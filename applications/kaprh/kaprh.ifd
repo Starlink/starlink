@@ -790,6 +790,225 @@ iraf! {
       }
 }
 
+      action mosaic {
+         alias {mosa(ic)}
+
+         parameter number {
+            position 1
+            type _INTEGER
+            access READ
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Number of images to be put in a mosaic}
+            help "Give the total number of data arrays be to made into a mosaic data array (max. 20)"
+          }
+
+         parameter inpic1 {
+            type IMAGE
+            access READ
+            vpath PROMPT
+            ppath GLOBAL
+            association <-GLOBAL.DATA_ARRAY
+            prompt {Image to be added}
+            help "Name of the IMAGE structure containing the next 2-d data array to be added"
+          }
+
+         parameter inpic2 {
+            type IMAGE
+            access READ
+            vpath PROMPT
+            prompt {Image to be added}
+            help "Name of the IMAGE structure containing the next 2-d data array to be added"
+          }
+
+         parameter inpic3 {
+            type IMAGE
+            access READ
+            vpath PROMPT
+            prompt {Image to be added}
+            help "Name of the IMAGE structure containing the next 2-d data array to be added"
+          }
+
+         parameter inpic4 {
+            type IMAGE
+            access READ
+            vpath PROMPT
+            prompt {Image to be added}
+            help "Name of the IMAGE structure containing the next 2-d data array to be added"
+          }
+
+         parameter inpic5 {
+            type IMAGE
+            access READ
+            vpath PROMPT
+            prompt {Image to be added}
+            help "Name of the IMAGE structure containing the next 2-d data array to be added"
+          }
+
+         parameter inpic6 {
+            type IMAGE
+            access READ
+            vpath PROMPT
+            prompt {Image to be added}
+            help "Name of the IMAGE structure containing the next 2-d data array to be added"
+          }
+
+         parameter inpic7 {
+            type IMAGE
+            access READ
+            vpath PROMPT
+            prompt {Image to be added}
+            help "Name of the IMAGE structure containing the next 2-d data array to be added"
+          }
+
+         parameter inpic8 {
+            type IMAGE
+            access READ
+            vpath PROMPT
+            prompt {Image to be added}
+            help "Name of the IMAGE structure containing the next 2-d data array to be added"
+          }
+
+         parameter inpic9 {
+            type IMAGE
+            access READ
+            vpath PROMPT
+            prompt {Image to be added}
+            help "Name of the IMAGE structure containing the next 2-d data array to be added"
+          }
+
+         parameter inpic10 {
+            type IMAGE
+            access READ
+            vpath PROMPT
+            prompt {Image to be added}
+            help "Name of the IMAGE structure containing the next 2-d data array to be added"
+          }
+
+         parameter inpic11 {
+            type IMAGE
+            access READ
+            vpath PROMPT
+            prompt {Image to be added}
+            help "Name of the IMAGE structure containing the next 2-d data array to be added"
+          }
+
+         parameter inpic12 {
+            type IMAGE
+            access READ
+            vpath PROMPT
+            prompt {Image to be added}
+            help "Name of the IMAGE structure containing the next 2-d data array to be added"
+          }
+
+         parameter inpic13 {
+            type IMAGE
+            access READ
+            vpath PROMPT
+            prompt {Image to be added}
+            help "Name of the IMAGE structure containing the next 2-d data array to be added"
+          }
+
+         parameter inpic14 {
+            type IMAGE
+            access READ
+            vpath PROMPT
+            prompt {Image to be added}
+            help "Name of the IMAGE structure containing the next 2-d data array to be added"
+          }
+
+         parameter inpic15 {
+            type IMAGE
+            access READ
+            vpath PROMPT
+            prompt {Image to be added}
+            help "Name of the IMAGE structure containing the next 2-d data array to be added"
+          }
+
+         parameter inpic16 {
+            type IMAGE
+            access READ
+            vpath PROMPT
+            prompt {Image to be added}
+            help "Name of the IMAGE structure containing the next 2-d data array to be added"
+          }
+
+         parameter inpic17 {
+            type IMAGE
+            access READ
+            vpath PROMPT
+            prompt {Image to be added}
+            help "Name of the IMAGE structure containing the next 2-d data array to be added"
+          }
+
+         parameter inpic18 {
+            type IMAGE
+            access READ
+            vpath PROMPT
+            prompt {Image to be added}
+            help "Name of the IMAGE structure containing the next 2-d data array to be added"
+          }
+
+         parameter inpic19 {
+            type IMAGE
+            access READ
+            vpath PROMPT
+            prompt {Image to be added}
+            help "Name of the IMAGE structure containing the next 2-d data array to be added"
+          }
+
+         parameter inpic20 {
+            type IMAGE
+            access READ
+            vpath PROMPT
+            prompt {Image to be added}
+            help "Name of the IMAGE structure containing the next 2-d data array to be added"
+          }
+
+         parameter xoffset {
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {x offset of the array from the first}
+            help "Give the x offset in pixels of the current data array from the first data array input"
+          }
+
+         parameter yoffset {
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {y offset of the array from the first}
+            help "Give the y offset in pixels of the current data array from the first data array input"
+          }
+
+         parameter outpic {
+            type IMAGE
+            access WRITE
+            vpath PROMPT
+            association ->GLOBAL.DATA_ARRAY
+            prompt {Mosaic image}
+            help "Name given to the IMAGE structure to hold the mosaic data array"
+          }
+
+         parameter otitle {
+            type _CHAR
+            vpath DEFAULT
+            prompt {Title for output image}
+            default {KAPPA - Mosaic}
+            help "Character string used as a title for the output IMAGE structure."
+          }
+
+         parameter average {
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            prompt {Are overlapped input pixels to be averaged in the output array?}
+            help "Input pixels may be occupy the same position in the output array. So output pixels can be averaged or summed"
+            default TRUE
+          }
+
+      }
+
       action quilt {
          alias {quil(t)}
 

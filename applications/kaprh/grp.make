@@ -14,19 +14,19 @@ KAPRH_SOURCE = kaprh.csh kaprh_link_adam kaprh.icl kaprh.hlp kaprh_mon.f
 # The contents of the kaprh_iraf.tar file:
 KAPRH_IRAF = doc helpdb.mip kaprh.hd  kaprh.par kaprh_mon.ifl root.hd \
 _kaprh.hd kaprh.cl  kaprh.men kaprh_mon.tcl greyplot.par contover.par \
-quilt.par snapshot.par turbocont.par inspect.par
+mosaic.par quilt.par snapshot.par turbocont.par inspect.par
 
 #  Contents of the doc/ directory in kaprh_iraf.tar
-IRAF_DOCS = greyplot.hlp contover.hlp quilt.hlp snapshot.hlp turbocont.hlp \
+IRAF_DOCS = greyplot.hlp contover.hlp mosaic.hlp quilt.hlp snapshot.hlp turbocont.hlp \
 inspect.hlp
 
 # The contents of the kaprh_ifls.tar file:
 KAPRH_IFLS = greyplot.ifl krhhelp.ifl kaprh_mon.ifl contover.ifl \
-quilt.ifl snapshot.ifl turbocont.ifl inspect.ifl
+mosaic.ifl quilt.ifl snapshot.ifl turbocont.ifl inspect.ifl
 
 # The contents of the kaprh_sub.tar file:
-KAPRH_SUB = greyplot.f krhhelp.f contover.f quilt.f snapshot.f turbocont.f \
-inspect.f
+KAPRH_SUB = greyplot.f krhhelp.f contover.f mosaic.f quilt.f snapshot.f \
+turbocont.f inspect.f
 
 # The source RCS files needed to create the kapsub_sub.tar file:
 KAPSUB_SOURCES = $(KAPSUB_NONGEN) $(KAPSUB_GEN)

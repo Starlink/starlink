@@ -59,7 +59,7 @@ log10.par pow.par kappa.par kstest.par laplace.par permaxes.par \
 linplot.par logar.par loge.par look.par lucy.par lutable.par lutflip.par \
 luthilite.par lutread.par lutrot.par lutsave.par luttweak.par lutview.par \
 makesurface.par manic.par maths.par median.par mem2d.par mlinplot.par \
-mosaic.par mstats.par mult.par native.par ndfcopy.par ndftrace.par \
+mstats.par mult.par native.par ndfcopy.par ndftrace.par \
 noglobals.par nomagic.par normalize.par numb.par outset.par ovclear.par \
 ovset.par paldef.par palentry.par palread.par palsave.par parget.par \
 paste.par piccur.par picdef.par picempty.par picentire.par picgrid.par \
@@ -101,7 +101,7 @@ lutbgyrw.hlp lutwarm.hlp lutcol.hlp lutcont.hlp lutfc.hlp lutflip.hlp lutgrey.hl
 lutheat.hlp luthilite.hlp lutikon.hlp lutneg.hlp lutramps.hlp lutread.hlp \
 lutrot.hlp lutsave.hlp lutspec.hlp lutview.hlp luttweak.hlp lutzebra.hlp \
 makesurface.hlp manic.hlp maths.hlp median.hlp mem2d.hlp mlinplot.hlp \
-mosaic.hlp mstats.hlp mult.hlp native.hlp ndfcopy.hlp ndftrace.hlp \
+mstats.hlp mult.hlp native.hlp ndfcopy.hlp ndftrace.hlp \
 ndf_history.hlp ndf_sections.hlp noglobals.hlp nomagic.hlp normalize.hlp \
 numb.hlp outset.hlp pow.hlp ovclear.hlp ovset.hlp paldef.hlp palentry.hlp \
 palread.hlp palsave.hlp parameters.hlp parget.hlp paste.hlp picbase.hlp \
@@ -138,7 +138,7 @@ div.ifl errclip.ifl expon.ifl ffclean.ifl permaxes.ifl \
 fillbad.ifl fitsurface.ifl flip.ifl fourier.ifl gausmooth.ifl glitch.ifl \
 globals.ifl histat.ifl histeq.ifl histogram.ifl kaphelp.ifl laplace.ifl \
 kstest.ifl logar.ifl look.ifl lucy.ifl manic.ifl \
-makesurface.ifl maths.ifl median.ifl mosaic.ifl mstats.ifl mult.ifl \
+makesurface.ifl maths.ifl median.ifl mstats.ifl mult.ifl \
 noglobals.ifl nomagic.ifl normalize.ifl numb.ifl outset.ifl parget.ifl \
 paste.ifl pixdupe.ifl pow.ifl psf.ifl rift.ifl rotate.ifl \
 segment.ifl setmagic.ifl shadow.ifl slide.ifl sqorst.ifl stats.ifl \
@@ -169,7 +169,7 @@ convolve.f creframe.f csub.f kap_div.f errclip.f expon.f collapse.f \
 ffclean.f fillbad.f fitsurface.f flip.f fourier.f gausmooth.f glitch.f \
 globals.f histat.f histeq.f histogram.f kaphelp.f laplace.f permaxes.f \
 kstest.f logar.f look.f lucy.f manic.f makesurface.f maths.f \
-median.f mosaic.f mstats.f mult.f noglobals.f nomagic.f normalize.f \
+median.f mstats.f mult.f noglobals.f nomagic.f normalize.f \
 numb.f outset.f parget.f paste.f pixdupe.f kap_pow.f psf.f rift.f \
 rotate.f segment.f setmagic.f shadow.f slide.f sqorst.f stats.f sub.f \
 substitute.f surfit.f thresh.f trandat.f traninvert.f tranjoin.f \

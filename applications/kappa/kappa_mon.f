@@ -316,11 +316,6 @@
          ELSE IF ( NAME .EQ. 'MEDIAN' ) THEN
             CALL MEDIAN ( STATUS )
 
-*  Merges several non-congruent 2-d data arrays into one output data
-*  array.
-         ELSE IF ( NAME .EQ. 'MOSAIC' ) THEN
-            CALL MOSAIC ( STATUS )
-
 *  Does cumulative statistics on a 2-d sub-array over a sequence of
 *  2-d data arrays.
          ELSE IF ( NAME .EQ. 'MSTATS' ) THEN

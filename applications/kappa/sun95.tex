@@ -11409,8 +11409,6 @@ Martin Shaw.  Mike Lawden helped produce the quick-reference card.
  Performs a Maximum-Entropy deconvolution of a 2-dimensional NDF.}
 \menuitem{MLINPLOT}{
  Draws a multi-line plot of a 2-d NDF's data values against their axis co-ordinates.}
-\menuitem{MOSAIC}{
- Merges several non-congruent  2-d data arrays into one output data array.}
 \menuitem{MSTATS}{
  Does cumulative statistics on  a 2-d sub-array over a sequence of data arrays.}
 \menuitem{MULT}{
@@ -11880,8 +11878,6 @@ functions as follows.
  Produce a colour composite image from 1, 2 or 3 individual NDFs.
 \classitem{KSTEST}
  Compares data sets using the Kolmogorov-Smirnov test.
-\classitem{MOSAIC}
- Merges several non-congruent 2-d data arrays into one output data array.
 \classitem{NORMALIZE}
  Normalises one NDF to a similar NDF by calculating a scale factor and zero
  difference.
@@ -29628,60 +29624,6 @@ Click \htmladdnormallink{here}{mlinplot_exam.gif} to see an example
 plot (9k).
 \end{htmlonly}
 
-\manroutine {{\manheadstyle{MOSAIC}}}{ Merges several non-congruent
-  2-d data arrays into one output data array.}
-\begin{manroutinedescription}
-\manroutineitem {Description }{}
-  Up to 20 non-congruent 2-d data arrays may be input, along with
-  their relative offsets from the first data array, and these are
-  then made into a mosaic into one (usually larger) output 2-d data
-  array. Where the frames overlap, either the mean value or just the
-  sum is inserted into the output data array. Normally averaging is
-  performed. All data arrays are stored in {\mantt{IMAGE}} structures.
-
-  The magic-value method is used for processing bad data.  Bad
-  pixels are excluded from the averaging in overlap areas. Output
-  pixels that have been mapped or correspond to one or more input
-  arrays, yet have no good pixels contributing, are set to bad.
-  Pixels in the output data array not mapped by any of the input
-  arrays are set to zero.
-
-\manroutineitem {Invocation }{}
-  MOSAIC
-
-\manroutineitem {Parameters }{}
-\begin{manparametertable}
-\manparameterentry {{\mantt{READ}} }{{\mantt{NUMBER}}  }{{\mantt{\_INTEGER}}}
-  Number of data arrays to be merged.
-\manparameterentry {{\mantt{READ}} }{{\mantt{AVERAGE}}  }{{\mantt{\_LOGICAL}}}
-  If true overlap regions are averaged, alternatively, they are
-  summed.  \mbox{{\mantt [TRUE]}}
-\manparameterentry {{\mantt{READ}} }{{\mantt{INPIC}}{$n$}  }{{\mantt{IMAGE}}}
-  {$n^{\rm th}$} {\mantt{IMAGE}} structure containing a data array to be a
-  constituent of a mosaic.
-\manparameterentry {{\mantt{WRITE}} }{{\mantt{OUTPIC}}  }{{\mantt{IMAGE}}}
-  Output {\mantt{IMAGE}} structure containing the merged data array.
-\manparameterentry {{\mantt{READ}} }{{\mantt{OTITLE}}  }{{\mantt{\_CHAR}}}
-  Title for the output {\mantt{IMAGE}} structure. \mbox{{\mantt ['KAPPA - Mosaic']}}
-\end{manparametertable}
-\begin{manparametertable}
-\manparameterentry {{\mantt{READ}} }{{\mantt{XOFFSET}} }{{\mantt{\_INTEGER}}}
-  {$x$} offset of {$n^{\rm th}$} data array from the first, in the sense of the
-  {$x$} origin of the {$n^{\rm th}$} data array minus the {$x$} origin of the
-  first.
-\manparameterentry {{\mantt{READ}} }{{\mantt{YOFFSET}} }{{\mantt{\_INTEGER}}}
-  {$y$} offset of {$n^{\rm th}$} data array from the first, in the sense of the
-  {$y$} origin of the {$n^{\rm th}$} data array minus the {$y$} origin of the
-  first.
-\end{manparametertable}
-\manroutineitem {Bugs }{}
-  None known.
-
-\manroutineitem {Authors }{}
-  Mark McCaughrean UoE ( {\mantt REVA}::{\mantt MJM} )
-  Malcolm J. Currie ~STARLINK \mbox{( {\mantt RAL}::{\mantt CUR} )}
-\end{manroutinedescription}
-
 \manroutine {{\manheadstyle{MSTATS}}}{ Does cumulative statistics on
   a 2-d sub-array over a sequence of data arrays.}
 \begin{manroutinedescription}
@@ -44180,6 +44122,7 @@ CLEAR to ``N''.
 \item [GREYPLOT] Use \htmlref{DISPLAY}{DISPLAY} instead setting parameter
 KEY to ``Y''.
 \item [INSPECT] Use \GAIAref\ instead.
+\item [MOSAIC] Use \CCDPACKref\ makemos instead.
 \item [QUILT] Use \CCDPACKref\ makemos instead.
 \item [SNAPSHOT] Use a commonly available utility such as {\tt xv} instead.
 \item [TURBOCONT] Use \htmlref{CONTOUR}{CONTOUR} instead.
@@ -44488,8 +44431,6 @@ functions as follows.
  Produce a colour composite image from 1, 2 or 3 individual NDFs.
 \classitem{KSTEST}
  Compares data sets using the Kolmogorov-Smirnov test.
-\classitem{MOSAIC}
- Merges several non-congruent 2-d data arrays into one output data array.
 \classitem{NORMALIZE}
  Normalises one NDF to a similar NDF by calculating a scale factor and zero
  difference.

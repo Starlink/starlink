@@ -551,7 +551,7 @@ histat.f histeq.f histogram.f \
 laplace.f kstest.f \
 logar.f look.f lucy.f manic.f \
 makesurface.f maths.f median.f \
-mosaic.f mstats.f mult.f noglobals.f nomagic.f \
+mstats.f mult.f noglobals.f nomagic.f \
 normalize.f numb.f outset.f parget.f paste.f \
 permaxes.f pixdupe.f psf.f rift.f \
 rotate.f segment.f setmagic.f shadow.f slide.f \
@@ -2733,7 +2733,6 @@ mem2d.o:	 SAE_PAR PRM_PAR NDF_PAR NDF_ERR PAR_ERR C1_COM ME_COM
 mfnext.o:	 SAE_PAR DAT_PAR
 mfopen.o:	 SAE_PAR DAT_PAR
 mlinplot.o:	 SAE_PAR AST_PAR NDF_PAR PRM_PAR PAR_ERR
-mosaic.o:	 SAE_PAR DAT_PAR PAR_ERR
 moscad.o:	 SAE_PAR PRM_PAR
 moscdv.o:	 SAE_PAR PRM_PAR
 mstats.o:	 SAE_PAR DAT_PAR PAR_ERR

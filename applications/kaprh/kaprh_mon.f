@@ -118,6 +118,9 @@
          ELSE IF ( NAME .EQ. 'KRHHELP' ) THEN
             CALL KRHHELP ( STATUS )
 
+         ELSE IF ( NAME .EQ. 'MOSAIC' ) THEN
+            CALL MOSAIC ( STATUS )
+
          ELSE IF ( NAME .EQ. 'QUILT' ) THEN
             CALL QUILT ( STATUS )
 
