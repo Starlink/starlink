@@ -1,0 +1,5 @@
+1998-07-04  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* Task.pm (obeyw): Check to see whether @_ is there before
+	shifting (protects -w)
+
