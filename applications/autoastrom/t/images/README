@@ -1,0 +1,91 @@
+
+Notes on the test images
+========================
+
+
+cat320421.sdf
+-------------
+
+Has AST WCS info, but a slightly corrupt FITS extension (a SKEW card
+has two values in it).  No important defects.  One very bright source
+near the edge.
+
+   Shape:
+      No. of dimensions:  2
+      Dimension size(s):  353 x 353
+      Pixel bounds     :  1:353, 1:353
+      Total pixels     :  124609
+
+WCS info seems odd.  There's an AXIS frame, which reports the first
+pixel centre as being at (261.8786, 74.4498), which appears to be a
+duplicate of the axis _attributes_ (is that what the AXIS domain
+means, I forget?), but the SKY frame has the first pixel centre at
+(9:13:04.5, 29:20:23).  Neither shows up in Gaia in the ra-dec boxes,
+but you _can_ plot the coordinate grid (and it's quite skew); from
+that plot, the centre appears to be at about (9:13:00, 28:50:00).
+
+
+r106280.sdf
+-----------
+
+   Shape:
+      No. of dimensions:  2
+      Dimension size(s):  2048 x 4097
+      Pixel bounds     :  1:2048, 1:4097
+      Total pixels     :  8390656
+
+Centre at (17:27:09.533, 74:20:07.88)
+
+Has AST WCS info (grid, pixel, axis, sky domains).  No important
+defects, but several heavily overexposed sources, with horizontal
+trails.
+
+The WCS information corresponding to this (obtained by using
+autoastrom with `--obsdata=ra=17:27:09.533,dec=74:20:07.88,scale=0.33
+--match=match') is in r106280-wcs.sdf
+
+
+
+r106281.sdf
+-----------
+
+Same size and shape.  No SKY frame, but four extra frames (domains:
+CCD_WCSEDIT, UNDISTORT, MOS1, CCD_REG), added by WCSEDIT and REGISTER.
+
+Sparse line of defects along edge x=1; a few overexposed sources,
+including one which has a trail vertically across half the CCD.
+
+
+r106282.sdf
+-----------
+
+Same set of frames as above.
+
+Substantial background, higher at the bottom than at the top; some
+overexposed sources.  Defects galore: a triangle in the bottom left,
+rows of single-pixel defects around x=357, 465, 1229 (monster), 1245,
+and a wierd splodge at (1245, 2829).
+
+
+r106283.sdf
+-----------
+
+Same set of frames.  No monster defects, but a few overexposed objects
+with long vertical trails.
+
+
+south.sdf
+---------
+
+   Shape:
+      No. of dimensions:  2
+      Dimension size(s):  353 x 353
+      Pixel bounds     :  1:353, 1:353
+      Total pixels     :  124609
+
+First pixel centre at (10:00:23.1, -30:05:00)
+
+WCS info: GRID, PIXEL, AXIS and SKY frames (and the AXIS and SKY
+frames appear to agree).  Southern hemisphere.  Not many defects;
+highish background.  Odd FITS card: SKEW, with two values, as for
+cat320421.sdf.
