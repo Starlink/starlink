@@ -43,8 +43,11 @@ Description:
    Normally, the new coordinate systems will be attached to the
    images with which the lists are associated, but if the lists are
    not associated with images then they can be attached to a named
-   list of images, or a single named one.  The TRANNDF program can
-   use the attached coordinate systems to resample images.
+   list of images, or a single named one.  The new coordinate system
+   is a copy of the Pixel coordinate system of the refernce image,
+   and so is guaranteed to be a sensible one in which to resample.
+   The resampling can be done by TRANNDF.
+
 
 Parameters
 

@@ -50,8 +50,10 @@
 *     Normally, the new coordinate systems will be attached to the
 *     NDFs with which the lists are associated, but if the lists are
 *     not associated with NDFs then they can be attached to a named 
-*     list of NDFs, or a single named one.  The TRANNDF program can 
-*     use the attached coordinate systems to resample NDFs.
+*     list of NDFs, or a single named one.  The new coordinate system
+*     is a copy of the Pixel coordinate system of the refernce image,
+*     and so is guaranteed to be a sensible one in which to resample.
+*     The resampling can be done by TRANNDF.
 
 *  Usage:
 *     register inlist fittype refpos
@@ -476,15 +478,17 @@
 *        Replaced use of IRH/IRG with GRP/NDG.
 *     22-FEB-2001 (MBT):
 *        Upgraded for use with Sets.
-*     21-MAR-2001 (MBT):
-*        Modified so that the registration frame added is a copy of the
-*        relevant frame of the reference NDF, rather than a virgin frame.
-*        Thus, inter alia, the new CCD_REG frame can now be a SkyFrame.
+*     12-APR-2001 (MBT):
+*        Modified back again so that the CCD_REG frame is a copy of the
+*        reference NDF's pixel frame.  This is the second time I've
+*        changed it to do this and changed it back again.  This is
+*        the right way to do it! (so that the CCD_REG frame is guaranteed
+*        suitable for resampling), don't be tempted to change it back
+*        to a copy of the Current frame again.
 *     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
-
 *-
 
 *  Type Definitions:
@@ -946,6 +950,14 @@
          IF ( STATUS .EQ. SAI__OK ) THEN
             DO 7 I = 1, NSUP
                CALL CCD1_LNMAP( TR( 1, I ), MAPTFM( I ), STATUS )
+
+*  If necessary convert these mappings from the Current to the pixel
+*  frame of the reference NDF.
+               IF ( USEWCS ) THEN
+                  MAPTFM( I ) = AST_CMPMAP( MAPTFM( I ), MAPCP,
+     :                                      .TRUE., ' ', STATUS )
+                  MAPTFM( I ) = AST_SIMPLIFY( MAPTFM( I ), STATUS )
+               END IF
  7          CONTINUE
          END IF
 
@@ -1242,6 +1254,14 @@
      :                          INVVAL, FULL, SIMPFI, SIMPIF, 
      :                          MAPTFM( I ), STATUS )
             END IF
+
+*  If necessary convert these mappings from the Current to the pixel
+*  frame of the reference NDF.
+            IF ( USEWCS ) THEN
+               MAPTFM( I ) = AST_CMPMAP( MAPTFM( I ), MAPCP, .TRUE.,
+     :                                   ' ', STATUS )
+               MAPTFM( I ) = AST_SIMPLIFY( MAPTFM( I ), STATUS )
+            END IF
  8       CONTINUE
       END IF
 
@@ -1262,27 +1282,6 @@
          END DO
       END IF
 
-*  Generate a new frame to add to the WCS frameset.  If we are using
-*  NDFs it will be a copy of the Current or PIXEL frame from the 
-*  reference NDF.
-      IF ( NDFS ) THEN
-         CALL NDG_NDFAS( NDFGR, IPREF, 'READ', ID, STATUS )
-         CALL CCD1_GTWCS( ID, IWCS, STATUS )
-         CALL NDF_ANNUL( ID, STATUS )
-         IF ( USEWCS ) THEN
-            JREG = AST__CURRENT
-         ELSE
-            CALL CCD1_FRDM( IWCS, 'Pixel', JREG, STATUS )
-         END IF
-         FRREG = AST_GETFRAME( IWCS, JREG, STATUS )
-
-*  Not using NDFs: the registration frame will be a plain 2-dimensional
-*  frame.
-      ELSE
-         FRREG = AST_FRAME( 2, ' ', STATUS )
-      END IF
-      CALL AST_SETC( FRREG, 'Title', 'Alignment by REGISTER', STATUS )
-
 *  Loop through each NDF which had an associated position list.
       DO 9 I = 1, NOPEN
 
@@ -1296,8 +1295,11 @@
             CALL CHR_PUTI( I, DMN, IAT )
          END IF
 
-*  Write the correct domain to the registration frame.
+*  Generate a new frame to add to the WCS frameset.
+         FRREG = AST_FRAME( 2, ' ', STATUS )
          CALL AST_SETC( FRREG, 'Domain', DMN( 1:IAT ), STATUS )
+         CALL AST_SETC( FRREG, 'Title', 'Alignment by REGISTER',
+     :                  STATUS )
 
 *  If we are putting frames into each NDF, open the right one here and
 *  get its frameset identifier.
@@ -1401,7 +1403,7 @@
 
 *  If the Set alignment frame exists, add the registration frame using
 *  the mapping between Set alignment frame and registration frame for
-*  another memeber of the same Set.  Otherwise, add nothing.
+*  another member of the same Set.  Otherwise, add nothing.
             IF ( JSET .NE. AST__NOFRAME ) THEN
                CALL AST_ADDFRAME( IWCS, JSET, MAPSET( L ), FRREG,
      :                            STATUS )
