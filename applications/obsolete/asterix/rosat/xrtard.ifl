@@ -1,0 +1,91 @@
+interface xrtard
+
+  parameter ROOTNAME
+    position 1
+    type '_CHAR'
+    ppath 'CURRENT'
+    prompt 'Rootname of datafile'
+    help 'Enter name of files without the extension'
+  endparameter
+
+  parameter ARDFILE
+    position 2
+    type '_CHAR'
+    ppath 'CURRENT'
+    prompt 'Name of output text file'
+    help 'Will contain a description of regions'
+  endparameter
+
+  parameter TIMRANGE
+    position 3
+    type '_CHAR'
+    default 'xrt_times.lis'
+    ppath 'CURRENT'
+    prompt 'Time ranges'
+    help 'e.g. 130.6:140.7 or M47890.4:M47891.0 or TIMES.DAT'
+  endparameter
+
+  parameter SRCLIST
+    position 4
+    type '_CHAR'
+    default 'srclist'
+    ppath 'CURRENT'
+    prompt 'Source search results file'
+    help 'Output results file from PSS'
+  endparameter
+
+  parameter ENERGY
+    position 5
+    type '_REAL'
+    default 0.9
+    ppath 'CURRENT'
+    prompt 'Mean photon energy (keV)'
+    help 'e.g. 0.9'
+  endparameter
+
+  parameter PFRAC
+    position 6
+    type '_REAL'
+    default 0.95
+    ppath 'CURRENT'
+    prompt 'Fraction of counts'
+    help 'Fraction of counts to take the PSF out to, e.g. 0.95'
+  endparameter
+
+  parameter NEW
+    type '_LOGICAL'
+    default NO
+    vpath 'DEFAULT, NOPROMPT'
+  endparameter
+
+  parameter MODE
+    type '_CHAR'
+    default 'C'
+    vpath 'DEFAULT, NOPROMPT'
+  endparameter
+
+  parameter OUTSIDE
+    type '_LOGICAL'
+    default NO
+    vpath 'DEFAULT, NOPROMPT'
+  endparameter
+
+  parameter DOPLOT
+    type '_LOGICAL'
+    default NO
+    vpath 'DEFAULT, NOPROMPT'
+  endparameter
+
+  parameter EXTRA_WIDTH
+    type '_REAL'
+    default 0.04
+    vpath 'DEFAULT, NOPROMPT'
+  endparameter
+
+  parameter ATTFIL
+    type '_CHAR'
+    vpath 'INTERNAL'
+    ppath 'DEFAULT'
+  endparameter
+
+endinterface
