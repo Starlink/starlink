@@ -42,17 +42,22 @@ for name in $filelist
 do
 	echo -n "$name... "
 	sh $name >$name.stdout 2>$name.stderr
+	testval=$?
 
-	if [ -r "$name.correct" ]; then
-		diff $name.correct $name.stdout >$name.diff
-		rval=$?
-		if [ $rval != 0 ]; then
-			echo "failed (results in $name.diff)"
-			nfailures=`expr $nfailures + 1`
-		else
-			echo "ok"
-			$deletetemp && rm $name.diff $name.stdout $name.stderr
-		fi
+	if [ $testval != 0 ]; then
+	    echo "failed (exited with error status $testval)"
+	    nfailures=`expr $nfailures + 1`
+	    $deletetemp && rm $name.stdout $name.stderr
+	elif [ -r "$name.correct" ]; then
+	    diff $name.correct $name.stdout >$name.diff
+	    rval=$?
+	    if [ $rval != 0 ]; then
+		echo "failed (results in $name.diff)"
+		nfailures=`expr $nfailures + 1`
+	    else
+		echo "ok"
+		$deletetemp && rm $name.diff $name.stdout $name.stderr
+	    fi
 	else
 		echo "apparently OK, but no correct results to compare"
 		mv $name.stdout $name.correct

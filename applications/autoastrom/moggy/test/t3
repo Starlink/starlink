@@ -1,4 +1,6 @@
 make t3.run >/dev/null 2>&1
+test $? = 0 || exit 1
+
 run=./t3.run
 
 $run "hello there"
@@ -8,3 +10,5 @@ $run "  one"
 $run one:two:three :
 $run :one::two::three::: :
 $run one=two*three=*four "=*"
+
+exit 0
