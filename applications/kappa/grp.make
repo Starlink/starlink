@@ -275,7 +275,7 @@ kps1_agnch.f kps1_agndw.f kps1_agnwc.f kps1_look1.f kps1_look2.f
 
 # The contents of the kapview_sub.tar file:
 KAPVIEW_SUB = ardplot.f contour.f cursor.f drawsig.f display.f \
-elprof.f gdclear.f gdset.f gdstate.f idclear.f \
+elprof.f gdclear.f gdnames.f gdset.f gdstate.f idclear.f \
 idset.f idstate.f linplot.f lutable.f \
 lutsave.f lutview.f mlinplot.f \
 ovclear.f ovset.f paldef.f palentry.f palread.f palsave.f piccur.f \
@@ -283,7 +283,7 @@ picdef.f picempty.f picentire.f picin.f piclabel.f piclist.f picsel.f \
 pictrans.f picvis.f scatter.f vecplot.f colcomp.f
 
 # The contents of the kapgks_sub.tar file:
-KAPGKS_SUB = crelut.f gdnames.f idinvisible.f idpazo.f \
+KAPGKS_SUB = crelut.f idinvisible.f idpazo.f \
 lutflip.f luthilite.f lutrot.f luttweak.f 
 
 # The contents of the ndfpack_sub.tar file:
