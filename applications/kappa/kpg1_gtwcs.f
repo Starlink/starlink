@@ -45,6 +45,9 @@
 *  History:
 *     16-JUL-1998 (DSB):
 *        Original version.
+*     9-DEC-1998 (DSB):
+*        Modified to ignore un-usable WCS information read from an IRAS90 
+*        astrometry structure, or a FITS extension.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -98,6 +101,7 @@
       INTEGER PNTR               ! Pointer to mapped array of FITS headers
       LOGICAL FLAG               ! Was group expression flagged? (NO)
       LOGICAL THERE              ! Does object exist?
+      LOGICAL VERB               ! Give verbose warnings about bad IRAS90/FITS?
       LOGICAL WRACC              ! Can the supplied NDF be modified?
 *.
 
@@ -136,7 +140,7 @@
          CALL IRA_FIND( INDF, THERE, XNAME, ASNAME, XLOC, STATUS )
 
 *  If an IRA structure was found...
-         IF( THERE ) THEN
+         IF( THERE .AND. STATUS .EQ. SAI__OK ) THEN
 
 *  Get an HDS locator for the astrometry structure.
             CALL DAT_FIND( XLOC, ASNAME, LOC, STATUS )
@@ -151,12 +155,6 @@
 *  Only proceed if both Mapping and Frame were produced.
             IF( IRAFRM .NE. AST__NULL .AND. IRAMAP .NE. AST__NULL ) THEN
 
-*  Warn the user.
-               CALL NDF_MSG( 'NDF', INDF )
-               CALL MSG_OUT( 'KPG1_GTWCS_MSG1', 'Reading WCS '//
-     :                       'information from an IRAS90 astrometry '//
-     :                       'structure in ''^NDF''.', STATUS )
-
 *  Get the default WCS FrameSet from the NDF.
                CALL NDF_GTWCS( INDF, IWCS, STATUS )
 
@@ -168,15 +166,49 @@
 *  "image" co-ords identical.
                CALL AST_ADDFRAME( IWCS, IPIX, IRAMAP, IRAFRM, STATUS )
 
-*  If the NDF can be modified, save the new FrameSet.
-               IF( WRACC ) CALL NDF_PTWCS( IWCS, INDF, STATUS )
-
             END IF
 
 *  Annul the locator to the IRA structure, and the IRA identifier.
             CALL IRA_ANNUL( IDA, STATUS )
             CALL DAT_ANNUL( LOC, STATUS )
             CALL DAT_ANNUL( XLOC, STATUS )
+
+*  If an error occurred, annul or flush it since failure to read WCS 
+*  information is probably not fatal.
+            IF( STATUS .NE. SAI__OK ) THEN
+
+*  Annul any FrameSet pointer.
+               IF( IWCS .NE. AST__NULL ) CALL AST_ANNUL( IWCS, STATUS )
+
+*  See if we are running in verbose mode.
+               CALL KPG1_VERB( VERB, STATUS )
+
+*  If we are, add a context message, and flush the error.
+               IF( VERB ) THEN
+                  CALL NDF_MSG( 'NDF', INDF )
+                  CALL ERR_REP( 'KPG1_GTWCS_ERR1', 'Ignoring '//
+     :                          'un-usable IRAS90 astrometry '//
+     :                          'information in ''^NDF''.', STATUS )
+                  CALL ERR_FLUSH( STATUS )
+
+*  Otherwise, annul the error message.
+               ELSE
+                  CALL ERR_ANNUL( STATUS )
+               END IF
+
+*  If the IRAS90 information was read succesfully, tell the user.
+            ELSE IF( IWCS .NE. AST__NULL ) THEN
+               CALL MSG_BLANK( STATUS )
+               CALL NDF_MSG( 'NDF', INDF )
+               CALL MSG_OUT( 'KPG1_GTWCS_MSG1', 'Using WCS '//
+     :                       'information read from an IRAS90 '//
+     :                       'astrometry structure in ''^NDF''.', 
+     :                       STATUS )
+
+*  If the NDF can be modified, save the new FrameSet.
+               IF( WRACC ) CALL NDF_PTWCS( IWCS, INDF, STATUS )
+
+            END IF
 
          END IF
 
@@ -262,23 +294,59 @@
 
                END IF
 
+*  Only proceed if no error has occurred. 
+               IF( STATUS .EQ. SAI__OK ) THEN
+
 *  Attempt to create a WCS component within the NDF selected above.
-               CALL FTS1_FTWCS( NCARD, %VAL( PNTR ), 1, INDFC, NENCOD, 
-     :                          ENCODS, STATUS, %VAL( 80 ) )
+                  CALL FTS1_FTWCS( NCARD, %VAL( PNTR ), 1, INDFC, 
+     :                             NENCOD, ENCODS, STATUS, %VAL( 80 ) )
+
+*  If an error occurred reading the FITS WCS information, annul or flush it
+*  since failure to read WCS information is probably not fatal. 
+                  IF( STATUS .NE. SAI__OK ) THEN
+
+*  See if we are running in verbose mode.
+                     CALL KPG1_VERB( VERB, STATUS )
+
+*  If we are, add a context message, and flush the error.
+                     IF( VERB ) THEN
+                        CALL NDF_MSG( 'NDF', INDF )
+                        CALL ERR_REP( 'KPG1_GTWCS_ERR2', 'Ignoring '//
+     :                                'un-usable WCS information in '//
+     :                                'the FITS extension of ''^NDF''.', 
+     :                                STATUS )
+                        CALL ERR_FLUSH( STATUS )
+
+*  Otherwise, annul the error.
+                     ELSE
+                        CALL ERR_ANNUL( STATUS )
+                     END IF
+
+*  Ensure the WCS component in the NDF is undefined.
+                     CALL NDF_RESET( INDFC, 'WCS', STATUS )
+
+*  If succesful...
+                  ELSE
 
 *  See if the NDF now has a defined WCS component.
-               CALL NDF_STATE( INDFC, 'WCS', THERE, STATUS )
+                     CALL NDF_STATE( INDFC, 'WCS', THERE, STATUS )
 
 *  If so, get it.
-               IF( THERE ) THEN
-                  CALL NDF_GTWCS( INDFC, IWCS, STATUS )
+                     IF( THERE ) THEN
+                        CALL NDF_GTWCS( INDFC, IWCS, STATUS )
 
 *  Warn the user.
-                  CALL NDF_MSG( 'NDF', INDF )
-                  CALL MSG_OUT( 'KPG1_GTWCS_MSG1', 'Reading WCS '//
-     :                          'information from the FITS extension '//
-     :                          'in ''^NDF''.', STATUS )
-               END IF         
+                        CALL MSG_BLANK( STATUS )
+                        CALL NDF_MSG( 'NDF', INDF )
+                        CALL MSG_OUT( 'KPG1_GTWCS_MSG1', 'Using WCS '//
+     :                                'information read from the FITS'//
+     :                                ' extension of ''^NDF''.', 
+     :                                STATUS )
+                     END IF         
+
+                  END IF
+
+               END IF
 
 *  If a temporary copy of the NDF was used, delete it.
                IF( .NOT. WRACC ) CALL NDF_DELET( INDFC, STATUS )
