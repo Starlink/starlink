@@ -17,9 +17,9 @@
       REAL R, RA( NR )
       DOUBLE PRECISION D, DA( ND )
       LOGICAL L, LA( NL )
-      BYTE B, BA ( NB )
+      INTEGER*1 B, BA ( NB )
       INTEGER*2 W, WA( NW )
-      BYTE UB, UBA ( NUB )
+      INTEGER*1 UB, UBA ( NUB )
       INTEGER*2 UW, UWA( NUW )
       CHARACTER * ( 10 ) C, CA( NC )
       CHARACTER * ( 1 ) CH
@@ -31,7 +31,7 @@
       DOUBLE PRECISION FD
       LOGICAL FL
       CHARACTER * (40) FC
-      BYTE FB, FUB
+      INTEGER*1 FB, FUB
       INTEGER*2 FW, FUW
       INTEGER PTR
 
