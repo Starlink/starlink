@@ -31,6 +31,10 @@
 *     5-OCT-2004 (DSB):
 *        Bug fix in astLoadPointSet - npoint was used as size for new array
 *        of pointers (changed to ncoord).
+*     19-OCT-2004 (DSB):
+*        Added astSetNpoint.
+*     2-NOV-2004 (DSB):
+*        Do not write out AST__BAD axis values in the Dump function.
 */
 
 /* Module Macros. */
@@ -96,6 +100,7 @@ static void Dump( AstObject *, AstChannel * );
 static void PermPoints( AstPointSet *, int, const int[] );
 static void SetAttrib( AstObject *, const char * );
 static void SetPoints( AstPointSet *, double ** );
+static void SetNpoint( AstPointSet *, int );
 static void SetSubPoints( AstPointSet *, int, int, AstPointSet * );
 
 /* Member functions. */
@@ -617,6 +622,7 @@ void astInitPointSetVtab_(  AstPointSetVtab *vtab, const char *name ) {
    vtab->GetPoints = GetPoints;
    vtab->PermPoints = PermPoints;
    vtab->SetPoints = SetPoints;
+   vtab->SetNpoint = SetNpoint;
    vtab->SetSubPoints = SetSubPoints;
 
 /* Save the inherited pointers to methods that will be extended, and
@@ -808,6 +814,54 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 
 /* Undefine macros local to this function. */
 #undef MATCH
+}
+
+static void SetNpoint( AstPointSet *this, int npoint ) {
+/*
+*+
+*  Name:
+*     astSetNpoint
+
+*  Purpose:
+*     Reduce the number of points in a PointSet.
+
+*  Type:
+*     Public virtual function.
+
+*  Synopsis:
+*     #include "pointset.h"
+*     void astSetNpoint( AstPointSet *this, int npoint )
+
+*  Class Membership:
+*     PointSet method.
+
+*  Description:
+*     This function reduces the number of points stored in a PointSet.
+*     Points with indices beyond the new size will be discarded. 
+
+*  Parameters:
+*     this
+*        Pointer to the PointSet.
+*     npoint
+*        The new value for the number of points in the PointSet. Must be
+*        less than or equal to the original size of the PointSet, and 
+*        greater than zero.
+*-
+*/
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Check the new size is valid. */
+   if( npoint < 1 || npoint > this->npoint ) {
+      astError( AST__NPTIN, "astSetNpoint(%s): Number of points (%d) is "
+                "not valid.", astGetClass( this ), npoint );
+      astError( AST__NPTIN, "Should be in the range 1 to %d.", this->npoint );
+
+/* Store the new size. */
+   } else {
+      this->npoint = npoint;
+   }
 }
 
 static void SetPoints( AstPointSet *this, double **ptr ) {
@@ -1289,6 +1343,7 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
    int coord;                    /* Loop counter for coordinates */
    int i;                        /* Counter for coordinate values */
    int ival;                     /* Integer value */
+   int makeComment;              /* Include a comment? */
    int point;                    /* Loop counter for points */
    int set;                      /* Attribute value set? */
    
@@ -1337,15 +1392,19 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 /* If it contains data, create a suitable keyword for each coordinate
    value in turn. */
    if ( this->ptr ) {
+      makeComment = 1;
       i = 0;
       for ( point = 0; point < this->npoint; point++ ) {
          for ( coord = 0; coord < this->ncoord; coord++ ) {
             i++;
             (void) sprintf( key, "X%d", i );
 
-/* Write the value out. Only supply a comment for the first value. */
-            astWriteDouble( channel, key, 1, 1, this->ptr[ coord ][ point ],
-                            ( i == 1 ) ? "Coordinate values..." : "" );
+/* Write the value out if good. Only supply a comment for the first good value. */
+            if( this->ptr[ coord ][ point ] != AST__BAD ) {
+               astWriteDouble( channel, key, 1, 1, this->ptr[ coord ][ point ],
+                               ( makeComment ) ? "Coordinate values..." : "" );
+               makeComment = 0;
+            }
          }
       }
    }
@@ -1861,6 +1920,10 @@ void astPermPoints_( AstPointSet *this, int forward, const int perm[] ) {
 void astSetPoints_( AstPointSet *this, double **ptr ) {
    if ( !astOK ) return;
    (**astMEMBER(this,PointSet,SetPoints))( this, ptr );
+}
+void astSetNpoint_( AstPointSet *this, int npoint ) {
+   if ( !astOK ) return;
+   (**astMEMBER(this,PointSet,SetNpoint))( this, npoint );
 }
 void astSetSubPoints_( AstPointSet *point1, int point, int coord,
                        AstPointSet *point2) {
