@@ -8065,6 +8065,7 @@ U java/source/topcat/src/main/uk/ac/starlink/topcat/ColumnInfoWindow.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/CustomComboBoxRenderer.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/HelpWindow.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/JELRowReader.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/LoadQueryWindow.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/MetaColumn.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/MetaColumnTableModel.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/MirageHandler.java
