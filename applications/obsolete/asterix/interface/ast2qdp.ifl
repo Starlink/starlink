@@ -12,8 +12,7 @@ interface AST2QDP
   parameter OUT
     type 'LITERAL'
     position 2
-    vpath 'CURRENT'
-    ppath 'CURRENT'
+    association '<->GLOBAL.OUT'
     prompt 'Output QDP data file'
     help 'QDP file containing data and commands'
   endparameter
