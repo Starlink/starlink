@@ -479,7 +479,7 @@
         CHARACTER*8		ADI2_MKIDX
 
 *  Local Variables:
-      CHARACTER*72		CMNT			! Keyword comment
+      CHARACTER*80		CMNT			! Keyword comment
       CHARACTER*6		MODE			! File access mode
       CHARACTER*20		SHDU			! Scanned HDU name
 
@@ -1063,7 +1063,7 @@ c     END IF
         CHARACTER*8		ADI2_MKIDX
 
 *  Local Variables:
-      CHARACTER*72		CMNT			! Comment
+      CHARACTER*80		CMNT			! Comment
       CHARACTER*8		CNAME			! Card name
       CHARACTER*8		KEYWRD			! Keyword name
       CHARACTER*15		TYPE			! Data type
