@@ -1,6 +1,15 @@
 	-- 
 	  catalog: SGML Open style entity catalogue for Starlink DTDs
 	  $Id$
+
+	  Keep the entries in this file normalised so that each entry
+	  is on a single line, the PUBLIC keyword at the beginning is
+	  in upper case, and the system id on those lines doesn't have
+	  quotes.  This is so that tools such as perlSGML, which have
+	  relatively simple catalogue parsers, don't get confused.
+	  The SYSTEM entry is an SP extension, and the SP
+	  documentation recommends that its sysid2 is quoted to avoid
+	  confusing tools which don't recognise it.
 	--
 
 SGMLDECL starlink.decl
@@ -34,8 +43,8 @@ PUBLIC "-//Starlink//DTD DSSSL Source Code 0.2//EN"	dssslcode-0.2.dtd
 --
 PUBLIC "-//Starlink//DTD tth equation list//EN"		tth-equations.dtd
 --
-SYSTEM "tth-equation-list"				tth-equations.dtd
-SYSTEM "img-eqlist"					img-eqlist.dtd
+SYSTEM "tth-equation-list"				"tth-equations.dtd"
+SYSTEM "img-eqlist"					"img-eqlist.dtd"
 
 	-- 
 	  OASIS exchange table model.
