@@ -1,17 +1,8 @@
 # Makefile for the various forms of ECHOMOP documentation.
-#
-# This is largely a slave makefile for the makefile in the parent directory.
-#
-# Parts of this (specifically the generation of the defects list) use
-# software installed only on Norman's machine, and so those parts are
-#
-#      NOT BUILDABLE AFTER DISTRIBUTION
-#
-# $Id$
+
 
 
 # Following might be overridden on the command line (by the parent makefile)
-PKG_NAME=echomop
 LATEX_DOCS=sun152.latex_tar
 HYPERTEXT_DOCS=sun152.htx_tar
 
@@ -36,7 +27,7 @@ sun152/sun152.htx/sun152.html: sun152/sun152.tex
 # `file', but at the risk of biting ourselves with excess cleverness.
 # It's not really a problem, since the distributions will typically be
 # built from exported copies of the repository rather than checked out ones.
-$(PKG_NAME)_hyper.tar: htmlhelp/intro.html
+echomop_hyper.tar: htmlhelp/intro.html
 	cd htmlhelp; tar cf ../$@ *
 
 
