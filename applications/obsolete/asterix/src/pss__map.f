@@ -40,12 +40,16 @@
 *    Status :
 *
       INTEGER                  STATUS                  ! Run-time error
+*
+*    Local Variables:
+*
+      INTEGER			BDID
 *-
 
-*    Check status
+*  Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Set prompt
+*  Set prompt
       CALL USI_PROMT( EPAR, EPROMPT, STATUS )
       MP_PAR = EPAR
       MP_ENVIR = .TRUE.
@@ -53,9 +57,10 @@
 
 *    Get output dataset
       IF ( MP_MODE .EQ. 'R' ) THEN
-        CALL USI_TASSOCI( EPAR, '*', 'READ', MP_ID, STATUS )
+        CALL USI_ASSOC( EPAR, 'BinDS|Array', 'READ', MP_ID, STATUS )
       ELSE
-        CALL USI_TASSOCO( EPAR, 'Image', MP_ID, STATUS )
+        CALL BDI_NEW( 'BinDS', 2, GR_DIMS, 'REAL', BDID, STATUS )
+        CALL USI_CREAT( EPAR, BDID, MP_ID, STATUS )
       END IF
       IF ( STATUS .NE. SAI__OK ) THEN
         IF ( (STATUS.EQ.PAR__NULL) .AND. NOK ) THEN
@@ -66,13 +71,13 @@
         GOTO 99
       END IF
 
-*    Generate map axes
+*  Generate map axes
       CALL PSS_MAP_SETUP( STATUS )
 
-*    Set map flag
+*  Set map flag
       MP_OK = ( STATUS .EQ. SAI__OK )
 
-*    Tidy up
+*  Tidy up
  99   IF ( STATUS .NE. SAI__OK ) THEN
         CALL AST_REXIT( 'PSS_MAP_ASSOC', STATUS )
       END IF
@@ -118,9 +123,6 @@
 
 *    Valid map?
       IF ( MP_OK ) THEN
-
-*      Free from BDI system
-        CALL BDI_RELEASE( MP_ID, STATUS )
 
 *      Environment map?
         IF ( MP_ENVIR ) THEN
@@ -330,29 +332,29 @@
       INTEGER                  STATUS                  ! Run-time error
 *-
 
-*    Check status
+*  Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Set prompt
+*  Set prompt
       CALL PSS_MAP_ASSOC( EPAR, 'Significance map', 'WRITE', .TRUE.,
      :                                                      STATUS )
       IF ( (STATUS.NE.SAI__OK) .OR. .NOT. MP_OK ) GOTO 99
 
-*    Write a title and units
-      CALL BDI_PUTUNITS( MP_ID, 'sigma', STATUS )
+*  Write a title and units
+      CALL BDI_PUT0C( MP_ID, 'Units', 'sigma', STATUS )
       IF ( CP_CASH ) THEN
         CALL PSS_MAP_TITLE( 'Cash significance map', STATUS )
       ELSE
         CALL PSS_MAP_TITLE( 'Gaussian significance map', STATUS )
       END IF
 
-*    Copy SMAP data to output
+*  Copy SMAP data to output
       CALL ARR_COP1R( GR_NELM, SMAP, %VAL(MP_DPTR), STATUS )
 
-*    Copy MORE box
-      CALL BDI_COPMORE( IM_ID, MP_ID, STATUS )
+*  Copy ancillaries
+      CALL UDI_COPANC( IM_ID, 'grf', MP_ID, STATUS )
 
-*    Pixel plot with colour bar
+*  Pixel plot with colour bar
       CALL GCB_LCONNECT( STATUS )
       CALL GCB_CLEAR( STATUS )
       CALL GCB_SETL( 'PIX_FLAG', .TRUE., STATUS )
@@ -361,10 +363,10 @@
       CALL GCB_FSAVE( MP_ID, STATUS )
       CALL GCB_DETACH( STATUS )
 
-*    Release the dataset
+*  Release the dataset
       CALL PSS_MAP_CLOSE( STATUS )
 
-*    Tidy up
+*  Tidy up
  99   IF ( STATUS .NE. SAI__OK ) THEN
         CALL AST_REXIT( 'PSS_MAP_OUT', STATUS )
       END IF
@@ -599,17 +601,19 @@
 *
 *    Local variables :
 *
-      CHARACTER*80             HTEXT(5)                ! History text
-      CHARACTER*40             UNITS                   ! Axis units
+      CHARACTER*80              HTEXT(5)                ! History text
+      CHARACTER*40              UNITS                   ! Axis units
 
-      REAL                     TOR                     ! Axis conversion factor
+      REAL		  	 SPARR(2)		! Spaced axis data
+      REAL                      TOR                     ! Axis conversion factor
 
-      INTEGER                  DIM                     ! Axis dimension
-      INTEGER                  IAX                     ! Loop over axes
-      INTEGER                  HLINES                  ! History text used
-      INTEGER                  NDIM                    ! Input dimensionality
+      INTEGER			APTR			! Axis pointer
+      INTEGER                   IAX                     ! Loop over axes
+      INTEGER                   HLINES                  ! History text used
+      INTEGER                   NDIM                    ! Input dimensionality
 
-      LOGICAL                  OK                      ! Input map ok?
+      LOGICAL                   OK                      ! Input map ok?
+      LOGICAL			REG			! Input map axis reg?
 *-
 
 *    Check status
@@ -618,36 +622,35 @@
 *    Write mode?
       IF ( MP_MODE .EQ. 'W' ) THEN
 
-*      Create dataset mapping the current grid
-        CALL BDI_CREBDS( MP_ID, 2, GR_DIMS, .TRUE., .FALSE.,
-     :                                          .FALSE., STATUS )
-
-*      Set up axes to describe current grid
+*    Set up axes to describe current grid
         DO IAX = 1, 2
-          CALL BDI_PUTAXVAL( MP_ID, IAX, AXV(IAX,GR_A0(IAX)),
-     :              GR_DA(IAX)/AX_TOR(IAX), GR_DIMS(IAX), STATUS )
-          CALL BDI_PUTAXWID( MP_ID, IAX, ABS(GR_DA(IAX)/
-     :                              AX_TOR(IAX)), STATUS )
-          CALL BDI_COPAXTEXT( IM_ID, MP_ID, IAX, IAX, STATUS )
+          SPARR(1) = AXV(IAX,GR_A0(IAX))
+          SPARR(2) = GR_DA(IAX)/AX_TOR(IAX)
+          CALL BDI_AXPUT1R( MP_ID, IAX, 'SpacedData', 2, SPARR, STATUS )
+          CALL BDI_AXPUT0R( MP_ID, IAX, 'ScalarWidth',
+     :                      ABS(GR_DA(IAX)/AX_TOR(IAX)), STATUS )
+          CALL BDI_AXCOPY( IM_ID, IAX, 'Label,Units',
+     :                     MP_ID, IAX, STATUS )
         END DO
 
-*      Create some HISTORY
+*    Create some HISTORY
         CALL HSI_COPY( IM_ID, MP_ID, STATUS )
         CALL HSI_ADD( MP_ID, PSS__VERSION, STATUS )
 
-*      Bit more information
+*    Bit more information
         HTEXT(1) = 'Input dataset {INP}'
         HLINES = 5
         CALL USI_TEXT( 1, HTEXT, HLINES, STATUS )
         CALL HSI_PTXT( MP_ID, HLINES, HTEXT, STATUS )
 
-*      Copy MORE box
-        CALL BDI_COPMORE( IM_ID, MP_ID, STATUS )
+*    Copy ancillaries
+        CALL UDI_COPANC( IM_ID, 'grf', MP_ID, STATUS )
 
       ELSE
 
-*      Check dataset
-        CALL BDI_CHKDATA( MP_ID, OK, NDIM, GR_DIMS, STATUS )
+*    Check dataset
+        CALL BDI_CHK( MP_ID, 'Data', OK, STATUS )
+        CALL BDI_GETSHP( MP_ID, 2, GR_DIMS, NDIM, STATUS )
         GR_NELM = GR_DIMS(1)*GR_DIMS(2)
         IF ( .NOT. OK ) THEN
           CALL MSG_PRNT( '! Invalid significance map' )
@@ -655,18 +658,20 @@
           GOTO 99
         END IF
 
-*      Get axis info
+*    Get axis info
         DO IAX = 1, 2
 
-*        Get axis scales
-          CALL BDI_GETAXVAL( MP_ID, IAX, GR_A0(IAX),
-     :                          GR_DA(IAX), DIM, STATUS )
+*      Get axis scales
+          CALL BDI_AXMAPR( MP_ID, IAX, 'Data', 'READ', APTR, STATUS )
+          CALL ARR_CHKREG( %VAL(APTR), GR_DIMS(IAX), REG, GR_A0(IAX),
+     :                     GR_DA(IAX), STATUS )
+          CALL BDI_AXUNMAP( MP_ID, IAX, 'Data', APTR, STATUS )
 
-*        Get units and conversion factor
-          CALL BDI_GETAXUNITS( MP_ID, IAX, UNITS, STATUS )
+*      Get units and conversion factor
+          CALL BDI_AXGET0C( MP_ID, IAX, 'Units', UNITS, STATUS )
           CALL CONV_UNIT2R( UNITS, TOR, STATUS )
 
-*        Set grid data
+*      Set grid data
           GR_DA(IAX) = GR_DA(IAX) * TOR
           GR_A0(IAX) = GR_A0(IAX) * TOR
 
@@ -674,10 +679,10 @@
 
       END IF
 
-*    Map the map data
-      CALL BDI_MAPDATA( MP_ID, MP_MODE, MP_DPTR, STATUS )
+*  Map the map data
+      CALL BDI_MAPR( MP_ID, 'Data', MP_MODE, MP_DPTR, STATUS )
 
-*    Tidy up
+*  Tidy up
  99   IF ( STATUS .NE. SAI__OK ) THEN
         CALL AST_REXIT( 'PSS_MAP_SETUP', STATUS )
       END IF
@@ -734,7 +739,7 @@
         CALL MSG_MAKE( UTITLE, TEXT, TLEN )
 
 *      Write titl;e
-        CALL BDI_PUTTITLE( MP_ID, TEXT(:TLEN), STATUS )
+        CALL BDI_PUT0C( MP_ID, 'Title', TEXT(:TLEN), STATUS )
 
       END IF
 

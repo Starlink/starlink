@@ -38,23 +38,17 @@
       LOGICAL                  LAST                    ! Last input file?
 *-
 
-*    New error context
+*  New error context
       CALL ERR_BEGIN( STATUS )
 
-*    Unmap everything
-      CALL BDI_UNMAPDATA( IM_ID, STATUS )
-
-*    Free BDI resources
-      CALL BDI_RELEASE( IM_ID, STATUS )
-
-*    Close the file
+*  Close the file
       IF ( CP_MULTI ) THEN
         CALL ADI_FCLOSE( IM_ID, STATUS )
       ELSE
         CALL USI_ANNUL( 'INP', STATUS )
       END IF
 
-*    Restore error context
+*  Restore error context
       CALL ERR_END( STATUS )
 
       END
@@ -104,7 +98,6 @@
 *
       CHARACTER                PATH*80                 ! Object path
 
-      INTEGER                  NDIM, DIMS(ADI__MXDIM)
       INTEGER                  NLEV                    ! Useless TRACE output
 
       LOGICAL                  OK                      ! Validity checks
@@ -121,24 +114,21 @@
 
 *    Get background subtracted flag if present
       IF ( .NOT. IM_PRIM ) THEN
-        CALL BDI_CHKAST( IM_ID, OK, STATUS )
-        IF ( OK ) THEN
-          CALL PRF_GET( IM_ID, 'BGND_SUBTRACTED',
-     :                  IM_BGND_SUBTRACTED, STATUS )
-          IF ( IM_BGND_SUBTRACTED ) THEN
-            CALL MSG_PRNT( 'Image is background subtracted...' )
-          END IF
+        CALL PRF_GET( IM_ID, 'BGND_SUBTRACTED',
+     :                IM_BGND_SUBTRACTED, STATUS )
+        IF ( IM_BGND_SUBTRACTED ) THEN
+          CALL MSG_PRNT( 'Image is background subtracted...' )
         END IF
       END IF
 
 *    Check and map data
-      CALL BDI_CHKDATA( IM_ID, OK, BDS_NDIM, BDS_DIMS,STATUS )
-      CALL ARR_SUMDIM( BDS_NDIM, BDS_DIMS, BDS_NELM )
+      CALL BDI_CHK( IM_ID, 'Data', OK, STATUS )
+      CALL BDI_GETSHP( IM_ID, PSS__MXDIM, BDS_DIMS, BDS_NDIM, STATUS )
       IF ( .NOT. OK ) THEN
         STATUS = SAI__ERROR
         CALL ERR_REP( ' ', 'Invalid input data', STATUS )
       ELSE
-        CALL BDI_MAPDATA( IM_ID, 'READ', IM_DATA_PTR, STATUS )
+        CALL BDI_MAPR( IM_ID, 'Data', 'READ', IM_DATA_PTR, STATUS )
       END IF
 
 *    If not an image, check that the product of the higher dimensions
@@ -151,16 +141,17 @@
         END IF
       END IF
 
-*    Get data units
-      CALL BDI_GETUNITS( IM_ID, IM_UNITS, STATUS )
+*  Get data units
+      CALL BDI_GET0C( IM_ID, 'Units', IM_UNITS, STATUS )
       IF ( IM_UNITS .LE. ' ' ) IM_UNITS = 'count'
 
-*    Look for quality
-      CALL BDI_CHKQUAL( IM_ID, BDS_QUAL_OK, NDIM, DIMS, STATUS )
+*  Look for quality
+      CALL BDI_CHK( IM_ID, 'Quality', BDS_QUAL_OK, STATUS )
       IF ( BDS_QUAL_OK ) THEN
-        CALL BDI_MAPMQUAL( IM_ID, 'READ', BDS_QUAL_PTR, STATUS )
+        CALL BDI_MAP( IM_ID, 'MaskedQuality', 'UBYTE', 'READ',
+     :                BDS_QUAL_PTR, STATUS )
 
-*      Which way to use quality if present?
+*    Which way to use quality if present?
         IF ( BDS_QUAL_OK ) THEN
           CALL USI_GET0L( 'QBAD', CP_NOBADQSRC, STATUS )
         END IF
@@ -168,45 +159,44 @@
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    See if there's VARIANCE present
-      CALL BDI_CHKVAR( IM_ID, IM_VAR_OK, NDIM, DIMS, STATUS )
+*  See if there's VARIANCE present
+      CALL BDI_CHK( IM_ID, 'Variance', IM_VAR_OK, STATUS )
       IF ( IM_VAR_OK ) THEN
-        CALL BDI_MAPVAR( IM_ID, 'READ', IM_VAR_PTR, STATUS )
+        CALL BDI_MAPR( IM_ID, 'Variance', 'READ', IM_VAR_PTR, STATUS )
         CALL PSS_CHK_VAR( BDS_NELM, BDS_QUAL_OK,
      :                    BDS_QUAL_PTR, %VAL(IM_VAR_PTR), STATUS )
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Check axes
+*  Check axes
       CALL PSS_GET_AXES( STATUS )
 
-*    Only if first file
+*  Only if first file
       IF ( IFILE .EQ. 1 ) THEN
 
-*      PSF box sizes
+*    PSF box sizes
         CALL PSS_PSF_INIT( STATUS )
 
-*      Get slice
+*    Get slice
         CALL PSS_GET_SUBSET( STATUS )
 
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Get pointing info from header.
-      CALL BDI_CHKHEAD( IM_ID, OK, STATUS )
-      IF ( OK ) THEN
-        CALL WCI_GETIDS( IM_ID, GE_PIXID, GE_PRJID, GE_SYSID, STATUS )
-        GE_OK = (STATUS.EQ.SAI__OK)
+*  Get pointing info from header.
+      CALL WCI_GETIDS( IM_ID, GE_PIXID, GE_PRJID, GE_SYSID, STATUS )
+      IF ( STATUS .EQ. SAI__OK ) THEN
+        GE_OK = .TRUE.
       ELSE
-        STATUS = SAI__OK
+        CALL ERR_ANNUL( STATUS )
         GE_OK =. FALSE.
       END IF
 
-*    Get name etc
+*  Get name etc
       CALL ADI_FTRACE( IM_ID, NLEV, PATH, IM_FILE, STATUS )
       IM_OK = ( STATUS .EQ. SAI__OK )
 
-*    Tidy up
+*  Tidy up
  99   IF ( STATUS .NE. SAI__OK ) THEN
         CALL AST_REXIT( 'PSS_INP_LOAD', STATUS )
       END IF
@@ -260,32 +250,33 @@
       CHARACTER*132            IMAGE                   ! Image name
 *-
 
-*    Check status
+*  Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Initialise
+*  Initialise
       IM_OK = .FALSE.
       IM_DYNAMIC = .FALSE.
       IM_DATA_DYNAMIC = .FALSE.
       IM_BGND_SUBTRACTED = .FALSE.
 
-*    Get input file locator
+*  Get input file identifier
       IF ( CP_MULTI ) THEN
 
-*      Get image name
+*    Get image name
         CALL PSS_MUL_NEXT( IFILE, NFILE, IMAGE, STATUS )
 
-*      Open it
-        CALL ADI_FOPEN( IMAGE, '*', 'READ', IM_ID, STATUS )
+*    Open it
+        CALL ADI_FOPEN( IMAGE, 'BinDS|Array', 'READ', IM_ID, STATUS )
         IM_PRIM = .FALSE.
 
       ELSE
 
-*      Get input object from user
-        CALL USI_TASSOCI( 'INP', '*', 'READ', IM_ID, STATUS )
+*    Get input object from user
+        CALL USI_ASSOC( 'INP', 'BinDS|Array', 'READ', IM_ID, STATUS )
 
-*      Primitive?
-        CALL BDI_PRIM( IM_ID, IM_PRIM, STATUS )
+*    Primitive?
+        CALL ADI_DERVD( IM_ID, 'BinDS', IM_PRIM, STATUS )
+        IM_PRIM = (.NOT. IM_PRIM)
 
       END IF
 

@@ -548,6 +548,7 @@
 
       INTEGER		        APTR, DPTR, QPTR	! Diag o/p data pointers
       INTEGER                   B                       ! Best width index
+      INTEGER			BDID			! Binned object
       INTEGER                   EB                      ! Error width index
       INTEGER                   I                       ! Loop over parameters
       INTEGER                   K                       ! Convergence loop
@@ -562,59 +563,59 @@
      :                              2.4,2.8,3.2,4.0,5.0,6.0,8.0/
 *-
 
-*    Check status
+*  Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Make copy of OBOX
+*  Make copy of OBOX
       CALL PSS_SRC_GRAB_INT( OBOX, STATUS )
       CALL PSS_SRC_COPY( ID, OBOX, STATUS )
 
-*    Define grid of one test point
+*  Define grid of one test point
       CALL PSS_SRC_POS( S_CP(1,ID), 1, AX_DR(1), AX_DR(2), STATUS )
 
-*    Tell STAT routines to use convolved psf
+*  Tell STAT routines to use convolved psf
       CP_USECON = .TRUE.
       GR_PASS = 2
 
-*    Cache integrity gone if we've done fitting between a call to PSS_STAT
-*    and this point.
+*  Cache integrity gone if we've done fitting between a call to PSS_STAT
+*  and this point.
       DC_VOLATILE = .TRUE.
 
-*    Find RA and DEC for title
+*  Find RA and DEC for title
       APOS(1) = AXV( 1, S_CP(1,ID) )
       APOS(2) = AXV( 2, S_CP(2,ID) )
       CALL WCI_CNA2S( APOS, GE_PIXID, GE_PRJID, CELPOS, STATUS )
       CALL STR_DRADTOC( CELPOS(1), 'HHhMMmSSs', RASTR, STATUS )
       CALL STR_DRADTOC( CELPOS(2), 'SDDhMMmSSs', DECSTR, STATUS )
 
-*    Diagnostic mode?
+*  Diagnostic mode?
       IF ( DI_SIG_V_CRAD ) THEN
 
-*      Create significance vs. convolution file
-        WRITE( FNAME, '(A,I4.4,A)' ) 'svc_', GE_EXEC_NSRC, '%HDS'
-        CALL ADI_FCREAT( FNAME, ADI__NULLID, SID, STATUS )
+*    Define new binned dataset
+        CALL BDI_NEW( 'BinDS', 1, MAXWID+1, 'REAL', BDID, STATUS )
 
-*      Write title containing source position
-        CALL BDI_PUTTITLE( SID, 'RA : '//RASTR//', DEC : '/
+*    Create significance vs. convolution file
+        WRITE( FNAME, '(A,I4.4,A)' ) 'svc_', GE_EXEC_NSRC, '%hds'
+        CALL ADI_FCREAT( FNAME, BDID, SID, STATUS )
+
+*    Write title containing source position
+        CALL BDI_PUT0C( SID, 'Title', 'RA : '//RASTR//', DEC : '/
      :                         /DECSTR, STATUS )
 
-*      Create data, quality and axis
-        CALL BDI_CREDATA( SID, 1, MAXWID+1, STATUS )
-        CALL BDI_CREQUAL( SID, 1, MAXWID+1, STATUS )
-        CALL BDI_PUTMASK( SID, QUAL__MASK, STATUS )
-        CALL BDI_CREAXES( SID, 1, STATUS )
-        CALL BDI_CREAXVAL( SID, 1, .FALSE., MAXWID+1, STATUS )
+*    Create data, quality and axis
+        CALL BDI_PUT( SID, 'QualityMask', 'UBYTE', QUAL__MASK, STATUS )
 
-*      Map the 3 arrays
-        CALL BDI_MAPDATA( SID, 'WRITE', DPTR, STATUS )
-        CALL BDI_MAPQUAL( SID, 'WRITE', QPTR, STATUS )
-        CALL BDI_MAPAXVAL( SID, 'WRITE', 1, APTR, STATUS )
+*    Map the 3 arrays
+        CALL BDI_MAPR( SID, 'Data', 'WRITE', DPTR, STATUS )
+        CALL BDI_MAP( SID, 'Quality', 'UBYTE', 'WRITE', QPTR, STATUS )
+        CALL BDI_AXMAPR( SID, 1, 'Data', 'WRITE', APTR, STATUS )
 
-*      Axis attributes
-        CALL BDI_PUTAXLABEL( SID, 1, 'Gaussian convolution', STATUS )
-        CALL BDI_PUTAXUNITS( SID, 1, 'arcmin', STATUS )
-        CALL BDI_PUTLABEL( SID, 'Significance', STATUS )
-        CALL BDI_PUTUNITS( SID, 'sigma', STATUS )
+*    Axis attributes
+        CALL BDI_AXPUT0C( SID, 1, 'Label', 'Gaussian convolution',
+     :                    STATUS )
+        CALL BDI_AXPUT0C( SID, 1, 'Units', 'arcmin', STATUS )
+        CALL BDI_PUT0C( SID, 'Label', 'Significance', STATUS )
+        CALL BDI_PUT0C( SID, 'Units', 'sigma', STATUS )
 
       END IF
 
@@ -642,7 +643,6 @@
 
 *    Close diagnostic file
       IF ( DI_SIG_V_CRAD ) THEN
-        CALL BDI_RELEASE( SID, STATUS )
         CALL ADI_FCLOSE( SID, STATUS )
       END IF
 
@@ -1385,8 +1385,10 @@
       REAL                     	BASE                    ! Axis base value
       REAL                     	SCALE                   ! Axis scale value
       REAL                     	LB(PSS__FITNPAR)        ! Copies of IN_LB
+      REAL			SPARR(2)		! Spaced array values
       REAL                     	UB(PSS__FITNPAR)        ! Copies of IN_UB
 
+      INTEGER			BDID			! O/p binned object
       INTEGER                  	DIMS(MAXAX)             ! Grid dimensions
       INTEGER                  	FAX, XAX, YAX, BAX      ! Axis numbers if present
       INTEGER                  	DPTR                    ! Grid data array
@@ -1412,13 +1414,13 @@
 *    Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Initialise
+*  Initialise
       FAX = 0
       XAX = 0
       YAX = 0
       BAX = 0
 
-*    Make copies of input data
+*  Make copies of input data
       CALL ARR_COP1R( PSS__FITNPAR, IN_LB, LB, STATUS )
       CALL ARR_COP1R( PSS__FITNPAR, IN_UB, UB, STATUS )
       CALL ARR_COP1L( PSS__FITNPAR, IN_FRO, FROZEN, STATUS )
@@ -1457,20 +1459,14 @@
         GOTO 99
       END IF
 
-*    Open file
-      WRITE( NSTR, '(I4.4)' ) GE_EXEC_NSRC
-      FNAME = PREFIX(:CHR_LEN(PREFIX))//'_'//GVARS//'_'//NSTR//'%hds'
-      CALL ADI_FCREAT( FNAME, ADI__NULLID, GID, STATUS )
-      IF ( STATUS .NE. SAI__OK ) GOTO 99
-
-*    Find RA and DEC for title
+*  Find RA and DEC for title
       APOS(1) = AXV( 1, PARAM(P__X) )
       APOS(2) = AXV( 2, PARAM(P__Y) )
       CALL WCI_CNA2S( APOS, GE_PIXID, GE_PRJID, CELPOS, STATUS )
       CALL STR_DRADTOC( CELPOS(1), 'HHhMMmSSs', RASTR, STATUS )
       CALL STR_DRADTOC( CELPOS(2), 'SDDdMMmSSs', DECSTR, STATUS )
 
-*    Loop over parameters to be frozen
+*  Loop over parameters to be frozen
       DO IP = 1, LEN(FPARS)
 
 *      Convert to upper case
@@ -1575,72 +1571,79 @@
           BASE = PARAM(P__Y) - SCALE*REAL(DIM)/2.0
         END IF
 
-*      Create the grid axis
+*    Create the grid axis
         CALL FIT_DEFREGRID( IP, DIM, .FALSE., BASE,
-     :                   SCALE, GAX(IAX), STATUS  )
+     :                      SCALE, GAX(IAX), STATUS  )
 
-*      Set this dimensions
+*    Set this dimension
         DIMS(IAX) = DIM
 
       END DO
 
-*    Create arrays
-      CALL BDI_CREDATA( GID, NAX, DIMS, STATUS )
-      CALL BDI_CREQUAL( GID, NAX, DIMS, STATUS )
+*  Open file
+      WRITE( NSTR, '(I4.4)' ) GE_EXEC_NSRC
+      FNAME = PREFIX(:CHR_LEN(PREFIX))//'_'//GVARS//'_'//NSTR//'%hds'
+      CALL BDI_NEW( 'BinDS', NAX, DIMS, 'REAL', BDID, STATUS )
+      CALL ADI_FCREAT( FNAME, BDID, GID, STATUS )
+      IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Map arrays
-      CALL BDI_MAPDATA( GID, 'WRITE', DPTR, STATUS )
-      CALL BDI_MAPQUAL( GID, 'WRITE', QPTR, STATUS )
+*  Map arrays
+      CALL BDI_MAPR( GID, 'Data', 'WRITE', DPTR, STATUS )
+      CALL BDI_MAP( GID, 'Quality', 'UBYTE', 'WRITE', QPTR, STATUS )
 
-*    Find product of dimensions
+*  Find product of dimensions
       CALL ARR_SUMDIM( NAX, DIMS, NELM )
 
-*    Create axes
+*  Create axes
       CALL FIT_CREGRIDAX( GID, NAX, GAX, STATUS )
 
-*    Axis labels
+*  Axis labels
       IF ( FAX .GT. 0 ) THEN
-        CALL BDI_PUTAXTEXT( GID, FAX, 'Flux', IM_UNITS, STATUS )
+        CALL BDI_AXPUT0C( GID, FAX, 'Label', 'Flux', STATUS )
+        CALL BDI_AXPUT0C( GID, FAX, 'Units', IM_UNITS, STATUS )
       END IF
       IF ( XAX .GT. 0 ) THEN
-        CALL BDI_PUTAXVAL( GID, XAX, AXV(1,GAX(XAX).BASE),
-     :           GAX(XAX).SCALE/AX_TOR(1), DIMS(XAX), STATUS )
-        CALL BDI_PUTAXTEXT( GID, XAX, AX_LABEL(1), AX_UNITS(1), STATUS )
+        SPARR(1) = AXV(1,GAX(XAX).BASE)
+        SPARR(2) = GAX(XAX).SCALE/AX_TOR(1)
+        CALL BDI_AXPUT1R( GID, XAX, 'SpacedData', 2, SPARR, STATUS )
+        CALL BDI_AXPUT0C( GID, XAX, 'Label', AX_LABEL(1), STATUS )
+        CALL BDI_AXPUT0C( GID, XAX, 'Units', AX_UNITS(1), STATUS )
       END IF
       IF ( YAX .GT. 0 ) THEN
-        CALL BDI_PUTAXVAL( GID, YAX, AXV(2,GAX(YAX).BASE),
-     :           GAX(YAX).SCALE/AX_TOR(2), DIMS(XAX), STATUS )
-        CALL BDI_PUTAXTEXT( GID, YAX, AX_LABEL(2), AX_UNITS(2), STATUS )
+        SPARR(1) = AXV(2,GAX(YAX).BASE)
+        SPARR(2) = GAX(YAX).SCALE/AX_TOR(2)
+        CALL BDI_AXPUT1R( GID, YAX, 'SpacedData', 2, SPARR, STATUS )
+        CALL BDI_AXPUT0C( GID, YAX, 'Label', AX_LABEL(2), STATUS )
+        CALL BDI_AXPUT0C( GID, YAX, 'Units', AX_UNITS(2), STATUS )
       END IF
       IF ( BAX .GT. 0 ) THEN
-        CALL BDI_PUTAXLABEL( GID, BAX,
+        CALL BDI_AXPUT0C( GID, BAX, 'Label',
      :           'Background rescale factor', STATUS )
       END IF
 
-*    Title
-      CALL BDI_PUTTITLE( GID, 'RA : '//RASTR//', DEC : '//DECSTR,
+*  Title
+      CALL BDI_PUT0C( GID, 'Title', 'RA : '//RASTR//', DEC : '//DECSTR,
      :                       STATUS )
 
-*    Data labels
-      CALL BDI_PUTLABEL( GID, LABEL, STATUS )
-      CALL BDI_PUTUNITS( GID, UNITS, STATUS )
+*  Data labels
+      CALL BDI_PUT0C( GID, 'Label', LABEL, STATUS )
+      CALL BDI_PUT0C( GID, 'Units', UNITS, STATUS )
 
-*    Grid the statistic over the cube
+*  Grid the statistic over the cube
       CALL FIT_GRID( 1, FIT.DS, 0, MODEL, 0, NAX, GAX, 1, LGPAR,
      :               PSS__FITMXIT, PSS__FITNPAR, LB, UB, FROZEN,
      :               PSCALE, 0.0, ISTAT, PSS_FIT_GENMODEL, FIT.PRED,
      :               PARAM, STATMIN, DPTR, %VAL(QPTR), GQMASK, STATUS )
 
-*    Write quality mask
-      CALL BDI_PUTMASK( GID, GQMASK, STATUS )
+*  Write quality mask
+      CALL BDI_PUT( GID, 'QualityMask', 'UBYTE', GQMASK, STATUS )
 
-*    Convert to probability if needed
+*  Convert to probability if needed
       IF ( GPAR .EQ. -1 ) THEN
         CALL PSS_FIT_P_NORM( NELM, %VAL(DPTR), %VAL(QPTR), STATUS )
       END IF
 
-*    Free the grid object
-      CALL BDI_RELEASE( GID, STATUS )
+*  Free grid object
       CALL ADI_FCLOSE( GID, STATUS )
 
 *    Abort point

@@ -46,14 +46,6 @@
 *      Release workspace
         CALL DYN_UNMAP( BG_DATA_PTR, STATUS )
 
-      ELSE
-
-*      Unmap everything
-        CALL BDI_UNMAP( BG_ID, STATUS )
-
-*      Free BDI resources
-        CALL BDI_RELEASE( BG_ID, STATUS )
-
       END IF
 
 *    Free log(bgnd) array
@@ -117,18 +109,19 @@
       INTEGER                  NDIM
 *-
 
-*    Check status
+*  Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    First the data array
-      CALL BDI_CHKDATA( BG_ID, BG_OK, NDIM, DIMS, STATUS )
+*  First the data array
+      CALL BDI_CHK( BG_ID, 'Data', BG_OK, STATUS )
+      CALL BDI_GETSHP( BG_ID, PSS__MXDIM, DIMS, NDIM, STATUS )
       IF ( .NOT. BG_OK ) THEN
         STATUS = SAI__ERROR
         CALL ERR_REP( ' ', 'Invalid background data', STATUS )
 
       ELSE
 
-*      Check it matches the input image
+*    Check it matches the input image
         DO I = 1, NDIM
           IF ( BDS_DIMS(I) .NE. DIMS(I) ) THEN
             STATUS = SAI__ERROR
@@ -138,10 +131,10 @@
           END IF
         END DO
 
-*      Map the data
-        CALL BDI_MAPDATA( BG_ID, 'READ', BG_DATA_PTR, STATUS )
+*    Map the data
+        CALL BDI_MAPR( BG_ID, 'Data', 'READ', BG_DATA_PTR, STATUS )
 
-*      Map array for background variance & divide by data variance squared
+*    Map array for background variance & divide by data variance squared
         IF ( .NOT. CP_CASH ) THEN
 
           CALL DYN_MAPR( NDIM, BDS_DIMS, BG_VAR_PTR, STATUS )
@@ -156,7 +149,7 @@
 
       END IF
 
-*    Report errors
+*  Report errors
  99   IF ( STATUS .NE. SAI__OK ) THEN
         CALL AST_REXIT( 'PSS_BGND_LOAD', STATUS )
       END IF
@@ -210,7 +203,7 @@
       INTEGER                  I,J                     ! Loops over array
 *-
 
-*    Check status
+*  Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
       DO J = BDS_EXTREMA(1,2), BDS_EXTREMA(2,2)

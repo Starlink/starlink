@@ -120,8 +120,8 @@
       ELSE IF ( IFILE .EQ. 1 ) THEN
 
 *      Get option from user
-        CALL USI_TASSOCI( 'BGND', '*', 'READ', BG_ID, STATUS )
-        CALL BDI_PRIM( BG_ID, BPRIM, STATUS )
+        CALL USI_ASSOC( 'BGND', 'BinDS|Scalar', 'READ', BG_ID, STATUS )
+        CALL ADI_DERVD( BG_ID, 'Scalar', BPRIM, STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *      Primitive?
@@ -136,7 +136,7 @@
           END IF
 
 *        Get value
-          CALL BDI_GET0R( BG_ID, VAL, STATUS )
+          CALL BDI_GET0R( BG_ID, 'Data', VAL, STATUS )
           BPROCESS = .TRUE.
 
         END IF

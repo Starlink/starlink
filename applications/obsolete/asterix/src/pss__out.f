@@ -203,11 +203,11 @@
       INTEGER			SID			! ADI identifier
 *-
 
-*    Check status
+*  Check status
       IF ( ( STATUS .EQ. SAI__OK ) .AND. CP_OPT ) THEN
 
-*      Associate dataset
-        CALL USI_TASSOCO( 'SSUB', 'BINDS', SID, STATUS )
+*    Associate dataset
+        CALL USI_CLONE( 'INP', 'SSUB', 'BinDS', SID, STATUS )
         IF ( STATUS .EQ. SAI__OK ) THEN
           CALL MSG_PRNT( 'Creating source subtracted image...' )
         ELSE IF ( STATUS .EQ. PAR__NULL ) THEN
@@ -215,19 +215,14 @@
           GOTO 99
         END IF
 
-*      Check that there are some sources to be subtracted
+*    Check that there are some sources to be subtracted
         IF ( LI_NSRC .LE. 0 ) THEN
           CALL MSG_PRNT( '! No sources to subtract from input image' )
           GOTO 99
         END IF
 
-*      Copy input dataset
-	CALL BDI_COPDATA( IM_ID, SID, STATUS )
-	CALL BDI_COPTEXT( IM_ID, SID, STATUS )
-	CALL BDI_COPAXES( IM_ID, SID, STATUS )
-
-*      Map data to subtract sources
-	CALL BDI_MAPDATA( SID, 'UPDATE', SDPTR, STATUS )
+*    Map data to subtract sources
+	CALL BDI_MAPR( SID, 'Data', 'UPDATE', SDPTR, STATUS )
 	IF ( STATUS .EQ. SAI__OK ) THEN
 
 *        Loop over sources
@@ -287,24 +282,19 @@
 
 	END IF
 
-*      Copy MORE box
-	CALL BDI_COPMORE( IM_ID, SID, STATUS )
-
-*      Create some HISTORY
-	CALL HSI_COPY( IM_ID, SID, STATUS )
+*    Create some HISTORY
 	CALL HSI_ADD( SID, PSS__VERSION, STATUS )
 
-*      Bit more information
+*    Bit more information
 	HTEXT(1) = 'Input dataset {INP}'
 	HLINES = 5
 	CALL USI_TEXT( 1, HTEXT, HLINES, STATUS )
 	CALL HSI_PTXT( SID, HLINES, HTEXT, STATUS )
 
-*      Release the dataset
-	CALL BDI_RELEASE( SID, STATUS )
+*    Release the dataset
 	CALL USI_CANCL( 'SSUB', STATUS )
 
-*      Tidy up
+*    Tidy up
  99     IF ( STATUS .NE. SAI__OK ) THEN
           CALL AST_REXIT( 'PSS_OUT_SSUB', STATUS )
         END IF
