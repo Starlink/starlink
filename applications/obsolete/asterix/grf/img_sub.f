@@ -986,15 +986,29 @@
 *  Local constants :
 *  Local variables :
       LOGICAL OK,YES
+      LOGICAL PIXEL,CONTOUR
 *-
       IF (STATUS.EQ.SAI__OK) THEN
 
         CALL GCB_GETL('PIX_FLAG',OK,YES,STATUS)
         IF (OK.AND.YES) THEN
-          CALL IMG_PIXEL(STATUS)
+          PIXEL=.TRUE.
+        ELSE
+          PIXEL=.FALSE.
         ENDIF
         CALL GCB_GETL('CONT_FLAG',OK,YES,STATUS)
         IF (OK.AND.YES) THEN
+          CONTOUR=.TRUE.
+        ELSE
+          CONTOUR=.FALSE.
+        ENDIF
+        IF (.NOT.(PIXEL.OR.CONTOUR)) THEN
+          PIXEL=.TRUE.
+        ENDIF
+        IF (PIXEL) THEN
+          CALL IMG_PIXEL(STATUS)
+        ENDIF
+        IF (CONTOUR) THEN
           CALL IMG_CONTOUR(STATUS)
         ENDIF
         CALL IMG_GRID(STATUS)
