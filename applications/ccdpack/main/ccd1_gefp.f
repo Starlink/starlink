@@ -1,5 +1,6 @@
-      SUBROUTINE CCD1_GEFP( GRAPH, NEDGES, X1, Y1, X2, Y2, ID1, N, OFFS,
-     :                      NODE, XN, YN, IDN, NOUT, STATUS )
+      SUBROUTINE CCD1_GEFP( GRAPH, NEDGES, X1, Y1, R1, X2, Y2, R2, ID1,
+     :                      N, OFFS, NODE, XN, YN, RN, IDN, NOUT,
+     :                      STATUS )
 *+
 *  Name:
 *     CCD1_GEFP
@@ -12,8 +13,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL CCD1_GEFP( GRAPH, NEDGES, X1, Y1, X2, Y2, ID1, N, OFFS,
-*                     NODE, XN, YN, IDN, NOUT, STATUS )
+*     CALL CCD1_GEFP( GRAPH, NEDGES, X1, Y1, R1, X2, Y2, R2, ID1, N,
+*                     OFFS, NODE, XN, YN, IDN, NOUT, STATUS )
 
 *  Description:
 *     This routine perform the task of extracting all the position
@@ -35,11 +36,17 @@
 *     Y1( N ) = DOUBLE PRECISION (Given)
 *        The Y1 position list merged into one. The offsets into this
 *        list are OFFS.
+*     R1( N ) = INTEGER (Given)
+*        The rank index list merged into one.  The offsets into this
+*        list are OFFS.
 *     X2( N ) = DOUBLE PRECISION (Given)
 *        The X2 position list merged into one. The offsets into this
 *        list are OFFS.
 *     Y2( N ) = DOUBLE PRECISION (Given)
-*        The X1 position list merged into one. The offsets into this
+*        The Y2 position list merged into one. The offsets into this
+*        list are OFFS.
+*     R2( N ) = INTEGER (Given)
+*        The rank index list merged into one.  The offsets into this
 *        list are OFFS.
 *     N = INTEGER (Given)
 *        The total number of entries in input merged lists.
@@ -56,16 +63,19 @@
 *        On exit this array contains the extracted X positions.
 *     YN( * ) = DOUBLE PRECISION (Returned)
 *        On exit this array contains the extracted Y positions.
+*     RN( * ) = INTEGER (Returned)
+*        On exit this array contains the extracted rank indices.
 *     IDN( * ) = DOUBLE PRECISION (Returned)
 *        On exit this array contains the extracted identifiers.
 *     NOUT = INTEGER (Returned)
-*        The number of valid entries in the XN,YN and IDN arrays on
-*        exit.
+*        The number of valid entries in the XN, YN, RN and IDN arrays
+*        on exit.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -73,6 +83,8 @@
 *        Original version.
 *     7-MAR-1993 (PDRAPER):
 *        Complete rewrite.
+*     29-JAN-2001 (MBT):
+*        Added R1, R2 and RN arguments.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -93,8 +105,10 @@
       INTEGER ID1( N )
       DOUBLE PRECISION X1( N )
       DOUBLE PRECISION Y1( N )
+      INTEGER R1( N )
       DOUBLE PRECISION X2( N )
       DOUBLE PRECISION Y2( N )
+      INTEGER R2( N )
       INTEGER OFFS( NEDGES + 1 )
       INTEGER NODE
 
@@ -102,6 +116,7 @@
       INTEGER IDN( * )
       DOUBLE PRECISION XN( * )
       DOUBLE PRECISION YN( * )
+      INTEGER RN( * )
       INTEGER NOUT
 
 *  Status:
@@ -132,6 +147,7 @@
                IDN( NN ) = ID1( K )
                XN( NN ) = X1( K ) 
                YN( NN ) = Y1( K )
+               RN( NN ) = R1( K )
  2          CONTINUE
          ELSE IF ( GRAPH( 2, I ) .EQ. NODE ) THEN 
 
@@ -141,6 +157,7 @@
                IDN( NN ) = ID1( K )
                XN( NN ) = X2( K ) 
                YN( NN ) = Y2( K )
+               RN( NN ) = R2( K )
  3          CONTINUE
          END IF
  1    CONTINUE
@@ -164,6 +181,7 @@
             IDN( NOUT ) = IDN( I )
             XN( NOUT ) = XN( I )
             YN( NOUT ) = YN( I )
+            RN( NOUT ) = RN( I )
          END IF
  6    CONTINUE      
       END

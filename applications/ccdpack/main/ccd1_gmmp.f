@@ -1,6 +1,6 @@
-      SUBROUTINE CCD1_GMMP( GRAPH, NEDGES, NNODE, IPX1, IPY1, IPX2,
-     :                      IPY2, NIN, OFFS, IPX, IPY, IPIDS, NOUT,
-     :                      STATUS )
+      SUBROUTINE CCD1_GMMP( GRAPH, NEDGES, NNODE, IPX1, IPY1, IPRAN1,
+     :                      IPX2, IPY2, IPRAN2, NIN, OFFS, IPX, IPY,
+     :                      IPRANK, IPIDS, NOUT, STATUS )
 *+
 *  Name:
 *     CCD1_GMMP
@@ -13,8 +13,9 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL CCD1_GMMP( GRAPH, NEDGES, NNODE, IPX1, IPY1, IPX2, IPY2,
-*                     NIN, OFFS, IPX, IPY, IPIDS, NOUT, STATUS )
+*     CALL CCD1_GMMP( GRAPH, NEDGES, NNODE, IPX1, IPY1, IPRAN1, IPX2,
+*                     IPY2, IPRAN, NIN, OFFS, IPX, IPY, IPRANK, IPIDS,
+*                     NOUT, STATUS )
 
 *  Description:
 *     {routine_description}
@@ -35,12 +36,22 @@
 *     IPY1( * ) = INTEGER (Given)
 *        Pointer to Y positions related to edge. These are indexed
 *        by IPY1( GRAPH( 4, * ) ).
+*     IPRAN1( * ) = INTEGER (Given)
+*        Pointer to rank identifiers related to edge.  These are indexed
+*        by IPRAN1( GRAPH( 4, * ) ).  The values are not used by this
+*        routine, but the returned IPRANK preserves them in the
+*        corresponding order.
 *     IPX2( * ) = INTEGER (Given)
 *        Pointer to X positions related to edge. These are indexed
 *        by IPX2( GRAPH( 4, * ) ).
 *     IPY2( * ) = INTEGER (Given)
 *        Pointer to X positions related to edge. These are indexed
 *        by IPY2( GRAPH( 4, * ) ).
+*     IPRAN2( * ) = INTEGER (Given)
+*        Pointer to rank identifiers related to edge.  These are indexed
+*        by IPRAN2( GRAPH( 4, * ) ).  The values are not used by this
+*        routine, but the returned IPRANK preserves them in the
+*        corresponding order.
 *     NIN( * ) = INTEGER (Given)
 *        Number of X and Y positions in IPX1, IPY1, IPX2, IPY2.
 *     OFFS( NEDGES + 1 ) = INTEGER (Given and Returned)
@@ -48,28 +59,36 @@
 *     IPX( * ) = INTEGER (Returned)
 *        Pointers to all X positions matched at this node. The pointers
 *        are generated in this routine. The index to this array and IPY,
-*        IPIDS and NOUT are the node numbers.
+*        IPRANK, IPIDS and NOUT are the node numbers.
 *     IPY( * ) = INTEGER (Returned)
 *        Pointers to all Y positions matched at this node. The pointers
 *        are generated in this routine. The index to this array and IPX,
-*        IPIDS and NOUT are the node numbers.
+*        IPRANK, IPIDS and NOUT are the node numbers.
+*     IPRANK( * ) = INTEGER (Returned)
+*        Pointers to the rank identifiers for each node.  The mapping
+*        from the points in the input arrays to the ones in the output
+*        arrays can be kept track of using these values.  The index 
+*        to this array and IPX, IPY, IPIDS and NOUT are the node numbers.
 *     IPIDS( * ) = INTEGER (Returned)
 *        Pointers to the identifiers of the positions for each node. The
 *        pointers are generated within this routine. The index to this
-*        array and IPX, IPY and NOUT are the node numbers.
+*        array and IPX, IPY, IPRANK and NOUT are the node numbers.
 *     NOUT( * ) = INTEGER (Returned)
 *        The numbers of positions matched at each node. The index to
-*        this array and IPX, IPY and IPIDS are the node numbers.
+*        this array and IPX, IPY, IPIDS and IPRANK are the node numbers.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     14-DEC-1992 (PDRAPER):
 *        Original version.
+*     29-JAN-2001 (MBT):
+*        Added the IPRAN1, IPRAN2 and IPRANK parameters.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -90,8 +109,10 @@
       INTEGER NNODE
       INTEGER IPX1( * )
       INTEGER IPY1( * )
+      INTEGER IPRAN1( * )
       INTEGER IPX2( * )
       INTEGER IPY2( * )
+      INTEGER IPRAN2( * )
       INTEGER NIN( * )
 
 *  Arguments Given and Returned:
@@ -100,6 +121,7 @@
 *  Arguments Returned:
       INTEGER IPX( * )
       INTEGER IPY( * )
+      INTEGER IPRANK( * )
       INTEGER IPIDS( * )
       INTEGER NOUT( * )
 
@@ -110,6 +132,8 @@
       INTEGER FNODE              ! First node index
       INTEGER I                  ! Loop variable
       INTEGER IIN                ! Offset into lists
+      INTEGER IPAR1              ! Pointer to workspace
+      INTEGER IPAR2              ! Pointer to workspace
       INTEGER IPAX1              ! Pointer to workspace
       INTEGER IPAX2              ! Pointer to workspace
       INTEGER IPAY1              ! Pointer to workspace
@@ -140,6 +164,8 @@
       CALL CCD1_MALL( NEED, '_DOUBLE', IPAY1, STATUS )
       CALL CCD1_MALL( NEED, '_DOUBLE', IPAX2, STATUS )
       CALL CCD1_MALL( NEED, '_DOUBLE', IPAY2, STATUS )
+      CALL CCD1_MALL( NEED, '_INTEGER', IPAR1, STATUS )
+      CALL CCD1_MALL( NEED, '_INTEGER', IPAR2, STATUS )
       CALL CCD1_MALL( NEED, '_INTEGER', IPI1, STATUS )
       CALL CCD1_MALL( NEED, '_INTEGER', IPI2, STATUS )
       CALL CCD1_MALL( NEED, '_INTEGER', IP, STATUS )
@@ -157,6 +183,10 @@
      :                    %VAL( IPAX2 ), STATUS )
          CALL CCG1_LAPND( %VAL( IPY2( J ) ), NIN( J ), IIN,
      :                    %VAL( IPAY2 ), STATUS )
+         CALL CCG1_LAPNI( %VAL( IPRAN1( J ) ), NIN( J ), IIN,
+     :                    %VAL( IPAR1 ), STATUS )
+         CALL CCG1_LAPNI( %VAL( IPRAN2( J ) ), NIN( J ), IIN,
+     :                    %VAL( IPAR2 ), STATUS )
          OFFS( I ) = IIN
          IIN = IIN + NIN( J ) 
  2    CONTINUE
@@ -200,16 +230,17 @@
          IF ( NOUT( I ) .GT. 0 ) THEN
             CALL CCD1_MALL( NOUT( I ), '_DOUBLE', IPX( I ), STATUS )
             CALL CCD1_MALL( NOUT( I ), '_DOUBLE', IPY( I ), STATUS )
+            CALL CCD1_MALL( NOUT( I ), '_INTEGER', IPRANK( I ), STATUS )
             CALL CCD1_MALL( NOUT( I ), '_INTEGER', IPIDS( I ), STATUS )
 
 *  Now generate the final positions and identifiers removing multiple
 *  identifications of the same positions.
             CALL CCD1_GEFP( GRAPH, NEDGES, %VAL( IPAX1 ), %VAL( IPAY1 ),
-     :                      %VAL( IPAX2 ), %VAL( IPAY2 ), %VAL( IPI1 ),
-     :                      IIN, OFFS, I,
+     :                      %VAL( IPAR1 ), %VAL( IPAX2 ), %VAL( IPAY2 ),
+     :                      %VAL( IPAR2 ), %VAL( IPI1 ), IIN, OFFS, I,
      :                      %VAL( IPX( I ) ), %VAL( IPY( I ) ),
-     :                      %VAL( IPIDS( I ) ), NOUT( I ), STATUS )
-
+     :                      %VAL( IPRANK( I ) ), %VAL( IPIDS( I ) ),
+     :                      NOUT( I ), STATUS )
          END IF
  6    CONTINUE
 
@@ -218,6 +249,8 @@
       CALL CCD1_MFREE( IPAY1, STATUS )
       CALL CCD1_MFREE( IPAX2, STATUS )
       CALL CCD1_MFREE( IPAY2, STATUS )
+      CALL CCD1_MFREE( IPAR1, STATUS )
+      CALL CCD1_MFREE( IPAR2, STATUS )
       CALL CCD1_MFREE( IPI1, STATUS )
       CALL CCD1_MFREE( IPI2, STATUS )
       CALL CCD1_MFREE( IP, STATUS )
