@@ -260,7 +260,7 @@ use base qw/ AstFramePtr /;
 package AstSkyFramePtr;
 use base qw/ AstFramePtr /;
 
-package AstSprecFramePtr;
+package AstSpecFramePtr;
 use base qw/ AstFramePtr /;
 
 
