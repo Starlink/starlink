@@ -67,7 +67,6 @@
       INTEGER			IFID			! Input dataset id
       INTEGER                	INAXPTR                 ! Input time axis
       INTEGER                	OUTAXPTR                ! Output phase axis
-      INTEGER                	NPTS                    ! No of data poits
       INTEGER                	NDIMS                   ! Number of dimensions
       INTEGER                	LDIM(ADI__MXDIM)        ! Input dimensions
       INTEGER			OFID			! Output dataset id
@@ -108,7 +107,7 @@
 *  Check time axis
       CALL BDI_AXCHK( IFID, TAXIS, 'Data', OK, STATUS )
       IF ( OK ) THEN
-        CALL BDI_AXMAPR( IFID, TAXIS, 'Data', 'READ', INAXPTR, STATUS )
+        CALL BDI_AXMAPD( IFID, TAXIS, 'Data', 'READ', INAXPTR, STATUS )
 
       ELSE
         STATUS = SAI__ERROR
@@ -164,8 +163,8 @@
       CALL BDI_AXPUT0C( OFID, TAXIS, 'Units', 'unitless', STATUS )
 
 *  Execute time-phase conversion
-      CALL PHASE_DOIT( NPTS, %VAL(INAXPTR), COEFF, %VAL(OUTAXPTR),
-     :                                                    STATUS )
+      CALL PHASE_DOIT( DIMS(TAXIS), %VAL(INAXPTR), COEFF,
+     :                 %VAL(OUTAXPTR), STATUS )
 
 *  History
       CALL HSI_ADD( OFID, VERSION, STATUS )
@@ -203,7 +202,7 @@
 *    Import :
 *
       INTEGER                NPTS                          ! No of data poits
-      REAL                   TIME(NPTS)                    ! Time bin values
+      DOUBLE PRECISION       TIME(NPTS)                    ! Time bin values
       DOUBLE PRECISION       COEFF(3)                      ! Ephemeris coefficients
 *
 *    Export :
