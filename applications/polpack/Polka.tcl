@@ -301,13 +301,13 @@
    bind . <Destroy> ""
 
 # Save the current value of environment variable NDF_FORMATS_OUT (if any),
-# and ensure that NDF applications will create output NDFs, rather than
-# any other data format. This is done here so that the tasks about to be 
+# and ensure that NDF applications will create output NDFs, by default, rather 
+# than any other data format. This is done here so that the tasks about to be 
 # loaded will inherit it.
    if { [info exists env(NDF_FORMATS_OUT)] } {
       set ndf_formats_out $env(NDF_FORMATS_OUT)
+      set env(NDF_FORMATS_OUT) ".,$ndf_formats_out"
    }
-   set env(NDF_FORMATS_OUT) "."
 
 # Load the required ADAM monoliths. 
    LoadTask kapview  $KAPPA_DIR/kapview_mon
