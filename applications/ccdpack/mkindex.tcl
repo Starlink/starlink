@@ -61,8 +61,8 @@
       set patterns {}
 
 #  Work out whether [incr Tcl] is present.
-      set hasItcl 0;
-      set hasItk 0;
+      set hasItcl 0
+      set hasItk 0
       foreach ext [info loaded] {
          set extname [lindex $ext 1]
          if { $extname == "Itcl" } { set hasItcl 1 }
