@@ -1,0 +1,71 @@
+#!/bin/csh
+# Name:
+#    make_unix_release
+#
+# Purpose:
+#    Do unix specific bits required to make a release of polpack.
+#
+# Type of Module:
+#    Shell script
+#
+# Description:
+#    This command creates a compressed tar file containing a release of the 
+#    polpack package. It is called from within the make_release script. 
+#    
+# Invocation:
+#    make_unix_release
+#
+# Authors:
+#    DSB: David S. Berry (STARLINK)
+#    {enter_new_authors_here}
+#
+# History:
+#    18-JUL-1997 (DSB):
+#       Original version, based on PDA equivalent.
+#    {enter_changes_here}
+#
+# Bugs:
+#    {note_any_bugs_here}
+#-
+
+#  Ensure the sdt grp command is available.
+      source $SDT_DIR/startup.csh
+
+#  Store the name of the release directory, and go there.
+      set REL_DIR = ${TEMPDIR}/polpack_${SYSTEM}
+      cd ${REL_DIR}
+
+#  See if the hypertext documents are to be re-created.
+      echo -n "Re-create polreg.htx? (y/n): "
+      set ans = $<
+      if( $ans == "y" ) then
+         star2html polreg.tex
+         tar -cvhf ./polreg.htx_tar polreg.htx/*
+         rm -rf polreg.htx
+         mv ./polreg.htx_tar ${POLPACK_DEV}/..
+      endif
+
+#  Copy the hypertext docs to the release directory.
+      cp ${POLPACK_DEV}/../polreg.htx_tar ${REL_DIR}
+
+#  Copy the ndg tar file to the release directory.
+      cp ${POLPACK_DEV}/../ndg.tar ${REL_DIR}
+
+#  Ensure all files are accessable.
+      chmod 777 *
+
+#  Tar up the source files and then remove them.
+      tar -cvh -f ${TEMPDIR}/polpack_source.tar `grp unix_source` 
+      rm -f `grp unix_source`
+      mv ${TEMPDIR}/polpack_source.tar ${REL_DIR}
+
+#  Tar up all the release files (source and non-source), and then remove
+#  them.
+      tar -cvh -f ${TEMPDIR}/polpack.tar `grp unix_total` 
+      rm `grp unix_total` 
+      mv ${TEMPDIR}/polpack.tar ${REL_DIR}
+
+#  Compress it.
+      compress polpack.tar
+
+      exit
