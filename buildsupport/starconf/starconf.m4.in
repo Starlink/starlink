@@ -162,8 +162,9 @@ fi
 ## else to the _STAR_RESTFP_FIX macro. 
 _poss_STAR_RESTFP_FIX
 
-# Installation directory options.  This must match the variables handled
-# by _STAR_EXTRADIR_COMMON
+# Installation directory options (these are no longer handled
+# by _STAR_EXTRADIR_COMMON).  There should be an entry here for each of
+# Starlink's special installation locations.
 AC_SUBST([stardocsdir],     ['${prefix}/docs'])dnl
 AC_SUBST([starhelpdir],     ['${prefix}/help'])dnl
 AC_SUBST([staretcdir],      ['${prefix}/etc'])dnl
@@ -1159,10 +1160,11 @@ AC_DEFUN([_STAR_UPCASE],
 # AC_SUBSTing the variables `starX_DATA for X=dir-type (eg, `stardocs_DATA').
 #
 # This is now obsolete -- components should use star<dir-type>_DATA in
-# the Makefile.am file instead.
+# the Makefile.am file instead.  Don't use AC_[]DIAGNOSE([obsolete],...),
+# since those warnings aren't turned on by default.
 AC_DEFUN([_STAR_EXTRADIR_COMMON],
-   [AC_MSG_WARN([Macro STAR_$1_FILES($2) is obsolete -- use star$1_DATA in Makefile.am instead])
-    AC_MSG_WARN([For STAR@&t@_LATEX_DOCUMENTATION, use stardocs_DATA=@STAR@&t@_LATEX_DOCUMENTATION@ instead])]
+   [AC_FATAL([Macro STAR_]_STAR_UPCASE($1)[_FILES($2) is obsolete -- use star$1_DATA in Makefile.am instead])
+    AC_FATAL([For STAR@&t@_LATEX_DOCUMENTATION, use stardocs_DATA=@STAR@&t@_LATEX_DOCUMENTATION@ instead])]
 )# _STAR_EXTRADIR_COMMON
 
 
