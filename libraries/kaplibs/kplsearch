@@ -351,7 +351,8 @@ proc search {test words} {
 #  Display the results.
       puts ""
       for {set i 0} {$i < $nrout} {incr i} {
-         puts "  $routine($i):"
+         set name $routine($i)
+         puts "  $name:"
          display $purpose($name) 75 5
          puts ""
       }
