@@ -76,6 +76,13 @@
 #           NULL   combines the functions of "file" and "func".
 #           "regex" performs a Perl regular expression search on the keys
 #              of both StarIndex objects
+#     $indexdir = string (optional).
+#        If present, this argument specifies the directory in which to find
+#        the index files.  It overrides the default and the environment
+#        variable SCB_INDEX, which normally supply this value.  Setting
+#        SCB_INDEX is the preferred way of influencing this value; hence
+#        this will normally be used only in CGI mode, rather than from
+#        the command line.
 #
 #     If invoked from the command line, then $name must be specified.
 #     If invoked as a CGI script then if $module is specified an attempt
@@ -118,7 +125,7 @@ $self =~ s%.*/%%;
 
 #  Name of source code retrieval program and usage message.
 
-$scb = $self;
+$scb = $self . "?";
 $usage = "Usage: $self [-html] [-exact] \\\n"
        . "        " . ' ' x length ($self)
        . "[[name=]<name>] [[package=]<package>] [[type=]func|file|regex]\n";
@@ -161,7 +168,7 @@ if (exists $ENV{'SERVER_PROTOCOL'}) {
 
 #  Parse command line arguments.
 
-($rarg, $rflag, $rextra) = parse_args \@ARGV, qw/name package type/;
+($rarg, $rflag, $rextra) = parse_args \@ARGV, qw/name package type indexdir/;
 die $usage if (@$rextra);
 
 #  Process flags.
@@ -172,9 +179,34 @@ error $usage if (%$rflag);
 
 #  Process arguments.
 
-$name    = $rarg->{'name'}    || '';
-$package = $rarg->{'package'} || '';
-$type    = $rarg->{'type'}    || '';
+$name     = $rarg->{'name'}     || '';
+$package  = $rarg->{'package'}  || '';
+$type     = $rarg->{'type'}     || '';
+$indexdir = $rarg->{'indexdir'} || '';
+
+#  If the indexdir parameter is specified, then indexes need to be read
+#  from a directory other than the default.
+
+if ($indexdir) {
+
+#  Set the basic href used for constructing hyperlinks to source files
+#  to include specification of the new index, so that it is inherited
+#  by files linked from this one.
+
+   $scb .= "indexdir=$indexdir&amp;";
+
+#  Some of the file location variables set in Scb.pm must be changed.
+#  Since Scb.pm is executed at compile time by the 'use' declaration,
+#  its execution cannot be deferred until $indexdir has been evaluated.
+#  Instead we execute it again here, but using 'do' which is a runtime
+#  command.  Executing it twice is rather inelegant, but the extra time
+#  taken should be minimal.  To prevent unwanted messages about 
+#  redefining functions, the $^W variable is temporarily unset.
+
+   $ENV{'SCB_INDEX'} = $indexdir;
+   local $^W = 0;
+   do 'Scb.pm';
+}
 
 #  Initialise index objects containing locations of functions and files.
 
@@ -605,11 +637,11 @@ sub package_list {
       my %printlist;
       $printlist{$type} = 1;
 
-      print "<hr><h3><a href='$scb?package=$package&amp;type=file#file'>",
+      print "<hr><h3><a href='${scb}package=$package&amp;type=file#file'>",
             "Files</a> in package <b>$package</b>.</h3>\n"
          unless ($printlist{'file'});
    
-      print "<hr><h3><a href='$scb?package=$package&amp;type=func#func'>",
+      print "<hr><h3><a href='${scb}package=$package&amp;type=func#func'>",
             "Routines</a> in package <b>$package</b>.</h3>\n"
          unless ($printlist{'func'});
 
@@ -653,7 +685,7 @@ sub package_list {
             $task = $module;
             $task =~ s/_$//;
             print 
-               "$sep<a href='$scb?$module&amp;$package#$module'>$task</a>\n";
+               "$sep<a href='${scb}$module&amp;$package#$module'>$task</a>\n";
          }
          print "</dl>\n\n";
       }
@@ -700,7 +732,7 @@ sub package_list {
                   else {
                      $ignore = undef;
                   }
-                  print "$sep<a href='$scb?$mod&amp;$package#$mod'>$mod</a>\n";
+                  print "$sep<a href='${scb}$mod&amp;$package#$mod'>$mod</a>\n";
                }
             }
             print "\n</dl>\n<hr>\n";
@@ -733,7 +765,7 @@ sub package_list {
                print "<dt> $key <br>\n<dd>\n";
                foreach $file (sort @{$files{$key}}) {
                   print 
-                     "$sep<a href='$scb?$file&amp;$package&type=file'>",
+                     "$sep<a href='${scb}$file&amp;$package&type=file'>",
                      "$file</a>\n";
                }
             }
@@ -758,7 +790,7 @@ sub package_list {
       my $typesel = $type ? "type='$type'" : '';
       foreach $pack (@packages) {
          print "<li> ";
-         print "<a href='$scb?package=$pack&$typesel'>$pack</a>\n";
+         print "<a href='${scb}package=$pack&$typesel'>$pack</a>\n";
       }
       print "</dir>\n";
    }
@@ -862,13 +894,13 @@ sub search_keys {
                if ($html) {
                   if ($index eq 'file') {
                      print
-                        "<a href='$scb?$name&$package&$type=file'>",
+                        "<a href='${scb}$name&$package&$type=file'>",
                         "$name</a>",
                         "<br>\n";
                   }
                   elsif ($index eq 'func') {
                      print
-                        "<a href='$scb?$name&$package&$type=func#$name'>",
+                        "<a href='${scb}$name&$package&$type=func#$name'>",
                         "$name</a>",
                         "<br>\n";
                   }
@@ -1374,7 +1406,7 @@ sub output {
                            $file =~ tr/A-Z/a-z/;
                         }
                         if ($file_index->get($file)) {
-                           $href = "$scb?$file&amp;$package&amp;type=file";
+                           $href = "${scb}$file&amp;$package&amp;type=file";
                         }
                      }
                      else {
@@ -1387,7 +1419,7 @@ sub output {
                               $href = "#$name";
                            }
                            else {
-                              $href = "$scb?$name&amp;$package&amp;type=func"
+                              $href = "${scb}$name&amp;$package&amp;type=func"
                                     . "#$name";
                            }
                         }
