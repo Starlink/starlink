@@ -11,7 +11,7 @@ PutCards Card =  1
 #   DfB1950 = 1 	# Default to FK4 B1950
 #   CdMat = 0 	# Use PC matrix
 #   CarLin = 0 	# Use full FITS-WCS CAR projections
-#   Warn = "Tnx Zpx BadCel BadMat" 	# Warnings to be reported
+#   Warn = "Tnx Zpx BadCel BadMat BadCTYPE" 	# Warnings to be reported
     Nm1 = "NAXIS" 	# FITS keyword name
     Ty1 = "integer" 	# FITS keyword data type
     Dt1 = 1 	# FITS keyword value
@@ -2546,14 +2546,6 @@ REG_CAP:  0
 REG_CAP:  0
 REG_TEXT: '180'
      47.5       80.0     TC  0.253      0.968    
-REG_CAP:  2
-REG_SCALES: 
-REG_QCH: 
-REG_CAP:  2
-REG_SCALES: 
-REG_QCH: 
-REG_CAP:  0
-REG_CAP:  0
 REG_CAP:  2
 REG_SCALES: 
 REG_QCH: 
