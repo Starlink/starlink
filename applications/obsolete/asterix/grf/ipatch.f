@@ -112,6 +112,7 @@
       LOGICAL IMG_INREG
 *    Local constants :
 *    Local variables :
+      INTEGER X1,X2,Y1,Y2
       INTEGER I,J,II,JJ,I1,I2,J1,J2
       INTEGER NX,NX1,NX2,NY,NY1,NY2
       INTEGER IX,IY
@@ -124,9 +125,13 @@
       BYTE MASK1,MASK2
       LOGICAL ALL
       LOGICAL EDGE
-      LOGICAL PATCHED
 *-
       IF (STATUS.EQ.SAI__OK) THEN
+
+        X1=I_NX
+        X2=1
+        Y1=I_NY
+        Y2=1
 
         ALL=.TRUE.
 
@@ -270,7 +275,10 @@
                       V(II,J)=(XSIGSQ+YSIGSQ)/4.0
                     ENDIF
                   ENDIF
-                  PATCHED=.TRUE.
+                  X1=MIN(X1,II)
+                  X2=MAX(X2,II)
+                  Y1=MIN(Y1,J)
+                  Y2=MAX(Y2,J)
                 ELSEIF (NX.GT.0) THEN
                   IF (IMG_INREG(II,J)) THEN
                     D(II,J)=AX*REAL(II)+BX
@@ -279,7 +287,10 @@
                       V(II,J)=XSIGSQ
                     ENDIF
                   ENDIF
-                  PATCHED=.TRUE.
+                  X1=MIN(X1,II)
+                  X2=MAX(X2,II)
+                  Y1=MIN(Y1,J)
+                  Y2=MAX(Y2,J)
                 ELSEIF (NY.GT.0) THEN
                   IF (IMG_INREG(II,J)) THEN
                     D(II,J)=AY*REAL(J)+BY
@@ -288,7 +299,10 @@
                       V(II,J)=YSIGSQ
                     ENDIF
                   ENDIF
-                  PATCHED=.TRUE.
+                  X1=MIN(X1,II)
+                  X2=MAX(X2,II)
+                  Y1=MIN(Y1,J)
+                  Y2=MAX(Y2,J)
                 ELSE
                   CALL MSG_SETI('I',II)
                   CALL MSG_SETI('J',J)
@@ -297,11 +311,9 @@
                   PATCHED=.FALSE.
                 ENDIF
 
-c                IF (PATCHED) THEN
-c                  CALL GFX_PIXELQ(I_WKPTR,I_NX,I_NY,II,II,J,J,
-c     :                .TRUE.,%VAL(I_XPTR_W),%VAL(I_YPTR_W),0,0,
-c     :                           D,I_PMIN,I_PMAX,Q,MASK2,STATUS)
-c                ENDIF
+                CALL GFX_PIXELQ(I_WKPTR,I_NX,I_NY,X1,X2,Y1,Y2,
+     :                .TRUE.,%VAL(I_XPTR_W),%VAL(I_YPTR_W),0,0,
+     :                           D,I_PMIN,I_PMAX,Q,MASK2,STATUS)
 
               ENDDO
 
