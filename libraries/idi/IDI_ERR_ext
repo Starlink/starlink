@@ -12,6 +12,6 @@
 * using the C version so we have to provide both.
 
 *     Environment device name not defined
-      INTEGER IDI__DEVNULL
-      PARAMETER (IDI__DEVNULL = IDI__NULLDEV)
+      INTEGER IDI__VD_DEVNULL
+      PARAMETER (IDI__VD_DEVNULL = IDI__VD_NULLDEV)
 
