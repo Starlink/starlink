@@ -281,6 +281,9 @@
 *     1997 March 20 (TIMJ)
 *        Extract from main tasks
 *     $Log$
+*     Revision 1.15  2004/09/01 01:02:48  timj
+*     mark SLA_DRANRM as external
+*
 *     Revision 1.14  2002/09/14 03:58:13  timj
 *     Update copyright
 *
@@ -445,6 +448,7 @@
 
 *  External References:
       DOUBLE PRECISION SLA_DRANRM
+      EXTERNAL SLA_DRANRM
 
 *  Local constants:
       DOUBLE PRECISION ARCSEC2RAD ! arcsec 2 radians conversion
