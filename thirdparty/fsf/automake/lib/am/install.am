@@ -58,6 +58,14 @@ endif !%?SUBDIRS%
 .PHONY: install-am
 install-am: all-am
 	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
+## Starlink: install a stamp file, just in case install-manifest isn't run
+	rm -f stamp-starlink-install
+	echo "component=$(PACKAGE_NAME)" >stamp-starlink-install
+	echo "version=$(PACKAGE_VERSION)" >>stamp-starlink-install
+	echo "date=\"`date`\"" >>stamp-starlink-install
+	$(INSTALL_DATA) stamp-starlink-install \
+	    $(STAR_MANIFEST_DIR)/stamp-$(PACKAGE_NAME)
+	rm -f stamp-starlink-install
 
 
 .PHONY: installcheck
