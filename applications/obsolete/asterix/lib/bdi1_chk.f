@@ -132,6 +132,7 @@
         CALL DAT_ANNUL( CLOC, STATUS )
 
       ELSE
+        IF ( STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
         OK = .FALSE.
 
       END IF
