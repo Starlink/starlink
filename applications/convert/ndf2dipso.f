@@ -146,7 +146,7 @@
          CALL NDF_MSG( 'NDF', NDF )
          CALL ERR_REP ('NDF2DIPSO_TOO_MANY_DIM',
      :     'NDF2DIPSO: Data array should be 1-dimensional. '/
-     :     /'NDF ^NDF has ^NDIM-dimensional.', STATUS)
+     :     /'NDF ^NDF is ^NDIM-dimensional.', STATUS)
          GOTO 999
       END IF    
 
