@@ -213,6 +213,10 @@
 *
       INTEGER                  STATUS               ! Run-time error
 *
+*    Functions:
+*
+      INTEGER			CHR_LEN
+*
 *    Local variables :
 *
       CHARACTER*80		PDATA			! PSFPIX response
@@ -228,6 +232,7 @@
       INTEGER          		MAXW                    ! Maximum psf size
       INTEGER          		NIPOS                   ! Number of psf image posn's
       INTEGER          		NUR                     ! # user psfpix values
+      INTEGER			PLEN
       INTEGER          		R68(3)                  !
 
       LOGICAL          		FIR_TRUNC               ! First psf truncated?
@@ -354,7 +359,7 @@
           IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *      User supplied a percentage
-          PLEN = CHR_LEN( PDADTA )
+          PLEN = CHR_LEN( PDATA )
           IF ( PDATA(PLEN:PLEN) .EQ. '%' ) THEN
             IF ( PDATA(1:PLEN-1) .EQ. '50' ) THEN
               ILEV = 1
