@@ -3,9 +3,9 @@ CONVERT is a command-driven package.  Commands have parameters by
 which you can qualify their behaviour.  Parameters are obtained in
 response to prompts or supplied on a command line.
 
-For convenience, the main aspects of the ADAM parameter system as
-seen by a user of CONVERT are described below, but note that most
-of what follows is applicable to any ADAM application.
+For convenience, the main aspects of the Starlink parameter system
+as seen by a user of CONVERT are described below, but note that most
+of what follows is applicable to any Starlink application.
 
 2 Defaults
 Command-line values are used mostly for those parameters that are
@@ -14,12 +14,12 @@ applications to have many options, say for controlling the format of
 the output file, without making routine operations tedious because
 of a large number of prompts.  The values of normally defaulted
 parameters are given in the help for each parameter within each
-application. They are enclosed in square brackets at the end of the
+application.  They are enclosed in square brackets at the end of the
 parameter descriptions. 
  
      ICL> HELP NDF2DST PARAM * 
  
-gives details of all parameters in application NDF2DST. If you want
+gives details of all parameters in application NDF2DST.  If you want
 to override one of these defaults, then you must specify the
 parameter's value on the command line. 
 
@@ -38,36 +38,38 @@ to override the default.  Some defaults begin with an @.
  
      IN - NDF to be converted /@starfield/ > 
  
-These are associated with files. If you want to override the default
+These are associated with files.  If you want to override the default
 given, you do not have to prefix your value with an @, e.g.
  
      IN - NDF to be converted /@starfield/ > horse
  
 There are rare cases when the syntax is ambiguous, and it is then
-that you need to include the @. One occasion where you would need
+that you need to include the @.  One occasion where you would need
 it is when the filename is a number, e.g. if your NDF was called 234
-you must enter @234, otherwise ADAM will think you are giving the
-integer 234.  Note that the file extension must not be included
-when giving the name of an NDF file.  Otherwise HDS will look
-for an object called SDF nested within the file. 
+you must enter @234, otherwise the parameter system will think you
+are giving the integer 234.  Note that the file extension must not
+be included when giving the name of an NDF file.  Otherwise HDS will
+look for an object called SDF nested within the file. 
 
-The default value can be edited to save typing by first pressing the
-<TAB> key. The editor behaves like the DCL command-line editor.
-Defaults may change as data are processed by CONVERT.  Often the
-current (last) value of the parameter will be substituted, or a
-dynamic value is suggested depending on the values of other
-parameters.
+From ICL, the default value can be edited to save typing by first
+pressing the <TAB> key.  The editor behaves like the DCL
+command-line editor.  Defaults may change as data are processed by
+CONVERT.  Often the current (last) value of the parameter will be
+substituted, or a dynamic value is suggested depending on the
+values of other parameters.
 
 Current values of CONVERT parameters are stored in the HDS file
-ADAM_USER:CONVERT.SDF for ICL CONVERT, and ADAM_USER:application.SDF
-for the DCL commands.  These enable the defaults to persist between
-CONVERT sessions.  These files should not be deleted unless CONVERT
-parameters are to be completely reset. 
+$ADAM_USER/<application>.sdf, where <application> is the name of
+the CONVERT command.  (If the environment variable $ADAM_USER is
+not defined the parameter file is situated in $HOME/adam).  Current
+values enable the defaults to persist between CONVERT sessions. 
+These files should not be deleted unless CONVERT parameters are to
+be completely reset. 
 
 2 Globals
 CONVERT uses the KAPPA global parameter that records the last NDF
 accessed or created, in order to reduce typing in response to
-prompts.  Global means that it is  shared between applications. 
+prompts.  Global means that it is shared between applications. 
 Thus the suggested input NDF for NDF2x applications is the value of
 that global parameter.  If you just press <CR> to the prompt for an
 input NDF, the global value is unchanged.  Only when you modify the
@@ -76,11 +78,12 @@ value updated, and so becomes the suggested default value for the
 next prompt for an NDF.  Similarly an x2NDF application updates the
 global parameter with the name of the NDF it has just made.
 
-All global parameters are stored in HDS file ADAM_USER:GLOBAL.SDF.
+All global parameters are stored in HDS file $ADAM_USER/GLOBAL.sdf
+(or $HOME/adam/GLOBAL.sdf when $ADAM_USER is not defined).
 
 2 Strings
 The apostrophes around strings given in response to prompts for a
-character parameter can be omitted. Responses to prompts are case
+character parameter can be omitted.  Responses to prompts are case
 insensitive. 
 
 2 Arrays
@@ -89,10 +92,10 @@ brackets separated by commas or spaces.  For example,
 
      SHAPE - Shape of the output NDF > [3,5,4]
 
-would input three values: 3, 5 and 4 into the integer parameter SHAPE.
-There is one exception where you can omit the brackets---a fairly common
-one---and that is in response to a prompt for a one-dimensional array as
-above. 
+would input three values: 3, 5 and 4 into the integer parameter
+SHAPE.  There is one exception where you can omit the brackets---a
+fairly common one---and that is in response to a prompt for a
+one-dimensional array as above. 
 
 2 Abort_and_Null
 Responding to a prompt with a null value ! will not necessarily
@@ -102,8 +105,7 @@ to be used, where this is the most-sensible action.
 Responding to a prompt with an abort request !! will abort the
 application.  This process includes the various tidying operations
 such as the unmapping and closing of files.  Any other method of
-stopping an application prematurely can leave files mapped or
-corrupted. 
+stopping a task prematurely can leave files mapped or corrupted.
 
 2 Help
 To get help about a parameter enter ?.  This will give access to the
@@ -117,20 +119,21 @@ help-library information for that parameter, for example,
 
          RECLEN = _INTEGER (Read)
             The maximum record length in bytes of the output file.  This
-            must be between 32 and 32766.  The lower limit is further
-            increased to 80 when there is a FITS header to be copied.  It
-            is only used when FIXED is FALSE and will default to the
-            current value, or 512 if there is no current value.  When
-            FIXED is TRUE the application creates data records whose
+            must be greater than 31 on UNIX systems.  The lower limit is
+            further increased to 80 when there is a FITS header to be
+            copied.  It is only used when FIXED is FALSE and will default
+            to the current value, or 512 if there is no current value.
+            When FIXED is TRUE the application creates data records whose
             length is the product of the number of bytes per value plus
-            one (for the space), times the number of values per record. []
+            one (for the space), times the number of values per record.
+            []
 
      RECLEN - Maximum recordsize of the ASCII file. /512/ > 
  
 and then immediately reprompt you for the parameter.  There are
 occasions when information about the parameter is insufficient; you
 may require to examine the examples or the description of related
-parameters.  This can be achieved via entering ?? to the prompt.
+parameters.  This can be achieved via entering ?? at the prompt.
 You can then delve anywhere in the help information.  When you exit
 the help system you're reprompted for the parameter.
 
@@ -142,7 +145,7 @@ little as a single character.  Here is an example.
 
      TYPE - HDS data type required for NDF /'_REAL'/ ?
 
-     NDF2BDF
+     ASCII2NDF
 
        Parameters
 
@@ -152,87 +155,110 @@ little as a single character.  Here is an example.
             "_DOUBLE", "_UBYTE", "_UWORD" corresponding to signed byte,
             signed word, real, integer, double precision, unsigned byte,
             and unsigned word.  See SUN/92 for further details.  An
-            unambiguous abbreviation may be given.  The default is the
-            type corresponding to that of the BDF.  []
+            unambiguous abbreviation may be given.  TYPE is ignored when
+            COMP = "Quality" since the QUALITY component must comprise
+            unsigned bytes (equivalent to TYPE = "_UBYTE") to be a valid
+            NDF.  The suggested default is the current value.  TYPE is only
+            accessed when FITS is FALSE. ["_REAL"]
+
  
 where an _R would be sufficient to select the _REAL type, but at
 least two characters would be needed if you wanted unsigned byte
 or unsigned word.
 
-2 Logical_names
-From DCL, ordinary process logical names may be used as normal.
-However, logical names to be used by applications (including CONVERT)
-from within ICL must be defined with the /JOB qualifier. Thus if
-your NDF data files are stored in IMAGEDIR alias
-DISK$USER1:[XYZ.IRCAM.IMAGES]
- 
-    $ DEFINE/JOB IMAGEDIR DISK$USER1:[XYZ.IRCAM.IMAGES]
- 
-will enable you to respond to a prompt thus
- 
-     IN - NDF to be converted /@starfield/ > imagedir:ngc1365
- 
-Regrettably, at present ICL cannot change default directories for
-CONVERT.  The DEFAULT command only applies to ICL and the DCL
-process. Therefore, if you need to access files in several
-directories with the minimum of typing, you should define some job
-logical names as described above.  If you require many then you will
-need your JTQUOTA increased.  See your site manager if you run into
-difficulties.  It is advisable to set default to the directory
-containing your data files before entering ICL.
+2 Environment_Variables
+Environment variables operate both on the command line and prompts,
+and both from the shell and ICL.  Thus if IMAGEDIR is an environment
+variable pointing to a directory containing the NDF called ngc1365,
+you could access it at a prompt as shown below.
 
+     IN - Input NDF /@starfield/ > $IMAGEDIR/ngc1365
+ 
 2 Specifying_Parameter_Values_on_Command_Lines
 Parameters may be assigned values on the command line. This is
 useful for running CONVERT in batch mode and in procedures, and for
 specifying the values of parameters that would otherwise be
-defaulted. A command-line parameter will prevent prompting for that
+defaulted.  A command-line parameter will prevent prompting for that
 parameter unless there is an error with the given value, say giving
 an alphabetic character string where a floating-point value is
 demanded.
 
 There are two ways in which parameter values may be given on the
-command line: by keyword and by position. The two forms may be mixed
-with care. The parser looks for positional parameters then keywords,
-so you can have some positional values followed by keyword values.
-See some of the "Examples" sub-topics presented in help on individual
-applications.
+command line: by keyword and by position.  The two forms may be
+mixed with care.  The parser looks for positional parameters then
+keywords, so you can have some positional values followed by
+keyword values.  See some of the "Examples" sub-topics presented in
+the help on individual applications.
 
+3 Keyword
 Keywords may appear in any order.  Here is an example of
 command-line defaults using keywords: 
  
-     ICL> BDF2NDF DESCRIP TYPE=_REAL MYZNDF
+     % ascii2ndf fits type=_real
  
-TYPE is a literal parameter.  DESCRIP is a logical parameter; by giving
-just its name it is given the value TRUE.  DESCRIP=T would
-have the same effect.  To obtain a false value for a logical parameter
-you add a NO prefix to keyword, for example,
+TYPE is a literal parameter.  FITS is a logical parameter; by
+giving just its name it is given the value TRUE.  FITS=T would
+have the same effect.  To obtain a FALSE value for a logical
+parameter add a NO prefix to keyword, for example,
  
-     ICL> BDF2NDF NODESCRIP 
+     % ascii2ndf nofits
  
-would be equivalent to DESCRIP=F.
+would be equivalent to
 
+     % ascii2ndf fits=false
+
+3 Abbreviations
+There is an experimental system that allows you to abbreviate
+parameter keywords to the minimum unambiguous length.  To use it,
+you must first create an environment variable called ADAM_ABBRV
+with an arbitrary value.
+
+So for example
+
+     % setenv ADAM_ABBRV true
+     % ndf2fits bit=32 co=v 
+
+would convert the variance array of an NDF to FITS using a BITPIX of
+32.
+
+If you give an ambiguous keyword, the parameter system will present
+the list of possible keywords and ask you to select the one you
+intended.  Suppose you want to ensure that ndf2fits merges the
+contents of an NDF's FITS extension into the header of the FIT file,
+and you think that there is only one paramewter starting with P.
+
+     % ndf2fits p
+     !! Ambiguous keyword P used on the command line
+     !  Matches with PROEXTS
+     !           and PROFITS
+       - Specify the keyword unambiguously > PROF
+
+When reprompted you just give an unambiguous abbreviation for the
+desired parameter, that being PROFITS in this example.
+
+3 Position
 Alternatively, you can specify command-line values by position:
  
-     $ DST2NDF MYDST MYNDF
+     % dst2ndf mydst myndf
  
-The application converts the Figaro DST file called MYDST.DST to the
-NDF called MYNDF.  Note that trailing parameters may be omitted but
-intermediate ones may not. The position of a parameter can be found
-in the "Usage" topic for the application.
+The application converts the Figaro DST file called mydst.dst to the
+NDF called myndf (in file myndf.sdf).  Note that trailing parameters
+may be omitted but intermediate ones may not.  The position of a
+parameter can be found in the "Usage" topic for the application.
 
 Another consideration is that some parameters do not have defined
-positions because they are normally defaulted. Thus the keyword
+positions because they are normally defaulted.  Thus the keyword
 technique is recommended for most parameters.
 
 2 Special Keywords:_ACCEPT,_PROMPT,_RESET
-Another way in which prompts and default values can be controlled is
-by use of the keywords ACCEPT, PROMPT and RESET.
+Another way in which prompts and default values can be controlled
+is by use of the keywords ACCEPT, PROMPT and RESET.
 
-The RESET keyword causes the default value of all parameters (apart
-from those already specified before it on the command line) to be
-set to the original values specified by the application or its
-interface file.  In other words global and current values are
-ignored.
+The RESET keyword causes the suggested default value of all
+parameters (apart from those already specified before it on the
+command line) to be set to the original values specified by the
+application or its interface file.  In other words global and
+current values are ignored. 
 
 The PROMPT keyword forces a prompt to appear for every application
 parameter.  This can be useful if you cannot remember the name of a
@@ -240,17 +266,46 @@ defaulted parameter or there would be too much to type on the
 command line.  
 
 The ACCEPT keyword forces the parameter system to accept the
-suggested default values for every application parameter.  In other
-words, those parameters which would normally be prompted with a
-value between `/ /' delimiters take the value between those
-delimiters.  Parameters that are normally defaulted behave as
-normal.  The ACCEPT keyword needs to be used with care because not
-every parameter has a default, and therefore must be given on the
-command line for the application to work properly. 
+suggested default values either for every application parameter if
+the keyword appears on the command line, or all subsequent
+parameters if it is supplied to a prompt.  In other words, those
+parameters which would normally be prompted with a value between
+"/ /" delimiters take the value between those delimiters.
+Parameters that are normally defaulted behave as usual.  The ACCEPT
+keyword needs to be used with care in scripts because not every
+parameter has a default, and therefore must be given on the command
+line for the application to work properly.
 
 There is a shorthand for ACCEPT---a backslash at the end of the
-command line.  For example,
+command line.
 
-     $ unf2ndf \
- 
+     ICL> unf2ndf \
+
 though you would still be prompted for the name of output NDF.
+
+How do you find out which parameters have suggested defaults, as
+opposed to those that are normally defaulted?  Well, a good rule of
+thumb is that parameters for output files (images, lookup tables and
+text) will not have a default, but the remainder will.  Consulting
+the description of the parameters should give the suggested
+defaults, where appropriate.  If you want to use ACCEPT for an
+automatic procedure or batch job you could do some tests to find
+which parameters get prompted and then put them on the command line
+in your procedure. 
+
+In command lines from the shell, the backslash is a metacharacter
+and has to be escaped.  The easiest way to do that is to double the
+backslash. 
+
+     % unf2ndf \\
+ 
+The RESET and ACCEPT keywords will work in tandem.  So for instance,
+
+     ICL> ircam2ndf reset accept
+
+will reset the suggested defaults of IRCAM2NDF to their original,
+preset values, and accept these as the parameter values.
+
+These special keywords may be abbreviated to no fewer than two
+characters, if you have enabled keyword-abbreviation. 
+
