@@ -592,6 +592,11 @@
             LOOP = .FALSE.
          END IF
 
+*  Cancel the parameter so that it doesn't get used again on the next
+*  invocation of thsi application. This would only happen when running as a
+*  monolith (i.e. from ICL or StarTcl).
+         CALL PAR_CANCL( PNAME( : LPNAME ), STATUS )
+
 *  Now deal with interface mode...
       ELSE 
          CALL KPS1_INXYR( 'XY', NVERT, IPX, IPY, STATUS )

@@ -41,6 +41,7 @@ interface POLPLOT
       type        '_LOGICAL'
       prompt      'Are annotated axes to be drawn?'
       vpath       'DEFAULT'
+      ppath       'DEFAULT'
       default     T
       helpkey     '*'
    endparameter
@@ -56,6 +57,7 @@ interface POLPLOT
    parameter      CLEAR          
       type        '_LOGICAL'
       vpath       'DEFAULT'
+      ppath       'DEFAULT'
       prompt      'Is the current picture to be cleared before plotting?'
       helpkey     '*'
       default     Y
@@ -119,6 +121,7 @@ interface POLPLOT
       type        '_LOGICAL'
       prompt      'Fill the plotting area?'
       vpath       'DEFAULT'
+      ppath       'DEFAULT'
       default     N
       helpkey     '*'
    endparameter
@@ -173,6 +176,15 @@ interface POLPLOT
       prompt      'Co-ordinates at lower left corner of plotting area'
       vpath       'DYNAMIC'
       ppath       'DYNAMIC'
+      helpkey     '*'
+   endparameter
+
+   parameter      NEGATE
+      type        '_LOGICAL'
+      prompt      'Are the supplied angles to be negated?'
+      vpath       'DEFAULT'
+      ppath       'DEFAULT'
+      default     F
       helpkey     '*'
    endparameter
 

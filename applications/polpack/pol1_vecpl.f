@@ -1,5 +1,6 @@
       SUBROUTINE POL1_VECPL( NVEC, X, Y, VECMAG, VECORN, ANGFAC,
-     :                       ANGROT, DSCALE, AHSIZE, JUST, STATUS )
+     :                       ANGROT, DSCALE, AHSIZE, JUST, NEGATE,
+     :                       STATUS )
 *+
 *  Name:
 *     POL1_VECPL
@@ -12,7 +13,7 @@
 
 *  Invocation:
 *     CALL POL1_VECPL( NVEC, X, Y, VECMAG, VECORN, ANGFAC,
-*                      ANGROT, DSCALE, AHSIZE, JUST, STATUS )
+*                      ANGROT, DSCALE, AHSIZE, JUST, NEGATE, STATUS )
 
 *  Description:
 *     The supplied vectors are plotted.
@@ -52,6 +53,8 @@
 *        'START' causes vectors to be drawn starting at the
 *        corresponding pixel.  'END' causes vectors to be drawn ending
 *        at the corresponding pixel.
+*     NEGATE = LOGICAL (Given)
+*        Negate the supplied angles before adding on ANGROT?
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -89,6 +92,7 @@
       REAL DSCALE
       REAL AHSIZE
       CHARACTER * ( * ) JUST
+      LOGICAL NEGATE
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -127,8 +131,11 @@
 *  vector orientations are measured from the Y axis, but the supplied
 *  VECORN values are measured from the X axis. So subtract 90 degrees
 *  from the supplied value to make zero equivalent to the Y axis.
-            VECANG = ANGFAC * VECORN( I ) + ANGROT - PIBY2
-
+            IF( NEGATE ) THEN
+               VECANG = -ANGFAC * VECORN( I ) + ANGROT - PIBY2
+            ELSE
+               VECANG = ANGFAC * VECORN( I ) + ANGROT - PIBY2
+            END IF
 *  Plot the vector.      
             CALL KPG1_VECT( REAL( X( I ) ), REAL( Y( I ) ), JUST, 
      :                      VECLEN, VECANG, AHSIZE, STATUS )

@@ -265,6 +265,11 @@
 *        Add checks that STATUS is SAI__OK before reporting new errors.
 *        Add cast to REAL when passing DOUBLE PRECISION variables to
 *        MSG_SETR.
+*     8-MAY-1998 (DSB):
+*        Added code to reject the 0.5% of supplied points with the
+*        smallest variances. Very small variances were previously causing
+*        the iterative procedure not to converge because of extremely large 
+*        wieghts being given to very points.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -433,6 +438,45 @@
 *  ===========
 *  Find the smallest variance value which is safe to handle.
          TINY = EL / NUM__MAXR
+
+*  DSB: The above limit is sometimes too small. Very small variances turn 
+*  into very large weights, which can totally throw the whole business.
+*  If variances are being used, find the 0.5% quantile points in VAR1 and 
+*  VAR2. Points with variances smaller than these are not used.
+         IF ( VAR ) THEN
+
+*  First identify the good variance values.
+            IF( BAD ) THEN
+
+               NPTS = 0
+               DO I = 1, EL
+                  IF ( ( VAR1( I ) .NE. VAL__BADR ) .AND.
+     :                 ( VAR2( I ) .NE. VAL__BADR ) ) THEN
+                     NPTS = NPTS + 1
+                     IP( NPTS, 1 ) = I
+                  END IF
+               END DO
+
+            ELSE
+               NPTS = EL
+               DO I = 1, EL
+                  IP( I, 1 ) = I
+               END DO
+
+            END IF
+
+*  If there are more than 3 good variances values, find the 0.5% quantiles.
+            IF( NPTS .GT. 3 ) THEN
+               CALL CCD1_QNTLR( .FALSE., .FALSE., 0.005, NPTS, VAR1,
+     :                          0.0, IP, Q1, STATUS )
+               CALL CCD1_QNTLR( .FALSE., .FALSE., 0.005, NPTS, VAR2,
+     :                          0.0, IP, Q2, STATUS )
+
+*  Modify the TINY value set above.               
+               TINY = MAX( TINY, MAX( Q1, Q2 ) )
+            END IF
+
+         END IF
 
 *  Loop to identify input data points to use.
          NPTS = 0
