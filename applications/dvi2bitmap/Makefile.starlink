@@ -369,7 +369,7 @@ PKG_NAME = dvi2bitmap
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
-PKG_VERS = 1.0-5
+PKG_VERS = 1.0-6
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the
@@ -856,8 +856,16 @@ unbuild: clean
 # the file dvi2bitmap.cc as a trigger: if that's missing, then we must be
 # in the distributed directory, so unpack the source bundle and move the
 # files up to the current directory.
+#
+# dvi2bitmap has a feature which allows it to work around the problem
+# caused by a TeX installation in which texmf.cnf defines VARTEXFONTS to 
+# depend on one of the SELFAUTO... variables.  Grep the texmf.cnf file for
+# the pattern 'FONTS.*AUTO', and add this configure option if we find it.
+# This isn't _terribly_ robust, but it should do.
 dvi2bitmap: dvi2bitmap.cc
-	CXX=$(CXX) ./configure --enable-gif --with-kpathsea
+	eval test -x "`which kpsewhich`" && grep 'FONTS.*AUTO' `kpsewhich cnf texmf.cnf` > /dev/null && TEXMFCNFTEST=--enable-fake-progname ;\
+	test -n "$$TEXMFCNFTEST" && echo "Warning: faking dvi2bitmap program name" ; \
+	CXX=$(CXX) ./configure --enable-gif --with-kpathsea $$TEXMFCNFTEST
 	$(MAKE) -f Makefile dvi2bitmap
 
 # Don't have this depending dvi2bitmap_source.tar - the latter will usually
