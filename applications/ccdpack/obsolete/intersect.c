@@ -37,8 +37,8 @@
 
 *  History:
 *     1-JAN-1994 (OROURKE):
-*        Original version published in "Computational Geometry in C",
-*        Cambridge University Press, 1994, J. O'Rourke.
+*        Original version published in J. O'Rourke, "Computational 
+*        Geometry in C", Cambridge University Press (1994).
 *     25-OCT-2000 (MBT):
 *        Adapted for use with Tcl.
 
@@ -50,11 +50,17 @@
 #define X       0
 #define Y       1
 #define DIM     2               /* Dimension of points */
+#define PMAX    100             /* Max # of pts in polygon */
 typedef double  tPointi[DIM];   /* type integer point */
 typedef double  tPointd[DIM];   /* type double point */
-#define PMAX    100             /* Max # of pts in polygon */
+typedef tPointi tPolygoni[PMAX];/* type integer polygon */
+typedef enum { FALSE, TRUE } bool;
+bool    Left( tPointi a, tPointi b, tPointi c );
+void    ConvexIntersect( tPolygoni P, tPolygoni Q, int n, int m, tPointd *Z, int *pnz );
 
-#include <tcl.h>
+void preverse( int n, tPolygoni poly );
+
+#include "tcl.h"
 
 
    int IntersectCmd( ClientData clientData, Tcl_Interp *interp, int objc,
@@ -62,9 +68,12 @@ typedef double  tPointd[DIM];   /* type double point */
 
 /* Local Variables. */
       tPolygoni poly[ 2 ];
+      tPointi intpoly[ PMAX * 2 ];
       int i;
+      int intnvert;
       int j;
       int nvertex[ 2 ];
+      Tcl_Obj *result;
 
 /* Check syntax. */
       if ( objc != 3 ) {
@@ -105,19 +114,66 @@ typedef double  tPointd[DIM];   /* type double point */
          }
       }
 
-      
+/* Check that both polygons are defined in a clockwise direction, which is
+   required for the intersection algorithm.  If not, reverse the order of
+   the vertices.  We make the assumption that they are in fact convex. */
       for ( i = 0; i < 2; i++ ) {
-         for ( j = 0; j < nvertex[ i ]; j++ ) {
-            printf( "{%6lf %6lf}  ", poly[ i ][ j ][ X ], poly[ i ][ j ][ Y ] );
+         if ( ! Left( poly[ i ][ 0 ], poly[ i ][ 1 ], poly[ i ][ 2 ] ) ) {
+            printf( "reverse %d\n", i );
+            preverse( nvertex[ i ], poly[ i ] );
          }
-         printf( "\n" );
       }
 
-      return TCL_OK;
+/* Do the calculation.  Check for an intersection; if we don't get one 
+   then try reversing the order of the vertices of one or both polygons.
+   This may be necessary since the algorithm only works if both polygons
+   are specified in clockwise order.  There is probably a more efficient
+   way of doing this. */
+      ConvexIntersect( poly[ 0 ], poly[ 1 ], nvertex[ 0 ], nvertex[ 1 ],
+                       intpoly, &intnvert );
 
+/* Set the result. */
+      result = Tcl_NewListObj( 0, NULL );
+      for ( i = 0; i < intnvert; i++ ) {
+         Tcl_Obj *pov[ 2 ];
+         if ( i > 0 && intpoly[ i ][ X ] == intpoly[ i - 1 ][ X ] 
+                    && intpoly[ i ][ Y ] == intpoly[ i - 1 ][ Y ] ) {
+            /* no point in writing two identical adjacent points. */
+         } 
+         else {
+            pov[ 0 ] = Tcl_NewDoubleObj( intpoly[ i ][ X ] );
+            pov[ 1 ] = Tcl_NewDoubleObj( intpoly[ i ][ Y ] );
+            Tcl_ListObjAppendElement( interp, result, 
+                                      Tcl_NewListObj( 2, pov ) );
+         }
+      }
+      Tcl_SetObjResult( interp, result );
+
+/* Return with success status. */
+      return TCL_OK;
    }
 
 
+   void preverse( int n, tPolygoni poly ) {
+      int i;
+      double x, y;
+      for ( i = 0; i < ( n + 1 ) / 2; i++ ) {
+         x = poly[ i ][ X ];
+         y = poly[ i ][ Y ];
+         poly[ i ][ X ] = poly[ n - 1 - i ][ X ];
+         poly[ i ][ Y ] = poly[ n - 1 - i ][ Y ];
+         poly[ n - 1 - i ][ X ] = x;
+         poly[ n - 1 - i ][ Y ] = y;
+      }
+   }
+
+
+/*************************************************************************/
+/* The following code is lifted mostly from O'Rourke's book.             */
+/* Modifications were made to allow it to return the vertices of an      */
+/* overlap polygon to a calling routine, and to allow double precision   */
+/* coordinates for the initial polygons rather than just integer ones.   */
+/*************************************************************************/
 
 /*
 This code is described in "Computational Geometry in C" (Second Edition),
@@ -133,19 +189,13 @@ redistributed in its entirety provided that this copyright notice is
 not removed.
 --------------------------------------------------------------------
 */
-#define EXIT_SUCCESS 0
-#define EXIT_FAILURE 1
-typedef enum { FALSE, TRUE } bool;
 typedef enum { Pin, Qin, Unknown } tInFlag;
 
 
-typedef tPointi tPolygoni[PMAX];/* type integer polygon */
 
 /*---------------------------------------------------------------------
 Function prototypes.
 ---------------------------------------------------------------------*/
-void    ClosePostscript( void );
-void	PrintSharedSeg( tPointd p, tPointd q );
 double  Dot( tPointi a, tPointi b );
 int	AreaSign( tPointi a, tPointi b, tPointi c );
 char    SegSegInt( tPointi a, tPointi b, tPointi c, tPointi d, tPointd p, tPointd q );
@@ -163,33 +213,11 @@ void	OutputPolygons( void );
 
 void firstpoint( tPointd p, tPointd dest );
 void addpoint( tPointd p, tPointd dest );
-/*-------------------------------------------------------------------*/
-
-/* Global variables */
-int     	n, m, nz;
-tPolygoni	P, Q;
-tPointd         Z[PMAX*2];
-
-main()
-{
-   int i;
-   n = ReadPoly( P );
-   m = ReadPoly( Q );
-   OutputPolygons();
-   fprintf( stderr, "Starting calculations:\n" );
-   ConvexIntersect( P, Q, n, m, Z, &nz );
-
-   fprintf( stderr, "Intersect polygon has %d vertices:\n", nz );
-   for ( i = 0; i < nz; i++ ) {
-      fprintf( stderr, "%8.2lf  %8.2lf\n", Z[i][X], Z[i][Y] );
-   }
-   ClosePostscript();
-}
 
 /*---------------------------------------------------------------------
 ---------------------------------------------------------------------*/
-void    ConvexIntersect( tPolygoni P, tPolygoni Q, int n, int m,
-                         tPointd *Z, int *pnz )
+void ConvexIntersect( tPolygoni P, tPolygoni Q, int n, int m,
+                      tPointd *Z, int *pnz )
                            /* P has n vertices, Q has m vertices. */
 {
    int     a, b;           /* indices on P and Q (resp.) */
@@ -225,7 +253,6 @@ void    ConvexIntersect( tPolygoni P, tPolygoni Q, int n, int m,
 
       /* If A & B intersect, update inflag. */
       code = SegSegInt( P[a1], P[a], Q[b1], Q[b], p, q );
-      printf("%%SegSegInt: code = %c\n", code );
       if ( code == '1' || code == 'v' ) {
          if ( inflag == Unknown && FirstPoint ) {
             aa = ba = 0;
@@ -241,16 +268,14 @@ void    ConvexIntersect( tPolygoni P, tPolygoni Q, int n, int m,
 
       /* Special case: A & B overlap and oppositely oriented. */
       if ( ( code == 'e' ) && (Dot( A, B ) < 0) ) {
-         printf("%%A int B:\n");
          firstpoint( p, Z[(*pnz)++] );
          addpoint( q, Z[(*pnz)++] );
-         ClosePostscript();
          return;
       }
 
       /* Special case: A & B parallel and separated. */
       if ( (cross == 0) && ( aHB < 0) && ( bHA < 0 ) ) {
-            printf("%%P and Q are disjoint.\n");
+            /* printf("%%P and Q are disjoint.\n"); */
             return;
       }
 
@@ -296,20 +321,19 @@ void    ConvexIntersect( tPolygoni P, tPolygoni Q, int n, int m,
             addpoint( p0, Z[(*pnz)++] );
 
    /* Deal with special cases: not implemented. */
-   if ( inflag == Unknown) 
-      printf("%%The boundaries of P and Q do not cross.\n");
+   if ( inflag == Unknown) {
+      /* printf("%%The boundaries of P and Q do not cross.\n"); */
+   }
 }
 
 void firstpoint( tPointi p, tPointi dest ) {
    dest[X] = p[X];
    dest[Y] = p[Y];
-   printf("%8.2lf %8.2lf moveto\n", p[X], p[Y]);
 }
 
 void addpoint( tPointd p, tPointd dest ) {
    dest[X] = p[X];
    dest[Y] = p[Y];
-   printf("%8.2lf %8.2lf lineto\n", p[X], p[Y]);
 }
 
 /*---------------------------------------------------------------------
@@ -332,40 +356,6 @@ int     Advance( int a, int *aa, int n, bool inside, tPointi v )
 {
    (*aa)++;
    return  (a+1) % n;
-}
-
-/*
-   Reads in the coordinates of the vertices of a polygon from stdin,
-   puts them into P, and returns n, the number of vertices.
-   Formatting conventions: etc.
-*/
-int   ReadPoly( tPolygoni P )
-{
-   int   n = 0;
-   int   nin;
-
-   scanf("%d", &nin);
-   while ( (n < nin) && (scanf("%lf %lf",&P[n][0],&P[n][1]) != EOF) ) {
-      ++n;
-   }
-/*
-   if (n < PMAX)
-      printf("%%n = %3d vertices read\n",n);
-   else   printf("Error in read_poly:  too many points; max is %d\n", PMAX);
-   putchar('\n');
-*/
-
-   return   n;
-}
-
-void   PrintPoly( int n, tPolygoni P )
-{
-   int   i;
-
-   printf("Polygon:\n");
-   printf("  i   l   x   y\n");
-   for( i = 0; i < n; i++ )
-      printf("%3d%8.2lf%8.2lf%4d\n", i, P[i][0], P[i][1]);
 }
 
 /*
@@ -405,10 +395,10 @@ int	AreaSign( tPointi a, tPointi b, tPointi c )
     area2 = ( b[0] - a[0] ) * (double)( c[1] - a[1] ) -
             ( c[0] - a[0] ) * (double)( b[1] - a[1] );
 
-    /* The area should be an integer. */
-    if      ( area2 >  0.5 ) return  1;
-    else if ( area2 < -0.5 ) return -1;
-    else                     return  0;
+    /* These values of 0.001 are arbitrary - they should be small though. */
+    if      ( area2 >  0.001 ) return  1;
+    else if ( area2 < -0.001 ) return -1;
+    else                      return  0;
 }
 
 /*---------------------------------------------------------------------
@@ -523,55 +513,6 @@ bool    Between( tPointi a, tPointi b, tPointi c )
              ((a[Y] >= c[Y]) && (c[Y] >= b[Y]));
 }
 
-void   OutputPolygons( void )
-{
-   int i;
-   int xmin, ymin, xmax, ymax;
-
-   /* Compute Bounding Box for Postscript header. */
-   xmin = xmax = P[0][X];
-   ymin = ymax = P[0][Y];
-   for (i = 1; i < n; i++) {
-      if      ( P[i][X] > xmax ) xmax = P[i][X];
-      else if ( P[i][X] < xmin ) xmin = P[i][X];
-      if      ( P[i][Y] > ymax ) ymax = P[i][Y];
-      else if ( P[i][Y] < ymin ) ymin = P[i][Y];
-   }
-   for (i = 0; i < m; i++) {
-      if      ( Q[i][X] > xmax ) xmax = Q[i][X];
-      else if ( Q[i][X] < xmin ) xmin = Q[i][X];
-      if      ( Q[i][Y] > ymax ) ymax = Q[i][Y];
-      else if ( Q[i][Y] < ymin ) ymin = Q[i][Y];
-   }
-
-
-   /* PostScript header */
-   printf("%%!PS\n");
-   printf("%%%%Creator: convconv.c (Joseph O'Rourke)\n");
-   printf("%%%%BoundingBox: %d %d %d %d\n",
-      xmin, ymin, xmax, ymax);
-   printf("%%%%EndComments\n");
-   printf(".00 .00 setlinewidth\n");
-   printf("%d %d translate\n", -xmin+100, -ymin+100 );
-   /* The +100 shifts the figure from the lower left corner. */
-
-   printf("\n%%Polygon P:\n");
-   printf("newpath\n");
-   printf("%lf\t%lf\tmoveto\n", P[0][X], P[0][Y]);
-   for( i = 1; i <= n; i++ )
-      printf("%lf\t%lf\tlineto\n", P[i%n][X], P[i%n][Y]);
-   printf("closepath stroke\n");
-
-   printf("\n%%Polygon Q:\n");
-   printf("newpath\n");
-   printf("%lf\t%lf\tmoveto\n", Q[0][X], Q[0][Y]);
-   for( i = 1; i <= m; i++ )
-      printf("%lf\t%lf\tlineto\n", Q[i%m][X], Q[i%m][Y]);
-   printf("closepath stroke\n");
-
-   printf("2 2 setlinewidth\n");
-   printf("newpath\n");
- }
 /*---------------------------------------------------------------------
 Returns the dot product of the two input vectors.
 ---------------------------------------------------------------------*/
@@ -586,8 +527,3 @@ double  Dot( tPointi a, tPointi b )
     return  sum;
 }
 
-void   ClosePostscript( void )
-{
-   printf("closepath stroke\n");
-   printf("showpage\n%%%%EOF\n");
-}
