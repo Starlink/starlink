@@ -135,7 +135,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/splat/build/java
-     [copy] Copying 155 files to /apps/cvsbuild/java/source/splat/build/java
+     [copy] Copying 156 files to /apps/cvsbuild/java/source/splat/build/java
      [echo] Executing Mirage target: javadoc-sources
 
 javadoc-sources:
@@ -150,8 +150,8 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/treeview/build/java
-     [copy] Copying 113 files to /apps/cvsbuild/java/source/treeview/build/java
-     [copy] Copied 4 empty directories to /apps/cvsbuild/java/source/treeview/build/java
+     [copy] Copying 114 files to /apps/cvsbuild/java/source/treeview/build/java
+     [copy] Copied 3 empty directories to /apps/cvsbuild/java/source/treeview/build/java
      [echo] Executing Coco target: javadoc-sources
 
 javadoc-sources:
@@ -1544,4 +1544,4 @@ javadoc-sources:
   [javadoc] 578 warnings
 
 BUILD SUCCESSFUL
-Total time: 1 minute 26 seconds
+Total time: 1 minute 12 seconds

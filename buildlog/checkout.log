@@ -8238,6 +8238,7 @@ U java/source/splat/src/main/uk/ac/starlink/splat/iface/FloatJSlider.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/FloatJSliderModel.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/FuzzyBooleanCellEditor.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/FuzzyBooleanCellRenderer.java
+U java/source/splat/src/main/uk/ac/starlink/splat/iface/GenerateFromInterpFrame.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/GlobalSpecPlotList.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/HelpFrame.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/InterpolateFrame.java
@@ -9068,6 +9069,9 @@ U java/source/treeview/src/main/uk/ac/starlink/treeview/ZipBranchDataNode.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/ZipFileDataNode.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/ZipStreamDataNode.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/package.html
+cvs checkout: Updating java/source/treeview/src/main/uk/ac/starlink/treeview/splat
+U java/source/treeview/src/main/uk/ac/starlink/treeview/splat/README
+U java/source/treeview/src/main/uk/ac/starlink/treeview/splat/SplatNodeChooser.java
 cvs checkout: Updating java/source/treeview/src/main/uk/ac/starlink/treeview/votable
 cvs checkout: Updating java/source/treeview/src/resources
 cvs checkout: Updating java/source/treeview/src/resources/uk
