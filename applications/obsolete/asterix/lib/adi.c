@@ -3284,7 +3284,7 @@ ADIobj adix_find( ADIobj id, char *name, int nlen, ADIstatus status )
 /* Find data insertion point */
   adix_locdat( &id, name, nlen, DA__DEFAULT, &lid, NULL, status );
 
-  if ( _ok(status) ) {
+  if ( _ok(status) && _valid_q(*lid) ) {
 /* Bump up reference count unless it's a kernel object */
     if ( _han_q(*lid) )
       adix_refadj( *lid, 1, status );

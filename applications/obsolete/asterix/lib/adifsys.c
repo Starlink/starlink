@@ -215,6 +215,8 @@ void ADIfsysFileClose( ADIobj id, ADIstatus status )
 void adix_fcreat_int( ADIobj rtn, ADIobj fspec, ADIobj id, ADIobj *fileid,
                       ADIstatus status )
   {
+  _chk_stat;
+
   if ( _eprc_c(rtn) ) 			/* C routine? */
     ((ADIcCreatRCB) _eprc_prc(rtn))( fspec, id, fileid, status );
   else					/* Fortran routine */
