@@ -61,6 +61,7 @@
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -73,6 +74,9 @@
 *        Added LOG, LOGFILE and NDFNAMES parameters.
 *     28-JAN-1994 (PDRAPER):
 *        Added saturation extensions.
+*     23-MAR-2001 (MBT):
+*        Changed access method for calibration NDFs to go via SUBPAR -
+*        previous method did not work with NDG.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -99,9 +103,9 @@
 
 *  Local Variables:
       CHARACTER * ( 8 ) LOGTO    ! Where information is logged to
-      CHARACTER BIAS * ( FIO__SZFNM ) ! Name of mask file.
-      CHARACTER CAL * ( FIO__SZFNM ) ! Name of mask file.
-      CHARACTER FLAT * ( FIO__SZFNM ) ! Name of mask file.
+      CHARACTER BIAS * ( FIO__SZFNM ) ! Name of master bias file.
+      CHARACTER CAL * ( FIO__SZFNM ) ! Name of master cal file.
+      CHARACTER FLAT * ( FIO__SZFNM ) ! Name of master flat file.
       CHARACTER LOGNAM * ( FIO__SZFNM ) ! Name of logfile
       CHARACTER MSKNAM * ( FIO__SZFNM ) ! Name of mask file.
       DOUBLE PRECISION ADC       ! ADC factor
@@ -113,6 +117,7 @@
       INTEGER EXTENT( 4 )        ! Useful CCD area
       INTEGER I                  ! Dummy
       INTEGER NBOUND             ! Number of bounds
+      INTEGER IPAR               ! SUBPAR parameter identifier
       LOGICAL DUMMY              ! Dummy variable
       LOGICAL GENVAR             ! Whether variances are generated
       LOGICAL GOTADC             ! Flags showing which values have been
@@ -314,9 +319,13 @@
          GOTNAM = .TRUE.
       END IF
 
-*  What are the names of the GLOBAL calibration frames?
+*  What are the names of the GLOBAL calibration frames?  These are 
+*  stored in ADAM_PARNAME structures by NDG, so we have to go through
+*  SUBPAR to retrieve them.
+
 *  Master BIAS frame.
-      CALL PAR_GET0C( 'BIAS', BIAS, STATUS )
+      CALL SUBPAR_FINDPAR( 'BIAS', IPAR, STATUS )
+      CALL SUBPAR_GETNAME( IPAR, BIAS, STATUS )
       IF ( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
          GOTBIA = .FALSE.
@@ -326,7 +335,8 @@
       END IF
 
 *  Master flatfield.
-      CALL PAR_GET0C( 'FLAT', FLAT, STATUS )
+      CALL SUBPAR_FINDPAR( 'FLAT', IPAR, STATUS )
+      CALL SUBPAR_GETNAME( IPAR, FLAT, STATUS )
       IF ( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
          GOTFLA = .FALSE.
@@ -336,7 +346,8 @@
       END IF
       
 *  Master calibration frame.
-      CALL PAR_GET0C( 'CAL', CAL, STATUS )
+      CALL SUBPAR_FINDPAR( 'CAL', IPAR, STATUS )
+      CALL SUBPAR_GETNAME( IPAR, CAL, STATUS )
       IF ( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
          GOTCAL = .FALSE.
