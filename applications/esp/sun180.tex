@@ -1022,9 +1022,9 @@ you to see what progress is being made.
 \begin{myquote}
 \begin{verbatim}
 Initial parameter estimates
-Rad(*)     5.41  Posang   12.1  Ellipt.  .692
+Rad(a)     5.41  Posang   12.1  1/Ellipt.  .692
 
-  X       Y     Points   Rad(*)    Count     PA   Ellipt  Dev.  PPU  Statistic
+  X       Y     Points   Rad(a)    Count     PA  1/Ellip Dev.  PPU  Statistic
 
 Residual calculation: weighted SD
   93.3    96.5    76      4.81      114.2  -16.4  0.593    0.9  100.  0.87E+03
@@ -1032,16 +1032,16 @@ Residual calculation: weighted SD
   93.0    96.2    20      0.27      211.6  -23.4  0.141    0.9  100.  0.97E+03
   93.0    96.1    20      0.36      211.3  -23.4  0.141    0.8  100.  0.97E+03
   92.9    96.2    20      0.45      210.6  -23.4  0.141    0.8  100.  0.97E+03
-  ----    ----    ---     ----       ---    ----    -----   ---    ----
-  ----    ----    ---     ----       ---    ----    -----   ---    ----
-  ----    ----    ---     ----       ---    ----    -----   ---    ----
+  ----    ----    ---     ----       ---    ----  -----    ---  ----
+  ----    ----    ---     ----       ---    ----  -----    ---  ----
+  ----    ----    ---     ----       ---    ----  -----    ---  ----
   93.5    95.8   332     19.93        1.9   -2.9  0.602    0.5   92.  0.76E+03
  
 Mean count below threshold LIM2.
 \end{verbatim}
 \end{myquote}
 
-Descriptions for the headings may be found in Appendix \ref{app:outputfiles}.
+Descriptions for the headings may be found in Appendix~\ref{app:outputfiles}.
 
 When the application has finished profiling the galaxy it issues a message
 indicating why the profiling action was stopped.
@@ -3452,7 +3452,8 @@ The ESP routine descriptions are contained in the following pages.
       The method used involves fitting an ellipse to the shape
       of the isophote contour.
 
-      The output includes both the ellipse parameters and
+      The output includes the ellipse parameters, the azimuthally-averaged
+      intensity around them, and
       the Fourier descriptors. The position of the centre of the
       galaxy (and a number of other parameters) must be specified
       interactively (using cursor or keyboard) by the user.
@@ -3737,8 +3738,13 @@ The ESP routine descriptions are contained in the following pages.
    intensity analysis
 }{
    \sstdescription{
-      Performs an ellipse fitting galaxy profile using simple
-      intensity analysis. The position of the centre of the galaxy
+      Fits a galaxy profile using simple intensity analysis.  The
+      routine fits a series of ellipses to the galaxy, at varying
+      intensity values, and displays the position, size and angle of
+      these ellipses, as well as the azimuthally-averaged intensity
+      around them.  It plots these intensities as a function of radius.
+
+      The position of the centre of the galaxy
       (and a number of other parameters) may be specified
       interactively (using cursor or keyboard) or the location
       within the image of several galaxies may be specified using
@@ -3917,18 +3923,20 @@ The ESP routine descriptions are contained in the following pages.
       }{
          Which type of ellipse-residual minimisation is to be used.
 
-         The type of residual to be calculated is specified as 0, 1 or
-         2.  This also controls which type of statistic is returned in
-         the final column of the ELLPRO output file.  It{\tt '}s not
-         completely clear what is the best type of residual to use.  The
-         original one -- a weighted standard error, selected by giving
-         this parameter the option$\sim$0 -- is rational, but not obviously
-         ideal.  I{\tt '}ve added here the range and the squared-differences
-         as alternatives, selectable by options$\sim$1 and$\sim$2 respectively.
-
-         I don{\tt '}t really recommend you play with this unless you wish to
-         experiment.  If this parameter makes much of a difference, the
-         ESP maintainer would be interested to hear about it.
+        The type of residual to be calculated is specified as 0, 1 or
+        2.  It's not
+        completely clear what is the best type of residual to use.  The
+        original one -- a weighted standard error, selected by giving
+        this parameter the option~0 -- is rational, but not obviously
+        ideal.  As alternatives, you can use the range and the
+        squared-differences, selectable by options~1 and~2 respectively.
+        This also controls which type of statistic is returned in
+        the final column of the ELLPRO output file: this statistic is
+        the mean, median and mean (including background) in the three
+        cases, but you should not regard this as useful information.
+        You are advised not to play with this unless you particularly wish to
+        experiment.  If this parameter makes much of a difference, the
+        ESP maintainer would be interested to hear about it.
       }
       \sstsubsection{
          MODE=\_LOGICAL (Read)
@@ -6138,7 +6146,9 @@ are shown below:
 %\begin{verbatim}
 \begin{description}
 \item[Angle]The angle of the major axis of a source (degrees).
-\item[Count]Mean ellipse brightness above the background (counts). 
+\item[Count]Mean ellipse brightness above the background (counts).
+This is the mean of the image value along the ellipse, as interpolated 
+by the scheme implied by ELLPRO parameter FAST.
 %\item[Dev]Standard deviation of the ellipse brightness variation.
 \item[Dev]Estimated standard deviation of the mean ellipse brightness.
 \item[ECSB]Elliptical model estimated central surface brightness.
@@ -6158,6 +6168,7 @@ circle with the same area as the ellipse (arcsecs).
 \item[Points]ELLFOU. The number of image pixel employed.
 \item[PPU]Percentage of trial ellipse pixels that were available.  
 \item[Proj.]Modal value of smoothed histogram by taking chords.
+\item[Rad(a)]The semi-major axis of the ellipse
 \item[Raw]Modal value of unsmoothed count histogram.
 \item[Sa]Standard deviation of source in major axis.
 \item[Sb]Standard deviation of source in minor axis.

@@ -451,7 +451,7 @@ STARTUP_SCRIPTS = $(PKG_NAME).csh $(PKG_NAME).sh
 
 #  Link script.  This script does not form part of the package but is 
 #  required for building it.  It will not be installed.
- 
+
 LINK_SCRIPT = $(PKG_NAME)_link_adam
 
 #  Startup ICL script.  This is the file that must be loaded by ICL
@@ -1026,6 +1026,8 @@ install:
 #
 #  Install the date stamp file and make it read-only to prevent its
 #  date being changed.
+	test -f $(INSTALL_DATES)/$(DATE_STAMP) && \
+		chmod 644 $(INSTALL_DATES)/$(DATE_STAMP)
 	cp -p $(DATE_STAMP) $(INSTALL_DATES)
 	chmod 444 $(INSTALL_DATES)/$(DATE_STAMP)
 	chmod 644 $(DATE_STAMP)

@@ -18,18 +18,24 @@
 *        The global status.
 
 *  Description: 
-*     Performs an ellipse fitting galaxy profile using simple
-*     intensity analysis. The position of the centre of the galaxy 
+*
+*     Fits a galaxy profile using simple intensity analysis.  The
+*     routine fits a series of ellipses to the galaxy, at varying
+*     intensity values, and displays the position, size and angle of
+*     these ellipses, as well as the azimuthally-averaged intensity
+*     around them.  It plots these intensities as a function of radius.
+*
+*     The position of the centre of the galaxy 
 *     (and a number of other parameters) may be specified 
 *     interactively (using cursor or keyboard) or the location
 *     within the image of several galaxies may be specified using
 *     an ASCII text file.  
 *
-*     A number of options allow the user to determine criteria for;
+*     A number of options allow the user to determine criteria for
 *     when profiling should end, whether an ARD file is to be used
 *     to mask out bad areas of the image, whether the initial galaxy
-*     centre value is to be fixed throughout profiling and also
-*     whether or not the initial galaxy centre co-ordinates provided 
+*     centre value is to be fixed throughout profiling, and whether
+*     or not the initial galaxy centre co-ordinates provided 
 *     by the user may be refined by the application before the first
 *     profile is generated.
 * 
@@ -134,15 +140,17 @@
 *        Which type of ellipse-residual minimisation is to be used.
 *
 *        The type of residual to be calculated is specified as 0, 1 or
-*        2.  This also controls which type of statistic is returned in
-*        the final column of the ELLPRO output file.  It's not
+*        2.  It's not
 *        completely clear what is the best type of residual to use.  The
 *        original one -- a weighted standard error, selected by giving
 *        this parameter the option~0 -- is rational, but not obviously
-*        ideal.  I've added here the range and the squared-differences
-*        as alternatives, selectable by options~1 and~2 respectively.
-*
-*        I don't really recommend you play with this unless you wish to
+*        ideal.  As alternatives, you can use the range and the
+*        squared-differences, selectable by options~1 and~2 respectively.
+*        This also controls which type of statistic is returned in
+*        the final column of the ELLPRO output file: this statistic is
+*        the mean, median and mean (including background) in the three
+*        cases, but you should not regard this as useful information.
+*        You are advised not to play with this unless you particularly wish to
 *        experiment.  If this parameter makes much of a difference, the
 *        ESP maintainer would be interested to hear about it.
 *     MODE=_LOGICAL (Read)
@@ -4216,13 +4224,13 @@ C      CALL HDS_SHOW ('LOCATORS', STATUS)
          END IF
          CALL MSG_FMTR('POS','F6.1',TEMP)
          CALL MSG_FMTR('ELL','F4.3',ELLIP)
-         CALL MSG_OUT(' ','Rad(*) ^RAD  Posang ^POS  Ellipt.  ^ELL',
+         CALL MSG_OUT(' ','Rad(a) ^RAD    Posang ^POS    1/Ellipt ^ELL',
      :                STATUS)
 
 *      Heading for output.
          CALL MSG_BLANK(STATUS)
          TOP='  X       Y     Points   Rad(a)    Count     PA '//
-     :       '  Ellipt  Dev.  PPU  Statistic'
+     :       ' 1/Ellip  Dev.  PPU  Statistic'
          CALL MSG_OUT(' ',TOP,STATUS)
 
       END IF
@@ -4833,7 +4841,7 @@ C      CALL HDS_SHOW ('LOCATORS', STATUS)
 *     The routine works by examining the intensity variation of pixels
 *     around a theoretical ellipse. A minimisation method where 
 *     ellipse ellipticity, origin and position angle are varied is employed 
-*     to determine what values of these parameters lead to the to the
+*     to determine what values of these parameters lead to the
 *     minimum variation in intensity around the ellipse. Care is taken
 *     to ensure this isnt acheived by merely moving the ellipse away
 *     from the galaxy centre and down into the noise. The ellipse
@@ -4868,7 +4876,7 @@ C      CALL HDS_SHOW ('LOCATORS', STATUS)
 *     LIM3 = REAL (Given)
 *        The ellipse radius value at which the position angle, ellipticity
 *        and origin are frozen. If the value is less than or equal to zero
-*        not such cutoff is applied. Units pixels.
+*        no such cutoff is applied. Units pixels.
 *     FRACT = REAL (Given)
 *        Proportion of points within an ellipse that must be valid for 
 *        the result for that radius to be retained.
@@ -5982,8 +5990,8 @@ C      CALL HDS_SHOW ('LOCATORS', STATUS)
 *     use.  The original one - a weighted standard error - is rational,
 *     but not obviously ideal.  I've added here the range and the
 *     squared-differences as alternatives, selectable by
-*     RTYPE=elp__resmd and elp__resls respectively.  (Also, this
-*     really shouldn't be called a `residual' - it's a statistic, but it
+*     RTYPE=elp__resmd and elp__resls respectively.  (And yes, this
+*     shouldn't be called a `residual' - it's a statistic, but it
 *     would be dangerous to try changing variable names).
 *
 *     An error message is returned if the values for too many points could
@@ -6122,7 +6130,7 @@ C      CALL HDS_SHOW ('LOCATORS', STATUS)
          USED(I)=0
  5    CONTINUE
 
-*   Use spline  routines to construct a 2D surface and use that for
+*   Use spline routines to construct a 2D surface and use that for
 *   interpolating at small radii. Other wise use bi-linear interpolation.
       IF ((RADIUS.LE.3.26).AND.(.NOT.FAST)) THEN
 
@@ -6201,7 +6209,7 @@ C      CALL HDS_SHOW ('LOCATORS', STATUS)
                STATUS = SAI__ERROR
                GOTO 9999
             ENDIF
-            WSSIZE = -2! So we don't come here again
+            WSSIZE = -2 ! So we don't come here again
          ENDIF
 
          IF (RTYPE .EQ. ELP__RESMN) THEN

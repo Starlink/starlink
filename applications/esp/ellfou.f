@@ -21,7 +21,8 @@
 *     The method used involves fitting an ellipse to the shape
 *     of the isophote contour.
 *
-*     The output includes both the ellipse parameters and 
+*     The output includes the ellipse parameters, the azimuthally-averaged
+*     intensity around them and 
 *     the Fourier descriptors. The position of the centre of the
 *     galaxy (and a number of other parameters) must be specified
 *     interactively (using cursor or keyboard) by the user.
