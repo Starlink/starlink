@@ -63,6 +63,7 @@
 *      5 Mar 93 : V1.7-1 Use non-congruential number generator, SIM_RND (DJA)
 *     14 Jul 93 : V1.7-2 Use MATH_RND generator (DJA)
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
+*     28 Mar 95 : V1.8-1 Use new interface for model (DJA)
 *
 *    Type definitions :
 *
@@ -72,6 +73,7 @@
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
       INCLUDE 'PAR_ERR'
 *
 *    Status :
@@ -90,7 +92,6 @@
 *
 *    Local variables :
 *
-      CHARACTER         MLOC*(DAT__SZLOC)      ! Locator to bgnd model
       CHARACTER         OLOC*(DAT__SZLOC)      ! Locator to output dataset
       CHARACTER         XLOC*(DAT__SZLOC)      ! Locator to X_CORR data
       CHARACTER         XLLOC*(DAT__SZLOC)     ! Locator to X_CORR list
@@ -101,6 +102,8 @@
       CHARACTER*80      MODEL                  ! Background model file
       CHARACTER*80      OROOT                  ! Output dataset root
       CHARACTER*132     ONAME                  ! Output file name
+
+      DOUBLE PRECISION		SPOINT(2)
 
       REAL              FSIZE                  ! Size of field
       REAL              LO, HI                 ! AXIS extrema
@@ -121,6 +124,7 @@
       INTEGER           IFILE                  ! Loop over files
       INTEGER           ISRC                   ! Loop over sources
       INTEGER           IWID                   ! Loop over widths
+      INTEGER			MFID			! Model dataset id
       INTEGER           NPT                    ! No. of points in position lists
       INTEGER           NBACK                  ! No. of background counts
       INTEGER           NDIM                   ! Bgnd dimensionality
@@ -129,12 +133,14 @@
       INTEGER           NOUT                   ! # events outside field ranges
       INTEGER           NSRC                   ! # sources in image
       INTEGER           NVAL                   ! # values in model axis
+      INTEGER			OFID			! Output dataset id
       INTEGER           ONBACK                 ! Requested # background counts
       INTEGER           OSCOUNT(MAXSRC)        ! Requested # of source counts
       INTEGER           PDPTR                  ! Psf data ptr
+      INTEGER                   PIXID, PRJID, SYSID     ! World coordinates
       INTEGER           PIN                    ! Length of psf prob index
       INTEGER           PIPTR                  ! Psf prob index ptr
-      INTEGER           PSLOT                  ! PSF system slot
+      INTEGER           	PSLOT                  	! PSF system slot
       INTEGER           PSW                    ! Psf access width in pixels
       INTEGER           PSW2                   ! Psf model width in pixels
       INTEGER           MDPTR                  ! Model data ptr
@@ -157,7 +163,11 @@
 *    Version id :
 *
       CHARACTER*30      VERSION
-         PARAMETER      ( VERSION = 'EVSIM Version 1.8-0' )
+         PARAMETER      ( VERSION = 'EVSIM Version 1.8-1' )
+*
+*    Local Data:
+*
+      DATA              SPOINT/0D0,0D0/
 *-
 
 *    Check status
@@ -168,7 +178,11 @@
 
 *    Initialise Asterix
       CALL AST_INIT()
-      CALL PSF_INIT( STATUS )
+
+*    No astrometry by default
+      PIXID = ADI__NULLID
+      PRJID = ADI__NULLID
+      SYSID = ADI__NULLID
 
 *    Get number of files
       CALL USI_GET0I( 'NFILE', NFILE, STATUS )
@@ -205,39 +219,39 @@
       IF ( STATUS .EQ. SAI__OK ) THEN
 
 *      Try to open it
-        CALL HDS_OPEN( MODEL, 'READ', MLOC, STATUS )
+        CALL ADI_FOPEN( MODEL, '*', 'READ', MFID, STATUS )
 
 *      Check dimensions and map
-        CALL BDA_CHKDATA( MLOC, OK, NDIM, DIMS,STATUS )
+        CALL BDI_CHKDATA( MFID, OK, NDIM, DIMS,STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *      Check dimensionality
         IF ( .NOT. OK ) THEN
-          CALL MSG_PRNT( '! Invalid model data' )
           STATUS = SAI__ERROR
+          CALL ERR_REP( ' ', 'Invalid model data', STATUS )
         ELSE IF ( NDIM .NE. 2 ) THEN
-          CALL MSG_PRNT( '! Background must be 2D' )
           STATUS = SAI__ERROR
+          CALL ERR_REP( ' ', 'Background must be 2D', STATUS )
         END IF
         IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *      Map model array
         NELM = DIMS(1)*DIMS(2)
-        CALL BDA_MAPDATA( MLOC, 'READ', MDPTR, STATUS )
+        CALL BDI_MAPDATA( MFID, 'READ', MDPTR, STATUS )
 
 *      Quality present?
-        CALL BDA_CHKQUAL( MLOC, OK, MQNDIM, MQDIMS, STATUS )
+        CALL BDI_CHKQUAL( MFID, OK, MQNDIM, MQDIMS, STATUS )
         IF ( OK ) THEN
-          CALL BDA_MAPLQUAL( MLOC, 'READ', ANYBAD, MQPTR, STATUS )
+          CALL BDI_MAPLQUAL( MFID, 'READ', ANYBAD, MQPTR, STATUS )
           IF ( ANYBAD ) THEN
             CALL MSG_PRNT( 'Using model quality array...' )
           ELSE
-            CALL BDA_UNMAPLQUAL( MLOC, STATUS )
+            CALL BDI_UNMAPLQUAL( MFID, STATUS )
           END IF
         END IF
 
 *      Map memory for index
-        CALL DYN_MAPR( 1, NELM, MIPTR, STATUS )
+        CALL DYN_MAPR( 1, NELM+1, MIPTR, STATUS )
 
 *      Normalise
         CALL MSG_PRNT( 'Normalising model...' )
@@ -249,9 +263,9 @@
         CALL MSG_PRNT( 'Model contains ^C counts' )
 
 *      Get axis details
-        CALL BDA_GETAXVAL( MLOC, 1, XBASE, XSCALE, NVAL, STATUS )
-        CALL BDA_GETAXVAL( MLOC, 2, YBASE, YSCALE, NVAL, STATUS )
-        CALL BDA_GETAXUNITS( MLOC, 1, UNITS, STATUS )
+        CALL BDI_GETAXVAL( MFID, 1, XBASE, XSCALE, NVAL, STATUS )
+        CALL BDI_GETAXVAL( MFID, 2, YBASE, YSCALE, NVAL, STATUS )
+        CALL BDI_GETAXUNITS( MFID, 1, UNITS, STATUS )
 
 *      Describe evds bounds
         XDEC = (XSCALE.LT.0.0)
@@ -268,7 +282,10 @@
         MOK = .TRUE.
 
 *      Unmap model values
-        CALL BDA_UNMAP( MLOC, STATUS )
+        CALL BDI_UNMAP( MFID, STATUS )
+
+*      Close the file
+        CALL ADI_FCLOSE( MFID, STATUS )
 
 *    No model
       ELSE IF ( STATUS .EQ. PAR__NULL ) THEN
@@ -287,6 +304,10 @@
         XHI = -XLO
         YHI = -YLO
 
+*      Invent some WCS stuff
+        CALL WCI_NEWPRJ( 'TAN', 0, 0.0, SPOINT, 180D0, PRJID, STATUS )
+        CALL WCI_NEWSYS( 'FK5', 2000.0, 2000D0, SYSID, STATUS )
+
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
@@ -299,8 +320,9 @@
         CALL ERR_ANNUL( STATUS )
         ONBACK = 0
       ELSE IF ( ( ONBACK .LT. 0 ) .AND. ( STATUS .EQ. SAI__OK ) ) THEN
-        CALL MSG_PRNT( '! Number of counts must be positive' )
         STATUS = SAI__ERROR
+        CALL ERR_REP( ' ', 'Number of counts must be positive',
+     :                STATUS )
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
@@ -313,15 +335,16 @@
         GOTO 99
       ELSE IF ( NSRC .GT. MAXSRC ) THEN
         CALL MSG_SETI( 'MAX', MAXSRC )
-        CALL MSG_PRNT( 'Number of sources must be between 0 and ^MAX')
         STATUS = SAI__ERROR
+        CALL ERR_REP( ' ', 'Number of sources must be between 0 and'/
+     :                /' ^MAX', STATUS )
         GOTO 99
       END IF
 
 *    No sources and background
       IF ( ( NSRC .EQ. 0 ) .AND. ( ONBACK .EQ. 0 ) ) THEN
-        CALL MSG_PRNT( '! No sources and no background' )
         STATUS = SAI__ERROR
+        CALL ERR_REP( ' ', 'No sources and no background', STATUS )
         GOTO 99
       END IF
 
@@ -403,11 +426,12 @@
         END IF
 
 *      Open file
-        CALL HDS_NEW( ONAME(:CHR_LEN(ONAME)), 'EVDS', 'EVDS', 0, 0,
-     :                                               OLOC, STATUS )
+        CALL ADI_FCREAT( ONAME(:CHR_LEN(ONAME))//'%hds', ADI__NULLID,
+     :                    OFID, STATUS )
+        CALL ADI1_GETLOC( OFID, OLOC, STATUS )
 
 *      Introduce Poisson noise into source and background
-        IF ( PDEV ) THEN
+        IF ( PDEV .AND. (ONBACK.GT.0) ) THEN
           NBACK = MATH_POISS(FLOAT(ONBACK))
         ELSE
           NBACK = ONBACK
@@ -443,19 +467,30 @@
         END IF
 
 *      Associate psf if first time through
-        IF ( ( IFILE .EQ. 1 ) .AND. ( NSRC .GT. 0 ) ) THEN
-          CALL PSF_ASSOCO( OLOC, PSLOT, STATUS )
+        IF ( IFILE .EQ. 1 ) THEN
+
+*      Write astrometry
+          CALL WCI_PUTIDS( OFID, PIXID, PRJID, SYSID, STATUS )
+
+*      Associate psf if first time through
+          IF ( NSRC .GT. 0 ) THEN
+            CALL PSF_TASSOCO( OFID, PSLOT, STATUS )
+            IF ( STATUS .NE. SAI__OK ) GOTO 99
+          END IF
+
         END IF
 
 *      Dump counts to user
-        WRITE(*,'(1X,A,I,A)') 'Background', NBACK, ' counts'
+        CALL MSG_SETI( 'NB', NBACK )
+        CALL MSG_PRNT( 'Background ^NB counts' )
         DO ISRC = 1, NSRC
-          WRITE(*,'(1X,A,I4,I,A)') 'Source', ISRC, SCOUNT(ISRC),
-     :                                                 ' counts'
+          CALL MSG_SETI( 'N', ISRC )
+          CALL MSG_SETI( 'SC', SCOUNT(ISRC) )
+          CALL MSG_PRNT( 'Source ^N ^SC counts' )
         END DO
 
 *      Create events
-        CALL EVSIM_INT( OLOC, MLOC, PSLOT, PSFCON, SEED_GIVEN, SEED,
+        CALL EVSIM_INT( OFID, PSLOT, PSFCON, SEED_GIVEN, SEED,
      :                  NSRC, SCOUNT, WIDS, NBACK, MOK, DIMS(1),
      :                  DIMS(2), %VAL(MIPTR), PSIZE, TOR, XLO, XHI,
      :                  XDEC, YLO, YHI, YDEC, %VAL(XPTR), %VAL(YPTR),
@@ -475,16 +510,18 @@
         END IF
         CALL DAT_ANNUL( XLOC, STATUS )
         CALL DAT_ANNUL( YLOC, STATUS )
-        CALL BDA_RELEASE( OLOC, STATUS )
-        IF ( IFILE .GT. 1 ) THEN
-          CALL HDS_CLOSE( OLOC, STATUS )
+
+*      Close if not first file
+        IF ( (IFILE.GT.1) .OR. (IFILE.EQ.NFILE) ) THEN
+          CALL ADI_FCLOSE( OFID, STATUS )
         END IF
 
       END DO
 
 *    Free model
       IF ( MOK ) THEN
-        CALL BDA_RELEASE( MLOC, STATUS )
+        CALL BDI_RELEASE( MFID, STATUS )
+        CALL ADI_FCLOSE( MFID, STATUS )
       END IF
 
 *    Tidy up
@@ -497,7 +534,7 @@
 
 
 *+  EVSIM_INT - Creates the dummy data set
-      SUBROUTINE EVSIM_INT( LOC, MODLOC, PSFH, PSFCON, SEEDOK, GSEED,
+      SUBROUTINE EVSIM_INT( OFID, PSFH, PSFCON, SEEDOK, GSEED,
      :                      NSRC, SCOUNT, WID, NMOD, MOK,
      :                      BNX, BNY, MPI, DX, TOR, XMIN, XMAX,
      :                      XDEC, YMIN, YMAX, YDEC, XP, YP,
@@ -529,7 +566,6 @@
 *    Global Constants:
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'MATH_PAR'
 *
 *    Status:
@@ -538,9 +574,8 @@
 *
 *    Import:
 *
-      CHARACTER*(DAT__SZLOC)  LOC                 ! Output dataset
-      CHARACTER*(DAT__SZLOC)  MODLOC              ! Model dataset
-      INTEGER                 PSFH                ! PSF system handle
+      INTEGER			OFID			! Output dataset id
+      INTEGER                 	PSFH                	! PSF system handle
       LOGICAL                 PSFCON              ! Psf constant across field?
       INTEGER                 PW                  ! Psf width in pixels
       REAL                    PD(-PW:PW,-PW:PW,*) ! Psf data
@@ -573,11 +608,6 @@
 *
 *    Local Variables:
 *
-      CHARACTER        FMLOC*(DAT__SZLOC)               ! Locator 1st file MORE
-      CHARACTER        HLOC*(DAT__SZLOC)                ! Locator to HEADER
-      CHARACTER        MLOC*(DAT__SZLOC)                ! Locator to MORE
-      CHARACTER        SLOC*(DAT__SZLOC)                ! Locator to SIM_PARS
-
       REAL             FWX, FWY                         ! Field full widths
 C      REAL             GAU(0:MAXPSF)                    ! Gaussian data
 C      REAL             GSIG                             ! Gaussian sigma in arcmin
@@ -591,10 +621,6 @@ C      REAL             PGSIG                            ! Gaussian sigma in pix
       INTEGER          IP, IPHOT                        ! Photon counters
       INTEGER          PSRC                             ! Source of psf data
       INTEGER          SEED                             ! Seed for MATH_RND
-*
-*    Preserve across invocations :
-*
-      SAVE             FMLOC
 *-
 
 *    Check status
@@ -613,30 +639,6 @@ C      REAL             PGSIG                            ! Gaussian sigma in pix
       SDY = DX*TOR
       IF ( YDEC ) SDY = - SDY
 
-*    Create rubbish in more box to fool system
-      IF ( IFILE .EQ. 1 ) THEN
-        CALL BDA_CREHEAD( LOC, STATUS )
-        CALL BDA_LOCHEAD( LOC, HLOC, STATUS )
-        CALL HDX_PUTD( HLOC, 'AXIS_RA', 1, 0.0D0, STATUS )
-        CALL HDX_PUTD( HLOC, 'AXIS_DEC', 1, 0.0D0, STATUS )
-        CALL HDX_PUTD( HLOC, 'FIELD_RA', 1, 0.0D0, STATUS )
-        CALL HDX_PUTD( HLOC, 'FIELD_DEC', 1, 0.0D0, STATUS )
-        CALL HDX_PUTD( HLOC, 'POSITION_ANGLE', 1, 0.0D0, STATUS )
-        CALL DAT_FIND( LOC, 'MORE', FMLOC, STATUS )
-      ELSE IF ( MOK ) THEN
-        CALL BDA_COPMORE( MODLOC, LOC, STATUS )
-      ELSE
-        CALL DAT_NEW( LOC, 'MORE', 'EXTENSION', 0, 0, STATUS )
-      END IF
-
-*    Create structure to hold simulation data
-      CALL DAT_FIND( LOC, 'MORE', MLOC, STATUS )
-      IF ( IFILE .GT. 1 ) THEN
-        CALL HDX_CCOPY( FMLOC, MLOC, 'ASTERIX', STATUS )
-      END IF
-      CALL DAT_NEW( MLOC, 'SIM_DATA', 'EXTENSION', 0, 0, STATUS )
-      CALL DAT_FIND( MLOC, 'SIM_DATA', SLOC, STATUS )
-
 *    Set up the seed
       IF ( .NOT. SEEDOK ) THEN
         CALL PSX_TIME( SEED, STATUS )
@@ -646,13 +648,11 @@ C      REAL             PGSIG                            ! Gaussian sigma in pix
       END IF
 
 *    Write simulation parameters
-      CALL HDX_PUTI( SLOC, 'ISEED', 1, SEED, STATUS )
-      CALL HDX_PUTI( SLOC, 'BCOUNT', 1, NMOD, STATUS )
+      CALL AUI_PUT0I( OFID, 'SIM_DATA.SEED', SEED, STATUS )
+      CALL AUI_PUT0I( OFID, 'SIM_DATA.BCOUNT', NMOD, STATUS )
       IF ( NSRC .GT. 0 ) THEN
-        CALL HDX_PUTI( SLOC, 'SCOUNT', NSRC, SCOUNT, STATUS )
+        CALL AUI_PUT1I( OFID, 'SIM_DATA.SCOUNT', NSRC, SCOUNT, STATUS )
       END IF
-      CALL DAT_ANNUL( SLOC, STATUS )
-      CALL DAT_ANNUL( MLOC, STATUS )
 
 *    Jump over this bit if no source
       IF ( NSRC .EQ. 0 ) GOTO 50
