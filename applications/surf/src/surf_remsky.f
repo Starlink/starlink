@@ -1,4 +1,4 @@
-      SUBROUTINE REDS_REMSKY (STATUS)
+      SUBROUTINE SURF_REMSKY (STATUS)
 *+
 *  Name:
 *     REMSKY
@@ -13,7 +13,7 @@
 *     ADAM A-task
  
 *  Invocation:
-*     CALL REDS_REMSKY( STATUS )
+*     CALL SURF_REMSKY( STATUS )
  
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
@@ -24,49 +24,75 @@
 *     data. It does this by requesting 'sky' bolometers, calculating some
 *     average value for each jiggle and then subtracts this off the
 *     jiggle. Each jiggle is analysed in turn. The average value can be
-*     calculated in two ways:
+*     calculated in two ways: either MEDIAN or MEAN.
 *
-*        1) Median - the median value for all the sky bolometers is taken
-*                    from each bolomoter signal.
-*        2) Mean   - the mean of the sky bolometers is used as the average.
-*                    This mean value is iterative - ie The mean and standard
-*                    deviation are calculated, any points greater than the
-*                    given distance from the mean are removed and the mean
-*                    and standard deviation are calculated.  This process
-*                    is repeated until no bolometers are dropped from the
-*                    mean.
-*
-*     A simple despiking system is also included. Each bolometer is analysed 
-*     independently, a mean and standard deviation are calculated, any points
-*     greater than NSIGMA sigma from the mean are treated as spikes and
-*     removed. Note that this despiking algorithm is only useful for very weak
-*     sources. Bright sources will be removed (since a source  bolometer
-*     jiggles on and off bright sources).
+*     A simple despiking algorithm is also included: 
+*     - Each bolometer is analysed independently, a mean and standard 
+*       deviation are calculated, any points greater than NSIGMA sigma 
+*       from the mean are treated as spikes and removed. Note that for mapping 
+*       this despiking algorithm is only useful for very weak
+*       sources; bright sources will be removed (since a bolometer
+*       jiggles on and off bright sources).
 
 *  Usage:
-*     REMSKY IN
+*     remsky in out
 
 *  ADAM Parameters:
-*     BOLOMETERS = _CHAR (Read)
+*     BOLOMETERS = CHAR (Read)
 *        List of sky bolometers (either by number in the data file, or
-*        by id (eg H7,G3)
-*     CLIP = _LOGICAL (Read)
+*        by id (eg H7,G3))
+*     DESPIKE = LOGICAL (Read)
 *        Answering yes to this will initiate the simple despiking routine.
 *     IN = NDF (Read)
 *        This is the name of the input demodulated data file
-*     ITER_SIGMA = _REAL (Read)
+*     ITER_SIGMA = REAL (Read)
 *        When using MEAN to calculate the average, this is the sigma clipping
-*        level used. Supplying -1 will turn off clipping.
-*     MODE = _CHAR (Read)
-*        Method to be used for calculating the average (MEDIAN or MEAN)
-*     NSIGMA = _DOUBLE (Read)
-*        Number of sigma to despike at.
+*        level used. This is an iterative value - points will be removed
+*        from the mean until the spread of data points is smaller than
+*        this value. Supplying a negative value  will turn off clipping.
+*     MODE = CHAR (Read)
+*        Method to be used for calculating the average sky. There are
+*        two methods available:
+*        - Median - the median value for all the sky bolometers is taken
+*                   from each bolomoter signal.
+*        - Mean   - the mean of the sky bolometers is used as the average.
+*                   This mean value is iterative - ie The mean and standard
+*                   deviation are calculated, any points greater than the
+*                   given distance from the mean are removed and the mean
+*                   and standard deviation are calculated.  This process
+*                   is repeated until no bolometers are dropped from the
+*                   mean.
+*     MSG_FILTER = CHAR (Read)
+*        Message output level. Default is NORM
+*     NSIGMA = DOUBLE (Read)
+*        Number of sigma beyond which data are thought to be spikes. This
+*        is used for the despiking algorithm and is only used if DESPIKE
+*        is true.
 *     OUT = NDF (Write)
 *        Output data file
+
+*  Examples:
+*     remsky ndf sky_removed bolometers='[g1,g2,g3,g4,g5]' mode=median \
+*        Use the median of bolometers g1,g2,g3,g4,g5 (not necessarily 
+*        the best choice) to calculate the sky signal and write the
+*        output to sky_removed.sdf. No despiking is to be used.
+
+*  Notes:
+*     - Source rotation is not accounted for so use only those bolometers
+*       that always observe sky. This can be checked by using
+*       SCUOVER to overlay the bolometer positions on a NAsmyth regridded
+*       image (since NA shows the signal measured by each bolometer
+*       throughout the observation without source rotation).
+*     - The despiking routine is very primitive and should not be used
+*       with jiggle map data of bright sources. It can probably be used
+*       on PHOTOM data since the jiggle pattern never moves off source.
 
 *  Implementation status:
 *     The despiking routine sets QUALITY bit 5 to bad. It does not affect
 *     the data.
+
+*  Related Applications:
+*     SURF: SCUQUICK, REBIN, SCUPHOT, SCUOVER
  
 *  Authors:
 *     TIMJ: Tim Jenness (timj@jach.hawaii.edu)
@@ -89,7 +115,7 @@
       INCLUDE 'SAE_PAR'                 ! SSE global definitions
       INCLUDE 'DAT_PAR'                 ! for DAT__SZLOC
       INCLUDE 'PRM_PAR'                 ! for VAL__xxxx
-      INCLUDE 'REDS_SYS'                ! REDS constants
+      INCLUDE 'SURF_PAR'                ! REDS constants
       INCLUDE 'MSG_PAR'                 ! MSG__ constants
 
 *  Status :
@@ -466,7 +492,7 @@
       END IF
 
 *  Remove spikes from each bolometer?
-      CALL PAR_GET0L('CLIP', DOCLIP, STATUS)
+      CALL PAR_GET0L('DESPIKE', DOCLIP, STATUS)
 *  How many sigma?
       IF (DOCLIP) CALL PAR_GET0D('NSIGMA', NSIGMA, STATUS)
 
