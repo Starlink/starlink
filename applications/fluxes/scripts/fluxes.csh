@@ -77,7 +77,9 @@ if ( -f JPLEPH ) then
    set jpl_ok = "no"
 else
    # Location of JPL ephemeris. JPL_DIR takes precedence
-   set jpl_dir = @staretcdir@
+   # Note that staretcdir refers to $STARLINK/etc/fluxes
+   # but the JPL files are in $STARLINK/etc
+   set jpl_dir = @staretcdir@/../
    if ($?JPL_DIR) then
      if (-d $JPL_DIR) then
        set jpl_dir = $JPL_DIR
