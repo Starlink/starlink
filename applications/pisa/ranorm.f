@@ -32,6 +32,7 @@
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -42,6 +43,8 @@
 *        routine. Need to replace with the correct version when released).
 *     23-OCT-2002 (PDRAPER):
 *        Added change to use a different seed for each initialization.
+*     15-JUL-2004 (TIMJ)
+*        Use renamed PDA_DRNOR from PDA library
 *     {enter_changes_here}
 
 *  Bugs:
@@ -63,8 +66,8 @@
       INTEGER STATUS            ! Global status
 
 *  External References:
-      EXTERNAL PDA_DRNOR
-      DOUBLE PRECISION PDA_DRNOR ! The pseudo random normal number
+      EXTERNAL PDA_DRANN
+      DOUBLE PRECISION PDA_DRANN ! The pseudo random normal number
                                  ! generator
 
 *  Local variables:
@@ -82,12 +85,12 @@
 *  isn't always enough resolution to get a unique values, machines are
 *  getting fast... May not work for non-UNIX.
          CALL PSX_GETPID( SEED, STATUS )
-         CALL PDA_DSTART( SEED )
+         CALL PDA_DRANS( SEED )
       END IF
 
 *  And generate the random number. Note this has a mean of zero and a
 *  standard deviation of 1.
-      RANORM = REAL ( PDA_DRNOR() ) * B + A
+      RANORM = REAL ( PDA_DRANN() ) * B + A
 
       END
 * $Id$

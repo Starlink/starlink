@@ -47,7 +47,7 @@ SUBSRC = addmod.f func.f analys.f anoise.f checkp.f dchole.f \
          phopt24.f psa1_clwo4.f psa1_ndfin4.f super4.f featur4.f \
          phopt4.f  psa1_exss4.f sorti34.f median4.f psa1_iminv.f \
          sortin4.f pqsort4.f psa1_ccatf.f psa1_ccats.f psa1_ccatp.f \
-         dchole4.f psa1_fitfn.f pda_drnor.f
+         dchole4.f psa1_fitfn.f
 
 PRIVATE_INCLUDES = PSA1_PAR hlpcmd.inc
 
