@@ -14,8 +14,8 @@
 #  aclocal || exit 1
 #echo "automake --add-missing..."
 #  automake --add-missing --foreign || exit 1
-#echo "autoconf..."
-#  autoconf || exit 1
+echo "autoconf..."
+  autoconf || exit 1
 
 for d in moggy astrom; do
     echo "Bootstrapping $d..."
