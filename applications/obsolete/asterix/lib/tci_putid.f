@@ -99,7 +99,6 @@
       INTEGER                   STATUS                  ! Global status
 
 *  Local variables:
-      INTEGER			ARGS(2)			! Method inputs
       INTEGER			OARG			! Method o/p (ignored)
 *.
 
@@ -109,12 +108,8 @@
 *  Check initialised
       IF ( .NOT. TCI_INIT ) CALL TCI0_INIT( STATUS )
 
-*  Write arguments
-      ARGS(1) = ID
-      ARGS(2) = TIMID
-
 *  Invoke the write method
-      CALL ADI_EXEC( 'WriteTiming', 2, ARGS, OARG, STATUS )
+      CALL ADI_EXEC2( 'WriteTiming', ID, TIMID, OARG, STATUS )
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'TCI_PUTID', STATUS )
