@@ -68,7 +68,8 @@ be declared <em/somewhere/: the default is declared in the General DTD.
 
 <routine>
 <routinename>%copyright-string%
-<description>Standard copyright string, unless overridded.
+<description>Standard copyright string, unless overridden.
+<returnvalue type=string>Text of copyright string.
 <codebody>
 (define %copyright-string%
   "Copyright 1999, Central Laboratories for the Research Councils")
