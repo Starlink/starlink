@@ -1215,14 +1215,16 @@ do_test:
 	@ echo
 	@ echo '$(PACK_NAME) does not have a make driven installation test'
 	@ echo
-	@ echo 'To test $(PACK_NAME), you should run the demonstation script,'
-	@ echo 'thus (% is the shell prompt):'
+	@ echo 'To test $(PACK_NAME), you should run the extractor program,'
+	@ echo 'on a data file (% is the shell prompt):'
 	@ echo
 	@ echo ' % cd /empty_directory'
 	@ echo ' % source /star/etc/cshrc'
-	@ echo ' % xdisplay'
 	@ echo ' % $(PKG_NAME)setup'
-	@ echo ' % command_name'
+	@ echo ' % extractor image=$$PISA_DIR/frame config=$$EXTRACTOR_DIR/config/default.sex'
+	@ echo
+	@ echo 'Alternatively you can test EXTRACTOR from the object '
+	@ echo 'detection toolbox of GAIA.'
 	@ echo
 #
 #  Note the test has been run.
