@@ -3435,14 +3435,15 @@ sub handle_man_pages
 }
 
 # Handle DATA variables.
-# Starlink: the prefixes star{docs,etc,help} are additions here, and must
-# match the similar directories defined in buildsupport/starconf/starconf.m4.in
+# Starlink: the prefixes star{docs,etc,help,examples} are additions here,
+# and must match the similar directories defined in
+# buildsupport/starconf/starconf.m4.in 
 sub handle_data
 {
     &am_install_var ('-noextra', '-candist', 'data', 'DATA',
                      'data', 'sysconf', 'sharedstate', 'localstate',
                      'pkgdata', 'lisp', 'noinst', 'check',
-                     'stardocs', 'staretc', 'starhelp' );
+                     'stardocs', 'staretc', 'starhelp', 'starexamples' );
 }
 
 # Handle TAGS.
