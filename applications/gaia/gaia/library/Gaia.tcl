@@ -1217,7 +1217,7 @@ itcl::class gaia::Gaia {
    #  the binary.
    public proc startGaia {} {
       global ::rtd_library ::skycat_library ::gaia_usage ::tk_strictMotif \
-         ::argv0 ::argv ::argc ::env
+         ::argv0 ::argv ::argc ::env ::gaia_dir
       if {! [info exists rtd_library]} {
          set rtd_library .
       }
@@ -1236,7 +1236,7 @@ itcl::class gaia::Gaia {
       #    use CATLIB_CONFIG, if set (assume this is deliberate)
       #    next use ~/.skycat/skycat.cfg if it exists (this contains
       #    the user's preferences), finally use $SKYCAT_CONFIG if set
-      #    (note native implimentation ignores SKYCAT_CONFIG as this
+      #    (note native implementation ignores SKYCAT_CONFIG as this
       #    may be set by CURSA, which is bad).
       if { ! [info exists env(CATLIB_CONFIG)] } {
 
@@ -1246,6 +1246,12 @@ itcl::class gaia::Gaia {
             set env(CATLIB_CONFIG) "file:$config_file"
          } elseif {[info exists env(SKYCAT_CONFIG)]  && ! $native} {
             set env(CATLIB_CONFIG) $env(SKYCAT_CONFIG)
+         } else {
+            #  No config file, so use GAIA version.
+            if { [file exists $gaia_dir/skycat2.0.cfg] } {
+               file copy $gaia_dir/skycat2.0.cfg $config_file
+               set env(CATLIB_CONFIG) "file:$config_file"
+            }
          }
       }
       if { ! $native } {
