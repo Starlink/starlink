@@ -21,7 +21,7 @@
     FITS header keywords, and values in FITS headers of the form 
     '[X1:X2,Y1:Y2]'.
 
-  - The behaviour of IDICURS, PAIRNDF and CCDALIGN on TrueColor visuals 
+  - The behaviour of IDICURS and PAIRNDF on TrueColor visuals 
     (typically newer Linux X displays) has been improved; they now signal 
     an error rather than just crashing.  In a future release these 
     applications will be replaced by ones which run properly on these 

@@ -5313,13 +5313,8 @@ The CCDPACK routine descriptions are contained in the following pages.
 
          CCDALIGN will only work on PseudoColor X displays; this means
          that it cannot be used on the displays of most newer Linux
-         machines as normally configured.  If an attempt is made to
-         do so, then the warning:
-\begin{quote}
-            !! Window has unsupported visual type
-\end{quote}
-         will be emitted; attempting to proceed may result in a core
-         dump.
+         machines as normally configured.  Attempting to do so may
+         result in a core dump.
 
    }
 }
@@ -16079,8 +16074,8 @@ This is a major update to CCDPACK.
   FITS header keywords, and values in FITS headers of the form 
   '[X1:X2,Y1:Y2]'.
 \item
-  The behaviour of \xroutine{IDICURS}, \xroutine{PAIRNDF} and 
-  \xroutine{CCDALIGN} on TrueColor visuals (typically newer Linux X displays)
+  The behaviour of \xroutine{IDICURS} and \xroutine{PAIRNDF} and 
+  on TrueColor visuals (typically newer Linux X displays)
   has been improved; they now signal an error rather than just crashing.
   In a future release these applications will be replaced by ones which
   run properly on these visuals.
