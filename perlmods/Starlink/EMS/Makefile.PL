@@ -74,5 +74,8 @@ WriteMakefile(
     'LIBS'      => [ "$libs"],   # e.g., '-lm' 
     'DEFINE'    => '',     # e.g., '-DHAVE_SOMETHING' 
     'INC'       => "$inc $starinc",     # e.g., '-I/usr/include/other' 
+    'dist'      => {'COMPRESS'=>'gzip -9f', 'SUFFIX' => 'gz',
+                    'ZIP'=>'/usr/bin/zip','ZIPFLAGS'=>'-rl'}
+
 );
 
