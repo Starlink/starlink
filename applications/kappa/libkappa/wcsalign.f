@@ -277,6 +277,7 @@
       INCLUDE 'PRM_PAR'          ! VAL__ constants
       INCLUDE 'PAR_ERR'          ! PAR error constants
       INCLUDE 'GRP_PAR'          ! GRP constants
+      INCLUDE 'NDF_PAR'          ! NDF constants
       INCLUDE 'AST_PAR'          ! AST constants
 
 *  Status:
@@ -286,6 +287,7 @@
       CHARACTER METHOD*13           ! Interpolation method to use.
       CHARACTER NDFNAM*(GRP__SZNAM) ! The name of an NDF.
       DOUBLE PRECISION PARAMS( 2 ) ! Param. values passed to AST_RESAMPLE<x>
+      INTEGER DIM( NDF__MXDIM )  ! Dimensions of pixel axes
       INTEGER I                  ! Index into input and output groups
       INTEGER IGRP1              ! GRP id. for group holding input NDFs
       INTEGER IGRP2              ! GRP id. for group holding output NDFs
@@ -296,6 +298,7 @@
       INTEGER LBND( 2 )          ! Indices of lower left corner of outputs
       INTEGER MAXPIX             ! Initial scale size in pixels
       INTEGER METHOD_CODE        ! Integer corresponding to interp. method 
+      INTEGER NDIM               ! Number of pixel axes
       INTEGER NPAR               ! No. of required interpolation parameters
       INTEGER RESULT             ! Debugging variable
       INTEGER SDIM( 2 )          ! Indices of significant axis
@@ -337,16 +340,21 @@
       CALL KPG1_ASGET( INDFR, 2, .FALSE., .FALSE., .TRUE., SDIM, 
      :                 SLBND, SUBND, IWCSR, STATUS )
 
+*  If the reference NDF actually only has 1 pixel axis, we create a 1D output 
+*  NDF.
+      CALL NDF_DIM( INDFR, NDF__MXDIM, DIM, NDIM, STATUS )
+      IF( NDIM .GT. 1 ) NDIM = 2
+
 *  Set the suggested default for LBND and UBND.
-      CALL PAR_DEF1I( 'LBND', 2, SLBND, STATUS )
-      CALL PAR_DEF1I( 'UBND', 2, SUBND, STATUS )
+      CALL PAR_DEF1I( 'LBND', NDIM, SLBND, STATUS )
+      CALL PAR_DEF1I( 'UBND', NDIM, SUBND, STATUS )
 
 *  Abort if an error has occurred.
       IF ( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Get the bounds required for the output images.
-      CALL PAR_EXACI( 'LBND', 2, LBND, STATUS )
-      CALL PAR_EXACI( 'UBND', 2, UBND, STATUS )
+      CALL PAR_EXACI( 'LBND', NDIM, LBND, STATUS )
+      CALL PAR_EXACI( 'UBND', NDIM, UBND, STATUS )
 
 *  If a null value was supplied for LBND or UBND, annul the error and
 *  put bad values in them.
@@ -356,6 +364,9 @@
          LBND( 2 ) = VAL__BADI
          UBND( 1 ) = VAL__BADI
          UBND( 2 ) = VAL__BADI
+      ELSE IF( NDIM .EQ. 1 ) THEN
+         LBND( 2 ) = SLBND( 2 )
+         UBND( 2 ) = SUBND( 2 )
       END IF
 
 *  Get a group containing the names of the output NDFs.  Base

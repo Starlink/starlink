@@ -11026,20 +11026,29 @@ Usage:
    gdnames
 
 Description:
-    The routine displays a list of the graphics devices available and
-    the names (both traditional Starlink GNS names and the equivalent
-    PGPLOT names) which identify them.  Each name is accompanied by a
-    brief descriptive comment.
+
+   The routine displays a list of the graphics devices available and
+   the names (both traditional Starlink GNS names and the equivalent
+   PGPLOT names) which identify them.  Each name is accompanied by a
+   brief descriptive comment.
 2 Authors
 RFWS: R.F. Warren-Smith (STARLINK)
 
 MJC: Malcolm J. Currie (STARLINK)
+
+TDCA: Tim Ash (STARLINK)
 2 History
  4-MAY-1989 (RFWS):
     Original version (RFWS).
 
  1990 Mar 31 (MJC):
     Renamed from SHODEV to GDNAMES for consistency (MJC).
+
+ 1999 Jul 19 (TDCA):
+    Replaced call to SGS_WNAME with call to PGLDEV.
+
+ 7-NOV-2001 (DSB):
+    Changed to use AGP_GDLST.
 1 GDSET
 Selects a current graphics device.
 

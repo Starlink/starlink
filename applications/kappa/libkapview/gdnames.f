@@ -24,13 +24,10 @@
 
 *  Description:
 *     The routine displays a list of the graphics devices available and
-*     the names which identify them.  Each name is accompanied by a
+*     the names (both traditional Starlink GNS names and the equivalent
+*     PGPLOT names) which identify them.  Each name is accompanied by a
 *     brief descriptive comment.
      
-*  Algorithm:
-*     A call is made to the PGPLOT routine PGLDEV and a suitable
-*     service routine is provided.
-
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
 *     MJC: Malcolm J. Currie (STARLINK)
@@ -44,6 +41,8 @@
 *        Renamed from SHODEV to GDNAMES for consistency (MJC).
 *     1999 Jul 19 (TDCA):
 *        Replaced call to SGS_WNAME with call to PGLDEV.
+*     7-NOV-2001 (DSB):
+*        Changed to use AGP_GDLST.
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -64,12 +63,16 @@
       IF( STATUS .NE. SAI__OK ) RETURN
 
 *  Display a header for the list of devices.
-      CALL MSG_OUT( 'BLANK', ' ', STATUS )
-      CALL MSG_OUT( 'HEADING', 'Graphics devices available:', STATUS )
-      CALL MSG_OUT( 'BLANK', ' ', STATUS )
+      CALL MSG_BLANK( STATUS )
+      CALL MSG_OUT( ' ', 'The following graphics devices are '//
+     :              'available. The first column holds the GNS names,'//
+     :              ' and the second the equivalent PGPLOT names (in '//
+     :              'parentheses). Either form can be used...', 
+     :              STATUS )
+      CALL MSG_BLANK( STATUS )
    
 *  Call PGLDEV to display the list of devices.
-      CALL PGLDEV
+      CALL AGP_GDLST( STATUS )
 
 *  Put a blank line at the end of the list.
       CALL MSG_OUT( 'BLANK', ' ', STATUS )

@@ -117,7 +117,7 @@
       DOUBLE PRECISION XL( 2 )     ! I/p position of output lower bound
       DOUBLE PRECISION XU( 2 )     ! I/p position of output upper bound
       INTEGER BAD_PIXELS         ! Value returned from AST_RESAMPLE<x>
-      INTEGER DIM1( 2 )          ! Indices of significant axes in input NDF
+      INTEGER DIM1( NDF__MXDIM ) ! Indices of significant axes in input NDF
       INTEGER EL                 ! No. of elements in a mapped array
       INTEGER FLAGS              ! Sum of AST__USEBAD and AST__USEVAR
       INTEGER IAT                ! No. of characters in string
@@ -164,6 +164,11 @@
 
 *  Begin an AST context.
       CALL AST_BEGIN( STATUS )
+
+*  Set the number of axes required in the final output NDF. This is one
+*  if the input NDF has one pixel axis and two otherwise.
+      CALL NDF_DIM( INDF1, NDF__MXDIM, DIM1, NDIM, STATUS )
+      IF( NDIM .GT. 2 ) NDIM = 2
 
 *  Find the Mapping from input pixel co-ordinates to reference (i.e.
 *  output) pixel co-ordinates.
@@ -319,6 +324,10 @@
 
 *  Store this FrameSet in the output NDF.
       CALL NDF_PTWCS( IWCSR2, INDF2, STATUS )
+
+*  The output currently has two pixel axes. If the input NDF only has 1
+*  pixel axis, then throw away the second output pixel axis.
+      IF( NDIM .EQ. 1 ) CALL NDF_SBND( 1, LBND2, UBND2, INDF2, STATUS )
 
 *  Do the resampling.
 *  ==================
