@@ -4,7 +4,7 @@
      :                         DMAXC, SUMC, MEANC, STDEVC, STATUS )
 *+
 *  Name:
-*     KPG1_STAT<T>
+*     KPG1_STATX
  
 *  Purpose:
 *     Compute simple statistics for an array.
@@ -13,7 +13,7 @@
 *     Starlink Fortran 77
  
 *  Invocation:
-*     CALL KPG1_STAT<T>( BAD, EL, DATA, NCLIP, CLIP, NGOOD, IMIN, DMIN,
+*     CALL KPG1_STATX( BAD, EL, DATA, NCLIP, CLIP, NGOOD, IMIN, DMIN,
 *                      IMAX, DMAX, SUM, MEAN, STDEV, NGOODC, IMINC,
 *                      DMINC, IMAXC, DMAXC, SUMC, MEANC, STDEVC,
 *                      STATUS )
@@ -31,7 +31,7 @@
 *        being analysed.
 *     EL = INTEGER (Given)
 *        Number of pixels in the array.
-*     DATA( EL ) = <TYPE> (Given)
+*     DATA( EL ) = ? (Given)
 *        Array to be analysed.
 *     NCLIP = INTEGER (Given)
 *        Number of K-sigma clipping iterations to apply (may be zero).
@@ -78,6 +78,10 @@
 *        The global status.
  
 *  Notes:
+*     -  There is a routine for each of the standard numeric types.
+*     Replace "x" in the routine name by D, R, I, W, UW, B or UB as
+*     appropriate. The data type of the array being analysed must match
+*     the particular routine used.
 *     -  If no clipping is performed (i.e. if NCLIP = 0) then the values
 *     of arguments which return results after clipping will be the same
 *     as for those returning results before clipping.
