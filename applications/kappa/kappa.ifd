@@ -13040,7 +13040,7 @@ iraf! {
             type _REAL
             vpath PROMPT
             ppath CURRENT
-            prompt {Number of degrees clockwise rotation}
+            prompt {Number of degrees clockwise rotation, or null}
             helpkey *
           }
 
@@ -13091,7 +13091,14 @@ iraf! {
             default !
             helpkey *
           }
-
+         parameter useaxis {
+            type LITERAL
+            vpath DEFAULT
+            prompt {The axes defining north and east}
+            ppath DYNAMIC DEFAULT
+            default !
+            helpkey *
+          }
          parameter variance {
             type _LOGICAL
             vpath DEFAULT

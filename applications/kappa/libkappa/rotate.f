@@ -21,12 +21,13 @@
 
 *  Description:
 *     This routine rotates a 2-dimensional array stored in an NDF data
-*     structure by an arbitrary angle.  The origin of the rotation is
-*     around the point (0,0) in pixel co-ordinates.  The output array 
-*     dimensions just accommodate the rotated array.  Output pixels can 
-*     be generated from the input array by one of two methods: 
-*     nearest-neighbour substitution or by bi-linear interpolation.  The 
-*     latter is slower, but gives better results. Output pixels not 
+*     structure by an arbitrary angle.  The rotation angle can be chosen
+*     automatically to make north vertical in the output NDF (see parameter
+*     ANGLE). The origin of the rotation is around the point (0,0) in pixel 
+*     co-ordinates.  The output array dimensions just accommodate the rotated 
+*     array.  Output pixels can  be generated from the input array by one of 
+*     two methods: nearest-neighbour substitution or by bi-linear interpolation.  
+*     The latter is slower, but gives better results. Output pixels not 
 *     corresponding to input pixels take the bad value.
 
 *  Usage:
@@ -36,7 +37,11 @@
 *     ANGLE  = _REAL (Read)
 *        Number of clockwise degrees by which the data array is to be
 *        rotated.  It must lie between -360 and 360 degrees.  The suggested
-*        default is the current value.
+*        default is the current value. If a null (!) value is supplied,
+*        then the rotation angle is chosen to make north vertical. If the
+*        current co-ordinate Frame in the input NDF is not a celestial co-ordinate
+*        frame, then the rotation angle is chosen to make the second axis
+*        of the current Frame vertical.
 *     IN = NDF (Read)
 *        NDF structure containing the 2-dimensional array to be rotated.
 *     NNMETH = _LOGICAL (Read)
@@ -55,6 +60,17 @@
 *     TITLE = LITERAL (Read)
 *        A title for the output NDF.  A null value will cause the title
 *        of the NDF supplied for parameter IN to be used instead. [!]
+*     USEAXIS = GROUP (Read)
+*        USEAXIS is only accessed if the current co-ordinate Frame of the 
+*        NDF has more than 2 axes. A group of two strings should be
+*        supplied specifying the 2 axes which are to be used when
+*        determining the rotation angle needed to make north vertical. Each
+*        axis can be specified either by its integer index within the current 
+*        Frame (in the range 1 to the number of axes in the current Frame), or
+*        by its symbol string. A list of acceptable values is displayed if an 
+*        illegal value is supplied. If a null (!) value is supplied, the axes 
+*        with the same indices as the 2 used pixel axes within the NDF
+*        are used. [!]
 *     VARIANCE = _LOGICAL (Read)
 *        A TRUE value causes variance values to be used as weights for
 *        the pixel values in bi-linear interpolation, and also causes 
@@ -76,6 +92,10 @@
 *        result in the NDF called ew.  The former x axis becomes the new
 *        y axis, and the former y axis becomes the new x axis. The former 
 *        y-axis arrays are also reversed in the process.
+*     rotate m31 m31r angle=!
+*        This rotates the NDF called m31 so that north is vertical and
+*        stores the results in an NDF called m31r. This assumes that the
+*        current WCS Frame in the input NDF is a celestial coordinate Frame.
 *     rotate angle=180 out=sn in=ns
 *        This rotates the array components in the NDF called ns by 180
 *        degrees clockwise around the pixel co-ordinates [0,0], and stores 
@@ -140,6 +160,8 @@
 *        point (0,0) in pixel co-ordinates.
 *     17-AUG-1999 (DSB):
 *        Tidied up the above TDCA changes.
+*     15-FEB-2002 (DSB):
+*        Added option to rotate north to vertical.
 *     {enter_any_changes_here}
 
 *  Bugs:
@@ -155,6 +177,7 @@
       INCLUDE 'NDF_PAR'          ! NDF__ constants
       INCLUDE 'PRM_PAR'          ! VAL__ errors
       INCLUDE 'PAR_ERR'          ! Parameter-system errors
+      INCLUDE 'AST_PAR'          ! AST constants and functions
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -177,6 +200,10 @@
 
 *  Local Variables:
       DOUBLE PRECISION
+     :  A(2),                    ! First point
+     :  B(2),                    ! Second point
+     :  C(2),                    ! Third point
+     :  ANGLED,                  ! Rotation angle 
      :  COSANG,                  ! Cosine of rotation angle
      :  IXC,                     ! X pix. coord. at centre of input array
      :  IYC,                     ! Y pix. coord. at centre of input array
@@ -184,11 +211,14 @@
      :  OFFSET( NDF__MXDIM ),    ! Offset vector for i/p -> o/p mapping
      :  OXC,                     ! X pix. coord. at centre of output array
      :  OYC,                     ! Y pix. coord. at centre of output array
-     :  SINANG                   ! Sine of rotation angle
+     :  SINANG,                  ! Sine of rotation angle
+     :  XP(2),                   ! Axis 1 values
+     :  YP(2)                    ! Axis 2 values
 
       CHARACTER * ( 8 ) ACOMP( 3 ) ! Axis array components to process
       REAL ANGLE                 ! Clockwise degrees rotation
       CHARACTER * ( 80 ) AXCOMP  ! Axis character component
+      INTEGER IAXIS              ! Axis index
       LOGICAL AXIS               ! Axis structure present?
       LOGICAL AXNORM             ! Axis normalisation flag
       LOGICAL BAD                ! Bad-pixel flag
@@ -202,12 +232,14 @@
       CHARACTER * ( NDF__SZFTP ) DTYPE ! Array component storage type
       INTEGER EL                 ! Number of elements mapped
       CHARACTER * ( NDF__SZFRM ) FORM ! Form of the NDF array
+      INTEGER CFRM               ! Current WCS Frame
       INTEGER I                  ! Loop counter
       INTEGER ICOMP              ! Loop counter for array components
       INTEGER IDIM               ! Total number of dimensions
       INTEGER IDIMS( 2 )         ! Dimensions of input array
       INTEGER IERR               ! Location of first conversion error
       INTEGER ISHIFT( 2 )        ! Extra shift required to align pivot points
+      INTEGER IWCS               ! WCS FrameSet for input NDF
       INTEGER LBNDO( NDF__MXDIM ) ! Lower bounds of output array
       INTEGER LONG               ! Longer dimension of input array
       INTEGER M( 4 )             ! MATRIX indices
@@ -245,6 +277,38 @@
 *  Check the global inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*  Begin an AST context.
+      CALL AST_BEGIN( STATUS )
+
+*  Begin an NDF context.
+      CALL NDF_BEGIN
+
+*  Obtain the input NDF and its dimensions.
+*  ========================================
+
+*  Obtain the identifier of the input NDF.
+      CALL LPG_ASSOC( 'IN', 'READ', NDFI, STATUS )
+
+*  Get an AST pointer to a FrameSet describing the co-ordinate Frames
+*  present in the NDF's WCS component. Modify it to ensure that the Base,
+*  PIXEL and Current frames all have 2 dimensions. The NDF must have no
+*  more than 2 significant dimensions (i.e. axes spanning more than 1
+*  pixel). A single significant axis is allowed.
+      CALL KPG1_ASGET( NDFI, NDIM, .FALSE., .TRUE., .TRUE., SDIM, 
+     :                 SLBNDI, SUBNDI, IWCS, STATUS )
+
+*  Find the dimensions of the input array.
+      DIMSI( 1 ) = SUBNDI( 1 ) - SLBNDI( 1 ) + 1
+      DIMSI( 2 ) = SUBNDI( 2 ) - SLBNDI( 2 ) + 1
+
+*  Find the total number of dimensions, and all the bounds of the NDF.
+*  Store these in the output bounds.  The two-dimensional rotate plane
+*  will be modified below.
+      CALL NDF_BOUND( NDFI, NDF__MXDIM, LBNDO, UBNDO, IDIM, STATUS )
+
+*  Abort if an error has occurred.
+      IF( STATUS .NE. SAI__OK ) GO TO 999
+
 *  Find the rotation parameters.
 *  =============================
 
@@ -252,7 +316,83 @@
       CALL PAR_GDR0R( 'ANGLE', 90.0, -360.0 + VAL__SMLR, 
      :                360.0 - VAL__SMLR, .FALSE., ANGLE, STATUS )
 
-      IF( ANGLE .LT. 0.0 ) ANGLE = 360 + ANGLE
+*  If a null value was supplied, annull the error and find the angle 
+*  between the second significant pixel axis and north.
+      IF( STATUS .EQ. PAR__NULL ) THEN
+         CALL ERR_ANNUL( STATUS )
+
+*  If the current WCS Frame is a celestial coord Frame, get the index of
+*  the latitude axis. Otherwise, use the second axis.
+         CFRM = AST_GETFRAME( IWCS, AST__CURRENT, STATUS )
+         IF( AST_ISASKYFRAME( CFRM, STATUS ) ) THEN
+            IAXIS = AST_GETI( CFRM, 'LATAXIS', STATUS )
+         ELSE
+            IAXIS = 2
+         END IF
+
+*  Transform two points on the second GRID axis into the current Frame.
+         XP( 1 ) = 1.0D0
+	 YP( 1 ) = 1.0D0
+         XP( 2 ) = 1.0D0
+	 YP( 2 ) = 100.0D0
+         CALL AST_TRAN2( IWCS, 2, XP, YP, .TRUE., XP, YP, STATUS )
+
+*  Find another point (C) which is to the north of point 1 (A). The
+*  arc-distance from C to A is equal to the arc-distance form B to A.
+         A( 1 ) = XP( 1 )
+         A( 2 ) = YP( 1 )
+         B( 1 ) = XP( 2 )
+         B( 2 ) = YP( 2 )
+         C( IAXIS ) = AST_AXOFFSET( CFRM, IAXIS, A( IAXIS ), 
+     :                              AST_DISTANCE( CFRM, A, B, STATUS ),
+     :                              STATUS )
+         C( 3 - IAXIS ) = A( 3 - IAXIS )
+
+*  Convert A and C back into GRID coords.
+         XP( 1 ) = A( 1 )
+	 YP( 1 ) = A( 2 )
+         XP( 2 ) = C( 1 )
+	 YP( 2 ) = C( 2 )
+         CALL AST_TRAN2( IWCS, 2, XP, YP, .FALSE., XP, YP, STATUS )
+
+*  Find the angle between the line joining these transformed points in
+*  the GRID Frame, and the second GRID axis.
+         A( 1 ) = XP( 1 )
+         A( 2 ) = YP( 1 )
+         B( 1 ) = XP( 2 )
+         B( 2 ) = YP( 2 )
+         
+         ANGLED = AST_AXANGLE( AST_GETFRAME( IWCS, AST__BASE, STATUS ), 
+     :                         A, B, 2, STATUS )
+
+* Check the angle is OK. If so, convert to degrees. Otherwise report an
+* error.
+         IF( ANGLED .NE. AST__BAD ) THEN
+            ANGLE = REAL( -ANGLED/DTOR )
+            IF( ANGLE .LT. 0.0 ) ANGLE = 360 + ANGLE
+            CALL MSG_BLANK( STATUS )
+            CALL MSG_SETR( 'A', ANGLE )
+            CALL MSG_OUT( 'ROTATE_MSG1', '  Rotating by ^A degrees', 
+     :                    STATUS )
+            CALL MSG_BLANK( STATUS )
+         ELSE
+            IF( STATUS .EQ. SAI__OK ) THEN
+               STATUS = SAI__ERROR
+               CALL ERR_REP( 'ROTATE_ERR1', 'Rotation angle is '//
+     :                       'undefined.', STATUS )
+            END IF
+         END IF
+
+      END IF
+
+*  Ensure the angle is in the range 0 - 360.
+      DO WHILE ( ANGLE .LT. 0.0 ) 
+         ANGLE = 360 + ANGLE
+      END DO
+
+      DO WHILE ( ANGLE .GT. 360.0 ) 
+         ANGLE = ANGLE - 360.0
+      END DO
 
 *  Look for the special cases.
 *  A simple 90-degree rotation...
@@ -277,29 +417,6 @@
 
       END IF
 
-*  Obtain the input NDF and its dimensions.
-*  ========================================
-
-*  Begin an NDF context.
-      CALL NDF_BEGIN
-
-*  Get the NDF containing the input data.  There must be only two
-*  significant dimensions.
-      CALL KPG1_GTNDF( 'IN', NDIM, .TRUE., 'READ', NDFI, SDIM,
-     :                 SLBNDI, SUBNDI, STATUS )
-
-*  Find the dimensions of the input array.
-      DIMSI( 1 ) = SUBNDI( 1 ) - SLBNDI( 1 ) + 1
-      DIMSI( 2 ) = SUBNDI( 2 ) - SLBNDI( 2 ) + 1
-
-*  Find the total number of dimensions, and all the bounds of the NDF.
-*  Store these in the output bounds.  The two-dimensional rotate plane
-*  will be modified below.
-      CALL NDF_BOUND( NDFI, NDF__MXDIM, LBNDO, UBNDO, IDIM, STATUS )
-
-*  Abort if an error has occurred.
-      IF( STATUS .NE. SAI__OK ) GO TO 999
-
       IF ( NRAFLG ) THEN
 
 *  Work out the dimensions of the output array to hold the results of
@@ -307,11 +424,12 @@
          CALL KPS1_ROSIZ( DIMSI, ANGLE, DIMSO, STATUS )
 
 *  Compute the output bounds and dimensions.
-          LBNDO( SDIM( 1 ) ) = 1
-          LBNDO( SDIM( 2 ) ) = 1
-          UBNDO( SDIM( 1 ) ) = DIMSO( 1 )
-          UBNDO( SDIM( 2 ) ) = DIMSO( 2 )
-       ELSE
+         LBNDO( SDIM( 1 ) ) = 1
+         LBNDO( SDIM( 2 ) ) = 1
+         UBNDO( SDIM( 1 ) ) = DIMSO( 1 )
+         UBNDO( SDIM( 2 ) ) = DIMSO( 2 )
+      ELSE
+
 *  A rotation angle divisible by 90.0 degrees has been requested;
 *  proceed according to the set value of NUMRA.
          IF ( NUMRA .EQ. 2 ) THEN
@@ -1077,10 +1195,12 @@
 *  Release the NDF resources.
       CALL NDF_END( STATUS )
 
+*  Release the AST resources.
+      CALL AST_END( STATUS )
+
       IF ( STATUS .NE. SAI__OK ) THEN
-         CALL ERR_REP( 'ROTATE_ERR',
-     :     'ROTATE: Error occurred whilst trying to rotate an NDF.',
-     :     STATUS )
+         CALL ERR_REP( 'ROTATE_ERR2', 'ROTATE: Error occurred whilst '//
+     :                 'trying to rotate an NDF.', STATUS )
       END IF
 
       END
