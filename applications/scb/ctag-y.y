@@ -390,6 +390,8 @@ identifier
       char c;
       char *text;
       int done;
+      extern int preleng, prealloc;
+      extern char *preval;
 
 /* Add preval to the unprocessed text. */
       if ( prealloc > 0 ) {
@@ -412,6 +414,7 @@ identifier
       else {
          printf( "%s", text );
          yyclearin;
+         uclear();
       }
 
 /* Release memory allocated by ucontent. */

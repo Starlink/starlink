@@ -64,7 +64,7 @@ int yydebug;
 
 /* Declare local variables. */
       int retval;
-      char *name, *usagef;
+      char *name, *usagef, *text;
       char c;
 
 /* Get name of program etc. */
@@ -125,6 +125,12 @@ int yydebug;
          
 /* Call the parser. */
       retval = yyparse();
+
+/* Some tidying. */
+      text = ucontent();
+      printf( "%s", text );
+      free( text );
+      uclear();
 
 /* Return. */
       return( retval );
@@ -216,6 +222,8 @@ int yydebug;
    void unew() {
       ufirst = &ubase;
       ulast = &ubase;
+      ubase.text = "";
+      ubase.next = (ELEMENT *) NULL;
    }
 
    void uadd( char *item ) {
@@ -245,6 +253,7 @@ int yydebug;
          strcpy( text + j, i->text );
          j += strlen( i->text );
       }
+      text[ j ] = '\0';
 
 /* Return the concatenated string. */
       return( text );

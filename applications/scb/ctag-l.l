@@ -51,13 +51,11 @@ IS			[uUlL]*
 S			[ \t\v\n\f]*
 IDENT			{L}({L}|{D})*
 
-/* Limits bigger than default required for old lex (not flex). */
+/* Limits bigger than default required for lex (not flex). */
 
-%e 2000
-%k 10000
-%p 10000
-%a 5000
-%n 1000
+%k 1000
+%p 5000
+%a 3000
 
 
 %{
@@ -74,9 +72,7 @@ void munch();
 %}
 
 %%
-\n#include{S}\"			{ include(); }
-\n#define{S}/{IDENT}{S}\(	{ define(); }
-\n#				{ cpp(); }
+
 ^#include{S}\"			{ include(); }
 ^#define{S}/{IDENT}{S}\(	{ define(); }
 ^#				{ cpp(); }
@@ -213,8 +209,11 @@ extern int yyleng;
 *     to the parser, it won't be returned at all.
 *-
 */
-      if ( preleng > 0 )
-         printf( "%s", preval ); 
+      if ( preleng > 0 ) {
+         uadd( preval );
+         preleng = 0;
+         prealloc = 0;
+      }
       return(1); 
    }
 
