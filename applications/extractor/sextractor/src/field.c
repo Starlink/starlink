@@ -46,6 +46,7 @@ picstruct	*newfield(char *filename, int flags, int nok)
    tabstruct	*tab;
    OFF_T	mefpos = 0;		/* To avoid gcc -Wall warnings */
    int		nok2, ntab;
+   int          skip;
 
 /* Move to nok'th valid FITS image extension */
   if (!(cat = read_cat(filename)))
@@ -54,11 +55,19 @@ picstruct	*newfield(char *filename, int flags, int nok)
   tab = cat->tab;
   nok++;	/* At least one pass through the loop */
   nok2 = nok;
+
+  /* PWD: when extension is numbered don't skip */
+  skip = ( prefs.extnum[0] == -1 );
+  if ( ! skip ) {
+    nok2 = nok - 1;
+  }
+
   for (ntab=cat->ntab; nok && ntab--; tab=tab->nexttab)
     {
-    if ((tab->naxis < 2)
-	|| !strncmp(tab->xtension, "BINTABLE", 8)
-	|| !strncmp(tab->xtension, "ASCTABLE", 8))
+    if (skip && 
+        ( (tab->naxis < 2)
+          || !strncmp(tab->xtension, "BINTABLE", 8)
+          || !strncmp(tab->xtension, "ASCTABLE", 8)) )
       continue;
     mefpos = tab->headpos;
     nok--;

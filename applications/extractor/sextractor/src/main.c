@@ -58,6 +58,10 @@ int	main(int argc, char *argv[])
   strcpy(prefs.prefs_name, "default.sex");
   narg = nim = 0;
 
+/* PWD: FITS extension numbers, not set by default */
+  prefs.extnum[0] = -1;
+  prefs.extnum[1] = -1;
+
   for (a=1; a<argc; a++)
     {
     if (*(argv[a]) == '-')
@@ -98,10 +102,28 @@ int	main(int argc, char *argv[])
 /*---- The input image filename(s) */
       for(; (a<argc) && (*argv[a]!='-'); a++)
         for (str=NULL;(str=strtok(str?NULL:argv[a], notokstr)); nim++)
-          if (nim<MAXIMAGE)
-            prefs.image_name[nim] = str;
+          if (nim<MAXIMAGE) 
+            {
+            char *base = NULL;
+            int extension = 0;
+            // PWD: Allow the FITS extension number to be appended to the file
+            // names. 
+            base = strdup( str );
+            if ( sscanf( str,"%[^[][%d]", base, &extension ) == 2 ) 
+              {
+              fprintf( stderr,"base: %s, extension: %d\n", base, extension );
+              prefs.image_name[nim] = base;
+              prefs.extnum[nim] = extension;
+              }
+            else 
+              {
+              prefs.image_name[nim] = str;
+              free( base );
+              }
+            }
           else
             error(EXIT_FAILURE, "*Error*: Too many input images: ", str);
+
       prefs.nimage_name = nim;
       a--;
       }

@@ -193,6 +193,11 @@ typedef struct
   int           nrad_type;
   double        rad[3];                                 /* PWD: radii specs */
   int           nrad;                                   /* PWD: nb of params */
+  int           extnum[2];              /* PWD: FITS extension, if specified */
+  int           wextnum[2];             /* PWD: FITS extension of weight
+                                           image, if specified */
+  int	        fextnum[MAXFLAG];	/* PWD: FIT extension, flag image,
+                                           if specified */
   }	prefstruct;
 
   prefstruct		prefs;

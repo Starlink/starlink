@@ -108,16 +108,24 @@ void	makeit()
   close_cat(imacat);
   imatab = imacat->tab;
   next = 0;
-  for (ntab = 0 ; ntab<imacat->ntab; ntab++, imatab = imatab->nexttab)
-    {
+
+/* PWD: if not set to a fixed one */
+  if ( prefs.extnum[0] == -1 ) {
+    for (ntab = 0 ; ntab<imacat->ntab; ntab++, imatab = imatab->nexttab)
+      {
 /*--  Check for the next valid image extension */
-    if ((imatab->naxis < 2)
-	|| !strncmp(imatab->xtension, "BINTABLE", 8)
-	|| !strncmp(imatab->xtension, "ASCTABLE", 8))
-      continue;
-    next++;
-    }
-  thecat.next = next;
+      if ((imatab->naxis < 2)
+  	  || !strncmp(imatab->xtension, "BINTABLE", 8)
+  	  || !strncmp(imatab->xtension, "ASCTABLE", 8))
+        continue;
+      next++;
+      }
+    thecat.next = next;
+  }
+  else {
+    /* PWD: one extension has been specified */
+    thecat.next = prefs.extnum[0];
+  }
 
 /*-- Init the CHECK-images */
   if (prefs.check_flag)
@@ -142,15 +150,25 @@ void	makeit()
 
 
 /* Go through all images */
+/* -------MAIN LOOP ---- */
   nok = -1;
   for (ntab = 0 ; ntab<imacat->ntab; ntab++, imatab = imatab->nexttab)
     {
 /*--  Check for the next valid image extension */
-    if ((imatab->naxis < 2)
-	|| !strncmp(imatab->xtension, "BINTABLE", 8)
-	|| !strncmp(imatab->xtension, "ASCTABLE", 8))
-      continue;
-    nok++;
+/* PWD: if a specific extension hasn't been given */
+    if ( prefs.extnum[0] == -1 ) 
+      {
+      if ((imatab->naxis < 2)
+  	  || !strncmp(imatab->xtension, "BINTABLE", 8)
+	  || !strncmp(imatab->xtension, "ASCTABLE", 8))
+        continue;
+      nok++;
+      }
+    else 
+      {
+        /* PWD: preselected extension of detection image */
+        nok = prefs.extnum[0] - 1;
+      }
 
 /*-- Initial time measurement*/
     time(&thetime1);
@@ -162,7 +180,16 @@ void	makeit()
       {
 /*---- Init the Detection and Measurement-images */
       dfield = newfield(prefs.image_name[0], DETECT_FIELD, nok);
+
+      /* PWD: preselected extension */
+      if ( prefs.extnum[0] != -1 && prefs.extnum[1] != -1 ) 
+        {
+      field = newfield(prefs.image_name[1], MEASURE_FIELD, prefs.extnum[1]);
+        }
+      else
+        {
       field = newfield(prefs.image_name[1], MEASURE_FIELD, nok);
+        }
       if ((field->width!=dfield->width) || (field->height!=dfield->height))
         error(EXIT_FAILURE, "*Error*: Frames have different sizes","");
 /*---- Prepare interpolation */
@@ -192,8 +219,18 @@ void	makeit()
         if (prefs.weight_type[1] != WEIGHT_NONE)
           {
 /*-------- First: the "measurement" weights */
-          wfield = newweight(prefs.wimage_name[1],field,prefs.weight_type[1],
-		nok);
+              /* PWD: preselected extension */
+              if ( prefs.wextnum[0] != -1 && prefs.wextnum[1] != -1 ) 
+                {
+                  wfield = newweight(prefs.wimage_name[1],field,
+                                     prefs.weight_type[1],
+                                     prefs.wextnum[1]);
+                }
+              else
+                  {
+                  wfield = newweight(prefs.wimage_name[1],field,
+                                     prefs.weight_type[1],nok);
+                }
           wtype = prefs.weight_type[1];
           interpthresh = prefs.weight_thresh[1];
 /*-------- Convert the interpolation threshold to variance units */
@@ -209,14 +246,35 @@ void	makeit()
           interpthresh = prefs.weight_thresh[0];
           if (prefs.weight_type[0] == WEIGHT_FROMINTERP)
             {
-            dwfield=newweight(prefs.wimage_name[0],wfield,prefs.weight_type[0],
-		nok);
+              /* PWD: preselected extension */
+              if ( prefs.wextnum[0] != -1 ) 
+                {
+                    dwfield=newweight(prefs.wimage_name[0],wfield,
+                                      prefs.weight_type[0],nok);
+                }
+              else
+                {
+                    dwfield=newweight(prefs.wimage_name[0],wfield,
+                                      prefs.weight_type[0],prefs.wextnum[0]);
+                }
             weight_to_var(wfield, &interpthresh, 1);
             }
           else
             {
-            dwfield = newweight(prefs.wimage_name[0], dfield?dfield:field,
-		prefs.weight_type[0], nok);
+              /* PWD: preselected extension */
+              if ( prefs.wextnum[0] != -1 ) 
+                {
+                    dwfield = newweight(prefs.wimage_name[0], 
+                                        dfield?dfield:field,
+                                        prefs.weight_type[0], 
+                                        prefs.wextnum[0]);
+                }
+              else 
+                {
+                    dwfield = newweight(prefs.wimage_name[0], 
+                                        dfield?dfield:field,
+                                        prefs.weight_type[0], nok);
+                }
             weight_to_var(dwfield, &interpthresh, 1);
             }
           dwfield->weight_thresh = interpthresh;
@@ -228,8 +286,16 @@ void	makeit()
       else
         {
 /*------ Single-weight-map mode */
-        wfield = newweight(prefs.wimage_name[0], dfield?dfield:field,
-			prefs.weight_type[0], nok);
+          if ( prefs.wextnum[0] != -1 ) 
+            {
+                wfield = newweight(prefs.wimage_name[0], dfield?dfield:field,
+                                   prefs.weight_type[0], prefs.wextnum[0]);
+            }
+          else 
+            {
+                wfield = newweight(prefs.wimage_name[0], dfield?dfield:field,
+                                   prefs.weight_type[0], nok);
+            }
         wtype = prefs.weight_type[0];
         interpthresh = prefs.weight_thresh[0];
 /*------ Convert the interpolation threshold to variance units */
@@ -244,7 +310,18 @@ void	makeit()
 /*-- Init the FLAG-images */
     for (i=0; i<prefs.nimaflag; i++)
       {
-      pffield[i] = newfield(prefs.fimage_name[i], FLAG_FIELD, nok);
+
+        /* PWD: preselected extension */
+        if ( prefs.fextnum[i] != -1 ) 
+          {
+            pffield[i] = newfield(prefs.fimage_name[i], FLAG_FIELD, 
+                                  prefs.fextnum[i]);
+          }
+        else 
+          {
+            pffield[i] = newfield(prefs.fimage_name[i], FLAG_FIELD, nok);
+          }
+
       if ((pffield[i]->width!=field->width)
 	|| (pffield[i]->height!=field->height))
         error(EXIT_FAILURE,
@@ -357,6 +434,11 @@ void	makeit()
 
     QPRINTF(OUTPUT, "Objects: detected %-8d / sextracted %-8d\n",
 	thecat.ndetect, thecat.ntotal);
+
+    /* PWD: specified extension so loop once */
+    if ( prefs.extnum[0] != -1 ) break;
+
+/* --END MAIN LOOP ---- */
     }
 
   if (nok<0)

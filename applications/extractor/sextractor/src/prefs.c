@@ -379,6 +379,9 @@ void	useprefs()
    int			i, margin, naper;
    char			*str;
 
+   char                 *base = NULL;
+   int                  extension = 0;
+
 /* Test if byteswapping will be needed */
   bswapflag = *((char *)&ashort);
 
@@ -471,6 +474,19 @@ void	useprefs()
   prefs.nimaflag = (prefs.nimaisoflag < prefs.nfimage_name) ?
 		prefs.nimaisoflag : prefs.nfimage_name;
 
+  /* PWD: deal with selected extension numbers */
+  for ( i = 0; i < prefs.nfimage_name; i++ ) {
+    base = strdup( prefs.fimage_name[i] );
+    if ( sscanf( str,"%[^[][%d]", prefs.fimage_name[i], &extension ) == 2 ) {
+        prefs.fextnum[i] = extension;
+        prefs.fimage_name[i] = base;
+    }
+    else {
+        prefs.fextnum[i] = -1;
+        free( base );
+    }
+  }
+  
 /*----------------------------- CHECK-images -------------------------------*/
   prefs.check_flag = 0;
   for (i=0; i<prefs.ncheck_type; i++)
@@ -535,6 +551,19 @@ void	useprefs()
       prefs.wimage_name[1] = prefs.wimage_name[0];
     if (prefs.nwimage_name==2 && prefs.nweight_type==1)
       prefs.nweight_type = 2;
+
+    /* PWD: deal with selected extension numbers */
+    for ( i = 0; i < 2; i++ ) {
+      base = strdup( prefs.wimage_name[i] );
+      if ( sscanf( str,"%[^[][%d]", prefs.wimage_name[i], &extension ) == 2 ) {
+        prefs.wextnum[i] = extension;
+        prefs.wimage_name[i] = base;
+      }
+      else {
+        prefs.wextnum[i] = -1;
+        free( base );
+      }
+    }
 
 /*-- If detection-only interpolation is needed with 1 Weight image... */
 /*-- ...pretend we're using 2, with only one being interpolated */
