@@ -130,6 +130,15 @@ run=
 runn=
 tempdest=tmp.stamp
 
+# The dvi2bitmap call is currently rather sensitive to the version
+DVI2BITMAPVERSION=`$DVI2BITMAP -V|sed -n '1s/^[^ ]* *\([^ ]*\).*$/\1/p'`
+if [ $DVI2BITMAPVERSION != 0.9 ]; then
+    echo "Using" $DVI2BITMAP "at"
+    which `echo $DVI2BITMAP | awk '{print $1}'`
+    echo "Need dvi2bitmap version 0.9, but $DVI2BITMAP is version $DVI2BITMAPVERSION"
+    exit 1
+fi
+
 PROGNAME=`basename $0`
 
 tidy-up ()
@@ -306,16 +315,22 @@ if [ $TARGETFORMAT -eq 0 ]; then
 	$VERBOSE && echo "$PROGNAME:I: $LATEX $ROOT.imgeq.tex"
 	$run $LATEX $ROOT.imgeq.tex $OUTPUTDEST
 
-	$VERBOSE && echo "$PROGNAME:I: $DVI2BITMAP -m 2 -s 2 -Pt $ROOT.imgeq.dvi" 
+	$VERBOSE && echo "$PROGNAME:I: $DVI2BITMAP -m 3 -s 3 -Pt $ROOT.imgeq.dvi" 
 	$run $DVI2BITMAP -m 3 -s 3 -Pt -q -Qb $ROOT.imgeq.dvi >dvi2bitmap.log
 
 	if [ -r dvi2bitmap.log -a -r $ROOT.imgeq.labelmap ]; then
-	    awk '/^Qb/ { map[$2]=sprintf(" width=\"%s\" height=\"%s\"",$3,$4); };/^label/ { printf("<img-eq label=\"%s\" sysid=\"%s\"%s/>\n",$2,$3,map[$3]?map[$3]:"");};BEGIN { print "<?xml version=\"1.0\"?>\n<!DOCTYPE img-eqlist SYSTEM \"img-eqlist\">\n<img-eqlist>";};END {print "</img-eqlist>"; }' dvi2bitmap.log $ROOT.imgeq.labelmap >$ROOT.imgeq.xml
+	    awk '
+	    /^Qb/ { map[$2]=sprintf(" width=\"%s\" height=\"%s\"", $3, $4) }
+	    /^label/ { printf("<img-eq label=\"%s\" sysid=\"%s\"%s/>\n", 
+		$2, $3, map[$3]?map[$3]:"") }
+	    BEGIN { print "<?xml version=\"1.0\"?>\n<!DOCTYPE img-eqlist SYSTEM \"img-eqlist\">\n<img-eqlist>" }
+	    END { print "</img-eqlist>" }
+	    ' dvi2bitmap.log $ROOT.imgeq.labelmap >$ROOT.imgeq.xml
 	else
 	    echo "$PROGNAME:W: failed generating equation-image refs"
 	fi
     else
-	$VERBOSE && echo "$PROGNAME:I: no maths in document"
+	$VERBOSE && echo "$PROGNAME:I: (no maths in document)"
     fi
 
     # Generate backmatter.  Don't fail if no .aux file was generated
