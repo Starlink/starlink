@@ -5287,7 +5287,7 @@ void adix_fopen( char *fspec, int flen, char *cls, int clen,
   }
 
 
-void adix_id_flush( ADIobj id, char *grp, int glen, ADIstatus status )
+void adix_id_flush( char *grp, int glen, ADIstatus status )
   {
   ADIobj	*lvalue;
 
@@ -5298,7 +5298,7 @@ void adix_id_flush( ADIobj id, char *grp, int glen, ADIstatus status )
     }
   else {
     adic_setetc( "GRP", grp, glen );
-    adic_setecs( ADI__INVARG, "Invalid identifier group /^ID/", status );
+    adic_setecs( ADI__INVARG, "Invalid identifier group /^GRP/", status );
     }
   }
 
@@ -5313,6 +5313,6 @@ void adix_id_link( ADIobj id, char *grp, int glen, ADIstatus status )
     }
   else {
     adic_setetc( "GRP", grp, glen );
-    adic_setecs( ADI__INVARG, "Invalid identifier group /^ID/", status );
+    adic_setecs( ADI__INVARG, "Invalid identifier group /^GRP/", status );
     }
   }

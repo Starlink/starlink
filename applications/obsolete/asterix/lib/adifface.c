@@ -151,6 +151,11 @@
 *      Symbol packages :
 *
 *	adi_reqpkg	- Load a package from the search path
+*
+*      Miscellaneous :
+*
+*	adi_link	- Link an identifier to a name group
+*	adi_flush	- Erase all objects in a name group
 
 *  Authors:
 *     DJA: David J. Allan (JET-X, University of Birmingham)
@@ -1814,7 +1819,7 @@ F77_SUBROUTINE(adifn(there))( INTEGER(id), CHARACTER(name),
 
   _ERR_IN("ADI_THERE");			/* Mark routine for error reporting */
 
-  cres = adix_there( (ADIobj) id, name,
+  cres = adix_there( (ADIobj) *id, name,
 		      name_length, status );
 
   _ASSFLOG(*there,cres);		/* Set return value */
@@ -2088,6 +2093,42 @@ F77_SUBROUTINE(adifn(reqpkg))( CHARACTER(pkg), INTEGER(status) TRAIL(pkg) )
   _ERR_IN("ADI_REQPKG");
 
   ADIpkgRequire( pkg, pkg_length, status );
+
+  _ERR_OUT;
+  }
+
+
+/* -------------------------------------------------------------------------
+ * Miscellaneous
+ * -------------------------------------------------------------------------
+ */
+
+F77_SUBROUTINE(adifn(flush))( CHARACTER(grp), INTEGER(status) TRAIL(grp) )
+  {
+  GENPTR_CHARACTER(grp)
+  GENPTR_INTEGER(status)
+
+  _chk_init; _chk_stat;
+
+  _ERR_IN("ADI_FLUSH");
+
+  adix_id_flush( grp, grp_length, status );
+
+  _ERR_OUT;
+  }
+
+F77_SUBROUTINE(adifn(link))( INTEGER(id), CHARACTER(grp), INTEGER(status)
+			     TRAIL(grp) )
+  {
+  GENPTR_INTEGER(id)
+  GENPTR_CHARACTER(grp)
+  GENPTR_INTEGER(status)
+
+  _chk_init; _chk_stat;
+
+  _ERR_IN("ADI_LINK");
+
+  adix_id_link( (ADIobj) *id, grp, grp_length, status );
 
   _ERR_OUT;
   }
