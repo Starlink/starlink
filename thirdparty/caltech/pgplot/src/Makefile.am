@@ -3,10 +3,10 @@
 # grfont.dat and rgb.txt are not actually programs but they still need to
 # go into bin/
 
-noinst_LTLIBRARIES = libpgplot_base.la libpgplot_adam_base.la
+noinst_LTLIBRARIES = libpgplot_base.la libpgplot_star_base.la
 
 libpgplot_base_la_SOURCES = $(F_ROUTINES) $(NATIVE_PGPLOT_ROUTINES)
-libpgplot_adam_base_la_SOURCES = $(F_ROUTINES) $(STARLINK_PGPLOT_ROUTINES)
+libpgplot_star_base_la_SOURCES = $(F_ROUTINES) $(STARLINK_PGPLOT_ROUTINES)
 
 #  List of Fortran routines required for building the package.  This is
 #  just a list of all the Fortran source files (excluding BLOCK DATA

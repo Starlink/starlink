@@ -2,7 +2,7 @@
 #  N.B. the previous line should be blank.
 #+
 #  Name:
-#     pgp_link_adam
+#     pgplot_link_adam
 
 #  Purpose:
 #     Generate linker (ld) arguments for linking against adam Starlink-PGPLOT.
@@ -12,24 +12,25 @@
 
 #  Description:
 #     This script should be invoked by those building ADAM applications
-#     which use Starlink-PGPLOT in order to generate the correct arguments for the 
-#     compiler (or ld) command. The arguments generated are written to 
+#     which use Starlink-PGPLOT in order to generate the correct arguments for
+#     the compiler (or ld) command. The arguments generated are written to 
 #     the standard output.
 
 #  Invocation:
 #     The script is normally invoked as part of a compiler command line,
 #     such as:
 #
-#        alink program.f -L/star/lib `pgp_link_adam`
+#        alink program.f -L/star/lib `pgplot_link_adam`
 
 #  Copyright:
-#     Copyright (C) 1995 Rutherford Appleton Laboratory
+#     Copyright (C) 1995,1998-1999,2004 Rutherford Appleton Laboratory
 
 #  Authors:
 #     RFWS: R.F. Warren-Smith (STARLINK, RAL)
 #     BLY:  M.J. Bly (Starlink, RAL)
 #     DLT:  D.L. Terrett (Starlink, RAL)
 #     BKM:  B.K. McIlwrath (Starlink, RAL)
+#     TIMJ: Tim Jenness (JAC, Hawaii)
 #     {enter_new_authors_here}
 
 #  History:
@@ -41,6 +42,8 @@
 #        Version for Starlink "native" PGPLOT.
 #     01-JUL-2004 (TIMJ):
 #        Use pgplot_adam library and include png
+#     08-JUL-2004 (TIMJ):
+#        Now get pgplot libraries using pgplot_link script
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -48,7 +51,7 @@
 
 #-
 
-      echo -lpgppar_adam  -lpgplot_adam -lpng -lz `gwm_link_adam` \
+      echo -lpgppar_adam  `pgplot_link -star` `gwm_link_adam` \
            `psx_link_adam` `chr_link_adam`   \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}

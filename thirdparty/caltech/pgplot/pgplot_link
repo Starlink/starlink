@@ -15,11 +15,16 @@
 #     This script should be invoked by those building standalone
 #     applications which use Native-PGPLOT in order to generate the correct
 #     arguments for the compiler (or ld) command. The arguments
-#     generated are written to the standard output.
+#     generated are written to the standard output. Relevant X
+#     libraries are included.
 
 #     Note that this really does link against the standard native
-#     PGPLOT library with no starlink-isms.
-#     Use pgplot_link_adam for native pgplot with starlink drivers.
+#     PGPLOT library with no starlink-isms. Use the -star option to
+#     this command to link against a version of pgplot that includes
+#     Starlink drivers.
+
+#     Use pgplot_link_adam for native pgplot with starlink drivers
+#     in an ADAM context.
 
 #  Invocation:
 #     The script is normally invoked as part of a compiler command line,
@@ -28,7 +33,7 @@
 #        f77 -o program -L/star/lib `pgplot_link` program.f
 
 #  Copyright:
-#     Copyright (C) 1998 CCLRC
+#     Copyright (C) 1998-1999,2004 CCLRC
 
 #  Authors:
 #     RFWS: R.F. Warren-Smith (STARLINK, RAL)
@@ -50,6 +55,8 @@
 #        Version for GWM window enabled native PGPLOT.
 #     01-JUL-2004 (TIMJ):
 #        Revert to no Starlink libraries
+#     08-JUL-2004 (TIMJ):
+#        Add -star switch to enable Starlink drivers
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -57,7 +64,31 @@
 
 #-
 
-      echo -lpgplot -lpng -lz `starX_link` \
+#  Initialise linking options (default to non-Starlink)
+      star='-lpgplot'
+
+#  Interpret command line switches.
+#  --------------------------------
+      while :; do
+         case "${1}" in
+
+#  -star - Requests linking with Starlink extensions
+         -star)
+            star='-lpgplot_star'
+            shift;;
+
+#  Once all switches have been read, continue with the rest of the script.
+         '') break;;
+
+#  Catch unrecognised arguments and report an error.
+         *)
+            echo >&2 "pgplot_link: unknown argument \""${1}"\" given"
+            exit 1;;
+         esac
+      done
+
+
+      echo $star -lpng -lz `starX_link` \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}
                   END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'

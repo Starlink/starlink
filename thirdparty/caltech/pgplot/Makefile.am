@@ -6,11 +6,11 @@ SUBDIRS = @subdirs@
 bin_SCRIPTS = pgplot_link pgplot_link_adam rgb.txt
 
 # Made up from sublibs
-lib_LTLIBRARIES = libpgplot.la libpgplot_adam.la
+lib_LTLIBRARIES = libpgplot.la libpgplot_star.la
 
 libpgplot_la_SOURCES = 
 libpgplot_la_LIBADD = src/libpgplot_base.la sys/libpgplot_sys.la drivers/libpgplot_drivers.la
 
-libpgplot_adam_la_SOURCES = 
-libpgplot_adam_la_LIBADD = src/libpgplot_adam_base.la sys/libpgplot_adam_sys.la drivers/libpgplot_adam_drivers.la
+libpgplot_star_la_SOURCES = 
+libpgplot_star_la_LIBADD = src/libpgplot_star_base.la sys/libpgplot_star_sys.la drivers/libpgplot_star_drivers.la
 
