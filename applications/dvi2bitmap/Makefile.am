@@ -31,7 +31,7 @@ $(libdocdir):
 	doxygen
 
 # doc/ directory has its own simple makefile
-manual.tar:
+manual.tar: VERSION
 	cd doc; $(MAKE) doc.tar
 	mv doc/doc.tar ./manual.tar
 
