@@ -186,7 +186,8 @@
 *     27-FEB-1998 (DSB):
 *        Type of local variable AXWT corrected from INTEGER to LOGICAL.
 *     10-JUN-1998 (DSB):
-*        Propagate WCS component.
+*        Propagate WCS component. Ensure each output dimension is at least
+*        one pixel long. 
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -214,7 +215,7 @@
      :  TYPE * ( NDF__SZTYP )  ! Data type of an array component
 
       DOUBLE PRECISION
-     :  MATRIX( NDF__MXDIM, NDF__MXDIM ),! Matrix component of linear mapping
+     :  MATRIX( NDF__MXDIM*NDF__MXDIM ),! Matrix component of linear mapping
      :  OFFSET( NDF__MXDIM )   ! Translation component of linear mapping
 
       INTEGER
@@ -308,10 +309,11 @@
       IF ( STATUS .NE. SAI__OK ) GOTO 999
 
 *  Should less values be entered than is required copy the last value to
-*  higher dimensions.
+*  higher dimensions, limiting it to be no smaller than the corresponding
+*  input NDF axis.
       IF ( ACTVAL .LT. NDIM ) THEN
          DO I = ACTVAL + 1, NDIM
-            COMPRS( I ) = COMPRS( ACTVAL )
+            COMPRS( I ) = MIN( IDIMS( I ), COMPRS( ACTVAL ) )
          END DO
       END IF
 
@@ -370,7 +372,7 @@
 *  arithmetic truncation.  Also derive bounds for the output array.
 *  These are somewhat arbitrary.
       DO I = 1, NDIM
-         ODIMS( I ) = IDIMS( I ) / COMPRS( I )
+         ODIMS( I ) = MAX( 1, IDIMS( I ) / COMPRS( I ) )
          LBNDO( I ) = 1
          UBNDO( I ) = ODIMS( I )
       END DO
@@ -676,17 +678,14 @@
 
 *  Propagate the WCS component, incorporating a linear mapping between
 *  pixel coordinates. This mapping is described by a matrix and an offset
-*  vector. Set these up. The matrix is diagonal, with the reciprocals of
-*  the compression factors on the diagonal, and the offset is zero.
+*  vector. Set these up. 
+      DO I = 1, NDIMI*NDIMI
+         MATRIX( I ) = 0.0
+      END DO
+
       DO J = 1, NDIMI
-         OFFSET( J ) = 0.0
-
-         DO I = 1, NDIMI
-            MATRIX( I, J ) = 0.0
-         END DO
-
-         MATRIX( J, J ) = 1.0D0/DBLE( COMPRS( J ) )
-
+         OFFSET( J ) = DBLE( 1 - LBND( J ) )/DBLE( COMPRS( J ) )
+         MATRIX( NDIMI*( J - 1 ) + J ) = 1.0D0/DBLE( COMPRS( J ) )
       END DO
 
 *  Propagate the WCS component.
