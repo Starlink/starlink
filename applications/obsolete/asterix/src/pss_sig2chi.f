@@ -25,10 +25,12 @@
 *    Authors :
 *
 *     David J. Allan (BHVAD::DJA)
+*     Richard Beard (Birmingham)
 *
 *    History :
 *
 *     13 Jan 93 : Original (DJA)
+*     23 Jun 97 : Replace NAG with ASTPDA (RB)
 *
 *    Type definitions :
 *
@@ -48,7 +50,7 @@
 *
 *    Function declarations :
 *
-c     DOUBLE PRECISION             S15ABF
+      DOUBLE PRECISION             PDA_CNDFPX
 *
 *    Local constants :
 *
@@ -69,9 +71,7 @@ c     DOUBLE PRECISION             S15ABF
 *    Convert to a change in Cash statistic
       IF ( SIG .LE. 5.0 ) THEN
         ISTAT = 1
-        PROB = 0.0D0
-c       PROB = 2.0D0 * S15ABF( DBLE(SIG), ISTAT) - 1.0D0
-        CALL MSG_PRNT( '*** WARNING: no PDA replacement for S15ABF' )
+        PROB = 2.0D0 * PDA_CNDFPX( DBLE(SIG), ISTAT) - 1.0D0
         CALL MATH_CHISQD( REAL(1.0D0-PROB), NDOF, DC, STATUS )
 
       ELSE

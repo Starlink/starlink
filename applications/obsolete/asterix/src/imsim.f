@@ -46,6 +46,7 @@
 *    Authors :
 *
 *     David J. Allan (BHVAD::DJA)
+*     Richard Beard (Birmingham)
 *
 *    History :
 *
@@ -70,6 +71,8 @@
 *        Full ADI port
 *     15 May 1996 V2.0-1 (DJA):
 *        Fixed convolution option
+*     23 Jun 1997 V2.1-0 (RB):
+*        Replace NAG with ASTPDA
 *
 *    Type definitions :
 *
@@ -185,7 +188,6 @@
 
 *    Version
       CALL MSG_PRNT( VERSION )
-      CALL NAG_MISSING ( 'G05ECF, G05EYF, C05ADF', STATUS )
 
 *    Initialise Asterix
       CALL AST_INIT()
@@ -988,8 +990,8 @@
 *    Functions :
 *
       DOUBLE PRECISION  IMSIM_RNS
-c     DOUBLE PRECISION  G05CAF
-c     INTEGER           G05EYF
+      REAL		PDA_RAND
+      INTEGER           PDA_RNPOI
 *
 *    Local variables :
 *
@@ -999,12 +1001,13 @@ c     INTEGER           G05EYF
       DOUBLE PRECISION  SSMAX                   !
 
       INTEGER           I        		! Loop over sources
-      INTEGER           IFAIL        		! NAG status code
-      INTEGER           NERRE                   !
+      INTEGER           IFAIL        		! PDA status code
+      INTEGER		SEED, TICKS, STATUS
 *
 *    External references :
 *
       EXTERNAL          IMSIM_FUNRNS
+      EXTERNAL		PDA_RNPOI
 *-
 
 *    Check status
@@ -1021,21 +1024,22 @@ c     INTEGER           G05EYF
       LNS_RK = 1.0
       LNS_RK = DBLE(NSNORM)/IMSIM_RNS(DBLE(SNORM))
       RNMEAN = (IMSIM_RNS(SMIN)-IMSIM_RNS(SMAX))*AREA
-c     CALL G05CCF
+      STATUS = 0
+      CALL PSX_TIME( TICKS, STATUS )
+      SEED = ( TICKS / 4 ) * 4 + 1
+      CALL PDA_RNSED( SEED )
+
       IFAIL = 0
-      NERRE = 20+20*INT(SQRT(RNMEAN))
-c     CALL G05ECF( RNMEAN, ERRE, NERRE, IFAIL )
-      NSRC = 0
-c     NSRC = G05EYF( ERRE, NERRE )
+      NSRC = PDA_RNPOI( RNMEAN )
 
 *    Get a flux for each source
       DO I = 1, NSRC
-c      	LNS_F = G05CAF( XX )
+	LNS_F = DBLE( PDA_RAND( 0.0 ) )
 	SSMAX = SMAX
 	SSMIN = SMIN
 	IFAIL = 0
-c      	CALL C05ADF( SSMIN, SSMAX, 1.0D-6, 1.0D-6,
-c    :                   IMSIM_FUNRNS, SS, IFAIL )
+	CALL PDA_FUNC0( SSMIN, SSMAX, 1.0D-6, 1.0D-6,
+     :                   IMSIM_FUNRNS, SS, IFAIL )
 	FLUX(I) = NINT(SS)
       END DO
 

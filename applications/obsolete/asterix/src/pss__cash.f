@@ -11,10 +11,12 @@
 *    Authors :
 *
 *     David J. Allan (BHVAD::DJA)
+*     Richard Beard (Birmingham)
 *
 *    History :
 *
 *     12 Nov 90 : Original (DJA)
+*     23 Jun 97 : Replace NAG with ASTPDA (RB)
 *
 *    Type definitions :
 *
@@ -102,7 +104,7 @@
 *
 *    Function definitions :
 *
-c     DOUBLE PRECISION         G01ECF, G01FAF
+      DOUBLE PRECISION         PDA_CHISQD, PDA_NORDEV
       LOGICAL                  PSS_CONVERGED
 *
 *    Local constants :
@@ -120,7 +122,7 @@ c     DOUBLE PRECISION         G01ECF, G01FAF
       REAL                     SIG                     ! Working significance
       REAL                     CON                     ! Constant in iteration
 
-      INTEGER                  IFAIL                   ! NAG status
+      INTEGER                  IFAIL                   ! PDA status
       INTEGER                  ITER                    ! Iteration counter
 *-
 
@@ -128,15 +130,13 @@ c     DOUBLE PRECISION         G01ECF, G01FAF
       IF ( DELCHI .LT. 0.0 ) THEN
         SIG = 0.0
 
-*    Ok to use NAG routine
+*    Ok to use PDA routine
       ELSE IF ( DELCHI .LT. 100.0 ) THEN
         IFAIL = 0
         PROB = 0.0D0
         SIG = 0.0
-c       PROB = G01ECF('Upper-tail',DBLE(DELCHI),1.0D0,IFAIL)
-c       SIG = -REAL(G01FAF('Lower-tail',PROB/2.0D0,IFAIL))
-        CALL MSG_PRNT( '*** WARNING: no PDA replacements ' //
-     :                 'for G01ECF or G01FAF' )
+        PROB = PDA_CHISQD('U',DBLE(DELCHI),1.0D0,IFAIL)
+        SIG = -REAL(PDA_NORDEV('L',PROB/2.0D0,IFAIL))
 
 *    Use iteration scheme
       ELSE

@@ -202,7 +202,7 @@
 *
 *    Functions :
 *
-c     DOUBLE PRECISION           S15ABF
+      DOUBLE PRECISION           PDA_CNDFPX
       LOGICAL                    STR_ABBREV
 *
 *    Local constants :
@@ -287,10 +287,8 @@ c     DOUBLE PRECISION           S15ABF
             CALL CHR_FIWE( TEXT, I, ISTAT )
             IF ( STR_ABBREV( TEXT(BEG:I), 'SIGMAS')  ) THEN
               ACTLEV = ACTLEV + 1
-              LEVS(ACTLEV) = 0.0D0
-c             LEVS(ACTLEV) = 100.0D0*(2.0D0*S15ABF(VAL,ISTAT) - 1.0D0)
-              CALL MSG_PRNT( '*** WARNING: ' //
-     :                       'no PDA replacement for S15ABF' )
+              LEVS(ACTLEV) = 100.0D0*
+     :                       (2.0D0*PDA_CNDFPX(VAL,ISTAT) - 1.0D0)
             ELSE
               CALL MSG_PRNT( '! Error reading confidence levels' )
               GOTO 10

@@ -1758,6 +1758,7 @@
 *    History :
 *
 *     22 Jul 93 : Original (BHVAD::DJA)
+*     23 Jun 87 : Replace NAG with ASTPDA (RB:Birmingham)
 *
 *    Type definitions :
 *
@@ -1790,7 +1791,7 @@
       REAL                     DSUM                    ! Sum of good data points
 
       INTEGER                  CP                      ! Loop over data cache
-      INTEGER                  IFAIL                   ! NAG status
+      INTEGER                  IFAIL                   ! PDA status
 *-
 
 *    Accumulate sum of oberved counts and background
@@ -1820,9 +1821,7 @@
 
 *      Get the various probabilities
         IFAIL = 0
-        PLEK = 0.0D0
-c       CALL G01BKF( DBLE(BSUM), NINT(DSUM), PLEK, PGTK, PEQK, IFAIL )
-        CALL MSG_PRNT( '*** WARNING: no PDA replacement for G01BKF' )
+        CALL PDA_POIPRB( DBLE(BSUM), NINT(DSUM), PLEK, PGTK, PEQK, IFAIL )
 
 *      We want upper tail AND the probability of observed counts
         PPROB = PGTK + PEQK
