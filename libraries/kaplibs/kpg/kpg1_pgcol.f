@@ -99,9 +99,9 @@
          GOTO 999
       END IF
 
-*  Remove blanks and convert to uppercase.
+*  Remove leading blanks and convert to uppercase.
       COLOUR = COL
-      CALL CHR_RMBLK( COLOUR )
+      CALL CHR_LDBLK( COLOUR )
       CALL CHR_UCASE( COLOUR )
 
 *  Test for the various options.

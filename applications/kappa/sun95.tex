@@ -3786,24 +3786,40 @@ supplied, ending up with blue contours.
 
 \subsubsection{Colour Attributes}
 The {\tt Colour} attribute can be used to specify the colours of various
-components of a plot. The value assigned to the attribute can either 
-be an integer colour index, or a colour name. 
+components of a plot. The value assigned to the attribute can be:
+\begin{itemize}
 
-Colour indices can be thought of as ``pen numbers''. For instance, the
-string {\tt Colour(border)=3} says ``Draw the border using pen number 3''.
-The resulting colour depends on the colour of pen 3, which can be set using
-\htmlref{PALENTRY}{PALENTRY}. 
+\item An integer colour index. Colour indices can be thought of as ``pen 
+numbers''. For instance, the string {\tt Colour(border)=3} says ``Draw the 
+border using pen number 3''. The resulting colour depends on the colour of 
+pen 3, which can be set using \htmlref{PALENTRY}{PALENTRY}. 
 
-Colours specified by name are first translated into the corresponding
-colour index. If no pen is currently available with the requested colour,
-then the ``nearest'' colour will be used instead --- sometimes this may
-not be very near at all! If you specifically want the requested colour,
-then you should use PALENTRY first to set one of the available pens to the 
-required colour.
+\item A standard X colour name, \emph{e.g.} {\tt Colour(border)=red}.
+
+\item A triple of floating point red, green and blue intensity values in
+the range zero to one, separated by spaces, \emph{e.g.} 
+{tt Colour(border)=1.0 0.0 0.0}.
+
+\item An HTML colour code. This is a hash followed by 3 pairs of hexadecimal 
+digits giving red, green and blue intensity in the range 0 to 255,
+\emph{e.g.} {tt Colour(border)=#ffa700}. Within style files, the ``#''
+character is used to introduce a comment, and so the colour code would be
+ignored. To avoid this, the ``@'' character can be used in place of ``#''.
+
+\end{itemize}
+
+If no pen is currently available in the pallette with the requested
+colour, then the ``nearest'' colour will be used instead --- sometimes
+this may not be very near at all! If you specifically want the requested
+colour, then you should use PALENTRY first to set one of the available
+pens to the required colour.
 
 Note, if you produce a plot on an X-window and then change the representation 
 of pens using PALENTRY, then any components of the existing plot which were
-drawn with the modified pens will change colour immediately.
+drawn with the modified pens will change colour immediately \emph{if an
+only if} your X window is set to 256 colours (i.e. if you have an 8 bit
+pseudo-colour visual). If you have a 16 or 24 bit display, then changes
+to pen colours will only affect subsequently drawn graphics.
 
 \subsection{Establishing Defaults for Plotting Attributes}
 
@@ -3925,10 +3941,12 @@ additional attributes are described \hyperref{here}{in section }{}{se:frmatt}.
       This attribute determines the colour index used when drawing each
       element of of a plot. It takes a separate value for each graphical
       element so that, for instance, the setting ``{\tt Colour(title)=2}''
-      causes the title to be drawn using
-      colour index 2. Standard X colour names can also be specified, and
-      the nearest colour will be used if the requested colour is not currently
-      in the palette.
+      causes the title to be drawn using colour index 2. Standard X colour 
+      names, space separated floating point RGB triples, or HTML colour codes 
+      (optionally using a ``@'' inplace of a ``#'' to avoid the code
+      being interpreted as a comment within a style file) can also be 
+      specified, and the nearest available colour will be used if 
+      the requested colour is not currently in the palette. 
 
       The default behaviour is for all graphical elements to be drawn
       using pen 1.
@@ -31961,6 +31979,10 @@ plot (9k).
            o  Normalised red, green, and blue intensities separated by
            commas or spaces.  Each value must lie in the range 0.0--1.0.
            For example, {\tt "1.0,1.0,0.5"} would give a pale yellow.
+
+           o  An HTML colour code such as #ff002d. The leading #
+           character can be replaced if required by a ``@'' character.
+
       }
       \sstsubsection{
          DEVICE = DEVICE (Read)

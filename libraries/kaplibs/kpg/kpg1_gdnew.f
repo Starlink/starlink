@@ -419,6 +419,13 @@
 *  Save the viewport as a new picture.
          CALL AGP_SVIEW( 'FRAME', COMMNT, IPICF, STATUS )
 
+*  This is now the current picture. Update the bounds of the current
+*  picture.
+         CXL = FXL
+         CXR = FXR
+         CYT = FYT
+         CYB = FYB
+
 *  If the FRAME and DATA pictures would be equivalent, use the current
 *  picture as the "FRAME" picture.
       ELSE
@@ -463,6 +470,12 @@
 
          END IF
 
+*  Ensure the picture does not extend beyond the current picture.
+         PXL = MAX( CXL + 0.001, PXL )
+         PXR = MIN( CXR - 0.001, PXR )
+         PYB = MAX( CYB + 0.001, PYB )
+         PYT = MIN( CYT - 0.001, PYT )
+
 *  Create a PGPLOT viewport for this picture and save it as a picture 
 *  within the FRAME picture (but only if it has non-zero size). The world
 *  coordinate system is inherited from the FRAME picture.
@@ -484,6 +497,12 @@
          END IF
 
       END DO
+
+*  Ensure the DATA picture does not extend beyond the current picture.
+      DXL = MAX( CXL + 0.001, DXL )
+      DXR = MIN( CXR - 0.001, DXR )
+      DYB = MAX( CYB + 0.001, DYB )
+      DYT = MIN( CYT - 0.001, DYT )
 
 *  Create a PGPLOT viewport for the DATA picture, and set its world 
 *  coordinate bounds to the supplied values. If the box defined by
