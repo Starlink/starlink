@@ -24,6 +24,8 @@
 %        Modify for release 1.3 of SURF
 %     1998 December 7th (TIMJ)
 %        Add GUARD parameter to REBIN derivatives 
+%     1999 November (TIMJ)
+%        Add SCUBA2MEM. Update for V1.5
 %     {Add further history here}
 %
 % -
@@ -40,10 +42,10 @@
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
 \newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardocnumber}    {216.5}
+\newcommand{\stardocnumber}    {216.6}
 \newcommand{\stardocauthors}   {T. Jenness, J.~F. Lightfoot\\
                                 Joint Astronomy Centre, Hilo, Hawaii}
-\newcommand{\stardocdate}      {16 June 1999}
+\newcommand{\stardocdate}      {4 November 1999}
 \newcommand{\stardoctitle}     {SURF -- SCUBA User Reduction Facility}
 \newcommand{\stardocversion}   {1.4}
 \newcommand{\stardocmanual}    {User's manual}
@@ -130,6 +132,7 @@ descriptions of each task.
 \newcommand{\adddbm}{\htmlref{\task{add\_dbm}}{ADD_DBM}}
 \newcommand{\remip}{\htmlref{\task{remip}}{REMIP}}
 \newcommand{\scusetenv}{\htmlref{\task{scusetenv}}{SCUSETENV}}
+\newcommand{\scubamem}{\htmlref{\task{scuba2mem}}{SCUBA2MEM}}
 
 
 % Non surf tasks
@@ -2977,9 +2980,51 @@ wish-list}{http://www.jach.hawaii.edu/jcmt\_sw/bin/scuba\_wish.pl}.
 
 \section{\xlabel{relnotes}Release Notes\label{relnotes}}
 
+\subsection{Changes in Version 1.5}
+
+This is a minor update.
+
+\begin{description}
+
+\item[\textbf{New Tasks}] \mbox{}
+
+\begin{itemize}
+\item \scubamem\ officially released (previously it was available but
+not advertised). 
+
+\item The SURF programming guide (\xref{SSN/72}{ssn72}{}) now available.
+\end{itemize}
+
+\item[\textbf{Changes to existing tasks}] \mbox{}
+
+\begin{itemize}
+\item \sculog\ and related tools rewritten to handle data from
+multiple UT dates in a single directory. Extended support for POLMAP
+and POLPHOT observing modes.
+
+\item Improve support of external data model in \calcsky. Can now
+import image of arbritrary coordinates and automatically add chop functions.
+
+\item \adddbm\ can now be used to add a triple beam.
+
+\item Scripts are now compatible with \Kappa\ version 0.14.
+
+\item 
+
+\end{itemize}
+
+\item[\textbf{Bug fixes}] \mbox{}
+
+\begin{itemize}
+\item Fix bug in \remdbm\ when using filtering when data have a pixel
+origin that is not in the middle of the array.
+\end{itemize}
+
+\end{description}
+
 \subsection{Changes in Version 1.4}
 
-The main purpose of this upgrade is to add polarimetry support to 
+The main purpose of this upgrade is to add polarimetry support to
 SURF.
 
 \begin{description}
@@ -3001,7 +3046,7 @@ SURF.
 
 \item \scusoft\ version number is now written to history information
 
-\item \scanrlb : The \texttt{-filter} option will filter out high frequencies
+\item \remdbm\ : The \texttt{-filter} option will filter out high frequencies
            before inverting the Fourier transform.
 
 \item \rebin :
@@ -3537,6 +3582,7 @@ process individual switches.}{surf:resw}
 \quickdes{RESTORE}{Remove dual-beam response from SCAN/MAP data.}{surf:restore}
 \quickdes{RLINPLOT}{Interactive data inspection via \mlinplot\ (Requires \Kappa)}{surf:rlinplot}
 \quickdes{SCAN\_RLB}{Remove linear baselines from SCAN/MAP data}{surf:scanrlb}
+\quickdes{SCUBA2MEM}{Calculates bolometer positions with chops}{surf:scuba2mem}
 \quickdes{SCUCAT}{Concatenates photometry results into a single NDF.}{surf:scucat}
 \quickdes{SCUCLIP}{Perform sigma clipping of each bolometer}{surf:scuclip}
 \quickdes{SCUHELP}{Interactive help system}{surf:scuhelp}
@@ -3593,6 +3639,8 @@ observation  data.
 to a text file.
 
 \item[\htmlref{REDUCE\_NOISE}{REDUCE_NOISE}:] Process demodulated noise data.
+
+\item[\htmlref{SCUBA2MEM}{SCUBA2MEM}:] Calculate bolometer positions
 
 \item[\htmlref{SCUHELP}{SCUHELP}:] Interactive help system.
 
@@ -3746,15 +3794,25 @@ The \scusoft\ routines are described in the following pages:
 \sstroutine{
    ADD\_DBM
 }{
-   Generate a dual beam map from a single beam map
+   Generate a chopped image from a single beam map
 }{
    \sstdescription{
-      Create a dual beam map from a single beam input map.
-      Simply finds the signal detected at each pixel by looking
+      Create a chopped image from a single beam input map.
+      Can be used to create a dual-beam (e.g.\ a simlated
+      scan map image) or a triple-beam map (e.g.\ a simulated
+      jiggle map image).
+
+      For dual-beam it
+      simply finds the signal detected at each pixel by looking
       at the difference between the pixels nearest to each chop
       beam. This calculates a middle beam response. (ie the response
       at each pixel is the difference between the L and the R
       beams).
+
+     For the triple-beam response the signal is the difference
+     between the middle pixel and half the values measured
+     in the negative beams. Set NBEAMS to 3 to use triple-beam
+     response.
 
       This task can be used to generate test data for \remdbm.
    }
@@ -3779,6 +3837,12 @@ The \scusoft\ routines are described in the following pages:
       }{
          Message filter level. Options are QUIET, NORMAL and
          VERBOSE. Default is NORM.
+      \sstsubsection{
+         NBEAMS = INTEGER (Read)
+      }{
+   *        When NBEAMS=2 a dual-beam response is calculated. When
+        NBEAMS=3 a triple-beam response is calculated. Default 
+        is 3.      
       }
       \sstsubsection{
          OUT = NDF (Write)
@@ -3811,6 +3875,13 @@ The \scusoft\ routines are described in the following pages:
          input NDF using a 30 pixel chop at 0 degrees. Write the
          resulting image to dbm\_out.sdf.
       }
+      \sstexamplesubsection{
+         add\_dbm image 90 45 3bm_out nbeams=3
+      }{
+       Generate a triple-beam image with throw 45 and position angle
+       90 degrees.
+      }
+
    }
    \sstnotes{
       \sstitemlist{
@@ -4266,11 +4337,9 @@ Astrometry information is stored in the WCS component and not
       \sstsubsection{
          MODEL = NDF (Read)
       }{
-         NDF containing the model of the source. The size of the
-         input image must (currently) match the default size of the
-         image that would be generated by \rebin\ with the current input
-         files. The coordinate frame of this image must match that
-         specified in OUT\_COORDS.
+         NDF containing the model of the source. The astrometry
+       is read from this file. The model must have been generated
+       by SURF since it relies on the presence of certain FITS keywords.
       }
       \sstsubsection{
          MSG\_FILTER = CHAR (Read)
