@@ -182,8 +182,13 @@ void compareBitmaps(Bitmap *testB, const char **picture,
 int main (int argc, char** argv)
 {
     try {
-	
-	DviFile *dvif = new DviFile(argc > 1 ? argv[1] : "t5.dvi",
+	string arg;
+	if (argc > 1)
+	    arg = argv[1];
+	else
+	    arg = "t5.dvi";
+	//DviFile *dvif = new DviFile(argc > 1 ? argv[1] : "t5.dvi",
+	DviFile *dvif = new DviFile(arg,
 				    PkFont::dpiBase(), // resolution
 				    1.0, // overall magnification
 				    true); // read postamble
