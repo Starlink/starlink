@@ -163,6 +163,7 @@ static void ClearReport( AstMapping * );
 static void Copy( const AstObject *, AstObject * );
 static void Delete( AstObject * );
 static void Dump( AstObject *, AstChannel * );
+static void GlobalBounds( MapData *, double *, double *, double [], double [] );
 static void InitVtab( AstMappingVtab * );
 static void Invert( AstMapping * );
 static void MapList( AstMapping *, int, int, int *, AstMapping ***, int ** );
@@ -179,435 +180,11 @@ static void ValidateMapping( AstMapping *, int, int, int, int, const char *);
 
 /* Member functions. */
 /* ================= */
-static void GlobalBounds( MapData *mapdata, double *lbnd, double *ubnd,
-                          double *xl, double *xu ) {
 
-/* Local Constants: */
-   const int maxiter = 200000;   /* Maximum number of iterations */
-   const int minsame = 5;        /* Minimum no. consistent extrema required */
-   const int nbatch = 64;        /* No. function samples obtained at once */
-
-/* Local Variables: */
-   AstPointSet *pset_in;         /* Input PointSet for batch transformation */
-   AstPointSet *pset_out;        /* Output PointSet for batch transformation */
-   double **ptr_in;              /* Pointer to batch input coordinates */
-   double **ptr_out;             /* Pointer to batch output coordinates */
-   double *x;                    /* Pointer to array of coordinates */
-   double acc;                   /* Convergence accuracy for finding maximum */
-   double new_max;               /* Value of new local maximum */
-   double new_min;               /* Value of new local minimum */
-   double random;                /* Pseudo-random number */
-   int bad;                      /* Transformed position is bad? */
-   int batch;                    /* Next element to use in position batch */
-   int coord;                    /* Loop counter for coordinates */
-   int done_max;                 /* Satisfactory global maximum found? */
-   int done_min;                 /* Satisfactory global minimum found? */
-   int iter;                     /* Loop counter for iterations */
-   int ncall;                    /* Number of Mapping function calls (junk) */
-   int ncoord;                   /* Number of coordinates in search space */
-   int nmax;                     /* Number of local maxima found */
-   int nmin;                     /* Number of local minima found */
-   int nsame_max;                /* Number of equivalent local maxima found */
-   int nsame_min;                /* Number of equivalent local minima found */
-   long int seed = 1776655449;   /* Arbitrary pseudo-random number seed */
-   double *lo;
-   double *hi;
-
-   double w[10];
-   double bot[10];
-   double top[10];
-   double factor;
-
-/* Check the global error status */
-   if ( !astOK ) return;
-
-/* Initialise. */
-   done_max = 0;
-   done_min = 0;
-   ncall = 0;
-   nmax = 0;
-   nmin = 0;
-   nsame_max = 0;
-   nsame_min = 0;
-
-/* Extract the number of input coordinates for the Mapping function
-   and allocate workspace to hold coordinates. */
-   ncoord = mapdata->nin;
-   x = astMalloc( sizeof( double ) * (size_t) ncoord );
-
-   lo = astMalloc( sizeof( double ) * (size_t) ncoord );
-   hi = astMalloc( sizeof( double ) * (size_t) ncoord );
-   factor = pow( 2.0, 1.0 / ( (double) ncoord ) );
-   for ( coord = 0; coord < ncoord; coord++ ) {
-      lo[ coord ] = DBL_MAX;;
-      hi[ coord ] = -DBL_MAX;
-
-      w[ coord ] = factor * ( mapdata->ubnd[ coord ] - mapdata->lbnd[ coord ] );
-      bot[ coord ] = mapdata->lbnd[ coord ];
-      top[ coord ] = mapdata->ubnd[ coord ];
-   }
-
-/* Create two PointSets to act as buffers to hold a complete batch of
-   input and output coordinates. Obtain pointers to their coordinate
-   arrays. */
-   pset_in = astPointSet( nbatch, ncoord, "" );
-   pset_out = astPointSet( nbatch, mapdata->nout, "" );
-   ptr_in = astGetPoints( pset_in );
-   ptr_out = astGetPoints( pset_out );
-
-/* Initialise the next element to be used in the position buffer to
-   indicate that the buffer is currently empty. */
-   batch = nbatch;
-
-/* Loop to perform up to "maxiter" iterations to estimate the global
-   minimum and maximum. */
-   for ( iter = 0; astOK && ( iter < maxiter ); iter++ ) {
-
-/* Determine the search accuracy. */
-/* ============================== */
-/* Decide the accuracy to which local extrema should be found. The
-   intention here is to optimise performance, especially where one
-   extremum lies near zero and so could potentially be found to
-   unnecessarily high precision. If we make a mis-assumption (the code
-   below is not fool-proof), we will slow things down for this
-   iteration, but the error will be corrected in future iterations
-   once better estimates are available. */
-
-/* If we have no current estimate of either global extremum, we assume
-   the values we eventually obtain will be of order unity and required
-   to machine precision. */
-      acc = DBL_EPSILON;
-
-/* If we already have an estimate of both global extrema, we set the
-   accuracy so that the difference between them will be known to
-   machine precision. */
-      if ( ( *lbnd != AST__BAD ) && ( *ubnd != AST__BAD ) ) {
-         acc = fabs( *ubnd - *lbnd ) * DBL_EPSILON;
-
-/* If we have an estimate of only one global extremum, we assume that
-   the difference between the two global extrema will eventually be of
-   the same order as the estimate we currently have, so long as this
-   is not less than unity. */
-      } else if ( *lbnd != AST__BAD ) {
-         if ( fabs( *lbnd ) > 1.0 ) acc = fabs( *lbnd) * DBL_EPSILON;
-      } else if ( *ubnd != AST__BAD ) {
-         if ( fabs( *ubnd ) > 1.0 ) acc = fabs( *ubnd) * DBL_EPSILON;
-      }
-
-      for ( coord = 0; coord < ncoord; coord++ ) {
-         if ( hi[ coord ] >= lo[ coord ] ) {
-            double r = pow( 2.0, 1.0 / ncoord );
-            double ww = hi[ coord ] - lo[ coord ];
-            if ( ww < r * w[ coord ] ) {
-               w[ coord ] *= 0.9;
-            } else if ( ww > r * w[ coord ] ) {
-               w[ coord ] *= 2.0;
-            }
-            top[ coord ] = 0.5 * ( lo[ coord ] + hi[ coord ] ) +
-                           0.5 * w[ coord ];
-            if ( top[ coord ] > mapdata->ubnd[ coord ] ) {
-               top[ coord ] = mapdata->ubnd[ coord ];
-            }
-            bot[ coord ] = 0.5 * ( lo[ coord ] + hi[ coord ] ) -
-                           0.5 * w[ coord ];
-            if ( bot[ coord ] < mapdata->lbnd[ coord ] ) {
-               bot[ coord ] = mapdata->lbnd[ coord ];
-            }
-         }
-      }
-      
-/* Search for a new local minimum. */
-/* =============================== */
-/* If we are still searching for the global minimum, then obtain a set
-   of starting coordinates from which to find a new local minimum. */
-      if ( !done_min ) {
-
-/* On the first iteration, start searching at the position where the
-   best estimate of the global minimum (if any) has previously been
-   found. We know that this produces non-bad transformed
-   coordinates. */
-         bad = 0;
-         if ( !iter && ( *lbnd != AST__BAD ) ) {
-            for ( coord = 0; coord < ncoord; coord++ ) {
-               x[ coord ] = xl[ coord ];
-            }
-
-/* Otherwise, if no estimate of the global minimum is available, then
-   start searching at the position where the best estimate of the
-   global maximum (if any) has been found. This may be a long way from
-   a local minimum, but at least it will yield a non-bad value for the
-   Mapping function, so some sort of estimate of the global minimum
-   will be obtained. This is important in cases where finding the
-   "active" (i.e. non-bad) region of the function is the main
-   problem. Note that this condition can only occur once, since the
-   global minimum will have an estimate on the next iteration. */
-         } else if ( ( *lbnd == AST__BAD ) && ( *ubnd != AST__BAD ) ) {
-            for ( coord = 0; coord < ncoord; coord++ ) {
-               x[ coord ] = xu[ coord ];
-            }
-
-/* Having exhausted the above possibilities, we use pseudo-random
-   starting positions which are uniformly distributed throughout the
-   search volume. First check to see if the buffer containing such
-   positions is empty. */
-         } else {
-            if ( batch >= nbatch ) {
-
-/* If it is, then generate a new batch of pseudo-random starting
-   positions and transform them. Transforming them all at once in this
-   way saves considerable time if we need to test many points to
-   locate the active (i.e. non-bad) regions of the Mapping
-   function. In simpler cases, however, a few positions may be
-   transformed unnecessarily. */
-               for ( batch = 0; batch < nbatch; batch++ ) {
-                  for ( coord = 0; coord < ncoord; coord++ ) {
-                     random = Random( &seed );
-                     ptr_in[ coord ][ batch ] =
-                        bot[ coord ] * random +
-                        top[ coord ] * ( 1.0 - random );
-                  }
-               }
-               (void) astTransform( mapdata->mapping, pset_in,
-                                    mapdata->forward, pset_out );
-
-/* Note the position buffer is now full. */
-               batch = 0;
-            }
-
-/* Test the next available set of output (transformed) coordinates in
-   the position buffer to see if they are bad. */
-            if ( astOK ) {
-               for ( coord = 0; coord < mapdata->nout; coord++ ) {
-                  bad = ( ptr_out[ coord ][ batch ] == AST__BAD );
-                  if ( bad ) break;
-               }
-
-/* If not, we have a good starting position for finding a local
-   minimum, so extract the corresponding input coordinates. */
-               if ( !bad ) {
-                  for ( coord = 0; coord < ncoord; coord++ ) {
-                     x[ coord ] = ptr_in[ coord ][ batch ];
-                  }
-               }
-
-/* Increment the position buffer location. */
-               batch++;
-            }
-         }
-
-/* If we do not have a good starting position, then don't do anything
-   more on this iteration. A new position will be obtained and tested
-   on the next iteration and this (we hope) will eventually identify a
-   suitable starting point. */
-         if ( astOK && !bad ) {
-            for ( coord = 0; coord < ncoord; coord++ ) {
-               if ( x[ coord ] < lo[ coord ] ) lo[ coord ] = x[ coord ];
-               if ( x[ coord ] > hi[ coord ] ) hi[ coord ] = x[ coord ];
-            }
-            printf( "%d minimising at: ", iter );
-            for ( coord = 0; coord < ncoord; coord ++ ) {
-               printf( "%g ", x[ coord ] );
-            }
-            printf( "\n" );
-
-/* Indicate that the Mapping function should be negated (because we
-   want a local minimum) and then search for a local maximum in this
-   negated function. If the result is non-bad (as it should always be,
-   barring an error), then negate it to obtain the value of the local
-   minimum found. */
-            mapdata->negate = 1;
-            new_min = LocalMaximum( mapdata, acc, 0.01, x );
-            if ( new_min != AST__BAD ) {
-               new_min = -new_min;
-               for ( coord = 0; coord < ncoord; coord++ ) {
-                  if ( x[ coord ] < lo[ coord ] ) lo[ coord ] = x[ coord ];
-                  if ( x[ coord ] > hi[ coord ] ) hi[ coord ] = x[ coord ];
-               }
-               printf( "minimum %g at ", new_min );
-               for ( coord = 0; coord < ncoord; coord++ ) {
-                  printf( "%g ", x[ coord ] );
-               }
-               printf( "\n" );
-
-/* Count the number of times we successfully locate a local minimum
-   (ignoring the fact they might all be the same one). */
-               nmin++;
-
-/* Update the global minimum. */
-/* ========================== */
-/* If this is the first estimate of the global minimum, then set to
-   one the count of the number of consecutive iterations where this
-   estimate remains unchanged. Store the minimum value and its
-   position. */
-               if ( *lbnd == AST__BAD ) {
-                  nsame_min = 1;
-                  *lbnd = new_min;
-                  for ( coord = 0; coord < ncoord; coord++ ) {
-                     xl[ coord ] = x[ coord ];
-                  }
-
-/* Otherwise, test if this local minimum is lower than the previous
-   estimate of the global minimum. If so, then reset the count of
-   unchanged estimates of the global mimimum to one if the difference
-   exceeds the accuracy with which the minimum was found (i.e. if we
-   have found a significantly different minimum). Otherwise, just
-   increment this count (because we have found the same minimum but by
-   chance with slightly improved accuracy). Store the new minimum and
-   its position. */
-               } else if ( new_min < *lbnd ) {
-                  nsame_min = ( ( *lbnd - new_min ) > acc ) ? 1 :
-                  nsame_min + 1;
-                  *lbnd = new_min;
-                  for ( coord = 0; coord < ncoord; coord++ ) {
-                     xl[ coord ] = x[ coord ];
-                  }
-
-/* If the latest local minimum is no improvement on previous estimates
-   of the global minimum, then increment the count of unchanged
-   estimates of the global mimimum, but do not save the new one. */
-               } else {
-                  nsame_min++;
-               }
-               printf( "nmin, nsame_min = %d %d\n\n", nmin, nsame_min );
-
-/* Determine if a satisfactory estimate of the global minimum has been
-   obtained.  It has if the number of consecutive local minima which
-   have not significantly improved the estimate is at least equal to
-   "minsame", and at least 30% of the total number of local minima
-   found. */
-               if ( ( nsame_min >= minsame ) &&
-                   ( nsame_min >= (int) ( 0.3f * (float) nmin + 0.5f ) ) ) {
-                  done_min = 1;
-               }
-            }
-         }
-      }
-
-/* Search for a new local maximum. */
-/* =============================== */
-/* Now repeat all of the above to find a new local maximum which estimates
-   the upper bound. */
-      if ( !done_max ) {
-         if ( !iter && ( *ubnd != AST__BAD ) ) {
-            for ( coord = 0; coord < ncoord; coord++ ) {
-               x[ coord ] = xu[ coord ];
-            }
-         } else if ( ( *ubnd == AST__BAD ) && ( *lbnd != AST__BAD ) ) {
-            for ( coord = 0; coord < ncoord; coord++ ) {
-               x[ coord ] = xl[ coord ];
-            }
-         } else {
-            if ( batch >= nbatch ) {
-               for ( batch = 0; batch < nbatch; batch++ ) {
-                  for ( coord = 0; coord < ncoord; coord++ ) {
-                     random = Random( &seed );
-                     ptr_in[ coord ][ batch ] =
-                        bot[ coord ] * random +
-                        top[ coord ] * ( 1.0 - random );
-                  }
-               }
-               (void) astTransform( mapdata->mapping, pset_in,
-                                    mapdata->forward, pset_out );
-               batch = 0;
-            }
-            for ( coord = 0; coord < mapdata->nout; coord++ ) {
-                bad = ( ptr_out[ coord ][ batch ] == AST__BAD );
-                if ( bad ) break;
-            }
-            if ( !bad ) {
-               for ( coord = 0; coord < ncoord; coord++ ) {
-                  x[ coord ] = ptr_in[ coord ][ batch ];
-               }
-            }
-            batch++;
-         }
-         if ( !bad ) {
-            for ( coord = 0; coord < ncoord; coord++ ) {
-               if ( x[ coord ] < lo[ coord ] ) lo[ coord ] = x[ coord ];
-               if ( x[ coord ] > hi[ coord ] ) hi[ coord ] = x[ coord ];
-            }
-            printf( "%d maximising at: ", iter );
-            for ( coord = 0; coord < ncoord; coord ++ ) {
-               printf( "%g ", x[ coord ] );
-            }
-            printf( "\n" );
-            mapdata->negate = 0;
-            new_max = LocalMaximum( mapdata, acc, 0.01, x );
-            if ( new_max != AST__BAD ) {
-               for ( coord = 0; coord < ncoord; coord++ ) {
-                  if ( x[ coord ] < lo[ coord ] ) lo[ coord ] = x[ coord ];
-                  if ( x[ coord ] > hi[ coord ] ) hi[ coord ] = x[ coord ];
-               }
-               printf( "maximum %g at ", new_max );
-               for ( coord = 0; coord < ncoord; coord++ ) {
-                  printf( "%g ", x[ coord ] );
-               }
-               printf( "\n" );
-               nmax++;
-               if ( *ubnd == AST__BAD ) {
-                  nsame_max = 1;
-                  *ubnd = new_max;
-                  for ( coord = 0; coord < ncoord; coord++ ) {
-                     xu[ coord ] = x[ coord ];
-                  }
-               } else if ( new_max > *ubnd ) {
-                  nsame_max = ( ( new_max - *ubnd ) > acc ) ? 1 :
-                  nsame_max + 1;
-                  *ubnd = new_max;
-                  for ( coord = 0; coord < ncoord; coord++ ) {
-                     xu[ coord ] = x[ coord ];
-                  }
-               } else {
-                  nsame_max++;
-               }
-               printf( "nmax, nsame_max = %d %d\n\n", nmax, nsame_max );
-               if ( ( nsame_max >= minsame ) &&
-                    ( nsame_max >= ( 0.3 * nmax + 0.5 ) ) ) done_max = 1;
-            }
-         }
-      }
-      if ( done_min && done_max ) break;
-if( 0 && lo[0] <= hi[0] ) {
-printf("lo = %g %g\n", lo[0], lo[1] );
-printf("hi = %g %g\n", hi[0], hi[1] );
-printf("bot = %g %g\n", bot[0], bot[1] );
-printf("top = %g %g\n\n", top[0], top[1] );
-}
-   }
-   x = astFree( x );
-   lo = astFree( lo );
-   hi = astFree( hi );
-   pset_in = astAnnul( pset_in );
-   pset_out = astAnnul( pset_out );
-
-#if 1
-   if ( astOK ) {
-      if ( *lbnd != AST__BAD ) {
-         mapdata->negate = 1;
-         *lbnd = LocalMaximum( mapdata, 0.0, sqrt( DBL_EPSILON ), xl );
-         if ( *lbnd != AST__BAD ) *lbnd = - *lbnd;
-      }
-      if ( *ubnd != AST__BAD ) {
-         mapdata->negate = 0;
-         *ubnd = LocalMaximum( mapdata, 0.0, sqrt( DBL_EPSILON ), xu );
-      }
-      if ( !astOK || ( *lbnd == AST__BAD ) ) {
-         *lbnd = AST__BAD;
-         for ( coord = 0; coord < ncoord; coord++ ) xl[ coord ] = AST__BAD;
-      }
-      if ( !astOK || ( *ubnd == AST__BAD ) ) {
-         *ubnd = AST__BAD;
-         for ( coord = 0; coord < ncoord; coord++ ) xu[ coord ] = AST__BAD;
-      }
-#endif
-      printf( "best limit(l) = %g at %.20g %.20g\n", *lbnd, xl[0], xl[1] );
-      printf( "best limit(u) = %g at %.20g %.20g\n", *ubnd, xu[0], xu[1] );
-   }
-}
-void astBoxBound( AstMapping *this,
-                  const double lbnd_in[], const double ubnd_in[],
-                  int coord_out, double *lbnd_out, double *ubnd_out,
-                  double xl[], double xu[] ) {
+void astMapBox( AstMapping *this,
+                const double lbnd_in[], const double ubnd_in[],
+                int coord_out, double *lbnd_out, double *ubnd_out,
+                double xl[], double xu[] ) {
 
    MapData mapdata;
    double *x_l;
@@ -643,6 +220,10 @@ void astBoxBound( AstMapping *this,
    mapdata.pset_out = astAnnul( mapdata.pset_out );
    x_l = astFree( x_l );
    x_u = astFree( x_u );
+   if ( !astOK ) {
+      astError( astStatus, "Unable to find a bounding box for a %s.",
+                astGetClass( this ) );
+   }
 }
 
 /*************************************/
@@ -1149,6 +730,596 @@ static int GetTranInverse( AstMapping *this ) {
 
 /* Return the result. */
    return result;
+}
+
+static void GlobalBounds( MapData *mapdata, double *lbnd, double *ubnd,
+                          double xl[], double xu[] ) {
+/*
+*  Name:
+*     GlobalBounds
+
+*  Purpose:
+*     Estimate global coordinate bounds for a Mapping.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "mapping.h"
+*     void GlobalBounds( MapData *mapdata, double *lbnd, double *ubnd,
+*                        double xl[], double xu[] );
+
+*  Class Membership:
+*     Mapping member function.
+
+*  Description:
+*     This function estimates the global lower and upper bounds of a
+*     Mapping function within a constrained region of its input
+*     coordinate space. It uses a robust global optimisation algorithm
+*     based on the selection of pseudo-random starting positions,
+*     followed by the location of local minima and maxima using the
+*     downhill (or uphill) simplex method. The algorithm will cope
+*     with the case where there are several competing minima (or
+*     maxima) with nearly equal values. It attempts to locate the
+*     global bounds to full machine precision when possible.
+
+*  Parameters:
+*     mapdata
+*        Pointer to a MapData structure describing the Mapping
+*        function, its coordinate constraints, etc.
+*     lbnd
+*        Pointer to a double.  On entry, this should contain a
+*        previously-obtained upper limit on the global lower bound, or
+*        AST__BAD if no such limit is available. On exit, it will be
+*        updated with a new estimate of the global lower bound, if a
+*        better one has been found.
+*     ubnd
+*        Pointer to a double.  On entry, this should contain a
+*        previously-obtained lower limit on the global upper bound, or
+*        AST__BAD if no such limit is available. On exit, it will be
+*        updated with a new estimate of the global upper bound, if a
+*        better one has been found.
+*     xl
+*        Pointer to an array of double, with one element for each
+*        input coordinate. On entry, if *lbnd is not equal to AST__OK,
+*        this should contain the input coordinates of a point at which
+*        the Mapping function takes the value *lbnd. On exit, this
+*        function returns the position of a (not necessarily unique)
+*        input point at which the Mapping function takes the value of
+*        the new global lower bound.  This array is not altered if an
+*        improved estimate of the global lower bound cannot be found.
+*     xu
+*        Pointer to an array of double, with one element for each
+*        input coordinate. On entry, if *ubnd is not equal to AST__OK,
+*        this should contain the input coordinates of a point at which
+*        the Mapping function takes the value *ubnd. On exit, this
+*        function returns the position of a (not necessarily unique)
+*        input point at which the Mapping function takes the value of
+*        the new global upper bound.  This array is not altered if an
+*        improved estimate of the global upper bound cannot be found.
+
+*  Notes:
+*     - The efficiency of this function will usually be improved if
+*     previously-obtained estimates of the extrema and their locations
+*     are provided.
+*     - The values returned via "lbnd", "ubnd", "xl" and "xu" will be
+*     set to the value AST__BAD if this function should fail for any
+*     reason. Their initial values on entry will not be altered if the
+*     function is invoked with the global error status set.
+*/
+
+/* Local Constants: */
+   const int maxiter = 500000;   /* Maximum number of iterations */
+   const int minsame = 5;        /* Minimum no. consistent extrema required */
+   const int nbatch = 64;        /* No. function samples obtained per batch */
+
+/* Local Variables: */
+   AstPointSet *pset_in;         /* Input PointSet for batch transformation */
+   AstPointSet *pset_out;        /* Output PointSet for batch transformation */
+   double **ptr_in;              /* Pointer to batch input coordinates */
+   double **ptr_out;             /* Pointer to batch output coordinates */
+   double *active_hi;            /* Estimated upper limits of active region */
+   double *active_lo;            /* Estimated lower limits of active region */
+   double *sample_hi;            /* Upper limits of sampled region */
+   double *sample_lo;            /* Lower limits of sampled region */
+   double *sample_width;         /* Nominal widths of sampled region */
+   double *x;                    /* Pointer to array of coordinates */
+   double acc;                   /* Convergence accuracy for finding maximum */
+   double active_width;          /* Estimated width of active region */
+   double new_max;               /* Value of new local maximum */
+   double new_min;               /* Value of new local minimum */
+   double oversize;              /* Over-size factor for sampled region */
+   double random;                /* Pseudo-random number */
+   int bad;                      /* Transformed position is bad? */
+   int batch;                    /* Next element to use in position batch */
+   int coord;                    /* Loop counter for coordinates */
+   int done_max;                 /* Satisfactory global maximum found? */
+   int done_min;                 /* Satisfactory global minimum found? */
+   int iter;                     /* Loop counter for iterations */
+   int ncall;                    /* Number of Mapping function calls (junk) */
+   int ncoord;                   /* Number of coordinates in search space */
+   int nmax;                     /* Number of local maxima found */
+   int nmin;                     /* Number of local minima found */
+   int nsame_max;                /* Number of equivalent local maxima found */
+   int nsame_min;                /* Number of equivalent local minima found */
+   long int seed = 1776655449;   /* Arbitrary pseudo-random number seed */
+
+/* Check the global error status */
+   if ( !astOK ) return;
+
+/* Initialise. */
+   done_max = 0;
+   done_min = 0;
+   ncall = 0;
+   nmax = 0;
+   nmin = 0;
+   nsame_max = 0;
+   nsame_min = 0;
+
+/* Extract the number of input coordinates for the Mapping function
+   and allocate workspace. */
+   ncoord = mapdata->nin;
+   active_hi = astMalloc( sizeof( double ) * (size_t) ncoord );
+   active_lo = astMalloc( sizeof( double ) * (size_t) ncoord );
+   sample_hi = astMalloc( sizeof( double ) * (size_t) ncoord );
+   sample_lo = astMalloc( sizeof( double ) * (size_t) ncoord );
+   sample_width = astMalloc( sizeof( double ) * (size_t) ncoord );
+   x = astMalloc( sizeof( double ) * (size_t) ncoord );
+   if ( astOK ) {
+
+/* Calculate the factor by which the size of the region we sample will
+   exceed the size of the Mapping function's active region (the region
+   where the transformed coordinates are non-bad) in each
+   dimension. This is chosen so that the volume ratio will be 2. */
+      oversize = pow( 2.0, 1.0 / ( (double) ncoord ) );
+
+/* Initialise the limits iof the active region to unknown. */
+      for ( coord = 0; coord < ncoord; coord++ ) {
+         active_lo[ coord ] = DBL_MAX;;
+         active_hi[ coord ] = -DBL_MAX;
+
+/* Initialise the nominal widths of the sampled region to be twice the
+   actual widths of the search region times the over-size factor. */
+         sample_width[ coord ] = ( mapdata->ubnd[ coord ] -
+                                   mapdata->lbnd[ coord ] ) * oversize;
+
+/* Initialise the sampled region to match the search region. */
+         sample_lo[ coord ] = mapdata->lbnd[ coord ];
+         sample_hi[ coord ] = mapdata->ubnd[ coord ];
+      }
+
+/* Set up position buffer. */
+/* ======================= */
+/* Create two PointSets to act as buffers to hold a complete batch of
+   input and output coordinates. Obtain pointers to their coordinate
+   arrays. */
+      pset_in = astPointSet( nbatch, ncoord, "" );
+      pset_out = astPointSet( nbatch, mapdata->nout, "" );
+      ptr_in = astGetPoints( pset_in );
+      ptr_out = astGetPoints( pset_out );
+
+/* Initialise the next element to be used in the position buffer to
+   indicate that the buffer is initially empty. */
+      batch = nbatch;
+   }
+
+/* Define a macro to fill the position buffer with a set of
+   pseudo-random positions and to transform them. */
+#define FILL_POSITION_BUFFER {\
+\
+/* We first generate a suitable volume over which to distribute the\
+   batch of pseudo-random positions. Initially, this will be the\
+   entire search volume, but if we find that the only non-bad\
+   transformed coordinates we obtain are restricted to a small\
+   sub-region of this input volume, then we reduce the sampled volume\
+   so as to concentrate more on the active region. */\
+\
+/* Loop through each input coordinate, checking that at least one\
+   non-bad transformed point has been obtained. If not, we do not\
+   adjust the sampled volume, as we do not yet know where the active\
+   region lies. */\
+   for ( coord = 0; coord < ncoord; coord++ ) {\
+      if ( active_hi[ coord ] >= active_lo[ coord ] ) {\
+\
+/* Estimate the width of the active region from the range of input\
+   coordinates that have so far produced non-bad transformed\
+   coordinates. */\
+         active_width = active_hi[ coord ] - active_lo[ coord ];\
+\
+/* If the current width of the sampled volume exceeds this estimate by\
+   more than the required factor, then reduce the width of the sampled\
+   volume. The rate of reduction is set so that the volume of the\
+   sampled region can halve with every fourth batch of positions. */\
+         if ( ( active_width * oversize ) < sample_width[ coord ] ) {\
+            sample_width[ coord ] /= pow( oversize, 0.25 );\
+\
+/* If the width of the sampled volume does not exceed that of the\
+   known active region by the required factor, then adjust it so that\
+   it does. Note that we must continue to sample some points outside\
+   the known active region in case we have missed any (in which case\
+   the sampled region will expand again to include them). */\
+         } else if ( ( active_width * oversize ) > sample_width[ coord ] ) {\
+            sample_width[ coord ] = active_width * oversize;\
+         }\
+\
+/* Calculate the lower and upper bounds on the sampled volume, using\
+   the new width calculated above and centring it on the active\
+   region, as currently known. */\
+         sample_lo[ coord ] = ( active_lo[ coord ] + active_hi[ coord ] -\
+                                sample_width[ coord ] ) * 0.5;\
+         sample_hi[ coord ] = ( active_lo[ coord ] + active_hi[ coord ] +\
+                                sample_width[ coord ] ) * 0.5;\
+\
+/* Ensure that the sampled region does not extend beyond the original\
+   search region. */\
+         if ( sample_lo[ coord ] < mapdata->lbnd[ coord ] ) {\
+            sample_lo[ coord ] = mapdata->lbnd[ coord ];\
+         }\
+         if ( sample_hi[ coord ] > mapdata->ubnd[ coord ] ) {\
+            sample_hi[ coord ] = mapdata->ubnd[ coord ];\
+         }\
+      }\
+   }\
+\
+/* Having determined the size of the sampled volume, create a batch of\
+   pseudo-random positions uniformly distributed within it. */\
+   for ( batch = 0; batch < nbatch; batch++ ) {\
+      for ( coord = 0; coord < ncoord; coord++ ) {\
+         random = Random( &seed );\
+         ptr_in[ coord ][ batch ] = sample_lo[ coord ] * random +\
+                                    sample_hi[ coord ] * ( 1.0 - random );\
+      }\
+   }\
+\
+/* Transform these positions. We process them in a single batch in\
+   order to minimise the overheads in doing this. */\
+   (void) astTransform( mapdata->mapping, pset_in, mapdata->forward,\
+                        pset_out );\
+\
+/* Indicate that the position buffer is now full. */\
+   batch = 0;\
+}
+
+/* Fill the position buffer using the above macro. (Note that because
+   we do not yet have an estimate of the size of the active region,
+   this does not change the sampled region size from our earlier
+   initialised values. */
+   FILL_POSITION_BUFFER;
+
+/* Iterate. */
+/* ======== */
+/* Loop to perform up to "maxiter" iterations to estimate the global
+   minimum and maximum. */
+   for ( iter = 0; astOK && ( iter < maxiter ); iter++ ) {
+
+/* Determine the search accuracy. */
+/* ============================== */
+/* Decide the accuracy to which local extrema should be found. The
+   intention here is to optimise performance, especially where one
+   extremum lies near zero and so could potentially be found to
+   unnecessarily high precision. If we make a mis-assumption (the code
+   below is not fool-proof), we will slow things down for this
+   iteration, but the error will be corrected in future iterations
+   once better estimates are available. */
+
+/* If we have no current estimate of either global extremum, we assume
+   the values we eventually obtain will be of order unity and required
+   to machine precision. */
+      acc = DBL_EPSILON;
+
+/* If we already have an estimate of both global extrema, we set the
+   accuracy so that the difference between them will be known to
+   machine precision. */
+      if ( ( *lbnd != AST__BAD ) && ( *ubnd != AST__BAD ) ) {
+         acc = fabs( *ubnd - *lbnd ) * DBL_EPSILON;
+
+/* If we have an estimate of only one global extremum, we assume that
+   the difference between the two global extrema will eventually be of
+   the same order as the estimate we currently have, so long as this
+   is not less than unity. */
+      } else if ( *lbnd != AST__BAD ) {
+         if ( fabs( *lbnd ) > 1.0 ) acc = fabs( *lbnd) * DBL_EPSILON;
+      } else if ( *ubnd != AST__BAD ) {
+         if ( fabs( *ubnd ) > 1.0 ) acc = fabs( *ubnd) * DBL_EPSILON;
+      }
+
+/* Search for a new local minimum. */
+/* =============================== */
+/* If we are still searching for the global minimum, then obtain a set
+   of starting coordinates from which to find a new local minimum. */
+      if ( !done_min ) {
+
+/* On the first iteration, start searching at the position where the
+   best estimate of the global minimum (if any) has previously been
+   found. We know that this produces non-bad transformed
+   coordinates. */
+         bad = 0;
+         if ( !iter && ( *lbnd != AST__BAD ) ) {
+            for ( coord = 0; coord < ncoord; coord++ ) {
+               x[ coord ] = xl[ coord ];
+            }
+
+/* Otherwise, if no estimate of the global minimum is available, then
+   start searching at the position where the best estimate of the
+   global maximum (if any) has been found. This may be a long way from
+   a local minimum, but at least it will yield a non-bad value for the
+   Mapping function, so some sort of estimate of the global minimum
+   will be obtained. This is important in cases where finding the
+   active region of the function is the main problem. Note that this
+   condition can only occur once, since the global minimum will have
+   an estimate on the next iteration. */
+         } else if ( ( *lbnd == AST__BAD ) && ( *ubnd != AST__BAD ) ) {
+            for ( coord = 0; coord < ncoord; coord++ ) {
+               x[ coord ] = xu[ coord ];
+            }
+
+/* Having exhausted the above possibilities, we use pseudo-random
+   starting positions which are uniformly distributed throughout the
+   search volume. First check to see if the buffer containing such
+   positions is empty and refill it if necessary. */
+         } else {
+            if ( batch >= nbatch ) FILL_POSITION_BUFFER;
+
+/* Test the next available set of output (transformed) coordinates in
+   the position buffer to see if they are bad. */
+            if ( astOK ) {
+               for ( coord = 0; coord < mapdata->nout; coord++ ) {
+                  bad = ( ptr_out[ coord ][ batch ] == AST__BAD );
+                  if ( bad ) break;
+               }
+
+/* If not, we have a good starting position for finding a local
+   minimum, so extract the corresponding input coordinates. */
+               if ( !bad ) {
+                  for ( coord = 0; coord < ncoord; coord++ ) {
+                     x[ coord ] = ptr_in[ coord ][ batch ];
+                  }
+               }
+
+/* Increment the position buffer location. */
+               batch++;
+            }
+         }
+
+/* If we do not have a good starting position, we can't do anything
+   more on this iteration. A new position will be obtained and tested
+   on the next iteration and this (we hope) will eventually identify a
+   suitable starting point. */
+         if ( astOK && !bad ) {
+
+/* Form estimates of the lower and upper limits of the active region
+   from the starting positions used. */
+            for ( coord = 0; coord < ncoord; coord++ ) {
+               if ( x[ coord ] < active_lo[ coord ] ) {
+                  active_lo[ coord ] = x[ coord ];
+               }
+               if ( x[ coord ] > active_hi[ coord ] ) {
+                  active_hi[ coord ] = x[ coord ];
+               }
+            }
+
+/* Indicate that the Mapping function should be negated (because we
+   want a local minimum) and then search for a local maximum in this
+   negated function. If the result is non-bad (as it should always be,
+   barring an error), then negate it to obtain the value of the local
+   minimum found. */
+            mapdata->negate = 1;
+            new_min = LocalMaximum( mapdata, acc, 0.01, x );
+            if ( new_min != AST__BAD ) {
+               new_min = -new_min;
+
+/* Update the estimates of the lower and upper bounds of the active
+   region to take account of where the minimum was found. */
+               for ( coord = 0; coord < ncoord; coord++ ) {
+                  if ( x[ coord ] < active_lo[ coord ] ) {
+                     active_lo[ coord ] = x[ coord ];
+                  }
+                  if ( x[ coord ] > active_hi[ coord ] ) {
+                     active_hi[ coord ] = x[ coord ];
+                  }
+               }
+
+/* Count the number of times we successfully locate a local minimum
+   (ignoring the fact they might all be the same one). */
+               nmin++;
+
+/* Update the global minimum. */
+/* ========================== */
+/* If this is the first estimate of the global minimum, then set to
+   one the count of the number of consecutive iterations where this
+   estimate remains unchanged. Store the minimum value and its
+   position. */
+               if ( *lbnd == AST__BAD ) {
+                  nsame_min = 1;
+                  *lbnd = new_min;
+                  for ( coord = 0; coord < ncoord; coord++ ) {
+                     xl[ coord ] = x[ coord ];
+                  }
+
+/* Otherwise, test if this local minimum is lower than the previous
+   estimate of the global minimum. If so, then reset the count of
+   unchanged estimates of the global mimimum to one if the difference
+   exceeds the accuracy with which the minimum was found (i.e. if we
+   have found a significantly different minimum). Otherwise, just
+   increment this count (because we have found the same minimum but by
+   chance with slightly improved accuracy). Store the new minimum and
+   its position. */
+               } else if ( new_min < *lbnd ) {
+                  nsame_min = ( ( *lbnd - new_min ) > acc ) ? 1 :
+                  nsame_min + 1;
+                  *lbnd = new_min;
+                  for ( coord = 0; coord < ncoord; coord++ ) {
+                     xl[ coord ] = x[ coord ];
+                  }
+
+/* If the latest local minimum is no improvement on previous estimates
+   of the global minimum, then increment the count of unchanged
+   estimates of the global mimimum, but do not save the new one. */
+               } else {
+                  nsame_min++;
+               }
+
+/* Determine if a satisfactory estimate of the global minimum has been
+   obtained.  It has if the number of consecutive local minima which
+   have not significantly improved the estimate is at least equal to
+   "minsame", and at least 30% of the total number of local minima
+   found. */
+               if ( ( nsame_min >= minsame ) &&
+                    ( nsame_min >= (int) ( 0.3f * (float) nmin + 0.5f ) ) ) {
+                  done_min = 1;
+               }
+            }
+         }
+      }
+
+/* Search for a new local maximum. */
+/* =============================== */
+/* Now repeat all of the above to find a new local maximum which
+   estimates the global maximum. */
+      if ( !done_max ) {
+
+/* Choose a suitable starting position, based on one already available
+   if appropriate. */
+         if ( !iter && ( *ubnd != AST__BAD ) ) {
+            for ( coord = 0; coord < ncoord; coord++ ) {
+               x[ coord ] = xu[ coord ];
+            }
+
+         } else if ( ( *ubnd == AST__BAD ) && ( *lbnd != AST__BAD ) ) {
+            for ( coord = 0; coord < ncoord; coord++ ) {
+               x[ coord ] = xl[ coord ];
+            }
+
+/* Otherwise use a pseudo-random position, refilling the position
+   buffer if necessary. Check if the transformed coordinates are
+   bad. */
+         } else {
+            if ( batch >= nbatch ) FILL_POSITION_BUFFER;
+            for ( coord = 0; coord < mapdata->nout; coord++ ) {
+                bad = ( ptr_out[ coord ][ batch ] == AST__BAD );
+                if ( bad ) break;
+            }
+            if ( !bad ) {
+               for ( coord = 0; coord < ncoord; coord++ ) {
+                  x[ coord ] = ptr_in[ coord ][ batch ];
+               }
+            }
+            batch++;
+         }
+
+/* If the coordinates are OK, update the active region limits. */
+         if ( !bad ) {
+            for ( coord = 0; coord < ncoord; coord++ ) {
+               if ( x[ coord ] < active_lo[ coord ] ) {
+                  active_lo[ coord ] = x[ coord ];
+               }
+               if ( x[ coord ] > active_hi[ coord ] ) {
+                  active_hi[ coord ] = x[ coord ];
+               }
+            }
+
+/* Find a local maximum in the Mapping function. */
+            mapdata->negate = 0;
+            new_max = LocalMaximum( mapdata, acc, 0.01, x );
+            if ( new_max != AST__BAD ) {
+
+/* Use the result to further update the active region limits. */
+               for ( coord = 0; coord < ncoord; coord++ ) {
+                  if ( x[ coord ] < active_lo[ coord ] ) {
+                     active_lo[ coord ] = x[ coord ];
+                  }
+                  if ( x[ coord ] > active_hi[ coord ] ) {
+                     active_hi[ coord ] = x[ coord ];
+                  }
+               }
+
+/* Count the number of local maxima found. */
+               nmax++;
+
+/* Update the estimate of the global maximum. */
+               if ( *ubnd == AST__BAD ) {
+                  nsame_max = 1;
+                  *ubnd = new_max;
+                  for ( coord = 0; coord < ncoord; coord++ ) {
+                     xu[ coord ] = x[ coord ];
+                  }
+
+               } else if ( new_max > *ubnd ) {
+                  nsame_max = ( ( new_max - *ubnd ) > acc ) ? 1 :
+                  nsame_max + 1;
+                  *ubnd = new_max;
+                  for ( coord = 0; coord < ncoord; coord++ ) {
+                     xu[ coord ] = x[ coord ];
+                  }
+
+               } else {
+                  nsame_max++;
+               }
+
+/* Test for a satisfactory global maximum estimate. */
+               if ( ( nsame_max >= minsame ) &&
+                    ( nsame_max >= (int) ( 0.3f * (float) nmax + 0.5 ) ) ) {
+                  done_max = 1;
+               }
+            }
+         }
+      }
+
+/* Quit iterating once both the global minimum and the global maximum
+   have been found. */
+      if ( done_min && done_max ) break;
+   }
+
+/* Free workspace. */
+   x = astFree( x );
+   active_hi = astFree( active_hi );
+   active_lo = astFree( active_lo );
+   sample_hi = astFree( sample_hi );
+   sample_lo = astFree( sample_lo );
+   sample_width = astFree( sample_width );
+
+/* Annul temporary PointSets. */
+   pset_in = astAnnul( pset_in );
+   pset_out = astAnnul( pset_out );
+
+/* If the global minimum has been found, attempt to polish the result
+   to machine precision by requesting that it be found with an
+   accuracy tolerance of zero (subject to the maximum number of
+   iterations that LocalMaximum will perform,). */
+   if ( astOK ) {
+      if ( *lbnd != AST__BAD ) {
+         mapdata->negate = 1;
+         *lbnd = LocalMaximum( mapdata, 0.0, sqrt( DBL_EPSILON ), xl );
+         if ( *lbnd != AST__BAD ) *lbnd = - *lbnd;
+      }
+
+/* Similarly polish the estimate of the global maximum. */
+      if ( *ubnd != AST__BAD ) {
+         mapdata->negate = 0;
+         *ubnd = LocalMaximum( mapdata, 0.0, sqrt( DBL_EPSILON ), xu );
+      }
+
+/* If either extremum could not be found, then report an error. */
+      if ( ( *lbnd == AST__BAD ) || ( *ubnd == AST__BAD ) ) {
+         astError( AST__MBBNF, "astMapBox(%s): No valid output coordinates "
+                   "(after %d test points).", astGetClass( mapdata->mapping ),
+                   2 * maxiter );
+      }
+
+/* If an error occurred, then return bad extremum values and
+   coordinates. */
+      if ( !astOK ) {
+         *lbnd = AST__BAD;
+         *ubnd = AST__BAD;
+         for ( coord = 0; coord < ncoord; coord++ ) {
+            xl[ coord ] = AST__BAD;
+            xu[ coord ] = AST__BAD;
+         }
+      }
+   }
+
+/* Undefine macros local to this function. */
+#undef FILL_POSITION_BUFFER
 }
 
 static void InitVtab( AstMappingVtab *vtab ) {
