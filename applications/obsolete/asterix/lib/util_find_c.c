@@ -249,7 +249,7 @@ F77_SUBROUTINE(util_findfile_int)( CHARACTER(deft), CHARACTER(wspec),
       if ( lctx->ndir && *lctx->ncp )		/* Advance to next one */
         {
         lctx->cp = lctx->ncp;
-        while ( isspace(*(lctx->cp)) && *(lctx->cp) )
+        while ( (isspace(*(lctx->cp)) || (*(lctx->cp) == ':')) && *(lctx->cp) )
           lctx->cp++;
         }
       else if ( lctx->ndir )
