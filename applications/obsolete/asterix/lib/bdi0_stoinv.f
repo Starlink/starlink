@@ -94,8 +94,8 @@
       INTEGER 			STATUS             	! Global status
 
 *  Local Constants:
-      CHARACTER*10		IPROP
-        PARAMETER 		( IPROP = 'Inventions' )
+      CHARACTER*11		IPROP
+        PARAMETER 		( IPROP = '.Inventions' )
 
 *  Local Variables:
       INTEGER			INVID			! Inventions store
