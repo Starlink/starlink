@@ -227,10 +227,21 @@
 *     loop. This is because it is possible to have AZ offsets for
 *     RA,Dec centres.
 *
-*     The coordinate frame of RA1, RA2, DEC1 and DEC2 fro SCAN/MAP depends
-*     on the CENTRE_COORDS of the observation. For CENTRE=RD the scan positions
-*     are in RD; for CENTRE=RB,RJ,GA the scans are in RJ and for centre=AZ
-*     the scans are in AZ.
+*     This routine tries to deal with  the different versions of
+*     SCUCD (only affects SCAN/MAP data).
+*     For version 0:
+*       RA/Decs of the scan were incorrectly stored as RJ. They
+*       are converted to RD before further processing.
+*       The coordinate frame of RA1, RA2, DEC1 and DEC2 fro SCAN/MAP
+*       depends on the CENTRE_COORDS of the observation. For CENTRE=RD
+*       the * scan positions are in RD; for CENTRE=RB,RJ,GA the scans
+*       are in RJ * and for centre=AZ the scans are in AZ.
+*       (SCULIB_SCAN_2_RD)
+
+*     For version 1.0:
+*       A bug was introduced concerning the calculation of the
+*       ends of the scans. The bug is recreated and inverted in order
+*       to compensate. (SCULIB_FIX_SCAN_V10)
 
 *  Authors:
 *     TIMJ: Tim Jenness (JACH)
@@ -239,6 +250,10 @@
 *  History:
 *     1997 March 20 (TIMJ)
 *        Extract from main tasks
+*     $Log$
+*     Revision 1.12  1998/04/25 03:41:15  timj
+*     Include fix for incorrect header in version 1.0 of SCUCD.
+*
 
 *  Bugs:
 *     Currently the IN_UT1 is assumed to be the MJD when the data taking
@@ -391,6 +406,10 @@
       DOUBLE PRECISION MYLONG           ! Long for use with MAP_X/Y offsets
       DOUBLE PRECISION NEW_ARRAY_DEC    ! Map centre of beam
       DOUBLE PRECISION NEW_ARRAY_RA     ! Map centre of beam
+      DOUBLE PRECISION NEW_DEC_END      ! Corrected scan pos (Dec/End)
+      DOUBLE PRECISION NEW_DEC_START    ! Corrected scan pos (Dec/Start)
+      DOUBLE PRECISION NEW_RA_END       ! Corrected scan pos (RA/End)
+      DOUBLE PRECISION NEW_RA_START     ! Corrected scan pos (RA/Start)
       CHARACTER *(2)   OFFSET_COORDS    ! Coordinate system of offsets
       REAL             OFFSET_X         ! X offset of measurement in OFF_COORDS
       REAL             OFFSET_Y         ! Y offset of measurement in OFF_COORDS
@@ -643,11 +662,37 @@
      :                    MEASUREMENT)
 
 *     convert to radians
+*     This assumes that RA is apparent RA/Dec
 
                      RA_START = RA_START * REAL (PI) / 12.0
                      RA_END = RA_END * REAL (PI) / 12.0
                      DEC_START = DEC_START * REAL (PI) / 180.0
                      DEC_END = DEC_END * REAL (PI) / 180.0
+
+
+*     If we are at version 1.0 of SCUCD we need to correct these
+*     header values so long as this  is not a moving source
+*     or we have an RD centre. RD centre should work anyway.
+
+                     IF (SCUCD_VERSION .EQ. 1.0
+     :                    .AND. CENTRE_COORDS .NE. 'RD'
+     :                    .AND. CENTRE_COORDS .NE. 'PLANET') THEN
+
+                        CALL SCULIB_FIX_SCAN_V10(CENTRE_COORDS,
+     :                       RA_CEN, DEC_CEN, IN_UT1,
+     :                       DBLE(RA_START), DBLE(DEC_START), 
+     :                       DBLE(RA_END), DBLE(DEC_END), 
+     :                       NEW_RA_START, NEW_DEC_START,
+     :                       NEW_RA_END, NEW_DEC_END,
+     :                       STATUS)
+
+                        RA_START = SNGL(NEW_RA_START)
+                        RA_END   = SNGL(NEW_RA_END)
+                        DEC_START = SNGL(NEW_DEC_START)
+                        DEC_END  = SNGL(NEW_DEC_END)
+
+                     END IF
+
                   END IF
 
 *     Store the first position of this exposure (in the data array
