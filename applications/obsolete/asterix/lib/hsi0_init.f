@@ -66,11 +66,14 @@
 
 *  Authors:
 *     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     RB: Richard Beard (ROSAT, University of Birmingham)
 *     {enter_new_authors_here}
 
 *  History:
 *     9 Jan 1995 (DJA):
 *        Original version.
+*     4 Feb 1997 (RB):
+*        Expand to cope with FITS better
 *     {enter_changes_here}
 
 *  Bugs:
@@ -101,8 +104,11 @@
       EXTERNAL			HSI1_PTXT
       EXTERNAL			HSI1_PUTCTR
 
+      EXTERNAL			HSI2_OK
       EXTERNAL			HSI2_ADD
       EXTERNAL			HSI2_PTXT
+      EXTERNAL			HSI2_GETCTR
+      EXTERNAL			HSI2_GETREC
 
       EXTERNAL			ADI_DEFMTH
       EXTERNAL			ADI_REQPKG
@@ -138,8 +144,15 @@
         CALL ADI_DEFMTH( 'PutHistoryCtrl(_HDSfile,_HistoryControl)',
      :                   HSI1_PUTCTR, DID, STATUS )
 
+        CALL ADI_DEFMTH( 'GetHistoryCtrl(_FITSfile)', HSI2_GETCTR,
+     :                   DID, STATUS )
+        CALL ADI_DEFMTH( 'GetHistoryRec(_FITSfile,_INTEGER)',
+     :                   HSI2_GETREC, DID, STATUS )
+
 *    Checkers
         CALL ADI_DEFMTH( 'ChkHistory(_HDSfile)', HSI1_OK,
+     :                   DID, STATUS )
+        CALL ADI_DEFMTH( 'ChkHistory(_FITSfile)', HSI2_OK,
      :                   DID, STATUS )
 
 *    Creators of new history
