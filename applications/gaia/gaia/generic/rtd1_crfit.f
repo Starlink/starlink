@@ -306,7 +306,7 @@
      :        ( KEYWRD .NE. 'LABEL' .OR. .NOT. LABFND ) .AND.
      :        ( KEYWRD .NE. 'BUNIT' .OR. .NOT. UNTFND ) .AND.
      :        ( KEYWRD .NE. 'OBJECT' .OR. .NOT. TITFND ) .AND.
-     :        ( KEYWRD( 1:6 ) .NE. 'LBOUND' ) ) THEN 
+     :        ( KEYWRD( 1:6 ) .NE. 'LBOUND' ) )
      :      THEN
 
 *  Write the header card, replacing any non-printing characters
