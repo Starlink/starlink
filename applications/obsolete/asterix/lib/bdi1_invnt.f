@@ -1,4 +1,4 @@
-      SUBROUTINE BDI1_INVNT( BDID, HFID, ITEM, TYPE, MODE,
+a      SUBROUTINE BDI1_INVNT( BDID, HFID, ITEM, TYPE, MODE,
      :                       ITID, NDIM, DIMS, WBPTR, STATUS )
 *+
 *  Name:
@@ -176,8 +176,8 @@
      :                    STATUS )
 
 *    Map it
-        CALL BDI1_ARYMAP( CLOC, 'REAL', 'READ', NDIM, DIMS, PSID, PTR,
-     :                    NELM, STATUS )
+        CALL BDI1_ARYMAP( BDID, CLOC, 'REAL', 'READ', NDIM, DIMS,
+     :                    PSID, PTR, NELM, STATUS )
 
 *    Create invented object and map
         CALL ADI_NEW1( TYPE, NELM, ITID, STATUS )
@@ -338,8 +338,8 @@
         CALL BDI0_LOCPST( BDID, 'Data', .TRUE., PSID, STATUS )
 
 *    Map it
-        CALL BDI1_ARYMAP( CLOC, TYPE, 'READ', NDIM, DIMS, PSID, PTR,
-     :                    NELM, STATUS )
+        CALL BDI1_ARYMAP( BDID, CLOC, TYPE, 'READ', NDIM, DIMS,
+     :                    PSID, PTR, NELM, STATUS )
 
 *    Map the invented object
         CALL ADI_MAP( ITID, TYPE, 'WRITE', WPTR, STATUS )
@@ -388,8 +388,8 @@
           CALL BDI0_LOCPST( BDID, 'Variance', .TRUE., PSID, STATUS )
 
 *      Map it
-          CALL BDI1_ARYMAP( CLOC, TYPE, 'READ', NDIM, DIMS, PSID, PTR,
-     :                      NELM, STATUS )
+          CALL BDI1_ARYMAP( BDID, CLOC, TYPE, 'READ', NDIM, DIMS,
+     :                      PSID, PTR, NELM, STATUS )
 
 *      Map the invented object
           CALL ADI_MAP( ITID, TYPE, 'WRITE', WPTR, STATUS )
@@ -434,8 +434,8 @@
      :                    STATUS )
 
 *    Map it
-        CALL BDI1_ARYMAP( CLOC, 'REAL', 'READ', NDIM, DIMS, PSID, PTR,
-     :                    NELM, STATUS )
+        CALL BDI1_ARYMAP( BDID, CLOC, 'REAL', 'READ', NDIM, DIMS,
+     :                    PSID, PTR, NELM, STATUS )
 
 *    Widths present?
         CALL BDI1_CFIND( BDID, HFID, ITEM(1:7)//'Width',
@@ -445,8 +445,8 @@
           CALL BDI0_LOCPST( BDID, ITEM(1:7)//'Width', .TRUE., WPSID,
      :                      STATUS )
 
-          CALL BDI1_ARYMAP( WLOC, 'REAL', 'READ', NDIM, DIMS, WPSID,
-     :                      PTR2, NELM, STATUS )
+          CALL BDI1_ARYMAP( BDID, WLOC, 'REAL', 'READ', NDIM, DIMS,
+     :                      WPSID, PTR2, NELM, STATUS )
 
         ELSE
           PTR2 = 0
@@ -492,8 +492,8 @@
           CALL BDI0_LOCPST( BDID, ITEM, .TRUE., PSID, STATUS )
 
 *      Map it
-          CALL BDI1_ARYMAP( CLOC, TYPE, 'READ', NDIM, DIMS, PSID, PTR,
-     :                      NELM, STATUS )
+          CALL BDI1_ARYMAP( BDID, CLOC, TYPE, 'READ', NDIM, DIMS,
+     :                      PSID, PTR, NELM, STATUS )
 
 *      Create dynamic array
           CALL ADI_NEW1( TYPE, NELM, ITID, STATUS )
@@ -520,8 +520,8 @@
             CALL BDI0_LOCPST( BDID, ITEM, .TRUE., PSID, STATUS )
 
 *        Map it
-            CALL BDI1_ARYMAP( CLOC, TYPE, 'READ', NDIM, DIMS, PSID,
-     :                        PTR, NELM, STATUS )
+            CALL BDI1_ARYMAP( BDID, CLOC, TYPE, 'READ', NDIM, DIMS,
+     :                        PSID, PTR, NELM, STATUS )
 
 *        Create dynamic array
             CALL ADI_NEW1( TYPE, NELM, ITID, STATUS )

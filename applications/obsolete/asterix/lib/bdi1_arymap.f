@@ -185,9 +185,10 @@
       ELSE IF ( ENELM .NE. NELM ) THEN
         CALL ADI_NAME( PSID, ITEM, STATUS )
         CALL MSG_SETC( 'IT', ITEM )
+        CALL BDI0_DESCID( BID, 'F', STATUS )
         STATUS = SAI__ERROR
-        CALL ERR_REP( ' ', 'The dimensions of item ^IT differ '/
-     :                /'from those expected - check the program '/
+        CALL ERR_REP( ' ', 'The dimensions of item ^IT in file ^F '/
+     :           /'differ from those expected - check the program '/
      :                /'which created this file', STATUS )
         GOTO 99
 
