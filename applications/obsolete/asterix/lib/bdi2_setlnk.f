@@ -103,6 +103,7 @@
 
 *  Local Variables:
       CHARACTER*4		BCS			! String of BCOL
+      CHARACTER*72		CMNT			! Key comment
       CHARACTER*20		CONTNT			! CONTENT keyword value
       CHARACTER*80		FPATH			! Sub-HDU path info
       CHARACTER*10		TYP			! Primary data type
@@ -146,7 +147,7 @@
 
 *  Locate the main HDU for this input. This is the primary HDU for file
 *  level input, or the user specified HDU otherwise.
-      CALL ADI2_FNDHDU( ARGS(2), ' ', PHDU, STATUS )
+      CALL ADI2_FNDHDU( ARGS(2), 'PRIMARY', .FALSE., PHDU, STATUS )
 
 *  If the user has specified the HDU we can't move outside it
       IF ( UIHDU .GT. 0 ) THEN
@@ -207,7 +208,8 @@
                 END IF
 
 *            NDIM'th dimension is the length of the table
-                CALL ADI2_HGKYI( PHDU, 'NAXIS2', DIMS(NDIM), STATUS )
+                CALL ADI2_HGKYI( PHDU, 'NAXIS2', DIMS(NDIM), CMNT,
+     :                           STATUS )
 
 *          The TLMIN keyword for the column?
               ELSE IF ( CHR_SIMLR( FPATH(SPOS(3):EPOS(3)),
@@ -260,17 +262,9 @@
           ELSE
 
 *        Get shape of HDU
-            CALL ADI2_ISHAPE( PHDU, ADI__MXDIM, DIMS, NDIM, STATUS )
-            IF ( NDIM .EQ. 2 ) THEN
-              ISIMAG = .TRUE.
-
-            ELSE
-
-*          Convert BITPIX value to type
-              CALL ADI2_HGKYI( PHDU, 'BITPIX', BITPIX, STATUS )
-              CALL ADI2_BP2TYP( BITPIX, TYP, STATUS )
-
-            END IF
+            CALL ADI2_IMGTSHP( PHDU, .FALSE., BITPIX, NDIM, DIMS,
+     :                         STATUS )
+            CALL ADI2_BP2TYP( BITPIX, TYP, STATUS )
 
           END IF
 
@@ -280,7 +274,7 @@
       ELSE
 
 *    HDU has CONTENT keyword?
-        CALL ADI2_HGKYC( PHDU, 'CONTENT', CONTNT, STATUS )
+        CALL ADI2_HGKYC( PHDU, 'CONTENT', CONTNT, CMNT, STATUS )
         IF ( STATUS .EQ. SAI__OK ) THEN
           IF ( CHR_SIMLR( 'SPECTRUM', CONTNT ) ) THEN
             ISSPEC = .TRUE.
@@ -293,11 +287,11 @@
           CALL ERR_ANNUL( STATUS )
 
 *      Check dimensionality
-          CALL ADI2_HGKYI( PHDU, 'NAXIS', NDIM, STATUS )
+          CALL ADI2_HGKYI( PHDU, 'NAXIS', NDIM, CMNT, STATUS )
 
 *      Look for RATE extension if no primary data
           IF ( NDIM .EQ. 0 ) THEN
-            CALL ADI2_FNDHDU( ARGS(2), 'RATE', DHDU, STATUS )
+            CALL ADI2_FNDHDU( ARGS(2), 'RATE', .FALSE., DHDU, STATUS )
             IF ( STATUS .EQ. SAI__OK ) THEN
               ISTIME = .TRUE.
               CALL ADI_ERASE( DHDU, STATUS )
@@ -306,7 +300,12 @@
               CALL ERR_REP( ' ', 'Unknown FITS dataset type', STATUS )
             END IF
           ELSE
-            ISIMAG = .TRUE.
+
+*        Get shape of HDU
+            CALL ADI2_IMGTSHP( PHDU, .FALSE., BITPIX, NDIM, DIMS,
+     :                         STATUS )
+            CALL ADI2_BP2TYP( BITPIX, TYP, STATUS )
+
           END IF
 
         END IF
@@ -321,11 +320,11 @@
 
 *    The number of bins is the number of rows in the table
         NDIM = 2
-        CALL ADI2_HGKYI( PHDU, 'NAXIS1', DIMS(1), STATUS )
-        CALL ADI2_HGKYI( PHDU, 'NAXIS2', DIMS(2), STATUS )
+        CALL ADI2_HGKYI( PHDU, 'NAXIS1', DIMS(1), CMNT, STATUS )
+        CALL ADI2_HGKYI( PHDU, 'NAXIS2', DIMS(2), CMNT, STATUS )
 
 *    Convert BITPIX value to type
-        CALL ADI2_HGKYI( PHDU, 'BITPIX', BITPIX, STATUS )
+        CALL ADI2_HGKYI( PHDU, 'BITPIX', BITPIX, CMNT, STATUS )
         CALL ADI2_BP2TYP( BITPIX, TYP, STATUS )
 
 *  OGIP spectra
@@ -335,11 +334,11 @@
         CALL ADI_NEW0( 'Spectrum', OARG, STATUS )
 
 *    Locate the extension containing the spectrum
-        CALL ADI2_FNDHDU( ARGS(2), 'SPECTRUM', DHDU, STATUS )
+        CALL ADI2_FNDHDU( ARGS(2), 'SPECTRUM', .FALSE., DHDU, STATUS )
 
 *    The number of bins is the number of rows in the table
         NDIM = 1
-        CALL ADI2_HGKYI( DHDU, 'NAXIS2', DIMS(1), STATUS )
+        CALL ADI2_HGKYI( DHDU, 'NAXIS2', DIMS(1), CMNT, STATUS )
 
 *    Type is REAL
         TYP = 'REAL'
@@ -354,11 +353,11 @@
         CALL ADI_NEW0( 'TimeSeries', OARG, STATUS )
 
 *    Locate the extension containing the time series
-        CALL ADI2_FNDHDU( ARGS(2), 'RATE', DHDU, STATUS )
+        CALL ADI2_FNDHDU( ARGS(2), 'RATE', .FALSE., DHDU, STATUS )
 
 *    The number of bins is the number of rows in the table
         NDIM = 1
-        CALL ADI2_HGKYI( DHDU, 'NAXIS2', DIMS(1), STATUS )
+        CALL ADI2_HGKYI( DHDU, 'NAXIS2', DIMS(1), CMNT, STATUS )
 
 *    Type is REAL
         TYP = 'DOUBLE'

@@ -103,6 +103,7 @@
       INTEGER 			STATUS             	! Global status
 
 *  Local Variables:
+      CHARACTER*72		CMNT			! Keyword comment
       CHARACTER*8		LKEY			! Local keyword name
       CHARACTER*7		STR			! Index encoded
 
@@ -117,7 +118,8 @@
       LKEY = KEY(:LEN(KEY))//STR(:NDIG)
 
 *  Get keyword value
-      CALL ADI2_HGKY<T>( HDUID, LKEY(:NDIG+LEN(KEY)), VALUE, STATUS )
+      CALL ADI2_HGKY<T>( HDUID, LKEY(:NDIG+LEN(KEY)), VALUE, CMNT,
+     :                   STATUS )
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'ADI2_HGKYI<T>', STATUS )

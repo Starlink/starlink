@@ -14,16 +14,18 @@
 
 *  Description:
 *     Write value of keyword to specified HDU. Any existing keyword value
-*     is overwritten.
+*     is overwritten. If the first character of KEY is '@' then the call
+*     is regarded as an internal setting of a keyword, and the modification
+*     flag is not set.
 
 *  Arguments:
 *     HDUID = INTEGER (given)
 *        ADI identifier of HDU object
 *     KEY = CHARACTER*(*) (given)
-*        The name of the keyword to be extracted
+*        The name of the keyword to be set
 *     VALUE = <TYPE> (given)
 *        The keyword value
-*     CMNT = CHARACTER*(*)
+*     CMNT = CHARACTER*(*) (given)
 *        The keyword comment
 *     STATUS = INTEGER (given and returned)
 *        The global status.
@@ -97,42 +99,18 @@
 *  Status:
       INTEGER 			STATUS             	! Global status
 
-*  External References:
-      EXTERNAL			CHR_LEN
-        INTEGER			CHR_LEN
-
 *  Local Variables:
-      INTEGER			FC			! First proper KEY char
       INTEGER			VID			! Keyword value object
-
-      LOGICAL			SCAND			! HDU has been scanned?
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  If first character is '@' this is an internal write and we won't need to
-*  update the keyword in file commit
-      FC = 1
-      IF ( KEY(1:1) .EQ. '@' ) FC = 2
-
-*  Have keywords been scanned for this HDU
-      CALL ADI_CGET0L( HDUID, 'Scanned', SCAND, STATUS )
-      IF ( .NOT. SCAND ) THEN
-        CALL ADI2_SCAN( HDUID, STATUS )
-      END IF
-
 *  Create ADI object to hold value
       CALL ADI_NEWV0<T>( VALUE, VID, STATUS )
 
-*  Write comment if significant
-      IF ( CMNT .GT. ' ' ) THEN
-        CALL ADI_CNEWV0C( VID, '.Comment', CMNT(:CHR_LEN(CMNT)),
-     :                    STATUS )
-      END IF
-
 *  Add keyword definition
-      CALL ADI2_ADDKEY( HDUID, KEY(FC:), VID, (FC.EQ.1), STATUS )
+      CALL ADI2_ADDKEY( HDUID, KEY, VID, CMNT, STATUS )
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'ADI2_HPKY<T>', STATUS )

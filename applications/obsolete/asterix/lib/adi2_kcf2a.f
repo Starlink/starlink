@@ -90,6 +90,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'ADI_PAR'
 
 *  Arguments Given:
       INTEGER			HDUID, OBJ
@@ -102,12 +103,9 @@
       INTEGER 			STATUS             	! Global status
 
 *  Local Variables:
-      INTEGER                   KID                     ! Keywords list
+      INTEGER                   KID                     ! Keywords cache object
       INTEGER                   KVID                    ! Keywords value object
       INTEGER			MVID			! Member value object
-
-      LOGICAL                   SCAND                   ! HDU has been scanned?
-      LOGICAL                   THERE                   ! Keyword exists?
 *.
 
 *  Check inherited global status.
@@ -116,30 +114,27 @@
 *  Initialise
       OK = .FALSE.
 
-*  Have keywords been scanned for this HDU
-      CALL ADI_CGET0L( HDUID, 'Scanned', SCAND, STATUS )
-      IF ( .NOT. SCAND ) THEN
-        CALL ADI2_SCAN( HDUID, STATUS )
-      END IF
-
-*  Locate keywords container
-      CALL ADI_FIND( HDUID, 'Keys', KID, STATUS )
+*  Look for keyword
+      CALL ADI2_CFIND_KEY( HDUID, KEY, .FALSE., KID, .FALSE., STATUS )
 
 *  Does our keyword exist?
-      CALL ADI_THERE( KID, KEY, THERE, STATUS )
-      IF ( THERE ) THEN
+      IF ( KVID .NE. ADI__NULLID ) THEN
 
 *    Locate the value
-        CALL ADI_FIND( KID, KEY, KVID, STATUS )
+        CALL ADI_FIND( KID, 'Value', KVID, STATUS )
 
 *    Make a copy
         CALL ADI_COPY( KVID, MVID, STATUS )
 
 *    Release keyword value
-        CALL ADI_ERASE( KVID, STATUS )
+        CALL ADI_ERASE( KID, STATUS )
 
 *    Write object component
-        CALL ADI_CPUTID( OBJ, MEMBER, MVID, STATUS )
+        IF ( MEMBER .GT. ' ' ) THEN
+          CALL ADI_CPUTID( OBJ, MEMBER, MVID, STATUS )
+        ELSE
+          OBJ = MVID
+        END IF
 
 *    Set return flag
         IF ( STATUS .EQ. SAI__OK ) THEN
@@ -148,12 +143,10 @@
           CALL ERR_ANNUL( STATUS )
         END IF
 
-      END IF
+*    Release keyword cache object
+        CALL ADI_ERASE( KID, STATUS )
 
-*  Release keyword container
-      CALL ERR_BEGIN( STATUS )
-      CALL ADI_ERASE( KID, STATUS )
-      CALL ERR_END( STATUS )
+      END IF
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'ADI2_KCF2A', STATUS )
