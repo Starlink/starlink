@@ -1,0 +1,10 @@
+       for_recursive_glob var dirlist globlist code
+              This  procedure  performs a foreach-style loop over
+              recursively  matched  files.   All  directories  in
+              dirlist  are  recursively searched (breadth-first),
+              comparing each file found  against  the  file  glob
+              patterns  in  globlist.  For each matched file, the
+              variable var is set to the file path  and  code  is
+              evaluated.  Symbolic links are not followed.
+
+              This procedure is provided by Extended Tcl.

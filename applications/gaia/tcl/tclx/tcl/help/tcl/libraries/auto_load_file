@@ -1,0 +1,5 @@
+auto_load_file file
+Source  a  file,  as  with  the  source  command,  except  search
+auto_path for the file.
+
+This procedure is provided by Extended Tcl.

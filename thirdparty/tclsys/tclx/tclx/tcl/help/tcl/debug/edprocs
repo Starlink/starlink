@@ -1,0 +1,9 @@
+       edprocs ?proc...?
+              This  procedure writes the named procedures, or all
+              currently defined procedures, to a temporary  file,
+              then  calls  an  editor  on it (as specified by the
+              EDITOR environment variable, or vi if none is spec-
+              ified),  then  sources  the  file back in if it was
+              changed.
+
+              This procedure is provided by Extended Tcl.

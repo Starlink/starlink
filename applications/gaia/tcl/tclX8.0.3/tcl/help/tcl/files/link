@@ -1,0 +1,11 @@
+       link ?-sym? srcpath destpath
+
+              Create  a  directory entry, destpath, linking it to
+              the existing file, srcpath.  If -sym is  specified,
+              a  symbolic  link, rather than a hard link, is cre-
+              ated.  (The -sym option is only available  on  sys-
+              tems that support symbolic links.)
+
+              The link command is not available on Windows 95/NT.
+
+              This command is provided by Extended Tcl.

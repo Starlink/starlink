@@ -1,0 +1,322 @@
+NAME
+       event  -  Miscellaneous  event  facilities: define virtual
+       events and generate events
+
+SYNOPSIS
+       event option ?arg arg ...?
+
+
+DESCRIPTION
+       The event command provides several facilities for  dealing
+       with window system events, such as defining virtual events
+       and synthesizing events.  The command has several  differ-
+       ent  forms, determined by the first argument.  The follow-
+       ing forms are currently supported:
+
+       event add <<virtual>> sequence ?sequence ...?
+              Associates the virtual event virtual with the phys-
+              ical  event sequence(s) given by the sequence argu-
+              ments, so that the virtual event will trigger when-
+              ever  any one of the sequences occurs.  Virtual may
+              be any string value and sequence may  have  any  of
+              the values allowed for the sequence argument to the
+              bind command.  If virtual is already  defined,  the
+              new  physical  event  sequences add to the existing
+              sequences for the event.
+
+       event delete <<virtual>> ?sequence sequence ...?
+              Deletes each of the sequences from those associated
+              with  the  virtual event given by virtual.  Virtual
+              may be any string value and sequence may  have  any
+              of  the values allowed for the sequence argument to
+              the bind  command.   Any  sequences  not  currently
+              associated   with   virtual  are  ignored.   If  no
+              sequence argument is provided, all  physical  event
+              sequences are removed for virtual, so that the vir-
+              tual event will not trigger anymore.
+
+       event generate window event ?option value option value
+              ...?
+              Generates  a window event and arranges for it to be
+              processed just as if it had come  from  the  window
+              system.   Window  gives the path name of the window
+              for which the event will be generated; it may  also
+              be  an identifier (such as returned by winfo id) as
+              long as it is for a window in the current  applica-
+              tion.   Event  provides  a basic description of the
+              event,  such  as  <Shift-Button-2>  or   <<Paste>>.
+              Event  may  have  any  of the forms allowed for the
+              sequence argument of the bind command  except  that
+              it  must  consist  of a single event pattern, not a
+              sequence.  Option-value pairs may be used to  spec-
+              ify additional attributes of the event, such as the
+              x and y mouse position;  see  EVENT  FIELDS  below.
+              If  the -when option is not specified, the event is
+              processed immediately:  all of the handlers for the
+              event  will complete before the event generate com-
+              mand returns.  If the  -when  option  is  specified
+              then it determines when the event is processed.
+
+       event info ?<<virtual>>?
+              Returns  information  about virtual events.  If the
+              <<virtual>> argument is omitted, the  return  value
+              is  a  list of all the virtual events that are cur-
+              rently defined.  If <<virtual>> is  specified  then
+              the  return  value is a list whose elements are the
+              physical event sequences currently defined for  the
+              given  virtual  event;  if the virtual event is not
+              defined then an empty string is returned.
+
+
+EVENT FIELDS
+       The following options are supported for the event generate
+       command.  These correspond to the ``%'' expansions allowed
+       in binding scripts for the bind command.
+
+       -above window
+              Window specifies the above  field  for  the  event,
+              either  as a window path name or as an integer win-
+              dow id.  Valid for Configure  events.   Corresponds
+              to the %a substitution for binding scripts.
+
+       -borderwidth size
+              Size  must  be a screen distance;  it specifies the
+              border_width field for the event.  Valid  for  Con-
+              figure  events.  Corresponds to the %B substitution
+              for binding scripts.
+
+       -button number
+              Number must be an integer;  it specifies the detail
+              field  for  a  ButtonPress  or ButtonRelease event,
+              overriding any button  number provided in the  base
+              event argument.  Corresponds to the %b substitution
+              for binding scripts.
+
+       -count number
+              Number must be an integer;  it specifies the  count
+              field  for  the  event.   Valid  for Expose events.
+              Corresponds to  the  %c  substitution  for  binding
+              scripts.
+
+       -detail detail
+              Detail specifies the detail field for the event and
+              must be one of the following:
+
+                     NotifyAncestor          NotifyNonlinearVirtual
+                     NotifyDetailNone        NotifyPointer
+                     NotifyInferior          NotifyPointerRoot
+                     NotifyNonlinear         NotifyVirtual
+              Valid  for  Enter,  Leave,  FocusIn  and   FocusOut
+              events.   Corresponds  to  the  %d substitution for
+              binding scripts.
+
+       -focus boolean
+              Boolean must be a boolean value;  it specifies  the
+              focus  field  for  the  event.  Valid for Enter and
+              Leave events.  Corresponds to the  %f  substitution
+              for binding scripts.
+
+       -height size
+              Size  must  be a screen distance;  it specifies the
+              height field for the event.   Valid  for  Configure
+              events.   Corresponds  to  the  %h substitution for
+              binding scripts.
+
+       -keycode number
+              Number  must be an integer;  it specifies the  key-
+              code  field  for the event.  Valid for KeyPress and
+              KeyRelease events.  Corresponds to the %k substitu-
+              tion for binding scripts.
+
+       -keysym name
+              Name must be the name of a valid keysym, such as g,
+              space, or Return;  its corresponding keycode  value
+              is  used as the keycode field for event, overriding
+              any detail specified in the  base  event  argument.
+              Valid  for  KeyPress and KeyRelease events.  Corre-
+              sponds to the %K substitution for binding  scripts.
+
+       -mode notify
+              Notify  specifies  the mode field for the event and
+              must be one of NotifyNormal, NotifyGrab,  NotifyUn-
+              grab,  or  NotifyWhileGrabbed.   Valid  for  Enter,
+              Leave, FocusIn, and FocusOut  events.   Corresponds
+              to the %m substitution for binding scripts.
+
+       -override boolean
+              Boolean  must be a boolean value;  it specifies the
+              override_redirect field for the event.   Valid  for
+              Map,  Reparent,  and Configure events.  Corresponds
+              to the %o substitution for binding scripts.
+
+       -place where
+              Where specifies the place field for the event;   it
+              must  be either PlaceOnTop or PlaceOnBottom.  Valid
+              for Circulate events.  Corresponds to the  %p  sub-
+              stitution for binding scripts.
+
+       -root window
+              Window  must  be  either  a  window path name or an
+              integer window identifier;  it specifies  the  root
+              field  for  the  event.  Valid for KeyPress, KeyRe-
+              lease, ButtonPress,  ButtonRelease,  Enter,  Leave,
+              and Motion events.  Corresponds to the %R substitu-
+              tion for binding scripts.
+
+       -rootx coord
+              Coord must be a screen distance;  it specifies  the
+              x_root  field  for  the event.  Valid for KeyPress,
+              KeyRelease,  ButtonPress,   ButtonRelease,   Enter,
+              Leave,  and  Motion  events.  Corresponds to the %X
+              substitution for binding scripts.
+
+       -rooty coord
+              Coord must be a screen distance;  it  specifies  th
+              y_root  field  for  the event.  Valid for KeyPress,
+              KeyRelease,  ButtonPress,   ButtonRelease,   Enter,
+              Leave,  and  Motion  events.  Corresponds to the %Y
+              substitution for binding scripts.
+
+       -sendevent boolean
+              Boolean must be a boolean value;  it specifies  the
+              send_event  field  for  the  event.   Valid for all
+              events.  Corresponds to  the  %E  substitution  for
+              binding scripts.
+
+       -serial number
+              Number must be an integer;  it specifies the serial
+              field for the event.  Valid for all events.  Corre-
+              sponds  to the %# substitution for binding scripts.
+
+       -state state
+              State specifies the state field for the event.  For
+              KeyPress,  KeyRelease,  ButtonPress, ButtonRelease,
+              Enter, Leave, and Motion events it must be an inte-
+              ger value.  For Visibility events it must be one of
+              VisibilityUnobscured,  VisibilityPartiallyObscured,
+              or  VisibilityFullyObscured.  This option overrides
+              any modifiers such as Meta or Control specified  in
+              the base event.  Corresponds to the %s substitution
+              for binding scripts.
+
+       -subwindow window
+              Window specifies the subwindow field for the event,
+              either  as  a  path  name  for a Tk widget or as an
+              integer window  identifier.   Valid  for  KeyPress,
+              KeyRelease,   ButtonPress,   ButtonRelease,  Enter,
+              Leave, and Motion events.  Similar to %S  substitu-
+              tion for binding scripts.
+
+       -time integer
+              Integer must be an integer value;  it specifies the
+              time field for  the  event.   Valid  for  KeyPress,
+              KeyRelease,   ButtonPress,   ButtonRelease,  Enter,
+              Leave, Motion, and Property events.  Corresponds to
+              the %t substitution for binding scripts.
+       -width size
+              Size  must  be a screen distance;  it specifies the
+              width field for the  event.   Valid  for  Configure
+              events.   Corresponds  to  the  %w substitution for
+              binding scripts.
+
+       -when when
+              When determines when the event will  be  processed;
+              it must have one of the following values:
+
+              now       Process the event immediately, before the
+                        command returns.  This  also  happens  if
+                        the -when option is omitted.
+
+              tail      Place  the  event  on  Tcl's  event queue
+                        behind any events already queued for this
+                        application.
+
+              head      Place  the  event  at  the front of Tcl's
+                        event queue, so that it will  be  handled
+                        before any other events already queued.
+
+              mark      Place  the  event  at  the front of Tcl's
+                        event queue but behind any  other  events
+                        already  queued  with  -when  mark.  This
+                        option is useful when generating a series
+                        of  events  that  should  be processed in
+                        order but at the front of the queue.
+
+       -x coord
+              Coord must be a screen distance;  it specifies  the
+              x  field for the event.  Valid for KeyPress, KeyRe-
+              lease, ButtonPress, ButtonRelease,  Motion,  Enter,
+              Leave,  Expose,  Configure,  Gravity,  and Reparent
+              events.  Corresponds to the the %x substitution for
+              binding scripts.
+
+       -y coord
+              Coord  must be a screen distance;  it specifies the
+              y field for the event.  Valid for KeyPress,  KeyRe-
+              lease,  ButtonPress,  ButtonRelease, Motion, Enter,
+              Leave, Expose,  Configure,  Gravity,  and  Reparent
+              events.  Corresponds to the the %y substitution for
+              binding scripts.
+
+       Any options that are  not  specified  when  generating  an
+       event  are  filled  with  the  value 0, except for serial,
+       which is filled with the next X event serial number.
+
+
+VIRTUAL EVENT EXAMPLES
+       In order for a  virtual  event  binding  to  trigger,  two
+       things  must  happen.   First,  the  virtual event must be
+       defined with the event add  command.   Second,  a  binding
+       must  be  created for the virtual event with the bind com-
+       mand.  Consider the following virtual event definitions:
+              event add <<Paste>> <Control-y>
+              event add <<Paste>> <Button-2>
+              event add <<Save>> <Control-X><Control-S>
+              event add <<Save>> <Shift-F12>
+       In the bind command, a virtual event can be bound like any
+       other builtin event type as follows:
+              bind Entry <<Paste>> {%W insert [selection get]}
+       The  double angle brackets are used to specify that a vir-
+       tual event is being bound.  If the user types Control-y or
+       presses  button 2, or if a <<Paste>> virtual event is syn-
+       thesized with event generate, then the  <<Paste>>  binding
+       will be invoked.
+
+       If a virtual binding has the exact same sequence as a sep-
+       arate physical binding, then  the  physical  binding  will
+       take precedence.  Consider the following example:
+              event add <<Paste>> <Control-y> <Meta-Control-y>
+              bind Entry <Control-y> {puts Control-y}
+              bind Entry <<Paste>> {puts Paste}
+       When the user types Control-y the <Control-y> binding will
+       be invoked, because a physical event  is  considered  more
+       specific  than  a  virtual  event,  all other things being
+       equal.  However, when the user  types  Meta-Control-y  the
+       <<Paste>>  binding will be invoked, because the Meta modi-
+       fier in the physical pattern associated with  the  virtual
+       binding is more specific than the <Control-y> sequence for
+       the physical event.
+
+       Bindings on a virtual event may be created before the vir-
+       tual  event exists.  Indeed, the virtual event never actu-
+       ally needs to be defined, for instance, on platforms where
+       the specific virtual event would meaningless or ungenerat-
+       able.
+
+       When a definition of a virtual event changes at run  time,
+       all  windows  will  respond immediately to the new defini-
+       tion.  Starting from the preceding example, if the follow-
+       ing code is executed:
+              bind <Entry> <Control-y> {}
+              event add <<Paste>> <Key-F6>
+       the  behavior  will  change  such in two ways.  First, the
+       shadowed <<Paste>> binding will emerge.  Typing  Control-y
+       will no longer invoke the <Control-y> binding, but instead
+       invoke the virtual event <<Paste>>.  Second, pressing  the
+       F6 key will now also invoke the <<Paste>> binding.
+
+
+SEE ALSO
+       bind
+KEYWORDS
+       event, binding, define, handle, virtual event

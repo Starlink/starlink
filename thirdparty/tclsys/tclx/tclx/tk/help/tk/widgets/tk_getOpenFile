@@ -1,0 +1,158 @@
+NAME
+       tk_getOpenFile,  tk_getSaveFile  - pop up a dialog box for
+       the user to select a file to open or save.
+
+
+
+SYNOPSIS
+       tk_getOpenFile ?option value ...?
+       tk_getSaveFile ?option value ...?
+
+
+DESCRIPTION
+       The procedures tk_getOpenFile and tk_getSaveFile pop up  a
+       dialog  box for the user to select a file to open or save.
+       The tk_getOpenFile command is usually associated with  the
+       Open command in the File menu. Its purpose is for the user
+       to select an existing file only. If  the  user  enters  an
+       non-existent  file, the dialog box gives the user an error
+       prompt and requires the user to give an alternative selec-
+       tion.  If  an  application  allows  the user to create new
+       files, it should do so by providing a  separate  New  menu
+       command.
+
+       The  tk_getSaveFile command is usually associated with the
+       Save as command in the File menu. If  the  user  enters  a
+       file  that already exists, the dialog box prompts the user
+       for confirmation whether the existing file should be over-
+       written or not.
+
+       The  following  option-value pairs are possible as command
+       line arguments to these two commands:
+
+       -defaultextension extension
+              Specifies a string that will  be  appended  to  the
+              filename  if  the user enters a filename without an
+              extension. The defaut value is  the  empty  string,
+              which  means  no  extension will be appended to the
+              filename in any case. This option is ignored on the
+              Macintosh  platform,  which does not require exten-
+              sions to filenames.
+
+       -filetypes filePatternList
+              If a File types listbox exists in the  file  dialog
+              on  the  particular platform, this option gives the
+              filetypes in this listbox. When the user  choose  a
+              filetype  in  the  listbox,  only the files of that
+              type are listed. If this option is unspecified,  or
+              if  it  is  set  to  the empty list, or if the File
+              types listbox is not supported  by  the  particular
+              platform  then  all  files are listed regardless of
+              their types. See the section SPECIFYING  FILE  PAT-
+              TERNS  below  for  a  discussion on the contents of
+              filePatternList.
+       -initialdir directory
+              Specifies that the files  in  directory  should  be
+              displayed  when the dialog pops up. If this parame-
+              ter is not specified, then the files in the current
+              working  directory  are displayed.  This option may
+              not always work on the Macintosh.  This  is  not  a
+              bug.  Rather, the General Controls control panel on
+              the Mac allows the end user to override the  appli-
+              cation default directory.
+
+       -initialfile filename
+              Specifies  a filename to be displayed in the dialog
+              when it pops up. This  option  is  ignored  by  the
+              tk_getOpenFile command.
+
+       -parent window
+              Makes window the logical parent of the file dialog.
+              The file dialog is displayed on top of  its  parent
+              window.
+
+       -title titleString
+              Specifies  a  string to display as the title of the
+              dialog box. If this option is not specified, then a
+              default  title is displayed. This option is ignored
+              on the Macintosh platform.
+
+       If the  user  selects  a  file,  both  tk_getOpenFile  and
+       tk_getSaveFile  return  the full pathname of this file. If
+       the user cancels the operation, both commands  return  the
+       empty string.
+
+SPECIFYING FILE PATTERNS
+       The  filePatternList  value given by the -filetypes option
+       is a list of file patterns. Each file pattern is a list of
+       the form
+              typeName {extension ?extension ...?} ?{macType ?macType ...?}?
+       typeName  is  the  name of the file type described by this
+       file pattern and is the text string that  appears  in  the
+       File types listbox. extension is a file extension for this
+       file pattern.  macType is a four-character Macintosh  file
+       type.  The list of macTypes is optional and may be omitted
+       for applications that do not need to execute on the Macin-
+       tosh platform.
+
+       Several file patterns may have the same typeName, in which
+       case they refer to the same file type and share  the  same
+       entry  in  the  listbox. When the user selects an entry in
+       the listbox, all the files that match at least one of  the
+       file patterns corresponding to that entry are listed. Usu-
+       ally, each file pattern corresponds to a distinct type  of
+       file.  The use of more than one file patterns for one type
+       of file is necessary on the Macintosh platform only.
+
+       On the Macintosh platform, a file matches a  file  pattern
+       if  its  name matches at least one of the extension(s) AND
+       it belongs to at least one of the macType(s) of  the  file
+       pattern.  For  example, the C Source Files file pattern in
+       the sample code matches with files that have a  .c  exten-
+       sion  AND  belong  to the macType TEXT. To use the OR rule
+       instead, you can use  two  file  patterns,  one  with  the
+       extensions  only  and the other with the macType only. The
+       GIF Files file type in the sample code matches files  that
+       EITHER  have  a  .gif  extension  OR belong to the macType
+       GIFF.
+
+       On the Unix and Windows platforms, a file matches  a  file
+       pattern  if its name matches at at least one of the exten-
+       sion(s) of the file pattern. The macTypes are ignored.
+
+SPECIFYING EXTENSIONS
+       On  the  Unix  and  Macintosh  platforms,  extensions  are
+       matched  using glob-style pattern matching. On the Windows
+       platforms, extensions are matched by the underlying  oper-
+       ating  system.  The  types of possible extensions are: (1)
+       the special extension * matches any file; (2) the  special
+       extension  "" matches any files that do not have an exten-
+       sion (i.e., the filename contains no full stop character);
+       (3)  any  character  string that does not contain any wild
+       card characters (* and ?).
+
+       Due to the different pattern matching rules on the various
+       platforms, to ensure portability, wild card characters are
+       not allowed in the extensions, except as  in  the  special
+       extension  *.  Extensions  without  a  full stop character
+       (e.g, ~) are allowed but may not work on all platforms.
+
+
+EXAMPLE
+              set types {
+                  {{Text Files}       {.txt}        }
+                  {{TCL Scripts}      {.tcl}        }
+                  {{C Source Files}   {.c}      TEXT}
+                  {{GIF Files}        {.gif}        }
+                  {{GIF Files}        {}        GIFF}
+                  {{All Files}        *             }
+              }
+              set filename [tk_getOpenFile -filetypes $types]
+
+              if {$filename != ""} {
+                  # Open the file ...
+              }
+
+
+KEYWORDS
+       file selection dialog

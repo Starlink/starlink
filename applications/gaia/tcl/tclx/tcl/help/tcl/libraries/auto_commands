@@ -1,0 +1,6 @@
+auto_commands  ?-loaders?   Lists the names of all known loadable
+procedures and commands procedures.  If  -loaders  is  specified,
+the  command  that will be executed to load the command will also
+be returned.
+
+This procedure is provided by Extended Tcl.

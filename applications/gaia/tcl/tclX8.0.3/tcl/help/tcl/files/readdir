@@ -1,0 +1,11 @@
+       readdir ?-hidden? dirPath
+
+              Returns  a  list  containing  the  contents  of the
+              directory dirPath.  The directory entries  "."  and
+              ".." are not returned.
+
+              On   Windows  95/NT,  -hidden  maybe  specified  to
+              include hidden files in the result.  This  flag  is
+              ignored on Unix systems.
+
+              This command is provided by Extended Tcl.

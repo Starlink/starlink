@@ -1,0 +1,182 @@
+NAME
+       info  -  Return  information  about  the  state of the Tcl
+       interpreter
+
+SYNOPSIS
+       info option ?arg arg ...?
+
+
+DESCRIPTION
+       This command provides information about various  internals
+       of  the Tcl interpreter.  The legal option's (which may be
+       abbreviated) are:
+
+       info args procname
+              Returns a list containing the names  of  the  argu-
+              ments  to  procedure  procname, in order.  Procname
+              must be the name of a Tcl command procedure.
+
+       info body procname
+              Returns the body of procedure  procname.   Procname
+              must be the name of a Tcl command procedure.
+
+       info cmdcount
+              Returns  a  count  of  the total number of commands
+              that have been invoked in this interpreter.
+
+       info commands ?pattern?
+              If pattern isn't specified, returns a list of names
+              of  all  the Tcl commands in the current namespace,
+              including both the built-in commands written  in  C
+              and  the  command procedures defined using the proc
+              command.  If pattern is specified, only those names
+              matching  pattern are returned.  Matching is deter-
+              mined using the same rules  as  for  string  match.
+              pattern  can  be a qualified name like Foo::print*.
+              That is, it  may  specify  a  particular  namespace
+              using  a  sequence  of namespace names separated by
+              ::s, and may have pattern matching special  charac-
+              ters  at  the  end  to specify a set of commands in
+              that namespace.  If pattern is  a  qualified  name,
+              the  resulting  list  of command names has each one
+              qualified with the name of the specified namespace.
+
+       info complete command
+              Returns  1  if command is a complete Tcl command in
+              the sense of having  no  unclosed  quotes,  braces,
+              brackets  or  array  element  names, If the command
+              doesn't appear to be complete then 0  is  returned.
+              This  command  is  typically  used in line-oriented
+              input environments to allow users to type  in  com-
+              mands  that  span  multiple  lines;  if the command
+              isn't complete, the script can delay evaluating  it
+              until  additional lines have been typed to complete
+              the command.
+       info default procname arg varname
+              Procname must be the name of a Tcl  command  proce-
+              dure  and  arg  must  be the name of an argument to
+              that procedure.  If  arg  doesn't  have  a  default
+              value  then  the  command  returns 0.  Otherwise it
+              returns 1 and places the default value of arg  into
+              variable varname.
+
+       info exists varName
+              Returns  1  if the variable named varName exists in
+              the current context (either as a  global  or  local
+              variable), returns 0 otherwise.
+
+       info globals ?pattern?
+              If  pattern  isn't specified, returns a list of all
+              the names of  currently-defined  global  variables.
+              Global variables are variables in the global names-
+              pace.  If pattern is specified,  only  those  names
+              matching  pattern are returned.  Matching is deter-
+              mined using the same rules as for string match.
+
+       info hostname
+              Returns the name of  the  computer  on  which  this
+              invocation is being executed.
+
+       info level ?number?
+              If  number is not specified, this command returns a
+              number giving the stack level of the invoking  pro-
+              cedure,  or  0  if  the  command is invoked at top-
+              level.  If number is specified, then the result  is
+              a list consisting of the name and arguments for the
+              procedure call at level number on  the  stack.   If
+              number  is  positive  then  it selects a particular
+              stack level (1 refers to the top-most active proce-
+              dure,  2  to  the  procedure it called, and so on);
+              otherwise it gives a level relative to the  current
+              level (0 refers to the current procedure, -1 to its
+              caller, and so on).  See the  uplevel  command  for
+              more information on what stack levels mean.
+
+       info library
+              Returns  the name of the library directory in which
+              standard Tcl scripts are stored.  This is  actually
+              the  value  of  the tcl_library variable and may be
+              changed by setting tcl_library.   See  the  tclvars
+              manual entry for more information.
+
+       info loaded ?interp?
+              Returns  a list describing all of the packages that
+              have been loaded into interp with the load command.
+              Each  list  element is a sub-list with two elements
+              consisting of the name of the file from  which  the
+              package  was  loaded  and  the name of the package.
+              For statically-loaded packages the file  name  will
+              be  an  empty  string.   If  interp is omitted then
+              information is returned for all packages loaded  in
+              any  interpreter  in the process.  To get a list of
+              just the packages in the current interpreter, spec-
+              ify an empty string for the interp argument.
+
+       info locals ?pattern?
+              If  pattern  isn't specified, returns a list of all
+              the names  of  currently-defined  local  variables,
+              including  arguments  to  the current procedure, if
+              any.  Variables defined with the global  and  upvar
+              commands will not be returned.  If pattern is spec-
+              ified,  only  those  names  matching  pattern   are
+              returned.   Matching  is  determined using the same
+              rules as for string match.
+
+       info nameofexecutable
+              Returns the full path name of the binary file  from
+              which  the  application  was  invoked.   If Tcl was
+              unable to identify the file, then an  empty  string
+              is returned.
+
+       info patchlevel
+              Returns the value of the global variable tcl_patch-
+              Level; see the tclvars manual entry for more infor-
+              mation.
+
+       info procs ?pattern?
+              If  pattern  isn't specified, returns a list of all
+              the names of Tcl command procedures in the  current
+              namespace.   If  pattern  is  specified, only those
+              procedure names in the current  namespace  matching
+              pattern are returned.  Matching is determined using
+              the same rules as for string match.
+
+       info script
+              If a Tcl script file is currently  being  evaluated
+              (i.e.  there  is  a  call to Tcl_EvalFile active or
+              there is an active invocation of  the  source  com-
+              mand),  then  this  command returns the name of the
+              innermost file being processed.  Otherwise the com-
+              mand returns an empty string.
+
+       info sharedlibextension
+              Returns the extension used on this platform for the
+              names of files  containing  shared  libraries  (for
+              example,  .so  under Solaris).  If shared libraries
+              aren't supported on this  platform  then  an  empty
+              string is returned.
+
+       info tclversion
+              Returns  the  value of the global variable tcl_ver-
+              sion; see the tclvars manual entry for more  infor-
+              mation.
+       info vars ?pattern?
+              If  pattern  isn't specified, returns a list of all
+              the names  of  currently-visible  variables.   This
+              includes  locals and currently-visible globals.  If
+              pattern is specified,  only  those  names  matching
+              pattern are returned.  Matching is determined using
+              the same rules as for string match.  pattern can be
+              a  qualified  name  like Foo::option*.  That is, it
+              may specify a particular namespace using a sequence
+              of  namespace  names separated by ::s, and may have
+              pattern matching special characters at the  end  to
+              specify  a  set of variables in that namespace.  If
+              pattern is a qualified name, the resulting list  of
+              variable names has each matching namespace variable
+              qualified with the name of its namespace.
+
+
+KEYWORDS
+       command, information, interpreter, level, namespace,  pro-
+       cedure, variable

@@ -1,0 +1,13 @@
+       pipe ?fileId_var_r fileId_var_w?
+              Create  a  pipe.   If fileId_var_r and fileId_var_r
+              are specified, then pipe will set  the  a  variable
+              named  fileId_var_r  to  contain  the fileId of the
+              side of the pipe that was opened for  reading,  and
+              fileId_var_w will contain the fileId of the side of
+              the pipe that was opened for writing.
+
+              If the fileId variables are not specified,  then  a
+              list  containing  the  read  and  write  fileIdw is
+              returned as the result of the command.
+
+              This command is provided by Extended Tcl.

@@ -1,0 +1,83 @@
+       scanmatch ?-nocase? contexthandle ?regexp? commands
+
+              Specify  Tcl  commands, to be evaluated when regexp
+              is matched by a scanfile  command.   The  match  is
+              added  to  the  scan  context  specified by contex-
+              thandle.  Any number of  match  statements  may  be
+              specified  for a give context.  Regexp is a regular
+              expression (see the regexp command).  If -nocase is
+              specified  as  the  first  argument, the pattern is
+              matched regardless of alphabetic case.
+
+              If regexp is not specified, then a default match is
+              specified  for the scan context.  The default match
+              will be executed when a line of the file  does  not
+              match any of the regular expressions in the current
+              scancontext.
+
+              The array matchInfo is available to  the  Tcl  code
+              that  is  executed  when  an expression matches (or
+              defaults).  It contains information about the  file
+              being  scanned  and  where within it the expression
+              was matched.
+
+              matchInfo is local to the top level  of  the  match
+              command unless declared global at that level by the
+              Tcl global command.  If it  is  to  be  used  as  a
+              global,  it must be declared global before scanfile
+              is called (since scanfile sets the matchInfo before
+              the  match  code  is  executed, a subsequent global
+              will override the local variable).   The  following
+              array entries are available:
+
+              matchInfo(line)
+                     Contains  the  text  of the line of the file
+                     that was matched.
+
+              matchInfo(offset)
+                     The byte offset into the file of  the  first
+                     character of the line that was matched.
+
+              matchInfo(linenum)
+                     The   line  number  of  the  line  that  was
+                     matched. This is relative to the first  line
+                     scanned, which is usually, but not necessar-
+                     ily, the first line of the file.  The  first
+                     line is line number one.
+
+              matchInfo(context)
+                     The  context handle of the context that this
+                     scan is associated with.
+
+              matchInfo(handle)
+                     The file id (handle) of the  file  currently
+                     being scanned.
+              matchInfo(copyHandle)
+                     The  file  id (handle) of the file specified
+                     by the -copyfile option.  The  element  does
+                     not exist if -copyfile was not specified.
+
+              matchInfo(submatch0)
+                     Will  contain  the  characters  matching the
+                     first parenthesized subexpression.  The sec-
+                     ond will be contained in submatch1, etc.
+
+              matchInfo(subindex0)
+                     Will  contain the a list of the starting and
+                     ending indices of the  string  matching  the
+                     first parenthesized subexpression.  The sec-
+                     ond will be contained in subindex1, etc.
+
+              All scanmatch patterns that match a  line  will  be
+              processed  in  the  order in which their specifica-
+              tions were added to the scan context.  The  remain-
+              der  of  the scanmatch pattern-command pairs may be
+              skipped for a file line if a continue  is  executed
+              by the Tcl code of a preceding, matched pattern.
+
+              If  a  return  is executed in the body of the match
+              command, the scanfile command currently in progress
+              returns,  with  the  value  passed to return as its
+              return value.
+
+              This command is provided by Extended Tcl.

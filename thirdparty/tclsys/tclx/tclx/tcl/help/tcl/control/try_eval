@@ -1,0 +1,25 @@
+       try_eval code catch ?finally?
+
+              The  try_eval command evaluates code in the current
+              context.
+
+       If an error occurs during the evaluation and catch is  not
+       empty,  then catch is evaluated to handler the error.  The
+       result of the command, containing the error message,  will
+       be  stored  in  a global variable errorResult.  The global
+       variables errorResult, errorInfo  and  errorCode  will  be
+       imported  into the current scope, there is no need to exe-
+       cute a global command.  The result of  the  catch  command
+       becomes  the result of the try_eval command.  If the error
+       that caused the catch to be evaluate is to  be  continued,
+       the following command should be used:
+            error $errorResult $errorCode $errorInfo
+
+       If  the  finally argument is supplied and not empty, it is
+       evaluated after the evaluation of the code and  the  catch
+       commands.  If an error occurs during the evaluation of the
+       finally command, it becomes the  result  of  the  try_eval
+       command.   Otherwise,  the result of either code  or catch
+       is preserved, as described above.
+
+       This command is provided by Extended Tcl.

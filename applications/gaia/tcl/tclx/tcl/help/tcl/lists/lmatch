@@ -1,0 +1,28 @@
+       lmatch ?mode? list pattern
+
+              Search  the  elements  of list, returning a list of
+              all elements matching pattern.  If none  match,  an
+              empty list is returned.
+
+              The mode argument indicates how the elements of the
+              list are to be matched against pattern and it  must
+              have one of the following values:
+
+              -exact The  list  element  must contain exactly the
+                     same string as pattern.
+
+              -glob  Pattern is a  glob-style  pattern  which  is
+                     matched  against each list element using the
+                     same rules as the string match command.
+
+              -regexp
+                     Pattern is treated as a  regular  expression
+                     and  matched against each list element using
+                     the same rules as the regexp command.
+
+              If mode is omitted then it defaults to -glob.
+
+              Only the -exact  comparison  will  work  on  binary
+              data.
+
+              This command is provided by Extended Tcl.

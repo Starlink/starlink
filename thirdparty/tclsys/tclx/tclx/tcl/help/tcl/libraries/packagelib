@@ -1,0 +1,62 @@
+TCL LOADABLE LIBRARIES AND PACKAGES
+       Extended  Tcl supports standard Tcl tclIndex libraries and
+       package libraries. A package library file can contain mul-
+       tiple independent Tcl packages.  A package is a named col-
+       lection of related Tcl procedures and initialization code.
+
+       The package library file is just a regular Unix text file,
+       editable with your favorite text editor, containing  pack-
+       ages  of  Tcl  source  code. The package library file name
+       must have the suffix .tlib.  An index file with  the  same
+       prefix  name  and the suffix .tndx resides the same direc-
+       tory as the .tlib file.  The .tndx will  be  automatically
+       created  whenever  it  is out of date or missing (provided
+       there is write access to the directory).
+
+       The variable auto_path contains a list of directories that
+       are  searched  for  libraries.   The first time an unknown
+       command trap is take, the indexes for  the  libraries  are
+       loaded  into  memory. If the auto_path variable is changed
+       during execution of a program,  it  will  be  re-searched.
+       Only  the  first  package of a given name found during the
+       execution of a program is loaded.  This can be  overridden
+       with loadlibindex command.
+
+       The start of a package is delimited by:
+
+              #@package: package_name proc1 ?..procN?
+
+       These  lines must start in column one.  Everything between
+       the #@package: keyword and the next #@package: keyword  or
+       a  #@packend keyword, or the end of the file, becomes part
+       of  the  named   package.    The   specified   procedures,
+       proc1..procN, are the entry points of the package.  When a
+       command named in a package specification is  executed  and
+       detected  as an unknown command, all code in the specified
+       package will be sourced.  This package should  define  all
+       of  the  procedures  named on the package line, define any
+       support procedures required by  the  package  and  do  any
+       package-specific  initialization.   Packages  declarations
+       maybe continued on subsequent  lines  using  standard  Tcl
+       backslash  line  continuations.   The #@packend keyword is
+       useful to make sure only the minimum required  section  of
+       code  is  sourced.  Thus for example a large comment block
+       at the beginning of the next file won't be loaded.
+
+       Care should be taken  in  defining  package_name,  as  the
+       first  package  found  in the path by with a given name is
+       loaded.  This can be useful in developing new  version  of
+       packages installed on the system.
+
+       For example, in a package source file, the presence of the
+       following line:
+
+              #@package: directory_stack pushd popd dirs
+       says that the text lines following that line in the  pack-
+       age  file  up  to  the next package line or the end of the
+       file is  a  package  named  directory_stack  and  that  an
+       attempt  to  execute  either  pushd, popd or dirs when the
+       routine is not  already  defined  will  cause  the  direc-
+       tory_stack portion of the package file to be loaded.
+
+       This functionality is provided by Extended Tcl.

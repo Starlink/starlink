@@ -1,0 +1,14 @@
+loadlibindex libfile.tlib
+Load the package library index of the library file libfile (which
+must have the suffix .tlib).  Package library indexes  along  the
+auto_path are loaded automatically on the first demand_load; this
+command is provided to explicitly load libraries that are not  in
+the  path.   If  the  index  file  (with a .tndx suffix) does not
+exists or is out of date, it will be  rebuilt  if  the  user  has
+directory  permissions  to  create it. If a package with the same
+name as a package in libfile.tlib has already  been  loaded,  its
+definition  will  be  overridden by the new package.  However, if
+any procedure has actually been used from the previously  defined
+package, the procedures from libfile.tlib will not be loaded.
+
+This command is provided by Extended Tcl.

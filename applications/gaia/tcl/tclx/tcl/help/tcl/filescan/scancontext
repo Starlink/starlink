@@ -1,0 +1,36 @@
+       scancontext ?option?
+              This  command  manages  file scan contexts.  A scan
+              context is a collection of regular expressions  and
+              commands  to  execute  when that regular expression
+              matches a line of the file.   A  context  may  also
+              have  a single default match, to be applied against
+              lines that do not match any of the regular  expres-
+              sions.   Multiple  scan contexts may be defined and
+              they may be reused on multiple files.  A scan  con-
+              text  is identified by a context handle.  The scan-
+              context command takes the following forms:
+
+       scancontext create
+              Create a new scan context.  The  scanmatch  command
+              is  used to define patterns in the context.  A con-
+              texthandle is returned, which  the  Tcl  programmer
+              uses  to refer to the newly created scan context in
+              calls to the Tcl file scanning commands.
+
+       scancontext delete contexthandle
+              Delete  the  scan  context  identified  by  contex-
+              thandle,  and  free all of the match statements and
+              compiled regular expressions  associated  with  the
+              specified context.
+
+       scancontext copyfile contexthandle ?filehandle?
+              Set  or return the file handle that unmatched lines
+              are copied to.  (See scanfile).  If  filehandle  is
+              omitted,  the  copy file handle is returned.  If no
+              copy file is associated with  the  context,  {}  is
+              returned.   If  a  file  handle  is  specified,  it
+              becomes the copy file for this context.   If  file-
+              handle  is {}, then it removes any copy file speci-
+              fication for the context.
+
+              This command is provided by Extended Tcl.

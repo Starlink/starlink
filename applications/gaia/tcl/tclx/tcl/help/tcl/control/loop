@@ -1,0 +1,37 @@
+       loop var first limit ?increment? body
+              Loop  is  a looping command, similar in behavior to
+              the Tcl for statement, except that the loop  state-
+              ment  achieves substantially higher performance and
+              is easier to code when  the  beginning  and  ending
+              values  of  a loop are known, and the loop variable
+              is to be incremented by a known, fixed amount every
+              time through the loop.
+
+               The  var  argument  is  the name of a Tcl variable
+              that will contain the loop index.  The  loop  index
+              is  set  to  the value specified by first.  The Tcl
+              interpreter is  invoked  upon  body  zero  or  more
+              times,  where var is incremented by increment every
+              time through the loop, or by one  if  increment  is
+              not  specified.  Increment can be negative in which
+              case the loop will count downwards.
+
+              When var reaches limit, the loop terminates without
+              a  subsequent  execution of body.  For instance, if
+              the original loop parameters would  cause  loop  to
+              terminate,  say  first  was one, limit was zero and
+              increment was not specified  or  was  non-negative,
+              body is not executed at all and loop returns.
+
+              The  first, limit and increment are integer expres-
+              sions.  They are only evaluated once at the  begin-
+              ning of the loop.
+
+              If  a  continue command is invoked within body then
+              any remaining commands in the current execution  of
+              body  are  skipped,  as  in  the for command.  If a
+              break command is invoked within body then the  loop
+              command  will  return immediately.  Loop returns an
+              empty string.
+
+              This command is provided by Extended Tcl.

@@ -1,0 +1,64 @@
+NAME
+       tk - Manipulate Tk internal state
+
+SYNOPSIS
+       tk option ?arg arg ...?
+
+
+DESCRIPTION
+       The  tk  command provides access to miscellaneous elements
+       of Tk's internal state.  Most of the  information  manipu-
+       lated  by  this  command  pertains to the application as a
+       whole, or to a screen or display, rather than to a partic-
+       ular window.  The command can take any of a number of dif-
+       ferent forms depending on the option argument.  The  legal
+       forms are:
+
+       tk appname ?newName?
+              If  newName  isn't  specified, this command returns
+              the name of the application (the name that  may  be
+              used  in  send  commands  to  communicate  with the
+              application).  If newName is  specified,  then  the
+              name  of the application is changed to newName.  If
+              the given name is already in use, then a suffix  of
+              the form `` #2'' or `` #3'' is appended in order to
+              make the name unique.  The command's result is  the
+              name  actually  chosen.   newName  should not start
+              with a capital letter.  This  will  interfere  with
+              option  processing, since names starting with capi-
+              tals are assumed to be classes;  as  a  result,  Tk
+              may not be able to find some options for the appli-
+              cation.  If sends have been  disabled  by  deleting
+              the  send  command, this command will reenable them
+              and recreate the send command.
+
+       tk scaling ?-displayof window? ?number?
+              Sets and queries the current scaling factor used by
+              Tk  to convert between physical units (for example,
+              points, inches, or millimeters)  and  pixels.   The
+              number  argument  is  a  floating point number that
+              specifies the number of pixels per  point  on  win-
+              dow's  display.  If the window argument is omitted,
+              it defaults to the  main  window.   If  the  number
+              argument is omitted, the current value of the scal-
+              ing factor is returned.
+
+              A ``point'' is a unit of measurement equal to  1/72
+              inch.   A  scaling  factor  of 1.0 corresponds to 1
+              pixel per point, which is equivalent to a  standard
+              72  dpi  monitor.   A  scaling factor of 1.25 would
+              mean 1.25 pixels per point, which  is  the  setting
+              for a 90 dpi monitor; setting the scaling factor to
+              1.25 on a 72 dpi monitor would cause everything  in
+              the application to be displayed 1.25 times as large
+              as normal.   The  initial  value  for  the  scaling
+              factor is set when the application starts, based on
+              properties of the installed monitor, but it can  be
+              changed  at  any time.  Measurements made after the
+              scaling factor is changed will use the new  scaling
+              factor,  but  it is undefined whether existing wid-
+              gets will resize themselves dynamically to  accomo-
+              date the new scaling factor.
+
+KEYWORDS
+       application name, send

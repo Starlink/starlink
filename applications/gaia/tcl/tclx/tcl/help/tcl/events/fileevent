@@ -1,0 +1,103 @@
+NAME
+       fileevent  - Execute a script when a channel becomes read-
+       able or writable
+
+SYNOPSIS
+       fileevent channelId readable ?script?
+
+       fileevent channelId writable ?script?
+
+
+DESCRIPTION
+       This command is used to create  file  event  handlers.   A
+       file  event  handler  is a binding between a channel and a
+       script, such that the script  is  evaluated  whenever  the
+       channel becomes readable or writable.  File event handlers
+       are most commonly used to allow data to be  received  from
+       another  process  on  an  event-driven  basis, so that the
+       receiver can continue to  interact  with  the  user  while
+       waiting for the data to arrive.  If an application invokes
+       gets or read on a blocking channel when there is no  input
+       data  available,  the  process will block; until the input
+       data arrives, it will not be able to service other events,
+       so  it  will  appear  to  the user to ``freeze up''.  With
+       fileevent, the process can tell when data is  present  and
+       only invoke gets or read when they won't block.
+
+       The  channelId  argument  to  fileevent  refers to an open
+       channel, such as the return value from a previous open  or
+       socket command.  If the script argument is specified, then
+       fileevent creates a new event  handler:   script  will  be
+       evaluated   whenever   the  channel  becomes  readable  or
+       writable (depending on the second argument to  fileevent).
+       In this case fileevent returns an empty string.  The read-
+       able and writable event handlers for a file  are  indepen-
+       dent, and may be created and deleted separately.  However,
+       there may be at most one readable and one writable handler
+       for  a  file  at  a given time in a given interpreter.  If
+       fileevent is called when  the  specified  handler  already
+       exists   in  the  invoking  interpreter,  the  new  script
+       replaces the old one.
+
+       If the script argument is not specified, fileevent returns
+       the  current  script  for channelId, or an empty string if
+       there is none.  If the script argument is specified as  an
+       empty string then the event handler is deleted, so that no
+       script will be invoked.  A  file  event  handler  is  also
+       deleted  automatically  whenever  its channel is closed or
+       its interpreter is deleted.
+
+       A channel is considered to be readable if there is  unread
+       data  available  on  the  underlying device.  A channel is
+       also considered to be readable if there is unread data  in
+       an input buffer, except in the special case where the most
+       recent attempt to read from the channel was  a  gets  call
+       that  could  not find a complete line in the input buffer.
+       This feature allows a file to be read a line at a time  in
+       nonblocking  mode using events.  A channel is also consid-
+       ered to be readable if an end of file or  error  condition
+       is present on the underlying file or device.  It is impor-
+       tant for script to check for these conditions  and  handle
+       them  appropriately;   for example, if there is no special
+       check for end of file, an infinite loop  may  occur  where
+       script  reads no data, returns, and is immediately invoked
+       again.
+
+       A channel is considered to be writable  if  at  least  one
+       byte  of  data  can  be  written to the underlying file or
+       device without blocking, or if an error condition is  pre-
+       sent on the underlying file or device.
+
+       Event-driven  I/O  works  best for channels that have been
+       placed into nonblocking mode with the fconfigure  command.
+       In  blocking mode, a puts command may block if you give it
+       more data than the underlying file or device  can  accept,
+       and  a  gets  or read command will block if you attempt to
+       read more data than is ready;  no events will be processed
+       while the commands block.  In nonblocking mode puts, read,
+       and gets never block.  See the documentation for the indi-
+       vidual  commands for information on how they handle block-
+       ing and nonblocking channels.
+
+       The script for a file event is executed  at  global  level
+       (outside  the  context of any Tcl procedure) in the inter-
+       preter in which the fileevent command was invoked.  If  an
+       error  occurs  while executing the script then the bgerror
+       mechanism is used to report the error.  In  addition,  the
+       file event handler is deleted if it ever returns an error;
+       this is done in order to prevent  infinite  loops  due  to
+       buggy handlers.
+
+
+CREDITS
+       fileevent is based on the addinput command created by Mark
+       Diekhans.
+
+
+SEE ALSO
+       bgerror, fconfigure, gets, puts, read
+
+
+KEYWORDS
+       asynchronous I/O, blocking, channel, event  handler,  non-
+       blocking, readable, script, writable.

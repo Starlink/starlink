@@ -1,0 +1,48 @@
+       profile ?-commands? ?-eval? on
+
+       profile off arrayVar
+              This  command is used to collect a performance pro-
+              file of a Tcl script.  It collects data at the  Tcl
+              procedure  level.  The  number of calls to a proce-
+              dure, and the amount of real and CPU time  is  col-
+              lected.  Time is also collected for the global con-
+              text.  The procedure data is collected by bucketing
+              it  based  on the procedure call stack, this allows
+              determination of how much time is spent in  a  par-
+              ticular procedure in each of it's calling contexts.
+
+              The on option enables profile data  collection.  If
+              the -commands option is specified, data on all com-
+              mands within a procedure is  collected  as  well  a
+              procedures.   Multiple  occurrences  of  a  command
+              within a procedure are not distinguished, but  this
+              data may still be useful for analysis.
+
+              The  off  option  turns off profiling and moves the
+              data collected to the array arrayVar.  The array is
+              address  by  a  list  containing the procedure call
+              stack.  Element zero is the top of the  stack,  the
+              procedure  that  the data is for.  The data in each
+              entry is a list consisting of  the  procedure  call
+              count  and  the real time and CPU time in millisec-
+              onds spent in the procedure (but not any procedures
+              it  calls).  The  list  is  in the form {count real
+              cpu}.
+
+              Normally, the  variable  scope  stack  is  used  in
+              reporting where time is spent.  Thus upleveled code
+              is reported in the context that it was executed in,
+              not the context that the uplevel was called in.  If
+              the -eval option is specified, the procedure evalu-
+              ation (call) stack is used instead of the procedure
+              scope stack.  Upleveled code  is  reported  in  the
+              context of the procedure that did the uplevel.
+
+              A  Tcl  procedure  profrep is supplied for reducing
+              the data and producing a report.
+
+              On Windows  95/NT,  profile  command  only  reports
+              elasped real time, CPU time is not available and is
+              reported as zero.
+
+              This command is provided by Extended Tcl.

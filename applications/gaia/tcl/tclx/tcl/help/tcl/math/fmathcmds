@@ -1,0 +1,12 @@
+       The following procedures provide command interfaces to the
+       expr math functions. They take the same arguments  as  the
+       expr functions and may take expressions as arguments.
+
+              abs         acos        asin       atan2
+              atan        ceil        cos        cosh
+              double      exp         floor      fmod
+              hypot       int         log10      log
+              pow         round       sin        sinh
+              sqrt        tan         tanh
+
+       These procedures are provided by Extended Tcl.

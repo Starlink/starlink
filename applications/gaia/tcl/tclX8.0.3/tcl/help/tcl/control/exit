@@ -1,0 +1,15 @@
+NAME
+       exit - End the application
+
+SYNOPSIS
+       exit ?returnCode?
+
+
+DESCRIPTION
+       Terminate  the process, returning returnCode to the system
+       as the exit status.  If returnCode isn't specified then it
+       defaults to 0.
+
+
+KEYWORDS
+       exit, process

@@ -1,0 +1,10 @@
+       keylset listvar key value ?key2 value2 ...?
+              Set  the  value  associated  with key, in the keyed
+              list contained in the variable listvar,  to  value.
+              If  listvar does not exists, it is created.  If key
+              is not currently in the list, it will be added.  If
+              it  already  exists,  value  replaces  the existing
+              value.  Multiple keywords and values may be  speci-
+              fied, if desired.
+
+              This command is provided by Extended Tcl.

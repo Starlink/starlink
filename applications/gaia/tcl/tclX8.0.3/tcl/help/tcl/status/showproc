@@ -1,0 +1,8 @@
+       showproc ?procname ...?
+              This  procedure  lists  the definition of the named
+              procedures.  Loading them  if  it  is  not  already
+              loaded.   If  no  procedure names are supplied, the
+              definitions of all currently loaded procedures  are
+              returned.
+
+              This procedure is provided by Extended Tcl.

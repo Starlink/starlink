@@ -1,0 +1,13 @@
+       random limit | seed ?seedval?
+              Generate a pseudorandom integer number greater than
+              or equal to zero and less than limit.  If  seed  is
+              specified,  then the command resets the random num-
+              ber generator to a starting point derived from  the
+              seedval.  This allows one to reproduce pseudorandom
+              number sequences for testing purposes.  If  seedval
+              is  omitted,  then the seed is set to a value based
+              on current system state and the current time,  pro-
+              viding  a  reasonably interesting and ever-changing
+              seed.
+
+              This command is provided by Extended Tcl.

@@ -1,0 +1,109 @@
+NAME
+       grab  -  Confine  pointer  and keyboard events to a window
+       sub-tree
+
+SYNOPSIS
+       grab ?-global? window
+
+       grab option ?arg arg ...?
+
+
+DESCRIPTION
+       This command implements simple pointer and keyboard  grabs
+       for Tk.  Tk's grabs are different than the grabs described
+       in the Xlib documentation.  When a grab is set for a  par-
+       ticular  window,  Tk  restricts  all pointer events to the
+       grab window and its descendants in Tk's window  hierarchy.
+       Whenever  the pointer is within the grab window's subtree,
+       the pointer will behave exactly the same as if  there  had
+       been no grab at all and all events will be reported in the
+       normal fashion.  When  the  pointer  is  outside  window's
+       tree,  button presses and releases and mouse motion events
+       are reported to window, and window entry and  window  exit
+       events   are  ignored.   The  grab  subtree  ``owns''  the
+       pointer: windows outside the grab subtree will be  visible
+       on  the screen but they will be insensitive until the grab
+       is released.  The tree of windows underneath the grab win-
+       dow  can  include  top-level windows, in which case all of
+       those top-level windows and their  descendants  will  con-
+       tinue to receive mouse events during the grab.
+
+       Two  forms  of  grabs  are possible:  local and global.  A
+       local grab affects only the grabbing application:   events
+       will  be reported to other applications as if the grab had
+       never occurred.  Grabs are local  by  default.   A  global
+       grab  locks  out  all  applications on the screen, so that
+       only the given subtree of the grabbing application will be
+       sensitive  to  pointer events (mouse button presses, mouse
+       button releases, pointer motions, window entries, and win-
+       dow  exits).   During global grabs the window manager will
+       not receive pointer events either.
+
+       During local grabs, keyboard events (key presses  and  key
+       releases) are delivered as usual:  the window manager con-
+       trols which application receives keyboard events,  and  if
+       they  are  sent  to any window in the grabbing application
+       then they are redirected to the focus  window.   During  a
+       global  grab  Tk  grabs  the keyboard so that all keyboard
+       events are always sent to the grabbing  application.   The
+       focus  command  is still used to determine which window in
+       the application receives the keyboard  events.   The  key-
+       board grab is released when the grab is released.
+
+       Grabs apply to particular displays.  If an application has
+       windows on multiple  displays  then  it  can  establish  a
+       separate  grab  on each display.  The grab on a particular
+       display affects only the windows on that display.   It  is
+       possible for different applications on a single display to
+       have simultaneous local grabs, but  only  one  application
+       can have a global grab on a given display at once.
+
+       The grab command can take any of the following forms:
+
+       grab ?-global? window
+              Same as grab set, described below.
+
+       grab current ?window?
+              If  window  is  specified,  returns the name of the
+              current grab window in this  application  for  win-
+              dow's  display,  or  an empty string if there is no
+              such window.  If window  is  omitted,  the  command
+              returns  a  list whose elements are all of the win-
+              dows grabbed by this application for all  displays,
+              or an empty string if the application has no grabs.
+
+       grab release window
+              Releases the grab on window if there is one, other-
+              wise does nothing.  Returns an empty string.
+
+       grab set ?-global? window
+              Sets  a  grab  on  window.  If -global is specified
+              then the grab is global, otherwise it is local.  If
+              a  grab  was already in effect for this application
+              on  window's  display  then  it  is   automatically
+              released.  If there is already a grab on window and
+              it has the same global/local form as the  requested
+              grab,  then  the  command does nothing.  Returns an
+              empty string.
+
+       grab status window
+              Returns none if no grab is currently set on window,
+              local  if a local grab is set on window, and global
+              if a global grab is set.
+
+
+BUGS
+       It took an incredibly complex and gross implementation  to
+       produce the simple grab effect described above.  Given the
+       current implementation, it isn't safe for applications  to
+       use  the Xlib grab facilities at all except through the Tk
+       grab procedures.  If applications try  to  manipulate  X's
+       grab mechanisms directly, things will probably break.
+
+       If  a  single  process  is  managing  several different Tk
+       applications, only one of those applications  can  have  a
+       local  grab for a given display at any given time.  If the
+       applications are in different processes, this  restriction
+       doesn't exist.
+KEYWORDS
+       grab, keyboard events, pointer events, window

@@ -1,0 +1,22 @@
+NAME
+       unset - Delete variables
+
+SYNOPSIS
+       unset name ?name name ...?
+
+
+DESCRIPTION
+       This  command removes one or more variables.  Each name is
+       a variable name, specified in any of the  ways  acceptable
+       to  the set command.  If a name refers to an element of an
+       array then that element is removed without  affecting  the
+       rest  of  the  array.  If a name consists of an array name
+       with no parenthesized index,  then  the  entire  array  is
+       deleted.   The  unset  command  returns an empty string as
+       result.  An error occurs if any of the  variables  doesn't
+       exist,  and  any  variables after the non-existent one are
+       not deleted.
+
+
+KEYWORDS
+       remove, variable

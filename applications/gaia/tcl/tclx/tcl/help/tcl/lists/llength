@@ -1,0 +1,14 @@
+NAME
+       llength - Count the number of elements in a list
+
+SYNOPSIS
+       llength list
+
+
+DESCRIPTION
+       Treats  list as a list and returns a decimal string giving
+       the number of elements in it.
+
+
+KEYWORDS
+       element, list, length

@@ -1,0 +1,27 @@
+NAME
+       vwait - Process events until a variable is written
+
+SYNOPSIS
+       vwait varName
+
+
+DESCRIPTION
+       This  command enters the Tcl event loop to process events,
+       blocking the application if no events are ready.  It  con-
+       tinues processing events until some event handler sets the
+       value of variable varName.  Once varName has been set, the
+       vwait  command  will  return  as soon as the event handler
+       that modified varName completes.
+
+       In some cases the vwait command may not return immediately
+       after  varName  is set.  This can happen if the event han-
+       dler that sets varName does not complete immediately.  For
+       example,  if an event handler sets varName and then itself
+       calls vwait to wait for a different variable, then it  may
+       not  return  for  a  long time.  During this time the top-
+       level vwait is blocked waiting for the  event  handler  to
+       complete, so it cannot return either.
+
+
+KEYWORDS
+       event, variable, wait

@@ -1,0 +1,5 @@
+       echo ?str ...?
+              Writes  zero  or  more  strings to standard output,
+              followed by a newline.
+
+              This command is provided by Extended Tcl.

@@ -1,0 +1,8 @@
+       times
+              Return a list containing the process and child exe-
+              cution times in the form:
+                   utime stime cutime cstime
+              Also see the times(2) system call manual page.  The
+              values are in milliseconds.
+
+              This command is provided by Extended Tcl.

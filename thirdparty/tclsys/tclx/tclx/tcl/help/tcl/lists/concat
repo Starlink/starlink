@@ -1,0 +1,23 @@
+NAME
+       concat - Join lists together
+
+SYNOPSIS
+       concat ?arg arg ...?
+
+
+DESCRIPTION
+       This  command  treats each argument as a list and concate-
+       nates them into a single list.  It also eliminates leading
+       and trailing spaces in the arg's and adds a single separa-
+       tor space between arg's.  It permits any number  of  argu-
+       ments.  For example, the command
+              concat a b {c d e} {f {g h}}
+       will return
+              a b c d e f {g h}
+       as its result.
+
+       If no args are supplied, the result is an empty string.
+
+
+KEYWORDS
+       concatenate, join, lists

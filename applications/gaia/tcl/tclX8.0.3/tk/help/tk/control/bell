@@ -1,0 +1,22 @@
+NAME
+       bell - Ring a display's bell
+
+SYNOPSIS
+       bell ?-displayof window?
+
+
+DESCRIPTION
+       This  command rings the bell on the display for window and
+       returns an empty string.   If  the  -displayof  option  is
+       omitted,  the  display of the application's main window is
+       used by default.   The  command  uses  the  current  bell-
+       related  settings  for  the display, which may be modified
+       with programs such as xset.
+
+       This command also resets the screen saver for the  screen.
+       Some screen savers will ignore this, but others will reset
+       so that the screen becomes visible again.
+
+
+KEYWORDS
+       beep, bell, ring

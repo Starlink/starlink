@@ -1,0 +1,17 @@
+       chmod [-fileid] mode filelist
+              Set  permissions  of  each of the files in the list
+              filelist to mode, where mode is an absolute numeric
+              mode   or  symbolic  permissions  as  in  the  UNIX
+              chmod(1) command.  To specify a mode as  octal,  it
+              should be prefixed with a "0" (e.g. 0622).
+
+              If  the  option -fileid is specified, filelist is a
+              list of open file identifiers rather than a list of
+              file  names.   This  option is not available on all
+              Unix systems.  Use the infox have_fchmod command to
+              determine if this functionality is available.
+
+              The  chmod  command  is  not  available  on Windows
+              95/NT.
+
+              This command is provided by Extended Tcl.

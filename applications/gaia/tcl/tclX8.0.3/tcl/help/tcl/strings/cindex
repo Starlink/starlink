@@ -1,0 +1,11 @@
+       cindex string indexExpr
+              Returns  the  character  indexed  by the expression
+              indexExpr (zero based) from string.
+
+              If the expression indexExpr starts with the  string
+              end,  then  end  is  replaced with the index of the
+              last character in the string.   If  the  expression
+              starts  with  len,  then  len  is replaced with the
+              length of the string.
+
+              This command is provided by Extended Tcl.

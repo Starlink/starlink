@@ -1,0 +1,5 @@
+#!/bin/sh
+# script for running TclX before installation
+
+TCL=@bldbasedir@/tcl/unix/tcl.standalone
+exec $TCL ${1+"$@"}

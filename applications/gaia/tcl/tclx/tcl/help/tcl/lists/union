@@ -1,0 +1,6 @@
+       union lista listb
+              Procedure  to  return  the logical union of the two
+              specified  lists.   Any  duplicate   elements   are
+              removed.
+
+              This procedure is provided by Extended Tcl.

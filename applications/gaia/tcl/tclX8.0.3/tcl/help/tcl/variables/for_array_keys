@@ -1,0 +1,6 @@
+       for_array_keys var array_name code
+              This  procedure  performs  a foreach-style loop for
+              each key in the named array.  The  break  and  con-
+              tinue statements work as with foreach.
+
+              This procedure is provided by Extended Tcl.

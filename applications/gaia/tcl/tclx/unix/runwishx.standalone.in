@@ -1,0 +1,6 @@
+#!/bin/sh
+# script for running wishx before installation
+
+WISHX=@bldbasedir@/tk/unix/wishx.standalone
+export LD_LIBRARY_PATH SHLIB_PATH
+exec $WISHX ${1+"$@"}

@@ -1,0 +1,18 @@
+       lvarpop var ?indexExpr? ?string?
+              The  lvarpop  command  pops  (deletes)  the element
+              indexed by the expression indexExpr from  the  list
+              contained  in  the variable var.  If index is omit-
+              ted, then 0 is assumed.  If string,  is  specified,
+              then the deleted element is replaced by string. The
+              replaced or  deleted  element  is  returned.   Thus
+              ``lvarpop  argv  0''  returns  the first element of
+              argv, setting argv to contain the remainder of  the
+              string.
+
+              If  the expression indexExpr starts with the string
+              end, then end is replaced with  the  index  of  the
+              last element in the list.  If the expression starts
+              with len, then len is replaced with the  length  of
+              the list.
+
+              This command is provided by Extended Tcl.

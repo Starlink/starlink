@@ -1,0 +1,16 @@
+       lassign list var ?var...?
+              Assign  successive  elements of a list to specified
+              variables.  If there are more variable  names  than
+              fields,  the  remaining  variables  are  set to the
+              empty string.  If  there  are  more  elements  than
+              variables,  a  list  of  the unassigned elements is
+              returned.
+
+              For example,
+
+                  lassign {dave 100 200 {Dave Foo}} name uid gid longName
+
+              Assigns name to ``dave'', uid to  ``100'',  gid  to
+              ``200'', and longName to ``Dave Foo''.
+
+              This command is provided by Extended Tcl.

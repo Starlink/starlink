@@ -1,0 +1,8 @@
+buildpackageindex libfilelist
+Build  index  files  for  package  libraries.   The argument lib-
+filelist is a list of package libraries.  Each name must end with
+the suffix .tlib.  A corresponding .tndx file will be built.  The
+user must have write access  to  the  directory  containing  each
+library.
+
+This procedure is provided by Extended Tcl.

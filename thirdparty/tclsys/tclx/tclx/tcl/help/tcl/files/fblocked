@@ -1,0 +1,24 @@
+NAME
+       fblocked - Test whether the last input operation exhausted
+       all available input
+
+SYNOPSIS
+       fblocked channelId
+
+
+DESCRIPTION
+       The fblocked command returns 1 if the  most  recent  input
+       operation  on  channelId  returned  less  information than
+       requested because all available input was exhausted.   For
+       example,  if  gets  is  invoked  when there are only three
+       characters  available  for  input   and   no   end-of-line
+       sequence,  gets  returns  an empty string and a subsequent
+       call to fblocked will return 1.
+
+
+SEE ALSO
+       gets(n), read(n)
+
+
+KEYWORDS
+       blocking, nonblocking

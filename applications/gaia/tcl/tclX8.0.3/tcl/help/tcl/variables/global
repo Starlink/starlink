@@ -1,0 +1,24 @@
+NAME
+       global - Access global variables
+
+SYNOPSIS
+       global varname ?varname ...?
+
+
+DESCRIPTION
+       This  command  is  ignored unless a Tcl procedure is being
+       interpreted.  If so then it declares the  given  varname's
+       to  be  global  variables  rather than local ones.  Global
+       variables are variables in the global namespace.  For  the
+       duration  of the current procedure (and only while execut-
+       ing in the current procedure), any reference to any of the
+       varnames  will  refer  to  the global variable by the same
+       name.
+
+
+SEE ALSO
+       namespace(n), variable(n)
+
+
+KEYWORDS
+       global, namespace, procedure, variable

@@ -1,0 +1,13 @@
+       crange string firstExpr lastExpr
+              Returns  a range of characters from string starting
+              at the character indexed by the  expression  first-
+              Expr  (zero-based)  until  the character indexed by
+              the expression lastExpr.
+
+              If the expression firstExpr or lastExpr starts with
+              the string end, then end is replaced with the index
+              of the  last  character  in  the  string.   If  the
+              expression  starts  with  len, then len is replaced
+              with the length of the string.
+
+              This command is provided by Extended Tcl.

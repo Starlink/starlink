@@ -1,0 +1,8 @@
+       lvarcat var string ?string...?
+              This  command treats each string argument as a list
+              and concatenates them to the end of the contents of
+              var,  forming  a a single list.  The list is stored
+              back into var and also returned as the result.   if
+              var does not exist, it is created.
+
+              This command is provided by Extended Tcl.

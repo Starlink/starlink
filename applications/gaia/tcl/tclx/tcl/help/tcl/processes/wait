@@ -1,0 +1,45 @@
+       wait ?-nohang? ?-untraced? ?-pgroup? ?pid?
+              Waits  for a process created with the execl command
+              to terminate, either due to an untrapped signal  or
+              call to exit system call.  If the process id pid is
+              specified, they wait  on  that  process,  otherwise
+              wait on any child process to terminate.
+
+              If  -nohang  is specified, then don't block waiting
+              on a process to terminate.  If no process is  imme-
+              diately   available,  return  an  empty  list.   If
+              -untraced is specified then  the  status  of  child
+              processes  that  are  stopped, and whose status has
+              not yet been reported since they stopped, are  also
+              returned.   If  -pgroup is specified and pid is not
+              specified, then wait on  any  child  process  whose
+              process  groupd ID is they same as the calling pro-
+              cess. If pid is specified with -pgroup, then it  is
+              take  as a process group ID, waiting on any process
+              in that process group to terminate.
+
+              Wait returns a list containing three elements:  The
+              first element is the process id of the process that
+              terminated.  If the process  exited  normally,  the
+              second  element  is  `EXIT', and the third contains
+              the numeric exit code.  If the  process  terminated
+              due  to  a signal, the second element is `SIG', and
+              the third contains the signal name.  If the process
+              is  currently  stopped  (on  systems  that  support
+              SIGSTP), the second element is `STOP', followed  by
+              the signal name.
+
+              Note  that  it  is possible to wait on processes to
+              terminate that were create in the  background  with
+              the  exec command.  However, if any other exec com-
+              mand is executed after the process terminates, then
+              the  process status will be reaped by the exec com-
+              mand and will not be available to the wait command.
+
+              On  systems  without  the  waitpid system call, the
+              -nohang, -untraced  and  -pgroup  options  are  not
+              available.   The  infox  have_waitpid command maybe
+              use to determine if this  functionality  is  avail-
+              able.
+
+              This command is provided by Extended Tcl.

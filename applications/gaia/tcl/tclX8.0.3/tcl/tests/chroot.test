@@ -1,0 +1,91 @@
+#
+# chroot.test
+#
+# Tests for the chroot command.
+#---------------------------------------------------------------------------
+# Copyright 1993-1997 Karl Lehenbauer and Mark Diekhans.
+#
+# Permission to use, copy, modify, and distribute this software and its
+# documentation for any purpose and without fee is hereby granted, provided
+# that the above copyright notice appear in all copies.  Karl Lehenbauer and
+# Mark Diekhans make no representations about the suitability of this
+# software for any purpose.  It is provided "as is" without express or
+# implied warranty.
+#------------------------------------------------------------------------------
+# $Id: 
+#------------------------------------------------------------------------------
+#
+
+if [cequal [info procs Test] {}] {source testlib.tcl}
+
+#
+# Fork without exec will not work under Tk, skip this test
+#
+if ![lempty [info commands button]] {
+    puts "*************************************************************"
+    puts "Chroot tests are constructed in a way that does not work"
+    puts "under Tk.  Test skipped."
+    puts "*************************************************************"
+    puts ""
+    return
+}
+
+Test chroot-1.1 {chroot tests} {
+    chroot
+} 1 {wrong # args: chroot path} {unixOnly}
+
+Test chroot-1.2 {chroot tests} {
+    chroot a b
+} 1 {wrong # args: chroot path} {unixOnly}
+
+Test chroot-1.3 {chroot tests} {
+    chroot a
+} 1 {chroot is not available on MS Windows} {pcOnly}
+
+#
+# Actually doing something real with chroot only makes sense on unix.
+#
+if ![cequal $tcl_platform(platform) "unix"] {
+    return
+}
+
+if {[id user] != "root"} {
+    puts "*************************************************************"
+    puts "You are not running as `root', certain chroot tests will be"
+    puts "skipped"
+    puts "*************************************************************"
+    return
+}
+
+#
+# clean up and create an empty test directory
+#
+catch {file delete -force CHROOTDIR}
+file mkdir CHROOTDIR
+
+#
+# since you can't chroot back up, we spawn a child process to do the
+# actual chroot
+#
+set pid [fork]
+
+#
+# parent waits for child to complete
+#
+if {$pid > 0} {
+    wait $pid
+    file delete -force CHROOTDIR
+    return
+}
+
+#
+# child tests chroot then exits
+#
+Test chroot-2.1 {chroot tests} {
+    chroot CHROOTDIR
+    glob -nocomplain /*
+} 0 {}
+
+exit
+
+

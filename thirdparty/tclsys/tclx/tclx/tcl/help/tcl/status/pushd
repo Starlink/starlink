@@ -1,0 +1,7 @@
+       pushd ?dir?
+              This procedure pushs the current directory onto the
+              directory stack and cd to the specified  directory.
+              If the directory is not specified, then the current
+              directory is pushed, but remains unchanged.
+
+              This procedure is provided by Extended Tcl.

@@ -1,0 +1,39 @@
+NAME
+       read - Read from a channel
+
+SYNOPSIS
+       read ?-nonewline? channelId
+
+       read channelId numBytes
+
+
+DESCRIPTION
+       In  the first form, the read command reads all of the data
+       from channelId up to the end of the file.  If the  -nonew-
+       line  switch  is  specified then the last character of the
+       file is discarded if it is a newline.  In the second form,
+       the  extra  argument  specifies  how  many  bytes to read.
+       Exactly that many bytes will be read and returned,  unless
+       there  are  fewer than numBytes left in the file;  in this
+       case all the remaining bytes are returned.
+
+       If channelId is in nonblocking mode, the command  may  not
+       read as many bytes as requested:  once all available input
+       has been read, the command will return the  data  that  is
+       available  rather  than  blocking  for  more  input.   The
+       -nonewline switch is ignored if the command returns before
+       reaching the end of the file.
+
+       Read  translates  end-of-line  sequences in the input into
+       newline characters according to  the  -translation  option
+       for  the channel.  See the manual entry for fconfigure for
+       details on the -translation option.
+
+
+SEE ALSO
+       eof(n), fblocked(n), fconfigure(n)
+
+
+KEYWORDS
+       blocking, channel, end of line, end of file,  nonblocking,
+       read, translation

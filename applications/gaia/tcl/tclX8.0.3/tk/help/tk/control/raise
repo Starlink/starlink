@@ -1,0 +1,27 @@
+NAME
+       raise - Change a window's position in the stacking order
+
+SYNOPSIS
+       raise window ?aboveThis?
+
+
+DESCRIPTION
+       If  the  aboveThis  argument  is  omitted then the command
+       raises window so that it is above all of its  siblings  in
+       the  stacking  order  (it will not be obscured by any sib-
+       lings and will obscure any siblings that overlap it).   If
+       aboveThis  is specified then it must be the path name of a
+       window that is either a sibling of window or  the  descen-
+       dant  of a sibling of window.  In this case the raise com-
+       mand will insert window into the stacking order just above
+       aboveThis  (or the ancestor of aboveThis that is a sibling
+       of window); this could end up either raising  or  lowering
+       window.
+
+
+SEE ALSO
+       lower
+
+
+KEYWORDS
+       obscure, raise, stacking order

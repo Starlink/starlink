@@ -1,0 +1,539 @@
+NAME
+       wm - Communicate with window manager
+
+SYNOPSIS
+       wm option window ?args?
+
+
+DESCRIPTION
+       The wm command is used to interact with window managers in
+       order to control such things as the title  for  a  window,
+       its  geometry,  or the increments in terms of which it may
+       be resized.  The wm command can take any of  a  number  of
+       different forms, depending on the option argument.  All of
+       the forms expect at least one additional argument, window,
+       which must be the path name of a top-level window.
+
+       The legal forms for the wm command are:
+
+       wm aspect window ?minNumer minDenom maxNumer maxDenom?
+              If  minNumer,  minDenom, maxNumer, and maxDenom are
+              all specified, then they will be passed to the win-
+              dow  manager and the window manager should use them
+              to enforce a range of acceptable aspect ratios  for
+              window.   The aspect ratio of window (width/length)
+              will be constrained to lie between  minNumer/minDe-
+              nom  and  maxNumer/maxDenom.   If minNumer etc. are
+              all specified as empty strings, then  any  existing
+              aspect ratio restrictions are removed.  If minNumer
+              etc. are specified, then  the  command  returns  an
+              empty  string.   Otherwise,  it  returns a Tcl list
+              containing four elements,  which  are  the  current
+              values  of minNumer, minDenom, maxNumer, and maxDe-
+              nom (if no aspect restrictions are in effect,  then
+              an empty string is returned).
+
+       wm client window ?name?
+              If  name  is  specified,  this  command stores name
+              (which should be the name of the host on which  the
+              application     is     executing)    in    window's
+              WM_CLIENT_MACHINE property for use  by  the  window
+              manager or session manager.  The command returns an
+              empty string in this case.  If  name  isn't  speci-
+              fied, the command returns the last name set in a wm
+              client command for window.  If name is specified as
+              an   empty   string,   the   command   deletes  the
+              WM_CLIENT_MACHINE property from window.
+
+       wm colormapwindows window ?windowList?
+              This command is  used  to  manipulate  the  WM_COL-
+              ORMAP_WINDOWS  property, which provides information
+              to the window managers about windows that have pri-
+              vate colormaps.  If windowList isn't specified, the
+              command returns a list whose elements are the names
+              of the windows in the WM_COLORMAP_WINDOWS property.
+              If windowList is specified, it consists of  a  list
+              of  window  path names;  the command overwrites the
+              WM_COLORMAP_WINDOWS property with the given windows
+              and  returns an empty string.  The WM_COLORMAP_WIN-
+              DOWS property should normally contain a list of the
+              internal windows within window whose colormaps dif-
+              fer from their parents.  The order of  the  windows
+              in  the  property  indicates  a priority order: the
+              window manager will attempt to install as many col-
+              ormaps  as possible from the head of this list when
+              window gets the colormap focus.  If window  is  not
+              included   among  the  windows  in  windowList,  Tk
+              implicitly adds  it  at  the  end  of  the  WM_COL-
+              ORMAP_WINDOWS  property,  so  that  its colormap is
+              lowest in priority.  If wm colormapwindows  is  not
+              invoked, Tk will automatically set the property for
+              each top-level window to all the  internal  windows
+              whose colormaps differ from their parents, followed
+              by the top-level itself;  the order of the internal
+              windows  is undefined.  See the ICCCM documentation
+              for more  information  on  the  WM_COLORMAP_WINDOWS
+              property.
+
+       wm command window ?value?
+              If value is specified, this command stores value in
+              window's WM_COMMAND property for use by the  window
+              manager  or  session  manager  and returns an empty
+              string.  Value must  have  proper  list  structure;
+              the  elements  should contain the words of the com-
+              mand used to  invoke  the  application.   If  value
+              isn't  specified  then the command returns the last
+              value set in a wm command command for  window.   If
+              value  is specified as an empty string, the command
+              deletes the WM_COMMAND property from window.
+
+       wm deiconify window
+              Arrange for window to be displayed in normal  (non-
+              iconified)  form.  This is done by mapping the win-
+              dow.  If the window has never been mapped then this
+              command will not map the window, but it will ensure
+              that when the window is first  mapped  it  will  be
+              displayed  in  de-iconified form.  Returns an empty
+              string.
+
+       wm focusmodel window ?active|passive?
+              If active or passive is  supplied  as  an  optional
+              argument  to  the  command,  then  it specifies the
+              focus model for window.  In this case  the  command
+              returns an empty string.  If no additional argument
+              is supplied, then the command returns  the  current
+              focus  model  for  window.   An  active focus model
+              means that window will claim the  input  focus  for
+              itself  or  its descendants, even at times when the
+              focus  is  currently  in  some  other  application.
+              Passive  means  that  window  will  never claim the
+              focus for itself:  the window manager  should  give
+              the focus to window at appropriate times.  However,
+              once the focus has been given to window or  one  of
+              its  descendants, the application may re-assign the
+              focus among window's descendants.  The focus  model
+              defaults to passive, and Tk's focus command assumes
+              a passive model of focusing.
+
+       wm frame window
+              If window has been reparented by the window manager
+              into  a  decorative  frame, the command returns the
+              platform specific window identifier for the  outer-
+              most  frame  that contains window (the window whose
+              parent is the root or  virtual  root).   If  window
+              hasn't  been  reparented by the window manager then
+              the command returns the  platform  specific  window
+              identifier for window.
+
+       wm geometry window ?newGeometry?
+              If  newGeometry  is specified, then the geometry of
+              window is changed and an empty string is  returned.
+              Otherwise   the  current  geometry  for  window  is
+              returned (this is the most recent  geometry  speci-
+              fied  either by manual resizing or in a wm geometry
+              command).   NewGeometry  has  the   form   =widthx-
+              height+-x+-y,  where  any  of  =,  widthxheight, or
+              +-x+-y may be omitted.  Width and height are  posi-
+              tive  integers specifying the desired dimensions of
+              window.  If window is gridded (see GRIDDED GEOMETRY
+              MANAGEMENT below) then the dimensions are specified
+              in grid units;  otherwise  they  are  specified  in
+              pixel  units.  X and y specify the desired location
+              of window on the screen, in pixels.  If x  is  pre-
+              ceded  by  +,  it  specifies  the  number of pixels
+              between the left edge of the screen  and  the  left
+              edge  of  window's border;  if preceded by - then x
+              specifies the number of pixels  between  the  right
+              edge  of  the screen and the right edge of window's
+              border.  If y is preceded by +  then  it  specifies
+              the  number of pixels between the top of the screen
+              and the top of window's border;  if y  is  preceded
+              by - then it specifies the number of pixels between
+              the bottom of window's border and the bottom of the
+              screen.   If  newGeometry  is specified as an empty
+              string then any  existing  user-specified  geometry
+              for window is cancelled, and the window will revert
+              to the size requested internally by its widgets.
+
+       wm grid window ?baseWidth baseHeight widthInc heightInc?
+              This command indicates that window is to be managed
+              as  a  gridded window.  It also specifies the rela-
+              tionship  between  grid  units  and  pixel   units.
+              BaseWidth and baseHeight specify the number of grid
+              units  corresponding  to   the   pixel   dimensions
+              requested internally by window using Tk_GeometryRe-
+              quest.  WidthInc and heightInc specify  the  number
+              of  pixels  in  each  horizontal  and vertical grid
+              unit.  These  four  values  determine  a  range  of
+              acceptable sizes for window, corresponding to grid-
+              based widths  and  heights  that  are  non-negative
+              integers.   Tk  will  pass  this information to the
+              window manager;  during manual resizing, the window
+              manager  will  restrict the window's size to one of
+              these acceptable sizes.  Furthermore, during manual
+              resizing  the  window manager will display the win-
+              dow's current size in terms of  grid  units  rather
+              than  pixels.   If baseWidth etc. are all specified
+              as empty strings, then window  will  no  longer  be
+              managed as a gridded window.  If baseWidth etc. are
+              specified then the return value is an empty string.
+              Otherwise the return value is a Tcl list containing
+              four  elements   corresponding   to   the   current
+              baseWidth, baseHeight, widthInc, and heightInc;  if
+              window is not  currently  gridded,  then  an  empty
+              string  is returned.  Note: this command should not
+              be needed very often, since the Tk_SetGrid  library
+              procedure  and  the  setGrid  option provide easier
+              access to the same functionality.
+
+       wm group window ?pathName?
+              If pathName is specified, it gives  the  path  name
+              for  the leader of a group of related windows.  The
+              window manager may use this information, for  exam-
+              ple,  to  unmap  all of the windows in a group when
+              the group's leader is iconified.  PathName  may  be
+              specified  as an empty string to remove window from
+              any group association.  If  pathName  is  specified
+              then  the  command returns an empty string;  other-
+              wise it returns the path name of  window's  current
+              group  leader,  or  an empty string if window isn't
+              part of any group.
+
+       wm iconbitmap window ?bitmap?
+              If bitmap is specified, then it names a  bitmap  in
+              the  standard forms accepted by Tk (see the Tk_Get-
+              Bitmap manual entry for details).  This  bitmap  is
+              passed  to  the  window  manager to be displayed in
+              window's icon, and the  command  returns  an  empty
+              string.   If  an  empty  string  is  specified  for
+              bitmap, then any current icon bitmap  is  cancelled
+              for  window.   If bitmap is specified then the com-
+              mand returns an empty string.  Otherwise it returns
+              the name of the current icon bitmap associated with
+              window, or an empty string if window  has  no  icon
+              bitmap.
+       wm iconify window
+              Arrange  for  window  to  be  iconified.  It window
+              hasn't yet been mapped for  the  first  time,  this
+              command will arrange for it to appear in the iconi-
+              fied state when it is eventually mapped.
+
+       wm iconmask window ?bitmap?
+              If bitmap is specified, then it names a  bitmap  in
+              the  standard forms accepted by Tk (see the Tk_Get-
+              Bitmap manual entry for details).  This  bitmap  is
+              passed  to  the window manager to be used as a mask
+              in conjunction with the iconbitmap  option:   where
+              the  mask  has  zeroes  no  icon will be displayed;
+              where it has ones, the bits from  the  icon  bitmap
+              will be displayed.  If an empty string is specified
+              for bitmap then any current icon mask is  cancelled
+              for  window  (this  is  equivalent  to specifying a
+              bitmap of all ones).  If bitmap is  specified  then
+              the  command returns an empty string.  Otherwise it
+              returns the name of the current icon  mask  associ-
+              ated  with window, or an empty string if no mask is
+              in effect.
+
+       wm iconname window ?newName?
+              If newName is specified, then it is passed  to  the
+              window  manager;  the window manager should display
+              newName inside the icon associated with window.  In
+              this  case  an  empty string is returned as result.
+              If newName isn't specified then the command returns
+              the  current  icon  name  for  window,  or an empty
+              string if no icon name has been specified (in  this
+              case  the  window manager will normally display the
+              window's title, as specified with the wm title com-
+              mand).
+
+       wm iconposition window ?x y?
+              If  x  and  y are specified, they are passed to the
+              window manager as a hint about  where  to  position
+              the  icon for window.  In this case an empty string
+              is returned.  If x and y  are  specified  as  empty
+              strings  then  any  existing  icon position hint is
+              cancelled.  If neither x nor y is  specified,  then
+              the  command returns a Tcl list containing two val-
+              ues, which are the current icon position hints  (if
+              no  hints  are  in  effect  then an empty string is
+              returned).
+
+       wm iconwindow window ?pathName?
+              If pathName is specified, it is the path name for a
+              window  to  use  as icon for window: when window is
+              iconified then pathName will be mapped to serve  as
+              icon, and when window is de-iconified then pathName
+              will be unmapped again.  If pathName  is  specified
+              as  an  empty  string then any existing icon window
+              association for window will be cancelled.   If  the
+              pathName argument is specified then an empty string
+              is returned.  Otherwise  the  command  returns  the
+              path name of the current icon window for window, or
+              an empty string if there is  no  icon  window  cur-
+              rently  specified  for window.  Button press events
+              are disabled for window as long as it  is  an  icon
+              window;   this  is  needed in order to allow window
+              managers to ``own'' those events.   Note:  not  all
+              window  managers support the notion of an icon win-
+              dow.
+
+       wm maxsize window ?width height?
+              If width and height are specified,  they  give  the
+              maximum  permissible  dimensions  for  window.  For
+              gridded windows the  dimensions  are  specified  in
+              grid  units;  otherwise they are specified in pixel
+              units.  The window manager will restrict  the  win-
+              dow's  dimensions to be less than or equal to width
+              and height.  If width  and  height  are  specified,
+              then  the  command returns an empty string.  Other-
+              wise it returns a Tcl list with two elements, which
+              are  the  maximum  width  and  height  currently in
+              effect.  The maximum size defaults to the  size  of
+              the screen.  If resizing has been disabled with the
+              wm resizable command,  then  this  command  has  no
+              effect.   See  the  sections on geometry management
+              below for more information.
+
+       wm minsize window ?width height?
+              If width and height are specified,  they  give  the
+              minimum  permissible  dimensions  for  window.  For
+              gridded windows the  dimensions  are  specified  in
+              grid  units;  otherwise they are specified in pixel
+              units.  The window manager will restrict  the  win-
+              dow's  dimensions  to  be  greater than or equal to
+              width and height.  If width and height  are  speci-
+              fied,  then  the  command  returns an empty string.
+              Otherwise it returns a Tcl list with two  elements,
+              which are the minimum width and height currently in
+              effect.  The minimum size defaults to one pixel  in
+              each dimension.  If resizing has been disabled with
+              the wm resizable command, then this command has  no
+              effect.   See  the  sections on geometry management
+              below for more information.
+
+       wm overrideredirect window ?boolean?
+              If boolean is specified,  it  must  have  a  proper
+              boolean  form  and  the  override-redirect flag for
+              window is set to that value.   If  boolean  is  not
+              specified  then  1  or  0  is  returned to indicate
+              whether or not the override-redirect flag  is  cur-
+              rently  set for window.  Setting the override-redi-
+              rect flag for a window causes it to be  ignored  by
+              the window manager;  among other things, this means
+              that the window will not  be  reparented  from  the
+              root  window  into  a decorative frame and the user
+              will not be able to manipulate the window using the
+              normal window manager mechanisms.
+
+       wm positionfrom window ?who?
+              If  who  is specified, it must be either program or
+              user, or an abbreviation of one of these  two.   It
+              indicates  whether  window's  current  position was
+              requested by the program or by the user.  Many win-
+              dow managers ignore program-requested initial posi-
+              tions and ask the user  to  manually  position  the
+              window;   if user is specified then the window man-
+              ager should position the window at the given  place
+              without  asking the user for assistance.  If who is
+              specified as an  empty  string,  then  the  current
+              position source is cancelled.  If who is specified,
+              then the command returns an empty  string.   Other-
+              wise  it  returns  user  or  window to indicate the
+              source of the  window's  current  position,  or  an
+              empty  string  if no source has been specified yet.
+              Most window managers  interpret  ``no  source''  as
+              equivalent  to  program.  Tk will automatically set
+              the position source to user when a wm geometry com-
+              mand  is  invoked,  unless  the source has been set
+              explicitly to program.
+
+       wm protocol window ?name? ?command?
+              This command is used to manage window manager  pro-
+              tocols  such as WM_DELETE_WINDOW.  Name is the name
+              of an atom corresponding to a window manager proto-
+              col,  such  as WM_DELETE_WINDOW or WM_SAVE_YOURSELF
+              or WM_TAKE_FOCUS.  If both  name  and  command  are
+              specified, then command is associated with the pro-
+              tocol specified by name.  Name  will  be  added  to
+              window's  WM_PROTOCOLS  property to tell the window
+              manager that the application has a protocol handler
+              for name, and command will be invoked in the future
+              whenever the window manager sends a message to  the
+              client for that protocol.  In this case the command
+              returns an empty string.  If name is specified  but
+              command isn't, then the current command for name is
+              returned, or an empty string if there is no handler
+              defined  for  name.   If command is specified as an
+              empty string then the current handler for  name  is
+              deleted  and  it  is  removed from the WM_PROTOCOLS
+              property on window;  an empty string  is  returned.
+              Lastly,  if  neither name nor command is specified,
+              the command returns a list of all the protocols for
+              which handlers are currently defined for window.
+
+              Tk   always   defines   a   protocol   handler  for
+              WM_DELETE_WINDOW, even if you haven't asked for one
+              with  wm  protocol.   If a WM_DELETE_WINDOW message
+              arrives when you haven't defined a handler, then Tk
+              handles  the  message  by destroying the window for
+              which it was received.
+
+       wm resizable window ?width height?
+              This command controls whether or not the  user  may
+              interactively  resize a top-level window.  If width
+              and height are specified, they are  boolean  values
+              that determine whether the width and height of win-
+              dow may be modified by the user.  In this case  the
+              command  returns  an  empty  string.   If width and
+              height are omitted then the command returns a  list
+              with  two  0/1  elements  that indicate whether the
+              width and height of window are currently resizable.
+              By  default,  windows  are resizable in both dimen-
+              sions.  If resizing is disabled, then the  window's
+              size will be the size from the most recent interac-
+              tive resize or wm geometry command.  If  there  has
+              been  no  such  operation then the window's natural
+              size will be used.
+
+       wm sizefrom window ?who?
+              If who is specified, it must be either  program  or
+              user,  or  an abbreviation of one of these two.  It
+              indicates  whether  window's   current   size   was
+              requested by the program or by the user.  Some win-
+              dow managers ignore program-requested sizes and ask
+              the  user  to manually size the window;  if user is
+              specified then the window manager should  give  the
+              window  its  specified size without asking the user
+              for assistance.  If who is specified  as  an  empty
+              string,  then the current size source is cancelled.
+              If who is specified, then the  command  returns  an
+              empty  string.  Otherwise it returns user or window
+              to indicate the  source  of  the  window's  current
+              size,  or  an  empty  string  if no source has been
+              specified yet.  Most window managers interpret ``no
+              source'' as equivalent to program.
+
+       wm state window
+              Returns  the  current state of window:  either nor-
+              mal, iconic, withdrawn, or  icon.   The  difference
+              between  iconic and icon is that iconic refers to a
+              window that has been iconified (e.g., with  the  wm
+              iconify  command)  while  icon  refers  to a window
+              whose only purpose is to serve as the icon for some
+              other window (via the wm iconwindow command).
+
+       wm title window ?string?
+              If  string  is specified, then it will be passed to
+              the window manager for use as the title for  window
+              (the  window  manager should display this string in
+              window's title bar).   In  this  case  the  command
+              returns an empty string.  If string isn't specified
+              then the command returns the current title for  the
+              window.   The  title  for  a window defaults to its
+              name.
+
+       wm transient window ?master?
+              If master is specified, then the window manager  is
+              informed  that  window  is a transient window (e.g.
+              pull-down menu) working on behalf of master  (where
+              master  is  the  path name for a top-level window).
+              Some window managers will use this  information  to
+              manage window specially.  If master is specified as
+              an empty string then window is marked as not  being
+              a  transient  window any more.  If master is speci-
+              fied, then the command  returns  an  empty  string.
+              Otherwise the command returns the path name of win-
+              dow's current master, or an empty string if  window
+              isn't currently a transient window.
+
+       wm withdraw window
+              Arranges  for  window  to  be  withdrawn  from  the
+              screen.  This causes the window to be unmapped  and
+              forgotten about by the window manager.  If the win-
+              dow has never been mapped, then this command causes
+              the  window  to  be  mapped in the withdrawn state.
+              Not all window managers appear to know how to  han-
+              dle windows that are mapped in the withdrawn state.
+              Note: it sometimes seems to be necessary  to  with-
+              draw  a  window  and  then  re-map it (e.g. with wm
+              deiconify) to  get  some  window  managers  to  pay
+              attention  to  changes in window attributes such as
+              group.
+
+
+GEOMETRY MANAGEMENT
+       By default a top-level window appears on the screen in its
+       natural  size,  which  is the one determined internally by
+       its widgets and geometry managers.  If the natural size of
+       a top-level window changes, then the window's size changes
+       to match.  A top-level window can be given  a  size  other
+       than  its  natural  size in two ways.  First, the user can
+       resize the window manually using  the  facilities  of  the
+       window  manager,  such  as  resize  handles.   Second, the
+       application can request a particular size for a  top-level
+       window using the wm geometry command.  These two cases are
+       handled identically by Tk;  in either case, the  requested
+       size  overrides the natural size.  You can return the win-
+       dow to its natural by invoking wm geometry with  an  empty
+       geometry string.
+
+       Normally  a  top-level  window  can have any size from one
+       pixel in each dimension up to  the  size  of  its  screen.
+       However,  you  can  use the wm minsize and wm maxsize com-
+       mands to limit the range of allowable  sizes.   The  range
+       set  by  wm minsize and wm maxsize applies to all forms of
+       resizing, including the window's natural size as  well  as
+       manual  resizes and the wm geometry command.  You can also
+       use the command wm resizable to completely disable  inter-
+       active resizing in one or both dimensions.
+
+
+GRIDDED GEOMETRY MANAGEMENT
+       Gridded geometry management occurs when one of the widgets
+       of an application supports a range of useful sizes.   This
+       occurs,  for  example,  in a text editor where the scroll-
+       bars, menus, and other adornments are fixed  in  size  but
+       the edit widget can support any number of lines of text or
+       characters per line.  In this case, it is  usually  desir-
+       able  to let the user specify the number of lines or char-
+       acters-per-line, either with the wm geometry command or by
+       interactively  resizing  the window.  In the case of text,
+       and in other interesting cases also, only  discrete  sizes
+       of  the  window  make  sense,  such as integral numbers of
+       lines and characters-per-line;  arbitrary pixel sizes  are
+       not useful.
+
+       Gridded geometry management provides support for this kind
+       of application.  Tk (and the window manager)  assume  that
+       there  is  a  grid of some sort within the application and
+       that the application should be resized in  terms  of  grid
+       units  rather than pixels.  Gridded geometry management is
+       typically invoked by turning on the setGrid option  for  a
+       widget;   it  can also be invoked with the wm grid command
+       or by calling Tk_SetGrid.  In each of these approaches the
+       particular widget (or sometimes code in the application as
+       a whole) specifies the relationship between integral  grid
+       sizes  for  the window and pixel sizes.  To return to non-
+       gridded geometry management, invoke  wm  grid  with  empty
+       argument strings.
+
+       When  gridded  geometry management is enabled then all the
+       dimensions specified in wm minsize,  wm  maxsize,  and  wm
+       geometry  commands  are  treated as grid units rather than
+       pixel units.  Interactive resizing is also carried out  in
+       even numbers of grid units rather than pixels.
+
+
+BUGS
+       Most  existing  window  managers  appear to have bugs that
+       affect the operation of the wm command.  For example, some
+       changes won't take effect if the window is already active:
+       the window will have to be withdrawn and  de-iconified  in
+       order to make the change happen.
+
+
+KEYWORDS
+       aspect  ratio,  deiconify,  focus  model,  geometry, grid,
+       group, icon, iconify, increments, position,  size,  title,
+       top-level window, units, window manager

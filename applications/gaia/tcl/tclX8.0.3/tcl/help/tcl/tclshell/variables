@@ -1,0 +1,52 @@
+       The  following  variables  are  set and/or used by the Tcl
+       shell.
+
+       argv0  Contains the name of the Tcl program  specified  on
+              the command line or the name that the Tcl shell was
+              invoked under if no program  was  specified.   argc
+              Contains a count of the number of argv arguments (0
+              if none).  argv A  list  containing  the  arguments
+              passed  in  from  the command line, excluding argu-
+              ments used by the Tcl shell.  The first element  is
+              the first passed argument, not the program name.
+
+       tcl_interactive
+              Set  to 1 if Tcl shell is invoked interactively, or
+              0 if the Tcl shell is directly executing a  script.
+              Normally  checked by scripts so that they can func-
+              tion as a standalone application  if  specified  on
+              the  command  line, but merely load in and not exe-
+              cute if loaded during an interactive invocation  of
+              Tcl.
+
+       auto_path
+              Path  to  search  to locate Tcl autoload libraries.
+              Used by the both the Tcl and TclX library autoload-
+              ing facility.
+
+       tclx_library
+              Path  to the TclX runtime library.  If your running
+              the TclX shell or an application based on it  (like
+              wishx).  The TclX initialization file normally adds
+              this to the auto_path.
+
+       tkx_library
+              Path to the TkX runtime library.  This is set  only
+              if  your  application has called Tkx_Init.  The TkX
+              initialization  file  normally  adds  this  to  the
+              auto_path.
+
+       tcl_prompt1
+              Contains code to run to output the prompt used when
+              interactively prompting for commands.
+
+       tcl_prompt2
+              Contains code to run to output the prompt used when
+              interactively  prompting  for  continuation  of  an
+              incomplete command.
+
+       TCLXENV
+              Array that contains information used internally  by
+              various  Tcl  procedures  that are part of the TclX
+              shell.  Don't change this  array  unless  you  know
+              what your doing.

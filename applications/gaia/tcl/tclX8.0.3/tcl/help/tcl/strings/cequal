@@ -1,0 +1,9 @@
+       cequal string string
+              This command compares two strings for equality.  It
+              returns 1 if string1 and string2 are the  identical
+              and 0 if they are not.  This command is a short-cut
+              for string compare and  avoids  the  problems  with
+              string expressions being treated unintentionally as
+              numbers.
+
+              This command is provided by Extended Tcl.

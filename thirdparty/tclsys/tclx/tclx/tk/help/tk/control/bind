@@ -1,0 +1,437 @@
+NAME
+       bind - Arrange for X events to invoke Tcl scripts
+
+SYNOPSIS
+       bind tag
+
+       bind tag sequence
+
+       bind tag sequence script
+
+       bind tag sequence +script
+
+
+INTRODUCTION
+       The bind command associates Tcl scripts with X events.  If
+       all three arguments are specified, bind will  arrange  for
+       script  (a  Tcl  script)  to  be  evaluated  whenever  the
+       event(s) given by sequence occur in the window(s)  identi-
+       fied  by tag.  If script is prefixed with a ``+'', then it
+       is appended to any existing binding for sequence;   other-
+       wise  script  replaces any existing binding.  If script is
+       an empty string then the current binding for  sequence  is
+       destroyed,  leaving sequence unbound.  In all of the cases
+       where a script argument is provided, bind returns an empty
+       string.
+
+       If sequence is specified without a script, then the script
+       currently bound to  sequence  is  returned,  or  an  empty
+       string  is  returned  if there is no binding for sequence.
+       If neither sequence nor  script  is  specified,  then  the
+       return  value  is  a  list  whose  elements  are  all  the
+       sequences for which there exist bindings for tag.
+
+       The tag argument determines which  window(s)  the  binding
+       applies  to.  If tag begins with a dot, as in .a.b.c, then
+       it must be the path name for a window; otherwise it may be
+       an  arbitrary  string.  Each window has an associated list
+       of tags, and a binding applies to a particular  window  if
+       its tag is among those specified for the window.  Although
+       the bindtags command may be used to  assign  an  arbitrary
+       set  of binding tags to a window, the default binding tags
+       provide the following behavior:
+
+              If a tag is the name  of  an  internal  window  the
+              binding applies to that window.
+
+              If  the  tag  is  the name of a toplevel window the
+              binding applies to the toplevel window and all  its
+              internal windows.
+
+              If  the tag is the name of a class of widgets, such
+              as Button, the binding applies to  all  widgets  in
+              that class;
+              If  tag  has  the value all, the binding applies to
+              all windows in the application.
+
+
+EVENT PATTERNS
+       The sequence argument specifies a sequence of one or  more
+       event patterns, with optional white space between the pat-
+       terns.  Each event pattern may take one  of  three  forms.
+       In the simplest case it is a single printing ASCII charac-
+       ter, such as a or [.  The character may  not  be  a  space
+       character  or  the  character  <.   This  form  of pattern
+       matches a KeyPress event  for  the  particular  character.
+       The second form of pattern is longer but more general.  It
+       has the following syntax:
+              <modifier-modifier-type-detail>
+       The entire event pattern is surrounded by angle  brackets.
+       Inside  the  angle brackets are zero or more modifiers, an
+       event type, and an extra  piece  of  information  (detail)
+       identifying  a  particular  button  or keysym.  Any of the
+       fields may be omitted, as long as at least one of type and
+       detail  is present.  The fields must be separated by white
+       space or dashes.
+
+       The third form of pattern  is  used  to  specify  a  user-
+       defined,  named  virtual event.  It has the following syn-
+       tax:
+              <<name>>
+       The entire virtual event pattern is surrounded  by  double
+       angle  brackets.   Inside  the angle brackets is the user-
+       defined name of the virtual  event.   Modifiers,  such  as
+       Shift or Control, may not be combined with a virtual event
+       to modify it.  Bindings on a virtual event may be  created
+       before the virtual event is defined, and if the definition
+       of a virtual event changes dynamically, all windows  bound
+       to  that virtual event will respond immediately to the new
+       definition.
+
+MODIFIERS
+       Modifiers consist of any of the following values:
+
+              Control                 Mod2, M2
+              Shift                   Mod3, M3
+              Lock                    Mod4, M4
+              Button1, B1             Mod5, M5
+              Button2, B2             Meta, M
+              Button3, B3             Alt
+              Button4, B4             Double
+              Button5, B5             Triple
+              Mod1, M1
+
+       Where more than one value is listed, separated by  commas,
+       the values are equivalent.  Most of the modifiers have the
+       obvious X meanings.  For example,  Button1  requires  that
+       button  1  be  depressed  when  the  event  occurs.  For a
+       binding to match a given event, the modifiers in the event
+       must  include all of those specified in the event pattern.
+       An event may also contain additional modifiers not  speci-
+       fied  in the binding.  For example, if button 1 is pressed
+       while the shift and control keys  are  down,  the  pattern
+       <Control-Button-1>  will  match  the event, but <Mod1-But-
+       ton-1> will not.  If no modifiers are specified, then  any
+       combination of modifiers may be present in the event.
+
+       Meta  and  M refer to whichever of the M1 through M5 modi-
+       fiers is associated with the meta key(s) on  the  keyboard
+       (keysyms  Meta_R  and Meta_L).  If there are no meta keys,
+       or if they are not associated  with  any  modifiers,  then
+       Meta  and M will not match any events.  Similarly, the Alt
+       modifier refers to whichever modifier is  associated  with
+       the  alt key(s) on the keyboard (keysyms Alt_L and Alt_R).
+
+       The Double and Triple  modifiers  are  a  convenience  for
+       specifying  double mouse clicks and other repeated events.
+       They cause a particular event pattern to be repeated 2  or
+       3  times,  and  also place a time and space requirement on
+       the sequence:  for a sequence of events to match a  Double
+       or  Triple  pattern,  all  of  the events must occur close
+       together in time and without substantial mouse  motion  in
+       between.   For example, <Double-Button-1> is equivalent to
+       <Button-1><Button-1>  with  the  extra  time   and   space
+       requirement.
+
+
+EVENT TYPES
+       The  type  field may be any of the standard X event types,
+       with a few extra abbreviations.  Below is a  list  of  all
+       the valid types; where two names appear together, they are
+       synonyms.
+
+              ButtonPress, Button Expose             Map
+              ButtonRelease       FocusIn            Motion
+              Circulate           FocusOut           Property
+              Colormap            Gravity            Reparent
+              Configure           KeyPress, Key      Unmap
+              Destroy             KeyRelease         Visibility
+              Enter               Leave              Activate
+              Deactivate
+
+
+       The last part of a long event specification is detail.  In
+       the  case  of  a ButtonPress or ButtonRelease event, it is
+       the number of a button  (1-5).   If  a  button  number  is
+       given,  then  only an event on that particular button will
+       match;  if no button number is given, then an event on any
+       button will match.  Note:  giving a specific button number
+       is different than specifying a  button  modifier;  in  the
+       first  case,  it  refers  to  a  button  being  pressed or
+       released, while in the second  it  refers  to  some  other
+       button  that  is already depressed when the matching event
+       occurs.  If a button number is  given  then  type  may  be
+       omitted:   if  will  default to ButtonPress.  For example,
+       the specifier <1> is equivalent to <ButtonPress-1>.
+
+       If the event type is KeyPress or KeyRelease,  then  detail
+       may  be specified in the form of an X keysym.  Keysyms are
+       textual specifications for particular  keys  on  the  key-
+       board;  they include all the alphanumeric ASCII characters
+       (e.g. ``a'' is the keysym for the ASCII character  ``a''),
+       plus    descriptions   for   non-alphanumeric   characters
+       (``comma'' is the keysym for the  comma  character),  plus
+       descriptions  for  all  the non-ASCII keys on the keyboard
+       (``Shift_L'' is the keysm for  the  left  shift  key,  and
+       ``F1''  is  the  keysym  for  the  F1  function key, if it
+       exists).  The complete list of keysyms  is  not  presented
+       here;   it  is  available in other X documentation and may
+       vary from system to system.  If necessary, you can use the
+       %K  notation  described below to print out the keysym name
+       for a particular key.  If a keysym detail is  given,  then
+       the  type  field  may be omitted;  it will default to Key-
+       Press.  For  example,  <Control-comma>  is  equivalent  to
+       <Control-KeyPress-comma>.
+
+
+BINDING SCRIPTS AND SUBSTITUTIONS
+       The script argument to bind is a Tcl script, which will be
+       executed whenever the given event sequence  occurs.   Com-
+       mand  will  be  executed  in the same interpreter that the
+       bind command was executed in, and it will  run  at  global
+       level  (only  global  variables  will  be accessible).  If
+       script contains any % characters, then the script will not
+       be  executed directly.  Instead, a new script will be gen-
+       erated by replacing each %, and  the  character  following
+       it, with information from the current event.  The replace-
+       ment depends on the character following the %, as  defined
+       in  the  list  below.   Unless  otherwise  indicated,  the
+       replacement string is the decimal value of the given field
+       from  the  current  event.   Some of the substitutions are
+       only valid for certain types of events;  if they are  used
+       for  other  types of events the value substituted is unde-
+       fined.
+
+       %%   Replaced with a single percent.
+
+       %#   The number of the last client  request  processed  by
+            the  server (the serial field from the event).  Valid
+            for all event types.
+
+       %a   The above field from the event, formatted as  a  hex-
+            adecimal number.  Valid only for Configure events.
+
+       %b   The   number  of  the  button  that  was  pressed  or
+            released.    Valid   only   for    ButtonPress    and
+            ButtonRelease events.
+
+       %c   The  count  field  from  the  event.   Valid only for
+            Expose events.
+
+       %d   The detail field from the event.  The %d is  replaced
+            by  a  string  identifying  the  detail.   For Enter,
+            Leave, FocusIn, and FocusOut events, the string  will
+            be one of the following:
+
+                   NotifyAncestor          NotifyNonlinearVirtual
+                   NotifyDetailNone        NotifyPointer
+                   NotifyInferior          NotifyPointerRoot
+                   NotifyNonlinear         NotifyVirtual
+
+            For  events  other than these, the substituted string
+            is undefined.
+
+       %f   The focus field from the event (0 or 1).  Valid  only
+            for Enter and Leave events.
+
+       %h   The height field from the event.  Valid only for Con-
+            figure and Expose events.
+
+       %k   The keycode field from the  event.   Valid  only  for
+            KeyPress and KeyRelease events.
+
+       %m   The  mode  field  from  the  event.   The substituted
+            string is one of NotifyNormal, NotifyGrab,  NotifyUn-
+            grab,  or  NotifyWhileGrabbed.  Valid only for Enter,
+            FocusIn, FocusOut, and Leave events.
+
+       %o   The override_redirect field from  the  event.   Valid
+            only for Map, Reparent, and Configure events.
+
+       %p   The place field from the event, substituted as one of
+            the strings PlaceOnTop or PlaceOnBottom.  Valid  only
+            for Circulate events.
+
+       %s   The  state  field  from  the event.  For ButtonPress,
+            ButtonRelease, Enter,  KeyPress,  KeyRelease,  Leave,
+            and  Motion  events, a decimal string is substituted.
+            For Visibility, one of  the  strings  VisibilityUnob-
+            scured,  VisibilityPartiallyObscured, and Visibility-
+            FullyObscured is substituted.
+
+       %t   The time field from the event.  Valid only for events
+            that contain a time field.
+
+       %w   The  width field from the event.  Valid only for Con-
+            figure and Expose events.
+
+       %x   The x field from the event.  Valid  only  for  events
+            containing an x field.
+       %y   The  y  field  from the event.  Valid only for events
+            containing a y field.
+
+       %A   Substitutes the ASCII character corresponding to  the
+            event,  or the empty string if the event doesn't cor-
+            respond to an ASCII character (e.g. the shift key was
+            pressed).   XLookupString does all the work of trans-
+            lating from the event to an ASCII  character.   Valid
+            only for KeyPress and KeyRelease events.
+
+       %B   The  border_width  field  from the event.  Valid only
+            for Configure events.
+
+       %E   The send_event field from the event.  Valid  for  all
+            event types.
+
+       %K   The keysym corresponding to the event, substituted as
+            a textual string.  Valid only for KeyPress and KeyRe-
+            lease events.
+
+       %N   The keysym corresponding to the event, substituted as
+            a decimal number.  Valid only for KeyPress and KeyRe-
+            lease events.
+
+       %R   The  root  window  identifier  from the event.  Valid
+            only for events containing a root field.
+
+       %S   The subwindow window identifier from the event,  for-
+            matted  as  a  hexadecimal  number.   Valid  only for
+            events containing a subwindow field.
+
+       %T   The type field from the event.  Valid for  all  event
+            types.
+
+       %W   The  path  name  of the window to which the event was
+            reported (the window field from  the  event).   Valid
+            for all event types.
+
+       %X   The  x_root  field from the event.  If a virtual-root
+            window manager is being  used  then  the  substituted
+            value  is  the corresponding x-coordinate in the vir-
+            tual root.  Valid  only  for  ButtonPress,  ButtonRe-
+            lease, KeyPress, KeyRelease, and Motion events.
+
+       %Y   The  y_root  field from the event.  If a virtual-root
+            window manager is being  used  then  the  substituted
+            value  is  the corresponding y-coordinate in the vir-
+            tual root.  Valid  only  for  ButtonPress,  ButtonRe-
+            lease, KeyPress, KeyRelease, and Motion events.
+
+       The replacement string for a %-replacement is formatted as
+       a proper Tcl list element.  This means  that  it  will  be
+       surrounded  with  braces if it contains spaces, or special
+       characters such as $ and { may be preceded by backslashes.
+       This guarantees that the string will be passed through the
+       Tcl parser when the binding  script  is  evaluated.   Most
+       replacements  are  numbers or well-defined strings such as
+       Above;  for these replacements no  special  formatting  is
+       ever  necessary.   The most common case where reformatting
+       occurs is for the %A substitution.  For example, if script
+       is
+              insert %A
+       and  the  character  typed is an open square bracket, then
+       the script actually executed will be
+              insert \[
+       This  will  cause  the  insert  to  receive  the  original
+       replacement  string  (open  square  bracket)  as its first
+       argument.  If the extra backslash hadn't been  added,  Tcl
+       would not have been able to parse the script correctly.
+
+
+MULTIPLE MATCHES
+       It  is  possible  for  several bindings to match a given X
+       event.  If the  bindings  are  associated  with  different
+       tag's,  then  each  of  the  bindings will be executed, in
+       order.  By default, a binding for the widget will be  exe-
+       cuted  first,  followed  by a class binding, a binding for
+       its toplevel, and an all binding.   The  bindtags  command
+       may  be  used to change this order for a particular window
+       or to associate additional binding tags with the window.
+
+       The continue and break commands may be used inside a bind-
+       ing  script to control the processing of matching scripts.
+       If continue is invoked, then the current binding script is
+       terminated but Tk will continue processing binding scripts
+       associated with other tag's.   If  the  break  command  is
+       invoked  within  a binding script, then that script termi-
+       nates and no other scripts will be invoked for the  event.
+
+       If  more  than  one binding matches a particular event and
+       they have the same tag, then the most specific binding  is
+       chosen  and  its script is evaluated.  The following tests
+       are applied, in  order,  to  determine  which  of  several
+       matching  sequences is more specific: (a) an event pattern
+       that specifies a specific button or key is  more  specific
+       than  one that doesn't; (b) a longer sequence (in terms of
+       number of events matched) is more specific than a  shorter
+       sequence;  (c)  if  the modifiers specified in one pattern
+       are a subset of the modifiers in another pattern, then the
+       pattern  with more modifiers is more specific.  (d) a vir-
+       tual event whose physical pattern matches the sequence  is
+       less  specific  than the same physical pattern that is not
+       associated with a virtual event.   (e)  given  a  sequence
+       that  matches  two or more virtual events, one of the vir-
+       tual events will be chosen, but the order is undefined.
+
+       If the matching sequences contain  more  than  one  event,
+       then  tests  (c)-(e)  are  applied  in order from the most
+       recent event to the least recent event in  the  sequences.
+       If  these  tests fail to determine a winner, then the most
+       recently registered sequence is the winner.
+
+       If there are two (or more) virtual events  that  are  both
+       triggered  by the same sequence, and both of those virtual
+       events are bound to the same window tag, then only one  of
+       the  virtual  events  will  be  triggered,  and it will be
+       picked at random:
+              event add <<Paste>> <Control-y>
+              event add <<Paste>> <Button-2>
+              event add <<Scroll>> <Button-2>
+              bind Entry <<Paste>> {puts Paste}
+              bind Entry <<Scroll>> {puts Scroll}
+       If the user types Control-y, the <<Paste>> binding will be
+       invoked,  but  if  the  user  presses button 2 then one of
+       either the <<Paste>> or the <<Scroll>>  bindings  will  be
+       invoked,  but exactly which one gets invoked is undefined.
+
+       If an X event does not match any of the existing bindings,
+       then  the  event is ignored.  An unbound event is not con-
+       sidered to be an error.
+
+
+MULTI-EVENT SEQUENCES AND IGNORED EVENTS
+       When a sequence specified in a bind command contains  more
+       than  one event pattern, then its script is executed when-
+       ever the recent events (leading up to  and  including  the
+       current  event) match the given sequence.  This means, for
+       example, that  if  button  1  is  clicked  repeatedly  the
+       sequence  <Double-ButtonPress-1>  will  match  each button
+       press but the first.  If extraneous events that would pre-
+       vent a match occur in the middle of an event sequence then
+       the extraneous events are ignored unless they are KeyPress
+       or   ButtonPress  events.   For  example,  <Double-Button-
+       Press-1> will match a sequence of  presses  of  button  1,
+       even though there will be ButtonRelease events (and possi-
+       bly Motion events) between the ButtonPress  events.   Fur-
+       thermore,  a  KeyPress event may be preceded by any number
+       of other KeyPress events for  modifier  keys  without  the
+       modifier  keys preventing a match.  For example, the event
+       sequence aB will match a press of the a key, a release  of
+       the  a key, a press of the Shift key, and a press of the b
+       key:  the press of Shift is ignored because it is a  modi-
+       fier  key.   Finally,  if several Motion events occur in a
+       row, only the last one is used for  purposes  of  matching
+       binding sequences.
+
+
+ERRORS
+       If  an  error occurs in executing the script for a binding
+       then the bgerror mechanism is used to  report  the  error.
+       The bgerror command will be executed at global level (out-
+       side the context of any Tcl procedure).
+SEE ALSO
+       bgerror
+
+
+KEYWORDS
+       form, manual

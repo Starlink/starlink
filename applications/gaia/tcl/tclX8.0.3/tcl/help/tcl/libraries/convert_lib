@@ -1,0 +1,9 @@
+convert_lib tclIndex packagelib ?ignore?
+Convert  a  Ousterhout  style  tclIndex  index file and associate
+source files into a package library  packagelib.   If  packagelib
+does  not  have  a .tlib extension, one will be added.  Any files
+specified in tclIndex  that  are  in  the  list  ignore  will  be
+skipped.   Files  listed  in  ignore should just be the base file
+names, not full paths.
+
+This procedure is provided by Extended Tcl.

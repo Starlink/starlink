@@ -1,0 +1,11 @@
+       max num1 ?..numN?
+
+       expr max(num1, num2)
+              Returns  the  argument that has the highest numeric
+              value. Each argument may be any integer or floating
+              point value.
+
+              This  functionality  is  also  available  as a math
+              function max in the Tcl expr command.
+
+              This command is provided by Extended Tcl.

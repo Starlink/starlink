@@ -1,0 +1,21 @@
+       host_info addresses host
+
+       host_info official_name host
+
+       host_info aliases host
+              Obtain information about a internet host. The argu-
+              ment host can be  either  a  host  name  or  an  IP
+              address.
+
+              The following subcommands are recognized:
+
+              addresses
+                     Return the list of IP addresses for host.
+
+              official_name
+                     Return official name for host.
+
+              aliases
+                     Return  the list of aliases for host.  (Note
+                     that these are IP number  aliases,  not  DNS
+                     CNAME aliases. See ifconfig(2).)

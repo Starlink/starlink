@@ -1,0 +1,22 @@
+NAME
+       lappend - Append list elements onto a variable
+
+SYNOPSIS
+       lappend varName ?value value value ...?
+
+
+DESCRIPTION
+       This  command  treats  the  variable given by varName as a
+       list and appends each of the value arguments to that  list
+       as  a  separate element, with spaces between elements.  If
+       varName doesn't exist, it is created as a list  with  ele-
+       ments given by the value arguments.  Lappend is similar to
+       append except that the values are appended  as  list  ele-
+       ments rather than raw text.  This command provides a rela-
+       tively efficient way to build up large lists.   For  exam-
+       ple,  ``lappend a $b'' is much more efficient than ``set a
+       [concat $a [list $b]]'' when $a is long.
+
+
+KEYWORDS
+       append, element, list, variable

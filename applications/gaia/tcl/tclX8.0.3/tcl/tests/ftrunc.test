@@ -1,0 +1,118 @@
+#
+# ftrunc.test
+#
+# Tests for the ftruncate command.
+#---------------------------------------------------------------------------
+# Copyright 1992-1997 Karl Lehenbauer and Mark Diekhans.
+#
+# Permission to use, copy, modify, and distribute this software and its
+# documentation for any purpose and without fee is hereby granted, provided
+# that the above copyright notice appear in all copies.  Karl Lehenbauer and
+# Mark Diekhans make no representations about the suitability of this
+# software for any purpose.  It is provided "as is" without express or
+# implied warranty.
+#------------------------------------------------------------------------------
+# $Id: ftrunc.test,v 8.3 1997/08/23 18:55:40 markd Exp $
+#------------------------------------------------------------------------------
+#
+
+if [cequal [info procs Test] {}] {source testlib.tcl}
+
+TestRemove TRUNCATE.TMP
+
+proc CreateTmpFile {name size} {
+    set fh [open $name w]
+    puts -nonewline $fh [replicate X $size]
+    close $fh
+    if {[file size $name] != $size} {
+        error "CreateTmpFile: [file size $name] != $size"
+    }
+}
+
+Test filecmds-7.1 {ftruncate tests} {
+    ftruncate 
+} 1 {wrong # args: ftruncate [-fileid] file newsize}
+
+Test filecmds-7.2 {ftruncate tests} {
+    ftruncate TRUNCATE.TMP 10 1000 200
+} 1 {wrong # args: ftruncate [-fileid] file newsize}
+
+Test filecmds-7.3 {ftruncate tests} {
+    ftruncate -fileid 10
+} 1 {wrong # args: ftruncate [-fileid] file newsize}
+
+Test filecmds-7.4 {ftruncate tests} {
+    ftruncate -fileid TRUNCATE.TMP 10 1000 200
+} 1 {wrong # args: ftruncate [-fileid] file newsize}
+
+if [infox have_truncate] {
+    Test filecmds-7.5 {ftruncate tests} {
+        list [catch {ftruncate NOTHERE.TMP 10} msg] [string tolower $msg]
+    } 0 {1 {nothere.tmp: no such file or directory}}
+
+    Test filecmds-7.6 {ftruncate tests} {
+        CreateTmpFile TRUNCATE.TMP 1000
+        set sizes {}
+        ftruncate TRUNCATE.TMP 500
+        lappend sizes [file size TRUNCATE.TMP]
+        ftruncate TRUNCATE.TMP 50
+        lappend sizes [file size TRUNCATE.TMP]
+        set sizes
+    } 0 {500 50}
+
+    Test filecmds-7.7 {ftruncate tests} {
+        CreateTmpFile TRUNCATE.TMP 1000
+        set sizes {}
+        ftruncate TRUNCATE.TMP 1000
+        lappend sizes [file size TRUNCATE.TMP]
+        ftruncate TRUNCATE.TMP 0
+        lappend sizes [file size TRUNCATE.TMP]
+        set sizes
+    } 0 {1000 0}
+}
+
+Test filecmds-7.7.1 {ftruncate tests} {
+    ftruncate NOTHERE.TMP 10
+} 1 {truncating files by path is not available on this system} pcOnly
+
+if [infox have_ftruncate] {
+    Test filecmds-7.8 {ftruncate tests} {
+        ftruncate -fileid TRUNCATE.TMP 1000
+    } 1 {can not find channel named "TRUNCATE.TMP"}
+
+    Test filecmds-7.9 {ftruncate tests} {
+        CreateTmpFile TRUNCATE.TMP 1000
+        set sizes {}
+        set fh [open TRUNCATE.TMP r+]
+        ftruncate -fileid $fh 500
+        lappend sizes [file size TRUNCATE.TMP] [fstat $fh size]
+        ftruncate  -fileid $fh 50
+        lappend sizes [file size TRUNCATE.TMP] [fstat $fh size]
+        close $fh
+        set sizes
+    } 0 {500 500 50 50}
+
+    Test filecmds-7.10 {ftruncate tests} {
+        CreateTmpFile TRUNCATE.TMP 1000
+        set sizes {}
+        set fh [open TRUNCATE.TMP r+]
+        ftruncate -fileid $fh 1000
+        lappend sizes [file size TRUNCATE.TMP] [fstat $fh size]
+        ftruncate -fileid $fh 0
+        lappend sizes [file size TRUNCATE.TMP] [fstat $fh size]
+        close $fh
+        set sizes
+    } 0 {1000 1000 0 0}
+}
+
+Test filecmds-7.10.1 {ftruncate tests} {
+    set fh [open TRUNCATE.TMP w]
+    set result [list [catch {ftruncate -fileid $fh 0} msg] $msg]
+    close $fh
+    set result
+} 0 {0 {}} pcOnly
+
+rename CreateTmpFile {}
+TestRemove TRUNCATE.TMP
+
+

@@ -1,0 +1,4 @@
+       sleep seconds
+              Sleep the Extended Tcl process for seconds seconds.
+
+              This command is provided by Extended Tcl.

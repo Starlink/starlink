@@ -1,0 +1,279 @@
+NAME
+       checkbutton - Create and manipulate checkbutton widgets
+
+SYNOPSIS
+       checkbutton pathName ?options?
+
+STANDARD OPTIONS
+       -activebackground              -cursor         -highlightthickness-takefocus
+       -activeforeground              -disabledforeground-image-text
+       -anchor         -font          -justify        -textvariable
+       -background     -foreground    -padx           -underline
+       -bitmap         -highlightbackground           -pady-wraplength
+       -borderwidth    -highlightcolor                -relief
+
+       See  the  options manual entry for details on the standard
+       options.
+
+WIDGET-SPECIFIC OPTIONS
+       Command-Line Name:-command
+       Database Name:  command
+       Database Class: Command
+
+              Specifies a Tcl command to associate with the  but-
+              ton.   This command is typically invoked when mouse
+              button 1 is released over the button  window.   The
+              button's global variable (-variable option) will be
+              updated before the command is invoked.
+
+       Command-Line Name:-height
+       Database Name:  height
+       Database Class: Height
+
+              Specifies a desired height for the button.   If  an
+              image  or  bitmap  is being displayed in the button
+              then the value is in screen units (i.e. any of  the
+              forms  acceptable  to Tk_GetPixels); for text it is
+              in lines of text.  If this option isn't  specified,
+              the  button's  desired  height is computed from the
+              size of the image or bitmap or text being displayed
+              in it.
+
+       Command-Line Name:-indicatoron
+       Database Name:  indicatorOn
+       Database Class: IndicatorOn
+
+              Specifies  whether  or  not the indicator should be
+              drawn.  Must be a proper boolean value.  If  false,
+              the  relief  option  is  ignored  and  the widget's
+              relief is always sunken if the widget  is  selected
+              and raised otherwise.
+
+       Command-Line Name:-offvalue
+       Database Name:  offValue
+       Database Class: Value
+              Specifies value to store in the button's associated
+              variable  whenever  this  button   is   deselected.
+              Defaults to ``0''.
+
+       Command-Line Name:-onvalue
+       Database Name:  onValue
+       Database Class: Value
+
+              Specifies value to store in the button's associated
+              variable  whenever   this   button   is   selected.
+              Defaults to ``1''.
+
+       Command-Line Name:-selectcolor
+       Database Name:  selectColor
+       Database Class: Background
+
+              Specifies a background color to use when the button
+              is selected.  If indicatorOn is true then the color
+              applies  to  the  indicator.   Under  Windows, this
+              color is used as the background for  the  indicator
+              regardless  of the select state.  If indicatorOn is
+              false, this color is used as the background for the
+              entire  widget,  in  place of background or active-
+              Background, whenever the widget  is  selected.   If
+              specified  as an empty string then no special color
+              is used for displaying when the widget is selected.
+
+       Command-Line Name:-selectimage
+       Database Name:  selectImage
+       Database Class: SelectImage
+
+              Specifies  an  image  to  display  (in place of the
+              image option) when  the  checkbutton  is  selected.
+              This  option is ignored unless the image option has
+              been specified.
+
+       Command-Line Name:-state
+       Database Name:  state
+       Database Class: State
+
+              Specifies one of three states for the  checkbutton:
+              normal,  active,  or disabled.  In normal state the
+              checkbutton is displayed using the  foreground  and
+              background  options.  The active state is typically
+              used when the pointer is over the checkbutton.   In
+              active state the checkbutton is displayed using the
+              activeForeground  and   activeBackground   options.
+              Disabled state means that the checkbutton should be
+              insensitive:  the default bindings will  refuse  to
+              activate  the  widget  and will ignore mouse button
+              presses.  In this state the disabledForeground  and
+              background options determine how the checkbutton is
+              displayed.
+       Command-Line Name:-variable
+       Database Name:  variable
+       Database Class: Variable
+
+              Specifies name of global variable to set  to  indi-
+              cate  whether  or  not  this  button  is  selected.
+              Defaults to the name of the button within its  par-
+              ent  (i.e.  the last element of the button window's
+              path name).
+
+       Command-Line Name:-width
+       Database Name:  width
+       Database Class: Width
+
+              Specifies a desired width for the  button.   If  an
+              image  or  bitmap  is being displayed in the button
+              then the value is in screen units (i.e. any of  the
+              forms  acceptable  to Tk_GetPixels); for text it is
+              in characters.  If this option isn't specified, the
+              button's desired width is computed from the size of
+              the image or bitmap or text being displayed in  it.
+
+
+DESCRIPTION
+       The checkbutton command creates a new window (given by the
+       pathName argument) and makes it into a checkbutton widget.
+       Additional  options,  described above, may be specified on
+       the command line or in the option  database  to  configure
+       aspects of the checkbutton such as its colors, font, text,
+       and initial relief.  The checkbutton command  returns  its
+       pathName  argument.   At the time this command is invoked,
+       there must not exist a window named  pathName,  but  path-
+       Name's parent must exist.
+
+       A  checkbutton is a widget that displays a textual string,
+       bitmap or image and a square called an indicator.  If text
+       is  displayed, it must all be in a single font, but it can
+       occupy multiple lines on the screen (if it  contains  new-
+       lines  or  if  wrapping  occurs  because of the wrapLength
+       option) and one of the characters may optionally be under-
+       lined  using  the underline option.  A checkbutton has all
+       of the behavior of a simple button, including the  follow-
+       ing:  it  can  display itself in either of three different
+       ways, according to the state option; it  can  be  made  to
+       appear  raised,  sunken, or flat; it can be made to flash;
+       and it invokes a Tcl command whenever mouse  button  1  is
+       clicked over the checkbutton.
+
+       In addition, checkbuttons can be selected.  If a checkbut-
+       ton is selected then the indicator is normally drawn  with
+       a  selected appearance, and a Tcl variable associated with
+       the checkbutton is set to a particular value (normally 1).
+       Under  Unix,  the  indicator is drawn with a sunken relief
+       and a special color.   Under  Windows,  the  indicator  is
+       drawn with a check mark inside.  If the checkbutton is not
+       selected, then the indicator is drawn  with  a  deselected
+       appearance,  and  the associated variable is set to a dif-
+       ferent value (typically 0).  Under Unix, the indicator  is
+       drawn  with  a  raised relief and no special color.  Under
+       Windows, the indicator  is  drawn  without  a  check  mark
+       inside.   By  default, the name of the variable associated
+       with a checkbutton is the same as the name used to  create
+       the  checkbutton.   The  variable name, and the ``on'' and
+       ``off'' values stored in it, may be modified with  options
+       on the command line or in the option database.  Configura-
+       tion options may also be used to modify the way the  indi-
+       cator  is  displayed  (or whether it is displayed at all).
+       By default a checkbutton is configured to select and dese-
+       lect itself on alternate button clicks.  In addition, each
+       checkbutton monitors its associated variable and automati-
+       cally  selects  and  deselects  itself  when the variables
+       value changes to and from the button's ``on'' value.
+
+
+WIDGET COMMAND
+       The checkbutton command creates a new  Tcl  command  whose
+       name is pathName.  This command may be used to invoke var-
+       ious operations on the widget.  It has the following  gen-
+       eral form:
+              pathName option ?arg arg ...?
+       Option  and  the  args determine the exact behavior of the
+       command.  The following commands are possible  for  check-
+       button widgets:
+
+       pathName cget option
+              Returns  the  current  value  of  the configuration
+              option given by option.  Option may have any of the
+              values accepted by the checkbutton command.
+
+       pathName configure ?option? ?value option value ...?
+              Query  or  modify  the configuration options of the
+              widget.  If no option is specified, returns a  list
+              describing  all  of the available options for path-
+              Name (see Tk_ConfigureInfo for information  on  the
+              format  of this list).  If option is specified with
+              no value, then the command returns a list  describ-
+              ing the one named option (this list will be identi-
+              cal to  the  corresponding  sublist  of  the  value
+              returned  if  no  option  is specified).  If one or
+              more option-value pairs  are  specified,  then  the
+              command modifies the given widget option(s) to have
+              the given  value(s);   in  this  case  the  command
+              returns  an  empty  string.  Option may have any of
+              the values accepted by the checkbutton command.
+
+       pathName deselect
+              Deselects the checkbutton and sets  the  associated
+              variable to its ``off'' value.
+       pathName flash
+              Flashes  the  checkbutton.  This is accomplished by
+              redisplaying the checkbutton several times,  alter-
+              nating  between  active  and normal colors.  At the
+              end of the flash the checkbutton  is  left  in  the
+              same  normal/active  state  as when the command was
+              invoked.  This command is ignored if the  checkbut-
+              ton's state is disabled.
+
+       pathName invoke
+              Does  just  what  would  have  happened if the user
+              invoked the checkbutton with the mouse: toggle  the
+              selection  state  of  the button and invoke the Tcl
+              command associated with the checkbutton,  if  there
+              is  one.  The return value is the return value from
+              the Tcl command, or an empty string if there is  no
+              command associated with the checkbutton.  This com-
+              mand is ignored if the checkbutton's state is  dis-
+              abled.
+
+       pathName select
+              Selects  the  checkbutton  and  sets the associated
+              variable to its ``on'' value.
+
+       pathName toggle
+              Toggles the selection state of the  button,  redis-
+              playing it and modifying its associated variable to
+              reflect the new state.
+
+
+BINDINGS
+       Tk automatically creates class bindings  for  checkbuttons
+       that give them the following default behavior:
+
+       [1]    On  Unix  systems, a checkbutton activates whenever
+              the mouse passes over it and  deactivates  whenever
+              the  mouse leaves the checkbutton.  On Mac and Win-
+              dows systems, when mouse button 1 is pressed over a
+              checkbutton,  the  button  activates  whenever  the
+              mouse pointer is inside the button, and deactivates
+              whenever the mouse pointer leaves the button.
+
+       [2]    When  mouse button 1 is pressed over a checkbutton,
+              it is invoked (its selection state toggles and  the
+              command  associated  with the button is invoked, if
+              there is one).
+
+       [3]    When a checkbutton has the input focus,  the  space
+              key  causes  the  checkbutton to be invoked.  Under
+              Windows, there are additional  key  bindings;  plus
+              (+)  and equal (=) select the button, and minus (-)
+              deselects the button.
+
+       If the checkbutton's state is disabled then  none  of  the
+       above  actions  occur:  the checkbutton is completely non-
+       responsive.
+
+       The behavior of checkbuttons can be  changed  by  defining
+       new  bindings  for individual widgets or by redefining the
+       class bindings.
+
+
+KEYWORDS
+       checkbutton, widget

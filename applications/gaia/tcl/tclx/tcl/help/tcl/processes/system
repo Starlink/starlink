@@ -1,0 +1,16 @@
+       system cmdstr1 ?cmdstr2...?
+              Concatenates  cmdstr1,  cmdstr2 etc with space sep-
+              arators (see the concat command) into a single com-
+              mand and then evaluates the command using the stan-
+              dard  system  shell.   On  Unix  systems,  this  is
+              /bin/sh  and  om Windows its command.com.  The exit
+              code of the command is returned.
+
+              This command differs from the exec command in  that
+              system  doesn't return the executed command's stan-
+              dard output as the result string, and  system  goes
+              through  the  Unix shell to provide wildcard expan-
+              sion, redirection, etc, as is  normal  from  an  sh
+              command line.
+
+              This command is provided by Extended Tcl.

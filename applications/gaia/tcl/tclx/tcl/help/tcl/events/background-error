@@ -1,0 +1,55 @@
+NAME
+       bgerror - Command invoked to process background errors
+
+SYNOPSIS
+       bgerror message
+
+
+DESCRIPTION
+       The bgerror command doesn't exist as built-in part of Tcl.
+       Instead, individual applications or  users  can  define  a
+       bgerror  command (e.g. as a Tcl procedure) if they wish to
+       handle background errors.
+
+       A background error is one that occurs in an event  handler
+       or  some  other  command  that  didn't  originate with the
+       application.  For example, if an error occurs  while  exe-
+       cuting a command specified with the after command, then it
+       is a background error.  For a  non-background  error,  the
+       error can simply be returned up through nested Tcl command
+       evaluations until it reaches the  top-level  code  in  the
+       application;  then the application can report the error in
+       whatever way it wishes.  When a background  error  occurs,
+       the  unwinding  ends  in  the  Tcl library and there is no
+       obvious way for Tcl to report the error.
+
+       When Tcl detects a background error, it saves  information
+       about  the  error and invokes the bgerror command later as
+       an idle  event  handler.   Before  invoking  bgerror,  Tcl
+       restores  the  errorInfo  and errorCode variables to their
+       values at the time the error  occurred,  then  it  invokes
+       bgerror  with the error message as its only argument.  Tcl
+       assumes that the application has implemented  the  bgerror
+       command,  and  that the command will report the error in a
+       way that makes sense for the application.  Tcl will ignore
+       any  result  returned by the bgerror command as long as no
+       error is generated.
+
+       If another Tcl error occurs  within  the  bgerror  command
+       (for example, because no bgerror command has been defined)
+       then Tcl reports the error itself by writing a message  to
+       stderr.
+
+       If  several background errors accumulate before bgerror is
+       invoked to process them, bgerror will be invoked once  for
+       each error, in the order they occurred.  However, if bger-
+       ror returns with a break  exception,  then  any  remaining
+       errors are skipped without calling bgerror.
+
+       Tcl  has  no default implementation for bgerror.  However,
+       in applications using Tk there is a default bgerror proce-
+       dure which posts a dialog box containing the error message
+       and offers the user a chance to see a stack trace  showing
+       where the error occurred.
+KEYWORDS
+       background error, reporting

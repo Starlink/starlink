@@ -1,0 +1,42 @@
+NAME
+       seek - Change the access position for an open channel
+
+SYNOPSIS
+       seek channelId offset ?origin?
+
+
+DESCRIPTION
+       Changes  the current access position for channelId.  Chan-
+       nelId must be a channel identifier such as returned from a
+       previous  invocation  of  open  or socket.  The offset and
+       origin arguments specify the position at  which  the  next
+       read  or write will occur for channelId. Offset must be an
+       integer (which may be negative) and origin must be one  of
+       the following:
+
+       start     The  new  access  position  will be offset bytes
+                 from the start of the underlying file or device.
+
+       current   The  new  access  position  will be offset bytes
+                 from the current  access  position;  a  negative
+                 offset  moves  the  access position backwards in
+                 the underlying file or device.
+
+       end       The new access position  will  be  offset  bytes
+                 from  the end of the file or device.  A negative
+                 offset places the access position before the end
+                 of file, and a positive offset places the access
+                 position after the end of file.
+
+       The origin argument defaults to start.
+
+       The command flushes all buffered output  for  the  channel
+       before the command returns, even if the channel is in non-
+       blocking mode.  It also discards any buffered  and  unread
+       input.   This  command  returns an empty string.  An error
+       occurs if this command is applied to channels whose under-
+       lying file or device does not support seeking.
+
+
+KEYWORDS
+       access position, file, seek

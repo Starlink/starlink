@@ -1,0 +1,151 @@
+#
+# unix/Common.mk.in  --
+#
+# Common macro definitions used by all include files.
+#------------------------------------------------------------------------------
+# Copyright 1995-1997 Karl Lehenbauer and Mark Diekhans.
+#
+# Permission to use, copy, modify, and distribute this software and its
+# documentation for any purpose and without fee is hereby granted, provided
+# that the above copyright notice appear in all copies.  Karl Lehenbauer and
+# Mark Diekhans make no representations about the suitability of this
+# software for any purpose.  It is provided "as is" without express or
+# implied warranty.
+#------------------------------------------------------------------------------
+# $Id: Common.mk.in,v 8.7.2.1 1998/08/09 06:46:36 markd Exp $
+#------------------------------------------------------------------------------
+#
+
+SHELL = /bin/sh
+
+#------------------------------------------------------------------------------
+# Tcl and Tk versions
+#
+TCL_VERSION      = @TCL_VERSION@
+TK_VERSION       = @TK_VERSION@
+
+#------------------------------------------------------------------------------
+# TclX version information extracted from tclExtend.h.
+#
+TCLX_VERSION       = @TCLX_VERSION@
+TCLX_FULL_VERSION  = @TCLX_FULL_VERSION@
+
+TKX_VERSION        = @TKX_VERSION@
+TKX_FULL_VERSION   = @TKX_FULL_VERSION@
+
+#------------------------------------------------------------------------------
+# Autoconfig defines that can be overridden in Config.mk.
+#
+CC           = @CC@
+CFLAGS       = @CFLAGS@
+SYSCFLAGS    = @SYSCFLAGS@
+RANLIB       = @RANLIB@
+LN_S         = ln -s
+srcbasedir   = @srcbasedir@
+bldbasedir   = @bldbasedir@
+VPATH        = ${srcdir}
+prefix       = @prefix@
+exec_prefix  = @exec_prefix@
+
+#------------------------------------------------------------------------------
+# TclX configuration information determined by configure.
+#
+BUILD_SHARED = @BUILD_SHARED@
+TKX_BUILD    = @TKX_BUILD@
+TCLX_DEFS    = @DEFS@
+TCLX_LIBS    = @TCLX_LIBS@
+
+#------------------------------------------------------------------------------
+# Library names.
+#
+TCL_STLIB_NAME  = @TCL_STLIB_NAME@
+TK_STLIB_NAME   = @TK_STLIB_NAME@
+
+TCLX_SHLIB_NAME = @TCLX_SHLIB_NAME@
+TCLX_STLIB_NAME = @TCLX_STLIB_NAME@
+TCLX_LIB_NAME   = @TCLX_LIB_NAME@
+
+TKX_SHLIB_NAME       = @TKX_SHLIB_NAME@
+TKX_STLIB_NAME       = @TKX_STLIB_NAME@
+TKX_LIB_NAME         = @TKX_LIB_NAME@
+
+#------------------------------------------------------------------------------
+# Compiler flag to use when generating shared object files.  Unixware cc will
+# only output the name of the .c file, so we hack it.
+
+CC_SHOBJ_FLAG = @CC_SHOBJ_FLAG@
+
+#------------------------------------------------------------------------------
+# Linker arguments to pick up TclX libraries.
+#
+TCLX_BUILD_LIB_SPEC  = @TCLX_BUILD_LIB_SPEC@
+TKX_BUILD_LIB_SPEC   = @TKX_BUILD_LIB_SPEC@
+TCLX_LD_SEARCH_FLAGS = @TCLX_LD_SEARCH_FLAGS@
+TCLX_CC_SEARCH_FLAGS = @TCLX_CC_SEARCH_FLAGS@
+TKX_LD_SEARCH_FLAGS  = @TKX_LD_SEARCH_FLAGS@
+TKX_CC_SEARCH_FLAGS  = @TKX_CC_SEARCH_FLAGS@
+
+#------------------------------------------------------------------------------
+# Configuration information from tclConfig.sh and tkConfig.sh.
+#
+TCL_DEFS             = @TCL_DEFS@
+TCL_LIBS             = @TCL_LIBS@
+TCL_EXEC_PREFIX      = @TCL_EXEC_PREFIX@
+TCL_SHLIB_CFLAGS     = @TCL_SHLIB_CFLAGS@
+TCL_LD_FLAGS         = @TCL_LD_FLAGS@
+TCL_DL_LIBS          = @TCL_DL_LIBS@
+TCL_SHLIB_LD         = @TCL_SHLIB_LD@
+TCL_SHLIB_LD_LIBS    = @TCL_SHLIB_LD_LIBS@
+TCL_BUILD_LIB_SPEC   = @TCL_BUILD_LIB_SPEC@
+TCL_LIB_SPEC         = @TCL_LIB_SPEC@
+TCL_LD_SEARCH_FLAGS  = @TCL_LD_SEARCH_FLAGS@
+
+TK_DEFS              = @TK_DEFS@
+TK_LIBS              = @TK_LIBS@
+TK_EXEC_PREFIX       = @TK_EXEC_PREFIX@
+TK_XINCLUDES         = @TK_XINCLUDES@
+TK_XLIBSW            = @TK_XLIBSW@
+TK_BUILD_LIB_SPEC    = @TK_BUILD_LIB_SPEC@
+TK_LIB_SPEC          = @TK_LIB_SPEC@
+TK_LD_SEARCH_FLAGS   = @TK_LD_SEARCH_FLAGS@
+
+#------------------------------------------------------------------------------
+# Location of directories.
+#
+TCL_GENERIC_DIR    = ${TCL_SRC}/generic
+TCL_UNIX_DIR       = ${TCL_SRC}/unix
+TCL_LIBRARY_DIR    = ${TCL_SRC}/library
+TK_GENERIC_DIR     = ${TK_SRC}/generic
+TK_UNIX_DIR        = ${TK_SRC}/unix
+
+TCLX_GENERIC_DIR   = ${srcbasedir}/tcl/generic
+TCLX_UNIX_SRC_DIR  = ${srcbasedir}/tcl/unix
+TCLX_UNIX_BLD_DIR  = ${bldbasedir}/tcl/unix
+TKX_GENERIC_DIR    = ${srcbasedir}/tk/generic
+TKX_UNIX_SRC_DIR   = ${srcbasedir}/tk/unix
+TKX_UNIX_BLD_DIR   = ${bldbasedir}/tk/unix
+COMPAT_DIR         = ${srcbasedir}/tcl/compat
+
+#------------------------------------------------------------------------------
+# Programs run during the build.
+#
+TCLX_TMP_RUNTIME   = ${bldbasedir}/tcl/unix
+TKX_TMP_RUNTIME    = ${bldbasedir}/tk/unix
+
+RUNTCL             = ${bldbasedir}/unix/runtcl
+RUNWISHX           = ${bldbasedir}/unix/runwishx
+GENTNDX            = ${RUNTCL} ${srcbasedir}/unix/tools/genindex.tcl
+BLDMANHELP         = ${RUNTCL} ${bldbasedir}/unix/tools/bldmanhelp
+CONVERTLIB         = ${RUNTCL} ${srcbasedir}/unix/tools/libconvert.tcl
+INSTCOPY           = ${RUNTCL} ${bldbasedir}/unix/tools/instcopy
+CPMANPAGES         = ${RUNTCL} ${bldbasedir}/unix/tools/cpmanpages
+
+  
+#------------------------------------------------------------------------------
+# For conversion of a tcl-script into C-strings.  Used in standalone binaries.
+# Requires Tcl PlusPatch.
+#
+.SUFFIXES: .tcl $(SUFFIXES)
+
+.tcl.c:
+	${TCL2C} -o $@ -a -n $@ $<

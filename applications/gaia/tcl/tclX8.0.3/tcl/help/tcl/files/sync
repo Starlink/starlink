@@ -1,0 +1,19 @@
+       sync ?fileId?
+
+              If  fileId  is  not specified, or if it is and this
+              system does not  support  the  fsync  system  call,
+              issues a sync system call to flush all pending disk
+              output.  If fileId is specified and the system does
+              support  the  fsync system call, issues an fsync on
+              the file corresponding to the specified Tcl  fileId
+              to force all pending output to that file out to the
+              disk.
+
+              If fileId is specified, the file must be  writable.
+              A  flush  will  be issued against the fileId before
+              the sync.
+
+              The infox have_fsync command can be used to  deter-
+              mine if "sync fileId" will do a sync or a fsync.
+
+              This command is provided by Extended Tcl.

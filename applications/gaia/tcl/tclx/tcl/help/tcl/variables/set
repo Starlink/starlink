@@ -1,0 +1,35 @@
+NAME
+       set - Read and write variables
+
+SYNOPSIS
+       set varName ?value?
+
+
+DESCRIPTION
+       Returns the value of variable varName.  If value is speci-
+       fied, then set the value of varName to value,  creating  a
+       new  variable if one doesn't already exist, and return its
+       value.  If varName contains an open parenthesis  and  ends
+       with  a close parenthesis, then it refers to an array ele-
+       ment:  the characters before the  first  open  parenthesis
+       are  the name of the array, and the characters between the
+       parentheses are the index  within  the  array.   Otherwise
+       varName refers to a scalar variable.  Normally, varName is
+       unqualified (does not include the names of any  containing
+       namespaces),  and the variable of that name in the current
+       namespace is read or written.  If varName includes  names-
+       pace  qualifiers  (in  the  array  name if it refers to an
+       array element), the variable in the specified namespace is
+       read or written.
+
+       If no procedure is active, then varName refers to a names-
+       pace variable (global variable if the current namespace is
+       the  global  namespace).   If  a procedure is active, then
+       varName refers to a parameter or  local  variable  of  the
+       procedure unless the global command was invoked to declare
+       varName to be global, or unless  a  variable  command  was
+       invoked to declare varName to be a namespace variable.
+
+
+KEYWORDS
+       read, write, variable

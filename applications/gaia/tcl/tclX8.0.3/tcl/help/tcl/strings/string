@@ -1,0 +1,127 @@
+NAME
+       string - Manipulate strings
+
+SYNOPSIS
+       string option arg ?arg ...?
+
+
+DESCRIPTION
+       Performs  one  of  several string operations, depending on
+       option.  The legal options (which may be abbreviated) are:
+
+       string compare string1 string2
+              Perform   a  character-by-character  comparison  of
+              strings string1 and string2 in the same way as  the
+              C  strcmp procedure.  Return -1, 0, or 1, depending
+              on whether string1 is lexicographically less  than,
+              equal to, or greater than string2.
+
+       string first string1 string2
+              Search  string2  for  a sequence of characters that
+              exactly match the characters in string1.  If found,
+              return  the  index  of  the  first character in the
+              first such match within  string2.   If  not  found,
+              return -1.
+
+       string index string charIndex
+              Returns  the  charIndex'th  character of the string
+              argument.  A charIndex  of  0  corresponds  to  the
+              first  character  of  the  string.  If charIndex is
+              less than 0 or greater than or equal to the  length
+              of the string then an empty string is returned.
+
+       string last string1 string2
+              Search  string2  for  a sequence of characters that
+              exactly match the characters in string1.  If found,
+              return the index of the first character in the last
+              such match within string2.  If there is  no  match,
+              then return -1.
+
+       string length string
+              Returns a decimal string giving the number of char-
+              acters in string.
+
+       string match pattern string
+              See if pattern matches string; return 1 if it does,
+              0  if  it  doesn't.   Matching is done in a fashion
+              similar to that used by the C-shell.  For  the  two
+              strings  to match, their contents must be identical
+              except that the  following  special  sequences  may
+              appear in pattern:
+
+              *         Matches  any  sequence  of  characters in
+                        string, including a null string.
+              ?         Matches any single character in string.
+
+              [chars]   Matches any character in the set given by
+                        chars.   If  a  sequence  of the form x-y
+                        appears  in  chars,  then  any  character
+                        between x and y, inclusive, will match.
+
+              \x        Matches  the  single  character  x.  This
+                        provides a way of  avoiding  the  special
+                        interpretation of the characters *?[]\ in
+                        pattern.
+
+       string range string first last
+              Returns a  range  of  consecutive  characters  from
+              string,  starting with the character whose index is
+              first and ending with the character whose index  is
+              last.  An  index of 0 refers to the first character
+              of the string.  An index of end (or  any  abbrevia-
+              tion  of  it)  refers  to the last character of the
+              string.  If first is less  than  zero  then  it  is
+              treated  as if it were zero, and if last is greater
+              than or equal to the length of the string  then  it
+              is  treated as if it were end.  If first is greater
+              than last then an empty string is returned.
+
+       string tolower string
+              Returns a value equal to  string  except  that  all
+              upper  case  letters  have  been converted to lower
+              case.
+
+       string toupper string
+              Returns a value equal to  string  except  that  all
+              lower  case  letters  have  been converted to upper
+              case.
+
+       string trim string ?chars?
+              Returns a value equal to  string  except  that  any
+              leading  or  trailing characters from the set given
+              by chars are removed.  If chars  is  not  specified
+              then  white  space  is  removed (spaces, tabs, new-
+              lines, and carriage returns).
+
+       string trimleft string ?chars?
+              Returns a value equal to  string  except  that  any
+              leading  characters from the set given by chars are
+              removed.  If chars  is  not  specified  then  white
+              space  is removed (spaces, tabs, newlines, and car-
+              riage returns).
+
+       string trimright string ?chars?
+              Returns a value equal to  string  except  that  any
+              trailing characters from the set given by chars are
+              removed.  If chars  is  not  specified  then  white
+              space  is  removed  (spaces,  tabs,  newlines,  and
+              carriage returns).
+
+       string wordend string index
+              Returns the index of the character just  after  the
+              last  one in the word containing character index of
+              string.  A word is considered to be any  contiguous
+              range  of alphanumeric or underscore characters, or
+              any single character other than these.
+
+       string wordstart string index
+              Returns the index of the  first  character  in  the
+              word  containing character index of string.  A word
+              is  considered  to  be  any  contiguous  range   of
+              alphanumeric  or underscore characters, or any sin-
+              gle character other than these.
+
+
+KEYWORDS
+       case conversion, compare, index, match,  pattern,  string,
+       word

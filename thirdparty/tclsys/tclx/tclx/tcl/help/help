@@ -1,0 +1,66 @@
+       The  help  facility allows one to look up help pages which
+       where extracted from the standard Tcl manual pages and Tcl
+       scripts  during  Tcl  installation.  Help files are struc-
+       tured as a multilevel tree of  subjects  and  help  pages.
+       Help  files  are found by searching directories named help
+       in the directories listed in the auto_path variable.   All
+       of  the  files in the list of help directories form a vir-
+       tual root of the help tree.  This method  allows  multiple
+       applications  to  provide  help  trees  without having the
+       files reside in the same directory.
+
+       The help facility can be accessed in two ways, as interac-
+       tive  commands in the Extended Tcl shell or as an interac-
+       tive Tk-based program (if you have built Extended Tcl with
+       Tk).
+
+       To run the Tk-based interactive help program:
+
+           tclhelp ?addpaths?
+
+       Where  addpaths  are  additional  paths to search for help
+       directories.  By  default,  only  the  auto_path  used  by
+       tclhelp  is  search.   This  will  result  in help on Tcl,
+       Extended Tcl and Tk.
+
+       The following interactive Tcl  commands  and  options  are
+       provided with the help package:
+
+       help
+              Help, without arguments, lists of all the help sub-
+              jects and pages under the current help subject.
+
+       help subject
+              Displays all of help pages and lower level subjects
+              (if any exist) under the subject subject.
+
+       help subject/helppage
+              Display  the  specified help page.  The help output
+              is passed through a simple pager if output  exceeds
+              23  lines,  pausing  waiting  for  a  return  to be
+              entered.  If any other character  is  entered,  the
+              output is terminated.
+
+       helpcd ?subject?
+              Change  the current subject, which is much like the
+              Unix current directory.  If subject is  not  speci-
+              fied,  return  to  the  top-level of the help tree.
+              Help subject path names  may  also  include  ``..''
+              elements.
+
+       helppwd
+              Displays the current help subject.
+       help help | ?
+              Displays help on the help facility at any directory
+              level.
+
+       apropos pattern
+              This command locates subjects  by  searching  their
+              one-line  descriptions  for  a pattern.  Apropos is
+              useful when you can remember part of  the  name  or
+              description  of  a  command,  and  want  to  search
+              through the one-line summaries for matching  lines.
+              Full  regular expressions may be specified (see the
+              regexp command).
+
+              These procedures are provided by Extended Tcl.

@@ -1,0 +1,63 @@
+NAME
+       proc - Create a Tcl procedure
+
+SYNOPSIS
+       proc name args body
+
+
+DESCRIPTION
+       The  proc  command creates a new Tcl procedure named name,
+       replacing any existing command or procedure there may have
+       been  by  that name.  Whenever the new command is invoked,
+       the contents of body will be executed by  the  Tcl  inter-
+       preter.   Normally,  name is unqualified (does not include
+       the names of any containing namespaces), and the new  pro-
+       cedure  is  created  in  the  current  namespace.  If name
+       includes any namespace qualifiers, the procedure  is  cre-
+       ated  in the specified namespace.  Args specifies the for-
+       mal arguments to the procedure.  It consists  of  a  list,
+       possibly empty, each of whose elements specifies one argu-
+       ment.  Each argument specifier is also a list with  either
+       one or two fields.  If there is only a single field in the
+       specifier then it is the name of the  argument;  if  there
+       are  two  fields,  then the first is the argument name and
+       the second is its default value.
+
+       When name is invoked a local variable will be created  for
+       each  of  the formal arguments to the procedure; its value
+       will be the value of corresponding argument in the  invok-
+       ing  command  or  the argument's default value.  Arguments
+       with default values need not be specified in  a  procedure
+       invocation.   However,  there  must be enough actual argu-
+       ments  for  all  the  formal  arguments  that  don't  have
+       defaults,  and  there  must  not be any extra actual argu-
+       ments.  There is one special  case  to  permit  procedures
+       with  variable  numbers  of arguments.  If the last formal
+       argument has the name args, then a call to  the  procedure
+       may  contain  more actual arguments than the procedure has
+       formals.  In this case, all of the actual arguments start-
+       ing at the one that would be assigned to args are combined
+       into a list (as if the list command had been  used);  this
+       combined value is assigned to the local variable args.
+
+       When body is being executed, variable names normally refer
+       to local variables, which are created  automatically  when
+       referenced  and  deleted  when the procedure returns.  One
+       local variable is automatically created for  each  of  the
+       procedure's  arguments.   Global  variables  can  only  be
+       accessed by invoking the global command or the upvar  com-
+       mand.   Namespace variables can only be accessed by invok-
+       ing the variable command or the upvar command.
+
+       The proc command returns an empty string.  When  a  proce-
+       dure is invoked, the procedure's return value is the value
+       specified in a return command.  If the  procedure  doesn't
+       execute  an  explicit return, then its return value is the
+       value of the last  command  executed  in  the  procedure's
+       body.   If  an  error occurs while executing the procedure
+       body, then the procedure-as-a-whole will return that  same
+       error.
+
+
+KEYWORDS
+       argument, procedure

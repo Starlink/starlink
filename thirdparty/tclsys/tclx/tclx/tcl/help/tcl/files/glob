@@ -1,0 +1,70 @@
+NAME
+       glob - Return names of files that match patterns
+
+SYNOPSIS
+       glob ?switches? pattern ?pattern ...?
+
+
+DESCRIPTION
+       This  command performs file name ``globbing'' in a fashion
+       similar to the csh shell.  It returns a list of the  files
+       whose names match any of the pattern arguments.
+
+       If  the  initial  arguments to glob start with - then they
+       are treated as switches.  The following switches are  cur-
+       rently supported:
+
+       -nocomplain    Allows an empty list to be returned without
+                      error;  without this  switch  an  error  is
+                      returned if the result list would be empty.
+
+       --             Marks the end of  switches.   The  argument
+                      following  this  one  will  be treated as a
+                      pattern even if it starts with a -.
+
+       The pattern arguments may contain  any  of  the  following
+       special characters:
+
+       ?         Matches any single character.
+
+       *         Matches any sequence of zero or more characters.
+
+       [chars]   Matches any single character in chars.  If chars
+                 contains  a  sequence  of  the form a-b then any
+                 character  between  a  and  b  (inclusive)  will
+                 match.
+
+       \x        Matches the character x.
+
+       {a,b,...} Matches any of the strings a, b, etc.
+
+       As with csh, a  ``.'' at the beginning of a file's name or
+       just after a ``/'' must be matched explicitly or with a {}
+       construct.   In  addition,  all  ``/''  characters must be
+       matched explicitly.
+
+       If the first character in  a  pattern  is  ``~''  then  it
+       refers  to the home directory for the user whose name fol-
+       lows the ``~''.  If the ``~'' is followed  immediately  by
+       ``/''  then  the value of the HOME environment variable is
+       used.
+
+       The glob command differs from csh globbing  in  two  ways.
+       First,  it  does  not  sort its result list (use the lsort
+       command if you want the list sorted).  Second,  glob  only
+       returns the names of files that actually exist;  in csh no
+       check for existence is made unless a pattern contains a ?,
+       *, or [] construct.
+
+
+PORTABILITY ISSUES
+       Unlike  other  Tcl  commands that will accept both network
+       and native style names (see the filename manual entry  for
+       details  on  how  native and network names are specified),
+       the glob command only accepts  native  names.   Also,  for
+       Windows UNC names, the servername and sharename components
+       of the path may not contain ?, *, or [] constructs.
+
+
+KEYWORDS
+       exist, file, glob, pattern

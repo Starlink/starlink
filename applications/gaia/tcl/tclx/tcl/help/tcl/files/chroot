@@ -1,0 +1,6 @@
+       chroot dirname
+              Change  root  directory to dirname, by invoking the
+              POSIX chroot(2) system  call.   This  command  only
+              succeeds if running as root.
+
+              This command is provided by Extended Tcl.

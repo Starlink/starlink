@@ -1,0 +1,19 @@
+NAME
+       rename - Rename or delete a command
+
+SYNOPSIS
+       rename oldName newName
+
+
+DESCRIPTION
+       Rename  the command that used to be called oldName so that
+       it is now called newName.  If newName is an  empty  string
+       then  oldName is deleted.  oldName and newName may include
+       namespace qualifiers (names of containing namespaces).  If
+       a  command  is  renamed into a different namespace, future
+       invocations of it will execute in the new namespace.   The
+       rename command returns an empty string as result.
+
+
+KEYWORDS
+       command, delete, namespace, rename

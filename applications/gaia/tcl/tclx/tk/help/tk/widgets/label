@@ -1,0 +1,103 @@
+NAME
+       label - Create and manipulate label widgets
+
+SYNOPSIS
+       label pathName ?options?
+
+STANDARD OPTIONS
+       -anchor         -font          -image          -takefocus
+       -background     -foreground    -justify        -text
+       -bitmap         -highlightbackground           -padx-textvariable
+       -borderwidth    -highlightcolor                -pady-underline
+       -cursor         -highlightthickness            -relief-wraplength
+
+       See  the  options manual entry for details on the standard
+       options.
+
+WIDGET-SPECIFIC OPTIONS
+       Command-Line Name:-height
+       Database Name:  height
+       Database Class: Height
+
+              Specifies a desired height for the  label.   If  an
+              image  or  bitmap  is  being displayed in the label
+              then the value is in screen units (i.e. any of  the
+              forms  acceptable  to Tk_GetPixels); for text it is
+              in lines of text.  If this option isn't  specified,
+              the  label's  desired  height  is computed from the
+              size of the image or bitmap or text being displayed
+              in it.
+
+       Command-Line Name:-width
+       Database Name:  width
+       Database Class: Width
+
+              Specifies  a  desired  width  for the label.  If an
+              image or bitmap is being  displayed  in  the  label
+              then  the value is in screen units (i.e. any of the
+              forms acceptable to Tk_GetPixels); for text  it  is
+              in characters.  If this option isn't specified, the
+              label's desired width is computed from the size  of
+              the  image or bitmap or text being displayed in it.
+
+
+DESCRIPTION
+       The label command creates a new window (given by the path-
+       Name  argument)  and  makes it into a label widget.  Addi-
+       tional options, described above, may be specified  on  the
+       command  line  or  in  the  option  database  to configure
+       aspects of the label such as its colors, font,  text,  and
+       initial  relief.   The  label command returns its pathName
+       argument.  At the time this command is invoked, there must
+       not  exist  a window named pathName, but pathName's parent
+       must exist.
+       A label is a widget that displays a textual string, bitmap
+       or  image.  If text is displayed, it must all be in a sin-
+       gle font, but it can occupy multiple lines on  the  screen
+       (if  it contains newlines or if wrapping occurs because of
+       the wrapLength option)  and  one  of  the  characters  may
+       optionally  be underlined using the underline option.  The
+       label can be manipulated in a few  simple  ways,  such  as
+       changing  its relief or text, using the commands described
+       below.
+
+
+WIDGET COMMAND
+       The label command creates a new Tcl command whose name  is
+       pathName.   This  command  may  be  used to invoke various
+       operations on the widget.  It has  the  following  general
+       form:
+              pathName option ?arg arg ...?
+       Option  and  the  args determine the exact behavior of the
+       command.  The following commands are  possible  for  label
+       widgets:
+
+       pathName cget option
+              Returns  the  current  value  of  the configuration
+              option given by option.  Option may have any of the
+              values accepted by the label command.
+
+       pathName configure ?option? ?value option value ...?
+              Query  or  modify  the configuration options of the
+              widget.  If no option is specified, returns a  list
+              describing  all  of the available options for path-
+              Name (see Tk_ConfigureInfo for information  on  the
+              format  of this list).  If option is specified with
+              no value, then the command returns a list  describ-
+              ing the one named option (this list will be identi-
+              cal to  the  corresponding  sublist  of  the  value
+              returned  if  no  option  is specified).  If one or
+              more option-value pairs  are  specified,  then  the
+              command modifies the given widget option(s) to have
+              the given  value(s);   in  this  case  the  command
+              returns  an  empty  string.  Option may have any of
+              the values accepted by the label command.
+
+
+BINDINGS
+       When a new label is created, it has no default event bind-
+       ings: labels are not intended to be interactive.
+
+
+KEYWORDS
+       label, widget

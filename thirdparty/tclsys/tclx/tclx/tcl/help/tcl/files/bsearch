@@ -1,0 +1,31 @@
+       bsearch fileId key ?retvar? ?compare_proc?
+              Search  an  opened  file fileId containing lines of
+              text sorted into ascending order for a match.   Key
+              contains  the string to match.  If retvar is speci-
+              fied, then the line from the file  is  returned  in
+              retvar, and the command returns 1 if key was found,
+              and 0 if it wasn't.  If retvar is not specified  or
+              is  a  null name, then the command returns the line
+              that was found, or an empty string  if  key  wasn't
+              found.
+
+              By  default,  the  key is matched against the first
+              white-space separated  field  in  each  line.   The
+              field  is  treated  as  an  ASCII  string.  If com-
+              pare_proc is specified, then it defines the name of
+              a  Tcl procedure to evaluate against each line read
+              from the sorted file during the  execution  of  the
+              bsearch command.  Compare_proc takes two arguments,
+              the key and a line extracted from  the  file.   The
+              compare  routine  should  return a number less than
+              zero if the key is less than the line, zero if  the
+              key  matches  the line, or greater than zero if the
+              key is greater than the line.   The  file  must  be
+              sorted  in  ascending  order  according to the same
+              criteria compare_proc uses to compare the key  with
+              the line, or erroneous results will occur.
+
+              This  command  does  not  work  on files containing
+              binary data (bytes of zero).
+
+              This command is provided by Extended Tcl.

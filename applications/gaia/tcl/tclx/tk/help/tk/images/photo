@@ -1,0 +1,366 @@
+NAME
+       photo - Full-color images
+
+SYNOPSIS
+       image create photo ?name? ?options?
+
+
+DESCRIPTION
+       A  photo is an image whose pixels can display any color or
+       be transparent.  A photo image  is  stored  internally  in
+       full  color  (24  bits  per pixel), and is displayed using
+       dithering if necessary.  Image data for a photo image  can
+       be obtained from a file or a string, or it can be supplied
+       from C code through a procedural interface.   At  present,
+       only  GIF and PPM/PGM formats are supported, but an inter-
+       face exists to allow additional image file formats  to  be
+       added  easily.   A  photo  image is transparent in regions
+       where no image data has been supplied.
+
+
+CREATING PHOTOS
+       Like all images, photos are created using the image create
+       command.  Photos support the following options:
+
+       -data string
+              Specifies  the  contents  of the image as a string.
+              The format of the string must be one of  those  for
+              which  there  is  an image file format handler that
+              will accept string data.  If  both  the  -data  and
+              -file options are specified, the -file option takes
+              precedence.
+
+       -format format-name
+              Specifies the name of the file format for the  data
+              specified with the -data or -file option.
+
+       -file name
+              name gives the name of a file that is to be read to
+              supply data for the photo image.  The  file  format
+              must  be  one  of those for which there is an image
+              file format handler that can read data.
+
+       -gamma value
+              Specifies that the colors allocated for  displaying
+              this  image  in  a window should be corrected for a
+              non-linear display with the specified  gamma  expo-
+              nent  value.   (The  intensity produced by most CRT
+              displays is a power function of the input value, to
+              a  good approximation; gamma is the exponent and is
+              typically around 2).  The value specified  must  be
+              greater  than  zero.   The default value is one (no
+              correction).  In general, values greater  than  one
+              will  make  the image lighter, and values less than
+              one will make it darker.
+       -height number
+              Specifies the height of the image, in pixels.  This
+              option  is useful primarily in situations where the
+              user wishes to build up the contents of  the  image
+              piece  by  piece.   A  value  of zero (the default)
+              allows the image to expand or shrink vertically  to
+              fit the data stored in it.
+
+       -palette palette-spec
+              Specifies  the  resolution  of the color cube to be
+              allocated for displaying this image, and  thus  the
+              number  of  colors  used  from the colormaps of the
+              windows where it is  displayed.   The  palette-spec
+              string may be either a single decimal number, spec-
+              ifying the number of shades  of  gray  to  use,  or
+              three  decimal  numbers  separated  by slashes (/),
+              specifying the number of shades of red,  green  and
+              blue  to  use,  respectively.  If the first form (a
+              single number) is used, the image will be displayed
+              in monochrome (i.e., grayscale).
+
+       -width number
+              Specifies  the  width  of  the  image,  in  pixels.
+              This option is useful primarily in situations where
+              the  user  wishes  to  build up the contents of the
+              image  piece  by  piece.   A  value  of  zero  (the
+              default) allows the image to expand or shrink hori-
+              zontally to fit the data stored in it.
+
+
+IMAGE COMMAND
+       When a photo image is created, Tk also creates a new  com-
+       mand  whose  name  is the same as the image.  This command
+       may be used to invoke various operations on the image.  It
+       has the following general form:
+              imageName option ?arg arg ...?
+       Option  and  the  args determine the exact behavior of the
+       command.
+
+       Those options that  write  data  to  the  image  generally
+       expand the size of the image, if necessary, to accommodate
+       the data written to the image, unless the user has  speci-
+       fied non-zero values for the -width and/or -height config-
+       uration options, in which case the  width  and/or  height,
+       respectively, of the image will not be changed.
+
+       The following commands are possible for photo images:
+
+       imageName blank
+              Blank  the  image; that is, set the entire image to
+              have no data, so it will be displayed as  transpar-
+              ent,  and  the  background of whatever window it is
+              displayed in will show through.
+       imageName cget option
+              Returns the  current  value  of  the  configuration
+              option given by option.  Option may have any of the
+              values accepted by the image create photo  command.
+
+       imageName configure ?option? ?value option value ...?
+              Query  or  modify the configuration options for the
+              image.  If no option is specified, returns  a  list
+              describing  all of the available options for image-
+              Name (see Tk_ConfigureInfo for information  on  the
+              format  of this list).  If option is specified with
+              no value, then the command returns a list  describ-
+              ing the one named option (this list will be identi-
+              cal to  the  corresponding  sublist  of  the  value
+              returned  if  no  option  is specified).  If one or
+              more option-value pairs  are  specified,  then  the
+              command  modifies  the  given option(s) to have the
+              given value(s);  in this case the  command  returns
+              an empty string.  Option may have any of the values
+              accepted by the image create photo command.
+
+       imageName copy sourceImage ?option value(s) ...?
+              Copies a region from the image  called  sourceImage
+              (which  must  be a photo image) to the image called
+              imageName, possibly with pixel zooming and/or  sub-
+              sampling.   If  no options are specified, this com-
+              mand copies the whole of  sourceImage  into  image-
+              Name,  starting  at coordinates (0,0) in imageName.
+              The following options may be specified:
+
+              -from x1 y1 x2 y2
+                     Specifies a rectangular  sub-region  of  the
+                     source  image  to  be  copied.   (x1,y1) and
+                     (x2,y2) specify diagonally opposite  corners
+                     of  the  rectangle.   If  x2  and y2 are not
+                     specified, the default value is the  bottom-
+                     right  corner of the source image.  The pix-
+                     els copied will include  the  left  and  top
+                     edges of the specified rectangle but not the
+                     bottom or right edges.  If the -from  option
+                     is  not  given,  the  default  is  the whole
+                     source image.
+
+              -to x1 y1 x2 y2
+                     Specifies a rectangular  sub-region  of  the
+                     destination  image  to be affected.  (x1,y1)
+                     and (x2,y2) specify diagonally opposite cor-
+                     ners of the rectangle.  If x2 and y2 are not
+                     specified, the default value is (x1,y1) plus
+                     the size of the source region (after subsam-
+                     pling and zooming, if specified).  If x2 and
+                     y2  are specified, the source region will be
+                     replicated if necessary to fill the destina-
+                     tion region in a tiled fashion.
+              -shrink
+                     Specifies  that  the size of the destination
+                     image should be reduced,  if  necessary,  so
+                     that  the region being copied into is at the
+                     bottom-right  corner  of  the  image.   This
+                     option  will  not affect the width or height
+                     of the image if the  user  has  specified  a
+                     non-zero  value  for  the  -width or -height
+                     configuration option, respectively.
+
+              -zoom x y
+                     Specifies that the source region  should  be
+                     magnified  by  a factor of x in the X direc-
+                     tion and y in the Y direction.  If y is  not
+                     given,  the  default value is the same as x.
+                     With this option, each pixel in  the  source
+                     image will be expanded into a block of x x y
+                     pixels in the  destination  image,  all  the
+                     same color.  x and y must be greater than 0.
+
+              -subsample x y
+                     Specifies that the source  image  should  be
+                     reduced  in  size  by  using  only every xth
+                     pixel in the X direction and  yth  pixel  in
+                     the Y direction.  Negative values will cause
+                     the image to be flipped about  the  Y  or  X
+                     axes,  respectively.  If y is not given, the
+                     default value is the same as x.
+
+       imageName get x y
+              Returns the color of the pixel at coordinates (x,y)
+              in  the image as a list of three integers between 0
+              and 255, representing the red, green and blue  com-
+              ponents respectively.
+
+       imageName put data ?-to x1 y1 x2 y2?
+              Sets pixels in imageName to the colors specified in
+              data.  data is used to form a two-dimensional array
+              of  pixels that are then copied into the imageName.
+              data is structured as a list  of  horizontal  rows,
+              from top to bottom, each of which is a list of col-
+              ors, listed from left to right.  Each color may  be
+              specified  by  name  (e.g., blue) or in hexadecimal
+              form (e.g., #2376af).  The -to option can  be  used
+              to  specify  the  area of imageName to be affected.
+              If only x1 and y1 are given, the area affected  has
+              its top-left corner at (x1,y1) and is the same size
+              as the array given in data.  If  all  four  coordi-
+              nates  are  given, they specify diagonally opposite
+              corners of the affected rectangle,  and  the  array
+              given  in  data  will be replicated as necessary in
+              the X and Y directions to fill the rectangle.
+       imageName read filename ?option value(s) ...?
+              Reads image data from the file named filename  into
+              the image.  This command first searches the list of
+              image file format handlers for a handler  that  can
+              interpret  the data in filename, and then reads the
+              image in filename into imageName  (the  destination
+              image).  The following options may be specified:
+
+              -format format-name
+                     Specifies  the  format  of the image data in
+                     filename.   Specifically,  only  image  file
+                     format  handlers whose names begin with for-
+                     mat-name will be used while searching for an
+                     image  data format handler to read the data.
+
+              -from x1 y1 x2 y2
+                     Specifies a rectangular  sub-region  of  the
+                     image file data to be copied to the destina-
+                     tion image.  If only x1 and  y1  are  speci-
+                     fied, the region extends from (x1,y1) to the
+                     bottom-right corner  of  the  image  in  the
+                     image  file.   If  all  four coordinates are
+                     specified, they specify diagonally  opposite
+                     corners or the region.  The default, if this
+                     option is not specified, is the whole of the
+                     image in the image file.
+
+              -shrink
+                     If  this  option, the size of imageName will
+                     be reduced, if necessary, so that the region
+                     into  which  the image file data are read is
+                     at the bottom-right corner of the imageName.
+                     This  option  will  not  affect the width or
+                     height of the image if the user  has  speci-
+                     fied  a  non-zero  value  for  the -width or
+                     -height configuration option,  respectively.
+
+              -to x y
+                     Specifies  the  coordinates  of the top-left
+                     corner of the region of imageName into which
+                     data  from  filename  are  to  be read.  The
+                     default is (0,0).
+
+       imageName redither
+              The dithering algorithm used  in  displaying  photo
+              images  propagates  quantization  errors  from  one
+              pixel to its neighbors.  If the image data for ima-
+              geName  is  supplied  in pieces, the dithered image
+              may not be exactly correct.  Normally  the  differ-
+              ence  is  not  noticeable,  but if it is a problem,
+              this  command  can  be  used  to  recalculate   the
+              dithered  image  in  each window where the image is
+              displayed.
+       imageName write filename ?option value(s) ...?
+              Writes image data from imageName to  a  file  named
+              filename.  The following options may be specified:
+
+              -format format-name
+                     Specifies  the name of the image file format
+                     handler to be used to write the data to  the
+                     file.     Specifically,    this   subcommand
+                     searches for the first  handler  whose  name
+                     matches  a  initial substring of format-name
+                     and which has the  capability  to  write  an
+                     image  file.   If  this option is not given,
+                     this subcommand uses the first handler  that
+                     has the capability to write an image file.
+
+              -from x1 y1 x2 y2
+                     Specifies  a rectangular region of imageName
+                     to be written to the image file.  If only x1
+                     and  y1  are  specified,  the region extends
+                     from (x1,y1) to the bottom-right  corner  of
+                     imageName.   If  all  four  coordinates  are
+                     given, they specify diagonally opposite cor-
+                     ners   of   the   rectangular  region.   The
+                     default, if this option is not given, is the
+                     whole image.
+
+IMAGE FORMATS
+       The  photo  image code is structured to allow handlers for
+       additional image file formats to  be  added  easily.   The
+       photo image code maintains a list of these handlers.  Han-
+       dlers are added to the list by  registering  them  with  a
+       call  to  Tk_CreatePhotoImageFormat.  The standard Tk dis-
+       tribution comes with handlers for PPM/PGM and GIF formats,
+       which are automatically registered on initialization.
+
+       When reading an image file or processing string data spec-
+       ified with the -data configuration option, the photo image
+       code  invokes each handler in turn until one is found that
+       claims to be able to read the data in the file or  string.
+       Usually  this  will  find  the  correct handler, but if it
+       doesn't, the user may give a format name with the  -format
+       option to specify which handler to use.  In fact the photo
+       image code will try those handlers whose names begin  with
+       the  string specified for the -format option (the compari-
+       son is case-insensitive).  For example, if the user speci-
+       fies  -format gif, then a handler named GIF87 or GIF89 may
+       be invoked, but a handler named  JPEG  may  not  (assuming
+       that such handlers had been registered).
+
+       When  writing  image data to a file, the processing of the
+       -format option is slightly  different:  the  string  value
+       given  for the -format option must begin with the complete
+       name of the requested handler, and may contain  additional
+       information following that, which the handler can use, for
+       example, to specify which variant to use  of  the  formats
+       supported by the handler.
+
+
+COLOR ALLOCATION
+       When  a  photo  image  is displayed in a window, the photo
+       image code allocates colors to use to  display  the  image
+       and  dithers the image, if necessary, to display a reason-
+       able approximation to the image using the colors that  are
+       available.  The colors are allocated as a color cube, that
+       is, the number of colors allocated is the product  of  the
+       number of shades of red, green and blue.
+
+       Normally,  the  number of colors allocated is chosen based
+       on the depth of the window.   For  example,  in  an  8-bit
+       PseudoColor  window,  the photo image code will attempt to
+       allocate seven shades of red, seven shades  of  green  and
+       four  shades  of  blue,  for  a total of 198 colors.  In a
+       1-bit StaticGray (monochrome) window, it will allocate two
+       colors, black and white.  In a 24-bit DirectColor or True-
+       Color window, it will allocate 256  shades  each  of  red,
+       green  and  blue.   Fortunately,  because  of the way that
+       pixel values can be combined in DirectColor and  TrueColor
+       windows,  this  only  requires 256 colors to be allocated.
+       If not all of the colors can be allocated, the photo image
+       code  reduces  the  number of shades of each primary color
+       and tries again.
+
+       The user can exercise some control over the number of col-
+       ors  that  a photo image uses with the -palette configura-
+       tion option.  If this option is  used,  it  specifies  the
+       maximum  number  of shades of each primary color to try to
+       allocate.  It can also be used to force the  image  to  be
+       displayed  in  shades of gray, even on a color display, by
+       giving a single number rather than three numbers separated
+       by slashes.
+
+
+CREDITS
+       The  photo image type was designed and implemented by Paul
+       Mackerras, based on his earlier photo widget and some sug-
+       gestions from John Ousterhout.
+
+
+KEYWORDS
+       photo, image, color

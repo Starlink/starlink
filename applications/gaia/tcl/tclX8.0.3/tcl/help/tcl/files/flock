@@ -1,0 +1,43 @@
+       flock options fileId ?start? ?length? ?origin?
+
+              This  command  places  a lock on all or part of the
+              file specified by fileId.  The lock is either advi-
+              sory  or  mandatory,  depending on the mode bits of
+              the file.  The lock is placed beginning at relative
+              byte  offset  start  for length bytes.  If start or
+              length is omitted or empty, zero  is  assumed.   If
+              length is zero, then the lock always extents to end
+              of file, even if the  file  grows.   If  origin  is
+              "start",  then the offset is relative to the begin-
+              ning of the file. If it is "current", it  is  rela-
+              tive  to  the  current access position in the file.
+              If it is "end", then it is relative to the  end-of-
+              file  (a  negative  is  before the EOF, positive is
+              after).  If origin is omitted, start is assumed.
+
+              The following options are recognized:
+
+              -read  Place a read lock  on  the  file.   Multiple
+                     processes  may  be  accessing  the file with
+                     read-locks.
+
+              -write Place a write lock on the  file.   Only  one
+                     process  may be accessing a file if there is
+                     a write lock.
+
+              -nowait
+                     If specified,  then  the  process  will  not
+                     block if the lock can not be obtained.  With
+                     this option, the command returns  1  if  the
+                     lock is obtained and 0 if it is not.
+
+              See  your  system's fcntl system call documentation
+              for full details of the behavior of  file  locking.
+              If locking is being done on ranges of a file, it is
+              best to use unbuffered file access (see  the  fcntl
+              command).
+
+              The  flock  command is not available on Windows 95.
+              It is available on Windows NT.
+
+              This command is provided by Extended Tcl.

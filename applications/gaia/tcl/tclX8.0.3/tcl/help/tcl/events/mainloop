@@ -1,0 +1,17 @@
+       mainloop
+              This  procedure  sets  up  a  top-level event loop.
+              Events are processed until there are no more active
+              event sources, at which time the process exits.  It
+              is used to build event oriented programs using  the
+              TclX  shell  in  a  style similar to that used with
+              wish.   If  the  global  variable   tcl_interactive
+              exists  and has a true value an interactive command
+              handler is started as well.   If the  command  han-
+              dler  is  terminated by an EOF, the process will be
+              exited.
+
+              This commands is not useful in wishx, as  it  auto-
+              matically  enters  an event loop after processing a
+              script.
+
+              This procedure is provided by Extended Tcl.

@@ -1,0 +1,85 @@
+tcl ?-qn? ?-f? script? | ?-c command? ?args?
+
+       The  tcl  starts the interactive TclX command interpreter.
+       The TclX shell provides an environment for writing, debug-
+       ging  and executing Tcl scripts.  The functionality of the
+       TclX shell can be easily obtained by any application  that
+       includes TclX.
+
+       The  tcl command, issued without any arguments, invokes an
+       interactive Tcl  shell,  allowing  the  user  to  interact
+       directly  with Tcl, executing any Tcl commands at will and
+       viewing their results.
+
+       If script is specified, then the script is  executed  non-
+       interactively  with  any additional arguments, args, being
+       supplied in the global Tcl variable `argv'.  If command is
+       supplied, then this command (or semicolon-separated series
+       of commands) is executed, with `argv' containing any args.
+
+       The  TclX shell is intended as an environment for Tcl pro-
+       gram development and execution.  While it is not  a  full-
+       featured  interactive  shell,  it  provides  a comfortable
+       environment for the interactive development of Tcl code.
+
+       The following command line flags are recognized by the Tcl
+       shell command line parser:
+
+       -q     Quick  initialization  flag.  The Tcl initiaization
+              file is not evaluated and the auto_path variable is
+              not  set.   Tcl  auto-load  libraries  will  not be
+              available.
+
+       -n     No procedure call stack dump.  The  procedure  call
+              stack  will  not be displayed when an error occurs,
+              only the error message.  Useful in the #!  line  of
+              already debugged scripts.
+
+       -f     Takes  the  next  argument  as  a script for Tcl to
+              source, rather than entering interactive mode.  The
+              -f  flag  is optional.  Normally the first argument
+              that does not start with a  `-'  is  taken  as  the
+              script  to execute unless the `-c' option is speci-
+              fied.  Any following arguments are  passed  to  the
+              script  via argv, thus any other Tcl shell command-
+              line flags must precede this option.
+
+       -c     Take the next argument as a Tcl command to execute.
+              It may contain series of commands to execute, sepa-
+              rated by `;'.  Any following arguments  are  passed
+              in  argv,  thus,  as  with  -f, any other Tcl shell
+              flags must precede this option.
+
+       --     Mark the end of the arguments to the Tcl shell. All
+              arguments  following  this  are  passed  in the Tcl
+              variable argv.  This is useful  to  pass  arguments
+              without attempting to execute a Tcl script.
+
+       The  result string returned by a command executed from the
+       Tcl shell command line is  normally  echoed  back  to  the
+       user.   If an error occurs, then the string result is dis-
+       played, along with the error message.  The  error  message
+       will be preceded by the string ``Error:''.
+
+       The  set  command  is  a  special case.  If the command is
+       called to set a variable (i.e. with two  arguments),  then
+       the  result will not be echoed.  If only one argument, the
+       name of a variable, is supplied to set,  then  the  result
+       will be echoed.
+
+       If  an  unknown  Tcl  command  is entered from the command
+       line, then the Unix command path, specified in  the  envi-
+       ronment  variable  PATH, will be searched for a command of
+       the same name.  If the command is found, it will  be  exe-
+       cuted with any arguments remaining on the Tcl command line
+       being passed as arguments to the command.  This feature is
+       provided to enhance the interactive environment for devel-
+       oping Tcl scripts.
+
+       Automatic execution of programs in  this  manner  is  only
+       supported from the command line, not in script files or in
+       procedures, to reduce confusion and  mistakes  while  pro-
+       gramming  in Tcl.  Scripts should use the Tcl exec or sys-
+       tem commands to run Unix commands.
+
+       This functionality is provided by Extended Tcl.

@@ -1,0 +1,10 @@
+       catclose ?-fail | -nofail? cathandle
+              Close  the  message catalog specified by cathandle.
+              Normally, errors are ignored.  If -fail  is  speci-
+              fied,  any  errors closing the message catalog file
+              are returned.  The  option  -nofail  specifies  the
+              default  behavior  of  not returning an error.  The
+              use of -fail only makes sense if it was also speci-
+              fied in the call to catopen.
+
+              This command is provided by Extended Tcl.

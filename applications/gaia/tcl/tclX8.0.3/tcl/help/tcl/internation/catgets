@@ -1,0 +1,10 @@
+       catgets catHandle setnum msgnum defaultstr
+              Retrieve   a   message   form  a  message  catalog.
+              CatHandle should be a Tcl  message  catalog  handle
+              that  was  returned by catopen.  Setnum is the mes-
+              sage set number, and msgnum is the message  number.
+              If  the message catalog was not opened, or the mes-
+              sage set or message number cannot  be  found,  then
+              the default string, defaultstr, is returned.
+
+              This command is provided by Extended Tcl.

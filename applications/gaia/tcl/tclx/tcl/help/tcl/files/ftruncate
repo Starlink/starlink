@@ -1,0 +1,18 @@
+       ftruncate [-fileid] file newsize
+              Truncate a file to have a length of at most newsize
+              bytes.
+
+              If the option -fileid is specified, file is an open
+              file identifier, otherwise it is a file path.
+
+              This  command  is  not available or not fully func-
+              tional if the underlying operating  system  support
+              is  not available.  The command infox have_truncate
+              will indicate if this command may truncate by  file
+              path.   The command infox have_ftruncate will indi-
+              cate if this command may truncate by file id.
+
+              The -fileid option  is  not  available  on  Windows
+              95/NT.
+
+              This command is provided by Extended Tcl.

@@ -1,0 +1,6 @@
+       keyldel listvar key
+              Delete  the  field  specified by key from the keyed
+              list in the variable listvar.   This  removes  both
+              the key and the value from the keyed list.
+
+              This command is provided by Extended Tcl.

@@ -1,0 +1,7 @@
+searchpath path file
+Search  all  directories  in  the  specified path, which is a Tcl
+list, for the specified file.  Returns the full path name of  the
+file,  or  an  empty  string  if  the requested file could not be
+found.
+
+This procedure is provided by Extended Tcl.

@@ -1,0 +1,15 @@
+NAME
+       tell - Return current access position for an open channel
+
+SYNOPSIS
+       tell channelId
+
+
+DESCRIPTION
+       Returns  a  decimal string giving the current access posi-
+       tion in channelId.  The value returned is -1 for  channels
+       that do not support seeking.
+
+
+KEYWORDS
+       access position, channel, seeking

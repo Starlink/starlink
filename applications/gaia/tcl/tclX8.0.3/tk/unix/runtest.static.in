@@ -1,0 +1,9 @@
+#!/bin/sh
+TCL_LIBRARY=@TCL_SRC@/library
+TCLX_LIBRARY=@bldbasedir@/tcl/unix
+TK_LIBRARY=@TK_SRC@/library
+TKX_LIBRARY=@bldbasedir@/tk/unix
+TCL_PROGRAM=@bldbasedir@/tcl/unix/tcl.static
+TKTEST=@bldbasedir@/tk/unix/tktest.static
+export TCL_LIBRARY TCLX_LIBRARY TK_LIBRARY TKX_LIBRARY TCL_PROGRAM
+exec $TKTEST ${1+"$@"}

@@ -1,0 +1,27 @@
+NAME
+       split - Split a string into a proper Tcl list
+
+SYNOPSIS
+       split string ?splitChars?
+
+
+DESCRIPTION
+       Returns a list created by splitting string at each charac-
+       ter that is in the splitChars argument.  Each  element  of
+       the result list will consist of the characters from string
+       that  lie  between  instances   of   the   characters   in
+       splitChars.   Empty  list  elements  will  be generated if
+       string contains adjacent characters in splitChars,  or  if
+       the  first  or  last character of string is in splitChars.
+       If splitChars is an empty string then  each  character  of
+       string  becomes  a  separate  element  of the result list.
+       SplitChars defaults to the  standard  white-space  charac-
+       ters.  For example,
+              split "comp.unix.misc" .
+       returns "comp unix misc" and
+              split "Hello world" {}
+       returns "H e l l o { } w o r l d".
+
+
+KEYWORDS
+       list, split, string

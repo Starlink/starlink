@@ -1,0 +1,53 @@
+tk/control/bell	Ring a display's bell
+tk/control/bind	Arrange for X events to invoke Tcl scripts
+tk/control/bindtags	Determine which bindings apply to a window, and order of evaluation
+tk/control/clipboard	Manipulate Tk clipboard
+tk/control/destroy	Destroy one or more windows
+tk/control/event	Miscellaneous event facilities: define virtual events and generate events
+tk/control/focus	Manage the input focus
+tk/control/font	Create and inspect fonts.
+tk/control/grab	Confine pointer and keyboard events to a window sub-tree
+tk/control/grid	Geometry manager that arranges widgets in a grid
+tk/control/lower	Change a window's position in the stacking order
+tk/control/option	Add/retrieve window options to/from the option database
+tk/control/pack	Geometry manager that packs around edges of cavity
+tk/control/pack-old	Obsolete syntax for packer geometry manager
+tk/control/place	Geometry manager for fixed or rubber-sheet placement
+tk/control/raise	Change a window's position in the stacking order
+tk/control/selection	Manipulate the X selection
+tk/control/send	Execute a command in a different application
+tk/control/tk	Manipulate Tk internal state
+tk/control/tk_bisque	Modify the Tk color palette
+tk/control/tk_focusNext	Utility procedures for managing the input focus.
+tk/control/tk_setPalette	Modify the Tk color palette
+tk/control/tkerror	Command invoked to process background errors
+tk/control/tkvars	Variables used or set by Tk
+tk/control/tkwait	Wait for variable to change or window to be destroyed
+tk/control/winfo	Return window-related information
+tk/control/wm	Communicate with window manager
+tk/images/bitmap	Images that display two colors
+tk/images/image	Create and manipulate images
+tk/images/photo	Full-color images
+tk/widgets/button	Create and manipulate button widgets
+tk/widgets/canvas	Create and manipulate canvas widgets
+tk/widgets/checkbutton	Create and manipulate checkbutton widgets
+tk/widgets/entry	Create and manipulate entry widgets
+tk/widgets/frame	Create and manipulate frame widgets
+tk/widgets/label	Create and manipulate label widgets
+tk/widgets/listbox	Create and manipulate listbox widgets
+tk/widgets/menu	Create and manipulate menu widgets
+tk/widgets/menubutton	Create and manipulate menubutton widgets
+tk/widgets/message	Create and manipulate message widgets
+tk/widgets/options	Standard options supported by widgets
+tk/widgets/radiobutton	Create and manipulate radiobutton widgets
+tk/widgets/scale	Create and manipulate scale widgets
+tk/widgets/scrollbar	Create and manipulate scrollbar widgets
+tk/widgets/text	Create and manipulate text widgets
+tk/widgets/tk_chooseColor	pops up a dialog box for the user to select a color.
+tk/widgets/tk_dialog	Create modal dialog and wait for response
+tk/widgets/tk_getOpenFile	pop up a dialog box for the user to select a file to open or save.
+tk/widgets/tk_menuBar	Obsolete support for menu bars
+tk/widgets/tk_messageBox	pops up a message window and waits for user response.
+tk/widgets/tk_optionMenu	Create an option menubutton and its menu
+tk/widgets/tk_popup	Post a popup menu
+tk/widgets/toplevel	Create and manipulate toplevel widgets

@@ -1,0 +1,15 @@
+       alarm seconds
+              Instructs  the  system  to send a SIGALRM signal in
+              the specified number of seconds.  This is a  float-
+              ing  point number, so fractions of a section may be
+              specified.  If seconds is 0.0, any  previous  alarm
+              request  is canceled.  Only one alarm at a time may
+              be active; the command returns the number  of  sec-
+              onds  left in the previous alarm.  On systems with-
+              out the setitimer system call, seconds  is  rounded
+              up to an integer number of seconds.
+
+              The  alarm  command  is  not  available  on Windows
+              95/NT.
+
+              This command is provided by Extended Tcl.

@@ -1,0 +1,13 @@
+NAME
+       pwd - Return the current working directory
+
+SYNOPSIS
+       pwd
+
+
+DESCRIPTION
+       Returns the path name of the current working directory.
+
+
+KEYWORDS
+       working directory

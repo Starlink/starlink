@@ -1,0 +1,13 @@
+       read_file ?-nonewline? fileName
+
+       read_file fileName numBytes
+              This  proecure  reads the file fileName and returns
+              the contents as a string.  If -nonewline is  speci-
+              fied,  then  the last character of the file is dis-
+              carded if it is a newline.  The second form  speci-
+              fies  exactly  how  many  bytes  will  be  read and
+              returned, unless  there  are  fewer  than  numBytes
+              bytes  left  in  the  file;  in  this case, all the
+              remaining bytes are returned.
+
+              This procedure is provided by Extended Tcl.

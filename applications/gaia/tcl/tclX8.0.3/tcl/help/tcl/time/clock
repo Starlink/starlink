@@ -1,0 +1,176 @@
+NAME
+       clock - Obtain and manipulate time
+
+SYNOPSIS
+       clock option ?arg arg ...?
+
+
+DESCRIPTION
+       This  command  performs one of several operations that may
+       obtain or manipulate strings or values that represent some
+       notion  of  time.   The  option  argument  determines what
+       action is carried out by the command.  The  legal  options
+       (which may be abbreviated) are:
+
+       clock clicks
+              Return  a  high-resolution  time value as a system-
+              dependent integer value.  The unit of the value  is
+              system-dependent  but should be the highest resolu-
+              tion clock available on the system such  as  a  CPU
+              cycle  counter.  This value should only be used for
+              the relative measurement of elapsed time.
+
+       clock format clockValue ?-format string? ?-gmt boolean?
+              Converts an integer time value, typically  returned
+              by  clock seconds, clock scan, or the atime, mtime,
+              or ctime options of the  file  command,  to  human-
+              readable  form.  If the -format argument is present
+              the next argument is a string  that  describes  how
+              the  date  and  time  are  to  be formatted.  Field
+              descriptors consist of a  %  followed  by  a  field
+              descriptor  character.   All  other  characters are
+              copied into the result.   Valid  field  descriptors
+              are:
+
+              %%     Insert a %.
+
+              %a     Abbreviated weekday name (Mon, Tue, etc.).
+
+              %A     Full weekday name (Monday, Tuesday, etc.).
+
+              %b     Abbreviated month name (Jan, Feb, etc.).
+
+              %B     Full month name.
+
+              %c     Locale specific date and time.
+
+              %d     Day of month (01 - 31).
+
+              %H     Hour in 24-hour format (00 - 23).
+
+              %I     Hour in 12-hour format (00 - 12).
+
+              %j     Day of year (001 - 366).
+              %m     Month number (01 - 12).
+
+              %M     Minute (00 - 59).
+
+              %p     AM/PM indicator.
+
+              %S     Seconds (00 - 59).
+
+              %U     Week  of year (01 - 52), Sunday is the first
+                     day of the week.
+
+              %w     Weekday number (Sunday = 0).
+
+              %W     Week of year (01 - 52), Monday is the  first
+                     day of the week.
+
+              %x     Locale specific date format.
+
+              %X     Locale specific time format.
+
+              %y     Year without century (00 - 99).
+
+              %Y     Year with century (e.g. 1990)
+
+              %Z     Time zone name.
+
+              In addition, the following field descriptors may be
+              supported on some systems (e.g. Unix but  not  Win-
+              dows):
+
+              %D     Date as %m/%d/%y.
+
+              %e     Day of month (1 - 31), no leading zeros.
+
+              %h     Abbreviated month name.
+
+              %n     Insert a newline.
+
+              %r     Time as %I:%M:%S %p.
+
+              %R     Time as %H:%M.
+
+              %t     Insert a tab.
+
+              %T     Time as %H:%M:%S.
+
+              If  the -format argument is not specified, the for-
+              mat string "%a %b %d %H:%M:%S %Z %Y" is  used.   If
+              the -gmt argument is present the next argument must
+              be a boolean which if true specifies that the  time
+              will  be formatted as Greenwich Mean Time. If false
+              then the local timezone will be used as defined  by
+              the operating environment.
+       clock scan dateString ?-base clockVal? ?-gmt boolean?
+              Convert  dateString  to an integer clock value (see
+              clock seconds).  This command can parse and convert
+              virtually  any  standard  date  and/or time string,
+              which can include standard time zone mnemonics.  If
+              only  a  time  is  specified,  the  current date is
+              assumed.  If the string does  not  contain  a  time
+              zone  mnemonic,  the  local  time  zone is assumed,
+              unless the -gmt argument is true, in which case the
+              clock  value is calculated assuming that the speci-
+              fied time is relative to Greenwich Mean Time.
+
+              If the -base flag is specified, the  next  argument
+              should  contain  an  integer clock value.  Only the
+              date in this value is used, not the time.  This  is
+              useful  for  determining the time on a specific day
+              or doing other date-relative conversions.
+
+              The dateString consists of zero or more  specifica-
+              tions of the following form:
+
+              time   A  time  of  day,  which  is  of  the  form:
+                     hh?:mm?:ss??   ?meridian?  ?zone?  or   hhmm
+                     ?meridian?  ?zone?. If no meridian is speci-
+                     fied, hh is interpreted on a 24-hour  clock.
+
+              date   A specific month and day with optional year.
+                     The acceptable formats are mm/dd?/yy?,  mon-
+                     thname dd ?, yy?, dd monthname ?yy? and day,
+                     dd monthname yy.  The default  year  is  the
+                     current year.  If the year is less than 100,
+                     we treat the years 00-68  as  2000-2068  and
+                     the years 69-99 as 1969-1999.  Not all plat-
+                     forms can represent the years 38-70,  so  an
+                     error may result if these years are used.
+
+              relative time
+                     A  specification  relative  to  the  current
+                     time.  The format is number unit  acceptable
+                     units are year, fortnight, month, week, day,
+                     hour, minute (or min), and second (or  sec).
+                     The  unit  can be specified as a singular or
+                     plural, as in 3 weeks.  These modifiers  may
+                     also   be  specified:  tomorrow,  yesterday,
+                     today, now, last, this, next, ago.
+
+              The actual date is calculated according to the fol-
+              lowing steps.  First, any absolute date and/or time
+              is processed and converted.  Using that time as the
+              base,  day-of-week specifications are added.  Next,
+              relative specifications are used.  If a date or day
+              is  specified,  and no absolute or relative time is
+              given, midnight is used.  Finally, a correction  is
+              applied  so  that  the  correct  hour of the day is
+              produced after allowing for daylight  savings  time
+              differences  and  the  correct  date  is given when
+              going from the end of  a  long  month  to  a  short
+              month.
+
+       clock seconds
+              Return the current date and time as a system-depen-
+              dent integer value.  The unit of the value is  sec-
+              onds, allowing it to be used for relative time cal-
+              culations.  The value is usually defined  as  total
+              elapsed  time  from  an  ``epoch''.   You shouldn't
+              assume the value of the epoch.
+
+
+KEYWORDS
+       clock, date, time

@@ -1,0 +1,15 @@
+       lvarpush var string ?indexExpr?
+              The  lvarpush command pushes (inserts) string as an
+              element in the list contained in the variable  var.
+              The  element  is inserted before position indexExpr
+              in the  list.  If  index  is  omitted,  then  0  is
+              assumed.  If var does not exists, it is created.
+
+              If  the expression indexExpr starts with the string
+              end, then end is replaced with  the  index  of  the
+              last element in the list.  If the expression starts
+              with len, then len is replaced with the  length  of
+              the list.  Note the a value of end means insert the
+              string before the last element.
+
+              This command is provided by Extended Tcl.

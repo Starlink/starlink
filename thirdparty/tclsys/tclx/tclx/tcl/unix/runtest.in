@@ -1,0 +1,9 @@
+#!/bin/sh
+TCL_LIBRARY=@TCL_SRC@/library
+TCLX_LIBRARY=@bldbasedir@/tcl/unix
+TCL_PROGRAM=@bldbasedir@/tcl/unix/tclXtest
+export TCL_LIBRARY TCLX_LIBRARY TCL_PROGRAM
+LD_LIBRARY_PATH=@bldbasedir@/tcl/unix:@TCL_BUILD@/unix:${LD_LIBRARY_PATH}
+SHLIB_PATH=@bldbasedir@/tcl/unix:@TCL_BUILD@/unix:${SHLIB_PATH}
+export LD_LIBRARY_PATH SHLIB_PATH
+exec $TCL_PROGRAM ${1+"$@"}

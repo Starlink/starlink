@@ -1,0 +1,5 @@
+       replicate string countExpr
+              Returns  string,  replicated  the  number  of times
+              indicated by the expression countExpr.
+
+              This command is provided by Extended Tcl.

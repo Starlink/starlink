@@ -1,0 +1,20 @@
+       chown [-fileid] owner | {owner group} filelist
+              Set  owner  of  each  file  in the list filelist to
+              owner, which can be a user name or numeric user id.
+              If the first parameter is a list, then the owner is
+              set to the first element of the list and the  group
+              is set to the second element.  Group can be a group
+              name or numeric group id.  If group is {}, then the
+              file  group  will  be set to the login group of the
+              specified user.
+
+              If the option -fileid is specified, filelist  is  a
+              list of open file identifiers rather than a list of
+              file names.  This option is not  available  on  all
+              Unix systems.  Use the infox have_fchown command to
+              determine if this functionality is available.
+
+              The chown  command  is  not  available  on  Windows
+              95/NT.
+
+              This command is provided by Extended Tcl.

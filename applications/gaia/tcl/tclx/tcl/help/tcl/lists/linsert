@@ -1,0 +1,20 @@
+NAME
+       linsert - Insert elements into a list
+
+SYNOPSIS
+       linsert list index element ?element element ...?
+
+
+DESCRIPTION
+       This  command  produces  a new list from list by inserting
+       all of the element arguments just before the indexth  ele-
+       ment  of  list.  Each element argument will become a sepa-
+       rate element of the new list.  If index is  less  than  or
+       equal  to  zero, then the new elements are inserted at the
+       beginning of the list.  If index has the value end, or  if
+       it  is  greater than or equal to the number of elements in
+       the list, then the new elements are appended to the  list.
+
+
+KEYWORDS
+       element, insert, list

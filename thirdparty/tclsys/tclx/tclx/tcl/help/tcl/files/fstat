@@ -1,0 +1,72 @@
+       fstat fileId ?item? | ?stat arrayvar?
+
+              Obtain status information about an open file.
+
+              The following keys are used to identify data items:
+
+              atime  The time of last access.
+
+              ctime  The time of last file status change
+
+              dev    The device containing a  directory  for  the
+                     file.   This  value  uniquely identifies the
+                     file system that contains the file.
+
+              gid    The group ID of the file's group.
+
+              ino    The inode number.  This field uniquely iden-
+                     tifies the file in a given file system.
+
+              mode   The  mode  of the file (see the mknod system
+                     call).
+
+              mtime  Time when the data in the file was last mod-
+                     ified.
+
+              nlink  The number of links to the file.
+
+              size   The file size in bytes.
+
+              tty    If  the  file is associated with a terminal,
+                     then 1 otherwise 0.
+
+              type   The type of the file in symbolic form, which
+                     is one of the following values: file, direc-
+                     tory, characterSpecial, blockSpecial,  fifo,
+                     link, or socket.
+
+              uid    The user ID of the file's owner.
+
+              If  one  of  these  keys is specified as item, then
+              that data item is returned.
+
+              If stat arrayvar is specified, then the information
+              is  returned  in  the  array arrayvar.  Each of the
+              above keys indexes an element of the array contain-
+              ing the data.
+
+              If  only  fileId  is specified, the command returns
+              the data as a keyed list.
+
+              The  following  values  may  be  returned  only  if
+              explicitly  asked for, it will not be returned with
+              the array or keyed list forms:
+              remotehost
+                     If fileId is  a  TCP/IP  socket  connection,
+                     then  a list is returned with the first ele-
+                     ment being the remote host IP  address.   If
+                     the  remote  host  name  can be found, it is
+                     returned as the second element of the  list.
+                     The  remote host IP port number is the third
+                     element.
+
+              localhost
+                     If fileId is  a  TCP/IP  socket  connection,
+                     then  a list is returned with the first ele-
+                     ment being the local host  IP  address.   If
+                     the  local  host  name  can  be found, it is
+                     returned as the second element of the  list.
+                     The  local  host IP port number is the third
+                     element.
+
+       This command is provided by Extended Tcl.

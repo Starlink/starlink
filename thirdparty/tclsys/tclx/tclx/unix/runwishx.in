@@ -1,0 +1,13 @@
+#!/bin/sh
+# script for running wishx before installation
+
+TCL_LIBRARY=@TCL_SRC@/library
+TCLX_LIBRARY=@bldbasedir@/tcl/unix
+TK_LIBRARY=@TK_SRC@/library
+TKX_LIBRARY=@bldbasedir@/tk/unix
+WISHX=@bldbasedir@/tk/unix/wishx
+export TCL_LIBRARY TCLX_LIBRARY TK_LIBRARY TKX_LIBRARY
+LD_LIBRARY_PATH=@bldbasedir@/tk/unix:@TK_BUILD@/unix:@bldbasedir@/tcl/unix:@TCL_BUILD@/unix:@LD_LIBRARY_PATH@
+SHLIB_PATH=@bldbasedir@/tk/unix:@TK_BUILD@/unix:@bldbasedir@/tcl/unix:@TCL_BUILD@/unix:@SHLIB_PATH@
+export LD_LIBRARY_PATH SHLIB_PATH
+exec $WISHX ${1+"$@"}

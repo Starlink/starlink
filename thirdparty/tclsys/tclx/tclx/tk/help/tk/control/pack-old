@@ -1,0 +1,185 @@
+NAME
+       pack - Obsolete syntax for packer geometry manager
+
+SYNOPSIS
+       pack after sibling window options ?window options ...?
+
+       pack append parent window options ?window options ...?
+
+       pack before sibling window options ?window options ...?
+
+       pack unpack window
+
+
+DESCRIPTION
+       Note:  this manual entry describes the syntax for the pack
+       command as it existed before  Tk  version  3.3.   Although
+       this syntax continues to be supported for backward compat-
+       ibility, it is obsolete and should not  be  used  anymore.
+       At  some point in the future it may cease to be supported.
+
+       The packer is a geometry manager that arranges  the  chil-
+       dren of a parent by packing them in order around the edges
+       of the parent.  The first child is placed against one side
+       of  the  window,  occupying  the entire span of the window
+       along that side.  This reduces  the  space  remaining  for
+       other  children  as  if  the side had been moved in by the
+       size of the first child.  Then the next  child  is  placed
+       against  one side of the remaining cavity, and so on until
+       all children have been placed or there is no space left in
+       the cavity.
+
+       The  before,  after,  and append forms of the pack command
+       are used to insert one or more children into  the  packing
+       order for their parent.  The before form inserts the chil-
+       dren before window sibling in the order;  all of the other
+       windows  must  be  siblings  of  sibling.   The after form
+       inserts the windows after sibling,  and  the  append  form
+       appends  one  or  more  windows  to the end of the packing
+       order for parent.  If a window named in any of these  com-
+       mands  is already packed in its parent, it is removed from
+       its current position in the packing order and repositioned
+       as indicated by the command.  All of these commands return
+       an empty string as result.
+
+       The unpack form of the pack command  removes  window  from
+       the  packing order of its parent and unmaps it.  After the
+       execution of this command the packer will no longer manage
+       window's geometry.
+
+       The  placement  of each child is actually a four-step pro-
+       cess; the options argument following each window  consists
+       of  a list of one or more fields that govern the placement
+       of that window.  In the discussion below, the term  cavity
+       refers  to  the  space  left in a parent when a particular
+       child is placed (i.e. all the space that wasn't claimed by
+       earlier  children  in the packing order).  The term parcel
+       refers to the space allocated to a particular child;  this
+       is  not  necessarily  the same as the child window's final
+       geometry.
+
+       The first step in placing a child is  to  determine  which
+       side  of  the  cavity it will lie against.  Any one of the
+       following options may be used to specify a side:
+
+       top    Position the child's parcel against the top of  the
+              cavity, occupying the full width of the cavity.
+
+       bottom Position  the  child's parcel against the bottom of
+              the cavity, occupying the full width of the cavity.
+
+       left   Position  the  child's parcel against the left side
+              of the cavity, occupying the  full  height  of  the
+              cavity.
+
+       right  Position  the child's parcel against the right side
+              of the cavity, occupying the  full  height  of  the
+              cavity.
+
+       At  most  one of these options should be specified for any
+       given window.  If no side is specified, then  the  default
+       is top.
+
+       The  second  step  is to decide on a parcel for the child.
+       For top and bottom windows, the desired  parcel  width  is
+       normally the cavity width and the desired parcel height is
+       the window's requested height, as passed to Tk_GeometryRe-
+       quest.  For  left  and  right  windows, the desired parcel
+       height is normally the cavity height and the desired width
+       is the window's requested width.  However, extra space may
+       be requested for the window using  any  of  the  following
+       options:
+
+       padx num    Add num pixels to the window's requested width
+                   before computing the parcel size as  described
+                   above.
+
+       pady num    Add  num  pixels  to  the  window's  requested
+                   height before computing  the  parcel  size  as
+                   described above.
+
+       expand      This  option requests that the window's parcel
+                   absorb any extra space left over in  the  par-
+                   ent's  cavity  after packing all the children.
+                   The amount of space left over depends  on  the
+                   sizes requested by the other children, and may
+                   be zero.  If several windows have  all  speci-
+                   fied  expand  then  the  extra  width  will be
+                   divided equally among all the left  and  right
+                   windows  that  specified  expand and the extra
+                   height will be divided equally among  all  the
+                   top  and bottom windows that specified expand.
+
+       If the desired width or height for a parcel is larger than
+       the  corresponding  dimension of the cavity, then the cav-
+       ity's dimension is used instead.
+
+       The third step in placing the window is to decide  on  the
+       window's  width and height.  The default is for the window
+       to receive either its requested width and  height  or  the
+       those  of the parcel, whichever is smaller.  If the parcel
+       is larger than the window's requested size, then the  fol-
+       lowing  options  may  be used to expand the window to par-
+       tially or completely fill the parcel:
+
+       fill   Set the window's size to equal the parcel size.
+
+       fillx  Increase the window's width to equal  the  parcel's
+              width, but retain the window's requested height.
+
+       filly  Increase  the window's height to equal the parcel's
+              height, but retain the window's requested width.
+
+       The last step is to decide the  window's  location  within
+       its  parcel.   If  the  window's  size equals the parcel's
+       size, then the window simply fills the entire parcel.   If
+       the parcel is larger than the window, then one of the fol-
+       lowing options may be used to  specify  where  the  window
+       should be positioned within its parcel:
+
+       frame center   Center  the  window in its parcel.  This is
+                      the default if no framing option is  speci-
+                      fied.
+
+       frame n        Position  the window with its top edge cen-
+                      tered on the top edge of the parcel.
+
+       frame ne       Position the window  with  its  upper-right
+                      corner  at  the  upper-right  corner of the
+                      parcel.
+
+       frame e        Position the window  with  its  right  edge
+                      centered on the right edge of the parcel.
+
+       frame se       Position  the  window  with its lower-right
+                      corner at the  lower-right  corner  of  the
+                      parcel.
+
+       frame s        Position  the  window  with its bottom edge
+                      centered on the bottom edge of the  parcel.
+
+       frame sw       Position  the  window  with  its lower-left
+                      corner at  the  lower-left  corner  of  the
+                      parcel.
+
+       frame w        Position the window with its left edge cen-
+                      tered on the left edge of the parcel.
+
+       frame nw       Position the  window  with  its  upper-left
+                      corner at the upper-left corner of the par-
+                      cel.
+
+       The packer manages the mapped/unmapped state  of  all  the
+       packed  children  windows.  It automatically maps the win-
+       dows when it packs them, and it  unmaps  any  windows  for
+       which there was no space left in the cavity.
+
+       The packer makes geometry requests on behalf of the parent
+       windows it manages.  For each parent window it requests  a
+       size large enough to accommodate all the options specified
+       by all the packed children, such that zero space would  be
+       leftover for expand options.
+
+
+KEYWORDS
+       geometry manager, location, packer, parcel, size

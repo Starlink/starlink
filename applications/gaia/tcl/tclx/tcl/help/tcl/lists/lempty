@@ -1,0 +1,8 @@
+       lempty list
+              Determine  if  the  specified  list  is  empty.  If
+              empty, 1 is returned,  otherwise,  0  is  returned.
+              This  command is an alternative to comparing a list
+              to an empty string, however it checks for a  string
+              of all whitespaces, which is an empty list.
+
+              This command is provided by Extended Tcl.

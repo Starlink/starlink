@@ -1,0 +1,8 @@
+       recursive_glob dirlist globlist
+              This   procedure  returns  a  list  of  recursively
+              matches files.   All  directories  in  dirlist  are
+              recursively   searched  (breadth-first),  comparing
+              each file found against the file glob  patterns  in
+              globlist.  Symbolic links are not followed.
+
+              This procedure is provided by Extended Tcl.
