@@ -30,6 +30,9 @@ libsubpar_adam_la_SOURCES =	\
 	$(PRIVATE_INCLUDES)
 
 FPP_ROUTINES = sup_openifc.fpp
+
+sup_openifc.f: sup_openifc.fpp
+
 F_ROUTINES = sup_accpt.f \
              sup_accpt1.f \
              sup_actdcl.f \
