@@ -22,11 +22,10 @@
 *  Description:
 *     This application calculates values of percentage polarization, 
 *     polarization angle, total intensity and polarized intensity, based 
-*     on Stokes parameters in the supplied input 3D (or 4D) cube (which 
-*     will normally have been created by POLKA or POLCAL). These calculated 
-*     values may be stored either in a series of 2D (or 3D) NDFs, or in a 
-*     single catalogue which may be examined and manipulated using the CURSA 
-*     package (see SUN/190).
+*     on Stokes parameters in the supplied input NDF (which will normally 
+*     have been created by POLKA or POLCAL). These calculated values may 
+*     be stored either in a series of output NDFs, or in a single
+*     catalogue.
 
 *  Usage:
 *     polvec in cat [p] [ang] [i] [ip] [q] [u] [v]
@@ -175,7 +174,7 @@
 *     updated to describe the new reference direction.
 
 *  Copyright:
-*     Copyright (C) 1999 Central Laboratory of the Research Councils
+*     Copyright (C) 2001 Central Laboratory of the Research Councils
  
 *  Authors:
 *     DSB: David Berry (STARLINK)

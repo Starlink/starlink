@@ -75,7 +75,7 @@
 *        current value. []
 *     ILEVEL = _INTEGER (Read)
 *        Controls the amount of information displayed on the screen while
-*        the programn is executing. A value of zero suppresses all
+*        the program is executing. A value of zero suppresses all
 *        information. A value of one results in a summary of each
 *        output image being displayed. A value of two additionally gives
 *        details of the input images, and further details of each output
@@ -130,7 +130,7 @@
 *        etc.
 
 *  Copyright:
-*     Copyright (C) 1999 Central Laboratory of the Research Councils
+*     Copyright (C) 2001 Central Laboratory of the Research Councils
  
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
