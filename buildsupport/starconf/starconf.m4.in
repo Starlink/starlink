@@ -677,7 +677,7 @@ AC_DEFUN([STAR_LATEX_DOCUMENTATION],
                 _star_tmp="$_star_tmp $d.tex $d.ps $d.htx_tar"
             done
             STAR@&t@_LATEX_DOCUMENTATION="$_star_tmp"
-            : ${LATEX2DVI='$LATEX $<; $LATEX $<'}
+            : ${LATEX2DVI='$$LATEX $<; $$LATEX $<'}
             AC_SUBST(LATEX2DVI)
         else
             AC_MSG_WARN([not installing docs $1])
