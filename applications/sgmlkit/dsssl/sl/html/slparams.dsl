@@ -95,7 +95,7 @@ root of the tree of files.  Note that this does <em/not/ affect the
 <returnvalue type=string>File name, without extension
 <codebody>
 (define %override-root-file-name%
-  #f ;"index"
+  "index"
   )
 
 <routine>
@@ -153,10 +153,6 @@ or false if none is to be produced.  See also (suppress-banner).
     (make element gi: "A"
 	  attributes: '(("HREF" "http://www.cclrc.ac.uk"))
 	  (literal "CCLRC"))
-    (literal " / ")
-    (make element gi: "A"
-	  attributes: '(("HREF" "http://www.cclrc.ac.uk/ral/"))
-	  (literal "Rutherford Appleton Laboratory"))
     (literal " / ")
     (make element gi: "A"
 	  attributes: '(("HREF" "http://www.pparc.ac.uk"))
