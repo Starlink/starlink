@@ -702,15 +702,13 @@
                      END DO
 
 *                  Generate the name of the output object.  This will
-*                  depend on whether the NDF is simple or primitive. In
+*                  depend on whether the NDF is simple or primitive.  In
 *                  the former case the data array lies within the
 *                  VARIANCE structure.
                      IF ( PRIM ) THEN
-                        CALL DTA_CRNAM( 'OUTPUT', 'VARIANCE', NDIM,
-     :                                  DIMS, NAMOUT, DSTAT )
+                        NAMOUT = 'OUTPUT.VARIANCE'
                      ELSE
-                        CALL DTA_CRNAM( 'OUTPUT.VARIANCE', 'DATA', NDIM,
-     :                                  DIMS, NAMOUT, DSTAT )
+                        NAMOUT = 'OUTPUT.VARIANCE.DATA'
                      END IF
 
 *                  Copy the input error array to the output primitive
