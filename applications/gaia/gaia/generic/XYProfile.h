@@ -134,7 +134,7 @@ public:
         return ret.typed;
      }
 
-  //  Test for a BAD pixel.
+  //  Test for a BAD pixel. XXX Note NDF specific doesn't check BLANK or NaN.
 #define GENERATE_BADPIXA( T, BADVAL ) \
    inline int badpix( const T *image, const int& span, \
                       const int& i, const int& j ) \

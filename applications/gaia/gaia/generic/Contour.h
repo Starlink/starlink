@@ -225,7 +225,7 @@ public:
   GENERATE_MIN(float);
   GENERATE_MIN(double);
 
-  //  Test for a BAD pixel within the current cell.
+  //  Test for a BAD pixel within the current cell. XXX Note NDF specific doesn't check BLANK or NaN.
 #define GENERATE_BADPIX( T, BADVAL ) \
    inline int badpix( const T *image, const int& span, \
                       const int& i, const int& j ) \
