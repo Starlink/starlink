@@ -51,6 +51,7 @@ use strict;
 use File::Spec;
 use Starlink::AMS::Init;
 use Starlink::AMS::Task;
+use Starlink::ADAM;
 use Astro::Catalog;
 
 use base qw/Exporter/;
@@ -63,6 +64,9 @@ $DEBUG = 0;
 @EXPORT_OK = qw/ /;
 
 our %config_options;
+
+# Cache the task;
+our $TASK;
 
 =head1 METHODS
 
@@ -258,9 +262,11 @@ sub extract {
 
 # Do the extraction.
   my $ams = new Starlink::AMS::Init(1);
-  my $ext = new Starlink::AMS::Task("extractor", $extractor_bin );
-  my $STATUS = $ext->contactw;
-  $ext->obeyw("extract", "image=$ndf config=" . $self->_config_file_name );
+  if( ! defined $TASK ) {
+    $TASK = new Starlink::AMS::Task("extractor", $extractor_bin );
+  }
+  my $STATUS = $TASK->contactw;
+  $TASK->obeyw("extract", "image=$ndf config=" . $self->_config_file_name );
 
 # Form a catalogue from Astro::Catalog.
   my $catalog = new Astro::Catalog( Format => 'SExtractor',
