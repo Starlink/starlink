@@ -6,7 +6,9 @@
 # ------------------------------------------------------------------------
 # 	Makefile
 # ------------------------------------------------------------------------
-
+# Modified:
+#
+#    Peter W. Draper: Added TCL_EXEC_DIR macro to locate itclsh2.2 binary
 # ------------------------------------------------------------------------
 
 # C compiler
@@ -39,6 +41,7 @@ X_INCLUDE     	= @XINCSW@
 # installed in $prefix/include)
 TCL_VERSION     = @TCL_VERSION@
 ITCL_MAJOR_VERSION = @ITCL_MAJOR_VERSION@
+TCL_EXEC_DIR    = @DESTDIR@/bin
 
 # ------------------------------------------------------------------------
 
@@ -105,7 +108,7 @@ $(OBJS): ../../config.status
 tixUnixSam.c: tixSamLib.c
 
 tixSamLib.c:
-	itclsh2.2 ../tools/tclc.tcl \
+	$(TCL_EXEC_DIR)/itclsh2.2 ../tools/tclc.tcl \
 	  ../library/pref/*.fsc \
 	  ../library/pref/*.csc \
 	  ../library/*.tcl > tixSamLib.c
