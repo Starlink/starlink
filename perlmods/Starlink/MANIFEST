@@ -1,4 +1,5 @@
 Makefile.PL
+starperl.news
 MANIFEST
 sun228.tex
 sun228.htx_tar
@@ -48,7 +49,7 @@ HDSPACK/Makefile.PL
 HDSPACK/MANIFEST
 HDSPACK/testhds.sdf
 HDSPACK/t/copobj.t
-HDSPACKt/creobj.t
+HDSPACK/t/creobj.t
 HDSPACK/t/delobj.t
 HDSPACK/t/wrapper.t
 Versions/MANIFEST
