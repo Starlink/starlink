@@ -33,6 +33,10 @@
 
 #  Public Variables (Configuration Options):
 #
+#     balloonstr
+#        A short which will pop up in a balloon if the cursor stays over
+#        the widget for longer than a short space of time.
+#
 #     childsite
 #        The pathname of the childsite widget, in which the specific 
 #        control should be put.
@@ -93,12 +97,6 @@
          }
          set childsite [ $itk_component(toolbar) add frame onlytool ]
          set tool $childsite
-
-       # itk_component add controlframe {
-       #    frame $itk_interior.controlframe
-       # }
-       # set control $itk_component(controlframe)
-
          set control $itk_component(toolbar)
          pack $control -fill y -expand 1
 
