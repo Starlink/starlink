@@ -1,0 +1,262 @@
+#+
+#  Name:
+#     FLUXES.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     GJP: Grant Privett (STARLINK)
+#     TIMJ: Tim Jenness (JACH)
+#     RPT:  Remo Tilanus (JACH)
+#     {enter_new_authors_here}
+
+#  History:
+#     06-JUL-1996 (GJP):
+#        Original version.
+#     09-JUL-1998 (TIMJ):
+#        Modified the prompt for PLANET
+#     10-SEP-1998 (RPT):
+#        Add write parameters: FILTER, F_CENTRE, F_WIDTH, F_TOTAL,
+#        F_BEAM, T_BRIGHT, T_ERROR
+#     17-SEP-1998 (TIMJ):
+#        Add MSG_FILTER
+#        Add SEMI_DIAM and SOLID_ANG
+#     {enter_changes_here}
+
+#-    
+
+interface FLUXES
+
+    PARAMETER MSG_FILTER
+        TYPE     '_CHAR'
+        PROMPT   'Messaging level'
+        DEFAULT  'NORM'
+        VPATH    'DEFAULT'
+        HELPKEY  '*'
+      ENDPARAMETER
+
+
+
+  parameter POS           # Use planetary data?
+    type '_LOGICAL'
+    access 'read'
+    keyword 'POS'
+    prompt 'Do you require planetary data? (Y/N)'
+    ppath 'current,default'
+    vpath 'prompt'
+    default Y
+  endparameter
+
+  parameter APASS           # Another pass?
+    type '_LOGICAL'
+    access 'read'
+    keyword 'APASS'
+    prompt 'Would you like another pass (Y/N)'
+    ppath 'default'
+    vpath 'prompt'
+    default N
+  endparameter
+
+  parameter FLU           # Use planetary data?
+    type '_LOGICAL'
+    access 'read'
+    keyword 'FLU'
+    prompt 'Do you require flux data?      (Y/N)'
+    ppath 'current,default'
+    vpath 'prompt'
+    default Y
+  endparameter
+ 
+  parameter SCREEN        # Display to terminal? 
+    type '_LOGICAL'
+    access 'read'
+    keyword 'SCREEN'
+    prompt 'Display output to terminal? (Y/N)'
+    ppath 'current,default'
+    vpath 'prompt'
+    default Y
+  endparameter
+
+  parameter OFL           # Store to file? 
+    type '_LOGICAL'
+    access 'read'
+    keyword 'OFL'
+    prompt 'Store output in a file?        (Y/N)'
+    ppath 'current,default'
+    vpath 'prompt'
+    default N
+  endparameter
+
+  parameter NOW       # Use current date/time? 
+    type '_LOGICAL'
+    access 'read'
+    keyword 'NOW'
+    prompt 'Use todays date/time? (Y/N)'
+    ppath 'current,default'
+    vpath 'prompt'
+    default Y
+  endparameter
+ 
+  parameter PREVUT       # Use previous UT date/time? 
+    type '_LOGICAL'
+    access 'read'
+    keyword 'PREVUT'
+    prompt 'Use previous date/time? (Y/N)'
+    ppath 'current,default'
+    vpath 'prompt'
+    default Y
+  endparameter
+ 
+  parameter SAMETIME       # Same time as previously? 
+    type '_LOGICAL'
+    access 'read'
+    keyword 'SAMETIME'
+    prompt 'Use the previous time value? (Y/N)'
+    ppath 'current,default'
+    vpath 'prompt'
+    default Y
+  endparameter
+
+  parameter SAMEDATE       # Same date as previously? 
+    type '_LOGICAL'
+    access 'read'
+    keyword 'SAMEDATE'
+    prompt 'use the previous date value (Y/N)'
+    ppath 'current,default'
+    vpath 'prompt'
+    default Y
+  endparameter
+
+  parameter DATE       # Date? 
+    type '_CHAR'
+    access 'update'
+    keyword 'DATE'
+    prompt 'UT DATE (DD MM YY)'
+    ppath 'current,default'
+    vpath 'prompt'
+    default '        '
+  endparameter
+ 
+  parameter TIME       # Time? 
+    type '_CHAR'
+    access 'update'
+    keyword 'TIME'
+    prompt 'UT TIME (HH MM SS)'
+    ppath 'current,default'
+    vpath 'prompt'
+    default '        '
+  endparameter
+ 
+  parameter OUTFILE       # Output filename. 
+    type '_CHAR'
+    access 'update'
+    keyword 'OUTFILE'
+    prompt 'Name of output file                '
+    ppath 'default'
+    default 'fluxes.dat'
+    vpath 'prompt'
+  endparameter
+ 
+  parameter PLANET       # Planet? 
+    type '_CHAR'
+    access 'update'
+    keyword 'PLANET'
+    prompt 'Planet name (ALL to list all planets)'
+    ppath 'current,default'
+    vpath 'prompt'
+    default 'ALL'
+  endparameter
+
+  parameter FILTER       # Filter? 
+    type '_CHAR'
+    access 'update'
+    keyword 'FILTER'
+    prompt 'Filter name (ALL to list all filters)'
+    ppath 'current,default'
+    vpath 'default'
+    default 'ALL'
+  endparameter
+
+  parameter F_CENTRE
+    prompt 'Centre Frequency'
+    type '_REAL'
+    default -1.0
+    helpkey '*'
+    vpath  'default'
+    access write
+  endparameter
+
+  parameter F_WIDTH
+    prompt 'Filter Width'
+    type '_REAL'
+    default -1.0
+    helpkey '*'
+    vpath  'default'
+    access write
+  endparameter
+
+  parameter F_TOTAL
+    prompt 'Total flux'
+    type '_REAL'
+    default -1.0
+    helpkey '*'
+    vpath  'default'
+    access write
+  endparameter
+
+  parameter F_BEAM
+    prompt 'Flux in Beam'
+    type '_REAL'
+    default -1.0
+    helpkey '*'
+    vpath  'default'
+    access write
+  endparameter
+
+  parameter T_BRIGHT
+    prompt 'Brightness Temperature'
+    type '_REAL'
+    default -1.0
+    helpkey '*'
+    vpath  'default'
+    access write
+  endparameter
+
+  parameter T_ERROR
+    prompt 'Error Brightness Temperature'
+    type '_REAL'
+    default -1.0
+    helpkey '*'
+    vpath  'default'
+    access write
+  endparameter
+
+  parameter HPBW
+    prompt 'Assumed Half Power BW'
+    type '_REAL'
+    default -1.0
+    helpkey '*'
+    vpath  'default'
+    access write
+  endparameter
+
+  parameter SEMI_DIAM
+    prompt 'Semi-diameter of planet (arcsec)'
+    type '_REAL'
+    default -1.0
+    helpkey '*'
+    vpath  'default'
+    access write
+  endparameter
+
+  parameter SOLID_ANG
+    prompt 'Solid angle of planet (sterad)'
+    type '_REAL'
+    default -1.0
+    helpkey '*'
+    vpath  'default'
+    access write
+  endparameter
+
+endinterface
