@@ -39,6 +39,9 @@
       - GAIA should now work correctly with X servers whose default
         visual doesn't match the requested visual.
 
+      - A bug in the aperture photometry toolbox that caused some 
+        detached sky regions to randomly move has been fixed.
+
 
   To try out GAIA for yourself type the following command:
 

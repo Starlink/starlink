@@ -633,11 +633,13 @@ itcl::class gaia::GaiaPhotomList {
    #  then all objects are written, otherwise just the currently selected
    #  objects are used, or the $selected_ object.
    public method write_file {filename {all 1} } {
+      puts "writing file: ($filename)"
       set ok 0
       set fid [open $filename w]
       if { $all } {
          for { set i $lowest_index_ } { $i <= $highest_index_ } { incr i } {
             if { [info exists objects_($i)] } {
+               puts "wrote object: $objects_($i)"
                puts $fid "[$objects_($i) getvalues all]"
                set ok 1
             }

@@ -67,10 +67,14 @@
 #     27-MAY-1999 (PDRAPER):
 #        Added changes to allow optimal photometry objects (normal and
 #        psf reference).
+#     17-MAY-2000 (PDRAPER):
+#        Fixed problem with saving sky circles/ellipses. These could
+#        occasionally reconfigure the main aperture using image,
+#        rather than canvas coordinates (dependended on major axis
+#        being smaller than minor).
 #     {enter_further_changes_here}
 
 #-
-
 #.
 
 itcl::class gaia::GaiaPhotomObject {
@@ -332,6 +336,7 @@ itcl::class gaia::GaiaPhotomObject {
       lassign [image_coord $xpos $ypos] x y
       set maj [image_dist $major]
       set ang [image_angle $angle]
+      puts "getapvals: $x, $y, $maj, $ang"
       set description \
          "[format {%10d %10f %10f %10f %10f %10f %14f %10s %10f %10f %10f} \
              $index $x $y $mag $magerr $sky $signal $code $maj \
@@ -396,8 +401,7 @@ itcl::class gaia::GaiaPhotomObject {
                   set min $maj
                   set maj $temp
                   set ang [expr fmod($ang+90.0,180.0)]
-                  $canvas coords $canvas_id_ $x $y
-                  $canvas itemconfigure $canvas_id_ \
+                  $canvas itemconfigure $sky_details_($i,id) \
                      -semimajor $maj -semiminor $min -angle $ang
                }
                set maj [image_dist $maj]
