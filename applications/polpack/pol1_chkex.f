@@ -107,13 +107,9 @@
 
 *  Local Variables:
       CHARACTER CCDLOC*(DAT__SZLOC) 
-      CHARACTER COMP*(GRP__SZNAM)
-      CHARACTER FDIRN*(GRP__SZFNM)
       CHARACTER FILTER*256
-      CHARACTER FTYPE*(GRP__SZFNM)
       CHARACTER IMGID*256
       CHARACTER NDFNAM*256
-      CHARACTER SLICE*(GRP__SZNAM)
       CHARACTER ANLID*30
       DOUBLE PRECISION ANGCOS  
       DOUBLE PRECISION ANGSIN
@@ -211,11 +207,9 @@
 
 *  Extract the file basename plus HDS component string (if any), and use 
 *  it as the IMGID value.
-            CALL NDG1_HSPEC( NDFNAM, ' ', .FALSE., FDIRN, IMGID, FTYPE,
-     :                       COMP, SLICE, FORM, STATUS )
-            IAT = CHR_LEN( IMGID )
-            IF( COMP .NE. ' ' ) CALL CHR_APPND( COMP, IMGID, IAT )
-            IF( SLICE .NE. ' ' ) CALL CHR_APPND( SLICE, IMGID, IAT )
+            CALL NDG1_LASTO( NDFNAM, '/', IAT, STATUS )
+            IMGID = NDFNAM( IAT + 1 : LC ) 
+            IAT = LC - IAT 
 
 *  Tell the user what is happening.
             IF( .NOT. QUIET ) THEN

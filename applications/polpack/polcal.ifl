@@ -85,7 +85,7 @@ interface POLCAL
       access   READ
       vpath    'DEFAULT'
       ppath    'DEFAULT'
-      default  1
+      default  2
       prompt   'Maximum number of iterations in single-beam mode'
       helpkey  '*'
    endparameter
