@@ -60,6 +60,8 @@
 #        control over the default number of objects that are searched
 #        for. Increased from 1000 to 20000. Images are getting bigger
 #        and deeper.
+#     29-APR-2003 (PWD):
+#        Increased precision of arc-minutes radius to 4 (from 2).
 #     {enter_further_changes_here}
 
 #-
@@ -119,7 +121,7 @@ itcl::class gaia::GaiaQuery {
          set center [$image_ wcscenter]
          if {[llength $center] >= 2} {
             lassign $center ra dec equinox
-            set radius [format "%.2f" [$image_ wcsradius]]
+            set radius [format "%.4f" [$image_ wcsradius]]
             if {$radius} {
                return [list $ra $dec $equinox $radius]
             }
@@ -128,9 +130,9 @@ itcl::class gaia::GaiaQuery {
          # using image coords
          set w [$image_ width]
          set h [$image_ height]
-         set x [format "%.2f" [expr $w/2.]]
-         set y [format "%.2f" [expr $h/2.]]
-         set radius [format "%.2f" [expr sqrt($w*$w+$h*$h)/2.]]
+         set x [format "%.4f" [expr $w/2.]]
+         set y [format "%.4f" [expr $h/2.]]
+         set radius [format "%.4f" [expr sqrt($w*$w+$h*$h)/2.]]
          return [list $x $y $radius]
       }
    }
