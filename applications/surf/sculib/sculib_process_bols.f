@@ -1,14 +1,16 @@
-      SUBROUTINE SCULIB_PROCESS_BOLS(EXTINCTION, N_BEAMS, N_BOL, N_POS, 
-     :     N_SWITCHES, N_EXPOSURES, N_INTEGRATIONS, N_MEASUREMENTS,
-     :     N_MAP, N_FITS, FITS, DEM_PNTR, LST_STRT,
+      SUBROUTINE SCULIB_PROCESS_BOLS(EXTINCTION, SCUOVER, N_BEAMS, 
+     :     N_BOL, N_POS, N_SWITCHES, N_EXPOSURES, N_INTEGRATIONS, 
+     :     N_MEASUREMENTS,START_EXP, END_EXP, START_INT, END_INT, 
+     :     START_MEAS, END_MEAS,N_MAP, N_FITS, FITS, DEM_PNTR, LST_STRT,
      :     IN_ROTATION, SAMPLE_MODE, SAMPLE_COORDS, OUT_COORDS,
      :     JIGGLE_REPEAT, JIGGLE_COUNT, JIGGLE_X, JIGGLE_Y,
      :     JIGGLE_P_SWITCH, RA_CEN, DEC_CEN,
      :     RA1, RA2, DEC1, DEC2, MJD_STANDARD, IN_UT1,
+     :     MJD1, LONG1, LAT1, MJD2, LONG2, LAT2,
      :     N_POINT, POINT_LST, POINT_DAZ, POINT_DEL, 
      :     NUM_CHAN, NUM_ADC, BOL_ADC, BOL_CHAN, BOL_DU3, BOL_DU4, 
      :     SCAN_REVERSAL, FIRST_LST, SECOND_LST, FIRST_TAU, SECOND_TAU,
-     :     BOL_DEC, BOL_RA, NDATA, NVARIANCE, ELEVATION, PAR_ANGLE,
+     :     BOL_DEC, BOL_RA, NDATA, NVARIANCE,
      :     STATUS)
 *+
 *  Name:
@@ -31,7 +33,7 @@
 *    :     N_POINT, POINT_LST, POINT_DAZ, POINT_DEL, 
 *    :     NUM_CHAN, NUM_ADC, BOL_ADC, BOL_CHAN, BOL_DU3, BOL_DU4, 
 *    :     SCAN_REVERSAL, FIRST_LST, SECOND_LST, FIRST_TAU, SECOND_TAU,
-*    :     BOL_DEC, BOL_RA, NDATA, NVARIANCE, ELEVATION, PAR_ANGLE,
+*    :     BOL_DEC, BOL_RA, NDATA, NVARIANCE,
 *    :     STATUS)
 
 *  Description:
@@ -43,11 +45,27 @@
 *     of the bolometers. If EXTINCTION is .FALSE. all the bolometers positions
 *     are converted to apparent RA-Dec at the reference modified Julian 
 *     date (given by MJD_STANDARD).
+*
+*     There is some complication for moving sources (use PL output coords):
+*      For JIGGLE:
+*       1) Calculate map RA/Dec at new MJD
+*       2) Convert to tangent plane offsets for this map centre
+*
+*      For SCAN:
+*       1) Calculate array centre for reference MJD
+*       2) Calculate tangent offsets of array centre relative to map centre
+*       3) Calculate map centre at the interpolated MJD
+*       4) Work out array centre given new map centre
+*      This is all because the file stores RA start and end relative
+*      to the fixed centre at the start of the observation.
 
 *  Arguments:
 *     EXTINCTION = _LOGICAL (Given)
 *        Determines whether the data are corrected for extinction (.TRUE.)
 *        or whether the bolometer positions are converted to a standaed MJD.
+*     SCUOVER = LOGICAL (Given)
+*        Kludge to get this working with SCUOVER (prevents EXP_START 
+*        loop from running properly)
 *     N_BEAMS = _INTEGER (Given)
 *        Number of beams in the input data. Only used if EXTINCTION=.TRUE.
 *     N_BOL = _INTEGER (Given)
@@ -62,6 +80,18 @@
 *        Number of integrations
 *     N_MEASUREMENTS = _INTEGER (Given)
 *        Number of measurements
+*     START_EXP  = INTEGER (Given)
+*        First exposure to process
+*     END_EXP    = INTEGER (Given)
+*        Last exposure to process
+*     START_INT  = INTEGER (Given)
+*        First integration to process
+*     END_INT    = INTEGER (Given)
+*        End integration to process
+*     START_MEAS = INTEGER (Given)
+*        First measurement to process
+*     END_MEAS   = INTEGER (Given)
+*        End measurement to process
 *     N_MAP = _INTEGER (Given)
 *        Map number of input data (only used if EXTINCTION=.FALSE.)
 *     N_FITS = _INTEGER (Given)
@@ -112,6 +142,18 @@
 *        Standard MJD to which each input map is referenced (EXTINCTION=FALSE)
 *     IN_UT1 = _DOUBLE (Given)
 *        MJD of input data.
+*     MJD1 = DOUBLE (Given)
+*        MJD of first planet position
+*     LONG1 = DOUBLE (Given)
+*        Longitude (apparent RA) at MJD1
+*     LAT1 = DOUBLE (Given)
+*        Latitude (apparent Dec) at MJD1
+*     MJD2 = DOUBLE (Given)
+*        MJD of second planet position
+*     LONG2 = DOUBLE (Given)
+*        Longitude (apparent RA) at MJD2
+*     LAT2 = DOUBLE (Given)
+*        Latitude (apparent Dec) at MJD2
 *     N_POINT = _INTEGER (Given)
 *        Number of pointing corrections (should be zero if EXTINCTION)
 *     POINT_DEL = _REAL (Given)
@@ -193,6 +235,9 @@
       DOUBLE PRECISION DEC_CEN
       INTEGER          DEM_PNTR(N_EXPOSURES, N_INTEGRATIONS, 
      :                          N_MEASUREMENTS)
+      INTEGER          END_EXP
+      INTEGER          END_INT
+      INTEGER          END_MEAS
       LOGICAL          EXTINCTION
       CHARACTER*(*)    FITS(N_FITS)
       DOUBLE PRECISION FIRST_LST
@@ -206,7 +251,13 @@
       REAL             JIGGLE_Y(JIGGLE_COUNT)
       DOUBLE PRECISION LST_STRT(N_SWITCHES, N_EXPOSURES,
      :                          N_INTEGRATIONS, N_MEASUREMENTS)
+      DOUBLE PRECISION LAT1
+      DOUBLE PRECISION LAT2
+      DOUBLE PRECISION LONG1
+      DOUBLE PRECISION LONG2
       DOUBLE PRECISION MJD_STANDARD
+      DOUBLE PRECISION MJD1
+      DOUBLE PRECISION MJD2
       INTEGER          NUM_CHAN
       INTEGER          NUM_ADC
       INTEGER          N_BEAMS
@@ -231,14 +282,16 @@
       CHARACTER *(*)   SAMPLE_COORDS
       CHARACTER *(*)   SAMPLE_MODE
       LOGICAL          SCAN_REVERSAL
+      LOGICAL          SCUOVER
+      INTEGER          START_EXP
+      INTEGER          START_INT
+      INTEGER          START_MEAS
       DOUBLE PRECISION SECOND_LST
       REAL             SECOND_TAU
 
 *     Arguments Returned:      
       DOUBLE PRECISION BOL_DEC(N_BOL, N_POS)
       DOUBLE PRECISION BOL_RA(N_BOL, N_POS)
-      DOUBLE PRECISION ELEVATION (N_POS)
-      DOUBLE PRECISION PAR_ANGLE (N_POS)
 
 *     Given & Returned
       REAL             NDATA(N_BOL, N_POS, N_BEAMS)
@@ -253,17 +306,22 @@
 
 *  Local Variables:
       LOGICAL          AZNASCAN         ! Am I using RASTER with AZ or NA?
+      LOGICAL          AZNASCAN_PL      ! Is the source moving with Az/NA/SCAN?
       DOUBLE PRECISION ARRAY_DEC_CENTRE ! apparent DEC of array centre (rads)
       DOUBLE PRECISION ARRAY_RA_CENTRE  ! apparent RA of array centre (rads)
       INTEGER          BEAM             ! Loop counter for N_BEAMS
+      INTEGER          BOL_COORDS_OFFSET! Offset used in CALC_BOL_COORDS
       REAL             CENTRE_DU3       ! dU3 Nasmyth coordinate of point on 
                                         ! focal plane that defines tel axis
       REAL             CENTRE_DU4       ! dU3 Nasmyth coordinate of point on 
                                         ! focal plane that defines tel axis
+      DOUBLE PRECISION CURR_MJD         ! MJD for current sample
       INTEGER          DATA_OFFSET      ! Offset in BOL_RA and BOL_DEC
       REAL             DEC_START        ! declination at start of SCAN 
       REAL             DEC_END          ! declination at end of SCAN
-      DOUBLE PRECISION ELTEMP           ! Elevation from CALC_BOL_COORDS
+      DOUBLE PRECISION ELAPSED          ! Elapsed time since start of obsn
+      DOUBLE PRECISION ELEVATION        ! Elevation from CALC_BOL_COORDS
+      DOUBLE PRECISION ETA              ! Tangent plane Y offset
       INTEGER          EXPOSURE         ! Loop counter for N_EXPOSURES
       INTEGER          EXP_END          ! Position of end of exposure
       DOUBLE PRECISION EXP_LST          ! LST of exposure
@@ -276,20 +334,66 @@
       INTEGER          JIGGLE           ! 
       DOUBLE PRECISION LAT_OBS          ! Latitude of observatory (radians)
       DOUBLE PRECISION LST              ! LST of switch
+      DOUBLE PRECISION MAP_DEC_CEN      ! Dec of Map centre
+      DOUBLE PRECISION MAP_RA_CEN       ! RA of map centre
       INTEGER          MEASUREMENT      ! Loop counter for N_MEASUREMENTS
       CHARACTER *(2)   OFFSET_COORDS    ! Coordinate system of offsets
       REAL             OFFSET_X         ! X offset of measurement in OFF_COORDS
       REAL             OFFSET_Y         ! Y offset of measurement in OFF_COORDS
       CHARACTER *(2)   OUTCRDS          ! Coordinate system of output map
-      DOUBLE PRECISION PATEMP           ! Par Angle from CALC_BOL_COORDS
+      DOUBLE PRECISION PAR_ANGLE        ! Par Angle from CALC_BOL_COORDS
       REAL             RA_END           ! RA at end of SCAN
       REAL             RA_START         ! RA at start of SCAN
       REAL             RTEMP            ! Temp real
+      LOGICAL          SET_STATUS       ! True is status has been set by sub
+      LOGICAL          SOME_DATA        ! True if data was found
+      INTEGER          STORED_OFFSET    ! Data offset at start of exposure
       REAL             TAUZ             ! Tau at zenith for given Bol elevation
+      DOUBLE PRECISION XI               ! Tangent plane x offset
 *.
 
       IF (STATUS .NE. SAI__OK) RETURN
 
+      SOME_DATA = .FALSE.
+      SET_STATUS = .FALSE.
+
+*     Check input data
+
+      IF (START_MEAS .GT. N_MEASUREMENTS .OR. START_MEAS .LT. 1
+     :     .OR. END_MEAS .LT. 1 .OR. END_MEAS .GT. N_MEASUREMENTS) THEN
+         STATUS = SAI__ERROR
+         CALL MSG_SETI('SM', START_MEAS)
+         CALL MSG_SETI('EM', END_MEAS)
+         CALL MSG_SETI('NM', N_MEASUREMENTS)
+         CALL ERR_REP(' ','SCULIB_PROCESS_BOLS: Start and end '//
+     :        'values for measurements (^SM and ^EM) are  '//
+     :        'not consistent with actual number of '//
+     :        'measurements (^NM)', STATUS)
+      END IF
+      IF (START_INT .GT. N_INTEGRATIONS .OR. START_INT .LT. 1
+     :     .OR. END_INT .LT. 1 .OR. END_INT .GT. N_INTEGRATIONS) THEN
+         STATUS = SAI__ERROR
+         CALL MSG_SETI('SM', START_INT)
+         CALL MSG_SETI('EM', END_INT)
+         CALL MSG_SETI('NM', N_INTEGRATIONS)
+
+         CALL ERR_REP(' ','SCULIB_PROCESS_BOLS: Start and end '//
+     :        'values for integrations (^SM and ^EM) are  '//
+     :        'not consistent with actual number of '//
+     :        'integrations (^NM)', STATUS)
+      END IF
+
+      IF (START_EXP .GT. N_EXPOSURES .OR. START_EXP .LT. 1
+     :     .OR. END_EXP .LT. 1 .OR. END_EXP .GT. N_EXPOSURES) THEN
+         STATUS = SAI__ERROR
+         CALL MSG_SETI('SM', START_EXP)
+         CALL MSG_SETI('EM', END_EXP)
+         CALL MSG_SETI('NM', N_EXPOSURES)
+         CALL ERR_REP(' ','SCULIB_PROCESS_BOLS: Start and end '//
+     :        'values for exposures (^SM and ^EM) are  '//
+     :        'not consistent with actual number of '//
+     :        'exposures (^NM)', STATUS)
+      END IF
 
 *     Get some values from the FITS array
 
@@ -335,18 +439,52 @@
 
       END IF
 
+*     Check if I am using a moving source with NA or AZ
+
+      AZNASCAN_PL = .FALSE.
+
+      IF (AZNASCAN) THEN
+         IF (MJD1 .GT. 1.0D0 .AND. MJD2 .GT. MJD1) THEN
+            AZNASCAN_PL = .TRUE.
+         END IF
+      END IF
+
 *     Set up the default value for flipping
 *     This assumes the first scan is the reference
       FLIP = .FALSE.
+
+*     Store the map centre 
+      MAP_RA_CEN = RA_CEN
+      MAP_DEC_CEN = DEC_CEN
+
+*     Set the DATA OFFSET to 1. This is needed if I want to start
+*     calculation from some arbritrary integration. If a subset of
+*     ints/exps etc is specified then the data is still stored
+*     sequentially. This will cause confusion in other routines
+*     if you start doing this sort of thing
+*     This feature is really to give SCUOVER more flexibility. REBIN
+*     and EXTINCTION should not notice a change.
+*     Do not confuse START_EXP with EXP_START. START_EXP is the exposure
+*     to start with, whereas EXP_START is the position in the data
+*     at which the exposure starts.
+
+      DATA_OFFSET = 0
 
 *     now go through the various exposures of the observation calculating the
 *     observed positions
 
       IF (STATUS .NE. SAI__OK) RETURN
 
-      DO MEASUREMENT = 1, N_MEASUREMENTS
-         DO INTEGRATION = 1, N_INTEGRATIONS
-            DO EXPOSURE = 1, N_EXPOSURES
+      DO MEASUREMENT = START_MEAS, END_MEAS
+         DO INTEGRATION = START_INT, END_INT
+            DO EXPOSURE = START_EXP, END_EXP
+
+*     Check status at start of loop
+               IF (STATUS .NE. SAI__OK .AND. .NOT. SET_STATUS) THEN
+                  CALL ERR_REP(' ','SCULIB_PROCESS_BOLS: Error '//
+     :                 'occurred whilst looping', STATUS)
+                  SET_STATUS = .TRUE.
+               ELSE
 
 *     find where the exposure starts and finishes in the data array
 
@@ -367,6 +505,8 @@
 
 *     OK, there is some data, first calculate mean LST for the switch
 *     sequence making up the exposure
+
+                  SOME_DATA = .TRUE.   ! I have processed some data
 
                   EXP_LST = 0.0D0
                   DO I = 1, N_SWITCHES
@@ -397,9 +537,33 @@
                      DEC_END = DEC_END * REAL (PI) / 180.0
                   END IF
 
+*     Store the first position of this exposure (in the data array
+
+                  STORED_OFFSET = DATA_OFFSET + 1
+
+*       Add kludge for SCUOVER - can only display zero jiggle
+*       or middle of SCAN
+               IF (SCUOVER) THEN
+                  IF (SAMPLE_MODE .EQ. 'RASTER') THEN
+
+*       Calculate middle of scan
+                     ITEMP = (EXP_END + EXP_START) / 2
+                     EXP_LST = EXP_LST + DBLE(ITEMP - EXP_START) *
+     :                    DBLE(EXP_TIME) * 1.0027379D0 * 
+     :                    2.0D0 * PI / (3600.0D0 * 24.0D0)
+
+                     EXP_START = ITEMP
+                  END IF
+
+                  EXP_END = EXP_START
+               END IF
+
 *     cycle through the measurements in the exposure
 
                   DO I = EXP_START, EXP_END
+
+*     Increment the data position
+                     DATA_OFFSET = DATA_OFFSET + 1
 
 *     calculate the LST at which the measurement was made (hardly worth the
 *     bother because it's averaged over the switches anyway)
@@ -408,11 +572,52 @@
      :                    DBLE(EXP_TIME) * 1.0027379D0 * 
      :                    2.0D0 * PI / (3600.0D0 * 24.0D0)
 
+*     Now need to work out the actual map centre at this time if
+*     we are rebinning a moving source (PL)
+*     Also need to do this if I am rebinning AZ or NA with SCAN map.
+
+                     IF (OUT_COORDS .EQ. 'PL' .OR. AZNASCAN_PL) THEN
+
+*     First calculate the elapsed time since the start of the observation
+*     Note that we have to be careful about LST wrapping round to zero
+*     part way through an observation.
+*     In this case if LST is less than the start LST I assume that we 
+*     have been observing long enough that LST has wrapped round.
+*     Hopefully this will be okay unless we take an obvservation lasting
+*     for 24 hours!
+
+                        ELAPSED = LST - LST_STRT(1,1,1,1)
+
+                        IF (ELAPSED .LT. 0.0D0) THEN
+                           ELAPSED = (2.0D0 * PI) + ELAPSED
+                        END IF
+
+*     Convert this to days
+                        ELAPSED = ELAPSED / (2.0D0 * PI)
+
+
+*     Current MJD is MJD at start of observation plus the elapsed
+*     time to this exposure. 
+
+                        CURR_MJD = IN_UT1 + ELAPSED
+
+                        IF (MJD2 .EQ. MJD1) THEN
+                           MAP_RA_CEN = LONG1
+                           MAP_DEC_CEN = LAT1
+                        ELSE
+
+                           MAP_RA_CEN =  LONG1 + (LONG2 - LONG1) * 
+     :                          (CURR_MJD - MJD1)/ (MJD2 - MJD1)
+                           MAP_DEC_CEN = LAT1 + (LAT2 - LAT1) * 
+     :                          (CURR_MJD - MJD1) / (MJD2 - MJD1)
+                        END IF
+                     END IF
+
 *     work out the offset at which the measurement was made in arcsec
                      
                      IF (SAMPLE_MODE .EQ. 'JIGGLE') THEN
-                        ARRAY_RA_CENTRE = RA_CEN
-                        ARRAY_DEC_CENTRE = DEC_CEN
+                        ARRAY_RA_CENTRE = MAP_RA_CEN
+                        ARRAY_DEC_CENTRE = MAP_DEC_CEN
                         
                         IF (JIGGLE_REPEAT .EQ. 1) THEN
                            JIGGLE = (EXPOSURE-1) *
@@ -447,21 +652,50 @@
 
                         OFFSET_X = 0.0
                         OFFSET_Y = 0.0
+
+*     Now need to calculate tangent plane offsets of this array centre
+*     from the reference map centre stored in RA_CEN and DEC_CEN
+*     This implies that shift will not work unless I pass it into
+*     this routine at the top
+
+                        IF (OUT_COORDS .EQ. 'PL' .OR. AZNASCAN_PL) THEN
+
+                           XI = ARRAY_RA_CENTRE
+                           ETA = ARRAY_DEC_CENTRE
+
+                           CALL SCULIB_APPARENT_2_TP(1, XI,
+     :                          ETA, RA_CEN, DEC_CEN,
+     :                          0.0D0, 0.0D0, 0.0D0, STATUS)
+
+*     These offsets are actually the offsets from the new map centre
+*     (and not from the RA_CEN,DEC_CEN!) This is what we think the
+*     on-line system is giving us.
+*     Now need to convert these tangent plane offsets from moving map centre 
+*     to apparent RA/Dec.
+
+                           CALL SLA_DTP2S (XI, ETA, MAP_RA_CEN,
+     :                          MAP_DEC_CEN, ARRAY_RA_CENTRE, 
+     :                          ARRAY_DEC_CENTRE) 
+
+                        END IF
+
                      END IF
 
 *     EXTINCTION only stores one exposures worth of bol positions
+*     Can only get away with this because EXTINCTION does not use
+*     the bolometer positions returned by CALC_BOL_COORDS
 
                      IF (EXTINCTION) THEN
-                        DATA_OFFSET = 1
+                        BOL_COORDS_OFFSET = 1
                      ELSE
-                        DATA_OFFSET = I
+                        BOL_COORDS_OFFSET = DATA_OFFSET
                      END IF
 
 *     now call a routine to work out the apparent RA,Dec of the measured
 *     bolometers at this position
 
-                     ELTEMP = VAL__BADD
-                     PATEMP = VAL__BADD
+                     ELEVATION = VAL__BADD
+                     PAR_ANGLE = VAL__BADD
 
                      CALL SCULIB_CALC_BOL_COORDS (OUTCRDS, 
      :                    ARRAY_RA_CENTRE, ARRAY_DEC_CENTRE, LST, 
@@ -471,16 +705,9 @@
      :                    NUM_CHAN, NUM_ADC, N_BOL, BOL_CHAN,
      :                    BOL_ADC, BOL_DU3, BOL_DU4,
      :                    CENTRE_DU3, CENTRE_DU4,
-     :                    BOL_RA(1, DATA_OFFSET), 
-     :                    BOL_DEC(1, DATA_OFFSET),
-     :                    ELTEMP, PATEMP, STATUS)
-
-
-                     IF (AZNASCAN) THEN
-                        ELEVATION (DATA_OFFSET) = ELTEMP
-                        PAR_ANGLE (DATA_OFFSET) = PATEMP
-                     END IF
-
+     :                    BOL_RA(1, BOL_COORDS_OFFSET), 
+     :                    BOL_DEC(1, BOL_COORDS_OFFSET),
+     :                    ELEVATION, PAR_ANGLE, STATUS)
 
                      IF (EXTINCTION) THEN
 *     work out the zenith sky opacity at this LST
@@ -501,20 +728,47 @@
 
                            CALL SCULIB_CORRECT_EXTINCTION (
      :                          NUM_ADC * NUM_CHAN, N_BOL,
-     :                          NDATA(1, I, BEAM), 
-     :                          NVARIANCE(1, I, BEAM),
+     :                          NDATA(1, DATA_OFFSET, BEAM), 
+     :                          NVARIANCE(1, DATA_OFFSET, BEAM),
      :                          BOL_RA, BOL_DEC, LST, LAT_OBS, TAUZ,
      :                          STATUS)
                         END DO
                      ELSE
 
+*     Convert the apparent RA/Decs to tangent plane offsets
+*     from the moving centre if we are using the 'PL' output system
+*     or want to calculate Az and NA
+
+                        IF (OUT_COORDS .EQ. 'PL' .OR. AZNASCAN) THEN
+
+                           CALL SCULIB_APPARENT_2_TP (N_BOL,
+     :                          BOL_RA(1,DATA_OFFSET), 
+     :                          BOL_DEC(1,DATA_OFFSET),
+     :                          MAP_RA_CEN, MAP_DEC_CEN, 0.0D0,
+     :                          0.0D0, 0.0D0, STATUS)
+
+*     If we are trying to do NA/AZ for RASTER data then we have to convert
+*     the coordinates from apparent RA/Dec to tangent plane offsets and
+*     then into Az or NA coordinates using an elevation dependent rotation.
+*     Convert these TP offsets to Az or NA
+                           IF (AZNASCAN) THEN
+
+                              CALL SCULIB_SCAN_APPARENT_TP_2_AZNA(
+     :                             OUT_COORDS, 1, N_BOL, ELEVATION,
+     :                             PAR_ANGLE, BOL_RA(1, DATA_OFFSET),
+     :                             BOL_DEC(1,DATA_OFFSET), STATUS)
+
+                           END IF
+
+                        ELSE
 *     convert the coordinates to apparent RA,Dec on MJD_STANDARD
-                        IF (OUTCRDS .EQ. 'RA') THEN
-                           IF (N_MAP .NE. 1) THEN
-                              CALL SCULIB_STANDARD_APPARENT (
-     :                             N_BOL, BOL_RA(1,DATA_OFFSET), 
-     :                             BOL_DEC(1, DATA_OFFSET),
-     :                             IN_UT1, MJD_STANDARD, STATUS)
+                           IF (OUTCRDS .EQ. 'RA') THEN
+                              IF (N_MAP .NE. 1) THEN
+                                 CALL SCULIB_STANDARD_APPARENT (
+     :                                N_BOL, BOL_RA(1,DATA_OFFSET), 
+     :                                BOL_DEC(1, DATA_OFFSET),
+     :                                IN_UT1, MJD_STANDARD, STATUS)
+                              END IF
                            END IF
                         END IF
                      END IF
@@ -530,8 +784,8 @@
                            RTEMP = -1.0
 
                            CALL SCULIB_MULCAR(ITEMP, 
-     :                          NDATA(1, EXP_START, 1), RTEMP, 
-     :                          NDATA(1, EXP_START, 1))
+     :                          NDATA(1,STORED_OFFSET,1), RTEMP, 
+     :                          NDATA(1, STORED_OFFSET,1))
                         END IF
                         FLIP = .FALSE.
                      ELSE
@@ -541,9 +795,26 @@
 
                END IF
 
+               END IF   ! This is the endif that goes with STATUS check
+
             END DO
          END DO
       END DO
+
+*     Check that some data was processed
+      IF (STATUS .EQ. SAI__OK .AND. .NOT. SOME_DATA) THEN
+         STATUS = SAI__WARN
+         CALL ERR_REP (' ', 'SCULIB_PROCESS_BOLS: No data was '//
+     :        'processed', STATUS)
+         SET_STATUS = .TRUE.
+      END IF
+
+*     Check final status so that I can inform people where the error
+*     occurred.
+      IF (STATUS .NE. SAI__OK .AND. .NOT.SET_STATUS) THEN
+         CALL ERR_REP(' ','SCULIB_PROCESS_BOLS: Error '//
+     :        'occurred somewhere', STATUS)
+      END IF
 
 
       END
