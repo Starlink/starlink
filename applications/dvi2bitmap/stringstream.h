@@ -40,7 +40,7 @@
 using std::ostringstream;
 #endif
 
-#else
+#elif HAVE_STRSTREAM
 
 #include <strstream>
 #define SSTREAM ostrstream
@@ -53,6 +53,8 @@ using std::ostrstream;
 using std::ends;
 #endif
 
+#else
+#error "Neither HAVE_SSTREAM nor HAVE_STRSTREAM is defined!"
 #endif
 
 #endif /* STRINGSTREAM_H_LOADED */
