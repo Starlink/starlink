@@ -275,6 +275,9 @@
 *        Modified some of the warnings.
 *     29-JUN-2000 (MBT):
 *        Replaced use of IRH/IRG with GRP/NDG.
+*     21-MAR-2001 (MBT):
+*        Now refuses to resample into a SkyFrame, which is bound to be
+*        a user error or misconception.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -566,12 +569,13 @@
                STATUS = SAI__ERROR
                CALL NDF_MSG( 'NDFNAME', IDIN )
                CALL ERR_REP( 'TRANNDF_NOAST', '  NDF ^NDFNAME '//
-     :'does not have a WCS extension (try setting USEWCS to .FALSE.).',
+     :'does not have a WCS component (try setting USEWCS to .FALSE.).',
      :                       STATUS ) 
                GO TO 940
             ENDIF  
             
-*  It appears we have a WCS component, get a pointer to the current FrameSet
+*  It appears we have a WCS component, get a pointer to the current 
+*  Frame.
             CALL CCD1_GTWCS( IDIN, IWCS, STATUS )
             MAP = AST_GETMAPPING( IWCS, 2, AST__CURRENT, STATUS )
             MAP = AST_SIMPLIFY( MAP, STATUS )
@@ -579,7 +583,7 @@
 
 *  Get the index of the current frame for future use 
             CFRAME = AST_GETI( IWCS, 'Current', STATUS )
-                                     
+
          ELSE
 
 *  The user wishes to use TRANSFORM structures.
@@ -637,19 +641,34 @@
 *  unlikely that deviations from linearity will be very great).
 
 *  Validate the transformation
-           IF ( IWCS .EQ. AST__NULL ) THEN
+            IF ( IWCS .EQ. AST__NULL ) THEN
                STATUS = SAI__ERROR
                CALL NDF_MSG( 'NDFNAME', IDIN )
                CALL ERR_REP( 'TRANNDF_NOAST', '  NDF ^NDFNAME '//
-     :'does not have a valid WCS extension.',STATUS ) 
+     :'does not have a valid WCS component.', STATUS ) 
                GO TO 940 
-           ELSE IF (AST_GETC( IWCS,'Class',STATUS) .NE. 'FrameSet') THEN
+
+            ELSE IF ( AST_GETC( IWCS,'Class', STATUS ) .NE. 'FrameSet' ) 
+     :      THEN
                STATUS = SAI__ERROR
                CALL NDF_MSG( 'NDFNAME', IDIN )
                CALL ERR_REP( 'TRANNDF_FRAME', '  NDF ^NDFNAME '//
-     :'does not have a WCS extention with class FrameSet.',STATUS)
+     :'does not have a WCS component with class FrameSet.',STATUS )
                GO TO 940             
-           ELSE 
+
+*  Check that we are not trying to resample into a SkyFrame.  This 
+*  pretty much has to be a silly thing to do, and probably indicates
+*  that the user has failed to stick a sensible frame onto the NDF.
+            ELSE IF ( AST_ISASKYFRAME( FRCUR, STATUS ) ) THEN
+               STATUS = SAI__ERROR
+               CALL ERR_REP( 'TRANNDF_SKYFRM', 'TRANNDF: It makes no'//
+     :' sense to resample into a SkyFrame (units are all wrong).', 
+     :STATUS )
+               CALL ERR_REP( ' ', '         Try adding a pixel-like'//
+     :' frame using WCSREG with DOMAINS=!.', STATUS )
+               GO TO 940
+                                     
+            ELSE 
                               
 *  Tell the user which co-ordinate frame we'll be resampling into.
                DMN = AST_GETC( FRCUR, 'Domain', STATUS )
@@ -663,11 +682,11 @@
                   CALL CCD1_MSG( ' ', '    (Warning: this is not a '//
      :'default CCDPACK registration coordinate system)', STATUS )
                END IF
-           END IF
+            END IF
 
 *  Obtain the number of input and output co-ordinates for a Mapping
-           NVIN = AST_GETI( MAP, 'Nin', STATUS )
-           NVOUT = AST_GETI( MAP, 'Nout', STATUS )    
+            NVIN = AST_GETI( MAP, 'Nin', STATUS )
+            NVOUT = AST_GETI( MAP, 'Nout', STATUS )    
                                
          ELSE
          
@@ -677,12 +696,12 @@
 *  Now validate the transformation.  Need forward and backward
 *  transformations.
             IF ( INEXT .OR. INDEX .EQ. 1 ) THEN
-                CALL TRN_COMP( LOCTR, .TRUE., TRIDF, STATUS )
-                CALL TRN_COMP( LOCTR, .FALSE., TRIDI, STATUS )
+               CALL TRN_COMP( LOCTR, .TRUE., TRIDF, STATUS )
+               CALL TRN_COMP( LOCTR, .FALSE., TRIDI, STATUS )
 
 *  Obtain the number of variables in the transformation.
-                CALL TRN_GTNV( LOCTR, NVIN, NVOUT, STATUS )
-                IF ( STATUS .NE. SAI__OK ) GO TO 940
+               CALL TRN_GTNV( LOCTR, NVIN, NVOUT, STATUS )
+               IF ( STATUS .NE. SAI__OK ) GO TO 940
 
 *  Inquire the classification of the transformation.
 *  =================================================
@@ -690,21 +709,21 @@
 *  Certain efficiencies gains can be made for certain types of
 *  transformation, mostly notably a linear transformation, where the
 *  flux conservation factor is a constant.
-                CALL TRN_GTCL( LOCTR, .TRUE., CLASS, STATUS )
+               CALL TRN_GTCL( LOCTR, .TRUE., CLASS, STATUS )
 
 *  Test if the transformation can be processed.
-                IF ( .NOT. CLASS( TRN__LIN   ) .AND.
-     :               .NOT. CLASS( TRN__CONDT ) .AND. NORM ) THEN
-                    STATUS = SAI__ERROR
-                    CALL ERR_REP( 'TRANNDF_ERR',
+               IF ( .NOT. CLASS( TRN__LIN   ) .AND.
+     :            .NOT. CLASS( TRN__CONDT ) .AND. NORM ) THEN
+                  STATUS = SAI__ERROR
+                  CALL ERR_REP( 'TRANNDF_ERR',
      :     'TRANNDF: The transformation is non-linear, '/
      :     /'or does not have a constant determinant, and cannot be '/
      :     /'handled with flux conservation by this routine', STATUS )
-                    GO TO 940
-                END IF
+                  GO TO 940
+               END IF
             END IF
             
-          ENDIF   
+         ENDIF   
          
 *  Get the properties of the NDF.
 *  ==============================
