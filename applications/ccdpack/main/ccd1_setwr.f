@@ -1,4 +1,4 @@
-      SUBROUTINE CCD1_SETWR( INDF, NAME, INDEX, JSET, STATUS )
+      SUBROUTINE CCD1_SETWR( INDF, SNAME, SINDEX, JSET, STATUS )
 *+
 *  Name:
 *     CCD1_SETWR
@@ -10,7 +10,7 @@
 *     Starlink Fortran 77.
 
 *  Invocation:
-*     CALL CCD1_SETWR( INDF, NAME, INDEX, JSET, STATUS )
+*     CALL CCD1_SETWR( INDF, SNAME, SINDEX, JSET, STATUS )
 
 *  Description:
 *     This routine writes the SET header to the .MORE.CCDPACK extension
@@ -35,13 +35,13 @@
 *  Arguments:
 *     INDF = INTEGER (Given)
 *        NDF identifier of the NDF to be modified.
-*     NAME = CHARACTER * ( * ) (Given)
+*     SNAME = CHARACTER * ( * ) (Given)
 *        A name labelling the Set.  This should be the same for all 
 *        members of the same Set, and no two NDFs with the same 
 *        SET.INDEX should share the same SET.NAME.  In determining
 *        equality of names everything (e.g. case, embedded spaces)
 *        apart from leading and trailing spaces is significant.
-*     INDEX = INTEGER (Given)
+*     SINDEX = INTEGER (Given)
 *        A number indicating rank within the Set.  This should be 
 *        different for all members of the same Set, i.e. no two 
 *        NDFs with the same SET.NAME should share the same SET.INDEX.
@@ -87,11 +87,12 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! Standard AST constants
       INCLUDE 'DAT_PAR'          ! Standard HDS constants
+      INCLUDE 'CCD1_PAR'         ! CCDPACK private constants
       
 *  Arguments Given:
       INTEGER INDF
-      CHARACTER * ( * ) NAME
-      INTEGER INDEX
+      CHARACTER * ( * ) SNAME
+      INTEGER SINDEX
       INTEGER JSET
       
 *  Status:
@@ -106,7 +107,7 @@
       INTEGER IWCS               ! Identifier for WCS frameset
       INTEGER JCUR               ! Index of Current frame
       INTEGER JNEW               ! Index of newly added frame
-      INTEGER NAMLEN             ! Length of NAME string
+      INTEGER NAMLEN             ! Length of SNAME string
       INTEGER NAXES              ! Number of axes in frame
       INTEGER SETFRM             ! Identifier for new WCS frame
       INTEGER UMAP               ! Identifier for UnitMap
@@ -121,8 +122,8 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Get length of NAME string.
-      NAMLEN = MAX( CHR_LEN( NAME ), 1 )
+*  Get length of SNAME string.
+      NAMLEN = MAX( CHR_LEN( SNAME ), 1 )
 
 *  Add and populate the .MORE.CCDPACK.SET NDF extension.
 *  =====================================================
@@ -150,9 +151,13 @@
 
 *  Check that we have valid values for the header; if not, then leave
 *  it empty.
-      IF ( NAME .EQ. ' ' .OR. INDEX .LE. 0 ) THEN
-         CALL MSG_SETC( 'NAME', NAME )
-         CALL MSG_SETI( 'INDEX', INDEX )
+      IF ( SNAME .EQ. ' ' .OR. SINDEX .EQ. CCD1__BADSI ) THEN
+         CALL MSG_SETC( 'NAME', SNAME )
+         IF ( SINDEX .EQ. CCD1__BADSI ) THEN
+            CALL MSG_SETC( 'INDEX', 'CCD1_BADSI' )
+         ELSE
+            CALL MSG_SETI( 'INDEX', SINDEX )
+         END IF
          CALL CCD1_MSG( ' ', '      Not adding invalid Set header '//
      :                  '(Name="^NAME", Index=^INDEX)', STATUS )
       ELSE
@@ -166,13 +171,13 @@
 *  Create, locate, populate and release the SET.NAME item.
          CALL DAT_NEW0C( SLOC, 'NAME', NAMLEN, STATUS )
          CALL DAT_FIND( SLOC, 'NAME', ILOC, STATUS )
-         CALL DAT_PUT0C( ILOC, NAME, STATUS )
+         CALL DAT_PUT0C( ILOC, SNAME, STATUS )
          CALL DAT_ANNUL( ILOC, STATUS )
 
 *  Create, locate, populate and release the SET.INDEX item.
          CALL DAT_NEW0I( SLOC, 'INDEX', STATUS )
          CALL DAT_FIND( SLOC, 'INDEX', ILOC, STATUS )
-         CALL DAT_PUT0I( ILOC, INDEX, STATUS )
+         CALL DAT_PUT0I( ILOC, SINDEX, STATUS )
          CALL DAT_ANNUL( ILOC, STATUS )
 
 *  Release the .MORE.CCDPACK.SET and .MORE.CCDPACK locators.
@@ -204,7 +209,7 @@
 *  Set the Title of the new frame appropriately.
             IAT = 0
             CALL CHR_APPND( 'Alignment in CCDPACK Set "', TITLE, IAT )
-            CALL CHR_APPND( NAME( :NAMLEN ), TITLE, IAT )
+            CALL CHR_APPND( SNAME( :NAMLEN ), TITLE, IAT )
             CALL CHR_APPND( '"', TITLE, IAT )
             CALL AST_SETC( SETFRM, 'Title', TITLE( :CHR_LEN( TITLE ) ),
      :                     STATUS )

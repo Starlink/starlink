@@ -404,7 +404,7 @@
       INTEGER SIZES( 2 )        ! Sides of box to use for cleaning
       INTEGER STACK( CCD1__MXNDF ) ! Stack of input NDF identifiers
       INTEGER SUBGRP( CCD1__MXNDF ) ! NDG identifiers for input subgroups
-      INTEGER SUBIND            ! Common Set Index attribute for this subgroup
+      INTEGER SINDEX            ! Common Set Index attribute for this subgroup
       INTEGER UBND( 3 )         ! Upper bounds of NDF
       LOGICAL BAD               ! Set if BAD pixels are present
       LOGICAL CLEAN             ! Clean the input NDFs of defects
@@ -509,16 +509,16 @@
 
 *  Get the stack of NDF identifiers for this subgroup, and find a common
 *  Set Index attribute if one exists.
-         SUBIND = 0
+         SINDEX = 0
          DO I = 1, NNDF
             CALL NDG_NDFAS( SUBGRP( ISUB ), I, 'READ', STACK( I ),
      :                      STATUS )
             CALL CCD1_SETRD( STACK( I ), AST__NULL, NAME, INDEX, JSET,
      :                       STATUS )
             IF ( I .EQ. 1 ) THEN
-               SUBIND = INDEX
+               SINDEX = INDEX
             ELSE
-               IF ( INDEX .NE. SUBIND ) SUBIND = 0
+               IF ( INDEX .NE. SINDEX ) SINDEX = CCD1__BADSI
             END IF
          END DO
 
@@ -633,8 +633,8 @@
 *  the input NDFs in this subgroup have the same (non-zero) Set Index,
 *  then use that as the Set Index of the output NDF.  In that case,
 *  use the name of the output NDF itself as the Set Name attribute.
-         IF ( SUBIND .GT. 0 ) THEN
-            CALL CCD1_SETWR( NDFOUT, OUTNAM, SUBIND, AST__NOFRAME,
+         IF ( SINDEX .NE. CCD1__BADSI ) THEN
+            CALL CCD1_SETWR( NDFOUT, OUTNAM, SINDEX, AST__NOFRAME,
      :                       STATUS )
          END IF
 

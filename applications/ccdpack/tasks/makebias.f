@@ -407,9 +407,9 @@
       INTEGER OPLACE( CCD1__MXNDF ) ! Placeholders for output NDFs
       INTEGER PLACE              ! Place holder for an NDF
       INTEGER POINT( CCD1__MXNDF ) ! Workspace for pointers to sorted data
+      INTEGER SINDEX             ! Common Set Index value in subgroup
       INTEGER STACK( CCD1__MXNDF ) ! Stack of input NDF identifiers
       INTEGER SUBGRP( CCD1__MXNDF ) ! NDG identifiers for subgroup NDF lists
-      INTEGER SUBIND             ! Common Set Index value in subgroup
       LOGICAL DELETE             ! Delete input NDFs?
       LOGICAL GENVAR             ! If true then variances are generated.
       LOGICAL OK                 ! Ok flag
@@ -507,16 +507,16 @@
 
 *  Get the stack of NDF identifiers for this subgroup,and find a common
 *  Set Index attribute if one exists.
-         SUBIND = 0
+         SINDEX = 0
          DO I = 1, NNDF
             CALL NDG_NDFAS( SUBGRP( ISUB ), I, 'READ', STACK( I ),
      :                      STATUS )
             CALL CCD1_SETRD( STACK( I ), AST__NULL, NAME, INDEX, JSET,
      :                       STATUS )
             IF ( I .EQ. 1 ) THEN
-               SUBIND = INDEX
+               SINDEX = INDEX
             ELSE
-               IF ( INDEX .NE. SUBIND ) SUBIND = 0
+               IF ( INDEX .NE. SINDEX ) SINDEX = CCD1__BADSI
             END IF
          END DO
 
@@ -648,8 +648,8 @@
 *  Set Index, then use that as the Set Index of the output NDF.
 *  In that case, use the name of the output NDF itself as the Set
 *  Name attribute.
-         IF ( SUBIND .GT. 0 ) THEN
-            CALL CCD1_SETWR( NDFOUT, OUTNAM, SUBIND, AST__NOFRAME,
+         IF ( SINDEX .NE. CCD1__BADSI ) THEN
+            CALL CCD1_SETWR( NDFOUT, OUTNAM, SINDEX, AST__NOFRAME,
      :                       STATUS )
          END IF
 

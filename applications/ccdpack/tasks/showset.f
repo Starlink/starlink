@@ -452,7 +452,7 @@
             CALL CCD1_GTWCS( INDF, IWCS, STATUS )
             CALL CCD1_SETRD( INDF, IWCS, NAME, INDEX, JSET, STATUS )
             CALL CHR_ITOC( INDEX, SINDEX, NCHAR )
-            NOSET = NAME .EQ. ' ' .AND. INDEX .LE. 0
+            NOSET = NAME .EQ. ' ' .AND. INDEX .EQ. CCD1__BADSI
             OK = .TRUE.
 
 *  See whether it is to be omitted because it has no Set information

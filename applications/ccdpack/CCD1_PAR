@@ -38,6 +38,8 @@
 *        Added package version string.
 *     10-FEB-2000 (MBT):
 *        Modified package version string for automatic editing at build time.
+*     9-MAY-2001 (MBT):
+*        Added symbolic constant CCD1__BADSI.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -90,6 +92,10 @@
 *  Maximum length of NAME field (FRAME_TYPE or FILTER)
       INTEGER CCD1__NMLEN
       PARAMETER ( CCD1__NMLEN = 33 )
+
+*  Invalid value for Set Index attribute.
+      INTEGER CCD1__BADSI
+      PARAMETER ( CCD1__BADSI = -2147483647 )
 
 *  Package version.
       CHARACTER * ( 32 ) VERS
