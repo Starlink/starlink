@@ -2153,6 +2153,13 @@ int fits_init_cfitsio(void)
 
     if (status)
     {
+        /**
+         * XXX This flag seem to get raised on Solaris for no
+         * discernable reason (perhaps the lock file is cleared?). The
+         * error isn't fatal so ignore).
+         */
+        return( 0 );
+        
         ffpmsg("failed to register the shmem:// driver (init_cfitsio)");
         return(status);
     }

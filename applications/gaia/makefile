@@ -522,9 +522,9 @@ GAIA_LIB_FILES =  \
    Catalogue.hlp Gaia.hlp GaiaApPhotom.hlp GaiaArd.hlp GaiaAst.hlp \
    GaiaAstCopy.hlp GaiaAstDefine.hlp GaiaAstGrid.hlp \
    GaiaAstReference.hlp GaiaAstRefine.hlp GaiaAstSystem.hlp \
-   GaiaAstTransfer.hlp GaiaAstTransform.hlp GaiaContour.hlp \
-   GaiaEsp.hlp GaiaOptPhotom.hlp GaiaPatch.hlp GaiaPositions.hlp \
-   GaiaSearch.hlp GaiaSextractor.hlp GaiaTextImport.hlp \
+   GaiaAstDomain.hlp GaiaAstTransfer.hlp GaiaAstTransform.hlp \
+   GaiaContour.hlp GaiaEsp.hlp GaiaOptPhotom.hlp GaiaPatch.hlp \
+   GaiaPositions.hlp GaiaSearch.hlp GaiaSextractor.hlp GaiaTextImport.hlp \
    GaiaXYProfile.hlp StarBlink.hlp \
    skycat2.0.cfg gaiawcs2tab pix2wcs gaia.sh gaiadisp.sh gaiaremote.sh \
    adamMessageRelay

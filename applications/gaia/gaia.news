@@ -84,3 +84,8 @@
   2.6-0  Facilities for selected the secndary coordinate system are now 
          available. The "pixel" system from the celestial coordinate system
          toolbox is now removed.
+
+         cfitsio: failed to regsiter the shmem:// driver message
+         should be fixed.
+
+         Pan window should now work with very thin images (1 pixel wide).
