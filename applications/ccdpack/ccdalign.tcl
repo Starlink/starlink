@@ -80,6 +80,21 @@
 #  Initialise screen.
       wm withdraw .
 
+#  Issue instructions about interacting with the GUI.
+      ccdputs " "
+      ccdputs "   For each image that is displayed, mark centroidable" \
+              " features on it."
+      ccdputs "   Add a point by clicking on the image with mouse button 1" \
+              " (left),"
+      ccdputs "   remove a point by clicking on it with mouse button 3 (right)."
+      ccdputs "   Corresponding features should be labelled by the same" \
+              " number on all images;"
+      ccdputs "   the number of the next point to be added can be changed" \
+              " in the toolbar."
+      ccdputs "   Click the 'Done' button when you have added all the points" \
+              " to an image."
+      ccdputs " "
+      
 #  Allow selection of points for the reference NDF.
       set refndf [ ndf $refndfname ]
       Ndfview .v$ref \
@@ -90,8 +105,11 @@
                   -maxpoints $MAXPOS
       .v$ref loadndf $refndf $MAXCANV
       .v$ref configure -geometry ${WINX}x${WINY}
+      ccdputs -log "   Mark points on the reference image, [ $refndf name ]:"
       .v$ref activate
       tkwait variable state$ref
+      ccdputs -log "   [ llength [ .v$ref points ] ] points initially marked."
+      ccdputs -log " "
 
 #  Get display preferences so that they can be propagated to subsequent
 #  windows.
@@ -121,8 +139,13 @@
                          -maxpoints $MAXPOS
             .v$i configure -geometry ${WINX}x${WINY}
             .v$i loadndf $ndf $MAXCANV
+            ccdputs -log \
+            "   Mark points on image #$done/$nother, [ $ndf name ]:"
             .v$i activate
             tkwait variable state$i
+            ccdputs -log "   [ llength [ .v$i points ] ] points marked."
+            ccdputs -log " "
+
             set ZOOM [ .v$i cget -zoom ]
             set MAXCANV [ .v$i maxcanvas ]
             regexp {^([0-9]+)x([0-9]+)} [ .v$i cget -geometry ] dummy WINX WINY 

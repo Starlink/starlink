@@ -220,7 +220,8 @@
             set pa [ $ndf(A) pixelsize CURRENT ]
             set pb [ $ndf(B) pixelsize CURRENT ]
             if { [ max [ expr $pa / $pb ] [ expr $pb / $pa ] ] > 20 } {
-               ccdlog "Uh-oh: gross discrepancy in pixel sizes"
+               ccdputs -log "  There is a gross discrepancy in pixel sizes; "
+                            "alignment will be difficult."
             }
 
 #  Change the pixelsize variable if pixel sizes in the frames of the
