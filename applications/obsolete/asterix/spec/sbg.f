@@ -127,9 +127,9 @@
       CALL AST_INIT()
 
 *  Get names of source and background datasets
-      CALL USI_TASSOCI( 'INP', '*', 'UPDATE', IFID, STATUS )
+      CALL USI_ASSOC( 'INP', 'BinDS', 'UPDATE', IFID, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
-      CALL USI_TASSOCI( 'BGFILE', '*', 'READ', BFID, STATUS )
+      CALL USI_ASSOC( 'BGFILE', 'BinDS', 'READ', BFID, STATUS )
       IF ( STATUS .EQ. PAR__NULL ) THEN
         CALL ERR_ANNUL( STATUS )
         BFID = ADI__NULLID

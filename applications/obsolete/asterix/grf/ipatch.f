@@ -457,11 +457,11 @@
 
 
           IF (I_GUI) THEN
-            CALL IMG_GUICURS(X,Y,STATUS)
+            CALL IMG_GUICURS(X,Y,FLAG,STATUS)
           ELSE
             CALL GFX_CURS(X,Y,LEFT,RIGHT,CH,STATUS)
             IF (RIGHT.OR.CH.EQ.'X'.OR.CH.EQ.'x') THEN
-              FLAG=0
+              FLAG=999
             ENDIF
           ENDIF
 

@@ -622,9 +622,9 @@
 *   Trace path of input data.
       CALL USI_NAMEI(NLINES,PATH,STATUS)
 *
-      CALL HIST_ADD(LOCOUT, VERSION, STATUS)
+      CALL HSI_ADD(OID, VERSION, STATUS)
 *
-      CALL HIST_PTXT(LOCOUT, NLINES, PATH, STATUS)
+      CALL HSI_PTXT(OID, NLINES, PATH, STATUS)
 *
       IF (STATUS .NE. SAI__OK) THEN
          CALL MSG_PRNT('Error writing history record')
@@ -634,9 +634,9 @@
       IF (LBMOD) THEN
 *
 *      Add history structure to the extrapolated background file
-         CALL HIST_ADD(BSLOC, VERSION, STATUS)
+         CALL HSI_ADD(MID, VERSION, STATUS)
 *
-         CALL HIST_PTXT(BSLOC, NLINES, PATH, STATUS)
+         CALL HSI_PTXT(MID, NLINES, PATH, STATUS)
 *
 *   Change title of the background image
          CALL BDA_PUTTITLE(BSLOC, 'Extrapolated background file',

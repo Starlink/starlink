@@ -180,7 +180,7 @@
       CALL AST_INIT
 
 *  Associate dataset
-      CALL USI_TASSOCI( 'INP', '*', 'READ', IFID, STATUS )
+      CALL USI_ASSOC( 'INP', '*', 'READ', IFID, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *  Check there is history available

@@ -35,6 +35,7 @@
       REAL XC,YC,PXC,PYC
       REAL XR,YR,PXR,PYR,RAD,PRAD
       REAL X,Y,ANG,XSIGN,YSIGN
+      INTEGER FLAG
       INTEGER NBIN
       INTEGER I
       DOUBLE PRECISION UNITFACT          ! Conversion factor between
@@ -66,7 +67,7 @@
           YC=I_Y
           IF (I_GUI) THEN
             CALL MSG_PRNT('Select centre...')
-            CALL IMG_GUICURS(XC,YC,STATUS)
+            CALL IMG_GUICURS(XC,YC,FLAG,STATUS)
           ELSE
             CALL MSG_SETR('X',XC)
             CALL MSG_SETR('Y',YC)
@@ -83,7 +84,7 @@
 *  get radius
           IF (I_GUI) THEN
             CALL MSG_PRNT('Select radius...')
-            CALL IMG_GUICURS(XR,YR,STATUS)
+            CALL IMG_GUICURS(XR,YR,FLAG,STATUS)
             RAD=SQRT((XR-XC)**2 + (YR-YC)**2)
           ELSE
             CALL MSG_SETR('R',I_R)

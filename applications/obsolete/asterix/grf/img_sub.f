@@ -4227,6 +4227,7 @@ c        REAL XX,XP,YP
 *    Local variables :
       REAL XCORN,YCORN,XWID,YWID
       CHARACTER*1 CH
+      INTEGER FLAG
       LOGICAL LEFT,RIGHT
 *    Global Variables :
       INCLUDE 'IMG_CMN'
@@ -4240,7 +4241,7 @@ c        REAL XX,XP,YP
           YC=I_Y
           IF (I_GUI) THEN
             CALL MSG_PRNT('Select centre...')
-            CALL IMG_GUICURS(XC,YC,STATUS)
+            CALL IMG_GUICURS(XC,YC,FLAG,STATUS)
           ELSE
             CALL MSG_SETR('XC',XC)
             CALL MSG_SETR('YC',YC)
@@ -4258,7 +4259,7 @@ c        REAL XX,XP,YP
           XCORN=XC
           YCORN=YC
           IF (I_GUI) THEN
-            CALL IMG_GUICURS(XCORN,YCORN,STATUS)
+            CALL IMG_GUICURS(XCORN,YCORN,FLAG,STATUS)
           ELSE
             CALL GFX_CURS(XCORN,YCORN,LEFT,RIGHT,CH,STATUS)
           ENDIF
@@ -4333,6 +4334,7 @@ c      REAL HWID
       REAL PXTR,PYTR,PXTL,PYTL,PXBR,PYBR,PXBL,PYBL
       REAL A,ASQ,B,BSQ,CSQ
       INTEGER LS
+      INTEGER FLAG
       LOGICAL LEFT,RIGHT
 *-
 
@@ -4345,7 +4347,7 @@ c      REAL HWID
           YCENT=I_Y
           IF (I_GUI) THEN
             CALL MSG_PRNT('Select centre...')
-            CALL IMG_GUICURS(XCENT,YCENT,STATUS)
+            CALL IMG_GUICURS(XCENT,YCENT,FLAG,STATUS)
           ELSE
             CALL MSG_SETR('X',XCENT)
             CALL MSG_SETR('Y',YCENT)
@@ -4365,7 +4367,7 @@ c      REAL HWID
           XEND=XCENT
           YEND=YCENT
           IF (I_GUI) THEN
-            CALL IMG_GUICURS(STATUS)
+            CALL IMG_GUICURS(XEND,YEND,FLAG,STATUS)
           ELSE
             CALL GFX_CURS(XEND,YEND,LEFT,RIGHT,CH,STATUS)
           ENDIF
@@ -4388,7 +4390,7 @@ c      REAL HWID
           XWID=XCENT
           YWID=YCENT
           IF (I_GUI) THEN
-            CALL IMG_GUICURS(XWID,YWID,STATUS)
+            CALL IMG_GUICURS(XWID,YWID,FLAG,STATUS)
           ELSE
             CALL GFX_CURS(XWID,YWID,LEFT,RIGHT,CH,STATUS)
           ENDIF
@@ -4675,6 +4677,7 @@ c      REAL HWID
 *    Local variables :
       CHARACTER*1 CH
       REAL XR,YR
+      INTEGER FLAG
       LOGICAL LEFT,RIGHT
 *-
       IF (STATUS.EQ.SAI__OK) THEN
@@ -4687,7 +4690,7 @@ c      REAL HWID
           CALL MSG_PRNT(' ')
           IF (I_GUI) THEN
             CALL MSG_PRNT('Select centre...')
-            CALL IMG_GUICURS(XC,YC,STATUS)
+            CALL IMG_GUICURS(XC,YC,FLAG,STATUS)
           ELSE
             CALL MSG_SETR('XC',XC)
             CALL MSG_SETR('YC',YC)
@@ -4706,7 +4709,7 @@ c      REAL HWID
           YR=YC
           IF (I_GUI) THEN
             CALL MSG_PRNT('Select radius...')
-            CALL IMG_GUICURS(XR,YR,STATUS)
+            CALL IMG_GUICURS(XR,YR,FLAG,STATUS)
             RAD=SQRT((XR-XC)**2 + (YR-YC)**2)
           ELSE
             CALL MSG_SETR('RAD',I_R)
@@ -4767,6 +4770,7 @@ c      REAL HWID
 *    Local variables :
       CHARACTER*1 CH
       REAL XR,YR
+      INTEGER FLAG
       LOGICAL LEFT,RIGHT
 *-
       IF (STATUS.EQ.SAI__OK) THEN
@@ -4778,7 +4782,7 @@ c      REAL HWID
           YC=I_Y
           IF (I_GUI) THEN
             CALL MSG_PRNT('Select centre...')
-            CALL IMG_GUICURS(XC,YC,STATUS)
+            CALL IMG_GUICURS(XC,YC,FLAG,STATUS)
           ELSE
             CALL MSG_PRNT(' ')
             CALL MSG_SETR('XC',XC)
@@ -4796,7 +4800,7 @@ c      REAL HWID
 *  get radii
           IF (I_GUI) THEN
             CALL MSG_PRNT('Select inner radius...')
-            CALL IMG_GUICURS(XR,YR,STATUS)
+            CALL IMG_GUICURS(XR,YR,FLAG,STATUS)
             IRAD=SQRT((XR-XC)**2 + (YR-YC)**2)
           ELSE
             CALL MSG_SETR('RAD',I_R)
@@ -4815,7 +4819,7 @@ c      REAL HWID
 
           IF (I_GUI) THEN
             CALL MSG_PRNT('Select outer radius...')
-            CALL IMG_GUICURS(XR,YR,STATUS)
+            CALL IMG_GUICURS(XR,YR,FLAG,STATUS)
             ORAD=SQRT((XR-XC)**2 + (YR-YC)**2)
           ELSE
             CALL MSG_SETR('RAD',I_R)
@@ -5070,7 +5074,7 @@ c      REAL HWID
       END
 
 *+  IMG_GUICURS - get cursor position from GUI
-      SUBROUTINE IMG_GUICURS(X,Y,STATUS)
+      SUBROUTINE IMG_GUICURS(X,Y,FLAG,STATUS)
 *    Description :
 *    Method :
 *    Deficiencies :
@@ -5086,6 +5090,8 @@ c      REAL HWID
 *    Import :
 *    Import-Export :
 *    Export :
+      REAL X,Y
+      INTEGER FLAG
 *    Status :
       INTEGER STATUS
 *    Functions :
@@ -5097,10 +5103,8 @@ c      REAL HWID
       INTEGER I1,I2,J1,J2
       INTEGER ISTAT
       INTEGER XPID,YPID,XPMID,YPMID,FID
-      INTEGER FLAG
       INTEGER NB
       REAL XP1,XP2,YP1,YP2
-      REAL X,Y
       REAL XW1,XW2,YW1,YW2
       REAL XSCALE,YSCALE
 *    Global Variables :

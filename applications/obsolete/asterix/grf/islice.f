@@ -48,6 +48,7 @@
       INTEGER WPNTR
       INTEGER LS
       INTEGER L
+      INTEGER FLAG
 *    Version :
       CHARACTER*30 VERSION
       PARAMETER (VERSION = 'ISLICE Version 1.8-1')
@@ -76,7 +77,7 @@
           YCENT=I_Y
           IF (I_GUI) THEN
             CALL MSG_PRNT('Select centre...')
-            CALL IMG_GUICURS(XCENT,YCENT,STATUS)
+            CALL IMG_GUICURS(XCENT,YCENT,FLAG,STATUS)
           ELSE
             CALL MSG_SETR('X',XCENT)
             CALL MSG_SETR('Y',YCENT)
@@ -95,7 +96,7 @@
           XEND=XCENT
           YEND=YCENT
           IF (I_GUI) THEN
-            CALL IMG_GUICURS(XEND,YEND,STATUS)
+            CALL IMG_GUICURS(XEND,YEND,FLAG,STATUS)
           ELSE
             CALL PGCURSE(XEND,YEND,CH)
           ENDIF
@@ -116,7 +117,7 @@
           XWID=XCENT
           YWID=YCENT
           IF (I_GUI) THEN
-            CALL IMG_GUICURS(XWID,YWID,STATUS)
+            CALL IMG_GUICURS(XWID,YWID,FLAG,STATUS)
           ELSE
             CALL PGCURSE(XWID,YWID,CH)
           ENDIF

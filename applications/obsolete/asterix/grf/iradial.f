@@ -30,6 +30,7 @@
       REAL XC,YC,PXC,PYC
       REAL XR,YR,PXR,PYR,RAD,PRAD
       INTEGER NBIN
+      INTEGER FLAG
 *    Version :
       CHARACTER*30 VERSION
       PARAMETER (VERSION = 'IRADIAL Version 1.7-1')
@@ -57,7 +58,7 @@
           YC=I_Y
           IF (I_GUI) THEN
             CALL MSG_PRNT('Select centre...')
-            CALL IMG_GUICURS(XC,YC,STATUS)
+            CALL IMG_GUICURS(XC,YC,FLAG,STATUS)
           ELSE
             CALL MSG_SETR('X',XC)
             CALL MSG_SETR('Y',YC)
@@ -76,7 +77,7 @@
           YR=YC
           IF (I_GUI) THEN
             CALL MSG_PRNT('Select radius...')
-            CALL IMG_GUICURS(XR,YR,STATUS)
+            CALL IMG_GUICURS(XR,YR,FLAG,STATUS)
             RAD=SQRT((XR-XC)**2 + (YR-YC)**2)
           ELSE
             CALL MSG_SETR('R',I_R)
