@@ -1,0 +1,14 @@
+<!--
+  `everything' DTD.
+  This is a pseudo-DTD, intended to be parsed by documentation tools.
+  It includes the Starlink General DTD, with the entity
+  %Feature.Everything set to include.  This includes _all_ features of
+  the General DTD.  Note that this is _not_ to be used for documents,
+  as some of the features in the General DTD may be mutually
+  exclusive.
+-->
+<!entity % Feature.Everything 'include'>
+
+<!entity % Starlink.general
+	public "-//Starlink//DTD Starlink General//EN">
+%Starlink.general;
