@@ -733,7 +733,7 @@
                TBIT = MIN( WORK(LP2*2), END(TLP) ) -
      &                       MAX( WORK(1+2*(LP2-1)), START(TLP) )
 *
-               EXPOS(TLP) = EXPOS(TLP) + MAX(0.0, TBIT)
+               EXPOS(TLP) = EXPOS(TLP) + MAX(0.0D0, TBIT)
 *
             ENDDO
 *
