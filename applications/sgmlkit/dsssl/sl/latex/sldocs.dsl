@@ -57,6 +57,7 @@ interface with the `style file' defined there.
 	 (authorlist (getdocinfo 'authorlist))
 	 (rel (document-release-info))
 	 (copy (getdocinfo 'copyright))
+	 (coverimage (getdocinfo 'coverimage))
 	 (date (format-date (car rel)))
 	 (docref (getdocnumber))
 	 (abstract (getdocbody 'abstract)))
@@ -77,6 +78,9 @@ interface with the `style file' defined there.
 	(empty-sosofo))
     (if copy
 	(make command name: "setCopyright" (process-node-list copy))
+	(empty-sosofo))
+    (if coverimage
+	(make command name: "setCoverimage" (process-node-list coverimage))
 	(empty-sosofo))
     (make empty-command name: "MakeTitle")
     (make environment name: "VersoTitlepage"
