@@ -52,6 +52,8 @@ f     The CmpFrame class does not define any new routines beyond those
 *     22-SEP-1998 (RFWS):
 *        Fixed bug in Match function - was not checking Domain values
 *        for equality.
+*     11-JUN-1999 (RFWS):
+*        Fixed bug in GenAxisSelection-  some selections were being omitted.
 *class--
 */
 
@@ -1246,35 +1248,33 @@ static int GenAxisSelection( int naxes, int nselect, int axes[] ) {
 */
 
 /* Local Variables: */
+   int i;                        /* Loop counter for axes */
    int iselect;                  /* Selection index */
 
 /* Check the global error status. */
    if ( !astOK ) return 0;
 
-/* Start with the first axis index. */
+/* Start with the first axis index and loop until the selection has
+   been updated. */
    iselect = 0;
-
-/* Loop until the selection has been updated. */
    while ( 1 ) {
 
-/* If we are beyond the end of the selection array, quit. */
-      if ( iselect >= nselect ) {
-         break;
-
-/* If we reach the final element of the selection array, increment it. */
-      } else if ( iselect == ( nselect - 1 ) ) {
+/* Increment the current axis index if it is the final one or it can
+   be incremented without equalling the one which follows (this ensures
+   the indices remain in increasing order). */
+      if ( ( iselect == ( nselect - 1 ) ) ||
+           ( axes[ iselect + 1 ] > ( axes[ iselect ] + 1 ) ) ) {
          axes[ iselect ]++;
+
+/* After incrementing an index, reset all previous indices to their
+   starting values. */
+         for ( i = 0; i < iselect; i++ ) axes[ i ] = i;
          break;
 
-/* Otherwise, increment the current axis index, so long as it remains
-   less than the next one (this ensures incresing order). */
-      } else if ( axes[ iselect + 1 ] > ( axes[ iselect ] + 1 ) ) {
-         axes[ iselect ]++;
+/* If this axis index can't be incremented, consider the next one.
+   Quit if we go beyond the end of the selection array. */
+      } else if ( ++iselect >= nselect ) {
          break;
-
-/* If this axis index can't be incremented, consider the next one. */
-      } else {
-         iselect++;
       }
    }   
 
