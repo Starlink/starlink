@@ -208,7 +208,6 @@ do
 
     # Handle the ! option
     echo 't=`expr "x $filelist" : "x .* \(['$optchars']*\)'$filename'"`' >&3
-    echo 'echo filename='$filename'  t=$t'                               >&3
     echo '# If the ! option is present, ...'                             >&3
     echo 'if expr "x$t" : "x.*\(!\)" >/dev/null; then'                   >&3
     echo '    # ...then just unpack the file (stomp stomp stomp)'        >&3
