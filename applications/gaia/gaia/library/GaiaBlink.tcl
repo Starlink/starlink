@@ -104,9 +104,13 @@ itcl::class gaia::GaiaBlink {
       add_short_help $itk_component(menubar).actions \
          {Choose an action}
 
-      add_menuitem $Actions command "Apply origins" \
-         {Attempt to position images using any origin information} \
-         -command [code $this set_origins_]
+      add_menuitem $Actions command "Apply NDF origins" \
+         {Attempt to position images using any NDF origin information} \
+         -command [code $this set_ndf_origins_]
+
+      add_menuitem $Actions command "Apply FITS origins" \
+         {Attempt to position images using FITS CRPIX1 and CRPIX2 values} \
+         -command [code $this set_fits_origins_]
 
       add_menuitem $Actions command "Blink on" \
          {Start blinking images} \
@@ -623,7 +627,8 @@ itcl::class gaia::GaiaBlink {
          set top_ $n
       }
       #  Clone filename and number.
-      $itk_component(Name) configure -value "$names_($top_) ($clone_num_($top_))"
+      $itk_component(Name) configure \
+         -value "$names_($top_) ($clone_num_($top_))"
 
       #  Image offsets WRT to mobile image.
       lassign [get_image_area_ $top_] tx0 ty0 tx1 ty1
@@ -729,10 +734,18 @@ itcl::class gaia::GaiaBlink {
    }
 
    #  Set the canvas positions of the images to reflect any image
-   #  origins. All images are first positioned at 0 0, i.e. the upper
-   #  left of canvas (this is already true at start, but is needed for
-   #  later calls to this method).
+   #  origins available. All images are first positioned at 0 0,
+   #  i.e. the upper left of canvas (this is already true at start,
+   #  but is needed for later calls to this set of methods).
    protected method set_origins_ {} {
+      #  Use method for the type of data of mobile image.
+      if { [$image_($mobile_) isfits] } {
+         set_fits_origins_
+      } else {
+         set_ndf_origins_
+      }
+   }
+   protected method set_ndf_origins_ {} {
       if { [info exists clones_(0)] } {
 
          #  Place mobile image at 0 0 and get image coordinates of
@@ -746,6 +759,54 @@ itcl::class gaia::GaiaBlink {
 
             #  Origin of upper left of this image (image coordinates).
             $image_($i) origin xo yo
+            set yo [expr $yo+[$image_($i) height]-1]
+
+            # Pixel shift from mobile image upper left to this one.
+            set dx [expr $xo-$bxo]
+            set dy [expr $byo-$yo]
+
+            # Equivalent canvas shift.
+            $image_($mobile_) convert dist $dx $dy image dx dy canvas
+
+            #  Apply shift
+            $canvas_ coords $image_($i) 0 0
+            $canvas_ move $image_($i) $dx $dy
+         }
+
+         #  Final scrollregion encompasses positions of all images.
+         set_scroll_region_
+      }
+   }
+
+   protected method set_fits_origins_ {} {
+      if { [info exists clones_(0)] } {
+
+         #  Place mobile image at 0 0 and get image coordinates of
+         #  upper left.
+         $canvas_ coords $image_($mobile_) 0 0
+
+         set bxo [$image_($mobile_) fits get CRPIX1]
+         if { $bxo == {} } {
+            set bxo 1
+         }
+         set byo [$image_($mobile_) fits get CRPIX2]
+         if { $byo == {} } {
+            set byo 1
+         }
+         set byo [expr $byo+[$image_($mobile_) height]-1]
+
+         set_scroll_region_
+         for { set i 0 } { $i < $n_ } { incr i } {
+
+            #  Origin of upper left of this image (image coordinates).
+            set xo [$image_($i) fits get CRPIX1]
+            if { $xo == {} } {
+               set xo 1
+            }
+            set yo [$image_($i) fits get CRPIX2]
+            if { $yo == {} } {
+               set yo 1
+            }
             set yo [expr $yo+[$image_($i) height]-1]
 
             # Pixel shift from mobile image upper left to this one.
