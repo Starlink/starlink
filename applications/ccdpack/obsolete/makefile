@@ -239,6 +239,8 @@
 #        frameset manipulation.
 #     10-MAY-1999 (MBT):
 #        Modified to use IFD files as source of IFL files.
+#     12-MAY-1999 (MBT):
+#        Removed all NAG references.  Renamed ccdpack.tar to ccdpack_sub.tar.
 #     {enter_further_changes_here}
 #
 #  Bugs:
@@ -434,7 +436,7 @@ PKG_VERS = 2.3-1
 #  times.
 
 SOURCE_FILES = makefile mk $(DOCUMENTATION) $(HELPTASK).tar \
- $(PKG_NAME)_source.tar $(PKG_NAME).tar $(PKG_NAME)_dgen.tar \
+ $(PKG_NAME)_source.tar $(PKG_NAME)_sub.tar $(PKG_NAME)_dgen.tar \
  $(PKG_NAME)_gen.tar $(PKG_NAME)_tasks.tar irg.tar irh.tar \
  $(DATA_FILES) $(PKG_NAME)_iraf.tar
 
@@ -559,8 +561,7 @@ F_ROUTINES = $(TASKSRC) $(SUBSRC) $(HELPSRC) $(IRHSRC) $(IRGSRC) \
              $(DGENSRC) $(DGENSRC:.dgen=.f) \
              $(MONO_SOURCE)
 
-TASKSRC = $(REDTASKS:=.f) $(REGTASKS:=.f) $(RESTASKS:=.f) \
-          $(NAGTASKS:=.f) $(SCRTASKS:=.f)
+TASKSRC = $(REDTASKS:=.f) $(REGTASKS:=.f) $(RESTASKS:=.f) $(SCRTASKS:=.f)
 
 SUBSRC = ccd1_achan.f ccd1_acmsk.f ccd1_adds.f ccd1_adkey.f ccd1_aldif.f \
  ccd1_anoi.f ccd1_appnd.f ccd1_asfio.f ccd1_asnk.f ccd1_asrc.f \
@@ -617,8 +618,7 @@ SUBSRC = ccd1_achan.f ccd1_acmsk.f ccd1_adds.f ccd1_adkey.f ccd1_aldif.f \
  ccd1_cfgrp.f fts1_gkeyc.f ccd1_knext.f ccd1_touch.f \
  ccd1_ckdeb.f ccd1_ckccl.f ccd1_ckflc.f ccd1_resta.f \
  ccd1_docmd.f ccd1_prin.f aif_antmp.f aif_temp.f \
- ccd1_fcov.f ccd1_calcj.f pda_dsvdc.f \
- pda_drnor.f nag1_szprd.f nag1_szslv.f nag1_szlsf.f nag1_szlsm.f \
+ ccd1_fcov.f ccd1_calcj.f pda_dsvdc.f pda_drnor.f \
  ccd1_dqeds.f ccd1_entrn.f ccd1_hdrrn.f ccd1_setex.f \
  ccd1_cat.f ccd1_ggeom.f ccd1_sdect.f ccd1_setpa.f ccd1_wrtpa.f \
  kpg1_asfrm.f kpg1_asffr.f kpg1_isscs.f kpg1_assir.f \
@@ -715,49 +715,47 @@ REGTASKS = findcent idicurs findobj register tranlist plotlist findoff \
  pairndf ccdedit makemos tranndf astimp astexp wcsreg
 RESTASKS = ccdsetup ccdclear ccdnote ccdshow ccdndfac ccdgenerate \
  picinfo import present schedule ccdimp ccdexp
-NAGTASKS = nagmakemos
 SCRTASKS = reduce ccdalign xreduce
 
 #  Monolith routine source names.
 
 MONO_SOURCE = $(PKG_NAME)_red.f $(PKG_NAME)_reg.f $(PKG_NAME)_res.f \
-              $(PKG_NAME)_nag.f $(PKG_NAME)_scr.f
+              $(PKG_NAME)_scr.f
 
 #  Monolith binary names.
 
-MONOLITHS = $(MONOLITH1) $(MONOLITH2) $(MONOLITH3) $(MONOLITH4) $(MONOLITH5)
+MONOLITHS = $(MONOLITH1) $(MONOLITH2) $(MONOLITH3) $(MONOLITH4)
 
 MONOLITH1 = $(PKG_NAME)_red
 MONOLITH2 = $(PKG_NAME)_reg
 MONOLITH3 = $(PKG_NAME)_res
-MONOLITH4 = $(PKG_NAME)_nag
-MONOLITH5 = $(PKG_NAME)_scr
+MONOLITH4 = $(PKG_NAME)_scr
 
 #  Monolith interface file name.
 
 MONO_IFL = $(PKG_NAME)_red.ifl $(PKG_NAME)_reg.ifl $(PKG_NAME)_res.ifl \
-           $(PKG_NAME)_nag.ifl $(PKG_NAME)_scr.ifl
+           $(PKG_NAME)_scr.ifl
 
 #  Monolith tcl file names.
 
 MONO_TCL = $(PKG_NAME)_red.tcl $(PKG_NAME)_reg.tcl $(PKG_NAME)_res.tcl \
-           $(PKG_NAME)_nag.tcl $(PKG_NAME)_scr.tcl
+           $(PKG_NAME)_scr.tcl
 
 #  IFD interface files.
 
 IFD_FILES = $(PKG_NAME).ifd $(REDTASKS:=.ifd) $(REGTASKS:=.ifd) \
-            $(RESTASKS:=.ifd) $(NAGTASKS:=.ifd) $(SCRTASKS:=.ifd) \
+            $(RESTASKS:=.ifd) $(SCRTASKS:=.ifd) \
             $(HELPTASK).ifd 
 
 #  IRAF parameter files.
 
 IRAF_PAR = $(REDTASKS:=.par) $(REGTASKS:=.par) $(RESTASKS:=.par) \
-  $(NAGTASKS:=.par) $(SCRTASKS:=.par)
+           $(SCRTASKS:=.par)
 
 #  List of task interface files.
 
 IFL_FILES = $(REDTASKS:=.ifl) $(REGTASKS:=.ifl) $(RESTASKS:=.ifl) \
- $(HELPTASK).ifl $(NAGTASKS:=.ifl) $(SCRTASKS:=.ifl)
+            $(HELPTASK).ifl $(SCRTASKS:=.ifl)
 
 #  List of help library sources.
 
@@ -799,9 +797,6 @@ DOCUMENTATION = $(LATEX_DOCS) $(HYPERTEXT_DOCS:.htx=.htx_tar) \
 #  extensions.
 
 PLATFORM_TCLBINARIES = ccdwish atclsh
-
-#  Does this platform support NAG based applications? No by default.
-HAVE_NAG = 0
 
 ################################################################################
 #-------------------------------------------------------------------------------
@@ -917,8 +912,8 @@ $(TASKSRC) : $(PKG_NAME)_tasks.tar
 	@ if test -f $@; then :;\
 	  else echo $@ is not in the tar file; exit 1; fi
 
-$(SUBSRC) $(CSUBSRC) : $(PKG_NAME).tar
-	$(TAR_OUT) $(PKG_NAME).tar $@
+$(SUBSRC) $(CSUBSRC) : $(PKG_NAME)_sub.tar
+	$(TAR_OUT) $(PKG_NAME)_sub.tar $@
 	@ if test -f $@; then :;\
 	  else echo $@ is not in the tar file; exit 1; fi
 
@@ -987,14 +982,14 @@ RCSFILES = makefile mk $(LATEX_DOCS) $(PKG_NAME).news $(HELPSRC) \
 #  Build all required source files for distribution (tar archives etc)
 
 check_source: makefile mk $(DOCUMENTATION) $(HELPTASK).tar \
- $(PKG_NAME)_source.tar $(PKG_NAME).tar $(PKG_NAME)_dgen.tar \
+ $(PKG_NAME)_source.tar $(PKG_NAME)_sub.tar $(PKG_NAME)_dgen.tar \
  $(PKG_NAME)_gen.tar $(PKG_NAME)_tasks.tar irg.tar irh.tar \
  $(DOCUMENTATION) $(DATA_FILES) $(PKG_NAME)_iraf.tar \
  rcsrevs
 
 clean_source:
 	$(RM) $(DOCUMENTATION) $(HELPTASK).tar $(PKG_NAME)_source.tar \
-              $(PKG_NAME).tar $(PKG_NAME)_dgen.tar $(PKG_NAME)_gen.tar \
+              $(PKG_NAME)_sub.tar $(PKG_NAME)_dgen.tar $(PKG_NAME)_gen.tar \
               $(PKG_NAME)_tasks.tar irg.tar irh.tar $(DATA_FILES) \
               $(PKG_NAME)_iraf.tar
 
@@ -1057,11 +1052,11 @@ $(PKG_NAME)_tasks.tar:
 	$(TAR_IN) $(PKG_NAME)_tasks.tar $(TASKSRC)
 	@- $(RM) $(TASKSRC)
 
-$(PKG_NAME).tar:
+$(PKG_NAME)_sub.tar:
 	co $(SUBSRC)
 	co $(CSUBSRC)
 	chmod 644 $(SUBSRC) $(CSUBSRC)
-	$(TAR_IN) $(PKG_NAME).tar $(SUBSRC) $(CSUBSRC)
+	$(TAR_IN) $(PKG_NAME)_sub.tar $(SUBSRC) $(CSUBSRC)
 	@- $(RM) $(SUBSRC) $(CSUBSRC)
 
 $(PKG_NAME)_gen.tar:
@@ -1264,22 +1259,7 @@ $(MONOLITH3): $(PKG_NAME)_res.o $(OBJECT_LIBRARIES) $(LINK_SCRIPT1) \
                 `./$(LINK_SCRIPT1)` `./$(LINK_SCRIPT2)` \
 		$(OBJECT_LIBRARIES) -lpda
 
-$(MONOLITH4): $(PKG_NAME)_nag.o $(OBJECT_LIBRARIES) $(LINK_SCRIPT1) \
-              $(LINK_SCRIPT2)
-	if test "$(HAVE_NAG)" = "1"; then \
-	   $(ALINK) $(PKG_NAME)_nag.o -o $(PKG_NAME)_nag \
-	            $(ADDLIBS) $(OBJECT_LIBRARIES) -lnag \
-                   `./$(LINK_SCRIPT1)` `./$(LINK_SCRIPT2)` \
-		   $(OBJECT_LIBRARIES) -lpda; \
-        else \
-	   if test -f $(MONOLITH4) ; then $(RM) -f $(MONOLITH4) ; else :; fi;\
-	   echo "#!/bin/sh" > $(MONOLITH4);\
-	   echo "echo Sorry no NAG based routines are available." >> \
-                $(MONOLITH4);\
-	   chmod 755 $(MONOLITH4) ;\
-	fi
-
-$(MONOLITH5): $(PKG_NAME)_scr.o $(OBJECT_LIBRARIES) $(LINK_SCRIPT1) \
+$(MONOLITH4): $(PKG_NAME)_scr.o $(OBJECT_LIBRARIES) $(LINK_SCRIPT1) \
               $(LINK_SCRIPT2)
 	$(ALINK) $(PKG_NAME)_scr.o -o $(PKG_NAME)_scr \
 	         $(ADDLIBS) $(OBJECT_LIBRARIES) \
@@ -1619,11 +1599,6 @@ install:
 	      $(LINK) ./$(PKG_NAME)_res $(INSTALL_BIN)/$$f ;\
 	   else :; fi;\
 	done
-	for f in $(NAGTASKS) ""; do \
-	   if test -n "$$f"; then \
-	      $(LINK) ./$(PKG_NAME)_nag $(INSTALL_BIN)/$$f ;\
-	   else :; fi;\
-	done
 	for f in $(SCRTASKS) ""; do \
 	   if test -n "$$f" -a "$$f" != "xreduce" ; then \
 	      $(LINK) ./$(PKG_NAME)_scr $(INSTALL_BIN)/$$f ;\
@@ -1859,11 +1834,6 @@ do_deinstall:
 	   else :; fi;\
 	done
 	- for f in $(RESTASKS) ""; do \
-	   if test -n "$$f"; then \
-	      $(RM) $(INSTALL_BIN)/$$f ;\
-	   else :; fi;\
-	done
-	- for f in $(NAGTASKS) ""; do \
 	   if test -n "$$f"; then \
 	      $(RM) $(INSTALL_BIN)/$$f ;\
 	   else :; fi;\
@@ -2406,7 +2376,6 @@ ccdhelp.o: DAT_PAR PAR_ERR PAR_PAR SAE_PAR
 ccdimp.o: CCD1_PAR DAT_PAR FIO_ERR NDF_PAR SAE_PAR TRN_PAR
 ccdndfac.o: CCD1_PAR MSG_PAR PAR_ERR SAE_PAR
 ccdnote.o: MSG_PAR PAR_ERR SAE_PAR
-ccdpack_nag.o: CCD1_PAR PAR_PAR SAE_PAR
 ccdpack_red.o: CCD1_PAR PAR_PAR SAE_PAR
 ccdpack_reg.o: CCD1_PAR PAR_PAR SAE_PAR
 ccdpack_res.o: CCD1_PAR PAR_PAR SAE_PAR
@@ -2627,10 +2596,6 @@ makebias.o: CCD1_PAR NDF_PAR NUM_DEC_CVT NUM_DEF_CVT SAE_PAR
 makecal.o: CCD1_PAR NDF_PAR NUM_DEC_CVT NUM_DEF_CVT SAE_PAR
 makeflat.o: CCD1_PAR DAT_PAR NDF_PAR SAE_PAR
 makemos.o: CCD1_MOSCM CCD1_MOSPR CCD1_PAR NDF_PAR PAR_ERR PRM_PAR SAE_PAR
-nag1_szlsf.o: CCD1_MOSCM CCD1_MOSPR CCD1_PAR
-nag1_szprd.o: CCD1_MOSCM CCD1_MOSPR CCD1_PAR
-nag1_szslv.o: CCD1_MOSCM CCD1_MOSPR CCD1_PAR PRM_PAR SAE_PAR USER_ERR
-nagmakemos.o: CCD1_MOSCM CCD1_MOSPR CCD1_PAR DAT_PAR NDF_PAR PAR_ERR PRM_PAR SAE_PAR
 pairndf.o: CCD1_PAR DAT_PAR IDI_ERR IDI_PAR MSG_PAR NDF_PAR PAR_ERR PRM_PAR SAE_PAR
 picinfo.o: SAE_PAR
 plotlist.o: CCD1_PAR FIO_PAR SAE_PAR
