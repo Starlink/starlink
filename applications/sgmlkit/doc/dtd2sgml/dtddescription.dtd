@@ -6,90 +6,172 @@
      $Id$
      -->
 
-<!ELEMENT dtddescription - O (dtdsummary,(element+))>
-<!ELEMENT element - O (p+, attribute*)>
-<!ELEMENT attribute - O (p+)>
-<!ELEMENT p O O (#PCDATA | elemref | example | code | em | url | webref)+>
-<!ELEMENT elemref - O EMPTY>
-<!ELEMENT (example|code|em) - - (#PCDATA)>
-<!ELEMENT webref - - (#PCDATA)>
-<!ELEMENT url - - (#PCDATA)>
+<!ELEMENT dtddescription	(dtdsummary, (element+))>
+<!ELEMENT element		(p+, attribute*, commentary*)>
+<!ELEMENT attribute		(p+)>
+<!ELEMENT p			(#PCDATA | elemref | example | code 
+					| em | url | webref)*>
+<!ELEMENT elemref		EMPTY>
+<!ELEMENT example		(#PCDATA)>
+<!ELEMENT code			(#PCDATA)>
+<!ELEMENT em			(#PCDATA)>
+<!ELEMENT webref		(#PCDATA)>
+<!ELEMENT url			(#PCDATA)>
 
 <!-- The output of script dtd2sgml.pl consists of a representation of
      a DTD's structure, marked up using the following elements.  That
      output should be suitable for direct inclusion in an instance of
      this DTD.
      -->
-<!ELEMENT dtdsummary      - - (dtdelement+)>
-<!ELEMENT dtdelement	  - - (dtdparents, dtdcontent, dtdattribute*)>
-<!ELEMENT dtdparents	  - - (dtdelemref*)>
-<!ELEMENT dtdcontent	  - - (dtdcontentmodel, dtdcontenttree?)>
-<!ELEMENT dtdcontentmodel - - (#PCDATA | dtdelemref)*>
-<!ELEMENT dtdcontenttree  - - (#PCDATA)>
-<!ELEMENT dtdattribute	  - - (#PCDATA)>
-<!ELEMENT dtdelemref	  - O EMPTY>
+<!ELEMENT dtdsummary		(dtdelement+)>
+<!ELEMENT dtdelement		(dtdparents, dtdcontent, dtdattribute*)>
+<!ELEMENT dtdparents		(dtdelemref*)>
+<!ELEMENT dtdcontent		(dtdcontentmodel, dtdcontenttree?)>
+<!ELEMENT dtdcontentmodel	(#PCDATA | dtdelemref)*>
+<!ELEMENT dtdcontenttree	(#PCDATA)>
+<!ELEMENT dtdattribute		(#PCDATA)>
+<!ELEMENT dtdelemref		EMPTY>
+
+<!-- The element documentation can include a series of bits of
+     commentary, laid out like email messages.
+     -->
+<!ELEMENT commentary		(from?, email?, date?, subject?,
+					otherheader*, body)>
+<!ELEMENT from			(#PCDATA)>
+<!ELEMENT email			(#PCDATA)>
+<!ELEMENT date			(#PCDATA)>
+<!ELEMENT subject		(#PCDATA)>
+<!ELEMENT otherheader		(#PCDATA)>
+<!ELEMENT body			(#PCDATA)>
 
 <!ATTLIST dtddescription
-	docelem		-- Name of the document element of the DTD
-			   this describes.  This must match the
-			   document element of the dtdelementlist
-			   document which invokes this.  --
+	docelem
 		CDATA #REQUIRED
 	>
-<!ATTLIST element
-	gi		-- GI of this element --
-		ID #REQUIRED
-	>
-<!ATTLIST attribute
-	name		-- attribute name --
-		CDATA #REQUIRED
-	>
-<!ATTLIST elemref
-	gi		-- GI of element we're referring to --
-		IDREF #REQUIRED
-	dtd		-- entity referring to the DTD which we're
-			   cross-referencing.  At present, this is
-			   rather informal: it's just a CDATA entity which
-			   is used to name the target top-level element. --
-		ENTITY #IMPLIED
-	self		-- if present, then we're referring to the same
-			   element we're documenting.  Format the element name
-			   as usual, but don't include any sort of link. --
-		(self)	#IMPLIED
-	>
+	<!-- attributes:
+		docelem		Name of the document element of the DTD
+				this describes.  This must match the
+				document element of the dtdelementlist
+				document which invokes this.
+	-->
 
-<!ATTLIST webref
-	url		-- URL this element refers to --
-		CDATA
+<!ATTLIST element
+	gi
+		ID #REQUIRED
+	status
+		(experimental | alpha | beta | stable | deprecated)
 		#REQUIRED
 	>
+	<!-- attributes:
+		gi		GI of this element
+
+		status		how permanent is this element?
+	-->
+
+<!ATTLIST attribute
+	name
+		CDATA #REQUIRED
+	>
+	<!-- attributes:
+		name		 attribute name
+	-->
+
+<!ATTLIST elemref
+	gi
+		IDREF #REQUIRED
+	dtd
+		ENTITY #IMPLIED
+	self
+		(self)	#IMPLIED
+	>
+	<!-- attributes:
+		gi		GI of element we're referring to
+
+		dtd		entity referring to the DTD which we're
+				cross-referencing.  At present, this is
+				rather informal: it's just a CDATA entity which
+				is used to name the target top-level element.
+
+		self		if present, then we're referring to the same
+				element we're documenting.  Format the
+				element name as usual, but don't
+				include	any sort of link.
+	-->
+
+<!ATTLIST webref
+	url
+		CDATA #REQUIRED
+	>
+	<!-- attributes:
+		url		URL this element refers to
+	-->
 
 <!-- dtdsummary element attributes -->
 <!ATTLIST dtdsummary
-	sysid 		-- sysid of summarised DTD --
-		CDATA
-		#REQUIRED
-	top		-- name of document-element --
-		CDATA
-		#REQUIRED
+	sysid
+		CDATA #REQUIRED
+	top
+		CDATA #REQUIRED
 	>
+	<!-- attributes:
+		sysid 		sysid of summarised DTD
+
+		top		name of document-element
+	-->
+
 <!ATTLIST dtdelement 
-	gi		-- GI of this element --
-		NAME #REQUIRED
-	id		-- ID which refers to this element --
+	gi
+		CDATA #REQUIRED
+	id
 		ID #REQUIRED
 	>
+	<!-- attributes:
+		gi		GI of this element
+
+		id		ID which refers to this element
+	-->
+
+<!ATTLIST dtdparents
+	orphan
+		CDATA
+		#IMPLIED
+	>
+	<!-- attributes:
+		orphan		If present, then this element has no
+				parents (awww).  This means either
+				that it is a top-level element, or
+				that it is an experimental element,
+				included in this document purely for
+				documentation/discussion purposes.
+				The text of the attribute should make
+				clear which is the case.
+	-->
+
 <!ATTLIST dtdattribute 
 	name CDATA #REQUIRED
 	default CDATA #REQUIRED
 	type CDATA #IMPLIED
 	>
+
 <!ATTLIST dtdelemref
-	id		-- reference to dtdelement element --
+	id
 		IDREF #REQUIRED
 	>
+	<!-- attributes:
+		id		reference to dtdelement element
+	-->
 
 
+<!ATTLIST otherheader
+	name
+		CDATA #REQUIRED
+	>
+	<!-- attributes:
+		name		name of the header
+	-->
+
+<![ IGNORE [
 <!ENTITY amp CDATA '&'>
 <!ENTITY lt  CDATA '<'>
 <!ENTITY gt  CDATA '>'>
+]]>

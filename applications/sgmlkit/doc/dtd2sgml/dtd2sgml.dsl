@@ -217,6 +217,10 @@
   (make element gi: "url"
 	(process-children)))
 
+;; commentary element -- discard
+(element commentary
+  (empty-sosofo))
+
 ;; Utility functions
 
 ;; Get document element
