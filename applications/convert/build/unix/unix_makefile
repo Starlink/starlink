@@ -946,7 +946,7 @@ test:
 #  The do_test target (which should never exist) performs the
 #  installation test.
 
-do_test: $(EXTERNAL_INCLUDES)
+do_test:
 #
 #  Note the test has not yet succeeded.
 #
