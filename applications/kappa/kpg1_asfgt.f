@@ -50,6 +50,8 @@
 *  History:
 *     17-SEP-1998 (DSB):
 *        Original version.
+*     16-DEC-1998 (DSB):
+*        Added BASEPIC as a special case Domain.
 *     {enter_further_changes_here}
 
 *-
@@ -111,7 +113,7 @@
          CALL AST_ANNUL( FRM, STATUS )
 
 *  Get the number of axes for the Frame.
-         IF( DOM .EQ. 'GRAPHICS' ) THEN
+         IF( DOM .EQ. 'GRAPHICS' .OR. DOM .EQ. 'BASEPIC' ) THEN
             NAX = 2
          ELSE
             CALL PAR_GDR0I( PDIM, 2, 1, NDF__MXDIM, .FALSE., NAX, 
@@ -189,6 +191,11 @@
             CALL AST_SETC( FRM, 'Unit(1)', 'mm', STATUS )
             CALL AST_SETC( FRM, 'Unit(2)', 'mm', STATUS )
 
+*  AGI BASE picture world co-ordinates.
+         ELSE IF( DOM .EQ. 'BASEPIC' ) THEN
+            CALL AST_SETC( FRM, 'Title', 'Normalised world '//
+     :                     'co-ordinates in the AGI BASE picture.', 
+     :                     STATUS )
          END IF
 
       END IF
