@@ -1,3 +1,4 @@
+#include <config.h>
 *+  DTASK_CONTROL - Unix version : process a CONTROL context message
       SUBROUTINE DTASK_CONTROL( PATH, ACTION, VALUE, MESSID, STATUS )
 *+
@@ -115,10 +116,19 @@
 
 *  External References:
       EXTERNAL CHR_LEN           ! Used length of string
+      INTEGER CHR_LEN
+#if HAVE_INTRINSIC_GETCWD
       EXTERNAL GETCWD            ! Get current working directory
+      INTEGER GETCWD
+#endif
+#if HAVE_INTRINSIC_CHDIR
       EXTERNAL CHDIR             ! Change working directory
+      INTEGER CHDIR
+#endif
+#if HAVE_INTRINSIC_PUTENV
       EXTERNAL PUTENV            ! Set environment variable
-      INTEGER  CHR_LEN, GETCWD, CHDIR, PUTENV
+      INTEGER PUTENV
+#endif
 
 *  Local Variables:
       CHARACTER*(MESSYS__VAL_LEN) RVALUE ! Return VALUE string 
@@ -146,6 +156,7 @@
 
       IF ( UACT .EQ. 'DEFAULT' ) THEN
 
+#if HAVE_INTRINSIC_CHDIR && HAVE_INTRINSIC_GETCWD
 *  Get the required directory name
 
          IF ( LENGTH .GT. 0) THEN
@@ -173,8 +184,20 @@
      :                    'Failed to get current default directory',
      :                    STATUS )
          ENDIF
+#else
+*  Simply report that we can't chnage directory.  It appears that
+*  most Fortrans do have these intrinsics.  If you're looking at this because
+*  you have one that doesn't, then consider implementing this by adding
+*  a function in the psx component.
+         STATUS = DTASK__BADDEF
+         CALL EMS_REP( 'DTASK_CONTROL',
+     :        'DEFAULT unimplemented',
+     :        STATUS )
+#endif
 
       ELSE IF ( UACT .EQ. 'SETENV' ) THEN
+
+#if HAVE_INTRINSIC_PUTENV
 *   Strip quotes and blank following the = in the given string.
 *   This allows the string to be given quoted or unquoted in an ICL
 *   SEND command.
@@ -212,6 +235,15 @@
             ENDIF
          ENDIF
          
+#else
+
+         STATUS = DTASK__BADDEF
+         CALL EMS_REP( 'DTASK_CONTROL', 
+     :        'SETENV unimplemented',
+     :        STATUS )
+
+#endif
+
       ELSE IF ( UACT .EQ. 'PAR_RESET' ) THEN
          RVALUE = VALUE
 *  Find the action number

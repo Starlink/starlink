@@ -19,7 +19,9 @@ STAR_DEFAULTS
 # Find required versions of the programs we need for configuration
 AC_PROG_CC
 AC_PROG_FC
+AC_PROG_FPP
 AC_PROG_LIBTOOL
+
 AC_FC_LIBRARY_LDFLAGS
 
 AC_PATH_PROGS(M4, m4, m4)
@@ -28,14 +30,10 @@ STAR_CNF_COMPATIBLE_SYMBOLS
 
 AC_FC_CHECK_INTRINSICS([GETCWD CHDIR PUTENV])
 
-dnl    Declare the build and use dependencies for this package
 STAR_DECLARE_DEPENDENCIES([build], [adam cnf messys psx sae subpar])
 STAR_DECLARE_DEPENDENCIES([link],  [chr ems mers ams atimer hds psx subpar])
 STAR_DECLARE_DEPENDENCIES([use],   [hdspar])
 
-dnl    There are two .msg files in this directory, and this adds Makefile
-dnl    rules to generate the xxx_ERR, xxx_err.h and fac_nnn_err files
-dnl    which correspond to it.
 STAR_MESSGEN(act_err.msg dtask_err.msg)
 
 dnl    We need some further configuration: see the original dtask
@@ -46,8 +44,7 @@ dnl    necessary on Solaris.
 
 STAR_ETC_FILES(dtask_main.txt)
 
-dnl    If you wish to configure extra files, you can add them to this
-dnl    declaration.
+AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_FILES(Makefile component.xml)
 
 dnl    Files alink.in and ilink.in are substituted at `make' time,

@@ -7,6 +7,7 @@ lib_LTLIBRARIES = libdtask_adam.la
 libdtask_adam_la_SOURCES = \
 	$(PUBLIC_INCLUDES) \
 	$(F_ROUTINES) \
+	$(FPP_ROUTINES) \
 	$(C_ROUTINES)
 
 include_HEADERS = $(PUBLIC_INCLUDES)
@@ -24,7 +25,6 @@ F_ROUTINES = \
 	dts_cancel.f \
 	dts_cantim.f \
 	dts_comshut.f \
-	dts_control.f \
 	dts_dcltask.f \
 	dts_dtask.f \
 	dts_dumpast.f \
@@ -47,6 +47,9 @@ F_ROUTINES = \
 	dts_subsid.f \
 	dts_timeout.f
 
+FPP_ROUTINES = \
+	dts_control.fpp
+
 C_ROUTINES = \
 	dts_chdlr.c \
 	dts_setsig.c
@@ -55,13 +58,15 @@ EXTRA_DIST = alink.in ilink.in
 
 BUILT_SOURCES = ACT_ERR act_err.h DTASK_ERR dtask_err.h
 
+CLEANFILES = alink alink.in ilink ilink.in dtask_libtool
+
 # The alink and ilink scripts require a dtask_main.o file in $(libdir).
-# Build and install this, taking care to include it in the MANIFEST_FILE, too.
+# Build and install this, taking care to include it in the manifest file, too.
 dtask_main.o: dtask_main.f
 install-exec-local: dtask_main.o
 	$(INSTALL_PROGRAM) dtask_main.o $(DESTDIR)$(libdir)
-	if test -n "$$MANIFEST_FILE"; then \
-	    echo "$(DESTDIR)$(libdir)/dtask_main.o" >>$$MANIFEST_FILE; \
+	if test -n "$$MANIFEST_FD"; then \
+	    echo "$(DESTDIR)$(libdir)/dtask_main.o" >&$${MANIFEST_FD-0}; \
 	fi
 
 # Files alink.in and ilink.in depend on the values of the $(prefix)
