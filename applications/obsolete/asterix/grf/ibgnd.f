@@ -2447,7 +2447,7 @@
      :                      STATUS )
 
 *    Bgnd derived image is displayed?
-        IF ( I_BGM_DISIM .NE. 2 ) THEN
+        IF ( (I_BGM_DISIM .EQ. 1) .OR. (I_BGM_DISIM.EQ.-1) ) THEN
 
 *      Update it
           CALL IBGND_DISP_SURF( I_BGM_DISIM, STATUS )
