@@ -437,7 +437,7 @@ PRIVATE_INCLUDES =
 
 EXTERNAL_INCLUDES = HLPCMD PRM_PAR SAE_PAR DAT_PAR CTM_PAR NUM_DEC_CVT \
 NDF_ERR GNS_PAR NDF_PAR NUM_DEF_CVT PAR_ERR NUM_DEC_R SUBPAR_PAR GKS_PAR \
-NUM_DEF_R
+NUM_DEF_R IDI_PAR IDI_ERR
 
 #  List of Fortran routines required for building the package.  This is
 #  just a list of all the Fortran source files (excluding BLOCK DATA
@@ -446,7 +446,7 @@ NUM_DEF_R
 F_ROUTINES = $(KAPRH_F_ROUTINES) $(KAPSUB_F_ROUTINES) \
              $(MONO_SOURCE) 
 
-KAPRH_F1_ROUTINES = greyplot.f contover.f
+KAPRH_F1_ROUTINES = greyplot.f contover.f snapshot.f
 
 #  Kappa f files for which there are no corresponding iraf .par files.
 KAPRH_F2_ROUTINES = krhhelp.f
@@ -611,6 +611,8 @@ NUM_DEF_R:	$(STAR_INC)/num_def_R;	$(LINK) $? $@
 PAR_ERR:	$(STAR_INC)/par_err;	$(LINK) $? $@
 PRM_PAR:	$(STAR_INC)/prm_par;	$(LINK) $? $@
 SAE_PAR:	$(STAR_INC)/sae_par;	$(LINK) $? $@
+IDI_PAR:	$(STAR_INC)/idi_par;	$(LINK) $? $@
+IDI_ERR:	$(STAR_INC)/idi_err;	$(LINK) $? $@
 SUBPAR_PAR:	$(STAR_INC)/subpar_par;	$(LINK) $? $@
 
 #
@@ -1672,6 +1674,7 @@ $(PKG_NAME)_ifls.tar:
 #  files). These are normally generated automatically from the source
 #  files.
 
+snapshot.o:      SAE_PAR DAT_PAR CTM_PAR PAR_ERR NDF_PAR IDI_PAR IDI_ERR
 cnthlt.o:	 SAE_PAR
 cntsbp.o:	 SAE_PAR
 contover.o:	 SAE_PAR DAT_PAR PAR_ERR PRM_PAR NDF_PAR NDF_ERR GKS_PAR

@@ -13,16 +13,18 @@ KAPRH_SOURCE = kaprh.csh kaprh_link_adam kaprh.icl kaprh.hlp kaprh_mon.f
 
 # The contents of the kaprh_iraf.tar file:
 KAPRH_IRAF = doc helpdb.mip kaprh.hd  kaprh.par kaprh_mon.ifl root.hd \
-_kaprh.hd kaprh.cl  kaprh.men kaprh_mon.tcl greyplot.par contover.par
+_kaprh.hd kaprh.cl  kaprh.men kaprh_mon.tcl greyplot.par contover.par \
+snapshot.par
 
 #  Contents of the doc/ directory in kaprh_iraf.tar
-IRAF_DOCS = greyplot.hlp contover.hlp
+IRAF_DOCS = greyplot.hlp contover.hlp snapshot.hlp
 
 # The contents of the kaprh_ifls.tar file:
-KAPRH_IFLS = greyplot.ifl krhhelp.ifl kaprh_mon.ifl contover.ifl
+KAPRH_IFLS = greyplot.ifl krhhelp.ifl kaprh_mon.ifl contover.ifl \
+snapshot.ifl
 
 # The contents of the kaprh_sub.tar file:
-KAPRH_SUB = greyplot.f krhhelp.f contover.f
+KAPRH_SUB = greyplot.f krhhelp.f contover.f snapshot.f
 
 # The source RCS files needed to create the kapsub_sub.tar file:
 KAPSUB_SOURCES = $(KAPSUB_NONGEN) $(KAPSUB_GEN)
