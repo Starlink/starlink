@@ -104,7 +104,6 @@
 
       INTEGER			FSTAT			! I/o status code
       INTEGER			FPID			! Fpath value id
-      INTEGER			IHDU			! HDU number
       INTEGER			LUN			! Logical unit number
       INTEGER			NLEV			! # levels
       INTEGER			PID			! Copy of Fpath
@@ -140,6 +139,7 @@
           CALL ADI_COPY( FPID, PID, STATUS )
           CALL ADI_CPUTID( OARG, 'Path', PID, STATUS )
           CALL ADI_ERASE( FPID, STATUS )
+          NLEV = 1
         ELSE
           CALL ADI_CPUT0C( OARG, 'Path', ' ', STATUS )
           NLEV = 1
