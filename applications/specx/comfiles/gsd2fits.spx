@@ -60,7 +60,7 @@ do n nmin nmax
       cscan = scan_title
       csscan = subscan_no
       fitsoutfile = ' '
-      write fitsoutfile 'jcmt_',cscan,'_',csscan,'_A.fits'
+      write fitsoutfile 'jcmt_',cscan,'_',csscan,'_a.fits'
 
       if (no_new_spectra=1)
         if nquad > 1
@@ -103,7 +103,7 @@ do n nmin nmax
           print 'G2F> converted scan ',n:i4.4,'_',m:i4.4,' to ',fitsoutfile
           print 'G2F> -------------------------------------------------'
           xy
-          write fitsoutfile 'jcmt_',cscan,'_',csscan,'_B.fits'
+          write fitsoutfile 'jcmt_',cscan,'_',csscan,'_b.fits'
           if nquad > 1
             das-merge\\n\n\
           endif

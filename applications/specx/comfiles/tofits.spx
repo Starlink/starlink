@@ -38,10 +38,10 @@ fmode = true
 ask 'Use orig. scannr (else seqnr)?' fmode ?
 
 ! Give file name option
-mixid = 'A'
-ask 'Mixer id A,B,..? [A]' mixid ?
+mixid = 'a'
+ask 'Mixer id a,b,..? [a]' mixid ?
 if (mixid = '' or mixid = ' ') then
-  mixid = 'A'
+  mixid = 'a'
 endif
 
 ! Loop over spectra in file
