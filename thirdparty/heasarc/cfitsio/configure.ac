@@ -22,12 +22,12 @@ dnl    since that prompts autoreconf to try to reconfigure that directory, and
 dnl    automake to assume it's allowed to play there, too.
 (
     cd cfitsio
-    ./configure --prefix=$prefix --cache-file=config.cache
+    ./configure --prefix=$prefix
 )
 
 dnl    Find required versions of the programs we need for configuration
 AC_PROG_LIBTOOL
-AC_SET_MAKE
+AC_PROG_MAKE_SET
 
 dnl    List the sun/ssn/... numbers which document this package and
 dnl    which are present as .tex files in this directory.
