@@ -1,6 +1,6 @@
 #!/bin/sh
 # the next line restarts using wish \
-exec wish "$0" "$@"
+exec @WISH@ "$0" "$@"
 
 #+
 # This script is a simple testbed for loading adam tasks and sending them
@@ -8,7 +8,7 @@ exec wish "$0" "$@"
 #-
 
 # Add the location of the startcl library files to the auto load path.
-    lappend auto_path .
+    lappend auto_path @LIBSYS@
 
 # Build the menu bar and menus.
     set f [frame .menubar -relief raised -bd 2]

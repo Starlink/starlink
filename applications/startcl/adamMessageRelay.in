@@ -1,4 +1,4 @@
-#!./atclsh
+#! @ATCLSH@
 #
 # This script acts as a "go-between" between a tk application and adam 
 # tasks. The tk application cannot communicate directly with an adam

@@ -1,6 +1,6 @@
 #!/bin/sh
 # the next line restarts using wish \
-exec wish "$0" "$@"
+exec @WISH@ "$0" "$@"
 
 #
 # gwm.tcl
@@ -16,7 +16,7 @@ exec wish "$0" "$@"
 #
 
 # Add the location of the gwm procedures to the auto load path.
-    lappend auto_path .
+    lappend auto_path @LIBSYS@
 
 # Set a global variable to the name of the help file.
     global helpfile
