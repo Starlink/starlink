@@ -110,16 +110,14 @@
         PARAMETER		( VERSION = 'STREAMLINE Version V2.0-0' )
 
 *  Local Variables:
-      CHARACTER*80 		PTEXT(4)                ! History text
-
       LOGICAL 			LVAR     		! I/p variance present?
 
       INTEGER			IFID			! Input dataset
+      INTEGER			IFILES			! Input file info
       INTEGER			TPTR, DPTR, VPTR	! Input data
       INTEGER			OFID			! Output dataset
       INTEGER 			NTOT                    ! # input data points
       INTEGER 			NGOOD                   ! # good input points
-      INTEGER 			NLINES                  ! # history list items
 *.
 
 *  Check inherited global status.
@@ -160,8 +158,8 @@
 *  Copy and update history
       CALL HSI_COPY( IFID, OFID, STATUS )
       CALL HSI_ADD( OFID, VERSION, STATUS )
-      CALL USI_NAMEI( NLINES, PTEXT, STATUS )
-      CALL HSI_PTXT( OFID, NLINES, PTEXT, STATUS )
+      CALL USI_NAMES( 'I', IFILES, STATUS )
+      CALL HSI_PTXT( OFID, IFILES, .TRUE., STATUS )
 
 *  Tidy up
  99   CALL AST_CLOSE()
