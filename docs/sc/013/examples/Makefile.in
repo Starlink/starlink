@@ -16,6 +16,8 @@ CC=@CC@
 F77=@F77@
 DEFS=@DEFS@
 
+CFLAGS=$(CFLAGS) $(DEFS)
+
 PROFILING=@PROFILINGOPTION@
 NOUNDERSCORES=@NOUNDERSCORES@
 
@@ -36,22 +38,19 @@ all: $(EXECS)
 #
 
 # Simple link of the FP programs
-fpdemo: fpdemo.c
-	$(CC) $(DEFS) -o $@ fpdemo.c
+fpdemo: fpdemo.c bytesex.h
+	$(CC) $(CFLAGS) -o $@ fpdemo.c
 
 dfpp: fpp.c bytesex.h
-	$(CC) $(DEFS) -DDOUBLEPRECISION=1 -o $@ fpp.c
+	$(CC) $(CFLAGS) -DDOUBLEPRECISION=1 -o $@ fpp.c
 
 fpp: fpp.c bytesex.h
-	$(CC) $(DEFS) -DDOUBLEPRECISION=0 -o $@ fpp.c
+	$(CC) $(CFLAGS) -DDOUBLEPRECISION=0 -o $@ fpp.c
 
 bytesex.h: islittleendian
 	echo '#define BIGENDIAN' `if ./islittleendian; then echo 0; else echo 1;fi` >$@
 
 islittleendian: islittleendian.c
-
-#fpp: fpp.o
-#	$(LINK.C) $(DEFS) -o $@ fpp.o $(LDLIBS)
 
 #
 # Compile all three profiled programs with the $(PROFILING) flag, 
@@ -73,14 +72,15 @@ timewaster: p1.o p2.o p3.o
 # Compile and link the mixed-language demo.
 #
 mixed: mixed-f.o mixed-c.o
-	$(LINK.F) -o mixed mixed-c.o mixed-f.o
+#	$(LINK.F) -o mixed mixed-c.o mixed-f.o
+	$(CC) $(LDFLAGS) -o mixed mixed-c.o mixed-f.o
 
 # Compile the Fortran code with no trailing underscores
 mixed-f.o: mixed-f.f
 	$(F77) -c mixed-f.f $(NOUNDERSCORES)
 
 mixed-c.o: mixed-c.c
-	$(CC) -c mixed-c.c
+#	$(CC) $(CFLAGS) -c mixed-c.c
 
 
 ######################################################################
