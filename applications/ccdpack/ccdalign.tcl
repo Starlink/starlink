@@ -102,9 +102,9 @@
                   -watchstate state$ref \
                   -percentiles [ list $PERCLO $PERCHI ] \
                   -zoom $ZOOM \
-                  -maxpoints $MAXPOS
+                  -maxpoints $MAXPOS \
+                  -geometry ${WINX}x${WINY}
       .vref loadndf $refndf $MAXCANV
-      .vref configure -geometry ${WINX}x${WINY}
       ccdputs -log "   Mark points on the reference image, [ $refndf name ]:"
       .vref activate
       tkwait variable state$ref
@@ -131,8 +131,8 @@
                  -watchstate state \
                  -percentiles [ list $PERCLO $PERCHI ] \
                  -zoom $ZOOM \
-                 -maxpoints $MAXPOS
-      .v configure -geometry ${WINX}x${WINY} 
+                 -maxpoints $MAXPOS \
+                 -geometry ${WINX}x${WINY}
 
       set i 0
       set done 0
