@@ -62,10 +62,9 @@ F77_SUBROUTINE(one_exec)( CHARACTER(command), INTEGER(status) TRAIL(command) )
    cmd = cnfCreim( command, command_length ); /* Import the FORTRAN string. */
    if (cmd == NULL) {
      *status = ONE__MALLOCERR;
-      emsSetc( "COMND", cmd );
-      (void) emsRep( "ONE_EXECERR", 
-		     "Error allocating memory whilst executing command '^COMND'", 
-		     status );
+     emsRep( "ONE_EXECERR", 
+	     "Error allocating temp memory whilst executing command.", 
+	     status );
    }
    ret = system( cmd );
    free( cmd );
