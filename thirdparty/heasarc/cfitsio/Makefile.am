@@ -62,8 +62,15 @@ MAINTAINERCLEANFILES = $(include_HEADERS) $(EXAMPLE_SOURCES)
 ## don't seem to be added either, so must go here.
 EXTRA_DIST = cfitsio mud162.tex mud167.tex mud166.tex
 
-##  Before distributing the subdirectory we need to clean it up (we get all
-##  the files). Also remove the CVS trace.
+## Before distributing the subdirectory we need to clean it up (we get all
+## the files). Also remove the CVS trace.
 dist-hook:
 	rm -rf `find $(distdir) -name CVS`
 	(cd $(distdir)/cfitsio; make distclean);
+
+## Run the cfitsio test. 
+check:
+	(cd cfitsio; \
+	make testprog; \
+	./testprog > tmp.out 2>&1; \
+	diff testprog.out tmp.out)
