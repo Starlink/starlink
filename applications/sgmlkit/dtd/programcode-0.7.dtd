@@ -159,6 +159,35 @@
 %Additional.Char.Ents;
 %ISOents;
 
+<![ IGNORE [
+<!-- Omit these shortrefs, since they cause trouble.  The
+     language-specific DTDs which include this use short reference
+     maps to skip comments and the like.  If we try to enable the
+     following maps within <p> elements, we get trouble, because (in
+     the case of the Fortran DTD, for example) "^*" is no longer
+     ignored, and, more seriously, "^*-" is no longer recognised as
+     the end of the prologue, unless the previous paragraph element is
+     explicitly closed.
+     -->
+
+<!--======== Shortrefs ==========-->
+<!-- Have double-dash as a shortref for &endash, but don't define a
+     separate shortref for emdash.  This way, we could switch between
+     endash and emdash by changing this declaration. 
+     -->
+<!SHORTREF textabbrevsmap	"--"	endash
+				"_"	underscore
+				'"'	quot
+				"~"	nbsp>
+<!-- Enable this map in the following elements.  This means it's
+     enabled in all (?) of the places where text naturally goes,
+     like the abstract, plus section and other titles
+     -->
+<!USEMAP textabbrevsmap (p | px | tabular | title)>
+<!-- ...but suspend it where it's liable to cause trouble (thanks Mark!) -->
+<!USEMAP #EMPTY (m|mequation|meqnarray|verbatim|code|kbd)>
+]]>
+
 <!-- Language notations are declared here.  The DTDs which INCLUDE
      this one may declare attributes to these notations (for example, the
      DSSSLCODE DTD uses the DSSSL notation to declare the DSSSL DTD as an
