@@ -1,4 +1,4 @@
-      SUBROUTINE ADI2_ISHAPE( ID, HDU, MAXDIM, DIMS, NDIM, STATUS )
+      SUBROUTINE ADI2_ISHAPE( FID, HDU, MAXDIM, DIMS, NDIM, STATUS )
 *+
 *  Name:
 *     ADI2_ISHAPE
@@ -10,13 +10,13 @@
 *     Starlink Fortran
 
 *  Invocation:
-*     CALL ADI2_ISHAPE( ID, HDU, MAXDIM, DIMS, NDIM, STATUS )
+*     CALL ADI2_ISHAPE( FID, HDU, MAXDIM, DIMS, NDIM, STATUS )
 
 *  Description:
 *     {routine_description}
 
 *  Arguments:
-*     ID = INTEGER (given)
+*     FID = INTEGER (given)
 *        ADI identifier of FITSfile object
 *     HDU = CHARACTER*(*) (given)
 *        Name of the HDU whose dimensions are required
@@ -91,7 +91,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
 *  Arguments Given:
-      INTEGER			ID
+      INTEGER			FID
       CHARACTER*(*)		HDU
       INTEGER			MAXDIM
 
