@@ -81,8 +81,6 @@
       INTEGER NGOOD             ! Number of non-BAD data values.
       INTEGER I, J              ! Loop variables
 
-      DOUBLE PRECISION SUM
-
 *.
 
 *  Check inherited global status.
@@ -93,12 +91,10 @@
          IF ( LINE( J ) .NE. VAL__BAD<T> ) THEN 
             VAL = DBLE( LINE( J ) )
             SUMSQ = 0.0D0
-            SUM = 0.0D0
             NGOOD = 0
             DO 2 I = 1, NLINES
                IF ( STACK( J, I ) .NE. VAL__BAD<T> ) THEN
                   NGOOD = NGOOD + 1
-                  SUM = SUM + DBLE( STACK( J, I ) )
                   DIF = DBLE( STACK( J, I ) ) - VAL
                   SUMSQ = SUMSQ + ( DIF * DIF )
                END IF

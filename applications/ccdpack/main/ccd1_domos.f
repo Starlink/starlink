@@ -765,10 +765,12 @@
                         END IF
  7                   CONTINUE
 
-*  If no input NDFs contribute to this interval, then simply fill the
-*  appropriate region of the output array(s) with the bad pixel value.
-*  Set bad pixel flag values to indicate this.
-                     IF ( NII .EQ. 0 ) THEN
+*  If no input NDFs can contribute to this interval, then simply fill
+*  the appropriate region of the output array(s) with the bad pixel
+*  value.  Set bad pixel flag values to indicate this.
+                     IF ( ( NII .EQ. 0 ) .OR. 
+     :                    ( NII .EQ. 1 .AND. MINPIX .EQ. 2 ) ) 
+     :               THEN
                         CALL CCD1_PTBAD( ITYPE1, LBC, UBC, NLINES,
      :                                   ISTART, IEND, PNTR2( 1 ),
      :                                   STATUS )
@@ -779,11 +781,11 @@
                         BDOUTD = .TRUE.
                         BDOUTV = .TRUE.
 
-*  If only one input NDF contributes, then copy the input values
-*  directly to the appropriate part of the output array(s), including a
-*  scale factor and/or zero point adjustment if required and not
-*  already applied to the input values.
-                     ELSE IF ( NII .EQ. 1 ) THEN
+*  If only one input NDF contributes and MINPIX is 1, then copy the
+*  input values directly to the appropriate part of the output array(s),
+*  including a scale factor and/or zero point adjustment if required and
+*  not already applied to the input values.
+                     ELSE IF ( NII .EQ. 1 .AND. MINPIX .EQ. 1 ) THEN
                         II = LIST( 2, 1 )
                         CALL CCD1_MVDAT( ITYPE1,
      :                     ( ADJUST .AND. ( .NOT. MODIFY ) ),
