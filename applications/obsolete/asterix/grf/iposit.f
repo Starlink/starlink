@@ -635,7 +635,7 @@
           WRITE(NUM,'(I4)') IPOS
           NAME=NUM
           CALL GRP_GET(I_POS_ID,IPOS,1,REC,STATUS)
-          CALL CONV_SPLIT(REC,RA,DEC)
+          CALL CONV_SPLIT(REC,RA,DEC,STATUS)
           REC=NAME//RA//DEC
           CALL FIO_WRITE(FID,REC,STATUS)
         ENDDO
