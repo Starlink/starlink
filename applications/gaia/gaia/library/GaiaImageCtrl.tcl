@@ -402,6 +402,7 @@ itcl::class gaia::GaiaImageCtrl {
          itk_component add colorramp {
             rtd::RtdImageColorRamp $w_.colorramp \
                -height $itk_option(-colorramp_height) \
+               -usexshm $itk_option(-usexshm) \
                -viewmaster $image_
          }
          pack $itk_component(colorramp) -side bottom -fill x \
