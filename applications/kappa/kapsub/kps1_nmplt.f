@@ -143,6 +143,7 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
+      CHARACTER NDFNAM*255    ! Base name of NDF (possibly with HDS comp. path)
       CHARACTER XL*255       ! Default X axis label
       CHARACTER YL*255       ! Default Y axis label
       DOUBLE PRECISION ABOT  ! Lowest vector A value actually used
@@ -164,6 +165,7 @@
       INTEGER LENXL          ! Used length of XL
       INTEGER LENYL          ! Used length of YL
       INTEGER NDATA          ! No. of non-empty bins
+      INTEGER NMLEN          ! Used length of NDFNAM
       INTEGER NPIX           ! No. of vector B values used
       REAL A                 ! Vector A value
       REAL A0                ! Bin no. for zero A value
