@@ -125,7 +125,7 @@
       lower $row1 
       lower $row2
       pack $row1 $row2 -side top -expand 1 -fill x
-      foreach grp { zoom cutoff marknum } {
+      foreach grp { zoom cutoff markers } {
          set win [ groupwin $grp ]
          pack $win -in $row1 -side left -fill x -expand 1
       }
