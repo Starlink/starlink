@@ -274,11 +274,6 @@
 #include "ast.h"
 #include "cpgplot.h"
 
-/* Temporary measure: define the new AST__BLOCKAVE interpolation scheme
-   macro here, since it has not yet made it into the development system
-   AST include file. */
-#define AST__BLOCKAVE 10
-
 /* Unions for use with the Tcl hashes which store calculated percentiles.
    Tcl hash tables use something the size of a pointer for both the key
    and the value of each hash.  Since we want floating point numbers as

@@ -575,9 +575,6 @@
       DATA PX / 0D0, 1D0 /
       DATA PY / 0D0, 1D0 /
 
-      INTEGER AST__BLOCKAVE
-      PARAMETER ( AST__BLOCKAVE = 10 )
-
 *.
 
 *  Check inherited global status.
