@@ -32,8 +32,7 @@ AC_PROG_LIBTOOL
 
 dnl    List the sun/ssn/... numbers which document this package and
 dnl    which are present as .tex files in this directory.
-STAR_LATEX_DOCUMENTATION(sun227, [sun227.htx_tar sun227.ps])
-STAR_CHECK_PROGS(star2html)
+STAR_LATEX_DOCUMENTATION(sun227)
 
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.

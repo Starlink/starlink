@@ -31,9 +31,7 @@ STAR_DECLARE_DEPENDENCIES(build, [ast ndf sae cat])
 
 dnl    List the sun/ssn/... numbers which document this package and
 dnl    which are present as .tex files in this directory.
-STAR_LATEX_DOCUMENTATION(sun214, [sun214.htx_tar sun214.ps sun214.tex])
-STAR_CHECK_PROGS(star2html)
-
+STAR_LATEX_DOCUMENTATION(sun214)
 STAR_DOC_FILES(sun214fig.ps)
 
 dnl    If you wish to configure extra files, you can add them to this

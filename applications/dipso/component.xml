@@ -10,7 +10,7 @@
       
   </p></abstract>
   <dependencies >
-    <build>ast</build><build>cat</build><build>kaplibs</build><build>snx</build><build>pda</build><build>ndf</build><build>sae</build>
+    <build>ast</build><build>cat</build><build>kaplibs</build><build>snx</build><build>pda</build><build>ndf</build><build>sae</build><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>

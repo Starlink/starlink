@@ -30,8 +30,7 @@ STAR_DECLARE_DEPENDENCIES(link,  [cfitsio par err sla chr ast])
 
 dnl    List the sun/ssn/... numbers which document this package and
 dnl    which are present as .tex files in this directory.
-STAR_LATEX_DOCUMENTATION(sun181, [sun181.htx_tar sun181.ps sun181.tex])
-STAR_CHECK_PROGS(star2html)
+STAR_LATEX_DOCUMENTATION(sun181)
 
 dnl    There is a .msg file in this directory, and this adds Makefile
 dnl    rules to generate the xxx_ERR, xxx_err.h and fac_nnn_err files

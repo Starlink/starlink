@@ -15,7 +15,7 @@ Goddard Space Flight Center, USA.  Starlink is grateful to William
 Pence for giving his permission for CFITSIO to be released on Starlink.
 </p></abstract>
   <dependencies >
-    
+    <sourceset>star2html</sourceset>
   </dependencies>
   <!--
   <developers>

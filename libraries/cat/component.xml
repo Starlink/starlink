@@ -11,7 +11,7 @@ CAT is the Starlink Fortran subroutine library for manipulating
 astronomical catalogues and similar tabular datasets.
 </p></abstract>
   <dependencies >
-    <build>ast</build><build>sae</build><build>par</build><build>prm</build><link>cfitsio</link><link>par</link><link>err</link><link>sla</link><link>chr</link><link>ast</link><sourceset>messgen</sourceset>
+    <build>ast</build><build>sae</build><build>par</build><build>prm</build><link>cfitsio</link><link>par</link><link>err</link><link>sla</link><link>chr</link><link>ast</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
   </dependencies>
   <!--
   <developers>
