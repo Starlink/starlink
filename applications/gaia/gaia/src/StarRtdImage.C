@@ -3127,7 +3127,8 @@ int StarRtdImage::get_compass(double x, double y, const char* xy_units,
 //      Contour an image
 //
 //    Return:
-//       TCL status and result. Plots contours.
+//       TCL status and result (the number of points drawn). 
+//       Plots contours on canvas.
 //
 //    Notes:
 //       The first parameter passed to this routine should be a list
@@ -3239,34 +3240,37 @@ int StarRtdImage::contourCmd( int argc, char *argv[] )
 
   //  Get the region coordinates. Note just use Contour native
   //  facilities for this, not the plot (this potentially much
-  //  more efficient).
+  //  more efficient). These may be given as "" in which case they are 
+  //  ignored.
   char **coordArgv;
   int ncoords = 0;
   double region[4];
   if ( argc == 5 ) {
-    if ( Tcl_SplitList( interp_, argv[4], &ncoords, &coordArgv ) != TCL_OK ) {
-      error( "sorry: failed to decode region of image to contour" );
-      ncoords = 0;
-      inerror = 1;
-    } else {
-      if ( ncoords != 4 ) {
-        error( "wrong # of args, should be 4 canvas coordinates"
-               " for contouring region " );
+    if ( *argv[4] != '\0' ) {
+      if ( Tcl_SplitList( interp_, argv[4], &ncoords, &coordArgv ) != TCL_OK ) {
+        error( "sorry: failed to decode region of image to contour" );
+        ncoords = 0;
         inerror = 1;
       } else {
-        for ( int index = 0; index < ncoords; index++ ) {
-          if ( Tcl_GetDouble(interp_, coordArgv[index],
-                             &region[index] ) != TCL_OK ) {
-            error( coordArgv[index], "is not a valid number");
-            inerror = 1;
-            break;
+        if ( ncoords != 4 ) {
+          error( "wrong # of args, should be 4 canvas coordinates"
+                 " for contouring region " );
+          inerror = 1;
+        } else {
+          for ( int index = 0; index < ncoords; index++ ) {
+            if ( Tcl_GetDouble(interp_, coordArgv[index],
+                               &region[index] ) != TCL_OK ) {
+              error( coordArgv[index], "is not a valid number");
+              inerror = 1;
+              break;
+            }
           }
+          
+          //  Transform these positions into image coordinates.
+          swap( region[1], region[3] );
+          canvasToImageCoords( region[0], region[1], 0 );
+          canvasToImageCoords( region[2], region[3], 0 );
         }
-
-        //  Transform these positions into image coordinates.
-        swap( region[1], region[3] );
-        canvasToImageCoords( region[0], region[1], 0 );
-        canvasToImageCoords( region[2], region[3], 0 );
       }
     }
   }
@@ -3345,11 +3349,9 @@ int StarRtdImage::contourCmd( int argc, char *argv[] )
                            (int)(region[3] - region[1] + 1 ) );
       }
 
-      //  Draw the contour.
-      if ( ! contour.drawContours() ) {
-        more_error ("sorry: failed to plot contours" );
-        inerror = 1;
-      }
+      //  Draw the contour. Only result in drawn or not.
+      int ndrawn = contour.drawContours();
+      set_result( ndrawn );
     }
 
     //  Free the plot.

@@ -291,14 +291,15 @@ void Contour::getRegion( int& xlower, int& ylower, int& xsize, int& ysize )
 }
 
 //
-//  Draw the contours.
+//  Draw the contours. Returns the total number of points drawn.
 //
 int Contour::drawContours()
 {
   //  Local variables.
   double cval;
   AstPlot *lplot;
-  int ok = 1;
+  int ndrawn = 0;
+  int totaldrawn = 0;
 
   //  Get image data properties.
   void *image = (void *)imageio_.dataPtr();
@@ -369,39 +370,40 @@ int Contour::drawContours()
     //  data format.
     switch ( type ) {
     case BYTE_IMAGE:
-      ok = scanImage( (char *) image, nx, ny, lplot, cval,
-                      xlower, ylower, xsize, ysize, done );
+      ndrawn = scanImage( (char *) image, nx, ny, lplot, cval,
+                          xlower, ylower, xsize, ysize, done );
       break;
     case X_IMAGE:
-      ok = scanImage( (unsigned char *) image, nx, ny, lplot, cval,
-                      xlower, ylower, xsize, ysize, done );
+      ndrawn = scanImage( (unsigned char *) image, nx, ny, lplot, cval,
+                          xlower, ylower, xsize, ysize, done );
       break;
     case USHORT_IMAGE:
-      ok = scanImage( (ushort *) image, nx, ny, lplot, cval,
-                      xlower, ylower, xsize, ysize, done );
+      ndrawn = scanImage( (ushort *) image, nx, ny, lplot, cval,
+                          xlower, ylower, xsize, ysize, done );
       break;
     case SHORT_IMAGE:
-      ok = scanImage( (short *) image, nx, ny, lplot, cval,
-                      xlower, ylower, xsize, ysize, done );
+      ndrawn = scanImage( (short *) image, nx, ny, lplot, cval,
+                          xlower, ylower, xsize, ysize, done );
       break;
     case LONG_IMAGE:
-      ok = scanImage( (FITS_LONG *) image, nx, ny, lplot, cval,
-                      xlower, ylower, xsize, ysize, done );
+      ndrawn = scanImage( (FITS_LONG *) image, nx, ny, lplot, cval,
+                          xlower, ylower, xsize, ysize, done );
       break;
     case FLOAT_IMAGE:
-      ok = scanImage( (float *) image, nx, ny, lplot, cval,
-                      xlower, ylower, xsize, ysize, done );
+      ndrawn = scanImage( (float *) image, nx, ny, lplot, cval,
+                          xlower, ylower, xsize, ysize, done );
       break;
     default:
-      ok = 0;
+      ndrawn = 0;
     }
+    totaldrawn += ndrawn;
 
     //  Annul the temporary copy of the supplied Plot which was used
     //  to do the drawing.
     lplot = (AstPlot *) astAnnul( lplot );
 
     //  Abort if failing:
-    if ( ! ok ) {
+    if ( ! astOK ) {
       break;
     }
   }
@@ -409,8 +411,8 @@ int Contour::drawContours()
   //  Free the workspace.
   delete [] done;
 
-  //  Contoured OK?
-  return ok;
+  //  Return number of points drawn.
+  return totaldrawn;
 }
 
 //

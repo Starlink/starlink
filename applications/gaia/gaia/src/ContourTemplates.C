@@ -7,7 +7,8 @@
 //-
 
 //
-//   Detect and draw a single contour.
+//   Detect and draw a single contour. Returns the number of pixel
+//   used in the contour.
 //
 int Contour::scanImage( const DATA_TYPE *image, const int nx,
                         const int ny, const AstPlot *plot, 
@@ -68,9 +69,8 @@ int Contour::scanImage( const DATA_TYPE *image, const int nx,
   int linend;         // At end of a line?
   int lside = 0;      // Current exit side of cell
   int nexit;          // Number of cell exits for current cell
-
-  //  Initialise counter for number of x-y co-ordinates to plot.
-  int npts = -1;
+  int npts = -1;      // Counter for number of x-y co-ordinates to plot.
+  int ndrawn = 0;     // Number of points used in contour. 
 
   // Scan the image, looking for a cell containing the current contour
   // level.
@@ -235,11 +235,13 @@ int Contour::scanImage( const DATA_TYPE *image, const int nx,
             //  Plot the stored contour.
             npts++;
             contPlot( plot, npts, x, y );
+            ndrawn += npts;
 
             //  Plot the segment of the other contour found in the
             //  confused cell. 
             if ( confus ) {
               contPlot( plot, 2, &x[npts], &y[npts] );
+              ndrawn += 2;
             }
 
             // Reset the number of points to plot.
@@ -250,5 +252,5 @@ int Contour::scanImage( const DATA_TYPE *image, const int nx,
       } //  End of already contoured-pixel check.
     } // End of the loop through the columns.
   } //  End of the loop through the lines.
-  return 1;
+  return ndrawn;
 }

@@ -9,7 +9,22 @@
 #     Defines a class for image contouring
 
 #  Description:
+#     This class privides a toolbox for drawing contours over an
+#     image. The contours can be of the image itself, or of another
+#     image (which can be stored on disk, or displayed in another
+#     clone).
 #
+#     The toolbox provides interactive control of the levels, the
+#     colour that each level is drawn in and its line width. Drawing
+#     of contours can be done all at once, or one-by-one (this is
+#     achieved by pressing <Return> in the entry widget showing the
+#     value.
+#
+#     A key of contour levels (showing those drawn and which have some
+#     values plotted) is added to the display. The part of the image
+#     that is  contoured can be mapped onto the region of the
+#     displayed image. Contour levels can be generated using a range
+#     of techniques (such as magnitude intervals).
 
 #  Invocations:
 #
@@ -132,11 +147,41 @@ itcl::class gaia::GaiaContour {
       #  Allow selection of the contoured image.
       add_image_controls_
 
+      #  Add tab table to contain the various controls (too many for a
+      #  single pane).
+      itk_component add tab {
+         tabnotebook $w_.tab -angle 30 -tabpos w -width 370 -height 400
+      }
+
+      #  Get pane for levels and attributes.
+      $itk_component(tab) add -label Levels
+      set child_(levels) [$itk_component(tab) childsite 0]
+
       #  Add controls for line attributes.
-      add_att_controls_
+      add_att_controls_ $child_(levels)
+
+      #  Get pane for levels generation controls.
+      $itk_component(tab) add -label Generate
+      set child_(gener) [$itk_component(tab) childsite 1]
 
       #  Add controls for level generation.
-      add_gen_controls_
+      add_gen_controls_ $child_(gener)
+
+      #  Get pane for region to contour.
+      $itk_component(tab) add -label Region
+      set child_(region) [$itk_component(tab) childsite 2]
+
+      #  Add controls for choosing whether to contour the whole image,
+      #  or just the displayed part
+      add_whole_controls_ $child_(region)
+
+      #  Get pane for contour key configuration.
+      $itk_component(tab) add -label Key
+      set child_(key) [$itk_component(tab) childsite 3]
+
+      #  Add controls for choosing whether to contour the whole image,
+      #  or just the displayed part
+      add_key_controls_ $child_(key)
 
       #  Create the button bar
       itk_component add actionframe {frame $w_.action}
@@ -164,10 +209,10 @@ itcl::class gaia::GaiaContour {
 
       #  Pack all the components into place.
       pack $itk_component(actionframe) -side bottom -fill x -pady 5 -padx 5
+      pack $itk_component(tab) -side top -fill both -expand 1
       pack $itk_component(close) -side right -expand 1 -pady 3 -padx 3
       pack $itk_component(clear) -side right -expand 1 -pady 3 -padx 3
       pack $itk_component(draw) -side left -expand 1 -pady 3 -padx 3
-
 
       #  Set the canvas level tags and record no contours are drawn.
       for {set i 1} {$i <= $itk_option(-maxcnt)} {incr i} {
@@ -179,6 +224,8 @@ itcl::class gaia::GaiaContour {
       set keytag_ "ckey[incr unique_]"
       set texttag_ "ckey[incr unique_]"
 
+      #  Display a window pane.
+      $itk_component(tab) select 0
    }
 
    #  Destructor:
@@ -313,17 +360,17 @@ itcl::class gaia::GaiaContour {
    }
 
    #  Add the controls for the contour levels and attributes.
-   protected method add_att_controls_ {} {
+   protected method add_att_controls_ {w} {
 
       itk_component add attrule {
-         LabelRule $w_.attrule -text "Contour levels & attributes:"
+         LabelRule $w.attrule -text "Contour levels & attributes:"
       }
       pack $itk_component(attrule) -side top -fill x
 
       #  Use a scrolled frame to get all these in a small amount of
       #  real estate.
       itk_component add atframe {
-         scrolledframe $w_.atframe -width 75 -height 320
+         scrolledframe $w.atframe -width 75 -height 320
       }
       pack $itk_component(atframe) -fill both -expand 1
       set parent [$itk_component(atframe) childsite]
@@ -475,7 +522,11 @@ itcl::class gaia::GaiaContour {
          }
 
          #  If requested just display over the visible canvas +/- a little.
-         set bounds [calc_bounds_]
+         if { ! $whole_ } {
+            set bounds [calc_bounds_]
+         } else {
+            set bounds ""
+         }
 
          #  Draw the contours. Do this one at a time so that we can
          #  update the interface.
@@ -520,7 +571,7 @@ itcl::class gaia::GaiaContour {
    }
 
    #  Get the contour levels from the appropriate entry fields.
-   protected method get_levels_ {} {
+   protected method get_levels_ {{ignore 0}} {
       set levels {}
       for {set i 1} {$i <= $itk_option(-maxcnt)} {incr i} {
          set value [$itk_component(value$i) get]
@@ -531,7 +582,9 @@ itcl::class gaia::GaiaContour {
       if { $levels != {} } {
          return $levels
       } else {
-         info_dialog "You must give some valid contour levels"
+         if { ! $ignore } {
+            info_dialog "You must give some valid contour levels"
+         }
          return {}
       }
    }
@@ -577,11 +630,11 @@ itcl::class gaia::GaiaContour {
       return $atts
    }
 
-   #  Calculate the bounds of the visible image (canvas coordinates).
+   #  Calculate the bounds of the visible image (canvas
+   #  coordinates). This uses the xfrac_ and yfrac_ limits.
    protected method calc_bounds_ {} {
-      set frac 0.80
-      set xf [expr 0.5*(1.0-$frac)]
-      set yf [expr 0.5*(1.0-$frac)]
+      set xf [expr 0.5*(1.0-$xfrac_)]
+      set yf [expr 0.5*(1.0-$yfrac_)]
       set w [winfo width $itk_option(-canvas)]
       set h [winfo height $itk_option(-canvas)]
       set x0 [$itk_option(-canvas) canvasx 0]
@@ -663,18 +716,17 @@ itcl::class gaia::GaiaContour {
 
    #  Level generation commands. XXX Just use simple generation commands,
    #  no need to look at image data levels.
-   protected method add_gen_controls_ {} {
+   protected method add_gen_controls_ {w} {
 
-      #  Add section header and frame to contain generation commands
-      #  in a line.
+      #  Add section header.
       itk_component add genrule {
-         LabelRule $w_.genrule -text "Contour level generation:"
+         LabelRule $w.genrule -text "Contour level generation:"
       }
       pack $itk_component(genrule) -side top -fill x
 
       #  Number of contours to generate.
       itk_component add ncont {
-         util::LabelMenu $w_.ncont \
+         util::LabelMenu $w.ncont \
             -relief raised \
             -text "Number:" \
             -labelwidth 14 \
@@ -690,33 +742,9 @@ itcl::class gaia::GaiaContour {
       }
       $itk_component(ncont) configure -value 5
 
-      #  Starting value.
-      itk_component add start {
-         LabelEntry $w_.start \
-            -validate real \
-            -text "Start:" \
-            -labelwidth 14 \
-            -valuewidth 20 \
-      }
-      pack $itk_component(start) -side top -fill x -ipadx 1m -ipady 1m
-      add_short_help $itk_component(start) \
-         {Starting point for level generation}
-
-      #  Increment.
-      itk_component add incre {
-         LabelEntry $w_.incre \
-            -validate real \
-            -text "Increment:" \
-            -labelwidth 14 \
-            -valuewidth 20 \
-      }
-      pack $itk_component(incre) -side top -fill x -ipadx 1m -ipady 1m
-      add_short_help $itk_component(incre) \
-         {Increment between generated levels}
-
       #  Type of generation.
       itk_component add ctype {
-         util::LabelMenu $w_.ctype \
+         util::LabelMenu $w.ctype \
             -relief raised \
             -text {Algorithm:} \
             -labelwidth 14 \
@@ -732,13 +760,38 @@ itcl::class gaia::GaiaContour {
       }
       $itk_component(ctype) configure -value automatic
 
+      #  Starting value.
+      itk_component add start {
+         LabelEntry $w.start \
+            -validate real \
+            -text "Start:" \
+            -labelwidth 14 \
+            -valuewidth 20 \
+      }
+      pack $itk_component(start) -side top -fill x -ipadx 1m -ipady 1m
+      add_short_help $itk_component(start) \
+         {Starting point for level generation}
+
+      #  Increment.
+      itk_component add incre {
+         LabelEntry $w.incre \
+            -validate real \
+            -text "Increment:" \
+            -labelwidth 14 \
+            -valuewidth 20 \
+      }
+      pack $itk_component(incre) -side top -fill x -ipadx 1m -ipady 1m
+      add_short_help $itk_component(incre) \
+         {Increment between generated levels}
+
+
       #  Button to generate contours.
       itk_component add generate {
-         button $w_.gen \
+         button $w.gen \
             -text "Generate" \
             -command [code $this generate_contours_]
       }
-      pack $itk_component(generate) -side top -expand 1 -ipadx 1m -ipady 1m
+      pack $itk_component(generate) -side top -ipadx 1m -ipady 1m -pady 4m
       add_short_help $itk_component(generate) \
          {Generate contours}
    }
@@ -774,6 +827,9 @@ itcl::class gaia::GaiaContour {
                [expr $start+($i-1)*$incre]
          }
       }
+
+      #  Switch to the levels pane.
+      $itk_component(tab) select 0
    }
 
    #  Set the colour of a contour (if it is drawn).
@@ -791,37 +847,171 @@ itcl::class gaia::GaiaContour {
       $itk_option(-canvas) itemconfigure $texttag_ -width 0
    }
 
+   #  Add controls for configuring the contour key.
+   protected method add_key_controls_ {w} {
+
+      #  Add section header.
+      itk_component add keyrule {
+         LabelRule $w.keyrule -text "Key configuration:"
+      }
+      pack $itk_component(keyrule) -side top -fill x
+
+      #  Position of key relative to top right hand corner.
+      itk_component add xkeypos {
+         LabelEntryScale $w.xkeypos \
+            -text "X offset:" \
+            -labelwidth 15 \
+            -valuewidth 5 \
+            -from -200 \
+            -to 200 \
+            -increment 1  \
+            -resolution 1 \
+            -show_arrows 1 \
+            -anchor w \
+            -value 0 \
+            -command [code $this draw_key_]
+      }
+      pack $itk_component(xkeypos) -side top -fill x -ipadx 1m -ipady 1m
+      add_short_help $itk_component(xkeypos) \
+         {X offset of key from top right hand corner}
+
+      itk_component add ykeypos {
+         LabelEntryScale $w.ykeypos \
+            -text "Y offset:" \
+            -labelwidth 15 \
+            -valuewidth 5 \
+            -from -200 \
+            -to 200 \
+            -increment 1  \
+            -resolution 1 \
+            -show_arrows 1 \
+            -anchor w \
+            -value 0 \
+            -command [code $this draw_key_]
+      }
+      pack $itk_component(ykeypos) -side top -fill x -ipadx 1m -ipady 1m
+      add_short_help $itk_component(ykeypos) \
+         {Y offset of key from top right hand corner}
+
+      #  Menu for selecting colour of key title.
+      itk_component add keycolour {
+         util::LabelMenu $w.keycolour \
+            -relief raised \
+            -text "Title colour:" \
+            -labelwidth 15
+      }
+      pack $itk_component(keycolour) -side top -fill x -ipadx 1m -ipady 1m
+      add_short_help $itk_component(keycolour) \
+         {Colour of key title}
+
+      #  Now add all the colours to it.
+      foreach {index xname} $colourmap_ {
+         $itk_component(keycolour) add \
+            -label {    } \
+            -value $xname \
+            -background $xname \
+            -command [code $this draw_key_]
+      }
+
+      #  Menu for selecting fonts of key text.
+      itk_component add keyfont {
+         util::LabelMenu $w.keyfont \
+            -relief raised \
+            -text "Font:" \
+            -labelwidth 15
+      }
+      pack $itk_component(keyfont) -side top -fill x -ipadx 1m -ipady 1m
+      add_short_help $itk_component(keyfont) \
+         {Font of all text in key}
+
+      #  Now add all the fonts.
+      foreach {font sname} $fontmap_ {
+         $itk_component(keyfont) add \
+            -label $sname \
+            -value $font \
+            -font $font \
+            -command [code $this draw_key_]
+     }
+
+      #  Key line lengths.
+      itk_component add keylength {
+         LabelEntryScale $w.keylength \
+            -text "Bar length:" \
+            -labelwidth 15 \
+            -valuewidth 5 \
+            -from 2 \
+            -to 100 \
+            -increment 1  \
+            -resolution 1 \
+            -show_arrows 1 \
+            -anchor w \
+            -value 20 \
+            -command [code $this draw_key_]
+      }
+      pack $itk_component(keylength) -side top -fill x -ipadx 1m -ipady 1m
+      add_short_help $itk_component(keylength) \
+         {Length of bars shown in key}
+
+      #  Surround box line width.
+      itk_component add keywidth {
+         LabelEntryScale $w.keywidth \
+            -text "Surround width:" \
+            -labelwidth 15 \
+            -valuewidth 5 \
+            -from 1 \
+            -to 10 \
+            -increment 1  \
+            -resolution 1 \
+            -show_arrows 1 \
+            -anchor w \
+            -value 1 \
+            -command [code $this draw_key_]
+      }
+      pack $itk_component(keywidth) -side top -fill x -ipadx 1m -ipady 1m
+      add_short_help $itk_component(keywidth) \
+         {Width of box around key}
+   }
+
    #  Add a level key to the image. The key consists of the level and
-   #  a coloured line.
-   protected method draw_key_ {} {
+   #  a coloured line. Any args are ignored.
+   protected method draw_key_ {args} {
 
       #  Delete the current key.
       $itk_option(-canvas) delete $keytag_
 
       #  Get current levels.
-      set levels [get_levels_]
+      set levels [get_levels_ 1]
+      if { $levels == {} } {
+         return
+      }
 
       #  Get the bounds of the displayed contours and work out a
       #  suitable position for the key.
-      set bounds [calc_bounds_]
-      set x [lindex $bounds 2]
-      set y [lindex $bounds 1]
-      set dx 15.0
+      lassign [calc_bounds_] x0 y x y1
+      set xori [expr $x+[$itk_component(xkeypos) get]]
+      set yori [expr $y+[$itk_component(ykeypos) get]]
+      set x [expr $xori+10.0]
+      set y [expr $yori+10.0]
+
+      #  Get various configuration values.
+      set font [$itk_component(keyfont) get]
+      set keycol [$itk_component(keycolour) get]
+      set keywid [$itk_component(keywidth) get]
+      set dx [$itk_component(keylength) get]
       set dy 15.0
 
-      #  Draw the key.
-      
-      #  First the title.
+      #  Title.
       lassign [get_att_ 1] colour width
-      $itk_option(-canvas) create text [expr $x+$dx+5] $y \
+      $itk_option(-canvas) create text [expr $x+$dx] $y \
          -text "Contour key" \
-         -anchor c \
-         -fill $colour \
+         -anchor w \
+         -fill $keycol \
          -tags "$keytag_ $texttag_" \
-         -width 0
+         -width 0 \
+         -font $font
       set y [expr $y+$dy]
 
-      #  Now each line and level.
+      #  Now add each line and level.
       for {set i 1} {$i <= $itk_option(-maxcnt)} {incr i} {
          if { $drawn_($i) } {
             set value [lindex $levels [expr $i-1]]
@@ -835,7 +1025,8 @@ itcl::class gaia::GaiaContour {
                -anchor w \
                -fill $colour \
                -tags "$keytag_ $leveltags_($i) $texttag_" \
-               -width 0
+               -width 0 \
+               -font $font
             set y [expr $y+$dy]
          }
       }
@@ -845,15 +1036,140 @@ itcl::class gaia::GaiaContour {
       #  repositioning whole of key).
       set bbox [$itk_option(-canvas) bbox $keytag_]
       if { $bbox != {} } {
-         set x0 [expr [lindex $bbox 0] -5.0]
-         set y0 [expr [lindex $bbox 1] -5.0]
          set x1 [expr [lindex $bbox 2] +5.0]
          set y1 [expr [lindex $bbox 3] +5.0]
-         set keyid_ [$itk_option(-canvas) create rectangle $x0 $y0 $x1 $y1\
-                        -outline white -tags "$keytag_" -width 1 \
-                        -fill {}]
+         set keyid [$itk_option(-canvas) create rectangle $xori $yori $x1 $y1\
+                       -outline $keycol \
+                       -tags "$keytag_" \
+                       -width $keywid \
+                       -stipple pat7 \
+                       -fill white]
+
+         #  Add bindings to move this (and the other elements of the
+         #  key) about.
+         $itk_option(-canvas) bind $keyid <1> \
+            [code eval $this record_mark_ %x %y]
+         $itk_option(-canvas) bind $keyid <B1-Motion> \
+            [code eval $this move_key_ %x %y]
+         $itk_option(-canvas) bind $keyid <ButtonRelease-1> \
+            [code eval $this update_key_]
       }
    }
+
+   #  Record the position of the key when <1> is pressed.
+   protected method record_mark_ {x y} {
+      set xref_ [$itk_option(-canvas) canvasx $x]
+      set yref_ [$itk_option(-canvas) canvasy $y]
+   }
+
+   #  Move all the elements of the key.
+   protected method move_key_ {x y} {
+      set x [$itk_option(-canvas) canvasx $x]
+      set y [$itk_option(-canvas) canvasy $y]
+      set dx [expr $x-$xref_]
+      set dy [expr $y-$yref_]
+      $itk_option(-canvas) move $keytag_ $dx $dy
+      set xref_ $x
+      set yref_ $y
+   }
+
+   #  Update key position when move is complete.
+   protected method update_key_ {} {
+      lassign [$itk_option(-canvas) bbox $keytag_] bx0 by0 bx1 by1
+      puts "$bx0 $by0 $bx1 $by1"
+      lassign [calc_bounds_] ix0 iy0 ix1 iy1
+      puts "$ix0 $iy0 $ix1 $iy1"
+      set newx [expr $bx0+$ix1]
+      set newy [expr $by0+$iy0]
+      puts "$newx, $newy"
+      #$itk_component(xkeypos) configure -value $newx
+      $itk_component(ykeypos) configure -value $newy
+   }
+
+   #  Add controls for choosing which part of the image to contour.
+   protected method add_whole_controls_ {w} {
+
+      #  Control what area the plot covers. This can be the whole just
+      #  or just the part that is displayed.
+      itk_component add regionrule {
+         LabelRule $w.region -text "Contour region:"
+      }
+      pack $itk_component(regionrule) -fill x -ipadx 1m
+      itk_component add whole {
+         StarLabelCheck $w.whole \
+            -text "Whole of image:" \
+            -onvalue 1 \
+            -offvalue 0 \
+            -labelwidth 15 \
+            -variable [scope whole_] \
+            -command [code $this set_whole_]
+      }
+      set whole_ 0
+      pack $itk_component(whole) -side top -fill x -ipadx 1m -ipady 1m
+      add_short_help $itk_component(whole) \
+         {Toggle if whole image is to be contoured}
+
+      #  Control the fraction of the display that the contouringh
+      #  covers.
+      set xfrac_ 0.8
+      itk_component add xfrac {
+         LabelEntryScale $w.xfrac \
+            -text "X display fraction:" \
+            -labelwidth 15 \
+            -valuewidth 5 \
+            -from 0.01 \
+            -to 0.99 \
+            -increment 0.01  \
+            -resolution 0.01 \
+            -show_arrows 1 \
+            -anchor w \
+            -value $xfrac_ \
+            -command [code $this set_display_frac_ xfrac_]
+      }
+      pack $itk_component(xfrac) -side top -fill x -ipadx 1m -ipady 1m
+      add_short_help $itk_component(xfrac) \
+         {X fraction of visible region to contour}
+
+      set yfrac_ 0.8
+      itk_component add yfrac {
+         LabelEntryScale $w.yfrac \
+            -text "Y display fraction:" \
+            -labelwidth 15 \
+            -valuewidth 5 \
+            -from 0.01 \
+            -to 0.99 \
+            -increment 0.01  \
+            -resolution 0.01 \
+            -show_arrows 1 \
+            -anchor w \
+            -value $yfrac_ \
+            -command [code $this set_display_frac_ yfrac_]
+      }
+      pack $itk_component(yfrac) -side top -fill x -ipadx 1m -ipady 1m
+      add_short_help $itk_component(xfrac) \
+         {Y fraction of visible region to contour}
+
+      #  Do the initialisation of the fraction widget states.
+      set_whole_
+   }
+
+   #  Toggle fraction sliders according to whether whole of image is
+   #  being contoured.
+   protected method set_whole_ {args} {
+      if { $whole_ } {
+         $itk_component(xfrac) configure -state disabled
+         $itk_component(yfrac) configure -state disabled
+      } else {
+         $itk_component(xfrac) configure -state normal
+         $itk_component(yfrac) configure -state normal
+      }
+   }
+
+   #  Set the displayed fractions.
+   protected method set_display_frac_ {which value} {
+      set $which $value
+   }
+
 
    #  Configuration options: (public variables)
    #  ----------------------
@@ -930,6 +1246,40 @@ itcl::class gaia::GaiaContour {
    #  Text is different as need to disable width attributes.
    protected variable keytag_
    protected variable texttag_
+
+   #  Reference position for moving key.
+   protected variable xref_ 1
+   protected variable yref_ 1
+
+   #  Which part of image is to be contoured.
+   protected variable whole_ 0
+   protected variable xfrac_ 0.8
+   protected variable yfrac_ 0.8
+
+   #  Window names of the tab notebook childsites.
+   protected variable child_
+
+   #  Fonts for text in key, plus short description.
+   protected variable fontmap_ {
+      "-adobe-helvetica-medium-r-normal--*-140-*-*-*-*-*-*" "medium"
+      "-adobe-helvetica-medium-o-normal--*-140-*-*-*-*-*-*" "medium"
+      "-adobe-helvetica-bold-r-normal--*-140-*-*-*-*-*-*"   "bold"
+      "-adobe-helvetica-bold-o-normal--*-140-*-*-*-*-*-*"   "bold"
+      "-adobe-helvetica-medium-r-normal--*-120-*-*-*-*-*-*" "medium"
+      "-adobe-helvetica-medium-o-normal--*-120-*-*-*-*-*-*" "medium"
+      "-adobe-helvetica-bold-r-normal--*-120-*-*-*-*-*-*"   "bold"
+      "-adobe-helvetica-bold-o-normal--*-120-*-*-*-*-*-*"   "bold"
+      "-adobe-times-medium-r-normal--*-120-*-*-*-*-*-*"     "medium"
+      "-adobe-times-medium-i-normal--*-120-*-*-*-*-*-*"     "medium"
+      "-adobe-times-bold-r-normal--*-120-*-*-*-*-*-*"       "bold"
+      "-adobe-times-bold-i-normal--*-120-*-*-*-*-*-*"       "bold"
+      "-adobe-courier-medium-r-*-*-*-120-*-*-*-*-*-*"       "fixed-width"
+      "-adobe-courier-medium-o-*-*-*-120-*-*-*-*-*-*"       "fixed-width"
+      "-adobe-courier-bold-r-*-*-*-120-*-*-*-*-*-*"         "fixed-width"
+      "-adobe-courier-bold-o-*-*-*-120-*-*-*-*-*-*"         "fixed-width"
+      "-adobe-symbol-medium-r-normal-*-*-120-*-*-*-*-*-*"   "symbol"
+      "-adobe-helvetica-bold-r-*-*-20-120-*-*-*-*-*-*"      "large screen"
+   }
 
    #  Common variables: (shared by all instances)
    #  -----------------
