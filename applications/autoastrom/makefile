@@ -458,8 +458,15 @@ PUBLIC_SCRIPTS = autoastrom autoastrom.pm
 LIBRARY_FILES = moggy/Moggy.pm misc/extractor.config misc/extractor.param \
 	plugin-match-match.pl
 
+HYPERTEXT_DOCS = sun242.htx
+HYPERTEXT_TARBALL = $(HYPERTEXT_DOCS:.htx=.tar-htx)
+LATEX_DOCS = sun242.latex
+LATEX_TARBALL = $(LATEX_DOCS:.latex=.tar-tex)
+XML_DOCS = sun242.xml
+
 #  List of documentation files.
-DOCUMENTATION = $(PKG_NAME).news sun242.tar-htx sun242.tar-tex sun242.xml
+DOCUMENTATION = $(PKG_NAME).news \
+	$(HYPERTEXT_TARBALL) $(LATEX_TARBALL) $(XML_DOCS)
 
 ###############################################################################
 #------------------------------------------------------------------------------
@@ -520,7 +527,7 @@ INSTALL_SHARE = $(INSTALL)/share
 #  List of directories actually used for installation (selected from
 #  those above) and rules to create them.
 
-INSTALL_DIRS = $(INSTALL_BIN) $(INSTALL_DATES) $(INSTALL_DOCS)
+INSTALL_DIRS = $(INSTALL_BIN) $(INSTALL_DATES) $(INSTALL_DOCS) $(INSTALL_HELP)
 
 $(INSTALL_DIRS):
 	mkdir -p $@
@@ -742,14 +749,28 @@ install:
 #           chmod 755 $(INSTALL_BIN)/$(STARTUP_SCRIPT) ;\
 #        else :; fi
 #
-#  Install the Latex documentation, giving it world read permission,
+#  Install the LaTeX and XML documentation, giving it world read permission,
 #  leaving the source copy in place.
-	for f in $(LATEX_DOCS) ""; do \
+
+	for f in $(XML_DOCS) ""; do \
            if test -n "$$f"; then \
               cp -p $$f $(INSTALL_DOCS);\
               chmod 644 $(INSTALL_DOCS)/$$f;\
            else :; fi;\
         done
+
+	if test -n "$(LATEX_TARBALL)"; then \
+           pwd=`pwd`;\
+           (cd $(INSTALL_DOCS) && \
+           for f in $(LATEX_DOCS) ""; do \
+              if test -n "$$f"; then\
+                 $(TAR_OUT) $$pwd/$(LATEX_TARBALL);\
+                 chmod 755 `find $$f -type d -print`;\
+                 chmod 644 `find $$f ! -type d -print`;\
+                 touch $$f;\
+              else :; fi;\
+           done);\
+        fi;
 #
 #  Install any hypertext documents, giving world read access to all the files
 #  they contain and linking with other documents.
@@ -758,7 +779,7 @@ install:
            (cd $(INSTALL_DOCS) && \
            for f in $(HYPERTEXT_DOCS) ""; do \
               if test -n "$$f"; then\
-                 $(TAR_OUT) $$pwd/$${f}_tar;\
+                 $(TAR_OUT) $$pwd/$(HYPERTEXT_TARBALL);\
                  chmod 755 `find $$f -type d -print`;\
                  chmod 644 `find $$f ! -type d -print`;\
                  touch $$f;\
@@ -875,10 +896,10 @@ do_deinstall:
 #           $(MAKE) $(STARTUP_SCRIPT);\
 #        else :; fi
 #
-#  Deinstall the Latex documentation, if installed versions exist.
-	- for f in $(LATEX_DOCS) ""; do \
-           if test -n "$$f" -a -f $(INSTALL_DOCS)/$$f; then \
-              $(RMF) $(INSTALL_DOCS)/$$f;\
+#  Deinstall the LaTeX and XML documentation, if installed versions exist.
+	- for f in $(LATEX_DOCS) $(XML_DOCS) ""; do \
+           if test -n "$$f" -a -w $(INSTALL_DOCS)/$$f; then \
+              $(RMF) -R $(INSTALL_DOCS)/$$f;\
            else :; fi;\
         done
 #
