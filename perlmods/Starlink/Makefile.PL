@@ -3,7 +3,7 @@ use ExtUtils::MakeMaker;
 # the contents of the Makefile that is written.
 WriteMakefile(
     'NAME'      => 'Starlink',
-    'VERSION'   => '1.12', # finds $VERSION
+    'VERSION'   => '1.13', # finds $VERSION
     'DIR'       => [ qw/ Versions EMS ADAM AMS NBS HDSPACK /],
     'dist'      => {'COMPRESS'=>'gzip -9f', 'SUFFIX' => 'gz',
                     'ZIP'=>'/usr/bin/zip','ZIPFLAGS'=>'-rl'},
