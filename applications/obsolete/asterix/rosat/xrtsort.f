@@ -1,4 +1,4 @@
- *+  XRTSORT - Sorts XRT data into ASTERIX output file(s)
+*+  XRTSORT - Sorts XRT data into ASTERIX output file(s)
       SUBROUTINE XRTSORT( STATUS )
 *    Description :
 *     Program to create an ASTERIX data set using
