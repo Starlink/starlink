@@ -146,7 +146,7 @@ am_sex_OBJECTS = analyse.$(OBJEXT) assoc.$(OBJEXT) astrom.$(OBJEXT) \
 	misc.$(OBJEXT) neurro.$(OBJEXT) pc.$(OBJEXT) photom.$(OBJEXT) \
 	plist.$(OBJEXT) poly.$(OBJEXT) prefs.$(OBJEXT) psf.$(OBJEXT) \
 	readimage.$(OBJEXT) refine.$(OBJEXT) retina.$(OBJEXT) \
-	scan.$(OBJEXT) som.$(OBJEXT) weight.$(OBJEXT) userradii.$(OBJECT)
+	scan.$(OBJEXT) som.$(OBJEXT) weight.$(OBJEXT) userradii.$(OBJEXT)
 sex_OBJECTS = $(am_sex_OBJECTS)
 sex_DEPENDENCIES = $(top_builddir)/src/fits/libfits.a \
 	$(top_builddir)/src/wcs/libwcs_c.a
