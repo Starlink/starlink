@@ -19,6 +19,10 @@ extern "C" {
 }
 #endif
 
+
+/* I use a string handling routine (strdup) so read in prototype */
+#include <string.h>
+
 /* The array handling code can be included here */
 /* Deal with the packing of perl arrays to C pointers */
 
@@ -359,18 +363,22 @@ MODULE = NDF    PACKAGE = NDF
 locator *
 DAT__ROOT()
  PROTOTYPE:
+ PREINIT:
+  char ctemp[DAT__SZLOC] = DAT__ROOT;
  CODE:
- RETVAL = strdup(DAT__ROOT);
- stringCtof77(RETVAL, DAT__SZLOC);
+  RETVAL = (locator *)strdup((char *)ctemp);
+  stringCtof77(RETVAL, DAT__SZLOC);
  OUTPUT:
   RETVAL
  
 locator *
 DAT__NOLOC()
  PROTOTYPE:
+ PREINIT:
+  char ctemp[DAT__SZLOC] = DAT__NOLOC;
  CODE:
- RETVAL = strdup(DAT__NOLOC);
- stringCtof77(RETVAL, DAT__SZLOC);
+  RETVAL = (locator *)strdup((char *)ctemp);
+  stringCtof77(RETVAL, DAT__SZLOC);
  OUTPUT:
   RETVAL
 
