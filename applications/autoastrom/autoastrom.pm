@@ -122,14 +122,21 @@ sub extractor_object_badness($$$$$$$) {
 
      return $widmin/$x2bar * $widmin/$y2bar * $flux/$area/$densmax;
 
-
-#     my $score = 1;
-#     my $t = $x2bar/$widmax;
-#     $score *= $widmin/$x2bar + $t*$t;
-#     $t = $y2bar/$widmax;
-#     $score *= $widmin/$y2bar + $t*$t;
-#     $score *= $flux/$area/$densmax;
-#     return $score;
+     # The following is an alternative algorithm for badness, which
+     # also weights against objects which are very broad/overexposed,
+     # on the grounds that they are too smeared out to have good
+     # positions.  However that's not important -- Extractor can still
+     # get a good centre for them, so the position issue isn't
+     # important, and they're not defects, so they _will_ appear in
+     # catalogues, which is the important thing.
+     #
+     #     my $score = 1;
+     #     my $t = $x2bar/$widmax;
+     #     $score *= $widmin/$x2bar + $t*$t;
+     #     $t = $y2bar/$widmax;
+     #     $score *= $widmin/$y2bar + $t*$t;
+     #     $score *= $flux/$area/$densmax;
+     #     return $score;
 }
 
 
@@ -323,6 +330,7 @@ sub extract_objects ($$$$) {
 	my $catkey = sprintf ("%015.3fi%04d", $l[$FLUXcol], $nobj);
 	$cathash{$catkey} = \@l;
 	$nobj++;
+
 	# Calculate some statistics for the detected objects.  We
 	# don't have to worry too much about the details here -- the
 	# aim is to get a rough estimate of the position errors and
@@ -335,11 +343,15 @@ sub extract_objects ($$$$) {
 	# of the ellipse (=\pi AB) is the same as the area of a circle
 	# with radius \sqrt{AB}.
 	$objrad += sqrt($l[$Acol] * $l[$Bcol]);
+
 	# Use the ERRX2 and ERRY2 columns (variances) to calculate an
 	# estimate of the position error.  The standard deviation of
 	# r=\sqrt{x^2+y^2} is \sqrt{ERRX2+ERRY2}.
 	$objposerr += sqrt($l[$ERRX2col] + $l[$ERRY2col]);
 
+        # Sum the total flux and area, so we can crudely estimate the
+        # average flux in detected objects.  This is used to set the
+        # too-much-flux scale when we identify defects below.
         $totisoarea += $l[$AREAcol];
         $totisoflux += $l[$FLUXcol];
 
@@ -360,6 +372,13 @@ sub extract_objects ($$$$) {
                                 # 0=ignore, 1=warn, 2=remove
     my $badnessthreshold = 1.0;
     foreach my $k (keys %$filterdefects) {
+        # Prepare to detect or remove CCD defects.  Remember that we
+        # don't have to be obsessive, here: we can afford a few
+        # uncaught defects, since the match algorithms will generally
+        # simply ignore these.  What we need to avoid is a CCD
+        # catalogue which is dominated by bright sources which have no
+        # counterpart on the sky.
+
         if ($k eq 'ignore') {
             if ($defectfilterbehaviour >= 0) {
                 wmessage('warning', "duplicate --defects keyword $k ignored");
@@ -461,139 +480,9 @@ sub extract_objects ($$$$) {
     $rethash{objsize} = $objrad/$nobj;
 
 
-
-
-
-
-
-
-#     my $dofilterdefects = 0;
-#     my $cutoffarea = 0;		# zero: no cutoff by default
-#     my $cutoffellip = 1000000;	# large number: no cutoff by default
-#     if (defined($filterdefects)) {
-# 	my $reftype = ref($filterdefects);
-# 	if (!defined($reftype)) {
-# 	    wmessage ('warning',
-# 	      "filterdefects=$filterdefects: should be hash.  Ignored");
-# 	} elsif ($reftype ne 'HASH') {
-# 	    wmessage ('warning',
-# 		      "filterdefects must be a hash reference.  Ignored");
-# 	} else {
-# 	    # Cut out CCD blemishes.  Some of the `objects' detected
-# 	    # by EXTRACTOR are in fact CCD defects, or readout errors,
-# 	    # or the like.  These are very bright, so they can confuse
-# 	    # a matching program which examines only or preferentially
-# 	    # the brightest objects.  However these are either very
-# 	    # small or, if they're defects such as a line, extremely
-# 	    # elliptical, with A/B=10+. Examining the list of
-# 	    # detections with the test image r106282xx, all the
-# 	    # defects which had an area of more than 100 pixels also
-# 	    # had an `ellipticity' A/B of more than 3.5.  I think that
-# 	    # the 100-pixel and ellipticity thresholds will be
-# 	    # independent of the size of the CCD, so these make
-# 	    # sensible defaults.
-
-# 	    # Cut off very small objects.  We're doing this to remove
-# 	    # CCD flaws which are often bright `objects', but only ten
-# 	    # or twenty pixels in area, whereas the largest objects
-# 	    # are thousands.
-
-#             # We can afford a few uncaught defects, since the match
-#             # algorithms will generally simply ignore these.  What we
-#             # need to avoid is a CCD catalogue which is dominated by
-#             # bright sources which have no counterpart on the sky.
-
-# 	    # The filterdefects hash may contain either or both of the
-# 	    # keys {area} and {ellipticity} which indicate the minimum
-# 	    # area and maximum ellipticity required for an object to
-# 	    # be regarded as real.
-
-#             # If this hash is defined, then set $dofilterdefects true;
-#             # but if key `nofilter' is in the hash, then set it false
-#             $dofilterdefects = !defined($filterdefects->{nofilter});
-# 	    $cutoffarea = (defined($filterdefects->{area})
-# 			   ? $filterdefects->{area}
-# 			   : 50);
-# 	    $cutoffellip = (defined($filterdefects->{ellipticity})
-# 			    ? $filterdefects->{ellipticity}
-# 			    : 3.5);
-# 	}
-#     }
-
-#     $rethash{numobj} = $nobj;
-#     $rethash{poserr} = $objposerr/$nobj;
-#     $rethash{objsize} = $objrad/$nobj;
-
-
-#     # Construct an array holding references to temporary hashes each
-#     # containing one `row' of the catalogue of extracted objects.  In
-#     # this step remove any objects which fail the
-#     # cutoffarea/cutoffellip cuts described above, and also any for
-#     # which Extractor has found negative fluxes.
-#     my @catarr;
-#     my $ndefects = 0;
-#     my $totobjects = $#sortcat;
-#     while ($maxobj > 0 && $#sortcat >= 0) {
-# 	my $l = $cathash{$sortcat[0]};
-# #  	if (!$dofilterdefects
-# #             || ( $l->[$AREAcol] >= $cutoffarea
-# #                  && ($l->[$Acol]/$l->[$Bcol] < $cutoffellip)
-# #                  && ($l->[$FLUXcol] > 0))) {
-#         my $badness;
-#         $badness = extractor_object_badness($l->[$X2col],
-#                                             $l->[$Y2col],
-#                                             $l->[$FLUXcol],
-#                                             $l->[$AREAcol],
-#                                             2.0,
-#                                             20.0,
-#                                             100.0)
-#           if $dofilterdefects;
-
-#         if (!$dofilterdefects
-#             || $badness < 1.0) {
-
-# 	    my %t;
-# 	    $t{id} = $l->[$NUMBERcol];
-# 	    $t{x} = $l->[$Xcol];
-# 	    $t{y} = $l->[$Ycol];
-# 	    $t{flux} = $l->[$FLUXcol];
-# 	    $t{mag} = 25.0-log($l->[$FLUXcol])/2.30;
-# 	    $t{area} = $l->[$AREAcol];
-
-# 	    $maxobj--;
-# 	    push (@catarr, \%t);
-#  	} else {
-#             $ndefects++;
-# #             wmessage('info',
-# #                      "deleted defect id=%d, area=%.1f (min %.0f), ellipticity=%.2f (max %.1f), flux %.1f (min 0)",
-# #                      $l->[$NUMBERcol],
-# #                      $l->[$AREAcol], $cutoffarea,
-# #                      $l->[$Acol]/$l->[$Bcol], $cutoffellip,
-# #                      $l->[$FLUXcol]);
-# #  	    printf STDERR ("extract_objects: deleted object %d, area %f (min %f), ellipticity %f (max %f), flux %f\n",
-# #                            $l->[$NUMBERcol],
-# #                            $l->[$AREAcol], $cutoffarea,
-# #                            $l->[$Acol]/$l->[$Bcol], $cutoffellip,
-# #                            $l->[$FLUXcol])
-# # 	      if $verbose;
-#             wmessage('info',
-#                      "deleted defect id=%d, badness=%f",
-#                      $l->[$NUMBERcol], $badness);
-#             printf STDERR
-#               ("extract_objects: deleted defect id=%d, badness=%f\n",
-#                $l->[$NUMBERcol], $badness)
-#                 if $verbose;
-#  	}
-#  	shift (@sortcat);
-#     }
-#     wmessage('warning',
-#              "Deleted %d/%d CCD defects (req'd: area>=%.0f, ell<=%.1f, flux>0",
-#              $ndefects, $totobjects, $cutoffarea, $cutoffellip)
-#       if ($ndefects > 0);
-
+    # If requested, dump the catalogue to the specified file, for
+    # later reuse by {fromdump}.
     if (defined($opts->{todump})) {
-	# Dump the catalogue to the specified file, for later reuse
-	# by {fromdump}.
 	open (DUMPCAT, '>'.$opts->{todump}) || return undef;
 	print DUMPCAT "# Extractor catalogue, munged by $0\n";
 	print DUMPCAT "# Input NDF: $ndfname\n";
@@ -756,23 +645,6 @@ sub ndf_info ($$$$) {
 	}			# ignore `malformed' cards: blank, HISTORY, END
     }
 
-#     if (! $isSkyDomain && !defined($obsdata{ra})) {
-#         # There's no SKY position information in the WCS component,
-#         # and we haven't been given an RA on the command line, so grub
-#         # around in the FITS header.
-#         if (defined($fitshash{PLTRAH})) {
-#             # it's a UK Schmidt FITS header
-#             my $rastring = sprintf("%d:%02d:%02f",
-#                                    $fitshash{PLTRAH},
-#                                    $fitshash{PLTRAM},
-#                                    $fitshash{PLTRAS});
-#             my $decstring = sprintf("%c%d:%02d:%02f",
-#                                     $fitshash{PLTDECSN},
-#                                     $fitshash{PLTDECD},
-#                                     $fitshash{PLTDECM},
-#                                     $fitshash{PLTDECS});
-#             print STDERR ("FITS
-
     # Extract all the available date information from the NDF,
     # including from its FITS extension.
     my $ndfdates = get_dates ($indf, $helpers, \%fitshash);
@@ -930,7 +802,7 @@ sub ndf_info ($$$$) {
 	    print STDERR "ndf_info: can't work out ASTROM Met record\n";
 	}
     }
-    
+
     # ASTROM Colour record
     if (defined($obsdata->{col})) {
 	$returnhash{astromcol} = $obsdata->{col};
@@ -1091,12 +963,6 @@ sub get_catalogue ($\%$$) {
 
     my $mytempfile = "$tempdir/catalogue";
 
-#    if ($noregenerate && -e $mytempfile) {
-#	print STDERR "Reusing $mytempfile...\n"
-#	  if $verbose;
-#	return $mytempfile;
-#    }
-
     # Pass the WCS information to moggy, declaring that future points
     # will be specified in the GRID domain (that domain in which the
     # first pixel is centred at coordinate (1,1)).
@@ -1106,7 +972,11 @@ sub get_catalogue ($\%$$) {
     # objects sitting in a box with these points at opposite
     # corners. In fact, ask for a box somewhat larger than this (say,
     # 10% in linear dimension), anticipating some misalignment in the
-    # initial astrometry. XXX Unnecessary and can cause problems with `match'
+    # initial astrometry.  This can cause problems with the `match'
+    # algorithm, since that will get terribly confused if there are
+    # too many objects in the catalogue which are in the margin round
+    # the CCD; it's not a problem in practice as long as we use a
+    # largeish (say, 40) number of objects to match on.
     #
     # There's no need to make this margin of 10% configurable -- it
     # doesn't matter here if the projection pole is off the plate, as
@@ -1118,12 +988,11 @@ sub get_catalogue ($\%$$) {
     my $lly = -$errorest*$sizey;
     my $urx = (1.0+$errorest)*$sizex;
     my $ury = (1.0+$errorest)*$sizey;
+    # Or...
+    # llx=1, lly=1, urx=sizex, ury=sizey
+
     $cat->point     ($llx, $lly);
     $cat->otherpoint($urx, $ury);
-    #$cat->point     (-$errorest*$sizex,-$errorest*$sizey);
-    #$cat->otherpoint( (1.0+$errorest)*$sizex, (1.0+$errorest)*$sizey);
-    #$cat->point     (1, 1);
-    #$cat->otherpoint($sizex, $sizey);
     $cat->searchtype('box');
 
     # Get a decent number of points
@@ -1147,23 +1016,15 @@ sub get_catalogue ($\%$$) {
       sprintf ("get_catalogue: box(%.1f,%.1f)..(%.1f,%.1f) %d points",
                $llx, $lly, $urx, $ury,
                $cat->resultnrows());
-    #my $convref = $cat->astconvert(0,0,1);
     my $convref = $cat->astconvert($llx, $lly, 1);
     $sourcestring .= sprintf (": sky (%s,%s)",
                               deg2sex($convref->[0],0,':'),
                               deg2sex($convref->[1],1,':'));
     $convref = $cat->astconvert($urx, $ury, 1);
-    #$convref = $cat->astconvert($sizex,$sizey,1);
     $sourcestring .= sprintf ("..(%s,%s)",
                               deg2sex($convref->[0],0,':'),
                               deg2sex($convref->[1],1,':'));
     print STDERR "$sourcestring\n" if $verbose;
-
-#     printf STDERR ("get_catalogue: box(%f,%f)..(%f,%f) %d points\n",
-# 		   $cat->point()->[0], $cat->point()->[1],
-# 		   $cat->otherpoint()->[0], $cat->otherpoint()->[1],
-# 		   $cat->resultnrows())
-#       if $verbose;
 
     # Now write the catalogue out to a file which can be used as input
     # to FINDOFF.  Columns:
@@ -1408,7 +1269,6 @@ sub match_positions_findoff ($$$$$) {
     # might have been set by some intermediate by-hand run of FINDOFF.
     $findoffarg .= " error=$fofferr minsep=$foffminsep";
 
-
     # Other options
     $findoffarg .= ' fast=true failsafe=true';
     # Take maxdisp from the {area} argument, if present
@@ -1646,11 +1506,9 @@ sub generate_astrom ($) {
     my $nmatches = $#CCDarray + 1;
     for ($i=0; $i<$nmatches; $i++) {
 	$tmp += ($CCDarray[$i]->{x} - $CATarray[$i]->{x});
-	#$tmp += ($CCDarray[$i]->[1] - $CATarray[$i]->[1]);
 	$sumx += $tmp;
 	$sumsq += $tmp*$tmp;
 	$tmp = ($CCDarray[$i]->{y} - $CATarray[$i]->{y});
-	#$tmp = ($CCDarray[$i]->[2] - $CATarray[$i]->[2]);
 	$sumy += $tmp;
 	$sumsq += $tmp*$tmp;
     }
@@ -1666,6 +1524,8 @@ sub generate_astrom ($) {
     printf STDERR ("CCD-CAT offset=(%.2f,%.2f)pix, M=%f sample s.d.=%f\n",
 		   $xoffset, $yoffset, $statM, $samplesd)
       if $verbose;
+
+
 
     # At this point we can indulge in a good deal of statistical
     # hi-jinks which is fun, but essentially pointless, since the
@@ -1817,12 +1677,6 @@ sub generate_astrom ($) {
 	printf ASTROMOUT ("%12f   %12f\n",
 			  $CCDarray[$i]->{x},
 			  $CCDarray[$i]->{y});
-#	printf ASTROMOUT "%s   %s  0.0  0.0  J2000\t* %d/%d\n",
-#	    deg2sex($CATarray[$i]->[3], 0),
-#	    deg2sex($CATarray[$i]->[4], 1),
-#	    $CCDarray[$i]->[4], $CATarray[$i]->[5];
-#	printf ASTROMOUT "%12f   %12f\n", $CCDarray[$i]->[1],
-#	    $CCDarray[$i]->[2];
     }
 
     print ASTROMOUT "END\n";
@@ -2731,83 +2585,18 @@ sub run_command_pipe (\@) {
         }
     }
 
-#     my $pid = open(P,'-|');
-#     if (!defined($pid)) {
-#         wmessage ('warning', "Couldn't fork");
-#         $rval = undef;
-#     } elsif ($pid == 0) {
-#         # In the child
-#         $| = 1;
-# 	exec (@cmdargs);
-#         # NOT REACHED
+    # The alternative way to do this is to do
+    #
+    #    my $pid = open(P,'-|');
+    #
+    # then exec(@cmdargs) in the child.  That does NOT work, however,
+    # as the first time we read from the pipe in the parent, we
+    # usually, but not always, read EOF (while(<P>) returns false.  I
+    # have no idea why, and spent ages trying to work how how Perl
+    # could be stuffing this up, but finally realised that there was
+    # nothing particular to be gained by doing this, other than a warm
+    # glow of system programming....
 
-#         # Unlike execve(2) and friends, Perl exec guarantees
-#         # never to return, therefore we needn't (and since we run with
-#         # -w, we shouldn't) have any cleanup code here.
-#     } else {
-#         # In the parent
-#         my $rstr;
-#         my @lines;
-#         my $fudgedloop = 0;
-#         my $caughtsigchild = 0;
-#         local $SIG{CHLD} = sub { $caughtsigchild=1; };
-#         {
-#             while(<P>) {
-#                 s/\s*$//;
-#                 printf STDERR "%s: <%s>\n", $cmdargs[0], $_;
-#                 push(@lines,$_);
-#             }
-# #             $#lines != 0
-# #               || wmessage('warning', "$cmdargs[0] produced no output!");
-#             if ($#lines == 0) {
-#                 if ($fudgedloop) {
-#                     wmessage('warning',
-#                              "$cmdargs[0] produced no output!";
-#                 } else {
-#                     print STDERR "$cmdargs[0] initially produced no output! ($caughtsigchild) -- trying again\n");
-#                     $fudgedloop = 1;
-#                     redo;
-#                 }
-#             }
-#         }
-
-# #        my $line;
-# #         while (defined($line = <P>)) {
-# #             $line =~ s/\s*$//;
-# #             printf STDERR "%s: <%s>\n", $cmdargs[0], $line;
-# #             push(@lines,$line);
-# #         }
-# #         my $fudgedloop = 0;
-# #         sleep(1);               # helps avoid oddness below
-# #         my $caughtsigchild = 0;
-# #         local $SIG{CHLD} = sub { $caughtsigchild=1;wmessage ('warning', "Caught SIGCHLD"); };
-# #         {
-# #             while (<P>) {
-# #                 push(@lines,$_);
-# #             }
-# #             if ($#lines == 0 && !$fudgedloop) {
-# #                 # odd... We've apparently found EOF in the pipe, but
-# #                 # haven't read anything.  This shouldn't happen, but I
-# #                 # think there's a race condition here, as this does
-# #                 # happen occasionally, so in this case try going round
-# #                 # the loop again.  It's possible that the child
-# #                 # program collapsed without producing any output, but
-# #                 # if that has happened, we'll detect it when we look
-# #                 # at the error status below.
-# #                 wmessage('warning',
-# #                          "$cmdargs[0] produced no output? ($caughtsigchild)  Trying again");
-# #                 $fudgedloop = 1;
-# #                 redo;
-# #             }
-# #         }
-#         close(P) || wmessage('warning', "Closing P failed: $?");
-#         if ($? == 0) {
-#             $rval = \@lines;
-#         } else {
-#             wmessage('warning', "$cmdargs[0] produced error status $?");
-#             $rval = undef;
-#         }
-#     }
     return $rval;
 }
 
