@@ -305,6 +305,10 @@
 #      25-JUN-2000 (TIMJ):
 #        - Add new files for V1.6-0
 #        - Add creation/removal of version.dat file during install/deinstall
+#      11-JUL-2000 (TIMJ):
+#        - Add GZIP compression
+#        - Add SURF_CONDITIONS
+#        - Fix bug in version.dat deinstall
 #     {enter_further_changes_here}
 #
 #  Bugs:
@@ -446,6 +450,13 @@ TAR_OUT = pax -r -f
 #  Command for adding a file to an object archive (.a).
 
 AR_IN = ar -r
+
+#  Command to compress the tar files and the suffix used for the
+#  compression system. The compress command must send the output
+#  to standard out.
+
+COMPRESS = gzip -c --best
+COMPSFX  = gz
 
 #  ADAM monolith linker command.
 
@@ -773,7 +784,13 @@ HYPERTEXT_DOCS = sun216.htx sc10.htx sc11.htx ssn72.htx
 
 #  List of documentation files.
 
-DOCUMENTATION = $(LATEX_DOCS) $(HYPERTEXT_DOCS:.htx=.htx_tar) $(PKG_NAME).news
+DOCUMENTATION = $(LATEX_DOCS) $(HYPERTEXT_DOCS:.htx=.htx_tar) \
+                $(PKG_NAME).news $(LICENCE)
+
+#  Conditions of use file.
+
+LICENCE = $(PACK_NAME)_CONDITIONS
+
 
 ################################################################################
 #-------------------------------------------------------------------------------
@@ -1318,6 +1335,11 @@ install:
            $(STAR_BIN)/hlink $(INSTALL_DOCS) $(INSTALL_HELP);\
         fi;
 #
+#  Install the conditions of use file and make it read-only to prevent its
+#  date being changed.
+	cp -p $(LICENCE) $(INSTALL_DATES)
+	chmod 444 $(INSTALL_DATES)/$(LICENCE)
+#
 #  Install the date stamp file and make it read-only to prevent its
 #  date being changed.
 	cp -p $(DATE_STAMP) $(INSTALL_DATES)
@@ -1446,7 +1468,7 @@ do_deinstall:
 #  Remove the package version file in the installation directory.
 	- if test -n "version.dat"; then \
              rm -f $(INSTALL_BIN)/version.dat ;\
-           else :; 
+           else :; fi
 #
 #  Deinstall the package startup file.  Since it will have been edited
 #  during installation, we remove the installed copy, if present, and
@@ -1499,6 +1521,13 @@ do_deinstall:
            export HTX_PATH;\
            $(STAR_BIN)/hlink $(INSTALL_DOCS) $(INSTALL_HELP);\
         fi
+#
+#  Deinstall the conditions of use file after setting its protection so it may
+#  be removed.
+	- if test -f $(INSTALL_DATES)/$(LICENCE); then \
+           chmod 644 $(INSTALL_DATES)/$(LICENCE);\
+           rm -f $(INSTALL_DATES)/$(LICENCE);\
+        else :; fi
 #
 #  Deinstall the date stamp file after setting its protection so it may
 #  be removed.
@@ -1583,19 +1612,19 @@ do_test:
 #  The export target depends on the resulting compressed tar file being
 #  up to date.
 
-export: $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z
+export: $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.$(COMPSFX)
 	@ echo
 	@ echo \
 '*** Export copy of the built $(PACK_NAME) package is in the compressed'
 	@ echo \
-'    tar file $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z'
+'    tar file $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.$(COMPSFX)'
 	@ echo
 
 #  The compressed tar file is up to date if it exists and is more
 #  recent than all the source files and the date stamp file (which
 #  records the time of the last build which modified any files).
 
-$(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z: $(SOURCE_FILES) $(DATE_STAMP)
+$(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.$(COMPSFX): $(SOURCE_FILES) $(DATE_STAMP)
 #
 #  Issue a warning if the package has not been tested.
 	@ if test ! -f .TESTED_$(SYSTEM); then \
@@ -1605,10 +1634,10 @@ $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z: $(SOURCE_FILES) $(DATE_STAMP)
         else :; fi
 #
 #  Remove any pre-existing tar files before creating new ones.
-	if test -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z; then \
-           rm -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z; else :; fi
+	if test -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.$(COMPSFX); then \
+           rm -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.$(COMPSFX); else :; fi
 	$(TAR_IN) - $(SOURCE_FILES) $(BUILT_FILES) $(DATE_STAMP) .BUILT \
-           | compress -v > $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z
+           | $(COMPRESS) > $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.$(COMPSFX)
 
 #  export_run: Export the built system (without source).
 #  -----------------------------------------------------
@@ -1618,19 +1647,19 @@ $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z: $(SOURCE_FILES) $(DATE_STAMP)
 #  The export_run target depends on the resulting compressed tar file being
 #  up to date.
 
-export_run: $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z
+export_run: $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.$(COMPSFX)
 	@ echo
 	@ echo \
 '*** Export copy of the "runtime" $(PACK_NAME) package is in the compressed'
 	@ echo \
-'    tar file $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z'
+'    tar file $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.$(COMPSFX)'
 	@ echo
 
 #  The compressed tar file is up to date if it exists and is more
 #  recent than all the source files and the date stamp file (which
 #  records the time of the last build which modified any files).
 
-$(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z: $(SOURCE_FILES) $(DATE_STAMP)
+$(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.$(COMPSFX): $(SOURCE_FILES) $(DATE_STAMP)
 #
 #  Issue a warning if the package has not been tested.
 	@ if test ! -f .TESTED_$(SYSTEM); then \
@@ -1640,11 +1669,11 @@ $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z: $(SOURCE_FILES) $(DATE_STAMP)
         else :; fi
 #
 #  Remove any pre-existing tar files before creating new ones.
-	if test -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z; then \
-           rm -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z; else :; fi
+	if test -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.$(COMPSFX); then \
+           rm -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.$(COMPSFX); else :; fi
 	$(TAR_IN) - mk makefile $(DOCUMENTATION) $(BUILT_FILES) \
            $(DATE_STAMP) .BUILT \
-           | compress -v > $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z
+           | $(COMPRESS) > $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.$(COMPSFX)
 
 #  export_source: Export the source.
 #  --------------------------------
@@ -1654,24 +1683,24 @@ $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z: $(SOURCE_FILES) $(DATE_STAMP)
 #  This target depends on the resulting compressed tar file being up to
 #  date.
 
-export_source: $(EXPORT)/$(PKG_NAME).tar.Z
+export_source: $(EXPORT)/$(PKG_NAME).tar.$(COMPSFX)
 	@ echo
 	@ echo \
 '*** Export copy of the $(PACK_NAME) package source is in the compressed'
 	@ echo \
-'    tar file $(EXPORT)/$(PKG_NAME).tar.Z'
+'    tar file $(EXPORT)/$(PKG_NAME).tar.$(COMPSFX)'
 	@ echo
 
 #  The compressed tar file is up to date if it exists and is more
 #  recent than all the source files.
 
-$(EXPORT)/$(PKG_NAME).tar.Z: $(SOURCE_FILES)
+$(EXPORT)/$(PKG_NAME).tar.$(COMPSFX): $(SOURCE_FILES)
 #
 #  Remove any pre-existing tar files before creating new ones.
-	if test -f $(EXPORT)/$(PKG_NAME).tar.Z; then \
-           rm -f $(EXPORT)/$(PKG_NAME).tar.Z; else :; fi
+	if test -f $(EXPORT)/$(PKG_NAME).tar.$(COMPSFX); then \
+           rm -f $(EXPORT)/$(PKG_NAME).tar.$(COMPSFX); else :; fi
 	$(TAR_IN) - $(SOURCE_FILES) \
-           | compress -v > $(EXPORT)/$(PKG_NAME).tar.Z
+           | $(COMPRESS) > $(EXPORT)/$(PKG_NAME).tar.$(COMPSFX)
 
 #  clean: Clean up the source directory.
 #  ------------------------------------
