@@ -1,0 +1,41 @@
+*+
+*  Name:
+*     CCD1_FDCM
+
+*  Purpose:
+*     Defines the common block for communicating file descriptors.
+
+*  Description:
+*     This houses the common block for communicating file descriptors 
+*     to the source and sink routines required when using AST Channels.
+*     The global variables defined are intended for use as FIO-type
+*     file descriptors, but the values are integers so could equally
+*     be FORTRAN unit numbers or have some other suitable meaning.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Authors:
+*     MBT: Mark Taylor (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     02-MAR-1999 (MBT):
+*        Original version.
+*     {enter_changes_here}
+
+*-
+*  Global Variables:
+*        CCD1_FDIN = INTEGER
+*           File descriptor for input (as used by source routine).
+*        CCD1_FDOUT = INTEGER
+*           File descriptor for output (as used by sink routine).
+
+*  File descriptor variable declarations.
+      INTEGER CCD1_FDIN
+      INTEGER CCD1_FDOUT
+
+*  Define common block.
+      COMMON/ CCD1_FDCM / CCD1_FDIN, CCD1_FDOUT
+
+* $Id$
