@@ -50,10 +50,12 @@
          }
          itk_component add percentile {
             iwidgets::optionmenu $itk_component(control).percentile \
-               -width 160 \
+               -width 75 \
                -command [ code $this setvalue ]
          }
          set omenu $itk_component(percentile)
+         set omenubut [ $omenu component menuBtn ]
+         $omenubut configure -textvariable ""
          pack $omenu
          pack $itk_component(control)
          eval itk_initialize $args
@@ -146,6 +148,7 @@
             addchoice $text
             $omenu select $text
          }
+         $omenubut configure -text "[ lindex $value 1 ]%"
       }
 
 
@@ -194,6 +197,7 @@
             $itk_component(percentiledialog) setvec $value
             configure -value [ $itk_component(percentiledialog) activate ]
          }
+         $omenubut configure -text "[ lindex $value 1 ]%"
       }
    
 
@@ -204,6 +208,7 @@
 ########################################################################
 
       private variable omenu             ;# Path name of the optionmenu widget
+      private variable omenubut          ;# Path name of menubutton component
 
 
 ########################################################################
@@ -213,11 +218,7 @@
 #-----------------------------------------------------------------------
       private proc list2text { lo hi } {
 #-----------------------------------------------------------------------
-         if { abs( $lo + $hi - 100 ) < 1 } {
-            return "$hi%"
-         } else {
-            return "$lo% - $hi% "
-         }
+         return "$lo% - $hi% "
       }
 
 
