@@ -2,7 +2,7 @@ INTERFACE SBG
 
    PARAMETER INP
       POSITION 1
-      TYPE 'UNIV'
+      TYPE 'LITERAL'
       PPATH 'GLOBAL'
       ASSOCIATION '<->GLOBAL.FIT_DATA'
       PROMPT 'Data'
@@ -11,7 +11,7 @@ INTERFACE SBG
 
    PARAMETER BGFILE
       POSITION 2
-      TYPE 'UNIV'
+      TYPE 'LITERAL'
       PROMPT 'Background'
       HELP 'Name of associated b/g dataset - "!" will delete existing reference'
    ENDPARAMETER

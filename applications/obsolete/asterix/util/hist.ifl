@@ -2,7 +2,7 @@ INTERFACE HIST
 
   PARAMETER INP
     POSITION    1
-    TYPE        'UNIV'
+    TYPE        'LITERAL'
     PPATH       'GLOBAL'
     ASSOCIATION '<-GLOBAL.BINDS'
     PROMPT      'Dataset'

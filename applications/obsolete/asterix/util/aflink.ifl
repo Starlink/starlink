@@ -2,7 +2,7 @@ INTERFACE AFLINK
 
   PARAMETER INP
     POSITION 1
-    TYPE 'UNIV'
+    TYPE 'LITERAL'
     PPATH 'GLOBAL'
     ASSOCIATION '<->GLOBAL.BINDS'
     PROMPT 'Data'
@@ -18,7 +18,7 @@ INTERFACE AFLINK
 
   PARAMETER LFILE
     POSITION 3
-    TYPE 'UNIV'
+    TYPE 'LITERAL'
     PROMPT 'Associated dataset'
     HELP 'Name of associated dataset - "!" will delete existing reference'
   ENDPARAMETER
