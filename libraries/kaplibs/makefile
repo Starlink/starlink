@@ -448,7 +448,7 @@ STARTUP_SCRIPT = $(PKG_NAME)_dev
 
 IRA_PUBLIC_INCLUDES = ira_err ira_par
 CTG_PUBLIC_INCLUDES = ctg_err 
-KPG_PUBLIC_INCLUDES = ctm_par
+KPG_PUBLIC_INCLUDES = ctm_par kpg_ast
 PUBLIC_INCLUDES = $(IRA_PUBLIC_INCLUDES) $(CTG_PUBLIC_INCLUDES) $(KPG_PUBLIC_INCLUDES) 
 
 #  List of private include files.  These are additional include files
@@ -459,7 +459,7 @@ IRA_PRIVATE_INCLUDES = ira_com
 CTG_PRIVATE_INCLUDES = ctg_const 
 LPG_PRIVATE_INCLUDES = lpg_com lpg_const
 FTS_PRIVATE_INCLUDES = fts_par
-KPG_PRIVATE_INCLUDES = kpg_ast kpg_par hlpcmd ctm_com
+KPG_PRIVATE_INCLUDES = kpg_par hlpcmd ctm_com
 GRF_PRIVATE_INCLUDES = grf.h
 PRIVATE_INCLUDES = $(IRA_PRIVATE_INCLUDES) $(CTG_PRIVATE_INCLUDES) \
                    $(LPG_PRIVATE_INCLUDES) $(FTS_PRIVATE_INCLUDES) \
