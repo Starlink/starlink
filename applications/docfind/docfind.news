@@ -1,0 +1,13 @@
+1 DOCFIND - document index searching - update
+                                                         Expires: **.**.**
+ Version 1.3.
+    A pointer to the hypertext utilities `findme' and `showme' has been
+    added to the docfind results display, to bring alternative methods
+    of finding information to user's notice.
+
+ Version 1.2.  
+    This version fixes a problem which caused docfind not to search the
+    documents index, after the format of the index had changed.
+
+    SUN/38 has been revised to remove references to VMS.
+

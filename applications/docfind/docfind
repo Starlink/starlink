@@ -1,0 +1,187 @@
+
+#  This is a Bourne shell script.  In order to be POSIX-compliant, the
+#  first line must be blank.
+ 
+#+
+#  Name:
+#     docfind
+
+#  Purpose:
+#     To search for a keyword in the Starlink documentation indices
+
+#  Language
+#     Bourne shell
+
+#  Invocation:
+#     docfind keyword
+
+#  Description:
+#     The files containing the list of subjects, list of Starlink documents
+#     and the list of local documents are searched for the given keyword.
+
+#  Arguments:
+#     $1 = The word to be searched for.
+
+#  Algorithm:
+#     Check that a parameter has been given. Print a message if it has not
+#        and exit.
+#     All output from now on goes to a temporary file.
+#     Output a header message.
+#     Search the file containing the list of subjects for the keyword.
+#     Output some more header text.
+#     Do a multi-pipe operation on the file containing the list of 
+#        Starlink documentation that:
+#     -  Retains lines between the ones containing "File" and
+#        "        AUTHORS";
+#     -  Retains lines containing "STARLINK" or the keyword. The search is
+#           case insensitive;
+#     -  Prints header lines intact or formats data lines;
+#     -  Discards header lines that are not followed by a data line;
+#     -  Puts a blank line before each header line.
+#     The same process is repeated on a file containing a list of local
+#        documentation, if it exists.
+#     The file that contains all of the above output is printed using more
+#        to break it into screen-sized chunks.
+#     The temporary file is deleted.
+
+#  Copyright:
+#     Copyright (C) 1995 Rutherford Appleton Laboratory
+
+#  Authors:
+#     PMA: P.M.Allan (Starlink, RAL)
+#     BLY: M.J.Bly (Starlink, RAL)
+
+#  History:
+#     28-JUL-1993 (PMA):
+#        Original version.
+#     29-OCT-1993 (PMA):
+#        First release on Unix.
+#     28-SEP-1995 (BLY):
+#        Search area of docs_lis changed to start at `File' not `Base' due
+#           to format change in docs_lis.
+#        Installation procedure modified.
+#     13-MAR-1996 (BLY):
+#        Modified search to match new record format for docs_lis.
+#     26-NOV-1996 (BLY):
+#        Added advert for findme and showme to o/p.
+#     {add_further_modfications_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#-----------------------------------------------------------------------
+
+#  Define a shell variable to be the top level of the Starlink software.
+#  This is changed when the software is installed.
+
+root=STAR_ROOT  #  Searched for by the makefile at install time.
+
+#  Define shell variables to be the directories containing the
+#  documentation.
+
+docsdir=$root/docs
+ldocsdir=$root/local/docs
+
+#  Check that a parameter has been given.
+
+if expr "$1" == "" >/dev/null
+then
+   echo "You must give a name to search for, e.g. docfind graphics"
+   echo "To get the complete list of documents, type:"
+   echo "  cat $docsdir/docs_lis"
+   exit
+fi
+
+#  Search the file containing the subject list
+
+if test -f $docsdir/subject_lis
+   then
+   echo >/tmp/docfind$$
+   echo "Searching for the keyword $1 in the list of subjects ..." \
+      >>/tmp/docfind$$
+   echo >>/tmp/docfind$$
+   grep -i $1 $docsdir/subject_lis >>/tmp/docfind$$
+   echo >>/tmp/docfind$$
+else
+   echo >/tmp/docfind$$
+   echo "Subject index not found..." >>/tmp/docfind$$
+   echo >>/tmp/docfind$$
+fi
+
+#  Search the file containing the titles.
+
+if test -f $docsdir/docs_lis
+   then
+   echo "Searching for the keyword $1 in the titles of documents ..." \
+      >>/tmp/docfind$$
+
+awk '/File/,/        AUTHORS/' $docsdir/docs_lis | \
+fgrep -i "        STARLINK
+$1" | \
+awk '/        STARLINK/{print $0} \
+!/        STARLINK/{print "   " substr($0,1,6) "  " substr($0,27,52)}' | \
+awk 'BEGIN {i=1} \
+{array[i]=$0;i++} \
+END {for (i=1;i<=NR;i++) \
+if(substr(array[i],0,3)!="   "&&substr(array[i+1],0,3)!="   "); \
+else print array[i]}' | \
+awk '/        STARLINK/{print " ";print $0} \
+!/        STARLINK/{print $0}' >>/tmp/docfind$$
+
+else
+   echo >>/tmp/docfind$$
+   echo "Document index not found..." >>/tmp/docfind$$
+   echo >>/tmp/docfind$$
+fi
+
+#  Search any local files containing titles.
+
+if test -f $ldocsdir/docs_lis
+then
+
+echo "Searching for the keyword $1 in the titles of local documents ..." \
+   >>/tmp/docfind$$
+
+awk '/File/,/        AUTHORS/' $ldocsdir/docs_lis | \
+fgrep -i "        STARLINK
+$1" | \
+awk '/        STARLINK/{print $0} \
+!/        STARLINK/{print "   " substr($0,4,5) "  " substr($0,27,52)}' | \
+awk 'BEGIN {i=1} \
+{array[i]=$0;i++} \
+END {for (i=1;i<=NR;i++) \
+if(substr(array[i],0,3)!="   "&&substr(array[i+1],0,3)!="   "); \
+else print array[i]}' | \
+awk '/        STARLINK/{print " ";print $0} \
+!/        STARLINK/{print $0}' >>/tmp/docfind$$
+
+fi
+
+#  Print a notice about Hypertext search utilities.
+
+echo >>/tmp/docfind$$
+echo "Have you tried the 'findme' or 'showme' commands?" >>/tmp/docfind$$
+echo >>/tmp/docfind$$
+echo "The 'findme' command can be used to find documents about a subject or">>/tmp/docfind$$
+echo "conatining a particular keyword.  'findme $1' will search the document" >>/tmp/docfind$$
+echo "set to locate information on $1." >>/tmp/docfind$$
+echo >>/tmp/docfind$$
+echo "Alternatively, the 'showme' command will display a particular document -" >>/tmp/docfind$$
+echo "'showme sun1' will display SUN/1." >>/tmp/docfind$$
+echo >>/tmp/docfind$$
+echo "Each uses a hypertext browser to display the hypertext version of the" >>/tmp/docfind$$
+echo "document if available, or the .dvi file via 'xdvi'.">>/tmp/docfind$$
+echo >>/tmp/docfind$$
+
+#  Print the results of the searches
+
+more -c -f /tmp/docfind$$
+rm /tmp/docfind$$
+
+#  Exit
+
+exit 0
+
+#.
