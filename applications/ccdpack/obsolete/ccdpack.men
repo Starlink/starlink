@@ -1,5 +1,5 @@
-      astexp - Exports AST frameset information from images to external file.
-      astimp - Imports AST frameset information into images.
+      astexp - Exports AST FrameSet information from NDFs into external file.
+      astimp - Imports AST FrameSet information into NDFs.
       calcor - Subtracts a scaled dark or flash calibration image from a list.
     ccdalign - Interactive procedure to aid the alignment of images.
     ccdclear - Clears CCDPACK global parameters.
@@ -9,6 +9,7 @@
     ccdsetup - Sets the CCDPACK global parameters.
      ccdshow - Displays the value of the CCDPACK global parameters.
       debias - Performs the debiassing and initial preparation of CCD data.
+     drizzle - Mosaics images using the drizzling algorithm.
     findcent - Centroids image features.
      findobj - Locates and centroids image features.
      findoff - Performs pattern-matching between offset position lists.
@@ -28,7 +29,8 @@
  use_globals - Controls the use of global parameters in IRAF CCDPACK.
     tranlist - Transform lists of positions.
      tranndf - Transforms a list of images by resampling.
-      wcsreg - Aligns images using multiple frames from their WCS components.
+     wcsedit - Modifies WCS components of a set of images.
+      wcsreg - Aligns images using multiple frames from WCS components.
      xreduce - Starts the automated CCD data reduction GUI.
 position_lists            - Help about position lists
 processing_lists_of_data  - Help about using wildcards in CCDPACK
