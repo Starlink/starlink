@@ -30,6 +30,11 @@ Improve antialiasing, if there is in fact a more sophisticated
     option to abbreviate --scale + --magnification [the latter at
     least is quite trivial]
 
+Improve BitmapImage documentation.  Improve?  Write it!
+
+Create a process-DVI-file main loop as a function, allowing hooks to
+    be registered for each of the possible events.
+
 ----------------------------------------------------------------------
 
 Refactor runCommandPipe as PipeStream, a subclass of InputByteStream
