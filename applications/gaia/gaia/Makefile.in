@@ -10,7 +10,7 @@
 # ------------------------------------------------------------------------
 
 # run make in these sub directories
-SUBDIRS      = src colormaps
+SUBDIRS      = src colormaps mktclapp
 
 # root of source tree
 SRC_ROOT     = @SRC_ROOT@
