@@ -5,15 +5,20 @@
 *
 *	Part of:	SExtractor
 *
-*	Author:		E.BERTIN, IAP & Leiden Sterrewacht.
+*	Author:		E.BERTIN (IAP)
 *
 *	Contents:	functions dealing with on-line filtering of the image
 *			(for detection).
 *
-*	Last modify:	23/09/2001
+*	Last modify:	13/12/2002
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
+
+#ifdef HAVE_CONFIG_H
+#include        "config.h"
+#endif
+
 #include	<math.h>
 #include	<stdio.h>
 #include	<stdlib.h>
@@ -22,7 +27,8 @@
 
 #include	"define.h"
 #include	"globals.h"
-#include	"fitscat.h"
+#include	"prefs.h"
+#include	"fits/fitscat.h"
 #include	"bpro.h"
 #include	"filter.h"
 #include	"image.h"
@@ -229,7 +235,7 @@ int	getneurfilter(char *filename)
   thefilter->bpann = loadtab_bpann(ftab, filename);
 
   close_cat(fcat);
-  free_cat(fcat,1);
+  free_cat(&fcat,1);
 
   return RETURN_OK;
   }
@@ -242,11 +248,14 @@ Terminate filtering procedures.
 void	endfilter()
 
   {
-  free(thefilter->conv);
+  QFREE(thefilter->conv);
   if (thefilter->bpann)
+    {
     free_bpann(thefilter->bpann);
+    thefilter->bpann = NULL;
+    }
 
-  free(thefilter);
+  QFREE(thefilter);
 
   return;
   }

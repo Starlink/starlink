@@ -5,14 +5,18 @@
 *
 *	Part of:	SExtractor
 *
-*	Author:		E.BERTIN, IAP & Leiden observatory
+*	Author:		E.BERTIN (IAP)
 *
 *	Contents:	Make growth curves.
 *
-*	Last modify:	05/04/99
+*	Last modify:	13/12/2002
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
+
+#ifdef HAVE_CONFIG_H
+#include        "config.h"
+#endif
 
 #include	<math.h>
 #include	<stdio.h>
@@ -21,6 +25,7 @@
 
 #include	"define.h"
 #include	"globals.h"
+#include	"prefs.h"
 #include	"growth.h"
 
 /*------------------------------- variables ---------------------------------*/

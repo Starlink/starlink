@@ -5,14 +5,18 @@
 *
 *	Part of:	SExtractor
 *
-*	Author:		E.BERTIN (IAP, Leiden observatory & ESO)
+*	Author:		E.BERTIN (IAP)
 *
 *	Contents:	Functions to handle the configuration file.
 *
-*	Last modify:	25/05/99
+*	Last modify:	13/12/2002
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
+
+#ifdef HAVE_CONFIG_H
+#include        "config.h"
+#endif
 
 #include	<ctype.h>
 #include	<math.h>
@@ -22,8 +26,27 @@
 
 #include	"define.h"
 #include	"globals.h"
-#include	"key.h"
 #include	"prefs.h"
+#include	"preflist.h"
+#include	"fits/fitscat.h"
+
+
+/********************************* dumpprefs ********************************/
+/*
+Print the default preference parameters.
+*/
+void    dumpprefs(void)
+  {
+   char **dp;
+
+  dp = default_prefs;
+  while (**dp)
+    if (**dp != '*')
+      printf("%s\n",*(dp++));
+    else
+      dp++;
+  return;
+  }
 
 
 /********************************* readprefs ********************************/
@@ -36,8 +59,8 @@ void    readprefs(char *filename, char **argkey, char **argval, int narg)
   {
    FILE          *infile;
    char          *cp, str[MAXCHAR], *keyword, *value, **dp;
-   int           i, ival, nkey, warn, argi, flagc, flagd, flagz;
-   double        dval;
+   int           i, ival, nkey, warn, argi, flagc, flagd, flage, flagz;
+   float         dval;
 #ifndef	NO_ENVVAR
    static char	value2[MAXCHAR],envname[MAXCHAR];
    char		*dolpos;
@@ -45,7 +68,12 @@ void    readprefs(char *filename, char **argkey, char **argval, int narg)
 
 
   if ((infile = fopen(filename,"r")) == NULL)
-    error(EXIT_FAILURE,"*ERROR*: can't read ", filename);
+    {
+    flage = 1;
+    warning(filename, " not found, using internal defaults");
+    }
+  else
+    flage = 0;
 
 /*Build the keyword-list from pkeystruct-array */
 
@@ -65,21 +93,23 @@ void    readprefs(char *filename, char **argkey, char **argval, int narg)
     if (flagd)
       {
       if (**dp)
-        strcpy(str, *(dp++));
+        {
+        if (**dp=='*')
+          strcpy(str, *(dp++)+1);
+        else
+          strcpy(str, *(dp++));
+        }
       else
         flagd = 0;
       }
     if (!flagc && !flagd)
-      if (!fgets(str, MAXCHAR, infile))
+      if (flage || !fgets(str, MAXCHAR, infile))
         flagc=1;
 
     if (flagc)
       {
       if (argi<narg)
         {
-        if (strlen(argval[argi])>=MAXCHAR)
-          error(EXIT_FAILURE, "*Error*: maximum string-size exceeded in "
-		"command-line for argument to ", argkey[argi]);
         sprintf(str, "%s %s", argkey[argi], argval[argi]);
         argi++;
         }
@@ -90,7 +120,7 @@ void    readprefs(char *filename, char **argkey, char **argval, int narg)
     keyword = strtok(str, notokstr);
     if (keyword && keyword[0]!=0 && keyword[0]!=(char)'#')
       {
-      if (warn>=10)
+     if (warn>=10)
         error(EXIT_FAILURE, "*Error*: No valid keyword found in ", filename);
       nkey = findkeys(keyword, keylist, FIND_STRICT);
       if (nkey!=RETURN_ERROR)
@@ -179,6 +209,22 @@ void    readprefs(char *filename, char **argkey, char **argval, int narg)
               *(int *)(key[nkey].ptr) = ival;
             else
               error(EXIT_FAILURE, keyword, " set to an unknown keyword");
+            break;
+
+          case P_BOOLLIST:
+            for (i=0; i<MAXLIST&&value&&value[0]!=(char)'#'; i++)
+              {
+              if (i>=key[nkey].nlistmax)
+                error(EXIT_FAILURE, keyword, " has too many members");
+              if (cp = strchr("yYnN", (int)value[0]))
+                ((int *)(key[nkey].ptr))[i] = (tolower((int)*cp)=='y')?1:0;
+              else
+                error(EXIT_FAILURE, keyword, " value must be Y or N");
+              value = strtok((char *)NULL, notokstr);
+              }
+            if (i<key[nkey].nlistmin)
+              error(EXIT_FAILURE, keyword, " list has not enough members");
+            *(key[nkey].nlistptr) = i;
             break;
 
           case P_INTLIST:
@@ -272,7 +318,8 @@ void    readprefs(char *filename, char **argkey, char **argval, int narg)
   for (i=0; key[i].name[0]; i++)
     if (!key[i].flag)
       error(EXIT_FAILURE, key[i].name, " configuration keyword missing");
-  fclose(infile);
+  if (!flage)
+    fclose(infile);
 
   return;
   }
@@ -295,6 +342,32 @@ int	findkeys(char *str, char keyw[][16], int mode)
   }
 
 
+/******************************* cistrcmp ***********************************/
+/*
+case-insensitive strcmp.
+*/
+int     cistrcmp(char *cs, char *ct, int mode)
+
+  {
+   int  i, diff;
+
+  if (mode)
+    {
+    for (i=0; cs[i]&&ct[i]; i++)
+      if (diff=tolower((int)cs[i])-tolower((int)ct[i]))
+        return diff;
+    }
+  else
+    {
+    for (i=0; cs[i]||ct[i]; i++)
+      if (diff=tolower((int)cs[i])-tolower((int)ct[i]))
+        return diff;
+    }
+
+  return 0;
+  }
+
+
 /********************************* useprefs **********************************/
 /*
 Update various structures according to the prefs.
@@ -302,8 +375,12 @@ Update various structures according to the prefs.
 void	useprefs()
 
   {
-   int		i, margin, naper;
-   char		*str;
+   unsigned short	ashort=1;
+   int			i, margin, naper;
+   char			*str;
+
+/* Test if byteswapping will be needed */
+  bswapflag = *((char *)&ashort);
 
 /*-------------------------------- Images ----------------------------------*/
   prefs.dimage_flag = (prefs.nimage_name>1);
@@ -483,26 +560,26 @@ void	useprefs()
     prefs.pipe_flag = 1;
 
   if (str=strrchr(prefs.filter_name, '/'))
-    strcpy(cat.filter_name, str+1);
+    strcpy(thecat.filter_name, str+1);
   else
-    strcpy(cat.filter_name, prefs.filter_name);
+    strcpy(thecat.filter_name, prefs.filter_name);
 
   if (str=strrchr(prefs.prefs_name, '/'))
-    strcpy(cat.prefs_name, str+1);
+    strcpy(thecat.prefs_name, str+1);
   else
-    strcpy(cat.prefs_name, prefs.prefs_name);
+    strcpy(thecat.prefs_name, prefs.prefs_name);
 
   if (str=strrchr(prefs.nnw_name, '/'))
-    strcpy(cat.nnw_name, str+1);
+    strcpy(thecat.nnw_name, str+1);
   else
-    strcpy(cat.nnw_name, prefs.nnw_name);
+    strcpy(thecat.nnw_name, prefs.nnw_name);
 
   if (str=strrchr(prefs.image_name[prefs.nimage_name-1], '/'))
-    strcpy(cat.image_name, str+1);
+    strcpy(thecat.image_name, str+1);
   else
-    strcpy(cat.image_name, prefs.image_name[prefs.nimage_name-1]);
+    strcpy(thecat.image_name, prefs.image_name[prefs.nimage_name-1]);
 
-  sprintf(cat.soft_name, "%s%s", BANNER, VERSION);
+  sprintf(thecat.soft_name, "%s%s", BANNER, VERSION);
 
   return;
   }

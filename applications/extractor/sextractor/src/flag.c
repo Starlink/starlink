@@ -5,14 +5,18 @@
 *
 *	Part of:	SExtractor
 *
-*	Author:		E.BERTIN (IAP, Leiden observatory & ESO)
+*	Author:		E.BERTIN (IAP)
 *
 *	Contents:	Function related to external flagging.
 *
-*	Last modify:	18/11/98
+*	Last modify:	13/12/2002
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
+
+#ifdef HAVE_CONFIG_H
+#include        "config.h"
+#endif
 
 #include	<limits.h>
 #include	<stdlib.h>
@@ -20,6 +24,7 @@
 
 #include	"define.h"
 #include	"globals.h"
+#include	"prefs.h"
 #include	"plist.h"
 #include	"flag.h"
 

@@ -5,14 +5,18 @@
 *
 *	Part of:	SExtractor
 *
-*	Author:		E.BERTIN (IAP, Leiden observatory & ESO)
+*	Author:		E.BERTIN (IAP)
 *
 *	Contents:	Handling of field structures.
 *
-*	Last modify:	14/10/2000
+*	Last modify:	14/12/2002
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
+
+#ifdef HAVE_CONFIG_H
+#include        "config.h"
+#endif
 
 #include	<math.h>
 #include	<stdio.h>
@@ -21,6 +25,8 @@
 
 #include	"define.h"
 #include	"globals.h"
+#include	"prefs.h"
+#include	"fits/fitscat.h"
 #include	"assoc.h"
 #include	"astrom.h"
 #include	"back.h"
@@ -32,13 +38,37 @@
 /*
 Returns a pointer to a new field, ready to go!
 */
-picstruct	*newfield(char *filename, int flags)
+picstruct	*newfield(char *filename, int flags, int nok)
 
   {
    picstruct	*field;
+   catstruct	*cat;
+   tabstruct	*tab;
+   OFF_T	mefpos;
+   int		nok2, ntab;
+
+/* Move to nok'th valid FITS image extension */
+  if (!(cat = read_cat(filename)))
+    error(EXIT_FAILURE, "*Error*: cannot open ", filename);
+  close_cat(cat);
+  tab = cat->tab;
+  nok++;	/* At least one pass through the loop */
+  nok2 = nok;
+  for (ntab=cat->ntab; nok && ntab--; tab=tab->nexttab)
+    {
+    if ((tab->naxis < 2)
+	|| !strncmp(tab->xtension, "BINTABLE", 8)
+	|| !strncmp(tab->xtension, "ASCTABLE", 8))
+      continue;
+    mefpos = tab->headpos;
+    nok--;
+    }
+  if (ntab<0)
+    error(EXIT_FAILURE, "Not enough valid FITS image extensions in ",filename);
 
 /* First allocate memory for the new field (and nullify pointers) */
   QCALLOC(field, picstruct, 1);
+  field->mefpos = mefpos;
   field->flags = flags;
   strcpy (field->filename, filename);
 /* A short, "relative" version of the filename */
@@ -51,20 +81,23 @@ picstruct	*newfield(char *filename, int flags)
   NFPRINTF(OUTPUT, gstr);
 /* Check the image exists and read important info (image size, etc...) */
   readimagehead(field);
-  QPRINTF(OUTPUT, "%s \"%.20s\" / %d x %d / %d bits %s data\n",
+  if (cat->ntab>1)
+    sprintf(gstr, "[%d/%d]", nok2, cat->ntab-1);
+  QPRINTF(OUTPUT, "%s \"%.20s\" %s / %d x %d / %d bits %s data\n",
 	flags&FLAG_FIELD?   "Flagging  from:" :
        (flags&(RMS_FIELD|VAR_FIELD|WEIGHT_FIELD)?
 			     "Weighting from:" :
        (flags&MEASURE_FIELD? "Measuring from:" :
 			     "Detecting from:")),
 	field->ident,
+        cat->ntab>1? gstr : "",
 	field->width, field->height, field->bytepix*8,
 	field->bitpix>0?
-		(field->compress_type!=COMPRESS_NONE?"COMPRESSED":"INTEGER")
+		(field->compress_type!=ICOMPRESS_NONE?"COMPRESSED":"INTEGER")
 		:"FLOATING POINT");
 
 /* Provide a buffer for compressed data */
-  if (field->compress_type != COMPRESS_NONE)
+  if (field->compress_type != ICOMPRESS_NONE)
     QMALLOC(field->compress_buf, char, FBSIZE);
 
 /* Check the astrometric system and do the setup of the astrometric stuff */
@@ -114,6 +147,8 @@ picstruct	*newfield(char *filename, int flags)
       field->stripmargin = margin;
     }
 
+  free_cat(&cat, 1);
+
   return field;
   }
 
@@ -141,7 +176,7 @@ picstruct	*inheritfield(picstruct *infield, int flags)
   field->fstrip = NULL;
   field->reffield = infield;
   field->compress_buf = NULL;
-  field->compress_type = COMPRESS_NONE;
+  field->compress_type = ICOMPRESS_NONE;
   field->file = NULL;
 
   return field;
