@@ -528,13 +528,14 @@ C     :                           G_BOUNDS(1,J),G_BOUNDS(2,J))
 *    Local variables :
       CHARACTER*12 LBL
       REAL ASTEP(10)/1.0,2.0,5.0,10.0,20.0,30.0,60.0,120.0,300.0,600.0/
+      REAL AUNIT
       REAL RANGE
       REAL XSCALE,YSCALE
       REAL X,Y
       REAL FACT
       REAL SIZE
       INTEGER FONT,BOLD
-      INTEGER L
+      INTEGER L,I
       LOGICAL OK
 *-
 
