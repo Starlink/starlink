@@ -526,7 +526,6 @@
              CALL BDI_PUT0UB( FID1, 'QualityMask', QUAL__MASK, STATUS )
              CALL BDI_MAPUB( FID1, 'Quality', 'WRITE', IN1_QPTR,
      :                       STATUS )
-             CALL BDI_MAPQUAL(FID1,'WRITE',OUT_QPTR,STATUS)
              OUT_QOK = .TRUE.
 
 *       Quality exists
@@ -535,7 +534,7 @@
      :                       STATUS )
              OUT_QPTR = IN1_QPTR
              IF ( IN2_QOK ) THEN
-               CALL BDI_MAPQUAL(FID2,'READ',IN2_QPTR,STATUS)
+               CALL BDI_MAPUB( FID2,'Quality','READ',IN2_QPTR,STATUS)
                OUT_QOK = .TRUE.
              END IF
            END IF

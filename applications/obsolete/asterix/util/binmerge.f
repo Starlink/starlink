@@ -685,7 +685,7 @@
               CALL MSG_SETI ('NSET', INP)
               CALL MSG_PRNT ('WARNING: Data errors missing from'
      :                //' dataset ^NSET  - erasing from output dataset')
-              CALL BDI_UNMAPVAR( OFID, STATUS )
+              CALL BDI_UNMAP( IFID(INP), 'Variance', IVPTR, STATUS )
               CALL BDI_DELETE( OFID, 'Variance', STATUS )
               VAROK = .FALSE.
 
