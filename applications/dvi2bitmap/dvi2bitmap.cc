@@ -67,7 +67,8 @@ struct bitmap_info {
 
 void process_dvi_file (DviFile *, bitmap_info&, int resolution,
 		       const PkFont *fallback_font, PageRange&);
-bool process_special (string specialString, Bitmap*, bitmap_info&);
+bool process_special (DviFile *, string specialString,
+		      Bitmap*, bitmap_info&);
 string_list& tokenise_string (string s);
 string get_ofn_pattern (string dviname);
 void Usage (void);
@@ -703,7 +704,9 @@ void process_dvi_file (DviFile *dvif, bitmap_info& b, int fileResolution,
 		 dynamic_cast<DviFileSpecial*>(ev))
 	{
 	    DviFileSpecial& special = *test;
-	    if (!process_special (special.specialString, bitmap, b))
+	    if (!process_special (dvif,
+				  special.specialString,
+				  bitmap, b))
 		if (verbosity > silent)
 		    cerr << "Warning: unrecognised special: "
 			 << special.specialString
@@ -721,7 +724,8 @@ void process_dvi_file (DviFile *dvif, bitmap_info& b, int fileResolution,
 }
 
 // Process the special string, returning true on success.
-bool process_special (string specialString, Bitmap* bitmap, bitmap_info& b)
+bool process_special (DviFile *dvif, string specialString,
+		      Bitmap* bitmap, bitmap_info& b)
 {
     string_list l = tokenise_string (specialString);
     string_list::const_iterator s = l.begin();
@@ -873,6 +877,39 @@ bool process_special (string specialString, Bitmap* bitmap, bitmap_info& b)
 			     << static_cast<int>(g) << ','
 			     << static_cast<int>(b) << '\n';
 		    bitmap->setRGB (setDefault, isfg, r, g, b);
+		}
+	    }
+	    else if (*s == "strut")
+	    {
+		int x = dvif->currH() + oneInch;
+		int y = dvif->currV() + oneInch;
+		int left, right, top, bottom;
+		s++;
+		if (s == l.end()) { stringOK = false; break; }
+		left = dvif->pt2px(atof (s->c_str()));
+		s++;
+		if (s == l.end()) { stringOK = false; break; }
+		right = dvif->pt2px(atof (s->c_str()));
+		s++;
+		if (s == l.end()) { stringOK = false; break; }
+		top = dvif->pt2px(atof (s->c_str()));
+		s++;
+		if (s == l.end()) { stringOK = false; break; }
+		bottom = dvif->pt2px(atof (s->c_str()));
+		if (left<0 || right<0 || top<0 || bottom<0)
+		{
+		    if (verbosity > silent)
+			cerr << "Strut must have positive dimensions\n";
+		    stringOK = false;
+		}
+		else
+		{
+		    if (verbosity > normal)
+			cerr << "Strut: (" << x << ',' << y
+			     << ") (lrtb)=("
+			     << left << ',' << right << ','
+			     << top  << ',' << bottom << ")\n";
+		    bitmap->strut (x, y, left, right, top, bottom);
 		}
 	    }
 	    else

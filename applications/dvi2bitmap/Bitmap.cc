@@ -188,6 +188,37 @@ void Bitmap::rule (const int x, const int y, const int w, const int h)
 	     << bbT << ':' << bbB << ")\n";
 }
 
+// Strut is just the same as rule, except that it doesn't draw in any
+// pixels.  Its only effect is to make sure that the boundingbox is at
+// least larger than the box specified [x-l,x+r], [y-t,y+b].  l, r, t,
+// and b must all be positive.
+void Bitmap::strut (const int x, const int y,
+		    const int l, const int r,
+		    const int t, const int b)
+{
+    if (frozen_)
+	throw BitmapError ("strut() called after freeze()");
+
+    if (verbosity_ > normal)
+	cerr << "Strut @ (" << x << ',' << y << "): (x-"
+	     << l << ",x+" << r << ")/(y-"
+	     << r << ",y+" << b << "):"
+	     << "BB was [" << bbL << ':' << bbR << "), ["
+	     << bbT << ':' << bbB << ").";
+
+    if (bbL > bbR) bbL = bbR = x; // nothing on canvas before
+    if (x-l < bbL) bbL = x-l;
+    if (x+r > bbR) bbR = x+r;
+
+    if (bbT > bbB) bbT = bbB = y;
+    if (y-t < bbT) bbT = y-t;
+    if (y+b > bbB) bbB = y+b;
+
+    if (verbosity_ > normal)
+	cerr << "BB now [" << bbL << ':' << bbR << "), ["
+	     << bbT << ':' << bbB << ")\n";
+}
+
 // Freeze the bitmap and bounding box, simply by setting the frozen_ flag
 // to be true.  At the same time, normalise the bounding box by requiring
 // that (0 <= bbL < bbR <= W) and (0 <= bbT < bbB <= H).  If, however, the 

@@ -379,6 +379,46 @@ is output, since you can't, at present, change the colours after
 that.  Specifically, you can't change the colours for a fragment of
 text in the middle of a page.  The colours are specified as a set of
 three integers in the (inclusive) range 0--255.
+.TP
+.I "strut left right top bottom"
+.IP
+This places a `strut' in the generated file.  Using the usual TeX
+.I "\estrut"
+won't work: that would leave the appropriate space
+when TeXing the file, but that space doesn't explicitly appear in the
+DVI file (which is just a bunch of characters and locations), so when
+.I "dvi2bitmap"
+fits its tight bounding box to the blackened pixels
+in the file, it knows nothing of the extra space you want.
+.IP
+The `strut' special forces the bounding box to be at least `left',
+`right', `top' and `bottom' points away from the position in the file
+where this special appears.  All the dimensions must be positive, and
+they are floats rather than integers.
+.IP
+If you wanted to set a page containing only the maths
+.I "${}^\ecirc$"
+(why, is another matter),
+.I "dvi2bitmap"
+would normally make a tight bounding box for the bitmap, so that you'd get
+an image containing only the circle (unless other crop options were in
+force).  If, in this case, you put in a special such as
+.I "\especial{dvi2bitmap strut 0 2 10 2.5}"
+, you would force
+the bounding box to come no closer than 0pt to the left of the
+position in the file where this special appears, 2pt to the right,
+10pt above and 2.5pt below.
+.IP
+A useful bit of TeX magic is:
+.IP
+{\ecatcode`p=12 \ecatcode`t=12 \egdef\eDB@PT#1pt{#1}}
+\edef\eDBstrut{\estrut\especial{dvi2bitmap strut 0 0 
+\eexpandafter\eDB@PT\ethe\eht\estrutbox
+\espace\eexpandafter\eDB@PT\ethe\edp\estrutbox}}
+.IP
+Once you've done that, the command 
+.I "\eDBstrut"
+will put an appropriate strut in the output.
 
 .PP
 For example, the pair of commands

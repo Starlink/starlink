@@ -26,6 +26,9 @@ class Bitmap {
     void paint (const int x, const int y, const int w, const int h,
 		const Byte* b);
     void rule (const int x, const int y, const int w, const int h);
+    void strut (const int x, const int y,
+		const int l, const int r,
+		const int t, const int b);
     void write (const string filename, const string format);
     void freeze ();
     void crop ();

@@ -12,7 +12,7 @@
 	>Norman Gray
 
 <manualtype users>
-<softwareversion>0.7
+<softwareversion>0.8
 
 <docnumber>71
 
@@ -233,7 +233,7 @@ if any fonts were missing.
 formatting descriptor, which will be replaced in output filenames
 with the page number.  This can be overridden on a per-page basis by
 a &tex; <code/\special> embedded in the DVI file (see <ref
-id=usage.special/>).  If there is no 
+id=usage.special.opf/>).  If there is no 
 file extension, or if it does not match the output type, a suitable file
 extension will be added.
 
@@ -285,7 +285,7 @@ transparency, respectively.
 palette plus an alpha channel; these are calculated in such a way that
 if you display the resulting bitmap on the same colour background as
 <code/dvi2bitmap> was using (which is white by default, but can be
-specified using the <ref id=usage.special>background special</>) then
+specified using the <ref id=usage.special.fg>background special</>) then
 the result should look identical to the result with no transparency
 information, but probably progressively worse the further the
 background moves from this.  I suppose, but can't at present check,
@@ -368,7 +368,7 @@ recognises are:
 <dd>Makes other special-commands in this same special affect
 defaults.  See those commands for details.
 
-<dt><code>outputfile &lt;filename&gt;</code>
+<dt id=usage.special.opf><code>outputfile &lt;filename&gt;</code>
 <dd>The output file used for the current page will be named
 <code/filename.gif> (if the output type were `gif').  A filename
 extension will be added if none is 
@@ -407,13 +407,43 @@ clear that this is setting a default format rather than setting the
 format only for the next image (that's not implemented at present, but
 could be added).
 
-<dt><code>default foreground|background red green blue</code>
+<dt id=usage.special.fg><code>default foreground|background red green
+blue</code> 
 <dd>Sets the (default) foreground and background colours for text.
 This works, as long as you specify the colour change before any text
 is output, since you can't, at present, change the colours after
 that.  Specifically, you can't change the colours for a fragment of
 text in the middle of a page.  The colours are specified as a set of
 three integers in the (inclusive) range 0--255.
+
+<dt><code>strut left right top bottom</code>
+<dd>This places a `strut' in the generated file.  Using the usual TeX
+<code>\strut</code> won't work: that would leave the appropriate space
+when TeXing the file, but that space doesn't explicitly appear in the
+DVI file (which is just a bunch of characters and locations), so when
+<code/dvi2bitmap> fits its tight bounding box to the blackened pixels
+in the file, it knows nothing of the extra space you want.
+<p>The `strut' special forces the bounding box to be at least `left',
+`right', `top' and `bottom' points away from the position in the file
+where this special appears.  All the dimensions must be positive, and
+they are floats rather than integers.
+<p>If you wanted to set a page containing only the maths
+`<code/${}^\circ$>' (why, is another matter), <code/dvi2bitmap> would
+normally make a tight bounding box for the bitmap, so that you'd get
+an image containing only the circle (unless other crop options were in
+force).  If, in this case, you put in a special such as
+<code>\special{dvi2bitmap strut 0 2 10 2.5}</code>, you would force
+the bounding box to come no closer than 0pt to the left of the
+position in the file where this special appears, 2pt to the right,
+10pt above and 2.5pt below.
+<p>A useful bit of TeX magic is:
+<verbatim>
+{\catcode`p=12 \catcode`t=12 \gdef\DB@PT#1pt{#1}}
+\def\DBstrut{\strut\special{dvi2bitmap strut 0 0 
+\expandafter\DB@PT\the\ht\strutbox\space\expandafter\DB@PT\the\dp\strutbox}}
+</verbatim>
+Once you've done that, the command <code/\DBstrut> will put an
+appropriate strut in the output.
 
 </dl>
 

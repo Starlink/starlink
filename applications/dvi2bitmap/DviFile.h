@@ -45,6 +45,10 @@ public:
     PkFont *nextFont();
     // Return the net magnification factor for the DVI file
     double magnification() const { return magfactor_; }
+    // Convert a length in points to one in pixels,
+    // using the current magnifications, etc
+    int pt2px (double npt) const
+	{ return static_cast<int>(px_per_dviu_*dviu_per_pt_*npt+0.5); };
     const string *filename () const { return &fileName_; }
 
 private:

@@ -832,7 +832,10 @@ void DviFile::process_preamble(DviFilePreamble* p)
 	cerr << "Preamble: dviu_per_pt_ = " << dviu_per_pt_
 	     << ", px_per_dviu_ = " << px_per_dviu_
 	     << ", mag=" << p->mag
-	     << ", magmag=" << magmag_ << '\n';
+	     << ", magmag=" << magmag_
+	     << "\nScales: resolution_=" << resolution_
+	     << " magfactor_=" << magfactor_
+	     << '\n';
 }
 
 void DviFile::check_duplicate_font (int ksize)
