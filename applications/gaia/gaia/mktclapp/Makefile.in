@@ -65,8 +65,9 @@ CAT_LIB_STATIC       = @CAT_LIB_STATIC@
 SKYCAT_LIB	     = @SKYCAT_LIB@
 SKYCAT_LIB_STATIC    = @SKYCAT_LIB_STATIC@
 
-#  Local library.
-LOCAL_LIBRARY = lib/libgaia.a
+#  Local GAIA library.
+LOCAL_LIBRARY = ../lib/libgaia.a
+
 # info needed for shared libraries (see configure.in or tclConfig.sh
 # for an explanation)
 SHLIB_CFLAGS=@SHLIB_CFLAGS@
@@ -104,7 +105,7 @@ INCLUDES     = $(TK_INCLUDE) $(TCL_INCLUDE) $(X_INCLUDE)
 CC_SWITCHES  = $(CFLAGS) $(DEFINES) $(INCLUDES)
 
 # these objects are only needed to make the gaia_wish binary for the demos
-OBJECTS      = tkAppInit.o
+OBJECTS      = EtAppInit.o gaiainit.o
 
 INSTALL      = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
@@ -119,7 +120,7 @@ all: $(mktclapp) $(PROG)
 $(MKTCLAPP): mktclapp.o
 	$(CC) -o $(MKTCLAPP) mktclapp.o
 
-$(PROG): EtAppInit.o FORCE
+$(PROG): $(OBJECTS) FORCE
 	@echo "linking \"$(PROG)\"..."
 	$(CXX) $(CC_SWITCHES) $(OBJECTS) -o $(PROG)  \
 	       $(LD_SEARCH_FLAGS) $(SKYCAT_LIB_STATIC) $(CAT_LIB_STATIC) $(AST_LIBS) \

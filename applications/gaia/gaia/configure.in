@@ -649,22 +649,20 @@ fi
 DESTDIR="$prefix"
 BINDIR="$DESTDIR/bin"
 LIBDIR="$DESTDIR/lib"
-INCDIR="$DESTDIR/include/skycat"
-MANDIR="$DESTDIR/man"
-SKYCAT_DIR="$LIBDIR/skycat"
-SKYCAT_LIBRARY=$SKYCAT_DIR
-SKYCAT_BUILD_LIBRARY=$SRC_ROOT/interp/library
+GAIA_DIR="$LIBDIR/gaia"
+GAIA_LIBRARY=$GAIA_DIR
+GAIA_BUILD_LIBRARY=$SRC_ROOT/library
+IWIDGETS_VERSION="3.0.0"
+IWIDGETS_LIBRARY="$DESTDIR/lib/iwidgets$IWIDGETS_VERSION"
 
 AC_SUBST(DESTDIR)
 AC_SUBST(BINDIR)
 AC_SUBST(LIBDIR)
-AC_SUBST(INCDIR)
-AC_SUBST(MANDIR)
-AC_SUBST(SKYCAT_DIR)
-AC_SUBST(RTD_DIR)
-AC_SUBST(SKYCAT_LIBRARY)
-AC_SUBST(SKYCAT_BUILD_LIBRARY)
-
+AC_SUBST(GAIA_DIR)
+AC_SUBST(GAIA_LIBRARY)
+AC_SUBST(GAIA_BUILD_LIBRARY)
+AC_SUBST(IWIDGETS_VERSION)
+AC_SUBST(IWIDGETS_LIBRARY)
 
 #--------------------------------------------------------------------
 #	Print out some of the more important settings
@@ -672,19 +670,19 @@ AC_SUBST(SKYCAT_BUILD_LIBRARY)
 echo "
 Configuration results (edit and run ./config.status to modify):
 
-C   Compiler                                 => $CC
-C++ Compiler                                 => $CXX
-C++ include flag                             => $CXX_INCLUDE
-
-directory containing tcl library files       => $TCLLIBRARY
-directory containing tk  library files       => $TKLIBRARY
-directory containing blt library files       => $BLTLIBRARY
-directory containing Rtd library files       => $RTD_LIBRARY
-directory containing SkyCat library files    => $SKYCAT_LIBRARY
+C   Compiler            => $CC
+C++ Compiler            => $CXX
+C++ include flag        => $CXX_INCLUDE
+Fortran Compiier        => $FC
+Iwidgets library files  => $IWIDGETS_LIBRARY
 "
 
 #--------------------------------------------------------------------
 #	Generate the Makefiles etc...
 #--------------------------------------------------------------------
-AC_OUTPUT(Makefile library/Makefile library/gaia_version.tcl src/Makefile colormaps/Makefile, sh makelinks)
-
+AC_OUTPUT(Makefile \
+        library/Makefile \
+        library/gaia_version.tcl \
+        src/Makefile \
+        mktclapp/Makefile \
+        colormaps/Makefile, sh makelinks)

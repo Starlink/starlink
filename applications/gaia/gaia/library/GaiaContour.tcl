@@ -157,7 +157,7 @@ itcl::class gaia::GaiaContour {
       #  Add tab table to contain the various controls (too many for a
       #  single pane).
       itk_component add tab {
-         tabnotebook $w_.tab -angle 30 -tabpos w -width 370 -height 400
+         ::iwidgets::tabnotebook $w_.tab -angle 30 -tabpos w -width 370 -height 400
       }
 
       #  Get pane for levels and attributes.

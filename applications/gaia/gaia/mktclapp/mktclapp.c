@@ -1072,8 +1072,8 @@ int main(int argc, char **argv){
     printf("%s\n",zVersion);
     return 0;
   }
-  azTcl = SafeMalloc( sizeof(char*)*(argc + 100) );
-  aDoCompress = SafeMalloc( sizeof(int)*(argc + 100) );
+  azTcl = SafeMalloc( sizeof(char*)*(argc + 1000) );
+  aDoCompress = SafeMalloc( sizeof(int)*(argc + 1000) );
   for(i=1; i<argc; i++){
     if( argv[i][0]=='-' ){
       if( strcmp(argv[i],"-header")==0 ){

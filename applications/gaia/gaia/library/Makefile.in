@@ -4,7 +4,7 @@
 
 INSTALL      = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
-GAIA_LIB      = @RTD_DIR@/../gaia
+GAIA_LIBRARY = @GAIA_LIBRARY@
 RM           = rm -f
 SHELL        = /bin/sh
 FILES        = \
@@ -48,15 +48,15 @@ All:./built/lib/gaia/gaia
 	cd ..; $(MAKE)
 
 install-top:
-	test -d $(GAIA_LIB) || mkdir -p $(GAIA_LIB)
-	(cd $(GAIA_LIB); rm -rf library; ln -s . library)
+	test -d $(GAIA_LIBRARY) || mkdir -p $(GAIA_LIBRARY)
+	(cd $(GAIA_LIBRARY); rm -rf library; ln -s . library)
 
 install-files: install-top
 	@set -x; for i in $(srcdir)/$(FILES) ; do \
-	    $(INSTALL_DATA) $$i $(GAIA_LIB) ; \
+	    $(INSTALL_DATA) $$i $(GAIA_LIBRARY) ; \
 	done
 	for f in $(srcdir)/$(PROGRAMS); do \
-	    $(INSTALL) $$f $(GAIA_LIB) ;\
+	    $(INSTALL) $$f $(GAIA_LIBRARY) ;\
 	done
 
 install: install-files

@@ -111,7 +111,7 @@ extern "C" int Gaia_Init( Tcl_Interp *interp )
 	libDir = Tcl_GetVar2(interp, "env", "GAIA_LIBRARY", TCL_GLOBAL_ONLY);
     }
     if (libDir == NULL) {
-	libDir = "GAIA_LIBRARY";
+	libDir = GAIA_LIBRARY;
     }
 
     // Set the global Tcl variables gaia_library and gaia_version 
@@ -124,21 +124,56 @@ extern "C" int Gaia_Init( Tcl_Interp *interp )
     if (Tcl_Eval(interp, cmd) != TCL_OK)
 	return TCL_ERROR; 
 
-    // set up the namespaces used by the itcl/itk classes
+    //  Do the Iwidgets initialisation, needed for single binary as
+    //  Iwidget doesn't have a builtin init function (so the script
+    //  method of doing the init gets confused).
+    libDir = Tcl_GetVar(interp, "iwidgets_library", TCL_GLOBAL_ONLY);
+    if (libDir == NULL) {
+      libDir = Tcl_GetVar2(interp, "env", "IWIDGETS_LIBRARY", TCL_GLOBAL_ONLY);
+    }
+    if (libDir == NULL) {
+      libDir = IWIDGETS_LIBRARY;
+    }
+    Tcl_SetVar(interp, "iwidgets_library", libDir, TCL_GLOBAL_ONLY);
+    Tcl_SetVar(interp, "iwidgets_version", IWIDGETS_VERSION, TCL_GLOBAL_ONLY);
+    sprintf(cmd, "lappend auto_path %s", libDir);
+    if (Tcl_Eval(interp, cmd) != TCL_OK)
+        return TCL_ERROR;
+    
+    //  Also do the package provide.
+    if (Tcl_Eval(interp, "
+global iwidgets_library iwidgets_version
+package require Tcl 8.0
+package require Tk 8.0
+package require Itcl 3.0
+package require Itk 3.0
+namespace eval ::iwidgets {
+  namespace export *
+  variable library $iwidgets_library
+  variable version $iwidgets_version
+}
+lappend auto_path \"$iwidgets_library/scripts\"
+package provide Iwidgets $iwidgets_version
+"   
+                 ) != TCL_OK) {
+      return TCL_ERROR;
+    }
+      
+
+    //  Set up the namespaces used by the itcl/itk classes.
     if (Tcl_Eval(interp, 
 #if (TCL_MAJOR_VERSION >= 8)
 		 "namespace eval gaia {namespace export *};"
 		 "namespace import -force gaia::*;"
-		 "package require Iwidgets;"
 		 "namespace import -force iwidgets::*;"
 #else
 		 "namespace ::gaia {}; import add gaia;"
-		 "package require Iwidgets;"
+                 "package require Iwidgets;"
 		 "namespace ::iwidgets; import add ::iwidgets"
 #endif
-	) != TCL_OK)
-	return TCL_ERROR;
-
+                 ) != TCL_OK) {
+      return TCL_ERROR;
+    }
     return TCL_OK; 
 }
 

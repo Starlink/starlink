@@ -1733,13 +1733,11 @@ fi
 DESTDIR="$prefix"
 BINDIR="$DESTDIR/bin"
 LIBDIR="$DESTDIR/lib"
-INCDIR="$DESTDIR/include/skycat"
-MANDIR="$DESTDIR/man"
-SKYCAT_DIR="$LIBDIR/skycat"
-SKYCAT_LIBRARY=$SKYCAT_DIR
-SKYCAT_BUILD_LIBRARY=$SRC_ROOT/interp/library
-
-
+GAIA_DIR="$LIBDIR/gaia"
+GAIA_LIBRARY=$GAIA_DIR
+GAIA_BUILD_LIBRARY=$SRC_ROOT/library
+IWIDGETS_VERSION="3.0.0"
+IWIDGETS_LIBRARY="$DESTDIR/lib/iwidgets$IWIDGETS_VERSION"
 
 
 
@@ -1756,15 +1754,11 @@ SKYCAT_BUILD_LIBRARY=$SRC_ROOT/interp/library
 echo "
 Configuration results (edit and run ./config.status to modify):
 
-C   Compiler                                 => $CC
-C++ Compiler                                 => $CXX
-C++ include flag                             => $CXX_INCLUDE
-
-directory containing tcl library files       => $TCLLIBRARY
-directory containing tk  library files       => $TKLIBRARY
-directory containing blt library files       => $BLTLIBRARY
-directory containing Rtd library files       => $RTD_LIBRARY
-directory containing SkyCat library files    => $SKYCAT_LIBRARY
+C   Compiler            => $CC
+C++ Compiler            => $CXX
+C++ include flag        => $CXX_INCLUDE
+Fortran Compiier        => $FC
+Iwidgets library files  => $IWIDGETS_LIBRARY
 "
 
 #--------------------------------------------------------------------
@@ -1883,7 +1877,12 @@ done
 ac_given_srcdir=$srcdir
 ac_given_INSTALL="$INSTALL"
 
-trap 'rm -fr `echo "Makefile library/Makefile library/gaia_version.tcl src/Makefile colormaps/Makefile" | sed "s/:[^ ]*//g"` conftest*; exit 1' 1 2 15
+trap 'rm -fr `echo "Makefile \
+        library/Makefile \
+        library/gaia_version.tcl \
+        src/Makefile \
+        mktclapp/Makefile \
+        colormaps/Makefile" | sed "s/:[^ ]*//g"` conftest*; exit 1' 1 2 15
 EOF
 cat >> $CONFIG_STATUS <<EOF
 
@@ -2005,11 +2004,11 @@ s%@F77_LIBS@%$F77_LIBS%g
 s%@DESTDIR@%$DESTDIR%g
 s%@BINDIR@%$BINDIR%g
 s%@LIBDIR@%$LIBDIR%g
-s%@INCDIR@%$INCDIR%g
-s%@MANDIR@%$MANDIR%g
-s%@SKYCAT_DIR@%$SKYCAT_DIR%g
-s%@RTD_DIR@%$RTD_DIR%g
-s%@SKYCAT_LIBRARY@%$SKYCAT_LIBRARY%g
+s%@GAIA_DIR@%$GAIA_DIR%g
+s%@GAIA_LIBRARY@%$GAIA_LIBRARY%g
+s%@GAIA_BUILD_LIBRARY@%$GAIA_BUILD_LIBRARY%g
+s%@IWIDGETS_VERSION@%$IWIDGETS_VERSION%g
+s%@IWIDGETS_LIBRARY@%$IWIDGETS_LIBRARY%g
 
 CEOF
 EOF
@@ -2051,7 +2050,12 @@ EOF
 
 cat >> $CONFIG_STATUS <<EOF
 
-CONFIG_FILES=\${CONFIG_FILES-"Makefile library/Makefile library/gaia_version.tcl src/Makefile colormaps/Makefile"}
+CONFIG_FILES=\${CONFIG_FILES-"Makefile \
+        library/Makefile \
+        library/gaia_version.tcl \
+        src/Makefile \
+        mktclapp/Makefile \
+        colormaps/Makefile"}
 EOF
 cat >> $CONFIG_STATUS <<\EOF
 for ac_file in .. $CONFIG_FILES; do if test "x$ac_file" != x..; then
@@ -2121,5 +2125,4 @@ EOF
 chmod +x $CONFIG_STATUS
 rm -fr confdefs* $ac_clean_files
 test "$no_create" = yes || ${CONFIG_SHELL-/bin/sh} $CONFIG_STATUS || exit 1
-
 

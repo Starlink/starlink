@@ -266,7 +266,7 @@ itcl::class gaia::GaiaSextractor {
 
       #  Create the tab notebook for containing each page of options.
       itk_component add notebook {
-         tabnotebook $w_.notebook -tabpos w -width 450 -height 300
+         ::iwidgets::tabnotebook $w_.notebook -tabpos w -width 450 -height 300
       }
       pack $itk_component(notebook) -side top -fill both -expand 1 \
          -ipadx 1m -ipady 1m

@@ -82,7 +82,9 @@ INCLUDES	= -I../include  \
 
 DEFINES         = \
                 -DGAIA_VERSION=\"@GAIA_VERSION@\" \
-                -DGAIA_LIBRARY=\"@STARLINK@/bin/gaia\"
+                -DGAIA_LIBRARY=\"@GAIA_LIBRARY@\" \
+                -DIWIDGETS_VERSION=\"@IWIDGETS_VERSION@\" \
+                -DIWIDGETS_LIBRARY=\"@IWIDGETS_LIBRARY@\"
 
 CC_SWITCHES	= $(CFLAGS) $(DEFINES) $(INCLUDES)
 DEPEND_FLAGS    = $(CC_SWITCHES) @CXX_INCLUDE@ @CXX_DEPEND_FLAGS@
