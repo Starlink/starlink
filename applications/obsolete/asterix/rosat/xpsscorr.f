@@ -48,6 +48,7 @@
 *     14 Dec 93 : V1.7-0 Correctly default CALDIR on UNIX (DJA)
 *     21 Feb 94 : V1.7-1 Correct div. by zero error when Exposure time is zero (RJV)
 *     23 Nov 94 : V1.7-2 Vignetting correction for HRI (RJV)
+*      8 Feb 95 : V1.8-0 Corrected bu in types of MDATE and MSWITCH (DJA)
 *
 *    Type Definitions :
 *
@@ -82,7 +83,6 @@
       CHARACTER*20 DET               ! Name of detector (e.g. PSPCB or C)
       CHARACTER*1 MODE               ! Operation mode 'C' or 'E'
 
-      DOUBLE PRECISION MDATE,MSWITCH ! MJDs
 
       REAL        MEAN_EN            ! Photon energy used in PSS (keV)
       REAL        EXPOS              ! Exposure time of searched image
@@ -92,6 +92,7 @@
       INTEGER     EDIMS(3)           ! Error dimensions
       INTEGER     ENDIM              ! Error dimensionality
       INTEGER     DDIM(2)            ! Error dimensionality
+      INTEGER     MDATE,MSWITCH ! MJDs
       INTEGER     NED                ! Number of error items per source
       INTEGER     NELEV              ! Number of flux error levels
       INTEGER     NSRC               ! Number of sources
@@ -578,9 +579,6 @@
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
-*    Global variables :
-*     <global variables held in named COMMON>
 *    Structure definitions :
 *     <specification of FORTRAN structures>
 *    Import :
@@ -722,9 +720,6 @@
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
-*    Global variables :
-*     <global variables held in named COMMON>
 *    Structure definitions :
       INCLUDE 'XRTLIB(INC_CORR)'
 *     <specification of FORTRAN structures>
