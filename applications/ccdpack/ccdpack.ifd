@@ -93,7 +93,7 @@ package ccdpack {
 #  prompt strings.  Note in this case that the prompt strings must be
 #  delimited by double quotes, not braces.
    proc ccd_global {} { return {} }
-   iraf: { proc ccd_global {} { return {[G]} } }
+   iraf: { proc ccd_global {} { return { [G]} } }
 
    executable ccdpack_red {
       source makebias.ifd
