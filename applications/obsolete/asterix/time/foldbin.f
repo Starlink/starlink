@@ -272,7 +272,7 @@ C            CALL MSG_PRNT( 'Maximum number of phase bins is ^INBINS' )
 
       END IF
 
-      CALL USI_GET0I( 'N_PHASE_BINS', NBINS, STATUS )
+      CALL USI_GET0I( 'BINS', NBINS, STATUS )
 
       IF ( REGULAR .AND. (NBINS .GT. INBINS) ) THEN
          CALL MSG_PRNT('The data is being oversampled - this is'/
