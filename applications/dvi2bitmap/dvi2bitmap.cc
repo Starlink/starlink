@@ -3,7 +3,8 @@
 // See file LICENCE for conditions.
 //
 // part of dvi2bitmap
-// $Id$
+static const char RCSID[] =
+	"$Id$";
 
 #include "dvi2bitmap.h"
 #include <vector>
@@ -39,17 +40,19 @@ typedef vector<string> string_list;
 struct bitmap_info {
     bitmap_info()
 	: blur_bitmap(false), make_transparent(true), bitmap_scale_factor(1),
-	  ofile_pattern(""), ofile_type("") { }
+	  ofile_pattern(""), ofile_name(""), ofile_type("") { }
     bool blur_bitmap;
     bool make_transparent;
     int bitmap_scale_factor;
     string ofile_pattern;
+    string ofile_name;
     string ofile_type;
 };
 
 void process_dvi_file (DviFile *, bitmap_info&, int resolution,
 		       const PkFont *fallback_font);
-string_list *tokenise_string (string s);
+bool process_special (string specialString, Bitmap*, bitmap_info&);
+string_list& tokenise_string (string s);
 string get_ofn_pattern (string dviname);
 void Usage (void);
 char *progname;
@@ -58,10 +61,14 @@ verbosities verbosity = normal;
 int bitmapH = -1;
 int bitmapW = -1;
 
+// Make resolution global -- 
+// several functions in here might reasonably want to see this.
+int resolution = 72;		// in pixels-per-inch
+int oneInch = 72;		// one inch, including magnification
+
 main (int argc, char **argv)
 {
     string dviname;
-    int resolution = 72;	// in pixels-per-inch
     double magmag = 1.0;	// magnification of file magnification factor
     int show_font_list = 0;
     bitmap_info bm;
@@ -109,28 +116,33 @@ main (int argc, char **argv)
 	      {
 		  char c = *++*argv;
 		  argc--, argv++; if (argc <= 0) Usage();
-		  int cropmargin = atoi (*argv);
+		  // get dimension, and convert points to pixels.
+		  // Note that the functionality here will vary depending on
+		  // whether the magmag is set before or after this option,
+		  // and it'll take no account of variations of the
+		  // magnification within the DVI file.
+		  int cropmargin = static_cast<int>(magmag*atof(*argv)/72.0*resolution);
 		  switch (c)
 		  {
 		    case 'l':
-		      Bitmap::crop(Bitmap::Left,   cropmargin, absCrop);
+		      Bitmap::cropDefault(Bitmap::Left,   cropmargin, absCrop);
 		      break;
 		    case 'r':
-		      Bitmap::crop(Bitmap::Right,  cropmargin, absCrop);
+		      Bitmap::cropDefault(Bitmap::Right,  cropmargin, absCrop);
 		      break;
 		    case 't':
-		      Bitmap::crop(Bitmap::Top,    cropmargin, absCrop);
+		      Bitmap::cropDefault(Bitmap::Top,    cropmargin, absCrop);
 		      break;
 		    case 'b':
-		      Bitmap::crop(Bitmap::Bottom, cropmargin, absCrop);
+		      Bitmap::cropDefault(Bitmap::Bottom, cropmargin, absCrop);
 		      break;
 		    case '\0':
 		      if (absCrop) // don't want this!
 			  Usage();
-		      Bitmap::crop(Bitmap::Left,   cropmargin, false);
-		      Bitmap::crop(Bitmap::Right,  cropmargin, false);
-		      Bitmap::crop(Bitmap::Top,    cropmargin, false);
-		      Bitmap::crop(Bitmap::Bottom, cropmargin, false);
+		      Bitmap::cropDefault(Bitmap::Left,   cropmargin, false);
+		      Bitmap::cropDefault(Bitmap::Right,  cropmargin, false);
+		      Bitmap::cropDefault(Bitmap::Top,    cropmargin, false);
+		      Bitmap::cropDefault(Bitmap::Bottom, cropmargin, false);
 		      break;
 		    default:
 		      Usage();
@@ -276,6 +288,8 @@ main (int argc, char **argv)
 #ifdef DEFAULT_TEXMFCNF
 		cout << "DEFAULT_TEXMFCNF=" << DEFAULT_TEXMFCNF << '\n';
 #endif
+		if (*++*argv == 'V')
+		    cout << RCSID << '\n';
 		exit(0);	// ...and exit
 
 	      default:
@@ -386,10 +400,10 @@ void process_dvi_file (DviFile *dvif, bitmap_info& b, int resolution,
     DviFileEvent *ev;
     const PkFont *curr_font = 0;
     int pagenum = 0;
-    string output_filename = "";
     Bitmap *bitmap = 0;
     bool end_of_file = false;
     int outcount = 0;		// characters written to output current line
+    bool initialisedInch = false;
 
     while (! end_of_file)
     {
@@ -399,18 +413,26 @@ void process_dvi_file (DviFile *dvif, bitmap_info& b, int resolution,
 	if (verbosity > debug)
 	    ev->debug();
 
+	if (! initialisedInch)
+	{
+	    // can't do this any earlier, as it's set in the preamble
+	    oneInch = static_cast<int>(resolution * dvif->magnification());
+	    initialisedInch = true;
+	}
+
 	if (DviFilePage *page = dynamic_cast<DviFilePage*>(ev))
 	    if (page->isStart)
 	    {
 		pagenum++;
-		// Request a big-enough bitmap.  hSize and vSize are the
+		// Request a big-enough bitmap; this bitmap is the `page' on
+		// which we `print' below.  hSize and vSize are the
 		// width and height of the widest and tallest pages,
 		// as reported by the DVI file; however, the file doesn't
 		// report the offsets of these pages.  Add an inch to
 		// both and hope for the best.
 		bitmap = new Bitmap
-		    ((bitmapW > 0 ? bitmapW : dvif->hSize() + resolution),
-		     (bitmapH > 0 ? bitmapH : dvif->vSize() + resolution));
+		    ((bitmapW > 0 ? bitmapW : dvif->hSize()+oneInch),
+		     (bitmapH > 0 ? bitmapH : dvif->vSize()+oneInch));
 		if (verbosity > quiet)
 		{
 		    int last, i;
@@ -456,9 +478,9 @@ void process_dvi_file (DviFile *dvif, bitmap_info& b, int resolution,
 			     << ": bitmap too big: occupies (" << bb[0] << ','
 			     << bb[1] << ")...(" << bb[2] << ','
 			     << bb[3] << ").  Requested "
-			     << (bitmapW > 0 ? bitmapW : dvif->hSize() + resolution)
+			     << (bitmapW > 0 ? bitmapW : dvif->hSize()+oneInch)
 			     << 'x'
-			     << (bitmapH > 0 ? bitmapH : dvif->vSize() + resolution)
+			     << (bitmapH > 0 ? bitmapH : dvif->vSize()+oneInch)
 			     << '\n';
 		    }
 		    bitmap->crop();
@@ -468,15 +490,17 @@ void process_dvi_file (DviFile *dvif, bitmap_info& b, int resolution,
 			bitmap->setTransparent(true);
 		    if (b.bitmap_scale_factor != 1)
 			bitmap->scaleDown (b.bitmap_scale_factor);
-		    if (output_filename.length() == 0)
+		    if (b.ofile_name.length() == 0)
 		    {
 			char fn[100];
 			sprintf (fn, b.ofile_pattern.c_str(), pagenum);
-			output_filename = fn;
+			string output_filename = fn;
+			bitmap->write (output_filename, b.ofile_type);
 		    }
-		    bitmap->write (output_filename, b.ofile_type);
+		    else
+			bitmap->write (b.ofile_name, b.ofile_type);
 		}
-		output_filename = "";
+		b.ofile_name = "";
 
 		delete bitmap;
 		bitmap = 0;
@@ -499,22 +523,23 @@ void process_dvi_file (DviFile *dvif, bitmap_info& b, int resolution,
 		if (verbosity > debug)
 		    cerr << " size " << glyph->w() << 'x' << glyph->h()
 			 << " at position ("
-			 << dvif->currH() << ',' << dvif->currV() << ')';
+			 << dvif->currH() << ',' << dvif->currV()
+			 << ") plus oneInch=" << oneInch;
 		cerr << '\n';
 	    }
 	    // calculate glyph positions, taking into account the
 	    // offsets for the bitmaps, and the (1in,1in)=(72pt,72pt)
 	    // = (resolution px,resolution px) offset of the TeX origin.
-	    int x = dvif->currH() + glyph->hoff() + resolution;
-	    int y = dvif->currV() + glyph->voff() + resolution;
+	    int x = dvif->currH() + glyph->hoff() + oneInch;
+	    int y = dvif->currV() + glyph->voff() + oneInch;
 	    bitmap->paint (x, y,
 			   glyph->w(), glyph->h(),
 			   glyph->bitmap());
 	}
 	else if (DviFileSetRule *sr = dynamic_cast<DviFileSetRule*>(ev))
 	{
-	    int x = dvif->currH() + resolution;
-	    int y = dvif->currV() + resolution;
+	    int x = dvif->currH() + oneInch;
+	    int y = dvif->currV() + oneInch;
 	    bitmap->rule (x,y,sr->w, sr->h);
 	}
 	else if (DviFileFontChange *fc =
@@ -526,22 +551,11 @@ void process_dvi_file (DviFile *dvif, bitmap_info& b, int resolution,
 	else if (DviFileSpecial* special =
 		 dynamic_cast<DviFileSpecial*>(ev))
 	{
-	    string_list *l = tokenise_string (special->specialString);
-	    if (l->size() > 2
-		&& (*l)[0] == "dvi2bitmap"
-		&& (*l)[1] == "outputfile")
-	    {
-		output_filename = (*l)[2];
-		if (verbosity > normal)
-		    cerr << "special: outputfile="
-			 << output_filename << '\n';
-	    }
-	    else
+	    if (!process_special (special->specialString, bitmap, b))
 		if (verbosity > silent)
 		    cerr << "Warning: unrecognised special: "
 			 << special->specialString
 			 << '\n';
-	    delete l;
 	}
 	else if (DviFilePostamble *post
 		 = dynamic_cast<DviFilePostamble*>(ev))
@@ -552,6 +566,136 @@ void process_dvi_file (DviFile *dvif, bitmap_info& b, int resolution,
 
     if (verbosity > quiet)
 	cout << '\n';
+}
+
+// Process the special string, returning true on success.
+bool process_special (string specialString, Bitmap* bitmap, bitmap_info& b)
+{
+    string_list l = tokenise_string (specialString);
+    string_list::const_iterator s = l.begin();
+    bool stringOK = false;
+    bool setDefault = false;
+    bool absolute = false;
+
+    if (*s == "dvi2bitmap")	// OK
+    {
+	stringOK = true;
+	s++;
+
+	while (s != l.end() && stringOK)
+	{
+	    if (*s == "default")
+		setDefault = true;
+	    else if (*s == "absolute")
+		absolute = true;
+	    else if (*s == "outputfile")
+	    {
+		s++;
+		if (s == l.end())
+		    stringOK = false;
+		else
+		    if (setDefault)
+		    {
+			bool seenHash = false;
+			b.ofile_pattern = "";
+			for (int i=0; i<s->length(); i++)
+			{
+			    char c;
+			    if ((c=(*s)[i]) == '#')
+			    {
+				if (! seenHash)
+				{
+				    b.ofile_pattern += '%';
+				    b.ofile_pattern += 'd';
+				    seenHash = true;
+				}
+			    }
+			    else
+				b.ofile_pattern += c;
+			}
+			if (!seenHash)
+			{
+			    b.ofile_pattern += '%';
+			    b.ofile_pattern += 'd';
+			}
+			if (verbosity > normal)
+			    cerr << "special: ofile_pattern="
+				 << b.ofile_pattern << '\n';
+		    }
+		    else
+			b.ofile_name = *s;
+	    }
+	    else if (*s == "crop")
+	    {
+		s++;
+		if (s == l.end()) { stringOK = false; break; }
+		string side_s = *s;
+		Bitmap::Margin side;
+		s++;
+		if (s == l.end()) { stringOK = false; break; }
+		int dimen = atoi (s->c_str());
+		// scale from points to pixels
+		double npixels = dimen/72.0    // to inches
+		    * oneInch;
+		if (absolute)
+		{
+		    // these dimensions are given w.r.t. an origin one inch
+		    // from the left and top of the `paper'.  Add this inch:
+		    npixels += oneInch;
+		}
+		dimen = static_cast<int>(npixels);
+		bool cropAll = false;
+
+		if (side_s == "left")
+		    side = Bitmap::Left;
+		else if (side_s == "right")
+		    side = Bitmap::Right;
+		else if (side_s == "top")
+		    side = Bitmap::Top;
+		else if (side_s == "bottom")
+		    side = Bitmap::Bottom;
+		else if (side_s == "all")
+		    cropAll = true;
+		else
+		    stringOK = false;
+
+		if (verbosity > normal)
+		    cerr << "Crop " << side_s << '=' << dimen
+			 << (setDefault ? " default" : "")
+			 << (absolute ? " absolute" : "")
+			 << '\n';
+
+		if (stringOK)
+		    if (cropAll)
+		    {
+			if (setDefault)
+			    for (int tside=0; tside<4; tside++)
+				Bitmap::cropDefault
+				    (static_cast<Bitmap::Margin>(tside),
+				     dimen, absolute);
+			for (int tside=0; tside<4; tside++)
+			    bitmap->crop
+				(static_cast<Bitmap::Margin>(tside),
+				 dimen, absolute);
+		    }
+		    else
+		    {
+			if (setDefault)
+			    Bitmap::cropDefault (side, dimen, absolute);
+			bitmap->crop (side, dimen, absolute);
+		    }
+	    }
+	    else
+		stringOK = false;
+
+	    s++;
+	}
+    }
+
+    if (!stringOK && verbosity > silent)
+	cerr << "Warning: unrecognised special: " << specialString << '\n';
+
+    return stringOK;
 }
 
 DviError::DviError(const char *fmt,...)
@@ -597,18 +741,30 @@ string get_ofn_pattern (string dviname)
 
 // Tokenise string at whitespace.  There's a more C++-ish way of doing
 // this, I'm sure....
-string_list *tokenise_string (string str)
+string_list& tokenise_string (string str)
 {
+    static bool initialised = false;
+    static string_list *l;
+
     if (verbosity > normal)
 	cerr << "tokenise_string: string=<" << str << ">\n";
-    string_list *l = new string_list();
-    int unsigned i=0, wstart;
+
+    if (! initialised)
+    {
+	l = new string_list();
+	initialised = true;
+    }
+    else
+	l->clear();
+
+    unsigned int i=0;
+
     // skip leading whitespace
     while (i < str.length() && isspace(str[i]))
 	i++;
     while (i < str.length())
     {
-	wstart = i;
+	unsigned int wstart = i;
 	while (i < str.length() && !isspace(str[i]))
 	    i++;
 	string t = str.substr(wstart,i-wstart);
@@ -618,7 +774,7 @@ string_list *tokenise_string (string str)
 	while (i < str.length() && isspace(str[i]))
 	    i++;
     }
-    return l;
+    return *l;
 }
 
 
