@@ -381,10 +381,9 @@
             NUR = NIPOS
 
           ELSE
-            CALL PRS_GETLIST_INT( PDATA(:PLEN), NIPOS, PSF_PPS, NUR,
+            CALL PRS_GETLIST_INT( PDATA(:PLEN), 99, PSF_PPS, NUR,
      :                            STATUS )
           END IF
-          CALL USI_GET1I( 'PSFPIX', NIPOS, PSF_PPS, NUR, STATUS )
 	PRINT *,PSF_PPS
 
 *        Right number?
