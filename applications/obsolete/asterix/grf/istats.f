@@ -17,6 +17,7 @@
 *     16 Feb 94: V1.2-9 BOX and CIRC options (RJV)
 *     23 Feb 94: V1.2-10 Error in mean corrected again (RJV)
 *     28 Sep 94: V1.7-0 uses region definitions (RJV)
+*      8 Feb 96: V2.0-0 GUI version (RJV)
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -34,11 +35,12 @@
       REAL XC,YC,DX,DY,RAD
       REAL XCENT,YCENT
       INTEGER NGOOD,NBAD
+      INTEGER ID
       LOGICAL SUPPRESS
       LOGICAL BOX,CIRC
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'ISTATS Version 1.7-0')
+      PARAMETER (VERSION = 'ISTATS Version 2.0-0')
 *-
       CALL USI_INIT()
 
@@ -139,14 +141,32 @@
           CALL MSG_BLNK()
         ENDIF
 
-*  output to environment
-        CALL USI_PUT0R('MIN',MIN,STATUS)
-        CALL USI_PUT0R('MAX',MAX,STATUS)
-        CALL USI_PUT0R('MEAN',MEAN,STATUS)
-        CALL USI_PUT0R('TOT',TOT,STATUS)
-        CALL USI_PUT0I('NPIX',NGOOD,STATUS)
-        CALL USI_PUT0R('XCENT',XCENT,STATUS)
-        CALL USI_PUT0R('YCENT',YCENT,STATUS)
+*  if running from GUI - save to noticeboard
+        IF (I_GUI) THEN
+          CALL NBS_FIND_ITEM(I_NBID,'MIN',ID,STATUS)
+          CALL NBS_PUT_VALUE(ID,0,VAL__NBR,MIN,STATUS)
+          CALL NBS_FIND_ITEM(I_NBID,'MAX',ID,STATUS)
+          CALL NBS_PUT_VALUE(ID,0,VAL__NBR,MAX,STATUS)
+          CALL NBS_FIND_ITEM(I_NBID,'MEAN',ID,STATUS)
+          CALL NBS_PUT_VALUE(ID,0,VAL__NBR,MEAN,STATUS)
+          CALL NBS_FIND_ITEM(I_NBID,'MERR',ID,STATUS)
+          CALL NBS_PUT_VALUE(ID,0,VAL__NBR,MERR,STATUS)
+          CALL NBS_FIND_ITEM(I_NBID,'NGOOD',ID,STATUS)
+          CALL NBS_PUT_VALUE(ID,0,VAL__NBR,NGOOD,STATUS)
+          CALL NBS_FIND_ITEM(I_NBID,'NBAD',ID,STATUS)
+          CALL NBS_PUT_VALUE(ID,0,VAL__NBR,NBAD,STATUS)
+
+
+        ELSE
+* otherwise output to environment
+          CALL USI_PUT0R('MIN',MIN,STATUS)
+          CALL USI_PUT0R('MAX',MAX,STATUS)
+          CALL USI_PUT0R('MEAN',MEAN,STATUS)
+          CALL USI_PUT0R('TOT',TOT,STATUS)
+          CALL USI_PUT0I('NPIX',NGOOD,STATUS)
+          CALL USI_PUT0R('XCENT',XCENT,STATUS)
+          CALL USI_PUT0R('YCENT',YCENT,STATUS)
+        ENDIF
 
       ENDIF
 
