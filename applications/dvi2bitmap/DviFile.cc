@@ -65,7 +65,7 @@ DviFile::DviFile (string& s, int res, double magmag)
     : fileName_(s), pending_hupdate_(0), pending_hhupdate_(0),
       current_font_(0), dvif_(0), resolution_(res), magmag_(magmag),
       magfactor_(1.0), skipPage_(false),
-      max_drift_(0), iterOK_(false)
+      max_drift_(0)
 {
     PkFont::setResolution(res);
 
@@ -971,31 +971,48 @@ void DviFile::PosStateStack::clear()
 }
 #endif
 
-// Font iterator -- probably better implemented as an iterator itself
-PkFont *DviFile::firstFont()
+const PkFont* DviFile::const_iterator::operator*()
+    const
+    throw (DviBug)
 {
-    fontIter_ = fontMap_.begin();
-    if (fontIter_ == fontMap_.end())
-	return 0;
-    else
-    {
-	iterOK_ = true;
-	return fontIter_->second;
-    }
+    if (finished_)
+	throw DviBug("DviFile::const_iterator out of bounds");
+    return mapiter_->second;
 }
-PkFont *DviFile::nextFont() 
+
+DviFile::const_iterator& DviFile::const_iterator::operator++()
 {
-    if (!iterOK_)
-	return 0;
-    else
-    {
-	++fontIter_;
-	if (fontIter_ == fontMap_.end())
-	{
-	    iterOK_ = false;	// end of list
-	    return 0;
-	}
-	else
-	    return fontIter_->second;
-    }
+    ++mapiter_;
+    if (mapiter_ == endmapiter_)
+	finished_ = true;
+    return *this;
 }
+
+// // Font iterator -- probably better implemented as an iterator itself
+// PkFont *DviFile::firstFont()
+// {
+//     fontIter_ = fontMap_.begin();
+//     if (fontIter_ == fontMap_.end())
+// 	return 0;
+//     else
+//     {
+// 	iterOK_ = true;
+// 	return fontIter_->second;
+//     }
+// }
+// PkFont *DviFile::nextFont() 
+// {
+//     if (!iterOK_)
+// 	return 0;
+//     else
+//     {
+// 	++fontIter_;
+// 	if (fontIter_ == fontMap_.end())
+// 	{
+// 	    iterOK_ = false;	// end of list
+// 	    return 0;
+// 	}
+// 	else
+// 	    return fontIter_->second;
+//     }
+// }

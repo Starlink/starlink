@@ -78,9 +78,6 @@ public:
     // (ie, at (1in,1in)?), then everything should fit on.
     int hSize() const { return static_cast<int>(postamble_.u * px_per_dviu_); }
     int vSize() const { return static_cast<int>(postamble_.l * px_per_dviu_); }
-    // Return first, and subsequent defined fonts.
-    PkFont *firstFont();
-    PkFont *nextFont();
     // Return the net magnification factor for the DVI file
     double magnification() const { return magfactor_; }
     // Convert a length in points to one in pixels,
@@ -170,10 +167,38 @@ private:
     stack<PosState> posStack_;
 #endif
     map<int,PkFont*> fontMap_;
-    map<int,PkFont*>::const_iterator fontIter_;
-    bool iterOK_;		/* there's some visibility sublety involved 
-				   in setting fontIter_=0 in constructor */
     static verbosities verbosity_;
+
+ public:
+    class const_iterator {
+    public:
+	const PkFont* operator*() const throw (DviBug);
+	const_iterator& operator++();
+	bool operator==(const const_iterator& it) const
+		{ return finished_ == it.finished_; }
+	bool operator!=(const const_iterator& it) const
+		{ return finished_ != it.finished_; }
+    private:
+	/* These should be implementable more compactly, since we're
+	   just using map's iterator, but there's some visibility
+	   subtlety that escapes me... */
+	const_iterator(map<int,PkFont*>::const_iterator m,
+		       map<int,PkFont*>::const_iterator me) {
+	    mapiter_ = m;
+	    endmapiter_ = me;
+	    finished_ = false;
+	};
+	const_iterator() : mapiter_(0), endmapiter_(0), finished_(true) { }
+	map<int,PkFont*>::const_iterator mapiter_;
+	map<int,PkFont*>::const_iterator endmapiter_;
+	bool finished_;
+	friend class DviFile;
+    };
+    const_iterator begin() {
+	return const_iterator(fontMap_.begin(), fontMap_.end());
+    }
+    const_iterator end() const { return const_iterator(); };
+    friend class const_iterator;
 };
 
 

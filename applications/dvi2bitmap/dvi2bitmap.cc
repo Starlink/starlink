@@ -758,10 +758,14 @@ int main (int argc, char **argv)
 	no_font_present = true;
 	const PkFont *fallback_font = 0;
 
-	for (PkFont *f = dvif->firstFont();
-	     f != 0;
-	     f = dvif->nextFont())
+// 	for (PkFont *f = dvif->firstFont();
+// 	     f != 0;
+// 	     f = dvif->nextFont())
+	for (DviFile::const_iterator ci = dvif->begin();
+	     ci != dvif->end();
+	     ++ci)
 	{
+	    const PkFont *f = *ci;
 	    if (f->loaded())
 	    {
 		no_font_present = false;
@@ -1370,38 +1374,41 @@ void show_help()
 {
     Usage(false);
     cerr << "Options:" << endl;
-    cerr << "
-    --colours, --colors=[foreground|background]=spec
-                                   RGB spec, as red/blue/green or #rrggbb
-    --crop=[left|right|top|bottom|all]=n   Specify margin round output bitmap
-    --crop=[absolute|relative]     Specify cropping of bitmap
-    --debug=[dpribmg]              Trace execution
-    --font-search=[path|command|kpathsea]=value
-    --font-search=[nopath|nocommand|nokpathsea|none]
-                                   Control font-searching
-    --font-gen=boolean             Generate missing fonts?
-    --font-mode=mode               MetaFont mode used when generating fonts
-    --height=size, --width=size    Size of output bitmap
-    --help                         Show this help
-    --magnification=n              Magnification parameter for DVI file
-    -n, --preamble-only            Read only the DVI pre- and postamble
-    --output=filename-pattern      Specify pattern for output bitmaps
-    --output-type=type             Type of output bitmap, cf --query=types
-    --paper-size=string            Preset bitmap size, cf --query=paper
-    --process=[options-only|preamble-only|blur|transparent|crop]=boolean
-                                   Processing to do
-    --query=[missing-fonts|missing-fontgen|all-fonts|all-fontgen|f|F|g|G]
-                                   Display missing/present fonts
-    --query=bitmaps                Log bitmaps generated
-    --query=paper                  Show predefiend `paper' sizes
-    --query=types                  Show available bitmap formats
-    --resolution=n                 Output resolution, pixels-per-inch
-    --start-page=n, --end-page=n, --page-range=spec
-                                   Control which pages are processed
-    --scalefactor=n                Scale output bitmap down by n
-    --verbose=[quiet|silent]       Suppress chatter
-    -V, --version                  Show version and configuration info
-" << endl;
+    string helpstrings[] = {
+"  --colours, --colors=[foreground|background]=spec",
+"                                 RGB spec, as red/blue/green or #rrggbb",
+"  --crop=[left|right|top|bottom|all]=n   Specify margin round output bitmap",
+"  --crop=[absolute|relative]     Specify cropping of bitmap",
+"  --debug=[dpribmg]              Trace execution",
+"  --font-search=[path|command|kpathsea]=value",
+"  --font-search=[nopath|nocommand|nokpathsea|none]",
+"                                 Control font-searching",
+"  --font-gen=boolean             Generate missing fonts?",
+"  --font-mode=mode               MetaFont mode used when generating fonts",
+"  --height=size, --width=size    Size of output bitmap",
+"  --help                         Show this help",
+"  --magnification=n              Magnification parameter for DVI file",
+"  -n, --preamble-only            Read only the DVI pre- and postamble",
+"  --output=filename-pattern      Specify pattern for output bitmaps",
+"  --output-type=type             Type of output bitmap, cf --query=types",
+"  --paper-size=string            Preset bitmap size, cf --query=paper",
+"  --process=[options-only|preamble-only|blur|transparent|crop]=boolean",
+"                                 Processing to do",
+"  --query=[missing-fonts|missing-fontgen|all-fonts|all-fontgen|f|F|g|G]",
+"                                 Display missing/present fonts",
+"  --query=bitmaps                Log bitmaps generated",
+"  --query=paper                  Show predefiend `paper' sizes",
+"  --query=types                  Show available bitmap formats",
+"  --resolution=n                 Output resolution, pixels-per-inch",
+"  --start-page=n, --end-page=n, --page-range=spec",
+"                                 Control which pages are processed",
+"  --scalefactor=n                Scale output bitmap down by n",
+"  --verbose=[quiet|silent]       Suppress chatter",
+"  -V, --version                  Show version and configuration info",
+    };
+    int nstrings = sizeof(helpstrings)/sizeof(helpstrings[0]);
+    for (int i=0; i<nstrings; i++)
+	cerr << helpstrings[i] << endl;
 }
 
 void Usage (string msg)
