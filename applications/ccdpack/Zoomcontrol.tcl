@@ -53,6 +53,20 @@
          itk_component add control {
             frame [ childsite ].control
          }
+         itk_component add zoom {
+            menubutton $itk_component(control).zoom \
+               -width 4 \
+               -relief raised \
+               -menu $itk_component(control).zoom.menu
+         }
+         set menubutton $itk_component(zoom)
+         itk_component add menu {
+            menu $menubutton.menu
+         }
+         set menu $itk_component(menu)
+
+
+
          itk_component add zoomin {
             button $itk_component(control).zoomin \
                -text "+" \
@@ -68,7 +82,7 @@
                   -width 3
          }
          pack $itk_component(zoomin) \
-              $itk_component(zoomnum) \
+              $itk_component(zoom) \
               $itk_component(zoomout) \
               -side left
          pack $itk_component(control)
@@ -97,10 +111,12 @@
 #  Public variables.
 ########################################################################
 
+
 #-----------------------------------------------------------------------
       public variable max { 8 } {
 #-----------------------------------------------------------------------
          set maxlevel [ factor2level $max ]
+         menuconfig
       }
 
 
@@ -108,6 +124,7 @@
       public variable min { 0.05 } {
 #-----------------------------------------------------------------------
          set minlevel [ factor2level $min ]
+         menuconfig
       }
 
 
@@ -133,7 +150,7 @@
             configure -value $max 
          }
          set level [ factor2level $value ]
-         $itk_component(zoomnum) configure -text [ level2text $level ]
+         $itk_component(zoom) configure -text [ level2text $level ]
       }
 
 
@@ -141,25 +158,18 @@
 #  Private procedures.
 ########################################################################
 
-#-----------------------------------------------------------------------
-      private proc level2factor { level } {
-#-----------------------------------------------------------------------
-         if { $level >= 0 } {
-            return [ expr 1 + $level ]
-         } else {
-            return [ expr 1.0 / ( 1 - $level ) ]
-         }
+      common factorreps
+      common factors
+      foreach fac { 1/20 1/16 1/12 1/8 1/6 1/4 1/3 1/2 1 2 3 4 6 8 12 } {
+         lappend factorreps $fac
+         lappend factors [ expr "${fac}.0" ]
       }
 
 
 #-----------------------------------------------------------------------
-      private proc level2text { level } {
+      private proc level2factor { level } {
 #-----------------------------------------------------------------------
-         if { $level >= 0 } {
-            return [ expr round( 1 + $level ) ]
-         } else {
-            return "1/[ expr round( 1 - $level ) ]"
-         }
+         return [ lindex $factors $level ]
       }
 
 
@@ -173,20 +183,53 @@
                set factor $min
             }
          }
-         if { $factor >= 1 } {
-            return [ expr round( $factor - 1 ) ]
-         } else {
-            return [ expr 1 - round( 1.0 / $factor ) ]
+         for { set lev 0 } { $lev < [ llength $factors ] } { incr lev } {
+            if { $factor <= [ expr [ lindex $factors $lev ] + 0.0001 ] } {
+               return $lev
+            }
          }
+         return [ expr [ llength $factors ] - 1 ]
       }
 
+
+#-----------------------------------------------------------------------
+      private proc level2text { level } {
+#-----------------------------------------------------------------------
+         if { $level < 0 } {
+            return [ lindex $factorreps 0 ]
+         } elseif { $level > [ llength $factorreps ] } {
+            return [ lindex $factorreps end ]
+         }
+         return [ lindex $factorreps $level ]
+      }
 
 
 ########################################################################
 #  Private methods.
 ########################################################################
+
+#-----------------------------------------------------------------------
       private method zoomer { inc } {
+#-----------------------------------------------------------------------
          configure -value [ zoominc $value $inc ]
+      }
+
+
+#-----------------------------------------------------------------------
+      private method menuconfig { } {
+#-----------------------------------------------------------------------
+#  Clear out the current contents of the menu.
+         $menu delete 0 end
+
+#  Fill up the menu with all the valid values of the zoom factor between
+#  the min and max values.
+         for { set lev $minlevel } { $lev <= $maxlevel } { incr lev } {
+            set tex [ level2text $lev ]
+            set fac [ level2factor $lev ]
+            $menu add command \
+               -label [ level2text $lev ] \
+               -command [ code "$this configure -value $fac" ]
+         }
       }
 
 
@@ -194,9 +237,12 @@
 #  Private variables.
 ########################################################################
 
-      private variable maxlevel  ;# Maximum zoom level
-      private variable minlevel  ;# Minimum zoom level
-      private variable level     ;# The zoom level
+      private variable maxlevel [ expr [ llength $factorreps ] - 1 ]     
+                                       # Maximum zoom level
+      private variable menu           ;# Path name of the menu widget
+      private variable menubutton     ;# Path name of the menubutton widget
+      private variable minlevel 0     ;# Minimum zoom level
+      private variable level          ;# The zoom level
 
    }
 
