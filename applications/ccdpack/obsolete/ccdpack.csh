@@ -46,6 +46,9 @@
 #
 #   Define aliases for each application.
 #
+      alias astimp '$CCDPACK_DIR/astimp'
+      alias ccd_astimp '$CCDPACK_DIR/astimp'
+#
       alias calcor '$CCDPACK_DIR/calcor'
       alias ccd_calcor '$CCDPACK_DIR/calcor'
 #
