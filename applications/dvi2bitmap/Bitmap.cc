@@ -11,8 +11,8 @@ int Bitmap::debug_ = 0;
 
 // Coordinates on the bitmap run from 0 to W-1, and 0 to H-1,
 // with point (0,0) in the top left corner.
-Bitmap::Bitmap (int w, int h)
-    : W(w), H(h)
+Bitmap::Bitmap (int w, int h, int bpp=1)
+    : W(w), H(h), bpp_(bpp), transparent_(false)
 {
     B = new Byte[W*H];
     memset ((void*)B, 0, W*H);
@@ -25,9 +25,10 @@ Bitmap::Bitmap (int w, int h)
     cropT = 0;
     cropB = H;
     cropped_ = false;
+    max_colour_ = (1<<bpp_) - 1;
 
     if (debug_ > 1)
-	cerr << "new Bitmap(" << w << ',' << h << ")\n";
+	cerr << "new Bitmap(" << W << ',' << H << ',' << bpp_ << ")\n";
 }
 
 Bitmap::~Bitmap()
@@ -38,7 +39,8 @@ Bitmap::~Bitmap()
 // Paint the bitmap b, which is w x h pixels in size onto the master bitmap, 
 // starting with pixel (x,y).
 // Update bb? as a side-effect.
-// OR the new pixels into place, and crop any parts of the new bitmap
+// Set to max_colour_ any pixels in the master which are non-zero in the 
+// new bitmap, and crop any parts of the new bitmap
 // falling outside the boundary of the master
 void Bitmap::paint (const int x, const int y, const int w, const int h,
 		    const Byte *b)
@@ -56,8 +58,9 @@ void Bitmap::paint (const int x, const int y, const int w, const int h,
     {
 	Byte *P = &B[(y+row)*W+(x+col1)];
 	const Byte *p = &b[row*w+col1];
-	for (int col=col1; col<col2; col++)
-	    *P++ |= *p++;
+	for (int col=col1; col<col2; col++, P++, p++)
+	    if (*p)
+		*P = max_colour_;
     }
     // Note that we update the bounding box to the border of the
     // newly painted bitmap, rather than the position of the first
@@ -91,7 +94,7 @@ void Bitmap::rule (const int x, const int y, const int w, const int h)
 
     for (int row=row1; row<row2; row++)
 	for (int col=col1; col<col2; col++)
-	    B[row*W+col] = 1;
+	    B[row*W+col] = max_colour_;
 
     if (col1 < bbL) bbL = col1;
     if (col2 > bbR) bbR = col2;
@@ -113,6 +116,41 @@ void Bitmap::crop ()
     cropT = bbT;
     cropB = bbB;
     cropped_ = true;
+}
+
+void Bitmap::blur ()
+{
+    if (bbL >= bbR || bbT >= bbB) // nothing there - nothing to do
+	return;			// ...silently
+
+    Byte *newB = new Byte[W*H];
+    memset ((void*)newB, 0, W*H);
+
+    int newbpp = (bpp_ < 2 ? 2 : bpp_);
+    double scale = (double)((1<<newbpp) - 1)/(double)max_colour_;
+    // Blur leaving a 1-pixel margin, to avoid edge effects.  Do edge later.
+    // This could be made more efficient, but it doesn't really matter just now
+    for (int row = bbT+1; row<bbB-1; row++)
+	for (int col = bbL+1; col<bbR-1; col++)
+	    newB[row*W+col]
+		/*
+		= static_cast<int>((B[(row-1)*W+(col-1)] + B[(row-1)*W+(col+1)]
+				  + B[(row+1)*W+(col-1)] + B[(row+1)*W+(col+1)]
+				    + B[row*W+col]*4)
+				   / 8.0 // weighting
+				   * scale
+				   + 0.5);
+		*/
+		= static_cast<int>((  B[row*W+col-1]   + B[row*W+col+1]
+				    + B[(row+1)*W+col] + B[(row-1)*W+col]
+				    + B[row*W+col]*2)
+				   / 6.0 // weighting
+				   * scale
+				   + 0.5);
+    delete[] B;
+    bpp_ = newbpp;
+    max_colour_ = (1<<bpp_) - 1;
+    B = newB;
 }
 
 void Bitmap::write (string filename, imageFormats format)
@@ -163,14 +201,18 @@ void Bitmap::write_gif (string filename)
 {
     if (cropped_)
     {
-	GIFBitmap gif(cropR-cropL, cropB-cropT);
+	GIFBitmap gif(cropR-cropL, cropB-cropT, bpp_);
 	for (int row=cropT; row<cropB; row++)
 	    gif.addRow(&B[row*W+cropL]);
+	if (transparent_)
+	    gif.setTransparent();
 	gif.write (filename);
     }
     else
     {
-	GIFBitmap gif(W, H, B);
+	GIFBitmap gif(W, H, B, bpp_);
+	if (transparent_)
+	    gif.setTransparent();
 	gif.write (filename);
     }
 }

@@ -13,6 +13,7 @@
 #include "DviFile.h"
 #include "PkFont.h"
 #include "Bitmap.h"
+#include "version.h"
 
 void Usage (void);
 char *progname;
@@ -71,6 +72,9 @@ main (int argc, char **argv)
 	      case 'L':		// show all fonts
 		show_font_list = 2;
 		break;
+	      case 'v':		// version
+		cout << version_string << '\n';
+		break;
 	      default:
 		Usage();
 	    }
@@ -125,6 +129,8 @@ main (int argc, char **argv)
 		{
 		    pagenum++;
 		    bitmap->crop();
+		    bitmap->blur();
+		    bitmap->setTransparent();
 		    char fn[100];
 		    sprintf (fn, "page%d.gif", pagenum);
 		    bitmap->write(fn);
@@ -203,6 +209,6 @@ DviBug::DviBug(char *fmt,...)
 
 void Usage (void)
 {
-    cout << "Usage: " << progname << " [-f PKpath ] [-r resolution] [-g[dpr]] [-l] dvifile" << '\n';
+    cout << "Usage: " << progname << " [-f PKpath ] [-r resolution] [-g[dpr]] [-lLv] dvifile" << '\n';
     exit (1);
 }

@@ -13,16 +13,18 @@ typedef long int          count_int;
 
 class GIFBitmap {
  public:
-    GIFBitmap (int w, int h, Byte *b);
-    GIFBitmap (int w, int h);
+    GIFBitmap (int w, int h, Byte *b, int bpp=1);
+    GIFBitmap (int w, int h, int bpp=1);
     ~GIFBitmap ();
     void write (string filename);
     void addRow (Byte *b);
+    void setTransparent () { transparent_ = true; }
 
  private:
     Byte *bitmap_;
-    const int w_, h_;
+    const int w_, h_, bpp_;
     int bitmapRows_;
+    bool transparent_;
     const bool myBitmap_;
     void GIFEncode(FILE* fp,
 		  int GWidth, int GHeight,
@@ -30,7 +32,7 @@ class GIFBitmap {
 		  int Background,
 		  int Transparent,
 		  int BitsPerPixel,
-		  int Red[], int Green[], int Blue[]);
+		  int *Red, int *Green, int *Blue);
     void BumpPixel(void);
     int GIFNextPixel(void);
     void Putword(int w, FILE* fp);

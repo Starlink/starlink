@@ -41,8 +41,9 @@
 
 
 // Construct a GIFBitmap from a ready-made bitmap, of size w x h
-GIFBitmap::GIFBitmap (int w, int h, Byte *b)
-    : w_(w), h_(h), bitmap_(b), bitmapRows_(h), myBitmap_(false) 
+GIFBitmap::GIFBitmap (int w, int h, Byte *b, int bpp=1)
+    : w_(w), h_(h), bitmap_(b), bitmapRows_(h), bpp_(bpp),
+      myBitmap_(false), transparent_(false)
 { 
 }
 
@@ -51,8 +52,9 @@ GIFBitmap::GIFBitmap (int w, int h, Byte *b)
 // of the bitmap shortly - for now, initialise the bitmap to receive
 // them, and set myBitmap_ to true, indicating that the bitmap should be
 // deleted in the destructor
-GIFBitmap::GIFBitmap (int w, int h)
-    : w_(w), h_(h), bitmapRows_(0), myBitmap_(true)
+GIFBitmap::GIFBitmap (int w, int h, int bpp=1)
+    : w_(w), h_(h), bitmapRows_(0), bpp_(bpp),
+      myBitmap_(true), transparent_(false)
 {
     bitmap_ = new Byte[w_ * h_];
     bitmapRows_ = 0;
@@ -79,14 +81,37 @@ void GIFBitmap::write (string filename)
     if (bitmapRows_ != h_)
 	throw DviBug ("attempt to GIFBitmap::write with incomplete bitmap");
 
-    int Red[]   = { 255, 0 };
-    int Green[] = { 255, 0 };
-    int Blue[]  = { 255, 0 };
+    // make a colour table, appropriate for bpp_ bits-per-pixel
+    if (bpp_ > 8)
+	throw DviBug ("max of 8 bits-per-pixel");
+    int ncolours = 1<<bpp_;
+    int step = 256 >> bpp_;
+
+    int CT[ncolours];
+    int val;
+    for (int i=0, val=255; i<ncolours-1; i++, val-=step)
+	CT[i] = val;
+    CT[ncolours-1] = 0;
+    //cerr << "GIFBitmap: " << ncolours << " colours:\n";
+    //for (int i=0; i<ncolours; i++)
+    //	cerr << CT[i] << ' ';
+    //cerr << '\n';
+
+    //int Red[]   = { 255, 0 };
+    //int Green[] = { 255, 0 };
+    //int Blue[]  = { 255, 0 };
 
     FILE *F = fopen (filename.c_str(), "wb");
     if (F == 0)
 	throw BitmapError ("can't open GIF file "+filename+" to write");
-    GIFEncode (F, w_, h_, 1, 0, 0, 1, Red, Green, Blue);
+    GIFEncode (F,		// open file
+	       w_, h_,		// width and height of bitmap
+	       1,		// interlace?
+	       0,		// which CT entry is the background?
+	       (transparent_ ? 0 : -1),	// make entry 0 transparent, if req'd
+	       bpp_,		// bits-per-pixel
+	       CT, CT, CT	// colour tables
+	       );
     // GIFEncode closes the stream when it's finished
 }
 
@@ -195,7 +220,7 @@ void GIFBitmap::GIFEncode(FILE* fp,
 	  int Background,
 	  int Transparent,
 	  int BitsPerPixel,
-	  int Red[], int Green[], int Blue[])
+	  int *Red, int *Green, int *Blue)
 {
         int B;
         int RWidth, RHeight;
