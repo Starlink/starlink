@@ -89,6 +89,7 @@
       EXTERNAL        		ADI2_FCLONE
       EXTERNAL        		ADI2_FCLOSE
       EXTERNAL        		ADI2_FCOMIT
+      EXTERNAL        		ADI2_FOBNAM
       EXTERNAL        		ADI2_FTRACE
       EXTERNAL        		ADI2_NEWLNK_ARR
 
@@ -120,6 +121,8 @@
       CALL ADI_DEFMTH( 'FileClone(_FITSfile,_CHAR)', ADI2_FCLONE, DID,
      :                 STATUS )
       CALL ADI_DEFMTH( 'FileCommit(_FITSfile)', ADI2_FCOMIT, DID,
+     :                   STATUS )
+      CALL ADI_DEFMTH( 'FileObjName(_FITSfile)', ADI2_FOBNAM, DID,
      :                   STATUS )
       CALL ADI_DEFMTH( 'FileTrace(_FITSfile)', ADI2_FTRACE, DID,
      :                   STATUS )

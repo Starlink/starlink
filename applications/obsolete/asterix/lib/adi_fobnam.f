@@ -1,4 +1,4 @@
-      SUBROUTINE ADI_FOBNAM( ID, NLEV, PATH, FILE, STATUS )
+      SUBROUTINE ADI_FOBNAM( ID, NAME, NLEN, STATUS )
 *+
 *  Name:
 *     ADI_FOBNAM
@@ -96,6 +96,10 @@
 
 *  Status:
       INTEGER 			STATUS             	! Global status
+
+*  External References:
+      EXTERNAL			CHR_LEN
+        INTEGER			CHR_LEN
 
 *  Local Variables:
       INTEGER			FID			! File object

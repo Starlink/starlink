@@ -90,6 +90,7 @@
       EXTERNAL			ADI1_FCLONE
       EXTERNAL			ADI1_FCLOSE
       EXTERNAL			ADI1_FCREAT
+      EXTERNAL			ADI1_FOBNAM
       EXTERNAL			ADI1_FTRACE
 
       EXTERNAL			BDI1_SETLNK
@@ -121,6 +122,8 @@
      :                 STATUS )
       CALL ADI_DEFMTH( 'FileClose(_HDSfile)', ADI1_FCLOSE, DID,
      :                   STATUS )
+      CALL ADI_DEFMTH( 'FileObjName(_HDSlocator)', ADI1_FOBNAM, DID,
+     :                 STATUS )
       CALL ADI_DEFMTH( 'FileTrace(_HDSlocator)', ADI1_FTRACE, DID,
      :                 STATUS )
 
