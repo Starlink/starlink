@@ -139,9 +139,9 @@
         END IF
 
 *    Is the file linked to a USI parameter
-        CALL ADI_THERE( FID, '.USI_PAR', THERE, STATUS )
+        CALL ADI_THERE( ID, '.USI_PAR', THERE, STATUS )
         IF ( THERE ) THEN
-          CALL ADI_CGET0C( FID, '.USI_PAR', PAR, STATUS )
+          CALL ADI_CGET0C( ID, '.USI_PAR', PAR, STATUS )
           PLEN = CHR_LEN( PAR )
           FILE = FILE(:CLEN)//' (associated with parameter '/
      :                /PAR(:PLEN)//')'
