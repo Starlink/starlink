@@ -760,7 +760,7 @@ CSUBSRC = ccd1_exec.c slv.c find_file.c \
 
 REDTASKS = makebias debias makecal calcor makeflat flatcor
 REGTASKS = findcent idicurs findobj register tranlist plotlist findoff \
- pairndf ccdedit makemos tranndf drizzle astimp astexp wcsreg wcsedit outline
+ pairndf ccdedit makemos tranndf drizzle astimp astexp wcsreg wcsedit bounds
 RESTASKS = ccdsetup ccdclear ccdnote ccdshow ccdndfac ccdgenerate \
  picinfo import present schedule ccdimp ccdexp
 SCRTASKS = reduce ccdalign xreduce
@@ -817,7 +817,7 @@ IRAF_HELP = calcor.hlp makebias.hlp ccdalign.hlp makecal.hlp \
    debias.hlp schedule.hlp findcent.hlp tranlist.hlp findobj.hlp \
    tranndf.hlp findoff.hlp typical_initial_reduction.hlp flatcor.hlp \
    use_globals.hlp idicurs.hlp xreduce.hlp import.hlp \
-   drizzle.hlp astimp.hlp astexp.hlp wcsreg.hlp wcsedit.hlp outline.hlp
+   drizzle.hlp astimp.hlp astexp.hlp wcsreg.hlp wcsedit.hlp bounds.hlp
 
 #  Name of the help task.
 
@@ -845,7 +845,7 @@ DATA_FILES = ccdtest.ard ccdtest_obj.dat ccdtest2_obj.dat ccdtest.ast \
 #  Lists of Latex and hypertext documents.
 
 LATEX_DOCS = sun139.tex sun139geo.eps sun139reg.eps sun139red.eps \
-             sun139mos.eps sun139driz.eps sun139outsky.eps sun139.outclear.eps
+             sun139mos.eps sun139driz.eps sun139outsky.eps sun139outclear.eps
 HYPERTEXT_DOCS = sun139.htx
 HYPERTEXT_HELP = ccdpack.htx
 
@@ -2678,9 +2678,9 @@ makebias.o: CCD1_PAR NDF_PAR NUM_DEC_CVT NUM_DEF_CVT SAE_PAR
 makecal.o: CCD1_PAR NDF_PAR NUM_DEC_CVT NUM_DEF_CVT SAE_PAR
 makeflat.o: CCD1_PAR DAT_PAR NDF_PAR SAE_PAR
 makemos.o: CCD1_MOSCM CCD1_MOSPR CCD1_PAR FIO_ERR FIO_PAR NDF_PAR PAR_ERR PRM_PAR SAE_PAR
-pairndf.o: CCD1_PAR MSG_PAR AST_PAR SAE_PAR
+pairndf.o: CCD1_PAR MSG_PAR AST_PAR SAE_PAR DAT_PAR GRP_PAR
 picinfo.o: SAE_PAR
-plotlist.o: CCD1_PAR FIO_PAR SAE_PAR
+plotlist.o: CCD1_PAR FIO_PAR SAE_PAR USER_ERR
 present.o: CCD1_PAR PAR_ERR SAE_PAR GRP_PAR
 pthlpo.o: DAT_PAR HLPCMD.INC PAR_PAR SAE_PAR
 reduce.o: MSG_PAR PRM_PAR PSX_ERR SAE_PAR
@@ -2692,7 +2692,7 @@ tranndf.o: AST_PAR CCD1_PAR DAT_PAR MSG_PAR NDF_PAR PRM_PAR SAE_PAR TRN_PAR
 drizzle.o: AST_PAR CCD1_MOSCM CCD1_MOSPR CCD1_PAR DAT_PAR NDF_PAR NUM_DEC_CVT NUM_DEF_CVT PAR_ERR PRM_PAR SAE_PAR
 wcsreg.o: AST_PAR CCD1_PAR FIO_PAR SAE_PAR
 wcsedit.o: AST_PAR PAR_ERR SAE_PAR GRP_PAR
-outline.o: SAE_PAR AST_PAR NDF_PAR PRM_PAR GRP_PAR PAR_PAR PAR_ERR CCD1_PAR
+bounds.o: SAE_PAR AST_PAR NDF_PAR PRM_PAR GRP_PAR PAR_PAR PAR_ERR CCD1_PAR
 ccd1_setex.o: SAE_PAR PSX_ERR
 ccg1_smd1.o: NUM_CMN NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR
 ccg1_wtm4.o:NUM_DEC_CVT NUM_DEF_CVT SAE_PAR
