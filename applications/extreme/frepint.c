@@ -20,7 +20,7 @@
 *     more than 72 characters long are avoided (unless they were there
 *     in the first place).
 *
-*     Some effort is made to make the output aesthetically pleasing:
+*     Some attention is paid to the aesthetic qualities of the output:
 *     line breaks are done, where possible, following the usage in, e.g.,
 *     KAPPA.  An attempt is made copy the style of case usage and bracket 
 *     spacing from the input.
@@ -31,8 +31,13 @@
 *     These constructions are:
 *        - INTEGER * n declarations which already exist in the code 
 *          (these are not modified)
-*        - The IOSTAT keyword in I/O statements
 *        - EQUIVALENCE statements
+*        - Use of INTEGER Specific names for standard intrinsic functions
+*          (IABS, ISIGN, IDIM, MAX0, AMAX0, MIN0, IMIN0)
+*
+*     One construction which can cause trouble which is NOT spotted by
+*     this program is use of integer literals as actual arguments in 
+*     subroutine/function calls.
 *
 *  Notes:
 *     Although this program behaves as a filter, it is written on
@@ -133,6 +138,8 @@
       int nc;
       int nspc;
       int skipspc;
+      int t;
+      int t1;
       int tbufsiz = 0;
       int tok;
       char c;
@@ -270,20 +277,20 @@
 
 /* Any other token. */
          else {
-            if ( tbuf[ i ].tokval == INTEGER && tbuf[ i + 1 ].tokval == '*' ) {
+            t = tbuf[ i ].tokval;
+            t1 = tbuf[ i + 1 ].tokval;
+            if ( t == INTEGER && t1 == '*' ) {
                fprintf( stderr, "%s: INTEGER*%s declaration not changed\n", 
                                 name, tbuf[ i + 2 ].strmat );
             }
-            if ( tbuf[ i ].tokval == EQUIVALENCE ) {
+            if ( t == EQUIVALENCE ) {
                fprintf( stderr, "%s: EQUIVALENCE statement found\n", name );
             }
-            if ( tbuf[ i ].tokval == IOSTAT && 
-                 tbuf[ i + 1 ].tokval == '=' &&
-                 tbuf[ i + 2 ].tokval == IDENTIFIER ) {
-               fprintf( stderr, "%s: IOSTAT used with variable %s\n", name, 
-                        tbuf[ i + 2 ].strmat );
+            if ( ( t == IABS || t == ISIGN || t == IDIM || t == MAX0 ||
+                   t == AMAX0 || t == MIN0 || t == AMIN0 ) && t1 == '(' ) {
+               fprintf( stderr, "%s: INTEGER-specific intrinsic name %s\n",
+                               name, tbuf[ i ].strmat );
             }
-
          }
       }
 
