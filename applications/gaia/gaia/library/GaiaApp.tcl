@@ -426,7 +426,7 @@ itcl::class gaia::GaiaApp {
    #  completes).
    public variable notify {} {}
 
-   #  Notify command to be executed when a parameter value ha sbeen
+   #  Notify command to be executed when a parameter value has been
    #  obtained. The command should accept two arguments; the parameter 
    #  name and the parameter value.
    public variable parnotify {} {}

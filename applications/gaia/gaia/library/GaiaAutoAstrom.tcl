@@ -130,6 +130,14 @@ itcl::class gaia::GaiaAutoAstromSimple {
       add_short_help $itk_component(cancel) \
          {Close window and restore original astrometric calibration}
 
+      #  Add a button to reset the WCS to the last version.
+      itk_component add reset {
+         button $itk_component(actionframe).reset -text Reset \
+            -command [code $this reset_]
+      }
+      add_short_help $itk_component(reset) \
+         {Reset image to the original astrometric calibration}
+
       itk_component add status {
          Scrollbox $w_.status
       }
@@ -143,6 +151,7 @@ itcl::class gaia::GaiaAutoAstromSimple {
       pack $itk_component(actionframe) -side bottom -fill x -pady 5 -padx 5
       pack $itk_component(accept) -side right -expand 1 -pady 3 -padx 3
       pack $itk_component(cancel) -side right -expand 1 -pady 3 -padx 3
+      pack $itk_component(reset) -side right -expand 1 -pady 3 -padx 3
       pack $itk_component(fit)   -side right -expand 1 -pady 3 -padx 3
 
       #  Create an object for dealing with image names.
@@ -172,10 +181,7 @@ itcl::class gaia::GaiaAutoAstromSimple {
 
       #  Restore WCS system to the original (if available).
       if { $itk_option(-rtdimage) != {} } {
-         catch {
-            $itk_option(-rtdimage) astrestore original
-         }
-         notify_
+         reset_
       }
       if { $itk_option(-really_die) } {
          delete object $this
@@ -186,13 +192,21 @@ itcl::class gaia::GaiaAutoAstromSimple {
 
    #  Withdraw window and write new WCS to image permanently.
    public method accept {} {
-      set_wcs_
       $itk_option(-rtdimage) astfix
       if { $itk_option(-really_die) } {
          delete object $this
       } else {
          wm withdraw $w_
       }
+   }
+
+   #  Reset the WCS of the displayed image back to the original
+   #  version.
+   protected method reset_ {} {
+      catch {
+         $itk_option(-rtdimage) astrestore original
+      }
+      notify_
    }
 
    #  Run autoastrom to perform the fit.
@@ -210,11 +224,13 @@ itcl::class gaia::GaiaAutoAstromSimple {
             #  if not already done.
             if { $autoastrom_ == {} } {
                set autoastrom_ [GaiaForeignExec \#auto \
+                                   -use_error 1 \
+                                   -keepnewlines 0 \
                                    -show_output $itk_component(status) \
                                    -preprocess [code $this clean_] \
                                    -notify [code $this completed_] \
-                                   -application $env(AUTOASTROM_DIR)/autoastrom]
-                                   #-use_error 1
+                                   -application \
+                                   $env(AUTOASTROM_DIR)/autoastrom]
             }
 
             #  Clear the log window.
@@ -224,7 +240,7 @@ itcl::class gaia::GaiaAutoAstromSimple {
             catch {::file delete -force "autoastrom_tmp"} msg
             puts "delete msg = $msg"
 
-            catch {::file delete -force "solution.fits"} msg
+            catch {::file delete -force "$solution_"} msg
             puts "delete msg = $msg"
 
             #  Run program, monitoring output...
@@ -233,12 +249,12 @@ itcl::class gaia::GaiaAutoAstromSimple {
                --match=match \
                --skycatconfig=$env(CATLIB_CONFIG) \
                --catalogue=ngc1275.TAB \
-               --xxxccdcat=ngc1275.autoext \
                --noinsert \
-               --keepfits=solution.fits \
+               --keepfits=$solution_ \
                --temp=autoastrom_tmp \
                --keeptemps \
                $diskimage"
+            #--xxxccdcat=ngc1275.autoext
 
             # Use local catalogues...
 
@@ -248,25 +264,24 @@ itcl::class gaia::GaiaAutoAstromSimple {
             puts "$env(http_proxy)"
             catch {eval $cmd} msg
             puts "msg = $msg"
-
          }
       }
    }
 
    protected method completed_ {} {
       puts "Completed"
-      if { [file exists "solution.fits"] } {
-         puts "solution.fits exists"
-      } else {
-         puts "solution.fits doesn't exist"
-      }
+      if { [file exists $solution_] } {
+         puts "$solution_ exists"
 
-      #  Read the channel to create an AST object and then replace
-      #  the current WCS using it.
-      #      $image astread $chan
-      #      $image astreplace
-      #      notify_
-      #      $image astdelete $chan
+         #  Need to read the file to extract the solution so GAIA can
+         #  display this. Simplest thing to do is read as a new image
+         #  and copy the WCS.
+         $itk_option(-rtdimage) astcopy $solution_
+         $itk_option(-rtdimage) astreplace
+         notify_
+      } else {
+         puts "$solution_ doesn't exist"
+      }
    }
 
    #  Do the notify_cmd option if needed.
@@ -312,6 +327,8 @@ itcl::class gaia::GaiaAutoAstromSimple {
    #  Common variables: (shared by all instances)
    #  -----------------
 
+   #  Name of file to store the solution.
+   common solution_ GaiaAstSolution.fits
 
 #  End of class definition.
 }

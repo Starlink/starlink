@@ -88,11 +88,11 @@
 #     Copyright (C) 1998 Central Laboratory of the Research Councils
 
 #  Authors:
-#     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     PWD: Peter Draper (STARLINK - Durham University)
 #     {enter_new_authors_here}
 
 #  History:
-#     14-SEP-1998 (PDRAPER):
+#     14-SEP-1998 (PWD):
 #        Original version.
 #     {enter_further_changes_here}
 
@@ -113,11 +113,6 @@ itcl::class gaia::GaiaForeignExec {
 
       #  Create the command queue.
       set command_queue_ [Queue \#auto]
-
-      #  Set trace's on common variables that get the output from the
-      #  application.
-      trace variable [scope forout_($this)] w [code $this inform_]
-      trace variable [scope forerr_($this)] w [code $this error_]
 
       #  And evaluate any configuration options.
       if { $args != {} } {
@@ -185,10 +180,12 @@ itcl::class gaia::GaiaForeignExec {
          set forerr_($this) {}
          set forout_($this) {}
          catch {eval "blt::bgexec \[scope forret_($this)\] \
-                         -keepnewline 1 \
+                         -keepnewline $keepnewlines \
                          -error \[scope forerr_($this)\] \
-                         -update \[scope forout_($this)\] \
-                         $application $args"} msg
+                         -output \[scope forout_($this)\] \
+                         -onoutput \[code $this inform_\] \
+                         -onerror \[code $this error_\] \
+                         -- $application $args"} msg
          if { $msg != "" } {
             info_dialog "$msg"
          }
@@ -220,16 +217,15 @@ itcl::class gaia::GaiaForeignExec {
    }
 
    #  Method to deal with messages on stdout.
-   private method inform_ {args} {
+   private method inform_ {msg} {
 
       #  If request use a callback to preprocess the output (this
       #  allows the user to clean the output of escape sequences).
       if { $preprocess != {} } {
-         set output [$preprocess $forout_($this)]
+         set output [$preprocess $msg]
       } else {
-         set output $forout_($this)
+         set output $msg
       }
-      set forout_($this) {}
 
       #  Write output from task into window if required.
       if { $show_output_ } {
@@ -242,21 +238,17 @@ itcl::class gaia::GaiaForeignExec {
             set show_output_ 0
          }
       }
-
-      #  Keep a copy of the output for parsing.
-      append output_ "$output"
    }
 
    #  Method to deal with messages on stderr.
-   private method error_ {args} {
-      if { $forerr_($this) != {} } {
+   private method error_ {msg} {
+      if { $msg != "" } { 
          if { $use_error } {
-
             #  Ordinary message arrive on standard error, just pass on
             #  as if ordinary text.
-            set forout_($this) $forerr_($this)
+            inform_ $msg
          } else {
-            error_dialog "$shortname_: $forerr_($this)"
+            error_dialog "$shortname_: $msg"
          }
       }
    }
@@ -328,6 +320,9 @@ itcl::class gaia::GaiaForeignExec {
    #  preprocessing (say to remove escape sequences).
    public variable preprocess {} {}
 
+   #  Whether to not strip extra newlines from the command output.
+   public variable keepnewlines 1
+
    #  Protected variables: (available to instance)
    #  --------------------
 
@@ -345,9 +340,6 @@ itcl::class gaia::GaiaForeignExec {
 
    #  The name of the command queue.
    protected variable command_queue_
-
-   #  All the output from the application.
-   protected variable output_ {}
 
    #  Scrollbox to contain output from application.
    protected variable Scrollbox_ {}
