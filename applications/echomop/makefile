@@ -401,11 +401,11 @@ LDFLAG2 =
 
 #  Linker command to link C main programs with Fortran subroutins and
 #  libraries (and C functions).
- 
+
 CFLINK = $(FC) -O
- 
+
 #  Extra link libraries for CFLINK.
- 
+
 CFLIBS =
 
 #  Location of FIGARO libraries.
@@ -444,7 +444,7 @@ PKG_LINK = ECHOMOP
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 #  %%VERSION%%
-PKG_VERS = 3.3-6
+PKG_VERS = 3.3-6b1
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the
@@ -585,7 +585,7 @@ PLATFORM_F =
 #  C routines required for building the package.  This is just a list of
 #  all the C source files.
 
-C_ROUTINES = ech_system.c ech_zero_init2.c ech_mean_median.c
+C_ROUTINES = ech_system.c ech_zero_init2.c ech_mean_median.c ech_parse_option.c
 
 #  List of applications/tasks in monolith.
 
@@ -1589,6 +1589,23 @@ do_test:
 #  Note the test has been run.
 	@ touch .TESTED_$(SYSTEM)
 
+# Other regression test, of components.
+.SUFFIXES: .testdiff .testexe
+.testexe.testdiff:
+	./$(<) >$(@:.testdiff=).stdout 2>$(@:.testdiff=).stderr
+	diff $(@:.testdiff=).correct $(@:.testdiff=).stdout >$@
+
+test_ech_parse_option.testexe: test_ech_parse_option.o ech_parse_option.o
+	$(FC) -o $@ test_ech_parse_option.o ech_parse_option.o
+#test_ech_parse_option.testdiff: test_ech_parse_option.testexe
+
+#test_ech_parse_option.testdiff: \
+#		test_ech_parse_option test_ech_parse_option.correct
+#	./test_ech_parse_option \
+#		>test_ech_parse_option.stdout \
+#		2>test_ech_parse_option.stderr \
+#	diff test_ech_parse_option.correct test_ech_parse_option.stdout >$@
+
 #  export: Export the installed system.
 #  -----------------------------------
 #
@@ -1755,7 +1772,7 @@ $(PKG_NAME)_test.tar:
 #  echmono.f on VERSION, but some makes don't like a file having two
 #  dependencies).
 makefile: VERSION
-	./propagate-version makefile echmono.f
+	./propagate-version makefile echmono.f doc/sun152/sun152.tex
 
 #  clean: Clean up the source directory.
 #  ------------------------------------
@@ -1769,6 +1786,7 @@ clean:
               $(MONO_OBJECT) $(HELP_SOURCES) $(HELPTASK_SOURCE) \
               $(HELPTASK_SOURCE:.c=.o) junk.sdf \
               1>/dev/null 2>/dev/null
+	@- rm -f *.testexe *.testdiff test_*.stderr test_*.stdout
 	@ echo
 	@ echo '*** Intermediate files removed'
 	@ echo
