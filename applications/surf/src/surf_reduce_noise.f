@@ -75,6 +75,9 @@
 *     November 1998
 *       Converted to SURF (TIMJ)
 *     $Log$
+*     Revision 1.6  2003/04/02 02:58:24  timj
+*     Protect bad pixels when changing type with VEC
+*
 *     Revision 1.5  1999/08/03 20:01:37  timj
 *     Add copyright message to header.
 *     Minor fixes to header style.
@@ -716,7 +719,7 @@
                CALL VEC_RTOR(.FALSE., 1,
      :              %VAL(OUT_VARIANCE_PTR + (N_BOLS + I-1) * VAL__NBR ),
      :              CAL_VARIANCE, IERR, NERR, STATUS)
-               CALL VEC_UBTOI(.FALSE., 1,
+               CALL VEC_UBTOI(.TRUE., 1,
      :              %VAL(OUT_QUALITY_PTR + (I-1) * VAL__NBUB ),
      :              DEMOD_QUALITY, IERR, NERR, STATUS)
 

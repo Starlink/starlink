@@ -114,6 +114,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.14  2003/04/02 02:58:31  timj
+*     Protect bad pixels when changing type with VEC
+*
 *     Revision 1.13  2002/09/14 03:58:13  timj
 *     Update copyright
 *
@@ -572,13 +575,13 @@
          DO I = 1, N_BEAM
 
 *     Now the X positions
-            CALL VEC_DTOR(.FALSE., N_PTS, 
+            CALL VEC_DTOR(.TRUE., N_PTS, 
      :           %VAL(BOL_RA_PTR + VAL__NBD * N_PTS * (I - 1)),
      :           %VAL(OUT_DATA_PTR + VAL__NBR * (2 * I - 1) * N_PTS ),
      :           IERR, NERR, STATUS)
 
 *     Now Y
-            CALL VEC_DTOR(.FALSE., N_PTS, 
+            CALL VEC_DTOR(.TRUE., N_PTS, 
      :           %VAL(BOL_DEC_PTR + VAL__NBD * N_PTS * (I - 1)),
      :           %VAL(OUT_DATA_PTR + VAL__NBR * (2 * I) * N_PTS ),
      :           IERR, NERR, STATUS)
@@ -644,7 +647,7 @@
          CALL NDF_AMAP(OUTNDF, 'CENTRE', 2, '_DOUBLE', 'WRITE',
      :        OUT_A_PTR, ITEMP, STATUS)
 
-         CALL VEC_DTOD(.FALSE., N_POS, 
+         CALL VEC_DTOD(.TRUE., N_POS, 
      :        %VAL(LST_PTR(1)), %VAL(OUT_A_PTR),
      :        IERR, NERR, STATUS)
 
