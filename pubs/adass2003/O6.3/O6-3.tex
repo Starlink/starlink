@@ -1,9 +1,8 @@
 \documentclass[11pt,twoside]{article}
 
-%%% XXX Comment out or remove before submission!!!  Also remove
-%%% reference to \RCSRevision in \marginpar
-\def\RCS$#1: #2 ${\expandafter\def\csname RCS#1\endcsname{#2}}
-\RCS$Revision$
+%%% XXX Comment out before submission!!!
+%%%\def\RCS$#1: #2 ${\expandafter\def\csname RCS#1\endcsname{#2}}
+%%%\RCS$Revision$
 
 \usepackage{adassconf}
 
@@ -17,14 +16,16 @@
 \email{norman@astro.gla.ac.uk}
 
 \title{Data Models in the VO: How Do They Make Code Better?}
-\marginpar{[v\RCSRevision]}% XXX Remove before submission
+%%%\marginpar{[v\RCSRevision]}
 \titlemark{Data Models in the VO}
 
-\author{Norman Gray\altaffilmark{1},
+\author{Norman Gray,
         David L. Giaretta,
-        David S. Berry\altaffilmark{2},
+        David S. Berry,
         Malcolm J. Currie,
-        Mark B. Taylor\altaffilmark{3}}
+        Peter W. Draper,
+        Mark B. Taylor\altaffilmark{1}%
+        }
 \affil{Starlink Project,
         Rutherford Appleton Laboratory,
         Chilton,
@@ -32,32 +33,47 @@
         OX11 0QX,
         UK}
 
-\altaffiltext{1}{Department of Physics and Astronomy,
-        University of Glasgow,
-        Glasgow,
-        G12 8QQ, 
-        UK}
-
-\altaffiltext{2}{Centre for Astrophysics,
-        University of Central Lancashire,
-        Preston,
-        PR1 2HE,
-        UK}
-
-\altaffiltext{3}{Department of Physics,
-        University of Bristol,
-        Tyndall Avenue,
-        Bristol,
-        BS8 1TL,
-        UK}
+\altaffiltext{1}{Alternate affiliations:
+NG,
+%        Department of Physics and Astronomy,
+        University of Glasgow%,
+%        Glasgow,
+%        G12 8QQ, 
+%        UK%
+;
+DSB,
+%        Centre for Astrophysics,
+        University of Central Lancashire%,
+%        Preston,
+%        PR1 2HE,
+%        UK%
+;
+PWD,
+%        Department of Physics, 
+        University of Durham%, 
+        %Rochester Building, 
+        %Science Laboratories, 
+        %South Road, 
+%        Durham, DH1 3LE, 
+%        UK%
+;
+MBT,
+%        Department of Physics,
+        University of Bristol%,
+%        %Tyndall Avenue,
+%        Bristol,
+%        BS8 1TL,
+%        UK%
+        }
 
 \paindex{Gray, N.}
 \aindex{Giaretta, D. L.}
-\aindex{Currie, M. J.}
 \aindex{Berry, D. S.}
+\aindex{Currie, M. J.}
+\aindex{Draper, P. W.}
 \aindex{Taylor, M. B.}
 
-\authormark{Gray, Giaretta, Berry, Currie \& Taylor}
+\authormark{Gray, Giaretta, Berry, Currie, Draper \& Taylor}
 
 \keywords{Virtual Observatory, data models, usability, Starlink}
 
@@ -67,16 +83,17 @@
 Data Models exist in people's heads.  Data modelling consists of making
 these explicit on paper, so that (a) we can discover if there is more
 than one important model, and (b) we can develop using the model which
-has the best impedance match with the community being targeted.
+%has the best impedance match with the community being targeted.
+has the best impedance match with the targeted community.
 %Thus
 %modelling is not just about communications -- about bits (or angle
 %brackets!) on the wire -- but is a software quality and usability
 %issue.
 
 We contend that there is in fact more than one model relevant to the
-VO, and that while the VOTable model is an excellent and valuable fit
-to the archivists' model of data, it may be a poor match for many
-users or (which is much the same thing) for the software written to
+Virtual Observatory (VO), and that while the VOTable model is a
+valuable fit to the archivists' model of data, it may be a poor match
+for many users or (much the same thing) for the software written to
 service the sort of end-user astronomical applications which the VO
 targets.
 
@@ -102,11 +119,11 @@ think; and conversely, if we wish to have and manipulate a thought, we
 must find some language to express it.
 
 All this talk of languages matters to us, since when we create
-software systems, we are often creating a `language' -- in a
+software systems, we are generally creating a `language' -- in a
 user-interface, an API or a protocol -- which users must employ to
 interact with the underlying system, be it an application, a library,
-or a remote service.  Each of the user, the language and the system
-has a \emph{model} associated with it (see Figure~\ref{f:models}), and
+or a remote service.  The user, the language and the system each
+have a \emph{model} associated with them (see Figure~\ref{f:models}), and
 if there is a good three-way match between the models,
 %If there is a good
 %three-way match between the concepts in the user's head, the concepts
@@ -121,7 +138,7 @@ correct code faster, and help produce an application which will be
 usable by its eventual mouse-wielding audience.
 
 In some cases this match is reasonably obvious (think of the web and
-either HTML or HTTP); in other cases more work is involved (unix shell
+either HTML or HTTP); in other cases more work is involved (Unix shell
 language is tightly bound to the underlying system, but it takes
 effort for the user to acquire the corresponding model); and in other
 situations (notoriously video recorder interfaces) the complete
@@ -137,18 +154,19 @@ almost unusable.
 mediate between them, all have potentially separate implicit models.}
 \end{figure}
 
-Ideally, then, there is a single model which our user thinks with
-(possibly with the help of documentation), the language expresses, and
-the underlying system implements; it is the rendezvous which helps the
-system as a whole hang together.  If the model is made explicit during
-the development process, then it can itself be examined, criticised,
-and checked for consistency with itself and with the external system
-it is supposed to model, whether that is an archive or a `quantity'.
-The Sapir-Whorf hypothesis suggests that it is only once the model is
-itself part of the language of development, that we can think with it
-and talk about it.  Thus this is a software quality and usability issue; it
-is an abstraction with the concrete goal of freeing software design
-from the details of any particular implementation.
+Ideally, then, there is a single model, which our user thinks with
+(possibly with the help of documentation), which the language
+expresses, and which the underlying system implements; it is the
+rendezvous which helps the system as a whole hang together.  If the
+model is made explicit during the development process, then it can
+itself be examined, criticised, and checked for consistency with
+itself and with the external system it is supposed to model, whether
+that is an archive or a `quantity'.  The Sapir-Whorf hypothesis
+suggests that it is only once the model is itself part of the language
+of development, that we can think with it and talk about it.  Thus
+this is a software quality and usability issue; it is an abstraction
+with the concrete goal of freeing software design from the details of
+any particular implementation.
 
 It is important to note that the interface language's syntax is not a
 model.  Instead, that syntax should be chosen so as to faithfully
@@ -201,7 +219,7 @@ lead the process (this was arguably the case for UCD1).  Another is to confront
 the problem, acknowledge that our choice of language is not neutral,
 and make sure that choice is a good one.  A third is to choose a
 more primitive modelling language, which will push fewer things into
-the model.  We will return to this question in section~\ref{s:techniques}
+the model.  We will return to this question in Section~\ref{s:techniques}
 
 
 
@@ -223,10 +241,12 @@ match.
 Several of the systems in the current VO use VOTable
 syntax (Williams et~al.\ 2002).  Despite this, we claim that they do
 not all use the underlying VOTable data model.
-
+%
 VOTable is excellent as a way of archiving catalogue metadata, and
 encoding \emph{all} the available information about a catalogue or image.
-This comes about because VOTable is extremely expressive, recursive and
+This comes about because VOTable is
+%extremely
+expressive, recursive and
 flexible, and these are advantages for many users, with the result that
 there is a good match between the user, system and (VOTable) language.
 There is another category of users, however, who do not need or want this
@@ -238,15 +258,18 @@ and so cannot afford the luxury of reading documentation and building
 in to their application knowledge of the various ways that a set of data
 providers have exploited VOTable's flexibility.  The Simple Image Access
 (SIA) protocol implicitly uses this simple model at both the user and
-system ends, even though it uses in its responses the VOTable syntax,
-which implies a potentially much more complicated model.  This
+system ends, even though it uses in its responses the VOTable syntax.
+%which implies a potentially much more complicated model.
+This
 dissonance between models is a potential usability problem, and is
-addressable by using an alternative model such as that implied by HDX
-(Giaretta et~al.\ 2003).
+addressable by using an alternative model such as that
+of % implied by
+HDX (Giaretta et~al.\ 2003).
 
-The UCD system implies a third distinct data model, corresponding to a
-distinct constituency which is interested in metadata rather than
-pixels, and whose focus is on registries rather than image viewers.
+The UCD system (Derriere et~al.\ 2004) implies a third distinct data
+model, corresponding to a distinct constituency which is interested in
+metadata rather than pixels, and whose focus is on registries rather
+than image viewers.
 
 This (Kuhnian) incommensurability is not a defect which can be evaded
 by a yet more comprehensive Grand Unified Data Model; instead, it
@@ -270,116 +293,134 @@ say, is the error in an RA:
 _x rdf:type :pos.eq.ra .
 _x :stat.err #raerr .
 \end{verbatim}
-(this is RDF `notation3', and expresses in detail that there
+This is RDF `notation3', and expresses in detail that there
 exists a thing
 {\catcode`\_=12 \texttt{_x}} % plain \_ looks too thin, so make _ an `other'
-which is of type \texttt{pos.eq.ra}, and that
-{\catcode`\_=12 \texttt{_x}}
+that is of type \texttt{pos.eq.ra}, and
+% that {\catcode`\_=12 \texttt{_x}}
 has a property \texttt{stat.err} which is in the URL
 \texttt{\#raerr}; however the details are much less important than the
 observation that such a neutral notation exists, and that this 
 notation is distinct from the language we would use to communicate
-this in practice).
+this in practice.
 %
 This prompts a number of valuable questions: \texttt{pos.eq.ra}
 appears to be a type whereas \texttt{stat.err} is a property (in RDF
 terms): did we want this?  Is this what we want a UCD like
-`stat.err;pos.eq.ra' to mean?  If not, what?  For a given proposed UCD
-syntax, what would such a set of statements look like?  Can we
-construct similar sets of statements which our proposed syntax could
-not express?  Such questions are extremely difficult to ask, let alone
-answer, in the
-absence of a notation which is distinct from the syntax under
-discussion.
+\texttt{stat.err;pos.eq.ra} to mean?  If not, what?  For a given
+proposed UCD syntax, what would such a set of statements look like?
+Can we construct similar sets of statements which our proposed syntax
+could not express?  Such questions are extremely difficult to ask, let
+alone answer, without a notation which is distinct from the
+syntax under discussion.
+
+In summary, the VO contains multiple user groups and models, 
+% which are incompatible to a greater or lesser extent,
+and its challenges therefore cannot be met by an approach focused on a
+single central model.  Even when groups have largely compatible models
+(such as the producers and consumers of complicated archive data), the
+mappings between them, and consensus models, must be discussed using a
+notation \emph{which is distinct from the proposed syntax}, if it to
+be possible to discuss that syntax with clarity.
 
 
 \section{Modelling techniques\label{s:techniques}}
 
-Above, we illustrated using RDF as a modelling language; it is one of
-several possibilities.
+RDF, illustrated above, is one of several possible modelling languages.
+%Above, we illustrated using RDF as a modelling language; it is one of
+%several possibilities.
 
-XSchema is the World-Wide Web Consortium's (W3C) standard schema
-language which, as well as validation, is usable is a modelling
-language.  It is both verbose and rather complicated, and its main
-benefit over DTDs is its elaborate type system, which looks familiar
-to those with a database schema background, as well as being the type
-system for a variety of other W3C standards.
+XSchema is the World-Wide Web Consortium's (W3C) \htmladdnormallink
+{standard schema language} {http://www.w3.org/XML/Schema} which, as
+well as validation, is usable is a modelling language.  It is both
+verbose and rather complicated, and its main benefit over DTDs is its
+elaborate type system, which looks familiar to those with a database
+schema background, as well as being the type system for a variety of
+other W3C standards.
 
 The Unified Modelling Language (UML) is intended for designing
 object-oriented systems, and modelling their environments.
 Object-oriented notions of subclassing and object manipulation are
 very natural within UML, in the way that containment, for example, is
 natural in XML schemas.
-
-The Object Management Group (\htmladdnormallink {www.omg.org}
+%
+The Object Management Group (\htmladdnormallink {\texttt{www.omg.org}}
 {http://www.omg.org}) curates the UML standard as part of the larger
 Model Driven Architecture (MDA) as a means of specifying
 platform-independent application descriptions: XMI (XML Metadata
 Interchange) is an XML-based modelling language intended to help
-generate and exchange mutually consistent XSchemas, UML, and interface code.
+generate and exchange consistent XSchemas, UML, and code.
 
-Resource Description Format (RDF) is a W3C low-level
-modelling notation, with properties which make it usable by the
-inferencing engines which should drive the Semantic Web;
-it is the modelling aspect, rather than this inferencing one, we
-have emphasised in the discussion above.  Other W3C standards such as
-RDFSchema and OWL (Ontology Language for the Web) supplement the base
-RDF syntax to the point where it is useful for describing realistic
-ontologies.
+Resource Description Format (\htmladdnormallink {RDF}
+{http://www.w3.org/RDF/}) is a W3C low-level modelling notation,
+which is usable by the inferencing engines which
+should drive the Semantic Web; it is the modelling aspect, rather than
+this inferencing one, we have emphasised above.
+Other W3C standards such as RDFSchema and OWL supplement the base RDF syntax to the point where it is
+useful for describing realistic ontologies.
+
+%% Resource Description Format (\htmladdnormallink {RDF}
+%% {http://www.w3.org/RDF/}) is a W3C low-level modelling notation, with
+%% properties which make it usable by the inferencing engines which
+%% should drive the Semantic Web; it is the modelling aspect, rather than
+%% this inferencing one, we have emphasised in the discussion above.
+%% Other W3C standards such as RDFSchema and OWL (Ontology Language for
+%% the Web) supplement the base RDF syntax to the point where it is
+%% useful for describing realistic ontologies.
 
 
-\iffalse
-Above, we illustrated using RDF as a modelling language; it is one of
-several possibilities.
+%% Above, we illustrated using RDF as a modelling language; it is one of
+%% several possibilities.
 
-\paragraph{XSchema}
+%% \paragraph{XSchema}
 
-XSchema is the World-Wide Web Consortium's (W3C) replacement for the
-DTD syntax which XML inherited from SGML.  As such, it is intended
-primarily for validation, but since modelling is involved in the
-process of developing a markup schema, it is usable as a modelling
-language also.  XSchema is both verbose and rather complicated, and
-its main benefit over DTDs is its elaborate type system, which looks
-familiar to those with a database schema background, as well as being
-the type system for a variety of other W3C standards.  An alternative
-schema language is RelaxNG, which has a syntax which is substantially
-easier to read than XSchema, but which can be easily transformed to
-it.
+%% XSchema is the World-Wide Web Consortium's (W3C) replacement for the
+%% DTD syntax which XML inherited from SGML.  As such, it is intended
+%% primarily for validation, but since modelling is involved in the
+%% process of developing a markup schema, it is usable as a modelling
+%% language also.  XSchema is both verbose and rather complicated, and
+%% its main benefit over DTDs is its elaborate type system, which looks
+%% familiar to those with a database schema background, as well as being
+%% the type system for a variety of other W3C standards.  An alternative
+%% schema language is RelaxNG, which has a syntax which is substantially
+%% easier to read than XSchema, but which can be easily transformed to
+%% it.
 
-\paragraph{UML}
+%% \paragraph{UML}
 
-The Unified Modelling Language is primarily intended for designing
-object-oriented systems, but it is also designed to be able to model the
-environments those systems must operate within.  Object-oriented notions
-of subclassing and object manipulation are clearly very natural within
-UML, in the way that containment, for example, is natural in XML schemas.
+%% The Unified Modelling Language is primarily intended for designing
+%% object-oriented systems, but it is also designed to be able to model the
+%% environments those systems must operate within.  Object-oriented notions
+%% of subclassing and object manipulation are clearly very natural within
+%% UML, in the way that containment, for example, is natural in XML schemas.
 
-\paragraph{OMG standards}
+%% \paragraph{OMG standards}
 
-UML as a standard is curated by the Object Management Group
-(\htmladdnormallink{www.omg.org}{http://www.omg.org}), along with
-a collection of other object-modelling technologies including IDL and
-CORBA.  These can be tied together using yet more acronyms.  MDA
-(Model Driven Architecture) is a means of specifying
-platform-independent application descriptions: XMI (XML Metadata Interchange) is an XML-based modelling
-language intended to help generate and exchange mutually consistent
-XSchemas, UML, and code in the form of CORBA and IDL interfaces.
-%Since XMI suffers from the general XML verbosity, work is being done
-%on HUTNs (Human-Usable Textual Notations), as more
-%readable versions of XMI models.
+%% UML as a standard is curated by the Object Management Group
+%% (\htmladdnormallink{www.omg.org}{http://www.omg.org}), along with
+%% a collection of other object-modelling technologies including IDL and
+%% CORBA.  These can be tied together using yet more acronyms.  MDA
+%% (Model Driven Architecture) is a means of specifying
+%% platform-independent application descriptions: XMI (XML Metadata Interchange) is an XML-based modelling
+%% language intended to help generate and exchange mutually consistent
+%% XSchemas, UML, and code in the form of CORBA and IDL interfaces.
+%% %Since XMI suffers from the general XML verbosity, work is being done
+%% %on HUTNs (Human-Usable Textual Notations), as more
+%% %readable versions of XMI models.
 
-\paragraph{RDF and OWL}
+%% \paragraph{RDF and OWL}
 
-Resource Description Format (RDF) is a modelling notation standardised
-by the W3C.  It is a low-level modelling language, with properties
-which make it usable by the inferencing engines which, it is hoped,
-will drive the Semantic Web; it is the modelling aspect, rather than
-this inferencing one, which we have emphasised in the discussion
-above.  Other W3C standards such as RDFSchema and OWL (Ontology
-Language for the Web) supplement the base RDF syntax to the point
-where it is useful for describing realistic ontologies.
+%% Resource Description Format
+%% (RDF) is a modelling notation standardised 
+%% by the W3C.  It is a low-level modelling language, with properties
+%% which make it usable by the inferencing engines which, it is hoped,
+%% will drive the Semantic Web; it is the modelling aspect, rather than
+%% this inferencing one, which we have emphasised in the discussion
+%% above.  Other W3C standards such as RDFSchema and OWL (Ontology
+%% Language for the Web) supplement the base RDF syntax to the point
+%% where it is useful for describing realistic ontologies.
 
-\fi
+
 %% \section{Conclusions}
 
 %% The VO will have several distinct types of users, and thus several
@@ -398,6 +439,8 @@ where it is useful for describing realistic ontologies.
 \begin{references}
 % Reference format from proceedings instructions, which refers to
 %http://ukads.nottingham.ac.uk/cgi-bin/nph-bib_query?bibcode=1990ApJ...357....1A
+\reference Derriere, S. et al.\ 2004, \adassxiii, \paperref{P3-17}
+
 \reference
 Giaretta, D., % David,
 %% Taylor, M., % Mark,
@@ -405,8 +448,7 @@ Giaretta, D., % David,
 %% Gray, N., % Norman
 %% and
 %% McIlwrath, B., % Brian  
-et al.,
-2003,
+et al.\ 2003,
 \adassxii,
 221
 
@@ -422,9 +464,9 @@ Williams, R., % Roy,
 %% Szalay, A., % Alex,
 %% and
 %% Wicenec, A., % Andreas.
-et al.,
+et al.\ 2002,
 VOTable: A Proposed XML Format for Astronomical Tables, version 1.0,
-April 2002,
+% April 2002
 %online at URL 
 \htmladdURL{http://cdsweb.u-strasbg.fr/doc/VOTable/}
 
