@@ -3699,9 +3699,9 @@ void adix_map_n( int clang, ADIobj id, char *name, int nlen,
 /* Create the mapping control object */
     mctrl = adix_add_mapctrl( *objreq.data, imode, vtdef, nbyte, dynamic, status );
 
-/* Perform data conversion if dynamic, otherwise just point to the input */
-/* data object */
-    if ( dynamic ) {
+/* Perform data conversion if dynamic and not write mode, otherwise just */
+/* point to the input data object */
+    if ( dynamic && (imode != ADI__write) ) {
 
 /* Set output channel */
       ADIkrnlMtaInit( 0, imta.ndim, imta.udims, vsize, _mapctrl_dptr(mctrl),
@@ -3710,7 +3710,8 @@ void adix_map_n( int clang, ADIobj id, char *name, int nlen,
 /* Perform data transfer */
       adix_mtacop( &imta, &omta, status );
       }
-    else
+
+    else if ( ! dynamic )
       _mapctrl_dptr(mctrl) = (void *) imta.data;
     }
 
