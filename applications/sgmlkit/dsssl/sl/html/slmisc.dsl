@@ -59,13 +59,21 @@ within sl.dsl.
 ;; given as the element content.
 ;; Changes here might need matching changes in 
 ;; mode make-manifest-mode in sl.dsl.
+;;
+;; NOTE that the ent-sysid which is used is _stripped_ of its path.
+;; It is the responsibility of this stylesheet's harness to make sure
+;; that the positions of entities like this are resolved post-hoc.
 (element figurecontent
   (let* ((alt-text (attribute-string (normalize "alt")
 				     (parent (current-node))))
 	 (ent (attribute-string (normalize "image")
 				(current-node)))
 	 (ent-sysid (and ent
-			 (entity-system-id ent)))
+			 (car (reverse
+			       (tokenise-string
+				(entity-system-id ent)
+				boundary-char?: (lambda (c)
+						  (char=? c #\/)))))))
 	 (ent-notation (and ent
 			    (entity-notation ent))))
     (if ent-notation
@@ -133,7 +141,8 @@ to need explanation or elaboration.
 
 (element kbd
   (make element gi: "code"
-	(process-children)))
+	(make element gi: "u"
+	      (process-children))))
 
 (element verbatim
   (make element gi: "pre"
