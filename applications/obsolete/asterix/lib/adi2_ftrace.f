@@ -131,7 +131,7 @@
         CALL ADI_CPUT0C( OARG, 'File', FILE(:CHR_LEN(FILE)), STATUS )
 
 *    The path is formatted from the HDU number
-        CALL ADI_CGET0I( ARGS(1), '.HDU', IHDU, STATUS )
+        CALL ADI_CGET0I( ARGS(1), 'UserHDU', IHDU, STATUS )
         IF ( IHDU .GT. 0 ) THEN
           WRITE( PATH, '(A1,I1,A1)', IOSTAT=FSTAT ) '[',IHDU,']'
           CALL ADI_CPUT0C( OARG, 'Path', PATH(:3), STATUS )

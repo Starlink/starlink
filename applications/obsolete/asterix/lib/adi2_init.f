@@ -91,7 +91,9 @@
       EXTERNAL        		ADI2_FCLOSE
       EXTERNAL        		ADI2_NEWLNK_ARR
 
-      EXTERNAL			EDI2_SETLNK
+      EXTERNAL        		BDI2_SETLNK
+
+      EXTERNAL        		EDI2_SETLNK
 
 *  Local Variables:
       INTEGER			DID			! Dummy id (ignored)
@@ -106,10 +108,6 @@
 
 *  Locate the FITS file representation object
       CALL ADI_LOCREP( 'FITS', RID, STATUS )
-      IF (STATUS.NE.SAI__OK) THEN
-	CALL ERR_ANNUL(STATUS)
-        RETURN
-      END IF
 
       CALL ADI_DEFRCB( RID, 'CreatRtn', ADI2_FCREAT, STATUS )
       CALL ADI_DEFRCB( RID, 'OpenRtn', ADI2_OPEN, STATUS )
@@ -117,7 +115,7 @@
 *  File system methods
       CALL ADI_DEFMTH( 'FileClose(_FITSfile)', ADI2_FCLOSE, DID,
      :                   STATUS )
-      CALL ADI_DEFMTH( 'FileCommit(_FITSfile)', ADI2_FCOMIT, DID,
+      CALL ADI_DEFMTH( 'FileComit(_FITSfile)', ADI2_FCOMIT, DID,
      :                   STATUS )
       CALL ADI_DEFMTH( 'FileTrace(_FITSfile)', ADI2_FTRACE, DID,
      :                   STATUS )
@@ -125,8 +123,12 @@
       CALL ADI_DEFMTH( 'NewLink(_Array,_FITSfile)', ADI2_NEWLNK_ARR,
      :                   DID, STATUS )
 
-      CALL ADI_DEFMTH( 'SetLink(_EventDS,_FITSfile)', EDI2_SETLNK,
-     :                   DID, STATUS )
+*  Define BDI interface
+c      CALL ADI_DEFMTH( 'SetLink(_BinDS,_FITSfile)', BDI2_SETLNK,
+c     :                 DID, STATUS )
+
+c      CALL ADI_DEFMTH( 'SetLink(_EventDS,_FITSfile)', EDI2_SETLNK,
+c     :                 DID, STATUS )
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'ADI2_INIT', STATUS )

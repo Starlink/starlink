@@ -1,4 +1,4 @@
-      SUBROUTINE ADI2_PUTIMGB( FID, HDU, NDIM, DIMS, DATA, STATUS )
+      SUBROUTINE ADI2_PUTIMGB( HDUID, NDIM, DIMS, DATA, STATUS )
 *+
 *  Name:
 *     ADI2_PUTIMGB
@@ -10,16 +10,14 @@
 *     Starlink Fortran
 
 *  Invocation:
-*     CALL ADI2_PUTIMGB( FID, HDU, NDIM, DIMS, DATA, STATUS )
+*     CALL ADI2_PUTIMGB( HDUID, NDIM, DIMS, DATA, STATUS )
 
 *  Description:
 *     {routine_description}
 
 *  Arguments:
-*     FID = INTEGER (given)
-*        ADI identifier of FITS file object
-*     HDU = CHARACTER*(*) (given)
-*        Name of the HDU
+*     HDUID = INTEGER (given)
+*        ADI identifier of FITShdu object
 *     NDIM = INTEGER (given)
 *        Number of dimensions of DATA
 *     DIMS[NDIM] = INTEGER (given)
@@ -91,10 +89,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
 *  Arguments Given:
-      INTEGER                   FID                     ! See above
-      CHARACTER*(*)             HDU                     !
-      INTEGER                   NDIM                    !
-      INTEGER                   DIMS(*)                 !
+      INTEGER                   HDUID, NDIM, DIMS(*)
       BYTE			DATA(*)
 
 *  Status:
@@ -102,7 +97,6 @@
 
 *  Local Variables:
       INTEGER                   FSTAT                   ! FITSIO status
-      INTEGER                   HID                     ! HDU identifier
       INTEGER                   LUN                     ! Logical unit
       INTEGER			NELEM			! Total # elements
 *.
@@ -110,11 +104,8 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Locate the HDU buffer
-      CALL ADI2_MOVHDU( FID, HDU, HID, STATUS )
-
-*  Get logical unit
-      CALL ADI2_GETLUN( FID, LUN, STATUS )
+*  Extract logical unit and force this to be our current HDU
+      CALL ADI2_HDULUN( HDUID, LUN, STATUS )
 
 *  Find total number of elements
       CALL ARR_SUMDIM( NDIM, DIMS, NELEM )
@@ -122,9 +113,6 @@
 *  Write the data
       FSTAT = 0
       CALL FTPPRB( LUN, 1, 1, NELEM, DATA, FSTAT )
-
-*  Free the buffer
-      CALL ADI_ERASE( HID, STATUS )
 
 *  Translate any FITSIO error code
       IF ( FSTAT .NE. 0 ) THEN

@@ -98,10 +98,10 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Extract logical unit
-      CALL ADI_CGET0I( FID, 'Nhdu', NHDU, STATUS )
+c      CALL ADI_CGET0I( FID, 'Nhdu', NHDU, STATUS )
 
 *  Commit units and keywords
-      CALL ADI2_CHKPRV( FID, NHDU, .TRUE., STATUS )
+c      CALL ADI2_CHKPRV( FID, NHDU, .TRUE., STATUS )
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'ADI2_FCOMIT', STATUS )

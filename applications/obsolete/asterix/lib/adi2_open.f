@@ -95,7 +95,7 @@
       INTEGER			BSIZE			! FITS block size
       INTEGER			FITSTAT			! FITS inherited status
       INTEGER			HDU			! HDU number
-      INTEGER			HDUTYPE			! HDU type
+      INTEGER			HDUTYP			! HDU type
       INTEGER			IMODE			! FITSIO mode
       INTEGER			LFILEC			! Last char in filename
       INTEGER			LUN			! Logical unit number
@@ -131,34 +131,28 @@
 *      Opened ok?
         IF ( FITSTAT .EQ. 0 ) THEN
 
-*        Skip to HDU if specified
-          IF ( HDU .GT. 0 ) THEN
-            CALL FTMRHD( LUN, HDU, HDUTYPE, FITSTAT )
-            IF ( FITSTAT .NE. 0 ) THEN
-              STATUS = SAI__ERROR
-              CALL MSG_SETI( 'HDU', HDU )
-              CALL ERR_REP( ' ', 'Unable to move to HDU ^HDU', STATUS )
-              CALL FTGERR( FITSTAT, ERRTEXT )
-              CALL MSG_SETC( 'REASON', ERRTEXT )
-              CALL ERR_REP( ' ', '^REASON', STATUS )
-            END IF
-
-          END IF
-
-*        Create the new object
+*      Create the new object
           CALL ADI_NEW0( 'FITSfile', ID, STATUS )
 
-*        Write HDU number
-          CALL ADI_CPUT0I( ID, '.HDU', HDU, STATUS )
+*      Write HDU number
+          CALL ADI_CPUT0I( ID, 'UserHDU', HDU, STATUS )
 
-*        Write extra info into the file handle object
+*      Write extra info into the file handle object
           CALL ADI_CPUT0I( ID, 'Lun', LUN, STATUS )
           CALL ADI_CPUT0I( ID, 'BlockSize', BSIZE, STATUS )
 
-*        Initialise FITSfile structure
-          CALL ADI2_FOINIT( ID, STATUS )
+*      Initialise
+          CALL ADI_CPUT0I( ID, '.CurHdu', -1, STATUS )
 
-*      Failed to open
+*        Skip to HDU if specified
+          IF ( HDU .GT. 0 ) THEN
+            CALL ADI2_MVAHDU( ID, LUN, HDU, HDUTYP, STATUS )
+          END IF
+
+*        Initialise FITSfile structure
+c          CALL ADI2_FOINIT( ID, STATUS )
+
+*    Failed to open
         ELSE
           CALL FIO_PUNIT( LUN, STATUS )
 
@@ -167,10 +161,10 @@
           CALL MSG_SETC( 'REASON', ERRTEXT )
           CALL ERR_REP( ' ', '^REASON', STATUS )
 
-*      End opened ok test
+*    End opened ok test
         END IF
 
-*    End acquired logical unit test
+*  End acquired logical unit test
       END IF
 
       END

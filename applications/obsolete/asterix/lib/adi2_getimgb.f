@@ -1,4 +1,4 @@
-      SUBROUTINE ADI2_GETIMGB( FID, HDU, NDIM, DIMS, DATA, STATUS )
+      SUBROUTINE ADI2_GETIMGB( HDUID, NDIM, DIMS, DATA, STATUS )
 *+
 *  Name:
 *     ADI2_GETIMGB
@@ -10,16 +10,14 @@
 *     Starlink Fortran
 
 *  Invocation:
-*     CALL ADI2_GETIMGB( FID, HDU, NDIM, DIMS, DATA, STATUS )
+*     CALL ADI2_GETIMGB( HDUID, NDIM, DIMS, DATA, STATUS )
 
 *  Description:
 *     {routine_description}
 
 *  Arguments:
-*     FID = INTEGER (given)
-*        ADI identifier of FITSfile object
-*     HDU = CHARACTER*(*) (given)
-*        Name of the HDU whose dimensions are required
+*     HDUID = INTEGER (given)
+*        ADI identifier of FITShdu object
 *     NDIM = INTEGER (given)
 *        Dimensionality of DATA
 *     DIMS[] = INTEGER (given)
@@ -92,8 +90,7 @@
       INCLUDE 'ADI_PAR'
 
 *  Arguments Given:
-      INTEGER			FID
-      CHARACTER*(*)		HDU
+      INTEGER			HDUID
       INTEGER			NDIM
       INTEGER			DIMS(*)
 
@@ -120,7 +117,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Get dimensions of extension
-      CALL ADI2_ISHAPE( FID, HDU, ADI__MXDIM, ADIMS, ANDIM, STATUS )
+      CALL ADI2_ISHAPE( HDUID, ADI__MXDIM, ADIMS, ANDIM, STATUS )
 
 *  If ok, and dimensionalities match
       IF ( (STATUS .EQ. SAI__OK) .AND. (ANDIM.EQ.NDIM) ) THEN
@@ -134,7 +131,7 @@
         END DO
 
 *    Extract the logical unit
-        CALL ADI2_GETLUN( FID, LUN, STATUS )
+        CALL ADI2_HDULUN( HDUID, LUN, STATUS )
 
 *    Read the data
         FSTAT = 0
