@@ -123,6 +123,14 @@
      :                       DX, DY, NX, NY, ARRAY, STATUS )
 
 
+*    Lorentz profile
+      ELSE IF ( KIND .EQ. ANAL_LORENTZ ) THEN
+
+*      Fill in values
+        CALL MATH_INTLOR2D( AN_PW(SLOT,1), AN_PW(SLOT,2), 0.0, 0.0,
+     :                      0.0, QX, QY,
+     :                      DX, DY, NX, NY, ARRAY, STATUS )
+
 *    Top hat
       ELSE IF ( KIND .EQ. ANAL_TOPHAT ) THEN
 
@@ -596,6 +604,22 @@
 
 *      Convert core radius to radians
         AN_PW(SLOT(1),1) = AN_PW(SLOT(1),1) * X_TOR
+
+      ELSE IF ( STR_ABBREV(CHOICE,'LORENTZ') ) THEN
+
+        AN_KIND(SLOT(1)) = ANAL_LORENTZ
+
+*      We need a width for the gaussian
+        PROMPT = 'Lorentzian HWHM in '//UNITS(:CHR_LEN(UNITS))
+        CALL USI_PROMT( 'AUX', PROMPT(:CHR_LEN(PROMPT)), STATUS )
+        CALL USI_DEF0R( 'AUX', ABS(X_DR/X_TOR), STATUS )
+        CALL USI_GET0R( 'AUX', GWIDTH, STATUS )
+        CALL USI_CANCL( 'AUX', STATUS )
+        IF ( STATUS .NE. SAI__OK ) GOTO 99
+
+*      Convert it to radians
+        AN_PW(SLOT(1),1) = GWIDTH*X_TOR
+        AN_PW(SLOT(1),2) = GWIDTH*Y_TOR
 
       ELSE IF ( STR_ABBREV(CHOICE,'TOPHAT') ) THEN
 
