@@ -1,0 +1,33 @@
+# Include file identifying the target architecture (defines the T_A
+# macro) and application configuration definitions
+
+APPLIC_TOP := ../.applTop
+include Target.include
+include $(APPLIC_TOP)/config/CONFIG
+
+SRCS.f	= $(wildcard ../*.f) 
+
+# Add the object files in one of these two variables. 
+OBJS	= $(strip $(patsubst ../%.f,    %.o, $(SRCS.f)))
+
+# Things define with the PROD macro are installed in $(INSTALL_BIN)
+PROD  = cred4
+PROD += $(patsubst ../%.ifl, %.ifc, $(wildcard ../*.ifl))
+
+# Things defined by the PROCS macro are installed in $(INSTALL_PROC)
+PROCS = $(patsubst ../%, %, $(wildcard ../*.icl))
+
+# This defines the objects to include in any library that is built.
+# By default, the library isn't installed. To install it you must
+# define the library name with LIBNAME
+LIBOBJS = $(OBJS)
+
+# Rules for building targets
+include $(APPLIC_TOP)/config/RULES.Build
+
+cred4: cred4.o libcred4.a
+	$(ILINK) cred4.o -o $@ libcred4.a -L$(FIG_LIB) \
+          -ldsa -lfig -lpar -lich -ldta -lgen \
+          -L$(STAR_LIB) `psx_link_adam` `nbs_link_adam` \
+          `fio_link_adam` `prm_link_adam` `cnf_link_adam` $(LDFLAGS)
+

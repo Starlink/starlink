@@ -1,0 +1,29 @@
+# Include file identifying the target architecture (defines the T_A
+# macro) and application configuration definitions
+
+APPLIC_TOP := ../.applTop
+include Target.include
+include $(APPLIC_TOP)/config/CONFIG
+
+SRCS.f	= $(wildcard ../*.f) 
+
+# Add the object files in one of these two variables. 
+OBJS	= $(strip $(patsubst ../%.f,    %.o, $(SRCS.f)))
+
+# Things define with the PROD macro are installed in $(INSTALL_BIN)
+PROD  = $(patsubst ../%.ifl, %.ifc, $(wildcard ../*.ifl))
+
+# Things defined by the PROCS macro are installed in $(INSTALL_PROC)
+PROCS = $(patsubst ../%, %, $(wildcard ../*.icl))
+
+# This defines the objects to include in any library that is built.
+# By default, the library isn't installed. To install it you must
+# define the library name with LIBNAME
+LIBOBJS = $(OBJS)
+LIBNAME = libcgsgen.a
+
+# Rules for building targets
+include $(APPLIC_TOP)/config/RULES.Build
+
+
+

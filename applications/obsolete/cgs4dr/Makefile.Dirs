@@ -1,0 +1,11 @@
+DIRS+=fige
+DIRS+=gen
+DIRS+=cred4
+DIRS+=p4
+DIRS+=qman
+DIRS+=red4
+DIRS+=ukirtfig
+DIRS+=scripts
+DIRS+=tcl
+DIRS+=html
+DIRS+=icl
