@@ -20,7 +20,17 @@
       CHARACTER*200		AS_CALDB
       INTEGER			AS_CALDBL
 
+*  SIS grid variables
+      INTEGER			AS_SIS_DIMS(5), AS_SIS_NDIM
+      REAL			AS_SIS_DX, AS_SIS_XYSAM(2,2)
+      INTEGER			AS_SIS_RPTR, AS_SIS_EPTR, AS_SIS_DPTR
+      INTEGER			AS_SIS_FLAGS
+      LOGICAL			AS_SIS_LOADED
+
       COMMON /PSF_ASCA_CMN/    	AS_INIT, AS_GPTR,AS_SPTR, AS_GPIX,
-     :                          AS_SPIX, AS_CALDBL
+     :                          AS_SPIX, AS_CALDBL,
+     :                          AS_SIS_DIMS, AS_SIS_NDIM, AS_SIS_DX,
+     :                          AS_SIS_XYSAM, AS_SIS_RPTR, AS_SIS_EPTR,
+     :                          AS_SIS_DPTR, AS_SIS_FLAGS, AS_SIS_LOADED
 
       COMMON /PSF_ASCA_CMNC/    AS_CALDB
