@@ -80,8 +80,6 @@ This function displays lines joining the given positions.
 
 sub _GLine {
    my ( $external, $xf, $yf ) = @_;
-   use Data::Dumper;
-
    my $canvas = $$external[0];
    my ($xlo,$xhi,$ylo,$yhi) = @$external[1 .. 4];
    
@@ -218,7 +216,6 @@ top on the screen.
 =cut
 
 sub _GText {
-   #croak( "_GText: Not yet implemented");
    my ( $external, $text, $xf, $yf, $just, $upx, $upy ) = @_;
    my $canvas = $$external[0];
    my ($xlo,$xhi,$ylo,$yhi) = @$external[1 .. 4];
@@ -238,7 +235,6 @@ sub _GText {
       my $y = (1 - $yf)*$ymax;         
       
       # draw text
-      print "_GText: ($x,$y) ($xf, $yf) $text\n";
       $canvas->createText( $x, $y, -text => $text );
    }
    
@@ -261,8 +257,8 @@ increase from bottom to top.
 
 sub _GScales {
     my ( $external, $alpha, $beta ) = @_;
-   my $canvas = $$external[0];
-   my ($xlo,$xhi,$ylo,$yhi) = @$external[1 .. 4];
+    my $canvas = $$external[0];
+    my ($xlo,$xhi,$ylo,$yhi) = @$external[1 .. 4];
     print "_GScales: Placeholder routine called\n";
     
     my ( $nx1, $nx2, $ny1, $ny2, $wx1, $wx2, $wy1, $wy2, $ret );
@@ -416,8 +412,7 @@ AST's grf.h:
 =cut
 
 sub _GAttr {
-   #croak( "_GAttr: Not yet implemented");
-   my ( $canvas, $attr, $value, $prim ) = @_;
+   my ( $external, $attr, $value, $prim ) = @_;
    print "_GAttr: Placeholder routine called\n";
    return ( 1, undef );
 }   
@@ -478,6 +473,8 @@ sub _GCap {
 # Internal error setting routine
 sub ReportGrfError {
   my $text = shift;
+  my $canvas = $$external[0];
+  my ($xlo,$xhi,$ylo,$yhi) = @$external[1 .. 4];
   warn "Generated AST error in perl PGPLOT callback: $text\n";
   Starlink::AST::_Error( &Starlink::AST::Status::AST__GRFER(), $text);
 }
@@ -512,9 +509,6 @@ sub tk {
   my @external;
   push @external, $canvas;
   push @external, $self->GBox();
-  
-  
-  use Data::Dumper; print ( @external );
   
   $self->GExternal( \@external );
   $self->GFlush(\&Starlink::AST::Tk::_GFlush);  

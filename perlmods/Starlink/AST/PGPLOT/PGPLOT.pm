@@ -232,7 +232,6 @@ sub _GText {
       my $tbg;
       pgqtbg( $tbg );
       pgstbg( 0 );
-      print "_GText: ($x,$y) $text\n";
       pgptxt( $x, $y, $angle, $fjust, $text ); 
       pgstbg( $tbg );
    }
@@ -498,8 +497,6 @@ sub _GTxExt {
    }
    
    # Return
-   print "_GTxtExt: ($x,$y) $just\n ( $xb[0], $yb[0])\n ( $xb[1], $yb[1])\n" .
-         " ( $xb[2], $yb[2])\n ( $xb[3], $yb[3])\n";
    return (1, \@xb, \@yb );     
       
 }          
