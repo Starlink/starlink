@@ -20,9 +20,11 @@ OUT = NDF (Write)
    The name of the NDF to be produced.
 3 PROFITS
 PROFITS = _LOGICAL (Read)
-   If TRUE, the headers of the IRAF file are written
+   If TRUE, the user headers of the IRAF file are written
    verbatim to the NDF's FITS extension.  Any IRAF history
-   records are also appended to FITS extension. [TRUE]
+   records are also appended to the FITS extension.  The FITS
+   extension is not created if there are no user headers
+   present in the IRAF file. [TRUE]
 3 PROHIS
 PROHIS = _LOGICAL (Read)
    This parameter decides whether or not to create NDF HISTORY
@@ -175,6 +177,10 @@ MJC: Malcolm J. Currie (STARLINK)
     information, and the NDF label and units.  Expanded and
     corrected the documentation, including a second example.
     Improved the code structure.
+
+ 1997 September 25 (MJC):
+    Protect against case where PROFITS=TRUE but there are no
+    headers.
 2 Implementation_Status
    -  Only handles one-, two-, and three-dimensional IRAF files.
 

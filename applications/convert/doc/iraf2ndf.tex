@@ -26,9 +26,11 @@
       \sstsubsection{
          PROFITS = \_LOGICAL (Read)
       }{
-         If {\tt TRUE}, the headers of the IRAF file are written
+         If {\tt TRUE}, the user headers of the IRAF file are written
          verbatim to the NDF's FITS extension.  Any IRAF history
-         records are also appended to FITS extension. {\tt [TRUE]}
+         records are also appended to the FITS extension.  The FITS
+         extension is not created if there are no user headers
+         present in the IRAF file.  {\tt [TRUE]}
       }
       \sstsubsection{
          PROHIS = \_LOGICAL (Read)
