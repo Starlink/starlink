@@ -363,6 +363,8 @@ f     - AST_PUTFITS: Store a FITS header card in a FitsChan
 *        +/-90 degs (previously values outside this range were wrapped
 *        round onto the opposite meridian). Also added new warning
 *        condition "badlat".
+*     23-AUG-2001 (DSB):
+*        Re-write LinearMap to use a least squares fit.
 *class--
 */
 
@@ -468,6 +470,7 @@ f     - AST_PUTFITS: Store a FITS header card in a FitsChan
 #define NDESC              9
 #define MXCTYPELEN        81
 #define ALLWARNINGS       " noequinox noradesys nomjd-obs nolonpole nolatpole tnx zpx badcel noctype badlat "
+#define NPFIT             10
 
 /* Each card in the fitschan has a set of flags associated with it,
    stored in different bits of the "flags" item within each FitsCard
@@ -711,6 +714,7 @@ static int EncodeFloat( char *, int, int, int, double );
 static int EncodeValue( AstFitsChan *, char *, int, int, const char * );
 static int FindKeyCard( AstFitsChan *, const char *, const char *, const char * );
 static int FindString( int, const char *[], const char *, const char *, const char *, const char * );
+static int FitLinear( AstMapping *, int, double *, double *, double *, double * );
 static int FitsEof( AstFitsChan * );
 static int FitsFromStore( AstFitsChan *, FitsStore *, int, int, int, const char *, const char * );
 static int FitsGetCF( AstFitsChan *, const char *, double * );
@@ -729,7 +733,7 @@ static int GetSkip( AstChannel * );
 static int GetValue( AstFitsChan *, char *, int, void *, int, const char *, const char * );
 static int GoodWarns( const char * );
 static int KeyFields( AstFitsChan *, const char *, int, int *, int * );
-static int LinearMap( AstMapping *, int, int, double *, double *, double );
+static int LinearMap( AstMapping *, int, double *, double *, double );
 static int Match( const char *, const char *, int, int *, int *, const char *, const char * );
 static int MatchChar( char, char, const char *, const char *, const char * );
 static int MatchFront( const char *, const char *, char *, int *, int *, int *, const char *, const char *, const char * );
@@ -4597,6 +4601,376 @@ static int FindString( int n, const char *list[], const char *test,
 
 /* Return the answer. */
    return ret;
+}
+
+static int FitLinear( AstMapping *map, int ndim, double *dim, double *c,
+                      double *d, double *rms ){
+/*
+*  Name:
+*     FitLinear
+
+*  Purpose:
+*     Calculate an N-dimensional least-squares linear fit to a Mapping.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     int FitLinear( AstMapping *map, int ndim, double *dim, double *c,
+*                    double *d, double *rms )
+
+*  Class Membership:
+*     FitsChan
+
+*  Description:
+*     This function calculates a least squares linear fit to the supplied
+*     Mapping, if possible. For an n-dimensional position x[], the fit y[] 
+*     is given by:
+*
+*        y[0] = c[0] + d[0]*x[0] + d[1]*x[1] + ...
+*        y[1] = c[1] + d[n]*x[0] + d[n+1]*x[1] + ...
+*        y[2] = c[2] + d[2*n]*x[0] + d[2*n+1]*x[1] + ...
+*        y[3] = ...
+*
+*     where y[] is an approximation to the result of transforming x[]
+*     using the supplied Mapping.
+*
+*     A square grid of NPFIT x NPFIT test points, equally spaced over the
+*     specified array dimensions, is used to calculate the fit.
+
+*  Parameters:
+*     map
+*        A pointer to the Mapping. A function value of zero is returned
+*        (without error) if either the number of inputs or the number of 
+*        outputs is not equal to ndim.
+*     ndim 
+*        The number of axes.
+*     dim
+*        A pointer to an array holding the ndim dimensions of the data array
+*        in pixels (if known). If not know, the array should be filled with
+*        AST__BAD values, in which case a step size of 100 pixels will be
+*        used for the grid of NPFIT x NPFIT test points.
+*     c
+*        A pointer to an array in which to store the constant terms. Should
+*        have at least ndim elements.
+*     d
+*        A pointer to an array in which to store the coefficients. Should
+*        have at least (ndim*ndim) elements.
+*     rms
+*        A pointer to a location at which to return the RMS error between
+*        the actual test points and the fitted test points.
+
+*  Returned Value:
+*     Zero if no fit to the Mapping can be found. One otherwise.
+
+*  Notes:
+*     -  A value of zero is returned if an error has already occurred,
+*     or if an error occurs within this function.
+
+*/
+
+/* Local Variables: */
+   AstPointSet *pset1;            /* Pointer to the grid coords PointSet */
+   AstPointSet *pset2;            /* Pointer to the phys coords PointSet */
+   double **ptr1;                 /* Pointer to the grid positions */
+   double **ptr2;                 /* Pointer to the physical positions */
+   double *mat;                   /* Pointer to matrix */
+   double *mp;                    /* Pointer to next matrix element */
+   double *p1i;                   /* Pointer to first value on axis i*/
+   double *p1j;                   /* Pointer to first value on axis j */
+   double *p;                     /* Pointer to next position array */
+   double *step;                  /* Pointer to step sizes array */
+   double *vec;                   /* Pointer to known vector */
+   double *x;                     /* Pointer to first axis value */
+   double *z;                     /* Pointer to first residual */
+   double det;                    /* Determinant of supplied matrix */
+   double f;                      /* Normalization factor */
+   double res;                    /* The fit residual */
+   double s;                      /* Sum of logs of matrix elements */
+   double v;                      /* Vector element */
+   double zik;                    /* The fit value */
+   int *ip;                       /* Pointer to next position index array */
+   int *iw;                       /* Pointer to workspace used by slaDmat */
+   int allgood;                   /* Are all mapped positions good? */
+   int i;                         /* Axis index */
+   int j;                         /* Axis index */
+   int k;                         /* Test point index */
+   int m;                         /* Axis index */
+   int n;                         /* No. of values summed in s */
+   int np;                        /* Total number of test points */
+   int ok;                        /* Returned value */
+   int sing;                      /* Zero if matrix is not singular */
+
+/* Initialize the returned value to indsicate that no fit could be
+   obtained. */
+   ok = 0;
+
+/* Check the status */
+   if( !astOK ) return ok;
+
+/* A linear fit to the Mapping can only be made if the number of inputs
+   and outputs are equal. */
+   if( astGetNin( map ) != ndim || astGetNout( map ) != ndim ) return ok;
+
+/* Set up a PointSet holding a set of test points in grid coordinates. The
+   first of these points is the origin of grid coordinates. First find the
+   increment between test points on each axis. At the same time initialize
+   the current test point, p, to the bottom left corner (1.0, 1.0, 1.0, ...) */
+   step = (double *) astMalloc( ndim*sizeof( double ) );
+   p = (double *) astMalloc( ndim*sizeof( double ) );
+   ip = (int *) astMalloc( ndim*sizeof( int ) );
+   if( astOK ) {
+      np = 1;
+      for( i = 0; i < ndim; i++ ){
+         if( dim[ i ] != AST__BAD ) {
+            step[ i ] = dim[ i ]/NPFIT;
+         } else {
+            step[ i ] = 100.0;
+         }
+         np *= NPFIT;
+         p[ i ] = 1.0;
+         ip[ i ] = 0;
+      }
+   }
+
+/* Add one extra for the origin. */
+   np++;
+
+/* Now create the PointSet to hold the test grid coordinates. */
+   pset1 = astPointSet( np, ndim, "" );
+   ptr1 = astGetPoints( pset1 );
+
+/* Check the pointer can be used safely. */
+   if( astOK ) {
+
+/* Store the origin. */
+      for( j = 0; j < ndim; j++ ){
+         ptr1[ j ][ 0 ] = 0.0;
+      }
+
+/* Store the test point grid coords in the PointSet. Loop round each
+   point. */
+      for( k = 1; k < np; k++ ){            
+
+/* Store the current point in the PointSet. */
+         for( j = 0; j < ndim; j++ ){
+            ptr1[ j ][ k ] = p[ j ];
+         }
+
+/* Increment the axis 0 vaue at the current point. */
+         j = 0;
+         p[ j ] += step[ j ];
+         ip[ j ]++;
+
+/* If we have stepped beyond the last test point on this axis, reset the axis 
+   value to 1.0, and move on to increment the next higher axis. */
+         while( ip[ j ] == NPFIT ){
+            p[ j ] = 1.0;
+            ip[ j ] = 0;
+            if( ++j < ndim ) {
+               p[ j ] += step[ j ];
+               ip[ j ]++;
+            } else {
+               break;         
+            }
+         }
+      }
+
+/* Transform the test points using the supplied Mapping. */
+      pset2 = astTransform( map, pset1, 1, NULL );
+      ptr2 = astGetPoints( pset2 );
+
+/* Check the results array can be used. */
+      if( astOK ){
+
+/* The constant terms of the returned linear transformation are just
+   equal to the transformed origin. Store them in the returned array and
+   subtract them from all the transformed test points. Also check for any
+   bad transformed values. */
+         allgood = 1;
+         for( i = 0; i < ndim; i++ ){
+            c[ i ] = ptr2[ i ][ 0 ];
+            for( k = 0; k < np; k++ ){
+               if( ptr2[ i ][ k ] != AST__BAD ) {
+                  ptr2[ i ][ k ] -= c[ i ];
+               } else {
+                  allgood = 0;
+                  break;
+               }
+            }
+         }
+
+/* Create the matrix holding the coefficients of the normal equations. 
+   First allocate the memory for the matrix (and also the known vector -
+   used later) and check the pointers can be used. Abort if any bad
+   values were found above. */
+         mat = (double *) astMalloc( ndim*ndim*sizeof(double) );
+         vec = (double *) astMalloc( ndim*sizeof(double) );
+         if( astOK && allgood ) {
+
+/* Element (Row=i,Column=j) of the matrix holds the sum over all the test
+   points, of the product of i'th and j'th grid axis value. The matrix is
+   symetric since Xi*Xj=Xj*Xi, so we calculate the upper right half of the 
+   matrix explicitly, and copy the values into the lower left half. First,
+   initialize the pointer to the next matrix element. */
+            mp = mat;
+
+/* Loop round each row of the matrix. */
+            for( i = 0; i < ndim; i++ ){
+
+/* Get a pointer to the first test value for this (i.e. the i'th) axis. The
+   other values for this axis follow on after the first. */
+               p1i = ptr1[ i ];
+
+/* The elements to the left of the diagonal are simply copied from the
+   corresponding right-hand elements of earlier rows. */
+               for( j = 0; j < i; j++ ){
+                  *(mp++) = mat[ i + j*ndim ];
+               }
+
+/* The remaining elements of this row are calulated explicitly. Loop
+   through each column. */
+               for( j = i; j < ndim; j++ ){
+
+/* Get a pointer to the first test value for this (i.e. the j'th) axis. The
+   other values for this axis follow on after the first. */
+                  p1j = ptr1[ j ];
+
+/* Initialize the current matrix element to zero. */
+                  *mp = 0.0;
+
+/* Go round each test point (except the first which is the origin), 
+   incrementing the current matrix element by the product of the i'th and 
+   j'th coordinate value at the test point. */
+                  for( k = 1; k < np; k++ ) {
+                     *mp += p1i[ k ]*p1j[ k ];
+                  }
+
+/* Move on to the next matrix element. */
+                  mp++;
+               }
+            }
+
+/* The matrix elements and the known vectors are normalized by dividing
+   them by the geometric mean of the unnormalized matrix elements. Find
+   the normalization factor, and normlize the matrix elements. */
+            s = 0.0;
+            n = 0;
+            for( i = 0; i < ndim*ndim; i++ ) {
+               if( mat[ i ] != 0.0 ) {
+                  s += log( fabs( mat[ i ] ) );
+                  n++;
+               }
+            }
+            if( n > 0 ) {
+               f = 1.0/exp( s/( (double) n ) );
+               for( i = 0; i < ndim*ndim; i++ ) mat[ i ] *= f;
+            } else {
+               f = 1.0;
+            }
+
+/* For axis 0, we invert the above matrix, finding the required
+   transformation coefficients in the process. For subsequent axes, 
+   we use the inverted matrix directly. First find the known vector 
+   for axis 0, normalizing it using the above normalization factor. */
+            for( m = 0; m < ndim; m++ ) {
+               z = ptr2[ 0 ];
+               x = ptr1[ m ];
+               v = 0.0;
+               for( k = 1; k < np; k++ ) {
+                  v += z[ k ]*x[ k ];
+               }
+               vec[ m ] = v*f;
+            }
+
+/* Invert the normal equations matrix. */
+            iw = (int *) astMalloc( sizeof(int)*(size_t) ndim );
+            if( astOK ) slaDmat( ndim, mat, vec, &det, &sing, iw );
+            iw = (int *) astFree( (void *) iw ); 
+
+/* Check the matrix could be inverted. */
+            if( astOK && sing == 0 ) {
+               ok = 1;
+
+/* Store the resulting coefficients in the returned array. */
+               for( i = 0; i < ndim; i++ ) d[ i ] = vec[ i ]; 
+
+/* Loop round each other axis. */
+               for( i = 1; i < ndim; i++ ) {
+
+/* Form the known vector for this axis, normalizing it using the above 
+   normalization factor. */
+                  for( m = 0; m < ndim; m++ ) {
+                     z = ptr2[ i ];
+                     x = ptr1[ m ];
+                     v = 0.0;
+                     for( k = 1; k < np; k++ ) {
+                        v += z[ k ]*x[ k ];
+                     }
+                     vec[ m ] = v*f;
+                  }
+
+/* Apply the inverted normal equations matrix to the known vector, and
+   store the resulting coefficients in the returned array. */
+                  mp = mat;
+                  for( j = 0; j < ndim; j++ ) {
+                     v = 0.0;
+                     for( m = 0; m < ndim; m++ ) {
+                        v += ( *(mp++) )*vec[ m ];
+                     }
+                     d[ i*ndim + j ] = v;
+                  }
+               }
+
+/* We now have all the fit coefficients. Use them to find the fitted value
+   (without the constant term) at each test point. Then find the residuals
+   between the fitted value and the actual value, and form the sum of the
+   squared residuals, summed over all test points. Return the rms error
+   of the fit. */
+               *rms = 0.0;
+               for( k = 1; k < np; k++ ) {
+                  for( j = 0; j < ndim; j++ ) {
+                     p[ j ] = ptr1[ j ][ k ];
+                  }
+
+
+                  for( i = 0; i < ndim; i++ ) {
+
+                     zik = 0;
+                     for( j = 0; j < ndim; j++ ) {
+                        zik += p[ j ]*d[ i*ndim + j ];
+                     }
+
+                     step[ i ] = zik;
+                     res = ptr2[ i ][ k ] - zik ;
+                     *rms += res*res;
+                  }
+               }
+
+               *rms = sqrt( (*rms) / ( np - 1 ) );
+
+            }
+         }
+
+/*  Free the memory holding the matrix and vector. */
+         mat = (double *) astFree( (void *) mat );
+         vec = (double *) astFree( (void *) vec );
+
+      }
+   }
+
+/* Annul the PointSets. */
+   pset1 = astAnnul( pset1 );
+   pset2 = astAnnul( pset2 );
+
+/* Free other memory */
+   p = (double *) astFree( (void *) p );
+   ip = (int *) astFree( (void *) ip );
+   step = (double *) astFree( (void *) step );
+
+/* Return the success flag. */
+   return ok;
+
 }
 
 static int FitsFromStore( AstFitsChan *this, FitsStore *store, int encoding, 
@@ -9392,8 +9766,8 @@ static int IRAFFromStore( AstFitsChan *this, FitsStore *store,
    return astOK ? ret : 0;
 }
 
-static int LinearMap( AstMapping *map, int nin, int nout, double *matrix,
-                      double *test, double maxerr ){
+static int LinearMap( AstMapping *map, int ndim, double *dim, 
+                      double *matrix, double maxerr ){
 /*
 *  Name:
 *     LinearMap
@@ -9405,48 +9779,31 @@ static int LinearMap( AstMapping *map, int nin, int nout, double *matrix,
 *     Private function.
 
 *  Synopsis:
-*     int LinearMap( AstMapping *map, int nin, int nout, double *matrix,
-*                    double *test, double maxerr )
+*     int LinearMap( AstMapping *map, int ndim, double *dim, 
+*                    double *matrix, double maxerr )
 
 *  Class Membership:
 *     FitsChan
 
 *  Description:
 *     This function checks to see if the supplied Mapping is linear,
-*     except for an optional shift of origin.
-*   
-*     Unit vectors along each of the axes in the Mapping's input coordinate 
-*     system are transformed using the Mapping. If the Mapping is linear, 
-*     these transformed vectors form the columns of the required matrix. To 
-*     test for linearity, the supplied test point is transformed using the 
-*     supplied Mapping, and is then also transformed using the candidate 
-*     matrix formed by the above process. If the two resulting positions are 
-*     equal to within the supplied error, then the Mapping is considered to 
-*     be linear. 
-*
-*     To account for a possible shift of origin, the origin of the Mappings
-*     input Frame is transformed using the supplied Mapping, and this
-*     position is subtracted from all other transformed positions.
+*     except for an optional shift of origin. A least squares linear fit 
+*     is done to the Mapping. If the mean squared residual in this fit is 
+*     less than the suplied value of maxerr, then the fit is accepted. 
+*     Otherwise, zero is returned.
 
 *  Parameters:
 *     map
-*        A pointer to the Mapping to be checked.
-*     nin
-*        The number of input coordinates. This is the number of columns
-*        in the returned matrix.
-*     nout
-*        The number of output coordinates. This is the number of rows
-*        in the returned matrix.
+*        A pointer to the Mapping to be checked. The Mapping must have
+*        equal numbers of input and output coordinates.
+*     ndim
+*        The number of input and output coordinates for the Mapping.
+*     dim
+*        The dimensions of the array grid. If not known, supply AST__BAD.
 *     matrix
-*        A pointer to an array of nin*nout elements to receive the matrix.
+*        A pointer to an array of ndim**2 elements to receive the matrix.
 *        The elements are stored row by row. If the Mapping is not linear
 *        the supplied values are left unchanged.
-*     test
-*        A pointer to an array holding the test point to use, in the input
-*        frame of the Mapping. This point should be well away form the
-*        origin to ensure that he linearity test is applied over a sizable 
-*        distance. The default value of 1000 is used in place of any bad 
-*        values in this array.
 *     maxerr
 *        For two positions in the output coordinate system of the Mapping
 *        to be considered equal, the square of the distance between them
@@ -9462,116 +9819,54 @@ static int LinearMap( AstMapping *map, int nin, int nout, double *matrix,
 */
 
 /* Local Variables: */
-   AstPointSet *pset1;                /* Pointer to the input PointSet */
-   AstPointSet *pset2;                /* Pointer to the output PointSet */
-   double **ptr1;                     /* Pointer to the input positions */
-   double **ptr2;                     /* Pointer to the output positions */
-   double *p;                         /* Pointer to next local axis value */
-   double *q;                         /* Pointer to next returned axis value */
-   double err;                        /* Absolute difference between axis values */
-   double orig;                       /* Constant term on this axis */
-   double sumerr2;                    /* Squared distance between 2 points */
-   double sum;                        /* Sum of axis values */
+   double *c;                         /* Pointer to array of constant terms */
+   double *m;                         /* Pointer to next matrix element */
+   double *mm;                        /* Pointer to first matrix element in row */
+   double mx;                         /* Largest absolute element value */
+   double rms;                        /* RMS error of fit */
+   double v;                          /* Absolute element value */
    int i;                             /* Loop count */
    int j;                             /* Loop count */
    int ret;                           /* Returned value */
 
+ 
 /* Check the status */
    if( !astOK ) return 0;
 
-/* Initialise the returned flag to indicate that the Mapping is not
-   linear. */
-   ret = 0;
+/* If the number of input and output axes are equal, attempt to do a least 
+   squares linear fit to the Mapping. */
+   c = (double *) astMalloc( ndim*sizeof( double ) );
+   ret = FitLinear( map, ndim, dim, c, matrix, &rms );
+   c = (double *) astFree( (void *) c );
 
-/* Get a PointSet to hold a unit vector along every input axis, plus two
-   extra points. */
-   pset1 = astPointSet( nin + 2, nin, "" );
-   ptr1 = astGetPoints( pset1 );
-   if( astOK ){
+/* If the rms is greater than the maximum allowed error, returns zero. */
+   if( ret && rms*rms > maxerr ) {
+      ret = 0;
 
-/* We now store unit vectors along each of the input axes in the PointSet. 
-   The first extra point is the supplied test point. The second extra point 
-   is the origin. */
-      for( i = 0; i < nin; i++ ){
-         p = ptr1[ i ];
-         for( j = 0; j < nin; j++ ) *(p++) = 0.0;
-         if( test[ i ] != AST__BAD ) {
-            *(p++) = test[ i ];
-         } else {
-            *(p++) = 1000.0;
-         }
-         *p = 0.0;
-         ptr1[ i ][ i ] = 1.0;
-      }
+/* Otherwise, search for small non-zero values (typically caused by
+   rounding error within the least squares fit) and set them to zero. */
+   } else {
 
-/* Transform these vectors using the supplied Mapping, and get pointers
-   to the transformed data. If the Mapping is linear, the transformed data
-   will define the required matrix, with two extra columns holding the
-   transformed test point and origin. */
-      pset2 = astTransform( map, pset1, 1, NULL );
-      ptr2 = astGetPoints( pset2 );
-      if( astOK ){
-
-/* Subtract the transformed origin (the second extra position in the
-   PointSet) from each of the other positions in the PointSet. */
-         for( i = 0; i < nin; i++ ){
-            p = ptr2[ i ];
-            orig = ptr2[ i ][ nin + 1 ];
-            if( orig != AST__BAD ) {
-               for( j = 0; j < nin + 1; j++ ) {
-                  if( *p != AST__BAD ) *p -= orig;
-                  p++;
-               }               
-            } else {
-               for( j = 0; j < nin + 1; j++ ) *(p++) = AST__BAD;
-            }
+/* For each row of the matrix, find the largest absolute value. */
+      m = matrix;
+      for( i = 0; i < ndim; i++ ){
+         mm = m;
+         mx = 0.0;
+         for( j = 0; j < ndim; j++ ){
+            v = fabs( *(m++) );
+            if( v > mx ) mx = v;
          }
 
-/* We now test the Mapping for linearity. The test point is mapped using
-   the candidate matrix, and the squared distance between the resulting
-   point and the point found using the supplied Mapping is found. */
-         sumerr2 = 0.0;
-         for( i = 0; i < nin; i++ ){
-            p = ptr2[ i ];
-            sum = 0.0;
-            for( j = 0; j < nin; j++ ) {
-               if( *p != AST__BAD ) {
-                  sum += *(p++)*( ( test[ j ] != AST__BAD ) ? test[ j ] : 1000.0 );
-               } else {
-                  sum = AST__BAD;
-                  break;
-               }
-            }
-            if( sum != AST__BAD && *p != AST__BAD ) {
-               err = *p - sum;
-               sumerr2 += err*err;
-            } else {
-               sumerr2 = AST__BAD;
-               break;
-            }
-         }
-
-/* If the squared distance is less than the supplied maximum error, the 
-   Mapping is considered to be linear. Copy it to the returned array, row 
-   by row. */
-         if( sumerr2 != AST__BAD && sumerr2 < maxerr ){
-            ret = 1;
-            q = matrix;
-            for( i = 0; i < nin; i++ ){
-               p = ptr2[ i ];
-               for( j = 0; j < nin; j++ ) *(q++) = *(p++);
-            }
+/* Look for elements with absolute values which are less than 1.0E-5 of
+   the largest value found above, and set them to zero. */
+         m = mm;
+         mx *= 1.0E-5;
+         for( j = 0; j < ndim; j++ ){
+            if( fabs( *m ) < mx ) *m = 0.0;
+            m++;
          }
       }
-
-/* Annul the output PointSet. */
-      pset2 = astAnnul( pset2 );
-
    }
-
-
-/* Annul the input PointSet. */
-   pset1 = astAnnul( pset1 );
 
 /* If an error has occurred, return 0. */
    if( !astOK ) ret = 0;
@@ -17801,7 +18096,7 @@ static int WcsNoWcs( AstMapping *map, AstFrame *phyfrm, int naxis,
 
 /* See if the Mapping is linear. If it is, a matrix describing it
    is returned. */
-   if( maxerr != AST__BAD && LinearMap( map, naxis, naxis, matrix, dim, maxerr ) ){
+   if( maxerr != AST__BAD && LinearMap( map, naxis, dim, matrix, maxerr ) ){
 
 /* Store any non-default CD matrix elements in store. */
       for( j = 0; j < naxis; j++ ) { 
@@ -21721,3 +22016,9 @@ int astGetEncoding_( AstFitsChan *this ){
    if( !astOK ) return UNKNOWN_ENCODING;
    return (**astMEMBER(this,FitsChan,GetEncoding))( this );
 }
+
+
+
+
+
+
