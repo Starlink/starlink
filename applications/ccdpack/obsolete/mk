@@ -199,6 +199,7 @@
 #     AJC: A.J.Chipperfield (Starlink, RAL)
 #     PDRAPER: P.W.Draper (Starlink, Durham University)
 #     BKM: B.K.McIlwrath (Starlink, RAL)
+#     MBT: M.B.Taylor (Starlink)
 #     {enter_new_authors_here}
 #
 #  History:
@@ -222,6 +223,8 @@
 #        Converted for use in CCDPACK.
 #     7-AUG-1996 (BKM):
 #        Linux support added.
+#     10-OCT-2000 (MBT):
+#        Added LDFLAGS.
 #     {enter_further_changes_here}
 #
 #  Bugs:
@@ -235,6 +238,7 @@
       export CFLAGS
       export FC
       export FFLAGS
+      export LDFLAGS
       export LINK
       export SOURCE_VARIANT
       export RANLIB
@@ -267,6 +271,7 @@
                CFLAGS='-I$(STAR_INC) -I. -O -std1'
                FC='f77'
                FFLAGS='-O'
+               LDFLAGS=' -oldstyle_liblookup -ljpeg'
                LINK='ln -s'
                RANLIB='ranlib'
                TAR_IN='tar -cvhf'
@@ -317,6 +322,7 @@
                CFLAGS='-I$(STAR_INC) -I. -O'
                FC='f77'
                FFLAGS='-O'
+               LDFLAGS=' -lX -ljpeg'
                LINK='ln -s'
                TAR_IN='tar -cvhf'
                TAR_OUT='tar -xmf'
@@ -334,6 +340,7 @@
                CFLAGS='-I$(STAR_INC) -I. -O'
                FC='g77'
 	       FFLAGS='-O -fno-second-underscore -ffloat-store'
+               LDFLAGS=' -ldl -ljpeg'
                LINK='ln -s'
                RANLIB='ranlib'
                TAR_IN='tar -cvhf'
