@@ -47,6 +47,9 @@
 #        sun4_Solaris
 #           SUN Sparcstations running SunOS 5.x (Solaris)
 #
+#        ix86_Linux
+#           Intel PC running Linux
+#
 #     In addition, the following systems have been supported at some
 #     time in the past.  This script contains the macro definitions 
 #     needed for these systems, but it is not known whether CONVERT
@@ -199,6 +202,7 @@
 #     PTW: P.T.Wallace (Starlink, RAL)
 #     BLY: M.J.Bly (Starlink, RAL)
 #     AJC: A.J.Chipperfield (Starlink, RAL)
+#     BKM: B.K.McIlwrath (Starlink, RAL)
 #     {enter_new_authors_here}
 #
 #  History:
@@ -221,6 +225,8 @@
 #     25-OCT-1995 (AJC):
 #        Modify for CONVERT
 #        add FFLAGS -w for alpha
+#     10-DEC-1996 (BKM):
+#        Linux support added.
 #     {enter_further_changes_here}
 #
 #  Bugs:
@@ -310,6 +316,23 @@
                FC='f77'
                FFLAGS='-O -w'
                LINK='ln -s'
+               TAR_IN='tar -cvhf'
+               TAR_OUT='tar -xf'
+               echo "mk: Environment variables defined for $SYSTEM system"
+               ;;
+
+#  PC systems:
+#  ==========
+#  Intel PC running Linux.
+#  ----------------------
+            ix86_Linux)
+               AR_IN='ar r'
+	       CC='gcc'
+               CFLAGS='-I$(STAR_INC) -O'
+               FC='g77'
+	       FFLAGS='-O -fno-second-underscore'
+               LINK='ln -s'
+               RANLIB='ranlib'
                TAR_IN='tar -cvhf'
                TAR_OUT='tar -xf'
                echo "mk: Environment variables defined for $SYSTEM system"
