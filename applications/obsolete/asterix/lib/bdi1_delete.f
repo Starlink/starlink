@@ -85,6 +85,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'ADI_PAR'
 
 *  Arguments Given:
       INTEGER                   NARG, ARGS(*)

@@ -1,4 +1,4 @@
-      SUBROUTINE BDI_DELETE( ID, ITEMS, OKS, STATUS )
+      SUBROUTINE BDI_DELETE( ID, ITEMS, STATUS )
 *+
 *  Name:
 *     BDI_DELETE
@@ -128,7 +128,6 @@
         CALL BDI0_MKISTR( ID, ITEMS(C1:C2), ARGS(3), STATUS )
         IF ( STATUS .NE. SAI__OK ) THEN
           CALL ERR_ANNUL( STATUS )
-          OKS(IITEM) = .FALSE.
 
         ELSE
 
