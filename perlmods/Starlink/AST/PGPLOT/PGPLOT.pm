@@ -55,6 +55,8 @@ $Id$
 
 =head1 METHODS
 
+=over 
+
 =item B<_GFlush>
 
 This function ensures that the display device is up-to-date, by flushing 
@@ -696,6 +698,8 @@ sub _GAttr {
    return ( 1, $old_value );
 
 }   
+
+=back
 
 =head1 COPYRIGHT
 
