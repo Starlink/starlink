@@ -1,8 +1,25 @@
-*+  POWER - FFT power spectrum program.
       SUBROUTINE POWER( STATUS )
-*
-*    Description :
-*
+*+
+*  Name:
+*     POWER
+
+*  Purpose:
+*     FFT power spectrum program.
+
+*  Language:
+*     Starlink Fortran
+
+*  Type of Module:
+*     ASTERIX task
+
+*  Invocation:
+*     CALL POWER( STATUS )
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Description:
 *     Calculates the power spectrum of a 1D data array using an FFT for
 *     speed. Normalization used is:
 *                 power=F*conj(F)=(wave amplitude/2)**2
@@ -18,272 +35,303 @@
 *     numbers containing large prime factors can take a very long time.
 *     The user can therefore elect to truncate the data (by <10%) to avoid
 *     this problem.
-*
-*    Method :
-*
+
+*  Usage:
+*     power {parameter_usage}
+
+*  Environment Parameters:
+*     {parameter_name}[pdims] = {parameter_type} ({parameter_access_mode})
+*        {parameter_description}
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
 *     The basic technique is standard.
 *     The data must not be modified by the programme, so a temporary data
 *     object is used for scratch storage if mean-removal or tapering is
 *     requested.
 *     Arrays are mapped so there is no size limitation.
-*
-*    Deficiencies :
-*
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  Implementation Status:
+*     {routine_implementation_status}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
 *     Errors & Quality ignored.
 *     HISTORY should contain more info.
 *     Only handles 1d input data.
-*
-*    Bugs :
-*
-*    Authors :
-*
-*     Trevor Ponman  (BHVAD::TJP)
-*     Phil Andrews   (BHVAD::PLA)
-*     David J. Allan (BHVAD::DJA)
-*
-*    History :
-*
-*      8 Jan 86 : Original  (TJP)
-*     22 Jan 86 : Bug in TIM_FPOWER fixed  (TJP)
-*     20 Mar 86 : Array truncation option, COMMENTS removed  (TJP)
-*      1 Sep 86 : SGS workstation name updated (TJP)
-*     16 Mar 87 : Rewritten to ROSAT specification. Previous name: POWER (PLA)
-*      9 Jun 88 : Converted to new STARLINK HDS file standards.
-*                 No longer uses a temporary array for the data. (PLA)
-*     14 Jun 90 : V1.2-0  Checks for irregular axes and bad quality (DJA)
-*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
-*     20 Apr 95 : V1.8-1 New data interface (DJA)
-*
-*    Type Definitions :
-*
-      IMPLICIT NONE
-*
-*    Global constants :
-*
-      INCLUDE 'SAE_PAR'
-      INCLUDE 'ADI_PAR'
-*
-*    Status :
-*
-      INTEGER STATUS
-*
-*    External references :
-*
-      INTEGER                CHR_LEN
-*
-*    Local variables :
-*
-      CHARACTER*80           DUNITS        ! Data units.
-      CHARACTER*80           TUNITS        ! Time units.
-      CHARACTER*80           TITLE         ! Of the dataset
 
-      REAL                   BASE          ! Base value of input axis values
-      REAL                   DX            ! Data spacing.
+*  References:
+*     {task_references}...
 
-      INTEGER                DPTR          ! Pointer to TIM_FPOWER array.
-      INTEGER			IFID			! Input dataset id
-      INTEGER                NBAD          ! # of bad points
-      INTEGER                NDIMS         ! Dimensionality of data.
-      INTEGER                NDAT          ! No.of data points.
-      INTEGER                NEWPTR        ! Pointer to Output array.
-      INTEGER                NTRUNC        ! No. of points after truncation.
-      INTEGER                NV            ! Number of freqs in power spec.
-      INTEGER			OFID			! Output dataset id
-      INTEGER                QNDIM         ! Number of quality dimensions
-      INTEGER                QPTR          !
-      INTEGER                YPTR          ! Pointer to input data array.
-      INTEGER                LDIM(ADI__MXDIM)! Size of each dimension.
-      INTEGER                QDIMS(ADI__MXDIM)!
+*  Keywords:
+*     power, usage:public
 
-      LOGICAL                ANYBAD        ! Any bad quality points
-      LOGICAL                DEMEAN        ! Remove data mean?
-      LOGICAL                INPRIM        ! Input is primitive object.
-      LOGICAL                OK            ! General test
-      LOGICAL                REG           ! Is the input data regularly spaced?
-      LOGICAL                QOK           ! Quality there?
-      LOGICAL                TAPER         ! Data taper required?
-      LOGICAL                TRUNC         ! Data to be truncated?
-*
-*    Version id :
-*
-      CHARACTER*21           VERSION
-         PARAMETER           ( VERSION = 'POWER Version 1.8-1' )
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1995
+
+*  Authors:
+*     TJP: Trevor Ponman (University of Birmingham)
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*      8 Jan 1986 V0.6-0 (TJP):
+*        Original version.
+*     22 Jan 1986 V0.6-1 (TJP):
+*        Bug in TIM_FPOWER fixed
+*     20 Mar 1986 V0.6-2 (TJP):
+*        Array truncation option, COMMENTS removed
+*      1 Sep 1986 (TJP):
+*        SGS workstation name updated
+*     16 Mar 1987 V1.0-0 (PLA):
+*        Rewritten to ROSAT specification. Previous name: POWER
+*      9 Jun 1988 V1.1-0 (PLA):
+*        Converted to new STARLINK HDS file standards.
+*        No longer uses a temporary array for the data.
+*     14 Jun 1990 V1.2-0 (DJA):
+*        Checks for irregular axes and bad quality
+*     24 Nov 1994 V1.8-0 (DJA):
+*        Now use USI for user interface
+*     20 Apr 1995 V1.8-1 (DJA):
+*        New data interface
+*      5 Dec 1995 V2.0-0 (DJA):
+*        ADI port
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
 *-
 
-*    Check status.
-      IF (STATUS .NE. SAI__OK) RETURN
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
 
-*    Version.
-      CALL MSG_PRNT (VERSION)
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'ADI_PAR'
 
-*    Initialize ASTERIX
+*  Status:
+      INTEGER			STATUS             	! Global status
+
+*  External References:
+      EXTERNAL			CHR_LEN
+        INTEGER                	CHR_LEN
+
+*  Local Constants:
+      CHARACTER*30		VERSION
+        PARAMETER		( VERSION = 'POWER Version V2.0-0' )
+
+*  Local Variables:
+      CHARACTER*80           	UNITS        		! Data/axis units
+
+      REAL                   	BASE          		! Base value of input axis values
+      REAL                   	DX            		! Data spacing.
+
+      INTEGER			AXPTR			! Input axis data
+      INTEGER                	DIMS(ADI__MXDIM)	! I/p dimensions
+      INTEGER                	DPTR          		! Pointer to TIM_FPOWER array.
+      INTEGER			IFID			! Input dataset id
+      INTEGER                	NBAD          		! # of bad points
+      INTEGER                	NDIM         		! Dimensionality of data.
+      INTEGER                	NTRUNC        		! # points after truncation.
+      INTEGER                	NV            		! # freqs in power spec.
+      INTEGER			OFID			! Output dataset id
+      INTEGER                	QPTR          		! I/p quality
+      INTEGER                	YPTR          		! Pointer to input data array.
+      INTEGER			ULEN			! Length of new units
+
+      LOGICAL                	DEMEAN        		! Remove data mean?
+      LOGICAL			ISDS			! I/p non-primitive
+      LOGICAL                	OK            		! General test
+      LOGICAL                	REG           		! Is i/p regularly spaced?
+      LOGICAL                	QOK           		! Quality there?
+      LOGICAL                	TAPER         		! Data taper required?
+      LOGICAL                	TRUNC         		! Data to be truncated?
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Version id
+      CALL MSG_PRNT( VERSION )
+
+*  Initialise ASTERIX
       CALL AST_INIT()
 
-*    Obtain data object, access and check it.
-      CALL USI_TASSOCI( 'INP', '*', 'READ', IFID, STATUS )
+*  Obtain data object, access and check it.
+      CALL USI_ASSOC( 'INP', 'BinDS', 'READ', IFID, STATUS )
+      CALL ADI_DERVD( IFID, 'BinDS', ISDS, STATUS )
 
-*    Create a POWER_SPECTRUM object.
-      CALL USI_TASSOCO( 'OUT', 'POWER_SPECTRUM', OFID, STATUS )
-
-*    Check status
-      IF (STATUS .NE. SAI__OK) GOTO 99
-
-*    Get data object
-      CALL BDI_PRIM( IFID, INPRIM, STATUS )
-      CALL BDI_CHKDATA( IFID, OK, NDIMS, LDIM, STATUS )
-
+*  Get data object
+      CALL BDI_CHK( IFID, 'Data', OK, STATUS )
+      CALL BDI_GETSHP( IFID, ADI__MXDIM, DIMS, NDIM, STATUS )
       IF ( OK ) THEN
-        CALL BDI_MAPDATA( IFID, 'READ', YPTR, STATUS )
+        CALL BDI_MAPR( IFID, 'Data', 'READ', YPTR, STATUS )
       ELSE
         STATUS = SAI__ERROR
-        CALL ERR_REP( ' ', 'FATAL ERROR: No data object found.',
-     :                                                  STATUS )
+        CALL ERR_REP( ' ', 'FATAL ERROR: No data object found', STATUS )
       END IF
-      NDAT = LDIM(1)
+      IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Check status
-      IF (STATUS .NE. SAI__OK) GOTO 99
+*  Create output file
+      CALL USI_CREAT( 'OUT', ADI__NULLID, OFID, STATUS )
+      CALL BDI_LINK( 'PowerSpectrum', NDIM, DIMS, 'REAL', OFID, STATUS )
+      IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Check number of dimensions
-      IF ( NDIMS .EQ. 1 ) THEN
+*  Check number of dimensions
+      IF ( NDIM .EQ. 1 ) THEN
 
-*       Look for independent variable - if present & correct then map it
-         CALL BDI_CHKAXVAL( IFID, 1, OK, REG, NDAT, STATUS )
+*    Look for independent variable
+        CALL BDI_AXMAPR( IFID, 1, 'Data', 'READ', AXPTR, STATUS )
+        CALL ARR_CHKREG( %VAL(AXPTR), DIMS(1), REG, BASE, DX, STATUS )
+        IF ( (STATUS.EQ.SAI__OK) .AND. REG ) THEN
 
-         IF ( OK .AND. REG ) THEN
-            CALL BDI_GETAXVAL (IFID, 1, BASE, DX, NDAT, STATUS)
-         ELSE IF ( OK .AND. .NOT. REG ) THEN
-            CALL MSG_PRNT( 'FATAL ERROR: Cannot operate on irreg'/
+        ELSE IF ( STATUS .EQ. SAI__OK ) THEN
+          CALL MSG_PRNT( 'FATAL ERROR: Cannot operate on irreg'/
      :                                              /'ular data' )
-            STATUS = SAI__ERROR
-         ELSE
-            DX = 1.0
-            CALL MSG_PRNT ('WARNING: Invalid axis data - unit '/
+          STATUS = SAI__ERROR
+        ELSE
+          DX = 1.0
+          CALL MSG_PRNT ('WARNING: Invalid axis data - unit '/
      :                                      /'spacing assumed' )
-         END IF
+        END IF
+        IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*       Check status
-         IF (STATUS .NE. SAI__OK) GOTO 99
-
-*       Check for bad quality
-         CALL BDI_CHKQUAL( IFID, QOK, QNDIM, QDIMS, STATUS )
+*     Check for bad quality
+         CALL BDI_CHK( IFID, 'Quality', QOK, STATUS )
          IF ( QOK ) THEN
-            CALL BDI_MAPLQUAL( IFID, 'READ', ANYBAD, QPTR, STATUS )
-            IF ( ANYBAD ) THEN
-               CALL ARR_NBAD( NDAT, %VAL(QPTR), NBAD, STATUS )
-               CALL MSG_SETI( 'NBAD', NBAD )
-               CALL MSG_PRNT( 'WARNING: There are ^NBAD quality '/
-     :                            /'points present, aborting...' )
-            ELSE
-               NBAD = 0
-            END IF
-            CALL BDI_UNMAPLQUAL( IFID, STATUS )
-            IF ( NBAD .GT. 0 ) THEN
-               STATUS = SAI__ERROR
-               GOTO 99
-            END IF
+           CALL BDI_MAPL( IFID, 'LogicalQuality', 'READ', QPTR, STATUS )
+           IF ( ANYBAD ) THEN
+             CALL ARR_NBAD( DIMS(1), %VAL(QPTR), NBAD, STATUS )
+             CALL MSG_SETI( 'NBAD', NBAD )
+             STATUS = SAI__ERROR
+             CALL ERR_REP( ' ', 'WARNING: There are ^NBAD quality '/
+     :                      /'points present, aborting...', STATUS )
+           END IF
          END IF
 
-*       Inform user about length of data set
-         CALL MSG_SETI('NDAT', NDAT)
+*     Inform user about length of data set
+         CALL MSG_SETI( 'NDAT', DIMS(1) )
          CALL MSG_PRNT( '^NDAT data points entered' )
 
-*       User input
+*     User input
          CALL USI_GET0L('TRUNCATE', TRUNC, STATUS)
-
-*       Check status
          IF (STATUS .NE. SAI__OK) GOTO 99
 
          IF ( TRUNC ) THEN
-            CALL TIM_TRUNC( NDAT, NTRUNC )
+            CALL TIM_TRUNC( DIMS(1), NTRUNC )
             CALL MSG_SETI('NTRUNC', NTRUNC )
             CALL MSG_PRNT( 'Truncated to ^NTRUNC values' )
-            NDAT = NTRUNC
+            DIMS(1) = NTRUNC
          END IF
 
 *       User input
-         CALL USI_GET0L ('TAPER', TAPER, STATUS)
-
+         CALL USI_GET0L( 'TAPER', TAPER, STATUS )
          IF ( .NOT. TAPER ) THEN
-            CALL USI_GET0L ('REMOVE_MEAN', DEMEAN, STATUS)
+            CALL USI_GET0L( 'REMOVE_MEAN', DEMEAN, STATUS )
          END IF
+         IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*       Check status - drop out if bad.
-         IF (STATUS .NE. SAI__OK) GOTO 99
-
-         CALL DYN_MAPR (1, NDAT, DPTR, STATUS)
+         CALL DYN_MAPR( 1, DIMS(1), DPTR, STATUS )
 
          IF ( TAPER .OR. DEMEAN ) THEN
 
 *          Set up modified data array with mean subtracted
-            CALL POWER_MEANSUB (NDAT, %VAL(YPTR), %VAL(DPTR))
+            CALL POWER_MEANSUB( DIMS(1), %VAL(YPTR), %VAL(DPTR) )
 
          ELSE
 
 *          Original array to be passed across
-            CALL ARR_COP1R( NDAT, %VAL(YPTR), %VAL(DPTR), STATUS )
+            CALL ARR_COP1R( DIMS(1), %VAL(YPTR), %VAL(DPTR), STATUS )
 
          END IF
+         IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*       Check status - drop out if bad.
-         IF (STATUS .NE. SAI__OK) GOTO 99
-
-*       Taper 10% of data at each end if required
-*       Should the fraction tapered be user selectable??
+*     Taper 10% of data at each end if required
+*     Should the fraction tapered be user selectable??
          IF ( TAPER ) THEN
-            CALL ARR_TAPERR( NDAT, 0.1, %VAL(DPTR), STATUS )
+           CALL ARR_TAPERR( DIMS(1), 0.1, %VAL(DPTR), STATUS )
          END IF
 
-*       Compute power spectrum
-         CALL TIM_FPOWER (NDAT, %VAL(DPTR), NV, STATUS)
+*     Compute power spectrum
+         CALL TIM_FPOWER( DIMS(1), %VAL(DPTR), NV, STATUS )
 
-*       Create components in output file.
-*       Start with the axis values
-         DX = 1.0 / ( REAL(NDAT) * DX )
-         CALL BDI_CREAXES( OFID, 1, STATUS )
-         CALL BDI_PUTAXVAL( OFID, 1, 0, DX, NV, STATUS )
-         CALL BDI_PUTAXLABEL( OFID, 1, 'Frequency', STATUS )
-         CALL BDI_PUTLABEL( OFID, 'Power', STATUS )
+*     Create components in output file.
+*     Start with the axis values
+         SPARR(1) = 0.0
+         SPARR(2) = 1.0 / ( REAL(DIMS(1)) * DX )
+         CALL BDI_AXPUT1R( OFID, 1, 'SpacedData', 2, SPARR, STATUS )
+         CALL BDI_AXPUT0C( OFID, 1, 'Label', 'Frequency', STATUS )
+         CALL BDI_PUT0C( OFID, 'Label', 'Power', STATUS )
 
-         IF ( .NOT. INPRIM ) THEN
-            CALL BDI_GETTITLE( IFID, TITLE, STATUS )
-            CALL BDI_PUTTITLE( OFID, TITLE, STATUS )
-            CALL BDI_GETUNITS( IFID, DUNITS, STATUS )
+*      Create output data array
+          CALL BDI_PUT1R( OFID, 'Data', NV, %VAL(NEWPTR), STATUS )
 
-            IF (CHR_LEN(DUNITS) .GT. 0) THEN
-               DUNITS = '('//DUNITS(1:CHR_LEN(DUNITS))//')**2'
-               CALL BDI_PUTUNITS (OFID, DUNITS, STATUS)
+*      Copy stuff from input
+         IF ( ISDS ) THEN
+
+*        The data units
+            CALL BDI_GETUNITS( IFID, UNITS, STATUS )
+            IF ( UNITS .GT. ' ' ) THEN
+              CALL MSG_SETC( 'UN', DUNITS )
+              CALL MSG_MAKE( '(^UN)**2', UNITS, ULEN )
+              CALL BDI_PUT0C( OFID, 'Units', UNITS(:ULEN), STATUS )
             END IF
 
-            CALL BDI_GETAXUNITS (IFID, 1, TUNITS, STATUS)
-            IF ( CHR_LEN(TUNITS) .GT. 0 ) THEN
-               TUNITS = '('//TUNITS(1:CHR_LEN(TUNITS))//')**-1'
-               CALL BDI_PUTAXUNITS( OFID, 1, TUNITS, STATUS)
+*        Frequency units
+            CALL BDI_AXGET0C( IFID, 1, 'Units', UNITS, STATUS)
+            IF ( UNITS .GT. ' ' ) THEN
+              CALL MSG_SETC( 'UN', UNITS )
+              CALL MSG_MAKE( '(^UN)**-1', UNITS, ULEN )
+              CALL BDI_AXPUT0C( OFID, 1, 'Units', UNITS(:ULEN), STATUS)
             END IF
 
-*          Create output data array
-            CALL BDI_CREDATA( OFID, 1, NV, STATUS )
-            CALL BDI_MAPDATA( OFID, 'WRITE', NEWPTR, STATUS )
-            CALL ARR_COP1R( NV, %VAL(DPTR), %VAL(NEWPTR), STATUS )
+            CALL BDI_COPY( IFID, 'Title', OFID, ' ', STATUS )
 
-*          Copy MORE structure.
-            CALL BDI_COPMORE( IFID, OFID, STATUS )
+          END IF
 
-*          Copy History.
-            CALL HSI_COPY( IFID, OFID, STATUS)
+*      Copy ancillaries
+          CALL UDI_COPANC( IFID, 'grf', OFID, STATUS )
 
-         END IF
+*      Copy History.
+          CALL HSI_COPY( IFID, OFID, STATUS )
 
-*       Add new history record. ! This should contain more info.
-         CALL HSI_ADD( OFID, VERSION, STATUS )
+        END IF
 
-      ELSE IF ( NDIMS .NE. 1 ) THEN
-         CALL ERR_REP( ' ', 'FATAL ERROR: Data is not one-dimensional',
-     :                                                         STATUS )
+*    Add new history record. ! This should contain more info.
+        CALL HSI_ADD( OFID, VERSION, STATUS )
+
+      ELSE IF ( NDIM .NE. 1 ) THEN
+        CALL ERR_REP( ' ', 'FATAL ERROR: Data is not one-dimensional',
+     :                                                        STATUS )
 
       END IF
 
-*    Tidy up
+*  Tidy up
  99   CALL AST_CLOSE()
       CALL AST_ERR( STATUS )
 
