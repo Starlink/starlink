@@ -108,6 +108,7 @@ bool process_special (DviFile *, string specialString,
 string_list& tokenise_string (string s);
 string get_ofn_pattern (string dviname);
 bool parse_boolean_string(char *s);
+void Usage (string msg);
 void Usage (void);
 char *progname;
 
@@ -242,48 +243,44 @@ int main (int argc, char **argv)
 			haveValue = true;
 		    }
 
-		    cerr << "crop: margin=" << suboptch << ", size="
-			 << (haveValue ? cropmargin : -1)
-			 << ", abs=" << absCrop << endl;
-
 		    switch(suboptch) {
 		      case 0:	// left
-			if (!haveValue) Usage();
+			if (!haveValue) Usage("no value for --crop=left");
 			Bitmap::cropDefault
 				(Bitmap::Left,   cropmargin, absCrop);
 			break;
 		      case 1:	// right
-			if (!haveValue) Usage();
+			if (!haveValue) Usage("no value for --crop=right");
 			Bitmap::cropDefault
 				(Bitmap::Right,  cropmargin, absCrop);
 			break;
 		      case 2:	// top
-			if (!haveValue) Usage();
+			if (!haveValue) Usage("no value for --crop=top");
 			Bitmap::cropDefault
 				(Bitmap::Top,    cropmargin, absCrop);
 			break;
 		      case 3:	// bottom
-			if (!haveValue) Usage();
+			if (!haveValue) Usage("no value for --crop=bottom");
 			Bitmap::cropDefault
 				(Bitmap::Bottom, cropmargin, absCrop);
 			break;
 		      case 4:	// all
-			if (!haveValue) Usage();
+			if (!haveValue) Usage("no value for --crop=all");
 			if (absCrop) // don't want this!
-			    Usage();
+			    Usage("can't have absolute crop for --crop=all");
 			Bitmap::cropDefault
 				(Bitmap::All,    cropmargin, false);
 			break;
 		      case 5:	// absolute
-			if (haveValue) Usage();
+			if (haveValue) Usage("--crop=absolute takes no value");
 			absCrop = true;
 			break;
 		      case 6:	// relative
-			if (haveValue) Usage();
+			if (haveValue) Usage("--crop=relative takes no value");
 			absCrop = false;
 			break;
 		      case -1:
-			Usage();
+			Usage("unrecognised keyword for --crop");
 			break;
 		      default:
 			throw DviBug("Impossible crop suboption " + suboptch);
@@ -335,7 +332,7 @@ int main (int argc, char **argv)
 			break;
 			
 		      default:
-			Usage();
+			Usage("bad keyword for --font-search");
 		    }
 		}
 	    }
@@ -343,7 +340,6 @@ int main (int argc, char **argv)
 
 	  case 'G':		// --font-gen
 	    PkFont::setMakeFonts (parse_boolean_string(optarg));
-	    cerr << "font-gen=" << parse_boolean_string(optarg) << endl;
 	    break;
 
 	  case 'g':		// --debug
@@ -380,7 +376,7 @@ int main (int argc, char **argv)
 			    debuglevel = everything;
 			break;
 		      default:
-			Usage();
+			Usage("bad flag for --debug");
 		    }
 		}
 	    }
@@ -395,14 +391,14 @@ int main (int argc, char **argv)
 	  case 'P':		// --page-range
 	    {
 		if (! PR.addSpec(optch, optarg))
-		    Usage();
-		// DEBUG
-		int tcounts[] = { 3, 0, 0, 0, 0, 0, 0, 0, 0, 0,};
-		for (int ti=0; ti<5; ti++)
-		    cerr << "Page " << ti << ": "
-			 << (PR.isSelected(ti, tcounts) ? "yes" : "no")
-			 << endl;
-		// ENDDEBUG			
+		    Usage("improper page spec");
+//		// DEBUG
+//		int tcounts[] = { 3, 0, 0, 0, 0, 0, 0, 0, 0, 0,};
+//		for (int ti=0; ti<5; ti++)
+//		    cerr << "Page " << ti << ": "
+//			 << (PR.isSelected(ti, tcounts) ? "yes" : "no")
+//			 << endl;
+//		// ENDDEBUG			
 	    }
 	    break;
 
@@ -412,7 +408,6 @@ int main (int argc, char **argv)
 
 	  case 'm':		// --magnification
 	    magmag = atof (optarg);
-	    cerr << "magnification=" << magmag << endl;
 	    break;
 
 	  case 'n':		// --preamble-only
@@ -445,7 +440,7 @@ int main (int argc, char **argv)
 		while (*options) {
 		    int suboptch = getsubopt(&options, tokens, &value);
 		    if (value)	// no values
-			Usage();
+			Usage("--query keywords do not take values");
 		    switch (suboptch)
 		    {
 		      case 0:	// missing-fonts
@@ -506,7 +501,7 @@ int main (int argc, char **argv)
 			break;
 
 		      case -1:
-			Usage();
+			Usage("unknown query type");
 			break;
 		      default:
 			throw DviBug("Impossible query suboption " + suboptch);
@@ -518,7 +513,6 @@ int main (int argc, char **argv)
 	  case 'r':		// --resolution
 	    PkFont::setResolution (atoi(optarg));
 	    resolution = PkFont::dpiBase();
-	    cerr << "resolution=" << resolution << endl;
 	    break;
 
 	  case 'R':		// --colours, --colors
@@ -532,28 +526,19 @@ int main (int argc, char **argv)
 		char c;
 		while (*options) {
 		    int fb = getsubopt(&options, tokens, &value);
-		    cerr << "R: fb=" << fb
-			 << " value=" << (value ? value : "<null>") << endl;
 		    Bitmap::BitmapColour rgb;
 		    if (!value)
-			Usage();
-		    if (Util::parseRGB(rgb, value)) {
+			Usage("no value given for --colours keyword");
+		    if (Util::parseRGB(rgb, value))
 			Bitmap::setDefaultRGB (fb==0, &rgb);
-			cerr << "rgb"
-			     << (fb==0 ? "(foreground)" : "(background)")
-			     << (int)rgb.red << ','
-			     << (int)rgb.green << ','
-			     << (int)rgb.blue << endl;
-		    }
 		    else
-			Usage();
+			Usage("bad colour spec");
 		}
 	    }
 	    break;		    
 
 	  case 's':		// --scale
 	    bm.bitmap_scale_factor = atoi (optarg);
-	    cerr << "scale-factor=" << bm.bitmap_scale_factor << endl;
 	    break;
 
 	  case 't':		// --paper-size
@@ -566,7 +551,6 @@ int main (int argc, char **argv)
 	    for (i = 0; i<npapersizes; i++)
 		if (strcmp (optarg, papersizes[i].name) == 0)
 		{
-		    cerr << "papersize=" << papersizes[i].name << endl;
 		    bitmapH
 			    = static_cast<int>(magmag*papersizes[i].h+0.5);
 		    bitmapW
@@ -575,7 +559,7 @@ int main (int argc, char **argv)
 		}
 	    if (i == npapersizes)
 		cerr << "--paper-size=" << optarg
-		     << " not recognised.  See -Qp XXX" << endl;
+		     << " not recognised.  See --query=paper" << endl;
 	    else
 		if (verbosity > normal)
 		    cerr << "Papersize " << optarg
@@ -659,7 +643,7 @@ int main (int argc, char **argv)
 	    else if (strcmp(optarg, "silent") == 0)
 		verbosity = silent;
 	    else
-		Usage();
+		Usage("bad verbosity keyword");
 	    
 	    DviFile::verbosity(verbosity);
 	    PkFont::verbosity(verbosity);
@@ -711,7 +695,7 @@ int main (int argc, char **argv)
 				= (!value || parse_boolean_string(value));
 			break;
 		      case -1:
-			Usage();
+			Usage("bad process keyword");
 			break;
 		      default:	// eh?
 			throw DviBug("Impossible process suboption "+suboptch);
@@ -727,7 +711,7 @@ int main (int argc, char **argv)
 	    break;
 	    
 	  default:
-	    Usage();
+	    Usage("unrecognised option");
 	}
     }
     
@@ -737,12 +721,12 @@ int main (int argc, char **argv)
     argc -= optind;
     argv += optind;
     if (argc != 1)
-	Usage();
+	Usage("no DVI file specified");
     dviname = *argv;
 
     // Insist we have a DVI file specified.
     if (dviname.length() == 0)
-	Usage();
+	Usage("DVI filename has zero length!");
 
     if (verbosity >= normal)
 	// Banner
@@ -1381,6 +1365,11 @@ bool parse_boolean_string(char *s)
     return false;
 }
 
+void Usage (string msg)
+{
+    cerr << "Error: " << msg << endl;
+    Usage();
+}
 void Usage (void)
 {
     cerr << "Usage: " << progname << " [flags...] filename" << endl;
