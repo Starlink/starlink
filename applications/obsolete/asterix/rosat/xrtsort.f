@@ -223,10 +223,6 @@
                CALL DYN_MAPR(1, MAPLIM, BEVPTR(LP), STATUS)
             ENDDO
 *
-            IF (STATUS .NE. SAI__OK) THEN
-               CALL MSG_PRNT('Error obtaining dynamic memory')
-               GOTO 999
-            ENDIF
 *
          ENDIF
 *
@@ -236,8 +232,9 @@
      &          %val(SEVPTR(4)), %val(SEVPTR(5)), %val(SEVPTR(6)),
      &          %val(SEVPTR(7)), %val(BEVPTR(1)), %val(BEVPTR(2)),
      &          %val(BEVPTR(3)), %val(BEVPTR(4)), %val(BEVPTR(5)),
-     &          %val(BEVPTR(6)), %val(BEVPTR(7)), TOTEV_SRC,
-     &                                         TOTEV_BCK, STATUS )
+     &          %val(BEVPTR(6)), %val(BEVPTR(7)),
+     &          MDIM(1),MDIM(2),MRES,%val(SMPTR),%val(BMPTR),
+     &          TOTEV_SRC,TOTEV_BCK, STATUS )
 *
          IF (STATUS .NE. SAI__OK) GOTO 999
 *
@@ -294,9 +291,9 @@
 999   CONTINUE
 *
 *   Tidy up
-      CALL USI_TANNUL(SID,STATUS)
+      CALL USI_ANNUL('SRCFILE',STATUS)
       IF (SRT.BCKGND) THEN
-         CALL USI_TANNUL(BID,STATUS)
+         CALL USI_ANNUL('BCKFILE',STATUS)
       ENDIF
       CALL AST_CLOSE()
 *
@@ -1381,161 +1378,6 @@ C     CALL BDA_ANNUL(LIV, STATUS)
 *
       END
 
-
-
-*+XRTSORT_MASK - creates image masks
-      SUBROUTINE XRTSORT_MASK(SRT, DIM1, DIM2, AMASK, STATUS)
-*    Description :
-*     <description of what the subroutine does - for user info>
-*    Method :
-*     <description of how the subroutine works - for programmer info>
-*    Deficiencies :
-*     <description of any deficiencies>
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
-*     R.D.Saxton
-*    History :
-*     12-May-1992
-*    Type definitions :
-      IMPLICIT NONE
-*    Global constants :
-      INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
-*    Global variables :
-      INCLUDE 'INC_XRTSRT'
-*    Structure definitions :
-*     <specification of FORTRAN structures>
-*    Import :
-      RECORD /XRT_SCFDEF/ SRT               ! Sort values
-      INTEGER DIM1,DIM2                     ! Image pixel dims
-*    Import-Export :
-      INTEGER AMASK(DIM1,DIM2)              ! Image mask
-*    Export :
-*    Status :
-      INTEGER STATUS
-*    Local variables :
-      CHARACTER*3 MODE
-      CHARACTER*6 UNITS(2)
-      INTEGER ARDID
-      INTEGER DIMS(2)
-      REAL XSCALE,YSCALE
-      REAL XC,YC
-      REAL RAD,MINRAD,MAJRAD
-      REAL XWID,YWID
-      REAL ANGLE
-      REAL BASE(2),SCALE(2)
-      LOGICAL EXC
-*-
-
-*    Check status
-      IF ( STATUS .NE. SAI__OK ) RETURN
-
-
-      XSCALE = ABS(SRT.MAX_X - SRT.MIN_X) / REAL(DIM1)
-      YSCALE = ABS(SRT.MAX_Y - SRT.MIN_Y) / REAL(DIM2)
-*
-* Open an ARD description
-      CALL ARX_OPEN('WRITE',ARDID,STATUS)
-
-* Set the mask to all excluded (zero)
-      CALL ARR_INIT1I(0, DIM1*DIM2, AMASK,STATUS)
-*
-* Fill in the first region
-      XC=REAL(DIM1)/2.0
-      YC=REAL(DIM2)/2.0
-*
-      IF (INDEX(SRT.SHAPE, 'E') .NE. 0) THEN
-*
-         MAJRAD = SRT.ELAMAX / XSCALE
-         MINRAD = SRT.ELBMAX / YSCALE
-         ANGLE = SRT.PHI
-
-         MODE='ADD'
-         EXC=.FALSE.
-
-         CALL ARX_ELLIPSE(ARDID,0,MODE,EXC,XC,YC,MAJRAD,MINRAD,
-     :                                             ANGLE,STATUS)
-*
-* Exclude the interior region bad if this is an annulus
-         IF (SRT.ELAMIN .GT. 0.0) THEN
-            MAJRAD = SRT.ELAMIN / XSCALE
-            MINRAD = SRT.ELBMIN / YSCALE
-
-            MODE='AND'
-            EXC=.TRUE.
-
-            CALL ARX_ELLIPSE(ARDID,0,MODE,EXC,XC,YC,MAJRAD,MINRAD,
-     :                                                ANGLE,STATUS)
-
-         ENDIF
-*
-      ELSEIF(INDEX(SRT.SHAPE, 'C') .NE. 0 .OR.
-     &              INDEX(SRT.SHAPE, 'A' ) .NE. 0) THEN
-*
-         RAD = SRT.ELAMAX / XSCALE
-*
-         MODE='ADD'
-         EXC=.FALSE.
-
-         CALL ARX_CIRCLE(ARDID,0,MODE,EXC,XC,YC,RAD,STATUS)
-
-*   Set the interior region bad if this is an annulus
-         IF (SRT.ELAMIN .GT. 0.0) THEN
-            RAD = SRT.ELAMIN / XSCALE
-*
-            MODE='AND'
-            EXC=.TRUE.
-            CALL ARX_CIRCLE(ARDID,0,MODE,EXC,XC,YC,RAD,STATUS)
-
-         ENDIF
-*
-      ELSEIF(INDEX(SRT.SHAPE, 'R') .NE. 0) THEN
-
-         XWID=SRT.ELAMAX * 2. / XSCALE
-         YWID=SRT.ELBMAX * 2. / YSCALE
-
-         MODE='ADD'
-         EXC=.FALSE.
-
-         CALL ARX_BOX(ARDID,0,MODE,EXC,XC,YC,XWID,YWID,STATUS)
-
-*
-*   Set the interior region bad if this is an annulus
-         IF (SRT.ELAMIN .GT. 0.0) THEN
-            XWID=SRT.ELAMIN * 2. / XSCALE
-            YWID=SRT.ELBMIN * 2. / YSCALE
-
-            MODE='AND'
-            EXC=.TRUE.
-
-            CALL ARX_BOX(ARDID,0,MODE,EXC,XC,YC,XWID,YWID,STATUS)
-
-         ENDIF
-*
-      ENDIF
-
-
-*  set mask
-      BASE(1)=1.0
-      BASE(2)=1.0
-      SCALE(1)=1.0
-      SCALE(2)=1.0
-      UNITS(1)='PIXEL'
-      UNITS(2)='PIXEL'
-      DIMS(1)=DIM1
-      DIMS(2)=DIM2
-      CALL ARX_MASK(ARDID,DIMS,BASE,SCALE,UNITS,AMASK,STATUS)
-
-*  close ARD description
-      CALL ARX_CLOSE(ARDID,STATUS)
-
-      IF (STATUS .NE. SAI__OK) THEN
-         CALL ERR_REP(' ','from XRTSORT_MASK',STATUS)
-      ENDIF
-*
-      END
 
 *+XRTSORT_PHOTONCNT   - Sorts XRT raw data into a binned data array
       SUBROUTINE XRTSORT_PHOTONCNT(HEAD, SRT, BSRT, MAXLIM, STATUS)
@@ -3272,21 +3114,21 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
       LOGICAL LHRI                           ! Is it an HRI file ?
       LOGICAL TOK                            ! Is this event within time ranges?
       LOGICAL OK
-      LOGICAL MOK			     ! Event within masked region
+      LOGICAL IMAGE			     ! Output contains image(s)
       INTEGER IX,YMAX                        ! Counter
+
 *-
       SAVE_YMIN = SRT.MIN_Y
       SAVE_YMAX = SRT.MAX_Y
 
       YMAX = HEAD.YEND
 
-C      IF (.NOT. LMPE) THEN
-C         SRT.MIN_Y = YMAX - SRT.MIN_Y + 1
-C         SRT.MAX_Y = YMAX - SRT.MAX_Y + 1
-C      ENDIF
 
 ***   Test if this is an HRI file
-      IF (INDEX(HEAD.DETECTOR, 'HRI') .NE. 0) LHRI = .TRUE.
+      LHRI = (INDEX(HEAD.DETECTOR, 'HRI') .NE. 0)
+
+*     Does the output contain image(s)
+      IMAGE=(SDIM1.GT.1.AND.SDIM2.GT.1.AND.NRBIN.EQ.1)
 
 ***   Calculate the pixel centres of each box
       SCEN_X = (SRT.MIN_X + SRT.MAX_X) / 2.0
@@ -3417,152 +3259,164 @@ C      ENDIF
 *
 *             Check if event is within the source box. Circles are tested
 *             as a special case of the elliptical box
-                  IF ( (SRT.SHAPE .EQ. 'R' .AND.
-     &              (SRT.MIN_X .LE. XEV .AND. SRT.MAX_X .GE. XEV) .AND.
-     &              (SRT.MIN_Y .LE. YEV .AND. SRT.MAX_Y .GE. YEV))
-     &                                  .OR.
-     &              ( (SRT.SHAPE .EQ. 'C' .OR. SRT.SHAPE .EQ. 'A' .OR.
-     &                              SRT.SHAPE .EQ. 'E') .AND.
-     &              ((SELPX2*SBMIN2 + SELPY2*SAMIN2) .GE. SA2B2I .AND.
-     &               (SELPX2*SBMAX2 + SELPY2*SAMAX2) .LE. SA2B2O))
-     &                       .OR.SRT.SHAPE.EQ.'I') THEN
+                 IF ( SRT.SHAPE .EQ. 'R') THEN
+                   OK=((SRT.MIN_X .LE. XEV .AND. SRT.MAX_X .GE. XEV)
+     &                                  .AND.
+     &                 (SRT.MIN_Y .LE. YEV .AND. SRT.MAX_Y .GE. YEV))
+                 ELSEIF (INDEX('CAE',SRT.SHAPE).NE.0) THEN
+                   OK=((SELPX2*SBMIN2 + SELPY2*SAMIN2) .GE. SA2B2I
+     &                                  .AND.
+     &                 (SELPX2*SBMAX2 + SELPY2*SAMAX2) .LE. SA2B2O))
+                 ELSEIF (SRT.SHAPE.EQ.'I') THEN
+*              Find position within spatial mask
+                   IF (IMAGE) THEN
+                     MEL1=INT((XEV-SRT.MIN_X)/XWIDTH) + 1
+                     IF (HEAD.ORIGIN.EQ.'MPE') THEN
+                       MEL2=SDIM2 - INT((YEV-SRT.MIN_Y)/YWIDTH)
+                     ELSE
+                       MEL2=INT((YEV-SRT.MIN_Y)/YWIDTH) + 1
+                     ENDIF
+                   ELSE
+                     MEL1=INT((XEV-HEAD.XSTART)/MRES)+1
+                     IF (HEAD.ORIGIN.EQ.'MPE') THEN
+                       MEL2=INT((-YEV-HEAD.YSTART)/MRES)+1
+                     ELSE
+                       MEL2=INT((YEV-HEAD.YSTART)/MRES)+1
+                     ENDIF
+                   ENDIF
+                   OK=(SMASK(MEL1,MEL2).NE.0)
+
+                 ENDIF
+
+                 IF (OK) THEN
+
 *
 *             Calculate position of data in array
 *               The first two dimensions of the array can be either
 *               X and Y pixel or RADIAL and AZIMUTHAL bin, depending on
 *               the user selection.
-                    IF (SDIM1.GT.1.AND.SDIM2.GT.1.AND.NRBIN.EQ.1) THEN
+                   IF (IMAGE) THEN
 *
 *                 X,Y bins:
-                      EL1=INT((XEV-SRT.MIN_X)/XWIDTH) + 1
+                     EL1=INT((XEV-SRT.MIN_X)/XWIDTH) + 1
 *
 *                 Calculate Y element according to orientation of raw pixels
-                      IF (HEAD.ORIGIN.EQ.'MPE') THEN
-                         EL2=SDIM2 - INT((YEV-SRT.MIN_Y)/YWIDTH)
-                      ELSE
-                         EL2=INT((YEV-SRT.MIN_Y)/YWIDTH) + 1
-                      ENDIF
-                      MEL1=EL1
-                      MEL2=EL2
+                     IF (HEAD.ORIGIN.EQ.'MPE') THEN
+                       EL2=SDIM2 - INT((YEV-SRT.MIN_Y)/YWIDTH)
+                     ELSE
+                       EL2=INT((YEV-SRT.MIN_Y)/YWIDTH) + 1
+                     ENDIF
 *
-                    ELSE
+                   ELSE
 
 *                   No spatial axes
-                      IF (SDIM1.EQ.1.AND.SDIM2.EQ.1) THEN
+                     IF (SDIM1.EQ.1.AND.SDIM2.EQ.1) THEN
 
-                        EL1=1
-                        EL2=1
+                       EL1=1
+                       EL2=1
 
 *                   Radial distribution
-                      ELSE
+                     ELSE
 
 *                 Calculate the radial (and azimuthal) bin by checking
 *                 each bin individually (how else ??)
-                        DO EL1=1,NRBIN
+                       DO EL1=1,NRBIN
 *
-                           IF (( SELPX2 / ELIPA2(EL1) +
+                         IF (( SELPX2 / ELIPA2(EL1) +
      &                         SELPY2 / ELIPB2(EL1) ) .LE. 1.0) GOTO 110
-                        ENDDO
+                       ENDDO
 *
 *                 This error message should never be activated
-                        CALL MSG_PRNT('Error calculating elliptical - '/
+                       CALL MSG_PRNT('Error calculating elliptical - '/
      &                             /'bin refer to author')
 *
-110                     CONTINUE
+110                    CONTINUE
 *
 *                 Set azimuthal bin to zero for now
-                        EL2=1
+                       EL2=1
 *
-                      ENDIF
-
-*                   Find position within spatial mask
-                      MEL1=INT((XEV-HEAD.XSTART)/MRES)+1
-                      IF (HEAD.ORIGIN.EQ.'MPE') THEN
-                        MEL2=INT((-YEV-HEAD.YSTART)/MRES)+1
-                      ELSE
-                        MEL2=INT((YEV-HEAD.YSTART)/MRES)+1
-                      ENDIF
+                     ENDIF
 
 
-                    ENDIF
+
+                   ENDIF
 *
 *               Calculate the other elements
-                    EL3=INT((XDEV-SRT.MIN_XD)/XDWID) + 1
-                    EL4=INT((YDEV-SRT.MIN_YD)/YDWID) + 1
-                    EL5=MIN((INT((TEV-SRT.MIN_T(1))/TWIDTH) + 1), SDIM5)
-                    EL6=INT((AEV-SRT.MIN_PH)/PWIDTH) + 1
-                    EL7=INT((CEV-SRT.MIN_EN)/EWIDTH) + 1
+                   EL3=INT((XDEV-SRT.MIN_XD)/XDWID) + 1
+                   EL4=INT((YDEV-SRT.MIN_YD)/YDWID) + 1
+                   EL5=MIN((INT((TEV-SRT.MIN_T(1))/TWIDTH) + 1), SDIM5)
+                   EL6=INT((AEV-SRT.MIN_PH)/PWIDTH) + 1
+                   EL7=INT((CEV-SRT.MIN_EN)/EWIDTH) + 1
 *
-                    IF (SRT.SHAPE.EQ.'I') THEN
-                      MOK=(SMASK(MEL1,MEL2).NE.0)
-                    ELSE
-                      MOK=.TRUE.
-                    ENDIF
 
-                    IF (MOK) THEN
-                      SDATA(EL1,EL2,EL3,EL4,EL5,EL6,EL7) =
+                   SDATA(EL1,EL2,EL3,EL4,EL5,EL6,EL7) =
      &                      SDATA(EL1,EL2,EL3,EL4,EL5,EL6,EL7) + 1.0
-                    ENDIF
 *
-                   ENDIF
+                 ENDIF
 
 *             Check if event is within the background box
-                   IF ( SRT.BCKGND .AND. (BSRT.SHAPE .EQ. 'R' .AND.
-     &             (BSRT.MIN_X .LE. XEV .AND. BSRT.MAX_X .GE. XEV) .AND.
-     &             (BSRT.MIN_Y .LE. YEV .AND. BSRT.MAX_Y .GE. YEV))
-     &                             .OR.
-     &             ( (BSRT.SHAPE .EQ. 'C' .OR. BSRT.SHAPE .EQ. 'A' .OR.
-     &                              BSRT.SHAPE .EQ. 'E') .AND.
-     &             ( (BELPX2*BBMIN2 + BELPY2*BAMIN2) .GE. BA2B2I .AND.
-     &               (BELPX2*BBMAX2 + BELPY2*BAMAX2) .LE. BA2B2O)
-     &                             .OR.BSRT.SHAPE.EQ.'I')) THEN
-*
+                 IF ( SRT.BCKGND) THEN
+                   IF (BSRT.SHAPE .EQ. 'R') THEN
+                     OK=((BSRT.MIN_X .LE.XEV.AND.BSRT.MAX_X.GE.XEV)
+     &                            .AND.
+     &                   (BSRT.MIN_Y.LE.YEV.AND.BSRT.MAX_Y.GE.YEV))
+                   ELSEIF (INDEX('CAE',BSRT.SHAPE).NE.0) THEN
+                     OK=((BELPX2*BBMIN2 + BELPY2*BAMIN2) .GE. BA2B2I
+     &                              .AND.
+     &                   (BELPX2*BBMAX2 + BELPY2*BAMAX2) .LE. BA2B2O)
+                   ELSEIF (BSRT.SHAPE.EQ.'I') THEN
+                  Find position within spatial mask
+                     IF (IMAGE) THEN
+                       MEL1=INT((XEV-BSRT.MIN_X)/BXWIDTH) + 1
+                       IF (HEAD.ORIGIN.EQ.'MPE') THEN
+                         MEL2=BDIM2 - INT((YEV-BSRT.MIN_Y)/BYWIDTH)
+                       ELSE
+                         MEL2=INT((YEV-BSRT.MIN_Y)/BYWIDTH) + 1
+                       ENDIF
+                     ELSE
+                       MEL1=INT((XEV-HEAD.XSTART)/MRES)+1
+                       IF (HEAD.ORIGIN.EQ.'MPE') THEN
+                         MEL2=INT((-YEV-HEAD.YSTART)/MRES)+1
+                       ELSE
+                         MEL2=INT((YEV-HEAD.YSTART)/MRES)+1
+                       ENDIF
+                     ENDIF
+                     OK=(BMASK(MEL1,MEL2).NE.0)
+
+                   ENDIF
+
+                   IF (OK) THEN
+
 *                Calculate position of data in array
 *                NB: no polar bins in background
-                      IF (BDIM1.GT.1.AND.BDIM2.GT.1) THEN
-                        EL1=INT((XEV-BSRT.MIN_X)/BXWIDTH) + 1
+                     IF (BDIM1.GT.1.AND.BDIM2.GT.1) THEN
+                       EL1=INT((XEV-BSRT.MIN_X)/BXWIDTH) + 1
 
 *                 Calculate Y element depending on orientation of raw pixels
-                        IF (HEAD.ORIGIN.EQ.'MPE') THEN
-                           EL2=BDIM2 - INT((YEV-BSRT.MIN_Y)/BYWIDTH)
-                        ELSE
-                           EL2=INT((YEV-BSRT.MIN_Y)/BYWIDTH) + 1
-                        ENDIF
+                       IF (HEAD.ORIGIN.EQ.'MPE') THEN
+                         EL2=BDIM2 - INT((YEV-BSRT.MIN_Y)/BYWIDTH)
+                       ELSE
+                         EL2=INT((YEV-BSRT.MIN_Y)/BYWIDTH) + 1
+                       ENDIF
 *
-                        MEL1=EL1
-                        MEL2=EL2
 
-                      ELSE
+                     ELSE
 
-                        EL1=1
-                        EL2=1
+                       EL1=1
+                       EL2=1
 
-*                   Find position within spatial mask
-                        MEL1=INT((XEV-HEAD.XSTART)/MRES)+1
-                        IF (HEAD.ORIGIN.EQ.'MPE') THEN
-                          MEL2=INT((-YEV-HEAD.YSTART)/MRES)+1
-                        ELSE
-                          MEL2=INT((YEV-HEAD.YSTART)/MRES)+1
-                        ENDIF
 
-                      ENDIF
+                     ENDIF
 
-                      EL3=INT((XDEV-BSRT.MIN_XD)/XDWID) + 1
-                      EL4=INT((YDEV-BSRT.MIN_YD)/YDWID) + 1
-                      EL5=INT((TEV-BSRT.MIN_T(1))/TWIDTH) + 1
-                      EL6=INT((AEV-BSRT.MIN_PH)/PWIDTH) + 1
-                      EL7=INT((CEV-BSRT.MIN_EN)/EWIDTH) + 1
+                     EL3=INT((XDEV-BSRT.MIN_XD)/XDWID) + 1
+                     EL4=INT((YDEV-BSRT.MIN_YD)/YDWID) + 1
+                     EL5=INT((TEV-BSRT.MIN_T(1))/TWIDTH) + 1
+                     EL6=INT((AEV-BSRT.MIN_PH)/PWIDTH) + 1
+                     EL7=INT((CEV-BSRT.MIN_EN)/EWIDTH) + 1
 *
-                      IF (BSRT.SHAPE.EQ.'I') THEN
-                        MOK=(BMASK(MEL1,MEL2).NE.0)
-                      ELSE
-                        MOK=.TRUE.
-                      ENDIF
 
-                      IF (MOK) THEN
-                        BDATA(EL1,EL2,EL3,EL4,EL5,EL6,EL7) =
+                     BDATA(EL1,EL2,EL3,EL4,EL5,EL6,EL7) =
      &                   BDATA(EL1,EL2,EL3,EL4,EL5,EL6,EL7) + 1.0
-                      ENDIF
 
                    ENDIF
                 ENDIF
@@ -3586,13 +3440,12 @@ C      ENDIF
 *+XRTSORT_SORT_EVE - Sorts XRT data into a binned data array
       SUBROUTINE XRTSORT_SORT_EVE(HEAD,SRT,BSRT,MAXLIM, EVE_X, EVE_Y,
      &                 EVE_XD, EVE_YD, EVE_T, EVE_P, EVE_E, BEVE_X,
-     &                 BEVE_Y, BEVE_XD, BEVE_YD, BEVE_T,
-     &                 BEVE_P, BEVE_E, TOTEV_SRC, TOTEV_BCK, STATUS)
+     &                 BEVE_Y,BEVE_XD,BEVE_YD,BEVE_T,BEVE_P,BEVE_E,
+     &                 MDIM1,MDIM2,MRES,SMASK,BMASK,
+     &                 TOTEV_SRC, TOTEV_BCK, STATUS)
 *    Description :
 *        Sorts raw events from an XRT event datafile into event lists
 *    History :
-*     2-Nov-1988   original (LTVAD::RDS)
-*     6-May-1993   now uses double prec. time lists (RDS)
 *    Type Definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -3608,6 +3461,10 @@ C      ENDIF
       RECORD /XRT_SCFDEF/ SRT,BSRT                ! Sort control structures
       RECORD /XRT_HEAD/ HEAD
       INTEGER MAXLIM                              ! Maximum number of events
+      INTEGER MDIM1,MDIM2
+      REAL MRES
+      INTEGER SMASK(MDIM1,MDIM2)
+      INTEGER BMASK(MDIM1,MDIM2)
 *    Import-Export :
       REAL EVE_X(MAXLIM)
       REAL EVE_Y(MAXLIM)
@@ -3694,7 +3551,8 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
      &      %val(PTRA(3)), %val(PTRA(4)), %val(PTRA(5)), %val(PTRA(6)),
      &      %val(PTRA(7)), NELEMS, MAXLIM, EVE_X, EVE_Y, EVE_XD, EVE_YD,
      &      EVE_T, EVE_P, EVE_E, BEVE_X, BEVE_Y, BEVE_XD, BEVE_YD,
-     &      BEVE_T, BEVE_P, BEVE_E, TOTEV_SRC, TOTEV_BCK, SRT.QUAL_MORE,
+     &      BEVE_T, BEVE_P, BEVE_E, MDIM1,MDIM2,MRES,SMASK,BMASK,
+     &      TOTEV_SRC, TOTEV_BCK, SRT.QUAL_MORE,
      &      MAXBAD, NBAD, STBAD, ENBAD, BADEV)
 
 ***      unmap the arrays & memory
@@ -3729,7 +3587,8 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
      &         %val(PTRA(3)),%val(PTRA(4)),%val(PTRA(5)), %val(PTRA(6)),
      &         %val(PTRA(7)),NELEMS,MAXLIM,EVE_X, EVE_Y, EVE_XD, EVE_YD,
      &         EVE_T, EVE_P, EVE_E, BEVE_X, BEVE_Y, BEVE_XD, BEVE_YD,
-     &         BEVE_T, BEVE_P,BEVE_E,TOTEV_SRC,TOTEV_BCK, SRT.QUAL_MORE,
+     &         BEVE_T, BEVE_P,BEVE_E,MDIM1,MDIM2,MRES,SMASK,BMASK,
+     &         TOTEV_SRC,TOTEV_BCK, SRT.QUAL_MORE,
      &         MAXBAD, NBAD, STBAD, ENBAD, BADEV)
 
 ***         unmap the arrays & memory
@@ -3761,12 +3620,12 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
       END
 
 *+XRTSORT_DOIT_EVE    Sorts XRT events into event lists
-      SUBROUTINE XRTSORT_DOIT_EVE(HEAD, SRT, BSRT, TIME, XPIX, YPIX,
-     &              XDET,
+      SUBROUTINE XRTSORT_DOIT_EVE(HEAD,SRT,BSRT,TIME,XPIX,YPIX,XDET,
      &              YDET, AMPL, CAMPL, NELEMS, MAXLIM, EVE_X, EVE_Y,
      &              EVE_XD, EVE_YD, EVE_T, EVE_P, EVE_E, BEVE_X, BEVE_Y,
-     &              BEVE_XD, BEVE_YD, BEVE_T, BEVE_P, BEVE_E, TOTEV_SRC,
-     &              TOTEV_BCK, QCHECK, MAXBAD, NBAD, STBAD, ENBAD,
+     &              BEVE_XD, BEVE_YD, BEVE_T, BEVE_P, BEVE_E,
+     &              MDIM1,MDIM2,MRES,SMASK,BMASK,
+     &              TOTEV_SRC,TOTEV_BCK,QCHECK,MAXBAD,NBAD,STBAD,ENBAD,
      &              BADEV)
 *    Description :
 *    History :
@@ -3791,6 +3650,10 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
       REAL STBAD(MAXBAD)                          ! Start of bad period
       REAL ENBAD(MAXBAD)                          ! End of bad period
       INTEGER MAXLIM                              ! Event list max extent
+      INTEGER MDIM1,MDIM2
+      REAL MRES
+      INTEGER SMASK(MDIM1,MDIM2)
+      INTEGER BMASK(MDIM1,MDIM2)
 *    Import-Export :
       REAL EVE_X(MAXLIM),EVE_Y(MAXLIM)
       INTEGER EVE_XD(MAXLIM),EVE_YD(MAXLIM)
@@ -3958,13 +3821,26 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
                IF (OK) THEN
 
 ***               Check if event is within the source box
-                  IF ( (SRT.SHAPE .EQ. 'R' .AND.
-     &               (SRT.MIN_X .LE. XEV .AND. SRT.MAX_X .GE. XEV) .AND.
-     &               (SRT.MIN_Y .LE. YEV .AND. SRT.MAX_Y .GE. YEV))
-     &                                  .OR.
-     &               ((INDEX( 'CAE', SRT.SHAPE ) .NE. 0 ) .AND.
-     &               ((SELPX2*SBMIN2 + SELPY2*SAMIN2) .GE. SA2B2I .AND.
-     &               (SELPX2*SBMAX2 + SELPY2*SAMAX2) .LE. SA2B2O))) THEN
+                  IF ( SRT.SHAPE .EQ. 'R' ) THEN
+                    OK=((SRT.MIN_X .LE. XEV .AND. SRT.MAX_X .GE. XEV)
+     &                                  .AND.
+     &                 (SRT.MIN_Y .LE. YEV .AND. SRT.MAX_Y .GE. YEV))
+                  ELSEIF ((INDEX( 'CAE', SRT.SHAPE ) .NE. 0 ) THEN
+                    OK=((SELPX2*SBMIN2 + SELPY2*SAMIN2) .GE. SA2B2I
+     &                                  .AND.
+     &               (SELPX2*SBMAX2 + SELPY2*SAMAX2) .LE. SA2B2O))
+                  ELSEIF (SRT.SHAPE .EQ. 'I') THEN
+                    MEL1=INT((XEV-HEAD.XSTART)/MRES)+1
+                    IF (HEAD.ORIGIN.EQ.'MPE') THEN
+                      MEL2=INT((-YEV-HEAD.YSTART)/MRES)+1
+                    ELSE
+                      MEL2=INT((YEV-HEAD.YSTART)/MRES)+1
+                    ENDIF
+                    OK=(SMASK(MEL1,MEL2).NE.0)
+
+                  ENDIF
+
+                  IF (OK) THEN
 
                      TOTEV_SRC=TOTEV_SRC+1
 
@@ -3977,23 +3853,32 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
                      EVE_E(TOTEV_SRC)=CEV
 
 ***               Check if event is within the bckgnd box
-                  ELSEIF ( SRT.BCKGND .AND. (SRT.SHAPE .EQ. 'R' .AND.
-     &               (BSRT.MIN_X.LE.XEV .AND. BSRT.MAX_X.GE.XEV).AND.
-     &               (BSRT.MIN_Y.LE.YEV .AND. BSRT.MAX_Y.GE.YEV))
-     &                             .OR.
-     &               ((INDEX( 'CAE', BSRT.SHAPE ) .NE. 0) .AND.
-     &               ((BELPX2*BBMIN2 + BELPY2*BAMIN2).GE.BA2B2I .AND.
-     &               (BELPX2*BBMAX2 + BELPY2*BAMAX2).LE.BA2B2O))) THEN
+                  ELSEIF ( SRT.BCKGND ) THEN
+                    IF (BSRT.SHAPE .EQ. 'R') THEN
+                      OK=((BSRT.MIN_X.LE.XEV .AND. BSRT.MAX_X.GE.XEV)
+     &                                  .AND.
+     &                   (BSRT.MIN_Y.LE.YEV .AND. BSRT.MAX_Y.GE.YEV))
+                    ELSEIF (INDEX( 'CAE', BSRT.SHAPE ) .NE. 0) THEN
+                      OK=((BELPX2*BBMIN2 + BELPY2*BAMIN2).GE.BA2B2I
+     &                                  .AND.
+     &                   (BELPX2*BBMAX2 + BELPY2*BAMAX2).LE.BA2B2O))
+                    ELSEIF (BSRT.SHAPE.EQ.'I') THEN
+                      OK=(BMASK(MEL1,MEL2).NE.0)
+                    ENDIF
 
-                     TOTEV_BCK=TOTEV_BCK+1
+                    IF (OK) THEN
 
-                     BEVE_X(TOTEV_BCK)=-XEV*HPIX60
-                     BEVE_Y(TOTEV_BCK)=-YEV*HPIX60
-                     BEVE_XD(TOTEV_BCK)=XDEV
-                     BEVE_YD(TOTEV_BCK)=YDEV
-                     BEVE_T(TOTEV_BCK)=TEV
-                     BEVE_P(TOTEV_BCK)=AEV
-                     BEVE_E(TOTEV_BCK)=CEV
+                      TOTEV_BCK=TOTEV_BCK+1
+
+                      BEVE_X(TOTEV_BCK)=-XEV*HPIX60
+                      BEVE_Y(TOTEV_BCK)=-YEV*HPIX60
+                      BEVE_XD(TOTEV_BCK)=XDEV
+                      BEVE_YD(TOTEV_BCK)=YDEV
+                      BEVE_T(TOTEV_BCK)=TEV
+                      BEVE_P(TOTEV_BCK)=AEV
+                      BEVE_E(TOTEV_BCK)=CEV
+
+                    ENDIF
 
                   ENDIF
                ENDIF
