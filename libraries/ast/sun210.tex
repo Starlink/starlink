@@ -9410,10 +9410,10 @@ functions to implement the required functionality. This file can be used
 as a template for writing your own.
 Currently, it is not possible to write such ``grf modules'' in Fortran.
 If you want to use wrapper functions written in Fortran, then you must 
-use the AST_SETGRFFUN method as described below.
+use the \htmlref{AST\_GRFSET}{AST_GRFSET} method as described below.
 
 \item The 
-AST_SETGRFFUN
+AST\_GRFSET
 method of the Plot class can be used to ``register''
 wrapper functions at run-time. This allows an application to switch
 between graphics systems if required. Graphics functions registered in
@@ -9423,7 +9423,7 @@ method described above.
 \end{enumerate}
 
 For details of the interfaces of the wrapper routines, see 
-the reference documentation for the AST_SETGRFFUN method.
+the reference documentation for the AST\_GRFSET method.
 
 \cleardoublepage
 \section{Compiling and Linking Software that Uses AST}
@@ -24944,13 +24944,18 @@ current version):
 \begin{enumerate}
 
 \item The \htmlref{Plot}{Plot} class has a new method called 
-AST_SETGRFFUN 
+\htmlref{AST\_GRFSET}{AST_GRFSET} 
 which allows the underlying primitive graphics functions to be selected
 at run-time. Previously, the functions used by the Plot class to produce
 graphics could only be selected at link-time, using the options of the
 \htmlref{ast\_link}{ast_link} command. The new Plot method allows an application to over-ride
 the functions established at link-time, by specifying alternative
-primitive graphics routines.
+primitive graphics routines. In addition, the two new Plot methods
+\htmlref{AST\_GRFPUSH}{AST_GRFPUSH} and \htmlref{AST\_GRFPOP}{AST_GRFPOP}
+allow the current graphics routines to be saved and restore on a
+first-in-last-out stack, allowing temporary changes to be made to the set
+of registered graphics routines.
+
 
 \item A bug has been fixed in the Plot class which could result in axis
 labels being drawn on inappropriate edges of the plotting box when using
