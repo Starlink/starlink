@@ -19,3 +19,10 @@
    simple data thresholding. Setting MODE to "Good" will produce a
    curve which encloses all the good pixel values. Setting MODE to
    "Bounds" will produce a curve which traces the edges of the array. 
+
+   - A new command call OUTLINE has been added which draws the outline of
+   an NDF over an existing plot. It is a synonym for "contour mode=bounds".
+
+   - The TextBackColour plotting attribute, which allows the background
+   colour for text to be selected (or set transparent) has been documented 
+   in SUN/95.

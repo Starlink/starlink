@@ -544,7 +544,6 @@
       CHARACTER UNITS*(CUNITS + 5)! Units of the data
       DOUBLE PRECISION BOX( 4 )! Bounds of image in pixel co-ordinates
       DOUBLE PRECISION POS( 2 )! Label reference position
-      DOUBLE PRECISION UP( 2 ) ! Label up-vector
       DOUBLE PRECISION XP( 2 ) ! Label text positions
       DOUBLE PRECISION YP( 2 ) ! Label test positions
       INTEGER CNTCLS( MXCONT ) ! Number of closed contours at each height
@@ -590,6 +589,7 @@
       REAL KEYPOS( 2 )         ! Key position
       REAL MARGIN( 4 )         ! Width of margins round DATA picture
       REAL PERCNT( MXCONT )    ! Contour heights as percentiles (=fractions)
+      REAL UP( 2 )             ! Label up-vector
       REAL Y1,Y2               ! Vertical bounds of PGPLOT viewport
 *.
 
@@ -866,10 +866,10 @@
             END IF
 
 *  Find the GRID position at which to place the bottom left corner fo the
-*  text. This is about 2mm (GRAPHICS coords) in both directions from the 
+*  text. This is about 4mm (GRAPHICS coords) in X and 3 in Y form the
 *  bottom left corner.
-            POS( 1 ) = 2.0/SQRT( UP( 1 )**2 + UP( 2 )**2 )
-            POS( 2 ) = POS( 1 )
+            POS( 1 ) = 4.0/SQRT( UP( 1 )**2 + UP( 2 )**2 )
+            POS( 2 ) = 0.75*POS( 1 )
 
 *  Choose the colour for the text. 
             IF( IGRP .NE. GRP__NOID ) THEN 

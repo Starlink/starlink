@@ -3491,6 +3491,7 @@ each. Full descriptions are included later in this section.
 {\tt NumLabGap(axis)}: Spacing of numerical axis labels\\
 {\tt Size(element)}: Character size for a plot element\\
 {\tt Style(element)}: Line style for a plot element\\
+{\tt TextBackColour}: Background colour to use when drawing text\\
 {\tt TextLab(axis)}: Draw descriptive axis labels?\\
 {\tt TextLabGap(axis)}: Spacing of descriptive axis labels\\
 {\tt TickAll}: Draw tick marks on all edges?\\
@@ -4470,6 +4471,25 @@ additional attributes are described \hyperref{here}{in section }{}{se:frmatt}.
          If no graphical element is specified, ({\it e.g.} {\tt Style} instead
 	 of {\tt Style(border)}), then all graphical elements are affected.
       }
+   }
+}
+\sstroutine{
+   TextBackColour
+}{
+   The background colour to use when drawing text
+}{
+   \sstdescription{
+      This attribute determines the background colour index to use when 
+      drawing textual strings - the foreground colour is determined by 
+      the {\tt Colour(strings)} attribute. Standard X colour names can 
+      also be specified, and the nearest colour will be used if the 
+      requested colour is not currently in the palette. 
+
+      If the value ``-1'' or ``{\tt clear}'' is given, the background
+      will be transparent.
+   }
+   \sstattributetype{
+      Integer.
    }
 }
 \sstroutine{
@@ -46052,6 +46072,16 @@ The following applications have been modified:
 
 \section{\xlabel{se_changes}Release Notes---V0.16\label{se:changes}}
 
+\begin{itemize}
+
+\item The previously undocumented plotting attribute ``{\tt TextBackColour}''
+has been included in \hyperref{the section on ``Plotting Styles and 
+Attributes''}{section}{}{se:style}. This attributes controls the
+background colour to use when drawing text strings within a plot. It can be 
+set to a specified colour, or can be set to produce a transparent
+background.
+
+\end{itemize}
 
 \subsection{Modified applications}
 The following applications have been modified:
