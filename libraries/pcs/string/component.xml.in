@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>libraries/pcs/string</path>
+  <description>Fortran string manipulation subroutines</description>
+  <abstract><p>Fortran string manipulation subroutines. These
+      subroutines are also used by software items outside the
+      parameter system, but the library has no published
+      interface</p></abstract>
+  <dependencies>
+    <build>@STAR_BUILD_DEPENDENCIES@</build>
+    <use>@STAR_USE_DEPENDENCIES@</use>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Alan J Chipperfield</name>
+      <uname>ajc</uname>
+      <email>a.j.chipperfield@rl.ac.uk</email>
+    </person>
+  </developers>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <notes><p>Described in SSN/29, but has no published interface</p></notes>
+</component>
