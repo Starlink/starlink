@@ -537,6 +537,17 @@ endif
    alias splatdispmany '@staretcdir@/notinst splatdispmany'
  endif
 
+#
+#   SST
+#
+
+if ( -e @bindir@/sst/start ) then
+   alias sstsetup source @bindir@/sst/start
+   alias sst source @bindir@/sst/start
+else
+   alias sstsetup '@staretcdir@/notinst sstsetup'
+   alias sst '@staretcdir@/notinst sst'
+endif
 
 #
 #   Frog, moved to StarJava - Spring 2003

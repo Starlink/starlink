@@ -467,6 +467,12 @@ endif
  endif
 
 #
+#  SST
+ if (-e @bindir@/sst/start) then
+    setenv SST_DIR @bindir@/sst
+ endif
+
+#
 #  FROG
  if ( -e @starjavadir@/bin/frog ) then
     setenv FROG_DIR @starjavadir@/bin/frog
