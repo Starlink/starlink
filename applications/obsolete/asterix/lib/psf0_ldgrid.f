@@ -251,7 +251,7 @@
         IF ( STATUS .EQ. SAI__OK ) THEN
           CALL MSG_SETC( 'G', GRID )
           CALL MSG_SETC( 'DIR', ETCDIR )
-          CALL MSG_OUT( ' ', 'Loaded psf grid ^G from ^DIR' )
+          CALL MSG_PRNT( 'Loaded psf grid ^G from ^DIR' )
         END IF
 
 *  Report error

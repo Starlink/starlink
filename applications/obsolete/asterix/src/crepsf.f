@@ -147,7 +147,7 @@
       SPARR(1) = RADIUS*SCALE
       SPARR(2) = -SCALE
       CALL BDI_AXPUT1R( OFID, 1, 'SpacedData', 2, SPARR, STATUS )
-      SPARR(1) = RADIUS*SCALE
+      SPARR(1) = -RADIUS*SCALE
       SPARR(2) = SCALE
       CALL BDI_AXPUT1R( OFID, 2, 'SpacedData', 2, SPARR, STATUS )
 
