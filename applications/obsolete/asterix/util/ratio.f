@@ -155,7 +155,6 @@
       INTEGER                WD_PTR              ! Workspace data
       INTEGER                WV_PTR              ! Workspace variance
 
-      LOGICAL                ANY_BAD             ! Any bad quality input data?
       LOGICAL			AX_DUMMY(ADI__MXDIM)	! Dummy axis values?
       LOGICAL			AX_GOT_WIDS(ADI__MXDIM)	! Got axis widths?
       LOGICAL			AX_MAPPED(ADI__MXDIM)	! Axis mapped?
@@ -198,11 +197,13 @@
       END DO
 
 *    Get input object
-      CALL USI_TASSOC2( 'INP', 'OUT', 'READ', IFID, OFID, STATUS )
-      CALL BDI_PRIM( IFID, PRIM, STATUS )
+      CALL USI_ASSOC( 'INP', 'BinDS|Array', 'READ', IFID, STATUS )
+      CALL USI_CREAT( 'OUT', ADI__NULLID, OFID, STATUS )
+      CALL ADI_DERVD( IFID, 'Array', PRIM, STATUS )
 
 *    Check input data
-      CALL BDI_CHKDATA( IFID, DATA_OK, NDIM, IDIMS, STATUS )
+      CALL BDI_CHK( IFID, 'Data', DATA_OK, STATUS )
+      CALL BDI_GETSHP( IFID, ADI__MXDIM, IDIMS, NDIM, STATUS )
       IF ( DATA_OK .AND. (STATUS .EQ. SAI__OK)) THEN
 
 *      Check not scalar
@@ -214,7 +215,7 @@
           CALL ARR_SUMDIM( NDIM, IDIMS, NELM )
 
 *        Map the input data
-          CALL BDI_MAPDATA( IFID, 'READ', ID_PTR, STATUS )
+          CALL BDI_MAPR( IFID, 'Data', 'READ', ID_PTR, STATUS )
 
         END IF
 
@@ -236,7 +237,7 @@
       ELSE
 
 *      See if we've got quality available
-        CALL BDI_CHKQUAL( IFID, QUAL_OK, QNDIM, DIMS, STATUS )
+        CALL BDI_CHK( IFID, 'Quality', QUAL_OK, STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 99
         IF ( QUAL_OK ) THEN
           IF ( QNDIM .NE. NDIM ) THEN
@@ -248,14 +249,15 @@
 
 *          Map it and tell user
             CALL MSG_PRNT( 'Input has valid QUALITY' )
-            CALL BDI_MAPLQUAL( IFID, 'READ', ANY_BAD, IQ_PTR, STATUS )
+            CALL BDI_MAPL( IFID, 'LogicalQuality', 'READ', IQ_PTR,
+     :                     STATUS )
 
           END IF
         END IF
         IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *      See if we've got variance available
-        CALL BDI_CHKVAR( IFID, VARI_OK, VNDIM, DIMS, STATUS )
+        CALL BDI_CHK( IFID, 'Variance', VARI_OK, STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 99
         IF ( VARI_OK .AND. ( VNDIM .NE. NDIM )) THEN
           CALL MSG_PRNT( 'Variance and data '/
@@ -274,7 +276,7 @@
 *        Map it and tell user
           IF ( VARI_OK ) THEN
             CALL MSG_PRNT( 'Input has valid VARIANCE' )
-            CALL BDI_MAPVAR( IFID, 'READ', IV_PTR, STATUS )
+            CALL BDI_MAPR( IFID, 'Variance', 'READ', IV_PTR, STATUS )
           END IF
 
         END IF
@@ -318,7 +320,7 @@
         IF ( .NOT. PRIM ) THEN
 
 *        Try for the label and units first
-          CALL BDI_GETAXLABEL( IFID, I, AX_LABEL(I), STATUS )
+          CALL BDI_AXGET0C( IFID, I, 'Label', AX_LABEL(I), STATUS )
           IF ( STATUS .NE. SAI__OK ) THEN
             AX_LABEL(I) = '** Unreadable **'
             CALL ERR_FLUSH( STATUS )
@@ -327,7 +329,7 @@
           IF ( TLEN .LT. 1 ) THEN
             AX_LABEL(I) = 'Not Set'
           END IF
-          CALL BDI_GETAXUNITS( IFID, I, AX_UNITS(I), STATUS )
+          CALL BDI_AXGET0C( IFID, I, 'Units', AX_UNITS(I), STATUS )
           IF ( STATUS .NE. SAI__OK ) THEN
             AX_UNITS(I) = '** Unreadable **'
             CALL ERR_FLUSH( STATUS )
@@ -341,7 +343,8 @@
 *         the equivalent dimension and work in Pixels.
            DATEXT = ' '
 
-           CALL BDI_CHKAXVAL( IFID, I, OK, AX_REG(I), TLEN, STATUS )
+           CALL BDI_CHK( IFID, I, 'Data', OK, STATUS )
+           AX_REG(I) = .FALSE.
            IF ( STATUS .NE. SAI__OK ) THEN
              DATEXT = 'No axis data. '
              USE_PIXELS = .TRUE.
@@ -349,13 +352,9 @@
 
            ELSE IF ( OK ) THEN
 
-*           Axis data is there. If its regularly spaced ( a spaced array )
-*           then find the axis constants, otherwise map its data.
-             IF ( AX_REG(I) ) THEN
-               CALL BDI_GETAXVAL( IFID, I, AX_BASE(I), AX_SCALE(I),
-     :                                               TLEN, STATUS )
-             END IF
-             CALL BDI_MAPAXVAL( IFID, 'READ', I, AX_PTR(I), STATUS )
+*         Map the axis data
+             CALL BDI_AXMAPR( IFID, I, 'Data', 'READ', AX_PTR(I),
+     :                        STATUS )
              AX_MAPPED(I) = ( STATUS .EQ. SAI__OK )
 
              IF ( STATUS .NE. SAI__OK ) THEN
@@ -380,7 +379,7 @@
 *         Find normalisation. If we can't get normalisation then we assume
 *         it is unnormalised.
            IF ( OK ) THEN
-             CALL BDI_GETAXNORM( IFID, I, AX_NORM(I), STATUS )
+             CALL BDI_AXGET0L( IFID, I, 'Normalised', AX_NORM(I), STATUS )
              IF ( STATUS .NE. SAI__OK ) THEN
                CALL ERR_FLUSH( STATUS )
                AX_NORM(I) = .FALSE.
@@ -478,64 +477,38 @@
 *    output is going to be normalised
       IF ( AX_NORM(AXIS) .OR. RENORMALISE ) THEN
 
-*      Get axis widths if present
-        IF ( AX_MAPPED(AXIS) ) THEN
-          CALL BDI_CHKAXWID( IFID, AXIS, OK, AX_WID_UNIF(AXIS),
-     :                                          DUMMY, STATUS )
-          IF ( OK ) THEN
-            CALL BDI_MAPAXWID( IFID, 'READ', AXIS, AX_WPTR(AXIS),
-     :                                                   STATUS )
-          END IF
-        ELSE
-          OK = .FALSE.
-        END IF
-        IF ( STATUS .NE. SAI__OK ) THEN
-          CALL ERR_FLUSH( STATUS )
-          OK = .FALSE.
-        END IF
-
-*      Otherwise invent them
-        IF ( .NOT. OK ) THEN
-          CALL DYN_MAPR( 1, IDIMS(AXIS), AX_WPTR(AXIS), STATUS )
-          IF ( STATUS .NE. SAI__OK ) GOTO 99
-          IF ( AX_REG(AXIS) ) THEN
-            CALL ARR_INIT1R( ABS(AX_SCALE(AXIS)), IDIMS(AXIS),
-     :                        %VAL(AX_WPTR(AXIS)), STATUS )
-          ELSE
-            CALL BDA_MAPAXWID_INVENT( %VAL(AX_PTR(AXIS)),
-     :            IDIMS(AXIS), %VAL(AX_WPTR(AXIS)), STATUS )
-          END IF
-
-        END IF
+*    Get axis widths. If not present BDI invents them
+        CALL BDI_AXMAPR( IFID, AXIS, 'Width', 'READ', AX_WPTR(AXIS),
+     :                                                      STATUS )
         AX_GOT_WIDS(AXIS) = .TRUE.
 
       END IF
 
-*    Denormalise axis to be RATIOed
+*  Denormalise axis to be RATIOed
       IF ( AX_NORM(AXIS) ) THEN
 
-*      Create dynamic data array copy
+*    Create dynamic data array copy
         CALL DYN_MAPR( ADI__MXDIM, IDIMS, T_PTR, STATUS )
         CALL ARR_COP1R( NELM, %VAL(ID_PTR), %VAL(T_PTR), STATUS )
+        CALL BDI_UNMAP( IFID, 'Data', ID_PTR, STATUS )
         ID_PTR = T_PTR
-        CALL BDI_UNMAPDATA( IFID, STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*      Denormalise it
+*    Denormalise it
         CALL AR7_DENORM( %VAL(AX_WPTR(AXIS)), IDIMS, AXIS,
      :                              %VAL(ID_PTR), STATUS )
 
-*      Variance present?
+*    Variance present?
         IF ( VARI_OK ) THEN
 
-*        Create dynamic copy
+*      Create dynamic copy
           CALL DYN_MAPR( ADI__MXDIM, IDIMS, T_PTR, STATUS )
           IF ( STATUS .NE. SAI__OK ) GOTO 99
           CALL ARR_COP1R( NELM, %VAL(IV_PTR), %VAL(T_PTR), STATUS )
+          CALL BDI_UNMAP( IFID, 'Variance', IV_PTR, STATUS )
           IV_PTR = T_PTR
-          CALL BDI_UNMAPVAR( IFID, STATUS )
 
-*        Denormalise it
+*      Denormalise it
           CALL AR7_DENORMV( %VAL(AX_WPTR(AXIS)), IDIMS, AXIS,
      :                                 %VAL(IV_PTR), STATUS )
 
@@ -543,24 +516,17 @@
 
       END IF
 
-*    Find axis array indices corresponding to the range values given
+*  Find axis array indices corresponding to the range values given
       CALL AXIS_VAL2PIX( IDIMS(AXIS), %VAL(AX_PTR(AXIS)), .FALSE.,
      :                   BANDS(1), BANDS(2), LOW1, HIGH1, STATUS )
       CALL AXIS_VAL2PIX( IDIMS(AXIS), %VAL(AX_PTR(AXIS)), .FALSE.,
      :                   BANDS(3), BANDS(4), LOW2, HIGH2, STATUS )
 
-*    Unmap axis data if used
-      IF ( (.NOT. PRIM) .AND. AX_MAPPED(AXIS) ) THEN
-        CALL BDI_UNMAPAXVAL( IFID, AXIS, STATUS )
-        IF ( STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
-      END IF
-
-*    If renormalising, we need the total width of each band. This width is
-*    from the lower bound of the left-most bin to upper bound of the
-*    rightmost bin
+*  If renormalising, we need the total width of each band. This width is from
+*  the lower bound of the left-most bin to upper bound of the rightmost bin
       IF ( RENORMALISE ) THEN
 
-*      First band
+*    First band
         CALL ARR_ELEM1R( AX_PTR(AXIS), IDIMS(AXIS), LOW1, LHC, STATUS )
         CALL ARR_ELEM1R( AX_PTR(AXIS), IDIMS(AXIS), HIGH1, RHC, STATUS )
         CALL ARR_ELEM1R( AX_WPTR(AXIS), IDIMS(AXIS), LOW1, LHW, STATUS )
@@ -606,42 +572,36 @@
         END DO
       END IF
 
-*    Transform these into the 7D system
+*  Transform these into the 7D system
       CALL AR7_PAD( ONDIM, ODIMS, STATUS )
       CALL ARR_SUMDIM( ONDIM, ODIMS, ONELM )
 
-*    Create components in output
-      CALL BDI_CREDATA( OFID, ONDIM, ODIMS, STATUS )
-      CALL BDI_CREQUAL( OFID, ONDIM, ODIMS, STATUS )
-      CALL BDI_CREAXES( OFID, ONDIM, STATUS )
-      IF ( VARI_OK ) THEN
-         CALL BDI_CREVAR( OFID, ONDIM, ODIMS, STATUS )
-      END IF
-      IF ( STATUS .NE. SAI__OK ) GOTO 99
+*  Create interface object
+      CALL BDI_LINK( 'BinDS', ONDIM, ODIMS, 'REAL', OFID, STATUS )
 
-*    Output label
-      CALL BDI_PUTLABEL( OFID, 'Relative intensity', STATUS )
+*  Output label
+      CALL BDI_PUT0C( OFID, 'Label', 'Relative intensity', STATUS )
 
-*    Map these output objects
-      CALL BDI_MAPDATA( OFID, 'WRITE', OD_PTR, STATUS )
-      CALL BDI_MAPQUAL( OFID, 'WRITE', OQ_PTR, STATUS )
+*  Map these output objects
+      CALL BDI_MAPR( OFID, 'Data', 'WRITE', OD_PTR, STATUS )
+      CALL BDI_MAPUB( OFID, 'Quality', 'WRITE', OQ_PTR, STATUS )
       IF ( VARI_OK ) THEN
-        CALL BDI_MAPVAR( OFID, 'WRITE', OV_PTR, STATUS )
+        CALL BDI_MAPR( OFID, 'Variance', 'WRITE', OV_PTR, STATUS )
       ELSE
         CALL DYN_MAPR( ONDIM, ODIMS, OV_PTR, STATUS )
         CALL ARR_INIT1R( 0.0, ONELM, %VAL(OV_PTR), STATUS )
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Grab workspace required by RATIO_INT. These are WD_ and WV_ the work
-*    space data and variance arrays, and OW_ which is an extra quality array
-*    needed by RATIO_INT.
+*  Grab workspace required by RATIO_INT. These are WD_ and WV_ the work
+*  space data and variance arrays, and OW_ which is an extra quality array
+*  needed by RATIO_INT.
       CALL DYN_MAPR( ONDIM, ODIMS, WD_PTR, STATUS )
       CALL DYN_MAPR( ONDIM, ODIMS, WV_PTR, STATUS )
       CALL DYN_MAPR( ONDIM, ODIMS, OW_PTR, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Do the ratioing
+*  Do the ratioing
       CALL RATIO_INT( IDIMS(1), IDIMS(2), IDIMS(3), IDIMS(4),
      :                IDIMS(5), IDIMS(6), IDIMS(7), %VAL(ID_PTR),
      :                %VAL(IQ_PTR), VARI_OK, %VAL(IV_PTR),
@@ -657,9 +617,6 @@
       CALL DYN_UNMAP( WD_PTR, STATUS )
       CALL DYN_UNMAP( WV_PTR, STATUS )
       CALL DYN_UNMAP( OW_PTR, STATUS )
-
-      CALL BDI_UNMAPDATA( IFID, STATUS )
-      CALL BDI_UNMAPQUAL( OFID, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Inform the user if any new bad quality points were generated
@@ -684,8 +641,9 @@
 *            Could create output axes for primitive input?
 
             ELSE
-              CALL BDI_COPAXIS( IFID, OFID, I, J, STATUS )
-              CALL BDI_PUTAXNORM( OFID, J, RENORMALISE, STATUS )
+              CALL BDI_AXCOPY( IFID, I, ' ', OFID, J, STATUS )
+              CALL BDI_AXPUT0L( OFID, J, 'Normalised', RENORMALISE,
+     :                          STATUS )
 
             END IF
             J = J + 1
@@ -697,8 +655,8 @@
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Copy MORE box unless primitive
-      IF ( .NOT. PRIM ) CALL BDI_COPMORE( IFID, OFID, STATUS )
+*  Copy ancillaries
+      CALL UDI_COPANC( IFID, 'grf', OFID, STATUS )
 
 *    If output is scalar tell user about it
       IF ( NDIM .EQ. 1 ) THEN
@@ -717,7 +675,7 @@
       TEXT(1) = 'Input dataset {INP}'
       USE=2
 
-*    Describe ratio axis
+*  Describe ratio axis
       IF ( (.NOT. (PRIM.OR.AX_DUMMY(AXIS))) .AND.
      :     CHR_SIMLR( AX_LABEL(AXIS), 'NOT SET' ) .AND.
      :     CHR_SIMLR( AX_LABEL(AXIS), '** UNREADABLE **' ) ) THEN
@@ -728,7 +686,7 @@
       CALL MSG_MAKE( 'Ratio on axis ^AXIS', TEXT(USE), TLEN )
       USE = USE + 1
 
-*    Describe ratio bands
+*  Describe ratio bands
       CALL MSG_SETR( 'LOW1', BANDS(1) )
       CALL MSG_SETR( 'HIGH1', BANDS(2) )
       CALL MSG_SETC( 'UNITS', AX_UNITS(AXIS) )
@@ -751,19 +709,15 @@
 *    Copy history
       CALL HSI_COPY( IFID, OFID, STATUS )
 
-*    Add History records
+*  Add History records
       CALL HSI_ADD( OFID, VERSION, STATUS )
 
-*    Process text
+*  Process text
       NREC = MAXLINES
       CALL USI_TEXT( USE, TEXT, NREC, STATUS )
       CALL HSI_PTXT( OFID, USE, TEXT, STATUS )
 
-*    Release datasets
-      CALL BDI_RELEASE( IFID, STATUS )
-      CALL BDI_RELEASE( OFID, STATUS )
-
-*    Tidy up
+*  Tidy up
  99   CALL AST_CLOSE
       CALL AST_ERR( STATUS )
 
