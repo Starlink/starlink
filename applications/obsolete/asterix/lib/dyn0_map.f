@@ -85,6 +85,8 @@
 *        Delete file if created but not mapped. Error reporting tidied up.
 *     20 Mar 1995 (DJA):
 *        Renamed to from DYN_MAP. No longer works in pages.
+*     11 Sep 1995 (DJA):
+*        Handle both HDS and ADI style types.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -136,6 +138,7 @@
       CHARACTER*(DAT__SZLOC) 	LOC			! Temp file locator
       CHARACTER*80           	SDIR       		! Scratch directory path
 
+      INTEGER			FC			! 1st useful MTYPE char
       INTEGER			FID			! ADI file identifier
       INTEGER                	FLEN       		! Length of FNAME used
       INTEGER                	NBYTE			! Total # bytes needed
@@ -159,16 +162,20 @@
 *  Check initialised
       IF ( .NOT. DYN_ISINIT ) CALL DYN0_INIT()
 
+*  HDS style type?
+      FC = 1
+      IF ( MTYPE(1:1) .EQ. '_' ) FC = 2
+
 *  Determine element size in bytes
-      IF ( (MTYPE(2:2) .EQ. 'I') .OR. (MTYPE(2:2) .EQ. 'L') ) THEN
+      IF ( (MTYPE(FC:FC) .EQ. 'I') .OR. (MTYPE(FC:FC) .EQ. 'L') ) THEN
         SIZE = VAL__NBI
-      ELSE IF ( MTYPE(2:2) .EQ. 'R' ) THEN
+      ELSE IF ( MTYPE(FC:FC) .EQ. 'R' ) THEN
         SIZE = VAL__NBR
-      ELSE IF ( MTYPE(2:2) .EQ. 'D' ) THEN
+      ELSE IF ( MTYPE(FC:FC) .EQ. 'D' ) THEN
         SIZE = VAL__NBD
-      ELSE IF ( MTYPE(2:2) .EQ. 'W' ) THEN
+      ELSE IF ( MTYPE(FC:FC) .EQ. 'W' ) THEN
         SIZE = VAL__NBW
-      ELSE IF ( MTYPE(2:2) .EQ. 'B' ) THEN
+      ELSE IF ( MTYPE(FC:FC) .EQ. 'B' ) THEN
         SIZE = VAL__NBB
       ELSE
         CALL MSG_SETC( 'TYPE', MTYPE )
