@@ -82,19 +82,22 @@
           KK = MIN( NRAD, KK )
 
 *      Find position angle of element
-	  THETA = ATAN2(YOLD,XOLD)
+          IF ( NSECTOR .GT. 1 ) THEN
+	    THETA = ATAN2(YOLD,XOLD)
 
-*      Subtract the initial azimuth angle
-          THETA = THETA - AZRAD
+*        Subtract the initial azimuth angle
+            THETA = THETA - AZRAD
 
-*      Force position angle to be in range 0 to TWOPI
-	  IF ( THETA .LT. 0.0 ) THETA=TWOPI+THETA
-	  IF ( THETA .LT. 0.0 ) THETA=TWOPI+THETA
-	  IF ( THETA .GT. TWOPI ) THETA=THETA-TWOPI
-	  IF ( THETA .GT. TWOPI ) THETA=THETA-TWOPI
-          JJ = INT(THETA/ABIN) + 1
-
-          INDEX(K,J) = KK + (JJ-1)*NSECTOR
+*        Force position angle to be in range 0 to TWOPI
+	    IF ( THETA .LT. 0.0 ) THETA=TWOPI+THETA
+	    IF ( THETA .LT. 0.0 ) THETA=TWOPI+THETA
+	    IF ( THETA .GT. TWOPI ) THETA=THETA-TWOPI
+	    IF ( THETA .GT. TWOPI ) THETA=THETA-TWOPI
+            JJ = INT(THETA/ABIN) + 1
+            INDEX(K,J) = KK + (JJ-1)*NSECTOR
+          ELSE
+            INDEX(K,J) = KK
+          END IF
 
 *      End loop over 1st dimension
 	END DO
