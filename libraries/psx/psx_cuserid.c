@@ -88,17 +88,18 @@
 
 /* Global Constants:							    */
 
+#include <config.h>
 #include <stdio.h>		 /* Standard I/O routines		    */
 #include "f77.h"		 /* C - Fortran interface		    */
 #include "sae_par.h"		 /* ADAM constants			    */
 
-#if defined(_needs_cuserid)
-/* cuserid is no longer in 1003.1-1990	                                    */
-extern char *cuserid( const char *__s ); 
-#endif
+/* Prefer getpwuid */
 
-#if defined(ultrix) && defined(__STDC__)    /* Temporary fix for bug in	    */
-extern char *cuserid( const char *__s );    /* stdio.h on Ultrix.	    */
+#if HAVE_CUSERID
+# if !HAVE_DECL_CUSERID
+/* cuserid is no longer in 1003.1-1990	                                    */
+extern char *cuserid( const char *); 
+# endif
 #endif
 
 
