@@ -21,6 +21,9 @@ dnl    Find required versions of the programs we need for configuration
 AC_PROG_CC
 AC_PROG_LIBTOOL
 
+dnl    Grab the F77 runtime libraries into FLIBS variable
+AC_F77_LIBRARY_LDFLAGS
+
 dnl    Should investigate whether we really need this for a non-starlink
 dnl    encumbered pgplot
 STAR_CNF_COMPATIBLE_SYMBOLS
