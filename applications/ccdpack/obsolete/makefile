@@ -1683,12 +1683,13 @@ install:
 	    else :; fi;\
 	 done)
 #
-#  Install the Latex documentation, giving it world read permission,
-#  leaving the source copy in place.
+#  Install the Latex documentation, giving it world read permission.
 	for f in $(LATEX_DOCS) ""; do \
 	   if test -n "$$f"; then \
 	      $(CP) $$f $(INSTALL_DOCS);\
 	      chmod 644 $(INSTALL_DOCS)/$$f;\
+              $(RM) $$f;\
+              $(LINK) $(INSTALL_DOCS)/$$f $$f;
 	   else :; fi;\
 	done
 #
@@ -1918,6 +1919,8 @@ do_deinstall:
 #  Deinstall the Latex documentation, if installed versions exist.
 	- for f in $(LATEX_DOCS) ""; do \
            if test -n "$$f" -a -f $(INSTALL_DOCS)/$$f; then \
+              $(RM) $$f;\
+              $(CP) $(INSTALL_DOCS)/$$f .;\
               $(RM) $(INSTALL_DOCS)/$$f;\
            else :; fi;\
         done
