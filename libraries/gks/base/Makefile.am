@@ -52,7 +52,7 @@ gkurei.f gkvers.f gkwcld.f gkwddl.f gkwkc4.f gkwspb.f gkxbcl.f gkxcge.f \
 gkxcpu.f gkxdcs.f gkxdwc.f gkxdwo.f gkxfd.f gkxlin.f gkxof.f gkxon.f \
 gkxpal.f gkxpat.f gkxpcc.f gkxpcx.f gkxpxc.f gkxpxo.f gkxqxc.f gkxqxo.f \
 gkxss.f gkxtfb.f gkxtfp.f gkxthw.f gkxxf.f gkan1.f gkaton.f gkfobo.f \
-gkfoco.f gkiocl.f gkiofi.f \
+gkfoco.f gkiocl.f gkiofi.f lnblnk.f gkna1.f gkntoa.f \
 gactm.f gacwk.f gasgwk.f gca.f gclks.f gclrwk.f gclsg.f gclwk.f \
 gcrsg.f gcsgwk.f gdawk.f gdsg.f gdsgwk.f geclks.f gerhnd.f gerlog.f \
 gesc.f gevtm.f gfa.f ggdp.f ggtitm.f giitm.f ginch.f ginlc.f ginpk.f \
