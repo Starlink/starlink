@@ -1,18 +1,19 @@
-      PROGRAM IDIBLD
+#include <config.h>
+      PROGRAM GKSBLD
 *+
 *   Program:
 *
-*      IDIBLD
+*      GKSBLD
 *
 *   Description:
 *
-*      Builds the binary GNS workstation description file for IDI
+*      Builds the binary GNS workstation description file for GKS
 *      workstations from a text description.
 *
 *
 *   Usage:
 *
-*      RUN IDIBUILD
+*      RUN GKSBUILD
 *
 *+
 *   Side Effects:
@@ -20,7 +21,7 @@
 *      Creates a new description file called GNS_GKSDEVICES.DAT in the
 *      current default directory.
 *    
-*   Nick Eaton    21-MAY-1989
+*   D L Terrett    4-APR-1989
 *-
       IMPLICIT NONE
 
@@ -32,21 +33,21 @@
 *   Hash algorithm constants (these MUST match the definitions in
 *   subroutine WRTSTN
       INTEGER IHASH1, IHASH2
-      PARAMETER (IHASH1 = 3, IHASH2 = 13)
+      PARAMETER (IHASH1 = 13, IHASH2 = 313)
 
 *   Array for contructing records (BUFSIZ must be a multiple of
-*   (RECSIZ-1) and greater than the number of keyword (1) plus the
-*   number of character items (1) times the maximum size of a character
-*   item (72) = 73)
+*   (RECSIZ-1) and greater than the number of keyword (9) plus the
+*   number of character items (2) times the maximum size of a character
+*   item (72) = 153)
       INTEGER BUFSIZ
-      PARAMETER (BUFSIZ=75)
+      PARAMETER (BUFSIZ=165)
       INTEGER IREC(BUFSIZ)
       REAL RREC(BUFSIZ)
       EQUIVALENCE (IREC,RREC)
 
       CHARACTER*40 INFILE
       INTEGER I
-
+      
 *   Counters for statistics
       INTEGER IRELOC, MAXREC, NWRKS, ICOLS
       COMMON /STATS/ IRELOC, MAXREC, NWRKS, ICOLS
@@ -62,8 +63,8 @@
       OPEN (UNIT=1, FILE=INFILE, STATUS='OLD')
 
 *   Create the output binary file
-      OPEN (UNIT=2, FILE='gns_ididevices', STATUS='NEW',
-     :      ACCESS='DIRECT', FORM='UNFORMATTED', RECL=RECSIZ)
+      OPEN (UNIT=2, FILE='gns_gksdevices', STATUS='NEW',
+     :      ACCESS='DIRECT', FORM='UNFORMATTED', RECL=RECSIZ*4)
 
 *   Write the first record containing the file structure version number
 *   and the hash algorithm contants
@@ -202,13 +203,16 @@
 *
 *      {arguments_or_none}
 *+
-*   Nick Eaton    21-MAY-1989
+*   D L Terrett    3-MAY-1989 
+*   Nick Eaton     2-APR-1990  Added OPEN keyword
+*   Nick Eaton    18-MAY-1990  Added AGI types
+*   Nick Eaton     3-JUN-1992  Added WINDOW_OVERLAY
 
       IMPLICIT NONE
-      INCLUDE 'gns_par'
+      INCLUDE 'GNS_PAR'
       
       INTEGER BUFSIZ
-      PARAMETER (BUFSIZ=75)
+      PARAMETER (BUFSIZ=165)
       INTEGER IREC(BUFSIZ)
       REAL RREC(BUFSIZ)
 *
@@ -218,11 +222,18 @@
 *   character values as described below.  The recognized keywords and
 *   their data types are as follows:
 *
-*           WORKSTATION       character
+*           WORKSTATION       integer
+*           CLASS             enumerated
+*           SCALE             real
+*           OUTPUT            enumerated
+*           CLEAR             enumerated
+*           ERASE_TEXT        character
+*           DEFAULT_NAME      character
+*           OPEN              enumerated
 *           AGITYPE           integer
 *
       INTEGER NKEYWR
-      PARAMETER (NKEYWR = 2)
+      PARAMETER (NKEYWR = 9)
       CHARACTER*(GNS__SZKEY) KEYWRD(NKEYWR)
 
       INTEGER ICHARA, IREAL, IINTEG, IENUM
@@ -234,11 +245,17 @@
       PARAMETER (MAXFLD = 72)
       CHARACTER*(MAXFLD) CVALS(NKEYWR)
 
+*   Values for enumerated types
+      INTEGER NENUMS
+      PARAMETER (NENUMS=14)
+      CHARACTER*(GNS__SZKEY) ENUMS(NENUMS)
+      INTEGER IENUMS(NENUMS)
 *
 *   The items are stored in the binary file in the order given above.
 *
 *   Each workstation defined by a WORKSTATION = statement followed by a
-*   series of keyword definitions. Each workstation must
+*   series of keyword definitions.  CLASS is mandatory for all
+*   workstations; all other keywords are optional. Each workstation must
 *   appear only once and duplicate keyword definitions are not allowed.
 *
 *   Real and integer values are decoded using the usual Fortran rules
@@ -281,11 +298,22 @@
       COMMON /STATS/ IRELOC, MAXREC, NWRKS, ICOLS
 
 *   Miscellanous counters, etc
-      INTEGER CHASH, IKEYIN, NCHAR, I, I1, I2
+      INTEGER IKEYIN, NCHAR, I, I1, I2
 
-      DATA KEYWRD / 'WORKSTATION', 'AGITYPE' /
-      DATA ITYPES / ICHARA, IINTEG /
+      INCLUDE 'chars.par'
 
+      DATA KEYWRD / 'WORKSTATION', 'CLASS', 'SCALE', 'OUTPUT', 'CLEAR',
+     : 'ERASE_TEXT', 'DEFAULT_NAME', 'OPEN', 'AGITYPE' /
+      DATA ITYPES / IINTEG, IENUM, IREAL, IENUM, IENUM, ICHARA, ICHARA,
+     :  IENUM, IINTEG /
+      DATA ENUMS /'GRAPHICS_OVERLAY', 'IMAGE_DISPLAY', 'IMAGE_OVERLAY',
+     :            'MATRIX_PRINTER', 'METAFILE_INPUT', 'METAFILE_OUTPUT',
+     :            'PEN_PLOTTER', 'TERMINAL', 'WINDOW', 'WINDOW_OVERLAY',
+     :            'DIRECT', 'FILE',
+     :            'SELECTIVE',
+     :            'NORESET' /
+      DATA IENUMS /GRAOVE, IMADISM, IMAOVE, MATPRI, METINP, METOUT,
+     : PENPLO, TERMIN, WINDOW, WINDOV, DIRECT, FILE, SELECT, NORST/
       DATA IVALS /NKEYWR*0/
       DATA RVALS /NKEYWR*0.0/
       DATA CVALS /NKEYWR*' '/
@@ -318,7 +346,7 @@
 *           to trigger writing of the previous workstation.
                IF (NCHAR.LT.0) THEN
                   IKEYIN = 1
-                  GO TO 40
+                  GO TO 30
                ELSE
                   DO 20 IKEYIN = 1, NKEYWR
                      IF (CURKEY(:NKEYC).EQ.KEYWRD(IKEYIN)) GOTO 30
@@ -350,32 +378,35 @@
                NVALC = 0
 
 *        If the keyword just found was WORKSTATION then 
-   40          CONTINUE
                IF (IKEYIN.EQ.1) THEN 
 
 *            and we have a already got a workstation
                   IF (IVALS(1).NE.0) THEN
 
 *                 Copy the data into the record
-                     I2 = 1
-                     IREC(I2) = IVALS(1)
-                     DO 50, I1 = 1,IVALS(1)
+                     IREC(1) = IVALS(2)
+                     RREC(2) = RVALS(3)
+                     IREC(3) = IVALS(4)
+                     IREC(4) = IVALS(5)
+                     IREC(5) = IVALS(6)
+                     I2 = 5
+                     DO 40, I1 = 1,IVALS(6)
                         I2 = I2 + 1
-                        IREC(I2) = ICHAR(CVALS(1)(I1:I1))
+                        IREC(I2) = ICHAR(CVALS(6)(I1:I1))
+   40                CONTINUE
+                     I2 = I2 + 1
+                     IREC(I2) = IVALS(7)
+                     DO 50, I1 = 1,IVALS(7)
+                        I2 = I2 + 1
+                        IREC(I2) = ICHAR(CVALS(7)(I1:I1))
    50                CONTINUE
                      I2 = I2 + 1
-                     IREC(I2) = IVALS(2)
+                     IREC(I2) = IVALS(8)
+                     I2 = I2 + 1
+                     IREC(I2) = IVALS(9)
 
 *                 and write the data to the binary file
-*                 Use the sum of the first two characters of the
-*                 workstation name for the hashing constant
-                     CHASH = 0
-                     IF ( IVALS(1) .EQ. 1 ) THEN
-                        CHASH = IREC(2)
-                     ELSEIF ( IVALS(1) .GT. 1 ) THEN
-                        CHASH = IREC(2) + IREC(3)
-                     ENDIF
-                     CALL WRTWST(CHASH,IREC,RREC,I2)
+                     CALL WRTWST(IVALS(1),IREC,RREC,I2)
 
 *                 Set all the values back to zero or blanks
                      DO 60 I =1, NKEYWR
@@ -403,8 +434,12 @@
                CVALS(IKEYIN) = CURVAL(:NVALC)
                IVALS(IKEYIN) = NVALC
             ELSE
+               DO 70 I = 1,NENUMS
+                  IF (CURVAL(:NVALC).EQ.ENUMS(I)) GO TO 80
+   70          CONTINUE
                PRINT *, 'Unknown value keyword'
                GO TO 9000
+   80          IVALS(IKEYIN) = IENUMS(I)
             END IF
 
 *   Change state to "reading keyword"
@@ -460,7 +495,7 @@
 *
 *      {arguments_or_none}
 *+
-*   Nick Eaton    21-MAY-1989
+*   D L Terrett    3-MAY-1989 
 
       IMPLICIT NONE
       INTEGER IWKSTN, IREC(*), NITEM
@@ -469,20 +504,21 @@
 *   The binary description file is an unformatted direct access Fortran
 *   file with fixed length records (dictated by the Fortran standard).
 *
-*   Each workstation description consists of the workstation type
-*   (a counted string) followed by a mixture of integers, reals,
-*   enumerated types (stored as integers) and "counted strings".
-*   A counted string is an integer character count followed by the
-*   characters stored as integers.  The order and meaning of the items
-*   is fixed; only the lengths of the counted strings varies between
-*   workstations.  Missing numeric items are represented my magic
-*   values that varies from item to item and missing string are
-*   represented by a count of zero.
+*   Each workstation description consists of the workstation type (an
+*   integer) followed by a mixture of integers, reals, enumerated types
+*   (stored as integers) and "counted strings".  A counted string is an
+*   integer character count followed by the characters stored as
+*   integers.  The order and meaning of the items is fixed; only the
+*   lengths of the counted strings varies between workstations.  Missing
+*   numeric items are represented my magic values that varies from item
+*   to item and missing string are represented by a count of zero.
 *
 *   Each workstation starts on the record boundary but may extend over
 *   more than one record in which case the first item on the
 *   continuation records is a magic value that can be distingushed from
-*   a workstation type.
+*   a GKS workstation type (this number is unfortunately GKS
+*   implementation dependent; -1 is used for GKS-UK for which all types
+*   are positive).
 *
 *   The record number at which a particular workstation starts is
 *   calulated from the type using a tbd. hashing algorithm.
@@ -499,7 +535,7 @@
 *   Hash algorithm constants (these MUST match the definitions in the
 *   main program)
       INTEGER IHASH1, IHASH2
-      PARAMETER (IHASH1 = 3, IHASH2 = 13)
+      PARAMETER (IHASH1 = 13, IHASH2 = 313)
 
 *   Tag values to indicate a continued record and an empty record.
       INTEGER ICONT, IEMPT
@@ -513,15 +549,15 @@
       COMMON /STATS/ IRELOC, MAXREC, NWRKS, ICOLS
 
       NWRKS = NWRKS + 1
-
+      
 *   Hash the workstation type to get the record index to start writing
       IND = MOD ((IWKSTN * IHASH1),IHASH2) + 1
 
 *   Tag for first record
-      ITAG = IREC(1)
+      ITAG = IWKSTN
 
 *   Initial offset into data buffer
-      IOFF = 1
+      IOFF = 0
 
 *   Number of data items written so far
       IWRTN = 0

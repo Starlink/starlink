@@ -42,7 +42,7 @@
       CHARACTER*(*) WKTYPE
       INTEGER STATUS
 
-      INCLUDE 'gns_par'
+      INCLUDE 'GNS_PAR'
       INCLUDE 'gns.cmn'
       INCLUDE 'GNS_ERR'
 

@@ -1,3 +1,4 @@
+#include <config.h>
       SUBROUTINE gns_1INITI (STATUS)
 *++
 *   gns_1INITI   Prepares the IDI name database for access
@@ -34,9 +35,9 @@
 *   D L Terrett  25-JUL-1995  Search for data files
 
       IMPLICIT NONE
-      INCLUDE 'gns_par'
+      INCLUDE 'GNS_PAR'
       INCLUDE 'gns.cmn'
-      INCLUDE 'gns_err'
+      INCLUDE 'GNS_ERR'
       INTEGER STATUS
 
       LOGICAL OPEN
@@ -69,7 +70,10 @@
 *   Open the database file
             CALL GNS_1FNDF('IDI','NAMES',NAMFNI)
             OPEN (UNIT=LUNIDI, FILE=NAMFNI, STATUS='OLD',
-     :      READONLY, ERR=100)
+#ifdef HAVE_F77_OPEN_READONLY
+     :           READONLY,
+#endif
+     :           ERR=100)
 
 *   Get our own node name
             CALL gns_1HOSTN( LOCNOD, L, STATUS)
@@ -182,8 +186,11 @@
 *   Open the workstation description file
                CALL GNS_1FNDF('IDI','DEVICES',DEVFNI)
                OPEN( UNIT=LUNIDI, FILE=DEVFNI, STATUS='OLD',
-     :               RECL=RECSIZ, READONLY, ACCESS='DIRECT', 
-     :               FORM='UNFORMATTED', ERR=100 )
+     :              RECL=RECSIZ*4,
+#ifdef HAVE_F77_OPEN_READONLY
+     :              READONLY,
+#endif
+     :              ACCESS='DIRECT', FORM='UNFORMATTED', ERR=100 )
 
 *   Save the file name returned by INQUIRE
                INQUIRE( UNIT=LUNIDI, NAME=FNAME )

@@ -1,3 +1,4 @@
+#include <config.h>
       SUBROUTINE gns_1INITG (STATUS)
 *++
 *   gns_1INITG   Prepares the GKS name database for access
@@ -32,9 +33,9 @@
 *   D L Terrett  25-JUL-1995  Search for data files
 
       IMPLICIT NONE
-      INCLUDE 'gns_par'
+      INCLUDE 'GNS_PAR'
       INCLUDE 'gns.cmn'
-      INCLUDE 'gns_err'
+      INCLUDE 'GNS_ERR'
       INTEGER STATUS
       
       LOGICAL OPEN
@@ -75,7 +76,10 @@
 *        Open the GNS names file
             CALL GNS_1FNDF('GKS', 'NAMES', NAMFNG)
             OPEN (UNIT=LUNGKS, FILE=NAMFNG, STATUS='OLD',
-     :      READONLY, ERR=100)
+#ifdef HAVE_F77_OPEN_READONLY
+     :           READONLY,
+#endif
+     :           ERR=100)
 
 *        Get our own node name
             CALL gns_1HOSTN( LOCNOD, L, STATUS)
@@ -194,7 +198,11 @@
 *           Open the workstation description file
                CALL GNS_1FNDF('GKS', 'DEVICES', DEVFNG)
                OPEN (UNIT=LUNGKS, FILE=DEVFNG, STATUS='OLD', 
-     :               RECL=RECSIZ, READONLY, ACCESS='DIRECT', 
+     :              RECL=RECSIZ*4, 
+#ifdef HAVE_F77_OPEN_READONLY
+     :              READONLY,
+#endif
+     :              ACCESS='DIRECT', 
      :               FORM='UNFORMATTED', ERR=100)
 
 *           Save the file name returned by INQUIRE
