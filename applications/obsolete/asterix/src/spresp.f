@@ -446,7 +446,7 @@
 
 *        Announce to user
           CALL MSG_SETR( 'ENERGY', E )
-          CALL MSG_SETC( 'AXLIB', EAXLAB )
+          CALL MSG_SETC( 'AXLAB', EAXLAB )
           CALL MSG_PRNT( 'Doing ^AXLAB band ^ENERGY' )
 
         END IF
