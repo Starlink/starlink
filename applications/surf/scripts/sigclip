@@ -34,6 +34,9 @@ $good = $status;
 # Remove trailing sdf
 $ndf =~ s/\.sdf$//;
 
+# Start ndf
+ndf_begin;
+
 # Check that files exists simply by doing an ndf_find
 # and checking for good status.
 
@@ -43,9 +46,11 @@ if ($status == $good) {
   print "Using the NDF $ndf...\n";
   $usethis = $ndf;
   ndf_annul($indf, $status);
+  ndf_end($status);
 } else {
   err_rep(' ',"SIGCLIP: $ndf does not appear to be an NDF", $status);
-  err_annul($status);
+  err_flush($status);
+  ndf_end($status);
   exit;
 }
 
