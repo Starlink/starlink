@@ -265,11 +265,11 @@
                         if ( ebuf[ i ] == '%' ) {
                            switch ( ebuf[ j + 1 ] ) {
                               case '(':
-                                 level++;
+                                 if ( level < MAXNEST -1 ) level++;
                                  started = 1;
                                  break;
                               case ')':
-                                 level--;
+                                 if ( level ) level--;
                                  break;
                               case ' ':
                               case ',':
@@ -296,25 +296,27 @@
                         if ( ind < 6 ) ind = 6;
                         if ( we - i + ind + 1 > 72 ) ind = 9;
                         if ( we - i + ind + 1 > 72 ) ind = 6;
-                        if ( we - i + ind + 1 > 72 )
-                           fprintf( stderr, 
-                                    "%s: Failed to break line\n", name );
       
 /* Output the line break, unless we've just done one. */
                         if ( col != 7 ) {
                            putchar( '\n' );
                            for ( k = 1; k <= ind; k++ )
                               putchar( k == 6 ? ':' : ' ' );
-                           col = ind;
+                           col = ind + 1;
                         }
                      }
       
 /* Now output the word. */
                      while ( i <= j ) {
-                        if ( 1 ) {
-                           putchar( ebuf[ i ] );
-                           col++;
+                        if ( col > 72 && ! isspace( ebuf[ i ] ) ) {
+                           putchar( '\n' );
+                           for ( k = 1; k <= ind; k++ )
+                              putchar( k == 6 ? ':' : ' ' );
+                           col = ind;
+                           fprintf( stderr, "%s: Ugly line break\n", name );
                         }
+                        putchar( ebuf[ i ] );
+                        col++;
                         i++;
                      }
                   }
@@ -431,10 +433,12 @@
          }
          switch( tok ) {
             case LINE_START:
+               buf[ leng ].flag = tok;
+               break;
             case LINE_END:
             case '(':
             case ')':
-               buf[ leng ].flag = tok;
+               buf[ leng + yleng - 1 ].flag = tok;
             default:
          }
          leng += yleng;
@@ -447,7 +451,7 @@
                                   LINE_END, 0 ) ) { 
                if ( incpos ) buf[ incpos ].interp = NULL;
                incpos = tokpos[ 3 ] + yleng;
-               buf[ incpos ].interp = pc = calloc( LINELENG, 1 );
+               buf[ incpos ].interp = pc = memok( calloc( LINELENG, 1 ) );
                strcpy( pc, "      " );
                pc += 6;
                for ( i = tokpos[ 1 ]; ( *(pc++) = buf[ i ].chr ) != '\''; i++ );
@@ -469,7 +473,8 @@
                }
                else {
                   if ( ! incpos ) 
-                     fprintf( stderr, "%s: Failed to include CNF_PAR\n", name );
+                     fprintf( stderr, 
+                              "%s: Failed to place INCLUDE 'CNF_PAR'\n", name );
                }
                nval = 0;
                incpos = 0;
@@ -513,11 +518,11 @@
                      if ( stcol[ level ] > col ) stcol[ level ] = col;
                   }
                   if ( buf[ i ].flag == '(' ) {
-                     level++;
+                     if ( level < MAXNEST - 1 ) level++;
                      stcol[ level ] = 99999;
                   }
                   else if ( buf[ i ].flag == ')' ) {
-                     level--;
+                     if ( level ) level--;
                   }
                   col++;
                   if ( buf[ i ].chr == '\n' ) {
