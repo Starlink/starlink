@@ -20,10 +20,10 @@ AXIS
 
 AXIS = _LOGICAL (Read)
    If a TRUE value is given for this parameter (the default),
-   then any axis values associated with the NDF dimension being
-   reversed will also be reversed in the same way.  If a FALSE
-   value is given, then all axis values will be left unchanged.
-   [TRUE]
+   then any axis values and WCS information associated with the
+   NDF dimension being reversed will also be reversed in the same
+   way.  If a FALSE value is given, then all axis values and WCS
+   information will be left unchanged. [TRUE]
 
 DIM
 
@@ -82,6 +82,8 @@ RFWS: R.F. Warren-Smith (STARLINK, RAL)
 
 MJC: Malcolm J. Currie (STARLINK)
 
+DSB: David S. Berry (STARLINK)
+
 History
 
  13-MAR-1991 (RFWS):
@@ -91,10 +93,13 @@ History
     Replaced AIF parameter-system calls by the extended PAR
     library.
 
+ 11-JUN-1998 (DSB):
+    Added propagation of the NDF WCS component.
+
 Implementation_Status
 
    -  This routine correctly processes the AXIS, DATA, QUALITY,
-   VARIANCE, LABEL, TITLE, UNITS, and HISTORY components of the
+   VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of the
    input NDF and propagates all extensions.
 
    -  Processing of bad pixels and automatic quality masking are

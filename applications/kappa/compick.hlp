@@ -94,6 +94,8 @@ Authors
 
 MJC: Malcolm J. Currie (STARLINK)
 
+DSB: David S. Berry (STARLINK)
+
 History
 
  1991 November 27 (MJC):
@@ -102,10 +104,14 @@ History
  1995 January 11 (MJC):
     Made TITLE propagate from the input NDF.
 
+ 10-JUN-1998 (DSB):
+    Propagate WCS component. Ensure each output dimension is at least
+    one pixel long.
+
 Implementation_Status
 
    -  This routine correctly processes the AXIS, DATA, QUALITY,
-   VARIANCE, LABEL, TITLE, UNITS, and HISTORY components of the
+   VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of the
    input NDF and propagates all extensions.
 
    -  Processing of bad pixels and automatic quality masking are

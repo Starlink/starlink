@@ -76,6 +76,32 @@ DSCFTABLE = FILENAME (Read)
    of the catalogue, as written in the FITS header, with a "dscf"
    prefix.
 
+ENCODINGS
+
+ENCODINGS = LITERAL (Read)
+   Determines which FITS keywords should be used to define the
+   world co-ordinate information stored in NDF's WCS component.
+   The allowed values (case-insensitive) are:
+
+   "FITS-WCS" --- This uses keywords CRVALi, CDELTi, CRPIXi,
+      PCiiijjj, etc., as described in the (draft) FITS world
+      co-ordinate system paper by E.W.Greisen and M.Calabretta
+      (A & A, in preparation).
+
+   "DSS" --- This is the system used by the Digital Sky Survey,
+      and uses keywords AMDXn, AMDYn, PLTRAH, etc.
+
+   "Native" --- This is the native system used by the AST library
+      (see SUN/210), and is the most general.  The others are
+      limited in the co-ordinate systems they can describe, and
+      may thus not fully describe the NDF's WCS component.
+
+   A comma-separated list of up to three values may be supplied,
+   in which case the value actually used is in the first in the
+   list for which corresponding keywords can be found in the FITS
+   header. If a null parameter value (!) is supplied, the encoding
+   is chosen automatically on the basis of the available headers. [!]
+
 FILES
 
 FILES() = LITERAL (Read)
@@ -179,6 +205,8 @@ MJC: Malcolm J. Currie (STARLINK)
 
 RDS: Richard D. Saxton (STARLINK, Leicester)
 
+DSB: David S. Berry (STARLINK)
+
 History
 
  1990 December 4 (MJC):
@@ -225,6 +253,9 @@ History
 
  1996 June 6 (MJC):
     Linux usage enabled.
+
+ 9-JUN-1998 (DSB):
+    Added support for WCS component.
 
 Implementation_Status
 

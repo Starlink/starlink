@@ -153,6 +153,8 @@ Authors
 
 MJC: Malcolm J. Currie (STARLINK)
 
+DSB: David S. Berry (STARLINK)
+
 History
 
  1991 November 30 (MJC):
@@ -162,10 +164,17 @@ History
     Made TITLE propagate from the input NDF.  Used PSX for
     workspace.
 
+ 27-FEB-1998 (DSB):
+    Type of local variable AXWT corrected from INTEGER to LOGICAL.
+
+ 10-JUN-1998 (DSB):
+    Propagate WCS component. Ensure each output dimension is at least
+    one pixel long.
+
 Implementation_Status
 
    -  This routine correctly processes the AXIS, DATA, VARIANCE,
-   LABEL, TITLE, UNITS, and HISTORY components of the input NDF and
+   LABEL, TITLE, UNITS, WCS and HISTORY components of the input NDF and
    propagates all extensions.  QUALITY is not processed since it is
    a series of flags, not numerical values.
 

@@ -117,26 +117,32 @@ Authors
 
 MJC: Malcolm J. Currie (STARLINK)
 
+DSB: David S. Berry (STARLINK)
+
 History
 
  1995 May 14 (MJC):
     Original NDF version.
 
+ 12-JUN-1998 (DSB):
+    Added propagation of the NDF WCS component.
+
+ {enter_any_changes_here}
 
 Implementation_Status
 
    The propagation rules depend on parameters ANGLE and NNMETH.
 
    -  For rotations that are multiples of 90-degrees, VARIANCE,
-   QUALITY, AXIS, HISTORY, LABEL and UNITS components of the input
-   NDF are propagated to the output NDF.  The axis components are
-   switched and flipped as appropriate.
+   QUALITY, AXIS, HISTORY, LABEL WCS and UNITS components of the input
+   NDF are propagated to the output NDF.  The axis and WCS components
+   are switched and flipped as appropriate.
 
    -  For the nearest-neighbour method VARIANCE, QUALITY, HISTORY,
-   LABEL and UNITS components of the input NDF are propagated to the
-   output NDF.
+   LABEL, WCS and UNITS components of the input NDF are propagated to
+   the output NDF.
 
-   -  For the linear interpolation method HISTORY, LABEL and
+   -  For the linear interpolation method HISTORY, LABEL, WCS and
    UNITS components of the input NDF are propagated to the output
    NDF.  In addition if parameter VARIANCE is TRUE, variance
    information is derived from the input variance; and if parameter
