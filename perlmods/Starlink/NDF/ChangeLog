@@ -1,3 +1,8 @@
+1998-09-21  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* NDF.pm (fits_extract_key_val): Modify so that an undefined value 
+	is returned if the key is there but the value is a blank string.
+
 1998-09-14  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* NDF.pm (par_get): Retrieve DOUBLE values as double precision numbers
