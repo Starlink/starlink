@@ -50,8 +50,8 @@
 *      Bolometer             : <bolometer name>
 *      Weight                : <weight to be given to its results>
 *
-*      Integration   Peak     Peak_var      Peak_x      Peak_y      Quality
-*      <integration> <peak>   <variance>   <x of peak> <y of peak>   <quality>
+*      Integration   Peak     Peak_sig      Peak_x      Peak_y      Quality
+*      <integration> <peak>   <Error>   <x of peak> <y of peak>   <quality>
 *                - for all the integrations taken in the observation -
 *
 *      Measurement results   :
@@ -235,6 +235,7 @@
       PARAMETER (RECLEN = 80)            !
 *    Local variables :
       INTEGER            BEAM            ! beam index
+      REAL               ERROR           ! SQRT variance
       INTEGER            FD              ! FIO file identifier
       INTEGER            I               ! DO loop index
       INTEGER            ITEMP           ! scratch integer
@@ -352,16 +353,21 @@
 
             CALL FIO_WRITE (FD, ' ', STATUS)
  
-            LINE = 'Integration  Peak   Peak_var     Peak_x     '//
-     ;        'Peak_y      Quality'
+            LINE = 'Integration  Peak    Error       S/N      '//
+     ;        'Peak_x     Peak_y'
             CALL FIO_WRITE (FD, LINE, STATUS)
 
             DO I = 1, N_INTEGRATIONS
-               IF (PEAK_D(I,BEAM).NE.VAL__BADR) THEN
-                  WRITE (LINE, 10) I, PEAK_D(I,BEAM), PEAK_V(I,BEAM),
-     :                 PEAK_X(I,BEAM), PEAK_Y(I,BEAM), PEAK_Q(I, BEAM)
-                  CALL FIO_WRITE (FD, LINE, STATUS)
+               IF (PEAK_D(I,BEAM).EQ.VAL__BADR .OR. 
+     :              PEAK_Q(I,BEAM) .GT. 0) THEN
+                  WRITE(LINE,15) I
+               ELSE
+                  ERROR = SQRT(PEAK_V(I,BEAM))
+                  WRITE (LINE, 10) I, PEAK_D(I,BEAM), ERROR,
+     :                 PEAK_D(I,BEAM)/ERROR, PEAK_X(I,BEAM),
+     :                 PEAK_Y(I,BEAM)
                END IF
+               CALL FIO_WRITE (FD, LINE, STATUS)
             END DO
 
 	    CALL FIO_WRITE (FD, ' ', STATUS)
@@ -369,25 +375,28 @@
             LINE = 'Measurement results:'
             CALL FIO_WRITE (FD, LINE, STATUS)
 
-            LINE = '  Fit to coadded jiggle:'
+            LINE = ' Parabolic fit to coadded jiggle:'
             CALL FIO_WRITE (FD, LINE, STATUS)
 
-            WRITE (LINE,20) MEAS_1_D(BEAM), MEAS_1_V(BEAM),
-     :        MEAS_1_X(BEAM), MEAS_1_Y(BEAM), MEAS_1_Q(BEAM)
+            ERROR = SQRT(MEAS_1_V(BEAM))
+
+            WRITE (LINE,20) MEAS_1_D(BEAM), ERROR, MEAS_1_D(BEAM)/ERROR,
+     :        MEAS_1_X(BEAM), MEAS_1_Y(BEAM)
             CALL FIO_WRITE (FD, LINE, STATUS)
 
-            LINE = '  Coadded fit results:'
+            LINE = '  Coadded result of individual integrations:'
             CALL FIO_WRITE (FD, LINE, STATUS)
 
-            WRITE (LINE,30) MEAS_2_D(BEAM), MEAS_2_V(BEAM),
-     :        MEAS_2_Q(BEAM)
+            ERROR = SQRT(MEAS_2_V(BEAM))
+            WRITE (LINE,30) MEAS_2_D(BEAM), ERROR, MEAS_2_D(BEAM)/ERROR
             CALL FIO_WRITE (FD, LINE, STATUS)
          END IF
       END DO
 
-  10  FORMAT (I4, '  ', 4E11.3, '  ', I5)
-  20  FORMAT ('      ', 4E11.3, '  ', I5)
-  30  FORMAT ('      ', 2E11.3, '  ', I27)
+  10  FORMAT (I4, '  ', 2E11.3, ' ', F8.3, 2E11.3)
+  15  FORMAT (I4, ' Bad integration')
+  20  FORMAT ('      ', 2E11.3, ' ', F8.3, 2E11.3)
+  30  FORMAT ('      ', 2E11.3, ' ', F8.3)
 
 *  close the file
 
