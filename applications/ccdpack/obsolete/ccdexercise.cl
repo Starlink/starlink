@@ -295,7 +295,7 @@ begin
    print "  images so that other routines may use it."
    print " "
    register ( inlist="reduced_data?.imh", refpos=1, usewcs=no,
-              outformat="transform", outdomain="ccd_reg", fittype=2 )
+              outdomain="ccd_reg", fittype=2 )
 
    #  For now, NDF2IRAF does not support WCS components, so we can't
    #  go any further.  This may get worked around one way or another
