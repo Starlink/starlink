@@ -19,7 +19,7 @@
 			SYSTEM '../dtd2sgml/starlink-0.6.sgmltext'>
   <!ENTITY programcodedtddoc
 			SYSTEM '../dtd2sgml/programcode-0.6.sgmltext'>
-  <!ENTITY dsssl.lib	SYSTEM "../../dsssl/sl/lib/sllib.dsl" SUBDOC
+  <!ENTITY dsssl.lib	SYSTEM "../../dsssl/sl/lib/sllib-jade-1.2.1.dsl" SUBDOC
 			-- DSSSL library code -->
   <!ENTITY dsssl.common	SYSTEM "../../dsssl/sl/common/slcommon.dsl" SUBDOC
 			-- dsssl common code -->
@@ -88,9 +88,15 @@ Time for few documentation updates.
 
 <change date="23-SEP-1999" versionid="post-v0-5">Misc. clarifications.</change>
 
-<distribution string="DR-0.6-unreleased" date="30-SEP-1999" author="ng" versionid="v0.6">
-Added sgml2docs command.  Significant changes to programcode.
-Incorporates decisions from Durham SGML meeting.
+<distribution string="DR-0.6" date="31-Mar-2000" author="ng" versionid="v0.6">
+
+<px>RCS: $Id$
+
+<px>Added sgml2docs command.  Significant changes to programcode.
+Incorporates decisions from Durham, RAL and
+Cambridge SGML meetings.  This is an interim release, intended as
+a snapshot for distribution to Rodney Warren-Smith and Mark Taylor.
+There will be a proper distribution before 1 June.
 </distribution>
 
 </history>
