@@ -8,11 +8,11 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 \newcommand{\stardocnumber}    {238.4}
 \newcommand{\stardocauthors}   {D.S. Berry}
-\newcommand{\stardocdate}      {7th February 2004}
+\newcommand{\stardocdate}      {16th March 2004}
 \newcommand{\stardoctitle}     {KAPLIBS \\ [1ex]
                                 Internal subroutines used within\\
                                 the KAPPA package.}
-\newcommand{\stardocversion}   {Version 2.6}
+\newcommand{\stardocversion}   {Version 2.7}
 \newcommand{\stardocmanual}    {Programmer's Reference}
 \newcommand{\stardocabstract}  {KAPLIBS is a package of Fortran subroutine 
 libraries which were originally written as part of the KAPPA package (a
@@ -525,6 +525,13 @@ GKS version of the PGPLOT graphics library. If you wish to link with the
 This will include native PGPLOT in the link list, and cause all GKS and IDI 
 related items to be removed.
 
+
+\section{Changes in Version 2.7}
+\begin{itemize}
+\item A new routine LPG_REPLA has been added. It controls a new option
+   which allows a single NDF to be used as both input and output for an adam task. 
+   The default is for this option to be disabled.
+\end{itemize}
 
 \section{Changes in Version 2.6}
 \begin{itemize}

@@ -102,6 +102,8 @@
 *  History:
 *     13-AUG-1999 (DSB):
 *        Original version.
+*     15-MAR-2004 (DSB):
+*        Added facility for using a single NDF as both input and output.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -117,6 +119,7 @@
       INCLUDE 'DAT_PAR'          ! HDS constants.
       INCLUDE 'PAR_ERR'          ! PAR error constants.
       INCLUDE 'LPG_CONST'        ! LPG private constants
+      INCLUDE 'GRP_PAR'          ! GRP constants.
 
 *  Global Variables:
       INCLUDE 'LPG_COM'          ! LPG global variables
@@ -147,6 +150,28 @@
 *           The inter-invocation delay, in seconds.
 *        DISAB = LOGICAL (Read)
 *           A flag indicating if looping is currently disabled.
+*        TMPLST = INTEGER (Read and Write)
+*           A GRP identifier for a group holding the full specification
+*           for any temporary output NDFs created during the previous
+*           invocation of the application. A temporary output NDF is
+*           created if the output NDF requested by the user may already
+*           be open by the NDF system. In this case the temporary NDF
+*           is copied to the requested position once the application has
+*           finished.  The TMPLST group holds adjacent pairs of file
+*           specs; the first one in each pair is the spec of the temporary 
+*           output NDF, the second is the spec of the requested output NDF.
+*        OPNLST = INTEGER (Read and Write)
+*           A GRP identifier for a group holding the full specification
+*           for any existing NDFs which have been opened for read-only
+*           input by this invocation of the application. 
+*        REPLACE = LOGICAL (Read)
+*           Should the user be allowed to use the same input as both
+*           input and output? If so, a temporary NDF will be used to
+*           store the output while the application is running. Once the
+*           application has finsished, the existing input NDF will be
+*           replaced by a copy of the temporary NDF. If REPLACE is false
+*           an error will be reported if an attempt is amde to use a
+*           single NDF as both input and output.
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -188,6 +213,11 @@
 *  if looping is currently diabled. This causes a .TRUE. value to be
 *  returned on the first invocation, but .FALSE. for subsequent invocations.
       ELSE IF( .NOT. DISAB ) THEN
+
+*  Ensure that any temporary output NDFs created by the previous invocation
+*  of the application have been copied to the appropriate permanent
+*  location.
+         CALL LPG1_TMPCP( STATUS )
 
 *  Assume to begin with that there are sufficient unused data files to run
 *  the application again.
@@ -326,6 +356,25 @@
          CALL ERR_REP( 'LPG_AGAIN_ERR', 'Continuing to process '//
      :                 'remaining data files...', STATUS )
          CALL ERR_FLUSH( STATUS )
+      END IF
+
+*  If the application is to be run again, initialise the list of existing NDFs
+*  currently opened by the application,and the list of temporary output
+*  NDFs currently created nu the application.
+      IF( LPG_AGAIN ) THEN
+
+         IF( OPNLST .NE. GRP__NOID ) THEN
+            CALL GRP_SETSZ( OPNLST, 0, STATUS )
+         ELSE
+            CALL GRP_NEW( ' ', OPNLST, STATUS )
+         END IF
+
+         IF( TMPLST .NE. GRP__NOID ) THEN
+            CALL GRP_SETSZ( TMPLST, 0, STATUS )
+         ELSE
+            CALL GRP_NEW( ' ', TMPLST, STATUS )
+         END IF
+
       END IF
 
 *  If an error occurred, indicate that the application should not be

@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL LPG_START( VERBO, DELAYO, DISABO, STATUS )
+*     CALL LPG_START( VERBO, DELAYO, DISABO, REPLA0, STATUS )
 
 *  Description:
 *     Initialises the global variables used by LPG. See LPG_AGAIN.
@@ -42,6 +42,8 @@
 *  History:
 *     24-AUG-1999 (DSB):
 *        Original version.
+*     15-MAR-2004 (DSB):
+*        Added initialisation of TMPLST, REPLACE and OPNLST.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -94,11 +96,34 @@
 *           Delay between invocations, in seconds.
 *        DISAB = LOGICAL (Write)
 *           Disable looping?
+*        TMPLST = INTEGER (Read and Write)
+*           A GRP identifier for a group holding the full specification
+*           for any temporary output NDFs created during the previous
+*           invocation of the application. A temporary output NDF is
+*           created if the output NDF requested by the user may already
+*           be open by the NDF system. In this case the temporary NDF
+*           is copied to the requested position once the application has
+*           finished.  The TMPLST group holds adjacent pairs of file
+*           specs; the first one in each pair is the spec of the temporary 
+*           output NDF, the second is the spec of the requested output NDF.
+*        OPNLST = INTEGER (Read and Write)
+*           A GRP identifier for a group holding the full specification
+*           for any existing NDFs which have been opened for read-only
+*           input by this invocation of the application. 
+*        REPLACE = LOGICAL (Read)
+*           Should the user be allowed to use the same input as both
+*           input and output? If so, a temporary NDF will be used to
+*           store the output while the application is running. Once the
+*           application has finsished, the existing input NDF will be
+*           replaced by a copy of the temporary NDF. If REPLACE is false
+*           an error will be reported if an attempt is amde to use a
+*           single NDF as both input and output.
 
 *  Arguments Given:
       LOGICAL VERBO
       REAL DELAYO
       LOGICAL DISABO
+      LOGICAL REPLA0
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -136,5 +161,13 @@
 
 *  Record whether looping should be disabled.
       DISAB = DISABO
+
+*  Record whether a single NDF can be used as both input and output
+      REPLACE = .FALSE.
+
+*  Initialise groupidentifiers.
+      TMPLST = GRP__NOID
+      OPNLST = GRP__NOID
+
 
       END

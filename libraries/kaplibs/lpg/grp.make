@@ -15,10 +15,11 @@ INCLUDES = lpg_com lpg_const
 FORTRAN_FILES = \
 lpg1_init.f lpg_again.f lpg_catcreat.f lpg_prop.f lpg1_ptpar.f \
 lpg_assoc.f lpg_creat.f lpg_start.f lpg1_tidy.f lpg_catassoc.f \
-lpg_crep.f lpg_state.f
+lpg_crep.f lpg_state.f lpg1_addtm.f lpg_crep1.f  \
+lpg_repla.f lpg1_tmpcp.f lpg_crea1.f lpg_prop1.f
 
 #  C source files 
-C_FILES = lpg1_rm.c lpg1_sleep.c
+C_FILES = lpg1_rm.c lpg1_sleep.c lpg1_tmpnm.c  
 
 #  Text files destined for UNIX release lpg_source.tar.
 OTHER_UNIX_SOURCES = lpg_dev lpg_link lpg_link_adam lpg_test.f lpg_test.ifl

@@ -402,7 +402,7 @@ PKG_NUM = 1522
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
-PKG_VERS = 2.6
+PKG_VERS = 2.7
 
 #  Library version number.
 #
@@ -685,7 +685,8 @@ ctg_asso1.f ctg_assoc.f ctg_crea1.f ctg_creat.f ctg1_sort.f
 
 LPG_F_ROUTINES = lpg_again.f lpg_catcreat.f lpg_prop.f lpg_test.f lpg1_ptpar.f \
 lpg_assoc.f lpg_creat.f lpg_start.f lpg1_tidy.f lpg_catassoc.f lpg_crep.f \
-lpg_state.f
+lpg_state.f lpg_repla.f lpg1_tmpcp.f lpg_prop1.f lpg_crea1.f lpg_crep1.f \
+lpg1_addtm.f
 
 F_ROUTINES = $(AIF_F_ROUTINES) $(IRA_F_ROUTINES) $(CTG_F_ROUTINES) \
              $(LPG_F_ROUTINES) $(FTS_F_ROUTINES) $(KPG_F_ROUTINES) \
@@ -711,7 +712,7 @@ PLATFORM_F =
 
 IRA_C_ROUTINES = 
 CTG_C_ROUTINES = ctg1_wild.c ctg1_rm.c 
-LPG_C_ROUTINES = lpg1_rm.c lpg1_sleep.c
+LPG_C_ROUTINES = lpg1_rm.c lpg1_sleep.c lpg1_tmpnm.c
 FTS_C_ROUTINES = fts1_findf.c fts1_rnand.c fts1_rnanr.c
 KPG_C_ROUTINES = kpg1_trmsz.c kpg1_ieeer.c kpg1_ieeed.c kpg1_tkast.c kpg1_isfind.c \
 kpg1_isfinr.c
@@ -2546,6 +2547,8 @@ kpg1_zones.o:	 SAE_PAR
 kpg1_zopic.o:	 SAE_PAR
 ld2ar.o:	 SAE_PAR PRM_PAR
 logarr.o:	 SAE_PAR PRM_PAR
+lpg1_addtm.o:    SAE_PAR GRP_PAR DAT_PAR LPG_CONST LPG_COM
+lpg1_tmpcp.o:    SAE_PAR GRP_PAR DAT_PAR LPG_CONST LPG_COM
 lpg1_init.o:	 DAT_PAR LPG_CONST GRP_PAR LPG_COM
 lpg1_ptpar.o:	 SAE_PAR GRP_PAR DAT_PAR
 lpg1_tidy.o:	 SAE_PAR DAT_PAR GRP_PAR SUBPAR_PAR LPG_CONST LPG_COM
@@ -2556,8 +2559,12 @@ lpg_catcreat.o:	 SAE_PAR DAT_PAR GRP_PAR CAT_PAR PAR_ERR SUBPAR_PAR LPG_CONST LP
 lpg_creat.o:	 SAE_PAR DAT_PAR GRP_PAR NDF_PAR PAR_ERR SUBPAR_PAR LPG_CONST LPG_COM
 lpg_crep.o:	 SAE_PAR DAT_PAR GRP_PAR NDF_PAR PAR_ERR SUBPAR_PAR LPG_CONST LPG_COM
 lpg_prop.o:	 SAE_PAR DAT_PAR GRP_PAR NDF_PAR SUBPAR_PAR LPG_CONST PAR_ERR LPG_COM
+lpg_repla.o:	 SAE_PAR DAT_PAR GRP_PAR LPG_CONST LPG_COM
 lpg_start.o:	 SAE_PAR DAT_PAR GRP_PAR SUBPAR_PAR LPG_CONST LPG_COM
 lpg_state.o:	 SAE_PAR DAT_PAR LPG_CONST LPG_COM
+lpg_prop1.o:     SAE_PAR GRP_PAR NDF_PAR
+lpg_crea1.o:     SAE_PAR GRP_PAR NDF_PAR
+lpg_crep1.o:     SAE_PAR GRP_PAR NDF_PAR
 ncraxs.o:	 SAE_PAR
 ncrbck.o:	 SAE_PAR
 ncropn.o:	 SAE_PAR PAR_ERR

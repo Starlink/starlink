@@ -390,7 +390,8 @@ C_ROUTINES = $(BASIC_C_ROUTINES)
 
 BASIC_F_ROUTINES = lpg_again.f lpg_catcreat.f lpg_prop.f \
 lpg_test.f lpg1_ptpar.f lpg_assoc.f lpg_creat.f lpg_start.f lpg1_tidy.f \
-lpg_catassoc.f lpg_crep.f lpg_state.f
+lpg_catassoc.f lpg_crep.f lpg_state.f lpg1_addtm.f lpg_crep1.f lpg_repla.f \
+lpg1_tmpcp.f lpg_crea1.f lpg_prop1.f
 
 #  Additional Fortran routines required for the standalone library.
 
@@ -413,7 +414,8 @@ PLATFORM_F =
 
 #  C routines required for both standalone and ADAM versions of the library.
 
-BASIC_C_ROUTINES = lpg1_sleep.c lpg1_rm.c
+BASIC_C_ROUTINES = lpg1_sleep.c lpg1_rm.c lpg1_tmpnm.c  
+
 
 #  The facility error file.
 
@@ -1199,6 +1201,12 @@ lpg_crep.o:	 SAE_PAR DAT_PAR GRP_PAR NDF_PAR PAR_ERR SUBPAR_PAR LPG_CONST LPG_CO
 lpg_prop.o:	 SAE_PAR DAT_PAR GRP_PAR NDF_PAR SUBPAR_PAR LPG_CONST PAR_ERR LPG_COM
 lpg_start.o:	 SAE_PAR DAT_PAR GRP_PAR SUBPAR_PAR LPG_CONST LPG_COM
 lpg_state.o:	 SAE_PAR DAT_PAR LPG_CONST LPG_COM
+lpg1_addtm.o:	 SAE_PAR DAT_PAR GRP_PAR NDF_PAR PAR_ERR SUBPAR_PAR LPG_CONST LPG_COM
+lpg_crep1.o:	 SAE_PAR DAT_PAR GRP_PAR NDF_PAR PAR_ERR SUBPAR_PAR LPG_CONST LPG_COM
+lpg_repla.o:	 SAE_PAR DAT_PAR GRP_PAR NDF_PAR PAR_ERR SUBPAR_PAR LPG_CONST LPG_COM
+lpg1_tmpcp.o:	 SAE_PAR DAT_PAR GRP_PAR NDF_PAR PAR_ERR SUBPAR_PAR LPG_CONST LPG_COM
+lpg_crea1.o:     SAE_PAR DAT_PAR GRP_PAR NDF_PAR PAR_ERR SUBPAR_PAR LPG_CONST LPG_COM
+lpg_prop1.o:     DAT_PAR GRP_PAR NDF_PAR PAR_ERR SUBPAR_PAR LPG_CONST LPG_COM
 
 #-------------------------------------------------------------------------------
 #

@@ -133,6 +133,7 @@
       INTEGER I                  ! Loop count
       INTEGER IGRP0              ! Basis group for modifications
       INTEGER IPAR               ! LPG common block slot index
+      INTEGER IRUN               ! The parameter index to use
       INTEGER STATE              ! Parameter state
       LOGICAL FLAG               ! Get more NDFs?
 *.
@@ -247,7 +248,7 @@
 *  result in the user being prompted for a new parameter value.
          CALL PAR_STATE( UPAR, STATE, STATUS )
          IF( STATE .EQ. SUBPAR__CANCEL ) THEN
-            CALL NDG_CREA1( PARAM, FTYPE, NDIM, LBND, UBND, INDF, 
+            CALL LPG_CREA1( PARAM, FTYPE, NDIM, LBND, UBND, INDF, 
      :                      NAME, STATUS )
 
 *  Store the new value in the group, replacing the old value, and store
@@ -273,15 +274,23 @@
 *  Get the NDF identifier unless one was obtained above.
       IF( INDF .EQ. NDF__NOID .AND. STATUS .EQ. SAI__OK ) THEN
 
-*  Get the NDF from the group. If the group only contains one NDF name,
-*  use it on all invocations of the application.
+*  If the group only contains one NDF name, use it on all invocations of the 
+*  application.
          IF( SIZE( IPAR ) .EQ. 1 ) THEN
-            CALL NDG_NDFCR( IGRP( IPAR ), 1, FTYPE, NDIM, LBND, UBND, 
-     :                      INDF, STATUS )
+            IRUN = 1
          ELSE
-            CALL NDG_NDFCR( IGRP( IPAR ), NRUN, FTYPE, NDIM, LBND, UBND, 
-     :                      INDF, STATUS )
+            IRUN = NRUN
          END IF
+
+*  If the requested output NDF is already in use as an input NDF, we
+*  create a temporary output NDF (if allowed) which is copied to the
+*  correct place once the application has completed. Modify the entry in
+*  the group  if necessary to refer to a temporary output NDF.
+         CALL LPG1_ADDTM( IGRP( IPAR ), IRUN, STATUS )
+
+*  Get the NDF from the group. 
+         CALL NDG_NDFCR( IGRP( IPAR ), IRUN, FTYPE, NDIM, LBND, UBND, 
+     :                   INDF, STATUS )
 
 *  Tell the user which NDF is being used, if required, and if it has not 
 *  already been reported.

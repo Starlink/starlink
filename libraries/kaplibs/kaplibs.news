@@ -6,9 +6,9 @@ which provide general purpose algorithms required by the KAPPA package,
 and which may be of use to anyone developing their own KAPPA-like 
 applications (see SUN/238).
 
-Version 2.5. includes the following changes:
+Version 2.7. includes the following changes:
 
-   - The KPG1_FFT* routine have been made significantly faster. For
-   instance, they now take a tenth of the time to transform a 150000 long
-   array.
+   - New routine LPG_REPLA controls a new option which allows a single NDF
+   to be used as both input and output for an adam task. The default is
+   for this option to be disabled.
 

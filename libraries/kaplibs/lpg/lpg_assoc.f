@@ -49,6 +49,8 @@
 *  History:
 *     13-SEP-1999 (DSB):
 *        Original version.
+*     15-MAR-2004 (DSB):
+*        Modified to put the opened NDF into the OPNLST group.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -97,6 +99,10 @@
 *           cannot be acessed.
 *        DISAB = (Read)
 *           A flag indicating if looping is currently disabled.
+*        OPNLST = INTEGER (Read)
+*           A GRP identifier for a group holding the full specification
+*           for any existing NDFs which have been opened for read-only
+*           input by this invocation of the application. 
 
 *  Arguments Given:
       CHARACTER PARAM*(*)
@@ -116,8 +122,10 @@
       CHARACTER UPAR*(DAT__SZNAM)! Upper case parameter name
       INTEGER I                  ! Loop count
       INTEGER IPAR               ! LPG common block slot index
+      INTEGER IRUN               ! Index of GRP element to use
       INTEGER STATE              ! Parameter state
       LOGICAL FLAG               ! Get more NDFs?
+      LOGICAL WRACC              ! Is WRITE access available for the NDF?
 *.
 
 *  Set an initial value for the INDF argument.
@@ -237,13 +245,19 @@
 *  Get the NDF identifier unless one was obtained above.
       IF( INDF .EQ. NDF__NOID .AND. STATUS .EQ. SAI__OK ) THEN
 
-*  Get the NDF from the group. If the group only contains one NDF name,
-*  use it on all invocations of the application.
+*  If the group only contains one NDF name, use it on all invocations of the 
+*  application.
          IF( SIZE( IPAR ) .EQ. 1 ) THEN
-            CALL NDG_NDFAS( IGRP( IPAR ), 1, MODE, INDF, STATUS )
+            IRUN = 1 
          ELSE
-            CALL NDG_NDFAS( IGRP( IPAR ), NRUN, MODE, INDF, STATUS )
+            IRUN =NRUN
          END IF
+
+*  Get the NDF from the group. 
+         CALL NDG_NDFAS( IGRP( IPAR ), IRUN, MODE, INDF, STATUS )
+
+*  Get the supplemental information for this element.
+         CALL NDG_GTSUP( IGRP( IPAR ), IRUN, FIELDS, STATUS )
 
 *  Tell the user which NDF is being used, if required, and if it has not 
 *  already been reported.
@@ -254,6 +268,17 @@
             REP( IPAR ) = .TRUE.
          END IF
 
+      END IF
+
+*  If the NDF was opened read-only, store the full NDF specification 
+*  in the OPNLST group. This group contains the list of all
+*  opened input NDFs which are candidates for being replaced with an 
+*  output NDF.
+      IF( STATUS .EQ. SAI__OK .AND. INDF .NE. NDF__NOID ) THEN
+         CALL NDF_ISACC( INDF, 'WRITE', WRACC, STATUS )
+         IF( .NOT. WRACC ) THEN
+            CALL GRP_PUT( OPNLST, 1, FIELDS( 6 ), 0, STATUS )
+         END IF
       END IF
 
 *  Tidy up.

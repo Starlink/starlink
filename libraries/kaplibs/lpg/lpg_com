@@ -27,6 +27,8 @@
 *  History:
 *     13-SEP-1999( DSB):
 *        Original version.
+*     15-MAR-2004 (DSB):
+*        Added TMPLST, OPNLST, REPLACE.
 *     {enter_further_changes_here}
 
 *-
@@ -77,10 +79,36 @@
 *  A delay (in seconds) to place between invocations.
       REAL DELAY
 
+*  A GRP identifier for a group holding the full specification
+*  for any temporary output NDFs created during the previous
+*  invocation of the application. A temporary output NDF is
+*  created if the output NDF requested by the user may already
+*  be open by the NDF system. In this case the temporary NDF
+*  is copied to the requested position once the application has
+*  finished.  The TMPLST group holds adjacent pairs of file
+*  specs; the first one in each pair is the spec of the temporary 
+*  output NDF, the second is the spec of the requested output NDF.
+      INTEGER TMPLST 
+
+
+*  A GRP identifier for a group holding the full specification
+*  for any existing NDFs which have been opened for read-only
+*  input by this invocation of the application. 
+      INTEGER OPNLST 
+
+*  Should the user be allowed to use the same input as both
+*  input and output? If so, a temporary NDF will be used to
+*  store the output while the application is running. Once the
+*  application has finsished, the existing input NDF will be
+*  replaced by a copy of the temporary NDF. If REPLACE is false
+*  an error will be reported if an attempt is amde to use a
+*  single NDF as both input and output.
+      LOGICAL REPLACE 
+
 *  Declare the common blocks, one for numeric/boolean data, and one for
 *  character data.
       COMMON /LPG_COM1/ NPAR, NRUN, IGRP, SIZE, OLD, VERB, REP, STATE2,
-     :                  NPAR2, DELAY, DISAB
+     :                  NPAR2, DELAY, DISAB, TMPLST, OPNLST, REPLACE
       COMMON /LPG_COM2/ PNAME, PNAME2
 
 *  Ensure the contents of the common blocks are retained throughout the
