@@ -961,20 +961,22 @@
       EXTERNAL			CHR_LEN
         INTEGER			CHR_LEN
 
-*  Local Constants:
-      INTEGER			NLINK
-        PARAMETER		( NLINK = 2 )
-
 *  Local Variables:
+      CHARACTER*132		ARDIN			! ARD text
       CHARACTER*40		CREATOR			! Selection author
+      CHARACTER*20		SNAME			! Selection name
       CHARACTER*20		VARIANT			! Selector variant
 
+      INTEGER			GRPID			! ARD identifier
       INTEGER			I			! Loop over selections
       INTEGER			ICMP			! Loop over selectors
+      INTEGER			ITXT			! Loop over ARD text
       INTEGER			NCMP			! # selectors
       INTEGER			NREC			! # selection records
       INTEGER			SELID			! Selection identifier
-      INTEGER			SID			! Selector identifier
+      INTEGER			SIID			! Selector identifier
+      INTEGER			SID			! Selectors structure
+      INTEGER			SIZE			! Amount of sel data
 
       LOGICAL			OK			! Link is present
 *.
@@ -1021,6 +1023,38 @@
 *      Get number of components
           CALL ADI_NCMP( SID, NCMP, STATUS )
           DO ICMP = 1, NCMP
+
+*        Index the selector
+            CALL ADI_INDCMP( SID, ICMP, SIID, STATUS )
+
+*        Get name and variant
+            CALL ADI_NAME( SIID, SNAME, STATUS )
+            CALL ADI_CGET0C( SIID, 'Variant', VARIANT, STATUS )
+
+*        Switch on variant
+            CALL ASHOW_VAL( VARIANT, 'Variant', ' ', OCH, STATUS )
+            IF ( VARIANT .EQ. 'AREA_DESCRIPTION' ) THEN
+              CALL ADI_CGET0I( SIID, 'GRPID', GRPID, STATUS )
+
+              CALL GRP_GRPSZ(GRPID,SIZE,STATUS)
+
+              DO ITXT = 1, SIZE
+                CALL GRP_GET( GRPID, ITXT, 1, ARDIN, STATUS )
+                L = CHR_LEN(ARDIN)
+                IF ( ITXT .EQ. 1 ) THEN
+                  CALL ASHOW_VAL( ARDIN(:L), 'Description', ' ',
+     :                            OCH, STATUS )
+                ELSE
+                  CALL AIO_IWRITE( OCH, 20, ': '//ARDIN(:L), STATUS )
+                END IF
+              END DO
+
+            ELSE IF ( VARIANT .EQ. 'RANGE_PAIRS' ) THEN
+            END IF
+
+*        Release selector
+            CALL ADI_ERASE( SIID, STATUS )
+
           END DO
 
 *      Destroy it
