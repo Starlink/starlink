@@ -22,6 +22,9 @@
 #        Add header and HELPLIB
 #     1997 April 11 (TIMJ)
 #        Make 'NO' the default for REDUCE_SWITCH
+#     1997 April 23 (TIMJ)
+#        Add ability to select a switch
+
 #     {enter_further_changes_here}
 
 #-
@@ -51,6 +54,15 @@
 	 TYPE '_INTEGER'
 	 DEFAULT 0
  	 PROMPT   'De-spike level'
+	 HELPKEY  '*'
+      ENDPARAMETER
+
+      PARAMETER SWITCH
+	 TYPE '_INTEGER'
+	 DEFAULT 0
+ 	 PROMPT   'Which switch (0=reduce;1,2,3=switch number)'
+         vpath       'CURRENT,DEFAULT'
+         ppath       'CURRENT'
 	 HELPKEY  '*'
       ENDPARAMETER
 
