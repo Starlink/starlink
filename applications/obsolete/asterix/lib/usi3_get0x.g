@@ -108,7 +108,9 @@
       CHARACTER*300		CVAL			! Transfer value
 
       INTEGER			CLEN			! Length of CVAL used
+      INTEGER			FSTAT			! FTOOLS status
       INTEGER			NTRY			! Number of tries
+	integer cstat
 *.
 
 *  Check inherited global status.
@@ -121,22 +123,25 @@
      :                  .AND. (STATUS.EQ.SAI__OK) )
 
 *    Get value from environment
-        CALL UCLGST( PAR, CVAL, CLEN )
-	print *,cval,clen
+        CALL UCLGST( PAR, CVAL, FSTAT )
 
 *    Increment try counter
         NTRY = NTRY + 1
 
 *    Trap special values
-        IF ( CLEN .EQ. 0 ) THEN
-        ELSE IF ( CVAL(:CLEN) .EQ. '!' ) THEN
-          STATUS = PAR__NULL
+        IF ( FSTAT .NE. 0 ) THEN
+          STATUS = SAI__ERROR
+          CALL ERR_REP( ' ', 'FTOOLS parameter system error', STATUS )
 
-        ELSE IF ( CVAL(:CLEN) .EQ. '!!' ) THEN
+        ELSE IF ( CVAL(:2) .EQ. '!!' ) THEN
           STATUS = PAR__ABORT
 
+        ELSE IF ( CVAL(:1) .EQ. '!' ) THEN
+          STATUS = PAR__NULL
+
         ELSE
-          CALL CHR_CTO<T>( CVAL, VALUE, STATUS )
+          CALL CHR_CTO<T>( CVAL, VALUE, CSTAT )
+	print *,cstat
 
         END IF
 
