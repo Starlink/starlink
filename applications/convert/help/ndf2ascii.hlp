@@ -40,9 +40,11 @@ IN = NDF (Read)
 3 NOPEREC
 NOPEREC = _INTEGER (Read)
    The number of data values per record of the output file, when
-   FIXED is TRUE.  It should be positive on UNIX platforms, and
-   in the range 1 to 16383 on VMS.  The suggested default is the
-   current value, or 8 when there is not one.
+   FIXED is TRUE.  The size of the output buffer imposes a maximum
+   number value for NOPEREC; it is 32766/(n+1), where n is the
+   maximum number bytes needed for the NDF's data type.  NOPEREC
+   must also be positive.  The suggested default is the current
+   value, or 8 when there is not one.
 3 OUT
 OUT = FILENAME (Write)
    Name of the output formatted Fortran file.  The file will
@@ -53,14 +55,14 @@ OUT = FILENAME (Write)
 3 RECLEN
 RECLEN = _INTEGER (Read)
    The maximum record length in bytes of the output file.  This
-   must be between 32 and 32766 on VMS and greater than 31 on
-   UNIX systems.  The lower limit is further increased to 80 when
-   there is a FITS header to be copied.  It is only used when
-   FIXED is FALSE and will default to the current value, or 512
-   if there is no current value.  When FIXED is TRUE the
-   application creates data records whose length is the product
-   of the number of bytes per value plus one (for the space),
-   times the number of values per record. []
+   must be between 32 and 32766 (the upper limit being set by the
+   size of the output buffer).  The lower limit is further
+   increased to 80 when there is a FITS header to be copied.  It
+   is only used when FIXED is FALSE and will default to the
+   current value, or 512 if there is no current value.  When
+   FIXED is TRUE the application creates data records whose
+   length is the product of the number of bytes per value plus
+   one (for the space), times the number of values per record. []
 2 Examples
 ndf2ascii cluster cluster.dat
    This copies the data array of the NDF called cluster to a text
