@@ -66,8 +66,8 @@
       LOGICAL ID
       LOGICAL ACTIVE
 *    Global variables :
-      INCLUDE '/star/asterix/kernel/grf/inc/GFX_CMN'
-      INCLUDE '/star/asterix/kernel/grf/inc/GMD_CMN'
+      INCLUDE '../../kernel/grf/inc/GFX_CMN'
+      INCLUDE '../../kernel/grf/inc/GMD_CMN'
 *-
 
 *  Version id
@@ -186,8 +186,8 @@
 *    Local variables :
       LOGICAL MULTI
 *    Global variables :
-      INCLUDE '/star/asterix/kernel/grf/inc/GFX_CMN'
-      INCLUDE '/star/asterix/kernel/grf/inc/GMD_CMN'
+      INCLUDE '../../kernel/grf/inc/GFX_CMN'
+      INCLUDE '../../kernel/grf/inc/GMD_CMN'
 *-
       IF (STATUS.EQ.SAI__OK) THEN
 
@@ -248,7 +248,7 @@
       LOGICAL OVLY
       PARAMETER (OVLY=.FALSE.)
 *    Global variables :
-      INCLUDE '/star/asterix/kernel/grf/inc/GFX_CMN'
+      INCLUDE '../../kernel/grf/inc/GFX_CMN'
 *    Local variables :
       REAL X1,X2,Y1,Y2
 *    External References :
@@ -293,7 +293,7 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE '/star/include/sae_par'
-      INCLUDE '/star/asterix/kernel/lib/inc/ADI_PAR'
+      INCLUDE '../../kernel/lib/inc/ADI_PAR'
 *    Import :
       INTEGER                           ID
       REAL X1,X2,Y1,Y2
@@ -304,7 +304,7 @@
       INTEGER STATUS
 *    Local Constants :
 *    Global variables :
-      INCLUDE '/star/asterix/kernel/grf/inc/GMD_CMN'
+      INCLUDE '../../kernel/grf/inc/GMD_CMN'
 *    Local variables :
       CHARACTER*80 TITLE,LABEL,UNITS
       CHARACTER*80 XLABEL,YLABEL
@@ -558,7 +558,7 @@
 *    Global constants :
       INCLUDE '/star/include/sae_par'
 *    Global variables :
-      INCLUDE '/star/asterix/kernel/grf/inc/GFX_CMN'
+      INCLUDE '../../kernel/grf/inc/GFX_CMN'
 *    Structure definitions :
 *    Import-Export :
 *    Export :
@@ -840,7 +840,7 @@
       LOGICAL OVLY
       PARAMETER (OVLY=.FALSE.)
 *    Global variables :
-      INCLUDE '/star/asterix/kernel/grf/inc/GFX_CMN'
+      INCLUDE '../../kernel/grf/inc/GFX_CMN'
 *    Local variables :
       REAL X1,X2,Y1,Y2
 *-
@@ -920,7 +920,7 @@
       LOGICAL RADEC
       LOGICAL ATTOK
 *    Global variables :
-      INCLUDE '/star/asterix/kernel/grf/inc/GMD_CMN'
+      INCLUDE '../../kernel/grf/inc/GMD_CMN'
 *-
 
       IF (STATUS.EQ.SAI__OK) THEN
@@ -1464,7 +1464,7 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE '/star/include/sae_par'
-      INCLUDE '/star/asterix/kernel/lib/inc/QUAL_PAR'
+      INCLUDE '../../kernel/lib/inc/QUAL_PAR'
       INCLUDE '/star/include/prm_par'
 *    Import :
       INTEGER NX,NY
@@ -1571,8 +1571,8 @@
       INTEGER MXOVLY
       PARAMETER (MXOVLY=100)
 *    Global variables :
-      INCLUDE '/star/asterix/kernel/grf/inc/GFX_CMN'
-      INCLUDE '/star/asterix/kernel/grf/inc/GMD_CMN'
+      INCLUDE '../../kernel/grf/inc/GFX_CMN'
+      INCLUDE '../../kernel/grf/inc/GMD_CMN'
 *    Local variables :
       INTEGER			GFID			! Individual graph
       CHARACTER*132 OVLY
