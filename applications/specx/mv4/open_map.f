@@ -58,6 +58,10 @@
 *        Compare NSPEC and NPTS1 from POSN with that from header.
 *        This was added because some people have maps where NSPEC is not equal
 *        to the number of spectra in the map itself!
+*     3 Nov 2003 (timj):
+*        Test of NSPEC was too stringent. Test simply requires that
+*        header value is less than data array size. Also, NPTS1 test had
+*        incorrect consequences.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -128,17 +132,17 @@
       END IF
 
 *  Make sure everything is in order with the POSN array to prevent
-*  buffer overruns
-      IF (TMPNSPEC .NE. NSPEC) THEN
-         print *,'Header inconsistency. SPECX.NSPEC [',NSPEC,
-     :        '] != DIMS(POSN) [',TMPNSPEC,']. Correcting error.'
+*  buffer overruns. This is only important if POSN is less than NSPEC.
+      IF (TMPNSPEC .LT. NSPEC) THEN
+         print *,'Dangerous header inconsistency. SPECX.NSPEC [',NSPEC,
+     :        '] > DIMS(POSN) [',TMPNSPEC,']. Correcting error.'
          NSPEC = TMPNSPEC
       END IF
 
       IF (TMPNPTS1 .NE. NPTS1) THEN
-         print *,'Header inconsistency. SPECX.NPTS1 [',NSPEC,
+         print *,'Header inconsistency. SPECX.NPTS1 [',NPTS1,
      :        '] != DIMS(POSN) [',TMPNPTS1,']. Correcting error.'
-         NSPEC = TMPNPTS1
+         NPTS1 = TMPNPTS1
       END IF
 
 *  Reset some flags.
