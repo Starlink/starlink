@@ -1,6 +1,4 @@
 /* To do:
-      o Check scaling in Ran2 (random_int goes from 1 to m1-1, rather
-        than as previously thought!), rename, tidy and add prologue.
       o Implement gaussian generator.
       o Prototype user docs for expression syntax.
       o Write Fortran interface.
@@ -149,6 +147,7 @@ typedef enum {
    OP_LOG,                       /* Natural logarithm */
    OP_LOG10,                     /* Base 10 logarithm */
    OP_NINT,                      /* Fortran NINT function (round to nearest) */
+   OP_POISS,                     /* Poisson random number */
    OP_SIN,                       /* Sine (radians) */
    OP_SIND,                      /* Sine (degrees) */
    OP_SINH,                      /* Hyperbolic sine */
@@ -161,6 +160,7 @@ typedef enum {
    OP_ATAN2,                     /* Inverse tangent (2 arguments, radians) */
    OP_ATAN2D,                    /* Inverse tangent (2 arguments, degrees) */
    OP_DIM,                       /* Fortran DIM (positive difference) fn. */
+   OP_GAUSS,                     /* Gaussian random number */
    OP_MOD,                       /* Modulus function */
    OP_POW,                       /* Raise to power */
    OP_RAND,                      /* Uniformly distributed random number */
@@ -278,6 +278,7 @@ static const Symbol symbol[] = {
    { "log("        ,  4,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_LOG      },
    { "log10("      ,  6,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_LOG10    },
    { "nint("       ,  5,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_NINT     },
+   { "poisson("    ,  8,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_POISS    },
    { "sin("        ,  4,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_SIN      },
    { "sind("       ,  5,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_SIND     },
    { "sinh("       ,  5,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_SINH     },
@@ -291,6 +292,7 @@ static const Symbol symbol[] = {
    { "atan2d("     ,  7,  0,  1,  1,  0, 19,  1,  1, -1,  2,  OP_ATAN2D   },
    { "dim("        ,  4,  0,  1,  1,  0, 19,  1,  1, -1,  2,  OP_DIM      },
    { "fmod("       ,  5,  0,  1,  1,  0, 19,  1,  1, -1,  2,  OP_MOD      },
+   { "gauss("      ,  6,  0,  1,  1,  0, 19,  1,  1, -1,  2,  OP_GAUSS    },
    { "mod("        ,  4,  0,  1,  1,  0, 19,  1,  1, -1,  2,  OP_MOD      },
    { "pow("        ,  4,  0,  1,  1,  0, 19,  1,  1, -1,  2,  OP_POW      },
    { "rand("       ,  5,  0,  1,  1,  0, 19,  1,  1, -1,  2,  OP_RAND     },
@@ -375,6 +377,8 @@ AstMathMap *astMathMapId_( int, int, const char *[], const char *[], const char 
 /* ======================================== */
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
 static const char *GetAttrib( AstObject *, const char * );
+static double Gauss( Rcontext * );
+static double Rand( Rcontext * );
 static int DefaultSeed( const Rcontext * );
 static int GetSeed( AstMathMap * );
 static int GetSimpFI( AstMathMap * );
@@ -408,162 +412,120 @@ static void SetSimpIF( AstMathMap *, int );
 static void ValidateSymbol( const char *, const char *, int, int, int *, int **, int **, int *, double ** );
 static void VirtualMachine( Rcontext *, int, int, const double **, const int *, const double *, int, double * );
 
+static double LogGamma( double );
+
 /* Member functions. */
 /* ================= */
-static double Ran2( Rcontext *context ) {
+static double Poisson( Rcontext *context, double mean ) {
+   double mult;
+   double result;
+   double static thresh;
+   double t;
+   double y;
+   double ymax;
+   int overflow;
+   static double last_mean = -1.0;
+   static double pi;
+   static double root_2mean;
+   static int init;
+   static double log_mean;
+   static double gamma_mean;
 
-/* Local Constants: */
-   const long int a1 = 40014L;   /* Random number generator constants... */
-   const long int a2 = 40692L;
-   const long int m1 = 2147483563L;
-   const long int m2 = 2147483399L;
-   const long int q1 = 53668L;
-   const long int q2 = 52774L;
-   const long int r1 = 12211L;
-   const long int r2 = 3791L;
-   const int ntab =              /* Size of shuffle table */
-      AST_MATHMAP_RAND_CONTEXT_NTAB_;
-   const int nwarm = 8;          /* Number of warm-up iterations */
-
-/* Local Variables: */
-   double result;                /* Result value to return */
-   double scale;                 /* Scale factor for random integers */
-   double sum;                   /* Sum for forming normalisation constant */
-   int dbits;                    /* Approximate bits in double mantissa */
-   int irand;                    /* Loop counter for random integers */
-   int itab;                     /* Loop counter for shuffle table */
-   int lbits;                    /* Approximate bits used by generators */
-   long int seed;                /* Random number seed */
-   long int tmp;                 /* Temporary variable */
-   static double norm;           /* Normalisation constant */
-   static double scale0;         /* Scale decrement for successive integers */
-   static int init = 0;          /* Local initialisation performed? */
-   static int nrand;             /* Number of random integers to use */
-   
-/* If the random number generator context is not active, then
-   initialise it. */
-   if ( !context->active ) {
-
-/* First, perform local initialisation for this function, if not
-   already done. */
-      if ( !init ) {
-
-/* Obtain the approximate number of bits used by the random integer
-   generator from the value "m1". */
-         (void) frexp( (double) m1, &lbits );
-
-/* Obtain the approximate number of bits used by the mantissa of the
-   double value we want to produce, allowing for the (unlikely)
-   possibility that the mantissa's radix isn't 2. */
-         dbits = (int) ceil( (double) DBL_MANT_DIG *
-                             log( (double) FLT_RADIX ) / log( 2.0 ) );
-
-/* Hence determine how many random integers we need to combine to
-   produce each double value, so that all the mantissa's bits will be
-   used. */
-         nrand = ( dbits + lbits - 1 ) / lbits;
-
-/* Calculate the scale factor by which each successive random
-   integer's contribution to the result is reduced so as to generate
-   progressively less significant bits. */
-         scale0 = 1.0 / (double) ( m1 - 2L );
-
-/* Loop to sum the maximum contributions from each random integer
-   (assuming that each takes its largest possible value). This produces
-   the normalisation factor by which the result must be scaled so as to
-   lie between 0.0 and 1.0 (inclusive). */
-         sum = 0.0;
-         scale = 1.0;
-         for ( irand = 0; irand < nrand; irand++ ) {
-            scale *= scale0;
-            sum += scale;
-         }
-         norm = 1.0 / ( sum * (double) ( m1 - 1L ) );
-
-/* Note that local initialisation has been done. */
-         init = 1;
-      }
-
-/* Obtain the seed value, enforcing positivity. */
-      seed = (long int) context->seed;
-      if ( seed < 1 ) seed = seed + LONG_MAX;
-      if ( seed < 1 ) seed = LONG_MAX;
-
-/* Initialise the random number generators with this seed. */
-      context->rand1 = context->rand2 = seed;
-
-/* Now loop to initialise the shuffle table with an initial set of
-   random values. We generate more values than required in order to "warm
-   up" the generator before recording values in the table. */
-      for ( itab = ntab + nwarm - 1; itab >= 0; itab-- ) {
-
-/* Repeatedly update "rand1" from the expression "(rand1*a1)%m1" while
-   avoiding overflow. */
-         tmp = context->rand1 / q1;
-         context->rand1 = a1 * ( context->rand1 - tmp * q1 ) - tmp * r1;
-         if ( context->rand1 < 0L ) context->rand1 += m1;
-
-/* After warming up, start recording values in the table. */
-         if ( itab < ntab ) context->table[ itab ] = context->rand1;
-      }
-
-/* Record the last entry in the table as the "previous" random
-   integer. */
-      context->random_int = context->table[ 0 ];
-
-/* Note the random number generator context is active. */
-      context->active = 1;
+   if ( !init ) {
+      pi = acos( -1.0 );
+      init = 1;
    }
 
-/* Generate a random value. */
-/* ------------------------ */
-/* Initialise. */
-   result = 0.0;
+   if ( mean < 0.0 ) {
+      result = AST__BAD;
 
-/* Loop to generate sufficient random integers to combine into a
-   single double value. */
-   scale = norm;
-   for ( irand = 0; irand < nrand; irand++ ) {
+   } else if ( mean < 12.0 ) {
+      if ( mean != last_mean ) {
+         last_mean = mean;
+         thresh = exp( -mean );
+      }
+      mult = 1.0;
+      result = -1.0;
+      do {
+         mult *= Rand( context );
+         result += 1.0;
+      } while ( mult > thresh );
 
-/* Update the first generator "rand1" from the expression
-   "(a1*rand1)%m1" while avoiding overflow. */
-      tmp = context->rand1 / q1;
-      context->rand1 = a1 * ( context->rand1 - tmp * q1 ) - tmp * r1;
-      if ( context->rand1 < 0L ) context->rand1 += m1;
-
-/* Similarly, update the second generator "rand2" from the expression
-   "(a2*rand2)%m2". */
-      tmp = context->rand2 / q2;
-      context->rand2 = a2 * ( context->rand2 - tmp * q2 ) - tmp * r2;
-      if ( context->rand2 < 0L ) context->rand2 += m2;
-
-/* Use the previous random integer to generate an index into the
-   shuffle table. */
-      itab = (int) ( context->random_int /
-                     ( 1L + ( m1 - 1L ) / (long int) ntab ) );
-
-/* Extract the table entry and replace it with a new random value from
-   the first generator "rand1". This is the Bays-Durham shuffle. */
-      context->random_int = context->table[ itab ];
-      context->table[ itab ] = context->rand1;
-
-/* Combine the extracted value with the latest value from the second
-   generator "rand2". */
-      context->random_int -= context->rand2;
-      if ( context->random_int < 1L ) context->random_int += m1 - 1L;
-
-/* Update the scale factor to apply to the resulting random integer
-   and accumulate its contribution to the result. */
-      scale *= scale0;
-      result += scale * (double) ( context->random_int - 1L );
+   } else {
+      if ( mean != last_mean ) {
+         last_mean = mean;
+         root_2mean = sqrt( 2.0 * mean );
+         ymax = DBL_MAX / root_2mean;
+         log_mean = log( mean );
+         gamma_mean = LogGamma( mean + 1.0 );
+      }
+      do {
+         do {
+            errno = 0;
+            y = tan( pi * Rand( context ) );
+            overflow = ( ( errno == ERANGE ) && ( y == HUGE_VAL ) ) ||
+                       ( y > ymax );
+            if ( !overflow ) {
+               result = root_2mean * y;
+               overflow = ( result > ( DBL_MAX - mean ) );
+               if ( !overflow ) result += mean;
+            }
+         } while ( ( result < 0.0 ) || overflow );
+         result = floor( result );
+         t = 0.9 * ( 1.0 + y * y ) * exp( ( result - mean ) * log_mean +
+                                          gamma_mean - LogGamma( result +
+                                                                 1.0 ) );
+      } while ( Rand( context ) > t );
    }
-#if 0
-   printf( "%.20g\n", result );
-#endif
-
-/* Return the result. */
    return result;
 }
+
+static double LogGamma( double x ) {
+
+/* Local Constants: */
+   const double c0 = 1.000000000190015;
+   const double c1 = 76.18009172947146;
+   const double c2 = -86.50532032941677;
+   const double c3 = 24.01409824083091;
+   const double c4 = -1.231739572450155;
+   const double c5 = 0.1208650973866179e-2;
+   const double c6 = -0.5395239384953e-5;
+   const double gamma = 5.0;
+
+/* Local Variables: */
+   double result;
+   double sum;
+   double xx;
+   static double root_twopi;
+   static int init = 0;
+
+   if ( !init ) {
+      root_twopi = sqrt( 2.0 * acos( -1.0 ) );
+      init = 1;
+   }
+
+   sum = c0;
+   xx = x + 1.0;
+   sum += c1 / xx;
+   xx += 1.0;
+   sum += c2 / xx;
+   xx += 1.0;
+   sum += c3 / xx;
+   xx += 1.0;
+   sum += c4 / xx;
+   xx += 1.0;
+   sum += c5 / xx;
+   xx += 1.0;
+   sum += c6 / xx;
+
+   result = x + gamma + 0.5;
+   result -= ( x + 0.5 ) * log( result );
+
+   result = -result + log( root_twopi * sum / x );
+
+   return result;
+}
+
 static void CleanFunctions( int nfun, const char *fun[], char ***clean ) {
 /*
 *  Name:
@@ -1918,6 +1880,103 @@ static void ExtractVariables( const char *method, int nfun, const char *fun[],
    }
 }
 
+static double Gauss( Rcontext *context ) {
+/*
+*  Name:
+*     Gauss
+
+*  Purpose:
+*     Produce a pseudo-random value from a standard Gaussian distribution.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "mathmap.h"
+*     double Gauss( Rcontext *context )
+
+*  Class Membership:
+*     MathMap member function.
+
+*  Description:
+*     On each invocation, this function returns a pseudo-random number
+*     selected from a standard Gaussian distribution with mean zero and
+*     standard deviation unity. The Box-Muller method is used.
+
+*  Parameters:
+*     context
+*        Pointer to an Rcontext structure which holds the random number
+*        generator's context between invocations.
+
+*  Notes:
+*     - The sequence of numbers returned is determined by the "seed"
+*     value in the Rcontext structure supplied.
+*     - If the seed value is changed, the "active" flag must also be cleared
+*     so that this function can re-initiallise the Rcontext structure before
+*     generating the next pseudo-random number. The "active" flag should
+*     also be clear to force initialisation the first time an Rcontext
+*     structure is used.
+*     - This function does not perform error checking and does not generate
+*     errors. It will execute even if the global error status is set.
+*/
+
+/* Local Variables: */
+   double rsq;                   /* Squared radius */
+   double s;                     /* Scale factor */
+   double x;                     /* First result value */
+   static double y;              /* Second result value */
+   static int ysaved = 0;        /* Previously-saved value available? */
+
+/* If the random number generator context is not active, then it will
+   be (re)initialised on the first invocation of Rand (below). Ensure
+   that any previously-saved value within this function is first
+   discarded. */
+   if ( !context->active ) ysaved = 0;
+
+/* If there is a previously-saved value available, then use it and
+   mark it as no longer available. */
+   if ( ysaved ) {
+      x = y;
+      ysaved = 0;
+
+/* Otherwise, loop until a suitable new pair of values has been
+   obtained. */
+   } else {
+      while ( 1 ) {
+
+/* Loop to obtain two random values uniformly distributed inside the
+   unit circle, while avoiding the origin (which maps to an infinite
+   result). */
+         do {
+            x = 2.0 * Rand( context ) - 1.0;
+            y = 2.0 * Rand( context ) - 1.0;
+            rsq = x * x + y * y;
+         } while ( ( rsq >= 1.0 ) || ( rsq == 0.0 ) );
+
+/* Perform the Box-Muller transformation, checking that this will not
+   produce overflow (which is extremely unlikely). If overflow would
+   occur, we simply repeat the above steps with a new pair of random
+   numbers. */
+         s = -2.0 * log( rsq );
+         if ( ( DBL_MAX * rsq ) >= s ) {
+            s = sqrt( s / rsq );
+
+/* Scale the original random values to give a pair of results. One will be
+   returned and the second kept until next time. */
+            x *= s;
+            y *= s;
+            break;
+         }
+      }
+
+/* Note that a saved value is available. */
+      ysaved = 1;
+   }
+
+/* Return the current result. */
+   return x;
+}
+
 static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /*
 *  Name:
@@ -2763,6 +2822,200 @@ static void ParseVariable( const char *method, const char *exprs,
    }
 }
 
+static double Rand( Rcontext *context ) {
+/*
+*  Name:
+*     Rand
+
+*  Purpose:
+*     Produce a uniformly distributed pseudo-random number.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "mathmap.h"
+*     double Rand( Rcontext *context )
+
+*  Class Membership:
+*     MathMap member function.
+
+*  Description:
+*     On each invocation, this function returns a pseudo-random number
+*     uniformly distributed in the range 0.0 to 1.0 (inclusive). The
+*     underlying algorithm is that used by the "ran2" function of Press et
+*     al. (Numerical Recipes), which has a long period and good statistical
+*     properties. This independent implementation returns double precision
+*     values.
+
+*  Parameters:
+*     context
+*        Pointer to an Rcontext structure which holds the random number
+*        generator's context between invocations.
+
+*  Notes:
+*     - The sequence of numbers returned is determined by the "seed"
+*     value in the Rcontext structure supplied.
+*     - If the seed value is changed, the "active" flag must also be cleared
+*     so that this function can re-initiallise the Rcontext structure before
+*     generating the next pseudo-random number. The "active" flag should
+*     also be clear to force initialisation the first time an Rcontext
+*     structure is used.
+*     - This function does not perform error checking and does not generate
+*     errors. It will execute even if the global error status is set.
+*/
+
+/* Local Constants: */
+   const long int a1 = 40014L;   /* Random number generator constants... */
+   const long int a2 = 40692L;
+   const long int m1 = 2147483563L;
+   const long int m2 = 2147483399L;
+   const long int q1 = 53668L;
+   const long int q2 = 52774L;
+   const long int r1 = 12211L;
+   const long int r2 = 3791L;
+   const int ntab =              /* Size of shuffle table */
+      AST_MATHMAP_RAND_CONTEXT_NTAB_;
+   const int nwarm = 8;          /* Number of warm-up iterations */
+
+/* Local Variables: */
+   double result;                /* Result value to return */
+   double scale;                 /* Scale factor for random integers */
+   double sum;                   /* Sum for forming normalisation constant */
+   int dbits;                    /* Approximate bits in double mantissa */
+   int irand;                    /* Loop counter for random integers */
+   int itab;                     /* Loop counter for shuffle table */
+   int lbits;                    /* Approximate bits used by generators */
+   long int seed;                /* Random number seed */
+   long int tmp;                 /* Temporary variable */
+   static double norm;           /* Normalisation constant */
+   static double scale0;         /* Scale decrement for successive integers */
+   static int init = 0;          /* Local initialisation performed? */
+   static int nrand;             /* Number of random integers to use */
+
+/* If the random number generator context is not active, then
+   initialise it. */
+   if ( !context->active ) {
+
+/* First, perform local initialisation for this function, if not
+   already done. */
+      if ( !init ) {
+
+/* Obtain the approximate number of bits used by the random integer
+   generator from the value "m1". */
+         (void) frexp( (double) m1, &lbits );
+
+/* Obtain the approximate number of bits used by the mantissa of the
+   double value we want to produce, allowing for the (unlikely)
+   possibility that the mantissa's radix isn't 2. */
+         dbits = (int) ceil( (double) DBL_MANT_DIG *
+                             log( (double) FLT_RADIX ) / log( 2.0 ) );
+
+/* Hence determine how many random integers we need to combine to
+   produce each double value, so that all the mantissa's bits will be
+   used. */
+         nrand = ( dbits + lbits - 1 ) / lbits;
+
+/* Calculate the scale factor by which each successive random
+   integer's contribution to the result is reduced so as to generate
+   progressively less significant bits. */
+         scale0 = 1.0 / (double) ( m1 - 1L );
+
+/* Loop to sum the maximum contributions from each random integer
+   (assuming that each takes the largest possible value, of "m1-1",
+   from which we will later subtract 1). This produces the normalisation
+   factor by which the result must be scaled so as to lie between 0.0 and
+   1.0 (inclusive). */
+         sum = 0.0;
+         scale = 1.0;
+         for ( irand = 0; irand < nrand; irand++ ) {
+            scale *= scale0;
+            sum += scale;
+         }
+         norm = 1.0 / ( sum * (double) ( m1 - 2L ) );
+
+/* Note that local initialisation has been done. */
+         init = 1;
+      }
+
+/* Obtain the seed value, enforcing positivity. */
+      seed = (long int) context->seed;
+      if ( seed < 1 ) seed = seed + LONG_MAX;
+      if ( seed < 1 ) seed = LONG_MAX;
+
+/* Initialise the random number generators with this seed. */
+      context->rand1 = context->rand2 = seed;
+
+/* Now loop to initialise the shuffle table with an initial set of
+   random values. We generate more values than required in order to "warm
+   up" the generator before recording values in the table. */
+      for ( itab = ntab + nwarm - 1; itab >= 0; itab-- ) {
+
+/* Repeatedly update "rand1" from the expression "(rand1*a1)%m1" while
+   avoiding overflow. */
+         tmp = context->rand1 / q1;
+         context->rand1 = a1 * ( context->rand1 - tmp * q1 ) - tmp * r1;
+         if ( context->rand1 < 0L ) context->rand1 += m1;
+
+/* After warming up, start recording values in the table. */
+         if ( itab < ntab ) context->table[ itab ] = context->rand1;
+      }
+
+/* Record the last entry in the table as the "previous" random
+   integer. */
+      context->random_int = context->table[ 0 ];
+
+/* Note the random number generator context is active. */
+      context->active = 1;
+   }
+
+/* Generate a random value. */
+/* ------------------------ */
+/* Initialise. */
+   result = 0.0;
+
+/* Loop to generate sufficient random integers to combine into a
+   single double value. */
+   scale = norm;
+   for ( irand = 0; irand < nrand; irand++ ) {
+
+/* Update the first generator "rand1" from the expression
+   "(a1*rand1)%m1" while avoiding overflow. */
+      tmp = context->rand1 / q1;
+      context->rand1 = a1 * ( context->rand1 - tmp * q1 ) - tmp * r1;
+      if ( context->rand1 < 0L ) context->rand1 += m1;
+
+/* Similarly, update the second generator "rand2" from the expression
+   "(a2*rand2)%m2". */
+      tmp = context->rand2 / q2;
+      context->rand2 = a2 * ( context->rand2 - tmp * q2 ) - tmp * r2;
+      if ( context->rand2 < 0L ) context->rand2 += m2;
+
+/* Use the previous random integer to generate an index into the
+   shuffle table. */
+      itab = (int) ( context->random_int /
+                     ( 1L + ( m1 - 1L ) / (long int) ntab ) );
+
+/* Extract the table entry and replace it with a new random value from
+   the first generator "rand1". This is the Bays-Durham shuffle. */
+      context->random_int = context->table[ itab ];
+      context->table[ itab ] = context->rand1;
+
+/* Combine the extracted value with the latest value from the second
+   generator "rand2". */
+      context->random_int -= context->rand2;
+      if ( context->random_int < 1L ) context->random_int += m1 - 1L;
+
+/* Update the scale factor to apply to the resulting random integer
+   and accumulate its contribution to the result. */
+      scale *= scale0;
+      result += scale * (double) ( context->random_int - 1L );
+   }
+
+/* Return the result. */
+   return result;
+}
+
 static void SetAttrib( AstObject *this_object, const char *setting ) {
 /*
 *  Name:
@@ -3402,6 +3655,23 @@ static void VirtualMachine( Rcontext *rcontext, int npoint,
    unsigned long b;              /* Block of bits for result */
    unsigned long neg;            /* Result is negative? (sign bit) */
 
+   {
+      double x[ 1000000 ];
+      int n = 1000000;
+      int i;
+      double s1, s2;
+      s1 = s2 = 0.0;
+      for ( i = 0; i < n; i++ ) {
+         x[ i ] = Poisson( rcontext, 1000000.0 );
+         s1 += x[ i ];
+      }
+      s1 /= n;
+      printf( "mean = %g\n", s1 );
+      for ( i = 0; i < n; i++ ) {
+         s2 += ( x[ i ] - s1 ) * ( x[ i ] - s1 );
+      }
+      printf( "st. dev. squared = %g\n", s2 / ( n - 1 ) );
+   }
 /* Check the global error status. */
    if ( !astOK ) return;
 
@@ -3949,6 +4219,30 @@ static void VirtualMachine( Rcontext *rcontext, int npoint,
    variable. */ \
    result = ldexp( result, expon )
 
+/* Gaussian random number. */
+/* ----------------------- */
+/* This macro expands to code which assigns a pseudo-random value to
+   the "result" variable. The value is drawn from a Gaussian distribution
+   with mean "x1" and standard deviation "ABS(x2)". */
+#define GAUSS( x1, x2 ) \
+\
+/* Loop until a satisfactory result is obtained. */ \
+   do { \
+\
+/* Obtain a value drawn from a standard Gaussian distribution. */ \
+      ran = Gauss( rcontext ); \
+\
+/* Multiply by "ABS(x2)", trapping possible overflow. */ \
+      result = ABS( (x2) ); \
+      result = SAFE_MUL( ran, result ); \
+\
+/* If OK, add "x1", again trapping possible overflow. */ \
+      if ( result != AST__BAD ) result = SAFE_ADD( result, (x1) ); \
+\
+/* Continue generating values until one is found which does not cause \
+   overflow. */ \
+   } while ( result == AST__BAD );
+
 /* All the required macros are now defined. */
 
 /* Initialise the top of stack index and constant counter. */
@@ -4035,6 +4329,7 @@ static void VirtualMachine( Rcontext *rcontext, int npoint,
             ARG_1( OP_LOG10,    *y = ( x > 0.0 ) ? log10( x ) : AST__BAD )
             ARG_1( OP_NINT,     *y = ( x >= 0 ) ?
                                      floor( x + 0.5 ) : ceil( x - 0.5 ) )
+            ARG_1( OP_POISS,    *y = Poisson( rcontext, x ) )
             ARG_1( OP_SIN,      *y = sin( x ) )
             ARG_1( OP_SIND,     *y = sin( x * d2r ) )
             ARG_1( OP_SINH,     *y = CATCH_MATHS_OVERFLOW( sinh( x ) ) )
@@ -4049,10 +4344,11 @@ static void VirtualMachine( Rcontext *rcontext, int npoint,
             ARG_2( OP_ATAN2,    *y = atan2( x1, x2 ) )
             ARG_2( OP_ATAN2D,   *y = atan2( x1, x2 ) * r2d )
             ARG_2( OP_DIM,      *y = ( x1 > x2 ) ? x1 - x2 : 0.0 )
+            ARG_2( OP_GAUSS,    GAUSS( x1, x2 ); *y = result )
             ARG_2( OP_MOD,      *y = ( x2 != 0.0 ) ?
                                      fmod( x1, x2 ) : AST__BAD )
             ARG_2( OP_POW,      *y = CATCH_MATHS_ERROR( pow( x1, x2 ) ) )
-            ARG_2( OP_RAND,     ran = Ran2( rcontext );
+            ARG_2( OP_RAND,     ran = Rand( rcontext );
                                 *y = x1 * ran + x2 * ( 1.0 - ran ); )
             ARG_2( OP_SIGN,     *y = ( ( x1 >= 0.0 ) == ( x2 >= 0.0 ) ) ?
                                      x1 : -x1 )
@@ -4147,6 +4443,8 @@ static void VirtualMachine( Rcontext *rcontext, int npoint,
 #undef SAFE_MUL
 #undef SAFE_DIV
 #undef BIT_OPER
+#undef SHIFT_BITS
+#undef GAUSS
 }
 
 /* Functions which access class attributes. */
