@@ -64,9 +64,10 @@
 *
       INTEGER                   STATUS                  ! Run-time error
 *
-*    Functions :
+*    Local constants :
 *
-      REAL			MATH_EXPR
+      INTEGER                  SPIX
+        PARAMETER              ( SPIX = 5 )
 *
 *    Local variables :
 *
@@ -85,18 +86,11 @@
       INTEGER                   XSUB, YSUB              ! Sub-pixel factors
 
       LOGICAL                   SYMMETRIC               ! Symmetric about centre?
-*
-*    Inline function :
-*
-      REAL                     DEL,SIG,PIX
-      INTEGER                  SPIX
-       SPIX(DEL,PIX,SIG) = MAX(1,NINT(abs(10.0*PIX)/SIG/MAX(1.0,
-     :                                SQRT(ABS(DEL/SIG)))))
 *-
 
 *    Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
-	print *,xwid,ywid,dx,dy
+
 *    Width squared
       WID2 = XWID*YWID
 
@@ -128,7 +122,7 @@
       DO J = 1, MNY
 
 *      Find Y sub-pixelling
-        YSUB = SPIX( YP0 + DY*REAL(J-1), DY, YWID )
+        YSUB = SPIX
         SDY = DY / YSUB
 
 *      Y contribution to normalisation
@@ -140,7 +134,7 @@
           SUM = 0.0
 
 *        Find X sub-pixelling
-          XSUB = SPIX( XP0 + DX*REAL(I-1), DX, XWID )
+          XSUB = SPIX
           SDX = DX / XSUB
 
 *        X contribution to normalisation - hence total normalisation
