@@ -1997,6 +1997,17 @@ configure.ac: installing `./missing'
           <code>make</code>.  That might just work.</p>
 
         <p>Iterate until success.</p>
+
+        <p>When the code is working, you will might want to add it to the
+          set of components which are explicitly built.  To do
+          this, add it to the <code>ALL_TARGETS</code> variable in the
+          top-level <code>Makefile.in</code>.  Next, go to the parent
+          directory of the directory you have just added: the
+          <code>configure.ac</code> file there will almost certainly
+          have a skeleton <code>configure.ac</code> which includes a
+          <code>AC_CONFIG_SUBDIRS</code> line, to which you should add
+          your newly working directory.</p>
+
       </subsect>
 
       <subsect id="importing-thirdparty" export="export">
@@ -2232,7 +2243,7 @@ M Makefile.dependencies
     <appendices>
       <sect id='starconfmacros' export='export'>
         <subhead>
-          <title>The Starconf macros</title>
+          <title>The Starconf macros and variables</title>
         </subhead>
 
         <p>The following macros may be used within the
@@ -2583,6 +2594,40 @@ M Makefile.dependencies
             through <code>STAR_CHECK_PROGS(star2html)</code> or
             otherwise (see <ref id="macro-check-progs"/>).</p>
 
+        </subsect>
+
+        <subsect id="variable-manifest-dir" export="export">
+          <subhead>
+            <title>Variable STAR_MANIFEST_DIR</title>
+          </subhead>
+
+          <p>The <code>STAR_MANIFEST_DIR</code> substitution variable
+            is slightly special.  If it is defined in your
+            <code>configure.ac</code> file, then Starlink automake
+            will include the <code>install-manifest</code> target in
+            the generated <code>Makefile.in</code>.</p>
+
+          <p>You define it as follows:
+            <verbatim>
+: ${STAR_MANIFEST_DIR='$(prefix)/manifests'}
+AC_SUBST(STAR_MANIFEST_DIR)
+</verbatim>
+            This sets the variable to be
+            <code>$(prefix)/manifests</code>, but allows it to be
+            overridden by a setting of the variable in the
+            environment.  Note that is is set to be relative to the
+            value of the <code>$(prefix)</code> makefile variable.</p>
+
+          <p>You do <em>not</em> have to set this in general, as this
+            is one of the things that the <code>STAR_DEFAULTS</code>
+            macro (<ref id="macro-defaults"/>) takes care of.  The
+            only time you need to use this feature is when you are
+            importing a third-party code set into the tree (as
+            described in <ref id="importing-thirdparty"/>).  In that
+            case, you do not want to specify
+            <code>STAR_DEFAULTS</code> in the
+            <code>configure.ac</code>, but you do need to install a
+            manifest.</p>
         </subsect>
 
         <subsect id='macro-messgen' export='export'>
