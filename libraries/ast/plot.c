@@ -254,6 +254,9 @@ f     using AST_GRID
 *        does not prevent exterior labels from being produced.
 *        o  Allow length of tick marks to be specified separately for
 *        both axes.
+*     13-OCT-2000 (DSB):
+*        o Purge zero length sections from CurveData structures.
+*        o Increase tolerance for edge labels from 0.0005 to 0.005.
 *class--
 */
 
@@ -1364,6 +1367,7 @@ static void Mark( AstPlot *, int, int, int, const double (*)[], int );
 static void Opoly( const char *, const char * );
 static void PlotLabels( AstPlot *, AstFrame *, int, LabelList *, char *, int, float **, const char *, const char *);
 static void PolyCurve( AstPlot *, int, int, int, const double (*)[] );
+static void PurgeCdata( CurveData * );
 static void RemoveFrame( AstFrameSet *, int );
 static void Text( AstPlot *, const char *, const double [], const float [2], const char *);
 static void TextLabels( AstPlot *, int, int *, const char *, const char *);
@@ -3026,6 +3030,69 @@ static void Apoly( float x, float y, const char *method, const char *class ){
 
 }
 
+static void PurgeCdata( CurveData *cdata ){
+/*
+*
+*  Name:
+*     CurveData
+
+*  Purpose:
+*     Remove any zero length sections from the description of a curve.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "plot.h"
+*     void PurgeCdata( CurveData *cdata )
+
+*  Class Membership:
+*     Plot member function.
+
+*  Description:
+*     This function removes any zero length sections from the supplied
+*     CurveData struture, which describes a multi-section curve.
+
+*  Parameters:
+*     cdata
+*        A pointer to the structure containing information about the
+*        breaks in a curve.
+
+*/
+
+/* Local Variables: */
+   int brk;                       /*Break index */
+   int i;                       /*Break index */
+
+/* Check the global error status. */
+   if ( !astOK || !cdata ) return;
+
+/* Loop round all breaks. */
+   brk = 0; 
+   while( brk < cdata->nbrk ) {
+
+/* If this break and the next one are co-incident, remove both breaks. */
+      if( cdata->xbrk[ brk ] == cdata->xbrk[ brk + 1 ] &&
+          cdata->ybrk[ brk ] == cdata->ybrk[ brk + 1 ] ) {
+
+/* Shuffle down the higher elements of all the arrays in the curve data. */
+         for( i = brk + 2; i < cdata->nbrk; i++ ){
+            cdata->xbrk[ i - 2 ] = cdata->xbrk[ i ];
+            cdata->ybrk[ i - 2 ] = cdata->ybrk[ i ];
+            cdata->vxbrk[ i - 2 ] = cdata->vxbrk[ i ];
+            cdata->vybrk[ i - 2 ] = cdata->vybrk[ i ];
+         }
+
+/*  Decrement the number of breaks in the curve data. */
+         cdata->nbrk -= 2;
+
+/* If the section is not zero length, move on to the next pair of breaks. */
+      } else {
+         brk += 2;
+      }
+   }
+}
+
 static void AxPlot( AstPlot *this, int axis, const double *start, double length,
                     int ink, CurveData *cdata, int normal, const char *method, 
                     const char *class ){
@@ -3211,11 +3278,13 @@ static void AxPlot( AstPlot *this, int axis, const double *start, double length,
          }
       }
 
-/* Store extra information about the curve in the returned structure. */
+/* Store extra information about the curve in the returned structure, and 
+   purge any zero length sections. */
       if( cdata ){
          cdata->length = Crv_len;
          cdata->out = Crv_out;
          cdata->nbrk = Crv_nbrk;
+         PurgeCdata( cdata );
       }
 
 /* Annul the Frame and Mapping. */
@@ -6576,11 +6645,13 @@ static void CurvePlot( AstPlot *this, const double *start, const double *finish,
          }
       }
 
-/* Store extra information about the curve in the returned structure. */
+/* Store extra information about the curve in the returned structure, and 
+   purge any zero length sections. */
       if( cdata ){
          cdata->length = Crv_len;
          cdata->out = Crv_out;
          cdata->nbrk = Crv_nbrk;
+         PurgeCdata( cdata );
       }
 
 /* Annul the Frame and Mapping. */
@@ -6965,7 +7036,7 @@ static CurveData **DrawGrid( AstPlot *this, TickInfo **grid, int drawgrid,
          info = grid[ i ];
 
 /* Allocate memory to hold information describing the breaks in each tick
-   mark curve. This takes the form of an array of CurveDara structures,
+   mark curve. This takes the form of an array of CurveData structures,
    one for each tick mark. */
          cdata[ i ] = (CurveData *) astMalloc( sizeof(CurveData)*
                                                (size_t) info->nmajor );
@@ -7909,7 +7980,7 @@ static int EdgeLabels( AstPlot *this, int ink, TickInfo **grid,
 
 /* Set up the tolerance for curve breaks occuring on an edge of 
    the plotting zone. */
-   tol = 0.0005*mindim;
+   tol = 0.005*mindim;
 
 /* First, we get a list of all the labels which can be produced on each
    axis. The list includes the labels reference position in graphics
@@ -8077,7 +8148,6 @@ static int EdgeLabels( AstPlot *this, int ink, TickInfo **grid,
                      ( edgeax == 1 && 
                        fabs( (double) *xbrk - edgeval ) < tol &&
                        fabs( (double) *vxbrk ) > 0.05 ) );
-
 
 /* Get the label text. */
             if( info->labels ) {
@@ -13365,6 +13435,36 @@ static void LinePlot( AstPlot *this, double xa, double ya, double xb,
 /* Tidy up the static data used by Map2. */
    Map2( 0, NULL, NULL, NULL, method, class );
 
+/* If no part of the curve could be drawn, set the number of breaks and the 
+   length of the drawn curve to zero. */
+   if( Crv_out ) {
+      Crv_nbrk = 0;
+      Crv_len = 0.0F;
+
+/* Otherwise, add an extra break to the returned structure at the position of 
+   the last point to be plotted. */
+   } else {
+      Crv_nbrk++;
+      if( Crv_nbrk > CRV_MXBRK ){
+         astError( AST__CVBRK, "%s(%s): Number of breaks in curve "
+                   "exceeds %d.", method, class, CRV_MXBRK );
+      } else {
+         *(Crv_xbrk++) = (float) Crv_xl;
+         *(Crv_ybrk++) = (float) Crv_yl;
+         *(Crv_vxbrk++) = (float) -Crv_vxl;
+         *(Crv_vybrk++) = (float) -Crv_vyl;
+      }
+   }
+
+/* Store extra information about the curve in the returned structure, and 
+   purge any zero length sections. */
+   if( cdata ){
+      cdata->length = Crv_len;
+      cdata->out = Crv_out;
+      cdata->nbrk = Crv_nbrk;
+      PurgeCdata( cdata );
+   }
+
 /* Annul the Mapping. */
    Map2_map = astAnnul( Map2_map );
 
@@ -15005,6 +15105,33 @@ f        The global status.
 /* Use Crv and Map3 to draw the curve segment. */
                Crv( d, x, y, method, class );
 
+/* If no part of the curve could be drawn, set the number of breaks and the 
+   length of the drawn curve to zero. */
+               if( Crv_out ) {
+                  Crv_nbrk = 0;
+                  Crv_len = 0.0F;
+
+/* Otherwise, add an extra break to the returned structure at the position of 
+   the last point to be plotted. */
+               } else {
+                  Crv_nbrk++;
+                  if( Crv_nbrk > CRV_MXBRK ){
+                     astError( AST__CVBRK, "%s(%s): Number of breaks in curve "
+                               "exceeds %d.", method, class, CRV_MXBRK );
+                  } else {
+                     *(Crv_xbrk++) = (float) Crv_xl;
+                     *(Crv_ybrk++) = (float) Crv_yl;
+                     *(Crv_vxbrk++) = (float) -Crv_vxl;
+                     *(Crv_vybrk++) = (float) -Crv_vyl;
+                  }
+               }
+
+/* Store extra information about the curve in the returned structure, and 
+   purge any zero length sections. */
+               Curve_data.length = Crv_len;
+               Curve_data.out = Crv_out;
+               Curve_data.nbrk = Crv_nbrk;
+               PurgeCdata( &Curve_data );
             }
          }
 
