@@ -14,12 +14,20 @@ Starlink::HDSPACK - routines for high level HDS manipulation
   $status = creobj("file.DATA_ARRAY", "ARRAY", $status);
   $status = creobj("file.DATA_ARRAY.DATA", "_REAL",[20,30], $status);
 
+  copy_hdsobj("file.more.fits","file1.more") or die "Oops";
+  create_hdsobj("file.DATA_ARRAY","ARRAY") or die "Oops2";
+  delete_hdsobj("file.more.fits") or die "Oops3";
+
 =head1 DESCRIPTION
 
 This module provides wrapper routines for common HDS manipulations.
 Functions are provided for copying data structures between locations,
 deleting structures and creating structures/primitives.
 
+Two interfacese are provided. The first mirrors the Figaro routines
+COPOBJ, CREOBJ and DELOBJ and use Starlink inherited status.
+The more verbose functions provide wrappers that assume good status
+on input and return perl status (either true or false).
 
 =cut
 
@@ -38,11 +46,96 @@ use constant SAI__ERROR => &NDF::SAI__ERROR;
 '$Revision$ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 $DEBUG = 0;
-@EXPORT_OK = qw( copobj retrieve_locs delobj creobj);
+@EXPORT_OK = qw( copobj retrieve_locs delobj creobj
+		 copy_hdsobj create_hdsobj delete_hdsobj
+	       );
 
-=head2 FUNCTIONS
+=head1 FUNCTIONS
 
-The following functions are available:
+=head2 Wrapper Routines
+
+The following functions provide the core functionality without worrying
+about the Starlink environment.
+
+=over 4
+
+=item B<create_hdsobj>
+
+Create a HDS object within an HDS structure.
+
+  create_hdsobj( $path, $type, \@dims );
+
+  create_hdsobj( $path, $type );
+
+Returns 1 if successful, false otherwise. See C<creobj>
+for more details on the arguments.
+
+=cut
+
+sub create_hdsobj {
+  my ($path, $type, $dims) = @_;
+
+  # Status stuff
+  my $status = SAI__OK;
+  err_begin( $status );
+
+  $status = creobj( $path, $type, $dims, $status );
+
+  return _status_toperl( $status );
+}
+
+=item B<delete_hdsobj>
+
+Delete an HDS object from an HDS file.
+
+  delete_hdsobj( $path );
+
+Returns 1 if successful, false otherwise. See C<delobj>
+for more details on the arguments.
+
+=cut
+
+sub delete_hdsobj {
+  my $path = shift;
+
+  # Status stuff
+  my $status = SAI__OK;
+  err_begin( $status );
+
+  $status = delobj( $path, $status );
+
+  return _status_toperl( $status );
+}
+
+=item B<copy_hdsobj>
+
+Copy an HDS structure from one location to another.
+
+  copy_hdsobj( $source, $destination );
+
+Returns 1 if successful, false otherwise. See C<copobj>
+for more details on the arguments.
+
+=cut
+
+sub copy_hdsobj {
+  my ($src, $dest) = @_;
+
+  # Status stuff
+  my $status = SAI__OK;
+  err_begin( $status );
+
+  $status = copobj( $src, $dest, $status );
+
+  return _status_toperl( $status );
+}
+
+
+=back
+
+=head2 Starlink status
+
+The following functions are available using Starlink inherited status:
 
 =over 4
 
@@ -350,6 +443,7 @@ sub creobj {
   my $indims = [];
   if (scalar(@_) == 2) {
     $indims = shift;
+    $indims = [] if !defined $indims;
   }
   my $status = shift;
 
@@ -501,6 +595,29 @@ sub _split_path {
 
   return($root, $last);
 }
+
+# Convert Starlink status to perl true/false
+# Input: Starlink status
+# Output: 1 or 0
+# Annulls status and closes error context
+sub _status_toperl {
+  my $status = shift;
+
+  # Check status return
+  my $pstat; # perl status
+  if ($status == SAI__OK) {
+    $pstat = 1;
+  } else {
+    err_annul($status);
+    $pstat = 0;
+  }
+
+  err_end($status);
+
+  return $pstat;
+}
+
+
 
 
 1;

@@ -1,5 +1,10 @@
 2003-03-07  Tim Jenness  <timj@jach.hawaii.edu>
 
+	* t/wrapper.t: Create
+
+	* HDSPACK.pm: Create wrapper functions that no longer rely on
+	Starlink status.
+
 	* t/creobj.t: First version
 
 	* HDSPACK.pm (creobj): Add creobj. Make sure that _find_loc can
