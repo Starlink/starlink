@@ -277,7 +277,10 @@
 <!ENTITY % para.content '(#PCDATA | %para.markup | ul)*'>
 ]]>
 
-<!ENTITY % paralist 'p, (p | tabular)*'>
+<!-- Allow paralist to be empty.  At one time this was 'p,(p|tabular)*', 
+     but this makes it awkward to keep empty placeholders in a
+     prologue. -->
+<!ENTITY % paralist '(p | tabular)*'>
 
 <!-- The code prologue is the documentation of the routine.  I'd consider
      making the connectors here into `&'; that can be done in future if
