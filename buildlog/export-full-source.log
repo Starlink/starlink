@@ -391,7 +391,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/soapserver/build/java
-     [copy] Copying 5 files to /apps/cvsbuild/java/source/soapserver/build/java
+     [copy] Copying 6 files to /apps/cvsbuild/java/source/soapserver/build/java
      [echo] Executing JPCS target: javadoc-sources
 
 javadoc-sources:
@@ -437,11 +437,11 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/build/java
-     [copy] Copying 2135 files to /apps/cvsbuild/java/source/build/java
+     [copy] Copying 2137 files to /apps/cvsbuild/java/source/build/java
      [copy] Copied 5 empty directories to /apps/cvsbuild/java/source/build/java
      [copy] Copying 1 file to /apps/cvsbuild/java/source/build/java
       [zip] Building zip: /apps/cvsbuild/export/starjava-src.zip
    [delete] Deleting directory /apps/cvsbuild/java/source/build/java
 
 BUILD SUCCESSFUL
-Total time: 28 seconds
+Total time: 27 seconds

@@ -76,9 +76,6 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/gui/FileNameListCellRenderer.java:35: warning - Tag @link: reference not found: ListCellRenderer
   [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/XMLEncodeDecode.java:25: warning - Tag @link: reference not found: uk.ac.starlink.ast.gui.AbstractPlotControlsModel
   [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/XMLEncodeDecode.java:25: warning - @copyright is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/PrimitiveXMLEncodeDecode.java:37: warning - Tag @link: reference not found: ChangeEvents
-  [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/URLUtils.java:177: warning - Tag @link: reference not found: java.net.File#toURI
-  [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/URLUtils.java:177: warning - Tag @link: reference not found: java.net.File#toURL
   [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/gui/SelectCharactersListener.java:15: warning - @copyright is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/gui/BasicFileFilter.java:46: warning - Tag @link: reference not found: JFileChooser
   [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/gui/BasicFileFilter.java:46: warning - Tag @link: reference not found: File.listFiles
@@ -101,7 +98,7 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/gui/StoreControlFrame.java:56: warning - Tag @link: reference not found: SourceSource
   [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/gui/StoreFileUtils.java:68: warning - Tag @link: reference not found: getConfigDirectory
   [javadoc] Generating /apps/cvsbuild/java/source/util/docs/util/javadocs/stylesheet.css...
-  [javadoc] 23 warnings
+  [javadoc] 20 warnings
      [echo] Executing Task target: javadocs
 
 prepare:
@@ -1761,6 +1758,7 @@ javadocs:
   [javadoc] Generating Javadoc
   [javadoc] Javadoc execution
   [javadoc] Loading source files for package uk.ac.starlink.soap...
+  [javadoc] Loading source files for package uk.ac.starlink.soap.util...
   [javadoc] Constructing Javadoc information...
   [javadoc] Standard Doclet version 1.4.1
 
@@ -2497,6 +2495,7 @@ javadocs:
   [javadoc]  creation, removal and transformations.
 
   [javadoc]  "
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/Frog.java:1528: warning - Tag @see: reference not found: RemoteServer
   [javadoc] Generating /apps/cvsbuild/java/source/frog/docs/frog/javadocs/uk/ac/starlink/frog/FrogSplash.html...
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/FrogSplash.java:20: Tag @see: Malformed: Frog, FrogMain
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/ast/AstUtilities.java:405: warning - @notes is an unknown tag.
@@ -2862,7 +2861,7 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/util/FrogSOAPServer.java:71: warning - Tag @link: can't find setFrogBrowser in uk.ac.starlink.frog.util.FrogSOAPServer
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/util/Percentile.java:17: warning - @copyright is an unknown tag.
   [javadoc] Generating /apps/cvsbuild/java/source/frog/docs/frog/javadocs/stylesheet.css...
-  [javadoc] 208 warnings
+  [javadoc] 209 warnings
 
 BUILD SUCCESSFUL
-Total time: 3 minutes 10 seconds
+Total time: 3 minutes 11 seconds

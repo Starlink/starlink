@@ -588,7 +588,7 @@ dist:
 install:
 [loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/bin
 [loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 19 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 25 files to /apps/cvsbuild/starjava/docs
      [echo] Executing JPCS target: install
 
 prepare:
@@ -669,4 +669,4 @@ build:
 BUILD FAILED
 file:/apps/cvsbuild/java/source/splat/build.xml:427: Compile failed; see the compiler error output for details.
 
-Total time: 2 minutes 25 seconds
+Total time: 2 minutes 26 seconds

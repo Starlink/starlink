@@ -187,7 +187,7 @@ check_packages:
 build:
     [mkdir] Created dir: /apps/cvsbuild/java/source/table/build/classes
     [javac] Compiling 110 source files to /apps/cvsbuild/java/source/table/build/classes
-     [copy] Copying 1 file to /apps/cvsbuild/java/source/table/build/classes
+     [copy] Copying 2 files to /apps/cvsbuild/java/source/table/build/classes
     [mkdir] Created dir: /apps/cvsbuild/java/source/table/lib/table
      [copy] Copying 1 file to /apps/cvsbuild/java/source/table/lib/table
      [echo] Executing NDTools target: build
@@ -264,7 +264,7 @@ check_packages:
 
 build:
     [mkdir] Created dir: /apps/cvsbuild/java/source/soapserver/build/classes
-    [javac] Compiling 5 source files to /apps/cvsbuild/java/source/soapserver/build/classes
+    [javac] Compiling 6 source files to /apps/cvsbuild/java/source/soapserver/build/classes
      [copy] Copying 1 file to /apps/cvsbuild/java/source/soapserver/build/classes
     [mkdir] Created dir: /apps/cvsbuild/java/source/soapserver/lib/soapserver
      [echo] Executing JPCS target: build
@@ -334,4 +334,4 @@ build:
 BUILD FAILED
 file:/apps/cvsbuild/java/source/splat/build.xml:427: Compile failed; see the compiler error output for details.
 
-Total time: 46 seconds
+Total time: 45 seconds

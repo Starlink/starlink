@@ -233,6 +233,7 @@ webstart:
 
 dist:
      [copy] Copying 284 files to /apps/cvsbuild/java/source/diva/docs/diva
+    [chmod] Result: -1
 
 install:
     [mkdir] Created dir: /apps/cvsbuild/starjava/lib/diva
@@ -677,7 +678,7 @@ install:
     [mkdir] Created dir: /apps/cvsbuild/starjava/docs/soapserver
 [loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/bin
 [loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 19 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 25 files to /apps/cvsbuild/starjava/docs
      [echo] Executing JPCS target: install
 
 prepare:
@@ -769,4 +770,4 @@ build:
 BUILD FAILED
 file:/apps/cvsbuild/java/source/splat/build.xml:427: Compile failed; see the compiler error output for details.
 
-Total time: 2 minutes 44 seconds
+Total time: 2 minutes 46 seconds
