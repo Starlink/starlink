@@ -144,6 +144,21 @@ clean:
    [delete] Deleting directory /apps/cvsbuild/java/source/splat/lib
    [delete] Deleting directory /apps/cvsbuild/java/source/splat/docs
    [delete] Deleting directory /apps/cvsbuild/java/source/splat/etc
+     [echo] Executing Mirage target: clean
+
+clean:
+   [delete] Deleting directory /apps/cvsbuild/java/source/mirage/build
+   [delete] Deleting directory /apps/cvsbuild/java/source/mirage/bin
+   [delete] Deleting directory /apps/cvsbuild/java/source/mirage/lib
+   [delete] Deleting directory /apps/cvsbuild/java/source/mirage/docs
+     [echo] Executing TOPCAT target: clean
+
+clean:
+   [delete] Deleting directory /apps/cvsbuild/java/source/topcat/build
+   [delete] Deleting directory /apps/cvsbuild/java/source/topcat/bin
+   [delete] Deleting directory /apps/cvsbuild/java/source/topcat/lib
+   [delete] Deleting directory /apps/cvsbuild/java/source/topcat/docs
+   [delete] Deleting directory /apps/cvsbuild/java/source/topcat/etc
      [echo] Executing Treeview target: clean
 
 clean:
@@ -152,13 +167,6 @@ clean:
    [delete] Deleting directory /apps/cvsbuild/java/source/treeview/lib
    [delete] Deleting directory /apps/cvsbuild/java/source/treeview/docs
    [delete] Deleting directory /apps/cvsbuild/java/source/treeview/etc
-     [echo] Executing Mirage target: clean
-
-clean:
-   [delete] Deleting directory /apps/cvsbuild/java/source/mirage/build
-   [delete] Deleting directory /apps/cvsbuild/java/source/mirage/bin
-   [delete] Deleting directory /apps/cvsbuild/java/source/mirage/lib
-   [delete] Deleting directory /apps/cvsbuild/java/source/mirage/docs
      [echo] Executing Pal target: clean
 
 clean:

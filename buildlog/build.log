@@ -228,7 +228,7 @@ build:
 prepare:
 
 check_packages:
-[available] May 23, 2003 4:05:21 AM uk.ac.starlink.util.Loader starjavaDirectory
+[available] May 24, 2003 4:05:15 AM uk.ac.starlink.util.Loader starjavaDirectory
 [available] WARNING: Loader.class location file:/apps/cvsbuild/java/source/util/build/classes/uk/ac/starlink/util/Loader.class unexpected
 
 build:
@@ -336,10 +336,8 @@ check_packages:
 
 build:
     [mkdir] Created dir: /apps/cvsbuild/java/source/table/build/classes
-    [javac] Compiling 84 source files to /apps/cvsbuild/java/source/table/build/classes
+    [javac] Compiling 58 source files to /apps/cvsbuild/java/source/table/build/classes
      [copy] Copying 1 file to /apps/cvsbuild/java/source/table/build/classes
-    [mkdir] Created dir: /apps/cvsbuild/java/source/table/lib/table
-     [copy] Copying 2 files to /apps/cvsbuild/java/source/table/lib/table
      [echo] Executing NDTools target: build
 
 prepare:
@@ -461,6 +459,27 @@ execute_mk_script:
      [exec] Processing 
      [exec] f() { g77 -shared -o $1 $2 -lg2c -lm -lgcc -lc;}; f /apps/cvsbuild/java/source/splat/lib/i386/libsplat.so 'NDFJImpl.o temp/*.o -L/apps/cvsbuild/java/source/..//lib/i386                -L/apps/cvsbuild/java/source/jniast/lib/i386 -ljniast' '';\
      [exec] rm -r -f temp
+     [echo] Executing Mirage target: build
+
+prepare:
+
+check_packages:
+
+build:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/mirage/build/classes
+    [javac] Compiling 3 source files to /apps/cvsbuild/java/source/mirage/build/classes
+     [echo] Executing TOPCAT target: build
+
+prepare:
+
+check_packages:
+
+build:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/topcat/build/classes
+    [javac] Compiling 26 source files to /apps/cvsbuild/java/source/topcat/build/classes
+     [copy] Copying 3 files to /apps/cvsbuild/java/source/topcat/build/classes
+    [mkdir] Created dir: /apps/cvsbuild/java/source/topcat/lib/topcat
+     [copy] Copying 2 files to /apps/cvsbuild/java/source/topcat/lib/topcat
      [echo] Executing Treeview target: build
 
 prepare:
@@ -483,15 +502,6 @@ build:
      [copy] Copying 12 files to /apps/cvsbuild/java/source/treeview/build/classes
      [copy] Copied 2 empty directories to /apps/cvsbuild/java/source/treeview/build/classes
      [copy] Copying 65 files to /apps/cvsbuild/java/source/treeview/build/classes
-     [echo] Executing Mirage target: build
-
-prepare:
-
-check_packages:
-
-build:
-    [mkdir] Created dir: /apps/cvsbuild/java/source/mirage/build/classes
-    [javac] Compiling 3 source files to /apps/cvsbuild/java/source/mirage/build/classes
      [echo] Executing Pal target: build
 
 prepare:
@@ -558,4 +568,4 @@ execute_mk_script:
      [exec] g77: temp/*.o: No such file or directory
 
 BUILD SUCCESSFUL
-Total time: 58 seconds
+Total time: 59 seconds

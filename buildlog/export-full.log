@@ -150,18 +150,24 @@ deinstall:
 
 real_deinstall:
    [delete] Deleting: /apps/cvsbuild/java/source/splat/.splat.install
-     [echo] Executing Treeview target: deinstall
-
-deinstall:
-
-real_deinstall:
-   [delete] Deleting: /apps/cvsbuild/java/source/treeview/.treeview.install
      [echo] Executing Mirage target: deinstall
 
 deinstall:
 
 real_deinstall:
    [delete] Deleting: /apps/cvsbuild/java/source/mirage/.mirage.install
+     [echo] Executing TOPCAT target: deinstall
+
+deinstall:
+
+real_deinstall:
+   [delete] Deleting: /apps/cvsbuild/java/source/topcat/.topcat.install
+     [echo] Executing Treeview target: deinstall
+
+deinstall:
+
+real_deinstall:
+   [delete] Deleting: /apps/cvsbuild/java/source/treeview/.treeview.install
      [echo] Executing Pal target: deinstall
 
 deinstall:
@@ -277,10 +283,13 @@ clean:
      [echo] Executing SPLAT target: clean
 
 clean:
-     [echo] Executing Treeview target: clean
+     [echo] Executing Mirage target: clean
 
 clean:
-     [echo] Executing Mirage target: clean
+     [echo] Executing TOPCAT target: clean
+
+clean:
+     [echo] Executing Treeview target: clean
 
 clean:
      [echo] Executing Pal target: clean
@@ -383,7 +392,8 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/table/build/java
-     [copy] Copying 86 files to /apps/cvsbuild/java/source/table/build/java
+     [copy] Copying 60 files to /apps/cvsbuild/java/source/table/build/java
+     [copy] Copied 1 empty directory to /apps/cvsbuild/java/source/table/build/java
      [echo] Executing NDTools target: javadoc-sources
 
 javadoc-sources:
@@ -420,15 +430,20 @@ javadoc-sources:
      [echo] Executing SPLAT target: javadoc-sources
 
 javadoc-sources:
+     [echo] Executing Mirage target: javadoc-sources
+
+javadoc-sources:
+     [echo] Executing TOPCAT target: javadoc-sources
+
+javadoc-sources:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/topcat/build/java
+     [copy] Copying 26 files to /apps/cvsbuild/java/source/topcat/build/java
      [echo] Executing Treeview target: javadoc-sources
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/treeview/build/java
      [copy] Copying 86 files to /apps/cvsbuild/java/source/treeview/build/java
      [copy] Copied 4 empty directories to /apps/cvsbuild/java/source/treeview/build/java
-     [echo] Executing Mirage target: javadoc-sources
-
-javadoc-sources:
      [echo] Executing Pal target: javadoc-sources
 
 javadoc-sources:
@@ -449,7 +464,7 @@ javadoc-sources:
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/build/java
      [copy] Copying 1254 files to /apps/cvsbuild/java/source/build/java
-     [copy] Copied 3 empty directories to /apps/cvsbuild/java/source/build/java
+     [copy] Copied 4 empty directories to /apps/cvsbuild/java/source/build/java
      [copy] Copying 1 file to /apps/cvsbuild/java/source/build/java
       [zip] Building zip: /apps/cvsbuild/export/starjava-src.zip
    [delete] Deleting directory /apps/cvsbuild/java/source/build/java
@@ -580,6 +595,7 @@ dist:
     [mkdir] Created dir: /apps/cvsbuild/java/source/jsky/bin/jsky
      [copy] Copying 2 files to /apps/cvsbuild/java/source/jsky/bin/jsky
      [copy] Copying 4 files to /apps/cvsbuild/java/source/jsky/docs/jsky
+    [chmod] Result: -1
 
 install:
     [mkdir] Created dir: /apps/cvsbuild/star/lib/jsky
@@ -866,7 +882,7 @@ install:
 prepare:
 
 check_packages:
-[available] May 23, 2003 4:24:09 AM uk.ac.starlink.util.Loader starjavaDirectory
+[available] May 24, 2003 4:22:36 AM uk.ac.starlink.util.Loader starjavaDirectory
 [available] WARNING: Loader.class location file:/apps/cvsbuild/java/source/util/build/classes/uk/ac/starlink/util/Loader.class unexpected
 
 build:
@@ -1347,12 +1363,11 @@ check_packages:
 
 build:
     [mkdir] Created dir: /apps/cvsbuild/java/source/table/build/classes
-    [javac] Compiling 84 source files to /apps/cvsbuild/java/source/table/build/classes
+    [javac] Compiling 58 source files to /apps/cvsbuild/java/source/table/build/classes
      [copy] Copying 1 file to /apps/cvsbuild/java/source/table/build/classes
-    [mkdir] Created dir: /apps/cvsbuild/java/source/table/lib/table
-     [copy] Copying 2 files to /apps/cvsbuild/java/source/table/lib/table
 
 jars:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/table/lib/table
       [jar] Building jar: /apps/cvsbuild/java/source/table/lib/table/table.jar
 
 javadoc_check:
@@ -1365,7 +1380,6 @@ javadocs:
   [javadoc] Loading source files for package uk.ac.starlink.table.formats...
   [javadoc] Loading source files for package uk.ac.starlink.table.gui...
   [javadoc] Loading source files for package uk.ac.starlink.table.jdbc...
-  [javadoc] Loading source files for package uk.ac.starlink.table.view...
   [javadoc] Constructing Javadoc information...
   [javadoc] Standard Doclet version 1.4.1
 
@@ -1386,14 +1400,14 @@ javadocs:
 
 dist:
     [mkdir] Created dir: /apps/cvsbuild/java/source/table/bin
-     [copy] Copying 3 files to /apps/cvsbuild/java/source/table/bin
+     [copy] Copying 1 file to /apps/cvsbuild/java/source/table/bin
 
 install:
     [mkdir] Created dir: /apps/cvsbuild/star/lib/table
     [mkdir] Created dir: /apps/cvsbuild/star/docs/table
-[loggedcopy] Copying 3 files to /apps/cvsbuild/star/lib
-[loggedcopy] Copying 3 files to /apps/cvsbuild/star/bin
-[loggedcopy] Copying 108 files to /apps/cvsbuild/star/docs
+[loggedcopy] Copying 1 file to /apps/cvsbuild/star/lib
+[loggedcopy] Copying 1 file to /apps/cvsbuild/star/bin
+[loggedcopy] Copying 82 files to /apps/cvsbuild/star/docs
      [echo] Executing NDTools target: install
 
 prepare:
@@ -2696,6 +2710,85 @@ install:
 [loggedcopy] Copying 1 file to /apps/cvsbuild/star/bin
 [loggedcopy] Copying 8 files to /apps/cvsbuild/star/lib
 [loggedcopy] Copying 280 files to /apps/cvsbuild/star/docs
+     [echo] Executing Mirage target: install
+
+prepare:
+
+check_packages:
+
+build:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/mirage/build/classes
+    [javac] Compiling 3 source files to /apps/cvsbuild/java/source/mirage/build/classes
+
+jars:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/mirage/lib/mirage
+      [jar] Building jar: /apps/cvsbuild/java/source/mirage/lib/mirage/mirage.jar
+
+javadoc_check:
+
+javadocs:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/mirage/docs/mirage/javadocs
+  [javadoc] Generating Javadoc
+  [javadoc] Javadoc execution
+  [javadoc] Loading source files for package uk.ac.starlink.mirage...
+  [javadoc] Constructing Javadoc information...
+  [javadoc] Standard Doclet version 1.4.1
+
+  [javadoc] Building tree for all the packages and classes...
+  [javadoc] Building index for all the packages and classes...
+  [javadoc] Building index for all classes...
+
+dist:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/mirage/bin
+     [copy] Copying 1 file to /apps/cvsbuild/java/source/mirage/bin
+
+install:
+    [mkdir] Created dir: /apps/cvsbuild/star/lib/mirage
+    [mkdir] Created dir: /apps/cvsbuild/star/docs/mirage
+[loggedcopy] Copying 1 file to /apps/cvsbuild/star/bin
+[loggedcopy] Copying 1 file to /apps/cvsbuild/star/lib
+[loggedcopy] Copying 17 files to /apps/cvsbuild/star/docs
+     [echo] Executing TOPCAT target: install
+
+prepare:
+
+check_packages:
+
+build:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/topcat/build/classes
+    [javac] Compiling 26 source files to /apps/cvsbuild/java/source/topcat/build/classes
+     [copy] Copying 3 files to /apps/cvsbuild/java/source/topcat/build/classes
+    [mkdir] Created dir: /apps/cvsbuild/java/source/topcat/lib/topcat
+     [copy] Copying 2 files to /apps/cvsbuild/java/source/topcat/lib/topcat
+
+jars:
+      [jar] Building jar: /apps/cvsbuild/java/source/topcat/lib/topcat/topcat.jar
+
+javadoc_check:
+
+javadocs:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/topcat/docs/topcat/javadocs
+  [javadoc] Generating Javadoc
+  [javadoc] Javadoc execution
+  [javadoc] Loading source files for package uk.ac.starlink.topcat...
+  [javadoc] Constructing Javadoc information...
+  [javadoc] Standard Doclet version 1.4.1
+
+  [javadoc] Building tree for all the packages and classes...
+  [javadoc] Building index for all the packages and classes...
+  [javadoc] Building index for all classes...
+
+dist:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/topcat/bin
+    [mkdir] Created dir: /apps/cvsbuild/java/source/topcat/etc/topcat
+     [copy] Copying 1 file to /apps/cvsbuild/java/source/topcat/bin
+
+install:
+    [mkdir] Created dir: /apps/cvsbuild/star/lib/topcat
+    [mkdir] Created dir: /apps/cvsbuild/star/docs/topcat
+[loggedcopy] Copying 1 file to /apps/cvsbuild/star/bin
+[loggedcopy] Copying 3 files to /apps/cvsbuild/star/lib
+[loggedcopy] Copying 38 files to /apps/cvsbuild/star/docs
      [echo] Executing Treeview target: install
 
 prepare:
@@ -2788,44 +2881,6 @@ install:
 [loggedcopy] Copying 2 files to /apps/cvsbuild/star/lib
 [loggedcopy] Copying 96 files to /apps/cvsbuild/star/docs
 [loggedcopy] Copying 14 files to /apps/cvsbuild/star/etc
-     [echo] Executing Mirage target: install
-
-prepare:
-
-check_packages:
-
-build:
-    [mkdir] Created dir: /apps/cvsbuild/java/source/mirage/build/classes
-    [javac] Compiling 3 source files to /apps/cvsbuild/java/source/mirage/build/classes
-
-jars:
-    [mkdir] Created dir: /apps/cvsbuild/java/source/mirage/lib/mirage
-      [jar] Building jar: /apps/cvsbuild/java/source/mirage/lib/mirage/mirage.jar
-
-javadoc_check:
-
-javadocs:
-    [mkdir] Created dir: /apps/cvsbuild/java/source/mirage/docs/mirage/javadocs
-  [javadoc] Generating Javadoc
-  [javadoc] Javadoc execution
-  [javadoc] Loading source files for package uk.ac.starlink.mirage...
-  [javadoc] Constructing Javadoc information...
-  [javadoc] Standard Doclet version 1.4.1
-
-  [javadoc] Building tree for all the packages and classes...
-  [javadoc] Building index for all the packages and classes...
-  [javadoc] Building index for all classes...
-
-dist:
-    [mkdir] Created dir: /apps/cvsbuild/java/source/mirage/bin
-     [copy] Copying 1 file to /apps/cvsbuild/java/source/mirage/bin
-
-install:
-    [mkdir] Created dir: /apps/cvsbuild/star/lib/mirage
-    [mkdir] Created dir: /apps/cvsbuild/star/docs/mirage
-[loggedcopy] Copying 1 file to /apps/cvsbuild/star/bin
-[loggedcopy] Copying 1 file to /apps/cvsbuild/star/lib
-[loggedcopy] Copying 17 files to /apps/cvsbuild/star/docs
      [echo] Executing Pal target: install
 
 prepare:
@@ -3589,7 +3644,7 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/DecimalComboBoxEditor.java:34: warning - @copyright is an unknown tag.
   [javadoc] Generating /apps/cvsbuild/java/source/frog/docs/frog/javadocs/uk/ac/starlink/frog/iface/DecimalComboBoxEditor.html...
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/DecimalComboBoxEditor.java:34: Tag @see: Malformed: BasicComboBoxEditor, DecimalField
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/GramControlFrame.java:44: warning - @copyright is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/GramControlFrame.java:45: warning - @copyright is an unknown tag.
   [javadoc] Generating /apps/cvsbuild/java/source/frog/docs/frog/javadocs/uk/ac/starlink/frog/iface/GramCreationDialog.html...
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/GramCreationDialog.java:37: Tag @see: Malformed: Gram, TimeSeries
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/GramFileFilter.java:182: warning - Tag @see: reference not found: setDescription
@@ -3607,7 +3662,7 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/LineRenderer.java:24: warning - @copyright is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/LineRenderer.java:24: warning - Tag @see: reference not found: PlotControl.
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/LookAndFeelManager.java:47: warning - @copyright is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/PlotControlFrame.java:50: warning - @copyright is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/PlotControlFrame.java:51: warning - @copyright is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/SeriesFileFilter.java:182: warning - Tag @see: reference not found: setDescription
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/SeriesFileFilter.java:182: warning - Tag @see: reference not found: setExtensionListInDescription
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/SeriesFileFilter.java:182: warning - Tag @see: reference not found: isExtensionListInDescription
@@ -3853,10 +3908,13 @@ javadoc-sources:
      [echo] Executing SPLAT target: javadoc-sources
 
 javadoc-sources:
-     [echo] Executing Treeview target: javadoc-sources
+     [echo] Executing Mirage target: javadoc-sources
 
 javadoc-sources:
-     [echo] Executing Mirage target: javadoc-sources
+     [echo] Executing TOPCAT target: javadoc-sources
+
+javadoc-sources:
+     [echo] Executing Treeview target: javadoc-sources
 
 javadoc-sources:
      [echo] Executing Pal target: javadoc-sources
@@ -3883,9 +3941,8 @@ javadoc-sources:
   [javadoc] Loading source files for package uk.ac.starlink.array...
   [javadoc] Loading source files for package uk.ac.starlink.ndx...
   [javadoc] Loading source files for package uk.ac.starlink.table...
-  [javadoc] Loading source files for package uk.ac.starlink.table.jdbc...
   [javadoc] Loading source files for package uk.ac.starlink.table.gui...
-  [javadoc] Loading source files for package uk.ac.starlink.table.view...
+  [javadoc] Loading source files for package uk.ac.starlink.table.jdbc...
   [javadoc] Loading source files for package uk.ac.starlink.table.formats...
   [javadoc] Loading source files for package uk.ac.starlink.fits...
   [javadoc] Loading source files for package uk.ac.starlink.votable...
@@ -4176,4 +4233,4 @@ export-full:
      [copy] Copying 2 files to /apps/cvsbuild/export
 
 BUILD SUCCESSFUL
-Total time: 13 minutes 25 seconds
+Total time: 12 minutes 5 seconds

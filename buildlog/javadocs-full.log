@@ -84,7 +84,8 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/table/build/java
-     [copy] Copying 86 files to /apps/cvsbuild/java/source/table/build/java
+     [copy] Copying 60 files to /apps/cvsbuild/java/source/table/build/java
+     [copy] Copied 1 empty directory to /apps/cvsbuild/java/source/table/build/java
      [echo] Executing NDTools target: javadoc-sources
 
 javadoc-sources:
@@ -121,15 +122,20 @@ javadoc-sources:
      [echo] Executing SPLAT target: javadoc-sources
 
 javadoc-sources:
+     [echo] Executing Mirage target: javadoc-sources
+
+javadoc-sources:
+     [echo] Executing TOPCAT target: javadoc-sources
+
+javadoc-sources:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/topcat/build/java
+     [copy] Copying 26 files to /apps/cvsbuild/java/source/topcat/build/java
      [echo] Executing Treeview target: javadoc-sources
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/treeview/build/java
      [copy] Copying 86 files to /apps/cvsbuild/java/source/treeview/build/java
      [copy] Copied 4 empty directories to /apps/cvsbuild/java/source/treeview/build/java
-     [echo] Executing Mirage target: javadoc-sources
-
-javadoc-sources:
      [echo] Executing Pal target: javadoc-sources
 
 javadoc-sources:
@@ -161,9 +167,8 @@ javadoc-sources:
   [javadoc] Loading source files for package uk.ac.starlink.array...
   [javadoc] Loading source files for package uk.ac.starlink.ndx...
   [javadoc] Loading source files for package uk.ac.starlink.table...
-  [javadoc] Loading source files for package uk.ac.starlink.table.jdbc...
   [javadoc] Loading source files for package uk.ac.starlink.table.gui...
-  [javadoc] Loading source files for package uk.ac.starlink.table.view...
+  [javadoc] Loading source files for package uk.ac.starlink.table.jdbc...
   [javadoc] Loading source files for package uk.ac.starlink.table.formats...
   [javadoc] Loading source files for package uk.ac.starlink.fits...
   [javadoc] Loading source files for package uk.ac.starlink.votable...
@@ -448,4 +453,4 @@ javadoc-sources:
   [javadoc] 86 warnings
 
 BUILD SUCCESSFUL
-Total time: 7 minutes 5 seconds
+Total time: 5 minutes 21 seconds

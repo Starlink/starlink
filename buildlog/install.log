@@ -72,7 +72,6 @@ javadocs:
 dist:
      [copy] Copying 2 files to /apps/cvsbuild/java/source/jsky/bin/jsky
      [copy] Copying 4 files to /apps/cvsbuild/java/source/jsky/docs/jsky
-    [chmod] Result: -1
 
 install:
     [mkdir] Created dir: /apps/cvsbuild/star/bin/jsky
@@ -283,7 +282,7 @@ install:
 prepare:
 
 check_packages:
-[available] May 23, 2003 4:16:12 AM uk.ac.starlink.util.Loader starjavaDirectory
+[available] May 24, 2003 4:14:28 AM uk.ac.starlink.util.Loader starjavaDirectory
 [available] WARNING: Loader.class location file:/apps/cvsbuild/java/source/util/build/classes/uk/ac/starlink/util/Loader.class unexpected
 
 build:
@@ -431,6 +430,7 @@ check_packages:
 build:
 
 jars:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/table/lib/table
       [jar] Building jar: /apps/cvsbuild/java/source/table/lib/table/table.jar
 
 javadoc_check:
@@ -439,14 +439,14 @@ javadocs:
 
 dist:
     [mkdir] Created dir: /apps/cvsbuild/java/source/table/bin
-     [copy] Copying 3 files to /apps/cvsbuild/java/source/table/bin
+     [copy] Copying 1 file to /apps/cvsbuild/java/source/table/bin
 
 install:
     [mkdir] Created dir: /apps/cvsbuild/star/lib/table
     [mkdir] Created dir: /apps/cvsbuild/star/docs/table
-[loggedcopy] Copying 3 files to /apps/cvsbuild/star/lib
-[loggedcopy] Copying 3 files to /apps/cvsbuild/star/bin
-[loggedcopy] Copying 108 files to /apps/cvsbuild/star/docs
+[loggedcopy] Copying 1 file to /apps/cvsbuild/star/lib
+[loggedcopy] Copying 1 file to /apps/cvsbuild/star/bin
+[loggedcopy] Copying 82 files to /apps/cvsbuild/star/docs
      [echo] Executing NDTools target: install
 
 prepare:
@@ -660,6 +660,58 @@ install:
 [loggedcopy] Copying 1 file to /apps/cvsbuild/star/bin
 [loggedcopy] Copying 8 files to /apps/cvsbuild/star/lib
 [loggedcopy] Copying 280 files to /apps/cvsbuild/star/docs
+     [echo] Executing Mirage target: install
+
+prepare:
+
+check_packages:
+
+build:
+
+jars:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/mirage/lib/mirage
+      [jar] Building jar: /apps/cvsbuild/java/source/mirage/lib/mirage/mirage.jar
+
+javadoc_check:
+
+javadocs:
+
+dist:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/mirage/bin
+     [copy] Copying 1 file to /apps/cvsbuild/java/source/mirage/bin
+
+install:
+    [mkdir] Created dir: /apps/cvsbuild/star/lib/mirage
+    [mkdir] Created dir: /apps/cvsbuild/star/docs/mirage
+[loggedcopy] Copying 1 file to /apps/cvsbuild/star/bin
+[loggedcopy] Copying 1 file to /apps/cvsbuild/star/lib
+[loggedcopy] Copying 17 files to /apps/cvsbuild/star/docs
+     [echo] Executing TOPCAT target: install
+
+prepare:
+
+check_packages:
+
+build:
+
+jars:
+      [jar] Building jar: /apps/cvsbuild/java/source/topcat/lib/topcat/topcat.jar
+
+javadoc_check:
+
+javadocs:
+
+dist:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/topcat/bin
+    [mkdir] Created dir: /apps/cvsbuild/java/source/topcat/etc/topcat
+     [copy] Copying 1 file to /apps/cvsbuild/java/source/topcat/bin
+
+install:
+    [mkdir] Created dir: /apps/cvsbuild/star/lib/topcat
+    [mkdir] Created dir: /apps/cvsbuild/star/docs/topcat
+[loggedcopy] Copying 1 file to /apps/cvsbuild/star/bin
+[loggedcopy] Copying 3 files to /apps/cvsbuild/star/lib
+[loggedcopy] Copying 38 files to /apps/cvsbuild/star/docs
      [echo] Executing Treeview target: install
 
 prepare:
@@ -697,32 +749,6 @@ install:
 [loggedcopy] Copying 2 files to /apps/cvsbuild/star/lib
 [loggedcopy] Copying 96 files to /apps/cvsbuild/star/docs
 [loggedcopy] Copying 14 files to /apps/cvsbuild/star/etc
-     [echo] Executing Mirage target: install
-
-prepare:
-
-check_packages:
-
-build:
-
-jars:
-    [mkdir] Created dir: /apps/cvsbuild/java/source/mirage/lib/mirage
-      [jar] Building jar: /apps/cvsbuild/java/source/mirage/lib/mirage/mirage.jar
-
-javadoc_check:
-
-javadocs:
-
-dist:
-    [mkdir] Created dir: /apps/cvsbuild/java/source/mirage/bin
-     [copy] Copying 1 file to /apps/cvsbuild/java/source/mirage/bin
-
-install:
-    [mkdir] Created dir: /apps/cvsbuild/star/lib/mirage
-    [mkdir] Created dir: /apps/cvsbuild/star/docs/mirage
-[loggedcopy] Copying 1 file to /apps/cvsbuild/star/bin
-[loggedcopy] Copying 1 file to /apps/cvsbuild/star/lib
-[loggedcopy] Copying 17 files to /apps/cvsbuild/star/docs
      [echo] Executing Pal target: install
 
 prepare:
@@ -810,10 +836,10 @@ execute_mk_script:
      [exec]          ar x $f; \
      [exec]       fi;\
      [exec] done)
-     [exec] g77: temp/*.o: No such file or directory
      [exec] Processing 
      [exec] f() { g77 -shared -o $1 $2 -lg2c -lm -lgcc -lc;}; f /apps/cvsbuild/java/source/frog/lib/libfrog.so 'Dummy.o temp/*.o -L/apps/cvsbuild/java/source/..//lib -L/apps/cvsbuild/java/source/jniast/lib -ljniast' '';\
      [exec] rm -r -f temp
+     [exec] g77: temp/*.o: No such file or directory
 
 jars:
       [jar] Building jar: /apps/cvsbuild/java/source/frog/lib/frog/frog.jar
@@ -838,4 +864,4 @@ install:
 [loggedcopy] Copying 132 files to /apps/cvsbuild/star/docs
 
 BUILD SUCCESSFUL
-Total time: 41 seconds
+Total time: 42 seconds

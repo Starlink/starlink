@@ -150,18 +150,24 @@ deinstall:
 
 real_deinstall:
    [delete] Deleting: /apps/cvsbuild/java/source/splat/.splat.install
-     [echo] Executing Treeview target: deinstall
-
-deinstall:
-
-real_deinstall:
-   [delete] Deleting: /apps/cvsbuild/java/source/treeview/.treeview.install
      [echo] Executing Mirage target: deinstall
 
 deinstall:
 
 real_deinstall:
    [delete] Deleting: /apps/cvsbuild/java/source/mirage/.mirage.install
+     [echo] Executing TOPCAT target: deinstall
+
+deinstall:
+
+real_deinstall:
+   [delete] Deleting: /apps/cvsbuild/java/source/topcat/.topcat.install
+     [echo] Executing Treeview target: deinstall
+
+deinstall:
+
+real_deinstall:
+   [delete] Deleting: /apps/cvsbuild/java/source/treeview/.treeview.install
      [echo] Executing Pal target: deinstall
 
 deinstall:

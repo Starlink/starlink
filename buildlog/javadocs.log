@@ -498,7 +498,6 @@ javadocs:
   [javadoc] Loading source files for package uk.ac.starlink.table.formats...
   [javadoc] Loading source files for package uk.ac.starlink.table.gui...
   [javadoc] Loading source files for package uk.ac.starlink.table.jdbc...
-  [javadoc] Loading source files for package uk.ac.starlink.table.view...
   [javadoc] Constructing Javadoc information...
   [javadoc] Standard Doclet version 1.4.1
 
@@ -1605,6 +1604,40 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/util/VoigtFitter.java:20: warning - @copyright is an unknown tag.
   [javadoc] Generating /apps/cvsbuild/java/source/splat/docs/splat/javadocs/stylesheet.css...
   [javadoc] 272 warnings
+     [echo] Executing Mirage target: javadocs
+
+prepare:
+
+javadoc_check:
+
+javadocs:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/mirage/docs/mirage/javadocs
+  [javadoc] Generating Javadoc
+  [javadoc] Javadoc execution
+  [javadoc] Loading source files for package uk.ac.starlink.mirage...
+  [javadoc] Constructing Javadoc information...
+  [javadoc] Standard Doclet version 1.4.1
+
+  [javadoc] Building tree for all the packages and classes...
+  [javadoc] Building index for all the packages and classes...
+  [javadoc] Building index for all classes...
+     [echo] Executing TOPCAT target: javadocs
+
+prepare:
+
+javadoc_check:
+
+javadocs:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/topcat/docs/topcat/javadocs
+  [javadoc] Generating Javadoc
+  [javadoc] Javadoc execution
+  [javadoc] Loading source files for package uk.ac.starlink.topcat...
+  [javadoc] Constructing Javadoc information...
+  [javadoc] Standard Doclet version 1.4.1
+
+  [javadoc] Building tree for all the packages and classes...
+  [javadoc] Building index for all the packages and classes...
+  [javadoc] Building index for all classes...
      [echo] Executing Treeview target: javadocs
 
 prepare:
@@ -1658,23 +1691,6 @@ javadocs:
   [javadoc] Building index for all classes...
   [javadoc] Generating /apps/cvsbuild/java/source/treeview/docs/treeview/javadocs/stylesheet.css...
   [javadoc] 8 warnings
-     [echo] Executing Mirage target: javadocs
-
-prepare:
-
-javadoc_check:
-
-javadocs:
-    [mkdir] Created dir: /apps/cvsbuild/java/source/mirage/docs/mirage/javadocs
-  [javadoc] Generating Javadoc
-  [javadoc] Javadoc execution
-  [javadoc] Loading source files for package uk.ac.starlink.mirage...
-  [javadoc] Constructing Javadoc information...
-  [javadoc] Standard Doclet version 1.4.1
-
-  [javadoc] Building tree for all the packages and classes...
-  [javadoc] Building index for all the packages and classes...
-  [javadoc] Building index for all classes...
      [echo] Executing Pal target: javadocs
 
 prepare:
@@ -2347,7 +2363,7 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/DecimalComboBoxEditor.java:34: warning - @copyright is an unknown tag.
   [javadoc] Generating /apps/cvsbuild/java/source/frog/docs/frog/javadocs/uk/ac/starlink/frog/iface/DecimalComboBoxEditor.html...
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/DecimalComboBoxEditor.java:34: Tag @see: Malformed: BasicComboBoxEditor, DecimalField
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/GramControlFrame.java:44: warning - @copyright is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/GramControlFrame.java:45: warning - @copyright is an unknown tag.
   [javadoc] Generating /apps/cvsbuild/java/source/frog/docs/frog/javadocs/uk/ac/starlink/frog/iface/GramCreationDialog.html...
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/GramCreationDialog.java:37: Tag @see: Malformed: Gram, TimeSeries
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/GramFileFilter.java:182: warning - Tag @see: reference not found: setDescription
@@ -2365,7 +2381,7 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/LineRenderer.java:24: warning - @copyright is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/LineRenderer.java:24: warning - Tag @see: reference not found: PlotControl.
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/LookAndFeelManager.java:47: warning - @copyright is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/PlotControlFrame.java:50: warning - @copyright is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/PlotControlFrame.java:51: warning - @copyright is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/SeriesFileFilter.java:182: warning - Tag @see: reference not found: setDescription
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/SeriesFileFilter.java:182: warning - Tag @see: reference not found: setExtensionListInDescription
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/SeriesFileFilter.java:182: warning - Tag @see: reference not found: isExtensionListInDescription
@@ -2506,4 +2522,4 @@ javadocs:
   [javadoc] 199 warnings
 
 BUILD SUCCESSFUL
-Total time: 2 minutes 54 seconds
+Total time: 2 minutes 59 seconds
