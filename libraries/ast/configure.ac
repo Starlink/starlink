@@ -39,7 +39,7 @@ AC_CHECK_FUNCS([isnan])
 AC_CHECK_DECLS([isnan],,,[#include <math.h>
                          ])
 STAR_DECLARE_DEPENDENCIES(sourceset, sst)
-STAR_DECLARE_DEPENDENCIES(use, sla)
+STAR_DECLARE_DEPENDENCIES(build, sla)
 
 #   Declare the message file.  This macro is documented to leave the
 #   discovered facility code in the shell variable
