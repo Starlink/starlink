@@ -24,11 +24,12 @@
 #     memory use and resident set size (i.e. real memory use).
 #     Every time the contents of a given external label file are changed
 #     (presumably by the parent process) it writes the contents of the 
-#     label file (typically the name of the process which has been 
-#     running), plus a summary of the resource usage since last time 
+#     label file (typically the name of the program which has been 
+#     running, perhaps with other data describing the invocation of that
+#     program), plus a summary of the resource usage since last time 
 #     the label file was changed, to a log file.
 #     The only communication between the parent and this process, 
-#     after it is started, is via the label file.
+#     between starting and terminating, is via the label file.
 #
 #     Accuracy of the summary will necessarily depend on the length of
 #     the intervals during which the script sleeps.  In particular 
@@ -59,15 +60,50 @@
 #     If this process receives an interrupt, or if it detects that its
 #     parent no longer exists, it will terminate.
 
+#  Output:
+#     Output is to a log file whose default name is reslog.log, but
+#     which can be specified using the -f flag.
+#
+#     Each time the label file is modified, resource usage is written
+#     to the log file for the major process to run since the last time 
+#     the label file was modified.
+#     The major process is defined as the one with the largest instantaneous
+#     memory use (size or RSS) in that interval.
+#     Thus any other process running between modifications of the label
+#     file smaller than the major process (or of the same size) will not
+#     be logged at all.
+#
+#     One line is printed per each logged process, with an entry in each
+#     of the following columns:
+#
+#     (unlabelled)
+#        The first column consists of the contents of the label file
+#     Elapsed(s)
+#        Seconds of elapsed time used by the major process.
+#        Note this is not the time which has elapsed since the last log entry.
+#     CPU(s)
+#        Seconds of CPU time used by the major process.
+#     RSS(k)
+#        Maximum resident set size (kilobytes of real memory occupied) 
+#        by the major process.
+#     Size(k)
+#        Maximum kilobytes of total (real + virtual) memory occupied 
+#        by the major process.
+#     Diskfree(M)
+#        Number of megabytes free on the disk (partition) being used.
+#        This isn't directly a measure of resource usage by the process,
+#        but it's useful to see if it is dropping to or near zero.
+
 #  Implementation status:
 #     Determining resource usage is inherently a highly system-dependent
 #     task, and the script cannot be expected to be portable to 
 #     arbitrary platforms.  In particular the 'ps' command, which has
-#     to be used heavily, exists in two very differnt forms, one 
+#     to be used heavily, exists in two very different forms, one 
 #     descending from BSD and one from Sytem V Unix.
-#     The script as it stands appears to work on the following systems:
+#     The script as it stands has been tested on the following systems:
 #        Red Hat Linux 5.0
 #        Solaris 2.6
+#        Digital Unix 4.0B
 #     however it's likely to be sensitive to details of the systems it's
 #     running on.  There may also be problems, for instance, if (e.g. 
 #     for a process with very high memory usage) the columns from ps 
@@ -140,9 +176,10 @@ echo
 
 # Print out header
 #
-set  format = "%29s %10d %10d %10d %10d  %s\n"
-set hformat = "%29s %10s %10s %10s %10s\n"
-printf "$hformat" " " "Elapsed(s)" "CPU(s)" "RSS(k)" "Size(k)" >>$logfile
+set  format = "%27s %10d %8d %8d %8d %11d\n"
+set hformat = "%27s %10s %8s %8s %8s %11s\n"
+printf >>$logfile \
+   "$hformat" " " "Elapsed(s)" "CPU(s)" "RSS(k)" "Size(k)" "Diskfree(M)"
 
 # Classify operating system 
 # (currently works for Red Hat Linux, Solaris, Digital Unix) 
@@ -176,6 +213,7 @@ alias tokb "sed -e 's/M *"'$'"/e3/' -e 's/K *"'$'"//' | awk '{print int("'$'"1)}
 #
 set size_max = 0
 set rss_max = 0
+set diskfree_min = 99999999
 set label = ""
 rm -f $labelfile
 onintr SIGNAL
@@ -220,11 +258,13 @@ while (`$parent_pscmd |& getfield field=PID`)
       #
       ( printf >> $logfile "$format" \
           "$label_last" \
-          "$elapsed_major" "$cpu_major" "$rss_max" "$size_max" ) >& /dev/null
+          "$elapsed_major" "$cpu_major" "$rss_max" "$size_max" "$diskfree_min"\
+          ) >& /dev/null
       set rss_max = 0
       set size_max = 0
       set cpu = 0
       set elapsed = 0
+      set diskfree = 0
    endif
 
    # Find the process we're interested in.
@@ -244,7 +284,7 @@ while (`$parent_pscmd |& getfield field=PID`)
    set awkprog = 'NR==1{for (i=1;i<=NF;i++) {if ($i=="PPID") f_i=i} print;}                       NR>1 && $f_i=="'$ppid'" {print;}'
    set pid = `cat $tmpfile | awk $awkprog:q  | getfield field=PID sortby=SIZE`
 
-   # Find out the stats we want (cpu, elapsed, size, rss)
+   # Find out the stats we want from ps (cpu, elapsed, size, rss)
    #
    if ("$pstype" == "BSD") then
       (ps u $pid > $tmpfile) >& /dev/null
@@ -270,6 +310,13 @@ while (`$parent_pscmd |& getfield field=PID`)
          set elapsed = `cat $tmpfile | getfield field=ETIME | tosec`
       endif
    endif
+
+   # Find out number of Mb left on disk containing current directory.
+   # (careful: df can output header plus one or two lines)
+   #
+   set dfline = `df -k . | tail +2`
+   set diskfree = `echo $dfline | awk '{print $4}'`
+   @ diskfree = $diskfree / 1024
    
    # Update maxima and make sure the current stats are those for the 
    # so far biggest process
@@ -292,6 +339,7 @@ while (`$parent_pscmd |& getfield field=PID`)
          set cpu_major     = "$cpu"
       endif
    endif
+   if ($diskfree < $diskfree_min) set diskfree_min = $diskfree
    
    # Go back to sleep for a while
    #
