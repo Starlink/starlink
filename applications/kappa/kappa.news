@@ -1,8 +1,14 @@
 1 KAPPA_Version_0.13
 
- A new version of KAPPA (V0.13) is now available. See SUN/95 for a
- complete list of changes. The main changes are in the areas of 
- co-ordinate handling and graphics:
+ A major new update to KAPPA (V0.13) is now available...
+
+    SOME IMPORTANT APPLICATIONS (DISPLAY, CONTOUR, CURSOR, ETC) 
+    HAVE HAD PARAMETERS ADDED, REMOVED AND CHANGED. SCRIPTS WHICH 
+    USE ANY OF THESE MODIFIED APPLICATIONS MAY NEED TO BE CHANGED 
+    TO TAKE ACCOUNT OF THE NEW PARAMETER LISTS. 
+
+ See SUN/95 ("Release Notes - V0.13") for a complete list of the changes. 
+ The main changes are in the areas of co-ordinate handling and graphics:
 
  o   Co-ordinate handling has been improved by using the facilities
  of the AST library to allow a wide range of co-ordinate Frames to
@@ -20,13 +26,6 @@
  plotting "styles". These changes have also involved the
  conversion from SGS/NCAR to PGPLOT as the underlying graphics
  system.
-
-
-    SOME APPLICATIONS HAVE HAD PARAMETERS ADDED, REMOVED AND
-    CHANGED. SCRIPTS WHICH USE ANY OF THESE MODIFIED APPLICATIONS
-    MAY NEED TO BE CHANGED TO TAKE ACCOUNT OF THE NEW PARAMETER
-    LISTS. SEE SUN/95 ("Release Notes - V0.13") FOR DETAILS.
-
 
  This release includes the new facilities in a limited number of
  applications. The remaining applications will be converted and
