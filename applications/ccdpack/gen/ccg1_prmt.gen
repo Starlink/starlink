@@ -1,0 +1,90 @@
+      SUBROUTINE CCG1_PRMT<T>( IN, RANK, DIM1, N, OUT, STATUS )
+*+
+*  Name:
+*     CCG1_PRMT<T>
+
+*  Purpose:
+*     Permute columns of an array.
+
+*  Language:
+*     Starlink Fortran 77.
+
+*  Invocation:
+*     CALL CCG1_PRMT<T>( IN, RANK, N, DIM1, OUT, STATUS )
+
+*  Description:
+*     This routine will permute columns an array IN of type <COMM>
+*     according to the index values in the array RANK, and write the
+*     resulting array into the array OUT.
+
+*  Arguments:
+*     IN( DIM1, * ) = <COMM> (Given)
+*        Input array.  The second dimension must be at least as large
+*        as the largest element of RANK.
+*     RANK( * ) = INTEGER (Given)
+*        Rank array: column I of OUT will be filled with column RANK( I ) 
+*        of IN.
+*     DIM1 = INTEGER (Given)
+*        The first dimension of IN and OUT.
+*     N = INTEGER (Given)
+*        The number of columns to be permuted - the first N elements of
+*        RANK will be used.
+*     OUT( DIM1, * ) = <COMM> (Returned)
+*        The array into which the results will be written.  The second
+*        dimension must be at least as large as N.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Copyright:
+*     Copyright (C) 2001 Central Laboratory of the Research Councils
+
+*  Authors:
+*     MBT: Mark Taylor (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     29-JAN-2001 (MBT):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      
+*  Arguments Given:
+      INTEGER DIM1
+      INTEGER RANK( * )
+      <TYPE> IN( DIM1, * )
+      INTEGER N
+      
+*  Arguments Returned:
+      <TYPE> OUT( DIM1, * )
+      
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      INTEGER I                  ! Loop variable
+      INTEGER J                  ! Loop variable
+      
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Permute columns.
+      DO I = 1, N
+         DO J = 1, DIM1
+            OUT( J, I ) = IN( J, RANK( I ) )
+         END DO
+      END DO
+      
+      END
+* $Id$
