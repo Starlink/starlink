@@ -4,7 +4,7 @@
 
 	INCLUDE 'SAE_PAR'
 
-	INTEGER DIMSX, DIMSY, J, K, N, IFAIL, STATUS, 
+	INTEGER DIMSX, DIMSY, J, K, N, STATUS, 
      :	        XST, XSZ, YST, YSZ
 
 	REAL ARROUT( DIMSX, DIMSY), VALMIN, VALMAX, SUM, MEAN, MEDIAN, 
@@ -39,10 +39,7 @@
 	END DO
 
 *      calculate the median value of the normalization area
-	IFAIL = 0
-
-	CALL M01CAF( DATA, 1, N, 'A', IFAIL)
-!	CALL M01ANF( DATA, 1, N, IFAIL)
+	CALL PDA_QSAD( N, DATA )
 
 	CALL MED3D_CALMEDSUB( N, DATA, VALMAX, VALMIN, SUM, MEAN, 
      :	                      MEDIAN, MODE)

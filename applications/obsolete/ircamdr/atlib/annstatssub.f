@@ -31,7 +31,6 @@
      :	  K,                   ! looping variable
      :	  STATUS,              ! status input/return
      :	  NUMANN,              ! number of annuli in image
-     :	  IFAIL,               ! nag status input/return
      :	  LUN,                 ! logical unit for output file
      :	  MAXDATA              ! maximum number of pixels in each annulus
 
@@ -217,8 +216,7 @@
 
 *        Sort the pixel values in current annulus
 	  IF( NPTS .GT. 0) THEN
-	    IFAIL = 0
-	    CALL M01CAF( DATARR, 1, NPTS, 'A', IFAIL)
+	    CALL PDA_QSAD( NPTS, DATARR )
  
 *          call subroutine to find median for the input DATARR
 	    CALL MED3D_CALMEDSUB( NPTS, DATARR, VALMAX, VALMIN, SUM, MEAN, 

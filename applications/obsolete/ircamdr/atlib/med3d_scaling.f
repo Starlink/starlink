@@ -7,7 +7,7 @@
 	INCLUDE 'SAE_PAR'
 
 	INTEGER WDIMSX, WDIMSY, WDIMSZ, DIMSX, DIMSY, COUNTER, J, K, 
-     :	        I, N, IFAIL, STATUS, XST, XSZ, YST, YSZ, NPIX, XEN, YEN
+     :	        I, N, STATUS, XST, XSZ, YST, YSZ, NPIX, XEN, YEN
 
 	REAL WORK( WDIMSX, WDIMSY, WDIMSZ), VALMIN, VALMAX, SUM, 
      :	     MEAN, MEDIAN, MODE, TOLERANCE
@@ -67,11 +67,8 @@
 
 	  END DO
 
-*        call nag routine to order the scaling ACTDATA
-	  IFAIL = 0
-
-	  CALL M01CAF( ACTDATA, 1, N, 'A', IFAIL)
-!	  CALL M01ANF( ACTDATA, 1, N, IFAIL)
+*        sort data
+	  CALL PDA_QSAD( N, ACTDATA )
 
 *        call subroutine to find median for the input ACTDATA
 	  CALL MED3D_CALMEDSUB( N, ACTDATA, VALMAX, VALMIN, SUM, MEAN, 
@@ -97,10 +94,7 @@
 	END DO
 
 *      calculate the median of the set of median values calculated above
-	IFAIL = 0
-
-	CALL M01CAF( SCALVAL, 1, COUNTER, 'A', IFAIL)
-!	CALL M01ANF( SCALVAL, 1, COUNTER, IFAIL)
+	CALL PDA_QSAD( COUNTER, SCALVAL )
 
 	CALL MED3D_CALMEDSUB( COUNTER, SCALVAL, VALMAX, VALMIN, SUM, MEAN, 
      :	                      MEDIAN, MODE)

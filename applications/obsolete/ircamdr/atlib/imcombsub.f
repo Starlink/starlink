@@ -9,7 +9,6 @@
      :	  DIMSX, 
      :	  DIMSY, 
      :	  STATUS,
-     :	  IFAIL,
      :	  J,
      :	  K,
      :	  L,
@@ -119,9 +118,8 @@
      :	      'Number of pixels in comparison area 1 = ^NPTS1',
      :	      STATUS)
 
-*          Median data using NAG routine
-	    IFAIL = 0
-	    CALL M01CAF( DATARR, 1, NPTS1, 'A', IFAIL)
+*          Median data. First sort
+	    CALL PDA_QSAD( NPTS1, DATARR )
  
 *          Call subroutine to find median for the input DATARR
 	    CALL MED3D_CALMEDSUB( NPTS1, DATARR, VALMAX1, VALMIN1, SUM1, 
@@ -193,9 +191,8 @@
      :	      'Number of pixels in comparison area 2 = ^NPTS2',
      :	      STATUS)
 
-*          Median data using NAG routine
-	    IFAIL = 0
-	    CALL M01CAF( DATARR, 1, NPTS2, 'A', IFAIL)
+*          Median data. First sort
+	    CALL PDA_QSAD( NPTS2, DATARR )
  
 *          Call subroutine to find median for the input DATARR
 	    CALL MED3D_CALMEDSUB( NPTS2, DATARR, VALMAX2, VALMIN2, SUM2, 

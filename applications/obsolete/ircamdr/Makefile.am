@@ -24,7 +24,7 @@ obsrap_LDADD = \
 	rapgen/librapgen.la \
         kersub/libkersub.la \
 	kergen/libkergen.la \
-	`ndf_link_adam` `fio_link_adam` `mag_link_adam`
+	`ndf_link_adam` `fio_link_adam` `mag_link_adam` `pda_link_adam`
 
 polrap_SOURCES = polrap.f
 polrap_TASKS = 
@@ -41,7 +41,7 @@ rapsub/librapsub.la \
 rapgen/librapgen.la \
 kersub/libkersub.la \
 kergen/libkergen.la \
-`ndf_link_adam` `fio_link_adam`
+`ndf_link_adam` `fio_link_adam` `pda_link_adam`
 
 AM_FCFLAGS = -Iplt2d_f
 

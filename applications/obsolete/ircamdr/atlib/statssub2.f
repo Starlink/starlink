@@ -17,7 +17,6 @@
      :	  J,                           ! counting variable
      :	  K,                           ! counting variable
      :	  L,                           ! counting variable
-     :	  IFAIL,                       ! error return from NAG
      :	  STATUS,                      ! adam status
      :	  MAXDATA                      ! Maximum data pixels for sorting
 
@@ -92,9 +91,7 @@
 
 *      Sort the pixel values in each stack image
 
-	IFAIL = 0
-
-	CALL M01CAF( ACTDATA, 1, L, 'A', IFAIL)
+	CALL PDA_QSAD( L, ACTDATA )
 
 *      call subroutine to find median for the input ACTDATA
 

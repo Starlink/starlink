@@ -10,7 +10,6 @@
      :	  DIMSY, 
      :	  ODIMSX, 
      :	  ODIMSY, 
-     :	  IFAIL, 
      :	  STATUS,
      :	  J,
      :	  K,
@@ -83,10 +82,7 @@
 	  END DO
 
 *        Call subroutine to order the column values 
-
-	  IFAIL = 0
-
-	  CALL M01CAF( DATA, 1, NUMPIX, 'A', IFAIL)
+	  CALL PDA_QSAD( NUMPIX, DATA )
 
 *        call subroutine to find median for the input data
 

@@ -19,7 +19,6 @@
      :	  K, 
      :	  L, 
      :	  I, 
-     :	  IFAIL, 
      :	  XPIX, 
      :	  YPIX, 
      :	  STATUS, 
@@ -99,10 +98,7 @@
 	    END IF
 
 *          Sort the pixel values in each stack image
-	    IFAIL = 0
-
-	    CALL M01CAF( LWORK, 1, COUNTER, 'A', IFAIL)
-!	    CALL M01ANF( LWORK, 1, COUNTER, IFAIL)
+	    CALL PDA_QSAD( COUNTER, LWORK )
 
 *          call subroutine to find median for the input LWORK
 	    CALL MED3D_CALMEDSUB( COUNTER, LWORK, VALMAX, VALMIN, SUM, 

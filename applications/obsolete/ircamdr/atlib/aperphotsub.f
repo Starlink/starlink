@@ -20,7 +20,6 @@
      :	  J,
      :	  K,
      :	  STATUS,
-     :	  IFAIL,
      :	  MAXDATA
 
 	PARAMETER ( MAXDATA = 10000)
@@ -121,10 +120,8 @@
 *      Sort the pixel values in each stack image
 	IF( NPTS .GT. 0) THEN
 
-*        Set nag status variable and call nag routine for sorting
-	  IFAIL = 0
-	  CALL M01CAF( DATARR, 1, NPTS, 'A', IFAIL)
- 
+	  CALL PDA_QSAD( NPTS, DATARR )
+
 *        Call subroutine to find median for the input DATARR
 	  CALL MED3D_CALMEDSUB( NPTS, DATARR, VALMAX, VALMIN, SUM, MEAN, 
      :	                        MEDIAN, MODE)
