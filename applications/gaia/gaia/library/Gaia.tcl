@@ -68,6 +68,8 @@
 #        configuration file).
 #     12-MAY-2000 (PWD):
 #        Added positions toolbox.
+#     18-JUL-2000 (PWD):
+#        Added XY profiles toolbox.
 #     {enter_changes_here}
 
 #-
@@ -857,15 +859,13 @@ itcl::class gaia::Gaia {
    public method make_xyprofile_ {name cloned rect_id x0 y0 x1 y1} {
       itk_component add $name {
          GaiaXYProfile $w_.\#auto \
-            -image $image_ \
             -rtdimage [$image_ get_image] \
             -canvasdraw [$image_ component draw] \
             -canvas [$image_ get_canvas] \
             -transient 1 \
             -number $clone_ \
             -clone_cmd [code $this make_toolbox xyprofile 1] \
-            -rect_id $rect_id \
-            -really_die $cloned
+            -rect_id $rect_id
       }
    }
 

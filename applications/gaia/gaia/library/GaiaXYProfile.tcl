@@ -6,18 +6,17 @@
 #     [incr Tcl] class
 
 #  Purpose:
-#     Display total profiles of data in the X and Y directions of a
+#     Display mean profile of data in the X and Y directions of a
 #     rectangular region of an image.
 
 #  Description:
-#     This class creates a toolbox that displays the cumilative
+#     This class creates a toolbox that displays the average
 #     profiles of all the data in the X and Y directions of a
 #     rectangular region on the image. The region is displayed as a
-#     rectangle that can be dragged around the image. The profiles are
-#     updated when the rectangle is dragged around the image.
-#
-#     When creating an instance of this class you must supply a canvas
-#     rectangle object (rect_id).
+#     rectangle that can be dragged around the image The profiles are
+#     updated when the rectangle is dragged around the image. When
+#     creating an instance of this class you must supply a CanvasDraw
+#     rectangle (option -rect_id).
 
 #  Invocations:
 #
@@ -35,12 +34,8 @@
 #
 #     Performs the given method on this object.
 
-#  Configuration options:
-
-#  Methods:
-
 #  Inheritance:
-#     This object inherits no other classes.
+#     util::TopLevelWidget
 
 #  Authors:
 #     PWD: Peter Draper (STARLINK - Durham University)
@@ -74,7 +69,7 @@ itcl::class gaia::GaiaXYProfile {
       eval itk_initialize $args
 
       #  Set the top-level window title.
-      wm title $w_ "GAIA: X and Y profile ($itk_option(-number))"
+      wm title $w_ "GAIA: X-Y mean profiles ($itk_option(-number))"
 
       #  Add the File menu
       add_menubar
@@ -131,8 +126,10 @@ itcl::class gaia::GaiaXYProfile {
    destructor  {
 
       #  Remove BLT vectors.
-      blt::vector destroy $xxVector_ $xiVector_ $xdVector_
-      blt::vector destroy $yyVector_ $yiVector_ $ydVector_
+      catch {
+         blt::vector destroy $xxVector_ $xiVector_ $xdVector_
+         blt::vector destroy $yyVector_ $yiVector_ $ydVector_
+      }
 
       #  Remove rectangle.
       catch {
@@ -144,7 +141,7 @@ itcl::class gaia::GaiaXYProfile {
    #  Methods:
    #  --------
 
-   #  Close the window.
+   #  Close the window. Always destroy.
    public method close {} {
       destroy $w_
    }
@@ -273,7 +270,9 @@ itcl::class gaia::GaiaXYProfile {
          [code $this notify_cmd] $itk_option(-continuous_updates)
    }
 
-   #  Deal with notification that rectangle has changed position.
+   #  Deal with notification that rectangle has changed position. If
+   #  the operation is "delete" (i.e. the rectangle has been removed)
+   #  then the whole toolbox is deleted.
    public method notify_cmd {{op update}} {
       if { "$op" == "delete" } {
          destroy $w_
@@ -294,20 +293,24 @@ itcl::class gaia::GaiaXYProfile {
       return 0
    }
 
-   #  Display the X and Y position.
+   #  Display the original X or Y position and the data value,
+   #  depending on which graph were moving around in.
    method dispXY {w x y} {
+
+      #  Update crosshair position.
+      $w crosshairs configure -position @$x,$y
+      
+      #  Find the closest position and hence the current data value.
+      #  If off the graph then do nothing.
+      set ret 0
+      if { ![$w element closest $x $y "" -interpolate 1 -halo 10000]} {
+         return
+      }
+      lassign [$w invtransform $x $y] index value
+      set index [expr int(round($index))]
+
+      #  Update the values according to which is the current graph.
       if { $w == $xgraph_ } {
-
-         #  Update crosshair position.
-         $xgraph_ crosshairs configure -position @$x,$y
-
-         #  Now update the readout.
-         set ret 0
-         if { ![$xgraph_ element closest $x $y "" -interpolate 1 -halo 10000]} {
-            return
-         }
-         lassign [$xgraph_ invtransform $x $y] index value
-         set index [expr int(round($index))]
          if {$index < 0 || $index >= $numXValues_} {
             return
          }
@@ -318,17 +321,6 @@ itcl::class gaia::GaiaXYProfile {
             $itk_component(value) config -text "Data: $y"
          }
       } else {
-
-         #  Update crosshair position.
-         $ygraph_ crosshairs configure -position @$x,$y
-
-         #  Now update the readout.
-         set ret 0
-         if { ![$ygraph_ element closest $x $y "" -interpolate 1 -halo 10000]} {
-            return
-         }
-         lassign [$ygraph_ invtransform $x $y] index value
-         set index [expr int(round($index))]
          if {$index < 0 || $index >= $numYValues_} {
             return
          }
@@ -352,10 +344,7 @@ itcl::class gaia::GaiaXYProfile {
       }
       add_short_help $itk_component(print) \
          {Print mean profiles to a printer or disk file}
-      #itk_component add save {
-      #   button $itk_component(bframe).save -text "Save as..." \
-      #      -command [code $this save_as]
-      #}
+
       itk_component add close {
          button $itk_component(bframe).close -text "Close" \
             -command [code $this close]
@@ -368,7 +357,8 @@ itcl::class gaia::GaiaXYProfile {
       pack $itk_component(bframe) -side bottom -fill x
    }
 
-   #  Make a postscript copy of the profiles.
+   #  Make a postscript copy of the profiles. This puts each profile
+   #  on a separate page.
    public method print {} {
       utilReUseWidget gaia::MultiGraphPrint $w_.print \
          -graphs [list $xgraph_ $ygraph_]
@@ -382,17 +372,11 @@ itcl::class gaia::GaiaXYProfile {
    #  Name of rtdimage widget.
    itk_option define -rtdimage rtdimage RtdImage {} {}
 
-   #  Name of RtdImageCtrl widget or a derived class.
-   itk_option define -image image Image {} {}
-
    #  Name of CanvasDraw widget.
    itk_option define -canvasdraw canvasdraw CanvasDraw {} {}
 
    #  Command to execute to create a new instance of this object.
    itk_option define -clone_cmd clone_cmd Clone_Cmd {}
-
-   #  If this is a clone, then it should die rather than be withdrawn.
-   itk_option define -really_die really_die Really_Die 0
 
    #  Canvas identifier of rectangle.
    itk_option define -rect_id rect_id Rect_Id {}

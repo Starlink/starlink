@@ -585,9 +585,7 @@ itcl::class gaia::GaiaApPhotom {
          } else {
             set skymag_ 0
          }
-         #set image [$itk_option(-rtdimage) cget -file]
          set image [$itk_option(-rtdimage) fullname]
-         puts "image = $image"
          if { $image != "" } {
 	    $namer_ configure -imagename $image
 	    set image [$namer_ ndfname]

@@ -504,7 +504,6 @@ itcl::class gaia::GaiaArd {
             #  And ARDSTAT on the image and file.
             blt::busy hold $w_
             update idletasks
-            puts "image = $image"
             $ardstat_ runwiths \
                "in=$image simple=f oneline=t region=^${tmpfile_}"
 

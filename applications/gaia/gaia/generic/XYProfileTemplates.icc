@@ -1,14 +1,29 @@
 //+
 //  Define members of XYProfile.C that are data type dependent.
 //
-//  The types used by these overloaded members is controlled by the macro
-//  "DATA_TYPE".
+//  The data type used by these overloaded members is controlled by
+//  the macro "DATA_TYPE". Define this and #include this file as many
+//  times as required for the data types that you want to support.
 //
 //-
 
 //
-//   Detect and draw a single contour. Returns the number of pixel
-//   used in the contour. Use unswapped data.
+//   Extract the X and Y profiles from a sub region of image data. 
+//   Native format image data version.
+//
+//   Arguments:
+//      image = pointer to the image data.
+//      nx, ny = size of image data.
+//      bscale, bzero = image data scale and zero point (FITS only).
+//      x0, y0, x1, y1 = array indices of region to process.
+//      xCoords = list of image coordinates of valid columns.
+//      xVector = pairs of values recording the index and mean value
+//                of each valid column (index starts from 0 == x0).
+//      yCoords = list of image coordinates of valid rows.
+//      yVector = pairs of values recording the index and mean value
+//                of each valid row (index starts from 0 == y0).
+//      numValues[2] = number of valid columns and rows.
+
 //
 void XYProfile::extractNativeImage( const DATA_TYPE *image, const int nx,
                                     const int ny, const double bscale,
@@ -96,8 +111,11 @@ void XYProfile::extractNativeImage( const DATA_TYPE *image, const int nx,
 }
 
 //
-//   Detect and draw a single contour. Returns the number of pixel
-//   used in the contour. Use swapped data.
+//   Extract the X and Y profiles from a sub region of image data. 
+//   Byte swapped image data version.
+//
+//   Arguments:
+//      as above.
 //
 void XYProfile::extractSwapImage( const DATA_TYPE *image, const int nx,
                                   const int ny, const double bscale,

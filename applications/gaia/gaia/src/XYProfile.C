@@ -58,7 +58,7 @@ XYProfile::~XYProfile()
 }
 
 //
-//   Set the limits of the region to be profiled.
+//   Set the limits of the region to be profiled (pixel indices).
 //
 void XYProfile::setRegion( const int x0, const int y0,
                            const int x1, const int y1 )
@@ -81,9 +81,20 @@ void XYProfile::getRegion( int& x0, int& y0, int& x1, int& y1 )
 }
 
 //
-//  Create the profiles. X and Y profile indices and data values are
-//  returned in packed vectors. The number of values entered into the
-//  vectors is the result.
+//  Create the profiles. 
+//
+//  The results are:
+// 
+//     xCoords and yCoords contain the original X and Y pixel indices
+//     of the profile positions (these can be used to refer back to
+//     the image coordinates).
+//
+//     xVector and yVector contain pairs of values. The first value is 
+//     the array index (along X or Y) and the second value the mean
+//     data values along that row or column.
+//
+//     numValues[2] contains the number of valid (i.e. non-BAD) values 
+//     that are returned in xVector and yVector.
 //
 void XYProfile::extractProfiles( double *xCoords, double *xVector,
                                  double *yCoords, double *yVector,  
@@ -180,7 +191,7 @@ void XYProfile::extractProfiles( double *xCoords, double *xVector,
 }
 
 //  Define members that are data type dependent. See
-//  XYProfileTemplates.C for which ones.
+//  XYProfileTemplates.C for which ones. 
 
 #define DATA_TYPE char
 #include "XYProfileTemplates.C"

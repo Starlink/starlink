@@ -3,11 +3,11 @@
 		  =====================
 
 This window displays the mean X and Y profiles of the image data
-bounded by the rectangle that you have drawn on the image. 
+bounded by the rectangle that you have drawn on the image.
 
-The only interesting options are the ability to stop the profiles from 
+The only interesting options are the ability to stop the profiles from
 being constantly updated when you move the rectangle, which is the
-"continuous updates" item in the "Options" menu (when this is switched 
+"continuous updates" item in the "Options" menu (when this is switched
 off the profiles are only updated when you release the rectangle) and
 the ability to change the amount of display surface used for the two
 profiles. The later being done by selecting the little square on the

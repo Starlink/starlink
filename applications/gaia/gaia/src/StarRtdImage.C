@@ -909,77 +909,65 @@ int StarRtdImage::configureImage(int argc, char* argv[], int flags)
 int StarRtdImage::foreignCmd( int argc, char *argv[] )
 {
 #ifdef _DEBUG_
-   cout << "Called StarRtdImage::foreignCmd" << endl;
+    cout << "Called StarRtdImage::foreignCmd" << endl;
 #endif
-
-   // Stop if no image loaded.
-   if ( !image_ ) {
-      return TCL_OK;
-   }
-
-   // Check number of arguments.
-   if ( argc != 2 ) {
-      set_result( "number of arguments wrong, require 2: command qualifiers" );
-      return TCL_ERROR;
-   }
-
-   // Now check for its existence and invoke it.
-  for ( unsigned int i = 0; i < sizeof( foreigncmds_ ) / sizeof( *foreigncmds_)
-           ; i++ ) {
-     StarRtdForeignCmds *t = &foreigncmds_[i];
-    if ( strcmp( t->name, argv[0] ) == 0 ) {
-
-       //  Matched a command so construct the image information and
-       //  invoke it.
-       StarImageInfo *info = new StarImageInfo;
-       ImageIO imio = image_->image();
-       ImageIO *imptr = &imio;
-
-       //  Look for NDF identifier.
-       char *id = imio.get( "NDFID" );
-       if ( id ) {
-          info->NDFid = atoi( id );
-       } else {
-          info->NDFid = 0;
-       }
-       info->imageData = (void *) imio.dataPtr();
-       info->type = (ImageDataType) image_->dataType();
-       info->nx = (int) image_->width();
-       info->ny = (int) image_->height();
-       info->interp = interp_;
-
-       //  If the image representation is byte swapped (i.e. FITS on
-       //  some architectures) then inform foreign method that it
-       //  needs to deal with this.
-       if ( imptr->nativeByteOrder() ) {
-          info->swap = 0;
-       } else {
-          int dsize = abs( imptr->bitpix() ) / 8;
-          FITS_LONG l = 1;
-          if ( (FITS_LONG) ntohl( l ) == l || dsize == 1 ) {
-             info->swap = 0;
-          } else {
-             info->swap = 1;
-          }
-       }
-
-       //  Invoke foreign command.
-       char *errStr;
-       int result = ( *t->fptr )( info, argv[1], &errStr );
-       delete info;
-       if ( result ) {
-          updateImage();
-          return TCL_OK;
-       } else {
-          set_result( errStr );
-          free( (void *) errStr );
-          return TCL_ERROR;
-       }
+    
+    // Stop if no image loaded.
+    if ( !image_ ) {
+        return TCL_OK;
     }
-  }
-
-  // Foreign command not found.
-  return error( "unknown foreign command");
+    
+    // Check number of arguments.
+    if ( argc != 2 ) {
+        set_result( "number of arguments wrong, require 2: command qualifiers" );
+        return TCL_ERROR;
+    }
+    
+    // Now check for its existence and invoke it.
+    for ( int i = 0; i < sizeof( foreigncmds_ ) / sizeof( *foreigncmds_); i++ ) {
+        StarRtdForeignCmds *t = &foreigncmds_[i];
+        if ( strcmp( t->name, argv[0] ) == 0 ) {
+            
+            //  Matched a command so construct the necessary image
+            //  information structure and invoke the command.
+            StarImageInfo *info = new StarImageInfo;
+            ImageIO imio = image_->image();
+            
+            //  Look for NDF identifier.
+            char *id = imio.get( "NDFID" );
+            if ( id ) {
+                info->NDFid = atoi( id );
+            } else {
+                info->NDFid = 0;
+            }
+            info->imageData = (void *) imio.dataPtr();
+            info->type = (ImageDataType) image_->dataType();
+            info->nx = (int) image_->width();
+            info->ny = (int) image_->height();
+            info->interp = interp_;
+            
+            //  If the image representation is byte swapped (i.e. FITS on
+            //  some architectures) then inform foreign method that it
+            //  needs to deal with this.
+            info->swap = swapNeeded();
+            
+            //  Invoke foreign command.
+            char *errStr;
+            int result = ( *t->fptr )( info, argv[1], &errStr );
+            delete info;
+            if ( result ) {
+                updateImage();
+                return TCL_OK;
+            } else {
+                set_result( errStr );
+                free( (void *) errStr );
+                return TCL_ERROR;
+            }
+        }
+    }
+    
+    // Foreign command not found.
+    return error( "unknown foreign command");
 }
 //+
 //   StarRtdImage::originCmd
@@ -3344,267 +3332,254 @@ int StarRtdImage::get_compass(double x, double y, const char* xy_units,
 int StarRtdImage::contourCmd( int argc, char *argv[] )
 {
 #ifdef _DEBUG_
-  cout << "Called StarRtdImage::contourCmd" << endl;
+    cout << "Called StarRtdImage::contourCmd" << endl;
 #endif
-
-  int inerror = 0;
-  if ( !image_ ) {
-    return error("no image loaded");
-  }
-
-  // Do the initial split of the input lists.
-  char **levelsArgv;
-  int nlevels = 0;
-  double *levels;
-  if ( argc > 6 || argc == 0 ) {
-    error( "wrong # args: contour levels [rtdimage] [careful] [smooth] [options_list] [canvas_area]" );
-    inerror = 1;
-  } else {
-    if ( Tcl_SplitList( interp_, argv[0], &nlevels, &levelsArgv ) != TCL_OK ) {
-      error( "sorry: failed to decode the contour levels (check format)" );
-      inerror = 1;
+    
+    int inerror = 0;
+    if ( !image_ ) {
+        return error("no image loaded");
     }
-
-    //  Convert these into doubles.
-    levels = new double[nlevels];
-    for ( int index = 0; index < nlevels; index++ ) {
-      if ( Tcl_GetDouble( interp_, levelsArgv[index],
-                          &levels[index] ) != TCL_OK ) {
-        error( levelsArgv[index], "is not a valid number");
+    
+    // Do the initial split of the input lists.
+    char **levelsArgv;
+    int nlevels = 0;
+    double *levels;
+    if ( argc > 6 || argc == 0 ) {
+        error( "wrong # args: contour levels [rtdimage] [careful] [smooth] [options_list] [canvas_area]" );
         inerror = 1;
-        break;
-      }
-    }
-  }
-
-  //  Get the rtdimage that contains the image we want to contour
-  //  really.
-  StarRtdImage *rtdimage = (StarRtdImage *) NULL;
-  if ( argc >= 2 ) {
-    if ( *argv[1] != '\0' ) {
-      rtdimage = (StarRtdImage *) getView( argv[1] );
-      if ( rtdimage == (StarRtdImage *) NULL ) {
-        more_error( "; cannot find the contour image -- is it still displayed?" );
-        inerror = 1;
-      }
-    }
-  }
-
-  //  Get whether plotting is careful, or fast.
-  int careful = 1;
-  if ( argc >= 3 ) {
-    if ( Tcl_GetBoolean(interp_, argv[2], &careful)  != TCL_OK ) {
-      error( "sorry: failed to decode careful preference" );
-      inerror = 1;
-    }
-  }
-
-  //  Get whether using smooth polylines (must be fast).
-  int smooth = 0;
-  if ( argc >= 4 ) {
-    if ( Tcl_GetBoolean(interp_, argv[3], &smooth)  != TCL_OK ) {
-      error( "sorry: failed to decode smooth preference" );
-      inerror = 1;
-    }
-  }
-
-  //  Get the preferences, if given
-  char **prefs;
-  int nprefs = 0;
-  if ( argc >= 5 ) {
-    if ( Tcl_SplitList( interp_, argv[4], &nprefs, &prefs ) != TCL_OK ) {
-      error( "sorry: failed to decode line attributes" );
-      nprefs = 0;
-      inerror = 1;
-    }
-  }
-
-  //  Get the region coordinates. Note just use Contour native
-  //  facilities for this, not the plot (this is potentially much
-  //  more efficient). These may be given as "" in which case they are
-  //  ignored.
-  char **coordArgv;
-  int ncoords = 0;
-  double region[4];
-  if ( argc == 6 ) {
-    if ( *argv[5] != '\0' ) {
-      if ( Tcl_SplitList( interp_, argv[5], &ncoords, &coordArgv ) != TCL_OK ) {
-        error( "sorry: failed to decode region of image to contour" );
-        ncoords = 0;
-        inerror = 1;
-      } else {
-        if ( ncoords != 4 ) {
-          error( "wrong # of args, should be 4 canvas coordinates"
-                 " for contouring region " );
-          inerror = 1;
-        } else {
-          for ( int index = 0; index < ncoords; index++ ) {
-            if ( Tcl_GetDouble(interp_, coordArgv[index],
-                               &region[index] ) != TCL_OK ) {
-              error( coordArgv[index], "is not a valid number");
-              inerror = 1;
-              break;
-            }
-          }
-
-          //  Transform these positions into image coordinates.
-          canvasToImageCoords( region[0], region[1], 0 );
-          canvasToImageCoords( region[2], region[3], 0 );
-
-          //  Correct for any flips etc. by re-picking the bounds.
-          double temp[4];
-          temp[0] = region[0];
-          temp[1] = region[1];
-          temp[2] = region[2];
-          temp[3] = region[3];
-          region[0] = min( temp[0], temp[2] );
-          region[2] = max( temp[0], temp[2] );
-          region[1] = min( temp[1], temp[3] );
-          region[3] = max( temp[1], temp[3] );
+    } else {
+        if ( Tcl_SplitList( interp_, argv[0], &nlevels, &levelsArgv ) != TCL_OK ) {
+            error( "sorry: failed to decode the contour levels (check format)" );
+            inerror = 1;
         }
-      }
+        
+        //  Convert these into doubles.
+        levels = new double[nlevels];
+        for ( int index = 0; index < nlevels; index++ ) {
+            if ( Tcl_GetDouble( interp_, levelsArgv[index],
+                                &levels[index] ) != TCL_OK ) {
+                error( levelsArgv[index], "is not a valid number");
+                inerror = 1;
+                break;
+            }
+        }
     }
-  }
-
-  //  Now see if a copy of the current WCS frameset is available (we
-  //  use a copy so we can  modify without changing any other elements).
-  StarWCS* wcsp = getStarWCSPtr();
-  if ( ! wcsp ) {
-    return TCL_ERROR;
-  }
-  AstFrameSet *wcs = wcsp->astWCSCopy();
-  if ( wcs == (AstFrameSet *) NULL ) {
-
-    //  If no WCS is available then we need to create a suitable AST
-    //  frameset. This just maps GRID coordinates to themselves, or to
-    //  pixel coordinates.
-    wcs = makeGridWCS();
-  }
-
-  //  See if another image is to be used for contouring. If so then
-  //  this is related to the image displayed by some AST based
-  //  transformation (which may be pixel coordinates or a sky-based
-  //  system). This is also the image we want to contour, so get its
-  //  ImageIO object.
-  ImageIO imageIO = image_->image();
-  AstFrameSet *farwcs = NULL;
-  if ( rtdimage != (StarRtdImage *) NULL ) {
-
-    //  OK, attempt to locate a WCS for this image.
-    ImageData *farimagedata = rtdimage->image();
-    imageIO = farimagedata->image();
-    StarWCS* wcsp = getStarWCSPtr( farimagedata );
+    
+    //  Get the rtdimage that contains the image we want to contour
+    //  really.
+    StarRtdImage *rtdimage = (StarRtdImage *) NULL;
+    if ( argc >= 2 ) {
+        if ( *argv[1] != '\0' ) {
+            rtdimage = (StarRtdImage *) getView( argv[1] );
+            if ( rtdimage == (StarRtdImage *) NULL ) {
+                more_error( "; cannot find the contour image -- is it still displayed?" );
+                inerror = 1;
+            }
+        }
+    }
+    
+    //  Get whether plotting is careful, or fast.
+    int careful = 1;
+    if ( argc >= 3 ) {
+        if ( Tcl_GetBoolean(interp_, argv[2], &careful)  != TCL_OK ) {
+            error( "sorry: failed to decode careful preference" );
+            inerror = 1;
+        }
+    }
+    
+    //  Get whether using smooth polylines (must be fast).
+    int smooth = 0;
+    if ( argc >= 4 ) {
+        if ( Tcl_GetBoolean(interp_, argv[3], &smooth)  != TCL_OK ) {
+            error( "sorry: failed to decode smooth preference" );
+            inerror = 1;
+        }
+    }
+    
+    //  Get the preferences, if given
+    char **prefs;
+    int nprefs = 0;
+    if ( argc >= 5 ) {
+        if ( Tcl_SplitList( interp_, argv[4], &nprefs, &prefs ) != TCL_OK ) {
+            error( "sorry: failed to decode line attributes" );
+            nprefs = 0;
+            inerror = 1;
+        }
+    }
+    
+    //  Get the region coordinates. Note just use Contour native
+    //  facilities for this, not the plot (this is potentially much
+    //  more efficient). These may be given as "" in which case they are
+    //  ignored.
+    char **coordArgv;
+    int ncoords = 0;
+    double region[4];
+    if ( argc == 6 ) {
+        if ( *argv[5] != '\0' ) {
+            if ( Tcl_SplitList( interp_, argv[5], &ncoords, &coordArgv ) != TCL_OK ) {
+                error( "sorry: failed to decode region of image to contour" );
+                ncoords = 0;
+                inerror = 1;
+            } else {
+                if ( ncoords != 4 ) {
+                    error( "wrong # of args, should be 4 canvas coordinates"
+                           " for contouring region " );
+                    inerror = 1;
+                } else {
+                    for ( int index = 0; index < ncoords; index++ ) {
+                        if ( Tcl_GetDouble(interp_, coordArgv[index],
+                                           &region[index] ) != TCL_OK ) {
+                            error( coordArgv[index], "is not a valid number");
+                            inerror = 1;
+                            break;
+                        }
+                    }
+                    
+                    //  Transform these positions into image coordinates.
+                    canvasToImageCoords( region[0], region[1], 0 );
+                    canvasToImageCoords( region[2], region[3], 0 );
+                    
+                    //  Correct for any flips etc. by re-picking the bounds.
+                    double temp[4];
+                    temp[0] = region[0];
+                    temp[1] = region[1];
+                    temp[2] = region[2];
+                    temp[3] = region[3];
+                    region[0] = min( temp[0], temp[2] );
+                    region[2] = max( temp[0], temp[2] );
+                    region[1] = min( temp[1], temp[3] );
+                    region[3] = max( temp[1], temp[3] );
+                }
+            }
+        }
+    }
+    
+    //  Now see if a copy of the current WCS frameset is available (we
+    //  use a copy so we can  modify without changing any other elements).
+    StarWCS* wcsp = getStarWCSPtr();
     if ( ! wcsp ) {
-      return TCL_ERROR;
+        return TCL_ERROR;
     }
-    farwcs = wcsp->astWCSCopy();
-    if ( farwcs == (AstFrameSet *) NULL ) {
-
-      //  If no WCS is available then we need to create a suitable AST
-      //  frameset. This just maps GRID coordinates to themselves, or to
-      //  pixel coordinates.
-      farwcs = rtdimage->makeGridWCS();
+    AstFrameSet *wcs = wcsp->astWCSCopy();
+    if ( wcs == (AstFrameSet *) NULL ) {
+        
+        //  If no WCS is available then we need to create a suitable AST
+        //  frameset. This just maps GRID coordinates to themselves, or to
+        //  pixel coordinates.
+        wcs = makeGridWCS();
     }
-  }
-  if ( ! inerror && wcs != (AstFrameSet *) NULL ) {
-
-    //  Current frame is the GRID coordinates of the image to be
-    //  contoured.
-    astSetI( wcs, "Current", AST__BASE );
-
-    //  Create an AstPlot that incorporates an additional FrameSet
-    //  that describes an system we want to add.
-    AstPlot *plot = createPlot( wcs, (AstFrameSet *) farwcs, 1, 1, region );
-    inerror = ( inerror || plot == (AstPlot *) NULL );
-
-    //  Initialise the interpreter and canvas name for the Tk plotting
-    //  routines.
-    astTk_Init( interp_, canvasName_ );
-
-    //  We want to draw polylines, not line segments. Polylines may be
-    //  smooth.
-    astTk_LineType( 0, smooth );
-
-    //  Define a tag for all items created in the plot.
-    astTk_Tag( ast_tag() );
-
-    if ( astOK && !inerror ) {
-
-      //  Create a contour object, setting the contour levels, and
-      //  line attributes.
-      Contour contour( imageIO, plot, levels, nlevels,
-                       (const char **) prefs, nprefs );
-
-      //  Establish if plotting is careful or fast.
-      contour.setCareful( careful );
-
-      //  Tell the contour object if it needs to byte swap the image
-      //  data. This is only necessary if the image is FITS on a non
-      //  bigendian machine.
-      ImageIO *imptr = &imageIO;
-      int swap = 0;
-      if ( imptr->nativeByteOrder() ) {
-         swap = 0;
-      } else {
-         int dsize = abs( imptr->bitpix() ) / 8;
-         FITS_LONG l = 1;
-         if ( (FITS_LONG)ntohl( l ) == l || dsize == 1 ) {
-            swap = 0;
-         } else {
-            swap = 1;
-         }
-      }
-      contour.setSwap( swap );
-
-      //  Set the region of image to contour (tuned to match grid plots).
-      if ( ncoords > 0 ) {
-        contour.setRegion( (int)(region[0] + 1), (int)(region[1] + 1),
-                           (int)(region[2] - region[0] + 1 ),
-                           (int)(region[3] - region[1] + 1 ) );
-      }
-
-      //  Draw the contour. Only result in drawn or not.
-      int ndrawn = contour.drawContours();
-      set_result( ndrawn );
+    
+    //  See if another image is to be used for contouring. If so then
+    //  this is related to the image displayed by some AST based
+    //  transformation (which may be pixel coordinates or a sky-based
+    //  system). This is also the image we want to contour, so get its
+    //  ImageIO object.
+    ImageIO imageIO = image_->image();
+    AstFrameSet *farwcs = NULL;
+    if ( rtdimage != (StarRtdImage *) NULL ) {
+        
+        //  OK, attempt to locate a WCS for this image.
+        ImageData *farimagedata = rtdimage->image();
+        imageIO = farimagedata->image();
+        StarWCS* wcsp = getStarWCSPtr( farimagedata );
+        if ( ! wcsp ) {
+            return TCL_ERROR;
+        }
+        farwcs = wcsp->astWCSCopy();
+        if ( farwcs == (AstFrameSet *) NULL ) {
+            
+            //  If no WCS is available then we need to create a suitable AST
+            //  frameset. This just maps GRID coordinates to themselves, or to
+            //  pixel coordinates.
+            farwcs = rtdimage->makeGridWCS();
+        }
     }
-
-    //  Free the plot.
-    plot = (AstPlot *) astAnnul( plot );
-
-    //  Reset the tag associated with AST grid items.
-    astTk_Tag( NULL );
-
-    //  Switch line type back to default.
-    astTk_LineType( 1, 0 );
-  }
-
-  //  Free the lists.
-  if ( ncoords > 0 ) {
-    Tcl_Free( (char *) coordArgv );
-  }
-  if ( nprefs > 0 ) {
-    Tcl_Free( (char *) prefs );
-  }
-  if ( nlevels > 0 ) {
-    Tcl_Free( (char *) levelsArgv );
-  }
-
-  //  Free the WCS copy.
-  wcs = (AstFrameSet *) astAnnul( wcs );
-
-  //  Free the contours.
-  if ( nlevels > 0 ) {
-    delete [] levels;
-  }
-
-  //  Tidy up.
-  if ( inerror || ! astOK ) {
-    if ( !astOK ) {
-      astClearStatus;
+    if ( ! inerror && wcs != (AstFrameSet *) NULL ) {
+        
+        //  Current frame is the GRID coordinates of the image to be
+        //  contoured.
+        astSetI( wcs, "Current", AST__BASE );
+        
+        //  Create an AstPlot that incorporates an additional FrameSet
+        //  that describes an system we want to add.
+        AstPlot *plot = createPlot( wcs, (AstFrameSet *) farwcs, 1, 1, region );
+        inerror = ( inerror || plot == (AstPlot *) NULL );
+        
+        //  Initialise the interpreter and canvas name for the Tk plotting
+        //  routines.
+        astTk_Init( interp_, canvasName_ );
+        
+        //  We want to draw polylines, not line segments. Polylines may be
+        //  smooth.
+        astTk_LineType( 0, smooth );
+        
+        //  Define a tag for all items created in the plot.
+        astTk_Tag( ast_tag() );
+        
+        if ( astOK && !inerror ) {
+            
+            //  Create a contour object, setting the contour levels, and
+            //  line attributes.
+            Contour contour( imageIO, plot, levels, nlevels,
+                             (const char **) prefs, nprefs );
+            
+            //  Establish if plotting is careful or fast.
+            contour.setCareful( careful );
+            
+            //  Tell the contour object if it needs to byte swap the image
+            //  data. This is only necessary if the image is FITS on a non
+            //  bigendian machine.
+            contour.setSwap( swapNeeded() );
+            
+            //  Set the region of image to contour (tuned to match grid plots).
+            if ( ncoords > 0 ) {
+                contour.setRegion( (int)(region[0] + 1), (int)(region[1] + 1),
+                                   (int)(region[2] - region[0] + 1 ),
+                                   (int)(region[3] - region[1] + 1 ) );
+            }
+            
+            //  Draw the contour. Only result in drawn or not.
+            int ndrawn = contour.drawContours();
+            set_result( ndrawn );
+        }
+        
+        //  Free the plot.
+        plot = (AstPlot *) astAnnul( plot );
+        
+        //  Reset the tag associated with AST grid items.
+        astTk_Tag( NULL );
+        
+        //  Switch line type back to default.
+        astTk_LineType( 1, 0 );
     }
-    return TCL_ERROR;
-  }
-  return TCL_OK;
+    
+    //  Free the lists.
+    if ( ncoords > 0 ) {
+        Tcl_Free( (char *) coordArgv );
+    }
+    if ( nprefs > 0 ) {
+        Tcl_Free( (char *) prefs );
+    }
+    if ( nlevels > 0 ) {
+        Tcl_Free( (char *) levelsArgv );
+    }
+    
+    //  Free the WCS copy.
+    wcs = (AstFrameSet *) astAnnul( wcs );
+    
+    //  Free the contours.
+    if ( nlevels > 0 ) {
+        delete [] levels;
+    }
+    
+    //  Tidy up.
+    if ( inerror || ! astOK ) {
+        if ( !astOK ) {
+            astClearStatus;
+        }
+        return TCL_ERROR;
+    }
+    return TCL_OK;
 }
 
 //+
@@ -5223,8 +5198,8 @@ int StarRtdImage::astwarningsCmd( int argc, char *argv[] )
 //   StarRtdImage::xyProfileCmd
 //
 //   Purpose:
-//      Creates BLT vectors that contain the average values along the
-//      X and Y directions of a rectangular region of the displayed
+//      Updates BLT vectors to contain the average values along the
+//      X and Y directions of a rectangular region of the current
 //      image. Essentially the X and Y profile equivalent of the
 //      interactive "slice" command.
 //
@@ -5256,7 +5231,6 @@ int StarRtdImage::astwarningsCmd( int argc, char *argv[] )
 //
 //      yyVector   (returned) name of a BLT vector to receive the Y
 //                 profile data values.
-//
 //
 //   Return:
 //      A list of two values, the number of positions written to the X 
@@ -5301,20 +5275,7 @@ int StarRtdImage::xyProfileCmd(int argc, char *argv[])
    //  Tell the profile object if it needs to byte swap the image
    //  data. This is only necessary if the image is FITS on a non
    //  bigendian machine.
-   ImageIO *imptr = &imageIO;
-   int swap = 0;
-   if ( imptr->nativeByteOrder() ) {
-       swap = 0;
-   } else {
-       int dsize = abs( imptr->bitpix() ) / 8;
-       FITS_LONG l = 1;
-       if ( (FITS_LONG)ntohl( l ) == l || dsize == 1 ) {
-           swap = 0;
-       } else {
-           swap = 1;
-       }
-   }
-   xyProfile.setSwap( swap );
+   xyProfile.setSwap( swapNeeded() );
 
    //  Set the region of image to extract the profiles from.
    xyProfile.setRegion( x0, y0, x1, y1 );
@@ -5365,6 +5326,13 @@ int StarRtdImage::xyProfileCmd(int argc, char *argv[])
 //
 //  Purpose:
 //     Reset data of a BLT vector to new values.
+//
+//  Arguments:
+//     num = number of values in new vector data.
+//
+//     valueArr = pointer to new vector data.
+//
+//     vecName = name of BLT vector to modify.
 //-
 int StarRtdImage::resetBltVector( const int num, const double *valueArr, 
                                   char *vecName ) 
@@ -5406,3 +5374,36 @@ int StarRtdImage::resetBltVector( const int num, const double *valueArr,
     return TCL_OK;
 }
 
+//+
+//   StarRtdImage::swapNeeded
+//
+//   Purpose:
+//      Test if the data of current image needs to be byte swapped.
+//
+//   Return:
+//      1 if swap is need, 0 otherwise.
+//-
+int StarRtdImage::swapNeeded() 
+{
+    int swap = 0;
+    ImageIO imio = image_->image();
+    ImageIO *imptr = &imio;
+
+    //  Check the ImageIO format. If this is "native" then the data is 
+    //  in the machine format already (NDF).
+    if ( imptr->nativeByteOrder() ) {
+        swap = 0;
+    } else {
+
+        //  Check byte ordering by looking at a 1, unless we have
+        //  a single byte image.
+        int dsize = abs( imptr->bitpix() ) / 8;
+        FITS_LONG l = 1;
+        if ( (FITS_LONG)ntohl( l ) == l || dsize == 1 ) {
+            swap = 0;
+        } else {
+            swap = 1;
+        }
+    }
+    return swap;
+}

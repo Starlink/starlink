@@ -338,6 +338,8 @@ class StarRtdImage : public Skycat {
    int resetBltVector( const int num, const double *valueArr,
                        char *vecName );
 
+   //  Whether associated image data is byte swapped.
+   int swapNeeded();
   private:
 
    // Copy constructor -- not defined.
