@@ -95,10 +95,6 @@
       EXTERNAL			CHR_LEN
         INTEGER			CHR_LEN
 
-*  Local Constants:
-      CHARACTER*6		TSTRING
-        PARAMETER               ( TSTRING = 'BIJEDC' )
-
 *  Local Variables:
       CHARACTER*6		ETABLE			! Extension for events
       CHARACTER*40		NAME			! Column name
@@ -109,7 +105,6 @@
 
       INTEGER			DIMS(ADI__MXDIM)	! List dimensions
       INTEGER			EVHDU			! EVENTS hdu
-      INTEGER			IC			! Character ptr
       INTEGER			ILIST			! Loop over lists
       INTEGER			L			! Use length of NAME
       INTEGER			LID			! Lists object id
@@ -117,7 +112,6 @@
       INTEGER			NDIM			! List dimensionality
       INTEGER			NEVENT			! Number of records
       INTEGER			NLIST			! Number of lists
-      INTEGER			TPOS			! Type code index
       INTEGER			UIHDU			! User HDU number
 
       LOGICAL			GOTMAX, GOTMIN		! Got extrema?
@@ -163,35 +157,12 @@
         CALL ADI2_HGKYIC( EVHDU, 'TTYPE', ILIST, NAME, STATUS )
         L = CHR_LEN(NAME)
 
-*    Read table item describing the type of the data stored
-        CALL ADI2_HGKYIC( EVHDU, 'TFORM', ILIST, TYPE, STATUS )
-
-*    Translate type string to dimensions and ADI type. The format is
-*    [<dims>]<tcode> where <dims> is some number and <tcode> is one of
-*    TSTRING
-        NDIM = 0
-        TPOS = INDEX(TSTRING,TYPE(1:1))
-        IF ( TPOS .EQ. 0 ) THEN
-          IC = 2
-          DO WHILE ( TPOS .EQ. 0 )
-            TPOS = INDEX(TSTRING,TYPE(IC:IC))
-            IF ( TPOS .EQ. 0 ) IC = IC + 1
-          END DO
-          CALL CHR_CTOI( TYPE(1:IC-1), DIMS(1), STATUS )
-          IF ( DIMS(1) .GT. 1 ) NDIM = 1
-        END IF
-        IF ( TPOS .EQ. 1 ) THEN
-          TYPE = 'BYTE'
-        ELSE IF ( TPOS .EQ. 2 ) THEN
-          TYPE = 'WORD'
-        ELSE IF ( TPOS .EQ. 3 ) THEN
-          TYPE = 'INTEGER'
-        ELSE IF ( TPOS .EQ. 4 ) THEN
-          TYPE = 'REAL'
-        ELSE IF ( TPOS .EQ. 5 ) THEN
-          TYPE = 'DOUBLE'
-        ELSE IF ( TPOS .EQ. 6 ) THEN
-          TYPE = 'CHAR'
+*    Translate type string to dimensions and ADI type
+        CALL ADI2_BTCTYP( EVHDU, ILIST, DIMS(1), TYPE, STATUS )
+        IF ( DIMS(1) .GT. 1 ) THEN
+          NDIM = 1
+        ELSE
+          NDIM = 0
         END IF
 
 *    Now the optional items

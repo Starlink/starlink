@@ -133,33 +133,42 @@
       DO WHILE ( (C1.NE.0) .AND. (STATUS.EQ.SAI__OK) )
 
 *    Check item name is valid, and make a local copy. Removes any
-*    special item names such as E_Axis_Label.
+*    special item names such as E_Axis_Label. If the item name is
+*    not valid we don't have to execute a method
         CALL BDI0_CHKITM( ID, ITEMS(C1:C2), LITEM, LITL, STATUS )
-
-*    Construct string for this item
-        CALL ADI_NEWV0C( LITEM(:LITL), ARGS(3), STATUS )
-
-*    Invoke the function
-        CALL ADI_FEXEC( 'FileItemChk', 3, ARGS, OARG, STATUS )
-
-*    Extract flag from return value
-        IF ( (STATUS .EQ. SAI__OK) .AND. (OARG.NE.ADI__NULLID) ) THEN
-          CALL ADI_GET0L( OARG, OKS(IITEM), STATUS )
-          CALL ADI_ERASE( OARG, STATUS )
-        ELSE
-          OKS(IITEM) = .FALSE.
-        END IF
-
-*    Release the item string
-        CALL ERR_BEGIN( STATUS )
-        CALL ADI_ERASE( ARGS(3), STATUS )
-        CALL ERR_END( STATUS )
-
-*    Error?
         IF ( STATUS .NE. SAI__OK ) THEN
-          CALL MSG_SETC( 'IT', ITEMS(C1:C2) )
-          CALL ERR_REP( ' ', 'Error checking presence of item /^IT/',
-     :                  STATUS )
+          CALL ERR_ANNUL( STATUS )
+          OKS(IITEM) = .FALSE.
+
+        ELSE
+
+*      Construct string for this item
+          CALL ADI_NEWV0C( LITEM(:LITL), ARGS(3), STATUS )
+
+*      Invoke the function
+          CALL ADI_FEXEC( 'FileItemChk', 3, ARGS, OARG, STATUS )
+
+*      Extract flag from return value
+          IF ( (STATUS .EQ. SAI__OK) .AND. (OARG.NE.ADI__NULLID) ) THEN
+            CALL ADI_GET0L( OARG, OKS(IITEM), STATUS )
+            CALL ADI_ERASE( OARG, STATUS )
+          ELSE
+            OKS(IITEM) = .FALSE.
+          END IF
+
+*      Release the item string
+          CALL ERR_BEGIN( STATUS )
+          CALL ADI_ERASE( ARGS(3), STATUS )
+          CALL ERR_END( STATUS )
+
+*      Error?
+          IF ( STATUS .NE. SAI__OK ) THEN
+            CALL MSG_SETC( 'IT', ITEMS(C1:C2) )
+            CALL ERR_REP( ' ', 'Error checking presence of item /^IT/',
+     :                    STATUS )
+          END IF
+
+*    End of switch on valid item
         END IF
 
 *    Advance iterator to next item

@@ -119,17 +119,17 @@
         CALL CHR_CTOI( TYPE(1:IC-1), DIMS, STATUS )
       END IF
       IF ( TPOS .EQ. 1 ) THEN
-        TYPE = 'BYTE'
+        TYP = 'BYTE'
       ELSE IF ( TPOS .EQ. 2 ) THEN
-        TYPE = 'WORD'
+        TYP = 'WORD'
       ELSE IF ( TPOS .EQ. 3 ) THEN
-        TYPE = 'INTEGER'
+        TYP = 'INTEGER'
       ELSE IF ( TPOS .EQ. 4 ) THEN
-        TYPE = 'REAL'
+        TYP = 'REAL'
       ELSE IF ( TPOS .EQ. 5 ) THEN
-        TYPE = 'DOUBLE'
+        TYP = 'DOUBLE'
       ELSE IF ( TPOS .EQ. 6 ) THEN
-        TYPE = 'CHAR'
+        TYP = 'CHAR'
       END IF
 
 *  Report any errors
