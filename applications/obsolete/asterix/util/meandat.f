@@ -1,56 +1,125 @@
-*+  MEANDAT - Averages a series of files of any dimensionality
       SUBROUTINE MEANDAT( STATUS )
-*
-*    Description :
-*
-*      Averages upto 20 datafiles using a weighted or non-weighted mean.
-*      Elements with bad quality are ignored.
-*
-*    Environment parameters :
-*
-*      NFILES       INTEGER        Number of files to average
-*      FILE1        UNIV           Name of first file
-*      FILE2        UNIV           Name of second file
-*      FILEn        UNIV           Name of nth file
-*      WEIGHT1      REAL           Weight of 1st file
-*      WEIGHTn      REAL           Weight of nth file
-*      AVERAGE      LOGICAL        Average or sum the files ?
-*
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
-*
-*      Richard Saxton  (LTVAD::RDS)
-*
-*    History :
-*
-*     12 May 90 : V1.2-1 Original (RDS)
-*     28 Feb 94 : V1.7-0 Use BIT_ routines for quality manipulation (DJA)
-*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
-*     21 Apr 95 : V1.8-1 Use new data interface (DJA)
-*
-*    Type definitions :
-*
-      IMPLICIT NONE
-*
-*    Global constants :
-*
-      INCLUDE 'SAE_PAR'
+*+
+*  Name:
+*     MEANDAT
+
+*  Purpose:
+*     Averages a series of files of any dimensionality
+
+*  Language:
+*     Starlink Fortran
+
+*  Type of Module:
+*     ASTERIX task
+
+*  Invocation:
+*     CALL MEANDAT( STATUS )
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Description:
+*     Averages upto 20 datafiles using a weighted or non-weighted mean.
+*     Elements with bad quality are ignored.
+
+*  Usage:
+*     meandat {parameter_usage}
+
+*  Environment Parameters:
+*     NFILES = INTEGER (read)
+*        Number of files to average
+*     INP<n> = CHAR (read)
+*        Name of the <n>th input file
+*     WEIGHT<n> = REAL (read)
+*        Weight of the <n>th file
+*     AVERAGE = LOGICAL (read)
+*        Average or sum the files ?
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
+*     {algorithm_description}...
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  Implementation Status:
+*     {routine_implementation_status}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
+*     {routine_deficiencies}...
+
+*  References:
+*     {task_references}...
+
+*  Keywords:
+*     meandat, usage:public
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1995
+
+*  Authors:
+*     RDS: Richard Saxton (Starlink,University of Leicester)
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*     12 May 1990 V1.2-1 (RDS):
+*        Original version.
+*     28 Feb 1994 V1.7-0 (DJA):
+*        Use BIT_ routines for quality manipulation
+*     24 Nov 1994 V1.8-0 (DJA):
+*        Now use USI for user interface
+*     11 Dec 1995 V2.0-0 (DJA):
+*        ADI port. Use logical quality
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'ADI_PAR'
       INCLUDE 'QUAL_PAR'
-*
-*    Status :
-*
-      INTEGER STATUS
-*
-*    Local constants :
-*
-      INTEGER MAXFIL
-        PARAMETER (MAXFIL=20)                ! Maximum number of files to avrge.
-*
-*    Local variables :
-*
+
+*  Status:
+      INTEGER			STATUS             	! Global status
+
+*  Local Constants:
+      INTEGER 			MAXFIL
+        PARAMETER 		( MAXFIL = 20 )
+
+      CHARACTER*30		VERSION
+        PARAMETER		( VERSION = 'MEANDAT Version V2.0-0' )
+
+*  Local Variables:
       LOGICAL LVAR                           ! Are variances present in all file
       LOGICAL LQUAL                          ! Is quality present in all files ?
       INTEGER LP,AXLP
@@ -69,20 +138,34 @@
       INTEGER ODP                            ! Pointer to output arrays
       INTEGER OVP                            ! Pointer to output variance array
       INTEGER OQP                            ! Pointer to output quality array
-      BYTE MASK(MAXFIL)                      ! Badbits mask for each file
       INTEGER NELS                           ! Total number of elements in array
       LOGICAL AVERAGE                        ! Average the files or sum ?
       INTEGER CPTR                           ! Pointer to dynamic workspace
       CHARACTER*3 CNUM                       ! File number character string
-      INTEGER IDUM,NDUM                      ! Dummy integer
-      INTEGER IDIM(ADI__MXDIM)               ! Dummy dimensions
       CHARACTER*80 PATH(42)                  ! Historty records
       INTEGER NLINES                         ! Number of lines of history text
-*    Local data :
-*     <any DATA initialisations for local variables>
-*    Version :
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Version id
+      CALL MSG_PRNT( VERSION )
+
+*  Initialise ASTERIX
+      CALL AST_INIT()
+
+*  Tidy up
+      CALL AST_CLOSE()
+      CALL AST_ERR( STATUS )
+
+      END
+
+
+
+*  Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'MEANDAT version 1.8-1')
+      PARAMETER (VERSION = 'MEANDAT version 1')
 *-
 
 *    Version id
@@ -94,188 +177,159 @@
 *    Initialise variables
       LVAR=.TRUE.
       LQUAL=.TRUE.
-*
       DO LP=1,ADI__MXDIM
          DIMS(LP)=1
          TDIMS(LP)=1
       ENDDO
-*
-* Find how many files are wanted
+
+*  Find how many files are wanted
       CALL USI_GET0I('NFILES', NFILES, STATUS)
-*
       IF (STATUS .NE. SAI__OK) GOTO 99
-*
       IF (NFILES .LT. 2 .OR. NFILES .GT. 20) THEN
          CALL MSG_PRNT('Number of files must be between 2 and 20')
          GOTO 99
       ENDIF
-*
-* Open files
-      DO LP=1,NFILES
-*
-         CALL CHR_ITOC(LP, CNUM, IDUM)
-         PARAM='FILE'//CNUM
-*
-         CALL USI_TASSOCI( PARAM, '*', 'READ', IFID(LP), STATUS)
-*
-         IF (STATUS .NE. SAI__OK) GOTO 99
-*
-      ENDDO
-*
-* Get dimensions of data array in first file
-      CALL BDI_CHKDATA(IFID(1), OK, NDIM, DIMS, STATUS)
-*
-* Map data array, variance and quality from all files
-      DO LP=1,NFILES
-*
-         CALL MSG_SETI('FNO', LP)
-*
-*  Get data array dimensions
-         CALL BDI_CHKDATA(IFID(LP), OK, TNDIM, TDIMS, STATUS)
-*
-         IF (.NOT. OK .OR. STATUS .NE. SAI__OK) THEN
-            CALL MSG_PRNT('Error looking for data array ^FNO')
-            GOTO 99
-         ELSE
-*
-*  Test if dimensions are the same as for file 1
-            DO AXLP=1,7
-               IF (DIMS(AXLP) .NE. TDIMS(AXLP)) THEN
-                  CALL MSG_PRNT('File ^FNO has different dimensions'/
-     &                         /' to file 1')
-                  GOTO 99
-               ENDIF
-            ENDDO
-*
-*  Map data array
-            CALL BDI_MAPDATA(IFID(LP), 'READ', DP(LP), STATUS)
-*
-            IF (STATUS .NE. SAI__OK) THEN
-               CALL MSG_PRNT('Error mapping data array ^FNO')
-               GOTO 99
-            ENDIF
-         ENDIF
-*
-* Attempt to map variance from file if not already missing
-         IF (LVAR) THEN
-*
-            CALL BDI_CHKVAR(IFID(LP), LVAR, NDUM, IDIM, STATUS)
-*
-            IF (STATUS .NE. SAI__OK .OR. .NOT. LVAR) THEN
-               CALL MSG_PRNT('Variance missing - will not be used')
-               LVAR=.FALSE.
-               CALL ERR_ANNUL(STATUS)
-            ELSE
-               CALL BDI_MAPVAR(IFID(LP), 'READ', VP(LP), STATUS)
-            ENDIF
-         ENDIF
-*
-* Attempt to map quality from file if not already missing
-         IF (LQUAL) THEN
-*
-            CALL BDI_CHKQUAL(IFID(LP), LQUAL, NDUM, IDIM, STATUS)
-*
-            IF (STATUS .NE. SAI__OK .OR. .NOT. LQUAL) THEN
-               CALL MSG_PRNT('Quality missing - will not be used')
-               LQUAL=.FALSE.
-               CALL ERR_ANNUL(STATUS)
-            ELSE
-               CALL BDI_MAPQUAL(IFID(LP), 'READ', QP(LP), STATUS)
-*
-* Attempt to get badbits value from file
-               CALL BDI_GETMASK(IFID(LP), MASK(LP), STATUS)
-*
-               IF (STATUS .NE. SAI__OK) THEN
-                  CALL ERR_ANNUL(STATUS)
-                  MASK(LP) = QUAL__MASK
-               ENDIF
-*
-            ENDIF
-         ENDIF
-*
-      ENDDO
 
-*    Calculate total number of elements in output array
+*  Open files
+      DO LP = 1, NFILES
+        CALL USI_IASSOC( LP, 'INP', 'BinDS|Array', 'READ', IFID(LP),
+     :                   STATUS )
+        IF (STATUS .NE. SAI__OK) GOTO 99
+      END DO
+
+*  Get dimensions of data array in first file
+      CALL BDI_GETSHP( IFID(1), ADI__MXDIM, DIMS, NDIM, STATUS )
+
+*  Map data array, variance and quality from all files
+      DO LP = 1, NFILES
+
+        CALL MSG_SETI('FNO', LP)
+
+*    Get data array dimensions
+        CALL BDI_CHK( IFID(LP), 'Data', OK, STATUS )
+        CALL BDI_GETSHP( IFID(LP), ADI__MXDIM, TDIMS, TNDIM, STATUS )
+        IF (.NOT. OK .OR. STATUS .NE. SAI__OK) THEN
+          CALL MSG_PRNT('Error looking for data array ^FNO')
+          GOTO 99
+
+        ELSE
+
+*      Test if dimensions are the same as for file 1
+          DO AXLP=1,7
+            IF (DIMS(AXLP) .NE. TDIMS(AXLP)) THEN
+              CALL MSG_PRNT('File ^FNO has different dimensions'/
+     :                         /' to file 1')
+              GOTO 99
+            END IF
+          ENDDO
+
+*      Map data array
+          CALL BDI_MAPR( IFID(LP), 'Data', 'READ', DP(LP), STATUS )
+          IF (STATUS .NE. SAI__OK) THEN
+            CALL MSG_PRNT('Error mapping data array ^FNO')
+            GOTO 99
+          END IF
+
+        END IF
+
+*    Attempt to map variance from file if not already missing
+        IF ( LVAR ) THEN
+
+          CALL BDI_CHK( IFID(LP), 'Variance', LVAR, STATUS )
+          IF (STATUS .NE. SAI__OK .OR. .NOT. LVAR) THEN
+            CALL MSG_PRNT('Variance missing - will not be used')
+            LVAR = .FALSE.
+            CALL ERR_ANNUL(STATUS)
+          ELSE
+            CALL BDI_MAPR( IFID(LP), 'Variance', 'READ', VP(LP),
+     :                     STATUS )
+          END IF
+        END IF
+
+*    Attempt to map quality from file if not already missing
+        IF ( LQUAL ) THEN
+
+          CALL BDI_CHK( IFID(LP), 'Quality', LQUAL, STATUS )
+          IF (STATUS .NE. SAI__OK .OR. .NOT. LQUAL) THEN
+            CALL MSG_PRNT('Quality missing - will not be used')
+            LQUAL = .FALSE.
+            CALL ERR_ANNUL(STATUS)
+          ELSE
+
+            CALL BDI_MAPL( IFID(LP), 'LogicalQuality', 'READ',
+     :                     QP(LP), STATUS )
+          END IF
+        END IF
+
+      END DO
+
+*  Calculate total number of elements in output array
       CALL ARR_SUMDIM( NDIM, DIMS, NELS )
 
-*    Create an output file
-      CALL USI_TASSOCO( 'OUT', 'BINDS', OFID, STATUS)
-*
+*  Create an output file
+      CALL USI_CLONE( 'INP', 'OUT', 'BinDS', OFID, STATUS )
+      IF ( STATUS .NE. SAI__OK ) GOTO 99
+
+*  Map the data array in the output file and zero it.
+      CALL BDI_MAPR( OFID, 'Data', 'UPDATE', ODP, STATUS )
+      CALL ARR_INIT1R(0.0, NELS, %val(ODP), STATUS )
+
+*  Map the variance array if variances being used, otherwise delete any
+*  variance array
+      IF ( LVAR ) THEN
+
+        CALL BDI_MAPR( OFID, 'Variance', 'UPDATE', OVP, STATUS )
+        IF (STATUS .NE. SAI__OK) GOTO 99
+        CALL ARR_INIT1R(0.0, NELS, %val(OVP), STATUS)
+
+      ELSE
+c         CALL BDI_DELETE( OFID, 'Variance', STATUS )
+        IF (STATUS .NE. SAI__OK)  CALL ERR_ANNUL(STATUS)
+
+      END IF
+
+*  Map the quality array if quality being used, otherwise delete any quality
+*  structure
+      IF ( LQUAL ) THEN
+        CALL BDI_MAPUB( OFID, 'Quality', 'UPDATE', OQP, STATUS )
+        IF (STATUS .NE. SAI__OK) GOTO 99
+
+*    Zero the quality array
+        CALL ARR_INIT1B( QUAL__GOOD, NELS, %val(OQP), STATUS )
+
+      ELSE
+
+c        CALL BDI_DELETE( OFID, 'Quality', STATUS )
+        IF (STATUS .NE. SAI__OK)  CALL ERR_ANNUL(STATUS)
+
+      END IF
+
+*  By default the files are averaged, if the user sets average to NO on
+*  the command line then the output will be the sum of these files.
+      CALL USI_GET0L('AVERAGE', AVERAGE, STATUS)
       IF (STATUS .NE. SAI__OK) GOTO 99
 
-*  Copy everything from the first file into the output file
-      CALL ADI_FCOPY( IFID(1), OFID, STATUS)
-*
-* Map the data array in the output file and zero it.
-      CALL BDI_MAPDATA(OFID, 'UPDATE', ODP, STATUS)
-      CALL ARR_INIT1R(0.0, NELS, %val(ODP), STATUS )
-*
-* Map the variance array if variances being used, otherwise delete any variance
-* array
-      IF (LVAR) THEN
-         CALL BDI_MAPVAR(OFID, 'UPDATE', OVP, STATUS)
-*
-         IF (STATUS .NE. SAI__OK) GOTO 99
-         CALL ARR_INIT1R(0.0, NELS, %val(OVP), STATUS)
-*
-      ELSE
-*
-         CALL BDI_DELETE( OFID, 'Variance', STATUS )
-*
-         IF (STATUS .NE. SAI__OK)  CALL ERR_ANNUL(STATUS)
-*
-      ENDIF
-*
-* Map the quality array if quality being used, otherwise delete any quality
-* structure
-      IF (LQUAL) THEN
-         CALL BDI_MAPQUAL(OFID, 'UPDATE', OQP, STATUS)
-*
-         IF (STATUS .NE. SAI__OK) GOTO 99
-*
-* Zero the quality array
-         CALL ARR_INIT1B( QUAL__GOOD, NELS, %val(OQP), STATUS )
-*
-      ELSE
-*
-         CALL BDI_DELETE( OFID, 'Quality', STATUS )
-*
-         IF (STATUS .NE. SAI__OK)  CALL ERR_ANNUL(STATUS)
-*
-      ENDIF
-*
-* By default the files are averaged, if the user sets average to NO on
-* the command line then the output will be the sum of these files.
-      CALL USI_GET0L('AVERAGE', AVERAGE, STATUS)
-*
-      IF (STATUS .NE. SAI__OK) GOTO 99
-*
-* Create a workspace array and zero it
-      CALL DYN_MAPR(7, DIMS, CPTR, STATUS)
-*
+*  Create a workspace array and zero it
+      CALL DYN_MAPR( NDIM, DIMS, CPTR, STATUS )
       IF (STATUS .NE. SAI__OK) THEN
          CALL MSG_PRNT('Error creating dynamic space')
          GOTO 99
-      ENDIF
-*
-      CALL ARR_INIT1R(0.0, NELS, %val(CPTR), STATUS)
+      END IF
+      CALL ARR_INIT1R( 0.0, NELS, %val(CPTR), STATUS )
 
-*    Average these files
+*  Average these files
       CALL MEANDAT_AVERAGE(MAXFIL, NFILES, LVAR, LQUAL, MASK, AVERAGE,
      :         NELS, DP, VP, QP, %val(CPTR), %val(ODP), %val(OVP),
      :         %val(OQP), STATUS)
 
-*    Add standard record to new history structure
+*  Add standard record to new history structure
       CALL HSI_ADD(OFID, VERSION, STATUS)
 
-*    Put names of input datafiles used into history
+*  Put names of input datafiles used into history
       CALL USI_NAMEI(NLINES, PATH, STATUS)
       CALL HSI_PTXT(OFID, NLINES, PATH, STATUS)
-*
-      IF (STATUS .NE. SAI__OK) THEN
-         CALL MSG_PRNT('Error adding history record in output file')
-      ENDIF
-*
+
+*  Tidy up
  99   CALL AST_CLOSE()
       CALL AST_ERR( STATUS )
 
@@ -283,7 +337,7 @@
 
 
 *+  MEANDAT_AVERAGE - Averages several datafiles
-      SUBROUTINE MEANDAT_AVERAGE(MAXFIL, NFILES, LVAR, LQUAL, MASK,
+      SUBROUTINE MEANDAT_AVERAGE(MAXFIL, NFILES, LVAR, LQUAL,
      :                     AVERAGE, NELS, DP, VP, QP, WTSUM, ODATA,
      :                     OVAR, OQUAL, STATUS)
 *    Description :
@@ -318,7 +372,6 @@
       INTEGER NFILES                     ! Number of files being averaged
       LOGICAL LVAR                       ! Use variances ?
       LOGICAL LQUAL                      ! Use quality ?
-      BYTE MASK(MAXFIL)                  ! Badbit mask for each file
       LOGICAL AVERAGE                    ! Average files or leave as sum ?
       INTEGER NELS                       ! Array length
       INTEGER DP(MAXFIL)                 ! Pointers to data arrays
@@ -377,62 +430,58 @@
          WEIGHT=1.0
          WTMETH='N    '
       ENDIF
-*
-      DO FLP=1,NFILES
-*
-*   Weights supplied by user ?
-         IF (WTMETH(1:1) .EQ. 'U') THEN
-*
-*     Create prompt for the weight parameter
-            CALL CHR_ITOC(FLP, CNUM, IDUM)
-            PARAM='WEIGHT'//CNUM
-*
-            CALL USI_PROMT(PARAM, 'Enter weighting for file '/
-     &                                             /CNUM, STATUS)
-*
-*     Ask for the weighting for this file
-            CALL USI_GET0R(PARAM, WEIGHT, STATUS)
-*
-            IF (STATUS .NE. SAI__OK) GOTO 99
-*
-         ENDIF
-*
-* Add the elements from this data array into the output arrays
-         CALL MEANDAT_SUM(WTMETH, WEIGHT, LVAR, LQUAL, MASK(FLP), NELS,
+
+*  Loop over files
+      DO FLP = 1, NFILES
+
+*    Weights supplied by user ?
+        IF (WTMETH(1:1) .EQ. 'U') THEN
+
+*    Create prompt for the weight parameter
+          CALL CHR_ITOC(FLP, CNUM, IDUM)
+          PARAM='WEIGHT'//CNUM
+          CALL USI_PROMT(PARAM, 'Enter weighting for file '/
+     :                                             /CNUM, STATUS)
+
+*      Ask for the weighting for this file
+          CALL USI_GET0R( PARAM, WEIGHT, STATUS )
+          IF ( STATUS .NE. SAI__OK ) GOTO 99
+
+        END IF
+
+*    Add the elements from this data array into the output arrays
+        CALL MEANDAT_SUM(WTMETH, WEIGHT, LVAR, LQUAL, NELS,
      :                    %VAL(DP(FLP)),  %VAL(VP(FLP)), %VAL(QP(FLP)),
      :                                              ODATA, OVAR, WTSUM)
 
       END DO
 
-*    By default the files should be averaged but give the user a chance to
-*    have them summed by not dividing by the number of elements used in each
-*    output bin.
+*  By default the files should be averaged but give the user a chance to
+*  have them summed by not dividing by the number of elements used in each
+*  output bin.
       DO LP=1,NELS
 
 *    Test if this element had any contribution from the input file
         IF (WTSUM(LP) .GT. 0.0) THEN
 
 *    Average the arrays if producing a mean rather than a sum
-          IF (AVERAGE) THEN
+          IF ( AVERAGE ) THEN
 
-               ODATA(LP) = ODATA(LP) / WTSUM(LP)
-*
-               IF (LVAR) THEN
-                  OVAR(LP) = OVAR(LP) / ( WTSUM(LP) **2 )
-               ENDIF
-*
-            ENDIF
-*
-*     Set quality good
-            IF (LQUAL) OQUAL(LP) = QUAL__GOOD
-*
-*   Element is bad
-         ELSE
-*
-            IF (LQUAL) OQUAL(LP) = QUAL__BAD
-*
-         ENDIF
-*
+            ODATA(LP) = ODATA(LP) / WTSUM(LP)
+            IF (LVAR) THEN
+              OVAR(LP) = OVAR(LP) / ( WTSUM(LP) **2 )
+            END IF
+          END IF
+
+*      Set quality good
+          IF (LQUAL) OQUAL(LP) = QUAL__GOOD
+
+*    Element is bad
+        ELSE
+          IF (LQUAL) OQUAL(LP) = QUAL__BAD
+
+        END IF
+
       END DO
 
 *    Tidy up
@@ -445,7 +494,7 @@
 
 
 *+  MEANDAT_SUM - Adds an input array to an output array
-      SUBROUTINE MEANDAT_SUM(WTMETH, WEIGHT, LVAR, LQUAL, BADBITS,
+      SUBROUTINE MEANDAT_SUM(WTMETH, WEIGHT, LVAR, LQUAL,
      &                 NELS, IDATA, IVAR, IQUAL, ODATA, OVAR, WTSUM)
 *    Description :
 *    Environment parameters :
@@ -462,10 +511,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'QUAL_PAR'
-*    Global variables :
-*     <global variables held in named COMMON>
-*    Structure definitions :
-*     <specification of FORTRAN structures>
 *    Import :
       CHARACTER*(*) WTMETH               ! Method of calculating weighting
 *                                        ! factor 'V'=inverse variance,
@@ -473,64 +518,54 @@
       REAL WEIGHT                        ! Weight if WTMETH .ne. 'V'
       LOGICAL LVAR                       ! Use variances ?
       LOGICAL LQUAL                      ! Use quality ?
-      BYTE BADBITS                       ! Badbits mask from datafile
       INTEGER NELS                       ! Number of elements in arrays
       REAL IDATA(NELS)                   ! Input data array
       REAL IVAR(NELS)                    ! Input variance array
-      BYTE IQUAL(NELS)                   ! Input quality array
+      LOGICAL IQUAL(NELS)                   ! Input quality array
 *    Import-Export :
       REAL ODATA(NELS)
       REAL OVAR(NELS)
       REAL WTSUM(NELS)                   ! Sum of weights used in pixel
-*    Export :
-*     <declarations and descriptions for exported arguments>
-*
-*    Function declarations :
-*
-      BYTE BIT_ANDUB
 *
 *    Local variables :
 *
       INTEGER LP
-      LOGICAL LBAD                       ! Is this pixel bad ?
+      LOGICAL			LGOOD			! Pixel is good?
 *-
-*
+
+
+*  Initialise
+      LGOOD = .TRUE.
+
+*  Loop over all data
       DO LP=1,NELS
-*
-*  Calculate weight from variance if wanted
-         IF (WTMETH(1:1) .EQ. 'V') THEN
-*
-            IF (IVAR(LP) .GT. 0.0) THEN
-               WEIGHT = 1.0 / IVAR(LP)
-            ELSE
-               WEIGHT = 0.0
-            ENDIF
-*
-         ENDIF
-*
-*  Is quality of this element ok ?
-         IF (LQUAL) THEN
-            LBAD = BIT_ANDUB(IQUAL(LP),BADBITS)
-         ELSE
-*
-*  If quality is not present - assume all elements are good
-            LBAD = .FALSE.
-*
-         ENDIF
-*
-         IF (LBAD .EQ. QUAL_GOOD) THEN
-*
-*    Add weighted data array element
-            ODATA(LP) = ODATA(LP) + IDATA(LP) * WEIGHT
-*
-*    Add variance if possible
-            IF (LVAR)  OVAR(LP) = OVAR(LP) + IVAR(LP) * ( WEIGHT**2 )
-*
-*    Tot up the normalising factor
-            WTSUM(LP) = WTSUM(LP) + WEIGHT
-*
-         ENDIF
-*
-      ENDDO
-*
+
+*    Calculate weight from variance if wanted
+        IF (WTMETH(1:1) .EQ. 'V') THEN
+          IF (IVAR(LP) .GT. 0.0) THEN
+            WEIGHT = 1.0 / IVAR(LP)
+          ELSE
+            WEIGHT = 0.0
+          END IF
+        ENDIF
+
+*    Is quality of this element ok ?
+        IF ( LQUAL ) LGOOD = IQUAL(LP)
+
+*    Good point?
+        IF ( LGOOD ) THEN
+
+*      Add weighted data array element
+          ODATA(LP) = ODATA(LP) + IDATA(LP) * WEIGHT
+
+*      Add variance if possible
+          IF (LVAR)  OVAR(LP) = OVAR(LP) + IVAR(LP) * ( WEIGHT**2 )
+
+*      Tot up the normalising factor
+          WTSUM(LP) = WTSUM(LP) + WEIGHT
+
+        END IF
+
+      END DO
+
       END
