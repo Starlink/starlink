@@ -4085,7 +4085,7 @@ f        SPECFRM. The value supplied for the SPECVAL
 *        A value of AST__BAD may be supplied if the spectral position is
 *        unknown, but this may result in it not being possible for the
 c        astConvert
-*        AST_CONVERT 
+f        AST_CONVERT 
 *        function to determine a Mapping between the new FluxFrame and
 *        some other FluxFrame.
 c     specfrm
