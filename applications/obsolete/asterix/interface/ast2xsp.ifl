@@ -1,25 +1,41 @@
+
 interface AST2XSP
+
   parameter INP
-    type 'LITERAL'
-    position 1
-    prompt 'Input dataset'
-    help 'Dataset to be converted - without the .SDF extension'
+    position	1
+    type	'LITERAL'
+    prompt	'Input dataset'
+    help	'Dataset to be converted - without the .SDF extension'
   endparameter
+
   parameter SLICE
-    type '_INTEGER'
-    prompt 'Number of spectra to use'
-    help 'e.g. spectra number 4'
+    type	'_INTEGER'
+    prompt	'Number of spectra to use'
+    help	'e.g. spectra number 4'
   endparameter
+
   parameter AREA
-    type '_REAL'
-    prompt 'Geometrical area of detector (cm**2)'
-    help 'Note this is purely the geometric area, and so isnt energy dependent'
+    type	'_REAL'
+    prompt	'Geometrical area of detector (cm**2)'
+    help	'Note this is purely the geometric area, and so isnt energy dependent'
   endparameter
+
   parameter OUT
     position 2
-    type   'LITERAL'
-    ppath  'DYNAMIC'
-    prompt 'Output file root'
-    help   'Spectrum will have extension .pha, and the response .rsp'
+    type	'LITERAL'
+    ppath	'DYNAMIC'
+    prompt	'Output file root'
+    help	'Spectrum will have extension .pha, and the response .rsp'
   endparameter
+
+  parameter ANC
+    position	3
+    type	'_CHAR'
+    default	'NONE'
+    vpath	'DEFAULT'
+    ppath	'DEFAULT'
+    prompt	'Type of ancillary file'
+    help	'Must be one of N(ONE), A(BSOLUTE), R(ELATIVE) or H(ELP)'
+  endparameter
+
 endinterface
