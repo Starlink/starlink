@@ -24,6 +24,8 @@
 *        Global Status value
 
 *  Implementation Status:
+*     Uses some non PSX calls for accessing Current working directory
+*     These are GETCWD and CHDIR. This may be a portability issue.
 
 *  Authors:
 *     TIMJ: Tim Jenness (JACH)
@@ -46,6 +48,7 @@
       INCLUDE 'SAE_PAR'               ! SSE global definitions
       INCLUDE 'MSG_PAR'               ! MSG__ constants
       INCLUDE 'NDF_PAR'               ! NDF__ constants
+      INCLUDE 'PAR_ERR'               ! PAR__NULL and ABORT constants
 
 *  Arguments Given:
       CHARACTER * (*) PARAM
@@ -80,18 +83,24 @@
 
       DO WHILE (TRYING)
  
-         CALL NDF_EXIST('IN', 'READ', INDF, STATUS)
+         CALL NDF_EXIST(PARAM, 'READ', INDF, STATUS)
+
+*     Jump out of loop if 
+         IF (STATUS .EQ. PAR__NULL .OR.
+     :        STATUS .EQ. PAR__ABORT) THEN
+
+            TRYING = .FALSE.
  
 *  The file could be in DATADIR
  
-         IF (INDF.EQ.NDF__NOID) THEN
+         ELSE IF (INDF .EQ. NDF__NOID) THEN
             CALL PSX_GETENV('DATADIR', DATA_DIR, STATUS)
  
             ISTAT = GETCWD(CWD)
             IF (ISTAT .EQ. 0) THEN
                ISTAT = CHDIR(DATA_DIR)
                IF (ISTAT .EQ. 0) THEN
-                  CALL NDF_EXIST('IN', 'READ', INDF, STATUS)
+                  CALL NDF_EXIST(PARAM, 'READ', INDF, STATUS)
                   ISTAT = CHDIR(CWD)
                   IF (INDF .NE. NDF__NOID) TRYING = .FALSE.
                END IF
@@ -106,7 +115,7 @@
             CALL MSG_OUTIF(MSG__QUIET, ' ','^TASK: Failed to'//
      :           ' find requested file in CWD and DATADIR',
      :           STATUS)
-            CALL PAR_CANCL('IN', STATUS)
+            CALL PAR_CANCL(PARAM, STATUS)
          END IF
          
       END DO
