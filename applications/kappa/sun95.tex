@@ -11380,6 +11380,8 @@ Martin Shaw.  Mike Lawden helped produce the quick-reference card.
  Normalises one NDF to a similar NDF by calculating a scale factor and zero-point difference.}
 \menuitem{NUMB}{
  Counts the number of elements of an NDF with values or absolute values above or below a threshold.}
+\menuitem{OUTLINE}{
+ Draws the outline of a 2-d NDF.}
 \menuitem{OUTSET}{
  Sets pixels outside a specified  circle in a 2-d data array to a specified value.}
 \menuitem{OVCLEAR}{
@@ -11754,6 +11756,8 @@ functions as follows.
 \classitem{MLINPLOT}
  Draws a multi-line plot of a 2-d NDF's data values against their axis
  co-ordinates.
+\classitem{OUTLINE}
+ Draws the outline of a 2-d NDF.
 \classitem{SCATTER}
  Displays a scatter plot between data in two NDFs.
 \classitem{SNAPSHOT}
@@ -32373,6 +32377,125 @@ plot (9k).
       }
    }
 }
+\sstroutine{
+   OUTLINE
+}{
+   Draws an outline of a 2-d NDF
+}{
+   \sstdescription{
+      This application draws an outline of a 2-dimensional NDF on
+      the current graphics device, optionally aligning it with an
+      existing plot (see parameter CLEAR). 
+
+      Annotated axes can be produced (see parameter AXES), and the appearance
+      of the axes and curve can be controlled in detail (see parameter STYLE). 
+      The axes show co-ordinates in the current co-ordinate Frame of the 
+      supplied NDF.
+
+      This command is a synonym for {\tt contour mode=bounds penrot=yes
+      labout=yes}.
+   }
+   \sstusage{
+      outline 
+   }
+   \sstparameters{
+      \sstsubsection{
+         AXES = \_LOGICAL (Read)
+      }{
+         TRUE if labelled and annotated axes are to be drawn around the
+         plot, showing the current co-ordinate Frame of the
+         supplied NDF. The appearance of the axes can be controlled using
+         the STYLE parameter. {\tt [TRUE]}
+      }
+      \sstsubsection{
+         CLEAR = \_LOGICAL (Read)
+      }{
+         TRUE if the graphics device is to be cleared before displaying
+         the outline. If you want the outline to be drawn over
+         the top of an existing DATA picture, then set CLEAR to FALSE. The
+         outline will then be drawn in alignment with the displayed
+         data. If possible, alignment occurs within the current co-ordinate
+         Frame of the NDF. If this is not possible, (for instance if
+         suitable WCS information was not stored with the existing DATA
+         picture), then alignment is attempted in PIXEL
+         co-ordinates. If this is not possible, then alignment is
+         attempted in GRID co-ordinates. If this is not possible, then
+         alignment is attempted in the first suitable Frame found in the NDF
+         irrespective of its domain. A message is displayed indicating the
+         domain in which alignment occurred. If there are no suitable Frames
+         in the NDF then an error is reported. {\tt [TRUE]}
+      }
+      \sstsubsection{
+         DEVICE = DEVICE (Read)
+      }{
+         The plotting device. {\tt [current image-display device]}
+      }
+      \sstsubsection{
+         LABOUT = \_LOGICAL (Read)
+      }{
+         If a TRUE
+         value is supplied then the name of the input NDF is included in
+         the plot as a label. The label is positioned so that its bottom
+         left corner is close to the bottom left pixel in the NDF. The
+         appearance of the label can be set by using the STYLE parameter
+         (for instance {\tt "}Size(strings)=2{\tt "}). {\tt [TRUE]}
+      }
+      \sstsubsection{
+         MARGIN( 4 ) = \_REAL (Read)
+      }{
+         The widths of the margins to leave around the outline for
+         axis annotation. The widths should be given as fractions of the
+         corresponding dimension of the current picture. The actual margins
+         used may be increased to preserve the aspect ratio of the DATA
+         picture. Four values may be given, in the order; bottom, right,
+         top, left. If fewer than four values are given, extra values are
+         used equal to the first supplied value. If these margins are too
+         narrow any axis annotation may be clipped. If a null (!) value is
+         supplied, the value used is 0.15 (for all edges) if annotated axes
+         are being produced, and zero otherwise. {\tt [current value]}
+      }
+      \sstsubsection{
+         NDF = NDF (Read)
+      }{
+         NDF structure containing the 2-dimensional image to be
+         outlined.
+      }
+      \sstsubsection{
+         STYLE = GROUP (Read)
+      }{
+         A group of attribute settings describing the plotting style to use
+         for the outline and annotated axes.
+
+         A comma-separated list of strings should be given in which each
+         string is either an attribute setting, or the name of a text file
+         preceded by an up-arrow character {\tt "}$\wedge${\tt "}. Such text files should
+         contain further comma-separated lists which will be read and
+         interpreted in the same manner. Attribute settings are applied in
+         the order in which they occur within the list, with later settings
+         over-riding any earlier settings given for the same attribute.
+
+         Each individual attribute setting should be of the form:
+
+            $<$name$>$=$<$value$>$
+
+         where $<$name$>$ is the name of a plotting attribute, and $<$value$>$ is
+         the value to assign to the attribute. Default values will be
+         used for any unspecified attributes. All attributes will be
+         defaulted if a null value (!) is supplied. See section {\tt "}Plotting
+         Attributes{\tt "} in SUN/95 for a description of the available
+         attributes. Any unrecognised attributes are ignored (no error is
+         reported).
+
+         The appearance of the outline is controlled by the attributes
+         Colour(Curves), Width(Curves), \emph{etc}. {\tt [current value]}
+      }
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+      KAPPA: WCSFRAME, CONTOUR, PICDEF.
+   }
+}
 \manroutine {{\manheadstyle{OUTSET}}}{ Sets pixels outside a specified
   circle in a 2-d data array to a specified value.}
 \begin{manroutinedescription}
@@ -45989,9 +46112,17 @@ The following applications have been modified:
 \end{description}
 
 \subsection{New applications}
-A new command called \htmlref{LUTWARM}{LUTWARM} has been added. It loads a
-colour table which goes from black to white, passing through warm shades
-of yellow and brown, as popularised by \GAIAref\@.
+The following new commands have been added:
+
+\begin{description}
+   \item [\htmlref{LUTWARM}{LUTWARM}] \mbox{}
+       Loads a colour table which goes from black to white, passing
+       through warm shades of yellow and brown, as popularised by
+       \GAIAref\@.
+   \item [\htmlref{OUTLINE}{OUTLINE}] \mbox{}
+       Draws an outline of an NDF, optionally aligning it with an
+       existing plot. This is a synonym for {\tt contour mode=bounds}.
+\end{description}
 
 \begin{latexonly}
 \newpage
@@ -46213,6 +46344,8 @@ functions as follows.
 \classitem{MLINPLOT}
  Draws a multi-line plot of a 2-d NDF's data values against their axis
  co-ordinates.
+\classitem{OUTLINE}
+ Draws the outline of a 2-d NDF.
 \classitem{SNAPSHOT}
  Dumps an image-display memory to a graphics hardcopy and
  optionally to an NDF.
