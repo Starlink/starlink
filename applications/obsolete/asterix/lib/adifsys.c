@@ -164,9 +164,37 @@ void adix_getpath( ADIobj id, ADIboolean nulterm, int mxlen, char *path,
  * Data system routines
  */
 
+void adix_fclose_int( ADIobj rtn, ADIobj id, ADIstatus status )
+  {
+  if ( _eprc_c(rtn) ) 			/* C routine? */
+    ((ADIcoCB) _eprc_prc(rtn))( id, fileid, status );
+  else					/* Fortran routine */
+    ((ADIfoCB) _eprc_prc(rtn))( &id, fileid, status );
+  }
+
 void ADIfsysFileClose( ADIobj id, ADIstatus status )
   {
+  ADIobj	ortn;			/* Close routine */
+  ADIobj        repid;
+  ADIboolean	there;
+
   _chk_stat;
+
+/* Extract representation id from file object */
+  adic_cget0i( id, "REP", &repid, status );
+
+/* Representation has supplied a closure routine? */
+  adic_there( repid, "CLOSE_RTN", &there, status );
+
+  if ( there ) {
+    adix_locrcb( repid, "CLOSE_RTN",	/* Locate the opening routine */
+                     8, &ortn, status );
+
+/* Try to close the file */
+    adix_fclose_int( ortn, id, status );
+
+    }
+
   }
 
 void adix_fcreat_int( ADIobj rtn, ADIobj fspec, ADIobj id, ADIobj *fileid,
@@ -257,6 +285,12 @@ void adix_fcreat( char *fspec, int flen, ADIobj id, ADIobj *fileid,
 
     if ( ! ppos )
       adic_setecs( ADI__INVARG, "File cannot be created", status );
+    }
+
+/* Created ok? If so, write in details of representation and access mode */
+  if ( _ok(status) ) {
+    adic_cput0i( *fileid, "REP", repid, status );
+    adic_cput0c( *fileid, "MODE", "WRITE", status );
     }
 
 /* Link user object if created ok */
@@ -364,6 +398,12 @@ void adix_fopen( char *fspec, int flen, char *cls, int clen,
 
     if ( ! ppos )
       adic_setecs( ADI__INVARG, "File cannot be opened", status );
+    }
+
+/* Opened ok? If so, write in details of representation and access mode */
+  if ( _ok(status) ) {
+    adic_cput0i( *fileid, "REP", repid, status );
+    adic_cputid( *fileid, "MODE", mid, status );
     }
 
   if ( _ok(status) && (*cls!='*') ) {	/* We've opened the file ok? */
@@ -535,7 +575,7 @@ void ADIfsysInit( ADIstatus status )
 		 status );
 
   adic_defcls( "FileRepresentation",
-	       "", "NAME,OPEN_RTN,CREAT_RTN,NATRL_RTN",
+	       "", "NAME,OPEN_RTN,CREAT_RTN,NATRL_RTN,CLOSE_RTN",
 	       &DsysFileRep, status );
 
   adic_defcls( "FileObject",
