@@ -24,13 +24,13 @@ AUX_FILES = byte byte_asterix \
 
 
 dcv_ttoub.f: dcv_ttoub.gen
-	./generic -t bdirwW dcv_ttoub.gen
+	env GENERIC_DIR=. ./generic -t bdirwW dcv_ttoub.gen
 dcv_ttouw.f: dcv_ttouw.gen
-	./generic -t bBdirw dcv_ttouw.gen
+	env GENERIC_DIR=. ./generic -t bBdirw dcv_ttouw.gen
 ## DCV_FUN: DCV_FUN.f
 ## 	cp DCV_FUN.f DCV_FUN
 ## DCV_FUN.f: DCV_FUN.fpp
 DCV_FUN: DCV_FUN.fpp
-	$(FPP) $(FPPFLAGS) $(CPPFLAGS) DCV_FUN.fpp $(FPP_OUTPUT)
+	$(FPP) $(FPPFLAGS) $(CPPFLAGS) -I. DCV_FUN.fpp $(FPP_OUTPUT)
 
 BUILT_SOURCES = DCV_FUN
