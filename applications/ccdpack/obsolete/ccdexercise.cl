@@ -121,7 +121,7 @@ begin
    #  Make the output files of type ".imh"
    reset NDF_FORMATS_OUT="IRAF(.imh),.,*"
    ccdgenerate ( nseq=4, file="ccdtest_obj.dat", reduced=no, container=no,
-                 dataname=data, biasname=bias, ffname=ff,
+                 dataname="data", biasname="bias", ffname="ff",
                  pixels="128,128", origins="-1,-1,-40,15,-10,-74,-35,-70",
                  angles="0,0,0,0" )
 
@@ -296,6 +296,11 @@ begin
    print " "
    register ( inlist="reduced_data?.imh", refpos=1, usewcs=no,
               outformat="transform", outdomain="ccd_reg", fittype=2 )
+
+   #  For now, NDF2IRAF does not support WCS components, so we can't
+   #  go any further.  This may get worked around one way or another
+   #  in the future.
+   bye
 
    #  Resample the data.
    print " "
