@@ -695,6 +695,10 @@
       CALL PAR_GDR1R( 'PERCENTILES', 2, PERDEF, 0.0, 100.0,
      :                .FALSE., PERCNT, STATUS )
 
+*  Tell the user what is happening.
+      CALL MSG_OUT( 'POLKA_MSG_2', 'Creating the POLKA Graphical User'//
+     :              ' Interface -- please wait...', STATUS )
+
 *  Execute the TCL script.
       CALL DOPLKA( IGRP1, IGRP2, IGRP3, DPI, HAREA, SAREA, PSF, 
      :             SI, FIT, OEFIT, LOGFIL( : CHR_LEN( LOGFIL ) ),
