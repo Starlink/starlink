@@ -634,7 +634,7 @@ sub index_source {
       print "Failed to open $file in directory ".cwd."\n";
       return;
    }
-   $tagged = &$rtagger (join ('', <SOURCE>), $ext);
+   my $tagged = &$rtagger (join ('', <SOURCE>), $ext);
    close SOURCE;
 
 #  Write index entries for all the "<a name=''>" type tags.

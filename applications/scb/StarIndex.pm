@@ -116,6 +116,9 @@ use Scb qw/:DEFAULT error/;
 use Fcntl;
 use NDBM_File;
 
+#  Declare all variables explicitly.
+
+use strict 'vars';
 
 ########################################################################
 sub new {
@@ -172,10 +175,10 @@ sub new {
 
 #  Set up mapping of requested access type to Fcntl type access mode.
 
-   %fmode = ( 'read'   => O_RDONLY,
-              'update' => O_RDWR | O_CREAT,
-              'new'    => O_RDWR | O_CREAT | O_TRUNC,
-            );
+   my %fmode = ( 'read'   => O_RDONLY,
+                 'update' => O_RDWR | O_CREAT,
+                 'new'    => O_RDWR | O_CREAT | O_TRUNC,
+               );
 
 #  Tie the StarIndex object, which is a hash, to the DBM file.
 
@@ -582,6 +585,9 @@ sub delete {
 
 
 ########################################################################
+
+use vars qw/@each_loc $each_key/;
+
 sub each {
 
 #+
@@ -742,7 +748,7 @@ sub delpack {
 
 #  Assemble list of names which contain entries for the chosen package.
 
-   my ($name, @names);
+   my ($name, @names, $value);
    while (($name, $value) = $rlocate->each($package)) {
       push @names, $name;
    }

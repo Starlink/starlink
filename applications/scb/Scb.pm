@@ -51,7 +51,7 @@ package Scb;
 
 #  Set up export of names into main:: namespace.
 
-require Exporter;
+use Exporter;
 @ISA = qw/Exporter/;
 
 #  Names of routines and variables defined here to be exported.
@@ -65,6 +65,16 @@ require Exporter;
              %tagger/;
 
 @EXPORT_OK = qw/error/;
+
+#  Declare all variables explicitly.
+
+use strict 'vars';
+use vars qw/ $incdir $srcdir $bindir $scb_tmpdir $scbindex_tmpdir
+             $mimetypes_file
+             $htxserver
+             $docslisfile
+             $func_indexfile $file_indexfile $taskfile
+             %tagger/;
 
 #  Map error handler routine to that from the main:: namespace.
 
@@ -100,7 +110,7 @@ use Cwd;
 my $STARLINK = "/star"; 
 my $SCB_SOURCES = "$STARLINK/sources"; 
 
-$star = "$STARLINK";
+my $star = "$STARLINK";
 $srcdir = $ENV{'SCB_SOURCES'} || "$SCB_SOURCES";
 $bindir = "$star/bin";
 $incdir = "$star/include";
@@ -126,7 +136,7 @@ $htxserver = "$HTXSERVER_URL";
 #  Index file locations.
 
 my $SCB_INDEX = cwd;
-$indexdir = $ENV{'SCB_INDEX'} || "$SCB_INDEX" || cwd;
+my $indexdir = $ENV{'SCB_INDEX'} || "$SCB_INDEX" || cwd;
 $func_indexfile = "$indexdir/func";
 $file_indexfile = "$indexdir/file";
 $taskfile       = "$indexdir/tasks";
@@ -171,10 +181,10 @@ use FortranTag;
 #  $ENV{'PATH'} should have been stripped down to a minimum 
 #  ('/bin:/usr/bin' is probably sufficient).
 
-   $tar = "tar";
-   $cat = "cat";
-   $zcat = "uncompress -c";
-   $gzcat = "gzip -dc";
+my $tar = "tar";
+my $cat = "cat";
+my $zcat = "uncompress -c";
+my $gzcat = "gzip -dc";
 
 
 ########################################################################
@@ -344,6 +354,7 @@ sub mkdirp {
 #  Step through directory name a ('/'-delimited) element at a time, creating
 #  any which don't already exist.
 
+   my $element;
    for (my $i = 0; $i >= 0;  $i = index ($dir, '/', $i+1)) {
       $element = substr $dir, 0, $i;
       unless (-d $element || $element eq '') {
@@ -510,6 +521,11 @@ sub rmrf {
    }
 }
 
+
+########################################################################
+#  Saved variable for pushd and popd.
+
+my @dirstack;
 
 ########################################################################
 sub pushd {
