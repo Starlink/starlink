@@ -23,29 +23,43 @@
 use strict;
 
 my $Usage = "$0 [--[no]keep] [--temp=dir] [--timeout=n] [--[no]messages] <NDF>";
-my $progpath;
+my $progpath;			# Path to program.
 ($progpath = $0) =~ s+/[^/]*$++;
 
-my $NDF = undef;
+my $NDF = undef;		# Name of the NDF to be processed
+                                # (that is, without the .sdf
+                                # extension) 
+
 my $keeptemps = 1;		# Keep temporary files for later debugging.
+
 my $tempDir = undef;		# Allow this to be forced on the
                                 # commandline.  This is presently
                                 # mostly for debugging, but could be
                                 # used in some production modes to
                                 # redo some processing.
+
 #$noregenerate = 0;		# If true, don't regenerate
                                 # preexisting files (probably only
                                 # used in conjunction with --temp to
                                 # redo some processing).
+
 my $monolithTimeout = 120;	# Timeout for monoliths.  Needs to be
                                 # larger than default 60s.
+
 my $monolithMessages = 1;	# Display monolith messages.
+
 my $maxobj = 500;		# Maximum number of objects to
                                 # manipulate.  This number is
                                 # fairly arbitrary, but generous.
 
+my $esocatname = 'usno@eso';	# Name of the catalogue to use by
+                                # default, as known by SkyCat.
+
+my $skycatconfig = undef;	# SkyCat configuration file.
+
 # Global variables
-my @TEMPFILES = ( );
+my @TEMPFILES = ( );		# List of the temporary files which
+                                # are created.
 
 
 
@@ -82,10 +96,9 @@ use NDF;
 use Getopt::Long;
 
 
-# Include the Moggy modules, for querying catalogues
-# FOR TESTING ONLY, INCLUDE LIB DIR
-#use lib "$ENV{AA}";
-#use moggy::Moggy;
+# The following requires that the variable AUTOASTROM_DIR be defined
+# at _compile_ time (so that the setting of it above will never
+# actually happen).
 use lib "$ENV{AUTOASTROM_DIR}";
 use Moggy;
 
@@ -117,7 +130,13 @@ my $d2r = 57.295779513082320876798155; # degrees to radians (quite accurately)
 # Examine the argument list and options
 my %optionset = ();
 GetOptions (\%optionset,
-	    "keep!", "temp=s", "timeout=i", "messages!", "maxobj=i")
+	    "keep!",		# keep temporary files?
+	    "temp=s",		# name of temporary directory
+	    "timeout=i",	# monolith timeout
+	    "messages!",	# show messages from monoliths?
+	    "maxobj=i",		# maximum number of objects to process
+	    "catalogue=s",	# SkyCat name of online catalogue to use 
+	    "skycatconfig=s")	# SkyCat configuration file
   || die "Can't parse options\n";
 
 $keeptemps = $optionset{keep} if defined ($optionset{keep});
@@ -125,6 +144,8 @@ $tempDir   = $optionset{temp} if defined ($optionset{temp});
 $monolithTimeout = $optionset{timeout} if defined ($optionset{timeout});
 $monolithMessages = $optionset{messages} if defined ($optionset{messages});
 $maxobj = $optionset{maxobj} if defined ($optionset{maxobj});
+$esocatname = $optionset{catalogue} if defined ($optionset{catalogue});
+$skycatconfig = $optionset{skycatconfig} if defined($optionset{skycatconfig});
 
 reuse_files() if $tempDir;
 
@@ -132,22 +153,6 @@ reuse_files() if $tempDir;
 
 $NDF = $ARGV[0];
 
-## Examine the argument list and options
-#foreach $arg (@ARGV) {
-#    $arg eq '--keep' && 	do { $keeptemps = 1; next; };
-#    $arg =~ /^--temp=(.*)/ &&	do { $tempDir = $1; reuse_files(); next; };
-#    $arg =~ /^-/ &&		do { die "Usage: $Usage\n"; next; };
-#    if (defined($NDF)) {
-#	# Only allow a single NDF to be processed at once.
-#	die "Usage: $Usage\n";
-#    } else {
-#	# What NDF file should we be processing.  In future, we'll
-#	# want to get approximate pointing information from the user,
-#	# but at present, just assume that the NDF file with the CCD
-#	# images in it already has a WCS component.
-#	$NDF = $arg;
-#    }
-#}
 
 
 # Generate a temporary file name
@@ -253,17 +258,30 @@ if (! $NDFinfo->{hassky}) {
     exit 1;
 }
 
-my $moggy = Moggy->new('usno@eso');
+# Find the moggy program.  Searching for it like this gives us a
+# little more flexibility in installation locations (and means that
+# the system will work for testing in its build directory).
+my $moggylocation = undef;
+foreach my $loc ("$ENV{AUTOASTROM_DIR}/moggy", 
+	      "$ENV{AUTOASTROM_DIR}/moggy/moggy") {
+    if (-f $loc && -x $loc) {
+	$moggylocation = $loc;
+	last;
+    }
+}
+defined ($moggylocation)
+  || die "Can't locate moggy program\n";
+print STDERR "moggylocation=$moggylocation\n";
+my $moggy = Moggy->new($esocatname, $skycatconfig, $moggylocation);
 $helpers{moggy} = $moggy;
 #$moggy = Moggy->new ('dummy@home',
 #		     'file:///home/norman/s/src/autoastrom/w/autoastrom/moggy/t/local.config');
-#		     #'file:///scratch/goedel/norman/playpen/test.config');
 
 #$moggy->debug("cataloguehandler");
 
 # Obtain a catalogue covering the same part of the sky as the NDF.  We
-# assume here that the projection pole is in the centre of the
-# image. XXX remove this restriction?
+# don't have to assume here that the projection pole is in the centre
+# of the image, since ASTROM isn't fazed if it it's elsewhere.
 my $CAT = get_catalogue ($moggy, %$NDFinfo, $maxobj, $tempDir);
 
 # ...and write an NDF which has the columns (number, ra/rad, dec/rad, ra,
@@ -286,10 +304,6 @@ print STDERR "CAT=$CAT  CATNDF=$CATNDF\n";
 
 # Extract a catalogue of objects from the NDF
 my $CCDcat = extract_objects (\%helpers, $NDF, $maxobj, $tempDir);
-#my $CCDcat = extract_objects ($extractor, $NDF, $maxobj, $tempDir);
-
-## ...and write it to an NDF
-#$CCDNDF = txt2ndf ($CCDcat);
 
 
 
@@ -297,25 +311,53 @@ print STDERR "get_catalogue    returned $CAT\n";
 print STDERR "extract_objects  returned $CCDcat\n";
 
 
-# We run ASTROM $iterationsleft times.  We may stop the loop from within
-# by setting $iterationsleft to zero.
-my $iterationsleft = 4;		# go from a 6-component solution to a
-                                # 9-component one in steps.
+# We run ASTROM $iterationsleft times.  We may stop the loop from
+# within by setting $iterationsleft to zero.
+#
+# How do we decide how many iterations is enough?  If we do the
+# iteration one more time after we get a 9-parameter fit, we do get an
+# improvement in both rrms and nstars, as well as a couple of arcmin
+# shift in the plate centre.
+my $iterationsleft = 5;
 
-# XXX do we need to have these as arrays?  Surely not.  We do use
-# $findofferrs[$iterno-1] below, but that's the only case.
-my @findofferrs =     (7.0);
-my @findoffnmatches = (0);
-my @findoffinfile =   ($CAT);
-my @findoffndfs =     ('X');
-my @findofffits =     ('X');
-my @astromnterms =    (6);	# Start with standard fit
-my %lastastrom;			# Hash holding the
-                                # results of the last ASTROM run
+# The following hold the state between iterations
+my $findofferrs =     7.0;
+my $lastfindofferrs = 0;
+my $findoffnmatches = 0;
+my $findoffinfile =   $CAT;
+my $findoffndfs =     'X';	# dummy initial value
+my $findofffits =     'X';	# dummy initial value
+
+# We have rather heuristic decisions to make, regarding the fit we
+# want ASTROM to attempt.  The ASTROM documentation recommends
+# attempting the fit for tilt and distortion only when there are at
+# least 10 reference stars, and we have the observation data `Obs',
+# `Met' and `Col'.  If we do not have this, we should stick with a
+# 6-parameter fit.  If we do have this, we should always ask for the
+# full 9-parameter fit _unless_ this full fit failed last time, in
+# which case we should use the 7-parameter fit, and have another try
+# at the 9-parameter fit next time round.  Experience with CCDs which
+# are mounted significantly eccentrically (the projection pole off the
+# plate) suggests that the 8-parameter fit is less robust than the
+# 7-parameter one.
+#
+# The decision about which fit to make is done in generate_astrom,
+# controlled by its parameter maxnterms (set equal to variable
+# $astromnterms here), which contains the _maximum_ number of terms to
+# use.  This will only ever have the values 7 or 9 (and we switch
+# between these at the end of the loop) -- if the actual number of
+# parameters is to be lowered to 6, that'll be done within
+# generate_astrom.
+my @astromnterms = (7, 9);
+my $ntermidx = $#astromnterms;	# Index into @astromnterms
+
+my %lastastrom;			# Hash holding the results of the last
+                                # (successful) ASTROM run.
+
 my $findoffmaxdisp;
-# Make this a quarter of the shorter side of the image.  This doesn't
-# have to be exact, but it's better than not specifying it at all.
-# Successive iterations decrease this.
+# Make $findoffmaxdisp a quarter of the shorter side of the image.
+# This doesn't have to be exact, but it's better than not specifying
+# it at all.  Successive iterations decrease this.
 if (  abs($NDFinfo->{x1} - $NDFinfo->{x0})
     < abs($NDFinfo->{y1} - $NDFinfo->{y0})) {
     $findoffmaxdisp = abs($NDFinfo->{x1} - $NDFinfo->{x0});
@@ -325,15 +367,15 @@ if (  abs($NDFinfo->{x1} - $NDFinfo->{x0})
 
 my $iterno = 0;
 while ($iterno < $iterationsleft) {
-    print STDERR "Starting iteration $iterno...\n";
+    print STDERR "-------------------------\nStarting iteration $iterno...\n";
 
     my $tfile = sprintf ("%s/%02d", $tempDir, $iterno);
 
     # Invoke FINDOFF, returning the names of the two output files
     my ($ccdlist, $catlist, $matchworked)
       = match_positions ($CCDPack,
-			 $CCDcat, $findoffinfile[$iterno],
-			 {error => $findofferrs[$iterno],
+			 $CCDcat, $findoffinfile,
+			 {error => $findofferrs,
 			  maxdisp => $findoffmaxdisp},
 			 $tfile);
 
@@ -343,15 +385,15 @@ while ($iterno < $iterationsleft) {
 	# using the last value which worked, if any.
 	if ($iterno == 0) {
 	    # No previous one.
-	    $findofferrs[0] *= 1.5; # guess
+	    $findofferrs *= 1.5; # guess
 	} else {
 	    # Use the last one (which presumably worked)
-	    $findofferrs[$iterno] = $findofferrs[$iterno-1];
+	    $findofferrs = $lastfindofferrs;
 	}
 	($ccdlist, $catlist, $matchworked)
 	  = match_positions ($CCDPack,
-			     $CCDcat, $findoffinfile[$iterno],
-			     {error => $findofferrs[$iterno],
+			     $CCDcat, $findoffinfile,
+			     {error => $findofferrs,
 			      maxdisp => $findoffmaxdisp},
 			     $tfile);
     }
@@ -361,6 +403,7 @@ while ($iterno < $iterationsleft) {
 	$iterationsleft = 0;	# Redundant (given `last' below), but neat.
 	last;			# JUMP OUT of the loop
     }
+    $lastfindofferrs = $findofferrs;
 
     $findoffmaxdisp /= 2.0;	# ...for next time
 
@@ -371,25 +414,18 @@ while ($iterno < $iterationsleft) {
     # {filename}, {nmatches}, {quality} and {findofferror}.
     my $astromparams = generate_astrom ({CCDin => $ccdlist,
 					 catalogue => $catlist,
-					 findofferror => $findofferrs[$iterno],
+					 findofferror => $findofferrs,
 					 helpers => \%helpers,
 					 NDFinfo => $NDFinfo,
 					 astrom => \%lastastrom,
-					 nterms => $astromnterms[$iterno],
+					 maxnterms => $astromnterms[$ntermidx],
 					 tempfn => $tfile});
-#    my $astromparams = generate_astrom ($ccdlist, $catlist, $findofferr,
-#					%helpers,
-#					%$NDFinfo,
-#					%lastastrom,
-#					$astromnterms[$iterno],
-#					$tfile);
     defined($astromparams) || die "generate_astrom failed\n";
 
     printf STDERR ("generate_astrom (\n\tccdlist=%s\n\tcatlist=%s\n\tfofferr=%f\n\tastromnterms=%d\n\ttfile=%s)\n    returned:\n",
-		   $ccdlist,$catlist,$findofferrs[$iterno],
-		   $astromnterms[$iterno],$tfile);
-    my $k;
-    foreach $k (sort keys %$astromparams) {
+		   $ccdlist,$catlist,$findofferrs,
+		   $astromnterms[$ntermidx],$tfile);
+    foreach my $k (sort keys %$astromparams) {
 	printf STDERR "\t%s => %s\n", $k, $astromparams->{$k};
     }
 
@@ -404,36 +440,62 @@ while ($iterno < $iterationsleft) {
     # the CURRENT domain, so to map sky coordinates to pixel ones,  the
     # AST transformation has to be done in the reverse direction.
     print STDERR "ASTROM fits, round $iterno:\n\tn nterms         centre            FITS-WCS\n";
-    foreach $k (0..$#fitdetails) {
-	printf STDERR ("\t%d   %2d  %.12s %.13s %s\n",
-		       $k,
-		       $fitdetails[$k]->{nterms},
-		       $fitdetails[$k]->{rasex},
-		       $fitdetails[$k]->{decsex},
-		       (length($fitdetails[$k]->{wcs}) > 35)
-		       ? "...".substr($fitdetails[$k]->{wcs},-32)
-		       : $fitdetails[$k]);
+    foreach my $k (0..$#fitdetails) {
+	if ($fitdetails[$k]->{STATUS}) {
+	    printf STDERR ("\t%d   %2d  %.12s %.13s %s\n",
+			   $k,
+			   $fitdetails[$k]->{nterms},
+			   $fitdetails[$k]->{rasex},
+			   $fitdetails[$k]->{decsex},
+			   (length($fitdetails[$k]->{wcs}) > 35)
+			   ? "...".substr($fitdetails[$k]->{wcs},-32)
+			   : $fitdetails[$k]);
+	} else {
+	    printf STDERR "\t%d    NO FIT\n", $k;
+	}
     }
-    %lastastrom = %{$fitdetails[$#fitdetails]};
-    print STDERR "ASTROM: best fit of ", $#fitdetails+1, ":\n";
-    foreach $k (sort keys %lastastrom) {
-	printf STDERR "\t%s => %s\n", $k, $lastastrom{$k};
+
+    # Check whether the highest-order fit failed
+    my $bestfitfailed = 0;
+    # %lastastrom = %{$fitdetails[$#fitdetails]};
+    for (my $k=$#fitdetails; $k>=0; $k--) {
+	%lastastrom = %{$fitdetails[$k]};
+	if ($lastastrom{STATUS}) {
+	    # This fit was OK
+	    printf STDERR ("ASTROM: best fit: %d of %d\n",
+			   $k+1, $#fitdetails+1);
+	    foreach my $kw (sort keys %lastastrom) {
+		printf STDERR "\t%s => %s\n", $kw, $lastastrom{$kw};
+	    }
+	    last;
+	} else {
+	    printf STDERR ("ASTROM: Fit %d of %d rejected",
+			   $k+1, $#fitdetails+1);
+	    print STDERR " (",$lastastrom{nterms}, " terms)"
+	      if (defined($lastastrom{nterms}));
+	    print STDERR "\n";
+	    $bestfitfailed = 1;
+	}
     }
-    $findoffnmatches[$iterno] = $astromparams->{nmatches};
+
+    # At least one of the fits worked, didn't it?
+    $lastastrom{STATUS} || croak "ASTROM failed to make any fits at all!\n";
+
+    $findoffnmatches = $astromparams->{nmatches};
 
     # Store the (best of the) WCS information obtained by ASTROM.
-    $findofffits[$iterno+1] = $lastastrom{wcs};
+    $findofffits = $lastastrom{wcs};
 
     # Generate the name of an NDF to receive the output from the
     # coordinate transformation.  This is to be the coordinates of the
     # catalogue objects, in the pixel domain specified by the WCS
     # information obtained by ASTROM (ie, $lastastrom{wcs}).
-    $findoffndfs[$iterno+1] = "$tfile-tran";
+    $findoffndfs = "$tfile-tran";
 
     # Produce the ASTTRANN argument list.  First, the astrometry...
-    my $asttrannarg = "this=$findofffits[$iterno+1]";
+    my $asttrannarg = "this=$findofffits";
     # then the input and output NDFs...
-    $asttrannarg .= " in=$CATNDF out=$findoffndfs[$iterno+1]";
+    $asttrannarg .= " in=$CATNDF out=$findoffndfs";
     # reverse transformation (ie, SKY to PIXEL domain) of columns 2 and 3...
     $asttrannarg .= " forward=false incols=[2,3]";
 
@@ -444,34 +506,50 @@ while ($iterno < $iterationsleft) {
     }
     my $status = $atools->obeyw ("asttrann", $asttrannarg);
     ($status == &Starlink::ADAM::DTASK__ACTCOMPLETE)
-      || die "Error getting atools/asttrann";
+      || croak "Error getting atools/asttrann";
 
-    push (@TEMPFILES, "$findoffndfs[$iterno+1].sdf");
+    push (@TEMPFILES, "$findoffndfs.sdf");
 
     # Now turn $findoffndfs[$iterno+1] (the best-so-far pixel coordinates
     # of the reference stars) into a text input file for FINDOFF.
-    $findoffinfile[$iterno+1] = ndf2txt ($findoffndfs[$iterno+1]);
-    push (@TEMPFILES, $findoffinfile[$iterno+1]);
+    $findoffinfile = ndf2txt ($findoffndfs);
+    push (@TEMPFILES, $findoffinfile);
 
     # We want to estimate the best value of findoff:error for the next
     # round.  Use the value returned from generate_astrom.
-    $findofferrs[$iterno+1] = $astromparams->{findofferror};
+    $findofferrs = $astromparams->{findofferror};
 
-    # What sort of ASTROM fit do we want to try?  Try a fit with one
+    # What sort of ASTROM fit do we want to try next time?
+    if ($bestfitfailed) {
+	# be less adventurous next time
+	$ntermidx-- if ($ntermidx > 0);
+    } else {
+	# be more adventurous next time
+	$ntermidx++ if ($ntermidx < $#astromnterms);
+    }
+
+
+    # Try a fit with one
     # more term than the best last time.
-    $astromnterms[$iterno+1] = $astromnterms[$iterno] + 1
-      if ($astromnterms[$iterno] < 9);
+#    if ($ntermsidx > 0) {
+#	$ntermsidx--;		# one better
+#    } elsif ($nt
+#    if ($astromnterms[$iterno] < 9) {
+#	$astromnterms[$iterno+1] = $astromnterms[$iterno] + 1;
+#    } else {
+#	$astromnterms[$iterno+1] = $astromnterms[$iterno];
+#    }
 
 } continue {
     $iterno++;
 }
 
 print STDERR "Finished???\n";
-print STDERR "findofferrs     : @findofferrs\n";
-print STDERR "findoffnmatches : @findoffnmatches\n";
-print STDERR "findoffinfile   : @findoffinfile\n";
-print STDERR "findoffndfs     : @findoffndfs\n";
-print STDERR "findofffits     : @findofffits\n";
+#print STDERR "findofferrs     : @findofferrs\n";
+#print STDERR "findoffnmatches : @findoffnmatches\n";
+#print STDERR "findoffinfile   : @findoffinfile\n";
+#print STDERR "findoffndfs     : @findoffndfs\n";
+#print STDERR "findofffits     : @findofffits\n";
 
 print STDERR "Temp files:\n";
 push (@TEMPFILES, get_temp_files());
