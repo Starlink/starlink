@@ -1364,7 +1364,7 @@ C      HEAD.PSCALE = (HEAD.PMAX - HEAD.PMIN + 1) / NBIN
       ENDIF
 
 *  Get this record
-      CALL SLN_GETREC(ID, '*', 0, SELID, STATUS )
+      CALL SLN_GETREC(ID, '*', 1, SELID, STATUS )
 
 *  Locate Selectors
       CALL ADI_FIND( SELID, 'Selectors', SID, STATUS )
