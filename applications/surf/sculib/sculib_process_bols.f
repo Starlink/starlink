@@ -399,7 +399,7 @@
       REAL             RA_END           ! RA at end of SCAN
       REAL             RA_START         ! RA at start of SCAN
       REAL             RTEMP            ! Temp real
-      INTEGER          SCUCD_VERSION    ! Version of SCUCD file
+      REAL             SCUCD_VERSION    ! Version of SCUCD file
       LOGICAL          SET_STATUS       ! True is status has been set by sub
       LOGICAL          SOME_DATA        ! True if data was found
       INTEGER          STORED_OFFSET    ! Data offset at start of exposure
@@ -492,7 +492,7 @@
      :     'CENT_CRD', CENTRE_COORDS, STATUS)
 
 *     Get the file version number
-      CALL SCULIB_GET_FITS_I(N_FITS, N_FITS, FITS,
+      CALL SCULIB_GET_FITS_R(N_FITS, N_FITS, FITS,
      :     'VERSION', SCUCD_VERSION, STATUS)
 
 *     Need some information on the CHOP
