@@ -1364,14 +1364,10 @@ C     CALL BDA_ANNUL(LIV, STATUS)
 *   Check status - return if bad
       IF (STATUS .NE. SAI__OK) RETURN
 
-	print*,mdim1,mdim2
-
       SCALE(1)=-HEAD.PIXEL*MRES/3600.0
       SCALE(2)=HEAD.PIXEL*MRES/3600.0
       BASE(1)=-MDIM1/2*SCALE(1)+SCALE(1)/2.0
       BASE(2)=-MDIM2/2*SCALE(2)+SCALE(2)/2.0
-
-	print*,base(1),scale(1),base(2),scale(2)
 
       IXMIN=MDIM1
       IXMAX=1
@@ -1401,27 +1397,18 @@ C     CALL BDA_ANNUL(LIV, STATUS)
         ENDDO
       ENDDO
 
-	print*,iXmin,iXmax,IYmin,IYmax
-
       XC=XTOT/REAL(NPIX)
       YC=YTOT/REAL(NPIX)
       HX=0.5*SCALE(1)
       HY=0.5*SCALE(2)
-	print*,hx,hy
       OFFSET=REAL(IXMIN-1)*SCALE(1)
-	print*,offset
       XMIN=BASE(1) +OFFSET -HX
       OFFSET=REAL(IXMAX-1)*SCALE(1)
-	print*,offset,base(1),hx,base(1)+offset+hx
-      XMAX=BASE(1)+ OFFSET +HX
+      XMAX=BASE(1)+OFFSET+HX
       OFFSET=REAL(IYMIN-1)*SCALE(2)
-	print*,offset
       YMIN=BASE(2)+ OFFSET -HY
       OFFSET=REAL(IYMAX-1)*SCALE(2)
-	print*,offset,base(2),hy,base(2)+offset+hy
-      XMAX=BASE(2)+ OFFSET +HY
-
-	print*,xmin,xmax,ymin,ymax
+      YMAX=BASE(2)+ OFFSET +HY
 
       IF (STATUS .NE. SAI__OK) THEN
          CALL ERR_REP(' ',' from XRTSORT_SCAN_MASK',STATUS)
@@ -1757,7 +1744,6 @@ C              WRITE(*,*)MAP,NINMAP,MAXLIM
         CALL XRTSORT_SCAN_MASK(HEAD,MDIM(1),MDIM(2),%val(SMPTR),MRES,
      :                                  XW,YW,XW1,XW2,YW1,YW2,STATUS)
 
-	print*,xw,yw,xw1,xw2,yw1,yw2
 
 *   Get nominal centre of sort region in RA and DEC degrees
         CALL MSG_PRNT('Specify nominal centre of region:-')
