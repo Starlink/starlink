@@ -37,7 +37,7 @@ ast_link command is not in your path." if $astlibs !~ /./;
 my $libs = "-L$StarConfig{Star_Lib} $astlibs ";
 
 # Fink requires an extra path on OS X
-$libs = "-L/sw/lib $libs" if $^O eq 'darwin';
+$libs = "-L/sw/lib $libs -lcc_dynamic" if $^O eq 'darwin';
 
 # Sun compiler needs special path to fortran libraries
 $libs = "-L/opt/SUNWspro/lib $libs" if $^O eq 'solaris' && $astlibs =~ /lM77/;
