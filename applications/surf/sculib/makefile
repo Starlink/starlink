@@ -86,16 +86,14 @@ FSOURCES= sculib_1d2_jiggle.f sculib_2pos_deconv.f sculib_3pos_deconv.f \
 
 FCPPSOURCES = sculib_skydip_temperatures.F sculib_bessel_wtinit.F 
 
-CSOURCES = sculib_linux.c
-
 # These are the external include files
 EXTERNAL_INCLUDES = SAE_PAR MSG_PAR PRM_PAR NDF_FUNC DAT_PAR NDF_PAR \
 	PAR_ERR NUM_DEC_CVT NUM_DEF_CVT
 
 
-SOURCE   = ${FSOURCES} ${FCPPSOURCES} ${CSOURCES}
+SOURCE   = ${FSOURCES} ${FCPPSOURCES}
 
-OBJS = ${FSOURCES:.f=.o} ${FCPPSOURCES:.F=.o} ${CSOURCES:.c=.o}
+OBJS = ${FSOURCES:.f=.o} ${FCPPSOURCES:.F=.o}
 
 .F.o:
 	$(FC) $(FFLAGS) $(FCPPFLAGS) -c $<
