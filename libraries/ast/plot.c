@@ -190,7 +190,7 @@ c     - Title: The Plot title drawn using astGrid
 f     - Title: The Plot title drawn using AST_GRID
 
 *  Copyright:
-*     Copyright (C) 2004 Central Laboratory of the Research Councils
+*     <COPYRIGHT_STATEMENT>
 
 *  Authors:
 *     DSB: D.S. Berry (Starlink)
@@ -516,6 +516,10 @@ f     - Title: The Plot title drawn using AST_GRID
 *        which included the "g" flag. As things were, this would prevent 
 *        the optimisation of the digits value. Can now use "dms.*g" to
 *        allow the number of digits to be optimised.
+*     24-SEP-2004 (DSB):
+*        Correct initialisation of variable "digset" in function TickMarks.
+*        This allows label precision to be optimised if no Format has
+*        been set.
 *class--
 */
 
@@ -23215,9 +23219,10 @@ static TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap,
 /* If a value has been set for the axis Format, see if the format string 
    contains a wildcard precision specifier ".*". If so, we are free to
    vary the number of digits used in the label in order to produce
-   distinct labels. */
-   digset = 1;
+   distinct labels. If no value has been set for the axis FOrmat,we are
+   also free to vary the number of digits. */
    if( fmtset ) {
+      digset = 1;
       fmt = astGetFormat( frame, axis );
       a = fmt;
       while( (a = strchr( a, '.' )) ){
@@ -23226,6 +23231,8 @@ static TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap,
             break;
          }
       }
+   } else {
+      digset = 0;
    }
 
 /* If the axis precision has been specified, either through the Format string 
