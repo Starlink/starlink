@@ -300,11 +300,11 @@ class DviFileEvent {
      * @param t the type of this event
      * @param dp the <code>DviFile</code> it is associated with
      */
-    DviFileEvent(eventTypes t, DviFile *dp=0)
-	: dviFile_(dp), type_(t) { }
-    virtual ~DviFileEvent () { };
+    DviFileEvent(unsigned char opcode, eventTypes t, DviFile *dp=0)
+	    : opcode_(opcode), dviFile_(dp), type_(t) { }
+    //virtual ~DviFileEvent () { };
  private:
-    unsigned char opcode;
+    const unsigned char opcode_;
     DviFile *dviFile_;
     const eventTypes type_;
 };
@@ -316,7 +316,9 @@ class DviFileSetChar : public DviFileEvent {
      * @param dptr the <code>DviFile</code> associated with this character
      */
     DviFileSetChar(int charno, DviFile *dptr)
-	: DviFileEvent(setchar,dptr), charno_(charno) { }
+	    : DviFileEvent(charno, setchar, dptr), charno_(charno) { }
+    DviFileSetChar(unsigned char opcode, int charno, DviFile *dptr)
+	    : DviFileEvent(opcode, setchar, dptr), charno_(charno) { }
     //~DviFileSetChar () { };
     void debug() const;
     /**
@@ -330,29 +332,31 @@ class DviFileSetChar : public DviFileEvent {
 class DviFileSetRule: public DviFileEvent {
  public:
     const int h, w;
-    DviFileSetRule(DviFile *dptr, int h, int w)
-	: DviFileEvent(setrule,dptr), h(h), w(w) { }
+    DviFileSetRule(unsigned char opcode, DviFile *dptr, int h, int w)
+	    : DviFileEvent(opcode, setrule, dptr), h(h), w(w) { }
     //~DviFileSetRule () { };
     void debug() const;
 };
 class DviFileFontChange : public DviFileEvent {
  public:
-    DviFileFontChange(PkFont *f) : DviFileEvent(fontchange), font(f) { }
+    DviFileFontChange(unsigned char opcode, PkFont *f)
+	    : DviFileEvent(opcode, fontchange), font(f) { }
     //~DviFileFontChange () { };
     void debug() const;
     const PkFont *font;
 };
 class DviFileSpecial : public DviFileEvent {
  public:
-    DviFileSpecial(string str)
-	: DviFileEvent(special), specialString(str) { }
+    DviFileSpecial(unsigned char opcode, string str)
+	    : DviFileEvent(opcode, special), specialString(str) { }
     //~DviFileSpecial () { };
     const string specialString;
     void debug() const;
 };
 class DviFilePage : public DviFileEvent {
  public:
-    DviFilePage(bool isStart) : DviFileEvent(page), isStart(isStart) { }
+    DviFilePage(unsigned char opcode, bool isStart)
+	    : DviFileEvent(opcode, page), isStart(isStart) { }
     //~DviFilePage () { };
     void debug() const;
     const bool isStart;		// true/false if this is a bop/eop
@@ -361,7 +365,8 @@ class DviFilePage : public DviFileEvent {
 };
 class DviFilePreamble : public DviFileEvent {
  public:
-    DviFilePreamble() : DviFileEvent(preamble) { }
+    DviFilePreamble()
+	    : DviFileEvent(247, preamble) { }
     //~DviFilePreamble () { };
     void debug() const;
     unsigned int dviType, num, den, mag;
@@ -369,7 +374,8 @@ class DviFilePreamble : public DviFileEvent {
 };
 class DviFilePostamble : public DviFileEvent {
  public:
-    DviFilePostamble() : DviFileEvent(postamble) { }
+    DviFilePostamble()
+	    : DviFileEvent(248, postamble) { }
     //~DviFilePostamble () { };
 };
 

@@ -176,7 +176,7 @@ DviFileEvent *DviFile::getEvent()
 	    current_font_ = fontMap_[opcode-171];
 	    if (current_font_ == 0)
 		throw DviError ("undefined font requested");
-	    gotEvent = new DviFileFontChange (current_font_);
+	    gotEvent = new DviFileFontChange (opcode, current_font_);
 	}
 	else
 	{
@@ -188,7 +188,7 @@ DviFileEvent *DviFile::getEvent()
 		    throw DviError ("current_font undefined");    
 		pending_hhupdate_ += charEscapement_(charno);
 		pending_hupdate_ += charWidth_(charno);
-		gotEvent = new DviFileSetChar (charno, this);
+		gotEvent = new DviFileSetChar (opcode, charno, this);
 		break;
 	      case 129:		// set2
 		charno = getSIU(2);
@@ -196,7 +196,7 @@ DviFileEvent *DviFile::getEvent()
 		    throw DviError ("current_font undefined");    
 		pending_hhupdate_ += charEscapement_(charno);
 		pending_hupdate_ += charWidth_(charno);
-		gotEvent = new DviFileSetChar (charno, this);
+		gotEvent = new DviFileSetChar (opcode, charno, this);
 		break;
 	      case 130:		// set3
 		charno = getSIU(3);
@@ -204,7 +204,7 @@ DviFileEvent *DviFile::getEvent()
 		    throw DviError ("current_font undefined");    
 		pending_hhupdate_ += charEscapement_(charno);
 		pending_hupdate_ += charWidth_(charno);
-		gotEvent = new DviFileSetChar (charno, this);
+		gotEvent = new DviFileSetChar (opcode, charno, this);
 		break;
 	      case 131:		// set4
 		charno = getSIS(4);
@@ -212,7 +212,7 @@ DviFileEvent *DviFile::getEvent()
 		    throw DviError ("current_font undefined");    
 		pending_hhupdate_ += charEscapement_(charno);
 		pending_hupdate_ += charWidth_(charno);
-		gotEvent = new DviFileSetChar (charno, this);
+		gotEvent = new DviFileSetChar (opcode, charno, this);
 		break;
 	      case 132:		// set_rule
 		{
@@ -220,28 +220,30 @@ DviFileEvent *DviFile::getEvent()
 		    int b = magnify_(getSIS(4));
 		    pending_hupdate_ += b;
 		    if (a > 0 && b > 0)
-			gotEvent = new DviFileSetRule (this, pixel_round(a),
+			gotEvent = new DviFileSetRule (opcode, this,
+						       pixel_round(a),
 						       pixel_round(b));
 		    break;
 		}
 	      case 133:		// put1
-		gotEvent = new DviFileSetChar (getSIU(1), this);
+		gotEvent = new DviFileSetChar (opcode, getSIU(1), this);
 		break;
 	      case 134:		// put2
-		gotEvent = new DviFileSetChar (getSIU(2), this);
+		gotEvent = new DviFileSetChar (opcode, getSIU(2), this);
 		break;
 	      case 135:		// put3
-		gotEvent = new DviFileSetChar (getSIU(3), this);
+		gotEvent = new DviFileSetChar (opcode, getSIU(3), this);
 		break;
 	      case 136:		// put4
-		gotEvent = new DviFileSetChar (getSIS(4), this);
+		gotEvent = new DviFileSetChar (opcode, getSIS(4), this);
 		break;
 	      case 137:		// put_rule
 		{
 		    int a = magnify_(getSIS(4));
 		    int b = magnify_(getSIS(4));
 		    if (a > 0 && b > 0)
-			gotEvent = new DviFileSetRule (this, pixel_round(a),
+			gotEvent = new DviFileSetRule (opcode,
+						       this, pixel_round(a),
 						       pixel_round(b));
 		    break;
 		}
@@ -249,7 +251,7 @@ DviFileEvent *DviFile::getEvent()
 		break;
 	      case 139:		// bop
 		{
-		    DviFilePage *pageEvent = new DviFilePage(true);
+		    DviFilePage *pageEvent = new DviFilePage(opcode, true);
 		    for (int i=0; i<=9; i++)
 			pageEvent->count[i] = getSIS(4);
 		    pageEvent->previous = getSIS(4);
@@ -270,7 +272,7 @@ DviFileEvent *DviFile::getEvent()
 		if (!posStack_.empty())
 #endif
 		    throw DviBug("EOP: position stack not empty");
-		gotEvent = new DviFilePage(false);
+		gotEvent = new DviFilePage(opcode, false);
 		skipPage_ = false;
 		break;
 	      case 141:		// push
@@ -434,35 +436,35 @@ DviFileEvent *DviFile::getEvent()
 		current_font_ = fontMap_[i1];
 		if (current_font_ == 0)
 		    throw DviError ("undefined font %d requested", i1);
-		gotEvent = new DviFileFontChange(current_font_);
+		gotEvent = new DviFileFontChange(opcode, current_font_);
 		break;
 	      case 236:		// fnt2
 		i1 = getSIU(2);
 		current_font_ = fontMap_[i1];
 		if (current_font_ == 0)
 		    throw DviError ("undefined font %d requested", i1);
-		gotEvent = new DviFileFontChange(current_font_);
+		gotEvent = new DviFileFontChange(opcode, current_font_);
 		break;
 	      case 237:		// fnt3
 		i1 = getSIU(3);
 		current_font_ = fontMap_[i1];
 		if (current_font_ == 0)
 		    throw DviError ("undefined font %d requested", i1);
-		gotEvent = new DviFileFontChange(current_font_);
+		gotEvent = new DviFileFontChange(opcode, current_font_);
 		break;
 	      case 238:		// fnt4
 		i1 = getSIS(4);
 		current_font_ = fontMap_[i1];
 		if (current_font_ == 0)
 		    throw DviError ("undefined font %d requested", i1);
-		gotEvent = new DviFileFontChange(current_font_);
+		gotEvent = new DviFileFontChange(opcode, current_font_);
 		break;
 	      case 239:		// xxx1
 		{
 		    string str;
 		    for (int len = getSIU(1); len>0; len--)
 			str += static_cast<char>(getByte());
-		    gotEvent = new DviFileSpecial(str);
+		    gotEvent = new DviFileSpecial(opcode, str);
 		}
 		break;
 	      case 240:		// xxx2
@@ -470,7 +472,7 @@ DviFileEvent *DviFile::getEvent()
 		    string str;
 		    for (int len = getSIU(2); len>0; len--)
 			str += static_cast<char>(getByte());
-		    gotEvent = new DviFileSpecial(str);
+		    gotEvent = new DviFileSpecial(opcode, str);
 		}
 		break;
 	      case 241:		// xxx3
@@ -478,7 +480,7 @@ DviFileEvent *DviFile::getEvent()
 		    string str;
 		    for (int len = getSIU(3); len>0; len--)
 			str += static_cast<char>(getByte());
-		    gotEvent = new DviFileSpecial(str);
+		    gotEvent = new DviFileSpecial(opcode, str);
 		}
 		break;
 	      case 242:		// xxx4
@@ -486,7 +488,7 @@ DviFileEvent *DviFile::getEvent()
 		    string str;
 		    for (int len = getSIS(4); len>0; len--)
 			str += static_cast<char>(getByte());
-		    gotEvent = new DviFileSpecial(str);
+		    gotEvent = new DviFileSpecial(opcode, str);
 		}
 		break;
 
@@ -534,7 +536,6 @@ DviFileEvent *DviFile::getEvent()
     }
 
     assert (gotEvent != 0);
-    gotEvent->opcode = opcode;
 
     return gotEvent;
 }
@@ -975,13 +976,13 @@ void DviFile::check_duplicate_font (int ksize)
 void DviFileEvent::debug ()
 const
 { 
-    cerr << 'E' << static_cast<unsigned int>(opcode) << '\n';
+    cerr << 'E' << static_cast<unsigned int>(opcode_) << '\n';
 }
 void DviFileSetChar::debug ()
 const
 {
-    cerr << 'C' << static_cast<unsigned int>(charno) << "=\'"
-	 << static_cast<char>(charno) << "\'\n";
+    cerr << 'C' << static_cast<unsigned int>(charno_) << "=\'"
+	 << static_cast<char>(charno_) << "\'\n";
 }
 void DviFileSetRule::debug()
 const
