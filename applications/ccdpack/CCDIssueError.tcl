@@ -16,6 +16,7 @@
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     MBT: Mark Taylor (STARLINK)
 #     {enter_new_authors_here}
 
 #  History:
@@ -26,12 +27,17 @@
 #     13-MAY-1999 (PDRAPER):
 #        Modified to use a window that is a child of .topwin (needed
 #        to control transient behaviour).
+#     19-JUN-2001 (MBT):
+#        Upgraded for use with Tcl8.
 #     {enter_changes_here}
 
 #-
 
-#  See if this is a Tk application or not.
+#  Global variables.
    global tk_version
+   global MAIN
+
+#  See if this is a Tk application or not.
    if {[info exists tk_version ]} {
       set is_tk 1
    } else {
@@ -43,10 +49,12 @@
 
 #  Check that error window doesn't already exist, if it does wait for
 #  it to go away before proceeding.
-      if { [winfo exists .topwin.ccdissueerror] } { 
-         tkwait window .topwin.ccdissueerror
+      set Issueerror $MAIN(window).ccdissueerror
+      set issueerror [CCDPathOf $Issueerror]
+      if { [winfo exists $issueerror] } { 
+         tkwait window $issueerror
       }
-      CCDDialog [CCDCmdOf .topwin.ccdissueerror] "Error..." "$message" error
+      CCDDialog $Issueerror "Error..." "$message" error
    } else {
       puts "Error. $message"
    }
