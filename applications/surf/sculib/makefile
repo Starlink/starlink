@@ -6,6 +6,7 @@
 
 FC    = f77
 FFLAGS = -g -C
+FFLAGS = -g -fno-second-underscore
 CFLAGS = 
 LINK   = ln -s
 
@@ -88,7 +89,9 @@ FSOURCES= sculib_1d2_jiggle.f sculib_2pos_deconv.f sculib_3pos_deconv.f \
 	sculib_construct_out.f sculib_get_filename.f sculib_par_get.f \
 	sculib_apparent_2_mp.f sculib_scan_2_rd.f sculib_add_chop.f \
 	sculib_fix_scan_v10.f sculib_gauss_wtinit.f sculib_skydip_var.f \
-	sculib_noise_mean.f sculib_find_int.f
+	sculib_noise_mean.f sculib_find_int.f sculib_calc_clockerr.f \
+	sculib_rad2string.f
+
 
 FCPPSOURCES = sculib_skydip_temperatures.F sculib_bessel_wtinit.F 
 
