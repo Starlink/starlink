@@ -33,6 +33,7 @@
 //#include <unistd.h>
 #include <vector>
 #include <string>
+//#include <memory>		// for auto_ptr
 
 #ifdef HAVE_CSTD_INCLUDE
 #include <cstring>
@@ -60,7 +61,7 @@ using std::ios;
 #include <Util.h>
 #include <stringstream.h>
 #ifdef ENABLE_KPATHSEA
-#include <kpathsea.h>
+#include <KarlPathSearcher.h>
 #endif
 
 
@@ -254,7 +255,7 @@ verbosities PkFont::verbosity (const verbosities level)
     enum verbosities oldv = verbosity_;
     verbosity_ = level;
 #ifdef ENABLE_KPATHSEA
-    kpathsea::verbosity (level);
+    KarlPathSearcher::verbosity (level);
 #endif
     return oldv;
 }
@@ -331,9 +332,11 @@ bool PkFont::find_font (string& path)
 	&& (fontSearchStrategies_ & fontSearchStrategyKpse_))
     {
 	const char *kpse_file;
+	//std::auto_ptr<KarlPathSearcher> kps = KarlPathSearcher::getInstance();
+	KarlPathSearcher* kps = KarlPathSearcher::getInstance();
 
-	kpse_file = kpathsea::find (name_.c_str(),
-				    static_cast<int>(scaled_res));
+	kpse_file = kps->find (name_.c_str(),
+			       static_cast<int>(scaled_res));
 
 	if (kpse_file != 0)
 	{
@@ -342,7 +345,7 @@ bool PkFont::find_font (string& path)
 	}
 
         if (verbosity_ > normal)
-            cerr << "PkFont::find_font: kpathsea::find("
+            cerr << "PkFont::find_font: (KarlPathSearcher)->find("
                  << name_ << "," << static_cast<int>(scaled_res) << ") = "
                  << (got_it ? path : "...nothing!") << endl;
 

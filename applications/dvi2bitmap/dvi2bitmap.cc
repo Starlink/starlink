@@ -77,7 +77,7 @@ using std::bitset;
 #include "version.h"
 
 #ifdef ENABLE_KPATHSEA
-#include "kpathsea.h"
+#include "KarlPathSearcher.h"
 #endif
 #ifdef ENABLE_PNG
 #include "PNGBitmap.h"		// for PNGBitmap::libpng_version
@@ -208,7 +208,7 @@ int main (int argc, char **argv)
     progname = argv[0];
 
 #ifdef ENABLE_KPATHSEA
-    kpathsea::init (progname, resolution);
+    KarlPathSearcher::setProgramName(progname);
 #endif
 
     BitmapImage::setInfo (BitmapImage::SOFTWAREVERSION,
@@ -686,7 +686,7 @@ int main (int argc, char **argv)
 
 	    cout << "ENABLE_KPATHSEA      " << 
 #ifdef ENABLE_KPATHSEA
-                "yes" << endl << "  libkpathsea: " << kpathsea::version_string()
+                "yes" << endl << "  libkpathsea: " << KarlPathSearcher::version_string()
 #else
                 "no"
 #endif

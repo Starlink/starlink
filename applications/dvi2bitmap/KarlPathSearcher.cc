@@ -45,7 +45,7 @@
 using std::cerr;
 #endif
 
-#include <kpathsea.h>
+#include <KarlPathSearcher.h>
 #include <PkFont.h>		// for PkFont::dpiBase
 
 // The Kpathsea library interface has to be isolated in this class because the
@@ -100,28 +100,31 @@ namespace kpse {
 }
 #undef HAVE_PROTOTYPES
 
-
-bool kpathsea::initialised_ = false;
-verbosities kpathsea::verbosity_ = normal;
+// Declare static variables
+KarlPathSearcher *KarlPathSearcher::instance_ = 0;
+verbosities KarlPathSearcher::verbosity_ = normal;
+const char* KarlPathSearcher::default_program_name_ = 0;
 
 /**
- * Initialises the <code>kpathsea</code> system.  If this is not done
- * explicitly, then the system initialises itself with sensible
- * defaults.  Thus the only reason for doing this is to register a
- * different <code>program_name</code> for the kpathsea library to
- * use when reporting errors or warnings.
+ * Private constructor, does the initialisation work.
+ *
+ * <p>Unfortunately, this naive implementation of a Singleton pattern
+ * has the problem that gcc (for example) reasonably enough warns
+ * that ``class KarlPathSearcher' only defines a private destructor
+ * and has no friends'.  I <em>think</em> we can address this, somehow,
+ * using code:auto_ptr.  However, that doesn't work naively either.
+ * In any case, this is documented to be a singleton object, so
+ * nothing should attempt to delete it.  It would be nice, therefore,
+ * to make the destructor private, and damn the warning.  Perhaps the
+ * analogues of g++'s <code>-Wctor-dtor-privacy</code> might be useful.
  *
  * @param program_name the name to be used in kpathsea feedback
  * @param basedpi the base resolution of the PK fonts; should
  * generally be {@link PkFont.dpiBase}
  */
-void kpathsea::init (const char *program_name, const int basedpi)
+KarlPathSearcher::KarlPathSearcher(const char* program_name,
+				   const int basedpi)
 {
-    if (initialised_ && verbosity_ > quiet) {
-	cerr << "Warning: kpathsea doubly initialised.  Duplicate init ignored\n";
-	return;
-    }
-    
 #ifdef DEFAULT_TEXMFCNF
     // if the TEXMFCNF variable isn't set in the environment, set it to this
     char *texmfcnf = getenv ("TEXMFCNF");
@@ -155,16 +158,62 @@ void kpathsea::init (const char *program_name, const int basedpi)
     program_name = kpse::program_invocation_name = FAKE_PROGNAME;
 #endif
 
-    kpse::kpse_set_program_name (program_name, "dvi2bitmap");
+    kpse::kpse_set_program_name (program_name, // current program name
+				 "dvi2bitmap");	// used in searching texmf.cnf
 
-    kpse::kpse_init_prog ("TEX", basedpi, NULL, NULL);
-    initialised_ = true;
+    kpse::kpse_init_prog ("TEX", // prefix to make TEXFONTS, TEXHEADERS, etc
+			  basedpi,
+			  NULL,
+			  NULL);
 }
+
+KarlPathSearcher::~KarlPathSearcher()
+{
+    // nothing
+}
+
+/**
+ * Returns an instance of the object which searches the TeX tree,
+ * using Karl's path-searching algorithm (KPSE).
+ *
+ * <p>Note that, although it looks as if you should be able to call
+ * this more than once with different parameters, you can't in fact,
+ * and if you call it more than once (that's fine and sensible) you
+ * get the same instance back each time.  In fact, there's no good
+ * reason I can think of why you'd <em>want</em> to initialise this in
+ * different ways, so this isn't a problem in fact.  The door remains
+ * open to this changing in future, though.  About the only reason for
+ * giving non-default parameters here is to register a different
+ * <code>program_name</code> for the kpathsea library to use when
+ * reporting errors or warnings.
+ *
+ * @param program_name the name to be used in kpathsea feedback; if
+ * zero, this default to the value set by {@link #setProgramName}, and
+ * if that has not been set, to <code>"tex"</code>
+ * @param basedpi the base resolution of the PK fonts; if zero, it is
+ * taken to be {@link PkFont.dpiBase} (a sensible default)
+ */
+KarlPathSearcher* KarlPathSearcher::getInstance(const char *program_name,
+						const int basedpi)
+{
+    if (instance_ == 0) {
+	instance_ = new KarlPathSearcher(program_name != 0
+					 ? program_name
+					 : (default_program_name_ != 0
+					    ? default_program_name_
+					    : "tex"),
+					 basedpi != 0
+					 ? basedpi
+					 : PkFont::dpiBase());
+    }
+    return instance_;
+}
+
 /**
  * Obtains the Kpathsea version
  * @return the kpathsea version string
  */
-const char *kpathsea::version_string (void)
+const char *KarlPathSearcher::version_string (void)
 {
     extern char *kpathsea_version_string;
     return kpathsea_version_string;
@@ -177,12 +226,8 @@ const char *kpathsea::version_string (void)
  * @return the full path to the PK file which defines the font, or
  * zero if the font cannot be found
  */
-const char *kpathsea::find (const char *fontname, int resolution)
+const char *KarlPathSearcher::find (const char *fontname, int resolution)
 {
-    if (! initialised_ && verbosity_ > silent) {
-	init("tex", PkFont::dpiBase());
-    }
-
     kpse::kpse_glyph_file_type glyph_info;
     char *fname;
     // This next line is really 
@@ -213,7 +258,7 @@ const char *kpathsea::find (const char *fontname, int resolution)
  * @param level the desired verbosity level
  * @return the previous verbosity level
  */
-verbosities kpathsea::verbosity (const verbosities level)
+verbosities KarlPathSearcher::verbosity (const verbosities level)
 {
     verbosities oldv = verbosity_;
     verbosity_ = level;

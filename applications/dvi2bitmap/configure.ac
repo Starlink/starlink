@@ -195,7 +195,8 @@ if test -n "$extrapath"; then
 	for font-searching.  The font _generation_ programs (usually)
 	use this library when they work their magic, but that's
 	entirely separate, and controlled only by ENABLE_FONT_GEN.])]
-                                EXTRALO="$EXTRALO kpathsea.lo"
+                                dnl EXTRALO="$EXTRALO kpathsea.lo"
+                                EXTRALO="$EXTRALO KarlPathSearcher.lo"
                                 LIBS="$LIBS -lkpathsea"
                                 needfontfinding=0)])
 fi
@@ -349,7 +350,7 @@ AC_ARG_WITH(fontgen-mode,
   fi)
 
 
-dnl   Do we want to use the fake_progname feature in kpathsea.cc?
+dnl   Do we want to use the fake_progname feature in KarlPathSearcher.cc?
 dnl   (following makes no sense if we don't have kpsewhich, and so
 dnl   presumably aren't using the texmf.cnf, but this is a
 dnl   use-at-your-own-risk option anyway, so presumably the user knows

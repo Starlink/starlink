@@ -38,7 +38,7 @@ libdvi2bitmap_la_SOURCES = \
 EXTRA_libdvi2bitmap_la_SOURCES = \
 	GIFBitmap.cc \
 	PNGBitmap.cc \
-	kpathsea.cc
+	KarlPathSearcher.cc
 EXTRALO=@EXTRALO@
 libdvi2bitmap_la_LIBADD = $(EXTRALO) $(LTLIBOBJS)
 libdvi2bitmap_la_DEPENDENCIES = $(EXTRALO) $(LTLIBOBJS)
