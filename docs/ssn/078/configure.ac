@@ -9,8 +9,6 @@ AC_CONFIG_SRCDIR(ssn78.xml)
 
 STAR_DEFAULTS(docs-only)
 
-dnl AC_PATH_PROGS(JADE, [jade openjade], jade)
-dnl AC_PATH_PROGS(SGMLNORM, [sgmlnorm osgmlnorm], sgmlnorm)
 STAR_XML_DOCUMENTATION(ssn78)
 LATEX2DVI='$$LATEX "\\batchmode\\input $$1" && makeindex $$1 && $$LATEX "\\batchmode\\input $$1"'
 AC_PATH_PROGS(METAPOST, [mp mpost])
