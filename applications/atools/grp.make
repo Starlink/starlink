@@ -29,7 +29,7 @@ asttrann.f atl1_cpcol.f gethlp.f astinvert.f astinvert.ifl astmapbox.f \
 astmapbox.ifl astgetrefpos.f astsetrefpos.f astspecframe.f astgetrefpos.ifl \
 astsetrefpos.ifl astspecframe.ifl astformat.ifl asttran2.ifl astformat.f \
 asttran2.f astmathmap.f astmathmap.ifl astsetactunit.f astsetactunit.ifl \
-astgetactunit.f astgetactunit.ifl
+astgetactunit.f astgetactunit.ifl astpolymap.f astpolymap.ifl
 
 # The contents of the atools_iraf.tar file:
 ATOOLS_IRAF = doc astcopy.par astaddframe.par astclear.par astget.par astset.par \
@@ -39,7 +39,7 @@ astpermmap.par astremoveframe.par astremapframe.par astmatrixmap.par \
 astconvert.par astlutmap.par astpcdmap.par astwinmap.par astfindframe.par \
 astpermaxes.par astpickaxes.par astsimplify.par asttrann.par astinvert.par \
 astmapbox.par astgetrefpos.par astsetrefpos.par astspecframe.par \
-astshiftmap.par astformat.par asttran2.par astmathmap.par \
+astshiftmap.par astformat.par asttran2.par astmathmap.par astpolymap.par \
 astsetactunit.par astgetactunit.par
 
 #  The fortran A-task files containing prologues to be included in the
@@ -51,7 +51,7 @@ astremapframe.f astmatrixmap.f astconvert.f astlutmap.f astpcdmap.f \
 astwinmap.f astshiftmap.f astfindframe.f astpermaxes.f astpickaxes.f astsimplify.f \
 asttrann.f astinvert.f astmapbox.f astgetrefpos.f astsetrefpos.f \
 astspecframe.f astformat.f asttran2.f astmathmap.f astsetactunit.f \
-astgetactunit.f
+astgetactunit.f astpolymap.f 
 
 #  Contents of the doc/ directory in atools_iraf.tar
 IRAF_DOCS = astcopy.hlp astaddframe.hlp astclear.hlp astget.hlp astset.hlp \
@@ -62,7 +62,7 @@ astconvert.hlp astlutmap.hlp astpcdmap.hlp astwinmap.hlp astshiftmap.hlp astfind
 astpermaxes.hlp astpickaxes.hlp astsimplify.hlp asttrann.hlp astinvert.hlp \
 astmapbox.hlp astgetrefpos.hlp astsetrefpos.hlp astspecframe.hlp \
 astformat.hlp asttran2.hlp astmathmap.hlp astsetactunit.hlp \
-astgetactunit.hlp
+astgetactunit.hlp astpolymap.hlp
 
 # The other files which need to be extracted from the source code
 # repository and which end up in atools.tar.
