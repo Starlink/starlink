@@ -45954,6 +45954,21 @@ The following applications have been modified:
 
 \begin{description}
 
+   \item [\htmlref{CONTOUR}{CONTOUR}] \mbox{}
+      \begin{itemize}
+         \item It is now possible to draw ``pseudo-contours'' which
+               outline regions of the data array chosen in ways other than 
+               than by simple data thresholding. Setting MODE to ``Good''
+               will produce a ``contour'' which encloses all the good 
+               pixel values. Setting MODE to ``Bounds'' will produce 
+               a curve which traces the edges of the array.
+         \item A new parameter LABOUT has been added which controls
+               whether or not labels are produced when drawing outlines 
+               using modes ``Good'' and ``Bounds''.
+         \item The number of pen colours used in a cycle if PENROT is set 
+               TRUE has been increased from 3 to 5.
+      \end{itemize}
+
    \item [\htmlref{FITSEDIT}{FITSEDIT}] \mbox{}
       \begin{itemize}
          \item FITSEDIT and FITSTEXT both now allow blank keyword values

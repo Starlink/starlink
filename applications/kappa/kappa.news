@@ -13,3 +13,9 @@
 
    - A bug has been fixed in PSF which caused the output NDF holding 
    the model PSF be filled with zeros.
+
+   - It is now possible to use CONTOUR to draw "pseudo-contours" which
+   outline regions of the data array chosen in ways other than than by
+   simple data thresholding. Setting MODE to "Good" will produce a
+   curve which encloses all the good pixel values. Setting MODE to
+   "Bounds" will produce a curve which traces the edges of the array. 
