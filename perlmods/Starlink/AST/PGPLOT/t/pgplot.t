@@ -31,7 +31,7 @@ is( Starlink::AST::PGPLOT::_GText( "Testing", 2, 4, "CC", 0, 1),
 # _GTxtEx( $text, $x, $y, $justification, $upx, $upy, $xb, $yb );
 my ( $status, $xb, $yb );
 ($status, $xb, $yb ) =
-      Starlink::AST::PGPLOT::_GTxtEx( "Testing", 2, 4, "CC", 0, 1 );
+      Starlink::AST::PGPLOT::_GTxExt( "Testing", 2, 4, "CC", 0, 1 );
 is( $status, 1, "Calling _GTxtEx()" );
 
 $$xb[4] = $$xb[0]; $$yb[4] = $$yb[0];
