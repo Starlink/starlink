@@ -7357,11 +7357,13 @@ U java/source/table/src/main/uk/ac/starlink/table/jdbc/SwingAuthenticator.java
 U java/source/table/src/main/uk/ac/starlink/table/jdbc/TerminalAuthenticator.java
 cvs checkout: Updating java/source/table/src/main/uk/ac/starlink/table/view
 U java/source/table/src/main/uk/ac/starlink/table/view/AuxWindow.java
+U java/source/table/src/main/uk/ac/starlink/table/view/BitsRowSubset.java
 U java/source/table/src/main/uk/ac/starlink/table/view/ColumnDialog.java
 U java/source/table/src/main/uk/ac/starlink/table/view/ColumnInfoWindow.java
 U java/source/table/src/main/uk/ac/starlink/table/view/ColumnsDisplay.java
 U java/source/table/src/main/uk/ac/starlink/table/view/JELRowReader.java
 U java/source/table/src/main/uk/ac/starlink/table/view/MirageHandler.java
+U java/source/table/src/main/uk/ac/starlink/table/view/OptionsListModel.java
 U java/source/table/src/main/uk/ac/starlink/table/view/ParameterWindow.java
 U java/source/table/src/main/uk/ac/starlink/table/view/PlasticStarTable.java
 U java/source/table/src/main/uk/ac/starlink/table/view/PlotWindow.java
