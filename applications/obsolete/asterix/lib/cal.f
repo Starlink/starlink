@@ -1559,7 +1559,7 @@ C
 	REAL		QMAP(65,65,2)   ! Linearization table
 	REAL		AZ, EL		! Spherical coords (rads)
 * Output
-	INTEGER		STATUS
+*	INTEGER		STATUS
 * M Denby 16-Jun-89
 * Modified to use linearization table Dick Willingale 1990-Apr-20
 * Major modification of masking Dick Willingale 1990-Sep-3
