@@ -136,7 +136,7 @@
 *        1-dimensional NDF called profile. This is done using a
 *        compression box which is 1 pixel high, but which is wider than
 *        the whole input image. Each pixel in the output NDF thus 
-*        corresponds to the average of the corresonding row in the
+*        corresponds to the average of the corresponding row in the
 *        input image. WLIM is set to zero to ensure that bad pixels
 *        are ignored. ALIGN is set to FIRST so that each compression box 
 *        is flush with the left edge of the input image. TRIM is set to

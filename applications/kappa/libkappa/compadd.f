@@ -143,7 +143,7 @@
 *        1-dimensional NDF called profile. This is done using a
 *        compression box which is 1 pixel high, but which is wider than
 *        the whole input image. Each pixel in the output NDF thus 
-*        corresponds to the sum of the corresonding row in the
+*        corresponds to the sum of the corresponding row in the
 *        input image. WLIM is set to zero to ensure that bad pixels
 *        are ignored. ALIGN is set to FIRST so that each compression box 
 *        is flush with the left edge of the input image. TRIM is set to
@@ -168,7 +168,7 @@
 *        stores the reduced data in the NDF called galaxy.  Thus if
 *        cosmos is two-dimensional, this command would result in a
 *        twelve-fold reduction in the array components.  Also, if there
-*        are bad pixels there will be no normalistion correction for the
+*        are bad pixels there will be no normalisation correction for the
 *        missing values.  The title of the output NDF is "COSMOS
 *        compressed".
 *     compadd in=arp244 compress=[1,1,3] out=arp244cs
