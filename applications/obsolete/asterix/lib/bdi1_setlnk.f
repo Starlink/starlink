@@ -205,7 +205,7 @@
               CALL DAT_SHAPE( AXLOC, 1, NDIM, IDUM, STATUS )
               DO I = 1, NDIM
                 CALL DAT_CELL( AXLOC, 1, I, AXCLOC, STATUS )
-                IF ( STATUS .NE. SAI__OK ) THEN
+                IF ( STATUS .EQ. SAI__OK ) THEN
                   CALL DAT_FIND( AXCLOC, 'DATA_ARRAY', AXDLOC, STATUS )
                   CALL ADI1_ARYSHP( AXDLOC, 1, DIMS(I), IDUM, TYP,
      :                              STATUS )
@@ -233,7 +233,7 @@
 *        Report or annul original error
             IF ( GOTAX .AND. (STATUS.NE.SAI__OK) ) THEN
               CALL ERR_ANNUL( STATUS )
-            ELSE
+            ELSE IF ( .NOT. GOTAX ) THEN
               CALL ERR_REP( 'BDI1_SETLNK', 'Unable to find primary '/
      :                               /'data array in input', STATUS )
             END IF
