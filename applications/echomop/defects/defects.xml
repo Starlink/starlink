@@ -26,20 +26,65 @@ than others.</p>
 <defectgroup>
 <title>Functionality</title>
 
-<defect status="open"
-	originator="Michael Albrow"
-	originatoremail="phys170@cantua.canterbury.ac.nz"
-	date="1-Feb-1999">
-<title>ech_dekker and ech_object apparently yoked together</title>
-<p>Michael Albrow:
+<defect status="closed" originator="Ignacio Negueruela"
+originatoremail="ignacio@tocai.sdc.asi.it" date="4-May-1999">
+<title>Ripple on the continuum</title>
+<p>Ripple superimposed on the continuum, possibly due to missing
+counts?</p>
+<appendices>
+<email id="negueruela1" src="negueruela1.mail"/>
+</appendices>
+<resolution status="deferred" author="Norman" date="10-May-1999">
+<p>An expert I consulted suggested:
 <blockquote>
-<p>When using
-echmenu, options "4.1" and "4.2" (these are the tasks ech_dekker and
-ech_object)
-don't seem to be able to be invoked separately anymore. Instead, trying
-either option seems to do the same as option "4" (ech_spatial).</p>
+<p>Hmm. A lot depends on how bright the object is. For bright objects where
+sky background is not a problem, I normally try to take the dekker limits
+well into the inter-order gap. This is wider than the limits that are
+normally set automatically by option 4.1. This ensures that there is
+sufficient background. Is he substracting sky with option 6, or fitting
+scattered light with option 22?</p>
+
+<p>It is hard to judge whether or not this is the problem, as he doesn't
+mention the amplitude of the ripple. Last year, when I was dealing with
+obscenely high S:N ratios, I found that the interpolation routine for
+tdetermining the spatial profile shape for optimal extraction was giving a
+ripple with an amplitude about 0.003 of the signal. The cure was to ditch
+optimal extraction and do simple extraction over the same limits.
+</p>
 </blockquote>
 </p>
+
+<p>In a later message, Ignacio reported:
+<blockquote>
+<p>The two problems I had seem to be in part due to the fact that
+the data were taken with a fibre-fed spectrograph (though they also affect
+the UES data). The difficulties can be interpreted as follows:
+<ol>
+<li><p>"One issue is with the use of flat  fields. With fibre data it doesnt
+usually work very well if you use flat fields in the reduction as you
+would with conventional echelle data. I think it is better to extract the
+object spectrum and flat field spectrum individually and then divide the
+object by the flat field."</p>
+
+<p>Well, I've tried this ans it sort of works with the fibre-fed data. I am
+not very happy with the results for the UES data. Neither the traditional
+approach nor this other one seems to work. One possible explanation could
+be that the extent of the flat orders is limited by the dekker while the
+star orders are much smaller and their geometries do not much exactly. I
+am not sure. I keep looking into it.</p></li>
+
+<li><p>"The other difficulty with fibre data is that the object profile limits
+need to be set very carefully else pixellation introduces noise. This is
+probably what was responsible for the ripple pattern you found." </p>
+
+<p>This seems to work correctly if you are careful defining the extent of
+the object. The pixellation (ripple) effect disappears.</p>
+</li>
+</ol>
+</p>
+</blockquote>
+</p>
+</resolution>
 </defect>
 
 <defect status="open" originator="Orlon Petterson"
@@ -49,17 +94,33 @@ originatoremail="physokp@cantua.canterbury.ac.nz" date="4-Aug-2000">
 <p>ECHOMOP 3.3-4: optimal extraction, as opposed to profile
 extraction, seems to round pixel numbers much more often than seems
 plausible.</p>
+<appendices>
+<email id="petterson0" src="petterson0.mail"/>
+</appendices>
 </defect>
 
 <defect status="open" originator="James Bleach"
 originatoremail="jnb@astro.keele.ac.uk" date="9-Aug-2000">
 <title>`Hedgehog' problem</title>
 
-<p>Need to get more details.  See <figref id="bleach1"/> and <figref
-id="bleach2"/> for pictures.</p>
-
+<p>Quoth James:
+<blockquote>
+<p>I have attached two ps files to illustrate the problem that I and a
+colleague of mine have encountered during the reduction of sets of WHT
+echelle spectroscopy, dubbed the `hedgehog' problem. The problem is clear
+in the first image and is also present on a smaller scale in the lower
+spectrum of the second image, seen as small regular jumps. We found that
+this problem is removed if the dekker extent is reduced (see the upper two
+spectra in the second image, the only difference between these spectra is
+the background definition and as a result the S/N). I am not clear on what
+is causing the problem and therefore why it is solved by decreasing he
+dekker extent.</p>
+</blockquote>
+</p>
+<appendices>
 <fig id="bleach1" src="bleach1.gif"/>
 <fig id="bleach2" src="bleach2.gif"/>
+</appendices>
 </defect>
 
 <defect status="open" originator="Rachel North"
@@ -76,6 +137,34 @@ RESULT_TYPE: SCROBJ).</p>
 <defectgroup>
 
 <title>Interface problems</title>
+
+<defect status="open"
+	originator="Michael Albrow"
+	originatoremail="phys170@cantua.canterbury.ac.nz"
+	date="1-Feb-1999">
+<title>ech_dekker and ech_object apparently yoked together</title>
+<p>Michael Albrow:
+<blockquote>
+<p>When using
+echmenu, options "4.1" and "4.2" (these are the tasks ech_dekker and
+ech_object)
+don't seem to be able to be invoked separately anymore. Instead, trying
+either option seems to do the same as option "4" (ech_spatial).</p>
+</blockquote>
+</p>
+<appendices>
+<email id="albrow1" src="albrow1.mail"/>
+</appendices>
+</defect>
+
+<defect status="open" originator="Dave James"
+originatoremail="djj@st-andrews.ac.uk" date="14-Sep-1999">
+<title>Option 4.2</title>
+<p>Option 4.2 isn't `sticky'.</p>
+<appendices>
+<email id="djj1" src="djj1.mail"/>
+</appendices>
+</defect>
 
 <defect status="open" originator="Rachel North"
 originatoremail="rcn@astro.soton.ac.uk" date="12-May-2000">

@@ -1,0 +1,47 @@
+From ussc@star.rl.ac.uk Thu Apr  5 10:18:13 2001
+From: Starlink Software Librarian <ussc@star.rl.ac.uk>
+To: Norman Gray <norman@astro.gla.ac.uk>
+Date: Mon, 1 Feb 1999 09:04:09 +0000 (GMT)
+Subject: ECHOMOP bug report (fwd)
+
+
+
+-- 
+  ---------------------------------------------------------------------------
+     Martin Bly,                     | Internet: ussc@star.rl.ac.uk
+     Starlink Software Librarian     | URL:      http://star-www.rl.ac.uk/
+     Starlink, RAL, Chilton, DIDCOT  | Tel:      +44|0 1235 445363
+     OXON, OX11 0QX, United Kingdom. | Fax:      +44|0 1235 446667
+  ------- Software Store: http://star-www.rl.ac.uk/cgi-store/storetop -------
+
+
+---------- Forwarded message ----------
+Date: Mon, 01 Feb 1999 16:28:12 +1300 (NZDT)
+From: Michael Albrow <phys170@cantua.canterbury.ac.nz>
+Reply-To: m.albrow@phys.canterbury.ac.nz
+To: ussc@star.rl.ac.uk
+Subject: ECHOMOP bug report
+
+Dear Martin
+
+I have found a problem in the current release of ECHOMOP. When using
+echmenu, options "4.1" and "4.2" (these are the tasks ech_dekker and ech_object)
+don't seem to be able to be invoked separately anymore. Instead, trying
+either option seems to do the same as option "4" (ech_spatial). This is
+a change from the way ECHOMOP used to behave and makes it impossible
+to clone the dekker information from a template file.
+
+regards
+Michael Albrow
+
+
++-----------------------------------------------------------------------------+
+| Michael Albrow                         telephone +64 3 3667001 x7579 (work) |
+| Department of Physics and Astronomy              +64 4 3642987 x7579 (work) |
+| University of Canterbury               fax       +64 3 3642469              |
+| Private Bag 4800                                                            |
+| Christchurch                      email   m.albrow@phys.canterbury.ac.nz    |
+| New Zealand                       http://www.phys.canterbury.ac.nz/~phys170 |
++-----------------------------------------------------------------------------+
+ 
+

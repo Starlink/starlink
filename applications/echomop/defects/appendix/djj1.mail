@@ -1,0 +1,97 @@
+From ussc@star.rl.ac.uk Thu Apr  5 10:43:57 2001
+From: Starlink Software Librarian <ussc@star.rl.ac.uk>
+To: Norman Gray <norman@astro.gla.ac.uk>
+Date: Tue, 14 Sep 1999 13:44:38 +0100 (BST)
+Subject: LINUX ECHOMOP problem (fwd)
+
+And you thought you'd seen the back of this...
+
+Cany you investigate please?
+
+Martin.
+-- 
+  ---------------------------------------------------------------------------
+    Martin Bly,                     | email: ussc@star.rl.ac.uk
+    Starlink Software Librarian     | URL:   http://www.starlink.rl.ac.uk/
+    Starlink, RAL, Chilton, DIDCOT  | Tel:   +44|0 1235 445363
+    OXON, OX11 0QX, United Kingdom. | Fax:   +44|0 1235 446667
+  ----- Software Store: http://www.starlink.rl.ac.uk/cgi-store/storetop -----
+
+
+---------- Forwarded message ----------
+Date: Tue, 14 Sep 1999 12:55:28 +0100 (BST)
+From: Maverick <djj@st-andrews.ac.uk>
+To: ussc@star.rl.ac.uk
+Subject: LINUX ECHOMOP problem
+
+hi Martin, 
+
+how's things ? 
+
+Just thought I would report a little bug with the LINUX version 
+of ECHOMOP. 
+
+There is an option 4 inside the main program, and the first run 
+through the data, one selects option 4.1 to model the dekker/object 
+positions.
+
+Normally, the dekker limits are obtained through modelling a flat field, 
+and after that, on subsequent runs, this information in stored in the 
+created reduction fle (a communication file for the program).
+
+On subsequent runs through the images, only optoin 4.2 is selected ....
+to model the object limits.
+
+(Inside option 4.2 there is a tunable option 3 >> PFL_MODE...
+
+this in principle allows you to select 
+
+D, S, O, A  
+
+User_parameters
+
+  PFL_MODE=_CHAR
+
+     The profiling mode used to specify which profiles are to be
+     calculated/edited.
+
+     The options are:
+
+        D  -  Calculate/edit Dekker limits.
+        O  -  Calculate/edit Object profile.
+        S  -  Calculate Flux standard profile.
+        A  -  All, do each of the above in turn.          
+
+)
+
+
+Now you should just use option 'O' for all the objects....
+
+BUT, the current LINUX version (Version 3.3-4  13th June 1997) 
+forces you to re-do the dekker limits and then the object 
+EVERY time irrespective of whether you choose option 4.1 or 
+4.2 and sub option 'O'.
+
+Now for big CCDs this is time consuming and damned boring if 
+you have to do it for say 100 frames or thereabouts. 
+
+Can this be looked at please ? 
+
+thanks
+
+Dave
+
+
+
+
+                    "No man is poor who has friends" 
+-----------------------------------------------------------------------
+  Dr. Dave James 
+  School of Physics & Astronomy     Tel: +44-1334-46-3068 
+  University of St Andrews          Fax: +44-1334-46-3104
+  North Haugh                       http://star-www.st-and.ac.uk/~djj/
+  St Andrews  	                    E-mail djj@st-and.ac.uk
+  FIFE, KY16 9SS                    +      djj@nightly.com 
+-----------------------------------------------------------------------
+
+

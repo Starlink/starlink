@@ -1,0 +1,35 @@
+From physokp@cantua.canterbury.ac.nz Thu Apr  5 10:58:57 2001
+From: Orlon Petterson <physokp@cantua.canterbury.ac.nz>
+To: Norman Gray <norman@astro.gla.ac.uk>
+Date: Fri, 13 Oct 2000 18:54:01 +1300 (NZDT)
+Subject: Re: ECHOMOP: Arc Line Profile Fitting
+Reply-To: Orlon Petterson <o.petterson@phys.canterbury.ac.nz>
+
+Hi Norman
+
+Part 2, the first file is the RV standard beta aqr, like all the files it
+has already been preprocessed and dark subtracted so is ready to go.  The
+second file is a composite flat image made from several images.
+
+Hope this goes a long way to recreating the line identification problems.
+
+Regards
+
+Orlon
+
+--
+Orlon Petterson    email:o.petterson@phys.canterbury.ac.nz 
+                   Department of Physics and Astronomy 
+          University of Canterbury,  Christchurch,  New Zealand
+                http://www.phys.canterbury.ac.nz/~physokp/
++-------------------* Our future is among the stars! *-------------------+ 
+
+    [ Part 2, "betaaqr"  Application/OCTET-STREAM (Name: ]
+    [ "betaaqr.fit.gz")  3.2MB. ]
+    [ Unable to print this part. ]
+
+
+    [ Part 3, "flat"  Application/OCTET-STREAM (Name: "flat.fit.gz")  ]
+    [ 5.4MB. ]
+    [ Unable to print this part. ]
+

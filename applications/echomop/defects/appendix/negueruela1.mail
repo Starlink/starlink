@@ -1,0 +1,47 @@
+From ignacio@tocai.sdc.asi.it Thu Apr  5 10:29:07 2001
+From: Ignacio Negueruela <ignacio@tocai.sdc.asi.it>
+To: norman@astro.gla.ac.uk
+Date: Tue, 4 May 1999 17:15:47 +0200 (MET DST)
+Subject: echomop
+
+
+ Dear Norman,
+
+ I hope you're still responsible for ECHOMOP.
+ 
+ I am finding a weird problem when processing spectra taken with different
+instruments - I have until now found it with UES data, FOCES data (a
+fibre-fed spectrograph) and BFOSC data a multiinstrument using a
+combination of two grisms.
+
+ The problem is a sort of ripple superposed on the continuum - as a matter
+of fact, it's not a propoer sort-of-sinusoidal wave, but looks more like
+some missing counts every so many wavelength units. I am tempted to
+attribute this to sky subtraction, since in most cases there shouldn't
+really be any sky to subtract from the image (the seeing being bad enough
+for the star to occupy the whole slit or fibre-hole). My idea is that,
+given the relatively curved shape of the orders, ECHOMOP leaves out pixels
+that belong to the object (or counts them as sky). I cannot be sured
+becuase I really don't know how ECHOMOP determines the extent of the order
+at each point. I have experimented quite a lot with ECH_SPATIAL, changing
+the parameters for individual orders, but I cannot find a correlation
+between, say,  the number of sky pixels and the quality of the resulting
+spectrum. Also, I cannot extend indefinitely the size of the object, due
+to order overlapping.
+
+ Are you conscious of this problem happening to someone else and do you
+have any recipe to treat it?
+
+ Thanks,
+
+   Ignacio.
+
+
+--------------------------------------------------------------------------
+Ignacio Negueruela - ESA External Research Fellow    Phone +39 06 40796012
+SAX Science Data Center, Agenzia Spaziale Italiana   Fax   +39 06 40796291
+c/o Telespazio, via Corcolle 19            email: ignacio@tocai.sdc.asi.it
+I00131 Roma, Italy                  WWW:sax.sdc.asi.it/~ignacio/index.html
+
+
+

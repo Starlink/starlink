@@ -1,0 +1,116 @@
+Date: Fri, 04 Aug 2000 15:28:53 +1200 (NZST)
+From: Orlon Petterson <physokp@cantua.canterbury.ac.nz>
+Reply-To: Orlon Petterson <o.petterson@phys.canterbury.ac.nz>
+To: ussc@star.rl.ac.uk, mjc@star.ucl.ac.uk
+Cc: Orlon Petterson <o.petterson@phys.canterbury.ac.nz>,
+     Daniel Pooley <physdjp@cantua.canterbury.ac.nz>,
+     Michael Albrow <m.albrow@phys.canterbury.ac.nz>,
+     Peter Cottrell <p.cottrell@cantva.canterbury.ac.nz>,
+     Jennifer McSaveney <j.mcsaveney@phys.canterbury.ac.nz>
+Subject: Arc Line Profile Fitting
+
+Dear Sir/Madam,
+
+When reducing echelle spectra using your ECHOMOP package (version 3.3-4) we
+have noticed a rather curious feature.
+
+The tables have been garnered from the reduction database file.
+
+Table 1
+Line Ord  Pixel       Wavelength
+No.  No.  No.
+
+1    1    132.5948    5437.388     
+2    1    176.9542    5440.602     
+3    1    268.0225    5447.154     
+4    1    331	      5451.652     
+5    1    339	      5452.219     
+6    1    434.3124    5458.968     
+7    1    473.6672    5461.736     
+8    1    551.2589    5467.161     
+9    1    603.013     5470.759     
+10   1    797.3746    5484.146    
+11   1    930.4254    5493.204    
+12   1    947.1292    5494.331    
+13   1    1004.136    5498.184    
+14   1    1020	      5499.255    
+
+1    2    108	      5567.999     
+2    2    219	      5576.204     
+3    2    262	      5579.358     
+4    2    367	      5587.026     
+5    2    478	      5595.063     
+6    2    610	      5604.516     
+7    2    697	      5610.681     
+8    2    843.0988    5620.921     
+9    2    911.7693    5625.678
+
+Table 2
+Line Ord  Pixel       Wavelength
+No.  No.  No.
+
+1     1   46.73944     5431.112
+2     1   176.9541     5440.602
+3     1   268.049      5447.154
+4     1   300.5043     5449.479
+5     1   331.0103     5451.652
+6     1   338.8997     5452.219
+7     1   473.6638     5461.736
+8     1   486.1268     5462.613
+9     1   508.8778     5464.206
+10    1   602.9222     5470.759
+11    1   723.3015     5479.075
+12    1   922.144      5492.643
+13    1   930.4376     5493.204
+14    1   947.153      5494.331
+15    1   1004.119     5498.184
+16    1   1020.048     5499.255
+
+1     2   57.71556     5564.201
+2     2   108.3163     5567.999
+3     2   151.1628     5571.191
+4     2   238.9309     5577.685
+5     2   261.6746     5579.358
+6     2   302.8055     5582.367
+7     2   321.8966     5583.762
+8     2   477.9442     5595.063
+9     2   610.2751     5604.516
+10    2   681.7349     5609.58 
+11    2   697.3672     5610.681
+12    2   717.0639     5612.068
+13    2   763.3085     5615.319
+14    2   911.7241     5625.678
+15    2   978.4145     5630.297
+
+
+These orders have been fitted with a 4 coefficient polynomial with an RMS
+< 0.002. Probably a good identification.
+
+The only difference in process is that the orders were optimally extracted
+in the first case and profile extracted in the second (ech_extrct).
+
+The main feature is that the pixel numbers for the optimal case often have
+integer values. In the profile case there are also integer pixel values,
+but these are only for lines which are saturated. Consequently the arc
+line centres are more accurate and lead to fits in general involving
+nearly 50% more lines. The standard deviations for radial velocities
+calculated from these fits are 1.16 km/s and 0.68 km/s respectively.
+
+The question we have is why does the part of echomop responsible for the
+centroiding of arc lines feel compelled to round some pixel values in the
+optimal case but not the profile? Are we setting some parameter
+incorrectly or is there really a bug in the program?
+
+Yours sincerely
+
+Daniel Pooley & Orlon Petterson
+
+--
+Orlon Petterson    email:o.petterson@phys.canterbury.ac.nz 
+                   Department of Physics and Astronomy 
+          University of Canterbury,  Christchurch,  New Zealand
+                http://www.phys.canterbury.ac.nz/~physokp/
++-------------------* Our future is among the stars! *-------------------+ 
+
+
+

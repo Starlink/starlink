@@ -1,0 +1,77 @@
+From physokp@cantua.canterbury.ac.nz Thu Apr  5 10:56:21 2001
+From: Orlon Petterson <physokp@cantua.canterbury.ac.nz>
+To: Norman Gray <norman@astro.gla.ac.uk>
+Date: Fri, 13 Oct 2000 13:13:05 +1300 (NZDT)
+Subject: Re: ECHOMOP: Arc Line Profile Fitting
+Reply-To: Orlon Petterson <o.petterson@phys.canterbury.ac.nz>
+
+Hi
+
+>I'm now trying, from the top as it were, to reproduce the problem
+>you're having.  Would you be able to send me, or point me to, the data
+>which produces the integer results you quote.  
+>
+I can send you some of our data so you can see what we are working with.
+Its data we have gathered locally.  I'll send you some compressed FITS
+files.
+
+>Also, you say:
+>
+>> When reducing echelle spectra using your ECHOMOP package (version 3.3-4) we
+>> have noticed a rather curious feature.
+>> 
+>> The tables have been garnered from the reduction database file.
+>
+>Ermmm, how?  The information in the reduction database is in an opaque
+>NDF extension, so that, for example, KAPPA's ndftrace can't poke around
+>inside it.  As far as I can recall.  Is your remark a hint that the
+>fiddling-with-NDFs gadget I've been meaning to write for ages, already
+>exists?
+>
+We are able to extract information from the reduction database using the
+"convert" package of commands.  This output the data as an ascii file which
+we can then feed into other programs.
+
+Below is the file that have been written to do this:
+
+#!/bin/csh -f
+#
+source /star/etc/cshrc
+source /star/etc/login
+figaro
+convert
+
+foreach file ( $* )
+  creobj type=NDF dims=0 object=tempid
+  creobj type=ARRAY dims=0 object=tempid.data_array
+  copobj source=$file:r".more.echelle.id_lines" \
+         object=tempid.data_array.data
+  ndf2ascii tempid out=$file:r"idl.asc" fixed noperec=1
+  /bin/rm tempid.sdf
+  creobj type=NDF dims=0 object=tempid
+  creobj type=ARRAY dims=0 object=tempid.data_array
+  copobj source=$file:r".more.echelle.id_waves" \
+         object=tempid.data_array.data
+  ndf2ascii tempid out=$file:r"idw.asc" fixed noperec=1
+  /bin/rm tempid.sdf
+end
+
+
+-----------------------------------------------
+
+If you want I can also send my reduction scripts in case there is something
+there that might be of use.
+
+I'll send the CCD image files in a separate email.
+
+Regards
+
+Orlon
+
+--
+Orlon Petterson    email:o.petterson@phys.canterbury.ac.nz 
+                   Department of Physics and Astronomy 
+          University of Canterbury,  Christchurch,  New Zealand
+                http://www.phys.canterbury.ac.nz/~physokp/
++-------------------* Our future is among the stars! *-------------------+ 
+
