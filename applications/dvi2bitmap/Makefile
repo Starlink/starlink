@@ -1,3 +1,6 @@
+# part of dvi2bitmap
+# $Id$
+
 CXXFLAGS=-g
 
 EXEC=dvi2bitmap
