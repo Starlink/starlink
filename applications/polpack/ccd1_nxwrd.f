@@ -37,8 +37,14 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
+*  Notes:
+*     -  If an error has already occurred, or if an error occurs during this
+*     routine, NOTFND is returned .FALSE., and FIRST and LAST are returned
+*     equal to one.
+
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -46,6 +52,9 @@
 *        Original version.
 *     5-FEB-1992 (PDRAPER):
 *        Changed to CCD1_ routine from ARD original.
+*     15-APR-1998 (DSB):
+*        Changed so that words which end at the end of the string are
+*        found without error.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -72,25 +81,44 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
+*  Initialise returned values.
+      NOTFND = .TRUE.
+      FIRST = 1
+      LAST = 1
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Look for the first character of the word - first non delimeter.
+*  Look for the first character of the word - first non delimiter.
       FIRST = OFFSET 
       CALL CHR_FIWS( STRING, FIRST, STATUS )
-      LAST = FIRST 
-      CALL CHR_FIWE( STRING, LAST, STATUS )
 
-*  Check for error.
-      IF ( STATUS .EQ. CHR__ENDOFSENT .OR. STATUS .EQ. CHR__WRDNOTFND )
-     :   THEN
-            CALL ERR_ANNUL( STATUS )
-            NOTFND = .TRUE.
-      ELSE
-            NOTFND = .FALSE.
+*  If no more words remain in the string, annul the error and set the
+*  returned flag to indicate this.
+      IF ( STATUS .EQ. CHR__WNOTF ) THEN
+         CALL ERR_ANNUL( STATUS )
+         NOTFND = .TRUE.
+
+*  If a word start was found, indicate a word has been found and find the 
+*  word end.
+      ELSE IF( STATUS .EQ. SAI__OK ) THEN
+         NOTFND = .FALSE.
+
+         LAST = FIRST 
+         CALL CHR_FIWE( STRING, LAST, STATUS )
+
+*  An error will be reported if the word end does not occur before the end
+*  of the string. This is still a valid word though, so annul the error.
+         IF( STATUS .EQ. CHR__EOSNT ) CALL ERR_ANNUL( STATUS )
+
+      END IF
+
+*  Return null values if an error occurred.
+      IF( STATUS .NE. SAI__OK ) THEN
+         NOTFND = .TRUE.
+         FIRST = 1
+         LAST = 1
       END IF
 
       END 
-* @(#)ccd1_nxwrd.f	2.1     11/30/93     2
