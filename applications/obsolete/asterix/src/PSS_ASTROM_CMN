@@ -4,5 +4,6 @@
       INTEGER			GE_PIXID		! Pixellation
       INTEGER			GE_PRJID		! Projection
       INTEGER			GE_SYSID		! Coordindate system
+      LOGICAL			GE_OK			! Ok?
 
-      COMMON /PSS_ASTROM_CMN/   GE_PIXID, GE_PRJID, GE_SYSID
+      COMMON /PSS_ASTROM_CMN/   GE_PIXID, GE_PRJID, GE_SYSID, GE_OK
