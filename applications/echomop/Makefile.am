@@ -3,7 +3,7 @@
 dist_bin_SCRIPTS = decos_many ech_toarchive
 bin_SCRIPTS = echomop.csh echomop.sh
 
-bin_MONOLITHS = echmono
+bin_MONOLITHS = echmono ech_scrn2d ech_ftrdb
 echmono_TASKS = \
     ech_2dfit ech_decimg ech_decos1 ech_decos2 \
     ech_ext2d ech_extrct ech_ffield ech_trplt \
@@ -22,24 +22,23 @@ echmono_LDADD = libechomop.la \
 	 `hlp_link` `fio_link_adam` `ndf_link_adam` \
 	 `kaplibs_link_adam`
 
-bin_PROGRAMS = ech_ftrdb ech_scrn2d echhelp
+bin_PROGRAMS = echhelp
 
 ## This was pgplot_link -- better as pgp_link?
-ech_ftrdb: ech_ftrdb.f libechomop.la
-	$(ALINK) ech_ftrdb.f \
-	  libechomop.la \
-	  `hlp_link` `pgp_link` `sla_link_adam` `pda_link` \
-	  `psx_link_adam` `fio_link_adam` `ndf_link_adam` \
-	  `kaplibs_link_adam`
-ech_scrn2d: ech_scrn2d.f libechomop.la
-	$(ALINK) ech_scrn2d.f \
-	  libechomop.la \
+ech_ftrdb_SOURCES = ech_ftrdb.f
+ech_ftrdb_LDADD = libechomop.la \
 	  `hlp_link` `pgp_link` `sla_link_adam` `pda_link` \
 	  `psx_link_adam` `fio_link_adam` `ndf_link_adam` \
 	  `kaplibs_link_adam`
 
-echhelp_SOURCES = helpm.c helpc.c
-echhelp_LDADD = `hlp_link` `fio_link` `cnf_link` @FCLIBS@
+ech_scrn2d_SOURCES = ech_scrn2d.f
+ech_scrn2d_LDADD = libechomop.la \
+	  `hlp_link` `pgp_link` `sla_link_adam` `pda_link` \
+	  `psx_link_adam` `fio_link_adam` `ndf_link_adam` \
+	  `kaplibs_link_adam`
+
+echhelp_SOURCES = helpm.c
+echhelp_LDADD = `shl_link` @FCLIBS@
 
 # Help files
 echomop.shl: echomop.hlp
