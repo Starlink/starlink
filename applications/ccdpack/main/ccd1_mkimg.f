@@ -64,7 +64,9 @@
 *        This determines the subpixel resampling scheme.  If set to 
 *        AST__UINTERP then the resampling will be done using the 
 *        CCG1_IBLK<X> routines, which average over a cube in the input
-*        array.
+*        array.  This option should not be used as long as you have 
+*        a sufficiently recent version of AST; in that case you can
+*        use the value AST__BLOCKAVE instead.
 *     INTPAR( * ) = DOUBLE PRECISION (Given)
 *        The PARAMS vector to be passed to the AST_RESAMPLE routine.
 *        For certain values of INTSCH, it gives additional information
@@ -162,8 +164,8 @@
       OUBND( 1 ) = OXBASE + OXDIM - 1
       OUBND( 2 ) = OYBASE + OYDIM - 1
       RFLAGS = AST__USEBAD
-      TOL = 0.5D0 * ( FLOAT( OXDIM ) / FLOAT( IXDIM ) + 
-     :                FLOAT( OYDIM ) / FLOAT( IYDIM ) )
+      TOL = 0.5D0 * MIN( FLOAT( OXDIM ) / FLOAT( IXDIM ),
+     :                   FLOAT( OYDIM ) / FLOAT( IYDIM ) )
       MAXPIX = IXDIM + IYDIM
 
 *  Get dummy workspace for unused input and output variance arrays.  This
