@@ -149,6 +149,9 @@
         CALL ADI2_FITERP( FSTAT, STATUS )
       END IF
 
+*  Define its size
+      CALL FTBDEF( LUN, NFLDS, TYPES, VARIDAT, STATUS )
+
 *  Free the buffer
       CALL ADI_ERASE( HID, STATUS )
 
