@@ -39,12 +39,21 @@
 *
 *    History :
 *
-*      4 Feb 87 : Original (BHVAD::TJP)
-*     14 Apr 88 : New structures - global eliminated (TJP)
-*     25 Mar 92 : Renamed, FIT_PREDDAT made external (RJV)
-*     27 May 92 : Added max-l statistic, error handling corrected (DJA)
-*     12 Jun 92 : Passes quality to FIT_LOGL_ACCUM (DJA)
-*     18 Aug 92 : Statistic now double precision (DJA)
+*      4 Feb 1987 (TJP):
+*        Original version
+*     14 Apr 1988 (TJP):
+*        New structures - global eliminated
+*     25 Mar 1992 (RJV):
+*        Renamed, FIT_PREDDAT made external
+*     27 May 1992 (DJA):
+*        Added max-l statistic, error handling corrected
+*     12 Jun 1992 (DJA):
+*        Passes quality to FIT_LOGL_ACCUM
+*     18 Aug 1992 (DJA):
+*        Statistic now double precision
+*      4 Mar 1996 (DJA):
+*        Now use grouped data pointers. If no grouping is defined these
+*        have the same values as the primary dataset pointers
 *
 *    Type definitions :
 *
@@ -53,7 +62,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'FIT_PAR'
 *
 *    Structure definitions :
@@ -87,23 +95,21 @@
 *    Local variables :
 *
       DOUBLE PRECISION    DSTAT			! Double prec accumulator
-D     INTEGER             I
       INTEGER             N			! Dataset index
       LOGICAL             MAXL                  ! Use maximum likelihood?
 *-
 
-*    Status check
+*  Check inherited global status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Maximum likelihood?
+*  Maximum likelihood?
       MAXL = (FSTAT.EQ.FIT__LOGL)
 
-*    Loop through datasets calculating predicted data and accumulating statistic
+*  Loop through datasets calculating predicted data and accumulating statistic
       DSTAT = 0.0D0
-      DO N=1,NDS
+      DO N = 1, NDS
 
-*      Check dataset
-D	PRINT *,'fit_stat;param,ndat: ',(PARAM(I),I=1,6),OBDAT(N).NDAT
+*    Check dataset
 	IF ( (OBDAT(N).WPTR.EQ.0) .AND. .NOT. MAXL ) THEN
 	  STATUS = SAI__ERROR
 	  CALL ERR_REP( 'NOWTS','No data weights available', STATUS )
@@ -114,19 +120,29 @@ D	PRINT *,'fit_stat;param,ndat: ',(PARAM(I),I=1,6),OBDAT(N).NDAT
 	  GOTO 99
 	END IF
 
-*      Evaluate model
+*    Evaluate model
 	CALL PREDICTOR( FSTAT, NDS, OBDAT, INSTR, PREDDAT, MODEL,
      :                  PARAM, N, %VAL(PREDDAT(N).DPTR), STATUS )
 
-*      Accumulate statistic
+*    Group the predicted data?
+        IF ( OBDAT(N).GFLAG ) THEN
+          CALL FIT_GROUP( OBDAT(N).NDAT, %VAL(PREDDAT(N).DPTR),
+     :                    .FALSE., 0.0, OBDAT(N).QFLAG,
+     :                    %VAL(OBDAT(N).QPTR), %VAL(OBDAT(N).GPTR),
+     :                    OBDAT(N).NGDAT, %VAL(PREDDAT(N).GDPTR),
+     :                    0.0, %VAL(OBDAT(N).GQPTR), STATUS )
+        END IF
+
+*    Accumulate statistic
         IF ( MAXL ) THEN
-	  CALL FIT_LOGL_ACCUM( OBDAT(N).NDAT, %VAL(OBDAT(N).DPTR),
-     :                      OBDAT(N).QFLAG, %VAL(OBDAT(N).QPTR),
-     :                      %VAL(PREDDAT(N).DPTR), DSTAT, STATUS )
+	  CALL FIT_LOGL_ACCUM( OBDAT(N).NDAT, %VAL(OBDAT(N).GDPTR),
+     :                      OBDAT(N).QFLAG, %VAL(OBDAT(N).GQPTR),
+     :                      %VAL(PREDDAT(N).GDPTR), DSTAT, STATUS )
         ELSE
-          IF ( STATUS .NE. SAI__OK ) GOTO 99
-	  CALL FIT_CHISQ_ACCUM( OBDAT(N).NDAT, %VAL(OBDAT(N).DPTR),
-     :          %VAL(OBDAT(N).WPTR), %VAL(PREDDAT(N).DPTR), DSTAT )
+	  CALL FIT_CHISQ_ACCUM( OBDAT(N).NDAT, %VAL(OBDAT(N).GDPTR),
+     :                         OBDAT(N).QFLAG, %VAL(OBDAT(N).GQPTR),
+     :          %VAL(OBDAT(N).GVPTR), %VAL(PREDDAT(N).GDPTR), DSTAT,
+     :             STATUS )
         END IF
 
       END DO
@@ -138,11 +154,9 @@ D	PRINT *,'fit_stat;param,ndat: ',(PARAM(I),I=1,6),OBDAT(N).NDAT
         STAT = DSTAT
       END IF
 
-D     PRINT *,'fit_stat;stat: ',STAT
-
-*    Exit
+*  Exit
  99   IF ( STATUS .NE. SAI__OK ) THEN
-        CALL ERR_REP( ' ', '...from FIT_STAT', STATUS )
+        CALL AST_REXIT( 'FIT_STAT', STATUS )
       END IF
 
       END
