@@ -8684,7 +8684,6 @@ U java/source/table/src/main/uk/ac/starlink/table/TableSink.java
 U java/source/table/src/main/uk/ac/starlink/table/Tables.java
 U java/source/table/src/main/uk/ac/starlink/table/UCD.java
 U java/source/table/src/main/uk/ac/starlink/table/URLValueInfo.java
-U java/source/table/src/main/uk/ac/starlink/table/UnknownTableFormatException.java
 U java/source/table/src/main/uk/ac/starlink/table/ValueInfo.java
 U java/source/table/src/main/uk/ac/starlink/table/ValueInfoMapGroup.java
 U java/source/table/src/main/uk/ac/starlink/table/WrapperColumn.java
@@ -8693,8 +8692,12 @@ U java/source/table/src/main/uk/ac/starlink/table/WrapperStarTable.java
 U java/source/table/src/main/uk/ac/starlink/table/package.html
 cvs checkout: Updating java/source/table/src/main/uk/ac/starlink/table/formats
 U java/source/table/src/main/uk/ac/starlink/table/formats/AsciiTableWriter.java
+U java/source/table/src/main/uk/ac/starlink/table/formats/CsvStarTable.java
+U java/source/table/src/main/uk/ac/starlink/table/formats/CsvTableBuilder.java
+U java/source/table/src/main/uk/ac/starlink/table/formats/CsvTableWriter.java
 U java/source/table/src/main/uk/ac/starlink/table/formats/HTMLTableWriter.java
 U java/source/table/src/main/uk/ac/starlink/table/formats/LatexTableWriter.java
+U java/source/table/src/main/uk/ac/starlink/table/formats/StreamStarTable.java
 U java/source/table/src/main/uk/ac/starlink/table/formats/TextStarTable.java
 U java/source/table/src/main/uk/ac/starlink/table/formats/TextTableBuilder.java
 U java/source/table/src/main/uk/ac/starlink/table/formats/TextTableWriter.java
@@ -8920,6 +8923,7 @@ U java/source/topcat/src/docs/JEL-licence
 U java/source/topcat/src/docs/Ptplot-licence
 U java/source/topcat/src/docs/avalon-framework-cvs-20020806.jar
 U java/source/topcat/src/docs/batik.jar
+U java/source/topcat/src/docs/changes
 U java/source/topcat/src/docs/docs.dtd
 U java/source/topcat/src/docs/epsgraphics.jar
 U java/source/topcat/src/docs/fop.jar
@@ -9050,6 +9054,8 @@ U java/source/topcat/src/main/uk/ac/starlink/topcat/func/Strings.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/func/TwoQZ.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/func/package.html
 cvs checkout: Updating java/source/topcat/src/main/uk/ac/starlink/topcat/join
+U java/source/topcat/src/main/uk/ac/starlink/topcat/join/ColumnConverter.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/join/ColumnSelector.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/join/InterMatchSpec.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/join/IntraMatchSpec.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/join/MatchOption.java
