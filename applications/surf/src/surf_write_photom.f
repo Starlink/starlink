@@ -143,7 +143,7 @@
 *                            = REAL (Given)
 *           the y offset of the fitted peak
 *     PEAK_Q (MAX_INT, MAX_BEAM)
-*                            = INTEGER (Given)
+*                            = BYTE (Given)
 *           the quality of each fitted peak (0 is good)
 *     BEAM_WEIGHT (MAX_BEAM) = REAL (Given)
 *           the weights assigned to the measurements with each bolometer
@@ -155,14 +155,14 @@
 *           the x offset of the peak fitted to the coadd
 *     MEAS_1_Y (MAX_BEAM)    = REAL (Given)
 *           the y offset
-*     MEAS_1_Q (MAX_BEAM)    = INTEGER (Given)
+*     MEAS_1_Q (MAX_BEAM)    = BYTE (Given)
 *           the quality on MEAS_1_D
 *     MEAS_2_D (MAX_BEAM)    = REAL (Given)
 *           the coadd of the peaks fitted to the individual integrations
 *           for each bolometer
 *     MEAS_2_V (MAX_BEAM)    = REAL (Given)
 *           the variance on MEAS_2_D
-*     MEAS_2_Q (MAX_BEAM)    = INTEGER (Given)
+*     MEAS_2_Q (MAX_BEAM)    = BYTE (Given)
 *           the quality on MEAS_2_D
 *     STATUS                 = INTEGER (Given and returned)
 *           global status
@@ -211,16 +211,16 @@
       REAL          PEAK_V (MAX_INT, MAX_BEAM)
       REAL          PEAK_X (MAX_INT, MAX_BEAM)
       REAL          PEAK_Y (MAX_INT, MAX_BEAM)
-      INTEGER       PEAK_Q (MAX_INT, MAX_BEAM)
+      BYTE          PEAK_Q (MAX_INT, MAX_BEAM)
       REAL          BEAM_WEIGHT (MAX_BEAM)
       REAL          MEAS_1_D (MAX_BEAM)
       REAL          MEAS_1_V (MAX_BEAM)
       REAL          MEAS_1_X (MAX_BEAM)
       REAL          MEAS_1_Y (MAX_BEAM)
-      INTEGER       MEAS_1_Q (MAX_BEAM)
+      BYTE          MEAS_1_Q (MAX_BEAM)
       REAL          MEAS_2_D (MAX_BEAM)
       REAL          MEAS_2_V (MAX_BEAM)
-      INTEGER       MEAS_2_Q (MAX_BEAM)
+      BYTE       MEAS_2_Q (MAX_BEAM)
 *    Import-Export :
 *    Export :
 *    Status :
