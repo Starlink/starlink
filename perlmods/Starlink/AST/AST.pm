@@ -7,7 +7,7 @@ use vars qw/ $VERSION /;
 
 require DynaLoader;
 use base qw| DynaLoader |;
-use Scalar::Util;
+
 
 $VERSION = '0.01';
 
