@@ -1045,8 +1045,8 @@ Many applications handle all non-complex data types directly, for
 efficient memory and disc usage.  Those that do not will usually
 undergo automatic data conversion to produce the desired result.
 
-{\footnotesize KAPPA}'s graphics are device independent.  X-windows and
-overlays are supported.
+{\footnotesize KAPPA}'s graphics are device independent.  X-windows is 
+supported.
 
 \subsection{Support}
 {\footnotesize KAPPA} receives a high level of support, and bug reports
@@ -2211,7 +2211,6 @@ use of this parameter is being phased out. See
 \htmlref{Co-ordinate Systems}{se:co-ordsystem}}.}.\\
 {\tt GLOBAL.DATA\_ARRAY}      & Last NDF or foreign data file accessed or written.\\
 {\tt GLOBAL.GRAPHICS\_DEVICE} & Current graphics workstation.\\
-{\tt GLOBAL.IMAGE\_OVERLAY}   & Current image-display overlay.\\
 {\tt GLOBAL.INTERACTIONMODE}  & Current interaction mode. \\
 {\tt GLOBAL.LUT} & Last lookup table file accessed or written. \\
 {\tt GLOBAL.TRANSFORM} & Current transformation structure. \\
@@ -2240,7 +2239,6 @@ The values of all global parameters may be inspected with the
      ICL> globals
      The current data file                : @/home/dro/jkt/ccdpic
      The current graphics device is       : @ps_l
-     The current image-display overlay is : <undefined>
      The current lookup table file is     : @$KAPPA_DIR/spectrum_lut
      The current transformation is        : @/home/dro/deform/warpit
      The current interaction mode is      : <undefined>
@@ -2249,8 +2247,7 @@ The values of all global parameters may be inspected with the
 \normalsize
 In the above example no interaction mode is defined.  The next time
 you call an application which uses the interaction mode you
-would be prompted for a value.   Likewise for the image-display
-overlay. (Under normal circumstances you will not
+would be prompted for a value.   (Under normal circumstances you will not
 have to enter the {\tt @} prefix yourself.) 
 
 \subsection{\xlabel{se_parstrings}Strings\label{se:parstrings}}
@@ -3245,23 +3242,17 @@ remain unambiguous.
 
 \subsubsection{\xlabel{se_devglobal}Global Parameters\label{se:devglobal}}
 
-There are global parameters for the graphics devices.
+There is a global parameter for the graphics device.
 \begin{description}
-\item [Graphics Device] --- The device used for line graphics.
-\item [Image-display Overlay] --- The device used for overlays on the image
-display.  Again there is a restriction there should be at least 16
-colours, except for X-windows overlays since these only have a single
-colour.
+\item [Graphics Device] --- The device used for graphics.
 \end{description}
-The purpose of these global parameters is ostensibly to prevent
+The purpose of this global parameter is ostensibly to prevent
 unnecessary prompting. However, there is an ulterior motive as well. 
 The selection of devices outside of the graphics applications enables
 us to perform other necessary actions just once. 
 
-There are commands for selecting each type of device:
-\htmlref{GDSET}{GDSET} and
-\htmlref{OVSET}{OVSET} for the graphics device and
-overlay respectively.  For example,
+There is a command for selecting the current graphics device:
+\htmlref{GDSET}{GDSET}. For example,
 
 \small
 \begin{verbatim}
@@ -3334,55 +3325,36 @@ This example makes a window of dimension 600-by-450 pixels, the
 background colour is black and colour for the line graphics is
 yellow. 
 
-{\footnotesize GWM} also enables a single-colour overlay to be associated
-with a window.  This lets you clear the overlay independently of the
-image (task \htmlref{OVCLEAR}{OVCLEAR}), so you can annotate a picture
-with other graphics. This is most useful in interactive applications
-like \htmlref{ARDGEN}{ARDGEN}, \htmlref{CONTOUR}{CONTOUR},
-or \htmlref{SEGMENT}{SEGMENT}.  A
-{\footnotesize GWM} overlay does have one drawback, however: it halves the
-number of available colour indices.  If you want to use an X-windows
-overlay, you must ensure that you have made the window with the {\tt
--overlay} qualifier to {\tt xmake}, or change your X-defaults file,
-or use a {\tt +} suffix to the device name.
-
 The following set up to place in your X-defaults file is a reasonable
 compromise, as it maximises the number of colour indices for the
-graphics window (xwindows), has a yellow overlay (xoverlay), and
-a second graphics window (x2windows).  In the defaults file there are
-the following lines
+graphics window (xwindows), and has a second graphics window (x2windows).  
+In the defaults file there are the following lines
 
 \small
 \begin{verbatim}
      gwm*xwindows*colours:         80
-     gwm*xwindows*overlay:         True
-     gwm*xwindows*ovcolour:        Yellow
      gwm*xwindows2*colours:        20
 \end{verbatim}
 \normalsize
 and you can also set the sizes of the windows too.  Notice that the
 second device name is x2windows, but the window name is xwindows2.
-Don't ask why.  An overlay on this device is called x2overlay.  This
+Don't ask why.  This
 confusing name rule applies also to all but the first window of the
 maximum of four windows allowed.
 
 The device names can be abbreviated, to give unambiguous names.  Thus
-you can enter {\tt xw} for the xwindows device, and {\tt xo} for its
-overlay; {\tt x2w} for the x2windows device, and {\tt x2o} for its
-overlay; and so on.  This is the reason for having device names as
-they are.  If a window does not exist, you can create one with an
-overlay by appending a {\tt +} to the name, so for example a device
-name of {\tt x2w+} would open the x2windows device with an overlay
-plane. 
+you can enter {\tt xw} for the xwindows device;
+{\tt x2w} for the x2windows device; and so on.  This is the reason for 
+having device names as
+they are.  
 
-The following tells {\footnotesize KAPPA} that these are the current devices.
-These remain as global parameters, so you probably will not need to
-issue these commands that often.
+The following tells {\footnotesize KAPPA} that this is the current device.
+This remains as a global parameter, so you probably will not need to
+issue this command that often.
 
 \small
 \begin{verbatim}
      % gdset x2windows
-     % ovset xoverlay
 \end{verbatim}
 \normalsize
 \bigskip
@@ -8635,9 +8607,6 @@ entry 0 is the background colour, and entries 1--5 correspond to
 choosing a palette colour equal to the background colour, features may
 be `erased'.
 
-Note that the X-windows overlay only has one colour, and so does not have
-a palette.
-
 \newpage
 \section{\xlabel{se_masking}Masking, Bad Values, and Quality\label{se:masking}}
 
@@ -11258,10 +11227,6 @@ picture.}
  Draws the outline of a 2-d NDF.}
 \menuitem{OUTSET}{
  Sets pixels outside a specified  circle in a 2-d data array to a specified value.}
-\menuitem{OVCLEAR}{
- Clears an graphics device overlay.}
-\menuitem{OVSET}{
- Selects a current graphics device overlay.}
 \menuitem{PALDEF}{
  Loads the default palette to a colour table.}
 \menuitem{PALENTRY}{
@@ -11493,8 +11458,6 @@ functions as follows.
  Shows which graphics devices are available.
 \classitem{GDSET}
  Selects a current graphics device.
-\classitem{OVSET}
- Selects a current graphics device overlay.
 \end{description}
 \vspace*{0.7ex}
 %
@@ -11506,8 +11469,6 @@ functions as follows.
  Clears a graphics device and purges its database entries.
 \classitem{GDSTATE}
  Shows the current status of a graphics device.
-\classitem{OVCLEAR}
- Clears an graphics device overlay.
 \end{description}
 \vspace*{0.7ex}
 %
@@ -21989,7 +21950,7 @@ plot (101k).
    \sstdiytopic{
       Related Applications
    }{
-      KAPPA: GDSET, GDSTATE, OVCLEAR.
+      KAPPA: GDSET, GDSTATE.
    }
 }
 
@@ -26630,12 +26591,7 @@ plot (10k).
          DEVICE = DEVICE (Read)
       }{
          The graphics device on which the colour table is to be
-         drawn.  The device must be in one of the following GNS
-         categories: IMAGE\_DISPLAY, IMAGE\_OVERLAY, MATRIX\_PRINTER, or
-         WINDOW, and have at least 24 greyscale intensities or colour
-         indices.  It must also not reset when the device is opened
-         (since the colour table would be lost) unless parameter LUT
-         does not have the null value.  {\tt [Current graphics device]}
+         drawn.  {\tt [Current graphics device]}
       }
       \sstsubsection{
          FRAME = LITERAL (Read)
@@ -30456,88 +30412,6 @@ plot (9k).
   Malcolm J. Currie ~STARLINK \mbox{( {\mantt RAL}::{\mantt CUR} )}
 \end{manroutinedescription}
 
-\sstroutine{
-   OVCLEAR
-}{
-   Clears an graphics device overlay
-}{
-   \sstdescription{
-      This application clears an overlay device, but without purging
-      the graphics-database entries for the device.  Optionally, only
-      the current picture is cleared.
-   }
-   \sstusage{
-      ovclear [device] [current]
-   }
-   \sstparameters{
-      \sstsubsection{
-         CURRENT = \_LOGICAL (Read)
-      }{
-         If {\tt TRUE}, then only the current picture is cleared. {\tt [FALSE]}
-      }
-      \sstsubsection{
-         DEVICE = DEVICE (Read)
-      }{
-         The graphics device to be cleared.  It must be in GNS classes
-         IMAGE\_OVERLAY or WINDOW\_OVERLAY.
-         {\tt [}Current graphics device-overlay device{\tt ]}
-      }
-   }
-   \sstexamples{
-      \sstexamplesubsection{
-         ovclear
-      }{
-         Clears the current image-overlay device.
-      }
-      \sstexamplesubsection{
-         ovclear current
-      }{
-         Clears the current picture on the current image-overlay device.
-      }
-      \sstexamplesubsection{
-         ovclear xoverlay
-      }{
-         Clears the xoverlay device.
-      }
-   }
-   \sstdiytopic{
-      Related Applications
-   }{
-      KAPPA: GDCLEAR, OVSET.
-   }
-}
- 
-\sstroutine{
-   OVSET
-}{
-   Selects a current graphics device overlay
-}{
-   \sstdescription{
-      This application selects a current graphics device overlay. This
-      device will be used for all applications requiring an
-      graphics device overlay until changed explicitly.
-   }
-   \sstusage{
-      ovset device
-   }
-   \sstparameters{
-      \sstsubsection{
-         DEVICE = DEVICE (Read)
-      }{
-         The graphics device overlay to become the current graphics device
-         overlay device.  The device must be in GNS categories
-         IMAGE\_OVERLAY or WINDOW\_OVERLAY.
-      }
-   }
-   \sstexamples{
-      \sstexamplesubsection{
-         ovset xov
-      }{
-         Makes the xov device the current graphics device overlay.
-      }
-   }
-}
- 
 \sstroutine{
    PALDEF
 }{
@@ -41056,13 +40930,25 @@ and HDS data types is as follows:
 
 \section{Retired Applications}
 \xlabel{CONTOVER}
+\xlabel{CRELUT}
 \xlabel{GREYPLOT}
+\xlabel{IDCLEAR}
+\xlabel{IDSET}
+\xlabel{IDSTATE}
+\xlabel{IDINVISIBLE}
+\xlabel{IDPAZO}
 \xlabel{INSPECT}
+\xlabel{KRHHELP}
+\xlabel{LUTFLIP}
+\xlabel{LUTHILITE}
+\xlabel{LUTROT}
+\xlabel{LUTTWEAK}
 \xlabel{MOSAIC}
+\xlabel{OVCLEAR}
+\xlabel{OVSET}
 \xlabel{QUILT}
 \xlabel{SNAPSHOT}
 \xlabel{TURBOCONT}
-\xlabel{CRELUT}
 
 The following commands used to be part of KAPPA but have now been
 ``retired'' to the \KAPRHref package:
@@ -41070,8 +40956,20 @@ The following commands used to be part of KAPPA but have now been
 \item \xref{CONTOVER}{sun239}{CONTOVER}
 \item \xref{CRELUT}{sun239}{CRELUT}
 \item \xref{GREYPLOT}{sun239}{GREYPLOT}
+\item \xref{IDCLEAR}{sun239}{IDCLEAR}
+\item \xref{IDINVISIBLE}{sun239}{IDINVISIBLE}
+\item \xref{IDPAZO}{sun239}{IDPAZO}
+\item \xref{IDSET}{sun239}{IDSET}
+\item \xref{IDSTATE}{sun239}{IDSTATE}
 \item \xref{INSPECT}{sun239}{INSPECT}
+\item \xref{KRHHELP}{sun239}{KRHHELP}
+\item \xref{LUTFLIP}{sun239}{LUTFLIP}
+\item \xref{LUTHILITE}{sun239}{LUTHILITE}
+\item \xref{LUTROT}{sun239}{LUTROT}
+\item \xref{LUTTWEAK}{sun239}{LUTTWEAK}
 \item \xref{MOSAIC}{sun239}{MOSAIC}
+\item \xref{OVCLEAR}{sun239}{OVCLEAR}
+\item \xref{OVSET}{sun239}{OVSET}
 \item \xref{QUILT}{sun239}{QUILT}
 \item \xref{SNAPSHOT}{sun239}{SNAPSHOT}
 \item \xref{TURBOCONT}{sun239}{TURBOCONT}
@@ -43813,8 +43711,6 @@ functions as follows.
  Shows which graphics devices are available.
 \classitem{GDSET}
  Selects a current graphics device.
-\classitem{OVSET}
- Selects a current graphics device overlay.
 \end{description}
 \vspace*{0.7ex}
 %
@@ -43826,8 +43722,6 @@ functions as follows.
  Clears a graphics device and purges its database entries.
 \classitem{GDSTATE}
  Shows the current status of a graphics device.
-\classitem{OVCLEAR}
- Clears an graphics device overlay.
 \end{description}
 \vspace*{0.7ex}
 %
