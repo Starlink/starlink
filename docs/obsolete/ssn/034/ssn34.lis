@@ -1,0 +1,343 @@
+
+
+
+SCIENCE AND ENGINEERING RESEARCH COUNCIL                      SSN/34.3
+RUTHERFORD APPLETON LABORATORY
+SPACE & ASTROPHYSICS DIVISION
+
+Starlink Project                                             Issued by
+Starlink System Note 34.3
+
+                                                               J P Day
+                                                        12 August 1986
+
+----------------------------------------------------------------------
+
+                 CDS - Database Administrator's Guide
+                 ------------------------------------
+
+
+
+1  PURPOSE OF THIS GUIDE
+
+This guide aims to instruct the CDS database administrator in:
+
+      o  The CDS file system.
+
+      o  The CDS index files.
+
+      o  The procedure for  assimilating  a  new  CDS  tape  into  the
+         database.
+
+It is assumed that the administrator has read SUN/79.
+
+
+
+2  CDS FILE SYSTEM
+
+Logical names are set up by  the  START_CAR  command.   The  procedure
+invoked  by this symbol should be run whenever you do anything in this
+tree.
+
+The  root  of  the  directory  tree  is  "CDS"  currently  located  on
+DISK$IRAS:[CDSDIR.CDS].  The tree is depicted below; logical names are
+in brackets:
+
+
+
+
+
+
+
+
+
+
+
+
+                                - 1 -
+SSN/34.3                                                        Page 2
+
+
+
+         CDSDIR.CDS             [CDS]
+             |
+             +----BACK
+             |
+             +----DOC           [CDS_DOC]
+             |
+             +----DSCF          [CDS_DSCF]
+             |
+             +----INDEX         [CDS_INDEX]
+             |
+             +----MTANAL
+             |
+             +----PROGRAMS      [CDS_PROGRAM]
+
+The main directory only contains subdirectory files.
+
+
+
+2.1  BACK
+
+BACK contains the CDS backup system.  This is easier to use  than  the
+ordinary  backup.  Just set default to [.BACK], then issue the command
+@BACKMAC.
+
+
+
+2.2  DOC
+
+DOC contains the copies of SUN/79, SSN/34 and the  printable  versions
+of  the  indexes which all have a filetype of CAR.  It also contains a
+procedure REPORT.COM to generate new printable versions of the indexes
+when the main index is updated.
+
+
+
+2.3  DSCF
+
+This contains the (very  large)  text  library  of  FACTS  description
+files, CDSDSCF.TLB.
+
+
+
+2.4  INDEX
+
+This contains the FACTS description  files  and  data  files  for  the
+indexes.   The  main  index is CDSI.DAT and its format is described in
+DSCFCDSI.DAT.  CDST is CDSI, sorted  by  tape  and  filenumber.   CDSD
+contains  those  entries of CDST which have the documentation flag set
+to T.  Note  the  CRITERION  parameter  in  DSCFCDSD  which  activates
+selection by CAR_SEARCH.  CDSA, CDSN, CDSO, CDSC, CDSW are versions of
+CDSD sorted by AUTHOR_NAME, TITLE, OBJECT, CDS_CLASS, and WAVELENGTH.
+
+                                - 2 -
+SSN/34.3                                                        Page 3
+
+
+There is an index antecedent to the CDSI called DATAINDEX.DAT which is
+kept in this directory.
+
+All the index files and description files can be typed and edited.
+
+INDEX contains a procedure SORTINDEX to be performed  after  the  main
+index has been updated after the assimilation of new CDS tapes.
+
+
+
+2.5  MTANAL
+
+This contains the printed outputs of the MTANAL utility.  Each listing
+is suffixed with the tape name.  (After running MTANAL you must rename
+the MTANAL.LIS.)
+
+
+
+2.6  PROGRAMS
+
+This contains the source and images for the programs  CDS_DATASET  and
+CDS_TAPE.    CDS_DATASET   only   requires  the  INTERIM  environment.
+CDS_TAPE requires to be linked with ADC; a procedure  is  provided  to
+compile and link it.
+
+
+
+3  CDS INDEX FILES
+
+Keeping the indexes updated is  crucial  to  the  maintenance  of  the
+database.   There are two index files:  DATAINDEX and CDSI.  There are
+versions of CDSI sorted on various fields as explained above.
+
+DATAINDEX is appended to  by  the  CDS_DATASET  program,  and  is  not
+required by users directly.  DATAINDEX is not a FACTs file.  DATAINDEX
+is read by the CDS_TAPE program as it processes each dataset on a tape
+to  get the title, mnemonic, author, reference and keyword information
+for the dataset.  There are  three  lines  for  each  dataset  in  the
+DATAINDEX file.  The first dataset in the file is shown below:
+
+        3079A83 F SPECTRUM OF GAMMA-TAU 5185 A TO 6005 A
+        APPLA     APPLEQUIST,L. ET AL A&A. SUPP, 52, 237
+        STAR/G-TAU        OPTICAL
+
+The first record contains  the  dataset  id,  documentation  flag  and
+title.  The second record contains the mnemonic, author and reference.
+The third record contains the object keyword and wavelength keyword.
+
+CDSI is appended to by the CDS_TAPE.  There is  one  record  for  each
+dataset.   The  fields  are documented in DSCFCDSI.DAT.  You can amend
+entries in CDSI using CAR_EDIT - it is possible, but not convenient to
+edit it with the VMS editor as the records are 248 characters.
+
+                                - 3 -
+SSN/34.3                                                        Page 4
+
+
+4  ASSIMILATING A CDS TAPE
+
+When a CDS tape is received,  follow  the  following  procedure.   The
+example used here is for SD999.
+
+        $ SET DEF CDS
+        $ SET DEF [.MTANAL]
+        $ RUN UTILITYDIR:MTANAL to check the tape.
+
+If there is no documentation or the tape is unreadable then
+        Telex CDS about the fact and put the tape aside
+else
+        Rename the MTANAL.LIS.
+
+        $ RENAME MTANAL.LIS  MTANALSD999.LIS
+
+Get the documentation on  the  catalogue  and  the  catalogue  of  CDS
+catalogues to hand and a copy of the MTANALSD999.LIS
+
+        $ SET DEF CDS_INDEX
+        $ CDS_DATASET
+
+The program operates in a loop for each dataset  to  set  up  a  three
+record  entry  for  the  DATAINDEX  file.   You  enter  the  requisite
+information for each dataset on the tape.  The example above is  used.
+The  space  for  your  string  is marked by "!" - don't overflow, make
+abbreviations.  You can repeat a previous value of a string  by  using
+the  "/"  character (some files have the same title etc).  Hints below
+are marked with < > brackets.
+
+        Give dataset id:
+        !!!!!!!
+        3079A83
+< From MTANAL listing >
+        Documentation ? (T/F):
+        !
+        F
+< Do you have full documentation ? >
+        Give full title, ("/" for same):
+        !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        SPECTRUM OF GAMMA-TAU 5185 A TO 6005 A
+< Use name from Catalogue of Catalogues else use the name in the >
+< documentation >
+        Give 5 character mnemonic:
+        !!!!!
+        APPLA
+< first 4 characters of author name followed by dataset letter.>
+        Give reference, ("/" for same):
+        !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        APPLEQUIST,L. ET AL A&A. SUPP, 52, 237
+< Use reference from the Catalogue of Catalogues else use the
+< reference from the documentation.  Space marks end of AUTHOR_NAME>
+
+                                - 4 -
+SSN/34.3                                                        Page 5
+
+
+        Give object keyword, ("/" for same):
+        !!!!!!!!!!!!!!!!!
+        STAR/G-TAU
+< Main object type, qualifiers. Singulars only. >
+< See CDSO.CAR for examples >
+        Give wavelength keyword, ("/" for same):
+        !!!!!!!!!!!!!!!!!
+        OPTICAL
+< One of RADIO INFRARED OPTICAL UV X-RAY GAMMA-RAY >
+        END:=
+< Type END to finish, hit return for the next dataset >
+
+You correct any errors in DATAINDEX with  the  editor.   Allocate  and
+mount the tape and give the deck logical name TAPE0 or TAPE1.
+
+        $ CAR_MOUNT
+
+Run the CDS_TAPE program:
+
+        $ CDS_TAPE/DECK=TAPE0/TAPE=SD999
+
+The program then proceeds to process each  dataset  on  the  tape  and
+update  the  CDSI,  using physical information taken from the tape and
+index information from DATAINDEX.
+
+When CDS_TAPE has ended, make a security copy of the CDS tape using  a
+tape utility (eg MTCOPY).
+
+Put the description files generated by CDS_TAPE into the CDSDSCF  text
+library:
+
+        $ LIB/REPLACE/LOG/TEXT CDS_DSCF:CDSDSCF.TLB DSCF*.DAT
+
+and then delete the description files:
+
+        $ DEL DSCF*.DAT.*
+
+Now regenerate the other (user) index files, CDSA etc:
+
+        $ SET DEF CDS_INDEX
+        $ @SORTINDEX
+
+Then regenerate the printed reports:
+
+        $ SET DEF CDS_DOC
+        $ @REPORTS
+        $ R27LASER *.CAR
+
+The VAX work is now finished.
+
+
+
+
+                                - 5 -
+SSN/34.3                                                        Page 6
+
+
+Use laser output for CDSA.CAR to update appendix A and B to SUN/79.
+
+Send the printed documentation to reprographics  and  have  10  copies
+made.  Send one copy to the site manager at each Starlink node.  Issue
+a NEWS item on CDS catalogues to the effect that new  catalogues  have
+just been received.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                - 6 -
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              

@@ -1,0 +1,948 @@
+\documentstyle{article} 
+\pagestyle{myheadings}
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink System Note}
+\newcommand{\stardocinitials}  {SSN}
+\newcommand{\stardocnumber}    {2.1}
+\newcommand{\stardocauthors}   {Jeremy Bailey\footnote{Science and Engineering
+Research Council, Joint Astronomy Centre Hawaii}}
+\newcommand{\stardocdate}      {6 December 1989}
+\newcommand{\stardoctitle}     {MSP --- Message System Primitive Routines\\
+Version 2.1}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{240mm}
+\setlength{\topmargin}{-5mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+%+                              M A N . S T Y
+%
+%  Module name:
+%    MAN.STY
+%
+%  Function:
+%    Default definitions for \LaTeX\ macros used in MAN output
+%
+%  Description:
+%    As much as possible of the output from the MAN automatic manual generator
+%    uses calls to user-alterable macros rather than direct calls to built-in
+%    \LaTeX\ macros. This file contains the default definitions for these
+%    macros.
+%
+%  Language:
+%    \LaTeX
+%
+%  Support:
+%    William Lupton, {AAO}
+%-
+%  History:
+%    16-Nov-88 - WFL - Add definitions to permit hyphenation to work on
+%		 words containing special characters and in teletype fonts.
+
+\typeout{Default MAN macros. Released 8th November 1988}
+
+% permit hyphenation when in teletype font (support 9,10,11,12 point only -
+% could extend), define lccodes for special characters so that the hyphen-
+% ation algorithm is not switched off. Define underscore character to be
+% explicit underscore rather than lots of kerns etc.
+
+%\hyphenchar\nintt=`-\hyphenchar\tentt=`-\hyphenchar\elvtt=`-\hyphenchar\twltt=`-
+
+\lccode`_=`_\lccode`$=`$
+
+\renewcommand{\_}{{\tt\char'137}}
+
+%+                      M A N _ I N T R O
+%
+%  Section name:
+%    MAN_INTRO
+%                                 
+%  Function:
+%    Macros used in the .TEX_INTRO file
+%
+%  Description:
+%    There are no such special macros.
+%-
+
+%+                      M A N _ S U M M A R Y
+%
+%  Section name:
+%    MAN_SUMMARY
+%
+%  Function:
+%    Macros used in the .TEX_SUMMARY file
+%
+%  Description:
+%    There is a command to introduce a new section (mansection) and a list-like
+%    environment (mansectionroutines) that handles the list of routines in the
+%    current section. In addition a mansectionitem command can be used instead
+%    of the item command to introduce a new routine in the current section.
+%-
+
+\newcommand {\mansection}[2]{\subsection{#1 --- #2}}
+
+\newenvironment {mansectionroutines}{\begin{description}\begin{description}}%
+{\end{description}\end{description}}
+
+\newcommand {\mansectionitem}[1]{\item [#1:] \mbox{}}
+
+%+                      M A N _ D E S C R
+%
+%  Section name:
+%    MAN_DESCR
+%
+%  Function:
+%    Macros used in the .TEX_DESCR file
+%
+%  Description:
+%    There is a command to introduce a new routine (manroutine) and a list-like
+%    environment (manroutinedescription) that handles the list of paragraphs
+%    describing the current routine. In addition a manroutineitem command can
+%    be used instead of the item command to introduce a new paragraph for the
+%    current routine.
+%
+%    Two-column tables (the ones that can occur anywhere and which are
+%    triggered by "=>" as the second token on a line) are bracketed by a
+%    new environment (mantwocolumntable). Other sorts of table are introduced
+%    by relevant  environments (manparametertable, manfunctiontable and
+%    manvaluetable). The definitions of these environments call various other
+%    user-alterable commands, thus allowing considerable user control over such
+%    tables... (to be filled in when the commands have been written)
+%-
+
+\newcommand {\manrule}{\rule{\textwidth}{0.5mm}}
+
+\newcommand {\manroutine}[2]{\subsection{#1 --- #2}}
+
+\newenvironment {manroutinedescription}{\begin{description}}{\end{description}%
+\manrule}
+
+\newenvironment {mansubparameterdescription}{\begin{description}}%
+{\end{description}}
+
+\newcommand {\manroutineitem}[2]{\item [#1:] #2\mbox{}}
+
+% two column tables
+
+\newcommand {\mantwocolumncols}{||l|p{80mm}||}
+
+\newcommand {\mantwocolumntop}{\hline}
+
+\newcommand {\mantwocolumnblank}{\mantwocolumnzss\mantwocolumnzhl%
+\gdef\mantwocolumnzhl{}\gdef\mantwocolumnzss{}}
+
+\newcommand {\mantwocolumnbottom}{\mantwocolumnzss\mantwocolumnzhl}
+
+\newenvironment {mantwocolumntable}{\gdef\mantwocolumnzss{}%
+\gdef\mantwocolumnzhl{}\hspace*{\fill}\vspace*{-\partopsep}\begin{center}%
+\begin{tabular}{\mantwocolumncols}\mantwocolumntop}{\mantwocolumnbottom%
+\end{tabular}\end{center}}
+
+\newcommand{\mantwocolumnentry}[1]{\mantwocolumnzss\gdef\mantwocolumnzss{\\}%
+\gdef\mantwocolumnzhl{\hline}#1 & }
+
+% parameter tables
+
+\newcommand {\manparametercols}{lllp{80mm}}
+
+\newcommand {\manparameterorder}[3]{#1 & #2 & #3 & }
+
+\newcommand {\manparametertop}{}
+
+\newcommand {\manparameterblank}{\gdef\manparameterzhl{}\gdef\manparameterzss{}}
+
+\newcommand {\manparameterbottom}{}
+
+\newenvironment {manparametertable}{\gdef\manparameterzss{}%
+\gdef\manparameterzhl{}\hspace*{\fill}\vspace*{-\partopsep}\begin{trivlist}%
+\item[]\begin{tabular}{\manparametercols}\manparametertop}{\manparameterbottom%
+\end{tabular}\end{trivlist}}
+
+\newcommand {\manparameterentry}[3]{\manparameterzss\gdef\manparameterzss{\\}%
+\gdef\manparameterzhl{\hline}\manparameterorder{#1}{#2}{#3}}
+
+% return tables
+
+\newcommand {\manreturncols}{lllp{80mm}}
+
+\newcommand {\manreturnorder}[3]{#1 & #2 & #3 & }
+
+\newcommand {\manreturntop}{}
+
+\newcommand {\manreturnblank}{\gdef\manreturnzhl{}\gdef\manreturnzss{}}
+
+\newcommand {\manreturnbottom}{}
+
+\newenvironment {manreturntable}{\gdef\manreturnzss{}%
+\gdef\manreturnzhl{}\hspace*{\fill}\vspace*{-\partopsep}\begin{trivlist}%
+\item[]\begin{tabular}{\manreturncols}\manreturntop}{\manreturnbottom%
+\end{tabular}\end{trivlist}}
+
+\newcommand {\manreturnentry}[3]{\manreturnzss\gdef\manreturnzss{\\}%
+\gdef\manreturnzhl{\hline}\manreturnorder{#1}{#2}{#3}}
+
+% function tables
+
+\newcommand {\manfunctioncols}{||l|l|p{80mm}||}
+
+\newcommand {\manfunctionorder}[2]{#1 & #2 & }
+
+\newcommand {\manfunctiontop}{\hline}
+
+\newcommand {\manfunctionblank}{\manfunctionzss\manfunctionzhl%
+\gdef\manfunctionzss{}\gdef\manfunctionzhl{}}
+
+\newcommand {\manfunctionbottom}{\manfunctionzss\manfunctionzhl}
+
+\newenvironment {manfunctiontable}{\gdef\manfunctionzss{}\gdef\manfunctionzhl{}%
+\hspace*{\fill}\vspace*{-\partopsep}\begin{center}\begin{tabular}%
+{\manfunctioncols}\manfunctiontop}{\manfunctionbottom\end{tabular}\end{center}}
+
+\newcommand {\manfunctionentry}[2]{\manfunctionzss\gdef\manfunctionzss{\\}%
+\gdef\manfunctionzhl{\hline}\manfunctionorder{#1}{#2}}
+
+% value tables
+
+\newcommand {\manvaluecols}{||l|l|l|p{80mm}||}
+
+\newcommand {\manvalueorder}[3]{#1 & #2 & #3 & }
+
+\newcommand {\manvaluetop}{\hline}
+
+\newcommand {\manvalueblank}{\manvaluezss\manvaluezhl\gdef\manvaluezss{}%
+\gdef\manvaluezhl{}}
+
+\newcommand {\manvaluebottom}{\manvaluezss\manvaluezhl}
+
+\newenvironment {manvaluetable}{\gdef\manvaluezss{}\gdef\manvaluezhl{}%
+\hspace*{\fill}\vspace*{-\partopsep}\begin{center}\begin{tabular}%
+{\manvaluecols}\manvaluetop}{\manvaluebottom\end{tabular}\end{center}}
+
+\newcommand {\manvalueentry}[3]{\manvaluezss\gdef\manvaluezss{\\}%
+\gdef\manvaluezhl{\hline}\manvalueorder{#1}{#2}{#3}}
+
+% list environments
+
+\newenvironment {manenumerate}{\begin{enumerate}}{\end{enumerate}}
+
+\newcommand {\manenumerateitem}[1]{\item [#1]}
+
+\newenvironment {manitemize}{\begin{itemize}}{\end{itemize}}
+
+\newcommand {\manitemizeitem}{\item}
+
+\newenvironment {mandescription}{\begin{description}\begin{description}}%
+{\end{description}\end{description}}
+
+\newcommand {\mandescriptionitem}[1]{\item [#1]}
+
+\newcommand {\mantt}{\tt}
+
+% "semi-verbatim" environment (modified from LaTeX source)
+
+\def\zmansemiverbatim{\trivlist\item[]\ifzminipage\else\vskip\parskip\fi%
+\leftskip\ztotalleftmargin\rightskip\zz%
+\parindent\zz\parfillskip\zflushglue\parskip\zz%
+\ztempswafalse\def\par{\ifztempswa\hbox{}\fi\ztempswatrue\zzpar}%
+\obeylines}
+
+\def\mansemiverbatim{\zmansemiverbatim\frenchspacing\zvobeyspaces}
+
+\let\endmansemiverbatim=\endtrivlist
+%------------------------------------------------------------------------------
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+%------------------------------------------------------------------------------
+%  Add this part if you want a table of contents
+\setlength{\parskip}{0mm}
+\tableofcontents
+\setlength{\parskip}{\medskipamount}
+\markright{\stardocname}
+%------------------------------------------------------------------------------
+\newenvironment{cozy}[1]%
+{\begin{list}{}{%
+\settowidth{\labelwidth}{\large\tt #1}%
+\setlength{\labelsep}{5mm}%
+\setlength{\leftmargin}{\labelwidth}\addtolength{\leftmargin}{\labelsep}%
+\setlength{\parsep}{\medskipamount}%
+}}{\end{list}}
+\newpage
+\section{Introduction}
+
+This document describes the message system primitive (MSP) routines.
+These routines were specified by the workshop on data acquisition environments
+held at AAO in October 1985. The routines provide a fast, general means of
+synchronous communication between VMS processes. They are used by version
+2.0 of the ADAM system to provide the low level message system facilities.
+However, the routines form an independent package which does not require
+the existence of any other parts of the ADAM system. Thus they could be used 
+for any application which requires fast interprocess communication.
+
+\section{General Description}
+
+\subsection{Queues}
+
+The system is built around the concept of message queues. A queue is
+simply a first-in first-out buffer for messages. Any number of messages may
+be placed on a queue by one or more sending processes, and read off the
+queue by a receiving process. Each queue in the system is owned by a
+specific process. Only the owner of a queue may receive a message on
+the queue. However, any process may send a message to a queue. A process enters
+itself into the message system by calling the routine MSP\_ENTER\_TASK. The
+process provides a task name, which other processes can use to obtain
+access to its queues. The call to MSP\_ENTER\_TASK creates a queue owned
+by the process, which is referred to as the command queue. A process may
+also create and delete additional queues as it needs them by calling
+the routines MSP\_CREATE\_QUEUE, and MSP\_DELETE\_QUEUE.
+
+\subsection{Queue identifiers}
+
+Each queue is referred to by means of a queue identifier. The
+queue identifier for the command queue of a task can be obtained from
+the task name by means of the routine MSP\_GET\_TASK\_QUEUE. It is also
+possible to get the name of the owner task from a queue identifier by using
+the routine MSP\_GET\_TASK\_NAME. How can a task find the queue identifier
+of another task's queue which is not the command queue? The answer is that it 
+can be sent the queue identifier in a message. Each message can carry a queue
+identifier of a queue (referred to as the reply queue) as part of the message.
+(NB The terms `command queue' and `reply queue' describe the intended usage
+of these queues in the ADAM system, but in fact the facilities provided are
+completely general and are not restricted to being used in this way. In 
+particular the `reply queue' is not restricted to being a queue owned by the
+sending process, so this facility could be used to pass a queue identifier
+down a chain of processes.) 
+
+Queue identifiers are generated by the system and are represented as
+integer variables. A valid queue identifier never has the value zero,
+so zero may be used as a null value in certain circumstances.
+
+\subsection{Sending and Receiving messages}
+
+The routine MSP\_SEND\_MESSAGE is used to send a message. A call to
+this routine specifies the queue to which the message is to be sent, the
+reply queue to be passed with the message, and the message itself. The
+message is in the form of a byte array of a specified length.
+
+Messages are received by calls to MSP\_RECEIVE\_MESSAGE. This routine
+specifies a list of queues on which messages are to be received. The order of
+queues on the list specifies the order of precedence. The message returned is
+the one on the first queue in the list for which a message is present.
+
+If no messages are present on any of the queues the action of the routine
+depends on the parameter WAIT. If WAIT is false it returns immediately. If
+WAIT is true the routine does not return until a message arrives on
+one of the specified queues. As well as the message itself, the queue identifiers
+of the queue on which the message arrived, and of the reply queue are returned.
+
+\subsection{AST Delivery in Response to a Message}
+
+Instead of waiting for a message to arrive, it is possible to specify that
+an AST will be delivered when a message arrives. This enables a task to carry
+on with other processing while it waits for a message to arrive. This is
+achieved using the MSP\_ENABLE\_AST routine which specifies the address of an
+AST routine to be triggered when a message arrives on one of a list of queues.
+The queue identifier of the queue on which the message arrived is passed to
+the AST routine as its AST parameter.
+                                                    
+\section{Scope of Message System}
+
+MSP communicates by setting up queues in a global section shared by each
+communicating process. The name of the global section is, by default, derived 
+from the username of the user and has the form MSP\_username. Thus all
+processes under the same username (including multiple login sessions) can
+communicate with each other.
+
+Because global section names are subject to logical name translation it
+is possible to override this default behaviour and provide wider or
+more restrictive coverage. To change the name of the section define the
+logical name GBL\$MSP\_username to be the required section name. In this way
+a special message system section can be used to communicate between
+different users in a group, or between a specific subset of processes for
+an individual user. Any one VMS process can only use one message system
+section.
+
+To send a message to a user with a different UIC, but within the same group,
+GROUP privilege is required. It is not possible with the current version
+of MSP to communicate between users in different groups (this is because
+the global section is a group global section).
+
+\section{System Parameters}
+
+The message system code includes several system parameters which are
+currently set up as follows:
+
+\begin{tabular}{|l|l|}  \hline
+  Max length of a task name     &          20 characters   \\
+  Max length of a message       &          512 bytes      \\
+  Max number of messages at one time   &   200    \\
+  Max number of task entries           &   50     \\
+  max number of queues at one time     &   200     \\ \hline
+\end{tabular}
+
+With these parameters the message system uses 230 global pages for each
+section in use (normally each simultaneous user of MSP will use one
+global section). The SYSGEN parameter GLBPAGFIL must be sufficient to
+allow for this.
+
+\section{Installation}
+
+The message system files should be copied into a directory with logical name
+MSP\_DIR. The logical name MSP\_SHR must also be defined as
+MSP\_DIR:MSP\_SHR.EXE. The message system makes use of the AZUSS system service
+package. To install the AZUSS system services run the command procedure
+MSP\_DIR:INSTAZUSS.COM. CMKRNL and SYSPRV privileges are required for this.
+With MSP version 2.0 it is no longer necessary to install the MSP shareable
+image. Nor is it necessary (or possible) to run the MSINIT program.
+
+\section{Using the MSP System}
+
+Fortran programs using the message system should use the include
+file MSPDEF.FOR, to obtain declarations of the functions as integers,
+and definitions of the status code identifiers. 
+
+To link a program with the message system use the command:
+\begin{verbatim}
+
+    LINK program,MSP_DIR:MSP/OPT
+
+\end{verbatim}
+This will link with the shareable image version of MSP. To link with a non
+shareable version use the following command:
+\begin{verbatim}
+
+    LINK program,MSP_DIR:MSPNOSHR/OPT
+                    
+\end{verbatim}
+The program MSMON may be found useful in debugging programs which
+use the message system. It outputs on the terminal a list of the tasks
+currently entered into the message system, and the queues owned by
+these tasks.
+
+\section{Contents of MSP\_DIR}
+
+The message system directory contains the following files:
+
+\begin{tabular}{|l|l|}    \hline
+AZUSS.EXE      &   AZUSS system services shareable image    \\
+AZUSS.MAR      &   Macro source of AZUSS system services package   \\
+INSTAZUSS.COM   &  Command procedure to install AZUSS package  \\
+LINK.COM        &  Command procedure to link a program with the message system\\
+LNKAZUSS.COM    &  Command procedure to link the AZUSS shareable image \\
+MSMON.EXE       &  Program to monitor current use of message system \\
+MSMON.PAS      &   Source of above program  \\
+MSP.TEX        &   Message system documentation (this document) \\
+MSP.OBJ        &   Message system routines object code \\
+MSP.OPT       &    Linker options file to link with message system  \\       
+MSPNOSHR.OPT  &    Linker options file to link with nonshareable MSP \\
+MSP.PAS       &    Pascal source of message system routines  \\
+MSP.PEN       &    Pascal environment from above \\
+MSPDEF.FOR    &    Fortran include file of message system definitions  \\
+MSPERR.MSG    &    Message system status codes --- source file \\
+MSPERR.OBJ    &    Message system status codes --- object file \\
+MSPERR.FOR    &    Message system status codes --- Fortran version \\
+MSPERR.PIN    &    Message system status codes --- Pascal version \\
+MSPFOR.FOR    &    Fortran source of `wraparound' routines \\
+MSPFOR.OBJ    &    Object code of above  \\
+MSPLINK.COM   &    Command procedure to link message system shareable image \\
+MSP\_SHR.EXE    &    Message system shareable image \\
+MSPVEC.MAR    &    Message system transfer vectors --- source file \\
+MSPVEC.OBJ    &    Message system transfer vectors --- object file \\
+TEST*.*       &    Assorted test programs   \\    \hline
+\end{tabular}
+
+
+\newpage
+
+\section{Message System Routines}
+
+\subsection{Deviation from the specification}
+
+There is one difference between this implementation and the
+specification given in the workshop report. The specification
+for MSP\_ENABLE\_AST said that the queue identifier of the queue
+on which the message arrived should be passed by reference to the
+AST routine using the AST parameter. To do this the value would have
+to be stored in shared memory, and the routine delivering the AST would
+have to have some means of finding the address of the shared memory in the
+virtual address space of the process to which the AST was being delivered.
+
+In this implementation the AST parameter is the value of the
+queue identifier.
+
+\subsection{Status Values}
+
+The message system routines use the Starlink status convention.
+The parameter STATUS must have the value MSP\_\_NORMAL (=0) on entry to
+the routine, otherwise the routines will simply return with no action.
+If an error occurs during execution of one of the routines this is indicated
+by an error status code. The error STATUS values conform to the VAX VMS
+condition code convention (the success status value does not!). A message
+file is linked into the shareable image, so that LIB\$SIGNAL and LIB\$STOP
+will generate meaningful error messages fromn the status codes. The function
+return value gives the same value as the STATUS parameter on exit.   
+              
+In addition to the error codes listed in the routine descriptions, the
+first call to an MSP routine by any process may return an error status from
+the \$CRMPSC system service. Also it could return the error status
+MSP\_\_TIMEOUT indicating a timeout in accessing the message system section.
+
+\subsection{Additional Routines}
+
+MSP\_EXIT can be used to terminate a task's association with
+the message system. It is not normally needed because the same action
+is performed by an exit handler which is established by MSP\_ENTER\_TASK.
+However it is in principle possible for a program to enter and exit the
+message system several times and in this case the MSP\_EXIT routine would
+be required.
+
+Two further routines (not described here) were provided to meet the needs of
+the MSMON program.
+              
+\newpage
+\begin{appendix}
+
+\section{Detailed Routine descriptions}
+
+\manroutine {{\mantt{MSP\_CREATE\_QUEUE}}}{      Create a new queue associated %
+with this task.}
+\begin{manroutinedescription}
+\manroutineitem {Function}{}
+      Create a new queue associated with this task.
+
+\manroutineitem {Description}{}
+      A new queue is created, and its queue identifier returned
+      in {\mantt{QUEUE\_ID}}.
+
+\manroutineitem {Language}{}
+      Written in Pascal. Suitable for calling from any language.
+
+\manroutineitem {Call}{}
+      {\mantt{FSTATUS}} {\mantt{=}} {\mantt{MSP\_CREATE\_QUEUE}} ( {\mantt{%
+QUEUE\_ID}}, {\mantt{STATUS}} )
+
+\manroutineitem {Parameters}{}
+\begin{manparametertable}
+\manparameterentry {{\mantt{<}}}{{\mantt{QUEUE\_ID}}}{integer, ref}
+                          The queue identifier of the created queue.
+\manparameterentry {{\mantt{!}}}{{\mantt{STATUS}}}{integer, ref}
+      {\mantt{STATUS}} Values
+\end{manparametertable}
+\begin{mantwocolumntable}
+\mantwocolumnentry {{\mantt{MSP\_\_NORMAL}}}  Routine completed succesfully.
+\mantwocolumnentry {{\mantt{MSP\_\_NOTINITED}}}  {\mantt{MSP}} Not initialized.
+\mantwocolumnentry {{\mantt{MSP\_\_TASKNOTENT}}}  The task has not entered %
+itself
+                         into the message system.
+\mantwocolumnentry {{\mantt{MSP\_\_TOOMANYQUEUES}}}  All available queue entries
+                         have been used.
+\end{mantwocolumntable}
+\manroutineitem {External Variables used}{ None}
+\manroutineitem {External routines used}{ None}
+\manroutineitem {Author}{ J. Bailey}
+\manroutineitem {Date}{ 13th Jan 1986}
+\end{manroutinedescription}
+\manroutine {{\mantt{MSP\_DELETE\_QUEUE}}}{      Delete a queue.}
+\begin{manroutinedescription}
+\manroutineitem {Function}{}
+      Delete a queue.
+
+\manroutineitem {Description}{}
+      Delete the indicated queue. The queue must be owned by
+      this task. A queue will not be deleted if it currently
+      has a read with wait or Enable\_ast operation uncompleted.
+
+\manroutineitem {Language}{}
+      Written in Pascal. Suitable for calling from any language.
+
+\manroutineitem {Call}{}
+      {\mantt{FSTATUS}} {\mantt{=}} {\mantt{MSP\_DELETE\_QUEUE}} ( {\mantt{%
+QUEUE\_ID}}, {\mantt{STATUS}} )
+
+\manroutineitem {Parameters}{}
+\begin{manparametertable}
+\manparameterentry {{\mantt{>}}}{{\mantt{QUEUE\_ID}}}{integer, ref}
+                          The queue identifier of the queue to be
+                          deleted.
+\manparameterentry {{\mantt{!}}}{{\mantt{STATUS}}}{integer, ref}
+      {\mantt{STATUS}} values
+\end{manparametertable}
+\begin{mantwocolumntable}
+\mantwocolumnentry {{\mantt{MSP\_\_NORMAL}}}  Routine completed succesfully.
+\mantwocolumnentry {{\mantt{MSP\_\_NOTINITED}}}  {\mantt{MSP}} Not initialized.
+\mantwocolumnentry {{\mantt{MSP\_\_INVQUEUEID}}}  The queue\_id is not valid.
+\mantwocolumnentry {{\mantt{MSP\_\_NOTOWNED}}}  The queue specified is not owned
+                           by this process.
+\mantwocolumnentry {{\mantt{MSP\_\_READINPROG}}}  A read with wait, or enable {%
+\mantt{AST}} operation
+                             is incomplete on the specified queue.
+\mantwocolumnentry {{\mantt{MSP\_\_TIMEOUT}}}  Timeout accessing critical code.
+\end{mantwocolumntable}
+\manroutineitem {External Variables used}{ None}
+\manroutineitem {External routines used}{ None}
+\manroutineitem {Author}{ J. Bailey}
+\manroutineitem {Date}{ 13th Jan 1986}
+\end{manroutinedescription}
+\manroutine {{\mantt{MSP\_ENABLE\_AST}}}{      Specify an {\mantt{AST}} %
+routine to be triggered in response to a message.}
+\begin{manroutinedescription}
+\manroutineitem {Function}{}
+      Specify an {\mantt{AST}} routine to be triggered in response to a message.
+
+\manroutineitem {Description}{}
+      Specify an {\mantt{AST}} routine to be triggered when a message
+      is added to any one of the specified list of queues.
+      If there is already a message on any of the queues
+      (order of queues within the list specifies precedence),
+      the {\mantt{AST}} is delivered immediately. When the {\mantt{AST}} is %
+delivered,
+      the queue identification is passed by value to the {\mantt{AST}}
+      routine in its parameter.
+
+\manroutineitem {Language}{}
+      Written in Pascal. Suitable for calling from any language.
+
+\manroutineitem {Call}{}
+      {\mantt{FSTATUS}} {\mantt{=}} {\mantt{MSP\_ENABLE\_AST}} ( {\mantt{%
+QUEUES}}, {\mantt{NUMBER\_QUEUES}}, {\mantt{AST\_ROUTINE}},
+                         {\mantt{STATUS}} )
+
+\manroutineitem {Parameters}{}
+\begin{manparametertable}
+\manparameterentry {{\mantt{>}}}{{\mantt{QUEUES}}}{integer, ref} Array of size %
+{\mantt{NUMBER\_QUEUES}}
+                         of queue identifiers of the queues on which
+                         messages will cause {\mantt{AST}} triggering.
+\manparameterentry {{\mantt{>}}}{{\mantt{NUMBER\_QUEUES}}}{integer, ref}
+                         The number of queues.
+\manparameterentry {{\mantt{>}}}{{\mantt{AST\_ROUTINE}}}{address, value}
+                         Address of the {\mantt{AST}} routine.
+\manparameterentry {{\mantt{!}}}{{\mantt{STATUS}}}{integer, ref}
+      {\mantt{STATUS}} values
+\end{manparametertable}
+\begin{mantwocolumntable}
+\mantwocolumnentry {{\mantt{MSP\_\_NORMAL}}}  Completed succesfully.
+\mantwocolumnentry {{\mantt{MSP\_\_NOTINITED}}}  {\mantt{MSP}} Not initialized.
+\mantwocolumnentry {{\mantt{MSP\_\_INVQEUEID}}}  One or more of the specified %
+queue\_ids
+                             is invalid.
+\mantwocolumnentry {{\mantt{MSP\_\_NOTOWNED}}} One or more of the specified %
+queues is
+                             not owned by this task.
+\mantwocolumnentry {{\mantt{MSP\_\_READINPROG}}} A read with wait or {\mantt{%
+ENABLE\_AST}} operation
+                             is already in progress on one or more
+                             of the specified queues.
+\mantwocolumnentry {{\mantt{MSP\_\_TIMEOUT}}} Timeout accessing critical code.
+\end{mantwocolumntable}
+\manroutineitem {External Variables used}{ None}
+\manroutineitem {External routines used}{ None}
+\manroutineitem {Author}{ J. Bailey}
+\manroutineitem {Date}{ 14th Jan 1986}
+\end{manroutinedescription}
+\manroutine {{\mantt{MSP\_ENTER\_TASK}}}{      Make this task known to the %
+message system.}
+\begin{manroutinedescription}
+\manroutineitem {Function}{}
+      Make this task known to the message system.
+
+\manroutineitem {Description}{}
+      Make this task known to the message system by {\mantt{TASK\_NAME}}, and
+      create the associated command queue.
+
+\manroutineitem {Language}{}
+      Written in Pascal. Suitable for calling from any language.
+      ( A Fortran wraparound routine is used to provide the fixed
+      descriptor passing of the task name )
+
+\manroutineitem {Call}{}
+      {\mantt{FSTATUS}} {\mantt{=}} {\mantt{MSP\_ENTER\_TASK}} ( {\mantt{TASK\_%
+NAME}}, {\mantt{STATUS}} )
+
+\manroutineitem {Parameters}{}
+\begin{manparametertable}
+\manparameterentry {{\mantt{>}}}{{\mantt{TASK\_NAME}}}{fixed string, descr}
+                       name by which the calling task wishes to
+                       be known. This name is used purely by the
+                       message system and does not necessarily
+                       bear any relation to the {\mantt{VMS}} process name.
+\manparameterentry {{\mantt{!}}}{{\mantt{STATUS}}}{integer, ref}
+      {\mantt{STATUS}} values
+\end{manparametertable}
+\begin{mantwocolumntable}
+\mantwocolumnentry {{\mantt{MSP\_\_NORMAL}}}        The routine completed %
+succesfully
+\mantwocolumnentry {{\mantt{MSP\_\_TOOMANYTASKS}}}  All available task entries %
+have been
+                                used.
+\mantwocolumnentry {{\mantt{MSP\_\_TOOMANYQUEUES}}}  All available queue %
+entries have been
+                                used.
+\mantwocolumnentry {{\mantt{MSP\_\_TIMEOUT}}}   Timeout initializing the %
+global section.
+\mantwocolumnentry {{\mantt{MSP\_\_NAMETOOLONG}}}   The task name is too long.
+\mantwocolumnentry {{\mantt{SS\$\_*}}}   Error status returned by \$GETJPI.
+\end{mantwocolumntable}
+\manroutineitem {External variables used}{ None}
+\manroutineitem {External routines used}{ None}
+\manroutineitem {Author}{  J. Bailey}
+\manroutineitem {Date}{ 13th Jan 1986}
+\end{manroutinedescription}
+\manroutine {{\mantt{MSP\_GET\_TASK\_NAME}}}{      Get the name of the task %
+which owns the indicated queue.}
+\begin{manroutinedescription}
+\manroutineitem {Function}{}
+      Get the name of the task which owns the indicated queue.
+
+\manroutineitem {Language}{}
+      Written in Pascal. Suitable for calling from any language.
+
+\manroutineitem {Call}{}
+      {\mantt{FSTATUS}} {\mantt{=}} {\mantt{MSP\_GET\_TASK\_NAME}} ( {\mantt{%
+QUEUE\_ID}}, {\mantt{TASK\_NAME}}, {\mantt{STATUS}} )
+
+\manroutineitem {Parameters}{}
+\begin{manparametertable}
+\manparameterentry {{\mantt{>}}}{{\mantt{QUEUE\_ID}}}{integer, ref}
+                          The queue identifier of the queue.
+\manparameterentry {{\mantt{<}}}{{\mantt{TASK\_NAME}}}{fixed string, descr}
+                          The name of the task which owns the
+                          specified queue.
+\manparameterentry {{\mantt{!}}}{{\mantt{STATUS}}}{integer, ref}
+      {\mantt{STATUS}} Values
+\end{manparametertable}
+\begin{mantwocolumntable}
+\mantwocolumnentry {{\mantt{MSP\_\_NORMAL}}}  Routine completed succesfully.
+\mantwocolumnentry {{\mantt{MSP\_\_NOTINITED}}}  {\mantt{MSP}} Not initialized.
+\mantwocolumnentry {{\mantt{MSP\_\_NAMETOOLONG}}} Name is too long for buffer %
+supplied.
+\mantwocolumnentry {{\mantt{MSP\_\_INVQUEUEID}}}  The Queue\_id specified was %
+invalid.
+\end{mantwocolumntable}
+\manroutineitem {External Variables used}{ None}
+\manroutineitem {External routines used}{ None}
+\manroutineitem {Author}{ J. Bailey}
+\manroutineitem {Date}{ 13th Jan 1986}
+\end{manroutinedescription}
+\manroutine {{\mantt{MSP\_GET\_TASK\_QUEUE}}}{      Get the identifier of the %
+command queue of a named task}
+\begin{manroutinedescription}
+\manroutineitem {Function}{}
+      Get the identifier of the command queue of a named task
+
+\manroutineitem {Language}{}
+      Written in Pascal. Suitable for calling from any language.
+      ( A Fortran wraparound routine is used to provide the fixed
+      descriptor passing of the task name )
+
+\manroutineitem {Call}{}
+      {\mantt{FSTATUS}} {\mantt{=}} {\mantt{MSP\_GET\_TASK\_QUEUE}} ( {\mantt{%
+TASK\_NAME}}, {\mantt{QUEUE\_ID}}, {\mantt{STATUS}} )
+
+\manroutineitem {Parameters}{}
+\begin{manparametertable}
+\manparameterentry {{\mantt{>}}}{{\mantt{TASK\_NAME}}}{fixed string, descr}
+                          The name of the task for which the
+                          queue identifier is required.
+\manparameterentry {{\mantt{<}}}{{\mantt{QUEUE\_ID}}}{integer, ref}
+                          The queue identifier of the command queue
+                          of the task
+      ({\mantt{!}}) {\mantt{STATUS}}
+      {\mantt{STATUS}} values
+\end{manparametertable}
+\begin{mantwocolumntable}
+\mantwocolumnentry {{\mantt{MSP\_\_NORMAL}}}  Routine completed succesfully.
+\mantwocolumnentry {{\mantt{MSP\_\_NOTINITED}}}    {\mantt{MSP}} not %
+initialized.
+\mantwocolumnentry {{\mantt{MSP\_\_NAMETOOLONG}}}  Task name is too long.
+\mantwocolumnentry {{\mantt{MSP\_\_NOSUCHTASK}}}  No task of the specified %
+name had
+                              entered itself into the message
+                              system.
+\end{mantwocolumntable}
+\manroutineitem {External Variables used}{ None}
+\manroutineitem {External routines used}{ None}
+\manroutineitem {Author}{ J. Bailey}
+\manroutineitem {Date}{ 13th Jan 1986}
+\end{manroutinedescription}
+\manroutine {{\mantt{MSP\_RECEIVE\_MESSAGE}}}{      Receive a message on one %
+of a list of queues.}
+\begin{manroutinedescription}
+\manroutineitem {Function}{}
+      Receive a message on one of a list of queues.
+
+\manroutineitem {Description}{}
+      Attempt to read a message from any one of the given list of queues.
+      If messages are present, then
+         the order of the list of {\mantt{QUEUES}} specifies
+         precedence. Return the message and queue information.
+      else if {\mantt{WAIT}} is false then
+         return with zero queue identifiers
+         and {\mantt{ACTUAL\_LENGTH}} of zero.
+      else
+         wait for the first message to arrive on any of the listed {\mantt{%
+QUEUES}}
+         and return the message and queue information.
+      endif
+
+\manroutineitem {Language}{}
+     Written in Pascal. Suitable for calling from any language.
+
+\manroutineitem {Call}{}
+      {\mantt{FSTATUS}} {\mantt{=}} {\mantt{MSP\_RECEIVE\_MESSAGE}} ( {\mantt{%
+QUEUES}}, {\mantt{NUMBER\_QUEUES}}, {\mantt{WAIT}},
+            {\mantt{MAXLEN}}, {\mantt{MESSAGE}}, {\mantt{ACTUAL\_LENGTH}}, {%
+\mantt{QUEUE\_ID}}, {\mantt{REPLY\_QUEUE}},
+            {\mantt{STATUS}} )
+
+\manroutineitem {Parameters}{}
+\begin{manparametertable}
+\manparameterentry {{\mantt{>}}}{{\mantt{QUEUES}}}{integer, ref} Array of size %
+{\mantt{NUMBER\_QUEUES}}
+                         of queue identifiers of the queues on which
+                         messages may be received.
+\manparameterentry {{\mantt{>}}}{{\mantt{NUMBER\_QUEUES}}}{integer, ref}
+                         The number of queues.
+\manparameterentry {{\mantt{>}}}{{\mantt{WAIT}}}{logical, ref}
+                         True if the routine is required to wait
+                         for a message to arrive, when no message
+                         is on any of the specified queues.
+\manparameterentry {{\mantt{>}}}{{\mantt{MAXLEN}}}{integer, ref}
+                         Maximum length of message to be received.
+\manparameterentry {{\mantt{<}}}{{\mantt{MESSAGE}}}{byte array of size {\mantt{%
+MAXLEN}}, ref}
+                         The message received.
+\manparameterentry {{\mantt{<}}}{{\mantt{ACTUAL\_LENGTH}}}{integer, ref}
+                         The actual length of the message received.
+\manparameterentry {{\mantt{<}}}{{\mantt{QUEUE\_ID}}}{integer, ref}
+                         The queue identifier of the queue on which
+                         the message arrived.
+\manparameterentry {{\mantt{<}}}{{\mantt{REPLY\_QUEUE}}}{integer, ref}
+                         The queue identifier of the reply queue
+                         specified by the calling process.
+\manparameterentry {{\mantt{!}}}{{\mantt{STATUS}}}{integer, ref}
+      {\mantt{STATUS}} values
+\end{manparametertable}
+\begin{mantwocolumntable}
+\mantwocolumnentry {{\mantt{MSP\_\_NORMAL}}}  Routine completed succesfully
+\mantwocolumnentry {{\mantt{MSP\_\_NOTINITED}}}  {\mantt{MSP}} Not initialized.
+\mantwocolumnentry {{\mantt{MSP\_\_INVQEUEID}}}  One or more of the specified %
+queue\_ids
+                             is invalid.
+\mantwocolumnentry {{\mantt{MSP\_\_NOTOWNED}}}  One or more of the specified %
+queues is
+                             not owned by this task.
+\mantwocolumnentry {{\mantt{MSP\_\_READINPROG}}}  A read with wait or {\mantt{%
+ENABLE\_AST}} operation
+                             is already in progress on one or more
+                             of the specified queues.
+\mantwocolumnentry {{\mantt{MSP\_\_NOMESSAGE}}} No message on any of the %
+specified
+                             queues, and {\mantt{WAIT}} was not specified.
+\mantwocolumnentry {{\mantt{MSP\_\_TRUNCATED}}} Message was truncated to fit %
+buffer supplied.
+\mantwocolumnentry {{\mantt{MSP\_\_TIMEOUT}}} Timeout accessing critical code.
+\end{mantwocolumntable}
+\manroutineitem {External Variables used}{ None}
+\manroutineitem {External routines used}{ None}
+\manroutineitem {Author}{ J. Bailey}
+\manroutineitem {Date}{ 14th Jan 1986}
+\end{manroutinedescription}
+\manroutine {{\mantt{MSP\_SEND\_MESSAGE}}}{      Send a message to a specified %
+queue.}
+\begin{manroutinedescription}
+\manroutineitem {Function}{}
+      Send a message to a specified queue.
+
+\manroutineitem {Description}{}
+      Put a message on the indicated queue, and specify a queue
+      to which replies should be sent. If the message requires
+      no reply, then  {\mantt{REPLY\_QUEUE}} may be given a the value zero.
+
+\manroutineitem {Language}{}
+      Written in Pascal. Suitable for calling from any language.
+
+\manroutineitem {Call}{}
+      {\mantt{FSTATUS}} {\mantt{=}} {\mantt{MSP\_SEND\_MESSAGE}} ( {\mantt{%
+MESSAGE}}, {\mantt{MESSAGE\_LENGTH}}, {\mantt{QUEUE\_ID}},
+           {\mantt{REPLY\_QUEUE}}, {\mantt{STATUS}} )
+
+\manroutineitem {Parameters}{}
+\begin{manparametertable}
+\manparameterentry {{\mantt{>}}}{{\mantt{MESSAGE}}}{byte array of size {\mantt{%
+LENGTH}}, ref}
+                          The message to be sent.
+\manparameterentry {{\mantt{>}}}{{\mantt{MESSAGE\_LENGTH}}}{integer, ref}
+                          The length of the message to be sent.
+\manparameterentry {{\mantt{>}}}{{\mantt{QUEUE\_ID}}}{integer, ref}
+                          The queue identifier of the queue to
+                          which the message will be sent.
+\manparameterentry {{\mantt{>}}}{{\mantt{REPLY\_QUEUE}}}{integer, ref}
+                          The queue identifier of the queue to
+                          which replies should be sent.
+\manparameterentry {{\mantt{!}}}{{\mantt{STATUS}}}{integer,ref} The status %
+value.
+      {\mantt{STATUS}} values
+\end{manparametertable}
+\begin{mantwocolumntable}
+\mantwocolumnentry {{\mantt{MSP\_\_NORMAL}}}  Routine completed succesfully.
+\mantwocolumnentry {{\mantt{MSP\_\_NOTINITED}}}  {\mantt{MSP}} Not initialized.
+\mantwocolumnentry {{\mantt{MSP\_\_INVQUEUID}}}  Either {\mantt{QUEUE\_ID}} or %
+{\mantt{REPLY\_QUEUE}} is
+                          not a valid queue\_id.
+\mantwocolumnentry {{\mantt{MSP\_\_NOSLOTS}}} No more message slots are %
+available.
+\mantwocolumnentry {{\mantt{MSP\_\_DELETED}}}  Queue was deleted during send %
+operation.
+\mantwocolumnentry {{\mantt{MSP\_\_TIMEOUT}}}  Timeout accessing critical code.
+\end{mantwocolumntable}
+          Any status from \$WAKE or {\mantt{AZ\$SNDAST}}, e.g.
+\begin{mantwocolumntable}
+\mantwocolumnentry {{\mantt{SS\$\_NOPRIV}}} No privilege to send message to
+                          receiving process (see below)
+\end{mantwocolumntable}
+\manroutineitem {External variables used}{ None}
+\manroutineitem {External Routines called}{}
+      Calls the user written system service {\mantt{AZ\$SNDAST}} written by
+      Lew Waller, and part of the {\mantt{AZUSS}} package.
+
+\manroutineitem {Restrictions}{}
+      The sending process will require {\mantt{GROUP}} privilege if the
+      receiving process is in the same group but with a different {\mantt{UIC}}.
+      No privilege is required if the receiving process has the same {\mantt{%
+UIC}}.
+
+\manroutineitem {Author}{ J. Bailey}
+\manroutineitem {Date}{ 14th Jan 1986}
+\end{manroutinedescription}
+
+%\input{MSP.TEX_DESCR}
+
+
+                 
+\end{appendix}
+\end{document}

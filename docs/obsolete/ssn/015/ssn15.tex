@@ -1,0 +1,1043 @@
+\documentstyle[11pt]{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink System Note}
+\newcommand{\stardocinitials}  {SSN}
+\newcommand{\stardocnumber}    {15.8}
+\newcommand{\stardocauthors}   {M.\ J.\ Bly, M.\ D.\ Lawden, D.\ L.\ Terrett}
+\newcommand{\stardocdate}      {20 November 1992}
+\newcommand{\stardoctitle}     {Starlink Software Installation --- VMS}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\LARGE\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+%------------------------------------------------------------------------------
+%  Add this part if you want a table of contents
+\setlength{\parskip}{0mm}
+\begin{small}
+\tableofcontents
+\end{small}
+\setlength{\parskip}{\medskipamount}
+\markright{\stardocname}
+%------------------------------------------------------------------------------
+
+\newpage
+
+\section {Introduction}
+\label{se:intro}
+
+This paper describes, in general terms, the characteristics of the Starlink
+Software Collection and how to install it on a VAX computer. It is meant for
+the System Manager of that VAX since some integration with and adaptation to
+the local systems software will be necessary.
+
+\vfill
+
+The Starlink Software Collection is a set of astronomical and general purpose
+software put together and maintained by the Starlink project. The definition
+and management of the Collection is described in SGP/20. It is not a tightly
+integrated system but a set of software items, some of which are autonomous.
+The Starlink Software Librarian manages it, but does not have extensive
+knowledge about individual items. Each item is maintained by an individual
+named in the Starlink Software Index ({\tt RLVAD::LADMINDIR:SUPPORT.LIS}); some
+items may become unsupported because of staff changes. The general level of
+support for each item is indicated in {\tt ADMINDIR:SUPPORT.LIS}.
+
+\vfill
+
+The non-proprietary part of the Collection may be distributed to non-Starlink
+sites at the discretion of the Starlink Software Librarian, however you should
+not redistribute Starlink software without his prior approval. The Collection
+contains some proprietary software which cannot be distributed outside Starlink
+without the consent of the proprietor. The distribution policy is explained in
+more detail in SGP/21. Some items in the non-proprietary part depend on items
+in the proprietary part.
+
+\vfill
+
+The Collection is not a commercial package, therefore only very limited support
+and assistance can be provided by Project staff to non-Starlink users. It is
+undergoing continual development; updates are available on request, subject to
+the approval of the Project Manager and the availability of the effort required
+to do the distribution.
+
+\vfill
+
+The Collection was created specifically for the VAXs at Starlink sites and is
+adapted to their specific hardware and software environments. No guarantee can
+be given that any particular item will work on a non-Starlink VAX, although the
+Collection has been installed successfully on many such VAXs and microVAXs. The
+effort and management controls necessary to ensure that it is portable,
+exhaustively documented and tested are not available. Ultimately, it is up to
+the recipient to solve whatever problems arise when installing it on a
+non-Starlink VAX.
+
+\vfill
+
+Starlink is always anxious to improve the correctness  and portability of its
+software. If you experience any installation difficulties or operational
+problems, please send clear and specific details to:
+
+\vfill
+
+\begin{center}
+\parbox{80mm}
+{Starlink Software Librarian,\\
+Building R68,\\
+Rutherford Appleton Laboratory,\\
+Chilton, DIDCOT, Oxon, OX11 0QX,\\
+UNITED KINGDOM}
+
+\vspace*{5mm}
+
+\parbox{80mm}
+{Tel: 0235 445363\\
+Fax: 0235 445848 \\
+Telex: 83159 RUTHLB G \\
+Email: STAR@UK.AC.RL.STAR \quad (JANET) \\
+Email: star@star.rl.ac.uk \quad (Internet) }
+\end{center}
+
+\newpage
+
+\section {Configuration requirements}
+\label{se:config}
+
+Specifications of the hardware and software requirements of each item are not
+available. However, the following is a summary of the prerequisites for
+successful installation and full use of the Collection as a whole.
+
+\begin{description}
+
+\item [\bf Processor]: Any computer with the DEC VAX architecture should be
+suitable.
+
+\item [\bf Operating System]: VAX VMS (currently version 5.5), and 
+DECwindows-Motif. You may experience difficulties if your version of VMS
+differs from that at RAL.
+
+\item [\bf Disk-space]: The Collection has seven separate parts. Their size is
+continually changing; at the time of writing (revision level 598) they were:
+
+\begin{itemize}
+\item Standard Software -- (151 Mbyte)
+\item Secure Software -- (0.3 Mbyte)
+\item Optional Software --  (280 Mbyte)
+\item Restricted Software -- (132 Mbyte)
+\item Devolved Software -- (\verb+>+230 Mbyte)
+\item Local Software (RAL) -- (35 Mbyte)
+\item Data (Star catalogues {\em etc}) -- (569 Mbyte)
+\end{itemize}
+
+Thus, the total disk space required is approximately 1400 Mbyte. This can be
+reduced by deleting unwanted items or files (see section \ref{ss:reduce}). 
+
+New non-Starlink sites are normally sent only the Standard software, including
+GKS, plus any optional items specifically requested, so 200 Mbyte is often
+enough space. 
+
+\item [\bf Magnetic Tape]: Normally, software will be supplied as VMS Backup
+save-sets on Exabyte cassette. By request, DEC TK50 and TK70 cartridges can be
+provided, as can industry standard magnetic tape at densities of 6250 bpi or
+1600 bpi.
+
+\item [\bf Line Printer]: For example the Printronix P300.
+
+\item [\bf Graphics terminals]: Pericom MG100, Pericom Graphpac; Tektronix
+T4010 and T4014 are also suitable. See also the section on GKS workstations in
+SUN/83.
+
+\item [\bf Graphics hardcopy]: Starlink has a considerable variety of hardcopy
+devices. At RAL there is a Printronix P300 lineprinter, Canon LBP-8III Laser
+printer (operating in PostScript mode), a Zeta (NICOLET) plotter, and Honeywell
+Color Graphics Recorder.
+
+\item [\bf Image Display]: Digisolve Ikon and Xwindows display devices. These
+can display a colour picture and have a number of advanced features such as
+zoom, pan and colour lookup table. The maximum format of the Ikon is 1024x780.
+
+\item [\bf GKS]: GKS (version 7.2) is commercial software. It can only be
+distributed to people who use other Starlink software for non-commercial
+astronomical research. Prospective users must complete a form which is
+obtainable from the Starlink Software Librarian at RAL, or by copying
+Appendix~C of SGP/21.
+
+\end{description}
+
+\section {Structure}
+\label{se:struct}
+
+The Starlink Software Collection comprises seven parts:
+\begin{description}
+\begin{description}
+\item [Standard Software]
+\item [Secure Software]
+\item [Optional Software]
+\item [Restricted Software]
+\item [Devolved Software]
+\item [Local Software]
+\item [Data]
+\end{description}
+\end{description}
+
+\paragraph{Standard Software:} comprises several directory trees:
+
+\begin{itemize}
+
+\item {\tt [STARLINK...]} --- general purpose software that can be distributed at
+the discretion of the Software Librarian, and administrative information such
+as user lists and document indexes. This is also referred to as the {\bf Core
+Software}.
+
+\item {\tt [ADAM...]} --- the Starlink software environment for data reduction
+and image display applications. This software is needed to run many of the
+applications packages in the {\bf Option set}.
+
+\item {\tt [KAPPA...]} --- a comprehensive applications package for image
+processing and display.
+
+\item {\tt [CONVERT]} --- a set of data format conversion routines.
+
+\item {\tt [ADAMAPP...]} --- This suite is currently being split up into
+separate items in the Standard and Option sets, and now only holds SST.
+
+\item {\tt [FIGARO...]} --- a large set of spectroscopy and related
+applications. 
+
+\item {\tt [FIGPACK...]} --- some additional applications associated with
+FIGARO, and the applications in the main FIGARO tree that have had bugs fixed,
+or have been enhanced or altered for UK astronomical use. 
+
+\end{itemize}
+
+\paragraph{Secure Software:} a small set of systems software distributed
+only to Starlink sites in the UK, concerned generally with Starlink Networking.
+The Secure set is contained in:
+
+\begin{itemize}
+\item {\tt [STARSEC...]}
+\end{itemize}
+
+\paragraph{Restricted Software:} is the set of mainly commercial applications
+software for which Starlink licences its own sites in the UK. In some cases the
+software is only installed on one central machine at RAL. This software is not
+distributed outside Starlink. Potential users should contact the vendors for
+more information (see SGP/21). The restricted set currently comprises:
+
+\begin{itemize}
+\item {\tt [CLUSTAN]} --- specialised multivariate cluster analysis
+\item {\tt [FORCHECK]} --- Fortran standards verifier
+\item {\tt [GENSTAT...]} --- GENSTAT general statistical analysis
+\item {\tt [IDL...]} --- Image display and manipulation package
+\item {\tt [MAPLE...]} --- mathematical manipulation language
+\item {\tt [PRISM\_314]} --- Fortran `spaghetti unscrambler'
+\item {\tt [JM.USSP...]} --- for access to the IUE low-dispersion archive
+\end{itemize}
+
+\paragraph{Optional Software:} comprises the majority of the applications in
+the  Software Collection. They are generally large, and are not distributed
+unless specifically requested. Some require ADAM and/or FIGARO to be installed
+in order to run. Commercial items are indicated thus: {\tt *}.
+
+\begin{itemize}
+\item {\tt [APIG...]} --- APIG
+\item {\tt [ASPIC...]} --- ASPIC/DSCL
+\item {\tt [ASTERIX88...]} --- ASTERIX
+\item {\tt [CATPAC]} --- CATPAC
+\item {\tt [CCDPACK]} --- CCDPACK
+\item {\tt [CHI...]} --- CHI
+\item {\tt [DAOPHOT2]} --- DAOPHOT
+\item {\tt [DIPSO...]} --- DIPSO
+\item {\tt [ECHWIND]} --- ECHWIND
+\item {\tt [FITSIO]} --- FITSIO
+\item {\tt [HRTS...]} --- HRTS
+\item {\tt [HXIS...]} --- HXIS
+\item {\tt [IRAS...]} --- IRAS
+\item {\tt [IRCAM]} --- IRCAM
+\item {\tt [IUEDR...]} --- IUEDR
+\item {\tt [JCMTDR...]} --- JCMTDR
+\item {\tt [JPL]} --- JPL
+\item {\tt [LTEX...]} --- LTEX
+\item {\tt [MEMSYS...]} --- MEMSYS*
+\item {\tt [MONGO]} --- MONGO*
+\item {\tt [NAG...]} --- NAG*
+\item {\tt [NOD2]} --- NOD2
+\item {\tt [PHOTOM]} --- PHOTOM
+\item {\tt [PISA]} --- PISA
+\item {\tt [QDP...]} --- QDP
+\item {\tt [REXEC]} --- REXEC
+\item {\tt [RGASP]} --- RGASP
+\item {\tt [SAM...]} --- SAM
+\item {\tt [SCAR53...]} --- SCAR
+\item {\tt [SCP...]} --- SCP
+\item {\tt [SPECDRE...]} --- SPECDRE 
+\item {\tt [SPECX...]} --- SPECX
+\item {\tt [STARMAN...]} --- STARMAN
+\item {\tt [TEX...]} --- TEX
+\item {\tt [TOOLPACK...]} --- TOOLPACK*
+\item {\tt [TPOINT]} --- TPOINT
+\item {\tt [TSP]} --- TSP
+\item {\tt [ROSAT...]} --- WFCSORT
+\end{itemize}
+
+
+\paragraph{Devolved Software:} is the classification of items which are not
+distributed by Starlink, but are included in the index files for reference
+because the software is installed at many Starlink sites.
+
+\begin{itemize}
+\item {\tt [AIPS]} --- AIPS
+\item {\tt [IRAF]} --- IRAF
+\item {\tt [MIDAS]} --- MIDAS
+\end{itemize}
+
+\paragraph{Local Software:} comprises two directories:
+
+\begin{itemize}
+
+\item {\tt [STARLOCAL]} --- local modifications to the Collection and local
+administration files. Its structure should be similar to {\tt [STARLINK]}. Its
+contents is decided locally, but RAL can supply their version as a starting
+point. It is not well controlled or documented. References to Local Software in
+this paper ({\em e.g.}\ {\tt LDOCSDIR:ONLINE.LIS}) refer to the RAL version.
+
+\item {\tt [STARLHOLD]} --- local proprietary software which is not distributed.
+\end{itemize}
+
+\paragraph{Data:} currently comprises the following directories:
+
+\begin{itemize}
+\item {\tt [STARCATS]} --- Star catalogues for CHART.
+\item {\tt [SCARDATA]} --- SCAR online database.
+\item {\tt [CDS]} --- SCAR offline database.
+\end{itemize}
+
+Starlink directories are usually referred to by logical names defined in
+{\tt SSC:STARTUP.COM} and {\tt LSSC:\-STARTUP.\-COM}. In particular:
+
+\begin{description}
+\begin{description}
+\item [{\tt SSC}] is the logical name for \verb+<disk>:[STARLINK]+
+\item [{\tt LSSC}] is the logical name for \verb+<disk>:[STARLOCAL]+
+\end{description}
+\end{description}
+
+\begin{quote}\em
+There is a constant turnover of software items and the information in this
+paper rapidly gets out-of-date. The latest information on the current items is
+stored in {\tt ADMINDIR:SSI.LIS}
+\end{quote}
+
+\section {Activation}
+\label{se:active}
+
+Once one or more parts of the Collection have been installed and adapted to the
+local system (see sections 5 and 6), it is activated in two phases:
+
+\begin{itemize}
+\item Startup Phase
+\item Login Phase
+\end{itemize}
+
+\subsection {Startup phase}
+\label{ss:startup}
+
+This occurs when the VAX is booted. The System Manager is responsible for what
+happens during this phase. It is concerned with the general configuring of VMS
+on a specific VAX. The following command procedures are particularly
+significant:
+
+\begin{enumerate}
+\item {\tt SYS\$STARTUP:SYSTARTUP\_V5.COM}
+\item {\tt SSC:STARTUP.COM}
+\item {\tt LSSC:STARTUP.COM}
+\end{enumerate}
+
+Procedures 2 and 3 are called from 1. As far as the Collection is concerned,
+their main functions are to:
+
+\begin{itemize}
+\item Define system logical names
+\item Install known images
+\end{itemize}
+
+\subsection {Login phase}
+\label{ss:login}
+
+This is controlled by the User Authorization File (UAF) which specifies the
+command procedure to be executed each time a particular user logs in and
+establishes his quotas and privileges. At Starlink sites, a normal user will
+have the following procedures executed at login time:
+
+\begin{enumerate}
+\item {\tt SYS\$MANAGER:SYLOGIN.COM}
+\item {\tt SYS\$LOGIN:LOGIN.COM}
+\end{enumerate}
+
+If a user wishes to use items in the Collection, he must call the following
+procedure from his own {\tt LOGIN.COM} file:
+
+\begin{itemize}
+\item {\tt SSC:LOGIN.COM}
+\end{itemize}
+
+This executes the local Starlink Login procedure, if it exists:
+
+\begin{itemize}
+\item {\tt LSSC:LOGIN.COM}
+\end{itemize}
+
+The main function of the Starlink Login procedures is to define Global Symbols.
+The quotas and privileges needed by some items are discussed in Section
+\ref{se:quotas} .
+
+\section {Installation}
+\label{se:install}
+
+The precise procedure for installing the Collection is clearly at the
+discretion of the Site Manager who will be aware of particular constraints
+affecting his system. However, the general procedure is as follows:
+
+\begin{enumerate}
+\item Study Documentation.
+\item Store Starlink Directories on Disk.
+\item Install Items.
+\item Activate Collection.
+\item List Key documentation.
+\item Test Collection.
+\item Reduce Size of Collection.
+\end{enumerate}
+
+The process by which the tapes containing the Collection were produced is
+described in Appendix \ref{se:tapes}. A summary of the actions required in
+steps 2, 3 and 4 is given in Appendix \ref{se:actions}. It is suggested that
+you read this paper fully before attempting to install the Collection and then
+use Appendix \ref{se:actions} to guide your actions during the actual
+installation.
+
+\subsection {Study documentation}
+\label{ss:studydocs}
+
+The tapes supplied should be accompanied by the following documentation:
+
+\begin{description} 
+\begin{description} 
+\item [\bf RELEASE]: Release note (describes what is on the tape) 
+\item [\bf ACKNOWLEDGEMENT]: Acknowledgement note (return to Software Librarian)
+\item [\bf GKS]: Copy of the GKS form (return to Software Librarian)
+\item [\bf SSN/15]: `Starlink Software Installation' (this document) 
+\item [\bf SGP/25]: `Starlink Site Manager's Guide --- major nodes' 
+\item [\bf SSN/39]: `GKS --- Installation and Modification'
+\item [\bf SUG]: `Starlink User Guide' 
+\item [\bf ONLINE]: On-line documentation index 
+\item [\bf WHOSWHO]: Starlink Who's Who
+\item [\bf STARTUP]: System startup procedure ({\tt
+SYS\$STARTUP:SYSTARTUP\_V5.COM}) 
+\end{description} 
+\end{description}
+
+A large amount of documentation is stored in the Collection. This is indexed in
+{\tt LDOCSDIR:\-ONLINE.\-LIS}, {\tt DOCSDIR:\-DOCS.\-LIS}, {\tt
+DOCSDIR:\-MUD.\-LIS} and {\tt LDOCSDIR:\-DOCS.\-LIS}. Selections of non-\LaTeX\
+documents may be printed once {\tt [STARLINK.\-DOCS]} has been stored. \LaTeX\
+documents should normally be studied in the form of the paper documents
+supplied; however, you may be able to produce masters by running \LaTeX\ on the
+appropriate `{\tt .TEX}' file. The contents of the files should be obvious from
+their names, thus {\tt DOCSDIR:\-SUN33.\-TEX} holds the \LaTeX\ source for
+SUN/33. Of particular interest at the planning stage are: 
+
+\begin{description} 
+\begin{description}
+\item [\bf SUN/1]: `Starlink Software -- An Introduction' 
+\item [\bf SSN/33]: `Configuring Queues for Starlink Graphics' 
+\item [\tt ADMINDIR:SSCLIS.TLB]: Modules contain Starlink Software
+Change notices describing the updates to the Collection (large). 
+\item [\tt ADMINDIR:SSCCOM.TLB]: Modules contain command procedures associated
+with the updates (large). 
+\end{description} 
+\end{description}
+
+\subsection {Store Starlink Directories on Disk}
+\label{ss:store}
+
+The tapes you receive will probably contain a save set {\tt STAR.BCK} holding
+{\tt [STARLINK]} and possibly a save set {\tt STARLOCAL.BCK} containing RAL's
+version of {\tt [STARLOCAL]}. They may also contain one or more other save sets
+containing Optional Software and Data directories. These directories may be
+stored on different disks. Before carrying out the installation, delete any
+existing copies of the supplied directories.
+
+\begin{enumerate}
+
+\item Allocate tape deck:
+
+\begin{verbatim}
+      $ ALLOC Mxxx TAPE
+\end{verbatim}
+
+\item Load first tape onto allocated deck and copy {\tt [STARLINK]} from tape 
+to disk:
+
+\begin{verbatim}
+      $ BACKUP/REWIND/NOASSIST TAPE:STAR.BCK <device>:[*...]
+\end{verbatim}
+
+By default, the files will be written with the UIC set to the users's current
+default. At RAL, all Starlink files have a UIC of {\tt [STAR]}. If you want to
+preserve this, qualify the output file with `{\tt /OWNER\_UIC=ORIGINAL}'. If
+you want to specify a UIC different from the original and your default, qualify
+it with `{\tt /OWNER\_UIC=[uic]}'. You may wish to add the qualifier `{\tt
+/VERIFY}' which will cause the created directories to be compared with those on
+tape, or the qualifier `{\tt/LOG}' which will cause the name of each file
+copied to be displayed on {\tt SYS\$OUTPUT} (warning: there are thousands of
+files).
+
+\item Copy the remaining Standard software items from tape to disk, as for {\tt
+[STARLINK]}, substituting the relevant save set name (see the {\bf RELEASE}
+note), and omitting the {\tt /REWIND} qualifier if you do not need to rewind
+the tape to find the file.
+
+\item If you have been sent any Optional Software or Data, deal with these as
+above.
+
+\end{enumerate}
+
+\subsection {Install items}
+\label{ss:install}
+
+After Starlink directories have been stored on disk, it is still necessary to
+carry out further actions to integrate them with the local environment. The
+specific actions required are described in section \ref{se:specific} for each
+item which needs attention. Items are referred to by the acronym used to
+identify them in the Starlink Software Index ({\tt ADMINDIR:SSI.LIS}). One part
+of the Core is fundamental in that it creates an environment upon which most
+of the other items depend:
+
+\begin{quote}
+{\bf Startup, Shutdown and Login files}
+\end{quote}
+
+Other items are essentially systems software which may need to be integrated
+with the local system; at the time of writing, they are:
+
+\begin{quote} 
+{\bf PSSMB} --- Print symbiont for non-DEC PostScript printer
+\end{quote}
+
+Other items may need special consideration. These are mentioned in Section
+\ref{ss:applications}.
+
+If you have problems with an item, there are two sources of information that
+might help you:
+
+\begin{itemize}
+\item Starlink Software Change documentation ({\tt ADMINDIR:SSCLIS.TLB},
+{\tt SSCCOM.TLB})
+\item Starlink Notes and Papers (SUN, SGP, SSN)
+\end{itemize}
+
+The relevant documents are specified in the entries in the Starlink Software
+Index and in {\tt DOCSDIR:ANALYSIS.LIS}. Sometimes, users have problems with an
+item because of a lack of quotas or privileges; read Section \ref{se:quotas} if
+you encounter such problems. The standard protection for Starlink files is {\tt
+(RE,RWED,RE,RE)}. An exception to this are the files in {\tt [ASPIC.ARGSDB]}
+which should have the protection {\tt (RWE,RWED,RWE,RWE)}.
+
+\subsection {Activate Collection}
+\label{ss:activate}
+
+\subsubsection {Startup phase}
+\label{subss:startup}
+
+Activate the Collection by executing the commands you have added to
+{\tt SYS\$STARTUP:\-SYSTART\-UP\_V5.\-COM}.
+
+This can be done by either rebooting, or explicitly typing them in.
+
+\subsubsection {Login phase}
+\label{subss:login}
+
+Execute the login commands:
+\begin{verbatim}
+      $ @SSC:LOGIN
+\end{verbatim}
+
+Add this command to your login command file so it will be executed automatically
+in future.
+
+\subsection {List Key Documentation}
+\label{ss:listdocs}
+
+Starlink documentation is described in the Starlink User Guide ({\tt 
+DOCSDIR:SUG.TEX}). It is stored in directories {\tt DOCSDIR:} and {\tt
+LDOCSDIR:} and indexed by files {\tt LDOCSDIR:ONLINE}, {\tt DOCSDIR:DOCS}, {\tt
+DOCSDIR:MUD}, {\tt LDOCSDIR:DOCS} and {\tt DOCSDIR:SUBJECT}. Other
+documentation is stored elsewhere in the Collection and is referenced by
+Starlink documents; print out what you need (non-\LaTeX\ documents only) or
+refer to the supplied documentation. \LaTeX\ documents will normally be
+supplied on paper as you may not be able to process the {\tt .TEX} files with
+\LaTeX\ or have a suitable output device such as a laser printer.
+
+\subsection {Test Collection}
+\label{ss:testit}
+
+A comprehensive test package for the Collection does not exist.
+Some items do have tests provided; these are usually described in their
+associated Starlink Software Change notices (see {\tt ADMINDIR:SSCLIS.TLB} and
+{\tt ADMINDIR:SSI.LIS}) or SUN's.
+In other cases you will simply have to try to run the program and see if you
+get sensible results.
+
+\subsection {Reduce size of Collection}
+\label{ss:reduce}
+
+The Collection is large enough to cause on-line storage problems at some sites.
+Three methods are recommended for reducing its size:
+
+\begin{itemize}
+
+\item Delete files corresponding to unwanted software items. These can be
+identified by examining the Starlink Software Index. You can delete the
+definitions of logical names and symbols in the Starlink Startup and Login
+files for uninstalled items.
+
+\item Delete files not needed by users; these are mainly those containing
+source code.
+
+\item Delete the {\tt .LIS} forms of files in DOCSDIR. Generate readable
+versions of these files when required. 
+
+\end{itemize}
+We recommend that whenever the Collection is truncated, details of what has been
+omitted are recorded in file {\tt LADMINDIR:SURGERY.LIS}.
+
+\section {Specific items}
+\label{se:specific}
+
+If you have trouble with any particular software item, look in {\tt
+DOCSDIR:\-ANALYSIS.\-LIS} and identify the documents associated with the item.
+In particular, look for any release notes or installation instructions (see
+\ref{ss:applications}).
+
+\subsection{Fundamental items}
+\label{ss:fundamental}
+
+\begin{description}
+
+\item [Startup, Shutdown, Login files] --- We assume you want the Starlink
+logical names to be defined as system logical names at startup time and that
+you have command procedure {\tt SYS\$STARTUP:SYSTARTUP\_V5.COM} called from 
+{\tt SYS\$\-SYSTEM:\-STARTUP.\-COM}.
+
+Study {\tt SYS\$STARTUP:SYSTARTUP\_V5.COM} in the listing provided; this shows
+what happens at RAL during a system boot.
+
+Note 2 in Appendix \ref{se:actions} shows what extra statements will probably
+need to be added to your version of this file.
+
+\begin{enumerate}
+\item Define {\tt STARDISK} as the disk holding {\tt [STARLINK]},
+and define {\tt LSTARDISK} as the disk holding {\tt [STARLOCAL]} if provided.
+
+These disks can be different, but if so they must both be on-line during a
+system boot.
+
+\item Study {\tt SSC:STARTUP.COM} and make it compatible with your local system.
+You may wish to delete definitions which are associated with items or
+directories you will not use. 
+
+You will need to add logical name definitions for optional items to {\tt
+SSC:STARTUP.COM} if {\tt LSSC:STARTUP.COM} is not provided. Many Option set
+packages have {\tt package\_LSSC\-\_STARTUP.COM} files which act as templates.
+
+\item If provided, study {\tt LSSC:STARTUP.COM} and make it compatible with
+your local system.
+
+Notice that near the end of the procedure several Starlink executable images
+are installed. Delete these statements if the images do not exist or you do not
+want them installed.
+
+\item Study {\tt SSC:\-LOGIN.\-COM} and (if provided) {\tt LSSC:\-LOGIN.\-COM}.
+
+Option set package startup commands are set to produce a `package not installed
+message' by default in {\tt SSC:LOGIN.COM}, and are overridden in 
+{\tt LSSC:LOGIN.COM}. If you are not provided with this you will need to add
+the startup commands to  {\tt SSC:LOGIN.COM} --- many packages now have 
+a {\tt package\_LSSC\-\_LOGIN.COM} file which should be used as a template.
+
+No modifications should be necessary, although you may wish to delete
+definitions you think will not be used.
+
+\end{enumerate}
+
+Any user who wishes to use the Collection should include the command:
+\begin{verbatim}
+      $ @SSC:LOGIN			
+\end{verbatim}
+in his own login command procedure; please inform them.
+
+{\tt SSC:SHUTDOWN.COM} doesn't do anything significant and can be deleted.
+
+\item [Graphics] --- GKS {\em etc}
+
+The Starlink software graphics systems use GKS, included in the Standard set.
+GKS and its associated systems need to be customised to your site specific
+requirements, though the supplied version (customised for use on the Starlink
+Project VAXcluster at RAL) will run at most sites.
+
+\begin{enumerate} \item Customise GKS for your system according to the
+instructions in SSN/39. \item Customise your GNS Graphics names service data
+files to contain references to your chosen devices, both for GKS and IDI. The
+files  {\tt GNS\_DIR:GKSNAMES.TEMPLATE} and {\tt GNS\_DIR:IDINAMES.TEMPLATE}
+provide templates for the working versions {\tt GNS\_DIR:\-GKSNAMES.\-DAT} and
+{\tt GNS\_DIR:\-IDINAMES.DAT}.
+
+\end{enumerate}
+
+\end{description}
+
+\subsection {Systems Software}
+\label{ss:systems}
+
+\begin{description}
+
+\item [PSSMB] --- Postscript printer symbiont.
+
+PSSMB is the printer symbiont used by Starlink to drive non-DEC printers for
+PostScript printing. If you have a PostScript printer and are not already using
+a suitable symbiont, PSSMB may be used.
+
+In its supplied from the symbiont is suitable for queues to printers connected
+via terminal servers and LAT. If you are using a directly connected printer,
+the symbiont must FIRST be rebuilt according to the details in  {\tt
+STARDISK:\-[STARLINK.\-SYSTEM.\-PSSMB.\-SOURCE]\-README\-.TXT}.
+
+\begin{enumerate}
+
+\item Copy the executable image {\tt PSSMB\_DIR:PSSMB.EXE} to 
+{\tt SYS\$COMMON:[SYSEXE]}. 
+
+\item Edit your queue definition and startup command procedures so that the
+queue for the  PostScript printer  uses the PSSMB symbiont. The file {\tt
+PSSMB\_DIR:\-DEFINE\_QUEUES.\-TEMPLATE} may be used as a template. 
+
+\item Redefine the queue using the new symbiont.
+
+\end{enumerate}
+
+\end{description}
+
+\subsection {Applications Software}
+\label{ss:applications}
+
+There are a number of Starlink System Notes which deal with the installation
+of specific applications software items; among these are:
+\begin{description}
+\begin{description}
+\item [SSN/39]: GKS
+\item [SSN/40]: FIGARO
+\item [SSN/44]: ADAM
+\end{description}
+\end{description}
+
+
+The following sections deal with further items whose installation needs comment.
+
+\begin{description}
+\begin{description}
+\item [ASPIC] --- Collection of application programs.
+
+If you move the {\tt [ASPIC]} directory, change the definitions of logical
+names {\tt EDRS} and {\tt PER} in {\tt ASPDIR:ASPPAK.COM}.
+
+\item [CHART] --- Finding chart and stellar data system.
+
+CHART uses star catalogues in a directory with logical name {\tt CATALOGDIR}
+and a plotting directory with logical name {\tt PLOTDIR}. These are defined in
+{\tt LSSC:STARTUP.COM} which you must modify if you install the catalogues.
+These are normally not distributed with the Collection because of their large
+size (65203 blocks) and must be requested separately from the Librarian.
+
+\end{description}
+\end{description}
+
+\section {Quotas, Privileges and Relationships}
+\label{se:quotas}
+
+\subsection {Quotas}
+
+Starlink software is concerned with manipulation large quantities of data in
+the form of images or data sets. In order to use the Starlink Software, a user
+must have process quotas adequate for the amount of data, and the machine must
+also have adequate quotas. 
+
+A typical user at RAL has process quotas set thus:
+\begin{quote}\small
+\begin{verbatim}
+ CPU limit:                      Infinite  Direct I/O limit:       100
+ Buffered I/O byte count quota:     65535  Buffered I/O limit:     100
+ Timer queue entry quota:              40  Open file quota:        100
+ Paging file quota:                 60000  Subprocess quota:        10
+ Default page fault cluster:           16  AST quota:               98
+ Enqueue quota:                       199  Shared file limit:        0
+ Max detached processes:                0  Max active jobs:          0
+\end{verbatim}
+\end{quote}
+
+We recommend that in addition, the users {\tt JTquota} be at least 3072.
+
+The system parameters that have been found to cause problems are:
+
+\begin{itemize}
+\item {\tt VIRTUALPAGECNT} --- use 100000 or more
+\item {\tt GBLPAGFIL} --- use 1400 more that AUTOGEN thinks necessary
+\item {\tt PROCSETCNT} --- use 100 or more
+\end{itemize}
+
+\subsection {Privileges}
+
+\begin{description} 
+\begin{description} 
+
+\item [Logical Names] --- Starlink recommends that the Starlink logical names
+are defined at {\tt /SYSTEM} level as in {\tt SSC:STARTUP.COM}.
+
+However, excepting the GWM logical names (see below), the Starlink software
+will run with the logical names set at {\tt /JOB} level. Some software will run
+with Starlink logical names at {\tt /PROCESS} level, but ADAM applications
+will not work when run from ICL. 
+
+For the GKS system to be able to use X-windows without the displayed image
+disappearing each time an executable image (application) runs down, a Graphics
+Window Manager (GWM) has been developed. The logical names associated with GWM
+({\tt GWM\_DIR} and the image names) {\bf must} be defined at {\tt /GROUP} or
+{\tt /SYSTEM} level, otherwise the detached window manager process will not
+be able to see the software and will fail to generate a window. 
+
+\item [Installed Images] --- The standard AZUSS image for the ADAM system needs
+to be INSTALLed as a known image in order that ICL works. A dummy version of
+the AZUSS image is also available that need not be installed. Swapping between
+the two is archived by pointing the {\tt AZUSS} logical name appropriately.
+AZUSS is part of the real-time data acquisition capabilities of ADAM and is not
+needed for data-reduction. See SSN/44 for more details. 
+
+\end{description}
+\end{description}
+
+\subsection {Dependencies}
+
+In general, the relationships and dependencies between Starlink software items
+have not been documented, although some installation notes mention them.
+Any item which features graphical output will need {\tt GKS}.
+
+The dependencies of applications packages on other applications packages where
+known are given in {\tt ADMINDIR\-:SSI.LIS}.
+
+\section {References}
+\label{se:references}
+
+\begin{description}
+\begin{description}
+\item[\bf SGP/20]: Starlink Software Management
+\item[\bf SGP/21]: Starlink Software Distribution Policy
+\item[\bf SGP/25]: Starlink Site Manager's Guide -- major nodes
+\item[\bf SSN/33]: Configuring Queues for Starlink Graphics
+\item[\bf SSN/44]: ADAM -- Installation Guide
+\item[\bf SUG]: Starlink User Guide
+\item[\bf SUN/1]: Starlink Software -- An Introduction
+\item[\bf SUN/83]: GKS -- Version 7.2
+\end{description}
+\end{description}
+
+\newpage
+
+\appendix
+\section{How the tapes were written}
+\label{se:tapes}
+
+Because making tapes is tedious, the tapes are generally written using site
+specific command procedures, submitted as batch jobs on the RAL Starlink
+VAXcluster. The log of the batch job will be included with the tape(s) sent to
+sites. A typical batch job log is shown below:
+
+\begin{quote}\small
+\begin{verbatim}
+$ verify = f$verify(0)
+$!+
+$! BAMBERG_6250.COM
+$!
+$! Software for BAMBERG
+$!
+$! M J Bly 24-OCT-92
+$!-
+$       set verify
+$       on error then goto exit
+$       old_name = f$process()
+$       set proc/name="Bamberg"
+$       allocate muc0
+%DCL-I-ALLOC, _RLSTAR$MUC0: allocated
+$! core
+$       backup/noassist/rewind/ignore=label/label="STAR" - 
+        /density=6250/block_size=64000 -         
+        disk$star:[starlink...]*.*;* muc0:star.bck/save
+%MOUNT-I-OPRQST, Please mount volume STAR   in device _RLSTAR$MUC0:
+BACKUP requests: Saveset STAR.BCK, Volume number 01, write ENABLED
+%MOUNT-I-MOUNTED, STAR mounted on _RLSTAR$MUC0:
+%MOUNT-I-RQSTDON, operator request canceled - mount completed successfully
+$!
+$! adam
+$       backup/noassist/ignore=label/density=6250/block_size=64000 -         
+        disk$star:[adam.release...]*.*;* muc0:adam.bck/save
+$!
+$! adamapp
+$       backup/noassist/ignore=label/density=6250/block_size=64000 -         
+        disk$star:[adamapp...]*.*;* muc0:adamapp.bck/save
+$!
+$! kappa
+$       backup/noassist/ignore=label/density=6250/block_size=64000 -         
+        disk$star:[kappa...]*.*;* muc0:kappa.bck/save
+$!
+$! figaro
+$       backup/noassist/ignore=label/density=6250/block_size=64000 -         
+        disk$star:[figaro...]*.*;* muc0:figaro.bck/save
+$!
+$! figpack
+$       backup/noassist/ignore=label/density=6250/block_size=64000 -         
+        disk$star:[figpack...]*.*;* muc0:figpack.bck/save
+$!
+$! dipso
+$       backup/noassist/ignore=label/density=6250/block_size=64000 -         
+        disk$star:[dipso...]*.*;* muc0:dipso.bck/save
+$!
+$! iuedr
+$       backup/noassist/ignore=label/density=6250/block_size=64000 -         
+        disk$star:[iuedr...]*.*;* muc0:iuedr.bck/save
+$!
+$ exit:
+$       dism muc0
+$       deal muc0
+$       set proc/name="BATCH_714"
+$       exit
+  STAR         job terminated at 24-OCT-1992 15:11:04.54
+ 
+   Accounting information:
+  Buffered I/O count:           15162         Peak working set size:    1989
+  Direct I/O count:             19467         Peak page file size:      4259
+  Page faults:                   9384         Mounted volumes:             1
+  Charged CPU time:           0 00:07:28.02   Elapsed time:     0 00:35:30.06
+\end{verbatim}
+\end{quote}
+
+In this case, the tape was an industry standard 2400' half inch tape written at
+a density of 6250bpi. The software provided was:
+\begin{enumerate}
+\item The Starlink Core
+\item The mini release of ADAM
+\item ADAMAPP suite
+\item KAPPA 
+\item FIGARO
+\item FIGPACK
+\item DIPSO --- optional item
+\item IUEDR --- optional item
+\end{enumerate}
+
+\newpage
+
+\section{Action list}
+\label{se:actions}
+
+This is a summary of actions required to install the Collection; if in doubt,
+consult the appropriate section of this paper. The numbers in parentheses -
+{\em e.g.}\ (5.2) - refer to sections of this paper. Actions which may not be
+relevant are indicated as follows - (?).
+
+\begin{enumerate}
+
+\item Store the Starlink directories on disk (\ref{ss:store}).
+
+\begin{verbatim}
+    $ ALLOC Mxxx TAPE
+    $ BACKUP/REWIND/NOASSIST TAPE:STAR.BCK - 
+            <device>:[*...]/OWNER_UIC=ORIGINAL
+    $ BACKUP/NOASSIST TAPE:STARLOCAL.BCK - 
+            <device>:[*...]/OWNER_UIC=ORIGINAL
+\end{verbatim}
+
+(?) Directories containing Optional Software and Data may also need to be
+stored.
+
+\item Edit file {\tt SYS\$STARTUP:SYSTARTUP\_V5.COM} (\ref{ss:fundamental})\\
+Add these statements and insert variables ({\em e.g.}\ \verb+<device>+):
+
+\begin{quote}\small
+\begin{verbatim}
+$!******************************************************
+$!
+$! EXTRA COMMANDS ADDED FOR STARLINK SOFTWARE COLLECTION
+$!
+$! Define initial Starlink logical names
+$!
+$	ASSIGN/SYSTEM <device> STARDISK
+$	ASSIGN/SYSTEM <device> LSTARDISK
+$!
+$! Call the Starlink startup files
+$!
+$	@STARDISK:[STARLINK]STARTUP
+$	@LSTARDISK:[STARLOCAL]STARTUP
+$!
+$!******************************************************
+\end{verbatim}
+\end{quote}
+
+\item Edit files {\tt [STARLINK]:STARTUP.COM} and {\tt [STARLOCAL]:STARTUP.COM}
+(\ref{ss:fundamental}).
+
+Check that the installed images are acceptable. Check the relevance of the
+definitions of the logical names.
+
+\item Activate the Collection (\ref{ss:activate}).
+
+Reboot or explicitly enter commands added to SYS\$STARTUP:SYSTARTUP\_V5.COM.
+
+\item Customise the Graphics system (\ref{ss:fundamental}).
+
+\item (?) Install PSSMB (\ref{ss:systems}). 
+
+\item Files {\tt SSC:LOGIN.COM} and {\tt LSSC:LOGIN.COM}.
+
+Execute procedure
+{\tt SSC:LOGIN.COM} and add the command `{\tt \$ @SSC:LOGIN.COM}' to your login
+command file.
+
+\end{enumerate}
+
+\end{document}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         

@@ -1,0 +1,1067 @@
+\documentstyle[11pt]{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink System Note}
+\newcommand{\stardocinitials}  {SSN}
+\newcommand{\stardocnumber}    {41.7}
+\newcommand{\stardocauthors}   {M D Lawden \& M J Bly}
+\newcommand{\stardocdate}      {1 February 1993}
+\newcommand{\stardoctitle}     {Starlink Software Changes}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+%  table of contents
+\setlength{\parskip}{0mm}
+\tableofcontents
+\setlength{\parskip}{\medskipamount}
+\markright{\stardocname}
+
+\newpage
+\section {Introduction}
+
+Starlink Software Changes (SSC's) are the mechanism by which the Starlink
+Software Collection is maintained and updated.
+They are prepared and distributed by the Starlink Software Librarian who is
+responsible for the management of the Collection.
+This paper gives a detailed description of the preparation, implementation and
+distribution of SSC's.
+
+The Collection is implemented on every Starlink computer, all of which have
+access to the JANET network.
+It is also implemented on many non-Starlink computers, some of which have access
+to JANET.
+
+There are two methods of updating the Collection.
+The first consists of obtaining and implementing a sequence of SSC's issued by
+the Librarian at RAL.
+This method is appropriate for sites with access to JANET or the Starlink
+DECnet.
+SSC's are implemented at RAL in the same way as at every other site which uses
+this method.
+This means that every SSC is tested before being distributed and that every site
+is treated the same way.
+It also ensures that the Collection is identical at every site (unless
+unauthorized changes or omissions are made).
+The second method consists of a complete reissue on magnetic tape of the
+standard software, plus whatever optional software or data is required.
+Because of the effort, expense, and number of sites involved, this can only be
+done infrequently, but it is the only method available to sites without access
+to JANET.
+In this paper, only the first method is considered.
+
+Each SSC is prepared at RAL in its own directory on the Starlink VAX cluster.
+When it is ready, it is implemented at RAL.
+If any problems are detected at this stage, these are resolved and the SSC is
+re-implemented.
+When an SSC has been successfully implemented at RAL, an SSC notice is sent
+by electronic mail to all the sites which use the network updating method.
+A compressed BACKUP save set of the directory is made to make it easier to copy
+over a network.
+Each Site Manager then copies this save set and recreates the directory.
+He or she then implements the SSC by following the instructions in the SSC
+notice.
+Normally, this consists simply of executing a supplied command procedure.
+
+The sections that follow describe the network method in detail.
+The steps fall naturally into three phases:
+\begin{description}
+\begin{description}
+\item [PREPARATION]
+\item [RELEASE]
+\item [CLEAN-UP]
+\end{description}
+\end{description}
+The control and maintenance of the Starlink Software Collection is a big and
+challenging job.
+It needs technical knowledge, insight, imagination and initiative.
+Above all it requires care, constant checking, attention to detail, and a
+systematic working method.
+This all takes time, but in the long run it is the quickest way of doing it
+properly.
+The steps described below should be regarded as recommendations based on years
+of experience in managing the Collection.
+They need to be applied intelligently rather than dogmatically.
+For instance, the exact order in which steps are carried out is usually not
+critical and not every contingency can be anticipated.
+The important thing is that the Collection be properly controlled and
+documented and that required actions are not overlooked.
+Improvements in the method are to be welcomed, however it is important that it
+remains simple and robust.
+Avoid complicated, clever (and fragile) command procedures as these sometimes
+go wrong with disastrous results (to the surprise and amusement of the
+perpetrator).
+Avoid adding extra steps that seem attractive but are not worth the continual
+effort involved; remember, over the years each step will be done hundreds of
+times.
+
+A release may be associated with a single item, or several  items may be
+released together, and when a new version of VMS is released many items may
+need changing simultaneously.
+
+\section {Preparation}
+
+All work on the Collection should be carried out under the Librarian's username
+{\tt STAR}.
+The process starts when the Librarian learns about a change which is needed to
+an existing item in the Collection, or about the advent of a new item which
+should be added to the Collection.
+One way or another, the required information about how to implement the change
+or addition must be supplied to the Librarian.
+The formal way to do this is for the software supporter to submit a completed
+Starlink Software Item Submission Form (SSISF).
+This can be found in the file {\tt RLVAD::LDOCSDIR:SSISF.TEX}.
+However, the information may be supplied by a mail message or some other
+method of communication.
+The advantage of the SSISF is that it asks for information that may be omitted
+from a less formal submission.
+It doesn't really matter how the information is supplied; the important thing
+is that the Librarian must acquire the information needed to prepare the
+release.
+
+It may be worth mentioning that many people who submit software assume that the
+Librarian has the same detailed understanding of it that they have and often
+leave out vital instructions on the grounds that these are `obvious'.
+These naive people need educating as you have to continually pump them for
+information, which wastes time.
+
+Software submission is dealt with further in SGP/19.
+
+\begin{description}
+
+\item [A1 : HOMELESS FILES] ---
+Some files in the Collection are not associated with a specific software item.
+These contain such things as username lists, general documentation and 
+management information.
+When new versions of these become available, store them in 
+{\tt [STAR.TEMP.PENDING]} until a new release is prepared, then include them 
+in that release.
+
+\item [A2 : HOMEWORK] ---
+When a software item is submitted for release, study the information supplied
+on the proposed new issue or update.
+If necessary, discuss the release with the originator to resolve any problems
+which arise.
+Make sure the item is suitable for general release ({\em e.g.} has it been
+coordinated with general Starlink software development?).
+Decide where to put the files; this may involve the creation of new directories.
+If a new item is large ($>$2000 blocks) or of limited interest, it should be
+released as an Optional Starlink Software Item (see SGP/20) since the ideal
+of an integrated software collection identical at all sites may break down if
+the standard collection gets too large for convenient storage.
+
+\item [A3 : SUN's] ---
+Every item should have a Starlink User Note (SUN) associated with it.
+If one has not been provided you should produce one yourself.
+This can be either a reformatted version of an existing piece of documentation,
+or a brief introduction which points to internal documentation.
+Check the spelling with SPELL (LUN/26 (RAL)).
+
+\item [A4 : CREATE DIRECTORY] ---
+Create directory {\tt [STAR.TEMP.SSCn]} to contain a complete update package:
+\begin{verbatim}
+    $ CREATE/DIR/OWNER=STAR [STAR.TEMP.SSCn]
+\end{verbatim}
+{\tt n} stands for the number of the Starlink Software Change being prepared.
+SSC's should be issued and implemented in numerical order, although several
+can be in preparation at any one time.
+
+If the item is an Optional item, the submitted files should be stored in a
+separate directory called {\tt [STAR.TEMP.SSCnX]} (and {\tt [STAR.TEMP.SSCnY]} 
+if needed).
+This is because a Site Manager may choose not to implement this item and may
+therefore not want to copy it over a network.
+However, directory {\tt [STAR.TEMP.SSCn]} will be produced for every release 
+because you need to add some files to those submitted and these are stored here.
+In some cases it is easier to implement the release if the submitted files are
+stored in subdirectories while the ones you add are stored in 
+{\tt [STAR.TEMP.SSCn]}.
+
+Site Managers should copy and implement {\em every}\, {\tt SSCn.COM} released; 
+even if they do not want the item itself.
+
+\item [A5 : SELECT FILES] ---
+Decide what files to put in {\tt [STAR.TEMP.SSCn]} and copy them across.
+Do not forget to update the revision dates of any files you modify.
+The following categories of files are eligible:
+\begin{description}
+\begin{description}
+\item [Submitted files]:
+These should be specified by the person submitting the software.
+What is appropriate depends on the nature of the software, however it will
+include things like source code, libraries, executable code, command procedures,
+test data and documentation.
+\item [Homeless files]:
+Usually, these are documentation files for storage in {\tt DOCSDIR}.
+They may have been stored temporarily in {\tt [STAR.TEMP.PENDING]}.
+\item [Information files]:
+Copy the ones which need updating and prepare new versions.
+\begin{verbatim}
+    DOCSDIR:DOCS.LIS            ADMINDIR:SIG.LIS
+            SUBJECT.LIS                  SSI.LIS
+            NEWS.LIS                     USERNAMES.LIS
+            BUGS.LIS                     WHOSWHO.LIS
+            ANALYSIS.LIS                 HAG.LIS
+            ADAMDOCS.LIS                 SUPPORT.LIS
+            MUD.LIS
+            DOCBUGS.LIS
+\end{verbatim}
+\item [Environment files]:
+These set up an environment for Starlink software.
+Copy the ones which need updating and prepare new versions.
+\begin{verbatim}
+    SSC:LOGIN.COM         (Global symbol definitions)
+        STARTUP.COM       (Logical name definitions)
+        ADAM_PACKAGES.ICL (ADAM packages ICL startup file)
+\end{verbatim}
+For items stored outside {\tt [STARLINK]} you may need to edit:
+\begin{verbatim}
+    LSSC:LOGIN.COM         (Local Global symbol definitions)
+         STARTUP.COM       (Local Logical name definitions)
+         ADAM_PACKAGES.ICL (Local ADAM packages ICL startup file)
+\end{verbatim}
+
+\item [SSC files]:
+The SSC notice and implementation command procedure (see {\bf A7}, {\bf A8}):
+\begin{verbatim}
+    SSCn.COM          (SSC implementation command procedure)
+    SSCn.LIS          (SSC notice)
+\end{verbatim}
+\end{description}
+\end{description}
+
+\item [A6 : SAVE SPACE] ---
+Save as much disk space as possible.
+Space economy is very important for Starlink software, not just to save disk
+space but to minimise the network traffic involved in software distribution.
+Make sure the directories you release are purged.
+
+If the release contains many source code files, these should be stored in a text
+library in reduced format.
+Thus, suppose the submitted software contains a number of {\tt *.FOR} files
+containing Fortran source code.
+First create a text library:
+\begin{verbatim}
+    $ LIB/TEXT/CREATE item
+\end{verbatim}
+where {\tt item} is the software item name.
+Add the source files to the library as modules:
+\begin{verbatim}
+    $ LIB item.TLB *.FOR
+\end{verbatim}
+Then store it in reduced form which should save about a third of the original
+space:
+\begin{verbatim}
+    $ LIB/DATA=REDUCE item.TLB
+\end{verbatim}
+You can check that the modules are in the library by:
+\begin{verbatim}
+    $ LIB/LIST item.TLB
+\end{verbatim}
+Also, a single source file can be restored by:
+\begin{verbatim}
+    $ LIB/EXTRACT=name/OUTPUT=name.FOR item.TLB
+\end{verbatim}
+Compress all libraries that are submitted for release
+(We have known people submit libraries containing 90\% waste space):
+\begin{verbatim}
+    $ LIB/COMPRESS name.typ
+\end{verbatim}
+Make sure the space allocated to files is as low as possible.
+Find out what the situation is by:
+\begin{verbatim}
+    $ DIR/SIZE=ALL
+\end{verbatim}
+If there is wasted space, truncate the files:
+\begin{verbatim}
+    $ SET FILE/TRUNCATE *.*
+\end{verbatim}
+The saving depends on the original cluster size.
+The Librarian allocates 100 blocks for even a small library, so these should be
+truncated after being set up.
+Truncation resets the file date.
+
+Use STRIP (LUN/47 (RAL)) to strip the blanks off the end of lines in text files.
+
+\item [A7 : PREPARE SSCn.COM] ---
+This is the SSC implementation command procedure.
+Look at previous examples for the correct format and suitable techniques; one
+example is shown in Appendix \ref{se:ex.proc}.
+A skeleton command procedure is stored in {\tt [STAR.TEMP]SSC.COM}.
+Copy this into {\tt [STAR.TEMP.SSCn]\-SSCn.\-COM} and edit it.
+\begin{verbatim}
+    $ COPY [-]SSC.COM SSCn.COM
+    $ EVE SSCn.COM
+\end{verbatim}
+Change {\tt ***} to the number of the release.
+When using the EVE editor, this is most easily done as follows:
+\begin{verbatim}
+    <DO> or GOLD-KP7
+       Replace *** XXX   (where XXX is the number of the release)
+       A[ll]
+\end{verbatim}
+Delete any lines which are not required, {\em e.g.} information summaries that
+are not changed, and add the commands required to implement the release.
+
+\item [A8 : PREPARE SSCn.LIS] ---
+This is the SSC notice.
+This should tell Site Managers how to install the release and give them
+information about it.
+Enter the EVE editor using the special symbol,
+\begin{verbatim}
+    $ SSCEVE SSCn.LIS
+    
+    <DO> or GOLD-KP7
+       Replace *** XXX
+       A[ll]
+\end{verbatim}
+from within {\tt [STAR.TEMP.SSCn]}.
+(If you use the EDT editor you can copy the skeleton file from [-]SSC.EVE.)
+This will create a partially complete file which can be edited to provide the
+final version.
+Try to maintain a format and style similar to previous releases; one example is
+shown in Appendix \ref{se:ex.note}.
+Try to include the following information in the `Notes' section:
+\begin{itemize}
+\item The purpose of the release ({\em i.e.} what's new) or a pointer to this
+information.
+\item A test that can be carried out to confirm that the software has been
+installed correctly (see {\bf B3}).
+\end{itemize}
+If users are likely to be affected noticeably by the release, ask the Site
+Managers to announce the release in their NEWS file (see {\bf C1}).
+If a news item is required, prepare a file called `NEWS\_name.TXT' with the
+required information and ask the Site Manager to post it into his News file.
+The required format is described in SUN/51.
+Put in a deletion date of about a month hence.
+
+Every software item should have a version number, and this should change with
+every release that affects it.
+Every item should have a file called `VERSION.NUM' in its top level directory.
+This should contain a single line of text like:
+\begin{verbatim}
+    This is version n.n-n of XXXXXXX, released in SSCnnn.
+\end{verbatim}
+
+\item [A9 : FILE ATTRIBUTES] ---
+Check the protection code and owner for all files.
+The protection code should be {\tt (RWE,RWE,RE,RE)} for directories and 
+{\tt (RE,RWED,RE,RE)} for other files.
+The owner should be UIC = {\tt [STAR]}.
+However, there are files in the directories {\tt STARDISK:[STARSEC...]} that
+require special privileges set by the Project.
+Occasionally, some files need Write privilege for users ({\em e.g.}\ ARGS
+data base files).
+The lack of this privilege is sometimes the cause of mysterious errors.
+
+There should be no ACL information on any released files, except some of those
+in {\tt STARDISK:\-[STARSEC...]}.
+
+You can look at the current file protection and ownership by:
+\begin{verbatim}
+    $ DIR/PROT/OWN
+    $ DIR/SEC          ! checks the ACL protection on files [STARSEC...]
+\end{verbatim}
+You can set the protection by:
+\begin{verbatim}
+    $ SET PROT *.*
+\end{verbatim}
+For directory trees try:
+\begin{verbatim}
+    $ SET PROT [...]*.*
+    $ SET PROT=(S:RWE,O:RWE) [...]*.DIR
+\end{verbatim}
+See Vol. 3 System Management for details of the ACL editor.
+You can set the ownership (if you have {\tt SYSPRV} and {\tt BYPASS} 
+privileges) by:
+\begin{verbatim}
+    $ SET FILE/OWN *.*
+\end{verbatim}
+
+\item [A10 : FINAL CHECK] ---
+Purge {\tt [STAR.TEMP.SSCn\ldots]} and check the {\tt SSCn.LIS/COM} files 
+carefully. Make sure no files are missing or superfluous.
+Note down the size of all directories in the release and note these in
+{\tt SSCn.LIS}.
+Make sure the size of the directory is described correctly in {\tt SSCn.LIS} 
+as this will give a remote manager confidence that he has copied the software 
+correctly or warn him that some files are missing.
+If errors are detected after release, issue corrections in new releases called
+{\tt SSCnA}, {\tt SSCnB}, {\em etc}.
+\end{description}
+
+\section {Release}
+
+We implement software updates while the computer is in normal operation.
+Perfectionists will want to do updates during special `system development'
+sessions during which users are excluded from the computer.
+In practice this is highly inconvenient for users, so we think the current
+trade-off between safety and speed is acceptable.
+In any case, warnings can be given (see {\bf B1}).
+
+\begin{description}
+
+\item [B1 : WARN USERS] ---
+If the update will affect users presently on the system it is wise to inform
+them (you need {\tt OPER} privilege):
+\begin{verbatim}
+    $ REPLY/USER/BELL "<message>"
+\end{verbatim}
+To display a message to any user logging into the system (you need {\tt SYSNAM}
+privilege):
+\begin{verbatim}
+    $ ASSIGN/SYSTEM "<message>" SYS$WELCOME
+\end{verbatim}
+To cancel the message:
+\begin{verbatim}
+    $ DEASSIGN/SYSTEM SYS$WELCOME
+\end{verbatim}
+Only use the above for information of immediate relevance to users.
+Use the NEWS system for routine announcements of software releases (see {\bf
+C1}).
+
+\item [B2 : IMPLEMENT] ---
+Implement the update at RAL.
+Make {\tt [STAR.TEMP]} your default directory (command {\tt TEMP} does this).
+Define logical name {\tt SSCTEMP}:
+\begin{verbatim}
+    $ DEF SSCTEMP DISK$SOFTDEV:[STAR.TEMP.SSCn]
+\end{verbatim}
+Check that you have done this correctly by:
+\begin{verbatim}
+    $ DIR SSCTEMP
+\end{verbatim}
+Then, implement the release:
+\begin{verbatim}
+    $ @SSCTEMP:SSCn
+\end{verbatim}
+If you have any problems you may need to take corrective action and revise the
+{\tt SSCn.LIS} and/or {\tt SSCn.COM} files.
+After the command procedure has finished successfully, do any manual operations
+that are required to complete the installation.
+These should have been documented in {\tt SSCn.LIS}.
+
+\item [B3 : TEST] ---
+If possible, test the software you have installed to make sure that it appears
+to work.
+It is the responsibility of the originator to give you an appropriate test.
+If there are any problems, correct the release before sending the SSC notice to
+other sites (see {\bf B7}).
+Ideally, every software release should be exhaustively tested before general
+distribution.
+In reality, this is just not possible for Starlink because of limited manpower,
+remember {\em `The Best is the enemy of the Good'}.
+Our aim is simply to ensure that the software submitted has been installed
+as intended and works as it did for the person who submitted it.
+This does not imply that this person got it to work properly in the first place.
+
+\item [B4 : SSC FILES] ---
+Copy {\tt SSCn.LIS} into {\tt [STAR.TEMP]} and print out {\tt SSCn.COM} as 
+soon as you are satisfied that the SSC is in a satisfactory state for general 
+release. 
+
+\item [B5 : SAVE SET] ---
+Produce the save set {\tt SSCn.BCK} which is to be copied by other sites.
+Make {\tt [STAR.TEMP]} your default directory.
+To create the save set containing the release and compress, type the following:
+\begin{verbatim}
+    $ COMPRESS SSCn   ! this executes a command procedure COMPRESS.COM
+\end{verbatim}
+or explicitly
+\begin{verbatim}
+    $ BACKUP [STAR.TEMP.SSCn...]*.* SSCn.BCK/SAVE
+    $ LZCMP -V SSCn.BCK SSCn.BCK  
+\end{verbatim}
+Do the same for {\tt [STAR.TEMP.SSCnX]} if it exists.
+Note the sizes of the save-sets in standard and compressed form, and add these
+to the copy of {\tt SSCn.LIS} in {\tt [STAR.TEMP]}.
+
+\item [B6 : SAVE SET PROTECTION] ---
+Save sets need to be protected from copying between the time of creation
+(after the release has been implemented at RLVAD) and the time of release
+(e-mailing).
+This protection should be extended to directories and the release note.
+
+Save sets will be created by the COMPRESS command with the protection set as:
+\begin{verbatim}
+    (S:RE,O:RWE,G:RE,W)
+\end{verbatim}
+After completing the release note in [STAR.TEMP] by adding the save set sizes,
+set the protection to World No Access:
+\begin{verbatim}
+    $ SET PROT=W SSCnnn.LIS
+\end{verbatim}
+Also, set the same protection on the top release directories:
+\begin{verbatim}
+    $ SET PROT=W SSCnnn*.DIR
+\end{verbatim}
+Just before release, reset World protection to W:RE:
+\begin{verbatim}
+    $ SET PROT=W:RE SSCnnn*.*
+\end{verbatim}
+
+\item [B7 : RELEASE] ---
+Send the SSC notice to the sites on the distribution lists and to the person
+who submitted the software for his/her information.
+This constitutes the actual {\em software release} for remote sites and should
+be carried out on the VAX cluster node that runs the Coloured Book Software
+(usually the BOOT NODE).
+
+The message should be sent to all sites on {\bf DECNET} by using the
+batch mailing procedure.
+
+\begin{verbatim}
+    $ SET DEF [STAR.TEMP]
+    $ BM SSCn.LIS
+    Version 6.1 -- 18 April 1985
+    To: @SSC_DECNET
+    Subject: SSCn
+    CC:
+\end{verbatim}
+The symbol {\tt BM} submits a batch procedure {\tt [STAR.BMAIL]BMAIL.COM}
+that mails all sites in the distribution list {\tt [STAR.TEMP]SSC\_DECNET.DIS}.
+This file MUST be kept up-to-date.
+Any failed attempts to mail DECNET sites will be requeued for later.
+The procedure reports its progress and eventually lists the sites it was
+unable to contact over a 24 hour period.
+
+Because of a bug in the Batch Mailer, it does not handle mail to {\bf JANET} 
+sites correctly. Use {\em either} of the following methods:
+
+\begin{enumerate}
+\item Mail the release note to all the sites in {\tt [STAR.TEMP]SSC\_JANET.DIS} 
+at one shot using the VMS MAIL command:
+\begin{verbatim}
+    $ @CBSMAILER
+      File to be mailed: SSCnnn.LIS
+      Distribution File (including extension): SSC_JANET.DIS
+      Subject: SSCnnn
+\end{verbatim}
+\item Mail the release note to each site in {\tt [STAR.TEMP]SSC\_JANET.DIS}
+individually using VMS MAIL.
+This is a bit time consuming, but if a site is not reached, the returned
+message will always indicate which site was not reached.
+We use this method. 
+\end{enumerate}
+
+JANET mail that cannot be sent will eventually be returned as `undelivered
+mail' via the ftp\_manager.
+
+Messages from the Batch Mailer and ftp\_manager should be stored on-line in a
+mail `folder' called SSCn until the Batch Mailer has successfully reached all
+DECNET sites. Note sites which cannot be contacted and try them individually 
+later. Read and print the {\tt SSCn.LIS} from your own MAIL.
+Trim {\tt SSCn.LIS} and {\tt SSCn.COM} to A4 size and file in the 
+`STARLINK -- Operations' folder. When you are satisfied that all sites have been
+reached, delete the contents of MAIL `folder' {\tt SSCn}.
+
+\item [B8 : SSC\_RELEASE CONFERENCE] --- A VAXNotes conference has been set up
+on RLSTAR. This conference should contain the {\tt SSCn.LIS} release notes for
+each release as a separate topic.
+Any associated messages should be entered as replies to the relevant topic.
+
+\begin{verbatim}
+    $ NOTES
+    Notes> OPEN SSC_RELEASE
+    Notes> WRITE
+    (in the editor, include the file SSCn.LIS by pressing the `Do' button
+    and telling the system to include SSCnnn.  Then exit.)
+    ^Z
+    Enter a title for your topic: SSCnnn
+    Your topic is complete.  Proceed to enter it? (Y?N) <Y> Y
+    Notes> EXIT
+\end{verbatim}
+
+\end{description}
+
+\section {Clean-up}
+
+A number of things need to be done after an SSC has been implemented.
+Some can be delayed until the end of a batch of releases; use your discretion.
+When printing files use the /NOFEED qualifier to save paper (or use the 
+{\tt PNF} command defined for {\tt STAR}), trim the output to A4 size and file.
+
+If you need to print a complete set of information files, the command
+procedure {\tt [STAR.TEMP]\-PRINT\_SSC\_DOC.COM} which will print them in three
+batches. 
+
+\begin{description}
+
+\item [C1 : NEWS] ---
+If users will be noticeably affected by the release ({\em e.g.}\, they may 
+need to relink programs) add a message to the RAL user news system as follows 
+(you need {\tt SYSPRV} privilege):
+\begin{verbatim}
+    $ ADDNEWS
+\end{verbatim}
+This invokes the NEWSMAINT utility and can be used to ADD, MODIFY and DELETE
+news items. A menu will be presented and you should select the required
+option.
+When you select [A]dd or [M]od you will find yourself in the EDT editor.
+Enter the required text in the form of a HELP file; {\em e.g. }
+\begin{verbatim}
+      1 <keyword>
+                                           <expiry date>
+        <text associated with the keyword>
+      2 <sub-keyword>
+        <text associated with the sub-keyword>
+\end{verbatim}
+The numbers in front of the keywords are the HELP system level numbers.
+The keywords must not include blanks.
+When a user logs in he will be bleeped if there are any news messages that he
+has not read.
+To read the news, type
+\begin{verbatim}
+    $ NEWS <item>
+\end{verbatim}
+Delete the message after the expiry date by running the NEWSMAINT utility again.
+
+\item [C2 : STORE NOTES] ---
+File any notes associated with released items in their folders.
+
+\item [C3 : DELETE DIRECTORY] ---
+Delete directory {\tt [STAR.TEMP.SSCn]} (and any optional directories) to save
+space.
+You will need to set the protection of the DIR file before deletion:
+\begin{verbatim}
+    $ SET PROT [.SSCn...]*.DIR
+    $ DELETE [.SSCn...]*.*.*
+    $ SET PROT SSCn.DIR
+    $ DELETE SSCn.DIR.*
+\end{verbatim}
+The information is still available in {\tt SSCn.BCK} and can be restored if
+required by:
+\begin{verbatim}
+    $ BACKUP SSCn.BCK/SAVE [*...]
+\end{verbatim}
+The release directory tree is usually retained for a few days after release 
+in case of problems. 
+
+\item [C4 : DELETE SSC NOTICE] ---
+Delete {\tt [STAR.TEMP]SSCn.LIS} when every site on the distribution list has
+received it. Make sure you have a printout of it in the operations file.
+
+\item [C5 : INFORMATION FILES] ---
+Print any new information summaries.
+
+\item [C6 : ENVIRONMENT FILES] ---
+Print a new summary of the startup and login files if {\tt SSC:\-LO\-GIN.\-COM}
+or {\tt SSC:STARTUP.COM} have been changed:
+\begin{verbatim}
+    $ @LADMINDIR:CPSHORT
+\end{verbatim}
+
+\item [C7 : DIRECTORY MAPS] ---
+Update and print {\tt LADMINDIR:DIRMAP.LIS} illustrating the directory
+structure of {\tt [STARLINK\ldots]} if new directories were created or old
+directories deleted:
+\begin{verbatim}
+    $ @LADMINDIR:DIRMAP
+    $ PNF LADMINDIR:DIRMAP
+\end{verbatim}
+
+\item [C8 : SIZE ANALYSIS] ---
+An analysis of the software sizes is kept in {\tt [STAR.ADMIN.SIZES]\-ALL.LIS}.
+This is an `unloaded' REXEC file. Update the file, and then load the new data:
+\begin{verbatim}
+      $ REXEC
+      REXEC> COPY STAR_ALL STAR_ALL (0)
+      REXEC> LOAD ALL.LIS STAR_ALL
+      REXEC> EXIT
+      $ @SIZES
+\end{verbatim}
+The command procedure (final step above) will print out sorted lists of the 
+software sizes in various categories. 
+
+\item [C9 : DOCUMENT ANALYSIS] ---
+Update and print {\tt LDOCSDIR:ANALYSIS.LIS} containing the documentation
+analysis if a new document number or item has been released.
+
+\item [C10 : DOCUMENT MASTERS] ---
+If new documentation ({\em e.g.}\,SUN) has been released and masters have not 
+been supplied, prepare them yourself.
+For RUNOFF files the best current method of producing a master is to use the
+Sanders printer in the lineprinter room in `letter' mode (although some people
+prefer the laser printer, see LUN/27 (RAL); use the same positioning as for the
+Sanders).
+Masters of \LaTeX\ files should be produced on the Laser printer.
+
+\begin{description}
+
+\item [\LaTeX] :
+These files should be suitable for processing by \LaTeX\ (this is the Starlink
+recommendation).
+The standard method of producing a master is:
+\begin{verbatim}
+    $ LATEX file
+    $ DVIPSA4 file
+    $ PRCN file.DVI-PS
+\end{verbatim}
+Output is on a laser printer. You may need to \LaTeX\ the master several times
+to get the internal references correct.
+
+\item [RUNOFF] :
+Produce a suitable file for the Sanders from the RUNOFF file and print it by:
+\begin{verbatim}
+    $ RUNOFF/RIGHT=4 <filename>
+    $ PSAN <filename>.MEM
+\end{verbatim}
+The value of the RIGHT parameter may need to be changed if people have fiddled
+with the printer.
+
+If the Sanders needs preparing for action, put A4 photocopying paper in its
+hopper, press the bar down and press `START'.
+It may need resetting by pressing the `RESET' button at the back, or by
+switching it off and on.
+The ribbon may need changing at any time.
+\end{description}
+
+Add diagrams or special notation if required.
+Make sure the masters are clear and have good contrast as faint copies of
+documents are very irritating to users.
+
+To get copies, complete a pink form N127a for each document to be copied
+specifying `Double-sided', `Stapled' and `Top left hand corner'.
+The number of copies to specify varies, but at the time of writing was 70 for
+SUN, SGP, SSN, SG, and 40 for LUN, LGP, LSN, MUD.
+Enclose the master in a plastic folder, put in form N127a, and send them to
+`Repro R3' for copying.
+When they return, distribute them to everyone on the `/ALL' distribution list
+(see {\tt LADMINDIR:PEOPLE.ADR}) and file the left-overs in the drawers holding
+Starlink documents.
+Update the document set in the terminal room.
+We find it helpful to note on the blackboard when documents are sent to and
+returned from Repro, otherwise we forget about them.
+
+\item [C11 : TAPES] ---
+Some items are too large (say $>$10000 blocks -- $>$1000 for the AAO) to send
+over the network, or a site may request the release to be sent on tape
+(usually AAO and Hawaii).
+Write and post any such tapes required.
+Use the sticky address labels which should be available (see LSN/28).
+Packets of tapes can be left in the OUT tray.
+Jiffy bags are normally adequate.
+
+
+% \item [C13 : BACKUP] ---
+% Backup DISK\$STAR periodically to exabyte tape.
+% This can be done by typing:
+% \begin{verbatim}
+%    $ BUP
+%    $ @STAR_IMAGE
+%    select MUB0: on RLSTAR
+% \end{verbatim}
+% Backup any optional items which have changed.
+% The tapes are kept in R68/1.02; please keep them in order and with the
+% contents clearly visible --- it's a bore having to shuffle through a rack of
+% tapes to find the right one.
+
+\item [C12 : DELETE SAVE SET] ---
+Copy SSC save-sets to {\tt DISK\$RLSSD1:\-[STAR]} for storage until a batch of
+10 SSCs is reached.
+Delete {\tt [STAR.TEMP]SSCn.BCK} and any optional save set one month after 
+its initial release to save disk space. 
+All sites on the distribution list should be aware that this will be done
+without notice.
+Any site that hasn't copied the save sets within a month is delinquent and
+should be made to wait for recovery.
+
+\item [C13 : BACKUP] ---
+For safety, the SSC backup save-sets are archived to exabyte tape in batches 
+of ten SSCs. The procedure {\tt [STAR.TEMP]SSCBACK.COM} does this. 
+Copy the appropriate batch of save sets to {\tt DISK\$RLSSD1:[STAR]}. 
+Edit the procedure to change the tape save-set name and batch of save-sets
+appropriately.
+Load the backup tape in the exabyte drive and run the command procedure as a
+batch job or interactively.
+
+\item [C14 : NON-STARLINK SITES] ---
+Prepare and send out update tapes to active sites which cannot (or will not)
+use the network update method.
+Do this about once a year (it's a terrible job but you might be able to delegate
+it).
+The non-Starlink sites are listed in {\tt LADMINDIR:EXTERNAL.LIS} which should
+be kept up-to-date. Refer to the `External Distribution' folder.
+
+\end{description}
+
+\section {References}
+
+\begin{description}
+\begin{description}
+\item [SGP/19]: Starlink software submission
+\item [SGP/20]: Starlink software management
+\item [LUN/26 (RAL)]: SPELL --- Spelling checker
+\item [LUN/27 (RAL)]: R1LASER  --- Printing files on the R1 laser printer
+\item [LUN/47 (RAL)]: STRIP --- Strip blanks from the end of line
+\item [LSN/28 (RAL)]: STICKY --- Produce address labels from an address list
+\end{description}
+\end{description}
+
+\appendix
+
+\newpage
+\section {Example SSC Command Procedure}
+\label{se:ex.proc}
+\begin{quote}
+\begin{verbatim}
+$!	SSC550.COM
+$!
+$!	2.19 GKS 7.2 v1.0-1
+$!	2.41 PSX v1.0-2
+$!
+$!	M J Bly 07.01.92
+$!
+$	SET PROTECTION=(S:RE,O:RWED,G:RE,W:RE)/DEFAULT
+$	SAVE_DIR = F$ENVIRONMENT("DEFAULT")
+$	SAVE_VERIFY = F$VERIFY()
+$	SET VERIFY
+$	ON WARNING THEN GOTO EXIT
+$!
+$! Implement update
+$!
+$! GKS 7.2 v1.0-1
+$	SET DEFAULT SSCTEMP
+$	COPY [.GKS]*.* GKS_DIR:*.*
+$	PURGE GKS_DIR
+$!
+$! PSX v1.0-2
+$	SET DEFAULT SSCTEMP
+$	COPY [.PSX]*.* PSX_DIR:*.*
+$	SET DEFAULT PSX_DIR
+$	DELETE PSX_ERR.H;*
+$	PURGE
+$!
+$! Copy other files ready for release:
+$!
+$	COPY SSCTEMP:STARTUP.COM SSC:*.*
+$	PURGE SSC
+$!
+$! Update information summaries
+$!
+$	COPY SSCTEMP:NEWS.LIS      DOCSDIR:NEWS.LIS
+$	COPY SSCTEMP:SSI.LIS       ADMINDIR:SSI.LIS
+$!
+$	LIB  ADMINDIR:SSCLIS.TLB   SSCTEMP:SSC550.LIS
+$	LIB  ADMINDIR:SSCCOM.TLB   SSCTEMP:SSC550.COM
+$!
+$	PURGE DOCSDIR:
+$	PURGE ADMINDIR:
+$!
+$! Record this update in ADMINDIR:STATUS.LIS
+$!
+$	OPEN/APPEND STATUS         ADMINDIR:STATUS.LIS
+$	SSCTIME=F$TIME()
+$	SSCUSER=F$USER()
+$	WRITE STATUS "SSC550 implemented ",SSCTIME, " by ",SSCUSER
+$	CLOSE STATUS
+$!
+$ EXIT:
+$	SET DEF 'SAVE_DIR'
+$	IF .NOT. SAVE_VERIFY THEN SET NOVERIFY
+$	EXIT
+\end{verbatim}
+\end{quote}
+
+\newpage
+\section {Example SSC Notice}
+\label{se:ex.note}
+\begin{verbatim}
+SSC550 - STARLINK SOFTWARE CHANGE 550
+
+The following software items have been modified at RAL.
+Please install at your own site.
+
+ITEM:   2.19 GKS 7.2 v1.0-1                             (*** Cock up fix ***)
+        Submitted and supported by Dave Terrett
+
+ITEM:   2.41 PSX v1.0-2                                     (*** Re-link ***)
+        Submitted and supported by Peter Allan
+
+SSC550  Directory size: 809 blocks (3 dirs, 26 files)
+        Environment:VMS 5.4
+        Save set: blocks normal, blocks compressed
+
+Installation instructions:
+
+1.      Install a copy of directory DISK$SOFTDEV:[STAR.TEMP.SSC550] and give 
+        it the logical name SSCTEMP (include the device name if this is 
+        different from the device holding the Starlink software).
+
+2.      Execute the command procedure SSCTEMP:SSC550.COM.
+
+3.      The logical name GKS_IMAGE_ADAM has been added to SSC:STARTUP.COM.
+        Define it on all nodes on your cluster. It requires the .EXE suffix as
+        shown.
+
+                $ DEFINE/SYSTEM GKS_IMAGE_ADAM GKS_DIR:GKS_IMAGE_ADAM.EXE
+
+4.      If you have the other GKS shareable images installed as known images, 
+        install GKS_IMAGE_ADAM.EXE and replace GKS_IMAGE.EXE on all nodes in 
+        your cluster:
+
+                $ MCR SYSMAN
+                SYSMAN> SET ENV/CLUSTER
+                SYSMAN> SET PROFILE/PRIV=(SYSPRV,CMKRNL)
+                SYSMAN> DO INSTALL ADD GKS_DIR:GKS_IMAGE_ADAM.EXE /SHARED
+                SYSMAN> DO INSTALL REPLACE GKS_DIR:GKS_IMAGE.EXE
+                SYSMAN> EXIT
+                $
+
+         Add an entry to your LSSC:STARTUP.COM to ensure the GKS images are 
+         installed with the rest of the installed images:
+
+                ADD GKS_DIR:GKS_IMAGE_ADAM.EXE /SHARED
+                ADD GKS_DIR:GKS_IMAGE.EXE /SHARED
+                ADD GKS_DIR:GKS_WS_IMAGE.EXE /SHARED
+
+        Remove the entry for GKS_DIR:GKSSHARE.EXE in the same section.
+
+        Please NOTE: The modification to LSSC:STARTUP.COM regarding image
+        installation for GKS_IMAGE.EXE and GKS_WS_IMAGE.EXE should have 
+        occurred at SSC546. The omission of this change has not effected GKS.
+
+5.      Rebuild the non-ADAM shareable image library:
+
+                $ SET DEFAULT LIB_COMMON_DIR:
+                $ @STAR_LINK
+
+Documentation:
+
+        No Change
+
+Notes:
+
+1.      PSX v1.0-2 is a re-link to tidy up the shareable images. The PSX images
+        PSX_IMAGE and *_ADAM) are now linked with EMG_IMAGE(_ADAM) as
+        appropriate instead of ADAMSHARE and the EMS object Library.
+
+        This is a complete release of PSX, but the only changes that affect 
+        users are that PSX_CALLOC and PSX_MALLOC now report how many bytes were
+        being requested if they fail.
+
+        There is no change to the documentation.
+
+        A VERSION.NUM file has been added to PSX at this release.
+
+2.      GKS 7.2 v1.0-1 corrects a DLT `cock up' (his  phrase, not mine!). There 
+        is no effect on users.
+
+
+Other files released in this SSC:               
+
+        SSC:STARTUP.COM
+
+Information summaries updated:
+
+        DOCSDIR:  NEWS 
+        ADMINDIR: SSI 
+
+Martin Bly 07.01.92
+\end{verbatim}
+
+\newpage
+
+\section {Installing Software at Remote Sites}
+
+The directory containing the files for release SSCn is stored at RAL as a
+compressed save set in {\tt DISK\$SOFTDEV:\-[STAR.\-TEMP]\-SSCn.\-BCK}.
+Copy this to your local site and install the release.
+There may be an optional save set called {\tt SSCnX.BCK} in the same directory.
+This need not be copied if you do not want to install the software released
+(if this is an optional item).
+However, you should {\em always} copy {\tt SSCn.BCK} and run the command 
+procedure {\tt SSCn.COM} that it contains.
+Also, you should install updates in their numerical order since information
+files are updated in every release.
+
+\begin{description}
+
+\item [COPY]: Copy {\tt SSCn.BCK} and any optional save sets from RAL.
+If on DECNET, store the command:
+\begin{verbatim}
+    $ COPY RLVAD::DISK$SOFTDEV:[STAR.TEMP]SSCn.BCK disk:[STAR.TEMP]*.*
+\end{verbatim}
+in file CPYSSC.COM, then submit it to a batch queue:
+\begin{verbatim}
+    $ SUBMIT CPYSSC
+\end{verbatim}
+If not on DECNET, use the TRANSFER command:
+\begin{verbatim}
+    $ TRANSFER/CODE=FAST/USERNAME=NETUSR,NETUSR -
+         UK.AC.RL.STAR::DISK$SOFTDEV:[STAR.TEMP]SSCn.BCK -
+         disk:[STAR.TEMP]SSCn.BCK
+\end{verbatim}
+
+\item [RECREATE]: Recreate the {\tt [STAR.TEMP.SSCn]} directory:
+\begin{verbatim}
+    $ SET DEF [STAR.TEMP]
+    $ LZDCM  SSCn.BCK SSCn.BCK
+    $ PURGE
+    $ BACKUP SSCn.BCK/SAVE [*...]
+\end{verbatim}
+Use [name...] instead of [*...] to put the directory structure in the directory
+of your choice.
+Notice that you must de-compress the copied version of the save-set using
+LZDCM before using BACKUP to recreate the directory.
+People of a nervous disposition may use the qualifiers /LOG and /VERIFY in the
+BACKUP command if this makes them feel happier.
+
+\item [IMPLEMENT]: Follow the implementation instructions in {\tt SSCn.LIS} 
+(which you should already have available) to install the release.
+
+\item [CLEAN-UP]: Carry out any actions of the CLEAN-UP phase that you consider
+necessary.
+\end{description}
+
+BACKUP can be a tricky command to use.
+Here are some versions we have found useful:
+
+To copy a directory tree to a specific location:
+\begin{verbatim}
+   $ BACKUP [...] [name...]
+\end{verbatim}
+To copy a subdirectory and its lower branches:
+\begin{verbatim}
+   $ BACKUP/LOG name.BCK/SAVE/SEL=[...DIR...] [...]
+\end{verbatim}
+
+\rule{\textwidth}{0.3mm}
+\begin{quote}\large
+N.B.\ You must copy the SSCn.BCK file from RAL within a month of notification
+of a release as the file will disappear without notice after this time.
+The file may not be backed-up, so you may have to wait a long time to be
+rescued if you have not copied it.
+\end{quote}
+\rule{\textwidth}{0.3mm}
+
+\end{document}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
