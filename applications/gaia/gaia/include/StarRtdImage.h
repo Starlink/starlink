@@ -159,6 +159,9 @@ public:
   //  Write the current image and if new WCS (if modified) to a file.
   int dumpCmd( int argc, char *argv[] );
 
+  //  Colorramp command, with pseudo WCS.
+  int colorrampCmd( int argc, char *argv[] );
+
   //  Draw a Skycat-like ellipse and rotbox
   virtual int draw_symbol(const char *shape,
                   double x, double y, const char *xy_units,

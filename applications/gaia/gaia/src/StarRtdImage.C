@@ -165,6 +165,7 @@ public:
   { "astwcs2pix",    &StarRtdImage::astwcs2pixCmd,   2, 2 },
   { "astwrite",      &StarRtdImage::astwriteCmd,     1, 2 },
   { "blankcolor",    &StarRtdImage::blankcolorCmd,   1, 1 },
+  { "colorramp",     &StarRtdImage::colorrampCmd,    0, 2 },
   { "contour",       &StarRtdImage::contourCmd,      1, 6 },
   { "dump",          &StarRtdImage::dumpCmd,         1, 2 },
   { "foreign",       &StarRtdImage::foreignCmd,      2, 2 },
@@ -385,7 +386,6 @@ int StarRtdImage::call ( const char *name, int len, int argc, char *argv[] )
   // Not found at this scope, down to Skycat.
   return Skycat::call( name, len, argc, argv );
 }
-
 
 //+
 // Load an image file and return a pointer to the ImageData object for it.
@@ -2084,7 +2084,7 @@ int StarRtdImage::astcopyCmd( int argc, char *argv[] )
   // with it.
   if ( newset_ ) newset_ = (AstFrameSet *) astAnnul( newset_ );
 
-  StarWCS* wcsp = getStarWCSPtr(newimage);
+  StarWCS* wcsp = getStarWCSPtr( newimage );
   if (!wcsp)
       return TCL_ERROR;
   newset_ = wcsp->astWCSCopy();
@@ -3621,4 +3621,69 @@ int StarRtdImage::hduCmd( int argc, char *argv[] )
   cout << "Called StarRtdImage::hduCmd" << endl;
 #endif
   return error( "Sorry the HDU commands are not available" );
+}
+
+//+
+//   StarRtdImage::colorrampCmd
+//
+//   Purpose:
+//      Extends the standard colorramp command to add a pseudo AST WCS
+//      which describes the image in terms of the current intensity range.
+//
+//      The reason for doing this is so that the image can have a AST grid
+//      drawn around it, so that it may be annotated and have axes which
+//      make the colour correspondence clear.
+//
+//      With no arguments the standard "colorramp" command is invoked.
+//      With the arguments "setwcs" the WCS system is added based on
+//      the image whose name is given as the second argument. 
+//-
+int StarRtdImage::colorrampCmd( int argc, char *argv[] ) 
+{
+#ifdef _DEBUG_
+  cout << "Called StarRtdImage::colorrampCmd" << endl;
+#endif
+  if ( argc == 0 ) {
+    return RtdImage::colorrampCmd( argc, argv );
+  } else {
+
+    //  Get the image, should be named as second argument. 
+    StarRtdImage *rtdimage = (StarRtdImage *) getView( argv[1] );
+    if ( rtdimage == (StarRtdImage *) NULL ) {
+      return error( "Cannot access main image" );
+    }
+    ImageData *rtdimagedata = rtdimage->image();
+
+    //  Create a frameset that maps from BASE pixels to 
+    AstFrame *base = (AstFrame *) astFrame( 2, "Domain=GRID" );
+    AstFrameSet *fset = (AstFrameSet *) astFrameSet( base, "" );
+    AstMapping *map = (AstMapping *) astUnitMap( 2, "" );
+    AstFrame *current = (AstFrame *) astFrame( 2, "Domain=PIXEL" );
+    astAddFrame( fset, 1, map, current );
+
+    // Add a linear mapping that transforms from the base map to the 
+    // current as intensity along the X axis.
+    double tr[6];
+    double low = rtdimagedata->lowCut();
+    double high = rtdimagedata->highCut();
+    double width = image_->width();
+    double scale = ( high - low ) / width;
+    cout << "range = " << low << "," << high << endl;
+    tr[0] = low ;
+    tr[1] = scale;
+    tr[2] = 0.0;
+    tr[3] = 0.0;
+    tr[4] = 0.0;
+    tr[5] = 1.0;
+    addLinear( 2, fset, tr, 2 );
+
+    //  And make the new FrameSet current.
+    StarWCS* wcsp = getStarWCSPtr();
+    wcsp->astWCSReplace( fset );
+    astAnnul( base );
+    astAnnul( current );
+    astAnnul( fset );
+    astAnnul( map );
+  }
+  return TCL_OK;
 }
