@@ -20,7 +20,16 @@ dnl    Find required versions of the programs we need for configuration
 AC_PROG_FC
 AC_PROG_CC
 AC_PROG_YACC
+
+dnl    See AM_PROG_LEX documentation
 AM_PROG_LEX
+if test "$LEX" != flex; then
+  LEX="$SHELL $missing_dir/missing flex"
+  AC_SUBST(LEX_OUTPUT_ROOT, lex.yy)
+  AC_SUBST(LEXLIB, '')
+fi
+
+
 AC_HEADER_STDC
 AC_PROG_LIBTOOL
 
