@@ -1,0 +1,90 @@
+! rdwidesp.spx
+!
+! This script reads a wideband scan and combines the sections
+! into one contiguous spectrum, optinally performing a
+! linear baseline fit to the outer portions of each section.
+
+declare  iscan      i4
+declare  bpart      r4
+declare  finc       r4
+declare  b1         r4
+declare  b2         r4
+declare  b3         r4
+declare  b4         r4
+declare  b12        r4
+declare  b34        r4
+
+ask 'GSD scan #?', iscan, ?
+
+print '      Baseline using outer x km/s of each section?'
+print '      (the extreme outer 10% will be avoided in the fit regardless)'
+ask 'Outer x km/s [0:none]? ', bpart, ?
+
+!  make sure it won't crash if file not found or unreadable
+!  and switch to velocity frame
+
+set-error f
+last_error = 0
+set-x \3\\\
+
+! read subsystem 1 or 2 of the scan and das-merge 
+
+r-d-g  iscan 1
+d-m \\\\
+
+! do baseline fit if requested
+
+if (bpart > 0.1) then
+
+  ! fit a linear baseline to the section outside +/-bpart km/s 
+  ! from the center. calculate baseline parts first.
+
+  finc=abs(f_inc)/1e+06
+  b1  = vlsr-0.9*npts*finc*230.0/lo_freq*1.3
+  b2  = vlsr-npts*finc*230.0/lo_freq*1.3+bpart
+  b12 = b1+(b2-b1)/2.0
+  b4  = vlsr+0.9*npts*finc*230.0/lo_freq*1.3
+  b3  = vlsr+npts*finc*230.0/lo_freq*1.3-bpart
+  b34 = b4-(b4-b3)/2.0
+
+  ! LSB and USB spectra run in 'opposite directions in vel. space:
+
+  if (f_cen/1e06 < lo_freq) then
+    r-l-b \b3 b34\b34 b4\
+  else
+    r-l-b \b1 b12\b12 b2\
+  endif
+
+endif
+
+! repeat procedure for subsystem 2
+
+r-d-g  iscan 2
+d-m \\\\
+
+if (bpart > 0.1) then
+
+  if (f_cen/1e06 < lo_freq) then
+    r-l-b \b1 b12\b12 b2\
+  else
+    r-l-b \b3 b34\b34 b4\
+  endif
+
+endif
+
+! now stuff the two sections into 1 scan
+
+concat
+
+! merge the sections into one contiguous spectrum without
+! further alignment of the sections since it is assumed that
+! the baselining has taken care of that.
+
+merge-q n
+
+if (bpart > 0.1) then
+  print ' '
+  print 'Baseline used: ', b1:f7.1, b2:f7.1,'   and ', b3:f7.1, b4:f7.1
+  print ' '
+endif
+

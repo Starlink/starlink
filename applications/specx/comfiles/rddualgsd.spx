@@ -1,0 +1,12 @@
+declare ifchan i4
+
+ifchan = 1
+r-g-d \?\?\
+ask 'IF Chan 1 (A) or 2 (B)? [1]/2: ', ifchan, ?
+if (ifchan = 1) then
+  print 'selecting mixer A'
+else
+  print 'selecting mixer B'
+  xy
+endif
+pop

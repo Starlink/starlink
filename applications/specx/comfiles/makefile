@@ -41,7 +41,8 @@ CSOURCES =
 SPXSOURCE = baseline.spx convert.spx fetch.spx fiddle.spx frqfix.spx fsw.spx \
 gsd2fits.spx helpfits.spx image.spx makefile map_av.spx newton_root.spx \
 readall.spx showastro.spx source.spx specx_to_dbmem.spx st.spx \
-stack.spx tofits.spx tsky.spx unaverage.spx vertical.spx 
+stack.spx tofits.spx tsky.spx unaverage.spx vertical.spx rdwidesp.spx \
+rddualgsd.spx
 
 # These are the external include files
 EXTERNAL_INCLUDES = 
