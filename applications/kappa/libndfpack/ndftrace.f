@@ -233,6 +233,9 @@
 *        Use CNF_PVAL
 *     30-SEP-2004 (PWD):
 *        Moved CNF_PAR out of executable code.
+*     16-MAR-2005 (DSB):
+*        Only write AXIS-related output parameters if the NDF has an AXIS
+*        structure.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -686,22 +689,21 @@
             IF ( IAXIS .NE. NDIM .AND. REPORT ) CALL MSG_BLANK( STATUS )
     3    CONTINUE
 
-      END IF
-
 *  Write the output axis parameters.
-      CALL PAR_PUT1D( 'AEND', NDIM, AEND, STATUS )
-      CALL PAR_PUT1C( 'ALABEL', NDIM, ALABEL, STATUS )
-      CALL PAR_PUT1D( 'ASTART', NDIM, ASTART, STATUS )
-      CALL PAR_PUT1C( 'AUNITS', NDIM, AUNITS, STATUS )
-      IF ( FULLAX ) THEN
-         CALL PAR_PUT1C( 'AFORM', NDIM, CFORM, STATUS )
-         CALL PAR_PUT1L( 'AMONO', NDIM, MONOTO, STATUS )
-         CALL PAR_PUT1L( 'ANORM', NDIM, NORM, STATUS )
-         CALL PAR_PUT1C( 'ATYPE', NDIM, CTYPE, STATUS )
-         CALL PAR_PUT1L( 'AVARIANCE', NDIM, AVAR, STATUS )
-         CALL PAR_PUT1L( 'WIDTH', NDIM, WIDTH, STATUS )
-      END IF
+         CALL PAR_PUT1D( 'AEND', NDIM, AEND, STATUS )
+         CALL PAR_PUT1C( 'ALABEL', NDIM, ALABEL, STATUS )
+         CALL PAR_PUT1D( 'ASTART', NDIM, ASTART, STATUS )
+         CALL PAR_PUT1C( 'AUNITS', NDIM, AUNITS, STATUS )
+         IF ( FULLAX ) THEN
+            CALL PAR_PUT1C( 'AFORM', NDIM, CFORM, STATUS )
+            CALL PAR_PUT1L( 'AMONO', NDIM, MONOTO, STATUS )
+            CALL PAR_PUT1L( 'ANORM', NDIM, NORM, STATUS )
+            CALL PAR_PUT1C( 'ATYPE', NDIM, CTYPE, STATUS )
+            CALL PAR_PUT1L( 'AVARIANCE', NDIM, AVAR, STATUS )
+            CALL PAR_PUT1L( 'WIDTH', NDIM, WIDTH, STATUS )
+         END IF
 
+      END IF
 
 *  Data component:
 *  ===============
