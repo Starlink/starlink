@@ -238,7 +238,6 @@ javadocs:
 webstart:
 
 dist:
-    [chmod] Result: -1
 
 create_archives:
       [zip] Building zip: /apps/cvsbuild/export/diva-0.3.zip
@@ -1013,4 +1012,4 @@ create_archives:
    [delete] Deleting: /apps/cvsbuild/java/source/frog/frog-0.6.0.tar
 
 BUILD SUCCESSFUL
-Total time: 14 minutes 50 seconds
+Total time: 14 minutes 48 seconds
