@@ -66,7 +66,10 @@
 *     12-FEB-1999 (DSB):
 *        Added support for ANLANG as an alternative to WPLATE, and allow
 *        arbitrary values for WPLATE when using single-beam data. WPLATE
-*        changed from _CHAR to _REAL.
+*        changed from _CHAR to _REAL. 
+*     15-FEB-1999 (DSB):
+*        Use HDS component path and slice spec in IMGID (if they are not
+*        blank).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -206,9 +209,13 @@
             CALL NDF_MSG( 'NDF', INDF )
             CALL MSG_LOAD( ' ', '^NDF', NDFNAM, LC, STATUS ) 
 
-*  Extract the file basename, and use it as the IMGID value.
+*  Extract the file basename plus HDS component string (if any), and use 
+*  it as the IMGID value.
             CALL NDG1_HSPEC( NDFNAM, ' ', .FALSE., FDIRN, IMGID, FTYPE,
      :                       COMP, SLICE, FORM, STATUS )
+            IAT = CHR_LEN( IMGID )
+            IF( COMP .NE. ' ' ) CALL CHR_APPND( COMP, IMGID, IAT )
+            IF( SLICE .NE. ' ' ) CALL CHR_APPND( SLICE, IMGID, IAT )
 
 *  Tell the user what is happening.
             IF( .NOT. QUIET ) THEN
