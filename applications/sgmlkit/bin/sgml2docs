@@ -222,7 +222,7 @@ if [ $TARGETFORMAT -eq 0 ]; then
 elif [ $TARGETFORMAT -eq 1 ]; then
     # Generate LaTeX
 
-    $JADE -t sgml -iLaTeX.entiies -iOnly.paper $JADEFLAGS \
+    $JADE -t sgml -iLaTeX.entities -iOnly.paper $JADEFLAGS \
 	-d $STYLESHEET/latex/slback.dsl#back.main \
 	$DECL $SGMLSRC \
 	> tmp.stamp
