@@ -11,8 +11,10 @@ typemap.561
 t/attrib.t
 t/channel.t
 t/fitschan.t
+t/fitschn0.t
 t/formats.t
 t/offset.t
+t/pgplot.t
 t/specframe.t
 t/unitmap.t
 t/xmlchan.t
