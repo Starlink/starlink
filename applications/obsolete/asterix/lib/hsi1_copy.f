@@ -127,7 +127,7 @@
 
 *  Is input primitive?
       CALL DAT_PRIM( ILOC, IPRIM, STATUS )
-      IF ( .NOT. PRIM ) THEN
+      IF ( .NOT. IPRIM ) THEN
 
 *    History exists?
         CALL DAT_THERE( ILOC, 'HISTORY', THERE, STATUS )
