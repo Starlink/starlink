@@ -60,6 +60,10 @@ plinit();
 pladv(0);
 plvpor(0,1,0,1);
 plwind(0,1,0,1);
+plschr(2,1);
+
+plschr(0,2);
+plschr(0,1);
 
 my ( $x1, $x2, $y1, $y2 ) = (0.2,0.8,0.2,0.8);
 

@@ -5,7 +5,8 @@ use vars qw/ $VERSION /;
 use constant R2D     => 57.29578;        # Radians to degrees factor
 use constant FLT_MAX => 3.40282347e+38;  # Maximum float on ix86 platform
 
-use Graphics::PLplot qw/:all/;
+# Need plstrl
+use Graphics::PLplot 0.03 qw/:all/;
 use Starlink::AST;
 use Carp;
 
@@ -217,7 +218,7 @@ sub _GText {
       #pgptxt( $x, $y, $angle, $fjust, $text ); 
       #pgstbg( $tbg );
       plcol0(15);
-      plptex ( $x, $y, $upy, $upx, $fjust, $text);
+      plptex ( $x, $y, $upy, -$upx, $fjust, $text);
       
    }
    
@@ -303,18 +304,40 @@ Notes:
 sub _GTxExt {
   my ( $text, $x, $y, $just, $upx, $upy ) = @_;
   #warn "_GTxExt: not yet implemented for PLplot\n";
-  
+
+  # Get the height of the font in world coordinates
+  my ($chstat, $chv, $chh) = _GQch();
+  return 0 unless Starlink::AST::_OK();
+
+  # Get the length of the string in mm
+  my $strlen = Graphics::PLplot::plstrl( $text );
+  my $strlenw = mm2world( 1, $strlen);
+
   # initalise @$xb and @$yb
   my ( @xb, @yb );
-  $xb[0] = $x-0.01;
-  $yb[0] = $y-0.01;
-  $xb[1] = $x-0.01;
-  $yb[1] = $y+0.01;
-  $xb[2] = $x+0.01;
-  $yb[2] = $y+0.01;
-  $xb[3] = $x+0.01;
-  $yb[3] = $y-0.01;
-   
+
+  # Kluge - assume text either horizontal or vertical
+  if ($upx == 0 ) {
+    $xb[0] = $x-($strlenw / 2);
+    $yb[0] = $y-($chv / 2);
+    $xb[1] = $x-($strlenw / 2);
+    $yb[1] = $y+($chv/2);
+    $xb[2] = $x+($strlenw/2);
+    $yb[2] = $y+($chv/2);
+    $xb[3] = $x+($strlenw/2);
+    $yb[3] = $y-($chv/2);
+  } else {
+    $yb[0] = $y-($strlenw / 2);
+    $xb[0] = $x-($chv / 2);
+    $yb[1] = $y-($strlenw / 2);
+    $xb[1] = $x+($chv/2);
+    $yb[2] = $y+($strlenw/2);
+    $xb[2] = $x+($chv/2);
+    $yb[3] = $y+($strlenw/2);
+    $xb[3] = $x-($chv/2);
+  }
+
+
   # Return
   _GFlush();
   return (1, \@xb, \@yb );     
@@ -339,34 +362,13 @@ sub _GQch {
   # Get the height in millimetres
   my ($def, $ht) = plgchr();
 
-  # page size in millimetres
-  my ($mx1,$mx2,$my1,$my2) = plgspa();
+  my $chv = mm2world( 1, $ht );
+  my $chh = mm2world( 2, $ht );
 
-  # Size of viewport in world coordinates
-  my ($wx1, $wx2, $wy1, $wy2) = plgvpw();
-
-  # now convert height in mm to world coordinates
-
-  # X direction
-  my $chv = $ht;
-  if ($mx1 != $mx2) {
-    $chv *= ($wx2 - $wx1 ) / ( $mx2 - $mx1 );
-  } else {
-    ReportGrfError("astGQch: The graphics viewport has zero size in the X direction.");
-    return 0;
-  }
-
-  # Y direction
-  my $chh = $ht;
-  if ($my1 != $my2) {
-    $chh *= ($wy2 - $wy1 ) / ( $my2 - $my1 );
-  } else {
-    ReportGrfError("astGQch: The graphics viewport has zero size in the Y direction.");
-    return 0;
-  }
+  my $status = ( Starlink::AST::_OK() ? 1 : 0 );
 
   # Return the result in world coordinates
-  return (1,$chv, $chh);
+  return ($status,$chv, $chh);
 }
 
 =item B<_GAttr>
@@ -508,6 +510,47 @@ sub ReportGrfError {
   warn "Generated AST error in perl PLplot callback: $text\n";
   Starlink::AST::_Error( &Starlink::AST::Status::AST__GRFER(), $text);
 }
+
+# Routine to convert distance in millimetres to world coordinates
+#   $dw = mm2world( $axis, $mm )
+# Where argument one is "1" for X-axis and "2" for Y-axis.
+# Second argument is distance in mm.
+# Returns 0 and sets AST status on error
+
+sub mm2world {
+  my ($ax, $mm ) = @_;
+  return 0 unless Starlink::AST::_OK;
+
+  # page size in millimetres
+  my ($mx1,$mx2,$my1,$my2) = plgspa();
+
+  # Size of viewport in world coordinates
+  my ($wx1, $wx2, $wy1, $wy2) = plgvpw();
+
+  # now convert distance in mm to world coordinates
+
+  # X direction
+  if ($ax == 1) {
+    if ($mx1 != $mx2) {
+      $mm *= ($wx2 - $wx1 ) / ( $mx2 - $mx1 );
+    } else {
+      ReportGrfError("astGQch: The graphics viewport has zero size in the X direction.");
+      return 0;
+    }
+  } else {
+    # Y direction
+    if ($my1 != $my2) {
+      $mm *= ($wy2 - $wy1 ) / ( $my2 - $my1 );
+    } else {
+      ReportGrfError("astGQch: The graphics viewport has zero size in the Y direction.");
+      return 0;
+    }
+
+  }
+  return $mm;
+
+}
+
 
 =back
 
