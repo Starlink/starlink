@@ -157,7 +157,10 @@
       END IF
 
 *  Define its size
-      CALL FTPDEF( LUN, BITPIX, NDIM, DIMS, 1, 0, FSTAT )
+      CALL FTRDEF( LUN, FSTAT )
+      IF ( FSTAT .NE. 0 ) THEN
+        CALL ADI2_FITERP( FSTAT, STATUS )
+      END IF
 
 *  Free the buffer
       CALL ADI_ERASE( HID, STATUS )
