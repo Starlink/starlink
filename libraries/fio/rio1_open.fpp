@@ -129,8 +129,8 @@
          IF( ACMODU .EQ. 'WRITE' ) THEN
             STATUS = FIO__INVRL
             CALL EMS_REP( 'RIO1_OPEN_BADSZ',
-     :         'You cannot specify a record length of zero when '
-     :         // 'creating a new file', STATUS )
+     :         'You cannot specify a record length of zero when '/
+     :         / 'creating a new file', STATUS )
          ELSE
             INQUIRE( UNIT=UNIT, RECL=RECLEN )
 *         RECLEN is now, obviously, in the correct wordlength units
@@ -140,8 +140,8 @@
 *  The record length is negative, report an error.
          STATUS = FIO__INVRL
          CALL EMS_REP( 'RIO1_OPEN_NEGSZ',
-     :      'Programming error: RIO1_OPEN has been called with a '
-     :      // 'negative record length.', STATUS )
+     :      'Programming error: RIO1_OPEN has been called with a '/
+     :      / 'negative record length.', STATUS )
       END IF
 
 *  Open the file.
