@@ -20,6 +20,7 @@ AC_PROG_LIBTOOL
 
 STAR_MONOLITHS
 STAR_CHECK_PROGS( ifd2star )
+STAR_CHECK_PROGS( perl )
 
 dnl    Build dependencies for this package.
 dnl    Includes: fio, par, sae; 
