@@ -355,8 +355,10 @@ void	readimagehead(picstruct *field)
     astromstruct *as;
     AstFrameSet  *wcsinfo;
     AstFrame     *frame;
+    AstSkyFrame  *template;
+    AstMapping   *map;
+    AstFrameSet  *fs;
     int          exists;
-    int          issky;
 
     QCALLOC(as, astromstruct, 1);
     field->astrom = as;
@@ -367,23 +369,52 @@ void	readimagehead(picstruct *field)
     ndfState( field->ndf, "WCS", &exists, &status );
     if ( exists ) {
 
-      /* Access it and record the identifier */
-      ndfGtwcs( field->ndf, &wcsinfo, &status );
-      as->naxis = 2;
-      field->astwcs = wcsinfo;
+        /* Get a pointer to the WCS FrameSet. */
+        ndfGtwcs( field->ndf, &wcsinfo, &status );
 
-      /* Make sure the WCS represents a celestial coordinate system
-         (that's all we can deal with). */
-      frame = astGetFrame( wcsinfo, AST__CURRENT );
-      issky = astIsASkyFrame( frame );
-      frame = astAnnul( frame );
-      if ( ! issky ) {
-        /*  No WCS */
-        as->wcs_flag = 0;
-      } else {
-        as->wcs_flag = 1;
-      }
-      if ( status != SAI__OK ) errAnnul( &status );
+        /* We can only deal with 2D celestial coordinate systems in which the
+           longitude is the first axis and the latitude is the second
+           axis. Create such a Frame (a SkyFrame) which we can use as a
+           template for probing the WCS FrameSet. All attributes which are
+           left unset (such as System) will act as wild cards and match any
+           value in the WCS FrameSet. 
+        */
+        template = astSkyFrame( "" );
+
+        /* Search the WCS FrameSet for a Frame matching this template. This
+           will match any SkyFrame, no matter what the axis order, system type,
+           etc. It returns a FrameSet connecting the base Frame in the WCS
+           FrameSet (GRID coords) to a Frame which has the axis order of the
+           template but inherits attribute values from the matching (Sky)Frame
+           in the WCS FrameSet.
+        */
+        fs = astFindFrame( wcsinfo, template, "" );
+        template = astAnnul( template );
+
+        /* A NULL pointer is returned if no SkyFrame is found in the WCS
+           FrameSet. */
+        if ( fs ) {
+
+            /* Add the resulting SkyFrame into the WCS FrameSet, making it the
+               new current Frame. */
+            map = astGetMapping( fs, AST__BASE, AST__CURRENT );
+            frame = astGetFrame( fs, AST__CURRENT );
+            astAddFrame( wcsinfo, AST__BASE, map, frame );
+            map = astAnnul( map );
+            frame = astAnnul( frame );
+
+            /* Set a flag indicating if the current Frame in the WCS FrameSet
+               is a usable SkyFrame. */
+            as->wcs_flag = 1;
+        } else {
+            as->wcs_flag = 0;
+        }
+
+        /* Store the pointer to the WCS FrameSet */
+        as->naxis = 2;
+        field->astwcs = wcsinfo;
+
+        if ( status != SAI__OK ) errAnnul( &status );
     }
     else {
       /*  No WCS */
@@ -391,7 +422,7 @@ void	readimagehead(picstruct *field)
     }
 
     /*-----------------------------------------------------------------------*/
-  } /* end if MEASURE or DETECT field */
+  } /* end of MEASURE or DETECT field */
 
   /*-------------------------------------------------------------------------*/
 
