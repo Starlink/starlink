@@ -1,7 +1,7 @@
-      SUBROUTINE CCDGENERATE( STATUS )
+      SUBROUTINE CCDBGEN( STATUS )
 *+
 *  Name:
-*     CCDGENERATE
+*     CCDBGEN
 
 *  Purpose:
 *     Generates a sequence of test frames.
@@ -23,7 +23,7 @@
 *     ADAM A-task
 
 *  Invocation:
-*     ccdgenerate
+*     ccddbgen
 
 *  ADAM Parameters:
 *     FILE = LITERAL (Read)
@@ -363,10 +363,10 @@ C         CALL NDF_HCRE( IDO, STATUS )
          CALL CCD1_ANOI( %VAL( IPOBJ ), EL, 8.0, STATUS )
 
 *    Multiply data by the flatfield.
-         CALL CCD1_FLMUL( %VAL( IPOBJ ), DIMS( 1 ), DIMS( 2 ), STATUS )
+         CALL CCDB1_FLMUL( %VAL( IPOBJ ), DIMS( 1 ), DIMS( 2 ), STATUS )
 
 *    Add bias to it.
-         CALL CCD1_ABIA( %VAL( IPOBJ ), EL, SEEDB, STATUS )
+         CALL CCDB1_ABIA( %VAL( IPOBJ ), EL, SEEDB, STATUS )
 
 *    Include FITS block.
          CALL NDF_XNEW( IDO, 'FITS', '_CHAR*80', 1, 15, LOCEXT, 
@@ -397,7 +397,7 @@ C            CALL NDF_HCRE( IDB, STATUS )
             CALL CCG1_STVR( 0.0, EL, %VAL( IPBIA ), STATUS )
 
 *    Add bias to it.
-         CALL CCD1_ABIA( %VAL( IPOBJ ), EL, SEEDB, STATUS )
+         CALL CCDB1_ABIA( %VAL( IPOBJ ), EL, SEEDB, STATUS )
 
 *    Include FITS block.
             CALL NDF_XNEW( IDB, 'FITS', '_CHAR*80', 1, 15, LOCEXT, 
@@ -430,7 +430,7 @@ C            CALL NDF_HCRE( IDF, STATUS )
             CALL CCG1_STVR( 1000.0, EL, %VAL( IPFF ), STATUS )
 
 *    Multiply by flatfield.
-            CALL CCD1_FLMUL( %VAL( IPOBJ ), DIMS( 1 ), DIMS( 2 ), 
+            CALL CCDB1_FLMUL( %VAL( IPOBJ ), DIMS( 1 ), DIMS( 2 ), 
      :                       STATUS )
 
 *    Add noise.
@@ -438,7 +438,7 @@ C            CALL NDF_HCRE( IDF, STATUS )
             CALL CCD1_ANOI( %VAL( IPOBJ ), EL, 1.0, STATUS )
 
 *    Add bias to it.
-            CALL CCD1_ABIA( %VAL( IPOBJ ), EL, SEEDB, STATUS )
+            CALL CCDB1_ABIA( %VAL( IPOBJ ), EL, SEEDB, STATUS )
 
 *    Include FITS block.
             CALL NDF_XNEW( IDF, 'FITS', '_CHAR*80', 1, 15, LOCEXT, 
@@ -448,7 +448,7 @@ C            CALL NDF_HCRE( IDF, STATUS )
             CALL DAT_ANNUL( LOCEXT, STATUS )
 
 *    Unmap and release.
-            CALL NDF_ANNUL ( IFD, STATUS )
+            CALL NDF_ANNUL ( IDF, STATUS )
 
          END IF
 
@@ -479,4 +479,4 @@ C            CALL NDF_HCRE( IDF, STATUS )
       CALL CCD1_END( STATUS )
 
       END
-* $Id: ccdgenerate.f,v 1.3 1998/06/15 11:41:41 mbt Exp mbt $
+* $Id: ccdbgen.f,v 1.4 1998/06/16 09:41:43 mbt Exp $
