@@ -32,7 +32,7 @@ colstar.icl fancylook.icl flatfield.icl kappa_proc.icl multistat.icl \
 unsharpmask.icl irg_wild nfi.awk kappa.csh kappa_link_adam kappa.icl \
 c1_com me_com grecom.inc grerr \
 sft_com kappa.hlp kappa_mon.f kapview_mon.f ndfpack_mon.f \
-kappa_style.def tkast.tcl \
+kappa_style.def tkast.tcl kappa_contour_keystyle.def \
 kappa_lutview_style.def kappa_keystyle.def kappa_display_keystyle.def \
 kappa_linplot_keystyle.def kappa_vecplot_keystyle.def stardemo.tcl \
 stardemo_procs.tcl adamMessageRelay adamtask.tcl dialog.tcl kappa.demo \

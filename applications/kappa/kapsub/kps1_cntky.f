@@ -1,5 +1,5 @@
       SUBROUTINE KPS1_CNTKY( IPLOT, NCONT, CNTLEV, CNTUSD, FRMOFF, 
-     :                       UNITS, STATUS )
+     :                       UNITS, CNTPEN, STATUS )
 *+
 *  Name:
 *     KPS1_CNTKY
@@ -11,7 +11,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_CNTKY( IPLOT, NCONT, CNTLEV, CNTUSD, FRMOFF, UNITS, STATUS )
+*     CALL KPS1_CNTKY( IPLOT, NCONT, CNTLEV, CNTUSD, FRMOFF, UNITS, CNTPEN,
+*                      STATUS )
 
 *  Description:
 *     This routine plots an enumerated list of contour heights, units and 
@@ -47,6 +48,8 @@
 *     UNITS = CHARACTER * ( * ) (Given)
 *        The units of the heights.  If this is null no units line will
 *        be plotted.
+*     CNTPEN( NCONT ) = INTEGER (Given)
+*        The pen index used for each contour.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -58,6 +61,8 @@
 *  History:
 *     17-MAR-1998 (DSB):
 *        Original version, based on CNTKEY by MJC.
+*     20-AUG-2001 (DSB):
+*        Added arg CNTPEN.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -79,6 +84,7 @@
       LOGICAL CNTUSD( NCONT )
       REAL FRMOFF
       CHARACTER UNITS*(*)
+      INTEGER CNTPEN( NCONT )
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -102,7 +108,9 @@
       DOUBLE PRECISION ATTR( 20 )! Saved graphics attribute values
       INTEGER I                  ! loop counter
       INTEGER IAT                ! Line break position
+      INTEGER PENCOL             ! Pen index to use
       INTEGER TLEN               ! Used length of text
+      LOGICAL SETCOL             ! Use a default colour for contour indices?
       REAL HGT                   ! Height for Title text
       REAL HGT1                  ! Height for NumLab text
       REAL HGT2                  ! Height for TextLab text
@@ -201,6 +209,16 @@
 *  Re-instate original PGPLOT attributes.
       CALL KPG1_PGSTY( IPLOT, 'TITLE', .FALSE., ATTR, STATUS )
 
+*  Set a flag indicating if colour should be set for the contour indices.
+*  Only do this if the user has not specified a colour, and if the colours
+*  used for the contours are not all the same.
+      SETCOL = .FALSE.
+      IF( .NOT. AST_TEST( IPLOT, 'COLOUR(TEXTLAB)', STATUS ) ) THEN
+         DO I = 2, NCONT
+            IF( CNTPEN( I ) .NE. CNTPEN( I - 1 ) ) SETCOL = .TRUE.
+         END DO
+      END IF
+
 *  Start with the first contour at the top of the key. Leave a small gap
 *  between the heading an dthe first contour level.
       YC = YC - 0.8*MXHGT
@@ -217,6 +235,10 @@
 *  Append the separator.
             TEXT( TLEN + 1 : ) = ': '
             TLEN = TLEN + 2
+
+*  If setting the index colour to mimic the contour colour, do it now.
+            IF( SETCOL ) CALL AST_SETI( IPLOT, 'COLOUR(TEXTLAB)', 
+     :                                  CNTPEN( I ), STATUS )
 
 *  Set plotting style to mimic textual labels produced by the supplied Plot.
             CALL KPG1_PGSTY( IPLOT, 'TEXTLAB', .TRUE., ATTR, STATUS )
@@ -246,6 +268,9 @@
          END IF
 
       END DO
+
+*  Clear the TextLab colour if necessary.
+      IF( SETCOL ) CALL AST_CLEAR( IPLOT, 'COLOUR(TEXTLAB)', STATUS )
 
 *  Flush the output.
       CALL PGUPDT

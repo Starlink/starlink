@@ -1,6 +1,7 @@
       SUBROUTINE KPS1_CNTDR( IPLOT, IGRP, DIM1, DIM2, ARRAY, XLL, YLL, 
      :                       XSIZE, YSIZE, NCONT, CONT, STATS, FAST, 
-     :                       DONE, CNTUSD, CNTLEN, CNTCLS, STATUS )
+     :                       DONE, CNTUSD, CNTLEN, CNTCLS, CNTPEN,
+     :                       STATUS )
 *+
 *  Name:
 *     KPS1_CNTDR
@@ -14,7 +15,7 @@
 *  Invocation:
 *     CALL KPS1_CNTDR( IPLOT, IGRP, DIM1, DIM2, ARRAY, XLL, YLL, XSIZE, 
 *                      YSIZE, NCONT, CONT, STATS, FAST, DONE, CNTUSD, 
-*                      CNTLEN, CNTCLS, STATUS )
+*                      CNTLEN, CNTCLS, CNTPEN, STATUS )
 
 *  Description:
 *     This routine plots a contour map of a two-dimensional sub-array
@@ -89,6 +90,8 @@
 *     CNTCLS( NCONT ) = INTEGER (Returned)
 *        If STATS is .TRUE., this returns the number of closed contours
 *        at each level actually used.
+*     CNTPEN( NCONT ) = INTEGER (Returned)
+*        The pen index used for each contour.
 *     STATUS = INTEGER (Given)
 *        Global status value.
 
@@ -167,6 +170,8 @@
 *        statistics via new arguments STATS, CNTLEN, and CNTCLS.
 *     17-MAR-1998 (DSB):
 *        Modified to use AST for drawing the contours.
+*     20-AUG-2001 (DSB):
+*        Added argument CNTPEN.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -203,6 +208,7 @@
       LOGICAL CNTUSD( NCONT )
       REAL CNTLEN( NCONT )
       INTEGER CNTCLS( NCONT )
+      INTEGER CNTPEN( NCONT )
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -402,6 +408,9 @@
          ELSE
             IPLOTT = AST_CLONE( IPLOT, STATUS )
          END IF
+
+*  Return the colour used for this contour.
+         CNTPEN( ICONT ) = AST_GETI( IPLOTT, 'COLOUR(CURVES)', STATUS )
 
 *  Buffer all PGPLOT output produced while drawing this contour.
          CALL PGBBUF 

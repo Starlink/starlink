@@ -501,6 +501,9 @@
 *        of the DATA picture.
 *     6-FEB-2001 (DSB):
 *        Added modes Good and Bounds, and parameter LABPOS.
+*     20-AUG-2001 (DSB):
+*        Change default Format (to "%g") and Colour (to the colour used
+*        to draw the contour) for the contour indices in the key.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -553,6 +556,7 @@
       DOUBLE PRECISION XP( 2 ) ! Label text positions
       DOUBLE PRECISION YP( 2 ) ! Label test positions
       INTEGER CNTCLS( MXCONT ) ! Number of closed contours at each height
+      INTEGER CNTPEN( MXCONT ) ! Pen index used to draw each contour
       INTEGER DIMS( NDIM )     ! Dimensions of input array
       INTEGER EL               ! Number of elements in the input array
       INTEGER I                ! General variable
@@ -752,6 +756,7 @@
      :                   IPLOT, NFRM, ALIGN, STATUS )
       END IF
 
+
 *  If the user did not specify a Plot title (as indicated by the Plot title
 *  being the same as the WCS title), make the NDF Title the default Title for 
 *  the Plot. We have to be careful about the timing of this change to the
@@ -842,7 +847,7 @@
          CALL KPS1_CNTDR( IPLOT, IGRP, DIMS( 1 ), DIMS( 2 ), 
      :                    %VAL( PNTR ), 1, 1, DIMS( 1 ), DIMS( 2 ), 
      :                    NCONT, CNTLEV, STATS, FAST, %VAL( WKPNTR ), 
-     :                    CNTUSD, CNTLEN, CNTCLS, STATUS )
+     :                    CNTUSD, CNTLEN, CNTCLS, CNTPEN, STATUS )
       END IF
 
 *  Add a context message if anything went wrong.
@@ -977,10 +982,13 @@
             IF( STATUS .NE. SAI__OK ) GO TO 999
          END IF
 
-*  Cancel the Title set for the Current Frame in the key Plot. This will
-*  be "Graphical co-ordinates" and is not useful. Clearing the Title will
-*  allow KPS1_CNTKY to use its own more appropriate title.
+*  Cancel attributes set for the Current Frame in the key Plot. These will
+*  be appropriate to AGI world coordinates and are not useful. Clearing
+*  these attributes will allow KPS1_CNTKY to use its own more appropriate 
+*  values.
          CALL AST_CLEAR( IPLOTK, 'TITLE', STATUS )
+         CALL AST_CLEAR( IPLOTK, 'FORMAT(1)', STATUS )
+         CALL AST_CLEAR( IPLOTK, 'FORMAT(2)', STATUS )
 
 *  Ensure that any previous synonyms for AST attributes are cleared.
          CALL KPG1_ASPSY( ' ', ' ', STATUS )
@@ -1000,7 +1008,7 @@
 *  Draw the key to the right of the contour plot and aligned with
 *  the top axis.
          CALL KPS1_CNTKY( IPLOTK, NCONT, CNTLEV, CNTUSD, KEYOFF, UNITS,
-     :                    STATUS )
+     :                    CNTPEN, STATUS )
 
 *  Report a context message if anything went wrong.
          IF( STATUS .NE. SAI__OK ) THEN
