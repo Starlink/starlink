@@ -1,6 +1,6 @@
 interface HTAB
   parameter INP1
-    type 'UNIV'
+    type 'LITERAL'
     position 1
     vpath 'PROMPT'
     ppath 'GLOBAL'
@@ -9,7 +9,7 @@ interface HTAB
     help 'Full name of vector object to be included in table'
   endparameter
   parameter INP2
-    type 'UNIV'
+    type 'LITERAL'
     position 2
     vpath 'DEFAULT'
     default !
@@ -17,7 +17,7 @@ interface HTAB
     help 'Full name of vector object to be included in table'
   endparameter
   parameter INP3
-    type 'UNIV'
+    type 'LITERAL'
     position 3
     vpath 'DEFAULT'
     default !
@@ -25,7 +25,7 @@ interface HTAB
     help 'Full name of vector object to be included in table'
   endparameter
   parameter INP4
-    type 'UNIV'
+    type 'LITERAL'
     position 4
     vpath 'DEFAULT'
     default !
@@ -33,7 +33,7 @@ interface HTAB
     help 'Full name of vector object to be included in table'
   endparameter
   parameter INP5
-    type 'UNIV'
+    type 'LITERAL'
     position 5
     vpath 'DEFAULT'
     default !
@@ -41,7 +41,7 @@ interface HTAB
     help 'Full name of vector object to be included in table'
   endparameter
   parameter INP6
-    type 'UNIV'
+    type 'LITERAL'
     position 6
     vpath 'DEFAULT'
     default !
