@@ -59,6 +59,9 @@
                             Continuous-tone Still Images (JPEG)//EN">
 <!NOTATION eps      PUBLIC
   "+//ISBN 0-201-18127::Adobe//NOTATION PostScript Language Ref. Manual//EN">
+<!NOTATION pdf      PUBLIC
+  "+//IDN partners.adobe.com/asn/tech/pdf//NOTATION Adobe Portable Document Format//EN">
+  <!-- http://partners.adobe.com/asn/tech/pdf/specifications.jsp -->
 <!NOTATION gif89a   PUBLIC
   "-//CompuServe//NOTATION Graphics Interchange Format 89a//EN">
 <!NOTATION png PUBLIC
