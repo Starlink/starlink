@@ -56,6 +56,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.2  1997/11/06 02:09:44  timj
+*     Fix bug in section that removes duplicates in POS_BOLS
+*
 *     Revision 1.1  1997/11/06 01:56:57  timj
 *     Initial revision
 *
@@ -450,7 +453,7 @@
 *     Not the same as the previous entry so we can copy this one
 
                COUNTER = COUNTER + 1
-               CURRENT = POS_BOLS(I)
+               CURRENT = NEG_BOLS(I)
                NEGB(COUNTER) = NEG_BOLS(I)
 
             END IF
