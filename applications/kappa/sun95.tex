@@ -8658,6 +8658,9 @@ some supplied limit or signal-to-noise ratios below a threshold.  The
 errors come from the \htmlref{VARIANCE}{apndf:variance} component of the NDF. 
 Thus you can exclude unreliable data from analysis.
 
+\htmlref{THRESH}{THRESH} flags pixels that have data values within or
+outside some specified range. 
+
 % The filtering applications have a WLIM parameter
 
 \subsection{\xlabel{se_qualitymask}Quality Masking\label{se:qualitymask}}
@@ -8726,8 +8729,10 @@ the mask unaltered, whereas the second switches off the same bits.
 Now remembering which bit corresponds to which could be a strain on
 the memory.  It would be better if some meaning was attached to each
 bit through a name.  There are four general tasks which address this. 
-SETQUAL sets quality values and names; SHOWQUAL lists the named qualities;
-REMQUAL removes named qualities; and QUALTOBAD uses a logical expression
+\htmlref{SETQUAL}{SETQUAL} sets quality values and names;
+\htmlref{SHOWQUAL}{SHOWQUAL} lists the named qualities;
+\htmlref{REMQUAL}{REMQUAL} removes named qualities; and 
+\htmlref{QUALTOBAD}{QUALTOBAD} uses a logical expression
 containing the named quality properties to create a copy of your NDF
 in which pixels satisfying the quality expression are set bad.
 See \hyperref{``Using Quality Names''}{section }{}{se:qnames} for more 
@@ -8809,81 +8814,77 @@ The dataset old is a copy of dataset new, except in the 22-pixel region
 \section{\xlabel{se_qnames}Using Quality Names\label{se:qnames}}
 
 \subsection{Introduction}
-As described in \hyperref{``Masking, Bad Values, and Quality''}{section}
-{}{se:masking},
-an {\small NDF} may optionally contain a component called {\small
-QUALITY}. If this component exists, it will be an array with the same
-bounds as the main {\small DATA} array. Each element in the {\small QUALITY}
-array can be used to store several flags which are associated with the
-corresponding element in the {\small DATA} array. These flags may be used to
-indicate that the {\small DATA} value holds some specified property. For
+As described in \hyperref{``Masking, Bad Values, and Quality''}{section}{}
+{se:masking}, an NDF may optionally contain a component called
+\htmlref{QUALITY}{apndf:quality}. If this component exists, it will be an 
+array with the same bounds as the main DATA array. Each element in the
+QUALITY array can be used to store several flags which are associated
+with the corresponding element in the DATA array. These flags may be used
+to indicate that the DATA value holds some specified property. For
 instance, one of the flags may be used to indicate if the corresponding
-{\small DATA} values are saturated, another may be used to indicate if
-the {\small DATA}
-value lies within a background area, and so on. 
+DATA values are saturated, another may be used to indicate if the DATA
+value lies within a background area, and so on.
 
-The user is free to use the flags in whatever way seems most
-suited to the particular process being performed. The user can
-set (or reset) any of the flags within any sub-region of the {\small NDF}
-using application \htmlref{SETQUAL}{SETQUAL}.
-Each of the flags is referred to by a ``Quality Name''
-specified by the user. Names which reflect the nature of the
-quality should be used, e.g. the quality name ``SATURATED'' could
-be used to flag saturated data values. These quality names get
-stored within the {\small NDF} and can be used to refer to the quality
-flag when running later applications. The terminology adopted here
-is that an element of the {\small DATA} array ``holds'' the quality
-``SATURATED'' (for instance) if the flag which is associated with
-the quality name ``SATURATED'' is set for the corresponding 
-element within the {\small QUALITY} array.
+You are free to use the flags in whatever way seems most suited to the
+particular process being performed. You can set (or reset) any of the
+flags within any sub-region of the NDF using application
+\htmlref{SETQUAL}{SETQUAL}. Each of the flags is referred to by a
+{\em Quality Name} specified by the user. Names which reflect the nature of
+the quality should be used, e.g. the quality name {\tt SATURATED} could be
+used to flag saturated data values. These quality names get stored within
+the NDF and can be used to refer to the quality flag when running later
+applications. The terminology adopted here is that an element of the DATA
+array ``holds'' the quality {\tt SATURATED} (for instance) if the flag
+which is associated with the quality name {\tt SATURATED} is set for the
+corresponding element within the QUALITY array.
 
-The number of quality names which can be stored within an {\small NDF} is
-limited and therefore it may become necessary to remove quality names
-which are no longer needed to make room for new ones. The applications
-\htmlref{SHOWQUAL}{SHOWQUAL} and \htmlref{REMQUAL}{REMQUAL} allow the user to do this. {\small
-SHOWQUAL} displays a list of the quality names currently defined within
-an {\small NDF}, and {\small REMQUAL} removes specified quality names
-from an {\small NDF}.
+The number of quality names which can be stored within an NDF is limited
+and therefore it may become necessary to remove quality names which are
+no longer needed to make room for new ones. The applications
+\htmlref{SHOWQUAL}{SHOWQUAL} and \htmlref{REMQUAL}{REMQUAL} allow you
+to do this. SHOWQUAL displays a list of the quality names currently
+defined within an NDF, and REMQUAL removes specified quality
+names from an NDF.
 
-Some applications have a parameter {\small QEXP} which may be used to
+Some applications have a parameter QEXP, which may be used to
 specify that the application is only to use data values which hold a
 specified selection of qualities.  As an example, when running 
-\htmlref{QUALTOBAD}{QUALTOBAD} the user could (for instance) specify a value of
-``BACKGROUND'' for the {\small QEXP} parameter. This means that only
+\htmlref{QUALTOBAD}{QUALTOBAD} you could (for instance) specify a value of
+{\tt BACKGROUND} for the QEXP parameter. This means that only
 those data values for which the flag associated with the quality name
-``BACKGROUND'' is set, are to be set bad. The quality name ``BACKGROUND''
+{\tt BACKGROUND} is set, are to be set bad. The quality name {\tt BACKGROUND}
 must previously have been defined and assigned to the appropriate data
-values using application {\small SETQUAL}.
+values using application SETQUAL.
 
 The specification of the data values to be used by an application
 can be more complex than this, and can depend on several
 qualities combined together using ``Boolean'' operators. For
-instance, assigning the value ``.NOT. (SOURCE\_A .OR. SOURCE\_B)''
+instance, assigning the value {\tt .NOT. (SOURCE\_A .OR. SOURCE\_B) }
 would cause the application to use only those data values which
-hold neither of the qualities SOURCE\_A and/or SOURCE\_B. These
-sort of strings are  known as ``quality expressions''. 
+hold neither of the qualities {\tt SOURCE\_A} and/or {\tt SOURCE\_B}. These
+sort of strings are  known as {\em quality expressions}. 
 
 \subsection{Quality Names}
 Quality names are names by which the user refers to particular flags
-stored  in the {\small QUALITY} component of the {\small NDF}. They
+stored  in the QUALITY component of the NDF. They
 must not be longer than 15 characters. Leading blanks are ignored, and
 they are always stored in upper case, even if they are supplied by the
 user in lower case. Embedded blanks are considered to  be significant.
 Quality names must not contain any period characters (``.''), and there
-are three reserved names which cannot be used; these are ``ANY'', 
-``IRQ\_BAD\_SLOT'' and ``IRQ\_FREE\_SLOT''. 
+are three reserved names which cannot be used; these are {\tt ANY}, 
+{\tt IRQ\_BAD\_SLOT} and {\tt IRQ\_FREE\_SLOT}. 
 
 \subsection{Quality Expressions}
 Quality names may be combined together using Boolean operators
-into complex ``quality expressions''. The quality expression is
-evaluated at each element within the {\small NDF} by substituting a value
+into complex {\em quality expressions}. The quality expression is
+evaluated at each element within the NDF by substituting a value
 of true or false for each quality name used in the expression,
 depending on whether or not that element holds the specified
 quality. Elements are used if the quality expression evaluates
 to a true value. Boolean operators are delimited on each side by
-a period (eg ``.AND.'' ). The operands on which these operators
+a period ({\em e.g.} {\tt .AND.} ). The operands on which these operators
 act must be either a quality name (which must be defined within
-the {\small NDF}), or one of the Boolean constants .TRUE and .FALSE.
+the NDF), or one of the Boolean constants {\tt .TRUE.} and {\tt .FALSE.}
 Parentheses can be used to nest expressions. 
 
 Quality expressions can be up to 254 characters long, and must
@@ -8893,31 +8894,32 @@ expression to reduce the run time needed to evaluate the
 expression for every data value.
 
 The precedence of the Boolean  operators decreases in the following
-order; .NOT., .AND., .OR., .XOR., .EQV. (the final two have equal 
-precedence). In an expression such as ( A .XOR. B .EQV. C .XOR. D ) in
+order; {\tt .NOT.}, {\tt .AND.}, {\tt .OR.}, {\tt .XOR.}, {\tt .EQV.}
+ (the final two have equal 
+precedence). In an expression such as {\tt ( A .XOR. B .EQV. C .XOR. D )} in
 which all operators have equal precedence, the evaluation proceeds from
-left to right., i.e. the expression is evaluated as ( ( ( A .XOR. B )
-.EQV. C ) .XOR. D ). If there is any doubt about the order in which an
+left to right, {\em i.e.} the expression is evaluated as {\tt ( ( ( A .XOR. B )
+.EQV. C ) .XOR. D )}. If there is any doubt about the order in which an
 expression will be evaluated, parentheses should be used to ensure the
 required order of evaluation. 
 
 \begin{description}
 \item [.NOT.] -
-The expression (.NOT.A) is true only if A is false.
+The expression {\tt (.NOT.A)} is true only if A is false.
 
 \item [.AND.] -
-The expression (A.AND.B) is true only if A and B are both true.
+The expression {\tt (A.AND.B)} is true only if A and B are both true.
 
 \item [.OR.] -
-The expression (A.OR.B) is true if either (or both) of A or B are
+The expression {\tt (A.OR.B)} is true if either (or both) of A or B are
 true. 
 
 \item [.XOR.] -
-The expression (A.XOR.B) is true if either A is true and B is
+The expression {\tt (A.XOR.B)} is true if either A is true and B is
 false, or A is false and B is true. 
 
 \item [.EQV.] -
-The expression (A.EQV.B) is true if either A is true and B is
+The expression {\tt (A.EQV.B)} is true if either A is true and B is
 true, or A is false and B is false. 
 \end{description}
 
@@ -8969,7 +8971,7 @@ co-ordinates are used to refer to positions within the NDFs, if possible.
 \end{verbatim}
 \normalsize
 
-This will run \htmlref{CURSOR}{CURSOR} several times, allowing the user
+This will run \htmlref{CURSOR}{CURSOR} several times, allowing you
 to select display positions using a cursor. On the first invocation,  
 the selected positions are written to a positions list stored in file 
 \verb+first.FIT+. Positions selected on subsequent invocations are
@@ -9014,7 +9016,7 @@ The OUT parameter in the above example could alternatively have been
 specified as \verb+out="'*|1|3|'"+. Here, the asterisk (*) represents the
 base-names, \verb+a1+ and \verb+b1+, of the NDFs supplied for the first
 NDF parameter to be accessed (IN1). The following string, \verb+|1|3|+,
-means ``replace all occurrences of 1 with 3'', thus giving the final NDF
+means {\em replace all occurrences of 1 with 3}, thus giving the final NDF
 names \verb+a3+ and \verb+b3+.
 
 \subsection{Applications which Process Groups of NDFs}
@@ -9051,17 +9053,17 @@ or when prompted during the first invocation. This value would be
 retained for subsequent invocations, but what happens if one of the NDFs
 does not have a SKY Frame defined in its \htmlref{WCS component}{apndf:wcs}? Not surprisingly,
 you get an error message identifying the NDF, and you are asked to supply a
-new value for FRAME. You could, for instance supply ``PIXEL'' as the new
+new value for FRAME. You could, for instance supply {\tt PIXEL} as the new
 value. This changes the current value of the FRAME parameter to PIXEL,
 and this value will consequently be used for any remaining NDFs.
 
 If you do not specify a value for a parameter, the default value used by
 the first invocation will be re-used for all subsequent invocations. Note
 that the default value for some parameters (for instance the CENTRE
-parameter of the DISPLAY command) is the null value ``!''. This is
+parameter of the DISPLAY command) is the null value {\tt !}. This is
 usually interpreted as a request for the application to find an
 appropriate value itself for the parameter. In these cases, the parameter
-\emph{value} is ``!'' and is re-used on all invocations, resulting in the
+\emph{value} is {\tt !} and is re-used on all invocations, resulting in the
 application finding and using a potentially different value on each
 invocation. So, for instance, the above DISPLAY example will find and use
 an appropriate CENTRE value for each displayed image. If you want to use
@@ -9086,11 +9088,11 @@ application.
 
 \subsection{What Happens if an Error Occurs?}
 If an application fails to execute successfully, the error report will be 
-displayed, and then canceled.\footnote{This is called ``flushing'' the error.}
+displayed, and then cancelled.\footnote{This is called ``flushing'' the error.}
 This means that any remaining NDFs will continued to be processed normally.
 
 The exception to this is that if the error is an ``abort request''
-(caused by the user supplying two exclamation marks for a parameter), then 
+(caused by supplying two exclamation marks for a parameter), then 
 the loop exits immediately. That is, no remaining NDFs are processed.
 
 \subsection{What about Applications which Re-use Parameters?}
@@ -9101,7 +9103,7 @@ parameters which are not associated with either an NDF or a positions
 list retain their values between invocations, it is not surprising that
 care is needed when using such application to process groups of NDFs. For
 instance, when using CENTROID you supply a null parameter value
-(\emph{i.e.} a single exclamation mark ``!'') as the final value for the
+(\emph{i.e.} a single exclamation mark {\tt !}) as the final value for the
 INIT parameter to indicate that you do not wish to find any more
 centroids. Since parameter values are retained between invocations when
 processing groups of NDFs, this null value becomes the first value to be
@@ -9133,7 +9135,7 @@ Sometimes you may want to slow down the speed at which data files are
 processed. For instance, if you display several small images using a
 single DISPLAY command, you may want time to examine each image before
 moving on to the next. You can introduce a delay between invocations
-by setting the shell environment variable KAPPA\_LOOP\_DELAY to the
+by setting the shell environment variable {\tt KAPPA\_LOOP\_DELAY} to the
 required delay time (in units of seconds). For instance, in the
 C-shell:
 
@@ -9144,7 +9146,7 @@ C-shell:
 \normalsize
 
 causes a delay of 2.5 seconds between invocations of any {\footnotesize KAPPA} 
-command. To remove the delay, you should undefined KAPPA\_LOOP\_DELAY. In 
+command. To remove the delay, you should undefined {\tt KAPPA\_LOOP\_DELAY}. In 
 C-shell:
 
 \small
@@ -9164,7 +9166,7 @@ However, it is often very useful to see the names of the files as they are
 processed. For instance, if an error occurs processing one of the files,
 it is useful to know which file failed. If the application doesn't display
 this information, then you can force it to by setting the shell
-environment variable KAPPA\_REPORT\_NAMES to an arbitrary
+environment variable {\tt KAPPA\_REPORT\_NAMES} to an arbitrary
 value.\footnote{The actual value does not matter.} For instance, in the
 C-shell:
 
@@ -9176,7 +9178,7 @@ C-shell:
 
 This causes the value used for each data file parameter to be displayed in the
 form ``\verb+parameter = value+'' on each invocation. To go back to the
-normal, quiet reporting scheme, you should undefined KAPPA\_REPORT\_NAMES.
+normal, quiet reporting scheme, you should undefined {\tt KAPPA\_REPORT\_NAMES}.
 In C-shell:
 
 \small
@@ -9243,7 +9245,7 @@ be used (if they exist) in preference to all other files types.
 In certain circumstances, you may possibly want to disable the automatic
 re-invocation of {\footnotesize KAPPA} applications to process groups of 
 data files. This can be done by setting the environment variable 
-KAPPA\_LOOP\_DISABLE to an arbitrary value.\footnote{The actual value does 
+{\tt KAPPA\_LOOP\_DISABLE} to an arbitrary value.\footnote{The actual value does 
 not matter.} For instance, in the C-shell:
 
 \small
@@ -9256,7 +9258,7 @@ will cause all NDF and positions list parameters to accept only a single
 data file, and each application will be run only once. Note, the extra
 facilities for specifying data files provided by the group expression
 syntax will not then be available. To re-enable looping, you should
-undefine KAPPA\_LOOP\_DISABLE. In C-shell:
+undefine {\tt KAPPA\_LOOP\_DISABLE}. In C-shell:
 
 \small
 \begin{verbatim}
@@ -9443,11 +9445,21 @@ data values, or co-ordinates and data values into an NDF, and
 
 The automatic conversion does not allow you the full control of the
 conversion that direct use of a \FITSref\ reader offers and it does
-not deal with the special properties of tape.
-\htmlref{FITSIN}{FITSIN} will read, amongst others, simple FITS files
-including blocked or group format and floating-point data from tape.
-\htmlref{FITSDIN}{FITSDIN} is its counterpart for disc files.  
-\latexonly{Let's see the FITS readers in action.}
+not deal with the special properties of tape. For full control of the
+conversion process, you should use the FITS2NDF and MTFITS2NDF commands
+form the \CONVERTref package. \xref{FITS2NDF}{sun55}{FITS2NDF} reads disk FITS
+files, and \xref{MTFITS2NDF}{sun55}{MTFITS2NDF} reads FITS files from
+magnetic tape.
+
+For historical reasons, {\footnotesize KAPPA} contains its own additional 
+FITS readers; \htmlref{FITSIN}{FITSIN} for reading data from tape, and 
+\htmlref{FITSDIN}{FITSDIN} for reading data from disk. These do not
+currently have all the features of the corresponding \CONVERTref commands
+(for instance, they do not allow an NDF to be created from a specified
+FITS extension). For this reason, you should normally use the CONVERT
+commands described in \xref{SUN/55}{sun55}{}. 
+
+\latexonly{Let's see the {\footnotesize KAPPA} FITS readers in action.}
 
 \subsubsection{\xlabel{se_readfitstape}Reading FITS Tapes\label{se:readfitstape}}
 
@@ -9880,13 +9892,19 @@ FITS-like header in a text file.  For example,
 \normalsize
 places the contents of {\tt myfile} in the NDF called myndf. This is
 not advised unless you are familiar with the rules for writing FITS
-headers.  See the NOST {\sl A User's Guide to FITS}.  You find this
-and other useful FITS documents, test files, and software at 
-\htmladdnormallink{FITS Support Office Home
-Page} {http://www.gsfc.nasa.gov/astro/fits/fits\_home.html}\latexonly{ (URL
-{\tt http://www.gsfc.nasa.gov/astro/fits/fits\_home.html})}.  FITSTEXT does
-perform some limited validation of the FITS headers, and informs you
-of any problems it detects.  See the \htmlref{FITSHEAD}{FITSHEAD} Notes in
+headers.  See the NOST 
+\htmladdnormallink{{\em A User's Guide to FITS}}
+{http://archive.stsci.edu/fits/users_guide/}
+\latexonly{ (URL {\tt http://archive.stsci.edu/fits/users\_guide/})}.
+Other useful FITS documents, test files, and software are available at 
+the \htmladdnormallink{FITS Support Office Home Page} 
+{http://fits.gsfc.nasa.gov/}
+\latexonly{ (URL {\tt http://fits.gsfc.nasa.gov/})}.  
+
+
+FITSTEXT does perform some limited validation of the FITS headers, and
+informs you of any problems it detects.  See the
+\htmlref{FITSHEAD}{FITSHEAD} Notes in
 \latexelsehtml{Appendix~\ref{ap:full}}{\htmlref{application
 specifications}{ap:full}} for details.
 
@@ -10455,6 +10473,23 @@ the {\tt{"}} to cure the problem.
 \end{verbatim}
 \normalsize
 
+\subsection{Annotated axes show the wrong co-ordinate system}
+Each NDF has an associated {\em current co-ordinate system} which is used
+when reporting positions within the NDF, or when obtaining positions from
+the user. If you want to either see, or give, positions in a {\em
+different} co-ordinate system, you need to change the current co-ordinate
+system (more often called the current coordinate {\em frame}) of the NDF
+by using command \htmlref{WCSFRAME}{WCSFRAME}. For instance,
+
+\small
+\begin{verbatim}
+     % wcsframe m57 pixel
+\end{verbatim}
+\normalsize
+
+will cause all subsequent commands to use pixel co-ordinates when
+reporting positions, or obtaining positions.
+
 \subsection{\xlabel{se_fitsunixtape}``I've Got This FITS Tape''
 \label{se:fitsunixtape}}
 
@@ -10814,7 +10849,7 @@ is the equivalent of the DEFSTRING above, except that in keeping with
 UNIX tradition the command is in lowercase, and the alias cannot be
 abbreviated.
 
-\section{Acknowledgements}
+\section{Acknowledgments}
 
 Several people have contributed complete {\footnotesize KAPPA}
 programmes, or have upgraded earlier versions, or have written original
@@ -10891,7 +10926,7 @@ picture.}
 \menuitem{CMULT}{
  Multiplies an NDF by a scalar.}
 \menuitem{COLCOMP}{
- Produce a colour composite image from 1, 2 or 3 individual NDFs.}
+ Produces a colour composite image from 1, 2 or 3 individual NDFs.}
 \menuitem{COLLAPSE}{
  Reduce the number of axes in an NDF by collapsing it along a nominated axis.}
 \menuitem{COMPADD}{
@@ -10999,7 +11034,7 @@ picture.}
 \menuitem{LINPLOT}{
  Draws a line plot of the data values in a 1-d NDF.}
 \menuitem{LISTMAKE}{
- Create a catalogue holding a positions list.}
+ Creates a catalogue holding a positions list.}
 \menuitem{LISTSHOW}{
  Reports the positions stored in a positions list.}
 \menuitem{LOG10}{
@@ -11009,7 +11044,7 @@ picture.}
 \menuitem{LOGE}{
  Takes the natural logarithm of each pixel of an NDF.}
 \menuitem{LOOK}{
- Outputs the values of a sub-array of a 2-d NDF to the screen or a text file.}
+ Outputs the values of specified NDF pixels to the screen or a text file.}
 \menuitem{LUCY}{
  Performs a Richardson-Lucy deconvolution of a 1- or 2-dimensional array.}
 \menuitem{LUTABLE}{
@@ -11023,7 +11058,7 @@ picture.}
 \menuitem{LUTCONT}{
  Loads a lookup table to give the display the appearance of a contour plot.}
 \menuitem{LUTEDIT}{
- Create or edit an graphics device colour table.}
+ Creates or edits an graphics device colour table.}
 \menuitem{LUTFC}{
  Loads the standard false-colour lookup table.}
 \menuitem{LUTGREY}{
@@ -11139,9 +11174,9 @@ picture.}
 \menuitem{QUALTOBAD}{
  Assigns bad values to pixels with given qualities.}
 \menuitem{REGRID}{
- Use an arbitrary mapping to regrid an NDF.}
+ Uses an arbitrary mapping to regrid an NDF.}
 \menuitem{REMQUAL}{
- Remove named qualities stored in an NDF Quality component.}
+ Removes named qualities stored in an NDF Quality component.}
 \menuitem{RESHAPE}{
  Reshapes an NDF, treating its arrays as vectors.}
 \menuitem{RIFT}{
@@ -11171,7 +11206,7 @@ picture.}
 \menuitem{SETORIGIN}{
  Sets a new pixel origin for an NDF.}
 \menuitem{SETQUAL}{
- Assign a specified quality to selected pixels within an NDF.}
+ Assigns a specified quality to selected pixels within an NDF.}
 \menuitem{SETSKY}{
  Stores WCS Information in an NDF.}
 \menuitem{SETTITLE}{
@@ -11207,7 +11242,7 @@ picture.}
 \menuitem{VECPLOT}{
  Plots a 2-dimensional vector map.}
 \menuitem{KAPVERSION}{
- Check the version number of the installed package.}
+ Checks the version number of the installed package.}
 \menuitem{WCSADD}{
 Creates a Mapping and optionally adds a new co-ordinate Frame into the 
 WCS component of an NDF.}
@@ -11295,7 +11330,7 @@ functions as follows.
 \item {\large\bf Detail enhancement}
 \begin{description}
 \classitem{COLCOMP}
- Produce a colour composite image from 1, 2 or 3 individual NDFs.
+ Produces a colour composite image from 1, 2 or 3 individual NDFs.
 \classitem{HISTEQ}
  Performs an histogram equalisation on an NDF.
 \classitem{LAPLACE}
@@ -11423,8 +11458,7 @@ functions as follows.
 \classitem{LISTSHOW}
  Displays the positions stored in a positions list.
 \classitem{LOOK}
- Outputs the values of a sub-array of a 2-d NDF to the screen or a
- text file.
+ Outputs the values of specified NDF pixels to the screen or a text file.
 \classitem{MLINPLOT}
  Draws a multi-line plot of a 2-d NDF's data values against their axis
  co-ordinates.
@@ -11505,7 +11539,7 @@ functions as follows.
 \classitem{CALPOL}
  Calculates polarisation parameters.
 \classitem{COLCOMP}
- Produce a colour composite image from 1, 2 or 3 individual NDFs.
+ Produces a colour composite image from 1, 2 or 3 individual NDFs.
 \classitem{KSTEST}
  Compares data sets using the Kolmogorov-Smirnov test.
 \classitem{NORMALIZE}
@@ -11530,7 +11564,7 @@ functions as follows.
 \classitem{SQORST}
  Squashes or stretches an NDF.
 \classitem{REGRID}
- Use an arbitrary mapping to regrid an NDF.
+ Uses an arbitrary mapping to regrid an NDF.
 \classitem{WCSALIGN}
  Aligns a group of 2-d NDFs using WCS information.
 \end{description}
@@ -11551,7 +11585,7 @@ functions as follows.
 \classitem{PROFILE}
  Creates a 1-d profile through an N-d NDF.
 \classitem{REGRID}
- Use an arbitrary mapping to regrid an NDF.
+ Uses an arbitrary mapping to regrid an NDF.
 \classitem{RESHAPE}
  Reshapes an NDF, treating its arrays as vectors.
 \classitem{ROTATE}
@@ -11604,7 +11638,7 @@ functions as follows.
 \classitem{QUALTOBAD}
  Assigns bad values to pixels with given qualities.
 \classitem{REMQUAL}
- Remove named qualities stored in an NDF Quality component.
+ Removes named qualities stored in an NDF Quality component.
 \classitem{SETBAD}
  Sets new bad-pixel flag values for an NDF.
 \classitem{SETBB}
@@ -11612,7 +11646,7 @@ functions as follows.
 \classitem{SETBOUND}
  Sets new bounds for an NDF.
 \classitem{SETQUAL}
- Assign a specified quality to selected pixels within an NDF.
+ Assigns a specified quality to selected pixels within an NDF.
 \classitem{SETTYPE}
  Sets a new numeric type for the data and variance components of an NDF.
 \classitem{SETVAR}
@@ -11747,6 +11781,8 @@ WCS component of an NDF.
  with the bad value.
 \classitem{SUBSTITUTE}
  Replaces all occurrences of a given value in an NDF array with another value.
+\classitem{THRESH}
+ Edits an NDF such that array values below and above two thresholds take
 \classitem{ZAPLIN}
  Replaces regions in a 2-d NDF by bad values or by linear
  interpolation.
@@ -11764,7 +11800,7 @@ WCS component of an NDF.
 \item {\large\bf Resampling and transformations}
 \begin{description}
 \classitem{REGRID}
- Use an arbitrary mapping to regrid an NDF.
+ Uses an arbitrary mapping to regrid an NDF.
 \classitem{WCSALIGN}
  Aligns a group of 2-d NDFs using WCS information.
 \end{description}
@@ -11889,9 +11925,9 @@ WCS component of an NDF.
 \classitem{KAPHELP}
  Gives help about {\footnotesize KAPPA}.
 \classitem{LISTMAKE}
- Create a catalogue holding a positions list.
+ Creates a catalogue holding a positions list.
 \classitem{KAPVERSION}
- Check the version number of the installed package.
+ Checks the version number of the installed package.
 \end{description}
 \end{description}
 \end{small}
@@ -12031,7 +12067,7 @@ default value.
       \sstsubsection{
          TITLE = LITERAL (Read)
       }{
-         Value for the title of the output NDF.  A null value will cause
+         The title for the output NDF.  A null value will cause
          the title of the NDF supplied for parameter IN1 to be used
          instead. {\tt [!]}
       }
@@ -12056,7 +12092,7 @@ default value.
       result if they have no pixels in common.
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: CADD, CDIV, CMULT, CSUB, DIV, MATHS, MULT, SUB.
    }
@@ -12149,7 +12185,7 @@ default value.
          (!) value is supplied then the aperture is assumed to be circular
          with centre and diameter given by parameters CENTRE and DIAM. ARD
          files can be created either {\tt "}by hand{\tt "} using an editor, or using a
-         specialist application should as KAPPA:ARDGEN.
+         specialist application such as KAPPA:ARDGEN.
 
          The co-ordinate system in which positions within the ARD file are
          given should be indicated by including suitable COFRAME or WCS
@@ -12308,7 +12344,7 @@ default value.
       }
    }
    \sstdiytopic{
-      ASCII-region-definition Descriptors
+      ASCII-region-definition Descriptors:
    }{
       The ARD file may be created by ARDGEN or written manually.  In the
       latter case consult SUN/183 for full details of the ARD
@@ -12317,7 +12353,7 @@ default value.
       There is also a summary with examples in the main body of SUN/95.
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: STATS, MSTATS, ARDGEN, ARDMASK, ARDPLOT, WCSFRAME.
    }
@@ -12690,7 +12726,7 @@ default value.
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: ARDPLOT, ARDMASK, LOOK; CCDPACK; ESP.
    }
@@ -12786,7 +12822,7 @@ default value.
       }
    }
    \sstdiytopic{
-      ASCII-region-definition Descriptors
+      ASCII-region-definition Descriptors:
    }{
       The ARD file may be created by ARDGEN or written manually.  In the
       latter case consult SUN/183 for full details of the ARD
@@ -12795,7 +12831,7 @@ default value.
       There is also a summary with examples in the main body of SUN/95.
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: ARDGEN, ARDPLOT, LOOK.
    }
@@ -12895,7 +12931,7 @@ default value.
          reported).
 
          The appearance of the plotted curves is controlled by the attributes
-         Colour(Curves), Width(Curves), \emph{etc}. {\tt [current value]}
+         Colour(Curves), Width(Curves), \emph{etc}. {\tt [}current value{\tt ]}
       }
    }
    \sstexamples{
@@ -12922,7 +12958,7 @@ default value.
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: ARDGEN, ARDMASK, LOOK.
    }
@@ -12960,7 +12996,7 @@ default value.
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: SETAXIS.
    }
@@ -13038,7 +13074,7 @@ default value.
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: AXUNITS, SETAXIS, SETLABEL.
    }
@@ -13109,7 +13145,7 @@ default value.
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: AXLABEL, SETAXIS, SETUNITS.
    }
@@ -13165,7 +13201,7 @@ default value.
       \sstsubsection{
          TITLE = LITERAL (Read)
       }{
-         Value for the title of the output NDF. A null value will cause
+         The title for the output NDF. A null value will cause
          the title of the input NDF to be used. {\tt [!]}
       }
       \sstsubsection{
@@ -13258,7 +13294,7 @@ default value.
       heavily dependant on the smoothing box size.
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: CONVOLVE, FFCLEAN, GAUSMOOTH, MEDIAN; Figaro: ICONV3,
       ISMOOTH, IXSMOOTH, MEDFILT.
@@ -13317,7 +13353,7 @@ default value.
       \sstsubsection{
          TITLE = LITERAL (Read)
       }{
-         Value for the title of the output NDF.  A null value will cause
+         The title for the output NDF.  A null value will cause
          the title of the NDF supplied for parameter IN to be used
          instead. {\tt [!]}
       }
@@ -13337,7 +13373,7 @@ default value.
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: ADD, CDIV, CMULT, CSUB, DIV, MATHS, MULT, SUB.
    }
@@ -13537,7 +13573,7 @@ default value.
       are due to problems with the TRANSFORM infrastructure.
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: MATHS.
    }
@@ -13733,10 +13769,9 @@ default value.
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
-      KAPPA: VECPLOT; IRCAMPACK: POLCAL, POLMAPC, POLMAPD, POLSKY, \linebreak
-      POLSMOOTH, POLZAP; TSP.
+      KAPPA: VECPLOT; POLPACK: POLCAL, POLVEC; TSP.
    }
    \sstimplementationstatus{
       \sstitemlist{
@@ -13808,7 +13843,7 @@ default value.
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: ADD, CADD, CMULT, CSUB, DIV, MATHS, MULT, SUB.
    }
@@ -13911,7 +13946,7 @@ default value.
          WCS information. {\tt [!]}
       }
       \sstsubsection{
-         CATEPOCH = DOUBLE PRECISION (Read)
+         CATEPOCH = \_DOUBLE (Read)
       }{
          The epoch at which the sky positions stored in the output
          catalogue were determined. It will only be accessed if an epoch
@@ -13950,7 +13985,7 @@ default value.
       }{
          If TRUE, a detailed description of the co-ordinate Frame in which
          the centroided positions will be reported is displayed before the
-         positions themselves. {\tt [current value]}
+         positions themselves. {\tt [}current value{\tt ]}
       }
       \sstsubsection{
          DEVICE = DEVICE (Read)
@@ -13970,7 +14005,7 @@ default value.
       }{
          If TRUE, then the supplied guesses for the centroid positions
          will be included in the screen and log file output, together
-         with the accurate positions. {\tt [current value]}
+         with the accurate positions. {\tt [}current value{\tt ]}
       }
       \sstsubsection{
          INCAT = FILENAME (Read)
@@ -14021,17 +14056,17 @@ default value.
             {\tt "}None{\tt "}: No positions are marked.
 
          }
-         {\tt [current value]}
+         {\tt [}current value{\tt ]}
       }
       \sstsubsection{
-         MARKER = INTEGER (Read)
+         MARKER = \_INTEGER (Read)
       }{
          This parameter is only accessed if parameter MARK is set TRUE.
          It specifies the type of marker with which each cursor position
          should be marked, and should be given as an integer PGPLOT marker
          type. For instance, 0 gives a box, 1 gives a dot, 2 gives a cross,
          3 gives an asterisk, 7 gives a triangle. The value must be larger
-         than or equal to -31. {\tt [current value]}
+         than or equal to -31. {\tt [}current value{\tt ]}
       }
       \sstsubsection{
          MAXITER  =  \_INTEGER (Read)
@@ -14069,7 +14104,7 @@ default value.
 
             \sstitem
             {\tt "}File{\tt "}: positions are obtained from a text file using parameter
-               COIN. {\tt [current value]}
+               COIN. {\tt [}current value{\tt ]}
          }
       }
       \sstsubsection{
@@ -14121,7 +14156,7 @@ default value.
          defaulted if a null value (!) is supplied. See section {\tt "}Plotting
          Attributes{\tt "} in SUN/95 for a description of the available
          attributes. Any unrecognised attributes are ignored (no error is
-         reported). {\tt [current value]}
+         reported). {\tt [}current value{\tt ]}
       }
       \sstsubsection{
          POSITIVE  =  \_LOGICAL (Read)
@@ -14282,7 +14317,7 @@ default value.
       the standard deviations.
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: PSF, CURSOR, LISTSHOW, LISTMAKE.
    }
@@ -14355,7 +14390,7 @@ default value.
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: PASTE, RESHAPE.
    }
@@ -14480,7 +14515,7 @@ default value.
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: ARDMASK, FILLBAD, GLITCH, NOMAGIC, SEGMENT, SETMAGIC, SUBSTITUTE, ZAPLIN;
       Figaro: CSET, ICSET, NCSET, TIPPEX.
@@ -14555,7 +14590,7 @@ default value.
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: ADD, CADD, CDIV, CSUB, DIV, MATHS, MULT, SUB.
    }
@@ -14622,7 +14657,7 @@ default value.
       so may give better visual results.
    }
    \sstusage{
-      colcomp inr ing inb out lut device
+      colcomp inr ing inb out lut [device]
    }
    \sstparameters{
       \sstsubsection{
@@ -14652,7 +14687,7 @@ default value.
          manipulated choose an integer between 0 and 15, or a named
          colour.  Note, if only the PPM output is to be created (see
          parameter PPM), then a named colour must be given for BADCOL.
-         {\tt [current value]}
+         {\tt [}current value{\tt ]}
       }
       \sstsubsection{
          BHIGH = \_DOUBLE (Read)
@@ -14681,7 +14716,7 @@ default value.
          is created by this application. This parameter is not accessed
          if a null (!) value is supplied for parameter OUT. The device
          must have at least 24 colour indices or greyscale intensities.
-         {\tt [current graphics device]}
+         {\tt [}current graphics device{\tt ]}
       }
       \sstsubsection{
          GHIGH = \_DOUBLE (Read)
@@ -14830,7 +14865,7 @@ default value.
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: DISPLAY, LUTREAD; XV; PBMPLUS; NETPBM.
    }
@@ -15031,9 +15066,9 @@ default value.
       values to collapse.
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
-      KAPPA: WCSFRAME, COMPAVE, COMPICK, COMPADD.
+      KAPPA: WCSFRAME, COMPAVE, COMPICK, COMPADD, MANIC.
    }
    \sstimplementationstatus{
       \sstitemlist{
@@ -15185,7 +15220,7 @@ default value.
          have any overlap with the input NDF.  All pixels outside the
          bounds of the NDF are assumed to be bad. That is, any boxes which
          extend beyond the bounds of the input NDF are padded with bad
-         pixels. See also parameter ALIGN. {\tt [current value]}
+         pixels. See also parameter ALIGN. {\tt [}current value{\tt ]}
       }
       \sstsubsection{
          WLIM = \_REAL (Read)
@@ -15281,7 +15316,7 @@ default value.
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: BLOCK, COMPAVE, COMPICK, PIXDUPE, SQORST, REGRID;
       Figaro: ISTRETCH, YSTRACT.
@@ -15421,7 +15456,7 @@ default value.
          have any overlap with the input NDF. All pixels outside the
          bounds of the NDF are assumed to be bad. That is, any boxes which
          extend beyond the bounds of the input NDF are padded with bad
-         pixels. See also parameter ALIGN. {\tt [current value]}
+         pixels. See also parameter ALIGN. {\tt [}current value{\tt ]}
       }
       \sstsubsection{
          WEIGHT = \_LOGICAL (Read)
@@ -15526,7 +15561,7 @@ default value.
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: BLOCK, COMPADD, COMPICK, PIXDUPE, SQORST, REGRID;
       Figaro: ISTRETCH.
@@ -15648,7 +15683,7 @@ default value.
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: BLOCK, COMPADD, COMPAVE, PIXDUPE, SQORST, REGRID;
       Figaro: ISTRETCH.
@@ -15766,7 +15801,7 @@ default value.
       \sstsubsection{
          DEVICE = DEVICE (Read)
       }{
-         The plotting device. {\tt [current graphics device]}
+         The plotting device. {\tt [}current graphics device{\tt ]}
       }
       \sstsubsection{
          FAST = \_LOGICAL (Read)
@@ -15820,7 +15855,7 @@ default value.
          is not given, the top of the key is placed level with the top of the
          contour map. Both values should be in the range 0.0 to 1.0. If a
          key is produced, then the right hand margin specified by parameter
-         MARGIN is ignored. {\tt [current value]}
+         MARGIN is ignored. {\tt [}current value{\tt ]}
       }
       \sstsubsection{
          KEYSTYLE = GROUP (Read)
@@ -15860,7 +15895,7 @@ default value.
          using attributes Format(1), Digits(1), \emph{etc} (the synonym Index can
          be used in place of value 1). Contour values are formatted
          using attributes Format(2), \emph{etc} (the synonym Value can be used in
-         place of the value 2). {\tt [current value]}
+         place of the value 2). {\tt [}current value{\tt ]}
       }
       \sstsubsection{
          LABPOS = \_REAL() (Read)
@@ -15876,7 +15911,7 @@ default value.
          bottom left pixel to the baseline of the label. If a null (!) 
          value is given, no label is produced. The appearance of the label 
          can be set by using the STYLE parameter
-         (for instance {\tt "}Size(strings)=2{\tt "}). {\tt [current value]}
+         (for instance {\tt "}Size(strings)=2{\tt "}). {\tt [}current value{\tt ]}
       }
       \sstsubsection{
          LENGTH() = \_REAL (Write)
@@ -15898,7 +15933,7 @@ default value.
          narrow any axis annotation may be clipped. If a null (!) value is
          supplied, the value used is 0.15 (for all edges) if annotated axes
          are being produced, and zero otherwise. See also parameter KEYPOS.
-         {\tt [current value]}
+         {\tt [}current value{\tt ]}
       }
       \sstsubsection{
          MODE = LITERAL (Read)
@@ -16046,7 +16081,7 @@ default value.
          Colour(Curves), Width(Curves), \emph{etc} (the synonym Contours may be
          used in place of Curves). The contour appearance established in
          this way may be modified using parameters PENS, PENROT and DASHED.
-         {\tt [current value]}
+         {\tt [}current value{\tt ]}
       }
       \sstsubsection{
          USEAXIS = GROUP (Read)
@@ -16173,9 +16208,9 @@ default value.
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
-      KAPPA: WCSFRAME, PICDEF; Figaro: ICONT; SPECDRE: SPECCONT.
+      KAPPA: WCSFRAME, PICDEF; Figaro: ICONT, SPECCONT.
    }
    \sstimplementationstatus{
       \sstitemlist{
@@ -16317,7 +16352,7 @@ default value.
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: BLOCK, FFCLEAN, GAUSMOOTH, MATHS, MEDIAN, PSF; Figaro:
       ICONV3, ISMOOTH, IXSMOOTH, MEDFILT.
@@ -16355,7 +16390,7 @@ default value.
       and VARIANCE (if available) arrays in OUT.
    }
    \sstusage{
-      copybad in ref out title
+      copybad in ref out [title]
    }
    \sstparameters{
       \sstsubsection{
@@ -16376,7 +16411,7 @@ default value.
       \sstsubsection{
          TITLE = LITERAL (Read)
       }{
-         Value for the title of the output NDF.  A null value will cause
+         The title for the output NDF.  A null value will cause
          the title of the NDF supplied for parameter IN to be used
          instead. {\tt [!]}
       }
@@ -16401,7 +16436,7 @@ default value.
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: SUBSTITUTE, NOMAGIC, FILLBAD, PASTE, GLITCH.
    }
@@ -16691,7 +16726,7 @@ default value.
       \sstsubsection{
          TITLE = LITERAL (Read)
       }{
-         Value for the title of the output NDF.  A null value will cause
+         The title for the output NDF.  A null value will cause
          the title of the NDF supplied for parameter IN to be used
          instead. {\tt [!]}
       }
@@ -16711,7 +16746,7 @@ default value.
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: ADD, CADD, CDIV, CMULT, DIV, MATHS, MULT, SUB.
    }
@@ -16791,7 +16826,7 @@ default value.
          WCS information. {\tt [!]}
       }
       \sstsubsection{
-         CATEPOCH = DOUBLE PRECISION (Read)
+         CATEPOCH = \_DOUBLE (Read)
       }{
          The epoch at which the sky positions stored in the output
          catalogue were determined. It will only be accessed if an epoch
@@ -16806,20 +16841,20 @@ default value.
       }{
          This parameter is only accessed if parameter PLOT is set to
          {\tt "}Chain{\tt "} or {\tt "}Poly{\tt "}. If TRUE, polygons will be closed by joining
-         the first position to the last position. {\tt [current value]}
+         the first position to the last position. {\tt [}current value{\tt ]}
       }
       \sstsubsection{
          DESCRIBE = \_LOGICAL (Read)
       }{
          If TRUE, a detailed description of the co-ordinate Frame in which
          subsequent positions will be reported is produced each time a
-         position is reported within a new picture. {\tt [current value]}
+         position is reported within a new picture. {\tt [}current value{\tt ]}
       }
       \sstsubsection{
          DEVICE = DEVICE (Read)
       }{
          The graphics workstation.  This device must support cursor
-         interaction. {\tt [current graphics device]}
+         interaction. {\tt [}current graphics device{\tt ]}
       }
       \sstsubsection{
          EPOCH = \_DOUBLE (Read)
@@ -16894,7 +16929,7 @@ default value.
          {\tt "}C{\tt "} or {\tt "}T{\tt "}, meaning bottom, centre or top. The second should be
          {\tt "}L{\tt "}, {\tt "}C{\tt "} or {\tt "}R{\tt "}, meaning left, centre or right. The text is
          displayed so that the supplied position is at the specified
-         point within the displayed text string. {\tt [CC]}
+         point within the displayed text string. {\tt ["CC"]}
       }
       \sstsubsection{
          LASTDIM = \_INTEGER (Write)
@@ -16926,7 +16961,7 @@ default value.
          position should be marked, and should be given as an integer
          PGPLOT marker type. For instance, 0 gives a box, 1 gives a dot,
          2 gives a cross, 3 gives an asterisk, 7 gives a triangle. The
-         value must be larger than or equal to -31. {\tt [current value]}
+         value must be larger than or equal to -31. {\tt [}current value{\tt ]}
       }
       \sstsubsection{
          MAXPOS = \_INTEGER (Read)
@@ -17053,7 +17088,7 @@ default value.
             parameter STRINGS.
 
          }
-         {\tt [current value]}
+         {\tt [}current value{\tt ]}
       }
       \sstsubsection{
          QUIET = \_LOGICAL (Read)
@@ -17070,7 +17105,7 @@ default value.
          shown on a separate line, following the co-ordinates requested
          using parameter FRAME. If pixel co-ordinates are being displayed
          anyway (see parameter FRAME) then a value of FALSE is used for.
-         SHOWPIXEL. {\tt [current value]}
+         SHOWPIXEL. {\tt [}current value{\tt ]}
       }
       \sstsubsection{
          STRINGS = LITERAL (Read)
@@ -17123,8 +17158,8 @@ default value.
          the graphics (Colour, Font, \emph{etc}), the following attributes may
          be set in order to control the appearance of the formatted axis
          values reported on the screen: Format, Digits, Symbol, Unit. These
-         may be suffixed with an axis number (eg {\tt "}Digits(2){\tt "}) to refer to
-         the values displayed for a specific axis. {\tt [current value]}
+         may be suffixed with an axis number (e.g. {\tt "}Digits(2){\tt "}) to refer to
+         the values displayed for a specific axis. {\tt [}current value{\tt ]}
       }
    }
    \sstexamples{
@@ -17214,7 +17249,7 @@ default value.
          \sstitem
          Pixel co-ordinates are formatted with 1 decimal place unless a
          format has already been specified by setting the Format attributes
-         for the axes of the PIXEL co-ordinate Frame (eg using application
+         for the axes of the PIXEL co-ordinate Frame (e.g. using application
          WCSATTRIB).
 
          \sstitem
@@ -17227,14 +17262,9 @@ default value.
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: LISTSHOW, LISTMAKE, PICCUR; Figaro: ICUR, IGCUR.
-   }
-   \sstdiytopic{
-      $*$
-   }{
-      Bugs:
    }
 }
 \sstroutine{
@@ -17807,9 +17837,9 @@ default value.
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
-      KAPPA: WCSFRAME, PICDEF; Figaro: IGREY, IMAGE; SPECDRE: MOVIE.
+      KAPPA: WCSFRAME, PICDEF; Figaro: IGREY, IMAGE, MOVIE.
    }
    \sstimplementationstatus{
       \sstitemlist{
@@ -17867,7 +17897,7 @@ plot (101k).
       \sstsubsection{
          TITLE = LITERAL (Read)
       }{
-         Value for the title of the output NDF.  A null value will cause
+         The title for the output NDF.  A null value will cause
          the title of the NDF supplied for parameter IN1 to be used
          instead. {\tt [!]}
       }
@@ -17892,7 +17922,7 @@ plot (101k).
       result if they have no pixels in common.
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: ADD, CADD, CDIV, CMULT, CSUB, MATHS, MULT, SUB.
    }
@@ -18038,7 +18068,7 @@ plot (101k).
          either a {\tt "}$+${\tt "} or a {\tt "}-{\tt "} to the {\tt "}Nsig$<$i$>${\tt "} string. Thus,
          {\tt "}Width(Nsig2-){\tt "} sets the line width for the lower of the two
          lines associated with the second clipping level, and {\tt "}Width(Nsig2+){\tt "}
-         sets the width for the upper of the two lines. {\tt [current value]}
+         sets the width for the upper of the two lines. {\tt [}current value{\tt ]}
       }
    }
    \sstexamples{
@@ -18084,7 +18114,7 @@ plot (101k).
       within this picture.
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: HISTOGRAM, LINPLOT, MLINPLOT, STATS.
    }
@@ -18118,7 +18148,7 @@ plot (101k).
      or into a ``fan'' of adjacent sectors, centred on a specified
      position.  The typical data values in each bin are found (see
      parameter ESTIMATOR), and stored in a 1-dimensional NDF which 
-     can be examined using LINPLOT, INSPECT, \emph{etc}.  A 2-dimensional mask 
+     can be examined using LINPLOT, LOOK, \emph{etc}.  A 2-dimensional mask 
      image can optionally be produced indicating which bin each input 
      pixel was placed in.
 
@@ -18323,7 +18353,7 @@ plot (101k).
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       ESP: ELLFOU, ELLPRO, SECTOR.
    }
@@ -18403,7 +18433,7 @@ plot (101k).
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       Figaro: CREOBJ, DELOBJ, RENOBJ.
    }
@@ -18488,7 +18518,7 @@ plot (101k).
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: FFCLEAN, PASTE, SEGMENT, SETMAGIC, THRESH.
    }
@@ -18539,7 +18569,7 @@ plot (101k).
       \sstsubsection{
          TITLE = LITERAL (Read)
       }{
-         Value for the title of the output NDF.  A null value will cause
+         The title for the output NDF.  A null value will cause
          the title of the NDF supplied for parameter IN to be used
          instead. {\tt [!]}
       }
@@ -18561,7 +18591,7 @@ plot (101k).
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: LOG10, LOGAR, LOGE, EXPE, EXPON, POW; Figaro: IALOG, ILOG,
       IPOWER.
@@ -18612,7 +18642,7 @@ plot (101k).
       \sstsubsection{
          TITLE = LITERAL (Read)
       }{
-         Value for the title of the output NDF.  A null value will cause
+         The title for the output NDF.  A null value will cause
          the title of the NDF supplied for parameter IN to be used
          instead. {\tt [!]}
       }
@@ -18634,7 +18664,7 @@ plot (101k).
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: LOG10, LOGAR, LOGE, EXP10, EXPON, POW; Figaro: IALOG, ILOG,
       IPOWER.
@@ -18690,7 +18720,7 @@ plot (101k).
       \sstsubsection{
          TITLE = LITERAL (Read)
       }{
-         Value for the title of the output NDF.  A null value will cause
+         The title for the output NDF.  A null value will cause
          the title of the NDF supplied for parameter IN to be used
          instead. {\tt [!]}
       }
@@ -18712,7 +18742,7 @@ plot (101k).
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: LOG10, LOGAR, LOGE, EXP10, EXPE, POW; Figaro: IALOG, ILOG,
       IPOWER.
@@ -18875,7 +18905,7 @@ plot (101k).
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: CHPIX, FILLBAD, GLITCH, MEDIAN, MSTATS, ZAPLIN; Figaro: BCLEAN,
       COSREJ, CLEAN, ISEDIT, MEDFILT, MEDSKY, TIPPEX.
@@ -19102,7 +19132,7 @@ plot (101k).
       section.
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: CHPIX, GLITCH, MEDIAN, ZAPLIN; Figaro: BCLEAN,
       COSREJ, CLEAN, ISEDIT, MEDFILT, MEDSKY, REMBAD, TIPPEX.
@@ -19388,7 +19418,7 @@ plot (101k).
       \end{refs}
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: FITSHEAD, FITSIMP, FITSIN, FITSLIST; CONVERT: FITS2NDF;
       CURSA; Figaro: RDFITS.
@@ -19426,7 +19456,7 @@ plot (101k).
             An AXIS component will be stored in the NDF if the CRVAL$n$
             keyword is present.  ($n$ is the number of the dimension.)  If the
             CRPIX$n$ keyword is absent it defaults to 1, and likewise for the
-            CDELT$n$ keyword.  The value of CRTYPE$n$ is made the label of the
+            CDELT$n$ keyword.  The value of CTYPE$n$ is made the label of the
             axis structure.
          }
 
@@ -19495,7 +19525,7 @@ plot (101k).
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: FITSMOD, FITSEXP, FITSHEAD, FITSIMP, FITSLIST; Figaro: FITSKEYS.
    }
@@ -19560,7 +19590,7 @@ plot (101k).
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: FITSEDIT, FITSHEAD, FITSLIST, FITSMOD, FITSVAL.
    }
@@ -19708,7 +19738,7 @@ plot (101k).
       NASA/Science Office of Science and Technology (1994).
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: FITSEDIT, FITSHEAD, FITSLIST, FITSMOD; CONVERT: NDF2FITS.
    }
@@ -19835,7 +19865,7 @@ plot (101k).
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: FITSEDIT, FITSEXP, FITSIMP, FITSLIST; Figaro: FITSKEYS.
    }
@@ -19949,7 +19979,7 @@ plot (101k).
       ignored.
    }
    \sstdiytopic{
-   Related Applications
+   Related Applications:
    }{
       KAPPA: FITSHEAD, FITSLIST, FITSDIN, FITSIN; CONVERT: FITS2NDF;
       Figaro: RDFITS.
@@ -20254,7 +20284,7 @@ plot (101k).
       \end{refs}
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: FITSDIN, FITSHEAD, FITSIMP, FITSLIST; CONVERT: FITS2NDF;
       CURSA; Figaro: RDFITS.
@@ -20292,7 +20322,7 @@ plot (101k).
             An AXIS component will be stored in the NDF if the CRVAL$n$
             keyword is present.  ($n$ is the number of the dimension.)  If the
             CRPIX$n$ keyword is absent it defaults to 1, and likewise for the
-            CDELT$n$ keyword.  The value of CRTYPE$n$ is made the label of the
+            CDELT$n$ keyword.  The value of CTYPE$n$ is made the label of the
             axis structure.
          }
 
@@ -20369,7 +20399,7 @@ plot (101k).
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: FITSEDIT, FITSHEAD; Figaro: FITSKEYS.
    }
@@ -20956,7 +20986,7 @@ plot (101k).
       \end{refs}
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: FITSEDIT, FITSEXIST, FITSEXP, FITSHEAD, FITSIMP, FITSLIST,
       FITSVAL, FITSWRITE.
@@ -21042,7 +21072,7 @@ plot (101k).
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: FITSEDIT, FITSEXP, FITSLIST; CONVERT: NDF2FITS.
    }
@@ -21214,7 +21244,7 @@ plot (101k).
       RSMAX), and the co-ordinate system (component COSYS).
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: MAKESURFACE, SURFIT.
    }
@@ -21295,7 +21325,7 @@ plot (101k).
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: FITSEDIT, FITSEXIST, FITSHEAD, FITSLIST, FITSMOD.
    }
@@ -21468,7 +21498,7 @@ plot (101k).
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: FITSEDIT, FITSEXP, FITSMOD.
    }
@@ -21551,7 +21581,7 @@ plot (101k).
       The pixel-index bounds of the NDF are unchanged by this routine.
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: ROTATE, REGRID; Figaro: IREVX, IREVY, IROT90.
    }
@@ -21838,7 +21868,7 @@ plot (101k).
        }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: CONVOLVE, LUCY, MEM2D, WIENER; Figaro: BFFT, CMPLX$\lsk$,
       COSBELL, FFT, $\lsk$2CMPLX.
@@ -21932,7 +21962,7 @@ plot (101k).
       \sstsubsection{
          TITLE = LITERAL (Read)
       }{
-         Value for the title of the output NDF.  A null value will cause
+         The title for the output NDF.  A null value will cause
          the title of the input NDF to be used.  {\tt [!]}
       }
       \sstsubsection{
@@ -22027,7 +22057,7 @@ plot (101k).
       a variance array is present in the input NDF.
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: BLOCK, CONVOLVE, FFCLEAN, MATHS, MEDIAN, PSF; Figaro:
       ICONV3, ISMOOTH, IXSMOOTH, MEDFILT.
@@ -22059,7 +22089,7 @@ plot (101k).
    Clears a graphics device and purges its database entries
 }{
    \sstdescription{
-      This application software resets an SGS graphics device. In effect
+      This application software resets a graphics device. In effect
       the device is cleared.  It purges the graphics-database entries
       for the device.  Optionally, only the current picture is cleared
       and the database unchanged. (Note the clearing of the current
@@ -22100,7 +22130,7 @@ plot (101k).
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: GDSET, GDSTATE.
    }
@@ -22180,7 +22210,7 @@ plot (101k).
       }{
          If TRUE, a detailed description is displayed of the co-ordinate
          Frame in which the picture bounds are reported (see parameter
-         FRAME). {\tt [current value]}
+         FRAME). {\tt [}current value{\tt ]}
       }
       \sstsubsection{
          DEVICE = DEVICE (Read)
@@ -22301,7 +22331,7 @@ plot (101k).
          may be set in order to control the appearance of the formatted axis
          values reported on the screen: Format, Digits, Symbol, Unit. These
          may be suffixed with an axis number (\emph{e.g.} {\tt "}Digits(2){\tt "}) to refer to
-         the values displayed for a specific axis. {\tt [current value]}
+         the values displayed for a specific axis. {\tt [}current value{\tt ]}
       }
       \sstsubsection{
          X1 = LITERAL (Write)
@@ -22394,7 +22424,7 @@ plot (101k).
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: GDSET, GDCLEAR.
    }
@@ -22486,7 +22516,7 @@ plot (101k).
                exceed 200.
 
          }
-         {\tt [current value]}
+         {\tt [}current value{\tt ]}
       }
       \sstsubsection{
          OUT  =  NDF (Write)
@@ -22520,7 +22550,7 @@ plot (101k).
       }{
          Reads pixel positions from the positions list stored in the FITS
          file badpix.FIT, and replaces the corresponding pixels in the
-         2-d NDF m51.sdf by the median of the surrounding neighbouring
+         2-d NDF m51 by the median of the surrounding neighbouring
          pixels. The cleaned image is written to cleaned.sdf.
       }
    }
@@ -22534,7 +22564,7 @@ plot (101k).
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: ARDMASK, CHPIX, FILLBAD, ZAPLIN, NOMAGIC, SEGMENT,
       SETMAGIC; Figaro: CSET, ICSET, NCSET, TIPPEX.
@@ -22623,6 +22653,7 @@ plot (101k).
                              text is preserved in the history unless
                              WRAP=TRUE and there are lines longer than
                              the width of the history records.
+
             {\tt "}Interface{\tt "} ---  The commentary is to be supplied through a
                              parameter.  See parameter COMMENT.
 
@@ -22747,7 +22778,7 @@ plot (101k).
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: HISCOM, HISSET, NDFTRACE.
    }
@@ -22847,7 +22878,7 @@ plot (101k).
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: HISCOM, HISLIST, NDFTRACE.
    }
@@ -23076,7 +23107,7 @@ plot (101k).
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: HISTOGRAM, MSTATS, NDFTRACE, NUMB, STATS;
       Figaro: ISTAT.
@@ -23171,7 +23202,7 @@ plot (101k).
       data array via THRESH, or have a large number of histogram bins.
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: LAPLACE, LUTABLE, LUTEDIT, SHADOW, THRESH; Figaro: HOPT.
    }
@@ -23491,7 +23522,7 @@ scaling limits are used for both images.
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: HISTAT, MSTATS, NUMB, STATS; Figaro: HIST, ISTAT.
    }
@@ -23698,7 +23729,7 @@ plot (6k).
          fields default to zero). {\tt [!]}
       }
       \sstsubsection{
-         RESULT = INTEGER (Write)
+         RESULT = \_INTEGER (Write)
       }{
          If a value is given for the COMPARE parameter, then RESULT is
          set to one of the following values:
@@ -23989,7 +24020,7 @@ plot (6k).
       in the output data array.
    }
    \sstusage{
-      laplace in number out title
+      laplace in [number] out [title]
    }
    \sstparameters{
       \sstsubsection{
@@ -24010,7 +24041,7 @@ plot (6k).
       \sstsubsection{
          TITLE = LITERAL (Read)
       }{
-         Value for the title of the output NDF.  A null value will cause
+         The title for the output NDF.  A null value will cause
          the title of the NDF supplied for parameter IN to be used
          instead. {\tt [!]}
       }
@@ -24024,7 +24055,7 @@ plot (6k).
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: SHADOW, MEDIAN; Figaro: ICONV3.
    }
@@ -24142,7 +24173,7 @@ plot (6k).
       \sstsubsection{
          DEVICE = DEVICE (Read)
       }{
-         The plotting device. {\tt [current graphics device]}
+         The plotting device. {\tt [}current graphics device{\tt ]}
       }
       \sstsubsection{
          ERRBAR = \_LOGICAL (Read)
@@ -24207,7 +24238,7 @@ plot (6k).
          defaulted if a null value (!) is supplied. See section {\tt "}Plotting
          Attributes{\tt "} in SUN/95 for a description of the available
          attributes. Any unrecognised attributes are ignored (no error is
-         reported). {\tt [current value]}
+         reported). {\tt [}current value{\tt ]}
       }
       \sstsubsection{
          LMODE = LITERAL(Read)
@@ -24266,7 +24297,7 @@ plot (6k).
 
          The method name can be abbreviated to a single character, and is
          case insensitive. The initial value is {\tt "}Extended{\tt "}. 
-         {\tt [current value]}
+         {\tt [}current value{\tt ]}
       }
       \sstsubsection{
          MARGIN( 4 ) = \_REAL (Read)
@@ -24278,7 +24309,7 @@ plot (6k).
          the first supplied value. If these margins are too narrow any axis
          annotation may be clipped. If a null (!) value is supplied, the
          value used is 0.15 (for all edges) if either annotated axes or a
-         key are produced, and zero otherwise. {\tt [current value]}
+         key are produced, and zero otherwise. {\tt [}current value{\tt ]}
       }
       \sstsubsection{
          MARKER = \_INTEGER (Read)
@@ -24288,7 +24319,7 @@ plot (6k).
          position should be marked, and should be given as an integer
          PGPLOT marker type. For instance, 0 gives a box, 1 gives a dot,
          2 gives a cross, 3 gives an asterisk, 7 gives a triangle. The
-         value must be larger than or equal to -31. {\tt [current value]}
+         value must be larger than or equal to -31. {\tt [}current value{\tt ]}
       }
       \sstsubsection{
          MODE = LITERAL (Read)
@@ -24322,7 +24353,7 @@ plot (6k).
             length is specified by the axis width of the pixel.
 
          }
-         {\tt [current value]}
+         {\tt [}current value{\tt ]}
       }
       \sstsubsection{
          NDF = NDF (Read)
@@ -24358,7 +24389,7 @@ plot (6k).
          draw them can be controlled using the plotting attributes
          {\tt "}Colour(ErrBars){\tt "}, {\tt "}Width(ErrBars){\tt "} and {\tt "}Style(ErrBars){\tt "} (see
          parameter STYLE). SHAPE is only accessed when parameter ERRBAR
-         is TRUE.  {\tt [current value]}
+         is TRUE.  {\tt [}current value{\tt ]}
       }
       \sstsubsection{
          STYLE = LITERAL (Read)
@@ -24393,7 +24424,7 @@ plot (6k).
          Colour(Markers), Width(Markers), \emph{etc} (the synonym Symbols may be
          used in place of Markers). The appearance of the error symbols is
          controlled using Colour(ErrBars), Width(ErrBars), \emph{etc}, (see
-         parameter SHAPE). {\tt [current value]}
+         parameter SHAPE). {\tt [}current value{\tt ]}
       }
       \sstsubsection{
          USEAXIS = LITERAL (Read)
@@ -24443,7 +24474,7 @@ plot (6k).
       }{
          If horizontal error bars are produced (see parameter ERRBAR), then
          XSIGMA gives the number of standard deviations which the error
-         bars are to represent. {\tt [current value]}
+         bars are to represent. {\tt [}current value{\tt ]}
       }
       \sstsubsection{
          YBOT = LITERAL (Read)
@@ -24468,7 +24499,7 @@ plot (6k).
       }{
          If vertical error bars are produced (see parameter ERRBAR), then
          YSIGMA gives the number of standard deviations which the error
-         bars are to represent. {\tt [current value]}
+         bars are to represent. {\tt [}current value{\tt ]}
       }
       \sstsubsection{
          YTOP = LITERAL (Read)
@@ -24582,10 +24613,9 @@ plot (6k).
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
-      KAPPA: PROFILE, MLINPLOT; Figaro: ESPLOT, IPLOTS, MSPLOT, SPLOT;
-      SPECDRE: SPECGRID.
+      KAPPA: PROFILE, MLINPLOT; Figaro: ESPLOT, IPLOTS, SPECGRID, MSPLOT, SPLOT.
    }
    \sstimplementationstatus{
       \sstitemlist{
@@ -24617,8 +24647,8 @@ plot (6k).
       co-ordinate Frames in which the positions are defined. Integer
       position identifiers which allow positions to be distinguished are
       also stored in the catalogue. The catalogue may be manipulated
-      using the CURSA package (SUN/190), and is stored in either FITS
-      binary format or the {\tt "}Small Text List{\tt "} (STL) format defined by CURSA.
+      using the CURSA package (\xref{SUN/190}{sun190}{}), and is stored in either FITS
+      binary format or the {\tt "}Small Text List{\tt "} (\STLref) format defined by CURSA.
 
       If an NDF is specified using parameter NDF, then the positions should
       be given in the current co-ordinate Frame of the NDF. Information
@@ -24659,7 +24689,7 @@ plot (6k).
          value is supplied for parameter NDF.
       }
       \sstsubsection{
-         EPOCH = DOUBLE PRECISION (Read)
+         EPOCH = \_DOUBLE (Read)
       }{
          If an IRAS90 Sky Co-ordinate System specification is supplied
          (using parameter DOMAIN) for a celestial co-ordinate system,
@@ -24682,7 +24712,7 @@ plot (6k).
       }{
          Specifies the co-ordinate Frame of the positions supplied using parameter
          POSITION or FILE. If an IRAS90 Sky Co-ordinate System (SCS) string
-         such as EQUAT(J2000) is supplied (see SUN/163), then the positions
+         such as EQUAT(J2000) is supplied (see \xref{SUN/163}{sun163}{}), then the positions
          are assumed to be 2-dimensional celestial co-ordinates in the
          specified system. Otherwise, the given string is used as a Domain
          name without
@@ -24781,7 +24811,7 @@ plot (6k).
          positions, together with a description of a single FK4 equatorial
          RA/DEC co-ordinate Frame (referenced to the B1950 equinox). The
          catalogue is stored in a text file using the CAT {\tt "}Small Text List{\tt "}
-         format ({\tt "}STL{\tt "} - see SUN/190). The positions were determined at epoch
+         format ({\tt "}STL{\tt "} - see \xref{SUN/190}{sun190}{}). The positions were determined at epoch
          B1962.3. The epoch of observation is required since the underlying
          model on which the FK4 system is based is non-inertial and rotates
          slowly with time, introducing fictitious proper motions. The
@@ -24855,7 +24885,7 @@ plot (6k).
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: CURSOR, LISTSHOW; CURSA: XCATVIEW, CATSELECT.
    }
@@ -24909,7 +24939,7 @@ plot (6k).
          Frame used to specify positions within the input catalogue. {\tt [!]}
       }
       \sstsubsection{
-         CATEPOCH = DOUBLE PRECISION (Read)
+         CATEPOCH = \_DOUBLE (Read)
       }{
          The epoch at which the sky positions stored in the output
          catalogue were determined. It will only be accessed if an epoch
@@ -24946,7 +24976,7 @@ plot (6k).
          POSNS.
       }
       \sstsubsection{
-         EPOCH = DOUBLE PRECISION (Read)
+         EPOCH = \_DOUBLE (Read)
       }{
          If an IRAS90 Sky Co-ordinate System specification is supplied
          (using parameter FRAME) for a celestial co-ordinate system,
@@ -24957,7 +24987,7 @@ plot (6k).
          epoch if less than 1984.0 and as a Julian epoch otherwise.
       }
       \sstsubsection{
-         FIRST = INTEGER (Read)
+         FIRST = \_INTEGER (Read)
       }{
          The identifier for the first position to be displayed. Positions
          are only displayed which have identifiers in the range given by
@@ -24982,7 +25012,7 @@ plot (6k).
 
             \sstitem
             An IRAS90 Sky Co-ordinate System (SCS) values such as
-            EQUAT(J2000) (see SUN/163).
+            EQUAT(J2000) (see \xref{SUN/163}{sun163}{}).
 
          }
          If a null value (!) is supplied, positions are reported in the
@@ -25037,7 +25067,7 @@ plot (6k).
          These attributes may be specified using parameter STYLE. {\tt [FALSE]}
       }
       \sstsubsection{
-         LAST = INTEGER (Read)
+         LAST = \_INTEGER (Read)
       }{
          The identifier for the last position to be displayed. Positions
          are only displayed which have identifiers in the range given by
@@ -25055,14 +25085,14 @@ plot (6k).
          no file is created.  {\tt [!]}
       }
       \sstsubsection{
-         MARKER = INTEGER (Read)
+         MARKER = \_INTEGER (Read)
       }{
          This parameter is only accessed if parameter PLOT is set to
          {\tt "}Chain{\tt "} or {\tt "}Mark{\tt "}. It specifies the type of marker with which each
          position should be marked, and should be given as an integer
          PGPLOT marker type. For instance, 0 gives a box, 1 gives a dot,
          2 gives a cross, 3 gives an asterisk, 7 gives a triangle. The
-         value must be larger than or equal to -31. {\tt [current value]}
+         value must be larger than or equal to -31. {\tt [}current value{\tt ]}
       }
       \sstsubsection{
          NAME = LITERAL (Read)
@@ -25070,7 +25100,7 @@ plot (6k).
          Determines the graphics database picture with which the supplied
          positions are to be aligned. Only accessed if parameter PLOT
          indicates that some graphics are to be produced. A search is made
-         for the most recent picture with the specified name (eg DATA,
+         for the most recent picture with the specified name (e.g. DATA,
          FRAME or KEY) within the current picture. If no such picture can
          be found, or if a null value is supplied, the current picture itself
          is used. The name BASE can also be supplied as a special case, which
@@ -25227,8 +25257,8 @@ plot (6k).
          the graphics (Colour, Font, \emph{etc}), the following attributes may
          be set in order to control the appearance of the formatted axis
          values reported on the screen: Format, Digits, Symbol, Unit. These
-         may be suffixed with an axis number (eg {\tt "}Digits(2){\tt "}) to refer to
-         the values displayed for a specific axis. {\tt [current value]}
+         may be suffixed with an axis number (e.g. {\tt "}Digits(2){\tt "}) to refer to
+         the values displayed for a specific axis. {\tt [}current value{\tt ]}
       }
    }
    \sstexamples{
@@ -25288,7 +25318,7 @@ plot (6k).
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: CURSOR, LISTMAKE; CURSA: XCATVIEW, CATSELECT.
    }
@@ -25321,7 +25351,7 @@ plot (6k).
       \sstsubsection{
          TITLE = LITERAL (Read)
       }{
-         Value for the title of the output NDF.  A null value will cause
+         The title for the output NDF.  A null value will cause
          the title of the NDF supplied for parameter IN to be used
          instead. {\tt [!]}
       }
@@ -25343,7 +25373,7 @@ plot (6k).
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: LOGAR, LOGE, EXP10, EXPE, EXPON, POW; Figaro: IALOG, ILOG,
       IPOWER.
@@ -25398,7 +25428,7 @@ plot (6k).
       \sstsubsection{
          TITLE = LITERAL (Read)
       }{
-         Value for the title of the output NDF.  A null value will cause
+         The title for the output NDF.  A null value will cause
          the title of the NDF supplied for parameter IN to be used
          instead. {\tt [!]}
       }
@@ -25420,7 +25450,7 @@ plot (6k).
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: LOG10, LOGE, EXP10, EXPE, EXPON, POW; Figaro: IALOG, ILOG,
       IPOWER.
@@ -25470,7 +25500,7 @@ plot (6k).
       \sstsubsection{
          TITLE = LITERAL (Read)
       }{
-         Value for the title of the output NDF.  A null value will cause
+         The title for the output NDF.  A null value will cause
          the title of the NDF supplied for parameter IN to be used
          instead. {\tt [!]}
       }
@@ -25492,7 +25522,7 @@ plot (6k).
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: LOG10, LOGAR, EXP10, EXPE, EXPON, POW; Figaro: IALOG, ILOG,
       IPOWER.
@@ -25602,13 +25632,13 @@ plot (6k).
             {\tt "}clist{\tt "} -- Each row of textual output consists of an X pixel
             index, followed by a Y pixel index, followed by the pixel data
             value. No headers or blank lines are included. The pixels are
-            listed in {\tt "}fortran order{\tt "} - the lower left pixel first, and the
+            listed in {\tt "}Fortran order{\tt "} - the lower left pixel first, and the
             upper right pixel last.
 
             \sstitem
             {\tt "}vlist{\tt "} -- Each row of textual output consists of just the
             pixel data value. No headers or blank lines are included. The
-            pixels are listed in {\tt "}fortran order{\tt "} - the lower left pixel first,
+            pixels are listed in {\tt "}Fortran order{\tt "} - the lower left pixel first,
             and the upper right pixel last.
 
             \sstitem
@@ -25719,7 +25749,7 @@ plot (6k).
          reported).
 
          Data values are formatted using attributes Format(1) and Digits(1).
-         {\tt [current value]}
+         {\tt [}current value{\tt ]}
       }
       \sstsubsection{
          UBOUND = LITERAL (Read)
@@ -25755,7 +25785,7 @@ plot (6k).
    }
    \sstexamples{
       \sstexamplesubsection{
-         look ngc6872 {\tt "}1:27:23 -22:41:12{\tt "} quiet logfile=log
+         look ngc6872 {\tt "}1:27:23 {\tt -}22:41:12{\tt "} quiet logfile=log
       }{
          Lists a 7x7 block of pixel values centred on RA/DEC 1:27:23,
          \sstitemlist{
@@ -25819,9 +25849,9 @@ plot (6k).
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
-      KAPPA: TRANDAT, ARDGEN, ARDMASK, ARDPLOT.
+      KAPPA: ARDGEN, ARDMASK, ARDPLOT, TRANDAT.
    }
    \sstimplementationstatus{
       \sstitemlist{
@@ -26151,7 +26181,7 @@ plot (6k).
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: FOURIER, MEM2D, WIENER.
    }
@@ -26358,7 +26388,7 @@ plot (6k).
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: LUTEDIT, LUTREAD, LUTSAVE, LUTVIEW; Figaro: COLOUR.
    }
@@ -26494,7 +26524,7 @@ plot (6k).
 \sstroutine{
    LUTEDIT
 }{
-   Create or edit an graphics device colour lookup table
+   Creates or edits an graphics device colour lookup table
 }{
    \sstdescription{
       This application allows a lookup table to be created or edited
@@ -26542,7 +26572,7 @@ plot (6k).
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: LUTABLE, LUTREAD, LUTSAVE, LUTVIEW, PALREAD, PALSAVE;
       Figaro: COLOUR.
@@ -26832,7 +26862,7 @@ plot (6k).
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: LUTEDIT, LUTABLE, LUTREAD.
    }
@@ -26898,7 +26928,7 @@ plot (6k).
       the STYLE parameter.
    }
    \sstusage{
-      lutview [mode] [low] [high] [curpic] [device]
+      lutview [mode] [low] [high] [curpic] [device] lbound=? ubound=?
    }
    \sstparameters{
       \sstsubsection{
@@ -27098,7 +27128,7 @@ plot (6k).
          To get a linear population axis, specify {\tt "}logpop=0{\tt "} (the default).
          To annotate the long axis with pen numbers instead of pixel value,
          specify {\tt "}pennums=1{\tt "} (the default, {\tt "}pennums=0{\tt "}, shows pixel
-         values). {\tt [current value]}
+         values). {\tt [}current value{\tt ]}
       }
       \sstsubsection{
          UBOUND = LITERAL (Read)
@@ -27180,7 +27210,7 @@ plot (6k).
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: DISPLAY, LUTABLE, LUTEDIT ; Figaro: COLOUR.
    }
@@ -27385,7 +27415,7 @@ plot (6k).
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: FITSURFACE, SURFIT.
    }
@@ -27543,7 +27573,7 @@ plot (6k).
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: COLLAPSE, PERMAXES.
    }
@@ -27702,7 +27732,7 @@ plot (6k).
       \sstsubsection{
          TITLE = LITERAL (Read)
       }{
-         Value for the title of the output NDF.  A null value will cause
+         The title for the output NDF.  A null value will cause
          the title of the (alphabetically) first input NDF to be used
          instead. {\tt [!]}
       }
@@ -27936,7 +27966,7 @@ plot (6k).
       approximate factor ($2N+$1).
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: CREFRAME, SETAXIS, and numerous arithmetic tasks; Figaro:
       numerous arithmetic tasks.
@@ -28001,7 +28031,7 @@ plot (6k).
       pixel is bad.
    }
    \sstusage{
-      median in out [mode] [diff] [bound] [numit] corner side centre
+      median in out [mode] [diff] [bound] [numit] [corner] [side] [centre]
    }
    \sstparameters{
       \sstsubsection{
@@ -28191,7 +28221,7 @@ plot (6k).
       \sstsubsection{
          TITLE = LITERAL (Read)
       }{
-         Value for the title of the output NDF.  A null value will cause
+         The title for the output NDF.  A null value will cause
          the title of the NDF supplied for parameter IN to be used
          instead. {\tt [!]}
       }
@@ -28280,10 +28310,10 @@ plot (6k).
       stepsize-minus-one zeros.
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
-      KAPPA: BLOCK, CONVOLVE, FFCLEAN, GAUSMOOTH; Figaro: ICONV3, \linebreak
-      ISMOOTH, IXSMOOTH, MEDFILT.
+      KAPPA: BLOCK, CONVOLVE, FFCLEAN, GAUSMOOTH;  ESP: FASTMED; \linebreak
+      Figaro: ICONV3, ISMOOTH, IXSMOOTH, MEDFILT.
    }
    \sstimplementationstatus{
       \sstitemlist{
@@ -28714,7 +28744,7 @@ plot (6k).
       same length of time as a single deconvolution iteration.
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: FOURIER, LUCY, WIENER.
    }
@@ -28829,7 +28859,7 @@ plot (6k).
       \sstsubsection{
          DEVICE = DEVICE (Read)
       }{
-         The plotting device. {\tt [current graphics device]}
+         The plotting device. {\tt [}current graphics device{\tt ]}
       }
       \sstsubsection{
          ERRBAR = \_LOGICAL (Read)
@@ -28870,7 +28900,7 @@ plot (6k).
          is not given, the top of the key is placed level with the top of the
          contour map. Both values should be in the range 0.0 to 1.0. If a
          key is produced, then the right hand margin specified by parameter
-         MARGIN is ignored. {\tt [current value]}
+         MARGIN is ignored. {\tt [}current value{\tt ]}
       }
       \sstsubsection{
          KEYSTYLE = GROUP (Read)
@@ -28908,7 +28938,7 @@ plot (6k).
          attributes Colour(NumLab), Font(NumLab), \emph{etc} (the synonym Offset
          can be used in place of NumLab). Offset values are formatted
          using attributes Format(2), \emph{etc} (the synonym Offset can be used in
-         place of the value 2). {\tt [current value]}
+         place of the value 2). {\tt [}current value{\tt ]}
       }
       \sstsubsection{
          LABELS = LITERAL (Read)
@@ -28970,7 +29000,7 @@ plot (6k).
          given, in the order; bottom, right, top, left. If fewer than four
          values are given, extra values are used equal to the first supplied
          value. If these margins are too narrow any axis annotation may be
-         clipped. See also parameter KEYPOS. {\tt [current value]}
+         clipped. See also parameter KEYPOS. {\tt [}current value{\tt ]}
       }
       \sstsubsection{
          MARKER = \_INTEGER (Read)
@@ -28980,7 +29010,7 @@ plot (6k).
          position should be marked, and should be given as an integer
          PGPLOT marker type. For instance, 0 gives a box, 1 gives a dot,
          2 gives a cross, 3 gives an asterisk, 7 gives a triangle. The
-         value must be larger than or equal to -31. {\tt [current value]}
+         value must be larger than or equal to -31. {\tt [}current value{\tt ]}
       }
       \sstsubsection{
          MODE = LITERAL (Read)
@@ -29010,7 +29040,7 @@ plot (6k).
             {\tt "}Chain{\tt "} -- A combination of {\tt "}Line{\tt "} and {\tt "}Mark{\tt "}.
 
          }
-         {\tt [current value]}
+         {\tt [}current value{\tt ]}
       }
       \sstsubsection{
          NDF = NDF (Read)
@@ -29045,7 +29075,7 @@ plot (6k).
       }{
          If vertical error bars are produced (see parameter ERRBAR), then
          SIGMA gives the number of standard deviations which the error
-         bars are to represent. {\tt [current value]}
+         bars are to represent. {\tt [}current value{\tt ]}
       }
       \sstsubsection{
          SPACE = LITERAL (Read)
@@ -29127,7 +29157,7 @@ plot (6k).
          parameter ZMARK). LabPos without any qualifier is equivalent to
          LabPos(Left). LabPos values are floating point, with 0.0 meaning
          the left edge of the plotting area, and 1.0 the right edge. Values
-         outside the range 0 to 1 may be used. {\tt [current value]}
+         outside the range 0 to 1 may be used. {\tt [}current value{\tt ]}
       }
       \sstsubsection{
          USEAXIS = LITERAL (Read)
@@ -29280,7 +29310,7 @@ plot (6k).
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: LINPLOT; Figaro: ESPLOT, IPLOTS, MSPLOT, SPLOT, SPECGRID.
    }
@@ -29525,7 +29555,7 @@ plot (9k).
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       CCDPACK: MAKEMOS, MAKECAL, MAKEFLAT.
    }
@@ -29561,7 +29591,7 @@ plot (9k).
       \sstsubsection{
          TITLE = LITERAL (Read)
       }{
-         Value for the title of the output NDF.  A null value will cause
+         The title for the output NDF.  A null value will cause
          the title of the NDF supplied for parameter IN1 to be used
          instead. {\tt [!]}
       }
@@ -29586,7 +29616,7 @@ plot (9k).
       will result if they have no pixels in common.
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: ADD, CADD, CDIV, CMULT, CSUB, DIV, MATHS, SUB.
    }
@@ -29810,7 +29840,7 @@ plot (9k).
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: SETBOUND; Figaro: ISUBSET.
    }
@@ -30148,7 +30178,7 @@ plot (9k).
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: FITSLIST, WCSFRAME; HDSTRACE.
    }
@@ -30205,7 +30235,7 @@ plot (9k).
       required.
    }
    \sstusage{
-      nomagic in out repval sigma [comp]
+      nomagic in out repval [sigma] [comp]
    }
    \sstparameters{
       \sstsubsection{
@@ -30308,9 +30338,9 @@ plot (9k).
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
-      KAPPA: CHPIX, FILLBAD, GLITCH, SEGMENT, SETMAGIC, SUBSTITUTE,
+      KAPPA: CHPIX, FILLBAD, GLITCH, SEGMENT, SETMAGIC, SUBSTITUTE, \linebreak
       ZAPLIN; FIGARO: GOODVAR.
    }
    \sstimplementationstatus{
@@ -30430,7 +30460,7 @@ plot (9k).
          the first supplied value. If these margins are too narrow any axis
          annotation may be clipped. If a null (!) value is supplied, the
          value used is 0.15 (for all edges) if annotated axes are produced, 
-         and zero otherwise. {\tt [current value]}
+         and zero otherwise. {\tt [}current value{\tt ]}
       }
       \sstsubsection{
          MARKER = \_INTEGER (Read)
@@ -30439,7 +30469,7 @@ plot (9k).
          the plot. It should be given as an integer PGPLOT marker type. For
          instance, 0 gives a box, 1 gives a dot, 2 gives a cross, 3 gives
          an asterisk, 7 gives a triangle. The value must be larger than or
-         equal to -31. {\tt [current value]}
+         equal to -31. {\tt [}current value{\tt ]}
       }
       \sstsubsection{
          MINPIX = \_INTEGER (Read)
@@ -30535,12 +30565,12 @@ plot (9k).
          error bars is controlled using Colour(ErrBars), Width(ErrBars),
          \emph{etc}. Note, Size(ErrBars) controls the length of the serifs (\emph{i.e.}
          the cross pieces at each end of the error bar), and defaults to
-         1.0. {\tt [current value]}
+         1.0. {\tt [}current value{\tt ]}
       }
       \sstsubsection{
          TITLE = LITERAL (Read)
       }{
-         Value for the title of the output NDF.  A null value will cause
+         The title for the output NDF.  A null value will cause
          the title of the NDF supplied for parameter IN1 to be used
          instead. {\tt [!]}
       }
@@ -30642,7 +30672,7 @@ plot (9k).
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       CCDPACK: MAKEMOS.
    }
@@ -30815,7 +30845,7 @@ plot (9k).
       clear=no}.
    }
    \sstusage{
-      outline 
+      outline ndf
    }
    \sstparameters{
       \sstsubsection{
@@ -30829,7 +30859,7 @@ plot (9k).
       \sstsubsection{
          DEVICE = DEVICE (Read)
       }{
-         The plotting device. {\tt [current graphics device]}
+         The plotting device. {\tt [}current graphics device{\tt ]}
       }
       \sstsubsection{
          LABOUT = \_LOGICAL (Read)
@@ -30844,7 +30874,7 @@ plot (9k).
          bottom left pixel to the baseline of the label. If a null (!) 
          value is given, no label is produced. The appearance of the label 
          can be set by using the STYLE parameter
-         (for instance {\tt "}Size(strings)=2{\tt "}). {\tt [current value]}
+         (for instance {\tt "}Size(strings)=2{\tt "}). {\tt [}current value{\tt ]}
       }
       \sstsubsection{
          MARGIN( 4 ) = \_REAL (Read)
@@ -30858,7 +30888,7 @@ plot (9k).
          used equal to the first supplied value. If these margins are too
          narrow any axis annotation may be clipped. If a null (!) value is
          supplied, the value used is 0.15 (for all edges) if annotated axes
-         are being produced, and zero otherwise. {\tt [current value]}
+         are being produced, and zero otherwise. {\tt [}current value{\tt ]}
       }
       \sstsubsection{
          NDF = NDF (Read)
@@ -30893,13 +30923,13 @@ plot (9k).
          reported).
 
          The appearance of the outline is controlled by the attributes
-         Colour(Curves), Width(Curves), \emph{etc}. {\tt [current value]}
+         Colour(Curves), Width(Curves), \emph{etc}. {\tt [}current value{\tt ]}
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
-      KAPPA: WCSFRAME, CONTOUR, PICDEF.
+      KAPPA: WCSFRAME, CONTOUR, PICDEF; CCDPACK: DRAWNDF.
    }
 }
 \sstroutine{
@@ -30996,7 +31026,7 @@ plot (9k).
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: ARDMASK.
    }
@@ -31074,7 +31104,7 @@ plot (9k).
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: PALENTRY, PALREAD, PALSAVE.
    }
@@ -31160,7 +31190,7 @@ plot (9k).
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: PALDEF, PALREAD, PALSAVE.
    }
@@ -31228,7 +31258,7 @@ plot (9k).
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: PALDEF, PALENTRY, PALSAVE.
    }
@@ -31287,7 +31317,7 @@ plot (9k).
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: PALDEF, PALENTRY, PALREAD.
    }
@@ -31566,7 +31596,7 @@ plot (9k).
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: ROTATE, FLIP; Figaro: IREVX, IREVY, IROT90.
    }
@@ -31624,7 +31654,7 @@ plot (9k).
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: PICCUR, PICDATA, PICFRAME, PICLAST, PICLIST, PICSEL.
    }
@@ -31695,7 +31725,7 @@ plot (9k).
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: CURSOR, PICBASE, PICDATA, PICEMPTY, PICENTIRE, PICFRAME,
       PICLIST, PICSEL, PICVIS.
@@ -31737,7 +31767,7 @@ plot (9k).
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: PICCUR, PICBASE, PICFRAME, PICLAST, PICLIST, PICSEL.
    }
@@ -32002,7 +32032,7 @@ plot (9k).
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: PICBASE, PICCUR, PICDATA, PICFRAME, PICGRID, PICLABEL,
              PICLIST, PICSEL, PICXY.
@@ -32054,7 +32084,7 @@ plot (9k).
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: PICENTIRE, PICGRID, PICLAST, PICLIST, PICSEL, PICVIS.
    }
@@ -32121,7 +32151,7 @@ plot (9k).
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: PICEMPTY, PICGRID, PICLAST, PICLIST, PICSEL, PICVIS.
    }
@@ -32172,7 +32202,7 @@ plot (9k).
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: PICBASE, PICCUR, PICDATA, PICLAST, PICLIST, PICSEL.
    }
@@ -32285,7 +32315,7 @@ plot (9k).
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: PICCUR, PICDEF, PICGRID, PICSEL.
    }
@@ -32471,7 +32501,7 @@ plot (9k).
       accessed.
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: GDSTATE, PICDEF, PICLIST, PICTRANS, PICXY.
    }
@@ -32512,9 +32542,9 @@ plot (9k).
          have a label of {\tt "GALAXY"}.
       }
       \sstexamplesubsection{
-         piclabel A3 ikon
+         piclabel A3 x2w
       }{
-         This labels the current Ikon picture {\tt "A3"}.
+         This labels the current picture on the x2w device {\tt "A3"}.
       }
    }
    \sstnotes{
@@ -32522,7 +32552,7 @@ plot (9k).
       clashes with an existing one, then the existing label is deleted.
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: PICDEF, PICLIST, PICSEL.
    }
@@ -32563,7 +32593,7 @@ plot (9k).
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: PICBASE, PICCUR, PICDATA, PICFRAME, PICLIST, PICSEL.
    }
@@ -32664,7 +32694,7 @@ plot (9k).
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: PICBASE, PICDATA, PICEMPTY, PICENTIRE, PICFRAME, PICIN,
       PICLAST, PICSEL, PICVIS.
@@ -32726,7 +32756,7 @@ plot (9k).
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: PICDATA, PICDEF, PICEMPTY, PICENTIRE, PICFRAME, PICLABEL,
       PICLAST, PICVIS.
@@ -32911,7 +32941,7 @@ plot (9k).
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: GDSTATE, PICIN, PICXY.
    }
@@ -32965,7 +32995,7 @@ plot (9k).
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: PICEMPTY, PICENTIRE, PICGRID, PICLAST, PICLIST, PICSEL.
    }
@@ -33048,7 +33078,7 @@ plot (9k).
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: PICCUR, PICDEF, PICGRID, PICSEL.
    }
@@ -33122,7 +33152,7 @@ plot (9k).
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: COMPADD, COMPAVE, COMPICK.
    }
@@ -33193,7 +33223,7 @@ plot (9k).
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: ADD, CADD, CMULT, CDIV, CSUB, DIV, MATHS, MULT, SUB.
    }
@@ -33254,7 +33284,7 @@ plot (9k).
 
             \sstitem
             An IRAS90 Sky Co-ordinate System (SCS) values such as
-            EQUAT(J2000) (see SUN/163).
+            EQUAT(J2000) (see \xref{SUN/163}{sun163}{}).
 
          }
          If a null (!) value is supplied, the positions will be stored
@@ -33265,7 +33295,7 @@ plot (9k).
          WCS information. {\tt [!]}
       }
       \sstsubsection{
-         CATEPOCH = DOUBLE PRECISION (Read)
+         CATEPOCH = \_DOUBLE (Read)
       }{
          The epoch at which the sky positions stored in the output
          catalogue were determined. It will only be accessed if an epoch
@@ -33349,7 +33379,7 @@ plot (9k).
          {\tt [Curve]}
       }
       \sstsubsection{
-         NSAMP = INTEGER (Read)
+         NSAMP = \_INTEGER (Read)
       }{
          The number of samples required along the length of the profile.
          The first sample is at the first supplied vertex, and the last
@@ -33393,7 +33423,7 @@ plot (9k).
       \sstexamplesubsection{
          profile my\_data prof {\tt "}0 0{\tt "} {\tt "}100 100{\tt "} 40 outcat=samps
       }{
-         Create a 1-dimensional NDF called prof, holding a profile of the
+         Creates a 1-dimensional NDF called prof, holding a profile of the
          data values in the input NDF my\_data along a profile starting at
          pixel co-ordinates [0.0,0.0] and ending at pixle co-ordinates
          [100.0,100.0]. The profile consists of 40 samples spread evenly
@@ -33451,7 +33481,7 @@ plot (9k).
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: LINPLOT, CURSOR, LISTMAKE, LISTSHOW; CURSA: XCATVIEW.
    }
@@ -33482,7 +33512,7 @@ plot (9k).
       photometry, to evaluate correction terms to aperture
       photometry, or for filtering.
 
-      The model has a radial profile:
+      The model has a Sersic radial profile:
       {\Large
       \[   D =  A \exp^{-0.5\,(r/\sigma)^{\gamma}} \]
       }where $r$ is calculated from the true radial distance from the star
@@ -33570,7 +33600,7 @@ plot (9k).
          The graphics workstation on which to produce a plot of the
          mean radial profile of the stars and the fitted function.  A
          null ({\tt !}) name indicates that no plot is required.
-         {\tt [current graphics device]}
+         {\tt [}current graphics device{\tt ]}
       }
       \sstsubsection{
          FWHM = \_REAL (Write)
@@ -33633,13 +33663,13 @@ plot (9k).
          the first supplied value. If these margins are too narrow any axis
          annotation may be clipped. If a null ({\tt !}) value is supplied, the
          value used is 0.15 (for all edges) if either annotated axes or a
-         key are produced, and zero otherwise. {\tt [current value]}
+         key are produced, and zero otherwise. {\tt [}current value{\tt ]}
       }
       \sstsubsection{
-         MARKER = INTEGER (Read)
+         MARKER = \_INTEGER (Read)
       }{
          The PGPLOT marker type to use for the data values in the plot.
-         {\tt [current value]}
+         {\tt [}current value{\tt ]}
       }
       \sstsubsection{
          MINOR = \_LOGICAL (Read)
@@ -33741,7 +33771,7 @@ plot (9k).
          in place of Curves). The appearance of the markers representing
          the real data is controlled by Colour(Markers), Width(Markers),
          \emph{etc}. (the synonym Symbols may be used in place of Markers).
-         {\tt [current value]}
+         {\tt [}current value{\tt ]}
       }
       \sstsubsection{
          TITLE = LITERAL (Read)
@@ -33889,7 +33919,7 @@ plot (9k).
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       PHOTOM; Starman.
    }
@@ -33968,7 +33998,7 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: REMQUAL, SETQUAL, SHOWQUAL.
    }
@@ -34100,7 +34130,7 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
          require additional parameters to be supplied via the PARAMS
          parameter.  A more detailed discussion of these schemes is
          given in the {\tt "}Sub-Pixel Interpolation Schemes{\tt "} section below.
-         {\tt [current value]}
+         {\tt [}current value{\tt ]}
       }
       \sstsubsection{
          OUT = NDF (Write)
@@ -34426,7 +34456,7 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: FLIP, ROTATE, SLIDE, WCSADD, WCSALIGN.
       CCDPACK: TRANLIST, TRANNDF, WCSEDIT.
@@ -34459,7 +34489,7 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
 \sstroutine{
    REMQUAL
 }{
-   Remove specified quality definitions from an NDF
+   Removes specified quality definitions from an NDF
 }{
    \sstdescription{
       This routine removes selected quality name definitions from an
@@ -34493,7 +34523,7 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: QUALTOBAD, SHOWQUAL, SETQUAL.
    }
@@ -34579,7 +34609,7 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: CHAIN, PASTE, RESHAPE.
    }
@@ -34646,7 +34676,7 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
       \sstsubsection{
          TITLE = LITERAL (Read)
       }{
-         Value for the title of the output NDF.  A null value will cause
+         The title for the output NDF.  A null value will cause
          the title of the NDF supplied for parameter IN to be used
          instead. {\tt [!]}
       }
@@ -34682,7 +34712,7 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
       paste the result back into the full array.
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: CADD, CHPIX, GLITCH, PASTE, SEGMENT, ZAPLIN; Figaro: CSET,
       ICSET, NCSET, TIPPEX.
@@ -34853,7 +34883,7 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: FLIP, RESAMPLE; Figaro: IREVX, IREVY, IROT90.
    }
@@ -34915,7 +34945,7 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
       also reduces the noise in the data.
    }
    \sstusage{
-      scatter in1 in2 comp1 comp2 device
+      scatter in1 in2 [comp1] [comp2] [device]
    }
    \sstparameters{
       \sstsubsection{
@@ -34997,7 +35027,7 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
          the first supplied value. If these margins are too narrow any axis
          annotation may be clipped. If a null (!) value is supplied, the
          value used is 0.15 (for all edges) if annotated axes are produced, 
-         and zero otherwise. {\tt [current value]}
+         and zero otherwise. {\tt [}current value{\tt ]}
       }
       \sstsubsection{
          MARKER = \_INTEGER (Read)
@@ -35006,7 +35036,7 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
          the plot. It should be given as an integer PGPLOT marker type. For
          instance, 0 gives a box, 1 gives a dot, 2 gives a cross, 3 gives
          an asterisk, 7 gives a triangle. The value must be larger than or
-         equal to -31. {\tt [current value]}
+         equal to -31. {\tt [}current value{\tt ]}
       }
       \sstsubsection{
          PERC1( 2 ) = \_REAL (Read)
@@ -35015,7 +35045,7 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
          XRIGHT. For example, {\tt [5,95]} would result in the lowest and
          highest 5\% of the data value in IN1 being excluded from the plot
          if the default values are accepted for XLEFT and XRIGHT.
-         {\tt [current value]}
+         {\tt [}current value{\tt ]}
       }
       \sstsubsection{
          PERC2( 2 ) = \_REAL (Read)
@@ -35024,7 +35054,7 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
          YTOP. For example, {\tt [5,95]} would result in the lowest and
          highest 5\% of the data value in IN2 being excluded from the plot
          if the default values are accepted for YBOT and YTOP.
-         {\tt [current value]}
+         {\tt [}current value{\tt ]}
       }
       \sstsubsection{
          STYLE = LITERAL (Read)
@@ -35054,7 +35084,7 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
 
          The appearance of markers is controlled by Colour(Markers),
          Width(Markers), \emph{etc} (the synonym Symbols may be used in place
-         of Markers). {\tt [current value]}
+         of Markers). {\tt [}current value{\tt ]}
       }
       \sstsubsection{
          XLEFT = \_REAL (Read)
@@ -35120,7 +35150,7 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA:NORMALIZE.
    }
@@ -35235,7 +35265,7 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
          no file is created. {\tt [!]}
       }
       \sstsubsection{
-         MARKER = INTEGER (Read)
+         MARKER = \_INTEGER (Read)
       }{
          This parameter is only accessed if parameter PLOT is set to
          {\tt "}Chain{\tt "} or {\tt "}Mark{\tt "}. It specifies the type of marker with which
@@ -35243,7 +35273,7 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
          an integer PGPLOT marker type. For instance, 0 gives a box, 1
          gives a dot, 2 gives a cross, 3 gives an asterisk, 7 gives a
          triangle. The value must be larger than or equal to -31.
-         {\tt [current value]}
+         {\tt [}current value{\tt ]}
       }
       \sstsubsection{
          MODE = LITERAL (Read)
@@ -35284,7 +35314,7 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
             separated by white space or a comma.
 
          }
-         {\tt [current value]}
+         {\tt [}current value{\tt ]}
       }
       \sstsubsection{
          MAXPOLY = \_INTEGER (Read)
@@ -35348,7 +35378,7 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
             {\tt "}Chain{\tt "} -- This is a combination of {\tt "}Mark{\tt "} and {\tt "}Poly{\tt "}. Each
             position is marked by a marker and joined by a line to the
             previous position. Parameter MARKER is used to specify the marker
-            to use. {\tt [current value]}
+            to use. {\tt [}current value{\tt ]}
          }
       }
       \sstsubsection{
@@ -35413,7 +35443,7 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
          (either of the synonyms Lines and Edges may be used in place of
          Curves). The appearance of the vertex markers is controlled by the
          attributes Colour(Markers), Size(Markers), \emph{etc} (the synonyms
-         Vertices may be used in place of Markers).  {\tt [current value]}
+         Vertices may be used in place of Markers).  {\tt [}current value{\tt ]}
       }
       \sstsubsection{
          USEAXIS = GROUP (Read)
@@ -35488,7 +35518,7 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: ARDMASK, ERRCLIP, FILLBAD, FFCLEAN, PASTE, SETMAGIC,
       THRESH.
@@ -35775,20 +35805,19 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
       is an example file, though a more regular format would be clearer
       for the human reader (say 10 values per line with commenting).
 
-          \# Axis Centres along second dimension
-      \sstitemlist{
+      {\tt \begin{verse}
+      \# Axis Centres along second dimension \\
+      -3.4 -0.81 \\
+      .1 3.3 4.52 5.6 9 10.5 12.  15.3   18.1  20.2 \\
+      23 25.3 ! a comment \\
+      26.8,27.5 29. 30.76  32.1 32.4567 \\
+       35.2 37. \\
+      <EOF> \\
+      \end{verse}}
 
-         \sstitem
-             3.4 -0.81
-             .1 3.3 4.52 5.6 9 10.5 12.  15.3   18.1  20.2
-             23 25.3 ! a comment
-             26.8,27.5 29. 30.76  32.1 32.4567
-              35.2 37.
-             $<$EOF$>$
-      }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: AXCONV, AXLABEL, AXUNITS; Figaro: LXSET, LYSET.
    }
@@ -35956,7 +35985,7 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
       erasing the quality component.
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: NOMAGIC, SETMAGIC.
    }
@@ -36075,7 +36104,7 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
       issued if this should occur.
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: QUALTOBAD, REMQUAL, SETQUAL, SHOWQUAL; Figaro: Q2BAD.
    }
@@ -36183,7 +36212,7 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
       eliminated.
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: NDFCOPY, SETORIGIN; Figaro: ISUBSET.
    }
@@ -36374,7 +36403,7 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: FITSIMP, FITSLIST, NDFTRACE; CCDPACK: CCDEDIT;
       Figaro: FITSKEYS; HDSTRACE; IRAS90: IRASTRACE, PREPARE.
@@ -36434,7 +36463,7 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: AXLABEL, SETTITLE, SETUNITS.
    }
@@ -36524,7 +36553,7 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: CHPIX, FILLBAD, GLITCH, NOMAGIC, SEGMENT, SUBSTITUTE, ZAPLIN;
       FIGARO: GOODVAR.
@@ -36636,7 +36665,7 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
       widths are defined in terms of angular size.
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: SETAXIS.
    }
@@ -36723,7 +36752,7 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
       not depend on the size of the NDF.
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: SETBOUND.
    }
@@ -36731,7 +36760,7 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
 \sstroutine{
    SETQUAL
 }{
-   Assign a specified quality to selected pixels within an NDF
+   Assigns a specified quality to selected pixels within an NDF
 }{
    \sstdescription{
       This routine assigns (or optionally removes) the quality
@@ -36803,7 +36832,7 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
       }{
          This parameter specifies what function is to be performed on
          the {\tt "}selected{\tt "} pixels specified using parameters MASK, LIST or
-         ARD. It can take any of the values {\tt "}HS{\tt "}, {\tt "}HU{\tt "}, {\tt "}NS{\tt "}, {\tt "}NU{\tt "},
+         ARDFILE. It can take any of the values {\tt "}HS{\tt "}, {\tt "}HU{\tt "}, {\tt "}NS{\tt "}, {\tt "}NU{\tt "},
          {\tt "}HS$+$NU{\tt "} or {\tt "}HU$+$NS{\tt "}
 
          \sstitemlist{
@@ -36846,7 +36875,7 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
          A group of pixels positions within the input NDF listing the
          pixels which are to be `selected{\tt '} (see parameter FUNCTION).
          Each position should be giving as a list of pixel indices
-         (eg X1, Y1, X2, Y2,...  for a two dimensional NDF). LIST is
+         (e.g. X1, Y1, X2, Y2,...  for a two dimensional NDF). LIST is
          only prompted for if parameter SELECT is given the value LIST.
       }
       \sstsubsection{
@@ -36921,7 +36950,7 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
          source\_a.lis have the quality.
       }
       \sstexamplesubsection{
-         setqual m51 source\_b select=ard ard=background.ard
+         setqual m51 source\_b select=ard ardfile=background.ard
       }{
          This example assigns the quality {\tt "}source\_b{\tt "} to pixels of the
          NDF {\tt "}m51{\tt "} as described by an ARD description stored in the text
@@ -36942,7 +36971,7 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: QUALTOBAD, REMQUAL, SHOWQUAL.
    }
@@ -36994,7 +37023,7 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
          than 1984.0, and a Julian epoch is assumed otherwise.
       }
       \sstsubsection{
-         EPOCH = DOUBLE PRECISION (Read)
+         EPOCH = \_DOUBLE (Read)
       }{
          The Julian epoch at which the observation was made (\emph{e.g.}
          {\tt "}1994.0{\tt "}).
@@ -37004,7 +37033,7 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
       }{
          If a TRUE value is supplied, then the WCS information will be
          stored in the form of an IRAS90 astrometry structure. This is the
-         form used by the IRAS90 package (see SUN/163). In this case, any
+         form used by the IRAS90 package (see \xref{SUN/163}{sun163}{}). In this case, any
          existing IRAS90 astrometry structure will be over-written. See
          the {\tt "}Notes:{\tt "} section below for warnings about using this form.
 
@@ -37022,7 +37051,7 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
       }{
          The latitude of the reference point, in the co-ordinate system
          specified by parameter COORDS.  For example, if COORDS is
-         {\tt "}Equatorial{\tt "}, LAT is the Declination.  See SUN/163, Section
+         {\tt "}Equatorial{\tt "}, LAT is the Declination.  See \xref{SUN/163}{sun163}{}, Section
          4.7.2 for full details of the allowed syntax for specifying
          this position.  For convenience here are some examples how you
          may specify the Declination -45 degrees, 12 arcminutes: {\tt "}-45 12
@@ -37044,7 +37073,7 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
       }{
          The longitude of the reference point, in the co-ordinate
          system specified by parameter COORDS.  For example, if COORDS
-         is {\tt "}Equatorial{\tt "}, LON is the Right Ascension.  See SUN/163,
+         is {\tt "}Equatorial{\tt "}, LON is the Right Ascension.  See \xref{SUN/163}{sun163}{},
          Section 4.7.2 for full details of the allowed syntax for
          specifying this position.  For convenience here are some
          examples how you may specify the Right Ascension 11 hours, 34
@@ -37129,7 +37158,7 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
              {\tt "}Cylindrical{\tt "}   - Lambert,
              {\tt "}Tangent\_plane{\tt "} - Gnomonic.
 
-         See SUN/163 for descriptions of these projections.  A null
+         See \xref{SUN/163}{sun163}{} for descriptions of these projections.  A null
          value causes the projection to be determined automatically
          from the data supplied for parameter POSITIONS. {\tt [!]}
       }
@@ -37259,7 +37288,7 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       ASTROM; IRAS90: SKYALIGN, SKYBOX, SKYGRID, SKYLINE, SKYMARK,
       SKYPOS, SKYWRITE.
@@ -37318,7 +37347,7 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: SETLABEL, SETUNITS.
    }
@@ -37415,7 +37444,7 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
       pixel values to be converted.
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       Figaro: RETYPE.
    }
@@ -37474,7 +37503,7 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: AXUNITS, SETLABEL, SETTITLE.
    }
@@ -37559,7 +37588,7 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: ERRCLIP; Figaro: GOODVAR.
    }
@@ -37604,7 +37633,7 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
       \sstsubsection{
          TITLE = LITERAL (Read)
       }{
-         Value for the title of the output NDF.  A null value will cause
+         The title for the output NDF.  A null value will cause
          the title of the NDF supplied for parameter IN to be used
          instead. {\tt [!]}
       }
@@ -37626,7 +37655,7 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: LAPLACE, MEDIAN; Figaro: ICONV3.
    }
@@ -37696,7 +37725,7 @@ Click \htmladdnormallink{here}{shadow_exam.gif} to see an example plot
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: REMQUAL, QUALTOBAD, SETQUAL.
    }
@@ -37875,7 +37904,7 @@ Click \htmladdnormallink{here}{shadow_exam.gif} to see an example plot
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: REGRID, SQORST, WCSADD.
    }
@@ -38089,7 +38118,7 @@ Click \htmladdnormallink{here}{shadow_exam.gif} to see an example plot
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: REGRID, SLIDE, WCSADD.
    }
@@ -38313,7 +38342,7 @@ Click \htmladdnormallink{here}{shadow_exam.gif} to see an example plot
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: HISTAT, NDFTRACE; Figaro: ISTAT.
    }
@@ -38349,7 +38378,7 @@ Click \htmladdnormallink{here}{shadow_exam.gif} to see an example plot
       \sstsubsection{
          TITLE = LITERAL (Read)
       }{
-         Value for the title of the output NDF.  A null value will cause
+         The title for the output NDF.  A null value will cause
          the title of the NDF supplied for parameter IN1 to be used
          instead. {\tt [!]}
       }
@@ -38374,7 +38403,7 @@ Click \htmladdnormallink{here}{shadow_exam.gif} to see an example plot
       will result if they have no pixels in common.
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: ADD, CADD, CDIV, CMULT, CSUB, DIV, MATHS, MULT.
    }
@@ -38495,7 +38524,7 @@ Click \htmladdnormallink{here}{shadow_exam.gif} to see an example plot
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: CHPIX, FILLBAD, GLITCH, NOMAGIC, SEGMENT, SETMAGIC, ZAPLIN;
       FIGARO: GOODVAR.
@@ -38681,7 +38710,7 @@ Click \htmladdnormallink{here}{shadow_exam.gif} to see an example plot
       \sstsubsection{
          TITLE = LITERAL (Read)
       }{
-         Value for the title of the output NDF.  A null value will cause
+         The title for the output NDF.  A null value will cause
          the title of the NDF supplied for parameter IN to be used
          instead. {\tt [!]}
       }
@@ -38737,7 +38766,7 @@ Click \htmladdnormallink{here}{shadow_exam.gif} to see an example plot
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: ARDMASK, FITSURFACE, MAKESURFACE.
    }
@@ -38902,7 +38931,7 @@ right.
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: HISTEQ, MATHS; Figaro: CLIP, IDIFF, RESCALE.
    }
@@ -39200,7 +39229,7 @@ right.
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       CONVERT: ASCII2NDF, NDF2ASCII; FIGARO: ASCIN, ASCOUT.
    }
@@ -39298,7 +39327,7 @@ right.
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: ADD, CADD, CMULT, CDIV, CSUB, DIV, MATHS, MULT, SUB.
    }
@@ -39373,7 +39402,7 @@ right.
          Vectors are drawn as arrows, with the size of the arrow head
          specified by this parameter. Simple lines can be drawn by setting
          the arrow head size to zero. The value should be expressed as a
-         fraction of the largest dimension of the vector map. {\tt [current value]}
+         fraction of the largest dimension of the vector map. {\tt [}current value{\tt ]}
       }
       \sstsubsection{
          AXES = \_LOGICAL (Read)
@@ -39467,7 +39496,7 @@ right.
          is not given, the top of the key is placed level with the top of the
          vector map. Both values should be in the range 0.0 to 1.0. If a
          key is produced, then the right hand margin specified by parameter
-         MARGIN is ignored. {\tt [current value]}
+         MARGIN is ignored. {\tt [}current value{\tt ]}
       }
       \sstsubsection{
          KEYSTYLE = GROUP (Read)
@@ -39512,7 +39541,7 @@ right.
          controlled using attribute TextLabGap. A value of 1.0 is used if
          no value is set for this attribute, and produces default vertical
          spacing. Values larger than 1.0 increase the vertical space, and
-         values less than 1.0 decrease the vertical space. {\tt [current value]}
+         values less than 1.0 decrease the vertical space. {\tt [}current value{\tt ]}
       }
       \sstsubsection{
          KEYVEC = \_REAL (Read)
@@ -39534,7 +39563,7 @@ right.
          narrow any axis annotation may be clipped. If a null (!) value
          is supplied, the value used is 0.15 (for all edges) if annotated
          axes are being produced, and zero otherwise. See also parameter
-         KEYPOS. {\tt [current value]}
+         KEYPOS. {\tt [}current value{\tt ]}
       }
       \sstsubsection{
          NDF1 = NDF (Read)
@@ -39588,7 +39617,7 @@ right.
 
          The appearance of the vectors is controlled by the attributes
          Colour(Curves), Width(Curves), \emph{etc.} (the synonym Vectors may be
-         used in place of Curves). {\tt [current value]}
+         used in place of Curves). {\tt [}current value{\tt ]}
       }
       \sstsubsection{
          VSCALE = \_REAL (Read)
@@ -39668,7 +39697,7 @@ right.
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: CALPOL.
    }
@@ -39788,7 +39817,7 @@ plot (7k).
          should be separated by commas or, if they are supplied in a file,
          new-lines (see SUN/95 section {\tt "}Specifying Groups of Objects{\tt "}
          which is within the section {\tt "}Parameters{\tt "}). The suntax for each
-         expression is fortran-like; see the {\tt "}Examples{\tt "} section 
+         expression is Fortran-like; see the {\tt "}Examples{\tt "} section 
          below, and the Appendix entitled ``\htmlref{Using MathMaps}{ap:MathMaps}''
          in SUN/95 for details. Only used when MAPTYPE=MATH.
       }
@@ -40052,7 +40081,7 @@ plot (7k).
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: REGRID, NDFTRACE, WCSFRAME, WCSREMOVE, WCSATTRIB.
       CCDPACK: WCSEDIT.
@@ -40281,7 +40310,7 @@ plot (7k).
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: REGRID, WCSFRAME; CCDPACK: TRANNDF.
    }
@@ -40472,7 +40501,7 @@ plot (7k).
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: NDFTRACE, WCSFRAME, WCSREMOVE, WCSCOPY, WCSADD, AXUNITS, AXLABEL.
    }
@@ -40639,7 +40668,7 @@ plot (7k).
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: NDFTRACE, WCSFRAME, WCSREMOVE, WCSADD, WCSATTRIB.
    }
@@ -40762,7 +40791,7 @@ plot (7k).
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: NDFTRACE, WCSREMOVE, WCSCOPY, WCSATTRIB.
    }
@@ -40791,8 +40820,8 @@ plot (7k).
          Frames 4,6,7,8,9,12,14,15,16. (Note that the brackets are required to
          distinguish this array of characters from a single string including
          commas.  The brackets are unnecessary when there only one item.) If
-         you wish to remove all the files enter the wildcard $*$. 5-$*$ will
-         remove from 5 to the last Frame.
+         you wish to remove all the files enter the wildcard $*$.
+         Therefore 5-$*$ will remove from 5 to the last Frame.
       }
       \sstsubsection{
          NDF = NDF (Read and Write)
@@ -40819,7 +40848,7 @@ plot (7k).
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: NDFTRACE, WCSADD, WCSFRAME, WCSATTRIB, WCSCOPY.
    }
@@ -40959,7 +40988,7 @@ plot (7k).
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: LISTMAKE, LISTSHOW, WCSFRAME, NDFTRACE, WCSATTRIB.
    }
@@ -41200,7 +41229,7 @@ plot (7k).
       }
    }
    \sstdiytopic{
-      Related Applications
+      Related Applications:
    }{
       KAPPA: FOURIER, LUCY, MEM2D.
    }
@@ -41256,6 +41285,271 @@ plot (7k).
          COLIN =  FILENAME (Read)
       }{
          The name of a text file containing the bounds of the areas to be
+         replaced. This parameter is only accessed if parameter MODE is
+         set to {\tt "}File{\tt "}. Each record in the file must be either a blank
+         line, a comment (indicated by a {\tt "}!{\tt "} or {\tt "}\#{\tt "} in column 1 ), or a
+         definition of an area to be replaced, consisting of three of
+         four space-separated fields. If a range of columns is to be
+         replaced, each of the first two fields should be a formatted
+         value for the first axis of the current co-ordinate Frame of the
+         input NDF, and the third field should be the single character
+         {\tt "}C{\tt "}. If a range of lines is to be replaced, each of the first
+         two fields should be a formatted value for the second axis of
+         the current co-ordinate Frame, and the third field should be the
+         single character {\tt "}L{\tt "}. If a rectangular region is to be replaced,
+         the first two fields should give the formatted values on axes 1
+         and 2 at one corner of the box, and the second two fields should
+         give the formatted values on axes 1 and 2 at the opposite corner
+         of the box.
+      }
+      \sstsubsection{
+         COLOUT =  FILENAME (Read)
+      }{
+         The name of an output text file in which to store descriptions of
+         the areas replaced by the current invocation of this application.
+         It has the same format as the input file accessed using parameter
+         COLIN, and so may be used as input on a subsequent invocation. This
+         parameter is not accessed if parameter MODE is set to {\tt "}File{\tt "}. If
+         COLOUT is null (!), no file will be created. {\tt [!]}
+      }
+      \sstsubsection{
+         COLUMNS = LITERAL (Read)
+      }{
+         A pair of X values indicating the range of columns to be replaced.
+         All columns between the supplied values will be replaced. This
+         parameter is only accessed if parameter LINCOL is set to
+         {\tt "}Columns{\tt "} or {\tt "}Region{\tt "}, and parameter MODE is set to {\tt "}Interface{\tt "}.
+         Each X value should be given as a formatted value for axis 1
+         of the current co-ordinate Frame of the input NDF. The two values
+         should be separated by a comma, or by one or more spaces.
+      }
+      \sstsubsection{
+         DEVICE = DEVICE (Read)
+      }{
+         The graphics device to use if parameter MODE is set to {\tt "}Cursor{\tt "}.
+         {\tt [}Current graphics device{\tt ]}
+      }
+      \sstsubsection{
+         IN  =  NDF (Read)
+      }{
+         The input image.
+      }
+      \sstsubsection{
+         LINCOL  =  LITERAL (Read)
+      }{
+         The type of area is to be replaced.  This parameter is only
+         accessed if parameter MODE is set to {\tt "}Cursor{\tt "} or {\tt "}Interface{\tt "}.
+         The options are:
+
+         \sstitemlist{
+
+            \sstitem
+            {\tt "}Lines{\tt "} -- Replaces lines of pixels between the Y values
+            specified by parameter LINES. Each replaced line extends the
+            full width of the image.
+
+            \sstitem
+            {\tt "}Columns{\tt "} -- Replaces columns of pixels between the X values
+            specified by parameter COLUMNS. Each replaced column extends the
+            full height of the image.
+
+            \sstitem
+            {\tt "}Region{\tt "} -- Replaces the rectangular region of pixels within the
+            X and Y bounds specified by parameters COLUMNS and LINES. The
+            edges of the box are parallel to the pixel axes.
+
+         }
+         If this parameter is specified on the command line, and parameter
+         MODE is set to {\tt "}Interface{\tt "}, only one area will be replaced;
+         otherwise a series of areas will be replaced until a null (!)
+         value is supplied for this parameter.
+      }
+      \sstsubsection{
+         LINES = LITERAL (Read)
+      }{
+         A pair of Y values indicating the range of lines to be replaced.
+         All lines between the supplied values will be replaced. This
+         parameter is only accessed if parameter LINCOL is set to
+         {\tt "}Lines{\tt "} or {\tt "}Region{\tt "}, and parameter MODE is set to {\tt "}Interface{\tt "}.
+         Each Y value should be given as a formatted value for axis 2
+         of the current co-ordinate Frame of the input NDF. The two values
+         should be separated by a comma, or by one or more spaces.
+      }
+      \sstsubsection{
+         MARKER = INTEGER (Read)
+      }{
+         This parameter is only accessed if parameter PLOT is set to
+         {\tt "}Mark{\tt "}. It specifies the type of marker with which
+         each cursor position should be marked, and should be given as
+         an integer PGPLOT marker type. For instance, 0 gives a box, 1
+         gives a dot, 2 gives a cross, 3 gives an asterisk, 7 gives a
+         triangle. The value must be larger than or equal to -31.
+         {\tt [}current value{\tt ]}
+      }
+      \sstsubsection{
+         MODE  =  LITERAL (Read)
+      }{
+         The method used to obtain the bounds of the areas to be replaced.
+         The supplied string can be one of the following:
+
+         \sstitemlist{
+
+            \sstitem
+            {\tt "}Interface{\tt "}: bounds are obtained using parameters COLUMNS,
+            and LINES. The type of area to be replaced is specified using
+            parameter LINCOL.
+
+            \sstitem
+            {\tt "}Cursor{\tt "}: bounds are obtained using the graphics cursor of the
+            device specified by parameter DEVICE. The type of area to be
+            replaced is specified using parameter LINCOL. The WCS
+            information stored with the picture in the graphics database is
+            used to map the supplied cursor positions into the pixel
+            co-ordinate Frame of the input NDF. A message is displayed
+            indicating the co-ordinate Frame in which the picture and the
+            output NDF were aligned. Graphics may be drawn over the image
+            indicating the region to be replaced (see parameter PLOT).
+
+            \sstitem
+            {\tt "}File{\tt "}: the bounds and type of each area to be replaced are
+            supplied in the text file specified by parameter COLIN.
+
+         }
+         {\tt [}current value{\tt ]}
+      }
+      \sstsubsection{
+         NOISE  =  \_LOGICAL (Read)
+      }{
+         This parameter is only accessed if parameter ZAPTYPE is set to
+         {\tt "}Linear{\tt "}. If a TRUE value is supplied, gaussian noise is added to
+         each interpolated pixel value.  The variance of the noise is
+         equal to the variance of the data value being replaced.  If the
+         data variance is bad, no noise is added.  If the input NDF has
+         no VARIANCE component, variances equal to the absolute data
+         value are used. This facility is provided for cosmetic use. {\tt [FALSE]}
+      }
+      \sstsubsection{
+         OUT  =  NDF (Write)
+      }{
+         The output image.
+      }
+      \sstsubsection{
+         PLOT = LITERAL (Read)
+      }{
+         The type of graphics to be used to mark each cursor position.
+         The appearance of these graphics (colour, size, \emph{etc} ) is
+         controlled by the STYLE parameter. PLOT can take any of the
+         following values:
+
+         \sstitemlist{
+
+            \sstitem
+            {\tt "}Adapt{\tt "} -- Causes {\tt "}Box{\tt "} to be used if a region is being
+            replaced, {\tt "}Vline{\tt "} is a range of columns is being replaced, and
+            {\tt "}Hline{\tt "} if a range of lines is being replaced.
+
+            \sstitem
+            {\tt "}Box{\tt "} -- A rectangular box with edges parallel to the edges of
+            the graphics device is drawn with the two specified positions at
+            opposite corners.
+
+            \sstitem
+            {\tt "}Mark{\tt "} -- Each position is marked by the symbol specified
+            by parameter MARKER.
+
+            \sstitem
+            {\tt "}None{\tt "} -- No graphics are produced.
+
+            \sstitem
+            {\tt "}Vline{\tt "} -- A vertial line is drawn through each specified
+            position, extending the entire height of the selected picture.
+
+            \sstitem
+            {\tt "}Hline{\tt "} -- A horizontal line is drawn through each specified
+            position, extending the entire width of the selected picture.
+
+         }
+         {\tt [}current value{\tt ]}
+      }
+      \sstsubsection{
+         STYLE = LITERAL (Read)
+      }{
+         A group of attribute settings describing the style to use when
+         drawing the graphics specified by parameter PLOT.
+
+         A comma-separated list of strings should be given in which each
+         string is either an attribute setting, or the name of a text file
+         preceded by an up-arrow character {\tt "}$\wedge${\tt "}. Such text files should
+         contain further comma-separated lists which will be read and
+         interpreted in the same manner. Attribute settings are applied in
+         the order in which they occur within the list, with later settings
+         over-riding any earlier settings given for the same attribute.
+
+         Each individual attribute setting should be of the form:
+
+            $<$name$>$=$<$value$>$
+
+         where $<$name$>$ is the name of a plotting attribute, and $<$value$>$ is
+         the value to assign to the attribute. Default values will be
+         used for any unspecified attributes. All attributes will be
+         defaulted if a null value (!) is supplied. See section {\tt "}Plotting
+         Attributes{\tt "} in SUN/95 for a description of the available
+         attributes. Any unrecognised attributes are ignored (no error is
+         reported).
+
+         The appearance of vertical and horizontal lines is controlled by
+         the attributes Colour(Curves), Width(Curves), \emph{etc} (the synonym
+         Lines may be used in place of Curves). The appearance of boxes
+         is controlled by the attributes Colour(Border), Size(Border), \emph{etc}
+         (the synonym Box may be used in place of Border). The appearance
+         of markers is controlled by attributes Colour(Markers),
+         Size(Markers), \emph{etc}. {\tt [}current value{\tt ]}
+      }
+      \sstsubsection{
+         TITLE  =  LITERAL (Read)
+      }{
+         Title for the output image.  A null value (!) propagates the title
+         from the input image to the output image. {\tt [!]}
+      }
+      \sstsubsection{
+         USEAXIS = GROUP (Read)
+      }{
+         USEAXIS is only accessed if the current co-ordinate Frame of the
+         input NDF has more than 2 axes. A group of two strings should be
+         supplied specifying the 2 axes spanning the plane containing the
+         areas to be replaced. Each axis can be specified either
+         by its integer index within the current Frame of the output NDF
+         (in the range 1 to the number of axes in the current Frame), or
+         by its Symbol attribute. A list of acceptable values is displayed
+         if an illegal value is supplied. If a null (!) value is supplied,
+         the axes with the same indices as the first 2 significant NDF pixel
+         axes are used. {\tt [!]}
+      }
+      \sstsubsection{
+         ZAPTYPE  =  LITERAL (Read)
+      }{
+         The method used to choose the replacement pixel values. It
+         should be one of:
+
+         \sstitemlist{
+
+            \sstitem
+            {\tt "}Bad{\tt "} -- Replace the selected pixels by bad values.
+
+            \sstitem
+            {\tt "}Linear{\tt "} -- Replace the selected pixels using linear
+            interpolation. If a range of lines is replaced, then the
+            interpolation is performed vertically between the first
+            non-bad pixels above and below the selected lines. If a
+            range of columns is replaced, then the interpolation is
+            performed horizontally between the first non-bad pixels to
+            the left and right of the selected columns. If a rectangular
+            region is replaced, then the interpolation is bi-linear
+            between the nearest non-bad pixels on all four edges of
+            the selected region. If interpolation is not possible (for
+            instance, if the selected pixels are at the edge of the array)
+            then the pixels are replaced with bad values. {\tt ["Linear"]}
+         }
       }
    }
    \sstexamples{
@@ -41328,6 +41622,12 @@ plot (7k).
          2-dimensional section, and do not necessarily refer to the first
          and second dimensions of the NDF as a whole.  See the {\tt "}Examples{\tt "}.
       }
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+      KAPPA: ARDMASK, CHPIX, FILLBAD, GLITCH, NOMAGIC, SEGMENT,
+      SETMAGIC; Figaro: CSET, ICSET, NCSET, TIPPEX.
    }
    \sstimplementationstatus{
       \sstitemlist{
@@ -41653,7 +41953,7 @@ by applications such as \htmlref{REGRID}{REGRID} which require a mapping.
    instance, if Nout is 2 you might use:
 
    \begin{verbatim}
-      'R = SQRT( X $*$ X $+$ Y $*$ Y )'
+      'R = SQRT( X * X + Y * Y )'
       'THETA = ATAN2( Y, X )'
    \end{verbatim}
 
@@ -41876,7 +42176,7 @@ by applications such as \htmlref{REGRID}{REGRID} which require a mapping.
       Note, also, that because logical operators can operate on floating
       point values, care must be taken to use parentheses in some cases
       where they would not normally be required in Fortran. For example,
-      the expresssion:
+      the expression:
 
       \begin{verbatim}
          .NOT. A .EQ. B
@@ -42393,7 +42693,7 @@ of the pixel origin of the NDF. Other Frames can be added to the WCS
 component in various ways, for instance, by importing them from
 appropriate FIST headers (\htmlref{FITSIN}{FITSIN},
 \htmlref{FITSDIN}{FITSDIN}), or using an appropriate application to 
-create them from scratch (eg \htmlref{WCSADD}{WCSADD},
+create them from scratch (e.g. \htmlref{WCSADD}{WCSADD},
 \htmlref{SETSKY}{SETSKY} or \GAIAref\ ).
 
 \label{apndf:history}
@@ -42516,7 +42816,6 @@ and HDS data types is as follows:
 \xlabel{IDSET}
 \xlabel{IDSTATE}
 \xlabel{INSPECT}
-\xlabel{KRHHELP}
 \xlabel{LUTFLIP}
 \xlabel{LUTHILITE}
 \xlabel{LUTROT}
@@ -43518,7 +43817,7 @@ section \ref{se:style} the use of graphical style parameters.
                                    Label(1)}.
                   \item[BORDER] -- Set AXES=TRUE, and suppress everything
                                    but the border by setting suitable plotting 
-                                   attributes (eg {\tt MajTickLen=0, 
+                                   attributes (e.g. {\tt MajTickLen=0, 
                                    MinTickLen=0, TextLab=0} {\it etc}).
                   \item[CONCOL] -- Use the {\tt Colour(Cont)} plotting 
                                    attribute (or parameter PENS).
@@ -44452,7 +44751,7 @@ The following applications have been modified:
                                    Label(1)}.
                   \item[BORDER] -- Set AXES=TRUE, and suppress everything
                                    but the border by setting suitable plotting 
-                                   attributes (eg {\tt MajTickLen=0, 
+                                   attributes (e.g. {\tt MajTickLen=0, 
                                    MinTickLen=0, TextLab=0} {\it etc}).
                   \item[COSYS] -- Use application WCSFRAME to set the required 
                                    co-ordinate Frame first.
@@ -45485,7 +45784,7 @@ functions as follows.
 \item {\large\bf Detail enhancement}
 \begin{description}
 \classitem{COLCOMP}
- Produce a colour composite image from 1, 2 or 3 individual NDFs.
+ Produces a colour composite image from 1, 2 or 3 individual NDFs.
 \classitem{HISTEQ}
  Performs an histogram equalisation on an NDF.
 \classitem{LAPLACE}
@@ -45613,8 +45912,7 @@ functions as follows.
 \classitem{LISTSHOW}
  Displays the positions stored in a positions list.
 \classitem{LOOK}
- Outputs the values of a sub-array of a 2-d NDF to the screen or a
- text file.
+ Outputs the values of specified NDF pixels to the screen or a text file.
 \classitem{MLINPLOT}
  Draws a multi-line plot of a 2-d NDF's data values against their axis
  co-ordinates.
@@ -45694,7 +45992,7 @@ functions as follows.
 \classitem{CALPOL}
  Calculates polarisation parameters.
 \classitem{COLCOMP}
- Produce a colour composite image from 1, 2 or 3 individual NDFs.
+ Produces a colour composite image from 1, 2 or 3 individual NDFs.
 \classitem{KSTEST}
  Compares data sets using the Kolmogorov-Smirnov test.
 \classitem{NORMALIZE}
@@ -45800,7 +46098,7 @@ functions as follows.
 \classitem{SETBOUND}
  Sets new bounds for an NDF.
 \classitem{SETQUAL}
- Assign a specified quality to selected pixels within an NDF.
+ Assigns a specified quality to selected pixels within an NDF.
 \classitem{SETTYPE}
  Sets a new numeric type for the data and variance components of an NDF.
 \classitem{SETVAR}
@@ -45933,6 +46231,8 @@ functions as follows.
  with the bad value.
 \classitem{SUBSTITUTE}
  Replaces all occurrences of a given value in an NDF array with another value.
+\classitem{THRESH}
+ Edits an NDF such that array values below and above two thresholds take
 \classitem{ZAPLIN}
  Replaces regions in a 2-d NDF by bad values or by linear
  interpolation.
@@ -45949,7 +46249,7 @@ functions as follows.
 \item {\large\bf Resampling and transformations}
 \begin{description}
 \classitem{REGRID}
- Use an arbitrary mapping to regrid an NDF.
+ Uses an arbitrary mapping to regrid an NDF.
 \classitem{WCSALIGN}
  Aligns a group of 2-d NDFs using WCS information.
 \end{description}
@@ -46073,9 +46373,9 @@ functions as follows.
 \classitem{KAPHELP}
  Gives help about {\footnotesize KAPPA}.
 \classitem{LISTMAKE}
- Create a catalogue holding a positions list.
+ Creates a catalogue holding a positions list.
 \classitem{KAPVERSION}
- Check the version number of the installed package.
+ Checks the version number of the installed package.
 \end{description}
 \end{description}
 
