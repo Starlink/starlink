@@ -1,0 +1,407 @@
+                            Starlink Documentation
+Date: 20th June, 2004
+File: /star/docs/docs_lis
+
+SC                             STARLINK COOKBOOKS                             SC
+001.02  1995-11-10 dwt   43   JCMTDR - Cookbook
+002.03  1997-10-01 ACD   50   The DX cookbook
+003.01  1996-08-05 MXC   37   Echelle Data Reduction Cookbook
+004.02  1998-01-09 MJC   53   C-Shell Cookbook v1.1
+005.03  2001-08-16 acd   76   The 2-d CCD Data Reduction Cookbook
+006.04  2001-08-31 acd   70   CCD Photometric Calibration Cookbook
+007.02  1998-06-15 ajh   59   Simple Spectroscopy Reductions
+008.01  1997-03-01 hm    61   Specx Cookbook - reduction of millimetre-wave data
+009.01  1997-05-14 acc   43   LaTeX Cookbook
+010.01  1997-08-01 jxs   22   The SCUBA photometry cookbook
+011.02  2001-10-29 GS    75   The SCUBA mapping cookbook
+012.01  1997-11-28 JJL   44   Writing your own data reduction software
+013.01  2001-12-02 NXG   51   Theory and Modelling Resources Cookbook
+014.02  1999-06-11 ACD   56   The Fibre Spectroscopy Cookbook
+015.02  2000-08-22 aa    100  The Graphics Cookbook
+016.02  2002-09-30 AA    55   The IFU Data product cookbook
+017.01  2001-12-31 acd   40   The GAIA Cookbook
+
+SG                               STARLINK GUIDES                              SG
+003.05  1996-03-12 dm    76   IUEDR - Reference manual
+004.02  1992-08-12 kfh   303  ADAM -The Starlink software environment
+005.02  1998-06-09 ajc   101  ICL - Interactive command language for ADAM
+006.03  1994-02-04 RWS   18   ADAM - Programmer's facilities & documentation guide
+007.04  1996-03-12 mxc   15   IUEDR - IUE analysis - a tutorial
+008.02  1997-03-04 ACD   35   Introduction to Visualisation Software for Astronomy
+009.02  1996-12-11 MXC   32   Introduction to Echelle Spectroscopy
+010.02  1998-01-30 GJP   24   Preparing to Observe
+012.02  1999-12-02 acd   30   An Introduction to IRAF
+
+SGP                          STARLINK GENERAL PAPERS                         SGP
+001.01  1989-09-08 DJR   3    Procedure for reporting bugs
+002.02  1990-09-26 PTW   14   Starlink software support responsibilities
+004.02  1994-06-20 acc   15   Starlink C programming standard
+007.01  1991-08-06 PTW   11   Unix and Starlink
+012.01  1992-09-16 DLT   5    AVS as a GUI for ADAM
+016.01  1992-03-23 PTW   30   Starlink application programming standard
+021.01  2000-02-11 MJB   10   Starlink software distribution policy
+025.13  1997-12-09 ajp   32   Starlink site manager's guide
+028.08  1997-09-25 acc   11   How to write good documents for Starlink
+031.11  1996-06-17 MDL   30   STARLINK Support for astronomical computing in the UK
+038.02  1989-01-20 mjc   36   Starlink standard data structures
+041.01  1994-09-16 PTW   8    Local management arrangements
+042.01  1995-05-18 RWS   15   Starlink software strategy
+044.01  1995-06-07 RWS   9    Guidelines for Starlink Software Strategy Groups
+045.01  1995-09-13 BKM   6    ADAM review panel report
+047.01  1997-03-11 MXC   16   Computer Algebra Software
+049.01  1996-05-28 cac   10   Starlink's Support for PCs
+050.03  1997-11-20 MDL   13   Starlink Document Styles
+051.01  1997-03-10 mjb   19   Starlink Software Maintenance Procedures
+052.01  1997-08-05 MJB   7    Plan for Starlink Software Distribution
+
+SSN                           STARLINK SYSTEM NOTES                          SSN
+003.01  1989-12-22 WFL   10   ECH - Echelle spectrograph model package
+004.13  2001-09-28 ajc   26   EMS - Error message service 1.7: PM
+006.01  1990-10-09 CAC   8    The Cifer M990 tape drive
+007.02  1991-03-05 CAC   15   Administering Starlink Sun systems
+008.01  1991-03-06 RWS   9    Naming conventions for Starlink subroutine libraries
+018.01  1994-01-14 CAC   13   Administering Solaris Sun systems
+020.03  2000-07-17 RWS   25   Adding Format Conversion Facilities to the NDF Library
+021.02  1996-04-09 MJB   3    STARX - X library linking
+022.03  1992-06-08 mjb   2    Coordinate systems for pixel arrays
+023.03  1997-01-08 cac   17   Starlink Benchmarking Utility v1.0: UM
+024.03  1997-07-30 ACC   3    Notes for Site managers about TeX and LaTeX
+025.02  1997-03-10 gjp   4    PERIOD - Installation notes
+026.01  1995-08-15 CAC   12   Configuring, monitoring & tuning SPARC/Solaris systems
+027.01  1995-10-13 ACF   19   staradmin - Starlink user database maintainer
+029.05  2001-08-20 AJC   5    PCS - Parameter and communication subsystems
+030.02  1996-06-13 TMG   9    SYSTUNE - Monitoring & tuning SPARC/Solaris v0.4
+031.01  1995-11-17 KPD   32   A Starlink guide to cartridge tape subsystems
+032.01  1995-11-08 GRM   13   Custom jumpstart tutorial
+033.01  1995-12-14 ACF   9    FORUM - Installation guide
+035.03  1997-10-14 ajc   10   IRAFSTAR - IRAF/Starlink inter-operability
+036.01  1996-02-07 KPD   15   XpressWare Installation UG
+037.01  1996-05-30 CAC   16   Starlink Security
+039.06  1992-11-18 DLT   7    GKS - Installation and modification
+064.05  2002-09-03 AJC   13   ADAM - Organisation of application packages
+067.01  1996-11-27 SCR   28   Unix Security Cookbook
+068.03  1997-12-17 AJC   35   IFD - Interface definition files v1.2
+072.02  2000-07-10 jfl   284  SURF programming interface
+075.01  2000-07-26 ACD   32   Writing Catalogue and Image servers for GAIA and CURSA
+076.01  2001-05-24 ACD   17   CATREMOTE - a tool for querying remote catalogues
+077.01  2001-08-16 ajc   14   ADAM - The control subsystem
+
+SUG                            STARLINK USER GUIDE                           SUG
+.10     1997-10-17 MDL   24   Starlink User's Guide
+
+SUN                            STARLINK USER NOTES                           SUN
+001.24  2003-08-05 MJB   125  Starlink software collection
+005.18  2003-05-02 PTW   31   ASTROM - Basic astrometry program
+007.04  1993-03-31 pma   22   GENERIC - Utility for compiling generic subroutines
+009.07  1997-06-26 ACC   16   LATEX - Document preparation system v2e User's Guide
+011.03  1998-04-28 RWS   36   ARY - Subroutines for accessing ARRAY data structures
+013.03  1998-01-22 mjb   6    ASURV - Astronomical survival statistics
+015.08  1999-02-25 dlt   8    PGPLOT - Graphics subroutine library
+017.09  2000-11-13 hme   21   SPECX - Millimetre wave spectral reduction package
+020.04  1993-06-30 djs   11   ULDA/USSP - Accessing the IUE ULDA
+027.05  1996-09-09 PND   81   CGS4DR - Portable CGS4 data reduction 1.3-0, UG
+028.12  1999-09-02 MJB   31   NAG - Numerical and Graphical Libraries Mk 18/4 UG
+030.02  1989-09-22 DLG   5    Using the Starlink database microVAX computer
+031.05  1998-04-27 ajc   10   REF - Handling references to HDS objects 1.1
+032.12  1989-04-24 PMA   14   CHART - Finding chart and stellar data system 3.3
+033.07  2000-01-11 RWS   254  NDF - Routines for accessing extensible n-D data 1.5
+034.01  1991-10-07 GRM   7    EMACS - Display editor
+037.11  1996-03-12 dm    5    IUEDR - IUE data reduction package v3.2-0
+038.08  1996-11-26 mjb   2    DOCFIND - Starlink document index search
+039.02  1995-02-28 RWS   25   PRIMDAT - Processing primitive numerical data 1.0, PG
+040.05  1995-08-02 acc   39   CHR - Character handling routines 2.0, PM
+042.05  1996-12-06 gjp   6    DAOPHOT - Stellar photometry package V1.2
+045.13  2002-08-20 aa    38   PHOTOM - An aperture photometry package v1.8-3
+048.08  2002-01-30 bkm   51   AGI - Applications graphics interface
+050.24  2004-03-05 dm    58   DIPSO - Friendly spectrum analysis program v3.5
+053.03  1996-10-01 acc   8    ECHWIND - Echelle spectrograph observation planning
+055.19  2003-05-07 acd   97   CONVERT - A format-conversion package 1.2 UM
+056.01  1995-06-21 PTW   7    COCO - Conversion of celestial coordinates
+057.08  1995-07-12 dlt   19   GNS - Graphics workstation name service
+058.07  1995-03-16 CXL   14   IUEDA - Access to the IUE data archive
+061.03  1998-04-28 RWS   60   TRANSFORM - Coordinate transformation facility
+063.04  1992-07-28 PCR   4    SPAG - Spaghetti unscrambler
+065.08  1995-07-20 NE    33   IDI - Image display interface, PG
+066.05  1997-05-02 JAB   86   TSP - Time series and polarimetry package 2.3
+067.63  2003-10-21 PTW   220  SLALIB - Positional astronomy library 2.3-0: PM
+073.01  1990-02-21 MDL   3    FORCHECK - Fortran verifier and programming aid
+077.08  1995-09-11 DXA   48   NBS - Noticeboard system 2.5.5, PM
+078.09  1997-09-02 cac   5    RV - Radial components of observer's velocity
+079.03  1986-09-15 JHF   32   CDS - Centre de donnees stellaire catalogues
+082.04  1993-06-21 dcp   12   IRAS - Data products primer
+083.13  1995-12-08 DLT   16   GKS - Graphical kernel system
+085.06  1995-07-10 dlt   51   SGS - Simple graphics system
+086.02  2002-09-19 acc   232  FIGARO - General data reduction system v5.5-0, UG
+087.06  2000-09-19 ajb   22   JPL - Solar system ephemeris 2.0
+088.06  1999-06-28 dlt   12   NCAR - Graphics utilities v1.3 UG
+090.09  1995-03-07 mjb   34   SNX - Starlink extensions to NCAR graphics utilities
+092.11  1999-02-23 mdl   90   HDS - Hierarchical data system 4.3, PG
+093.03  1995-04-25 acc   10   TEX - Superior document preparation system
+095.27  2004-04-15 dsb   596  KAPPA - Kernel application package 0.14-5: UG
+101.02  1991-01-24 JM    48   ADAM - Introduction to programming
+102.04  1998-02-05 MJC   13   HDSTRACE - Listing HDS data files v1.2
+104.11  2001-10-22 ajc   61   MERS (MSG/ERR) - Message and error reporting 1.6: PM
+107.04  1998-08-06 MJB   8    MAPLE - Mathematical manipulation language
+109.11  2002-10-23 ne    41   PISA - Position, intensity and shape analysis
+111.02  1993-02-01 dlt   6    SPT - Software porting tools
+113.04  1995-07-19 ajc   16   ADAM graphics, PG
+114.04  1999-09-24 ajc   56   PAR - ADAM parameter system 2.3; PM
+115.03  2002-09-03 ajc   40   ADAM - Interface module, RM
+117.04  1993-12-09 DSB   15   MEMSYS - Maximum entropy image reconstruction 1.2, PM
+119.02  1992-08-18 ARW   70   CHI - Catalogue handling interface 1.1, PM
+120.03  1994-10-11 ARW   37   CATPAC - Catalogue applications package on Unix
+121.05  2003-04-10 PMA   35   PSX - POSIX interface routines 0.2, PM
+124.01  1995-06-13 PTW   25   HLP - Interactive help system 3.3
+127.01  1991-07-02 JO    3    EXOSAT database system
+129.05  2000-02-03 bkm   3    XDISPLAY - Setting remote X windows v2.1
+130.05  1995-07-07 dlt   21   GWM - X graphics window manager
+132.03  2003-03-20 hme   17   JCMTDR - Applications for reducing JCMTdata 1.2
+134.03  1992-03-30 ajc   34   ADAM - Guide to writing instrumentation tasks
+136.06  1997-11-18 MJB   2    FITSIO - Disk FITS I/O routines 5.03
+137.07  2004-04-22 pah   102  PONGO - Interactive data plotting 2.0
+139.16  2002-09-05 aa    220  CCDPACK - CCD data reduction package v4.0
+143.04  2001-07-20 ajc   34   FIO/RIO - Fortran file I/O routines 1.5, PM
+144.15  2001-08-17 AJC   18   ADAM - Unix version 4
+145.06  1996-07-12 bs    58   UNIX - An introduction
+146.03  1996-06-25 gjp   6    OBSERVE - Check star observability, v2.2: UG
+150.06  2003-01-08 DSB   46   GRP - Managing groups of objects v3.0: PM
+152.04  1997-06-13 dm    116  ECHOMOP - Echelle data reduction package v3.3[0&wUM
+160.06  2003-03-03 pwd   46   IMG - Simple image data access 1.2
+161.02  1994-11-10 dcp   67   IRAS90 - Introduction & user guide to CRDD analysis
+162.01  1993-03-18 ACD   25   A guide to astronomical catalogues/databases/archives
+163.03  1995-02-19 dcp   104  IRAS90 - IRAS survey & PO data analysis package, RM
+164.02  1998-04-24 DLT   5    PSMERGE - Encapsulated PostScript handling utility
+165.04  1995-02-19 dcp   15   IRAS90 - IRAS survey & PO data analysis package, PG
+166.04  1996-12-06 gjp   8    SAOIMAGE - Astronomical image display
+167.06  2001-12-12 gjp   15   PERIOD - A time-series analysis package
+168.03  1998-11-27 bkm   12   EDT mode for JED - An advanced Unix text editor v2.0
+169.03  1994-08-13 GRM   3    PINE - Electronic mail interface
+170.02  1997-10-11 CAC   3    Editors on Unix
+171.01  1996-11-12 ajc   24   MAG - Access to magnetic tapes v2.0: PM
+172.01  1993-10-13 CGP   4    FTNCHEK - A Fortran 77 source-code checker
+174.01  1993-11-29 ACD   46   Guide to on-line bibliographies and information
+177.01  1994-09-27 DSB   34   IRCAMPACK - IRCAM data reduction
+180.05  2000-01-27 gjp   94   ESP - Extended surface photometry v0.10: UM
+181.01  2001-04-04 ACD   96   CAT - Catalogue and table manipulation library
+182.07  2000-02-18 grm   6    EMAIL - Email address searching
+183.04  2001-10-26 DSB   29   ARD - Language for describing array regions
+184.02  1997-11-13 MJB   2    A2PS - Ascii to PostScript formatter
+185.02  1994-11-04 ajc   4    MESSGEN - Starlink facility error message gen 1.1
+186.03  1999-03-03 DLT   26   STARTCL - Starlink extensions to TCL and TK v1.2: UG
+187.01  1995-01-16 MJB   1    SKYCAL - Interactive almanac and calculator
+188.03  1998-01-06 RWS   36   HTX - Hypertext cross-reference utilities 1.2, UM
+189.03  1996-06-25 MXC   10   ISPELL - Spelling checker
+190.01  2001-11-04 ACD   128  CURSA - Catalogue and table manipulation applications
+191.01  1995-05-02 MJB   1    SAE - Starlink applications environment special files
+192.01  1995-05-10 SCR   1    NUTPU - A DEC TPU compatible editor for Unix
+193.07  2004-02-12 MJB   4    PERL - Practical Extraction and Report Language
+194.02  1997-02-14 dsb   205  PDA - Public domain algorithms library 0.4, PM
+195.01  1995-09-26 GRM   2    NEWS - Starlink online information system
+196.01  1995-06-20 SCR   1    tcsh - C-Shell with enhancements
+197.02  1997-07-31 MJB   1    GHOSTSCRIPT - PostScript interpreter/previewer
+199.07  2000-02-02 ajc   25   STAR2HTML - Convert Starlink docs to hypertext 1.4, UM
+200.03  2000-10-13 MJB   2    TCLSYS - TCL, TK and EXPECT utilities v3.0
+201.01  1995-10-09 MJB   3    LATEX2HTML - Latex to HTML conversion
+202.02  1998-02-19 MJB   5    Starlink subroutine libraries: Linking guide
+203.03  1997-09-15 acd   83   SX & DX - IBM data explorer for data visualisation
+204.01  1996-01-15 TJH   16   POLMAP - Interactive linear spectropolarimetry analysi
+205.01  1995-12-12 djr   3    FORUM - Starlink conferencing software
+207.01  1996-02-21 JWP   1    AIPS - Astronomical Image Processing System
+208.01  1996-03-18 pam   19   REPACK - Handle ROSAT WFC survey data; UM
+209.06  2000-01-19 ajc   116  CNF and F77 Mixed Language Programming v4.0: PM.
+210.15  2004-04-23 dsb   407  AST - World Coordinate System library (Fortran)
+211.15  2004-04-23 dsb   413  AST - World Coordinate Systems library (C version)
+212.12  2003-07-21 MJB   67   Starlink Software CD-ROM User's Guide
+213.02  1998-09-22 gjp   10   FLUXES - JCMT position and flux density calibration
+214.15  2004-04-28 ng    14   GAIA - Graphical astronomy & image analysis tool
+216.08  2003-04-03 jfl   182  SURF - SCUBA User Reduction Facility
+217.02  1997-12-11 AJC   15   Running Starlink Applications from IRAF CL
+218.01  1997-05-22 MJB   2    JPEG - The JPEG library and utilities
+219.01  1997-06-05 MJB   8    The GWM Xdisplay Widget User's Guide
+221.01  1997-12-22 AJC   2    KAPPA for IRAF
+223.07  2003-02-26 dsb   104  POLPACK - An Imaging Polarimetry reduction package
+224.02  2000-02-10 AJC   12   HDSPAR - HDS Parameter routine v1.1 PM
+226.08  2004-04-24 ajc   12   EXTRACTOR - An astronomical source detection program
+227.02  2003-05-07 MJB   4    CFITSIO - Disk FITS input/output functions
+228.05  2003-05-06 fe    42   STARPERL - Starlink Perl modules
+229.01  1999-12-16 hme   14   The Global Section Datafile (GSD) access library
+230.06  2004-06-01 aja   30   ORAC-DR - Overview and General Introduction
+231.04  2004-06-01 fe    14   ORAC-DR - SCUBA pipeline data reduction
+232.08  2004-06-01 MJC   154  ORAC-DR - imaging data reduction v1.0 user's guide
+234.01  2000-09-22 RTP   8    ONE - Odds and Ends library
+235.03  2002-09-24 ACD   27   NAOS - finding NAOMI guide stars
+236.04  2004-06-01 PH    20   ORAC-DR - spectroscopy data reduction
+237.01  2001-01-02 AA    18   DATACUBE - an IFS datacube manipulation package
+238.04  2004-03-16 DSB   641  KAPLIBS - Internal subroutines used within KAPPA
+239.02  2001-11-20 DSB   34   KAPRH - home for retired KAPPA applications
+240.01  2001-05-29 ACD   2    FINDCOORDS - finding coordinates of a named object
+241.01  2001-08-16 ajc   27   AMS - the Unix ADAM message system
+242.01  2003-08-25 NXG   20   Autoastrometry for Mosaics
+243.03  2004-05-19 PWD   49   SPLAT - a spectral analysis tool
+245.01  2002-01-21 AJC   36   HDSTOOLS - Tools to display and edit HDS objects
+246.02  2004-06-01 ST    25   ORAC-DR - integral field spectroscopy data reduction
+251.02  2004-05-28 SER   22   Getting Started with STARJAVA
+253.01  2004-05-05 MBT   22   TOPCAT - Tool for OPerations on Catalogues And Tables
+254.01  2004-04-21 AA    22   FROG - A Time Series Analysis Package
+
+AUTHORS                          AUTHORS                                AUTHORS
+                                     (Site code)
+       AA    Alasdair Allan          (KEE)
+       ACC   Anne Charles            (RAL - left)
+       ACD   Clive Davenhall         (EDI)
+       ACF   Adrian Fish             (UCL - left)
+       AFT   Allyn Tennant           (Marshall SFC)
+       AJC   Alan Chipperfield       (RAL)
+       AJP   Alan Penny              (RAL)
+       APL   Alan Lotts              (DUR)
+       ARW   Alan Wood               (RAL - left)
+       AT    Antonio Talavera        (VILSPA)
+       AW    A Woollatt              (CAM Univ Press)
+       AXF   Andrew Ford             (Thomson Computer Ps)
+       BCS   Brian Stewart           (RAL)
+       BDK   Dennis Kelly            (EDI)
+       BJR   Brian Read              (RAL)
+       BKM   Brian McIlwrath         (RAL)
+       BPK   Brendan Kehoe           (USA)
+       BWC   Bruce Char              (Canada)
+       CAA   Colin Aspin             (OXF)
+       CAC   Chris Clayton           (RAL - left)
+       CD    Cornelius Driessen      (VILSPA)
+       CGP   Clive Page              (LEI)
+       CHD   Chris Downey            (Kent)
+       CR    Carol Rhodes            (Smithsonian)
+       CRB   Chris Benn              (La Palma)
+       CSJ   Simon Jeffery           (ARM)
+       CXL   Chris Lloyd             (RAL)
+       DAC   David Curry             (SRI)
+       DC    Daniel Connolly         (Convex)
+       DCP   Diana Parsons           (RAL - left)
+       DCW   Don Wells               (Kitt Peak)
+       DH    David Harper            (QMW)
+       DJR   David Rawlinson         (RAL)
+       DK    Donald Knuth            (Stanford)
+       DLG   Dave Giaretta           (RAL)
+       DLT   Dave Terrett            (RAL)
+       DM    Dave Mills              (NOAO)
+       DSB   David Berry             (MAN)
+       DT    Doug Tody               (NOAO)
+       DW    David Wishart           (Clustan Ltd, Edinburgh)
+       DXA   David Allan             (BIR - left)
+       EBN   E Bertin                (Institute d'Astrophysique de Paris)
+       EDF   Eric Feigelson          (Penn State Univ, USA)
+       ERN   ? EARN association      (?)
+       EWG   Eric Greisen            (NRAO)
+       FB    F Bonnarel              (CDS, Strasbourg)
+       FE    Frossie Economou        (JACH)
+       FT    F Teagle                (IST, Manchester)
+       GJP   Grant Privett           (CAR - left)
+       GRM   Geoff Mellor            (LEI - left)
+       GS    G Sandell               (Hawaii)
+       HA    Heinz Andernach         (IAC)
+       HJW   Helen Walker            (RAL)
+       HM    Henry Matthews          (JACH)
+       HME   Horst Meyerdierks       (EDI)
+       IDH   Ian Howarth             (UCL)
+       ISM   Ian McLean              (?)
+       JAB   Jeremy Bailey           (AAO)
+       JAJ   J A Johnson             (?)
+       JAS   Janet Searle            (Kent)
+       JB    J Butland               (Bradford)
+       JCS   John Sherman            (RAL)
+       JFL   John Lightfoot          (EDI)
+       JG    Jack Giddings           (UCL - left)
+       JHF   Jon Fairclough          (RAL - left)
+       JID   Jon Davies              (CAR - left)
+       JJL   Jon Lockley             (SOU - left)
+       JL    Jim Lewis               (La Palma)
+       JM    Jo Murray               (RAL)
+       JO    Julian Osborne          (LEI)
+       JPD   Julian Day              (RAL - left)
+       JPW   John Wack               (NIST Special Pub)
+       JRW   Joyce Rey-Watson        (Smithsonian)
+       JS    John Straede            (AAO)
+       JT    John Thorstensen        (Dartmouth College)
+       JW    John Wisniewski         (DEC)
+       JWP   John Palmer             (MAN - left)
+       JXP   Jen Phillips            (?)
+       JXS   Jason Stevens           (PRE)
+       KPD   Kevin Duffey            (RAL)
+       KS    Keith Shortridge        (AAO)
+       LL    Leslie Lamport          (?)
+       LS    Lakshimi Sastry         (?)
+       M2D   Michael Doob            (Winnipeg)
+       MA    Marc Andreessen         (NCSA)
+       MAR   M A Reed                (CUP, Cambridge)
+       MBT   Mark Taylor             (CAM)
+       MCS   Michael McSherry        (ARM - left)
+       MD    Mike Denby              (LEI)
+       MDL   Mike Lawden             (RAL - left)
+       MF    Marion Fisher           (CAM)
+       MJB   Martin Bly              (RAL - left)
+       MJC   Malcolm Currie          (RAL)
+       MJD   Mike Disney             (CAR)
+       MJR   Martin Ricketts         (RAL)
+       MVH   M VanHilst              (Smithsonian)
+       MXC   Martin Clayton          (UCL - left)
+       NA    Norman Alvey            (?)
+       ND    Nikos Drakos            (Leeds)
+       NE    Nicholas Eaton          (IMP - left)
+       NG    Nick Galwey             (?)
+       NRA   N R Arnot               (King's College)
+       NXG   Norman Gray             (GLA)
+       PAH   Paul Harrison           (JOD)
+       PAM   Paul McGale             (LEI)
+       PBS   Peter Stetson           (DAO, Victoria)
+       PCR   Paul Rees               (RAL - left)
+       PJR   Phil Richards           (RAL)
+       PM    Patricia Monger         (McMaster, USA)
+       PMA   Peter Allan             (RAL - left)
+       PND   Phil Daly               (JACH - left)
+       PSL   ? Polyhedron Software Limi(Witney)
+       PTW   Patrick Wallace         (RAL)
+       PWD   Peter Draper            (DUR)
+       RAM   Rhys Morris             (CAR)
+       RDS   Richard Saxton          (LEI - left)
+       RJH   Robert Hanisch          (Baltimore)
+       RLA   R L Aurbach             (Monsanto)
+       RLB   Russell Brand           (Berkeley, USA)
+       RMP   Richard Prestage        (JACH)
+       RP    Rachael Padman          (CAM (Cavendish))
+       RS    Richard Stallman        (?)
+       RW    Richard West            (LEI)
+       RWS   Rodney Warren-Smith     (RAL - left)
+       SCR   Subhash Rehan           (KEN - left)
+       SER   Stephen Rankin          (RAL)
+       SMB   Steven Beard            (EDI)
+       SR    Simon Riggs             (RAL - left)
+       ST    Stephen Todd            (EDI)
+       TC    Tim Clark               (Warwick)
+       TJ    Tim Jenness             (JACH)
+       TJH   Tim Harries             (STA)
+       TJP   Tim Pearson             (Caltech)
+       TMG   Tim Gledhill            (HAT)
+       TNW   Tim Wilkins             (DUR - left)
+       TW    Thomas Walker           (Hawaii)
+       VL    Vassilis Laspias        (MAN - left)
+       VSD   V S Dhillon             (CAM)
+       WDP   William Pence           (USRA)
+       WFL   William Lupton          (Keck)
+       WW    W Wamsteker             (VILSPA)
+
+FORMAT                           FORMAT                                  FORMAT
+
+Cols 1-6   Document Number: The current version number is shown after the
+           serial number.  Thus, 1.2 means paper 1, version 2.
+Cols 9-16  Date of issue: yyyy-mm-dd
+Cols 18-20 Authors initials.  If there is more than one author, the first or
+           principle author is indicated in lower case.  Authors full names are
+           shown after the titles.
+Cols 22-25 Number of pages.
+Cols 27-80 Document title.
+
+The Authors list gives the Starlink site code at which the author has a primary
+user account, and is not an indication of affiliation to a particular
+institution.
+
+Each site should maintain an index of their own LUN's, LGP's, and LSN's on
+their local computer in a file called /star/local/docs/docs.lis.
