@@ -4860,24 +4860,40 @@ AC_SUBST(STAR_MANIFEST_DIR)
             <title>STAR_PATH_TCLTK</title>
           </subhead>
 
-          <p><strong><code>STAR_PATH_TCLTK([minversion=0])</code></strong></p>
+          <p><strong><code>STAR_PATH_TCLTK([minversion=0], [options=''])</code></strong></p>
 
-          <p>Finds a tclsh and wish, and the associated libraries.
-            Sets substitution variable <code>TCL_CFLAGS</code> to the
+          <p>Finds a tclsh, and the associated libraries, optionally
+            searching for Tk as well.</p>
+
+          <p>Sets substitution variable <code>TCL_CFLAGS</code> to the
             C compiler flags necessary to compile with Tcl,
             <code>TCL_LIBS</code> to the required library flags, and
-            variables <code>TCLSH</code> and <code>WISH</code> to the
-            full path of the matching <code>tclsh</code> and
-            <code>wish</code> executables.  Define the cpp variable
-            <code>TCL_MISSING</code> to 1 if Tcl is not available.</p>
+            variable <code>TCLSH</code> to the full path of the
+            matching <code>tclsh</code> executable; if Tk is
+            requested, it similarly sets <code>TK_CFLAGS</code>,
+            <code>TK_LIBS</code> and <code>WISH</code>.  Define the
+            cpp variable <code>TCL_MISSING</code> to 1 if the required
+            programs and libraries are not available (that is, it is
+            also set if Tcl is available but a suitable version of Tk
+            isn't).</p>
 
-          <p>If argument minversion is present, it specifies the
-            minimum Tcl/Tk version number required.  The macro
-            searches first in the path, and then in a selection of
-            platform-specific standard locations.  The configure
-            option <code>--with-tcl</code> allows you to provide a
-            path to a tclsh binary, which is put at the head of the
-            list of locations to search.</p>
+          <p>If argument <code>minversion</code> is present, it specifies the
+            minimum Tcl/Tk version number required.</p>
+
+          <p>If the argument <code>options</code> is present, it is a
+            space-separated list of the words <code>tk</code> and
+            <code>itcl</code>.  If one or both of these is present,
+            then the macro will find a Tcl location which also has Tk
+            or itcl installed (note that the itcl test doesn't do
+            anything at present).</p>
+
+          <p>The macro searches first in the path, and then in a
+            selection of platform-specific standard locations.  The
+            configure option <code>--with-tcl</code> allows you to
+            provide a path to a <code>tclsh</code> binary, which is
+            put at the head of the list of locations to search.
+            Option <code>--without-tcl</code> suppresses the search,
+            and results in no variables being substituted.</p>
 
           <p>This is intended to be similar to macro
             <code>AC_PATH_XTRA</code>.</p>
