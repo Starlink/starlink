@@ -123,7 +123,7 @@ c      END IF
 
 *  Scale up by TEFF and add background if count model is required
       IF ( COUNTMODEL ) THEN
-	CALL ARR_MULTR( OBDAT(N).TEFF, OBDAT(N).NDAT, PRED )
+	CALL ARR_MULTR( OBDAT(N).TEFF, OBDAT(N).NDAT, PRED, STATUS )
 	CALL VEC_ADDR( .FALSE., OBDAT(N).NDAT, %VAL(OBDAT(N).BPTR),
      :                 PRED, PRED, IERR, NERR, STATUS )
       END IF

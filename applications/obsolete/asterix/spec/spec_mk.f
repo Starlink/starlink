@@ -131,7 +131,7 @@
 	IF(STATUS.NE.SAI__OK) GO TO 9000
 
 * Multiply by 1E-23*EM/4*pi*R**2 to get spec photon flux in photons/(cm**2*s)
-        CALL ARR_MULTR( A*1.0E-23*EM10, NEN, FLUX )
+        CALL ARR_MULTR( A*1.0E-23*EM10, NEN, FLUX, STATUS )
 
 * Exit
  9000	IF(STATUS.NE.SAI__OK) THEN

@@ -626,7 +626,8 @@
 	      CALL ARR_COP1R(OBDAT(NDS).NDAT,%VAL(PTR),
      :        %VAL(OBDAT(NDS).DPTR),STATUS)
 	      IF (STATUS.NE.SAI__OK) GOTO 99
-	      CALL ARR_MULTR(TEFF,OBDAT(NDS).NDAT,%VAL(OBDAT(NDS).DPTR))
+	      CALL ARR_MULTR(TEFF,OBDAT(NDS).NDAT,
+     :           %VAL(OBDAT(NDS).DPTR),STATUS )
 	    END IF
 
 *       Map variance and quality and use to set up array of data weights
@@ -786,7 +787,8 @@
 	          CALL ARR_COP1R(OBDAT(NDS).NDAT,%VAL(PTR),
      :            %VAL(OBDAT(NDS).BPTR),STATUS)
 	          IF (STATUS.NE.SAI__OK) GOTO 99
-	          CALL ARR_MULTR(TEFF,OBDAT(NDS).NDAT,%VAL(OBDAT(NDS).BPTR))
+	          CALL ARR_MULTR(TEFF,OBDAT(NDS).NDAT,
+     :        %VAL(OBDAT(NDS).BPTR),STATUS)
 	        END IF
 
 *            If b/g has been subtracted then add it back into data and SSCALE
