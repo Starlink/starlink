@@ -1,7 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
 @SET_MAKE@
-RECURSIVE_TARGETS = clean distclean check
 
 # We can't override target `all', but `all-local' is the approved hook.
 all-local: $(MAIN_TARGET)
@@ -16,5 +15,14 @@ jpeglib-stamp:
 	{ date; \
           echo "jpeglib.h found in system -- no need to build our own"; } >$@
 
-$(RECURSIVE_TARGETS):
-	cd src; $(MAKE) $@
+# Recursive targets, use local versions so that we get proper cleans too.
+# This means we must expand into explicit lines so that automake see them
+# (previously these three were a macro, plus target)
+clean-local:
+	cd src; $(MAKE) clean
+
+distclean-local:
+	cd src; $(MAKE) distclean
+
+check:
+	cd src; $(MAKE) check
