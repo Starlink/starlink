@@ -141,6 +141,8 @@
 *        Now use USI for user interface
 *      1 Dec 1995 V2.0-0 (DJA):
 *        ADI port
+*     17 Apr 1996 V2.0-1 (DJA):
+*        Use new minimisation control
 *     {enter_changes_here}
 
 *  Bugs:
@@ -178,7 +180,7 @@
 	PARAMETER	     	( PROB_REPLY = 99 )
 
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'SGRID Version V2.0-0' )
+        PARAMETER		( VERSION = 'SGRID Version V2.0-1' )
 
 *  Local Variables:
       RECORD /GRID_AXIS/     	GAX(ADI__MXDIM)    	! Grid axes
@@ -199,7 +201,6 @@
       REAL                   LB(NPAMAX)		! Parameter lower bounds
       REAL                   LE(NPAMAX)		! Parameter lower errors
       REAL                   ALO, AHI           ! Grid axis bounds
-      REAL                   MINSLO		! Reduced stat threshold for FIT_MIN
       REAL                   PARAM(NPAMAX)	! Model parameters
       REAL                   RANGE(2)           ! User supplied axis range
       REAL                   UB(NPAMAX)		! Parameter upper bounds
@@ -217,6 +218,7 @@
       INTEGER                	GQPTR              	! Grid quality pointer
       INTEGER                	I, J            	! Loop variables
       INTEGER			IFID			! Input dataset id
+      INTEGER			MCTRL			! Minimisation control
       INTEGER			MFID			! Model spec dataset id
       INTEGER                NDOF		! d.o.f. - no of data values
 					        ! - no of unfrozen params
@@ -225,7 +227,6 @@
       INTEGER                	NGRIDAX            	! # grid axes
       INTEGER                	NGRID              	! # grids
       INTEGER                	NHBUF              	! # lines used in HBUF
-      INTEGER                NITMAX		! Return when NIT reaches NITMAX
       INTEGER                NRANGE             ! # range values entered
       INTEGER                	NPAR			! No of parameters
       INTEGER                	PCOMP(NPAMAX)		! Model par nos.
@@ -533,7 +534,7 @@
           CALL BDI_AXPUT0C( GFID(I), J, 'Label',
      :                      MODEL.PARNAME(GAX(J).PAR), STATUS )
           CALL BDI_AXPUT0C( GFID(I), J, 'Units',
-     :                      MODEL.PARNAME(GAX(J).PAR), STATUS )
+     :                      MODEL.UNITS(GAX(J).PAR), STATUS )
         END DO
 
 *    Title and units for this grid
@@ -621,9 +622,7 @@
 
 *  Set iteration limits
       IF ( OPTIMISING ) THEN
-        CALL USI_DEF0I( 'MAX', 30, STATUS )
-        CALL USI_GET0I( 'MAX', NITMAX, STATUS )
-        CALL USI_GET0R( 'MINS', MINSLO, STATUS )
+        CALL FCI_GETMC( MCTRL, STATUS )
         CALL MSG_PRNT( 'There are free non-grid parameters - '/
      :                          /' optimising at each grid point.' )
       ELSE
@@ -633,9 +632,9 @@
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *  Evaluate grid
-      CALL FIT_GRID( NDS, OBDAT, INSTR, MODEL, OPCHAN, NGRIDAX, GAX,
-     :               NGRID, GPARS, NITMAX, NPAR, LB, UB, FROZEN, SSCALE,
-     :               MINSLO, FSTAT, FIT_PREDDAT, PREDDAT, PARAM,
+      CALL FIT_GRID( NDS, OBDAT, INSTR, MODEL, MCTRL, OPCHAN, NGRIDAX,
+     :               GAX, NGRID, GPARS, NPAR, LB, UB, FROZEN, SSCALE,
+     :               FSTAT, FIT_PREDDAT, PREDDAT, PARAM,
      :               STATMIN, GDPTR, %VAL(GQPTR), GQMASK, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
