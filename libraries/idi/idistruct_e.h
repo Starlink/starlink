@@ -32,7 +32,7 @@
 #if defined(VMS)
 #define NOSHARE extern noshare
 #else
-#define NOSHARE
+#define NOSHARE extern
 #endif
 
 struct      int_bar     /* intensity bar structure              */

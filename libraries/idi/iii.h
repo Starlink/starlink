@@ -6,7 +6,7 @@
 #if defined(VMS)
 #define NOSHARE extern noshare
 #else
-#define NOSHARE
+#define NOSHARE extern
 #endif
 
 NOSHARE int                  sli_ind, sli_r, sli_g, sli_b;
