@@ -63,6 +63,8 @@
    extern int errno;
    char buffer[ BUFLENG ];          /* General purpose buffer */             
 
+/* Static functions. */
+   static char *ccdTclEval( ccdTcl_Interp *cinterp, char *cmd, int *status );
 
 
    ccdTcl_Interp *ccdTclStart( int *status ) {
@@ -82,9 +84,9 @@
 *     the ccdTcl_* routines could use this), so don't use it as one.
 *
 *     Commands can be executed within the Tcl interpreter thus constructed
-*     by calling ccdTclEval.  The correct way to free the resources 
-*     associated with this pointer is using a call to the ccdTclStop 
-*     routine.
+*     by calling ccdTclDo or one of the other similar functions.  The 
+*     correct way to free the resources associated with this pointer 
+*     is using a call to the ccdTclStop routine.
 *
 *  Arguments:
 *     status = int *
@@ -185,7 +187,7 @@
    }
 
 
-   char *ccdTclEval( ccdTcl_Interp *cinterp, char *cmd, int *status ) {
+   static char *ccdTclEval( ccdTcl_Interp *cinterp, char *cmd, int *status ) {
 /*
 *+
 *  Name:
@@ -195,7 +197,7 @@
 *     Evaluate a Tcl command.
 *
 *  Description:
-*     This routine evaluates a command in the Tcl interpreter specified
+*     This routine executes a command in the Tcl interpreter specified
 *     by the cinterp argument, and returns the interpreter's result 
 *     as a character string.  If the return code from the Tcl
 *     interpreter was not TCL_OK, then the status argument will be set.
@@ -205,6 +207,10 @@
 *     reading the response sent back up the pipe from that process.
 *     It also watches for, and outputs appropriately, messages for 
 *     output via the CCDPACK logging system which may come up the pipe.
+*
+*     This function is declared static, and so not intended for use 
+*     by external code.  External routines should use ccdTclDo or one
+*     of the other ccdTcl* functions instead.
 *
 *  Arguments:
 *     cinterp = ccdTcl_Interp *
@@ -384,6 +390,46 @@
    }
 
 
+   void ccdTclDo( ccdTcl_Interp *cinterp, char *script, int *status ) {
+/*+
+*  Name:
+*     ccdTclDo
+*
+*  Purpose:
+*     Execute a Tcl command and discard the result.
+*
+*  Description:
+*     This function executes an arbitrary string of Tcl commands within
+*     the current interpreter and discards the result.  It is better
+*     to use this than ccdTclGetC cast to void if the result string 
+*     may be long, since attempting to pass a long result string up 
+*     the result pipe may result in a buffer overflow.
+*
+*  Arguments:
+*     cinterp = ccdTcl_Interp *
+*        The interpreter got from a previous ccdTclStart call.
+*     script = char *
+*        Any string of Tcl commands.
+*     status = int *
+*        The global status.
+*-
+*/
+
+/* Local variables. */
+      char dobuf[ BUFLENG ];
+
+/* Check the inherited status. */
+      if ( *status != SAI__OK ) return;
+
+/* Construct a command which executes the string, but is guaranteed to
+   have a return value small enough not to overflow the buffer. */
+      sprintf( dobuf, "llength [ %s ]", script );
+
+/* Execute the command in the Tcl interpreter. */
+      (void) ccdTclEval( cinterp, dobuf, status );
+   }
+
+
    void ccdTclRun( ccdTcl_Interp *cinterp, char *filename, int *status ) {
 /*+
 *  Name:
@@ -423,7 +469,7 @@
       }
 
 /* Execute the constructed command. */
-      (void) ccdTclEval( cinterp, buffer, status );
+      ccdTclDo( cinterp, buffer, status );
    }
 
 
@@ -460,9 +506,8 @@
       sprintf( buffer, "lappend %s {%s}", name, value );
 
 /* Execute the command in the Tcl interpreter. */
-      (void) ccdTclEval( cinterp, buffer, status );
+      ccdTclDo( cinterp, buffer, status );
    }
-
 
 
    void ccdTclSetI( ccdTcl_Interp *cinterp, char *name, int value, 
@@ -494,7 +539,7 @@
       sprintf( buffer, "set %s %d", name, value );
 
 /* Execute the command in the Tcl interpreter. */
-      (void) ccdTclEval( cinterp, buffer, status );
+      ccdTclDo( cinterp, buffer, status );
    }
 
 
@@ -527,7 +572,7 @@
       sprintf( buffer, "set %s %g", name, value );
 
 /* Execute the command in the Tcl interpreter. */
-      (void) ccdTclEval( cinterp, buffer, status );
+      ccdTclDo( cinterp, buffer, status );
    }
 
 
@@ -560,7 +605,7 @@
       sprintf( buffer, "set %s {%s}", name, value );
 
 /* Execute the command in the Tcl interpreter. */
-      (void) ccdTclEval( cinterp, buffer, status );
+      ccdTclDo( cinterp, buffer, status );
    }
 
 
@@ -656,6 +701,13 @@
 *  Purpose:
 *     Evaluate a Tcl expression as a string value.
 *
+*  Description:
+*     This function executes an arbitrary string within the Tcl 
+*     interpreter and returns the result string.  Note it should NOT
+*     be used if the return string may be long (longer than BUFLENG)
+*     since this may cause the read buffer to overflow when the result
+*     is passed back up the pipe.
+*
 *  Arguments:
 *     cinterp = ccdTcl_Interp *
 *        The interpreter got from a previous ccdTclStart call.
@@ -666,7 +718,8 @@
 *
 *  Return value:
 *     A pointer to the result of the expression.  If there was an error
-*     then status is set, and the return value will be to an empty string.
+*     then status is set, and the return value will be set to an empty 
+*     string.
 *-
 */
 

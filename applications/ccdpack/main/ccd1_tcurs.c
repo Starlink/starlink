@@ -8,8 +8,6 @@
 #include <stdlib.h>
 #include "tcltalk.h"
 
-
-
 #define BUFLENG 200
 
 
@@ -205,9 +203,8 @@
       ccdTclSetI( cinterp, "CENTROID", F77_ISTRUE(*centrd), status );
       ccdTclSetI( cinterp, "VERBOSE", F77_ISTRUE(*verbos), status );
       for ( i = 0; i < *nipos; i++ ) {
-         sprintf( buffer, "lappend POINTS [ list %d %lf %lf ]", 
-                          idi[ i ], xipos[ i ], yipos[ i ] );
-         ccdTclEval( cinterp, buffer, status );
+         sprintf( buffer, "%d %lf %lf", idi[ i ], xipos[ i ], yipos[ i ] );
+         ccdTclAppC( cinterp, "POINTS", buffer, status );
       }
 
 /* Execute the Tcl script. */
