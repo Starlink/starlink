@@ -20,11 +20,25 @@
 #     <code>sgml2hlp routines.sgml >package.hlp</code>
 #
 #  <diytopic>Environment
-#     <p>Requires that the environment variable <code>STARLINK_SGML_DIR</> is 
-#     properly set, pointing to the root of the Starlink SGML kit.
+#     <p>The program requires that the environment variable 
+#     <code>STARLINK_SGML_DIR</> is properly set, pointing to the root 
+#     of the Starlink SGML kit.
 #
 #     <p>The following binaries must be in the path:
-#        jade nroff tbl sed
+#     <ul>
+#         <li><code>jade</code>
+#         <li><code>nroff</code>
+#         <li><code>sed</code>
+#         <li><code>tbl</code>
+#     </ul>
+#
+#  <examplelist>
+#  <example>
+#  sgml2hlp routines.sgml > package.hlp
+#     <examplenote>
+#     The file <code>routines.sgml</code>, which should conform to the 
+#     Programcode DTD, is processed to produce a <code>.hlp</code> file,
+#     which can be used directly by the HLP facility.
 #
 #  <authorlist>
 #  <author id=mbt>
