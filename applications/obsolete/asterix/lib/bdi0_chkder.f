@@ -82,7 +82,6 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE '{global_constants_file}' ! [global_constants_description]
 
 *  Global Variables:
       INCLUDE 'BDI_CMN'                                 ! BDI common block
@@ -90,37 +89,13 @@
 *         BDI class definitions loaded?
 
 *  Arguments Given:
-      {data_type} {name}[dimensions]
-
-*  Arguments Given and Returned:
-      {data_type} {name}[dimensions]
-
-*  Arguments Returned:
-      {data_type} {name}[dimensions]
+      INTEGER			ID
 
 *  Status:
       INTEGER 			STATUS             	! Global status
 
 *  External References:
       EXTERNAL			BDI0_BLK		! Ensures inclusion
-      [external_declaration]
-      {data_type} {external_name} ! [external_description]
-
-*  Local Constants:
-      {data_type} {constant_name} ! [constant_description]
-      PARAMETER ( {constant_name} = {cons} )
-
-*  Local Variables:
-      {data_type} {name}[dimensions] ! [local_variable_description]
-
-*  Internal References:
-      {data_type} {internal_name} ! [internal_description]
-      [internal_definition_statement]...
-
-*  Local Data:
-      DATA {data_elm} / {data_values}... /
-      [data_stmt]...
-
 *.
 
 *  Check inherited global status.
