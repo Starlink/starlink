@@ -7,7 +7,7 @@ noinst_LTLIBRARIES = libappcb.la
 
 libappcb_la_SOURCES = $(F_ROUTINES)
 
-F_ROUTINES = \ 
+F_ROUTINES = \
 spd_czad.f spd_czbc.f spd_czbd.f spd_czbe.f spd_czca.f spd_czde.f \
 spd_czee.f spd_czfd.f spd_czge.f spd_czjd.f \
 spd_czje.f spd_czmd.f spd_czme.f spd_cznd.f spd_czpd.f spd_czpf.f \
