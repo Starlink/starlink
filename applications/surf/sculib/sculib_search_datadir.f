@@ -132,7 +132,11 @@
 
       IF (STATUS .NE. SAI__OK) RETURN
 
+*     Variable initialization
       TRYING = .TRUE.
+      CWD = ' '
+      DATA_DIR = ' '
+
 
       DO WHILE (TRYING)
  
@@ -254,7 +258,7 @@
 
 *     If everything is okay then we simply change to the DATADIR directory
 
-               IF (ISTAT .EQ. 0) THEN
+               IF (ISTAT .EQ. 0 .AND. STATUS .EQ. SAI__OK) THEN
 
                   ISTAT = CHDIR(DATA_DIR)
 
@@ -279,6 +283,14 @@
 
 *     Now we remember to change back to our first directory
                      ISTAT = CHDIR(CWD)
+
+*     Always check system calls. 
+                     IF (ISTAT .NE. 0) THEN
+                        IF (STATUS .EQ. SAI__OK) STATUS = SAI__ERROR
+                        CALL ERR_REP(' ','Could not change back '//
+     :                       'to current working directory (^CWD) '//
+     :                       'from DATADIR', STATUS)
+                     END IF
 
 *     If everything is fine we inform the user and stop looping
                      IF (INDF .NE. NDF__NOID) THEN
