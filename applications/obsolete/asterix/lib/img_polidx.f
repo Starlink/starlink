@@ -79,6 +79,7 @@
 *      Calculate radius of element
 	  RAD = SQRT(XOLD**2+YOLD**2)
           KK = INT( RAD / RBIN ) + 1
+          KK = MIN( NRAD, KK )
 
 *      Find position angle of element
 	  THETA = ATAN2(YOLD,XOLD)
