@@ -114,7 +114,6 @@
       INTEGER			IFILES			! Input file info
       INTEGER 			IDUM
       INTEGER 			NFAIL                   ! # failures in SPLREC
-      INTEGER 			NLINES                  ! No of lines of text
       INTEGER			OFID			! O/p dataset id
       INTEGER			TLEN			! Length of string
 
