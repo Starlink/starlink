@@ -148,8 +148,9 @@ AC_SUBST([staretcdir],  ['${prefix}/etc'])dnl
 if $_star_per_package_dirs; then
     bindir="$bindir/$PACKAGE_NAME"
     starhelpdir="$starhelpdir/$PACKAGE_NAME"
+    staretcdir="$staretcdir/$PACKAGE_NAME"
     AC_MSG_NOTICE([[STAR_DEFAULTS] has option per-package-dirs:])
-    AC_MSG_NOTICE([    bindir=$bindir starhelpdir=$starhelpdir])
+    AC_MSG_NOTICE([    bindir=$bindir starhelpdir=$starhelpdir staretcdir=$staretcdir])
 fi
 
 # Dependency declarations and checks.
