@@ -810,7 +810,9 @@ uninstall-am: uninstall-binSCRIPTS uninstall-info-am \
 
 start: start.in
 	rm -f start.tmp start
-	$(edit) $(srcdir)/start.in >start.tmp
+	$(edit) \
+	    -e 's,@edited_input\@,start: produced from start.in by Makefile.am,' \
+	    $(srcdir)/start.in >start.tmp
 	mv start.tmp start
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

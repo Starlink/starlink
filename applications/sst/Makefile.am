@@ -45,5 +45,7 @@ edit = sed \
 	-e 's,@VERSION\@,$(VERSION),g'
 start: start.in
 	rm -f start.tmp start
-	$(edit) $(srcdir)/start.in >start.tmp
+	$(edit) \
+	    -e 's,@edited_input\@,start: produced from start.in by Makefile.am,' \
+	    $(srcdir)/start.in >start.tmp
 	mv start.tmp start
