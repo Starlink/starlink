@@ -1,4 +1,4 @@
-@set UPDATED 17 June 2004
-@set UPDATED-MONTH June 2004
-@set EDITION 2.59
-@set VERSION 2.59
+@set UPDATED 19:16 June ./autoconf.texi
+@set UPDATED-MONTH June ./autoconf.texi
+@set EDITION 2.59-starlink1
+@set VERSION 2.59-starlink1

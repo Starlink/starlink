@@ -45,6 +45,7 @@ mkinstalldirs = $(SHELL) $(top_srcdir)/config/mkinstalldirs
 CONFIG_CLEAN_FILES =
 SOURCES =
 DIST_SOURCES =
+STAR_EXTRA_DIST =
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-exec-recursive install-info-recursive \
@@ -56,7 +57,6 @@ nodist_pkgdataDATA_INSTALL = $(INSTALL_DATA)
 DATA = $(nodist_pkgdata_DATA)
 ETAGS = etags
 CTAGS = ctags
-INSTALL_STARDATA = $(INSTALL_DATA)
 DIST_SUBDIRS = $(SUBDIRS)
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST) \
 	$(STAR_EXTRA_DIST)
@@ -184,8 +184,8 @@ install-nodist_pkgdataDATA: $(nodist_pkgdata_DATA)
 	  f="`echo $$p | sed -e 's|^.*/||'`"; \
 	  echo " $(nodist_pkgdataDATA_INSTALL) $$d$$p $(DESTDIR)$(pkgdatadir)/$$f"; \
 	  $(nodist_pkgdataDATA_INSTALL) $$d$$p $(DESTDIR)$(pkgdatadir)/$$f; \
-	  if test -n "$$MANIFEST_FILE"; then \
-	  	echo "$(DESTDIR)$(pkgdatadir)/$$f" >>$$MANIFEST_FILE; \
+	  if test -n "$(MANIFEST_FD)"; then \
+	  	echo "$(DESTDIR)$(pkgdatadir)/$$f" >&$(MANIFEST_FD); \
 	  else :; fi; \
 	done
 
@@ -313,28 +313,6 @@ GTAGS:
 distclean-tags:
 	-rm -f TAGS ID GTAGS GRTAGS GSYMS GPATH tags
 
-# Create an install manifest, and install it in the required manifest location
-install-manifest.xml: all-am
-	rm -f $@
-	echo "<?xml version='1.0'?>"                            >$@
-	echo "<!DOCTYPE manifest SYSTEM 'componentinfo.dtd'>"   >>$@
-	echo "<manifest component='$(PACKAGE)'>"                >>$@
-	echo "<version>$(PACKAGE_VERSION)</version>"            >>$@
-	echo "<files>"                                          >>$@
-	env MANIFEST_FILE=`pwd`/$@ $(MAKE) install
-	echo "</files>"                                         >>$@
-	echo "</manifest>"                                      >>$@
-
-# Install the install-manifest.xml into the $(STAR_MANIFEST_DIR) directory.
-# We should respect $(DESTDIR), but needn't worry about $(srcdir),
-# since we know that the file was created in the current directory.
-# Having done that, delete the install-manifest.xml file
-install-manifest: install-manifest.xml
-	@$(NORMAL_INSTALL)
-	$(mkdir_p) $(DESTDIR)$(STAR_MANIFEST_DIR)
-	$(INSTALL_DATA) install-manifest.xml \
-		$(DESTDIR)$(STAR_MANIFEST_DIR)/$(PACKAGE)
-
 distdir: $(DISTFILES)
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
@@ -386,8 +364,44 @@ install-exec: install-exec-recursive
 install-data: install-data-recursive
 uninstall: uninstall-recursive
 
+# Wrap the installation in an environment which has MANIFEST_FD open on
+# a manifest file which the rest of the installation
+# should append to.  Only do this if STAR_MANIFEST_DIR is defined and
+# MANIFEST_FD isn't -- this should always be the case, but don't
+# fail if it isn't.  If we permit MANIFEST_FD to be defined, then
+# (a) it makes it possible to control this from outside by defining
+# this variable deliberately (given that we were ever to decide that
+# was a cunning plan), and (b) if one of these makefiles has its
+# `install-am' target invoked (which I don't _think_ should happen)
+# then we don't end up creating two manifests.
 install-am: all-am
-	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
+# Create an install manifest, and install it in the required manifest location
+	if test -n "$(STAR_MANIFEST_DIR)" -a -z "$(MANIFEST_FD)"; then \
+	    $(mkdir_p) $(DESTDIR)$(STAR_MANIFEST_DIR); \
+	    MF=$${TMPDIR-/tmp}/manifest-$$$$; rm -f $$MF && exec 5>$$MF && \
+	    echo "<?xml version='1.0'?>"                          >&5 ; \
+	    echo "<!DOCTYPE manifest SYSTEM 'componentinfo.dtd'>" >&5 ; \
+	    echo "<manifest component='$(PACKAGE_NAME)'>"         >&5 ; \
+	    echo "<version>$(PACKAGE_VERSION)</version>"          >&5 ; \
+	    echo "<files>"                                        >&5 ; \
+	    MANIFEST_FD=5 $(MAKE) $(AM_MAKEFLAGS) \
+	        install-exec-am install-data-am; \
+	    echo "</files>"                                       >&5; \
+	    echo "</manifest>"                                    >&5; \
+	    exec 5>&-; \
+	    $(INSTALL_DATA) $$MF $(DESTDIR)$(STAR_MANIFEST_DIR)/$(PACKAGE); \
+	    rm -f $$MF; \
+	else \
+	    $(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am; \
+	fi
+	rm -f stamp-starlink-install
+	echo "component=\"$(PACKAGE_NAME)\"" >stamp-starlink-install
+	echo "version=\"$(PACKAGE_VERSION)\"" >>stamp-starlink-install
+	echo "date=\"`date`\"" >>stamp-starlink-install
+	$(mkdir_p) $(STAR_MANIFEST_DIR)
+	$(INSTALL_DATA) stamp-starlink-install \
+	    $(STAR_MANIFEST_DIR)/stamp-`echo $(PACKAGE_NAME) | sed 's/[^A-Za-z0-9.-]/_/g'`
+	rm -f stamp-starlink-install
 
 installcheck: installcheck-recursive
 install-strip:
