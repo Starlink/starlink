@@ -212,6 +212,9 @@
 #        Updated for GAIA version 2.0.
 #     2-NOV-1998 (PDRAPER):
 #        Updated for GAIA version 2.2.
+#     18-MAY-1999 (PDRAPER):
+#        Updated for GAIA version 2.3. Introduced single binaries
+#        for Tcl scripts.
 #     {enter_further_changes_here}
 #
 #  Bugs:
@@ -512,119 +515,26 @@ DOCUMENTATION = $(LATEX_DOCS) $(HYPERTEXT_DOCS:.htx=.htx_tar) $(PKG_NAME).news
 #  List of files that should be created and copied into the runtime
 #  directory for a sucessful built of GAIA.
 
-GAIA_FILES = \
- Batch.tcl ETable.tcl FileSelect.tcl Gaia.tcl GaiaAstTransfer.tcl \
- GaiaAstTransferTable.tcl GaiaContour.tcl GaiaConvertTable.tcl \
- GaiaForeignExec.tcl GaiaImageCtrl.tcl GaiaImageCut.tcl \
- GaiaImageMBand.tcl GaiaImagePanel.tcl GaiaImagePick.tcl \
- GaiaImagePrint.tcl GaiaImageSpectrum.tcl GaiaQuery.tcl \
- GaiaQueryResult.tcl GaiaSearch.tcl GaiaSextractor.tcl \
- LabelCommandMenu.tcl LabelEntry.tcl LabelEntryMenu.tcl \
- LabelEntryScale.tcl LabelFileChooser.tcl LabelMenu.tcl LabelRule.tcl \
- ManyLabelEntry.tcl NameChooser.tcl NewStarBlink.tcl Queue.tcl \
- ScrollArrows.tcl ScrollText.tcl Scrollbox.tcl StarApp.tcl \
- StarAppFilter.tcl StarArd.tcl StarArdAnnBox.tcl StarArdAnnCircle.tcl \
- StarArdAnnColumn.tcl StarArdAnnEllipse.tcl StarArdAnnList.tcl \
- StarArdAnnPixel.tcl StarArdAnnPoly.tcl StarArdAnnRect.tcl \
- StarArdAnnRotBox.tcl StarArdAnnRow.tcl StarArdAnnTool.tcl \
- StarArdBox.tcl StarArdCircle.tcl StarArdColumn.tcl StarArdEllipse.tcl \
- StarArdLine.tcl StarArdList.tcl StarArdPixel.tcl StarArdPoly.tcl \
- StarArdPrim.tcl StarArdRect.tcl StarArdRotBox.tcl StarArdRow.tcl \
- StarArdTool.tcl StarAstCopy.tcl StarAstDefine.tcl StarAstGrid.tcl \
- StarAstReference.tcl StarAstRefine.tcl StarAstSystem.tcl \
- StarAstTable.tcl StarBlink.tcl StarCanvasDraw.tcl StarCanvasObject.tcl \
- StarDemo.tcl StarEnterObject.tcl StarLabelCheck.tcl StarPatch.tcl \
- StarPhotom.tcl StarPhotomDetails.tcl StarPhotomExtras.tcl \
- StarPhotomList.tcl StarPhotomObject.tcl gaia2astrom.tcl gaiaMain.tcl \
- gaia_defaults.tcl gaia_util.tcl gaia_version.tcl graphics_features.tcl \
+GAIA_LIB_FILES =  \
  Catalogue.hlp Gaia.hlp GaiaSearch.hlp GaiaSextractor.hlp \
  StarArd.hlp StarAst.hlp StarAstCopy.hlp StarAstDefine.hlp \
  StarAstGrid.hlp StarAstReference.hlp StarAstRefine.hlp \
  StarAstSystem.hlp StarBlink.hlp StarPatch.hlp StarPhotom.hlp \
- skycat.cfg gaiawcs2tab tclIndex pix2wcs \
- gaia_wish ardstat ardstat.ifc autocrop autocrop.ifc \
- cat2tab cat2tab.ifc tab2cat tab2cat.ifc asc2tab asc2tab.ifc tab2asc \
- tab2asc.ifc \
- gaia.sh gaiadisp.sh gaiaremote.sh gaia_logo.xpm
+ skycat.cfg gaiawcs2tab pix2wcs gaia.sh gaiadisp.sh gaiaremote.sh \
+ adamMessageRelay 
 
+GAIA_BIN_FILES = \
+ gaia_swish gaia_stcl ardstat ardstat.ifc autocrop autocrop.ifc \
+ cat2tab cat2tab.ifc tab2cat tab2cat.ifc asc2tab asc2tab.ifc tab2asc \
+ tab2asc.ifc
+
+GAIA_FILES = $(GAIA_LIB_FILES) $(GAIA_BIN_FILES)
 
 SKYCAT_FILES = \
- SkyCat.tcl SkyCatCtrl.tcl SkyCatHduChooser.tcl SkyQuery.tcl \
- SkyQueryResult.tcl SkySearch.tcl skycat_defaults.tcl \
- skycat_version.tcl \
- AstroCat.tcl AstroImage.tcl AstroQuery.tcl CatalogInfo.tcl \
- EnterObject.tcl PreviewPlot.tcl ProxyDialog.tcl QueryResult.tcl \
- SearchConfig.tcl SymbolConfig.tcl cat_version.tcl \
- catdefaults.tcl \
- Rtd.tcl RtdImage.tcl RtdImageColorRamp.tcl RtdImageColors.tcl \
- RtdImageCtrl.tcl RtdImageCut.tcl RtdImageFrame.tcl RtdImageGrid.tcl \
- RtdImageIcon.tcl RtdImageMBand.tcl RtdImagePan.tcl RtdImagePanel.tcl \
- RtdImagePerf.tcl RtdImagePick.tcl RtdImagePixTable.tcl \
- RtdImagePopup.tcl RtdImagePrint.tcl RtdImageSpectrum.tcl \
- RtdImageTrans.tcl RtdImageZoom.tcl RtdImageZoomView.tcl \
- RtdRecorder.tcl RtdRemoteTcl.tcl RtdServerTool.tcl \
- rtd_defaults.tcl rtd_version.tcl \
- astrotcl_version.tcl \
- LabelChoice.tcl TableListSort.tcl ButtonFrame.tcl \
- TextDialog.tcl CanvasDraw.tcl TopLevelWidget.tcl \
- CanvasPrint.tcl CanvasWidget.tcl LabelMessage.tcl \
- bltGraph.tcl CheckEntry.tcl LabelNumber.tcl canvastext.tcl \
- ChoiceDialog.tcl LabelValue.tcl Chooser.tcl LabelWidget.tcl \
- list.tcl DialogWidget.tcl ListDialog.tcl DoubleList.tcl \
- ListboxWidget.tcl DoubleTableList.tcl PasswdDialog.tcl \
- EntryForm.tcl PrintDialog.tcl tclutil.tcl ProgressBar.tcl \
- tclutil_defaults.tcl FrameWidget.tcl \
- tclutil_version.tcl GraphPrint.tcl TableList.tcl tkutil.tcl \
- HelpWin.tcl TableListConfig.tcl udialog.tcl InputDialog.tcl \
- TableListConfigFile.tcl LabelCheck.tcl TableListPrint.tcl \
- pkgIndex.tcl rtdServer rtdClient
+ rtdServer rtdClient
 
 TCL_FILES = \
- history.tcl init.tcl ldAout.tcl parray.tcl safe.tcl word.tcl \
- bgerror.tcl dialog.tcl msgbox.tcl scale.tcl button.tcl entry.tcl \
- obsolete.tcl scrlbar.tcl tkfbox.tcl clrpick.tcl focus.tcl \
- optMenu.tcl xmfbox.tcl comdlg.tcl palette.tcl tearoff.tcl \
- console.tcl listbox.tcl prolog.ps text.tcl menu.tcl safetk.tcl \
- tk.tcl \
- bltCanvEps.pro bltHier.tcl bltDnd.tcl bltTabset.tcl \
- itcl.tcl \
- Archetype.itk Widget.itk Toplevel.itk itk.tcl \
- iwidgets.tcl \
- buttonbox.itk pane.itk calendar.itk panedwindow.itk \
- canvasprintbox.itk promptdialog.itk canvasprintdialog.itk \
- pushbutton.itk checkbox.itk radiobox.itk colors.itcl \
- regexpfield.itk combobox.itk roman.itcl dateentry.itk \
- scopedobject.itcl datefield.itk scrolledcanvas.itk dialog.itk \
- scrolledframe.itk dialogshell.itk scrolledhtml.itk \
- disjointlistbox.itk scrolledlistbox.itk entryfield.itk \
- scrolledtext.itk extfileselectionbox.itk scrolledwidget.itk \
- extfileselectiondialog.itk selectionbox.itk feedback.itk \
- selectiondialog.itk fileselectionbox.itk shell.itk \
- fileselectiondialog.itk spindate.itk finddialog.itk spinint.itk \
- hierarchy.itk spinner.itk hyperhelp.itk spintime.itk \
- labeledframe.itk tabnotebook.itk labeledwidget.itk tabset.itk \
- mainwindow.itk menubar.itk timeentry.itk messagebox.itk \
- timefield.itk messagedialog.itk toolbar.itk notebook.itk \
- optionmenu.itk watch.itk \
- atclsh adamMessageRelay adamtask.tcl \
- autoload.tcl tcl.tndx tclx.tcl buildidx.tcl tcl.tlib \
- tkx.tcl
-
-GAIA_COLORMAP_FILES = bgyrw.lasc
-
-SKYCAT_COLORMAP_FILES = \
- aips0.lasc backgr.lasc blue.lasc blulut.lasc color.lasc \
- equa.iasc expo.iasc gamma.iasc green.lasc heat.lasc idl11.lasc \
- idl12.lasc idl14.lasc idl15.lasc idl2.lasc idl4.lasc idl5.lasc \
- idl6.lasc isophot.lasc jigsaw.iasc lasritt.iasc light.lasc log.iasc \
- manycol.lasc neg.iasc neglog.iasc null.iasc pastel.lasc rainbow.lasc \
- rainbow1.lasc rainbow2.lasc rainbow3.lasc rainbow4.lasc ramp.iasc \
- ramp.lasc random.lasc random1.lasc random2.lasc random3.lasc \
- random4.lasc random5.lasc random6.lasc real.lasc red.lasc smooth.lasc \
- smooth1.lasc smooth2.lasc smooth3.lasc staircase.lasc stairs.iasc \
- stairs8.lasc stairs9.lasc standard.lasc
-
-COLORMAP_FILES = $(GAIA_COLORMAP_FILES) $(SKYCAT_COLORMAP_FILES)
+ bltCanvEps.pro bltGraph.pro
 
 #  Names of all these files.
 
@@ -633,7 +543,7 @@ $(GAIA_FILES): $(SKYCAT_FILES)
 $(SKYCAT_FILES): $(TCL_FILES)
 
 #  Names of binaries that will need to be stripped.
-RUNTIME_BINARIES = gaia_wish atclsh rtdClient rtdServer ardstat \
+RUNTIME_BINARIES = gaia_swish gaia_stcl rtdClient rtdServer ardstat \
                    autocrop tab2cat cat2tab asc2tab tab2asc
 
 #  Names of scripts that will need 755 protections.
@@ -659,7 +569,7 @@ RUNTIME_SCRIPTS = gaia.sh gaiadisp.sh gaiaremote.sh adamMessageRelay
 #  file).
 
 BUILT_FILES = \
- $(PUBLIC_SCRIPTS) $(RUNTIME_FILES) $(COLORMAP_FILES) \
+ $(PUBLIC_SCRIPTS) $(RUNTIME_FILES) \
  $(IRAF_SCRIPTS) $(IRAF_HELP) helpdb.mip
 
 #  List of links used to access include files during compilation.  This
@@ -724,7 +634,6 @@ DATE_STAMP = $(PKG_NAME)_datestamp
 #  package is installed.
 
 INSTALL_BIN = $(INSTALL)/bin/$(PKG_NAME)
-INSTALL_MAPS = $(INSTALL)/bin/$(PKG_NAME)/colormaps
 INSTALL_DATES = $(INSTALL)/dates
 INSTALL_DOCS = $(INSTALL)/docs
 INSTALL_HELP = $(INSTALL)/help/$(PKG_NAME)
@@ -749,21 +658,6 @@ $(INSTALL_DIRS):
 #  directory.  The actual installation copies these parts into place.
 
 SCRIPT_PLACES = \
-	./built/lib/tclX8.0.3/*.tcl \
-	./built/lib/tclX8.0.3/tcl.tndx \
-	./built/lib/tclX8.0.3/tcl.tlib \
-	./built/lib/tkX8.0.3/*.tcl \
-	./built/lib/itcl3.0/*.tcl \
-	./built/lib/itk3.0/*.itk \
-	./built/lib/itk3.0/*.tcl \
-	./built/lib/tcl8.0/*.tcl  \
-	./built/lib/startcl/* \
-	./built/lib/tk8.0/*.tcl \
-	./built/lib/tk8.0/prolog.ps \
-	./built/lib/iwidgets3.0.0/scripts/*.itk \
-	./built/lib/iwidgets3.0.0/scripts/*.itcl \
-	./built/lib/iwidgets3.0.0/*.tcl \
-	./built/lib/blt2.4/*.tcl \
 	./built/lib/blt2.4/*.pro
 
 $(TCL_FILES): .tcl.built
@@ -787,8 +681,8 @@ $(TCL_FILES): .tcl.built
 
 #  Rule for building the rtd installation. Again we will actually only
 #  install part of this. Note SKYCAT_WRAPPER_DIR works around need for
-#  tclpro (et build succeeds, but produces an invalid binary).
-$(SKYCAT_FILES) $(SKYCAT_COLORMAP_FILES): .skycat.built
+#  tclpro (ET build succeeds, but produces an invalid binary).
+$(SKYCAT_FILES): .skycat.built
 
 .skycat.built: gaia_skycat.tar
 	- rm -r -f ./skycat/
@@ -803,43 +697,12 @@ $(SKYCAT_FILES) $(SKYCAT_COLORMAP_FILES): .skycat.built
 	make -e all install)
 	cp -p ./built/bin/rtdClient .
 	cp -p ./built/bin/rtdServer .
-	for f in ./built/lib/rtd/* ./built/lib/rtd/.??* ""; do \
-	   if test -f "$$f"; then \
-	      cp -p $$f . ;\
-	   else :; fi;\
-	done
-	for f in ./built/lib/skycat/* ""; do \
-	   if test -f "$$f"; then \
-	      cp -p $$f . ;\
-	   else :; fi;\
-	done
-	for f in ./built/lib/tclutil/* ""; do \
-	   if test -f "$$f"; then \
-	      cp -p $$f . ;\
-	   else :; fi;\
-	done
-	for f in ./built/lib/astrotcl/* ""; do \
-	   if test -f "$$f"; then \
-	      cp -p $$f . ;\
-	   else :; fi;\
-	done
-	for f in ./built/lib/cat/* ""; do \
-	   if test -f "$$f"; then \
-	      cp -p $$f . ;\
-	   else :; fi;\
-	done
-	for f in ./built/lib/rtd/colormaps/* ""; do \
-	   if test -f "$$f"; then \
-	      cp -p $$f . ;\
-	   else :; fi;\
-	done
 	touch .skycat.built
 
 #  Rule for building the GAIA installation. This installs into built/
 #  as do the other components. These are then all lifted from built/
-#  into this directory and a tclIndex that will work for all files is
-#  created.
-$(GAIA_FILES) $(GAIA_COLORMAP_FILES): .gaia.built
+#  into this directory.
+$(GAIA_FILES): .gaia.built
 
 .gaia.built: gaia.tar
 	rm -r -f ./gaia/
@@ -847,37 +710,20 @@ $(GAIA_FILES) $(GAIA_COLORMAP_FILES): .gaia.built
 	- mkdir -p ./built ;\
 	pwd=`pwd`;\
 	(cd ./gaia; \
+	PATH=$${pwd}/built/bin:$${PATH}; export PATH; \
 	export INSTALL; unset INSTALL;\
 	./configure --prefix=$${pwd}/built;\
 	make -e all install)
-	cp -p ./built/bin/autocrop .
-	cp -p ./built/bin/autocrop.ifc .
-	cp -p ./built/bin/ardstat .
-	cp -p ./built/bin/ardstat.ifc .
-	cp -p ./built/bin/autocrop .
-	cp -p ./built/bin/gaia_wish .
-	cp -p ./built/bin/tab2cat .
-	cp -p ./built/bin/tab2cat.ifc .
-	cp -p ./built/bin/cat2tab .
-	cp -p ./built/bin/cat2tab.ifc .
-	cp -p ./built/bin/asc2tab .
-	cp -p ./built/bin/asc2tab.ifc .
-	cp -p ./built/bin/tab2asc .
-	cp -p ./built/bin/tab2asc.ifc .
-	for f in ./built/lib/gaia/* ./built/lib/gaia/.??* ""; do \
-	   if test -f "$$f"; then \
-	      cp -p $$f .;\
+	for f in $(GAIA_BIN_FILES) ""; do \
+	   if test -f "built/bin/$${f}"; then \
+	      cp -p built/bin/$${f} .;\
 	   else :; fi;\
 	done
-	for f in ./built/lib/gaia/colormaps/* ""; do \
-	   if test -f "$$f"; then \
-	      cp -p $$f . ;\
+	for f in $(GAIA_LIB_FILES) ""; do \
+	   if test -f "built/lib/gaia/$${f}"; then \
+	      cp -p built/lib/gaia/$${f} .;\
 	   else :; fi;\
 	done
-	(cd built;\
-	 find . -name tclIndex -exec cat {} \; > ../tclIndex; \
-	 echo >> ../tclIndex "set auto_index(auto_load_ouster_index) [list source [file join \$$dir loadouster.tcl]]";\
-	)
 	touch .gaia.built
 
 #-------------------------------------------------------------------------------
@@ -1086,13 +932,6 @@ install:
 	      chmod 755 $(INSTALL_BIN)/$$f;\
 	   else :; fi;\
         done
-	for f in $(COLORMAP_FILES) ""; do \
-	   if test -n "$$f"; then \
-	      cp -p $$f $(INSTALL_MAPS);\
-	      rm -f $$f;\
-	      $(LINK) $(INSTALL_MAPS)/$$f $$f;\
-	   else :; fi;\
-	done
 #
 #  Install the monolith, giving it world execute permission.
 #	for f in $(MONOLITH) ""; do \
@@ -1274,13 +1113,6 @@ do_deinstall:
 	      rm -f $$f ;\
 	      cp -p $(INSTALL_BIN)/$$f ./ ;\
               rm -f $(INSTALL_BIN)/$$f;\
-	   else :; fi;\
-	done
-	for f in $(COLORMAP_FILES) ""; do \
-	   if test -f $(INSTALL_MAPS)/$$f; then \
-	      rm -f $$f;\
-              cp -p $(INSTALL_MAPS)/$$f ./ ;\
-	      rm -f $(INSTALL_MAPS)/$$f;\
 	   else :; fi;\
 	done
 #
@@ -1482,7 +1314,7 @@ $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z: $(SOURCE_FILES) $(DATE_STAMP)
 	if test -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z; then \
            rm -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z; else :; fi
 	$(TAR_IN) - $(SOURCE_FILES) $(PUBLIC_SCRIPTS) $(RUNTIME_FILES)  \
-		$(COLORMAP_FILES) $(DATE_STAMP) $(IRAF_SCRIPTS) \
+		$(DATE_STAMP) $(IRAF_SCRIPTS) \
 		$(IRAF_HELP) helpdb.mip .BUILT .gaia.built \
 		.skycat.built .tcl.built \
            | compress -v > $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z
@@ -1520,7 +1352,7 @@ $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z: $(SOURCE_FILES) $(DATE_STAMP)
 	if test -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z; then \
            rm -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z; else :; fi
 	$(TAR_IN) - mk makefile $(DOCUMENTATION) $(PUBLIC_SCRIPTS) \
-	   $(RUNTIME_FILES) $(COLORMAP_FILES) $(DATA_FILES) \
+	   $(RUNTIME_FILES) $(DATA_FILES) \
 	   $(IRAF_SCRIPTS) $(IRAF_HELP) helpdb.mip $(DATE_STAMP) .BUILT \
            | compress -v > $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z
 
@@ -1575,7 +1407,7 @@ clean:
 
 unbuild: clean
 	@- rm -f $(BUILT_FILES) $(DATE_STAMP) .BUILT 1>/dev/null 2>/dev/null
-	@- rm -f $(RUNTIME_FILES) $(COLORMAP_FILES) 1>/dev/null 2>/dev/null
+	@- rm -f $(RUNTIME_FILES) 1>/dev/null 2>/dev/null
 	@- rm -f .gaia.built .tcl.built .skycat.built 1>/dev/null 2>/dev/null
 	@ echo '*** Built files removed'
 	@ echo
