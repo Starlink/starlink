@@ -148,7 +148,7 @@
       INTEGER       I                          ! DO loop index
       INTEGER       ITEMP                      ! scratch integer
       INTEGER       J                          ! DO loop index
-      INTEGER       RTEMP                      ! scratch real            
+      REAL          RTEMP                      ! scratch real            
       CHARACTER*15  STEMP                      ! scratch string
 *    Internal References :
 *    Local data :
