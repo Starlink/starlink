@@ -159,7 +159,7 @@
 *    Function declarations :
 *    Local constants :
       INTEGER NLINE
-      PARAMETER (NLINE=7)
+      PARAMETER (NLINE=6)
 *    Local variables :
       CHARACTER*79 TEXT(NLINE)
       INTEGER I
@@ -266,7 +266,8 @@
       CHARACTER*80 REC
       REAL COLTAB(3,16)
       INTEGER IFD
-      INTEGER I
+      INTEGER I,N
+      LOGICAL OK
 *-
 
       IF (STATUS.EQ.SAI__OK) THEN
