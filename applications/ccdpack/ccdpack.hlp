@@ -7010,16 +7010,6 @@ MAXCANV = INTEGER (Read and Write)
    the program attempting to display an enormous viewing region.
    If set to zero, then no limit is in effect.
    [1280]
-3 NAMELIST
-NAMELIST = LITERAL (Read)
-   The name of a file to contain the names of the output
-   position lists. The names written to this file are those
-   generated using the expression given to the OUTLIST parameter.
-   This file may be used in an indirection expression to input
-   all the position lists output from this routine into another
-   routine, if the associating position lists with images option is
-   not being used.
-   [PAIRNDF.LIS]
 3 OUTLIST
 OUTLIST = LITERAL (Read)
    An expression which is either a list of names or expands to a
@@ -7049,6 +7039,20 @@ OUTLIST = LITERAL (Read)
    recommended that wildcards are also used for the position list
    names as the correspondence between these may be confusing.
    [*.DAT]
+3 OVERRIDE
+OVERRIDE = _LOGICAL (Read)
+   This parameter controls whether to continue and create an
+   incomplete solution. Such solutions will result when only a
+   subset of the input position lists have been paired.
+
+   In this case, any images for which matching was not 
+   achieved will have their associated position lists removed
+   from their .MORE.CCDPACK extensions.  Thus after running 
+   PAIRNDF with OVERRIDE set to TRUE, any position list associated
+   with an image is guaranteed to be one which has been matched, and 
+   not just one left over from the previously associated unmatched 
+   list.
+   [TRUE]
 3 PERCENTILES
 PERCENTILES( 2 ) = _DOUBLE (Read)
    The default low and high percentiles of the data range to use
