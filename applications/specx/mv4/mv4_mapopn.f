@@ -48,6 +48,9 @@
 *        for size verification against header. This was added
 *        because some people have maps where NSPEC is not equal
 *        to the number of spectra in the map itself!
+*     3 Nov 2003 (timj):
+*        Should only compare bounds when STATUS is good (eg when
+*        opening a new file you get bad status!)
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -147,7 +150,7 @@
 
 *  Verify the dimensions of the spectral data
       CALL NDF_DIM( POSNDF, NUM_POSN_DIMS, SPDIM, NSPDIMS, STATUS)
-      IF (NSPDIMS .NE. NUM_POSN_DIMS) THEN
+      IF (STATUS .EQ. SAI__OK .AND. NSPDIMS .NE. NUM_POSN_DIMS) THEN
 *  Abort if we do not get the right number of dimensions
          print *,'Fatal error in map. Number of dimensions is ',
      :        NSPDIMS, ' and not ', NUM_POSN_DIMS
@@ -157,8 +160,10 @@
 
 *  Set NSPEC from here prior to reading the header itself
 *  Ideally the header should already have been read.      
-      NSPEC = SPDIM(2)
-      NPTS1 = SPDIM(1)
+      IF (STATUS .EQ. SAI__OK) THEN
+         NSPEC = SPDIM(2)
+         NPTS1 = SPDIM(1)
+      END IF
 
       CALL DAT_ANNUL( TLOC, STATUS )
 
