@@ -64,6 +64,22 @@ dnl    which means that the rule is completely redundant.
 #
 # Always create a manifest-install target
 _STAR_MAKE_MANIFEST
+
+# Dependencies declarations and checks (see macros
+# [STAR_DECLARE_BUILD_DEPENDENCIES] and [STAR_DECLARE_USE_DEPENDENCIES])
+STAR_BUILD_DEPENDENCIES='starconf'
+AC_SUBST(STAR_BUILD_DEPENDENCIES)dnl
+STAR_USE_DEPENDENCIES=''
+AC_SUBST(STAR_USE_DEPENDENCIES)dnl
+
+# List of documentation.  See [STAR_LATEX_DOCUMENTATION].
+# STAR_DOCUMENTATION is a list of document codes,
+# STAR_DOCUMENTATION_TARGETS is a list of targets which may be
+# included in a Makefile.am EXTRA_DIST line
+STAR_DOCUMENTATION=
+AC_SUBST([STAR_DOCUMENTATION])
+STAR_DOCUMENTATION_TARGETS=
+AC_SUBST([STAR_DOCUMENTATION_TARGETS])
 ])# STAR_DEFAULTS
 
 # STAR_FACILITY_CODE(code, [msgfile=$PACKAGE_err.msg])
@@ -82,10 +98,11 @@ _star_tmp=m4_ifval([$2], [$2], [${PACKAGE}_err.msg])
 cat >>$STAR_BOILERPLATE <<EOD
 #  Rules for generating files built by the error message system.
 #  ------------------------------------------------------------
-${PACKAGE}_err:   $_star_tmp; $(STARLINK)/bin/messgen -f $_star_tmp
-${PACKAGE}_err.h: $_star_tmp; $(STARLINK)/bin/messgen -c $_star_tmp
-fac_$1_err:       $_star_tmp; $(STARLINK)/bin/messgen -e $_star_tmp
+${PACKAGE}_err:   $_star_tmp; \$(STARLINK)/bin/messgen -f $_star_tmp
+${PACKAGE}_err.h: $_star_tmp; \$(STARLINK)/bin/messgen -c $_star_tmp
+fac_$1_err:       $_star_tmp; \$(STARLINK)/bin/messgen -e $_star_tmp
 EOD
+STAR_DECLARE_BUILD_DEPENDENCIES(messgen)
 ])# STAR_FACILITY_CODE
 
 
@@ -116,22 +133,42 @@ EOD
 AC_DEFUN([_STAR_MAKE_MANIFEST],
 [#
 AC_REQUIRE([_STAR_BOILERPLATE])
+# Declare where the manifests should live.  This is slightly
+# complicated: we want to use this at configure time to check that
+# dependencies have in fact been installed, but it ought to depend on
+# $(prefix), since the user has the freedom to install things
+# elsewhere, and will expect the manifests to go in the same place.
+# We can't do anything other than accept, and document, that the user
+# can confuse things here.  It doesn't matter too much, really, as the
+# dependency check isn't crucial.  XXX revisit this.
+current_MANIFESTS="$prefix/manifests"
+MANIFESTS='$(prefix)/manifests'
+AC_SUBST(MANIFESTS)
 dnl   The $[]@ quoting below is because $@ means rest-of-args to m4
 cat >>$STAR_BOILERPLATE <<\_EOD
+# Create an install manifest, and install it in the required manifest location
 # Create install-manifest.xml file, using the MANIFEST file generated
 # by install-with-manifest
 install-manifest.xml: install-with-manifest
 	rm -f MANIFEST; touch MANIFEST
 	$(MAKE) INSTALL=./install-with-manifest install
 	rm -f $[]@
-	echo "<?xml version='1.0'?>"             >$[]@
+	echo "<?xml version='1.0'?>"                     >$[]@
 	echo "<!DOCTYPE manifest SYSTEM 'componentinfo.dtd'>" >>$[]@
-	echo "<manifest component='$(PACKAGE)'>" >>$[]@
-	echo "<files>"                           >>$[]@
-	cat MANIFEST                             >>$[]@
-	echo "</files>"                          >>$[]@
-	echo "</manifest>"                       >>$[]@
+	echo "<manifest component='$(PACKAGE)'>"         >>$[]@
+	echo "<version>$(PACKAGE_VERSION)</version>"     >>$[]@
+	echo "<files>"                                   >>$[]@
+	cat MANIFEST                                     >>$[]@
+	echo "</files>"                                  >>$[]@
+	echo "</manifest>"                               >>$[]@
 	rm -f MANIFEST
+# Install the install-manifest.xml into the $(MANIFESTS) directory.
+# We should respect $(DESTDIR), but needn't worry about $(srcdir),
+# since we know that the file was created in the current directory.
+install-manifest: install-manifest.xml
+	@$(NORMAL_INSTALL)
+	$(mkinstalldirs) $(DESTDIR)$(MANIFESTS)
+	$(INSTALL_DATA) install-manifest.xml $(DESTDIR)$(MANIFESTS)/$(PACKAGE)
 # The following rule is redundant (install-with-manifest.in must exist
 # in order for ./configure to run without error), but leave it in for
 # its documentation value.
@@ -143,23 +180,35 @@ AC_CONFIG_FILES(install-with-manifest, [chmod +x install-with-manifest])
 
 
 
-# STAR_LATEX_DOCUMENTATION(documentcode)
-# --------------------------------------
+# STAR_LATEX_DOCUMENTATION(documentcode, [targets])
+# -------------------------------------------------
 # Generate the standard makefile targets to handle LaTeX documentation
 # source.  The parameter documentcode should be something like
 # `sun123' -- it should not include any .tex extension.
 #
-# Defines and AC_SUBSTs @STAR_DOCUMENTATION@; thus one can use
-# $(STAR_DOCUMENTATION) as a Makefile variable, for example in an
-# EXTRA_DIST Makefile.am line.
+# The second, optional, argument gives an explicit list of the targets
+# which are build.  If this is _not_ specified, then a standard list
+# is used (.tex, .ps and .tar_htx) and corresponding rules added to
+# the generated makefile.  If it is specified (to any value, including
+# ''), then its value is added to the STAR_DOCUMENTATION_TARGETS
+# variable, and no extra Makefile rules are added.  Thus if users need
+# anything complicated done, they should use this second argument and
+# provide rules for satisfying the given targets.
 #
-# If users need anything complicated done, they should probably not use this
-# standard target.
+# Adds to the substituted variable @STAR_DOCUMENTATION_TARGETS@; thus
+# one can use $(STAR_DOCUMENTATION_TARGETS) as a Makefile variable,
+# for example in an EXTRA_DIST Makefile.am line.
 AC_DEFUN([STAR_LATEX_DOCUMENTATION],
 [AC_REQUIRE([_STAR_BOILERPLATE])dnl
 m4_ifval([$1], [], [AC_FATAL([$0: called with no documentcode])])dnl
-docno=`basename $1 .tex`
-cat >>$STAR_BOILERPLATE <<EOD
+STAR_DOCUMENTATION="$STAR_DOCUMENTATION $1"
+m4_ifval([$2],
+         [dnl non-empty second argument -- just add to variable
+	  STAR_DOCUMENTATION_TARGETS="$STAR_DOCUMENTATION_TARGETS $2"],
+	 [dnl second arg empty -- use defaults
+	  for d in $1; do
+              docno=`basename $d .tex`
+              cat >>$STAR_BOILERPLATE <<EOD
 $docno.dvi: $docno.tex
 	latex $docno
 $docno.ps: $docno.dvi
@@ -169,6 +218,36 @@ $docno.htx: $docno.tex
 $docno.htx_tar: $docno.htx
 	tar cf $docno.htx_tar $docno.htx
 EOD
-STAR_DOCUMENTATION="$docno.tex $docno.ps $docno.htx_tar"
-AC_SUBST([STAR_DOCUMENTATION])
+	  done
+          STAR_DOCUMENTATION_TARGETS="$STAR_DOCUMENTATION_TARGETS $docno.tex $docno.ps $docno.htx_tar"
+	  STAR_DECLARE_BUILD_DEPENDENCIES(star2html)
+])dnl
 ])# STAR_LATEX_DOCUMENTATION
+
+# STAR_DECLARE_BUILD_DEPENDENCIES(packagelist)
+# --------------------------------------------
+#
+# Declare a space-separated list of packages/components which the
+# build of this package depends on.  The packages here are tested to
+# ensure thay do exist (XXX not yet), and the list is available for
+# substitution in the AC_SUBST-ed variable [@STAR_BUILD_DEPENDENCIES@].
+# The macro may be called several times.
+AC_DEFUN([STAR_DECLARE_BUILD_DEPENDENCIES],
+[#
+m4_ifval([$1], [], [AC_FATAL([$0: called with empty packagelist])])dnl
+STAR_BUILD_DEPENDENCIES="$STAR_BUILD_DEPENDENCIES $1"
+])# STAR_DECLARE_BUILD_DEPENDENCIES
+
+# STAR_DECLARE_USE_DEPENDENCIES(packagelist)
+# ------------------------------------------
+#
+# Declare a space-separated list of packages/components which the use
+# of this package depends on.  The packages here are tested to ensure
+# thay do exist (XXX not yet), and the list is available for
+# substitution in the [AC_SUBST]-ed variable [@STAR_USE_DEPENDENCIES@].
+# The macro may be called several times.
+AC_DEFUN([STAR_DECLARE_USE_DEPENDENCIES],
+[#
+m4_ifval([$1], [], [AC_FATAL([$0: called with empty packagelist])])dnl
+STAR_USE_DEPENDENCIES="$STAR_USE_DEPENDENCIES $1"
+])# STAR_DECLARE_USE_DEPENDENCIES
