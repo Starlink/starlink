@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="ref">
+  <version>2.4-5</version>
+  <path>applications/rv</path>
+  <description>Radial Components of Observer's Velocity</description>
+  <abstract><p>The RV program produces a report listing the
+  components, in a given direction, of the observer's velocity on a
+  given date.  This allows an observed radial velocity to be referred
+  to an appropriate standard of rest -- typically either the Sun or an
+  LSR.
+    </p></abstract>
+  <dependencies >
+    <build>sla</build><sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Patrick Wallace</name>
+      <uname>ptw</uname>
+    </person>
+    <person>
+      <name>Chris Clayton</name>
+      <uname>cac</uname>
+    </person>
+  </developers>
+  <documentation> sun78</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>

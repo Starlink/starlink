@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="starx">
+  <version>1.2-1</version>
+  <path>applications/starx</path>
+  <description>X library linker helper</description>
+  <abstract><p>This application provides a simple routine for obtaining the link options suitable for linking against an X application. It is provided for backwards compatibility with the old Starlink linking scheme. New applications should use the configure system directly.
+    </p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Martin J Bly</name>
+      <uname>mjb</uname>
+    </person>
+  </developers>
+  <documentation> ssn21</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
