@@ -15941,7 +15941,7 @@ iraf! {
       }
 
       action traninvert {
-         alias {trani(nvert))}
+         alias {trani(nvert)}
 
          helplib {$KAPPA_HELP}
 
