@@ -149,7 +149,7 @@
       END IF
 
 *  Define its size
-      CALL FTBDEF( LUN, NFLDS, TYPES, VARIDAT, NENER, FSTAT )
+      CALL FTBDEF( LUN, NFLDS, TYPES, VARIDAT, NROWS, FSTAT )
 
 *  Free the buffer
       CALL ADI_ERASE( HID, STATUS )
