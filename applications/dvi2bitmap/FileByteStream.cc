@@ -37,9 +37,11 @@
 #ifdef HAVE_CSTD_INCLUDE
 #include <cstdio>
 #include <cerrno>
+#include <cassert>
 #else
 #include <stdio.h>
 #include <errno.h>
+#include <assert.h>
 #endif
 
 #ifdef HAVE_STD_NAMESPACE
