@@ -9,6 +9,8 @@
  * who             when       what
  * --------------  --------   ----------------------------------------
  * Allan Brighton  26 Sep 95  Created
+ * Peter W. Draper 01 May 03  Added "ws" and "hs" to get width and
+ *                            height in arcsecs (2MASS image servers)
  */
 static const char* const rcsId="@(#) $Id: AstroCatalog.C,v 1.36 1999/03/11 20:59:14 abrighto Exp $";
 
@@ -420,6 +422,8 @@ int AstroCatalog::getImage(const char* url)
  *   %x, %y           - image coordinates of center point (for pixel based catalogs)
  *
  *   %w, %h           - width and height of area in arcmin (area query)
+ * 
+ *   %ws, %hs         - width and height of area in arcsec (area query)
  *
  *   %r1, %r2         - min and max radius (for circular query)
  *
@@ -516,6 +520,16 @@ int AstroCatalog::genHttpQuery(char* buf, int bufsz, const AstroQuery& q, const 
 		// so we can determine if that was all...
 		if (q.maxRows() > 0)
 		    os << q.maxRows()+1;
+		url++;
+	    }
+	    else if (strncmp(url, "ws", 2) == 0) {
+		if (q.width() != 0.0 || q.height() != 0.0)
+		    os << q.width() * 60.0;
+		url++;
+	    }
+	    else if (strncmp(url, "hs", 2) == 0) {
+		if (q.width() != 0.0 || q.height() != 0.0)
+		    os << q.height() * 60.0;
 		url++;
 	    }
 	    else if (strncmp(url, "w", 1) == 0) {
