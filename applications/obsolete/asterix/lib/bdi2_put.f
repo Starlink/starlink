@@ -169,15 +169,7 @@
           CALL BDI2_CFIND( ARGS(1), ARGS(2), ITEM(1:6)//AXITEM(I),
      :                     .TRUE., .FALSE., ITID, CNDIM, CDIMS,
      :                     STATUS )
-          print*
-          print*, i, ' ', axitem(i)
-          call adi_print(itid, status)
-          IF ( STATUS .EQ. SAI__OK ) THEN
-            CALL ADI2_DCOP( ARGS(4), ITID, STATUS )
-            CALL ADI_ERASE( ITID, STATUS )
-          ELSE
-            CALL ERR_ANNUL( STATUS )
-          END IF
+          CALL ERR_ANNUL( STATUS )
         END DO
 
 *  All the other items as standard...
