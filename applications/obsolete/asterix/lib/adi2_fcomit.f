@@ -93,6 +93,7 @@
 *  Local Variables:
       CHARACTER*132		CMT			! Keyword comment
       CHARACTER*132		CVALUE			! Keyword value
+      CHARACTER*8		KEY			! Keyword name
 
       INTEGER			FSTAT			! FITSIO status
       INTEGER			HID			! HDU object
@@ -104,6 +105,7 @@
       INTEGER			NKEY			! # of keywords
 
       LOGICAL			COMIT			! Value committed?
+      LOGICAL			THERE			! Object exists?
 *.
 
 *  Check inherited global status.
