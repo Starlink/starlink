@@ -445,7 +445,6 @@ ImageData* StarRtdImage::getStarImage(const char* filename,
 	strcpy( p, path );
       }
       if ( slice ) strcat( fullname, slice );
-      cout << "Expanded name = " << fullname << endl;
 
       //  Open image.
       imio = NDFIO::read( fullname, component() );
@@ -548,11 +547,7 @@ int StarRtdImage::loadFile()
   char *name;
   char *slice;
   char *path;
-  if ( parseName( file(), &name, &slice, &path ) == TCL_OK ) {
-    if ( name ) cout << "fullname = " << name << endl;
-    if ( slice ) cout << "slice = " << slice << endl;
-    if ( path ) cout << "path = " << path << endl;
-  } else {
+  if ( parseName( file(), &name, &slice, &path ) != TCL_OK ) {
     if ( name ) delete name;
     if ( slice ) delete slice;
     if ( path ) delete path;
@@ -2037,7 +2032,7 @@ int StarRtdImage::astcopyCmd( int argc, char *argv[] )
   char *name;
   char *slice;
   char *path;
-  if ( ! parseName( argv[0], &name, &slice, &path ) ) {
+  if ( parseName( argv[0], &name, &slice, &path ) != TCL_OK ) {
     if ( name ) delete name;
     if ( slice ) delete slice;
     if ( path ) delete path;
