@@ -82,6 +82,8 @@ itcl::class gaia::GaiaImagePanel {
                -valuefont $itk_option(-valuefont) \
                -anchor e
          }
+         add_short_help $itk_component(autocut) \
+            {Select a quick percentiles image cut, based on what you see not whole image}
          foreach value {100 99.5 99 98 95 90 80 70 60 50} {
             $itk_component(autocut) add \
                -label "$value%" \
@@ -97,6 +99,8 @@ itcl::class gaia::GaiaImagePanel {
                -valuefont $itk_option(-valuefont) \
                -anchor e
          }
+         add_short_help $itk_component(autocolor) \
+            {Select a quick colour map (more in View...Colors)}
          foreach {name value} \
             {default real greyscale ramp color bgyrw heat heat pastel pastel} {
             $itk_component(autocolor) add \
@@ -113,6 +117,8 @@ itcl::class gaia::GaiaImagePanel {
                -valuefont $itk_option(-valuefont) \
                -anchor e
          }
+         add_short_help $itk_component(autoitt) \
+            {Select a quick intensity transfer table (more in View...Colors)}
          foreach {name value} \
             {default ramp {hist equalize} equa log log 
             {negative ramp} neg wrapped lasritt} {
@@ -284,11 +290,9 @@ itcl::class gaia::GaiaImagePanel {
          blt::table $w_ \
             $itk_component(min)     3,0 -fill x -anchor w \
             $itk_component(max)     3,1 -fill x -anchor w
-#            $itk_component(bitpix)  3,2 -fill x -anchor w
 
          add_short_help $itk_component(min) {Estimated minimum raw image value}
          add_short_help $itk_component(max) {Estimated maximum raw image value}
-#         add_short_help $itk_component(bitpix) {Raw image FITS data type code}
       }
       
       # cut level controls
@@ -327,8 +331,6 @@ itcl::class gaia::GaiaImagePanel {
          
          add_short_help $itk_component(low) {Image low cut value, type return after editing value}
          add_short_help $itk_component(high) {Image high cut value, type return after editing value}
-         add_short_help $itk_component(autocut) \
-            {Quick settings for image cuts, colormaps and intensity transfer tables}
       }
       
       #  Image transformation controls.
