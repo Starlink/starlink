@@ -13,17 +13,32 @@
 *     This program is a filter which takes FORTRAN 77 source code
 *     and modifies it so that INTEGER declarations are rewritten as
 *     'INTEGER * 8'.  It also attempts to warn if there are usages which
-*     might cause trouble given this change.  Other lines are left
-*     unmodified.
+*     might cause trouble given this change. 
 *
-*     Attention is paid to fortran 77 source format, so that lines are
+*     Additionally, if there appear to be actual arguments to subroutines
+*     or functions which are literal integers, the program will attempt
+*     to replace them with symbolic constants, as defined in the 
+*     EXT_PAR include file.  It will also attempt to add a line INCLUDEing
+*     this file.  This aspect of the processing is not foolproof.
+*     It can misidentify an array reference as a function call - if
+*     the 'function' name contains an underscore it assumes that it is
+*     a function name and not an array name.  Only single literal integers
+*     as actual arguments are thus replaced, so that, e.g. the code
+*
+*        L = XXX1_FUNC( X, Y, Z, 0, 3 * 5, STATUS )
+*
+*     will be replaced by 
+*
+*        L = XXX1_FUNC( X, Y, Z, EXT__0, 3 * 5, STATUS )
+*
+*     Attention is paid to fortran 77 source format, so that lines
 *     more than 72 characters long are avoided (unless they were there
 *     in the first place).
 *
 *     Some attention is paid to the aesthetic qualities of the output:
 *     line breaks are done, where possible, following the usage in, e.g.,
-*     KAPPA.  An attempt is made copy the style of case usage and bracket 
-*     spacing from the input.
+*     KAPPA.  An attempt is made copy the style of case usage from the 
+*     input.
 *
 *     The program will write a warning on standard error for certain 
 *     constructions in the code which are likely to cause trouble after
@@ -38,6 +53,10 @@
 *          or subroutine calls.  A function call is identified as such
 *          (rather than an array reference) if its name contains an 
 *          underscore - obviously, this might lead to mistakes.
+*
+*  Bugs:
+*     In some cases, the line breaks are not made in very beautiful places.
+*     They should, however, always be correct.
 *
 *  Notes:
 *     Although this program behaves as a filter, it is written on
@@ -67,6 +86,9 @@
 
 /* Local function prototypes. */
    void frepint();
+   void outchar( char );
+   void outmark( char * );
+   void outwrite();
 
 
    int main( int argc, char **argv ) {
@@ -148,6 +170,11 @@
    }
 
 
+/* Get the next column from the current column and the character being 
+   output. */
+#define colchar(col,c) ( (c) == '\n' ? 1 : (col) + ( (c) == '\t' ? 8 : 1 ) )
+
+
    void frepint() {
 /*
 *+
@@ -172,19 +199,22 @@
 /* Local variable declarations. */
       int col;
       int done;
+      int fixedint = 0;
       int i;
       int j;
       int k;
       int leng;
       int nc;
       int nspc;
+      int pre;
+      int post;
       int skipspc;
       int t;
       int t1;
-      int tp;
       int tbufsiz = 0;
       int tok;
       char c;
+      char incbuf[ 160 ] = "";
       char *pc;
       char *qc;
       struct tokitem *pctok;
@@ -214,17 +244,8 @@
 
 /* Output the string in any case, keeping track of source line column. */
          for ( pc = tbuf[ i ].string; c = *pc; pc++ ) {
-            putchar( c );
-            switch ( c ) {
-               case '\n':
-                  col = 1;
-                  break;
-               case '\t':
-                  col += 8;  /* better safe than sorry */
-                  break;
-               default:
-                  col++;
-            }
+            outchar( c );
+            col = colchar( col, c );
          }
 
 /* Get values of tokens for convenience. */
@@ -234,10 +255,11 @@
 /* INTEGER declaration to be changed.  Handle this token and any others 
    up till the next newline character. */
          if ( t == INTEGER && t1 != '*' ) {
-            printf( " * 8" );
+            for ( pc = " * 8"; c = *pc; pc++ ) 
+               outchar( c );
             skipspc = 4;
             if ( ! isspace( *(tbuf[ i + 1 ].string) ) ) {
-               putchar( ' ' );
+               outchar( ' ' );
                skipspc++;
             }
             col += skipspc;
@@ -264,7 +286,7 @@
                                  skipspc--;
                               }
                               else {
-                                 putchar( c );
+                                 outchar( c );
                                  switch( c ) {
                                     case '\n':
                                        col = 1;
@@ -278,7 +300,7 @@
                                        break;
                                     default:
                                        col++;
-                                }
+                                 }
                               }
                            }
                         }
@@ -288,22 +310,13 @@
    after the INTEGER declaration and the rest of the line unchanged after 
    it. */
                      else {
-                        putchar( '\n' );
+                        outchar( '\n' );
                         for ( k = 1; k < col - skipspc ; k++ )
-                           putchar( k == 6 ? ':' : ' ' );
+                           outchar( k == 6 ? ':' : ' ' );
                         for ( k = i + 1; k <= j; k++ ) {
                            for ( qc = tbuf[ k ].string; c = *qc; qc++ ) {
-                              putchar( c );
-                              switch( c ) {
-                                 case '\n':
-                                    col = 1;
-                                    break;
-                                 case '\t':
-                                    col += 8;
-                                    break;
-                                 default:
-                                    col++;
-                              }
+                              outchar( c );
+                              col = colchar( col, c );
                            }
                         }
 
@@ -323,18 +336,94 @@
          }
 
 /* Literal integer constant.  If this occurs as an actual argument of a
-   subroutine or function call, we should at least generate a warning. */
-         else if ( t == INTEGER_CONSTANT ) {
-            tp = tbuf[ i - 1 ].tokval;
-            if ( tp == '+' || tp == '-' )   /* Cope with unary plus or minus */
-               tp = tbuf[ i - 2 ].tokval;
-            if ( ( t1 == ',' || t1 == ')' ) && ( tp == ',' || tp == '(' ) ) {
-               pctok = funcofarg( tbuf + i );
+   subroutine or function call, we should replace it by an expression of
+   the right type. */
+         else if ( t1 == INTEGER_CONSTANT ) {
+            int sign = 1;
+            int itok = i + 1;
+
+/* Get the token preceding the constant, and any unary sign; and the token
+   following it. */
+            post = tbuf[ itok + 1 ].tokval;
+            pre = tbuf[ itok - 1 ].tokval;
+            if ( pre == '+' || pre == '-' ) pre = tbuf[ itok - 2 ].tokval;
+
+/* Only proceed if the constant looks like the whole of an actual argument. */
+            if ( ( pre == ',' || pre == '(' ) && 
+                 ( post == ',' || post == ')' ) ) {
+               
+/* Only proceed if the thing it's an argument of is a subroutine, or looks
+   like it's probably a function call (the alternative is that it might be
+   an array reference). */
+               pctok = funcofarg( tbuf + itok );
                if ( pctok[ -1 ].tokval == CALL || 
                     ( pctok->tokval == IDENTIFIER && 
                       strchr( pctok->strmat, '_' ) != NULL ) ) {
-                  fprintf( stderr, "%s: Literal integer as arg of %s\n",
-                                   name, pctok->strmat );
+                  int col1;
+                  int col2;
+                  int indent;
+                  int lastcol;
+                  long cval;
+                  char *fmt;
+                  char *cstr; 
+
+/* Prepare the replacement text. */
+                  sscanf( tbuf[ itok ].strmat, "%ld", &cval );
+                  fmt = ( cval <= 10 ) ? "EXT__%ld" : "%ld + EXT__0";
+
+/* Work out whether there is enough space on this line for the modified 
+   text. */
+                  col1 = col;
+                  lastcol = 0;
+                  for ( j = itok; ! lastcol && j < leng; j++ ) {
+                     for ( pc = tbuf[ j ].string; c = *pc; pc++ ) {
+                        if ( pc == tbuf[ itok ].strmat ) col2 = col1;
+                        if ( c == '\n' && j > itok ) {
+                           lastcol = col1;
+                           break;
+                        }
+                        col1 = colchar( col1, c );
+                     }
+                     if ( ! lastcol && tbuf[ j ].tokval == LINE_END ) 
+                        lastcol = col1;
+                  }
+                  indent = 0;
+
+/* If we need a line break, work out how far it should be indented.  Find
+   out the column of the bracket enclosing this argument list, and try 
+   that.  If that's too far, use an indent of 9, which must be OK. */
+                  if ( lastcol + strlen( fmt ) - 3 > 72 || ! lastcol ) {
+                     for ( j = pctok - tbuf + 1;  
+                           tbuf[ j ].tokval != LINE_START && j >= 0; j-- );
+                     col1 = 1;
+                     for ( ; j <= pctok - tbuf; j++ ) {
+                        for ( pc = tbuf[ j ].string; c = *pc; pc++ )
+                           col1 = colchar( col1, c );
+                     }
+                     if ( col1 + strlen( fmt ) - 3 + lastcol - col2 > 72 )
+                        indent = 9;
+                     else
+                        indent = col1 + 1;
+                  }
+
+/* Reconstruct the integer token with the new text. */
+                  cstr = memok( malloc( strlen( tbuf[ itok ].string ) +
+                                        strlen( fmt ) + indent ) );
+                  qc = cstr;
+                  for ( pc = tbuf[ itok ].string; pc < tbuf[ itok ].strmat; ) 
+                     *(qc++) = *(pc++);
+                  if ( indent ) {
+                     *(qc++) = '\n';
+                     for ( j = 1; j <= indent; j++ )
+                        *(qc++) = ( j == 6 ) ? ':' : ' ';
+                  }
+                  sprintf( qc, fmt, cval );
+                  tbuf[ itok ].strmat = qc;
+                  tbuf[ itok ].string = cstr;
+
+/* Record that we have done this, so we can remember to write the correct
+   INCLUDE line. */
+                  fixedint = 1;
                }
             }
          }
@@ -357,12 +446,86 @@
             fprintf( stderr, "%s: INTEGER-specific intrinsic name %s\n",
                             name, tbuf[ i ].strmat );
          }
+
+/* Include line - mark it for interpolating our own includes afterwards. */
+         else if ( i > 2 && tbuf[ i ].tokval == LINE_END
+                         && tbuf[ i - 1 ].tokval == STRING_CONSTANT
+                         && tbuf[ i - 2 ].tokval == INCLUDE
+                         && tbuf[ i - 3 ].tokval == LINE_START ) {
+            int spc;
+            int itok = i - 2;
+            qc = incbuf;
+            for ( pc = tbuf[ itok - 1 ].string; *pc; pc++ ) *(qc++) = *pc;
+            for ( pc = tbuf[ itok ].string; *pc; pc++ ) *(qc++) = *pc;
+            for ( pc = tbuf[ itok + 1 ].string; 
+                  pc < tbuf[ itok + 1 ].strmat; pc++ ) *(qc++) = *pc;
+            for ( pc = "'EXT_PAR'"; *pc; pc++ ) *(qc++) = *pc;
+            if ( strchr( tbuf[ itok + 2 ].string, '!' ) ) {
+               spc = strlen( tbuf[ itok + 1 ].strmat ) - strlen( "'EXT_PAR'" )
+                   + strchr( tbuf[ itok + 2 ].string, '!' ) 
+                   - tbuf[ itok + 2 ].string;
+               while ( spc-- ) *(qc++) = ' ';
+               for ( pc = "! For large integer type constants\n"; *pc; pc++ )
+                   *(qc++) = *pc;
+            }
+            *(qc) = '\0';
+            outmark( incbuf );
+         }
+
+/* End line - flush character buffer. */
+         if ( ( t == END && t1 == LINE_END ) || i == leng - 1 ) {
+            if ( fixedint ) {
+               if ( ! *incbuf )
+                  fprintf( stderr, "%s: Nowhere to INCLUDE 'EXT_PAR'\n", name );
+            }
+            else {
+               *incbuf = '\0';
+            }
+            outwrite();
+            *incbuf = '\0';
+            fixedint = 0;
+         }
          
       }
 
    }
 
 
+   int cleng = 0;
+   int cbufsiz = 0;
+   int iinterp = -1;
+   char *cbuf = NULL;
+   char *cinterp = NULL;
+
+   void outmark( char *buf ) {
+      cinterp = buf;
+      iinterp = cleng - 1;
+   }
+
+   void outchar( char c ) {
+      if ( cleng + 1 >= cbufsiz  ) {
+         cbufsiz += BUFINC;
+         cbuf = memok( realloc( cbuf, cbufsiz ) );
+      }
+      cbuf[ cleng++ ] = c;
+   }
+
+   void outwrite() {
+      char *pc;
+      char c;
+      int i;
+      for ( i = 0; i < cleng; i++ ) {
+         putchar( cbuf[ i ] );
+         if ( i == iinterp ) 
+            for ( pc = cinterp; c = *pc; pc++ )
+               putchar( c );
+      }
+      cleng = 0;
+      cbuf = NULL;
+      cbufsiz = 0;
+      cinterp = NULL;
+      iinterp = -1;
+   }
 
 
 /* $Id$ */
