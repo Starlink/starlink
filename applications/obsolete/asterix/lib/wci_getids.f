@@ -153,11 +153,9 @@
           CALL ADI_FIND( RESID, 'Sys', SYSID, STATUS )
         END IF
 
-      ELSE
+      END IF
 
 *  Report any errors
-        CALL AST_REXIT( 'WCI_GETIDS', STATUS )
-
-      END IF
+      IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'WCI_GETIDS', STATUS )
 
       END
