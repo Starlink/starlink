@@ -766,35 +766,33 @@ will eventually replace, will read data in floating point format
 (c.f. the PISA restriction of data in the range 0-32000).  It will
 also read NDFs that contain BAD pixels. These will appear as
 ``missing'' regions, so any objects that are intersected will be split
-into sub-objects.
+into parts.
 
 Since \EXTRACTOR\ uses the AST (\xref{SUN/211}{sun211}{}) library to
 perform astrometry, it can be used with images that contain DSS
-solutions, as well as FITS-WCS and AST native ones (native
-\SExtractor\ will only use images that have FITS-WCS solutions). The
-GAIA display tool is a convenient way to add such astrometrical
-calibrations.
+calibrations, as well as FITS-WCS and AST native ones (native
+\SExtractor\ will only use images that have FITS-WCS
+calibrations). The GAIA display tool is a convenient way to add such
+astrometrical calibrations.
 
-One current limitation is that no support is provided for the use of
+Two current limitations are that no support is provided for the use of
 NDF variance arrays (although these would probably map onto the
-``weight'' image concept of \SExtractor).
+``weight'' image concept of \SExtractor) and that the propagation of
+the input NDF to the check image is not done (so WCS calibration, for
+instance, is lost).
 
 The \SExtractor\ program has a very large range of processing
 options. Consequently many of these options have not been tried
-extensively in the \EXTRACTOR\ incarnation, so it is quite probable
-that problems may arise. 
+extensively in the \EXTRACTOR\ incarnation, so some problems may
+arise, when using non-default configurations.
 
-In particular some areas of \SExtractor\ that have not been
-implemented are:
-\begin{itemize}
- \item The propagation of the input NDF to the check image (so the WCS
-       information, for instance, is lost).
- \item The piping of catalogues to standard output.
-\end{itemize}
-The use of weight and flag images is not supported.
+A \SExtractor\ facility that has not been implemented is the piping of
+catalogues to standard output.  The use of weight and flag images are
+not supported.
 
-If you come across any problems with \EXTRACTOR\ please notify the
-authors.
+If you come across any problems with \EXTRACTOR\ please notify
+Starlink Software Support
+(\htmladdnormallink{ussc@star.rl.ac.uk}{mailto:ussc@star.rl.ac.uk}).
 
 \section{\xlabel{references}References}
 Bailey J.A. : \xref{SG/5}{sg5}{} : ICL \dash\ The Interactive Command Language for ADAM.\\
