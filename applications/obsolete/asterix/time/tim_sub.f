@@ -198,8 +198,6 @@
 *  variance
         CALL DYN_MAPR(1,T_NVAL,T_VPTR,STATUS)
         IF (.NOT.T_VOK) THEN
-          CALL MSG_PRNT('No variance present - '
-     :                         //'assuming Poissonian error')
           CALL ARR_COP1R(T_NVAL,%VAL(T_DPTR),%VAL(T_VPTR),STATUS)
         ELSE
           CALL BDA_MAPVAR(LOC,'R',VPTR,STATUS)

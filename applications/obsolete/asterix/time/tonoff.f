@@ -104,7 +104,7 @@
 *-
       IF (STATUS.EQ.SAI__OK) THEN
 
-        UNITS=T_UNITS
+        UNITS=T_AUNITS
         CALL CHR_UCASE(UNITS)
         IF (INDEX(UNITS,'SEC').NE.0) THEN
           CONV=86400.0D0
