@@ -1,0 +1,23 @@
+interface IGRID
+  parameter FRAME
+    position 1
+    type '_INTEGER'
+    default 1
+    prompt 'Coordinate frame'
+    help '1=Celestial   2=Ecliptic   3=Galactic'
+  endparameter
+  parameter POS
+    position 2
+    type '_INTEGER'
+    default 1
+    vpath 'DEFAULT'
+    prompt 'Label position'
+    help '1=edge  2=centre  3=outside'
+  endparameter
+  parameter OFF
+    type '_LOGICAL'
+    default N
+    vpath 'DEFAULT'
+    prompt 'Switch grid off'
+  endparameter
+endinterface

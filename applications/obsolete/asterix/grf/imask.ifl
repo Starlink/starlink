@@ -1,0 +1,16 @@
+interface IMASK
+  parameter TOGGLE
+    type '_LOGICAL'
+    prompt 'Toggle MS bit'
+    help 'Toggles the IGNORE bit on and off'
+    default N
+    vpath 'DEFAULT'
+  endparameter
+  parameter MASK
+    position 1
+    type '_CHAR'
+    ppath 'DYNAMIC'
+    prompt 'New mask'
+    help 'up to 8 binary digits'
+  endparameter
+endinterface

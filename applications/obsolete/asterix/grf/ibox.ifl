@@ -1,0 +1,28 @@
+interface IBOX
+  parameter XCENT
+    position 1
+    type '_REAL'
+    ppath 'DYNAMIC'
+    prompt 'X centre'
+    help 'X-coord of centre of box in axis units'
+  endparameter
+  parameter YCENT
+    position 2
+    type '_REAL'
+    ppath 'DYNAMIC'
+    prompt 'Y centre'
+    help 'Y-coord of centre of box in axis units'
+  endparameter
+  parameter XWID
+    position 3
+    type '_REAL'
+    prompt 'X width'
+    help 'Full horizontal width of box in axis units'
+  endparameter
+  parameter YWID
+    position 4
+    type '_REAL'
+    prompt 'Y width'
+    help 'Full vertical width of box in axis units'
+  endparameter
+endinterface

@@ -1,0 +1,34 @@
+interface ISLICE
+  parameter XCENT
+    position 1
+    type '_REAL'
+    ppath 'DYNAMIC'
+    prompt 'X centre'
+    help 'X coord of centre of slice in axis coords'
+  endparameter
+  parameter YCENT
+    position 2
+    type '_REAL'
+    ppath 'DYNAMIC'
+    prompt 'Y centre'
+    help 'Y coord of centre of slice in axis coords'
+  endparameter
+  parameter ANGLE
+    position 3
+    type '_REAL'
+    prompt 'Angle'
+    help 'Angle of slice in degrees anti-clockwise from horizontal'
+  endparameter
+  parameter LENGTH
+    position 4
+    type '_REAL'
+    prompt 'Length'
+    help 'Full length of slice in axis coords'
+  endparameter
+  parameter WIDTH
+    position 5
+    type '_REAL'
+    prompt 'Width'
+    help 'Full width of slice in axis coords'
+  endparameter
+endinterface

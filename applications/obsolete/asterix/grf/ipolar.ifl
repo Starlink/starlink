@@ -1,0 +1,87 @@
+	INTERFACE IPOLAR
+
+	    PARAMETER INPUT
+               POSITION 1
+               KEYWORD 'INP'
+               TYPE    'UNIV'
+               PROMPT  'Name of input file'
+               PPATH   'GLOBAL,CURRENT'
+               VPATH   'PROMPT'
+               ASSOCIATION '<->GLOBAL.BINDS'
+               HELP    'Without the .SDF extension'
+            ENDPARAMETER
+
+	    PARAMETER OUTPUT
+               POSITION 2
+               KEYWORD 'OUT'
+               TYPE    'UNIV'
+               PROMPT  'Name of output file'
+               PPATH   'CURRENT,DEFAULT'
+               VPATH   'PROMPT'
+               HELP    'Without the .SDF extension'
+            ENDPARAMETER
+
+	    PARAMETER XCENT
+               POSITION 3
+               TYPE    '_REAL'
+               PROMPT  'Centre of polar in horizontal axis'
+               PPATH   'CURRENT,DEFAULT'
+               VPATH   'PROMPT'
+               HELP    'X value of centre in axis units'
+            ENDPARAMETER
+
+	    PARAMETER YCENT
+               POSITION 4
+               TYPE    '_REAL'
+               PROMPT  'Centre of polar in vertical axis'
+               PPATH   'CURRENT,DEFAULT'
+               VPATH   'PROMPT'
+               HELP    'Y value of centre in axis units'
+            ENDPARAMETER
+
+	    PARAMETER RADIAL_BINSIZE
+               POSITION 5
+               TYPE    '_REAL'
+               KEYWORD 'RBIN'
+               PROMPT  'Radial binsize'
+               PPATH   'CURRENT,DEFAULT'
+               VPATH   'PROMPT'
+               HELP    'Enter in axis units'
+            ENDPARAMETER
+
+            PARAMETER NRAD
+               TYPE '_INTEGER'
+               PROMPT 'Number of radial bins'
+               HELP 'Default is maximum possible'
+               PPATH 'DYNAMIC'
+            ENDPARAMETER
+
+	    PARAMETER AZIM_BINSIZE
+               POSITION 6
+               TYPE    '_REAL'
+               KEYWORD 'ABIN'
+               PROMPT  'Azimuthal binsize'
+               PPATH   'CURRENT,DEFAULT'
+               VPATH   'PROMPT'
+               DEFAULT 360.0
+               HELP    'Enter in degrees'
+            ENDPARAMETER
+
+            PARAMETER NORM
+               TYPE '_LOGICAL'
+               DEFAULT T
+               VPATH 'DEFAULT'
+               PROMPT 'Normalise to axis units'
+               HELP 'eg. counts/sq deg. as opposed to /pixel'
+            ENDPARAMETER
+
+	    PARAMETER AZSTART
+               TYPE    '_REAL'
+               PROMPT  'Azimuthal start position (degrees)'
+               PPATH   'DEFAULT'
+               VPATH   'DEFAULT'
+               DEFAULT  0.0
+               HELP 'Enter in degrees. Right is 0.0, Top is 90.0, bottom is -90.0'
+            ENDPARAMETER
+
+	ENDINTERFACE

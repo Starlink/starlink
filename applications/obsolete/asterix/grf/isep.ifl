@@ -1,0 +1,113 @@
+interface ISEP
+  parameter FRAME
+    position 1
+    type '_INTEGER'
+    default 1
+    prompt 'Coordinate frame'
+    help '1-celestial  2-ecliptic  3-galactic  4-axis  5-pixel'
+  endparameter
+  parameter RA1
+    position 2
+    type '_CHAR'
+    prompt 'RA of 1st point'
+    help 'RA in any form : 234.56   2.345rad  12h34m56.5s  12:34:56.5'
+  endparameter
+  parameter DEC1
+    position 3
+    type '_CHAR'
+    prompt 'DEC of 1st point'
+    help 'DEC in any form : -50.56   2.345rad  12d34m56.5s  12:34:56.5'
+  endparameter
+  parameter RA2
+    position 4
+    type '_CHAR'
+    prompt 'RA of 2nd point'
+    help 'RA in any form : 234.56   2.345rad  12h34m56.5s  12:34:56.5'
+  endparameter
+  parameter DEC2
+    position 5
+    type '_CHAR'
+    prompt 'DEC of 2nd point'
+    help 'DEC in any form : -50.56   2.345rad  12d34m56.5s  12:34:56.5'
+  endparameter
+  parameter ELON1
+    type '_DOUBLE'
+    prompt 'Ecliptic lon. of 1st point'
+    help 'Ecliptic longitude in decimal degrees'
+  endparameter
+  parameter ELAT1
+    type '_DOUBLE'
+    prompt 'Ecliptic lat. of 1st point'
+    help 'Ecliptic latitude in decimal degrees'
+  endparameter
+  parameter ELON2
+    type '_DOUBLE'
+    prompt 'Ecliptic lon. of 2nd point'
+    help 'Ecliptic longitude in decimal degrees'
+  endparameter
+  parameter ELAT2
+    type '_DOUBLE'
+    prompt 'Ecliptic lat. of 2nd point'
+    help 'Ecliptic latitude in decimal degrees'
+  endparameter
+  parameter L1
+    type '_DOUBLE'
+    prompt 'Galactic lon. of 1st point'
+    help 'Galactic longitude in decimal degrees'
+  endparameter
+  parameter B1
+    type '_DOUBLE'
+    prompt 'Galactic lat. of 1st point'
+    help 'Galactic latitude in decimal degrees'
+  endparameter
+  parameter L2
+    type '_DOUBLE'
+    prompt 'Galactic lon. of 2nd point'
+    help 'Galactic longitude in decimal degrees'
+  endparameter
+  parameter B2
+    type '_DOUBLE'
+    prompt 'Galactic lat. of 2nd point'
+    help 'Galactic latitude in decimal degrees'
+  endparameter
+  parameter X1
+    type '_REAL'
+    prompt 'X-position of 1st point'
+    help 'X-coord. in axis units'
+  endparameter
+  parameter Y1
+    type '_REAL'
+    prompt 'Y-position of 1st point'
+    help 'Y-coord. in axis units'
+  endparameter
+  parameter X2
+    type '_REAL'
+    prompt 'X-position of 2nd point'
+    help 'X-coord. in axis units'
+  endparameter
+  parameter Y2
+    type '_REAL'
+    prompt 'Y-position of 2nd point'
+    help 'Y-coord. in axis units'
+  endparameter
+  parameter XPIX1
+    type '_REAL'
+    prompt 'X-pixel of 1st point'
+    help 'X-coord. in pixels'
+  endparameter
+  parameter YPIX1
+    type '_REAL'
+    prompt 'Y-pixel of 1st point'
+    help 'Y-coord. in pixels'
+  endparameter
+  parameter XPIX2
+    type '_REAL'
+    prompt 'X-pixel of 2nd point'
+    help 'X-coord. in pixels'
+  endparameter
+  parameter YPIX2
+    type '_REAL'
+    prompt 'Y-pixel of 2nd point'
+    help 'Y-coord. in pixels'
+  endparameter
+endinterface

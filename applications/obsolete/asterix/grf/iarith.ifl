@@ -1,0 +1,12 @@
+interface IARITH
+  parameter OPER
+    position 1
+    type '_CHAR'
+  endparameter
+  parameter INP
+    position 2
+    type 'UNIV'
+    prompt 'Image/array/scalar'
+    help 'quantity to add/sub etc to/from loaded image'
+  endparameter
+endinterface

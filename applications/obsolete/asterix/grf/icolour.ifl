@@ -1,0 +1,15 @@
+interface ICOLOUR
+  parameter MODE
+    position 1
+    type '_CHAR'
+    default 'HELP'
+    prompt 'Mode'
+    help 'Reply with HELP for a full list'
+  endparameter
+  parameter TABLE
+    position 2
+    type 'UNIV'
+    prompt 'Table'
+    help 'Object containing or to contain colour table'
+  endparameter
+endinterface

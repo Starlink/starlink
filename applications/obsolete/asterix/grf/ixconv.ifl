@@ -1,0 +1,43 @@
+INTERFACE IXCONV
+
+  PARAMETER INP1
+    POSITION 1
+    TYPE 'UNIV'
+    PROMPT 'Input dataset 1'
+    HELP 'Name of a dataset containing a 2d data_array'
+    ASSOCIATION '<-GLOBAL.BINDS'
+    PPATH 'GLOBAL'
+  ENDPARAMETER
+
+  PARAMETER INP2
+    POSITION 2
+    TYPE 'UNIV'
+    PROMPT 'Input dataset 2'
+    HELP 'Name of a dataset containing a 2d data_array (can be same)'
+  ENDPARAMETER
+
+  PARAMETER OUT
+    POSITION 3
+    TYPE 'UNIV'
+    PROMPT 'Output dataset'
+    ASSOCIATION '->GLOBAL.BINDS'
+  ENDPARAMETER
+
+  PARAMETER CYCLIC
+    TYPE '_LOGICAL'
+    PROMPT 'Do a cyclic deconvolution?'
+    DEFAULT 'Y'
+    PPATH 'DEFAULT'
+    VPATH 'PROMPT'
+    HELP 'If non-cyclic dimensions of OUT = sum of dimensions of 2 INP1, INP2'
+  ENDPARAMETER
+
+  PARAMETER DC_RESTORE
+    TYPE '_LOGICAL'
+    PROMPT 'Add back in DC level? '
+    DEFAULT 'Y'
+    PPATH 'DEFAULT'
+    VPATH 'PROMPT'
+  ENDPARAMETER
+
+ENDINTERFACE

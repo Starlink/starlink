@@ -1,0 +1,257 @@
+interface IMOSAIC
+
+
+   parameter      NUMBER
+      keyword     'NUMBER'
+      position    1
+      type        '_INTEGER'
+      vpath       'PROMPT'
+      ppath       'CURRENT,DYNAMIC'
+      prompt      'Number of images to be put in a mosaic'
+      help        'Give the total number of data arrays be to made into a mosaic data array (max. 20)'
+#     range       1, 20
+   endparameter
+
+   parameter      INPIC1
+      keyword     'INP1'
+      position    2
+      type        'UNIV'
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'Image to be added'
+      help        'Name of the IMAGE structure containing the next 2-d data array to be added'
+   endparameter
+
+   parameter      INPIC2
+      keyword     'INP2'
+      position    3
+      type        'UNIV'
+      ppath       'CURRENT'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of the IMAGE structure containing the next 2-d data array to be added'
+   endparameter
+
+   parameter      INPIC3
+      keyword     'INP3'
+      type        'UNIV'
+      ppath       'CURRENT'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of the IMAGE structure containing the next 2-d data array to be added'
+   endparameter
+
+   parameter      INPIC4
+      keyword     'INP4'
+      type        'UNIV'
+      ppath       'CURRENT'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of the IMAGE structure containing the next 2-d data array to be added'
+   endparameter
+
+   parameter      INPIC5
+      keyword     'INP5'
+      type        'UNIV'
+      ppath       'CURRENT'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of the IMAGE structure containing the next 2-d data array to be added'
+   endparameter
+
+   parameter      INPIC6
+      keyword     'INP6'
+      type        'UNIV'
+      access      'READ'
+      ppath       'CURRENT'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of the IMAGE structure containing the next 2-d data array to be added'
+   endparameter
+
+   parameter      INPIC7
+      keyword     'INP7'
+      type        'UNIV'
+      access      'READ'
+      ppath       'CURRENT'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of the IMAGE structure containing the next 2-d data array to be added'
+   endparameter
+
+   parameter      INPIC8
+      keyword     'INP8'
+      type        'UNIV'
+      access      'READ'
+      ppath       'CURRENT'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of the IMAGE structure containing the next 2-d data array to be added'
+   endparameter
+
+   parameter      INPIC9
+      keyword     'INP9'
+      type        'UNIV'
+      access      'READ'
+      ppath       'CURRENT'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of the IMAGE structure containing the next 2-d data array to be added'
+   endparameter
+
+   parameter      INPIC10
+      keyword     'INP10'
+      type        'UNIV'
+      access      'READ'
+      ppath       'CURRENT'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of the IMAGE structure containing the next 2-d data array to be added'
+   endparameter
+
+   parameter      INPIC11
+      keyword     'INP11'
+      type        'UNIV'
+      access      'READ'
+      ppath       'CURRENT'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of the IMAGE structure containing the next 2-d data array to be added'
+   endparameter
+
+   parameter      INPIC12
+      keyword     'INP12'
+      type        'UNIV'
+      access      'READ'
+      ppath       'CURRENT'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of the IMAGE structure containing the next 2-d data array to be added'
+   endparameter
+
+   parameter      INPIC13
+      keyword     'INP13'
+      type        'UNIV'
+      access      'READ'
+      ppath       'CURRENT'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of the IMAGE structure containing the next 2-d data array to be added'
+   endparameter
+
+   parameter      INPIC14
+      keyword     'INP14'
+      type        'UNIV'
+      access      'READ'
+      ppath       'CURRENT'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of the IMAGE structure containing the next 2-d data array to be added'
+   endparameter
+
+   parameter      INPIC15
+      keyword     'INP15'
+      type        'UNIV'
+      access      'READ'
+      ppath       'CURRENT'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of the IMAGE structure containing the next 2-d data array to be added'
+   endparameter
+
+   parameter      INPIC16
+      keyword     'INP16'
+      type        'UNIV'
+      access      'READ'
+      ppath       'CURRENT'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of the IMAGE structure containing the next 2-d data array to be added'
+   endparameter
+
+   parameter      INPIC17
+      keyword     'INP17'
+      type        'UNIV'
+      access      'READ'
+      ppath       'CURRENT'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of the IMAGE structure containing the next 2-d data array to be added'
+   endparameter
+
+   parameter      INPIC18
+      keyword     'INP18'
+      type        'UNIV'
+      access      'READ'
+      ppath       'CURRENT'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of the IMAGE structure containing the next 2-d data array to be added'
+   endparameter
+
+   parameter      INPIC19
+      keyword     'INP19'
+      type        'UNIV'
+      access      'READ'
+      ppath       'CURRENT'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of the IMAGE structure containing the next 2-d data array to be added'
+   endparameter
+
+   parameter      INPIC20
+      keyword     'INP20'
+      type        'UNIV'
+      access      'READ'
+      ppath       'CURRENT'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of the IMAGE structure containing the next 2-d data array to be added'
+   endparameter
+
+   parameter      XOFFSET
+      keyword     'XOFFSET'
+      type        '_INTEGER'
+      vpath       'PROMPT'
+      ppath       'CURRENT,DYNAMIC'
+      prompt      'x offset of the array from the first'
+      help        'Give the x offset in pixels of the current data array from the first data array input'
+   endparameter
+
+   parameter      YOFFSET
+      keyword     'YOFFSET'
+      type        '_INTEGER'
+      vpath       'PROMPT'
+      ppath       'CURRENT,DYNAMIC'
+      prompt      'y offset of the array from the first'
+      help        'Give the y offset in pixels of the current data array from the first data array input'
+   endparameter
+
+   parameter      OUTPUT
+      keyword     'OUT'
+      type        'UNIV'
+      vpath       'PROMPT'
+      prompt      'Mosaic image'
+      help        'Name given to the IMAGE structure to hold the mosaic data array'
+   endparameter
+
+   parameter      OTITLE
+      keyword     'OTITLE'
+      type        '_CHAR'
+      vpath       'DEFAULT'
+      prompt      'Title for output image'
+      default     'Mosaic'
+      help        'Character string used as a title for the output IMAGE structure.'
+   endparameter
+
+   parameter      AVERAGE
+      keyword     'AVERAGE'
+      type        '_LOGICAL'
+      access      'READ'
+      vpath       'DEFAULT'
+      prompt      'Are overlapped input pixels to be averaged in the output array?'
+      help        'Input pixels may be occupy the same position in the output array. So output pixels can be averaged or summed'
+      default     YES
+   endparameter
+
+endinterface

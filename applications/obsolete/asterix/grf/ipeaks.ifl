@@ -1,0 +1,8 @@
+interface IPEAKS
+  parameter THRESH
+    position 1
+    type '_REAL'
+    prompt 'Threshold value'
+    help 'Minimum data value for point to be considered a peak'
+  endparameter
+endinterface

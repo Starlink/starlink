@@ -1,0 +1,14 @@
+interface IMODE
+  parameter KEY
+    type '_LOGICAL'
+    prompt 'Select keyboard mode'
+    default N
+    vpath 'DEFAULT'
+  endparameter
+  parameter CURS
+    type '_LOGICAL'
+    prompt 'Select cursor mode'
+    default N
+    vpath 'DEFAULT'
+  endparameter
+endinterface

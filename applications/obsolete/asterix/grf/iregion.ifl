@@ -1,0 +1,61 @@
+interface IREGION
+  parameter MODE
+    position 1
+    type '_CHAR'
+    prompt 'Mode'
+    help 'Type HELP for a full list'
+  endparameter
+  parameter XC
+    position 2
+    type '_REAL'
+    ppath 'DYNAMIC'
+    prompt 'X centre'
+    help 'X-coord of centre in axis units'
+  endparameter
+  parameter YC
+    position 3
+    type '_REAL'
+    ppath 'DYNAMIC'
+    prompt 'Y centre'
+    help 'Y-coord of centre in axis units'
+  endparameter
+  parameter RAD
+    type '_REAL'
+    ppath 'DYNAMIC'
+    prompt 'Radius'
+    help 'Radius of circle in axis units'
+  endparameter
+  parameter IRAD
+    type '_REAL'
+    ppath 'DYNAMIC'
+    prompt 'Inner radius'
+    help 'Inner radius of annulus in axis units'
+  endparameter
+  parameter ORAD
+    type '_REAL'
+    ppath 'DYNAMIC'
+    prompt 'Outer radius'
+    help 'Outer radius of annulus in axis units'
+  endparameter
+  parameter XWID
+    type '_REAL'
+    ppath 'DYNAMIC'
+    prompt 'X width'
+    help 'Horizontal width of box in axis units'
+  endparameter
+  parameter YWID
+    type '_REAL'
+    ppath 'DYNAMIC'
+    prompt 'Y width'
+    help 'Vertical width of box in axis units'
+  endparameter
+  parameter LEV
+    type '_REAL'
+    prompt 'Reference level'
+  endparameter
+  parameter TEXT
+    type '_CHAR'
+    prompt 'ARD input'
+    help '^filename or direct text input'
+  endparameter
+endinterface

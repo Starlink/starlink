@@ -1,0 +1,78 @@
+interface ISTATS
+  parameter BOX
+    type '_LOGICAL'
+    vpath 'DEFAULT'
+    default N
+    prompt 'Define box'
+  endparameter
+  parameter CIRC
+    type '_LOGICAL'
+    vpath 'DEFAULT'
+    default N
+    prompt 'Define circle'
+  endparameter
+  parameter XC
+    type '_REAL'
+    ppath 'DYNAMIC'
+    prompt 'X-pos of centre'
+  endparameter
+  parameter YC
+    type '_REAL'
+    ppath 'DYNAMIC'
+    prompt 'Y-pos of centre'
+  endparameter
+  parameter XWID
+    type '_REAL'
+    prompt 'X-width'
+  endparameter
+  parameter YWID
+    type '_REAL'
+    prompt 'Y-width'
+  endparameter
+  parameter RAD
+    type '_REAL'
+    ppath 'DYNAMIC'
+    prompt 'Radius'
+  endparameter
+  parameter MIN
+    position 1
+    type '_REAL'
+    vpath 'INTERNAL,NOPROMPT'
+  endparameter
+  parameter MAX
+    position 2
+    type '_REAL'
+    vpath 'INTERNAL,NOPROMPT'
+  endparameter
+  parameter MEAN
+    position 3
+    type '_REAL'
+    vpath 'INTERNAL,NOPROMPT'
+  endparameter
+  parameter TOT
+    position 4
+    type '_REAL'
+    vpath 'INTERNAL,NOPROMPT'
+  endparameter
+  parameter NPIX
+    position 5
+    type '_INTEGER'
+    vpath 'INTERNAL,NOPROMPT'
+  endparameter
+  parameter XCENT
+    position 6
+    type '_REAL'
+    vpath 'INTERNAL,NOPROMPT'
+  endparameter
+  parameter YCENT
+    position 7
+    type '_REAL'
+    vpath 'INTERNAL,NOPROMPT'
+  endparameter
+  parameter SUPPRESS
+    type '_LOGICAL'
+    vpath 'DEFAULT'
+    default N
+    prompt 'Suppress screen output'
+  endparameter
+endinterface

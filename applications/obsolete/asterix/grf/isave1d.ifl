@@ -1,0 +1,9 @@
+interface ISAVE1D
+  parameter OUT
+    type 'UNIV'
+    position 1
+    prompt 'Output dataset'
+    help 'File to which 1D data are to be saved'
+    association '->GLOBAL.BINDS'
+  endparameter
+endinterface

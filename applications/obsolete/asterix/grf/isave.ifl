@@ -1,0 +1,9 @@
+interface ISAVE
+  parameter OUT
+    type 'UNIV'
+    position 1
+    prompt 'Output dataset'
+    help 'File to which image is to be saved'
+    association '->GLOBAL.BINDS'
+  endparameter
+endinterface

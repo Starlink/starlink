@@ -1,0 +1,82 @@
+interface IEXCLUDE
+  parameter MODE
+    position 1
+    type '_CHAR'
+    prompt 'Mode switch'
+    help 'SOUrce/PIXel/CIRcle/POLygon/REGion'
+  endparameter
+  parameter RAD
+    type '_REAL'
+    prompt 'Radius'
+  endparameter
+  parameter LIST
+    type '_CHAR'
+    prompt 'Source list'
+    help 'Text or HDS file containing source list'
+  endparameter
+  parameter RA
+    type 'UNIV'
+    prompt 'RA'
+    help 'HDS array containing RA values'
+  endparameter
+  parameter DEC
+    type 'UNIV'
+    prompt 'DEC'
+    help 'HDS array containing DEC values'
+  endparameter
+  parameter DVAL
+    type '_REAL'
+    default !
+    vpath 'DEFAULT'
+    ppath 'DEFAULT'
+    prompt 'Data value'
+    help 'Data values to insert or ! to leave data unchanged'
+  endparameter
+  parameter OUTSIDE
+    type '_LOGICAL'
+    default N
+    vpath 'DEFAULT'
+    prompt 'Change values outside polygon or circle'
+    help 'Default is to change values inside'
+  endparameter
+  parameter ARD
+    type '_LOGICAL'
+    default N
+    vpath 'DEFAULT'
+    prompt 'Write ARD file'
+  endparameter
+  parameter FILE
+    type '_CHAR'
+    association '<->GLOBAL.ARDFILE'
+    ppath 'DEFAULT'
+    help 'ARD file'
+    help 'Name of new or existing ARD file'
+  endparameter
+  parameter APPEND
+    type '_LOGICAL'
+    default Y
+    ppath 'DEFAULT'
+    prompt 'Append to existing ARD file'
+    help 'Alternative is to write a new ARD file'
+  endparameter
+  parameter LOOP
+    type '_LOGICAL'
+    default N
+    vpath 'DEFAULT'
+    ppath 'DEFAULT'
+    prompt 'Select multiple polygons'
+    help 'IEXCLUDE will loop until a double cursor press'
+  endparameter
+  parameter XCENT
+    type '_REAL'
+    ppath 'DYNAMIC'
+    prompt 'X centre'
+    help 'X-coord of centre in axis units'
+  endparameter
+  parameter YCENT
+    type '_REAL'
+    ppath 'DYNAMIC'
+    prompt 'Y centre'
+    help 'Y-coord of centre in axis units'
+  endparameter
+endinterface

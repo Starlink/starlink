@@ -1,0 +1,35 @@
+interface ISCALE
+  parameter SCALING
+    position 1
+    type '_CHAR'
+    default 'LIN'
+    ppath 'CURRENT,DEFAULT'
+    prompt 'Scaling type'
+    help 'LINear, SQRt, LOGarithmic, HIStogram, CYClic SINusoidal PARabolic'
+  endparameter
+  parameter MIN
+    position 2
+    type '_REAL'
+    ppath 'DYNAMIC'
+    prompt 'Minimum'
+    help 'Minimum scaling value'
+  endparameter
+  parameter MAX
+    position 3
+    type '_REAL'
+    ppath 'DYNAMIC'
+    prompt 'Maximum'
+    help 'Maximum scaling value'
+  endparameter
+  parameter CYCLES
+    type '_INTEGER'
+    prompt 'Number of cycles'
+    help 'Number of times to cycle through colour table'
+  endparameter
+  parameter DISP
+    type '_LOGICAL'
+    vpath 'DEFAULT'
+    default F
+    prompt 'Immediate display'
+  endparameter
+endinterface

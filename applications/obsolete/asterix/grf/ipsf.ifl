@@ -1,0 +1,121 @@
+interface IPSF
+
+   parameter NEW
+      type '_LOGICAL'
+      vpath 'DEFAULT'
+      default N
+      prompt 'New PSF'
+      help 'Y to load new PSF'
+   endparameter
+
+   parameter PMAX
+      type '_REAL'
+      vpath 'DEFAULT'
+      ppath 'DEFAULT'
+      default !
+      prompt 'Maximum value for centre of psf'
+      help 'The psf will be scaled to this central value'
+   endparameter
+
+   parameter BGND
+      type '_REAL'
+      DEFAULT 0.0
+      vpath 'PROMPT'
+      ppath 'DYNAMIC,CURRENT,DEFAULT'
+      default !
+      prompt 'Background value'
+      help 'The background will be subtracted from the profile before fitting'
+   endparameter
+
+   parameter BGNDERR
+      type '_REAL'
+      DEFAULT 0.0
+      vpath 'PROMPT'
+      ppath 'DYNAMIC,CURRENT,DEFAULT'
+      default !
+      prompt 'Background error'
+      help 'Used in subtracting bgnd from the profile before fitting'
+   endparameter
+
+   PARAMETER PSF
+      position 1
+      TYPE '_CHAR'
+      VPATH 'PROMPT'
+      PPATH 'DYNAMIC,DEFAULT'
+      PROMPT 'Form of PSF'
+      HELP 'Enter one of the capitalised names above'
+   ENDPARAMETER
+
+   PARAMETER MASK
+      position 2
+      TYPE '_CHAR'
+      VPATH 'PROMPT'
+      PPATH 'DEFAULT'
+      PROMPT 'Name of profile to use (select from above)'
+   ENDPARAMETER
+
+   PARAMETER AUX
+      position 3
+      TYPE 'LITERAL'
+      VPATH 'PROMPT'
+      PPATH 'DYNAMIC,DEFAULT'
+      PROMPT 'This should never appear!'
+   ENDPARAMETER
+
+   PARAMETER X_BLUR
+      TYPE '_REAL'
+      PROMPT 'Telescope motion blurring FWHM in X (arcmin) '
+      DEFAULT 1.5
+      HELP 'Will be modelled as a Gaussian with specfied FWHM'
+   ENDPARAMETER
+
+   PARAMETER Y_BLUR
+      TYPE '_REAL'
+      PROMPT 'Telescope motion blurring FWHM in Y (arcmin) '
+      DEFAULT 1.5
+      HELP 'Will be modelled as a Gaussian with specfied FWHM'
+   ENDPARAMETER
+
+   PARAMETER DO_DET_BLUR
+      TYPE '_LOGICAL'
+      PROMPT 'Allow for Detector blurring ?'
+      DEFAULT N
+      HELP 'Put in energy dependent spatial blurring function ?'
+   ENDPARAMETER
+
+   PARAMETER DET_BLUR_FIL
+      TYPE '_CHAR'
+      PROMPT 'Detector blurring dataset'
+      DEFAULT 'DET_BLUR_NOM'
+      HELP 'Contains data on effect of finite spatial resolution'
+   ENDPARAMETER
+
+   PARAMETER DO_PEN_DEPTH
+      TYPE '_LOGICAL'
+      PROMPT 'Allow for penetration depth effects ?'
+      DEFAULT N
+      HELP 'Compute position and energy dependent asymmetric PSF; Slow'
+   ENDPARAMETER
+
+   PARAMETER PEN_DEPTH_FIL
+      TYPE '_CHAR'
+      PROMPT 'Penetration depth dataset'
+      DEFAULT 'PEN_DEPTH_NOM'
+      HELP 'Contains probability of various penetration depths occurring'
+   ENDPARAMETER
+
+   PARAMETER TEL_LEN_COR
+      TYPE '_REAL'
+      PROMPT 'Correction to Telescope length in mm'
+      DEFAULT -1.1
+      HELP 'Amount to be added to nominal value'
+   ENDPARAMETER
+
+   PARAMETER DO_CW_COR
+      TYPE '_LOGICAL'
+      PROMPT 'Correct for bar screening bias to pen depth? '
+      DEFAULT Y
+      HELP 'Reduce weights of large pen. depths to allow for events lost behind bars'
+   ENDPARAMETER
+
+endinterface

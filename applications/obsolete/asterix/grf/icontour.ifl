@@ -1,0 +1,15 @@
+interface ICONTOUR
+  parameter LEVELS
+    position 1
+    type '_REAL'
+    default !
+    prompt 'Level(s)'
+    help 'One or more contour levels or ! to leave unchanged'
+  endparameter
+  parameter OFF
+    type '_LOGICAL'
+    default N
+    vpath 'DEFAULT'
+    prompt 'Switch off contours'
+  endparameter
+endinterface

@@ -1,0 +1,22 @@
+interface IZED
+  parameter X
+    position 1
+    type 'REAL'
+    prompt 'X position'
+    ppath 'DYNAMIC'
+    help 'X position of centre of circle'
+  endparameter
+  parameter Y
+    position 2
+    type 'REAL'
+    prompt 'X position'
+    ppath 'DYNAMIC'
+    help 'X position of centre of circle'
+  endparameter
+  parameter RAD
+    position 3
+    type 'REAL'
+    prompt 'Radius'
+    help 'Radius of circle'
+  endparameter
+endinterface

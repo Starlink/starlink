@@ -1,0 +1,15 @@
+interface IPIXEL
+  parameter QUAL
+    type '_LOGICAL'
+    vpath 'DEFAULT'
+    default N
+    prompt 'Plot QUALITY mask'
+    help 'QUALITY mask plotted instead of data'
+  endparameter
+  parameter OFF
+    type '_LOGICAL'
+    vpath 'DEFAULT'
+    default N
+    prompt 'Supress pixel plotting'
+  endparameter
+endinterface

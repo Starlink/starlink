@@ -1,0 +1,9 @@
+interface ISURFACE
+  parameter ANGLE
+    position 1
+    type '_REAL'
+    prompt 'Viewing angle'
+    default 45.0
+    help 'eye position in degrees above horizontal'
+  endparameter
+endinterface

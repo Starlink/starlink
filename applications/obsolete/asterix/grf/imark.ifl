@@ -1,0 +1,61 @@
+interface IMARK
+  parameter OFF
+    type '_LOGICAL'
+    default N
+    vpath 'DEFAULT'
+    prompt 'Switch off current marks'
+  endparameter
+  parameter CURR
+    type '_LOGICAL'
+    default N
+    vpath 'DEFAULT'
+    prompt 'Mark current position'
+    help 'Otherwise get positions from file'
+  endparameter
+  parameter LIST
+    position 1
+    type '_CHAR'
+    prompt 'Source list'
+    help 'Text or HDS file containing source list'
+  endparameter
+  parameter RA
+    type 'UNIV'
+    prompt 'RA'
+    help 'HDS array containing RA values'
+  endparameter
+  parameter DEC
+    type 'UNIV'
+    prompt 'DEC'
+    help 'HDS array containing DEC values'
+  endparameter
+  parameter SYMBOL
+    type '_INTEGER'
+    default 2
+    prompt 'Symbol'
+    help 'PGPLOT symbol number'
+  endparameter
+  parameter COLOUR
+    type '_INTEGER'
+    default 1
+    prompt 'Colour'
+    help 'PGPLOT colour index'
+  endparameter
+  parameter SIZE
+    type '_REAL'
+    default 1.0
+    prompt 'Symbol size'
+  endparameter
+  parameter BOLD
+    type '_INTEGER'
+    default 1
+    prompt 'Symbol boldness'
+  endparameter
+  parameter NUMBER
+    type '_LOGICAL'
+    vpath 'DEFAULT'
+    ppath 'DEFAULT'
+    default N
+    prompt 'Number the symbols'
+    help 'Default is just to plot the symbol'
+  endparameter
+endinterface

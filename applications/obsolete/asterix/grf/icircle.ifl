@@ -1,0 +1,23 @@
+interface ICIRCLE
+  parameter XCENT
+    position 1
+    type '_REAL'
+    ppath 'DYNAMIC'
+    prompt 'X centre'
+    help 'X-coord of centre in axis units'
+  endparameter
+  parameter YCENT
+    position 2
+    type '_REAL'
+    ppath 'DYNAMIC'
+    prompt 'Y centre'
+    help 'Y-coord of centre in axis units'
+  endparameter
+  parameter RAD
+    position 3
+    type '_REAL'
+    ppath 'DYNAMIC'
+    prompt 'Radius'
+    help 'Radius of circle in axis units'
+  endparameter
+endinterface

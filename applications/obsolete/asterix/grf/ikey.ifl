@@ -1,0 +1,8 @@
+interface IKEY
+  parameter OFF
+    type '_LOGICAL'
+    default N
+    vpath 'DEFAULT'
+    prompt 'Switch key off'
+  endparameter
+endinterface

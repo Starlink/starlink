@@ -1,0 +1,31 @@
+interface IRADIAL
+  parameter XCENT
+    position 1
+    type '_REAL'
+    ppath 'DYNAMIC'
+    prompt 'X centre'
+    help 'X-coord of centre in axis units'
+  endparameter
+  parameter YCENT
+    position 2
+    type '_REAL'
+    ppath 'DYNAMIC'
+    prompt 'Y centre'
+    help 'Y-coord of centre in axis units'
+  endparameter
+  parameter RAD
+    position 3
+    type '_REAL'
+    prompt 'Radius'
+    help 'Radius of circle in axis units'
+  endparameter
+  parameter SAMPLE
+    position 4
+    type '_INTEGER'
+    default 1
+    vpath 'default'
+    ppath 'current,default'
+    prompt 'Oversampling'
+    help 'Oversampling factor when creating profile'
+  endparameter
+endinterface

@@ -1,0 +1,28 @@
+interface IAZIMUTH
+  parameter XCENT
+    position 1
+    type '_REAL'
+    ppath 'DYNAMIC'
+    prompt 'X centre'
+    help 'X-coord of centre in axis units'
+  endparameter
+  parameter YCENT
+    position 2
+    type '_REAL'
+    ppath 'DYNAMIC'
+    prompt 'Y centre'
+    help 'Y-coord of centre in axis units'
+  endparameter
+  parameter RAD
+    position 3
+    type '_REAL'
+    prompt 'Radius'
+    help 'Radius of circle in axis units'
+  endparameter
+  parameter NBIN
+    position 4
+    type '_INTEGER'
+    prompt 'Number of bins'
+    help 'Number of sectors to divide circle into'
+  endparameter
+endinterface

@@ -1,0 +1,8 @@
+interface IHIST
+  parameter NBIN
+    position 1
+    type '_INTEGER'
+    prompt 'Number of bins'
+    help 'Number of count rate bins'
+  endparameter
+endinterface

@@ -1,0 +1,15 @@
+interface IDISPLAY
+  parameter NEXT
+    type '_LOGICAL'
+    vpath 'DEFAULT'
+    default Y
+    prompt 'Next window'
+    help 'Y = advance to next display window  N = stay in current one'
+  endparameter
+  parameter BQUAL
+    type '_LOGICAL'
+    vpath 'DEFAULT'
+    default NO
+    prompt 'Blank out bad quality pixels'
+  endparameter
+endinterface
