@@ -8296,7 +8296,7 @@ default value.
 
          \sstitem
          This routine correctly processes the AXIS, DATA, QUALITY,
-         LABEL, TITLE, HISTORY, and VARIANCE components of an NDF
+         LABEL, TITLE, HISTORY, WCS and VARIANCE components of an NDF
          data structure and propagates all extensions.
 
          \sstitem
@@ -8734,7 +8734,7 @@ default value.
 
          \sstitem
          This routine correctly processes the AXIS, DATA, QUALITY,
-         LABEL, TITLE, UNITS, HISTORY, and VARIANCE components of an NDF
+         LABEL, TITLE, UNITS, HISTORY, WCS and VARIANCE components of an NDF
          data structure and propagates all extensions.
 
          \sstitem
@@ -9093,7 +9093,7 @@ default value.
 
          \sstitem
          This routine correctly processes the AXIS, DATA, QUALITY,
-         LABEL, TITLE, UNITS, and HISTORY components of the input NDF
+         LABEL, TITLE, UNITS, WCS and HISTORY components of the input NDF
          and propagates all extensions.  In addition, if the mean
          estimator is used, the VARIANCE component is also processed.
          If the median estimator is used, then the output NDF will have
@@ -9171,7 +9171,7 @@ default value.
 
          \sstitem
          This routine correctly processes the AXIS, DATA, QUALITY,
-         LABEL, TITLE, UNITS, HISTORY, and VARIANCE components of an NDF
+         LABEL, TITLE, UNITS, HISTORY, WCS and VARIANCE components of an NDF
          data structure and propagates all extensions.
 
          \sstitem
@@ -9568,7 +9568,7 @@ default value.
 
          \sstitem
          This routine correctly processes the AXIS, DATA, QUALITY, VARIANCE,
-         LABEL, TITLE, UNITS, and HISTORY components of the input NDF
+         LABEL, TITLE, UNITS, WCS and HISTORY components of the input NDF
          and propagates all extensions.
 
          \sstitem
@@ -9643,7 +9643,7 @@ default value.
 
          \sstitem
          This routine correctly processes the AXIS, DATA, QUALITY,
-         LABEL, TITLE, UNITS, HISTORY, and VARIANCE components of an NDF
+         LABEL, TITLE, UNITS, HISTORY, WCS and VARIANCE components of an NDF
          data structure and propagates all extensions.
 
          \sstitem
@@ -10068,7 +10068,7 @@ default value.
 
          \sstitem
          The routine correctly processes the AXIS, DATA, QUALITY,
-         VARIANCE, LABEL, TITLE, UNITS, and HISTORY components of an NDF;
+         VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of an NDF;
          and propagates all extensions.
 
          \sstitem
@@ -10142,7 +10142,7 @@ default value.
 
          \sstitem
          This routine correctly processes the AXIS, DATA, QUALITY,
-         LABEL, TITLE, UNITS, HISTORY, and VARIANCE components of an NDF
+         LABEL, TITLE, UNITS, HISTORY, WCS and VARIANCE components of an NDF
          data structure and propagates all extensions.
 
          \sstitem
@@ -11563,7 +11563,7 @@ plot with PENROT={\tt TRUE} (11k).
 
          \sstitem
          This routine correctly processes the AXIS, DATA, QUALITY,
-         VARIANCE, LABEL, TITLE, UNITS, and HISTORY components of the
+         VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of the
          input NDF and propagates all extensions.
 
          \sstitem
@@ -12069,7 +12069,7 @@ plot with PENROT={\tt TRUE} (11k).
 
          \sstitem
          This routine correctly processes the AXIS, DATA, QUALITY,
-         LABEL, TITLE, UNITS, HISTORY, and VARIANCE components of an NDF
+         LABEL, TITLE, UNITS, HISTORY, WCS and VARIANCE components of an NDF
          data structure and propagates all extensions.
 
          \sstitem
@@ -12894,6 +12894,7 @@ plot with PENROT={\tt TRUE} (11k).
          \sstitem
          This routine correctly processes the AXIS, DATA, QUALITY,
          VARIANCE, LABEL, TITLE, and UNITS components of the input NDF.
+         The WCS component is propagated correctly to any output NDF.
 
          \sstitem
          Processing of bad pixels and automatic quality masking are
@@ -12977,7 +12978,7 @@ plot (101k).
 
          \sstitem
          This routine correctly processes the AXIS, DATA, QUALITY,
-         LABEL, TITLE, HISTORY, and VARIANCE components of an NDF
+         LABEL, TITLE, HISTORY, WCS and VARIANCE components of an NDF
          data structure and propagates all extensions.
 
          \sstitem
@@ -13561,7 +13562,7 @@ plot (101k).
 
          \sstitem
          This routine correctly processes the AXIS, DATA, QUALITY,
-         VARIANCE, LABEL, TITLE, UNITS, and HISTORY components of an NDF data
+         VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of an NDF data
          structure and propagates all extensions.
 
          \sstitem
@@ -13822,7 +13823,7 @@ plot (101k).
 
          \sstitem
          This routine correctly processes the AXIS, DATA, QUALITY,
-         VARIANCE, LABEL, TITLE, UNITS, and HISTORY components of an NDF
+         VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of an NDF
          data structure and propagates all extensions.
 
          \sstitem
@@ -14049,7 +14050,7 @@ plot (101k).
 
          \sstitem
          This routine correctly processes the AXIS, DATA, QUALITY,
-         VARIANCE, LABEL, TITLE, UNITS, and HISTORY components of an NDF
+         VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of an NDF
          data structure and propagates all extensions.
 
          \sstitem
@@ -14321,6 +14322,8 @@ plot (101k).
       This procedure allows you to use your favourite editor to
       modify the FITS headers stored in an NDF's FITS extension.
       There is limited validation of the FITS headers after editing.
+      A FITS extension is created if the NDF does not already have 
+      one.
    }
    \sstusage{
       fitsedit ndf
@@ -16810,7 +16813,7 @@ plot (101k).
 
          \sstitem
          This routine correctly processes the AXIS, DATA, QUALITY, VARIANCE,
-         LABEL, TITLE, UNITS, and HISTORY components of the input NDF
+         LABEL, TITLE, UNITS, WCS and HISTORY components of the input NDF
          and propagates all extensions.
 
          \sstitem
@@ -17624,7 +17627,7 @@ plot (101k).
 
          \sstitem
          This routine correctly processes the AXIS, DATA, QUALITY,
-         VARIANCE, LABEL, TITLE, and UNITS components of the input NDF.
+         VARIANCE, LABEL, TITLE, WCS and UNITS components of the input NDF.
 
          \sstitem
          Processing of bad pixels and automatic quality masking are
@@ -18264,7 +18267,7 @@ plot (101k).
 
          \sstitem
          This routine correctly processes the AXIS, DATA, QUALITY,
-         LABEL, TITLE, and HISTORY components of an NDF data structure and
+         LABEL, TITLE, WCS and HISTORY components of an NDF data structure and
          propagates all extensions.  UNITS and VARIANCE become undefined
          by the transformation, and so are not propagated.
 
@@ -19438,7 +19441,8 @@ plot (6k).
          \sstitem
          The routine correctly processes the AXIS, DATA, QUALITY, VARIANCE,
          LABEL, TITLE, UNITS, and HISTORY components of an NDF, and
-         propagates all extensions to the output Region NDF.
+         propagates the WCS component, plus all extensions, to the output 
+         Region NDF.
 
          \sstitem
          Processing of bad pixels and automatic quality masking are
@@ -20821,7 +20825,7 @@ plot (10k).
 
          \sstitem
          This routine correctly processes the AXIS, DATA, QUALITY,
-         VARIANCE, LABEL, TITLE, UNITS, and HISTORY components of the
+         VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of the
          input NDF and propagates all extensions.
 
          \sstitem
@@ -22266,7 +22270,7 @@ plot (10k).
 
          \sstitem
          This routine correctly processes the AXIS, DATA, QUALITY,
-         VARIANCE, LABEL, TITLE, UNITS, and HISTORY components of an NDF
+         VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of an NDF
          data structure and propagates all extensions.  However, neither
          QUALITY nor a SURFACEFIT extension is propagated when LIKE is not
          null.
@@ -22751,7 +22755,7 @@ plot (10k).
 
          \sstitem
          This routine correctly processes the AXIS, DATA, QUALITY,
-         VARIANCE, LABEL, TITLE, UNITS, and HISTORY components of the
+         VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of the
          input NDFs.  HISTORY and extensions are propagated from both the
          primary NDF and template NDF.
 
@@ -23094,7 +23098,7 @@ plot (10k).
 
          \sstitem
          This routine correctly processes the AXIS, DATA, LABEL, TITLE,
-         UNITS, and HISTORY components of an NDF data structure and
+         UNITS, WCS and HISTORY components of an NDF data structure and
          propagates all extensions.  VARIANCE is not used to weight the
          median filter and is not propagated.  QUALITY is also lost.
 
@@ -23527,7 +23531,7 @@ plot (10k).
 
          \sstitem
          This routine correctly processes the AXIS, DATA, QUALITY,
-         VARIANCE, LABEL, TITLE, UNITS, and HISTORY components of an NDF
+         VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of an NDF
          data structure and propagates all extensions.
 
          \sstitem
@@ -24166,7 +24170,7 @@ plot (9k).
 
          \sstitem
          This routine correctly processes the AXIS, DATA, QUALITY,
-         LABEL, TITLE, HISTORY, and VARIANCE components of an NDF
+         LABEL, TITLE, HISTORY, WCS and VARIANCE components of an NDF
          data structure and propagates all extensions.
 
          \sstitem
@@ -24329,7 +24333,7 @@ plot (9k).
    }
    \sstimplementationstatus{
       If present, an NDF's TITLE, LABEL, UNITS, DATA, VARIANCE,
-      QUALITY, AXIS and HISTORY components are copied by this routine,
+      QUALITY, AXIS WCS and HISTORY components are copied by this routine,
       together with all extensions. The output NDF's title may be
       modified, if required, by specifying a new value via the TITLE
       parameter.
@@ -24754,7 +24758,7 @@ plot (9k).
 
          \sstitem
          This routine correctly processes the AXIS, DATA, QUALITY,
-         VARIANCE, LABEL, TITLE, UNITS, and HISTORY components of an NDF
+         VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of an NDF
          data structure and propagates all extensions.
 
          \sstitem
@@ -25045,7 +25049,7 @@ plot (9k).
 
          \sstitem
          The routine correctly processes the AXIS, DATA, QUALITY,
-         VARIANCE, LABEL, TITLE, UNITS, and HISTORY components of an NDF,
+         VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of an NDF,
          and propagates all extensions to the output NDF.  All propagated
          components come from the NDF to be normalised.
 
@@ -25746,7 +25750,7 @@ plot (9k).
 
          \sstitem
          This routine correctly processes the AXIS, DATA, QUALITY,
-         VARIANCE, LABEL, TITLE, UNITS, and HISTORY, components of an NDF
+         VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY, components of an NDF
          data structure and propagates all extensions.  Propagation is from
          the base NDF.
  
@@ -27956,7 +27960,7 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
 
          \sstitem
          This routine correctly processes the AXIS, DATA, QUALITY,
-         VARIANCE, LABEL, TITLE, UNITS, and HISTORY components of an NDF
+         VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of an NDF
          data structure and propagates all extensions.
 
          \sstitem
@@ -28437,7 +28441,7 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
          parameter QUALITY is not {\tt FALSE}.
 
          \sstitem
-         The UNITS, AXIS, LABEL, TITLE, and HISTORY components are
+         The UNITS, AXIS, LABEL, TITLE, WCS and HISTORY components are
          propagated from the first supplied input NDF, together with all
          extensions.
 
@@ -29447,7 +29451,7 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
 
          \sstitem
          This routine correctly processes the AXIS, DATA, QUALITY,
-         VARIANCE, LABEL, TITLE, UNITS, and HISTORY components of an NDF
+         VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of an NDF
          data structure and propagates all extensions.
 
          \sstitem
@@ -30315,8 +30319,8 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
 
          \sstitem
          This routine correctly processes the AXIS, DATA, QUALITY,
-         VARIANCE, LABEL, TITLE, UNITS, and HISTORY components of an NDF data
-         structure and propagates all extensions.
+         VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of an 
+         NDF data structure and propagates all extensions.
 
          \sstitem
          Processing of bad pixels and automatic quality masking are
@@ -30872,7 +30876,7 @@ Click \htmladdnormallink{here}{shadow_exam.gif} to see an example plot
 
          \sstitem
          This routine correctly processes the AXIS, DATA, QUALITY,
-         LABEL, TITLE, HISTORY, and VARIANCE components of an NDF
+         LABEL, TITLE, HISTORY, WCS and VARIANCE components of an NDF
          data structure and propagates all extensions.
 
          \sstitem
@@ -30994,7 +30998,7 @@ Click \htmladdnormallink{here}{shadow_exam.gif} to see an example plot
 
          \sstitem
          This routine correctly processes the AXIS, DATA, QUALITY,
-         VARIANCE, LABEL, TITLE, UNITS, and HISTORY components of an NDF
+         VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of an NDF
          data structure and propagates all extensions.
 
          \sstitem
@@ -31231,7 +31235,7 @@ Click \htmladdnormallink{here}{shadow_exam.gif} to see an example plot
 
          \sstitem
          This routine correctly processes the AXIS, DATA, QUALITY,
-         LABEL, TITLE, UNITS, and HISTORY components of the input NDF.
+         LABEL, TITLE, UNITS, WCS and HISTORY components of the input NDF.
          There is no support for VARIANCE processing.
 
          \sstitem
@@ -31379,7 +31383,7 @@ right.
 
          \sstitem
          This routine correctly processes the AXIS, DATA, QUALITY,
-         VARIANCE, LABEL, TITLE, UNITS, and HISTORY components of an NDF
+         VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of an NDF
          data structure and propagates all extensions.
 
          \sstitem
@@ -33842,7 +33846,7 @@ plot (7k).
 
          \sstitem
          This routine correctly processes the AXIS, DATA, QUALITY,
-         LABEL, TITLE, UNITS, and HISTORY components of the
+         LABEL, TITLE, UNITS, WCS and HISTORY components of the
          input NDF and propagates all extensions.
 
          \sstitem
@@ -34123,7 +34127,7 @@ plot (7k).
 
          \sstitem
          This routine correctly processes the AXIS, DATA, QUALITY,
-         VARIANCE, LABEL, TITLE, UNITS, and HISTORY components of the
+         VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of the
          input NDF and propagates all extensions.
 
          \sstitem
@@ -35262,24 +35266,6 @@ the NDF\_ library feature much-improved documentation.
     setting the array lower bounds in automatic mode.  The created NDF
     uses the simple variant for the data array.
 \end{itemize}
-\end{htmlonly}
-
-
-\section{Release Notes---V0.12}
-\subsection{Modified applications}
-\begin{itemize}
-  \item \htmlref{DISPLAY}{DISPLAY} changed to avoid a spurious error
-previously reported if double precision data is displayed which requires
-compression to fit in the display.
-  \item \htmlref{FILLBAD}{FILLBAD} now ignores any input VARIANCE component
-if all the variances are bad or zero. Also added protection against
-division by zero which occurred if the variance array contained any isolated 
-zeros.
-  \item \htmlref{LINPLOT}{LINOPLOT} changed to avoid spurious clearing of
-X displays when using two or more GWM windows under ICL.
-  \item  \htmlref{TRANMAKE}{TRANMAKE} no longer reports a compilation error 
-if a null value is given for parameter CLASS.
-\end{itemize}
 
 \section{Release Notes---V0.10}
 This release includes four new applications, three new synonyms, and
@@ -35460,7 +35446,40 @@ withdrawn, two to enable {\footnotesize KAPPA} to be NAG-free.
     \htmlref{TRANSFORMER}{TRANSFORMER}.
 
 \end{itemize}
+\end{htmlonly}
 
+\section{Release Notes---V0.12}
+\subsection{Modified applications}
+\begin{itemize}
+  \item \htmlref{DISPLAY}{DISPLAY} changed to avoid a spurious error
+previously reported if double precision data is displayed which requires
+compression to fit in the display.
+  \item \htmlref{DRAWSIG}{DRAWSIG} changed to avoid spurious clearing of
+X displays when using two or more GWM windows under ICL.
+  \item \htmlref{FFCLEAN}{FFCLEAN} bug fixed which caused parameter
+THRESH to be ignored when using a \_DOUBLE data array.
+  \item \htmlref{FILLBAD}{FILLBAD} now ignores any input VARIANCE component
+if all the variances are bad or zero. Also added protection against
+division by zero which occurred if the variance array contained any isolated 
+zeros.
+  \item \htmlref{FITSEDIT}{FITSEDIT} now creates a new FITS extension if
+the specified NDF does not already contain a FITS extension.
+  \item \htmlref{LINPLOT}{LINOPLOT} changed to avoid spurious clearing of
+X displays when using two or more GWM windows under ICL.
+  \item \htmlref{PARGET}{PARGET} bug fixed which caused the application
+to terminate if the specified parameter is an array with only a single
+element.
+  \item  \htmlref{TRANMAKE}{TRANMAKE} no longer reports a compilation error 
+if a null value is given for parameter CLASS.
+\end{itemize}
+
+The following applications now propagate the WCS component of an NDF
+structure: 
+
+ADD ARDMASK BLOCK CADD CALPOL CDIV CHPIX CMULT CONVOLVE CSUB DISPLAY
+ERRCLIP FFCLEAN FILLBAD GAUSMOOTH GREYPLOT HISTEQ INSPECT DIV LUCY
+MAKESURFACE MATHS MEDIAN MEM2D MULT NDFCOPY NOMAGIC NORMALIZE PASTE RIFT
+SEGMENT SETMAGIC SHADOW SUB SUBSTITUTE SURFIT THRESH WIENER ZAPLIN
 
 \begin{latexonly}
 \newpage
