@@ -72,4 +72,4 @@ asttest_SOURCES = asttest.f \
 	$(PRIVATE_INCLUDES)
 
 asttest_TASKS =
-asttest_LDADD = $(LDADD) `atools_link_adam`
+asttest_LDADD = $(LDADD) `$(srcdir)/atools_link_adam`
