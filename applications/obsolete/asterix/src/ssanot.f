@@ -57,6 +57,7 @@
 
       DOUBLE PRECISION		EQUPOS(2)		! Source RA,DEC
 
+      REAL			AXPOS(2)       		! Axis position
       REAL                  XBASE, XSCALE             ! X axis values
       REAL                  XC, YC                    ! Image coordinates
       REAL                  YBASE, YSCALE             ! Y axis values
