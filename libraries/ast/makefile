@@ -133,7 +133,9 @@
 #     8-APR-1998 (RFWS):
 #        Additional edit to change the exponent character produced by
 #        astbad.c from "E" to "D" before using it in ast_par.
-#
+#     29-MAY-1998 (RFWS):
+#        Modified handling of conditions of use file to adhere to
+#        current standards.
 #------------------------------------------------------------------------------
 
 #  Help target.
@@ -461,7 +463,11 @@ FIGURES = sun210_figures sun211_figures
 
 DOCUMENTATION = \
 $(LATEX_DOCS) $(HYPERTEXT_DOCS:.htx=.htx_tar) $(FIGURES) \
-$(PKG_NAME).news LICENCE
+$(PKG_NAME).news $(LICENCE)
+
+#  Conditions of use file.
+
+LICENCE = $(PACK_NAME)_CONDITIONS
 
 ###############################################################################
 #------------------------------------------------------------------------------
@@ -906,6 +912,11 @@ install:
            else :; fi;\
         fi;
 #
+#  Install the conditions of use file and make it read-only to prevent its
+#  date being changed.
+	cp -p $(LICENCE) $(INSTALL_DATES)
+	chmod 444 $(INSTALL_DATES)/$(LICENCE)
+#
 #  Install the date stamp file and make it read-only to prevent its
 #  date being changed.
 	cp -p $(DATE_STAMP) $(INSTALL_DATES)
@@ -1051,6 +1062,13 @@ do_deinstall:
               $(STAR_BIN)/hlink $(INSTALL_DOCS) $(INSTALL_HELP);\
            else :; fi;\
         fi
+#
+#  Deinstall the conditions of use file after setting its protection so it may
+#  be removed.
+	- if test -f $(INSTALL_DATES)/$(LICENCE); then \
+           chmod 644 $(INSTALL_DATES)/$(LICENCE);\
+           rm -f $(INSTALL_DATES)/$(LICENCE);\
+        else :; fi
 #
 #  Deinstall the date stamp file after setting its protection so it may
 #  be removed.

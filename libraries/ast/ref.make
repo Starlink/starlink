@@ -150,7 +150,7 @@ do_unix_release:
 #
 #  Fetch the news file and licence conditions and any additional files
 #  required in the release. Make all files accessible.
-	files="$(PKG).news LICENCE makefile mk \
+	files="$(PKG).news AST_CONDITIONS makefile mk \
                $(LATEX_DOCUMENTATION_FILES)";\
         fetch $${files}; rm RCS; \
         for f in $${files}; do \

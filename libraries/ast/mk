@@ -260,8 +260,8 @@
                LINK='ln -s'
                RANLIB=':'
 #               SHARE='.so'
-               TAR_IN='pax -w -v -x ustar -f'
-               TAR_OUT='pax -r -f'
+               TAR_IN='tar -cvhf'
+               TAR_OUT='tar -xf'
                echo "mk: Environment variables defined for $SYSTEM system"
                ;;
 

@@ -124,9 +124,6 @@
 *           Get the number of output coordinates for a Mapping.
 *        astGetReport
 *           Get the Report attribute value for a Mapping.
-*        astGetTranDef (deprecated)
-*           Determine if a Mapping can perform a specified coordinate
-*           transformation.
 *        astGetTranForward
 *           Determine if a Mapping can perform a "forward" coordinate
 *           transformation.
@@ -258,7 +255,6 @@ typedef struct AstMappingVtab {
    int (* GetNin)( AstMapping * );
    int (* GetNout)( AstMapping * );
    int (* GetReport)( AstMapping * );
-   int (* GetTranDef)( AstMapping *, int );
    int (* GetTranForward)( AstMapping * );
    int (* GetTranInverse)( AstMapping * );
    int (* MapMerge)( AstMapping *, int, int, int *, AstMapping ***, int ** );
@@ -320,7 +316,6 @@ int astGetInvert_( AstMapping * );
 int astGetNin_( AstMapping * );
 int astGetNout_( AstMapping * );
 int astGetReport_( AstMapping * );
-int astGetTranDef_( AstMapping *, int );
 int astGetTranForward_( AstMapping * );
 int astGetTranInverse_( AstMapping * );
 int astMapMerge_( AstMapping *, int, int, int *, AstMapping ***, int ** );
@@ -403,8 +398,6 @@ astINVOKE(V,astGetNin_(astCheckMapping(this)))
 astINVOKE(V,astGetNout_(astCheckMapping(this)))
 #define astGetReport(this) \
 astINVOKE(V,astGetReport_(astCheckMapping(this)))
-#define astGetTranDef(this,forward) \
-astINVOKE(V,astGetTranDef_(astCheckMapping(this),forward))
 #define astGetTranForward(this) \
 astINVOKE(V,astGetTranForward_(astCheckMapping(this)))
 #define astGetTranInverse(this) \
