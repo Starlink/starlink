@@ -49,6 +49,9 @@
 //        Added test for sky coordinates and members to query this.
 //    15-SEP-2000 (PWD):
 //        Fixed ::set member so that it works as advertised.
+//     7-DEC-2000 (PWD):
+//        Added methods to return a list of domains and to set an AST
+//        attribute.
 //-
 
 #include <string.h>
@@ -78,19 +81,19 @@ extern "C" {
 //
 //  Utility routines for formating FITS cards.
 //
-static void ccard( char *card, const char* keyword, char* const value )
+static void ccard( char *card, const char *keyword, char const *value )
 {
     char buf[81];
     sprintf(buf, "%-8.8s= '%.21s' /", keyword, value);
     sprintf(card, "%-80s", buf);
 }
-static void icard( char *card, const char* keyword, int value )
+static void icard( char *card, const char *keyword, int value )
 {
     char buf[81];
     sprintf(buf, "%-8.8s= %20d /", keyword, value);
     sprintf(card, "%-80s", buf);
 }
-static void dcard(char *card, const char* keyword, double value)
+static void dcard(char *card, const char *keyword, double value)
 {
     char  buf[81];
     sprintf(buf, "%-8.8s= %20f /", keyword, value);
@@ -100,7 +103,7 @@ static void dcard(char *card, const char* keyword, double value)
 //
 //  Constructor
 //
-StarWCS::StarWCS( const char* header )
+StarWCS::StarWCS( const char *header )
   : wcs_(NULL),
     equinox_(0.0),
     raIndex_(1),
@@ -860,7 +863,7 @@ int StarWCS::set( double ra, double dec,
 		  int nxpix, int nypix,
 		  double rotate,
 		  int equinox, double epoch,
-		  const char* proj )
+		  const char *proj )
 {
     if ( wcs_ ) {
         wcs_ = (AstFrameSet *) astAnnul( wcs_ );
@@ -950,7 +953,7 @@ WorldCoords StarWCS::center() const
 //
 //  Return the value of an AST attribute.
 //
-const char *StarWCS::astGet( char *attrib )
+const char *StarWCS::astGetAttrib( char *attrib )
 {
     if ( !isWcs() ) {
         return (char *)NULL;
@@ -1184,7 +1187,8 @@ double StarWCS::plaindist(double x0, double y0, double x1, double y1) const
 //  Check the WCS to see if current coordinates are a celestial
 //  coordinate system.
 //
-void StarWCS::setCelestial() {
+void StarWCS::setCelestial() 
+{
     AstFrame *frame = (AstFrame *) astGetFrame( wcs_, AST__CURRENT );
     issky_ = astIsASkyFrame( frame );
     frame = (AstFrame *) astAnnul( frame );
@@ -1237,12 +1241,72 @@ void StarWCS::constructWarning( AstFitsChan *fitschan )
 //  Get access to any ASTWARN cards that have been produced during
 //  construction. Note caller shouldn't delete this string.
 //
-const char *StarWCS::getWarning() {
+const char *StarWCS::getWarning() 
+{
     if ( warnings_ ) {
         return warnings_;
     } else {
         return NULL;
     }
+}
+
+//
+//  Get a list of the domains available in the frameset. The returned
+//  string should be freed by the caller.
+//
+char *StarWCS::getDomains() 
+{
+    if ( ! wcs_ ) {
+        return NULL;
+    }
+    
+    // Record the indices of the current frame (this is changed to get
+    // each domainname).
+    int icur = astGetI( wcs_, "Current" );
+
+    int insert = 0;
+    const int chunk = 128;
+    char *namelist = (char *) malloc( (size_t) chunk );
+    namelist[0] = '\0';
+    int length = chunk;
+
+    int nframe = astGetI( wcs_, "nframe" );
+    for ( int i = 1; i <= nframe; i++ ) {
+        astSetI( wcs_, "Current", i );
+        const char *domain = astGetC( wcs_, "Domain" );
+        int newlength = strlen( domain );
+        if ( insert + newlength > length ) {
+            length += chunk;
+            namelist = (char *) realloc( namelist, length );
+        }
+        strcat( namelist, " " );
+        strcat( namelist, domain );
+    }
+
+    //  Restore original current frame and return list of names.
+    astSetI( wcs_, "Current", icur );
+    if ( !astOK ) {
+        astClearStatus;
+    }
+    return namelist;
+}
+
+//
+//  Set an AST attribute. Name and value supplied as characters.
+//  
+//  Success (1) or failure (0) returned as result.
+//
+int StarWCS::astSetAttrib( const char *what, const char *value ) 
+{
+    if ( ! wcs_ ) {
+        return 0;
+    }
+    astSetC( wcs_, what, value );
+    if ( !astOK ) {
+        astClearStatus;
+        return 0;
+    }
+    return 1;
 }
 
 //

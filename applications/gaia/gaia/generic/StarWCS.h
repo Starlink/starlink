@@ -196,11 +196,16 @@ public:
   int astWCSReplace( AstFrameSet *newwcs);
 
   // Return the value of an AST attribute of the main AstFrameSet.
-  const char *astGet( char *attrib );
+  const char *astGetAttrib( char *attrib );
 
   //  Return copy ofwarnings string.
   const char *getWarning();
 
+  //  Get a list of the domains available in the frameset.
+  char *getDomains();
+  
+  //  Set an AST attribute.
+  int astSetAttrib( const char *what, const char *value );
 };
 
 

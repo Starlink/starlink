@@ -205,6 +205,7 @@ public:
    { "astcopy",       &StarRtdImage::astcopyCmd,      1, 1 },
    { "astcreate",     &StarRtdImage::astcreateCmd,    0, 0 },
    { "astdelete",     &StarRtdImage::astdeleteCmd,    1, 1 },
+   { "astdomains",    &StarRtdImage::astDomainsCmd,   0, 0 },
    { "astfix",        &StarRtdImage::astfixCmd,       0, 0 },
    { "astget",        &StarRtdImage::astgetCmd,       1, 1 },
    { "astpix2wcs",    &StarRtdImage::astpix2wcsCmd,   2, 2 },
@@ -213,9 +214,10 @@ public:
    { "astreplace",    &StarRtdImage::astreplaceCmd,   0, 0 },
    { "astreset",      &StarRtdImage::astresetCmd,     1, 1 },
    { "astrestore",    &StarRtdImage::astrestoreCmd,   0, 1 },
-   { "asttran2",      &StarRtdImage::asttran2Cmd,     2, 2 },
+   { "astset",        &StarRtdImage::astsetCmd,       2, 2 },
    { "aststore",      &StarRtdImage::aststoreCmd,     2, 4 },
    { "astsystem",     &StarRtdImage::astsystemCmd,    2, 3 },
+   { "asttran2",      &StarRtdImage::asttran2Cmd,     2, 2 },
    { "astwarnings",   &StarRtdImage::astwarningsCmd,  0, 0 },
    { "astwcs2pix",    &StarRtdImage::astwcs2pixCmd,   2, 2 },
    { "astwrite",      &StarRtdImage::astwriteCmd,     1, 3 },
@@ -1346,19 +1348,57 @@ int StarRtdImage::plotgridCmd( int argc, char *argv[] )
 int StarRtdImage::astgetCmd( int argc, char *argv[] )
 {
 #ifdef _DEBUG_
-  cout << "Called StarRtdImage::astgetCmd" << endl;
+    cout << "Called StarRtdImage::astgetCmd" << endl;
 #endif
-  if (!image_) {
-    return error("no image loaded");
-  }
+    if (!image_) {
+        return error("no image loaded");
+    }
+    
+    //  Get the value.
+    StarWCS* wcsp = getStarWCSPtr();
+    if ( !wcsp ) {
+        return TCL_ERROR;
+    }
+    const char *result = wcsp->astGetAttrib( argv[0] );
+    Tcl_SetResult( interp_, (char *)result, TCL_VOLATILE );
+    return TCL_OK;
+}
 
-  //  Get the value.
-  StarWCS* wcsp = getStarWCSPtr();
-  if (!wcsp)
-      return TCL_ERROR;
-  const char *result = wcsp->astGet( argv[0] );
-  Tcl_SetResult( interp_, (char *)result, TCL_VOLATILE );
-  return TCL_OK;
+//+
+//   StarRtdImage::astsetCmd
+//
+//   Purpose:
+//      Set the value of an AST attribute.
+//
+//    Return:
+//       TCL status and result.
+//
+//    Notes:
+//       The two input string should be the name of a known
+//       AST attribute and the new value. The AST object which is queried
+//       is the current WCS object, so any attributes should be
+//       limited to applicable values.
+//
+//-
+int StarRtdImage::astsetCmd( int argc, char *argv[] )
+{
+#ifdef _DEBUG_
+    cout << "Called StarRtdImage::astsetCmd" << endl;
+#endif
+    if (!image_) {
+        return error("no image loaded");
+    }
+    
+    //  Get the value.
+    StarWCS* wcsp = getStarWCSPtr();
+    if (!wcsp) {
+        return TCL_ERROR;
+    }
+    if ( wcsp->astSetAttrib( argv[0], argv[1] ) ) {
+        return TCL_OK;
+    } else {
+        return error( "Failed to set:" , argv[0] );
+    }
 }
 
 //+
@@ -5457,3 +5497,33 @@ int StarRtdImage::swapNeeded()
     }
     return swap;
 }
+
+//+
+//   StarRtdImage::astDomainsCmd
+//
+//   Purpose:
+//      Return a list of all the domain names in the current AST
+//      frameset. 
+//
+//   Result:
+//      A tcl list of the names.
+//-
+int StarRtdImage::astDomainsCmd( int argc, char *argv[] )
+{
+#ifdef _DEBUG_
+    cout << "Called StarRtdImage::astDomainsCmd" << endl;
+#endif
+    if (!image_) {
+        return error("no image loaded");
+    }
+    StarWCS* wcsp = getStarWCSPtr();
+    if ( !wcsp ) {
+        return TCL_ERROR;
+    }
+    
+    char *result = wcsp->getDomains();
+    Tcl_SetResult( interp_, (char *)result, TCL_VOLATILE );
+    free( result );
+    return TCL_OK;
+}
+
