@@ -56,8 +56,8 @@ interface POLVEC
 
    parameter      DEBIAS         
       type        _LOGICAL
-      vpath       'DYNAMIC,DEFAULT'
-      ppath       'DYNAMIC,DEFAULT'
+      vpath       'DEFAULT'
+      ppath       'DEFAULT'
       default     !
       prompt      'Remove statistical bias?'
       helpkey     '*'

@@ -94,10 +94,11 @@
 *     DEBIAS = _LOGICAL (Read)
 *        TRUE if a correction for statistical bias is to be made to
 *        percentage polarization and polarized intensity. The returned 
-*        variance values are unchanged. This correction only applies to
+*        variance values are unchanged. This correction only applies to 
 *        calculations of linear polarization, and cannot be used if the 
-*        input cube does not contain variance values. The dynamic default 
-*        is equal to the value supplied for parameter VARIANCE. []
+*        input cube does not contain variance values. If a null value 
+*        (!) is supplied, then the correction is applied if output variances
+*        are being created, and not otherwise.           [!]
 *     I = NDF (Write)
 *        An output NDF holding the total intensity. A null value can be
 *        supplied if this output image is not required. [!]
@@ -755,7 +756,6 @@
 *  See if a correction is to be made to the percentage polarisation to
 *  correct for bias introduced as a result of the noise distribution not
 *  being symmetric.
-      CALL PAR_DEF0L( 'DEBIAS', VAR, STATUS )
       CALL PAR_GET0L( 'DEBIAS', DEBIAS, STATUS )
 
 *  If a null value is supplied, annull the error, and debias if the
