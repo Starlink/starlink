@@ -1,0 +1,13 @@
+
+No configure for the following drivers:
+
+  X - do not know what it builts (lots of undocumented subdirs)
+  sun - presumably need an old sun to build
+
+Won't build even with autoconf:
+
+  IBM
+
+
+Should build up a libgks_drivers.la from SUBDIRS
+
