@@ -64,6 +64,8 @@
 *        Original version.
 *     04-OCT-2004: BRADC):
 *        No longer use NUM_ERROR
+*     09-DEC-2004 (PDRAPER):
+*        Deal with case when only one good value is available.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -167,8 +169,8 @@
             END IF
  2       CONTINUE
 
-*  Continue if more than one good value.
-         IF ( NGOOD .GT. 0 ) THEN
+*  Continue if at least two good values.
+         IF ( NGOOD .GT. 1 ) THEN
 
 *  Form mode.
             CALL CCG1_WMD2R( WRK1, WRK2, NGOOD, PBAD, NITER, TOLL,
@@ -186,6 +188,10 @@
             ELSE
                NGOOD = 0
             END IF
+         ELSE 
+
+*  Just one value, same as none.
+            NGOOD = 0
          END IF
 
 *  If there are sufficient good pixels output the result.
