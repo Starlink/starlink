@@ -73,3 +73,10 @@ PSEUDOCOMMON_SUBS = \
 # Other subroutines, which don't fit into any of the above categories.
 MISC_SUBS = \
     dnsg.f esp1_vers.f
+
+# Help files
+esp.shl: esp.hlp
+	$(HLIB) esp.hlp
+EXTRA_DIST = esp.hlp
+
+starhelp_DATA = esp.shl

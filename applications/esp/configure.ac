@@ -15,11 +15,9 @@ AC_PROG_FC
 dnl AC_PROG_LIBTOOL
 STAR_MONOLITHS
 
-AC_C_BIGENDIAN
-
 dnl    Other options here, such as
-dnl STAR_HAVE_FC_OPEN_READONLY
 STAR_CNF_COMPATIBLE_SYMBOLS
+STAR_CHECK_PROGS( hlib )
 
 dnl    Declare the build and use dependencies for this package
 STAR_DECLARE_DEPENDENCIES(build, [ast cat chr fio grp hds ndf par mers pda prm psx sae shl sgs subpar])
