@@ -61,10 +61,10 @@ EOF
 
 
 
-for t in tmp1 tmp2 # tmp3
+for t in tmp1 tmp2
 do
-    $RUN . $t.astrom-in $t.rep $t.sum $t-fits $t.log
-
+    $RUN input=$t.astrom-in report=$t.rep summary=$t.sum log=$t.log \
+        fits=$t-fits wcsstyle=qtan
 
     for f in $t.astrom-in $t.rep $t.sum $t.log
     do
