@@ -513,7 +513,7 @@
 
 *  Get the number of percentiles that the threshold is to be set at.
             CALL PAR_GET0D( 'PERCENTILE', PERCEN, STATUS )
-            PERCEN = ABS( PERCEN * 0.01 )
+            PERCEN = ABS( PERCEN * 0.01D0 )
 
 *  Determine what this value is.
             CALL CCD1_HISP( %VAL( IPHIST ), NBIN, ZERO, WIDTH, PERCEN,
