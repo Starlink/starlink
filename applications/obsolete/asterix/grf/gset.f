@@ -9,6 +9,7 @@
 *      10 Jun 94 : 1.7-3 DUMP option (RJV)
 *       7 Sep 94 : 1.7-4 OFF added as alternative to CANCEL (RJV)
 *      24 Nov 94 : 1.7-5 SUPPRESS added (RJV)
+*      10 FEB 95 : 1.8-0 open in READ mode for SHOW or DUMP (RJV)
 *    Type Definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -26,7 +27,7 @@
       INCLUDE 'GMD_CMN'
 *    Local Constants :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION='GSET Version 1.7-4')
+      PARAMETER (VERSION='GSET Version 1.8-0')
 *    Local variables :
       CHARACTER*(DAT__SZLOC) LOC
       CHARACTER*10 SWITCH
@@ -110,7 +111,11 @@
         IF (.NOT.G_OPEN) THEN
           CALL AST_INIT()
 *  get locator to top level
-          CALL USI_ASSOCI('INP','UPDATE',LOC,PRIM,STATUS)
+          IF (SHOW.OR.DUMP) THEN
+            CALL USI_ASSOCI('INP','READ',LOC,PRIM,STATUS)
+          ELSE
+            CALL USI_ASSOCI('INP','UPDATE',LOC,PRIM,STATUS)
+          ENDIF
 *  check if multiple dataset
           CALL GMD_QMULT(LOC,MULTI,STATUS)
 *  if not check NDF type
