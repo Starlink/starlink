@@ -100,7 +100,7 @@ struct bitmap_info {
 };
 
 void process_dvi_file (DviFile *, bitmap_info&, int resolution,
-		       const PkFont *fallback_font, PageRange&);
+		       PageRange&);
 bool process_special (DviFile *, string specialString,
 		      Bitmap*, bitmap_info&);
 string get_ofn_pattern (string dviname);
@@ -806,85 +806,80 @@ int main (int argc, char **argv)
 	    exit(1);
 	}
 
-	all_fonts_present = true;
-	no_font_present = true;
-	const PkFont *fallback_font = 0;
+	if (dvif->haveReadPostamble()) {
+	    all_fonts_present = true;
+	    no_font_present = true;
 
-	const DviFile::FontSet* fontset = dvif->getFontSet();
-	for (DviFile::FontSet::const_iterator ci = fontset->begin();
-	     ci != fontset->end();
-	     ++ci)
-	{
-	    const PkFont *f = *ci;
-	    if (f->loaded())
+	    const DviFile::FontSet* fontset = dvif->getFontSet();
+	    for (DviFile::FontSet::const_iterator ci = fontset->begin();
+		 ci != fontset->end();
+		 ++ci)
 	    {
-		no_font_present = false;
-		// Set the fallback font to be the first font named cmr10,
-		// or the first font if there are none such.
-		if (verbosity > normal)
-		    cerr << "dvi2bitmap: loaded font " << f->name() << endl;
-		if (fallback_font == 0)
-		    fallback_font = f;
-		else if (f->name() == "cmr10"
-			 && fallback_font->name() != "cmr10")
+		const PkFont *f = *ci;
+		if (f->loaded())
 		{
-		    fallback_font = f;
+		    no_font_present = false;
 		    if (verbosity > normal)
-			cerr << "dvi2bitmap: fallback font now "
-			     << fallback_font->name() << endl;
+			cerr << "dvi2bitmap: loaded font " << f->name()
+			     << endl;
+		}
+		else		// flag at least one missing
+		    all_fonts_present = false;
+
+		if (show_font_list & FONT_SHOW) {
+		    bool fld = (show_font_list & FONT_LONG_DISPLAY);
+		    if (show_font_list & FONT_CMDS)
+		    {
+			if ((show_font_list & FONT_INCFOUND) || !f->loaded())
+			{
+			    // If f->loaded() is true, then we're here
+			    // because FONT_INCFOUND was set, so indicate
+			    // this in the output.
+			    string cmd = f->fontgenCommand();
+			    if (cmd.length() == 0)
+				throw DviError ("configuration problem: I can't create a font-generation command");
+			    //cout << (f->loaded() ? "QG " : "Qg ")
+			    cout << (f->loaded()
+				     ? (fld ? "Qall-fontgen " : "Qg ")
+				     : (fld ? "Qmissing-fontgen " : "Qg "))
+				 << f->fontgenCommand()
+				 << endl;
+			}
+		    } else {
+			if ((show_font_list & FONT_INCFOUND) || !f->loaded())
+			{
+			    // If f->loaded() is true, then we're here
+			    // because FONT_INCFOUND was set, so indicate
+			    // this in the output.
+			    //cout << (f->loaded() ? "QF " : "Qf ");
+			    cout << (f->loaded()
+				     ? (fld ? "Qall-fonts " : "QF ")
+				     : (fld ? "Qmissing-fonts " : "Qf "));
+
+			    // write out font name, dpi, base-dpi, mag and MF mode
+			    cout << f->name() << ' '
+				 << f->dpiBase() << ' '
+				 << f->dpiScaled() << ' '
+				 << f->magnification()
+				 << " localfont";
+			    if (f->loaded())
+			    {
+				string fn = f->fontFilename();
+				string unk = "unknown";
+				cout << ' ' << (fn.length() > 0 ? fn : unk);
+			    }
+			    cout << endl;
+			}
+		    }
 		}
 	    }
-	    else		// flag at least one missing
-		all_fonts_present = false;
-
-	    if (show_font_list & FONT_SHOW) {
-		bool fld = (show_font_list & FONT_LONG_DISPLAY);
-		if (show_font_list & FONT_CMDS)
-		{
-		    if ((show_font_list & FONT_INCFOUND) || !f->loaded())
-		    {
-			// If f->loaded() is true, then we're here
-			// because FONT_INCFOUND was set, so indicate
-			// this in the output.
-			string cmd = f->fontgenCommand();
-			if (cmd.length() == 0)
-			    throw DviError ("configuration problem: I can't create a font-generation command");
-			//cout << (f->loaded() ? "QG " : "Qg ")
-			cout << (f->loaded()
-				 ? (fld ? "Qall-fontgen " : "Qg ")
-				 : (fld ? "Qmissing-fontgen " : "Qg "))
-			     << f->fontgenCommand()
-			     << endl;
-		    }
-		}
-		else
-		    if ((show_font_list & FONT_INCFOUND) || !f->loaded())
-		    {
-			// If f->loaded() is true, then we're here
-			// because FONT_INCFOUND was set, so indicate
-			// this in the output.
-			//cout << (f->loaded() ? "QF " : "Qf ");
-			cout << (f->loaded()
-				 ? (fld ? "Qall-fonts " : "QF ")
-				 : (fld ? "Qmissing-fonts " : "Qf "));
-
-			// write out font name, dpi, base-dpi, mag and MF mode
-			cout << f->name() << ' '
-			     << f->dpiBase() << ' '
-			     << f->dpiScaled() << ' '
-			     << f->magnification()
-			     << " localfont";
-			if (f->loaded())
-			{
-			    string fn = f->fontFilename();
-			    string unk = "unknown";
-			    cout << ' ' << (fn.length() > 0 ? fn : unk);
-			}
-			cout << endl;
-		    }
+	} else {
+	    // haven't read postamble
+	    if (show_font_list != 0) {
+		cerr << "Font information requested, but DVI postamble suppressed" << endl;
+		no_font_present = true;
 	    }
 	}
-
 
 	if (processing_ == process_dvi)
 	{
@@ -894,7 +889,7 @@ int main (int argc, char **argv)
 		    cerr << progname << ": no fonts found!  Giving up" << endl;
 	    }
 	    else
-		process_dvi_file (dvif, bm, resolution, fallback_font, PR);
+		process_dvi_file (dvif, bm, resolution, PR);
 	}
 
     }
@@ -921,7 +916,7 @@ int main (int argc, char **argv)
 }
 
 void process_dvi_file (DviFile *dvif, bitmap_info& b, int fileResolution,
-		       const PkFont *fallback_font, PageRange& PR)
+		       PageRange& PR)
 {
     DviFileEvent *ev;
     const PkFont *curr_font = 0;
@@ -1127,7 +1122,14 @@ void process_dvi_file (DviFile *dvif, bitmap_info& b, int fileResolution,
 	{
 	    DviFileFontChange& fc = *test;
 	    const PkFont *f = fc.font;
-	    curr_font = (f->loaded() ? f : fallback_font);
+	    if (f->loaded())
+		curr_font = f;
+	    else {
+		f = dvif->getFallbackFont(f);
+		if (f != 0)
+		    curr_font = f;
+	    }
+	    // curr_font unchanged if font-change was unsuccessful
 	}
 	else if (DviFileSpecial* test =
 		 dynamic_cast<DviFileSpecial*>(ev))
