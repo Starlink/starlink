@@ -331,7 +331,7 @@ PRIVATE_INCLUDES = hlpcmd.f
 EXTERNAL_INCLUDES = SAE_PAR CHR_ERR CMP_ERR DAT_PAR DAT_ERR FIO_PAR \
                     MSG_PAR NUM_CMN NUM_DEC_CVT NUM_DEF_CVT \
                     NDF_PAR NDF_ERR PAR_PAR PAR_ERR PRM_PAR \
-                    PSX_ERR
+                    PSX_ERR DTACODES DYNAMIC_MEMORY
 
 #  Fortran routines required for building the library used by the
 #  application.  Note that we keep the SPP convert routines separate;
@@ -411,7 +411,7 @@ DOCUMENTATION = sun55.tex convert.news
 
 #  Files needed to test the installation.
 
-TEST_FILES = $(PKG_NAME)_test.dst
+TEST_FILES = convert_test.dst
 
 #-------------------------------------------------------------------------------
 
@@ -447,7 +447,7 @@ $(SHAREABLE_LIBRARIES) $(ATASKS) $(COMPILED_INTERFACE_FILES) $(HELP_LIBRARIES)
 #  files whose names do not exactly match the names used in the source
 #  code.
 
-INCLUDE_LINKS = $(EXTERNAL_INCLUDES)
+INCLUDE_LINKS = $(EXTERNAL_INCLUDES) HLPCMD
 #
 #  Rules to set up links to locate each of the above include files.
 #
@@ -458,7 +458,7 @@ DAT_PAR:     $(STAR_INC)/dat_par;     $(LINK) $? $@
 DTACODES:    $(FIG_INC)/dtacodes.inc; $(LINK) $? $@
 DYNAMIC_MEMORY:  $(FIG_INC)/dynamic_memory.inc; $(LINK) $? $@
 FIO_PAR:     $(STAR_INC)/fio_par;     $(LINK) $? $@
-HLPCMD:      ./hlpcmd.f;              $(LINK) $? $@
+HLPCMD:      hlpcmd.f;                $(LINK) $? $@
 MSG_PAR:     $(STAR_INC)/msg_par;     $(LINK) $? $@
 NDF_ERR:     $(STAR_INC)/ndf_err;     $(LINK) $? $@
 NDF_PAR:     $(STAR_INC)/ndf_par;     $(LINK) $? $@
@@ -539,21 +539,18 @@ unf2ndf
 
 #
 ascii2ndf: ascii2ndf.o $(OBJECT_LIBRARIES)
-	alink ascii2ndf.o libcon.a -L/star/lib `par_link_adam` \
-	                `ndf_link_adam` `fio_link_adam`
+	alink ascii2ndf.o libcon.a -L/star/lib `ndf_link_adam` `fio_link_adam`
 
 conhelp: conhelp.o $(OBJECT_LIBRARIES)
 	alink conhelp.o libcon.a -L/star/lib `hlp_link`
 
 dst2ndf: dst2ndf.o $(OBJECT_LIBRARIES)
-	alink dst2ndf.o libcon.a -L/star/lib `par_link_adam` \
-	                `ndf_link_adam` `prm_link_adam` \
+	alink dst2ndf.o libcon.a -L/star/lib `ndf_link_adam` `prm_link_adam` \
 	                $(STARLINK)/figaro/lib/libdta.a \
 	                $(STARLINK)/figaro/lib/libich.a 
 
 gasp2ndf: gasp2ndf.o $(OBJECT_LIBRARIES)
-	alink gasp2ndf.o libcon.a -L/star/lib `par_link_adam` \
-	                `ndf_link_adam` `fio_link_adam`
+	alink gasp2ndf.o libcon.a -L/star/lib `ndf_link_adam` `fio_link_adam`
 
 iraf2ndf: iraf2ndf.o $(OBJECT_LIBRARIES)
 	if test "$(SYSTEM)" = "sun4" -o "$(SYSTEM)" = "mips" ; then \
@@ -561,42 +558,37 @@ iraf2ndf: iraf2ndf.o $(OBJECT_LIBRARIES)
 	                libimfort.a libsys.a libvops.a libos.a \
 	                -L/star/lib `ndf_link_adam` ; \
 	else \
-	   touch iraf2ndf ;\
+	   echo "echo \" iraf2ndf is not available for $$SYSTEM\" " > iraf2ndf ;\
+	   chmod 755 iraf2ndf ;\
 	fi
 
 ircam2ndf: ircam2ndf.o $(OBJECT_LIBRARIES)
-	alink ircam2ndf.o libcon.a \
-	                -L/star/lib `par_link_adam` `ndf_link_adam`
+	alink ircam2ndf.o libcon.a -L/star/lib `ndf_link_adam`
 
 ndf2ascii: ndf2ascii.o $(OBJECT_LIBRARIES)
-	alink ndf2ascii.o libcon.a -L/star/lib `par_link_adam` \
-	                `ndf_link_adam` `fio_link_adam`
+	alink ndf2ascii.o libcon.a -L/star/lib `ndf_link_adam` `fio_link_adam`
 
 ndf2dst: ndf2dst.o $(OBJECT_LIBRARIES)
-	alink ndf2dst.o libcon.a -L/star/lib `par_link_adam` \
-	                `ndf_link_adam` `prm_link_adam` 
+	alink ndf2dst.o libcon.a -L/star/lib `ndf_link_adam` `prm_link_adam` 
 
 ndf2gasp: ndf2gasp.o $(OBJECT_LIBRARIES)
-	alink ndf2gasp.o libcon.a -L/star/lib `par_link_adam` \
-	                `ndf_link_adam` `fio_link_adam`
+	alink ndf2gasp.o libcon.a -L/star/lib `ndf_link_adam` `fio_link_adam`
 
 ndf2iraf: ndf2iraf.o $(OBJECT_LIBRARIES)
 	if test "$(SYSTEM)" = "sun4" -o "$(SYSTEM)" = "mips" ; then \
 	   alink ndf2iraf.o libcon.a libconspp.a \
 	                libimfort.a libsys.a libvops.a libos.a \
-	                -L/star/lib `par_link_adam` `ndf_link_adam` \
-	                `prm_link_adam` ;\
+	                -L/star/lib `ndf_link_adam` `prm_link_adam` ;\
 	else \
-	   touch ndf2iraf ;\
+	   echo "echo \" ndf2iraf is not available for $$SYSTEM\" " > ndf2iraf ;\
+	   chmod 755 ndf2iraf ;\
 	fi
 
 ndf2unf: ndf2unf.o $(OBJECT_LIBRARIES)
-	alink ndf2unf.o libcon.a -L/star/lib `par_link_adam` \
-	                `ndf_link_adam` `fio_link_adam`
+	alink ndf2unf.o libcon.a -L/star/lib `ndf_link_adam` `fio_link_adam`
 
 unf2ndf: unf2ndf.o $(OBJECT_LIBRARIES)
-	alink unf2ndf.o libcon.a -L/star/lib `par_link_adam` \
-	                `ndf_link_adam` `fio_link_adam`
+	alink unf2ndf.o libcon.a -L/star/lib `ndf_link_adam` `fio_link_adam`
 
 #  List of the interface files to be built and rules for compiling them.
 
