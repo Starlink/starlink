@@ -1850,7 +1850,7 @@ c     :           I_X1_1D,I_X2_1D,I_Y1_1D,I_Y2_1D,SCALED,STATUS)
 *  Local constants :
 *  Local variables :
       INTEGER NDIM,DIMS(ADI__MXDIM),NVAL,NWID
-      INTEGER DPTR
+      INTEGER DPTR,IDUM
       INTEGER VPTR,QPTR
 c      LOGICAL VOK,QOK
       LOGICAL UNIF,WOK
@@ -1911,7 +1911,8 @@ C        ENDIF
           CALL BDI_MAP(IFID,'Quality','UBYTE','READ',QPTR,STATUS)
           CALL DYN_MAPB(1,NVAL,I_QPTR,STATUS)
           CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
-          CALL BDI_GET(IFID,'QualityMask','UBYTE',I_MASK,STATUS)
+          CALL BDI_GET(IFID,'QualityMask','UBYTE',0,0,I_MASK,IDUM,
+     :                  STATUS)
           CALL IMG_BAD(%VAL(I_QPTR),STATUS)
           CALL BDI_UNMAP(IFID,'Quality',QPTR,STATUS)
           CALL DYN_MAPB(1,NVAL,I_QPTR_W,STATUS)
@@ -1986,13 +1987,11 @@ c      LOGICAL VOK,QOK
 
 *  convert to range (inclusive) of indices
         CALL IMG_ZRANGE(RANGE(1),RANGE(2),%VAL(ZPTR),STATUS)
-	call msg_prnt( 'got zrange')
 
 *  map data and get axis values
         CALL BDI_MAPR(IFID,'Data','READ',DPTR,STATUS)
         CALL DYN_MAPR(1,NVAL,I_DPTR,STATUS)
         CALL DYN_MAPR(1,NVAL,I_DPTR_W,STATUS)
-	call msg_prnt( 'mapped data')
 
 *  get variance and quality if there
         CALL BDI_CHK( IFID, 'Variance', I_VOK, STATUS )
@@ -2001,22 +2000,18 @@ c      LOGICAL VOK,QOK
           CALL DYN_MAPR(1,NVAL,I_VPTR,STATUS)
           CALL DYN_MAPR(1,NVAL,I_VPTR_W,STATUS)
         ENDIF
-	call msg_prnt( 'got variance')
 
         CALL BDI_CHK( IFID, 'Quality', I_QOK, STATUS )
         IF (I_QOK) THEN
           CALL BDI_MAP(IFID,'Quality','UBYTE','READ',QPTR,STATUS)
-	call msg_prnt( 'got quality')
           CALL DYN_MAPB(1,NVAL,I_QPTR,STATUS)
           CALL DYN_MAPB(1,NVAL,I_QPTR_W,STATUS)
           CALL BDI_GET(IFID,'QualityMask','UBYTE',0,0,I_MASK,IDUM,
      :          STATUS)
-	call msg_prnt( 'got quality mask')
         ENDIF
 
         CALL IMG_BINCUBE(%VAL(DPTR),%VAL(VPTR),%VAL(QPTR),STATUS)
 
-	call msg_prnt( 'binned it')
         CALL BDI_UNMAP( IFID, 'Data', DPTR, STATUS )
         IF (I_QOK) THEN
           CALL IMG_BAD(%VAL(I_QPTR),STATUS)
@@ -2025,7 +2020,6 @@ c      LOGICAL VOK,QOK
         IF (I_VOK) THEN
           CALL BDI_UNMAP( IFID, 'Variance', VPTR, STATUS )
         ENDIF
-	call msg_prnt( 'unmapped')
 
         CALL DYN_MAPR(1,I_NX,I_XPTR,STATUS)
         CALL DYN_MAPR(1,I_NX,I_XPTR_W,STATUS)
@@ -2047,7 +2041,6 @@ c        ELSE
           I_YWID=ABS(I_YSCALE)
 c        ENDIF
 
-	call msg_prnt( 'got axes')
 *  get min and max
         CALL IMG_MINMAX(STATUS)
 
