@@ -73,6 +73,8 @@ INTERFACE HDS2TEXT
 
  PARAMETER OUT
   PROMPT 'Name of output ASCII text file'
+  TYPE 'LITERAL'
+  HELP 'Text file to be filled with data from HDS objects'
  ENDPARAMETER
 
  PARAMETER QDP
