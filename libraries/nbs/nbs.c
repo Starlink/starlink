@@ -125,6 +125,8 @@
 *  Authors:
 *     WFL: William Lupton (AAO)
 *     DJA: David J. Allan (ROSAT)
+*     BKM: Brian McIIwrath (Starlink)
+*     AA: Alasdair Allan (Starlink)
 *     {enter_new_authors_here}
 
 *  Version Date:
@@ -278,6 +280,8 @@
 *        Correct Fortran version of NBS_GET_CVALUE call.
 *     27-Apr-99 - (BKM):
 *        Omit unnecessary malloc and free declarations.
+*     28-Jun-04 - (AA):
+*        Fixed ifdef logic for building under Mac OSX
 *     {enter_changes_here}
 
 *  Bugs:

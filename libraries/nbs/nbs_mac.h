@@ -40,6 +40,7 @@
       08-Mar-94 - DJA - Added EXPORT_POINTER macro to export pointers to
                         C and Fortran portably.
       08-Feb-95 - DJA - Changed NBS__OK to SAI__OK 
+      27-Jun-04 - AA - Changed ifdef logic for building under Mac OSX
  */
 
 /* Constant definitions	*/
@@ -116,7 +117,11 @@ else {\
 
 #endif
 
-#ifdef unix
+
+/* see Apple Developer Connection Tech Notes
+  http://developer.apple.com/technotes/tn2002/tn2071.html */
+#if defined(unix) || defined(__APPLE__) || defined(__MACH__)
+
 #define _chmove(num,sptr,dptr)\
 {\
 typedef struct {  char body[1]; } byte1;\
@@ -142,7 +147,11 @@ default: memcpy(dptr,sptr,num);\
 if (!_ADAWI(1,(unsigned short *)(dptr))) (*(dptr))+=0x10000
 #endif
 
-#ifdef unix
+
+/* see Apple Developer Connection Tech Notes
+  http://developer.apple.com/technotes/tn2002/tn2071.html */
+#if defined(unix) || defined(__APPLE__) || defined(__MACH__)
+
 #define _add_interlocked(dptr) (*(dptr))++
 #endif
 

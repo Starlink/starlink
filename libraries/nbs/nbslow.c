@@ -90,6 +90,8 @@
 *        Added NBS_MAKE_KEY.
 *     27-Apr-99 - (BKM):
 *        Add include of <string.h> and omit unnecessary declarations.
+*     28-Jun-04 (AA):
+*        Changed ifdef logic for Mac OSX support.
 *     {enter_changes_here}
 */
 
@@ -199,7 +201,11 @@ extern void   NBS_MLIST_UNMAP (char *,int *);
 #include <ssdef.h>		    /* System service error codes	*/
 #endif
 
-#ifdef unix
+
+/* see Apple Developer Connection Tech Notes
+  http://developer.apple.com/technotes/tn2002/tn2071.html */
+#if defined(unix) || defined(__APPLE__) || defined(__MACH__)
+
 #include <errno.h>		    /* Error code definitions		*/
 #include <sys/types.h>		    /* System dependent types		*/
 #include <sys/ipc.h>		    /* Inter-process comms definitions	*/
@@ -230,7 +236,11 @@ extern void   NBS_MLIST_UNMAP (char *,int *);
 static mapping_id nbs_gl_mlist = NIL; /* Mapping list */
 
 
-#ifdef unix
+
+/* see Apple Developer Connection Tech Notes
+  http://developer.apple.com/technotes/tn2002/tn2071.html */
+#if defined(unix) || defined(__APPLE__) || defined(__MACH__)
+
 /*
 *+
 *  Name:
@@ -1314,7 +1324,9 @@ char *NBS_CREATE_SECTION ( RW_CHARACTER(name), int section_size,
 
 #endif
 
-#ifdef unix
+/* see Apple Developer Connection Tech Notes
+  http://developer.apple.com/technotes/tn2002/tn2071.html */
+#if defined(unix) || defined(__APPLE__) || defined(__MACH__)
 
 /* UNIX-specific section	*/
 
@@ -1501,7 +1513,11 @@ char *NBS_MAP_SECTION ( RW_CHARACTER(name), W_INTEGER(status) TRAIL(name) )
 
 #endif
 
-#ifdef unix
+
+/* see Apple Developer Connection Tech Notes
+  http://developer.apple.com/technotes/tn2002/tn2071.html */
+#if defined(unix) || defined(__APPLE__) || defined(__MACH__)
+
 
 /* UNIX-specific section	*/
 
@@ -1647,7 +1663,11 @@ int NBS_UNMAP_SECTION ( RW_POINTER(start), int section_size, W_INTEGER(status) )
 
 #endif
 
-#ifdef unix
+
+/* see Apple Developer Connection Tech Notes
+  http://developer.apple.com/technotes/tn2002/tn2071.html */
+#if defined(unix) || defined(__APPLE__) || defined(__MACH__)
+
 
 /* UNIX-specific section	*/
 
@@ -2150,7 +2170,11 @@ void F77_EXTERNAL_NAME(nbs_strexp)( RW_CHARACTER(out),
 
 
 
-#ifdef unix
+
+/* see Apple Developer Connection Tech Notes
+  http://developer.apple.com/technotes/tn2002/tn2071.html */
+#if defined(unix) || defined(__APPLE__) || defined(__MACH__)
+
 
 /*
 *  Section name:

@@ -9,7 +9,11 @@
 #define _chmove(n,sptr,dptr) ots$move3(n,sptr,dptr)
 #endif
 
-#ifdef unix
+
+/* see Apple Developer Connection Tech Notes
+  http://developer.apple.com/technotes/tn2002/tn2071.html */
+#if defined(unix) || defined(__APPLE__) || defined(__MACH__)
+
 #define _chmove(n,sptr,dptr) memcpy(dptr,sptr,n)
 #endif
 
