@@ -51,3 +51,11 @@ PUBLIC_INCLUDES = \
 	par_par.h
 
 BUILT_SOURCES = PAR_ERR par_err.h
+
+
+TESTS = par_test
+
+check_MONOLITHS = par_test
+par_test_SOURCES = par_test.f
+par_test_TASKS =
+par_test_LDADD = libpar_adam.la `err_link_adam` `subpar_link_adam` `chr_link_adam`
