@@ -482,6 +482,11 @@ f     - AST_PUTFITS: Store a FITS header card in a FitsChan
 *        - Added Warnings "BadVal", "Distortion".
 *        - Ignore FITS-WCS paper IV CTYPE distortion codes (except for
 *          "-SIP" which is interpreted correctly on reading).
+*     22-OCT-2003 (DSB):
+*        - GetEncoding: If the header contains CDi_j but does not contain
+*        any of the old IRAF keywords (RADECSYS, etc) then assume FITS-WCS
+*        encoding. This allows a FITS-WCS header to have both CDi_j *and*
+*        CROTA keywords.
 *class--
 */
 
@@ -7289,17 +7294,22 @@ static int GetEncoding( AstFitsChan *this ){
 
 /* Otherwise, if the FitsChan contains any keywords with the format 
    "CDi_j"  AND there is a RADECSYS. PROJPi or CmVALi keyword, then return 
-   "FITS-IRAF" encoding. */
-      } else if( astKeyFields( this, "CD%1d_%1d", 0, NULL, NULL ) 
+   "FITS-IRAF" encoding. If "CDi_j" is present but none of the others
+   are, return "FITS-WCS" encoding. */
+      } else if( astKeyFields( this, "CD%1d_%1d", 0, NULL, NULL ) ) {
 
-                 && ( (astKeyFields( this, "RADECSYS", 0, NULL, NULL ) &&
-                       !astKeyFields( this, "RADESYS", 0, NULL, NULL ) ) ||
+         if( (  astKeyFields( this, "RADECSYS", 0, NULL, NULL ) &&
+               !astKeyFields( this, "RADESYS", 0, NULL, NULL ) ) ||
 
-                      (astKeyFields( this, "PROJP%d", 0, NULL, NULL ) &&
-                       !astKeyFields( this, "PV%d_%d", 0, NULL, NULL ) ) ||
+             ( astKeyFields( this, "PROJP%d", 0, NULL, NULL ) &&
+              !astKeyFields( this, "PV%d_%d", 0, NULL, NULL ) ) ||
 
-                      (astKeyFields( this, "C%1dVAL%d", 0, NULL, NULL )) ) ){
-         ret = FITSIRAF_ENCODING;
+             ( astKeyFields( this, "C%1dVAL%d", 0, NULL, NULL )) ){
+            ret = FITSIRAF_ENCODING;
+
+         } else {
+            ret = FITSWCS_ENCODING;
+         }
 
 /* Otherwise, if the FitsChan contains any keywords with the format 
    RADECSYS. PROJPi or CmVALi keyword, then return "FITS-PC" encoding. */

@@ -50,7 +50,7 @@ f     The GrismMap class does not define any new routines beyond those
 *     which are applicable to all Mappings.
 
 *  Copyright:
-*     Copyright (C) 2003 Central Laboratory of the Research Councils
+*     <COPYRIGHT_STATEMENT>
 
 *  Authors:
 *     DSB: David S. Berry (Starlink)
@@ -1517,7 +1517,7 @@ static void UpdateConstants( AstGrismMap *this ){
 MAKE_CLEAR(GrismMap,GrismNR,nr,(AST__BAD))
 astMAKE_GET(GrismMap,GrismNR,double,1.0,( ( this->nr == AST__BAD ) ?
                                       1.0 : this->nr ))
-MAKE_SET(GrismMap,GrismNR,double,nr,(value) );
+MAKE_SET(GrismMap,GrismNR,double,nr,(value) )
 astMAKE_TEST(GrismMap,GrismNR,( this->nr != AST__BAD ))
 
 /*
@@ -1551,7 +1551,7 @@ astMAKE_TEST(GrismMap,GrismNR,( this->nr != AST__BAD ))
 MAKE_CLEAR(GrismMap,GrismNRP,nrp,(AST__BAD))
 astMAKE_GET(GrismMap,GrismNRP,double,0.0,( ( this->nrp == AST__BAD ) ?
                                       0.0 : this->nrp ))
-MAKE_SET(GrismMap,GrismNRP,double,nrp,(value) );
+MAKE_SET(GrismMap,GrismNRP,double,nrp,(value) )
 astMAKE_TEST(GrismMap,GrismNRP,( this->nrp != AST__BAD ))
 
 /*
@@ -1582,7 +1582,7 @@ astMAKE_TEST(GrismMap,GrismNRP,( this->nrp != AST__BAD ))
 MAKE_CLEAR(GrismMap,GrismWaveR,waver,(AST__BAD))
 astMAKE_GET(GrismMap,GrismWaveR,double,5000.0,( ( this->waver == AST__BAD ) ?
                                       5000.0 : this->waver ))
-MAKE_SET(GrismMap,GrismWaveR,double,waver,(value) );
+MAKE_SET(GrismMap,GrismWaveR,double,waver,(value) )
 astMAKE_TEST(GrismMap,GrismWaveR,( this->waver != AST__BAD ))
 
 /*
@@ -1612,7 +1612,7 @@ astMAKE_TEST(GrismMap,GrismWaveR,( this->waver != AST__BAD ))
 MAKE_CLEAR(GrismMap,GrismAlpha,alpha,(AST__BAD))
 astMAKE_GET(GrismMap,GrismAlpha,double,0.0,( ( this->alpha == AST__BAD ) ?
                                        0.0 : this->alpha ))
-MAKE_SET(GrismMap,GrismAlpha,double,alpha,(value) );
+MAKE_SET(GrismMap,GrismAlpha,double,alpha,(value) )
 astMAKE_TEST(GrismMap,GrismAlpha,( this->alpha != AST__BAD ))
 
 /*
@@ -1644,7 +1644,7 @@ astMAKE_TEST(GrismMap,GrismAlpha,( this->alpha != AST__BAD ))
 MAKE_CLEAR(GrismMap,GrismG,g,(AST__BAD))
 astMAKE_GET(GrismMap,GrismG,double,0.0,( ( this->g == AST__BAD ) ?
                                       0.0 : this->g ))
-MAKE_SET(GrismMap,GrismG,double,g,(value) );
+MAKE_SET(GrismMap,GrismG,double,g,(value) )
 astMAKE_TEST(GrismMap,GrismG,( this->g != AST__BAD ))
 
 /*
@@ -1674,7 +1674,7 @@ astMAKE_TEST(GrismMap,GrismG,( this->g != AST__BAD ))
 MAKE_CLEAR(GrismMap,GrismM,m,(INT_MAX))
 astMAKE_GET(GrismMap,GrismM,int,0,( ( this->m == INT_MAX ) ?
                                       0 : this->m ))
-MAKE_SET(GrismMap,GrismM,int,m,(value) );
+MAKE_SET(GrismMap,GrismM,int,m,(value) )
 astMAKE_TEST(GrismMap,GrismM,( this->m != INT_MAX ))
 
 /*
@@ -1706,7 +1706,7 @@ astMAKE_TEST(GrismMap,GrismM,( this->m != INT_MAX ))
 MAKE_CLEAR(GrismMap,GrismEps,eps,(AST__BAD))
 astMAKE_GET(GrismMap,GrismEps,double,0.0,( ( this->eps == AST__BAD ) ?
                                       0.0 : this->eps ))
-MAKE_SET(GrismMap,GrismEps,double,eps,(value) );
+MAKE_SET(GrismMap,GrismEps,double,eps,(value) )
 astMAKE_TEST(GrismMap,GrismEps,( this->eps != AST__BAD ))
 
 /*
@@ -1739,7 +1739,7 @@ astMAKE_TEST(GrismMap,GrismEps,( this->eps != AST__BAD ))
 MAKE_CLEAR(GrismMap,GrismTheta,theta,(AST__BAD))
 astMAKE_GET(GrismMap,GrismTheta,double,0.0,( ( this->theta == AST__BAD ) ?
                                       0.0 : this->theta ))
-MAKE_SET(GrismMap,GrismTheta,double,theta,(value) );
+MAKE_SET(GrismMap,GrismTheta,double,theta,(value) )
 astMAKE_TEST(GrismMap,GrismTheta,( this->theta != AST__BAD ))
 
 /* Copy constructor. */

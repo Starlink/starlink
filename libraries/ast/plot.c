@@ -411,7 +411,10 @@ f     - Title: The Plot title drawn using AST_GRID
 *        be the case).
 *        - Modify FindMajTicks to avoid tick marks which should be at
 *        exactly zero being placed at some very small non-zero axis value.
-being 
+*     22-OCT-2003 (DSB):
+*        - DrawTicks modified to correctly reset graphical attributes and
+*        pass on to the next axis if an axis has zero length major and minor 
+*        tick marks.
 *class--
 */
 
@@ -8450,248 +8453,240 @@ static void DrawTicks( AstPlot *this, TickInfo **grid, int drawgrid,
          if( major ) ntot = info->nmajor;
          if( minor ) ntot += ( info->nmajor - 1 )*( info->nminor - 1 );
 
-/* Break out of the loop to do the next axis if no ticks are to be drawn. */
-         if( !ntot ) break;
+/* Pass on to the next axis if no ticks are to be drawn. */
+         if( ntot ) {
 
 /* Allocate memory to hold the physical coordinates defining all the
    required tick marks. Each tick mark is defined by 2 points. */
-         ptr1[ 0 ] = (double *) astMalloc( sizeof(double)*(size_t)(2*ntot) );
-         ptr1[ 1 ] = (double *) astMalloc( sizeof(double)*(size_t)(2*ntot) );
+            ptr1[ 0 ] = (double *) astMalloc( sizeof(double)*(size_t)(2*ntot) );
+            ptr1[ 1 ] = (double *) astMalloc( sizeof(double)*(size_t)(2*ntot) );
 
 /* Allocate memory to hold a set of flags indicating whether each tick
    mark is minor or major. */
-         majflags = (int *) astMalloc( sizeof(int)*(size_t)ntot );
+            majflags = (int *) astMalloc( sizeof(int)*(size_t)ntot );
 
 /* Check the pointers can be used. */
-         if( astOK ){
+            if( astOK ){
 
 /* Store pointers to the next point on each axis. "a" always refers to the
    current axis. Also store the value on the other axis at which the tick
    marks starts, and another value on the other axis which is used to
    defined the tick mark directions. Also store the increment in axis
    value between minor tick marks. */
-            a = ptr1[ axis ];    
-            b = ptr1[ 1 - axis ];    
-            majflag = majflags;
-            lblat = labelat[ axis ];
-            lblat2 = labelat[ axis ] + 0.2*gap[ 1 - axis ];
-            delta = gap[ axis  ]/(double)info->nminor;
+               a = ptr1[ axis ];    
+               b = ptr1[ 1 - axis ];    
+               majflag = majflags;
+               lblat = labelat[ axis ];
+               lblat2 = labelat[ axis ] + 0.2*gap[ 1 - axis ];
+               delta = gap[ axis  ]/(double)info->nminor;
 
 /* Store the indicies of the first and last minor tick marks, relative to
    a major tick mark. */
-            minlo = 1;
-            minhi = info->nminor - 1;
+               minlo = 1;
+               minhi = info->nminor - 1;
 
 /* Loop round until all ticks have been done. */
-            lasttick = info->nmajor - 1;
-            for( tick = 0; tick <= lasttick; tick++ ){
+               lasttick = info->nmajor - 1;
+               for( tick = 0; tick <= lasttick; tick++ ){
 
 /* If major tick marks are required, store the physical coordinates at the 
    start of the major tick mark, and at a point a little way up the major 
    tick mark. */
-               if( major ){
-                  *(a++) = *value;
-                  *(b++) = lblat;
-                  *(a++) = *value;
-                  *(b++) = lblat2;
-                  *(majflag++) = 1;
-               }
+                  if( major ){
+                     *(a++) = *value;
+                     *(b++) = lblat;
+                     *(a++) = *value;
+                     *(b++) = lblat2;
+                     *(majflag++) = 1;
+                  }
 
 /* If minor tick marks are required, store the points defining the minor tick 
    marks on either side of this major tick mark. Do not place minor tick
    marks beyond the last major tick mark. */
-               if( minor && tick < lasttick ){
+                  if( minor && tick < lasttick ){
 
 /* Store the axis value at the first minor tick mark. */
-                  minval = *value + minlo*delta;
+                     minval = *value + minlo*delta;
 
 /* Loop round all the minor tick marks, storing the physical coordinates
    defining the tick mark. */
-                  for( i = minlo; i <= minhi; i++ ){
+                     for( i = minlo; i <= minhi; i++ ){
 
 /* Do not do the minor tick mark with index zero, since this corresponds
    to the position of the major tick mark. */
-                     if( i ){
-                        *(a++) = minval;
-                        *(b++) = lblat;
-                        *(a++) = minval;
-                        *(b++) = lblat2;
-                        *(majflag++) = 0;
-                     }
+                        if( i ){
+                           *(a++) = minval;
+                           *(b++) = lblat;
+                           *(a++) = minval;
+                           *(b++) = lblat2;
+                           *(majflag++) = 0;
+                        }
 
 /* Get the axis value at the next minor tick mark. */
-                     minval += delta;
-   
-                  }
-
-               } 
+                        minval += delta;
+                     }
+                  } 
 
 /* Point to the next major tick value. */
-               value++;
-
+                  value++;
+               }
             }
 
-         }
-
 /* Adjust the size of the arrays to exclude any unused space. */
-         nel = a - ptr1[axis];
-         ptr1[axis] = (double *) astRealloc( (void *) ptr1[axis], 
-                                             sizeof(double)*nel );
-         ptr1[1-axis] = (double *) astRealloc( (void *) ptr1[1-axis], 
-                                               sizeof(double)*nel );
+            nel = a - ptr1[axis];
+            ptr1[axis] = (double *) astRealloc( (void *) ptr1[axis], 
+                                                sizeof(double)*nel );
+            ptr1[1-axis] = (double *) astRealloc( (void *) ptr1[1-axis], 
+                                                  sizeof(double)*nel );
 
 /* Create a pointset holding these coordinates. */
-         pset1 = astPointSet( nel, 2, "" );
-         astSetPoints( pset1, ptr1 );
+            pset1 = astPointSet( nel, 2, "" );
+            astSetPoints( pset1, ptr1 );
 
 /* Transform these physical coordinates into graphics coordinates, without
    doing any clipping (this is so that tick marks are still drawn even if
    they extend into the area containing clipped physical coordinates). */
-         pset2 = astTransform( mapping, pset1, 0, NULL );
-         ptr2 = astGetPoints( pset2 );
+            pset2 = astTransform( mapping, pset1, 0, NULL );
+            ptr2 = astGetPoints( pset2 );
 
 /* Transform them again this time with clipping. */
-         pset3 = Trans( this, NULL, mapping, pset1, 0, NULL, 0, method, class );
-         ptr3 = astGetPoints( pset3 );
+            pset3 = Trans( this, NULL, mapping, pset1, 0, NULL, 0, method, class );
+            ptr3 = astGetPoints( pset3 );
 
 /* Check the pointers can be used.*/
-         if( astOK ){
+            if( astOK ){
 
 /* Store pointers to the next point on each axis. */
-            a = ptr1[ axis ];
+               a = ptr1[ axis ];
 
-            x = ptr2[ 0 ];    
-            y = ptr2[ 1 ];    
-
-            xc = ptr3[ 0 ];    
-            yc = ptr3[ 1 ];    
-
-            majflag = majflags;
+               x = ptr2[ 0 ];    
+               y = ptr2[ 1 ];    
+   
+               xc = ptr3[ 0 ];    
+               yc = ptr3[ 1 ];    
+   
+               majflag = majflags;
 
 /* Loop round all ticks (major and minor). */
-            ux = AST__BAD;
-            first = 1;
-            for( tick = 0; tick < nel/2; tick++ ){
+               ux = AST__BAD;
+               first = 1;
+               for( tick = 0; tick < nel/2; tick++ ){
 
 /* Store the physical axis value at the base of the tick mark (skip over
    the physical axis value at the point up the tick mark). */
-               a0 = *(a++);
-               a++;
+                  a0 = *(a++);
+                  a++;
 
 /* Store the x and y coordinates at the base of the tick mark. */
-               x0 = *(x++);
-               y0 = *(y++);
+                  x0 = *(x++);
+                  y0 = *(y++);
 
 /* Store the x and y coordinates at a point up the tick mark. */
-               x1 = *(x++);
-               y1 = *(y++);
+                  x1 = *(x++);
+                  y1 = *(y++);
 
 /* Store the clipped x and y coordinates at the base of the tick mark. */
-               x2 = *(xc++);
-               y2 = *(yc++);
+                  x2 = *(xc++);
+                  y2 = *(yc++);
 
 /* Skip over the clipped x and y coordinates at the point up the tick mark. */
-               xc++;
-               yc++;
+                  xc++;
+                  yc++;
 
 /* Check they are all valid, and that the start of the tick mark is within
    the plotting area. */
-               if( x0 != AST__BAD && y0 != AST__BAD &&
-                   x1 != AST__BAD && y1 != AST__BAD &&
-                   x2 != AST__BAD && y2 != AST__BAD &&
-                   x0 <= this->xhi && x0 >= this->xlo &&
-                   y0 <= this->yhi && y0 >= this->ylo ){
+                  if( x0 != AST__BAD && y0 != AST__BAD &&
+                      x1 != AST__BAD && y1 != AST__BAD &&
+                      x2 != AST__BAD && y2 != AST__BAD &&
+                      x0 <= this->xhi && x0 >= this->xlo &&
+                      y0 <= this->yhi && y0 >= this->ylo ){
 
 /* Get the increments in X and Y beyween the two points, and the squared
    distance between the two points. */
-                  dx = x1 - x0;
-                  dy = y1 - y0;
-                  dl2 = dx*dx + dy*dy;
+                     dx = x1 - x0;
+                     dy = y1 - y0;
+                     dl2 = dx*dx + dy*dy;
 
 /* Check the two points are not co-incident. */
-                  if( dl2 > dl2_limit ){
+                     if( dl2 > dl2_limit ){
 
 /* Store the distance between the two points. */
-                     dl = sqrt( dl2 );
+                        dl = sqrt( dl2 );
 
 /* If this is the first tick to be drawn on this axis, decide which
    direction to draw the tick mark so that they will appear on the right
    hand side of the axis as seen by someone moving along the axis in the
    positive direction (the numerical labels are also drawn on the same 
    side). */
-                     if( first ){
-                        first = 0;
+                        if( first ){
+                           first = 0;
 
 /* If the next tick mark is not defined, make an arbitrary decision by
    leaving the sign of the tick mark length unchanged. */
-                        if( tick + 1 < nel/2 && 
-                            *x != AST__BAD && *y != AST__BAD &&
-                            a0 != AST__BAD && *a != AST__BAD ){
+                           if( tick + 1 < nel/2 && 
+                               *x != AST__BAD && *y != AST__BAD &&
+                               a0 != AST__BAD && *a != AST__BAD ){
 
 /* Form the vector joining this tick mark to the next. */
-                            ex = *x - x0;
-                            ey = *y - y0;
+                               ex = *x - x0;
+                               ey = *y - y0;
 
 /* Ensure this vector is in the positive direction of the axis. */
-                            if( *a < a0 ) {
-                               ex = -ex;
-                               ey = -ey;
-                            }
+                               if( *a < a0 ) {
+                                  ex = -ex;
+                                  ey = -ey;
+                               }
 
 /* If a positive tick mark length would put the marks on the wrong side, 
    negate the tick mark length. */
-                            if( ex*dy > ey*dx ){
-                               mjsign = -1.0;
-                               mnsign = -1.0;
-                            }
+                               if( ex*dy > ey*dx ){
+                                  mjsign = -1.0;
+                                  mnsign = -1.0;
+                               }
+                           }
                         }
-                     }
 
 /* Store the unit vector in the direction of the tick mark. This is used
    as the default vector for the next tick mark if the direction of the 
    next tick mark is indeterminate. */
-                     ux = dx/dl;
-                     uy = dy/dl;
-
-                  }
+                        ux = dx/dl;
+                        uy = dy/dl;
+                     }
 
 /* Only draw this tickmark if its direction is known. */
-                  if( ux != AST__BAD ) {
+                     if( ux != AST__BAD ) {
 
 /* Get the position of the end of the tick mark. The length of the tick
    mark depends on whether it is a major or minor tick mark. */
-                     if( *majflag ){
-                        x1 = x0 + mjsign*mjtklen*ux;
-                        y1 = y0 + mjsign*mjtklen*uy;
-                     } else {
-                        x1 = x0 + mnsign*mntklen*ux;
-                        y1 = y0 + mnsign*mntklen*uy;
-                     }
+                        if( *majflag ){
+                           x1 = x0 + mjsign*mjtklen*ux;
+                           y1 = y0 + mjsign*mjtklen*uy;
+                        } else {
+                           x1 = x0 + mnsign*mntklen*ux;
+                           y1 = y0 + mnsign*mntklen*uy;
+                        }
 
 /* Draw the tick mark. */
-                     Bpoly( this, (float) x0, (float) y0, method, class );
-                     Apoly( this, (float) x1, (float) y1, method, class );
-                     Opoly( this, method, class );
-
+                        Bpoly( this, (float) x0, (float) y0, method, class );
+                        Apoly( this, (float) x1, (float) y1, method, class );
+                        Opoly( this, method, class );
+                     }
                   }
 
-               }
-
 /* Point to the next major/minor flag. */
-               majflag++;
-
+                  majflag++;
+               }
             }
 
-         }
-
 /* Free the memory holding the physical coordinates. */
-         ptr1[ 0 ] = (double *) astFree( ( void *) ptr1[ 0 ] );
-         ptr1[ 1 ] = (double *) astFree( ( void *) ptr1[ 1 ] );
-         majflags = (int *) astFree( (void *) majflags );
+            ptr1[ 0 ] = (double *) astFree( ( void *) ptr1[ 0 ] );
+            ptr1[ 1 ] = (double *) astFree( ( void *) ptr1[ 1 ] );
+            majflags = (int *) astFree( (void *) majflags );
 
 /* Annul the PointSets. */
-         pset1 = astAnnul( pset1 );
-         pset2 = astAnnul( pset2 );
+            pset1 = astAnnul( pset1 );
+            pset2 = astAnnul( pset2 );
+         }
 
 /* Re-establish the original graphical attributes. */
          GrfAttrs( this, gelid, 0, GRF__LINE, method, class );
