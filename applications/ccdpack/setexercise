@@ -96,7 +96,7 @@
          index=1 \
          bounds='[1,2,56,64]' \
          extent='[3,55,1,128]' \
-	 adc=2.1 \
+	 adc=1.01 \
 	 rnoise=10.1 \
          logto=both \
 	 logfile=ccdtest.log \
@@ -106,12 +106,12 @@
          reset accept
       ccdsetup \
          index=2 \
-         adc=2.2 \
+         adc=1.02 \
          rnoise=10.2 \
          accept
       ccdsetup \
          index=3 \
-         adc=2.3 \
+         adc=1.03 \
          rnoise=10.3 \
          accept
 
