@@ -80,6 +80,9 @@
 *  History:
 *     9-JUN-1998 (DSB):
 *        Original version.
+*     5-OCT-1998 (DSB):
+*        Fixed bug which caused NDF AXIS structure to be erroneously
+*        deleted if the FITS header has no WCS information of any sort.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -114,6 +117,7 @@
 
 *  Local Variables:
       CHARACTER ASTCOD( DEFNCD )*8 ! The non-native AST encoding names
+      CHARACTER CARD*80          ! FITS header card
       INTEGER DIM( NDF__MXDIM )  ! NDF dimensions
       INTEGER FC2                ! AST identifier for temporary FitsChan 
       INTEGER I                  ! Axis count
@@ -145,8 +149,13 @@
 *  Axis structures which are currently defined in the NDF. This is done
 *  because earlier routines may have created Axis structures based
 *  on the values of the CRVAL, CDELT, CRPIX keywords, but the native 
-*  AST FrameSet is the prefered origin for Axis information.       
-      IF( AST_GETC( FC, 'ENCODING', STATUS ) .EQ. 'NATIVE' ) THEN
+*  AST FrameSet is the prefered origin for Axis information. Note,
+*  we look for cards starting with "BEGAST" (instead of using the ENCODING
+*  attribute), since since a header with no WCS information will have a 
+*  default ENCOIDNG value of NATIVE. In these cases we do NOT want to
+*  delete the AXIS structures!
+      CALL AST_CLEAR( FC, 'CARD', STATUS )
+      IF( AST_FINDFITS( FC, 'BEGAST%0f', CARD, .FALSE., STATUS ) ) THEN
          CALL NDF_RESET( INDF, 'AXIS', STATUS )
       END IF
 
@@ -156,6 +165,9 @@
 *  if foreign software has modified one encoding without modifying all
 *  the others.
 *  ==================================================================
+
+*  Rewind the FitsChan.
+      CALL AST_CLEAR( FC, 'CARD', STATUS )
 
 *  If a list of encodings preferences was supplied, attempt to read an 
 *  Object using each encoding in turn until an Object (FrameSet) is read 
