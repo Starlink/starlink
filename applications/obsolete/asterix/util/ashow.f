@@ -676,7 +676,7 @@
       CALL ADI_CGET0C( TIMID, 'DateObs', STR, STATUS )
       CALL MSG_SETC( 'DATE', STR )
       CALL AIO_IWRITE( OCH, 6, 'Date at start   : ^DATE', STATUS )
-      CALL ADI_CGET0R( TIMID, 'ObsLength', STR, STATUS )
+      CALL ADI_CGET0R( TIMID, 'ObsLength', RVAL, STATUS )
       CALL MSG_SETR( 'OBSL', RVAL )
       CALL AIO_IWRITE( OCH, 6, 'Obs. length     : ^OBSL seconds',
      :           STATUS )
