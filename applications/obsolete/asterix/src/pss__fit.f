@@ -205,7 +205,7 @@ c     RECORD /MODEL_SPEC/      MODEL			! Dummy model record
 
 *      Set up fit parameters
         CALL PSS_FIT_DLOAD( ID, PARAM, LB, UB, FROZEN, PSCALE, ISTAT,
-     :                                                       STATUS )
+     :                      LNDFAC, STATUS )
 
 *      Store parameter set just in case
         CALL PSS_FIT_P2S( PARAM, PGOOD, ID, STATUS )
@@ -948,7 +948,7 @@ c     RECORD /MODEL_SPEC/      MODEL			! Dummy model record
 
 *+  PSS_FIT_DLOAD - Sets up PSS_FIT_CMN for fitting package
       SUBROUTINE PSS_FIT_DLOAD( ID, PARAM, LB, UB, FROZEN, PSCALE,
-     :                                            STATID, STATUS )
+     :                          STATID, LNDFAC, STATUS )
 *
 *    Description :
 *
@@ -960,6 +960,7 @@ c     RECORD /MODEL_SPEC/      MODEL			! Dummy model record
 *
 *     27 May 92 : Original (DJA)
 *     10 Jul 93 : Source position vectorised (DJA)
+*      4 Jun 98 : Add LNDFAC variable (RB)
 *
 *    Type definitions :
 *
@@ -1002,6 +1003,7 @@ c     RECORD /MODEL_SPEC/      MODEL			! Dummy model record
       LOGICAL             FROZEN(PSS__FITNPAR)! Parameter frozen?
       INTEGER             PSCALE              ! Statistic scale factor
       INTEGER             STATID              ! Statistic to use
+      DOUBLE PRECISION    LNDFAC
 *
 *    Local constants :
 *
@@ -1093,6 +1095,16 @@ c     RECORD /MODEL_SPEC/      MODEL			! Dummy model record
         DATASET_QPTR(FIT_DS) = 0
       END IF
       DATASET_GQPTR(FIT_DS) = DATASET_QPTR(FIT_DS)
+
+*    Initialise CASH statistic for ELD (RB)
+      IF ( BDS_QUAL_OK ) THEN
+        CALL FIT_GETDAT_LNDFACQ( DATASET_NDAT(FIT_DS),
+     :                           DATASET_DPTR(FIT_DS),
+     :                           DATASET_QPTR(FIT_DS), LNDFAC )
+      ELSE
+        CALL FIT_GETDAT_LNDFACQ( DATASET_NDAT(FIT_DS),
+     :                           DATASET_DPTR(FIT_DS), LNDFAC )
+      END IF
 
       IF ( .NOT. CP_CASH ) THEN
         DATASET_VPTR(FIT_DS) = UTIL_PLOC( DC_IMBV(DC_LO) )
