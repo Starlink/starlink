@@ -1,0 +1,5 @@
+This is another anomalous directory.  Since the modules here are all
+obsolete, they're in the repository only for reference, and they
+shouldn't be bootstrapped or configured by default.  Therefore there
+should be no bootstrap script of any sort here, and no recursion into
+this directory.
