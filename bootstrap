@@ -5,8 +5,9 @@
 buildsupportonly=false
 dryrun=false
 need_gnu_m4=false
+buildsupport_prefix=
 
-USAGE="Usage: $0 [--buildsupport | --dry-run | -n | --help]"
+USAGE="Usage: $0 [--buildsupport[=inst-dir] | --dry-run | -n | --help]"
 
 while test $# -gt 0
 do
@@ -16,17 +17,17 @@ do
         buildsupportonly=:
         ;;
 
-    --buildsupport-only)
-        echo "Use --buildsupport rather than --buildsupport-only" >&2
+    --buildsupport=*)
         buildsupportonly=:
+        buildsupport_prefix=`expr x$1 : 'x--buildsupport=\(.*\)'`
         ;;
 
     --dry-run|-n)
         dryrun=:
         ;;
 
-    --force-starconf)
-        echo "Option --force-starconf is redundant: use --buildsupport" >&2
+    --force-starconf|--buildsupport-only)
+        echo "Option $1 is redundant: use --buildsupport" >&2
         exit 1
         ;;
 
@@ -39,6 +40,9 @@ Available options:
                             nothing else.  Deletes any preexisting
                             buildsupport manifest files, to force all of
                             these tools to be rebuilt.
+    --buildsupport=<X>  As --buildsupport, except that the tools are
+                            installed in directory X.  Defaults to
+                            $STARCONF_DEFAULT_PREFIX/buildsupport.
     -n, --dry-run       Show the installation locations which the
                             script works out, but don't actually do anything.
     --help              Show this help.
@@ -123,7 +127,11 @@ fi
 
 # Makefile.dependencies uses BUILDSUPPORT_PREFIX to configure
 # the buildsupport tools
-BUILDSUPPORT_PREFIX=$STARCONF_DEFAULT_PREFIX/buildsupport
+if test -n "$buildsupport_prefix"; then
+    BUILDSUPPORT_PREFIX=$buildsupport_prefix
+else
+    BUILDSUPPORT_PREFIX=$STARCONF_DEFAULT_PREFIX/buildsupport
+fi
 
 # Let the user know what we've decided
 echo "Bootstrapping with"
@@ -189,7 +197,13 @@ sed -e 's/@JAVA@/NOJAVA/' -e 's/@[a-zA-Z0-9_]*@/#DUMMY/' Makefile.in >$tempmakef
 (
 
     MISSING_SUPPRESS_RUN=true
-    STAR_MANIFEST_DIR=$STARCONF_DEFAULT_PREFIX/manifests
+    if test -n "$buildsupport_prefix"; then
+        # this was not defaulted, so install the manifests next to the
+        # installation binary location
+        STAR_MANIFEST_DIR=$BUILDSUPPORT_PREFIX/manifests
+    else
+        STAR_MANIFEST_DIR=$STARCONF_DEFAULT_PREFIX/manifests
+    fi
     # Export these to subprocesses.
     # These are referred to in configure scripts
     export STARCONF_DEFAULT_STARLINK STARCONF_DEFAULT_PREFIX STAR_MANIFEST_DIR
