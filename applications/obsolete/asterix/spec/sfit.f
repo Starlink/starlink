@@ -246,7 +246,6 @@
       INTEGER 			NPAR			! No of parameters
       INTEGER 			NIT			! Iteration number
       INTEGER FITERR			! Fitting error encountered
-      INTEGER 			N			! Dataset index
       INTEGER 			J			! Parameter index
       INTEGER NRET			! Itern no for return from FIT_MIN
       INTEGER OCI			! Logical unit number for o/p file
