@@ -15,7 +15,11 @@
 buildsupport=@prefix@
 buildsupportbin=@bindir@
 buildsupportdata=@pkgdatadir@
-buildsupportjar=@pkgdatadir@/starconf.jar
+if test "@JAVA@" = NOJAVA; then
+  buildsupportjar=NOJAVA
+else
+  buildsupportjar=@pkgdatadir@/starconf.jar
+fi
 ln_s="@LN_S@"
 versionint="@PACKAGE_VERSIONINT@"
 version="@PACKAGE_VERSION@"
