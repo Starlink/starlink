@@ -105,14 +105,14 @@
 #  List of files in current directory scrollbox.
       CCDCcdWidget Filebox filebox \
          Ccd_scrollbox $Frame1.filebox \
-                      -label "Files in directory:" -singleselect 0 \
+                      -label "Images in directory:" -singleselect 0 \
                       -exportselect 0
 
 #  Selected files scrollbox.
       CCDTkWidget Frame2 frame2 frame $topwin.frame2
       CCDCcdWidget Selectbox selectbox \
          Ccd_scrollbox $Frame2.selectbox \
-                        -label "Files selected:" -singleselect 0 \
+                        -label "Images selected:" -singleselect 0 \
                         -exportselect 0
 
 #  Options for adding and removing entries from the list of selected names.

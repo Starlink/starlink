@@ -150,7 +150,7 @@
       CCDCcdWidget Directbox directbox \
          Ccd_scrollbox $Frame1.s1 -label {Directories:}
       CCDCcdWidget Filesbox filesbox \
-         Ccd_scrollbox $Frame1.s2 -label "Files in directory:" -singleselect 0
+         Ccd_scrollbox $Frame1.s2 -label "Images in directory:" -singleselect 0
       CCDCcdWidget Control control \
          Ccd_choice $Frame1.c -standard 0 -stack vertical
       CCDCcdWidget Choice choice Ccd_choice $Top.c1 -standard 0
@@ -173,7 +173,7 @@
             foreach f $Fnames {
                CCDCcdWidget Targ targ \
                   Ccd_scrollbox $Frame2.t$f -singleselect 0 \
-                                             -label "Files selected:"
+                                             -label "Images selected:"
                if { $f != "NONE" } {
                   set label "TARGET $f"
                } else {
@@ -198,7 +198,7 @@
                $Switch addbutton $label $Targ
                bind $targ <Unmap> \
                   "CCDUpdateLabelCount $Switch \"$label\" $Targ"
-               $Targ setlabel 0 {Files Selected:}
+               $Targ setlabel 0 {Images Selected:}
                set cols 1
                if { ! $CCDsame(darks) } {
                   incr cols
@@ -223,7 +223,7 @@
             foreach f $Fnames {
                CCDCcdWidget Fl fl \
                   Ccd_scrollbox $Frame2.f$f -singleselect 0 \
-                                             -label "Files Selected:"
+                                             -label "Images Selected:"
                if { $f != "NONE" } {
                   set label "FLAT $f"
 
@@ -249,7 +249,7 @@
                $Switch addbutton $label $Fl
                bind $fl <Unmap> \
                   "CCDUpdateLabelCount $Switch \"$label\" $Fl"
-               $Fl setlabel 0 {Files Selected:}
+               $Fl setlabel 0 {Images Selected:}
                set cols 1
                if { ! $CCDsame(darks) } {
                   incr cols
@@ -269,7 +269,7 @@
 #  Biases.
       if { $CCDhaveframe(biases) } {
          CCDCcdWidget Bias bias \
-            Ccd_scrollbox $Frame2.b -singleselect 0 -label "Files Selected:"
+            Ccd_scrollbox $Frame2.b -singleselect 0 -label "Images Selected:"
          $Switch addbutton "BIAS" $Bias
          bind $bias <Unmap> "CCDUpdateLabelCount $Switch {BIAS} $Bias"
       }
@@ -281,11 +281,11 @@
          if { $CCDsame(darks) } {
             CCDCcdWidget Dark dark \
                Ccd_scrollbox $Frame2.d -singleselect 0 \
-                         -label "Files Selected:"
+                         -label "Images Selected:"
          } else {
             CCDCcdWidget Dark dark \
                Ccd_table $Frame2.d -singleselect 0 -padvalue 1
-            $Dark setlabel 0 {Files Selected:}
+            $Dark setlabel 0 {Images Selected:}
 
 #  Configure number of columns (do this now as this keeps the frames
 #  the same size as an earlier instances).
@@ -303,11 +303,11 @@
          if { $CCDsame(flashes) } {
             CCDCcdWidget Flash flash \
                Ccd_scrollbox $Frame2.l -singleselect 0 \
-                          -label "Files Selected:"
+                          -label "Images Selected:"
          } else {
             CCDCcdWidget Flash flash \
                Ccd_table $Frame2.l -singleselect 0 -padvalue 1
-            $Flash setlabel 0 {Files Selected:}
+            $Flash setlabel 0 {Images Selected:}
             $Flash configure -columns 2
             $Flash setlabel 1 {Flash Time:}
          }
