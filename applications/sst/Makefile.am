@@ -29,15 +29,9 @@ SUBCSRC = find_file.c
 PRIVATE_INCLUDES = SST_PAR SST_SCB
 
 # We (oddly) want these data files to go into the same directory as the 
-# binaries, but automake doesn't allow `bin_DATA'.  However automake does
-# supply an escape hatch, and allows `anything_DATA' as long as a
-# another variable `anythingdir' is defined (presumably on the grounds that
-# defining two matching variables lets it guess you haven't just made a
-# mistake).  So define sstsupportdir to be $(bindir) -- the standard install
-# location of the binaries -- and define sstsupport_DATA to tell automake
-# the list of files to install there.
-sstsupportdir = $(bindir)
-sstsupport_DATA = sun.tex sst.tex layout.tex forstats.dat html.sty
+# binaries.  Since we have STAR_DEFAULTS(per-package-dirs) in configure.ac, 
+# however, we are allowed to use bin_DATA (don't ask).
+bin_DATA = sun.tex sst.tex layout.tex forstats.dat html.sty
 
 # The `start' script needs to have installation locations edited into it
 edit = sed \
@@ -50,4 +44,4 @@ start: start.in
 	    $(srcdir)/start.in >start.tmp
 	mv start.tmp start
 
-EXTRA_DIST = start.in $(sstsupport_DATA)
+EXTRA_DIST = start.in $(bin_DATA)
