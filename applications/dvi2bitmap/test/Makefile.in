@@ -22,16 +22,13 @@ regression:
 	cd ..; $(MAKE) libdvi2bitmap.a
 	PERLBIN=$(PERLBIN) ./runtests
 
-#pathtest: ../dvi2bitmap hello.dvi
 pathtest: hello.dvi
 	sh ./test-font-gen.sh ../dvi2bitmap hello.dvi
 	touch pathtest
 
-#magtest: ../dvi2bitmap magtest.dvi
 magtest: magtest.dvi
 	sh ./test-font-gen.sh ../dvi2bitmap magtest.dvi magtest-output
 
-#modetest: ../dvi2bitmap modetest.dvi
 modetest: modetest.dvi
 	sh ./test-font-gen.sh ../dvi2bitmap modetest.dvi modetest-output
 
@@ -50,40 +47,17 @@ modetest.dvi: modetest.tex
 # otherwise linking all the tests is too complicated to deal with happily.
 # Add a suffix rule for stupid makes (hello, Tru64...)
 .SUFFIXES: .o .cc .run
-.cc.o:
-	$(CXX) $(CXXFLAGS) -c $<
-
-#%.run: %.o ../libdvi2bitmap.a
-.o.run:
-	cd ..; $(MAKE) libdvi2bitmap.a
-	$(CXX) $(CXXFLAGS) -o $@ $< -L.. -ldvi2bitmap
-
-# For some reason, linking t2.o against the library in the parent
-# directory doesn't work, because they seem determined
-# to link in std::vector, referenced from ../libdvi2bitmap.a, for
-# some reason I am unable to fathom.  So link it against the full list
-# of object files.  libdvi2bitmap.a is therefore a phony target, here
-# to force all the parent object files to be built.
-#t2.run: t2.o
-#	cd ..; $(MAKE)
-#	$(CXX) $(CXXFLAGS) -o $@ t2.o `ls ../*.o|sed '/dvi2bitmap/d'` $(LIBS)
-#	$(CXX) $(CXXFLAGS) -o $@ t2.cc -L.. -ldvi2bitmap
-
-#dvi2bitmap.diff: ../dvi2bitmap dvi2bitmap.correct
-#	../dvi2bitmap -X >dvi2bitmap.test
-#	diff dvi2bitmap.correct dvi2bitmap.test >dvi2bitmap.diff; \
-#		if test $$? -gt 0; then echo Fail; else echo OK; fi
+# .cc.o:
+# 	$(CXX) $(CXXFLAGS) -c $<
 #
-## The order of the files in the for statement below must match the
-## order of the calls in dvi2bitmap::doRegression.
-##
-## Naw -- use the t? tests instead.
-#dvi2bitmap.correct: ../dvi2bitmap
-#	rm -f $@
-#	for f in ../PkFont.cc ../Util.cc; do \
-#		FN=`echo $$f|sed -e 's+^.*/\([^.]*\).*$$+\1+' `; \
-#		sed -n "/REGRESSIONTEST/s+^.*REGRESSIONTEST:+$$FN:+p" $$f >> $@; \
-#	done
+# .o.run:
+# 	cd ..; $(MAKE) libdvi2bitmap.a
+# 	$(CXX) $(CXXFLAGS) -o $@ $< -L.. -ldvi2bitmap
+#  ARGH.  Tru64's make seems unable to cope even with implied dependencies!
+.cc.run:
+	cd ..; $(MAKE) libdvi2bitmap.a
+	$(CXX) $(CXXFLAGS) -o $@ $< -L.. -ldvi2bitmap $(LIBS) -lm
+
 
 clean:
 	rm -f *~ *.o *.run
