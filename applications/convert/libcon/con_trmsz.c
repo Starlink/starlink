@@ -70,3 +70,4 @@ F77_INTEGER_FUNCTION(con_trmsz)(INTEGER(width),INTEGER(height))
 #else
 	return 0;
 #endif
+}
