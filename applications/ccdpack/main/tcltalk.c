@@ -246,7 +246,7 @@
       DECLARE_CHARACTER( fname, MSG__SZMSG );
 
 /* Check inherited status. */
-      if ( *status != SAI__OK ) return;
+      if ( *status != SAI__OK ) return NULL;
 
 /* Write the text of the command to execute to the downward pipe, so that
    the child process can execute it.  We ignore a SIGPIPE but check for
@@ -732,7 +732,7 @@
       char *result = "";
 
 /* Check the inherited status. */
-      if ( *status != SAI__OK ) return;
+      if ( *status != SAI__OK ) return NULL;
 
 /* Evaluate the expression in the Tcl interpreter. */
       result = ccdTclEval( cinterp, script, status );
