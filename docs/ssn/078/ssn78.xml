@@ -1089,7 +1089,7 @@ EXTRA_DIST = start.in $(sstsupport_DATA)
             library (automake constrains what can appear in the
             <code>LDADD</code> variable, and the
             <code>`fio_link`</code> is permissable only in Starlink
-            automake).</p>
+            automake -- see <ref id="gnutools"/> for details).</p>
 
           <p>The variables <code>SUBSRC</code>, <code>SUBCSRC</code>
             and <code>PRIVATE_INCLUDES</code> are purely user
@@ -4887,14 +4887,26 @@ STAR_MANIFEST_INSTALL_COMMAND = cd unix; \
                 objects to add to a program, or extra libraries,
                 specified through <code>-l</code> and <code>-L</code>
                 flags.  In Starlink <code>automake</code>, you can
-                also specify extra libraries using the standard
+                additionally specify extra libraries using the standard
                 Starlink <code>*_link</code> and
                 <code>*_link_adam</code> commands.  You can add to the
                 <code>LDADD</code> variable tokens matching
-                <code>`*_link`</code> or <code>`*_link_adam`</code>,
-                with possible script options, or either of these preceded by
-                exactly <code>$(srcdir)/</code>, which you would need to
-                do only in the case of test code.</p>
+                <code>`[a-z_]*_link`</code> or
+                <code>`[a-z_]*_link_adam`</code> (that is, a sequence
+                of lowercase letters and underscore), or either of
+                these preceded by <em>exactly</em>
+                <code>$(srcdir)/</code>, which you would need to do
+                only in the case of test code or the case below.</p>
+
+              <p>You cannot include any options or arguments.  If you
+                want, for example, <code>ast_link -pgplot</code>, then
+                you should create a local script named, for example,
+                <code>my_ast_pgplot_link</code> (that is, matching the
+                pattern above), which simply invokes the correct link
+                script.  In this case, you will have to include the
+                <code>$(srcdir)/</code> element in the line, so that
+                the script will be picked up from the current
+                directory.</p>
             </li>
 
             <li>
