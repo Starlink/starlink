@@ -256,9 +256,14 @@
 #----------------------------------------------------------------------------
 #  Set the help for this window.
 #----------------------------------------------------------------------------
-      $Top sethelp ccdpack CCDGetFileNameWindow
-      $Menu sethelpitem {On Window} ccdpack CCDGetFileNameWindow
-      $Menu sethelp all ccdpack CCDGetFileNameMenu
+      if { $image } {
+         set helpref CCDGetImageName
+      } else {
+         set helpref CCDGetFileName
+      }
+      $Top sethelp ccdpack ${helpref}Window
+      $Menu sethelpitem {On Window} ccdpack ${helpref}Window
+      $Menu sethelp all ccdpack ${helpref}Menu
 
 #----------------------------------------------------------------------------
 #   Pack all widgets.
