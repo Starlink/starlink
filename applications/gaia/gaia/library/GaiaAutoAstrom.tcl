@@ -151,7 +151,7 @@ itcl::class gaia::GaiaAutoAstromSimple {
             -rtdimage $itk_option(-rtdimage)
       }
       add_short_help $itk_component(racentre) \
-         {Centre in Right Ascension (hh:mm:ss.ss/dd.dd)}
+         {Image centre in Right Ascension (hh:mm:ss.ss/dd.dd)}
       set values_(racentre) "00:00:00"
 
       itk_component add deccentre {
@@ -162,7 +162,7 @@ itcl::class gaia::GaiaAutoAstromSimple {
             -rtdimage $itk_option(-rtdimage)
       }
       add_short_help $itk_component(deccentre) \
-         {Centre in Declination (dd:mm:ss.ss/dd.dd)}
+         {Image centre in Declination (dd:mm:ss.ss/dd.dd)}
       set values_(deccentre) "00:00:00"
 
       itk_component add imagescale {
@@ -186,6 +186,15 @@ itcl::class gaia::GaiaAutoAstromSimple {
       add_short_help $itk_component(angle) \
          {Position angle, Dec axis anti-clock degrees}
       set values_(angle) "0.0"
+
+      #  Button to guess initial values based on FITS headers.
+      itk_component add guess {
+         button $w_.guess \
+            -text "Guess" \
+            -command [code $this fits_based_guess_]
+      }
+      add_short_help $itk_component(guess) \
+         {Make a guess based on FITS headers}
 
       itk_component add invert {
          StarLabelCheck $w_.invert \
@@ -277,6 +286,7 @@ itcl::class gaia::GaiaAutoAstromSimple {
       pack $itk_component(deccentre) -side top -fill x -pady 5 -padx 5
       pack $itk_component(imagescale) -side top -fill x -pady 5 -padx 5
       pack $itk_component(angle) -side top -fill x -pady 5 -padx 5
+      pack $itk_component(guess) -side top -pady 5 -padx 5
       pack $itk_component(invert) -side top -fill x -pady 5 -padx 5
       pack $itk_component(linear) -side top -fill x -pady 5 -padx 5
       pack $itk_component(refcat) -side top -fill x -pady 5 -padx 5
@@ -290,6 +300,9 @@ itcl::class gaia::GaiaAutoAstromSimple {
 
       #  Create an object for dealing with image names.
       set namer_ [GaiaImageName \#auto]
+
+      #  Do a guess.
+      fits_based_guess_
    }
 
    #  Destructor:
@@ -350,7 +363,7 @@ itcl::class gaia::GaiaAutoAstromSimple {
       set image [$itk_option(-rtdimage) fullname]
       if { $image != "" } {
          $namer_ configure -imagename $image
-         set image [$namer_ ndfname]
+         set image [$namer_ ndfname 0]
          set diskimage [$namer_ diskfile]
 
          busy {
@@ -413,11 +426,10 @@ itcl::class gaia::GaiaAutoAstromSimple {
 
             #  Run program, monitoring output...
 
-            set cmd "$autoastrom_ runwith \
-               $wcssource \
+            set args "$wcssource \
                --match=match \
                --skycatconfig=$env(CATLIB_CONFIG) \
-               --catalogue=temp.TAB \
+               --catalogue=$values_(refcat) \
                --noinsert \
                --keepfits=$solution_ \
                --temp=autoastrom_tmp \
@@ -426,14 +438,13 @@ itcl::class gaia::GaiaAutoAstromSimple {
                $fitopts \
                $verbosity \
                $keeptemps \
-               --bestfitlog=$bestfitlog_ \
-               $diskimage"
+               --bestfitlog=$bestfitlog_"
 
-            # --catalogue=$values_(refcat) \
+            #--catalogue=temp.TAB \
             #  Use local SExtractor catalogue...
             #--xxxccdcat=ngc1275.autoext
-            puts "Running: $cmd"
-            catch {eval $cmd} msg
+            puts "Running: $args $image"
+            catch {eval $autoastrom_ runwith $args \$image} msg
             if { "$msg" != "" && "$msg" != "0" } { 
                warning_dialog "$msg"
             }
@@ -599,6 +610,85 @@ itcl::class gaia::GaiaAutoAstromSimple {
       $astrocatname_ search
    }
 
+   #  Guess the initial WCS parameters from the FITS headers of the 
+   #  image. This is purely guess work based on a look around any
+   #  images that I've come across.
+   protected method fits_based_guess_ {} {
+
+      if { $itk_option(-rtdimage) != {} } {
+         
+         #  Reset to defaults first.
+         set values_(racentre) "00:00:00"
+         set values_(deccentre) "00:00:00"
+         set values_(imagescale) "1.0"
+         set values_(angle) "0.0"
+
+         puts "reset to defaults"
+
+         #  RA.
+         set ra_keys_ "RA OBSRA OBJCTRA RABASE RA_TARG CRVAL1"
+         foreach key $ra_keys_ {
+            set value [$itk_option(-rtdimage) fits get $key]
+            if { $value != {} } {
+               regsub -all { } [string trim $value] {:} value
+               set values_(racentre) $value
+               puts "RA = $values_(racentre)"
+               break
+            }
+         }
+
+         #  Dec.
+         set dec_keys_ "DEC OBSDEC OBJCTDEC DECBASE DEC_TARG CRVAL2"
+         foreach key $dec_keys_ {
+            set value [$itk_option(-rtdimage) fits get $key]
+            if { $value != {} } {
+               regsub -all { } [string trim $value] {:} value
+               set values_(deccentre) $value
+               puts "Dec = $values_(deccentre)"
+               break
+            }
+         }
+
+         #  Image scale. Arc sec
+         set imagescale_done 0
+         set arcsec_scale_keys_ \
+            "SECPIX SECPIX1 SECPIX2 PIXSCAL1 PIXSCAL2 SECPPIX"
+         foreach key $arcsec_scale_keys_ {
+            set value [$itk_option(-rtdimage) fits get $key]
+            if { $value != {} } {
+               set values_(imagescale) [expr abs($value)]
+               puts "Imagescale = $values_(imagescale)"
+               set imagescale_done 1
+               break
+            }
+         }
+
+         #  Image scale. Degrees.
+         if { ! $imagescale_done } {
+            set degree_scale_keys_ "CDELT1 CDELT2"
+            foreach key $degree_scale_keys_ {
+               set value [$itk_option(-rtdimage) fits get $key]
+               if { $value != {} } {
+                  set values_(imagescale) [expr abs($value*3600.0)]
+                  puts "Imagescale = $values_(imagescale)"
+                  break
+               }
+            }
+         }
+
+         #  Rotation.
+         set rotation_keys_ "CROTA2 CROTA1 DECPANGL"
+         foreach key $rotation_keys_ {
+            set value [$itk_option(-rtdimage) fits get $key]
+            if { $value != {} } {
+               set values_(angle) $value
+               puts "Angle = $values_(angle)"
+               break
+            }
+         }
+      }
+   }
+
    #  Configuration options: (public variables)
    #  ----------------------
 
@@ -636,9 +726,25 @@ itcl::class gaia::GaiaAutoAstromSimple {
    #  catalogue.
    protected variable astrocatname_ {}
 
+
+   #  Common variables: (shared by all instances)
+   #  -----------------
+
+   #  Name of file to store the solution.
+   common solution_ GaiaAutoAstSolution.fits
+
+   #  Name of file to store the catalogue of positions used in fit.
+   common solution_catalogue_ GaiaAutoAstSolutionPos.ASC
+
+   #  Name of file to store the best fit parameters.
+   common bestfitlog_ GaiaAutoAstromFit.Log
+
+   # C++ astrocat object used here to access catalog entries
+   common astrocat_ [astrocat ::gaia::.cat]
+
    #  Names of any parameters that we want to report from AUTOASTROM best
    #  fit log file and their descriptions as pairs (use foreach name desc).
-   protected variable pnames_ { 
+   common pnames_ { 
       "nstars"    "no. ref stars"
       "rrms"      "radial rms, arcsec"
       "xrms"      "x-axis rms, arcsec"
@@ -656,21 +762,6 @@ itcl::class gaia::GaiaAutoAstromSimple {
       "deltapc"   "change in plate centre"
       "deltapcsd" "standard deviation of change in plate centre"
    }
-
-   #  Common variables: (shared by all instances)
-   #  -----------------
-
-   #  Name of file to store the solution.
-   common solution_ GaiaAutoAstSolution.fits
-
-   #  Name of file to store the catalogue of positions used in fit.
-   common solution_catalogue_ GaiaAutoAstSolutionPos.ASC
-
-   #  Name of file to store the best fit parameters.
-   common bestfitlog_ GaiaAutoAstromFit.Log
-
-   # C++ astrocat object used here to access catalog entries
-   common astrocat_ [astrocat ::gaia::.cat]
 
 #  End of class definition.
 }
