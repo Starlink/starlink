@@ -36,6 +36,10 @@
       INCLUDE 'SAE_PAR'
       INCLUDE 'PSF_PAR'
 *
+*  Global Variables:
+*
+      INCLUDE 'PSF_CMN'
+*
 *    Import :
 *
       INTEGER          		PSID                   	! Psf slot
@@ -52,8 +56,7 @@
       REAL             		XLO, XHI, YLO, YHI     	! Axis extrema
 
       INTEGER			BPTR			! Bin pointers
-      INTEGER          		I                      	! Loop over radial model bins
-      INTEGER			NR, NX, NY		! Number of model bins
+      INTEGER			NA, NR, NX, NY		! Number of model bins
       INTEGER			NTOT			! Total # model bins
       INTEGER			RTNPTR			! Init routine ptr
       INTEGER			SMTYPE			! Spatial model type
@@ -139,8 +142,8 @@
           CALL ADI_CPUT0R( PSID, 'ModelDy', DY, STATUS )
 
 *      Numbers of bins in X and Y axes
-          NX = INT( X_DIM * X_DR/ SM_R_DX(SLOT) )
-          NY = INT( Y_DIM * Y_DR/ SM_R_DY(SLOT) )
+          NX = INT( X_DIM * X_DR/ DX )
+          NY = INT( Y_DIM * Y_DR/ DY )
           CALL ADI_CPUT0I( PSID, 'ModelNx', NX, STATUS )
           CALL ADI_CPUT0I( PSID, 'ModelNy', NY, STATUS )
 
