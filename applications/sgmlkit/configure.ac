@@ -17,13 +17,17 @@ AC_PROG_LN_S
 
 # The documentation requires Earl Hood's perlSGML library.  See
 # http://search.cpan.org/~ehood/perlSGML.1997Sep18/
+# This is imported into this repository in directory
+# applications/sgmlkit/thirdparty/perlSGML (ie, subdirectory of here).
+# If there should ever be a reason to change this, then you can override it
+# with the --with-perlsgml option
 # Unpack this, and give its location with the --with-perlsgml option
 AC_ARG_WITH(perlsgml,
             AS_HELP_STRING([--with-perlsgml],
                            [location of the perlSGML distribution (path to dir w
 hich contains lib/SGML/DTD.pm)]),
             PERLSGMLDIR=$withval/lib,
-            PERLSGMLDIR=./lib)
+            PERLSGMLDIR=thirdparty/perlSGML/lib)
 AC_CHECK_FILE([$PERLSGMLDIR/SGML/DTD.pm],,[PERLSGMLDIR=UNKNOWN])
 if test "$PERLSGMLDIR" = UNKNOWN; then
     AC_MSG_NOTICE([Can't find perlSGML, which is required for building SSN/70.  Get it from http://search.cpan.org/~ehood/perlSGML.1997Sep18/ and point to it using --with-perlsgml])
