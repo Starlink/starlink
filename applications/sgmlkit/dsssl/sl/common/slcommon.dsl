@@ -554,13 +554,27 @@ char-property - see notes at
 
 <func>
 <routinename>root-file-name
+<purpose>Return a root filename.
 <description>
-Returns the filename to be used for the root HTML file, based on
+Returns the filename to be used for the root HTML file, and the `root part'
+of any generated filenames, based on
 document type and DOCNUMBER if present (which need not be the case for
 all document types). Another way to set this might be through a
 processing-instruction.
 <p>This is also used by the LaTeX stylesheet, when generating the names
 of various auxiliary files.
+<p>Note that the parameter <funcname/%override-root-file-name%/ does <em/not/
+override within this function, since this function is not merely used for
+the name of the single root file.  See <funcname/html-file/.
+<p>An arguably better way to obtain a root file name is to 
+root around in the grove and find the name of the source file,
+then use that information to generate the output file name.
+That should be possible, and it 
+almost certainly involves the SosSequence property class (cf,
+HyTime A.6.1, for example, or
+<url>http://www.hytime.org/materials/sgmlpropset/classes/sosseq/index.htm</url>),
+which is in the `formal system identifier abstract' (fsiabs) module of the
+SGML property set.  This isn't, however, implemented in Jade.
 <returnvalue type=string>Complete filename for the `entry-point' HTML file.
 <argumentlist>
 <parameter optional default='(current-node)'>
@@ -571,29 +585,27 @@ of various auxiliary files.
 	docdate missing
 </history>
 <codebody>
+;; (define (root-file-name #!optional (nd (current-node)))
+;;   (let* ((dn (getdocinfo 'docnumber nd))
+;; 	 (docelemtype (case-fold-down
+;; 		       (if dn
+;; 			   (if (attribute-string (normalize "documenttype") dn)
+;; 			       (attribute-string (normalize "documenttype") dn)
+;; 			       (error "DOCNUMBER has no DOCUMENTTYPE"))
+;; 			   (gi (document-element)))))
+;; 	 (docref (cond (dn (if (attribute-string "UNASSIGNED" dn)
+;; 			       "unassigned" ; better alternative?
+;; 			       (trim-data dn)))
+;; 		       ((getdocinfo 'docdate nd)
+;; 			(trim-data (getdocinfo 'docdate nd)))
+;; 		       (else  ; if no date, at least it should have a history
+;; 			(let ((rel (document-release-info)))
+;; 			  (car rel)))))
+;; 	 )
+;;     (string-append docelemtype ;(gi (document-element))
+;; 		   (if docref docref ""))))
 (define (root-file-name #!optional (nd (current-node)))
-  (let* ((dn (getdocinfo 'docnumber nd))
-	 (docelemtype (if dn
-			  (if (attribute-string (normalize "documenttype") dn)
-			      (attribute-string (normalize "documenttype") dn)
-			      (error "DOCNUMBER has no DOCUMENTTYPE"))
-			  (gi (document-element))))
-	 (docref (cond (dn (if (attribute-string "UNASSIGNED" dn)
-			       "unassigned" ; better alternative?
-			       (trim-data dn)))
-		       ((getdocinfo 'docdate nd)
-			(trim-data (getdocinfo 'docdate nd)))
-		       (else  ; if no date, at least it should have a history
-			(let ((rel (document-release-info)))
-			  (car rel)))))
-	 ;;(docref (if dn
-		;;     (if (attribute-string "UNASSIGNED" dn)
-		;;	 "unassigned"	; is there a better alternative?
-		;;	 (trim-data dn))
-		;;     (trim-data (getdocinfo 'docdate nd))))
-	 )
-    (string-append docelemtype ;(gi (document-element))
-		   (if docref (string-append "-" docref) ""))))
+  "N")
 
 <func>
 <routinename>document-release-info
@@ -1000,6 +1012,179 @@ dd-MMM-yyyy.
 <func>
 <routinename>tokenise-string
 <description>Tokenises a string, breaking at arbitrary character classes
+<returnvalue type=list>List of strings, each containing a single token
+<parameter>str<type>String<description>String to be tokenised
+<parameter keyword default='break at spaces'>boundary-char?
+  <type>function
+  <description>Character-class function, which takes a single
+  character as argument, and returns true if it should be categorised
+  as whitespace, and false otherwise.  If this is insufficiently
+  flexible, then the <funcname/isbdy?/ function can be used.
+<parameter keyword default='break at spaces'>isbdy?
+  <type>function
+  <description>General character-class function, which takes as
+  argument a list of characters, and returns <code/#f/
+  if the string should <em/not/ be broken here (ie, if the string does
+  not begin with separator characters).  If the string should
+  be broken here, it returns the list of characters which consists of
+  the remainder of the string with the leading separators removed.  For
+  example, the function <code>(lambda (l) (if (and (char=? (car l)
+  #\/) (char=? (cadr l) #\/)) (cddr l) #f))</code> breaks strings at
+  double-slashes, but not single ones.  By default, the function
+  removes strings of characters for which <funcname/boundary-char?/ is true.
+<parameter keyword default='no max'>max
+  <type>integer
+  <description>Integer which specifies the maximum number of splits
+  which should be made.  Thus, for example, if max is passed as 1, the
+  string will be split into a maximum of two pieces; if this is
+  negative (the default) the string will be completely tokenised.
+  Note that removal of initial whitespace counts as a `split'.
+<codebody>
+(define (tokenise-string str
+			 #!key
+			 (boundary-char? isspace?)
+			 (isbdy? (lambda (l)
+				   (if (boundary-char? (car l))
+				       (let loop ((rest l))
+					 (if (null? rest)
+					     '()
+					     (if (boundary-char? (car rest))
+						 (loop (cdr rest))
+						 rest)))
+				       #f)))
+;			 (isbdy? (lambda (l)
+;				   (if (boundary-char? (car l))
+;				       (cdr l)
+;				       #f)))
+			 (max -1))
+  (let loop ((charlist (string->list str))
+	     (wordlist '())
+	     (currword '())
+	     (splits max))
+    (if (or (= splits 0)		;reached max split
+	    (null? charlist))		;nothing more to do
+	(let ((cw (append currword charlist)))
+	  (if (null? cw)
+	      wordlist
+	      (append wordlist (list (list->string cw)))))
+	(let ((nextword (isbdy? charlist)))
+	  (if nextword
+	      (loop nextword		;word just ended - add to list
+		    (append wordlist (list (list->string currword)))
+		    '()
+		    (- splits 1))
+	      (loop (cdr charlist)	;within word
+		    wordlist
+		    (append currword (list (car charlist)))
+		    splits))))))
+
+<func>
+<routinename>parse-fpi
+<purpose>Parse a formal public identifier
+<description>Breaks an FPI into its component parts. 
+  <p>Returns an object which can be passed to the
+  <funcname/query-parse-fpi/ function.
+  <p>It should be fairly robust, but it won't detect nonsense, so that
+  it won't, for example, object to <code>hello//MyCorp//...</code> as
+  an FPI.  Note that the separator
+  between the text class and description is a <em/single/ space.
+  <p>See productions 79--90 in ISO 8879.
+<returnvalue type='opaque object'>Object to be passed to
+  <funcname/query-parse-fpi/.
+<parameter>str<type>string<description>FPI to be parsed
+<codebody>
+(define (parse-fpi str)
+  (let* ((frag-list (tokenise-string str
+ 				     isbdy?: (lambda (l)
+ 					       (if (and (char=? (car l) #\/)
+ 							(char=? (cadr l) #\/))
+ 						   (cddr l)
+ 						   #f))))
+	 (reg (car frag-list))
+	 (frag-list2 (if (or (string=? reg "+")
+			     (string=? reg "-"))
+			 ;; glue the first two strings back together
+			 (append (list (string-append (car frag-list)
+						      "//"
+						      (cadr frag-list)))
+				 (cddr frag-list))
+			 frag-list))
+	 (owner-id (if (>= (length frag-list2) 1)
+		       (car frag-list2)
+		       #f))
+	 (tc-and-d (if (>= (length frag-list2) 2) ;text class and description
+		       (tokenise-string (cadr frag-list2)
+					;;split at _single_ space
+					isbdy?: (lambda (l)
+						  (if (isspace? (car l))
+						      (cdr l)
+						      #f))
+					max: 1)
+		       #f))
+	 (text-class (and tc-and-d
+			  (car tc-and-d)))
+	 (uti (and tc-and-d
+		   (>= (length tc-and-d) 2)
+		   (string=? (cadr tc-and-d) "-"))) ;unavailable text indicator
+	 (frag-list3 (if (>= (length frag-list2) 2)
+			 (if uti
+			     (cddr frag-list2)
+			     (append (cdr tc-and-d) (cddr frag-list2)))
+			 '()))
+	 )
+    (list (cons 'registered reg)
+	  (cons 'owner-id owner-id)
+	  (cons 'text-class text-class)
+	  (cons 'unavailable uti)
+	  (cons 'text-description (if (>= (length frag-list3) 1)
+				      (car frag-list3)
+				      #f))
+	  (cons 'lang-or-des-seq (if (>= (length frag-list3) 2)
+				     (cadr frag-list3)
+				     #f))
+	  (cons 'display-version (if (>= (length frag-list3) 3)
+				     (caddr frag-list3)
+				     #f))
+	  )))
+
+
+<func>
+<routinename>query-parse-fpi
+<purpose>Query an FPI parsed using <funcname/parse-fpi/
+<description>
+  Given an object returned by function <funcname/parse-fpi/, this
+  returns elements of it.
+<returnvalue type=string>Requested part of FPI, or <code/#f/ if not
+  available.
+<parameter>symbol
+  <type>symbol
+  <description>One of the symbols <code/'registered/ (`+', `-' or
+  `ISO...', or any other (wrong) text found here), <code/'owner-id/
+  (the owner identifier, production [80]), <code/'text-class/
+  ([86]), <code/'unavailable/ (<code/#t/or <code/#f/,
+  depending on whether the `unavailable text indicator' [85] was
+  present), <code/'text-description/ ([87]), <code/'lang-or-des-seq/
+  (`public text language' [88] or 
+  `public text designating sequence' [89]), or <code/'display-version/
+  ([90]).
+<parameter>parse-list
+  <type>opaque
+  <description>Object returned from <funcname/parse-fpi/
+<codebody>
+(define (query-parse-fpi symbol parse-list)
+  (let ((p (assoc symbol parse-list)))
+    (if p
+	(cdr p)
+	#f)))
+
+
+
+
+
+<![ ignore [
+<func>
+<routinename>tokenise-string
+<description>Tokenises a string, breaking at arbitrary character classes
 <returnvalue type=list>List of strings, each containing a single word
 <parameter>str<type>String<description>String to be tokenised
 <parameter optional default='isspace?'>isbdy?
@@ -1028,6 +1213,7 @@ dd-MMM-yyyy.
 	      (loop (cdr charlist)	;within word
 		    wordlist
 		    (append currword (list (car charlist)))))))))
+]]>
 
 <func>
 <routinename>get-sysid-by-notation
@@ -1202,6 +1388,28 @@ MLABEL child in the document instance.
     (if mlabel
 	(number->string (element-number mlabel))
 	#f)))
+
+<func>
+<routinename>img-eqnref
+<description>Returns a unique reference to an equation.  If the element does
+  not have one of MEQUATION or MEQNARRAY in its ancestry (for example because
+  it is an M element), then we won't need to refer to this label.  It must,
+  however, be generated and be unique.
+<returnvalue type=string>String usable as an ID attribute value.
+<parameter optional default='(current-node)'>nd
+  <type>node-list
+  <description>A singleton node-list containing the element which is
+  to be referred to.
+<codebody>
+(define (img-eqnref #!optional (nd (current-node)))
+  (let ((refable-ancestor (ancestor-member nd '("MEQUATION" "MEQNARRAY"))
+			  ))
+    (if (node-list-empty? refable-ancestor)
+	(string-append "DUMMYEQ" (gi nd) (number->string (element-number nd)))
+	(string-append "EQ" (gi refable-ancestor)
+		       (number->string (element-number refable-ancestor)))
+	)
+    ))
 
 <func>
 <name>nl-to-pairs
