@@ -1,10 +1,10 @@
-.help bounds Starlink out
+.help drawndf Starlink out
 .nf
 Draws aligned boundaries of images on a graphics display.
 
 Usage:
 
-   bounds in [device]
+   drawndf in [device]
 
 Description:
 
@@ -26,7 +26,7 @@ Description:
    registered.  If they do not all have the same current Domain
    name, a warning will be issued, but plotting will proceed.
 
-   BOUNDS uses the AGI graphics database in a way which is
+   DRAWNDF uses the AGI graphics database in a way which is
    compatible with KAPPA applications; if the CLEAR parameter is set
    to false then it will attempt to align the boundary drawings with
    suitably registered graphics which are already on the graphics
@@ -34,7 +34,7 @@ Description:
    of a set of images on a mosaic image which has been constructed
    using those images, or to see how an undisplayed set of images
    would map onto one already displayed, either by a previous
-   invocation of BOUNDS or by a KAPPA program such as DISPLAY
+   invocation of DRAWNDF or by a KAPPA program such as DISPLAY
    or CONTOUR.
 
    This routine is designed for use on two-dimensional images;
@@ -67,7 +67,7 @@ CLEAR = _LOGICAL (Read)
    possible, alignment will occur within the Current coordinate
    system of the image.  If this is not possible, an attempt is
    made in SKY, PIXEL or GRID domains.  If the image cannot be
-   aligned in any suitable domain, then BOUNDS will terminate
+   aligned in any suitable domain, then DRAWNDF will terminate
    with an error.  If CLEAR is set to FALSE, then there must
    already be a picture displayed on the graphics device.
    [TRUE]
@@ -194,7 +194,7 @@ STYLE = LITERAL (Read)
 
 Examples
 
-bounds reg-data* clear
+drawndf reg-data* clear
    This will clear the current graphics device and plot on it
    labelled outlines of all the `reg-data*' images, as well as
    axes showing the common coordinate system in which they
@@ -203,14 +203,14 @@ bounds reg-data* clear
    Current attached coordinate system of all the reg-data* images
    should be one in which they are all aligned.
 
-bounds ccd* noclear
+drawndf ccd* noclear
    This will attempt to plot boundaries of all the `ccd*' images
    aligned with whatever is already plotted on the graphics
    device, for instance the result of a KAPPA DISPLAY command
-   or of a previous call of BOUNDS.  Parts of the image outlines
+   or of a previous call of DRAWNDF.  Parts of the image outlines
    which fall outside the existing plot area will not be visible.
 
-bounds in="one,two,three' axes=yes label=[name,index] penrot=yes
+drawndf in="one,two,three' axes=yes label=[name,index] penrot=yes
         style="size(strings)=2,width(curves)=3"
    This will draw outlines of the images `one', `two' and `three'
    in the current directory with labelled axes, in triple-thick
@@ -219,7 +219,7 @@ bounds in="one,two,three' axes=yes label=[name,index] penrot=yes
    outline and its associated text label will be different from
    the others.
 
-bounds in=a* noclear nopenrot style="colour=2" label=\!
+drawndf in=a* noclear nopenrot style="colour=2" label=\!
    All the images beginning with `a' will be outlined in colour 2,
    with no text labels or indication of the origin.
 
@@ -255,7 +255,7 @@ History
 
 Implementation_Status
 
-   BOUNDS's communication with the AGI database is compatible with
+   DRAWNDF's communication with the AGI database is compatible with
    most of KAPPA's behaviour, but is slightly less capable; in
    particular it will fail to align with pictures whose alignment
    has been stored using TRANSFORM structures instead of MORE.AST
