@@ -934,8 +934,8 @@
       CALL CCD1_MALL( NMATCH * 4, '_INTEGER', IPGRA, STATUS )
       CALL CCD1_MALL( NMATCH * 4, '_INTEGER', IPSPAN, STATUS )
       CALL CCD1_MALL( NMATCH * 4, '_INTEGER', IPSUB, STATUS )
-      CALL CCD1_MALL( NOPEN, '_INTEGER', IPQUE, STATUS )
-      CALL CCD1_MALL( NOPEN, '_LOGICAL', IPBEEN, STATUS )
+      CALL CCD1_MALL( MAX( NOPEN, NMATCH ), '_INTEGER', IPQUE, STATUS )
+      CALL CCD1_MALL( MAX( NOPEN, NMATCH ), '_LOGICAL', IPBEEN, STATUS )
                            
 *  Look for a maximum likelihood span of the graph of positions (each
 *  position is treated as a node, the node-node transformations are
