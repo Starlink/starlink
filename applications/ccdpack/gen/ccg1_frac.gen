@@ -521,7 +521,7 @@
                   LOWER = LOWER + 1
 
 *  Set new lower limits.
-                  FRALIM( 2 ) = MAX( FRAC( LOWER ), 0D0 )
+                  FRALIM( 1 ) = MAX( FRAC( LOWER ), 0D0 )
                   FRATOT( 1 ) = DNVAL * FRALIM( 1 )
 
                ELSE
