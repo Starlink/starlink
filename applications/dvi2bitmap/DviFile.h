@@ -30,6 +30,12 @@
 
 #include <config.h>
 
+#ifdef HAVE_CSTD_INCLUDE
+#include <cctype>
+#else
+#include <ctype.h>
+#endif
+
 #include <string>
 
 #include <stack>
@@ -60,7 +66,12 @@ class DviFileEvent;
 class DviFilePreamble;
 
 /**
- * Represents a DVI file.
+ * Represents a DVI file.  See the DVI Driver standard [driv-std] for
+ * details of the parameters here.
+ *
+ * <p>[driv-std] Level-0 DVI Driver Standard, available on-line on CTAN, in
+ * the directory 
+ * <a href='http://www.tex.ac.uk/tex-archive/dviware/driv-standard'>dviware/driv-standard</a>.
  */
 class DviFile {
 public:
@@ -74,16 +85,6 @@ public:
     bool eof();
     DviFileEvent *getEvent();
     DviFileEvent *getEndOfPage();
-    /**
-     * Sets the verbosity of this module.
-     * @param level the required verbosity
-     * @return the previous verbosity level
-     */
-    static verbosities verbosity (const verbosities level) {
-	enum verbosities oldv = verbosity_;
-	verbosity_ = level;
-	return oldv;
-    }
     /**
      * Units of length.  Used in {@link #currH} and {@link #currV},
      * and other conversions are available through method {@link
@@ -209,37 +210,10 @@ public:
 	}
 	return r;
     }
-    /**
-     * Obtains the `width of the widest page'.  This is either the
-     * value obtained from the postamble of the DVI file, if that was
-     * read, or else the maximum value of the horizontal position (as
-     * returned by <code>currH()</code>), if that is larger.  If the
-     * postamble has not been read, then this is initialised to -1.
-     * Note that this isn't the same as the maximum value of {@link
-     * #currH}, any more than 0 is the minimum, but if the origin is
-     * set `appropriately' (ie, at (1in,1in)), then everything should
-     * fit on.  It's not a precise figure, but can be useful as a
-     * scale for initialising bitmap sizes, for example.
-     *
-     * @return the horizontal size of the largest `page', in pixels
-     */
-    int hSize() const { return widest_page_; }
-    /**
-     * Obtains the `height plus depth of the tallest page'.    This is either the
-     * value obtained from the postamble of the DVI file, if that was
-     * read, or else the maximum value of the vertical position (as
-     * returned by <code>currV()</code>), if that is larger.  If the
-     * postamble has not been read, then this is initialised to -1.
-     * Note that this isn't the same as the maximum value of {@link
-     * #currV}, any more than 0 is the minimum, but if the origin is
-     * set `appropriately' (ie, at (1in,1in)), then everything should
-     * fit on.  It's not a precise figure, but can be useful as a
-     * scale for initialising bitmap sizes, for example.
-     *
-     * @return the vertical size of the largest `page', in pixels
-     */
-    int vSize() const { return deepest_page_; }
+    int hSize();
+    int vSize();
     static double convertFromScaledPoints(int sp, DviUnits units);
+    static verbosities verbosity(const verbosities level);
     /**
      * Return the net magnification factor for the DVI file
      * @return the overall magnification factor applied to lengths in
@@ -253,8 +227,13 @@ public:
      * @param npt a length in points
      * @return the given length, in pixels
      */
-    int pt2px (double npt) const
-	    { return static_cast<int>(px_per_dviu_*dviu_per_pt_*netmag_*npt+0.5); };
+    int pt2px(double npt) const
+    {
+	return static_cast<int>
+		(npt * dviu_per_pt_ / dviu_per_px_ + 0.5);
+    }
+/*     int pt2px (double npt) const */
+/* 	    { return static_cast<int>(px_per_dviu_*dviu_per_pt_*netmag_*npt+0.5); }; */
     /**
      * Gets the name of this DVI file.
      * @return the open file name as a string
@@ -278,41 +257,83 @@ public:
 
 private:
     string fileName_;
-    // all dimensions within this class are in DVI units, except where stated.
+    /** Horizontal and other positions.  All dimensions within this
+     * class are in DVI units, except where stated.  That means that they
+     * are not multiplied by any magnification factors.
+     */
     int h_, v_, w_, x_, y_, z_;
-    int pending_hupdate_;	// in DVIUnits
-    int pending_hhupdate_;	// in device units
-    int hh_, vv_;		// these are in device units
+    /** Horizontal and other positions in pixel units.  This includes
+     * any magnifications.
+     */
+    int hh_, vv_;
+    /** Updates to h_ yet to be applied.  In DVIunits */
+    int pending_hupdate_;
+    /** Updates to hh_ yet to be applied.  In pixel units */
+    int pending_hhupdate_;
     PkFont *current_font_;
     InputByteStream *dvif_;
-    // DVI units are defined by the numerator and denominator 
-    // specified in the DVI preamble.
-    // 1dviu = 1/dviu_per_pt_ * 1pt <==> d/dviu = dviu_per_pt * d/pt
-    // Note dviu_per_pt_ does not include DVI-magnification
+    /**
+     * Conversion between DVI units and points.  DVIunits are defined
+     * by the numerator and denominator specified in the DVI preamble.
+     * The definition is <code>1pt = dviu_per_pt_ * 1dviu</code>, and
+     * thus for a distance <em>d</em>, <em>d/dviu =
+     * <code>dviu_per_pt_</code> x d/pt</em>.  This does not include
+     * any DVI-magnification.
+     */
     double dviu_per_pt_;	// 1dviu = 1/dviu_per_pt_ * 1pt
-    double px_per_dviu_;	// 1px = px_per_dviu_ * 1dviu
+    // <code>1dviu = 1/dviu_per_pt_ * 1pt</code>, and thus <code>d/dviu =
+    // dviu_per_pt * d/pt</code>.  Note that <code>dviu_per_pt_</code>
+    // does not include DVI-magnification 
+
+    //double px_per_dviu_;	// 1px = px_per_dviu_ * 1dviu
+    /**
+     * Conversion between DVIunits and pixels.  This is 
+     * <em>1/K</em>, where <em>K</em> is the constant referred to in
+     * [driv-std], which multiplies lengths in DVIunits to get 
+     * lengths in pixels, or <code>1px = dviu_per_px_ *
+     * 1dviu</code>.  It includes DVI-magnification.
+     */
+    double dviu_per_px_;	// 1px = dviu_per_px_ * 1dviu (includes mag)
+    /**
+     * Conversion between DVIunits and scaled points.  For DVI files
+     * written by TeX82, this will have the value 1 (see [driv-std]).
+     * Definition is <code>1sp = dviu_per_sp_ * 1dviu</code>.
+     */
+    double dviu_per_sp_;	// 1sp = dviu_per_sp_ * 1dviu
     // resolution is in pixels-per-inch
-    int resolution_;
-    // extmag is a factor by which the file's internal magnification
-    // should be increased (1.0 = no magnification).  This is set
-    // externally to the DVI file.
+    //int resolution_;
+    /**
+     * The factor by which the file's internal magnification
+     * should be increased (1.0 = no magnification).  This is set
+     * externally to the DVI file.
+     */
     const double extmag_;
-    // ...resulting in a net magnification of (1.0 = no magnification):
+    /**
+     * Net magnification.  The externally-imposed magnification times
+     * the DVI file's own magnification (1.0 = no magnification).
+     */
     double netmag_;
 
     // tell getEvent to skip this page
     bool skipPage_;
 
-    // device units are 1pt=1/2.54 mm, so set max_drift_ to 0
-    // This might change in future, if the effective device units of the output
-    // change (for example if we produce oversize gifs, ready for shrinking).
+    /**
+     * Maximum drift parameter.  See [driv-std].
+     */
     int max_drift_;
 
-    // Largest width and height+depth, in pixels (ie, device units).
-    // These are either initialised to the values in the postamble,
-    // scaled to pixels, or are the maximum values of hh_ and vv_
-    // encountered so far.
+    /** 
+     * Largest width in pixels.  This is either initialised to the
+     * value given in the postamble, scaled to pixels, or is the
+     * maximum value of <code>hh_</code> encountered so far.
+     */
     int widest_page_;
+    /**
+     * Largest value of the height+depth, in pixels.  This is either
+     * initialised to the value given in the postamble, scaled to
+     * pixels, or is the maximum value of <code>vv_</code> encountered
+     * so far.
+     */
     int deepest_page_;
 
     Byte getByte();
@@ -325,10 +346,10 @@ private:
 	unsigned int i, num, den, mag;
 	string comment;
     } preamble_;
-    inline int magnify_(int i) const
-	{ return (netmag_==1.0
-		  ? i
-		  : static_cast<int>(netmag_*(double)i)); }
+/*     inline int magnify_(int i) const */
+/* 	{ return (netmag_==1.0 */
+/* 		  ? i */
+/* 		  : static_cast<int>(netmag_*(double)i)); } */
     void read_postamble()
 	    throw (DviError);
     bool have_preread_postamble_; /* we sought to it at beginning */
@@ -538,17 +559,12 @@ class DviFileEvent {
 
     void release();
 
+    static verbosities verbosity(const verbosities level);
+
  protected:
-    /**
-     * Creates a new event.
-     *
-     * @param opcode the DVI opcode which resulted in this event 
-     * @param t the type of this event
-     * @param dp the <code>DviFile</code> it is associated with
-     */
-    DviFileEvent(unsigned char opcode, eventTypes t, DviFile *dp=0)
-	    : opcode_(opcode), dviFile_(dp), type_(t) { }
-    //virtual ~DviFileEvent () { };
+    DviFileEvent(unsigned char opcode, eventTypes t, DviFile *dp=0);
+    static verbosities verbosity_;
+
  private:
     const unsigned char opcode_;
     DviFile *dviFile_;
@@ -563,10 +579,18 @@ class DviFileSetChar : public DviFileEvent {
      * @param charno the character to be set
      * @param dptr the <code>DviFile</code> associated with this character
      */
-    DviFileSetChar(int charno, DviFile *dptr)
-	    : DviFileEvent(charno, setchar, dptr), charno_(charno) { }
-    DviFileSetChar(unsigned char opcode, int charno, DviFile *dptr)
-	    : DviFileEvent(opcode, setchar, dptr), charno_(charno) { }
+    DviFileSetChar(int charno, DviFile *dptr);
+    DviFileSetChar(int opcode, int charno, DviFile *dptr);
+/*     DviFileSetChar(int charno, DviFile *dptr) */
+/* 	    : DviFileEvent(charno, setchar, dptr), charno_(charno) */
+/*     { */
+/* 	if (verbosity_ > normal) */
+/* 	    cerr << "Char " << charno << "=" */
+/* 		 << (isprint(charno) ? static_cast<char>(charno) : '?') */
+/* 		 << endl; */
+/*     } */
+/*     DviFileSetChar(unsigned char opcode, int charno, DviFile *dptr) */
+/* 	    : DviFileEvent(opcode, setchar, dptr), charno_(charno) { } */
     void debug() const;
     /**
      * Obtains the character which is to be set.

@@ -118,13 +118,13 @@ bool PkFont::makeMissingFonts_ = false;
  *
  * <p>The constructor arguments are those read from the DVI file font
  * declaration, after a <code>fnt_def</code> opcode, except for
- * <code>fontmag</code>, which is the overall DVI magnification
+ * <code>dvimag</code>, which is the overall DVI magnification
  * factor, and includes the file and command-line magnification
  * adjustments.  For more details, see the definition of the font
  * declaration in section `A.4 Font defintions' of the DVI standard,
  * and the use of these factors in method {@link #magnification}.
  *
- * @param fontmag the scale factor (1.0 = no magnification) by which
+ * @param dvimag the scale factor (1.0 = no magnification) by which
  * the font is to be magnified as it is read from the PK file
  *
  * @param c the font checksum expected
@@ -136,19 +136,19 @@ bool PkFont::makeMissingFonts_ = false;
  *
  * @param name the name of the font
  */
-PkFont::PkFont(double fontmag,
+PkFont::PkFont(double dvimag,
 	       unsigned int c,
 	       unsigned int s,
 	       unsigned int d,
 	       string name)
-    : pkf_(0), font_loaded_(false), seen_in_doc_(false)
+    : pkf_(0), font_loaded_(false), seen_in_doc_(false),
+      dvimag_(dvimag), name_(name)
 {
     font_header_.c = c;
     font_header_.s = s;
     font_header_.d = d;
-    fontmag_ = fontmag;
+
     path_ = "";
-    name_ = name;
 
     if (verbosity_ > normal)
 	cerr << "PkFont::PkFont " << name
@@ -236,7 +236,13 @@ PkFont::PkFont(double fontmag,
 	glyphs_[0] = new PkGlyph(resolution_, this); // dummy glyph
     }
     //quad_ = ((double)dvimag/1000.0) * d;
-    quad_ = d * magnification();
+
+    // These next three quantities should be given in DVI units
+    // _without_ the overall DVI magnification.  The function
+    // magnification() includes that, so remove it.
+    quad_ = d * magnification(false);
+    //quad_ = d * magnification(true);
+    //quad_ = d * dvimag_;
     word_space_ = 0.2*quad_;
     back_space_ = 0.9*quad_;
     if (verbosity_ > normal)
@@ -842,16 +848,21 @@ void PkFont::read_font (InputByteStream& pkf)
  * magnification taking into account DVI preamble magnification and
  * any command-line overriding.
  *
+ * @param includeDviMag if true (the default), include the overall
+ * DVI file magnification <code>mag</code> (as set in the
+ * constructor); if false, do not
+ *
  * @return the font magnification
  */
-double PkFont::magnification() const
+double PkFont::magnification(bool includeDviMag) const
 {
-    double rval = ((double)font_header_.s * fontmag_)
-	/ (double)font_header_.d;
+    double rval = (double)font_header_.s / (double)font_header_.d;
+    if (includeDviMag)
+	rval *= dvimag_;
     if (verbosity_ > normal)
 	cerr << "PkFont::magnification: "
 	     << font_header_.s << '/' << font_header_.d
-	     << " *" << fontmag_ << " = " << rval << endl;
+	     << " * " << dvimag_ << " = " << rval << endl;
     return rval;
 }
 
@@ -988,10 +999,12 @@ PkGlyph::PkGlyph(unsigned int cc,
  *
  * @param cc the character code of this glyph
  * @param tfmwidth the width of the character, in DVI units
- * @param dx the horizontal escapement, in pixels; this is the number
+ * @param dx the horizontal escapement, in pixels times
+ * <em>2<sup>16</sup></em>; this defines the number
  * of pixels rightwards (towards increasing <em>x</em>) that the
  * reference should move after this glyph is set
- * @param dy the vertical escapement, in pixels
+ * @param dy the vertical escapement, in pixels times
+ * <em>2<sup>16</sup></em>
  * @param w width of the bitmap in pixels
  * @param h height of the bitmap in pixels
  * @param hoff <em>(hoff,voff)</em> is the position of the glyph

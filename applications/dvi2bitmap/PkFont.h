@@ -251,7 +251,7 @@ class PkFont {
      * @return theh path to the PK file which defines this font
      */
     string fontFilename() const { return path_; }
-    double magnification() const;
+    double magnification(bool includeDviMag=true) const;
     /**
      * Obtains the base font resolution, in dots-per-inch.  This is
      * the base resolution corresponding to the Metafont mode set by
@@ -294,41 +294,45 @@ class PkFont {
      */
     bool seenInDoc(void) const { return seen_in_doc_; }
     void setSeenInDoc(void) { seen_in_doc_ = true; }
-    // wordSpace(), backSpace() and quad() return those values in DVI units
+
     /**
      * Obtains the size of the <code>word_space</code> parameter for this font.
+     * This does <em>not</em> include any overall DVI magnification.
      * @return <code>word_space</code> in DVI units
      */
     double wordSpace() const { return word_space_; }
     /**
      * Obtains the size of the <code>back_space</code> parameter for this font.
+     * This does <em>not</em> include any overall DVI magnification.
      * @return <code>back_space</code> in DVI units
      */
     double backSpace() const { return back_space_; }
     /**
      * Obtains the size of the <code>quad</code> parameter for this font.
+     * This does <em>not</em> include any overall DVI magnification.
      * @return <code>quad</code> in DVI units
      */
     double quad() const { return quad_; }
+
     // No need to check font_loaded_ in these next three, since these
     // are never called between the font being created and preamble_
     // being filled in.
     /**
      * Obtains the design size of this font, as obtained from the PK
      * file preamble.
-     * @return the design size in points.
+     * @return the design size in points
      */
     double designSize() const {	return preamble_.designSize; }
     /**
      * Obtains the number of horizontal pixels per point for this
      * font, as obtained from the PK file preamble.
-     * @return the hppp parameter in points.
+     * @return the hppp parameter in points
      */
     double hppp() const { return preamble_.hppp; }
     /**
      * Obtains the number of vertical pixels per point for this
      * font, as obtained from the PK file preamble.
-     * @return the vppp parameter in points.
+     * @return the vppp parameter in points
      */
     double vppp() const { return preamble_.vppp; }
     /**
@@ -368,8 +372,7 @@ class PkFont {
 	unsigned int d;		/* `design size', in DVI units */
     } font_header_;		/* this is the information retrieved
 				   from the font declaration */
-    /*int dvimag_;		// DVI magnification reported by the file*/
-    double fontmag_;		/* Font magnification (1.0 = no mag) */
+    double dvimag_;		/* Magnification imposed by DVI file (1.0 = no mag) */
     struct {
 	unsigned int id, cs;
 	double designSize, hppp, vppp;

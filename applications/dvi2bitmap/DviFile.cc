@@ -53,6 +53,7 @@ using std::endl;
 
 // Static debug switch
 verbosities DviFile::verbosity_ = normal;
+verbosities DviFileEvent::verbosity_ = normal;
 
 // Mmm, there's something strangely amiss with the exception handling
 // in this module, or here and in InputByteStream.  
@@ -119,7 +120,8 @@ DviFile::DviFile (string& fn,
 		  bool read_post,
 		  bool seekable)
     throw (DviError)
-    : fileName_(fn), resolution_(res),
+    : fileName_(fn),
+      //resolution_(res),
       pending_hupdate_(0), pending_hhupdate_(0),
       current_font_(0), dvif_(0), extmag_(externalmag),
       netmag_(1.0), skipPage_(false),
@@ -127,9 +129,14 @@ DviFile::DviFile (string& fn,
       widest_page_(-1), deepest_page_(-1),
       have_preread_postamble_(false), have_read_to_postamble_(false)
 {
-    if (resolution_ == 0)	// then default it
-	resolution_ = PkFont::dpiBase();
-    PkFont::setResolution(resolution_);
+    if (res != 0)
+	PkFont::setResolution(res);
+//     if (resolution_ == 0)
+// 	// then default it from PkFont
+// 	resolution_ = PkFont::dpiBase();
+//     else
+// 	// set PkFont's resolution to match this
+// 	PkFont::setResolution(resolution_);
 
     try
     {
@@ -286,8 +293,8 @@ DviFileEvent *DviFile::getEvent()
 		break;
 	      case 132:		// set_rule
 		{
-		    int a = magnify_(getSIS(4));
-		    int b = magnify_(getSIS(4));
+		    int a = getSIS(4);
+		    int b = getSIS(4);
 		    pending_hupdate_ += b;
 		    if (a > 0 && b > 0)
 			gotEvent = new DviFileSetRule (opcode,
@@ -310,8 +317,8 @@ DviFileEvent *DviFile::getEvent()
 		break;
 	      case 137:		// put_rule
 		{
-		    int a = magnify_(getSIS(4));
-		    int b = magnify_(getSIS(4));
+		    int a = getSIS(4);
+		    int b = getSIS(4);
 		    if (a > 0 && b > 0)
 			gotEvent = new DviFileSetRule (opcode,
 						       this,
@@ -400,103 +407,103 @@ DviFileEvent *DviFile::getEvent()
 		}
 		break;
 	      case 143:		// right1
-		updateH_ (magnify_(getSIS(1)), 0);
+		updateH_ (getSIS(1), 0);
 		break;
 	      case 144:		// right2
-		updateH_ (magnify_(getSIS(2)), 0);
+		updateH_ (getSIS(2), 0);
 		break;
 	      case 145:		// right3
-		updateH_ (magnify_(getSIS(3)), 0);
+		updateH_ (getSIS(3), 0);
 		break;
 	      case 146:		// right4
-		updateH_ (magnify_(getSIS(4)), 0);
+		updateH_ (getSIS(4), 0);
 		break;
 	      case 147:		// w0
 		updateH_ (w_, 0);
 		break;
 	      case 148:		// w1
-		w_ = magnify_(getSIS(1));
+		w_ = getSIS(1);
 		updateH_ (w_, 0);
 		break;
 	      case 149:		// w2
-		w_ = magnify_(getSIS(2));
+		w_ = getSIS(2);
 		updateH_ (w_, 0);
 		break;
 	      case 150:		// w3
-		w_ = magnify_(getSIS(3));
+		w_ = getSIS(3);
 		updateH_ (w_, 0);
 		break;
 	      case 151:		// w4
-		w_ = magnify_(getSIS(4));
+		w_ = getSIS(4);
 		updateH_ (w_, 0);
 		break;
 	      case 152:		// x0
 		updateH_ (x_, 0);
 		break;
 	      case 153:		// x1
-		x_ = magnify_(getSIS(1));
+		x_ = getSIS(1);
 		updateH_ (x_, 0);
 		break;
 	      case 154:		// x2
-		x_ = magnify_(getSIS(2));
+		x_ = getSIS(2);
 		updateH_ (x_, 0);
 		break;
 	      case 155:		// x3
-		x_ = magnify_(getSIS(3));
+		x_ = getSIS(3);
 		updateH_ (x_, 0);
 		break;
 	      case 156:		// x4
-		x_ = magnify_(getSIS(4));
+		x_ = getSIS(4);
 		updateH_ (x_, 0);
 		break;
 	      case 157:		// down1
-		updateV_ (magnify_(getSIS(1)));
+		updateV_ (getSIS(1));
 		break;
 	      case 158:		// down2
-		updateV_ (magnify_(getSIS(2)));
+		updateV_ (getSIS(2));
 		break;
 	      case 159:		// down3
-		updateV_ (magnify_(getSIS(3)));
+		updateV_ (getSIS(3));
 		break;
 	      case 160:		// down4
-		updateV_ (magnify_(getSIS(4)));
+		updateV_ (getSIS(4));
 		break;
 	      case 161:		// y0
 		updateV_ (y_);
 		break;
 	      case 162:		// y1
-		y_ = magnify_(getSIS(1));
+		y_ = getSIS(1);
 		updateV_ (y_);
 		break;
 	      case 163:		// y2
-		y_ = magnify_(getSIS(2));
+		y_ = getSIS(2);
 		updateV_ (y_);
 		break;
 	      case 164:		// y3
-		y_ = magnify_(getSIS(3));
+		y_ = getSIS(3);
 		updateV_ (y_);
 		break;
 	      case 165:		// y4
-		y_ = magnify_(getSIS(4));
+		y_ = getSIS(4);
 		updateV_ (y_);
 		break;
 	      case 166:		// z0
 		updateV_ (z_);
 		break;
 	      case 167:		// z1
-		z_ = magnify_(getSIS(1));
+		z_ = getSIS(1);
 		updateV_ (z_);
 		break;
 	      case 168:		// z2
-		z_ = magnify_(getSIS(2));
+		z_ = getSIS(2);
 		updateV_ (z_);
 		break;
 	      case 169:		// z3
-		z_ = magnify_(getSIS(3));
+		z_ = getSIS(3);
 		updateV_ (z_);
 		break;
 	      case 170:		// z4
-		z_ = magnify_(getSIS(4));
+		z_ = getSIS(4);
 		updateV_ (z_);
 		break;
 
@@ -731,10 +738,16 @@ bool DviFile::eof()
 */
 int DviFile::pixel_round(int dp)
 {
+    if (dp > 0)
+	return  static_cast<int>( dp/dviu_per_px_ + 0.5);
+    else
+	return -static_cast<int>(-dp/dviu_per_px_ + 0.5);
+#if 0
     if (dp>0)
 	return  static_cast<int>(px_per_dviu_ *   dp  + 0.5);
     else
 	return -static_cast<int>(px_per_dviu_ * (-dp) + 0.5);
+#endif
 #if 0
     if (dp>0)
 	return  static_cast<int>(floor(px_per_dviu_ *   dp  + 0.5));
@@ -806,13 +819,14 @@ int DviFile::charWidth_ (int charno)
 {
     if (current_font_ == 0)
 	throw DviError ("current_font undefined (charWidth)");
-    return static_cast<int>(current_font_->glyph(charno)->tfmWidth()
-			    * current_font_->magnification()
+    return static_cast<int>(current_font_->glyph(charno)->tfmWidth() //points
+			    * current_font_->magnification(false)
 			    * dviu_per_pt_);
 }
 
 /**
- * Return escapement of character, in pixel units.
+ * Return escapement of character, in pixel units (thus including
+ * magnification).
  *
  * @param charno the number of the character to examine
  * @return the escapement appropriate for the character
@@ -821,17 +835,23 @@ int DviFile::charEscapement_ (int charno)
 {
     if (current_font_ == 0)
 	throw DviError ("current_font undefined (charEscapement)");
-//     return static_cast<int>(current_font_->glyph(charno)->hEscapement()
-// 			    * current_font_->magnification());
-    return static_cast<int>(current_font_->glyph(charno)->hEscapement());
+    return static_cast<int>
+	    (current_font_->glyph(charno)->hEscapement() // unmagnified
+	     * current_font_->magnification());
+    //    return static_cast<int>(current_font_->glyph(charno)->hEscapement());
 }
 
 
-// Update the horizontal position.  If hhup is non-zero, then the last thing
-// we did was set a character, and this was its width.  If it's zero, then
-// the last action was some other adjustment of the horizontal position,
-// so we need to update hh_ based on this.  See DVI standard, section 2.6.2
-// hup is in DVI units, hhup in pixels.
+/**
+ * Update the horizontal position.  If hhup is non-zero, then the last thing
+ * we did was set a character, and this was its width.  If it's zero, then
+ * the last action was some other adjustment of the horizontal position,
+ * so we need to update hh_ based on this.  See DVI standard, section
+ * 2.6.2
+ *
+ * @param hup the horizontal update, in (unmagnified) DVIunits
+ * @param hhup the horizontal update in pixels
+ */
 void DviFile::updateH_ (int hup, int hhup)
 {
     if (hhup == 0)
@@ -869,7 +889,13 @@ void DviFile::updateH_ (int hup, int hhup)
 	     << (sdist > 0 ? '+' : '-') << dist
 	     << endl;
 }
-// Similarly, update the vertical position.  vup is in DVI units.
+
+/**
+ * Updates the vertical position.
+ *
+ * @param the vertical update to be applied, in DVIunits
+ * @see #updateH_
+ */
 void DviFile::updateV_ (int vup)
 {
     double range;
@@ -964,8 +990,8 @@ void DviFile::read_postamble()
 // 						 * (double)dvimag / 1000.0);
     }
     // px_per_dviu_ is set in preamble
-    widest_page_ = static_cast<int>(postamble_.u * px_per_dviu_);
-    deepest_page_ = static_cast<int>(postamble_.l * px_per_dviu_);
+//     widest_page_ = static_cast<int>(postamble_.u * px_per_dviu_);
+//     deepest_page_ = static_cast<int>(postamble_.l * px_per_dviu_);
 
     // dvimag/1000 is the font magnification factor
     double fontmag = dvimag/1000.0;
@@ -975,6 +1001,7 @@ void DviFile::read_postamble()
 	     << " u=" << postamble_.u
 	     << " s=" << postamble_.s
 	     << " t=" << postamble_.t
+		//	     << "; (w)x(d)=" << widest_page_ << "x" << deepest_page_
 	     << "; fontmag=" << fontmag
 	     << endl;
 
@@ -1081,11 +1108,30 @@ void DviFile::fnt_def_(double fontmag, int nbytes)
  * define the units of measurement; they are the numerator and
  * denominator of a fraction by which all dimensions in the DVI file
  * could be multiplied in order to get lengths in units of 10^{-7}
- * meters.  (For example, there are exactly 7227 \TeX\ points in 254
+ * meters. (For example, there are exactly 7227 \TeX\ points in 254
  * centimeters, and \TeX82 works with scaled points where there are
  * $2^{16}$ sp in a point, so \TeX82 sets num=25400000 and
- * den=7227.2^{16}=473628672.)' [from the spec].  That is, for TeX,
- * DVI unit = sp, and 1sp = num/den x 10^{-7}m.
+ * den=7227.2^{16}=473628672.)' [from the spec].
+ *
+ * <p>That is, if u is the length of a DVIunit, then u=(n/d)*1e-7m.  We
+ * also know, from their definitions, that 7227*2^16sp/2.54e7=1e-7m.
+ * Thus, if we write u=(r*1sp), then
+ * <pre>
+ *     u = r * 2.54e7 / (7227*2^16) * 1e-7m
+ *       = num/dem * 1e-7m
+ * </pre>
+ * or
+ * <pre>
+ *     r = num/den * (7227*2^16) / 2.54e7
+ * </pre>
+ * For TeX, therefore, r=1, and 1DVIunit = 1sp.
+ *
+ * <p>Similarly 1pt = 2.54e7/7227 * 1e-7m = (d/n) * (2.54e7/7227) u.
+ *
+ * <p>There are R pixels (=`device units') in 1 inch: r*1px = 1in =
+ * 72.27pt = 72.27 * (d/n) * (2.54e5/72.27) u.  Thus 1px =
+ * (d/n)*2.54e5 u.  It is at <em>this</em> point that we impose the
+ * overall magnification, netmag_, by multiplying R by netmag_.
  *
  * <p>We want to use these numbers to establish a conversion between DVI
  * units and screen pixels, each of which is nominally 1 TeX point
@@ -1117,26 +1163,150 @@ void DviFile::process_preamble(DviFilePreamble* p)
 	netmag_ = (double)preamble_.mag/1000.0 * extmag_;
     // Note dviu_per_pt_ does not include DVI-magnification
     // (so `true' dviu_per_pt_ would be this/netmag_)
-    dviu_per_pt_ = ((double)p->den/(double)p->num) * (2.54e7/7227e0);
-    px_per_dviu_ = ((double)p->num/(double)p->den) * (resolution_/254000e0);
-    double device_units = 1.0/72.27/netmag_;
-    if (device_units > 0.01)
+    double numden = (double)p->num/(double)p->den;
+    // 1dviu = 1/dviu_per_sp_ * 1sp.
+    // In comments above, dviu_per_sp_ = 1/r.
+    // dviu_per_sp_ = 1/r = 1 for DVI files generated by TeX82
+    dviu_per_sp_ = (2.54e7/7227*65536) / numden;
+    // 1pt = dviu_per_pt_ * 1dviu
+    dviu_per_pt_ = 2.54e7/7227.0 / numden;
+    // 1px = dviu_per_px_ * 1dviu
+    double resolution = PkFont::dpiBase();
+    dviu_per_px_ = 2.54e5/(resolution*netmag_) / numden;
+//     dviu_per_pt_ = ((double)p->den/(double)p->num) * (2.54e7/7227e0);
+//     px_per_dviu_ = ((double)p->num/(double)p->den) * (resolution_/254000e0);
+
+    // pixel_size is the size of one pixel, in inches
+    double pixel_size = dviu_per_px_ / dviu_per_pt_ / 72.27;
+    if (pixel_size > 0.01)
 	max_drift_ = 0;
-    else if (device_units > 0.005)
+    else if (pixel_size > 0.005)
 	max_drift_ = 1;
     else
 	max_drift_ = 2;
     if (verbosity_ > normal)
 	cerr << "Preamble: dviu_per_pt_ = " << dviu_per_pt_
-	     << ", px_per_dviu_ = " << px_per_dviu_
+		//	     << ", px_per_dviu_ = " << px_per_dviu_
+	     << ", dviu_per_px_ = " << dviu_per_px_
 	     << ", mag=" << preamble_.mag
 	     << ", extmag=" << extmag_
 	     << endl
-	     << "Scales: resolution_=" << resolution_
+	     << "Scales: resolution=" << PkFont::dpiBase()
 	     << " netmag_=" << netmag_
-	     << " device_units=" << device_units
-	     << "=>max_drift_=" << max_drift_
+	     << " pixel_size=" << pixel_size
+	     << "in, =>max_drift_=" << max_drift_
 	     << endl;
+}
+
+/**
+ * Obtains the `width of the widest page'.  This is either the
+ * value obtained from the postamble of the DVI file, if that was
+ * read, or else the maximum value of the horizontal position (as
+ * returned by <code>currH()</code>), if that is larger.  If the
+ * postamble has not been read, then this is initialised to -1.
+ * Note that this isn't the same as the maximum value of {@link
+ * #currH}, any more than 0 is the minimum, but if the origin is
+ * set `appropriately' (ie, at (1in,1in)), then everything should
+ * fit on.  It's not a precise figure, but can be useful as a
+ * scale for initialising bitmap sizes, for example.
+ *
+ * @return the horizontal size of the largest `page', in pixels
+ */
+int DviFile::hSize()
+{
+    if (widest_page_ < 0 && have_preread_postamble_)
+	widest_page_  = static_cast<int>(postamble_.u / dviu_per_px_);
+
+    return widest_page_;
+}
+
+/**
+ * Obtains the `height plus depth of the tallest page'.    This is either the
+ * value obtained from the postamble of the DVI file, if that was
+ * read, or else the maximum value of the vertical position (as
+ * returned by <code>currV()</code>), if that is larger.  If the
+ * postamble has not been read, then this is initialised to -1.
+ * Note that this isn't the same as the maximum value of {@link
+ * #currV}, any more than 0 is the minimum, but if the origin is
+ * set `appropriately' (ie, at (1in,1in)), then everything should
+ * fit on.  It's not a precise figure, but can be useful as a
+ * scale for initialising bitmap sizes, for example.
+ *
+ * @return the vertical size of the largest `page', in pixels
+ */
+int DviFile::vSize()
+{
+    if (deepest_page_ < 0 && have_preread_postamble_)
+	deepest_page_ = static_cast<int>(postamble_.l / dviu_per_px_);
+
+    return deepest_page_;
+}
+
+/**
+ * Creates a new event.
+ *
+ * @param opcode the DVI opcode which resulted in this event 
+ * @param t the type of this event
+ * @param dp the <code>DviFile</code> it is associated with
+ */
+DviFileEvent::DviFileEvent(unsigned char opcode, eventTypes t, DviFile *dp)
+    : opcode_(opcode), type_(t), dviFile_(dp)
+{
+    // nothing
+}
+
+/**
+ * Sets the verbosity of this module.
+ * @param level the required verbosity
+ * @return the previous verbosity level
+ */
+verbosities DviFile::verbosity (const verbosities level) {
+    enum verbosities oldv = verbosity_;
+    verbosity_ = level;
+    DviFileEvent::verbosity(level);
+    return oldv;
+}
+
+/**
+ * Constructs a set-character event
+ *
+ * @param charno the character to be set
+ * @param dptr pointer to the DVI file which contained this character
+ */
+DviFileSetChar::DviFileSetChar(int charno, DviFile *dptr)
+    : DviFileEvent(charno, setchar, dptr), charno_(charno)
+{
+    if (verbosity_ > normal)
+	cerr << "Char " << charno << "="
+	     << (isprint(charno) ? static_cast<char>(charno) : '?')
+	     << endl;
+}
+
+/**
+ * Constructs a set-character event
+ *
+ * @param opcode the opcode which prompted this event
+ * @param charno the character to be set
+ * @param dptr pointer to the DVI file which contained this character
+ */
+DviFileSetChar::DviFileSetChar(int opcode, int charno, DviFile *dptr)
+    : DviFileEvent(opcode, setchar, dptr), charno_(charno)
+{
+    if (verbosity_ > normal)
+	cerr << "Char " << charno << "="
+	     << (isprint(charno) ? static_cast<char>(charno) : '?')
+	     << endl;
+}
+
+/**
+ * Sets the verbosity for DviFileEvent and its subclasses
+ * @param level the desired verbosity
+ * @return the old verbosity
+ */
+verbosities DviFileEvent::verbosity(const verbosities level) {
+    enum verbosities oldv = verbosity_;
+    verbosity_ = level;
+    return oldv;
 }
 
 /**
