@@ -1,0 +1,3 @@
+#!/bin/sh
+./hdstrace hdstrace_test
+
