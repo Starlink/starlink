@@ -2319,10 +2319,27 @@ sub handle_monoliths
 {
   my @proglist = &am_install_var ('monoliths', 'MONOLITHS',
                                   'bin', 'check', 'noinst');
-  return if ! @proglist;
 
-  my $seen_global_libobjs =
-    var ('LDADD') && &handle_lib_objects ('', 'LDADD');
+  my $star_monoliths_seen = (defined($starlink_seen_features{monoliths})
+                             && $starlink_seen_features{monoliths});
+
+  # If there is no monolith support mentioned (bin_MONOLITHS), then do nothing.
+  if (! @proglist)
+    {
+      if ($star_monoliths_seen) {
+        err_am("STAR_MONOLITHS seen in configure.ac, but no bin_MONOLITHS declared in Makefile.am");
+      }
+      return;
+    }
+
+  # Just to keep the user sane, check that we did see STAR_MONOLITHS in the
+  # configure.ac.
+  $star_monoliths_seen || do {
+    err_am("have bin_MONOLITHS, but no STAR_MONOLITHS in configure.ac");
+  };
+  
+
+  my $seen_global_libobjs = var ('LDADD') && &handle_lib_objects ('', 'LDADD');
 
   my @all_tasks;
   my @task_monolith_pairs;
@@ -2437,7 +2454,7 @@ sub handle_monoliths
           # handle_starlink adds the right rules.
           $starlink_seen_features{compifl} = 1;
 
-          # Define a variable $xname_IFCS which contains the names of
+          # Define a variable $xname_IFC which contains the names of
           # each of the .ifc files.  As a side-effect, add each of the
           # .ifl files to the dist_common list.  $resvar is returned
           # as the $xname_IFC variable.
@@ -2453,7 +2470,41 @@ sub handle_monoliths
                  push (@task_monolith_pairs, "$val:$xname");
                  return @r;
                });
-          push (@all_tasks, $resvar);          
+          push (@all_tasks, $resvar);
+
+          my @task_names = $tasklist->value_as_list_recursive;
+          # If the list of tasks is non-null, then make the
+          # monolith.ifl file by concatenating the .ifl files of all
+          # the tasks; if it is null, then there must be a
+          # monolith.ifl file present.
+          my $monoifl = $xname . '.ifl';
+          if (@task_names)
+            {
+              my @ifls = map { $_.'.ifl' } @task_names;
+              &pretty_print_rule ($monoifl . ':', "\t\t", @ifls);
+              $output_rules .= "\trm -f \$\@\n";
+              $output_rules .= "\techo 'begin monolith' >\$\@\n";
+              $output_rules .= makefile_wrap ("\t", "\t\t",
+                                              ('cat', @ifls, '>>$@'));
+              $output_rules .= "\techo 'end monolith' >>\$\@\n";
+              $output_rules .= "\n";
+            }
+          else
+            {
+              # monolith _TASKS variable has no entries -- we must have a
+              # file $monoifl present.
+              err_am ("Variable " . $xname . "_TASKS is null, but no $monoifl file exists")
+                unless -f $monoifl;
+            }
+
+          # Append the <monolith>.ifc file to this $xname_IFC (since
+          # this is a make target, it doesn't matter if it's (accidentally)
+          # there already.
+          Automake::Variable::define ($xname . '_IFC', VAR_MAKEFILE,
+                                      '+', TRUE, # append in all conditions
+                                      $xname . '.ifc',
+                                      '', INTERNAL, VAR_ASIS);
+          push (@task_monolith_pairs, "$xname:$xname");
         }
       else 
         {
@@ -4840,6 +4891,7 @@ sub scan_autoconf_traces ($)
                 STAR_DEFAULTS => 0,
                 STAR_LATEX_DOCUMENTATION => 1,
                 STAR_MESSGEN => 1,
+                STAR_MONOLITHS => 0,
                 STAR_PREDIST_SOURCES => 1,
                 _STAR_EXTRA_DIST => 1,
 	      );
@@ -5021,6 +5073,10 @@ sub scan_autoconf_traces ($)
               {
                   $starlink_seen_features{messgen} = $args[1];
               }
+        }
+      elsif ($macro eq 'STAR_MONOLITHS')
+        {
+          $starlink_seen_features{monoliths} = 1;
         }
       elsif ($macro eq 'STAR_PREDIST_SOURCES')
         {
