@@ -24,7 +24,18 @@ dnl   use C++ to compile test programs
 AC_LANG_CPLUSPLUS
 
 dnl   Check for a Perl binary, looking in the likely Starlink area first
-AC_PATH_PROG(PERL, perl, perl, /star/bin:$PATH)
+AC_PATH_PROG(PERLPATH, perl, noperl, /star/Perl/bin:/stardev/Perl/bin:$PATH)
+dnl   In fact, Moggy.pm currently _requires_ StarPerl, since it uses
+dnl   autoastrom.pm, which loads the NDF library; it only uses deg2sex 
+dnl   from autoastrom.pm, however, so that if it were desirable to
+dnl   make Moggy independent of autoastrom, this function would have
+dnl   to be copied over.
+AC_MSG_CHECKING(whether we can invoke the autoastrom Perl library)
+if $PERLPATH -e 'use lib ".."; use autoastrom; exit 0;'; then
+  AC_MSG_RESULT(ok)
+else
+  AC_MSG_ERROR(no -- you need to adjust the PATH to include StarPerl)
+fi
 
 dnl   Similarly, check for uncompress and gzip programs
 AC_PATH_PROG(PROGUNCOMPRESS, uncompress)
@@ -58,17 +69,20 @@ AC_CHECK_FUNC(setenv,
 
 dnl   Take a `copy' of the means autoconf uses to echo a string
 dnl   without a newline.  This will be a Makefile variable, so double
-dnl   the dollar sign to escape it (you'd think we could just
-dnl   escape this automagically, but that's unexpectedly hard).
+dnl   the dollar sign to escape it.
 AC_SUBST(ECHONONL)
-if test -n "$ac_n"; then
-    ECHONONL='echononl () { echo -n $$*; }'
-elif test -n "$ac_c"; then
-    ECHONONL='echononl () { echo "$$*\c"; }'
-else
-    # eh?
-    ECHONONL='echononl () { echo $$*; }'
-fi
+ECHONONL='echononl () { echo '$ac_n' $$* '$ac_c'; }'
+dnl (you'd think we could just write
+dnl   'echo $ac_n $$* $ac_c' and escape it automagically, but that's
+dnl   unexpectedly hard).
+dnl if test -n "$ac_n"; then
+dnl    ECHONONL='echononl () { echo -n $$*; }'
+dnl elif test -n "$ac_c"; then
+dnl     ECHONONL='echononl () { echo "$$*\c"; }'
+dnl else
+dnl     # eh?
+dnl     ECHONONL='echononl () { echo $$*; }'
+dnl fi
 
 
 
