@@ -16,24 +16,23 @@
 *  Description:
 *     The routine does the following:
 *     1) Checks that the POLPACK extension contains one and only one of 
-*     WPLATE or STOKES. An error is reported if not.
+*     WPLATE, ANLANG or STOKES. An error is reported if not.
 *     2) If STOKES is found, no further checks are made.
 *     3) If WPLATE is found...
-*     4) Check the WPLATE value.
-*     5) Sets up a default IMGID component in the POLPACK extension if
+*     4) Sets up a default IMGID component in the POLPACK extension if
 *     the extension does not currently contain an IMGID value, or if the
-*     existiung value is blank. The default IMGID value used is the
+*     existing value is blank. The default IMGID value used is the
 *     basename of the NDF.
-*     6) Checks that the IMGID value is unique amongst the NDFs being
+*     5) Checks that the IMGID value is unique amongst the NDFs being
 *     processed. If not, a warning (not an error) is given.
-*     7) Sets up a default ANGROT component in the POLPACK extension if
+*     6) Sets up a default ANGROT component in the POLPACK extension if
 *     the extension does not currently contain an ANGROT value. The default 
 *     value used is zero.
-*     8) Appends the WPLATE value to the FILTER value. If there is no
-*     FILTER value then one is created equal to WPLATE.
-*     9) Copies the FILTER value into the CCDPACK extension (an extension
+*     7) Appends the WPLATE or ANLANG value to the FILTER value. If there is 
+*     no FILTER value then one is created equal to WPLATE or ANLANG.
+*     8) Copies the FILTER value into the CCDPACK extension (an extension
 *     is created if necessary).
-*     10) Adds a Frame into the NDF's WCS component representing a 2D
+*     9) Adds a Frame into the NDF's WCS component representing a 2D
 *     cartesian coordinate system with origin at pixel coordinates (0,0), 
 *     with its first axis parallel to the analyser for WPLATE = 0.0
 *     degrees.
@@ -64,6 +63,10 @@
 *        Original version.
 *     2-JUL-1998 (DSB):
 *        Modified to handle Stokes cubes as well as intensity images.
+*     12-FEB-1999 (DSB):
+*        Added support for ANLANG as an alternative to WPLATE, and allow
+*        arbitrary values for WPLATE when using single-beam data. WPLATE
+*        changed from _CHAR to _REAL.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -108,7 +111,7 @@
       CHARACTER IMGID*256
       CHARACTER NDFNAM*256
       CHARACTER SLICE*(GRP__SZNAM)
-      CHARACTER WPLATE*10
+      CHARACTER ANLID*30
       DOUBLE PRECISION ANGCOS  
       DOUBLE PRECISION ANGSIN
       DOUBLE PRECISION MAT( NDF__MXDIM*NDF__MXDIM )
@@ -125,6 +128,7 @@
       INTEGER LC
       INTEGER MAP
       INTEGER NDIM
+      LOGICAL ATHERE
       LOGICAL WTHERE
       LOGICAL STHERE
       LOGICAL THERE
@@ -137,57 +141,48 @@
 *  See if the extension contains the WPLATE item.
       CALL DAT_THERE( LOC, 'WPLATE', WTHERE, STATUS )
 
+*  See if the extension contains the ANLANG item.
+      CALL DAT_THERE( LOC, 'ANLANG', ATHERE, STATUS )
+
 *  See if the extension contains the STOKES item.
       CALL DAT_THERE( LOC, 'STOKES', STHERE, STATUS )
 
-*  Report an error if neither item was found.
-      IF( .NOT. WTHERE .AND. .NOT. STHERE .AND. STATUS .EQ. SAI__OK 
-     :    .AND. .NOT. QUIET ) THEN
+*  Report an error if none of these was found.
+      IF( .NOT. WTHERE .AND. .NOT. STHERE .AND. .NOT. ATHERE
+     :    .AND. STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
-         CALL ERR_REP( 'POLIMP_NOWPL', 'No value found for either of '//
-     :                 'the POLPACK extension items WPLATE or STOKES.', 
-     :                 STATUS )
+         CALL ERR_REP( 'POLIMP_NOWPL', 'No value found for any of '//
+     :                 'the POLPACK extension items WPLATE, ANLANG or'//
+     :                 ' STOKES.', STATUS )
       END IF
 
-*  Report an error if both were found.
-      IF( WTHERE .AND. STHERE .AND. STATUS .EQ. SAI__OK 
-     :    .AND. .NOT. QUIET ) THEN
-         STATUS = SAI__ERROR
-         CALL ERR_REP( 'POLIMP_STWPL', 'Values found for both of the '//
-     :                 'mutually exclusive POLPACK extension items '//
-     :                 'WPLATE and STOKES.', STATUS )
-      END IF
+*  Report an error if more than one found.
+      IF( STATUS .EQ. SAI__OK ) THEN
 
-*  First check intensity images (identified by having a WPLATE value and
-*  no STOKES value)...
-*  =======================================================================
-      IF( WTHERE ) THEN
-
-*  Check the WPLATE extension item.
-         CALL CMP_GET0C( LOC, 'WPLATE', WPLATE, STATUS )
-
-*  If the value is "45" or "0", use "45.0" and "0.0". The existing
-*  WPLATE component will not be long enough to hold the trailing ".0"
-*  so erase it and create a new, longer, WPLATE component.
-         IF( WPLATE .EQ. '0' ) THEN
-            CALL DAT_ERASE( LOC, 'WPLATE', STATUS )
-            CALL DAT_NEW0C( LOC, 'WPLATE', 3, STATUS ) 
-            CALL CMP_PUT0C( LOC, 'WPLATE', '0.0', STATUS ) 
-
-         ELSE IF( WPLATE .EQ. '45' ) THEN
-            CALL DAT_ERASE( LOC, 'WPLATE', STATUS )
-            CALL DAT_NEW0C( LOC, 'WPLATE', 4, STATUS ) 
-            CALL CMP_PUT0C( LOC, 'WPLATE', '45.0', STATUS ) 
-
-*  Report an error if the WPLATE extension item has an illegal value.
-         ELSE IF( WPLATE .NE. '0.0' .AND. WPLATE .NE. '45.0' .AND.
-     :            WPLATE .NE. '22.5' .AND. WPLATE .NE. '67.5' .AND.
-     :            STATUS .EQ. SAI__OK ) THEN
+         IF( WTHERE .AND. STHERE ) THEN
             STATUS = SAI__ERROR
-            CALL MSG_SETC( 'WP', WPLATE )
-            CALL ERR_REP( 'POLIMP_BADWPL', 'Extension item WPLATE has'//
-     :                    ' the illegal value ''^WP''.', STATUS )
+            CALL ERR_REP( 'POLIMP_STWPL', 'Values found for both of '//
+     :                    'the mutually exclusive POLPACK extension '//
+     :                    'items WPLATE and STOKES.', STATUS )
+
+         ELSE IF( WTHERE .AND. ATHERE ) THEN
+            STATUS = SAI__ERROR
+            CALL ERR_REP( 'POLIMP_STWPL', 'Values found for both of '//
+     :                    'the mutually exclusive POLPACK extension '//
+     :                    'items WPLATE and ANLANG.', STATUS )
+
+         ELSE IF( STHERE .AND. ATHERE ) THEN
+            STATUS = SAI__ERROR
+            CALL ERR_REP( 'POLIMP_STWPL', 'Values found for both of '//
+     :                    'the mutually exclusive POLPACK extension '//
+     :                    'items STOKES and ANLANG.', STATUS )
          END IF
+
+      END IF
+
+*  First check intensity images (identified by not having a STOKES value)...
+*  =======================================================================
+      IF( .NOT. STHERE ) THEN
 
 *  Get the value of the IMGID component, creating it with a blank value if  
 *  it does not currently exist in the extension.
@@ -275,12 +270,19 @@
             CALL CMP_GET0C( LOC, 'FILTER', FILTER, STATUS )
          END IF
 
-*  Append WPLATE to the FILTER value unless the FILTER value already
-*  contains the WPLATE string.
+*  Get the WPLATE or ANLANG value.
+         IF( WTHERE ) THEN
+            CALL CMP_GET0C( LOC, 'WPLATE', ANLID, STATUS )
+         ELSE
+            CALL CMP_GET0C( LOC, 'ANLANG', ANLID, STATUS )
+         END IF
+         
+*  Append WPLATE or ANLANG to the FILTER value unless the FILTER value 
+*  already contains the WPLATE or ANLANG string.
          IAT = CHR_LEN( FILTER )
-         IF( INDEX( FILTER, WPLATE ) .EQ. 0 ) THEN
+         IF( INDEX( FILTER, ANLID ) .EQ. 0 ) THEN
             CALL CHR_APPND( '_', FILTER, IAT )
-            CALL CHR_APPND( WPLATE, FILTER, IAT )
+            CALL CHR_APPND( ANLID, FILTER, IAT )
          END IF
 
 *  Store the new FILTER value.

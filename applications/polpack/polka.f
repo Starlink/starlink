@@ -434,7 +434,7 @@
       REAL
      :        PERCNT(2),         ! Display percentiles
      :        PERDEF(2),         ! Default display percentiles
-     :        WPLATE             ! Value of WPLATE extension component
+     :        ANG                ! Value of WPLATE or ANLANG extension item
 *.
 
 *  Check inherited global status.
@@ -533,7 +533,7 @@
      :                      .TRUE., MODE, STATUS )
 
 *  Check that all of the input object frames have POLPACK extensions 
-*  containing WPLATE values. Also check the image is 2d.
+*  containing WPLATE or ANLANG values. Also check the image is 2d.
             DO I = 1, SIZE
                CALL NDG_NDFAS( IGRP1, I, 'READ', INDF, STATUS )
 
@@ -547,18 +547,17 @@
      :                          'handle 2 dimensional images.', STATUS )
                END IF
 
-               WPLATE = VAL__BADR
-               CALL NDF_XGT0R( INDF, 'POLPACK', 'WPLATE', WPLATE,
-     :                         STATUS )            
-               IF( STATUS .EQ. SAI__OK .AND. 
-     :             WPLATE .NE. 0.0 .AND. WPLATE .NE. 22.5 .AND.
-     :             WPLATE .NE. 45.0 .AND. WPLATE .NE. 67.5 ) THEN
+               ANG = VAL__BADR
+               CALL NDF_XGT0R( INDF, 'POLPACK', 'WPLATE', ANG, STATUS )
+               CALL NDF_XGT0R( INDF, 'POLPACK', 'ANLANG', ANG, STATUS )
+
+               IF( STATUS .EQ. SAI__OK .AND. ANG .EQ. VAL__BADR ) THEN
                   STATUS = SAI__ERROR
                   CALL NDF_MSG( 'NDF', INDF )
                   CALL ERR_REP( 'POLKA_ERR3', 'POLKA: Unable to ' //
-     :                          'obtain a valid WPLATE value ' //
-     :                          'from the POLPACK extension of ' //
-     :                          '''^NDF''.', STATUS )
+     :                          'obtain either a WPLATE or ANLANG ' //
+     :                          'value from the POLPACK extension ' //
+     :                          'of ''^NDF''.', STATUS )
                END IF
                CALL NDF_ANNUL( INDF, STATUS )
             END DO

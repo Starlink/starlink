@@ -46,6 +46,8 @@
 *        global parameters used by CCDPACK.
 *     3-DEC-1997 (DSB):
 *        CCDPACK version modified for use in POLPACK.
+*     12-FEB-1999 (DSB):
+*        Added ANLANG, T, EPS. WPLATE changed from _CHAR to _REAL.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -75,7 +77,7 @@
 
 *  Local Constants:
       INTEGER NCOMP              ! No. of recognised compoents
-      PARAMETER ( NCOMP = 6 )
+      PARAMETER ( NCOMP = 9 )
 
       INTEGER NMLEN              ! Length of each name string
       PARAMETER ( NMLEN = 15 )
@@ -92,14 +94,20 @@
      :             'FILTER',
      :             'RAY',
      :             'ANGROT',
-     :             'STOKES' /
+     :             'STOKES',
+     :             'ANLANG',
+     :             'T',
+     :             'EPS' /
 
-      DATA TYPES / '_CHAR',
+      DATA TYPES / '_REAL',
      :             '_CHAR',
      :             '_CHAR',
      :             '_CHAR',
      :             '_REAL',
-     :             '_CHAR'/
+     :             '_CHAR',
+     :             '_REAL',
+     :             '_REAL',
+     :             '_REAL' /
 
 *.
 

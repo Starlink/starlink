@@ -67,11 +67,14 @@
 *        POLEXP:
 *
 *              ANGROT?  PPCKANGR
+*              ANLANG?  PPCKANLA
+*              EPS?     PPCKEPS
 *              FILTER?  PPCKFILT
 *              IMGID?   PPCKIMID
-*              WPLATE?  PPCKWPLT
 *              RAY?     PPCKRAY
 *              STOKES?  PPCKSTOK
+*              T?       PPCKT
+*              WPLATE?  PPCKWPLT
 *
 *        See the topic "Table Format" for information on how to create 
 *        translation tables. [!]
