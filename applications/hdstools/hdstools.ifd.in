@@ -1,7 +1,7 @@
 package hdstools {
    version @PACKAGE_VERSION@
    prefix hdt
-   executable hdstools {
+   executable hdstools_mon {
       action hcopy {
 
          helplib {$HDSTOOLS_HELP}
