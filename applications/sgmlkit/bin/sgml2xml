@@ -26,19 +26,19 @@ $ident_string = 'Starlink SGML Kit, release ((PKG_VERS))';
 #
 #    <p>Notes:
 #    <ul>
-#    * No parsing of any declaration -- uses RCS only.
+#    <li> No parsing of any declaration -- uses RCS only.
 #
-#    * Limited error recovery (the input is supposed to be valid already),
+#    <li> Limited error recovery (the input is supposed to be valid already),
 #    so most errors are fatal.
 #
-#    * Only processes entity declarations in subset -- element
+#    <li> Only processes entity declarations in subset -- element
 #    declarations, etc, are discarded with warnings.
 #
-#    * No automatic rewriting of public identifiers -- if the input
+#    <li> No automatic rewriting of public identifiers -- if the input
 #    document is a valid instance of the given DTD, the output document
 #    will be, also.
 #
-#    * Generates system identifiers for external entities which have only
+#    <li> Generates system identifiers for external entities which have only
 #    public ones.  At present, this generates a reference to the
 #    catalogue server -- should it try to do a catalogue lookup and
 #    replace it by what it finds there?  That starts to get
@@ -46,9 +46,10 @@ $ident_string = 'Starlink SGML Kit, release ((PKG_VERS))';
 #    which either requires OpenSP, or that I resurrect my
 #    catalogue-parser.  XML's requirement for system identifiers is a pig.
 #
-#    * Entities which can't be easily translated are discarded with warnings.
+#    <li> Entities which can't be easily translated are discarded with
+#    warnings. 
 #
-#    * It's not clear what one should do with SUBDOC entities.  This
+#    <li> It's not clear what one should do with SUBDOC entities.  This
 #    translates them to <code>NDATA XML</> entities, and warns that it's done
 #    this, but the referenced document might well be SGML rather than
 #    XML.
@@ -63,27 +64,27 @@ $ident_string = 'Starlink SGML Kit, release ((PKG_VERS))';
 #  <diytopic>Options
 #    <dl>
 #
-#    --pubid public-identifier:
-#        Specify the public identifier which is to be used to identify
+#    <dt>--pubid public-identifier
+#        <dd>Specify the public identifier which is to be used to identify
 #        the DTD in the output XML file.  If not specified, the public
 #        identifier in the input file is reused, which will almost
 #        certainly be wrong, but should nonetheless give broadly sensible
 #        error messages when it's parsed, and do no harm if it's not.
 #
-#    --sysid system-identifier:
-#        Specify the system identifier which is to be used to identify
+#    <dt>--sysid system-identifier
+#        <dd>Specify the system identifier which is to be used to identify
 #        the DTD in the output XML file.  If not specified, either the
 #        input file's system identifier is reused, if one exists, or
 #        else the public identifier in the input file is converted to
 #        a system identifier, and that is used.
 #
-#    --declaration decl:
-#        The declaration which is appropriate to the input file.  Note
+#    <dt>--declaration decl
+#        <dd>The declaration which is appropriate to the input file.  Note
 #        that this is specified for the benefit of sx -- this script
 #        pays no attention to it.
 #
-#    --version:
-#        Print version information and exit.
+#    <dt>--version
+#        <dd>Print version information and exit.
 #    </dl>
 #
 #  <diytopic>Environment

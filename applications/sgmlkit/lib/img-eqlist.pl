@@ -46,9 +46,11 @@ $RCSID = '$Id$';
 #
 #  <diytopic>Options
 #     <dl>
-#     --imgformat (gif|png): specifies the format of the images to be
+#     <dt>--imgformat (gif|png)
+#       <dd>specifies the format of the images to be
 #       generated.  Must be an image type recognised by dvi2bitmap.
-#     --version: display the current version number and exit.
+#     <dt>--version
+#       <dd>display the current version number and exit.
 #     </dl>
 #
 #  <authorlist>

@@ -1018,7 +1018,7 @@ with a non-existent file.
   (let* (;(pubid (entity-public-id str))
 	 (fsi (if prepend-decl
 		  (string-append (entity-generated-system-id prepend-decl)
-				 (debug (entity-generated-system-id str)))
+				 (entity-generated-system-id str))
 		  (entity-generated-system-id str))))
     (if fsi
 	(document-element (sgml-parse fsi))

@@ -116,14 +116,19 @@ There will be a proper distribution before 1 June.
 <px>Modified documentation of the programcode upconverter to reflect new usage.
 </change>
 
-<change date='10-May-2000' versionid='v0-7-1' author=ng>
+<change date='10-May-2000' versionid='v0-6-2' author=ng>
 <px>Miscellaneous tweaks.
 
 <change date='1-JUN-2000' author=mbt>
 <px>Thoroughly revised documentation of upconverters.
 
-<change date='2-Jun-2000' versionid='v0-7-2' author=ng>
+<change date='2-Jun-2000' versionid='v0-6-3' author=ng>
 <px>Some restructuring.  Preparing for distribution
+
+<distribution string='DR-0.7" date='11-Jun-2000' author=ng versionid='v0-7'>
+<px>RCS $Id$
+<px>First real release to programmers not directly concerned with the
+SGML project.
 
 </history>
 
@@ -1808,7 +1813,7 @@ down-converter.  In other words: <em>Do Not Hack This!</em></p>
 
 
 <subsect id=str.span export>Output depending on media type
-<update versionid="v0-7-2">Added this section</px>
+<update versionid="v0-6-3">Added this section</px>
 
 <p>Includes
 <ref id='el.sun.span' >span</ref>.
@@ -2715,7 +2720,7 @@ collection=supportprogs id=sgml2hlp>sgml2hlp</coderef>.
 
 
 <subsect id=proc.sgml2xml export>Converting to XML
-<update versionid=v0-7-1>Added</update>
+<update versionid=v0-6-2>Added</update>
 
 <p>Converting a document to XML cannot always be done automatically,
 since there are some SGML constructs which do not map easily to XML
@@ -4025,9 +4030,9 @@ completely externally to the document in a command-line option to the
 parser.
 
 <sect id=appx.supportprogs export>Support utilities
-<update versionid=v0-7-1>Added codecollections for bin and lib
+<update versionid=v0-6-2>Added codecollections for bin and lib
 directory programs</update>
-<update versionid=v0-7-2>Moved to a section of their own</update>
+<update versionid=v0-6-3>Moved to a section of their own</update>
 
 <routinelist>
 <p>Here you can find documentation for the user tools which are
@@ -4083,7 +4088,7 @@ General DTD's documentation.
 <sect id=appx.system export>The Starlink SGML set for maintainers
 <update versionid="post-0.2">Very substantial additions -- this
 section was barely present before.</update>
-<update versionid='v0-7-2'>Relocated this section to end of
+<update versionid='v0-6-3'>Relocated this section to end of
 appendices.</update>
 
 

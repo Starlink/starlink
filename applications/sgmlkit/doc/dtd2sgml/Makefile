@@ -61,7 +61,7 @@ DECL=$(STARLINK_SGML_DIR)/dtd/xml.decl
 	SGML_SEARCH_PATH=$(DTDDIR) \
 	perl -I $(PERLSGML_DIR) dtd2sgml.pl $< >$@ 
 
-%.sgmltext: %.description %.dtdsummary
+%.sgmltext: %.description
 	jade -t sgml -d dtd2sgml.dsl $(DECL) $< >$@
 
 # Handy target for producing a skeleton description of a DTD, to
@@ -87,6 +87,18 @@ all:
 # do not rename!
 sgmltext.stamp: starlink-0.7.sgmltext programcode-0.7.sgmltext
 	touch sgmltext.stamp
+
+# Because the two .description files cross-refer to each other, source files
+# for both must be up-to-date before either can be processed.
+starlink-0.7.sgmltext: starlink-0.7.description \
+		starlink-0.7.dtdsummary \
+		programcode-0.7.description \
+		programcode-0.7.dtdsummary
+
+programcode-0.7.sgmltext: programcode-0.7.description \
+		programcode-0.7.dtdsummary \
+		starlink-0.7.description \
+		starlink-0.7.dtdsummary
 
 starlink-0.7.dtdsummary: $(DTDDIR)/starlink-everything.dtd \
 			$(DTDDIR)/starlink-0.7.dtd
