@@ -102,7 +102,8 @@
 
 *  Local Variables:
       LOGICAL                  ! True if :
-     :  AXLIN( NDF__MXDIM )    ! Axes are linear
+     :  AXLIN( NDF__MXDIM ),   ! Axes are linear
+     :  IDENTY                 ! Axes have unit scale and zero offset
 
       INTEGER
      :  AEL,                   ! Number of elements in an axis array
@@ -133,9 +134,11 @@
 
       CALL NDF_BOUND( NDF, NDIM, LBND, UBND, NDIMS, STATUS )
 
-*    Assume that the data co-ordinates are linear.
+*    Assume that the data co-ordinates are linear and all have the
+*    identity transformation, i.e. unit scale factor and zero offset.
 
       LINEAR = .TRUE.
+      IDENTY = .TRUE.
 
       IF ( '<T>' .EQ. 'D' ) THEN
          ATYPE = '_DOUBLE'
@@ -192,7 +195,7 @@
 *          Determine whether the two co-ordinate systems are
 *          identical.
 
-            LINEAR = LINEAR .AND. .NOT. (
+            IDENTY = IDENTY .AND. .NOT. (
      :               ABS( SCALE( I ) - 1<CONST> ) .LT. VAL__EPS<T> .AND.
      :               ABS( OFFSET( I ) - 0<CONST> ) .LT. VAL__EPS<T> )
          END IF
@@ -202,5 +205,10 @@
          CALL NDF_AUNMP( NDF, 'Centre', I, STATUS )
 
       END DO
+
+*    If the linear axes have identical co-ordinate systems the returned
+*    flag is made false.
+
+      LINEAR = LINEAR .AND. .NOT. IDENTY
 
       END
