@@ -94,7 +94,7 @@ configured into the program at compile-time.  This script is any
 program which will search the filesystem and produce a single line on
 output, giving the full path to the specified font.  For example, this
 might be given as
-    --font-search=command="kpsewhich pk %f.%dpk"
+    \f(CR--font-search=command="kpsewhich pk %f.%dpk"\fP
 .br
 to run the
 .I kpsewhich
@@ -232,11 +232,7 @@ comma-separated sequence of page numbers and ranges (
 ); only
 those pages, and the pages falling in those ranges (inclusive of the
 end pages) are processed.  Any of these specifications may be prefixed
-by either
-.I "="
-or
-.I ":n:"
-In the former case, DVI page
+by either '\f(CR=\fP' or '\f(CR:n:\fP'.  In the former case, DVI page
 numbers are used rather than the TeX
 .I "\ecount0"
 register; in the latter case, the program examines the 
@@ -279,7 +275,7 @@ itself, prefixed by a `Q', the keyword and a space, so that, for
 example, each of the lines produced by the
 .I "--query=missing-fonts"
 option would start
-    Qmissing-fonts cmbx10 110 ...
+    \f(CRQmissing-fonts cmbx10 110 ...\fP
 .IP
 Some of these options (
 .I --query=missing-fonts
@@ -605,7 +601,7 @@ position in the file where this special appears, 2pt to the right,
 .IP
 A useful bit of TeX magic is:
   \f(CR{\ecatcode`p=12 \ecatcode`t=12 \egdef\eDB@PT#1pt{#1}}
-   \edef\eDBstrut{%
+   \egdef\eDBstrut{%
      \estrut\especial{dvi2bitmap strut 0 0 
        \eexpandafter\eDB@PT\ethe\eht\estrutbox
        \espace\eexpandafter\eDB@PT\ethe\edp\estrutbox}}\fP
@@ -655,12 +651,12 @@ You may use
 center ;
 c	l .
 Code	Substitution
-%M	mode (eg. ibmvga)
-%f	font name (eg. cmr10)
-%d	dpi (eg. 330)
-%b	base dpi (eg. 110)
-%m	magnification (eg. 3)
-%%	%
+\f(CR%M\fP	mode (eg. ibmvga)
+\f(CR%f\fP	font name (eg. cmr10)
+\f(CR%d\fP	dpi (eg. 330)
+\f(CR%b\fP	base dpi (eg. 110)
+\f(CR%m\fP	magnification (eg. 3)
+\f(CR%%\fP	%
 .TE
 Thus, using these values as an example, if one of the entries in
 .I DVI2BITMAP_PK_PATH
@@ -731,10 +727,10 @@ environment variable gives a colon-separated list of directories which
 are to be searched for PK files.  If the required font is not found in
 the directories specified in this list, then the kpathsea library is
 used, if support for that was available at compile-time.
-.PP
 This variable is overridden by the 
 .I "\--font-path"
-option.
+option.  Each of the entries in this path is a `font string
+template', as described above.
 .PP
 If the program was compiled with support for the kpathsea library,
 then it will use that library to find fonts.  If you did
@@ -745,7 +741,7 @@ additionally have to specify the
 environment variable:
 set it to the directory which contains the main TeX configuration
 file, which you can find using the command
-.I "kpsewhich cnf texmf.cnf"
+    \f(CRkpsewhich cnf texmf.cnf\fP
 .SH "SEE ALSO"
 DVItype and PKtoPX: Knuth programs intended as model DVI and PK file
 readers, and as containers for the canonical documentation of the DVI
