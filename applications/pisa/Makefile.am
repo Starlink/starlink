@@ -29,7 +29,8 @@ pisa_mon4_LDADD = $(LDADD) `$(srcdir)/pisa_link_adam`
 pisa_mon4_TASKS = pisafind4 pisafit4
 
 ##  Link the pisahelp program as an atask. 
-pisahelp_SOURCES = pisahelp.f $(HELPSRC)
+pisahelp_SOURCES = pisahelp.f
+pisahelp_LDADD = `kaplibs_link_adam`
 pisahelp_TASKS = 
 
 
@@ -46,12 +47,9 @@ SUBSRC = addmod.f func.f analys.f anoise.f checkp.f dchole.f \
          phopt24.f psa1_clwo4.f psa1_ndfin4.f super4.f featur4.f \
          phopt4.f  psa1_exss4.f sorti34.f median4.f psa1_iminv.f \
          sortin4.f pqsort4.f psa1_ccatf.f psa1_ccats.f psa1_ccatp.f \
-         dchole4.f psa1_fitfn.f \
-         pda_qsiar.f pda_rinpi.f pda_drnor.f
+         dchole4.f psa1_fitfn.f pda_drnor.f
 
 PRIVATE_INCLUDES = PSA1_PAR hlpcmd.inc
-
-HELPSRC = gethlp.f gthlpi.f kpg1_scrsz.f pthlpo.f sread.f
 
 ##  The on-line help.
 HELP_SOURCES = pisahelp.hlp
