@@ -41,8 +41,8 @@
 *    Check status
       IF ( STATUS .NE. SAI__OK ) THEN
         BR_PSI = 0.0D0
-        END IF
-      RETURN
+        RETURN
+      END IF
 
       IF ( A .LT. 75.0 ) THEN
         BR_PSI = 3.0D0/(4.0D0*A)+BR_K1(A,STATUS)/BR_K0(A,STATUS)
