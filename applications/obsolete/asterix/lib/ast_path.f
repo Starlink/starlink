@@ -4,7 +4,10 @@
 *  Creates a path name from an environment variable and relative path.
 *  It allows two possibilities for the environment variable - a default
 *  and an alternative.  The relative path may be blank.  There is also
-*  an overall default of AST_ETC
+*  an overall default of AST_ETC.  It allows for the possibility that
+*  the default has a relative added, but the alternative points directly
+*  to a file.  The special value of NULL for default suppresses use
+*  of this environment variable, but allows the alternative.
 *    History :
 *     27/2/98 : Original (RJV)
 *    Type definitions :
@@ -33,7 +36,11 @@
         IF (STATUS.NE.SAI__OK) THEN
           CALL ERR_ANNUL(STATUS)
 *  if not defined then try default location
-          CALL PSX_GETENV(DEF,BUFF,STATUS)
+          IF (DEF.EQ.'NULL'.OR.DEF.EQ.'null') THEN
+            BUFF=' '
+          ELSE
+            CALL PSX_GETENV(DEF,BUFF,STATUS)
+          ENDIF
           IF (STATUS.NE.SAI__OK) THEN
             CALL ERR_ANNUL(STATUS)
 *  still not found then try AST_ETC as catch-all
@@ -57,12 +64,16 @@
               PATH=BUFF
 
             ELSE
+              IF (L.EQ.0) THEN
+                PATH=REL
+              ELSE
 *  if we are appending then sort out slashes
-              IF (BUFF(L:L).NE.'/'.AND.REL(1:1).NE.'/') THEN
-                BUFF=BUFF(1:L)//'/'
-                L=L+1
+                IF (BUFF(L:L).NE.'/'.AND.REL(1:1).NE.'/') THEN
+                  BUFF=BUFF(1:L)//'/'
+                  L=L+1
+                ENDIF
+                PATH=BUFF(1:L)//REL
               ENDIF
-              PATH=BUFF(1:L)//REL
 
             ENDIF
 
