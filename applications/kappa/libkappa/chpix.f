@@ -402,8 +402,8 @@
 
 *  Cancel the previous values of NEWVAL and SECTION for the loop.
          ELSE IF ( LOOP .AND. STATUS .EQ. SAI__OK ) THEN
-             CALL NDG_CANCL( 'SECTION', STATUS )
-             CALL NDG_CANCL( 'NEWVAL', STATUS )
+             CALL PAR_CANCL( 'SECTION', STATUS )
+             CALL PAR_CANCL( 'NEWVAL', STATUS )
          END IF
 
 *  End of the do-while loop for the section.

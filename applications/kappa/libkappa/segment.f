@@ -830,7 +830,7 @@
 *  been supplied for the first polygon co-ordinate file.  If so, set a
 *  flag to suppress looping.
       IF ( MODE .EQ. 'FILE' ) THEN
-         CALL PAR_STATE( 'POLY1', PSTATE, STATUS )
+         CALL NDG_STATE( 'POLY1', PSTATE, STATUS )
          LOOP = PSTATE .NE. PAR__ACTIVE
 
       ELSE
@@ -951,7 +951,7 @@
 *  In no-prompt mode (i.e. when POLY1 is supplied on the command line)
 *  check when the next polygon is supplied there too.
          IF ( NPOLY .GT. 0 .AND. .NOT. LOOP ) THEN
-            CALL PAR_STATE( PNAME( :LPNAME ), PSTATE, STATUS )
+            CALL NDG_STATE( PNAME( :LPNAME ), PSTATE, STATUS )
             USE = PSTATE .EQ. PAR__ACTIVE
          END IF
 

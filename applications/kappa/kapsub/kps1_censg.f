@@ -749,7 +749,7 @@
 
 *  Otherwise, cancel the parameter value if we are not in cursor mode.
          ELSE IF( .NOT. CURSOR ) THEN
-            CALL NDG_CANCL( PARAM, STATUS )
+            CALL PAR_CANCL( PARAM, STATUS )
 
          END IF
 

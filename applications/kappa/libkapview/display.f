@@ -779,7 +779,7 @@
 *  only access the CENTRE parameter if a value was supplied on the command 
 *  line. Otherwise, just use the centre of the GRID frame as the centre for 
 *  the displayed image.
-      CALL PAR_STATE( 'CENTRE', STATE, STATUS )
+      CALL NDG_STATE( 'CENTRE', STATE, STATUS )
       IF( ( CC( 1 ) .NE. AST__BAD .AND. CC( 2 ) .NE. AST__BAD ) .OR.
      :    STATE .EQ. PAR__ACTIVE ) THEN
 

@@ -343,7 +343,7 @@
 
 *  See if a value has been assigned to the parameter INCAT on the command 
 *  line.
-      CALL PAR_STATE( 'INCAT', STATE, STATUS )
+      CALL NDG_STATE( 'INCAT', STATE, STATUS )
              
 *  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999

@@ -139,7 +139,7 @@
 
 *  If no value was supplied for parameter FRAME on the command line, 
 *  display the current co-ordinate Frame.
-      CALL PAR_STATE( 'FRAME', STATE, STATUS )
+      CALL NDG_STATE( 'FRAME', STATE, STATUS )
       IF( STATE .NE. PAR__ACTIVE ) THEN
          CALL MSG_BLANK( STATUS )
          CALL KPG1_DSFRM( IWCS, 'Current co-ordinate Frame:', STATUS )

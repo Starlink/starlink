@@ -930,7 +930,7 @@
 
 *          Cancel the line/column switch so that it can be reprompted.
 
-            CALL NDG_CANCL( 'LINCOL', STATUS )
+            CALL PAR_CANCL( 'LINCOL', STATUS )
 
 *          Abort if there is an error.  No need to call ERR_MARK and
 *          ERR_RLSE because the error can only have arisen in obtaining
@@ -1594,9 +1594,9 @@
             IF ( ENVIRO ) THEN
                IF ( REGION .OR. .NOT. LINE )
 
-     :           CALL NDG_CANCL( 'COLUMNS', STATUS )
+     :           CALL PAR_CANCL( 'COLUMNS', STATUS )
                IF ( REGION .OR. LINE )
-     :           CALL NDG_CANCL( 'LINES', STATUS )
+     :           CALL PAR_CANCL( 'LINES', STATUS )
             END IF
          END IF
 

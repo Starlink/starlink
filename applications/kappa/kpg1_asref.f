@@ -122,7 +122,7 @@
 *  a) command line, b) graphics database, c) prompting.
 
 *  See if the NDF is pre-supplied on the command line.
-      CALL PAR_STATE( PNNDF, STATE, STATUS )
+      CALL NDG_STATE( PNNDF, STATE, STATUS )
 
 *  Get an identifier to the input NDF if it has not already been
 *  obtained on the command line, using a supplied reference.  See if the

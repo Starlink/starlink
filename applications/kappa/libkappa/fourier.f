@@ -945,11 +945,11 @@
 *  Find which combination is specified on the command line.  We do not
 *  want to prompt unnecessarily.  The priority list is 1) HERMIN, 2)
 *  REALIN and/or IMAGIN, and 3) POWERIN and/or PHASEIN.
-         CALL PAR_STATE( 'HERMIN', ACTHER, STATUS )
-         CALL PAR_STATE( 'REALIN', ACTREA, STATUS )
-         CALL PAR_STATE( 'IMAGIN', ACTIMA, STATUS )
-         CALL PAR_STATE( 'POWERIN', ACTPOW, STATUS )
-         CALL PAR_STATE( 'PHASEIN', ACTPHA, STATUS )
+         CALL NDG_STATE( 'HERMIN', ACTHER, STATUS )
+         CALL NDG_STATE( 'REALIN', ACTREA, STATUS )
+         CALL NDG_STATE( 'IMAGIN', ACTIMA, STATUS )
+         CALL NDG_STATE( 'POWERIN', ACTPOW, STATUS )
+         CALL NDG_STATE( 'PHASEIN', ACTPHA, STATUS )
 
 *  Access the Hermitian NDF, if needed.
 *  ====================================

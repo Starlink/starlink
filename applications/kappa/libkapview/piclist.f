@@ -215,7 +215,7 @@
 *  Determine if the PICNUM parameter was specified on the command line.
 *  If it is not active, it has not been supplied.  Set the flag to
 *  decide whether of not to report the list.
-      CALL PAR_STATE( 'PICNUM', STATE, STATUS )
+      CALL NDG_STATE( 'PICNUM', STATE, STATUS )
       REPORT = STATE .NE. PAR__ACTIVE
 
       IF ( STATUS .NE. SAI__OK ) GOTO 999

@@ -1146,7 +1146,7 @@
 
 *    Cancel the parameter as we may loop.
 
-      CALL NDG_CANCL( 'OPTION', STATUS )
+      CALL PAR_CANCL( 'OPTION', STATUS )
 
 *    Clear the graphics devices.
 *    ===========================
@@ -1184,7 +1184,7 @@
          IF ( OPTION(1:2) .EQ. 'HI' .OR. OPTION(1:2) .EQ. 'SL' ) THEN
             CALL PAR_GTD0L( 'PLOTSTYLE', .TRUE., .TRUE., PLTSTY,
      :                      STATUS )
-            CALL NDG_CANCL( 'PLOTSTYLE', STATUS )
+            CALL PAR_CANCL( 'PLOTSTYLE', STATUS )
 
 *          Get the plot annotations.
 
@@ -1256,9 +1256,9 @@
 
 *             Cancel parameters in the loop.
 
-               CALL NDG_CANCL( 'PLTITL', STATUS )
-               CALL NDG_CANCL( 'ABSLAB', STATUS )
-               CALL NDG_CANCL( 'ORDLAB', STATUS )
+               CALL PAR_CANCL( 'PLTITL', STATUS )
+               CALL PAR_CANCL( 'ABSLAB', STATUS )
+               CALL PAR_CANCL( 'ORDLAB', STATUS )
 
 *          End of check for plotting style to be changed.
 
@@ -1309,8 +1309,8 @@
                   CALL PAR_GDR1R( 'MAJTIC', 2, TICDEF, -1., VAL__MAXR,
      :                            .FALSE., MAJTIC, STATUS )
 
-                  CALL NDG_CANCL( 'MINTIC', STATUS )
-                  CALL NDG_CANCL( 'MAJTIC', STATUS )
+                  CALL PAR_CANCL( 'MINTIC', STATUS )
+                  CALL PAR_CANCL( 'MAJTIC', STATUS )
                END IF
 
 *             Are the tick marks on the outside of the axes?
@@ -1337,11 +1337,11 @@
 
 *             Cancel the parameters in the loop.
 
-               CALL NDG_CANCL( 'XLOG', STATUS )
-               CALL NDG_CANCL( 'YLOG', STATUS )
-               CALL NDG_CANCL( 'OUTTIC', STATUS )
-               CALL NDG_CANCL( 'THICK', STATUS )
-               CALL NDG_CANCL( 'FONT', STATUS )
+               CALL PAR_CANCL( 'XLOG', STATUS )
+               CALL PAR_CANCL( 'YLOG', STATUS )
+               CALL PAR_CANCL( 'OUTTIC', STATUS )
+               CALL PAR_CANCL( 'THICK', STATUS )
+               CALL PAR_CANCL( 'FONT', STATUS )
 
 *             Report context of an error
 
@@ -1419,8 +1419,8 @@
 
 *       Cancel the output parameters to enable a further region to be
 *       saved.
-         CALL NDG_CANCL( 'TITLE', STATUS )
-         CALL NDG_CANCL( 'OUT', STATUS )
+         CALL PAR_CANCL( 'TITLE', STATUS )
+         CALL PAR_CANCL( 'OUT', STATUS )
 
 *    DEVICE option.
 *    ==============
@@ -1569,7 +1569,7 @@
 
 *       Cancel the parameter as we are in a loop.
 
-         CALL NDG_CANCL( 'FILENAME', STATUS )
+         CALL PAR_CANCL( 'FILENAME', STATUS )
 
 *       Display and clear errors.
 
@@ -1718,7 +1718,7 @@
      :              DIMS( 2 ), %VAL( PNTRI( 1 ) ), XLOW, XHIGH, 
      :              YLOW, YHIGH, 'XYCONT', 'XYFILE', 'XYTITLE', STATUS )
 
-         CALL NDG_CANCL( 'XYFILE', STATUS )
+         CALL PAR_CANCL( 'XYFILE', STATUS )
 
 *    EXIT option.
 *    ============

@@ -379,7 +379,7 @@
 *  Obtain the range of values first; later get the number of bins.
 *  Only compute the extreme values and report them when parameter RANGE
 *  is not specified on the command line.
-      CALL PAR_STATE( 'RANGE', ACTRNG, STATUS )
+      CALL NDG_STATE( 'RANGE', ACTRNG, STATUS )
       COMEXT = ACTRNG .NE. PAR__ACTIVE
 
 *  We need to find the minimum and maximum to assist the user.  This

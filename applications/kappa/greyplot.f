@@ -1549,8 +1549,8 @@
 *       found, to avoid finding the maximum and minimum values when
 *       they are not required.
 
-         CALL PAR_STATE( 'BLACK', ACTBLA, STATUS )
-         CALL PAR_STATE( 'WHITE', ACTWHI, STATUS )
+         CALL NDG_STATE( 'BLACK', ACTBLA, STATUS )
+         CALL NDG_STATE( 'WHITE', ACTWHI, STATUS )
          FNDRNG = ACTBLA .EQ. SUBPAR__ACTIVE .AND.
      :            ACTWHI .EQ. SUBPAR__ACTIVE
 
