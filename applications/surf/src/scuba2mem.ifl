@@ -13,6 +13,8 @@
 #  History:
 #     1998 Jan 8 (TIMJ)
 #        Original Version
+#     1999 Jul 13 (TIMJ)
+#        Add LONG, LAT
 #     {enter_further_changes_here}
  
 #-
@@ -28,6 +30,18 @@ INTERFACE SCUBA2MEM
          VPATH    'PROMPT'
          PPATH    'CURRENT'
          HELPKEY  '*'
+      ENDPARAMETER
+
+    PARAMETER LONG
+         TYPE    '_CHAR'
+         PROMPT  'Longitude of output map centre in hh (or dd) mm ss.ss format'
+	 HELPKEY  '*'
+      ENDPARAMETER
+
+      PARAMETER LAT
+         TYPE    '_CHAR'
+         PROMPT  'Latitude of output map centre in dd mm ss.ss format'
+	 HELPKEY  '*'
       ENDPARAMETER
  
       PARAMETER MSG_FILTER
