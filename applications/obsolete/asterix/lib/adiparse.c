@@ -1806,7 +1806,7 @@ ADItokenType ADInextToken( ADIobj stream, ADIstatus status )
 
     else if ( isdigit(ch) ) {
       str->ctok.ptr0 = str->dev->ptr - 1;
-      while( isalnum(ch) )
+      while( isalpha(ch) || isdigit(ch)  )
 	ch = ADIreadCharFromStream( str, status );
 
 /* Decimal point found */
