@@ -725,7 +725,8 @@
 
 
 *+  PSF_ANAL_PFL - Analytic psf energy profiling
-      SUBROUTINE PSF_ANAL_PFL( PSID, X0, Y0, NFRAC, FRAC, RADII, STATUS )
+      SUBROUTINE PSF_ANAL_PFL( PSID, X0, Y0, NFRAC, FRAC, RADII,
+     :                         STATUS )
 *
 *    Description :
 *
