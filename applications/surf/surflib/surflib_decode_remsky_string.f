@@ -70,6 +70,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.4  1997/11/10 21:21:40  timj
+*     Remove the SCRATCH variable from declaration list
+*
 *     Revision 1.3  1997/11/06 22:19:01  timj
 *     Add and subtract bolometers sequentially rather than at the end.
 *
@@ -134,7 +137,6 @@
       INTEGER RINGS(N_BPR,0:N_RINGS,N_SUBS)
                                       ! Bolometers in each ring and sub_inst
       INTEGER RNUM                    ! Ring number
-      INTEGER SCRATCH(MAX_N_BOLS)     ! Temporary bolometer list
       CHARACTER*(10) STEMP            ! Modified remsky string
       INTEGER SUB_INDEX               ! Index to specify sub instrument in RINGS
 
