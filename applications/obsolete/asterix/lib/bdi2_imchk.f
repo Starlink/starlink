@@ -103,7 +103,6 @@
 *  Local Variables:
       CHARACTER*20		ITEM
 
-      INTEGER			BCOL			! Binary table column
       INTEGER			IMHDU			! IMAGE hdu id
 
       LOGICAL			OK			! Object exists/ok?

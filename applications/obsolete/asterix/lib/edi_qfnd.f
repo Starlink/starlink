@@ -100,8 +100,6 @@
       INTEGER 			STATUS             	! Global status
 
 *  External References:
-      EXTERNAL			CHR_LEN
-        INTEGER			CHR_LEN
       EXTERNAL			CHR_SIMLR
         LOGICAL			CHR_SIMLR
 

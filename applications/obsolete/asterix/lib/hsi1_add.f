@@ -104,10 +104,6 @@
 *  Status:
       INTEGER 			STATUS             	! Global status
 
-*  External References:
-      EXTERNAL			CHR_LEN
-        INTEGER			CHR_LEN
-
 *  Local Constants:
       CHARACTER*8		UMODE
         PARAMETER		( UMODE = 'NORMAL' )

@@ -97,10 +97,6 @@
 *  Status:
       INTEGER 			STATUS             	! Global status
 
-*  External References:
-      EXTERNAL			CHR_LEN
-        INTEGER			CHR_LEN
-
 *  Local Variables:
       CHARACTER*20		ITEM
       CHARACTER*40		UNIT			! Unit string
