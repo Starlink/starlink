@@ -122,9 +122,7 @@
 *        The side of the square area to be used when forming the marginal 
 *        profiles for a star image, given as a number of pixels.  It should 
 *        be sufficiently large to contain the entire star image.  It should 
-*        be an odd number and must lie in the range from 3 to 101.  If an
-*        even value is given, the next largest odd number is used instead.
-*        [15]
+*        be an odd number and must lie in the range from 3 to 101.  [15]
 *     LOGFILE = FILENAME (Read)
 *        Text file to contain the table of parameters for each star.  A
 *        null (!) name indicates that no log file is required. [!]
