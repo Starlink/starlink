@@ -241,6 +241,9 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
+*     Revision 1.65  1999/06/25 05:59:36  timj
+*     Fix REFPIX bounds problem.
+*
 *     Revision 1.64  1999/06/18 03:20:24  timj
 *     Add missing parameters to docs
 *
@@ -1874,7 +1877,7 @@ c
             N_PIXELS = MAP_SIZE(1) * MAP_SIZE(2)
 
 *     Allow for the reference pixel to be redefined - this is required
-*     since sometimes the required size if equal to the actual size
+*     since sometimes the required size is equal to the actual size
 *     but we *want* the ref pixel to be in the middle of the map 
 *     (eg for scan map reduction) - provide the actual value as the
 *     default modified to the centre if the size was different
@@ -1885,10 +1888,21 @@ c
             LBND(1) = 1
             LBND(2) = 1
 
-*     Note that we use a different range for each value
+*     Set the default value and ask for the range
+*     Note that we do not constrain the allowed range since the
+*     reference pixel does not have to lie on the regridded image.
+            CALL PAR_DEF1I('REFPIX', 2, UBND, STATUS)
+            IF (STATUS .EQ. SAI__OK) THEN
+               CALL PAR_EXACI('REFPIX', 2, UBND, STATUS)
 
-            CALL PAR_GRM1I('REFPIX', 2, UBND, LBND, MAP_SIZE,
-     :           .TRUE., UBND, STATUS)
+*     Accept the defaults if PAR__NULL is returned
+               IF (STATUS .EQ. PAR__NULL) THEN
+                  UBND(1) = I_CENTRE
+                  UBND(2) = J_CENTRE
+                  CALL ERR_ANNUL(STATUS)
+               END IF
+
+            END IF
 
 *     Copy the result back to I, J
             I_CENTRE = UBND(1)
