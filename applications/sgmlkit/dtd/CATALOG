@@ -1,129 +1,160 @@
-	-- 
-	  catalog: SGML Open style entity catalogue for Starlink DTDs
-	  $Id$
+	-- catalog: SGML Open style entity catalogue for Starlink DTDs
 
-	  Keep the entries in this file normalised so that each entry
-	  is on a single line, the PUBLIC keyword at the beginning is
-	  in upper case, and the system id on those lines doesn't have
-	  quotes.  This is so that tools such as perlSGML, which have
-	  relatively simple catalogue parsers, don't get confused.
-	  The SYSTEM entry is an SP extension, and the SP
-	  documentation recommends that its sysid2 is quoted to avoid
-	  confusing tools which don't recognise it.
-	--
+	   $Id$
 
-SGMLDECL starlink.decl
+	   Keep the entries in this file normalised so that each entry
+	   is on a single line, the PUBLIC keyword at the beginning is
+	   in upper case, and the system id on those lines doesn't have
+	   quotes.  This is so that tools such as perlSGML, which have
+	   relatively simple catalogue parsers, don't get confused.
+	   The SYSTEM entry is an SP extension, and the SP
+	   documentation recommends that its sysid2 is quoted to avoid
+	   confusing tools which don't recognise it.
 
-	-- Remap the system entity html-parameters to the default location  --
-	-- of the DSSSL file.  If a user wants to override this DSSSL file, --
-	-- they can do so, and put a catalogue earlier in the path which    --
-	-- replaces this definition					    --
+	   For details of the catalog format, see James Clark's notes
+	   at <http://www.jclark.com/sp/catalog.htm>, or OASIS
+	   Technical Resolution 9401:1997, at
+	   <http://www.oasis-open.org/html/a401.htm>.
+	   --
+
+	-- The Starlink DTDs use the SGML declaration contained in the
+	   s.o.i. starlink.decl.  Don't, however, declare the use of
+	   this declaration here using an SGMLDECL declaration.  Since
+	   the declaration now includes NAMECASE GENERAL NO, it
+	   comprehensively messes up the parsing of the various
+	   non-Starlink DTDs (particularly the DSSSL architecture).
+	   My understanding of the OASIS TR above suggests that the
+	   first SGMLDECL entry in the whole catalog governs all the
+	   DTDs mentioned.
+	   --
+--SGMLDECL starlink.decl--
+
+	-- Remap the system entity html-parameters to the default location 
+	   of the DSSSL file.  If a user wants to override this DSSSL file,
+	   they can do so, and put a catalogue earlier in the path which
+	   replaces this definition.
+	   --
 SYSTEM "sl-html-parameters"	"../dsssl/sl/html/slparams.dsl"
 SYSTEM "sl-latex-parameters"	"../dsssl/sl/latex/slparams.dsl"
 
 	-- listed most general to most specific --
 
-	-- Starlink General is to be used _only_ by reference		--
-	-- from within one of the other DTDs				--
+	-- Starlink General is to be used _only_ by reference
+	   from within one of the other DTDs.
+	   --
 -- require a version number
-PUBLIC "-//Starlink//DTD Starlink General//EN"		starlink-0.5.dtd
+PUBLIC "-//Starlink//DTD Starlink General//EN"		starlink-0.6.dtd
 --
+PUBLIC "-//Starlink//DTD Starlink General 0.6//EN"	starlink-0.6.dtd
 PUBLIC "-//Starlink//DTD Starlink General 0.5//EN"	starlink-0.5.dtd
 PUBLIC "-//Starlink//DTD Starlink General 0.4//EN"	starlink-0.4.dtd
 PUBLIC "-//Starlink//DTD Starlink General 0.3//EN"	starlink-0.3.dtd
 PUBLIC "-//Starlink//DTD Starlink General 0.2//EN"	starlink-0.2.dtd
 PUBLIC "-//Starlink//DTD Starlink General 0.1//EN"	starlink-0.1.dtd
 
-PUBLIC "-//Starlink//DTD Starlink SUG//EN"		sug-0.5.dtd
+PUBLIC "-//Starlink//DTD Starlink SUG//EN"		sug-0.6.dtd
+PUBLIC "-//Starlink//DTD Starlink SUG 0.6//EN"		sug-0.6.dtd
 PUBLIC "-//Starlink//DTD Starlink SUG 0.5//EN"		sug-0.5.dtd
 PUBLIC "-//Starlink//DTD Starlink SUG 0.4//EN"		sug-0.4.dtd
 PUBLIC "-//Starlink//DTD Starlink SUG 0.3//EN"		sug-0.3.dtd
 PUBLIC "-//Starlink//DTD Starlink SUG 0.2//EN"		sug-0.2.dtd
 
-PUBLIC "-//Starlink//DTD Starlink SUN//EN"		sun-0.5.dtd
+PUBLIC "-//Starlink//DTD Starlink SUN//EN"		sun-0.6.dtd
+PUBLIC "-//Starlink//DTD Starlink SUN 0.6//EN"		sun-0.6.dtd
 PUBLIC "-//Starlink//DTD Starlink SUN 0.5//EN"		sun-0.5.dtd
 PUBLIC "-//Starlink//DTD Starlink SUN 0.4//EN"		sun-0.4.dtd
 PUBLIC "-//Starlink//DTD Starlink SUN 0.3//EN"		sun-0.3.dtd
 PUBLIC "-//Starlink//DTD Starlink SUN 0.2//EN"		sun-0.2.dtd
 PUBLIC "-//Starlink//DTD Starlink SUN 0.1//EN"		sun-0.1.dtd
 
-PUBLIC "-//Starlink//DTD Starlink SSN//EN"		ssn-0.5.dtd
+PUBLIC "-//Starlink//DTD Starlink SSN//EN"		ssn-0.6.dtd
+PUBLIC "-//Starlink//DTD Starlink SSN 0.6//EN"		ssn-0.6.dtd
 PUBLIC "-//Starlink//DTD Starlink SSN 0.5//EN"		ssn-0.5.dtd
 PUBLIC "-//Starlink//DTD Starlink SSN 0.4//EN"		ssn-0.4.dtd
 PUBLIC "-//Starlink//DTD Starlink SSN 0.3//EN"		ssn-0.3.dtd
 PUBLIC "-//Starlink//DTD Starlink SSN 0.2//EN"		ssn-0.2.dtd
 PUBLIC "-//Starlink//DTD Starlink SSN 0.1//EN"		ssn-0.1.dtd
 
-PUBLIC "-//Starlink//DTD Starlink SGP//EN"		sgp-0.5.dtd
+PUBLIC "-//Starlink//DTD Starlink SGP//EN"		sgp-0.6.dtd
+PUBLIC "-//Starlink//DTD Starlink SGP 0.6//EN"		sgp-0.6.dtd
 PUBLIC "-//Starlink//DTD Starlink SGP 0.5//EN"		sgp-0.5.dtd
 PUBLIC "-//Starlink//DTD Starlink SGP 0.4//EN"		sgp-0.4.dtd
 PUBLIC "-//Starlink//DTD Starlink SGP 0.3//EN"		sgp-0.3.dtd
 PUBLIC "-//Starlink//DTD Starlink SGP 0.2//EN"		sgp-0.2.dtd
 
-PUBLIC "-//Starlink//DTD Starlink SC//EN"		sc-0.5.dtd
+PUBLIC "-//Starlink//DTD Starlink SC//EN"		sc-0.6.dtd
+PUBLIC "-//Starlink//DTD Starlink SC 0.6//EN"		sc-0.6.dtd
 PUBLIC "-//Starlink//DTD Starlink SC 0.5//EN"		sc-0.5.dtd
 PUBLIC "-//Starlink//DTD Starlink SC 0.4//EN"		sc-0.4.dtd
 PUBLIC "-//Starlink//DTD Starlink SC 0.3//EN"		sc-0.3.dtd
 PUBLIC "-//Starlink//DTD Starlink SC 0.2//EN"		sc-0.2.dtd
 
-PUBLIC "-//Starlink//DTD Starlink SG//EN"		sg-0.5.dtd
+PUBLIC "-//Starlink//DTD Starlink SG//EN"		sg-0.6.dtd
+PUBLIC "-//Starlink//DTD Starlink SG 0.6//EN"		sg-0.6.dtd
 PUBLIC "-//Starlink//DTD Starlink SG 0.5//EN"		sg-0.5.dtd
 PUBLIC "-//Starlink//DTD Starlink SG 0.4//EN"		sg-0.4.dtd
 PUBLIC "-//Starlink//DTD Starlink SG 0.3//EN"		sg-0.3.dtd
 PUBLIC "-//Starlink//DTD Starlink SG 0.2//EN"		sg-0.2.dtd
 
-PUBLIC "-//Starlink//DTD Starlink MUD//EN"		mud-0.5.dtd
+PUBLIC "-//Starlink//DTD Starlink MUD//EN"		mud-0.6.dtd
+PUBLIC "-//Starlink//DTD Starlink MUD 0.6//EN"		mud-0.6.dtd
 PUBLIC "-//Starlink//DTD Starlink MUD 0.5//EN"		mud-0.5.dtd
 PUBLIC "-//Starlink//DTD Starlink MUD 0.4//EN"		mud-0.4.dtd
 PUBLIC "-//Starlink//DTD Starlink MUD 0.3//EN"		mud-0.3.dtd
 PUBLIC "-//Starlink//DTD Starlink MUD 0.2//EN"		mud-0.2.dtd
 PUBLIC "-//Starlink//DTD Starlink MUD 0.1//EN"		mud-0.1.dtd
 
+PUBLIC "-//Starlink//DTD Document Summary 0.6//EN"	summary-0.6.dtd
 PUBLIC "-//Starlink//DTD Document Summary 0.5//EN"	summary-0.5.dtd
 PUBLIC "-//Starlink//DTD Document Summary 0.2//EN"	summary-0.2.dtd
 PUBLIC "-//Starlink//DTD Document Summary 0.1//EN"	summary-0.1.dtd
 
+PUBLIC "-//Starlink//ELEMENTS Starlink Paragraph Elements 0.6//EN"	paracontent-0.6.dtd
 PUBLIC "-//Starlink//ELEMENTS Starlink Paragraph Elements 0.5//EN"	paracontent-0.5.dtd
 
-	-- The part of the DTD dealing with the notation declarations	--
-	-- is broken off into a separate entity.  See the main DTD	--
-	-- for discussion						--
+	-- The part of the DTD dealing with the notation declarations
+	   is broken off into a separate entity.  See the main DTD
+	   for discussion.
+	   --
 PUBLIC "-//Starlink//ELEMENTS Starlink Notation Declarations//EN"	notations.text
 
 	-- Program source code DTDs --
 
 -- require a version number
-PUBLIC "-//Starlink//DTD Program Source Code//EN"	programcode-0.5.dtd
+PUBLIC "-//Starlink//DTD Program Source Code//EN"	programcode-0.6.dtd
 --
+PUBLIC "-//Starlink//DTD Program Source Code 0.6//EN"	programcode-0.6.dtd
 PUBLIC "-//Starlink//DTD Program Source Code 0.5//EN"	programcode-0.5.dtd
 PUBLIC "-//Starlink//DTD Program Source Code 0.3//EN"	programcode-0.3.dtd
 PUBLIC "-//Starlink//DTD Program Source Code 0.2//EN"	programcode-0.2.dtd
 PUBLIC "-//Starlink//DTD Program Source Code 0.1//EN"	programcode-0.1.dtd
 
-PUBLIC "-//Starlink//DTD Fortran Source Code//EN"	fortrancode-0.5.dtd
+PUBLIC "-//Starlink//DTD Fortran Source Code//EN"	fortrancode-0.6.dtd
+PUBLIC "-//Starlink//DTD Fortran Source Code 0.6//EN"	fortrancode-0.6.dtd
 PUBLIC "-//Starlink//DTD Fortran Source Code 0.5//EN"	fortrancode-0.5.dtd
 PUBLIC "-//Starlink//DTD Fortran Source Code 0.3//EN"	fortrancode-0.3.dtd
 PUBLIC "-//Starlink//DTD Fortran Source Code 0.2//EN"	fortrancode-0.2.dtd
 PUBLIC "-//Starlink//DTD Fortran Source Code 0.1//EN"	fortrancode-0.1.dtd
 
-PUBLIC "-//Starlink//DTD DSSSL Source Code//EN"		dssslcode-0.5.dtd
+PUBLIC "-//Starlink//DTD DSSSL Source Code//EN"		dssslcode-0.6.dtd
+PUBLIC "-//Starlink//DTD DSSSL Source Code 0.6//EN"	dssslcode-0.6.dtd
 PUBLIC "-//Starlink//DTD DSSSL Source Code 0.5//EN"	dssslcode-0.5.dtd
 PUBLIC "-//Starlink//DTD DSSSL Source Code 0.3//EN"	dssslcode-0.3.dtd
 PUBLIC "-//Starlink//DTD DSSSL Source Code 0.2//EN"	dssslcode-0.2.dtd
 
-	-- The following DTDs are used only internally to the --
-	-- SGML application, so they shouldn't have public identifiers --
+	-- The following DTDs are used only internally to the SGML
+	   application, so they shouldn't have public identifiers.
+	   --
 --
 PUBLIC "-//Starlink//DTD tth equation list//EN"		tth-equations.dtd
 --
 SYSTEM "tth-equation-list"				"tth-equations.dtd"
 SYSTEM "img-eqlist"					"img-eqlist.dtd"
 
-	-- 
-	  OASIS exchange table model.
-	  See http://www.oasis-open.org/html/a503.htm
-	  and http://www.oasis-open.org/html/publtext.htm
-	--
+	-- OASIS exchange table model.
+	   See http://www.oasis-open.org/html/a503.htm
+	   and http://www.oasis-open.org/html/publtext.htm
+	   --
 PUBLIC "-//OASIS//DTD Exchange Table Model 19960430//EN"	oasis-exchange-table.dtd
 
 	-- ISO latin 1 entity set for HTML and LaTeX -- 
@@ -141,31 +172,31 @@ PUBLIC "-//James Clark//DTD DSSSL Flow Object Tree//EN" dsssl/fot.dtd
 PUBLIC "ISO/IEC 10179:1996//DTD DSSSL Architecture//EN" dsssl/dsssl.dtd
 PUBLIC "-//James Clark//DTD DSSSL Style Sheet//EN" 	dsssl/style-sheet.dtd
 
---
-  Catalog entry for HyTime meta-DTD
-  from the HyTime source distribution at http://www.ornl.gov/sgml/wg4/
+	-- Catalog entry for HyTime meta-DTD
+	   from the HyTime source distribution at http://www.ornl.gov/sgml/wg4/
 
-  Note that the HyTime DTD I use here is that obtained from WG4, with
-  the addition of a COM token which seemed to be missing, and the
-  declaration of a REFSUB attribute to the hylink AF, which I _think_
-  is missing, too, and without which, REFSUB isn't declared anywhere,
-  and the declaration of clink fails with an error.
+	   Note that the HyTime DTD I use here is that obtained from WG4, with
+	   the addition of a COM token which seemed to be missing, and the
+	   declaration of a REFSUB attribute to the hylink AF, which I _think_
+	   is missing, too, and without which, REFSUB isn't declared
+	   anywhere, and the declaration of clink fails with an error.
 
-  As explained by Eliot Kimber, in a posting
-  <35EEA7F8.8D04857A@isogen.com> on comp.text.sgml, because REFSUB is
-  remapped to LINKEND, there's no actual need for the REFSUB attribute
-  at all.  However, SP's architectural processor still wants it.  I'm
-  not sure what's the best way to get round this, short of fiddling
-  with the HyTime DTD (which is what I've still done).
---
+	   As explained by Eliot Kimber, in a posting
+	   <35EEA7F8.8D04857A@isogen.com> on comp.text.sgml, because REFSUB is
+	   remapped to LINKEND, there's no actual need for the REFSUB attribute
+	   at all.  However, SP's architectural processor still wants it.  I'm
+	   not sure what's the best way to get round this, short of fiddling
+	   with the HyTime DTD (which is what I've still done).
+	   --
 PUBLIC	"ISO/IEC 10744:1997//DTD AFDR Meta-DTD Hypermedia/Time-based Structuring Language (HyTime)//EN"		hytime/hi2mdhyt.sgm-mod
 PUBLIC	"ISO/IEC 10744:1997//DTD AFDR Meta-DTD Property Set//EN"	hytime/hi2mdps.sgm
 PUBLIC	"ISO/IEC 10744:1997//DTD AFDR Meta-DTD General Architecture//EN" hytime/hi2mdga.sgm
 PUBLIC	"ISO/IEC 10744:1997//NONSGML LEXTYPES HyTime Lexical Types//EN"	hytime/hytime-lextypes.sgm
-	-- The following is *not* the public identifier suggested in --
-	-- the file (the one above is).  However, the HyTime meta-DTD --
-	-- appears to want this file, but refers to it by this --
-	-- following entity name.  So add it, and hope for the best! --
+	-- The following is *not* the public identifier suggested in
+	   the file (the one above is).  However, the HyTime meta-DTD
+	   appears to want this file, but refers to it by this
+	   following entity name.  So add it, and hope for the best!
+	   --
 PUBLIC	"ISO/IEC 10744:1997//NONSGML LTDR LEXTYPES HyTime Lexical Types//EN" hytime/hytime-lextypes.sgm
 PUBLIC	"ISO/IEC 10744:1997//NONSGML LTDR LEXTYPES SGML Lexical Types//EN" hytime/sgml-lextypes.sgm
 
