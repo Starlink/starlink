@@ -106,26 +106,6 @@
 
 *  Arguments Returned:
       INTEGER 			STATUS             	! Global status
-
-*  External References:
-      [external_declaration]
-      {data_type} {external_name} ! [external_description]
-
-*  Local Constants:
-      {data_type} {constant_name} ! [constant_description]
-      PARAMETER ( {constant_name} = {cons} )
-
-*  Local Variables:
-      {data_type} {name}[dimensions] ! [local_variable_description]
-
-*  Internal References:
-      {data_type} {internal_name} ! [internal_description]
-      [internal_definition_statement]...
-
-*  Local Data:
-      DATA {data_elm} / {data_values}... /
-      [data_stmt]...
-
 *.
 
 *  Check inherited global status.
