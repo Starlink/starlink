@@ -44,6 +44,9 @@
 *        Added POLSIM.
 *     8-JUN-1999 (DSB):
 *        Added POLSTACK.
+*     20-SEP-2000 (DSB):
+*        Set CAT tuning parameter QUIET to YES to suppress warnings about 
+*        blank format strings.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -76,6 +79,9 @@
 *  Free up any compiled expressions currently in use by CAT. This should
 *  be done by CAT itself, but it can't (at the moment).
       CALL ANT_XINIT( STATUS )
+
+*  Stop CAT from complaining about blank format strings.
+      CALL CAT_TUNES( 'QUIET', 'YES', STATUS )
 
 *  Obtain the action name.
       CALL TASK_GET_NAME( NAME, STATUS )      

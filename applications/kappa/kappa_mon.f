@@ -88,7 +88,10 @@
 
 *  Identify and execute the task.
 *  ==============================
-*
+
+*  Make CAT run in quiet mode.
+      CALL CAT_TUNES( 'QUIET', 'YES', STATUS )
+
 *  Define the current application name for history. The package version
 *  number gets substituted in here when the KAPPA release source tar file 
 *  is contructed.
