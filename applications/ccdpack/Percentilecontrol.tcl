@@ -78,9 +78,11 @@
                itk_component add percentiledialog {
                   vectordialog $itk_interior.percdialog 2 \
                      -modality application \
+                     -master $itk_interior \
                      -from { 0 0 } \
                      -to { 100 100 } \
                      -label { "Lower percentile" "Upper percentile" }
+                     
                }
                $itk_component(percentiledialog) buttonconfigure Apply \
                    -command [ code "$this configure -value \
@@ -196,6 +198,7 @@
             configure -value $val
          } else {
             $itk_component(percentiledialog) setvec $value
+            $itk_component(percentiledialog) center $itk_interior
             configure -value [ $itk_component(percentiledialog) activate ]
          }
          $omenubut configure -text "[ lindex $value 1 ]%"

@@ -53,6 +53,7 @@
          set waitwin $itk_interior
          wm withdraw $waitwin
          set master [ winfo parent $itk_interior ]
+         $waitwin configure -title "Busy"
 
 #  Pack it with content.
          itk_component add messframe {
@@ -102,6 +103,7 @@
          }
 
 #  Arrange that the window is never eclipsed by its master.
+         wm transient $waitwin $master
          bind $waitwin <Visibility> [ code raise $waitwin $master ]
 
 #  Map the window and grab pointer events.
