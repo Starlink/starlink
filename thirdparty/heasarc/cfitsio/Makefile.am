@@ -15,7 +15,7 @@ include_HEADERS = \
     cfitsio/fitsio2.h \
     cfitsio/drvrsmem.h
 
-EXAMPLE_SOURCES = cookbook.c cookbook.f
+EXAMPLE_SOURCES = cfitsio/cookbook.c cfitsio/cookbook.f
 
 # Put examples in dist_pkgdata
 dist_pkgdata_DATA = $(EXAMPLE_SOURCES) cfitsio_changes.txt CFITSIO_CONDITIONS\
