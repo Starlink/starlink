@@ -32,9 +32,9 @@ proc red4EditMask {taskname qval} {
     set bot [frame $frame.bot]
     pack $top $bot -in $frame -side top -expand yes -fill both
 
-    set Red$Widgets(EM_LAB01) [label $top.l1 -text "Mask"]
+    set Red4Widgets(EM_LAB01) [label $top.l1 -text "Mask"]
     set Red4Widgets(EM_ENT01) [entry $top.e1 -width 60]
-    pack $Red$Widgets(EM_LAB01) $Red4Widgets(EM_ENT01) -in $top -side left
+    pack $Red4Widgets(EM_LAB01) $Red4Widgets(EM_ENT01) -in $top -side left
     if {[info exists Cred4NoticeBoard]==1} {
       $Red4Widgets(EM_ENT01) insert end [string trim [nbs get ${Cred4NoticeBoard}.miscellaneous.mask]]
     } else {

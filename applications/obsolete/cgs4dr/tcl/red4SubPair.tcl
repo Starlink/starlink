@@ -71,7 +71,7 @@ proc red4SubPair {taskname pair} {
         if {$pair==1} {
           $taskname obey remove_obs "obsfile=$obj" -inform "cgs4drInform $taskname %V"
         } elseif {$pair==2} {
-          $taskname obey remove_pair "objectobse=$obj skyobs=$sky" -inform "cgs4drInform $taskname %V"
+          $taskname obey remove_pair "objectobs=$obj skyobs=$sky" -inform "cgs4drInform $taskname %V"
         }
       }
     }

@@ -67,7 +67,7 @@ proc red4Stats {taskname} {
     $Red4Widgets(GS_ENT05) insert end 1
     $Red4Widgets(GS_ENT06) insert end 256
     $Red4Widgets(GS_ENT07) insert end 1
-    pack $isl $Red4Widgets(GS_ENT02) $iel $Red4Widgets(GS_ENT03) $itl $Red4Widgets(GS_ENT04) $jsl $jRed4Widgets(GS_ENT05) \
+    pack $isl $Red4Widgets(GS_ENT02) $iel $Red4Widgets(GS_ENT03) $itl $Red4Widgets(GS_ENT04) $jsl $Red4Widgets(GS_ENT05) \
       $jel $Red4Widgets(GS_ENT06) $jtl $Red4Widgets(GS_ENT07) -side left -padx 2m
     set Red4Widgets(GS_WHOLE) 1
     trace variable Red4Widgets(GS_WHOLE) w "RedFlipOut $limits1"
@@ -112,13 +112,7 @@ proc red4Stats {taskname} {
 
 # Do the stats
         set Red4Widgets(RO) $obs
-        if {$Red4Widgets(GS_AUTOSCALE) == 1} {
-          set high 00.0
-          set low 0.0
-        } else {
-          set high [string trim [$Red4Widgets(GS_ENT08) get]]
-          set low [string trim [$Red4Widgets(GS_ENT09) get]]
-        }
+        set param "data='[string trim $obs]' plane='[string trim $Red4Widgets(GS_PLANE)]'"
         if {$Red4Widgets(GS_WHOLE) == 1} {
           set ist 1 
           set ien 256
@@ -126,6 +120,7 @@ proc red4Stats {taskname} {
           set jst 1
           set jen 256
           set jin 1
+          set param "${param} whole='T'"
         } else {
           set ist [string trim [$Red4Widgets(GS_ENT02) get]]
           set ien [string trim [$Red4Widgets(GS_ENT03) get]]
@@ -133,10 +128,19 @@ proc red4Stats {taskname} {
           set jst [string trim [$Red4Widgets(GS_ENT05) get]]
           set jen [string trim [$Red4Widgets(GS_ENT06) get]]
           set jin [string trim [$Red4Widgets(GS_ENT07) get]]
+          set param "${param} whole='F' istart=$ist iend=$ien iincr=$iin jstart=$jst jend=$jen jincr=$jin"
         }
-        $taskname obey stats "data=$obs plane=$Red4Widgets(GS_PLANE) whole=$Red4Widgets(GS_WHOLE) mean=0.0 median=0.0 mode=0.0 sigma=0.0 \
-          istart=$ist iend=$ien jstart=$jst jend=$jen iincr=$iin jincr=$jin autoscale=$Red4Widgets(GS_AUTOSCALE) high=$high low=$low" \
-             -inform "cgs4drInform $taskname %V"
+        if {$Red4Widgets(GS_AUTOSCALE) == 1} {
+          set high 0.0
+          set low 0.0
+          set param "${param} autoscale='T'"
+        } else {
+          set high [string trim [$Red4Widgets(GS_ENT08) get]]
+          set low [string trim [$Red4Widgets(GS_ENT09) get]]
+          set param "${param} autoscale='F' high=$high low=$low"
+        }
+        set param "${param} mean=0.0 sigma=0.0 median=0.0 mode=0.0"
+        $taskname obey stats "${param}" -inform "cgs4drInform $taskname %V"
       }
     }
 
