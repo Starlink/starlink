@@ -430,7 +430,7 @@ PKG_LINK = CCD1
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
-PKG_VERS = 3.2-0
+PKG_VERS = 3.2-1
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the
@@ -845,7 +845,7 @@ DATA_FILES = ccdtest.ard ccdtest_obj.dat ccdtest2_obj.dat ccdtest.ast \
 #  Lists of Latex and hypertext documents.
 
 LATEX_DOCS = sun139.tex sun139geo.eps sun139reg.eps sun139red.eps \
-             sun139mos.eps sun139driz.eps
+             sun139mos.eps sun139driz.eps sun139outsky.eps sun139.outclear.eps
 HYPERTEXT_DOCS = sun139.htx
 HYPERTEXT_HELP = ccdpack.htx
 
@@ -2692,7 +2692,7 @@ tranndf.o: AST_PAR CCD1_PAR DAT_PAR MSG_PAR NDF_PAR PRM_PAR SAE_PAR TRN_PAR
 drizzle.o: AST_PAR CCD1_MOSCM CCD1_MOSPR CCD1_PAR DAT_PAR NDF_PAR NUM_DEC_CVT NUM_DEF_CVT PAR_ERR PRM_PAR SAE_PAR
 wcsreg.o: AST_PAR CCD1_PAR FIO_PAR SAE_PAR
 wcsedit.o: AST_PAR PAR_ERR SAE_PAR GRP_PAR
-outline.o: SAE_PAR AST_PAR NDF_PAR PRM_PAR GRP_PAR PAR_ERR CCD1_PAR
+outline.o: SAE_PAR AST_PAR NDF_PAR PRM_PAR GRP_PAR PAR_PAR PAR_ERR CCD1_PAR
 ccd1_setex.o: SAE_PAR PSX_ERR
 ccg1_smd1.o: NUM_CMN NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR
 ccg1_wtm4.o:NUM_DEC_CVT NUM_DEF_CVT SAE_PAR
