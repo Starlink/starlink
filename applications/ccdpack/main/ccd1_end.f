@@ -49,8 +49,8 @@
                                  ! if so the delimeter is not written.
 *.
 
-*  Check inherited global status.
-      IF ( STATUS .NE. SAI__OK ) RETURN
+*  This routine alway executes regardless of STATUS.
+      CALL ERR_BEGIN( STATUS )
 
 *  Add some blanks
       IF ( .NOT. CCD1_HVUSR( STATUS ) ) THEN
@@ -62,5 +62,6 @@
 
 *  Close the log file.
       CALL CCD1_CLLOG( STATUS )
+      CALL ERR_END( STATUS )
       END
 *  $Id$

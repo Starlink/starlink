@@ -60,13 +60,14 @@
 
 *.
 
-*  Check inherited global status.
-      IF ( STATUS .NE. SAI__OK ) RETURN
 
+*  This routine alway executes regardless of STATUS.
+      CALL ERR_BEGIN( STATUS )
 *  Close the log file if it is opened.
       IF ( CCD1_ILEV .GE. 2  ) THEN
          CALL LOG_CLOSE_WRITE( NOTREP, STATUS )
       END IF
 
+      CALL ERR_END( STATUS )
       END
 * $Id$
