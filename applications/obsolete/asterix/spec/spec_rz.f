@@ -689,7 +689,6 @@ D	        type*,'  energy bounds values dont agree'
 *
 *    Local data:
 *
-        INCLUDE 'SPEC_CMN_RZ'
 	LOGICAL FIRSTHERE		! first time in this subroutine
 	DATA FIRSTHERE /.TRUE./
 *-
