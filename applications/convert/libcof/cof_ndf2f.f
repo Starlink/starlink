@@ -836,7 +836,7 @@
 
 *  Define any special extensions.
                   E2DF = XNAME .EQ. 'FIBRES' .AND.
-     :                   XTYPE .EQ. 'FIBRES_EXT'
+     :                   XTYPE .EQ. 'FIBRE_EXT'
 
 *  Skip over the FITS extension.
                   IF ( XNAME .NE. 'FITS' .AND. .NOT. E2DF ) THEN
