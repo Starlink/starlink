@@ -95,9 +95,10 @@
 <!ENTITY % references	"">
 
 <!ENTITY % simplephrase	"| em | strong | quote | code | kbd | cite | m
-			 | angle | foreign | span
+			 | angle | foreign
 			%additional.simplephrase;">
 <!ENTITY % structuring	"| blockquote | dl | ul | ol | verbatim | linespecific 
+			 | span
 			%update.or;
 			%additional.structuring;">
 <!ENTITY % maths	"| mequation | meqnarray">
@@ -142,6 +143,11 @@
      the media attribute, but I expect that it will be extended with a
      more general `class' attribute at some point.
 
+     Span has a rather broad content model (%p.model) to allow it to
+     contain all the elements which are allowed inside P or PX
+     elements.  In order not to break the hierarchy of models, it
+     therefore needs to go in the %structuring; parameter entity.
+
      The media.types are patterned after those in the W3C HTML4 spec.  See
      <http://www.w3.org/TR/REC-html40/types.html#h-6.13> for media
      types, and
@@ -152,7 +158,7 @@
      be recognised.
      -->
 <!ENTITY % media.types "CDATA">
-<!ELEMENT span		%MXX (%phrase;)*>
+<!ELEMENT span		%MXX (%p.model;)*>
 <!ATTLIST span
 	media	%media.types	#IMPLIED
 	>
