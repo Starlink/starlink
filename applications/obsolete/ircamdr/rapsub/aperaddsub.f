@@ -124,7 +124,7 @@
 
 *    now the bottom left and top right pixels which are to be
 *    included in the box
-      IRADIUS =  ININT( RADIUS + 1.0 )
+      IRADIUS =  NINT( RADIUS + 1.0 )
       BLXPIX  =  XPIX - IRADIUS
       BLYPIX  =  YPIX - IRADIUS 
       TRXPIX  =  XPIX + IRADIUS 
