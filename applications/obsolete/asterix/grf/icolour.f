@@ -1048,74 +1048,84 @@
       INTEGER NB
       INTEGER CI,CJ
       INTEGER J,K,J1,J2
-      INTEGER ICOL
+      INTEGER ICOL,JCOL
 *-
       IF (STATUS.EQ.SAI__OK.AND.NCOL.GE.16) THEN
 
-
-*  which colour is being changed
         CALL NBS_FIND_ITEM(I_NBID,'COLOUR',CID,STATUS)
-        CALL NBS_GET_VALUE(CID,0,VAL__NBI,ICOL,NB,STATUS)
-
-*  convert to colour index within full range
-        J1=MAX(1,ICOL-1)
-        J2=MIN(16,ICOL+1)
-        CI=FIRST+(J1-1)*(NSHADE+1)
-
-*  get new primary colours
-        RNAME='RED'
-        GNAME='GREEN'
-        BNAME='BLUE'
-        IF (ICOL.LT.10) THEN
-          WRITE(RNAME(4:4),'(I1)') ICOL
-          WRITE(GNAME(6:6),'(I1)') ICOL
-          WRITE(BNAME(5:5),'(I1)') ICOL
-        ELSE
-          WRITE(RNAME(4:5),'(I2)') ICOL
-          WRITE(GNAME(6:7),'(I2)') ICOL
-          WRITE(BNAME(5:6),'(I2)') ICOL
-        ENDIF
-        CALL NBS_FIND_ITEM(I_NBID,RNAME,RID,STATUS)
-        CALL NBS_FIND_ITEM(I_NBID,GNAME,GID,STATUS)
-        CALL NBS_FIND_ITEM(I_NBID,BNAME,BID,STATUS)
         CALL NBS_FIND_ITEM(I_NBID,'FLAG',FID,STATUS)
+
+*  which is initial colour being changed
+        CALL NBS_GET_VALUE(CID,0,VAL__NBI,ICOL,NB,STATUS)
 
 *  monitor noticeboard until flag goes non-zero
         FLAG=0
         DO WHILE (FLAG.EQ.0)
-          CJ=CI
+
+*  convert to colour index within full range
+          J1=MAX(1,ICOL-1)
+          J2=MIN(16,ICOL+1)
+          CI=FIRST+(J1-1)*(NSHADE+1)
+
+*  get new primary colours
+          RNAME='RED'
+          GNAME='GREEN'
+          BNAME='BLUE'
+          IF (ICOL.LT.10) THEN
+            WRITE(RNAME(4:4),'(I1)') ICOL
+            WRITE(GNAME(6:6),'(I1)') ICOL
+            WRITE(BNAME(5:5),'(I1)') ICOL
+          ELSE
+            WRITE(RNAME(4:5),'(I2)') ICOL
+            WRITE(GNAME(6:7),'(I2)') ICOL
+            WRITE(BNAME(5:6),'(I2)') ICOL
+          ENDIF
+          CALL NBS_FIND_ITEM(I_NBID,RNAME,RID,STATUS)
+          CALL NBS_FIND_ITEM(I_NBID,GNAME,GID,STATUS)
+          CALL NBS_FIND_ITEM(I_NBID,BNAME,BID,STATUS)
+
+          JCOL=ICOL
+          DO WHILE (JCOL.EQ.ICOL)
+
+            CJ=CI
 
 *  get current colours from noticeboard
-          CALL NBS_GET_VALUE(RID,0,VAL__NBR,RED,NB,STATUS)
-          COL(1,ICOL)=RED
-          CALL NBS_GET_VALUE(GID,0,VAL__NBR,GREEN,NB,STATUS)
-          COL(2,ICOL)=GREEN
-          CALL NBS_GET_VALUE(BID,0,VAL__NBR,BLUE,NB,STATUS)
-          COL(3,ICOL)=BLUE
+            CALL NBS_GET_VALUE(RID,0,VAL__NBR,RED,NB,STATUS)
+            COL(1,ICOL)=RED
+            CALL NBS_GET_VALUE(GID,0,VAL__NBR,GREEN,NB,STATUS)
+            COL(2,ICOL)=GREEN
+            CALL NBS_GET_VALUE(BID,0,VAL__NBR,BLUE,NB,STATUS)
+            COL(3,ICOL)=BLUE
 
 *  set colour
-          DO J=J1,J2-1
-            RED=COL(1,J)
-            REDHUE=(COL(1,J+1)-RED)/REAL(NSHADE+1)
-            GREEN=COL(2,J)
-            GREENHUE=(COL(2,J+1)-GREEN)/REAL(NSHADE+1)
-            BLUE=COL(3,J)
-            BLUEHUE=(COL(3,J+1)-BLUE)/REAL(NSHADE+1)
-            CALL PGSCR(CJ,RED,GREEN,BLUE)
-            DO K=1,NSHADE
-              CJ=CJ+1
-              RED=RED+REDHUE
-              GREEN=GREEN+GREENHUE
-              BLUE=BLUE+BLUEHUE
+            DO J=J1,J2-1
+              RED=COL(1,J)
+              REDHUE=(COL(1,J+1)-RED)/REAL(NSHADE+1)
+              GREEN=COL(2,J)
+              GREENHUE=(COL(2,J+1)-GREEN)/REAL(NSHADE+1)
+              BLUE=COL(3,J)
+              BLUEHUE=(COL(3,J+1)-BLUE)/REAL(NSHADE+1)
               CALL PGSCR(CJ,RED,GREEN,BLUE)
+              DO K=1,NSHADE
+                CJ=CJ+1
+                RED=RED+REDHUE
+                GREEN=GREEN+GREENHUE
+                BLUE=BLUE+BLUEHUE
+                CALL PGSCR(CJ,RED,GREEN,BLUE)
+              ENDDO
+              CJ=CJ+1
             ENDDO
-            CJ=CJ+1
-          ENDDO
-          RED=COL(1,J2)
-          GREEN=COL(2,J2)
-          BLUE=COL(3,J2)
-          CALL PGSCR(CJ,RED,GREEN,BLUE)
+            RED=COL(1,J2)
+            GREEN=COL(2,J2)
+            BLUE=COL(3,J2)
+            CALL PGSCR(CJ,RED,GREEN,BLUE)
 
+*  see if colour has changed
+            CALL NBS_GET_VALUE(CID,0,VAL__NBI,ICOL,NB,STATUS)
+
+          ENDDO
+
+*  see if GUI is still sending data
           CALL NBS_GET_VALUE(FID,0,VAL__NBI,FLAG,NB,STATUS)
 
         ENDDO
