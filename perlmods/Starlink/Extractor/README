@@ -1,0 +1,28 @@
+This README describes the Starlink::Extractor Perl module.
+
+Extractor (in Starlink-speak, SExtractor everywhere else) is
+an source-detection and extraction program. This Perl module
+presents a Perl interface to the Starlink version of the
+application for use in Perl programs.
+
+To be able to use this module you must have Starlink Extractor,
+which can be obtained from the Starlink Project at
+http://www.starlink.ac.uk.  To point this module to your
+version of Extractor, set the EXTRACTOR_DIR environment variable
+to the directory containing the Extractor binary. Under a
+standard Starlink installation this environment variable
+will be set for you upon sourcing the Starlink etc/login and
+etc/cshrc files, and will be typically set to /star/bin/extractor.
+
+This module was written and is supported by Brad Cavanagh
+(b.cavanagh@jach.hawaii.edu).
+
+Copyright
+---------
+
+This module is Copyright (C) 2004 Brad Cavanagh and the UK
+Particle Physics and Astronomy Research Council.  All Rights
+Reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.

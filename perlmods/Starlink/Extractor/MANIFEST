@@ -1,0 +1,5 @@
+MANIFEST
+README
+Makefile.PL
+Extractor.pm
+ChangeLog
