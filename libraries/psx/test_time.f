@@ -15,6 +15,11 @@
 * Initialize STATUS
       STATUS = SAI__OK
 
+      STRING = ' '
+      STRING2 = ' '
+
+      CALL EMS_BEGIN( STATUS )
+
 * Test PSX_TIME
       PRINT *,' '
       PRINT *,'--  Program PSX_TIME, function PSX_TIME  --'
@@ -84,5 +89,7 @@
       CALL PSX_ASCTIME( TSTRCT, STRING, STATUS )
       PRINT *,'The value returned by PSX_ASCTIME is :'
       PRINT *,STRING
+
+      CALL EMS_END( STATUS )
 
       END
