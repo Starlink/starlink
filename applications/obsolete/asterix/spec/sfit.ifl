@@ -64,6 +64,15 @@ INTERFACE SFIT
       HELP 'Number of its. between update of model file (and diagnostic o/p)'
    ENDPARAMETER
 
+   PARAMETER MCTRL
+      TYPE 'CHAR'
+      DEFAULT !
+      VPATH 'CURRENT,DEFAULT'
+      PPATH 'CURRENT,DEFAULT'
+      PROMPT 'Minimisation control file'
+      HELP 'Name of minimisation control file, or ! for defaults'
+   ENDPARAMETER
+
    PARAMETER ERR
       TYPE '_LOGICAL'
       VPATH 'DEFAULT'
