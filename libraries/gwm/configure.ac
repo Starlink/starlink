@@ -16,9 +16,10 @@ AC_CONFIG_SRCDIR([gwm.h])
   
 dnl    Include defaults for Starlink configurations
 STAR_DEFAULTS
-  
+
 dnl    Find required versions of the programs we need for configuration
 AC_PROG_CC
+AC_PROG_FC
 AC_HEADER_STDC
 AC_PATH_XTRA
 AC_PROG_LIBTOOL
