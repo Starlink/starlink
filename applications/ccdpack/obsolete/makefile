@@ -114,7 +114,7 @@
 #
 #        The following ADAM UNIX software libraries and their
 #        dependencies.
-#           AGI ARD AST CHR FIO GRP IDI NDF PGPLOT PRM PSX TRN PDA NDG
+#           AGI ARD AST CHR FIO GRP NDF PGPLOT PRM PSX TRN PDA NDG
 #           TCLSYS STARTCL
 #        HTX
 #           The hypertext linker.
@@ -483,15 +483,57 @@ TCL_SCRIPTS = CCDAnimateBitmap.tcl CCDBindings.tcl CCDContextHelp.tcl \
  Ccd_toplevel.tcl Ccd_gwm.tcl CCDScanDetectorFiles.tcl CCDViewFile.tcl \
  CCDSetDetector.tcl CCDGeomCheckandExit.tcl CCDGeomDrawCommand.tcl \
  CCDGeomTransform.tcl CCDGeometry.tcl CCDGetColour.tcl CCDMax.tcl \
- CCDMin.tcl CCDRestartTask.tcl tclIndex \
+ CCDMin.tcl CCDRestartTask.tcl \
  CCDGeometryMain.tcl CCDTaskRegistry.tcl CCDTaskStart.tcl \
  CCDCheckReduce.tcl CCDInitialize.tcl \
  CCDTaskQuery.tcl CCDGeomSetPercent.tcl CCDExit.tcl \
  CCDFileMonitorMain.tcl CCDDoPresent.tcl \
- CCDTkWidget.tcl CCDCcdWidget.tcl CCDNameTail.tcl CCDPathOf.tcl CCDCmdOf.tcl
+ CCDTkWidget.tcl CCDCcdWidget.tcl CCDNameTail.tcl CCDPathOf.tcl CCDCmdOf.tcl \
+ Control.tcl Gwmview.tcl Marknumcontrol.tcl Ndfalign.tcl Ndfchoose.tcl \
+ Ndfview.tcl Percentilecontrol.tcl Stylecontrol.tcl Vectordialog.tcl \
+ Zoomcontrol.tcl \
+ tasksetup.tcl ccdalign.tcl pairndf.tcl idicurs.tcl
 
-STARTCL_SUPPORT = \
- adamMessageRelay adamtask.tcl atclsh
+
+TCL_SUPPORT_BIN = atclsh
+
+TCL_SUPPORT_TCL = auto.tcl history.tcl init.tcl package.tcl parray.tcl \
+ safe.tcl word.tcl
+
+TCL_SUPPORT_TK = bgerror.tcl button.tcl clrpick.tcl comdlg.tcl console.tcl \
+ dialog.tcl entry.tcl focus.tcl listbox.tcl menu.tcl msgbox.tcl \
+ obsolete.tcl optMenu.tcl palette.tcl safetk.tcl scale.tcl scrlbar.tcl \
+ tearoff.tcl text.tcl tk.tcl tkfbox.tcl xmfbox.tcl
+
+TCL_SUPPORT_STARTCL = adamMessageRelay adamtask.tcl colourDialog.tcl \
+ dialogShow.tcl dialogStart.tcl gwmWithScroll.tcl jpegDialog.tcl \
+ printDialog.tcl
+
+TCL_SUPPORT_ITCL = itcl.tcl
+
+TCL_SUPPORT_ITK = Archetype.itk Toplevel.itk Widget.itk itk.tcl
+
+TCL_SUPPORT_IWIDGETS = buttonbox.itk calendar.itk canvasprintbox.itk \
+ canvasprintdialog.itk checkbox.itk colors.itcl combobox.itk dateentry.itk \
+ datefield.itk dialog.itk dialogshell.itk disjointlistbox.itk \
+ entryfield.itk extfileselectionbox.itk extfileselectiondialog.itk \
+ feedback.itk fileselectionbox.itk fileselectiondialog.itk finddialog.itk \
+ hierarchy.itk hyperhelp.itk labeledframe.itk labeledwidget.itk \
+ mainwindow.itk menubar.itk messagebox.itk messagedialog.itk notebook.itk \
+ optionmenu.itk pane.itk panedwindow.itk promptdialog.itk pushbutton.itk \
+ radiobox.itk regexpfield.itk roman.itcl scopedobject.itcl \
+ scrolledcanvas.itk scrolledframe.itk scrolledhtml.itk scrolledlistbox.itk \
+ scrolledtext.itk scrolledwidget.itk selectionbox.itk selectiondialog.itk \
+ shell.itk spindate.itk spinint.itk spinner.itk spintime.itk \
+ tabnotebook.itk tabset.itk timeentry.itk timefield.itk toolbar.itk \
+ unknownimage.gif watch.itk
+
+TCL_INDEX = tclIndex
+
+TCL_SUPPORT = $(TCL_SUPPORT_BIN) $(TCL_SUPPORT_TCL) $(TCL_SUPPORT_TK) \
+              $(TCL_SUPPORT_STARTCL) $(TCL_SUPPORT_ITCL) $(TCL_SUPPORT_ITK) \
+              $(TCL_SUPPORT_IWIDGETS)
+
 
 CONFIG_SCRIPTS = EEV3QUICK.DAT EEV3STANDARD.DAT EEV5QUICK.DAT \
  EEV5STANDARD.DAT EEV6QUICK.DAT EEV6STANDARD.DAT EEV7QUICK.DAT \
@@ -549,7 +591,7 @@ PKG_INCLUDE = ccd1_par
 #  the files.
 
 EXTERNAL_INCLUDES = AST_PAR CHR_ERR DAT_PAR DAT_ERR TRN_PAR TRN_ERR \
- FIO_ERR FIO_PAR IDI_ERR IDI_PAR MSG_PAR NDF_ERR NDF_PAR NUM_CMN NUM_DEC_B \
+ FIO_ERR FIO_PAR MSG_PAR NDF_ERR NDF_PAR NUM_CMN NUM_DEC_B \
  NUM_DEC_CVT NUM_DEC_D NUM_DEC_I NUM_DEC_R NUM_DEC_UB NUM_DEC_UW \
  NUM_DEC_W NUM_DEF_B NUM_DEF_CVT NUM_DEF_D NUM_DEF_I NUM_DEF_R \
  NUM_DEF_UB NUM_DEF_UW NUM_DEF_W PAR_ERR PAR_PAR PRM_PAR SAE_PAR \
@@ -641,7 +683,7 @@ GENSRC = ccg1_add.gen ccg1_bext.gen ccg1_bl.gen ccg1_bmd1.gen \
  ccg1_bmd2.gen ccg1_bmd3.gen ccg1_bmr1.gen ccg1_bmr2.gen \
  ccg1_bmr3.gen ccg1_clip.gen ccg1_cm1d.gen ccg1_cm1r.gen \
  ccg1_cm2d.gen ccg1_cm2r.gen ccg1_cm3d.gen ccg1_cm3r.gen \
- ccg1_cmlt.gen ccg1_cmsk.gen ccg1_copa.gen ccg1_cpb.gen \
+ ccg1_cmlt.gen ccg1_cmsk.gen ccg1_copa.gen ccg1_cops.gen ccg1_cpb.gen \
  ccg1_debi.gen ccg1_flw.gen ccg1_fpw.gen ccg1_gpl.gen \
  ccg1_gvar.gen ccg1_is2.gen ccg1_is3.gen ccg1_mdd1.gen \
  ccg1_mdd2.gen ccg1_mdd3.gen ccg1_mdr1.gen ccg1_mdr2.gen \
@@ -700,7 +742,8 @@ PLATFORM_F =
 C_ROUTINES = $(CSUBSRC) $(WISH_SOURCE)
 
 CSUBSRC = ccd1_exec.c slv.c find_file.c \
- tcltalk.c ndf.c ndfdrawpair.c ndfcentroffset.c ccdlog.c ccdAppInit.c
+ tcltalk.c ndf.c ndfdrawpair.c ndfcentroffset.c ccdlog.c ccdAppInit.c \
+ ccd1_tcurs.c ccd1_algn.c ccd1_pndf.c
 
 #  List of applications/tasks in monoliths.
 
@@ -817,7 +860,8 @@ DOCUMENTATION = $(LATEX_DOCS) $(HYPERTEXT_DOCS:.htx=.htx_tar) \
 #  file).
 
 BUILT_FILES = $(LINK_SCRIPT1) $(LINK_SCRIPT2) \
- $(PUBLIC_SCRIPTS) $(STARTCL_SUPPORT) $(OBJECT_LIBRARIES) $(MONOLITHS) \
+ $(PUBLIC_SCRIPTS) $(TCL_SUPPORT) $(TCL_INDEX) $(OBJECT_LIBRARIES) \
+ $(MONOLITHS) \
  $(IFC_FILES) $(HELP_FILES) $(ICL_STARTUP_SCRIPT) $(STARTUP_SCRIPT) \
  $(IRAF_STARTUP_SCRIPT) $(HELPTASK) $(WISH) \
  $(IRAF_SCRIPTS) $(MONO_TCL) $(IRAF_PAR) $(IRAF_HELP) helpdb.mip
@@ -850,8 +894,6 @@ FIO_PAR:	$(STAR_INC)/fio_par;      $(LINK) $? $@
 GRP_PAR:	$(STAR_INC)/grp_par;      $(LINK) $? $@
 GRP_ERR:        $(STAR_INC)/grp_err;      $(LINK) $? $@
 HLPCMD.INC: 	hlpcmd.inc;	          $(LINK) $? $@
-IDI_ERR:        $(STAR_INC)/idi_err;      $(LINK) $? $@
-IDI_PAR:        $(STAR_INC)/idi_par;      $(LINK) $? $@
 IRA_ERR:        ira_err;		  $(LINK) $? $@
 IRA_PAR:        ira_par;		  $(LINK) $? $@
 MSG_PAR:        $(STAR_INC)/msg_par;      $(LINK) $? $@
@@ -951,12 +993,25 @@ $(PKG_INCLUDE):
 	sed -e s#PKG_VERS#$(PKG_VERS)# $@ >$@_tmp
 	mv $@_tmp $@
 
-#  Rules for copying versions of the files in the STARTCL_SUPPORT macro from 
+#  Rules for copying versions of the files in the TCL_SUPPORT macro from 
 #  elsewhere in the Starlink tree.
 
-adamMessageRelay: $(STAR_LIB)/startcl/adamMessageRelay; cp $? $@
-adamtask.tcl: $(STAR_LIB)/startcl/adamtask.tcl;         cp $? $@
-atclsh: $(STAR_BIN)/atclsh;                             cp $? $@
+$(TCL_SUPPORT_BIN):
+	cp $(STAR_BIN)/$@ $@
+$(TCL_SUPPORT_TCL):
+	cp $(STAR_LIB)/tcl$(TCL_VERS)/$@ $@
+$(TCL_SUPPORT_TK):
+	cp $(STAR_LIB)/tk$(TCL_VERS)/$@ $@
+$(TCL_SUPPORT_STARTCL):
+	cp $(STAR_LIB)/startcl/$@ $@
+$(TCL_SUPPORT_ITCL):
+	cp $(STAR_LIB)/itcl$(ITCL_VERS)/$@ $@
+$(TCL_SUPPORT_ITK):
+	cp $(STAR_LIB)/itk$(ITCL_VERS)/$@ $@
+$(TCL_SUPPORT_IWIDGETS):
+	cp $(STAR_LIB)/iwidgets$(IWIDGETS_VERS)/scripts/$@ $@
+$(TCL_INDEX): $(TCL_SUPPORT) $(WISH)
+	echo 'auto_mkindex . *.tcl *.tk *.itcl *.itk; exit' | $(WISH)
 
 
 #  Personal rules for building source code archives from RCS and
@@ -1221,6 +1276,7 @@ $(MONOLITH4): $(PKG_NAME)_scr.o $(OBJECT_LIBRARIES) $(LINK_SCRIPT1) \
 
 TCL_VERS = 8.2
 ITCL_VERS = 3.1
+IWIDGETS_VERS = 3.0.0
 
 #  Location of libraries required for linking to Tcl.
 
@@ -1512,7 +1568,7 @@ install:
 #
 #  Install the tcl binaries and support scripts, giving them world execute 
 #  permission.
-	for f in $(WISH) $(STARTCL_SUPPORT) ""; do \
+	for f in $(WISH) $(TCL_SUPPORT) $(TCL_INDEX) ""; do \
 	   if test -n "$$f"; then \
 	      $(CP) $$f $(INSTALL_BIN);\
 	      chmod 755 $(INSTALL_BIN)/$$f;\
@@ -1756,7 +1812,7 @@ do_deinstall:
         done
 #
 #  Deinstall the tcl binaries and support scripts, if installed versions exist.
-	- for f in $(WISH) $(STARTCL_SUPPORT) ""; do \
+	- for f in $(WISH) $(TCL_SUPPORT) $(TCL_INDEX) ""; do \
            if test -n "$$f" -a -f $(INSTALL_BIN)/$$f; then \
               $(RM) $$f;\
               $(CP) $(INSTALL_BIN)/$$f .;\
@@ -2110,6 +2166,9 @@ strip:
 #  files).  These are normally generated automatically from the source
 #  files.
 
+ccd1_algn.o: ccdtcl.h
+ccd1_pndf.o: ccdtcl.h grp_par.h
+ccd1_tcurs.o: ccdtcl.h
 ccdAppInit.o:
 ccdlog.o:
 ndf.o: tclndf.h
@@ -2404,6 +2463,7 @@ ccg1_cmlt.o: NUM_CMN NUM_DEC_B NUM_DEC_CVT NUM_DEC_D NUM_DEC_I NUM_DEC_R NUM_DEC
 ccg1_cmpr.o: PRM_PAR SAE_PAR USER_ERR
 ccg1_cmsk.o: PRM_PAR SAE_PAR
 ccg1_copa.o: SAE_PAR
+ccg1_cops.o: SAE_PAR
 ccg1_cpb.o: PRM_PAR SAE_PAR
 ccg1_crdt.o: PRM_PAR SAE_PAR
 ccg1_dcn.o: NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR
