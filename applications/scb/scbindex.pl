@@ -1056,6 +1056,7 @@ sub tidyup {
 
 #  Remove any straggling temporary files.
 
+   chdir "/";
    rmrf $tmpdir;
 }
 
