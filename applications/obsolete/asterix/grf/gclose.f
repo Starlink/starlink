@@ -41,6 +41,14 @@
         CALL GCB_DETACH(STATUS)
       ENDIF
 
+      CALL GCB_QCONTXT(N,STATUS)
+      IF (N.GT.0) THEN
+        CALL MSG_PRNT('****** Graphics device not closed ******')
+        CALL MSG_PRNT('****** other contexts are active  ******')
+      ELSE
+        CALL GDV_CLOSE(STATUS)
+      ENDIF
+
       CALL USI_CLOSE()
 
       END
