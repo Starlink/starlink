@@ -107,7 +107,6 @@
 
 *    Get input object from user
       CALL USI_ASSOC( 'INP', 'SSDSset|SSDS', 'READ', SFID, STATUS )
-      CALL ADI1_GETLOC
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Get number of sources
