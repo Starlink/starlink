@@ -1,7 +1,7 @@
 INTERFACE CREPSF
   parameter OUT
     position 1
-    TYPE 'UNIV'
+    TYPE 'LITERAL'
     association '->global.binds'
     prompt 'PSF data image'
   endparameter
