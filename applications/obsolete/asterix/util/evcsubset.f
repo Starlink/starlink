@@ -1,560 +1,444 @@
-*+  EVCSUBSET - Interactively select an annular subset of an event dataset
       SUBROUTINE EVCSUBSET( STATUS )
-*
-*    Description :
-*
+*+
+*  Name:
+*     EVCSUBSET
+
+*  Purpose:
+*     Select an annular subset of an event dataset
+
+*  Language:
+*     Starlink Fortran
+
+*  Type of Module:
+*     ASTERIX task
+
+*  Invocation:
+*     CALL EVCSUBSET( STATUS )
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Description:
 *     The user may select a circular or annular subset of the event dataset
 *     according to X and Y coordinate list values.
 *
-*    Parameters :
-*
-*     INP=UNIV(U)
-*           Dataset from which selection will be made
-*     OUT=UNIV(W)
-*           Dataset into which selected items will be put
-*     ANNULUS=LOGICAL(R)
-*           Annular subset?
-*     XCENT=REAL(R)
-*     YCENT=REAL(R)
-*           Coords. of centre of region
-*     OUTER=REAL(R)
-*           Outer radius of region
-*     INNER=REAL(R)
-*           Inner radius of region
-*
-*    Method :
-*
-*     The new values of FIELD_MIN and FIELD_MAX are derived from the
+*     The new values of the X and Y field extrema are derived from the
 *     minimum and maximum values of the events which pass the annular
 *     criterion.
-*
-*    Deficiencies :
-*
-*     Currently, EVCSUBSET does not update either OBS_LENGTH or EXPOSURE_TIME
-*     components, the reason being that data are selected subject to spatial
-*     cconstraints and thus the pbservation length and exposur time of the
-*     selected data are not changed by this process. Eg if the original
-*     dataset had an OBS_LENGTH of 2000 secs and an annulur subset was selected\
-*     then the data in this region is all that was collected in 2000 secs in
-*     that region- the observation length is unchanged.
-*
-*    Bugs :
-*    Authors :
-*     Alan McFadzean (BHVAD::ADM)
-*    History :
-*
-*     16 Jan 89 : V1.1-1  Original (BHVAD::ADM)
-*     11 Jan 90 : V1.1-2  DATA_MIN and DATA_MAX references removed (BHVAD::DJA)
-*     28 Mar 90 : V1.1-3  x and y coords made into separate parameters
-*     24 Nov 94 : V1.8-0  Now use USI for user interface (DJA)
-*
-*    Type Definitions :
-      IMPLICIT NONE
-*    Global constants :
-      INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'LIST_PAR'
-*    Status :
-      INTEGER STATUS
-*    Local variables :
-      CHARACTER*(DAT__SZLOC) CLOC               ! component locator
-      CHARACTER*(DAT__SZLOC) ILLOC(LIST__MXNL)  ! input list locators
-      CHARACTER*(DAT__SZLOC) ILOC               ! input dataset locator
-      CHARACTER*(DAT__SZLOC) OLLOC(LIST__MXNL)  ! output list locators
-      CHARACTER*(DAT__SZLOC) OLOC               ! output dataset locator
-      CHARACTER*(DAT__SZNAM) CNAM               ! current quantity
-      CHARACTER*(DAT__SZNAM) XNAME              ! X List
-      CHARACTER*(DAT__SZNAM) YNAME              ! Y List
-      CHARACTER*(DAT__SZNAM) LNAMES(LIST__MXNL) ! list names
-      CHARACTER*(DAT__SZTYP) TYPE               ! component type
-      CHARACTER*80           C                  ! Character for input number
-      CHARACTER*80           TEXTI(2)           ! History text
-      CHARACTER*6            SIRAD              ! History text
-      CHARACTER*6            SORAD              ! History text
-      CHARACTER*6            SXCEN              ! History text
-      CHARACTER*6            SYCEN              ! History text
-      CHARACTER*80           TEXT(2)            ! History text
 
-      INTEGER                XPTR               ! X axis pointer
-      INTEGER                YPTR               ! Y axis pointer
-      INTEGER                DIMS(DAT__MXDIM)   ! item dimensions
-      INTEGER                I            	! Loop counters
-      INTEGER                IDATA              ! Pointer to input list DATA_ARRAY
-      INTEGER                IQUAN              ! Pointer to input list QUANTUM
-      INTEGER                INLEN              ! Length of input lists
-      INTEGER                N                  !
-      INTEGER                NCOMP              ! # components in input object
-      INTEGER                NDIM               ! # item dimensions
-      INTEGER                INLINES            ! Number of lines of TEXTI
-      INTEGER                NLIST              ! # lists
-      INTEGER                ODATA              ! Pointer to output list DATA_ARRAY
-      INTEGER                OUTLEN             ! Length of output lists
-      INTEGER                OQUAN              ! Pointer to output list QUANTUM
-      INTEGER                PTR                ! pointer to selection logicals
-      INTEGER                XN                 ! X List number
-      INTEGER                YN                 ! Y List number
-      INTEGER                L1,L2,L3,L4        ! lengths of char strings
-      INTEGER			IFID, OFID		!
+*  Usage:
+*     evcsubset {parameter_usage}
 
-      LOGICAL                OK
-      LOGICAL                SCALAR_QUAN        ! Is QUANTUM scalar?
-      LOGICAL                ANNTYPE            ! annulur or circular aperture?
+*  Environment Parameters:
+*     INP = LITERAL (read)
+*        Name of input event dataset
+*     OUT = LITERAL (read)
+*        Name of the output event dataset
+*     ANNULUS = LOGICAL (read)
+*        Annular subset?
+*     XCENT = REAL (read)
+*        X coordinate of centre of region
+*     YCENT = REAL (read)
+*        Y coordinate of centre of region
+*     OUTER = REAL (read)
+*        Outer radius of region
+*     INNER = REAL (read)
+*        Inner radius of region
 
-      REAL                   MIN, MAX           ! range of output data
-      REAL                   XMIN, XMAX         ! range of X list
-      REAL                   YMIN, YMAX           ! range of Y list
-      REAL                   VALUE              ! Used in copying values between input & output
-      REAL                   XCEN               ! X value of annulus centre
-      REAL                   YCEN               ! Y value of annulus centre
-      REAL                   IRAD               ! Inner annulus radius
-      REAL                   ORAD               ! Outer annulus radius
-*
-*    Local Constants :
-*
-      CHARACTER*25           VERSION            ! version ID
-        PARAMETER           (VERSION = ' EVCSUBSET Version 1.8-0')
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
+*     {algorithm_description}...
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  Implementation Status:
+*     {routine_implementation_status}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
+*     {routine_deficiencies}...
+
+*  References:
+*     {task_references}...
+
+*  Keywords:
+*     evcsubset, usage:public
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1995
+
+*  Authors:
+*     ADM: Alan McFadzean (ROSAT, University of Birmingham)
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*     16 Jan 1989 V1.1-1 (ADM):
+*        Original version.
+*     11 Jan 1990 V1.1-2 (DJA):
+*        DATA_MIN and DATA_MAX references removed
+*     28 Mar 1990 V1.1-3 (DJA):
+*        X and Y coords made into separate parameters
+*     24 Nov 1994 V1.8-0 (DJA):
+*        Now use USI for user interface
+*      2 Jan 1996 V2.0-0 (DJA):
+*        ADI port
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
 *-
 
-*    Version announcement
-      CALL MSG_PRNT (VERSION)
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
 
-*    Initialise
-      CALL AST_INIT
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'ADI_PAR'
 
-*   Obtain object name and associate locator and display to term.
-      CALL USI_TASSOC2('INP', 'OUT', 'READ',IFID, OFID,  STATUS)
-      CALL ADI1_GETLOC( IFID, ILOC, STATUS )
-      CALL ADI1_GETLOC( OFID, OLOC, STATUS )
+*  Status:
+      INTEGER			STATUS             	! Global status
 
-*    Locate & display all lists in the input data object
-      CALL MSG_PRNT ('The LIST''s present are:')
-      CALL LIST_FINDALLOK (ILOC, .TRUE., ILLOC, LNAMES, NLIST, INLEN,
-     :                                                           STATUS)
+*  Local Constants:
+      CHARACTER*30		VERSION
+        PARAMETER		( VERSION = 'EVCSUBSET Version V2.0-0' )
 
-*    Check status
-      IF (STATUS .NE. SAI__OK) GOTO 9000
+*  Local Variables:
+      CHARACTER*80		TEXT(2)			! History text
+      CHARACTER*20		XLNAME, YLNAME		! X,Y list names
 
-*    Check there are some
-      IF (NLIST .EQ.0) THEN
-        CALL MSG_PRNT ('FATAL ERROR: there are no lists!')
-        STATUS = SAI__ERROR
-        GOTO 9000
+      REAL			IRAD, ORAD		! Selection radii
+      REAL			XCEN, YCEN		! Centre of selection
+      REAL			XMIN, XMAX		! X list extrema
+      REAL			YMIN, YMAX		! Y list extrema
 
+      INTEGER			COPY			! Event selection array
+      INTEGER			EVENTS			! # input events
+      INTEGER			IFID			! Input event dataset
+      INTEGER			IFILES			! Input file info
+      INTEGER			LSEL(2)			! X,Y list numbers
+      INTEGER			NLISTS			! # lists in input
+      INTEGER 			NSEL			! # selected lists
+      INTEGER			OFID			! Output event dataset
+      INTEGER			OUTLEN			! # output events
+      INTEGER			TLEN			! Length of string
+      INTEGER			X_LID, Y_LID		! X,Y list indices
+      INTEGER			XPTR, YPTR		! Mapped list values
+
+      LOGICAL			ANNULUS			! Annular selection?
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Version id
+      CALL MSG_PRNT( VERSION )
+
+*  Initialise ASTERIX
+      CALL AST_INIT()
+
+*  Associate input
+      CALL USI_ASSOC( 'INP', 'EventDS', 'READ', IFID, STATUS )
+      IF ( STATUS .NE. SAI__OK ) GOTO 99
+
+*  Get number of events and lists
+      CALL EDI_GETNS( IFID, EVENTS, NLISTS, STATUS )
+
+*  Associate output dataset
+      CALL USI_CREAT( 'OUT', ADI__NULLID, OFID, STATUS )
+
+*  Display lists
+      CALL MSG_PRNT( ' ' )
+      CALL MSG_PRNT( 'The availible LISTs are:' )
+      CALL EDI_DISP( IFID, STATUS )
+
+*  Find out which events are to be copied. We use a BYTE here rather than
+*  a LOGICAL to save dynamic memory.
+      CALL DYN_MAPB( 1, EVENTS, COPY, STATUS )
+
+*  Display list names
+      CALL MSG_PRNT (' ')
+      CALL MSG_PRNT ('Enter the LISTs to have ranges applied, by '//
+     :                                     'entering the index numbers')
+      CALL MSG_PRNT ('E.g. 1 2 4')
+      CALL EDI_SELCT( 'LISTS', NLISTS, 2, 2, LSEL, NSEL, STATUS )
+      IF ( STATUS .NE. SAI__OK ) GOTO 99
+
+*  Locate the lists
+      CALL EDI_IDX( IFID, LSEL(1), X_LID, STATUS )
+      CALL EDI_IDX( IFID, LSEL(2), Y_LID, STATUS )
+      CALL ADI_CGET0C( X_LID, 'Name', XLNAME, STATUS )
+      CALL ADI_CGET0C( Y_LID, 'Name', YLNAME, STATUS )
+      CALL ADI_ERASE( X_LID, STATUS )
+      CALL ADI_ERASE( Y_LID, STATUS )
+
+*  Map the two lists
+      CALL EDI_MAPR( IFID, XLNAME, 'READ', 0, 0, XPTR, STATUS )
+      CALL EDI_MAPR( IFID, YLNAME, 'READ', 0, 0, YPTR, STATUS )
+
+*  Get field ranges
+      CALL EDI_RANGE( IFID, XLNAME, XPTR, XMIN, XMAX, STATUS )
+      CALL EDI_RANGE( IFID, YLNAME, YPTR, YMIN, YMAX, STATUS )
+
+*  Announce X axis range
+      CALL MSG_SETR( 'XMIN', XMIN )
+      CALL MSG_SETR( 'XMAX', XMAX )
+      CALL MSG_SETC( 'XNAME', XLNAME )
+      CALL MSG_PRNT( 'The ^XNAME data range is ^XMIN to ^XMAX' )
+
+*  Announce Y axis range
+      CALL MSG_SETR( 'YMIN', YMIN )
+      CALL MSG_SETR( 'YMAX', YMAX )
+      CALL MSG_SETC( 'YNAME', YLNAME )
+      CALL MSG_PRNT( 'The ^YNAME data range is ^YMIN to ^YMAX' )
+
+*  Annular or circular subset?
+      CALL USI_GET0L( 'ANNULUS', ANNULUS, STATUS )
+
+*  Central point
+      CALL USI_GET0R( 'XCENT', XCEN, STATUS )
+      CALL USI_GET0R( 'YCENT', YCEN, STATUS )
+
+*  Get radius/radii
+      CALL USI_GET0R('OUTER',ORAD,STATUS)
+      IF ( ANNULUS ) THEN
+        CALL USI_GET0R( 'INNER', IRAD, STATUS )
+      ELSE
+        IRAD = 0.0
       END IF
 
-      DO I=1,NLIST
-* Find X list
-        IF(LNAMES(I).EQ.'X_CORR') THEN
-	   XNAME='X_CORR'
-           XN=I
-	ELSEIF(LNAMES(I).EQ.'X_RAW') THEN
-           XNAME='X_RAW'
-           XN=I
-	ELSEIF(LNAMES(I).EQ.'Y_CORR') THEN
-	   YNAME='Y_CORR'
-           YN=I
-	ELSEIF(LNAMES(I).EQ.'Y_RAW') THEN
-           YNAME='Y_RAW'
-           YN=I
-        ENDIF
-      ENDDO
-      IF(XN.EQ.0) THEN
-        CALL MSG_PRNT ('No legal Y-Coordinate')
-        GOTO 9000
-      ELSEIF(YN.EQ.0) THEN
-        CALL MSG_PRNT ('No legal Y-Coordinate')
-        GOTO 9000
-      ENDIF
+*  Find elements to copy to output
+      CALL EVCSUBSET_SETSEL( EVENTS, %VAL(XPTR), %VAL(YPTR), XCEN, YCEN,
+     :                       ORAD, IRAD, %VAL(COPY), OUTLEN, STATUS )
 
-* Map X and Y lists using common type
-        CALL BDA_CHKDATA(ILLOC(XN),OK,NDIM,DIMS,STATUS)
-        IF(OK.AND.NDIM.EQ.1) THEN
-          CALL BDA_MAPDATA(ILLOC(XN),'READ',XPTR,STATUS)
-        ELSE
-          CALL MSG_PRNT ('No legal X-Coordinate')
-          GOTO 9000
-        ENDIF
-	IF(STATUS.NE.SAI__OK) GOTO 9000
-
-        CALL BDA_CHKDATA(ILLOC(YN),OK,NDIM,DIMS,STATUS)
-        IF(OK.AND.NDIM.EQ.1) THEN
-          CALL BDA_MAPDATA(ILLOC(YN),'READ',YPTR,STATUS)
-        ELSE
-          CALL MSG_PRNT ('No legal Y-Coordinate')
-          GOTO 9000
-        ENDIF
-	IF(STATUS.NE.SAI__OK) GOTO 9000
-        INLEN=DIMS(1)
-
-* Obtain field ranges
-	CALL LIST_GFLDR(ILLOC(XN),XMIN,XMAX,STATUS)
-	CALL LIST_GFLDR(ILLOC(YN),YMIN,YMAX,STATUS)
-
-* Tell user what data range is
-* First X axis..
-       CALL MSG_SETR('XMIN',XMIN)
-       CALL MSG_SETR('XMAX',XMAX)
-       CALL MSG_SETC('XNAME',XNAME)
-       CALL MSG_PRNT ('The ^XNAME data range is ^XMIN to ^XMAX')
-
-* now Y axis..
-       CALL MSG_SETR('YMIN',YMIN)
-       CALL MSG_SETR('YMAX',YMAX)
-       CALL MSG_SETC('YNAME',YNAME)
-       CALL MSG_PRNT ('The ^YNAME data range is ^YMIN to ^YMAX')
-
-* annular or circular subset?
-       CALL USI_GET0L('ANNULUS',ANNTYPE,STATUS)
-* Central point?
-       CALL USI_GET0R('XCENT',XCEN,STATUS)
-       CALL USI_GET0R('YCENT',YCEN,STATUS)
-* Get radius/radii
-       CALL USI_GET0R('OUTER',ORAD,STATUS)
-       IF(ANNTYPE) THEN
-         CALL USI_GET0R('INNER',IRAD,STATUS)
-       ELSE
-         IRAD=0.0
-       ENDIF
-
-*    Set up and map temp 1D logical array
-      CALL DYN_MAPL (1, INLEN, PTR, STATUS)
-
-*    Find elements to copy to output
-      CALL EVCSUB_SETSEL(INLEN,%VAL(XPTR),%VAL(YPTR),XCEN,YCEN,ORAD,
-     :IRAD,%VAL(PTR),OUTLEN)
-
-*    Tell user how many items will remain
-      CALL MSG_SETI ('N1', INLEN)
-      CALL MSG_SETI ('N2',  OUTLEN)
-      CALL MSG_PRNT ('^N2 items remain out of ^N1 in original  dataset')
-
-      IF (OUTLEN .EQ. 0) THEN
+*  Tell user how many items will remain
+      CALL MSG_SETI( 'N1', EVENTS )
+      CALL MSG_SETI( 'N2', OUTLEN )
+      CALL MSG_PRNT( '^N2 items remain out of ^N1 in original dataset' )
+      IF ( OUTLEN .EQ. 0 ) THEN
         CALL MSG_PRNT ('FATAL ERROR: All data excluded')
         STATUS = SAI__ERROR
-      ELSE IF (OUTLEN .EQ. INLEN) THEN
+      ELSE IF ( OUTLEN .EQ. EVENTS ) THEN
         CALL MSG_PRNT ('FATAL ERROR: All data included')
         STATUS = SAI__ERROR
       END IF
+      IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Check status
-      IF (STATUS .NE. SAI__OK) GOTO 9000
+*  Create output file
+      CALL EDI_LINK( 'EventDS', OUTLEN, ' ', OFID, STATUS )
+      CALL UDI_COPANC( IFID, ' ', OFID, STATUS )
 
-*    Copy non list components ie TITLE, HISTORY, & MORE.
-      CALL DAT_NCOMP (ILOC, NCOMP, STATUS)
+*  Select events
+      CALL EDI_SUBSET( IFID, %VAL(COPY), OFID, STATUS )
 
-      DO I = 1, NCOMP
-        CALL DAT_INDEX (ILOC, I, CLOC, STATUS)
-        CALL DAT_TYPE  (CLOC, TYPE,    STATUS)
+*  Update list ranges
 
-        IF (TYPE .NE. 'LIST') THEN
-          CALL DAT_NAME (CLOC, CNAM,       STATUS)
-          CALL DAT_COPY (CLOC, OLOC, CNAM, STATUS)
+*  Release selection array
+      CALL DYN_UNMAP( COPY, STATUS )
 
-        END IF
-      END DO
-
-*    Do the subset operation
-      DO I = 1, NLIST
-        CALL MSG_PRNT ('Processing '//LNAMES(I))
-*      Find out if QUANTUM is scalar
-        IF(LNAMES(I).NE.'QUALITY') THEN
-          CALL CMP_SHAPE (ILLOC(I), 'QUANTUM', 7, DIMS, NDIM, STATUS)
-        ELSE
-          NDIM=0
-        ENDIF
-
-        IF (NDIM .EQ. 0) THEN
-          SCALAR_QUAN = .TRUE.
-
-        ELSE
-          SCALAR_QUAN = .FALSE.
-
-        END IF
-
-*      Get data type
-        CALL CMP_TYPE (ILLOC(I), 'DATA_ARRAY', TYPE, STATUS)
-
-*      Create new list
-        CALL LIST_NEW (OLOC, LNAMES(I), TYPE, OUTLEN, SCALAR_QUAN,
-     :                                                 OLLOC(I), STATUS)
-
-*      Check status
-        IF (STATUS .NE. SAI__OK) GOTO 9000
-
-*      Map input & output list vectors
-        IF (I.EQ.XN) THEN
-          IDATA = XPTR
-        ELSEIF(I.EQ.YN) THEN
-          IDATA = YPTR
-        ELSE
-          CALL BDA_MAPDATA(ILLOC(I),'READ',IDATA,STATUS)
-        END IF
-
-        CALL BDA_MAPDATA(OLLOC(I),'WRITE',ODATA,STATUS)
-
-        IF (.NOT. SCALAR_QUAN) THEN
-          CALL CMP_MAPV (ILLOC(I), 'QUANTUM', '_REAL', 'READ', IQUAN,
-     :                                                        N, STATUS)
-          CALL CMP_MAPV (OLLOC(I), 'QUANTUM', '_REAL', 'WRITE', OQUAN,
-     :                                                        N, STATUS)
-
-        END IF
-
-*      Perform the selection
-        CALL EVCSUB_SEL (INLEN, SCALAR_QUAN, %VAL(PTR), %VAL(IDATA),
-     :          %VAL(IQUAN), %VAL(ODATA), %VAL(OQUAN), STATUS)
-        CALL ARR_RANG1R(OUTLEN,%VAL(ODATA),MIN,MAX,STATUS)
-* Update field range
-        CALL LIST_PFLDR(OLLOC(I),MIN,MAX,STATUS)
-
-*      Unmap
-        CALL BDA_UNMAPDATA(ILLOC(I),STATUS)
-        CALL BDA_UNMAPDATA(OLLOC(I),STATUS)
-
-
-        IF (SCALAR_QUAN.AND.LNAMES(I).NE.'QUALITY') THEN
-          CALL HDX_OK (ILLOC(I), 'QUANTUM', OK, STATUS)
-
-          IF (OK) THEN
-            CALL CMP_GET0R (ILLOC(I), 'QUANTUM', VALUE, STATUS)
-            CALL CMP_PUT0R (OLLOC(I), 'QUANTUM', VALUE, STATUS)
-
-          END IF
-        ENDIF
-
-
-*      Update exposure time if TIMETAG list
-c        IF (LNAMES(I) .EQ. 'TIMETAG' .OR.
-c     :                                LNAMES(I) .EQ. 'RAW_TIMETAG') THEN
-*      Update exposure_time, etc.
-c          IF(SCALAR_QUAN) THEN
-c            EXPOS=VALUE*FLOAT(OUTLEN)
-c          ELSE
-c            CALL EVCSUB_EXPOS(OUTLEN,%VAL(OQUAN),EXPOS)
-c          ENDIF
-c          OBSLEN=MAX-MIN
-c
-c          CALL BDA_LOCHEAD (OLOC, TLOC,                STATUS)
-
-c          CALL DAT_THERE   (TLOC, 'EXPOSURE_TIME', THERE, STATUS)
-c          IF (.NOT. THERE) THEN
-c            CALL DAT_NEW0R (TLOC, 'EXPOSURE_TIME', STATUS)
-c          END IF
-c          CALL CMP_PUT0R (TLOC, 'EXPOSURE_TIME', EXPOS, STATUS)
-
-c          CALL DAT_THERE   (TLOC, 'OBS_LENGTH', THERE, STATUS)
-c          IF (.NOT. THERE) THEN
-c            CALL DAT_NEW0R (TLOC, 'OBS_LENGTH', STATUS)
-c          END IF
-c          CALL CMP_PUT0R (TLOC, 'OBS_LENGTH', OBSLEN, STATUS)
-
-c        END IF
-
-
-        IF(.NOT.SCALAR_QUAN) THEN
-          CALL CMP_UNMAP (ILLOC(I), 'QUANTUM', STATUS)
-          CALL CMP_UNMAP (OLLOC(I), 'QUANTUM', STATUS)
-        END IF
-
-*      Write FIELD_MIN & FIELD_MAX values
-        CALL CMP_PUT0R (OLLOC(I), 'FIELD_MAX', MAX, STATUS)
-        CALL CMP_PUT0R (OLLOC(I), 'FIELD_MIN', MIN, STATUS)
-
-*      Copy units
-        CALL HDX_OK (ILLOC(I), 'UNITS', OK, STATUS)
-
-        IF (OK) THEN
-          CALL CMP_GET0C (ILLOC(I), 'UNITS', C, STATUS)
-          CALL CMP_PUT0C (OLLOC(I), 'UNITS', C, STATUS)
-
-        END IF
-      END DO
-
-*    Unmap temporary booleans
-      CALL DYN_UNMAP( PTR, STATUS )
-
-*    Update history
+*  Update history
       CALL HSI_ADD( OFID, VERSION, STATUS )
-      CALL USI_NAMEI (INLINES,TEXTI, STATUS)
-      CALL HSI_PTXT( OFID, INLINES, TEXTI, STATUS )
-      CALL CHR_RTOC(XCEN,SXCEN,L1)
-      CALL CHR_RTOC(YCEN,SYCEN,L2)
-      ORAD=SQRT(ORAD)
-      CALL CHR_RTOC(ORAD,SORAD,L3)
-      IF(ANNTYPE) THEN
-        IRAD=SQRT(IRAD)
-        CALL CHR_RTOC(IRAD,SIRAD,L4)
-        TEXT(1)='Annulus, centre: ('//SXCEN(1:L1)//','//SYCEN(1:L2)
-     ://')'
-        TEXT(2)='Inner radius= '//SIRAD(1:L4)//',Outer radius='
-     ://SORAD(1:L3)
+      CALL USI_NAMES( 'I', IFILES, STATUS )
+      CALL HSI_PTXTI( OFID, IFILES, STATUS )
+      CALL MSG_SETR( 'XC', XCEN )
+      CALL MSG_SETR( 'YC', YCEN )
+      CALL MSG_SETR( 'OR', ORAD )
+      IF ( ANNULUS ) THEN
+        CALL MSG_SETR( 'IR', IRAD )
+        CALL MSG_MAKE( 'Annulus, centre (^XC,^YC)', TEXT(1), TLEN )
+        CALL MSG_MAKE( 'Inner radius = ^IR, outer radius = ^OR',
+     :                 TEXT(2), TLEN )
       ELSE
-        TEXT(1)='Circle, centre: ('//SXCEN(1:L1)//','//SYCEN(1:L2)
-     ://')'
-        TEXT(2)='Radius= '//SORAD(1:L3)
-      ENDIF
+        CALL MSG_MAKE( 'Circle, centre (^XC,^YC)', TEXT(1), TLEN )
+        CALL MSG_MAKE( 'Radius = ^OR', TEXT(2), TLEN )
+      END IF
       CALL HSI_PTXT( OFID, 2, TEXT, STATUS )
 
-*    Tidy up and exit
- 9000 CALL AST_CLOSE
+*  Tidy up
+ 99   CALL AST_CLOSE()
       CALL AST_ERR( STATUS )
 
       END
 
-*+  EVCSUB_SETSEL - Set up selection logicals according to values
-      SUBROUTINE EVCSUB_SETSEL(INLEN,XPTR,YPTR,XCEN,YCEN,ORAD,
-     : IRAD,TPTR,OUTLEN)
-*    Description :
-*     The selection criteria are applied, and if met TPTR = .TRUE.
-*     else TPTR = .FALSE.
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
-*     Alan McFadzean (BHVAD::ADM)
-*    History :
-*     16/1/89:  Original (ADM)
-*    Type Definitions :
-      IMPLICIT NONE
-*    Global constants :
-      INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-*    Import :
-      INTEGER                INLEN            ! length of lists
-      REAL                   XPTR(*)          ! X COORDS
-      REAL                   YPTR(*)          ! Y COORDS
-      REAL                   XCEN             ! X CENTRE POSITION
-      REAL                   YCEN             ! Y CENTRE POSITION
-      REAL                   ORAD             ! Annulus outer radius
-      REAL                   IRAD             ! Annulus inner radius
 
-*    Export :
-      LOGICAL                TPTR(*)          ! Copy this element to output?
-      INTEGER                OUTLEN           ! # outputs
-* Internal
-      REAL                   TEST             ! Test values
-      INTEGER                I                ! Loop counter
+
+      SUBROUTINE EVCSUBSET_SETSEL( INLEN, XP, YP, XCEN, YCEN, ORAD,
+     :                             IRAD, COPY, OUTLEN, STATUS )
+*+
+*  Name:
+*     EVCSUBSET_SELSEL
+
+*  Purpose:
+*     Set up selection logicals according to X,Y list values
+
+*  Language:
+*     Starlink Fortran
+
+*  Invocation:
+*     CALL EVCSUBSET_SELSEL( [p]... )
+
+*  Description:
+*     {routine_description}
+
+*  Arguments:
+*     INLEN = INTEGER (given)
+*        Number of events in input
+*     XP[] = REAL (given)
+*        X position of events
+*     YP[] = REAL (given)
+*        Y position of events
+*     XCEN = REAL (given)
+*        X centre of selection region
+*     YCEN = REAL (given)
+*        Y centre of selection region
+*     ORAD = REAL (given)
+*        Outer radius of selection region
+*     IRAD = REAL (given)
+*        Inner radius of selection region
+*     OUTLEN = INTEGER (returned)
+*        Number of selected events
+*     COPY[] = BYTE (returned)
+*        Selection array, 1 for selected events, 0 otherwise
+*     STATUS = INTEGER (given)
+*        The global status.
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
+*     {algorithm_description}...
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
+*     {routine_deficiencies}...
+
+*  References:
+*     {task_references}...
+
+*  Keywords:
+*     evcsubset, usage:private
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1995
+
+*  Authors:
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*     11 Jan 1996 (DJA):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
 *-
 
-      IF(IRAD.EQ.0) THEN
-* circular
-        ORAD=ORAD**2
-        OUTLEN=0
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+
+*  Arguments Given:
+      INTEGER			INLEN
+      REAL			XP(*), YP(*), XCEN, YCEN, ORAD, IRAD
+
+*  Arguments Returned:
+      INTEGER			OUTLEN
+      BYTE			COPY(*)
+
+*  Status:
+      INTEGER 			STATUS             	! Global status
+
+*  Local Variables:
+      REAL	  		IR2, OR2	  	! Radii squared
+      REAL                   	TEST             	! Test value
+
+      INTEGER                	I                	! Loop counter
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Initialise
+      OR2 = ORAD**2
+      IR2 = IRAD**2
+      OUTLEN = 0
+
+*  Circle?
+      IF ( IRAD .EQ. 0.0 ) THEN
+
         DO I=1,INLEN
-          TEST=((XCEN-XPTR(I))**2)+((YCEN-YPTR(I))**2)
-          IF(TEST.LE.ORAD) THEN
-            TPTR(I)=.TRUE.
-            OUTLEN=OUTLEN+1
+          TEST=((XCEN-XP(I))**2)+((YCEN-YP(I))**2)
+          IF(TEST.LE.OR2) THEN
+            COPY(I) = 1
+            OUTLEN = OUTLEN + 1
           ELSE
-            TPTR(I)=.FALSE.
-          ENDIF
-        ENDDO
-      ELSE
-* annular
-        ORAD=ORAD**2
-        IRAD=IRAD**2
-        OUTLEN=0
-        DO I=1,INLEN
-          TEST=((XCEN-XPTR(I))**2)+((YCEN-YPTR(I))**2)
-          IF(TEST.LE.ORAD.AND.TEST.GT.IRAD) THEN
-            TPTR(I)=.TRUE.
-            OUTLEN=OUTLEN+1
-          ELSE
-            TPTR(I)=.FALSE.
-          ENDIF
-        ENDDO
-      ENDIF
-
-      END
-
-*+  EVCSUB_SEL - Perform the subsetting
-      SUBROUTINE EVCSUB_SEL (INLEN, SCALAR_QUAN, COPY, IDATA, IQUAN,
-     :                                 ODATA, OQUAN, STATUS)
-*    Description :
-*     Loops over list, copying selected input values to output.
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
-*     Phil Andrews (PLA_AST88@uk.ac.bham.sr.star)
-*    History :
-*     30/11/88:  Original (PLA)
-*     17/11/89:  Borrowed from EVSUBSET (BHVAD::ADM)
-*    Type Definitions :
-      IMPLICIT NONE
-*    Global constants :
-      INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-*    Import :
-      INTEGER                INLEN            ! Length of input lists
-
-      LOGICAL                SCALAR_QUAN        ! Is QUANTUM scalar?
-      LOGICAL                COPY(INLEN)      ! Copy this element to output?
-
-      REAL                   IDATA(INLEN)     ! Input list DATA_ARRAY
-      REAL                   IQUAN(INLEN)     ! Input list QUANTUM
-*    Export :
-      REAL                   ODATA(*)           ! Output list DATA_ARRAY
-      REAL                   OQUAN(*)           ! Output list QUANTUM
-*    Status :
-      INTEGER                STATUS
-*    Local variables :
-      INTEGER                I, J               ! loop variables
-*-
-*    Check status
-      IF (STATUS .NE. SAI__OK) RETURN
-
-      J = 1
-
-      IF (SCALAR_QUAN) THEN
-        DO I = 1, INLEN
-          IF (COPY(I)) THEN
-            ODATA (J) = IDATA (I)
-            J = J + 1
-
+            COPY(I) = 0
           END IF
         END DO
-      ELSE
-        DO I = 1, INLEN
-          IF (COPY(I)) THEN
-            ODATA (J) = IDATA (I)
-            OQUAN (J) = IQUAN (I)
-            J = J + 1
 
+*  Annnulus
+      ELSE
+
+        DO I=1,INLEN
+          TEST=((XCEN-XP(I))**2)+((YCEN-YP(I))**2)
+          IF(TEST.LE.OR2.AND.TEST.GT.IR2) THEN
+            COPY(I) = 1
+            OUTLEN = OUTLEN + 1
+          ELSE
+            COPY(I) = 0
           END IF
         END DO
+
       END IF
-      END
 
-
-*+  EVCSUB_EXPOS - determine exposure time from QUANTUM info.
-      SUBROUTINE EVCSUB_EXPOS(OUTLEN,OQUAN,VALUE)
-*    Description :
-*     Loops over output QUANTUM values and sums to give total integration time.
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
-*     Alan McFadzean (BHVAD::ADM)
-*    History :
-*     17/1/89:  Original (ADM)
-*    Type Definitions :
-      IMPLICIT NONE
-*    Global constants :
-      INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-*    Import :
-      INTEGER                OUTLEN            ! Length of QUANTUM list
-
-      REAL                   OQUAN(OUTLEN)     ! Output list QUANTUM
-*    Export :
-      REAL                   VALUE             ! Integration time
-*    Local variables :
-      INTEGER                I                 ! loop variables
-*-
-      VALUE=0.0
-
-      DO I=1,OUTLEN
-        VALUE=VALUE+OQUAN(I)
-      ENDDO
       END
