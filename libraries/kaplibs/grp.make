@@ -6,7 +6,7 @@ EXCLUDE = ctg_test.f lpg_test.f
 TAR_FILES_A = kaplibs_source ira_source aif_source
 
 # The contents of the ira_source.tar file:
-KAPLIBS_SOURCE = kaplibs_link_adam kaplibs_dev fac_1522_err
+KAPLIBS_SOURCE = kaplibs_link_adam kaplibs_dev fac_1522_err kplsearch
 
 # The contents of the aif_source.tar file:
 AIF_SOURCE = aif_antmp.f aif_asfio.f aif_flnam.f aif_getvm.f aif_opfio.f \
