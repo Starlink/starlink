@@ -176,7 +176,6 @@
      :  NC,                    ! Number of characters
      :  NCK,                   ! Number of characters in the compound
                                ! keyword
-     :  NCKEY,                 ! Number of characters in the keyword
      :  NCHV,                  ! Number of characters in the value
      :  NWORD,                 ! Number of keywords in the current card
                                ! image
