@@ -43,6 +43,17 @@
 *     (the F.T. of the Bessel function), then transforming back into image
 *     space.
 *
+*     Additionally, spline interpolation and smoothing routines are also
+*     available. Note that the spline routines work on each integration
+*     in turn, whereas the weighting function routines work on all the input
+*     data in one go.
+
+*     The relative weights associated with each point in the output map
+*     are stored in a WEIGHTS NDF in the REDS extension of the output 
+*     data. For spline rebinning each point is equivalent to the number
+*     of integrations added into the final data point. For weight function
+*     regridding the situation is more complicated.
+
 *     This task can not be fully automated since the INPUT parameters
 *     are reused for each dataset. Datasets are entered until a null parameter
 *     value (!) is returned for IN.
@@ -50,6 +61,11 @@
 *     If this task is invoked as BOLREBIN then a separate map will be made
 *     of each bolometer. The output file will contain an NDF for each 
 *     bolometer.
+
+*     If this task is invoked as INTREBIN then a separate map will be 
+*     made of each integration. The output file will contain an NDF for each 
+*     bolometer.
+
 
 *  Usage:
 *     rebin REBIN_METHOD OUT_COORDS PIXSIZE_OUT
@@ -71,20 +87,34 @@
 *        map. For BOLREBIN this is the name of the HDS container file.
 *     OUT_COORDS = _CHAR (Read)
 *        The coordinate system of the output map. Available coordinate
-*        systems are AZimuth/elevation offsets, NAsmyth, RB (B1950), 
-*        RJ (J2000), RD (Current epoch) and GAlactic.
+*        systems are:
+*        - AZ:  Azimuth/elevation offsets 
+*        - NA:  Nasmyth offsets
+*        - PL:  RA/Dec Offsets from moving centre (eg Planets)
+*        - RB:  RA/Dec (B1950)
+*        - RJ:  RA/Dec (J2000)
+*        - RD:  RA/Dec (epoch of observation)
+*        - GA:  Galactic coordinates (J2000)
 *     OUT_OBJECT = _CHAR (Read)
 *        The name of the object (ie the NDF title).
 *     PIXSIZE_OUT = _REAL (Read)
-*        Size of pixels in the output map
+*        Size of pixels in the output map. Units are arcsec.
 *     REBIN_METHOD = _CHAR (Read)
-*        The rebin method to be used. This can be either LINEAR or BESSEL.
+*        The rebin method to be used. A number of regridding methods are
+*        available:
+*        - LINEAR:  Linear weighting function
+*        - BESSEL:  Bessel weighting function
+*        - SPLINE1: Interpolating spline (PDA_IDBVIP)
+*        - SPLINE2: Smoothing spline (PDA_SURFIT)
+*        - SPLINE3: Interpolating spline (PDA_IDSFFT)
+*        Please refer to the PDA documentation (SUN/194) for more information
+*        on the spline fitting algorithms.
 *     SHIFT_DX = _REAL (Read)
 *        The pointing shift (in X) to be applied that would bring the
-*        maps in line.
+*        maps in line. This is a shift in the output coordinte frame.
 *     SHIFT_DY = _REAL (Read)
 *        The pointing shift (in Y) to be applied that would bring the
-*        maps in line.
+*        maps in line. This is a shift in the output coordinate frame.
 *     USE_SECTION = _LOGICAL (Read)
 *        If you wish to discard the data specified by the SCUBA Section
 *        then select 'no'. If you wish to rebin a map using only
@@ -105,9 +135,10 @@
 *  Notes: 
 *     For each file name that is entered, values for the parameters
 *     SELECT_INTS, WEIGHT, SHIFT_DX and SHIFT_DY are requested.
-*     - Currently LINEAR and BESSEL regridding are supported.
 *     - The application can read in up to 100 separate input datasets. 
 *     - The output map will be large enough to include all data points.
+*     - Spline regridding may have problems with SCAN/MAP (since integrations
+*     contain lots of overlapping data points).
 
 
 *  Authors :
@@ -118,6 +149,11 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
+*     Revision 1.31  1997/05/13 01:25:46  timj
+*     Add EXTRACT_DATA.
+*     Add PL output coords
+*     Add SHIFTS to NA/AZ/PL
+*
 *     Revision 1.30  1997/04/09 20:45:13  timj
 *     Add INTREBIN
 *     Add extra security to new call to NDF_OPEN (include DUMMY parameter)
@@ -217,14 +253,6 @@ c
       INTEGER CHR_LEN                  ! CHR used-string-length function
 
 * Local Constants:
-      INTEGER          MAX__EXP           ! max number of exposures
-      PARAMETER (MAX__EXP = 128)          ! in a file
-      INTEGER          MAX__INT           ! max number of integrations 
-      PARAMETER (MAX__INT = 200)          ! in a file
-      INTEGER          MAX__MEAS          ! max number of measurements
-      PARAMETER (MAX__MEAS = 20)          ! that can be specified
-      INTEGER          MAX__SWITCH        ! max number of switches
-      PARAMETER (MAX__SWITCH = 3)         ! in a file
       REAL DIAMETER                    ! diameter of JCMT mirror
       PARAMETER (DIAMETER = 15.0)
       INTEGER WTFNRES                  ! number of values per scale length
@@ -303,11 +331,12 @@ c
       INTEGER          DUMMY_VARIANCE_PTR (MAX_FILE)
                                        ! Pointer to dummy variance
       INTEGER          EACHBOL         ! Bolometer loop counter
-      INTEGER          EXP_S (MAX__EXP)   ! array containing 1 for
+      INTEGER          EXP_S (SCUBA__MAX_EXP)! array containing 1 for
                                           ! exposures selected in
                                           ! data-spec, 0 otherwise
       LOGICAL          EXTINCTION      ! .TRUE. if EXTINCTION application has
                                        ! been run on input file
+      INTEGER          FD              ! File descriptor
       INTEGER          FILE            ! number of input files read
       CHARACTER*40     FILENAME (MAX_FILE)
                                        ! names of input files read
@@ -329,10 +358,10 @@ c
       CHARACTER*80     IN                 ! input filename and data-spec
       INTEGER          INTEGRATION     ! integration index in DO loop
       LOGICAL          INTREBIN        ! Am I rebinning ints separately?
-      INTEGER          INT_LIST(MAX_FILE, MAX__INT)
+      INTEGER          INT_LIST(MAX_FILE, SCUBA__MAX_INT + 1)
                                 ! Pointer to integration posns
       INTEGER          INT_NEXT        ! Position of start of next int
-      INTEGER          INT_S (MAX__INT)! array containing 1 for
+      INTEGER          INT_S (SCUBA__MAX_INT)! array containing 1 for
                                        ! integration selected by
                                        ! data-spec, 0 otherwise
       INTEGER          INT_START       ! Position of start of int
@@ -421,7 +450,7 @@ c
       REAL             MAP_Y           ! y offset of map centre from telescope
                                        ! centre (radians)
       INTEGER          MEASUREMENT     ! Counter in do loop
-      INTEGER          MEAS_S (MAX__MEAS) ! array containing 1 for
+      INTEGER          MEAS_S (SCUBA__MAX_MEAS) ! array containing 1 for
                                           ! measurement selected by
                                           ! data-spec, 0 otherwise
       DOUBLE PRECISION MJD_STANDARD    ! date for which apparent RA,Decs
@@ -470,8 +499,12 @@ c
                                        ! (radians)
       DOUBLE PRECISION OUT_ROTATION    ! angle between apparent N and N of
                                        ! output coord system (radians)
+      CHARACTER*(DAT__SZLOC) OUT_REDSX_LOC
+                                       ! locator to REDS extension in output
       CHARACTER * (132)OUT_TITLE       ! Title of output NDF
       INTEGER          OUT_VARIANCE_PTR! pointer to output map variance array
+      INTEGER          OUT_WEIGHT_NDF  ! NDF identifier for weight array
+      INTEGER          OUT_WEIGHT_PTR  ! Pointer to mapped weights array
       CHARACTER * (PAR__SZNAM) PARAM   ! Name of input parameter
       INTEGER          PLACE           ! Place holder for output NDF
       REAL             POINT_DAZ (SCUBA__MAX_POINT)
@@ -490,6 +523,7 @@ c
                                        ! been run on input file
       LOGICAL          REDUCE_SWITCH   ! .TRUE. if REDUCE_SWITCH application
                                        ! has been run on input file
+      LOGICAL          RESTORE         ! Was the SCAN data restored
       REAL             RTEMP           ! scratch real
       INTEGER          RUN_NUMBER      ! run number of input file
       CHARACTER*15     SAMPLE_COORDS   ! coordinate system of sample offsets
@@ -497,9 +531,11 @@ c
       REAL             SAMPLE_PA       ! position angle of sample x axis
                                        ! relative to x axis of SAMPLE_COORDS
                                        ! system
+      LOGICAL          SCAN_REVERSAL   ! Are we using SCAN_REVERSAL?
       CHARACTER*80     SCUCD_STATE     ! 'state' of SCUCD at the end of
                                        ! the observation
       LOGICAL          SECTION         ! Am I processing a SCUBA section?
+      REAL             SFACTOR         ! Smoothing factor for spline PDA_SURFIT
       REAL             SHIFT_DX (MAX_FILE)
                                        ! x shift to be applied to component map
                                        ! in OUTPUT_COORDS frame (radians)
@@ -508,6 +544,7 @@ c
                                        ! in OUTPUT_COORDS frame (radians)
       CHARACTER*1      SIGN            ! + or -
       CHARACTER*40     SOBJECT         ! name of first object
+      CHARACTER*10     SPMETHOD        ! Method of spline interpolation
       LOGICAL          STATE           ! Is an NDF component there or not
       CHARACTER*80     STEMP           ! scratch string
       CHARACTER*15     SUB_INSTRUMENT  ! the sub-instrument used to make the
@@ -516,7 +553,7 @@ c
       CHARACTER*15     SUTDATE         ! date of first observation
       CHARACTER*15     SUTSTART        ! UT of start of first observation
       LOGICAL          SWITCH_EXPECTED ! Should the section include SWITCH(NO)
-      INTEGER          SWITCH_S (MAX__SWITCH)
+      INTEGER          SWITCH_S (SCUBA__MAX_SWITCH)
                                           ! array that has 1 for
                                           ! switches selected by
                                           ! data-spec, 0 otherwise
@@ -570,21 +607,32 @@ c
       CALL MSG_IFGET('MSG_FILTER', STATUS)
 
 * Read in the weighting function
-      
+
+      IF (TSKNAME .NE. 'EXTRACT_DATA') THEN
       IF (METHOD.EQ.'BESSEL') THEN
 *   Bessel
+         CALL MSG_SETC('PKG',PACKAGE)
          CALL MSG_OUTIF(MSG__NORM, ' ', 
-     :        'Initialising BESSEL weighting functions',
+     :        '^PKG: Initialising BESSEL weighting functions',
      :        STATUS)
          WEIGHTSIZE = WTFNRAD
          CALL SCULIB_BESSEL_WTINIT(WTFN, WEIGHTSIZE, WTFNRES, STATUS)
       ELSE IF (METHOD.EQ.'LINEAR') THEN
 *   Linear
+         CALL MSG_SETC('PKG',PACKAGE)
          CALL MSG_OUTIF(MSG__NORM, ' ', 
-     :        'Initialising LINEAR weighting functions',
+     :        '^PKG: Initialising LINEAR weighting functions',
      :        STATUS)
          WEIGHTSIZE = 1
          CALL SCULIB_LINEAR_WTINIT(WTFN, WTFNRES, STATUS)
+
+      ELSE IF (METHOD(1:6) .EQ. 'SPLINE') THEN
+*     Do nothing
+         CALL MSG_SETC('PKG',PACKAGE)
+         CALL MSG_OUTIF(MSG__NORM, ' ', 
+     :        '^PKG: Spline interpolation selected',
+     :        STATUS)
+
       ELSE
          STATUS = SAI__ERROR
          CALL MSG_SETC('METHOD', METHOD)
@@ -592,13 +640,14 @@ c
          CALL ERR_REP(' ','^PKG: Rebin type ^METHOD unavailable',
      :        STATUS)
       END IF
+      END IF
 
 *  get the output coordinate system and set the default centre of the
 *  output map
 * This needs to be done in advance of reading files as sme systems
 * do not need to convert coordinate systems to apparent RA,Dec (eg NA)
 
-      CALL PAR_CHOIC('OUT_COORDS','RJ','AZ,NA,RB,RJ,GA,RD',.TRUE.,
+      CALL PAR_CHOIC('OUT_COORDS','RJ','AZ,NA,RB,RJ,GA,RD,PL',.TRUE.,
      :     OUT_COORDS, STATUS)
 
       HOURS = .TRUE.
@@ -630,6 +679,12 @@ c
          CALL MSG_OUTIF(MSG__NORM, ' ', 
      :        '^PKG: output coordinates are Az/El offsets', STATUS)
          HOURS = .FALSE.
+      ELSE IF (OUT_COORDS .EQ. 'PL') THEN
+         CALL MSG_SETC('PKG', PACKAGE)
+         CALL MSG_OUTIF(MSG__NORM, ' ', 
+     :        '^PKG: output coordinates are offsets from moving centre', 
+     :        STATUS)
+         HOURS = .FALSE.
       ELSE
          IF (STATUS .EQ. SAI__OK) THEN
             STATUS = SAI__ERROR
@@ -646,7 +701,7 @@ c
 
       READING = .TRUE.
       FILE = 0
-
+      
       DO WHILE (READING)
 
          FILE = FILE + 1
@@ -663,6 +718,7 @@ c
          END IF
 
          GOODNDF = .FALSE.
+
          DO WHILE (.NOT.GOODNDF)
 
 *       Set the default to GLOBAL first (have to do it this way since
@@ -703,12 +759,22 @@ c
  
 *       If STATUS is bad (maybe no file) then we need to ask again
                IF (STATUS .NE. SAI__OK) THEN
-                  CALL MSG_SETC('TASK',TSKNAME)
-                  CALL MSG_SETC('FILE',FILENAME(FILE))
-                  CALL ERR_REP(' ', '^TASK: Error opening file ^FILE',
-     :                 STATUS)
-                  CALL ERR_FLUSH(STATUS)
-                  CALL PAR_CANCL(PARAM, STATUS)
+
+*       It just might be a ASCII file so try opening with FIO
+*                  FIOSTATUS = 0
+*                  CALL FIO_OPEN(FILENAME(FILE),'READ','LIST',0,FD,
+*     :                 FIOSTATUS)
+
+*                  IF (FIOSTATUS .EQ. SAI__OK) THEN
+*                     FIO = .TRUE.
+*                  ELSE
+                     CALL MSG_SETC('TASK',TSKNAME)
+                     CALL MSG_SETC('FILE',FILENAME(FILE))
+                     CALL ERR_REP(' ','^TASK: Error opening file ^FILE',
+     :                    STATUS)
+                     CALL ERR_FLUSH(STATUS)
+                     CALL PAR_CANCL(PARAM, STATUS)
+*                  END IF
                ELSE 
                   GOODNDF = .TRUE.
                END IF
@@ -813,6 +879,7 @@ c
                EXTINCTION = .FALSE.
                FLATFIELD = .FALSE.
                REBIN = .FALSE.
+               RESTORE = .FALSE.
 
                IF (NREC .GT. 0) THEN
                   DO I = 1, NREC
@@ -827,6 +894,8 @@ c
                         FLATFIELD = .TRUE.
                      ELSE IF (STEMP .EQ. 'REBIN') THEN
                         REBIN = .TRUE.
+                     ELSE IF (STEMP .EQ. 'RESTORE') THEN
+                        RESTORE = .TRUE.
                      END IF
                   END DO
                END IF
@@ -879,6 +948,25 @@ c
                END IF
             END IF
 
+*       If this data is SCAN and has not been restored then I 
+*       need to implment SCAN_REVERSAL
+
+            SCAN_REVERSAL = .FALSE.
+            IF (SAMPLE_MODE .EQ. 'RASTER' .AND. .NOT. RESTORE) THEN
+               IF (STATUS .EQ. SAI__OK) THEN
+                  CALL SCULIB_GET_FITS_L(SCUBA__MAX_FITS, N_FITS, FITS,
+     :                 'SCAN_REV', SCAN_REVERSAL, STATUS)
+
+*     If I couldnt find the SCAN_REV keyword assume that SCAN_REVERSAL
+*     is true (always was initially).
+                  IF (STATUS .NE. SAI__OK) THEN
+                     SCAN_REVERSAL = .TRUE.
+                     CALL ERR_ANNUL(STATUS)
+                  END IF
+               END IF
+
+            END IF
+
 *  get the sub-instrument and wavelength of the data, check for consistency
 
             CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
@@ -923,6 +1011,17 @@ c
             CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
      :        'CENT_CRD', IN_CENTRE_COORDS, STATUS)
             CALL CHR_UCASE (IN_CENTRE_COORDS)
+
+            IF (OUT_COORDS .EQ. 'PL' .AND. 
+     :           IN_CENTRE_COORDS .NE. 'PLANET') THEN
+               STATUS = SAI__ERROR
+               CALL MSG_SETC('TASK', TSKNAME)
+               CALL ERR_REP(' ', '^TASK: You have chosen the PL '//
+     :              'coordinate system but the source is not moving',
+     :              STATUS)
+            END IF
+
+
             CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
      :        'LAT', STEMP, STATUS)
             CALL SCULIB_DECODE_ANGLE (STEMP, IN_LAT_RAD, STATUS)
@@ -942,10 +1041,16 @@ c
      :           'MJD1', IN_MJD1, STATUS)
                CALL SCULIB_GET_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS, 
      :           'MJD2', IN_MJD2, STATUS)
+            ELSE
+               IN_LAT2_RAD = 0.0D0
+               IN_LONG2_RAD = 0.0D0
+               IN_MJD1 = 0.0D0
+               IN_MJD2 = 0.0D0
             END IF
 
             IF ((IN_CENTRE_COORDS .NE. 'AZ') .AND.
-     :          (IN_CENTRE_COORDS .NE. 'GA')) THEN
+     :          (IN_CENTRE_COORDS .NE. 'GA') .AND.
+     :           (IN_CENTRE_COORDS .NE. 'NA')) THEN
                IN_LONG_RAD = IN_LONG_RAD * 15.0D0
                IN_LONG2_RAD = IN_LONG2_RAD * 15.0D0
             END IF
@@ -1188,6 +1293,10 @@ c
                CALL PAR_GET0L ('USE_SECTION', USE_INTS, STATUS)
                CALL PAR_CANCL ('USE_SECTION', STATUS)
 
+*     If we are using the section we actually want the inverse
+*     section to be set bad and not the section itself.
+               USE_INTS = .NOT.USE_INTS
+
 *     and set quality for the selected bolometers and positions
 
                CALL SCULIB_SET_DATA (USE_INTS, %val(IN_DATA_PTR(FILE)), 
@@ -1206,13 +1315,14 @@ c
             CALL SCULIB_MALLOC (N_POS(FILE) * N_BOL(FILE) * VAL__NBD,
      :           BOL_DEC_PTR(FILE), BOL_DEC_END(FILE), STATUS)
 
-
 *     Loop through bolometers and find apparent RA/Dec
             IF (STATUS .EQ. SAI__OK) THEN
 
-               CALL SCULIB_PROCESS_BOLS(.FALSE., 0, N_BOL(FILE),
+               CALL SCULIB_PROCESS_BOLS(.FALSE., .FALSE.,1, N_BOL(FILE),
      :              N_POS(FILE), N_SWITCHES, N_EXPOSURES, 
-     :              N_INTEGRATIONS, N_MEASUREMENTS, FILE, N_FITS, FITS,
+     :              N_INTEGRATIONS, N_MEASUREMENTS,
+     :              1, N_EXPOSURES, 1, N_INTEGRATIONS, 1,N_MEASUREMENTS,
+     :              FILE, N_FITS, FITS,
      :              %VAL(IN_DEM_PNTR_PTR), %VAL(IN_LST_STRT_PTR),
      :              IN_ROTATION, SAMPLE_MODE,
      :              SAMPLE_COORDS, OUT_COORDS, JIGGLE_REPEAT,
@@ -1220,11 +1330,14 @@ c
      :              IN_RA_CEN, IN_DEC_CEN,
      :              %VAL(IN_RA1_PTR), %VAL(IN_RA2_PTR), 
      :              %VAL(IN_DEC1_PTR), %VAL(IN_DEC2_PTR), MJD_STANDARD,
-     :              IN_UT1, N_POINT, POINT_LST, POINT_DAZ, POINT_DEL,
+     :              IN_UT1, IN_MJD1, IN_LONG_RAD, IN_LAT_RAD, IN_MJD2, 
+     :              IN_LONG2_RAD, IN_LAT2_RAD,
+     :              N_POINT, POINT_LST, POINT_DAZ, POINT_DEL,
      :              SCUBA__NUM_CHAN, SCUBA__NUM_ADC, BOL_ADC, BOL_CHAN,
-     :              BOL_DU3, BOL_DU4, 0.0, 0.0, 0.0, 0.0,
+     :              BOL_DU3, BOL_DU4, SCAN_REVERSAL, 0.0, 0.0, 0.0, 0.0,
      :              %VAL(BOL_DEC_PTR(FILE)), %VAL(BOL_RA_PTR(FILE)),
-     :              0,0, STATUS)
+     :              %VAL(IN_DATA_PTR(FILE)), 0.0, 
+     :              STATUS)
 
             END IF
 
@@ -1284,6 +1397,8 @@ c
 
             CALL NDF_ANNUL (IN_NDF, STATUS)
             CALL PAR_CANCL ('IN', STATUS)
+            CALL PAR_CANCL ('REF', STATUS)
+
          END IF
 
 *  break out of loop if status has gone bad
@@ -1307,14 +1422,15 @@ c
          END IF
       END IF
 
-*  get a title for the output map
+*     Nasmyth rebin doesn't need a coordinate frame
+*     Should only get through here if I am trying to rebin NA or AZ
+*     with SCAN data
 
-      CALL PAR_DEF0C ('OUT_OBJECT', SOBJECT, STATUS)
-      CALL PAR_GET0C ('OUT_OBJECT', OBJECT, STATUS)
+      IF ((OUT_COORDS.NE.'NA'.AND.OUT_COORDS.NE.'AZ' 
+     :     .AND. OUT_COORDS.NE.'PL')) THEN
 
-*  Nasmyth rebin doesn't need a coordinate frame
-
-      IF (OUT_COORDS.NE.'NA'.AND.OUT_COORDS.NE.'AZ') THEN
+*     Convert the input coordinates to the output coordinates
+*     and use them as the default.
 
          CALL SCULIB_CALC_OUTPUT_COORDS (OUT_RA_CEN, OUT_DEC_CEN, 
      :        MJD_STANDARD, OUT_COORDS, OUT_LONG, OUT_LAT, STATUS)
@@ -1322,7 +1438,7 @@ c
          IF (STATUS .EQ. SAI__OK) THEN
             IF (HOURS) then
                CALL SLA_DR2TF (2, OUT_LONG, SIGN, HMSF)
-               
+                  
                STEMP = SIGN
                WRITE (STEMP(2:3),'(I2.2)') HMSF(1)
                STEMP (4:4) = ' '
@@ -1333,7 +1449,7 @@ c
                WRITE (STEMP(11:12),'(I2.2)') HMSF(4)
             ELSE
                CALL SLA_DR2AF (1, OUT_LONG, SIGN, HMSF)
-
+               
                STEMP = SIGN
                WRITE (STEMP(2:4), '(I3.3)') HMSF(1)
                STEMP (5:5) = ' '
@@ -1345,7 +1461,7 @@ c
             END IF
          END IF
 
-*  Inform the 'RD' regridder the date of regrid
+*     Inform the 'RD' regridder the date of regrid
 
          IF (OUT_COORDS .EQ. 'RD') THEN
             CALL MSG_SETC ('UTDATE', SUTDATE)
@@ -1360,7 +1476,7 @@ c
 
          CALL PAR_DEF0C ('LONG_OUT', STEMP, STATUS)
          CALL PAR_GET0C ('LONG_OUT', STEMP, STATUS)
-
+         
          IF (STATUS .EQ. SAI__OK) THEN
             ITEMP = 1
             CALL SLA_DAFIN (STEMP, ITEMP, OUT_LONG, STATUS)
@@ -1379,7 +1495,7 @@ c
 
          IF (STATUS .EQ. SAI__OK) THEN
             CALL SLA_DR2AF (1, OUT_LAT, SIGN, HMSF)
-
+            
             STEMP = SIGN
             WRITE (STEMP(3:4),'(I2.2)') HMSF(1)
             STEMP (5:5) = ' '
@@ -1389,7 +1505,7 @@ c
             STEMP (11:11) = '.'
             WRITE (STEMP(12:12), '(I1.1)') HMSF(4)
          END IF
-
+            
          CALL PAR_DEF0C ('LAT_OUT', STEMP, STATUS)
          CALL PAR_GET0C ('LAT_OUT', STEMP, STATUS)
 
@@ -1419,20 +1535,61 @@ c
             DO I = 1, FILE
                CALL SCULIB_APPARENT_2_TP (N_BOL(I) * N_POS(I), 
      :              %val(BOL_RA_PTR(I)), %val(BOL_DEC_PTR(I)), 
-     :              OUT_RA_CEN, OUT_DEC_CEN, OUT_ROTATION, 
+     :              OUT_RA_CEN, OUT_DEC_CEN, OUT_ROTATION,
      :              DBLE(SHIFT_DX(I)), DBLE(SHIFT_DY(I)), STATUS)
             END DO
          END IF
 
 
-*  Deal with NA coords
+*  Deal with NA coords in Jiggle mode
       ELSE
 
          OUT_RA_CEN = 0.0
          OUT_DEC_CEN = 0.0
 
+*     Add a shift to the output coordinates
+         IF (STATUS .EQ. SAI__OK) THEN
+            DO I = 1, FILE
+
+               CALL SCULIB_ADDCAD(N_BOL(I) * N_POS(I),
+     :              %VAL(BOL_RA_PTR(I)), DBLE(SHIFT_DX(I)), 
+     :              %VAL(BOL_RA_PTR(I)))
+               CALL SCULIB_ADDCAD(N_BOL(I) * N_POS(I),
+     :              %VAL(BOL_DEC_PTR(I)), DBLE(SHIFT_DY(I)), 
+     :              %VAL(BOL_DEC_PTR(I)))
+               
+            END DO
+         END IF
+
       END IF
 
+*     Now if I want to I can simply write the data out to a file
+*     I can do this for task EXTRACT_DATA
+
+      IF (TSKNAME .EQ. 'EXTRACT_DATA') THEN
+
+*     Open an output file (I really want to check for STDOUT)
+         CALL FIO_ASSOC('FILE', 'WRITE', 'LIST', 0, FD, STATUS)
+
+*     Write out a small header
+
+*     Write out the good numbers
+         DO I = 1, FILE
+            CALL REDS_WRITE_DATA( FD, N_POS(I) * N_BOL(I), 
+     :           %VAL(IN_DATA_PTR(I)), %VAL(IN_VARIANCE_PTR(I)),
+     :           %VAL(BOL_RA_PTR(I)), %VAL(BOL_DEC_PTR(I)),
+     :           STATUS)
+         END DO
+
+*     Close the file
+         CALL FIO_CANCL('FILE', STATUS)
+
+      ELSE
+
+*  get a title for the output map
+
+      CALL PAR_DEF0C ('OUT_OBJECT', SOBJECT, STATUS)
+      CALL PAR_GET0C ('OUT_OBJECT', OBJECT, STATUS)
 
 *  get the pixel spacing of the output map
 
@@ -1441,18 +1598,6 @@ c
       CALL PAR_GET0R ('PIXSIZE_OUT', OUT_PIXEL, STATUS)
       OUT_PIXEL = OUT_PIXEL / REAL(R2AS)
 
-*  Now want to have full REBIN and looped BOLREBIN in same code
-
-      IF (BOLREBIN) THEN
-         TOTAL_BOLS = N_BOL(1)
-         CALL MSG_SETC('PKG', PACKAGE)
-         CALL MSG_SETC('NB', TOTAL_BOLS)
-         CALL MSG_OUTIF(MSG__NORM, ' ',
-     :        '^PKG: Processing ^NB bolometers', STATUS)
-      ELSE
-         TOTAL_BOLS = 1
-      END IF
-
       IF (BOLREBIN .OR. INTREBIN) THEN
 *  create the output file that will contain the reduced data in NDFs
  
@@ -1460,6 +1605,20 @@ c
          CALL HDS_NEW (OUT, OUT, 'REDS_BOLMAPS', 0, 0, OUT_LOC, STATUS)
 
       END IF
+
+*  Now want to have full REBIN and looped BOLREBIN in same code
+
+      IF (BOLREBIN) THEN
+         TOTAL_BOLS = N_BOL(1)
+         CALL MSG_SETC('PKG', PACKAGE)
+         CALL MSG_SETI('NB', TOTAL_BOLS)
+         CALL MSG_OUTIF(MSG__NORM, ' ',
+     :        '^PKG: Processing ^NB bolometers', STATUS)
+      ELSE
+         TOTAL_BOLS = 1
+      END IF
+
+
 
 *     Start looping on each bolometer
       IF (STATUS .EQ. SAI__OK) THEN
@@ -1659,10 +1818,25 @@ c
                   CALL NDF_MAP (OUT_NDF, 'VARIANCE', '_REAL', 
      :                 'WRITE/ZERO', OUT_VARIANCE_PTR, ITEMP, STATUS)
 
+*     Also create and map associated NDF of weights for each pixel
+*     as an NDF in the REDS extension
+
+                  CALL NDF_XNEW (OUT_NDF, 'REDS', 'REDS_EXTENSION',
+     :                 0, 0, OUT_REDSX_LOC, STATUS)
+
+                  CALL NDF_PLACE (OUT_REDSX_LOC, 'WEIGHTS', PLACE, 
+     :                 STATUS) 
+                  CALL NDF_NEW('_REAL', 2, LBND, UBND, PLACE, 
+     :                 OUT_WEIGHT_NDF, STATUS)
+                  CALL DAT_ANNUL(OUT_REDSX_LOC, STATUS)
+
+                  CALL NDF_MAP (OUT_WEIGHT_NDF, 'DATA', '_REAL', 
+     :                 'WRITE/ZERO', OUT_WEIGHT_PTR, ITEMP, STATUS)
+
 *     Fill Quality array with bad data
 
                   IF (STATUS .EQ. SAI__OK) THEN
-                     CALL SCULIB_CFILLB (NX_OUT * NY_OUT, 1, 
+                     CALL SCULIB_CFILLB (NX_OUT * NY_OUT, BADBIT, 
      :                    %val(OUT_QUALITY_PTR))
                   END IF
 
@@ -1686,19 +1860,30 @@ c
      :                    WTFN, WEIGHT, ABOL_DATA_PTR, ABOL_VAR_PTR, 
      :                    ABOL_RA_PTR, ABOL_DEC_PTR, %VAL(OUT_DATA_PTR), 
      :                    %VAL(OUT_VARIANCE_PTR), %VAL(OUT_QUALITY_PTR), 
-     :                    STATUS )
+     :                    %VAL(OUT_WEIGHT_PTR), STATUS )
 
-                  ELSE IF (METHOD .EQ. 'SPLINE') THEN
+                  ELSE IF (METHOD(1:6) .EQ. 'SPLINE') THEN
 
-*     Regrid with SPLINE interpolaion
-                     CALL SCULIB_SPLINE_REGRID(NFILES, N_POS, N_BOL,
-     :                    MAX__INT, N_INTS, DIAMETER, WAVELENGTH,
-     :                    OUT_PIXEL, NX_OUT, NY_OUT, I_CENTRE, J_CENTRE, 
-     :                    WEIGHT, INT_LIST, ABOL_DATA_PTR, ABOL_VAR_PTR, 
-     :                    ABOL_RA_PTR, ABOL_DEC_PTR, %VAL(OUT_DATA_PTR), 
+                     IF (METHOD .EQ. 'SPLINE1') THEN
+                        SPMETHOD = 'IDBVIP'
+                     ELSE IF (METHOD .EQ. 'SPLINE2') THEN
+                        SPMETHOD = 'SURFIT'
+                        CALL PAR_DEF0R('SFACTOR',NX_OUT*NY_OUT/2.0,
+     :                       STATUS)
+                        CALL PAR_GET0R('SFACTOR', SFACTOR, STATUS)
+                     ELSE 
+                        SPMETHOD = 'IDSFFT'
+                     END IF
+
+*     Regrid with SPLINE interpolation
+                     CALL SCULIB_SPLINE_REGRID(SPMETHOD, SFACTOR, 
+     :                    MAX_FILE, NFILES, N_BOL, SCUBA__MAX_INT, 
+     :                    N_INTS, DIAMETER, WAVELENGTH,OUT_PIXEL,NX_OUT, 
+     :                    NY_OUT, I_CENTRE, J_CENTRE, WEIGHT, INT_LIST, 
+     :                    ABOL_DATA_PTR, ABOL_VAR_PTR, ABOL_RA_PTR, 
+     :                    ABOL_DEC_PTR, %VAL(OUT_DATA_PTR), 
      :                    %VAL(OUT_VARIANCE_PTR), %VAL(OUT_QUALITY_PTR), 
-     :                    STATUS )
-
+     :                    %VAL(OUT_WEIGHT_PTR), STATUS )
 
                   ELSE
 
@@ -1743,6 +1928,7 @@ c
                      END DO
                   END IF
 
+                  CALL NDF_ANNUL(OUT_WEIGHT_NDF, STATUS)
                   CALL NDF_ANNUL(OUT_NDF, STATUS)
 
                END DO
@@ -1752,6 +1938,8 @@ c
       END IF
 
 *     This is the end of the BOLOMETER looping
+
+      END IF   ! This is the end of the EXTRACT_DATA bypass
 
 *  now finish off
 
