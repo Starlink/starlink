@@ -150,17 +150,7 @@ $(TKPROG): $(MKTCLAPP) gaia_swish.o tkAppInit.o ../initFortran.o FORCE
 	   $(LDFLAG1) $(ADDLIBS) $(LD_SEARCH_FLAGS) $(AST_LIBS) \
 	   $(SKYCAT_LIB) $(LOCAL_LIBRARY) \
 	   $(ADDLIBS) $(AST_LIBS) $(ADAM_LIBS) $(AST_LIBS) $(TCLTKLIBS) \
-	   $(X_LIB) $(LDFLAG2) $(EXTRA_LIBS) \
-  -L/Volumes/Boltzmann/local-star/lib \
-  -L/Volumes/Boltzmann/opt/local/bin/../lib/gcc-lib/powerpc-apple-darwin7.3.1/3.3.3 \
-  -L/Volumes/Boltzmann/opt/local/bin/../lib/gcc-lib \
-  -L/opt/local/lib \
-  -L/opt/local/lib/gcc-lib/powerpc-apple-darwin7.3.1/3.3.3 \
-  -L/Volumes/Boltzmann/opt/local/bin/../lib/gcc-lib/powerpc-apple-darwin7.3.1/3.3.3/../../.. \
-  -L/opt/local/lib/gcc-lib/powerpc-apple-darwin7.3.1/3.3.3/../../.. \
-  -lfrtbegin \
-  -lg2c \
-  -lSystem
+	   $(X_LIB) $(LDFLAG2) $(EXTRA_LIBS)
 
 $(TCLPROG): $(MKTCLAPP) gaia_stcl.o tclAppInit.o FORCE
 	@echo "linking \"$(TCLPROG)\"..."
