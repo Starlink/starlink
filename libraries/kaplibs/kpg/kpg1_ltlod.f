@@ -65,8 +65,6 @@
       CHARACTER LOC*(DAT__SZLOC) ! Locator to top-level container file object
       CHARACTER PATH*132         ! Path to the container file
       CHARACTER PLOC*(DAT__SZLOC)! Locator to LUT array 
-      CHARACTER TYPE*(DAT__SZNAM)! Device name
-      CHARACTER TYPE2*(DAT__SZNAM)! Secondary device name
       INTEGER DIMS( 2 )          ! Array dimensions
       INTEGER EL                 ! Number of mapped array elements
       INTEGER I                  ! Colour index
@@ -78,7 +76,6 @@
       LOGICAL DONE               ! LUT loaded?
       LOGICAL GWM                ! Is current device a GWM window?
       LOGICAL RDONLY             ! Is the GWM colour table read-only?
-      LOGICAL THERE              ! Object present?
       REAL D                     ! Increment in intensity  
       REAL RGB                   ! Current intensity  
 *.
@@ -146,27 +143,12 @@
 *  the file.
       ELSE
 
-*  Get the name of the component within the HDS container file which
-*  contains the LUT for the currently opened graphics device. 
-*  =================================================================
-         CALL KPG1_PGHNM( TYPE, STATUS )
-
-*  Find the LUT array within the container file.
-*  =================================================
-*  See if a component with the primary name exists within the container file.
-         CALL DAT_THERE( LOC, TYPE, THERE, STATUS )
-
-*  If not, see if a component for a device of the same type (but maybe a
-*  different name) can be found in the container file.
-         IF( .NOT. THERE ) THEN
-            CALL KPG1_PGHN2( LOC, THERE, TYPE, STATUS )
-         END IF
+*  Get a locator to the component within the HDS container file which
+*  contains the LUT to be used.
+         CALL KPG1_PGLOC( LOC, PLOC, STATUS )
 
 *  If a component with the right name exists, use it.
-         IF( THERE ) THEN
-
-*  Get a locator for it.
-            CALL DAT_FIND( LOC, TYPE, PLOC, STATUS )
+         IF( PLOC .NE. DAT__NOLOC ) THEN
 
 *  Get its dimensions.
             CALL DAT_SHAPE( PLOC, 2, DIMS, NDIM, STATUS )
@@ -223,6 +205,9 @@
 *  If no error has occurred, indicate that the LUT is loaded.
             IF( STATUS .EQ. SAI__OK ) DONE = .TRUE.
  
+*  Release the component locator.
+            CALL DAT_ANNUL( PLOC, STATUS )
+
          END IF
 
 *  Close the HDS container file.

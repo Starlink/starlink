@@ -67,7 +67,6 @@
       CHARACTER LOC*(DAT__SZLOC) ! Locator to top-level container file object
       CHARACTER PATH*132         ! Path to the container file
       CHARACTER PLOC*(DAT__SZLOC)! Locator to palette array 
-      CHARACTER TYPE*(DAT__SZNAM)! Device name
       INTEGER DIMS( 2 )          ! Array dimensions
       INTEGER EL                 ! Number of mapped array elements
       INTEGER NC                 ! Number of characters in the buffer
@@ -75,7 +74,6 @@
       INTEGER CI1                ! Lowest available colour index
       INTEGER CI2                ! Lowest available colour index
       INTEGER PNTR               ! Pointer to mapped array
-      LOGICAL THERE              ! Object present?
   
 *.
 
@@ -130,22 +128,13 @@
 *  the file.
       ELSE
 
-*  Get the name of the component within the HDS container file which
-*  contains the palette for the currently opened graphics device. 
+*  Get a locator for the component within the HDS container file which
+*  contains the palette to be used.
 *  =================================================================
-         CALL KPG1_PGHNM( TYPE, STATUS )
+         CALL KPG1_PGLOC( LOC, PLOC, STATUS )
 
-*  Find the palette array within the container file.
-*  =================================================
-
-*  See if a component with this name exists within the container file.
-         CALL DAT_THERE( LOC, TYPE, THERE, STATUS )
-
-*  If so...
-         IF( THERE ) THEN
-
-*  Get a locator for it.
-            CALL DAT_FIND( LOC, TYPE, PLOC, STATUS )
+*  If found...
+         IF( PLOC .NE. DAT__NOLOC ) THEN
 
 *  Get its dimensions.
             CALL DAT_SHAPE( PLOC, 2, DIMS, NDIM, STATUS )
@@ -205,6 +194,9 @@
 
 *  Load the palette into the colour table.
             CALL KPG1_PLGET( CI1, CI2, %VAL( PNTR ), STATUS )
+
+*  Release the component locator.
+            CALL DAT_ANNUL( PLOC, STATUS )
 
          END IF
 

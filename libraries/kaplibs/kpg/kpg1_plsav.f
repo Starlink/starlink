@@ -158,10 +158,9 @@
      :                 LOC, STATUS ) 
       END IF
 
-*  Get the name of the component within the HDS container file which
-*  contains the palette for the currently opened graphics device. 
-*  =================================================================
-      CALL KPG1_PGHNM( TYPE, STATUS )
+*  Get the name of the component to create within the HDS container file.
+*  This is the AGI name of the current graphics device.
+      CALL AGP_CURAG( TYPE, STATUS )
 
 *  Create an array of suitable dimensions within the container file to
 *  store the palette data.
