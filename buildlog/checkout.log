@@ -9094,23 +9094,23 @@ U java/source/votable/src/main/uk/ac/starlink/votable/CustomDOMBuilder.java
 U java/source/votable/src/main/uk/ac/starlink/votable/DataFormat.java
 U java/source/votable/src/main/uk/ac/starlink/votable/Decoder.java
 U java/source/votable/src/main/uk/ac/starlink/votable/Encoder.java
-U java/source/votable/src/main/uk/ac/starlink/votable/Field.java
-U java/source/votable/src/main/uk/ac/starlink/votable/Link.java
+U java/source/votable/src/main/uk/ac/starlink/votable/FieldElement.java
+U java/source/votable/src/main/uk/ac/starlink/votable/LinkElement.java
 U java/source/votable/src/main/uk/ac/starlink/votable/NumericDecoder.java
-U java/source/votable/src/main/uk/ac/starlink/votable/Param.java
+U java/source/votable/src/main/uk/ac/starlink/votable/ParamElement.java
 U java/source/votable/src/main/uk/ac/starlink/votable/RowStepper.java
-U java/source/votable/src/main/uk/ac/starlink/votable/Table.java
 U java/source/votable/src/main/uk/ac/starlink/votable/TableBodies.java
 U java/source/votable/src/main/uk/ac/starlink/votable/TableCopier.java
+U java/source/votable/src/main/uk/ac/starlink/votable/TableElement.java
 U java/source/votable/src/main/uk/ac/starlink/votable/TabularData.java
 U java/source/votable/src/main/uk/ac/starlink/votable/VOElement.java
+U java/source/votable/src/main/uk/ac/starlink/votable/VOElementFactory.java
 U java/source/votable/src/main/uk/ac/starlink/votable/VOSerializer.java
 U java/source/votable/src/main/uk/ac/starlink/votable/VOStarTable.java
-U java/source/votable/src/main/uk/ac/starlink/votable/VOTable.java
 U java/source/votable/src/main/uk/ac/starlink/votable/VOTableBuilder.java
 U java/source/votable/src/main/uk/ac/starlink/votable/VOTableDOMBuilder.java
 U java/source/votable/src/main/uk/ac/starlink/votable/VOTableWriter.java
-U java/source/votable/src/main/uk/ac/starlink/votable/Values.java
+U java/source/votable/src/main/uk/ac/starlink/votable/ValuesElement.java
 U java/source/votable/src/main/uk/ac/starlink/votable/package.html
 cvs checkout: Updating java/source/votable/src/resources
 cvs checkout: Updating java/source/votable/src/resources/uk
