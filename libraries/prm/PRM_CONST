@@ -1,0 +1,111 @@
+************************************************************************
+*				BEGIN                                  *
+*                                                                      *
+*    Private (internal) constant definitions for the PRIMDAT package   *
+*    ---------------------------------------------------------------   *
+*                                                                      *
+*				BEGIN                                  *
+************************************************************************
+*
+*    Authors :
+*     R.F. Warren-Smith (DUVAD::RFWS)
+*
+*    History :
+*     16-AUG-1988:  Original version (DUVAD::RFWS)
+*    endhistory
+*
+
+
+**********************************
+*   Zero, using each data type   *
+**********************************
+
+
+      BYTE VAL__ZB
+      PARAMETER ( VAL__ZB = 0 )
+
+      BYTE VAL__ZUB
+      PARAMETER ( VAL__ZUB = 0 )
+
+      INTEGER*2 VAL__ZW
+      PARAMETER ( VAL__ZW = 0 )
+
+      INTEGER*2 VAL__ZUW
+      PARAMETER ( VAL__ZUW = 0 )
+
+      INTEGER*2 VAL__ZI
+      PARAMETER ( VAL__ZI = 0 )
+
+      REAL VAL__ZR
+      PARAMETER ( VAL__ZR = 0.0 )
+
+      DOUBLE PRECISION VAL__ZD
+      PARAMETER ( VAL__ZD = 0.0D0 )
+
+
+
+*******************************************************************
+*   Lower limit for the argument of the inverse sine and cosine   *
+*   functions (i.e. -1 as close as possible)                      *
+*******************************************************************
+
+
+      BYTE VAL__M1B
+      PARAMETER ( VAL__M1B = -1 )
+
+      BYTE VAL__M1UB
+      PARAMETER ( VAL__M1UB = 0 )
+
+      INTEGER*2 VAL__M1W
+      PARAMETER ( VAL__M1W = -1 )
+
+      INTEGER*2 VAL__M1UW
+      PARAMETER ( VAL__M1UW = 0 )
+
+      INTEGER VAL__M1I
+      PARAMETER ( VAL__M1I = -1 )
+
+      REAL VAL__M1R
+      PARAMETER ( VAL__M1R = -1.0 )
+
+      DOUBLE PRECISION VAL__M1D
+      PARAMETER ( VAL__M1D = -1.0D0 )
+
+
+
+*******************************************************************
+*   Upper limit for the argument of the inverse sine and cosine   *
+*   functions (i.e. +1)                                           *
+*******************************************************************
+
+
+      BYTE VAL__P1B
+      PARAMETER ( VAL__P1B = 1 )
+
+      BYTE VAL__P1UB
+      PARAMETER ( VAL__P1UB = 1 )
+
+      INTEGER*2 VAL__P1W
+      PARAMETER ( VAL__P1W = 1 )
+
+      INTEGER*2 VAL__P1UW
+      PARAMETER ( VAL__P1UW = 1 )
+
+      INTEGER VAL__P1I
+      PARAMETER ( VAL__P1I = 1 )
+
+      REAL VAL__P1R
+      PARAMETER ( VAL__P1R = 1.0 )
+
+      DOUBLE PRECISION VAL__P1D
+      PARAMETER ( VAL__P1D = 1.0D0 )
+
+
+
+************************************************************************
+*				END                                    *
+*                                                                      *
+*    Private (internal) constant definitions for the PRIMDAT package   *
+*                                                                      *
+*				END                                    *
+************************************************************************

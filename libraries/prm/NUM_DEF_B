@@ -1,0 +1,151 @@
+************************************************************************
+*                               BEGIN                                  *
+*                                                                      *
+*                 Definitions of NUM_ BYTE functions                   *
+*                 ----------------------------------                   *
+*                                                                      *
+*                               BEGIN                                  *
+************************************************************************
+*
+*    Authors :
+*     R.F. Warren-Smith (DUVAD::RFWS)
+*
+*    History :
+*     16-AUG-1988:  Original version (DUVAD::RFWS)
+*    endhistory
+*
+ 
+ 
+*******************************************
+*   Arithmetic between two BYTE numbers   *
+*******************************************
+
+ 
+*   Add.
+      NUM_ADDB( NUM_ARGB1, NUM_ARGB2 ) =
+     :                          NUM_ARGB1 + NUM_ARGB2
+ 
+*   Subtract.
+      NUM_SUBB( NUM_ARGB1, NUM_ARGB2 ) =
+     :                          NUM_ARGB1 - NUM_ARGB2
+ 
+*   Floating multiply.
+      NUM_MULB( NUM_ARGB1, NUM_ARGB2 ) =
+     :                          NUM_ARGB1 * NUM_ARGB2
+ 
+*   Floating divide.
+      NUM_DIVB( NUM_ARGB1, NUM_ARGB2 ) = NUM_RTOB(
+     :                          NUM_BTOR( NUM_ARGB1 ) /
+     :                          NUM_BTOR( NUM_ARGB2 ) )
+
+*   Integer divide.
+      NUM_IDVB( NUM_ARGB1, NUM_ARGB2 ) = NUM_ARGB1 / NUM_ARGB2
+
+*   Raise to power.
+      NUM_PWRB( NUM_ARGB1, NUM_ARGB2 ) = NUM_ITOB(
+     :                          NUM_BTOI( NUM_ARGB1 ) **
+     :                          NUM_BTOI( NUM_ARGB2 ) )
+
+ 
+ 
+**************************************************
+*   BYTE functions with a single BYTE argument   *
+**************************************************
+
+ 
+*   Negate argument.
+      NUM_NEGB( NUM_ARGB ) = - NUM_ARGB
+ 
+*   Square root.
+      NUM_SQRTB( NUM_ARGB ) = NUM_RTOB( SQRT( NUM_BTOR( NUM_ARGB ) ) )
+ 
+*   Natural logarithm (base e).
+      NUM_LOGB( NUM_ARGB ) = NUM_RTOB( LOG( NUM_BTOR( NUM_ARGB ) ) )
+ 
+*   Common logarithm (base 10).
+      NUM_LG10B( NUM_ARGB ) = NUM_RTOB( LOG10( NUM_BTOR( NUM_ARGB ) ) )
+ 
+*   Exponential function.
+      NUM_EXPB( NUM_ARGB ) = NUM_RTOB( EXP( NUM_BTOR( NUM_ARGB ) ) )
+ 
+*   Absolute (positive) value.
+      NUM_ABSB( NUM_ARGB ) = NUM_WTOB( ABS( NUM_BTOW( NUM_ARGB ) ) )
+ 
+*   Nearest integer.
+      NUM_NINTB( NUM_ARGB ) = NUM_ARGB
+
+*   Truncation to integer.
+      NUM_INTB( NUM_ARGB ) = NUM_ARGB 
+
+ 
+
+*********************************************
+*  BYTE functions with two BYTE arguments   *
+*********************************************
+
+ 
+*   Minimum of two numbers.
+      NUM_MINB( NUM_ARGB1, NUM_ARGB2 ) = NUM_WTOB( MIN(
+     :                          NUM_BTOW( NUM_ARGB1 ),
+     :                          NUM_BTOW( NUM_ARGB2 ) ) )
+ 
+*   Maximum of two numbers.
+      NUM_MAXB( NUM_ARGB1, NUM_ARGB2 ) = NUM_WTOB( MAX(
+     :                          NUM_BTOW( NUM_ARGB1 ),
+     :                          NUM_BTOW( NUM_ARGB2 ) ) )
+ 
+*   Fortran DIM (positive difference) function.
+      NUM_DIMB( NUM_ARGB1, NUM_ARGB2 ) = NUM_WTOB( DIM(
+     :                          NUM_BTOW( NUM_ARGB1 ),
+     :                          NUM_BTOW( NUM_ARGB2 ) ) )
+ 
+*   Fortran MOD (remainder) function.
+      NUM_MODB( NUM_ARGB1, NUM_ARGB2 ) = NUM_WTOB( MOD(
+     :                          NUM_BTOW( NUM_ARGB1),
+     :                          NUM_BTOW( NUM_ARGB2 ) ) )
+ 
+*   Fortran SIGN (transfer of sign) function.
+      NUM_SIGNB( NUM_ARGB1, NUM_ARGB2 ) = NUM_WTOB( SIGN(
+     :                          NUM_BTOW( NUM_ARGB1 ),
+     :                          NUM_BTOW( NUM_ARGB2 ) ) )
+
+
+ 
+****************************************************
+*   Logical functions comparing two BYTE numbers   *
+****************************************************
+
+ 
+*   Equality.
+      NUM_EQB( NUM_ARGB1, NUM_ARGB2 ) =
+     :                          NUM_ARGB1 .EQ. NUM_ARGB2
+ 
+*   Inequality.
+      NUM_NEB( NUM_ARGB1, NUM_ARGB2 ) =
+     :                          NUM_ARGB1 .NE. NUM_ARGB2
+ 
+*   Greater than.
+      NUM_GTB( NUM_ARGB1, NUM_ARGB2 ) =
+     :                          NUM_ARGB1 .GT. NUM_ARGB2
+ 
+*   Greater than or equal.
+      NUM_GEB( NUM_ARGB1, NUM_ARGB2 ) =
+     :                          NUM_ARGB1 .GE. NUM_ARGB2
+ 
+*   Less than.
+      NUM_LTB( NUM_ARGB1, NUM_ARGB2 ) =
+     :                          NUM_ARGB1 .LT. NUM_ARGB2
+ 
+*   Less than or equal.
+      NUM_LEB( NUM_ARGB1, NUM_ARGB2 ) =
+     :                          NUM_ARGB1 .LE. NUM_ARGB2
+ 
+ 
+
+************************************************************************
+*                               END                                    *
+*                                                                      *
+*                 Definitions of NUM_ BYTE functions                   *
+*                                                                      *
+*                               END                                    *
+************************************************************************

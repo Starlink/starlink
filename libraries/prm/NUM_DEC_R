@@ -1,0 +1,80 @@
+************************************************************************
+*                               BEGIN                                  *
+*                                                                      *
+*               Declarations for NUM_ REAL functions                   *
+*               ------------------------------------                   *
+*                                                                      *
+*                               BEGIN                                  *
+************************************************************************
+*
+*    Authors :
+*     R.F. Warren-Smith (DUVAD::RFWS)
+*
+*    History :
+*     16-AUG-1988:  Original version (DUVAD::RFWS)
+*    endhistory
+*
+ 
+ 
+*   REAL arithmetic functions.
+      REAL NUM_ADDR
+      REAL NUM_SUBR
+      REAL NUM_MULR
+      REAL NUM_DIVR
+      REAL NUM_IDVR
+      REAL NUM_PWRR
+      REAL NUM_NEGR
+ 
+ 
+*   REAL functions with a single REAL argument.
+      REAL NUM_SQRTR
+      REAL NUM_LOGR
+      REAL NUM_LG10R
+      REAL NUM_EXPR
+      REAL NUM_SINR
+      REAL NUM_COSR
+      REAL NUM_TANR
+      REAL NUM_SINDR
+      REAL NUM_COSDR
+      REAL NUM_TANDR
+      REAL NUM_ASINR
+      REAL NUM_ACOSR
+      REAL NUM_ATANR
+      REAL NUM_ASNDR
+      REAL NUM_ACSDR
+      REAL NUM_ATNDR
+      REAL NUM_SINHR
+      REAL NUM_COSHR
+      REAL NUM_TANHR
+      REAL NUM_ABSR
+      REAL NUM_NINTR
+      REAL NUM_INTR
+ 
+ 
+*   REAL functions with two REAL arguments.
+      REAL NUM_MINR
+      REAL NUM_MAXR
+      REAL NUM_DIMR
+      REAL NUM_MODR
+      REAL NUM_SIGNR
+      REAL NUM_ATN2R
+      REAL NUM_AT2DR
+ 
+ 
+*   Logical functions comparing two REAL numbers.
+      LOGICAL NUM_EQR
+      LOGICAL NUM_NER
+      LOGICAL NUM_GTR
+      LOGICAL NUM_GER
+      LOGICAL NUM_LTR
+      LOGICAL NUM_LER
+ 
+
+ 
+************************************************************************
+*                               END                                    *
+*                                                                      *
+*               Declarations for NUM_ REAL functions                   *
+*                                                                      *
+*                               END                                    *
+************************************************************************

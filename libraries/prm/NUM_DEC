@@ -1,0 +1,71 @@
+************************************************************************
+*                               BEGIN                                  *
+*                                                                      *
+*             Declarations of NUM_ routines and arguments              *
+*             -------------------------------------------              *
+*                                                                      *
+*                               BEGIN                                  *
+************************************************************************
+*
+*    Authors :
+*     R.F. Warren-Smith (DUVAD::RFWS)
+*     A.J. Chipperfield (STARLINK, RAL)
+*
+*    History :
+*     16-AUG-1988:  Original version (DUVAD::RFWS)
+*     28-FEB-1995:  Replace references to /star/include (AJC)
+*     12-MAR-2003:  Remove INSTALL_INC and change include names to uppercase
+*                   (done during import into CVS and autoconfing)
+*                   (Norman Gray, Starlink)
+*    endhistory
+*
+ 
+ 
+*   Declare data type conversion routines and arguments.
+      INCLUDE 'NUM_DEC_CVT'
+
+
+
+*   Declare BYTE routines.
+      INCLUDE 'NUM_DEC_B'
+
+
+
+*   Declare UNSIGNED BYTE routines.
+      INCLUDE 'NUM_DEC_UB'
+
+
+ 
+*   Declare WORD routines.
+      INCLUDE 'NUM_DEC_W'
+
+
+ 
+*   Declare UNSIGNED WORD routines.
+      INCLUDE 'NUM_DEC_UW'
+
+
+
+*   Declare INTEGER routines.
+      INCLUDE 'NUM_DEC_I'
+
+
+ 
+*   Declare REAL routines.
+      INCLUDE 'NUM_DEC_R'
+
+
+
+*   Declare DOUBLE PRECISION routines.
+      INCLUDE 'NUM_DEC_D'
+
+
+ 
+ 
+************************************************************************
+*                               END                                    *
+*                                                                      *
+*             Declarations of NUM_ routines and arguments              *
+*                                                                      *
+*                               END                                    *
+************************************************************************

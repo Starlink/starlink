@@ -1,0 +1,146 @@
+************************************************************************
+*                               BEGIN                                  *
+*                                                                      *
+*                 Definitions of NUM_ WORD functions                   *
+*                 ----------------------------------                   *
+*                                                                      *
+*                               BEGIN                                  *
+************************************************************************
+*
+*    Authors :
+*     R.F. Warren-Smith  (DUVAD::RFWS)
+*
+*    History :
+*     16-AUG-1988:  Original version (DUVAD::RFWS)
+*    endhistory
+*
+ 
+ 
+*******************************************
+*   Arithmetic between two WORD numbers   *
+*******************************************
+
+ 
+*   Add.
+      NUM_ADDW( NUM_ARGW1, NUM_ARGW2 ) =
+     :                          NUM_ARGW1 + NUM_ARGW2
+ 
+*   Subtract.
+      NUM_SUBW( NUM_ARGW1, NUM_ARGW2 ) =
+     :                          NUM_ARGW1 - NUM_ARGW2
+ 
+*   Floating multiply.
+      NUM_MULW( NUM_ARGW1, NUM_ARGW2 ) =
+     :                          NUM_ARGW1 * NUM_ARGW2
+ 
+*   Floating divide.
+      NUM_DIVW( NUM_ARGW1, NUM_ARGW2 ) = NUM_RTOW(
+     :                          NUM_WTOR( NUM_ARGW1 ) /
+     :                          NUM_WTOR( NUM_ARGW2 ) )
+ 
+*   Integer divide.
+      NUM_IDVW( NUM_ARGW1, NUM_ARGW2 ) = NUM_ARGW1 / NUM_ARGW2
+
+*   Raise to power.
+      NUM_PWRW( NUM_ARGW1, NUM_ARGW2 ) = NUM_ITOW(
+     :                          NUM_WTOI( NUM_ARGW1 ) **
+     :                          NUM_WTOI( NUM_ARGW2 ) )
+ 
+
+ 
+**************************************************
+*   WORD functions with a single WORD argument   *
+**************************************************
+
+ 
+*   Negate argument.
+      NUM_NEGW( NUM_ARGW ) = - NUM_ARGW
+ 
+*   Square root.
+      NUM_SQRTW( NUM_ARGW ) = NUM_RTOW( SQRT( NUM_WTOR( NUM_ARGW ) ) )
+ 
+*   Natural logarithm (base e).
+      NUM_LOGW( NUM_ARGW ) = NUM_RTOW( LOG( NUM_WTOR( NUM_ARGW ) ) )
+ 
+*   Common logarithm (base 10).
+      NUM_LG10W( NUM_ARGW ) = NUM_RTOW( LOG10( NUM_WTOR( NUM_ARGW ) ) )
+ 
+*   Exponential function.
+      NUM_EXPW( NUM_ARGW ) = NUM_RTOW( EXP( NUM_WTOR( NUM_ARGW ) ) )
+ 
+*   Absolute (positive) value.
+      NUM_ABSW( NUM_ARGW ) = ABS( NUM_ARGW )
+ 
+*   Nearest integer.
+      NUM_NINTW( NUM_ARGW ) = NUM_ARGW
+
+*   Truncate to integer.
+      NUM_INTW( NUM_ARGW ) = NUM_ARGW
+
+       
+ 
+*********************************************
+*  WORD functions with two WORD arguments   *
+*********************************************
+
+ 
+*   Minimum of two numbers.
+      NUM_MINW( NUM_ARGW1, NUM_ARGW2 ) =
+     :                          MIN( NUM_ARGW1, NUM_ARGW2 )
+ 
+*   Maximum of two numbers.
+      NUM_MAXW( NUM_ARGW1, NUM_ARGW2 ) =
+     :                          MAX( NUM_ARGW1, NUM_ARGW2 )
+ 
+*   Fortran DIM (positive difference) function.
+      NUM_DIMW( NUM_ARGW1, NUM_ARGW2 ) =
+     :                          DIM( NUM_ARGW1, NUM_ARGW2 )
+ 
+*   Fortran MOD (remainder) function.
+      NUM_MODW( NUM_ARGW1, NUM_ARGW2 ) =
+     :                          MOD( NUM_ARGW1, NUM_ARGW2 )
+ 
+*   Fortran SIGN (transfer of sign) function.
+      NUM_SIGNW( NUM_ARGW1, NUM_ARGW2 ) =
+     :                          SIGN( NUM_ARGW1, NUM_ARGW2 )
+
+ 
+ 
+****************************************************
+*   Logical functions comparing two WORD numbers   *
+****************************************************
+
+ 
+*   Equality.
+      NUM_EQW( NUM_ARGW1, NUM_ARGW2 ) =
+     :                          NUM_ARGW1 .EQ. NUM_ARGW2
+ 
+*   Inequality.
+      NUM_NEW( NUM_ARGW1, NUM_ARGW2 ) =
+     :                          NUM_ARGW1 .NE. NUM_ARGW2
+ 
+*   Greater than.
+      NUM_GTW( NUM_ARGW1, NUM_ARGW2 ) =
+     :                          NUM_ARGW1 .GT. NUM_ARGW2
+ 
+*   Greater than or equal.
+      NUM_GEW( NUM_ARGW1, NUM_ARGW2 ) =
+     :                          NUM_ARGW1 .GE. NUM_ARGW2
+ 
+*   Less than.
+      NUM_LTW( NUM_ARGW1, NUM_ARGW2 ) =
+     :                          NUM_ARGW1 .LT. NUM_ARGW2
+ 
+*   Less than or equal.
+      NUM_LEW( NUM_ARGW1, NUM_ARGW2 ) =
+     :                          NUM_ARGW1 .LE. NUM_ARGW2
+ 
+
+ 
+************************************************************************
+*                               END                                    *
+*                                                                      *
+*                 Definitions of NUM_ WORD functions                   *
+*                                                                      *
+*                               END                                    *
+************************************************************************

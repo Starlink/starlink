@@ -1,0 +1,71 @@
+************************************************************************
+*                               BEGIN                                  *
+*                                                                      *
+*                    Definitions of NUM_ functions		       *
+*                    -----------------------------                     *
+*                                                                      *
+*                               BEGIN                                  *
+************************************************************************
+*
+*    Authors :
+*     R.F. Warren-Smith (DUVAD::RFWS)
+*     A.J. Chipperfield (STARLINK, RAL)
+*
+*    History :
+*     16-AUG-1988:  Original version (DUVAD::RFWS)
+*     28-FEB-1995:  Replace references to /star/include (AJC)
+*     12-MAR-2003:  Remove INSTALL_INC and change include names to uppercase
+*                   (done during import into CVS and autoconfing)
+*                   (Norman Gray, Starlink)
+*    endhistory
+*
+ 
+
+*   Define data type conversion functions and arguments.
+      INCLUDE 'NUM_DEF_CVT'
+
+
+
+*   Define BYTE functions.
+      INCLUDE 'NUM_DEF_B'
+
+
+
+*   Define UNSIGNED BYTE functions.
+      INCLUDE 'NUM_DEF_UB'
+
+
+ 
+*   Define WORD functions.
+      INCLUDE 'NUM_DEF_W'
+
+
+ 
+*   Define UNSIGNED WORD functions.
+      INCLUDE 'NUM_DEF_UW'
+
+
+
+*   Define INTEGER functions.
+      INCLUDE 'NUM_DEF_I'
+
+
+ 
+*   Define REAL functions.
+      INCLUDE 'NUM_DEF_R'
+
+
+ 
+*   Define DOUBLE PRECISION functions.
+      INCLUDE 'NUM_DEF_D'
+
+
+
+ 
+************************************************************************
+*                               END                                    *
+*                                                                      *
+*                    Definitions of NUM_ functions		       *
+*                                                                      *
+*                               END                                    *
+************************************************************************

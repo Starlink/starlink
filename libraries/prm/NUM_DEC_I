@@ -1,0 +1,63 @@
+************************************************************************
+*                               BEGIN                                  *
+*                                                                      *
+*              Declarations for NUM_ INTEGER functions                 *
+*              ---------------------------------------                 *
+*                                                                      *
+*                               BEGIN                                  *
+************************************************************************
+*
+*    Authors :
+*     R.F. Warren-Smith (DUVAD::RFWS)
+*
+*    History :
+*     16-AUG-1988:  Original version (DUVAD::RFWS)
+*    endhistory
+*
+ 
+ 
+*   INTEGER arithmetic functions.
+      INTEGER NUM_ADDI
+      INTEGER NUM_SUBI
+      INTEGER NUM_MULI
+      INTEGER NUM_DIVI
+      INTEGER NUM_IDVI
+      INTEGER NUM_PWRI
+      INTEGER NUM_NEGI
+ 
+ 
+*   INTEGER functions with a single INTEGER argument.
+      INTEGER NUM_SQRTI
+      INTEGER NUM_LOGI
+      INTEGER NUM_LG10I
+      INTEGER NUM_EXPI
+      INTEGER NUM_ABSI
+      INTEGER NUM_NINTI
+      INTEGER NUM_INTI
+ 
+ 
+*   INTEGER functions with two INTEGER arguments.
+      INTEGER NUM_MINI
+      INTEGER NUM_MAXI
+      INTEGER NUM_DIMI
+      INTEGER NUM_MODI
+      INTEGER NUM_SIGNI
+ 
+ 
+*   Logical functions comparing two INTEGER numbers.
+      LOGICAL NUM_EQI
+      LOGICAL NUM_NEI
+      LOGICAL NUM_GTI
+      LOGICAL NUM_GEI
+      LOGICAL NUM_LTI
+      LOGICAL NUM_LEI
+ 
+
+ 
+************************************************************************
+*                               END                                    *
+*                                                                      *
+*              Declarations for NUM_ INTEGER functions                 *
+*                                                                      *
+*                               END                                    *
+************************************************************************

@@ -1,9 +1,18 @@
+#include <config.h>
+#if HAVE_INTRINSIC_NINT
+#  define xNINT NINT
+#elif HAVE_INTRINSIC_ANINT
+#  define xNINT ANINT
+#else
+#  error Neither NINT nor ANINT is available
+#endif
+
 *+
 *  Name:
 *     NUM_DEF_CVT
 
 *  Type of Module:
-*     Fortran include file.
+*     Fortran include file, to be preprocessed.
 
 *  Purpose:
 *     Define NUM_ functions for type conversion.
@@ -15,10 +24,33 @@
 *  Notes:
 *     This file should be preceded by the file NUM_DEC_CVT which
 *     declares the function data types and their arguments.
+*
+*     This file is to be preprocessed by running it through a
+*     preprocessor which can expand #include and #define statements.
+*     The file config.h should define HAVE_INTRINSIC_ANINT, ...NINT,
+*     ...IZEXT, ...JZEXT to be 1 if the Fortran compiler to be used does
+*     have the corresponding intrinsics.
+*
+*     This file is an adaptation of the _set_ of files num_def_cvt_X, for
+*     X in {alpha_OSF1, ix86_Linux, mips, sun4 sun4_Solaris}, which were
+*     in the original pre-autoconf distribution.  These files had some
+*     puzzling features, probably related to their history.  The
+*     floating-to-integer functions below are documented to round, and
+*     to produce integers rather than reals, so they should be
+*     implemented using the NINT intrinsic.  The sun4 and sun4_Solaris
+*     originals used ANINT for some reason: I presume this was either an
+*     error, or the result of some (long ago?) limitation on the part of
+*     the Sun compiler.  At any rate, these now use NINT if it's
+*     available, and ANINT only if necessary.
+*
+*     This file also uses the VMS intrinsics JZEXT and IZEXT if they are
+*     available (configure.ac tests for IZEXT, and if it's present
+*     presumes that the other VMS intrinsics are also).  If not, they
+*     must be defined in the module num1_cvt.c instead.
+
 
 *  Machine-specific features used:
-*     This version is specific to DECstation systems using the DEC
-*     Fortran compiler.
+*     None.  
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
@@ -47,25 +79,28 @@
 
 *  Machine dependent definitions:
 *  =============================
-*  These conversions between the unsigned integer types are not
-*  directly supported by normal Fortran implementations, so we must
-*  invoke whatever intrinsic functions are appropriate on the machine
-*  in use.
+*  The following conversions between the unsigned integer types use VMS
+*  intrinsic functions which are not directly supported by normal
+*  Fortran implementations, so we must define them only if the intrinsic
+*  IZEXT (which we take as proxy for the others) is available.  If it is
+*  not available, then the following six functions must be defined in
+*  the module num1_cvt.c
 
-* 05-OCT-1995: Linux does not have the VMS intrinsic extensions used below
-*              so the following NUM1 routines are implemented in the file
-*              num1_cvt.c.
-
-*     NUM1_UBTOI( NUM_ARGUB ) = JZEXT( NUM_ARGUB )
-*     NUM1_UBTOUW( NUM_ARGUB ) = IZEXT( NUM_ARGUB )
-*     NUM1_UBTOW( NUM_ARGUB ) = IZEXT( NUM_ARGUB )
-*     NUM1_UWTOI( NUM_ARGUW ) = JZEXT( NUM_ARGUW )
-*     NUM1_WTOUB( NUM_ARGW )   =
-*    :   IIEOR( NUM_ARGW, IIAND( - IIAND( NUM_ARGW, 128 ), -256 ) )
-*     NUM1_ITOUW( NUM_ARGI )   =
-*    :  JIAND( 65535, NUM1_WTOI( NUM1_ITOW( NUM_ARGI - 32768 ) )
-*    :                           + 65536 ) - 32768
-      
+#if HAVE_INTRINSIC_IZEXT
+      NUM1_UBTOI( NUM_ARGUB ) = JZEXT( NUM_ARGUB )
+      NUM1_UBTOUW( NUM_ARGUB ) = IZEXT( NUM_ARGUB )
+      NUM1_UBTOW( NUM_ARGUB ) = IZEXT( NUM_ARGUB )
+      NUM1_UWTOI( NUM_ARGUW ) = JZEXT( NUM_ARGUW )
+      NUM1_WTOUB( NUM_ARGW )   =
+     :   IIEOR( NUM_ARGW, IIAND( - IIAND( NUM_ARGW, 128 ), -256 ) )
+      NUM1_ITOUW( NUM_ARGI )   =
+     :  JIAND( 65535, NUM1_WTOI( NUM1_ITOW( NUM_ARGI - 32768 ) )
+     :                           + 65536 ) - 32768
+#else
+*  VMS intrinsics IZEXT and co are not supported by this Fortran
+*  compiler.  Functions NUM1_UBTOI, NUM1_UBTOUW, NUM1_UBTOW, NUM1_UWTOI,
+*  NUM1_WTOUB, and NUM1_ITOUW must therefore be supplied by module num1_cvt.c.
+#endif 
 
 *  Functions resulting in BYTE.
 *  ===========================
@@ -74,11 +109,11 @@
 
       NUM_UBTOB( NUM_ARGUB )  = NUM1_UBTOW( NUM_ARGUB )
 
-      NUM_DTOB( NUM_ARGD )    = NINT( NUM_ARGD )
+      NUM_DTOB( NUM_ARGD )    = xNINT( NUM_ARGD )
 
       NUM_ITOB( NUM_ARGI )    = NUM_ARGI
 
-      NUM_RTOB( NUM_ARGR )    = NINT( NUM_ARGR )
+      NUM_RTOB( NUM_ARGR )    = xNINT( NUM_ARGR )
 
       NUM_WTOB( NUM_ARGW )    = NUM_ARGW
 
@@ -110,11 +145,11 @@
 
       NUM_UBTOI( NUM_ARGUB )  = NUM1_UBTOI( NUM_ARGUB )
 
-      NUM_DTOI( NUM_ARGD )    = NINT( NUM_ARGD )
+      NUM_DTOI( NUM_ARGD )    = xNINT( NUM_ARGD )
 
       NUM_ITOI( NUM_ARGI )    = NUM_ARGI
 
-      NUM_RTOI( NUM_ARGR )    = NINT( NUM_ARGR )
+      NUM_RTOI( NUM_ARGR )    = xNINT( NUM_ARGR )
 
       NUM_WTOI( NUM_ARGW )    = NUM_ARGW
 
@@ -146,11 +181,11 @@
 
       NUM_UBTOW( NUM_ARGUB )  = NUM1_UBTOW( NUM_ARGUB )
 
-      NUM_DTOW( NUM_ARGD )    = NINT( NUM_ARGD )
+      NUM_DTOW( NUM_ARGD )    = xNINT( NUM_ARGD )
 
       NUM_ITOW( NUM_ARGI )    = NUM_ARGI
 
-      NUM_RTOW( NUM_ARGR )    = NINT( NUM_ARGR )
+      NUM_RTOW( NUM_ARGR )    = xNINT( NUM_ARGR )
 
       NUM_WTOW( NUM_ARGW )    = NUM_ARGW
 

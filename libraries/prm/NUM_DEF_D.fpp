@@ -1,3 +1,12 @@
+#include <config.h>
+#if HAVE_INTRINSIC_SIND
+#  define FC_USE_INTD
+#  define FC_USE_INTX *
+#else
+#  define FC_USE_INTD *
+#  define FC_USE_INTX
+#endif
+
 ************************************************************************
 *                               BEGIN                                  *
 *                                                                      *
@@ -12,8 +21,21 @@
 *
 *    History :
 *     16-AUG-1988:  Original version (DUVAD::RFWS)
+*     12-MAR-2003:  autoconfed (Norman Gray, Starlink)
 *    endhistory
 *
+*    The definitions below use SIND and friends as well as SIN, if these
+*    are available as intrinsics (they take and return arguments in
+*    degrees instead of radians).  Whether these are available or not is
+*    determined by ./configure, which tests whether SIND is available
+*    and if it is, assumes that the others are, too.  It configures this
+*    file by defining macro HAVE-INTRINSIC-SIND (with - as underscores)
+*    in config.h.  This file must be run through a Fortran preprocessor
+*    before use.
+*
+*    The values obtained for this file are:
+*        (FC_USE_INTD) this Fortran doesn't have SIND and co
+*        (FC_USE_INTX) this Fortran does have SIND and co
  
  
 *******************************************************
@@ -77,13 +99,16 @@
       NUM_TAND( NUM_ARGD ) = TAN( NUM_ARGD )
  
 *   Sine function (argument in degrees).
-      NUM_SINDD( NUM_ARGD ) = SIND( NUM_ARGD )
+FC_USE_INTD      NUM_SINDD( NUM_ARGD ) = SIND( NUM_ARGD )
+FC_USE_INTX      NUM_SINDD( NUM_ARGD ) = SIN( NUM_ARGD / 57.295779513082323 )
  
 *   Cosine function (argument in degrees).
-      NUM_COSDD( NUM_ARGD ) = COSD( NUM_ARGD )
+FC_USE_INTD      NUM_COSDD( NUM_ARGD ) = COSD( NUM_ARGD )
+FC_USE_INTX      NUM_COSDD( NUM_ARGD ) = COS( NUM_ARGD / 57.295779513082323 )
  
 *   Tangent function (argument in degrees).
-      NUM_TANDD( NUM_ARGD ) = TAND( NUM_ARGD )
+FC_USE_INTD      NUM_TANDD( NUM_ARGD ) = TAND( NUM_ARGD )
+FC_USE_INTX      NUM_TANDD( NUM_ARGD ) = TAN( NUM_ARGD / 57.295779513082323)
  
 *   Inverse sine function (result in radians).
       NUM_ASIND( NUM_ARGD ) = ASIN( NUM_ARGD )
@@ -95,13 +120,16 @@
       NUM_ATAND( NUM_ARGD ) = ATAN( NUM_ARGD )
  
 *   Inverse sine function (result in degrees).
-      NUM_ASNDD( NUM_ARGD ) = ASIND( NUM_ARGD )
+FC_USE_INTD      NUM_ASNDD( NUM_ARGD ) = ASIND( NUM_ARGD )
+FC_USE_INTX      NUM_ASNDD( NUM_ARGD ) = 57.295779513082323 * ASIN( NUM_ARGD )
  
 *   Inverse cosine function (result in degrees).
-      NUM_ACSDD( NUM_ARGD ) = ACOSD( NUM_ARGD )
+FC_USE_INTD      NUM_ACSDD( NUM_ARGD ) = ACOSD( NUM_ARGD )
+FC_USE_INTX      NUM_ACSDD( NUM_ARGD ) = 57.295779513082323 * ACOS( NUM_ARGD )
  
 *   Inverse tangent function (result in degrees).
-      NUM_ATNDD( NUM_ARGD ) = ATAND( NUM_ARGD )
+FC_USE_INTD      NUM_ATNDD( NUM_ARGD ) = ATAND( NUM_ARGD )
+FC_USE_INTX      NUM_ATNDD( NUM_ARGD ) = 57.295779513082323 * ATAN( NUM_ARGD )
  
 *   Hyperbolic sine function.
       NUM_SINHD( NUM_ARGD ) = SINH( NUM_ARGD )
@@ -156,7 +184,8 @@
 *   Fortran ATAN2 (inverse tangent with two arguments) function (result
 *   in degrees).
       NUM_AT2DD( NUM_ARGD1, NUM_ARGD2 ) =
-     :                          ATAN2D( NUM_ARGD1, NUM_ARGD2 )
+FC_USE_INTD     :                          ATAN2D( NUM_ARGD1, NUM_ARGD2 )
+FC_USE_INTX     :              57.295779513082323 * ATAN2( NUM_ARGD1, NUM_ARGD2 )
 
  
  
