@@ -1308,6 +1308,26 @@ iraf! {
           }
       }
 
+      action astdsbframe {
+         helplib {$ATOOLS_HELP}
+         parameter options {
+            position 1
+            type LITERAL
+            prompt {Options for the DSBSpecFrame}
+            ppath CURRENT DEFAULT
+            default !
+            helpkey *
+          }
+         parameter result {
+            position 2
+            type LITERAL
+            prompt {Name of file in which to store the DSBSpecFrame}
+            ppath DYNAMIC CURRENT
+            association ->GLOBAL.AST_OBJECT
+            helpkey *
+          }
+      }
+
       action astgetrefpos {
          helplib {$ATOOLS_HELP}
          parameter this {
