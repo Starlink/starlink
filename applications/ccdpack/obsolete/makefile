@@ -450,7 +450,7 @@ SOURCE_FILES = makefile mk $(DOCUMENTATION) $(HELPTASK).tar \
 #  set.
 
 PUBLIC_SCRIPTS = $(SHELL_SCRIPTS) $(TCL_SCRIPTS) $(ICL_SCRIPTS) \
-                 $(STANDALONE_SCRIPTS) $(CONFIG_SCRIPTS)
+                 $(CONFIG_SCRIPTS)
 
 SHELL_SCRIPTS = ccdfork ccdexercise wcsexercise ccdpack_back xreduce \
  ccdexecute ccdwww geometry ccdpack_ex1.csh ccdpack_ex2.csh \
@@ -490,8 +490,8 @@ TCL_SCRIPTS = CCDAnimateBitmap.tcl CCDBindings.tcl CCDContextHelp.tcl \
  CCDFileMonitorMain.tcl CCDDoPresent.tcl \
  CCDTkWidget.tcl CCDCcdWidget.tcl CCDNameTail.tcl CCDPathOf.tcl CCDCmdOf.tcl
 
-STANDALONE_SCRIPTS = \
- adamMessageRelay adamtask.tcl 
+STARTCL_SUPPORT = \
+ adamMessageRelay adamtask.tcl atclsh
 
 CONFIG_SCRIPTS = EEV3QUICK.DAT EEV3STANDARD.DAT EEV5QUICK.DAT \
  EEV5STANDARD.DAT EEV6QUICK.DAT EEV6STANDARD.DAT EEV7QUICK.DAT \
@@ -817,8 +817,8 @@ DOCUMENTATION = $(LATEX_DOCS) $(HYPERTEXT_DOCS:.htx=.htx_tar) \
 #  file).
 
 BUILT_FILES = $(LINK_SCRIPT1) $(LINK_SCRIPT2) \
- $(PUBLIC_SCRIPTS) $(OBJECT_LIBRARIES) $(MONOLITHS) $(IFC_FILES) \
- $(HELP_FILES) $(ICL_STARTUP_SCRIPT) $(STARTUP_SCRIPT) \
+ $(PUBLIC_SCRIPTS) $(STARTCL_SUPPORT) $(OBJECT_LIBRARIES) $(MONOLITHS) \
+ $(IFC_FILES) $(HELP_FILES) $(ICL_STARTUP_SCRIPT) $(STARTUP_SCRIPT) \
  $(IRAF_STARTUP_SCRIPT) $(HELPTASK) $(WISH) \
  $(IRAF_SCRIPTS) $(MONO_TCL) $(IRAF_PAR) $(IRAF_HELP) helpdb.mip
 
@@ -950,6 +950,14 @@ $(PKG_INCLUDE):
           else echo $@ is not in the tar file; exit 1; fi
 	sed -e s#PKG_VERS#$(PKG_VERS)# $@ >$@_tmp
 	mv $@_tmp $@
+
+#  Rules for copying versions of the files in the STARTCL_SUPPORT macro from 
+#  elsewhere in the Starlink tree.
+
+adamMessageRelay: $(STAR_LIB)/startcl/adamMessageRelay; cp $? $@
+adamtask.tcl: $(STAR_LIB)/startcl/adamtask.tcl;         cp $? $@
+atclsh: $(STAR_BIN)/atclsh;                             cp $? $@
+
 
 #  Personal rules for building source code archives from RCS and
 #  other places.
@@ -1502,8 +1510,9 @@ install:
 	   else :; fi;\
 	done
 #
-#  Install the tcl binaries, giving them world execute permission.
-	for f in $(WISH) ""; do \
+#  Install the tcl binaries and support scripts, giving them world execute 
+#  permission.
+	for f in $(WISH) $(STARTCL_SUPPORT) ""; do \
 	   if test -n "$$f"; then \
 	      $(CP) $$f $(INSTALL_BIN);\
 	      chmod 755 $(INSTALL_BIN)/$$f;\
@@ -1746,8 +1755,8 @@ do_deinstall:
            else :; fi;\
         done
 #
-#  Deinstall the tcl binaries, if an installed version exists.
-	- for f in $(WISH) ""; do \
+#  Deinstall the tcl binaries and support scripts, if installed versions exist.
+	- for f in $(WISH) $(STARTCL_SUPPORT) ""; do \
            if test -n "$$f" -a -f $(INSTALL_BIN)/$$f; then \
               $(RM) $$f;\
               $(CP) $(INSTALL_BIN)/$$f .;\
