@@ -26,7 +26,7 @@ AC_FC_OPEN_SPECIFIERS(readonly)
 AC_FC_OPEN_SPECIFIERS(access='append')
 AC_FC_OPEN_SPECIFIERS(blocksize=0)
 AC_FC_OPEN_SPECIFIERS(organization='RELATIVE')
-AC_FC_OPEN_SPECIFIERS(carriagecontrol='NONE')
+AC_FC_OPEN_SPECIFIERS(carriagecontrol='CC')
 AC_FC_OPEN_SPECIFIERS([access='sequential',recl=1])
 
 
