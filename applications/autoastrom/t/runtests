@@ -14,6 +14,12 @@
 # files are deleted on successful completion, unless the --keep flag
 # is present.
 #
+# Tests should exit with 0 if they appear to have succeeded (their
+# output will then be compared to the *.correct output), or 1 on an
+# error, or 2 if the test couldn't be run, perhaps because some
+# helper program was not installed).  Any other exit value is reported
+# as an anomaly.
+#
 # Run without an argument, and if there is no file runtests.filelist,
 # this runs all the tests in the directory; run with an argument, it
 # runs only the specified tests.
@@ -69,15 +75,14 @@ nfailures=0
 
 for name in $filelist
 do
-	echononl "$name... "
-	sh $name >$name.stdout 2>$name.stderr
-	testval=$?
 
-	if [ $testval != 0 ]; then
-	    echo "failed (exited with error status $testval)"
-	    nfailures=`expr $nfailures + 1`
-	    # Don't delete temporary files on failure
-	elif [ -r "$name.correct" ]; then
+    echononl "$name... "
+    sh $name >$name.stdout 2>$name.stderr
+    testval=$?
+
+    case $testval in
+    0)
+        if [ -r "$name.correct" ]; then
 	    diff $name.correct $name.stdout >$name.diff
 	    rval=$?
 	    if [ $rval != 0 ]; then
@@ -93,6 +98,22 @@ do
 		echo "    (now in $name.correct)"
 		$deletetemp && rm -f $name.stderr $name*.tmp
 	fi
+        ;;
+    1)
+	echo "failed"
+	nfailures=`expr $nfailures + 1`
+	# Don't delete temporary files on failure
+        ;;
+    2)
+        echo "this test can't be run"
+	$deletetemp && rm -f $name.stderr $name*.tmp
+        ;;
+    *)
+	echo "failed (unexpectedly, with error status $testval)"
+	nfailures=`expr $nfailures + 1`
+	# Don't delete temporary files on failure
+        ;;
+    esac
 done
 
 echo "$nfailures failed tests"
