@@ -6,7 +6,7 @@ dnl      Research Councils (`CCLRC').
 AC_REVISION($Revision$)
 
 dnl  package name, version, and bug-report address
-AC_INIT(autoastrom, 0.5-8, [norman@astro.gla.ac.uk])
+AC_INIT(autoastrom, 0.5-10, [norman@astro.gla.ac.uk])
 
 dnl  config.* and install-sh are in config/
 AC_CONFIG_AUX_DIR(config)
@@ -22,7 +22,8 @@ dnl  the makefile handles its own installation)
 AC_PREFIX_DEFAULT(/star)
 
 dnl  Search for Perl.  We want to find Starlink perl.
-AC_PATH_PROG(STARPERL, perl, perl, /stardev/Perl/bin:/star/Perl/bin:$PATH)
+AC_PATH_PROG(STARPERL, perl, [/usr/bin/env perl], 
+             [$STARLINK/Perl/bin:/stardev/Perl/bin:/star/Perl/bin:$PATH])
 
 dnl  Checks for programs.
 AC_PROG_CXX
@@ -52,16 +53,18 @@ fi
 
 dnl  Find the SYSTEM type.  If this is specified in the environment,
 dnl  then use that value; otherwise, use AC_CANONICAL_BUILD.
-AC_SUBST(SYSTEM)
-if test -z "$SYSTEM"; then
+AC_SUBST(BUILD_SYSTEM)
+if test -n "$SYSTEM"; then
+  BUILD_SYSTEM=$SYSTEM
+else
   AC_CANONICAL_BUILD
   case "$build" in
-    alpha*)                 SYSTEM=alpha_OSF1 ;;
-    ix86*|i486*|i686*)      SYSTEM=ix86_Linux ;;
-    sparc*)                 SYSTEM=sun4_Solaris ;;
+    alpha*)                 BUILD_SYSTEM=alpha_OSF1 ;;
+    ix86*|i486*|i686*)      BUILD_SYSTEM=ix86_Linux ;;
+    sparc*)                 BUILD_SYSTEM=sun4_Solaris ;;
     *)
         echo "Warning: unable to recognise system type $host; using UNKNOWN"
-        SYSTEM=UNKNOWN
+        BUILD_SYSTEM=UNKNOWN
         ;;
   esac
 fi
