@@ -85,7 +85,7 @@ itcl::class gaia::StarPhotomDetails {
       #  Create and pack all the widgets that are necessary for
       #  displaying the values of the current StarPhotomObject.
       itk_component add MainLabel {
-         label $w_.label -text "Object details\n" -anchor c
+         LabelRule $w_.label -text "Object details"
       }
       itk_component add Index {
          LabelValue $w_.index -text {Aperture index:} \

@@ -120,52 +120,44 @@ itcl::class gaia::StarPhotomExtras {
 
    #  Inheritances:
    #  -------------
-   inherit util::TopLevelWidget
+#   inherit util::TopLevelWidget
+   inherit util::FrameWidget
 
    #  Constructor:
    #  ------------
    constructor {args} {
-      TopLevelWidget::constructor -transient 1 -withdraw 1 -center 0
-   } {
-      wm title $w_ {Set Addition Photometry Parameters}
 
       #  Add widget for accessing the values.
       set labelwidth 28
-      itk_component add Frame1 {
-         frame $w_.frame1 -bd 2
-      }
       itk_component add Label1 {
-         label $itk_component(Frame1).label \
-            -text "Image parameters:" -anchor c
+         LabelRule $w_.label1 \
+            -text "Image parameters:"
       }
       itk_component add Biaslevel {
-         LabelEntry $itk_component(Frame1).bias \
+         LabelEntry $w_.bias \
             -text "Image bias level:" \
             -labelwidth $labelwidth \
             -command [code $this null_method]
       }
       itk_component add Photons {
-         LabelEntry $itk_component(Frame1).padu \
+         LabelEntry $w_.padu \
             -text "Photons per data unit" \
             -labelwidth $labelwidth \
             -command [code $this null_method]
       }
       itk_component add Saturation {
-         LabelEntry $itk_component(Frame1).satur \
+         LabelEntry $w_.satur \
             -text "Saturation value:" \
             -labelwidth $labelwidth \
             -command [code $this null_method]
       }
 
-      itk_component add Frame2 {
-         frame $w_.frame2 -bd 2
-      }
       itk_component add Label2 {
-         label $itk_component(Frame2).label \
-            -text "Centroid parameters:" -anchor c
+         LabelRule $w_.label2 \
+            -text "Centroid parameters:"
       }
       itk_component add Centroid {
-         StarLabelCheck $itk_component(Frame2).cent \
+         StarLabelCheck $w_.cent \
             -text "Perform centroiding:" \
             -onvalue TRUE -offvalue FALSE \
             -labelwidth $labelwidth \
@@ -173,31 +165,31 @@ itcl::class gaia::StarPhotomExtras {
       }
       set state_($this,centroid) TRUE
       itk_component add Maxiterations {
-         LabelEntry $itk_component(Frame2).maxiter \
+         LabelEntry $w_.maxiter \
             -text "Maximum iterations:" \
             -labelwidth $labelwidth \
             -command [code $this null_method]
       }
       itk_component add Maxshift {
-         LabelEntry $itk_component(Frame2).maxshift \
+         LabelEntry $w_.maxshift \
             -text "Maximum shift in position:" \
             -labelwidth $labelwidth \
             -command [code $this null_method]
       }
       itk_component add Search {
-         LabelEntry $itk_component(Frame2).search \
+         LabelEntry $w_.search \
             -text "Size of search box:" \
             -labelwidth $labelwidth \
             -command [code $this null_method]
       }
       itk_component add Toler {
-         LabelEntry $itk_component(Frame2).toler \
+         LabelEntry $w_.toler \
             -text "Positional accuracy:" \
             -labelwidth $labelwidth \
             -command [code $this null_method]
       }
       itk_component add Positive {
-         StarLabelCheck $itk_component(Frame2).positive \
+         StarLabelCheck $w_.positive \
             -text "Positive features:" \
             -onvalue TRUE -offvalue FALSE \
             -labelwidth $labelwidth \
@@ -205,16 +197,13 @@ itcl::class gaia::StarPhotomExtras {
       }
       set state_($this,positive) TRUE
 
-      itk_component add Frame3 {
-         frame $w_.frame3 -bd 2
-      }
       itk_component add Label3 {
-         label $itk_component(Frame3).label \
-            -text "Measurement parameters:" -anchor c
+         LabelRule $w_.label3 \
+            -text "Measurement parameters:"
       }
 
       itk_component add Photonerr {
-         LabelMenu $itk_component(Frame3).photon \
+         LabelMenu $w_.photon \
             -text "Measurement errors use:" \
             -labelwidth $labelwidth
       }
@@ -226,7 +215,7 @@ itcl::class gaia::StarPhotomExtras {
          -command [code $this configure -photon_errors {data variance}]
 
       itk_component add Skyest {
-         LabelMenu $itk_component(Frame3).skyest -text "Sky estimator:" \
+         LabelMenu $w_.skyest -text "Sky estimator:" \
             -labelwidth $labelwidth
       }
       $itk_component(Skyest) add -label {mean} \
@@ -239,55 +228,39 @@ itcl::class gaia::StarPhotomExtras {
          -command [code $this configure -sky_estimator constant]
 
       itk_component add Sky {
-         LabelEntry $itk_component(Frame3).sky \
+         LabelEntry $w_.sky \
             -text "Default sky level:" \
             -labelwidth $labelwidth \
          -command [code $this null_method]
       }
       itk_component add Skysig {
-         LabelEntry $itk_component(Frame3).skysig \
+         LabelEntry $w_.skysig \
             -text "Default error in sky level:" \
             -labelwidth $labelwidth \
             -command [code $this null_method]
-      }
-
-      #  Button to close and accept this window.
-      itk_component add Frame4 {
-         frame $w_.frame4 -bd 2
-      }
-      itk_component add Close {
-         button $itk_component(Frame4).close \
-            -text "Close" \
-            -command [code $this hide_window]
       }
 
       #  All widgets now exist so set default values.
       eval itk_initialize $args
 
       #  Pack up frame.
-      pack $itk_component(Frame1) -fill x -expand true
       pack $itk_component(Label1) -fill x
-      pack $itk_component(Biaslevel) -fill x -expand true
-      pack $itk_component(Photons) -fill x -expand true
-      pack $itk_component(Saturation) -fill x -expand true
+      pack $itk_component(Biaslevel) -fill x
+      pack $itk_component(Photons) -fill x
+      pack $itk_component(Saturation) -fill x
 
-      pack $itk_component(Frame2) -fill x -expand true
       pack $itk_component(Label2) -fill x
-      pack $itk_component(Centroid) -fill x -expand true
-      pack $itk_component(Maxiterations) -fill x -expand true
-      pack $itk_component(Maxshift) -fill x -expand true
-      pack $itk_component(Toler) -fill x -expand true
-      pack $itk_component(Positive) -fill x -expand true
+      pack $itk_component(Centroid) -fill x
+      pack $itk_component(Maxiterations) -fill x
+      pack $itk_component(Maxshift) -fill x
+      pack $itk_component(Toler) -fill x
+      pack $itk_component(Positive) -fill x
 
-      pack $itk_component(Frame3) -fill x -expand true
       pack $itk_component(Label3) -fill x
-      pack $itk_component(Photonerr) -fill x -expand true
-      pack $itk_component(Skyest) -fill x -expand true
-      pack $itk_component(Sky) -fill x -expand true
-      pack $itk_component(Skysig) -fill x -expand true
-
-      pack $itk_component(Frame4) -fill x -expand true
-      pack $itk_component(Close)
+      pack $itk_component(Photonerr) -fill x
+      pack $itk_component(Skyest) -fill x
+      pack $itk_component(Sky) -fill x
+      pack $itk_component(Skysig) -fill x
    }
 
    #  Destructor:

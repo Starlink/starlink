@@ -15,7 +15,7 @@
 #     listbox and bindings may be associated with actions in the list.
 #
 #     The objects (and more importantly their properties) can be
-#     displayed graphically in a GaiaImageCtrl widget. A state is
+#     displayed graphically in a GaiaImage widget. A state is
 #     associated with each object -- selected, displayed or new -- and
 #     the object appears graphically in the correct form. Objects that
 #     are displayed are drawn in a different colour to those that are
@@ -163,6 +163,10 @@
 #           Write a photom file (extended form). If all is true (default)
 #           then all objects are written, otherwise just the currently
 #           selected objects or last selected object is used.
+#        append_file comment filename
+#           Append a list of the current objects to a file (which may or may
+#           not already exist). The comment string, if not {}, is written 
+#           before the record (so is useful for recording filenames etc.).
 #
 #     private:
 #        add_scrollbox_bindings_
@@ -499,6 +503,21 @@ itcl::class gaia::StarPhotomList {
       return $ok
    }
 
+   #  Append the current objects to a file.
+   method append_file {comment filename} {
+       set ok 0
+       set fid [open $filename a+]
+       puts $fid "# $comment"
+       for { set i 1 } { $i <= $highest_index_ } { incr i } {
+	   if { [info exists objects_($i)] } {
+               puts $fid "[$objects_($i) getvalues all]"
+               set ok 1
+	   }
+       }
+       close $fid
+       return $ok
+   }
+
    #  Set a configuration option for the currently selected objects.
    method config_selected {item value} {
       set ids [$canvasdraw selected_items]
@@ -611,7 +630,7 @@ itcl::class gaia::StarPhotomList {
    #  Name of canvas.
    public variable canvas {} {}
 
-   #  Name of GaiaImageCtrl type object for converting aperture sizes
+   #  Name of GaiaImage type object for converting aperture sizes
    #  into displayed canvas sizes.
    public variable rtdimage {} {}
 
