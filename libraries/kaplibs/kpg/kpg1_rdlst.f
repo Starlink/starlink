@@ -16,19 +16,28 @@
 
 *  Description:
 *     This routine reads a FrameSet, and a set of positions with
-*     associated integer identifiers from a CAT catalogue. An error is
-*     reported if the catalogue does not contain a FrameSet. The FrameSet
+*     associated integer identifiers from a CAT catalogue. The FrameSet
 *     should be stored as an AST Dump in the textual information associated
 *     with the catalogue. Such catalogues can be created using KPG1_WRLST. 
+*     If the catalogue does not contain a FrameSet, then a default
+*     FrameSet will be used if possible. If the catalogue contains 
+*     floating point columns named RA and DEC, then the default FrameSet
+*     contains a single SkyFrame (Epoch and Equinox are set from the
+*     EPOCH and EQUINOX catalogue parameters - if they exist). Otherwise,
+*     if the catalogue contains floating point columns named X and Y, then 
+*     the default FrameSet contains a single 2D Frame with axis symbols X
+*     and Y, and Domain GRID. If there is also a column named Z, then
+*     the Frame will be 3D, with a Z axis.
 *
-*     It is assumed that the columns containing the axis values have CAT
-*     names equal to the Symbol attribute of the corresponding AST Axis.
-*     The catalogue columns from which to read the axis values are chosen
-*     by matching column names with Axis Symbols (only columns containing 
-*     floating point values are considered). Frames are checked in the
-*     following order: the Base Frame, the Current Frame, all other
-*     Frames in order of increasing Frame index. AN error is reported if no
-*     Frame has a set of corresponding columns.
+*     Hoqwever the FrameSet is obtained, it is assumed that the columns
+*     containing the axis values have CAT names equal to the Symbol
+*     attribute of the corresponding AST Axis. The catalogue columns from
+*     which to read the axis values are chosen by matching column names
+*     with Axis Symbols (only columns containing floating point values are
+*     considered). Frames are checked in the following order: the Base
+*     Frame, the Current Frame, all other Frames in order of increasing
+*     Frame index. An error is reported if no Frame has a set of
+*     corresponding columns.
 *
 *     It is assumed that position identifiers are stored in an integer column 
 *     with name PIDENT. If no such column is found, the returned position
@@ -73,6 +82,9 @@
 *  History:
 *     26-OCT-1998 (DSB):
 *        Original version.
+*     10-DEC-2001 (DSB):
+*        Modified to use a default FrameSet if the catalogue does not
+*        contain a FrameSet.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -109,6 +121,8 @@
 *  Local Variables:
       CHARACTER ATTR*10          ! Attribute name
       CHARACTER CNAME*128        ! Catalogue name
+      CHARACTER EPOCH*40         ! Epoch string
+      CHARACTER EQN*40           ! Equinox string
       CHARACTER SYM*20           ! Axis symbol
       INTEGER CI                 ! Catalogue identifier
       INTEGER DTYPE              ! Data type identifier
@@ -126,9 +140,11 @@
       INTEGER JAT                ! No. of characters in a string
       INTEGER MAP                ! Pointer to mapping from file to IWCS
       INTEGER NAXCAT             ! No. of axes in Frame read from catalogue
+      INTEGER NDIM               ! No of axes
       LOGICAL DONE               ! Have we read enough AST Objects?
+      LOGICAL GOTRD              ! Found RA and DEC columns in catalogue?
+      LOGICAL GOTXY              ! Found X and Y columns in catalogue?
       LOGICAL THERE              ! Was FrameSet found?
-
 *.
 
 *  Initialise.
@@ -174,6 +190,134 @@
          END IF
 
       END DO
+
+*  If no FrameSet was found, we may be able to create a suitable FrameSet
+*  by guessing at the column names in the catalogue.
+      IF( IWCS .EQ. AST__NULL ) THEN
+
+*  Look for a floating point catalogue column with the name "RA". 
+         GOTRD = .FALSE.
+         CALL CAT_TIDNT( CI, 'RA', GAXIS( 1 ), STATUS )
+         IF( STATUS .EQ. SAI__OK ) THEN
+            CALL CAT_TIQAI( GAXIS( 1 ), 'DTYPE', DTYPE, STATUS ) 
+            IF( DTYPE .EQ. CAT__TYPER .OR. DTYPE .EQ. CAT__TYPED ) THEN
+               GOTRD = .TRUE.
+            END IF
+         ELSE IF( STATUS .EQ. CAT__NOCMP ) THEN
+            CALL ERR_ANNUL( STATUS )
+         END IF
+
+*  If found, look for a floating point catalogue column with the name "DEC". 
+         IF( GOTRD ) THEN
+            GOTRD = .FALSE.
+            CALL CAT_TIDNT( CI, 'DEC', GAXIS( 1 ), STATUS )
+            IF( STATUS .EQ. SAI__OK ) THEN
+               CALL CAT_TIQAI( GAXIS( 1 ), 'DTYPE', DTYPE, STATUS ) 
+               IF( DTYPE .EQ. CAT__TYPER .OR. 
+     :             DTYPE .EQ. CAT__TYPED ) THEN
+                  GOTRD = .TRUE.
+               END IF
+            ELSE IF( STATUS .EQ. CAT__NOCMP ) THEN
+               CALL ERR_ANNUL( STATUS )
+            END IF
+         END IF
+
+*  If both RA and DEC columns were found, create a FrameSet holding a
+*  single SkyFrame.
+         IF( GOTRD ) THEN
+            IWCS = AST_FRAMESET( AST_SKYFRAME( ' ', STATUS ), ' ', 
+     :                           STATUS )
+
+*  Ensure the axis symbols are RA and DEC since this is assumed later on.
+            CALL AST_SETC( IWCS, 'SYMBOL(1)', 'RA', STATUS )
+            CALL AST_SETC( IWCS, 'SYMBOL(2)', 'DEC', STATUS )
+
+*  If there is an EPOCH parameter in the catalogue, use it to set the
+*  Epoch attribute of the SkyFrame.
+            CALL CAT_TIDNT( CI, 'EPOCH', GAXIS( 1 ), STATUS )
+            IF( STATUS .EQ. SAI__OK ) THEN
+               CALL CAT_TIQAC( GAXIS( 1 ), 'VALUE', EPOCH, STATUS ) 
+               CALL AST_SETC( IWCS, 'EPOCH', EPOCH, STATUS )
+            ELSE IF( STATUS .EQ. CAT__NOCMP ) THEN
+               CALL ERR_ANNUL( STATUS )
+            END IF
+
+*  If there is an EQUINOX parameter in the catalogue, use it to set the
+*  Equinox attribute of the SkyFrame.
+            CALL CAT_TIDNT( CI, 'EQUINOX', GAXIS( 1 ), STATUS )
+            IF( STATUS .EQ. SAI__OK ) THEN
+               CALL CAT_TIQAC( GAXIS( 1 ), 'VALUE', EQN, STATUS ) 
+               CALL AST_SETC( IWCS, 'EQUINOX', EQN, STATUS )
+            ELSE IF( STATUS .EQ. CAT__NOCMP ) THEN
+               CALL ERR_ANNUL( STATUS )
+            END IF
+
+*  If no RA/DEC columns found, look for X/Y columns and assume they are GRID
+*  coords.
+         ELSE
+
+*  Look for a floating point catalogue column with the name "X". 
+            GOTXY = .FALSE.
+            CALL CAT_TIDNT( CI, 'X', GAXIS( 1 ), STATUS )
+            IF( STATUS .EQ. SAI__OK ) THEN
+               CALL CAT_TIQAI( GAXIS( 1 ), 'DTYPE', DTYPE, STATUS ) 
+               IF( DTYPE .EQ. CAT__TYPER .OR. 
+     :             DTYPE .EQ. CAT__TYPED ) THEN
+                  GOTXY = .TRUE.
+               END IF
+            ELSE IF( STATUS .EQ. CAT__NOCMP ) THEN
+               CALL ERR_ANNUL( STATUS )
+            END IF
+
+*  If found, look for a floating point catalogue column with the name "Y". 
+            IF( GOTXY ) THEN 
+               GOTXY = .FALSE.
+               CALL CAT_TIDNT( CI, 'Y', GAXIS( 1 ), STATUS )
+               IF( STATUS .EQ. SAI__OK ) THEN
+                  CALL CAT_TIQAI( GAXIS( 1 ), 'DTYPE', DTYPE, STATUS ) 
+                  IF( DTYPE .EQ. CAT__TYPER .OR. 
+     :                DTYPE .EQ. CAT__TYPED ) THEN
+                     GOTXY = .TRUE.
+                  END IF
+               ELSE IF( STATUS .EQ. CAT__NOCMP ) THEN
+                  CALL ERR_ANNUL( STATUS )
+               END IF
+            END IF
+
+*  If both X and Y columns were found, create a FrameSet holding a
+*  single Frame.
+            IF( GOTXY ) THEN
+
+*  See if thre is a Z column, if so make the Frame 3D.
+               NDIM = 2
+               CALL CAT_TIDNT( CI, 'Z', GAXIS( 1 ), STATUS )
+               IF( STATUS .EQ. SAI__OK ) THEN
+                  CALL CAT_TIQAI( GAXIS( 1 ), 'DTYPE', DTYPE, STATUS ) 
+                  IF( DTYPE .EQ. CAT__TYPER .OR. 
+     :                DTYPE .EQ. CAT__TYPED ) THEN
+                     NDIM = 3
+                  END IF
+               ELSE IF( STATUS .EQ. CAT__NOCMP ) THEN
+                  CALL ERR_ANNUL( STATUS )
+               END IF
+
+*  Create the Frame with Domain GRID.
+               IWCS = AST_FRAMESET( AST_FRAME( NDIM, 'DOMAIN=GRID', 
+     :                                         STATUS ),
+     :                              ' ', STATUS )
+
+*  Set the Symbols to X,Y,Z since this is assumed later on.
+               CALL AST_SETC( IWCS, 'SYMBOL(1)', 'X', STATUS )
+               CALL AST_SETC( IWCS, 'SYMBOL(2)', 'Y', STATUS )
+               IF( NDIM .EQ. 3 ) THEN
+                  CALL AST_SETC( IWCS, 'SYMBOL(3)', 'Z', STATUS )
+               END IF
+   
+            END IF
+   
+         END IF
+
+      END IF
 
 *  If no FrameSet was found, report an error.
       IF( IWCS .EQ. AST__NULL .AND. STATUS .EQ. SAI__OK ) THEN
