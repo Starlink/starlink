@@ -173,8 +173,23 @@ cat > ${script_dir}/wcs2pix.real <<EOF
 global argc
 global argv
 
-#  There are two too many arguments always.
-incr argc -2
+#  There may be confusion over arguments. 
+#  Remove "-file", "-file_types {*}" and "-hdu {*}"
+set n [lsearch -exact \$argv "-file"]
+if { \$n != -1 } {
+   lvarpop argv \$n
+}
+set n [lsearch -exact \$argv "-file_types"]
+if { \$n != -1 } {
+   lvarpop argv [expr \$n+1]
+   lvarpop argv \$n
+}
+set n [lsearch -exact \$argv "-hdu"]
+if { \$n != -1 } {
+   lvarpop argv [expr \$n+1]
+   lvarpop argv \$n
+}
+set argc [llength \$argv]
 
 #  Get the image, if not given.
 if { \$argc == 0 } {

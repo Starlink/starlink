@@ -2,7 +2,7 @@
 
 # Run the real pix2wcs script using the gaia_swish binary.
 
-# The gaia_swish binary run the gaiaMain.tcl script as soon as it
+# The gaia_swish binary runs the gaiaMain.tcl script as soon as it
 # starts, so the only way we can stop GAIA from running up is by
 # replacing the commands that gaiaMain invokes.
 
@@ -171,8 +171,23 @@ cat > ${script_dir}/pix2wcs.real <<EOF
 global argc
 global argv
 
-#  There are two too many arguments always.
-incr argc -2
+#  There may be confusion over arguments. 
+#  Remove "-file", "-file_types {*}" and "-hdu {*}"
+set n [lsearch -exact \$argv "-file"]
+if { \$n != -1 } {
+   lvarpop argv \$n
+}
+set n [lsearch -exact \$argv "-file_types"]
+if { \$n != -1 } {
+   lvarpop argv [expr \$n+1]
+   lvarpop argv \$n
+}
+set n [lsearch -exact \$argv "-hdu"]
+if { \$n != -1 } {
+   lvarpop argv [expr \$n+1]
+   lvarpop argv \$n
+}
+set argc [llength \$argv]
 
 #  Get the image, if not given.
 if { \$argc == 0 } {
