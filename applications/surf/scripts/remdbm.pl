@@ -130,7 +130,7 @@ if ($use_ams) {
   # Start ADAM messaging
   $adam = new ORAC::Msg::ADAM::Control;
   $status = $adam->init;
-  check_status($status))
+  check_status($status);
   $adam->timeout(120);     # task timeout
 
   
@@ -314,15 +314,23 @@ foreach $frame ($Grp->members) {
 # Now we have the total weight, and the processed real and imaginary
 # components.
 
+# Remove all the zeroes from the weights array and replace with a small
+# number. This is a kludge to prevent DIV from doing weird things
+# and crashing on the alpha
+
+$status = $Mon{kappa_mon}->obeyw("substitute","in=$wt out=s$wt oldval=0.0 newval=0.00001");
+
+unlink "$wt$ext";
+
 # Divide real and imaginary by the total weight
 
-$status = $Mon{kappa_mon}->obeyw("div","in1=$re in2=$wt out=rediv reset");
+$status = $Mon{kappa_mon}->obeyw("div","in1=$re in2=s$wt out=rediv reset");
 check_status($status);
-$status = $Mon{kappa_mon}->obeyw("div","in1=$im in2=$wt out=imdiv reset");
+$status = $Mon{kappa_mon}->obeyw("div","in1=$im in2=s$wt out=imdiv reset");
 check_status($status);
 
 # Remove the weight
-unlink "$wt$ext", "$re$ext", "$im$ext";
+unlink "s$wt$ext", "$re$ext", "$im$ext";
 
 print "Running inverse FFT...\n";
 # Inverse fourier
