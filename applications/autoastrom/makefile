@@ -1181,9 +1181,12 @@ moggy/Makefile: moggy/Makefile.in  $(CATLIBINSTALLDIR)/lib/libcat.a
 # DSB added the AST function astVersion_ (macro astVersion) in this
 # same release, so if that function is there, we know we have that
 # release or better.
+#
+# Ignore any errors from the `if' testing conftest -- solaris make
+# unaccountably reports a fatal error from this line if the test cc fails!
 astrom/makefile: astrom/makefile.in
 	echo 'int astVersion_(); int main() { astVersion_(); return 0; }' >conftest.c
-	if cc -o conftest conftest.c -L$(STAR_LIB) `$(STAR_BIN)/ast_link` >conftest.log 2>&1; then \
+	- if cc -o conftest conftest.c -L$(STAR_LIB) `$(STAR_BIN)/ast_link` >conftest.log 2>&1; then \
 	    echo "AST >= 2.0-7"; echo DEFWCSSTYLE=qtan >conftest.tanresult; \
 	else \
 	    echo "AST < 2.0-7"; echo DEFWCSSTYLE=xtan >conftest.tanresult; \
