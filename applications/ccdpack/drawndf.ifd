@@ -1,0 +1,127 @@
+      action outline {
+#+
+#  Name:
+#     outline.ifd
+
+#  Type of Module:
+#     IFD parameter interface file.
+
+#  Language:
+#     Tcl.
+
+#  Authors:
+#     MBT: Mark Taylor (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     22-DEC-2000 (MBT):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+         helplib {$CCDPACK_HELP}
+
+         parameter in {
+            position 1
+            type LITERAL
+            access READ
+            vpath PROMPT CURRENT GLOBAL
+            ppath CURRENT GLOBAL
+            association <-global.ccdpack_ndfin
+            prompt {List of input NDFs}
+            helpkey *
+         }
+
+         parameter device {
+            position 2
+            access READ
+            vpath GLOBAL CURRENT PROMPT
+            ppath GLOBAL CURRENT DEFAULT
+            association <->GLOBAL.GRAPHICS_DEVICE
+            default xwindows
+            ptype DEVICE
+            prompt {Name of device}
+            helpkey *
+          }
+        
+#        parameter clear {
+#           access READ
+#           type _LOGICAL
+#           vpath CURRENT DEFAULT
+#           ppath CURRENT DEFAULT
+#           default TRUE
+#           prompt {Clear display device}
+#           helpkey *
+#        }
+
+         parameter axes {
+                         # Whether to draw axes
+            type _LOGICAL
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default TRUE
+            prompt {Are annotated axes to be plotted?}
+            helpkey *
+         }
+
+         parameter penrot {
+                           # Whether to rotate pens for outlines
+            type _LOGICAL
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default FALSE
+            prompt {Use a different pen for each outline?}
+            helpkey *
+         }
+
+         parameter style {
+                          # Plot style
+            type LITERAL
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default {}
+            prompt {Style specification for plot appearance}
+            helpkey *
+         }
+
+         parameter labmode {
+                            # Labelling mode
+            type LITERAL
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default NAME
+            prompt {Text labelling mode (NAME,INDEX,BOTH,NONE)}
+            helpkey *
+         }
+
+         parameter logto {
+                          # Logging system interaction level
+            type LITERAL
+            access READ
+            vpath GLOBAL CURRENT DEFAULT
+            ppath GLOBAL CURRENT DEFAULT
+            association <-global.ccdpack_logto
+            prompt "Write log to (Logfile,Terminal,Neither,Both)[ccd_global]"
+            default Both
+            helpkey *
+          }
+
+         parameter logfile {
+                            # The log file
+            type LITERAL
+            access READ
+            vpath GLOBAL CURRENT DEFAULT
+            ppath GLOBAL CURRENT DEFAULT
+            association <-global.ccdpack_logfile
+            prompt "Logfile name[ccd_global]"
+            default CCDPACK.LOG
+            helpkey *
+          }
+
+      }
+# $Id$
