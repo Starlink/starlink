@@ -79,7 +79,7 @@
       INTEGER       BOL_CHAN (NUM_CHAN * NUM_ADC)
       REAL          BOL_DU3 (NUM_CHAN, NUM_ADC)
       REAL          BOL_DU4 (NUM_CHAN, NUM_ADC)
-      CHARACTER*20  BOL_TYPE (NUM_CHAN, NUM_ADC)
+      CHARACTER*(*) BOL_TYPE (NUM_CHAN, NUM_ADC)
 
 *  Status:
       INTEGER STATUS             ! Global status
