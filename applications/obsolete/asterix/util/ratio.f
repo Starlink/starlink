@@ -80,6 +80,7 @@
 *     19 Nov 92 : V1.7-1  Updated arguments to AXIS_VAL2PIX (DJA)
 *     25 Feb 94 : V1.7-2  Use BIT_ routines to do bit manipulations (DJA)
 *     24 Nov 94 : V1.8-0  Now use USI for user interface (DJA)
+*     28 Mar 95 : V1.8-1  Use new data interface (DJA)
 *
 *    Type Definitions :
 *
@@ -88,7 +89,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
 *
 *    Status :
 *
@@ -106,30 +107,29 @@
 *
 *    Local variables :
 *
-      CHARACTER*80		AX_LABEL(DAT__MXDIM)	! Axis labels
-      CHARACTER*80		AX_UNITS(DAT__MXDIM)	! Axis labels
+      CHARACTER*80		AX_LABEL(ADI__MXDIM)	! Axis labels
+      CHARACTER*80		AX_UNITS(ADI__MXDIM)	! Axis labels
       CHARACTER*80           DATEXT              ! Message text
-      CHARACTER*(DAT__SZLOC) ILOC                ! Locator to input object
-      CHARACTER*(DAT__SZLOC) OLOC                ! Locator to output object
       CHARACTER*80           TEXT(MAXLINES)      ! History text
 
-      REAL			AX_BASE(DAT__MXDIM)	! Axis base values
-      REAL			AX_PX1(DAT__MXDIM)	! First axis value
-      REAL			AX_PXN(DAT__MXDIM)	! Last axis value
-      REAL			AX_SCALE(DAT__MXDIM)	! Axis scale values
+      REAL			AX_BASE(ADI__MXDIM)	! Axis base values
+      REAL			AX_PX1(ADI__MXDIM)	! First axis value
+      REAL			AX_PXN(ADI__MXDIM)	! Last axis value
+      REAL			AX_SCALE(ADI__MXDIM)	! Axis scale values
       REAL                   BANDS(4)            ! Axis ranges boundaries
       REAL                   OVAR                ! Output variance if 1D input
       REAL                   LHC, RHC, LHW, RHW  ! Bin centres and widths
       REAL                   WIDTH1, WIDTH2      ! Band widths
 
-      INTEGER			AX_PTR(DAT__MXDIM)	! Ptr to axis data
-      INTEGER			AX_WPTR(DAT__MXDIM)	! Ptr to axis widths
+      INTEGER			AX_PTR(ADI__MXDIM)	! Ptr to axis data
+      INTEGER			AX_WPTR(ADI__MXDIM)	! Ptr to axis widths
       INTEGER                AXIS                ! Axis selected for ratio
-      INTEGER                DIMS(DAT__MXDIM)    ! A spare dims array
+      INTEGER                DIMS(ADI__MXDIM)    ! A spare dims array
       INTEGER                DUMMY               !
       INTEGER                I,J                 ! Axis loop counters
-      INTEGER                IDIMS(DAT__MXDIM)   ! Input data dimensions
+      INTEGER                IDIMS(ADI__MXDIM)   ! Input data dimensions
       INTEGER                ID_PTR              ! Input data pointer
+      INTEGER			IFID			! Input dataset id
       INTEGER                IQ_PTR              ! Input quality pointer
       INTEGER                IV_PTR              ! Input variance pointer
       INTEGER                LOW1,HIGH1          ! Pixel positions of BANDS(1/2)
@@ -137,14 +137,14 @@
       INTEGER                NDIM                ! Number of input data dims
       INTEGER                NELM                ! Total no of input elements
       INTEGER                NEWBAD              ! New bad points generated
-      INTEGER                NLB,NUB             ! No of values for range given
       INTEGER                NREC                ! Number of history records
       INTEGER                NRNG                ! Number of ranges entered
-      INTEGER                ODIMS(DAT__MXDIM)   ! Output data dimensions
+      INTEGER                ODIMS(ADI__MXDIM)   ! Output data dimensions
       INTEGER                ONDIM               ! Number of output data dims
       INTEGER                ONELM               ! # output data items
       INTEGER                QNDIM               ! No of input quality dims
       INTEGER                OD_PTR              ! Output data pointer
+      INTEGER			OFID			! Output dataset id
       INTEGER                OQ_PTR              ! Output quality pointer
       INTEGER                OV_PTR              ! Output variance pointer
       INTEGER                OW_PTR              ! Output work quality pointer
@@ -156,12 +156,12 @@
       INTEGER                WV_PTR              ! Workspace variance
 
       LOGICAL                ANY_BAD             ! Any bad quality input data?
-      LOGICAL			AX_DUMMY(DAT__MXDIM)	! Dummy axis values?
-      LOGICAL			AX_GOT_WIDS(DAT__MXDIM)	! Got axis widths?
-      LOGICAL			AX_MAPPED(DAT__MXDIM)	! Axis mapped?
-      LOGICAL			AX_NORM(DAT__MXDIM)	! Axis normalised?
-      LOGICAL			AX_REG(DAT__MXDIM)	! Axis values regular?
-      LOGICAL			AX_WID_UNIF(DAT__MXDIM)	! Axis widths uniform?
+      LOGICAL			AX_DUMMY(ADI__MXDIM)	! Dummy axis values?
+      LOGICAL			AX_GOT_WIDS(ADI__MXDIM)	! Got axis widths?
+      LOGICAL			AX_MAPPED(ADI__MXDIM)	! Axis mapped?
+      LOGICAL			AX_NORM(ADI__MXDIM)	! Axis normalised?
+      LOGICAL			AX_REG(ADI__MXDIM)	! Axis values regular?
+      LOGICAL			AX_WID_UNIF(ADI__MXDIM)	! Axis widths uniform?
       LOGICAL                DATA_OK             ! Input data ok?
       LOGICAL                OK                  ! General validity test
       LOGICAL                PRIM                ! Was input object primitive?
@@ -174,7 +174,7 @@
 *    Version id :
 *
       CHARACTER*30           VERSION
-        PARAMETER            ( VERSION = 'RATIO Version 1.8-0' )
+        PARAMETER            ( VERSION = 'RATIO Version 1.8-1' )
 *-
 
 *    Check status
@@ -187,7 +187,7 @@
       CALL AST_INIT()
 
 *    Initialise axis structure
-      DO I = 1, DAT__MXDIM
+      DO I = 1, ADI__MXDIM
         AX_DUMMY(I) = .TRUE.
         AX_LABEL(I) = ' '
         AX_UNITS(I) = ' '
@@ -198,10 +198,11 @@
       END DO
 
 *    Get input object
-      CALL USI_ASSOC2( 'INP', 'OUT', 'READ', ILOC, OLOC, PRIM, STATUS )
+      CALL USI_TASSOC2( 'INP', 'OUT', 'READ', IFID, OFID, STATUS )
+      CALL BDI_PRIM( IFID, PRIM, STATUS )
 
 *    Check input data
-      CALL BDA_CHKDATA( ILOC, DATA_OK, NDIM, IDIMS, STATUS )
+      CALL BDI_CHKDATA( IFID, DATA_OK, NDIM, IDIMS, STATUS )
       IF ( DATA_OK .AND. (STATUS .EQ. SAI__OK)) THEN
 
 *      Check not scalar
@@ -213,7 +214,7 @@
           CALL ARR_SUMDIM( NDIM, IDIMS, NELM )
 
 *        Map the input data
-          CALL BDA_MAPDATA( ILOC, 'READ', ID_PTR, STATUS )
+          CALL BDI_MAPDATA( IFID, 'READ', ID_PTR, STATUS )
 
         END IF
 
@@ -235,7 +236,7 @@
       ELSE
 
 *      See if we've got quality available
-        CALL BDA_CHKQUAL( ILOC, QUAL_OK, QNDIM, DIMS, STATUS )
+        CALL BDI_CHKQUAL( IFID, QUAL_OK, QNDIM, DIMS, STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 99
         IF ( QUAL_OK ) THEN
           IF ( QNDIM .NE. NDIM ) THEN
@@ -247,14 +248,14 @@
 
 *          Map it and tell user
             CALL MSG_PRNT( 'Input has valid QUALITY' )
-            CALL BDA_MAPLQUAL( ILOC, 'READ', ANY_BAD, IQ_PTR, STATUS )
+            CALL BDI_MAPLQUAL( IFID, 'READ', ANY_BAD, IQ_PTR, STATUS )
 
           END IF
         END IF
         IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *      See if we've got variance available
-        CALL BDA_CHKVAR( ILOC, VARI_OK, VNDIM, DIMS, STATUS )
+        CALL BDI_CHKVAR( IFID, VARI_OK, VNDIM, DIMS, STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 99
         IF ( VARI_OK .AND. ( VNDIM .NE. NDIM )) THEN
           CALL MSG_PRNT( 'Variance and data '/
@@ -273,7 +274,7 @@
 *        Map it and tell user
           IF ( VARI_OK ) THEN
             CALL MSG_PRNT( 'Input has valid VARIANCE' )
-            CALL BDA_MAPVAR( ILOC, 'READ', IV_PTR, STATUS )
+            CALL BDI_MAPVAR( IFID, 'READ', IV_PTR, STATUS )
           END IF
 
         END IF
@@ -317,7 +318,7 @@
         IF ( .NOT. PRIM ) THEN
 
 *        Try for the label and units first
-          CALL BDA_GETAXLABEL( ILOC, I, AX_LABEL(I), STATUS )
+          CALL BDI_GETAXLABEL( IFID, I, AX_LABEL(I), STATUS )
           IF ( STATUS .NE. SAI__OK ) THEN
             AX_LABEL(I) = '** Unreadable **'
             CALL ERR_FLUSH( STATUS )
@@ -326,7 +327,7 @@
           IF ( TLEN .LT. 1 ) THEN
             AX_LABEL(I) = 'Not Set'
           END IF
-          CALL BDA_GETAXUNITS( ILOC, I, AX_UNITS(I), STATUS )
+          CALL BDI_GETAXUNITS( IFID, I, AX_UNITS(I), STATUS )
           IF ( STATUS .NE. SAI__OK ) THEN
             AX_UNITS(I) = '** Unreadable **'
             CALL ERR_FLUSH( STATUS )
@@ -340,7 +341,7 @@
 *         the equivalent dimension and work in Pixels.
            DATEXT = ' '
 
-           CALL BDA_CHKAXVAL( ILOC, I, OK, AX_REG(I), TLEN, STATUS )
+           CALL BDI_CHKAXVAL( IFID, I, OK, AX_REG(I), TLEN, STATUS )
            IF ( STATUS .NE. SAI__OK ) THEN
              DATEXT = 'No axis data. '
              USE_PIXELS = .TRUE.
@@ -351,10 +352,10 @@
 *           Axis data is there. If its regularly spaced ( a spaced array )
 *           then find the axis constants, otherwise map its data.
              IF ( AX_REG(I) ) THEN
-               CALL BDA_GETAXVAL( ILOC, I, AX_BASE(I), AX_SCALE(I),
+               CALL BDI_GETAXVAL( IFID, I, AX_BASE(I), AX_SCALE(I),
      :                                               TLEN, STATUS )
              END IF
-             CALL BDA_MAPAXVAL( ILOC, 'READ', I, AX_PTR(I), STATUS )
+             CALL BDI_MAPAXVAL( IFID, 'READ', I, AX_PTR(I), STATUS )
              AX_MAPPED(I) = ( STATUS .EQ. SAI__OK )
 
              IF ( STATUS .NE. SAI__OK ) THEN
@@ -379,7 +380,7 @@
 *         Find normalisation. If we can't get normalisation then we assume
 *         it is unnormalised.
            IF ( OK ) THEN
-             CALL BDA_GETAXNORM( ILOC, I, AX_NORM(I), STATUS )
+             CALL BDI_GETAXNORM( IFID, I, AX_NORM(I), STATUS )
              IF ( STATUS .NE. SAI__OK ) THEN
                CALL ERR_FLUSH( STATUS )
                AX_NORM(I) = .FALSE.
@@ -450,7 +451,7 @@
       END IF
 
 *    Transform input dimensions
-      DO I = NDIM+1, DAT__MXDIM
+      DO I = NDIM+1, ADI__MXDIM
         IDIMS(I) = 1
       END DO
 
@@ -481,10 +482,10 @@
 
 *      Get axis widths if present
         IF ( AX_MAPPED(AXIS) ) THEN
-          CALL BDA_CHKAXWID( ILOC, AXIS, OK, AX_WID_UNIF(AXIS),
+          CALL BDI_CHKAXWID( IFID, AXIS, OK, AX_WID_UNIF(AXIS),
      :                                          DUMMY, STATUS )
           IF ( OK ) THEN
-            CALL BDA_MAPAXWID( ILOC, 'READ', AXIS, AX_WPTR(AXIS),
+            CALL BDI_MAPAXWID( IFID, 'READ', AXIS, AX_WPTR(AXIS),
      :                                                   STATUS )
           END IF
         ELSE
@@ -516,10 +517,10 @@
       IF ( AX_NORM(AXIS) ) THEN
 
 *      Create dynamic data array copy
-        CALL DYN_MAPR( DAT__MXDIM, IDIMS, T_PTR, STATUS )
+        CALL DYN_MAPR( ADI__MXDIM, IDIMS, T_PTR, STATUS )
         CALL ARR_COP1R( NELM, %VAL(ID_PTR), %VAL(T_PTR), STATUS )
         ID_PTR = T_PTR
-        CALL BDA_UNMAPDATA( ILOC, STATUS )
+        CALL BDI_UNMAPDATA( IFID, STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *      Denormalise it
@@ -530,11 +531,11 @@
         IF ( VARI_OK ) THEN
 
 *        Create dynamic copy
-          CALL DYN_MAPR( DAT__MXDIM, IDIMS, T_PTR, STATUS )
+          CALL DYN_MAPR( ADI__MXDIM, IDIMS, T_PTR, STATUS )
           IF ( STATUS .NE. SAI__OK ) GOTO 99
           CALL ARR_COP1R( NELM, %VAL(IV_PTR), %VAL(T_PTR), STATUS )
           IV_PTR = T_PTR
-          CALL BDA_UNMAPVAR( ILOC, STATUS )
+          CALL BDI_UNMAPVAR( IFID, STATUS )
 
 *        Denormalise it
           CALL AR7_DENORMV( %VAL(AX_WPTR(AXIS)), IDIMS, AXIS,
@@ -552,7 +553,7 @@
 
 *    Unmap axis data if used
       IF ( (.NOT. PRIM) .AND. AX_MAPPED(AXIS) ) THEN
-        CALL BDA_UNMAPAXVAL( ILOC, AXIS, STATUS )
+        CALL BDI_UNMAPAXVAL( IFID, AXIS, STATUS )
         IF ( STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
       END IF
 
@@ -608,28 +609,28 @@
       END IF
 
 *    Transform these into the 7D system
-      DO I = ONDIM+1, DAT__MXDIM
+      DO I = ONDIM+1, ADI__MXDIM
         ODIMS(I) = 1
       END DO
       CALL ARR_SUMDIM( ONDIM, ODIMS, ONELM )
 
 *    Create components in output
-      CALL BDA_CREDATA( OLOC, ONDIM, ODIMS, STATUS )
-      CALL BDA_CREQUAL( OLOC, ONDIM, ODIMS, STATUS )
-      CALL BDA_CREAXES( OLOC, ONDIM, STATUS )
+      CALL BDI_CREDATA( OFID, ONDIM, ODIMS, STATUS )
+      CALL BDI_CREQUAL( OFID, ONDIM, ODIMS, STATUS )
+      CALL BDI_CREAXES( OFID, ONDIM, STATUS )
       IF ( VARI_OK ) THEN
-         CALL BDA_CREVAR( OLOC, ONDIM, ODIMS, STATUS )
+         CALL BDI_CREVAR( OFID, ONDIM, ODIMS, STATUS )
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Output label
-      CALL BDA_PUTLABEL( OLOC, 'Relative intensity', STATUS )
+      CALL BDI_PUTLABEL( OFID, 'Relative intensity', STATUS )
 
 *    Map these output objects
-      CALL BDA_MAPDATA( OLOC, 'WRITE', OD_PTR, STATUS )
-      CALL BDA_MAPQUAL( OLOC, 'WRITE', OQ_PTR, STATUS )
+      CALL BDI_MAPDATA( OFID, 'WRITE', OD_PTR, STATUS )
+      CALL BDI_MAPQUAL( OFID, 'WRITE', OQ_PTR, STATUS )
       IF ( VARI_OK ) THEN
-        CALL BDA_MAPVAR( OLOC, 'WRITE', OV_PTR, STATUS )
+        CALL BDI_MAPVAR( OFID, 'WRITE', OV_PTR, STATUS )
       ELSE
         CALL DYN_MAPR( ONDIM, ODIMS, OV_PTR, STATUS )
         CALL ARR_INIT1R( 0.0, ONELM, %VAL(OV_PTR), STATUS )
@@ -661,8 +662,8 @@
       CALL DYN_UNMAP( WV_PTR, STATUS )
       CALL DYN_UNMAP( OW_PTR, STATUS )
 
-      CALL BDA_UNMAPDATA( ILOC, STATUS )
-      CALL BDA_UNMAPQUAL( OLOC, STATUS )
+      CALL BDI_UNMAPDATA( IFID, STATUS )
+      CALL BDI_UNMAPQUAL( OFID, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Inform the user if any new bad quality points were generated
@@ -687,8 +688,8 @@
 *            Could create output axes for primitive input?
 
             ELSE
-              CALL BDA_COPAXIS( ILOC, OLOC, I, J, STATUS )
-              CALL BDA_PUTAXNORM( OLOC, J, RENORMALISE, STATUS )
+              CALL BDI_COPAXIS( IFID, OFID, I, J, STATUS )
+              CALL BDI_PUTAXNORM( OFID, J, RENORMALISE, STATUS )
 
             END IF
             J = J + 1
@@ -701,7 +702,7 @@
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Copy MORE box unless primitive
-      IF ( .NOT. PRIM ) CALL BDA_COPMORE( ILOC, OLOC, STATUS )
+      IF ( .NOT. PRIM ) CALL BDI_COPMORE( IFID, OFID, STATUS )
 
 *    If output is scalar tell user about it
       IF ( NDIM .EQ. 1 ) THEN
@@ -732,25 +733,15 @@
       USE = USE + 1
 
 *    Describe ratio bands
+      CALL MSG_SETR( 'LOW1', BANDS(1) )
+      CALL MSG_SETR( 'HIGH1', BANDS(2) )
       CALL MSG_SETC( 'UNITS', AX_UNITS(AXIS) )
-      IF ( AX_REG(AXIS) ) THEN
-        CALL MSG_SETI( 'LOW1', LOW1 )
-        CALL MSG_SETI( 'HIGH1', HIGH1 )
-      ELSE
-        CALL MSG_SETR( 'LOW1', BANDS(1) )
-        CALL MSG_SETR( 'HIGH1', BANDS(2) )
-      END IF
       CALL MSG_MAKE( 'Lower range ^LOW1 to ^HIGH1 ^UNITS', TEXT(USE),
      :                                                         TLEN )
       USE = USE + 1
       CALL MSG_SETC( 'UNITS', AX_UNITS(AXIS) )
-      IF ( AX_REG(AXIS) ) THEN
-        CALL MSG_SETI( 'LOW2', LOW2 )
-        CALL MSG_SETI( 'HIGH2', HIGH2 )
-      ELSE
-        CALL MSG_SETR( 'LOW2', BANDS(3) )
-        CALL MSG_SETR( 'HIGH2', BANDS(4) )
-      END IF
+      CALL MSG_SETR( 'LOW2', BANDS(3) )
+      CALL MSG_SETR( 'HIGH2', BANDS(4) )
       CALL MSG_MAKE( 'Upper range ^LOW2 to ^HIGH2 ^UNITS', TEXT(USE),
      :                                                         TLEN )
       USE = USE + 1
@@ -762,21 +753,19 @@
       END IF
 
 *    Copy history
-      CALL HIST_COPY( ILOC, OLOC, STATUS )
+      CALL HSI_COPY( IFID, OFID, STATUS )
 
 *    Add History records
-      CALL HIST_ADD( OLOC, VERSION, STATUS )
+      CALL HSI_ADD( OFID, VERSION, STATUS )
 
 *    Process text
       NREC = MAXLINES
       CALL USI_TEXT( USE, TEXT, NREC, STATUS )
-      CALL HIST_PTXT( OLOC, USE, TEXT, STATUS )
+      CALL HSI_PTXT( OFID, USE, TEXT, STATUS )
 
 *    Release datasets
-      CALL BDA_RELEASE( ILOC, STATUS )
-      CALL BDA_RELEASE( OLOC, STATUS )
-      CALL USI_ANNUL( ILOC, STATUS )
-      CALL USI_ANNUL( OLOC, STATUS )
+      CALL BDI_RELEASE( IFID, STATUS )
+      CALL BDI_RELEASE( OFID, STATUS )
 
 *    Tidy up
  99   CALL AST_CLOSE
@@ -839,7 +828,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PRM_PAR'
       INCLUDE 'QUAL_PAR'
 *
@@ -1028,7 +1016,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *
 *    Input :
 *
@@ -1156,7 +1143,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *
 *    Input :
 *
@@ -1284,8 +1270,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-*
 *    Input :
 *
       INTEGER                LOW1,HIGH1          ! Bounds on first range
@@ -1412,7 +1396,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *
 *    Input :
 *
@@ -1540,7 +1523,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *
 *    Input :
 *
@@ -1668,7 +1650,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *
 *    Input :
 *
@@ -1798,7 +1779,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *
 *    Input :
 *
