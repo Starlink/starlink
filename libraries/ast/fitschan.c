@@ -388,6 +388,10 @@ f     - AST_PUTFITS: Store a FITS header card in a FitsChan
 *     9-MAY-2002 (DSB):
 *        Correct GetCard to avoid infinite loop if the current card has
 *        been marked as deleted.
+*     25-SEP-2002 (DSB):
+*        AIPSFromStore: use larger of coscro and sincro when determining
+*        CDELT values. Previously a non-zero coscro was always used, even
+*        if it was a s small as 1.0E-17.
 *class--
 */
 
@@ -1362,16 +1366,16 @@ static int AIPSFromStore( AstFitsChan *this, FitsStore *store,
       if( fabs( slaDrange( rho_a - rho_b ) ) < 1.0E-3 ){
          crota = 0.5*( slaDranrm( rho_a ) + slaDranrm( rho_b ) );
          coscro = cos( crota );
+         sincro = sin( crota );
 
-         if( coscro != 0.0 ){
+         if( fabs( coscro ) > fabs( sincro ) ){
             cdelt[ axlat ] /= coscro;
             cdelt[ axlon ] /= coscro;
-            crota *= AST__DR2D;
          } else {
-            sincro = sin( crota );
             cdelt[ axlat ] = -cdlon_lat/sincro;
             cdelt[ axlon ] = cdlat_lon/sincro;
          }      
+         crota *= AST__DR2D;
 
       } else {
          ok = 0;
