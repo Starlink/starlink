@@ -29,13 +29,10 @@ are shown below,
    ( $status, $xb, $yb ) = _GTxExt( $text, $x, $y, $just, $upx, $upy );
    ( $status, $chv, $chh ) = _GQch();
    ( $status, $old_value ) = _GAttr( $attr, $value, $prim );
-
-The following helper methods are also provided,
-
-   my ( $status, $alpha, $beta ) = _GAxScale()
+   ( $status, $alpha, $beta) = _GScales();
 
 =head1 DESCRIPTION
-  
+
 This file implements the low level graphics functions required by the rest
 of AST, by calling suitable PGPLOT functions (the FORTRAN PGPLOT interface
 is used).
@@ -55,7 +52,7 @@ $Id$
 
 =head1 METHODS
 
-=over 
+=over 4
 
 =item B<_GFlush>
 
@@ -153,22 +150,22 @@ sub _GText {
          
         # if we have a bogus justification string default it 
         unless( $just1 =~ /[TBC]/ ) {
-           print "_GText: bad vertical justification defaulting to 'C'\n";
+           warn "_GText: bad vertical justification defaulting to 'C'\n";
            $just1 = "C";
         }
         unless( $just2 =~ /[LCR]/ ) {
-           print "_GText: bad horizontal justification defaulting to 'C'\n";
+           warn "_GText: bad horizontal justification defaulting to 'C'\n";
            $just2 = "C"; 
         }
       } else {
-         print "_GText: No justification string defaulting to 'CC'\n";
+         warn "_GText: No justification string defaulting to 'CC'\n";
          $just1 = "C";
          $just2 = "C";
       }
       $just = $just1 . $just2;
       
       # get the axis scaling
-      my ( $ret, $alpha, $beta ) = _GAxScale();
+      my ( $ret, $alpha, $beta ) = _GScales();
       return 0 if $ret == 0;
       
       # If either axis is reversed, reverse the supplied up-vector 
@@ -206,9 +203,9 @@ sub _GText {
             $upx /= $uplen;
             $upy /= $uplen;
          } else {
-            print "_GText: Zero length up-vector supplied.";
+            ReportGrfError("_GText: Zero length up-vector supplied.");
             return 0;
-         }      
+         }
 
          # Find the height of the text above the base-line. Note, the PGPLOT  
          # manual is not clear about the order of the corners returned by
@@ -245,7 +242,7 @@ sub _GText {
 }            
 
 
-=item B<_GAxScale>
+=item B<_GScales>
 
 This function returns two values (one for each axis) which scale
 increments on the corresponding axis into a "normal" coordinate system in
@@ -253,11 +250,11 @@ which: The axes have equal scale in terms of (for instance) millimetres
 per unit distance, X values increase from left to right and the Y values 
 increase from bottom to top.
 
-   my ( $status, $alpha, $beta ) = _GAxScale()
+   my ( $status, $alpha, $beta ) = _GScales()
 
 =cut
 
-sub _GAxScale {
+sub _GScales {
     my $alpha = shift;
     my $beta = shift;
     
@@ -270,7 +267,7 @@ sub _GAxScale {
        $beta = ( $ny2 - $ny1 ) / ( $wy2 - $wy1 );
        $ret = 1
     } else {
-       print "_GAxScale: The graphics window has zero size\n";
+       ReportGrfError("_GScales: The graphics window has zero size\n");
        $ret = 0;
     }
     return ( $ret, $alpha, $beta );
@@ -342,23 +339,23 @@ sub _GTxExt {
          
         # if we have a bogus justification string default it 
         unless( $just1 =~ /[TBC]/ ) {
-           print "_GText: bad vertical justification defaulting to 'C'\n";
+           warn "_GText: bad vertical justification defaulting to 'C'\n";
            $just1 = "C";
         }
         unless( $just2 =~ /[LCR]/ ) {
-           print "_GText: bad horizontal justification defaulting to 'C'\n";
+           warn "_GText: bad horizontal justification defaulting to 'C'\n";
            $just2 = "C"; 
         }
       } else {
-         print "_GText: No justification string defaulting to 'CC'\n";
+         warn "_GText: No justification string defaulting to 'CC'\n";
          $just1 = "C";
          $just2 = "C";
       }
       $just = $just1 . $just2;
       
       # get the axis scaling
-      my ( $ret, $alpha, $beta ) = _GAxScale();
-      return ( 0, undef, undef ) if $ret == 0;
+      my ( $ret, $alpha, $beta ) = _GScales();
+      return ( 0 ) if $ret == 0;
       
       # If either axis is reversed, reverse the supplied up-vector 
       # components so that they refer to the world-coordinates axes.
@@ -375,8 +372,8 @@ sub _GTxExt {
          $ux /= $uplen;
          $uy /= $uplen;
       } else {
-         print "_GTxtExt: Zero length up-vector supplied.";
-         return ( 0, undef, undef );
+         ReportGrfError("_GTxtExt: Zero length up-vector supplied.");
+         return ( 0 );
       }
  
       # Form the base-line vector by rotating the up-vector by 90 degrees 
@@ -521,7 +518,6 @@ drawn with a horizontal baseline. This will be an increment in the Y axis.
 =cut
 
 sub _GQch {
-   
    # return variables
    my ( $status, $chv, $chh );
    
@@ -544,8 +540,8 @@ sub _GQch {
    if( $vx1 != $vx2 ){
       $chv *= ( $wx2 - $wx1 )/( $vx2 - $vx1 );
    } else {
-      print "_GQch: The graphics viewport has zero size in the X direction.";
-      return 0;
+      ReportGrfError("_GQch: The graphics viewport has zero size in the X direction.");
+      return (0);
    }   
 
    # Convert the text height from normalised device coordinates into world 
@@ -554,12 +550,12 @@ sub _GQch {
    if( $vy1 != $vy2 ){
       $chh *= ( $wy2 - $wy1 )/( $vy2 - $vy1 );
    } else {
-      print "_GQch: The graphics viewport has zero size in the Y direction.";
-      return 0;
+      ReportGrfError("_GQch: The graphics viewport has zero size in the Y direction.");
+      return (0);
    }   
 
    # Return. 
-   return ( 1, $chv, $chh );   
+   return ( 1, $chv, $chh );
 }   
 
 
@@ -690,15 +686,24 @@ sub _GAttr {
       }
 
    # Give an error message for any other attribute value. 
-   } else {     
-      print "_GAttr: Unknown graphics attribute $attr requested.";
-      return ( 0, $old_value );
+   } else {
+      ReportGrfError("_GAttr: Unknown graphics attribute $attr requested.");
+      return ( 0 );
    }
 
    # Return. 
    return ( 1, $old_value );
 
 }   
+
+
+# Internal error setting routine
+sub ReportGrfError {
+  my $text = shift;
+  warn "Generated AST error in perl PGPLOT callback: $text\n";
+  Starlink::AST::Error( &Starlink::AST::AST__GRFER(), $text);
+}
+
 
 =back
 
@@ -724,16 +729,17 @@ use Starlink::AST::PGPLOT;
 
 sub pgplot {
   my $self = shift;
-  
-  $self->GFlush(\&Starlink::AST::PGPLOT::_GFlush);  
+
+  $self->GFlush(\&Starlink::AST::PGPLOT::_GFlush);
   $self->GLine(\&Starlink::AST::PGPLOT::_GLine);
   $self->GMark(\&Starlink::AST::PGPLOT::_GMark);
   $self->GText(\&Starlink::AST::PGPLOT::_GText);
   $self->GTxExt(\&Starlink::AST::PGPLOT::_GTxExt);
   $self->GQch(\&Starlink::AST::PGPLOT::_GQch);
   $self->GAttr(\&Starlink::AST::PGPLOT::_GAttr);
-  
-  return 1; 
+  $self->GScales(\&Starlink::AST::PGPLOT::_GScales);
+
+  return 1;
 }
 
 1;
