@@ -249,17 +249,8 @@ documented by the source of this function.
 <argumentlist>
 <parameter>key <type>string <description>Key name of file.
 <codebody>
-;;
-;; FIXME
-;;
-;; This currently gets the gifs from /stardev/docs/sun139.htx/, which is
-;; obviously a temporary measure.  The gifs in here ought to be distributed
-;; as part of the SGML distribution and copied into the target directory
-;; by the downconverter control program (i.e. sgml2docs) or something -
-;; probably easiest to have a tar file of all the ones which might be 
-;; needed and just untar them all into the target directory.
 (define (file-href key)
-   (let ((gifdir "/stardev/docs/sun139.htx/"))
+   (let ((gifdir "icons/"))
       (case (case-fold-down key)
          (("hardcopy") (string-append gifdir "source.gif"))
          (("next") (string-append gifdir "next_motif.gif"))

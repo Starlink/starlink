@@ -40,6 +40,8 @@ ident_string='Starlink SGML Kit, release ((PKG_VERS))'
 #           bundling up files, but instead just bundle everything in
 #           sight.  You will need to use this only if there is some
 #           bug in the mechanism which generates the manifest.
+#     <dt>--quiet<dd>Don't chatter (not completely silent, since it
+#           doesn't suppress output from TeX).
 #     <dt>--options opt,opt,...<dd>set format-specific options.
 #     <dt>--help<dd>display usage and exit.
 #     <dt>--version<dd>display version and exit.
@@ -89,6 +91,7 @@ ident_string='Starlink SGML Kit, release ((PKG_VERS))'
 
 LIBDIR=${STARLINK_SGML_DIR}/lib
 DECL=${STARLINK_SGML_DIR}/dtd/starlink.decl
+ICONTARBALL=${STARLINK_SGML_DIR}/lib/icons.tar
 STYLESHEET=${STARLINK_SGML_DIR}/dsssl/sl
 
 # Binaries
@@ -108,20 +111,23 @@ OPTIONS=
 
 DEBUGGING=false
 USEMANIFEST=true
+VERBOSE=true
 run=
 runn=
 tempdest=tmp.stamp
 
+PROGNAME=`basename $0`
+
 tidy-up ()
 {
     if $DEBUGGING; then
-	echo "Work directory $WORKDIR not deleted"
+	echo "$PROGNAME:I: Work directory $WORKDIR not deleted"
     else
 	if [ -w "$WORKDIR" ]; then
 	    rm -Rf $WORKDIR
 	fi
 	if [ -d "$WORKDIR" ]; then
-	    echo "Couldn't delete work directory $WORKDIR"
+	    echo "$PROGNAME:W: Couldn't delete work directory $WORKDIR"
 	fi
     fi
 }
@@ -131,13 +137,12 @@ trap tidy-up 0
 
 USAGE="Usage: $0 [--latex] [--html] [--htmlsingle]\
 	[--packagedir directory] [--tarball file.tar] [--jadeflags flags]\
-	[--ignore-manifest]\
+	[--ignore-manifest] [--quiet]\
 	[--help] [--debug] [--version] [-n]\
 	[--options]\
 	sgml-file\
     (--latex options: cts-sect, cts-appx, onepass)"
 
-PROGNAME=`basename $0`
 while [ $# -gt 0 ]; do
     case $1 in
 	--html) TARGETFORMAT=0 ;;
@@ -150,9 +155,10 @@ while [ $# -gt 0 ]; do
 	--debug) DEBUGGING=true ;;
 	--options) OPTIONS=$2; shift ;;
 	--ignore-manifest) USEMANIFEST=false ;;
+	--quiet) VERBOSE=false; DVI2BITMAP="$DVI2BITMAP -q" ;;
 	  # undocumented -- use when manifest-generation is buggy
 	--help) echo $USAGE; exit 0;;
-	--version) echo $ident_string; echo $RCSID; exit 0;;
+	--version) echo "$PROGNAME:I:" $ident_string; echo "$PROGNAME:I:" $RCSID; exit 0;;
 	-n) run=echo; runn=: ; tempdest=/dev/stdout; ;;
 	-*) echo $USAGE; exit 1 ;;
 	*) SGMLSRC=$1 ;;
@@ -168,11 +174,11 @@ case $SGMLSRC in
 	*) SGMLSRC=$PWD/$SGMLSRC ;;
 esac
 
-echo "Processing $SGMLSRC..."
+$VERBOSE && echo "$PROGNAME:I: Processing $SGMLSRC..."
 case $TARGETFORMAT in
-    0)  echo "Target HTML...";
+    0)  $VERBOSE && echo "$PROGNAME:I: Target HTML...";
 	PACKAGEEXT='.htx' ;;
-    1)  echo "Target LaTeX...";
+    1)  $VERBOSE && echo "$PROGNAME:I: Target LaTeX...";
 	PACKAGEEXT='.latex' ;;
     *) echo $USAGE; exit 1 ;;
 esac
@@ -194,19 +200,19 @@ TARNAME=`expr $TARNAME : '\(/.*\)' \| $PWD/$TARNAME`
 # Fail if the directory already exists.
 WORKDIR=/tmp/$PROGNAME.$$
 if [ -d $WORKDIR -o -f $WORKDIR ]; then
-	echo "$0: temp dir $WORKDIR already exists - not overwriting"
+	echo "$PROGNAME:W: temp dir $WORKDIR already exists - not overwriting"
 	exit 1
 fi
 
 mkdir -p $WORKDIR
 if [ $? -ne 0 ]; then
-    echo "$0: Can't make temp dir $WORKDIR"
+    echo "$PROGNAME:E: Can't make temp dir $WORKDIR"
     exit 1
 fi
 
 cd $WORKDIR
 if [ $? -ne 0 ]; then
-    echo "$0: Can't cd to temp dir $WORKDIR"
+    echo "$PROGNAME:E: Can't cd to temp dir $WORKDIR"
     exit 1
 fi
 
@@ -216,21 +222,20 @@ fi
 # Before we do anything else, create the package directory.
 mkdir $PACKAGEDIR
 if [ ! -d $PACKAGEDIR ]; then
-    echo "$0: Can't create subdir $WORKDIR/$PACKAGEDIR"
+    echo "$PROGNAME:E: Can't create subdir $WORKDIR/$PACKAGEDIR"
     exit 1
 fi
 
 if $DEBUGGING; then
-    echo "JADE=$JADE"
-    echo "SGMLNORM=$SGMLNORM"
-    echo "LIBDIR=$LIBDIR"
-    echo "DVI2BITMAP=$DVI2BITMAP"
-    echo "LATEX=$LATEX"
-    echo "BIBTEX=$BIBTEX"
-    echo ""
-    echo "WORKDIR=$WORKDIR"
-    echo "JADEFLAGS=$JADEFLAGS"
-    echo "TARGETFORMAT=$TARGETFORMAT"
+    echo "$PROGNAME:I: JADE=$JADE"
+    echo "$PROGNAME:I: SGMLNORM=$SGMLNORM"
+    echo "$PROGNAME:I: LIBDIR=$LIBDIR"
+    echo "$PROGNAME:I: DVI2BITMAP=$DVI2BITMAP"
+    echo "$PROGNAME:I: LATEX=$LATEX"
+    echo "$PROGNAME:I: BIBTEX=$BIBTEX"
+    echo "$PROGNAME:I: WORKDIR=$WORKDIR"
+    echo "$PROGNAME:I: JADEFLAGS=$JADEFLAGS"
+    echo "$PROGNAME:I: TARGETFORMAT=$TARGETFORMAT"
 fi
 
 
@@ -240,7 +245,7 @@ fi
 if [ $TARGETFORMAT -eq 0 ]; then
     # Generate HTML
     # generate $ROOT.imgeq.list and convert it to a set of bitmaps
-    echo "Pre-processing..."
+    $VERBOSE && echo "$PROGNAME:I: Pre-processing..."
     $run $JADE -t sgml -iOnly.web $JADEFLAGS \
 	    -d $STYLESHEET/html/slpreprocess.dsl#preprocess.main \
 	    $DECL $SGMLSRC \
@@ -252,20 +257,19 @@ if [ $TARGETFORMAT -eq 0 ]; then
 	# Find dvi2bitmap's default format
 	# Default to gif if the dvi2bitmap version doesn't have the -Qt option
 	imgfmt=`($DVI2BITMAP -Qt 2>/dev/null || echo gif) | awk '{print $1}'`
-	echo $IMGEQ --imgformat $imgfmt $ROOT.imgeq.list
+	$VERBOSE && echo "$PROGNAME:I: $IMGEQ --imgformat $imgfmt $ROOT.imgeq.list"
 	$run $IMGEQ --imgformat $imgfmt $ROOT.imgeq.list
 
-	echo "LaTeXing maths..."
+	$VERBOSE && echo "$PROGNAME:I: $LATEX $ROOT.imgeq.tex"
 	$run $LATEX $ROOT.imgeq.tex
 
-	echo "dvi2bitmap..."
-	echo $DVI2BITMAP -m 2 -s 2 -Pt $ROOT.imgeq.dvi
+	$VERBOSE && echo "$PROGNAME:I: $DVI2BITMAP -m 2 -s 2 -Pt $ROOT.imgeq.dvi"
 	$run $DVI2BITMAP -m 2 -s 2 -Pt $ROOT.imgeq.dvi
     fi
 
     # Generate backmatter.  Don't fail if no .aux file was generated
     if [ -r "$ROOT.htmlbib.aux" ]; then
-	echo "Backmatter..."
+	$VERBOSE && echo "$PROGNAME:I: Backmatter..."
 	# BSTINPUTS set here; require the user to do any setting of BIBINPUTS
 	BSTINPUTS=$LIBDIR $run $BIBTEX $ROOT.htmlbib
 	$runn sed -f $LIBDIR/postprocess-bbl.sed $ROOT.htmlbib.bbl > t.bbl
@@ -273,7 +277,7 @@ if [ $TARGETFORMAT -eq 0 ]; then
     fi
 
     # Generate the destination file
-    echo "Generating output..."
+    $VERBOSE && echo "$PROGNAME:I: Generating output..."
     $run $JADE -t sgml -iHTML.entities -iOnly.web $JADEFLAGS \
 	    -d $STYLESHEET/html/sl.dsl#html \
 	    $DECL $SGMLSRC \
@@ -298,12 +302,12 @@ elif [ $TARGETFORMAT -eq 1 ]; then
 		cts-sect) JADEFLAGS="$JADEFLAGS -V section-samepage" ;;
 		cts-appx) JADEFLAGS="$JADEFLAGS -V appendix-samepage" ;;
 		onepass)  JADEFLAGS="$JADEFLAGS -V onepass-latex" ;;
-		*) echo "$0: LaTeX options (cts-sect|cts-appx|onepass)" ;
+		*) echo "$PROGNAME:E: LaTeX options (cts-sect|cts-appx|onepass)" ;
 		   exit 1 ;;
 	    esac
 	done
 	if $DEBUGGING; then
-	    echo "JADEFLAGS (post-options)=$JADEFLAGS"
+	    echo "$PROGNAME:I: JADEFLAGS (post-options)=$JADEFLAGS"
 	fi
     fi
 
@@ -332,7 +336,7 @@ elif [ $TARGETFORMAT -eq 1 ]; then
 
 else
 
-    echo "Illegal TARGETFORMAT=$TARGETFORMAT !"
+    echo "$PROGNAME:E: Illegal TARGETFORMAT=$TARGETFORMAT !"
     exit 1
 
 fi
@@ -364,19 +368,34 @@ if [ -r MANIFEST -o -n "$run" ]; then
     (cd $SRCDIR; \
 	eval `awk "NF==2 {printf \"$run cp %s $WORKDIR/$PACKAGEDIR/%s\n\","'$2,$1}' $WORKDIR/MANIFEST`)
     $run cp MANIFEST $PACKAGEDIR
+
+    if [ $TARGETFORMAT -eq 0 ]; then
+	# Generating HTML:
+	# At this point append the contents of the icons tarball to the
+	# MANIFEST.  Don't do this earlier, since these files weren't
+	# present to be copied.
+	(cd $PACKAGEDIR; \
+	    tar tf $ICONTARBALL | sed '/\/$/d' >> MANIFEST)
+    fi
 else
     # It's not clear what to do here, since _something_ has clearly
-    # gone wrong.  However, package up all (?) the generated files and
-    # hope for the best.
-    echo "$0: Can't find manifest -- something's gone wrong:  I'm tarring up everything and hoping for the best!"
+    # gone wrong if we don't have a manifest.  However, package up all
+    # (?) the generated files and hope for the best.
+    $VERBOSE && echo "$PROGNAME:W: Can't find manifest -- something's gone wrong:  I'm tarring up everything and hoping for the best!"
     $run mv * $PACKAGEDIR
 fi
+
+if [ $TARGETFORMAT -eq 0 ]; then
+    # Unpack the icons into the target directory, to match the manifest.
+    (cd $PACKAGEDIR; tar xf $ICONTARBALL)
+fi
+
 $run tar cf $TARNAME $PACKAGEDIR
 
 
 # No need to remove the workdir, as that'll be done through the exit trap
 
-echo "Created $TARNAME"
+$VERBOSE && echo "$PROGNAME:I: Created $TARNAME"
 
 exit 0
 

@@ -361,6 +361,19 @@ funny.  Left and right angle brackets appear unescaped, so come out
 like upside-down punctuation.</p>
 </defect>
 
+<defect status="open" originator="Mark" date='6-Jun-2000'>
+<title>HTML: Generated maths bitmaps wrongly positioned</title>
+<p>Bitmaps could do with some sort of strut, so that, for example, a
+single minus sign doesn't drop to the bottom of the line.</p>
+<p>This is actually a consequence of the way dvi2bitmap forms its
+images, and the fact that DVI files contain no notion of baselines --
+they're just collections of characters at random points on the page.
+That means it's probably not that easy to fix.</p>
+<p>How much of a problem is this?  If folk are in the habit of writing
+minus signs alone within maths mode, then I think they should be told
+to stoppit, since, apart from anything else, the spacing would be wrong.</p>
+</defect>
+
 </defectgroup>
 
 <defectgroup>

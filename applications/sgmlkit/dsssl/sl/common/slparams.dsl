@@ -26,7 +26,14 @@
      -->
 
 <routine>
+<routinename>%stylesheet-version%
+<description>Version string
+<codebody>
+(define %stylesheet-version% "Starlink SGML Kit, version 0.7")
+
+<routine>
 <routinename>show-element-ids
+<purpose>Display exported IDs
 <description>
 If true, then display exported IDs in section (etc) titles.  This is
 useful for preparing a version of a document which you refer to while
@@ -37,6 +44,7 @@ working on it, or another which refers to it often.
 
 <routine>
 <routinename>%short-crossrefs%
+<purpose>Generate shorter crossrefs
 <description>If true, this will make the down-converter generate shorter 
 link texts for cross-references.
 <returnvalue type=boolean>Return true to generate short references
@@ -46,6 +54,7 @@ link texts for cross-references.
 
 <routine>
 <routinename>suppress-manifest
+<purpose>Turn off generation of manifest
 <description>
 If true, this will suppress the generation of a manifest, even if the variable 
 <funcname>%latex-manifest%</> or <funcname>%html-manifest</> is given.
@@ -57,6 +66,7 @@ Jade command line).
 
 <routine>
 <routinename>%starlink-decl-entity%
+<purpose>Pointer to Starlink SGML declaration
 <description>
 <p>Entity name which refers to the Starlink declaration.  This has to
 be declared <em>somewhere</>: the default is declared in the General DTD.

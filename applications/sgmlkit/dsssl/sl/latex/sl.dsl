@@ -67,8 +67,6 @@ of Jade, written by me.
   "UNREGISTERED::Norman Gray//Characteristic::escape-tex?"
   #t)
 
-(define %stylesheet-version%
-  "Starlink LaTeX stylesheet, version 0.1")
 
 ;; incorporate the simple stylesheets directly
 

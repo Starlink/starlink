@@ -112,8 +112,6 @@ transformation extensions of Jade.</description>
 (define all-element-number
   (external-procedure "UNREGISTERED::James Clark//Procedure::all-element-number"))
 
-(define %stylesheet-version%
-  "Starlink HTML Stylesheet version 0.1")
 
 <!-- include the other parts by reference -->
 
