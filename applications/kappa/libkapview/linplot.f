@@ -22,8 +22,9 @@
 *  Description:
 *     This application creates a plot of array value against position for
 *     a 1-dimensional NDF. The vertical axis of the plot represents array 
-*     value (or the logarithm of the array value - see parameter YLOG),
-*     and the horizontal axis represents position.
+*     value, and the horizontal axis represents position. These can be
+*     mapped in various ways onto the screen (e.g. linearly, logarithmically, 
+*     etc, see parameters XMAP and YMAP).
 *
 *     The plot may take several different forms such as a "join-the-dots"
 *     plot, a "staircase" plot, a "chain" plot, etc, (see parameter MODE).
@@ -80,12 +81,11 @@
 *        TRUE if labelled and annotated axes are to be drawn around the
 *        plot. If a null (!) value is supplied, the value used is FALSE if 
 *        the plot is being aligned with an existing plot (see parameter 
-*        ALIGN), and TRUE otherwise. Parameters USEAXIS and YLOG determine 
-*        the quantities used to annotated the horizontal and vertical axes
-*        respectively. The width of the margins left for the annotation 
-*        may be controlled using parameter MARGIN. The appearance of the 
-*        axes (colours, fonts, etc) can be controlled using the parameter
-*        STYLE. [!]
+*        ALIGN), and TRUE otherwise. Parameter USEAXIS determines the 
+*        quantity used to annotated the horizontal axis. The width of the 
+*        margins left for the annotation may be controlled using parameter 
+*        MARGIN. The appearance of the axes (colours, fonts, etc) can be 
+*        controlled using the parameter STYLE. [!]
 *     CLEAR = _LOGICAL (Read)
 *        If TRUE the current picture is cleared before the plot is 
 *        drawn. If CLEAR is FALSE not only is the existing plot retained, 
@@ -191,7 +191,9 @@
 *        for YTOP is set to the maximum data value plus 5% of the data range.
 *        If only one value is supplied, the second value defaults to the
 *        supplied value. If no values are supplied, both values default to
-*        "2.5".
+*        "2.5". Care should be taken with this mode if YMAP is set to "Log"
+*        since the extension to the data range caused by this mode may result 
+*        in the axis encompassing the value zero.
 *
 *        - "Percentile" -- The default values for YBOT and YTOP are set to 
 *        the specified percentiles of the data (excluding error bars). For 
@@ -334,6 +336,30 @@
 *        less than the value supplied for XRIGHT. A formatted value for the 
 *        quantity specified by parameter USEAXIS should be supplied. See also 
 *        parameter ALIGN. [!]
+*     XMAP = LITERAL (Read)
+*        Specifies hwo the quantity represented by the X axis is mapped
+*        onto the screen. The options are:
+*
+*        - "Pixel" -- The mapping is such that pixel index within the
+*        input NDF increases linearly across the screen.
+*
+*        - "Distance" -- The mapping is such that distance along the curve 
+*        within the current WCS Frame of the input NDF increases linearly 
+*        across the screen.
+*
+*        - "Log" -- The mapping is such that the logarithm (base 10) of
+*        the value used to annotate the axis increases linearly across
+*        the screen. An error will be reported if the dynamic range of
+*        the axis is less than 100, or if the range specified by XLEFT
+*        and XRIGHT encompasses the value zero.
+*
+*        - "Linear" -- The mapping is such that the value used to annotate 
+*        the axis increases linearly across the screen.
+*
+*        - "Default" -- One of "Linear" or "log" is chosen automatically,
+*        depending on whcih one produces a more even spread of values on the 
+*        screen. [DEFAULT]
+*
 *     XRIGHT = LITERAL (Read)
 *        The axis value to place at the right hand end of the horizontal
 *        axis. If a null (!) value is supplied, the value used is the value 
@@ -349,15 +375,33 @@
 *     YBOT = LITERAL (Read)
 *        The axis value to place at the bottom end of the vertical
 *        axis. If a null (!) value is supplied, the value used is
-*        determined by parameter LMODE. The value of LBOT may be 
-*        greater than or less than the value supplied for YTOP, and
-*        should be supplied as a floating point value for the quantity
-*        specified by parameter YLOG. See also parameter ALIGN. [!]
-*     YLOG = _LOGICAL (Read)
-*        TRUE if the value displayed on the vertical axis is to be the
-*        logarithm of the supplied data values. If TRUE, then the values
-*        supplied for parameters YTOP and YBOT should be values for the
-*        logarithm of the data value, not the data value itself. [FALSE]
+*        determined by parameter LMODE. The value of YBOT may be 
+*        greater than or less than the value supplied for YTOP. If
+*        parameter YMAP is set to "ValueLog", then the supplied value
+*        should be the logarithm (base 10) of the bottom data value.
+*        See also parameter ALIGN. [!]
+*     YMAP = LITERAL (Read)
+*        Specifies hwo the quantity represented by the Y axis is mapped
+*        onto the screen. The options are:
+*
+*        - "Linear" -- The data values are mapped linearly onto the
+*        screen.
+*
+*        - "Log" -- The data values are logged logarithmically onto the
+*        screen. An error will be reported if the dynamic range of
+*        the axis is less than 100, or if the range specified by YTOP and
+*        YBOT encompasses the value zero. For this reason, care should
+*        be taken over the choice of value for parameter LMODE, since
+*        some choices could result in the Y range being extended so far
+*        that it encompasses zero. 
+*
+*        - "ValueLog" -- This is similar to "Log" except that, instead 
+*        of mapping the data values logarithmically onto the screen,
+*        this option maps the log (base 10) of the data values linearly 
+*        onto the screen. If this option is selected, the values supplied 
+*        for parameters YTOP and YBOT should be values for the logarithm of 
+*        the data value, not the data value itself. [Linear]
+*
 *     YSIGMA = LITERAL (Read)
 *        If vertical error bars are produced (see parameter ERRBAR), then
 *        YSIGMA gives the number of standard deviations which the error
@@ -366,9 +410,10 @@
 *        The axis value to place at the top end of the vertical
 *        axis. If a null (!) value is supplied, the value used is
 *        determined by parameter LMODE. The value of LTOP may be 
-*        greater than or less than the value supplied for YBOT, and
-*        should be supplied as a floating point value for the quantity
-*        specified by parameter YLOG. See also parameter ALIGN. [!]
+*        greater than or less than the value supplied for YBOT. If
+*        parameter YMAP is set to "ValueLog", then the supplied value
+*        should be the logarithm (base 10) of the bottom data value.
+*        See also parameter ALIGN. [!]
 
 *  Examples:
 *     linplot spectrum 
@@ -394,13 +439,13 @@
 *        1-dimensional NDF called prof with declination value between 23d
 *        30m 22s, and 23d 30m 45s. This assumes that the current
 *        co-ordinate Frame in the NDF has an axis with symbol "dec".
-*     linplot prof useaxis=2 ybot=1.0 ytop=3.0 ylog
-*        This plots the logarithm (base 10) of the data values in the
-*        entire 1-dimensional NDF called prof, against the value described 
-*        by the second axis in the current co-ordinate Frame of the NDF.
-*        The bottom of the vertical axis corresponds to a data value of 
-*        10.0 and the top corresponds to a data value of 1000.0 (10 to
-*        the power 3.0).
+*     linplot prof useaxis=2 ybot=10 ytop=1000.0 ymap=log xmap=log
+*        This plots the data values in the entire 1-dimensional NDF called 
+*        prof, against the value described by the second axis in the current 
+*        co-ordinate Frame of the NDF. The values represented by both
+*        axes are mapped logarithmically onto the screen. The bottom of the 
+*        vertical axis corresponds to a data value of 10.0 and the top 
+*        corresponds to a data value of 1000.0.
 *     linplot xspec mode=p errbar xsigma=3 ysigma=3 shape=d style=^my_sty 
 *        This plots the data values versus position for the dataset called 
 *        xspec. Each pixel is plotted as a point surrounded by diamond-shaped 
@@ -511,7 +556,6 @@
 
 *  External References:
       INTEGER CHR_LEN            ! Used length of a string
-      LOGICAL CHR_SIMLR          ! Strings equal apart from case?
 
 *  Local Constants:
       INTEGER NDIM               ! Dimensionality of input array
@@ -521,6 +565,7 @@
       PARAMETER ( KW = 0.1 )     ! current picture.
 
 *  Local Variables:
+      CHARACTER CIAXIS*8       ! String obtained for parameter USEAXIS
       CHARACTER COMP*8         ! Component to be displayed
       CHARACTER KEYLN1*80      ! First line of key text
       CHARACTER KEYLN2*80      ! Second line of key text
@@ -528,6 +573,8 @@
       CHARACTER NDFNAM*255     ! Full NDF specification 
       CHARACTER TEXT*255       ! A general text string
       CHARACTER UNITS*20       ! Units of the data
+      CHARACTER XMAP*8         ! How to map the X axis onto the screen
+      CHARACTER YMAP*8         ! How to map the Y axis onto the screen
       DOUBLE PRECISION BL( 2 ) ! "w.w. want" X/Y values at bottom left corner
       DOUBLE PRECISION BLG( 2 )! "uniform" X/Y values at bottom left corner
       DOUBLE PRECISION BOX( 4 )! Bounds of DATA picture 
@@ -544,7 +591,6 @@
       INTEGER DIAXIS           ! Default value for USEAXIS
       INTEGER DIM              ! Number of elements in the input array
       INTEGER DPFS             ! FrameSet connecting old and new DATAPLOT Frames
-      INTEGER DPMAP            ! Mapping between old and new DATAPLOT Frames
       INTEGER EL               ! Number of mapped elements 
       INTEGER FREQ             ! Interval between error bars
       INTEGER FSET             ! Pointer to FrameSet 
@@ -610,10 +656,8 @@
       LOGICAL OLDPIC           ! Was an existing DATA picture found?
       LOGICAL THERE            ! Does object exist?
       LOGICAL XVAR             ! Display x axis centre variances?
-      LOGICAL YLOG             ! Show log of data value?
       LOGICAL YVAR             ! Display y data variances?
       REAL HGT                 ! Height of text with horizontal baseline
-      REAL KEYOFF              ! Offset to top of key 
       REAL LNSP                ! Line spacing in millimetres
       REAL MARGIN( 4 )         ! Width of margins round DATA picture
       REAL UP(2)               ! Up vector
@@ -691,16 +735,19 @@
 *  dimensional, and zero otherwise. An axis index is returned. Since
 *  KPG1_GTAXI will not accept an axis value of zero, use PAR_GET0I first
 *  to see if the value zero was supplied.
-      CALL PAR_GET0I( 'USEAXIS', IAXIS, STATUS )
+      CALL PAR_GET0C( 'USEAXIS', CIAXIS, STATUS )
 
       IF( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
          IAXIS = DIAXIS
 
-      ELSE IF( STATUS .NE. SAI__OK .OR. IAXIS .NE. 0  ) THEN
-         IF( STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
-         IAXIS = DIAXIS
-         CALL KPG1_GTAXI( 'USEAXIS', IWCS, 1, IAXIS, STATUS )
+      ELSE IF( STATUS .EQ. SAI__OK ) THEN
+         CALL CHR_CTOI( CIAXIS, IAXIS, STATUS )
+         IF( STATUS .NE. SAI__OK .OR. IAXIS .NE. 0 ) THEN
+            STATUS = SAI__OK
+            IAXIS = DIAXIS
+            CALL KPG1_GTAXI( 'USEAXIS', IWCS, 1, IAXIS, STATUS )
+         END IF
       END IF
 
 *  If we got a value greater than zero, indicate that the horizontal axis 
@@ -789,23 +836,27 @@
          END IF
       END IF
 
-*  See if the Y axis is to display logged data values.
-      CALL PAR_GET0L( 'YLOG', YLOG, STATUS )      
+*  See how the X and Y axes are to be mapped onto the screen.
+      IF( STATUS .NE. SAI__OK ) GO TO 999
+      CALL PAR_CHOIC( 'XMAP', 'Default', 'Default,Linear,Log,Pixel,'//
+     :                'Distance', .TRUE., XMAP, STATUS )
+      CALL PAR_CHOIC( 'YMAP', 'Linear', 'Linear,Log,ValueLog', .TRUE., 
+     :                YMAP, STATUS )
 
 *  Obtain a FrameSet containing three 2-D Frames. In the Frame 1, axis 1
 *  is the GRID co-ordinate with the supplied 1-d array, and axis 2 is the 
 *  raw data value. This Frame corresponds to "what we've got". In the Frame 3 
 *  (the current Frame), axis 1 is the value on the selected axis from the 
 *  NDF's current Frame (or distance along the profile if DIST is .TRUE.), and 
-*  axis 2 is the raw or logged data value. This Frame corresponds to "what we
-*  want" and is given the Domain "DATAPLOT". Frame 2 (the Base Frame) is 
-*  spanned by the axes which are to mapped linearly onto the graphics 
-*  screen (distance from the starting point on the first axis, and raw 
-*  or logged data value on the second axis). This Frame corresponds to 
-*  the "uniform" co-ordinate system, and is given the Domain AGI_WORLD. A 
-*  flag is returned if any of the required Mappings do not have an inverse 
-*  transformation. 
-      CALL  KPS1_LPLFS( INDF, IWCS, DIST, IAXIS, DIM, YLOG, MCOMP,
+*  axis 2 is the raw (or logged if ymap=ValueLog) data value. This Frame 
+*  corresponds to "what we want to see" and is given the Domain "DATAPLOT". 
+*  Frame 2 (the Base Frame) is spanned by the axes which are to mapped 
+*  linearly or logarithmically onto the graphics screen. Axis 1 will be 
+*  determined by the setting of parameter XMAP, and axis 2 by the setting
+*  of YMAP. This Frame corresponds to the "uniform" co-ordinate system, and 
+*  is given the Domain AGI_WORLD. A flag is returned if any of the required 
+*  Mappings do not have an inverse transformation. 
+      CALL  KPS1_LPLFS( INDF, IWCS, DIST, IAXIS, DIM, XMAP, YMAP, MCOMP,
      :                  UNITS( : NCU ), NOINV, FSET, STATUS )
 
 *  Note the index of the "what we've got" and "what we want" Frames.
@@ -894,6 +945,7 @@
          XSIGMA = ABS( XSIGMA )
 
 *  Tell the user what XSIGMA value we are using.
+         CALL MSG_BLANK( STATUS )
          CALL MSG_SETR( 'XS', XSIGMA )
          CALL MSG_OUT( 'LINPLOT_MSG1', '  Errors in position will be '//
      :                 'displayed as ^XS sigma errors.', STATUS )
@@ -959,6 +1011,7 @@
          YSIGMA = ABS( YSIGMA )
 
 *  Tell the user what YSIGMA value we are using.
+         CALL MSG_BLANK( STATUS )
          CALL MSG_SETR( 'YS', YSIGMA )
          CALL MSG_OUT( 'LINPLOT_MSG2', '  Errors in data value will '//
      :                 'be displayed as ^YS sigma errors.', STATUS )
@@ -1318,6 +1371,19 @@
          CALL KPG1_GTAXV( 'YTOP', 1, .TRUE., FSET, 2, TR( 2 ), NVAL,
      :                    STATUS )
 
+*  If the Y axis will be logarithmic, ensure that the limits are of the
+*  same sign. */
+         IF( YMAP .EQ. 'LOG' ) THEN
+            IF( TR( 2 )*BL( 2 ) .LE. 0.0 ) THEN            
+               CALL MSG_BLANK( STATUS )
+               CALL MSG_OUT( ' ', '  Cannot use logarithmic mapping '//
+     :                       'for the Y axis (parameter YMAP) since '//
+     :                       'the axis range specified by YTOP and '//
+     :                       'YBOT includes zero. Try a different '//
+     :                       'value for parameter LMODE?', STATUS )
+            END IF
+         END IF
+
 *  Map these positions into the Base (uniform) Frame.
          CALL AST_TRANN( FSET, 1, 2, 1, BL, .FALSE., 2, 1, BLG, STATUS ) 
          CALL AST_TRANN( FSET, 1, 2, 1, TR, .FALSE., 2, 1, TRG, STATUS ) 
@@ -1412,6 +1478,10 @@
 *  We now have a Plot and a new DATA picture. Prepare to produce the
 *  graphical output.
 *  =================================================================
+*  Set the LogPlot attributes in the Plot appropriately.
+      CALL AST_SETL( IPLOT, 'LOGPLOT(1)', ( XMAP .EQ. 'LOG' ), STATUS )
+      CALL AST_SETL( IPLOT, 'LOGPLOT(2)', ( YMAP .EQ. 'LOG' ), STATUS )
+
 *  Get the 1-D mappings which transform each of the GRAPHICS Frame axes
 *  onto the corresponding "what we want" Frame axes.
       CALL KPG1_ASSPL( IPLOT, 2, AXMAPS, STATUS )
@@ -1482,7 +1552,6 @@
 
 *  Produce the plot.
 *  =================
-
 *  Draw the grid if required.
       IF( AXES ) CALL KPG1_ASGRD( IPLOT, IPICF, .TRUE., STATUS )
 

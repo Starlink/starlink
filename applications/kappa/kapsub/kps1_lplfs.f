@@ -1,5 +1,5 @@
-      SUBROUTINE KPS1_LPLFS( INDF, IWCS, DIST, IAXIS, DIM, YLOG, MCOMP,
-     :                       DUNIT, NOINV, FSET, STATUS )
+      SUBROUTINE KPS1_LPLFS( INDF, IWCS, DIST, IAXIS, DIM, XMAP, YMAP, 
+     :                       MCOMP, DUNIT, NOINV, FSET, STATUS )
 *+
 *  Name:
 *     KPS1_LPLFS
@@ -11,8 +11,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_LPLFS( INDF, IWCS, DIST, IAXIS, DIM, YLOG, MCOMP, DUNIT, 
-*                      NOINV, FSET, STATUS )
+*     CALL KPS1_LPLFS( INDF, IWCS, DIST, IAXIS, DIM, XMAP, YMAP, MCOMP, 
+*                      DUNIT, NOINV, FSET, STATUS )
 
 *  Description:
 *     This routine is supplied with FrameSet describing a 1-d data array as
@@ -31,12 +31,13 @@
 *                 an array component in the supplied NDF).
 *        Axis 2 - Supplied data value.
 *
-*     Frame 2: This is the Frame which is to be mapped uniformly onto the
-*              graphics screen, and is given the Domain AGI_WORLD. 
-*        Axis 1 - The distance from the first grid element, measured
-*                 along the profile.
-*        Axis 2 - This will correspond to raw data value if YLOG is
-*                 .FALSE., and the logaritthm of the data value otherwise.
+*     Frame 2: This is the Frame which is to be mapped linearly or
+*              logarithmically (depending on the LogPlot attribute of the 
+*              Plot) onto the graphics screen, and is given the Domain 
+*              AGI_WORLD (strictly AGI_WORLD should always be linear, but
+*              no one uses AGI_WORLD these days...)
+*        Axis 1 - The axis specified using XMAP.
+*        Axis 2 - The axis specified using YMAP.
 *
 *     Frame 3: Corresponds to "what we want to see" (i.e. the Frame describing 
 *              the quantities which are to be annotated on the displayed axes).
@@ -63,8 +64,48 @@
 *        distance values (if DIST is .TRUE.).
 *     DIM = INTEGER (Given)
 *        The number of pixels in the 1-d array being plotted.
-*     YLOG = LOGICAL (Given)
-*        Should the logarithm of the Y axis data be displayed?
+*     XMAP = CHARACTER * ( * ) (Given and Returned)
+*        Specifies what to use for axis 1 of Frame 2 in the returned
+*        FrameSet. This controls how the values specified by IAXIS/DIST
+*        are mapped onto the screen. The options are:
+*
+*        - "PIXEL" -- Use NDF grid index. This means that pixel index within 
+*        the input NDF will increase linearly across the screen.
+*
+*        - "DISTANCE" -- Use a 1-D Frame representing distance along the
+*        curve. This means that distance along the curve will increase
+*        linearly across the screen.
+*
+*        - "LINEAR" -- Use the axis specified by IAXIS/DIST and set the
+*        LogPlot attribute for this axis to zero. This means that the value 
+*        used to annotate the axis increases linearly across the screen.
+*
+*        - "LOG" -- Use the axis specified by IAXIS/DIST and set the
+*        LogPlot attribute for this axis non-zero. This means that the 
+*        logarithm (base 10) of the value used to annotate the axis 
+*        increases linearly across the screen.
+*
+*        - "DEFAULT" -- Determine an appropriate default. This default 
+*        value is returned. One of "LINEAR" or "LOG" is chosen as the
+*        default.
+*
+*     YMAP = CHARACTER * ( * ) (Given)
+*        Specifies what to use for axis 2 of Frame 2 in the returned
+*        FrameSet. This controls how the data values are mapped onto the 
+*        screen. The options are:
+*
+*        - "LINEAR" -- Axis 2 represents data values, and the LogPlot
+*        attribute for the axis is set zero, so that data values are 
+*        mapped linearly onto the screen.
+*
+*        - "LOG" -- Axis 2 represents data values, and the LogPlot
+*        attribute for the axis is set non-zero, so that data values are 
+*        mapped logarithmically onto the screen.
+*
+*        - "VALUELOG" -- Axis 2 represents log (base 10) of the data
+*        values, and the LogPlot attribute for the axis is set zero, so that 
+*        the log of the data values are mapped linearly onto the screen.
+*
 *     MCOMP = CHARACTER * ( * ) (Given)
 *        NDF component being displayed.
 *     DUNIT = CHARACTER * ( * ) (Given)
@@ -94,6 +135,8 @@
 *     25-FEB-2003 (DSB):
 *        Extended length of TEXT variable to avoid spurious errors in Y
 *        axis label.
+*     7-FEB-2004 (DSB):
+*        Replaced YLOG parameter by XMAP and YMAP parameters.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -114,7 +157,8 @@
       LOGICAL DIST
       INTEGER IAXIS
       INTEGER DIM
-      LOGICAL YLOG
+      CHARACTER XMAP*(*)
+      CHARACTER YMAP*(*)
       CHARACTER DUNIT*(*)
       CHARACTER MCOMP*(*)
 
@@ -133,11 +177,17 @@
       CHARACTER LAB*80           ! Label text string
       CHARACTER TEXT*100         ! General text string
       CHARACTER UNIT*100         ! Unit attribute value
+      DOUBLE PRECISION C         ! Offset of fit
+      DOUBLE PRECISION M         ! Gradient of fit
       DOUBLE PRECISION POS( 2 )  ! Start and end of samples in GRID Frame
+      DOUBLE PRECISION RMSLIN    ! RMS residual of fit (linear mapping)
+      DOUBLE PRECISION RMSLOG    ! RMS residual of fit (log mapping)
       INTEGER AXES( 2 )          ! Axes to pick from an existing Frame 
       INTEGER CFRM               ! Current Frame in supplied FrameSet
       INTEGER FR1                ! Frame 1 in compound frame
       INTEGER FR2                ! Frame 2 in compound frame
+      INTEGER FRM0               ! Pointer to distance Frame
+      INTEGER FRMI               ! Pointer to axis value Frame
       INTEGER I                  ! Loop count
       INTEGER IAT                ! No. of characters in a string
       INTEGER ICURR              ! Index of current Frame in IWCS
@@ -145,19 +195,22 @@
       INTEGER IPD                ! Pointer to array of returned axis 1 values
       INTEGER IPG                ! Pointer to array of GRID values
       INTEGER IPW                ! Pointer to array of Current Frame values
+      INTEGER LUT0               ! Pointer to distance LutMap
+      INTEGER LUTI               ! Pointer to axis value LutMap
       INTEGER MAP1               ! Map pointer
       INTEGER MAP2               ! Map pointer
+      INTEGER MAPX               ! X axis 1-D Mapping
+      INTEGER MAPY               ! Y axis 1-D Mapping
       INTEGER NAX                ! No. of axes in supplied Current Frame
+      INTEGER NERR               ! Number of numerical errors
+      INTEGER NERRV              ! Number of numerical variance errors
       INTEGER SMAP               ! Base->Current Mapping in supplied FrameSet
       INTEGER TMAP               ! Unused Mapping
       INTEGER UNIFRM             ! Uniform Frame in returned FrameSet
       INTEGER WWGOT              ! Base Frame in returned FrameSet
       INTEGER WWWANT             ! Current Frame in returned FrameSet
-      INTEGER XMAP               ! X axis 1-D Mapping
-      INTEGER YMAP               ! Y axis 1-D Mapping
       LOGICAL BAD                ! Any bad values found?
       LOGICAL SAMEUN             ! Do all current frame axes have same units?
-
 *.
 
 *  Initialise.
@@ -169,15 +222,6 @@
 
 *  Start an AST context.
       CALL AST_BEGIN( STATUS )
-
-*  First create the Mapping from the "what we've got" Frame to the uniform
-*  Frame. This is a parallel CmpMap. The Mapping for axis 1 is a LutMap
-*  giving distance from the starting point for any GRID position. The
-*  Mapping for axis 2 is a UnitMap if raw data value is being displayed, or
-*  an IntraMap implementing a LOG10 function if the log of the data value
-*  is being displayed. An IntraMap is used because AST as yet has no LOG10
-*  Mapping.
-*  =======================================================================
 
 *  Get a simplified Mapping from Base to Current Frame in the supplied
 *  FrameSet.
@@ -227,20 +271,33 @@
    
       END DO
 
+*  Now create the Mapping from the "what we've got" Frame to the uniform
+*  Frame. This is a parallel CmpMap. The Mapping for axis 1 depends on
+*  the value of parameter XMAP. If XMAP is "PIXEL" the Mapping is a UnitMap. 
+*  If it is "DISTANCE", it is a LutMap giving distance from the starting 
+*  point for any GRID position. If it is "LINEAR" or "LOG", it is a LutMap 
+*  giving the value of axis IAXIS for any GRID position. The Mapping for axis 
+*  2 depends on the value of parameter YMAP. If YMAP is "LINEAR" or "LOG", 
+*  it is a UnitMap. If YMAP is "VALUELOG", it is an IntraMap implementing a 
+*  LOG10 function. An IntraMap is used because AST as yet has no LOG10
+*  Mapping.
+*  =======================================================================
+
 *  Allocate memory to hold an array of DIM 1-d GRID values.
       CALL PSX_CALLOC( DIM, '_DOUBLE', IPG, STATUS )
 
 *  Allocate memory to hold the corresponding n-d Current Frame values.
       CALL PSX_CALLOC( DIM*NAX, '_DOUBLE', IPW, STATUS )
 
-*  Allocate memory to hold the corresponding distance values.
+*  Allocate memory to hold the corresponding distance or selected axis values.
       CALL PSX_CALLOC( DIM, '_DOUBLE', IPD, STATUS )
 
 *  Abort if an error occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Find DIM positions evenly spaced in the GRID Frame along the profile.
-*  The positions are at the centre of each grid cell.
+*  The positions are at the centre of each grid cell. This results in the
+*  IPG array holding 1.0, 2.0, 3.0, ... NDIM.
       POS( 1 ) = 1.0D0
       POS( 2 ) = DBLE( DIM )
       CALL KPG1_ASSMP( AST__NULL, 2, 1, 2, POS, .FALSE., DIM, 
@@ -248,41 +305,159 @@
 
 *  Transform these GRID positions into the Current Frame in the supplied
 *  FrameSet.
-      CALL AST_TRANN( SMAP, DIM, 1, DIM, %VAL( IPG ), .TRUE., NAX, DIM,
-     :                %VAL( IPW ), STATUS ) 
+      CALL AST_TRANN( SMAP, DIM, 1, DIM, %VAL( IPG ), .TRUE., NAX, 
+     :                DIM, %VAL( IPW ), STATUS ) 
 
-*  Find the distance from the first GRID position to each subsequent GRID
-*  position, measured along the profile. If the axes of the current Frame 
-*  do not all have the same Unit, normalise the distances to a maximum
-*  value of 1.0.
-      CALL KPG1_ASDSV( CFRM, DIM, NAX, %VAL( IPW ), .NOT. SAMEUN, 
-     :                 %VAL( IPD ), BAD, STATUS )
+*  Indicate we have found no bad axis values yet.
+      BAD = .FALSE.
 
-*  Report an error if any bad distance values were found.
+*  If necessary, we create a LutMap which maps grid indicies to distance
+*  along the curve.
+      IF( DIST .OR. XMAP .EQ. 'DISTANCE' ) THEN
+
+*  Find the distance from the first GRID position to each subsequent GRID 
+*  position, measured along the profile. If the axes of the current Frame do 
+*  not all have the same Unit, normalise the distances to a maximum value of 
+*  1.0.
+         CALL KPG1_ASDSV( CFRM, DIM, NAX, %VAL( IPW ), .NOT. SAMEUN, 
+     :                    %VAL( IPD ), BAD, STATUS )
+
+*  Create the LutMap. 
+         LUT0 = AST_LUTMAP( DIM, %VAL( IPD ), 1.0D0, 1.0D0, ' ', 
+     :                      STATUS )
+
+*  If we need to find a default value for XMAP, and the axis is being annotated
+*  with distance, see if a log or lin mapping would produce a more even
+*  spread of values.
+         IF( XMAP .EQ. 'DEFAULT' .AND. DIST ) THEN
+
+*  First find the RMS deviation of a stright line fitted to the axis value
+            CALL KPG1_FIT1D( 1, DIM, %VAL( IPD ), %VAL( IPG ), M, C, 
+     :                       RMSLIN, STATUS )
+
+*  Now take the log base 10 of the axis values and find the new RMS
+*  deviation.
+            CALL KPG1_LOGAD( .TRUE., DIM, %VAL( IPD ), .FALSE., 
+     :                        %VAL( IPD ), 10.0D0, %VAL( IPD ),
+     :                        %VAL( IPD ), NERR, NERRV, STATUS ) 
+            IF( NERR .LT. 0.5*DIM ) THEN
+               CALL KPG1_FIT1D( 1, DIM, %VAL( IPD ), %VAL( IPG ), M, C, 
+     :                          RMSLOG, STATUS )
+
+*  Choose the mapping which gives the smallest rms (i.e. spreads the
+*  pixels out most evenly on the screen).
+               IF( RMSLOG .LT. RMSLIN ) THEN
+                  XMAP = 'LOG'
+               ELSE
+                  XMAP = 'LINEAR'
+               END IF      
+            ELSE
+               XMAP = 'LINEAR'
+            END IF
+
+         END IF
+
+      ELSE 
+         LUT0 = AST__NULL
+      END IF
+
+*  If necessary, we create a LutMap which maps grid indicies to value on
+*  the selected axis. 
+      IF( .NOT. DIST ) THEN
+ 
+*  Normalise the axis values using AST_NORM and copy the values on the 
+*  required axis to a new 1-d array. Note if there are any bad values in this 
+*  array.
+         CALL KPS1_LPLNM( CFRM, IAXIS, DIM, NAX, %VAL( IPW ),
+     :                    %VAL( IPD ), BAD, STATUS )
+
+*  Create the LutMap. 
+         LUTI = AST_LUTMAP( DIM, %VAL( IPD ), 1.0D0, 1.0D0, ' ', 
+     :                      STATUS )
+
+
+*  If we need to find a default value for XMAP, see if a log or lin mapping 
+*  would produce a more even spread of values.
+         IF( XMAP .EQ. 'DEFAULT' ) THEN
+
+*  First find the RMS deviation of a stright line fitted to the axis value
+            CALL KPG1_FIT1D( 1, DIM, %VAL( IPD ), %VAL( IPG ), M, C, 
+     :                       RMSLIN, STATUS )
+
+*  Now take the log base 10 of the axis values and find the new RMS
+*  deviation.
+            CALL KPG1_LOGAD( .TRUE., DIM, %VAL( IPD ), .FALSE., 
+     :                        %VAL( IPD ), 10.0D0, %VAL( IPD ),
+     :                        %VAL( IPD ), NERR, NERRV, STATUS ) 
+            IF( NERR .LT. 0.5*DIM ) THEN
+               CALL KPG1_FIT1D( 1, DIM, %VAL( IPD ), %VAL( IPG ), M, C, 
+     :                          RMSLOG, STATUS )
+
+*  Choose the mapping which gives the smallest rms (i.e. spreads the
+*  pixels out most evenly on the screen).
+               IF( RMSLOG .LT. RMSLIN ) THEN
+                  XMAP = 'LOG'
+               ELSE
+                  XMAP = 'LINEAR'
+               END IF      
+            ELSE
+               XMAP = 'LINEAR'
+            END IF
+
+         END IF
+
+      ELSE 
+         LUTI = AST__NULL
+      END IF
+
+*  Report an error if any bad values were found.
       IF( BAD .AND. STATUS .EQ. SAI__OK ) THEN
+         IF( IAXIS .NE. 0 ) THEN
+            ATTR = 'LABEL('
+            IAT = 7
+            CALL CHR_PUTI( IAXIS, ATTR, IAT )
+            CALL CHR_APPND( ')', ATTR, IAT )
+            TEXT = AST_GETC( CFRM, ATTR( : IAT ), STATUS )
+            CALL KPG1_PGESC( TEXT, STATUS )
+            CALL MSG_SETC( 'LBL', TEXT )
+            CALL MSG_SETC( 'LBL', ' values' )
+         ELSE
+            CALL MSG_SETC( 'LBL', ' positions' )
+         END IF
+
          STATUS = SAI__ERROR
          CALL NDF_MSG( 'NDF', INDF )
          CALL ERR_REP( 'KPS1_LPLFS_ERR', 'Some points along the '//
-     :                 'profile have undefined positions within '//
+     :                 'profile have undefined ^LBL within '//
      :                 'the current co-ordinate Frame of ''^NDF''.',
      :                 STATUS )
       END IF
 
-*  Create the LutMap for axis 1.
-      XMAP = AST_LUTMAP( DIM, %VAL( IPD ), 1.0D0, 1.0D0, ' ', STATUS )
+*  If pixel indices are to be mapped linearly onto the horizontal screen
+*  axis, use a UnitMap for the x axis map. */
+      IF( XMAP .EQ. 'PIXEL' ) THEN
+         MAPX = AST_UNITMAP( 1, ' ', STATUS )
 
-*  If the axes of the current frame do not all have the same units, 
-*  use a normalised distance in the range [0,1].
+*  If distance is to be mapped linearly onto the horizontal screen
+*  axis, or if the horizontal axis is being annotated with distance, 
+*  use the LUT0 LutMap created above. */
+      ELSE IF( LUT0 .NE. AST__NULL ) THEN
+         MAPX = AST_CLONE( LUT0, STATUS )
 
+*  If selected axis value is to be mapped linearly onto the horizontal screen
+*  axis, use the LUTI LutMap created above. */
+      ELSE 
+         MAPX = AST_CLONE( LUTI, STATUS )
 
+      END IF
 
 *  Set the NOINV flag if the inverse transformation is not defined.
-      NOINV = ( .NOT. AST_GETL( XMAP, 'TranInverse', STATUS ) )
+      NOINV = ( .NOT. AST_GETL( MAPX, 'TranInverse', STATUS ) )
 
 *  Now do axis 2 (the vertical axis). If the Y axis is to display data as 
 *  supplied, just use a UnitMap.
-      IF( .NOT. YLOG ) THEN
-         YMAP = AST_UNITMAP( 1, ' ', STATUS )         
+      IF( YMAP .NE. 'VALUELOG' ) THEN
+         MAPY = AST_UNITMAP( 1, ' ', STATUS )         
 
 *  If the Y axis is to display log base 10 of the data, create s suitable
 *  Mapping.
@@ -294,65 +469,33 @@
          CALL KPG1_ASREG( STATUS )
 
 *  Create a "Log10" Mapping.
-         YMAP = AST_INTRAMAP( 'Log10', 1, 1, ' ', STATUS )         
+         MAPY = AST_INTRAMAP( 'Log10', 1, 1, ' ', STATUS )         
 
       END IF
 
 *  Combine the X and the Y Mappings in parallel.
-      MAP1 = AST_CMPMAP( XMAP, YMAP, .FALSE., ' ', STATUS )
+      MAP1 = AST_CMPMAP( MAPX, MAPY, .FALSE., ' ', STATUS )
 
 *  Now create the Mapping from the "what we've got" Frame to the "what we
-*  want" Frame. This is also a parallel CmpMap. The only difference between
-*  this Mapping and the one just created (MAP1) is that if DIST is .FALSE.
-*  the axis 1 Mapping maps GRID position onto the selected axis in
-*  the current Frame, instead of distance from the starting point.
+*  want" Frame. This is also a parallel CmpMap. 
 *  =======================================================================
 
-*  If the horizontal axis is being annotated with distance, then the
-*  required Mapping is identical to the "what we've got" -> "uniform"
-*  Mapping. So just clone MAP1.
+*  Axis 1. This is a LutMap which gives either the distance along the
+*  curve (LUT0) or axis value (LUT1).
       IF( DIST ) THEN
-         MAP2 = AST_CLONE( MAP1, STATUS )
-
-*  Otherwise, create a new Mapping for axis 1.
+         MAPX = AST_CLONE( LUT0, STATUS )       
       ELSE
-
-*  Normalise the axis values and copy the values on the required axis to
-*  a new 1-d array. Note if there are any bad values in this array.
-         CALL KPS1_LPLNM( CFRM, IAXIS, DIM, NAX, %VAL( IPW ),
-     :                    %VAL( IPD ), BAD, STATUS )
-
-*  Report an error if any bad axis values were found.
-         IF( BAD .AND. STATUS .EQ. SAI__OK ) THEN
-            ATTR = 'LABEL('
-            IAT = 7
-            CALL CHR_PUTI( IAXIS, ATTR, IAT )
-            CALL CHR_APPND( ')', ATTR, IAT )
-            TEXT = AST_GETC( CFRM, ATTR( : IAT ), STATUS )
-            CALL KPG1_PGESC( TEXT, STATUS )
-            CALL MSG_SETC( 'LBL', TEXT )
-
-            STATUS = SAI__ERROR
-            CALL NDF_MSG( 'NDF', INDF )
-            CALL ERR_REP( 'KPS1_LPLFS_ERR', 'Some points along the '//
-     :                    'profile have undefined ^LBL values.', 
-     :                    STATUS )
-         END IF
-
-*  Now create the LutMap for axis 1.
-         XMAP = AST_LUTMAP( DIM, %VAL( IPD ), 1.0D0, 1.0D0, ' ', 
-     :                      STATUS )
+         MAPX = AST_CLONE( LUTI, STATUS )       
+      END IF
 
 *  Set the NOINV flag if the inverse transformation is not defined.
-         NOINV = ( NOINV .OR. 
-     :             .NOT. AST_GETL( XMAP, 'TranInverse', STATUS ) )
+      NOINV = ( NOINV .OR. 
+     :          .NOT. AST_GETL( MAPX, 'TranInverse', STATUS ) )
 
 *  Create a CmpMap giving the required "what we've got" -> "what we want"
 *  Mapping (the axis 2 Mapping is the same as for the "what we've got" ->
 *  "uniform" Mapping).
-         MAP2 = AST_CMPMAP( XMAP, YMAP, .FALSE., ' ', STATUS )
-
-      END IF
+      MAP2 = AST_CMPMAP( MAPX, MAPY, .FALSE., ' ', STATUS )
 
 *  Create the required Frames
 *  ==========================
@@ -388,56 +531,68 @@
 *  "What we want":
 *  ---------------
 
-*  This is a 2-D CmpFrame. If the X axis is not being annotated with
-*  distance along the curve, the first axis is copied from the specified 
-*  axis in the Current Frame of the supplied FrameSet. If the X axis is 
-*  being annotated with distance along the curve, the first axis is still
-*  copied from the specified axis in the Current Frame but only if all
-*  axes have the same units - otherwise a new default Axis is used.
-*  The second (data) axis is a default 1-D Axis.
-
-      IF( .NOT. DIST .OR. SAMEUN ) THEN 
-         AXES( 1 ) = IAXIS
-         FR1 = AST_PICKAXES( CFRM, 1, AXES, TMAP, STATUS ) 
-      ELSE 
-         FR1 = AST_FRAME( 1, "", STATUS ) 
-      END IF
-      FR2 = AST_FRAME( 1, "", STATUS ) 
-      WWWANT = AST_CMPFRAME( FR1, FR2, "", STATUS )
-      CALL AST_ANNUL( FR1, STATUS )
-      CALL AST_ANNUL( FR2, STATUS )
+*  Extract a copy of the specified axis from the Current Frame.
+      AXES( 1 ) = IAXIS
+      FRMI = AST_PICKAXES( CFRM, 1, AXES, TMAP, STATUS ) 
 
 *  When a SkyAxis is extracted from a SkyFrame, its Format and Digits 
 *  attributes are set, even if they were not set in the SkyFrame. This means 
 *  that Plot does not remove trailing zeros from the formatted axis values.
 *  To avoid this, explicitly clear the Format and Digits attributes for the
-*  first axis of the "what we want" Frame, unless values have been set
-*  for them in the original Current Frame.
+*  extracted axis unless values have been set for them in the original 
+*  Current Frame.
       ATTR = 'FORMAT('
       IAT = 7
       CALL CHR_PUTI( IAXIS, ATTR, IAT )
       CALL CHR_APPND( ')', ATTR, IAT )
 
       IF( .NOT. AST_TEST( CFRM, ATTR( : IAT ), STATUS ) ) THEN
-         CALL AST_CLEAR( WWWANT, 'FORMAT(1)', STATUS )
+         CALL AST_CLEAR( FRMI, 'FORMAT(1)', STATUS )
       END IF
 
       ATTR( : 6 ) = 'DIGITS'
       IF( .NOT. AST_TEST( CFRM, ATTR( : IAT ), STATUS ) ) THEN
-         CALL AST_CLEAR( WWWANT, 'DIGITS(1)', STATUS )
+         CALL AST_CLEAR( FRMI, 'DIGITS(1)', STATUS )
       END IF
 
-*  If distance is being used to annotate the axis, set appropriate
-*  attributes for axis 1.
-      IF( DIST ) THEN
-         IF( SAMEUN ) THEN
-            CALL AST_SETC( WWWANT, 'LABEL(1)', 'Offset', STATUS )
-         ELSE
-            CALL AST_SETC( WWWANT, 'LABEL(1)', 'Normalised offset', 
-     :                     STATUS )
+*  If necessary, create a Frame to represent distance along the curve.
+      IF( DIST .OR. XMAP .EQ. 'DISTANCE' ) THEN
+
+*  If the units are the same on all axes of CFRM, we use the axis
+*  specified by IAXIS. Otherwise we create a new 1D Frame.
+         IF( SAMEUN ) THEN 
+            FRM0 = AST_COPY( FRMI, STATUS )
+            CALL AST_SETC( FRM0, 'LABEL(1)', 'Offset', STATUS )
+
+         ELSE 
+            FRM0 = AST_FRAME( 1, ' ', STATUS )
+            CALL AST_SETC( FRM0, 'LABEL(1)', 'Normalised offset', 
+     :                        STATUS )
          END IF
-         CALL AST_SETC( WWWANT, 'SYMBOL(1)', 'OFFSET ', STATUS )
+
+*  Set an appropriate Symbol attribute.
+         CALL AST_SETC( FRM0, 'SYMBOL(1)', 'OFFSET ', STATUS )
+
+      ELSE
+         FRM0 = AST__NULL 
       END IF
+
+*  "What we want" is represented by a 2-D CmpFrame. If the X axis is not 
+*  being annotated with distance along the curve, the first axis is copied 
+*  from the specified axis in the Current Frame of the supplied FrameSet. If 
+*  the X axis is being annotated with distance along the curve, the first 
+*  axis is still copied from the specified axis in the Current Frame but only 
+*  if all axes have the same units - otherwise a new default Axis is used.
+*  The second (data) axis is a default 1-D Axis.
+      IF( DIST ) THEN
+         FR1 = AST_CLONE( FRM0, STATUS )
+      ELSE
+         FR1 = AST_CLONE( FRMI, STATUS )
+      END IF
+      FR2 = AST_FRAME( 1, "", STATUS ) 
+      WWWANT = AST_CMPFRAME( FR1, FR2, "", STATUS )
+      CALL AST_ANNUL( FR1, STATUS )
+      CALL AST_ANNUL( FR2, STATUS )
 
 *  Get the Label component from the NDF, use a default equal to 
 *  "<MCOMP> value" where MCOMP is the name of the NDF component.
@@ -445,7 +600,7 @@
       CALL NDF_CGET( INDF, 'LABEL', LAB, STATUS )
 
 *  Set the label, symbol and units for the data axis (axis 2).
-      IF( YLOG ) THEN
+      IF( YMAP .EQ. 'VALUELOG' ) THEN
          TEXT = ' '
          IAT = 0
          CALL CHR_APPND( 'Log\\d10\\u(', TEXT, IAT )
@@ -488,19 +643,28 @@
 
 *  "Uniform": 
 *  ----------
-*  The uniform Frame is identical to the "what we want" Frame if the
-*  horizontal axis is being annotated with distance.
-      UNIFRM = AST_COPY( WWWANT, STATUS )
+*  A 2D CmpFrame. Frame 1 (axis 1) is either "grid", "distance" 
+*  or axis value, depending on XMAP.
+      IF( XMAP .EQ. 'PIXEL' ) THEN
+         FR1 = AST_GETFRAME( IWCS, AST__BASE, STATUS )
 
-*  If the "what we want" Frame was not annotated with distance, we need to
-*  change the attributes for axis 1.
-      IF( DIST ) THEN
-         CALL AST_SETC( UNIFRM, 'LABEL(1)', 'Offset', STATUS )
-         CALL AST_SETC( UNIFRM, 'SYMBOL(1)', 'OFFSET ', STATUS )
+      ELSE IF( XMAP.EQ. 'DISTANCE' ) THEN
+         FR1 = AST_CLONE( FRM0, STATUS )
+
+      ELSE 
+         FR1 = AST_CLONE( FRMI, STATUS )
+
       END IF
 
-*  Clear the Domain (set to DATAPLOT in the "what we want" Frame).
-      CALL AST_CLEAR( UNIFRM, 'DOMAIN', STATUS )
+*  Frame 2 (axis 2) is a copy of the second axis of the What we want"
+*  frame.
+      AXES( 1 ) = 2
+      FR2 = AST_PICKAXES( WWWANT, 1, AXES, TMAP, STATUS ) 
+
+*  Combine them.
+      UNIFRM = AST_CMPFRAME( FR1, FR2, "", STATUS )
+      CALL AST_ANNUL( FR1, STATUS )
+      CALL AST_ANNUL( FR2, STATUS )
 
 *  Set the new Domain ("AGI_WORLD").
       CALL AST_SETC( UNIFRM, 'DOMAIN', 'AGI_WORLD', STATUS )
