@@ -368,7 +368,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/table/build/java
-     [copy] Copying 71 files to /apps/cvsbuild/java/source/table/build/java
+     [copy] Copying 73 files to /apps/cvsbuild/java/source/table/build/java
      [echo] Executing NDTools target: javadoc-sources
 
 javadoc-sources:
@@ -433,7 +433,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/build/java
-     [copy] Copying 1206 files to /apps/cvsbuild/java/source/build/java
+     [copy] Copying 1210 files to /apps/cvsbuild/java/source/build/java
      [copy] Copied 3 empty directories to /apps/cvsbuild/java/source/build/java
      [copy] Copying 1 file to /apps/cvsbuild/java/source/build/java
       [zip] Building zip: /apps/cvsbuild/export/starjava-src.zip
@@ -565,7 +565,6 @@ dist:
     [mkdir] Created dir: /apps/cvsbuild/java/source/jsky/bin/jsky
      [copy] Copying 2 files to /apps/cvsbuild/java/source/jsky/bin/jsky
      [copy] Copying 4 files to /apps/cvsbuild/java/source/jsky/docs/jsky
-    [chmod] Result: -1
 
 install:
     [mkdir] Created dir: /apps/cvsbuild/star/lib/jsky
@@ -887,7 +886,7 @@ install:
 prepare:
 
 check_packages:
-[available] Apr 15, 2003 4:17:27 AM uk.ac.starlink.util.Loader starjavaDirectory
+[available] Apr 16, 2003 4:17:11 AM uk.ac.starlink.util.Loader starjavaDirectory
 [available] WARNING: Loader.class location file:/apps/cvsbuild/java/source/util/build/classes/uk/ac/starlink/util/Loader.class unexpected
 
 build:
@@ -1345,13 +1344,13 @@ check_packages:
 
 build:
     [mkdir] Created dir: /apps/cvsbuild/java/source/table/build/classes
-    [javac] Compiling 69 source files to /apps/cvsbuild/java/source/table/build/classes
-    [javac] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/view/ColumnsDisplay.java:32: cannot resolve symbol
+    [javac] Compiling 71 source files to /apps/cvsbuild/java/source/table/build/classes
+    [javac] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/view/ColumnsDisplay.java:40: cannot resolve symbol
     [javac] symbol  : method retainKeys (java.util.List)
     [javac] location: class uk.ac.starlink.table.ValueInfoMapGroup
     [javac]         mg.retainKeys( keyList );
     [javac]           ^
-    [javac] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/view/ColumnsDisplay.java:36: cannot resolve symbol
+    [javac] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/view/ColumnsDisplay.java:44: cannot resolve symbol
     [javac] symbol  : method size ()
     [javac] location: class uk.ac.starlink.table.ValueInfoMapGroup
     [javac]             StarJTable.configureColumnWidth( jtab, 300, mg.size(), icol );
@@ -1361,4 +1360,4 @@ build:
 BUILD FAILED
 file:/apps/cvsbuild/java/source/table/build.xml:347: Compile failed; see the compiler error output for details.
 
-Total time: 3 minutes 7 seconds
+Total time: 3 minutes 6 seconds

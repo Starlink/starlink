@@ -450,7 +450,7 @@ install:
 prepare:
 
 check_packages:
-[available] Apr 15, 2003 4:20:52 AM uk.ac.starlink.util.Loader starjavaDirectory
+[available] Apr 16, 2003 4:20:30 AM uk.ac.starlink.util.Loader starjavaDirectory
 [available] WARNING: Loader.class location file:/apps/cvsbuild/java/source/util/build/classes/uk/ac/starlink/util/Loader.class unexpected
 
 build:
@@ -908,13 +908,13 @@ check_packages:
 
 build:
     [mkdir] Created dir: /apps/cvsbuild/java/source/table/build/classes
-    [javac] Compiling 69 source files to /apps/cvsbuild/java/source/table/build/classes
-    [javac] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/view/ColumnsDisplay.java:32: cannot resolve symbol
+    [javac] Compiling 71 source files to /apps/cvsbuild/java/source/table/build/classes
+    [javac] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/view/ColumnsDisplay.java:40: cannot resolve symbol
     [javac] symbol  : method retainKeys (java.util.List)
     [javac] location: class uk.ac.starlink.table.ValueInfoMapGroup
     [javac]         mg.retainKeys( keyList );
     [javac]           ^
-    [javac] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/view/ColumnsDisplay.java:36: cannot resolve symbol
+    [javac] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/view/ColumnsDisplay.java:44: cannot resolve symbol
     [javac] symbol  : method size ()
     [javac] location: class uk.ac.starlink.table.ValueInfoMapGroup
     [javac]             StarJTable.configureColumnWidth( jtab, 300, mg.size(), icol );
