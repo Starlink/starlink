@@ -948,6 +948,7 @@
          DIFER = .FALSE.
          K = 0
          DO J = 1, NNDF
+            IF ( STATUS .NE. SAI__OK ) GO TO 99
             IF ( ISET( J ) .EQ. I ) THEN
                K = K + 1
                INDEX = SINDEX( J )
