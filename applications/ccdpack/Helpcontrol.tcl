@@ -98,6 +98,7 @@
                wm positionfrom $helpwin program
             }
             $helpwin activate
+            wm resizable $helpwin 0 0
          }
       }
 
