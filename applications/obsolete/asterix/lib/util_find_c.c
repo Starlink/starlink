@@ -21,6 +21,8 @@
  *
  *     7-DEC-1992 (DJA):
  *        Original version.
+ *    22-NOV-1994 (DJA):
+ *        Removed nasty hack to get around Solaris 2.1 bug (DJA)
  *- */
 
 /* Include Statements: */
@@ -193,9 +195,6 @@ F77_SUBROUTINE(util_findfile_int)( CHARACTER(deft), CHARACTER(wspec),
       if ( dent )				/* Anything in it? */
         {
         d_name = dent->d_name;
-#ifdef sun4_Solaris
-        d_name -= 2;
-#endif
 
         if ( !strcmp(d_name,".") ||		/* Skip these entries */
              !strcmp(d_name,"..") ) continue;
