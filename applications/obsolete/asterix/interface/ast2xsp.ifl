@@ -10,6 +10,11 @@ interface AST2XSP
     prompt 'Number of spectra to use'
     help 'e.g. spectra number 4'
   endparameter
+  parameter AREA
+    type '_REAL'
+    prompt 'Geometrical area of detector (cm**2)'
+    help 'Note this is purely the geometric area, and so isn't energy dependent'
+  endparameter
   parameter OUT
     position 2
     type   'LITERAL'
