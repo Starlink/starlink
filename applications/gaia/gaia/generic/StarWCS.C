@@ -1163,7 +1163,7 @@ void StarWCS::constructWarning( AstFitsChan *fitschan )
 
       //  See if this is a report about the equinox. If so don't
       //  show a valid one.
-      equinox = strstr( ptr, "equinox" );
+      equinox = strstr( card, "equinox" );
       if ( equinox != NULL ) {
          equinoxStr_[0] = '\0';
       }

@@ -41,6 +41,10 @@
 
       - A bug in the aperture photometry toolbox that caused some 
         detached sky regions to randomly move has been fixed.
+ 
+      - Broken image headers that do not have an equinox value are
+        no longer shown as having a default value. Problems with the
+        equinox, epoch and coordinate system can now be viewed.
 
 
   To try out GAIA for yourself type the following command:

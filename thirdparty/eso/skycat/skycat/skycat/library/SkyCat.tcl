@@ -13,7 +13,7 @@
 # --------   ---------   ----------------------------------------------
 # A.Brighton 11 Oct 95   created
 # P.W.Draper 19 Jan 00   added concat to bindtags, itk ones were
-#                        being lost.
+#                        being lost. Removed extra ] from ]] in title string.
 
 set skycat_usage {
 Usage: skycat ?fitsFile? ?-option value ...?
@@ -92,7 +92,7 @@ itcl::class skycat::SkyCat {
     protected method init {} {
 	Rtd::init
 	load_toplevel_geometry
-	wm title $w_ "Skycat - version [skycat_version]] ($itk_option(-number))"
+	wm title $w_ "Skycat - version [skycat_version] ($itk_option(-number))"
 	wm iconname $w_ 
 	feedback "catalog and help menu..."
 	
