@@ -140,6 +140,9 @@ if ($formatted) {
 
 print  "-"x78,"\n";
 
+# Find the item number related to the C13DAT field
+my $C13DATitemno = $gsd->Find( 'C13DAT' );
+
 # Loop over each item
 for my $i (1.. $gsd->nitems) {
 
@@ -179,7 +182,7 @@ for my $i (1.. $gsd->nitems) {
 
     # Write the data - skipping if this is the last item
     # unless $printdata is true
-    if (($i != $gsd->nitems) || $printdata)  {
+    if (($i != $C13DATitemno) || $printdata)  {
       print "  Data:\n";
 
       # Print the data in blocks of 4 if we are not using PDL interface
@@ -341,8 +344,8 @@ Prints the manual page and exits.
 =item B<-data>
 
 Print the C<C13DAT> field as well as the header fields. 
-In reality without this option the program  simply misses off the 
-last GSD item assuming that it is the main data array.
+By default the C<C13DAT> field is omitted since it can be
+very long and is usually of little interest.
 
 =item B<-noarray>
 

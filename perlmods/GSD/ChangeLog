@@ -1,5 +1,7 @@
 2000-05-17  Tim Jenness  <timj@jach.hawaii.edu>
 
+	* gsdprint: Properly determine where C13DAT is in order to omit it. 
+
 	* GSD.pm (DESTROY): Use isa() to see if we are a hash since ref()
 	always returns that we are a GSD object regardless of whether we
 	are a glob or not.
