@@ -99,7 +99,7 @@
               CALL BDI_AXMAPR( ID, E_AX, 'Data', 'READ', AXPTR, STATUS )
 
 *      And check against dataset channels...
-	      CALL FIT_INSGET_CCHECK( NAX, %VAL(AXPTR), NCC,
+	      CALL FIT_INSGET_CCHECK( DIMS(E_AX), %VAL(AXPTR), NCC,
      :                                %VAL(RCPTR), STATUS )
 
 *      Release the axis and spec array
