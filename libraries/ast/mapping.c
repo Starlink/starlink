@@ -237,6 +237,165 @@ static void ValidateMapping( AstMapping *, int, int, int, int, const char * );
 /*
 *++
 *  Name:
+*     astInterpolate
+
+*  Purpose:
+*     Perform sub-pixel interpolation on a grid of data.
+
+*  Type:
+*     Dummy function.
+
+*  Synopsis:
+*     #include "mapping.h"
+*     int astInterpolate( int ndim_in,
+*                                    const int *lbnd_in, const int *ubnd_in,
+*                                    const <Xtype> *in, const <Xtype> *in_var,
+*                                    int npoint, const int *offset,
+*                                    double *coord, int flags, <Xtype> #badval,
+*                                    <Xtype> *out, <Xtype> *out_var )
+
+*  Class Membership:
+*     Mapping member function.
+
+*  Description:
+*     (This is a dummy function, which does not actually
+*     exist. Instead, this description forms a template for the
+*     interface to a function which you may implement yourself, and to
+*     which you may give any name you wish.  A pointer to a function
+*     with this interface may be passed as the "interp" argument to
+*     the astResample<X> functions (q.v.), in order to perform
+*     sub-pixel interpolation during resampling of gridded data. This
+*     allows you to use your own interpolation algorithms, in addition
+*     to those which are pre-defined.)
+*
+*     This function interpolates an input grid of data (and,
+*     optionally, processes associated statistical variance estimates)
+*     at a set of specified positions. Where these positions do not
+*     correspond with a pixel centre in the input grid, a sub-pixel
+*     interpolation algorithm is used.
+
+*  Parameters:
+*     ndim_in
+*        The number of dimensions in the input grid. This will be at
+*        least one.
+*     lbnd_in
+*        Pointer to an array of integers, with "ndim_in" elements.
+*        This will give the coordinates of the centre of the first
+*        pixel in the input grid along each dimension.
+*     ubnd_in
+*        Pointer to an array of integers, with "ndim_in" elements.
+*        This will give the coordinates of the centre of the last
+*        pixel in the input data grid along each dimension.
+*
+*        Note that "lbnd_in" and "ubnd_in" together define the shape,
+*        size and coordinate system of the input data grid in the same
+*        way as in astResample<X>.
+*     in
+*        Pointer to an array, with one element for each pixel in the
+*        input grid, containing the input data. This will be the same
+*        array as was passed to astResample<X> via the "in" parameter.
+*        The numerical type of this array should match that of the
+*        data being processed.
+*     in_var
+*        Pointer to an optional second array with the same size and
+*        data type as the "in" array.  If given, this will contain the
+*        set of variance values associated with th einput data and
+*        will be the same array as was passed to astResample<X> via
+*        the "in_var" parameter.
+*
+*        If no variance values were supplied, this will be a NULL pointer.
+*     npoint
+*        The number of positions at which the input grid is to be
+*        interpolated.
+*     offset
+*        Pointer to an array of integers with "npoint" elements. For
+*        each position, this will contain the index in the "out" (and
+*        "out_var") arrays at which the interpolated value(s) should
+*        be stored.
+*     coord
+*        An array of pointers to double, with "ndim_in"
+*        elements. Element "coord[icoord]" will point at the first
+*        element of an array of double (with "npoint" elements) which
+*        contain the values of coordinate number "icoord" for each
+*        position at which interpolation is required. The value of
+*        coordinate number "icoord" for input position number "ipos"
+*        is therefore given by "coord[icoord][ipos]" (both indices
+*        being zero-based).
+*
+*        If any position has any coordinate value set to AST__BAD,
+*        then the corresponding output data (and variance) should be
+*        set to the value given by "badval".
+*     flags
+*        This will be the value of the "flags" argument, as passed to
+*        astResample<X>. You may test its value in order to provide
+*        additional control over the operation of your resampling
+*        algorithm.
+*     badval
+*        This will be the value of the "badval" argument, as passed to
+*        astResample<X>, and should have the same numerical type as
+*        the data being processed (i.e. as elements of the "in"
+*        array).  It should be used to test for bad pixels in the
+*        input grid (but only if the AST__USEBAD flag is set in the
+*        "flags" argument) and for identifying bad output values in
+*        the "out" (and "out_var") array(s).
+*     out
+*        Pointer to an array with the same data type as the "in"
+*        array, into which the interpolated data values should be
+*        returned.  Note that details of the storage order and number
+*        of dimensions of this array are not needed, since the
+*        "offset" array contains all the required information about
+*        where each returned value should be stored.
+*
+*        In general, not all elements of this array may be used in any
+*        particular invocation of the function.
+*     out_var
+*        Pointer to an optional array with the same data type and
+*        size as the "out" array, into which variance estimates for
+*        the resampled values should be returned.
+*
+*        This array will only be
+*        used if the "in_var" array has been given. It is addressed in
+*        exactly the same way (via the "offset" array) as the "out"
+*        array. The values returned are estimates of the statistical
+*        variance of the corresponding values in the "out" array, on
+*        the assumption that all errors in input grid values (in the
+*        "in" array) are statistically independent, and that their
+*        variance estimates (in the "in_var" array) may simply be
+*        summed.
+*
+*        If no output variance estimates are required, a NULL pointer
+*        should be given.
+
+*  Returned Value:
+c     astInterpolate()
+f     AST_INTERPOLATE = INTEGER
+*        The number of output grid points to which a data value (or a
+*        variance value if relevant) equal to "badval" has been
+*        assigned because no valid output value could be
+*        obtained. Typically, this will be because (a) the input
+*        position corresponding to the output grid point lies outside
+*        the input grid, or (b) because it lies inside an input pixel
+*        which itself has the value "badval" (and the AST__USEBAD flag
+*        is set), or (c) one or more of the coordinates specifying the
+*        position has the value AST__BAD.
+*
+*        The maximum value that may be returned is "npoint", and the
+*        minimum is zero (indicating that all output values were
+*        successfully obtained).
+
+*  Notes:
+*     - There is a separate function for each numerical type of
+*     gridded data, distinguished by replacing the <X> in the function
+*     name by the appropriate 1- or 2-character suffix.
+*     - A value of zero will be returned if any of these functions is
+*     invoked with the global error status set, or if it should fail
+*     for any reason.
+*--
+*/
+
+/*
+*++
+*  Name:
 c     astResample<X>
 f     AST_RESAMPLE<X>
 
@@ -268,21 +427,26 @@ f                               LBND, UBND, OUT, OUT_VAR, STATUS )
 *     Mapping method.
 
 *  Description:
-*     This is a set of comprehensive functions for resampling gridded
-*     data under the control of a geometrical transformation which is
-*     specified by a Mapping.  The functions operate on a pair of data
-*     grids (input and output), each of which may have any number of
-*     dimensions. Resampling may be restricted to a specified
-*     sub-region of these grids. An associated grid of error estimates
-*     associated with the input data may also be supplied (as variance
+*     This is a set of functions for resampling gridded data under the
+*     control of a geometrical transformation, which is specified by a
+*     Mapping.  The functions operate on a pair of data grids (input
+*     and output), each of which may have any number of dimensions,
+*     and resampling may be restricted to a specified region of these
+*     grids. An associated grid of error estimates associated with the
+*     input data may also be supplied (in the form of variance
 *     values), so as to produce error estimates for the resampled
-*     output data. Handling of missing data (bad pixels) is also
-*     available.
+*     output data. Propagation of missing data (bad pixels) is also
+*     provided.
 *
-*     An appropriate resampling function should be chosen which
-*     matches the numerical type of the data being processed by
-*     replacing <X> in the generic function name by an appropriate 1-
-*     or 2-character type code (see the "Notes" section for details).
+*     An appropriate resampling function should be chosen, which
+*     matches the numerical type of the data being processed, by
+c     replacing <X> in the generic function name astResample<X> by an
+f     replacing <X> in the generic function name AST_RESAMPLE<X> by an
+*     appropriate 1- or 2-character type code. For example, if you are
+c     transforming data with type "float", you should use the function
+c     astResampleF (see the "Notes" section below for full details).
+f     transforming data with type REAL, you should use the function
+f     AST_RESAMPLER (see the "Notes" section below for full details).
 *
 *     Resampling of the input data is performed by transforming the
 *     coordinates of the centre of each output grid element (or pixel)
@@ -292,15 +456,17 @@ f                               LBND, UBND, OUT, OUT_VAR, STATUS )
 *     the neighbouring input pixels is performed. This produces a
 *     resampled value which is assigned to the output pixel. A choice
 *     of sub-pixel interpolation algorithms is provided, but you may
-*     also supply a function which implements your own.
+*     also supply a function which implements your own (see
+c     astInterpolate).
+f     AST_INTERPOLATE).
 *
 *     Output pixel coordinates are transformed into the coordinate
 *     system of the input grid using the inverse transformation of the
 *     Mapping which is supplied. This means that geometrical features
 *     in the input grid undergo this Mapping's forward transformation
-*     as they are transferred from the input to the output grid.  (The
-*     Mapping's forward transformation is not actually used
-*     explicitly.)
+*     as they are transferred from the input to the output grid
+*     (although the Mapping's forward transformation is not explicitly
+*     used).
 *
 *     In practice, transforming the coordinates of every pixel of a
 *     large data grid can be time-consuming, especially if the Mapping
@@ -309,7 +475,7 @@ f                               LBND, UBND, OUT, OUT_VAR, STATUS )
 *     approximate non-linear Mappings by a set of equivalent simple
 *     linear transformations which are applied piece-wise to separate
 *     sub-regions of the data. This approximation process is applied
-*     automatically by an adaptive algorithm, under the control of an
+*     automatically by an adaptive algorithm, under control of an
 *     accuracy criterion which expresses the maximum tolerable
 *     geometrical distortion which may be introduced (as a fraction of
 *     a pixel).
@@ -331,8 +497,8 @@ f     THIS = INTEGER (Given)
 *        Pointer to a Mapping, whose inverse transformation will be
 *        used to transform the coordinates of pixels in the output
 *        grid into the coordinate system of the input grid. This
-*        yields positions which are used to obtain resampled values by
-*        sub-pixel interpolation within the input grid.
+*        yields the positions which are used to obtain resampled
+*        values by sub-pixel interpolation within the input grid.
 *
 *        The number of input coordinates used by this Mapping (as
 *        given by its Nin attribute) should match the number of input
@@ -364,132 +530,189 @@ f        pixel in the input grid along each dimension.
 c        Note that "lbnd_in" and "ubnd_in" together define the shape
 f        Note that LBND_IN and UBND_IN together define the shape
 *        and size of the input grid. Its extent along a particular
-c        (i'th) dimension is ubnd_in[i]-lbnd_in[i]+1. They also define
+c        (i'th) dimension is ubnd_in[i-1]-lbnd_in[i-1]+1 (the first
+c        dimension being number 1). They also define
 f        (I'th) dimension is UBND_IN(I)-LBND_IN(I)+1. They also define
 *        the input grid's coordinate system, with each pixel being of
 *        unit extent along each dimension with integral coordinate
 *        values at its centre.
 c     in
 f     IN( * ) = <Xtype> (Given)
-*        Pointer to an array, with one element for each pixel in the
+c        Pointer to an array, with one element for each pixel in the
+f        An array, with one element for each pixel in the
 *        input grid, containing the input data to be resampled.  The
 *        numerical type of this array should match the 1- or
 *        2-character type code appended to the function name (e.g. if
-*        you are using astResampleF, the type of each array element
-*        should be "float"; if using astResampleUS, the type should be
-*        "unsigned short int").
+c        you are using astResampleF, the type of each array element
+c        should be "float", while if using astResampleS, this type
+c        should be "short int").
+f        you are using AST_RESAMPLER, the type of each array element
+f        should be REAL, while if using AST_RESAMPLES, this type
+f        should be INTEGER*2).
 *
 *        The storage order of data within this array should be such
 *        that the index of the first grid dimension varies most
 *        rapidly and that of the final dimension least rapidly
-*        (i.e. Fortran array storage order is used).
+c        (i.e. Fortran array indexing is used).
+f        (i.e. normal Fortran array storage order).
 c     in_var
 f     IN_VAR( * ) = <Xtype> (Given)
-*        Pointer to an optional second array with the same size and
-*        type as the "in" array. If given, this should contain a set
-*        of non-negative values which represent estimates of the
-*        statistical variance associated with each element of the "in"
-*        array. If this array is supplied (together with the
-*        corresponding "out_var" array), then estimates of the
-*        variance of the resampled output data will be calculated.
-*
-*        If no output variance estimates are required, a NULL pointer
-*        should be given.
-f     INTERP
-f        Flag to select built-in interpolation scheme.
+c        An optional pointer to a second array with the same size and
+c        type as the "in" array. If given, this should contain a set
+c        of non-negative values which represent estimates of the
+c        statistical variance associated with each element of the "in"
+c        array. If this array is supplied (together with the
+c        corresponding "out_var" array), then estimates of the
+c        variance of the resampled output data will be calculated.
+c
+c        If no input variance estimates are being provided, a NULL
+c        pointer should be given.
+f        An optional second array with the same size and type as the
+f        IN array. If the AST__USEVAR flag is set via the FLAGS
+f        argument (q.v.), this array should contain a set of
+f        non-negative values which represent estimates of the
+f        statistical variance associated with each element of the IN
+f        array. Estimates of the variance of the resampled output data
+f        will then be calculated.
+f
+f        If the AST__USEVAR flag is not set, then no input variance
+f        estimates are required and this array will not be used. A
+f        dummy (e.g. one-element) array may then be supplied.
+f     INTERP = INTEGER (Given)
+f        This argument specifies the algorithm to be used for
+f        sub-pixel interpolation within the input grid. It may be used
+f        to select from a set of pre-defined algorithms by supplying
+f        one of the values described in the "Sub-Pixel Interpolation
+f        Schemes" section below.
+f
+f        If a value of zero is supplied, then the default linear
+f        interpolation scheme is used (equivalent to supplying the
+f        value AST__LINEAR).
+f
+f        Alternatively, you may supply the value AST__UINTERP, which
+f        indicates that you will provide your own function to perform
+f        sub-pixel interpolation by means of the UINTERP argument
+f        (below).
+f     UINTERP = FUNCTION (Given)
+f        If the value AST__UINTERP is given for the INTERP argument,
+f        then this argument should be used to supply a function which
+f        implements a sub-pixel interpolation algorithm of your own.
+f        This function should have the same interface as the dummy
+f        function AST_INTERPOLATE which is provided as a template,
+f        and should be designed to process data with the same
+f        numerical type as the IN array. It must also be declared in
+f        an EXTERNAL statement in the routine which invokes
+f        AST_RESAMPLE<X>.
+f
+f        If the INTERP argument has any other value, corresponding to
+f        a pre-defined sub-pixel interpolation algorithm, then you
+f        should supply the dummy routine AST_NULL here (note only one
+f        underscore).  No EXTERNAL statment is required for this
+f        routine, so long as the AST_PAR include file has been used.
 c     interp
 f     INTERP = FUNCTION (Given)
 *        This parameter specifies the algorithm to be used for
 *        sub-pixel interpolation within the input grid. It may be used
 *        to select from a set of pre-defined algorithms by supplying
-*        one of the macro values described under "Sub-Pixel
-*        Interpolation Schemes" below.
+*        one of the values described in the "Sub-Pixel Interpolation
+*        Schemes" section below.
 *
 *        Alternatively, you may supply a pointer to a function which
-*        implements an interpolation algorithm of your own. The
-*        function you supply should have the same interface as the
-*        dummy function astInterpolate, which is provided as a
-*        template for such functions, and should be designed to
-*        process data with the same numerical type as the "in"
-*        array. (The C type astInterpolate<X>, where <X> is replaced
-*        by a 1- or 2-character type code, is provided by AST as a
-*        shorthand for the C type of a pointer to such a function.)
+*        implements an interpolation algorithm of your own. This
+*        function should have the same interface as the dummy function
+*        astInterpolate which is provided as a template, and should
+*        be designed to process data with the same numerical type as
+*        the "in" array. (Note that the C type AstInterpolate<X>,
+*        where <X> is replaced by the appropriate 1- or 2-character
+*        type code, is provided by AST as a shorthand for the C type
+*        of a pointer to such a function.)
 *        
-*        If a NULL pointer is supplied, then the default interpolation
-*        scheme is used (linear interpolation, equivalent to supplying
-*        the value AST__LINEAR).
+*        If a NULL pointer is supplied, then the default linear
+*        interpolation scheme is used (equivalent to supplying the
+*        value AST__LINEAR).
 c     tol
 f     TOL = DOUBLE PRECISION (Given)
 *        The maximum tolerable geometrical distortion which may be
 *        introduced as a result of approximating non-linear Mappings
-*        by a set of piece-wise linear transformations.  This should
-*        be expressed as a displacement in pixels in the input grid's
+*        by a set of piece-wise linear transformations. This should be
+*        expressed as a displacement in pixels in the input grid's
 *        coordinate system.
 *
-*        If linear approximation is not required, a value of zero may
-*        be given. This will ensure that the Mapping is used without
-*        any approximation.
+*        If piece-wise linear approximation is not required, a value
+*        of zero may be given. This will ensure that the Mapping is
+*        used without any approximation.
 c     maxpix
 f     MAXPIX = INTEGER (Given)
 *        A value which specifies an initial scale for the adaptive
 *        algorithm which approximates non-linear Mappings with
-*        piece-wise linear transformations. If this value is larger
-*        than any of the output grid dimensions (the normal
-*        recommendation), then a first attempt to approximate the
-*        Mapping by a linear transformation will be made over the
-*        entire output grid.
+*        piece-wise linear transformations. Normally, this should be a
+*        large value (larger than any dimension of the region of the
+*        output grid being used). In this case, a first attempt to
+*        approximate the Mapping by a linear transformation will be
+*        made over the entire output region.
 *
-*        If a smaller value is used, however, then the output grid
-*        will first be divided into sub-regions whose size does not
-*        exceed "maxpix" pixels in any dimension. Only at this point
-*        will attempts at approximation commence.
+*        If a smaller value is used, the output region will first be
+*        divided into sub-regions whose size does not exceed "maxpix"
+*        pixels in any dimension. Only at this point will attempts at
+*        approximation commence.
 *
 *        This value may occasionally be useful in preventing false
 *        convergence of the adaptive algorithm in cases where the
 *        Mapping appears approximately linear on large scales, but has
-*        irregularities (e.g. "holes") on smaller scales. A value of
-*        50 to 100 pixels can also be employed as a safeguard in
+*        irregularities (e.g. "holes") on smaller scales. A value of,
+*        say, 50 to 100 pixels can also be employed as a safeguard in
 *        general-purpose software, since the effect on performance is
 *        minimal.
 *
 *        If too small a value is given, it will have the effect of
-*        inhibiting linear approximation (equivalent to setting "tol"
-*        to zero).  This may degrade performance, but accurate results
-*        will still be obtained.
+*        inhibiting linear approximation altogether (equivalent to
+c        setting "tol" to zero). Although this may degrade
+f        setting TOL to zero). Although this may degrade
+*        performance, accurate results will still be obtained.
 c     flags
 f     FLAGS = INTEGER (Given)
-*        The bitwise OR of a set of flag values which control the
-*        operation of the function. See the "Control Flags" section
-*        below for a description of the values available.
+c        The bitwise OR of a set of flag values which provide
+f        The sum of a set of flag values which provide
+*        additional control over the resampling operation. See the
+*        "Control Flags" section below for a description of the
+*        options available.
 *
-*        If no flag values are being set, a value of zero should be
+*        If no flag values are to be set, a value of zero should be
 *        given.
 c     badval
 f     BADVAL = <Xtype> (Given)
-*        A number with the same type as elements of the "in" array. It
-*        specifies the value used to flag missing data (bad pixels) in
-*        the input and output arrays.
+c        A number, with the same type as the elements of the "in"
+f        A number, with the same type as the elements of the IN
+*        array, which specifies the value used to flag missing data
+*        (bad pixels) in the input and output arrays.
 *
-*        If the AST__USEBAD flag is set via the "flags" parameter,
-*        then this value is used to identify bad pixels in the "in"
-*        (and "in_var") arrays.
+c        If the AST__USEBAD flag is set via the "flags" parameter,
+f        If the AST__USEBAD flag is set via the FLAGS argument,
+*        then the value supplied here is used to test for bad pixels
+c        in the "in" (and "in_var") arrays.
+f        in the IN (and IN_VAR) arrays.
 *
-*        Whether or not the AST__USEBAD flag is set, the same value is
-*        also used to flag any output array elements (in the "out" and
-*        "out_var" arrays) for which resampled values could not be
-*        obtained. (The function return value indicates whether any
-*        such values have been produced.)
+*        In all cases, the value given here is also used to flag any
+*        output elements in the "out" (and "out_var") array(s) for
+*        which resampled values could not be obtained (see the
+*        "Propagation of Missing Data" section below for details of
+*        the circumstances under which this may occur). The function
+*        return value indicates whether any such values have been
+*        produced.
 c     params
 f     PARAMS( * ) = DOUBLE PRECISION (Given)
-*        Pointer to an optional array of double to contain any
-*        additional parameter values required by the sub-pixel
-*        interpolation scheme (see the "interp" parameter).  If such
+c        An optional pointer to an array of double which should contain
+f        An optional array which should contain
+*        any additional parameter values required by the sub-pixel
+c        interpolation algorithm (see "interp" above).  If such
+f        interpolation algorithm (see INTERP above).  If such
 *        parameters are required, this will be noted in the "Sub-Pixel
-*        Interpolation Schemes" section below, and the relevant
-*        parameter values should be passed via this array.
+*        Interpolation Schemes" section below.
 *
-*        If no additional parameters are required, a NULL pointer may
-*        be given.
+c        If no additional parameters are required, this array is not
+c        used and a NULL pointer may be given.
+f        If no additional parameters are required, this array is not
+f        used. A dummy (e.g. one-element) array may then be supplied.
 c     ndim_out
 f     NDIM_OUT = INTEGER (Given)
 *        The number of dimensions in the output grid. This should be
@@ -497,56 +720,88 @@ f     NDIM_OUT = INTEGER (Given)
 *        of dimensions in the input grid.
 c     lbnd_out
 f     LBND_OUT( NDIM_OUT ) = INTEGER (Given)
-*        Pointer to an array of integers, with "ndim_out" elements.
+c        Pointer to an array of integers, with "ndim_out" elements.
+f        Pointer to an array of integers, with NDIM_OUT elements.
 *        This should give the coordinates of the centre of the first
 *        pixel in the output grid along each dimension.
 c     ubnd_out
 f     UBND_OUT( NDIM_OUT ) = INTEGER (Given)
-*        Pointer to an array of integers, with "ndim_out" elements.
+c        Pointer to an array of integers, with "ndim_out" elements.
+f        Pointer to an array of integers, with NDIM_OUT elements.
 *        This should give the coordinates of the centre of the last
 *        pixel in the output grid along each dimension.
 *
-*        Note that "lbnd_out" and "ubnd_out" together define the
+c        Note that "lbnd_out" and "ubnd_out" together define the
+f        Note that LBND_OUT and UBND_OUTd together define the
 *        shape, size and coordinate system of the output grid in the
-*        same way as "lbnd_in" and "ubnd_in" define the shape, size
-*        and coordinate system of the input grid (see above).
+c        same way as "lbnd_in" and "ubnd_in" define the shape, size
+f        same way as LBND_IN and UBND_IN define the shape, size
+*        and coordinate system of the input grid.
 c     lbnd
 f     LBND( NDIM_OUT ) = INTEGER (Given)
-*        Pointer to an array of integers, with "ndim_out" elements.
+c        Pointer to an array of integers, with "ndim_out" elements.
+f        Pointer to an array of integers, with NDIM_OUT elements.
 *        This should give the coordinates of the first pixel in the
-*        sub-region of the output grid for which a resampled value is
+*        region of the output grid for which a resampled value is
 *        required.
 c     ubnd
 f     UBND( NDIM_OUT ) = INTEGER (Given)
-*        Pointer to an array of integers, with "ndim_out" elements.
+c        Pointer to an array of integers, with "ndim_out" elements.
+f        Pointer to an array of integers, with NDIM_OUT elements.
 *        This should give the coordinates of the last pixel in the
-*        sub-region of the output data grid for which a resampled
-*        value is required.
+*        region of the output grid for which a resampled value is
+*        required.
 *
-*        Note that "lbnd" and "ubnd" together define the shape and
-*        position of the sub-region of the output grid for which
-*        resampled values should be produced. This region should lie
-*        wholly within the extent of the output grid (as defined by
-*        the "lbnd_out" and "ubnd_out" arrays). Regions of the output
-*        grid lying ouside this sub-region will not be modified.
+c        Note that "lbnd" and "ubnd" together define the shape and
+f        Note that LBND and UBND together define the shape and
+*        position of the region of the output grid for which resampled
+*        values should be produced. This region should lie wholly
+*        within the extent of the output grid (as defined by the
+c        "lbnd_out" and "ubnd_out" arrays). Regions of the output grid
+f        LBND_OUT and UBND_OUT arrays). Regions of the output grid
+*        lying ouside this region will not be modified.
 c     out
 f     OUT( * ) = <Xtype> (Returned)
-*        Pointer to an array, with one element for each pixel in the
+c        Pointer to an array, with one element for each pixel in the
+f        An array, with one element for each pixel in the
 *        output grid, into which the resampled data values will be
 *        returned. The numerical type of this array should match that
-*        of the "in" array, and the data storage order should be such
+c        of the "in" array, and the data storage order should be such
+f        of the IN array, and the data storage order should be such
 *        that the index of the first grid dimension varies most
 *        rapidly and that of the final dimension least rapidly
-*        (i.e. Fortran array storage order is used).
+c        (i.e. Fortran array indexing is used).
+f        (i.e. normal Fortran array storage order).
 c     out_var
 f     OUT_VAR( * ) = <Xtype> (Returned)
-*        Pointer to an optional array with the same type and size as
-*        the "out" array. If given, it will be used to return variance
-*        estimates for the resampled data values. This array will only
-*        be used if the "in_var" array has also been supplied.
+c        An optional pointer to an array with the same type and size
+c        as the "out" array. If given, this array will be used to
+c        return variance estimates for the resampled data values. This
+c        array will only be used if the "in_var" array has also been
+c        supplied.
+f        An optional array with the same type and size as the OUT
+f        array. If the AST__USEVAR flag is set via the FLAGS argument,
+f        this array will be used to return variance estimates for the
+f        resampled data values.
 *
-*        If no output variance estimates are required, a NULL pointer
-*        should be given.
+*        The output variance values will be calculated on the
+*        assumption that errors on the input data values are
+*        statistically independent, and that their variance estimates
+*        may simply be summed (with appropriate weighting factors)
+*        when several input pixels contribute to an output data
+*        value. If this assumption is not valid, then the output error
+*        estimates may not be accurate. In addition, note that the
+*        statistical errors on neighbouring output data values (as
+*        well as the estimates of those errors) may often be
+*        correlated, even if the above assumption about the input data
+*        is correct, because of the sub-pixel interpolation algorithm
+*        employed.
+*
+c        If no output variance estimates are required, a NULL pointer
+c        should be given.
+f        If the AST__USEVAR flag is not set, then no output variance
+f        estimates will be calculated and this array will not be
+f        used. A dummy (e.g. one-element) array may then be supplied.
 f     STATUS = INTEGER (Given and Returned)
 f        The global status.
 
@@ -556,16 +811,50 @@ f     AST_RESAMPLE<X> = INTEGER
 *        The number of output pixels to which a data value (or a
 *        variance value if relevant) equal to "badval" has been
 *        assigned because no valid resampled value could be obtained.
+*        Thus, in the absence of any error, a returned value of zero
+*        indicates that all the required output pixels received valid
+*        resampled data values (and variances).
 
 *  Notes:
 *     - A value of zero will be returned if this function is invoked
 *     with the global error status set, or if it should fail for any
 *     reason.
 
+*  Data Type Codes:
+*     To select the correct function to use, you should replace <X> in
+*     the generic function name astResample<X> by one of the following
+*     1- or 2-character data type codes, so as to match the numerical
+*     type of the data you are processing (i.e. that of the "in",
+*     "in_var", "badval", "out" and "out_var" arguments), as follows:
+*
+c     - D: double
+c     - F: float
+c     - L: long int
+c     - UL: unsigned long int
+c     - I: int
+c     - UI: unsigned int
+c     - S: short int
+c     - US: unsigned short int
+c     - B: byte (signed char)
+c     - UB: unsigned byte (unsigned char)
+f     - D: DOUBLE PRECISION
+f     - R: REAL
+f     - I: INTEGER
+f     - S: INTEGER*2 (short integer)
+f     - US: INTEGER*2 (short integer, treated as unsigned)
+f     - B: BYTE (signed)
+f     - UB: (BYTE (unsigned)
+f
+f     In addition, for compatibility with other Starlink facilities,
+f     the codes W and UW are provided as synonyms for S and US
+f     respectively.
+
 *  Sub-Pixel Interpolation Schemes:
-*     The following macro values may be supplied via the "interp"
-*     parameter in order to select a pre-defined sub-pixel
-*     interpolation algorithm:
+c     The following values are defined in the "ast.h" header file and
+c     may be supplied via the "interp" parameter in order to select a
+f     The following values are defined in the AST_PAR include file and
+f     may be supplied via the INTERP argument in order to select a
+*     pre-defined sub-pixel interpolation algorithm:
 *
 *     - AST__NEAREST: This is the simplest interpolation scheme, in
 *     which the value of the input pixel with the nearest centre to
@@ -586,23 +875,69 @@ f     AST_RESAMPLE<X> = INTEGER
 *     However, it introduces a degree of spatial smoothing which
 *     varies according to the distance of the input position from the
 *     neighbouring pixel centres. This effect can degrade the shape of
-*     sharp data features in the data in a position-dependent way and
-*     may also show in the output variance grid (if used) as a pattern
+*     sharp features in the data in a position-dependent way and may
+*     also show up in the output variance grid (if used) as a pattern
 *     of stripes or fringes.
+*
+c     If none of the above values is given, the "interp" value is
+c     interpreted as a pointer to a function which implements the
+c     required sub-pixel interpolation algorithm.
+f     If none of the above values is given, INTERP should be set to
+f     AST__UINTERP and a function should be supplied, via the UINTERP
+f     argument, which implements the required sub-pixel interpolation
+f     algorithm.
 
 *  Control Flags:
-*     The following flags are defined in the "ast.h" header file and
+c     The following flags are defined in the "ast.h" header file and
+f     The following flags are defined in the AST_PAR include file and
 *     provide additional control over the resampling process. Having
-*     selected the set of flags to apply, you should supply the
-*     bitwise OR of their values as the "flags" argument to
-*     astResample<X>.
+*     selected a set of flags, you should supply the bitwise OR of
+c     their values as the "flags" argument to astResample<X>.
+f     their values as the FLAGS argument to AST_RESAMPLE<X>.
 *
 *     - AST__USEBAD: Indicates that there may be bad pixels in the
-*     input array(s) which must be recognised by (comparing with the
-*     value of the "badval" argument) and propagated to the output
+*     input array(s) which must be recognised (by comparing with the
+c     value of the "badval" argument) and propagated to the output
+f     value of the BADVAL argument) and propagated to the output
 *     array(s).  If this flag is not set, all input values are treated
-*     literally and the "badval" value is only used for flagging
+c     literally and the "badval" value is only used for flagging
+f     literally and the BADVAL value is only used for flagging
 *     output array values.
+f     - AST__USEVAR: Indicates that variance information should be
+f     processed in order to provide estimates of the statistical error
+f     associated with the resampled values. If this flag is not set,
+f     no variance processing will occur and the IN_VAR and OUT_VAR
+f     arrays will not be used.
+
+*  Propagation of Missing Data:
+*     Instances of missing data (bad pixels) in the output grid are
+*     identified by the value "badval" in the "out" array. They may be
+*     produced under any of the following circumstances:
+*
+*     - The input position (the transformed position of the output
+*     pixel's centre) lies outside the boundary of the grid of input
+*     pixels.
+*     - The input position lies inside the boundary of a bad input
+*     pixel. In this context, an input pixel is considered bad if its
+*     data value is equal to "badval" and if the AST__USEBAD flag is
+*     set in the "flags" argument.
+*     - The set of neighbouring input pixels (excluding those which
+*     are bad) is unsuitable for calculating an interpolated
+*     value. Whether this is true may depend on the sub-pixel
+*     interpolation algorithm in use.
+*
+*     In addition, associated output variance estimates (if
+*     calculated) may be pronounced bad, and flagged with the "badval"
+*     value in the "out_var" array, under any of the following
+*     circumstances:
+*
+*     - The associated resampled data value (in the "out" array) is bad.
+*     - The set of neighbouring input pixels which actually
+*     contributed to the output data value do not all have valid
+*     variance estimates associated with them. In this context, an
+*     input variance estimate may be regarded as bad either because it
+*     has the value "badval" (and the AST__USEBAD flag is set), or
+*     because it is negative.
 *--
 */
 /* Define a macro to implement the function for a specific data
