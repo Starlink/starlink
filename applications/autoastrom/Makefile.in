@@ -8,7 +8,7 @@ PKG_VERS=0.1
 PKG_NAME=autoastrom
 PKG_DIR=$(PKG_NAME)-$(PKG_VERS)
 
-SOURCE_FILES=README Makefile.in configure
+SOURCE_FILES=autoastrom.news Makefile.in configure
 SOURCE_DIRS=config moggy astrom
 
 
@@ -31,7 +31,7 @@ test:
 
 # Distribution and maintenance targets
 
-autoastrom.tar: README configure moggy/configure
+autoastrom.tar: autoastrom.news configure moggy/configure
 	mkdir $(PKG_DIR)
 	for f in $(SOURCE_FILES) $(SOURCE_DIRS); do \
 		find $$f \( -type d -exec mkdir $(PKG_DIR)/{} \; \) -o -exec ln {} $(PKG_DIR)/{} \; ; \
@@ -40,8 +40,8 @@ autoastrom.tar: README configure moggy/configure
 	rm -Rf $(PKG_DIR)
 	ln -s $(PKG_DIR).tar $@
 
-README Makefile.in moggy/Moggy.pm: VERSION
-	misc/propagate-version README Makefile.in moggy/Moggy.pm
+autoastrom.news Makefile.in moggy/Moggy.pm: VERSION
+	support/propagate-version autoastrom.news Makefile.in moggy/Moggy.pm
 
 configure: config/configure.in
 	autoconf config/configure.in > configure
