@@ -1,0 +1,176 @@
+
+SSN/78
+
+Preliminary notes on the build system
+=====================================
+
+
+
+Build sequence and configuration
+--------------------------------
+
+The sequence of commands to build and install a component from a CVS
+checkout is:
+
+    ./bootstrap
+    ./configure
+    make
+    make install
+
+and the sequence from an unpacked distribution is the same, minus the
+./bootstrap.
+
+The ./bootstrap script can be anything you like in principle, however
+it should be rare for it to be anything more complicated than
+
+    $STARLINK/buildsupport/bin/starconf
+    aclocal
+    autoheader
+    if test ! -e ltmain.sh; then
+      echorun libtoolize
+    fi
+    automake --add-missing --foreign
+    autoconf
+
+Notes: 
+  - These components need to be in this order
+
+  - The autoheader invocation may be redundant: it causes
+  configuration information to be put into a file config.h, from where
+  it can be read by a C program, but it is worth including even if you
+  don't plan to use this directly, because otherwise the system packs
+  this information into confusingly long compiler command lines.
+
+  - We need to explicitly run libtoolize only if ltmain.sh is not
+  present (it won't be, in the case when we really are bootstrapping,
+  but it might be if we're running bootstrap redundantly, which ought
+  to be OK).  Generally, it's (re)run implicitly by automake.
+
+  - In the automake line, use --foreign so automake doesn't check
+  strict adherence to GNU coding standards
+
+The starconf script sets a number of defaults, and extends the default
+autoconf behaviour, via autoconf macros.  Specifically, it creates a
+file acinclude.m4 which aclocal finds and includes.  It is this which
+defines the STAR_* macros described below.  The command creates a
+script called starconf.status which contains configured versions of a
+couple of files (listed at the top of starconf.status).  You should
+check starconf.status into your component repository.  You do not
+need to distribute it, however: the files it generates will typically
+be distributed instead, and if they are not distributed automatically,
+you may need to adjust the distribution specifications.
+
+
+
+
+How to autoconf a package from scratch
+--------------------------------------
+
+* Make a directory to hold the package, and add it to the repository
+
+      % mkdir adam
+      % cvs add adam
+      Directory /cvs/libraries/pcs/adam added to the repository
+      % cd adam
+
+* Get the complete set of source files, and check them in to the repository.
+
+      % ...
+      % $STARLINK/bin/cremsg adam_err # make adam_err.msg from adam_err
+      % cvs add *.f adam_link_adam adam_defns.h ADAM_DEFNS adam_err.msg
+      ...
+      cvs server: scheduling file `ADAM_DEFNS' for addition
+      cvs server: scheduling file `adam_err.msg' for addition
+      cvs server: use 'cvs commit' to add these files permanently
+      %
+
+* Create files configure.ac, Makefile.am and component.xml.in by
+copying the templates in $STARLINK/buildsupport/share.  If you have an
+editor that can use it, you might also want to create a link to the
+DTD used for the component.xml file.  Edit these files as appropriate,
+using information in the original Starlink makefile for guidance.
+Then check them in.
+
+* Run starconf
+
+      % $STARLINK/buildsupport/bin/starconf
+      starconf-validate: required file bootstrap does not exist
+      starconf-validate: file bootstrap is not checked in, but should be
+      starconf-validate: file component.xml.in is not checked in, but should be
+      starconf-validate: file Makefile.in is not checked in, but should be
+      starconf-validate: file component.xml is not checked in, but should be
+      starconf-validate: file configure is not checked in, but should be
+      starconf-validate: file starconf.status is not checked in, but should be
+      Creating install-with-manifest.in
+      Creating acinclude.m4
+      Creating Makefile.starconf
+      Creating bootstrap
+      %
+
+This additionally runs the command
+$STARLINK/buildsupport/bin/starconf-validate, which checks the
+configuration.  In this example, it complained that the bootstrap file
+did not exist, and promptly created one for you.  It noticed that we
+have checked in Makefile.am and configure.ac, but we haven't checked
+in component.xml.in yet.  The other files it's complaining about can't
+be checked in because they don't exist yet -- they are all generated
+files.  Starconf also created a few other files: with the exception of
+bootstrap, these should not be checked in, as they are in fact
+extracted from starconf.status.
+
+If we now run the bootstrap command, however, all should be well.
+This chatters a little, before running automake and autoconf.
+
+* You now have a ./configure file: run it:
+
+     % ./configure
+
+All should be well, and you should be able to type `make' to build the
+package.  In theory.  Iterate until success.
+
+* Run .../starconf-validate again to make sure it can't find anything
+to complain about.  Do `cvs -n update' to get the list of files which
+are and are not checked in, and make sure you have left nothing out.
+Commit everything.
+
+* That's it.  If you want to test that everything is as it should be,
+clean out the directory with `make maintainer-clean', then do
+./bootstrap;./configure;make
+
+* Install it with `make install-manifest'
+
+
+
+Extra autoconf macros
+---------------------
+
+AC_INIT(pkg, vers, bugaddress): This is a standard autoconf macro, but
+some of the macros below rely on its behaviour, specifically that with
+the command given, the macro defines PACKAGE=pkg, and
+PACKAGE_VERSION=vers.
+
+STAR_DEFAULTS: Include this near the beginning of your configure.ac
+
+STAR_FACILITY_CODE(facno, [msgfile]): declare the msg-system facility
+code which is to be used for error messages within this package.  This
+adds boilerplate code to create the corresponding msg output files,
+$PACKAGE_err, $PACKAGE_err.h and fac_<facno>_err.  The default input
+file is $PACKAGE_err.msg, but this may be modified by giving the
+optional second argument.
+
+STAR_MAKE_MANIFEST: Adds a `manifest-install' target to the generated
+Makefile, and creates a `install-with-manifest.in' script which you
+will probably need to distribute (though not check in to the
+repository, since it is created by the starconf.status script
+mentioned above).
+
+STAR_LATEX_DOCUMENTATION(documentcode): Generate the standard makefile
+targets to handle LaTeX documentation source.  The parameter
+documentcode should be something like `sun123' -- it should not
+include any .tex extension.  Defines and AC_SUBSTs
+@STAR_DOCUMENTATION@; thus one can use $(STAR_DOCUMENTATION) as a
+Makefile variable, for example in an EXTRA_DIST Makefile.am line.  If
+users need anything complicated done, they should probably not use
+this standard target.
+
+
