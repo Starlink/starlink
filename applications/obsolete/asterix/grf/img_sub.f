@@ -3676,6 +3676,89 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
 
 
 
+*+ IMG_REGTOBOX - get range of pixels inside current region
+	SUBROUTINE IMG_REGTOBOX(I1,I2,J1,J2,STATUS)
+
+        IMPLICIT NONE
+
+*  Global constants :
+        INCLUDE 'SAE_PAR'
+        INCLUDE 'DAT_PAR'
+*    Global variables :
+        INCLUDE 'IMG_CMN'
+*  Import :
+*  Export :
+        INTEGER I1,I2,J1,J2
+*  Status :
+        INTEGER STATUS
+*  Local constants :
+*  Local variables :
+*-
+      IF (STATUS.EQ.SAI__OK) THEN
+
+        IF (I_REG_TYPE.EQ.'NONE') THEN
+          I1=1
+          I2=I_NX
+          J1=1
+          J2=I_NY
+
+        ELSE
+
+          CALL IMG_REGTOBOX_SUB(%val(I_REG_PTR),I1,I1,J1,J2)
+
+        ENDIF
+
+
+      ENDIF
+
+      END
+
+
+
+*+
+	SUBROUTINE IMG_REGTOBOX_SUB(REG,I1,I2,J1,J2)
+
+        IMPLICIT NONE
+
+*  Global constants :
+        INCLUDE 'SAE_PAR'
+        INCLUDE 'DAT_PAR'
+*    Global variables :
+        INCLUDE 'IMG_CMN'
+*  Import :
+        BYTE REG(I_NX,I_NY)
+*  Export :
+        INTEGER I1,I2,J1,J2
+*  Status :
+*  Local constants :
+*  Local variables :
+      INTEGER I,J
+*-
+
+      I1=I_NX
+      I2=1
+      J1=I_NY
+      J2=1
+
+      J=1
+      DO WHILE (J.LE.I_NY.AND.J1.NE.1.AND.J2.NE.I_NY)
+        I=1
+        DO WHILE (I.LE.I_NX.AND.I1.NE.1.AND.I2.NE.I_NX)
+          IF (REG(I,J).NE.'00'X) THEN
+            I1=MIN(I1,I)
+            I2=MAX(I2,I)
+            J1=MIN(J1,J)
+            J2=MAX(J2,J)
+          ENDIF
+          I=I+1
+        ENDDO
+        J=J+1
+      ENDDO
+
+      END
+
+
+
 *+ IMG_BOXTOBOX - convert box spec. to range of pixels
 	SUBROUTINE IMG_BOXTOBOX(X,Y,DX,DY,I1,I2,J1,J2,STATUS)
 
