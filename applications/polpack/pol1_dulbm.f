@@ -108,6 +108,8 @@
 *     21-JUN-1999 (DSB):
 *        Output reference direction is now north or +ve Y (like for
 *        single-beam data).
+*     5-AUG-1999 (DSB):
+*        TRIM changed to PAD in call to NDF_MBNDN.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -282,7 +284,7 @@
 *  Replace the identifiers to the supplied NDFs with identifiers for
 *  sections of the supplied NDFs which have equal bounds. Abort if there
 *  is an error since this means that some of the images do not overlap.
-      CALL NDF_MBNDN( 'TRIM', NIM, NDFIN, STATUS )      
+      CALL NDF_MBNDN( 'PAD', NIM, NDFIN, STATUS )      
       IF ( STATUS .NE. SAI__OK ) GO TO 99
       
 *  Get the image dimensions and data type by looking at the first mapped
