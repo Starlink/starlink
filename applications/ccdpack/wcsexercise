@@ -1,0 +1,424 @@
+#!/bin/csh
+#+
+#  Name:
+#     WCSEXERCISE
+
+#  Purpose:
+#     Tests WCS-aware aspects of CCDPACK functionality.
+
+#  Language:
+#     C shell
+
+#  Description:
+#     The script creates a series of test frames using CCDGENERATE. It
+#     then executes various of the CCDPACK Atasks simulating a
+#     registration sequence. Intermediary results are displayed 
+#     (if requested).
+
+#  Authors:
+#     PDRAPER: Peter Draper (STARLINK)
+#     MBT: Mark Taylor (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     4-APR-1992 (PDRAPER):
+#        Original version.
+#     29-JUN-1993 (PDRAPER):
+#     	 Changed to include automated alignment.
+#     18-JUL-1995 (PDRAPER):
+#        Now references $CCDPACK_DIR instead of editting INSTALL at
+#        install time.
+#     21-MAR-1997 (PDRAPER):
+#        Now does above properly.
+#     20-JAN-1998 (PDRAPER):
+#        Fixed problem with device=! not being accepted on OSF1.
+#     17-FEB-1999 (MBT):
+#        Modified for use with WCS-aware CCDPACK tasks.
+#     26-APR-1999 (MBT):
+#        Changed name CCDEXERCISE -> WCSEXERCISE and removed
+#        pre-registration steps.
+#     {enter_further_changes_here}
+#-
+#
+      onintr EXIT
+      set null = "\!"
+      set abort = "\!\!"
+
+#  Initialise CCDPACK within this shell.
+      if ( $?CCDPACK_DIR ) then 
+         if ( -e $CCDPACK_DIR/ccdpack.csh ) then 
+            source $CCDPACK_DIR/ccdpack.csh
+         else 
+            echo "Sorry cannot run the demonstration script as the CCDPACK"
+            echo "initialisation file CCDPACK_DIR/ccdpack.csh does not seem to"
+            echo "exist. This probably means that you are running an incompatible"
+            echo "version of CCDPACK or your installation is broken."
+            exit 1
+         endif
+      else 
+        echo "Sorry cannot run the demonstration script as the CCDPACK_DIR"
+        echo "environment variable is not set. This is normally set by"
+        echo "sourcing the Starlink login file (usually in your .login file)."
+        exit 1
+      endif
+
+#  Establish the current directory as ADAM_USER and clear 
+#  any global values already existing 
+      setenv ADAM_USER $cwd
+      if ( -e ${ADAM_USER}/GLOBAL.sdf ) then
+	 ccdclear accept 
+      endif
+
+#  Does the user want to see image display activity?
+      echo -n "DISPLAY - Display device (! for none) > "
+      set device = $<
+      if ( "$device" == "$abort" || "$device" == "" ) then
+         goto EXIT
+      else
+         if ( "$device" == "$null" ) then
+            set device = "NONE"
+         endif
+      endif
+
+#  Set a file extension for generating data.
+      if ( $?CCDPACK_EXT ) then 
+         set exten =  $CCDPACK_EXT
+      else 
+         set exten = ".sdf"
+      endif
+
+#  If we're going to use a device we need KAPPA.
+      if ( "$device" != "NONE" ) then
+         kappa
+         idset $device \\
+         gdset $device \\
+         gdclear \\
+         paldef \\
+      else
+         kappa
+      endif
+
+#  Try to locate the object specification file. If this does not exists
+#  then exit.
+      set objfile = ccdtest2_obj.dat
+      set astfile = ccdtest.ast
+      foreach file ( $objfile $astfile )
+         if ( -e $file ) then
+	    'rm' $file
+         endif
+         if ( -e $CCDPACK_DIR/$file ) then
+	    cp $CCDPACK_DIR/$file ./
+         else
+	    echo "Cannot locate file $CCDPACK_DIR/$file"
+	    echo "- test terminated."
+	    exit
+         endif
+      end
+
+#  Create the test frames
+      echo " "
+      echo "  Creating the test data. "
+      echo " "
+      echo "  The test data consists of :-"
+      echo "     6 object fields. "
+      echo " "
+      echo "  The target data is a simulated starfield in which two exposures"
+      echo "  have been made with the same 3-chip mosaic camera.  The camera"
+      echo "  has been rotated by 180 degrees between exposures."
+      echo " "
+      echo "  Generate the first exposure."
+      ccdgenerate \
+         nseq=3 \
+         file=$objfile \
+         type=$exten \
+         pixels='[64,128]' \
+         origins='[-1,-101,-69,-101,297,-1]' \
+         angles='[0,0,270]' \
+         reduced \
+         accept
+#     end ccdgenerate
+      mv data1$exten data-1a$exten
+      mv data2$exten data-1b$exten
+      mv data3$exten data-1c$exten
+      set ndfs = ( data-1a data-1b data-1c )
+
+      echo " "
+      echo "  Generate the second exposure."
+      ccdgenerate \
+         nseq=3 \
+         file=$objfile \
+         type=$exten \
+         pixels='[64,128]' \
+         origins='[163,210,95,210,-15,163]' \
+         angles='[180,180,90]' \
+         reduced \
+         accept
+#     end ccdgenerate
+      mv data1$exten data-2a$exten
+      mv data2$exten data-2b$exten
+      mv data3$exten data-2c$exten
+      set ndfs = ( $ndfs data-2a data-2b data-2c )
+
+#  Get the AST file describing the relative positions of images on the 
+#  focal plane of the notional instrument.  If it does not exist, then
+#  sneakily create it from the data we have.
+      set astfile=CCDTEST.AST
+      if ( -e $astfile ) then
+         'rm' $astfile
+      endif
+      if ( -e $CCDPACK_DIR/$astfile ) then
+         cp $CCDPACK_DIR/$astfile ./
+      else
+         astexp in='data-1?' idtype=fitsid fitsid=iseq astfile=$astfile accept \
+            >& /dev/null
+      endif
+
+      echo " "
+      echo "  We use an AST file containing information about the relative"
+      echo "  positions of the CCDs on the focal plane of the mosaic camera."
+      echo "  The application ASTIMP imports this information from the AST"
+      echo "  file to the WCS components of the images.  If the telescope"
+      echo "  adds approximate pointing information to the images which can"
+      echo "  be used for provisional alignment then this step may not be"
+      echo "  necessary.  We will use this as an aid to registration, but where"
+      echo "  possible alignment will be done by object matching."
+      echo " "
+      echo "  We set the Domain of the Current frames of NDFs from the two"
+      echo "  exposures to different values, since coordinates refer to the"
+      echo "  notional instrument's focal plane, which has moved between the"
+      echo "  two."
+      echo " "
+      astimp \
+         in='data-1?' \
+         astfile=$astfile \
+         indomain=set1 \
+         accept
+#     end astimp
+      astimp \
+         in='data-2?' \
+         astfile=$astfile \
+         indomain=set2 \
+         accept
+#     end astimp
+
+      echo " "
+      echo "  Since we know that the instrument has been rotated by 180 degrees"
+      echo "  between exposures, we add a new frame to the WCS components"
+      echo "  which is identical to the instrument alignment plane for the"
+      echo "  first set, and rotated for the second set.  Before object "
+      echo "  identification is attempted by FINDOFF the images must have"
+      echo "  the same orientation, although not necessarily the correct"
+      echo "  translational alignment."
+      echo " "
+      wcsadd data-1a set1 provisional 
+      wcsadd data-1b set1 provisional
+      wcsadd data-1c set1 provisional
+      wcsadd data-2a set2 provisional '[0,-1,0,0,0,-1]'
+      wcsadd data-2b set2 provisional '[0,-1,0,0,0,-1]'
+      wcsadd data-2c set2 provisional '[0,-1,0,0,0,-1]'
+
+#  If display capability is enabled then display the data frames.
+      if ( "$device" != "NONE" ) then
+         echo " "
+         echo "  Displaying pre-reduced target frames."
+         echo " "
+         picdef \
+            mode=array \
+            xpic=3 \
+            ypic=2 \
+            prefix=a \
+            accept
+#        end picdef
+         lutheat \
+            accept
+#        end lutheat
+         foreach num ( 1 2 3 4 5 6 )
+            picsel label=a$num accept
+            display \
+               in=$ndfs[$num] \
+               mode=percentiles \
+               percentiles='[2,98]' \
+               style="'colour(numlab)=cyan" \
+               accept
+#           end display
+         end
+      endif
+
+#  Add note to logfile.
+      echo " "
+      echo "  Adding a note to the logfile. "
+      echo " "
+      set name = `who am i`
+      ccdnote \
+         '"'$name : exercising WCS registration in CCDPACK'"' \
+         accept
+#     end ccdnote
+
+#  Now proceed to test out some alignment functionality.
+      echo " "
+      echo "  CCDPACK will now attempt to realign the target frames to"
+      echo "  produce a complete mosaic of whole of the target region."
+      echo " "
+
+#  Locate all the objects on the frames
+      echo " " 
+      echo "  The first stage of the automated registration process is"
+      echo "  to detect the positions of objects (stars and galaxies)."
+      echo "  "
+      findobj \
+         in='data-??' \
+	 outlist='*.find' \
+         percentile=94 \
+	 accept
+#     end findobj
+      if ( "$device" != "NONE" ) then
+
+#  Display the objects located.
+         echo " "
+         echo "  Displaying the positions of the objects which have been"
+         echo "  detected."
+         echo " "
+         foreach num ( 1 2 3 4 5 6 )
+            picsel label=a$num accept
+            plotlist \
+               inlist=$ndfs[$num] \
+               palnum=4 \
+               mtype=23 \
+               logto=neither \
+               accept
+#           end plotlist
+         end
+      endif
+	
+#  Determine matches between the positions.
+      echo " "
+      echo "  After locating the objects it is now necessary to determine"
+      echo "  which objects correspond.  Note that because of the alignment"
+      echo "  of the two exposures some of the images have no matching objects."
+      echo " "
+      findoff \
+         inlist='data-??' \
+	 ndfnames=true \
+         usewcs=true \
+         restrict=false \
+         override=true \
+	 outlist='*.off' \
+	 accept
+#     end findoff
+      if ( "$device" != "NONE" ) then
+
+#  Display the objects located.
+#  For NDFs without associated position lists (ones with no matched objects)
+#  PLOTLIST would fail verbosely but harmlessly.  This is avoided
+#  by omitting numbers 3 and 6 from the position list below.
+         echo " "
+         echo "  Displaying the labels of objects which have been matched."
+         echo " "
+         foreach num ( 1 2 4 5 )
+            picsel label=a$num accept
+            plotlist \
+               inlist=$ndfs[$num] \
+               palnum=3 \
+               mtype=-1 \
+               thick=2 \
+               msize=1.5 \
+               logto=neither \
+               accept
+#           end plotlist
+         end
+      endif
+
+#  Set the registration structures.
+      echo " "
+      echo "  Now that the object-object correspondence is known it is"
+      echo "  possible to work out the inter-NDF transformations."
+      echo "  The next routine, REGISTER, selects images which have matched"
+      echo "  position lists and adds a new frame to the WCS component with" 
+      echo "  a domain name of CCD_REG for all those which can be mutually"
+      echo "  aligned by object matching."
+      echo " "
+      rm -f ccdexercise.ast
+      register \
+         inlist='data-??' \
+	 fittype=2 \
+         outformat=wcs \
+	 accept
+#     end register
+
+      echo " "
+      echo "  Not all of the images could be registered by object matching, so"
+      echo "  there is no single domain in which they can all be aligned."
+      echo "  However, by using the information in the WCS component"
+      echo "  (the frames with domains SET1 and SET2 inserted using ASTIMP"
+      echo "  as well as the frames with domain CCD_REG just added to some"
+      echo "  of them by REGISTER) it is possible to find an aligment of all"
+      echo "  of them.  The task WCSREG tries to register all the images"
+      echo "  making the best use of information in the WCS component that"
+      echo "  it can."
+      echo " "
+      wcsreg \
+         in='data-??' \
+         domains='[ccd_reg,set1,set2]' \
+         accept
+#     end wcsreg
+        
+#  Resample the data.
+      echo " "
+      echo "  The reduced NDFs will now be resampled to the same coordinate"
+      echo "  system. After this is performed they can then be combined"
+      echo "  (after determining normalising scale and zero points which "
+      echo "  take into account any variations in sky transparency and "
+      echo "  exposure time) into a single frame which shows the complete"
+      echo "  data coverage for the target area."
+      echo " "
+# Until TRANNDF is rewritten to be WCS-aware, we use WCSALIGN to do more
+# or less the same job.
+#       tranndf \
+#          in='data?' \
+#          out='*|reduced|resamp|' \
+#          accept
+# #     end tranndf
+      wcsalign \
+         in='data-??' \
+         out='*-align' \
+         lbnd=\! \
+         ref=\! \
+         accept
+#     end wcsalign
+
+#  Combine to a mosaic.
+      echo " "
+      echo "  The aligned images are now combined into a single mosaic."
+      echo " "
+      makemos \
+         in='*-align' \
+	 scale=false \
+	 zero=false \
+	 out=mosaic \
+	 accept
+#     end makemos
+
+#  Display the final mosaic.
+      if ( "$device" != "NONE" ) then 
+         echo " "
+         echo "  Displaying the final mosaic."
+         echo " "
+         gdclear \\
+         display \
+           in=mosaic \
+           mode=percentiles \
+           percentiles='[2,98]' \
+           accept
+#        end display
+      endif
+
+#  Exercise is completed.
+      ccdnote \
+         '"Exercise completed"' \
+	 accept
+#     end ccdnote
+
+#  Exit label
+EXIT:
+      exit
+# $Id$
