@@ -1,0 +1,62 @@
+C+
+C     D T A _ T Y P E S
+C
+C     Definitions for possible data types.
+C
+C     NTYPES  (Integer parameter) Number of DTA_ types
+C     TYPES   (Character) Type names
+C     TSIZE   (Integer)   Type sizes in bytes.
+C     TCODES  (Integer)   Type code for conversion
+C     HTYPE   (Character) Corresponding HDS type names.
+C     NHTYPES (Integer parameter) Number of HDS types
+C     HTYPES  (Character) HDS type names
+C     DTYPES  (Character) Corresponding DTA_ type names
+C
+C     Note that the code for each type is its position
+C     in the names array, but these do not map in a one-to-
+C     one manner to the type conversion codes.
+C
+C     Note also that NTYPES,TYPES,TSIZE,TCODES and HTYPE form a
+C     set based on the DTA_ types - ie with one entry for each
+C     DTA_ type - while NHTYPES,HTYPES and DTYPES form a set based
+C     on the HDS types.  It is easiest to have two sets of tables,
+C     since the occasional ambiguity in the inter-type mapping
+C     makes it hard to use a single set of tables for both DTA->HDS
+C     and HDS->DTA conversions.
+C
+C                                     KS / CIT 25th Oct 1982
+C     Modified:
+C
+C     12th March 1986.  KS / AAO.  HDS types now included.
+C     9th  Nov   1988.  KS / AAO.  USHORT type added.
+C     1st  March 1990.  KS / AAO.  LOGICAL type added. (Just so HDS
+C                       objects of type _LOGICAL can be created; access
+C                       to them can be through DTA_R/WVARI).
+C     10th Jan   1992.  KS / AAO.  SAVE statements added for all variables.
+C+
+      INTEGER NTYPES,NHTYPES
+      PARAMETER (NTYPES=11,NHTYPES=9)
+C
+      CHARACTER TYPES(NTYPES)*7,HTYPE(NTYPES)*8
+      CHARACTER HTYPES(NHTYPES)*8,DTYPES(NHTYPES)*7
+      INTEGER TSIZE(NTYPES),TCODE(NTYPES)
+C
+      DATA TYPES/'BIT      ','BYTE     ','SHORT    ','INT      ',
+     :           'LONG     ','FLOAT    ','DOUBLE   ','CHAR     ',
+     :           'FILE     ','USHORT   ','LOGICAL  '/
+      DATA TSIZE/ 1         , 1         , 2         , 4         ,
+     :            4         , 4         , 8         , 1         ,
+     :            1         , 2         , 4/
+      DATA TCODE/ TYP_BYTE  , TYP_BYTE  , TYP_WORD  , TYP_LONG  ,
+     :            TYP_LONG  , TYP_REAL  , TYP_DBLE  , TYP_CHAR  ,
+     :            TYP_CHAR  , TYP_UWRD  , TYP_LGCL/
+      DATA HTYPE/'_UBYTE   ','_UBYTE   ','_WORD    ','_INTEGER ',
+     :           '_INTEGER ','_REAL    ','_DOUBLE  ','_CHAR    ',
+     :           '_CHAR    ','_UWORD   ','_LOGICAL '/
+      DATA HTYPES/'_INTEGER','_REAL','_DOUBLE','_LOGICAL',
+     :            '_CHAR','_BYTE','_UBYTE','_WORD','_UWORD'/
+      DATA DTYPES/'INT','FLOAT','DOUBLE','LOGICAL',
+     :            'CHAR','BYTE','BYTE','SHORT','USHORT'/
+C
+      SAVE TYPES,TSIZE,TCODE,HTYPE,HTYPES,DTYPES
+C

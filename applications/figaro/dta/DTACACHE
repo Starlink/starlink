@@ -1,0 +1,124 @@
+C+
+C     D T A _ C A C H E
+C
+C     Data structure name cache definition.
+C
+C     The data cache consists of four levels, each
+C     containing object names and location pointers to the
+C     data structures for those objects.  The lowest level
+C     contains the last used object names.  The third
+C     level contains the last used third level names, the
+C     second level contains the last used second level names,
+C     and the top level contains all the top level names
+C     currently in use.  The cache will always contain some
+C     entry relating to any valid object; with luck, it will
+C     sometimes be a low level entry.
+C
+C     There is also a cache initialisation flag (CACHEI). This
+C     should be set by a block data routine to .false.  All
+C     other cache initialisation is performed by the routine
+C     DTA_ICACHE.
+C
+C     There must always be a top level slot free; if not there
+C     have been too many files opened.  Records can be removed
+C     from the top level cache at random, as files are closed.
+C     For the other levels, there are pointers that record the
+C     next slot to be used.  These are controlled so that the
+C     latest entry is the first in the cache and is tested first.
+C     When the upper level caches fill, older entries are
+C     replaced.
+C
+C     The only active locators allowed by the DTA system between
+C     calls to DTA routines - ie those left active when the last
+C     DTA routine returns to its caller - are those locators
+C     held in the cache.  This is the way the system keeps track
+C     of which locators are active (although the use of groups does
+C     act as a backup).  This means that as entries are removed
+C     from the cache their locators have to be annulled.
+C
+C     The statistics variables are used to probe the cache hit rate.
+C     They are updated by CACHEL and may be reported by CACHES.
+C
+C                          KS / CIT  15th Oct 1982
+C     Modified:
+C
+C     10th Mar 1986.  KS / AAO. Changed for use in the HDS based
+C                     version of the DTA_ routines.  Locators are
+C                     now character*15 variables, not integers, and
+C                     the common blocks have been re-organised
+C                     accordingly.
+C     15th May 1986.  KS / AAO. Cache statistics variables added.
+C     26th May 1986.  KS / AAO. File names and top-level names added.
+C     11th Apr 1991.  KS / AAO. Cache string lengths increased to
+C                     maximum necessary. 
+C     8th  Jan 1992.  KS / AAO. Statistics variables were in the character
+C                     common block (CACHEC) instead of the numeric block
+C                     (CACHEN). The SUN compiler spotted this. Now fixed.
+C     12th Apr 1993.  HME / UoE, Starlink. DAT__SZLOC instead of "15".
+C     26th Jul 1994.  HME / UoE, Starlink. Make common blocks SAVE.
+C+
+C
+C     Parameters controlling cache size
+C
+C     (Tuning the cache size involves a trade-off between
+C     the time taken to search the cache and the chance of
+C     finding something useful in the lower levels.  NCACHT
+C     is simply the number of files that can be open at a time)
+C
+      INTEGER NCACHT,NCACH2,NCACH3,NCACHB
+C
+      PARAMETER (NCACHT=16,
+     :           NCACH2=5,
+     :           NCACH3=5,
+     :           NCACHB=5)
+C
+C     Top level entries
+C
+C     CACHET     The top level names as cached - these are 
+C                the same as TLNAMES, but manipulated in some
+C                cases to be acceptable HDS names.
+C     LOCNT      The HDS locators for the top level names
+C     TLNAMES    The names of the top-level structures
+C                as originally passed to DTA_ASFNAM.
+C     FILES      The names of the files associated with
+C                the top level structures.  These are the 
+C                file names as passed to DTA_ASFNAM.
+C
+      CHARACTER*(16) CACHET(NCACHT)
+      CHARACTER*(DAT__SZLOC) LOCNT(NCACHT)
+      CHARACTER*(16) TLNAME(NCACHT)
+      CHARACTER*(80) FILES(NCACHT)
+C
+C     Second and third level entries
+C
+      CHARACTER*(34) CACHE2(NCACH2)
+      CHARACTER*(DAT__SZLOC) LOCN2(NCACH2)
+      CHARACTER*(51) CACHE3(NCACH3)
+      CHARACTER*(DAT__SZLOC) LOCN3(NCACH3)
+C
+C     Bottom level entries
+C
+      CHARACTER*(132) CACHEB(NCACHB)
+      CHARACTER*(DAT__SZLOC) LOCNB(NCACHB)
+C
+C     Initialisation flag
+C
+      LOGICAL CACHEI
+C    
+C     Next slot pointers for the upper levels
+C
+      INTEGER CNEXT2,CNEXT3,CNEXTB
+C
+C     Statistics variables
+C
+      INTEGER LOOKUPS,FAILS,COMPS,FOUNDT,FOUNDB,FOUND2,FOUND3
+C
+C     Common block definition
+C
+      COMMON /CACHEC/ CACHET,CACHE2,CACHE3,CACHEB,LOCNT,
+     :                LOCN2,LOCN3,LOCNB,TLNAME,FILES
+      COMMON /CACHEN/ CACHEI,CNEXT2,CNEXT3,CNEXTB,LOOKUPS,FAILS,COMPS,
+     :                FOUNDT,FOUNDB,FOUND2,FOUND3
+      SAVE /CACHEC/
+      SAVE /CACHEN/
+C

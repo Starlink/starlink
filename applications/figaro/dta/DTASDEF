@@ -1,0 +1,20 @@
+C+
+C     D T A _ S D E F
+C
+C     Record structure definition parameters.  Note that this file is mostly
+C     a relic of the original 'raw DTA' implementation, where the file
+C     format was more or less defined in terms of the parameters in this
+C     file.  Now the file format depends on the lower HDS level.
+C
+C     Modified:
+C  
+C     8th Jan 1992.  DST_STRUCT removed - it was completely unused and
+C                    the SUN compiler gave a warning for it.  KS/AAO.
+C     23rd Jan 1992. In fact, the only parameters used by the new system are
+C                    DST_MAXLEV and DST_MAXDIM.  All others now removed. KS/AAO.
+C+
+      INTEGER DST_MAXLEV    ! Maximum number of name levels
+      INTEGER DST_MAXDIM    ! Maximum number of dimensions for objects
+C 
+      PARAMETER (DST_MAXLEV=10,DST_MAXDIM=10)
+C

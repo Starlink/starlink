@@ -1,0 +1,36 @@
+C+
+C     D T A _ M A P
+C
+C     Common blocks and parameters for the mapped object
+C     information used by the data system.
+C
+C     MUNAME   (Character) Name of mapped object
+C     MUSTART  (Integer) Start address of mapped object
+C     MUITEMS  (Integer) Number of items mapped
+C     MUTYPES  (Integer) Type of mapped item
+C     MUSED    (Logical) Flag to indicate slot used
+C     MULOCS   (Character) HDS locator for mapped object
+C     MUMODE   (Character) Mapping mode for object
+C
+C                                    KS / CIT  16th March 1983
+C     Modified:
+C
+C     28th March 1986  KS / AAO.  Modified for use with the HDS based
+C                      version of the DTA_ package.
+C     12th April 1993  HME / UoE, Starlink.  Use DAT__SZLOC.
+C     26th Jul  1994.  HME / UoE, Starlink. Make common blocks SAVE.
+C+
+      INTEGER MUMAX
+      PARAMETER (MUMAX=32)
+C
+      INTEGER MUSTART(MUMAX)
+      INTEGER MUTYPES(MUMAX),MUITEMS(MUMAX)
+      LOGICAL MUSED(MUMAX)
+      CHARACTER MUNAME(MUMAX)*80,MUMODE(MUMAX)*6,
+     :   MULOCS(MUMAX)*(DAT__SZLOC)
+C
+      COMMON /MUINFO/ MUSED,MUSTART,MUTYPES,MUITEMS
+      COMMON /MUCHAR/ MUNAME,MUMODE,MULOCS
+      SAVE /MUINFO/
+      SAVE /MUCHAR/
+C
