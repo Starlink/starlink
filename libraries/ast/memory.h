@@ -109,6 +109,9 @@ char *astAppendString_( char *, int *, const char * );
 void astListIssued_( const char *label );
 void astSetWatchId_( int id );
 int astSetPermMem_( int perm );
+int astGetMemId_( void * );
+void astMemCheckId_( int, void (*)( void *ptr ) );
+void *astFindIdPtr_( int );
 #endif
 
 #endif
@@ -139,6 +142,9 @@ int astSetPermMem_( int perm );
 #define astListIssued(label) astListIssued_(label)
 #define astSetWatchId(id) astSetWatchId_(id)
 #define astSetPermMem(perm) astSetPermMem_(perm)
+#define astGetMemId(ptr) astGetMemId_(ptr)
+#define astFindIdPtr(id) astFindIdPtr_(id)
+#define astMemCheckId(id,fun) astMemCheckId_(id,fun)
 #endif
 
 #endif

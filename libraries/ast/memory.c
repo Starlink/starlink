@@ -106,6 +106,9 @@ static int siz_issued = 0;
 static int next_id = 0;
 static int watch_id = 0;
 static int perm_mem = 0;
+static int memcheckid = -1;
+static int domemcheck = 1;
+static void (*memcheckfun)( void * );
 #endif
 
 /* Prototypes for Private Functions. */
@@ -633,6 +636,16 @@ static unsigned long Magic( void *ptr, size_t size ) {
 *  Notes:
 *     This function does not perform error checking.
 */
+
+#ifdef DEBUG
+   if( domemcheck && memcheckfun && memcheckid != -1 ) {
+      void *memcheckptr;
+      domemcheck = 0;
+      memcheckptr = astFindIdPtr( memcheckid );
+      if( memcheckptr ) (*memcheckfun)( memcheckptr );
+      domemcheck = 1;
+   }
+#endif
 
 /* Form the bit-wise exclusive OR between the memory address and the
    object size, then add 1 and invert the bits. Return the result as
@@ -1796,6 +1809,156 @@ int astSetPermMem_( int perm ){
    perm_mem = perm;
    return old_perm;
 }
+
+int astGetMemId_( void *ptr ){
+/*
+*+
+*  Name:
+*     astGetMemId
+
+*  Purpose:
+*     Return the unique identifier associated with a given memory block.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "memory.h"
+*     int astGetMemId( void *ptr )
+
+*  Description:
+*     This function returns the integer identiier associated with the
+*     given memory block, which should have been allocated using one of
+*     the AST memory management function defined in this module.
+
+*  Parameters:
+*     ptr
+*        Pointer to the memory block.
+
+*  Returned Value:
+*     The integer identifier for the supplied memory block.
+
+*  Notes:
+*     - This function attempts to execute even if an error has occurred.
+*     - An invalid identifier of -1 is returned if an error occurs.
+*-
+*/
+/* Local Variables: */
+   Memory *mem;                  /* Pointer to memory header */
+   int result;                   /* The returned identifier value */
+
+/* Initialise */
+   result = -1;
+
+/* If the incoming pointer is NULL, do nothing. Otherwise, check if it
+   points at dynamically allocated memory (IsDynamic sets the global
+   error status if it does not). */
+   if ( ptr && IsDynamic( ptr ) ) {
+
+/* If OK, obtain a pointer to the memory header and return the identifier. */
+      mem = ( (Memory *) ptr ) - 1;
+      result = mem->id;
+   }
+
+/* Return the result. */
+   return result;
+}
+
+void astMemCheckId_( int id, void (*fun)( void *ptr ) ){
+/*
+*+
+*  Name:
+*     astMemCheckId
+
+*  Purpose:
+*     Cause a function to be executed at frequent intervals.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "memory.h"
+*     void astMemCheckId( int id, void (*fun)( void * ) ){
+
+*  Description:
+*     This function causes the supplied "fun" function to be invoked when
+*     ever a AST memory management function is invoked (actually when the 
+*     Magic function is invoked), so long as the given memory block idenifier
+*     is current active. Each time the function is invoked, it is passed a 
+*     pointer to the memory block with the supplied identifier.
+*
+*     Note, if the memory pointer passed to the supplied function is a
+*     pointer to an AST object, the object may be in an incomplete state
+*     of construction and consequently may not be usable.
+
+*  Parameters:
+*     id
+*        The identifier for the memory block to be passed to the function.
+*     fun
+*        The function to call.
+
+*-
+*/
+
+   memcheckfun = fun;
+   memcheckid = id;
+}
+
+void *astFindIdPtr_( int id ){
+/*
+*+
+*  Name:
+*     astFindIdPtr
+
+*  Purpose:
+*     Return a pointer to the memory block with a given identifier.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "memory.h"
+*     void *astFindIdPtr( int id )
+
+*  Description:
+*     This function returns a pointer to the memory block with a given
+*     identifier. NULL is returned if the given identifier is not active.
+
+*  Parameters:
+*     id
+*        The identifier.
+
+*  Returned Value:
+*     The pointer to the memory block.
+
+*-
+*/
+/* Local Variables: */
+   Memory *list;
+   int i;
+   void *result;                 
+
+/* Initialise */
+   result = NULL;
+
+/* Loop round all Memory structures which are on the list of issued
+   blocks. */
+   list = ( (Memory *) issued ) - 1;
+   for( i = 0; i < nissued; i++ ) {
+
+/* Set the returned pointer and leave the loop when one is found with the 
+   supplied identifier. */
+      if( issued[ i ] && issued[ i ]->id == id ) {
+         result = issued[ i ] + 1;
+         break;
+      } 
+   }
+
+/* Return the result. */
+   return result;
+}
+
+
 
 #endif
 
