@@ -26,6 +26,11 @@
       <uname>bkm</uname>
       <email>B.K.McIlwrath@rl.ac.uk</email>
     </person>
+    <person>
+      <name>Norman Gray</name>
+      <uname>nxg</uname>
+      <email>norman@astro.gla.ac.uk</email>
+    </person>
   </developers>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
@@ -134,6 +139,91 @@
 </component>
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
+<component id="ard">
+  <version>2.0-5</version>
+  <path>libraries/ard</path>
+  <description>ASCII Region Definition</description>
+  <abstract><p>The ARD (ASCII Region Definition) system provides a 
+     textual language for describing regions within a data array,
+     together with software for converting a textual description
+     into a pixel mask, or plotting it on a graphics device.
+     The textual language is based on a set of keywords identifying
+     simple shapes (boxes, circles, lines, etc.).
+     These keywords can be combined together using Boolean-style
+     operators (AND, OR, NOT, etc.) to create more complex shapes.
+     Data arrays can be multi-dimensional.</p></abstract>
+  <dependencies >
+    <build>sae</build><build>ast</build><build>grp</build><build>subpar</build><link>ast</link><link>psx</link><link>mers</link><link>chr</link><link>pgplot</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>David Berry</name>
+      <uname>dsb</uname>
+      <email>dsb@ast.man.ac.uk</email>
+    </person>
+  </developers>
+  <documentation> sun183</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="ary">
+  <version>1.1-9</version>
+  <path>libraries/ary</path>
+  <description>A Subroutine Library for Accessing ARRAY Data Structures</description>
+  <abstract><p> The ARY library is a set of routines for accessing
+  Starlink ARRAY data structures built using the Hierarchical Data
+  System (HDS).
+    </p></abstract>
+  <dependencies >
+    <build>sae</build><build>prm</build><build>hds</build><build>chr</build><build>ems</build><link>hds</link><link>ems</link><link>chr</link><link>prm</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Rodney Warren-Smith</name>
+      <uname>rfws</uname>
+    </person>
+  </developers>
+  <documentation> sun11</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+
+<component id="ast">
+  <version>3.3</version>
+  <path>libraries/ast</path>
+  <description>WCS library</description>
+  <abstract>
+    <p>The AST library provides a comprehensive range of facilities for
+      attaching world coordinate systems to astronomical data, for
+      retrieving and interpreting that information in a variety of formats,
+      including FITS-WCS, and for generating graphical output based on it.</p>
+    <p>This library should be of interest to anyone writing
+      astronomical applications which need to manipulate coordinate system
+      data, especially celestial or spectral coordinate systems. AST
+      is portable and environment-independent.</p>
+  </abstract>
+  <dependencies >
+    <sourceset>sst</sourceset><use>sla</use><sourceset>messgen</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>David Berry</name>
+      <uname>dsb</uname>
+      <email>dsb@ast.man.ac.uk</email>
+    </person>
+    <person>
+      <name>Norman Gray</name>
+      <uname>nxg</uname>
+      <email>norman@astro.gla.ac.uk</email>
+    </person>
+  </developers>
+  <documentation> sun210 sun211</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
 <component id="chr">
   <version>2.2-5</version>
   <path>libraries/chr</path>
@@ -148,7 +238,7 @@
       basis for more complex text processing applications.
     </p></abstract>
   <dependencies >
-    <build>sae</build><build>cnf</build><sourceset>star2html</sourceset>
+    <build>sae</build><build>cnf</build><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -246,7 +336,7 @@
       the Starlink software environment, plus routines to interface to
       the Starlink parameter system.</abstract>
   <dependencies >
-    <build>sae</build><build>par</build><link>chr</link><link>ems</link><link>mers</link><link>subpar</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+    <build>parsecon</build><build>dtask</build><build>sae</build><build>par</build><link>chr</link><link>ems</link><link>mers</link><link>subpar</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -261,6 +351,101 @@
     </person>
   </developers>
   <documentation> sun143</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="grp">
+  <version>3.3</version>
+  <path>libraries/grp</path>
+  <description>GRP - Routines for Managing Groups of Objects</description>
+  <abstract><p>GRP provides facilities for handling groups of objects which
+      can be described by character strings (e.g. file names, astronomical
+      objects, numerical values, etc). Facilities are provided for storing
+      and retrieving such character strings within groups, and for passing
+      groups of character strings between applications by means of a text
+      file. It also allows the creation of groups in which each element
+      is a modified version of an element in another group.</p></abstract>
+  <dependencies >
+    <build>cnf</build><build>sae</build><build>subpar</build><link>chr</link><link>mers</link><link>psx</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>David Berry</name>
+      <uname>dsb</uname>
+      <email>dsb@ast.man.ac.uk</email>
+    </person>
+  </developers>
+  <documentation> sun150</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="gsd">
+  <version>1.0-1</version>
+  <path>libraries/gsd</path>
+  <description>Global Section Datafile (GSD) access library</description>
+  <abstract><p>This library provides read-only access to GSD files created at the James Clerk Maxwell Telescope. It is mainly useful for accessing JCMT archive data.
+    </p></abstract>
+  <dependencies >
+    <build>prm</build><build>cnf</build><link>prm</link><link>cnf</link><sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Remo P J Tilanus</name>
+      <uname>rpt</uname>
+    </person>
+    <person>
+      <name>Horst Meyerdierks</name>
+      <uname>hme</uname>
+    </person>
+    <person>
+      <name>Jon Fairclough</name>
+      <uname>jhf</uname>
+    </person>
+    <person>
+      <name>Tim Jenness</name>
+      <uname>timj</uname>
+      <email>t.jenness@jach.hawaii.edu</email>
+    </person>
+    <person>
+      <name>Rachel Padman</name>
+      <uname>rp</uname>
+    </person>
+  </developers>
+  <documentation> sun229</documentation>
+  <bugreports>t.jenness@jach.hawaii.edu</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="gwm">
+  <version>1.5-1</version>
+  <path>libraries/gwm</path>
+  <description>GWM - X Graphics Window Manager</description>
+  <abstract><p>These applications provide a means to create graphics
+  windows on an X display that do not disappear when a program
+  terminates.
+    </p></abstract>
+  <dependencies >
+    <build>sae</build><build>cnf</build><build>ems</build><link>starx</link><link>ems</link><link>cnf</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>David Terrett</name>
+      <uname>dlt</uname>
+    </person>
+    <person>
+      <name>Nicholas Eaton</name>
+      <uname>ne</uname>
+    </person>
+  </developers>
+  <documentation> sun130</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <!-- <notes><p></p></notes> -->
 </component>
@@ -292,7 +477,7 @@
       software.</p>
   </abstract>
   <dependencies >
-    <build>sae</build><build>cnf</build><build>ems</build><link>chr</link><link>cnf</link><link>ems</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+    <build>sae</build><build>cnf</build><build>ems</build><link>chr</link><link>cnf</link><link>ems</link><test>chr</test><test>cnf</test><test>ems</test><test>prm</test><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -332,6 +517,82 @@
 </component>
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
+<component id="idi">
+  <version>1.4-5</version>
+  <path>libraries/idi</path>
+  <description>IDI -- Image Display Interface</description>
+  <abstract><p> The Image Display Interface (IDI) is an international
+  standard for displaying astronomical data on an image display.  The
+  specification of the interface is given in Terrett et al, 1988
+  (A&amp;AS, 76, 263).
+    </p></abstract>
+  <dependencies >
+    <build>parsecon</build><build>dtask</build><build>sae</build><build>cnf</build><build>ems</build><link>starx</link><link>ems</link><link>cnf</link><link>gwm</link><link>gns</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Nicholas Eaton</name>
+      <uname>ne</uname>
+    </person>
+    <person>
+      <name>Dave Terrett</name>
+      <uname>dlt</uname>
+    </person>
+    <person>
+      <name>P Santin</name>
+      <uname>santin</uname>
+    </person>
+  </developers>
+  <documentation> sun65</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="mag">
+  <version>1.1-4</version>
+  <path>libraries/mag</path>
+  <description>Fortran access to magentic tape devices</description>
+  <abstract><p>
+The MAG subroutine library allows a programmer to write portable programs
+which access data stored on magnetic tapes.
+
+By using the MAG routines, a program can read and write tapes, position the
+tape (both in absolute terms and relative to the current position) and can
+control the allocation of the tape drive and the physical mounting of the tape
+on systems which provide that facility.
+
+The library is currently supported for Sun Sparcstations running Solaris and
+for DEC Alphas running OSF/1. Historically it has been supported for DEC
+Ultrix and for SunOS and may still work for them.
+    </p></abstract>
+  <dependencies >
+    <build>parsecon</build><build>dtask</build><build>sae</build><build>par</build><build>hds</build><build>psx</build><build>mers</build><link>par</link><link>hds</link><link>psx</link><link>mers</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Sid Wright</name>
+      <uname>slw</uname>
+    </person>
+    <person>
+      <name>Ken Hartley</name>
+      <uname>kfh</uname>
+    </person>
+    <person>
+      <name>P M Allan</name>
+      <uname>pma</uname>
+    </person>
+    <person>
+      <name>Alan J Chipperfield</name>
+      <uname>ajc</uname>
+    </person>
+  </developers>
+  <documentation> sun171</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
 <component id="mers">
   <version>1.8</version>
   <path>libraries/mers</path>
@@ -359,6 +620,69 @@
     </person>
   </developers>
   <documentation> sun104</documentation> 
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="nbs">
+  <version>2.5-9</version>
+  <path>libraries/nbs</path>
+  <description>NBS Noticeboard System</description>
+  <abstract><p> The noticeboard system routines provide a fast means
+  for processes to share data in global memory. A given process may
+  own as many noticeboards as it wishes and may access noticeboards
+  owned by other processes.  Normally the only process that writes to
+  a noticeboard is its owner but other processes that know what they
+  are doing can subvert this rule either by calling a special routine
+  or else by accessing noticeboard data by using a pointer.
+    </p></abstract>
+  <dependencies >
+    <build>sae</build><build>ems</build><build>cnf</build><link>ems</link><link>cnf</link><link>chr</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>William Lupton</name>
+      <uname>wfl</uname>
+    </person>
+    <person>
+      <name>David Allan</name>
+      <uname>dja</uname>
+    </person>
+  </developers>
+  <documentation> sun77</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="ndf">
+  <version>1.5-9</version>
+  <path>libraries/trn</path>
+  <description>NDF - Routines for Accessing the Extensible N-Dimensional Data Format</description>
+  <abstract><p>The Extensible N-Dimensional Data Format (NDF) is a
+  format for storing bulk data in the form of N-dimensional arrays of
+  numbers. It is typically used for storing spectra, images and
+  similar datasets with higher dimensionality. The NDF format is based
+  on the Hierarchical Data System HDS (SUN/92) and is extensible; not
+  only does it provide a comprehensive set of standard ancillary items
+  to describe the data, it can also be extended indefinitely to handle
+  additional user-defined information of any type.
+    </p></abstract>
+  <dependencies >
+    <build>sae</build><build>prm</build><build>hds</build><build>chr</build><build>ems</build><build>ary</build><build>ast</build><build>psx</build><link>psx</link><link>ary</link><link>hds</link><link>ems</link><link>chr</link><link>prm</link><link>ast</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Rodney Warren-Smith</name>
+      <uname>rfws</uname>
+    </person>
+    <person>
+      <name>David Berry</name>
+      <uname>dsb</uname>
+    </person>
+  </developers>
+  <documentation> ssn20 sun33</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <!-- <notes><p></p></notes> -->
 </component>
@@ -793,6 +1117,73 @@
 </component>
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
+<component id="pda">
+  <version>0.4-1</version>
+  <path>libraries/pda</path>
+  <description>Public Domain Algorithms</description>
+  <abstract><p>Replacements of NAG routines with public domain equivalents from packages such as NETLIB and SLATEC. They have been homogenized to fit into the Starlink calling scheme.
+    </p></abstract>
+  <dependencies >
+    <build>sae</build><link>ems</link><link>cnf</link><sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Horst Meyerdierks</name>
+      <uname>hme</uname>
+    </person>
+    <person>
+      <name>David Berry</name>
+      <uname>dsb</uname>
+    </person>
+    <person>
+      <name>Peter Draper</name>
+      <uname>pwd</uname>
+    </person>
+    <person>
+      <name>Grant Privett</name>
+      <uname>gp</uname>
+    </person>
+    <person>
+      <name>Malcolm J Currie</name>
+      <uname>mjc</uname>
+    </person>
+  </developers>
+  <documentation> sun194</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="prm">
+  <version>1.3-1</version>
+  <path>libraries/prm</path>
+  <description>PRIMDAT --- Processing of Primitive Numerical Data</description>
+  <abstract><p>This document describes the PRIMDAT package, which
+      is a collection of Fortran functions and subroutines providing
+      support for ``primitive data processing''.  Routines from this
+      package may be used to perform arithmetic, mathematical
+      operations, type conversion and inter-comparison of any of the
+      primitive numerical data types supported by the Starlink
+      Hierarchical Data System HDS (SUN/92). 
+    </p></abstract>
+  <dependencies >
+    <build>sae</build><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>R.F. Warren-Smith (DUVAD::RFWS)</name>
+    </person>
+    <person>
+      <name>Alan J Chipperfield</name>
+    </person>
+  </developers>
+  <documentation> sun39</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
 <component id="psx">
   <version>0.4</version>
   <path>libraries/psx</path>
@@ -820,6 +1211,37 @@
 </component>
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
+<component id="ref">
+  <version>1.1-4</version>
+  <path>libraries/ref</path>
+  <description>Routines for Handling References to HDS Objects</description>
+  <abstract><p> It is sometimes useful to use the Hierarchical Data
+  System HDS (SUN/92) to store references or pointers to other HDS
+  objects. For instance, this allows the same data object to be used
+  in several places without the need to have more than one copy.  The
+  REF library is provided to facilitate this data object
+  referencing process and the subsequent accessing of objects
+  which have been referenced in this way.
+    </p></abstract>
+  <dependencies >
+    <build>sae</build><link>hds</link><link>ems</link><link>cnf</link><link>chr</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Rodney Warren-Smith</name>
+      <uname>rfws</uname>
+    </person>
+    <person>
+      <name>Alan J Chipperfield</name>
+      <uname>ajc</uname>
+    </person>
+  </developers>
+  <documentation> sun31</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
 <component id="sae">
   <version>1.0</version>
   <path>libraries/sae</path>
@@ -843,6 +1265,7 @@
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <!-- <notes><p></p></notes> -->
 </component>
+
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="sla">
@@ -866,6 +1289,35 @@
   </developers>
   <documentation> sun67</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="trn">
+  <version>0.9-5</version>
+  <path>libraries/trn</path>
+  <description>TRANSFORM - Coordinate Transformation Facility</description>
+  <abstract><p> TRANSFORM provides a standard, flexible method for
+  manipulating coordinate transformations and for transferring
+  information about them between applications.  It can handle
+  coordinate systems with any number of dimensions and can efficiently
+  process large (i.e. image-sized) arrays of coordinate data using a
+  variety of numerical precisions.  No specific support for
+  astronomical coordinate transformations or map projections is
+  included -- these features are provided by the AST (SUN/210)
+  library.
+    </p></abstract>
+  <dependencies >
+    <build>sae</build><build>prm</build><build>hds</build><build>chr</build><build>ems</build><link>hds</link><link>ems</link><link>chr</link><link>prm</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Rodney Warren-Smith</name>
+      <uname>rfws</uname>
+    </person>
+  </developers>
+  <documentation> sun61</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
 </component>
 
 <component id="autoconf" buildsupport="yes">
@@ -931,24 +1383,5 @@
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <notes><p>This version of libtool is unpatched -- just the standard
       version.</p></notes>
-</component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
-
-<component id="m4" buildsupport="noauto">
-  <!-- Note that, although m4 is a 'buildsupport' tool, we do NOT
-       add the buildsupport="yes" attribute.  If we did, then this would
-       ALWAYS be built at the beginning of the bootstrap process.
-       Instead, we want to build it only if the system m4 is not GNU m4.
-       Thus set the attribute to be "noauto", which causes the correct
-       build rule to be generated (by GenerateDependencies.java), but does
-       not include it in the list of buildsupport dependencies, so that it
-       is not build automatically. -->
-  <version>1.4</version>
-  <path>thirdparty/fsf/m4</path>
-  <description>GNU m4</description>
-  <dependencies/>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <notes><p>Imported from distributed m4-1.4.tar.gz by nxg,
-    on 2004-03-07</p></notes>
 </component>
 </componentset>
