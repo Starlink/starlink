@@ -145,6 +145,9 @@
 
           END IF
 
+*        Create the new object
+          CALL ADI_NEW0( 'FITSfile', ID, STATUS )
+
 *        Write HDU number
           CALL ADI_CPUT0I( ID, '.HDU', HDU, STATUS )
 
