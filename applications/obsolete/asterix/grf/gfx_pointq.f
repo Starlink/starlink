@@ -86,7 +86,7 @@
           DO I=N1,N2
             IF (Y(I).GT.VAL__SMLR.AND.
      :                BIT_ANDUB(Q(I),MASK).EQ.QUAL__GOOD) THEN
-              CALL PGMOVE(1,X(I),LOG10(Y(I)),SYMBOL)
+              CALL PGPOINT(1,X(I),LOG10(Y(I)),SYMBOL)
             ENDIF
           ENDDO
 
