@@ -19,7 +19,6 @@
 *    Function declarations :
 *    Local constants :
 *    Local variables :
-      INTEGER ISTAT
 *-
 
       IF (G_LOCAL) THEN
@@ -27,13 +26,14 @@
         G_DMEMPTR=0
         G_LOCAL=.FALSE.
       ELSE
+	print *,1
         CALL GCB_DETACH_REMCONTXT(STATUS)
+	print *,2
         IF (G_NCONTEXT.EQ.0) THEN
+	print *,3
           CALL DYN_UNMAP(G_GMEMPTR,STATUS)
+	print *,4
           G_GMEMPTR=0
-c          ISTAT=SAI__OK
-c          CALL NBS_LOSE_NOTICEBOARD(G_ID,'FORCE',ISTAT)
-c          G_ID=0
         ENDIF
       ENDIF
 
