@@ -20,3 +20,4 @@ stamp-h1
 make.log
 .deps
 
+config.h
