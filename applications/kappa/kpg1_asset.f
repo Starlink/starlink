@@ -144,7 +144,6 @@
 
 *  If the Object is a Plot, reset the colour index for text backgrounds to 0.
       IF( CLASS .EQ. 'Plot' ) CALL GRF_SETTBG( 0 )
-      IF( CLASS .NE. 'Plot' ) WRITE( *,*) 'CLASS: ',CLASS
 
 *  Take a copy of the Object, and indicate it has not yet been changed.
       IOBJ2 = AST_COPY( IOBJ, STATUS )

@@ -76,7 +76,7 @@
 *  Loop until a catalogue has been opened successfully or a non-recoverable 
 *  error occurs.
       MORE = .TRUE.
-      DO WHILE( MORE )
+      DO WHILE( MORE .AND. STATUS .EQ. SAI__OK )
 
 *  Attempt to obtain a name for the catalogue from the parameter system and 
 *  proceed only if ok.

@@ -203,47 +203,6 @@
 *        0.8 times smaller in both dimensions, and the labels are 1,
 *        2, 3, 4, 5, and 6.
 
-*  Algorithm:
-*     -  Open graphics device and start database activity.
-*     -  Determine the mode required (including cursor), and whether or
-*     not the current picture is to enclose the new picture. If not
-*     get the BASE picture and viewport, otherwise get the viewport associated
-*     with the current picture.
-*     -  If mode is cursor prepare the cursor.  If a cursor and one
-*     choice could not be obtained report what has happened and
-*     determine a new mode (excluding cursor).
-*     -  Determine whether or not an outline is required.
-*     -  If the mode is cursor get the bounds of the current picture and
-*     find its centre.  Then get two x-y points defining the new
-*     picture via a cursor starting from the centre and checking the
-*     points do not lie outside the current picture.
-*     -  If the mode is xy get two x-y points defining the new picture
-*     from the environment
-*     -  If the mode is array then
-*        o  Get the number of pictures horizontally and vertically.
-*        o  Get the prefix, and if null switch off labelling
-*        o  Find maximum label start number depending on prefix length
-*        and array size.  Get the label start number.
-*        o  Inquire the bounds of the existing picture.  For each
-*        picture in the array:
-*           -  Select the original picture identifier and viewport. Compute
-*           its bounds, create the new viewport. Draw a box around the viewport
-*           if requested. Save the new viewport in the database.  If
-*           labelling required form the label from the prefix and
-*           current label number, and then store in the database.
-*        o  If an error occurred, report that the current picture has
-*        not been switched.
-*        o  Make the bottom-left picture in the array the current
-*        picture.
-*     -  If the mode is a position code get linear fractions of the
-*     current viewport, and the picture aspect ratio.  Obtain x-y limits
-*     given the justification, fractions, and aspect ratio.
-*     -  For non-array modes create the new viewport, draw a box around it
-*     if requested, and save the new viewport in the database.
-*     -  If an error occurred, report that the current picture has not
-*     been switched.
-*     -  Deactivate plotting package and cancel AGI device
-
 *  Related Applications:
 *     KAPPA: PICBASE, PICCUR, PICDATA, PICFRAME, PICGRID, PICLABEL,
 *            PICLIST, PICSEL, PICXY.
@@ -484,6 +443,12 @@
 
 *  End of current-picture-to-be-used check
       END IF
+
+*  PGPLOT resets the colour palette when the device is opened (which
+*  occurs when AGI creates the first PGPLOT viewport - above). Therefore we
+*  need to re-instate the colour palette set by the user, reading it from
+*  the HDS file kappa-palette.sdf in the users adam directory.
+      CALL KPG1_PLLOD( STATUS )
 
 *  Has cursor mode been requested, but there is no cursor?
       IF( MODE .EQ. 'CURSOR' .AND. STATUS .EQ. SAI__OK ) THEN
