@@ -210,6 +210,8 @@
 
       DOUBLE PRECISION		DVALUE			! Keyword value
 
+      REAL			RVALUE			!
+
       INTEGER			FSTAT			! FITSIO status
       INTEGER			HID			! HDU object
       INTEGER			IKEY			! Loop over keys
@@ -245,6 +247,9 @@
           IF ( CLASS(1:1) .EQ. 'D' ) THEN
             CALL ADI_GET0D( KID, DVALUE, STATUS )
             CALL FTPKYG( LUN, KEY, DVALUE, 8, CMT, FSTAT )
+          ELSE IF ( CLASS(1:1) .EQ. 'R' ) THEN
+            CALL ADI_GET0R( KID, RVALUE, STATUS )
+            CALL FTPKYE( LUN, KEY, RVALUE, 8, CMT, FSTAT )
           ELSE IF ( CLASS(1:1) .EQ. 'I' ) THEN
             CALL ADI_GET0I( KID, IVALUE, STATUS )
             CALL FTPKYJ( LUN, KEY, IVALUE, CMT, FSTAT )
