@@ -6338,13 +6338,14 @@ c        REAL XX,XP,YP
 *  Local constants :
 *  Local variables :
       CHARACTER*132 BUFF
-      INTEGER ID,NB
+      INTEGER ID,MB,NB
 *-
       IF (STATUS.EQ.SAI__OK) THEN
 
         BUFF=CVAL
         CALL NBS_FIND_ITEM(I_NBID,NAME,ID,STATUS)
-        CALL NBS_PUT_CVALUE(ID,0,BUFF,STATUS)
+        CALL NBS_GET_SIZE(ID,MB,NB,STATUS)
+        CALL NBS_PUT_CVALUE(ID,0,BUFF(:MB),STATUS)
 
 
       ENDIF
