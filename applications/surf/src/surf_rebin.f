@@ -182,6 +182,9 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
+*     Revision 1.39  1997/07/31 19:40:24  timj
+*     Fix bug with propogating of user specified output title OBJECT vs. SOBJECT
+*
 *     Revision 1.38  1997/06/28 00:55:10  timj
 *     Put the ASCII text file part into its own section of the header.
 *
@@ -955,7 +958,7 @@ c
 *  get a title for the output map
 
       CALL PAR_DEF0C ('OUT_OBJECT', SOBJECT, STATUS)
-      CALL PAR_GET0C ('OUT_OBJECT', OBJECT, STATUS)
+      CALL PAR_GET0C ('OUT_OBJECT', SOBJECT, STATUS)
 
 *  get the pixel spacing of the output map
 
