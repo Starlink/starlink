@@ -1,7 +1,8 @@
       SUBROUTINE SURF_WRITE_MAP_INFO( OUT_NDF, OUT_COORDS, OUT_TITLE,
      :     MJD_STANDARD, NFILE, FILENAME, OUT_LONG, OUT_LAT,
-     :     OUT_PIXEL, I_CENTRE, J_CENTRE, NX_OUT, NY_OUT, 
-     :     WAVELENGTH, WRITE_CHOP, CHOP_CRD, CHOP_PA, CHOP_THROW, 
+     :     OUT_PIXEL, I_CENTRE, J_CENTRE, NX_OUT, NY_OUT, WAVELENGTH,
+     :     FILTER, WRITE_CHOP, CHOP_CRD, CHOP_PA, CHOP_THROW, 
+     :     WPLATE, ANGROT,
      :     STATUS)
 *+
 *  Name:
@@ -13,11 +14,12 @@
 *  Invocation:
 *     CALL SURF_WRITE_MAP_INFO( OUT_NDF, OUT_COORDS, OUT_TITLE,
 *    :     MJD_STANDARD, NFILE, FILENAME, OUT_LONG, OUT_LAT,
-*    :     OUT_PIXEL, I_CENTRE, J_CENTRE, NX_OUT, NY_OUT,
-*    :     WRITE_CHOP, CHOP_PA, CHOP_THROW, STATUS )
+*    :     OUT_PIXEL, I_CENTRE, J_CENTRE, NX_OUT, NY_OUT, WAVELENGTH
+*    :     FILTER, WRITE_CHOP, CHOP_PA, CHOP_THROW, WPLATE, ANGROT, 
+*    :     STATUS )
 
 *  Description:
-*     This routine writes Axis, FITS nd WCS information to a rebinned
+*     This routine writes Axis, FITS and WCS information to a rebinned
 *     map file.
 
  
@@ -50,6 +52,8 @@
 *        Size of output map in Y direction
 *     WAVELENGTH = REAL (Given)
 *        Wavelength of the map (microns)
+*     FILTER = CHARACTER (Given)
+*        Name of filter
 *     WRITE_CHOP = LOGICAL (Given)
 *        Write the CHOP information to the header
 *     CHOP_CRD = CHARACTER (Given)
@@ -58,6 +62,11 @@
 *        Chop position angle in degrees east of north
 *     CHOP_THROW = REAL (Given)
 *        Chop throw in arcsec
+*     WPLATE = REAL (Given)
+*        Wave plate angle (ignored if bad value).
+*     ANGROT = REAL (Given)
+*        POLPACK rotation angle between waveplate and X pixel axis
+*        (ignored if bad value)
 *     STATUS = INTEGER (Given and Returned)
 *        The global status
 
@@ -89,10 +98,12 @@
 
 *  Arguments Given:
       INTEGER          NFILE
+      REAL             ANGROT
       CHARACTER*(*)    CHOP_CRD
       REAL             CHOP_PA
       REAL             CHOP_THROW
       CHARACTER*(*)    FILENAME (NFILE)
+      CHARACTER*(*)    FILTER
       INTEGER          I_CENTRE
       INTEGER          J_CENTRE
       DOUBLE PRECISION MJD_STANDARD
@@ -106,6 +117,7 @@
       CHARACTER * (*)  OUT_TITLE
       LOGICAL          USEWCS
       REAL             WAVELENGTH
+      REAL             WPLATE
       LOGICAL          WRITE_CHOP
 
 *  Status
@@ -328,6 +340,8 @@
       END IF
 
 *     This is the SCUBA software so I know the instrument and telescope
+*     This will be incorrect for UKT14 data if I ever get around to
+*     fixing that
 
       INSTRUMENT = 'SCUBA'
       TELESCOPE = 'JCMT-Hawaii'
@@ -388,6 +402,25 @@
       CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS,
      :     'FREQ', FREQ, 'Frequency of observation (Hz)', STATUS)
       
+*     Write the FILTER name
+      CALL SCULIB_PUT_FITS_C(SCUBA__MAX_FITS, N_FITS, FITS,
+     :     'FILTER', FILTER, 'SCUBA filter name',
+     :     STATUS)
+
+*     Store the polarimeter information
+
+      IF (ANGROT .NE. VAL__BADR) THEN
+         CALL SCULIB_PUT_FITS_D( SCUBA__MAX_FITS, N_FITS, FITS,
+     :        'ANGROT', DBLE(ANGROT), 
+     :        'Angle between X-pixel axis and wplate 0 (deg)', STATUS)
+      END IF
+      IF (WPLATE .NE. VAL__BADR) THEN
+         CALL SCULIB_PUT_FITS_D( SCUBA__MAX_FITS, N_FITS, FITS,
+     :        'WPLATE', DBLE(WPLATE), 
+     :        'Wave-plate P.A. (anti-clockwise, degrees)',
+     :        STATUS)
+      END IF
+
 *     Store SCUBA projection name
 
       CALL SCULIB_PUT_FITS_C(SCUBA__MAX_FITS, N_FITS, FITS,
