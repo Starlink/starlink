@@ -90,7 +90,7 @@
             vpath CURRENT DEFAULT
             ppath CURRENT DEFAULT
             default NDF
-            prompt {Store transformation structures in}
+            prompt {Store transformation structures in (NDF,FILE)}
             helpkey *
           }
 
@@ -100,7 +100,7 @@
             vpath PROMPT
             ppath CURRENT DEFAULT
             default WCS
-            prompt {How transformation is written to output NDF}
+            prompt {How transformation is written to NDF (WCS,TRANSFORM)}
             helpkey *
           }
 
@@ -232,6 +232,15 @@
             ppath CURRENT
             helpkey *
           }
+
+         parameter usewcs {
+            type _LOGICAL
+            access READ
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default TRUE
+            helpkey *
+         }
 
          parameter fa {
             type LITERAL
