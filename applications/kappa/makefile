@@ -1125,7 +1125,13 @@ TRN_PAR:     $(STAR_INC)/trn_par;     $(LINK) $? $@
 #  Rules for extracting source files from the source archive.  Split to
 #  avoid "too many lefts".
 #
-$(PUBLIC_SCRIPTS) $(STARTUP_SCRIPT) $(LINK_SCRIPT) $(ICL_SCRIPT) \
+$(LINK_SCRIPT):
+	$(TAR_OUT) $(PKG_NAME)_source.tar $@ ;\
+           chmod 755 $(LINK_SCRIPT)
+	@ if test -f $@; then :;\
+           else echo $@ is not in the tar file; exit 1; fi
+
+$(PUBLIC_SCRIPTS) $(STARTUP_SCRIPT) $(ICL_SCRIPT) \
 $(I_KAPPA) $(PLATFORM_F) $(HELP_SOURCES) $(MONO_SOURCE) \
 $(STYLE_FILES) $(DEMO_FILES):
 	$(TAR_OUT) $(PKG_NAME)_source.tar $@
