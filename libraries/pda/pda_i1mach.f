@@ -1,4 +1,5 @@
       INTEGER FUNCTION PDA_I1MACH(I)
+      IMPLICIT NONE
       INTEGER I
 C
 C    I1MACH( 1) = THE STANDARD INPUT UNIT.
@@ -248,7 +249,7 @@ C
  9020 FORMAT(/' Adjust I1MACH by uncommenting data statements'/
      * ' appropriate for your machine.')
       IF (I .LT. 1  .OR.  I .GT. 16) GO TO 40
-      I1MACH = IMACH(I)
+      PDA_I1MACH = IMACH(I)
       RETURN
  40   WRITE(*,*) 'I1MACH(I): I =',I,' is out of bounds.'
       STOP

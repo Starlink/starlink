@@ -1,4 +1,5 @@
       DOUBLE PRECISION FUNCTION PDA_D1MACH(I)
+      IMPLICIT NONE
       INTEGER I
 C
 C  DOUBLE-PRECISION MACHINE CONSTANTS
@@ -180,7 +181,7 @@ C     ON FIRST CALL, IF NO DATA UNCOMMENTED, TEST MACHINE TYPES.
          WRITE(*,*) 'D1MACH(I): I =',I,' is out of bounds.'
          STOP
          END IF
-      D1MACH = DMACH(I)
+      PDA_D1MACH = DMACH(I)
       RETURN
  9000 FORMAT(/' Adjust D1MACH by uncommenting data statements'/
      *' appropriate for your machine.')
