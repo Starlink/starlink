@@ -82,6 +82,10 @@
                                  ! trailing blanks
 
 *  Local Constants:
+      INTEGER FITSOK             ! Value of good FITSIO status
+      PARAMETER( FITSOK = 0 )
+
+
       DOUBLE PRECISION PRECF     ! The factor times the machine
                                  ! precision above which the ratio of
                                  ! the scale factor to offset must lie

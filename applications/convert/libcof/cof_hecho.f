@@ -70,6 +70,10 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
+*  Local Constants:
+      INTEGER   FITSOK           ! Value of good FITSIO status
+      PARAMETER( FITSOK = 0 )
+
 *  Local Variables:
       INTEGER FSTAT              ! FITSIO status
       INTEGER I                  ! Loop counter
