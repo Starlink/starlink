@@ -86,6 +86,9 @@
 *    Status :
       INTEGER STATUS
 *    External references :
+      INTEGER GETCWD
+      INTEGER CHDIR
+      EXTERNAL GETCWD, CHDIR
 *    Global variables :
 *    Local Constants :
       INTEGER MAXDIM
@@ -101,6 +104,8 @@
                                         ! for each beam
       LOGICAL CALIBRATOR                ! .TRUE. if internal calibrator was ON
       CHARACTER*15 CHOP_FUNCTION        ! type of chop used
+      CHARACTER*64 CWD                  ! Current directory
+      CHARACTER*64 DATA_DIR             ! Data directory
       CHARACTER*20 DATA_KEPT            ! types of data stored in file
       INTEGER DEMOD_CALIBRATOR_END      ! pointer to end of scratch calibrator
       INTEGER DEMOD_CALIBRATOR_PTR      ! pointer to start of scratch calibrator
@@ -118,6 +123,7 @@
       INTEGER EXPOSURE                  ! exposure index in DO loop
       INTEGER EXP_POINTER               ! the offset in the output data array
                                         ! of a reduced exposure result
+      CHARACTER*20 FILENAME             ! Name of data file
       CHARACTER*80 FITS (SCUBA__MAX_FITS)
                                         ! array of FITS keyword lines
       CHARACTER*(DAT__SZLOC) FITS_LOC   ! HDS locator to FITS structure
@@ -128,6 +134,7 @@
       INTEGER INTEGRATION               ! integration index in DO loop
       INTEGER IN_DATA_PTR               ! pointer to data array of input file
       INTEGER IN_DEM_PNTR_PTR           ! pointer to input .SCUBA.DEM_PNTR array
+      INTEGER ISTAT                     ! temporary status
       INTEGER ITEMP                     ! scratch integer
       INTEGER LBND (MAXDIM)             ! lower bounds of array
       CHARACTER*(DAT__SZLOC) LOC1       !
@@ -168,6 +175,7 @@
       INTEGER SWITCH2_START             ! index of first point in switch 2
       INTEGER SWITCH3_END               ! index of last point in switch 3
       INTEGER SWITCH3_START             ! index of first point in switch 3
+      LOGICAL TRYING                    ! Logical to find NDF files
       INTEGER UBND (MAXDIM)             ! upper bounds of array
       LOGICAL USE_CALIBRATOR            ! .TRUE. if internal calibrator signal
                                         ! is be divided into the data
@@ -177,15 +185,49 @@
 
       IF (STATUS .NE. SAI__OK) RETURN
 
-*  does the user want to divide the data by the internal calibrator
-
-      CALL PAR_GET0L ('USE_CALIBRATOR', USE_CALIBRATOR, STATUS)
-
 *  start up the NDF system and read in the demodulated data file
 
       CALL NDF_BEGIN
 
-      CALL NDF_ASSOC ('IN', 'READ', IN_NDF, STATUS)
+      TRYING = .TRUE.
+      DO WHILE (TRYING)
+
+         CALL PAR_GET0C ('IN', FILENAME, STATUS)
+         CALL PAR_CANCL('IN', STATUS)
+         CALL NDF_FIND(DAT__ROOT, FILENAME, IN_NDF, STATUS)
+
+*  The file could be in DATADIR
+
+         IF (STATUS.NE. SAI__OK) THEN
+            CALL GETENV('DATADIR', DATA_DIR)
+
+            ISTAT = GETCWD(CWD)
+            IF (ISTAT .EQ. 0) THEN
+               ISTAT = CHDIR(DATA_DIR)
+               IF (ISTAT .EQ. 0) THEN
+                  CALL ERR_ANNUL(STATUS)
+                  CALL NDF_FIND(DAT__ROOT, FILENAME, IN_NDF, STATUS)
+                  ISTAT = CHDIR(CWD)
+                  IF (STATUS .EQ. SAI__OK) TRYING = .FALSE.
+               END IF
+            END IF
+         ELSE
+            TRYING = .FALSE.
+         END IF
+         
+         IF (TRYING) THEN
+            CALL ERR_ANNUL(STATUS)
+            CALL MSG_OUT(' ','REDS_REDUCE_SWITCH: Failed to'//
+     :           ' find requested file in CWD and DATADIR',
+     :           STATUS)
+         END IF
+
+      END DO
+
+*  does the user want to divide the data by the internal calibrator
+
+      CALL PAR_GET0L ('USE_CALIBRATOR', USE_CALIBRATOR, STATUS)
+
 
 *  get some general descriptive parameters of the observation
 
@@ -213,6 +255,13 @@
       CALL MSG_SETI ('RUN', RUN_NUMBER)
       CALL MSG_OUT (' ', 'REDS: run ^RUN was a ^MODE observation '//
      :  'of object ^OBJECT', STATUS)
+
+      IF (OBSERVING_MODE .EQ. 'SKYDIP') THEN
+         STATUS = SAI__ERROR
+         CALL ERR_REP (' ','REDS: REDUCE_SWITCH can not be run on '//
+     :        '^MODE observations', STATUS)
+      ENDIF
+
 
 *  check that the history of the input file is OK
 
@@ -415,17 +464,23 @@
 *  get some scratch memory and copy the different sections of the data array
 *  into it
 
+*      PRINT *, 'Malloc', N_BOLS, N_POS
       CALL SCULIB_MALLOC (N_BOLS * N_POS * VAL__NBR, DEMOD_DATA_PTR,
      :  DEMOD_DATA_END, STATUS)
+*      PRINT *, 'Malloc', N_BOLS, N_POS, STATUS
       CALL SCULIB_MALLOC (N_BOLS * N_POS * VAL__NBR, DEMOD_VARIANCE_PTR,
      :  DEMOD_VARIANCE_END, STATUS)
+*      PRINT *, 'Malloc', N_BOLS, N_POS, STATUS
       CALL SCULIB_MALLOC (N_BOLS * N_POS * VAL__NBR,
      :  DEMOD_CALIBRATOR_PTR, DEMOD_CALIBRATOR_END, STATUS)
+*      PRINT *, 'Malloc', N_BOLS, N_POS, STATUS
       CALL SCULIB_MALLOC (N_BOLS * N_POS * VAL__NBR, 
      :  DEMOD_CAL_VARIANCE_PTR, DEMOD_CAL_VARIANCE_END, STATUS)
+*      PRINT *, 'Malloc', N_BOLS, N_POS, STATUS
       CALL SCULIB_MALLOC (N_BOLS * N_POS * VAL__NBUB, DEMOD_QUALITY_PTR,
      :  DEMOD_QUALITY_END, STATUS)
 
+*      PRINT *,'About to DEMOD_SWITCH', STATUS
       IF (STATUS .EQ. SAI__OK) THEN
          CALL SCULIB_COPY_DEMOD_SWITCH (N_BOLS, N_POS, SPIKE_LEVEL,
      :     %val(IN_DATA_PTR), %val(DEMOD_DATA_PTR),
@@ -436,6 +491,7 @@
 
 *  if required, divide the calibrator signal into the data
 
+*      PRINT *,'About to CALIB'
       IF (STATUS .EQ. SAI__OK) THEN
          IF (USE_CALIBRATOR) THEN
             CALL SCULIB_DIV_CALIBRATOR (N_BOLS * N_POS,
