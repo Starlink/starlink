@@ -187,6 +187,7 @@ typedef enum {
    OP_SIN,                       /* Sine (radians) */
    OP_SIND,                      /* Sine (degrees) */
    OP_SINH,                      /* Hyperbolic sine */
+   OP_SQR,                       /* Square */
    OP_SQRT,                      /* Square root */
    OP_TAN,                       /* Tangent (radians) */
    OP_TAND,                      /* Tangent (degrees) */
@@ -316,6 +317,7 @@ static const Symbol symbol[] = {
    { "sin("        ,  4,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_SIN      },
    { "sind("       ,  5,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_SIND     },
    { "sinh("       ,  5,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_SINH     },
+   { "sqr("        ,  4,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_SQR      },
    { "sqrt("       ,  5,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_SQRT     },
    { "tan("        ,  4,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_TAN      },
    { "tand("       ,  5,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_TAND     },
@@ -2169,6 +2171,7 @@ static void EvaluateFunction( Rcontext *rcontext, int npoint,
             ARG_1( OP_SIN,      *y = sin( x ) )
             ARG_1( OP_SIND,     *y = sin( x * d2r ) )
             ARG_1( OP_SINH,     *y = CATCH_MATHS_OVERFLOW( sinh( x ) ) )
+            ARG_1( OP_SQR,      *y = SAFE_MUL( x, x ) )
             ARG_1( OP_SQRT,     *y = ( x >= 0.0 ) ? sqrt( x ) : AST__BAD )
             ARG_1( OP_TAN,      *y = CATCH_MATHS_OVERFLOW( tan( x ) ) )
             ARG_1( OP_TAND,     *y = tan( x * d2r ) )
@@ -5537,19 +5540,92 @@ f     AST_MATHMAP = INTEGER
 *     - isbad( x ): Returns a boolean result (0 or 1) indicating whether "x" is
 *     set to the missing-data value <bad> (equal to AST__BAD).
 
-*  Functions Available:
+*  Functions:
 *     The following functions may appear in transformation functions
-*     with the number of argumnents indicated:
+*     with the number of arguments indicated:
+*     - abs(x): Absolute value of "x" (sign removal), same as fabs(x).
+*     - acos(x): Inverse cosine of "x", in radians.
+*     - acosd(x): Inverse cosine of "x", in degrees.
+*     - aint(x): Integer part of "x" (round towards zero), same as int(x).
+*     - asin(x): Inverse sine of "x", in radians.
+*     - asind(x): Inverse sine of "x", in degrees.
+*     - atan(x): Inverse tangent of "x", in radians.
+*     - atan2(x1, x2): Inverse tangent of "x1/x2", in degrees.
+*     - atan2(x1, x2): Inverse tangent of "x1/x2", in radians.
+*     - atand(x): Inverse tangent of "x", in degrees.
+*     - ceil(x): Smallest integer value not less then "x" (round towards
+*       plus infinity).
 *     - cos(x): Cosine of "x" in radians.
+*     - cosd(x): Cosine of "x" in degrees.
+*     - cosh(x): Hyperbolic cosine of "x".
+*     - dim(x1, x2): Returns "x1-x2" if "x1" is greater than "x2", otherwise 0.
+*     - exp(x): Exponential function of "x".
+*     - fabs(x): Absolute value of "x" (sign removal), same as abs(x).
+*     - floor(x): Largest integer not greater than "x" (round towards
+*       minus infinity).
+*     - fmod(x1, x2): Remainder when "x1" is divided by "x2", same as
+*       mod(x1, x2).
+*     - gauss(x1, x2): Random sample from a Gaussian distribution with mean
+*       "x1" and standard deviation "x2".
+*     - int(x): Integer part of "x" (round towards zero), same as aint(x).
+*     - isbad(x): Returns 1 if "x" has the <bad> value (AST__BAD), otherwise 0.
+*     - log(x): Natural logarithm of "x".
+*     - log10(x): Logarithm of "x" to base 10.
+*     - max(x1, x2, ...): Maximum of two or more values.
+*     - min(x1, x2, ...): Minimum of two or more values.
+*     - mod(x1, x2): Remainder when "x1" is divided by "x2", same as
+*       fmod(x1, x2).
+*     - nint(x): Nearest integer to "x" (round to nearest).
+*     - poisson(x): Random integer-valued sample from a Poisson
+*       distribution with mean "x".
+*     - pow(x1, x2): "x2" raised to the power of "x2".
+*     - rand(x1, x2): Random sample from a uniform distribution in the
+*       range "x1" to "x2" inclusive.
+*     - sign(x1, x2): Absolute value of "x1" with the sign of "x2"
+*       (transfer of sign).
 *     - sin(x): Sine of "x" in radians.
+*     - sind(x): Sine of "x" in degrees.
+*     - sinh(x): Hyperbolic sine of "x".
+*     - sqr(x): Square of "x" (= "x*x").
+*     - sqrt(x): Square root of "x".
 *     - tan(x): Tangent of "x" in radians.
 *     - tand(x): Tangent of "x" in degrees.
+*     - tanh(x): Hyperbolic tangent of "x".
 
-*  Mathematical Constants:
-*     The following mathematical constants may appear in transformation
-*     functions (with the enclosing <> brackets):
-*     - <e>: The base of natural logarithms.
-*     - <pi>: The ratio of the circumference of a circle to its diameter.
+*  Constants:
+*     Literal constants, such as "0", "1", "0.007" or "2.505e-16" may be
+*     used in transformation functions, with the decimal point and exponent
+*     being optional. A unary minus "-" may be used as a prefix.  In
+*     addition, the following symbolic constants may be used (the enclosing
+*     <> brackets being required):
+*     - <bad>: The "bad" value (AST__BAD) used to flag missing data. Note
+*       that you cannot usefully compare values with this constant (the result
+*       is always <bad>). The isbad() function should be used instead.
+*     - <dig>: Number of decimal digits of precision available (in a
+*       double coordinate value).
+*     - <e>: Base of natural logarithms.
+*     - <epsilon>: Smallest number such that "1.0+<epsilon>" is
+*       distinguishable from "1.0".
+*     - <mant_dig>: The number of base "<radix>" digits stored in the
+*       mantissa of a floating-point (double) value.
+*     - <max>: Maximum representable double value.
+*     - <max_10_exp>: Maximum integer such that 10 raised to that power
+*       can be represented as a double value.
+*     - <max_exp>: Maximum integer such that "<radix>" raised to that
+*       power minus 1 can be represented as a double value.
+*     - <min>: Smallest positive number which can be represented as a
+*       (normalised) double value.
+*     - <min_10_exp>: Minimum negative integer such that 10 raised to that
+*       power can be represented as a (normalised) double value.
+*     - <min_exp>: Minimum negative integer such that "<radix>" raised to
+*       that power minus 1 can be represented as a (normalised) double value.
+*     - <pi>: Ratio of the circumference of a circle to its diameter.
+*     - <radix>: The radix (number base) used to represent the mantissa of
+*       floating-point (double) values.
+*     - <rounds>: The mode used for rounding floating-point results after
+*       addition. Possible values include: -1 (indeterminate), 0 (toward
+*       zero), 1 (to nearest), 2 (toward plus infinity) and 3 (toward minus
+*       infinity). Other values indicate machine-dependent behaviour.
 
 *  Evaluation Precedence:
 *     Operators appearing in transformation functions are evaluated in the
