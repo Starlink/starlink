@@ -27,7 +27,6 @@
 *    Local Constants :
 *    Local variables :
       CHARACTER*132 BUFF
-      CHARACTER*12 ISDIR,ISSEQ
       LOGICAL ISAFILE
 *-
       IF (STATUS.EQ.SAI__OK) THEN
@@ -59,12 +58,9 @@
 *  if relative path defined then append it
           IF (CHR_LEN(REL).GT.0) THEN
 *  but first see if what we have already points to a file
-            INQUIRE(FILE=BUFF,EXIST=ISAFILE,
-     :         DIRECT=ISDIR,SEQUENTIAL=ISSEQ)
-*  exclude directories
-           ISAFILE=(ISAFILE.AND.(ISDIR.EQ.'YES'.OR.ISSEQ.EQ.'YES'))
+            CALL AST_PATH_TRY(BUFF,ISAFILE,STATUS)
             IF (.NOT.ISAFILE) THEN
-              INQUIRE(FILE=BUFF(1:L)//'.sdf',EXIST=ISAFILE)
+              CALL AST_PATH_TRY(BUFF(1:L)//'.sdf',ISAFILE,STATUS)
             ENDIF
 *  could be case that default expects filename to be added
             IF (ISAFILE) THEN
@@ -100,6 +96,36 @@
           CALL ERR_REP(' ','from AST_PATH',STATUS)
         ENDIF
 
+      ENDIF
+
+      END
+
+
+
+      SUBROUTINE AST_PATH_TRY(NAME,ISAFILE,STATUS)
+
+      IMPLICIT NONE
+
+      INCLUDE 'SAE_PAR'
+
+      INTEGER STATUS
+
+      CHARACTER*(*) NAME
+      LOGICAL ISAFILE
+
+      INTEGER ISTAT,UNIT
+
+      IF (STATUS.NE.SAI__OK) RETURN
+
+      CALL FIO_GUNIT(UNIT,STATUS)
+      OPEN(UNIT,FILE=NAME,IOSTAT=ISTAT)
+
+      IF (ISTAT.EQ.0) THEN
+        CLOSE(UNIT)
+        CALL FIO_PUNIT(UNIT,STATUS)
+        ISAFILE=.TRUE.
+      ELSE
+        ISAFILE=.FALSE.
       ENDIF
 
       END
