@@ -1,10 +1,21 @@
-*+  MOSAIC - Merges several non-congruent 2-d data arrays into one
-*            output data array
-
       SUBROUTINE MOSAIC ( STATUS )
-*
-*    Description :
-*
+*+
+*  Name:
+*     MOSAIC
+
+*  Purpose:
+*     Mosaic up to 20 non-congruent 2-d data arrays.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     ADAM A-task
+
+*  Invocation
+*     CALL MOSAIC( STATUS )
+
+*  Description:
 *     Up to 20 non-congruent 2-d data arrays may be input, along with
 *     their relative offsets from the first data array, and these are
 *     then made into a mosaic into one (usually larger) output 2-d data
@@ -18,141 +29,42 @@
 *     arrays, yet have no good pixels contributing, are set to bad.
 *     Pixels in the output data array not mapped by any of the input
 *     arrays are set to zero.
-*
-*    Invocation :
-*
-*     CALL MOSAIC( STATUS )
-*
-*    Parameters :
-*
-*     NUMBER  =  INTEGER( READ )
+
+*  ADAM Parameters:
+*     NUMBER = _INTEGER (READ)
 *         Number of data arrays to be merged
-*     AVERAGE  = LOGICAL( READ )
+*     AVERAGE  = _LOGICAL (READ)
 *         If true overlap regions are averaged, alternatively, they are
-*           summed
-*     INPICn  =  IMAGE( READ )
+*         summed
+*     INPICn = IMAGE (READ)
 *         nth IMAGE structure containing a data array to be a
 *           constituent of a mosaic
-*     OUTPIC  =  IMAGE( WRITE )
+*     OUTPIC = IMAGE (WRITE)
 *         Output IMAGE structure containing the merged data array
-*     OTITLE  =  CHAR( READ )
+*     OTITLE = LITERAL (READ)
 *         Title for the output IMAGE structure
-*     XOFFSET =  INTEGER( READ )
+*     XOFFSET =  _INTEGER (READ)
 *         x offset of nth data array from the first, in the sense of the
 *         x origin of the nth data array minus the x origin of the
 *         first.
-*     YOFFSET =  INTEGER( READ )
+*     YOFFSET =  _INTEGER (READ)
 *         y offset of nth data array from the first, in the sense of the
 *         y origin of the nth data array minus the y origin of the
 *         first.
-*
-*    Arguments:
-*
-*     STATUS  = INTEGER( READ, WRITE )
-*         Global status value
-*
-*    Method :
-*
-*     Check for error on entry - return if not o.k.
-*     Get number of frames to be merged
-*     Determine whether or not averaging of overlapped regions required
-*     Initialise good frame flag and counter
-*     For each frame
-*        Get locator for input structure
-*        If there is an error then
-*           If error is not abort request then
-*              Report error and set good data flag to bad
-*              Increment first good frame counter if the current
-*                frame number has the same value
-*           Else
-*              Return after unmapping and annulling data
-*                successfully accessed
-*           Endif
-*        Else
-*           Map its data-array component
-*           If there is an error then
-*              Annul current frame
-*              If error is not abort request then
-*                 Report error and set good data flag to bad
-*                 Increment first good frame counter if the current
-*                   frame number has the same value
-*              Else
-*                 Return after unmapping and annulling data
-*                   successfully accessed
-*              Endif
-*           Else
-*              If not the first frame then
-*                 Get the x,y offsets
-*                 If there is an error then
-*                    Annul and unmap current frame
-*                    If error is not abort request then
-*                       Report error and set good data flag to bad
-*                         current frame number has the same value
-*                    Else
-*                       Return after unmapping and annulling data
-*                         successfully accessed
-*                    Endif
-*                 Else
-*                    Set the good data flag to true
-*                 Endif
-*              Else
-*                 Set the good data flag to true
-*                 Set both offsets to be zero
-*              Endif
-*           Endif
-*        Endif
-*     Endfor
-*     Find the maximum and minimum offsets of the good frames
-*     Calculate size of output frame and inform user
-*     If either dimension is zero, meaning there were no valid input
-*       frames then
-*        Report error, set error status and return
-*     Endif
-*     For each good frame
-*        Redefine offsets to be relative to the minima
-*     Endfor
-*     Create output IMAGE structure
-*     Propagate NDF MORE from the input data file
-*     If no error so far
-*        Map new data-array component in output structure
-*        If no error so far
-*           Create and map work space for mask
-*           If no error then
-*              Zero mask and output arrays
-*              If no error then
-*                 For all good frames
-*                    Call routine which actually makes the mosaic
-*                 Endfor
-*                 If no error and averaging required then
-*                    Normalise output array by the mask
-*                 Endif
-*              Endif
-*              Tidy workspace
-*           Else
-*              Report error
-*           Endif
-*           Unmap output data array
-*        Else
-*           Report error context
-*        Endif
-*        Tidy output IMAGE structure
-*     Else
-*        Report error context
-*     Endif
-*     Tidy input structures
-*     End
-*
-*    Bugs :
-*
-*     None known.
-*
-*    Authors :
-*
-*     Malcolm J. Currie RAL (UK.AC.RL.STAR::CUR)
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Related Applications:
+*     CCDPACK: MAKEMOS.
+
+*  Authors:
+*     MJC: Malcolm J. Currie  STARLINK
 *     Mark McCaughrean UOE (REVA::MJM)
-*
-*    History :
-*
+*     {enter_new_authors_here}
+
+*  History:
 *     16-09-1985 : First implementation (REVA::MJM)
 *     1986 Aug 7 : Renamed algorithm subroutines (MOSAIC_ADD to MOSCAD,
 *                  MOSAIC_DIV to MOSCDV). Correctly ordered arguments
@@ -184,6 +96,13 @@
 *     1992 Feb 25: Limited processing of simple NDFs (RAL::CUR).
 *     1992 Mar  3: Replaced AIF parameter-system calls by the extended
 *                  PAR library (RAL::CUR).
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_new_bugs_here}
+
+*-
+
 *
 *    Type Definitions :
 
@@ -302,7 +221,7 @@
 
 *    now get the required number of DATA_ARRAYs
 
-      DO  I  =  1, NUMBER
+      DO  I = 1, NUMBER
 
 *       tell user which number frame is required
 
@@ -445,8 +364,8 @@
 
 *               no offset for first frame
 
-                  XOFSET( 1 )  =  0
-                  YOFSET( 1 )  =  0
+                  XOFSET( 1 ) = 0
+                  YOFSET( 1 ) = 0
 
 *                the data array and offsets are all in order so set
 *                the good data flag for this frame
@@ -474,14 +393,14 @@
 
 *    initialise the maxima and minima values
 
-      MINX  =  0
-      MINY  =  0
-      MAXX  =  0
-      MAXY  =  0
+      MINX = 0
+      MINY = 0
+      MAXX = 0
+      MAXY = 0
 
 *    loop round for each good input frame
 
-       DO  J  =  1, NUMBER
+       DO  J = 1, NUMBER
 
          IF ( GOODAT( J ) ) THEN
 
@@ -493,8 +412,8 @@
 *          just use MAX function for the maxima; maxima are found
 *          from the offset plus frame size relative to first frame
 
-            MAXX  =  MAX( MAXX, IDIMS( 1, J ) + XOFSET( J ) )
-            MAXY  =  MAX( MAXY, IDIMS( 2, J ) + YOFSET( J ) )
+            MAXX = MAX( MAXX, IDIMS( 1, J ) + XOFSET( J ) )
+            MAXY = MAX( MAXY, IDIMS( 2, J ) + YOFSET( J ) )
 
 *       end of valid-data-and-offsets check
 
@@ -505,8 +424,8 @@
 *    calculate size of output frame from the extrema in the
 *    offset values
 
-      ODIMS( 1 )  =  MAXX - MINX
-      ODIMS( 2 )  =  MAXY - MINY         
+      ODIMS( 1 ) = MAXX - MINX
+      ODIMS( 2 ) = MAXY - MINY         
 
 *    inform user of output array dimensions
 
@@ -531,10 +450,10 @@
 *    redefine offsets to be relative to the origin in the output array
 *    so that the offsets will not be negative
 
-      DO  K  =  1, NUMBER
+      DO  K = 1, NUMBER
          IF ( GOODAT( K ) ) THEN
-            XOFSET( K )  =  XOFSET( K ) - MINX
-            YOFSET( K )  =  YOFSET( K ) - MINY
+            XOFSET( K ) = XOFSET( K ) - MINX
+            YOFSET( K ) = YOFSET( K ) - MINY
          END IF
       END DO         
 
@@ -583,7 +502,7 @@
 *                add each array into the (big) output array, updating
 *                the array mask at the same time, using MOSCAD
 
-                  DO  L  =  1, NUMBER
+                  DO  L = 1, NUMBER
                      IF ( GOODAT( L ) ) THEN
 
                         CALL MOSCAD( %VAL( PNTRI( L ) ), IDIMS( 1, L ),
@@ -655,7 +574,7 @@
 *    unmap all the input data arrays and annul the locators
 
  998  CONTINUE
-      DO  M  =  1, NUMREA
+      DO  M = 1, NUMREA
          CALL CMP_UNMAP( LOCDI( M ), DNAMEI( M ), STATUS )
          CALL DAT_ANNUL( LOCDI( M ), STATUS )
          CALL DAT_ANNUL( LOCI( M ), STATUS )

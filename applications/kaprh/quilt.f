@@ -1,10 +1,22 @@
-*+  QUILT - Generates a mosaic from equally sized 2-d data arrays,
-*           optionally specified from an ASCII file
-
       SUBROUTINE QUILT ( STATUS )
+*+
+*  Name:
+*     QUILT
 
-*    Description :
-*
+*  Purpose:
+*     Generates a mosaic from equally sized 2-d data arrays, optionally 
+*     specified from an ASCII file
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     ADAM A-task
+
+*  Invocation
+*     CALL QUILT( STATUS )
+
+*  Description:
 *     This routine provides a more-sophisticated version of the MOSAIC
 *     application for combining many 2-d data arrays into one large
 *     output data array. All the data arrays are stored in IMAGE
@@ -42,193 +54,65 @@
 *     data array.
 *
 *     Bad pixels are processed by the magic-value method.
-*
-*    Invocation :
-*
-*     CALL QUILT( STATUS )
-*
-*    Parameters :
-*
-*     WHERE  =  CHAR( READ )
+
+*  ADAM Parameters:
+*     WHERE = LITERAL (READ)
 *         Whether input comes from an ASCII 'File' or from the
-*           'Interface'.
-*     FNAME  =  CHAR( READ )
+*         'Interface'.
+*     FNAME = LITERAL (READ)
 *         Name of the ASCII file holding the input information to define
-*           the mosaic.
-*     NUMBER  =  INTEGER( READ )
+*         the mosaic.
+*     NUMBER = _INTEGER (READ)
 *         Number of data arrays to form the mosaic.
-*     INPICI  =  IMAGE( READ )
+*     INPICI = IMAGE (READ)
 *         IMAGE structure containing the central data array (offset
-*           0,0).
-*     MAXX  =  INTEGER( READ )
+*         0,0).
+*     MAXX = _INTEGER (READ)
 *         Maximum x offset of any data array from the central data array
-*           (must be >= 0) (Interface mode).
-*     MAXY  =  INTEGER( READ )
+*         (must be >= 0) (Interface mode).
+*     MAXY = _INTEGER (READ)
 *         Maximum y offset of any data array from the central data array
-*           (must be >= 0) (Interface mode).
-*     MINX  =  INTEGER( READ )
+*         (must be >= 0) (Interface mode).
+*     MINX = _INTEGER (READ)
 *         Minimum x offset of any data array from the central data array
-*           (must be =< 0) (Interface mode).
-*     MINY  =  INTEGER( READ )
+*         (must be =< 0) (Interface mode).
+*     MINY = _INTEGER (READ)
 *         Minimum y offset of any data array from the central data array
-*           (must be =< 0) (Interface mode).
-*     AVERAGE  = LOGICAL( READ )
+*         (must be =< 0) (Interface mode).
+*     AVERAGE = _LOGICAL (READ)
 *         If true overlap regions are averaged, alternatively, they are
-*           summed.
-*     OUTPIC  =  IMAGE( WRITE )
+*         summed.
+*     OUTPIC = IMAGE (WRITE)
 *         Output IMAGE structure.
-*     OTITLE  =  CHAR( READ )
+*     OTITLE = LITERAL (READ)
 *         Title string for output IMAGE structure.
-*     CURPIC  =  IMAGE( READ )
+*     CURPIC = IMAGE (READ)
 *         IMAGE containing the current data array being concatenated to
-*           the mosaic.
-*     OFFSETX  =  INTEGER( READ )
+*         the mosaic.
+*     OFFSETX = _INTEGER (READ)
 *         x offset of current data array from the central one (Interface
-*           mode)
-*     OFFSETY  =  INTEGER( READ )
+*         mode)
+*     OFFSETY = _INTEGER (READ)
 *         y offset of current data array from the central one (Interface
-*           mode)
-*
-*    Arguments:
-*
-*     STATUS  = INTEGER( READ, WRITE )
-*         Global status value
-*
-*    Method :
-*
-*     Check for error on entry - return if not o.k.
-*     Get information input method - File or Interface
-*     If from a File then
-*        Call MFOPEN to open File, read number of data arrays, max and
-*          min x-y offsets, and get locator to central data array
-*        If status bad (other than abort) on return then
-*           Report that problem was found with file
-*        Endif
-*     Else from Interface
-*        Get number of data arrays
-*        Get max and min x-y offsets from this data array
-*        If an error occurred then
-*           Report context
-*        Else
-*           Get central data array
-*           If an error occurred then
-*              Report context
-*           Endif
-*        Endif
-*     Endif
-*     If no error so far then
-*        Map in the central data array
-*        If error then 
-*           Report context
-*        Else
-*           Work out size of output array and workspace
-*           Determine whether or not overlapped pixels are to be
-*             averaged
-*           If an error occurred then
-*              Report context
-*           Else
-*              Create output image structure
-*              Propagate NDF MORE from the input data file
-*              If an error occurred then
-*                 Report context
-*              Else
-*                 Map output data array
-*                 If an error occurred then
-*                    Report context
-*                 Else
-*                    Get and map workspace for mask
-*                    If an error occurred then
-*                       Report context
-*                    Else
-*                       Zero output data array and workspace array
-*                       Redefine offsets of central data array to be
-*                         with respect to the lower left corner of the
-*                         output array
-*                       Call MOSCAD to add in central data array
-*                       Output message saying central data array done ok
-*                       Initialise loop counter to 1 so we look at data
-*                         arrays from 2 to NUMBER
-*                       Do while more data arrays to be input and status
-*                         is ok
-*                          Increment loop counter by one
-*                          If input by File then
-*                             Call MFNEXT to get offsets and locator to
-*                               next image
-*                             If there is error on return then
-*                                Report context
-*                             Else if offsets outside range then
-*                                Report error context
-*                                Set status bad
-*                             Endif
-*                          Else 
-*                             Get offsets and next image locator from
-*                               interface
-*                             If there is error on return then
-*                                Report context
-*                             Endif
-*                             Cancel parameters ready for next loop
-*                          Endif
-*                          If no error so far then
-*                             Map next data array
-*                             If there is error on return then
-*                                Report context
-*                             Else
-*                                If current image has same dimensions
-*                                  as central image then
-*                                   Redefine the offsets of the current
-*                                     data array to be with respect to
-*                                     the lower left corner of the
-*                                     output data array
-*                                   Call MOSCAD to insert current data
-*                                     array into the mosaic
-*                                   Output message saying that current
-*                                     data array done
-*                                Else
-*                                   Output message that current data
-*                                     array is not same size as central
-*                                     and will not be included
-*                                Endif
-*                             Endif
-*                             Unmap current data array
-*                          Endif
-*                          Tidy up current image
-*                       Enddo
-*                       If no error and averaging required then
-*                          Call MOSCDV to normalise output data array
-*                            with the mask
-*                       Endif
-*                    Endif
-*                    Tidy up workspace
-*                 Endif
-*                 Unmap output data array
-*              Endif
-*              Tidy output image
-*           Endif
-*           Unmap central data array
-*        Endif
-*        Tidy up central image
-*     Endif
-*     If input came from File then
-*        Close file
-*     Endif
-*     End
-*
-*    Deficiencies :
-*
+*         mode)
+
+*  Deficiencies :
 *     Works with like-sized images only and uses Fortran i/o for getting
 *     stuff from a file. 
-*
-*    Bugs :
-*
-*     None known.
-*
-*    Authors :
-*
-*     Mark McCaughrean UoE ( REVA::MJM )
-*     Malcolm J. Currie STARLINK ( RAL::CUR )
-*
-*    History :
-*
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Related Applications:
+*     CCDPACK: MAKEMOS.
+
+*  Authors:
+*     MJC: Malcolm J. Currie  STARLINK
+*     Mark McCaughrean UOE (REVA::MJM)
+*     {enter_new_authors_here}
+
+*  History:
 *     29-12-1986 : First implementation (from MOSAIC) (REVA::MJM)
 *     1988 May 29: KAPPA version, using magic-value bad pixels only
 *                  ( RAL::CUR ).
@@ -240,7 +124,13 @@
 *     1992 Feb 26: Limited processing of simple NDFs (RAL::CUR).
 *     1992 Mar  3: Replaced AIF parameter-system calls by the extended
 *                  PAR library (RAL::CUR).
-*
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_new_bugs_here}
+
+*-
+
 *    Type definitions :
 
       IMPLICIT  NONE           ! no default typing allowed
@@ -259,7 +149,7 @@
 
       INTEGER  
      :  NDIMS                  ! dimensionality of input data arrays
-      PARAMETER( NDIMS  =  2 ) ! 2-d arrays only
+      PARAMETER( NDIMS = 2 ) ! 2-d arrays only
 
 *    Local variables :
 
@@ -416,8 +306,8 @@
 
 *          Work out size of the output data array and workspace array
 
-            ODIMS( 1 )  =  ( MAXI( 1 ) + IDIMS( 1 ) ) - MINI( 1 )
-            ODIMS( 2 )  =  ( MAXI( 2 ) + IDIMS( 2 ) ) - MINI( 2 )
+            ODIMS( 1 ) = ( MAXI( 1 ) + IDIMS( 1 ) ) - MINI( 1 )
+            ODIMS( 2 ) = ( MAXI( 2 ) + IDIMS( 2 ) ) - MINI( 2 )
 
 *          Ask user if want to average the overlap region or not
 
@@ -507,8 +397,8 @@
 *                      respect to the lower left corner of the output 
 *                      array
 
-                        OFFSET( 1 )  =  -MINI( 1 )
-                        OFFSET( 2 )  =  -MINI( 2 )
+                        OFFSET( 1 ) = -MINI( 1 )
+                        OFFSET( 2 ) = -MINI( 2 )
 
 *                      Insert central data array into output
 
@@ -528,7 +418,7 @@
 *                      Initialise counter at 1 - we have already done
 *                      first data array
 
-                        I  =  1
+                        I = 1
 
 *                      Now loop round all requested input data arrays
 
@@ -537,7 +427,7 @@
 
 *                         Increment counter
 
-                           I  =  I + 1
+                           I = I + 1
 
 *                         Check if input from File
 
@@ -577,7 +467,7 @@
 
 *                               Set up error message and set bad status
 
-                                 STATUS  =  SAI__ERROR
+                                 STATUS = SAI__ERROR
                                  CALL MSG_SETI( 'I', I )
                                  CALL ERR_REP( 'ERR_QUILT_MFNOFF',
      :                             'QUILT: Offsets obtained for data '/
@@ -679,9 +569,9 @@
 *                                  respect to the lower left corner of
 *                                  the output data array
 
-                                    OFFSET( 1 )  =  OFFSET( 1 ) -
+                                    OFFSET( 1 ) = OFFSET( 1 ) -
      :                                              MINI( 1 )
-                                    OFFSET( 2 )  =  OFFSET( 2 ) -
+                                    OFFSET( 2 ) = OFFSET( 2 ) -
      :                                              MINI( 2 )
 
 *                                  Insert the current data array into
