@@ -111,6 +111,10 @@
       EXTERNAL			AST_QPKGI
         LOGICAL			AST_QPKGI
 
+*  Local Constants:
+      CHARACTER*4		WCI_PROP
+        PARAMETER		( WCI_PROP = '.WCS' )
+
 *  Local Variables:
       INTEGER			FILID			! Base file identifier
       INTEGER			RESID			! Method output data

@@ -82,21 +82,21 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-
-*  Global Variables:
-      INCLUDE 'WCI_CMN'                 ! ASTERIX WCI common block
-*       WCS_INIT = LOGICAL (given)
-*         WCI class definitions loaded?
+      INCLUDE 'AST_PKG'
 
 *  Arguments Given:
-      DOUBLE PRECISION		RPH(3)			! Relative physicals
-      INTEGER			PRJID			! Projection object
+      DOUBLE PRECISION		RPH(3)
+      INTEGER			PRJID
 
 *  Arguments Returned:
-      DOUBLE PRECISION		STD(3)			! Native sphericals
+      DOUBLE PRECISION		STD(3)
 
 *  Status:
       INTEGER 			STATUS             	! Global status
+
+*  External References:
+      EXTERNAL			AST_QPKGI
+        LOGICAL			AST_QPKGI
 
 *  Local Variables:
       INTEGER			RPTR			! Routine address
@@ -106,10 +106,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Check initialised
-      IF ( .NOT. WCI_INIT ) THEN
-        STATUS = SAI__ERROR
-        CALL ERR_REP( ' ', 'WCI has not been initialised', STATUS )
-      END IF
+      IF ( .NOT. AST_QPKGI( WCI__PKG ) ) CALL WCI0_INIT( STATUS )
 
 *  Extract projection routine address
       CALL ADI_CGET0I( PRJID, '.WCIRTN', RPTR, STATUS )
