@@ -12,14 +12,17 @@
 #  Description:
 #     The script creates a series of test frames using CCDGENERATE. It
 #     then executes various of the CCDPACK Atasks simulating a
-#     reduction sequence. Intermediary results are displayed (if requested)
-#
+#     reduction and registration sequence. Intermediary results are 
+#     displayed on a graphics device (if requested).
+
+#  Notes:
 #     Various attempts are made to mess up the images in gratuitous ways
 #     to test the CCDPACK commands as hard as possible.  Do not try
 #     to look for a sensible astronomical/data reduction motive in
 #     all the commands here, or use it indiscriminately as a template
-#     for reduction scripts.
-
+#     for reduction scripts.  However, the data reduction and
+#     registration steps themselves are illustrative of sensible
+#     techniques.
 
 #  Authors:
 #     MBT: Mark Taylor (STARLINK)
@@ -192,7 +195,9 @@
       if ( "$device" != "NONE" ) then
          picgrid xpic=3 ypic=1 accept
          lutheat accept
-         picsel 1; bounds data-a image nolabnum nolabname noorigin reset accept
+         picsel 1 
+         bounds data-a image nolabnum nolabname noorigin \
+                style='"title=Raw data"' reset accept
          picsel 2; bounds data-b
          picsel 3; bounds data-c
       endif
@@ -226,7 +231,8 @@
          picgrid xpic=3 ypic=1
          lutheat
          picsel 1; 
-         bounds debias_data-a image nolabnum nolabname noorigin reset accept
+         bounds debias_data-a image nolabnum nolabname noorigin \
+                style='"title=Debiassed data"' reset accept
          picsel 2; bounds debias_data-b
          picsel 3; bounds debias_data-c
       endif
@@ -257,7 +263,9 @@
       if ( "$device" != "NONE" ) then
          gdclear accept
          picgrid xpic=3 ypic=1
-         picsel 1; bounds reduced_data-a nolabnum nolabname noorigin accept
+         picsel 1
+         bounds reduced_data-a nolabnum nolabname noorigin image \
+                style='"title=Reduced data"' reset accept
          picsel 2; bounds reduced_data-b
          picsel 3; bounds reduced_data-c
       endif
@@ -447,6 +455,8 @@
            in=mosaic \
            mode=percentiles \
            percentiles='[2,98]' \
+           style='"textlab=0"' \
+           margin=0.05 \
            reset accept
       endif
 
