@@ -109,6 +109,8 @@
 *        of the NDF. The elements in this parameter correspond to 
 *        those in the FDIM and FTITLE parameters. The number of elements 
 *        in each of these parameters is given by NFRAME.
+*     FLABEL( ) = LITERAL (Write)
+*        The axis labels from the current WCS Frame of the NDF.  
 *     FLBND( ) = _DOUBLE (Write)
 *        The lower bounds of the bounding box enclosing the NDF in the
 *        current WCS Frame. The number of elements in this parameter is
@@ -142,6 +144,8 @@
 *        If a TRUE value is given for this parameter then all co-ordinate 
 *        Frames in the WCS component of the NDF are displayed. Otherwise, 
 *        only the current co-ordinate Frame is displayed. [FALSE]
+*     FUNIT( ) = LITERAL (Write)
+*        The axis units from the current WCS Frame of the NDF.  
 *     HISTORY = _LOGICAL (Write)
 *        Whether or not the NDF contains HISTORY records.
 *     LABEL = LITERAL (Write)
@@ -250,6 +254,8 @@
 *        structure.
 *     17-MAR-2005 (DSB):
 *        Added FLBND and FUBND.
+*     21-MAR-2005 (DSB):
+*        Added FLABEL and FUNIT.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -281,10 +287,13 @@
 *  Local Variables:
       BYTE BADBIT                ! Bad-bits mask
       CHARACTER * ( 35 ) APPN    ! Last recorded application name
+      CHARACTER * ( 15 ) ATTRIB  ! AST attribute name
       CHARACTER * ( 8 ) BINSTR   ! Binary bad-bits mask string
       CHARACTER * ( 80 ) ALABEL( NDF__MXDIM ) ! Axis label
       CHARACTER * ( 80 ) AUNITS( NDF__MXDIM ) ! Axis units
       CHARACTER * ( 80 ) CCOMP   ! Character component
+      CHARACTER * ( 80 ) FLABEL( NDF__MXDIM ) ! WCS axis label
+      CHARACTER * ( 80 ) FUNIT( NDF__MXDIM ) ! WCS axis units
       CHARACTER * ( 80 ) FRMDMN  ! Frame domain
       CHARACTER * ( 80 ) FRMTTL  ! Frame title
       CHARACTER * ( 80 ) WCSDMN( MXFRM )  ! Frame domains
@@ -318,6 +327,7 @@
       INTEGER EL                 ! Number of array elements mapped
       INTEGER FRMNAX             ! Frame dimensionality
       INTEGER I                  ! Loop counter for dimensions
+      INTEGER IAT                ! Used length of string
       INTEGER IAXIS              ! Loop counter for axes
       INTEGER ICURR              ! Index of Current Frame in WCS FrameSet
       INTEGER IDIG               ! Loop counter for binary digits
@@ -996,11 +1006,30 @@
                CALL AST_NORM( IWCS, LBOUT, STATUS )
                CALL AST_NORM( IWCS, UBOUT, STATUS )
 
-*  If this is the current Frame, write the bounds to the output
-*  parameters.
+*  If this is the current Frame, write the bounds units and labels to the 
+*  output parameters.
                IF( IFRAME .EQ. ICURR ) THEN 
                   CALL PAR_PUT1D( 'FLBND', FRMNAX, LBOUT, STATUS )
                   CALL PAR_PUT1D( 'FUBND', FRMNAX, UBOUT, STATUS )
+
+                  DO IAXIS = 1, FRMNAX
+                     ATTRIB = 'UNIT('
+                     IAT = 5
+                     CALL CHR_PUTI( IAXIS, ATTRIB, IAT )
+                     CALL CHR_PUTC( ')', ATTRIB, IAT )
+                     FUNIT( IAXIS ) = AST_GETC( IWCS, ATTRIB( : IAT ),
+     :                                           STATUS )
+                     ATTRIB = 'LABEL('
+                     IAT = 6
+                     CALL CHR_PUTI( IAXIS, ATTRIB, IAT )
+                     CALL CHR_PUTC( ')', ATTRIB, IAT )
+                     FLABEL( IAXIS ) = AST_GETC( IWCS, ATTRIB( : IAT ),
+     :                                           STATUS )
+                  END DO
+
+                  CALL PAR_PUT1C( 'FUNIT', FRMNAX, FUNIT, STATUS )
+                  CALL PAR_PUT1C( 'FLABEL', FRMNAX, FLABEL, STATUS )
+
                END IF
             END IF
 

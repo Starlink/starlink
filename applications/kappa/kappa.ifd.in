@@ -1044,6 +1044,14 @@ package kappa {
             helpkey *
           }
 
+         parameter flabel {
+            size *
+            type LITERAL
+            access WRITE
+            vpath INTERNAL
+            helpkey *
+          }
+
          parameter amono {
             size *
             type _LOGICAL
@@ -1077,6 +1085,14 @@ package kappa {
           }
 
          parameter aunits {
+            size *
+            type LITERAL
+            access WRITE
+            vpath INTERNAL
+            helpkey *
+          }
+
+         parameter funit {
             size *
             type LITERAL
             access WRITE
