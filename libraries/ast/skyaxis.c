@@ -932,7 +932,6 @@ static const char *DHmsFormat( const char *fmt, double value ) {
    int pos;                      /* Position to add next character */
    int positive;                 /* Value is positive (or zero)? */
    int sec;                      /* Seconds field required? */
-   int stat;                     /* SLALIB status */
    static char buff[ BUFF_LEN + 1 ]; /* Buffer for result string */
 
 /* Check the global error status. */
@@ -1243,7 +1242,6 @@ static double DHmsGap( const char *fmt, double gap, int *ntick ) {
    int plus;                     /* Add leading plus sign? */
    int positive;                 /* Value is positive (or zero)? */
    int sec;                      /* Seconds field required? */
-   int stat;                     /* SLALIB status */
 
 /* Local Data: */
 /* ----------- */
@@ -2970,7 +2968,6 @@ static int AxisUnformat( AstAxis *this_axis, const char *string,
    int sep_field_id;             /* Field ID from separator (0 = don't know) */
    int sep_index;                /* Index of separator character in table */
    int sep_len;                  /* Length of separator plus trailing space */
-   int stat;                     /* SLALIB status */
    int suffix_sep;               /* Field has a suffix separator? */
 
 /* Local Data: */

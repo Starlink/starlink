@@ -66,7 +66,7 @@
 #define AST__LKSOR         6
 #define AST__LGSOR         7
 #define AST__GLSOR         8
-#define AST__NOSOR         9
+#define AST__SCSOR         9
 #endif
 
 /* Type Definitions. */
@@ -92,6 +92,7 @@ typedef struct AstSpecFrame {
    double refdec;                /* Dec (FK5 J2000) of source */
    double refra;                 /* RA (FK5 J2000) of source */
    double restfreq;              /* Rest frequency (Hz)*/
+   double sourcevel;             /* Source velocity (heliocentric, m/s) */
 } AstSpecFrame;
 
 /* Virtual function table. */
@@ -145,6 +146,11 @@ typedef struct AstSpecFrameVtab {
    int (* TestRefDec)( AstSpecFrame * );
    void (* ClearRefDec)( AstSpecFrame * );
    void (* SetRefDec)( AstSpecFrame *, double );
+
+   double (* GetSourceVel)( AstSpecFrame * );
+   int (* TestSourceVel)( AstSpecFrame * );
+   void (* ClearSourceVel)( AstSpecFrame * );
+   void (* SetSourceVel)( AstSpecFrame *, double );
 
 } AstSpecFrameVtab;
 #endif
@@ -220,6 +226,11 @@ double astGetRefDec_( AstSpecFrame * );
 int astTestRefDec_( AstSpecFrame * );
 void astClearRefDec_( AstSpecFrame * );
 void astSetRefDec_( AstSpecFrame *, double );
+
+double astGetSourceVel_( AstSpecFrame * );
+int astTestSourceVel_( AstSpecFrame * );
+void astClearSourceVel_( AstSpecFrame * );
+void astSetSourceVel_( AstSpecFrame *, double );
 
 #endif
 
@@ -313,6 +324,11 @@ astINVOKE(O,astLoadSpecFrame_(mem,size,vtab,name,astCheckChannel(channel)))
 #define astTestRefDec(this) astINVOKE(V,astTestRefDec_(astCheckSpecFrame(this)))
 #define astClearRefDec(this) astINVOKE(V,astClearRefDec_(astCheckSpecFrame(this)))
 #define astSetRefDec(this,value) astINVOKE(V,astSetRefDec_(astCheckSpecFrame(this),value))
+
+#define astGetSourceVel(this) astINVOKE(V,astGetSourceVel_(astCheckSpecFrame(this)))
+#define astTestSourceVel(this) astINVOKE(V,astTestSourceVel_(astCheckSpecFrame(this)))
+#define astClearSourceVel(this) astINVOKE(V,astClearSourceVel_(astCheckSpecFrame(this)))
+#define astSetSourceVel(this,value) astINVOKE(V,astSetSourceVel_(astCheckSpecFrame(this),value))
 
 #endif
 #endif

@@ -97,34 +97,22 @@ f     - AST_SPECADD: Add a celestial coordinate conversion to an SpecMap
 #define AST__VLTOZO     16       /* Relativistic velocity to redshift */
 #define AST__BTTOVL     17       /* Beta factor to relativistic velocity */
 #define AST__VLTOBT     18       /* Relativistic velocity to beta factor */
-#define AST__TPV2HL     19       /* Topocentric to heliocentric velocity */
-#define AST__HLV2TP     20       /* Heliocentric to topocentric velocity */
-#define AST__GEV2HL     21       /* Geocentric to heliocentric velocity */
-#define AST__HLV2GE     22       /* Heliocentric to geocentric velocity */
-#define AST__BYV2HL     23       /* Barycentric to heliocentric velocity */
-#define AST__HLV2BY     24       /* Heliocentric to barycentric velocity */
-#define AST__LKV2HL     25       /* LSRK to heliocentric velocity */
-#define AST__HLV2LK     26       /* Heliocentric to LSRK velocity */
-#define AST__LDV2HL     27       /* LSRD to heliocentric velocity */
-#define AST__HLV2LD     28       /* Heliocentric to LSRD velocity */
-#define AST__LGV2HL     29       /* Local group to heliocentric velocity */
-#define AST__HLV2LG     30       /* Heliocentric to local group velocity */
-#define AST__GLV2HL     31       /* Galactic to heliocentric velocity */
-#define AST__HLV2GL     32       /* Heliocentric to galactic velocity */
-#define AST__TPF2HL     33       /* Topocentric to heliocentric frequency  */
-#define AST__HLF2TP     34       /* Heliocentric to topocentric frequency */
-#define AST__GEF2HL     35       /* Geocentric to heliocentric frequency */
-#define AST__HLF2GE     36       /* Heliocentric to geocentric frequency */
-#define AST__BYF2HL     37       /* Barycentric to heliocentric frequency */
-#define AST__HLF2BY     38       /* Heliocentric to barycentric frequency */
-#define AST__LKF2HL     39       /* LSRK to heliocentric frequency */
-#define AST__HLF2LK     40       /* Heliocentric to LSRK frequency */
-#define AST__LDF2HL     41       /* LSRD to heliocentric frequency */
-#define AST__HLF2LD     42       /* Heliocentric to LSRD frequency */
-#define AST__LGF2HL     43       /* Local group to heliocentric frequency */
-#define AST__HLF2LG     44       /* Heliocentric to local group frequency */
-#define AST__GLF2HL     45       /* Galactic to heliocentric frequency */
-#define AST__HLF2GL     46       /* Heliocentric to galactic frequency */
+#define AST__USF2HL     19       /* User-defined to heliocentric frequency  */
+#define AST__HLF2US     20       /* Heliocentric to user-defined frequency */
+#define AST__TPF2HL     21       /* Topocentric to heliocentric frequency  */
+#define AST__HLF2TP     22       /* Heliocentric to topocentric frequency */
+#define AST__GEF2HL     23       /* Geocentric to heliocentric frequency */
+#define AST__HLF2GE     24       /* Heliocentric to geocentric frequency */
+#define AST__BYF2HL     25       /* Barycentric to heliocentric frequency */
+#define AST__HLF2BY     26       /* Heliocentric to barycentric frequency */
+#define AST__LKF2HL     27       /* LSRK to heliocentric frequency */
+#define AST__HLF2LK     28       /* Heliocentric to LSRK frequency */
+#define AST__LDF2HL     29       /* LSRD to heliocentric frequency */
+#define AST__HLF2LD     30       /* Heliocentric to LSRD frequency */
+#define AST__LGF2HL     31       /* Local group to heliocentric frequency */
+#define AST__HLF2LG     32       /* Heliocentric to local group frequency */
+#define AST__GLF2HL     33       /* Galactic to heliocentric frequency */
+#define AST__HLF2GL     34       /* Heliocentric to galactic frequency */
 
 /* Maximum number of arguments required by a conversion. */
 #define MAX_ARGS 6
@@ -181,6 +169,22 @@ static int class_init = 0;       /* Virtual function table initialised? */
 /* Pointers to parent class methods which are extended by this class. */
 static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet * );
 
+/* Structure to hold parameters and intermediate values describing a
+   reference frame */
+typedef struct FrameDef {
+   double geolat;     /* Observers geodetic latitude (rads) */
+   double geolon;     /* Observers geodetic longitude (rads, +ve east) */
+   double epoch;      /* Julian epoch of observation */
+   double refdec;     /* RA of reference point (FK5 J2000) */
+   double refra;      /* DEC of reference point (FK5 J2000) */
+   double veluser;    /* Heliocentric velocity of user-defined system (m/s) */
+   double last;       /* Local apparent sideral time */
+   double amprms[21]; /* Mean to apparent parameters */
+   double vuser[3];   /* Used-defined velocity as a FK5 J2000 vector */
+   double dvh[3];     /* Earth-sun velocity */
+   double dvb[3];     /* Barycentre-sun velocity */
+} FrameDef;
+
 /* External Interface Function Prototypes. */
 /* ======================================= */
 /* The following functions have public prototypes only (i.e. no
@@ -193,66 +197,21 @@ AstSpecMap *astSpecMapId_( int, int, const char *, ... );
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
 static const char *CvtString( int, const char **, int *, int *, int *, int *, const char *[ MAX_ARGS ] );
 static double Refrac( double );
-static double HelioVel( double, double, double );
-static double BaryVel( double, double, double );
-static double TopoVel( double, double, double, double, double );
+static double BaryVel( double, double, FrameDef * );
+static double TopoVel( double, double, FrameDef * );
+static double GeoVel( double, double, FrameDef * );
+static double LsrkVel( double, double, FrameDef * );
+static double LsrdVel( double, double, FrameDef * );
+static double UserVel( double, double, FrameDef * );
+static double LgVel( double, double, FrameDef * );
+static double GalVel( double, double, FrameDef * );
 static int CvtCode( const char * );
 static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int ** );
-static void (*GetCvtFunc( int ))( int, double *, double *, double *, double *, int );
 static void AddSpecCvt( AstSpecMap *, int, const double * );
 static void Copy( const AstObject *, AstObject * );
 static void Delete( AstObject * );
 static void Dump( AstObject *, AstChannel * );
 static void SpecAdd( AstSpecMap *, const char *, const double[] );
-static void VelCorr( double *, double );
-static void awtofr( int, double *, double *, double *, double *, int ); 
-static void bttovl( int, double *, double *, double *, double *, int ); 
-static void byf2hl( int, double *, double *, double *, double *, int ); 
-static void byv2hl( int, double *, double *, double *, double *, int ); 
-static void entofr( int, double *, double *, double *, double *, int ); 
-static void frtoaw( int, double *, double *, double *, double *, int ); 
-static void frtoen( int, double *, double *, double *, double *, int ); 
-static void frtovl( int, double *, double *, double *, double *, int ); 
-static void frtown( int, double *, double *, double *, double *, int ); 
-static void frtowv( int, double *, double *, double *, double *, int ); 
-static void gef2hl( int, double *, double *, double *, double *, int ); 
-static void gev2hl( int, double *, double *, double *, double *, int ); 
-static void glf2hl( int, double *, double *, double *, double *, int ); 
-static void glv2hl( int, double *, double *, double *, double *, int ); 
-static void hlf2by( int, double *, double *, double *, double *, int ); 
-static void hlf2ge( int, double *, double *, double *, double *, int ); 
-static void hlf2gl( int, double *, double *, double *, double *, int ); 
-static void hlf2ld( int, double *, double *, double *, double *, int ); 
-static void hlf2lg( int, double *, double *, double *, double *, int ); 
-static void hlf2lk( int, double *, double *, double *, double *, int ); 
-static void hlf2tp( int, double *, double *, double *, double *, int ); 
-static void hlv2by( int, double *, double *, double *, double *, int ); 
-static void hlv2ge( int, double *, double *, double *, double *, int ); 
-static void hlv2gl( int, double *, double *, double *, double *, int ); 
-static void hlv2ld( int, double *, double *, double *, double *, int ); 
-static void hlv2lg( int, double *, double *, double *, double *, int ); 
-static void hlv2lk( int, double *, double *, double *, double *, int ); 
-static void hlv2tp( int, double *, double *, double *, double *, int ); 
-static void ldf2hl( int, double *, double *, double *, double *, int ); 
-static void ldv2hl( int, double *, double *, double *, double *, int ); 
-static void lgf2hl( int, double *, double *, double *, double *, int ); 
-static void lgv2hl( int, double *, double *, double *, double *, int ); 
-static void lkf2hl( int, double *, double *, double *, double *, int ); 
-static void lkv2hl( int, double *, double *, double *, double *, int ); 
-static void tpf2hl( int, double *, double *, double *, double *, int ); 
-static void tpv2hl( int, double *, double *, double *, double *, int ); 
-static void vltobt( int, double *, double *, double *, double *, int ); 
-static void vltofr( int, double *, double *, double *, double *, int ); 
-static void vltovo( int, double *, double *, double *, double *, int ); 
-static void vltovr( int, double *, double *, double *, double *, int ); 
-static void vltozo( int, double *, double *, double *, double *, int ); 
-static void votovl( int, double *, double *, double *, double *, int ); 
-static void vrtovl( int, double *, double *, double *, double *, int ); 
-static void wntofr( int, double *, double *, double *, double *, int ); 
-static void wvtofr( int, double *, double *, double *, double *, int ); 
-static void zotovl( int, double *, double *, double *, double *, int ); 
-
-
 
 /* Member functions. */
 /* ================= */
@@ -346,34 +305,12 @@ static void AddSpecCvt( AstSpecMap *this, int cvttype, const double *args ) {
 *           Convert beta factor to relativistic velocity.
 *        AST__VLTOBT     
 *           Convert relativistic velocity to beta factor.
-*        AST__TPV2HL( GLON, GLAT, EPOCH, RA, DEC )
-*           Convert from Topocentric to heliocentric relativistic velocity.
-*        AST__HLV2TP( GLON, GLAT, EPOCH, RA, DEC )
-*           Convert from Heliocentric to topocentric relativistic velocity.
-*        AST__GEV2HL( EPOCH, RA, DEC )
-*           Convert from Geocentric to heliocentric relativistic velocity.
-*        AST__HLV2GE( EPOCH, RA, DEC )
-*           Convert from Heliocentric to geocentric relativistic velocity.
-*        AST__BYV2HL( EPOCH, RA, DEC )
-*           Convert from Barycentric to heliocentric relativistic velocity.
-*        AST__HLV2BY( EPOCH, RA, DEC )
-*           Convert from Heliocentric to barycentric relativistic velocity.
-*        AST__LKV2HL( RA, DEC )
-*           Convert from LSRK to heliocentric relativistic velocity.
-*        AST__HLV2LK( RA, DEC )
-*           Convert from Heliocentric to LSRK relativistic velocity.
-*        AST__LDV2HL( RA, DEC )
-*           Convert from LSRD to heliocentric relativistic velocity.
-*        AST__HLV2LD( RA, DEC )
-*           Convert from Heliocentric to LSRD relativistic velocity.
-*        AST__LGV2HL( RA, DEC )
-*           Convert from Local group to heliocentric relativistic velocity.
-*        AST__HLV2LG( RA, DEC )
-*           Convert from Heliocentric to local group relativistic velocity.
-*        AST__GLV2HL( RA, DEC )
-*           Convert from Galactic to heliocentric relativistic velocity.
-*        AST__HLV2GL( RA, DEC )
-*           Convert from Heliocentric to galactic relativistic velocity.
+*        AST_USF2HL( VOFF, RA, DEC )
+*           Convert frequency from a user-defined reference frame to 
+*           heliocentric.
+*        AST__HLF2US( VOFF, RA, DEC )
+*           Convert frequency from heliocentric reference frame to 
+*           user-defined.
 *        AST__TPF2HL( GLON, GLAT, EPOCH, RA, DEC )
 *           Convert from Topocentric to heliocentric frequency
 *        AST__HLF2TP( GLON, GLAT, EPOCH, RA, DEC )
@@ -420,11 +357,17 @@ static void AddSpecCvt( AstSpecMap *this, int cvttype, const double *args ) {
 *     - EPOCH: Epoch of observation (UT1 expressed as a Modified Julian Date).
 *     - RA: Right Ascension of source (radians, FK5 J2000).
 *     - DEC: Declination of source (radians, FK5 J2000).
+*     - VOFF: Velocity of the user-defined reference frame, towards the
+*     position given by RA and DEC, measured in the heliocentric
+*     reference frame.
 *
-*     The RA and DEC values are ignored if the SpecMap is 3-dimensional
-*     (the souce position is instead supplied as values for axes 2 and 3
-*     of the SpecMap). However, values must still be supplied even if
-*     they are to be ignored (they can be AST__BAD).
+*     If the SpecMap is 3-dimensional, source positions are provided by the 
+*     values supplied to inputs 2 and 3 of the SpecMap (which are simply 
+*     copied to outputs 2 and 3). Note, usable values are still required
+*     for the RA and DEC arguments in order to define the "user-defined" 
+*     reference frame used by USF2HL and HLF2US. However, AST__BAD can be 
+*     supplied for RA and DEC if the user-defined reference frame is not 
+*     required.
 
 *  Notes:
 *     - The specified conversion is appended only if the SpecMap's
@@ -484,61 +427,57 @@ static void AddSpecCvt( AstSpecMap *this, int cvttype, const double *args ) {
    AST__BAD in any elements of the argument array which are beyond the
    end of the user-supplied arguments. These will be used to hold
    intermediate values calculated on the basis of the user-supplied
-   arguments. Also set any source RA and DEC arguments to AST__BAD if the 
-   SpecMap is 3-dimensional. */
+   arguments. */
       if ( astOK ) {
          this->cvttype[ ncvt ] = cvttype;
          this->ncvt++;
          for( i = nargs; i < szargs; i++ ) this->cvtargs[ ncvt ][ i ] = AST__BAD;
-
-         if( astGetNin( this ) == 3 ) {
-            if( argra != -1 ) this->cvtargs[ ncvt ][ argra ] = AST__BAD;
-            if( argdec != -1 ) this->cvtargs[ ncvt ][ argdec ] = AST__BAD;
-         }
-
       }
    }
 }
 
-static double BaryVel( double epoch, double ra, double dec ){
+static double BaryVel( double ra, double dec, FrameDef *def ) {
 /*
 *  Name:
 *     BaryVel
 
 *  Purpose:
-*     Returns the heliocentric velocity component of the sun-earth barycentre.
+*     Find the velocity of the earth-sun barycentre away from the source.
 
 *  Type:
 *     Private function.
 
 *  Synopsis:
 *     #include "specmap.h"
-*     double BaryVel( double epoch, double ra, double dec )
+*     double BaryVel( double ra, double dec, FrameDef *def ) 
 
 *  Class Membership:
 *     SpecMap method.
 
 *  Description:
-*     This function returns the component away from the source, of the 
-*     velocity of the sun-earth barycentre relative to the sun (in km/s). 
+*     This function finds the component of the velocity of the earth-sun
+*     barycentre away from a specified source position, at a given epoch, in 
+*     the frame of rest of the centre of the Sun.
 
 *  Parameters:
-*    epoch 
-*       Epoch of observation (UT1 expressed as a Modified Julian Date)
-*    ra 
-*       Right Ascension of source (radians, FK5 J2000)
-*    dec
-*       Declination of source (radians, FK5 J2000)
+*     ra 
+*        The RA (rads, FK5 J2000) of the source.
+*     dec
+*        The Dec (rads, FK5 J2000) of the source.
+*     def
+*        Pointer to a FrameDef structure which holds the parameters which
+*        define the frame, together with cached intermediate results.
 
-*  Returned Value:
-*     The required velocity (km/s).
+*  Returns:
+*     The component of the frame's velocity away from the position given by
+*     "ra" and "dec", in m/s, measured within the Heliographic frame of
+*     rest. Zero is returned if an error has already occurred.
 
 */
 
 /* Local Variables: */
    double dpb[ 3 ];          /* Barycentric earth position vector */
    double dph[ 3 ];          /* Heliocentric earth position vector */
-   double dvb[ 3 ];          /* Barycentric earth velocity vector */
    double dvh[ 3 ];          /* Heliocentric earth velocity vector */
    double v[ 3 ];            /* Source direction vector */
 
@@ -549,18 +488,22 @@ static double BaryVel( double epoch, double ra, double dec ){
    J2000 system. */
    slaDcs2c( ra, dec, v );
 
-/* Get the Earth/Sun velocity and position vectors in the same system. */
-   slaEvp( epoch, 2000.0, dvb, dpb, dvh, dph );
+/* If not already done so, get the Earth/Sun velocity and position vectors in 
+   the same system. Speed is returned in units of AU/s. Store in the supplied 
+   frame definition structure. */
+   if( def->dvb[ 0 ] == AST__BAD ) {
+      slaEvp( def->epoch, 2000.0, def->dvb, dpb, dvh, dph );
   
-/* Change the heliocentric velocity of the earth into the heliocentric 
+/* Change the barycentric velocity of the earth into the heliocentric 
    velocity of the barycentre. */
-   dvh[ 0 ] -= dvb[ 0 ];
-   dvh[ 1 ] -= dvb[ 1 ];
-   dvh[ 2 ] -= dvb[ 2 ];
+      def->dvb[ 0 ] = dvh[ 0 ] - def->dvb[ 0 ];
+      def->dvb[ 1 ] = dvh[ 1 ] - def->dvb[ 1 ];
+      def->dvb[ 2 ] = dvh[ 2 ] - def->dvb[ 2 ];
+   }
 
 /* Return the component away from the source, of the velocity of the
-   barycentre relative to the sun (in km/s). */
-   return -slaDvdv( v, dvh )*149.597870E6;
+   barycentre relative to the sun (in m/s). */
+   return -slaDvdv( v, def->dvb )*149.597870E9;
 
 }
 
@@ -671,47 +614,11 @@ static int CvtCode( const char *cvt_string ) {
    } else if ( astChrMatch( cvt_string, "VLTOBT" ) ) { 
       result = AST__VLTOBT; 
 
-   } else if ( astChrMatch( cvt_string, "TPV2HL" ) ) { 
-      result = AST__TPV2HL; 
+   } else if ( astChrMatch( cvt_string, "USF2HL" ) ) { 
+      result = AST__USF2HL; 
 
-   } else if ( astChrMatch( cvt_string, "HLV2TP" ) ) { 
-      result = AST__HLV2TP; 
-
-   } else if ( astChrMatch( cvt_string, "GEV2HL" ) ) { 
-      result = AST__GEV2HL; 
-
-   } else if ( astChrMatch( cvt_string, "HLV2GE" ) ) { 
-      result = AST__HLV2GE; 
-
-   } else if ( astChrMatch( cvt_string, "BYV2HL" ) ) { 
-      result = AST__BYV2HL; 
-
-   } else if ( astChrMatch( cvt_string, "HLV2BY" ) ) { 
-      result = AST__HLV2BY; 
-
-   } else if ( astChrMatch( cvt_string, "LKV2HL" ) ) { 
-      result = AST__LKV2HL; 
-
-   } else if ( astChrMatch( cvt_string, "HLV2LK" ) ) { 
-      result = AST__HLV2LK; 
-
-   } else if ( astChrMatch( cvt_string, "LDV2HL" ) ) { 
-      result = AST__LDV2HL; 
-
-   } else if ( astChrMatch( cvt_string, "HLV2LD" ) ) { 
-      result = AST__HLV2LD; 
-
-   } else if ( astChrMatch( cvt_string, "LGV2HL" ) ) { 
-      result = AST__LGV2HL; 
-
-   } else if ( astChrMatch( cvt_string, "HLV2LG" ) ) { 
-      result = AST__HLV2LG; 
-
-   } else if ( astChrMatch( cvt_string, "GLV2HL" ) ) { 
-      result = AST__GLV2HL; 
-
-   } else if ( astChrMatch( cvt_string, "HLV2GL" ) ) { 
-      result = AST__HLV2GL; 
+   } else if ( astChrMatch( cvt_string, "HLF2US" ) ) { 
+      result = AST__HLF2US; 
 
    } else if ( astChrMatch( cvt_string, "TPF2HL" ) ) { 
       result = AST__TPF2HL; 
@@ -901,7 +808,7 @@ static const char *CvtString( int cvt_code, const char **comment,
       break;
 
    case AST__FRTOWV:
-      *comment = "Convert fFrequency to wavelength (vacuum)";
+      *comment = "Convert frequency to wavelength (vacuum)";
       result = "FRTOWV";
       *nargs = 0;
       *szargs = 0;
@@ -977,182 +884,30 @@ static const char *CvtString( int cvt_code, const char **comment,
       *szargs = 0;
       break;
 
-   case AST__TPV2HL:
-      *comment = "Convert from Topocentric to heliocentric rel. velocity";
-      result = "TPV2HL";
-      *nargs = 5;
-      *argra = 3;
-      *argdec = 4;
-      *szargs = 6;
-      arg[ 0 ] = "Longitude (positive eastwards, radians)";
-      arg[ 1 ] = "Latitude (geodetic, radians)";
-      arg[ 2 ] = "UT1 epoch of observaton (Modified Julian Date)";
-      arg[ 3 ] = "RA of source (FK5 J2000, radians)";
-      arg[ 4 ] = "DEC of source (FK5 J2000, radians)";
-      arg[ 5 ] = "Velocity correction term (m/s)";
-      break;
-
-   case AST__HLV2TP:
-      *comment = "Convert from Heliocentric to topocentric rel. velocity";
-      result = "HLV2TP";
-      *nargs = 5;
-      *argra = 3;
-      *argdec = 4;
-      *szargs = 6;
-      arg[ 0 ] = "Longitude (positive eastwards, radians)";
-      arg[ 1 ] = "Latitude (geodetic, radians)";
-      arg[ 2 ] = "UT1 epoch of observaton (Modified Julian Date)";
-      arg[ 3 ] = "RA of source (FK5 J2000, radians)";
-      arg[ 4 ] = "DEC of source (FK5 J2000, radians)";
-      arg[ 5 ] = "Velocity correction term (m/s)";
-      break;
-
-   case AST__GEV2HL:
-      *comment = "Convert from Geocentric to heliocentric rel. velocity";
-      result = "GEV2HL";
-      *nargs = 3;
-      *argra = 1;
-      *argdec = 2;
-      *szargs = 4;
-      arg[ 0 ] = "UT1 epoch of observaton (Modified Julian Date)";
-      arg[ 1 ] = "RA of source (FK5 J2000, radians)";
-      arg[ 2 ] = "DEC of source (FK5 J2000, radians)";
-      arg[ 3 ] = "Velocity correction term (m/s)";
-      break;
-
-   case AST__HLV2GE:
-      *comment = "Convert from Heliocentric to geocentric rel. velocity";
-      result = "HLV2GE";
-      *nargs = 3;
-      *argra = 1;
-      *argdec = 2;
-      *szargs = 4;
-      arg[ 0 ] = "UT1 epoch of observaton (Modified Julian Date)";
-      arg[ 1 ] = "RA of source (FK5 J2000, radians)";
-      arg[ 2 ] = "DEC of source (FK5 J2000, radians)";
-      arg[ 3 ] = "Velocity correction term (m/s)";
-      break;
-
-   case AST__BYV2HL:
-      *comment = "Convert from Barycentric to heliocentric rel. velocity";
-      result = "BYV2HL";
+   case AST__USF2HL:
+      *comment = "Convert from user-defined to heliocentric frequency";
+      result = "USF2HL";
       *argra = 1;
       *argdec = 2;
       *nargs = 3;
       *szargs = 4;
-      arg[ 0 ] = "UT1 epoch of observaton (Modified Julian Date)";
+      arg[ 0 ] = "Velocity offset (m/s)";
       arg[ 1 ] = "RA of source (FK5 J2000, radians)";
       arg[ 2 ] = "DEC of source (FK5 J2000, radians)";
-      arg[ 3 ] = "Velocity correction term (m/s)";
+      arg[ 3 ] = "Frequency correction factor";
       break;
 
-   case AST__HLV2BY:
-      *comment = "Convert from Heliocentric to barycentric rel. velocity";
-      result = "HLV2BY";
+   case AST__HLF2US:
+      *comment = "Convert from heliocentric to user-defined frequency";
+      result = "HLF2US";
       *argra = 1;
       *argdec = 2;
       *nargs = 3;
       *szargs = 4;
-      arg[ 0 ] = "UT1 epoch of observaton (Modified Julian Date)";
+      arg[ 0 ] = "Velocity offset (m/s)";
       arg[ 1 ] = "RA of source (FK5 J2000, radians)";
       arg[ 2 ] = "DEC of source (FK5 J2000, radians)";
-      arg[ 3 ] = "Velocity correction term (m/s)";
-      break;
-
-   case AST__LKV2HL:
-      *comment = "Convert from LSRK to heliocentric rel. velocity";
-      result = "LKV2HL";
-      *argra = 0;
-      *argdec = 1;
-      *nargs = 2;
-      *szargs = 3;
-      arg[ 0 ] = "RA of source (FK5 J2000, radians)";
-      arg[ 1 ] = "DEC of source (FK5 J2000, radians)";
-      arg[ 2 ] = "Velocity correction term (m/s)";
-      break;
-
-   case AST__HLV2LK:
-      *comment = "Convert from Heliocentric to LSRK rel. velocity";
-      result = "HLV2LK";
-      *argra = 0;
-      *argdec = 1;
-      *nargs = 2;
-      *szargs = 3;
-      arg[ 0 ] = "RA of source (FK5 J2000, radians)";
-      arg[ 1 ] = "DEC of source (FK5 J2000, radians)";
-      arg[ 2 ] = "Velocity correction term (m/s)";
-      break;
-
-   case AST__LDV2HL:
-      *comment = "Convert from LSRD to heliocentric rel. velocity";
-      result = "LDV2HL";
-      *argra = 0;
-      *argdec = 1;
-      *nargs = 2;
-      *szargs = 3;
-      arg[ 0 ] = "RA of source (FK5 J2000, radians)";
-      arg[ 1 ] = "DEC of source (FK5 J2000, radians)";
-      arg[ 2 ] = "Velocity correction term (m/s)";
-      break;
-
-   case AST__HLV2LD:
-      *comment = "Convert from Heliocentric to LSRD rel. velocity";
-      result = "HLV2LD";
-      *argra = 0;
-      *argdec = 1;
-      *nargs = 2;
-      *szargs = 3;
-      arg[ 0 ] = "RA of source (FK5 J2000, radians)";
-      arg[ 1 ] = "DEC of source (FK5 J2000, radians)";
-      arg[ 2 ] = "Velocity correction term (m/s)";
-      break;
-
-   case AST__LGV2HL:
-      *comment = "Convert from Local group to heliocentric rel. velocity";
-      result = "LGV2HL";
-      *argra = 0;
-      *argdec = 1;
-      *nargs = 2;
-      *szargs = 3;
-      arg[ 0 ] = "RA of source (FK5 J2000, radians)";
-      arg[ 1 ] = "DEC of source (FK5 J2000, radians)";
-      arg[ 2 ] = "Velocity correction term (m/s)";
-      break;
-
-   case AST__HLV2LG:
-      *comment = "Convert from Heliocentric to local group rel. velocity";
-      result = "HLV2LG";
-      *argra = 0;
-      *argdec = 1;
-      *nargs = 2;
-      *szargs = 3;
-      arg[ 0 ] = "RA of source (FK5 J2000, radians)";
-      arg[ 1 ] = "DEC of source (FK5 J2000, radians)";
-      arg[ 2 ] = "Velocity correction term (m/s)";
-      break;
-
-   case AST__GLV2HL:
-      *comment = "Convert from Galactic to heliocentric rel. velocity";
-      result = "GLV2HL";
-      *argra = 0;
-      *argdec = 1;
-      *nargs = 2;
-      *szargs = 3;
-      arg[ 0 ] = "RA of source (FK5 J2000, radians)";
-      arg[ 1 ] = "DEC of source (FK5 J2000, radians)";
-      arg[ 2 ] = "Velocity correction term (m/s)";
-      break;
-
-   case AST__HLV2GL:
-      *comment = "Convert from Heliocentric to galactic rel. velocity";
-      result = "HLV2GL";
-      *argra = 0;
-      *argdec = 1;
-      *nargs = 2;
-      *szargs = 3;
-      arg[ 0 ] = "RA of source (FK5 J2000, radians)";
-      arg[ 1 ] = "DEC of source (FK5 J2000, radians)";
-      arg[ 2 ] = "Velocity correction term (m/s)";
+      arg[ 3 ] = "Frequency correction factor";
       break;
 
    case AST__TPF2HL:
@@ -1339,294 +1094,429 @@ static const char *CvtString( int cvt_code, const char **comment,
    return result;
 }
 
-
-static void (*GetCvtFunc( int cvt_code ))( int, double *, double *, double *, 
-                                           double *, int ) {
+static int FrameChange( int cvt_code, int np, double *ra, double *dec, double *freq,
+                        double *args, int forward ){ 
 /*
 *  Name:
-*     GetCvtFunc
+*     FrameChange
 
 *  Purpose:
-*     Return a pointer to the function which implements a particular
-*     conversion type.
+*     Apply a doppler shift caused by a change of reference frame.
 
 *  Type:
 *     Private function.
 
 *  Synopsis:
 *     #include "specmap.h"
-*     void (*GetCvtFunc( int cvt_code ))( int, double *, double *, double *, 
-*                                         double *, int )
+*     int FrameChange( int cvt_code, int np, double *ra, double *dec, 
+*                      double *freq, double *args, int forward )
 
 *  Class Membership:
-*     SpecMap member function.
+*     SpecMap method.
 
 *  Description:
-*     This function accepts a code value used to represent one of the
-*     SpecMap coordinate conversions and returns a pointer to a function
-*     which will implement that conversion. 
+*     This function modifies the supplied frequency values in order to
+*     apply a doppler shift caused by a change of the observers rest-frame.
 
 *  Parameters:
 *     cvt_code
-*        The conversion code.
+*        A code indicating the conversion to be applied. If the code does
+*        not correspond to a change of rest-frame, then the supplied
+*        frequencies are left unchanged and zero is returned as the
+*        function value.
+*     np
+*        The number of frequency values to transform.
+*     ra
+*        Pointer to an array of "np" RA (J2000 FK5) values at which the
+*        "np" frequencies are observed. These are unchanged on exit. If a 
+*        NULL pointer is supplied, then all frequencies are assumed to be 
+*        observed at the single RA value given by "refra"
+*     dec
+*        Pointer to an array of "np" Dec (J2000 FK5) values at which the
+*        "np" frequencies are observed. These are unchanged on exit. If a 
+*        NULL pointer is supplied, then all frequencies are assumed to be 
+*        observed at the single Dec value given by "refdec"
+*     freq
+*        Pointer to an array of "np" frequency values, measured in the
+*        input rest-frame. These are modified on return to hold the 
+*        corresponding values measured in the output rest-frame.
+*     args
+*        Pointer to an array holding the conversion arguments. The number
+*        of arguments expected depends on the particular conversion being
+*        used.
+*     forward
+*        Should the conversion be applied in the forward or inverse
+*        direction? Non-zero for forward, zero for inverse.
 
 *  Returned Value:
-*     Pointer to a function which implements the conversion. This function
-*     will have the following synopsis:
-*
-*        void CvtFunc( int npoint, double *values, double *ra, double *dec, 
-*                      double *args, int forward )
-*
-*     where "npoint" is the number of axis values to transform, "values"
-*     is a pointer to the array of "npoint" axis values, "args" is a
-*     pointer to an array of argument values, and "forward" indicates if
-*     the conversion should be applied in the forward or invere direction. 
-*     The number of arguments required is specified by each particular 
-*     conversion. If the conversion code value supplied is not valid, a 
-*     NULL pointer will be returned, without error.
+*     Non-zero if the supplied conversion code corresponds to a change of
+*     reference frame. Zoer otherwise  (in which case the upplied values
+*     will not have been changed).
 
 *  Notes:
-*     - A NULL pointer value will be returned if this function is
-*     invoked with the global error status set, or if it should fail
-*     for any reason.
+*     - The "args" array contains RA and DEC values which give the "source" 
+*     position (FK5 J2000). If a NULL value is supplied for the "ra" 
+*     parameter, then these args define the position of all the frequency
+*     values. In addition they also define the direction of motion of
+*     the "user-defined" rest-frame (see "veluser"). Thus they should still 
+*     be supplied even if "ra" is NULL.
+
 */
 
 /* Local Variables: */
-   void (* result)( int, double *, double *, double *, double *, int); /* Pointer to return */
+   FrameDef def;      /* Structure holding frame parameters */
+   double (* cvtFunc)( double, double, FrameDef * ); /* Pointer to conversion function */
+   double *fcorr;     /* Pointer to frequency correction factor */   
+   double *pdec;      /* Pointer to next Dec value */   
+   double *pf;        /* Pointer to next frequency value */   
+   double *pra;       /* Pointer to next RA value */   
+   double factor;     /* Frequency correction factor */
+   double s;          /* Velocity correction (m/s) */
+   int i;             /* Loop index */
+   int result;        /* Returned value */
+   int sign;          /* Sign for velocity correction */
 
-/* Initialise the returned pointer, */
-   result = NULL;
+/* Check inherited status. */
+   if( !astOK ) return 0;
 
-/* Check the global error status. */
-   if ( !astOK ) return result;
-      
-/* Test for each valid code value in turn and assign the appropriate
-   return value. */
+/* Set the return value to indicate that the supplied conversion code 
+   represents a change of rest-frame. */
+   result = 1;
+
+/* Initialise a structure which stores parameters which define the
+   transformation. */
+   def.geolat = AST__BAD;
+   def.geolon = AST__BAD;
+   def.epoch = AST__BAD;
+   def.refdec = AST__BAD;
+   def.refra = AST__BAD;
+   def.veluser = AST__BAD;
+   def.last = AST__BAD;
+   def.amprms[ 0 ] = AST__BAD;
+   def.vuser[ 0 ] = AST__BAD;
+   def.dvh[ 0 ] = AST__BAD;
+   def.dvb[ 0 ] = AST__BAD;
+
+/* Test for each rest-frame code value in turn and assign the appropriate
+   values. */
    switch ( cvt_code ) {
 
-   case AST__FRTOVL:
-      result = frtovl;
+   case AST__USF2HL:
+      cvtFunc = UserVel;
+      def.veluser = args[ 0 ];
+      def.refra = args[ 1 ];
+      def.refdec = args[ 2 ];
+      fcorr = args + 3;
+      sign = -1;
       break;
 
-   case AST__VLTOFR:
-      result = vltofr;
-      break;
-
-   case AST__ENTOFR:
-      result = entofr;
-      break;
-
-   case AST__FRTOEN:
-      result = frtoen;
-      break;
-
-   case AST__WNTOFR:
-      result = wntofr;
-      break;
-
-   case AST__FRTOWN:
-      result = frtown;
-      break;
-
-   case AST__WVTOFR:
-      result = wvtofr;
-      break;
-
-   case AST__FRTOWV:
-      result = frtowv;
-      break;
-
-   case AST__AWTOFR:
-      result = awtofr;
-      break;
-
-   case AST__FRTOAW:
-      result = frtoaw;
-      break;
-
-   case AST__VRTOVL:
-      result = vrtovl;
-      break;
-
-   case AST__VLTOVR:
-      result = vltovr;
-      break;
-
-   case AST__VOTOVL:
-      result = votovl;
-      break;
-
-   case AST__VLTOVO:
-      result = vltovo;
-      break;
-
-   case AST__ZOTOVL:
-      result = zotovl;
-      break;
-
-   case AST__VLTOZO:
-      result = vltozo;
-      break;
-
-   case AST__BTTOVL:
-      result = bttovl;
-      break;
-
-   case AST__VLTOBT:
-      result = vltobt;
-      break;
-
-   case AST__TPV2HL:
-      result = tpv2hl;
-      break;
-
-   case AST__HLV2TP:
-      result = hlv2tp;
-      break;
-
-   case AST__GEV2HL:
-      result = gev2hl;
-      break;
-
-   case AST__HLV2GE:
-      result = hlv2ge;
-      break;
-
-   case AST__BYV2HL:
-      result = byv2hl;
-      break;
-
-   case AST__HLV2BY:
-      result = hlv2by;
-      break;
-
-   case AST__LKV2HL:
-      result = lkv2hl;
-      break;
-
-   case AST__HLV2LK:
-      result = hlv2lk;
-      break;
-
-   case AST__LDV2HL:
-      result = ldv2hl;
-      break;
-
-   case AST__HLV2LD:
-      result = hlv2ld;
-      break;
-
-   case AST__LGV2HL:
-      result = lgv2hl;
-      break;
-
-   case AST__HLV2LG:
-      result = hlv2lg;
-      break;
-
-   case AST__GLV2HL:
-      result = glv2hl;
-      break;
-
-   case AST__HLV2GL:
-      result = hlv2gl;
+   case AST__HLF2US:
+      cvtFunc = UserVel;
+      def.veluser = args[ 0 ];
+      def.refra = args[ 1 ];
+      def.refdec = args[ 2 ];
+      fcorr = args + 3;
+      sign = +1;
       break;
 
    case AST__TPF2HL:
-      result = tpf2hl;
+      cvtFunc = TopoVel;
+      def.geolon = args[ 0 ];
+      def.geolat = args[ 1 ];
+      def.epoch = args[ 2 ];
+      def.refra = args[ 3 ];
+      def.refdec = args[ 4 ];
+      fcorr = args + 5;
+      sign = -1;
       break;
 
    case AST__HLF2TP:
-      result = hlf2tp;
+      cvtFunc = TopoVel;
+      def.geolon = args[ 0 ];
+      def.geolat = args[ 1 ];
+      def.epoch = args[ 2 ];
+      def.refra = args[ 3 ];
+      def.refdec = args[ 4 ];
+      fcorr = args + 5;
+      sign = +1;
       break;
 
    case AST__GEF2HL:
-      result = gef2hl;
+      cvtFunc = GeoVel;
+      def.epoch = args[ 0 ];
+      def.refra = args[ 1 ];
+      def.refdec = args[ 2 ];
+      fcorr = args + 3;
+      sign = -1;
       break;
 
    case AST__HLF2GE:
-      result = hlf2ge;
+      cvtFunc = GeoVel;
+      def.epoch = args[ 0 ];
+      def.refra = args[ 1 ];
+      def.refdec = args[ 2 ];
+      fcorr = args + 3;
+      sign = +1;
       break;
 
    case AST__BYF2HL:
-      result = byf2hl;
+      cvtFunc = BaryVel;
+      def.epoch = args[ 0 ];
+      def.refra = args[ 1 ];
+      def.refdec = args[ 2 ];
+      fcorr = args + 3;
+      sign = -1;
       break;
 
    case AST__HLF2BY:
-      result = hlf2by;
+      cvtFunc = BaryVel;
+      def.epoch = args[ 0 ];
+      def.refra = args[ 1 ];
+      def.refdec = args[ 2 ];
+      fcorr = args + 3;
+      sign = +1;
       break;
 
    case AST__LKF2HL:
-      result = lkf2hl;
+      cvtFunc = LsrkVel;
+      def.refra = args[ 0 ];
+      def.refdec = args[ 1 ];
+      fcorr = args + 2;
+      sign = -1;
       break;
 
    case AST__HLF2LK:
-      result = hlf2lk;
+      cvtFunc = LsrkVel;
+      def.refra = args[ 0 ];
+      def.refdec = args[ 1 ];
+      fcorr = args + 2;
+      sign = +1;
       break;
 
    case AST__LDF2HL:
-      result = ldf2hl;
+      cvtFunc = LsrdVel;
+      def.refra = args[ 0 ];
+      def.refdec = args[ 1 ];
+      fcorr = args + 2;
+      sign = -1;
       break;
 
    case AST__HLF2LD:
-      result = hlf2ld;
+      cvtFunc = LsrdVel;
+      def.refra = args[ 0 ];
+      def.refdec = args[ 1 ];
+      fcorr = args + 2;
+      sign = +1;
       break;
 
    case AST__LGF2HL:
-      result = lgf2hl;
+      cvtFunc = LgVel;
+      def.refra = args[ 0 ];
+      def.refdec = args[ 1 ];
+      fcorr = args + 2;
+      sign = -1;
       break;
 
    case AST__HLF2LG:
-      result = hlf2lg;
+      cvtFunc = LgVel;
+      def.refra = args[ 0 ];
+      def.refdec = args[ 1 ];
+      fcorr = args + 2;
+      sign = +1;
       break;
 
    case AST__GLF2HL:
-      result = glf2hl;
+      cvtFunc = GalVel;
+      def.refra = args[ 0 ];
+      def.refdec = args[ 1 ];
+      fcorr = args + 2;
+      sign = -1;
       break;
 
    case AST__HLF2GL:
-      result = hlf2gl;
+      cvtFunc = GalVel;
+      def.refra = args[ 0 ];
+      def.refdec = args[ 1 ];
+      fcorr = args + 2;
+      sign = +1;
       break;
 
+/* If the supplied code does not represent a change of rest-frame, clear
+   the returned flag. */
+   default:
+      result = 0;      
+   }
 
+/* Check we have a rest-frame code. */
+   if( result ) {
+
+/* First deal with cases where we have a single source position (given by
+   refra and refdec). */
+      if( !ra ) {
+
+/* If the frequency correction factor has not been found, find it now. */
+         if( *fcorr == AST__BAD ) {
+
+/* Get the velocity correction. This is the component of the velocity of the 
+   output system, away from the source, as measured in the input system. */
+            s = sign*cvtFunc( def.refra, def.refdec, &def );
+
+/* Find the factor by which to correct supplied frequencies. If the
+   velocity correction is positive, the output frequency wil be lower than
+   the input frequency. */
+            if( s < AST__C && s > -AST__C ) {
+               *fcorr = sqrt( ( AST__C - s )/( AST__C + s ) );    
+            }
+         }
+
+/* Correct each supplied frequency. */
+         if( *fcorr != AST__BAD && *fcorr != 0.0 ) {
+            factor = forward ? *fcorr : 1.0 / ( *fcorr );
+            pf = freq;
+            for( i = 0; i < np; i++ ) *(pf++) *= factor;
+
+/* Set returned values bad if the velocity correction is un-physical. */
+         } else {
+            pf = freq;
+            for( i = 0; i < np; i++ ) *(pf++) = AST__BAD;
+         }
+
+/* Now deal with cases where each frequency value has its own source
+   position. */
+      } else {
+
+/* Invert the sign if we are doing a inverse transformation. */
+         if( !forward ) sign = -sign;
+
+/* Loop round each value. */
+         pf = freq;
+         pra = ra;
+         pdec = dec;
+         for( i = 0; i < np; i++ ) {
+
+/* If the ra or dec is bad, store a bad frequency. */
+            if( *pra == AST__BAD || *pdec == AST__BAD ) {
+               *(pf++) = AST__BAD;
+
+/* Otherwise, produce a corrected frequency. */
+            } else {
+
+/* Get the velocity correction. */
+               s = sign*cvtFunc( *pra, *pdec, &def );
+
+/* Correct this frequency, if possible. Otherwise set bad. */
+               if( s < AST__C && s > -AST__C ) {
+                  *(pf++) *= sqrt( ( AST__C - s )/( AST__C + s ) );
+               } else {
+                  *(pf++) = AST__BAD;
+               }
+            }
+
+/* Move on to the next position. */
+            pra++;
+            pdec++;
+         }
+      }
    }
 
 /* Return the result. */
    return result;
 }
 
-static double HelioVel( double epoch, double ra, double dec ){
+static double GalVel( double ra, double dec, FrameDef *def ) {
 /*
 *  Name:
-*     HelioVel
+*     GalVel
 
 *  Purpose:
-*     Returns the heliocentric velocity component of the earth.
+*     Find the velocity of the galactic centre away from the source.
 
 *  Type:
 *     Private function.
 
 *  Synopsis:
 *     #include "specmap.h"
-*     double HelioVel( double epoch, double ra, double dec )
+*     double GalVel( double ra, double dec, FrameDef *def ) 
 
 *  Class Membership:
 *     SpecMap method.
 
 *  Description:
-*     This function returns the component away from the source, of the 
-*     velocity of the earths centre relative to the sun (in km/s). 
+*     This function finds the component of the velocity of the galactic
+*     centre away from a specified source position, in the frame of rest 
+*     of the Sun.
 
 *  Parameters:
-*    epoch 
-*       Epoch of observation (UT1 expressed as a Modified Julian Date)
-*    ra 
-*       Right Ascension of source (radians, FK5 J2000)
-*    dec
-*       Declination of source (radians, FK5 J2000)
+*     ra 
+*        The RA (rads, FK5 J2000) of the source.
+*     dec
+*        The Dec (rads, FK5 J2000) of the source.
+*     def
+*        Pointer to a FrameDef structure which holds the parameters which
+*        define the frame, together with cached intermediate results.
 
-*  Returned Value:
-*     The required velocity (km/s).
+*  Returns:
+*     The component of the frame's velocity away from the position given by
+*     "ra" and "dec", in m/s, measured within the Heliographic frame of
+*     rest. Zero is returned if an error has already occurred.
+
+*/
+
+/* Local Variables: */
+   double s1, s2;          
+
+/* Check the global error status. */
+   if ( !astOK ) return 0.0;
+
+/* Get the component away from the source, of the velocity of the sun
+   relative to the dynamic LSR (in km/s). */
+   s1 = (double) slaRvlsrd( (float) ra, (float) dec );
+
+/* Get the component away from the source, of the velocity of the
+   dynamic LSR relative to the galactic centre (in km/s). */
+   s2 = (double) slaRvgalc( (float) ra, (float) dec );
+
+/* Return the total velocity of the galactic centre away from the source,
+   relative to the sun, in m/s. */
+   return -1000.0*( s1 + s2 );
+}
+
+static double GeoVel( double ra, double dec, FrameDef *def ) {
+/*
+*  Name:
+*     GeoVel
+
+*  Purpose:
+*     Find the velocity of the earth away from the source.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "specmap.h"
+*     double GeoVel( double ra, double dec, FrameDef *def ) 
+
+*  Class Membership:
+*     SpecMap method.
+
+*  Description:
+*     This function finds the component of the velocity of the earth away 
+*     from a specified source position, at a given epoch, in the frame of
+*     rest of the Sun.
+
+*  Parameters:
+*     ra 
+*        The RA (rads, FK5 J2000) of the source.
+*     dec
+*        The Dec (rads, FK5 J2000) of the source.
+*     def
+*        Pointer to a FrameDef structure which holds the parameters which
+*        define the frame, together with cached intermediate results.
+
+*  Returns:
+*     The component of the frame's velocity away from the position given by
+*     "ra" and "dec", in m/s, measured within the Heliographic frame of
+*     rest. Zero is returned if an error has already occurred.
 
 */
 
@@ -1634,7 +1524,6 @@ static double HelioVel( double epoch, double ra, double dec ){
    double dpb[ 3 ];          /* Barycentric earth position vector */
    double dph[ 3 ];          /* Heliocentric earth position vector */
    double dvb[ 3 ];          /* Barycentric earth velocity vector */
-   double dvh[ 3 ];          /* Heliocentric earth velocity vector */
    double v[ 3 ];            /* Source direction vector */
 
 /* Check the global error status. */
@@ -1644,13 +1533,15 @@ static double HelioVel( double epoch, double ra, double dec ){
    J2000 system. */
    slaDcs2c( ra, dec, v );
 
-/* Get the Earth/Sun velocity and position vectors in the same system. */
-   slaEvp( epoch, 2000.0, dvb, dpb, dvh, dph );
+/* If not already done so, get the Earth/Sun velocity and position vectors in 
+   the same system. Speed is returned in units of AU/s. Store in the supplied 
+   frame definition structure. */
+   if( def->dvh[ 0 ] == AST__BAD ) slaEvp( def->epoch, 2000.0, dvb, dpb,
+                                           def->dvh, dph );
   
 /* Return the component away from the source, of the velocity of the earths
-   centre relative to the sun (in km/s). */
-   return -slaDvdv( v, dvh )*149.597870E6;
-
+   centre relative to the sun (in m/s). */
+   return -slaDvdv( v, def->dvh )*149.597870E9;
 }
 
 void astInitSpecMapVtab_(  AstSpecMapVtab *vtab, const char *name ) {
@@ -1728,6 +1619,145 @@ void astInitSpecMapVtab_(  AstSpecMapVtab *vtab, const char *name ) {
    astSetDelete( vtab, Delete );
    astSetDump( vtab, Dump, "SpecMap",
                "Conversion between spectral coordinate systems" );
+}
+
+static double LgVel( double ra, double dec, FrameDef *def ) {
+/*
+*  Name:
+*     LgVel
+
+*  Purpose:
+*     Find the velocity of the Local Group away from the source.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "specmap.h"
+*     double LgVel( double ra, double dec, FrameDef *def ) 
+
+*  Class Membership:
+*     SpecMap method.
+
+*  Description:
+*     This function finds the component of the Local Group velocity away 
+*     from a specified source position, in the frame of rest of the Sun.
+
+*  Parameters:
+*     ra 
+*        The RA (rads, FK5 J2000) of the source.
+*     dec
+*        The Dec (rads, FK5 J2000) of the source.
+*     def
+*        Pointer to a FrameDef structure which holds the parameters which
+*        define the frame, together with cached intermediate results.
+
+*  Returns:
+*     The component of the frame's velocity away from the position given by
+*     "ra" and "dec", in m/s, measured within the Heliographic frame of
+*     rest. Zero is returned if an error has already occurred.
+
+*/
+
+/* Return the component away from the source, of the velocity of the
+   local group relative to the sun (in m/s). */
+   return -1000.0*slaRvlg( (float) ra, (float) dec );
+}
+
+static double LsrdVel( double ra, double dec, FrameDef *def ) {
+/*
+*  Name:
+*     LsrdVel
+
+*  Purpose:
+*     Find the velocity of the Dynamical LSR away from the source.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "specmap.h"
+*     double LsrdVel( double ra, double dec, FrameDef *def ) 
+
+*  Class Membership:
+*     SpecMap method.
+
+*  Description:
+*     This function finds the component of the velocity of the Dynamical 
+*     LSR away from a specified source position, in the frame of rest of 
+*     the Sun.
+
+*  Parameters:
+*     ra 
+*        The RA (rads, FK5 J2000) of the source.
+*     dec
+*        The Dec (rads, FK5 J2000) of the source.
+*     def
+*        Pointer to a FrameDef structure which holds the parameters which
+*        define the frame, together with cached intermediate results.
+
+*  Returns:
+*     The component of the frame's velocity away from the position given by
+*     "ra" and "dec", in m/s, measured within the Heliographic frame of
+*     rest. Zero is returned if an error has already occurred.
+
+*/
+/* Check the global error status. */
+   if ( !astOK ) return 0.0;
+
+/* Get the component away from the source, of the velocity of the sun
+   relative to the dynamical LSR (in m/s). This can also be thought of as the 
+   velocity of the LSR towards the source relative to the sun. Return the
+   negated value (i.e. velocity of lsrd *away from* the source. */
+   return -1000.0*slaRvlsrd( (float) ra, (float) dec );
+}
+
+static double LsrkVel( double ra, double dec, FrameDef *def ) {
+/*
+*  Name:
+*     LsrkVel
+
+*  Purpose:
+*     Find the velocity of the Kinematic LSR away from the source.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "specmap.h"
+*     double LsrkVel( double ra, double dec, FrameDef *def ) 
+
+*  Class Membership:
+*     SpecMap method.
+
+*  Description:
+*     This function finds the component of the velocity of the Kinematic
+*     LSR away from a specified source position, in the frame of rest of 
+*     the Sun.
+
+*  Parameters:
+*     ra 
+*        The RA (rads, FK5 J2000) of the source.
+*     dec
+*        The Dec (rads, FK5 J2000) of the source.
+*     def
+*        Pointer to a FrameDef structure which holds the parameters which
+*        define the frame, together with cached intermediate results.
+
+*  Returns:
+*     The component of the frame's velocity away from the position given by
+*     "ra" and "dec", in m/s, measured within the Heliographic frame of
+*     rest. Zero is returned if an error has already occurred.
+
+*/
+/* Check the global error status. */
+   if ( !astOK ) return 0.0;
+
+/* Get the component away from the source, of the velocity of the sun
+   relative to the kinematic LSR (in m/s). This can also be thought of as the 
+   velocity of the LSR towards the source relative to the sun. Return the
+   negated value (i.e. velocity of lsrk *away from* the source. */
+   return -1000.0*slaRvlsrk( (float) ra, (float) dec );
 }
 
 static int MapMerge( AstMapping *this, int where, int series, int *nmap,
@@ -2041,19 +2071,10 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                SWAP_CODES( AST__ZOTOVL, AST__VLTOZO ) 
                SWAP_CODES( AST__BTTOVL, AST__VLTOBT ) 
 
-/* Exchange transformation codes for their inverses, and negate the
-   velocity correction term. */
-               SWAP_CODES3( AST__TPV2HL, AST__HLV2TP, 5 ) 
-               SWAP_CODES3( AST__GEV2HL, AST__HLV2GE, 3 ) 
-               SWAP_CODES3( AST__BYV2HL, AST__HLV2BY, 3 ) 
-               SWAP_CODES3( AST__LKV2HL, AST__HLV2LK, 2 ) 
-               SWAP_CODES3( AST__LDV2HL, AST__HLV2LD, 2 ) 
-               SWAP_CODES3( AST__LGV2HL, AST__HLV2LG, 2 ) 
-               SWAP_CODES3( AST__GLV2HL, AST__HLV2GL, 2 ) 
-
 /* Exchange transformation codes for their inverses, and reciprocate the
    frequency correction factor. */
                SWAP_CODES2( AST__TPF2HL, AST__HLF2TP, 5 ) 
+               SWAP_CODES2( AST__USF2HL, AST__HLF2US, 3 ) 
                SWAP_CODES2( AST__GEF2HL, AST__HLF2GE, 3 ) 
                SWAP_CODES2( AST__BYF2HL, AST__HLF2BY, 3 ) 
                SWAP_CODES2( AST__LKF2HL, AST__HLF2LK, 2 ) 
@@ -2128,11 +2149,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                } else if( ( PAIR_CVT2( AST__LKF2HL, AST__HLF2LK ) || 
                             PAIR_CVT2( AST__LDF2HL, AST__HLF2LD ) || 
                             PAIR_CVT2( AST__LGF2HL, AST__HLF2LG ) || 
-                            PAIR_CVT2( AST__GLF2HL, AST__HLF2GL ) || 
-                            PAIR_CVT2( AST__LKV2HL, AST__HLV2LK ) || 
-                            PAIR_CVT2( AST__LDV2HL, AST__HLV2LD ) || 
-                            PAIR_CVT2( AST__LGV2HL, AST__HLV2LG ) || 
-                            PAIR_CVT2( AST__GLV2HL, AST__HLV2GL ) ) &&
+                            PAIR_CVT2( AST__GLF2HL, AST__HLF2GL ) ) &&
                           EQUAL( cvtargs[ istep ][ 0 ], 
                                  cvtargs[ istep + 1 ][ 0 ] ) &&
                           EQUAL( cvtargs[ istep ][ 1 ], 
@@ -2143,8 +2160,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* Now check for conversions which have three user-supplied arguments. */
                } else if( ( PAIR_CVT2( AST__GEF2HL, AST__HLF2GE ) || 
                             PAIR_CVT2( AST__BYF2HL, AST__HLF2BY ) ||
-                            PAIR_CVT2( AST__GEV2HL, AST__HLV2GE ) || 
-                            PAIR_CVT2( AST__BYV2HL, AST__HLV2BY ) ) &&
+                            PAIR_CVT2( AST__USF2HL, AST__HLF2US ) ) &&
                           EQUAL( cvtargs[ istep ][ 0 ], 
                                  cvtargs[ istep + 1 ][ 0 ] ) &&
                           EQUAL( cvtargs[ istep ][ 1 ], 
@@ -2156,8 +2172,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 
 /* Now check for conversions which have five user-supplied arguments (currently
    no conversions have four user-supplied arguments). */
-               } else if( ( PAIR_CVT2( AST__TPF2HL, AST__HLF2TP ) ||
-                            PAIR_CVT2( AST__TPV2HL, AST__HLV2TP ) ) &&
+               } else if( ( PAIR_CVT2( AST__TPF2HL, AST__HLF2TP ) ) && 
                           EQUAL( cvtargs[ istep ][ 0 ], 
                                  cvtargs[ istep + 1 ][ 0 ] ) &&
                           EQUAL( cvtargs[ istep ][ 1 ], 
@@ -2479,34 +2494,10 @@ f     these arguments should be given, via the ARGS array, in the
 *     - "VLTOZO": Convert relativistic velocity to redshift.
 *     - "BTTOVL": Convert beta factor to relativistic velocity.
 *     - "VLTOBT": Convert relativistic velocity to beta factor.
-*     - "TPV2HL" (GLON,GLAT,EPOCH,RA,DEC): Convert relativistic velocity from 
-*     topocentric reference frame to heliocentric.
-*     - "HLV2TP" (GLON,GLAT,EPOCH,RA,DEC): Convert relativistic velocity from 
-*     heliocentric reference frame to topocentric.
-*     - "GEV2HL" (EPOCH,RA,DEC): Convert relativistic velocity from geocentric 
+*     - "USF2HL" (VOFF,RA,DEC): Convert frequency from a user-defined 
 *     reference frame to heliocentric.
-*     - "HLV2GE" (EPOCH,RA,DEC): Convert relativistic velocity from 
-*     heliocentric reference frame to geocentric.
-*     - "BYV2HL" (EPOCH,RA,DEC): Convert relativistic velocity from 
-*     barycentric reference frame to heliocentric.
-*     - "HLV2BY" (EPOCH,RA,DEC): Convert relativistic velocity from 
-*     heliocentric reference frame to barycentric.
-*     - "LKV2HL" (RA,DEC): Convert relativistic velocity from kinematic LSR 
-*     reference frame to heliocentric.
-*     - "HLV2LK" (RA,DEC): Convert relativistic velocity from heliocentric 
-*     reference frame to kinematic LSR.
-*     - "LDV2HL" (RA,DEC): Convert relativistic velocity from dynamical LSR
-*     reference frame to heliocentric.
-*     - "HLV2LD" (RA,DEC): Convert relativistic velocity from heliocentric 
-*     reference frame to dynamical LSR.
-*     - "LGV2HL" (RA,DEC): Convert relativistic velocity from local group 
-*     reference frame to heliocentric.
-*     - "HLV2LG" (RA,DEC): Convert relativistic velocity from heliocentric 
-*     reference frame to local group.
-*     - "GLV2HL" (RA,DEC): Convert relativistic velocity from galactic 
-*     reference frame to heliocentric.
-*     - "HLV2GL" (RA,DEC): Convert relativistic velocity from heliocentric 
-*     reference frame to galactic.
+*     - "HLF2US" (VOFF,RA,DEC): Convert frequency from heliocentric 
+*     reference frame to user-defined.
 *     - "TPF2HL" (GLON,GLAT,EPOCH,RA,DEC): Convert frequency from 
 *     topocentric reference frame to heliocentric.
 *     - "HLF2TP" (GLON,GLAT,EPOCH,RA,DEC): Convert frequency from 
@@ -2539,7 +2530,8 @@ f     these arguments should be given, via the ARGS array, in the
 *     The units for the values processed by the above conversions are as
 *     follows: 
 *
-*     - all velocities: metres per second.
+*     - all velocities: metres per second (positive if the source receeds from 
+*       the observer). 
 *     - frequency: Hertz.
 *     - all wavelengths: metres.
 *     - energy: Joules.
@@ -2553,12 +2545,17 @@ f     these arguments should be given, via the ARGS array, in the
 *     - EPOCH: Epoch of observation (UT1 expressed as a Modified Julian Date).
 *     - RA: Right Ascension of source (radians, FK5 J2000).
 *     - DEC: Declination of source (radians, FK5 J2000).
+*     - VOFF: Velocity of the user-defined reference frame, towards the
+*     position given by RA and DEC, measured in the heliocentric
+*     reference frame.
 *
-*     The values supplied for the "RA" and "DEC" arguments are ignored if
-*     the SpecMap is 3-dimensional (AST__BAD may be supplied). In this case, 
-*     the source position is provided by the RA and DEC values supplied to 
-*     inputs 2 and 3 of the SpecMap (which are simply copied to outputs 2 and 
-*     3).
+*     If the SpecMap is 3-dimensional, source positions are provided by the 
+*     values supplied to inputs 2 and 3 of the SpecMap (which are simply 
+*     copied to outputs 2 and 3). Note, usable values are still required
+*     for the RA and DEC arguments in order to define the "user-defined" 
+*     reference frame used by USF2HL and HLF2US. However, AST__BAD can be 
+*     supplied for RA and DEC if the user-defined reference frame is not 
+*     required.
 *
 *--
 */
@@ -2584,68 +2581,503 @@ f     these arguments should be given, via the ARGS array, in the
    AddSpecCvt( this, cvttype, args );
 }
 
-static double TopoVel( double lon, double lat, double epoch, double ra,
-                       double dec ){
+static int SystemChange( int cvt_code, int np, double *values, double *args, 
+                         int forward ){ 
 /*
 *  Name:
-*     TopoVel
+*     SystemChange
 
 *  Purpose:
-*     Returns the topocentric velocity of the observer.
+*     Change values between two spectral systems.
 
 *  Type:
 *     Private function.
 
 *  Synopsis:
 *     #include "specmap.h"
-*     double TopoVel( double lon, double lat, double epoch, double ra,
-*                     double dec )
+*     int SystemChange( int cvt_code, int np, double *values, double *args, 
+*                       int forward )
 
 *  Class Membership:
 *     SpecMap method.
 
 *  Description:
-*     This function returns the component away from the source, of the 
-*     velocity of the observer  relative to the centre of the earth, in 
-*     km/s. 
+*     This function modifies the supplied values in order to change the
+*     spectral co-ordinate system (frequency, wavelength, etc) to which 
+*     they refer.
 
 *  Parameters:
-*    lon 
-*       Geodetic longitude of observer (radians - positive eastwards)
-*    lat 
-*       Geodetic latitude of observer (radians)
-*    epoch 
-*       Epoch of observation (UT1 expressed as a Modified Julian Date)
-*    ra 
-*       Right Ascension of source (radians, FK5 J2000)
-*    dec
-*       Declination of source (radians, FK5 J2000)
+*     cvt_code
+*        A code indicating the conversion to be applied. If the code does
+*        not correspond to a change of system, then the supplied values
+*        are left unchanged and zero is returned as the function value.
+*     np
+*        The number of frequency values to transform.
+*     values
+*        Pointer to an array of "np" spectral values. These are modified on 
+*        return to hold the corresponding values measured in the output
+*        system.
+*     args
+*        Pointer to an array holding the conversion arguments. The number
+*        of arguments expected depends on the particular conversion being
+*        used.
+*     forward
+*        Should the conversion be applied in the forward or inverse
+*        direction? Non-zero for forward, zero for inverse.
 
 *  Returned Value:
-*     The required velocity (km/s).
+*     Non-zero if the supplied conversion code corresponds to a change of
+*     system. Zero otherwise  (in which case the upplied values will not 
+*     have been changed).
 
 */
 
 /* Local Variables: */
-   double amprms[21];        /* Mean to apparent parameters */
+   double *pv;        /* Pointer to next value */   
+   double d;          /* Intermediate value */
+   double f2;         /* Squared frequency */   
+   double temp;       /* Intermediate value */
+   int i;             /* Loop index */
+   int result;        /* Returned value */
+
+/* Check inherited status. */
+   if( !astOK ) return 0;
+
+/* Set the return value to indicate that the supplied conversion code 
+   represents a change of system. */
+   result = 1;
+
+/* Test for each code value in turn and assign the appropriate values. */
+   switch ( cvt_code ) {
+
+/* Frequency to relativistic velocity. */
+   case AST__FRTOVL:
+      if( forward ) {
+         if( args[ 0 ] != AST__BAD ) {
+            temp = args[ 0 ] * args[ 0 ];
+            pv = values - 1;
+            for( i = 0; i < np; i++ ){
+               pv++;
+               if( *pv != AST__BAD ) {
+                  f2 = ( *pv ) * ( *pv );
+                  d = temp + f2;
+                  if( d > 0.0 ) {
+                     *pv = AST__C*( ( temp - f2 )/d );
+                  } else {
+                     *pv = AST__BAD;
+                  }
+               }
+            }
+         } else {
+            pv = values;
+            for( i = 0; i < np; i++ ) *( pv++ ) = AST__BAD;
+         }
+      } else {
+         SystemChange( AST__VLTOFR, np, values, args, 1 );
+      }
+      break;
+
+/* Relativistic velocity to frequency. */
+   case AST__VLTOFR:
+      if( forward ) {
+         if( args[ 0 ] != AST__BAD ) {
+            temp = args[ 0 ];
+            pv = values - 1;
+            for( i = 0; i < np; i++ ){
+               pv++;
+               if( *pv != AST__BAD ) {
+                  d = AST__C + ( *pv );
+                  if( d != 0.0 ) {
+                     d = ( AST__C - ( *pv ) )/d;
+                     if( d >= 0.0 ) {
+                        *pv = temp*sqrt( d );
+                     } else {
+                        *pv = AST__BAD;
+                     }
+                  } else {
+                     *pv = AST__BAD;
+                  }
+               }
+            }
+         } else {
+            pv = values;
+            for( i = 0; i < np; i++ ) *( pv++ ) = AST__BAD;
+         }
+      } else {
+         SystemChange( AST__FRTOVL, np, values, args, 1 );
+      }
+      break;
+
+/* Energy to frequency */
+   case AST__ENTOFR:
+      if( forward ) {
+         pv = values - 1;
+         for( i = 0; i < np; i++ ) {
+            pv++;
+            if( *pv != AST__BAD ) {
+               *pv /= AST__H;
+            }
+         }
+      } else {
+         SystemChange( AST__FRTOEN, np, values, args, 1 );
+      }
+      break;
+
+/* Frequency to energy */
+   case AST__FRTOEN:
+      if( forward ) {
+         pv = values - 1;
+         for( i = 0; i < np; i++ ) {
+            pv++;
+            if( *pv != AST__BAD ) {
+               *pv *= AST__H;
+            }
+         }
+      } else {
+         SystemChange( AST__ENTOFR, np, values, args, 1 );
+      }
+      break;
+
+/* Wave number to frequency */
+   case AST__WNTOFR:
+      if( forward ) {
+         pv = values - 1;
+         for( i = 0; i < np; i++ ) {
+            pv++;
+            if( *pv != AST__BAD ) {
+               *pv *= AST__C;
+            }
+         }
+      } else {
+         SystemChange( AST__FRTOWN, np, values, args, 1 );
+      }
+      break;
+
+/* Wave number to frequency */
+   case AST__FRTOWN:
+      if( forward ) {
+         pv = values - 1;
+         for( i = 0; i < np; i++ ) {
+            pv++;
+            if( *pv != AST__BAD ) {
+               *pv /= AST__C;
+            }
+         }
+      } else {
+         SystemChange( AST__WNTOFR, np, values, args, 1 );
+      }
+      break;
+
+/* Wavelength to frequency */
+   case AST__WVTOFR:
+      if( forward ) {
+         pv = values - 1;
+         for( i = 0; i < np; i++ ) {
+            pv++;
+            if( *pv != AST__BAD && *pv != 0.0 ) {
+               *pv = AST__C/( *pv );
+            } else {
+               *pv = AST__BAD;
+            }
+         }
+      } else {
+         SystemChange( AST__FRTOWV, np, values, args, 1 );
+      }
+      break;
+
+/* Frequency to wavelength. */
+   case AST__FRTOWV:
+      if( forward ) {
+         pv = values - 1;
+         for( i = 0; i < np; i++ ) {
+            pv++;
+            if( *pv != AST__BAD ) {
+               *pv = AST__C/( *pv );
+            } else {
+               *pv = AST__BAD;
+            }
+         }
+      } else {
+         SystemChange( AST__WVTOFR, np, values, args, 1 );
+      }
+      break;
+
+/* Wavelength in air to frequency. */
+   case AST__AWTOFR:
+      if( forward ) {
+         pv = values - 1;
+         for( i = 0; i < np; i++ ) {
+            pv++;
+            if( *pv != AST__BAD && *pv != 0.0 ) {
+               *pv = AST__C/( ( *pv )*Refrac( *pv ) );
+            } else {
+               *pv = AST__BAD;
+            }
+         }
+      } else {
+         SystemChange( AST__FRTOAW, np, values, args, 1 );
+      }
+      break;
+
+/* Frequency to wavelength in air. */
+   case AST__FRTOAW:
+      if( forward ) {
+         pv = values - 1;
+         for( i = 0; i < np; i++ ) {
+            pv++;
+            if( *pv != AST__BAD && *pv != 0.0 ) {
+               temp = AST__C/( *pv );
+               *pv = temp/Refrac( temp );
+            } else {
+               *pv = AST__BAD;
+            }
+         }
+      } else {
+         SystemChange( AST__AWTOFR, np, values, args, 1 );
+      }
+      break;
+
+/* Radio velocity to relativistic velocity */
+   case AST__VRTOVL:
+      if( forward ) {
+         pv = values - 1;
+         for( i = 0; i < np; i++ ) {
+            pv++;
+            if( *pv != AST__BAD ) {
+               temp = 1.0 - ( *pv )/AST__C;
+               temp *= temp;
+               *pv = AST__C*( 1.0 - temp )/( 1.0 + temp );
+            }
+         }
+      } else {
+         SystemChange( AST__VLTOVR, np, values, args, 1 );
+      }
+      break;
+
+/* Relativistic velocity to radio velocity. */
+   case AST__VLTOVR:
+      if( forward ) {
+         pv = values - 1;
+         for( i = 0; i < np; i++ ) {
+            pv++;
+            if( *pv != AST__BAD ) {
+               temp = AST__C + ( *pv );
+               if( temp != 0.0 ) {
+                  temp = (AST__C - *pv )/temp;
+                  if( temp >= 0.0 ) {
+                     *pv = AST__C*( 1.0 - sqrt( temp ) );
+                  } else {
+                     *pv = AST__BAD;
+                  }
+               } else {
+                  *pv = AST__BAD;
+               }
+            }
+         }
+      } else {
+         SystemChange( AST__VRTOVL, np, values, args, 1 );
+      }
+      break;
+
+/* Optical velocity to relativistic velocity */
+   case AST__VOTOVL:
+      if( forward ) {
+         pv = values - 1;
+         for( i = 0; i < np; i++ ) {
+            pv++;
+            if( *pv != AST__BAD ) {
+               temp = 1.0 + ( *pv )/AST__C;
+               temp *= temp;
+               *pv = AST__C*( temp - 1.0 )/( temp + 1.0 );
+            }
+         }
+      } else {
+         SystemChange( AST__VLTOVO, np, values, args, 1 );
+      }
+      break;
+
+/* Relativistic velocity to optical velocity. */
+   case AST__VLTOVO:
+      if( forward ) {
+         pv = values - 1;
+         for( i = 0; i < np; i++ ) {
+            pv++;
+            if( *pv != AST__BAD ) {
+               temp = AST__C - *pv;
+               if( temp != 0.0 ) {
+                  temp = (AST__C + *pv )/temp;
+                  if( temp >= 0.0 ) {
+                     *pv = AST__C*( sqrt( temp ) - 1.0 );
+                  } else {
+                     *pv = AST__BAD;
+                  }
+               } else {
+                  *pv = AST__BAD;
+               }
+            }
+         }
+      } else {
+         SystemChange( AST__VOTOVL, np, values, args, 1 );
+      }
+      break;
+
+/* Redshift to relativistic velocity */
+   case AST__ZOTOVL:
+      if( forward ) {
+         pv = values - 1;
+         for( i = 0; i < np; i++ ) {
+            pv++;
+            if( *pv != AST__BAD ) {
+               temp = 1.0 + ( *pv );
+               temp *= temp;
+               *pv = AST__C*( temp - 1.0 )/( temp + 1.0 );
+            }
+         }
+      } else {
+         SystemChange( AST__VLTOZO, np, values, args, 1 );
+      }
+      break;
+
+/* Relativistic velocity to redshift. */
+   case AST__VLTOZO:
+      if( forward ) {
+         pv = values - 1;
+         for( i = 0; i < np; i++ ) {
+            pv++;
+            if( *pv != AST__BAD ) {
+               temp = AST__C - *pv;
+               if( temp != 0.0 ) {
+                  temp = (AST__C + *pv )/temp;
+                  if( temp >= 0.0 ) {
+                     *pv = sqrt( temp ) - 1.0;
+                  } else {
+                     *pv = AST__BAD;
+                  }
+               } else {
+                  *pv = AST__BAD;
+               }
+            }
+         }
+      } else {
+         SystemChange( AST__ZOTOVL, np, values, args, 1 );
+      }
+      break;
+
+/* Beta factor to relativistic velocity */
+   case AST__BTTOVL:
+      if( forward ) {
+         pv = values - 1;
+         for( i = 0; i < np; i++ ) {
+            pv++;
+            if( *pv != AST__BAD ) {
+               *pv *= AST__C;
+            }
+         }
+      } else {
+         SystemChange( AST__VLTOBT, np, values, args, 1 );
+      }
+      break;
+
+/* Relativistic velocity to beta factor. */
+   case AST__VLTOBT:
+      if( forward ) {
+         pv = values - 1;
+         for( i = 0; i < np; i++ ) {
+            pv++;
+            if( *pv != AST__BAD ) {
+               *pv /= AST__C;
+            }
+         }
+      } else {
+         SystemChange( AST__BTTOVL, np, values, args, 1 );
+      }
+      break;
+
+/* If the supplied code does not represent a change of system, clear
+   the returned flag. */
+   default:
+      result = 0;      
+   }
+
+/* Return the result. */
+   return result;
+}
+
+static double TopoVel( double ra, double dec, FrameDef *def ) {
+/*
+*  Name:
+*     TopoVel
+
+*  Purpose:
+*     Find the velocity of the observer away from the source.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "specmap.h"
+*     double TopoVel( double ra, double dec, FrameDef *def ) 
+
+*  Class Membership:
+*     SpecMap method.
+
+*  Description:
+*     This function finds the component of the velocity of the observer away 
+*     from a specified source position, at a given epoch, in the frame of
+*     rest of the Sun.
+
+*  Parameters:
+*     ra 
+*        The RA (rads, FK5 J2000) of the source.
+*     dec
+*        The Dec (rads, FK5 J2000) of the source.
+*     def
+*        Pointer to a FrameDef structure which holds the parameters which
+*        define the frame, together with cached intermediate results.
+
+*  Returns:
+*     The component of the frame's velocity away from the position given by
+*     "ra" and "dec", in m/s, measured within the Heliographic frame of
+*     rest. Zero is returned if an error has already occurred.
+
+*/
+
+/* Local Variables: */
    double deca;              /* Apparent DEC */
-   double last;              /* Local apparent siderial time */
    double raa;               /* Apparent RA */
+   double vobs;              /* Velocity of observer relative to earth */
+   double vearth;            /* Velocity of earth realtive to sun */
 
 /* Check the global error status. */
    if ( !astOK ) return 0.0;
 
-/* Convert the supplied mean ra and dec to apparent ra and dec. */
-   slaMappa( 2000.0, epoch, amprms );
-   slaMapqkz( ra, dec, amprms, &raa, &deca );
+/* If not already done so, get the parameters defining the transformation
+   of mean ra and dec to apparent ra and dec, and store in the supplied frame 
+   definition structure. */
+   if( def->amprms[ 0 ] == AST__BAD ) slaMappa( 2000.0, def->epoch, 
+                                                def->amprms );
 
-/* Get the local apparent siderial time (in radians). */
-   last = slaGmst( epoch ) + slaEqeqx( epoch ) + lon;
+/* Convert the source position from mean ra and dec to apparent ra and dec. */
+   slaMapqkz( ra, dec, def->amprms, &raa, &deca );
 
-/* Return the component away from the source, of the velocity of the observer 
-   relative to the centre of the earth (in km/s). */
-   return (double) slaRverot( (float) lat, (float) raa, (float) deca, 
-                              (float) last );
+/* If not already done so, get the local apparent siderial time (in radians)
+   and store in the supplied frame definition structure. */
+   if( def->last == AST__BAD ) def->last = slaGmst( def->epoch ) + 
+                                           slaEqeqx( def->epoch ) +
+                                           def->geolon;
+
+/* Get the component away from the source, of the velocity of the observer 
+   relative to the centre of the earth (in m/s). */
+   vobs = 1000.0*slaRverot( (float) def->geolat, (float) raa, (float) deca, 
+                            (float) def->last );
+
+/* Get the component away from the source, of the velocity of the earth's 
+   centre relative to the Sun, in m/s. */
+   vearth = GeoVel( ra, dec, def );
+
+/* Return the total velocity of the observer away from the source in the
+   frame of the sun. */
+   return vobs + vearth;
 }
 
 static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
@@ -2717,7 +3149,6 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
    int ncoord_in;                /* Number of coordinates per input point */
    int npoint;                   /* Number of points */
    int start;                    /* Starting index for conversion loop */
-   void (* cvtFunc)( int, double *, double *, double *, double *, int ); /* Pointer to conversion function */
 
 /* Check the global error status. */
    if ( !astOK ) return NULL;
@@ -2783,13 +3214,15 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 /* Loop through the coordinate conversions in the required order. */
       for ( cvt = start; cvt != end; cvt += inc ) {
 
-/* Get a pointer to the function to be called to do the transformation. */
-         cvtFunc = GetCvtFunc( map->cvttype[ cvt ] );
+/* Process conversions which correspond to changes of reference frames. */
+         if( !FrameChange( map->cvttype[ cvt ], npoint, alpha, beta, spec,
+                          map->cvtargs[ cvt ], forward ) ) {
 
-/* Invoke this function to do the transformation. This over-writes the
-   current contents of the "spec" array. */
-         if( cvtFunc ) cvtFunc( npoint, spec, alpha, beta, map->cvtargs[ cvt ],
-                                forward );
+/* If this conversion was not a change of reference frame, it must be a
+   change of system. */
+            SystemChange( map->cvttype[ cvt ], npoint, spec,
+                          map->cvtargs[ cvt ], forward );
+         }
       }
    }
 
@@ -2806,58 +3239,76 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 
 }
 
-
-static void VelCorr( double *value, double vc ){
+static double UserVel( double ra, double dec, FrameDef *def ) {
 /*
 *  Name:
-*     VelCorr
+*     UserVel
 
 *  Purpose:
-*     Convert a radial velocity to a new reference frame.
+*     Find the component of the velocity of the user-defined rest-frame 
+*     away from the source.
 
 *  Type:
 *     Private function.
 
 *  Synopsis:
 *     #include "specmap.h"
-*     void VelCorr( double *value, double vc )
+*     double UserVel( double ra, double dec, FrameDef *def ) 
 
 *  Class Membership:
 *     SpecMap method.
 
 *  Description:
-*     This function converts the supplied relativistic radial velocity to 
-*     a new reference frame.
+*     This function finds the component of the velocity of the user-defined 
+*     rest-frame away from a specified position. The magnitude and direction 
+*     of the rest-frames velocity are defined within the supplied "def" 
+*     structure. The user-defined rest-frame is typically used to represent 
+*     the velocity of the source within the heliocentric rest-frame.
 
 *  Parameters:
-*     value
-*        Pointer to a double holding a velocity value (m/s) measured
-*        in the old reference frame. Positive velocity corresponds to the 
-*        source receeding from the observer. The supplied value is modified 
-*        on return to hold the corresponding converted value.
-*     vc 
-*        The component of the velocity (m/s) of the origin of the new 
-*        reference frame, towards the source, measured in the old
-*        reference frame.
+*     ra 
+*        The RA (rads, FK5 J2000) of the source.
+*     dec
+*        The Dec (rads, FK5 J2000) of the source.
+*     def
+*        Pointer to a FrameDef structure which holds the parameters which
+*        define the frame, together with cached intermediate results.
+
+*  Returns:
+*     The component of the frame's velocity away from the position given by
+*     "ra" and "dec", in m/s, measured within the Heliographic frame of
+*     rest. Zero is returned if an error has already occurred.
+
+*  Notes:
+*     - The direction of the user velocity is given by def->refra and
+*     def->refdec (an FK5 J2000 position). The maginitude of the velocity
+*     is given by def->veluser, in m/s, positive when the source is moving
+*     away from the observer towards def->refra, def->refdec, and given
+*     with respect to the heliocentric rest-frame. 
+
 */
 
 /* Local Variables: */
-   double f, d;
+   double vb[ 3 ];          /* Source position vector */
 
 /* Check the global error status. */
-   if ( !astOK ) return;
+   if ( !astOK ) return 0.0;
 
-/* Correct the supplied velocity value, adding the correction term to the 
-   velocity relativistically. */
-   f = vc/( AST__C * AST__C );
-   if( *value != AST__BAD ) {
-      d = 1.0 - (*value)*f;
-      if( d != 0.0 ) {
-         *value = ( (*value) - vc )/d;
-      } else {
-         *value = AST__BAD;
-      }
+/* If not already done so, express the user velocity in the form of a 
+   J2000.0 x,y,z vector. */
+   if( def->vuser[ 0 ] == AST__BAD ) {
+      def->vuser[ 0 ] = def->veluser*cos( def->refra )*cos( def->refdec );
+      def->vuser[ 1 ] = def->veluser*sin( def->refra )*cos( def->refdec );
+      def->vuser[ 2 ] = def->veluser*sin( def->refdec );
    }
+
+/* Convert given J2000 RA,Dec to x,y,z. */
+   slaDcs2c( ra, dec, vb );
+
+/* Return the dot product with the user velocity. Invert it to get the
+   velocity towards the observer (the def->veluser value is supposed to be
+   positive if the source is moving away from the observer). */
+   return -slaDvdv( def->vuser, vb );
 }
 
 /* Copy constructor. */
@@ -3115,2249 +3566,6 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 
 /* Undefine macros local to this function. */
 #undef KEY_LEN
-}
-
-/* Conversion functions. */
-/* ===================== */
-/* These functions provide the implementation of each of the supported
-   conversions. They all have the same synopsis and argument list:
-
-*  Synopsis:
-*     #include "specmap.h"
-*     void <name>( int npoint, double *values, double *ra, double *dec, 
-*                  double *args )
-
-*  Parameters:
-*     npoint
-*        The number of axis values to transform.
-*     values
-*        Pointer to an array of "npoint" spectral axis values. These are 
-*        modified on return to hold the corresponding converted values.
-*     ra
-*        Pointer to an array of "npoint" RA (J2000 FK5) values. These are 
-*        unchanged on exit. If a NULL pointer is supplied, then a single
-*        RA value is used for all spectral axis values, given by the RA 
-*        value in the "args" array. Otherwise, the "RA" value in the
-*        "args" array is ignored.
-*     dec
-*        Pointer to an array of "npoint" DEC (J2000 FK5) values. These are 
-*        unchanged on exit. If a NULL pointer is supplied, then a single
-*        DEC value is used for all spectral axis values, given by the DEC
-*        value in the "args" array. Otherwise, the "DEC" value in the
-*        "args" array is ignored.
-*     args
-*        Pointer to an array holding the conversion arguments. The number
-*        of arguments expected depends on the particular conversion being
-*        used.
-*     forward
-*        Should the conversion be applied in the forward or inverse
-*        direction? Non-zero for forward, zero for inverse.
-*/
-
-
-
-/* Frequency (Hz) to relativistic velocity (m/s). "args[0]" is the rest
-   frequency (Hz).
-   -------------------------------------------------------------------- */
-static void frtovl( int npoint, double *values, double *ra, double *dec, double *args, int forward ) {
-
-/* First deal with forward transformations. */
-   if( forward ) {
-
-      double *val, *end, rf2, f2, d;
-      rf2 = args[ 0 ]*args[ 0 ];
-   
-      end = values + npoint;
-      for( val = values; val < end; val++ ) {
-         if( *val != AST__BAD ) {
-            f2 = (*val)*(*val);
-            d = rf2 + f2;
-            if( d > 0.0 ) {
-               *val = AST__C*( ( rf2 - f2 )/( rf2 + f2 ) );
-            } else {
-               *val = AST__BAD;
-            }
-         }
-      }
-
-/* If the inverse transformation is to be applied, invoke the appropriate
-   inverse function in the forward direction. */
-   } else {
-      vltofr( npoint, values, ra, dec, args, 1 );
-   }
-}
-
-
-
-/* Relativistic velocity (m/s) to frequency (Hz). "args[0]" is the rest
-   frequency (Hz).
-   ------------------------------------------------------------------- */
-static void vltofr( int npoint, double *values, double *ra, double *dec, double *args, int forward ) {
-
-/* First deal with forward transformations. */
-   if( forward ) {
-      double *val, *end, rf, d;
-      rf = args[ 0 ];
-   
-      end = values + npoint;
-      for( val = values; val < end; val++ ) {
-         if( *val != AST__BAD ) {
-            d = AST__C + *val;
-            if( d != 0.0 ) {
-               d = (AST__C - *val )/d;
-               if( d >= 0.0 ) {
-                  *val = rf*sqrt( d );
-               } else {
-                  *val = AST__BAD;
-               }
-   
-            } else {
-               *val = AST__BAD;
-            }
-         }
-      }
-
-/* If the inverse transformation is to be applied, invoke the appropriate
-   inverse function in the forward direction. */ 
-   } else {
-      frtovl( npoint, values, ra, dec, args, 1 );
-   }
-}
-
-/* Frequency (Hz) to energy (Joules). No arguments used.
-   ---------------------------------------------------- */
-static void frtoen( int npoint, double *values, double *ra, double *dec, double *args, int forward ) {
-
-/* First deal with forward transformations. */
-   if( forward ) {
-      double *val, *end;
-   
-      end = values + npoint;
-      for( val = values; val < end; val++ ) {
-         if( *val != AST__BAD ) {
-            *val *= AST__H;
-         }
-      }
-
-/* If the inverse transformation is to be applied, invoke the appropriate
-   inverse function in the forward direction. */ 
-   } else {
-      entofr( npoint, values, ra, dec, args, 1 );
-   }
-}
-
-
-
-/* Energy (Joules) to frequency (Hz). No arguments used.
-   ---------------------------------------------------- */
-static void entofr( int npoint, double *values, double *ra, double *dec, double *args, int forward ) {
-
-/* First deal with forward transformations. */
-   if( forward ) {
-      double *val, *end;
-   
-      end = values + npoint;
-      for( val = values; val < end; val++ ) {
-         if( *val != AST__BAD ) {
-            *val /= AST__H;
-         }
-      }
-
-/* If the inverse transformation is to be applied, invoke the appropriate
-   inverse function in the forward direction. */ 
-   } else {
-      frtoen( npoint, values, ra, dec, args, 1 );
-   }
-}
-
-
-
-/* Frequency (Hz) to WaveNumber (cycles per metre). No arguments used.
-   ------------------------------------------------------------------- */
-static void frtown( int npoint, double *values, double *ra, double *dec, double *args, int forward ) {
-
-/* First deal with forward transformations. */
-   if( forward ) {
-      double *val, *end;
-   
-      end = values + npoint;
-      for( val = values; val < end; val++ ) {
-         if( *val != AST__BAD ) {
-            *val /= AST__C ;
-         }
-      }
-
-/* If the inverse transformation is to be applied, invoke the appropriate
-   inverse function in the forward direction. */ 
-   } else {
-      wntofr( npoint, values, ra, dec, args, 1 );
-   }
-}
-
-
-
-/* WaveNumber (cycles per metre) to frequency (Hz). No arguments used.
-   ------------------------------------------------------------------ */
-static void wntofr( int npoint, double *values, double *ra, double *dec, double *args, int forward ) {
-
-/* First deal with forward transformations. */
-   if( forward ) {
-      double *val, *end;
-   
-      end = values + npoint;
-      for( val = values; val < end; val++ ) {
-         if( *val != AST__BAD ) {
-            *val *= AST__C;
-         }
-      }
-
-/* If the inverse transformation is to be applied, invoke the appropriate
-   inverse function in the forward direction. */ 
-   } else {
-      frtown( npoint, values, ra, dec, args, 1 );
-   }
-}
-
-
-
-/* Frequency (Hz) to wavelength (metres). No arguments used.
-   --------------------------------------------------------- */
-static void frtowv( int npoint, double *values, double *ra, double *dec, double *args, int forward ) {
-
-/* First deal with forward transformations. */
-   if( forward ) {
-      double *val, *end;
-   
-      end = values + npoint;
-      for( val = values; val < end; val++ ) {
-         if( *val != AST__BAD ) {
-            if( *val != 0.0 ) {
-               *val = AST__C/(*val);
-            } else {
-               *val = AST__BAD;
-            }
-         }
-      }
-
-/* If the inverse transformation is to be applied, invoke the appropriate
-   inverse function in the forward direction. */ 
-   } else {
-      wvtofr( npoint, values, ra, dec, args, 1 );
-   }
-}
-
-
-
-/* Wavelength (metres) to frequency (Hz). No arguments used.
-   --------------------------------------------------------- */
-static void wvtofr( int npoint, double *values, double *ra, double *dec, double *args, int forward ) {
-
-/* First deal with forward transformations. */
-   if( forward ) {
-      double *val, *end;
-   
-      end = values + npoint;
-      for( val = values; val < end; val++ ) {
-         if( *val != AST__BAD ) {
-            if( *val != 0.0 ) {
-               *val = AST__C/(*val);
-            } else {
-               *val = AST__BAD;
-            }
-         }
-      }
-
-/* If the inverse transformation is to be applied, invoke the appropriate
-   inverse function in the forward direction. */ 
-   } else {
-      frtowv( npoint, values, ra, dec, args, 1 );
-   }
-}
-
-
-
-/* Frequency (Hz) to wavelength (metres) in air. No arguments used.
-   --------------------------------------------------------------- */
-static void frtoaw( int npoint, double *values, double *ra, double *dec, double *args, int forward ) {
-
-/* First deal with forward transformations. */
-   if( forward ) {
-      double *val, *end, wavelen;
-   
-      end = values + npoint;
-      for( val = values; val < end; val++ ) {
-         if( *val != AST__BAD ) {
-            if( *val != 0.0 ) {
-               wavelen  = AST__C/(*val);
-               *val = wavelen/Refrac( wavelen );
-            } else {
-               *val = AST__BAD;
-            }
-         } 
-      }
-
-/* If the inverse transformation is to be applied, invoke the appropriate
-   inverse function in the forward direction. */ 
-   } else {
-      awtofr( npoint, values, ra, dec, args, 1 );
-   }
-}
-
-
-
-/* Wavelength (metres) in air to frequency (Hz). No arguments used.
-   ---------------------------------------------------------------- */
-static void awtofr( int npoint, double *values, double *ra, double *dec, double *args, int forward ) {
-
-/* First deal with forward transformations. */
-   if( forward ) {
-      double *val, *end;
-   
-      end = values + npoint;
-      for( val = values; val < end; val++ ) {
-         if( *val != AST__BAD ) {
-            if( *val != 0.0 ) {
-               *val = AST__C/( (*val)*Refrac( *val ) );
-            } else {
-               *val = AST__BAD;
-            }
-         }
-      }
-
-/* If the inverse transformation is to be applied, invoke the appropriate
-   inverse function in the forward direction. */ 
-   } else {
-      frtoaw( npoint, values, ra, dec, args, 1 );
-   }
-}
-
-
-
-/* Radio velocity to relativistic velocity (m/s). No arguments used.
-   ---------------------------------------------------------------- */
-static void vrtovl( int npoint, double *values, double *ra, double *dec, double *args, int forward ) {
-
-/* First deal with forward transformations. */
-   if( forward ) {
-      double *val, *end, rnu;
-   
-      end = values + npoint;
-      for( val = values; val < end; val++ ) {
-         if( *val != AST__BAD ) {
-            rnu = 1.0 - (*val)/AST__C;
-            rnu *= rnu;
-            *val = AST__C*( 1.0 - rnu )/( 1.0 + rnu );
-         }
-      }
-
-/* If the inverse transformation is to be applied, invoke the appropriate
-   inverse function in the forward direction. */ 
-   } else {
-      vltovr( npoint, values, ra, dec, args, 1 );
-   }
-}
-
-
-
-/* Relativistic velocity (m/s) to radio velocity. No arguments used.
-   ------------------------------------------------------------------- */
-static void vltovr( int npoint, double *values, double *ra, double *dec, double *args, int forward ) {
-
-/* First deal with forward transformations. */
-   if( forward ) {
-      double *val, *end, d;
-   
-      end = values + npoint;
-      for( val = values; val < end; val++ ) {
-         if( *val != AST__BAD ) {
-   
-            d = AST__C + *val;
-            if( d != 0.0 ) {
-               d = (AST__C - *val )/d;
-               if( d >= 0.0 ) {
-                  *val = AST__C*( 1.0 - sqrt( d ) );
-               } else {
-                  *val = AST__BAD;
-               }
-   
-            } else {
-               *val = AST__BAD;
-            }
-         }
-      }
-
-/* If the inverse transformation is to be applied, invoke the appropriate
-   inverse function in the forward direction. */ 
-   } else {
-      vrtovl( npoint, values, ra, dec, args, 1 );
-   }
-}
-
-
-
-/* Optical velocity to relativistic velocity (m/s). No arguments used.
-   ------------------------------------------------------------------ */
-static void votovl( int npoint, double *values, double *ra, double *dec, double *args, int forward ) {
-
-/* First deal with forward transformations. */
-   if( forward ) {
-      double *val, *end, rlam;
-   
-      end = values + npoint;
-      for( val = values; val < end; val++ ) {
-         if( *val != AST__BAD ) {
-            rlam = 1.0 + (*val)/AST__C;
-            rlam *= rlam;
-            *val = AST__C*( rlam - 1.0 )/( rlam + 1.0 );
-         }
-      }
-
-/* If the inverse transformation is to be applied, invoke the appropriate
-   inverse function in the forward direction. */ 
-   } else {
-      vltovo( npoint, values, ra, dec, args, 1 );
-   }
-}
-
-
-
-/* Relativistic velocity (m/s) to optical velocity (m/s). No arguments used.
-   ----------------------------------------------------------------------- */
-static void vltovo( int npoint, double *values, double *ra, double *dec, double *args, int forward ) {
-
-/* First deal with forward transformations. */
-   if( forward ) {
-      double *val, *end, d;
-   
-      end = values + npoint;
-      for( val = values; val < end; val++ ) {
-         if( *val != AST__BAD ) {
-   
-            d = AST__C - *val;
-            if( d != 0.0 ) {
-               d = (AST__C + *val )/d;
-               if( d >= 0.0 ) {
-                  *val = AST__C*( sqrt( d ) - 1.0 );
-               } else {
-                  *val = AST__BAD;
-               }
-   
-            } else {
-               *val = AST__BAD;
-            }
-         }
-      }
-
-/* If the inverse transformation is to be applied, invoke the appropriate
-   inverse function in the forward direction. */ 
-   } else {
-      votovl( npoint, values, ra, dec, args, 1 );
-   }
-}
-
-
-
-/* Redshift to relativistic velocity (m/s). No arguments used.
-   --------------------------------------------------------- */
-static void zotovl( int npoint, double *values, double *ra, double *dec, double *args, int forward ) {
-
-/* First deal with forward transformations. */
-   if( forward ) {
-      double *val, *end, rlam;
-   
-      end = values + npoint;
-      for( val = values; val < end; val++ ) {
-         if( *val != AST__BAD ) {
-            rlam = 1.0 + (*val);
-            rlam *= rlam;
-            *val = AST__C*( rlam - 1.0 )/( rlam + 1.0 );
-         }
-      }
-
-/* If the inverse transformation is to be applied, invoke the appropriate
-   inverse function in the forward direction. */ 
-   } else {
-      vltozo( npoint, values, ra, dec, args, 1 );
-   }
-}
-
-
-
-/* Relativistic velocity (m/s) to redshift. No arguments used.
-   ----------------------------------------------------------- */
-static void vltozo( int npoint, double *values, double *ra, double *dec, double *args, int forward ) {
-
-/* First deal with forward transformations. */
-   if( forward ) {
-      double *val, *end, d;
-   
-      end = values + npoint;
-      for( val = values; val < end; val++ ) {
-         if( *val != AST__BAD ) {
-            d = AST__C - *val;
-            if( d != 0.0 ) {
-               d = (AST__C + *val )/d;
-               if( d >= 0.0 ) {
-                  *val = sqrt( d ) - 1.0;
-               } else {
-                  *val = AST__BAD;
-               }
-   
-            } else {
-               *val = AST__BAD;
-            }
-         }
-      }
-
-/* If the inverse transformation is to be applied, invoke the appropriate
-   inverse function in the forward direction. */ 
-   } else {
-      zotovl( npoint, values, ra, dec, args, 1 );
-   }
-}
-
-
-
-/* Beta factor to relativistic velocity (m/s). No arguments used.
-   ------------------------------------------------------------ */
-static void bttovl( int npoint, double *values, double *ra, double *dec, double *args, int forward ) {
-
-/* First deal with forward transformations. */
-   if( forward ) {
-      double *val, *end;
-   
-      end = values + npoint;
-      for( val = values; val < end; val++ ) {
-         if( *val != AST__BAD ) {
-            *val *= AST__C;
-         }
-      }
-
-/* If the inverse transformation is to be applied, invoke the appropriate
-   inverse function in the forward direction. */ 
-   } else {
-      vltobt( npoint, values, ra, dec, args, 1 );
-   }
-}
-
-
-
-/* Relativistic velocity (m/s) to beta factor. No arguments used.
-   ------------------------------------------------------------------- */
-static void vltobt( int npoint, double *values, double *ra, double *dec, double *args, int forward ) {
-
-/* First deal with forward transformations. */
-   if( forward ) {
-      double *val, *end;
-   
-      end = values + npoint;
-      for( val = values; val < end; val++ ) {
-         if( *val != AST__BAD ) {
-            *val /= AST__C;
-         }
-      }
-
-/* If the inverse transformation is to be applied, invoke the appropriate
-   inverse function in the forward direction. */ 
-   } else {
-      bttovl( npoint, values, ra, dec, args, 1 );
-   }
-}
-
-
-
-/* Topocentric to heliocentric frequency correction:
-*    args[ 0 ] = Geodetic longitude of observer (radians, positive eastwards)
-*    args[ 1 ] = Geodetic latitude of observer (radians)
-*    args[ 2 ] = Epoch of observation (UT1 expressed as a Modified Julian Date)
-*    args[ 3 ] = Right Ascension of source (radians, FK5 J2000)
-*    args[ 4 ] = Declination of source (radians, FK5 J2000)
-*    args[ 5 ] = Corresponding frequency correction factor, or AST__BAD.
-   ------------------------------------------------------------------- */
-static void tpf2hl( int npoint, double *values, double *ra, double *dec, double *args, int forward ) {
-   double used_f, s1, s2, s3, ra0, dec0;
-   int i;
-
-/* If this is a 1-D SpecMap (i.e. for a single spatial position), get the 
-   frequency correction factor to use (which takes account of whether
-   we are doing an inverse or forward correction). */
-   used_f = AST__BAD;
-   if( !ra && args[ 5 ] != AST__BAD && args[ 5 ] != 0.0 ) {
-      used_f = forward ? args[ 5 ] : 1.0/args[ 5 ];
-   }
-
-/* Do each spectral point. */
-   for( i = 0; i < npoint; i++ ) {
-
-/* If we do not yet know the frequency correction factor for this
-   spectral point, or if we are finding a separate correction factor for
-   each spatial position, calculate it now. */
-      if( used_f == AST__BAD || ra ){
-
-/* Choose the source RA and DEC; either from the supplied arrays or from the
-   conversion argument array. */
-         if( ra ) {
-            ra0 = ra[ i ];
-            dec0 = dec[ i ];
-         } else {
-            ra0 = args[ 3 ];
-            dec0 = args[ 4 ];
-         }
-
-/* Get the component away from the source, of the velocity of the observer 
-   relative to the centre of the earth (in km/s). */
-         s1 = TopoVel( args[ 0 ], args[ 1 ], args[ 2 ], ra0, dec0 );
-
-/* Get the component away from the source, of the velocity of the earths
-   centre relative to the sun (in km/s). */
-         s2 = HelioVel( args[ 2 ], ra0, dec0 );
-
-/* Find the total velocity of the observer away from the source, relative
-   to the sun in m/s. This can also be thought of as the velocity of the
-   sun towards the source relative to the observer. */
-         s3 = 1000.0*( s1 + s2 );
-
-/* Find the factor by which to multiply the supplied topocentric frequency 
-   values to account for the Doppler shift introduced as a consequence of the
-   movement of the Sun towards the source relative to the observer.  If s3 is 
-   positive (i.e. the sun is moving towards the source relative to the 
-   observer), then the frequency as seen on the sun should be higher than the 
-   frequency as seen by the observer, so the factor should be greater
-   than one. The factor in args[ 5 ] is then the value appropriate to the
-   forward correction. For the inverse correction, it should be reciprocated. */
-         if( AST__C != s3 ) args[ 5 ] = sqrt( ( AST__C + s3 )/( AST__C - s3 ) );
-
-/* Reciprocate the frequency correction factor if the inverse conversion is
-   being performed. */
-         if( args[ 5 ] != AST__BAD && args[ 5 ] != 0.0 ) {
-            used_f = forward ? args[ 5 ] : 1.0/args[ 5 ];
-         }
-      }
-
-/* Correct the frequency value. */
-      if( values[ i ] != AST__BAD && used_f != AST__BAD ) {
-         values[ i ] *= used_f;
-      } else {
-         values[ i ] = AST__BAD;
-      }
-   }
-}
-
-
-/* Heliocentric to topocentric frequency correction:
-*    args[ 0 ] = Geodetic longitude of observer (radians, positive eastwards)
-*    args[ 1 ] = Geodetic latitude of observer (radians)
-*    args[ 2 ] = Epoch of observation (UT1 expressed as a Modified Julian Date)
-*    args[ 3 ] = Right Ascension of source (radians, FK5 J2000)
-*    args[ 4 ] = Declination of source (radians, FK5 J2000)
-*    args[ 5 ] = Corresponding frequency correction factor, or AST__BAD.
-   ------------------------------------------------------------------- */
-static void hlf2tp( int npoint, double *values, double *ra, double *dec, double *args, int forward ) {
-   double used_f, s1, s2, s3, ra0, dec0;
-   int i;
-
-/* If this is a 1-D SpecMap (i.e. for a single spatial position), get the 
-   frequency correction factor to use (which takes account of whether
-   we are doing an inverse or forward correction). */
-   used_f = AST__BAD;
-   if( !ra && args[ 5 ] != AST__BAD && args[ 5 ] != 0.0 ) {
-      used_f = forward ? args[ 5 ] : 1.0/args[ 5 ];
-   }
-
-/* Do each spectral point. */
-   for( i = 0; i < npoint; i++ ) {
-
-/* If we do not yet know the frequency correction factor for this
-   spectral point, calculate it now. */
-      if( used_f == AST__BAD || ra ){
-
-/* Choose the source RA and DEC; either from the supplied arrays or from the
-   conversion argument array. */
-         if( ra ) {
-            ra0 = ra[ i ];
-            dec0 = dec[ i ];
-         } else {
-            ra0 = args[ 3 ];
-            dec0 = args[ 4 ];
-         }
-
-/* Get the component away from the source, of the velocity of the observer 
-   relative to the centre of the earth (in km/s). */
-         s1 = TopoVel( args[ 0 ], args[ 1 ], args[ 2 ], ra0, dec0 );
-
-/* Get the component away from the source, of the velocity of the earths
-   centre relative to the sun (in km/s). */
-         s2 = HelioVel( args[ 2 ], ra0, dec0 );
-
-/* Find the total velocity of the observer away from the source, relative
-   to the sun in m/s. This can also be thought of as the velocity of the
-   sun towards the source relative to the observer. */
-         s3 = 1000.0*( s1 + s2 );
-
-/* Find the factor by which to multiply the supplied heliocentric frequency 
-   values to account for the Doppler shift introduced as a consequence of the
-   movement of the Sun towards the source relative to the observer.  If s3 is 
-   positive (i.e. the sun is moving towards the source relative to the 
-   observer), then the frequency as seen on the sun should be higher than the 
-   frequency as seen by the observer, so the factor should be less than 
-   one. */
-         if( AST__C != s3 ) args[ 5 ] = sqrt( ( AST__C - s3 )/( AST__C + s3 ) );
-
-/* Reciprocate the frequency correction factor if the inverse conversion is
-   being performed. */
-         if( args[ 5 ] != AST__BAD && args[ 5 ] != 0.0 ) {
-            used_f = forward ? args[ 5 ] : 1.0/args[ 5 ];
-         }
-      }
-
-/* Correct the frequency value. */
-      if( values[ i ] != AST__BAD && used_f != AST__BAD ) {
-         values[ i ] *= used_f;
-      } else {
-         values[ i ] = AST__BAD;
-      }
-   }
-}
-
-
-/* Geocentric to heliocentric frequency correction:
-*    args[ 0 ] = Epoch of observation (UT1 expressed as a Modified Julian Date)
-*    args[ 1 ] = Right Ascension of source (radians, FK5 J2000)
-*    args[ 2 ] = Declination of source (radians, FK5 J2000)
-*    args[ 3 ] = Corresponding frequency correction factor, or AST__BAD.
-   ------------------------------------------------------------------- */
-static void gef2hl( int npoint, double *values, double *ra, double *dec, double *args, int forward ) {
-   double used_f, s1, ra0, dec0;
-   int i;
-
-/* If this is a 1-D SpecMap (i.e. for a single spatial position), get the 
-   frequency correction factor to use (which takes account of whether
-   we are doing an inverse or forward correction). */
-   used_f = AST__BAD;
-   if( !ra && args[ 3 ] != AST__BAD && args[ 3 ] != 0.0 ) {
-      used_f = forward ? args[ 3 ] : 1.0/args[ 3 ];
-   }
-
-/* Do each spectral point. */
-   for( i = 0; i < npoint; i++ ) {
-
-/* If we do not yet know the frequency correction factor for this
-   spectral point, calculate it now. */
-      if( used_f == AST__BAD || ra ){
-
-/* Choose the source RA and DEC; either from the supplied arrays or from the
-   conversion argument array. */
-         if( ra ) {
-            ra0 = ra[ i ];
-            dec0 = dec[ i ];
-         } else {
-            ra0 = args[ 1 ];
-            dec0 = args[ 2 ];
-         }
-
-/* Get the component away from the source, of the velocity of the earths
-   centre relative to the sun (in m/s). This can also be thought of as the 
-   velocity of the sun towards the source relative to the earth. */
-         s1 = 1000.0*HelioVel( args[ 0 ], ra0, dec0 );
-
-/* Find the factor by which to multiply the supplied geocentric frequency 
-   values to account for the Doppler shift introduced as a consequence of the
-   movement of the Sun towards the source relative to the earth.  If s1 is 
-   positive (i.e. the sun is moving towards the source relative to the 
-   earth), then the frequency as seen on the sun should be higher than the 
-   frequency as seen on the earth, so the factor should be greater than one. */
-         if( AST__C != s1 ) args[ 3 ] = sqrt( ( AST__C + s1 )/( AST__C - s1 ) );
-
-/* Reciprocate the frequency correction factor if the inverse conversion is
-   being performed. */
-         if( args[ 3 ] != AST__BAD && args[ 3 ] != 0.0 ) {
-            used_f = forward ? args[ 3 ] : 1.0/args[ 3 ];
-         }
-      }
-
-/* Correct the frequency value. */
-      if( values[ i ] != AST__BAD && used_f != AST__BAD ) {
-         values[ i ] *= used_f;
-      } else {
-         values[ i ] = AST__BAD;
-      }
-   }
-}
-
-
-/* Heliocentric to Geocentric frequency correction:
-*    args[ 0 ] = Epoch of observation (UT1 expressed as a Modified Julian Date)
-*    args[ 1 ] = Right Ascension of source (radians, FK5 J2000)
-*    args[ 2 ] = Declination of source (radians, FK5 J2000)
-*    args[ 3 ] = Corresponding frequency correction factor, or AST__BAD.
-   ------------------------------------------------------------------- */
-static void hlf2ge( int npoint, double *values, double *ra, double *dec, double *args, int forward ) {
-   double used_f, s1, ra0, dec0;
-   int i;
-
-/* If this is a 1-D SpecMap (i.e. for a single spatial position), get the 
-   frequency correction factor to use (which takes account of whether
-   we are doing an inverse or forward correction). */
-   used_f = AST__BAD;
-   if( !ra && args[ 3 ] != AST__BAD && args[ 3 ] != 0.0 ) {
-      used_f = forward ? args[ 3 ] : 1.0/args[ 3 ];
-   }
-
-/* Do each spectral point. */
-   for( i = 0; i < npoint; i++ ) {
-
-/* If we do not yet know the frequency correction factor for this
-   spectral point, calculate it now. */
-      if( used_f == AST__BAD || ra ){
-
-/* Choose the source RA and DEC; either from the supplied arrays or from the
-   conversion argument array. */
-         if( ra ) {
-            ra0 = ra[ i ];
-            dec0 = dec[ i ];
-         } else {
-            ra0 = args[ 1 ];
-            dec0 = args[ 2 ];
-         }
-
-/* Get the component away from the source, of the velocity of the earths
-   centre relative to the sun (in m/s). This can also be thought of as the 
-   velocity of the sun towards the source relative to the earth. */
-         s1 = 1000.0*HelioVel( args[ 0 ], ra0, dec0 );
-
-/* Find the factor by which to multiply the supplied heliocentric frequency 
-   values to account for the Doppler shift introduced as a consequence of the
-   movement of the Sun towards the source relative to the earth.  If s1 is 
-   positive (i.e. the sun is moving towards the source relative to the 
-   earth), then the frequency as seen on the sun should be higher than the 
-   frequency as seen on the earth, so the factor should be less than one. */
-         if( AST__C != s1 ) args[ 3 ] = sqrt( ( AST__C - s1 )/( AST__C + s1 ) );
-
-/* Reciprocate the frequency correction factor if the inverse conversion is
-   being performed. */
-         if( args[ 3 ] != AST__BAD && args[ 3 ] != 0.0 ) {
-            used_f = forward ? args[ 3 ] : 1.0/args[ 3 ];
-         }
-      }
-
-/* Correct the frequency value. */
-      if( values[ i ] != AST__BAD && used_f != AST__BAD ) {
-         values[ i ] *= used_f;
-      } else {
-         values[ i ] = AST__BAD;
-      }
-   }
-}
-
-
-/* Barycentric to heliocentric frequency correction:
-*    args[ 0 ] = Epoch of observation (UT1 expressed as a Modified Julian Date)
-*    args[ 1 ] = Right Ascension of source (radians, FK5 J2000)
-*    args[ 2 ] = Declination of source (radians, FK5 J2000)
-*    args[ 3 ] = Corresponding frequency correction factor, or AST__BAD.
-   ------------------------------------------------------------------- */
-static void byf2hl( int npoint, double *values, double *ra, double *dec, double *args, int forward ) {
-   double used_f, s1, ra0, dec0;
-   int i;
-
-/* If this is a 1-D SpecMap (i.e. for a single spatial position), get the 
-   frequency correction factor to use (which takes account of whether
-   we are doing an inverse or forward correction). */
-   used_f = AST__BAD;
-   if( !ra && args[ 3 ] != AST__BAD && args[ 3 ] != 0.0 ) {
-      used_f = forward ? args[ 3 ] : 1.0/args[ 3 ];
-   }
-
-/* Do each spectral point. */
-   for( i = 0; i < npoint; i++ ) {
-
-/* If we do not yet know the frequency correction factor for this
-   spectral point, calculate it now. */
-      if( used_f == AST__BAD || ra ){
-
-/* Choose the source RA and DEC; either from the supplied arrays or from the
-   conversion argument array. */
-         if( ra ) {
-            ra0 = ra[ i ];
-            dec0 = dec[ i ];
-         } else {
-            ra0 = args[ 1 ];
-            dec0 = args[ 2 ];
-         }
-
-/* Get the component away from the source, of the velocity of the earth-sun
-   barycentre relative to the sun (in m/s). This can also be thought of as the 
-   velocity of the sun towards the source relative to the barycentre. */
-         s1 = 1000.0*BaryVel( args[ 0 ], ra0, dec0 );
-
-/* Find the factor by which to multiply the supplied barycentric frequency 
-   values to account for the Doppler shift introduced as a consequence of the
-   movement of the Sun towards the source relative to the barycentre.  If s1 
-   is positive (i.e. the sun is moving towards the source relative to the 
-   barycentre), then the frequency as seen on the sun should be higher than 
-   the frequency as seen at the barycentre, so the factor should be greater 
-   than one. */
-         if( AST__C != s1 ) args[ 3 ] = sqrt( ( AST__C + s1 )/( AST__C - s1 ) );
-
-/* Reciprocate the frequency correction factor if the inverse conversion is
-   being performed. */
-         if( args[ 3 ] != AST__BAD && args[ 3 ] != 0.0 ) {
-            used_f = forward ? args[ 3 ] : 1.0/args[ 3 ];
-         }
-      }
-
-/* Correct the frequency value. */
-      if( values[ i ] != AST__BAD && used_f != AST__BAD ) {
-         values[ i ] *= used_f;
-      } else {
-         values[ i ] = AST__BAD;
-      }
-   }
-}
-
-
-/* Heliocentric to barycentric frequency correction:
-*    args[ 0 ] = Epoch of observation (UT1 expressed as a Modified Julian Date)
-*    args[ 1 ] = Right Ascension of source (radians, FK5 J2000)
-*    args[ 2 ] = Declination of source (radians, FK5 J2000)
-*    args[ 3 ] = Corresponding frequency correction factor, or AST__BAD.
-   ------------------------------------------------------------------- */
-static void hlf2by( int npoint, double *values, double *ra, double *dec, double *args, int forward ) {
-   double used_f, s1, ra0, dec0;
-   int i;
-
-/* If this is a 1-D SpecMap (i.e. for a single spatial position), get the 
-   frequency correction factor to use (which takes account of whether
-   we are doing an inverse or forward correction). */
-   used_f = AST__BAD;
-   if( !ra && args[ 3 ] != AST__BAD && args[ 3 ] != 0.0 ) {
-      used_f = forward ? args[ 3 ] : 1.0/args[ 3 ];
-   }
-
-/* Do each spectral point. */
-   for( i = 0; i < npoint; i++ ) {
-
-/* If we do not yet know the frequency correction factor for this
-   spectral point, calculate it now. */
-      if( used_f == AST__BAD || ra ){
-
-/* Choose the source RA and DEC; either from the supplied arrays or from the
-   conversion argument array. */
-         if( ra ) {
-            ra0 = ra[ i ];
-            dec0 = dec[ i ];
-         } else {
-            ra0 = args[ 1 ];
-            dec0 = args[ 2 ];
-         }
-
-/* Get the component away from the source, of the velocity of the earth-sun
-   barycentre relative to the sun (in m/s). This can also be thought of as the 
-   velocity of the sun towards the source relative to the barycentre. */
-         s1 = 1000.0*BaryVel( args[ 0 ], ra0, dec0 );
-
-/* Find the factor by which to multiply the supplied heliocentric frequency 
-   values to account for the Doppler shift introduced as a consequence of the
-   movement of the Sun towards the source relative to the barycentre.  If s1 
-   is positive (i.e. the sun is moving towards the source relative to the 
-   barycentre), then the frequency as seen on the sun should be higher than 
-   the frequency as seen at the barycentre, so the factor should be less than 
-   one. */
-         if( AST__C != s1 ) args[ 3 ] = sqrt( ( AST__C - s1 )/( AST__C + s1 ) );
-
-/* Reciprocate the frequency correction factor if the inverse conversion is
-   being performed. */
-         if( args[ 3 ] != AST__BAD && args[ 3 ] != 0.0 ) {
-            used_f = forward ? args[ 3 ] : 1.0/args[ 3 ];
-         }
-      }
-
-/* Correct the frequency value. */
-      if( values[ i ] != AST__BAD && used_f != AST__BAD ) {
-         values[ i ] *= used_f;
-      } else {
-         values[ i ] = AST__BAD;
-      }
-   }
-}
-
-
-/* Kinematic LSR to heliocentric frequency correction:
-*    args[ 0 ] = Right Ascension of source (radians, FK5 J2000)
-*    args[ 1 ] = Declination of source (radians, FK5 J2000)
-*    args[ 2 ] = Corresponding frequency correction factor, or AST__BAD.
-   ------------------------------------------------------------------- */
-static void lkf2hl( int npoint, double *values, double *ra, double *dec, double *args, int forward ) {
-   double used_f, s1, ra0, dec0;
-   int i;
-
-/* If this is a 1-D SpecMap (i.e. for a single spatial position), get the 
-   frequency correction factor to use (which takes account of whether
-   we are doing an inverse or forward correction). */
-   used_f = AST__BAD;
-   if( !ra && args[ 2 ] != AST__BAD && args[ 2 ] != 0.0 ) {
-      used_f = forward ? args[ 2 ] : 1.0/args[ 2 ];
-   }
-
-/* Do each spectral point. */
-   for( i = 0; i < npoint; i++ ) {
-
-/* If we do not yet know the frequency correction factor for this
-   spectral point, calculate it now. */
-      if( used_f == AST__BAD || ra ){
-
-/* Choose the source RA and DEC; either from the supplied arrays or from the
-   conversion argument array. */
-         if( ra ) {
-            ra0 = ra[ i ];
-            dec0 = dec[ i ];
-         } else {
-            ra0 = args[ 0 ];
-            dec0 = args[ 1 ];
-         }
-
-/* Get the component away from the source, of the velocity of the sun
-   relative to the kinematic LSR (in m/s). This can also be thought of as the 
-   velocity of the LSR towards the source relative to the sun. */
-         s1 = (double) 1000.0*slaRvlsrk( (float) ra0, (float) dec0 );
-
-/* Find the factor by which to multiply the supplied LSRK frequency 
-   values to account for the Doppler shift introduced as a consequence of the
-   movement of the Sun away from the source relative to the LSRK.  If s1 
-   is positive (i.e. the sun is moving away from the source relative to the 
-   LSRK), then the frequency as seen on the sun should be lower than the
-   frequency as seen in the LSRK, so the factor should be less than one. */
-         if( AST__C != s1 ) args[ 2 ] = sqrt( ( AST__C - s1 )/( AST__C + s1 ) );
-
-/* Reciprocate the frequency correction factor if the inverse conversion is
-   being performed. */
-         if( args[ 2 ] != AST__BAD && args[ 2 ] != 0.0 ) {
-            used_f = forward ? args[ 2 ] : 1.0/args[ 2 ];
-         }
-      }
-
-/* Correct the frequency value. */
-      if( values[ i ] != AST__BAD && used_f != AST__BAD ) {
-         values[ i ] *= used_f;
-      } else {
-         values[ i ] = AST__BAD;
-      }
-   }
-}
-
-
-/* Heliocentric to kinematic LSR frequency correction:
-*    args[ 0 ] = Right Ascension of source (radians, FK5 J2000)
-*    args[ 1 ] = Declination of source (radians, FK5 J2000)
-*    args[ 2 ] = Corresponding frequency correction factor, or AST__BAD.
-   ------------------------------------------------------------------- */
-static void hlf2lk( int npoint, double *values, double *ra, double *dec, double *args, int forward ) {
-   double used_f, s1, ra0, dec0;
-   int i;
-
-/* If this is a 1-D SpecMap (i.e. for a single spatial position), get the 
-   frequency correction factor to use (which takes account of whether
-   we are doing an inverse or forward correction). */
-   used_f = AST__BAD;
-   if( !ra && args[ 2 ] != AST__BAD && args[ 2 ] != 0.0 ) {
-      used_f = forward ? args[ 2 ] : 1.0/args[ 2 ];
-   }
-
-/* Do each spectral point. */
-   for( i = 0; i < npoint; i++ ) {
-
-/* If we do not yet know the frequency correction factor for this
-   spectral point, calculate it now. */
-      if( used_f == AST__BAD || ra ){
-
-/* Choose the source RA and DEC; either from the supplied arrays or from the
-   conversion argument array. */
-         if( ra ) {
-            ra0 = ra[ i ];
-            dec0 = dec[ i ];
-         } else {
-            ra0 = args[ 0 ];
-            dec0 = args[ 1 ];
-         }
-
-/* Get the component away from the source, of the velocity of the sun
-   relative to the kinematic LSR (in m/s). This can also be thought of as the 
-   velocity of the LSR towards the source relative to the sun. */
-         s1 = (double) 1000.0*slaRvlsrk( (float) ra0, (float) dec0 );
-
-/* Find the factor by which to multiply the supplied heliocentric frequency 
-   values to account for the Doppler shift introduced as a consequence of the
-   movement of the Sun away from the source relative to the LSRK.  If s1 
-   is positive (i.e. the LSRK is moving towards the source relative to the 
-   sun), then the frequency as seen in the LSRK should be higher than 
-   the frequency as seen on the sun, so the factor should be greater 
-   than one. */
-         if( AST__C != s1 ) args[ 2 ] = sqrt( ( AST__C + s1 )/( AST__C - s1 ) );
-
-/* Reciprocate the frequency correction factor if the inverse conversion is
-   being performed. */
-         if( args[ 2 ] != AST__BAD && args[ 2 ] != 0.0 ) {
-            used_f = forward ? args[ 2 ] : 1.0/args[ 2 ];
-         }
-      }
-
-/* Correct the frequency value. */
-      if( values[ i ] != AST__BAD && used_f != AST__BAD ) {
-         values[ i ] *= used_f;
-      } else {
-         values[ i ] = AST__BAD;
-      }
-   }
-}
-
-
-/* Dynamic LSR to heliocentric frequency correction:
-*    args[ 0 ] = Right Ascension of source (radians, FK5 J2000)
-*    args[ 1 ] = Declination of source (radians, FK5 J2000)
-*    args[ 2 ] = Corresponding frequency correction factor, or AST__BAD.
-   ------------------------------------------------------------------- */
-static void ldf2hl( int npoint, double *values, double *ra, double *dec, double *args, int forward ) {
-   double used_f, s1, ra0, dec0;
-   int i;
-
-/* If this is a 1-D SpecMap (i.e. for a single spatial position), get the 
-   frequency correction factor to use (which takes account of whether
-   we are doing an inverse or forward correction). */
-   used_f = AST__BAD;
-   if( !ra && args[ 2 ] != AST__BAD && args[ 2 ] != 0.0 ) {
-      used_f = forward ? args[ 2 ] : 1.0/args[ 2 ];
-   }
-
-/* Do each spectral point. */
-   for( i = 0; i < npoint; i++ ) {
-
-/* If we do not yet know the frequency correction factor for this
-   spectral point, calculate it now. */
-      if( used_f == AST__BAD || ra ){
-
-/* Choose the source RA and DEC; either from the supplied arrays or from the
-   conversion argument array. */
-         if( ra ) {
-            ra0 = ra[ i ];
-            dec0 = dec[ i ];
-         } else {
-            ra0 = args[ 0 ];
-            dec0 = args[ 1 ];
-         }
-
-/* Get the component away from the source, of the velocity of the sun
-   relative to the dynamic LSR (in m/s). This can also be thought of as the 
-   velocity of the LSR towards the source relative to the sun. */
-         s1 = (double) 1000.0*slaRvlsrd( (float) ra0, (float) dec0 );
-
-/* Find the factor by which to multiply the supplied LSRD frequency 
-   values to account for the Doppler shift introduced as a consequence of the
-   movement of the Sun away from the source relative to the LSRD.  If s1 
-   is positive (i.e. the sun is moving away from the source relative to the 
-   LSRD), then the frequency as seen on the sun should be lower than the
-   frequency as seen in the LSRD, so the factor should be less than one. */
-         if( AST__C != s1 ) args[ 2 ] = sqrt( ( AST__C - s1 )/( AST__C + s1 ) );
-
-/* Reciprocate the frequency correction factor if the inverse conversion is
-   being performed. */
-         if( args[ 2 ] != AST__BAD && args[ 2 ] != 0.0 ) {
-            used_f = forward ? args[ 2 ] : 1.0/args[ 2 ];
-         }
-      }
-
-/* Correct the frequency value. */
-      if( values[ i ] != AST__BAD && used_f != AST__BAD ) {
-         values[ i ] *= used_f;
-      } else {
-         values[ i ] = AST__BAD;
-      }
-   }
-}
-
-
-/* Heliocentric to dynamic LSR frequency correction:
-*    args[ 0 ] = Right Ascension of source (radians, FK5 J2000)
-*    args[ 1 ] = Declination of source (radians, FK5 J2000)
-*    args[ 2 ] = Corresponding frequency correction factor, or AST__BAD.
-   ------------------------------------------------------------------- */
-static void hlf2ld( int npoint, double *values, double *ra, double *dec, double *args, int forward ) {
-   double used_f, s1, ra0, dec0;
-   int i;
-
-/* If this is a 1-D SpecMap (i.e. for a single spatial position), get the 
-   frequency correction factor to use (which takes account of whether
-   we are doing an inverse or forward correction). */
-   used_f = AST__BAD;
-   if( !ra && args[ 2 ] != AST__BAD && args[ 2 ] != 0.0 ) {
-      used_f = forward ? args[ 2 ] : 1.0/args[ 2 ];
-   }
-
-/* Do each spectral point. */
-   for( i = 0; i < npoint; i++ ) {
-
-/* If we do not yet know the frequency correction factor for this
-   spectral point, calculate it now. */
-      if( used_f == AST__BAD || ra ){
-
-/* Choose the source RA and DEC; either from the supplied arrays or from the
-   conversion argument array. */
-         if( ra ) {
-            ra0 = ra[ i ];
-            dec0 = dec[ i ];
-         } else {
-            ra0 = args[ 0 ];
-            dec0 = args[ 1 ];
-         }
-
-/* Get the component away from the source, of the velocity of the sun
-   relative to the dynamic LSR (in m/s). This can also be thought of as the 
-   velocity of the LSR towards the source relative to the sun. */
-         s1 = (double) 1000.0*slaRvlsrd( (float) ra0, (float) dec0 );
-
-/* Find the factor by which to multiply the supplied heliocentric frequency 
-   values to account for the Doppler shift introduced as a consequence of the
-   movement of the Sun away from the source relative to the LSRD.  If s1 
-   is positive (i.e. the LSRD is moving towards the source relative to the 
-   sun), then the frequency as seen in the LSRD should be higher than 
-   the frequency as seen on the sun, so the factor should be greater 
-   than one. */
-         if( AST__C != s1 ) args[ 2 ] = sqrt( ( AST__C + s1 )/( AST__C - s1 ) );
-
-/* Reciprocate the frequency correction factor if the inverse conversion is
-   being performed. */
-         if( args[ 2 ] != AST__BAD && args[ 2 ] != 0.0 ) {
-            used_f = forward ? args[ 2 ] : 1.0/args[ 2 ];
-         }
-      }
-
-/* Correct the frequency value. */
-      if( values[ i ] != AST__BAD && used_f != AST__BAD ) {
-         values[ i ] *= used_f;
-      } else {
-         values[ i ] = AST__BAD;
-      }
-   }
-}
-
-
-/* Local Group to heliocentric frequency correction:
-*    args[ 0 ] = Right Ascension of source (radians, FK5 J2000)
-*    args[ 1 ] = Declination of source (radians, FK5 J2000)
-*    args[ 2 ] = Corresponding frequency correction factor, or AST__BAD.
-   ------------------------------------------------------------------- */
-static void lgf2hl( int npoint, double *values, double *ra, double *dec, double *args, int forward ) {
-   double used_f, s1, ra0, dec0;
-   int i;
-
-/* If this is a 1-D SpecMap (i.e. for a single spatial position), get the 
-   frequency correction factor to use (which takes account of whether
-   we are doing an inverse or forward correction). */
-   used_f = AST__BAD;
-   if( !ra && args[ 2 ] != AST__BAD && args[ 2 ] != 0.0 ) {
-      used_f = forward ? args[ 2 ] : 1.0/args[ 2 ];
-   }
-
-/* Do each spectral point. */
-   for( i = 0; i < npoint; i++ ) {
-
-/* If we do not yet know the frequency correction factor for this
-   spectral point, calculate it now. */
-      if( used_f == AST__BAD || ra ){
-
-/* Choose the source RA and DEC; either from the supplied arrays or from the
-   conversion argument array. */
-         if( ra ) {
-            ra0 = ra[ i ];
-            dec0 = dec[ i ];
-         } else {
-            ra0 = args[ 0 ];
-            dec0 = args[ 1 ];
-         }
-
-/* Get the component away from the source, of the velocity of the sun
-   relative to the local group (in m/s). This can also be thought of as the 
-   velocity of the local group towards the source relative to the sun. */
-         s1 = (double) 1000.0*slaRvlg( (float) ra0, (float) dec0 );
-
-/* Find the factor by which to multiply the supplied local group frequency 
-   values to account for the Doppler shift introduced as a consequence of the
-   movement of the Sun away from the source relative to the local group.  If 
-   s1 is positive (i.e. the sun is moving away from the source relative to the 
-   local group), then the frequency as seen on the sun should be lower than
-   the frequency as seen in the local group, so the factor should be less than 
-   one. */
-         if( AST__C != s1 ) args[ 2 ] = sqrt( ( AST__C - s1 )/( AST__C + s1 ) );
-
-/* Reciprocate the frequency correction factor if the inverse conversion is
-   being performed. */
-         if( args[ 2 ] != AST__BAD && args[ 2 ] != 0.0 ) {
-            used_f = forward ? args[ 2 ] : 1.0/args[ 2 ];
-         }
-      }
-
-/* Correct the frequency value. */
-      if( values[ i ] != AST__BAD && used_f != AST__BAD ) {
-         values[ i ] *= used_f;
-      } else {
-         values[ i ] = AST__BAD;
-      }
-   }
-}
-
-
-/* Heliocentric to Local Group frequency correction:
-*    args[ 0 ] = Right Ascension of source (radians, FK5 J2000)
-*    args[ 1 ] = Declination of source (radians, FK5 J2000)
-*    args[ 2 ] = Corresponding frequency correction factor, or AST__BAD.
-   ------------------------------------------------------------------- */
-static void hlf2lg( int npoint, double *values, double *ra, double *dec, double *args, int forward ) {
-   double used_f, s1, ra0, dec0;
-   int i;
-
-/* If this is a 1-D SpecMap (i.e. for a single spatial position), get the 
-   frequency correction factor to use (which takes account of whether
-   we are doing an inverse or forward correction). */
-   used_f = AST__BAD;
-   if( !ra && args[ 2 ] != AST__BAD && args[ 2 ] != 0.0 ) {
-      used_f = forward ? args[ 2 ] : 1.0/args[ 2 ];
-   }
-
-/* Do each spectral point. */
-   for( i = 0; i < npoint; i++ ) {
-
-/* If we do not yet know the frequency correction factor for this
-   spectral point, calculate it now. */
-      if( used_f == AST__BAD || ra ){
-
-/* Choose the source RA and DEC; either from the supplied arrays or from the
-   conversion argument array. */
-         if( ra ) {
-            ra0 = ra[ i ];
-            dec0 = dec[ i ];
-         } else {
-            ra0 = args[ 0 ];
-            dec0 = args[ 1 ];
-         }
-
-/* Get the component away from the source, of the velocity of the sun
-   relative to the local group (in m/s). This can also be thought of as the 
-   velocity of the local group towards the source relative to the sun. */
-         s1 = (double) 1000.0*slaRvlg( (float) ra0, (float) dec0 );
-
-/* Find the factor by which to multiply the supplied heliocentric frequency 
-   values to account for the Doppler shift introduced as a consequence of the
-   movement of the Sun away from the source relative to the local group.  If 
-   s1 is positive (i.e. the local group is moving towards the source relative 
-   to the sun), then the frequency as seen in the local group should be higher 
-   than the frequency as seen on the sun, so the factor should be greater 
-   than one. */
-         if( AST__C != s1 ) args[ 2 ] = sqrt( ( AST__C + s1 )/( AST__C - s1 ) );
-
-/* Reciprocate the frequency correction factor if the inverse conversion is
-   being performed. */
-         if( args[ 2 ] != AST__BAD && args[ 2 ] != 0.0 ) {
-            used_f = forward ? args[ 2 ] : 1.0/args[ 2 ];
-         }
-      }
-
-/* Correct the frequency value. */
-      if( values[ i ] != AST__BAD && used_f != AST__BAD ) {
-         values[ i ] *= used_f;
-      } else {
-         values[ i ] = AST__BAD;
-      }
-   }
-}
-
-
-/* Galactic to heliocentric frequency correction:
-*    args[ 0 ] = Right Ascension of source (radians, FK5 J2000)
-*    args[ 1 ] = Declination of source (radians, FK5 J2000)
-*    args[ 2 ] = Corresponding frequency correction factor, or AST__BAD.
-   ------------------------------------------------------------------- */
-static void glf2hl( int npoint, double *values, double *ra, double *dec, double *args, int forward ) {
-   double used_f, s1, s2, s3, ra0, dec0;
-   int i;
-
-/* If this is a 1-D SpecMap (i.e. for a single spatial position), get the 
-   frequency correction factor to use (which takes account of whether
-   we are doing an inverse or forward correction). */
-   used_f = AST__BAD;
-   if( !ra && args[ 2 ] != AST__BAD && args[ 2 ] != 0.0 ) {
-      used_f = forward ? args[ 2 ] : 1.0/args[ 2 ];
-   }
-
-/* Do each spectral point. */
-   for( i = 0; i < npoint; i++ ) {
-
-/* If we do not yet know the frequency correction factor for this
-   spectral point, calculate it now. */
-      if( used_f == AST__BAD || ra ){
-
-/* Choose the source RA and DEC; either from the supplied arrays or from the
-   conversion argument array. */
-         if( ra ) {
-            ra0 = ra[ i ];
-            dec0 = dec[ i ];
-         } else {
-            ra0 = args[ 0 ];
-            dec0 = args[ 1 ];
-         }
-
-/* Get the component away from the source, of the velocity of the sun
-   relative to the dynamic LSR (in km/s). */
-         s1 = (double) slaRvlsrd( (float) ra0, dec0 );
-
-/* Get the component away from the source, of the velocity of the
-   dynamic LSR relative to the galactic centre (in km/s). */
-         s2 = (double) slaRvgalc( (float) ra0, (float) dec0 );
-
-/* Find the total velocity of the sun away from the source, relative
-   to the galactic centre, in m/s. This can also be thought of as the 
-   velocity of the galactic centre towards the source relative to the sun. */
-         s3 = 1000.0*( s1 + s2 );
-
-/* Find the factor by which to multiply the supplied galactic frequency 
-   values to account for the Doppler shift introduced as a consequence of the
-   movement of the Sun away from the source relative to the galactic centre.  
-   If s3 is positive (i.e. the sun is moving away from the source relative to 
-   the galactic centre), then the frequency as seen on the sun should be lower 
-   than the frequency as seen at the galactic centre, so the factor should be 
-   less than one. */
-         if( AST__C != s1 ) args[ 2 ] = sqrt( ( AST__C - s3 )/( AST__C + s3 ) );
-
-/* Reciprocate the frequency correction factor if the inverse conversion is
-   being performed. */
-         if( args[ 2 ] != AST__BAD && args[ 2 ] != 0.0 ) {
-            used_f = forward ? args[ 2 ] : 1.0/args[ 2 ];
-         }
-      }
-
-/* Correct the frequency value. */
-      if( values[ i ] != AST__BAD && used_f != AST__BAD ) {
-         values[ i ] *= used_f;
-      } else {
-         values[ i ] = AST__BAD;
-      }
-   }
-}
-
-
-/* Heliocentric to galactic frequency correction:
-*    args[ 0 ] = Right Ascension of source (radians, FK5 J2000)
-*    args[ 1 ] = Declination of source (radians, FK5 J2000)
-*    args[ 2 ] = Corresponding frequency correction factor, or AST__BAD.
-   ------------------------------------------------------------------- */
-static void hlf2gl( int npoint, double *values, double *ra, double *dec, double *args, int forward ) {
-   double used_f, s1, s2, s3, ra0, dec0;
-   int i;
-
-/* If this is a 1-D SpecMap (i.e. for a single spatial position), get the 
-   frequency correction factor to use (which takes account of whether
-   we are doing an inverse or forward correction). */
-   used_f = AST__BAD;
-   if( !ra && args[ 2 ] != AST__BAD && args[ 2 ] != 0.0 ) {
-      used_f = forward ? args[ 2 ] : 1.0/args[ 2 ];
-   }
-
-/* Do each spectral point. */
-   for( i = 0; i < npoint; i++ ) {
-
-/* If we do not yet know the frequency correction factor for this
-   spectral point, calculate it now. */
-      if( used_f == AST__BAD || ra ){
-
-/* Choose the source RA and DEC; either from the supplied arrays or from the
-   conversion argument array. */
-         if( ra ) {
-            ra0 = ra[ i ];
-            dec0 = dec[ i ];
-         } else {
-            ra0 = args[ 0 ];
-            dec0 = args[ 1 ];
-         }
-
-/* Get the component away from the source, of the velocity of the sun
-   relative to the dynamic LSR (in km/s). */
-         s1 = (double) slaRvlsrd( (float) ra0, (float) dec0 );
-
-/* Get the component away from the source, of the velocity of the
-   dynamic LSR relative to the galactic centre (in km/s). */
-         s2 = (double) slaRvgalc( (float) ra0, (float) dec0 );
-
-/* Find the total velocity of the sun away from the source, relative
-   to the galactic centre, in m/s. This can also be thought of as the 
-   velocity of the galactic centre towards the source relative to the sun. */
-         s3 = 1000.0*( s1 + s2 );
-
-/* Find the factor by which to multiply the supplied heliocentric frequency 
-   values to account for the Doppler shift introduced as a consequence of the
-   movement of the Sun away from the source relative to the galactic centre.  
-   If s3 is positive (i.e. the galactic centre is moving towards the source 
-   relative to the sun), then the frequency as seen at the galactic centre 
-   should be higher than the frequency as seen at the sun, so the factor 
-   should be greater than one. */
-         if( AST__C != s1 ) args[ 2 ] = sqrt( ( AST__C + s3 )/( AST__C - s3 ) );
-
-/* Reciprocate the frequency correction factor if the inverse conversion is
-   being performed. */
-         if( args[ 2 ] != AST__BAD && args[ 2 ] != 0.0 ) {
-            used_f = forward ? args[ 2 ] : 1.0/args[ 2 ];
-         }
-      }
-
-/* Correct the frequency value. */
-      if( values[ i ] != AST__BAD && used_f != AST__BAD ) {
-         values[ i ] *= used_f;
-      } else {
-         values[ i ] = AST__BAD;
-      }
-   }
-}
-
-
-/* Topocentric to heliocentric velocity correction:
-*    args[ 0 ] = Geodetic longitude of observer (radians, positive eastwards)
-*    args[ 1 ] = Geodetic latitude of observer (radians)
-*    args[ 2 ] = Epoch of observation (UT1 expressed as a Modified Julian Date)
-*    args[ 3 ] = Right Ascension of source (radians, FK5 J2000)
-*    args[ 4 ] = Declination of source (radians, FK5 J2000)
-*    args[ 5 ] = Corresponding velocity correction term, or AST__BAD.
-   ------------------------------------------------------------------- */
-static void tpv2hl( int npoint, double *values, double *ra, double *dec, double *args, int forward ) {
-   double used_f, s1, s2, ra0, dec0;
-   int i;
-
-/* If this is a 1-D SpecMap (i.e. for a single spatial position), get the 
-   velocity correction factor to use (which takes account of whether
-   we are doing an inverse or forward correction). */
-   used_f = AST__BAD;
-   if( !ra && args[ 5 ] != AST__BAD && args[ 5 ] != 0.0 ) {
-      used_f = forward ? args[ 5 ] : -args[ 5 ];
-   }
-
-/* Do each spectral point. */
-   for( i = 0; i < npoint; i++ ) {
-
-/* If we do not yet know the velocity correction factor for this spectral 
-   point, calculate it now. */
-      if( used_f == AST__BAD || ra ){
-
-/* Choose the source RA and DEC; either from the supplied arrays or from the
-   conversion argument array. */
-         if( ra ) {
-            ra0 = ra[ i ];
-            dec0 = dec[ i ];
-         } else {
-            ra0 = args[ 3 ];
-            dec0 = args[ 4 ];
-         }
-
-/* Get the component away from the source, of the velocity of the observer 
-   relative to the centre of the earth (in km/s). */
-         s1 = TopoVel( args[ 0 ], args[ 1 ], args[ 2 ], ra0, dec0 );
-
-/* Get the component away from the source, of the velocity of the earths
-   centre relative to the sun (in km/s). */
-         s2 = HelioVel( args[ 2 ], ra0, dec0  );
-
-/* Find the total velocity of the observer away from the source, relative
-   to the sun in m/s. This can also be thought of as the velocity of the
-   sun towards the source relative to the observer. */
-         args[ 5 ] = 1000.0*( s1 + s2 );
-
-/* Negate the velocity correction factor if the inverse conversion is
-   being performed. */
-         if( args[ 5 ] != AST__BAD && args[ 5 ] != 0.0 ) {
-            used_f = forward ? args[ 5 ] : -args[ 5 ];
-         }
-      }
-
-/* Correct the supplied velocity value. */
-      VelCorr( values + i, used_f );
-   }
-}
-
-/* Heliocentric to topocentric velocity correction:
-*    args[ 0 ] = Geodetic longitude of observer (radians, positive eastwards)
-*    args[ 1 ] = Geodetic latitude of observer (radians)
-*    args[ 2 ] = Epoch of observation (UT1 expressed as a Modified Julian Date)
-*    args[ 3 ] = Right Ascension of source (radians, FK5 J2000)
-*    args[ 4 ] = Declination of source (radians, FK5 J2000)
-*    args[ 5 ] = Corresponding velocity correction term, or AST__BAD.
-   ------------------------------------------------------------------- */
-static void hlv2tp( int npoint, double *values, double *ra, double *dec, double *args, int forward ) {
-   double used_f, s1, s2, ra0, dec0;
-   int i;
-
-/* If this is a 1-D SpecMap (i.e. for a single spatial position), get the 
-   velocity correction factor to use (which takes account of whether
-   we are doing an inverse or forward correction). */
-   used_f = AST__BAD;
-   if( !ra && args[ 5 ] != AST__BAD && args[ 5 ] != 0.0 ) {
-      used_f = forward ? args[ 5 ] : -args[ 5 ];
-   }
-
-/* Do each spectral point. */
-   for( i = 0; i < npoint; i++ ) {
-
-/* If we do not yet know the velocity correction factor for this spectral 
-   point, calculate it now. */
-      if( used_f == AST__BAD || ra ){
-
-/* Choose the source RA and DEC; either from the supplied arrays or from the
-   conversion argument array. */
-         if( ra ) {
-            ra0 = ra[ i ];
-            dec0 = dec[ i ];
-         } else {
-            ra0 = args[ 3 ];
-            dec0 = args[ 4 ];
-         }
-
-/* Get the component away from the source, of the velocity of the observer 
-   relative to the centre of the earth (in km/s). */
-         s1 = TopoVel( args[ 0 ], args[ 1 ], args[ 2 ], ra0, dec0 );
-
-/* Get the component away from the source, of the velocity of the earths
-   centre relative to the sun (in km/s). */
-         s2 = HelioVel( args[ 2 ], ra0, dec0  );
-
-/* Find the total velocity of the observer towards the source, relative
-   to the sun in m/s. */
-         args[ 5 ] = -1000.0*( s1 + s2 );
-
-/* Negate the velocity correction factor if the inverse conversion is
-   being performed. */
-         if( args[ 5 ] != AST__BAD && args[ 5 ] != 0.0 ) {
-            used_f = forward ? args[ 5 ] : -args[ 5 ];
-         }
-      }
-
-/* Correct the supplied velocity value. */
-      VelCorr( values + i, used_f );
-   }
-}
-
-/* Geocentric to heliocentric velocity correction:
-*    args[ 0 ] = Epoch of observation (UT1 expressed as a Modified Julian Date)
-*    args[ 1 ] = Right Ascension of source (radians, FK5 J2000)
-*    args[ 2 ] = Declination of source (radians, FK5 J2000)
-*    args[ 3 ] = Corresponding velocity correction term, or AST__BAD.
-   ------------------------------------------------------------------- */
-static void gev2hl( int npoint, double *values, double *ra, double *dec, double *args, int forward ) {
-   double used_f, ra0, dec0;
-   int i;
-
-/* If this is a 1-D SpecMap (i.e. for a single spatial position), get the 
-   velocity correction factor to use (which takes account of whether
-   we are doing an inverse or forward correction). */
-   used_f = AST__BAD;
-   if( !ra && args[ 3 ] != AST__BAD && args[ 3 ] != 0.0 ) {
-      used_f = forward ? args[ 3 ] : -args[ 3 ];
-   }
-
-/* Do each spectral point. */
-   for( i = 0; i < npoint; i++ ) {
-
-/* If we do not yet know the velocity correction factor for this spectral 
-   point, calculate it now. */
-      if( used_f == AST__BAD || ra ){
-
-/* Choose the source RA and DEC; either from the supplied arrays or from the
-   conversion argument array. */
-         if( ra ) {
-            ra0 = ra[ i ];
-            dec0 = dec[ i ];
-         } else {
-            ra0 = args[ 1 ];
-            dec0 = args[ 2 ];
-         }
-
-/* Get the component towards the source, of the velocity of the sun
-   relative to the earths centre (in m/s). */
-         args[ 3 ] = 1000.0*HelioVel( args[ 0 ], ra0, dec0 );
-
-/* Negate the velocity correction factor if the inverse conversion is
-   being performed. */
-         if( args[ 3 ] != AST__BAD && args[ 3 ] != 0.0 ) {
-            used_f = forward ? args[ 3 ] : -args[ 3 ];
-         }
-      }
-
-/* Correct the supplied velocity value. */
-      VelCorr( values + i, used_f );
-   }
-}
-
-/* Heliocentric to geocentric velocity correction:
-*    args[ 0 ] = Epoch of observation (UT1 expressed as a Modified Julian Date)
-*    args[ 1 ] = Right Ascension of source (radians, FK5 J2000)
-*    args[ 2 ] = Declination of source (radians, FK5 J2000)
-*    args[ 3 ] = Corresponding velocity correction term, or AST__BAD.
-   ------------------------------------------------------------------- */
-static void hlv2ge( int npoint, double *values, double *ra, double *dec, double *args, int forward ) {
-   double used_f, ra0, dec0;
-   int i;
-
-/* If this is a 1-D SpecMap (i.e. for a single spatial position), get the 
-   velocity correction factor to use (which takes account of whether
-   we are doing an inverse or forward correction). */
-   used_f = AST__BAD;
-   if( !ra && args[ 3 ] != AST__BAD && args[ 3 ] != 0.0 ) {
-      used_f = forward ? args[ 3 ] : -args[ 3 ];
-   }
-
-/* Do each spectral point. */
-   for( i = 0; i < npoint; i++ ) {
-
-/* If we do not yet know the velocity correction factor for this spectral 
-   point, calculate it now. */
-      if( used_f == AST__BAD || ra ){
-
-/* Choose the source RA and DEC; either from the supplied arrays or from the
-   conversion argument array. */
-         if( ra ) {
-            ra0 = ra[ i ];
-            dec0 = dec[ i ];
-         } else {
-            ra0 = args[ 1 ];
-            dec0 = args[ 2 ];
-         }
-
-/* Get the component towards the source, of the velocity of the earths
-   centre relative to the sun (in m/s). */
-         args[ 3 ] = -1000.0*HelioVel( args[ 0 ], ra0, dec0 );
-
-/* Negate the velocity correction factor if the inverse conversion is
-   being performed. */
-         if( args[ 3 ] != AST__BAD && args[ 3 ] != 0.0 ) {
-            used_f = forward ? args[ 3 ] : -args[ 3 ];
-         }
-      }
-
-/* Correct the supplied velocity value. */
-      VelCorr( values + i, used_f );
-   }
-}
-
-/* Barycentric to heliocentric velocity correction:
-*    args[ 0 ] = Epoch of observation (UT1 expressed as a Modified Julian Date)
-*    args[ 1 ] = Right Ascension of source (radians, FK5 J2000)
-*    args[ 2 ] = Declination of source (radians, FK5 J2000)
-*    args[ 3 ] = Corresponding velocity correction term, or AST__BAD.
-   ------------------------------------------------------------------- */
-static void byv2hl( int npoint, double *values, double *ra, double *dec, double *args, int forward ) {
-   double used_f, ra0, dec0;
-   int i;
-
-/* If this is a 1-D SpecMap (i.e. for a single spatial position), get the 
-   velocity correction factor to use (which takes account of whether
-   we are doing an inverse or forward correction). */
-   used_f = AST__BAD;
-   if( !ra && args[ 3 ] != AST__BAD && args[ 3 ] != 0.0 ) {
-      used_f = forward ? args[ 3 ] : -args[ 3 ];
-   }
-
-/* Do each spectral point. */
-   for( i = 0; i < npoint; i++ ) {
-
-/* If we do not yet know the velocity correction factor for this spectral 
-   point, calculate it now. */
-      if( used_f == AST__BAD || ra ){
-
-/* Choose the source RA and DEC; either from the supplied arrays or from the
-   conversion argument array. */
-         if( ra ) {
-            ra0 = ra[ i ];
-            dec0 = dec[ i ];
-         } else {
-            ra0 = args[ 1 ];
-            dec0 = args[ 2 ];
-         }
-
-/* Get the component towards the source, of the velocity of the sun
-   relative to the barycentre (in m/s). */
-         args[ 3 ] = 1000.0*BaryVel( args[ 0 ], ra0, dec0 );
-
-/* Negate the velocity correction factor if the inverse conversion is
-   being performed. */
-         if( args[ 5 ] != AST__BAD && args[ 5 ] != 0.0 ) {
-            used_f = forward ? args[ 5 ] : -args[ 5 ];
-         }
-      }
-
-/* Correct the supplied velocity value. */
-      VelCorr( values + i, used_f );
-   }
-}
-
-/* Heliocentric to barycentric velocity correction:
-*    args[ 0 ] = Epoch of observation (UT1 expressed as a Modified Julian Date)
-*    args[ 1 ] = Right Ascension of source (radians, FK5 J2000)
-*    args[ 2 ] = Declination of source (radians, FK5 J2000)
-*    args[ 3 ] = Corresponding velocity correction term, or AST__BAD.
-   ------------------------------------------------------------------- */
-static void hlv2by( int npoint, double *values, double *ra, double *dec, double *args, int forward ) {
-   double used_f, ra0, dec0;
-   int i;
-
-/* If this is a 1-D SpecMap (i.e. for a single spatial position), get the 
-   velocity correction factor to use (which takes account of whether
-   we are doing an inverse or forward correction). */
-   used_f = AST__BAD;
-   if( !ra && args[ 3 ] != AST__BAD && args[ 3 ] != 0.0 ) {
-      used_f = forward ? args[ 3 ] : -args[ 3 ];
-   }
-
-/* Do each spectral point. */
-   for( i = 0; i < npoint; i++ ) {
-
-/* If we do not yet know the velocity correction factor for this spectral 
-   point, calculate it now. */
-      if( used_f == AST__BAD || ra ){
-
-/* Choose the source RA and DEC; either from the supplied arrays or from the
-   conversion argument array. */
-         if( ra ) {
-            ra0 = ra[ i ];
-            dec0 = dec[ i ];
-         } else {
-            ra0 = args[ 1 ];
-            dec0 = args[ 2 ];
-         }
-
-/* Get the component towards the source, of the velocity of the barycentre
-   relative to the sun (in m/s). */
-         args[ 3 ] = -1000.0*BaryVel( args[ 0 ], ra0, dec0 );
-
-/* Negate the velocity correction factor if the inverse conversion is
-   being performed. */
-         if( args[ 5 ] != AST__BAD && args[ 5 ] != 0.0 ) {
-            used_f = forward ? args[ 5 ] : -args[ 5 ];
-         }
-      }
-
-/* Correct the supplied velocity value. */
-      VelCorr( values + i, used_f );
-   }
-}
-
-/* Kinematic LSR to heliocentric velocity correction:
-*    args[ 0 ] = Right Ascension of source (radians, FK5 J2000)
-*    args[ 1 ] = Declination of source (radians, FK5 J2000)
-*    args[ 2 ] = Corresponding velocity correction term, or AST__BAD.
-   ------------------------------------------------------------------- */
-static void lkv2hl( int npoint, double *values, double *ra, double *dec, double *args, int forward ) {
-   double used_f, ra0, dec0;
-   int i;
-
-/* If this is a 1-D SpecMap (i.e. for a single spatial position), get the 
-   velocity correction factor to use (which takes account of whether
-   we are doing an inverse or forward correction). */
-   used_f = AST__BAD;
-   if( !ra && args[ 2 ] != AST__BAD && args[ 2 ] != 0.0 ) {
-      used_f = forward ? args[ 2 ] : -args[ 2 ];
-   }
-
-/* Do each spectral point. */
-   for( i = 0; i < npoint; i++ ) {
-
-/* If we do not yet know the velocity correction factor for this spectral 
-   point, calculate it now. */
-      if( used_f == AST__BAD || ra ){
-
-/* Choose the source RA and DEC; either from the supplied arrays or from the
-   conversion argument array. */
-         if( ra ) {
-            ra0 = ra[ i ];
-            dec0 = dec[ i ];
-         } else {
-            ra0 = args[ 0 ];
-            dec0 = args[ 1 ];
-         }
-
-/* Get the component towards the source, of the velocity of the sun
-   relative to the LSRK (in m/s). */
-         args[ 2 ] = (double) -1000.0*slaRvlsrk( (float) ra0, (float) dec0 );
-
-/* Negate the velocity correction factor if the inverse conversion is
-   being performed. */
-         if( args[ 2 ] != AST__BAD && args[ 2 ] != 0.0 ) {
-            used_f = forward ? args[ 2 ] : -args[ 2 ];
-         }
-      }
-
-/* Correct the supplied velocity value. */
-      VelCorr( values + i, used_f );
-   }
-}
-
-/* Heliocentric to kinematic LSR velocity correction:
-*    args[ 0 ] = Right Ascension of source (radians, FK5 J2000)
-*    args[ 1 ] = Declination of source (radians, FK5 J2000)
-*    args[ 2 ] = Corresponding velocity correction term, or AST__BAD.
-   ------------------------------------------------------------------- */
-static void hlv2lk( int npoint, double *values, double *ra, double *dec, double *args, int forward ) {
-   double used_f, ra0, dec0;
-   int i;
-
-/* If this is a 1-D SpecMap (i.e. for a single spatial position), get the 
-   velocity correction factor to use (which takes account of whether
-   we are doing an inverse or forward correction). */
-   used_f = AST__BAD;
-   if( !ra && args[ 2 ] != AST__BAD && args[ 2 ] != 0.0 ) {
-      used_f = forward ? args[ 2 ] : -args[ 2 ];
-   }
-
-/* Do each spectral point. */
-   for( i = 0; i < npoint; i++ ) {
-
-/* If we do not yet know the velocity correction factor for this spectral 
-   point, calculate it now. */
-      if( used_f == AST__BAD || ra ){
-
-/* Choose the source RA and DEC; either from the supplied arrays or from the
-   conversion argument array. */
-         if( ra ) {
-            ra0 = ra[ i ];
-            dec0 = dec[ i ];
-         } else {
-            ra0 = args[ 0 ];
-            dec0 = args[ 1 ];
-         }
-
-/* Get the component towards the source, of the velocity of the LSRK 
-   relative to the sun (in m/s). */
-         args[ 2 ] = (double) 1000.0*slaRvlsrk( (float) ra0, (float) dec0 );
- 
-/* Negate the velocity correction factor if the inverse conversion is
-   being performed. */
-         if( args[ 2 ] != AST__BAD && args[ 2 ] != 0.0 ) {
-            used_f = forward ? args[ 2 ] : -args[ 2 ];
-         }
-      }
-
-/* Correct the supplied velocity value. */
-      VelCorr( values + i, used_f );
-   }
-}
-
-
-/* Dynamic LSR to heliocentric velocity correction:
-*    args[ 0 ] = Right Ascension of source (radians, FK5 J2000)
-*    args[ 1 ] = Declination of source (radians, FK5 J2000)
-*    args[ 2 ] = Corresponding velocity correction term, or AST__BAD.
-   ------------------------------------------------------------------- */
-static void ldv2hl( int npoint, double *values, double *ra, double *dec, double *args, int forward ) {
-   double used_f, ra0, dec0;
-   int i;
-
-/* If this is a 1-D SpecMap (i.e. for a single spatial position), get the 
-   velocity correction factor to use (which takes account of whether
-   we are doing an inverse or forward correction). */
-   used_f = AST__BAD;
-   if( !ra && args[ 2 ] != AST__BAD && args[ 2 ] != 0.0 ) {
-      used_f = forward ? args[ 2 ] : -args[ 2 ];
-   }
-
-/* Do each spectral point. */
-   for( i = 0; i < npoint; i++ ) {
-
-/* If we do not yet know the velocity correction factor for this spectral 
-   point, calculate it now. */
-      if( used_f == AST__BAD || ra ){
-
-/* Choose the source RA and DEC; either from the supplied arrays or from the
-   conversion argument array. */
-         if( ra ) {
-            ra0 = ra[ i ];
-            dec0 = dec[ i ];
-         } else {
-            ra0 = args[ 0 ];
-            dec0 = args[ 1 ];
-         }
-
-/* Get the component towards the source, of the velocity of the sun
-   relative to the LSRD (in m/s). */
-         args[ 2 ] = (double) -1000.0*slaRvlsrd( (float) ra0, (float) dec0 );
-
-/* Negate the velocity correction factor if the inverse conversion is
-   being performed. */
-         if( args[ 2 ] != AST__BAD && args[ 2 ] != 0.0 ) {
-            used_f = forward ? args[ 2 ] : -args[ 2 ];
-         }
-      }
-
-/* Correct the supplied velocity value. */
-      VelCorr( values + i, used_f );
-   }
-}
-
-/* Heliocentric to dynamic LSR velocity correction:
-*    args[ 0 ] = Right Ascension of source (radians, FK5 J2000)
-*    args[ 1 ] = Declination of source (radians, FK5 J2000)
-*    args[ 2 ] = Corresponding velocity correction term, or AST__BAD.
-   ------------------------------------------------------------------- */
-static void hlv2ld( int npoint, double *values, double *ra, double *dec, double *args, int forward ) {
-   double used_f, ra0, dec0;
-   int i;
-
-/* If this is a 1-D SpecMap (i.e. for a single spatial position), get the 
-   velocity correction factor to use (which takes account of whether
-   we are doing an inverse or forward correction). */
-   used_f = AST__BAD;
-   if( !ra && args[ 2 ] != AST__BAD && args[ 2 ] != 0.0 ) {
-      used_f = forward ? args[ 2 ] : -args[ 2 ];
-   }
-
-/* Do each spectral point. */
-   for( i = 0; i < npoint; i++ ) {
-
-/* If we do not yet know the velocity correction factor for this spectral 
-   point, calculate it now. */
-      if( used_f == AST__BAD || ra ){
-
-/* Choose the source RA and DEC; either from the supplied arrays or from the
-   conversion argument array. */
-         if( ra ) {
-            ra0 = ra[ i ];
-            dec0 = dec[ i ];
-         } else {
-            ra0 = args[ 0 ];
-            dec0 = args[ 1 ];
-         }
-
-/* Get the component towards the source, of the velocity of the LSRD
-   relative to the sun (in m/s). */
-         args[ 2 ] = (double) 1000.0*slaRvlsrd( (float) ra0, (float) dec0 );
-
-/* Negate the velocity correction factor if the inverse conversion is
-   being performed. */
-         if( args[ 2 ] != AST__BAD && args[ 2 ] != 0.0 ) {
-            used_f = forward ? args[ 2 ] : -args[ 2 ];
-         }
-      }
-
-/* Correct the supplied velocity value. */
-      VelCorr( values + i, used_f );
-   }
-}
-
-/* Local Group to heliocentric velocity correction:
-*    args[ 0 ] = Right Ascension of source (radians, FK5 J2000)
-*    args[ 1 ] = Declination of source (radians, FK5 J2000)
-*    args[ 2 ] = Corresponding velocity correction term, or AST__BAD.
-   ------------------------------------------------------------------- */
-static void lgv2hl( int npoint, double *values, double *ra, double *dec, double *args, int forward ) {
-   double used_f, ra0, dec0;
-   int i;
-
-/* If this is a 1-D SpecMap (i.e. for a single spatial position), get the 
-   velocity correction factor to use (which takes account of whether
-   we are doing an inverse or forward correction). */
-   used_f = AST__BAD;
-   if( !ra && args[ 2 ] != AST__BAD && args[ 2 ] != 0.0 ) {
-      used_f = forward ? args[ 2 ] : -args[ 2 ];
-   }
-
-/* Do each spectral point. */
-   for( i = 0; i < npoint; i++ ) {
-
-/* If we do not yet know the velocity correction factor for this spectral 
-   point, calculate it now. */
-      if( used_f == AST__BAD || ra ){
-
-/* Choose the source RA and DEC; either from the supplied arrays or from the
-   conversion argument array. */
-         if( ra ) {
-            ra0 = ra[ i ];
-            dec0 = dec[ i ];
-         } else {
-            ra0 = args[ 0 ];
-            dec0 = args[ 1 ];
-         }
-
-/* Get the component towards the source, of the velocity of the sun
-   relative to the Local Group (in m/s). */
-         args[ 2 ] = (double) -1000.0*slaRvlg( (float) ra0, (float) dec0 );
-
-/* Negate the velocity correction factor if the inverse conversion is
-   being performed. */
-         if( args[ 2 ] != AST__BAD && args[ 2 ] != 0.0 ) {
-            used_f = forward ? args[ 2 ] : -args[ 2 ];
-         }
-      }
-
-/* Correct the supplied velocity value. */
-      VelCorr( values + i, used_f );
-   }
-}
-
-/* Heliocentric to Local Group velocity correction:
-*    args[ 0 ] = Right Ascension of source (radians, FK5 J2000)
-*    args[ 1 ] = Declination of source (radians, FK5 J2000)
-*    args[ 2 ] = Corresponding velocity correction term, or AST__BAD.
-   ------------------------------------------------------------------- */
-static void hlv2lg( int npoint, double *values, double *ra, double *dec, double *args, int forward ) {
-   double used_f, ra0, dec0;
-   int i;
-
-/* If this is a 1-D SpecMap (i.e. for a single spatial position), get the 
-   velocity correction factor to use (which takes account of whether
-   we are doing an inverse or forward correction). */
-   used_f = AST__BAD;
-   if( !ra && args[ 2 ] != AST__BAD && args[ 2 ] != 0.0 ) {
-      used_f = forward ? args[ 2 ] : -args[ 2 ];
-   }
-
-/* Do each spectral point. */
-   for( i = 0; i < npoint; i++ ) {
-
-/* If we do not yet know the velocity correction factor for this spectral 
-   point, calculate it now. */
-      if( used_f == AST__BAD || ra ){
-
-/* Choose the source RA and DEC; either from the supplied arrays or from the
-   conversion argument array. */
-         if( ra ) {
-            ra0 = ra[ i ];
-            dec0 = dec[ i ];
-         } else {
-            ra0 = args[ 0 ];
-            dec0 = args[ 1 ];
-         }
-
-/* Get the component towards the source, of the velocity of the Local group
-   relative to the sun (in m/s). */
-         args[ 2 ] = (double) 1000.0*slaRvlg( (float) ra0, (float) dec0 );
-
-/* Negate the velocity correction factor if the inverse conversion is
-   being performed. */
-         if( args[ 2 ] != AST__BAD && args[ 2 ] != 0.0 ) {
-            used_f = forward ? args[ 2 ] : -args[ 2 ];
-         }
-      }
-
-/* Correct the supplied velocity value. */
-      VelCorr( values + i, used_f );
-   }
-}
-
-/* Galactic to heliocentric velocity correction:
-*    args[ 0 ] = Right Ascension of source (radians, FK5 J2000)
-*    args[ 1 ] = Declination of source (radians, FK5 J2000)
-*    args[ 2 ] = Corresponding velocity correction term, or AST__BAD.
-   ------------------------------------------------------------------- */
-static void glv2hl( int npoint, double *values, double *ra, double *dec, double *args, int forward ) {
-   double used_f, ra0, dec0, s1, s2;
-   int i;
-
-/* If this is a 1-D SpecMap (i.e. for a single spatial position), get the 
-   velocity correction factor to use (which takes account of whether
-   we are doing an inverse or forward correction). */
-   used_f = AST__BAD;
-   if( !ra && args[ 2 ] != AST__BAD && args[ 2 ] != 0.0 ) {
-      used_f = forward ? args[ 2 ] : -args[ 2 ];
-   }
-
-/* Do each spectral point. */
-   for( i = 0; i < npoint; i++ ) {
-
-/* If we do not yet know the velocity correction factor for this spectral 
-   point, calculate it now. */
-      if( used_f == AST__BAD || ra ){
-
-/* Choose the source RA and DEC; either from the supplied arrays or from the
-   conversion argument array. */
-         if( ra ) {
-            ra0 = ra[ i ];
-            dec0 = dec[ i ];
-         } else {
-            ra0 = args[ 0 ];
-            dec0 = args[ 1 ];
-         }
-
-/* Get the component away from the source, of the velocity of the sun
-   relative to the dynamic LSR (in km/s). */
-         s1 = (double) slaRvlsrd( (float) ra0, (float) dec0 );
-
-/* Get the component away from the source, of the velocity of the
-   dynamic LSR relative to the galactic centre (in km/s). */
-         s2 = (double) slaRvgalc( (float) ra0, (float) dec0 );
-
-/* Get the component towards the source, of the velocity of the sun
-   relative to the galactic centre (in m/s). */
-         args[ 2 ] = -1000.0*( s1 + s2 );
-
-/* Negate the velocity correction factor if the inverse conversion is
-   being performed. */
-         if( args[ 2 ] != AST__BAD && args[ 2 ] != 0.0 ) {
-            used_f = forward ? args[ 2 ] : -args[ 2 ];
-         }
-      }
-
-/* Correct the supplied velocity value. */
-      VelCorr( values + i, used_f );
-   }
-}
-
-/* Heliocentric to galactic velocity correction:
-*    args[ 0 ] = Right Ascension of source (radians, FK5 J2000)
-*    args[ 1 ] = Declination of source (radians, FK5 J2000)
-*    args[ 2 ] = Corresponding velocity correction term, or AST__BAD.
-   ------------------------------------------------------------------- */
-static void hlv2gl( int npoint, double *values, double *ra, double *dec, double *args, int forward ) {
-   double used_f, ra0, dec0, s1, s2;
-   int i;
-
-/* If this is a 1-D SpecMap (i.e. for a single spatial position), get the 
-   velocity correction factor to use (which takes account of whether
-   we are doing an inverse or forward correction). */
-   used_f = AST__BAD;
-   if( !ra && args[ 2 ] != AST__BAD && args[ 2 ] != 0.0 ) {
-      used_f = forward ? args[ 2 ] : -args[ 2 ];
-   }
-
-/* Do each spectral point. */
-   for( i = 0; i < npoint; i++ ) {
-
-/* If we do not yet know the velocity correction factor for this spectral 
-   point, calculate it now. */
-      if( used_f == AST__BAD || ra ){
-
-/* Choose the source RA and DEC; either from the supplied arrays or from the
-   conversion argument array. */
-         if( ra ) {
-            ra0 = ra[ i ];
-            dec0 = dec[ i ];
-         } else {
-            ra0 = args[ 0 ];
-            dec0 = args[ 1 ];
-         }
-
-/* Get the component away from the source, of the velocity of the sun
-   relative to the dynamic LSR (in km/s). */
-         s1 = (double) slaRvlsrd( (float) ra0, (float) dec0 );
-
-/* Get the component away from the source, of the velocity of the
-   dynamic LSR relative to the galactic centre (in km/s). */
-         s2 = (double) slaRvgalc( (float) ra0, (float) dec0 );
-
-/* Get the component towards the source, of the velocity of the galactic
-   centre relative to the sun (in m/s). */
-         args[ 2 ] = 1000.0*( s1 + s2 );
-
-/* Negate the velocity correction factor if the inverse conversion is
-   being performed. */
-         if( args[ 2 ] != AST__BAD && args[ 2 ] != 0.0 ) {
-            used_f = forward ? args[ 2 ] : -args[ 2 ];
-         }
-      }
-
-/* Correct the supplied velocity value. */
-      VelCorr( values + i, used_f );
-   }
 }
 
 /* Standard class functions. */
