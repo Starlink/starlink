@@ -249,16 +249,18 @@
             *ipio = (F77_POINTER_TYPE) NULL;
          }
       }
-      ccdTclGetD( cinterp, "set ZOOM", zoom, status );
-      ccdTclGetD( cinterp, "set PERCLO", percnt, status );
-      ccdTclGetD( cinterp, "set PERCHI", percnt + 1, status );
-      ccdTclGetI( cinterp, "set MAXCANV", maxcanv, status );
-      ccdTclGetI( cinterp, "set WINX", windim, status );
-      ccdTclGetI( cinterp, "set WINY", windim + 1, status );
-      ccdTclGetI( cinterp, "set CENTROID", centrd, status );
-      *centrd = F77_ISTRUE(*centrd);
-      cnfExprt( ccdTclGetC( cinterp, "set MARKSTYLE", status ), 
-                mstyle, mstyle_length );
+      if ( *status == SAI__OK ) {
+         ccdTclGetD( cinterp, "set ZOOM", zoom, status );
+         ccdTclGetD( cinterp, "set PERCLO", percnt, status );
+         ccdTclGetD( cinterp, "set PERCHI", percnt + 1, status );
+         ccdTclGetI( cinterp, "set MAXCANV", maxcanv, status );
+         ccdTclGetI( cinterp, "set WINX", windim, status );
+         ccdTclGetI( cinterp, "set WINY", windim + 1, status );
+         ccdTclGetI( cinterp, "set CENTROID", centrd, status );
+         *centrd = F77_ISTRUE(*centrd);
+         cnfExprt( ccdTclGetC( cinterp, "set MARKSTYLE", status ), 
+                   mstyle, mstyle_length );
+      }
 
 /* Delete the Tcl interpreter. */
       ccdTclStop( cinterp, status );
