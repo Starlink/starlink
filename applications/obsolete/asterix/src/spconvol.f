@@ -90,10 +90,12 @@
 *     {enter_new_authors_here}
 
 *  History:
-*     16-Aug-94 (DJA):
+*     16-Aug-1994 (DJA):
 *        V1.8-0  Original version.
-*     25-NOV-94 (DJA):
-*        V1.8-1  User interface now uses USI exclusively
+*     25-Nov-1994 (DJA):
+*        V1.8-1  User interface now uses USI exclusively.
+*     25-Apr-1995 (DJA):
+*        V1.8-2  Updated data interfaces.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -124,14 +126,13 @@
 *  Local Variables:
       CHARACTER*(DAT__SZLOC) 	ALOC           		! Input ASTERIX structure
       CHARACTER*80		HTXT(MXHLINE)		! History text
-      CHARACTER*(DAT__SZLOC) 	ILOC           		! Input dataset
       CHARACTER*(DAT__SZLOC) 	RLOC           		! Response object
-      CHARACTER*(DAT__SZLOC) 	SLOC           		! Source profile dataset
 
       REAL                   	CUTOFF			! Cutoff amplitude
 
       INTEGER		     	CP_PTR			! Cursor over spatial response
       INTEGER 		     	EBIN      		! Loop over energy axis
+      INTEGER			IFID			! Input dataset id
       INTEGER			INDX(3)			! Index triplet
       INTEGER                	IPSF           		! PSF handle
       INTEGER			NELM			! Product of dimensions
@@ -155,18 +156,18 @@
       INTEGER			SDPTR			! Source model data
       INTEGER			SEBIN			! Source model E bin
       INTEGER			SEDPTR			! Source model E slice
+      INTEGER			SFID			! Source profile dataset
       INTEGER			SNDIM			! Source model dim'ality
       INTEGER                	X_AX,Y_AX,E_AX,T_AX 	! Axis numbers
       INTEGER			XSMAX, YSMAX		! Psf extreme sizes
       LOGICAL                	EDEP           		! Response is energy dependent?
-      LOGICAL                	IPRIM          		! Input primitive?
       LOGICAL                	OK             		! General validity check
       LOGICAL                	RADIAL         		! Psf is only function of R
       LOGICAL                	THERE          		! Component exists?
 
 *  Version
       CHARACTER*30       VERSION
-        PARAMETER        ( VERSION = 'SPCONVOL Version 1.8-1' )
+        PARAMETER        ( VERSION = 'SPCONVOL Version 1.8-2' )
 *.
 
 *    Check inherited global status.
@@ -179,10 +180,10 @@
       CALL MSG_PRNT( VERSION )
 
 *    Get dataset
-      CALL USI_ASSOCI( 'INP', 'UPDATE', ILOC, IPRIM, STATUS )
+      CALL USI_TASSOCI( 'INP', '*', 'UPDATE', IFID, STATUS )
 
 *    Locate ASTERIX structure
-      CALL BDA_LOCAST( ILOC, ALOC, STATUS )
+      CALL ADI1_LOCAST( IFID, .FALSE., ALOC, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Check to see if response exists
@@ -199,10 +200,10 @@
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Get intrinsic source profile dataset
-      CALL USI_ASSOCI( 'SOURCE', 'READ', SLOC, IPRIM, STATUS )
+      CALL USI_TASSOCI( 'SOURCE', '*', 'READ', SFID, STATUS )
 
 *    Introduce to the psf system
-      CALL PSF_GETSLOTL( SLOC, IPSF, STATUS )
+      CALL PSF_GETSLOT( SFID, IPSF, STATUS )
       CALL PSF_CHKAXES( IPSF, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
@@ -219,7 +220,7 @@
       END IF
 
 *    Get intrinsic profile dimensions
-      CALL BDA_CHKDATA( SLOC, OK, SNDIM, SDIMS, STATUS )
+      CALL BDI_CHKDATA( SFID, OK, SNDIM, SDIMS, STATUS )
 
 *    Check source model is pixel centred
       IF ( (((SDIMS(1)/2)*2).EQ.SDIMS(1)) .OR.
@@ -231,7 +232,7 @@
       END IF
 
 *    Map source profile data
-      CALL BDA_MAPDATA( SLOC, 'READ', SDPTR, STATUS )
+      CALL BDI_MAPDATA( SFID, 'READ', SDPTR, STATUS )
 
 *    Get expanded response dimensions
       CALL CMP_GET1I( RLOC, 'DIMS', 5, RDIMS, RNDIM, STATUS )
@@ -380,16 +381,16 @@
       CALL CMP_UNMAP( RLOC, 'INDEX', STATUS )
 
 *    Add a bit of history
-      CALL HIST_ADD( ILOC, VERSION, STATUS )
+      CALL HSI_ADD( IFID, VERSION, STATUS )
       HTXT(1) = 'Convolved with : {SOURCE}'
       NLINE = MXHLINE
       CALL USI_TEXT( 1, HTXT, NLINE, STATUS )
-      CALL HIST_PTXT( ILOC, NLINE, HTXT, STATUS )
+      CALL HSI_PTXT( IFID, NLINE, HTXT, STATUS )
 
 *    Release response
-      CALL BDA_RELEASE( SLOC, STATUS )
+      CALL BDI_RELEASE( SFID, STATUS )
       CALL DAT_ANNUL( RLOC, STATUS )
-      CALL BDA_RELEASE( ILOC, STATUS )
+      CALL BDI_RELEASE( IFID, STATUS )
 
 *    Tidy up
  99   CALL AST_CLOSE()
