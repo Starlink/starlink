@@ -296,10 +296,10 @@ m31.sdf.sun4_Solaris iras.sdf.sun4_Solaris grey_lut.sdf.sun4_Solaris
 KAPPA_IFLS = add.ifl aperadd.ifl ardgen.ifl ardmask.ifl block.ifl \
 cadd.ifl calc.ifl calpol.ifl cdiv.ifl centroid.ifl chpix.ifl cmult.ifl \
 compadd.ifl compave.ifl compick.ifl convolve.ifl creframe.ifl csub.ifl \
-div.ifl errclip.ifl exp10.ifl expe.ifl expon.ifl ffclean.ifl \
+div.ifl errclip.ifl expon.ifl ffclean.ifl \
 fillbad.ifl fitsurface.ifl flip.ifl fourier.ifl gausmooth.ifl glitch.ifl \
 globals.ifl histat.ifl histeq.ifl histogram.ifl kaphelp.ifl laplace.ifl \
-log10.ifl kstest.ifl logar.ifl loge.ifl look.ifl lucy.ifl manic.ifl \
+kstest.ifl logar.ifl look.ifl lucy.ifl manic.ifl \
 makesurface.ifl maths.ifl median.ifl mosaic.ifl mstats.ifl mult.ifl \
 noglobals.ifl nomagic.ifl normalize.ifl numb.ifl outset.ifl parget.ifl \
 paste.ifl pixdupe.ifl pow.ifl psf.ifl quilt.ifl rift.ifl rotate.ifl \
