@@ -37,6 +37,8 @@
 *  History:
 *     24-FEB-1998 (DSB):
 *        Original version.
+*     26-MAY-1999 (DSB):
+*        Only read the required length from each GRP element.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -73,6 +75,8 @@
 *           GRP identifier for group holding AST_ data.
 *        ASTLN = INTEGER (Write)
 *           Next element to use in group holding AST_ data.
+*        ASTTSZ = INTEGER (Write)
+*           Max length of text to read from a GRP element.
 
 *  Local Variables:
       CHARACTER CLASS*8          ! CAT text class
@@ -110,6 +114,9 @@
 *  that it can be accessed by the AST_CHANNEL source function.
       CALL GRP_NEW( 'CAT textual information', ASTGRP, STATUS )
 
+*  Initialise the maximum line length.
+      ASTTSZ = 0
+
 *  Loop until the ned of the textual information has been reached.
       DONE = .FALSE.
       DO WHILE( .NOT. DONE .AND. STATUS .EQ. SAI__OK ) 
@@ -137,6 +144,10 @@
 *  character in "!!".
             CALL KPG1_CSHFT( -( IAT + 1 ), %VAL( IPBUF ), 
      :                          %VAL( LINESZ ) )
+
+*  Update the maximum line length after removal of everything upto the
+*  final character in "!!".
+            ASTTSZ = MAX( ASTTSZ, LINESZ - IAT - 1 )
 
 *  Report an error if the used length of the text is too long to be
 *  stored in a GRP group without truncation.

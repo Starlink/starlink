@@ -39,6 +39,8 @@
 *        group). On exit it will be incremented by the number of
 *        elements used to obtain data, so that it identifies the first
 *        element to be used on the next invocation.
+*     ASTTSZ = INTEGER (Given)
+*        The number of characters to use from each GRP element.
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
@@ -47,6 +49,8 @@
 *  History:
 *     24-FEB-1998 (DSB):
 *        Original version, based on NDF1_RDAST.
+*     26-MAY-1999 (DSB):
+*        Only read the required length from each GRP element.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -70,6 +74,8 @@
 *           GRP identifier for group holding AST_ data.
 *        ASTLN = INTEGER (Read and Write)
 *           Next element to use in group holding AST_ data.
+*        ASTTSZ = INTEGER (Read)
+*           The length to read from each GRP element.
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -123,15 +129,15 @@
 *  element number.
                IF ( STATUS .EQ. SAI__OK ) THEN
                   IF ( L .EQ. EMPTY ) THEN
-                     TEXT( : GRP__SZNAM - 1 ) = NEXT( 2 : GRP__SZNAM )
-                     L = GRP__SZNAM - 1
+                     TEXT( : ASTTSZ - 1 ) = NEXT( 2 : ASTTSZ )
+                     L = ASTTSZ - 1
                      ASTLN = ASTLN + 1
 
 *  If it is a continuation line, check whether its contents can be
 *  appended to the text buffer without exceeding its length. If not,
 *  then report an error.
                   ELSE IF ( NEXT( 1 : 1 ) .EQ. '+' ) THEN
-                     IF ( ( L + GRP__SZNAM - 1 ) .GT. LEN( TEXT ) ) THEN
+                     IF ( ( L + ASTTSZ - 1 ) .GT. LEN( TEXT ) ) THEN
                         STATUS = SAI__ERROR
                         CALL MSG_SETI( 'LEN', LEN( TEXT ) )
                         CALL ERR_REP( 'KPG1_SRCTA_CONT',
@@ -142,9 +148,9 @@
 *  Otherwise, append its contents to the text buffer and advance the
 *  input group element.
                      ELSE
-                        TEXT( L + 1 : L + GRP__SZNAM - 1 ) =
-     :                     NEXT( 2 : GRP__SZNAM )
-                        L = L + GRP__SZNAM - 1
+                        TEXT( L + 1 : L + ASTTSZ - 1 ) =
+     :                     NEXT( 2 : ASTTSZ )
+                        L = L + ASTTSZ - 1
                         ASTLN = ASTLN + 1
                      END IF
 
