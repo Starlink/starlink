@@ -238,9 +238,6 @@ here).
 <element gi='name'>
 <p>The author/function/parameter name, depending on context.
 
-<element gi='notelist'>
-<p>A list of other notes, each with an arbitrary title.
-
 <element gi='ol'>
 <p>See <elemref dtd=sundtd gi='ol'>
 
@@ -256,7 +253,7 @@ the function's generic name can be given in the <elemref
 gi=routinename>'s <elemref gi=name> element, and other names for it
 can be included as <elemref self gi=othernames>.
 
-<element gi='othernote'>
+<element gi='diytopic'>
 <p>A note, which will be displayed in the same format as the other
 headings in this context.
 
@@ -265,11 +262,20 @@ headings in this context.
 
 <element gi='parameter'>
 <p>A single parameter for a function.
+<attribute name='given'>
+<p>If the parameter is read by the function, this attribute should be
+present.  If neither this, nor the `returned' attribute is present,
+the default is taken to be `given'.
+<attribute name='returned'>
+<p>If the parameter is written by the function, this attribute should
+be present.
+<!--
 <attribute name='direction'>
 <p>Indicates whether the parameter is passed in to the function,
 set by the function, and so on.  In some languages (such as 
 DSSSL), all parameters are read-only, and so the corresponding DTD
 might default this.
+-->
 <attribute name='default'>
 <p>The default value, if this parameter is optional and omitted.
 <attribute name='optional'>
@@ -325,6 +331,65 @@ returnvalues, and the like.
 
 <element gi='row'>
 <p>See <elemref dtd=sundtd gi='row'>
+
+<element gi='softwarekeywords'>
+<p>This indicates which software group the software is a member of,
+and consists of a single group keyword.  This keyword is primarily
+intended for use internally to Starlink, although it may be used by
+users to find related software.  The <elemref gi=userkeywords> element
+is for user-oriented keywords.
+
+<p>The list of group names and keywords is maintained by the Starlink
+Software Librarian.  The current list of categories and their
+associated keywords is maintained at
+<webref url="http://www.starlink.rl.ac.uk/software.html">, and
+currently consists of the following.
+
+<!-- Is there a source of these keyword-catagory mappings more
+authoritative than the generated HTML at the URL above.  Also, is
+there a long-term database-query URL I can link these to?  The current
+entries in the table link to .../cgi-acc/..., which I assume was
+specific to Anne Charles. -->
+
+<p>Applications:
+
+Software Environment (SE),
+Spectroscopy (SP),
+Image Processing and Photometry (IP),
+Astronomical Catalogue Access (CA),
+Graphics (GR),
+Wavelengths and Instruments (WI),
+Time Series (TS),
+Polarimetry (PO).
+
+
+<p>Programming:
+
+Compilers and Languages (CL),
+Tools and Standards (ST).
+
+
+<p>Programming: High Level Libraries:
+Data access (DAPH),
+Graphics (GRPH),
+Mathematical (MAPH),
+Astronomical Positions and Time (PTPH),
+String manipulation (SMPH),
+Infrastructure (INPH).
+
+
+<p>Programming: Low Level Libraries:
+
+Data access (DAPL),
+String manipulation (SMPL),
+Infrastructure (INPL),
+Graphics (GRPL).
+
+
+
+
+
+
 <element gi='strong'>
 <p>See <elemref dtd=sundtd gi='strong'>
 <element gi='tabular'>
@@ -350,6 +415,20 @@ returnvalues, and the like.
 <element gi='usage'>
 <p>An example of the usage of this function (how is this different
 from `invocation'?)
+
+<element gi='userkeywords'>
+<p>This element lists keywords intended to help a user find
+appropriate software.  You can indicate the general area of astronomy
+which the software is intended to address, by using the `Monthly
+Notices' keyword list (which is common to A&amp;A and ApJ).  You can
+find the list in the journal, or on the Monthly Notices web pages.
+Separate keywords by semicolons.
+
+<p>Since not all Starlink software will necessarily be directly and
+solely related to astronomy, you may extend the keyword at lib., as
+long as the keywords you invent are prefixed with `general: ...'.
+
+<p>See also <elemref gi='softwarekeywords'>.
 
 <element gi='verbatim'>
 <p>See <elemref dtd=sundtd gi='verbatim'>
