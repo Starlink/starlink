@@ -2214,7 +2214,7 @@ $(PKG_NAME)_data.tar:
 
 add.o:	         SAE_PAR NDF_PAR
 apadsb.o:	 SAE_PAR PRM_PAR
-aperadd.o:	 SAE_PAR DAT_PAR PAR_ERR PRM_PAR
+aperadd.o:	 SAE_PAR GRP_PAR AST_PAR DAT_PAR PAR_ERR PRM_PAR
 ardgen.o:	 SAE_PAR DAT_PAR PAR_ERR AST_PAR GRP_PAR
 ardmask.o:	 SAE_PAR NDF_PAR GRP_PAR PRM_PAR
 ardplot.o:       SAE_PAR AST_PAR GRP_PAR
