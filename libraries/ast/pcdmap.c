@@ -56,6 +56,8 @@ f     The PcdMap class does not define any new routines beyond those
 *  History:
 *     18-MAY-1999 (DSB):
 *        Original version.
+*     25-OCT-1999 (DSB):
+*        Fixed memory leak in MapMerge.
 *class--
 */
 
@@ -1175,6 +1177,8 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    AstMapping *map2;     /* First mapping to check */
    AstMapping *newmap;   /* Pointer to replacement Mapping */
    AstMapping *mc[2];    /* Copies of supplied Mappings to swap */
+   AstMapping *smc0;     /* Simplied Mapping */
+   AstMapping *smc1;     /* Simplied Mapping */
    const char *class1;   /* Pointer to first Mapping class string */
    const char *class2;   /* Pointer to second Mapping class string */
    const char *nclass;   /* Pointer to neighbouring Mapping class */
@@ -1486,10 +1490,11 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 
 /* If neither of the swapped Mappings can be simplified further, then there
    is no point in swapping the Mappings, so just annul the map copies. */
-                     if( astGetClass( astSimplify( mc[0] ) ) == 
-                         astGetClass( mc[0] ) &&
-                         astGetClass( astSimplify( mc[1] ) ) == 
-                         astGetClass( mc[1] ) ) {
+                     smc0 = astSimplify( mc[0] );
+                     smc1 = astSimplify( mc[1] );
+
+                     if( astGetClass( smc0 ) == astGetClass( mc[0] ) &&
+                         astGetClass( smc1 ) == astGetClass( mc[1] ) ) {
       
                         mc[ 0 ] = (AstMapping *) astAnnul( mc[ 0 ] );
                         mc[ 1 ] = (AstMapping *) astAnnul( mc[ 1 ] );
@@ -1510,6 +1515,11 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                         result = i1;
                         break;
                      }
+
+/* Annul the simplied Mappings */
+                     smc0 = astAnnul( smc0 );
+                     smc1 = astAnnul( smc1 );
+
                   }
                }
             }

@@ -35,6 +35,8 @@ o  A new IntraFlag attribute has been added to the IntraMap class. This
    allows the transformation functions used by IntraMaps to adapt to
    produce the required transformation on a per-IntraMap basis.
 
+o  Some minor memory leaks have been fixed.
+
 o  A small number of documentation errors have been corrected.
 
    For further details of these changes, see the final appendix of
