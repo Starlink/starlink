@@ -58,6 +58,8 @@
 *        Original version, adapted from Specdre's SPE_HELP.
 *     28 Jul 2004 (timj):
 *        Now uses SHL library (simplifies this a lot)
+*     19 Oct 2004 (timj):
+*        SHL_GETHLP interface change
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -98,7 +100,7 @@
       CALL SHL_TRNVAR( 'SPECX', .TRUE., LIBRA, STATUS )
 
 *  Call SHL routine for help browser
-      CALL SHL_GETHLP( LIBRA, TOPIC, STATUS )
+      CALL SHL_GETHLP( LIBRA, TOPIC, .TRUE., STATUS )
 
 *  Tidy up error context
       IF ( STATUS .NE. SAI__OK ) CALL ERR_FLUSH( STATUS )
