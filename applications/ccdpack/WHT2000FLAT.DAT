@@ -1,0 +1,32 @@
+#  WHT prime focus camera data, flatfields recorded with FLAT.
+
+#  CCDPACK - import control table for the WHT prime focus camera. 
+#
+#  Special to this configuration is the filter item (PFMFBAND).
+
+#  Name the required FITS items and their types.
+_INTEGER BIASSEC<X1>
+_INTEGER BIASSEC<X2>
+_INTEGER CCDSEC<X1>
+_INTEGER CCDSEC<X2>
+_INTEGER CCDSEC<Y1>
+_INTEGER CCDSEC<Y2>
+_DOUBLE  GAIN
+_DOUBLE  READNOIS
+_CHAR    PFMFBAND
+_CHAR    OBSTYPE
+
+#  Map the FITS information into the CCDPACK extension.
+FILTER        PFMFBAND
+EXTENT.MINX   CCDSEC<X1>
+EXTENT.MINY   CCDSEC<Y1>
+EXTENT.MAXX   CCDSEC<X2>
+EXTENT.MAXY   CCDSEC<Y2>
+BOUNDS.START1 BIASSEC<X1>
+BOUNDS.END1   BIASSEC<X2>
+ADC           GAIN
+RNOISE        READNOIS/GAIN
+FTYPE         OBSTYPE 
+
+# $Id$
+
