@@ -478,7 +478,7 @@ PKG_LINK = SURF
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
-PKG_VERS = 1.4-2
+PKG_VERS = 1.4-3
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the
@@ -591,7 +591,7 @@ surflib_calc_ijpos.f surflib_histogram_grid.f \
 surflib_calc_output_grid.f surflib_plot_grid.f surflib_clip_grid.f \
 surflib_stats_grid.f surflib_decode_remsky_string.f \
 surflib_median_regrid.f surflib_remove_dc_from_exp.f surflib_rem_timeseries.f \
-surflib_rem_grid.f surflib_2dft_chop.f surflib_calc_dual_beam.f \
+surflib_rem_grid.f surflib_2dft_chop.f surflib_calc_chopped_image.f \
 surflib_process_bols.f surflib_fill_polpack_angles.f surflib_remove_ip.f \
 surflib_fill_wplate.f surflib_read_ipfile.f surflib_calc_polpack_angrot.f \
 surflib_trim_image.f surflib_remove_dc_via_sect.f
@@ -1879,7 +1879,7 @@ surflib_rem_grid.o: PRM_PAR SAE_PAR
 surflib_rem_timeseries.o: PRM_PAR SAE_PAR
 surflib_remove_dc_from_exp.o: MSG_PAR PRM_PAR SAE_PAR
 surflib_stats_grid.o: PRM_PAR SAE_PAR
-surflib_calc_dual_beam.o: PRM_PAR SAE_PAR
+surflib_calc_chopped_image.o: PRM_PAR SAE_PAR
 surflib_process_bols.o: PRM_PAR SAE_PAR
 surflib_read_ipfile.o: FIO_ERR SAE_PAR PRM_PAR
 surflib_trim_image.o: SAE_PAR NDF_FUNC
