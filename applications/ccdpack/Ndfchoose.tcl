@@ -116,6 +116,10 @@
 #        Original version.
 #     8-MAR-2001 (MBT):
 #        Upgraded for use with Sets.
+#     4-APR-2001 (MBT):
+#        Prevented resize attempts during window plotting.  For some
+#        reason I don't understand, this can cause core dumps.
+#        Also added the pre-plot button.
 #-
 
 #  Inheritance.
@@ -197,6 +201,12 @@
                -state disabled \
                -balloonstr "Do alignment on this pair"
          }
+         itk_component add preplot {
+            buttoncontrol $panel.preplot \
+               -text "Pre-plot" \
+               -cmd [ code $this preplot ] \
+               -balloonstr "Prepare all images for chooser display"
+         }
          itk_component add help {
             helpcontrol $panel.help
          } {
@@ -213,6 +223,7 @@
 #  Add control widgets to the control groups.
          addcontrol $itk_component(dstyle) style
          addcontrol $itk_component(showfits) style
+         addcontrol $itk_component(preplot) action
          addcontrol $itk_component(gotpair) action
          addcontrol $itk_component(help) action
          addcontrol $itk_component(done) action
@@ -440,6 +451,10 @@
 #  ndfs in the list, or a slot name (A or B).  In the latter case, a 
 #  suitable blank window will be returned.
 
+#  Prevent resize attempts during the plotting.  For reasons I don't
+#  understand, a user resize during plotting leads to a core dump.
+         wm resizable $itk_interior 0 0
+
 #  Validate the index argument.
          if { $index == "A" } {
             set isndfset 0
@@ -458,19 +473,19 @@
 
 #  Ensure that the corresponding info window exists (certain widgets
 #  on this are interrogated to do the display).
-            ndfinfowindow $index
+         ndfinfowindow $index
 
 #  Get characteristics of the plot.
-            set width [ lindex $viewport 0 ]
-            set height [ lindex $viewport 1 ]
-            if { $isndfset } {
-               set percs [ percentiles $index ]
-               set wcsframe [ wcsframe $index ]
-            } else {
-               set percs 0
-               set style 0
-               set wcsframe 0
-            }
+         set width [ lindex $viewport 0 ]
+         set height [ lindex $viewport 1 ]
+         if { $isndfset } {
+            set percs [ percentiles $index ]
+            set wcsframe [ wcsframe $index ]
+         } else {
+            set percs 0
+            set style 0
+            set wcsframe 0
+         }
 
 #  Check whether the window exists and is out of date.  If so, destroy
 #  it preparatory to generating a new one.
@@ -554,6 +569,9 @@
             set plotted($index,wcsframe) $wcsframe
             set plotted($index,displaystyle) $displaystyle
          }
+
+#  Withdraw the ban on user window resizing.
+         wm resizable $itk_interior 1 1
 
 #  Return the name of the window.
          return $itk_component(plot$index)
@@ -736,8 +754,6 @@
 #  Should be called if some of the displayed (selected) plot or info
 #  windows may have become out of date.
          update idletasks
-         set oldbind [ bind $itk_interior <Configure> ]
-         bind $itk_interior <Configure> ""
          foreach slot { A B } {
             if { $inview($slot) == $slot } {
                ndfselect $slot 0
@@ -751,7 +767,18 @@
          }
          wm geometry $itk_interior ""
          update idletasks
-         bind $itk_interior <Configure> $oldbind
+      }
+
+
+#-----------------------------------------------------------------------
+      private method preplot {} {
+#-----------------------------------------------------------------------
+#  If this method is called it prepares all the ndfplot and ndfinfo
+#  windows for display; the effect of this is that subsequent 
+#  select operations are almost instantaneous.
+         for { set index 1 } { $index <= $nndfset } { incr index } {
+            ndfplotwindow $index
+         }
       }
 
 

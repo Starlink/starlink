@@ -297,6 +297,10 @@
    "When this is done, the image will be displayed in the upper part of" \
    "the window on that side, and some information about it in the lower part." \
    "" \
+   "Normally images are plotted when they are selected, which may be slow.",
+   "Clicking the `Pre-plot' button causes all the images to be plotted" \
+   "straight away, so subsequent selections are (almost) instantaneous." \
+   "" \
    "The images are displayed resampled into their Current coordinate frame;" \
    "they must all be related by a simple offset (translation) for this" \
    "program to work." \
