@@ -29,6 +29,7 @@ ALL_TARGETS = \
 	$(MANIFEST)/dtask \
 	$(MANIFEST)/ems \
 	$(MANIFEST)/fio \
+	$(MANIFEST)/gaia \
 	$(MANIFEST)/gks \
 	$(MANIFEST)/gns \
 	$(MANIFEST)/graphpar \
@@ -41,7 +42,7 @@ ALL_TARGETS = \
 	$(MANIFEST)/idi \
 	$(MANIFEST)/img \
         $(MANIFEST)/itcl \
-	$(MANIFEST)/kaplibs \
+	$(MANIFEST)/kappa \
 	$(MANIFEST)/lex \
 	$(MANIFEST)/mag \
 	$(MANIFEST)/mers \
@@ -57,6 +58,7 @@ ALL_TARGETS = \
 	$(MANIFEST)/parsecon \
 	$(MANIFEST)/pda \
 	$(MANIFEST)/pgp \
+	$(MANIFEST)/polpack \
 	$(MANIFEST)/prm \
 	$(MANIFEST)/psx \
 	$(MANIFEST)/ref \
