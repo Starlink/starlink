@@ -64,13 +64,19 @@
 *     {routine_prior_requirements}...
 
 *  Side Effects:
-*     {routine_side_effects}...
+*     None
 
 *  Algorithm:
-*     {algorithm_description}...
+*     The algorithms used by the convertor routines WCI_CNS2Z and WCI_CNZ2S
+*     are identical to those used in the Starlink COCO utility, and that
+*     program can be used as a test of this routine.
 
 *  Accuracy:
-*     {routine_accuracy}
+*     The test procedure tst_wci_cns2s applying 2 WCI_CNS2S operations
+*     to shift from FK4 -> FK5 and back to FK4, with different equinoxes
+*     and epochs, averaged over the whole celestial sphere, recovers
+*     the original position to an average accuracy of 0.52 arcsec, with
+*     a worst case of 0.77 arcsec.
 
 *  Timing:
 *     {routine_timing}
