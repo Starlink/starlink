@@ -43,6 +43,8 @@
 *  History:
 *     8-JUL-1999 (DSB):
 *        Original version.
+*     8-SEP-2000 (DSB):
+*        Check for errors in AST_MAPBOX.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -76,6 +78,7 @@
       PARAMETER ( EPS = 100*VAL__EPSD )
 
 *  Local Variables:
+      CHARACTER ATT*20           ! Attribute name
       CHARACTER TTL*80           ! Title
       DOUBLE PRECISION AXVAL( NDF__MXDIM )! Constant axis values
       DOUBLE PRECISION CLBND     ! Lower Current Frame bounds
@@ -85,6 +88,7 @@
       DOUBLE PRECISION XL( NDF__MXDIM )! GRID coords at CLBND
       DOUBLE PRECISION XU( NDF__MXDIM )! GRID coords at CUBND
       INTEGER DUMMY              ! Unused PermMap 
+      INTEGER IAT                ! Used length of ATT
       INTEGER INPRM( NDF__MXDIM )! Input axis permutation array
       INTEGER J                  ! Axis index
       INTEGER LTTL               ! Used length of TTL
@@ -133,8 +137,33 @@
 *  Find the bounding box which encloses the pixel grid in the Current
 *  Frame. Do one axis at a time.
       DO J = 1, NAXC
+
+*  Abort if an error occurred.
+         IF( STATUS .NE. SAI__OK ) GO TO 999
+
+*  Now try to find the bounding box.
          CALL AST_MAPBOX( MAP, GLBND, GUBND, .TRUE., J, CLBND, CUBND, 
      :                    XL, XU, STATUS ) 
+
+*  Report a more informative error if anything went wrong.
+         IF( STATUS .NE. SAI__OK ) THEN
+            CALL ERR_ANNUL( STATUS )
+
+            ATT = 'Label('
+            IAT = 6
+            CALL CHR_PUTI( J, ATT, IAT )
+            CALL CHR_APPND( ')', ATT, IAT )
+
+            CALL MSG_SETC( 'AX', 
+     :                     AST_GETC( IWCS, ATT( : IAT ), STATUS ) )
+
+            STATUS = SAI__ERROR
+            CALL ERR_REP( 'KPG1_ASSIG_ERR', 'Unable to find limits '//
+     :                    'for ^AX over the pixel grid. Try using '//
+     :                    'WCSFRAME to set the current co-ordinate '//
+     :                    'Frame to PIXEL.', STATUS )
+            GO TO 999
+         END IF
 
 *  If this axis covers a zero range (i.e. if it is insignificant)...
          IF( ABS( CUBND - CLBND ) .LE. 
@@ -197,6 +226,9 @@
          CALL AST_ADDFRAME( IWCS, AST__CURRENT, PMAP, NEWCUR, STATUS )
 
       END IF
+
+*  Arrive here if an error occurs.
+ 999  CONTINUE
 
 *  End the AST context.
       CALL AST_END( STATUS )
