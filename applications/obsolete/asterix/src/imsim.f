@@ -1026,7 +1026,7 @@
       RNMEAN = (IMSIM_RNS(SMIN)-IMSIM_RNS(SMAX))*AREA
       STATUS = 0
       CALL PSX_TIME( TICKS, STATUS )
-      SEED = ( TICKS / 4 ) * 4 + 1
+      SEED = ( TICKS / 4 ) + 1
       CALL PDA_RNSED( SEED )
 
       IFAIL = 0
