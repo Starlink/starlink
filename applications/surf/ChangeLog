@@ -1,3 +1,16 @@
+1999-05-14  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* src/surf_scuphot.f: Add status checking to SCULIB_COADD 
+
+	* sculib/sculib_coadd.f (SCULIB_COADD): Add status checking
+
+	* sculib/sculib_coadd_maps.f (SCULIB_COADD_MAPS): Actually check
+	the status on entry.
+
+	* surf_scuphot.f: Initalise MAP_N_PTR
+
+	* sculib_analyse_photom_jiggle.f: Check status before fitting parabola.
+
 1999-05-13  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* src/surf_scuphot.f: Iterate over measurements as well as ints
