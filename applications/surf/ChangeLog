@@ -1,3 +1,20 @@
+1999-08-05  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* sculib/sculib_sinc.f (SINC): Rename as SCULIB_SINC
+
+	* sculib/sculib_gensyconfn.f (SCULIB_GENSYCONFN): Rename SINC as
+	SCULIB_SINC.
+
+	* sculib/sculib_2pos_confn.f (SCULIB_2POS_CONFN): Rename SINC as
+	SCULIB_SINC.
+
+	* sculib/sculib_3pos_confn.f (SCULIB_3POS_CONFN): Rename SINC as
+	SCULIB_SINC.
+
+1999-08-04  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* scripts/remdbm.pl: Correct coordinate centre of filter.
+
 1999-07-29  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* sculib/sculib_ranged.f (SCULIB_RANGED): Add STATUS

@@ -354,6 +354,8 @@ if ($filter) {
   ndf_find(&NDF::DAT__ROOT, 'rediv', $indf, $status);
   my @dim = ();
   ndf_dim($indf, 2, @dim, $ndim, $status);
+  my (@lbnd, @ubnd);
+  ndf_bound($indf, 2, @lbnd, @ubnd, $ndim, $status);
   ndf_annul($indf, $status);
   ndf_end($status);
 
@@ -365,10 +367,15 @@ if ($filter) {
 
   print "Filtering out high frequencies...\n";
 
+  # Mask should be centred on the middle pixel not the pixel 0,0
+  my $xcen = int( ( $ubnd[0] + $lbnd[0] )/ 2 );
+  my $ycen = int( ( $ubnd[1] + $lbnd[1] )/ 2 );
+  print "Pixel centre: $xcen, $ycen  Radius: $xrad, $yrad\n";
+
   # Create ARD file
   my $ardfile = "ard$$.mask";
   open ARD, "> $ardfile" || die "Error creating ARD file for fourier filter\n";
-  print ARD ".NOT.ELLIPSE(0,0,$xrad,$yrad,0)\n";
+  print ARD ".NOT.ELLIPSE($xcen,$ycen,$xrad,$yrad,0)\n";
   close ARD || die "Error closing ARD file\n";
 
   my $args = "cosys=world ardfile=$ardfile";
