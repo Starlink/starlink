@@ -548,9 +548,11 @@ itcl::class gaia::GaiaPhotomObject {
          #  overriden by update called during these commands.
          set x $xpos; set y $ypos
          set ma $major; set mi $minor; set a $angle
+
          $canvasdraw set_drawing_mode circle [code $this created_circle]
          $canvasdraw create_object $xpos $ypos
          $canvasdraw create_done $xpos $ypos
+
          set xpos $x; set ypos $y
          set major $ma; set minor $mi; set angle $a
 
@@ -558,8 +560,6 @@ itcl::class gaia::GaiaPhotomObject {
          $canvas itemconfigure $canvas_id_ \
             -semimajor $major -semiminor $minor -angle $angle
          update_circle $canvas_id_ move
-         #add_bindings_ $canvas_id_
-         #notify_change
 
          #  Update display and deselect object (immediate resize isn't 
          #  desirable).
@@ -781,8 +781,11 @@ itcl::class gaia::GaiaPhotomObject {
          $canvas itemconfigure $canvas_id_ \
             -semimajor $major -semiminor $minor -angle $angle
          update_ellipse $canvas_id_ move
-         add_bindings_ $canvas_id_
-         notify_change
+
+         #  Update display and deselect object (immediate resize isn't 
+         #  desirable).
+         update idletasks
+         $canvasdraw deselect_object $canvas_id_
       }
    }
 
@@ -793,10 +796,9 @@ itcl::class gaia::GaiaPhotomObject {
          set default_binding_ [bind $canvas <1>]
          set default_cursor_ [$canvas cget -cursor]
          $canvas configure -cursor circle
-         set major $tmajor
-         set eccen $teccen
-         set angle $tangle
-         set minor [expr $major*sqrt(1.0-$eccen*$eccen)]
+         configure -major $tmajor
+         configure -eccen $teccen
+         configure -angle $tangle
 
          #  Get the position of the ellipse and create it.
          bind $canvas <1> [code eval $this placed_ellipse_ $canvasX_ $canvasY_]
@@ -826,14 +828,13 @@ itcl::class gaia::GaiaPhotomObject {
    public method created_ellipse { id args } {
       set state_ drawn
       set canvas_id_ $id
-      $canvasdraw add_notify_cmd $id [code $this update_ellipse $id] 0
       update_ellipse $id create
       add_bindings_ $id
+      notify_change
       if { $create_cmd_ != {} } {
          eval $create_cmd_ $id
          set create_cmd_ {}
       }
-      notify_change
    }
 
    #  Update elliptical object.
