@@ -1,5 +1,6 @@
 *+  FIT_PREDSET - Sets up components of <PREDICTION> structure
-	SUBROUTINE FIT_PREDSET(DLOC,NDS,WORKSPACE,OBDAT,PREDDAT,STATUS)
+	SUBROUTINE FIT_PREDSET( DID, NDS, WORKSPACE, OBDAT, PREDDAT,
+     :                          STATUS )
 *    Description :
 *     All components of the FORTRAN structure PREDDAT (of type <PREDICTION>),
 *     apart from PREDDAT.CONVOLVE which must already be defined, are set up.
@@ -41,11 +42,10 @@
 	INCLUDE 'DAT_PAR'
 	INCLUDE 'PRM_PAR'
 	INCLUDE 'FIT_PAR'
-*    Global variables :
 *    Structure definitions :
 	INCLUDE 'FIT_STRUC'
 *    Import :
-	CHARACTER*(DAT__SZLOC) DLOC	! Locator to input dataset
+        INTEGER			DID			! Dataset identifier
 	INTEGER NDS			! Current dataset number
 	LOGICAL WORKSPACE		! Set up chisq gradient workspace?
 	RECORD /DATASET/ OBDAT		! Observed datasets
@@ -56,109 +56,95 @@
 	INTEGER STATUS
 *    Local constants :
 *    Local variables :
-	CHARACTER*(DAT__SZLOC) EBLOC	! Energy bound locators
-	CHARACTER*(DAT__SZLOC) ERLOC	! Locator to ENERGY_RESP structure
-	CHARACTER*(DAT__SZLOC) INSLOC	! Locator to instrument energy response
-	INTEGER MBINPTR			! Pointer to model bin centres
 	INTEGER MBNDPTR			! Pointer to bounds in response object
 	INTEGER I			! Index
 	INTEGER NVAL			! No of values mapped
 *-
 
-* Status check
-	IF(STATUS.NE.SAI__OK) RETURN
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
 
-* Instrument folding case (model space bins taken from response structure)
-	IF(PREDDAT.CONVOLVE)THEN
+*  Extract locator
+      CALL ADI1_GETLOC( DID, DLOC, STATUS )
 
-*    Get model dimensions
-	  CALL BDA_LOCERESP(DLOC,ERLOC,STATUS)
+*  Instrument folding case (model space bins taken from response structure)
+      IF ( PREDDAT.CONVOLVE ) THEN
 
-*       If spectral_set then take appropriate slice
-	  IF(OBDAT.SETINDEX.GT.0)THEN
-	    CALL DAT_CELL(ERLOC,1,OBDAT.SETINDEX,INSLOC,STATUS)
-	  ELSE
-	    CALL DAT_CLONE(ERLOC,INSLOC,STATUS)
-	  ENDIF
-	  IF(STATUS.NE.SAI__OK) GO TO 9000
+*    Locate response
+        CALL ERI_GETIDS( DID, OBDAT.SETINDEX, RMFID, ARFID, STATUS )
 
-	  CALL INSR_MAP(INSLOC,'ENERGY_SPEC','_REAL','READ',MBINPTR,
-     :    PREDDAT.NMDAT,STATUS)
-	  IF(STATUS.NE.SAI__OK) GO TO 9000
-	  PREDDAT.NMDIM=1			! 1D specific
-	  PREDDAT.IDIMM(1)=PREDDAT.NMDAT	! 1D specific
-	  PREDDAT.NMBOUND=PREDDAT.NMDAT		! 1D specific
+*    Size of model space energy axis
+        CALL ADI_CGET0I( RMFID, 'NENERGY', PREDDAT.NMDAT, STATUS )
+
+*    This is 1-D specific
+	PREDDAT.NMDIM = 1
+	PREDDAT.IDIMM(1) = PREDDAT.NMDAT
+	PREDDAT.NMBOUND = PREDDAT.NMDAT
 
 *    Set up model space bounds
-	  CALL DYN_MAPR(1,PREDDAT.NMBOUND,PREDDAT.MLBNDPTR,STATUS)
-	  CALL DYN_MAPR(1,PREDDAT.NMBOUND,PREDDAT.MUBNDPTR,STATUS)
-	  IF(STATUS.NE.SAI__OK) GO TO 9000
-	  CALL INSR_FIND(INSLOC,'ENERGY_BOUNDS',EBLOC,STATUS)
-	  IF(STATUS.EQ.SAI__OK)THEN
-	    CALL DAT_MAPV(EBLOC,'_REAL','READ',MBNDPTR,NVAL,STATUS)
+	CALL DYN_MAPR( 1, PREDDAT.NMBOUND, PREDDAT.MLBNDPTR, STATUS )
+	CALL DYN_MAPR( 1, PREDDAT.NMBOUND, PREDDAT.MUBNDPTR, STATUS )
+	IF(STATUS.NE.SAI__OK) GOTO 99
 
-*       Bounds found, decompose into lower and upper
-	    CALL FIT_PREDSET_LUBND(PREDDAT.NMBOUND,%VAL(MBNDPTR),
-     :      %VAL(PREDDAT.MLBNDPTR),%VAL(PREDDAT.MUBNDPTR))
-	    CALL DAT_ANNUL(EBLOC,STATUS)
-	  ELSE
+*    Map energy bounds, decompose into lower and upper arrays
+        CALL ADI_CMAPR( RMFID, 'Energy', 'READ', MBNDPTR, STATUS )
+	CALL FIT_PREDSET_LUBND( PREDDAT.NMBOUND, %VAL(MBNDPTR),
+     :          %VAL(PREDDAT.MLBNDPTR),%VAL(PREDDAT.MUBNDPTR))
+        CALL ADI_CUNMAP( RMFID, 'Energy', MBNDPTR, STATUS )
 
-*      Model channel bounds not present - construct them from centre values
-	    CALL ERR_REP('NOBNDS','Response contains no ENERGY_BOUNDS -'//
-     :      ' constructing bounds from centre values',STATUS)
-	    CALL ERR_FLUSH(STATUS)
-	    CALL FIT_PREDSET_LUCEN(PREDDAT.NMDAT,%VAL(MBINPTR),
-     :      %VAL(PREDDAT.MLBNDPTR),%VAL(PREDDAT.MUBNDPTR))
-	    IF(STATUS.NE.SAI__OK) GO TO 9000
-	  ENDIF
+*    Storage for predicted model array
+	CALL DYN_MAPR( 1, PREDDAT.NMDAT, PREDDAT.MPTR, STATUS )
 
-*      Storage for predicted model array
-	  CALL DYN_MAPR(1,PREDDAT.NMDAT,PREDDAT.MPTR,STATUS)
+*  No convolution - model space is identical to data space. Set up only
+*  those components of PREDDAT required (not MPTR), using data axis values.
+      ELSE
 
-*      Tidy up
-	  CALL DAT_ANNUL(INSLOC,STATUS)
+	PREDDAT.MPTR=0			! Flag for `not set'
+	PREDDAT.NMDIM=OBDAT.NDIM
+	PREDDAT.NMBOUND=0
+	DO I=1,OBDAT.NDIM
+	  PREDDAT.IDIMM(I) = OBDAT.IDIM(I)
+	  PREDDAT.NMBOUND = PREDDAT.NMBOUND+PREDDAT.IDIMM(I)
+	END DO
+	PREDDAT.NMDAT = OBDAT.NDAT
 
-* No convolution - model space is identical to data space. Set up only
-* those components of PREDDAT required (not MPTR), using data axis values.
-	ELSE
-	  PREDDAT.MPTR=0			! Flag for `not set'
-	  PREDDAT.NMDIM=OBDAT.NDIM
-	  PREDDAT.NMBOUND=0
-	  DO I=1,OBDAT.NDIM
-	    PREDDAT.IDIMM(I)=OBDAT.IDIM(I)
-	    PREDDAT.NMBOUND=PREDDAT.NMBOUND+PREDDAT.IDIMM(I)
-	  ENDDO
-	  PREDDAT.NMDAT=OBDAT.NDAT
+*    Set up model bounds using axis values from observed data
+	CALL DYN_MAPR(1,PREDDAT.NMBOUND,PREDDAT.MLBNDPTR,STATUS)
+	CALL DYN_MAPR(1,PREDDAT.NMBOUND,PREDDAT.MUBNDPTR,STATUS)
 
-*      Set up model bounds using axis values from observed data
-	  CALL DYN_MAPR(1,PREDDAT.NMBOUND,PREDDAT.MLBNDPTR,STATUS)
-	  CALL DYN_MAPR(1,PREDDAT.NMBOUND,PREDDAT.MUBNDPTR,STATUS)
-	  CALL FIT_PREDSET_AXBOUND(DLOC,NDS,PREDDAT.NMDIM,
+	CALL FIT_PREDSET_AXBOUND( DLOC,NDS,PREDDAT.NMDIM,
      :    PREDDAT.IDIMM,PREDDAT.NMBOUND,%VAL(PREDDAT.MLBNDPTR),
      :    %VAL(PREDDAT.MUBNDPTR),STATUS)
-	ENDIF
-	IF(STATUS.NE.SAI__OK) GO TO 9000
+
+      END IF
+      IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 * Storage for predicted data and if necessary workspace for chisq gradient
-	CALL DYN_MAPR(1,OBDAT.NDAT,PREDDAT.DPTR,STATUS)
-	IF(WORKSPACE)THEN
-	  CALL DYN_MAPR(1,PREDDAT.NMDAT,PREDDAT.PREDPTR(1),STATUS)
-	  CALL DYN_MAPR(1,PREDDAT.NMDAT,PREDDAT.PREDPTR(2),STATUS)
+      CALL DYN_MAPR(1,OBDAT.NDAT,PREDDAT.DPTR,STATUS)
+      IF ( WORKSPACE ) THEN
+	CALL DYN_MAPR(1,PREDDAT.NMDAT,PREDDAT.PREDPTR(1),STATUS)
+	CALL DYN_MAPR(1,PREDDAT.NMDAT,PREDDAT.PREDPTR(2),STATUS)
 c	  CALL DYN_MAPR(1,PREDDAT.NMDAT*NPAMAX,PREDDAT.DFDPPTR,STATUS)
-          PREDDAT.DFDPPTR = VAL__BADI
-	ELSE
-	  PREDDAT.PREDPTR(1)=0		! Set explicitly to zero as a
-	  PREDDAT.PREDPTR(2)=0		! flag for `workspace not mapped'
-	  PREDDAT.DFDPPTR=0
-	ENDIF
+        PREDDAT.DFDPPTR = VAL__BADI
 
-* Exit
- 9000	IF(STATUS.NE.SAI__OK) CALL ERR_REP('EXERR','from FIT_PREDSET',
-     :  STATUS)
-	END
+*  Set explicitly to zero as a flag for `workspace not mapped'
+      ELSE
+	PREDDAT.PREDPTR(1) = 0
+	PREDDAT.PREDPTR(2) = 0
+	PREDDAT.DFDPPTR = 0
+
+      END IF
+
+*  Exit
+ 99   IF ( STATUS .NE. SAI__OK ) THEN
+        CALL AST_REXIT( 'FIT_PREDSET', STATUS )
+      END IF
+
+      END
+
 
 *+  FIT_PREDSET_AXBOUND - Generates bin boundaries from data axis values
-      SUBROUTINE FIT_PREDSET_AXBOUND(LOC,NDS,NMDIM,IDIMM,NBOUND,LBOUND,
+      SUBROUTINE FIT_PREDSET_AXBOUND(DID,NDS,NMDIM,IDIMM,NBOUND,LBOUND,
      :UBOUND,STATUS)
 *    Description :
 *     Uses axis information to set up bin boundaries for data modelling.
@@ -175,7 +161,7 @@ c	  CALL DYN_MAPR(1,PREDDAT.NMDAT*NPAMAX,PREDDAT.DFDPPTR,STATUS)
 	INCLUDE 'SAE_PAR'
 	INCLUDE 'DAT_PAR'
 *    Import :
-	CHARACTER*(DAT__SZLOC) LOC	! Dataset locator
+        INTEGER			DID			! Dataset id
 	INTEGER NDS			! Current dataset number
 	INTEGER NMDIM			! Dimensionality of data
 	INTEGER IDIMM(NMDIM)		! No of bounds
@@ -197,15 +183,15 @@ c	  CALL DYN_MAPR(1,PREDDAT.NMDAT*NPAMAX,PREDDAT.DFDPPTR,STATUS)
 	LOGICAL WID			! Axis width available?
 *-
 
-* Status check
-	IF(STATUS.NE.SAI__OK) RETURN
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
 
-* Loop through data dimensions
-	N=1
-	DO AXNO=1,NMDIM
+*  Loop through data dimensions
+      N = 1
+      DO AXNO = 1, NMDIM
 
 *    Get axis values
-	  CALL BDA_MAPAXVAL(LOC,'READ',AXNO,AXPTR,STATUS)
+	  CALL BDI_MAPAXVAL( DID,'READ',AXNO,AXPTR,STATUS)
 	  IF(STATUS.NE.SAI__OK)THEN
 *       No axis data available, assume spot values 0,1,2,3,4... (i.e. both
 *       sets of bounds the same)
@@ -218,12 +204,12 @@ c	  CALL DYN_MAPR(1,PREDDAT.NMDAT*NPAMAX,PREDDAT.DFDPPTR,STATUS)
 	  ELSE
 
 *    Get axis bin size info
-	    CALL BDA_CHKAXWID(LOC,AXNO,WID,UNIF,NVAL,STATUS)
+	    CALL BDI_CHKAXWID(DID,AXNO,WID,UNIF,NVAL,STATUS)
 	    IF(WID)THEN
-	      CALL BDA_MAPAXWID(LOC,'READ',AXNO,AXWPTR,STATUS)
+	      CALL BDI_MAPAXWID( DID,'READ',AXNO,AXWPTR,STATUS)
 	      IF((.NOT.UNIF).AND.(NVAL.NE.IDIMM(AXNO)))THEN
 	        CALL MSG_SETI('NDS',NDS)
-	        CALL MSG_OUT('BAD_ERR','Axis width array is wrong size in'//
+	        CALL MSG_OUT(' ','Axis width array is wrong size in'//
      :          ' dataset ^NDS - not used',STATUS)
 	        WID=.FALSE.
 	      ENDIF
@@ -234,12 +220,16 @@ c	  CALL DYN_MAPR(1,PREDDAT.NMDAT*NPAMAX,PREDDAT.DFDPPTR,STATUS)
      :      %VAL(AXWPTR),LBOUND(N),UBOUND(N))
 	  ENDIF
 	  N=N+IDIMM(AXNO)
-	ENDDO
 
-* Exit
- 9000	IF(STATUS.NE.SAI__OK) CALL ERR_REP('EXERR',
-     :  'from FIT_PREDSET_AXBOUND',STATUS)
-	END
+      END DO
+
+*  Exit
+      IF ( STATUS .NE. SAI__OK ) THEN
+        CALL AST_REXIT( 'FIT_PREDSET_AXBOUND', STATUS )
+      END IF
+
+      END
+
 
 *+  FIT_PREDSET_AXBOUND_SET - Sets up bin boundaries for one axis
       SUBROUTINE FIT_PREDSET_AXBOUND_SET(NBIN,AX,WID,AXW,
@@ -267,7 +257,7 @@ c	  CALL DYN_MAPR(1,PREDDAT.NMDAT*NPAMAX,PREDDAT.DFDPPTR,STATUS)
 *    Status :
 *    Local variables :
 	INTEGER I
-*------------------------------------------------------------------------
+*-
 
 	DO I=1,NBIN
 
@@ -307,7 +297,7 @@ c	  CALL DYN_MAPR(1,PREDDAT.NMDAT*NPAMAX,PREDDAT.DFDPPTR,STATUS)
 *    Local constants :
 *    Local variables :
 	INTEGER I
-*------------------------------------------------------------------------
+*-
 
 	DO I=1,NBND
 	  LBOUND(I)=MBND(I)
@@ -341,7 +331,7 @@ c	  CALL DYN_MAPR(1,PREDDAT.NMDAT*NPAMAX,PREDDAT.DFDPPTR,STATUS)
 *    Local variables :
 	INTEGER I
 	REAL BASE			! Base value
-*------------------------------------------------------------------------
+*-
 
 * Base value
 	BASE=(3*BIN(1)-BIN(2))/2.0	! Corresponds to definition in header
