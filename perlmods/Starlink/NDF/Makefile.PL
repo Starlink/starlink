@@ -87,7 +87,7 @@ $starlibs = "-L/star/lib";
 # Uncomment this if you are explicitly linking with libarrays
 # $arrays = "-Larrays -larrays";
 
-$libs = "$starlibs $ndflibs $fortranlibs $arrays";
+$libs = "$fortranlibs $starlibs $ndflibs $arrays";
 
 WriteMakefile(
     'INSTALLBIN'=> $install,
