@@ -196,7 +196,7 @@
          PARAMETER        (MAX_DESCS = 30)
 
       INTEGER             PTR_TABLES        ! Number of pointer tables
-         PARAMETER        (PTR_TABLES = 40)
+         PARAMETER        (PTR_TABLES = 100)
 
       INTEGER             PTR_TABLEN        ! Length of a pointer table
          PARAMETER        (PTR_TABLEN = 10000)
