@@ -77,6 +77,9 @@
 #     10-APR-2001 (PWD):
 #        Changed fitting RMS value to sqrt(sum_of_dist_squared/n)
 #        rather than sqrt(sum_of_dist_squared)/n. Which was wrong.
+#     29-AUG-2001 (PWD):
+#        Renamed StarEnterObject to GaiaEnterObject. Added some
+#        checks for the RA and Dec field formats.
 #     {enter_further_changes_here}
 
 #-
@@ -711,10 +714,26 @@ itcl::class gaia::GaiaAstTable {
       redraw
    }
 
+   #  Check that the format of the celestial coordinates entered is
+   #  correct, i.e. no spaces as separators.
+   protected method check_ra_and_dec_ {data} {
+      set ra [lindex $data 1]
+      set dec [lindex $data 2]
+      if { [llength $ra] > 1 || [llength $dec] > 1 } { 
+         error_dialog \
+            "Celestial coordinates are required to have the format hh/dd:mm:ss.ss or dd.ddd"
+         return 0
+      }
+      return 1
+   }
+
    #  Replace an object line in the table.
    public method replace_object {old_data new_data} {
       if {"$old_data" == "$new_data"} {
          info_dialog "No changes were made" $w_
+         return
+      }
+      if { ! [check_ra_and_dec_ $new_data] } {
          return
       }
       set id [lindex $new_data 0]
@@ -751,6 +770,9 @@ itcl::class gaia::GaiaAstTable {
 
    #  Enter a new object given its data.
    public method enter_object {new_data} {
+      if { ! [check_ra_and_dec_ $new_data] } {
+         return
+      }
       set id [lindex $new_data 0]
       if {! [confirm_dialog "Enter new object with id $id ?" $w_]} {
          return
@@ -1092,7 +1114,12 @@ itcl::class gaia::GaiaAstTable {
                      error "Cannot interpret line: $line"
                   }
                   if { $ok } {
-                     $itk_component(table) append_row [list $id $ra $dec $x $y]
+                     set new_data [list $id $ra $dec $x $y]
+                     if { ! [check_ra_and_dec_ $new_data] } {
+                        error_dialog "Cannot interpret line: $line"
+                        return
+                     }
+                     $itk_component(table) append_row $new_data
                   }
                }
             } else {
