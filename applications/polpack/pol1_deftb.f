@@ -16,10 +16,10 @@
 *     This routine sets up groups describing the following default
 *     control table:
 *
-*           ANGROT      PPCKANGR
-*           FILTER      PPCKFILT
-*           IMGID       PPCKIMID
-*           WPLATE      PPCKWPLT
+*           ANGROT?     PPCKANGR
+*           FILTER?     PPCKFILT
+*           IMGID?      PPCKIMID
+*           WPLATE?     PPCKWPLT
 *           RAY?        PPCKRAY 
 *           STOKES?     PPCKSTOK
 
@@ -43,8 +43,11 @@
 *     {enter_new_authors_here}
 
 *  History:
-*     11-DEC-1997 (DSB)
+*     11-DEC-1997 (DSB):
 *        Original version.
+*     2-JUL-1998 (DSB):
+*        Make all extension items optional (i.e. terminate them with a
+*        question mark in the table).
 *     {enter_changes_here}
 
 *  Bugs:
@@ -87,7 +90,7 @@
      :     FITSTY / '_REAL', '_CHAR', '_CHAR', '_CHAR', '_CHAR', 
      :             '_CHAR' /,
 
-     :     EXTNM / 'ANGROT', 'FILTER', 'IMGID', 'WPLATE', 'RAY?', 
+     :     EXTNM / 'ANGROT?', 'FILTER?', 'IMGID?', 'WPLATE?', 'RAY?', 
      :             'STOKES?' /,
 
      :     EXTTY / '_REAL', '_CHAR', '_CHAR', '_CHAR', '_CHAR', 

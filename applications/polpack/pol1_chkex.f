@@ -44,7 +44,7 @@
 *     LOC = CHARACTER * ( * ) (Given)
 *        Locator to POLPACK extension of NDF.
 *     IGRP = INTEGER (Given and Returned)
-*        Identifier for a GRP group holding the user IMGID values. If
+*        Identifier for a GRP group holding the used IMGID values. If
 *        this is supplied equal to GRP__NOID, then a new group is created
 *        and its identifier is returned.
 *     QUIET = LOGICAL (Given)
@@ -127,6 +127,7 @@
       INTEGER NDIM
       LOGICAL WTHERE
       LOGICAL STHERE
+      LOGICAL THERE
       REAL ANGROT
 *.
 
@@ -285,7 +286,8 @@
 *  Store the new FILTER value.
          IF( .NOT. QUIET ) THEN
             CALL MSG_SETC( 'VL', FILTER( : IAT ) )
-            CALL MSG_OUT( ' ', '     Setting FILTER to ''^VL''', STATUS )
+            CALL MSG_OUT( ' ', '     Setting FILTER to ''^VL''', 
+     :                    STATUS )
          END IF
          CALL DAT_ERASE( LOC, 'FILTER', STATUS )
          CALL DAT_NEW0C( LOC, 'FILTER', MAX( 1, IAT ), STATUS ) 

@@ -66,10 +66,10 @@
 *        table is used which corresponds to the FITS keywords written by 
 *        POLEXP:
 *
-*              ANGROT   PPCKANGR
-*              FILTER   PPCKFILT
-*              IMGID    PPCKIMID
-*              WPLATE   PPCKWPLT
+*              ANGROT?  PPCKANGR
+*              FILTER?  PPCKFILT
+*              IMGID?   PPCKIMID
+*              WPLATE?  PPCKWPLT
 *              RAY?     PPCKRAY
 *              STOKES?  PPCKSTOK
 *
@@ -228,6 +228,9 @@
 *  History:
 *     3-DEC-1997 (DSB):
 *        Original version, based on CCDPACK:IMPORT
+*     2-JUL-1998 (DSB):
+*        Default control table changed to make all items optional. Delete
+*        POLPACK extensions if an error occurs.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -436,15 +439,15 @@
 *  Unmap FITS block.
          CALL DAT_UNMAP( FITLOC, STATUS )
 
-*  Release this NDF.
+*  Release the extensions.
          CALL DAT_ANNUL( POLLOC, STATUS )
          CALL DAT_ANNUL( FITLOC, STATUS )
-         CALL NDF_ANNUL( INDF, STATUS )
 
-*  If an error occurred, flush the error and continue to process the next
-*  NDF.
+*  If an error occurred, flush the error, delete any POLPACK extension, and 
+*  continue to process the next NDF.
          IF ( STATUS .NE. SAI__OK ) THEN
             CALL ERR_FLUSH( STATUS )
+            CALL NDF_XDEL( INDF, 'POLPACK', STATUS )
 
 *  Otherwise, add the name of the NDF to the group of successfully
 *  processed NDFs.
@@ -453,6 +456,9 @@
          END IF
 
          IF( .NOT. QUIET ) CALL MSG_BLANK( STATUS )
+
+*  Release the NDF.
+         CALL NDF_ANNUL( INDF, STATUS )
 
  100  CONTINUE
 
@@ -490,7 +496,7 @@
       CALL GRP_DELET( DESGRP( 3 ), STATUS )
       CALL GRP_DELET( IGRP1, STATUS )
       CALL GRP_DELET( IGRP2, STATUS )
-      CALL GRP_DELET( IGRP3, STATUS )
+      IF( IGRP3 .NE. GRP__NOID ) CALL GRP_DELET( IGRP3, STATUS )
 
 *  Close the translation table (if open).
       IF ( TOPEN ) CALL FIO_CLOSE( FDIN, STATUS )
