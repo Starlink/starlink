@@ -777,7 +777,7 @@ kps1_mlpcp.f kps1_mlpcv.f kps1_mlpfs.f kps1_mlpky.f kps1_mlplb.f \
 kps1_mlpml.f kps1_mlpmp.f kps1_mlpnd.f kps1_mlpng.f kps1_mlppn.f \
 kps1_elmap.f kps1_pswcs.f
 
-MEM_F_ROUTINES = 
+MEM_F_ROUTINES = mem2d.f
 
 NDFPACK_F_ROUTINES = \
 axconv.f axlabel.f axunits.f erase.f \
