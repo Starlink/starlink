@@ -2490,6 +2490,7 @@ C????            SRT.ELBMAX = SRT.ELBMAX * SRT.MAX_X / X_HWIDTH
       INTEGER VARIDAT                              ! Fitsio variable
       INTEGER TFIELDS            ! Fits header, no fields per rows
       INTEGER BLOCK, N1
+      INTEGER PHACOL
 
       CHARACTER*20  EXTNAME                         ! File extension name
       CHARACTER*100 INSTRUMENT,COMMENT              ! Instrument name
@@ -2610,6 +2611,7 @@ C????            SRT.ELBMAX = SRT.ELBMAX * SRT.MAX_X / X_HWIDTH
             CALL DYN_MAPI(1,NROWS,PTRA(6),STATUS)
             CALL FTGCVJ(IUNIT,COL,FBEG,1,NROWS,0,%VAL(PTRA(6)),
      :      ANYF,STATUS)
+            PHACOL=COL
          ELSE IF (TTYPE(N1)(1:2) .EQ. 'PI') THEN
             CALL DYN_MAPI(1,NROWS,PTRA(7),STATUS)
             CALL FTGCVJ(IUNIT,COL,FBEG,1,NROWS,0,%VAL(PTRA(7)),
@@ -2621,9 +2623,9 @@ C????            SRT.ELBMAX = SRT.ELBMAX * SRT.MAX_X / X_HWIDTH
 
 *     A special case for HRI. If it can't find a PI channel then it
 *     maps to the PHA channel.
-      IF ( PI ) THEN
+      IF (.NOT. PI ) THEN
           CALL DYN_MAPI(1,NROWS,PTRA(7),STATUS)
-          CALL FTGCVJ(IUNIT,6,FBEG,1,NROWS,0,%VAL(PTRA(7)),
+          CALL FTGCVJ(IUNIT,PHACOL,FBEG,1,NROWS,0,%VAL(PTRA(7)),
      :    ANYF,STATUS)
       END IF
 *
