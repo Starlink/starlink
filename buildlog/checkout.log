@@ -6968,6 +6968,7 @@ cvs checkout: Updating java/source/splat/src/docs
 U java/source/splat/src/docs/COPYING
 U java/source/splat/src/docs/HelpSet.hs
 U java/source/splat/src/docs/Map.jhm
+U java/source/splat/src/docs/README.ast
 U java/source/splat/src/docs/SPLAT_CONDITIONS
 U java/source/splat/src/docs/TOC.xml
 U java/source/splat/src/docs/apidocs.tex
@@ -7563,7 +7564,6 @@ U java/source/splat/src/main/uk/ac/starlink/splat/iface/PlotStyleBox.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/PlotTableModel.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/PlotWindowOrganizer.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/PolyFitFrame.java
-U java/source/splat/src/main/uk/ac/starlink/splat/iface/ProxySetupFrame.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/SimpleBinaryMaths.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/SimpleDataLimitControls.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/SimpleUnaryMaths.java
@@ -7765,7 +7765,6 @@ U java/source/splat/src/main/uk/ac/starlink/splat/util/FunctionFitter.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/FuzzyBoolean.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/GaussianFitter.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/GaussianGenerator.java
-U java/source/splat/src/main/uk/ac/starlink/splat/util/GridBagLayouter.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/JPEGUtilities.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/KernelFactory.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/KernelFilter.java
@@ -8402,17 +8401,27 @@ U java/source/util/src/main/uk/ac/starlink/util/Loader.java
 U java/source/util/src/main/uk/ac/starlink/util/MapGroup.java
 U java/source/util/src/main/uk/ac/starlink/util/NodeDescendants.java
 U java/source/util/src/main/uk/ac/starlink/util/PrimitiveXMLEncodeAndDecode.java
+U java/source/util/src/main/uk/ac/starlink/util/ProxySetup.java
 U java/source/util/src/main/uk/ac/starlink/util/SourceReader.java
+U java/source/util/src/main/uk/ac/starlink/util/SuperJar.java
 U java/source/util/src/main/uk/ac/starlink/util/TestCase.java
 U java/source/util/src/main/uk/ac/starlink/util/Tester.java
 U java/source/util/src/main/uk/ac/starlink/util/URLDataSource.java
 U java/source/util/src/main/uk/ac/starlink/util/URLUtils.java
 U java/source/util/src/main/uk/ac/starlink/util/XMLEncodeAndDecode.java
+cvs checkout: Updating java/source/util/src/main/uk/ac/starlink/util/gui
+U java/source/util/src/main/uk/ac/starlink/util/gui/GridBagLayouter.java
+U java/source/util/src/main/uk/ac/starlink/util/gui/ProxySetupFrame.java
+cvs checkout: Updating java/source/util/src/main/uk/ac/starlink/util/images
+U java/source/util/src/main/uk/ac/starlink/util/images/ImageHolder.java
+U java/source/util/src/main/uk/ac/starlink/util/images/accept.gif
+U java/source/util/src/main/uk/ac/starlink/util/images/close.gif
 cvs checkout: Updating java/source/util/src/script
 U java/source/util/src/script/starjava
 U java/source/util/src/script/starjava.bat
 U java/source/util/src/script/starlocation
 cvs checkout: Updating java/source/util/src/testcases
+U java/source/util/src/testcases/TestProxySetupFrame.java
 cvs checkout: Updating java/source/util/src/testcases/uk
 cvs checkout: Updating java/source/util/src/testcases/uk/ac
 cvs checkout: Updating java/source/util/src/testcases/uk/ac/starlink
