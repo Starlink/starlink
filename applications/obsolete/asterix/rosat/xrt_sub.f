@@ -226,18 +226,16 @@
       CHARACTER*(*) CALDIR           ! Name of the directory holding the
 *                                    ! XRT cal. files.
 *    Functions :
-      INTEGER CHR_LEN
-        EXTERNAL CHR_LEN
 *    Local constants :
 *    Local variables :
+      INTEGER L
 *    Local data :
 *-
 * Translate the dierctory specifier XRTCAL
-      CALL PSX_GETENV('XRTCAL', CALDIR, STATUS)
+      CALL AST_PATH('AST_ETC','XRTCAL',' ',CALDIR,L,STATUS)
 *
 * Add the standard character on to the directory spec for this machine
-      CALDIR = CALDIR(1:CHR_LEN(CALDIR)) //
-     &                   FIL_SEP_CH
+      CALDIR = CALDIR(1:L)//FIL_SEP_CH
 *
       END
 
