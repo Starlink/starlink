@@ -236,8 +236,9 @@ echorun autoreconf --install --symlink
 # configure.ac (because we don't want ./configure to recurse into
 # them), the autoreconf above did not run autoreconf in buildsupport.
 # Do that now (partly because we want buildsupport/install-sh from
-# there, but mostly for symmetry).
-(cd buildsupport && autoreconf --install --symlink)
+# there, but mostly for symmetry).  The --force appears to be necessary,
+# though I don't have a convincing explanation of why.
+(cd buildsupport && autoreconf --install --symlink --force)
 
 # autoreconf does _not_ add an install-sh link, because there's no
 # Makefile.am in this directory, so it thinks we don't need one.  We
