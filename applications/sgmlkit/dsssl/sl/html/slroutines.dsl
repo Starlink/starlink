@@ -46,7 +46,8 @@ $Id$
 (define (process-codecollection docent)
   (if docent
       (let ((de (document-element-from-entity docent)))
-	(if (node-list-empty? de)
+	(if (or (not de)
+		(node-list-empty? de))
 	    (error (string-append "Couldn't get document element from doc "
 				  docent))
 	    (process-node-list de)))
@@ -170,11 +171,21 @@ $Id$
 			    (empty-sosofo))))
 		    '("routinename" "purpose" "description" "returnvalue"
 		      "argumentlist" "parameterlist" "authorlist" "history"
-		      "usage" "invocation" "examplelist" "notelist"
-		      "implementationstatus" "bugs"))))))
+		      "usage" "invocation" "examplelist"
+		      "implementationstatus" "bugs")))
+	; now collect together all the diytopics
+	(apply sosofo-append
+	       (map (lambda (gi-and-nd)
+		      (if (string=? (normalize (car gi-and-nd))
+				    (normalize "diytopic"))
+			  (process-node-list (cdr gi-and-nd))
+			  (empty-sosofo)))
+		    kids)))))
   (element routinename
     (make sequence
+      (make empty-element gi: "hr")
       (make element gi: "h3"
+	    attributes: '(("align" "center"))
 	    (process-children))))
   (element name
     (make element gi: "b"
@@ -191,12 +202,25 @@ $Id$
       (literal (string-append " (also: " namelist ")"))))
   (element purpose
     (make element gi: "p"
+	  attributes: '(("align" "center"))
 	  (make sequence
 	    (make element gi: "b"
 		  (literal "Purpose: "))
 	    (process-children))))
   (element description
     (process-children))
+  (element userkeywords
+    (make sequence
+      (make element gi: "h4"
+	    (literal "Keywords"))
+      (make element gi: "p"
+	    (process-children))))
+  (element softwarekeywords
+    (make sequence
+      (make element gi: "h4"
+	    (literal "Software group"))
+      (make element gi: "p"
+	    (process-children))))
   (element returnvalue
     (let ((none-att (attribute-string (normalize "none")))
 	  (type-att (attribute-string (normalize "type"))))
@@ -235,11 +259,19 @@ $Id$
 	   (type (select-elements kids (normalize "type")))
 	   (desc (select-elements kids (normalize "description")))
 	   (opt-att (attribute-string (normalize "optional")))
-	   (dir-att (attribute-string (normalize "direction"))))
+	   (given-att (attribute-string (normalize "given")))
+	   (returned-att (attribute-string (normalize "returned"))))
       (make sequence
 	(make element gi: "h5"
 	      (process-node-list name)
-	      (literal (string-append " (" (data type) ") " dir-att
+	      (literal (string-append " (" (data type) ") "
+				      (cond
+				       ((and given-att returned-att)
+					"given and returned")
+				       (given-att "given")
+				       (returned-att "returned")
+				       (else ;default is given
+					"given"))
 				      (if opt-att
 					  (string-append ", " opt-att)
 					  ""))))
@@ -264,9 +296,7 @@ $Id$
       (make element gi: "h4"
 	    (literal "Bugs"))
       (process-children)))
-  (element notelist
-    (process-children))
-  (element othernote
+  (element diytopic
     (let ((kids (children (current-node))))
       (make sequence
 	(make element gi: "h4"
