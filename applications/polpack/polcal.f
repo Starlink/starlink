@@ -43,6 +43,19 @@
 *     polcal in out
 
 *  ADAM Parameters:
+*     DEZERO = _LOGICAL (Read)
+*        This parameter is only accessed by the single-beam algorithm
+*        when parameter WEIGHTS is set to 3. If TRUE, a constant value
+*        is added to the data values read from each input data array 
+*        to correct for any differences in zero points. The constant
+*        value used for each input array is chosen so that the residuals
+*        between the input array and the corresponding intensity values
+*        implied by the Stokes vectors produced on the previous iteration, 
+*        have a mean value of zero. Selecting the DEZERO option can
+*        reduce the variances in the output cube, but usually slows down 
+*        convergence of the iterative procedure. Thus you may have to give 
+*        a larger value for parameter MAXIT, resulting in significantly 
+*        longer run time. [FALSE]
 *     DUALBEAM = _LOGICAL (Read)
 *        If TRUE, then the input images are processed as dual-beam data.
 *        If FALSE they are processed as single-beam data. If a null (!)
@@ -303,6 +316,17 @@
 *        of size specified by parameter SMBOX. The values in the resulting 
 *        image are used as the variance estimates for the input data (note,
 *        the same variance estimates are used for all the input images).
+*
+*        If the input arrays have differing zero points, the residuals
+*        for any one image will usually not be centred on zero, but will
+*        have some non-zero mean determined by the zero point for the
+*        array. If uncorrected this would led to an artifically high
+*        estimate of the input variance. There is an option (see parameter 
+*        DEZERO) to reduce this effect, by using the mean of the residuals 
+*        as a zero point correction for the input array. Note however, that
+*        selecting this option will usually result in significantly
+*        longer run times, and may require larger values for parameter
+*        MAXIT.
 *        
 *        In order to provide some safe-guards against aberrant values in 
 *        the input images, input data values which are badly inconsistent 

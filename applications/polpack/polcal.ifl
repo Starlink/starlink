@@ -29,6 +29,16 @@ interface POLCAL
 
    helplib 'POLPACK_HELP:'
 
+   parameter DEZERO
+      type     _LOGICAL
+      access   READ
+      vpath    'DEFAULT '
+      ppath    'DEFAULT '
+      default  FALSE
+      prompt   'Calculate zero-point corrections for the input data?'
+      helpkey  '*'
+   endparameter
+
    parameter DUALBEAM
       type     _LOGICAL
       access   READ
