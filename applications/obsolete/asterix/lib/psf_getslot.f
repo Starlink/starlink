@@ -1,97 +1,142 @@
-*+  PSF_GETSLOT - Grab a slot in the PSF common block
-      SUBROUTINE PSF_GETSLOT( FID, SLOT, STATUS )
-*
-*    Author :
-*
-*     David J. Allan (BHVAD::DJA)
-*
-*    History :
-*
-*      1 Nov 89 : Original (DJA)
-*      7 Dec 92 : Removed SIZEOF function for port (DJA)
-*
-*    Type declarations :
-*
-      IMPLICIT NONE
-*
-      INTEGER	       STATUS
-*
-*    Global constants :
-*
-      INCLUDE 'SAE_PAR'
-      INCLUDE 'PSF_PAR'
-      INCLUDE 'AST_PKG'
-*
-*    Global variables :
-*
-      INCLUDE 'PSF_CMN'
-*
-*    Import :
-*
-      INTEGER			FID			! Input dataset id
-*
-*    Export :
-*
-      INTEGER          		SLOT                   	! Slot
-*
-*    External references :
-*
-      EXTERNAL                 PSF_BLK
-      EXTERNAL                  AST_QPKGI
-        LOGICAL                 AST_QPKGI
-*
-*    Local variables :
-*
-      INTEGER          I                      ! Loop over slots
+      SUBROUTINE PSF_GETSLOT( FID, PSID, STATUS )
+*+
+*  Name:
+*     PSF_GETSLOT
+
+*  Purpose:
+*     Return psf storage identifier given file id
+
+*  Language:
+*     Starlink Fortran
+
+*  Invocation:
+*     CALL PSF_GETSLOT( FID, PSID, STATUS )
+
+*  Description:
+*     {routine_description}
+
+*  Arguments:
+*     FID = INTEGER (given)
+*        File identifier
+*     PSID = INTEGER (returned)
+*        Psf identifier
+*     STATUS = INTEGER (given and returned)
+*        The global status.
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
+*     {algorithm_description}...
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
+*     {routine_deficiencies}...
+
+*  References:
+*     PSF Subroutine Guide : http://www.sr.bham.ac.uk/asterix-docs/Programmer/Guides/psf.html
+
+*  Keywords:
+*     package:psf, usage:public
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1996
+
+*  Authors:
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*      1 Nov 1989 (DJA):
+*        Original version.
+*      7 Dec 1992 (DJA):
+*        Removed SIZEOF function for UNIX port
+*      8 May 1996 (DJA):
+*        Full ADI version
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
 *-
 
-*  Check inherited global status
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'AST_PKG'
+
+*  Arguments Given:
+      INTEGER			FID
+
+*  Arguments Returned:
+      INTEGER			PSID
+
+*  Status:
+      INTEGER 			STATUS             	! Global status
+
+*  External References:
+      EXTERNAL			AST_QPKGI
+        LOGICAL			AST_QPKGI
+      EXTERNAL			PSF_BLK
+
+*  Local Constants:
+      CHARACTER*4		PSF_PROP
+        PARAMETER		( PROP = '.PSFID' )
+
+*  Local Variables:
+      LOGICAL			THERE			! Already exists?
+*.
+
+*  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Check initialised
       IF ( .NOT. AST_QPKGI( PSF__PKG ) ) CALL PSF_INIT( STATUS )
 
-*  Scan for an empty slot
-      SLOT = 0
-      I = 1
-      DO WHILE ( (I.LE.PSF_NMAX) .AND. (SLOT.EQ.0) )
-        IF ( FID .EQ. P_FID(I) ) THEN
-          SLOT = I
-        ELSE IF ( P_USED(I) ) THEN
-          I = I + 1
-        ELSE
-          SLOT = I
-        END IF
-      END DO
+*  Property already exists?
+      CALL ADI_THERE( FID, PROP, THERE, STATUS )
+      IF ( THERE ) THEN
+        CALL ADI_CGET0I( FID, PROP, PSID, STATUS )
 
-*  Make sure there are enough slots left
-      IF ( SLOT .EQ. 0 ) THEN
-        STATUS = SAI__ERROR
-        CALL ERR_REP( ' ', 'No more psf slots left', STATUS )
-
-      ELSE IF ( .NOT. P_USED(SLOT) ) THEN
-
-*    Zero the storage area
-        P_MODEL(SLOT) = .FALSE.
-        P_INST(SLOT) = 0
-        P_GOTAX(SLOT) = .FALSE.
-        P_FID(SLOT) = FID
+*  New psf
+      ELSE
 
 *    Create psf object
-        CALL ADI_NEW0( 'PsfDescription', P_PSID(SLOT), STATUS )
-        CALL ADI_CPUT0I( P_PSID(SLOT), 'Slot', SLOT, STATUS )
+        CALL ADI_NEW0( 'PsfDescription', PSID, STATUS )
 
 *    Store file id
-        CALL ADI_CPUT0I( P_PSID(SLOT), 'FileID', FID, STATUS )
+        CALL ADI_CPUT0I( PSID, 'FileID', FID, STATUS )
 
-*    Mark slot in use
-        P_USED(SLOT) = .TRUE.
+*    Store psf identifier
+        CALL ADI_CPUT0I( FID, PROP, PSID, STATUS )
 
       END IF
 
-*  Tidy up
-      IF ( STATUS .NE. SAI__OK ) THEN
-        CALL AST_REXIT( 'PSF_GETSLOT', STATUS )
-      END IF
+*  Report any errors
+      IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'PSF_GETSLOT', STATUS )
 
       END
