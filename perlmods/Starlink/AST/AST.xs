@@ -369,7 +369,7 @@ new( class, lut, start, inc, options )
   double * clut;
  CODE:
   nlut = av_len( lut );
-  clut = pack1D( (SV*)lut, 'd' );
+  clut = pack1D( newRV_noinc((SV*)lut), 'd' );
   ASTCALL(
    RETVAL = astLutMap( nlut, clut, start, inc, options );
   )
@@ -430,7 +430,7 @@ new( class, nin, nout, matrix, options )
   } else {
     Perl_croak(aTHX_ "MatrixMap: matrix len not consistent with nout/nin");
   }
-  cmatrix = pack1D((SV*)matrix, 'd');
+  cmatrix = pack1D(newRV_noinc((SV*)matrix), 'd');
   ASTCALL(
    RETVAL = astMatrixMap( nin, nout, form, cmatrix, options );
   )
@@ -453,7 +453,7 @@ new( class, disco, pcdcen, options )
   if (len != 2 ) {
     Perl_croak(aTHX_ "Must supply two values to PcdCen");
   }
-  cpcdcen = pack1D((SV*)pcdcen, 'd');
+  cpcdcen = pack1D(newRV_noinc((SV*)pcdcen), 'd');
   ASTCALL(
    RETVAL = astPcdMap( disco, cpcdcen, options );
   )
@@ -482,21 +482,21 @@ new( class, inperm, outperm, constant, options )
     /* no values */
     cinperm = NULL;
   } else {
-    cinperm = pack1D((SV*)inperm, 'i' );
+    cinperm = pack1D(newRV_noinc((SV*)inperm), 'i' );
   }
   nout = av_len( outperm );
   if (nout == -1 ) {
     /* no values */
     coutperm = NULL;
   } else {
-    coutperm = pack1D((SV*)outperm, 'i' );
+    coutperm = pack1D(newRV_noinc((SV*)outperm), 'i' );
   }
   len = av_len( constant );
   if (len == -1 ) {
     /* no values */
     cconstant = NULL;
   } else {
-    cconstant = pack1D((SV*)constant, 'd' );
+    cconstant = pack1D(newRV_noinc((SV*)constant), 'd' );
   }
   ASTCALL(
    RETVAL = astPermMap(nin, cinperm, nout, coutperm, cconstant, options );
@@ -523,7 +523,7 @@ new( class, shift, options )
   double * cshift;
  CODE:
   ncoord = av_len( shift );
-  cshift = pack1D((SV*)shift, 'd');
+  cshift = pack1D(newRV_noinc((SV*)shift), 'd');
   ASTCALL(
    RETVAL = astShiftMap( ncoord, cshift, options);
   )
@@ -631,8 +631,10 @@ new( class, ina, inb, outa, outb, options )
   char * options
  CODE:
   /* minimal arg checking - lazy XXXX */
-  RETVAL = astWinMap( av_len(ina), pack1D((SV*)ina,'d'), pack1D((SV*)inb,'d'),
-                      pack1D((SV*)outa,'d'), pack1D((SV*)outb,'d'),options );
+  RETVAL = astWinMap( av_len(ina)+1, pack1D(newRV_noinc((SV*)ina),'d'), 
+                      pack1D(newRV_noinc((SV*)inb),'d'),
+                      pack1D(newRV_noinc((SV*)outa),'d'),
+                      pack1D(newRV_noinc((SV*)outb),'d'),options );
  OUTPUT:
   RETVAL
 
@@ -909,9 +911,9 @@ astAngle( this, a, b, c )
      Perl_croak(aTHX_ "Number of elements in third coord array must be %d",
                 naxes);
 
-  aa = pack1D( (SV*)a, 'd');
-  bb = pack1D( (SV*)b, 'd');
-  cc = pack1D( (SV*)c, 'd');
+  aa = pack1D( newRV_noinc((SV*)a), 'd');
+  bb = pack1D( newRV_noinc((SV*)b), 'd');
+  cc = pack1D( newRV_noinc((SV*)c), 'd');
 
   /* Call the ast function */
   ASTCALL(
@@ -942,8 +944,8 @@ astAxAngle( this, a, b, axis )
      Perl_croak(aTHX_ "Number of elements in second coord array must be %d",
                 naxes);
 
-  aa = pack1D( (SV*)a, 'd');
-  bb = pack1D( (SV*)b, 'd');
+  aa = pack1D( newRV_noinc((SV*)a), 'd');
+  bb = pack1D( newRV_noinc((SV*)b), 'd');
   ASTCALL(
    RETVAL = astAxAngle( this, aa, bb, axis);
   )
@@ -1009,8 +1011,8 @@ astDistance( this, point1, point2 )
      Perl_croak(aTHX_ "Number of elements in second coord array must be %d",
                 naxes);
 
-  aa = pack1D( (SV*)point1, 'd');
-  bb = pack1D( (SV*)point2, 'd');
+  aa = pack1D( newRV_noinc((SV*)point1), 'd');
+  bb = pack1D( newRV_noinc((SV*)point2), 'd');
   ASTCALL(
    RETVAL = astDistance( this, aa, bb);
   )
@@ -1066,7 +1068,7 @@ astNorm( this, value )
   if (av_len(value) != naxes-1)
      Perl_croak(aTHX_ "Number of elements in first coord array must be %d",
                 naxes);
-  aa = pack1D( (SV*)value, 'd');
+  aa = pack1D( newRV_noinc((SV*)value), 'd');
   ASTCALL(
    astNorm( this, aa );
   )
@@ -1092,11 +1094,11 @@ astOffset( this, point1, point2, offset )
   if (av_len(point1) != naxes-1)
      Perl_croak(aTHX_ "Number of elements in first coord array must be %d",
                 naxes);
-  aa = pack1D( (SV*)point1, 'd');
+  aa = pack1D( newRV_noinc((SV*)point1), 'd');
   if (av_len(point2) != naxes-1)
      Perl_croak(aTHX_ "Number of elements in second coord array must be %d",
                 naxes);
-  bb = pack1D( (SV*)point2, 'd');
+  bb = pack1D( newRV_noinc((SV*)point2), 'd');
 
 
   /* Somewhere to put the return values */
@@ -1113,7 +1115,7 @@ astOffset( this, point1, point2, offset )
 
 # This method technically returns an angle and a pair of coordinates
 # We could return this as a list of the angle and ref to array.
-# Currently return 3 numbers
+# Currently return 3 numbers - XXXX
 
 void
 astOffset2( this, point1, angle, offset )
@@ -1134,7 +1136,7 @@ astOffset2( this, point1, angle, offset )
   if (av_len(point1) != naxes-1)
      Perl_croak(aTHX_ "Number of elements in first coord array must be %d",
                 naxes);
-  aa = pack1D( (SV*)point1, 'd');
+  aa = pack1D( newRV_noinc((SV*)point1), 'd');
 
   /* Somewhere to put the return values */
   point2 = get_mortalspace( naxes, 'd' );
@@ -1164,7 +1166,7 @@ astPermAxes( this, perm )
   if (av_len(perm) != naxes-1)
      Perl_croak(aTHX_ "Number of elements in perm array must be %d",
                 naxes);
-  aa = pack1D( (SV*)perm, 'i');
+  aa = pack1D( newRV_noinc((SV*)perm), 'i');
   ASTCALL(
    astPermAxes( this, aa );
   )
@@ -1188,7 +1190,7 @@ astPickAxes( this, axes )
   naxes = av_len(axes) + 1;
   if ( naxes > maxaxes )
     Perl_croak(aTHX_ "Number of axes selected must be less than number of axes in frame");
-  aa = pack1D( (SV*)axes, 'i');
+  aa = pack1D( newRV_noinc((SV*)axes), 'i');
   ASTCALL(
    RETVAL = astPickAxes( this, naxes, aa, NULL);
   )
@@ -1332,7 +1334,50 @@ astSimplify( this )
 
 # astTran1  XXXX
 
-# astTran2  XXXX
+# astTran2
+#   Returns 2 arrays
+
+void
+astTran2( this, xin, yin, forward )
+  AstMapping * this
+  AV* xin
+  AV* yin
+  bool forward
+ PREINIT:
+  int len1;
+  int len2;
+  double * cxin;
+  double * cyin;
+  AV* xout;
+  AV* yout;
+  double * cxout;
+  double * cyout;
+  SV** elem;
+ PPCODE:
+  len1 = av_len( xin ) + 1;
+  len2 = av_len( yin ) + 1;
+  if ( len1 != len2 )
+     Perl_croak(aTHX_ "Number of elements in input arrays must be identical (%d != %d )",
+             len1, len2);
+  cxin = pack1D( newRV_noinc((SV*)xin), 'd');
+  cyin = pack1D( newRV_noinc((SV*)yin), 'd');
+  cxout = get_mortalspace( len1, 'd' );
+  cyout = get_mortalspace( len2, 'd' );
+
+  ASTCALL(
+    astShow( this );
+    astTran2( this, len1, cxin, cyin, forward, cxout, cyout );
+  )
+
+  xout = newAV();
+  yout = newAV();
+  unpack1D( newRV_noinc((SV*) xout), cxout, 'd', len1);
+  unpack1D( newRV_noinc((SV*) yout), cyout, 'd', len2);
+
+  XPUSHs( newRV_noinc((SV*) xout ));
+  XPUSHs( newRV_noinc((SV*) yout ));
+
+
 
 # astTranN  XXXX
 
@@ -1442,7 +1487,7 @@ astSlaAdd( this, cvt, args )
  PREINIT:
   double * cargs;
  CODE:
-  cargs = pack1D((SV*)args, 'd');
+  cargs = pack1D(newRV_noinc((SV*)args), 'd');
   ASTCALL(
    astSlaAdd( this, cvt, cargs );
   )
@@ -1457,7 +1502,7 @@ astSpecAdd( this, cvt, args )
  PREINIT:
   double * cargs;
  CODE:
-  cargs = pack1D((SV*)args, 'd');
+  cargs = pack1D(newRV_noinc((SV*)args), 'd');
   ASTCALL(
    astSpecAdd( this, cvt, cargs );
   )
