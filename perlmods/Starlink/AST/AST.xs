@@ -68,6 +68,7 @@ typedef void AstSpecMap;
 #define HASPOLYMAP
 #define HASGRISMMAP
 #define HASSHIFTMAP
+#define HASRATE
 #else
 typedef void AstPolyMap;
 typedef void AstGrismMap;
@@ -84,12 +85,6 @@ typedef void AstXmlChan;
 #define HASTRANMAP
 #else
 typedef void AstTranMap;
-#endif
-
-#if ( (AST_MAJOR_VERS == 3 && AST_MINOR_VERS >= 2) || AST_MAJOR_VERS >= 4 )
-#define HASRATE
-#else
-typedef void AstRate;
 #endif
 
 /* Helper functions */
@@ -1757,7 +1752,7 @@ astRate( this, at, ax1, ax2 )
   double d2;
  PPCODE:
 #ifndef HASRATE
-   Perl_croak(aTHX_ "Rate: Please upgrade to AST V3.2-5 or greater");
+   Perl_croak(aTHX_ "astRate: Please upgrade to AST V3.x or greater");
 #else
   nin = astGetI( this, "Nin");
   len = av_len( at ) + 1;
