@@ -742,7 +742,7 @@ sc11_fig11.eps sc11_fig12.eps sc11_flow.eps sc11_logo.eps \
 ssn72.tex ssn72_logo.eps
 
 
-HYPERTEXT_DOCS = sun216.htx sc10.htx sc11.htx
+HYPERTEXT_DOCS = sun216.htx sc10.htx sc11.htx ssn72.htx
 
 #  List of documentation files.
 
