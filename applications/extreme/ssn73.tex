@@ -15,9 +15,9 @@
 \newcommand{\stardocsource}    {ssn\stardocnumber}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {73.1 (draft)}
+\newcommand{\stardocnumber}    {73.2 (draft)}
 \newcommand{\stardocauthors}   {Mark Taylor}
-\newcommand{\stardocdate}      {14 March 2000}
+\newcommand{\stardocdate}      {13 August 2001}
 \newcommand{\stardoctitle}     {EXTREME --- Handling extreme data sets}
 \newcommand{\stardocabstract}  {
 This package provides some utilities, background documentation,
@@ -26,6 +26,15 @@ for adapting the Starlink Software Collection, and software which uses it,
 to handle very large data sets.
 The principal focus of this is to move to use of 64 bits of address
 space on 64-bit operating systems.
+
+This document (SSN/73) is squarely aimed at the problem of adapting the 
+Starlink Software Collection, and consequently focuses on 
+the three operating systems (Solaris, Linux and Tru64) supported by Starlink,
+the compiled languages Fortran 77 and ANSI C, 
+and Starlink's somewhat idiosyncratic build mechanisms. 
+However, some of the discussion here may be of interest or use to 
+people who are considering the change from 32 to 64 bits for
+software in other contexts.
 }
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -614,7 +623,7 @@ acquired from a C routine such as \cc{malloc},
 in a variable.
 In C this will be taken care of automatically because the compiler
 ensures that pointer types are long enough to hold memory addresses.
-In Fortran however there is no pointer type so that INTEGERs, which are
+In Fortran 77 however there is no pointer type so that INTEGERs, which are
 normally 32 bits, have to be used.
 The solution to this, explained in \xref{SUN/209}{sun209}{pointers},
 is to use the \xref{CNF\_PVAL}{sun209}{CNF\_PVAL} function.
@@ -747,7 +756,7 @@ integer size will not cause too many problems.
 The rest of this section describes the four main sets of changes
 which need to be made to each package.
 
-\subsection{Pointer references in Fortran}
+\subsection{Pointer references in Fortran 77}
 
 As explained in \xref{SUN/209}{sun209}{pointers},
 whenever the \%VAL Fortran compiler directive 
@@ -796,10 +805,10 @@ they may not be pointers.
 It is described further in
 \latexhtml{appendix \ref{sec:commands}}{\htmlref{the appendix}{inscnf}}.
 
-\subsection{Enlarging integer type in Fortran\label{sec:fint}}
+\subsection{Enlarging integer type in Fortran 77\label{sec:fint}}
 
 
-In Fortran there is no (even slightly) portable way of declaring
+In Fortran 77 there is no (even slightly) portable way of declaring
 an integer to be of a configurable length. 
 Therefore all variables currently declared as `INTEGER' 
 should be changed instead to type `INTEGER*8'. 
@@ -913,6 +922,7 @@ Similarly, code which makes the assumption that four elements of
 a CHARACTER array correspond to each INTEGER will need changing.
 %
 \ditem{Storage alignment}
+The compiler documentation indicates that
 64-bit data types on Sun and Alpha systems should be aligned on 
 64-bit boundaries for performance reasons.
 Normally this is taken care of automatically by the compiler, 
@@ -932,9 +942,9 @@ which would align everything (happily) on 32-bit boundaries if IX, IY
 were INTEGER*4s, will be forced to align the 64-bit IX on a 32-bit
 boundary.
 The compilers will warn about this behaviour.
-I can't tell from the documentation on the supported platforms whether
-this will result in incorrect, or only slower exectutables;
-it should certainly be regarded as something to be fixed.
+I believe that the result will be slower, rather than incorrect,
+executables,
+but such occurrences should ideally be fixed.
 \html{\begin{squote}\end{squote}}
 %
 \ditem{IMPLICIT variable declarations}
