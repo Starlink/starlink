@@ -96,6 +96,8 @@
 *        General purpose FITS version derived from BDI1_CFIND
 *     30 Jan 1997 (RB):
 *        Hunt for the axis units and alter for ROSAT images
+*     11 Feb 1997 (RB):
+*        Axis_n_Width and QUALITY extensions
 *     {enter_changes_here}
 
 *  Bugs:
@@ -429,6 +431,15 @@ c     LOGICAL			ISBIND			! Binned dataset
             END IF
           END IF
 
+*    Axis widths
+        ELSE IF ( ITEM(8:) .EQ. 'Width' ) THEN
+
+*      Access keyword
+          CALL ADI2_CFIND( FITID, ' ', '.CDELT'//CAX, ' ', CREATE,
+     :                     DELETE, RTYPE, 0, 0, DIDCRE, CACHEID,
+     :                     STATUS )
+
+
 *    Axis normalisation flag (end rb)
         ELSE IF ( ITEM(8:) .EQ. 'Normalised' ) THEN
 
@@ -467,8 +478,10 @@ c     LOGICAL			ISBIND			! Binned dataset
           CALL ADI2_FPKYC( FITID, 'VARIANCE', 'EXTNAME', 'VARIANCE',
      :                     'Contains ASTERIX pixel variances', STATUS )
 
-*    QUALITY extension
+*    QUALITY extension (why doesn't EXTNAME work? RB)
         ELSE IF ( CREOBJ .EQ. 'QUALITY' ) THEN
+c         CALL ADI2_FPKYC( FITID, 'QUALITY', 'EXTNAME', 'QUALITY',
+c    :                     'Contains ASTERIX pixel quality', STATUS )
           CALL ADI2_FPKYC( FITID, 'QUALITY', 'QUALITY', 'QUALITY',
      :                     'Contains ASTERIX pixel quality', STATUS )
 
