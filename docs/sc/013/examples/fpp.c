@@ -13,6 +13,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 
+/* bytesex.h defines BIGENDIAN=1 (true) or 0 */
 #include "bytesex.h"
 
 #ifndef DOUBLEPRECISION

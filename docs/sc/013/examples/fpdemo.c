@@ -1,11 +1,7 @@
 #include <stdio.h>
 
-/* Intel and Alpha chips are little-endian. */
-/* Sparc, Motorola 68k and PowerPC chips are big-endian. */
-/* Compile with -DBIGENDIAN on the latter */
-#ifndef BIGENDIAN
-#define BIGENDIAN 0
-#endif
+/* bytesex.h defines BIGENDIAN=1 (true) or 0 */
+#include "bytesex.h"
 
 /*
  * pbits: given an integer i, put the rightmost n bits of the integer 
