@@ -46,9 +46,8 @@
 *     1995 March 16 (MJC):
 *        Corrected some typo's and used the modern style for variable
 *        declarations.
-*     4-OCT-2004 (DSB):
-*        Use SHL_HLPCMD instead of HLPCMD (its been moved from kaplibs
-*        to shl).
+*     6-OCT-2004 (DSB):
+*        Use SHL_PAGTXT to output text.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -63,25 +62,6 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'GRP_PAR'          ! GRP public constants
 
-*  Global Variables:
-      INCLUDE 'SHL_HLPCMD'       ! Paged screen I/O
-*        CMD = CHARACTER * ( 80 ) (Write)
-*           The command line.
-*        LHELP = INTEGER (Write)
-*           Lines of output this screenful.
-*        HELPN = LOGICAL (Write)
-*           If true, output is enabled.
-*        LTOP = INTEGER (Write)
-*           Top line number for the scrolling region.
-*        LBOT = INTEGER (Write)
-*           Bottom line number for the scrolling region.
-*        ANSI = LOGICAL (Write)
-*           If true, an ANSI terminal is in use.
-*        LUCMD = INTEGER (Write)
-*           Logical-unit number of the command input.
-*        LUTERM = INTEGER (Write)
-*           Logical-unit number of the terminal output.
-
 *  Arguments Given:
       INTEGER IGRP
       
@@ -90,28 +70,24 @@
 
 *  External References:
       INTEGER CHR_LEN
-      INTEGER PTHLPO
 
 *  Local Variables:
+      CHARACTER LINE*80          ! Output buffer
+      CHARACTER TEXT*(GRP__SZNAM)! Element of text from the group
       INTEGER ARGLST             ! Position of start of argument list
-      LOGICAL BLANK              ! Display a blank line?
       INTEGER I                  ! Current group element index
-      INTEGER ISTAT              ! Local status for PTHLPO routine
-      CHARACTER * ( 80 ) LINE    ! Output buffer
       INTEGER LINLEN             ! Used length of LINE
       INTEGER REG                ! Current region index
       INTEGER SIZE               ! Number of elements in group
-      CHARACTER * ( GRP__SZNAM ) TEXT ! Element of text from the group
-      INTEGER WIDTH              ! Screen width
+      LOGICAL BLANK              ! Display a blank line?
 
 *.
 
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Initialise the local status associated with the paged output routine
-*  PTHLPO.
-      ISTAT = 1
+*  Initialise the SHL paged output routines.
+      CALL SHL_PAGRST( STATUS )
 
 *  Space output from the previous text.
       CALL MSG_BLANK( STATUS )
@@ -125,38 +101,17 @@
          GO TO 999
       END IF
 
-*  Set up the common block used by the paged screen output routine
-*  PTHLPO.  This is the routine used to output help text.
-
-*  Nothing has been output, and there is no command.
-      LHELP = 0
-      HELPN = .TRUE.
-      CMD = ' '
-
-*  Fixed for test purposes.  Note these are hardware specific.
-      ANSI = .FALSE.
-      LUCMD = 5
-      LUTERM = 6
-
-*  Find the height and width of the screen.  Use the full screen area.
-*  A zero or negative LBOT (which occurs when there is an error) will
-*  suppress paging.
-      CALL KPG1_SCRSZ( WIDTH, LBOT, STATUS )
-      LTOP = 1
-
 *  Initialise the next region index.
       REG = 0
 
 *  Display a heading.  Abort if an error occurs while writing to the
 *  screen.
-      ISTAT = PTHLPO( ' Region          Region Description' ) 
-      IF ( ISTAT .NE. 1 ) GO TO 999
-
-      ISTAT = PTHLPO( ' Index' )
-      IF ( ISTAT .NE. 1 ) GO TO 999
+      CALL SHL_PAGTXT( ' Region          Region Description', STATUS ) 
+      CALL SHL_PAGTXT( ' Index', STATUS )
 
 *  Put a blank line above the first region.
       BLANK = .TRUE.
+      ARGLST = 1
 
 *  Go through the group.
       DO I = 1, SIZE
@@ -173,8 +128,7 @@
             REG = REG + 1
 
             IF ( BLANK ) THEN
-               ISTAT = PTHLPO( ' ' ) 
-               IF ( ISTAT .NE. 1 ) GO TO 999
+               CALL SHL_PAGTXT( ' ', STATUS ) 
                BLANK = .FALSE.
             END IF
 
@@ -196,20 +150,12 @@
 
 *  Display the stored text.
          LINLEN = CHR_LEN( LINE )
-         ISTAT = PTHLPO( LINE( : LINLEN ) ) 
-         IF ( ISTAT .NE. 1 ) GO TO 999
+         CALL SHL_PAGTXT( LINE( : LINLEN ), STATUS ) 
 
       END DO
 
-      ISTAT = PTHLPO( ' ' ) 
+      CALL SHL_PAGTXT( ' ', STATUS ) 
 
  999  CONTINUE
-
-*  If an error occurred, writing to the screen, report an error.
-      IF ( ISTAT .NE. 1 .AND. STATUS .EQ. SAI__OK ) THEN
-         STATUS = SAI__ERROR
-         CALL ERR_REP( 'KPS1_AGNLS_ERR', 'An error occurred writing '/
-     :                 /'paged text to the output device', STATUS )
-      END IF
 
       END
