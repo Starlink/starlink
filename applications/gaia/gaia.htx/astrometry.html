@@ -9,15 +9,18 @@
 <h2 align=center><font color=red>Astrometry Overview</font></h2>
 
 <h3>Reading coordinates</h3>
-<p>If you have an image with an appropriate set of FITS headers (from
-say the Digital Sky Survey, or other on-line sources of images) or an
-NDF with a defined WCS component, then will GAIA display the current
-coordinates in the Alpha and Delta readouts.<br>
+
+<p>
+If you have an image with an appropriate set of FITS headers or an NDF with
+a defined WCS component, then will GAIA display the current coordinates in the
+Alpha and Delta readouts.<br>
 <p align=center>
 <img src="panel.gif">
 <br>
 <p>
-You view coordinates in all the built-in systems using the 
+Some images may even have more than one coordinate system (say positions in
+millimetres as well as on the sky), when that is the case you view all
+these system simultaneously using the 
 <a href="alldomains.html">Show all coordinates toolbox</a>.
 
 
@@ -70,13 +73,15 @@ using the <a href="alldomains.html">Show all coordinates toolbox</a>.
 
 
 <h3>Astrometrically calibrating images</h3>
-<p>GAIA offers you a great deal of flexibility in setting and checking
-your image's astrometry information (that is the information used to
-define how positions on your image correspond to positions on the
-sky). There are four main toolboxes associated with this
-activity. Usage hints are available for each, but read this
-overview section first.
+
+<p>GAIA offers you a great deal of flexibility in setting and checking your
+image's astrometry information (that is the information used to define how
+positions on your image correspond to positions on the sky). There are six
+main toolboxes associated with this activity. Usage hints are available for
+each, but read this overview section first.
 <ul>
+<li><a href="autoastromsimple.html">Simple automated calibration toolbox</a>
+<li><a href="autoastromexpert.html">Expert automated calibration toolbox</a>
 <li><a href="reference.html">Fit to reference stars toolbox</a>.
 <li><a href="refine.html">Tweak existing calibration toolbox</a>.
 <li><a href="define.html">Enter an known calibration toolbox</a>.
@@ -101,88 +106,95 @@ image (in arc minutes), by using the rubber band ruler (see above).
 <p>If you need to calibrate your image astrometry, then you can go
 about this in several different ways:
 <ol>
-<li>Use a set of reference positions to estimate a fit to your data.</li>
+<li>Use your knowledge of the image position and scale on the sky to bootstrap
+    an automated solution against an on-line catalogue.</li>
+<li>Use a selected set of reference positions to estimate a fit to your
+    data.</li> 
 <li>Copy a calibration from a related image (which lies near to
     your current position on the sky).</li>
 <li>Define the calibration using standard descriptions (this
     needs at least a knowledge of the image scale and the
     coordinates of a reference position).</li>
 </ol>
-The calibration that you achieve using methods 2 and 3 needn't be very
-accurate as you can "tweak" the calibration by using new reference
-positions (obtained from say on-line catalogues) to generate any
-additional transformations, or, you can completely redo the fit using
-method 1 and these extra positions.
+Normally you'll probably want to use method 1, unless your data needs special
+attention (because of the bandpass and availability of matched on-line
+catalogues for instance).
 
-<p>Suitable reference positions are easy to get in GAIA as you can
-query on-line catalogues, such as the Guide Star Catalogue (GSC) or US
-Naval Office catalogue (USNO) or you can use a pre-calibrated
-reference image (such as a DSS image) to select fiducial marks
-(i.e. stars and galaxies). The main idea is to get things good enough
-so that you can recognize the objects that are displayed from the
-catalogue (you can then proceed to move the projected reference
-positions until they are in the correct place and completely redo the
-fit).
+<p>The calibration that you achieve using methods 3 and 4 needn't be very
+accurate as you can "tweak" the calibration by using new reference positions
+(obtained from say on-line catalogues) to generate any additional
+transformations, or, you can completely redo the fit using method 2 and these
+extra positions.
 
-<p>The most likely starting point given an uncalibrated image is to
-display it then retrieve a DSS image of the same part of the sky, in
-another window, then use the "Fit to star positions..." toolbox to
-transfer reference positions from the DSS image. These positions can
-then be used to initiate a first pass calibration.
+<p>If you have an existing set of astrometric positions for your data you'll
+want to use method 2.
 
-<p>Now query the USNO catalogue and overlay all the objects that it
-has, remove the obvious mistakes (blends etc.) and redo the fit. More
-accurate solutions can be done if you select background galaxies.
+<p>Reference positions are easy to get in GAIA as you can query on-line
+catalogues, such as the Guide Star Catalogue (GSC) or US Naval Office
+catalogue (USNO) or you can use a pre-calibrated reference image (such as a
+DSS image) to select fiducial marks (i.e. stars and galaxies).
 
-<p>As you can probably see by now it is valid to mix and match the
-ways of calibrating your data, you just pick a method or scheme that
-suits your particular data.
+<p>If you need to calibrate your image using a non-automated method (this can
+be useful if you don't know the image scale, as this value is reported when a
+fit is performed), then the simplest starting point given is to display it
+then retrieve a DSS image of the same part of the sky, in another window, then
+use the "Fit to star positions..." toolbox to transfer reference positions
+from the DSS image. These positions can then be used to initiate a first pass
+calibration.
+
+<p>Now query the USNO catalogue and overlay all the objects that it has,
+remove the obvious mistakes (blends etc.) and redo the fit. More accurate
+solutions can be done if you select background galaxies.
+
+<p>As you can probably see by now it is valid to mix and match the ways of
+calibrating your data, you just pick a method or scheme that you find suits
+your particular data.
 
 <h4>Saving the calibration with your image</h4>
-<p>To retain any calibration changes that you make you must save the
-displayed image to disk (using the "Save as..." item in the "File"
-menu in the main window). Once saved you can then re-read the image
-into GAIA and the calibration should be available again (note that
-this may not work with other software, see the next topic).
+
+<p>To retain any calibration changes that you make you must save the displayed
+image to disk (using the "Save as..." item in the "File" menu in the main
+window). Once saved you can then re-read the image into GAIA and the
+calibration should be available again (note that this may not work with other
+software, see the next topic).
 
 <h3>Types of astrometry information</h3>
+
 <p>GAIA uses the Starlink AST library (SUNs 210 and 211) to do its
-astrometry. This means that it can read many different types of
-astrometry information stored in FITS headers, such as those
-"standards" used by AIPS, the newer FITS-WCS system (see
-http://www.cv.nrao.edu/fits/documents/wcs/wcs.html) and the DSS. AST
-will also read astrometry information stored in its own native
-form. This may be available with NDFs, or FITS images you've saved
-using GAIA.
+astrometry. This means that it can read many different types of astrometry
+information stored in FITS headers, such as those "standards" used by AIPS,
+the newer FITS-WCS system (see
+http://www.cv.nrao.edu/fits/documents/wcs/wcs.html) and the DSS. AST will also
+read astrometry information stored in its own native form. This may be
+available with NDFs, or FITS images you've saved using GAIA.
 
-<p>This is all very useful, but there is a problem when it comes to
-writing out new astrometric calibrations or modification of existing
-astrometries. The problem is that it is not always possible to convert
-the AST native form (which is what is being used when a calibration is
-being created or tweaked) into a FITS representation of some kind
-(GAIA always attempts this).
+<p>This is all very useful, but there is a problem when it comes to writing
+out new astrometric calibrations or modification of existing astrometries. The
+problem is that it is not always possible to convert the AST native form
+(which is what is being used when a calibration is being created or tweaked)
+into a FITS representation of some kind (GAIA always attempts this).
 
-<p>Obviously if the calibration is not written out using FITS then
-this limits the possibilities of using this information in other
-astronomical software (in fact using FITS-WCS as a storage form is
-also potentially problematic, as it is not yet a standard and is still
-quite new). The only way to see if your calibration can be converted
-to FITS is to try and save the image. If it fails then you'll get a
-warning message. If this is a real concern to you then you can
-increase the chances of this conversion being successful if you define
-a new calibration (the chances of writing out a modified DSS
-calibration are very small) and keep the modifications (i.e. the fit
-solution, or tweak) as simple as possible.
+<p>Obviously if the calibration is not written out using FITS then this limits
+the possibilities of using this information in other astronomical software (in
+fact using FITS-WCS as a storage form is also potentially problematic, as it
+is not yet a standard and is still quite new). The only way to see if your
+calibration can be converted to FITS is to try and save the image. If it fails
+then you'll get a warning message. If this is a real concern to you then you
+can increase the chances of this conversion being successful if you define a
+new calibration (the chances of writing out a modified DSS calibration are
+very small) and keep the modifications (i.e. the fit solution, or tweak) as
+simple as possible.
 
-<p>If you are just using GAIA (and possibly other Starlink software
-that uses AST) then you'll always be able to save and restore your
-astrometry as GAIA always saves an AST native copy with your image.
+<p>If you are just using GAIA (and possibly other Starlink software that uses
+AST) then you'll always be able to save and restore your astrometry as GAIA
+always saves an AST native copy with your image.
 
 <h2>Health Warning</h2>
-<p>Getting an accurate astrometric solution to an image requires some
-effort, you should always check that the solution found is good enough
-for your purposes. Currently GAIA has no facilities for correcting for
-plate distortions.
+
+<p>Getting an accurate astrometric solution to an image requires some effort,
+you should always check that the solution found is good enough for your
+purposes. Currently GAIA only has facilities for correcting for plate
+distortions using the automated methods.
 
 </body>
 </html>
