@@ -19219,15 +19219,41 @@ plot (101k).
          \ssthitemlist{
 
          \sstitem
-            {\tt "FITS-IRAF"} --- This uses keywords CRVAL\textit{i}, 
-            CRPIX\textit{i}, CD\textit{i}\_\textit{j}, \emph{etc.}, and is 
-            the system used by IRAF.
+            {\tt "FITS-IRAF"} --- This uses keywords CRVAL\textit{i}
+            CRPIX\textit{i}, CD\textit{i\_j}, and is the system commonly
+	    used by IRAF. It is described in the document ``World
+	    Coordinate Systems Representations Within the FITS Format''
+	    by R.J. Hanisch and D.G. Wells, 1988, available by ftp from
+	    fits.cv.nrao.edu /fits/documents/wcs/wcs88.ps.Z.
 
          \sstitem
-            {\tt "FITS-WCS"} --- This uses keywords CRVAL\textit{i}, 
-            CDELT\textit{i}, CRPIX\textit{i}, PC\textit{iiijjj}, \emph{etc.},
-            as described in the (draft) FITS world co-ordinate system paper 
-            by E.W.Greisen and M.Calabretta (A \& A, in preparation).
+            {\tt "FITS-WCS"} --- This is the proposed FITS standard WCS 
+            encoding scheme described in the paper ``Representation of
+	    celestial coordinates in FITS'' 
+   (\htmladdnormallink{http://www.cv.nrao.edu/fits/documents/wcs/wcs.html}
+            {http://www.cv.nrao.edu/fits/documents/wcs/wcs.html}). It is
+	    very similar to FITS-IRAF but supports a wider range of
+	    projections and co-ordinate systems. Once the standard has
+	    been agreed, this encoding should be understood by any
+	    FITS-WCS compliant software and it is likely to be adopted
+	    widely for FITS data in future.
+
+         \sstitem
+            {\tt "FITS-PC"} --- This uses keywords CRVAL\textit{i}, 
+            CDELT\textit{i}, CRPIX\textit{i}, PC\textit{iiijjj}, \emph{etc}, 
+            as in a previous (now superceded) draft of the above
+	    FITS world co-ordinate system paper by E.W.Greisen and
+	    M.Calabretta.
+
+         \sstitem
+            {\tt "FITS-AIPS"} --- This uses conventions described in the 
+            document ``Non-linear Coordinate Systems in AIPS'' by Eric W.
+	    Greisen (revised 9th September, 1994), available by ftp from
+	    fits.cv.nrao.edu /fits/documents/wcs/aips27.ps.Z. It is
+	    currently employed by the AIPS data analysis facility, so its
+	    use will facilitate data exchange with AIPS. This encoding
+	    uses CROTA\textit{i} and CDELT\textit{i} keywords to describe 
+            axis rotation and scaling.
 
          \sstitem
             {\tt "DSS"} --- This is the system used by the Digital Sky Survey,
@@ -19236,17 +19262,29 @@ plot (101k).
 
          \sstitem
             {\tt "Native"} --- This is the native system used by the AST 
-            library (see 
-            \xref{SUN/210}{sun210}{}), and is the most general. The others are 
-            limited in the co-ordinate systems they can describe, and may 
-            thus not fully describe the NDF's WCS component.
+            library (see \xref{SUN/210}{sun210}{}), and provides a loss-free 
+            method for transferring WCS information between AST-based 
+            application. It allows more complicated WCS information to be 
+            stored and retrieved than any of the other encodings.
          }
-         A comma-separated list of up to three values may be supplied, in
-         which case the value actually used is in the first in the list
-         for which corresponding keywords can be found in the FITS header.
-         If a null parameter value ({\tt !}) is supplied, the encoding
-         is chosen automatically on the basis of the available headers. 
-         {\tt [!]}
+
+         A comma-separated list of up to six values may be supplied, in
+	 which case the value actually used is in the first in the list
+	 for which corresponding keywords can be found in the FITS
+	 header.
+
+         A FITS header may contain keywords from more than one of these
+	 encodings, in which case it is possible for the encodings to be
+	 inconsistent with each other.  This may happen for instance if
+	 an application modifies the keyword associated with one encoding
+	 but fails to make equivalent modifications to the others.  If a
+	 null parameter value ({\tt !}) is supplied for ENCODINGS, then an
+	 attempt is made to determine the most reliable encoding to use
+	 as follows.  If both native and non-native encodings are
+	 available, then the first non-native encoding to be found which
+	 is inconsistent with the native encoding is used.  If all
+	 encodings are consistent, then the native encoding is used (if
+	 present). {\tt [!]}
      }
       \sstsubsection{
          FILES() = LITERAL (Read)
@@ -20008,15 +20046,41 @@ plot (101k).
          \ssthitemlist{
 
          \sstitem
-            {\tt "FITS-IRAF"} --- This uses keywords CRVAL\textit{i}, 
-            CRPIX\textit{i}, CD\textit{i}\_\textit{j}, \emph{etc.}, and is 
-            the system used by IRAF.
+            {\tt "FITS-IRAF"} --- This uses keywords CRVAL\textit{i}
+            CRPIX\textit{i}, CD\textit{i\_j}, and is the system commonly
+	    used by IRAF. It is described in the document ``World
+	    Coordinate Systems Representations Within the FITS Format''
+	    by R.J. Hanisch and D.G. Wells, 1988, available by ftp from
+	    fits.cv.nrao.edu /fits/documents/wcs/wcs88.ps.Z.
 
          \sstitem
-            {\tt "FITS-WCS"} --- This uses keywords CRVAL\textit{i}, 
-            CDELT\textit{i}, CRPIX\textit{i}, PC\textit{iiijjj}, \emph{etc.},
-            as described in the (draft) FITS world co-ordinate system paper 
-            by E.W.Greisen and M.Calabretta (A \& A, in preparation).
+            {\tt "FITS-WCS"} --- This is the proposed FITS standard WCS 
+            encoding scheme described in the paper ``Representation of
+	    celestial coordinates in FITS'' 
+   (\htmladdnormallink{http://www.cv.nrao.edu/fits/documents/wcs/wcs.html}
+            {http://www.cv.nrao.edu/fits/documents/wcs/wcs.html}). It is
+	    very similar to FITS-IRAF but supports a wider range of
+	    projections and co-ordinate systems. Once the standard has
+	    been agreed, this encoding should be understood by any
+	    FITS-WCS compliant software and it is likely to be adopted
+	    widely for FITS data in future.
+
+         \sstitem
+            {\tt "FITS-PC"} --- This uses keywords CRVAL\textit{i}, 
+            CDELT\textit{i}, CRPIX\textit{i}, PC\textit{iiijjj}, \emph{etc}, 
+            as in a previous (now superceded) draft of the above
+	    FITS world co-ordinate system paper by E.W.Greisen and
+	    M.Calabretta.
+
+         \sstitem
+            {\tt "FITS-AIPS"} --- This uses conventions described in the 
+            document ``Non-linear Coordinate Systems in AIPS'' by Eric W.
+	    Greisen (revised 9th September, 1994), available by ftp from
+	    fits.cv.nrao.edu /fits/documents/wcs/aips27.ps.Z. It is
+	    currently employed by the AIPS data analysis facility, so its
+	    use will facilitate data exchange with AIPS. This encoding
+	    uses CROTA\textit{i} and CDELT\textit{i} keywords to describe 
+            axis rotation and scaling.
 
          \sstitem
             {\tt "DSS"} --- This is the system used by the Digital Sky Survey,
@@ -20025,18 +20089,30 @@ plot (101k).
 
          \sstitem
             {\tt "Native"} --- This is the native system used by the AST 
-            library (see 
-            \xref{SUN/210}{sun210}{}), and is the most general. The others are 
-            limited in the co-ordinate systems they can describe, and may 
-            thus not fully describe the NDF's WCS component.
+            library (see \xref{SUN/210}{sun210}{}), and provides a loss-free 
+            method for transferring WCS information between AST-based 
+            application. It allows more complicated WCS information to be 
+            stored and retrieved than any of the other encodings.
          }
-         A comma-separated list of up to three values may be supplied, in
-         which case the value actually used is in the first in the list
-         for which corresponding keywords can be found in the FITS header.
-         If a null parameter value ({\tt !}) is supplied, the encoding
-         is chosen automatically on the basis of the available headers. 
-         {\tt [!]}
-     }
+
+         A comma-separated list of up to six values may be supplied, in
+	 which case the value actually used is in the first in the list
+	 for which corresponding keywords can be found in the FITS
+	 header.
+
+         A FITS header may contain keywords from more than one of these
+	 encodings, in which case it is possible for the encodings to be
+	 inconsistent with each other.  This may happen for instance if
+	 an application modifies the keyword associated with one encoding
+	 but fails to make equivalent modifications to the others.  If a
+	 null parameter value ({\tt !}) is supplied for ENCODINGS, then an
+	 attempt is made to determine the most reliable encoding to use
+	 as follows.  If both native and non-native encodings are
+	 available, then the first non-native encoding to be found which
+	 is inconsistent with the native encoding is used.  If all
+	 encodings are consistent, then the native encoding is used (if
+	 present). {\tt [!]}
+      }
       \sstsubsection{
          FILES()  = \_CHAR (Read)
       }{
@@ -45070,6 +45146,22 @@ The following applications have been modified:
 
 \begin{description}
 
+   \item [\htmlref{FITSIN}{FITSIN}] \mbox{}
+      \begin{itemize}
+         \item Now supports the new FITS WCS standards based on keywords
+               CDi\_j, PVj\_m, {\emph etc}, plus explicit support for the
+               previous draft standard (based on PCjjjiii keywords), and
+               the AIPS WCS system (based on keywords CDELTj and CROTAj).
+      \end{itemize}
+
+   \item [\htmlref{FITSDIN}{FITSDIN}] \mbox{}
+      \begin{itemize}
+         \item Now supports the new FITS WCS standards based on keywords
+               CDi\_j, PVj\_m, {\emph etc}, plus explicit support for the
+               previous draft standard (based on PCjjjiii keywords), and
+               the AIPS WCS system (based on keywords CDELTj and CROTAj).
+      \end{itemize}
+
    \item [\htmlref{GAUSMOOTH}{GAUSMOOTH}] \mbox{}
       \begin{itemize}
          \item The FWHM parameter can now accept values up to 10000.0.
@@ -45209,7 +45301,7 @@ The following applications have been modified:
 
    \item [\htmlref{SURFIT}{SURFIT}] \mbox{}
       \begin{itemize}
-         A new output parameter called RMS has been added. The RMS
+         \item A new output parameter called RMS has been added. The RMS
          deviation of the fit from the original data (per pixel) is 
          stored in this output parameter on exit.
       \end{itemize}
