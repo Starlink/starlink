@@ -332,15 +332,16 @@
 *  sideband is upper, positive if we are in LSB
          CALL NDF_XGT0D( IMAP, 'SPECX', 'IFFREQ(1)', IFFREQ, STATUS )
 
-*  Calculate which sideband we are in and fix the sign of the IF
-*  Note that the sign of the IF controls the observed sideband, the
-*  sideband attribute controls the current sideband setting
-         IF (JFINC .GT. 0) THEN
+*  Calculate observed sidband. SPECX uses a positive IF if we are USB,
+*  negative IF if we are LSB.
+*  AST requires that the LO = JFCEN + IF such that LSB implies
+*  a positive IF, LSB a negative. (ie the reverse of SPECX convention)
+         IF (IFFREQ .GT. 0) THEN
             SIDEBAND = 'USB'
-            IFFREQ = IFFREQ * -1.0D0
          ELSE
             SIDEBAND = 'LSB'
          END IF
+         IFFREQ = IFFREQ * -1.0D0
 
 *   Set sideband and IF
          CALL AST_SETC(SPCFRM, 'SideBand', SIDEBAND, STATUS)
@@ -389,7 +390,7 @@
 *  Put FITS cards into the FitsChan representing a SIN projection of the
 *  sky, using the pixel sizes obtained above. It is assumed that north is
 *  parallel to the third axis and east is parallel to the second axis.
-*  It is assumed that the RA and DEC values are FK5 J2000. Axis 3 is the
+*  It is assumed that the RA and DEC values are FK4 B1950. Axis 3 is the
 *  spectral axis.
       CALL AST_PUTFITS( FC, ' ', .FALSE., STATUS ) 
 
