@@ -40,8 +40,6 @@ sub columns ($;$);
 sub maxrow ($;$);
 sub point ($$$);
 sub otherpoint ($$$);
-#sub point ($$$;$$$$);
-#sub otherpoint ($$$;$$$$);
 sub searchtype ($;$);
 sub astinformation ($;$\@);
 sub astdomain ($);
@@ -171,11 +169,18 @@ sub catconfig ($) {
 
 #+
 # <routinename>radius
-# <description>Gets or, with an argument, sets the radius for a subsequent
-#   search.
+#
+# <description>Gets or, with an argument, sets the radius for a
+#   subsequent search.  Note that the argument here is in arcminutes,
+#   even if the AST domain is SKY, so that point() and otherpoint()
+#   are accepting arguments in pixels.  If you want to specify a
+#   radius in pixels, set point() and otherpoint() (in pixels) and set
+#   the search type to `radius2'.
+#
 # <argumentlist>
 #  <parameter optional>
 #    <name>radius<type>float<description>Search radius
+#
 # <returnvalue>The current search radius.  If the argument is given, but
 #   the value cannot be changed, the radius is set to the undefined value,
 #   and it is this which is returned.
@@ -246,11 +251,14 @@ sub maxrow ($;$) {
 #   the arguments may be either decimal degrees or colon-separated
 #   sexagesimal angles (RA then Dec).  This method doesn't itself do
 #   any checking of the values, but instead relies on moggy to
-#   indicate that the values were set successfully.
+#   indicate that the values were set successfully.  If the current
+#   ASTDOMAIN is not `SKY', then the arguments may indifferently be
+#   decimal degrees or pixels.
 #
 #  <returnvalue>The current value.  If the argument is given, but
 #  there is an error setting it, then the point is set to the
-#  undefined value, and it is this which is returned.  -
+#  undefined value, and it is this which is returned.
+#-
 sub point ($$$) {
     my $self = shift;
     my @args = @_;
@@ -308,27 +316,6 @@ sub point ($$$) {
 	    $self->{POINT} = undef;
 	}
     }
-#    my $self = shift;
-#    my @args = @_;
-#    my $i;
-#    for ($i=0; $i<=$#args; $i++) { $args[$i] =~ s/\s*//g; };
-#     if (@args) {
-# 	if ($#args == 5) {
-# 	    unshift (@args, "COORD1");
-# 	    $self->send_command_to_slave_(@args);
-# 	    shift (@args);
-# 	    $self->{POINT} = ($self->status_ok() ? \@args : undef);
-# 	} elsif ($#args == 1) {
-# 	    my @a = "COORD1";
-# 	    push (@a, split (':',$args[0]));
-# 	    push (@a, split (':',$args[1]));
-# 	    $self->send_command_to_slave_(@a);
-# 	    shift (@a);
-# 	    $self->{POINT} = ($self->status_ok() ? \@a : undef);
-# 	} else {
-# 	    $self->{POINT} = undef;
-# 	}
-#     }
     return $self->{POINT};
 }
 
@@ -406,39 +393,24 @@ sub otherpoint ($$$) {
 	    $self->{OTHERPOINT} = undef;
 	}
     }
-#     my $self = shift;
-#     my @args = @_;
-#     my $i;
-#     for ($i=0; $i<=$#args; $i++) { $args[$i] =~ s/\s*//g; };
-#     if (@args) {
-# 	if ($#args == 5) {
-# 	    unshift (@args, "COORD2");
-# 	    $self->send_command_to_slave_(@args);
-# 	    shift (@args);
-# 	    $self->{OTHERPOINT} = ($self->status_ok() ? \@args : undef);
-# 	} elsif ($#args == 1) {
-# 	    my @a = "COORD2";
-# 	    push (@a, split (':',$args[0]));
-# 	    push (@a, split (':',$args[1]));
-# 	    $self->send_command_to_slave_(@a);
-# 	    shift (@a);
-# 	    $self->{OTHERPOINT} = ($self->status_ok() ? \@a : undef);
-# 	} else {
-# 	    $self->{OTHERPOINT} = undef;
-# 	}
-#     }
-     return $self->{OTHERPOINT};
+    return $self->{OTHERPOINT};
 }
 
 #+
 # <routinename>searchtype
-# <description>Gets or, with an argument, sets the searchtype.
-#   If the argument is
-#   not one of `RADIUS', `RADIUS2' or `BOX', then it is set to be
-#   undefined.
+#
+# <description>Gets or, with an argument, sets the searchtype.  If the
+#   argument is not one of `RADIUS', `RADIUS2' or `BOX', then it is
+#   set to be undefined.  Note that, because of the way that
+#   individual catalogue handlers implement this, it is not actually
+#   guaranteed that the returned results will be in the specified
+#   area, so if it matters, the results should be checked by the
+#   caller, or otherwise post-processed. 
+#
 # <argumentlist>
 #   <parameter optional><name>type<type>string<description>One of
 #     `RADIUS', `RADIUS2' or `BOX' (case-insensitive).
+#
 # <returnvalue>The current value.  If the argument is given, but there is
 #   an error setting it, then the value is set to the undefined value, and
 #   it is this which is returned.
@@ -447,11 +419,16 @@ sub searchtype ($;$) {
     my $self = shift;
     my $type = (@_ ? uc($_[0]) : undef);
 
-    if (defined($type) && $type =~ /RADIUS|RADIUS2|BOX/) {
-	$self->send_command_to_slave_ ("TYPE", $type);
-	if ($self->status_ok()) {
-	    $self->{SEARCHTYPE} = $type;
+    if (defined($type)) {
+	if ($type =~ /RADIUS|RADIUS2|BOX/) {
+	    $self->send_command_to_slave_ ("TYPE", $type);
+	    if ($self->status_ok()) {
+		$self->{SEARCHTYPE} = $type;
+	    } else {
+		$self->{SEARCHTYPE} = undef;
+	    }
 	} else {
+	    carp "Unknown search type $type";
 	    $self->{SEARCHTYPE} = undef;
 	}
     }
