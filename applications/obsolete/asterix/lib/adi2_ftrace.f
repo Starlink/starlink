@@ -116,13 +116,14 @@
       CALL ADI2_GETLUN( ARGS(1), LUN, STATUS )
 
 *  Filename from logical unit
-      INQUIRE( UNIT=LUN, FULLNAME=FILE, IOSTAT=FSTAT )
+      INQUIRE( UNIT=LUN, FILE=FILE, IOSTAT=FSTAT )
 
 *  Report error if that failed
       IF ( FSTAT .NE. 0 ) THEN
         STATUS = SAI__ERROR
         CALL ERR_REP( ' ', 'Unable to get file name for FITSfile'/
      :                /' object', STATUS )
+
       ELSE
 
 *    Create structure and store filename
@@ -136,7 +137,7 @@
           CALL ADI_CPUT0C( OARG, 'Path', PATH(:3), STATUS )
         ELSE
           CALL ADI_CPUT0C( OARG, 'Path', ' ', STATUS )
-        ELSE
+        END IF
         CALL ADI_CPUT0I( OARG, 'Nlev', 1, STATUS )
 
       END IF
