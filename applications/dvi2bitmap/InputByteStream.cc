@@ -32,26 +32,31 @@
 #include <iostream>
 #include <fcntl.h>
 
-#ifdef HAVE_CSTD_INCLUDE
+#if HAVE_CSTD_INCLUDE
 #  include <cstdio>
 #  include <cstdlib>
 #  include <cassert>
-#  include <cerrno>
 #else
 #  include <stdio.h>
 #  include <stdlib.h>
 #  include <assert.h>
-#  include <errno.h>
 #endif
 
 #if HAVE_SYS_ERRNO_H
 /* If it's available, explicitly include sys/errno.h as well as
- * <cerrno> or <errno.h> above.  If we're compiling in a strict-ansi
- * mode, the compiler may well have carefully avoided defining errors
- * which are specific to Unix/POSIX, which are, of course, precisely
- * the ones we're hoping to use.
+ * <cerrno> or <errno.h>.  If we're compiling in a strict-ansi mode,
+ * the compiler may well carefully avoid defining errors which are
+ * specific to Unix/POSIX; these (specifically EINTR) are precisely
+ * the ones we're hoping to use.  Include <sys/errno.h> _first_: if
+ * <cerrno> includes it, it will probably define sentinels to prevent
+ * us re-including it here.
  */
 #  include <sys/errno.h>
+#endif
+#if HAVE_CSTD_INCLUDE
+#  include <cerrno>
+#else
+#  include <errno.h>
 #endif
 
 #include <unistd.h>
