@@ -121,7 +121,7 @@
 *        Convert to radian**2
             CALL ADI_CGET0I( PSID, 'ModelNr', NR, STATUS )
             CALL ADI_CMAPR( PSID, 'ModelRup', 'UPDATE', BPTR, STATUS )
-            CALL ARR_MULTRR( X_TOR**2, NR, %VAL(BPTR) )
+            CALL ARR_MULTR( X_TOR**2, NR, %VAL(BPTR) )
             CALL ADI_CUNMAP( PSID, 'ModelRup', BPTR, STATUS )
 
           END IF

@@ -125,10 +125,13 @@
 *    Create psf object
         CALL ADI_NEW0( 'PsfDescription', PSID, STATUS )
 
+*    Create axes storage
+        CALL ADI_CNEW1( PSID, 'Axes', 'STRUC', ADI__MXDIM, STATUS )
+
 *    Store file id
         CALL ADI_CPUT0I( PSID, 'FileID', FID, STATUS )
 
-*    Store psf identifier
+*    Store psf identifier on the file property list
         CALL ADI_CPUT0I( FID, PSF__PROP, PSID, STATUS )
 
       END IF

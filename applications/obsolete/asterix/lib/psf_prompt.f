@@ -367,7 +367,7 @@
 
 *  Store energy model settings
       CALL ADI_CPUT0L( PSID, 'IsEnergyModel', EMOK, STATUS )
-      CALL ADI_CPUT0L( PSID, 'NemMode', MODE, STATUS )
+      CALL ADI_CPUT0I( PSID, 'NemMode', MODE, STATUS )
 
 *  Set model flag if ok
  99   IF ( STATUS .NE. SAI__OK ) THEN
