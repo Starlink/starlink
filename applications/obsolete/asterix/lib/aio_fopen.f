@@ -125,7 +125,7 @@
 
 
 *+  AIO_FOPEN1 - Open a FIO file in the path and with default extension
-      SUBROUTINE AFIO_OPEN1( FILE, ACCESS, MODE, RECSZ, FD, STATUS )
+      SUBROUTINE AIO_FOPEN1( FILE, ACCESS, MODE, RECSZ, FD, STATUS )
 *    Description :
 *    Method :
 *    Type definitions :
