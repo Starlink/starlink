@@ -76,7 +76,12 @@ atclsh_LDADD = `nbs_link` `ams_link_adam` `ems_link_adam` \
 awish_SOURCES = tkAppInit.c $(NBS_ROUTINES)
 awish_LDADD = `nbs_link` `chr_link_adam` \
         `gwm_link_adam` `ems_link_adam` `ams_link_adam` \
-	libtclAdam.la libtkGwm.la @TCL_LIBS@ @TK_LIBS@ @FCLIBS@
+	libtclAdam.la libtkGwm.la @TCL_LIBS@ @TK_LIBS@ @FCLIBS@ \
+        `starX_link`
+
+# For some reason starX_link is different to the other _link scripts. 
+# Stop the attempt to create it.
+.PHONY: `starX_link`
 
 # Define what is to be done with which sets of files.
 

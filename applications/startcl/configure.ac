@@ -24,11 +24,14 @@ AC_CHECK_LIB(jpeg,jpeg_start_compress)
 
 STAR_DECLARE_DEPENDENCIES(build, [starx adam ams dtask ems gwm messys mers tcl tk nbs sae])
 
-STAR_LATEX_DOCUMENTATION(sun186)
+dnl STAR_LATEX_DOCUMENTATION(sun186)
 STAR_LATEX_DOCUMENTATION(sun219)
 
 dnl    Locate the tclsh and wish binaries and associated libraries
 STAR_PATH_TCLTK(8.2,[tk])
+
+dnl    How to link to X.
+AC_PATH_XTRA
 
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.
