@@ -951,17 +951,16 @@ c        CALL BDI_AXCHK( IFID, I, 'SpacedData', REG(I), STATUS )
         LOGICAL LOFOUND,HIFOUND
         LOGICAL INCLUDE		! whether donor bin to be included
 *-
-	integer i
 
 *      Status check
       IF (STATUS.NE.SAI__OK) RETURN
 
-	do i=1,dims(1)
-          print *,frbnd1(1,i),frbnd1(2,i)
+	do ibin=1,dims(1)
+          print *,frbnd1(1,ibin),frbnd1(2,ibin)
 	enddo
         print *,' '
-	do i=1,nbin(1)
-          print *,tobnd1(1,i),tobnd1(2,i)
+	do ibin=1,nbin(1)
+          print *,tobnd1(1,ibin),tobnd1(2,ibin)
 	enddo
 
 *  set up array of flags to record whether output bins have been filled
