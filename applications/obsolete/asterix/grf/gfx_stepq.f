@@ -27,7 +27,7 @@
       BYTE BIT_ANDUB
 *    Local constants :
 *    Local variables :
-      REAL HWID				! x half-width
+      REAL X1,X2
       INTEGER I
       INTEGER STYLE,WIDTH,COLOUR
       LOGICAL FIRST			! first point of a continuous segment
@@ -65,16 +65,22 @@
 *  simple case of lin/lin axes
         IF (.NOT.(XLOG.OR.YLOG)) THEN
           FIRST=.TRUE.
+          X2=X(N1)-(X(N1+1)-X(N1))/2.0
           DO I=N1,N2
-            HWID=XW(I)/2.0
+            X1=X2
+            IF (I.LT.N2) THEN
+              X2=(X(I)+X(I+1))/2.0
+            ELSE
+              X2=X(I)+(X(I)-X(I-1))/2.0
+            ENDIF
             IF (BIT_ANDUB(Q(I),MASK).EQ.QUAL__GOOD) THEN
               IF (FIRST) THEN
-                CALL PGMOVE(X(I)-HWID,Y(I))
-                CALL PGDRAW(X(I)+HWID,Y(I))
+                CALL PGMOVE(X1,Y(I))
+                CALL PGDRAW(X2,Y(I))
                 FIRST=.FALSE.
               ELSE
-                CALL PGDRAW(X(I)-HWID,Y(I))
-                CALL PGDRAW(X(I)+HWID,Y(I))
+                CALL PGDRAW(X1,Y(I))
+                CALL PGDRAW(X2,Y(I))
               ENDIF
             ELSE
               FIRST=.TRUE.
@@ -84,17 +90,23 @@
 *  one or both log axes
         ELSEIF (XLOG.AND..NOT.YLOG) THEN
           FIRST=.TRUE.
+          X2=X(N1)-(X(N1+1)-X(N1))/2.0
           DO I=N1,N2
-            HWID=XW(I)/2.0
-            IF (X(I)-HWID.GT.VAL__SMLR
+            X1=X2
+            IF (I.LT.N2) THEN
+              X2=(X(I)+X(I+1))/2.0
+            ELSE
+              X2=X(I)+(X(I)-X(I-1))/2.0
+            ENDIF
+            IF (X1.GT.VAL__SMLR
      :              .AND.BIT_ANDUB(Q(I),MASK).EQ.QUAL__GOOD) THEN
               IF (FIRST) THEN
-                CALL PGMOVE(LOG10(X(I)-HWID),Y(I))
-                CALL PGDRAW(LOG10(X(I)+HWID),Y(I))
+                CALL PGMOVE(LOG10(X1),Y(I))
+                CALL PGDRAW(LOG10(X2),Y(I))
                 FIRST=.FALSE.
               ELSE
-                CALL PGDRAW(LOG10(X(I)-HWID),Y(I))
-                CALL PGDRAW(LOG10(X(I)+HWID),Y(I))
+                CALL PGDRAW(LOG10(X1),Y(I))
+                CALL PGDRAW(LOG10(X2),Y(I))
               ENDIF
             ELSE
               FIRST=.TRUE.
@@ -103,17 +115,23 @@
 
         ELSEIF (.NOT.XLOG.AND.YLOG) THEN
           FIRST=.TRUE.
+          X2=X(N1)-(X(N1+1)-X(N1))/2.0
           DO I=N1,N2
-            HWID=XW(I)/2.0
+            X1=X2
+            IF (I.LT.N2) THEN
+              X2=(X(I)+X(I+1))/2.0
+            ELSE
+              X2=X(I)+(X(I)-X(I-1))/2.0
+            ENDIF
             IF (Y(I).GT.VAL__SMLR.AND.
      :                  BIT_ANDUB(Q(I),MASK).EQ.QUAL__GOOD) THEN
               IF (FIRST) THEN
-                CALL PGMOVE(X(I)-HWID,LOG10(Y(I)))
-                CALL PGDRAW(X(I)+HWID,LOG10(Y(I)))
+                CALL PGMOVE(X1,LOG10(Y(I)))
+                CALL PGDRAW(X2,LOG10(Y(I)))
                 FIRST=.FALSE.
               ELSE
-                CALL PGDRAW(X(I)-HWID,LOG10(Y(I)))
-                CALL PGDRAW(X(I)+HWID,LOG10(Y(I)))
+                CALL PGDRAW(X1,LOG10(Y(I)))
+                CALL PGDRAW(X2,LOG10(Y(I)))
               ENDIF
             ELSE
               FIRST=.TRUE.
@@ -123,17 +141,23 @@
 
         ELSEIF (XLOG.AND.YLOG) THEN
           FIRST=.TRUE.
+          X2=X(N1)-(X(N1+1)-X(N1))/2.0
           DO I=N1,N2
-            HWID=XW(I)/2.0
-            IF (X(I)-HWID.GT.VAL__SMLR.AND.Y(I).GT.VAL__SMLR.AND.
+            X1=X2
+            IF (I.LT.N2) THEN
+              X2=(X(I)+X(I+1))/2.0
+            ELSE
+              X2=X(I)+(X(I)-X(I-1))/2.0
+            ENDIF
+            IF (X1.GT.VAL__SMLR.AND.Y(I).GT.VAL__SMLR.AND.
      :                        BIT_ANDUB(Q(I),MASK).EQ.QUAL__GOOD) THEN
               IF (FIRST) THEN
-                CALL PGMOVE(LOG10(X(I)-HWID),LOG10(Y(I)))
-                CALL PGDRAW(LOG10(X(I)+HWID),LOG10(Y(I)))
+                CALL PGMOVE(LOG10(X1),LOG10(Y(I)))
+                CALL PGDRAW(LOG10(X2),LOG10(Y(I)))
                 FIRST=.FALSE.
               ELSE
-                CALL PGDRAW(LOG10(X(I)-HWID),LOG10(Y(I)))
-                CALL PGDRAW(LOG10(X(I)+HWID),LOG10(Y(I)))
+                CALL PGDRAW(LOG10(X1),LOG10(Y(I)))
+                CALL PGDRAW(LOG10(X2),LOG10(Y(I)))
               ENDIF
             ELSE
               FIRST=.TRUE.
