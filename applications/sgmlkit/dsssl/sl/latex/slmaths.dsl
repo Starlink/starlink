@@ -38,7 +38,7 @@ Set the inherited characteristic <code/escape-tex?/ to <code/#f/, so that
 raw LaTeX within the environments isn't escaped.
 <codebody>
 (element m
-  (make environment brackets: '("\\(" "\\)")
+  (make environment brackets: '("$" "$")
 	escape-tex?: #f
 	(process-children)))
 
