@@ -946,7 +946,7 @@ int StarRtdImage::dumpCmd( int argc, char *argv[] )
             }
             message << ends;
             set_result( message.str() );
-            delete [] message.str();
+            message.freeze( 0 );
         }
         return result;
     } else {
@@ -2945,7 +2945,7 @@ int StarRtdImage::draw_symbol( const char *shape,
                                const char *label, const char *label_tags)
 {
 #ifdef _DEBUG_
-    cout << "Called StarRtdImage::draw_symbol" << endl;
+    cout << "Called StarRtdImage::draw_symbol: " << shape << endl;
 #endif
     static struct SymbolTab {
         // symbol name
@@ -2981,7 +2981,7 @@ int StarRtdImage::draw_symbol( const char *shape,
                                              label, label_tags );
         }
     }
-    return error("invalid plot symbol");
+    return error( "invalid plot symbol (%s)", shape );
 }
 
 //
@@ -3036,7 +3036,7 @@ int StarRtdImage::draw_ellipse(double x, double y, const char *xy_units,
 
     os << ends;
     int result = eval( os.str() );
-    delete [] os.str();
+    os.freeze( 0 );
     return result;
 }
 
@@ -3088,7 +3088,7 @@ int StarRtdImage::draw_rotbox(double x, double y, const char *xy_units,
 
     os << ends;
     int result = eval( os.str() );
-    delete [] os.str();
+    os.freeze( 0 );
     return result;
 }
 
@@ -4308,7 +4308,7 @@ int StarRtdImage::ndfCmdList( int argc, char *argv[], NDFIO *ndf )
     }
     os << ends;
     set_result( os.str() );
-    delete [] os.str();
+    os.freeze( 0 );
     return TCL_OK;
 }
 

@@ -39,10 +39,16 @@ searches the following directories:
 </ol>
 If they are not found then built-in defaults are used. So you may
 configure the default setup by changing these two files and placing
-them in the current directory. Note, however, that the interface
-itself will update these two files (unless you've changed the names to
-be used) whenever a detection pass is made, so they always reflect the
-current state of the interface.
+them in the current directory. 
+
+Note, however, that the interface itself will update these two files
+(unless you've changed the names to be used) whenever a detection pass
+is made (i.e. you press the "Detect objects" button), so they always
+reflect the current state of the interface of the last detection pass,
+except for the case of when the toolbox is first created.
+
+To read in a set of default parameters after the toolbox has been
+created use the options found in the file menu.
 
 <h3>Running SExtractor/EXTRACTOR directly using the values in the toolbox</h3>
 <p>When it runs the toolbox updates the "default.sex" and

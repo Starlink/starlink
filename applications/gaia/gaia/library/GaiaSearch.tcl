@@ -72,6 +72,9 @@ itcl::class gaia::GaiaSearch {
    
    #  Init method, called after the options have been evaluated.
    public method init {} {
+
+      #  Extra GAIA symbols for catalogues.
+      #set symbols_("rotbox") 1; TODO: add changes needed to support this.
       SkySearch::init
       
       #  Remove the "Save with image" menu option. This is not
