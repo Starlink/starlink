@@ -59,9 +59,24 @@ if test $# -gt 0; then
         echo "Usage:"
         echo "    $progname"
         echo "        Configure directory"
-        echo "    $progname --show [--all | variable ...]"
-        echo "        List configuration information:"
-        echo "        [variables:$allshowvars]"
+        echo "    $progname --show [--all | <var> ...]"
+        (
+         set "        List configuration information: <var> in {" $showvars "}"
+         l=
+         while test $# -gt 0
+         do
+             ll=`expr "$l" : '.*'`
+             nl=`expr "$1" : '.*'`
+             if test `expr '(' $ll + $nl ')' '>' 80` = 0; then
+                 l="$l $1"
+             else
+                 echo "$l"
+                 l="             $1"
+             fi
+             shift
+         done
+         test -n "$l" && echo "$l"
+        )
         echo "    $progname [--help | --version]"
         echo "        Show help/version"
         exit 0
