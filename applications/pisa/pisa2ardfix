@@ -1,0 +1,47 @@
+#!/usr/local/bin/tclsh
+#
+#  Fix pisa2ard output to correct angle!
+#
+#  Notes:
+#     I cannot believe this is wrong.  
+#
+
+#  Get the input file.
+if { $argc == 0 } {
+   puts -nonewline "PISA2ARD output file: "
+   set infile [gets stdin]
+} else { 
+   set infile [lindex $argv 0]
+}
+if { ! [file readable $infile] } {
+   puts stderr "Cannot read input file ($infile)"
+   exit 1
+}
+
+#  Get the output file.
+if { $argc != 2 } {
+   puts -nonewline "Output file: "
+   set outfile [gets stdin]
+} else { 
+   set outfile [lindex $argv 1]
+}
+
+#  Open the input file.
+set inard [open $infile r]
+
+#  And the output file.
+set outard [open $outfile w]
+
+#  Read the input file, extract the various elements and rotating the ellipse
+#  angle by 90 degrees.
+
+while { [gets $inard line] >= 0 } {
+   if { [regexp {^ELLIPSE\((.*)\)} $line matched numbers] } {
+      scan $numbers "%f %s %f %s %f %s %f %s %f" x c1 y c2 major c3 minor c4 angle
+      set angle [expr fmod(($angle + 90.0), 180.0)] 
+      puts $outard "ELLIPSE($x, $y, $major, $minor, $angle)"
+   }
+}
+close $inard
+close $outard
+exit

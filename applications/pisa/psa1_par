@@ -1,0 +1,54 @@
+*+
+*  Name:
+*     PSA1_PAR
+
+*  Purpose:
+*     PISA symbolic constants
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     INCLUDE 'PSA1_PAR'
+
+*  Description:
+*     This INCLUDE file contains the symbolic constants used by PISA.
+
+*  Authors:
+*     PDRAPER: P.W. Draper (Starlink - Durham University)
+*     {enter_new_authors_here}
+
+*  History:
+*     27-JUN-1995 (PDRAPER):
+*        Original version
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Global Constants:
+
+*     Maximum number of image fragments - strict limit. Note
+*     increasing this value can have severe side-effects as 8-byte
+*     dimensions of order two are used.
+      INTEGER IMNUM
+      PARAMETER (IMNUM = 512)
+
+*     Maximum number of thresholded pixels Note : This limit is not
+*     critical, the program loops using this as workspace for containing
+*     the present thresholded pixels re-initialising and looping again
+*     for the next IMLIM thresholded pixels.
+      INTEGER IMLIM
+      PARAMETER (IMLIM=75000)
+
+*     Maximum length of 1st dimension of input array.
+      INTEGER LINLEN
+      PARAMETER (LINLEN=10240)
+
+*     Maximum number of pixels processed in subroutines.
+      INTEGER PIXLIM
+      PARAMETER ( PIXLIM = 10000 )
+
+*.

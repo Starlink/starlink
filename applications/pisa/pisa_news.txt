@@ -1,0 +1,14 @@
+1 PISA_update
+                                                     Expires ??
+
+ PISA has only undergone minor changes this release, the main ones are.
+
+       o A new application PISA2ARD has been introduced.
+       o PISA can now be used from ICL.
+       o A hypertext form of the main document is now available   
+         using the command pisawww.
+
+ PISA is documented in SUN/109 or try the pisawww command (X display required).
+
+ Peter Draper (P.W.Draper@durham.ac.uk)
+

@@ -1,0 +1,16 @@
+1 PISA_update
+
+ This is a minor upgrade to PISA with the following changes:
+
+    PISA no longer relies on any NAG routines. This changes the 
+    applications PISAGEN, ADDNOISE, PISAKNN and PISAFIT. There 
+    should be no significant effects due to these changes. NAG 
+    removal has been performed to allow PISA to run on Linux based PCs.
+
+    SUN/109 has been changed to show the formulae involved in the
+    calculation of the image moments and ellipticity.
+
+ PISA is documented in SUN/109 or try the pisawww command (X display required).
+
+ Peter Draper (P.W.Draper@durham.ac.uk)
+

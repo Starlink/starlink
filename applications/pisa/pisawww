@@ -1,0 +1,164 @@
+
+#  N.B. the previous line has been left blank intentionally.
+#+
+#  Name:
+#     pisawwww
+
+#  Purpose:
+#     Starts a hypertext browser to read the PISA document.
+
+#  Description:
+#     This command displays a hypertext version of the PISA
+#     documentation in a Mosaic or netscape browser. If either of
+#     these browsers are already running then they are used to
+#     display the document, otherwise a new browser is started.
+
+#  Usage:
+#     pisawww [browser]
+
+#   Type of module:
+#     Bourne script.
+
+#  Arguments:
+#     $1 = string
+#        Command to start browser. This is optional and defaults to "Mosaic".
+
+#  Environment Variables:
+#     If the variable HTX_BROWSER is set then this will be used as the
+#     browser name, unless overridden by a command line name.
+
+#  History:
+#     7-JUN-1995 (PDRAPER):
+#        Original version.
+#     12-JUL-1995 (PDRAPER):
+#        Updated to work as Rodney Warren-Smith's showme (converted to
+#        bourne and uses HTX_BROWSER variable).
+#     14-AUG-1995 (PDRAPER):
+#        Added kill -0 as detection command (was 
+#           tail=`echo ${HTX_BROWSER} | sed 's:/.*/::'`
+#           exists=`ps -p ${pid} | grep ${tail} | wc -l`
+#        ).
+#        Added information output (bit mysterious before this).
+#     {enter_changes_here}
+# -
+
+#  Define the PISA document.
+      URL=file://localhost/${PISA_DIR}/../../docs/sun109.htx/sun109.html
+
+#.
+
+#  Provide a default hypertext browser.
+      if test "${HTX_BROWSER}" = "" && test "${1}" = "" ; then
+         HTX_BROWSER='Mosaic'
+      else
+          if test "${1}" != ""; then
+             HTX_BROWSER="${1}"
+          fi
+      fi
+
+#  Start the browser with the required document.
+#  Handle each browser.
+      case "${HTX_BROWSER}" in
+
+#  Netscape.
+#  --------
+      *[Nn]etscape*)
+
+#  Ensure that the DISPLAY environmant variable is defined.
+         if test "${DISPLAY}" = ""; then
+            DISPLAY=`${INSTALL}/etc/xdisplay`
+            export DISPLAY
+         fi
+
+#  Run netscape with "-remote" to make an existing browser invocation read
+#  the required file.
+         ( ${HTX_BROWSER} 1>/dev/null 2>/dev/null \
+                        -noraise -remote "openURL(${URL})" &&
+           echo "Loaded PISA document into existing Netscape browser"
+         ) || (
+
+#  If the attempt to use an existing browser failed, then start a new one.
+           ${HTX_BROWSER} 1>/dev/null 2>/dev/null "${URL}" &
+           echo "Loading PISA document into Netscape browser"
+         )
+         ;;
+
+#  Mosaic.
+#  ------
+      *[Mm]osaic*)
+
+#  See if a readable ".mosaicpid" file exists in the home directory. If not,
+#  there is no existing Mosaic browser running, so start a new one.
+         if test ! \( -f ${HOME}/.mosaicpid -a -r ${HOME}/.mosaicpid \); then
+            if test "${DISPLAY}" = ""; then
+               DISPLAY=`${INSTALL}/etc/xdisplay`
+               export DISPLAY
+            fi
+            ${HTX_BROWSER} 1>/dev/null 2>/dev/null "${URL}" &
+            echo "Loading PISA document into Mosaic browser"
+
+#  If a ".mosaicpid" file was found, extract the process ID of the existing
+#  Mosaic browser from it.
+         else
+            pid=`cat ${HOME}/.mosaicpid`
+
+#  Check that the process exists and is this browser (remove any
+#  directory specification, then ask for ninformation about process,
+#  if this exists check that name has browser name in it).
+            new=1;
+            if kill -0 ${pid} 1>/dev/null 2>/dev/null ; then
+               new=0;
+
+#  Write commands to go to the required file into to the scratch file that
+#  Mosaic uses for remote control.
+               echo 'goto'    >/tmp/Mosaic.${pid}
+               echo "${URL}" >>/tmp/Mosaic.${pid}
+
+#  Create reference file so we know when remote control file has been read.
+#  Also make sure clock has ticked.
+               touch /tmp/Mosaic.${pid}.ref
+               sleep 1
+
+#  Send a signal to the existing Mosaic browser to make it obey the remote
+#  control file. If this fails for any reasone need a new browser instance.
+               kill 1>/dev/null 2>/dev/null -USR1 ${pid} || new=1;
+
+#  Remove the Mosaic temporary file. Problem here is that we don't
+#  want to remove it before Mosaic has read it, so check the last
+#  accessed time against the reference file (which we touched after
+#  creating the remote control file). Try for a while then give up.
+              (cd /tmp
+               for i in 1 5 10 15 25; do
+                   sleep $i
+                   if test \
+     "`ls -ut Mosaic.${pid}* | head -1`" = "Mosaic.${pid}"
+                   then
+                      rm -f Mosaic.${pid} Mosaic.${pid}.ref
+                      exit
+                   fi
+                done
+              ) &
+            fi
+            if test $new -eq 1; then
+
+#  No Mosaic browser running start a new instance.
+               if test "${DISPLAY}" = ""; then
+                  DISPLAY=`${INSTALL}/etc/xdisplay`
+               fi
+               ${HTX_BROWSER} 1>/dev/null 2>/dev/null "${URL}" &
+               echo "Loading PISA document into Mosaic browser"
+            else 
+               echo "Loaded PISA document into existing Mosaic browser"
+            fi
+         fi
+         ;;
+
+        #  If the browser was not recognised, then output an error message.
+      *)
+         echo >&2 \
+"The ${HTX_BROWSER} hypertext browser is not recognised"
+         exit 1
+      esac
+
+#  End of script
+#  $Id$

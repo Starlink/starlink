@@ -1,0 +1,11 @@
+assign file=find spec=find.dat
+read data, infile=find, title "pisafind.dat", variables continuous 1-11,
+      format(f7.0,2f10.3,f10.0,f7.0,f10.0,f8.3,f8.1,3f8.2)
+mask variables 1,2,3,9,10
+standardise all
+calculate similarity matrix, coeff 34
+hierarchy, method wards, cluster min 2 max 4
+select graphics device plotter
+plink
+print results, contin data, classif numbers 
+stop
