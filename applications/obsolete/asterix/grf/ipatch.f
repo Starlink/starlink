@@ -125,6 +125,7 @@
       BYTE MASK1,MASK2
       LOGICAL ALL
       LOGICAL EDGE
+      LOGICAL PATCHED
 *-
       IF (STATUS.EQ.SAI__OK) THEN
 
@@ -132,6 +133,7 @@
         X2=1
         Y1=I_NY
         Y2=1
+        PATCHED=.FALSE.
 
         ALL=.TRUE.
 
@@ -279,6 +281,7 @@
                   X2=MAX(X2,II)
                   Y1=MIN(Y1,J)
                   Y2=MAX(Y2,J)
+                  PATCHED=.TRUE.
                 ELSEIF (NX.GT.0) THEN
                   IF (IMG_INREG(II,J)) THEN
                     D(II,J)=AX*REAL(II)+BX
@@ -291,6 +294,7 @@
                   X2=MAX(X2,II)
                   Y1=MIN(Y1,J)
                   Y2=MAX(Y2,J)
+                  PATCHED=.TRUE.
                 ELSEIF (NY.GT.0) THEN
                   IF (IMG_INREG(II,J)) THEN
                     D(II,J)=AY*REAL(J)+BY
@@ -303,6 +307,7 @@
                   X2=MAX(X2,II)
                   Y1=MIN(Y1,J)
                   Y2=MAX(Y2,J)
+                  PATCHED=.TRUE.
                 ELSE
                   CALL MSG_SETI('I',II)
                   CALL MSG_SETI('J',J)
@@ -310,9 +315,6 @@
      :             '** insufficient good pixels to patch (^I,^J)')
                 ENDIF
 
-                CALL GFX_PIXELQ(I_WKPTR,I_NX,I_NY,X1,X2,Y1,Y2,
-     :                .TRUE.,%VAL(I_XPTR_W),%VAL(I_YPTR_W),0,0,
-     :                           D,I_PMIN,I_PMAX,Q,MASK2,STATUS)
 
               ENDDO
 
@@ -321,6 +323,13 @@
 
           ENDDO
         ENDDO
+
+*  replot
+        IF (PATCHED) THEN
+          CALL GFX_PIXELQ(I_WKPTR,I_NX,I_NY,X1,X2,Y1,Y2,
+     :              .TRUE.,%VAL(I_XPTR_W),%VAL(I_YPTR_W),0,0,
+     :                           D,I_PMIN,I_PMAX,Q,MASK2,STATUS)
+        ENDIF
 
 *  adjust quality mask
         I_MASK_W=BIT_ANDUB(I_MASK_W,BIT_NOTUB(QUAL__PATCHED))
