@@ -5,10 +5,10 @@
 % ? Document identification
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun183.4}
+\newcommand{\stardocsource}    {sun183.5}
 \newcommand{\stardocnumber}    {183.4}
 \newcommand{\stardocauthors}   {D.S. Berry}
-\newcommand{\stardocdate}      {18th September 2001}
+\newcommand{\stardocdate}      {26th October 2001}
 \newcommand{\stardoctitle}     {ARD \\ [1ex]
                                 A Textual Language for Describing \\
                                 Regions within a Data Array}
@@ -1507,7 +1507,10 @@ calling ARD\_WORK. This is the system which was used prior to ARD version
 In addition, the deprecated version 1 statements COEFFS, OFFSET, TWIST,
 STRETCH, SCALE can be used to modify the relationship between the
 coordinate system used within the ARD description and the default
-coordinate system describe above.
+coordinate system describe above. If any of these statements are found,
+then any earlier COFRAME or WCS statements are ignored, and the requested
+operation (stretch, twist, offset, {\em etc}) is applied to the default
+coordinate system described above.
 
 \end{enumerate}
 
@@ -1515,7 +1518,13 @@ An ARD description can contain zero, one or more of the above WCS-related
 statements. The positions, {\em etc}, defining a given region in the
 description are interpreted using the most recent WCS-related statement.
 Thus, WCS information given later in an ARD description over-rides any
-given earlier.
+given earlier. 
+
+If any of the deprecated version 1 statements (COEFFS, OFFSET, TWIST,
+STRETCH, SCALE) are found, then any earlier COFRAME or WCS statements are 
+ignored, and the requested operation (stretch, twist, offset, {\em etc}) is 
+applied to the default coordinate system described above. For this
+reason, you should not normally mix the old and the new statements.
 
 \subsection{Coordinate Handling in ARD Prior to Version 2}
 
