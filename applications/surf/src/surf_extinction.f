@@ -128,7 +128,6 @@
 *     {enter_further_changes_here}
 
 *  Bugs:
-*     Aborted datasets have an incorrect Y-axis scale.
 *     {note_any_bugs_here}
 
 *-
