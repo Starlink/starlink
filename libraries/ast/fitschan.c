@@ -417,6 +417,10 @@ f     - AST_PUTFITS: Store a FITS header card in a FitsChan
 *          projection. It is now represented using the AST-specific TPN
 *          projection (until such time as FITS-WCS paper IV is finished).
 *        - Remove trailing "Z" from DATE-OBS values created by astWrite.
+*      14-NOV-2002 (DSB):
+*        - WcsWithWcs: Corrected to ignore longitude axis returned by
+*        astPrimaryFrame since it does not take into account any axis
+*        permutation.
 *class--
 */
 
@@ -18747,7 +18751,16 @@ static int WcsWithWcs( AstFitsChan *this, AstMapping *map1, AstMapping *map2,
          map3b = astClone( map3 );
       } else {
          astPrimaryFrame( phyfrm, axlon, (AstFrame **) &skyfrm, &skylonaxis );
-         skylataxis = 1 - skylonaxis;
+
+/* Note, the axis index returned in skylonaxis above, is the *un-permuted*
+   logitude axis index within skyfrm (i.e it will always be zero), but
+   skyfrm itself retains any axis permutation which is present within the
+   phyfrm frame. So skylonaxis cannot reliably be used to access the
+   longitude axis within skyfrm. For this reason, ignore skylonaxis, and
+   get the indices of the longitude and latitude axes directly using the 
+   LatAxis and LonAxis attributes of the skyframe. */
+         skylonaxis = astGetLonAxis( skyfrm );
+         skylataxis = astGetLatAxis( skyfrm );
 
 /* The HPR (Helio-projective Radial) system has a co-latitude axis instead 
    of a latitude axis, but is represented within FITS by a "HRLT" axis
