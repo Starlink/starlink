@@ -2969,10 +2969,13 @@ you can escape commas within text strings using this method.
 
 \subsubsection{Groups of Data Files}
 \label{SEC:NDF}
+
 If a group expression is used to specify a list of input data files (NDFs
 or positions lists), then file names may be specified which contain wild
-card characters (``\verb+*+'' and ``?''). These will be expanded into a list
-of explicit file names before returning the group to the application.
+card characters (``\verb+*+'' and ``?'' -- character classes can also be
+matched using strings such as ``[0-9]'', ``[abcd]'', \emph{etc}). These
+will be expanded into a list of explicit file names before returning the
+group to the application.
 
 If a group of output data files are specified by modification of a
 previously supplied group of input data files, the asterisk in the output
@@ -3026,14 +3029,17 @@ are all possible responses:
 \vspace{-3mm}
 
 This means ``Use the NDFs stored in files \verb+b1.sdf+, \verb+b2.sdf+,
-\verb+b3.sdf+ and \verb+b4.sdf+''. If \htmlref{`on-the-fly format 
-conversion'}{se:autoconvert} (see \latexonly{Section~\ref{se:autoconvert} 
-and} \xref{SUN/55}{sun55}{}) is being used, then this example
-would pick up data files with any known data format. So for instance,
-if the current directory contained both \verb+b1.sdf+ and \verb+b1.fit+,
-both would be used. If you want to restrict things to a particular data
-format, then you should include the corresponding file type in the group
-expression. An example such as:
+\verb+b3.sdf+ and \verb+b4.sdf+''. If \htmlref{`on-the-fly format
+conversion'}{se:autoconvert} (see \latexonly{Section~\ref{se:autoconvert}
+and} \xref{SUN/55}{sun55}{}) is being used, then this example would pick
+up data files with the highest priority data format (\emph{i.e.} the
+format nearest to the start of the list of formats supplied in
+environment variable NDF\_FORMATS\_IN). So for instance, if the current
+directory contained both \verb+b1.sdf+ and \verb+b1.fit+, then only one
+file would be used, depending on the relative positions of the ``.sdf''
+and ``.fit'' formats within NDF\_FORMATS\_IN. If you want to restrict
+things explicitly to a particular data format, then you should include
+the corresponding file type in the group expression. An example such as:
 
 \small
 \begin{verbatim}
@@ -3071,6 +3077,32 @@ This means ``Use \verb+hh1_b1s1_ds.sdf+, \verb+hh1_b1s2_ds.sdf+, \emph{etc}''.
 
 \small
 \begin{verbatim}
+   hh1_b[12]s*_ds
+\end{verbatim}
+\normalsize
+\vspace{-3mm}
+
+This means ``Use \verb+hh1_b1s1_ds.sdf+, \verb+hh1_b1s2_ds.sdf+,
+\emph{etc}, and also \verb+hh1_b2s1_ds.sdf+, \verb+hh1_b2s2_ds.sdf+,
+\emph{etc}''. The string ``[12]'' matches either a single character ``1''
+or a single character ``2''. The string ``[0-9]'' would match any single
+digit character. The string ``[a-z]'' would match any single lowercase
+alphabetical character.
+
+\small
+\begin{verbatim}
+   data.fit[12]
+\end{verbatim}
+\normalsize
+\vspace{-3mm}
+
+This means ``Use files \verb+data.fit1+ and \verb+data.fit2+ if they
+exist. If neither of these files exists, use the twelth image extension 
+in the multi-extension FITS file \verb+data.fit+''.
+
+
+\small
+\begin{verbatim}
    ^files.lis
 \end{verbatim}
 \normalsize
@@ -3086,6 +3118,37 @@ This means ``Read the names of data files from the text file
 \vspace{-3mm}
 This means ``Use all accessible data files contained in the directory 
 \verb+../data+''.
+
+\small
+\begin{verbatim}
+   data_{new,old,back}
+\end{verbatim}
+\normalsize
+\vspace{-3mm}
+This means ``Use files \verb+data_new.sdf+, \verb+data_old.sdf+ and
+\verb+data_back.sdf+''.
+
+\small
+\begin{verbatim}
+   {^files}_A
+\end{verbatim}
+\normalsize
+\vspace{-3mm}
+This means ``Read names of data files from text file \verb+files+ and 
+append \verb+_A+ to the end of each one''.
+
+\small
+\begin{verbatim}
+   `grep -l "OBJECT  = 'm57'" *.fit`
+\end{verbatim}
+\normalsize
+\vspace{-3mm}
+
+The string is enclosed in back quotes (\verb+`+) which causes the string
+to be executed as a shell command, and the resulting output to be used as
+the group expression. Thus this example means ``Use all FITS files which
+contain an OBJECT keyword equal to 'm57'''.
+
 
 \item If an application asks for a group of output data files, the following 
 are possible responses:
