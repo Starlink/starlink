@@ -50,6 +50,7 @@ using std::endl;
 
 // Static debug switch
 verbosities InputByteStream::verbosity_ = normal;
+unsigned int InputByteStream::buffer_length_ = 512;
 
 /**
  * Opens the requested file.  If preload is true, then open the file
@@ -67,31 +68,30 @@ InputByteStream::InputByteStream (string& filename, bool preload,
                                   string tryext)
     : eof_(true), preloaded_(preload), seekable_(true)
 {
-    fname_ = filename;
-    fd_ = open (fname_.c_str(), O_RDONLY);
-    if (fd_ < 0 && tryext.length() > 0)
+    //fname_ = filename;
+    cerr << "InputByteStream(" << filename << "," << preload << ","
+	 << tryext << ")" << endl;
+    int newfd = open (filename.c_str(), O_RDONLY);
+    if (newfd < 0 && tryext.length() > 0)
     {
-	fname_ += tryext;
-	fd_ = open (fname_.c_str(), O_RDONLY);
-	if (fd_ >= 0)
+	string tfilename = filename + tryext;
+	newfd = open (tfilename.c_str(), O_RDONLY);
+	if (newfd >= 0)
             // If this succeeds in opening the file, then modify the filename.
-	    filename = fname_;
+	    filename = tfilename;
     }
-    if (fd_ < 0)
+    if (newfd < 0)
     {
 	string errstr = strerror (errno);
 	throw InputByteStreamError ("can\'t open file " + filename
                                     + " to read (" + errstr + ")");
     }
 
-    eof_ = false;
-
     struct stat S;
-    if (fstat (fd_, &S))
+    if (fstat (newfd, &S))
     {
 	string errstr = strerror (errno);
-	throw InputByteStreamError ("Can't stat open file ("
-				    +errstr+")");
+	throw InputByteStreamError ("Can't stat open file (" + errstr + ")");
     }
     filesize_ = S.st_size;
 
@@ -99,34 +99,27 @@ InputByteStream::InputByteStream (string& filename, bool preload,
     {
 	buflen_ = filesize_;
 	buf_ = new Byte[buflen_];
-	size_t bufcontents = read(fd_, buf_, buflen_);
+	size_t bufcontents = read(newfd, buf_, buflen_);
 	if (bufcontents != buflen_)
 	{
 	    string errstr = strerror (errno);
-	    throw InputByteStreamError ("Couldn't preload file "+fname_
+	    throw InputByteStreamError ("Couldn't preload file "+filename
 					+" ("+errstr+")");
 	}
 	eob_ = buf_ + bufcontents;
+	p_ = buf_;
+	eof_ = false;
 
-	close (fd_);
+	close (newfd);
 	fd_ = -1;
 
 	if (verbosity_ > normal)
 	    cerr << "InputByteStream: preloaded " << fname_
 		 << ", " << filesize_ << " bytes" << endl;
+    } else {
+	bindToFileDescriptor(newfd);
     }
-    else
-    {
-	buflen_ = 512;
-	buf_ = new Byte[buflen_];
-	eob_ = buf_;	// nothing read in yet - eob at start
-
-	if (verbosity_ > normal)
-	    cerr << "InputByteStream: name=" << fname_
-		 << " filesize=" << filesize_
-		 << " buflen=" << buflen_ << endl;
-    }
-    p_ = buf_;
+    fname_ = filename;
 }
 
 /**
@@ -139,6 +132,11 @@ InputByteStream::InputByteStream (string& filename, bool preload,
 InputByteStream::InputByteStream(int fileno)
     : eof_(true), preloaded_(false), seekable_(false)
 {
+    bindToFileDescriptor(fileno);
+}
+
+bool InputByteStream::bindToFileDescriptor(int fileno)
+{
     fd_ = fileno;
     char filenamebuf[20]; // just in case fileno is a _large_ number...
     sprintf(filenamebuf, "fd:%d", fileno);
@@ -146,13 +144,28 @@ InputByteStream::InputByteStream(int fileno)
 
     eof_ = false;
 
-    buflen_ = 512;
+    buflen_ = buffer_length_;
     buf_ = new Byte[buflen_];
     p_ = eob_ = buf_;		// nothing read in yet -- eob at start
     if (verbosity_ > normal)
-	cerr << "InputByteStream: reading from STDIN, name=" << fname_
+	cerr << "InputByteStream: reading from fd " << fileno
+	     << ", name=" << fname_
 	     << endl;
+
+    return true;
 }
+
+
+/**
+ * Sets the buffer size to be used for reading files.
+ *
+ * @param length the size, in bytes, of the input buffer
+ */
+void InputByteStream::setBufferSize(unsigned int length)
+{
+    buffer_length_ = length;
+}
+
 
 /**
  * Closes the file and reclaims any buffers.
@@ -161,7 +174,9 @@ InputByteStream::~InputByteStream ()
 {
     if (fd_ >= 0)
 	close (fd_);
-    delete[] buf_;
+    if (buf_ != 0)
+	delete[] buf_;
+    buf_ = 0;
 }
 
 /**
@@ -170,8 +185,10 @@ InputByteStream::~InputByteStream ()
  * stream is at an end.
  *
  * @return the byte read, or zero if we are at the end of the file
+ * @throws DviBug if an internal inconsistency is found
  */
 Byte InputByteStream::getByte(void)
+    throw (DviBug)
 {
     if (eof_)
 	return 0;
@@ -188,10 +205,7 @@ Byte InputByteStream::getByte(void)
 	if (preloaded_)		// end of buffer means end of file
 	    eof_ = true;
 	else
-	{
 	    read_buf_();
-	    p_ = buf_;
-	}
     }
     Byte result = eof_ ? static_cast<Byte>(0) : *p_;
     ++p_;
@@ -199,81 +213,144 @@ Byte InputByteStream::getByte(void)
 }
 
 /**
- * Reads a block of data from anywhere in the file.
+ * Reads a block of data from anywhere in the file.  The stream
+ * pointer is placed at the beginning of this block.
  *
  * @param pos the offset from the beginning of the file from which the
- * block should be read.  If <code>pos</code> is negative, then read the block from
- * an offset <code>-pos</code> from the <em>end</em> of the file.
- * @param length the number of bytes to read
+ * block should be read.  If <code>pos</code> is negative, then read
+ * the block from an offset <code>-pos</code> from the <em>end</em> of
+ * the file.
+ *
+ * @param length the number of bytes to read, which must be no greater
+ * than the buffer size of the file, as obtained from {@link #getBufferSize}
+ *
  * @return a pointer to an array of bytes, or a null pointer if we
  * are at the end of the file
+ *
+ * @throws InputByteStreamError if the stream is not seekable, if
+ * <code>|pos|</code> is larger than the size of the file, or if
+ * <code>length</code> is greater than the buffer size of the file
  */
 const Byte *InputByteStream::getBlock (int pos, unsigned int length)
+    throw (InputByteStreamError)
 {
     if (eof_)
 	return 0;
 
-    Byte *blockp;
+    if (!seekable_)
+ 	throw InputByteStreamError("InputByteStream::getblock: stream "
+				   + fname_ + " is not seekable");
 
+    if (length > buffer_length_) {
+	char errbuf[100];
+	sprintf(errbuf,
+		"InputByteStream::getblock: length %d is greater than the stream buffer size, %d",
+		length, buffer_length_);
+ 	throw InputByteStreamError(errbuf);
+    }
+
+    seek(pos);
+    Byte *blockp;
+    if (preloaded_)
+	blockp = p_;
+    else {
+	read_buf_();
+	blockp = p_;
+    }
+
+    return blockp;
+}
+
+/** 
+ * Skip to a specified place in the file.
+ *
+ * @param pos the offset from the beginning of the file from which the
+ * block should be read.  If <code>pos</code> is negative, then read
+ * the block from an offset <code>-pos</code> from the <em>end</em> of
+ * the file.
+ *
+ * @throws InputByteStreamError if argument <code>|pos|</code> is
+ * larger than the size of the file
+ */
+void InputByteStream::seek (int pos)
+    throw (InputByteStreamError)
+{
     if (!seekable_)
 	throw InputByteStreamError("getblock: stream " + fname_
 				   + " is not seekable");
 
-    if (pos < 0)		// retrieve last `length' bytes from EOF
-    {
-	if (preloaded_)
-	{
-	    blockp = buf_ + buflen_ - length;
-	    if (blockp < buf_)
-		throw DviBug
-		  ("InputByteStream::getBlock:"+fname_+": requested more than bufferful");
-	}
-	else
-	{
-	    if (length > buflen_)
-		throw InputByteStreamError ("getBlock:"+fname_+": length too large");
-	    if (lseek (fd_, filesize_-length, SEEK_SET) < 0)
-	    {
-		string errstr = strerror (errno);
-		throw InputByteStreamError ("getBlock:"+fname_+
-					    ": can\'t seek to EOF ("
-					    +errstr+")");
-	    }
-	    read_buf_();
-	    blockp = buf_;
-	}
-    }
-    else
-    {
-	if (preloaded_)
-	{
-	    blockp = buf_ + pos;
-	    if (blockp < buf_)
-		throw DviBug
-		    ("InputByteStream::getBlock:"+fname_+": pointer before buffer start");
-	    if (blockp > eob_)
-	    {
-		char buf[100];
-		sprintf (buf,
-		      "InputByteStream::getBlock:%s: pointer beyond EOF (%d,%d)",
-			 fname_.c_str(), pos, length);
-		throw DviBug (buf);
-	    }
-	    if (blockp+length > eob_)
-	    {
-		char buf[100];
-		sprintf (buf,
-		"InputByteStream::getBlock:%s: requested block too large (%d,%d)",
-			 fname_.c_str(), pos,length);
-		throw DviBug (buf);
-	    }
-	}
-	else
-	    throw DviBug
-		("InputByteStream::getBlock:"+fname_+": implemented only for preloaded");
+    if (pos > 0) {
+	if (pos > filesize_) 
+	    throw InputByteStreamError
+		    ("InputByteStream::seek:"+fname_+": out of range");
+    } else {
+	if (-pos > filesize_)
+	    throw InputByteStreamError
+		    ("InputByteStream::seek:"+fname_+": out of range");
     }
 
-    return blockp;
+    if (preloaded_) {
+	if (pos > 0) {
+	    p_ = buf_ + pos;
+	} else {
+	    p_ = buf_ + buflen_ + pos;
+	}
+	if (verbosity_ > normal)
+	    cerr << "seek(" << pos << "),preloaded: p_-buf_=" << p_-buf_
+		 << endl;
+    } else {
+	off_t off;
+	
+	if (pos >= 0)
+	    off = pos;
+	else
+	    off = filesize_ + pos;
+	
+	if (lseek (fd_, off, SEEK_SET) < 0) {
+	    string errstr = strerror(errno);
+	    throw DviBug ("InputByteStream::seek:"+fname_+": can\'t seek ("
+			  +errstr+")");
+	}
+	if (verbosity_ > normal)
+	    cerr << "seek(" << pos << "): off=" << off << endl;
+	p_ = eob_;
+    }
+}
+
+/**
+ * Skips a number of bytes forward in the file.  This can be used only
+ * for preloaded files.
+ *
+ * @param skipsize the number of bytes to move forward in the file
+ * @throws InputByteStreamError if the file was not preloaded
+ */
+void InputByteStream::skip (unsigned int skipsize)
+    throw (InputByteStreamError)
+{
+    Byte *tp = p_ + skipsize;
+    if (preloaded_) {
+	if (tp > eob_)
+	    throw InputByteStreamError ("File " + fname_
+					+ ": skip past end of file");
+	p_ = tp;
+    } else {
+	if (tp <= eob_)
+	    p_ = tp;
+	else {
+	    off_t newpos = lseek(fd_, skipsize, SEEK_CUR);
+	    if (newpos < 0) {
+		string errstr = strerror(errno);
+		throw InputByteStreamError
+			("File " + fname_
+			 + ": error seeking (" + errstr + ")");
+	    } else if (newpos > filesize_) {
+		throw InputByteStreamError
+			("File " + fname_
+			 + ": seek past end of file");
+	    }
+	    p_ = eob_;		// prompts re-reading
+	}
+    }
 }
 
 /**
@@ -285,75 +362,33 @@ bool InputByteStream::eof()
     return eof_;
 }
 
-/** 
- * Skip to a specified place in the file.
- *
- * @param pos the offset from the beginning of the file where the file
- * pointer should be placed
- * @throws DviBug if argument <code>pos</code> is beyond the end of
- * the file
- */
-void InputByteStream::seek (unsigned int pos)
-{
-    if (!seekable_)
-	throw InputByteStreamError("getblock: stream " + fname_
-				   + " is not seekable");
-
-    if (preloaded_)
-    {
-	if (pos > buflen_)	// pos unsigned, so can't be negative
-	    throw DviBug ("InputByteStream::seek:"+fname_+": out of range");
-	p_ = buf_ + pos;
-    }
-    else
-    {
-	if (lseek (fd_, pos, SEEK_SET) < 0)
-	{
-	    string errstr = strerror(errno);
-	    throw DviBug ("InputByteStream::seek:"+fname_+": can\'t seek ("
-			  +errstr+")");
-	}
-	read_buf_();
-	p_ = buf_;
-    }
-}
-
 /**
  * Indicates the position within the file.  This information can be
  * reported only for preloaded files.
  *
  * @return the offset from the beginning of the file
- * @throws DviBug if the file was not preloaded
+ * @throws InputByteStreamError if the file was not preloaded
  */
 int InputByteStream::pos ()
+    throw (InputByteStreamError)
 {
     if (!preloaded_)
-	throw DviBug ("InputByteStream:"+fname_+": Can't get pos in non-preloaded file");
+	throw InputByteStreamError
+		("InputByteStream:" + fname_
+		 + ": Can't get pos in non-preloaded file");
     return static_cast<int>(p_ - buf_);
 }
 
-/**
- * Skips a number of bytes forward in the file.  This can be used only
- * for preloaded files.
- *
- * @param skipsize the number of bytes to move forward in the file
- * @throws DviBug if the file was not preloaded
- */
-void InputByteStream::skip (unsigned int skipsize)
-{
-    if (!preloaded_)
-	throw DviBug ("InputByteStream:"+fname_+": Can't skip in non-preloaded file");
-    p_ += skipsize;
-}
-
 void InputByteStream::read_buf_ ()
+    throw (InputByteStreamError)
 {
     ssize_t bufcontents = read(fd_, buf_, buflen_);
     if (bufcontents < 0)
     {
 	string errmsg = strerror(errno);
-	throw DviBug ("InputByteStream::read_buf_:"+fname_+": read error ("
-		      +errmsg+")");
+	throw InputByteStreamError
+		("InputByteStream::read_buf_:"+fname_+": read error ("
+		 +errmsg+")");
     }
     eof_ = (bufcontents == 0);
     eob_ = buf_ + bufcontents;
@@ -362,6 +397,7 @@ void InputByteStream::read_buf_ ()
 	     << bufcontents << '/' << buflen_ << " from fd " << fd_
 	     << "; eof=" << eof_
 	     << endl;
+    p_ = buf_;
 }
 /*
 #if (sizeof(unsigned int) != 4)
@@ -387,12 +423,15 @@ void InputByteStream::read_buf_ ()
  *
  * @param n the number of bytes to read, in the range 1--4 inclusive
  * @return the next integer from the input stream, as a signed int
- * @throws DviBug if parameter <code>n</code> was out of range
+ * @throws InputByteStreamError if parameter <code>n</code> was out of range
+ * @throws DviBug if an internal inconsistency is found
  */
 signed int InputByteStream::getSIS(int n)
+    throw (InputByteStreamError,DviBug)
 {
     if (n<0 || n>4)
-	throw DviBug("InputByteStream:"+fname_+": bad argument to getSIS");
+	throw InputByteStreamError
+		("InputByteStream:"+fname_+": bad argument to getSIS");
     unsigned int t = getByte();
     unsigned int pow2 = 128;	// 2^7-1   is largest one-byte signed int
 				// 2^7=128 is most negative signed int
@@ -440,13 +479,16 @@ signed int InputByteStream::getSIS(int n)
  * @param n the number of bytes to read, in the range 1--3 inclusive
  * (there are no 4-byte unsigned quantities in DVI files)
  * @return the next integer from the input stream, as a signed int
- * @throws DviBug if parameter <code>n</code> was out of range
+ * @throws InputByteStreamError if parameter <code>n</code> was out of range
+ * @throws DviBug if an internal inconsistency is found
  */
 signed int InputByteStream::getSIU(int n)
+    throw (InputByteStreamError,DviBug)
 {
     // disallow n==4 - there are no unsigned 4-byte quantities in the DVI file
     if (n<0 || n>3)
-	throw DviBug("InputByteStream:"+fname_+": bad argument to getSIU");
+	throw InputByteStreamError
+		("InputByteStream:"+fname_+": bad argument to getSIU");
     unsigned int t = 0;
     for (; n>0; n--)
     {
@@ -462,12 +504,15 @@ signed int InputByteStream::getSIU(int n)
  *
  * @param n the number of bytes to read, in the range 1--4 inclusive
  * @return the next integer from the input stream, as an unsigned int
- * @throws DviBug if parameter <code>n</code> was out of range
+ * @throws InputByteStreamError if parameter <code>n</code> was out of range
+ * @throws DviBug if an internal inconsistency is found
  */
 unsigned int InputByteStream::getUIU(int n)
+    throw (InputByteStreamError,DviBug)
 {
     if (n<0 || n>4)
-	throw DviBug("InputByteStream:"+fname_+": bad argument to getUIU");
+	throw InputByteStreamError
+		("InputByteStream:"+fname_+": bad argument to getUIU");
     unsigned int t = 0;
     for (; n>0; n--)
     {
@@ -486,12 +531,15 @@ unsigned int InputByteStream::getUIU(int n)
  * @param n the number of bytes to read, in the range 1--4 inclusive
  * @param p a pointer to an array of <code>Byte</code> values
  * @return the integer at the beginning of the given array, as an unsigned int
- * @throws DviBug if parameter <code>n</code> was out of range
+ * @throws InputByteStreamError if parameter <code>n</code> was out of range
+ * @throws DviBug if an internal inconsistency is found
  */
 unsigned int InputByteStream::getUIU(int n, const Byte *p)
+    throw (InputByteStreamError,DviBug)
 {
     if (n<0 || n>4)
-	throw DviBug("InputByteStream: bad argument to getUIU(int,Byte*)");
+	throw InputByteStreamError
+		("InputByteStream: bad argument to getUIU(int,Byte*)");
     unsigned int t = 0;
     for (const Byte *b=p; n>0; n--, b++)
 	t = t*256 + static_cast<unsigned int>(*b);

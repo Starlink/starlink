@@ -42,29 +42,48 @@ class InputByteStreamError : public DviError {
  * Abstracts a file as a stream of bytes.
  */
 class InputByteStream {
+ protected:			/* readable by subclasses only */
+    InputByteStream();
+    bool bindToFileDescriptor(int fd);
  public:
     InputByteStream (string& s, bool preload=false, string tryext="");
     InputByteStream(int fileno);
     ~InputByteStream();
     bool eof();
-    Byte getByte(void);
-    signed int getSIU(int);
-    signed int getSIS(int);
-    unsigned int getUIU(int);
+    Byte getByte(void)
+	    throw (DviBug);
+    signed int getSIU(int)
+	    throw (InputByteStreamError,DviBug);
+    signed int getSIS(int)
+	    throw (InputByteStreamError,DviBug);
+    unsigned int getUIU(int)
+	    throw (InputByteStreamError,DviBug);
     // static getUIU reads from an array, rather than the file (ie,
     // it's really nothing to do with InputByteStream, but it's here
     // for consistency.
-    static unsigned int getUIU(int, const Byte *);
+    static unsigned int getUIU(int, const Byte *)
+	    throw (InputByteStreamError,DviBug);
     // retrieve a block from the file.  pos<0 means from end of file.
-    const Byte *getBlock (int pos, unsigned int length);
-    void seek (unsigned int);
-    int pos ();
-    void skip (unsigned int);
+    const Byte *getBlock (int pos, unsigned int length)
+	    throw (InputByteStreamError);
+    void seek (int)
+	    throw (InputByteStreamError);
+    int pos ()
+	    throw (InputByteStreamError);
+    void skip (unsigned int)
+	    throw (InputByteStreamError);
     /**
      * Sets the verbosity of this module.
      * @param level the required verbosity
      */
     static void verbosity (const verbosities level) { verbosity_ = level; }
+    static void setBufferSize(unsigned int length);
+    /**
+     * Returns the size of the input buffer.  This is either the default 
+     * value, or the size set by {@link #setBufferSize}.
+     * @return the length of the input buffer in bytes
+     */
+    static unsigned int getBufferSize() { return buffer_length_; }
  private:
     int fd_;
     string fname_;
@@ -76,8 +95,10 @@ class InputByteStream {
     bool eof_;
     const bool preloaded_;
     const bool seekable_;
-    void read_buf_(void);
+    void read_buf_(void)
+	    throw (InputByteStreamError);
 
     static verbosities verbosity_;
+    static unsigned int buffer_length_;
 };
 #endif // #ifndef INPUT_BYTE_STREAM_HEADER_READ
