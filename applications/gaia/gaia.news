@@ -7,6 +7,11 @@
   creation (for instance the NDF chooser). This behaviour has now
   been fixed.
 
+  FITS astrometries stored in NDFs could result in a report to
+  the terminal about missing FITS keywords followed by a failure to
+  load the image (with a dialog message about "missing data
+  component"), this problem is now fixed.
+
   To try out GAIA for yourself type the following command:
 
       %  gaia [image_file]
@@ -19,4 +24,4 @@
 
   Peter W. Draper (p.w.draper@durham.ac.uk) and
 
-  20th February 2002.
+  2nd May 2002.
