@@ -199,6 +199,7 @@
 *    Status :
       INTEGER STATUS
 *    Function declarations :
+      INTEGER CHR_LEN
 *    Local constants :
 *    Local variables :
       CHARACTER*80 REC
@@ -208,12 +209,15 @@
       REAL COLTAB(3,16)
       INTEGER IFD
       INTEGER I
+      INTEGER L
 *-
 
       IF (STATUS.EQ.SAI__OK) THEN
 
         IF (TAB.GE.1.AND.TAB.LE.6) THEN
-          FILE='AST_ROOT/data/grafix/'//TABS(TAB)
+          CALL PSX_GETENV('AST_ROOT',FILE,STATUS)
+          L=CHR_LEN(FILE)
+          FILE=FILE(:L)//'/data/grafix/'//TABS(TAB)
         ELSE
           CALL USI_GET0C('FILE',FILE,STATUS)
         ENDIF
