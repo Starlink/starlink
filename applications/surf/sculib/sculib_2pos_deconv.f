@@ -2,7 +2,7 @@
       SUBROUTINE SCULIB_2POS_DECONV (N_EXPOSURES, N_INTEGRATIONS,
      :  N_MEASUREMENTS, DEMOD_POINTER, N_BOL, N_POS, IN_DATA,
      :  IN_VARIANCE, IN_QUALITY, SAMPLE_DX, BEAM_SEP, 
-     :  OUT_DATA, OUT_VARIANCE, OUT_QUALITY, STATUS)
+     :  OUT_DATA, OUT_VARIANCE, OUT_QUALITY, BADBIT, STATUS)
 *    Description :
 *     This routine deconvolves the chopped beam response from the
 *     individual scans of a SCUBA raster map. 
@@ -41,7 +41,7 @@
 *           the measured data
 *     IN_VARIANCE (N_BOL, N_POS)  = REAL (Given)
 *           the variance on IN_DATA
-*     IN_QUALITY (N_BOL, N_POS)   = INTEGER (Given)
+*     IN_QUALITY (N_BOL, N_POS)   = BYTE (Given)
 *           the quality on IN_DATA
 *     SAMPLE_DX                   = REAL (Given)
 *           the measurement spacing along the scan (arcseconds)
@@ -51,8 +51,10 @@
 *           the deconvolved data
 *     OUT_VARIANCE (N_BOL, N_POS) = REAL (Returned)
 *           the variance on OUT_DATA
-*     OUT_QUALITY (N_BOL, N_POS)  = INTEGER (Returned)
+*     OUT_QUALITY (N_BOL, N_POS)  = BYTE (Returned)
 *           the quality on OUT_DATA
+*     BADBIT                      = BYTE (Given)
+*           bad bit mask
 *     STATUS                      = INTEGER (Given and returned)
 *           global status
 *    Method :
@@ -79,23 +81,24 @@
       INTEGER N_POS
       REAL    IN_DATA (N_BOL, N_POS)
       REAL    IN_VARIANCE (N_BOL, N_POS)
-      INTEGER IN_QUALITY (N_BOL, N_POS)
+      BYTE    IN_QUALITY (N_BOL, N_POS)
       REAL    SAMPLE_DX
       REAL    BEAM_SEP
+      BYTE    BADBIT
 *    Import-Export :
 *    Export :
       REAL    OUT_DATA (N_BOL, N_POS)
       REAL    OUT_VARIANCE (N_BOL, N_POS)
-      INTEGER OUT_QUALITY (N_BOL, N_POS)
+      BYTE    OUT_QUALITY (N_BOL, N_POS)
 *    Status :
       INTEGER STATUS
 *    External references :
 *    Global variables :
 *    Local Constants :
       INTEGER MAX_CONV                         ! the maximum size of the
-      PARAMETER (MAX_CONV = 4001)              ! convolution functions
+      PARAMETER (MAX_CONV = 12001)              ! convolution functions
       INTEGER MAX_SCAN                         ! the maximum length of a scan
-      PARAMETER (MAX_SCAN = 2000)
+      PARAMETER (MAX_SCAN = 6000)
 *    Local variables :
       REAL    AS_CONV_FUNCTION (MAX_CONV)      ! the `asymmetric' convolution
                                                ! function
@@ -113,10 +116,10 @@
       INTEGER SCAN_START                       ! index of start of scan in
                                                ! demodulated data array
       REAL    SCRATCH1_DATA (MAX_SCAN)         ! scratch data
-      INTEGER SCRATCH1_QUALITY (MAX_SCAN)      ! scratch variance
+      BYTE    SCRATCH1_QUALITY (MAX_SCAN)      ! scratch variance
       REAL    SCRATCH1_VARIANCE (MAX_SCAN)     ! scratch quality
       REAL    SCRATCH2_DATA (MAX_SCAN)         ! scratch data
-      INTEGER SCRATCH2_QUALITY (MAX_SCAN)      ! scratch variance
+      BYTE    SCRATCH2_QUALITY (MAX_SCAN)      ! scratch variance
       REAL    SCRATCH2_VARIANCE (MAX_SCAN)     ! scratch quality
       REAL    SY_CONV_FUNCTION (MAX_CONV)      ! the `symmetric' convolution
                                                ! function
@@ -131,6 +134,12 @@
       DO MEASUREMENT = 1, N_MEASUREMENTS
          DO INTEGRATION = 1, N_INTEGRATIONS
             DO EXPOSURE = 1, N_EXPOSURES
+               
+               CALL MSG_SETI('NI', INTEGRATION)
+               CALL MSG_SETI('NE', EXPOSURE)
+
+               CALL MSG_OUT(' ','2POS_DECONV: Processing exposure ^NE'//
+     :              ' of integration ^NI', STATUS)
 
                CALL SCULIB_FIND_SWITCH (DEMOD_POINTER, 1,
      :           N_EXPOSURES, N_INTEGRATIONS, N_MEASUREMENTS, N_POS,
@@ -138,12 +147,12 @@
      :           SCAN_END, STATUS)
 
                IF ((SCAN_START .EQ. VAL__BADI) .OR.
-     :             (SCAN_START .EQ. 0))        THEN
+     :             (SCAN_START .EQ. 0) ) THEN
                   CALL MSG_SETI ('E', EXPOSURE)
                   CALL MSG_SETI ('I', INTEGRATION)
                   CALL MSG_SETI ('M', MEASUREMENT)
-                  CALL MSG_OUT (' ', 'SCULIB: no data for exp ^E '//
-     :              'in int ^I, meas ^M', STATUS)
+                  CALL MSG_OUT (' ', 'SCULIB_2POS_DECONV : no data '//
+     :                 'for exp ^E in int ^I, meas ^M', STATUS)
                ELSE
 
 *  OK, there is some data for the scan
@@ -207,13 +216,13 @@
      :                 SCRATCH1_VARIANCE, SCRATCH1_QUALITY, 
      :                 SY_CONV_FUNCTION, N_SCAN, N_CONV, N_SCAN, NORM,
      :                 SCRATCH2_DATA, SCRATCH2_VARIANCE, 
-     :                 SCRATCH2_QUALITY, STATUS)
+     :                 SCRATCH2_QUALITY, BADBIT, STATUS)
 
                      CALL SCULIB_CONVOLVE (SCRATCH2_DATA,
      :                 SCRATCH2_VARIANCE, SCRATCH2_QUALITY, 
      :                 AS_CONV_FUNCTION, N_SCAN, N_CONV, N_SCAN, NORM,
      :                 SCRATCH1_DATA, SCRATCH1_VARIANCE, 
-     :                 SCRATCH1_QUALITY, STATUS)
+     :                 SCRATCH1_QUALITY, BADBIT, STATUS)
 
 *  copy the convolved data from the output scratch array to the appropriate
 *  position in the output array
