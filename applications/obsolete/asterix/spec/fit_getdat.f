@@ -748,8 +748,8 @@ D	    print *,'ldim,udim :',ldim,udim
 	    ENDIF
 
 *      Find remaining components of PREDDAT(NDS)
-	  CALL FIT_TPREDSET( OBDAT(NDS).D_ID, NDS, WORKSPACE,
-     :                       OBDAT(NDS), PREDDAT(NDS), STATUS )
+	  CALL FIT_PREDSET( OBDAT(NDS).D_ID, NDS, WORKSPACE,
+     :                      OBDAT(NDS), PREDDAT(NDS), STATUS )
 
 	END DO
 

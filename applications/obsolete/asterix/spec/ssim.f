@@ -182,7 +182,7 @@
 
 *  Set up PREDDAT (no workspace required)
       PREDDAT.CONVOLVE = .TRUE.
-      CALL FIT_TPREDSET( IFID, 1, .FALSE., OBDAT, PREDDAT, STATUS )
+      CALL FIT_PREDSET( IFID, 1, .FALSE., OBDAT, PREDDAT, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *  Apply redshift to model space energy bounds
