@@ -1,0 +1,77 @@
+#!/bin/csh
+
+# Purpose:
+#   Echo an NDF section specification, with corners at given current 
+#   Frame positions.
+#
+#   The positions (a1,b1) and (a2,b2) are transformed into pixel indices
+#   within the supplied NDF, and an NDF section specification is printed 
+#   to standard output which has bounds at these two pixel positions.
+
+# Usage:
+#   s2p ndf a1 a2 b1 b2
+
+# Parameters:
+#   ndf
+#      The name of the ndf.
+#   a1 
+#      A value for the first axis within the curent Frame of the supplied NDF.
+#   a1 
+#      Another value for the first axis within the curent Frame of the 
+#      supplied NDF.
+#   b2
+#      A value for the second axis within the curent Frame of the supplied NDF.
+#   b2
+#      Another value for the second axis within the curent Frame of the 
+#      supplied NDF.
+
+# Examples:
+#   contour ndf=`s2p $KAPPA_DIR/iras 0:46:18.7 0:43:25.6 41:00:06 41:43:33`
+#      Produces a contour map of $KAPPA_DIR/iras.sdf from ra=0:46:18.7, 
+#      dec=41:00:06 to ra=0:43:25.6 dec=41:43:33.
+
+
+
+
+set ndf = $argv[1]
+set a1 = $argv[2]
+set a2 = $argv[3]
+set b1 = $argv[4]
+set b2 = $argv[5]
+
+# Transform the first position from current frame to pixel coordinates, 
+# suppressing output to the screen.
+$KAPPA_DIR/wcstran $ndf "'$a1 $b1'" FRAMEIN=\! FRAMEOUT=PIXEL QUIET
+
+# Get the output pixel coords from the above invocation of wcstran. A
+# pair of floating-point values separated by a space is stored in $words.
+set words = `$KAPPA_DIR/parget posout wcstran`
+
+# Convert the floating-point pixel coordsinates to integer pixel indices.
+set x1 = `$KAPPA_DIR/calc "nint($words[1]+0.5)"`
+set y1 = `$KAPPA_DIR/calc "nint($words[2]+0.5)"`
+
+# Do the same for the second point.
+$KAPPA_DIR/wcstran $ndf "'$a2 $b2'" FRAMEIN=\! FRAMEOUT=PIXEL QUIET
+set words = `$KAPPA_DIR/parget posout wcstran`
+set x2 = `$KAPPA_DIR/calc "nint($words[1]+0.5)"`
+set y2 = `$KAPPA_DIR/calc "nint($words[2]+0.5)"`
+
+# Swap the x values if $x1 is greater than $x2 (in case the positions were 
+# supplied in the wrong order on the command line).
+if( $x1 > $x2 ) then
+   set t = $x1
+   set x1 = $x2
+   set x2 = $t
+endif
+
+# Do the same with the y values.
+if( $y1 > $y2 ) then
+   set t = $y1
+   set y1 = $y2
+   set y2 = $t
+endif
+
+# Write out the full ndf specification to the screen.
+echo $ndf\($x1\:$x2,$y1\:$y2\)
+
