@@ -14,7 +14,7 @@
   - DRIZZLE has been substantially speeded up and some bugs removed.
 
   - The percentile location algorithm in FINDOBJ has been improved to 
-    deal better with images containing a few rougue pixels with far 
+    deal better with images containing a few rogue pixels with far 
     outlying values.
     
   - The IMPORT task has been improved so that it can use hierarchical
