@@ -15,6 +15,9 @@
 #undef HAVE_ASSERT_H
 #undef HAVE_SSTREAM
 
+/* Define as 1 if you want to enable generation of PNGs */
+#define ENABLE_PNG 0
+
 /* Define as 1 if you want to enable generation of GIFs */
 #define ENABLE_GIF 0
 

@@ -3,7 +3,7 @@
  * See file LICENCE for conditions.
  */
 
-static char *RCSID="$Id$";
+// $Id$
 
 #ifndef PNGBITMAP_HEADER_READ
 #define PNGBITMAP_HEADER_READ 1
@@ -28,8 +28,8 @@ class PNGBitmap : public BitmapImage {
     string fileExtension () const { return "png"; }
 
  private:
-    png_structp png_ptr_ = 0;
-    png_infoo info_ptr_ = 0;
+    static png_structp png_ptr_;
+    static png_infop info_ptr_;
 };
 
 

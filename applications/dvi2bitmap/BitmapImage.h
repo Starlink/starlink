@@ -2,6 +2,7 @@
  * Copyright 1999, Particle Physics and Astronomy Research Council.
  * See file LICENCE for conditions.
  */
+
 // $Id$
 
 #ifndef BITMAPIMAGE_HEADER_READ
@@ -28,6 +29,7 @@ class BitmapImage {
 
  protected:
     int w_, h_;
+    const int bpp_;
     const Byte *bitmap_;
     Byte *allocBitmap_;
     bool myBitmap_;

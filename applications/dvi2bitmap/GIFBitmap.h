@@ -38,7 +38,7 @@ class GIFBitmap : public BitmapImage {
     //const Byte *bitmap_;
     //Byte *allocBitmap_;
     //const int w_, h_;
-    const int bpp_;
+    //const int bpp_;
     //int bitmapRows_;
     //bool transparent_;
     //bool myBitmap_;

@@ -844,8 +844,9 @@ void DviFile::check_duplicate_font (int ksize)
     else
 	number = getSIU(ksize);
 
-    unsigned int unused_int4 = getUIU(4); // c
-    unsigned int s = getUIU(4);	// s
+    // Read `c' into s, and discard it by immediately reading `s'.
+    unsigned int s = getUIU(4); // c
+    s = getUIU(4);		// s
     unsigned int d = getUIU(4);	// d
     int namelen = getSIU(1);	// a
     namelen += getSIU(1);	// l

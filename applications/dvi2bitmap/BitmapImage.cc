@@ -12,6 +12,9 @@
 
 #include <string>
 #include "BitmapImage.h"
+#if ENABLE_PNG
+#include "PNGBitmap.h"
+#endif
 #if ENABLE_GIF
 #include "GIFBitmap.h"
 #endif
@@ -21,6 +24,11 @@ BitmapImage *BitmapImage::newBitmapImage
 	(const string format, const int w, const int h, const int bpp)
 {
     // format may be zero length: pick default
+#if ENABLE_PNG
+    if (format == "png")
+	return new PNGBitmap (w, h, bpp);
+    else
+#endif
 #if ENABLE_GIF
     if (format == "gif")
 	return new GIFBitmap (w, h, bpp);

@@ -7,10 +7,12 @@ DEFS=@DEFS@
 LIBS=-lm @LIBS@
 GIF_OBJ=@GIFOBJ@
 KPATHSEA_OBJ=@KPATHSEAOBJ@
+PNG_OBJ=@PNGOBJ@
 
 EXEC=dvi2bitmap
 OBJS=dvi2bitmap.o DviFile.o InputByteStream.o PkFont.o Bitmap.o \
-	BitmapImage.o XBMBitmap.o PageRange.o $(GIF_OBJ) $(KPATHSEA_OBJ)
+	BitmapImage.o XBMBitmap.o PageRange.o \
+	$(GIF_OBJ) $(KPATHSEA_OBJ) $(PNG_OBJ)
 
 # Add a suffix rule for stupid makes (hello, Tru64...)
 .SUFFIXES: .o .cc
@@ -31,9 +33,12 @@ dvi2bitmap.o: dvi2bitmap.cc dvi2bitmap.h DviFile.h PkFont.h Bitmap.h \
 PkFont.o: PkFont.cc PkFont.h InputByteStream.h dvi2bitmap.h kpathsea.h \
 		verbosity.h config.h
 
-BitmapImage.o: BitmapImage.cc BitmapImage.h GIFBitmap.h XBMBitmap.h config.h
+BitmapImage.o: BitmapImage.cc BitmapImage.h \
+	PNGBitmap.h GIFBitmap.h XBMBitmap.h config.h
 
 Bitmap.o: Bitmap.cc Bitmap.h dvi2bitmap.h BitmapImage.h verbosity.h config.h
+
+PNGBitmap.o: PNGBitmap.cc PNGBitmap.h Bitmap.h config.h
 
 GIFBitmap.o: GIFBitmap.cc GIFBitmap.h Bitmap.h config.h
 
