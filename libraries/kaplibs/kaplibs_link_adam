@@ -1,4 +1,5 @@
-echo -lira -lctg `chr_link_adam` `err_link_adam` `hds_link_adam` \
+echo -laif -lira -lctg -llpg -lfts -lpkg \
+           `chr_link_adam` `err_link_adam` `hds_link_adam` \
            `ndf_link_adam` `grp_link_adam` `psx_link_adam` \
            `par_link_adam` `sla_link_adam` `cat_link_adam` \
            `ndg_link_adam` | \

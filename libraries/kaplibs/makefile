@@ -458,7 +458,7 @@ IRA_PRIVATE_INCLUDES = ira_com
 CTG_PRIVATE_INCLUDES = ctg_const 
 LPG_PRIVATE_INCLUDES = lpg_com lpg_const
 FTS_PRIVATE_INCLUDES = fts_par
-KPG_PRIVATE_INCLUDES = kpg_ast kpg_par hlpcmd
+KPG_PRIVATE_INCLUDES = kpg_ast kpg_par hlpcmd ctm_par ctm_com
 PRIVATE_INCLUDES = $(IRA_PRIVATE_INCLUDES) $(CTG_PRIVATE_INCLUDES) \
                    $(LPG_PRIVATE_INCLUDES) $(FTS_PRIVATE_INCLUDES) \
                    $(KPG_PRIVATE_INCLUDES) 
@@ -469,9 +469,14 @@ PRIVATE_INCLUDES = $(IRA_PRIVATE_INCLUDES) $(CTG_PRIVATE_INCLUDES) \
 #  reference the files within the source code, not the actual names of
 #  the files.
 
-EXTERNAL_INCLUDES = SAE_PAR DAT_PAR DAT_ERR PAR_ERR PRM_PAR GRP_PAR GRP_ERR \
-                    CAT_PAR PSX_ERR SUBPAR_PAR NDF_PAR NUM_DEF_CVT \
-                    NUM_DEC_CVT MSG_PAR AST_PAR FIO_ERR
+EXTERNAL_INCLUDES = SAE_PAR DAT_PAR DAT_ERR PAR_PAR PAR_ERR PRM_PAR \
+                    GRP_PAR GRP_ERR CAT_PAR CAT_ERR PSX_ERR SUBPAR_PAR NDF_PAR \
+                    NUM_CMN NUM_DEC NUM_DEC_CVT NUM_DEC_B NUM_DEC_D \
+                    NUM_DEC_I NUM_DEC_R NUM_DEC_UB NUM_DEC_UW NUM_DEC_W \
+                    NUM_DEF NUM_DEF_CVT NUM_DEF_B NUM_DEF_D NUM_DEF_I \
+                    NUM_DEF_R NUM_DEF_UB NUM_DEF_UW NUM_DEF_W MSG_PAR \
+                    AST_PAR AST_ERR FIO_ERR CHR_ERR AGI_PAR IDI_ERR \
+                    GNS_PAR GKS_PAR NDG_ERR
 
 #  List of Fortran routines required for building the package.  This is
 #  just a list of all the Fortran source files (excluding BLOCK DATA
@@ -706,35 +711,63 @@ IRA_INCLUDE_LINKS = IRA_ERR IRA_PAR IRA_COM
 CTG_INCLUDE_LINKS = CTG_ERR CTG_CONST
 LPG_INCLUDE_LINKS = LPG_CONST LPG_COM
 FTS_INCLUDE_LINKS = FTS_PAR
-KPG_INCLUDE_LINKS = KPG_PAR KPG_AST HLPCMD
+KPG_INCLUDE_LINKS = KPG_PAR KPG_AST HLPCMD CTM_PAR CTM_COM
 INCLUDE_LINKS = $(EXTERNAL_INCLUDES) $(IRA_INCLUDE_LINKS) $(CTG_INCLUDE_LINKS) \
                 $(LPG_INCLUDE_LINKS) $(FTS_INCLUDE_LINKS) $(KPG_INCLUDE_LINKS) 
 
 #  Rules to set up links to locate each of the above include files.
 
-IRA_ERR:   ira_err;               $(LINK) $? $@
-IRA_COM:   ira_com;               $(LINK) $? $@
-IRA_PAR:   ira_par;               $(LINK) $? $@
+IRA_ERR:     ira_err;             $(LINK) $? $@
+IRA_COM:     ira_com;             $(LINK) $? $@
+IRA_PAR:     ira_par;             $(LINK) $? $@
 CTG_CONST:   ctg_const;           $(LINK) $? $@
 CTG_ERR:     ctg_err;             $(LINK) $? $@
 LPG_CONST:   lpg_const;           $(LINK) $? $@
 LPG_COM:     lpg_com;             $(LINK) $? $@
 FTS_PAR:     fts_par;             $(LINK) $? $@
 KPG_PAR:     kpg_par;             $(LINK) $? $@
+CTM_PAR:     ctm_par;             $(LINK) $? $@
+CTM_COM:     ctm_com;             $(LINK) $? $@
 HLPCMD:      hlpcmd;              $(LINK) $? $@
 KPG_AST:     kpg_ast;             $(LINK) $? $@
 
+GKS_PAR:   $(STAR_INC)/gks_par;   $(LINK) $? $@
+GNS_PAR:   $(STAR_INC)/gns_par;   $(LINK) $? $@
+IDI_ERR:   $(STAR_INC)/idi_err;   $(LINK) $? $@
+AGI_PAR:   $(STAR_INC)/agi_par;   $(LINK) $? $@
 AST_PAR:   $(STAR_INC)/ast_par;   $(LINK) $? $@
+AST_ERR:   $(STAR_INC)/ast_err;   $(LINK) $? $@
 CAT_PAR:   $(STAR_INC)/cat_par;   $(LINK) $? $@
+CAT_ERR:   $(STAR_INC)/cat_err;   $(LINK) $? $@
+NDG_ERR:   $(STAR_INC)/ndg_err;   $(LINK) $? $@
 DAT_PAR:   $(STAR_INC)/dat_par;   $(LINK) $? $@
 DAT_ERR:   $(STAR_INC)/dat_err;   $(LINK) $? $@
+CHR_ERR:   $(STAR_INC)/chr_err;   $(LINK) $? $@
 FIO_ERR:   $(STAR_INC)/fio_err;   $(LINK) $? $@
 GRP_ERR:   $(STAR_INC)/grp_err;   $(LINK) $? $@
 GRP_PAR:   $(STAR_INC)/grp_par;   $(LINK) $? $@
 MSG_PAR:   $(STAR_INC)/msg_par;   $(LINK) $? $@
 NDF_PAR:   $(STAR_INC)/ndf_par;   $(LINK) $? $@
+NUM_CMN:     $(STAR_INC)/num_cmn;     $(LINK) $? $@
+NUM_DEC:     $(STAR_INC)/num_dec;     $(LINK) $? $@
+NUM_DEC_B:   $(STAR_INC)/num_dec_B;   $(LINK) $? $@
 NUM_DEC_CVT: $(STAR_INC)/num_dec_cvt; $(LINK) $? $@
+NUM_DEC_D:   $(STAR_INC)/num_dec_D;   $(LINK) $? $@
+NUM_DEC_I:   $(STAR_INC)/num_dec_I;   $(LINK) $? $@
+NUM_DEC_R:   $(STAR_INC)/num_dec_R;   $(LINK) $? $@
+NUM_DEC_UB:  $(STAR_INC)/num_dec_UB;  $(LINK) $? $@
+NUM_DEC_UW:  $(STAR_INC)/num_dec_UW;  $(LINK) $? $@
+NUM_DEC_W:   $(STAR_INC)/num_dec_W;   $(LINK) $? $@
+NUM_DEF:     $(STAR_INC)/num_def;     $(LINK) $? $@
+NUM_DEF_B:   $(STAR_INC)/num_def_B;   $(LINK) $? $@
 NUM_DEF_CVT: $(STAR_INC)/num_def_cvt; $(LINK) $? $@
+NUM_DEF_D:   $(STAR_INC)/num_def_D;   $(LINK) $? $@
+NUM_DEF_I:   $(STAR_INC)/num_def_I;   $(LINK) $? $@
+NUM_DEF_R:   $(STAR_INC)/num_def_R;   $(LINK) $? $@
+NUM_DEF_UB:  $(STAR_INC)/num_def_UB;  $(LINK) $? $@
+NUM_DEF_UW:  $(STAR_INC)/num_def_UW;  $(LINK) $? $@
+NUM_DEF_W:   $(STAR_INC)/num_def_W;   $(LINK) $? $@
+PAR_PAR:   $(STAR_INC)/par_par;   $(LINK) $? $@
 PAR_ERR:   $(STAR_INC)/par_err;   $(LINK) $? $@
 PRM_PAR:   $(STAR_INC)/prm_par;   $(LINK) $? $@
 PSX_ERR:   $(STAR_INC)/psx_err;   $(LINK) $? $@
