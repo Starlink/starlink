@@ -4624,6 +4624,9 @@ sub handle_install ()
       $make_cmd = '';
     }
 
+  my $possibly_suppressed_install
+    = ($starlink_seen_features{suppress_build} || 0);
+
     
 
   $output_rules .= &file_contents
@@ -4638,7 +4641,8 @@ sub handle_install ()
      am__installdirs => variable_value ('am__installdirs') || '',
      INSTALLMANIFEST => $manifestdir,
      STANDARDMANIFEST => !$special_manifest,
-     MANIFESTMAKEINSTALL => $make_cmd
+     MANIFESTMAKEINSTALL => $make_cmd,
+     POSS_SUPPRESS_INSTALL => $possibly_suppressed_install
     );
 }
 
@@ -4670,44 +4674,20 @@ sub handle_all ($)
     }
 
     # If the STAR_SUPPRESS_BUILD_IF macro was present in configure.ac,
-    # then add a dependency on the phony target
-    # STAR_SUPPRESS_BUILD.test for each of the targets which all-am
-    # depends on.  Simpler would be to unshift 'STAR_SUPPRESS_BUILD.test'
-    # to the front of @all, but as noted above, this is not robust if
-    # make can run parallel jobs (the Single-Unix spec demands that
-    # dependencies be satisfied `in the order in which they appear in
-    # the rule', so this test will be done first when updating all-am;
-    # as noted above, however, other makes -- in particular makes
-    # which support parallel building -- give no such guarantee).
+    # then add another step of indirection to the all-am target.
+    # That macro will substitute ALL_TARGET to be one of
+    # all-am-normal, which is the usual all-am target, or
+    # all-am-suppress, which does nothing except write a useful (we
+    # hope) message.
     if ($starlink_seen_features{suppress_build})
       {
-        depend ('.PHONY', 'STAR_SUPPRESS_BUILD.test');
-
-        my @all_am_deps;
-        foreach my $alldep (@all)
-          {
-            if ($alldep =~ m{\$\((.*)\)})
-              {
-                my $var = var ($1);
-                push (@all_am_deps, $var->value_as_list_recursive)
-                  if ($var);    # just ignore undefined variables
-              }
-            else
-              {
-                push (@all_am_deps, $alldep);
-              }
-          }
-        define_pretty_variable ('ALL_AM_DEPENDENCIES', TRUE, INTERNAL,
-                                @all_am_deps);
-        pretty_print_rule ('$(ALL_AM_DEPENDENCIES):', "\t",
-                           'STAR_SUPPRESS_BUILD.test');
-        # The rule "all-am: @all" would work here, and is arguably
-        # clearer by itself, but it's clearer overall, when debugging
-        # the Makefile.in, if we use this variable in both places.
-        pretty_print_rule ("all-am:", "\t\t", '$(ALL_AM_DEPENDENCIES)');
+        &pretty_print_rule ('all-am:', "\t", '$(ALL_TARGET)');
+        &pretty_print_rule ('all-am-normal:', "\t\t", @all);
+        &depend ('.PHONY', 'all-am-normal', 'all-am-suppress');
       }
     else
       {
+        # the normal case
         &pretty_print_rule ("all-am:", "\t\t", @all);
       }
     &depend ('.PHONY', 'all-am', 'all');
@@ -5136,7 +5116,7 @@ sub handle_starlink
                                      XMLDOCS => $havexml,
                                      COMPIFL => $want_compifl,
                                      VERSIONDAT => $want_version_dat,
-                                     SUPPRESS_BUILD_TEST => $suppress_build,
+                                     ALL_AM_SUPPRESS => $suppress_build,
                                     );
 }
 

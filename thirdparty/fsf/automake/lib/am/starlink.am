@@ -117,15 +117,8 @@ version.dat: $(top_srcdir)/configure.ac
 	echo $(PACKAGE_VERSION) >version.dat
 endif %?VERSIONDAT%
 
-if %?SUPPRESS_BUILD_TEST%
-## Do the STAR_SUPPRESS_BUILD.test test: if the file
-## STAR_SUPPRESS_BUILD is present, then write out its contents and
-## terminate with an error.  This is declared as a .PHONY target in
-## automake.in.
-STAR_SUPPRESS_BUILD.test:
-	@if test -f STAR_SUPPRESS_BUILD; then \
-	  echo "According to ./configure, this component cannot be built:">&2;\
-	  sed 's/^/    /' STAR_SUPPRESS_BUILD >&2; \
-	  false; \
-	else :; fi
-endif %?SUPPRESS_BUILD_TEST%
+if %?ALL_AM_SUPPRESS%
+all-am-suppress:
+	@ echo "According to ./configure, this component cannot be built:"
+	@ sed 's/^ */    /' STAR_SUPPRESS_BUILD
+endif %?ALL_AM_SUPPRESS%
