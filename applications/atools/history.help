@@ -1,0 +1,8 @@
+
+1 Version History
+
+2 V1.6-1
+
+ - A bug has been fixed which could cause output text files to be
+ truncated when ATOOLS commands are used from ICL (or other similar
+ environments).
