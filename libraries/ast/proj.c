@@ -47,7 +47,10 @@
 *        front and changing the capitalisation.
 *     -  Include string.h (for strcpy and strcmp prototypes).
 *     -  Include stdlib.h (for abs prototype).
-
+*     -  Comment out declarations of npcode and pcodes variables (they
+*        are not needed by AST) in order to avoid clash with similar names
+*        in other modules imported as part of other software systems (e.g. 
+*        SkyCat).
 *=============================================================================
 *
 *   C implementation of the spherical map projections recognized by the FITS
@@ -263,11 +266,16 @@
 #include "wcstrig.h"
 #include "proj.h"
 
+/* Following variables are not needed in AST and are commented out to
+   avoid name clashes with other software systems (e.g. SkyCat) which
+   defines them.
+
 int  npcode = 26;
 char pcodes[26][4] =
       {"AZP", "SZP", "TAN", "STG", "SIN", "ARC", "ZPN", "ZEA", "AIR", "CYP",
        "CEA", "CAR", "MER", "COP", "COE", "COD", "COO", "SFL", "PAR", "MOL",
        "AIT", "BON", "PCO", "TSC", "CSC", "QSC"};
+*/
 
 const int AZP = 101;
 const int SZP = 102;
