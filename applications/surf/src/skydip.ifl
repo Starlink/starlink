@@ -17,10 +17,13 @@
 #     1997 March 26 (TIMJ)
 #	 OUT is now CHAR instead of NDF
 #        Add HELP
+#     1997 June 12 (TimJ)
+#        Add MSG_FILTER
+#-
 
    INTERFACE SKYDIP
 
-      HELPLIB 'SCUBA_HELP:'
+      HELPLIB 'SURF_HELP:'
 
       PARAMETER   B_FIT 
         POSITION 5
@@ -55,6 +58,15 @@
          DEFAULT  !
   	 HELPKEY '*'
       ENDPARAMETER
+
+      PARAMETER MSG_FILTER
+        TYPE     '_CHAR'
+        PROMPT   'Messaging level'
+        DEFAULT  'NORM'
+        VPATH    'DEFAULT'
+        HELPKEY  '*'
+      ENDPARAMETER
+
 
       PARAMETER   SUB_INSTRUMENT
          POSITION 2
