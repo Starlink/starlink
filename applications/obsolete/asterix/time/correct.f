@@ -374,9 +374,9 @@
      :                                          /'correction' )
 
 *      Apply the dead time correction to each time slice
-          CALL CORRECT_DEADCOR( DIMS(T_AX), NELM/DIMS(T_AX), %VAL(DCPTR),
-     :                        %VAL(DPTR), VOK, %VAL(VPTR), QOK,
-     :                        %VAL(QPTR), STATUS )
+          CALL CORRECT_DEADCOR( DIMS(T_AX), NELM/DIMS(T_AX),
+     :                          %VAL(DCPTR), %VAL(DPTR), VOK,
+     :                          %VAL(VPTR), QOK, %VAL(QPTR), STATUS )
 
         ELSE IF ( DEADC .NE. 1.0 ) THEN
           CALL MSG_SETR( 'DEAD', DEADC )
