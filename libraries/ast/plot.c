@@ -360,6 +360,12 @@ f     - Title: The Plot title drawn using AST_GRID
 *       - Added attribute Invisible.
 *       - Correct handling of "axis specific" plot elements cuch as
 *       (Axis1), (Axis2), etc.
+*     12-SEP-2002 (DSB):
+*       - Modified Map1 to remove slow normalization method (it is now
+*       faster but the changes result in some longer-than-needed grids 
+*       lines when (e.g.) plotting pixel coordins in Polar coords).
+*       - Modified Axlot so that SkyFrames positions which are out of
+*       their normal ranges are not rejected by Map1.
 *class--
 */
 
@@ -1506,7 +1512,7 @@ static int Ustrncmp( const char *, const char *, size_t );
 static int swapEdges( AstPlot *, TickInfo **, CurveData ** );
 static void AddCdt( CurveData *, CurveData *, const char *, const char * );
 static void Apoly( AstPlot *, float, float, const char *, const char * );
-static void AxPlot( AstPlot *, int, const double *, double, int, CurveData *, int, const char *, const char * );
+static void AxPlot( AstPlot *, int, const double *, double, int, CurveData *, const char *, const char * );
 static void BoundingBox( AstPlot *, float[2], float[2] );
 static void Bpoly( AstPlot *, float, float, const char *, const char * );
 static void Clip( AstPlot *, int, const double [], const double [] );
@@ -1538,6 +1544,7 @@ static void Labelat( AstPlot *, TickInfo **, CurveData **, double *, const char 
 static void Labels( AstPlot *, TickInfo **, CurveData **, double *, double *, const char *, const char * );
 static void LinePlot( AstPlot *, double, double, double, double, int, CurveData *, const char *, const char * );
 static void Map1( int, double *, double *, double *, const char *, const char * );
+static void slowNorm( double **, AstPointSet *, double *, double *, double *, double *, int, const char *, const char * );
 static void Map2( int, double *, double *, double *, const char *, const char * );
 static void Map3( int, double *, double *, double *, const char *, const char * );
 static void Map4( int, double *, double *, double *, const char *, const char * );
@@ -3378,8 +3385,7 @@ static void PurgeCdata( CurveData *cdata ){
 }
 
 static void AxPlot( AstPlot *this, int axis, const double *start, double length,
-                    int ink, CurveData *cdata, int normal, const char *method, 
-                    const char *class ){
+                    int ink, CurveData *cdata, const char *method, const char *class ){
 /*
 *
 *  Name:
@@ -3394,8 +3400,7 @@ static void AxPlot( AstPlot *this, int axis, const double *start, double length,
 *  Synopsis:
 *     #include "plot.h"
 *     void AxPlot( AstPlot *this, int axis, const double *start, double length,
-*                  int ink, CurveData *cdata, int normal, const char *method, 
-*                  const char *class )
+*                  int ink, CurveData *cdata, const char *method, const char *class )
 
 *  Class Membership:
 *     Plot member function.
@@ -3427,9 +3432,6 @@ static void AxPlot( AstPlot *this, int axis, const double *start, double length,
 *     cdata
 *        A pointer to a structure in which to return information about the
 *        breaks in the curve.
-*     normal
-*        If non-zero, then only draw points which are within the normal
-*        ranges of the physical axes. Otherwise, draw all points.
 *     method
 *        Pointer to a string holding the name of the calling method.
 *        This is only for use in constructing error messages.
@@ -3506,9 +3508,8 @@ static void AxPlot( AstPlot *this, int axis, const double *start, double length,
 /* The index of the axis which the curve follows. */
       Map1_axis = axis;
 
-/* Copy the flag which says whether to omit points not in their normal
-   ranges. */
-      Map1_norm = normal;
+/* Decide whether to omit points not in their normal ranges. */
+      Map1_norm = !astIsASkyFrame( Map1_frame );
 
 /* Convert the tolerance from relative to absolute graphics coordinates. */
       tol = astGetTol( this )*MAX( this->xhi - this->xlo, 
@@ -7761,7 +7762,7 @@ static void DrawAxis( AstPlot *this, TickInfo **grid, double *labelat,
    of the curve which are outside the primary domains of the physical axes. */
                start[ axis ] = *(value++);
                start[ 1 - axis ] = labelat[ axis ];
-               AxPlot( this, axis, start, gap[ axis ], 1, &cdata, 1, method, 
+               AxPlot( this, axis, start, gap[ axis ], 1, &cdata, method, 
                        class );
             }
          }
@@ -7896,7 +7897,7 @@ static CurveData **DrawGrid( AstPlot *this, TickInfo **grid, int drawgrid,
    structure. We use invisible ink if short tick marks are required instead 
    of a grid of curves. */
                AxPlot( this, 1 - i, start, (info->length)[ 0 ],
-                       drawgrid, cdt, 1, method, class );
+                       drawgrid, cdt, method, class );
 
 /* Now draw any other sections in the curve. */
                for( k = 1; k < info->nsect; k++ ){
@@ -7908,7 +7909,7 @@ static CurveData **DrawGrid( AstPlot *this, TickInfo **grid, int drawgrid,
 /* Draw the curve, the information describing the breaks goes into
    temporary storage in the local structure "tcdt". */
                   AxPlot( this, 1 - i, start, (info->length)[ k ],
-                          drawgrid, &tcdt, 1, method, class );
+                          drawgrid, &tcdt, method, class );
 
 /* Concatenate the break information for this section with the break
    information describing the previous sections. */
@@ -13641,7 +13642,7 @@ f     coordinates with the value AST__BAD, nor if LENGTH has this value.
 /* Draw the curve. The break information is stored in an external structure
    where it can be accessed by public methods which return information
    about the most recently drawn curve. */
-   AxPlot( this, axis - 1, start, length, 1, &Curve_data, 1, method, class );
+   AxPlot( this, axis - 1, start, length, 1, &Curve_data, method, class );
 
 /* Return. */
    return;
@@ -15494,7 +15495,7 @@ static void Labelat( AstPlot *this, TickInfo **grid, CurveData **cdata,
                }    
 
 /*  Find the effective length of this curve.*/
-               efflen = nin*cdt->length;
+               efflen = sqrt( (float) nin )*cdt->length;
 
 /* If the curve through this tick mark has a freater effective length than any 
    other found so far, record it. */
@@ -16374,7 +16375,7 @@ static void Map1( int n, double *dist, double *x, double *y,
       if( pset2 ) pset2 = astAnnul( pset2 );
       pset2 = astPointSet( n, 2, "" );   
 
-/* Get work space to hold two single positions. */
+/* Get work space to hold two positions. */
       work1 = (double *) astMalloc( sizeof(double)*(size_t)Map1_ncoord );
       work2 = (double *) astMalloc( sizeof(double)*(size_t)Map1_ncoord );
 
@@ -16419,48 +16420,93 @@ static void Map1( int n, double *dist, double *x, double *y,
 /* If points not in their normal ranges are to be set bad... */
       if( Map1_norm ) { 
 
+/* The following code siply normalizes the physical position, and if this
+   produces any change, the graphics positions are set bad. */
+         for( i = 0; i < n; i++){
+            for( j = 0; j < Map1_ncoord; j++) work1[j] = ptr1[j][i];
+            astNorm( Map1_frame, work1 );
+            for( j = 0; j < Map1_ncoord; j++) {
+               if( !EQUAL( work1[j], ptr1[j][i] ) ) {
+                  ptr2[0][i] = AST__BAD;
+                  ptr2[1][i] = AST__BAD;
+                  break;
+               }
+            }
+         }
+
+/* The above code is not fool-proof since it only checks for redundancy 
+   produced by the Frame geometry, and ignroed the possiblity of
+   redundancy being introduced by the base->current Mapping. For instance
+   if the current Frame is a simple Frame and the Mapping is a
+   Cartesian->Polar mapping, then each graphics position will correspond
+   to many different current Frame positions (all ofset by 2PI from each
+   other along the azimuthal axis). The following function call checks
+   for this sort of redundancy as well, but makes the plotting of grids much
+   slower since it involves may transformations. This is why it is
+   currently commented out. */
+/*         slowNorm( ptr1, pset2, work1, work2, x, y, n, method, class );
+*/
+
+      }
+   }
+   
+/* Return. */
+   return;
+
+}
+
+
+
+static void slowNorm( double **ptr1, AstPointSet *pset2, double *work1, 
+                      double *work2, double *x, double *y, int n,
+                      const char *method, const char *class ) {
+
+   AstPointSet *pset3;
+   double **ptr3, lim, dst;
+   int i, changed, nchanged, bad, j;
+
 /* Transform graphics coords back to physical coords, without normalizing the
    results using astNorm. */
-         pset3 = Trans( Map1_plot, Map1_frame, Map1_map, pset2, 1, NULL, 0, method, class );
-         ptr3 = astGetPoints( pset3 );
-         if( astOK ) {
+   pset3 = Trans( Map1_plot, Map1_frame, Map1_map, pset2, 1, NULL, 0, method, class );
+   ptr3 = astGetPoints( pset3 );
+   if( astOK ) {
 
 /* Check each of these re-created physical coords. If
    any are not the same as the original physical coords, set the
    corresponding graphics coords bad. */
-            for( i = 0; i < n; i++){
-               nchanged = 0;
-               changed = 0;
-               bad = 0;
-               for( j = 0; j < Map1_ncoord; j++){
+      for( i = 0; i < n; i++){
+         nchanged = 0;
+         changed = 0;
+         bad = 0;
+         for( j = 0; j < Map1_ncoord; j++){
 
-                  if( ptr1[j][i] == AST__BAD || ptr3[j][i] == AST__BAD ) {
-                     bad = 1;
-                     break;
+            if( ptr1[j][i] == AST__BAD || ptr3[j][i] == AST__BAD ) {
+               bad = 1;
+               break;
 
-                  } else if( !EQUAL( ptr1[j][i], ptr3[j][i] ) ) {
-                     nchanged++;
-                     changed = j;
-                  }
-                  work1[ j ] = work2[ j ] = ptr3[ j ][ i ];
-               }
+            } else if( !EQUAL( ptr1[j][i], ptr3[j][i] ) ) {
+               nchanged++;
+               changed = j;
+            }
+            work1[ j ] = work2[ j ] = ptr3[ j ][ i ];
+         }
 
 /* Reject the position if *any* axis is bad, or more than one axis has
    changed. */
-               if( bad || nchanged > 1 ) {
-                  x[ i ] = AST__BAD;
-                  y[ i ] = AST__BAD;
+         if( bad || nchanged > 1 ) {
+            x[ i ] = AST__BAD;
+            y[ i ] = AST__BAD;
 
 /* If just one axis has changed, this may be because we are at a
    singularity (like the poles in a celestial coord system) at which
    an axis value is undefined (e.g. RA is undefined at the equatorial 
    poles). */
-               } if( nchanged == 1 ) {
+         } if( nchanged == 1 ) {
 
 /* Modify the value on the axis which has changed. The size of the 
    modification is unimportant. We choose to modify the axis to the
    mean of the original and changed values. */
-                  work2[ changed ] = 0.5*( ptr1[changed][i] + ptr3[changed][i] );
+            work2[ changed ] = 0.5*( ptr1[changed][i] + ptr3[changed][i] );
 
 /* Find the geodesic distance from the modified position to the original
    position. If this is not significantly different to zero, then the 
@@ -16468,19 +16514,17 @@ static void Map1( int n, double *dist, double *x, double *y,
    space, and so we are at a singularity. Do not reject the tick value in 
    this case. As our "significant distance" we take a small fraction of 
    the largest of the axis values. */
-                  dst = astDistance( Map1_frame, work1, work2 );
+            dst = astDistance( Map1_frame, work1, work2 );
 
-                  lim = fabs( work1[0] );
-                  for( j = 1; j < Map1_ncoord; j++ ) {
-                     lim = MAX( fabs( work1[j] ), lim );
-                  }
-                  lim *= 1.0E5*DBL_EPSILON;
+            lim = fabs( work1[0] );
+            for( j = 1; j < Map1_ncoord; j++ ) {
+               lim = MAX( fabs( work1[j] ), lim );
+            }
+            lim *= 1.0E5*DBL_EPSILON;
 
-                  if( dst > lim ) {
-                     x[ i ] = AST__BAD;
-                     y[ i ] = AST__BAD;
-                  }
-               }
+            if( dst > lim ) {
+               x[ i ] = AST__BAD;
+               y[ i ] = AST__BAD;
             }
          }
       }
@@ -16490,6 +16534,10 @@ static void Map1( int n, double *dist, double *x, double *y,
    return;
 
 }
+
+
+
+
 
 static void Map2( int n, double *dist, double *x, double *y, 
                   const char *method, const char *class ){
@@ -20635,7 +20683,8 @@ static AstPointSet *Trans( AstPlot *this, AstFrame *frm, AstMapping *mapping,
 *        a pointer for the Current Frame is found within this function if
 *        required (i.e. if "forward" and "norm" are both non-zero).
 *     mapping
-*        Pointer to the Mapping extracted from the Plot.
+*        Pointer to the Mapping extracted from the Plot. If this is NULL, then
+*        a pointer for the base->current Mapping is found within this function.
 *     in
 *        Pointer to the PointSet holding the input coordinate data.
 *     forward
@@ -20699,6 +20748,9 @@ static AstPointSet *Trans( AstPlot *this, AstFrame *frm, AstMapping *mapping,
 
 /* Check the global error status. */
    if ( !astOK ) return NULL;
+
+/* Ensure we have a Mapping */
+   if( !mapping ) mapping = astGetMapping( this, AST__BASE, AST__CURRENT );
 
 /* Apply the parent mapping using the stored pointer to the Transform member
    function inherited from the parent FrameSet class. */
