@@ -96,6 +96,7 @@
       EXTERNAL			HSI1_ADD
       EXTERNAL			HSI1_COPY
       EXTERNAL			HSI1_NEW
+      EXTERNAL			HSI1_PTXT
 
       EXTERNAL			ADI_DEFMTH
       EXTERNAL			ADI_REQPKG
@@ -119,6 +120,8 @@
 
 *    Creators of new history
         CALL ADI_DEFMTH( 'AddHistory(HDSfile,CHAR)', HSI1_ADD,
+     :                   DID, STATUS )
+        CALL ADI_DEFMTH( 'AddHistoryText(HDSfile,Array)', HSI1_PTXT,
      :                   DID, STATUS )
         CALL ADI_DEFMTH( 'NewHistory(HDSfile)', HSI1_NEW,
      :                   DID, STATUS )

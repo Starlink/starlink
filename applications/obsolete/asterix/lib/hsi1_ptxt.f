@@ -170,8 +170,7 @@
         ELSE
           CALL DAT_FIND( CRLOC, 'TEXT', TXLOC, STATUS )
           CALL DAT_SIZE( TXLOC, NL, STATUS )
-          TLINES = NL + NLINE
-          CALL DAT_ALTER( TXLOC, 1, TLINES, STATUS )
+          CALL DAT_ALTER( TXLOC, 1, NL + NLINE, STATUS )
 
         END IF
 
