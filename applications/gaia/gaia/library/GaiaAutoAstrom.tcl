@@ -893,7 +893,8 @@ itcl::class gaia::GaiaAutoAstrom {
       #  Match these against those we can describe and write them out.
       foreach {name desc} "$pnames_" {
          if { [info exists params($name)] } {
-            $itk_component(status) insert end "$name = $params($name)  / $desc"
+            set line [format "%-22s \\ %s" "$name = $params($name)" $desc]
+            $itk_component(status) insert end $line
          }
       }
       $itk_component(status) see end
@@ -1044,6 +1045,7 @@ itcl::class gaia::GaiaAutoAstrom {
          #  Try to get the associated window.
          set catwin [::cat::AstroCat::get_instance $realname]
          set tempname "${temp_catalogues_}[incr count_].TAB"
+
          if { $catwin != {} } {
             $catwin save_to_file $tempname
          } else {
