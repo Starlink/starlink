@@ -3552,6 +3552,7 @@ void adix_print( ADIobj stream, ADIobj id, int level, ADIlogical value_only,
     for( i=0; i<ary->ndim; i++ )
       ADIstrmPrintf( stream, "%d%c", status,
 		ary->dims[i], ((i+1)==ary->ndim) ? ']' : ',' );
+    value_only = ADI__true;
     }
   else {
     tdef = _DTDEF(id);               /* Locate class definition block */

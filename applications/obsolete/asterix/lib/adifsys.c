@@ -37,7 +37,6 @@ ADIobj		ADI_G_exten_rep_alist = ADI__nullid;
 
 void adix_base_NewLink( ADIobj id, ADIobj lid, ADIstatus status )
   {
-printf("Calling base Newlink\n" );
   adic_cput0i( id, "ADIlink", (ADIinteger) lid, status );
   }
 
@@ -306,7 +305,6 @@ void adix_fcreat( char *fspec, int flen, ADIobj id, ADIobj *fileid,
       ADIlogical	there=ADI__false;
 
       rid = _CAR(curp);
-       adic_print( rid, status );
 
       adic_there( rid, "CREAT_RTN", &there, status );
 
