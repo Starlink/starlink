@@ -47,7 +47,7 @@ my $y2 = 0.1*$c->cget( '-height' );
 
 my $xzoom = ($x2-$x1)/300;
 my $yzoom = ($y1-$y2)/300;
-print "$xzoom, $yzoom";
+#print "# $xzoom, $yzoom";
 my $jpg = $c->Photo( -format => 'jpeg', -file => $jpeg );
 
 #my $zoom = $c->Photo();
