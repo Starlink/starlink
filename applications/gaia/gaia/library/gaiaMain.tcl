@@ -60,13 +60,14 @@ import add ::iwidgets
 #  Make GAIA modified core Tcl code available in preference to 
 #  the normal versions.
 #source $gaia_library/TopLevelWidget.tcl
-source $gaia_library/FrameWidget.tcl
-source $gaia_library/CanvasPrint.tcl 
+#source $gaia_library/FrameWidget.tcl
+#source $gaia_library/GraphPrint.tcl
+#source $gaia_library/CanvasPrint.tcl 
 source $gaia_library/FileSelect.tcl 
 source $gaia_library/LabelEntry.tcl
 source $gaia_library/LabelEntryMenu.tcl 
 source $gaia_library/LabelEntryScale.tcl 
-source $gaia_library/RtdImage.tcl 
+#source $gaia_library/RtdImage.tcl 
 source $gaia_library/RtdImageCtrl.tcl 
 source $gaia_library/RtdImagePick.tcl
 source $gaia_library/RtdImagePixTable.tcl 

@@ -205,34 +205,29 @@ class gaia::GaiaImage {
       }
    }
 
-   #  Make a hard copy of the image display
-   #  Note that this requires a version of Tk patched to include
-   #  support for printing canvas image items (in Tk4.0). This is also
-   #  different in that we now use postscript rather than
-   #  xgrabsc. XXX when [incr Tcl] becomes a loadable module in Tcl8.0
-   #  this may become a very difficult area, as it would be nice to
-   #  avoid patching the core.
+   #  Make a hard copy of the image display, just override to remove 
+   #  ESO references?
    method print {} {
-      if {[$image_ isclear]} {
-         warning_dialog "No image is currently loaded" $w_
-         return
-      }
-      global ::env
-      set name [$image_ object]
-      if {"$name" == ""} {
-         set name $itk_option(-file)
-      }
-
-      #  Removed part that works out display section as should
-      #  really be done just before printing (user may adjust the
-      #  image after starting the print toolbox).
-      utilReUseWidget util::CanvasPrint $w_.print \
-         -canvas $canvas_ \
-         -rtdimage $image_ \
-         -top_left {GAIA/SkyCat} \
-         -top_right $name \
-         -bot_left "printed for $env(USER)" \
-         -bot_right [clock format [clock seconds] -format {%b %d, %Y at %H:%M:%S}]
+        if {[$image_ isclear]} {
+            warning_dialog "No image is currently loaded" $w_
+            return
+        }
+        set object [$image_ object]
+        set file [file tail $itk_option(-file)]
+        set center [$image_ wcscenter]
+        set user [id user]
+        set app [lindex [winfo name .] 0]
+        set date [clock format [clock seconds] -format {%b %d, %Y at %H:%M:%S}]
+        puts "USING GAIA VERSION OF PRINT COMMAND"
+        utilReUseWidget RtdImagePrint $w_.print \
+            -image $this \
+            -show_footer 1 \
+            -whole_canvas 0 \
+            -transient 1 \
+            -top_left "GAIA/Skycat\n$object" \
+            -top_right "$file\n$center" \
+            -bot_left "$user/$app" \
+            -bot_right "$date"
    }
 
    #  Create a graph to display the image data values along the line
