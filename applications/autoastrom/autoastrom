@@ -1,4 +1,4 @@
-#!/star/Perl/bin/perl -W
+#! /star/Perl/bin/perl -w
 #
 # Autoastrometry tool
 #
@@ -144,6 +144,15 @@ use Moggy;
 # Include the subroutines
 use autoastrom;
 
+
+# Check that we have all the applications we need.
+foreach my $app ("$ENV{KAPPA_DIR}/kappa_mon",
+		    "$ENV{KAPPA_DIR}/ndfpack_mon",
+		    "$ENV{CCDPACK_DIR}/ccdpack_reg",
+		    "$ENV{EXTRACTOR_DIR}/extractor",
+		    "$ENV{ATOOLS_DIR}/atools_mon") {
+    -x $app || wmessage ('fatal', "Can't find monolith $app");
+}
 
 # Check we have the appropriate versions of applications.  We need
 # CCDPACK version 4.0.1 or better, to get the propagation of extra
