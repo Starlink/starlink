@@ -41,13 +41,13 @@
 #     inclusion in a (possibly compressed) tar file.  Thus some
 #     example logical pathnames would be:
 #
-#         SOURCE/ast.tar.Z>ast_source.tar>frame.f
-#         SOURCE/figaro/figaro_applic.tar>applic/bclean.f
-#         INCLUDE/par_err
+#         SOURCE#ast.tar.Z>ast_source.tar>frame.f
+#         SOURCE#figaro/figaro_applic.tar>applic/bclean.f
+#         INCLUDE#par_err
 #
 #     Additionally, some further information is stored in the dbm file:
-#         #SOURCE    - name of the source directory
-#         #INCLUDE   - name of the include directory 
+#         SOURCE#    - name of the source directory
+#         INCLUDE#   - name of the include directory 
 #     These are for information to whatever program is reading the file
 #     and may be ignored or used as desired.
 #
@@ -69,18 +69,6 @@
 
 #-
 
-#  Directory locations.
-
-$srcdir = "/local/scratch/sources";  # head of source tree
-$srcdir = "/local/star/src/from-ussc";
-$incdir = "/star/include";           # include directory
-$tmpdir = "/local/junk/scb/index";   # scratch directory
-
-#  Index file location.
-
-$indexfile = "/local/devel/scb/index";
-$taskfile  = "/local/devel/scb/tasks";
-
 #  Flags.
 
 $verbose = 1;
@@ -95,6 +83,10 @@ use Fcntl;
 use Cwd;
 use SDBM_File;
 use libscb;
+
+#  Debug: override source directory location.
+
+$srcdir = "/local/star/src/from-ussc";
 
 #  Declarations.
 
@@ -124,14 +116,14 @@ tie %locate, SDBM_File, $indexfile, O_CREAT | O_RDWR, 0644;
 #  Index source files.
 
 chdir $srcdir or die "Couldn't enter $srcdir\n";
-index_dir "SOURCE/", ".";
-write_entry "#SOURCE", $srcdir;
+index_dir "SOURCE#", ".";
+write_entry "SOURCE#", $srcdir;
 
 #  Index include files.
 
 chdir $incdir or die "Couldn't enter $incdir\n";
-index_incdir "INCLUDE/", ".";
-write_entry "#INCLUDE", $incdir;
+index_incdir "INCLUDE#", ".";
+write_entry "INCLUDE#", $incdir;
 
 #  Write checked task names out to text file.
 
@@ -437,21 +429,6 @@ sub indexinc_list {
    
 
 ########################################################################
-sub tarlevel {
-
-#  This is a compact, although rather obscure, routine to count the
-#  number of '>' characters in a string.  When applied to the logical
-#  pathname, a high number indicates that it's buried deep in layers 
-#  of tar files, and a low number that it's easier to get to.
-
-#  Arguments.
-
-   my $path = shift;
-
-   return ($path =~ y/>/>/);
-}
-
-########################################################################
 sub write_entry {
 
 #  Write index entry to database.
@@ -466,17 +443,25 @@ sub write_entry {
    $location =~ s%/./%/%g;
    $location =~ s%//*%/%g;
 
+#  If logical path looks like it starts with a package reference,
+#  rephrase it as a logical reference to the package.
+
+   $location =~ 
+      s%^SOURCE#([^./]+)(.tar.Z>|.tar.gz>|.tar>|/)(.*)$% uc($1) . "#$3" %e;
+
+#  Write entry to database (hash of hashes %locate); if no identifiable 
+#  package the hash key is ''.
+
+   $locate{$name} .= ' ' if (defined $locate{$name});
+   $locate{$name} .= $location;
+
 #  Optionally log entry to stdout.
 
-   printf "%-20s <-  %s\n", $name, $location if ($verbose);
-
-#  Write entry to database, except if a more accessible entry already
-#  exists.
-
-   $locate{$name} = $location
-       unless (   defined ($locate{$name})
-               && tarlevel ($locate{$name}) > tarlevel ($location) );
+   if ($verbose) {
+      printf "%-20s =>  %s\n", $name, $location;
+   }
 }
+
 
 ########################################################################
 sub error {
