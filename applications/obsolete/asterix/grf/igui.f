@@ -71,6 +71,17 @@
 
         CALL IGUI_TRANSFORM(STATUS)
 
+*  force synchronisation of GCB
+      ELSEIF (ACTION.EQ.'SYCHRO') THEN
+
+        CALL USI_GET0C('VALUE',VALUE,STATUS)
+        CALL CHR_UCASE(VALUE)
+        IF (VALUE.EQ.'ONED') THEN
+          CALL IMG_1DGCB(STATUS)
+        ELSEIF (VALUE.EQ.'TWOD') THEN
+          CALL IMG_2DGCB(STATUS)
+        ENDIF
+
       ENDIF
 
       CALL USI_CLOSE()
