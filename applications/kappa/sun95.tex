@@ -9274,8 +9274,8 @@ If an application has more than one NDF or positions list parameter, each
 parameter should be given the same number of values (\emph{i.e.} data
 files). A warning is issued if any parameter is given too many values, but
 processing continues normally until the smallest group is exhausted. For
-instance, the following example adds NDF \verb+a1+ to \verb+b1+, and
-\verb+a2+ to \verb+b2+, putting the results in \verb+a3+ and \verb+b3+:
+instance, the following example adds NDF \verb+a1+ to \verb+a2+, and
+\verb+b1+ to \verb+b2+, putting the results in \verb+a3+ and \verb+b3+:
 
 \small
 \begin{verbatim}
@@ -9379,7 +9379,7 @@ The exception to this is that if the error is an ``abort request''
 the loop exits immediately. That is, no remaining NDFs are processed.
 
 \subsection{What about Applications which Re-use Parameters?}
-Some application use a single parameter to obtain a series of values from
+Some applications use a single parameter to obtain a series of values from
 the user. Examples are the INIT parameter of \htmlref{CENTROID}{CENTROID}
 and the OPTION parameter of \htmlref{SETEXT}{SETEXT}. Remembering that
 parameters which are not associated with either an NDF or a positions
@@ -9437,16 +9437,16 @@ To remove the delay, you should undefined KAPPA\_LOOP\_DELAY. In C-shell:
 \end{verbatim}
 \normalsize
 
-\subsection{Reporting the NDF being Processed}
-When processing a single NDF, some applications report the name of the
-NDF and some do not. Normally, no extra information is given when
-processing groups of NDFs. This means that sometimes you get to see the 
-names of the NDFs as they are processed, and some times you do not. It
-just depends on the application.
+\subsection{Reporting the Data Files being Processed}
+When processing a single data file, some applications report the name of 
+the file and some do not. Normally, no extra information is given
+when processing groups of data files. This means that sometimes you get
+to see the names of the files as they are processed, and some times
+you do not. It just depends on the application.
 
-However, it is often very useful to see the names of the NDFs as they are 
-processed. For instance, if an error occurs processing one of the NDFs,
-it is useful to know which NDF failed. If the application doesn't display
+However, it is often very useful to see the names of the files as they are 
+processed. For instance, if an error occurs processing one of the files,
+it is useful to know which file failed. If the application doesn't display
 this information, then you can force it to by setting the shell
 environment variable KAPPA\_REPORT\_NAMES to an arbitrary
 value\footnote{The actual value does not matter.}. For instance, in the
@@ -9458,14 +9458,14 @@ C-shell:
 \end{verbatim}
 \normalsize
 
-This causes the value used for each NDF parameter to be displayed in the
-form \verb+parameter = value+ on each invocation. To go back to the
+This causes the value used for each data file parameter to be displayed in the
+form ``\verb+parameter = value+'' on each invocation. To go back to the
 normal, quiet reporting scheme, you should undefined KAPPA\_REPORT\_NAMES.
 In C-shell:
 
 \small
 \begin{verbatim}
-    % UN setenv KAPPA_REPORT_NAMES
+    % unsetenv KAPPA_REPORT_NAMES
 \end{verbatim}
 \normalsize
 
@@ -9495,6 +9495,16 @@ Note, when choosing the input parameter on which output data files are
 based, no significance is attached to whether the input and output file
 types match. That is, the first input parameter to be accessed if used,
 irrespective of whether it is associated with an NDF or a positions list.
+
+A feature which may sometimes be useful is the facility for providing a
+shell command in response to a prompt for a group of data files. To do
+this, enclose the command within the usual backward quotes (\verb+`+), as
+you would when substituting the output from a command into another shell 
+command. The command should generate a set of explicit file names, with
+file types. Note, you will need to escape any characters which are
+normally interpreted as part of the syntax of a group expression, such as
+``\verb+|+'' or ``\verb+,+'', by preceding them with a backslash
+``\verb+\+''.
 
 \subsection{Using non-NDF Data Formats}
 
