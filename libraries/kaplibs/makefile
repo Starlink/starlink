@@ -461,7 +461,7 @@ PRIVATE_INCLUDES = $(IRA_PRIVATE_INCLUDES)
 #  reference the files within the source code, not the actual names of
 #  the files.
 
-EXTERNAL_INCLUDES = SAE_PAR
+EXTERNAL_INCLUDES = SAE_PAR DAT_PAR PAR_ERR PRM_PAR
 
 #  List of Fortran routines required for building the package.  This is
 #  just a list of all the Fortran source files (excluding BLOCK DATA
@@ -506,8 +506,8 @@ FAC_ERRS = fac_$(PKG_NUM)_err
 
 #  Lists of Latex and hypertext documents.
 
-LATEX_DOCS = sunXX.tex
-HYPERTEXT_DOCS = sunXX.htx
+LATEX_DOCS = sunxx.tex
+HYPERTEXT_DOCS = sunxx.htx
 
 #  List of documentation files.
 
@@ -551,11 +551,14 @@ INCLUDE_LINKS = $(EXTERNAL_INCLUDES) $(IRA_INCLUDE_LINKS)
 
 #  Rules to set up links to locate each of the above include files.
 
-$IRA_ERR:   $ira_err;               $(LINK) $? $@
-$IRA_COM:   $ira_com;               $(LINK) $? $@
-$IRA_PAR:   $ira_par;               $(LINK) $? $@
+IRA_ERR:   ira_err;               $(LINK) $? $@
+IRA_COM:   ira_com;               $(LINK) $? $@
+IRA_PAR:   ira_par;               $(LINK) $? $@
 
 SAE_PAR:   $(STAR_INC)/sae_par;   $(LINK) $? $@
+DAT_PAR:   $(STAR_INC)/dat_par;   $(LINK) $? $@
+PAR_ERR:   $(STAR_INC)/par_err;   $(LINK) $? $@
+PRM_PAR:   $(STAR_INC)/prm_par;   $(LINK) $? $@
 
 #  Rules for extracting source files from the source archive.
 

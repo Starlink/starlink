@@ -83,8 +83,8 @@
       end
 
 #  Make the ctg and lpg source tar files.
-      ${CTG_SYS}/dev/bin/make_source.csh
-      ${LPG_SYS}/dev/bin/make_source.csh
+#      ${CTG_SYS}/dev/bin/make_source.csh
+#      ${LPG_SYS}/dev/bin/make_source.csh
 
 #  Tar up all the release files and then remove them.
       echo "Creating kaplibs.tar"
