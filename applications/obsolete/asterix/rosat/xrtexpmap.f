@@ -43,6 +43,8 @@
 *     18 Dec 92 :
 *     15 Apr 94 : V1.7-0  ADAMised and made portable (DJA)
 *      9 Jun 94 : V1.7-1  Handles RDF data (DJA)
+*      5 Sep 95 : V1.8-0  Bug calculating exposure time when first attitude
+*                         record was ok (DJA)
 *
 *    Type definitions :
 *
@@ -181,7 +183,7 @@ c	From INTEGER to improve exposure time evaluation
 *    Version :
 *
       CHARACTER*30		VERSION
-        PARAMETER 		( VERSION = 'XRTEXPMAP Version 1.7-1')
+        PARAMETER 		( VERSION = 'XRTEXPMAP Version 1.8-0')
 *-
 
 *    Initialise Asterix
@@ -458,7 +460,11 @@ c	From INTEGER to improve exposure time evaluation
 *		A/	STEVE HAS EVER USED THE DELT VALUE
 *		B/	STEVE HAS NOT NOTICED THE PROBLEM BEFORE
         ISCS = DSCS
-        DELT = ISCS - ISCSO
+        IF ( IATT .EQ. 1 ) THEN
+          DELT = 1.0
+        ELSE
+          DELT = ISCS - ISCSO
+        END IF
         ISCSO = ISCS
 
 *      Flip the Y value for consistancy.  Increasing Y in SASS is downward
