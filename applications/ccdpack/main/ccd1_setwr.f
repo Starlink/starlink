@@ -196,7 +196,8 @@
          CALL CHR_APPND( 'Alignment in CCDPACK Set "', TITLE, IAT )
          CALL CHR_APPND( NAME( :NAMLEN ), TITLE, IAT )
          CALL CHR_APPND( '"', TITLE, IAT )
-         CALL AST_SETC( SETFRM, 'Title', TITLE, STATUS )
+         CALL AST_SETC( SETFRM, 'Title', TITLE( :CHR_LEN( TITLE ) ),
+     :                  STATUS )
 
 *  Join the new frame to the WCS frameset using a UnitMap.
          NAXES = AST_GETI( SETFRM, 'Naxes', STATUS )
