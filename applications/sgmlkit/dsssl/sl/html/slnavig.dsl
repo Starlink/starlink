@@ -45,7 +45,7 @@ must be a subset of the return value of <funcname/section-element-list/.
         (normalize "sect")
 	(normalize "subsect")
 	(normalize "subsubsect")
-	(normalize "subsubsubsect")
+	;(normalize "subsubsubsect")
 	(normalize "appendices")
 	(normalize "routinelist")
 	(normalize "codecollection")

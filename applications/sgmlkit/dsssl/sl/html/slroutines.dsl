@@ -295,6 +295,11 @@ $Id$
       (make element gi: "h4"
 	    (literal "Usage"))
       (process-children)))
+  (element moduletype
+    (make sequence
+      (make element gi: "h4"
+	    (literal "Type of Module"))
+      (process-children)))
   (element invocation
     (make sequence
       (make element gi: "h4"
