@@ -379,7 +379,7 @@
      :                          %VAL(VPTR), QOK, %VAL(QPTR), STATUS )
 
         ELSE IF ( DEADC .NE. 1.0 ) THEN
-          CALL MSG_SETR( 'DEAD', DEADC )
+          CALL MSG_SETR( 'D', DEADC )
           CALL MSG_PRNT( 'Applied a total dead time correction of ^D' )
 
         END IF
