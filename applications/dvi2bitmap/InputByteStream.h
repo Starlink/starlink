@@ -16,19 +16,20 @@ class InputByteStream {
  public:
     bool eof();
     Byte getByte(int n=1);
-    void backspace(int n=1);
-    void gotoEnd();
     signed int getSIU(int);
     signed int getSIS(int);
     unsigned int getUIU(int);
-    const Byte *getBlock (unsigned int pos, unsigned int length);
+    static unsigned int getUIU(int, const Byte *);
+    // retrieve a block from the file.  pos<0 means from end of file.
+    const Byte *getBlock (int pos, unsigned int length);
     void seek (unsigned int);
-    unsigned int pos ();
+    int pos ();
     void skip (unsigned int);
     InputByteStream (string s, bool preload=false);
     ~InputByteStream();
  private:
     int fd_;
+    int filesize_;
     int buflen_;
     Byte *buf_;			// buffer
     Byte *p_;			// current position in buffer 
