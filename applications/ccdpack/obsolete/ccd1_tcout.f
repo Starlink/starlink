@@ -46,6 +46,8 @@
 *  History:
 *     23-FEB-1999 (MBT):
 *        Original version.
+*     17-MAR-1999 (MBT):
+*        Modified to use external routine CCD1_TROUT for the actual output.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -59,7 +61,6 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! Standard AST constants
-      INCLUDE 'MSG_PAR'          ! Standard MSG/ERR constants
       INCLUDE 'PRM_PAR'          ! PRIMDAT constants (machine precision etc)
       
 *  Arguments Given:
@@ -69,12 +70,9 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      CHARACTER BUFFER * ( MSG__SZMSG ) ! Buffer for output
       DOUBLE PRECISION DIFLX    ! Discrepancy between linear and actual X coords
       DOUBLE PRECISION DIFLY    ! Discrepancy between linear and actual Y coords
-      INTEGER IAT               ! Character position in buffer
       LOGICAL NONLIN            ! Does transformation appear to be nonlinear?
-      INTEGER NCHAR             ! Number of characters converted
       DOUBLE PRECISION PXI( 4 ) ! Input X coordinates for test transformation
       DOUBLE PRECISION PYI( 4 ) ! Input Y coordinates for test transformation
       DOUBLE PRECISION PXO( 4 ) ! Output X coordinates for test transformation
@@ -128,44 +126,16 @@
          NONLIN = MAX( ABS( DIFLX ), ABS( DIFLY ) ) 
      :            .GT. ( VAL__EPSR * 100D0 )
 
-*  Output the coefficients.
-         BUFFER = ' '
-         IAT = 4
-         BUFFER( IAT: ) = ' A ='
-         IAT = IAT + 5
-         CALL CHR_DTOC( TR( 1 ), BUFFER( IAT: ), NCHAR )
-         IAT = 29
-         BUFFER( IAT: ) = ' B ='
-         IAT = IAT + 5
-         CALL CHR_DTOC( TR( 2 ), BUFFER( IAT: ), NCHAR )
-         IAT = 54
-         BUFFER( IAT: ) = ' C ='
-         IAT = IAT + 5
-         CALL CHR_DTOC( TR( 3 ), BUFFER( IAT: ), NCHAR )
-         CALL CCD1_MSG( ' ', BUFFER, STATUS )
-         BUFFER = ' '
-         IAT = 4
-         BUFFER( IAT: ) = ' D ='
-         IAT = IAT + 5
-         CALL CHR_DTOC( TR( 4 ), BUFFER( IAT: ), NCHAR )
-         IAT = 29
-         BUFFER( IAT: ) = ' E ='
-         IAT = IAT + 5
-         CALL CHR_DTOC( TR( 5 ), BUFFER( IAT: ), NCHAR )
-         IAT = 54
-         BUFFER( IAT: ) = ' F ='
-         IAT = IAT + 5
-         CALL CHR_DTOC( TR( 6 ), BUFFER( IAT: ), NCHAR )
-         CALL CCD1_MSG( ' ', BUFFER, STATUS )
-       
-*  Warn if the mapping looks nonlinear.
-         IF ( NONLIN ) THEN
-            CALL CCD1_MSG( ' ', ' ', STATUS )
-            CALL CCD1_MSG( ' ', '     ' //
-     :      '  (Linear approximation to apparently nonlinear mapping)', 
-     :                     STATUS )
-         END IF
+      END IF
 
+      CALL CCD1_TROUT( TR, STATUS )
+
+*  Warn if the mapping looks nonlinear.
+      IF ( NONLIN ) THEN
+         CALL CCD1_MSG( ' ', ' ', STATUS )
+         CALL CCD1_MSG( ' ', '     ' //
+     :   '  (Linear approximation to apparently nonlinear mapping)', 
+     :                  STATUS )
       END IF
 
       END

@@ -158,10 +158,6 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'MSG_PAR'          ! MSG/ERR constants
-      INCLUDE 'PRM_PAR'          ! PRIMDAT constants (size of strings
-                                 ! required to hold double precision
-                                 ! etc.)
 
 *  Arguments Given:
       DOUBLE PRECISION X( * )
@@ -205,21 +201,16 @@
       INTEGER NUM_TRAP           ! Numeric error trap
 
 *  Local Variables:
-      CHARACTER BUFFER * ( MSG__SZMSG ) ! Buffer for output information
-      DOUBLE PRECISION CHANGE, TARGET ! change on last iteration and
-                                ! target
+      DOUBLE PRECISION CHANGE, TARGET ! change on last iteration and target
       DOUBLE PRECISION RMSSUM   ! sum for RMS error
       DOUBLE PRECISION TR1( 6 ) ! identity transformation
       DOUBLE PRECISION TRINV( 6 ) ! inverse transformation
       DOUBLE PRECISION TRS( 6 ) ! Spare transformation buffer
       DOUBLE PRECISION XX, YY   ! transformed positions
       INTEGER I, J, K           ! loop counters
-      INTEGER IAT               ! Position in string
       INTEGER IIFIT             ! fit type
       INTEGER IP                ! pointer into lists
-      INTEGER ITER              ! iteration counter
-      INTEGER NCHAR             ! Number of characters inserted into
-                                ! line
+      INTEGER ITER              ! iteration counter line
       INTEGER NMTCH             ! number of matched positions
       INTEGER NSUM              ! for calculating RMS error
       LOGICAL ALDONE            ! transformations have been calculated
@@ -445,52 +436,15 @@
 *  If successful, print results.
       IF ( STATUS .EQ. SAI__OK ) then
          CALL CCD1_MSG( ' ', ' ', STATUS )
-         CALL CCD1_MSG( ' ', '    Transformation coefficients', STATUS )
-         CALL CCD1_MSG( ' ', '    ---------------------------', STATUS )
+         CALL CCD1_MSG( ' ', '    Transformation coefficients ' 
+     :   //'(mappings between position lists)', STATUS )
+         CALL CCD1_MSG( ' ', '    ----------------------------'
+     :   //'---------------------------------', STATUS )
          DO 16 I = 1, NIM
+            CALL CCD1_MSG( ' ', ' ', STATUS )
             CALL MSG_SETC( 'ID', LISTID( I ) )
             CALL CCD1_MSG( ' ', '  ^ID:', STATUS )
-
-*  Construct an output string with a tabular look.
-            BUFFER = ' '
-            IAT = 5
-            BUFFER( IAT: ) = 'A = '
-            IAT = 11
-            CALL CHR_DTOC( TR( 1, I ), BUFFER( IAT : ), NCHAR )
-            IAT = IAT + VAL__SZD
-            BUFFER( IAT: ) = '    B = '
-            IAT = IAT + 12
-            CALL CHR_DTOC( TR( 2, I ), BUFFER( IAT : ), NCHAR )
-
-*  Write out the string.
-            CALL CCD1_MSG( ' ', BUFFER, STATUS )
-
-*  Construct an output string with a tabular look.
-            IAT = 5
-            BUFFER( IAT: ) = 'C = '
-            IAT = 11
-            CALL CHR_DTOC( TR( 3, I ), BUFFER( IAT : ), NCHAR )
-            IAT = IAT + VAL__SZD
-            BUFFER( IAT: ) = '    D = '
-            IAT = IAT + 12
-            CALL CHR_DTOC( TR( 4, I ), BUFFER( IAT : ), NCHAR )
-
-*  Write out the string.
-            CALL CCD1_MSG( ' ', BUFFER, STATUS )
-
-*  Construct an output string with a tabular look.
-            IAT = 5
-            BUFFER( IAT: ) = 'E = '
-            IAT = 11
-            CALL CHR_DTOC( TR( 5, I ), BUFFER( IAT : ), NCHAR )
-            IAT = IAT + VAL__SZD
-            BUFFER( IAT: ) = '    F = '
-            IAT = IAT + 12
-            CALL CHR_DTOC( TR( 6, I ), BUFFER( IAT : ), NCHAR )
-
-*  Write out the string.
-            CALL CCD1_MSG( ' ', BUFFER, STATUS )
-            CALL CCD1_MSG( ' ', ' ', STATUS )
+            CALL CCD1_TROUT( TR( 1, I ), STATUS )
  16      CONTINUE
       ENDIF
 
