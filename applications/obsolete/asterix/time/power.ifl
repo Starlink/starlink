@@ -1,18 +1,16 @@
 Interface POWER
-   Parameter    INPUT
+   Parameter    INP
       position    1
       type        'UNIV'
-      keyword     'INP'
       ppath       'GLOBAL'
       association '<->GLOBAL.ANAL_DATA'
       prompt      'Enter name of input dataset'
       help        'Must be an HDS structure'
    EndParameter
 
-   Parameter    OUTPUT
+   Parameter    OUT
       position    2
       type        'UNIV'
-      keyword     'OUT'
       association '->GLOBAL.GRAFDS'
       prompt      'Enter name for the output dataset'
       help        'This will be an HDS file'

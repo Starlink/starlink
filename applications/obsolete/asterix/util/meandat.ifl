@@ -12,7 +12,7 @@ INTERFACE MEANDAT
 
 	    PARAMETER FILE1
                POSITION 2
-               TYPE    '_UNIV'
+               TYPE    'UNIV'
                PROMPT  'Enter filename'
                PPATH   'GLOBAL,CURRENT'
                VPATH   'PROMPT'
@@ -22,7 +22,7 @@ INTERFACE MEANDAT
 
 	    PARAMETER FILE2
                POSITION 3
-               TYPE    '_UNIV'
+               TYPE    'UNIV'
                PROMPT  'Enter filename'
                PPATH   'CURRENT'
                VPATH   'PROMPT'
@@ -31,7 +31,7 @@ INTERFACE MEANDAT
 
 	    PARAMETER FILE3
                POSITION 4
-               TYPE    '_UNIV'
+               TYPE    'UNIV'
                PROMPT  'Enter filename'
                PPATH   'CURRENT'
                VPATH   'PROMPT'
@@ -40,7 +40,7 @@ INTERFACE MEANDAT
 
 	    PARAMETER FILE4
                POSITION 5
-               TYPE    '_UNIV'
+               TYPE    'UNIV'
                PROMPT  'Enter filename'
                PPATH   'CURRENT'
                VPATH   'PROMPT'
@@ -49,7 +49,7 @@ INTERFACE MEANDAT
 
 	    PARAMETER FILE5
                POSITION 6
-               TYPE    '_UNIV'
+               TYPE    'UNIV'
                PROMPT  'Enter filename'
                PPATH   'CURRENT'
                VPATH   'PROMPT'
@@ -58,7 +58,7 @@ INTERFACE MEANDAT
 
 	    PARAMETER FILE6
                POSITION 7
-               TYPE    '_UNIV'
+               TYPE    'UNIV'
                PROMPT  'Enter filename'
                PPATH   'CURRENT'
                VPATH   'PROMPT'
@@ -67,7 +67,7 @@ INTERFACE MEANDAT
 
 	    PARAMETER FILE7
                POSITION 8
-               TYPE    '_UNIV'
+               TYPE    'UNIV'
                PROMPT  'Enter filename'
                PPATH   'CURRENT'
                VPATH   'PROMPT'
@@ -76,7 +76,7 @@ INTERFACE MEANDAT
 
 	    PARAMETER FILE8
                POSITION 9
-               TYPE    '_UNIV'
+               TYPE    'UNIV'
                PROMPT  'Enter filename'
                PPATH   'CURRENT'
                VPATH   'PROMPT'
@@ -85,7 +85,7 @@ INTERFACE MEANDAT
 
 	    PARAMETER FILE9
                POSITION 10
-               TYPE    '_UNIV'
+               TYPE    'UNIV'
                PROMPT  'Enter filename'
                PPATH   'CURRENT'
                VPATH   'PROMPT'
@@ -94,7 +94,7 @@ INTERFACE MEANDAT
 
 	    PARAMETER FILE10
                POSITION 11
-               TYPE    '_UNIV'
+               TYPE    'UNIV'
                PROMPT  'Enter filename'
                PPATH   'CURRENT'
                VPATH   'PROMPT'
@@ -103,7 +103,7 @@ INTERFACE MEANDAT
 
 	    PARAMETER FILE11
                POSITION 12
-               TYPE    '_UNIV'
+               TYPE    'UNIV'
                PROMPT  'Enter filename'
                PPATH   'CURRENT'
                VPATH   'PROMPT'
@@ -112,7 +112,7 @@ INTERFACE MEANDAT
 
 	    PARAMETER FILE12
                POSITION 13
-               TYPE    '_UNIV'
+               TYPE    'UNIV'
                PROMPT  'Enter filename'
                PPATH   'CURRENT'
                VPATH   'PROMPT'
@@ -121,7 +121,7 @@ INTERFACE MEANDAT
 
 	    PARAMETER FILE13
                POSITION 14
-               TYPE    '_UNIV'
+               TYPE    'UNIV'
                PROMPT  'Enter filename'
                PPATH   'CURRENT'
                VPATH   'PROMPT'
@@ -130,7 +130,7 @@ INTERFACE MEANDAT
 
 	    PARAMETER FILE14
                POSITION 15
-               TYPE    '_UNIV'
+               TYPE    'UNIV'
                PROMPT  'Enter filename'
                PPATH   'CURRENT'
                VPATH   'PROMPT'
@@ -139,7 +139,7 @@ INTERFACE MEANDAT
 
 	    PARAMETER FILE15
                POSITION 16
-               TYPE    '_UNIV'
+               TYPE    'UNIV'
                PROMPT  'Enter filename'
                PPATH   'CURRENT'
                VPATH   'PROMPT'
@@ -148,7 +148,7 @@ INTERFACE MEANDAT
 
 	    PARAMETER FILE16
                POSITION 17
-               TYPE    '_UNIV'
+               TYPE    'UNIV'
                PROMPT  'Enter filename'
                PPATH   'CURRENT'
                VPATH   'PROMPT'
@@ -157,7 +157,7 @@ INTERFACE MEANDAT
 
 	    PARAMETER FILE17
                POSITION 18
-               TYPE    '_UNIV'
+               TYPE    'UNIV'
                PROMPT  'Enter filename'
                PPATH   'CURRENT'
                VPATH   'PROMPT'
@@ -166,7 +166,7 @@ INTERFACE MEANDAT
 
 	    PARAMETER FILE18
                POSITION 19
-               TYPE    '_UNIV'
+               TYPE    'UNIV'
                PROMPT  'Enter filename'
                PPATH   'CURRENT'
                VPATH   'PROMPT'
@@ -175,7 +175,7 @@ INTERFACE MEANDAT
 
 	    PARAMETER FILE19
                POSITION 20
-               TYPE    '_UNIV'
+               TYPE    'UNIV'
                PROMPT  'Enter filename'
                PPATH   'CURRENT'
                VPATH   'PROMPT'
@@ -184,7 +184,7 @@ INTERFACE MEANDAT
 
 	    PARAMETER FILE20
                POSITION 21
-               TYPE    '_UNIV'
+               TYPE    'UNIV'
                PROMPT  'Enter filename'
                PPATH   'CURRENT'
                VPATH   'PROMPT'
@@ -368,8 +368,8 @@ INTERFACE MEANDAT
                DEFAULT  Y
             ENDPARAMETER
 
-	    PARAMETER OUTPUT
-               TYPE    '_UNIV'
+	    PARAMETER OUT
+               TYPE    'UNIV'
                PROMPT  'Enter output filename'
                PPATH   'CURRENT'
                VPATH   'PROMPT'

@@ -1,8 +1,7 @@
 Interface SINFIT
-   Parameter    INPUT
+   Parameter    INP
       POSITION       1
       TYPE           'UNIV'
-      keyword        'INP'
       vpath          'PROMPT'
       ppath          'GLOBAL'
       association    '<->GLOBAL.BINDS'
@@ -10,34 +9,30 @@ Interface SINFIT
       help           'Must contain a DATA_ARRAY component or be a vector'
    EndParameter
 
-   Parameter    OUTPUT
+   Parameter    OUT
       POSITION       2
       TYPE           'UNIV'
-      keyword        'OUT'
       association    '->GLOBAL.GRAFDS'
       prompt         'Enter name of output dataset'
       help           'This will be an HDS object'
    EndParameter
 
-   Parameter    BASE_FREQ
+   Parameter    BASE
       position       3
-      keyword        'BASE'
       type           '_REAL'
       prompt         'Base frequency (time units)**-1'
       help           'Lowest frequency to be fitted to the data'
    EndParameter
 
-   Parameter    FREQ_INCREMENT
+   Parameter    INC
       POSITION       4
-      KEYWORD        'INC'
       type           '_REAL'
       prompt         'Frequency increment (time units)**-1'
       help           'Between frequencies fitted to the data'
    EndParameter
 
-   Parameter    NO_OF_FREQS
+   Parameter    NUM
       POSITION       5
-      KEYWORD        'NUM'
       type           '_INTEGER'
       prompt         'Number of frequencies to be fitted to the data'
       help           'There is no limit - except the time taken!'
