@@ -1208,24 +1208,24 @@ do_deinstall:
 #
 #  Deinstall the Latex documentation, if installed versions exist.
 	- for f in $(LATEX_DOCS) ""; do \
-           if test -n "$$f" -a -f $(INSTALL_DOCS)/$$f; then \
+	    if test -n "$$f" -a -f $(INSTALL_DOCS)/$$f; then \
 	      rm -r $$f;\
-	      cp -p $(INSTALL_DOCS)/$$f .\;
-              rm -f $(INSTALL_DOCS)/$$f;\
-           else :; fi;\
-        done
+	      cp -p $(INSTALL_DOCS)/$$f .;\
+	      rm -f $(INSTALL_DOCS)/$$f;\
+	    else :; fi;\
+	done
 #
 #  Deinstall any hypertext documents,  and relink the hypertext if required.
 	- if test -n "$(HYPERTEXT_DOCS)"; then \
-           for f in $(HYPERTEXT_DOCS) ""; do \
-              if test -n "$$f" -a -d $(INSTALL_DOCS)/$$f; then \
-                 rm -f -r $(INSTALL_DOCS)/$$f;\
-              else :; fi;\
-           done;\
-           HTX_PATH='$(STAR_DOCS):$(STAR_HELP)';\
-           export HTX_PATH;\
-           $(STAR_BIN)/hlink $(INSTALL_DOCS) $(INSTALL_HELP);\
-        fi
+	   for f in $(HYPERTEXT_DOCS) ""; do \
+	      if test -n "$$f" -a -d $(INSTALL_DOCS)/$$f; then \
+	         rm -f -r $(INSTALL_DOCS)/$$f;\
+	      else :; fi;\
+	   done;\
+	   HTX_PATH='$(STAR_DOCS):$(STAR_HELP)';\
+	   export HTX_PATH;\
+	   $(STAR_BIN)/hlink $(INSTALL_DOCS) $(INSTALL_HELP);\
+	fi
 #
 #  Deinstall the date stamp file after setting its protection so it may
 #  be removed.

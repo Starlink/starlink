@@ -207,12 +207,10 @@ install-bin:
 	chmod 0755 $(DEMO_TCL)
 	$(INSTALL) $(DEMO_TCL) $(BINDIR)
 	$(INSTALL) $(GAIAMON) $(BINDIR)
-	for f in gaiaMon $(IFC_FILES) ""; do \
+	for f in gaiaMon $(GAIA_TASKS) ""; do \
 	   (cd bin; \
-	   if test -f "$${f}.ifl"; then \
-	      $(COMPIFL) $$f; \
+	   if test -f "$${f}.ifc"; then \
 	      $(INSTALL_DATA) $${f}.ifc $(BINDIR)/; \
-	      $(RM) $${f}.ifc; \
 	   else :; fi;\
 	   );\
 	done
