@@ -685,6 +685,8 @@ AC_DEFUN([STAR_LATEX_DOCUMENTATION],
                 _star_tmp="$_star_tmp $d.tex $d.ps $d.htx_tar"
             done
             STAR@&t@_LATEX_DOCUMENTATION="$_star_tmp"
+            : ${LATEX2DVI='$LATEX $<; $LATEX $<'}
+            AC_SUBST(LATEX2DVI)
         else
             AC_MSG_WARN([not installing docs $1])
         fi
@@ -693,6 +695,66 @@ AC_DEFUN([STAR_LATEX_DOCUMENTATION],
        ])
     AC_SUBST([STAR@&t@_LATEX_DOCUMENTATION])dnl
 ])# STAR_LATEX_DOCUMENTATION
+
+# STAR_XML_DOCUMENTATION(documentcode, [targets])
+# -----------------------------------------------
+# Generate the standard makefile targets to handle XML documentation
+# source.  The parameter documentcode should be something like
+# `sun123' -- it should not include any .xml extension.
+#
+# The second, optional, argument gives an explicit list of the targets
+# which are build.  If this is _not_ specified, then a standard list
+# is used (.tex, .ps and .tar_htx) and corresponding rules added to
+# the generated makefile.  If it is specified, it must be non-null,
+# and its value is a list of files which are to be added to the
+# distribution, and no extra Makefile rules are added.  Thus if users need
+# anything complicated done, they should use this second argument and
+# provide rules for satisfying the given targets.
+#
+# In the latter case, the .tex -> htx_tar rule is still emitted, so
+# you can use it, but it requires the substitution variables JADE, SGMLNORM,
+# and SGMLKIT_HOME.  This is rather inconvenient, and it is fortunate that
+# you almost certainly won't need to use this.
+AC_DEFUN([STAR_XML_DOCUMENTATION],
+   [m4_ifval([$1], [], [AC_FATAL([$0: called with no documentcode])])dnl
+    STAR_DOCUMENTATION="$STAR_DOCUMENTATION $1"
+    m4_ifval([$2],
+       [dnl non-empty second argument -- just add to variable
+        if $_star_build_docs; then
+            _STAR_EXTRA_DIST($2)
+            STAR@&t@_XML_DOCUMENTATION="$2"
+        else
+            AC_MSG_WARN([not installing docs $1])
+        fi
+        ],
+       [dnl second arg empty -- use defaults
+        if $_star_build_docs; then
+            AC_PATH_PROGS(JADE, [openjade jade], NOJADE)
+            AC_PATH_PROGS(SGMLNORM, [osgmlnorm sgmlnorm], NOSGMLNORM)
+            if test "$JADE" = NOJADE -o "$SGMLNORM" = NOSGMLNORM; then
+                AC_MSG_WARN([can't find (open)jade + (o)sgmlnorm -- skipping XML documentation $1])
+            else
+                _star_tmp=
+                for d in $1
+                do
+                    _STAR_EXTRA_DIST($d.tex $d.ps $d.htx_tar)
+                    _star_tmp="$_star_tmp $d.tex $d.ps $d.htx_tar"
+                done
+                STAR@&t@_XML_DOCUMENTATION="$_star_tmp"
+                STAR_CHECK_PROGS([sgml2docs sgmlnorm])
+                SGMLKIT_HOME=$prefix/lib/sgmlkit
+                AC_SUBST(SGMLKIT_HOME)
+                : ${LATEX2DVI='$$LATEX $$[]1; $$LATEX $$[]1'}
+                AC_SUBST(LATEX2DVI)
+            fi
+        else
+            AC_MSG_WARN([not installing docs $1])
+        fi
+        STAR_DECLARE_DEPENDENCIES([sourceset], [sgmlkit])
+       ])
+    AC_SUBST([STAR@&t@_XML_DOCUMENTATION])dnl
+])# STAR_XML_DOCUMENTATION
+            
 
 
 # STAR_CHECK_PROGS(progs-to-check-for, [component=''])

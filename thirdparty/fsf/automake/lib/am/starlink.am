@@ -20,15 +20,27 @@
 ## This file contains material ADDITIONAL to FSF automake, for
 ## supporting the Starlink build system.
 
-if %?LATEXDOCS%
-# Templates to generate documentation
+if %?HAVEDOCS%
+# Templates to generate documentation from LaTeX sources
+# LATEX2DVI is a sequence of commands which will run $LATEX plus any other
+# commands (such as bibtex or makeindex) on the file $1.
+#
+# LaTeX commands are common to both LaTeX and XML sources.  These don't
+# have to be predist-only.
 .tex.dvi:
-	latex $<; latex $<
+	LATEX=latex; latex2dvi () { $(LATEX2DVI); }; \
+	  latex2dvi $<
 .dvi.ps:
 	dvips -o $@ $<
+.tex.pdf:
+	LATEX=pdflatex; latex2dvi () { $(LATEX2DVI); }; \
+	  latex2dvi $<
+endif %?HAVEDOCS%
+if %?LATEXDOCS%
 # Don't express a dependency via the directory .htx, or else Make
-# tries to delete it as an intermediate.  An alternative is to use
-# .PRECIOUS, but that's not completely straightforward to arrange.
+# tries to delete it as an intermediate (we can't specify
+# .PRECIOUS targets within this file).
+#
 # Requires that the STAR2HTML substitution was made in
 # configure.ac, probably implicitly by the STAR_LATEX_DOCUMENTATION macro.
 #
@@ -39,6 +51,32 @@ if %?LATEXDOCS%
 @PREDIST@	- @STAR2HTML@ $<
 @PREDIST@	tar cf $@ ${<:.tex=.htx}
 endif %?LATEXDOCS%
+if %?XMLDOCS%
+# Templates to generate documentation from XML sources
+#
+# We do not require that jade/sgmlnorm be available on the build system,
+# so we distribute built htx documentation.  The following rules are active
+# only in the predist state.
+#
+# Don't express a dependency via the tarball .texml_tar or the directory
+# .texml, or else Make deletes it as an intermediate, hence the tests within
+# the xml->tex rule (we can't specify .PRECIOUS targets here).
+#
+# Requires JADE, SGMLNORM and SGMLKIT_HOME substitutions, managed by
+# STAR_XML_DOCUMENTATION.
+@PREDIST@.xml.tex:
+@PREDIST@	if test -f $(<:.xml=.texml_tar); then :; else $(MAKE) $(<:.xml=.texml_tar); fi
+@PREDIST@	if test -d $(<:.xml=.texml); then :; else tar xf $(<:.xml=.texml_tar); fi
+@PREDIST@	cp $(<:.xml=.texml)/$@ .
+@PREDIST@.xml.htx_tar:
+@PREDIST@	JADE=$(JADE) SGMLNORM=$(SGMLNORM) \
+@PREDIST@		SGML_CATALOG_FILES=$(SGMLKIT_HOME)/dtd/CATALOG-override \
+@PREDIST@ 		$(SGML2DOCS) --html --tarball=$@ $<
+@PREDIST@.xml.texml_tar:
+@PREDIST@	JADE=$(JADE) SGMLNORM=$(SGMLNORM) \
+@PREDIST@		SGML_CATALOG_FILES=$(SGMLKIT_HOME)/dtd/CATALOG-override \
+@PREDIST@ 		$(SGML2DOCS) --texml --tarball=$@ $<
+endif %?XMLDOCS%
 
 if %?COMPIFL%
 # Compile IFL files.  Requires that the COMPIFL substitution was made in

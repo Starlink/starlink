@@ -4983,9 +4983,8 @@ sub handle_minor_options
 
 sub handle_starlink
 {
-    my $havelatex =
-      defined($starlink_seen_features{latexdocs})
-        && $starlink_seen_features{latexdocs};
+    my $havelatex = ($starlink_seen_features{latexdocs} || 0);
+    my $havexml =   ($starlink_seen_features{xmldocs}   || 0);
 
     # messgen handled in handle_messgen
 
@@ -5007,6 +5006,14 @@ sub handle_starlink
         register_suffix_rule (INTERNAL, '.ifl', '.ifc');
       }
 
+    my $havesomedocs = 0;
+    if ($havelatex || $havexml)
+      {
+        register_suffix_rule (INTERNAL, '.tex', '.dvi');
+        register_suffix_rule (INTERNAL, '.dvi', '.ps');
+        register_suffix_rule (INTERNAL, '.tex', '.pdf');
+        $havesomedocs = 1;
+      }
     if ($havelatex) 
       {
         # the starlink.am file defines template rules to generate
@@ -5015,16 +5022,23 @@ sub handle_starlink
         # rule here.  Simply adding to the SUFFIXES variable doesn't
         # work, since that variable is special.  The other two rules
         # aren't really necessary, but do no harm.
-        register_suffix_rule (INTERNAL, '.tex', '.dvi');
         register_suffix_rule (INTERNAL, '.tex', '.htx_tar');
-        register_suffix_rule (INTERNAL, '.dvi', '.ps');
+      }
+    if ($havexml)
+      {
+        # ditto, but for the XML rules
+        register_suffix_rule (INTERNAL, '.xml', '.tex');
+        register_suffix_rule (INTERNAL, '.xml', '.htx_tar');
+        register_suffix_rule (INTERNAL, '.xml', '.texml_tar');
       }
 
     my $want_version_dat = defined $starlink_seen_features{'per-package-dirs'};
 
     $output_rules .= &file_contents ('starlink',
                                      new Automake::Location,
+                                     HAVEDOCS => $havesomedocs,
                                      LATEXDOCS => $havelatex,
+                                     XMLDOCS => $havexml,
                                      COMPIFL => $want_compifl,
                                      VERSIONDAT => $want_version_dat,
                                     );
@@ -5136,6 +5150,7 @@ sub scan_autoconf_traces ($)
 		sinclude => 1,
                 STAR_DEFAULTS => 0,
                 STAR_LATEX_DOCUMENTATION => 1,
+                STAR_XML_DOCUMENTATION => 1,
                 STAR_MESSGEN => 1,
                 STAR_MONOLITHS => 0,
                 STAR_PREDIST_SOURCES => 1,
@@ -5320,7 +5335,14 @@ sub scan_autoconf_traces ($)
         }
       elsif ($macro eq 'STAR_LATEX_DOCUMENTATION')
         {
-          $starlink_seen_features{latexdocs} = 1;
+          if (defined $starlink_seen_features{latexdocs})
+            {
+              $starlink_seen_features{latexdocs} += ' '.$args[1];
+            }
+          else
+            {
+              $starlink_seen_features{latexdocs} = $args[1];
+            }
         }
       elsif ($macro eq 'STAR_MESSGEN')
         {
@@ -5347,6 +5369,17 @@ sub scan_autoconf_traces ($)
       elsif ($macro eq 'STAR_SPECIAL_INSTALL_COMMAND')
         {
           $starlink_seen_features{'special-install'} = $args[1];
+        }
+      elsif ($macro eq 'STAR_XML_DOCUMENTATION')
+        {
+          if (defined $starlink_seen_features{xmldocs})
+            {
+              $starlink_seen_features{xmldocs} += ' '.$args[1];
+            }
+          else
+            {
+              $starlink_seen_features{xmldocs} = $args[1];
+            }
         }
     }
 

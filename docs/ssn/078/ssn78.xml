@@ -5382,9 +5382,9 @@ file.f: file.$(FPP_SRC_EXT)
 
           <p>Generate the standard makefile targets to handle
             &latex; documentation source<index>documentation</index>.
-            The parameter documentcode 
+            The parameter <code>documentcode</code> 
             should be something like `sun123' -- it should not include
-            any .tex extension.</p>
+            any <code>.tex</code> extension.</p>
 
           <p>The second, optional, argument gives an explicit list
             of the targets which are build.  If this is <em>not</em>
@@ -5406,12 +5406,32 @@ file.f: file.$(FPP_SRC_EXT)
             <code>STAR_CHECK_PROGS(star2html)</code> or otherwise (see
             <ref id="macro-check-progs"/>).</p>
 
+          <p>The rule for compiling &latex; files simply runs &latex;
+            twice.  If you need to do more than this -- for example to
+            run BibTeX or make an index -- then you can override this
+            by setting the variable <code>LATEX2DVI</code> in the
+            <code>configure.ac</code> file; it is already substituted
+            with a default value, so you don't have to call
+            <code>AC_SUBST</code> on it.  This variable should refer
+            to &latex; as <code>$$LATEX</code> and to the &latex; file
+            to be compiled as <code>$$1</code> (the doubled dollar
+            signs are because this is evaluated within the context of
+            a `make' rule), so if you needed to run
+            BibTeX between the &latex; runs, you would define:
+<verbatim>
+LATEX2DVI='$$LATEX $$1; bibtex $$1; $$LATEX $$1'
+</verbatim></p>
+
           <p>This macro defines the substitution variable
             <code>@STAR_LATEX_DOCUMENTATION@</code> to be the second
             macro argument if that is present, or the default file
             list if not.  This variable must therefore be used as a value
             for the <code>stardocs_DATA</code> Makefile variable (see
             <ref id="variable-starxxxdata"/>).</p>
+
+          <p>The configure option
+            <code>--without-stardocs</code><index>configure!options!--without-stardocs</index>
+            suppresses building documenation.</p>
 
         </subsect>
 
@@ -5464,60 +5484,6 @@ AC_SUBST(STAR_MANIFEST_DIR)
             to add this for each one.</p>
 
           <p>See also <ref id="macro-special-install-command"/>.</p>
-        </subsect>
-
-        <subsect id="macro-special-install-command"
-            export="export"
-          indexkey="starconf!macros!STAR_SPECIAL_INSTALL_COMMAND">
-          <subhead>
-            <title>STAR_SPECIAL_INSTALL_COMMAND</title>
-          </subhead>
-
-          <p>Third-party sources will not come with a
-            <code>make install</code> target which installs a
-            manifest<index>installation!special</index>.  It is 
-            reasonably easy to add such support, however, as
-            described in <ref id="config-tclsys"/>.  The crucial
-            feature is the installation command declared in the macro
-            <code>STAR_SPECIAL_INSTALL_COMMAND</code>.  If this macro
-            variable is present in a <code>configure.ac</code> file,
-            then Starlink automake will generate an
-            <code>install</code> target which uses this command to do
-            the installation, in such a way that a manifest file can
-            be generated automatically.  For this to work, the command
-            must have the following features:
-            <ol>
-              <li>
-                <p>It must include the string <code>$(MAKE)</code> (as
-                opposed to plain `<code>make</code>'), as part of some
-                <code>$(MAKE) ... install</code> command.</p>
-              </li>
-              <li>
-                <p>It must be prepared to install its files in a
-                  location which is prefixed by the value of the
-                  environment variable <code>$DESTDIR</code>.  Recent
-                  versions of automake generate support for this
-                  variable automatically, older versions appear to
-                  have had the same functionality, but used a variable
-                  <code>$INSTALL_ROOT</code> for it.</p>
-              </li>
-            </ol>
-            The example shown in <ref id="config-tclsys"/> shows a use
-            of this macro which satisfies these constraints.</p>
-
-          <p>The command may be as complicated as you like, but note
-            that it is collapsed onto a single line by autoconf, so
-            although you may spread the macro argument over several
-            lines for readability, each command <em>must</em> be
-            separated by a semicolon (or double-ampersand or double-bar).</p>
-
-          <p>The generated Makefile rule requires that the makefile
-            variables <code>$(PACKAGE_NAME)</code> and
-            <code>$(PACKAGE_VERSION)</code> be set.</p>
-
-          <p>See <ref id="importing-thirdparty"/> for general
-            discussion of importing third-party
-            sources.<index>thirdparty code</index></p> 
         </subsect>
 
         <subsect id='macro-messgen' export='export'
@@ -5778,6 +5744,107 @@ BUILT_SOURCES = $(include_MESSAGES)
 
           <p>For examples of use, see <ref id="autodistrib"/></p>
 
+        </subsect>
+
+        <subsect id="macro-special-install-command"
+            export="export"
+          indexkey="starconf!macros!STAR_SPECIAL_INSTALL_COMMAND">
+          <subhead>
+            <title>STAR_SPECIAL_INSTALL_COMMAND</title>
+          </subhead>
+
+          <p>Third-party sources will not come with a
+            <code>make install</code> target which installs a
+            manifest<index>installation!special</index>.  It is 
+            reasonably easy to add such support, however, as
+            described in <ref id="config-tclsys"/>.  The crucial
+            feature is the installation command declared in the macro
+            <code>STAR_SPECIAL_INSTALL_COMMAND</code>.  If this macro
+            variable is present in a <code>configure.ac</code> file,
+            then Starlink automake will generate an
+            <code>install</code> target which uses this command to do
+            the installation, in such a way that a manifest file can
+            be generated automatically.  For this to work, the command
+            must have the following features:
+            <ol>
+              <li>
+                <p>It must include the string <code>$(MAKE)</code> (as
+                opposed to plain `<code>make</code>'), as part of some
+                <code>$(MAKE) ... install</code> command.</p>
+              </li>
+              <li>
+                <p>It must be prepared to install its files in a
+                  location which is prefixed by the value of the
+                  environment variable <code>$DESTDIR</code>.  Recent
+                  versions of automake generate support for this
+                  variable automatically, older versions appear to
+                  have had the same functionality, but used a variable
+                  <code>$INSTALL_ROOT</code> for it.</p>
+              </li>
+            </ol>
+            The example shown in <ref id="config-tclsys"/> shows a use
+            of this macro which satisfies these constraints.</p>
+
+          <p>The command may be as complicated as you like, but note
+            that it is collapsed onto a single line by autoconf, so
+            although you may spread the macro argument over several
+            lines for readability, each command <em>must</em> be
+            separated by a semicolon (or double-ampersand or double-bar).</p>
+
+          <p>The generated Makefile rule requires that the makefile
+            variables <code>$(PACKAGE_NAME)</code> and
+            <code>$(PACKAGE_VERSION)</code> be set.</p>
+
+          <p>See <ref id="importing-thirdparty"/> for general
+            discussion of importing third-party
+            sources.<index>thirdparty code</index></p> 
+        </subsect>
+
+        <subsect id="macro-xml-documentation" export="export"
+          indexkey="starconf!macros!STAR_XML_DOCUMENTATION">
+          <subhead>
+            <title>STAR_XML_DOCUMENTATION</title>
+          </subhead>
+
+          <p><strong><code>STAR_XML_DOCUMENTATION(documentcode, [targets=''])</code></strong></p>
+
+          <p>Generate the standard makefile targets to handle XML
+            documentation source<index>documentation</index>.  The
+            parameter <code>documentcode</code> should be something
+            like `sun123' -- it should not include any
+            <code>.xml</code> extension.</p>
+
+          <p>For details, see the macro <ref
+              id="macro-latex-documentation">STAR_LATEX_DOCUMENTATION</ref>,
+            which this macro closely matches, and which is more often
+            used.  The differences are as follows:
+            <ul>
+              <li>
+                <p>The default list of targets is the same, though
+                  using the second argument (discouraged)
+                  requires you to specify values for the
+                  <code>JADE</code>, <code>SGMLNORM</code> and
+                  <code>SGMLKIT_HOME</code> substitution variables.</p>
+              </li>
+
+              <li>
+                <p>This macro defines the substitution variable
+                <code>@STAR_XML_DOCUMENTATION@</code></p>
+              </li>
+
+              <li>
+                <p>This macro declares a dependency on the sgmlkit
+                  component.</p>
+              </li>
+
+              <li>
+                <p>The interface to <code>LATEX2DVI</code> is the
+                  same, and configure option
+                  <code>--without-stardocs</code><index>configure!options!--without-stardocs</index>
+                  suppresses this documenation, too.</p>
+              </li>
+            </ul>
+          </p>
         </subsect>
 
         <subsect id="variable-starxxxdata" export="export"
