@@ -10,6 +10,7 @@
 *    Authors :
 *
 *     David J. Allan (ROSAT, University of Birmingham)
+*     Richard Beard (ROSAT, University of Birmingham)
 *
 *    History :
 *
@@ -27,6 +28,8 @@
 *     25 Apr 95 : Switched to use BDI_ (DJA)
 *      8 May 1996 (DJA):
 *        Updated to ADI
+*     24 Feb 1997 (RB):
+*        Fudge axis id's if labels are blank for 2-d images
 *
 *    Type definitions :
 *
@@ -148,6 +151,16 @@
             AXID(IAX) = 0
           END IF
         END DO
+
+*    We'll have to fudge images as labels are blank (RB)
+        IF ( AXID(1) .EQ. 0 .AND. AXID(2) .EQ. 0 .AND.
+     :       AXID(2) .EQ. 0 .AND. AXID(3) .EQ. 0 ) THEN
+          IF ( NDIM .EQ. 2 .AND.
+     :         DIMS(1) .GT. 1 .AND. DIMS(2) .GT. 1) THEN
+            AXID(1) = 1
+            AXID(2) = 2
+          END IF
+        END IF
 
 *    Check axes
         DO IAX = 1, NDIM
