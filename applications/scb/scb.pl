@@ -130,6 +130,7 @@ sub search_keys;
 sub package_list;
 sub output;
 sub error;
+sub mimetype;
 sub header;
 sub footer;
 sub hprint;
@@ -144,7 +145,6 @@ sub tidyup;
 
 if (exists $ENV{'SERVER_PROTOCOL'}) {
    $cgi = 1;
-   print "Content-Type: text/html\n\n";
    @ARGV = split '&', $ENV{'QUERY_STRING'};
    $ENV{'PATH'} = '/bin:/usr/bin';
 }
@@ -550,6 +550,9 @@ sub package_list {
 
    my $package = shift;
 
+#  Separator
+
+   my $sep = "<b>-</b>&nbsp;";
 
    if ($package) {
 
@@ -557,31 +560,54 @@ sub package_list {
 
       print "<h2>$package</h2>\n";
 
-#     Get list of tasks within selected package.
+#     Print links to package-specific lists which will not be given here.
 
-      my @tasks = @{$tasks{$package}};
-      my $sep = "<b>-</b>&nbsp;";
+      my %printlist;
+      $printlist{$type} = 1;
 
-      if (@tasks) {
+      print "<hr><h3><a href='$scb?package=$package&amp;type=file#file'>",
+            "Files</a> in package <b>$package</b>.</h3>\n"
+         unless ($printlist{'file'});
+   
+      print "<hr><h3><a href='$scb?package=$package&amp;type=func#func'>",
+            "Routines</a> in package <b>$package</b>.</h3>\n"
+         unless ($printlist{'func'});
 
-#        Print list of tasks for selected package.
 
-         hprint "
-            <h3>Tasks</h3>
-            The following appear to be tasks within package $package:
-            <br>
-            <dl> <dt> <br> <dd>
-         ";
-         my $module;
-         foreach $module (sort @tasks) {
-            $task = $module;
-            $task =~ s/_$//;
-            print "$sep<a href='$scb?$module&amp;$package#$module'>$task</a>\n";
+      if (1) {
+#        Get list of tasks within selected package.
+
+         my @tasks = @{$tasks{$package}};
+
+         if (@tasks) {
+
+#           Print list of tasks for selected package.
+
+            hprint "
+               <hr>
+               <h3>Tasks in package <b>$package</b>:</h3>
+               The following appear to be tasks within package <b>$package</b>:
+               <br>
+               <dl> <dt> <br> <dd>
+            ";
+            my $module;
+            foreach $module (sort @tasks) {
+               $task = $module;
+               $task =~ s/_$//;
+               print 
+                  "$sep<a href='$scb?$module&amp;$package#$module'>$task</a>\n";
+            }
+            print "</dl>\n\n";
          }
-         print "</dl>\n<hr>\n";
       }
 
-      if ($type =~ /^(func|regex|)$/) {
+      if ($printlist{'func'}) {
+
+         hprint "
+            <hr>
+            <a name='func'>
+            <h3>Routines in package <b>$package</b>:</h3> 
+         ";
 
 #        Assemble a list of functions in the package for each function
 #        prefix.
@@ -599,7 +625,6 @@ sub package_list {
 #           For each prefix, print group of functions in the package.
 
             hprint "
-               <h3>Routines</h3>
                The following routines (C and Fortran functions and subroutines)
                from the package $package are indexed:<br>
             ";
@@ -623,9 +648,21 @@ sub package_list {
             }
             print "\n</dl>\n<hr>\n";
          }
+         else {
+            hprint "
+               No C or Fortran functions or subroutines are indexed for
+               package $package.
+            ";
+          }
       }
 
-      if ($type =~ /^(file|regex|)$/) {
+      if ($printlist{'file'}) {
+
+         hprint "
+            <hr>
+            <a name='file'>
+            <h3>Files in package <b>$package</b>:</h3>
+         ";
 
 #        Assemble a list of files in the package for each file extension.
 #        The code can be easily changed as commented to group them by
@@ -645,7 +682,6 @@ sub package_list {
 #           For each extension, print group of files in the package.
 
             hprint "
-               <h3>Files</h3>
                The following files from the package are indexed:<br>
             ";
             print "<dl>\n";
@@ -658,6 +694,11 @@ sub package_list {
                }
             }
             print "\n</dl>\n<hr>\n";
+         }
+         else {
+            hprint "
+               No files are indexed for package $package.
+            ";
          }
       }
 
@@ -1147,15 +1188,9 @@ sub output {
       or error "Failed to open $file\n",
          "Probably the index file $func_indexfile is outdated or corrupted.\n";
 
-#  Output appropriate header text.
+#  In command line mode, print location of file to standard error.
 
-   if ($html) {
-      header $locname;
-      print "<pre>\n";
-   }
-   else {
-      print STDERR "$locname\n";
-   }
+   print STDERR "$locname\n" unless ($cgi);
 
    my ($body, $name, @names, $include, $sub, $copyright);
 
@@ -1165,8 +1200,8 @@ sub output {
 #     a language-specific tagging routine if one is defined for this
 #     file type.
 
-      $file =~ /\.([^.]+)$/;
-      my $ext = $1 || '';
+      $ext = '';
+      $ext = $1 if ($file =~ /\.([^.]+)$/);
       if ($rtagger = $tagger{$ext}) {
          eval { $tagged = &$rtagger (join '', <FILE>) };
          error "Internal: tagging error: $@" if ($@);
@@ -1239,13 +1274,45 @@ sub output {
             }
          }ges;
 
-#        Output tagged text.
+#        Output header and tagged source.
 
+         header $locname;
+         print "<pre>\n";
          print $tagged;
       }
       else {
 
-#        No tagging routine available; output raw text.
+#        No tagging routine available; output without tagging.
+#        On the whole, binary files are output as their proper MIME
+#        type if it can be identified (otherwise an 'unknown' type),
+#        and text files are output as preformatted HTML with appropriate
+#        header and footer text.  Text files are not mostly output as
+#        their proper MIME types, since as source files, it's probably
+#        the source that we want to see rather than, say executing an
+#        application/x-tcl type script.  There are exceptions to this
+#        rule of thumb, e.g. postscript.
+
+#        Get MIME type.
+
+         $mime = mimetype $ext;
+
+         if (-T $file && $mime !~ /postscript|html/) {
+
+#           Text file - output as preformatted HTML.
+
+            header $locname, 'text/html';
+            print "<pre>\n";
+         }
+         else {
+
+#           Other - output as own, or unknown, MIME type.
+
+            $mime ||= 'application/unknown';
+            header $locname, $mime;
+            $raw = 1;
+         }
+
+#        Output text of file.
 
          while (<FILE>) {
             print;
@@ -1255,14 +1322,16 @@ sub output {
 
 #     Output appropriate footer text.
 
-      print "</pre>\n";
-      my $year = 1900 + (localtime)[5];
-      hprint "
-         <hr><i>
-         Copyright &copy; $year Central Laboratory of the Research Councils
-         </i>
-      " unless ($copyright);
-      footer;
+      unless ($raw) {
+         print "</pre>\n";
+         my $year = 1900 + (localtime)[5];
+         hprint "
+            <hr><i>
+            Copyright &copy; $year Central Laboratory of the Research Councils
+            </i>
+         " unless ($copyright);
+         footer;
+      }
 
    }
 
@@ -1422,15 +1491,18 @@ sub header {
 #     Perl 5
 
 #  Invocation:
-#     header ($title);
+#     header $title [, $mimetype];
 
 #  Description:
-#     If in HTML mode, this routine prints the HEAD part of the HTML
-#     document.  Otherwise no action is taken.
+#     If in CGI mode, the HTTP header info is printed.
+#     If in HTML mode, and $mimetype is 'text/html' (the default), the 
+#     HEAD part of the HTML document is printed.
 
 #  Arguments:
 #     $title = string.
 #        Title element of document.
+#     $mimetype = string (optional).
+#        MIME type of document.
 
 #  Return value:
 
@@ -1452,11 +1524,18 @@ sub header {
 
 #  Get argument.
 
-   my $title = shift;
+   my ($title, $mimetype) = @_;
+   $mimetype ||= 'text/html';
 
 #  Print header.
 
-   if ($html) {
+   if ($cgi) {
+      print "Content-Type: $mimetype\n";
+      print "Title: $title\n";
+      print "\n";
+   }
+      
+   if ($html && $mimetype eq 'text/html') {
       print "<html>\n";
       print "<head><title>", demeta ($title), "</title></head>\n";
       print "<body>\n";
@@ -1506,6 +1585,84 @@ sub footer {
 #  Print HTML footer.
 
    print "</body>\n</html>\n" if $html;
+}
+
+
+########################################################################
+sub mimetype {
+
+#+
+#  Name:
+#     mimetype
+
+#  Purpose:
+#     Map file extension to MIME type.
+
+#  Language:
+#     Perl 5
+
+#  Invocation:
+#     $type = mimetype $extension;
+
+#  Description:
+#     Uses the system file $mimetypes_file (typically /etc/mime.types) to
+#     get a MIME type for a file with a given extension.  This is the 
+#     way HTTP servers generate MIME types for serving documents in 
+#     absence of better information.
+
+#  Arguments:
+#     $extension = string.
+#        Filename extension (the part after the last dot).
+
+#  Return value:
+#     $type = string.
+#        MIME type if one can be located, otherwise ''.
+
+#  Notes:
+#     Subject of course to the completeness of the $mimetypes_file; these
+#     are not always very complete, especially on older systems.
+
+#  Authors:
+#     MBT: Mark Taylor (IoA, Starlink)
+#     {enter_new_authors_here}
+
+#  History:
+#     05-OCT-1998 (MBT):
+#       Initial revision.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#  Get argument.
+
+   my $extension = shift;
+
+#  Check through $mimetypes_file looking for the requested file extension.
+#  If it is found, return with the corresponding MIME type.
+
+   if (open MIMETYPES, $mimetypes_file) {
+      my ($type, @ext, $ext);
+      while (<MIMETYPES>) {
+         ($type, @ext) = split (/\s+/, $_);
+         foreach $ext (@ext) {
+            return $type if ($ext eq $extension);
+         }
+      }
+   }
+   else {
+
+#     If $mimetypes_file could not be found, log a non-fatal error.
+#     We can still proceed without the MIME type.
+
+      print STDERR "Failed to open mime.types file '$mimetypes_file'\n";
+   }
+
+#  Return empty string if no successful match was made.
+
+   return '';
 }
 
 
