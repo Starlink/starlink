@@ -376,7 +376,7 @@ c        END IF
       END DO
 
 *    Unmap temporary booleans
-      CALL DYN_UNMAP (PTR)
+      CALL DYN_UNMAP( PTR, STATUS )
 
 *    Update history
       CALL HIST_ADD    (OLOC, VERSION,      STATUS)

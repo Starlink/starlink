@@ -198,7 +198,7 @@
                IF(IDIM(I).EQ.0)IDIM(I)=1
             ENDDO
             CALL AR7_AXSWAP_R(ODIM,%VAL(PTR),OAX,IDIM,%VAL(DPTR),STATUS)
-            CALL DYN_UNMAP(PTR)
+            CALL DYN_UNMAP(PTR,STATUS)
          ELSE
             DPTR=PTR
             DO I=1,NACTDIM
@@ -307,7 +307,7 @@ C            CALL MSG_PRNT( 'Maximum number of phase bins is ^INBINS' )
             CALL DYN_MAPR(NACTDIM,IDIM,VPTR,STATUS)
             CALL AR7_AXSWAP_R(VDIMS,%VAL(VAPTR),OAX,VDIM,
      :                                 %VAL(VPTR),STATUS)
-            CALL DYN_UNMAP(VAPTR)
+            CALL DYN_UNMAP(VAPTR,STATUS)
          ELSE
             VPTR=VAPTR
          ENDIF
@@ -331,7 +331,7 @@ C            CALL MSG_PRNT( 'Maximum number of phase bins is ^INBINS' )
            CALL DYN_MAPR(NACTDIM,IDIM,QPTR,STATUS)
            CALL AR7_AXSWAP_B(QDIMS,%VAL(QAPTR),OAX,QDIM,
      :                              %VAL(QPTR),STATUS)
-           CALL DYN_UNMAP(QAPTR)
+           CALL DYN_UNMAP(QAPTR,STATUS)
          ELSE
            QPTR=QAPTR
          ENDIF

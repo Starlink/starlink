@@ -89,6 +89,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          			! SAE constants
+      INCLUDE 'ADI_PAR'
 
 *  Arguments Given:
       INTEGER			NDIM			! See above
