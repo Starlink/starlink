@@ -13,7 +13,7 @@
 
 #  Description:
 #     This procedure defines an alias for each POLPACK command. The string
-#     /star-test/bin/polpack is replaced by the path of the directory containing the 
+#     INSTALL_BIN is replaced by the path of the directory containing the 
 #     package executable files when the package is installed. The string
 #     HELP_DIR is likewise replaced by the path to the directory containing 
 #     help libraries.
@@ -57,21 +57,21 @@
 #  Define symbols for the applications and scripts.
 #  ===============================================
 #
-      alias calpol    /star-test/bin/polpack/calpol
-      alias polhelp   /star-test/bin/polpack/polhelp 
-      alias polexp    /star-test/bin/polpack/polexp
-      alias polimp    /star-test/bin/polpack/polimp
-      alias polmap    /star-test/bin/polpack/polmap
-      alias polka     /star-test/bin/polpack/polka
+      alias calpol    INSTALL_BIN/calpol
+      alias polhelp   INSTALL_BIN/polhelp 
+      alias polexp    INSTALL_BIN/polexp
+      alias polimp    INSTALL_BIN/polimp
+      alias polmap    INSTALL_BIN/polmap
+      alias polka     INSTALL_BIN/polka
 #
 #  Now do the same with alternative names.
 #
-      alias pol_calpol    /star-test/bin/polpack/pol_calpol
-      alias pol_polhelp   /star-test/bin/polpack/polhelp 
-      alias pol_polexp    /star-test/bin/polpack/pol_polexp
-      alias pol_polimp    /star-test/bin/polpack/pol_polimp
-      alias pol_polmap    /star-test/bin/polpack/pol_polmap
-      alias pol_polka     /star-test/bin/polpack/pol_polka
+      alias pol_calpol    INSTALL_BIN/pol_calpol
+      alias pol_polhelp   INSTALL_BIN/polhelp 
+      alias pol_polexp    INSTALL_BIN/pol_polexp
+      alias pol_polimp    INSTALL_BIN/pol_polimp
+      alias pol_polmap    INSTALL_BIN/pol_polmap
+      alias pol_polka     INSTALL_BIN/pol_polka
 #
 #
 #  Set up the commands and environment variables needed to export and
@@ -88,8 +88,8 @@
          setenv NDF_XTN POLPACK
       endif
 
-      setenv NDF_IMP_POLPACK '/star-test/bin/polpack/polimp.csh ^ndf'
-      setenv NDF_EXP_POLPACK '/star-test/bin/polpack/polexp.csh ^ndf'
+      setenv NDF_IMP_POLPACK 'INSTALL_BIN/polimp.csh ^ndf'
+      setenv NDF_EXP_POLPACK 'INSTALL_BIN/polexp.csh ^ndf'
       setenv NDF_IMP_POLPACK_COMPRESSED ' '
       setenv NDF_EXP_POLPACK_COMPRESSED ' '
       setenv NDF_IMP_POLPACK_GZIP ' '

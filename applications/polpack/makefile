@@ -1213,8 +1213,6 @@ do_test:
 	@ echo
 	$(INSTALL_BIN)/$(PKG_NAME)_test
 	@ echo
-	@ echo 'A sucessful test is indicated by 12 "undefined" statements'
-	@ echo
 #
 #  Note the test has been run.
 	@ touch .TESTED_$(SYSTEM)

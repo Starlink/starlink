@@ -13,7 +13,7 @@
 #     polpack_test
 #
 #  Description:
-#     Starts up the POLPACK package and runs the ??????? application.
+#     Starts up the POLPACK package and runs the POLHELP application.
 #
 #  Authors:
 #     DSB: D.S. Berry (Starlink)
@@ -27,6 +27,6 @@
 #-
 #
 source INSTALL_BIN/polpack.csh
-??????
+polhelp
 echo "  POLPACK test script completed."
 #      End of shell script.
