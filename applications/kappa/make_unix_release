@@ -114,23 +114,22 @@
       $KAPPA_DEV/bin/hdcheck.tcl
 
 
-#  Create a CL script which will create the help database on /homemips
+#  Create a CL script which will create the help database on sa1.
       cat > temp.cl << FOO
-set kappa = /home/mips/dsb/iraf/kappa/
+set kappa = /sa1/home/dsb/iraf/kappa/
 so
 mkhelpdb kappa\$root.hd helpdb.mip
 lo
 FOO
 
-#  Create a tcsh script to set things up on axp0 and activate the CL script.
+#  Create a tcsh script to set things up on sa1 and activate the CL script.
       cat > kapiraf << FOO2
 #!/usr/local/bin/tcsh
 cd iraf
 rm -rf kappa
 mkdir kappa
 cd kappa
-ftp -v 193.61.251.100 << FOO3
-dsb
+ftp -v sl5 << FOO3
 ascii
 cd ${REL_DIR}
 get root.hd
@@ -145,26 +144,24 @@ cl < temp.cl
 FOO2
       chmod u+x kapiraf
 
-#  FTP this file to axp0.
-      ftp -v axp0 << FOO4
-dsb
+#  FTP this file to sa1.
+      ftp -v sa1 << FOO4
 ascii
 put kapiraf
 bye
 FOO4
       rm kapiraf 
 
-#  Ask the user to execute the script on axp0. Why wont rsh do this?
+#  Ask the user to execute the script on sa1. Why wont rsh do this?
       echo " "
       echo " "
-      echo "  Now log into axp0 and do 'source kapiraf'"
+      echo "  Now log into sa1 and do 'source kapiraf'"
       echo " "
       echo -n "Press RETURN to continue ..."
       set ans = $<
 
-#  Now FTP the helpdb.mip file back from axp0.
-      ftp -v axp0 << FOO5
-dsb
+#  Now FTP the helpdb.mip file back from sa1.
+      ftp -v sa1 << FOO5
 binary
 cd iraf
 get helpdb.mip
