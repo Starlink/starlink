@@ -46,7 +46,7 @@ dnl    declaration.
 AC_CONFIG_FILES([Makefile component.xml])
 
 dnl    Need to go into sub directories
-AC_CONFIG_SUBDIRS([include base data ])
+AC_CONFIG_SUBDIRS([include base data call])
 
 dnl    This is the bit that does the actual work
 AC_OUTPUT
