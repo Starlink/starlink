@@ -5292,6 +5292,36 @@ c      REAL HWID
       END
 
 
+*+ IMG_PUTPOS
+	SUBROUTINE IMG_PUTPOS( RA, DEC, STATUS )
+
+        IMPLICIT NONE
+
+*  Global constants :
+        INCLUDE 'SAE_PAR'
+*    Global variables :
+        INCLUDE 'IMG_CMN'
+*  Import :
+        DOUBLE PRECISION RA,DEC
+*  Status :
+        INTEGER STATUS
+*  Local constants :
+*  Local variables :
+      CHARACTER*20 RAS,DECS
+*-
+      IF (STATUS.EQ.SAI__OK) THEN
+
+*    Convert back to a uniform format
+        CALL CONV_DEGHMS( REAL(RA), RAS )
+        CALL CONV_DEGDMS( REAL(DEC), DECS )
+
+*    And store
+        CALL GRP_PUT( I_POS_ID, 1, RAS(:11)//DECS(:11), 0, STATUS )
+        I_NPOS = I_NPOS + 1
+
+      END IF
+
+      END
 
 
 *+ IMG_
