@@ -228,7 +228,7 @@ build:
 prepare:
 
 check_packages:
-[available] May 29, 2003 4:05:23 AM uk.ac.starlink.util.Loader starjavaDirectory
+[available] May 31, 2003 4:05:14 AM uk.ac.starlink.util.Loader starjavaDirectory
 [available] WARNING: Loader.class location file:/apps/cvsbuild/java/source/util/build/classes/uk/ac/starlink/util/Loader.class unexpected
 
 build:
@@ -476,10 +476,10 @@ check_packages:
 
 build:
     [mkdir] Created dir: /apps/cvsbuild/java/source/topcat/build/classes
-    [javac] Compiling 26 source files to /apps/cvsbuild/java/source/topcat/build/classes
-     [copy] Copying 3 files to /apps/cvsbuild/java/source/topcat/build/classes
+    [javac] Compiling 27 source files to /apps/cvsbuild/java/source/topcat/build/classes
+     [copy] Copying 47 files to /apps/cvsbuild/java/source/topcat/build/classes
     [mkdir] Created dir: /apps/cvsbuild/java/source/topcat/lib/topcat
-     [copy] Copying 2 files to /apps/cvsbuild/java/source/topcat/lib/topcat
+     [copy] Copying 3 files to /apps/cvsbuild/java/source/topcat/lib/topcat
      [echo] Executing Treeview target: build
 
 prepare:
@@ -496,7 +496,7 @@ build_demo:
 
 build:
     [mkdir] Created dir: /apps/cvsbuild/java/source/treeview/build/classes
-    [javac] Compiling 85 source files to /apps/cvsbuild/java/source/treeview/build/classes
+    [javac] Compiling 86 source files to /apps/cvsbuild/java/source/treeview/build/classes
     [javac] Note: /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/ApplicationInvoker.java uses or overrides a deprecated API.
     [javac] Note: Recompile with -deprecation for details.
      [copy] Copying 12 files to /apps/cvsbuild/java/source/treeview/build/classes

@@ -129,6 +129,7 @@ dist:
     [mkdir] Created dir: /apps/cvsbuild/java/source/jsky/bin/jsky
      [copy] Copying 2 files to /apps/cvsbuild/java/source/jsky/bin/jsky
      [copy] Copying 4 files to /apps/cvsbuild/java/source/jsky/docs/jsky
+    [chmod] Result: -1
 
 install:
     [mkdir] Created dir: /apps/cvsbuild/star/lib/jsky
@@ -415,7 +416,7 @@ install:
 prepare:
 
 check_packages:
-[available] May 29, 2003 4:34:43 AM uk.ac.starlink.util.Loader starjavaDirectory
+[available] May 31, 2003 4:34:49 AM uk.ac.starlink.util.Loader starjavaDirectory
 [available] WARNING: Loader.class location file:/apps/cvsbuild/java/source/util/build/classes/uk/ac/starlink/util/Loader.class unexpected
 
 build:
@@ -2289,10 +2290,10 @@ check_packages:
 
 build:
     [mkdir] Created dir: /apps/cvsbuild/java/source/topcat/build/classes
-    [javac] Compiling 26 source files to /apps/cvsbuild/java/source/topcat/build/classes
-     [copy] Copying 3 files to /apps/cvsbuild/java/source/topcat/build/classes
+    [javac] Compiling 27 source files to /apps/cvsbuild/java/source/topcat/build/classes
+     [copy] Copying 47 files to /apps/cvsbuild/java/source/topcat/build/classes
     [mkdir] Created dir: /apps/cvsbuild/java/source/topcat/lib/topcat
-     [copy] Copying 2 files to /apps/cvsbuild/java/source/topcat/lib/topcat
+     [copy] Copying 3 files to /apps/cvsbuild/java/source/topcat/lib/topcat
 
 jars:
       [jar] Building jar: /apps/cvsbuild/java/source/topcat/lib/topcat/topcat.jar
@@ -2320,8 +2321,8 @@ install:
     [mkdir] Created dir: /apps/cvsbuild/star/lib/topcat
     [mkdir] Created dir: /apps/cvsbuild/star/docs/topcat
 [loggedcopy] Copying 1 file to /apps/cvsbuild/star/bin
-[loggedcopy] Copying 3 files to /apps/cvsbuild/star/lib
-[loggedcopy] Copying 38 files to /apps/cvsbuild/star/docs
+[loggedcopy] Copying 4 files to /apps/cvsbuild/star/lib
+[loggedcopy] Copying 39 files to /apps/cvsbuild/star/docs
      [echo] Executing Treeview target: install
 
 prepare:
@@ -2338,7 +2339,7 @@ build_demo:
 
 build:
     [mkdir] Created dir: /apps/cvsbuild/java/source/treeview/build/classes
-    [javac] Compiling 85 source files to /apps/cvsbuild/java/source/treeview/build/classes
+    [javac] Compiling 86 source files to /apps/cvsbuild/java/source/treeview/build/classes
     [javac] Note: /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/ApplicationInvoker.java uses or overrides a deprecated API.
     [javac] Note: Recompile with -deprecation for details.
      [copy] Copying 12 files to /apps/cvsbuild/java/source/treeview/build/classes
@@ -2412,7 +2413,7 @@ install:
     [mkdir] Created dir: /apps/cvsbuild/star/docs/treeview
 [loggedcopy] Copying 2 files to /apps/cvsbuild/star/bin
 [loggedcopy] Copying 2 files to /apps/cvsbuild/star/lib
-[loggedcopy] Copying 96 files to /apps/cvsbuild/star/docs
+[loggedcopy] Copying 97 files to /apps/cvsbuild/star/docs
 [loggedcopy] Copying 14 files to /apps/cvsbuild/star/etc
      [echo] Executing Pal target: install
 
