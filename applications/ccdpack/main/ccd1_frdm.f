@@ -1,4 +1,4 @@
-      SUBROUTINE CCD1_FRDM( FSET, DMN, INDEX, STATUS )
+      SUBROUTINE CCD1_FRDM( FSET, DMN, IX, STATUS )
 *+
 *  Name:
 *     CCD1_FRDM
@@ -10,7 +10,7 @@
 *     Starlink Fortran 77.
 
 *  Invocation:
-*     CALL CCD1_FRDM( FSET, DMN, INDEX, STATUS )
+*     CALL CCD1_FRDM( FSET, DMN, IX, STATUS )
 
 *  Description:
 *     Given a domain list, this routine searches a frameset for a frame
@@ -30,7 +30,7 @@
 *        Name of the domain list to be searched for (see documentation of
 *        the AST_FINDFRAME routine for the syntax and semantics of this 
 *        list).
-*     INDEX = INTEGER (Returned)
+*     IX = INTEGER (Returned)
 *        Index of the frame within the frameset.  If no matching frame
 *        can be found, a value of 0 (which is not a valid frame index)
 *        is returned.
@@ -66,18 +66,19 @@
       CHARACTER * ( * ) DMN
       
 *  Arguments Returned:
-      INTEGER INDEX
+      INTEGER IX
       
 *  Status:
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
       INTEGER FR2                 ! Two dimensional dummy frame
+      INTEGER FRAME               ! Selected frame in frameset
       
 *.
 
 *  Set failed value of return value.
-      INDEX = 0
+      IX = 0
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
@@ -85,8 +86,12 @@
 *  Set up dummy two-dimensional frame for use in AST_FINDFRAME.
       FR2 = AST_FRAME( 2, ' ', STATUS )
 
-*  Get index.
-      INDEX = AST_FINDFRAME( FSET, FR2, DMN, STATUS )
+*  Get frame and index.
+      FRAME = AST_FINDFRAME( FSET, FR2, DMN, STATUS )
+      IF ( FRAME .NE. AST__NULL ) THEN
+         IX = AST_GETI( FSET, 'Current', STATUS )
+         CALL AST_ANNUL( FRAME, STATUS )
+      END IF
 
 *  Tidy up and exit.
       CALL AST_ANNUL( FR2, STATUS ) 
