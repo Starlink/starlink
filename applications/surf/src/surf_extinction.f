@@ -500,10 +500,6 @@
      :     'LAT-OBS', LAT_OBS, STATUS)
       LAT_OBS = LAT_OBS * PI / 180.0D0
 
-*  UT at which observation was made expressed as modified Julian day
-
-      CALL SCULIB_GET_MJD(N_FITS, FITS, UT1, RTEMP, STATUS)
-
 *  telescope offset from telescope centre
 
       CALL SCULIB_GET_FITS_R (SCUBA__MAX_FITS, N_FITS, FITS, 'MAP_X',
@@ -597,6 +593,11 @@
       CALL SCULIB_GET_LST_STRT(IN_SCUCDX_LOC, IN_LST_STRT_PTR,
      :     N_SWITCHES, N_EXPOSURES, N_INTEGRATIONS,
      :     N_MEASUREMENTS, STATUS)
+
+*  UT at which observation was made expressed as modified Julian day
+
+      CALL SCULIB_GET_MJD(N_FITS, FITS, %VAL(IN_LST_STRT_PTR), UT1, 
+     :     RTEMP, RTEMP, STATUS)
 
 *  see if the observation completed normally or was aborted
 
@@ -829,7 +830,7 @@
 *     In this case we assume this means that the second lst is referring
 *     to the following day (rather than precedding which makes no sense)
 *     We therefore add 2*PI
-      IF (FIRST_LST_RAD > SECOND_LST_RAD) THEN
+      IF (FIRST_LST_RAD .GT. SECOND_LST_RAD) THEN
          SECOND_LST_RAD = SECOND_LST_RAD + (2.0D0 * PI)
          CALL MSG_SETC('TASK',TSKNAME)
          CALL MSG_OUTIF(MSG__NORM,' ',
