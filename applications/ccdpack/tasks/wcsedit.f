@@ -4,7 +4,7 @@
 *     WCSEDIT
 
 *  Purpose:
-*     Modifies WCS components of a set of NDFs.
+*     Modifies or examines WCS components of a set of NDFs.
 
 *  Language:
 *     Starlink Fortran 77
@@ -23,11 +23,11 @@
 *     This task performs one of a set of modifications to the WCS
 *     (World Coordinate System) components of a list of NDFs.  
 *     According to the value of the MODE parameter it will: 
-*        -  Set the Current frame
-*        -  Add a new frame
-*        -  Remove a frame
-*        -  Set an attribute for a frame
-*        -  Show the frames which currently exist
+*        -  Set the Current coordinate system
+*        -  Add a new coordinate system
+*        -  Remove a coordinate system
+*        -  Set an attribute for a coordinate system
+*        -  Show the coordinate system which currently exist
 *
 *     The routine does not fail if some of the requested edits cannot
 *     be performed, but an output parameter MODIFIED records which 
@@ -45,18 +45,22 @@
 *           -  UNIT       -- No values are required
 *                X' = X
 *                Y' = Y
+*
 *           -  LINEAR     -- Six values C1-C6 are required:
 *                X' = C1 + C2 * X + C3 * Y
 *                Y' = C4 + C5 * X + C6 * Y
+*
 *           -  PINCUSHION -- Three values C1-C3 are required:
 *                X' = X + C1 * (X - C2) * ( (X - C2)**2 + (Y - C3)**2 ) )
 *                Y' = Y + C1 * (Y - C3) * ( (X - C2)**2 + (Y - C3)**2 ) )
+*
 *     DOMAIN = LITERAL (Read)
-*        If MODE is ADD this gives the domain name to be used for the
+*        If MODE is ADD this gives the Domain (name) to be used for the
 *        new frame.  Spaces in the name are ignored and letters are
 *        folded to upper case.  If the new frame is successfully added
-*        and any frame with the same domain name already exists, it
-*        will be removed, and a message will be printed to that effect.
+*        and any frame with the same domain name already exists, the
+*        old one will be removed, and a message will be printed to that 
+*        effect.
 *        [CCD_WCSEDIT]
 *     EPOCH = _DOUBLE (Read)
 *        If a "Sky Co-ordinate System" specification is supplied (using
@@ -92,8 +96,8 @@
 *        [!]
 *     IN = LITERAL (Read)
 *        A list specifying the names of the NDFs whose WCS components
-*        are to be modified.  The NDF names should be separated by 
-*        commas and may include wildcards.
+*        are to be modified or examined.  The NDF names should be 
+*        separated by commas and may include wildcards.
 *     INVERT = _LOGICAL (Read)
 *        If set TRUE the mapping defined by COEFFS will be applied in 
 *        the reverse direction.
@@ -125,7 +129,7 @@
 *        [BOTH]
 *     MAPTYPE = LITERAL (Read)
 *        This parameter is required when MODE is ADD, and specifies the
-*        type of mapping which connects the target frame to the new frame.
+*        type of mapping which maps from the target frame to the new frame.
 *        It may take one of the following values:
 *           -  UNIT
 *           -  LINEAR
@@ -154,32 +158,33 @@
 
 *  Examples:
 *     wcsedit * current ccd_reg
-*        This sets the current frame of all the NDFs in the current
-*        directory to the 'CCD_REG' domain.  The MODIFY parameter is 
+*        This sets the Current coordinate system of all the NDFs in
+*        the current directory to 'CCD_REG'.  The MODIFY parameter is
 *        set on output to contain the names of all those NDFs which
 *        had such a frame.
 *
 *     wcsedit data* remove frame=4
-*        The fourth frame in the WCS component of each NDF 'data*.sdf' 
-*        is removed.
+*        The fourth coordinate frame in the WCS component of each NDF
+*        'data*.sdf' is removed.
 *
 *     wcsedit "first,second" mode=add frame=GRID maptype=pincushion
-*             coeffs=[-6.8e-10,0,0] domain=NEW
-*        A new frame, in the domain 'NEW', is added to the NDFs first 
-*        and second.  It is connected to the previously existing GRID
-*        domain by a pincushion distortion mapping centred at the 
-*        origin with a distortion coefficient of -6.8e-10.  If any 
-*        frames with domain NEW already exist in those NDFs they are
-*        removed.
+*             coeffs=[-6.8e-8,0,0] domain=NEW
+*        A new coordinate system, called 'NEW', is added to the NDFs
+*        first  and second.  It is connected to the previously
+*        existing GRID domain by a pincushion distortion mapping
+*        centred at the origin with a distortion coefficient of
+*        -6.8e-8.  If any frames with domain NEW already exist in
+*        those NDFs they are removed.
 *
 *     wcsedit ndf1 set ! set="domain=NEW,title=New frame" 
-*        This changes the value of the Domain attribute of the current 
-*        frame in the WCS component of NDF1 to the name "NEW" and 
-*        sets the Title attribute of the frame to "New frame".
+*        This changes the value of the Domain attribute of the Current
+*        coordinate frame in the WCS component of NDF1 to the name
+*        "NEW" and  sets the Title attribute of the frame to "New
+*        frame".
 *
 *     wcsedit image1 show
-*        This displays all the frames in image1 with their domains and
-*        titles, and indicates which one is Current.
+*        This displays all the coordinate frames in image1 with their 
+*        Domains and titles, and indicates which one is Current.
 
 *  Notes:
 *     This routine provides similar functionality to that provided by
