@@ -1,4 +1,7 @@
-This is V2.1.5 (February 8 2000). New features include:
+This is V2.1.6 (February 11 2000). New features include:
+- crowding-flag bug introduced in V2.1.5 fixed.
+
+/*- Previous notes for V2.1.5 (February 8 2000) */
 - Small inaccuracy in crowding-flag positioning fixed.
 - Fixed division by zero in local background in MASK_TYPE
   CORRECT mode.
