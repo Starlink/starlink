@@ -1,14 +1,14 @@
       SUBROUTINE SCULIB_PROCESS_BOLS(EXTINCTION, N_BEAMS, N_BOL, N_POS, 
      :     N_SWITCHES, N_EXPOSURES, N_INTEGRATIONS, N_MEASUREMENTS,
-     :     N_MAP, N_FITS, FITS, DEM_PNTR, LST_STRT, IN_ROTATION,
-     :     SAMPLE_MODE, SAMPLE_COORDS, OUT_COORDS,
+     :     N_MAP, N_FITS, FITS, DEM_PNTR, LST_STRT,
+     :     IN_ROTATION, SAMPLE_MODE, SAMPLE_COORDS, OUT_COORDS,
      :     JIGGLE_REPEAT, JIGGLE_COUNT, JIGGLE_X, JIGGLE_Y,
      :     JIGGLE_P_SWITCH, RA_CEN, DEC_CEN,
      :     RA1, RA2, DEC1, DEC2, MJD_STANDARD, IN_UT1,
      :     N_POINT, POINT_LST, POINT_DAZ, POINT_DEL, 
      :     NUM_CHAN, NUM_ADC, BOL_ADC, BOL_CHAN, BOL_DU3, BOL_DU4, 
-     :     FIRST_LST, SECOND_LST, FIRST_TAU, SECOND_TAU,
-     :     BOL_DEC, BOL_RA, NDATA, NVARIANCE, 
+     :     SCAN_REVERSAL, FIRST_LST, SECOND_LST, FIRST_TAU, SECOND_TAU,
+     :     BOL_DEC, BOL_RA, NDATA, NVARIANCE, ELEVATION, PAR_ANGLE,
      :     STATUS)
 *+
 *  Name:
@@ -23,15 +23,15 @@
 *  Invocation:
 *     SUBROUTINE SCULIB_PROCESS_BOLS(EXTINCTION, N_BEAMS, N_BOL, N_POS, 
 *    :     N_SWITCHES, N_EXPOSURES, N_INTEGRATIONS, N_MEASUREMENTS,
-*    :     N_MAP, N_FITS, FITS,  DEM_PNTR, LST_STRT, IN_ROTATION,
-*    :     SAMPLE_MODE, SAMPLE_COORDS, OUT_COORDS,
+*    :     N_MAP, N_FITS, FITS,  DEM_PNTR, LST_STRT, 
+*    :     IN_ROTATION, SAMPLE_MODE, SAMPLE_COORDS, OUT_COORDS,
 *    :     JIGGLE_REPEAT, JIGGLE_COUNT, JIGGLE_X, JIGGLE_Y,
 *    :     JIGGLE_P_SWITCH, RA_CEN, DEC_CEN,
 *    :     RA1, RA2, DEC1, DEC2, MJD_STANDARD, IN_UT1,
 *    :     N_POINT, POINT_LST, POINT_DAZ, POINT_DEL, 
 *    :     NUM_CHAN, NUM_ADC, BOL_ADC, BOL_CHAN, BOL_DU3, BOL_DU4, 
-*    :     FIRST_LST, SECOND_LST, FIRST_TAU, SECOND_TAU,
-*    :     BOL_DEC, BOL_RA, NDATA, NVARIANCE, 
+*    :     SCAN_REVERSAL, FIRST_LST, SECOND_LST, FIRST_TAU, SECOND_TAU,
+*    :     BOL_DEC, BOL_RA, NDATA, NVARIANCE, ELEVATION, PAR_ANGLE,
 *    :     STATUS)
 
 *  Description:
@@ -132,6 +132,8 @@
 *        dU3 Nasmyth coordinates of bolometers
 *     BOL_DU4 = _REAL (Given)
 *        dU4 Nasmyth coordinates of bolometers
+*     SCAN_REVERSAL = LOGICAL (Given)
+*        Multiply alternate exposures by -1 if SCANning
 *     FIRST_LST = _DOUBLE (Given)
 *        LST of first tau value (EXTINCTION only)
 *     SECOND_LST = _DOUBLE (Given)
@@ -148,14 +150,16 @@
 *         Extinction corrected data (EXTINCTION only)
 *     NVARIANCE(N_BOL, N_POS, N_BEAMS) = _REAL (Given & Returned)
 *         Extinction corrected variance (EXTINCTION only)
+*     ELEVATION(N_POS) = _DOUBLE (Returned)
+*        Elevation of each N_POS offset
+*     PAR_ANGLE(N_POS) = _DOUBLE (Returned)
+*        PAR_ANGLE of each N_POS offset
 *     STATUS = _INTEGER (Given & Returned)
 *        Global status
 
 *  Prior Requirements:
-*     The locator to the structure must already be available.
 
 *  Notes:
-*     This routine does not annul the locator.
 
 *  Authors:
 *     TIMJ: Tim Jenness (JACH)
@@ -226,12 +230,15 @@
      :                     N_INTEGRATIONS, N_MEASUREMENTS)
       CHARACTER *(*)   SAMPLE_COORDS
       CHARACTER *(*)   SAMPLE_MODE
+      LOGICAL          SCAN_REVERSAL
       DOUBLE PRECISION SECOND_LST
       REAL             SECOND_TAU
 
-*     Arguments Returned:
+*     Arguments Returned:      
       DOUBLE PRECISION BOL_DEC(N_BOL, N_POS)
       DOUBLE PRECISION BOL_RA(N_BOL, N_POS)
+      DOUBLE PRECISION ELEVATION (N_POS)
+      DOUBLE PRECISION PAR_ANGLE (N_POS)
 
 *     Given & Returned
       REAL             NDATA(N_BOL, N_POS, N_BEAMS)
@@ -245,6 +252,7 @@
       PARAMETER (PI = 3.14159265359D0)
 
 *  Local Variables:
+      LOGICAL          AZNASCAN         ! Am I using RASTER with AZ or NA?
       DOUBLE PRECISION ARRAY_DEC_CENTRE ! apparent DEC of array centre (rads)
       DOUBLE PRECISION ARRAY_RA_CENTRE  ! apparent RA of array centre (rads)
       INTEGER          BEAM             ! Loop counter for N_BEAMS
@@ -255,13 +263,16 @@
       INTEGER          DATA_OFFSET      ! Offset in BOL_RA and BOL_DEC
       REAL             DEC_START        ! declination at start of SCAN 
       REAL             DEC_END          ! declination at end of SCAN
+      DOUBLE PRECISION ELTEMP           ! Elevation from CALC_BOL_COORDS
       INTEGER          EXPOSURE         ! Loop counter for N_EXPOSURES
       INTEGER          EXP_END          ! Position of end of exposure
       DOUBLE PRECISION EXP_LST          ! LST of exposure
       REAL             EXP_TIME         ! Exposure time per measurement
       INTEGER          EXP_START        ! Position of start of exposure
+      LOGICAL          FLIP             ! Multiply data by -1
       INTEGER          I                ! Loop counter
       INTEGER          INTEGRATION      ! Loop counter for N_INTEGRATIONS
+      INTEGER          ITEMP            ! Temp int
       INTEGER          JIGGLE           ! 
       DOUBLE PRECISION LAT_OBS          ! Latitude of observatory (radians)
       DOUBLE PRECISION LST              ! LST of switch
@@ -270,12 +281,15 @@
       REAL             OFFSET_X         ! X offset of measurement in OFF_COORDS
       REAL             OFFSET_Y         ! Y offset of measurement in OFF_COORDS
       CHARACTER *(2)   OUTCRDS          ! Coordinate system of output map
+      DOUBLE PRECISION PATEMP           ! Par Angle from CALC_BOL_COORDS
       REAL             RA_END           ! RA at end of SCAN
       REAL             RA_START         ! RA at start of SCAN
+      REAL             RTEMP            ! Temp real
       REAL             TAUZ             ! Tau at zenith for given Bol elevation
 *.
 
       IF (STATUS .NE. SAI__OK) RETURN
+
 
 *     Get some values from the FITS array
 
@@ -303,17 +317,32 @@
       END IF
 
 *     Determine the output offset coordinates
+*     Note that we use RA output coords for NA/AZ output coords if
+*     we are using SCAN mode. This is because NA/AZ offsets are calculated
+*     later for SCAN/MAP from the tangent plane offsets.
+
+      OUTCRDS = 'RA'
+      AZNASCAN = .FALSE.
+
       IF ((OUT_COORDS .EQ. 'NA')  .OR.
      :     (OUT_COORDS .EQ. 'AZ')) THEN
-         OUTCRDS = OUT_COORDS
-      ELSE
-         OUTCRDS = 'RA'
+
+         IF (SAMPLE_MODE .NE. 'RASTER') THEN
+            OUTCRDS = OUT_COORDS
+         ELSE
+            AZNASCAN = .TRUE.
+         END IF
+
       END IF
 
-      IF (SAMPLE_MODE .EQ. 'RASTER') OUTCRDS = 'RA'
+*     Set up the default value for flipping
+*     This assumes the first scan is the reference
+      FLIP = .FALSE.
 
 *     now go through the various exposures of the observation calculating the
 *     observed positions
+
+      IF (STATUS .NE. SAI__OK) RETURN
 
       DO MEASUREMENT = 1, N_MEASUREMENTS
          DO INTEGRATION = 1, N_INTEGRATIONS
@@ -431,6 +460,9 @@
 *     now call a routine to work out the apparent RA,Dec of the measured
 *     bolometers at this position
 
+                     ELTEMP = VAL__BADD
+                     PATEMP = VAL__BADD
+
                      CALL SCULIB_CALC_BOL_COORDS (OUTCRDS, 
      :                    ARRAY_RA_CENTRE, ARRAY_DEC_CENTRE, LST, 
      :                    LAT_OBS, OFFSET_COORDS, OFFSET_X, 
@@ -439,8 +471,15 @@
      :                    NUM_CHAN, NUM_ADC, N_BOL, BOL_CHAN,
      :                    BOL_ADC, BOL_DU3, BOL_DU4,
      :                    CENTRE_DU3, CENTRE_DU4,
-     :                    BOL_RA(1,DATA_OFFSET), BOL_DEC(1,DATA_OFFSET),
-     :                    STATUS)
+     :                    BOL_RA(1, DATA_OFFSET), 
+     :                    BOL_DEC(1, DATA_OFFSET),
+     :                    ELTEMP, PATEMP, STATUS)
+
+
+                     IF (AZNASCAN) THEN
+                        ELEVATION (DATA_OFFSET) = ELTEMP
+                        PAR_ANGLE (DATA_OFFSET) = PATEMP
+                     END IF
 
 
                      IF (EXTINCTION) THEN
@@ -473,12 +512,32 @@
                         IF (OUTCRDS .EQ. 'RA') THEN
                            IF (N_MAP .NE. 1) THEN
                               CALL SCULIB_STANDARD_APPARENT (
-     :                             N_BOL, BOL_RA(1,I), BOL_DEC(1,I),
+     :                             N_BOL, BOL_RA(1,DATA_OFFSET), 
+     :                             BOL_DEC(1, DATA_OFFSET),
      :                             IN_UT1, MJD_STANDARD, STATUS)
                            END IF
                         END IF
                      END IF
                   END DO
+
+*     If we are using SCAN_REVERSAL then multiply every other
+*     exposure by -1
+
+                  IF (SCAN_REVERSAL) THEN
+                     IF (FLIP) THEN
+                        IF (STATUS .EQ. SAI__OK) THEN
+                           ITEMP = N_BOL * (EXP_END - EXP_START + 1)
+                           RTEMP = -1.0
+
+                           CALL SCULIB_MULCAR(ITEMP, 
+     :                          NDATA(1, EXP_START, 1), RTEMP, 
+     :                          NDATA(1, EXP_START, 1))
+                        END IF
+                        FLIP = .FALSE.
+                     ELSE
+                        FLIP = .TRUE.
+                     END IF
+                  END IF
 
                END IF
 
