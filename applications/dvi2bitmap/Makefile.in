@@ -29,21 +29,31 @@ OBJS=dvi2bitmap.o DviFile.o InputByteStream.o PkFont.o Bitmap.o \
 $(EXEC): $(OBJS)
 	$(CXX) $(OBJS) $(LIBS) -o $@
 
-Bitmap.o: Bitmap.cc Bitmap.h dvi2bitmap.h config.h BitmapImage.h
-BitmapImage.o: BitmapImage.cc BitmapImage.h \
-		config.h PNGBitmap.h GIFBitmap.h XBMBitmap.h
+# for i in *.cc;do echo `echo $i|sed 's/\.cc/.o/'`: $i `sed -n '/^#include/s/^[^\"]*\"\(.*\)\".*/\1/p' $i`;done
+Bitmap.o: Bitmap.cc dvi2bitmap.h config.h Bitmap.h BitmapImage.h
+BitmapImage.o: BitmapImage.cc config.h BitmapImage.h PNGBitmap.h GIFBitmap.h XBMBitmap.h
 DviFile.o: DviFile.cc DviFile.h PkFont.h InputByteStream.h
-GIFBitmap.o: GIFBitmap.cc GIFBitmap.h config.h Bitmap.h
-InputByteStream.o: InputByteStream.cc InputByteStream.h config.h dvi2bitmap.h
-PNGBitmap.o: PNGBitmap.cc PNGBitmap.h config.h Bitmap.h
-PageRange.o: PageRange.cc PageRange.h config.h
-PkFont.o: PkFont.cc PkFont.h config.h dvi2bitmap.h kpathsea.h InputByteStream.h
-XBMBitmap.o: XBMBitmap.cc XBMBitmap.h config.h Bitmap.h
-dvi2bitmap.o: dvi2bitmap.cc dvi2bitmap.h \
-		config.h DviFile.h PkFont.h Bitmap.h BitmapImage.h \
-		verbosity.h PageRange.h version.h kpathsea.h
-kpathsea.o: kpathsea.cc kpathsea.h config.h
+GIFBitmap.o: GIFBitmap.cc config.h Bitmap.h GIFBitmap.h
+InputByteStream.o: InputByteStream.cc config.h dvi2bitmap.h InputByteStream.h
+PNGBitmap-greyscale.o: PNGBitmap-greyscale.cc config.h Bitmap.h PNGBitmap.h
+PNGBitmap.o: PNGBitmap.cc config.h Bitmap.h PNGBitmap.h
+PageRange.o: PageRange.cc config.h PageRange.h
+PkFont.o: PkFont.cc config.h dvi2bitmap.h kpathsea.h InputByteStream.h PkFont.h
+XBMBitmap.o: XBMBitmap.cc config.h Bitmap.h XBMBitmap.h
+dvi2bitmap.o: dvi2bitmap.cc config.h dvi2bitmap.h DviFile.h PkFont.h Bitmap.h BitmapImage.h verbosity.h PageRange.h version.h kpathsea.h
+kpathsea.o: kpathsea.cc config.h kpathsea.h
 
+# for i in *.h *.cc;do echo "$i:" `sed -n '/^#include/s/^[^\"]*\"\(.*\)\".*/\1/p' $i`;done
+Bitmap.h: dvi2bitmap.h verbosity.h
+BitmapImage.h: dvi2bitmap.h verbosity.h Bitmap.h
+DviFile.h: dvi2bitmap.h InputByteStream.h PkFont.h verbosity.h
+GIFBitmap.h: dvi2bitmap.h BitmapImage.h
+InputByteStream.h: dvi2bitmap.h verbosity.h
+PNGBitmap.h: dvi2bitmap.h BitmapImage.h
+PageRange.h: verbosity.h
+PkFont.h: InputByteStream.h dvi2bitmap.h verbosity.h
+XBMBitmap.h: dvi2bitmap.h BitmapImage.h
+kpathsea.h: verbosity.h
 
 # Distribution
 configure: config/configure.in
