@@ -7327,6 +7327,7 @@ U java/source/table/src/main/uk/ac/starlink/table/EditableColumn.java
 U java/source/table/src/main/uk/ac/starlink/table/IteratorRowSequence.java
 U java/source/table/src/main/uk/ac/starlink/table/RandomRowSequence.java
 U java/source/table/src/main/uk/ac/starlink/table/RandomStarTable.java
+U java/source/table/src/main/uk/ac/starlink/table/ReaderRowSequence.java
 U java/source/table/src/main/uk/ac/starlink/table/RowScratchTable.java
 U java/source/table/src/main/uk/ac/starlink/table/RowSequence.java
 U java/source/table/src/main/uk/ac/starlink/table/StarTable.java
@@ -7345,6 +7346,10 @@ U java/source/table/src/main/uk/ac/starlink/table/WrapperColumn.java
 U java/source/table/src/main/uk/ac/starlink/table/WrapperRowSequence.java
 U java/source/table/src/main/uk/ac/starlink/table/WrapperStarTable.java
 U java/source/table/src/main/uk/ac/starlink/table/package.html
+cvs checkout: Updating java/source/table/src/main/uk/ac/starlink/table/formats
+U java/source/table/src/main/uk/ac/starlink/table/formats/WDCReader.java
+U java/source/table/src/main/uk/ac/starlink/table/formats/WDCStarTable.java
+U java/source/table/src/main/uk/ac/starlink/table/formats/WDCTableBuilder.java
 cvs checkout: Updating java/source/table/src/main/uk/ac/starlink/table/gui
 U java/source/table/src/main/uk/ac/starlink/table/gui/LabelledComponentStack.java
 U java/source/table/src/main/uk/ac/starlink/table/gui/MapGroupTableModel.java
@@ -7379,6 +7384,8 @@ U java/source/table/src/main/uk/ac/starlink/table/view/ColumnDialog.java
 U java/source/table/src/main/uk/ac/starlink/table/view/ColumnInfoWindow.java
 U java/source/table/src/main/uk/ac/starlink/table/view/ColumnsDisplay.java
 U java/source/table/src/main/uk/ac/starlink/table/view/JELRowReader.java
+U java/source/table/src/main/uk/ac/starlink/table/view/MetaColumn.java
+U java/source/table/src/main/uk/ac/starlink/table/view/MetaColumnTableModel.java
 U java/source/table/src/main/uk/ac/starlink/table/view/MirageHandler.java
 U java/source/table/src/main/uk/ac/starlink/table/view/OptionsListModel.java
 U java/source/table/src/main/uk/ac/starlink/table/view/ParameterWindow.java
@@ -7682,6 +7689,7 @@ U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/Stop.gif
 U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/TREE27.gif
 U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/TREE28.gif
 U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/TileCascade.gif
+U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/TopCat2.gif
 U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/Up.gif
 U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/archgreen.gif
 U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/archyellow.gif
