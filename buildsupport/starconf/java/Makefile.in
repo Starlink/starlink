@@ -1,0 +1,10 @@
+JAVAC=@JAVAC@
+
+.SUFFIXES: .java .class
+.java.class:
+	$(JAVAC) -source 1.4 $<
+
+GenerateDependencies.class: GenerateDependencies.java
+
+clean:
+	rm -f *.class
