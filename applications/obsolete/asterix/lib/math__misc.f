@@ -268,10 +268,6 @@
       INTEGER                  XSUB, YSUB              ! Sub-pixel factors
 
       LOGICAL                  SYMMETRIC               ! Symmetric about centre?
-*
-*    Local functions :
-*
-      INTEGER			SPIX
 *-
 
 *    Check status

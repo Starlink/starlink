@@ -71,6 +71,7 @@
 *    Functions :
 *
       REAL			MATH_EXPR
+      INTEGER			SPIX
 *
 *    Local variables :
 *
