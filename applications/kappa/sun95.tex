@@ -14,7 +14,7 @@
 \newcommand{\stardocsource}    {sun95.20}
 \newcommand{\stardocnumber}    {95.20}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {5th December 2001}
+\newcommand{\stardocdate}      {18th December 2001}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
 \newcommand{\stardocversion}   {0.19}
 \newcommand{\stardocmanual}    {User's Guide}
@@ -11021,16 +11021,8 @@ picture.}
  Edits an NDF such that array values below and above two thresholds take constant values.}
 \menuitem{TRANDAT}{
  Converts free-format text data into an NDF.}
-\menuitem{TRANINVERT}{
- Inverts a transformation.}
-\menuitem{TRANJOIN}{
- Joins two transformations.}
-\menuitem{TRANMAKE}{
- Makes a transformation structure given its co-ordinate mappings.}
-\menuitem{TRANSFORMER}{
- Applies a transformation to an NDF.}
-\menuitem{TRANTRACE}{
- Lists the contents of a transformation structure.}
+\menuitem{RESAMPLE}{
+ Use an arbitrary mapping to resample an NDF.}
 \menuitem{TRIG}{
  Performs a trigonometric  transformation on an NDF.}
 \menuitem{VECPLOT}{
@@ -11357,8 +11349,8 @@ functions as follows.
  Expands an NDF by pixel duplication.
 \classitem{SQORST}
  Squashes or stretches a 2-d data array in either or both axes.
-\classitem{TRANSFORMER}
- Applies a transformation to an NDF.
+\classitem{RESAMPLE}
+ Use an arbitrary mapping to resample an NDF.
 \classitem{WCSALIGN}
  Aligns a group of 2-d NDFs using WCS information.
 \end{description}
@@ -11579,16 +11571,8 @@ functions as follows.
 \label{cl:resample}
 \item {\large\bf Resampling and transformations}
 \begin{description}
-\classitem{TRANINVERT}
- Inverts a transformation.
-\classitem{TRANJOIN}
- Joins two transformations.
-\classitem{TRANMAKE}
- Makes a transformation structure given its co-ordinate mappings.
-\classitem{TRANSFORMER}
- Applies a transformation to an NDF.
-\classitem{TRANTRACE}
- Lists the contents of a transformation structure.
+\classitem{RESAMPLE}
+ Use an arbitrary mapping to resample an NDF.
 \classitem{WCSALIGN}
  Aligns a group of 2-d NDFs using WCS information.
 \end{description}
@@ -15107,7 +15091,7 @@ default value.
    \sstdiytopic{
       Related Applications
    }{
-      KAPPA: BLOCK, COMPAVE, COMPICK, PIXDUPE, SQORST, TRANSFORMER;
+      KAPPA: BLOCK, COMPAVE, COMPICK, PIXDUPE, SQORST, RESAMPLE;
       Figaro: ISTRETCH, YSTRACT.
    }
    \sstimplementationstatus{
@@ -15352,7 +15336,7 @@ default value.
    \sstdiytopic{
       Related Applications
    }{
-      KAPPA: BLOCK, COMPADD, COMPICK, PIXDUPE, SQORST, TRANSFORMER;
+      KAPPA: BLOCK, COMPADD, COMPICK, PIXDUPE, SQORST, RESAMPLE;
       Figaro: ISTRETCH.
    }
    \sstimplementationstatus{
@@ -15474,7 +15458,7 @@ default value.
    \sstdiytopic{
       Related Applications
    }{
-      KAPPA: BLOCK, COMPADD, COMPAVE, PIXDUPE, SQORST, TRANSFORMER;
+      KAPPA: BLOCK, COMPADD, COMPAVE, PIXDUPE, SQORST, RESAMPLE;
       Figaro: ISTRETCH.
    }
    \sstimplementationstatus{
@@ -21377,7 +21361,7 @@ plot (101k).
    \sstdiytopic{
       Related Applications
    }{
-      KAPPA: ROTATE, TRANSFORMER; Figaro: IREVX, IREVY, IROT90.
+      KAPPA: ROTATE, RESAMPLE; Figaro: IREVX, IREVY, IROT90.
    }
    \sstimplementationstatus{
       \sstitemlist{
@@ -33963,7 +33947,7 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
    \sstdiytopic{
       Related Applications
    }{
-      KAPPA: FLIP, TRANSFORMER; Figaro: IREVX, IREVY, IROT90.
+      KAPPA: FLIP, RESAMPLE; Figaro: IREVX, IREVY, IROT90.
    }
    \sstimplementationstatus{
       The propagation rules depend on parameters ANGLE and NNMETH.
@@ -37757,1056 +37741,6 @@ right.
    }
 }
 \sstroutine{
-   TRANINVERT
-}{
-   Inverts a transformation
-}{
-   \sstdescription{
-      This inverts a transformation stored in the TRANSFORM (SUN/61)
-      format within an existing HDS file.
-   }
-   \sstusage{
-      traninvert transform
-   }
-   \sstparameters{
-      \sstsubsection{
-         TRANSFORM = TRN (Read and Write)
-      }{
-         The transformation structure to be inverted.  This may be an
-         HDS container file, in which case the transformation structure
-         is assumed to be called TRANSFORM at the top level of the
-         file; or a path to the HDS object.  The suggested default is
-         the current transformation structure.
-      }
-   }
-   \sstexamples{
-      \sstexamplesubsection{
-         traninvert shear.transform
-      }{
-         This inverts the transformation structure stored in object
-         TRANSFORM within the HDS file called shear.
-      }
-      \sstexamplesubsection{
-         traninvert shear
-      }{
-         This does the same as above.
-      }
-      \sstexamplesubsection{
-         traninvert $\backslash$
-      }{
-         This inverts the current transformation structure.
-      }
-      \sstexamplesubsection{
-         traninvert m51.more.polar
-      }{
-         This inverts the transformation structure called POLAR in
-         the extension of the NDF called m51.
-      }
-   }
-   \sstnotes{
-      \sstitemlist{
-
-         \sstitem
-         On completion, the destination structure for the
-         transformation information equates to the current transformation
-         global parameter.
-      }
-   }
-   \sstdiytopic{
-      Related Applications
-   }{
-      KAPPA: TRANSFORMER, TRANJOIN, TRANMAKE, TRANTRACE;
-      CCDPACK: \linebreak CCDEDIT, TRANLIST, TRANNDF.
-   }
-}
-
-\sstroutine{
-   TRANJOIN
-}{
-   Joins two transformations
-}{
-   \sstdescription{
-      This joins two transformations stored in the TRANSFORM (SUN/61)
-      format.  The concatenated transformation can be stored with either
-      original transformation or be placed in a new file.
-   }
-   \sstusage{
-      tranjoin in1 in2 out dest=?
-   }
-   \sstparameters{
-      \sstsubsection{
-         DEST = LITERAL (Read)
-      }{
-         The destination for the concatenated transformations.  This can
-         be one of the following:
-         \begin{description}
-         \item {\tt "First"} --- Appends the second transformation in the first.
-                        The second transformation is unchanged.
-         \item {\tt "Second"} --- Prefixes the first transformation in the second.
-                        The first transformation is unchanged.
-         \item {\tt "New"}  --- Creates a new transformation structure using
-                        parameter OUT.  The input transformations are
-                        unchanged.
-         \end{description}
-         {\tt ["New"]}
-      }
-      \sstsubsection{
-         IN1 = TRN (Read and Write)
-      }{
-         The first transformation structure to be concatenated.  It
-         prefixes the second supplied transformation.  This may be an
-         HDS container file, in which case the transformation structure
-         is assumed to be called TRANSFORM at the top level of the
-         file; or a path to the HDS object.  The suggested default is
-         the current value.
-      }
-      \sstsubsection{
-         IN2 = TRN (Read and Write)
-      }{
-         The second transformation structure to be concatenated.  It
-         appends to the first supplied transformation.  This may be an
-         HDS container file, in which case the transformation structure
-         is assumed to be called TRANSFORM at the top level of the
-         file; or a path to the HDS object.  The suggested default is
-         the current value.
-      }
-      \sstsubsection{
-         OUT = TRN (Write)
-      }{
-         The path to the new transformation structure created when
-         DEST={\tt "NEW"} to hold the concatenated transformations.  If only
-         an HDS container filename is supplied, the transformation is
-         placed within a structure called TRANSFORM at the top-level of
-         the file.  So for instance, if OUT={\tt warp9}, the transformation
-         will be placed in the top-level structure TRANSFORM within the HDS
-         file {\tt warp9.sdf}.  In this case the container file may already
-         exist.  If, on the other hand, an explicit structure is named,
-         the transformation information will be placed there.  For
-         example, to place the transformation in the extension GALPHOT
-         of the NDF called NGC253, OUT would be
-         {\tt NGC253.MORE.GALPHOT}.  The structure name is limited to 15
-         printing characters.  Note that the structure must not already
-         exist.  If it does, an error condition results.
-      }
-   }
-   \sstexamples{
-      \sstexamplesubsection{
-         tranjoin tr1 tr2 tr3
-      }{
-         This prefixes the transformation in the HDS file called
-         {\tt tr1.sdf} to that in file {\tt tr2.sdf}, and stores the
-         result in HDS file {\tt tr3.sdf}.  All three transformations
-         are located within objects called TRANSFORM at the top-level.
-      }
-      \sstexamplesubsection{
-         tranjoin offset shear.tr1 shape.rotate
-      }{
-         This prefixes the transformation in the structure TRANSFORM at
-         the top level of the HDS container file called {\tt offset.sdf}
-         ({\it i.e.} OFFSET.TRANSFORM) to the transformation in the structure
-         TR1 in the HDS file {\tt shear.sdf}.  The resulting transformation is in
-         the file called {\tt shape.sdf} and is named ROTATE.
-      }
-      \sstexamplesubsection{
-         tranjoin norm.scale1 polar dest=S
-      }{
-         This prefixes the transformation structure NORM.SCALE1 to \linebreak
-         POLAR.TRANSFORM, the concatenation being stored in
-         POLAR.TRANSFORM.
-      }
-      \sstexamplesubsection{
-         tranjoin norm.scale1 polar dest=f
-      }{
-         This appends the transformation structure POLAR.TRANSFORM to \linebreak
-         NORM.SCALE1, the concatenation being stored in NORM.SCALE1.
-      }
-   }
-   \sstnotes{
-      \sstitemlist{
-
-         \sstitem
-         The number of output variables of the first transformation must
-         equal the number of input variables of the second.  Also it is not
-         permitted to concatenate a transformation in which only the
-         forward mapping is defined with another in which only the inverse
-         mapping is specified.
-
-         \sstitem
-         On completion, the destination structure for the
-         transformation information equates to the current transformation
-         global parameter.
-      }
-   }
-   \sstdiytopic{
-      Related Applications
-   }{
-      KAPPA: TRANSFORMER, TRANINVERT, TRANMAKE, TRANTRACE;
-      CCDPACK: CCDEDIT, TRANLIST, TRANNDF.
-   }
-}
-
-\sstroutine{
-   TRANMAKE
-}{
-   Makes a transformation structure given its co-ordinate mappings
-}{
-   \sstdescription{
-      This application creates a transformation data structure from
-      forward and inverse mappings that you supply.  The
-      TRANSFORMER application uses such a structure to transform an NDF
-      by resampling.  The structure can have classification qualifiers
-      and a comment.
-
-      For convenience, TRANMAKE can create a two-dimensional linear
-      transformation merely from the six coefficients, or
-      two-dimensional Cartesian-to-polar transformation given the
-      origin position and angle.
-   }
-   \sstusage{
-      tranmake transform trtype comment
-        \newline\hspace*{1.5em}
-        $\left\{ {\begin{tabular}{l}
-                  nvin=? nvout=? class=? for1-for7=? inv1-inv7=? fa-fz=? pa-pz=? \\
-                  tr \\
-                  \end{tabular} }
-        \right.$
-        \newline\hspace*{1.9em}
-        \makebox[0mm][c]{\small trtype}
-   }
-   \sstparameters{
-      \sstsubsection{
-         CLASS( ) = LITERAL (Read)
-      }{
-         A list of classifications that describe the properties of the
-         transformation.  This is optional, but the information can be
-         used to make other applications run more efficiently.  This
-         applies particularly to linear or constant determinants.
-         Valid values are:
-         \begin{description}
-         \item {\tt "Linear"}       --- linear and preserves straight lines,
-         \item {\tt "Independent"}  --- preserves the independence of the axes,
-         \item {\tt "Diagonal"}     --- preserves the axes themselves,
-         \item {\tt "Isotropic"}    --- preserves angles and shapes,
-         \item {\tt "Positive\_det"} --- a component of reflection is absent,
-         \item {\tt "Negative\_det"} --- a component of reflection is present,
-         \item {\tt "Constant\_det"} --- the scale factor is constant,
-         \item {\tt "Unit\_det"}     --- areas (or volumes {\it etc.}) are preserved.
-         \end{description}
-
-         See SUN/61 Appendix~B for more details of transformation
-         classification and a table of the classifications of common
-         mappings.  The suggested default is null ({\tt !}) meaning unknown,
-         and no classification is written to the transformation
-         structure.  This parameter is ignored unless TRTYPE={\tt "Expres"}.
-      }
-      \sstsubsection{
-         COMMENT = LITERAL (Read)
-      }{
-         The comment string associated with the transformation.
-         A null value ({\tt !}) causes a blank comment to be written into
-         the transformation.  Use the {\tt "--$>$"} symbol to indicate the
-         forward transformation.  The suggested default is the null value.
-      }
-      \sstsubsection{
-         FA-FZ = LITERAL (Read)
-      }{
-         These parameters supply the values of `sub-expressions' used
-         in the expressions FOR1-FOR7, and INV1-INV7.  Any of the 26
-         may appear; there is no restriction on order.  These
-         parameters should be used when repeated expressions are
-         present in complex transformations.  Sub-expressions may
-         contain references to other sub-expressions and constants
-         (PA-PZ).  An example of using sub-expressions is:
-         \begin{description}
-         \item FOR1 $>$ {\tt "XX=PA$*$ASIND(FA/PA)$*$X/FA"}
-         \item FOR2 $>$ {\tt "YY=PA$*$ASIND(FA/PA)$*$Y/FA"}
-         \item INV1 $>$ {\tt "X=PA$*$SIND(FB/PA)$*$XX/FB"}
-         \item INV2 $>$ {\tt "Y=PA$*$SIND(FB/PA)$*$YY/FB"}
-         \item FA $>$ {\tt SQRT(X$*$X$+$Y$*$Y)}
-         \item PA $>$ {\tt 100D0}
-         \item FB $>$ {\tt SQRT(XX$*$XX$+$YY$*$YY)}
-         \end{description}
-         where the parameter name is to the left of $>$ and its value is
-         to the right of the $>$.  This parameter is ignored unless
-         TRTYPE={\tt "Expres"}.
-      }
-      \sstsubsection{
-         FITTYPE = \_INTEGER (Read)
-      }{
-         The type of fit specified by coefficients supplied via the
-         TR parameter.  Appropriate values are:
-         \begin{description}
-         \item 1 -- shift of origin,
-         \item 2 -- shift of origin and rotation,
-         \item 3 -- shift of origin and magnification,
-         \item 4 -- shift of origin, rotation, and magnification
-                   (solid body), and
-         \item 5 -- a full six-parameter fit.
-         \end{description}
-
-         The value of this parameter is used to classify the
-         transformation (see the CLASS parameter).  This parameter is
-         ignored unless TRTYPE={\tt "Bilinear"}.  {\tt [5]}
-      }
-      \sstsubsection{
-         FOR1-FOR7 = LITERAL (Read)
-      }{
-         The NVIN expressions that define the forward mapping or
-         mappings of the transformation.  FOR1 applies to first
-         output variable, and so on through to FOR7 for the seventh
-         input variable.  The expressions are written in Fortran-like
-         syntax.  The arithmetic operators ({\tt $+$,$-$,/,$*$,$*$$*$})
-         follow the normal order of precedence.  Using matching (nested)
-         parentheses will explicitly define the order of expression
-         evaluation.  The expression may contain constants and the
-         built-in functions (LOG10, SQRT, SIN, TAND {\it etc.}) described in
-         SUN/61 Appendix~A.
-
-         For a null forward transformation there must still be NVOUT
-         expressions, each just containing the name of the output
-         variable, for example, {\tt "X"}.  An example expression is
-         {\tt "Z=PA$*$(NINT(ZP)$+$0.5)"}.
-
-         This parameter is ignored unless TRTYPE={\tt "Expres"}.
-      }
-      \sstsubsection{
-         INV1-INV7 = LITERAL (Read)
-      }{
-         The NVOUT expressions that define the inverse mapping or
-         mappings of the transformation.  INV1 applies to first
-         input variable, and so on through to INV7 for the seventh
-         input variable.  The expressions are written in Fortran-like
-         syntax.  The arithmetic operators ({\tt $+$,$-$,/,$*$,$*$$*$})
-         follow the normal order of precedence.  Using matching (nested)
-         parentheses will explicitly define the order of expression
-         evaluation.  The expression may contain constants and the
-         built-in functions (LOG10, SQRT, SIN, TAND {\it etc.}) described in
-         SUN/61 Appendix~A.
-
-         For a null inverse mapping there must still be NVIN
-         expressions, each just containing the name of the input
-         variable, for example, {\tt "XX"}.  Generally, it is the
-         inverse mapping that is required. An example expression is
-         {\tt "X=MOD(10$*$SQRT((XX$+$YY)$*$ZZ),360)"}.
-
-         This parameter is ignored unless TRTYPE={\tt "Expres"}.
-      }
-      \sstsubsection{
-         NVIN = \_INTEGER (Read)
-      }{
-         The number of input variables in the transformation.  It must
-         lie in the range 1 to 7.  The suggested default is the current
-         value, and 2 initially.   This parameter is ignored unless
-         TRTYPE={\tt "Expres"}.
-      }
-      \sstsubsection{
-         NVOUT = \_INTEGER (Read)
-      }{
-         The number of output variables in the transformation.  It must
-         lie in the range 1 to 7.  The suggested default is the number
-         of input variables.   This parameter is ignored unless
-         TRTYPE={\tt "Expres"}.
-      }
-      \sstsubsection{
-         PA-PZ = \_DOUBLE (Read)
-      }{
-         These parameters supply the values of constants used in the
-         expressions FOR1-FOR7, and INV1-INV7.  Any of the 26 may
-         appear; there is no restriction on order.  Using parameters
-         allows the substitution of repeated constants using one
-         reference.  This is especially convenient for constants with
-         many significant digits.  It also allows easy modification of
-         parameterised expressions (expressions say with an adjustable
-         centre) provided the application has not been used in the
-         interim.  The parameter PI has a default value of
-         3.14159265359D0.  An example of using parameters is:
-         \begin{description}
-         \item FOR1 $>$ {\tt "XX=SQRT(FX$*$FX$+$FY$*$FY)"}
-         \item FOR2 $>$ {\tt "YY=ATAN2D(-FY,FX)"}
-         \item INV1 $>$ {\tt "X=XX$*$SIND(YY)$+$PA"}
-         \item INV2 $>$ {\tt "Y=-YY$*$COSD(XX)$+$PB"}
-         \item FX $>$ {\tt X-PA}
-         \item FY $>$ {\tt Y-PB}
-         \item PA $>$ X-centre-value
-         \item PB $>$ Y-centre-value
-         \end{description}
-         where the parameter name is to the left of $>$ and its value is
-         to the right of the $>$.  This example maps Cartesian
-         co-ordinates ($x$,$y$) to polar ($r$,$\theta$) about a specified
-         centre.
-         This parameter is ignored unless TRTYPE={\tt "Expres"}.
-      }
-      \sstsubsection{
-         PREC = LITERAL (Read)
-      }{
-         The arithmetic precision with which the transformation
-         functions will be evaluated when used.  This may be either
-         {\tt "\_REAL"} for single precision, {\tt "\_DOUBLE"} for
-         double precision, or {\tt "\_INTEGER"} for integer precision.
-         Elastic precisions are used, such that a higher precision will
-         be used if the input
-         data warrant it.  So for example if PREC = {\tt "\_REAL"}, but
-         double-precision data were to be transformed, double-precision
-         arithmetic would actually be used.  This parameter is
-         ignored unless TRTYPE={\tt "Expres"}.  {\tt ["\_REAL"]}
-      }
-      \sstsubsection{
-         TR( 6 ) = \_DOUBLE (Read)
-      }{
-         If TRTYPE={\tt "Bilinear"} is chosen then the values of this
-         parameter are the 6 coefficients of a linear transformation of
-         the type.
-         \begin{description}
-         \item X$^\prime$ = TR(1) $+$ TR(2)$*$X $+$ TR(3)$*$Y
-         \item Y$^\prime$ = TR(4) $+$ TR(5)$*$X $+$ TR(6)$*$Y
-         \end{description}
-         The initial suggested default is the identity transformation.
-         ({\tt [0,1,0,0,0,1]}).
-
-         If TRTYPE={\tt "Polar"}, only three values are needed.  TR(1) and
-         TR(2) are the $x$-$y$ co-ordinates of the origin of the centre of
-         the polar co-ordinate system.  An optional third value is
-         the angular origin measured in degrees starting from the
-         $x$-axis in an anticlockwise direction.  If this is omitted, it
-         defaults to 0.  The initial suggested default is {\tt [0,0,0]}.
-
-         This parameter is ignored unless TRTYPE={\tt "Bilinear"} or
-         {\tt "Polar"}.
-      }
-      \sstsubsection{
-         TRANSFORM = TRN (Write)
-      }{
-         The actual or implied HDS object to store the created
-         transformation.  It may be an HDS container file, in which
-         case the transformation structure is placed within a structure
-         called TRANSFORM at the top level of the file; or a path to
-         the HDS object.  So for instance, if parameter
-         TRANSFORM={\tt warp9}, the transformation will be placed in
-         the top-level structure TRANSFORM within the HDS file
-         {\tt warp9.sdf}.  In this case the container file may already
-         exist.  If, on the other hand, the explicit structure is
-         named, the transformation information will be placed there. 
-         For example, to place the transformation in the extension
-         GALPHOT of the NDF called NGC253, parameter TRANSFORM would be
-         {\tt NGC253.MORE.GALPHOT}.  The structure name is limited to 15
-         printing characters.  Note that in either case the structure
-         must not already exist.  If it does, an error condition
-         results.
- 
-         This has parameter no suggested default.
-      }
-      \sstsubsection{
-         TRTYPE = LITERAL (Read)
-      }{
-         The type of transform which will be supplied.  Valid values are
-         {\tt "Bilinear"}, {\tt "Expres"}, and {\tt "Polar"}.
-
-         {\tt "Bilinear"} requests that the transform will be generated from
-         the six coefficients specified by parameter TR in the
-         equations:
-         \begin{description}
-         \item X$^\prime$ = TR(1) $+$ TR(2)$*$X $+$ TR(3)$*$Y
-         \item Y$^\prime$ = TR(4) $+$ TR(5)$*$X $+$ TR(6)$*$Y
-         \end{description}
-         that define a linear two-dimensional transformation.
-
-         {\tt "Expres"} lets an arbitrary transformation be specified
-         using algebraic-like statements of the type:
-         \begin{description}
-         \item  FOR1 $>$ {\tt "XX=PA$+$PC$*$X"}
-         \item  FOR2 $>$ {\tt "YY=PD$+$PE$*$Y"}
-         \item  INV1 $>$ {\tt "X=(XX-PA)/PC"}
-         \item  INV2 $>$ {\tt "Y=(YY-PD)/PE"}
-         \end{description}
-         where the parameter name is to the left of $>$ and its value is
-         to the right of the $>$.  The PA-PZs are reserved for constants
-         (FA-FZ are also reserved for repeated expressions).  This
-         example allows independent offsets and scales in $x$ and $y$.  The
-         inverse mapping must be supplied.
-
-         {\tt "Polar"} makes a 2-dimensional Cartesian-to-polar
-         transformation, where the origin in Cartesian co-ordinates, and
-         polar angle are specified by parameter TR.
-
-         {\tt ["Expres"]}
-      }
-   }
-   \sstexamples{
-      \sstexamplesubsection{
-         tranmake xyz nvin=1 nvout=1 for1="xd=1.01$*$x-0.34"
-         inv1="x=(xd$+$0.34)/1.01" $\backslash$
-      }{
-          This creates a transformation structure TRANSFORM in the HDS  
-          file called {\tt xyz.sdf}.  It specifies mappings between one input and
-          one output variable.  The output variable is 1.01 the output
-          variable less 0.34. 
-      }
-      \sstexamplesubsection{
-         tranmake xyz nvin=1 nvout=1 for1="xd=1.01$*$x-0.34" class=linear
-         inv1="x=(xd$+$0.34)/1.01" comment="Copier correction"
-      }{
-          As above, except that because the transformation is linear
-          (it is a magnification and translation), the classification is
-          set to {\tt "Linear"}.  {\tt "Copier correction"} is written
-          as the comment in the structure.
-      }
-      \sstexamplesubsection{
-         tranmake transform=turn.more.rot45 nvin=2 nvout=2
-         class=["linear","isotropic","unit\_det"] pa=45
-         for1="xo=cosd(pa)$*$xi-sind(pa)$*$yi"
-         for2="yo=sind(pa)$*$xi$+$cosd(pa)$*$yi"
-         inv1="xi=cosd(pa)$*$xo$+$sind(pa)$*$yo"
-         inv2="yi=-sind(pa)$*$xo$+$cosd(pa)$*$yo"
-      }{
-          This creates a transformation structure TURN.MORE.ROT45
-          (in HDS file {\tt turn.sdf}) that rotates
-          a two-dimensional co-ordinate system by 45\dgs\ clockwise.
-          Three classes---linear, isotropic, unit determinant---are
-          assigned for this transformation.  (As it is
-          a rotation, positive and constant determinants are also
-          applicable.)
-      }
-      \sstexamplesubsection{
-         tranmake shiftim trtype=lin tr=[8.73,1,0,-64.6,0,1] fittype=1 $\backslash$
-      }{
-         This creates an HDS file called {\tt raw\_origin.sdf} containing a
-         transformation structure called TRANSFORM at the top-level.
-         This transformation defines a shift of 8.73 of the first
-         variable (usually $x$ in an image) and a negative shift of 64.6
-         in the second variable (normally $y$).  The shift is specified
-         using the appropriate linear-transformation coefficients
-         [XSHIFT,1,0,YSHIFT,0,1] and is correctly classified as a
-         fit type of 1.  There is no comment.
-      }
-      \sstexamplesubsection{
-         tranmake my\_ndf.more.my\_extension.tran1 bilinear "15-deg rotation"
-         [0,0.965926,-0.258819,0,0.258819,0.965926] fittype=2
-      }{
-         This creates a transformation structure called TRAN1
-         in the extension MY\_EXTENSION of the NDF called my\_ndf.  The
-         structure defines a rotation by 15\dgs\ in about the (0,~0)
-         position in a plane (say $x$-$y$ of an image).  The rotation
-         is specified using the appropriate linear transformation
-         coefficients [0,COS,$-$SIN,0,SIN,COS].  The comment stored in the
-         structure is {\tt "15-deg rotation"}.
-      }
-      \sstexamplesubsection{
-         tranmake polish.origin1 trtype=p tr=[100.0,21.3] $\backslash$
-      }{
-         This creates an HDS file called {\tt polish.sdf} containing a
-         transformation structure called ORIGIN1 at the top-level.
-         This structure defines a Cartesian-to-polar transformation
-         about an origin at (100.3,~21.3) in pixel co-ordinates.
-         There is no comment stored in ORIGIN1.
-      }
-   }
-   \sstnotes{
-      \sstitemlist{
-
-         \sstitem
-         This routine does not check that the forward and inverse
-         expressions actually define a pair of complementary mappings.
-
-         \sstitem
-         On completion, the destination structure for the
-         transformation information equates to the current transformation
-         global parameter.
-
-         \sstitem
-         Expressions supplied for parameters FOR1-FOR7 and INV1-INV7 
-         should be enclosed in double quotes (even when given in response 
-         to a prompt) to protect the equals sign from interpretation by 
-         the shell or parameter system.
-
-      }
-   }
-   \sstdiytopic{
-      Related Applications
-   }{
-      KAPPA: FLIP, ROTATE, SLIDE, TRANINVERT, TRANJOIN, TRANSFORMER, \linebreak
-      TRANTRACE; CCDPACK: CCDEDIT, TRANLIST, TRANNDF.
-   }
-}
-
-\sstroutine{
-   TRANSFORMER
-}{
-   Applies a transformation to an NDF
-}{
-   \sstdescription{
-      This application performs an arbitrary transformation on an NDF to
-      create an output NDF.  There is full control of the shape, origin,
-      and co-ordinate limits of the output NDF.  The output NDF is
-      calculated by resampling within the input NDF.  Output array
-      elements are set to the bad value if their inverse-transformed
-      co-ordinates lie outside the input NDF{\tt '}s co-ordinate limits.
-   }
-   \sstusage{
-      transformer in transform out [method] [shape]
-        \newline\hspace*{1.5em}
-        $\left\{ {\begin{tabular}{l}
-                  lcoord=? ucoord=? \\
-                  lbound=? ubound=? \\
-                  \end{tabular} }
-        \right.$
-        \newline\hspace*{1.9em}
-        \makebox[0mm][c]{\small shape}
-   }
-   \sstparameters{
-      \sstsubsection{
-         CONSERVE = \_LOGICAL (Read)
-      }{
-         If CONSERVE is TRUE, the output values are normalised by the
-         ratio of the output-to-input pixel areas.  In other words this
-         conserves flux.  If CONSERVE is FALSE, there is no
-         normalisation.  {\tt [FALSE]}
-      }
-      \sstsubsection{
-         COSYS = LITERAL (Read)
-      }{
-         The co-ordinate system to be used.  This can be either {\tt "}World{\tt "}
-         or {\tt "}Data{\tt "}.  {\tt "}World{\tt "} inputs pixel co-ordinates to the supplied
-         transformation to derive the co-ordinates in the output NDF.
-         {\tt "}Data{\tt "} causes the NDF{\tt '}s axis information to be the input
-         co-ordinates to the transformation.  See the SHAPE parameter.
-         {\tt [Current co-ordinate system]}
-      }
-      \sstsubsection{
-         FULL = \_LOGICAL (Read)
-      }{
-         When the number of input variables is less than the number
-         of dimensions of input NDF (but not less than the number of
-         output variables), FULL set to TRUE applies the transformation
-         to all the higher dimensions.  For example, FULL = TRUE
-         would apply a 2-dimensional transformation to all the planes
-         along the third dimension of a cube NDF.  FULL = FALSE would
-         only transformed the first plane.  {\tt [FALSE]}
-      }
-      \sstsubsection{
-         IN = NDF (Read)
-      }{
-         The NDF to be transformed.
-      }
-      \sstsubsection{
-         LBOUND() = \_INTEGER (Read)
-      }{
-         The lower pixel-index bounds of the output NDF.  The number of
-         values should equal the number of output variables in the
-         transformation.  This parameter is only used when SHAPE is
-         {\tt "}Full{\tt "} or {\tt "}Bounds{\tt "}.  The suggested defaults are the lower
-         bounds of the input NDF, and where there are more output than
-         input dimensions they are set to 1.
-      }
-      \sstsubsection{
-         LCOORD() = \_DOUBLE (Read)
-      }{
-         The lower co-ordinate limits of the output NDF.  The number of
-         values should equal the number of output variables in the
-         transformation.  This parameter is only used when SHAPE is
-         {\tt "}Full{\tt "} or {\tt "}Limits{\tt "}.  The suggested defaults are the lower
-         co-ordinate limits determined from applying the transformation
-         to a series of test points.  Where there are more output than
-         input dimensions they are set to 0.0.
-      }
-      \sstsubsection{
-         METHOD = LITERAL (Read)
-      }{
-         The interpolation method used to resample the input array.
-         Permitted values are {\tt "}Nearest{\tt "} for nearest-neighbour, and
-         {\tt "}Linint{\tt "} for linear interpolation.  {\tt [{\tt "}Nearest{\tt "}]}
-      }
-      \sstsubsection{
-         OUT = NDF (Write)
-      }{
-         The transformed NDF.
-      }
-      \sstsubsection{
-         SHAPE = LITERAL (Read)
-      }{
-         The method by which to define the bounds and co-ordinate limits
-         of the output NDF.  See Section {\tt "}Co-ordinate Limits and
-         Bounds{\tt "}.  The options for SHAPE are:
-
-         \sstitemlist{
-
-            \sstitem
-            {\tt "}Bounds{\tt "} -- Specify the output bounds with LBOUND and UBOUND.
-                           Use the default co-ordinate limits derived from
-                           the transformation of test points in the input
-                           NDF.
-
-            \sstitem
-            {\tt "}Full{\tt "}   -- Specify the output co-ordinate limits and bounds
-                           with LCOORD, UCOORD, LBOUND and UBOUND.
-
-            \sstitem
-            {\tt "}Limits{\tt "} -- Use the bounds of the input NDF and specify the
-                           output co-ordinate limits with LCOORD and UCOORD.
-
-            \sstitem
-            {\tt "}Match{\tt "}  -- Use the co-ordinate limits from transformed test
-                           points of the input NDF, and make a co-ordinate
-                           unit equivalent to one pixel.  The bounds are the
-                           integer-rounded co-ordinate limits.  This option
-                           results in an output NDF that is not clipped and
-                           unlike the other options guarantees no further
-                           linear compression or expansion.
-
-            \sstitem
-            {\tt "}Same{\tt "}   -- Use the bounds of the input NDF and take the
-                           co-ordinate limits from transformed test points
-                           of the input NDF.
-
-         }
-         The first three also cause the co-ordinate limits to be
-         reported before obtaining the limits and/or bounds.
-
-         Not all of these are permitted simultaneously.  {\tt "}Same{\tt "} is not
-         allowed when the number of input and output transformation
-         variables are not equal.  Otherwise it is the value of
-         COSYS that controls the options.  When COSYS = {\tt "}Data{\tt "} all but
-         {\tt "}Match{\tt "} are allowed, and COSYS = {\tt "}World{\tt "} excludes {\tt "}Limits{\tt "} and
-         {\tt "}Full{\tt "}.  There is a special case where SHAPE is fixed to be
-         {\tt "}Bounds{\tt "}.  This is when the number of output variables exceeds
-         the number of input variables, and that in turn equals the
-         number of dimensions in the input NDF.
-
-         If a null (!) value is supplied, a default value is used. When
-         COSYS = {\tt "}Data{\tt "} this is {\tt "}Bounds{\tt "}, and when COSYS = {\tt "}World{\tt "} the
-         default is {\tt "}Match{\tt "}.  {\tt [!]}
-      }
-      \sstsubsection{
-         TITLE = LITERAL (Read)
-      }{
-         Title for the output NDF structure.  A null value (!)
-         propagates the title from the input NDF to the output NDF. {\tt [!]}
-      }
-      \sstsubsection{
-         TRANSFORM = TRN (Read)
-      }{
-         The transformation to be applied.  This may be an HDS
-         container file, in which case the transformation structure is
-         assumed to be called TRANSFORM at the top level of the file;
-         or a path to the HDS object.  For example, a value of
-         distort.mapping would use the transformation structure called
-         MAPPING in the HDS file distort.sdf; and a value of aitoff
-         would make the routine look for the transformation in top-level
-         object TRANSFORM within the HDS file aifoff.sdf.  Normally the
-         object name is TRANSFORM.  The structure must contain both the
-         forward and inverse mappings.
-
-         Structures can be made using CCDEDIT in CCDPACK or TRANMAKE.
-      }
-      \sstsubsection{
-         UBOUND() = \_INTEGER (Read)
-      }{
-         The upper pixel-index bounds of the output NDF.  The number of
-         values should equal the number of output variables in the
-         transformation.  This parameter is only used when SHAPE is
-         {\tt "}Full{\tt "} or {\tt "}Bounds{\tt "}.  Each suggested-default value is the
-         maximum of the input upper bound and the output lower bound.
-      }
-      \sstsubsection{
-         UCOORD() = \_DOUBLE (Read)
-      }{
-         The upper co-ordinate limits of the output NDF.  The number of
-         values should equal the number of output variables in the
-         transformation.  This parameter is only used when SHAPE is
-         {\tt "}Full{\tt "} or {\tt "}Limits{\tt "}.  Each suggested-default value is the
-         upper co-ordinate limit determined from applying the
-         transformation to a series of test points.
-      }
-   }
-   \sstexamples{
-      \sstexamplesubsection{
-         transformer curved sdist straight
-      }{
-         This transforms the NDF called curved into an NDF called
-         straight.sdf, using the transformation TRANSFORM in the HDS
-         file called sdist.sdf.  It uses nearest-neighbour resampling.
-         Assuming the current co-ordinate system is world, the
-         transformation is performed in pixel co-ordinates, setting the
-         bounds to just enclose the transformed input array.
-      }
-      \sstexamplesubsection{
-         transformer curved sdist.transform straight linint same
-      }{
-         As above, except linear interpolation is used, and the array
-         of NDF straight array uses the bounds of NDF curved.
-      }
-      \sstexamplesubsection{
-         transformer a119 proj.merc a119s shape=bounds lbound=[1,-20]
-      }{
-      }
-      \sstexamplesubsection{
-         ubound=[256,172]
-      }{
-         This transforms the NDF called a119, using the transformation
-         MERC in the HDS file called proj.sdf, into an NDF called
-         a119s.  It uses nearest-neighbour resampling.  a119s just
-         encloses the transformed arrays from a119, and has 256 x 192
-         pixels from origin (1,-20).
-      }
-      \sstexamplesubsection{
-         transformer spec2d scrunch.trn full method=l out=spec2d\_l
-      }{
-      }
-      \sstexamplesubsection{
-         shape=limits lcoord=5000 ucoord=6500
-      }{
-         This transforms the 2-dimensional NDF called spec2d, using
-         the 1-dimensional transformation TRN in the HDS file called
-         scrunch.sdf, into an NDF called spec2d\_l.  (NDF spec2d might
-         be a set of spectra before scrunching.)  The
-         linear-interpolation resampling is applied to all the lines in
-         spec2d\_l.  The NDFs have the same pixel-index bounds.
-         spec2d\_l is constrained to contain elements whose transformed
-         co-ordinates lie between 5000 to 6500.
-      }
-   }
-   \sstnotes{
-      \sstitemlist{
-
-         \sstitem
-         In general the test points to calculate the co-ordinate limits
-         for LCOORD and UCOORD are situated at the corners of each pixel,
-         assuming spaced axes.  Thus for a 2-dimensional array of 9-by-7
-         pixels there are 80 (10$*$8) test points.  For linear
-         transformations there is a smaller set of test points for
-         improved efficiency.  These are the corners of each axis and the
-         midpoints between them.
-
-         \sstitem
-         On completion, the current transformation global parameter
-         takes the value of parameter TRANSFORM.
-      }
-   }
-   \sstdiytopic{
-      Co-ordinate Limits and Bounds
-   }{
-      The limits are the lower co-ordinates of the first element, and
-      the upper co-ordinates of the last element of the NDF.  Using
-      these limits, TRANSFORMER derives the co-ordinates of the output
-      NDF{\tt '}s pixel centres by linear interpolation.  Therefore, the
-      co-ordinate limits define the region of the input NDF that will
-      appear in the output.
-
-      The bounds of the output NDF define its shape and origin.  So
-      an additional linear scaling transformation can be applied along
-      each axis by adjusting the shape independently of the co-ordinate
-      limits.
-   }
-   \sstdiytopic{
-      Related Applications
-   }{
-      KAPPA: FLIP, ROTATE, SLIDE, TRANINVERT, TRANJOIN, TRANMAKE,
-      TRANTRACE; CCDPACK: CCDEDIT, TRANLIST, TRANNDF.
-   }
-   \sstimplementationstatus{
-      \sstitemlist{
-
-         \sstitem
-         Flux conservation can only be applied to constant-determinant
-         or linear transformations.
-
-         \sstitem
-         The NDF components are processed by this application as
-         follows.
-            o  LABEL, UNITS, HISTORY, and extensions are propagated.
-            o  TITLE is controlled by the TITLE parameter.
-            o  QUALITY is not derived from the input NDF for a linearly
-            interpolated NDF.  The DATA and VARIANCE arrays are resampled.
-            o  Axis centre arrays are created using the co-ordinate
-            limits for COSYS = {\tt "}Data{\tt "}.
-
-         \sstitem
-         Processing of bad pixels and automatic quality masking are
-         supported.
-
-         \sstitem
-         All non-complex numeric data types can be handled.
-
-         \sstitem
-         There can be an arbitrary number of NDF dimensions.
-      }
-   }
-}
-\sstroutine{
-   TRANTRACE
-}{
-   Lists the contents of a transformation structure
-}{
-   \sstdescription{
-      This application reports or write to a text file the contents of
-      a TRANSFORM structure.  Items listed include:
-
-      \ssthitemlist{
-
-         \sstitem
-            the structure's name;
-
-         \sstitem
-            the version of the TRANSFORM software used to write the
-              structure;
-
-         \sstitem
-            the number of input and output variables for the nett
-            transformation and for each transformation where the structure
-            contains more than one;
-
-         \sstitem
-            the classification of the forward and inverse mappings; and
-
-         \sstitem
-            for each transformation its precision, comment, forward and
-            inverse functions.
-      }
-   }
-   \sstusage{
-      trantrace transform [logfile]
-   }
-   \sstparameters{
-      \sstsubsection{
-         LOGFILE = FILENAME (Write)
-      }{
-         The name of the text file to store a list of the
-         transformation structure.  If it is null ({\tt !}) the list of the
-         transformation structure is reported directly to you.
-         {\tt [!]}
-      }
-      \sstsubsection{
-         TRANSFORM = TRN (Read)
-      }{
-         The transformation structure to be listed.  This may be an HDS
-         container file, in which case the transformation structure is
-         assumed to be called TRANSFORM at the top level of the file;
-         or a path to the HDS object.  The suggested default is the
-         current transformation structure.
-      }
-   }
-   \sstresparameters{
-      \sstsubsection{
-         CLASSFOR = LITERAL (Write)
-      }{
-         A comma-separated list of classifications that describe the
-         properties of the forward mapping of the transformation.  The
-         possible values in the list are:
-         \begin{description}
-         \item {\tt "Linear"}       --- linear and preserves straight lines,
-         \item {\tt "Independent"}  --- preserves the independence of the axes,
-         \item {\tt "Diagonal"}     --- preserves the axes themselves,
-         \item {\tt "Isotropic"}    --- preserves angles and shapes,
-         \item {\tt "Positive\_det"} --- a component of reflection is absent,
-         \item {\tt "Negative\_det"} --- a component of reflection is present,
-         \item {\tt "Constant\_det"} --- the scale factor is constant,
-         \item {\tt "Unit\_det"}     --- areas (or volumes {\it etc.}) are preserved.
-         \end{description}
-
-         See SUN/61 Appendix~B for more details of transformation
-         classification and a table of the classifications of common
-         mappings.
-      }
-      \sstsubsection{
-         CLASSINV = LITERAL (Write)
-      }{
-         A comma-separated list of classifications that describe the
-         properties of the inverse mapping of the transformation.  See
-         parameter CLASSFOR for further details.
-      }
-      \sstsubsection{
-         COMMENT = LITERAL (Write)
-      }{
-         The comment string associated with the transformation.  A
-         {\tt "--$>$"} symbol, if present, indicates the forward
-         transformation.
-      }
-      \sstsubsection{
-         FORWARD = LITERAL (Write)
-      }{
-         The expression that defines the last forward mapping of the
-         transformation.
-      }
-      \sstsubsection{
-         INVERSE = LITERAL (Write)
-      }{
-         The expression that defines the last inverse mapping of the
-         transformation.
-      }
-      \sstsubsection{
-         PREC = LITERAL (Write)
-      }{
-         The arithmetic precision of the transformation.  This may be
-         either {\tt "\_REAL"} for single precision, {\tt "\_DOUBLE"} for double
-         precision, or {\tt "\_INTEGER"} for integer precision.
-      }
-      \sstsubsection{
-         VERSION = LITERAL (Write)
-      }{
-         The version number of the TRANSFORM software used to write the
-         transformation structure.
-      }
-   }
-   \sstexamples{
-      \sstexamplesubsection{
-         trantrace rot45.transform
-      }{
-         This reports the contents of the transformation structure within
-         the HDS container file {\tt rot45.sdf}, component TRANSFORM.
-      }
-      \sstexamplesubsection{
-         trantrace rot45
-      }{
-         This has the same affect as the previous example.
-      }
-      \sstexamplesubsection{
-         trantrace $\backslash$
-      }{
-         This reports the contents of the current TRANSFORM structure.
-      }
-      \sstexamplesubsection{
-         trantrace jkt256.more.ccdpack.transform trn.lis
-      }{
-         This lists to the text file {\tt trn.lis} the contents of the
-         transformation structure located within the HDS file
-         {\tt jkt256.sdf}, as component MORE.CCDPACK.TRANSFORM.
-      }
-      \sstexamplesubsection{
-         trantrace stretch.limit nvin=(nvi) comment=(trncom)
-      }{
-         This reports the contents of the transformation structure within
-         the HDS container file {\tt stretch.sdf}, component LIMIT.  The
-         number of input transformation variables is written to the
-         {\footnotesize ICL} variable called NVI, and the
-         transformation comment is stored in {\footnotesize ICL}
-         variable TRNCOM.
-      }
-   }
-   \sstnotes{
-      \sstitemlist{
-
-         \sstitem
-         Where a value is not optional but is absent, {\tt "$<$undefined$>$"} appears
-         in the listing.
-
-         \sstitem
-         TRANTRACE attempts to compile the forward and inverse mappings
-         to check that it is a TRANSFORM structure, and will exit with an
-         error if both of these compilations fail.
-
-         \sstitem
-         On completion, the current transformation global parameter
-         takes the value of parameter TRANSFORM.
-      }
-   }
-   \sstdiytopic{
-      Related Applications
-   }{
-      KAPPA: TRANSFORMER, TRANINVERT, TRANJOIN, TRANMAKE;
-      CCDPACK: CCDEDIT, TRANLIST, TRANNDF.
-   }
-}
-
-\sstroutine{
    TRIG
 }{
    Performs a trigonometric transformation on a NDF
@@ -39753,7 +38687,7 @@ plot (7k).
    \sstdiytopic{
       Related Applications
    }{
-      KAPPA: WCSFRAME, TRANMAKE, TRANSFORMER; CCDPACK: TRANNDF.
+      KAPPA: RESAMPLE, WCSFRAME; CCDPACK: TRANNDF.
    }
    \sstimplementationstatus{
       \sstitemlist{
@@ -41429,10 +40363,10 @@ and HDS data types is as follows:
 \xlabel{CRELUT}
 \xlabel{GREYPLOT}
 \xlabel{IDCLEAR}
-\xlabel{IDSET}
-\xlabel{IDSTATE}
 \xlabel{IDINVISIBLE}
 \xlabel{IDPAZO}
+\xlabel{IDSET}
+\xlabel{IDSTATE}
 \xlabel{INSPECT}
 \xlabel{KRHHELP}
 \xlabel{LUTFLIP}
@@ -41444,6 +40378,11 @@ and HDS data types is as follows:
 \xlabel{OVSET}
 \xlabel{QUILT}
 \xlabel{SNAPSHOT}
+\xlabel{TRANINVERT}
+\xlabel{TRANJOIN}
+\xlabel{TRANMAKE}
+\xlabel{TRANSFORMER}
+\xlabel{TRANTRACE}
 \xlabel{TURBOCONT}
 
 The following commands used to be part of KAPPA but have now been
@@ -41468,6 +40407,11 @@ The following commands used to be part of KAPPA but have now been
 \item \xref{OVSET}{sun239}{OVSET}
 \item \xref{QUILT}{sun239}{QUILT}
 \item \xref{SNAPSHOT}{sun239}{SNAPSHOT}
+\item \xref{TRANINVERT}{sun239}{TRANINVERT}
+\item \xref{TRANJOIN}{sun239}{TRANJOIN}
+\item \xref{TRANMAKE}{sun239}{TRANMAKE}
+\item \xref{TRANSFORMER}{sun239}{TRANSFORMER}
+\item \xref{TRANTRACE}{sun239}{TRANTRACE}
 \item \xref{TURBOCONT}{sun239}{TURBOCONT}
 \end{itemize}
 
@@ -44156,6 +43100,11 @@ need that may occur for them (see SUN/239).
 \item [LUTTWEAK] Use \htmlref{LUTEDIT}{LUTEDIT} instead.
 \item [OVCLEAR] Overlays are not supported by PGPLOT.
 \item [OVSET] Overlays are not supported by PGPLOT.
+\item [TRANINVERT] Use \htmlref{WCSATTRIB}{WCSATTRIB} instead.
+\item [TRANJOIN] Use \htmlref{WCSADD}{WCSADD} instead.
+\item [TRANMAKE] Use \htmlref{WCSADD}{WCSADD} instead.
+\item [TRANSFORMER] Use \htmlref{RESAMPLE}{RESAMPLE} instead.
+\item [TRANTRACE] Use \htmlref{WCSSHOW}{WCSSHOW} instead.
 \end{description}
 
 \subsection{Modified Commands}
@@ -44554,8 +43503,8 @@ functions as follows.
  Expands an NDF by pixel duplication.
 \classitem{SQORST}
  Squashes or stretches a 2-d data array in either or both axes.
-\classitem{TRANSFORMER}
- Applies a transformation to an NDF.
+\classitem{RESAMPLE}
+ Use an arbitrary mapping to resample an NDF.
 \classitem{WCSALIGN}
  Aligns a group of 2-d NDFs using WCS information.
 \end{description}
@@ -44774,16 +43723,8 @@ functions as follows.
 %
 \item {\large\bf Resampling and transformations}
 \begin{description}
-\classitem{TRANINVERT}
- Inverts a transformation.
-\classitem{TRANJOIN}
- Joins two transformations.
-\classitem{TRANMAKE}
- Makes a transformation structure given its co-ordinate mappings.
-\classitem{TRANSFORMER}
- Applies a transformation to an NDF.
-\classitem{TRANTRACE}
- Lists the contents of a transformation structure.
+\classitem{RESAMPLE}
+ Use an arbitrary mapping to resample an NDF.
 \classitem{WCSALIGN}
  Aligns a group of 2-d NDFs using WCS information.
 \end{description}
