@@ -16,6 +16,9 @@ ira_gtscs.f ira_init.f ira_iproj.f ira_iscs.f ira_locat.f ira_norm.f \
 ira_seteq.f ira_trans.f ira_write.f ira_read.f ira_com ira_par ira_err \
 ira_link_adam
 
+# A group of all the generic source files.
+GENERIC_SOURCES = 
+
 # The other files which need to be extracted from the source code
 # repository and which end up in kaplibs.tar.
 UNIX_OTHERS = makefile mk sunxx.tex kaplibs.news 

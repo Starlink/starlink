@@ -430,8 +430,8 @@ ira_source.tar
 #  installed in the $(INSTALL_BIN) directory with execute permission
 #  set.
 
-IRA_PUBLIC_SCRIPTS =
-GEN_PUBLIC_SCRIPTS = $(PKG_NAME)_link $(PKG_NAME)_link_adam 
+IRA_PUBLIC_SCRIPTS = ira_link_adam
+GEN_PUBLIC_SCRIPTS = $(PKG_NAME)_link_adam 
 PUBLIC_SCRIPTS = $(GEN_PUBLIC_SCRIPTS) $(IRA_PUBLIC_SCRIPTS)
 
 #  Startup script.  This is the file that must be executed by a
