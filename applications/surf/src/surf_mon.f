@@ -1,7 +1,7 @@
       SUBROUTINE SURF_MON (STATUS)
 *+
 *  Name:
-*     SURF
+*     SURF_MON
 
 *  Purpose:
 *     main routine for SCUBA offline data reduction package
@@ -10,7 +10,7 @@
 *     ADAM A-task
  
 *  Invocation:
-*     CALL SURF( STATUS )
+*     CALL SURF_MON( STATUS )
  
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
@@ -31,6 +31,9 @@
 *     25-FEB-1993: Original version
 *     12-JAN-1995: Ported to UNIX, changed to 'new style'
 *     $Log$
+*     Revision 1.32  1999/05/15 01:45:18  timj
+*     Add call to surf_set_app_name
+*
 *     Revision 1.31  1999/02/27 04:37:25  timj
 *     Add REMIP
 *
@@ -156,6 +159,10 @@ c
 
       CALL TASK_GET_NAME (NAME, STATUS)
 
+*     Set application name in history recording
+      CALL SURF_SET_APP_NAME( NAME, STATUS )
+
+*     Execute required action
       IF (NAME .EQ. 'ADD_DBM') THEN
 
          CALL SURF_ADD_DBM (STATUS)
