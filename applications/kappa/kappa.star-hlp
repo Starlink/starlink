@@ -7089,6 +7089,7 @@ MJC: Malcolm J. Currie  (STARLINK)
    -  This application will handle data in all numeric types, though
    type conversion to integer will occur for unsigned byte and word
    images.
+
 1 CSUB
 Subtracts a scalar from an NDF data structure.
 
@@ -7173,7 +7174,9 @@ Description:
    of the displayed positions may be controlled using parameter STYLE.
 
    Positions may be reported in several different co-ordinate Frames
-   (see parameter FRAME).
+   (see parameter FRAME). Optionally, the corresponding pixel
+   co-ordinates at each position may also be reported (see parameter
+   SHOWPIXEL).
 
    The picture or pictures within which positions are required can be
    selected in several ways (see parameters MODE and NAME).
@@ -7350,6 +7353,13 @@ QUIET = _LOGICAL (Read)
    parameters and files are still created. The display of informational
    messages describing the use of the cursor is controlled by the
    parameter INFO. [FALSE]
+3 SHOWPIXEL
+SHOWPIXEL = _LOGICAL (Read)
+   If TRUE, the pixel co-ordinates of each selected position are
+   shown on a separate line, following the co-ordinates requested
+   using parameter FRAME. If pixel co-ordinates are being displayed
+   anyway (see parameter FRAME) then a value of FALSE is used for.
+   SHOWPIXEL. [current value]
 3 STYLE
 STYLE = LITERAL (Read)
    A group of attribute settings describing the plotting style to use
@@ -7426,6 +7436,11 @@ celestial co-ordinate values are stored in radians.
 -  In DYNAMIC and ANCHOR modes, if the cursor is situated at a
 position where there are no pictures of the selected name, the
 co-ordinates in the BASE picture are reported.
+
+-  Pixel co-ordinates are formatted with 1 decimal place unless a
+format has already been specified by setting the Format attributes
+for the axes of the PIXEL co-ordinate Frame (eg using application
+WCSATTRIB).
 
 -  Positions can be removed (the instructions state how), starting
 from the most-recent one.  Such positions are excluded from the
@@ -8079,7 +8094,7 @@ CENTRE = LITERAL (Read)
 3 CLEAR
 CLEAR = _LOGICAL (Read)
    TRUE if the current picture is to be cleared before the image is
-   displayed. [FALSE]
+   displayed. [current value]
 3 COMP
 COMP = LITERAL (Read)
    The NDF array component to be displayed.  It may be "Data",
@@ -33989,20 +34004,22 @@ LOGFILE = FILENAME (Write)
    file is created. If a log file is given, the Tk browser window
    is not produced. [!]
 3 NDF
-NDF = NDF (Update)
+NDF = NDF (Read or Update)
    If an NDF is supplied, then its WCS FrameSet is displayed. If a
    null (!) value is supplied, then the parameter OBJECT is used to
-   specify the AST Object to display.
+   specify the AST Object to display. Update access is required to
+   the NDF if a value is given for parameter NEWWCS. Otherwise, only
+   read access is required.
 3 NEWWCS
 NEWWCS = GROUP (Read)
    A group expression giving a dump of an AST FrameSet which
    is to be stored as the WCS component in the NDF given by parameter
    NDF. The existing WCS component is unchanged if a null value is
-   supplied. This parameter is only accessed if a non-null value is
-   supplied for parameter NDF. The Base Frame in the FrameSet is
-   assumed to be the GRID Frame. If a value is given for this
-   parameter, then the log file or Tk browser will display the new
-   FrameSet (after being stored in the NDF and retrieved). [!]
+   supplied. The value supplied for this parameter is ignored if a
+   null value is supplied for parameter NDF. The Base Frame in the
+   FrameSet is assumed to be the GRID Frame. If a value is given for
+   this parameter, then the log file or Tk browser will display the
+   new FrameSet (after being stored in the NDF and retrieved). [!]
 3 OBJECT
 OBJECT = LITERAL (Read)
    The HDS object containing the AST Object to display. Only
