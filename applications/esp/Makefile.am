@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-bin_SCRIPTS = esp_link_adam esp.csh esp.sh
+dist_bin_SCRIPTS = esp_link_adam esp.csh esp.sh
 
 bin_MONOLITHS = esp_mon
 esp_mon_TASKS = corr ellfou ellpro esphelp fastmed \
@@ -15,7 +15,8 @@ esp_mon_SOURCES = \
     $(TASK_SUBS) \
     $(COMMON_SUBS) \
     $(PSEUDOCOMMON_SUBS) \
-    $(MISC_SUBS)
+    $(MISC_SUBS) \
+    $(PAR_FILES)
 
 esp_mon_LDADD = `$(srcdir)/esp_link_adam`
 
@@ -73,6 +74,11 @@ PSEUDOCOMMON_SUBS = \
 # Other subroutines, which don't fit into any of the above categories.
 MISC_SUBS = \
     dnsg.f esp1_vers.f
+
+PAR_FILES = \
+    COR_PAR ELF_PAR ELP_PAR FAS_PAR GAU_PAR GRA_PAR HIS_PAR HSB_PAR \
+    LOB_PAR SEC_PAR SEL_PAR SKE_PAR TOP_PAR
+
 
 # Help files
 esp.shl: esp.hlp
