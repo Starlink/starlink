@@ -7,11 +7,14 @@
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK)
+#     MBT: Mark Taylor (STARLINK)
 #     {enter_new_authors_here}
 
 #  History:
 #     10-JUL-1992 (PDRAPER):
 #     	 Original version.
+#     16-FEB-1998 (MBT):
+#        Added OUTFORMAT.
 #     {enter_changes_here}
 
 #-
@@ -71,6 +74,16 @@ interface REGISTER
       ppath    'CURRENT,DEFAULT '
       default  'NDF'
       prompt   'Store transformation structures in'
+      helpkey  '*'
+   endparameter
+
+   parameter OUTFORMAT
+      type     LITERAL
+      access   UPDATE
+      vpath    'CURRENT,DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  'WCS'
+      prompt   'How transformation is written to output NDF'
       helpkey  '*'
    endparameter
 
