@@ -81,7 +81,7 @@ dnl   implementation for getopt so that, if kpathsea is included, we
 dnl   must make sure that we pick up that one.  If this test is
 dnl   placed before kpathsea, we can end up defining getopt twice.
 AC_CHECK_FUNCS(getopt)
-AC_CHECK_DECLS([getopt,getsubopt,getopt_long])
+AC_CHECK_DECLS([getopt,getsubopt,getopt_long,setenv,putenv])
 AC_REPLACE_FUNCS(getopt_long getsubopt)
 
 

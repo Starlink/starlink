@@ -57,6 +57,9 @@
 #undef HAVE_SETENV
 #undef HAVE_PUTENV
 #undef HAVE___STRCHRNUL
+#undef HAVE_DECL_SETENV
+#undef HAVE_DECL_PUTENV
+
 /* Define as 1 if the getopt function (and thus, which is more
  * important to us, the getopt globals, optarg, optind, opterr and
  * optopt) is defined by the system.  Define as 0 if they should be
