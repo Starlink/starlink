@@ -206,7 +206,7 @@
           CALL ARR_ELEM1R( APTR, DIMS(IAX), 1, LO, STATUS )
           CALL ARR_ELEM1R( APTR, DIMS(IAX), DIMS(IAX), HI, STATUS )
           AXLO(IAX) = MIN(LO,HI)
-          AXHI(IAX) = MIN(LO,HI)
+          AXHI(IAX) = MAX(LO,HI)
         END DO
 
 *    For each source
