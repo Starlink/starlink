@@ -275,7 +275,12 @@ f     error value
    if ( !astIsAObject( this ) ) return NULL;
 
 #ifdef DEBUG
-   astIdHandler( this, "annulled" );   
+   {   int rc;
+       char buf[100];
+       rc = astGetRefCount( this );
+       sprintf(buf,"annulled (refcnt: %d -> %d)", rc, rc-1 );
+       astIdHandler( this, buf );   
+   }
 #endif
 
 /* Decrement the Object's reference count and delete the Object if
@@ -531,7 +536,12 @@ f     function is invoked with STATUS set to an error value, or if it
    if ( !astOK ) return NULL;
 
 #ifdef DEBUG
-   astIdHandler( this, "cloned" );   
+   {   int rc;
+       char buf[100];
+       rc = astGetRefCount( this );
+       sprintf(buf,"cloned (refcnt: %d -> %d)", rc, rc+1 );
+       astIdHandler( this, buf );   
+   }
 #endif
 
 /* Increment the Object's reference count. */

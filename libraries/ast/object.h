@@ -284,6 +284,9 @@
 #if defined(astCLASS)
 #include <stdarg.h>
 #endif
+#if defined(DEBUG)
+#include <stdio.h>
+#endif
 
 /* Macros. */
 /* ======= */
@@ -493,6 +496,8 @@ astINVOKE(V,astIsA##class##_((const Ast##class *)astEnsurePointer_(this)))
 *-
 */
 
+#ifndef DEBUG
+
 /* Define the macro. */
 #define astMAKE_CHECK(class) \
 \
@@ -517,6 +522,43 @@ Ast##class *astCheck##class##_( Ast##class *this ) { \
 /* Return the pointer value supplied. */ \
    return this; \
 }
+
+/* Define the macro with memory debugging facilities. */
+#else
+
+#define astMAKE_CHECK(class) \
+\
+/* Declare the function (see the object.c file for a prologue). */ \
+Ast##class *astCheck##class##_( Ast##class *this ) { \
+\
+   char buf[100]; \
+\
+/* Check the global error status. */ \
+   if ( !astOK ) return this; \
+\
+/* Check if the object is a class member. */ \
+   if ( !astIsA##class( this ) ) { \
+\
+/* If not, but the pointer was valid (which means it identifies an Object \
+   of some sort), then report more information about why this Object is \
+   unsuitable. */ \
+      if ( astOK ) { \
+         astError( AST__OBJIN, "Pointer to " #class " required, but pointer " \
+                   "to %s given.", astGetClass( this ) ); \
+      }\
+\
+   } else { \
+\
+/* See if the memory block is being watched. If so, the astIdAlarm \
+   function will be called.*/ \
+      sprintf( buf, "checked (refcnt: %d)", astGetRefCount_( (AstObject *) this ) ); \
+      astIdHandler( this, buf ); \
+   } \
+\
+/* Return the pointer value supplied. */ \
+   return this; \
+}
+#endif
 #endif
 
 #if defined(astCLASS)            /* Protected */
@@ -1364,7 +1406,7 @@ astINVOKE(V,astClearAttrib_(astCheckObject(this),attrib))
 #define astDump(this,channel) \
 astINVOKE(V,astDump_(astCheckObject(this),astCheckChannel(channel)))
 #define astEqual(this,that) \
-astINVOKE(V,astEqual_(astCheckObject(this),astCheckObject(that)))
+astINVOKE(V,((this==that)||astEqual_(astCheckObject(this),astCheckObject(that))))
 #define astGetAttrib(this,attrib) \
 astINVOKE(V,astGetAttrib_(astCheckObject(this),attrib))
 #define astGetClass(this) astINVOKE(V,astGetClass_((const AstObject *)(this)))

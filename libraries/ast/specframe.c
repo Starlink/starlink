@@ -67,6 +67,11 @@ f     - AST_GETREFPOS: Get reference position in any celestial system
 *        - Avoid using astStore to allocate more storage than is supplied
 *        in the "data" pointer. This can cause access violations since 
 *        astStore will then read beyond the end of the "data" area.
+*     22-MAR-2005 (DSB):
+*        - Re-structure MakeSpecMapping in order to avoid unnecessary
+*        access to SpecFrame attributes which may not be set, and to
+*        check that all required attributes have been set if UseDefs is 
+*        zero.
 *class--
 */
 
@@ -106,11 +111,6 @@ f     - AST_GETREFPOS: Get reference position in any celestial system
    compare bad values directory because of the danger of floating point
    exceptions, so bad values are dealt with explicitly. */
 #define EQUAL(aa,bb) (((aa)==AST__BAD)?(((bb)==AST__BAD)?1:0):(((bb)==AST__BAD)?0:(fabs((aa)-(bb))<=1.0E5*MAX((fabs(aa)+fabs(bb))*DBL_EPSILON,DBL_MIN))))
-
-/* Macro to check if two standards of rest are equivalent. If both are
-  "source" standards of rest, then they must have the same source velocity
-  to match. */
-#define EQUALSOR(sor1,srcvel1,sor2,srcvel2) (((sor1)!=(sor2))?0:(((sor1)!=AST__SCSOR)?1:(EQUAL(srcvel1,srcvel2))))
 
 /* Header files. */
 /* ============= */
@@ -194,10 +194,11 @@ static const char *StdOfRestString( AstStdOfRestType );
 static const char *SystemLabel( AstSystemType );
 static const char *SystemString( AstFrame *, AstSystemType );
 static double ConvertSourceVel( AstSpecFrame *, AstStdOfRestType );
+static int EqualSor( AstSpecFrame *, AstSpecFrame * );
 static int GetActiveUnit( AstFrame * );
-static int MakeSpecMapping( AstSpecFrame *, AstSpecFrame *, AstSystemType, AstStdOfRestType, double, int, AstMapping ** );
+static int MakeSpecMapping( AstSpecFrame *, AstSpecFrame *, AstSpecFrame *, int, AstMapping ** );
 static int Match( AstFrame *, AstFrame *, int **, int **, AstMapping **, AstFrame ** );
-static int SorConvert( AstSpecFrame *, AstSpecMap *, AstStdOfRestType, double, AstStdOfRestType, double);
+static int SorConvert( AstSpecFrame *, AstSpecFrame *, AstSpecMap * );
 static int SubFrame( AstFrame *, AstFrame *, int, const int *, const int *, AstMapping **, AstFrame ** );
 static int TestActiveUnit( AstFrame * );
 static void ClearUnit( AstFrame *, int );
@@ -555,11 +556,13 @@ static double ConvertSourceVel( AstSpecFrame *this, AstStdOfRestType new ) {
 */
 
 /* Local Variables: */
+   AstSpecFrame *from;     /* Pointer to a source SpecFrame */
+   AstSpecFrame *to;       /* Pointer to a destination SpecFrame */
    AstSpecMap *specmap;    /* Pointer to a SpecMap */
    AstStdOfRestType sor;   /* Standard of rest in which SourceVel is defined */
-   double temp;            /* Temporary storage */
    double ret;             /* The returned value */
    double rf;              /* Rest frequency (Hz) */
+   double temp;            /* Temporary storage */
 
 /* Initialise */
    ret = 0.0;
@@ -568,21 +571,35 @@ static double ConvertSourceVel( AstSpecFrame *this, AstStdOfRestType new ) {
    if ( !astOK ) return ret;
 
 /* Get the value of the SourceVel attribute. */
+   ret = astGetSourceVel( this );
+
+/* Check it can be used (depends on whether a value has been set and
+   whether the USeDefs attribute is zero). */
    VerifyAttrs( this, "convert source velocity to a new standard of rest", 
                 "SourceVel", "astMatch" );
-   ret = astGetSourceVel( this );
 
 /* Get the rest frame to which value refers. */
    sor = astGetSourceVRF( this );
 
 /* If necessary, convert to the requested rest frame. */
    if( sor != new ) {
-      specmap = astSpecMap( 1, 0, "" );
 
 /* Verify that usable value is available for the RestFreq attribute. An 
    error is reported if not. */
       VerifyAttrs( this, "convert source velocity to a new standard of rest", 
                    "RestFreq", "astMatch" );
+
+/* Take two copies of the supplied SpecFrame and set their StdOfRest
+   attribute to the required values. */
+      from = astCopy( this );
+      astSetStdOfRest( from, sor );
+
+      to = astCopy( this );
+      astSetStdOfRest( to, new );
+
+/* Initialise a new SpecMap to describe the conversion. The new sSpecMap
+   initially represents a UnitMap. */
+      specmap = astSpecMap( 1, 0, "" );
 
 /* Add a conversion from velocity to frequency since SorConvert converts
    frequencies. */
@@ -591,7 +608,7 @@ static double ConvertSourceVel( AstSpecFrame *this, AstStdOfRestType new ) {
 
 /* Now add a conversion from frequency in the SourveVRF standard of rest to 
    frequency in the required rest frame. */
-      SorConvert( this, specmap, sor, 0.0, new, 0.0 );
+      SorConvert( from, to, specmap );
 
 /* Finally, add a conversion from frequency back to velocity. Note, the
    value of the rest frequency does not affect the overall conversion. */
@@ -601,7 +618,11 @@ static double ConvertSourceVel( AstSpecFrame *this, AstStdOfRestType new ) {
    standard of rest to the required rest frame. */
       temp = ret;
       astTran1( specmap, 1, &temp, 1, &ret );
+
+/* Free resources */
       specmap = astAnnul( specmap );
+      to = astAnnul( to );
+      from = astAnnul( from );
    }
 
 /* Return zero if an error has occurred. */
@@ -695,6 +716,94 @@ static const char *DefUnit( AstSystemType system, const char *method,
    }
 
 /* Return the result. */
+   return result;
+}
+
+static int EqualSor( AstSpecFrame *this, AstSpecFrame *that ) {
+/*
+*  Name:
+*     EqualSor
+
+*  Purpose:
+*     Do two SpecFrames use the same standard of rest?
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "specframe.h"
+*     int EqualSor( AstSpecFrame *this, AstSpecFrame *that ) 
+
+*  Class Membership:
+*     SpecFrame member function 
+
+*  Description:
+*    This function returns non-zero if the two supplied SpecFrames use
+*    the same standard of rest.
+
+*  Parameters:
+*     this
+*        Pointer to the first SpecFrame.
+*     that
+*        Pointer to the second SpecFrame.
+
+*  Returned Value:
+*     Non-zero if the two SpecFrames use the same standard of rest. Zero
+*     otherwise.
+
+*/
+
+/* Local Variables: */
+   AstStdOfRestType sor;             /* Standard of rest */
+   int result;                       /* Value to return */
+
+/* Check the global error status. */
+   if ( !astOK ) return 0;
+
+/* Initialise. */
+   result = 1;
+
+/* Compare StdOfRest attributes. */
+   sor = astGetStdOfRest( this );
+   if( astGetStdOfRest( that ) != sor ) {
+      result = 0;
+
+/* If the standards of rest are equal we need to check the the attributes
+   which specify the precise rest frame. */
+   } else {
+
+/* The reference RA and Dec need to be equal */
+      if( !EQUAL( astGetRefRA( this ), astGetRefRA( that ) ) || 
+          !EQUAL( astGetRefDec( this ), astGetRefDec( that ) ) ) {
+         result = 0;
+
+/* For source rest frame, the source velocities must be equal */
+      } else if( sor == AST__SCSOR ){
+         if( !EQUAL( astGetSourceVel( this ), astGetSourceVel( that ) ) || 
+                     astGetSourceVRF( this ) != astGetSourceVRF( that ) ) {
+            result = 0;
+         }
+
+/* For gepcentric, barycentric and heliocentric rest frames, the epochs must 
+   be the same */
+      } else if( sor == AST__GESOR || sor == AST__BYSOR || sor == AST__HLSOR ){
+         if( !EQUAL( astGetEpoch( this ), astGetEpoch( that ) ) ) result = 0;
+
+/* For topocentric rest frame, the epoch and observer position must be the 
+   same */
+      } else if( sor == AST__TPSOR ){
+         if( !EQUAL( astGetEpoch( this ), astGetEpoch( that ) ) ||
+             !EQUAL( astGetGeoLon( this ), astGetGeoLon( that ) ) ||
+             !EQUAL( astGetGeoLat( this ), astGetGeoLat( that ) ) ) result = 0;
+      
+      } else if( astOK ) {
+         astError( AST__INTER, "SorEqual(SpecFrame): Function SorEqual "
+                   "does not yet support rest frame %d (AST internal "
+                   "programming error)", sor );
+      }
+   }
+
+/* Return the result */
    return result;
 }
 
@@ -1902,9 +2011,8 @@ void astInitSpecFrameVtab_(  AstSpecFrameVtab *vtab, const char *name ) {
 }
 
 static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
-                            AstSystemType align_sys, 
-                            AstStdOfRestType align_sor, double align_svel, 
-                            int report, AstMapping **map ) {
+                            AstSpecFrame *align_frm, int report, 
+                            AstMapping **map ) {
 /*
 *  Name:
 *     MakeSpecMapping
@@ -1918,9 +2026,8 @@ static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
 *  Synopsis:
 *     #include "specframe.h"
 *     int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
-*                          AstSystemType align_sys, 
-*                          AstStdOfRestType align_sor, 
-*                          double align_svel, int report, AstMapping **map )
+*                          AstSpecFrame *align_frm, int report, 
+*                          AstMapping **map ) {
 
 *  Class Membership:
 *     SpecFrame member function.
@@ -1936,34 +2043,29 @@ static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
 *     transformation. A transformation is then found from the alignment
 *     frame to the required result Frame,  using the attributes of the
 *     result to define the transformation. The alignment Frame is
-*     described by the supplied parameters "align_sys" and "align_sor".
+*     described by the attributes of the "align_frm" SpecFrame.
 *
 *     Thus, different forms of alignment can be obtained by suitable
-*     choice of align_sys and align_sor. For instance, to compare the
+*     choice of the attributes of "align_frm". For instance, to compare the
 *     radio velocity dispersion of two lines at different rest frequencies,
-*     you would use "align_sys=radio velocity" and (probably)
-*     "align_sor=local group". On the other hand if you wanted to
-*     re-calibrate an existing radio velocity Frame within a FrameSet to use 
-*     a different rest frequency, you would make the SpecFrame the current 
-*     Frame and then set the rest frequency attribute for the FrameSet.
-*     The "integrity checking" system in the FrameSet class would then
-*     get the Mapping between the original and the modified SpecFrames.
-*     In this case, the "align_sys" needs to be "frequency" since you
-*     want the original and modified SpecFrames to be aligned in
-*     frequency, not radio velocity.
+*     you would set "system=radio velocity" and (probably) "stdofrest=local 
+*     group" in "align_frm". On the other hand if you wanted to re-calibrate 
+*     an existing radio velocity Frame within a FrameSet to use a different 
+*     rest frequency, you would make the SpecFrame the current Frame and then 
+*     set the rest frequency attribute for the FrameSet. The "integrity 
+*     checking" system in the FrameSet class would then get the Mapping 
+*     between the original and the modified SpecFrames. In this case, the 
+*     "alignment system" needs to be "frequency" since you want the original 
+*     and modified SpecFrames to be aligned in frequency, not radio velocity.
 
 *  Parameters:
 *     target
 *        Pointer to the first SpecFrame.
 *     result
 *        Pointer to the second SpecFrame.
-*     align_sys
-*        The spectral system in which to align the two SpecFrames.
-*     align_sor
-*        The standard of rest in which to align the two SpecFrames.
-*     align_svel
-*        The heliocentric velocity of the "Source" standard of rest in which 
-*        to align the two SpecFrames. Only used if "align_sor" is AST__SCSOR.
+*     align_frm
+*        A SpecFrame defining the system and standard of rest in which to 
+*        align the target and result SpecFrames.
 *     report
 *        Should errors be reported if no match is possible? These reports
 *        will describe why no match was possible.
@@ -1994,21 +2096,24 @@ static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
    AstMapping *umap1;            /* First Units Mapping */
    AstMapping *umap2;            /* Second Units Mapping */
    AstSpecMap *specmap;          /* Pointer to SpecMap */
-   AstStdOfRestType result_sor;  /* Standard of rest in result */
-   AstStdOfRestType sor;         /* Standard of rest to use */
-   AstStdOfRestType target_sor;  /* Standard of rest in target */
    AstSystemType serr;           /* Erroneous system */
-   AstSystemType system;         /* Code to identify coordinate system */
+   AstSystemType align_system;   /* Code to identify alignment system */
+   AstSystemType target_system;  /* Code to identify target system */
+   AstSystemType result_system;  /* Code to identify result system */
    const char *uerr;             /* Erroneous units */
    const char *ures;             /* Results units */
    const char *utarg;            /* Target units */
    const char *vmess;            /* Text for use in error messages */
    double args[ MAX_ARGS ];      /* Conversion argument array */
-   double rest_freq;             /* Rest frequency (Hz) */
-   double result_svel;           /* Source velocity in result frame */
-   double target_svel;           /* Source velocity in target frame */
-   double svel;                  /* Source velocity in use */
+   double target_rf;             /* Target rest frequency (Hz) */
+   double result_rf;             /* Result rest frequency (Hz) */
    int match;                    /* Mapping can be generated? */
+   int step1;                    /* Perform the 1st step in the Mapping? */
+   int step2;                    /* Perform the 2nd step in the Mapping? */
+   int step3;                    /* Perform the 3rd step in the Mapping? */
+   int step4;                    /* Perform the 4th step in the Mapping? */
+   int step5;                    /* Perform the 5th step in the Mapping? */
+   int step6;                    /* Perform the 6th step in the Mapping? */
 
 /* Check the global error status. */
    if ( !astOK ) return 0;
@@ -2016,46 +2121,6 @@ static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
 /* Initialise the returned values. */
    match = 1;
    *map = NULL;
-
-/* Define text for error messages.*/
-   vmess = "convert between spectral systems";
-
-/* Verify that values for the standard of rest are available. */
-   VerifyAttrs( target, vmess, "StdOfRest", "astMatch" );
-   VerifyAttrs( result, vmess, "StdOfRest", "astMatch" );
-
-/* The supported spectral coordinate systems fall into two groups;
-   "relative", and "absolute". The relative systems define each axis
-   value with respect to the rest frequency, whereas the absolute systems
-   have axis values which do not depend on the rest frequency. In order
-   to convert an axis value from a system in one group to a system in the 
-   other group, the rest frequency must be known. However, the rest
-   frequency is not necessary in order to convert axis values between
-   two systems belonging to the same group.  Determine if the alignment 
-   system is absolute or relative. If absolute, we ignore the supplied 
-   "align_sys" and align in frequency, since aligning in any absolute
-   system will automatically ensure that all the other absolute systems are 
-   aligned. Similarly, aligning in any relative system will automatically 
-   ensure that all the other relative systems are aligned. Doing this
-   cuts down the complexity of the conversion process since we do not
-   need to check every possible alignment system. */
-   align_sys = ( ABS_SYSTEM( align_sys ) ) ? AST__FREQ : AST__VREL;
-
-/* If the target and result standard of rest are the same, we do not need to
-   do the conversion to and from the alignment standard of rest (which
-   may be different). To effect this, set the alignment sor to be the
-   same as the other sor. If both standards of rest are "Source" then
-   they are only considered to be equal if the two SpecFrames have the 
-   same source velocity. */
-   target_sor = astGetStdOfRest( target );
-   result_sor = astGetStdOfRest( result );
-   target_svel = ConvertSourceVel( target, AST__HLSOR );
-   result_svel = ConvertSourceVel( result, AST__HLSOR );
-   if( EQUALSOR(target_sor,target_svel,
-                result_sor,result_svel) ) {
-      align_sor = target_sor;
-      align_svel =  target_svel;
-   }
 
 /* Create an initial (null) SpecMap. This is a 1D Mapping which converts
    spectral axis values between different systems and standard of rest.
@@ -2076,339 +2141,232 @@ static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
         args[ 0 ] = arg0; \
         astSpecAdd( specmap, cvt, args );
 
-/* If the target's standard of rest is different to the alignment standard
-   of rest, we need to convert from the target system to frequency, do
-   the standard of rest conversion, and then convert from frequency to the
-   alignment system. */
-   sor = target_sor;   
-   svel = target_svel;
-   system = astGetSystem( target );   
-   rest_freq = astGetRestFreq( target );
-   if( !EQUALSOR(sor,svel,align_sor,align_svel) ) {
+/* Get all the necessary attributes from the result, target and alignment
+   Frames. */
+   target_rf = astGetRestFreq( target );
+   result_rf = astGetRestFreq( result );
 
-/* SpecMap will only apply doppler shifts to frequency values. So first
-   convert to frequency unless the target already represents frequency. */
-      if( system != AST__FREQ ) {
+   target_system = astGetSystem( target );
+   result_system = astGetSystem( result );
+   align_system = astGetSystem( align_frm );
+
+/* Define text for error messages.*/
+   vmess = "convert between spectral systems";
+
+/* Verify that values for the standard of rest have been set if required
+   (i.e if the UseDefs attribute of either SpecFrame is false). */
+   VerifyAttrs( result, vmess, "StdOfRest", "astMatch" );
+   VerifyAttrs( target, vmess, "StdOfRest", "astMatch" );
+
+/* The supported spectral coordinate systems fall into two groups;
+   "relative", and "absolute". The relative systems define each axis
+   value with respect to the rest frequency, whereas the absolute systems
+   have axis values which do not depend on the rest frequency. In order
+   to convert an axis value from a system in one group to a system in the 
+   other group, the rest frequency must be known. However, the rest
+   frequency is not necessary in order to convert axis values between two 
+   systems belonging to the same group.  Determine if the alignment system 
+   is absolute or relative. If absolute, we ignore the system of the supplied 
+   "align_frm" and align in frequency, since aligning in any absolute system 
+   will automatically ensure that all the other absolute systems are aligned. 
+   Similarly, aligning in any relative system will automatically ensure that 
+   all the other relative systems are aligned. Doing this cuts down the 
+   complexity of the conversion process since we do not need to check every 
+   possible alignment system. */
+   align_system = ( ABS_SYSTEM( align_system ) ) ? AST__FREQ : AST__VREL;
+
+/* The total Mapping is made up of the following steps in series:
+
+  0) Convert target units to default units for the targets system
+  1) Convert from target system in target SOR to frequency in target SOR
+  2) Convert from freq in target SOR to freq in alignment SOR
+  3) Convert from freq in alignment SOR to alignment system in alignment SOR
+  4) Convert from alignment system in alignment SOR to freq in alignment SOR
+  5) Convert from freq in alignment SOR to freq in result SOR 
+  6) Convert from freq in result SOR to result system in result SOR
+  7) Convert default units for the result system to results unit
+
+   Steps 1,2,3 are performed using the attributes of the target (rest
+   frequency, reference position, etc), whilst steps 4,5,6 are performed 
+   using the attributes of the target (rest frequency, reference position, 
+   etc). It is necessary to go from target system to alignment system 
+   via frequency because SOR conversion can only be performed in the
+   frequency domain.
+ 
+   Some of these steps may not be necessary. Initially assume all steps
+   are necessary (we leave steps 0 and 7 out of this process and
+   implement them once all other steps have been done). */
+   step1 = 1;
+   step2 = 1;
+   step3 = 1;
+   step4 = 1;
+   step5 = 1;
+   step6 = 1;
+
+/* Step 1 is not necessary if the target system is frequency. */
+   if( target_system == AST__FREQ ) step1 = 0;
+
+/* Step 2 is not necessary if the alignment SOR is the same as the target 
+   SOR. */
+   if( EqualSor( target, align_frm ) ) step2 = 0;
+
+/* Step 5 is not necessary if the alignment SOR is the same as the result
+   SOR. */
+   if( EqualSor( result, align_frm ) ) step5 = 0;
+
+/* Step 6 is not necessary if the result system is frequency. */
+   if( result_system == AST__FREQ ) step6 = 0;
+
+/* Steps 3 and 4 are not necessary if the alignment system is frequency,
+   or if the target and result rest frequencies are equal. */
+   if( align_system == AST__FREQ || result_rf == target_rf ) step3 = step4 = 0;
+
+/* Steps 2 and 5 are not necessary if steps 3 and 4 are not necessary, and
+   the target sor equals the result sor. */
+   if( !step3 && !step4 && EqualSor( target, result ) ) step2 = step5 = 0;
+
+/* Steps 1 and 6 are not necessary if steps 2, 3, 4, 5 are not necessary, and
+   the target sor equals the result sor, and the target and results systems 
+   are equal (if the systems are relative they must also have equal rest 
+   frequencies). */
+   if( !step2 && !step3 && !step4 && !step5 && EqualSor( target, result ) &&
+       target_system == result_system ) {
+      if( !ABS_SYSTEM( target_system ) || result_rf == target_rf ) step1 = step6 = 0;
+   }
+
+
+/* Now we know which steps are needed, let's do them (we delay unit
+   conversion to the end)... */
+
+/* Step 1: target system in target rest frame to frequency in target rest 
+   frame. */
+   if( step1 ) {
+      if( target_system != AST__FREQ ) {
 
 /* If the target system is absolute, we can convert directly to frequency. */
-         if ( system == AST__ENERGY ) {
+         if ( target_system == AST__ENERGY ) {
             TRANSFORM_0( "ENTOFR" )
 
-         } else if ( system == AST__WAVENUM ) {
+         } else if ( target_system == AST__WAVENUM ) {
             TRANSFORM_0( "WNTOFR" )
 
-         } else if ( system == AST__WAVELEN ) {
+         } else if ( target_system == AST__WAVELEN ) {
             TRANSFORM_0( "WVTOFR" )
 
-         } else if ( system == AST__AIRWAVE ) {
+         } else if ( target_system == AST__AIRWAVE ) {
             TRANSFORM_0( "AWTOFR" )
 
-/* If the target system is relative, we first need to convert to apparent radial 
-   velocity, and then to frequency using the rest frequency. Report an
-   error if the rest frequency is undefined. */
+/* If the target target_system is relative, we first need to convert to 
+   apparent radial velocity, and then to frequency using the rest frequency. */
          } else {
-            VerifyAttrs( target, vmess, "RestFreq", "astMatch" );
 
-            if ( system == AST__VRADIO ) {
+            if ( target_system == AST__VRADIO ) {
                TRANSFORM_0( "VRTOVL" )
    
-            } else if ( system == AST__VOPTICAL ) {
+            } else if ( target_system == AST__VOPTICAL ) {
                TRANSFORM_0( "VOTOVL" )
    
-            } else if ( system == AST__REDSHIFT ) {
+            } else if ( target_system == AST__REDSHIFT ) {
                TRANSFORM_0( "ZOTOVL" )
    
-            } else if ( system == AST__BETA ) {
+            } else if ( target_system == AST__BETA ) {
                TRANSFORM_0( "BTTOVL" )
             }
 
-            TRANSFORM_1( "VLTOFR", rest_freq )
-         }
-      }
-
-/* Now convert frequency in the targets standard of rest to frequency in
-   the alignment standard of rest. Report an error (if necessary) if the
-   referenc RA and DEC are not defined. */
-      if( !SorConvert( target, specmap, sor, svel, align_sor, align_svel ) ) {
-         match = 0;
-         if( astOK && report ) {
-            astError( AST__NOSOR, "astMatch(SpecFrame): Cannot convert "
-                      "between spectal standards of rest because the "
-                      "source position (attributes RefRA and RefDec) is "
-                      "undefined." );
-         }
-      }
-
-/* Now if the alignment system is apparent radial velocity, convert from  
-   frequency to relativisitic velocity. */
-      if( align_sys == AST__VREL ) {
-         VerifyAttrs( target, vmess, "RestFreq", "astMatch" );
-         TRANSFORM_1( "FRTOVL", rest_freq )
-      }
-
-/* If the target's standard of rest is the same as the alignment standard
-   of rest, we just need to convert from the target system to the alignment
-   system. */
-   } else {
-
-/* If the alignment system is frequency, convert to frequency. */
-      if( align_sys == AST__FREQ ) {
-
-/* If the target system is absolute, we can convert directly to frequency. */
-         if ( system == AST__ENERGY ) {
-            TRANSFORM_0( "ENTOFR" )
-
-         } else if ( system == AST__WAVENUM ) {
-            TRANSFORM_0( "WNTOFR" )
-
-         } else if ( system == AST__WAVELEN ) {
-            TRANSFORM_0( "WVTOFR" )
-
-         } else if ( system == AST__AIRWAVE ) {
-            TRANSFORM_0( "AWTOFR" )
-
-/* If the target system is relative, we first need to convert to apparent radial 
-   velocity, and then to frequency using the rest frequency. Report an
-   error if the rest frequency is undefined. */
-         } else if( system != AST__FREQ ) {
             VerifyAttrs( target, vmess, "RestFreq", "astMatch" );
-
-            if ( system == AST__VRADIO ) {
-               TRANSFORM_0( "VRTOVL" )
-   
-            } else if ( system == AST__VOPTICAL ) {
-               TRANSFORM_0( "VOTOVL" )
-   
-            } else if ( system == AST__REDSHIFT ) {
-               TRANSFORM_0( "ZOTOVL" )
-   
-            } else if ( system == AST__BETA ) {
-               TRANSFORM_0( "BTTOVL" )
-            }
-
-            TRANSFORM_1( "VLTOFR", rest_freq )
-         }
-
-/* If the alignment system is apparent radial velocity, convert to apparent radial
-   velocity. */
-      } else {
-
-/* If the target system is relative, we can convert directly to apparent radial 
-   velocity. */
-         if ( system == AST__VRADIO ) {
-            TRANSFORM_0( "VRTOVL" )
-
-         } else if ( system == AST__VOPTICAL ) {
-            TRANSFORM_0( "VOTOVL" )
-
-         } else if ( system == AST__REDSHIFT ) {
-            TRANSFORM_0( "ZOTOVL" )
-
-         } else if ( system == AST__BETA ) {
-            TRANSFORM_0( "BTTOVL" )
-
-/* If the target system is absolute, we first need to convert to frequency
-   and then to apparent radial velocity using the rest frequency. Report an
-   error if the rest frequency is undefined. */
-         } else if( system != AST__VREL ) {
-            VerifyAttrs( target, vmess, "RestFreq", "astMatch" );
-
-            if ( system == AST__ENERGY ) {
-               TRANSFORM_0( "ENTOFR" )
-   
-            } else if ( system == AST__WAVENUM ) {
-               TRANSFORM_0( "WNTOFR" )
-   
-            } else if ( system == AST__WAVELEN ) {
-               TRANSFORM_0( "WVTOFR" )
-   
-            } else if ( system == AST__AIRWAVE ) {
-               TRANSFORM_0( "AWTOFR" )
-            }
-
-            TRANSFORM_1( "FRTOVL", rest_freq )
+            TRANSFORM_1( "VLTOFR", target_rf )
          }
       }
    }
 
-/* The SpecMap now converts from the target system and standard of rest
-   to the alignment system and standard of rest. Now we have to add
-   the steps needed to go from the alignment system and standard of rest,
-   to the results system and standard of rest.  */
+/* Step 2: frequency in target rest frame to frequency in alignment rest
+   frame. */
+   if( step2 ) match = SorConvert( target, align_frm, specmap );
 
-/* If the alignment standard of rest is different to the result's standard of 
-   rest we need to convert from the alignment system to frequency, do
-   the standard of rest conversion, and then convert from frequency to the
-   result system. */
-   sor = result_sor;   
-   svel = result_svel;
-   system = astGetSystem( result );   
-   rest_freq = astGetRestFreq( result );
-   if( !EQUALSOR(sor,svel,align_sor,align_svel) ) {
+/* Step 3: frequency in alignment rest frame to alignment system in alignment 
+   rest frame. The alignment will be either relativistic velocity or
+   frequency. */
+   if( step3 ) {
+      if( align_system == AST__VREL ) {
+         VerifyAttrs( target, vmess, "RestFreq", "astMatch" );
+         TRANSFORM_1( "FRTOVL", target_rf )
+      }
+   }
 
-/* SpecMap will only apply doppler shifts to frequency values. So first
-   convert to frequency unless the alignment system is already frequency. */
-      if( align_sys == AST__VREL ) {
+/* Step 4: Alignment system in alignment rest frame to frequency in alignment 
+   rest frame (from now on use the attributes of the result SpecFrame to
+   define the conversion parameters). */
+   if( step4 ) {
+      if( align_system == AST__VREL ) {
          VerifyAttrs( result, vmess, "RestFreq", "astMatch" );
-         TRANSFORM_1( "VLTOFR", rest_freq )
+         TRANSFORM_1( "VLTOFR", result_rf )
       }
+   }
 
-/* Now convert frequency in the alignment standard of rest to frequency in
-   the results standard of rest. Report an error (if necessary) if the
-   referenc RA and DEC are not defined. */
-      if( !SorConvert( result, specmap, align_sor, align_svel, sor, svel ) ) {
-         match = 0;
-         if( astOK && report ) {
-            astError( AST__NOSOR, "astMatch(SpecFrame): Cannot convert "
-                      "between spectal standards of rest because the "
-                      "source position (attributes RefRA and RefDec) is "
-                      "undefined." );
-         }
-      }
+/* Step 5: frequency in alignment rest frame to frequency in result rest 
+   frame. */
+   if( step5 ) match = SorConvert( align_frm, result, specmap );
 
-/* Now convert from frequency to the results system (if necessary). */
-      if( system != AST__FREQ ) {
+/* Step 6: frequency in result rest frame to result system in result rest
+   frame. */
+   if( step6 ) {
+      if( result_system != AST__FREQ ) {
 
 /* If the results system is absolute, we can convert directly. */
-         if ( system == AST__ENERGY ) {
+         if ( result_system == AST__ENERGY ) {
             TRANSFORM_0( "FRTOEN" )
 
-         } else if ( system == AST__WAVENUM ) {
+         } else if ( result_system == AST__WAVENUM ) {
             TRANSFORM_0( "FRTOWN" )
 
-         } else if ( system == AST__WAVELEN ) {
+         } else if ( result_system == AST__WAVELEN ) {
             TRANSFORM_0( "FRTOWV" )
 
-         } else if ( system == AST__AIRWAVE ) {
+         } else if ( result_system == AST__AIRWAVE ) {
             TRANSFORM_0( "FRTOAW" )
 
-/* If the result system is relative, we first need to convert to apparent radial 
-   velocity from frequency using the rest frequency. Report an error if the 
-   rest frequency is undefined. */
+/* If the result system is relative, we first need to convert to apparent 
+   radial velocity from frequency using the rest frequency. Report an error 
+   if the rest frequency is undefined. */
          } else {
             VerifyAttrs( result, vmess, "RestFreq", "astMatch" );
-            TRANSFORM_1( "FRTOVL", rest_freq )
+            TRANSFORM_1( "FRTOVL", result_rf )
 
 /* Now convert from apparent radial velocity to the required result system. */
-            if ( system == AST__VRADIO ) {
+            if ( result_system == AST__VRADIO ) {
                TRANSFORM_0( "VLTOVR" )
    
-            } else if ( system == AST__VOPTICAL ) {
+            } else if ( result_system == AST__VOPTICAL ) {
                TRANSFORM_0( "VLTOVO" )
    
-            } else if ( system == AST__REDSHIFT ) {
+            } else if ( result_system == AST__REDSHIFT ) {
                TRANSFORM_0( "VLTOZO" )
    
-            } else if ( system == AST__BETA ) {
+            } else if ( result_system == AST__BETA ) {
                TRANSFORM_0( "VLTOBT" )
-            }
-         }
-      }
-
-/* If the alignment and results standards of rest are equal, we just
-   convert from the alignment system to the results system. */
-   } else {
-
-/* If the alignment system is frequency.... */
-      if( align_sys == AST__FREQ ) {
-
-/* If the results system is absolute, convert directly from frequency to
-   the results system. */
-         if ( system == AST__ENERGY ) {
-            TRANSFORM_0( "FRTOEN" )
-
-         } else if ( system == AST__WAVENUM ) {
-            TRANSFORM_0( "FRTOWN" )
-
-         } else if ( system == AST__WAVELEN ) {
-            TRANSFORM_0( "FRTOWV" )
-
-         } else if ( system == AST__AIRWAVE ) {
-            TRANSFORM_0( "FRTOAW" )
-
-/* If the result system is relative, we first need to convert to apparent radial 
-   velocity using the rest frequency. Report an error if the rest frequency 
-   is undefined. */
-         } else if( system != AST__FREQ ) {
-            VerifyAttrs( result, vmess, "RestFreq", "astMatch" );
-            TRANSFORM_1( "FRTOVL", rest_freq )
-
-/* Then convert from apparent radial velocity to the required result system. */
-            if ( system == AST__VRADIO ) {
-               TRANSFORM_0( "VLTOVR" )
-   
-            } else if ( system == AST__VOPTICAL ) {
-               TRANSFORM_0( "VLTOVO" )
-   
-            } else if ( system == AST__REDSHIFT ) {
-               TRANSFORM_0( "VLTOZO" )
-   
-            } else if ( system == AST__BETA ) {
-               TRANSFORM_0( "VLTOBT" )
-            }
-         }
-
-/* If the alignment system is apparent radial velocity... */
-      } else {
-
-/* If the result system is relative, we can convert directly from
-   apparent radial velocity. */
-         if ( system == AST__VRADIO ) {
-            TRANSFORM_0( "VLTOVR" )
-
-         } else if ( system == AST__VOPTICAL ) {
-            TRANSFORM_0( "VLTOVO" )
-
-         } else if ( system == AST__REDSHIFT ) {
-            TRANSFORM_0( "VLTOZO" )
-
-         } else if ( system == AST__BETA ) {
-            TRANSFORM_0( "VLTOBT" )
-
-/* If the result system is absolute, we first need to convert to frequency
-   using the rest frequency. Report an error if the rest frequency is 
-   undefined. */
-         } else if( system != AST__VREL ) {
-            VerifyAttrs( result, vmess, "RestFreq", "astMatch" );
-            TRANSFORM_1( "VLTOFR", rest_freq )
-
-/* Now convert from frequency to the required result system. */
-            if ( system == AST__ENERGY ) {
-               TRANSFORM_0( "FRTOEN" )
-   
-            } else if ( system == AST__WAVENUM ) {
-               TRANSFORM_0( "FRTOWN" )
-   
-            } else if ( system == AST__WAVELEN ) {
-               TRANSFORM_0( "FRTOWV" )
-   
-            } else if ( system == AST__AIRWAVE ) {
-               TRANSFORM_0( "FRTOAW" )
             }
          }
       }
    }
 
-/* The SpecMap class assumes that the axis values supplied to its
-   Transform method are in units which correspond to the default units 
+/* The SpecMap created above class assumes that the axis values supplied to 
+   its Transform method are in units which correspond to the default units 
    for its class (the returned values also use these units). However,
    the Unit attributes of the supplied Frames may have been set to some
    non-default value, and so we need to add Mappings before and after the
    SpecMap which convert to and from the default units. Find the Mapping
    from the target Frame Units to the default Units for the target's system. */
    utarg = astGetUnit( target, 0 );
-   umap1 = astUnitMapper( utarg, 
-                          SpecMapUnit( astGetSystem( target ), "MakeSpecMap", 
-                                       "SpecFrame" ), NULL, NULL );
+   umap1 = astUnitMapper( utarg, SpecMapUnit( target_system, "MakeSpecMap", 
+                                              "SpecFrame" ), NULL, NULL );
 
 /* Find the Mapping from the default Units for the result's system to the
    Units of the result Frame. */
    ures = astGetUnit( result, 0 );
-   umap2 = astUnitMapper( SpecMapUnit( astGetSystem( result ), "MakeSpecMap", 
-                                       "SpecFrame" ), 
-                          ures, NULL, NULL );
+   umap2 = astUnitMapper( SpecMapUnit( result_system, "MakeSpecMap", 
+                                       "SpecFrame" ), ures, NULL, NULL );
 
-/* If both unit Mappings were created OK, sandwich the SpecMap between
+/* If both units Mappings were created OK, sandwich the SpecMap between
    them. */
    if( umap1 && umap2 ) {
       map1 = (AstMapping *) astCmpMap( umap1, specmap, 1, "" );
@@ -3480,9 +3438,8 @@ static void SetUnit( AstFrame *this_frame, int axis, const char *value ) {
 
 }
 
-static int SorConvert( AstSpecFrame *this, AstSpecMap *specmap, 
-                       AstStdOfRestType from, double from_svel,
-                       AstStdOfRestType to, double to_svel ) {
+static int SorConvert( AstSpecFrame *this, AstSpecFrame *that,
+                       AstSpecMap *specmap ) {
 /*
 *  Name:
 *     SorConvert
@@ -3496,35 +3453,30 @@ static int SorConvert( AstSpecFrame *this, AstSpecMap *specmap,
 
 *  Synopsis:
 *     #include "specframe.h"
-*     int SorConvert( AstSpecFrame *this, AstSpecMap *specmap, 
-*                     AstStdOfRestType from, double from_svel,
-*                     AstStdOfRestType to, double to_svel ) 
+*     int SorConvert( AstSpecFrame *this, AstSpecFrame *that,
+*                     AstSpecMap *specmap )
 
 *  Class Membership:
 *     SpecFrame member function.
 
 *  Description:
 *     This function adds a conversion to a SpecMap which transforms
-*     frequencies between two specified standards of rest, using the 
-*     attributes of a specified SpecFrame to define the transformations.
+*     frequencies between the standards of rest specified by "this" to
+*     the standard of rest specified by "that". Note the conversion is
+*     always between frequency in the two rest frames no matter what the 
+*     System attributes of the two SpecFrames may be (which are ignored).
 
 *  Parameters:
 *     this
-*        The SpecFrame which defines the transformation.
+*        The SpecFrame which defines the input rest frame.
+*     that
+*        The SpecFrame which defines the output rest frame.
 *     specmap
 *        The SpecMap to which the conversion is to be added.
-*     from
-*        The input standard of rest.
-*     from_svel
-*        The input heliocentric source velocity (only used if "from" is AST_SCSOR).
-*     to
-*        The output standard of rest.
-*     to_svel
-*        The output heliocentric source velocity (only used if "to" is AST_SCSOR).
 
 *  Returned Value:
-*     Zero is returned if the conversion could not be performed because the
-*     source position is undefined in "this". One is returned otherwise.
+*     Zero is returned if the conversion could not be performed. One is 
+*     returned otherwise.
 
 */
 
@@ -3532,6 +3484,8 @@ static int SorConvert( AstSpecFrame *this, AstSpecMap *specmap,
 #define MAX_ARGS 5               /* Max arguments for an SpecMap conversion */
 
 /* Local Variables: */
+   AstStdOfRestType from;        /* Input standard of rest */
+   AstStdOfRestType to;          /* Output standard of rest */
    const char *vmess;            /* Text for use in error messages */
    double args[ MAX_ARGS ];      /* Conversion argument array */
    double dec;                   /* DEC of source (radians, FK5 J2000) */
@@ -3547,8 +3501,8 @@ static int SorConvert( AstSpecFrame *this, AstSpecMap *specmap,
 /* Check the global error status. */
    if ( !astOK ) return result;
 
-/* A string for use in error messages. */
-   vmess = "convert between different standards of rest";
+/* No conversion is required if the rest frames are equal. */
+   if( !EqualSor( this, that ) ) {
 
 /* Define local macros as shorthand for adding spectral coordinate
    conversions to the SpecMap.  Each macro simply stores details of
@@ -3574,28 +3528,26 @@ static int SorConvert( AstSpecFrame *this, AstSpecMap *specmap,
         args[ 4 ] = arg4; \
         astSpecAdd( specmap, cvt, args );
 
-/* Verify that usable values are available for RefRA and RefDec attributes. 
-   An error is reported if not. */
-   VerifyAttrs( this, vmess, "RefRA RefDec", "astMatch" );
+/* A string for use in error messages. */
+      vmess = "convert between different standards of rest";
 
-/* Get the reference RA and DEC. Return zero if either is bad. */
-   ra = astGetRefRA( this );
-   dec = astGetRefDec( this );
-   if( ra == AST__BAD || dec == AST__BAD ) {
-      result = 0;
-
-/* Otherwise, get the other value (these attributes do have usable
-   default attributes). */
-   } else {
+/* Get the required values from "this". */
+      from = astGetStdOfRest( this );
+      ra = astGetRefRA( this );
+      dec = astGetRefDec( this );
       lon = astGetGeoLon( this );
       lat = astGetGeoLat( this );
       epoch = astGetEpoch( this );
 
-/* Convert from the "from" frame to heliographic. */
+/* Verify that the reference RA and DEC can be used (they are needed by all 
+   the conversions used below). */
+      VerifyAttrs( this, vmess, "RefRA RefDec", "astMatch" );
+
+/* Convert from the "this" rest frame to heliographic. */
       if( from == AST__TPSOR ) {
          VerifyAttrs( this, vmess, "GeoLon GeoLat Epoch", "astMatch" );
          TRANSFORM_5( "TPF2HL", lon, lat, epoch, ra, dec )
-   
+      
       } else if( from == AST__GESOR ) {
          VerifyAttrs( this, vmess, "Epoch", "astMatch" );
          TRANSFORM_3( "GEF2HL", epoch, ra, dec )
@@ -3617,20 +3569,29 @@ static int SorConvert( AstSpecFrame *this, AstSpecMap *specmap,
          TRANSFORM_2( "GLF2HL", ra, dec )
 
       } else if( from == AST__SCSOR ) {
-         TRANSFORM_3( "USF2HL", from_svel, ra, dec )
+         TRANSFORM_3( "USF2HL", ConvertSourceVel( this, AST__HLSOR ), 
+                      ra, dec )
       }
    
 /* Now go from heliocentric to the "to" frame. */  
+      to = astGetStdOfRest( that );
+      ra = astGetRefRA( that );
+      dec = astGetRefDec( that );
+      lon = astGetGeoLon( that );
+      lat = astGetGeoLat( that );
+      epoch = astGetEpoch( that );
+      VerifyAttrs( that, vmess, "RefRA RefDec", "astMatch" );
+
       if( to == AST__TPSOR ) {
-         VerifyAttrs( this, vmess, "GeoLon GeoLat Epoch", "astMatch" );
+         VerifyAttrs( that, vmess, "GeoLon GeoLat Epoch", "astMatch" );
          TRANSFORM_5( "HLF2TP", lon, lat, epoch, ra, dec )
    
       } else if( to == AST__GESOR ) {
-         VerifyAttrs( this, vmess, "Epoch", "astMatch" );
+         VerifyAttrs( that, vmess, "Epoch", "astMatch" );
          TRANSFORM_3( "HLF2GE", epoch, ra, dec )
 
       } else if( to == AST__BYSOR ) {
-         VerifyAttrs( this, vmess, "Epoch", "astMatch" );
+         VerifyAttrs( that, vmess, "Epoch", "astMatch" );
          TRANSFORM_3( "HLF2BY", epoch, ra, dec )
 
       } else if( to == AST__LKSOR ) {
@@ -3646,7 +3607,8 @@ static int SorConvert( AstSpecFrame *this, AstSpecMap *specmap,
          TRANSFORM_2( "HLF2GL", ra, dec )
 
       } else if( to == AST__SCSOR ) {
-         TRANSFORM_3( "HLF2US", to_svel, ra, dec )
+         TRANSFORM_3( "HLF2US", ConvertSourceVel( that, AST__HLSOR ), 
+                      ra, dec )
       }
    }
 
@@ -4043,9 +4005,7 @@ static int SubFrame( AstFrame *target_frame, AstFrame *template,
 /* Local Variables: */
    AstSpecFrame *target;      /* Pointer to the SpecFrame structure */
    AstSpecFrame *temp;        /* Pointer to copy of target SpecFrame */
-   AstSystemType align_sys;   /* System in which to align the SpecFrames */
-   AstStdOfRestType align_sor;/* Standard of rest in which to align the SpecFrames */
-   double align_svel;         /* Source velocity for align_sor */
+   AstSpecFrame *align_frm;   /* Frame in which to align the SpecFrames */
    int match;                 /* Coordinate conversion is possible? */
    int report;                /* Report errors if SpecFrames cannot be aligned? */
 
@@ -4081,9 +4041,7 @@ static int SubFrame( AstFrame *target_frame, AstFrame *template,
       if ( template ) {
          astOverlay( template, template_axes, *result );
          if( astIsASpecFrame( template ) ) {
-            align_sys = astGetAlignSystem( template );
-            align_sor = astGetAlignStdOfRest( template );
-            align_svel = ConvertSourceVel( (AstSpecFrame *) template, AST__HLSOR );
+            align_frm = astClone( template );
 
 /* Since we now know that both the template and target are SpecFrames, it 
    should usually be possible to convert betwen them. If conversion is
@@ -4094,9 +4052,7 @@ static int SubFrame( AstFrame *target_frame, AstFrame *template,
             report = 1;
 
          } else {
-            align_sys = astGetAlignSystem( target );
-            align_sor = astGetAlignStdOfRest( target );
-            align_svel = ConvertSourceVel( target, AST__HLSOR );
+            align_frm = astClone( target );
          }
 
 /* If no template was supplied, align in the System and StdOfRest of the
@@ -4104,9 +4060,7 @@ static int SubFrame( AstFrame *target_frame, AstFrame *template,
       } else {
          VerifyAttrs( target, "convert between different spectral systems", 
                    "StdOfRest", "astMatch" );
-         align_sys = astGetSystem( target );
-         align_sor = astGetStdOfRest( target );
-         align_svel = ConvertSourceVel( target, AST__HLSOR );
+         align_frm = astClone( target );
       }
 
 /* Generate a Mapping that takes account of changes in the sky coordinate
@@ -4115,7 +4069,10 @@ static int SubFrame( AstFrame *target_frame, AstFrame *template,
    coordinate conversion is possible. If the template is a specframe,
    report errors if a match is not possible. */
       match = ( MakeSpecMapping( target, (AstSpecFrame *) *result, 
-                align_sys, align_sor, align_svel, report, map ) != 0 );
+                align_frm, report, map ) != 0 );
+
+/* Free resources. */
+      align_frm = astAnnul( align_frm );
 
 /* Result is not a SpecFrame. */
 /* ------------------------------ */
@@ -4778,12 +4735,6 @@ static void VerifyAttrs( AstSpecFrame *this, const char *purp,
    will be used if no explicit value has been set. So we only need to do
    any checks if UseDefs is zero. */
    if( !astGetUseDefs( this ) ) {   
-
-/* Initialise variables to avoid compiler warnings. */
-      a = NULL;
-      desc = NULL;
-      len = 0;
-      set = 0;
 
 /* Loop round the "attrs" string identifying the start and length of each
    non-blank word in the string. */
