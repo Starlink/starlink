@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>libraries/sgs</path>
+  <description>SGS -- Simple Graphics System</description>
+  <abstract><p> SGS is a set of subroutines for performing low-level
+  graphics input/output.  SGS is implemented above the GKS package
+  (described in SUN/83, the RAL GKS Guide and the ISO document GKS
+  7.4) which is a device independent graphics system designed to be
+  the kernel of a wide variety of graphics systems.  GKS, which is
+  very comprehensive, does not itself set out to provide the most
+  convenient interfaces for all applications, and SGS allows easy
+  access to many of its more straightforward features.</p> <p> SGS,
+  while preserving GKS concepts and indeed allowing direct GKS calls
+  to be interspersed with SGS calls, is optimised for convenience in
+  simple cases.  Many of its features are low level (for example:
+  open, draw a line, draw a text string, close), but there are some
+  routines of a slightly higher level (drawing arcs and formatted
+  numbers etc).  SGS does not include routines for high level
+  operations like drawing annotated axes or complete graphs.
+    </p></abstract>
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <developers>
+    <person>
+      <name>Pat Wallace</name>
+      <uname>ptw</uname>
+    </person>
+    <person>
+      <name>David Terrett</name>
+      <uname>dlt</uname>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
