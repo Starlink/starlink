@@ -313,7 +313,8 @@ PKG_VERS = 0.1
 #  package from source (including this makefile, the associated mk
 #  script and any documentation files).
 
-SOURCE_FILES = $(PKG_NAME)_source.tar makefile mk $(DOCUMENTATION)
+SOURCE_FILES = $(PKG_NAME)_source.tar $(PKG_NAME)_data.tar \
+               makefile mk $(DOCUMENTATION)
 
 #  List of shell script files.  These are scripts which form part of
 #  the package and will be required by users of it.  They will be
@@ -417,7 +418,7 @@ CCD1_PAR:       ccd1_par;                 $(LINK) $? $@
 
 #  Rules for extracting source files from the source archive.
 
-$(TASKSRC) $(SUBSRC) $(IFL_FILES) $(DATA_FILES) $(PRIVATE_INCLUDES): \
+$(TASKSRC) $(SUBSRC) $(GENSRC) $(IFL_FILES) $(PRIVATE_INCLUDES): \
                                                    $(PKG_NAME)_source.tar
 	$(TAR_OUT) $(PKG_NAME)_source.tar $@
 	@ if test -f $@; then :;\
@@ -426,6 +427,11 @@ $(TASKSRC) $(SUBSRC) $(IFL_FILES) $(DATA_FILES) $(PRIVATE_INCLUDES): \
 $(SHELL_SCRIPTS) $(LINK_SCRIPT): $(PKG_NAME)_source.tar
 	$(TAR_OUT) $(PKG_NAME)_source.tar $@
 	chmod 755 $@
+	@ if test -f $@; then :;\
+           else echo $@ is not in the tar file; exit 1; fi
+
+$(DATA_FILES): $(PKG_NAME)_data.tar
+	$(TAR_OUT) $(PKG_NAME)_data.tar $@
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
 
@@ -447,12 +453,16 @@ check_source: $(SOURCE_FILES)
 
 #  Contents of the $(PKG_NAME)_source.tar archive.
 
-SOURCE_CONTENTS = $(TASKSRC) $(SUBSRC) $(GENSRC) $(IFL_FILES) $(DATA_FILES) \
+SOURCE_CONTENTS = $(TASKSRC) $(SUBSRC) $(GENSRC) $(IFL_FILES) \
                   $(SHELL_SCRIPTS) $(LINK_SCRIPT) $(PRIVATE_INCLUDES)
+
+#  Contents of the $(PKG_NAME)_data.tar archive.
+
+DATA_CONTENTS = $(DATA_FILES)
 
 #  Rules for building release files from RCS repository.
 
-#  Rules for building source files.
+#  Rules for building distribution tar files.
 
 $(PKG_NAME)_source.tar:
 	for f in $(SOURCE_CONTENTS); do \
@@ -465,6 +475,17 @@ $(PKG_NAME)_source.tar:
 	rm -f $(PKG_NAME)_source.tar
 	$(TAR_IN) $(PKG_NAME)_source.tar $(SOURCE_CONTENTS)
 	rm -f $(SOURCE_CONTENTS)
+
+$(PKG_NAME)_data.tar:
+	for f in $(DATA_CONTENTS); do \
+           if test -f $$f; then \
+              ci $$f;\
+           else :; fi;\
+        done
+	co $(DATA_CONTENTS)
+	rm -f $(PKG_NAME)_data.tar
+	$(TAR_IN) $(PKG_NAME)_data.tar $(DATA_CONTENTS)
+	rm -f $(DATA_CONTENTS)
 
 source_files:
 	co $(SOURCE_CONTENTS)
@@ -1019,7 +1040,7 @@ $(EXPORT)/$(PKG_NAME).tar.Z: $(SOURCE_FILES)
 #  Remove all intermediate files.  Do not remove built files.
 
 clean:
-	rm -f $(INCLUDE_LINKS) $(IFC_FILES) $(OBJECT_FILES)
+	rm -f $(INCLUDE_LINKS) $(OBJECT_FILES) $(LINK_SCRIPT)
 	rm -f $(PRIVATE_INCLUDES) $(IFL_FILES) $(TASKSRC) $(SUBSRC) $(GENSRC)
 	@ echo
 	@ echo '*** intermediate files removed.'
