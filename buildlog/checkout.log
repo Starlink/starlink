@@ -2,28 +2,12 @@ cvs checkout: Updating java
 U java/makefile
 U java/package-list
 cvs checkout: Updating java/pal
-U java/pal/build.xml
 cvs checkout: Updating java/pal/src
 cvs checkout: Updating java/pal/src/main
 cvs checkout: Updating java/pal/src/main/uk
 cvs checkout: Updating java/pal/src/main/uk/ac
 cvs checkout: Updating java/pal/src/main/uk/ac/starlink
 cvs checkout: Updating java/pal/src/main/uk/ac/starlink/pal
-U java/pal/src/main/uk/ac/starlink/pal/AMParams.java
-U java/pal/src/main/uk/ac/starlink/pal/AOParams.java
-U java/pal/src/main/uk/ac/starlink/pal/AngleDR.java
-U java/pal/src/main/uk/ac/starlink/pal/Cartesian.java
-U java/pal/src/main/uk/ac/starlink/pal/Galactic.java
-U java/pal/src/main/uk/ac/starlink/pal/ObsPosition.java
-U java/pal/src/main/uk/ac/starlink/pal/Observatory.java
-U java/pal/src/main/uk/ac/starlink/pal/Pal.java
-U java/pal/src/main/uk/ac/starlink/pal/Spherical.java
-U java/pal/src/main/uk/ac/starlink/pal/Stardata.java
-U java/pal/src/main/uk/ac/starlink/pal/UTCdate.java
-U java/pal/src/main/uk/ac/starlink/pal/mjDate.java
-U java/pal/src/main/uk/ac/starlink/pal/palError.java
-U java/pal/src/main/uk/ac/starlink/pal/palString.java
-U java/pal/src/main/uk/ac/starlink/pal/palTime.java
 cvs checkout: Updating java/source
 U java/source/ant_import
 U java/source/build.xml
@@ -7135,6 +7119,7 @@ U java/source/splat/src/main/uk/ac/starlink/splat/iface/images/jpeg.gif
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/images/jspec.gif
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/images/minus.gif
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/images/minus24.gif
+U java/source/splat/src/main/uk/ac/starlink/splat/iface/images/modify.gif
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/images/multidisplay.gif
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/images/multiply.gif
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/images/openfile.gif
@@ -7157,6 +7142,7 @@ U java/source/splat/src/main/uk/ac/starlink/splat/iface/images/reset.gif
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/images/save.gif
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/images/savefile.gif
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/images/savestack.gif
+U java/source/splat/src/main/uk/ac/starlink/splat/iface/images/set.gif
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/images/special.gif
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/images/splat.gif
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/images/splat2.gif
@@ -7164,6 +7150,7 @@ U java/source/splat/src/main/uk/ac/starlink/splat/iface/images/stop.gif
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/images/table.gif
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/images/unarymaths.gif
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/images/viewer.gif
+U java/source/splat/src/main/uk/ac/starlink/splat/iface/images/xunits.gif
 cvs checkout: Updating java/source/splat/src/main/uk/ac/starlink/splat/iface/themes
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/themes/AquaTheme.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/themes/BigContrastMetalTheme.java
@@ -7362,6 +7349,7 @@ U java/source/table/src/main/uk/ac/starlink/table/gui/LabelledComponentStack.jav
 U java/source/table/src/main/uk/ac/starlink/table/gui/MapGroupTableModel.java
 U java/source/table/src/main/uk/ac/starlink/table/gui/MultilineJTable.java
 U java/source/table/src/main/uk/ac/starlink/table/gui/NumericCellRenderer.java
+U java/source/table/src/main/uk/ac/starlink/table/gui/ProgressBarStarTable.java
 U java/source/table/src/main/uk/ac/starlink/table/gui/SQLDialog.java
 U java/source/table/src/main/uk/ac/starlink/table/gui/SQLReadDialog.java
 U java/source/table/src/main/uk/ac/starlink/table/gui/SQLWriteDialog.java
@@ -7401,6 +7389,7 @@ U java/source/table/src/main/uk/ac/starlink/table/view/PlasticStarTable.java
 U java/source/table/src/main/uk/ac/starlink/table/view/PlotWindow.java
 U java/source/table/src/main/uk/ac/starlink/table/view/RowSubset.java
 U java/source/table/src/main/uk/ac/starlink/table/view/SizingScrollPane.java
+U java/source/table/src/main/uk/ac/starlink/table/view/StatsWindow.java
 U java/source/table/src/main/uk/ac/starlink/table/view/SubsetDialog.java
 U java/source/table/src/main/uk/ac/starlink/table/view/SubsetsDisplay.java
 U java/source/table/src/main/uk/ac/starlink/table/view/SyntheticColumn.java
@@ -7774,6 +7763,7 @@ U java/source/util/src/main/uk/ac/starlink/util/AuxClassLoader.java
 U java/source/util/src/main/uk/ac/starlink/util/Compression.java
 U java/source/util/src/main/uk/ac/starlink/util/DOMUtils.java
 U java/source/util/src/main/uk/ac/starlink/util/DataSource.java
+U java/source/util/src/main/uk/ac/starlink/util/ErrorDialog.java
 U java/source/util/src/main/uk/ac/starlink/util/FileDataSource.java
 U java/source/util/src/main/uk/ac/starlink/util/GenericNioBuffer.java
 U java/source/util/src/main/uk/ac/starlink/util/Loader.java
