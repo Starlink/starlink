@@ -1,0 +1,283 @@
+      SUBROUTINE KPS1_APAD<T>( WEIGHT, EL, MASK, DATIN, VAR, VARIN, 
+     :                         NGOOD, MEAN, SGMEAN, TOT, SGTOT, NUMPIX, 
+     :                         SIGMA, STATUS )
+*+
+*  Name:
+*     KPS1_APAD<T>
+
+*  Purpose:
+*     Integrate the pixels within an aperture.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL KPS1_APAD<T>( WEIGHT, EL, MASK, DATIN, VAR, VARIN, NGOOD, MEAN, 
+*                        SGMEAN, TOT, SGTOT, NUMPIX, SIGMA, STATUS )
+
+*  Description:
+*     This routine integrates the pixels within an aperture of the
+*     supplied data array, and returns the calculated statistics.
+*     The aperture is specified by a pixel mask. The following 
+*     statistics are returned:
+*
+*     - The total number of pixels within the aperture
+*     - The number of good pixels within the aperture
+*     - The total data sum within the aperture
+*     - The standard deviation on the total data sum (that is, the 
+*       square root of the sum of the individual pixel variances)
+*     - The mean pixel value within the aperture
+*     - The standard deviation on the mean pixel value (that is, the
+*       standard deviation on the total data sum divided by the number of
+*       values)
+*     - The standard deviation of the pixel values within the aperture
+*
+*     If VAR is .FALSE., (i.e. individual pixel variances are not available),
+*     then each pixel is assumed to have a constant variance equal to the 
+*     variance of the pixel values within the aperture. 
+
+*  Arguments:
+*     WEIGHT = LOGICAL (Given)
+*        Should any supplied variances be used to weight the pixel values?
+*        If so, the weight associated with each pixel is proportional to the 
+*        reciprocal of its variance. The constant of proportionality is 
+*        chosen so that the mean weight is unity. The pixel value and pixel 
+*        variance are multiplied by the pixels weight before being used to 
+*        calculate the statistics. The calculation of the statistics 
+*        remains unchanged in all other respects. 
+*     EL = INTEGER (Given)
+*        The size of the vectorized array.
+*     MASK( EL ) = INTEGER (Given)
+*        The pixels to be integrated are indicated by a non-zero value in this 
+*        array. 
+*     DATIN( EL ) = <TYPE> (Given)
+*        The data array.
+*     VAR = LOGICAL (Given)
+*        Use the variance array VARIN?
+*     VARIN( EL ) = <TYPE> (Given)
+*        The variance array. Only accessed if VAR is .TRUE.
+*     NGOOD = INTEGER (Returned)
+*        The number of good pixels included in the other returned statistics.
+*     MEAN = DOUBLE PRECISION (Returned)
+*        The mean data value in the aperture.
+*     SGMEAN = DOUBLE PRECISION (Returned)
+*        The standard deviation associated with the mean data value in the 
+*        aperture.
+*     TOT = DOUBLE PRECISION (Returned)
+*        The total data value in the aperture.
+*     SGTOT = DOUBLE PRECISION (Returned)
+*        The standard deviation associated with the total data value in the 
+*        aperture.
+*     NUMPIX = INTEGER (Returned)
+*        The total number of pixels in the aperture.
+*     SIGMA = DOUBLE PRECISION (Returned)
+*        The standard deviation of the pixel values in the aperture.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Authors:
+*     DSB: David Berry (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     28-NOV-2001 (DSB):
+*        Original version.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+      
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! VAL constants
+
+*  Arguments Given:
+      LOGICAL WEIGHT
+      INTEGER EL
+      INTEGER MASK( EL )
+      <TYPE> DATIN( EL )      
+      LOGICAL VAR
+      <TYPE> VARIN( EL )      
+
+*  Arguments Returned:
+      INTEGER NGOOD
+      DOUBLE PRECISION MEAN
+      DOUBLE PRECISION SGMEAN
+      DOUBLE PRECISION TOT
+      DOUBLE PRECISION SGTOT
+      INTEGER NUMPIX
+      DOUBLE PRECISION SIGMA
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      DOUBLE PRECISION DV      ! Data value
+      DOUBLE PRECISION K       ! Proportionality constant for weights
+      DOUBLE PRECISION SD      ! Sum of data values
+      DOUBLE PRECISION SDD     ! Sum of squared data values
+      DOUBLE PRECISION SV      ! Sum of variance values
+      DOUBLE PRECISION SW      ! Sum of weights
+      DOUBLE PRECISION SWD     ! Sum of weighted data values
+      DOUBLE PRECISION SWDD    ! Sum of weighted squared data values
+      DOUBLE PRECISION VV      ! Variance value
+      INTEGER DF               ! Number of degrees of freedom
+      INTEGER I                ! Index into vectorised array
+
+*  Internal References:
+      INCLUDE 'NUM_DEC_CVT'    ! NUM declarations for conversions
+      INCLUDE 'NUM_DEF_CVT'    ! NUM definitions for conversions
+*.
+
+*  Initialize the returned values.
+      NGOOD = 0
+      MEAN = VAL__BADD
+      SGMEAN = VAL__BADD
+      TOT = VAL__BADD
+      SGTOT = VAL__BADD
+      NUMPIX = 0
+      SIGMA = VAL__BADD
+
+*  Check the inherited global status.
+      IF( STATUS .NE. SAI__OK ) RETURN
+
+*  First deal with the case where variances are available.
+      IF( VAR ) THEN
+
+*  Deal with cases where weighting is required.
+         IF( WEIGHT ) THEN         
+
+*  Loop through the array, forming the required sums for all pixels which
+*  have a non-zero mask value.
+            SD = 0.0
+            SWD = 0.0
+            SW = 0.0
+            SWDD = 0.0
+         
+            DO I = 1, EL
+
+               IF( MASK( I ) .GT. 0 ) THEN
+                  NUMPIX = NUMPIX + 1
+
+                  IF( DATIN( I ) .NE. VAL__BAD<T> .AND. 
+     :                VARIN( I ) .NE. VAL__BAD<T> .AND.
+     :                VARIN( I ) .GT. 0.0 ) THEN
+                     DV = NUM_<T>TOD( DATIN( I ) )
+                     VV = NUM_<T>TOD( VARIN( I ) )
+   
+                     SD = SD + DV
+                     SWD = SWD + (DV/VV)
+                     SW = SW + (1.0/VV)
+                     SWDD = SWDD + (DV*DV/VV)
+                     NGOOD = NGOOD + 1
+   
+                  END IF
+   
+               END IF
+            END DO
+
+*  Check that some usable pixels were found.
+            IF( NGOOD .GT. 0 ) THEN
+
+*  Pixel weights are proportional to the reciprocal of the pixel variances. 
+*  First find the constant of proportionality such that the mean weight
+*  is unity (or put another way, the sum of the weights equals the number
+*  of good pixels in the aperture).
+               K = DBLE( NGOOD )/SW
+
+*  Calculate the other required values.
+               TOT = K*SWD
+               SGTOT = SQRT( K*DBLE( NGOOD ) )
+               MEAN = TOT/DBLE( NGOOD )
+               SGMEAN = SGTOT/DBLE( NGOOD )
+               DF = DBLE( NGOOD - 1 )
+               IF( DF .GT. 0 ) THEN
+                  SIGMA = SQRT( MAX( 0.0D0, 
+     :                              ( K*SWDD - NGOOD*(MEAN**2) )/DF ) )
+               END IF
+            END IF
+
+*  Now deal with cases where no weighting is required.
+         ELSE
+
+            SD = 0.0
+            SV = 0.0
+            SDD = 0.0
+         
+            DO I = 1, EL
+
+               IF( MASK( I ) .GT. 0 ) THEN
+                  NUMPIX = NUMPIX + 1
+
+                  IF( DATIN( I ) .NE. VAL__BAD<T> .AND. 
+     :                VARIN( I ) .NE. VAL__BAD<T> ) THEN
+                     DV = NUM_<T>TOD( DATIN( I ) )
+                     VV = NUM_<T>TOD( VARIN( I ) )
+   
+                     SD = SD + DV
+                     SV = SV + VV
+                     SDD = SDD + DV*DV
+                     NGOOD = NGOOD + 1
+   
+                  END IF
+   
+               END IF
+            END DO
+
+            IF( NGOOD .GT. 0 ) THEN
+               TOT = SD
+               SGTOT = SQRT( SV )
+               MEAN = TOT/DBLE( NGOOD )
+               SGMEAN = SGTOT/DBLE( NGOOD )
+               DF = DBLE( NGOOD - 1 )
+               IF( DF .GT. 0 ) THEN
+                  SIGMA = SQRT( MAX( 0.0D0, 
+     :                              ( SDD - NGOOD*(MEAN**2) )/DF ) )
+               END IF
+            END IF
+
+         END IF
+
+*  Now deal with the case where variances are not available.
+      ELSE
+
+         SD = 0.0
+         SDD = 0.0
+      
+         DO I = 1, EL
+
+            IF( MASK( I ) .GT. 0 ) THEN
+               NUMPIX = NUMPIX + 1
+
+               IF( DATIN( I ) .NE. VAL__BAD<T> ) THEN
+                  DV = NUM_<T>TOD( DATIN( I ) )
+   
+                  SD = SD + DV
+                  SDD = SDD + DV*DV
+                  NGOOD = NGOOD + 1
+   
+               END IF
+   
+            END IF
+         END DO
+
+         IF( NGOOD .GT. 0 ) THEN
+            TOT = SD
+            MEAN = TOT/DBLE( NGOOD )
+            DF = DBLE( NGOOD - 1 )
+            IF( DF .GT. 0 ) THEN
+               SIGMA = SQRT( MAX( 0.0D0, 
+     :                           ( SDD - NGOOD*(MEAN**2) )/DF ) )
+               SGTOT = SIGMA*SQRT( DBLE( NGOOD ) )
+               SGMEAN = SGTOT/DBLE( NGOOD )
+            END IF
+         END IF
+
+      END IF
+
+      END
