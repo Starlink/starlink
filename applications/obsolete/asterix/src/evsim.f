@@ -131,7 +131,7 @@
       INTEGER			OFID			! Output dataset id
       INTEGER           ONBACK                 ! Requested # background counts
       INTEGER           OSCOUNT(MAXSRC)        ! Requested # of source counts
-      INTEGER           PDPTR                  ! Psf data ptr
+      INTEGER           PDPTR,ptptr,pkptr                  ! Psf data ptr
       INTEGER                   PIXID, PRJID, SYSID     ! World coordinates
       INTEGER           PIN                    ! Length of psf prob index
       INTEGER           PIPTR                  ! Psf prob index ptr
@@ -391,11 +391,13 @@
         PIN = (2*PSW2+1)**2
         IF ( PSFCON .AND. ( ACTWID .EQ. 1 ) ) THEN
           CALL DYN_MAPR( 1, PIN, PDPTR, STATUS )
-          CALL DYN_MAPR( 1, PIN, PIPTR, STATUS )
+          CALL DYN_MAPR( 1, PIN+1, PIPTR, STATUS )
         ELSE
           CALL DYN_MAPR( 1, PIN*NSRC, PDPTR, STATUS )
-          CALL DYN_MAPR( 1, PIN*NSRC, PIPTR, STATUS )
+          CALL DYN_MAPR( 1, (PIN+1)*NSRC, PIPTR, STATUS )
         END IF
+        CALL DYN_MAPR( 1, PIN, PTPTR, STATUS )
+        CALL DYN_MAPR( 1, PIN, PT\KPTR, STATUS )
 
 *    Prevent problems declaring psf arrays in EVSIM_INT
       ELSE
@@ -482,7 +484,8 @@
      :                  NSRC, SCOUNT, WIDS, NBACK, MOK, DIMS(1),
      :                  DIMS(2), %VAL(MIPTR), PSIZE, TOR, XLO, XHI,
      :                  XDEC, YLO, YHI, YDEC, %VAL(XPTR), %VAL(YPTR),
-     :                  IFILE, PSW2, %VAL(PDPTR), PIN, %VAL(PIPTR),
+     :                  IFILE, PSW2, %VAL(PDPTR), %VAL(PTPTR),
+     :                  %VAL(PKPTR), PIN, %VAL(PIPTR),
      :                  XPOS, YPOS, NOUT, STATUS )
 
         SEED_GIVEN = .FALSE.
@@ -522,8 +525,8 @@
      :                      NSRC, SCOUNT, WID, NMOD, MOK,
      :                      BNX, BNY, MPI, DX, TOR, XMIN, XMAX,
      :                      XDEC, YMIN, YMAX, YDEC, XP, YP,
-     :                      IFILE, PW, PD, PIN, PI, SX, SY, NOUT,
-     :                                                     STATUS )
+     :                      IFILE, PW, PD, PTEMP, PKERN,
+     :                      PIN, PI, SX, SY, NOUT, STATUS )
 *
 *    Description:
 *
@@ -563,6 +566,8 @@
       LOGICAL                 PSFCON              ! Psf constant across field?
       INTEGER                 PW                  ! Psf width in pixels
       REAL                    PD(-PW:PW,-PW:PW,*) ! Psf data
+      REAL                    PTEMP(-PW:PW,-PW:PW) ! Psf data
+      REAL                    PKERN(-PW:PW,-PW:PW) ! Psf data
       INTEGER                 PIN                 ! Psf index size (PW*2+1)^2+1
       REAL                    PI(PIN,*)           ! Psf index data
       LOGICAL                 SEEDOK              ! Seed given?
@@ -599,6 +604,7 @@ C      REAL             PGSIG                            ! Gaussian sigma in pix
       REAL             PSUM                             ! Psf normalisation
       REAL             RPW                              ! real(PW)-1.0
       REAL             PTW                              !
+     REAL		SIGP
       REAL             SDX, SDY                         ! Signed radian pix size
 
       INTEGER          ISRC                     	! Loop indices
@@ -655,6 +661,25 @@ C      REAL             PGSIG                            ! Gaussian sigma in pix
             CALL PSF_2D_DATA( PSFH, SX(ISRC)*TOR, SY(ISRC)*TOR,
      :                        0.0, 0.0, SDX, SDY, .TRUE., PW*2+1,
      :                        PW*2+1, PD(-PW,-PW,ISRC), STATUS )
+
+*        Convolve with gaussian?
+          IF ( WID(ISRC) .GT. 0.0 ) THEN
+
+*          Make gaussian of this width
+            SIGP = (WID(ISRC) / (2.0 * SQRT(2.0*ALOG(2.0))))
+     :             / (ABS(DX)*MATH__RTOD*60.0)
+            CALL MATH_INTGAU2D( SIGP, SIGP, 0.0, 0.0, 0.0,
+     :                          0.0, 0.0, 1.0, 1.0, TPW, TPW,
+     :                          PKERN, STATUS )
+
+*          Make copy of psf
+            CALL ARR_COP1R( TPW*TPW, PD(-PW,-PW,ISRC), PTEMP, STATUS )
+
+*          Convolve
+            CALL PSF_CONVOLVE( TPW, TPW, PTEMP, TPW, TPW, PKERN,
+     :                         PD(-PW,-PW,ISRC), STATUS )
+
+          END IF
 
 *          Copy and psf the psf data into the full array
             CALL SIM_PADJUST( PW*2+1, PD(-PW,-PW,ISRC) )
