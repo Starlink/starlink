@@ -146,7 +146,7 @@ by the "figurecontent" element.
     (let* ((kids (children (current-node)))
 	   (content (get-best-figurecontent
 		     (select-elements kids (normalize "figurecontent"))
-		     '("EPS"))))
+		     '("eps"))))
       (if content
 	  (process-node-list content)
 	  (empty-sosofo))))
@@ -154,7 +154,7 @@ by the "figurecontent" element.
     (let* ((kids (children (current-node)))
 	   (content (get-best-figurecontent
 		     (select-elements kids (normalize "figurecontent"))
-		     '("EPS"))))
+		     '("eps"))))
       (if content
 	  (process-node-list content)
 	  (empty-sosofo))))
