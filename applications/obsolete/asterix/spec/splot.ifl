@@ -1,26 +1,30 @@
 INTERFACE SPLOT
 
    PARAMETER INP
-      TYPE 'UNIV'
+      TYPE 'LITERAL'
       VPATH 'GLOBAL,PROMPT'
       PPATH 'GLOBAL'
       ASSOCIATION '<->GLOBAL.FIT_DATA'
       PROMPT 'Data'
       HELP 'Either a single dataset, or an object containing refs to datasets'
    ENDPARAMETER
+
    PARAMETER ELOW
       TYPE '_REAL'
       PROMPT 'Lower energy bound'
    ENDPARAMETER
+
    PARAMETER EUPP
       TYPE '_REAL'
       PROMPT 'Upper energy bound'
    ENDPARAMETER
+
    PARAMETER NCHAN
       TYPE '_INTEGER'
       DEFAULT 100
       PROMPT 'Number of energy channels'
    ENDPARAMETER
+
    PARAMETER Z
       TYPE '_REAL'
       VPATH 'GLOBAL,DEFAULT'
@@ -31,7 +35,7 @@ INTERFACE SPLOT
    ENDPARAMETER
 
    PARAMETER MODEL
-      TYPE 'UNIV'
+      TYPE 'LITERAL'
       VPATH 'GLOBAL,PROMPT'
       PPATH 'GLOBAL'
       ASSOCIATION '<->GLOBAL.FIT_MODEL'
@@ -48,7 +52,7 @@ INTERFACE SPLOT
    ENDPARAMETER
 
    PARAMETER OUT
-      TYPE 'UNIV'
+      TYPE 'LITERAL'
       ASSOCIATION '->GLOBAL.BINDS'
       PROMPT 'Output'
       HELP 'Name of graphical dataset to be produced'
@@ -68,6 +72,5 @@ INTERFACE SPLOT
     PPATH 'Current'
     HELP 'Graphics device to plot to'
   ENDPARAMETER
-
 
 ENDINTERFACE
