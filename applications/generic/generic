@@ -10,12 +10,12 @@
 #     Unix C-shell
 
 #  Invocation:
-#     generic [-t types] [-a] [-c charsize] [-s] [-sc sepchar] file1.gen [file2.gen...]
+#     generic [-t types] [-a] [-c charsize] [-s] [-sc sepchar] [-u] [-x] file1.gen [file2.gen...]
 
 #  Description:
 #     The generic script takes FORTRAN source files that contain tokens and
 #     replaces these tokens with the appropriate words for the data type
-#     being processed. The data types allowed are byte, unsigned byte,
+#     being processed.  The data types allowed are byte, unsigned byte,
 #     character, double precision, integer, logical, real, word and unsigned
 #     word.
 #     The output is piped through a filter to ensure that the token replacement
@@ -27,7 +27,7 @@
 #  Arguments:
 #     -t
 #        The next argument is a list of data types that should be used in
-#        the token replacement. Each data type is represented by a single
+#        the token replacement.  Each data type is represented by a single
 #        letter and valid letters are:
 #           b = byte
 #           B = unsigned byte
@@ -44,6 +44,8 @@
 #        The list of types to be processed can be specified by the
 #        environment variable GENERIC_TYPES. If GENERIC_TYPES is defined
 #        and the -t argument is present, the -t argument takes precedence.
+#        Note that the token substituted for B and W may be ub and uw
+#        respectively if the -u option is selected.
 #     -a
 #        Replace ASTERIX tokens as well as the standard ones.
 #     -c
@@ -55,11 +57,21 @@
 #        Write the output to separate files for each data type given by
 #        the -t argument. The output file names are the same as the input file
 #        name with the trailing .gen removed and a <T>.f appended, where <T>
-#        is the character in the -t list that is being processed.
+#        is the character in the -t list that is being processed, except
+#        with the -u option where B and W become ub and uw respectively.
 #     -sc
 #        The next argument is a used to separate the base output file name
 #        from the appended <T>.f. If the -sc argumnt is given, the -s argument
 #        is superfluous.
+#     -u
+#        The B and W types substitute ub and uw tokens respectively in the
+#        code and in generated filename.  This for compability with the VMS
+#        version as used by most generic routines.  However, note that
+#        the -t values of BW should still be used to obtain unsigned
+#        byte and unsigned word instantiations.
+#     -x
+#        Removes the last x from the file name before generating the names of
+#        the output files.
 #     filename.gen ...
 #        A list of file names with a .gen suffix, containing generic FORTRAN
 #        source code.
@@ -73,27 +85,36 @@
 #        This will take the subroutine in the input file sub2.gen and create
 #        output files called sub2_b.f, sub2_B.f, sub2_w.f and sub2_W.f. 
 #        The -a flag means that any ASTERIX tokens will be processed.
+#     -  generic -t n -s -x subx.gen
+#        This takes the subroutine in the input file subx.gen and creates
+#        output files subB.f, subW.f, subb.f, subd.f, subi.f, subr.f, and
+#        subw.f.
+#     -  generic -t n -s -u -x subx.gen
+#        This takes the subroutine in the input file subx.gen and creates
+#        output files subb.f, subd.f, subi.f, subr.f, subub.f, subuw.f, and
+#        subw.f.
 
 #  Prior Requirements:
 #     The environment variable GENERIC_DIR must point to a directory
-#     containing the sed files and the wrap72 script. The value of the
+#     containing the sed files and the wrap72 script.  The value of the
 #     environment variable is is set within this script to a value
-#     determined when the package is installed. If the environment variable
+#     determined when the package is installed.  If the environment variable
 #     is set externally, that value is used in preference to the internal
 #     one.
 
 #  Notes:
 #     -  It is always true that generic output files will overwrite any
-#        existing output files of the same name. However, any files with
-#        similar names will not be touched. For example, the command
+#        existing output files of the same name.  However, any files with
+#        similar names will not be touched.  For example, the command
 #           generic -t il -s sub3.gen
-#        will create files called sub3i.f and sub3l.f. If there are files
+#        will create files called sub3i.f and sub3l.f.  If there are files
 #        called sub3.f, sub3b.f, sub3B.f, sub3c.f, sub3d.f, sub3r, sub3w.f
 #        or sub3W.f already in existence, then these are not affected by
 #        the above operation.
 
 #  Authors:
 #     PMA: Peter Allan (Starlink, RAL)
+#     MJC: Malcolm J. Currie (Starlink, RAL)
 #     {enter_new_authors_here}
 
 #  History:
@@ -113,7 +134,15 @@
 #        Fix bug whereby local character variables were declared as
 #        CHARACTER*<CHASIZ> rather than having a real size such as
 #        CHARACTER*200.
-#     {enter_changes_here}
+#     1994 December 19 (MJC):
+#        Added -x option to give behaviour like the VMS version.
+#     2000 May 31 (MJC):
+#        Outputs unsigned byte and word using VMS suffices of ub and uw
+#        respectively.
+#     2004 March 15 (MJC):
+#        Added -u option to permit both UNIX and VMS style usage.
+#        Changed -x to remove only a trailing x.
+#     {enter_further_changes_here}
 
 #-
 
@@ -133,15 +162,18 @@ set badarg = 0
 set gfiles
 set sepchar =
 set sepflag = 0
+set uflag = 0
+set xflag = 0
 
 #  Check that there are some arguments present.
 
-if( $#args == 0 ) then
-   echo "Usage: generic [-t types] [-a] [-c charsize] [-s] [-sc sepchar] file1.gen [file2.gen...]"
+if ( $#args == 0 ) then
+   echo "Usage: generic [-t types] [-a] [-c charsize] [-s] [-sc sepchar] [-u] [-x] file1.gen [file2.gen...]"
    exit
 endif
 
 #  Process each of the arguments to the script.
+
 while ( $#args > 0 )
    switch ($args[1])
    case -t:        #  Type of data flag.
@@ -168,6 +200,14 @@ while ( $#args > 0 )
       shift args
       set sepflag = 1
       breaksw
+   case -u:        # Use ub and uw tokens for types B and W.
+      set uflag = 1
+      shift args
+      breaksw
+   case -x:        # Remove the last x of the filename.
+      set xflag = 1
+      shift args
+      breaksw
    case *.gen:     # The names of the GEN files.
       set gfiles = ($gfiles[1-] $args[1])
       shift args
@@ -182,7 +222,7 @@ end
 #  Check that all arguments were valid.
 
 if( $badarg ) then
-   echo "Usage: generic [-t types] [-a] [-c charsize] [-s]  [-sc sepchar] file1.gen [file2.gen...]"
+   echo "Usage: generic [-t types] [-a] [-c charsize] [-s]  [-sc sepchar] [-u] [-x] file1.gen [file2.gen...]"
    exit
 endif
 
@@ -218,17 +258,41 @@ if ( $?chasiz == 0 ) then
    endif
 endif
 
+#  Select the unsigned integer tokens.
+
+if ( $uflag == 1 ) then
+   set ubtoken = "ub"
+   set uwtoken = "uw"
+else
+   set ubtoken = "B"
+   set uwtoken = "W"
+endif
+   
 #  Create a temporary file name.
 
 set tempfile = temp$$
 
 #  For each of the .gen files, create the set of output files, one for each
 #  data type.
+
 foreach fname ($gfiles[1-])
    set fprefix = $fname:r
 
+#  Remove the trailing x character of the file name, when the -x option
+#  has been selected.
+
+   if ( $xflag == 1 ) then
+      echo $fprefix > temp2$$
+      set lastchar = `awk '{print substr($1,length($1))}' temp2$$ `
+      if ( "$lastchar" == "x" ) then
+         set fprefix = `awk '{print substr($1,1,length($1)-1)}' temp2$$ `
+      endif
+      rm ./temp2$$
+   endif
+   
 #  If all the output routines for one input file are going to a single file,
 #  make sure that the output file is empty.
+
    if( ( $sepflag == 0 ) && -f ${fprefix}.f ) then
       rm ${fprefix}.f
    endif
@@ -262,7 +326,7 @@ foreach fname ($gfiles[1-])
          >$tempfile
       endif
       if( $sepflag ) then
-         awk -f $GENERIC_DIR/wrap72 $tempfile >${fprefix}${sepchar}B.f
+         awk -f $GENERIC_DIR/wrap72 $tempfile >${fprefix}${sepchar}${ubtoken}.f
       else
          awk -f $GENERIC_DIR/wrap72 $tempfile >>${fprefix}.f
       endif
@@ -376,7 +440,7 @@ foreach fname ($gfiles[1-])
          >$tempfile
       endif
       if( $sepflag ) then
-         awk -f $GENERIC_DIR/wrap72 $tempfile >${fprefix}${sepchar}W.f
+         awk -f $GENERIC_DIR/wrap72 $tempfile >${fprefix}${sepchar}${uwtoken}.f
       else
          awk -f $GENERIC_DIR/wrap72 $tempfile >>${fprefix}.f
       endif
