@@ -265,6 +265,7 @@
       export RANLIB
       export TAR_IN
       export TAR_OUT
+      export TAR_LIST
 
 #  Check that the SYSTEM environment variable is defined.
       if test "$SYSTEM" = ""; then
@@ -292,6 +293,7 @@
                RANLIB='ranlib'
                TAR_IN='tar -cvhf'
                TAR_OUT='tar -xf'
+	       TAR_LIST='tar -tf'
                echo "mk: Environment variables defined for $SYSTEM system"
                ;;
 
@@ -309,6 +311,7 @@
                RANLIB='ranlib'
                TAR_IN='tar -cvhf'
                TAR_OUT='tar -xf'
+	       TAR_LIST='tar -tf'
                echo "mk: Environment variables defined for $SYSTEM system"
                ;;
 
@@ -326,6 +329,7 @@
                RANLIB='ranlib'
                TAR_IN='tar -cvhf'
                TAR_OUT='tar -xf'
+	       TAR_LIST='tar -tf'
                echo "mk: Environment variables defined for $SYSTEM system"
                ;;
 
@@ -340,6 +344,7 @@
                LINK='ln -s'
                TAR_IN='tar -cvhf'
                TAR_OUT='tar -xf'
+	       TAR_LIST='tar -tf'
                echo "mk: Environment variables defined for $SYSTEM system"
                ;;
 
@@ -357,6 +362,7 @@
                MEMDEP=''
                TAR_IN='tar -cvhf'
                TAR_OUT='tar -xf'
+	       TAR_LIST='tar -tf'
                echo "mk: Environment variables defined for $SYSTEM system"
                ;;
 
