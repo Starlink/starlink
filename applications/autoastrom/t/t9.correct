@@ -1,49 +1,51 @@
 === Test 1 ===
--- Starting monoliths...
--- Monoliths OK
--- Processing NDF <testndf1>
--- NDF <testndf1> examined OK
--- WCS information from AST
--- Obtaining catalogue from usno@eso...
--- Obtained catalogue, 500 entries, from usno@eso
--- Using pre-existing CCD catalogue testndf1.ccdcat.munged
--- Iteration 0...
--- Matching position lists...
+--I Starting monoliths...
+--I Monoliths OK
+--I Processing NDF <testndf1>
+--I NDF <testndf1> examined OK
+--I WCS information from AST
+--I Obtaining catalogue from usno@eso...
+--I Obtained catalogue, 500 entries, from usno@eso
+--I Using pre-existing CCD catalogue testndf1.ccdcat.munged
+--I Iteration 0...
+--I Matching position lists...
   2 names accessed using parameter INLIST
--- Fitting astrometry
--- ASTROM found a 9-parameter fit
--- Iteration 1...
--- Matching position lists...
+--I Fitting astrometry
+--I ASTROM found a 9-parameter fit
+--I Iteration 1...
+--I Matching position lists...
   2 names accessed using parameter INLIST
--- Fitting astrometry
--- ASTROM found a 9-parameter fit
--- Iteration 2...
--- Matching position lists...
+--I Fitting astrometry
+--I ASTROM found a 8-parameter fit
+--I Iteration 2...
+--I Matching position lists...
   2 names accessed using parameter INLIST
--- Fitting astrometry
--- ASTROM found a 8-parameter fit
--- Iteration 3...
--- Matching position lists...
+--I That match didn't work.  Trying again, with a larger error
   2 names accessed using parameter INLIST
--- Fitting astrometry
--- ASTROM found a 9-parameter fit
--- Iteration 4...
--- Matching position lists...
+--I Fitting astrometry
+--I ASTROM found a 9-parameter fit
+--I Iteration 3...
+--I Matching position lists...
   2 names accessed using parameter INLIST
--- Fitting astrometry
--- ASTROM found a 9-parameter fit
--- Iteration 5...
--- Matching position lists...
+--I Fitting astrometry
+--I ASTROM found a 9-parameter fit
+--I Iteration 4...
+--I Matching position lists...
   2 names accessed using parameter INLIST
--- Fitting astrometry
--- ASTROM found a 9-parameter fit
--- Iteration 6...
--- Matching position lists...
+--I Fitting astrometry
+--I ASTROM found a 9-parameter fit
+--I Iteration 5...
+--I Matching position lists...
   2 names accessed using parameter INLIST
--- Fitting astrometry
--- ASTROM found a 9-parameter fit
-!! Not inserting WCS information into NDF <testndf1>
--- Retaining WCS information in t9-temp-testndf1.final-fits.fits
+--I Fitting astrometry
+--I ASTROM found a 9-parameter fit
+--I Iteration 6...
+--I Matching position lists...
+  2 names accessed using parameter INLIST
+--I Fitting astrometry
+--I ASTROM found a 9-parameter fit
+--W Not inserting WCS information into NDF <testndf1>
+--I Retaining WCS information in t9-temp-testndf1.final-fits.fits
 SIMPLE  =                    T / file does conform to FITS standard             
 BITPIX  =                    8 / number of bits per data pixel                  
 NAXIS   =                    2 / number of data axes                            
@@ -54,80 +56,80 @@ CTYPE2  = 'DEC--TAN'           / DEC -- tangent-plane projection
 RADESYS = 'FK5     '           / Celestial coordinates in FK5 system            
 EQUINOX =               2000.0 / Equator and equinox of J2000.0                 
 LONPOLE =                  180 / Native longitude of celestial pole             
-CRVAL1  =          261.4206261 / Projection pole -- RA =   17:25:41.0           
-CRVAL2  =           74.4419211 / Projection pole -- Dec = +74:26:31             
-CRPIX1  =         4104.1839381 / Projection pole -- x-pixels                    
-CRPIX2  =         3090.1668025 / Projection pole -- y-pixels                    
+CRVAL1  =          261.4898672 / Projection pole -- RA =   17:25:57.6           
+CRVAL2  =           74.4887044 / Projection pole -- Dec = +74:29:19             
+CRPIX1  =         3602.3870179 / Projection pole -- x-pixels                    
+CRPIX2  =         2899.1011340 / Projection pole -- y-pixels                    
 CUNIT1  = 'deg     '           / RA always given in degrees                     
 CUNIT2  = 'deg     '           / Dec always given in degrees                    
-CD1_1   =       -1.5176769E-06 / Transformation to intermed. world coords       
-CD2_1   =       -9.2548725E-05                                                  
-CD1_2   =       -9.2563023E-05                                                  
-CD2_2   =        1.3903583E-06                                                  
+CD1_1   =       -1.5586372E-06 / Transformation to intermed. world coords       
+CD2_1   =       -9.2217954E-05                                                  
+CD1_2   =       -9.2377669E-05                                                  
+CD2_2   =        1.7019849E-06                                                  
 PV1_0   =        0.0000000E+00 / Distortion function for x: a_0=0               
 PV1_1   =        1.0000000E+00 / a_1 x     = 1                                  
-PV1_7   =       -6.1566967E-02 / a_7 x^3   = -q                                 
-PV1_9   =       -6.1566967E-02 / a_9 xy^2  = -q                                 
-PV1_17  =        1.1371474E-02 / a_17 x^5  = 3q^2                               
-PV1_21  =        1.1371474E-02 / a_21 xy^4 = 3q^2                               
-PV1_31  =       -2.8004287E-03 / a_31 x^7  = -12q^3                             
-PV1_37  =       -2.8004287E-03 / a_37 xy^6 = -12q^3                             
+PV1_7   =       -6.6900338E-02 / a_7 x^3   = -q                                 
+PV1_9   =       -6.6900338E-02 / a_9 xy^2  = -q                                 
+PV1_17  =        1.3426966E-02 / a_17 x^5  = 3q^2                               
+PV1_21  =        1.3426966E-02 / a_21 xy^4 = 3q^2                               
+PV1_31  =       -3.5930741E-03 / a_31 x^7  = -12q^3                             
+PV1_37  =       -3.5930741E-03 / a_37 xy^6 = -12q^3                             
 PV2_0   =        0.0000000E+00 / Distortion function for y: b_0=0               
 PV2_1   =        1.0000000E+00 / b_1 y     = 1                                  
-PV2_7   =       -6.1566967E-02 / b_7 y^3   = -q                                 
-PV2_9   =       -6.1566967E-02 / b_9 yx^2  = -q                                 
-PV2_17  =        1.1371474E-02 / b_17 y^5  = 3q^2                               
-PV2_21  =        1.1371474E-02 / b_21 yx^4 = 3q^2                               
-PV2_31  =       -2.8004287E-03 / b_31 y^7  = -12q^3                             
-PV2_37  =       -2.8004287E-03 / b_37 yx^6 = -12q^3                             
+PV2_7   =       -6.6900338E-02 / b_7 y^3   = -q                                 
+PV2_9   =       -6.6900338E-02 / b_9 yx^2  = -q                                 
+PV2_17  =        1.3426966E-02 / b_17 y^5  = 3q^2                               
+PV2_21  =        1.3426966E-02 / b_21 yx^4 = 3q^2                               
+PV2_31  =       -3.5930741E-03 / b_31 y^7  = -12q^3                             
+PV2_37  =       -3.5930741E-03 / b_37 yx^6 = -12q^3                             
 MJD-OBS =        50985.1119714 / Obs. start J1998.468 (1998-06-21T02:41)        
 END                                                                             
 === Test 2 ===
--- Starting monoliths...
--- Monoliths OK
--- Processing NDF <testndf2>
--- NDF <testndf2> examined OK
--- WCS information from AST
--- Obtaining catalogue from usno@eso...
--- Obtained catalogue, 500 entries, from usno@eso
--- Using pre-existing CCD catalogue testndf2.ccdcat.munged
--- Iteration 0...
--- Matching position lists...
+--I Starting monoliths...
+--I Monoliths OK
+--I Processing NDF <testndf2>
+--I NDF <testndf2> examined OK
+--I WCS information from AST
+--I Obtaining catalogue from usno@eso...
+--I Obtained catalogue, 500 entries, from usno@eso
+--I Using pre-existing CCD catalogue testndf2.ccdcat.munged
+--I Iteration 0...
+--I Matching position lists...
   2 names accessed using parameter INLIST
--- Fitting astrometry
--- ASTROM found a 6-parameter fit
--- Iteration 1...
--- Matching position lists...
+--I Fitting astrometry
+--I ASTROM found a 6-parameter fit
+--I Iteration 1...
+--I Matching position lists...
   2 names accessed using parameter INLIST
--- Fitting astrometry
--- ASTROM found a 6-parameter fit
--- Iteration 2...
--- Matching position lists...
+--I Fitting astrometry
+--I ASTROM found a 6-parameter fit
+--I Iteration 2...
+--I Matching position lists...
   2 names accessed using parameter INLIST
--- Fitting astrometry
--- ASTROM found a 6-parameter fit
--- Iteration 3...
--- Matching position lists...
+--I Fitting astrometry
+--I ASTROM found a 6-parameter fit
+--I Iteration 3...
+--I Matching position lists...
   2 names accessed using parameter INLIST
--- Fitting astrometry
--- ASTROM found a 6-parameter fit
--- Iteration 4...
--- Matching position lists...
+--I Fitting astrometry
+--I ASTROM found a 6-parameter fit
+--I Iteration 4...
+--I Matching position lists...
   2 names accessed using parameter INLIST
--- Fitting astrometry
--- ASTROM found a 6-parameter fit
--- Iteration 5...
--- Matching position lists...
+--I Fitting astrometry
+--I ASTROM found a 6-parameter fit
+--I Iteration 5...
+--I Matching position lists...
   2 names accessed using parameter INLIST
--- Fitting astrometry
--- ASTROM found a 6-parameter fit
--- Iteration 6...
--- Matching position lists...
+--I Fitting astrometry
+--I ASTROM found a 6-parameter fit
+--I Iteration 6...
+--I Matching position lists...
   2 names accessed using parameter INLIST
--- Fitting astrometry
--- ASTROM found a 6-parameter fit
-!! Not inserting WCS information into NDF <testndf2>
--- Retaining WCS information in t9-temp-testndf2.final-fits.fits
+--I Fitting astrometry
+--I ASTROM found a 6-parameter fit
+--W Not inserting WCS information into NDF <testndf2>
+--I Retaining WCS information in t9-temp-testndf2.final-fits.fits
 SIMPLE  =                    T / file does conform to FITS standard             
 BITPIX  =                    8 / number of bits per data pixel                  
 NAXIS   =                    2 / number of data axes                            
@@ -140,14 +142,14 @@ EQUINOX =               2000.0 / Equator and equinox of J2000.0
 LONPOLE =                  180 / Native longitude of celestial pole             
 CRVAL1  =          150.0004167 / Projection pole -- RA =   10:00:00.1           
 CRVAL2  =          -30.0002778 / Projection pole -- Dec = -30:00:01             
-CRPIX1  =          177.3639579 / Projection pole -- x-pixels                    
-CRPIX2  =          176.5394624 / Projection pole -- y-pixels                    
+CRPIX1  =          176.9726518 / Projection pole -- x-pixels                    
+CRPIX2  =          176.6501346 / Projection pole -- y-pixels                    
 CUNIT1  = 'deg     '           / RA always given in degrees                     
 CUNIT2  = 'deg     '           / Dec always given in degrees                    
-CD1_1   =       -4.7196756E-04 / Transformation to intermed. world coords       
-CD2_1   =       -4.7082042E-06                                                  
-CD1_2   =       -6.0873915E-06                                                  
-CD2_2   =        4.7062821E-04                                                  
+CD1_1   =       -4.7169128E-04 / Transformation to intermed. world coords       
+CD2_1   =       -3.9115498E-06                                                  
+CD1_2   =       -4.6313252E-06                                                  
+CD2_2   =        4.7199225E-04                                                  
 PV1_0   =        0.0000000E+00 / Distortion function for x: a_0=0               
 PV1_1   =        1.0000000E+00 / a_1 x     = 1                                  
 PV1_7   =       -0.0000000E+00 / a_7 x^3   = -q                                 
