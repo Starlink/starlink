@@ -173,6 +173,7 @@
 *        improvements.  Replaced SUBSAMPLE parameter with NSAMPLE.
 *     7-OCT-1998 (DSB):
 *        Changed (irg based) KPG1_NWILD call to (ndg based) KPG1_RGNDF.
+*        Also changed to display the NDF name if the NDF Title is blank.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -411,17 +412,22 @@
      :                       %VAL( GDPTR( I ) ), %VAL( GVPTR( I ) ),
      :                       STATUS )
 
-*  Now unmap the input data.
-            CALL NDF_UNMAP( NDFI, '*', STATUS )
-            CALL NDF_ANNUL( NDFI, STATUS )
-
 * Write out some information.
-            CALL MSG_SETC( 'TITLE', TITLE )
+            IF( TITLE .NE. ' ' ) THEN
+               CALL MSG_SETC( 'TITLE', TITLE )
+            ELSE
+               CALL NDF_MSG( 'TITLE', NDFI )
+            END IF
+
             CALL MSG_SETI( 'NGOOD', NGOOD( I ) )
             CALL MSG_SETI( 'NEL', EL )
             CALL MSG_OUTIF( MSG__NORM, 'RES1',
      :        'Data for "^TITLE" contain ^NEL points, of which ^NGOOD '/
      :        /'are good.', STATUS )
+
+*  Now unmap the input data.
+            CALL NDF_UNMAP( NDFI, '*', STATUS )
+            CALL NDF_ANNUL( NDFI, STATUS )
 
          END IF
       END DO
