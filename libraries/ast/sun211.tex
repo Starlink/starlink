@@ -17,7 +17,7 @@
 % Variable part - replace [xxx] as appropriate.
 \newcommand{\stardocnumber}    {211.2}
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {11th June 1998}
+\newcommand{\stardocdate}      {15th June 1998}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
@@ -1666,13 +1666,36 @@ should read \secref{ss:nativefits} and \secref{ss:foreignfits}.
 
 \subsection{\label{ss:howtoplotgrid}\ldots Display a Graphical Coordinate Grid}
 
-A common requirement when displaying image data is to plot an
-associated coordinate grid ({\em{e.g.}}\ Figure~\ref{fig:gridplot})
-over the displayed image. The use of AST in such circumstances is
-independent of the underlying graphics system, so starting up the
-graphics system, setting up a coordinate system, displaying the image,
-and closing down afterwards can all be done using the graphics
-functions you would normally use.
+\begin{latexonly}
+   A common requirement when displaying image data is to plot an
+   associated coordinate grid ({\em{e.g.}}\ Figure~\ref{fig:overgrid})
+   over the displayed image.
+   \begin{figure}
+   \begin{center}
+   \includegraphics[scale=0.7]{sun211_figures/overgrid_bw.eps}
+   \caption{An example of a displayed image with a coordinate grid
+   plotted over it.}
+   \label{fig:overgrid}
+   \end{center}
+   \end{figure}
+\end{latexonly}
+\begin{htmlonly}
+   A common requirement when displaying image data is to plot an
+   associated coordinate grid over the displayed image ({\em{e.g.}}\
+   the following Figure):
+   \begin{quote}
+   \begin{figure}[bhtp]
+   \label{fig:overgrid}
+   \includegraphics[scale=0.8]{sun211_figures/overgrid.eps}
+   \caption{An example of a displayed image with a coordinate grid
+   plotted over it.}
+   \end{figure}
+   \end{quote}
+\end{htmlonly}
+The use of AST in such circumstances is independent of the underlying
+graphics system, so starting up the graphics system, setting up a
+coordinate system, displaying the image, and closing down afterwards
+can all be done using the graphics functions you would normally use.
 
 However, displaying an image at a precise location can be a little
 fiddly with some graphics systems, and obviously the grid drawn by AST
@@ -1905,7 +1928,7 @@ Labelling = Interior
 \normalsize
 \end{quote}
 
-For a yet more sophisticated interface, you could obviously perform
+For a more sophisticated interface, you could obviously perform
 pre-processing on this input---for example, to translate words like
 ``red'', ``green'' and ``blue'' into colour indices, to permit
 comments and blank lines, {\em{etc.}}
