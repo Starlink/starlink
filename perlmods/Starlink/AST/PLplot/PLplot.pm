@@ -100,6 +100,12 @@ sub _GMark {
    my $y = shift;
    my $type = shift;
 
+   # Check for supported plot symbols: PLplot does not support ftriangle or fdiamond
+   # Also we will arbitrarily not support anything above 18 for now
+   if ($type < 0 || $type == 13 || $type > 18) {
+     $type = 2;
+   }
+
    if( scalar(@$x) >= 1 && scalar(@$x) == scalar(@$y) ) {
       plcol0(2);
       plpoin( $x, $y, $type );
