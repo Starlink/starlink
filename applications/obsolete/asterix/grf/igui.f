@@ -488,6 +488,7 @@
 *    Local variables :
       CHARACTER TEXT*80,JUST*1
       REAL SIZE
+      REAL X,Y,ANGLE
       INTEGER FONT,BOLD,COLOUR
       INTEGER I,N
       INTEGER FLAG
@@ -515,12 +516,12 @@
             IF (.NOT.OK) THEN
               FONT=1
             ENDIF
-            CALL IMG_NBPUT0I('PAR_I1',FONT,STATUS)
+            CALL IMG_NBPUT0I('PAR_I2',FONT,STATUS)
             CALL GCB_GET1I('TITLE_BOLD',I,1,OK,BOLD,STATUS)
             IF (.NOT.OK) THEN
               BOLD=1
             ENDIF
-            CALL IMG_NBPUT0I('PAR_I2',BOLD,STATUS)
+            CALL IMG_NBPUT0I('PAR_I3',BOLD,STATUS)
             CALL GCB_GET1R('TITLE_SIZE',I,1,OK,SIZE,STATUS)
             IF (.NOT.OK) THEN
               SIZE=1.0
@@ -530,7 +531,7 @@
             IF (.NOT.OK) THEN
               COLOUR=1
             ENDIF
-            CALL IMG_NBPUT0I('PAR_I3',COLOUR,STATUS)
+            CALL IMG_NBPUT0I('PAR_I4',COLOUR,STATUS)
             CALL GCB_GET1C('TITLE_JUST',I,1,OK,JUST,STATUS)
             IF (.NOT.OK) THEN
               JUST='L'
@@ -550,6 +551,66 @@
 
         ELSEIF (NAME.EQ.'NOTE') THEN
 
+          CALL GCB_GETI('NOTE_N',OK,N,STATUS)
+          IF (.NOT.OK) THEN
+            N=0
+          ENDIF
+          I=1
+          DO WHILE (I.LE.N)
+*  put block on reading by GUI
+            CALL IMG_NBPUT0I('FLAG',-1,STATUS)
+*  write parameters to noticeboard
+            CALL GCB_GET1C('NOTE_TEXT',I,1,OK,TEXT,STATUS)
+            IF (.NOT.OK) THEN
+              TEXT=' '
+            ENDIF
+            CALL IMG_NBPUT0C('PAR_C1',TEXT,STATUS)
+            CALL GCB_GET1I('NOTE_FONT',I,1,OK,FONT,STATUS)
+            IF (.NOT.OK) THEN
+              FONT=1
+            ENDIF
+            CALL IMG_NBPUT0I('PAR_I2',FONT,STATUS)
+            CALL GCB_GET1I('NOTE_BOLD',I,1,OK,BOLD,STATUS)
+            IF (.NOT.OK) THEN
+              BOLD=1
+            ENDIF
+            CALL IMG_NBPUT0I('PAR_I3',BOLD,STATUS)
+            CALL GCB_GET1R('NOTE_SIZE',I,1,OK,SIZE,STATUS)
+            IF (.NOT.OK) THEN
+              SIZE=1.0
+            ENDIF
+            CALL IMG_NBPUT0R('PAR_R1',SIZE,STATUS)
+            CALL GCB_GET1I('NOTE_COLOUR',I,1,OK,COLOUR,STATUS)
+            IF (.NOT.OK) THEN
+              COLOUR=1
+            ENDIF
+            CALL IMG_NBPUT0I('PAR_I4',COLOUR,STATUS)
+            CALL GCB_GET1R('NOTE_X',I,1,OK,X,STATUS)
+            IF (.NOT.OK) THEN
+              X=0.0
+            ENDIF
+            CALL IMG_NBPUT0R('PAR_R2',X,STATUS)
+            CALL GCB_GET1R('NOTE_Y',I,1,OK,Y,STATUS)
+            IF (.NOT.OK) THEN
+              Y=0.0
+            ENDIF
+            CALL IMG_NBPUT0R('PAR_R3',Y,STATUS)
+            CALL GCB_GET1R('NOTE_ANGLE',I,1,OK,ANGLE,STATUS)
+            IF (.NOT.OK) THEN
+              ANGLE=0.0
+            ENDIF
+            CALL IMG_NBPUT0R('PAR_R4',X,STATUS)
+*  take block off reading
+            CALL IMG_NBPUT0I('FLAG',0,STATUS)
+            FLAG=0
+*  wait 'til GUI flags that values have been read
+            DO WHILE (FLAG.EQ.0)
+              CALL IMG_NBGET0I('FLAG',FLAG,STATUS)
+            ENDDO
+
+            I=I+1
+
+          ENDDO
 
         ELSEIF (NAME.EQ.'MARKER') THEN
 
@@ -617,7 +678,7 @@
             CALL GCB_SET1I('TITLE_FONT',I,1,FONT,STATUS)
 
             CALL IMG_NBGET0I('PAR_I3',BOLD,STATUS)
-            CALL GCB_SET1I('TITLE_BOLD',I,1,OK,BOLD,STATUS)
+            CALL GCB_SET1I('TITLE_BOLD',I,1,BOLD,STATUS)
 
             CALL IMG_NBGET0R('PAR_R1',SIZE,STATUS)
             CALL GCB_SET1R('TITLE_SIZE',I,1,SIZE,STATUS)
@@ -634,6 +695,44 @@
           ENDDO
 
         ELSEIF (NAME.EQ.'NOTE') THEN
+
+          CALL IMG_NBGET0I('PAR_I1',N,STATUS)
+          CALL GCB_SETI('NOTE_N',N,STATUS)
+          I=1
+          DO WHILE (I.LE.N)
+            FLAG=-1
+            DO WHILE (FLAG.EQ.-1)
+              CALL IMG_NBGET0I('FLAG',FLAG,STATUS)
+            ENDDO
+
+            CALL IMG_NBGET0C('PAR_C1',TEXT,STATUS)
+            CALL GCB_SET1C('NOTE_TEXT',I,1,TEXT,STATUS)
+
+            CALL IMG_NBGET0I('PAR_I2',FONT,STATUS)
+            CALL GCB_SET1I('NOTE_FONT',I,1,FONT,STATUS)
+
+            CALL IMG_NBGET0I('PAR_I3',BOLD,STATUS)
+            CALL GCB_SET1I('NOTE_BOLD',I,1,BOLD,STATUS)
+
+            CALL IMG_NBGET0R('PAR_R1',SIZE,STATUS)
+            CALL GCB_SET1R('NOTE_SIZE',I,1,SIZE,STATUS)
+
+            CALL IMG_NBGET0I('PAR_I4',COLOUR,STATUS)
+            CALL GCB_SET1I('TITLE_COLOUR',I,1,COLOUR,STATUS)
+
+            CALL IMG_NBGET0R('PAR_R2',X,STATUS)
+            CALL GCB_SET1R('NOTE_X',I,1,X,STATUS)
+
+            CALL IMG_NBGET0R('PAR_R3',Y,STATUS)
+            CALL GCB_SET1R('NOTE_Y',I,1,Y,STATUS)
+
+            CALL IMG_NBGET0R('PAR_R4',ANGLE,STATUS)
+            CALL GCB_SET1R('NOTE_ANGLE',I,1,ANGLE,STATUS)
+
+            CALL IMG_NBPUT0I('FLAG',-1,STATUS)
+            I=I+1
+
+          ENDDO
 
 
         ELSEIF (NAME.EQ.'MARKER') THEN
