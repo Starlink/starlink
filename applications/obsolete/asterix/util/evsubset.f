@@ -240,7 +240,7 @@ C      {data_type} {external_name} ! [external_description]
       IF ( .NOT. INDEXMODE ) THEN
         CALL MSG_PRNT( ' ' )
         CALL MSG_PRNT( 'The availible LISTs are:' )
-        CALL EDI_DISP( STATUS )
+        CALL EDI_DISP( IFID, STATUS )
       END IF
 
 *  Find out which events are to be copied. We use a BYTE here rather than
@@ -257,7 +257,7 @@ C      {data_type} {external_name} ! [external_description]
         CALL MSG_PRNT ('Enter the LISTs to have ranges applied, by '//
      :                                     'entering the index numbers')
         CALL MSG_PRNT ('E.g. 1 2 4')
-        CALL EDI_SELCT( IFID, 'LISTS', 1, MXSEL, INDEX, NSEL, STATUS )
+        CALL EDI_SELCT( 'LISTS', NLISTS, 1, MXSEL, INDEX, NSEL, STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Obtain ranges for the selected LISTs
