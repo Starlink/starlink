@@ -20,6 +20,12 @@
 #     By modifying the assignments at the head of the script some
 #     aspects of the reduction process and characteristics of the 
 #     synthetic data can be controlled.
+#
+#     The script calls another script "reslog" which logs resources used
+#     by processes started from this one.  Communication with the reslog
+#     script is done using the alias "log_start".
+#     For more details on how this resource logging works, see the 
+#     comments at the head of the "reslog" script.
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK)
@@ -35,7 +41,7 @@
 #        Now references $CCDPACK_DIR instead of editting INSTALL at
 #        install time.
 #     11-JUN-1998 (MBT):
-#        Added resource logging.
+#        Added resource logging (mainly external to this script).
 #        Modified to deal with varying image sizes and numbers of objects.
 #        Added options for cutting corners in some of the reduction steps.
 #        Name changed to ccdbig from (ccdexercise).
@@ -46,6 +52,8 @@
 # Set up the parameters of the reduction sequences.
 # These can be changed to test behaviour of the programs under
 # different circumstances.
+# The defaults are sensible.  For all the Boolean variables, 
+# TRUE is a more resource-intensive option than FALSE.
 
       # Do we want variances calculated and propagated (TRUE or FALSE)?
             set variance = TRUE
@@ -54,8 +62,12 @@
       # (else explicitly impose mask on data using ARDMASK).
             set keepard = TRUE
 
-      # Do we want to use a bias frame? (else just interpolate)
+      # Do we want to use a bias frame? (TRUE or FALSE)?
+      # (else just interpolate)
             set biasframe = TRUE
+
+      # Do we want to normalize the frames for scale and zero factors?
+            set normalise = TRUE
 
       # Set data type (_REAL, _WORD, _DOUBLE are sensible)
             set datatype = _REAL
@@ -86,7 +98,7 @@
 #  Validation of booleans
 #  (since we test on TRUE and FALSE a value which was neither would
 #  have messy consequences so it's best to check).
-      foreach boolean ( variance keepard biasframe )
+      foreach boolean ( variance keepard biasframe normalise )
          set value = `eval echo '$'$boolean`
          if ( "$value" != "TRUE" && "$value" != "FALSE" ) then
             echo "Variable $boolean='$value'; must be set to 'TRUE' or 'FALSE'."
@@ -157,20 +169,21 @@
       uptime                                              >>$reslogfile
       date                                                >>$reslogfile 
       du -sk $PWD                                         >>$reslogfile
-      echo                                                >>$reslogfile
-      echo "Variance:  $variance"                         >>$reslogfile
-      echo "Keepard:   $keepard "                         >>$reslogfile
-      echo "Biasframe: $biasframe"                        >>$reslogfile
-      echo "Data type: $datatype"                         >>$reslogfile
+      echo " "                                            >>$reslogfile 
+      echo "Variance:           $variance"                >>$reslogfile
+      echo "Keepard:            $keepard "                >>$reslogfile
+      echo "Biasframe:          $biasframe"               >>$reslogfile
+      echo "Normalisation:      $normalise"               >>$reslogfile
+      echo "Data type:          $datatype"                >>$reslogfile
       echo "Logging interval:   $interval"                >>$reslogfile
-      echo                                                >>$reslogfile
+      echo " "                                            >>$reslogfile
       printf "\n%7s%7s%12s\n"   'Pixels ' Objects Command >>$reslogfile 
       echo                                                >>$reslogfile
 
 #  Set up alias for logging run times to a file.
       set labelfile = reslog.label
       alias log_start \
-         'printf "%7d%7d%12s:  " $frame_pixels $objects \!\!:1 >$labelfile'
+         'printf "%7d%7d%12s:" $frame_pixels $objects \!\!:1 >$labelfile'
 
 #  Start logging process
       ./reslog -f $reslogfile -i $interval -l $labelfile  &
@@ -574,18 +587,20 @@
 #          end tranndf
 
 #  Normalise it.
-           echo " "
-           echo "  Normalising the aligned datasets."
-           echo " "
-           log_start makemosnorm
-           makemos \
-              in='resamp_data?' \
-              scale=true \
-              zero=true \
-              modify=true \
-              out=\! \
-              accept
-#          end makemos
+           if ("$normalise" == "TRUE") then
+              echo " "
+              echo "  Normalising the aligned datasets."
+              echo " "
+              log_start makemosnorm
+              makemos \
+                 in='resamp_data?' \
+                 scale=true \
+                 zero=true \
+                 modify=true \
+                 out=\! \
+                 accept
+#             end makemos
+           endif
 
 #  Combine to produce a mosaic.
            echo " "
