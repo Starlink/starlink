@@ -13,7 +13,7 @@
       source files for MESSGEN.</p>
   </abstract>
   <dependencies>
-    <build>starconf star2html</build>
+    <build></build>
     <use></use>
   </dependencies>
   <developers>
