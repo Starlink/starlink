@@ -19,8 +19,21 @@ if (`echo $1 | egrep '.'`) then
   # Use the supplied argument as UT date
   set utdate = $1
 else
+
+  # Check for location of date in two places -- /bin/date (linux)
+  # and /usr/bin/date (solaris)
+  if (-e '/usr/bin/date' ) then
+    set mydate = /usr/bin/date
+  else if (-e '/bin/date' ) then
+    set mydate = /bin/date
+  else
+    echo Could not find date in /bin/date or /usr/bin/date
+    exit -1
+  endif
+
+
   # No argument so find the current UT date
-  set utdate = `/usr/bin/date -u +%Y%m%d`
+  set utdate = `$mydate -u +%Y%m%d`
 endif
 
 # Echo setting up SURF for UT date $utdate
@@ -68,11 +81,23 @@ else if ($dname == 'JAC.Hilo') then
 
   if ($mm == '01') then
     # This is January so belongs to previous year    
-    set yy = `expr $yy - 1`
+    # Check for year=00 special case
+    if ($yy == '00') then
+      set yy = 99
+    else 
+      set yy = `expr $yy - 1`
+    endif
     set sem = "m${yy}b"
+
+
   else if ($mm == '02' && $dd == '01') then
     # First day of feb is in previous semester
-    set yy = `expr $yy - 1`
+    # check for OO special case
+    if ($yy == '00') then
+      set yy = 99
+    else
+      set yy = `expr $yy - 1`
+    endif
     set sem = "m${yy}b"
   else if ($mm < 8) then
     set sem = "m${yy}a"
@@ -100,6 +125,10 @@ if ($?DATADIR) then
   echo ORAC_DATA_IN has also been set to this value
 endif
 
+
+# clean up
+unset mydate
+unset utdate
 
 exit
 
@@ -155,6 +184,9 @@ exit
 
 *  History:
 *    $Log$
+*    Revision 1.5  2000/02/04 03:16:58  timj
+*    Fix 00 problem with semester calculation
+*
 *    Revision 1.4  1999/08/03 19:32:35  timj
 *    Add copyright message to header.
 *
