@@ -46,7 +46,7 @@ INTERFACE PSS
 
   PARAMETER SREGION
     TYPE 'LITERAL'
-    PROMPT 'ARD input'
+    PROMPT 'ARD input to define search region'
     DEFAULT !
     VPATH 'DEFAULT,PROMPT'
     PPATH 'DEFAULT'
