@@ -36,6 +36,12 @@
 *        The B parameter (filter transmission). This efficiency factor
 *        must be between 0 and 1. A negative value allows this parameter
 *        to be free.
+*     CVAR = LOGICAL (Read)
+*        This parameter governs whether the points are fitted with 
+*        a constant variance for all points (true) or the variance
+*        derived from the scatter in the individual integrations (false).
+*        The value used for the fixed variance is the mean of all the
+*        calculated variances.
 *     ETA_TEL = REAL (Read)
 *        The telescope efficiency. If available the current telescope value 
 *        is used as the default.  Values must be between 0 and 1.0. 
@@ -110,6 +116,9 @@
 *  History :
 *     $Id$
 *     $Log$
+*     Revision 1.22  1998/01/07 00:31:35  timj
+*     Add the CVAR parameter for controlling whether a constant variance is used.
+*
 *     Revision 1.21  1997/07/28 20:58:23  timj
 *     Add support for the presence of ETATEL in the FITS header.
 *
@@ -252,6 +261,7 @@ c
                                         ! dU3 Nasmyth coord of bolometers
       REAL             BOL_DU4 (SCUBA__NUM_CHAN, SCUBA__NUM_ADC)
                                         ! dU4 Nasmyth coord of bolometers
+      LOGICAL CVAR                      ! Use constant variance?
       INTEGER DIM (MAXDIM)              ! the dimensions of an array
       REAL    DEFAULT_ETA_TEL           ! Eta tel read from FITS header
       INTEGER DREF                      ! Pointer to output data
@@ -886,14 +896,18 @@ c
       CALL PAR_GET0R ('ETA_TEL', ETA_TEL, STATUS )
       CALL PAR_GET0R ('B_FIT', B, STATUS )
 
+*     Ask whether we are using a fixed variance or the actual variance.
+
+      CALL PAR_GET0L ('CVAR', CVAR, STATUS)
+
 *     The number of measurements is now actually the number of points
 *     that were kept after removing bad data
 
 
-* Send to fit skydip
+*     Send to fit skydip
 
       IF (STATUS .EQ. SAI__OK) THEN
-         CALL SCULIB_FIT_SKYDIP (NKEPT, AIRMASS, JSKY,JSKY_VAR,
+         CALL SCULIB_FIT_SKYDIP (CVAR, NKEPT, AIRMASS, JSKY,JSKY_VAR,
      :        WAVE, SUB_INST, FILT, T_TEL, T_AMB, ETA_TEL,B,ETA_TEL_FIT,
      :        B_FIT, TAUZ_FIT, STATUS)
 
