@@ -2559,7 +2559,6 @@
             XW = I_XBASE + (I-1)*I_XSCALE
             R = SQRT( (XW-X0)**2 + Y2 ) / RBIN
             IDX(I,J) = INT(R) + 1
-	ELSE
           END IF
         END DO
       END DO
@@ -3172,6 +3171,8 @@
         FMODE = F__NONE
       ELSE IF ( I_BGM_FIT .EQ. 'CONS' ) THEN
         FMODE = F__CONS
+      ELSE IF ( I_BGM_FIT .EQ. 'POLY' ) THEN
+        FMODE = F__POLY
       ELSE IF ( I_BGM_FIT .EQ. 'SPLINE' ) THEN
         FMODE = F__SPLINE
       END IF
