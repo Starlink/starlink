@@ -34,6 +34,8 @@
 *        Y coordinate of source position
 *     R = REAL (read)
 *        Radius of source to knock out
+*     ISRC = INTEGER (read)
+*        Source number
 
 *  Examples:
 *     {routine_example_text}
@@ -113,6 +115,8 @@
       CHARACTER*16		CMD			! Major mode
 
       REAL			XPOS, YPOS, R		! Source position
+
+      INTEGER			ISRC			! Source number
 *.
 
 *  Check inherited global status.
@@ -155,7 +159,18 @@
 
 *      Start modelling
           ELSE IF ( CMD .EQ. 'START' ) THEN
-            IF ( .NOT. I_BGM_ON ) THEN
+
+*        If already modelling then update to take account of changes since
+*        last restart (eg. in regions)
+            IF ( I_BGM_ON ) THEN
+
+*          Redo the quality
+              CALL IBGND_SETQ( STATUS )
+
+*          Recompute the samples and surface
+              CALL IBGND_RECALC( .TRUE., .TRUE., STATUS )
+
+            ELSE
               CALL IBGND_NEW( STATUS )
             END IF
 
@@ -186,6 +201,11 @@
 *      Mark sources
           ELSE IF ( CMD .EQ. 'MARKSRC' ) THEN
             CALL IBGND_MARK( STATUS )
+
+*      Delete a source
+          ELSE IF ( CMD .EQ. 'DELSRC' ) THEN
+            CALL USI_GET0I( 'ISRC', ISRC, STATUS )
+            CALL IBGND_DELSRC( ISRC, STATUS )
 
 *      Display model
           ELSE IF ( CMD .EQ. 'DISP' ) THEN
@@ -319,12 +339,7 @@
           CALL MSG_PRNT( '  Src      X          Y          R' )
           CALL MSG_BLNK()
           DO I = 1, I_BGM_NSRC
-            CALL ARR_ELEM1R( I_BGM_SRCPTR(1), I__MXBGSRC, I, X,
-     :                       STATUS )
-            CALL ARR_ELEM1R( I_BGM_SRCPTR(2), I__MXBGSRC, I, Y,
-     :                       STATUS )
-            CALL ARR_ELEM1R( I_BGM_SRCPTR(3), I__MXBGSRC, I, R,
-     :                       STATUS )
+            CALL IBGND_GETSRC( I, X, Y, R, STATUS )
             WRITE( TXT, '(2X,I3,3(2X,1PG12.5))', IOSTAT=ISTAT )
      :                       I, X, Y, R
             CALL MSG_PRNT( TXT )
@@ -462,15 +477,13 @@
       DO I = 1, I_BGM_NSRC
 
 *    Extract data
-        CALL ARR_ELEM1R( I_BGM_SRCPTR(1), I__MXBGSRC, I, X, STATUS )
-        CALL ARR_ELEM1R( I_BGM_SRCPTR(2), I__MXBGSRC, I, Y, STATUS )
-        CALL ARR_ELEM1R( I_BGM_SRCPTR(3), I__MXBGSRC, I, R, STATUS )
+        CALL IBGND_GETSRC( I, X, Y, R, STATUS )
 
 *    Plot a circle
         CALL IMG_CIRCLE( X, Y, R, STATUS )
 
 *    Write string with source number
-        X = X + R*COSD(45.0)
+        X = X + R*COSD(45.0)*SIGN(1.0,I_XSCALE)
         Y = Y + R*SIND(45.0)
         CALL PGUPDT(0)
         CALL CHR_ITOC( I, STR(2:), NDIGIT )
@@ -482,6 +495,135 @@
       END DO
 
       END
+
+
+      SUBROUTINE IBGND_GETSRC( ISRC, X, Y, R, STATUS )
+*+
+*  Name:
+*     IBGND_GETSRC
+
+*  Purpose:
+*     Get source attributes
+
+*  Language:
+*     Starlink Fortran
+
+*  Type of Module:
+*     Task subroutine
+
+*  Invocation:
+*     CALL IBGND_GETSRC( ISRC, X, Y, R, STATUS )
+
+*  Description:
+*     {routine_description}
+
+*  Arguments:
+*     ISRC = INTEGER (given)
+*        The source number
+*     X = REAL (returned)
+*        Source X position
+*     Y = REAL (returned)
+*        Source Y position
+*     R = REAL (returned)
+*        Source radius
+*     STATUS = INTEGER (given)
+*        The global status.
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
+*     {algorithm_description}...
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  Implementation Status:
+*     {routine_implementation_status}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
+*     {routine_deficiencies}...
+
+*  References:
+*     {task_references}...
+
+*  Keywords:
+*     ibgnd, usage:private
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1995
+
+*  Authors:
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*     23 Jan 1996 (DJA):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+
+*  Global Variables:
+      INCLUDE 'IMG_CMN'
+
+*  Arguments Given:
+      INTEGER			ISRC
+
+*  Arguments Returned:
+      REAL			X, Y, R
+
+*  Status:
+      INTEGER			STATUS             	! Global status
+
+*  Local Variables:
+      CHARACTER*4		STR			! String of I
+
+      REAL			X, Y, R			! Source attrs
+
+      INTEGER			I			! Loop over sources
+      INTEGER			NDIGIT			! # chars used in STR
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Extract data
+      CALL ARR_ELEM1R( I_BGM_SRCPTR(1), I_BGM_NSRC, ISRC, X, STATUS )
+      CALL ARR_ELEM1R( I_BGM_SRCPTR(2), I_BGM_NSRC, ISRC, Y, STATUS )
+      CALL ARR_ELEM1R( I_BGM_SRCPTR(3), I_BGM_NSRC, ISRC, R, STATUS )
+
+      END
+
 
 
       SUBROUTINE IBGND_ADDSRC( X, Y, R, STATUS )
@@ -610,15 +752,147 @@
         CALL ARR_SELEM1R( I_BGM_SRCPTR(3), I__MXBGSRC, I_BGM_NSRC,
      :                    R, STATUS )
 
-*    Initialise the the background model quality array. This is ok for points
-*    inside the current region, and bad outside and for bad input pixels
-        CALL IBGND_SETQ( I_NX, I_NY, %VAL(I_QPTR),
-     :                   %VAL(I_BGM_QPTR), STATUS )
+*    Redo the quality
+        CALL IBGND_SETQ( STATUS )
 
 *    Recompute the samples and surface
         CALL IBGND_RECALC( .TRUE., .TRUE., STATUS )
 
       END IF
+
+      END
+
+
+
+      SUBROUTINE IBGND_DELSRC( ISRC, STATUS )
+*+
+*  Name:
+*     IBGND_DELSRC
+
+*  Purpose:
+*     Delete a source from the background modeller database
+
+*  Language:
+*     Starlink Fortran
+
+*  Type of Module:
+*     Task subroutine
+
+*  Invocation:
+*     CALL IBGND_DELSRC( ISRC, STATUS )
+
+*  Description:
+*     {routine_description}
+
+*  Arguments:
+*     ISRC = INTEGER (given)
+*        Number of source to delete
+*     STATUS = INTEGER (given)
+*        The global status.
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
+*     {algorithm_description}...
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  Implementation Status:
+*     {routine_implementation_status}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
+*     {routine_deficiencies}...
+
+*  References:
+*     {task_references}...
+
+*  Keywords:
+*     ibgnd, usage:private
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1995
+
+*  Authors:
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*     23 Jan 1996 (DJA):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'
+
+*  Global Variables:
+      INCLUDE 'IMG_CMN'
+
+*  Arguments Given:
+      INTEGER			ISRC
+
+*  Status:
+      INTEGER			STATUS             	! Global status
+
+*  Local Variables:
+      INTEGER			I			! Loop over source attrs
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Any sources above this one?
+      IF ( I_BGM_NSRC .GT. ISRC ) THEN
+
+*    Move their data down
+        DO I = 1, I__NSRCATT
+          CALL ARR_COP1R( I_BGM_NSRC - ISRC,
+     :                    %VAL(I_BGM_SRCPTR(I)+ISRC*VAL__NBR),
+     :                    %VAL(I_BGM_SRCPTR(I)+(ISRC-1)*VAL__NBR),
+     :                    STATUS )
+        END DO
+
+      END IF
+
+*  Update number of sources
+      I_BGM_NSRC = I_BGM_NSRC - 1
+
+*  Initialise the the background model quality array. This is ok for points
+*  inside the current region, and bad outside and for bad input pixels
+      CALL IBGND_SETQ( STATUS )
+
+*  Recompute the samples and surface
+      CALL IBGND_RECALC( .TRUE., .TRUE., STATUS )
 
       END
 
@@ -911,10 +1185,8 @@
         I_BGM_NELM = I_NX*I_NY
       END IF
 
-*  Initialise the the background model quality array. This is ok for points
-*  inside the current region, and bad outside and for bad input pixels
-      CALL IBGND_SETQ( I_NX, I_NY, %VAL(I_QPTR),
-     :                 %VAL(I_BGM_QPTR), STATUS )
+*  Update quality array
+      CALL IBGND_SETQ( STATUS )
 
 *  Set the sample mode to the whole image, simple mean and compute the samples
       CALL IBGND_SETSAMP( 'WHOLE', 'MEAN', STATUS )
@@ -926,10 +1198,116 @@
 
 
 
-      SUBROUTINE IBGND_SETQ( NX, NY, QUAL, BQ, STATUS )
+      SUBROUTINE IBGND_SETQ( STATUS )
 *+
 *  Name:
 *     IBGND_SETQ
+
+*  Purpose:
+*     Set quality good/bad for background modeller
+
+*  Language:
+*     Starlink Fortran
+
+*  Type of Module:
+*     Task subroutine
+
+*  Invocation:
+*     CALL IBGND_SETQ( STATUS )
+
+*  Description:
+*     {routine_description}
+
+*  Arguments:
+*     STATUS = INTEGER (given and returned)
+*        The global status.
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
+*     {algorithm_description}...
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  Implementation Status:
+*     {routine_implementation_status}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
+*     {routine_deficiencies}...
+
+*  References:
+*     {task_references}...
+
+*  Keywords:
+*     ibgnd, usage:private
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1995
+
+*  Authors:
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*     23 Jan 1996 (DJA):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+
+*  Global Variables:
+      INCLUDE 'IMG_CMN'
+
+*  Status:
+      INTEGER			STATUS             	! Global status
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Call internal routine
+      CALL IBGND_SETQ_INT( I_NX, I_NY, %VAL(I_QPTR),
+     :                     %VAL(I_BGM_QPTR), STATUS )
+
+      END
+
+
+
+      SUBROUTINE IBGND_SETQ_INT( NX, NY, QUAL, BQ, STATUS )
+*+
+*  Name:
+*     IBGND_SETQ_INT
 
 *  Purpose:
 *     Set quality good/bad for points inside/outside the current region
@@ -941,7 +1319,7 @@
 *     Task subroutine
 
 *  Invocation:
-*     CALL IBGND_SETQ( NX, NY, QUAL, BQ, STATUS )
+*     CALL IBGND_SETQ_INT( NX, NY, QUAL, BQ, STATUS )
 
 *  Description:
 *     {routine_description}
@@ -1098,9 +1476,7 @@
       DO S = 1, I_BGM_NSRC
 
 *    Get position
-        CALL ARR_ELEM1R( I_BGM_SRCPTR(1), I_BGM_NSRC, S, X, STATUS )
-        CALL ARR_ELEM1R( I_BGM_SRCPTR(2), I_BGM_NSRC, S, Y, STATUS )
-        CALL ARR_ELEM1R( I_BGM_SRCPTR(3), I_BGM_NSRC, S, R, STATUS )
+        CALL IBGND_GETSRC( S, X, Y, R, STATUS )
 
 *    Convert position and radius to bounding rectangle
         CALL IMG_CIRCTOBOX( X, Y, R, I1, I2, J1, J2, STATUS )
@@ -1709,8 +2085,10 @@
 *  Local Variables:
       REAL			MINFR, MAXFR		! Extreme residuals
       REAL			FR, RMSFR		! RMS frac residual
+      REAL			XW1, XW2, YW1, YW2	! Worst positions
 
       INTEGER			I, J			! Loop over image
+      INTEGER			ITEMID			! GUI noticeboard item
       INTEGER			MAXFR_X, MAXFR_Y	! Max position
       INTEGER			MINFR_X, MINFR_Y	! Min position
       INTEGER			NFR			! # residuals
@@ -1774,20 +2152,54 @@
 *  Compute RMS fractional residual
       IF ( NFR .GT. 1 ) THEN
         RMSFR = SQRT( RMSFR  / REAL(NFR))
-        IF ( .NOT. I_GUI ) THEN
+        IF ( I_GUI ) THEN
+          CALL NBS_FIND_ITEM( I_NBID, 'BG_RMS', ITEMID, STATUS )
+          CALL NBS_PUT_VALUE( ITEMID, 0, VAL__NBR, RMSFR, STATUS )
+        ELSE
           CALL MSG_SETR( 'FR' , RMSFR )
           CALL MSG_PRNT( '  RMS fractional residual ^FR' )
         END IF
+
       END IF
-      IF ( .NOT. I_GUI ) THEN
-        CALL MSG_SETR( 'R', MAXFR*100.0 )
-        CALL MSG_SETI( 'X', MAXFR_X )
-        CALL MSG_SETI( 'Y', MAXFR_Y )
+
+*  Convert worst positions to world coordinates
+      CALL IMG_PIXTOWORLD( REAL(MAXFR_X), REAL(MAXFR_Y), XW1, YW1,
+     :                       STATUS )
+      CALL IMG_PIXTOWORLD( REAL(MINFR_X), REAL(MINFR_Y), XW2, YW2,
+     :                       STATUS )
+
+*  Convert worst residuals to percentages
+      MAXFR = MAXFR*1.0
+      MINFR = MINFR*1.0
+
+*  Write to environment
+      IF ( I_GUI ) THEN
+
+*    Most +ve deviation
+        CALL NBS_FIND_ITEM( I_NBID, 'BG_MAXR', ITEMID, STATUS )
+        CALL NBS_PUT_VALUE( ITEMID, 0, VAL__NBR, MAXFR, STATUS )
+        CALL NBS_FIND_ITEM( I_NBID, 'BG_MAXX', ITEMID, STATUS )
+        CALL NBS_PUT_VALUE( ITEMID, 0, VAL__NBR, XW1, STATUS )
+        CALL NBS_FIND_ITEM( I_NBID, 'BG_MAXY', ITEMID, STATUS )
+        CALL NBS_PUT_VALUE( ITEMID, 0, VAL__NBR, YW1, STATUS )
+
+*    Most -ve deviation
+        CALL NBS_FIND_ITEM( I_NBID, 'BG_MINR', ITEMID, STATUS )
+        CALL NBS_PUT_VALUE( ITEMID, 0, VAL__NBR, MAXFR, STATUS )
+        CALL NBS_FIND_ITEM( I_NBID, 'BG_MINX', ITEMID, STATUS )
+        CALL NBS_PUT_VALUE( ITEMID, 0, VAL__NBR, XW2, STATUS )
+        CALL NBS_FIND_ITEM( I_NBID, 'BG_MINY', ITEMID, STATUS )
+        CALL NBS_PUT_VALUE( ITEMID, 0, VAL__NBR, YW2, STATUS )
+
+      ELSE
+        CALL MSG_SETR( 'R', MAXFR )
+        CALL MSG_SETR( 'X', XW1 )
+        CALL MSG_SETR( 'Y', YW2 )
         CALL MSG_PRNT( '  Worst +ve deviation from model is ^R% at '/
      :               /'pixel (^X,^Y)' )
-        CALL MSG_SETR( 'R', MINFR*100.0 )
-        CALL MSG_SETI( 'X', MINFR_X )
-        CALL MSG_SETI( 'Y', MINFR_Y )
+        CALL MSG_SETR( 'R', MINFR )
+        CALL MSG_SETR( 'X', XW2 )
+        CALL MSG_SETR( 'Y', YW2 )
         CALL MSG_PRNT( '  Worst -ve deviation from model is ^R% at '/
      :               /'pixel (^X,^Y)' )
       END IF
@@ -1946,26 +2358,16 @@
 *    Function declarations :
 *    Local constants :
       INTEGER MLINE
-      PARAMETER (MLINE=7)
-      INTEGER PLINE
-      PARAMETER (PLINE=7)
+      PARAMETER (MLINE=12)
 *    Local variables :
       CHARACTER*79 MTEXT(MLINE)
-     :/' CIRcle  - circular region     BOX     - box parallel to axes',
-     : ' POLygon - irregular polygon   SLIce   - rectangular slice',
-     : ' ANNulus - annular region      ELLipse - elliptical region',
-     : ' CONtour - within contour      XSPokes - ROSAT XRT spokes',
-     : ' WHOle   - whole image         INVert  - invert region',
-     : ' SHOw    - outline all regions LISt    - list ARD text',
-     : ' IMPort  - input ARD           EXPort  - output ARD'/
-      CHARACTER*79 PTEXT(PLINE)
-     :/' ADD     - add a new region to previous definition',
-     : ' AND     - select only overlap of new region with existing one',
-     : ' NOT     - select pixels outside the specified region',
-     : ' EXC     -   "      "       "     "      "       "',
-     : ' ADDNOT  - add pixels outside new region to existing region',
-     : ' ANDNOT  - select overlap of pixels outside new region',
-     : '           with existing region'/
+     :/' Source commands:',' ',
+     : '  ADDSRC  - Add a source to the source database',
+     : '  DELSRC  - Delete a source from the source database',
+     : '  MARKSRC - Mark source positions on current display',
+     : ' ', ' Sampling commands:',' ',
+     : ' ', ' Plotting commands:',' ',
+     : '  DISP    - Display background model image'/
       INTEGER ILINE
 *-
 
@@ -1977,10 +2379,5 @@
       ENDDO
 
       CALL MSG_BLNK()
-      CALL MSG_PRNT('With the following prefixes:')
-      CALL MSG_BLNK()
-      DO ILINE=1,PLINE
-        CALL MSG_PRNT(PTEXT(ILINE))
-      ENDDO
 
       END
