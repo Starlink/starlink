@@ -1,4 +1,4 @@
-      SUBROUTINE EDI1_SETLNK( LHS, RHS, STATUS )
+      SUBROUTINE EDI1_SETLNK( NARG, ARGS, OARG, STATUS )
 *+
 *  Name:
 *     EDI1_SETLNK
@@ -10,17 +10,19 @@
 *     Starlink Fortran
 
 *  Invocation:
-*     CALL EDI1_SETLNK( LHS, RHS, STATUS )
+*     CALL EDI1_SETLNK( NARG, ARGS, OARG, STATUS )
 
 *  Description:
 *     Establishes ADI file link between high level objects Scalar, Array
 *     and BinDS and the HDSfile.
 
 *  Arguments:
-*     LHS = INTEGER (given)
-*        ADI identifier of high level object
-*     RHS = INTEGER (given)
-*        ADI identifier of low level object
+*     NARG = INTEGER (given)
+*        Number of method arguments
+*     ARGS(*) = INTEGER (given)
+*        ADI identifier of method arguments
+*     OARG = INTEGER (returned)
+*        Output data
 *     STATUS = INTEGER (given and returned)
 *        The global status.
 
@@ -84,10 +86,14 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'ADI_PAR'
       INCLUDE 'DAT_PAR'
 
 *  Arguments Given:
-      INTEGER                   LHS, RHS
+      INTEGER                   NARG, ARGS(*)
+
+*  Arguments Returned:
+      INTEGER                   OARG
 
 *  Status:
       INTEGER 			STATUS             	! Global status
@@ -123,7 +129,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Extract locator from HDSfile
-      CALL ADI1_GETLOC( RHS, LOC, STATUS )
+      CALL ADI1_GETLOC( ARGS(2), LOC, STATUS )
 
 *  Object is primitive?
       CALL DAT_PRIM( LOC, PRIM, STATUS )
@@ -223,7 +229,7 @@
           CALL ADI1_CCH2AC( CLOC, 'UNITS', LID, 'Units', STATUS )
 
 *      Update list description
-          CALL EDI0_UPDLD( LHS, LID, STATUS )
+          CALL EDI0_UPDLD( ARGS(1), LID, STATUS )
 
         END IF
 
@@ -234,10 +240,10 @@
       END DO
 
 *  Dataset title
-      CALL ADI1_CCH2AC( LOC, 'TITLE', LHS, 'Title', STATUS )
+      CALL ADI1_CCH2AC( LOC, 'TITLE', ARGS(1), 'Title', STATUS )
 
 *  Write class members
-      CALL ADI_CPUT0I( LHS, 'NEVENT', NEVENT, STATUS )
+      CALL ADI_CPUT0I( ARGS(1), 'NEVENT', NEVENT, STATUS )
 
 *  Report any errors
  99   IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'EDI1_SETLNK', STATUS )
