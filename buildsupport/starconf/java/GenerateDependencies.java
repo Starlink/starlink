@@ -152,16 +152,24 @@ public class GenerateDependencies {
             }
             alldeps.addAll(builddeps);
 
+            // Emit the target
             System.out.print(manifestString + c.getName() + ':');
+
+            // Emit the list of dependencies
             Component lastComponent = null;
             for (Iterator cpts=alldeps.iterator(); cpts.hasNext(); ) {
                 Component cpt = ((Dependency)cpts.next()).component();
-                if (cpt != lastComponent) {
+                // Don't emit duplicate dependencies;
+                // and don't emit a dependency of a component on itself
+                // (which is possible but harmless, and confuses make).
+                if (cpt != lastComponent && cpt != c) {
                     System.out.print(newlineString + manifestString + cpt);
                     lastComponent = cpt;
                 }
             }
             System.out.println();
+
+            // Emit the rule
             System.out.println(cdString + c.componentPath() + " \\");
             if (c.getBuildsupport() != Component.BUILDSUPPORT_NO) {
                 System.out.println(makeBuildsupportString);
