@@ -37,11 +37,14 @@
 //#include <iostream>		// debug code writes to cerr
 
 #ifdef HAVE_CSTD_INCLUDE
-#include <cstdio>
-#include <cctype>
+#  include <cstdio>
+#  include <cctype>
+#  if CCTYPE_IN_STD
+   using std::isalnum;
+#  endif
 #else
-#include <stdio.h>
-#include <ctype.h>
+#  include <stdio.h>
+#  include <ctype.h>
 #endif
 
 XPMBitmap::XPMBitmap (const int w, const int h)
@@ -65,7 +68,7 @@ void XPMBitmap::write (const string filename)
     if (dotpos == string::npos) dotpos = filename.length();
     string fnroot_str = "";
     for (unsigned int charno=(unsigned int)seppos; charno<dotpos; charno++)
-	fnroot_str += (STD::isalnum(filename[charno]) ? filename[charno] : '_');
+	fnroot_str += (isalnum(filename[charno]) ? filename[charno] : '_');
     const char *fnroot = fnroot_str.c_str();
 
     fprintf (op, "/* XPM */\n");
