@@ -1344,7 +1344,7 @@ AC_DEFUN([AC_F77_HAVE_OPEN_READONLY],
 # given as  argument to the OPEN statement.  The `mungedspecifier' is the
 # `specifier' converted to uppercase and with all characters outside
 # [a-zA-Z0-9_] deleted.  Note that this may include `specifiers' such
-# as `access=append' and `[access=sequential,recl=1]' (note quoting of
+# as "access='append'" and "[access='sequential',recl=1]" (note quoting of
 # comma) to check combinations of specifiers.  You may not include a
 # space in the `specifier', even quoted.  Each argument must be a
 # maximum of 65 characters in length (to abide by Fortran 77
@@ -1376,42 +1376,40 @@ AC_DEFUN([AC_FC_OPEN_SPECIFIERS],
 ])# AC_FC_OPEN_SPECIFIERS
 
 
-# AC_FC_CHECK_INTRINSICS(function ...)
-# ------------------------------------
+# AC_FC_CHECK_INTRINSICS(intrinsic-function ...)
+# ----------------------------------------------
 #
 # Like AC_CHECK_FUNCS, but instead determine the intrinsics available
 # to the Fortran compiler.  For each intrinsic in the
 # (whitespace-separated and case-insensitive) argument list, define
-# HAVE_INTRINSIC_intrinsic if it is available.  For example,
-# AC_FC_CHECK_INTRINSICS(sin) would define HAVE_INTRINSIC_SIN if the
-# `sin' intrinsic function were available (there are probably rather
-# few Fortrans which don't have this function).
-#
-# XXX: I think it should be safe enough to give a real argument to each
-# intrinsic below, and assign it to a real result -- that's more likely
-# to cause run-time than compilation or link errors, which are what we
-# care about here.
-#
+# HAVE_INTRINSIC_intrinsic-function (uppercased) if it is available.
+# For example, AC_FC_CHECK_INTRINSICS(sin) would define
+# HAVE_INTRINSIC_SIN if the `sin' intrinsic function were available
+# (there are probably rather few Fortrans which don't have this
+# function).  The macro works for both intrinsic functions and
+# intrinsic subroutines.
 AC_DEFUN([AC_FC_CHECK_INTRINSICS],
-         [AC_REQUIRE([AC_PROG_FC])dnl
-          AC_LANG_PUSH([Fortran])
-          AC_FOREACH([IntrinsicName],
-                     dnl In case the user is mad, escape impossible names
-                     m4_bpatsubst(m4_toupper([$1]), [[^a-zA-Z0-9_ ]], [_]),
-                     [AC_CACHE_CHECK([whether ${FC} supports intrinsic ]IntrinsicName,
-                                     [ac_cv_fc_has_]IntrinsicName,
-                                     [AC_LINK_IFELSE([AC_LANG_PROGRAM([],[
-      REAL X
-      X = IntrinsicName[(1.)]
+  [AC_REQUIRE([AC_PROG_FC])dnl
+   AC_LANG_PUSH([Fortran])
+   AC_FOREACH([IntrinsicName],
+              dnl In case the user is mad, escape impossible names
+              m4_bpatsubst(m4_toupper([$1]), [[^a-zA-Z0-9_ ]], [_]),
+              [AC_CACHE_CHECK([whether ${FC} supports intrinsic ]IntrinsicName,
+                              [ac_cv_fc_has_]IntrinsicName,
+                              [AC_COMPILE_IFELSE([AC_LANG_PROGRAM([],[
+dnl All we need do is attempt to declare the thing as an intrinsic, 
+dnl since it is an error to thus declare a symbol which is not
+dnl in fact an intrinsic function.
+      intrinsic IntrinsicName
 ])],
-                                          ac_cv_fc_has_[]IntrinsicName=yes,
-                                          ac_cv_fc_has_[]IntrinsicName=no)])
-                      if test $ac_cv_fc_has_[]IntrinsicName = yes; then
-                          AC_DEFINE([HAVE_INTRINSIC_]IntrinsicName, 1,
-                                    [Define to 1 if the Fortran compiler supports intrinsic ]IntrinsicName)
-                      fi
-                     ])
-         AC_LANG_POP([Fortran])
+                               ac_cv_fc_has_[]IntrinsicName=yes,
+                               ac_cv_fc_has_[]IntrinsicName=no)])
+               if test $ac_cv_fc_has_[]IntrinsicName = yes; then
+                   AC_DEFINE([HAVE_INTRINSIC_]IntrinsicName, 1,
+                             [Define to 1 if the Fortran compiler supports intrinsic ]IntrinsicName)
+               fi
+              ])
+   AC_LANG_POP([Fortran])
 ])# AC_FC_CHECK_INTRINSICS
 
 

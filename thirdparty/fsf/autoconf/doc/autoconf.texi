@@ -5978,17 +5978,19 @@ calls @ovar{action-if-failure} (defaults to exiting with an error
 message).
 @end defmac
 
-@defmac AC_FC_CHECK_INTRINSICS (@var{intrinsic}@dots{})
+@defmac AC_FC_CHECK_INTRINSICS (@var{intrinsic-function}@dots{})
 @acindex AC_FC_CHECK_INTRINSICS
 
 Like @code{AC_CHECK_FUNCS}, but instead determine the intrinsics available
 to the Fortran compiler.  For each intrinsic in the
 (whitespace-separated and case-insensitive) argument list, define
-@code{HAVE_INTRINSIC_@var{intrinsic}} if it is available.  For example,
-@samp{AC_FC_CHECK_INTRINSICS(sin)} would define
+@code{HAVE_INTRINSIC_@var{intrinsic-function}} (uppercased) if it is
+available.  For example, @samp{AC_FC_CHECK_INTRINSICS(sin)} would define
 @code{HAVE_INTRINSIC_SIN} if the @code{sin} intrinsic function were
 available (there are probably rather few Fortrans which don't have this
 function).
+
+The macro works for both intrinsic functions and intrinsic subroutines.
 
 @end defmac
 
@@ -6004,8 +6006,8 @@ define @code{HAVE_FC_OPEN_@var{mungedspecifier}} if the specifier may be
 given as argument to the @code{OPEN} statement.  The
 @var{mungedspecifier} is the @var{specifier} argument converted to
 uppercase and with all characters outside @code{[a-zA-Z0-9_]} deleted.
-Note that this may include `specifiers' such as @code{access=append} and
-@code{[access=sequential,recl=1]} (note quoting of comma) to check
+Note that this may include `specifiers' such as @code{access='append'} and
+@code{[access='sequential',recl=1]} (note quoting of comma) to check
 combinations of specifiers.  You may not include a space in the
 `specifier', even quoted.  Each argument must be a maximum of 65
 characters in length (to abide by Fortran 77 line-length limits).
