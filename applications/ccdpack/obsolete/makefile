@@ -538,7 +538,7 @@ PRIVATE_SCRIPTS = dgeneric
 PRIVATE_INCLUDES = ccd1_fdcm ccd1_fitcm ccd1_memcm ccd1_moscm \
  ccd1_mospr ccd1_par ccd1_tmpcm fio1_clog hlpcmd.inc ira_err ira_par \
  irg_com irg_err irg_fac irg_par irh_com irh_err irh_par ndf_const \
- user_err irg_err.h slv.h ast_par
+ user_err irg_err.h slv.h
 
 #  List of external include files.  These are files which are required
 #  in order to build the package but form part of other, externally
@@ -840,12 +840,11 @@ BUILT_FILES = $(LINK_SCRIPT1) $(LINK_SCRIPT2) \
 INCLUDE_LINKS = $(EXTERNAL_INCLUDES) CCD1_FDCM CCD1_FITCM CCD1_MEMCM \
                 CCD1_MOSCM CCD1_MOSPR CCD1_PAR CCD1_TMPCM FIO1_CLOG \
                 HLPCMD.INC IRA_ERR IRA_PAR IRG_COM IRG_ERR IRG_FAC \
-                IRG_PAR IRH_COM IRH_ERR IRH_PAR NDF_CONST USER_ERR \
-                AST_PAR
+                IRG_PAR IRH_COM IRH_ERR IRH_PAR NDF_CONST USER_ERR
 
 #  Rules to set up links to locate each of the above include files.
 
-AST_PAR:	ast_par;	          $(LINK) $? $@
+AST_PAR:	$(STAR_INC)/ast_par;	  $(LINK) $? $@
 CCD1_FDCM:	ccd1_fdcm;	          $(LINK) $? $@
 CCD1_FITCM:	ccd1_fitcm;	          $(LINK) $? $@
 CCD1_MEMCM:	ccd1_memcm;	          $(LINK) $? $@
