@@ -116,7 +116,7 @@
       IF( STATUS .NE. SAI__OK ) RETURN
 
 *  Get the full file specification for the packages version file.
-      CALL KPG1_FLPTH( 'KAPPA_DIR', 'version', PATH, NC, STATUS )
+      CALL KPG1_FLPTH( 'KAPPA_DIR', 'version.dat', PATH, NC, STATUS )
 
 *  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999
@@ -139,7 +139,7 @@
       IF( STATUS .NE. SAI__OK ) THEN
          CALL ERR_REP( 'VERSION_ERR2', 'Failed to read the package '//
      :                 'version string from the file '//
-     :                 '$$KAPPA_DIR/version.', STATUS )
+     :                 '$$KAPPA_DIR/version.dat', STATUS )
          GO TO 999
       END IF
 
@@ -152,7 +152,7 @@
          CALL MSG_SETC( 'V', BUF( : NC ) )
          CALL ERR_REP( 'VERSION_ERR3', 'The package version '//
      :                 'string ''^V'', read from file '//
-     :                 '$$KAPPA_DIR/version is illegal.', STATUS )
+     :                 '$$KAPPA_DIR/version.dat is illegal.', STATUS )
          GO TO 999
       END IF
 
