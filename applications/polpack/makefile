@@ -407,7 +407,7 @@ PRIVATE_INCLUDES = $(I_SUB1) $(I_SUB2)
 
 I_SUB1 = ndg_com ndg_const ndg_err
 
-I_SUB2 = hlpcmd ccd1_par ccd1_memcm 
+I_SUB2 = hlpcmd ccd1_par ccd1_memcm kpg_par kpg_ast
 
 #  List of external include files.  These are files which are required
 #  in order to build the package but form part of other, externally
@@ -434,7 +434,7 @@ ndg_delet.f ndg1_hfind.f ndg1_ndfch.f ndg_annul.f \
 ndg_ndfas.f ndg1_pshdb.f ndg_asexp.f ndg_ndfcr.f \
 ndg1_sdfex.f ndg1_ndfdl.f
 
-F_SUB2 =  \
+F_SUB2 =  kpg1_rcatw.f kpg1_srcta.f \
 ccd1_asfio.f ccd1_cmprr.f ccd1_hvcon.f \
 ccd1_iscom.f ccd1_mfree.f ccd1_orvar.f \
 ccd1_qntlr.f ccd1_qsrtr.f ccd1_rdlin.f ccd1_rmcom.f \
@@ -638,7 +638,7 @@ $(IRAF_AUX_SCRIPTS) $(IRAF_AUX_PARFILES) $(IRAF_DEMO) $(IRAF_DATA)
 #  code.
 
 INCLUDE_LINKS = $(EXTERNAL_INCLUDES) \
-CCD1_PAR CCD1_MEMCM HLPCMD NDG_ERR NDG_CONST NDG_COM 
+CCD1_PAR CCD1_MEMCM HLPCMD NDG_ERR NDG_CONST NDG_COM KPG_PAR KPG_AST
 
 #  Rules to set up links to locate each of the above include files.
 
@@ -648,6 +648,9 @@ CCD1_MEMCM:  ccd1_memcm;          $(LINK) $? $@
 NDG_ERR:   ndg_err;               $(LINK) $? $@
 NDG_CONST: ndg_const;             $(LINK) $? $@
 NDG_COM:   ndg_com;               $(LINK) $? $@
+KPG_AST:   kpg_ast;               $(LINK) $? $@
+KPG_PAR:   kpg_par;               $(LINK) $? $@
+
 
 ast.h:   $(STAR_INC)/ast.h;   $(LINK) $? $@
 AST_PAR:   $(STAR_INC)/ast_par;   $(LINK) $? $@
@@ -1838,6 +1841,10 @@ polvec.o:	 SAE_PAR PAR_ERR PRM_PAR NDF_PAR AST_PAR
 pthlpo.o:	 SAE_PAR HLPCMD
 rdndf.o:	 SAE_PAR PAR_ERR MSG_PAR GRP_PAR NDG_ERR
 wrndf.o:	 SAE_PAR PAR_ERR MSG_PAR GRP_PAR NDG_ERR
+
+kpg1_rcatw.o: SAE_PAR DAT_PAR AST_PAR CAT_PAR GRP_PAR KPG_AST
+kpg1_srcta.o: SAE_PAR DAT_PAR GRP_PAR KPG_PAR AST_PAR KPG_AST 
+
 
 #-------------------------------------------------------------------------------
 #

@@ -19,9 +19,6 @@
 *     The SAE_PAR include file should be included prior to this file, in
 *     order to define constants which are needed here.
 
-*  Copyright:
-*     Copyright (C) 1998 Central Laboratory of the Research Councils
- 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
@@ -47,7 +44,7 @@
 *  be stored). The array is expanded if this proves insufficient. It is
 *  always truncated after the data have been written.
       INTEGER KPG__INAST
-      PARAMETER ( KPG__INAST = 64 )
+      PARAMETER ( KPG__INAST = 256 )
 
 *  Minimum length of _CHAR array elements accepted as valid when
 *  reading AST data that has been stored in HDS.

@@ -21,9 +21,6 @@
 *     The DAT_PAR include file should be included prior to this file, in 
 *     order to define constants which are needed here.
 
-*  Copyright:
-*     Copyright (C) 1998 Central Laboratory of the Research Councils
- 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
@@ -62,6 +59,9 @@
 *  Number of defined psynonyms.
       INTEGER ASTNPS
 
+*  Character to prepend to each line when writing an AST Object to a GRP group.
+      CHARACTER ASTGSP*1
+
 *  Common Blocks:
 *  =============
 
@@ -70,7 +70,7 @@
      :                  ASTNPS
 
 *  Character data.
-      COMMON /KPG_AST2/  ASTLC
+      COMMON /KPG_AST2/  ASTLC, ASTGSP
 
 *  Save common block contents.
       SAVE /KPG_AST1/

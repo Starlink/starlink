@@ -25,6 +25,10 @@ polvec.f polplot.f polbin.f polext.f polimage.f polsim.f
 IRAF_TASKS = polcal polexp polimp polka polvec polplot polbin polext \
 polimage polsim
 
+#  Fixed KAPPA subroutines which are here only until the fixes are
+#  available in KAPPA.
+KAPFIX = kpg1_rcatw.f kpg1_srcta.f kpg_par kpg_ast
+ 
 #  The contents of polpack_source.tar. 
 UNIX_SOURCE =  CCDShowHelp.tcl Polka.tcl Polka_procs.tcl adamMessageRelay \
 adamtask.tcl blank.bit ccd1_asfio.f ccd1_cmprr.f \
@@ -64,7 +68,7 @@ POLPACK_CONDITIONS
 
 #  All files which need to be extracted from the RCS repository in order
 #  to make a UNIX release. 
-UNIX_RELEASE =  $(UNIX_SOURCE) $(UNIX_OTHERS) $(FIGS)
+UNIX_RELEASE =  $(UNIX_SOURCE) $(KAPFIX) $(UNIX_OTHERS) $(FIGS)
 
 #  The contents of polpack.tar.
 UNIX_TOTAL = polka.htx_tar ndg_source.tar polpack_source.tar \
