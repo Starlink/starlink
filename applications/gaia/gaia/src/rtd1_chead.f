@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL RTD1_CCHRA( IN, NEL, OUT, STATUS )
+*     CALL RTD1_CHEAD( IN, NEL, OUT, STATUS )
 
 *  Description:
 *     This routine copies a 1D character array of a given size into

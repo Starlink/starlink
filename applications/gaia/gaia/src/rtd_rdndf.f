@@ -50,9 +50,8 @@
 *     NY = INTEGER (Returned)
 *        The Y dimension of the NDF.
 *     IPHEAD = INTEGER (Returned)
-*        Pointer to a character array containing the FITS items. The
-*        elements of this array are 80 characters long and there
-*        are NHEAD of.
+*        Pointer to a character array containing the FITS items. There
+*        are NHEAD elements, each of which is 80 characters long.
 *     NHEAD = INTEGER (Returned)
 *        The maximum number of items in IPHEAD.
 *     STATUS = INTEGER (Write)
