@@ -284,7 +284,6 @@
       CALL PAR_GET0C ('OUT', FIGFIL, STATUS )
       FIGEXT  =  '.dst'
       CLEN  =  CHR_LEN( FIGFIL )
-      CALL CHR_UCASE( FIGFIL )
       CALL CHR_APPND( FIGEXT, FIGFIL, CLEN )
 
 *   Create the new Figaro structure and associate a locator with it.
