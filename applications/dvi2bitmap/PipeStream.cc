@@ -288,10 +288,13 @@ void PipeStream::close(void)
 		keep_waiting = false;
 	    } else {
 		switch (i) {
-		  case 0:
+                  case 0:
+                    sigtosend = 0; // check process (really, just wait)
+                    break;
+		  case 1:
 		    sigtosend = SIGINT;
 		    break;
-		  case 1:
+		  case 2:
 		    sigtosend = SIGKILL;
 		    break;
 		  default:
@@ -351,8 +354,11 @@ int PipeStream::getTerminationStatus(void)
  * parent, it cannot be re-read.  Any trailing whitespace, including
  * end-of-line characters, is stripped.
  *
- * <p>If the current platform cannot support pipes, then return
- * <code>InputByteStreamError</code> immediately.
+ * It's possible that the returned string will be incomplete, if the
+ * process failed somehow; irrespective of whether this happened, this
+ * returns what it can, and if this condition matters to you, you
+ * should check the termination status with
+ * <code>getTerminationStatus</code>.
  *
  * @param allOfFile if true, then all of the file is read into the
  * string; if false (the default), only the first line is returned,
@@ -362,7 +368,8 @@ int PipeStream::getTerminationStatus(void)
  * @param gobbleRest if true (the default) then gobble the rest of
  * the file; has an effect only if <code>allOfFile</code> was false
  *
- * @return the stream as a string
+ * @return the stream contents (or some of it, depending on the
+ * parameter values) as a string
  * @throws InputByteStreamError if there is some problem reading the stream
  */
  string PipeStream::getResult(bool allOfFile, bool gobbleRest)
@@ -382,37 +389,38 @@ int PipeStream::getTerminationStatus(void)
 	    while (!eof())
 		getByte();
     }
+    string response = SS_STRING(resp);
     if (getVerbosity() > normal)
-        cerr << "PipeStream::getResult... got <" << SS_STRING(resp)
-             << ">" << endl;
+        cerr << "PipeStream::getResult: returning <" << response
+             << ">; eof=" << (eof() ? "true" : "false") << endl;
 
-    string response;
-    int status = getTerminationStatus();
-    if (WIFEXITED(status)) {
-	if (getVerbosity() > normal)
-	    cerr << "exit status=" << WEXITSTATUS(status) << endl;
-	if (WEXITSTATUS(status) != 0 && getVerbosity() >= normal) {
-	    cerr << "Command <" << orig_command_
-		 << "> exited with non-zero status "
-		 << WEXITSTATUS(status) << endl;
-	}
-	response = SS_STRING(resp);
-    } else if (WIFSIGNALED(status)) {
-	// if the command fails we may come here
-	if (getVerbosity() >= normal)
-	    cerr << "Signalled with signal number " << WTERMSIG(status)
-		 << (WCOREDUMP(status) ? " (coredump)" : " (no coredump)")
-		 << endl;
-	response = "";
-    } else if (WIFSTOPPED(status)) {
-	if (getVerbosity() >= normal)
-	    cerr << "Stopped on signal " << WSTOPSIG(status) << endl;
-	response = "";
-    } else {
-	char msg[100];
-	sprintf(msg, "Impossible status %d from child %d", status, getPid());
-	throw InputByteStreamError(msg);
-    }
+//     string response;
+//     int status = getTerminationStatus();
+//     if (WIFEXITED(status)) {
+// 	if (getVerbosity() > normal)
+// 	    cerr << "exit status=" << WEXITSTATUS(status) << endl;
+// 	if (WEXITSTATUS(status) != 0 && getVerbosity() >= normal) {
+// 	    cerr << "Command <" << orig_command_
+// 		 << "> exited with non-zero status "
+// 		 << WEXITSTATUS(status) << endl;
+// 	}
+// 	response = SS_STRING(resp);
+//     } else if (WIFSIGNALED(status)) {
+// 	// if the command fails we may come here
+// 	if (getVerbosity() >= normal)
+// 	    cerr << "Signalled with signal number " << WTERMSIG(status)
+// 		 << (WCOREDUMP(status) ? " (coredump)" : " (no coredump)")
+// 		 << endl;
+// 	response = "";
+//     } else if (WIFSTOPPED(status)) {
+// 	if (getVerbosity() >= normal)
+// 	    cerr << "Stopped on signal " << WSTOPSIG(status) << endl;
+// 	response = "";
+//     } else {
+// 	char msg[100];
+// 	sprintf(msg, "Impossible status %d from child %d", status, getPid());
+// 	throw InputByteStreamError(msg);
+//     }
 
     return response;
 }
@@ -468,7 +476,15 @@ void PipeStreamSignalHandling::expectAnother()
 	if (sigaction(SIGALRM, &sa_alrm, 0) < 0)
 	    throw new InputByteStreamError("Can't install ALRM handler");
 
+        if (InputByteStream::getVerbosity() > normal) {
+            cerr << "expectAnother: initialised to " << nprocs << "; set now";
+            for (int i=0; i<nprocs; i++)
+                cerr << " " << procs[i].pid << '/' << procs[i].status;
+            cerr << endl;
+        }
+
     } else if (nprocs_used >= nprocs-1) {
+        assert(nprocs > 0);
 	int newnprocs = nprocs * 2;
 	struct process_status* newprocs = new struct process_status[nprocs];
 	for (int i=0; i<nprocs; i++)
@@ -476,6 +492,12 @@ void PipeStreamSignalHandling::expectAnother()
 	nprocs = newnprocs;
 	delete[] procs;
 	procs = newprocs;
+        if (InputByteStream::getVerbosity() > normal) {
+            cerr << "expectAnother: expanded to " << nprocs << "; set now";
+            for (int i=0; i<nprocs; i++)
+                cerr << " " << procs[i].pid << '/' << procs[i].status;
+            cerr << endl;
+        }
     }
     if (sigprocmask(SIG_SETMASK, &oldmask, 0) < 0)
 	throw InputByteStreamError("Can't reset set signal mask");
@@ -501,9 +523,16 @@ bool PipeStreamSignalHandling::got_status(pid_t pid, int* status)
 	    *status = static_cast<int>(procs[i].status);
 	    procs[i].clear();
 	    nprocs_used--;
+            if (InputByteStream::getVerbosity() > normal)
+                cerr << "got_status: pid=" << pid << " status=" << *status
+                     << " ("
+                     << i << "/" << nprocs_used << "/" << nprocs
+                     << ")" << endl;
 	    return true;
 	}
     }
+    if (InputByteStream::getVerbosity() > normal)
+        cerr << "got_status: no status for pid " << pid << endl;
     return false;
 }
 
@@ -519,6 +548,7 @@ void PipeStreamSignalHandling::childcatcher(int signum)
 	    procs[i].pid = static_cast<sig_atomic_t>(caughtpid);
 	    procs[i].status = static_cast<sig_atomic_t>(status);
 	    nprocs_used++;
+            break;
 	}
     }
     // If i=nprocs, then there's no space to store this signal.
