@@ -137,7 +137,7 @@
 *        be found, or if a null value is supplied, the current picture itself 
 *        is used. The name BASE can also be supplied as a special case, which 
 *        causes the BASE picture to be used even though it will not in
-*        general fall within the current picture. [DATA]
+*        general fall within the current picture. ["DATA"]
 *     NUMBER = _INTEGER (Write)
 *        The number of positions selected.
 *     OUTCAT = FILENAME (Write)
