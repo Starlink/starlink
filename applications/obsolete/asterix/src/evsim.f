@@ -673,11 +673,12 @@ C      REAL             PGSIG                            ! Gaussian sigma in pix
      :                          PKERN, STATUS )
 
 *          Make copy of psf
-            CALL ARR_COP1R( TPW*TPW, PD(-PW,-PW,ISRC), PTEMP, STATUS )
+            CALL ARR_COP1R( (PW*2+1)**2, PD(-PW,-PW,ISRC), PTEMP,
+     :                     STATUS )
 
 *          Convolve
-            CALL PSF_CONVOLVE( TPW, TPW, PTEMP, TPW, TPW, PKERN,
-     :                         PD(-PW,-PW,ISRC), STATUS )
+            CALL PSF_CONVOLVE( PW*2+1, TPW*2+1, PTEMP, PW*2+1, PW*2+1,
+     :                         PKERN, PD(-PW,-PW,ISRC), STATUS )
 
           END IF
 
