@@ -6853,9 +6853,9 @@ c     :              '^DEV   ^POI  ^STAT'
       implicit none
 
 *   Arguments:
+      integer n                 ! Size of the arrays
       real v(n)                 ! Array we want the median of
       integer good(n)           ! Only examine v(i) when good(i)>0
-      integer n                 ! Size of the arrays
       real ws(n)                ! Workspace
       integer status            ! Inherited status
 
