@@ -909,6 +909,8 @@
       CHARACTER*1		C			! Source index code
       CHARACTER*33		SSTR			! Source data string
 
+      REAL			X, Y, R			! Source attrs
+
       INTEGER			ISRC			! Source loop
       INTEGER			ISTAT			! I/o status code
       INTEGER			ITEMID			! Source NBS item id
@@ -1057,6 +1059,7 @@
 
 *  Local Variables:
       INTEGER			I			! Loop over source attrs
+      INTEGER			ITEMID			! Source NBS item id
 *.
 
 *  Check inherited global status.
