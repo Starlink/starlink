@@ -1,0 +1,90 @@
+      SUBROUTINE KPS1_MED<T>( NARR, EL, IPTRS, WORK, ODAT, STATUS )
+*+
+*  Name:
+*     KPS1_MED<T>
+
+*  Purpose:
+*     Calculate medians of multiple mapped arrays.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL KPS1_MED<T>( NARR, EL, IPTRS, WORK, ODAT, STATUS )
+
+*  Description:
+*     Takes pointers to a number of mapped arrays, and works out the
+*     median of the corresponding elements of each one, storing the
+*     result in an output array.
+
+*  Arguments:
+*     NARR = INTEGER (Given)
+*        The number of input arrays.
+*     EL = INTEGER (Given)
+*        The size of each array.
+*     IPTRS( NARR ) = INTEGER (Given)
+*        Pointers to the start of each of the supplied arrays.  Each 
+*        has EL elements and is of type <TYPE>.
+*     WORK( NARR ) = <TYPE> (Returned)
+*        Workspace.
+*     ODAT( EL ) = <TYPE> (Returned)
+*        The array into which the result should be written.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Authors:
+*     MBT: Mark Taylor (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     4-DEC-2001 (MBT):
+*        Original version.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+
+*  Arguments Given:
+      INTEGER NARR
+      INTEGER EL
+      INTEGER IPTRS( NARR )
+
+*  Arguments Returned:
+      <TYPE> WORK( NARR )
+      <TYPE> ODAT( EL )
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      INTEGER I                  ! Loop variable
+      INTEGER J                  ! Loop variable
+      INTEGER NUSE               ! Number of pixels used (dummy)
+
+*.
+
+*  Check the inherited status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Loop over each element of the arrays.
+      DO I = 1, EL
+
+*  Assemble an array of the input pixels.
+         DO J = 1, NARR
+            CALL KPG1_RETR<T>( NARR, I, %VAL( IPTRS( J ) ), WORK( J ),
+     :                         STATUS )
+         END DO
+
+*  Calculate the median, writing it into the output array.
+         CALL KPG1_MEDU<T>( .TRUE., NARR, WORK, ODAT( I ), NUSE, STATUS )
+      END DO
+
+      END

@@ -1,0 +1,113 @@
+      SUBROUTINE KPS1_MMV<T>( NARR, EL, IPTRS, OMEAN, OVAR, STATUS )
+*+
+*  Name:
+*     KPS1_MMV<T>
+
+*  Purpose:
+*     Calculate means and variances of multiple mapped arrays.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL KPS1_MMV<T>( NARR, EL, IPTRS, ODAT, OVAR, STATUS )
+
+*  Description:
+*     Takes pointers to a number of mapped arrays, and works out the
+*     means and variances of the corresponding elements of each one,
+*     storing the result in output arrays.
+
+*  Arguments:
+*     NARR = INTEGER (Given)
+*        The number of input arrays.
+*     EL = INTEGER (Given)
+*        The size of each array.
+*     IPTRS( NARR ) = INTEGER (Given)
+*        Pointers to the start of each of the supplied arrays.  Each 
+*        has EL elements and is of type <TYPE>.
+*     OMEAN( EL ) = <TYPE> (Returned)
+*        The array into which the resulting mean values should be written.
+*     OVAR( EL ) = <TYPE> (Returned)
+*        The array into which the resulting variance values should be
+*        written.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Authors:
+*     MBT: Mark Taylor (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     4-DEC-2001 (MBT):
+*        Original version.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! VAL__BADx constants
+
+*  Arguments Given:
+      INTEGER NARR
+      INTEGER EL
+      INTEGER IPTRS( NARR )
+
+*  Arguments Returned:
+      <TYPE> OMEAN( EL )
+      <TYPE> OVAR( EL )
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      INTEGER I                  ! Loop variable
+      INTEGER J                  ! Loop variable
+      <TYPE> DATUM               ! Pixel value
+      <TYPE> NUSE<T>             ! Number of used pixels as a <TYPE>
+      <TYPE> SUM                 ! Accumulator for values
+      <TYPE> SUM2                ! Accumulator for squared values
+
+*.
+
+*  Check the inherited status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Loop over each element of the arrays.
+      DO I = 1, EL
+
+*  Loop over each of the input arrays accumulating totals.
+         SUM = 0<CONST>
+         SUM2 = 0<CONST>
+         NUSE<T> = 0<CONST>
+         DO J = 1, NARR
+            CALL KPG1_RETR<T>( NARR, I, %VAL( IPTRS( J ) ), DATUM,
+     :                         STATUS )
+            IF ( DATUM .NE. VAL__BAD<T> ) THEN
+               SUM = SUM + DATUM
+               SUM2 = SUM2 + DATUM * DATUM
+               NUSE<T> = NUSE<T> + 1<CONST>
+            END IF
+         END DO
+
+*  If we have found at least one good pixel, calculate and store the
+*  mean and variance.
+         IF ( NUSE<T> .GT. 0<CONST> ) THEN
+            OMEAN( I ) = SUM / NUSE<T>
+            OVAR( I ) = SUM2 / NUSE<T> - OMEAN( I ) * OMEAN( I )
+
+*  Otherwise store bad values.
+         ELSE
+            OMEAN( I ) = VAL__BAD<T>
+            OVAR( I ) = VAL__BAD<T>
+         END IF
+
+      END DO
+
+      END
