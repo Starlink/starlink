@@ -1039,17 +1039,17 @@
 *+
 *  Name:
 *     GRA1_ELLS
-
+*
 *  Purpose:
 *     Read in the data found in a text file created by ELLPRO or ELLFOU.
-
+*
 *  Language:
 *     Starlink Fortran 77
-
+*
 *  Invocation:
 *     CALL GRA1_ELLS(FIOID,RFAIL,POINTS,RESULT,
 *                    FILEN,BACK,SIGMA,PSIZE,XCO,YCO,CURCO,ZEROP,STATUS) 
-
+*
 *  Description:
 *     Reads in the lines of a text file until either '## END' or
 *     an end of file message is encountered. The lines found are
@@ -1060,17 +1060,22 @@
 *
 *     A simple check is made on value (where) possible to ensure that
 *     it is not absurd (i.e. negative background count value).
-
+*
 *  Authors:
 *     GJP: Grant Privett (STARLINK)
-
+*     NG: Norman Gray (Starlink, Glasgow)
+*
 *  History:
 *     12-DEC-1993 (GJP)
-*     (Original version)
-
+*       (Original version)
+*     11-Nov-1999 (NG)
+*       Modified so that the reading of ellipse parameters will allow
+*       (but ignore) columns beyond column 9.  See below for explanation.
+*  
+*
 *  Bugs:
 *     None known.
-
+*
 *-
 
 *  Type Definitions:                  ! No implicit typing
@@ -1226,7 +1231,11 @@
                   N=0
                   DO WHILE ((FAIL.EQ.0).AND.(N.NE.POINTS))
                      CALL GRA1_RNUMBS(FIOID,RFAIL,TEMP,NUMW,STATUS)
-                     IF ((RFAIL.EQ.0).AND.(NUMW.EQ.9)) THEN
+*                  Accept, but ignore, any columns beyond column 9.
+*                  This used to fail unless NUMW was .eq.9, but this prevents
+*                  other applications (specifically gaufit) from adding further
+*                  columns, without really gaining anything.
+                     IF ((RFAIL.EQ.0).AND.(NUMW.GE.9)) THEN
                         N=N+1
                         DO 100 I=1,9
                            RESULT(N,I)=TEMP(I)

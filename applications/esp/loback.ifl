@@ -7,6 +7,8 @@
 
 #  Authors:
 #     GJP: Grant Privett (STARLINK)
+#     MBT: Mark Taylor (Starlink, Cambridge)
+#     NG: Norman Gray (Starlink, Glasgow)
 #     {enter_new_authors_here}
 
 #  History:
@@ -16,6 +18,9 @@
 #        Modified COSYS to accept value 'C'.
 #     8-NOV-1999 (MBT):
 #        Removed COSYS.
+#     11-NOV-1999 (NG):
+#        Renumbered parameters: removal of COSYS meant that there was
+#        no parameter number 5.  Later ones renumbered.
 #     {enter_changes_here}
 
 #-
@@ -78,7 +83,7 @@ interface LOBACK
     type '_CHAR'
     access 'read'
     keyword 'OUT'
-    position 6
+    position 5
     prompt 'Output results file'
     ppath 'current,default'
     vpath 'prompt'
@@ -90,7 +95,7 @@ interface LOBACK
     type '_INTEGER'
     access 'read'
     keyword 'WIDE'
-    position 7
+    position 6
     prompt 'Min. box width'
     ppath 'current,default'
     vpath 'prompt'

@@ -6331,7 +6331,7 @@ c     :              '^DEV   ^POI  ^STAT'
 *     use.  The original one - a weighted standard error - is rational,
 *     but not obviously ideal.  I've added here the range and the
 *     squared-differences as alternatives, selectable by
-*     RTYPE=elp__resmedian and elp__lsq respectively.  (Also, this
+*     RTYPE=elp__resmd and elp__resls respectively.  (Also, this
 *     really shouldn't be called a `residual' - it's a statistic, but it
 *     would be dangerous to try changing variable names).
 *
@@ -6822,18 +6822,18 @@ c     :              '^DEV   ^POI  ^STAT'
 *+
 *  Name:
 *     ELP1_TEXTO
-
+*
 *  Purpose:
 *     Puts the most recent galaxy 'fit' results into a text format 
 *     ASCII output file.
-      
+*     
 *  Language:
 *     Starlink Fortran 77
-
+*
 *  Invocation:
 *      CALL ELP1_TEXTO(MODE,NDF1,VALIDP,ZEROP,RESULT,
 *                      XCO,YCO,BACK,SIGMA,PSIZE,LBND,FIOD,EXCLAIM,STATUS)    
-
+*
 *  Description:
 *     Creates a text file (if required) and places in it data from the
 *     most recent galaxy profile/fit generated.
@@ -6845,7 +6845,7 @@ c     :              '^DEV   ^POI  ^STAT'
 *         MODE=3  Close the file.
 *
 *     All radii values output are measured in pixels.
-
+*
 *  Arguments:               
 *     MODE = INTEGER (Given)
 *        Used to show which part of the text file is to be created. 
@@ -6875,19 +6875,26 @@ c     :              '^DEV   ^POI  ^STAT'
 *        An exclaimation mark was returned for the file name.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
-
+*
 *  Authors:
 *     GJP: Grant Privett (STARLINK)
-
+*     NG: Norman Gray (Starlink, Glasgow)
+*
 *  History:
 *     12-MAR-1993 (GJP)
-*     (Original version)
+*       (Original version)
 *     20-FEB-1997 (GJP)
-*     Output format modified.
- 
+*       Output format modified.
+*     20-Aug-1998 (NG)
+*       Output format modified.
+*     11-Nov-1999 (NG)
+*       Output format modified again!  The previous version, by adding a
+*       column, managed to confuse the graphs application.
+*
+*
 *  Bugs:
 *     None known.
-
+*
 *-
 
 *  Type Definitions:                  ! No implicit typing
@@ -7066,17 +7073,19 @@ c     :              '^DEV   ^POI  ^STAT'
          CALL FIO_WRITE(FIOD,LINE(:NCHAR),STATUS)
 
 *      Output a data description.
+*      Write the statistic in column 10 rather than next to the `count'.
+*      The latter would be more logical, but confuses the graphs application.
          NCHAR=0
-         TEXT='X       Y     Points    Rad(a)            Count  '//
-     :        '        PA     Ellipt     Dev   PPU'
-C         TEXT='X       Y     Points    Rad(a)     Count     '//
-C     :    'PA     Ellipt     Dev   PPU'
+C         TEXT='X       Y     Points    Rad(a)            Count  '//
+C     :        '        PA     Ellipt     Dev   PPU'
+         TEXT='X       Y     Points    Rad(a)     Count     '//
+     :    'PA     Ellipt     Dev   PPU    Statistic'
          CALL CHR_PUTC('!! '//TEXT,LINE,NCHAR)
          CALL FIO_WRITE(FIOD,LINE(1:NCHAR),STATUS)
          NCHAR=0
-         TEXT='                                     Mean    Statistic'
-         CALL CHR_PUTC('!! '//TEXT,LINE,NCHAR)
-         CALL FIO_WRITE(FIOD,LINE(1:NCHAR),STATUS)
+C         TEXT='                                     Mean    Statistic'
+C         CALL CHR_PUTC('!! '//TEXT,LINE,NCHAR)
+C         CALL FIO_WRITE(FIOD,LINE(1:NCHAR),STATUS)
 
 *      Output the actual values.
          DO 400 I=1,VALIDP
@@ -7087,13 +7096,13 @@ C     :    'PA     Ellipt     Dev   PPU'
             CALL MSG_FMTI('N','I3',INT(RESULT(8,I)))
             CALL MSG_FMTR('RAD','F8.2',RESULT(4,I))
             CALL MSG_FMTR('VAL','F10.1',RESULT(6,I))
-            CALL MSG_FMTR('MEDN','F10.1',RESULT(ELP__STAT,I))
-            CALL MSG_FMTR('POS','F6.1',RESULT(5,I))
+             CALL MSG_FMTR('POS','F6.1',RESULT(5,I))
             CALL MSG_FMTR('ELL','F5.3',RESULT(3,I))
             CALL MSG_FMTR('DEV','F8.1',RESULT(7,I))
             CALL MSG_FMTR('POI','F4.0',RESULT(9,I))
-            TEXT='^X  ^Y    ^N   ^RAD  ^VAL  ^MEDN  ^POS   ^ELL'//
-     :           '  ^DEV  ^POI '
+            CALL MSG_FMTR('MEDN','F10.1',RESULT(ELP__STAT,I))
+           TEXT='^X  ^Y    ^N   ^RAD  ^VAL  ^POS   ^ELL'//
+     :           '  ^DEV  ^POI  ^MEDN'
 
 *         Output the results in suitably formatted form.
             NCHAR=0
@@ -7180,23 +7189,23 @@ C     :    'PA     Ellipt     Dev   PPU'
 *+
 *  Name:
 *     ELP1_TRANS
-
+*
 *  Purpose:
 *     Transfer data from the mapped NDF to a dynamic memory array.
-      
+*     
 *  Language:
 *     Starlink Fortran 77
-
+*
 *  Invocation:
 *      CALL ELP1_TRANS(ELEMS,ARRAY0,ARRAY1,STATUS)    
-
+*
 *  Description:
 *      Copies data from the currently mapped source NDF 'DATA' array and 
 *      transfers it into the PSX dynamic memory allocated for temporary
 *      storage. All manipulation is then carried out on that. The routine
 *      allows it to be refreshed whenever a new profile is required. 
 *      
-
+*
 *  Arguments:               
 *     ELEMS = INTEGER (Given)
 *        Number of elements in the data NDF.                  
@@ -7206,17 +7215,17 @@ C     :    'PA     Ellipt     Dev   PPU'
 *        Array into which the mapped NDF will be transfered.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
-
+*
 *  Authors:
 *     GJP: Grant Privett (STARLINK)
-
+*
 *  History:
 *     22-FEB-1993 (GJP)
-*     (Original version)
-
+*       (Original version)
+*
 *  Bugs:
 *     None known.
-
+*
 *-
 
 *  Type Definitions:                  ! No implicit typing
