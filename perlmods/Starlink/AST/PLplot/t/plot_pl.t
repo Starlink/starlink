@@ -82,7 +82,7 @@ my $ytop    = 0.5 * ( $y1 + $y2 + $ny * $scale );
 # ---------
 my $array = read_file( $file );
 
-Graphics::PLplot::plimage($array, $nx, $ny,
+Graphics::PLplot::plimage($array,
 			  $xleft, $xright, 
 			  $ybottom, $ytop,
 			  0,12000,
@@ -92,7 +92,7 @@ Graphics::PLplot::plimage($array, $nx, $ny,
 
 # Change FrameSet
 # ---------------
-#$wcsinfo->Set( System => "GALACTIC" );
+#$wcsinfo->Set( System => "Ecliptic" );
 
 # AST axes
 # --------
