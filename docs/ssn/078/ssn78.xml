@@ -5262,6 +5262,53 @@ file.f: file.$(FPP_SRC_EXT)
             we can do at configure time); and by the
             <code>$STARLINK/bin</code> directory.</p>
 
+          <p>If the program in question cannot be found, the the
+            substitution variable is set to be the name of the program
+            without any path, in the expectation or hope that the
+            program will eventually end up in the path.  This is not
+            ideal, but it is the best that can be done in the
+            important case where the program is being configured as
+            part of bootstrapping build, and thus before any packages
+            have been built and installed, so that there is in fact no
+            installed program to be found.  This heuristic will
+            obviously fail when the program to be checked for is not
+            in the path, and this will typically happen when
+            the second `package' argument is non-null.  The pattern to
+            use in this case is as follows.</p>
+
+          <p>Some components build their documentation using the (now
+            deprecated) <code>sst</code> component.  This uses the
+            <code>per-package-dirs</code> option, and so installs its
+            applications in a package-specific directory.  You would
+            therefore check for the <code>prolat</code> tool (for
+            example) in <code>configure.ac</code> using
+            <code>STAR_CHECK_PROGS(prolat,sst)</code>.  If the
+            <code>sst</code> component is in fact installed, this
+            would substitute <code>@PROLAT@</code> with the full path
+            to the application; but in a bootstrap build could do no
+            more than subsitute it with the bare program name
+            <code>prolat</code>, as described above.  In order to use
+            this within a <code>Makefile.am</code>, you would have to
+            use a rule like
+<verbatim>
+target: dependency
+        PATH=$$PATH:$(STARLINK)/bin/sst @PROLAT@ args...
+</verbatim>
+            where the <code>PATH</code> is temporarily augmented with
+            the installation location of the <code>sst</code>
+            component.  This is pretty safe, because the
+            <code>STARLINK</code> Makefile variable is always present
+            and always substituted.  Despite that, it is not ideal, since it
+            depends on undocumented (but unlikely to change in
+            practice) knowledge of how the <code>sst</code> component
+            is installed, and it is possible to think of convoluted
+            installation schemes which might trip this up.  Given that,
+            the only time this is likely to matter is during a
+            bootstrap build (at other times, <code>prolat</code> would
+            be installed already and so <code>@PROLAT@</code> would be
+            substituted with a full path), so it is unlikely to be a
+            problem in practice.</p>
+
         </subsect>
 
         <subsect id='macro-cnf-compatible-symbols' export='export'
@@ -5632,6 +5679,17 @@ LATEX2DVI='$$LATEX $$1; bibtex $$1; $$LATEX $$1'
           <p>The configure option
             <code>--without-stardocs</code><index>configure!options!--without-stardocs</index>
             suppresses building documenation.</p>
+
+          <p>It is occasionally necessary to add extra files to the
+            <code>.htx</code> tarball -- for example <code>.gif</code>
+            images, or other files referenced by the HTML version of
+            the documentation.  To request that extra files should be
+            added to the <code>starnnn.htx_tar</code> archive, you
+            should create a file <code>starnnn.htx_tar.extras</code>
+            listing the filenames which should be included, separated
+            by whitespace (spaces, tabs or newlines).  Though this
+            works, it is an unsightly mechanism, which we hope will
+            disappear in future.</p>
 
         </subsect>
 
