@@ -5,9 +5,10 @@
 # Create a TeX file with strut and mark specials in it, use
 # --query=bitmaps, and check that the correct stuff is reported.
 
-sub compare_bitmaps($\@);
+sub compare_bitmaps($$\@);
 
-sub compare_bitmaps ($\@) {
+sub compare_bitmaps ($$\@) {
+    my $testlabel = shift;
     my $cmd = shift;
     my $exref = shift;
     my $nerr = 0;
@@ -45,7 +46,7 @@ sub compare_bitmaps ($\@) {
             $i++;
         }
         if (!$isok) {
-            print STDERR "Test $ntests: expected [";
+            print STDERR "$testlabel, page $ntests: expected [";
             foreach $i (0..$#e) {
                 printf STDERR " %.1f", $e[$i];
             }
@@ -118,7 +119,7 @@ system("tex $prefix") == 0
 
 $cmd = sprintf("../dvi2bitmap --output=%s-%%d --query=bitmaps --resolution=%d --verbose=quiet %s.dvi",
 	       $prefix, 72*$m, $prefix);
-$nerrors += compare_bitmaps($cmd, @expected);
+$nerrors += compare_bitmaps("Test 1", $cmd, @expected);
 
 
 ########## test 2
@@ -137,18 +138,36 @@ foreach my $ev (@expected) {
 
 $cmd = sprintf("../dvi2bitmap --output=%s-%%d --query=bitmaps --resolution=%d --verbose=quiet --magnification=2 %s.dvi",
 	       $prefix, 72*$m, $prefix);
-$nerrors += compare_bitmaps($cmd, @texpected);
+$nerrors += compare_bitmaps("Test 2", $cmd, @texpected);
 
-# ########## test 3
+########## test 3
+#
+# Same, but with a --magnification of 5, so that the expected values
+# must be multiplied by 5.  This should show up more straightforward
+# rounding errors
+
+@texpected = ();
+foreach my $ev (@expected) {
+    my @t = ();
+    foreach my $tt (@$ev) {
+        push (@t, $tt*5);
+    }
+    push (@texpected, \@t);
+}
+
+$cmd = sprintf("../dvi2bitmap --output=%s-%%d --query=bitmaps --resolution=%d --verbose=quiet --magnification=5 %s.dvi",
+	       $prefix, 72*$m, $prefix);
+$nerrors += compare_bitmaps("Test 3", $cmd, @texpected);
+
+# ########## test 4
 # #
 # # Same, but with a --magnification of 3 and --scaledown of 2
 # OOOOPs, this last one doesn't work:
-#Test 4: expected [ 60.0 30.0 60.0 30.0 ], got [ 60.0 30.0 60.0 31.0 ]
+#Test 4, page 4: expected [ 60.0 30.0 60.0 30.0 ], got [ 60.0 30.0 60.0 31.0 ]
 # ... so there's possibly either a rounding problem, or an off-by-one error,
 # still in the bounding-box scaling code
-print "XXX t8:test3 fails -- commented out!\n";
-
-# 
+print "XXX t8:test4 fails -- commented out!\n";
+#
 # @texpected = ();
 # foreach my $ev (@expected) {
 #     my @t = ();
@@ -157,10 +176,10 @@ print "XXX t8:test3 fails -- commented out!\n";
 #     }
 #     push (@texpected, \@t);
 # }
-# 
+
 # $cmd = sprintf("../dvi2bitmap --output=%s-%%d --query=bitmaps --resolution=%d --verbose=quiet --magnification=3 --scaledown=2 %s.dvi",
 # 	       $prefix, 72*$m, $prefix);
-# $nerrors += compare_bitmaps($cmd, @texpected);
+# $nerrors += compare_bitmaps("Test 4", $cmd, @texpected);
 
 ########## That's all....
 
