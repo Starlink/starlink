@@ -1,5 +1,5 @@
 *+  PSF_CHKAXES - Locate axis data in dataset and produce radian measures
-      SUBROUTINE PSF_CHKAXES( LOC, SLOT, STATUS )
+      SUBROUTINE PSF_CHKAXES( SLOT, STATUS )
 *
 *    Description :
 *
@@ -35,11 +35,10 @@
 *
 *    Global variables :
 *
-      INCLUDE 'ASTLIB(PSF_CMN)'
+      INCLUDE 'PSF_CMN'
 *
 *    Import :
 *
-      CHARACTER*(DAT__SZLOC)  LOC               ! Dataset locator
       INTEGER                 SLOT              ! PSF handle
 *
 *    Status :
@@ -85,6 +84,9 @@
         CALL PSF1_ALLOC( P_INST(SLOT), STATUS )
       END IF
 
+*    Already done this?
+      IF ( P_GOTAX(SLOT) ) RETURN
+
 *    Initialise
       P_EVDS(SLOT) = .FALSE.
       X_AX = 0
@@ -93,11 +95,11 @@
       T_AX = 0
 
 *    Primitive?
-      CALL DAT_PRIM( LOC, PRIM, STATUS )
+      CALL DAT_PRIM( P_LOC(SLOT), PRIM, STATUS )
       IF ( PRIM ) THEN
 
 *      Can't be event dataset so check data
-        CALL BDA_FIND( LOC, BDA, STATUS )
+        CALL BDA_FIND( P_LOC(SLOT), BDA, STATUS )
         CALL BDA_CHKDATA_INT( BDA, OK, NDIM, DIMS, STATUS )
 
 *      If data isn't ok then we can't do much anyway!
@@ -111,14 +113,14 @@
       ELSE
 
 *      Decide whether event or image dataset
-        CALL DAT_TYPE( LOC, TYPE, STATUS )
+        CALL DAT_TYPE( P_LOC(SLOT), TYPE, STATUS )
 
 *      If binned
         IF ( .NOT. ((TYPE(:4).EQ.'EVDS') .OR.
      :              (TYPE(:5).EQ.'EVENT')) ) THEN
 
 *        Check data
-          CALL BDA_FIND( LOC, BDA, STATUS )
+          CALL BDA_FIND( P_LOC(SLOT), BDA, STATUS )
           CALL BDA_CHKDATA_INT( BDA, OK, NDIM, DIMS, STATUS )
 
 *        Get number of axes
@@ -231,16 +233,16 @@
           P_EVDS(SLOT) = .TRUE.
 
 *        Look for X_CORR list
-          CALL DAT_THERE( LOC, 'X_CORR', XOK, STATUS )
+          CALL DAT_THERE( P_LOC(SLOT), 'X_CORR', XOK, STATUS )
           IF ( XOK ) THEN
-            CALL DAT_FIND( LOC, 'X_CORR', LLOC(1), STATUS )
+            CALL DAT_FIND( P_LOC(SLOT), 'X_CORR', LLOC(1), STATUS )
             LSUF = '_CORR'
           ELSE
 
 *          Look for X_RAW list
-            CALL DAT_THERE( LOC, 'X_RAW', XOK, STATUS )
+            CALL DAT_THERE( P_LOC(SLOT), 'X_RAW', XOK, STATUS )
             IF ( XOK ) THEN
-              CALL DAT_FIND( LOC, 'X_RAW', LLOC(1), STATUS )
+              CALL DAT_FIND( P_LOC(SLOT), 'X_RAW', LLOC(1), STATUS )
               LSUF = '_RAW'
 
 *          Give up
@@ -254,9 +256,9 @@
           END IF
 
 *        Look for matching Y list
-          CALL DAT_THERE( LOC, 'Y'//LSUF, YOK, STATUS )
+          CALL DAT_THERE( P_LOC(SLOT), 'Y'//LSUF, YOK, STATUS )
           IF ( YOK ) THEN
-            CALL DAT_FIND( LOC, 'Y'//LSUF, LLOC(2), STATUS )
+            CALL DAT_FIND( P_LOC(SLOT), 'Y'//LSUF, LLOC(2), STATUS )
           ELSE
             CALL MSG_PRNT( '! No Y axis list data present' )
             STATUS = SAI__ERROR
@@ -302,6 +304,9 @@
 
 *    Write axis identifiers
       CALL PSF1_PUTAXID( P_INST(SLOT), X_AX, Y_AX, E_AX, T_AX, STATUS )
+
+*    Mark as done
+      P_GOTAX(SLOT) = .TRUE.
 
 *    Tidy up
  99   IF ( STATUS .NE. SAI__OK ) THEN

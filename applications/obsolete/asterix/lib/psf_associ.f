@@ -4,6 +4,19 @@
       INCLUDE 'DAT_PAR'
       CHARACTER*(DAT__SZLOC) LOC
 	INTEGER ID,SLOT,STATUS
+      IF ( STATUS.NE.SAI__OK) RETURN
+      CALL ADI1_GETLOC( ID,LOC,STATUS)
+      CALL PSF_ASSOCI( LOC, SLOT, STATUS )
+
+      END
+
+*+  PSF_INTRO - Introduce a dataset to the psf system
+      SUBROUTINE PSF_INTRO( ID, SLOT, STATUS )
+      IMPLICIT NONE
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'DAT_PAR'
+      CHARACTER*(DAT__SZLOC) LOC
+        INTEGER ID,SLOT,STATUS
       LOGICAL THERE
       IF ( STATUS.NE.SAI__OK) RETURN
       CALL ADI_THERE( ID, '.PSF_SLOT', THERE, STATUS )
@@ -11,12 +24,14 @@
         CALL ADI_CGET0I( ID, '.PSF_SLOT', SLOT, STATUS )
       ELSE
         CALL ADI1_GETLOC( ID, LOC, STATUS )
-        CALL PSF_ASSOCI( LOC, SLOT, STATUS )
+        CALL PSF_GETSLOT( ID, SLOT, STATUS )
         CALL ADI_CPUT0I( ID, '.PSF_SLOT', SLOT, STATUS )
+        CALL PSF_CHKAXES( SLOT, STATUS )
       END IF
+
       END
 
-*+  PSF_ASSOCI - Associate existing dataset with PSF routine
+
       SUBROUTINE PSF_ASSOCI( LOC, SLOT, STATUS )
 *
 *    Description :
@@ -49,7 +64,7 @@
 *
 *    Global variables :
 *
-      INCLUDE 'ASTLIB(PSF_CMN)'
+      INCLUDE 'PSF_CMN'
 *
 *    Import :
 *
@@ -81,16 +96,11 @@
 *    Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Psf system initialised yet?
-      IF ( .NOT. PSFINIT ) THEN
-        CALL PSF_INIT( STATUS )
-      END IF
-
 *    Initialise
       GOOD_PSF = .FALSE.
 
 *    Allocate slot
-      CALL PSF_GETSLOT( SLOT, STATUS )
+      CALL PSF_GETSLOTL( LOC, SLOT, STATUS )
 
 *    Does the dataset have an attached spatial response?
       CALL HDX_FIND( LOC, 'MORE.ASTERIX.SPATIAL_RESP', SLOC, STATUS )

@@ -30,7 +30,7 @@
 *
 *    Global variables :
 *
-      INCLUDE 'ASTLIB(PSF_CMN)'
+      INCLUDE 'PSF_CMN'
 *
 *    Import :
 *
@@ -77,7 +77,7 @@
       IF ( VALID ) THEN
 
 *      Get axis data from dataset
-        CALL PSF_CHKAXES( LOC, SLOT, STATUS )
+        CALL PSF_CHKAXES( SLOT, STATUS )
 
 *      Identify axes
         CALL PSF_QAXES( SLOT, X_AX, Y_AX, E_AX, T_AX, STATUS )
@@ -297,7 +297,7 @@
 *
 *    Global variables :
 *
-      INCLUDE 'ASTLIB(PSF_CMN)'
+      INCLUDE 'PSF_CMN'
 *
 *    Import :
 *

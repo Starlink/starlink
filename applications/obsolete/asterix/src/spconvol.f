@@ -202,8 +202,8 @@
       CALL USI_ASSOCI( 'SOURCE', 'READ', SLOC, IPRIM, STATUS )
 
 *    Introduce to the psf system
-      CALL PSF_GETSLOT( IPSF, STATUS )
-      CALL PSF_CHKAXES( SLOC, IPSF, STATUS )
+      CALL PSF_GETSLOTL( SLOC, IPSF, STATUS )
+      CALL PSF_CHKAXES( IPSF, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Get its axis identifiers
