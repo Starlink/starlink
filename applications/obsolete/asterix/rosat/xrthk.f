@@ -115,6 +115,7 @@
 * Attempt to open the eventrate file
       CALL RAT_HDLOOKUP(HEAD,'EVRATE','EXTNAME',EXT,STATUS)
       ERFILE = SRT.ROOTNAME(1:CHR_LEN(SRT.ROOTNAME))//EXT
+	print*,erfile
 *
       CALL HDS_OPEN(ERFILE, 'READ', ERLOC, STATUS)
 *
