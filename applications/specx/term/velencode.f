@@ -68,7 +68,7 @@ D     PRINT *, '    vel law   = ', VDEFT
       DO WHILE (J.LE.6 .AND. VFRAMET.NE.VFRAMES(J)(1:3))
         J = J + 1
       END DO
-      print *,'J for frame = ',J,' and I', I
+D     print *,'J for frame = ',J,' and I', I
 
 *     Equate BARYCENTRIC with GEOCENTRIC
       IF (J.EQ.5) J = 4
