@@ -105,6 +105,7 @@
 
 *  Local Variables:
       INTEGER			EID			! EXTENSIONS identifier
+      INTEGER			NHDU			! HDU number
 
       LOGICAL			CREATED			! Did we create object?
       LOGICAL			THERE			! Object exists
@@ -147,8 +148,17 @@
 
 *  Did we create the structure?
       IF ( CREATED ) THEN
+
+*    Set the HDU number
+        CALL ADI_CGET0I( FID, '.NHDU', NHDU, STATUS )
+        NHDU = NHDU + 1
+        CALL ADI_CPUT0I( FID, '.NHDU', NHDU, STATUS )
+        CALL ADI_CPUT0I( ID, '.IHDU', NHDU, STATUS )
+
+*    Mark HDU data area as undefined
         CALL ADI_CPUT0L( ID, '.DEF_START', .FALSE., STATUS )
         CALL ADI_CPUT0L( ID, '.DEF_END', .FALSE., STATUS )
+
       END IF
 
 *  Report any errors
