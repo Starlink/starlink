@@ -12,7 +12,13 @@ libparsecon_adam_la_SOURCES = \
 
 compifl_SOURCES = \
 	compifl.f
-LDFLAGS = '`$(bindir)/chr_link_adam` `$(bindir)/ems_link_adam` `$(bindir)/subpar_link_adam` `./parsecon_link_adam`'
+
+# This must be compifl_LDFLAGS or AM_LDFLAGS, but _not_ plain LDFLAGS,
+# since that would override a configure variable.
+compifl_LDFLAGS = `$(bindir)/chr_link_adam` \
+	`$(bindir)/ems_link_adam` \
+	`$(bindir)/subpar_link_adam` \
+	`./parsecon_link_adam`
 ##LIBS = `$(bindir)/chr_link_adam` `$(bindir)/ems_link_adam` `$(bindir)/subpar_link_adam`
 ##LDFLAGS = `./parsecon_link_adam`
 
