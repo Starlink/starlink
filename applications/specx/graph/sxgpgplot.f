@@ -15,6 +15,8 @@
 *              in SXGCONB: ITEMP
 *              in SXGPLOTID: NTICKS
 *       Don't write "hardcopy file closed" if it isn't
+*    05 Mar 2002 (TIMJ)
+*       SAVE cursor position in SXGCURSOR
 *-----------------------------------------------------------------------
 
       SUBROUTINE SXGINIT
@@ -752,6 +754,10 @@ C     Local variables
 C     Functions
 
       INTEGER   PGCURSE
+
+C  Make sure we retain the position from the time this was called
+C  previously
+      SAVE U,V
 
 C  OK, go...
 
