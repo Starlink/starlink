@@ -18,6 +18,12 @@
  *                           pixels (too many occurences of "strange" limits).
  *                 06/03/98  Added changes to support XImage depths
  *                           greater than one byte.
+ *                 17/08/00  Changed getMinMax slightly. This now
+ *                           checks if the total height of the image
+ *                           is shown, rather than just testing
+ *                           y0_. This could be wrong for zoomed
+ *                           images that do not fill the display area
+ *                           making the region used overrun. 
  *
  * This file is included in the .C files for classes derived from class
  * ImageData. The file defines a number of member functions that are
@@ -147,8 +153,8 @@ void CLASS_NAME::getMinMax()
     int xmargin = 0, ymargin = 0;
     if (w == width_)
 	xmargin = int(w * 0.02);
-    if (y0_ == 0)
-	ymargin = int(h * 0.02);
+    if (h == height_)
+	ymargin = int(h * 0.02);  // PWD: change here, test was y0_ == 0
 
     int x0 = x0_ + xmargin;
     int y0 = y0_ + ymargin;
