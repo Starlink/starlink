@@ -36,6 +36,7 @@
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -45,6 +46,8 @@
 *        New log system.
 *     3-MAR-1997 (PDRAPER):
 *        Removed top-level locator code.
+*     14-MAY-2001 (MBT):
+*        Added initialisation of keyed parameter block.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -133,5 +136,11 @@
          CCD1_TMPPO( I ) = -1
          CCD1_TMPLO( I ) = DAT__NOLOC
  2    CONTINUE
+
+*  Initialise the keyed-variable info structures.  Although the first
+*  call to CCD1_KPLD initialises this, it is necessary to do it here
+*  since it must be reset for each task within a monolith.
+      CALL CCD1_KPLD( ' ', CCD1__BADSI, STATUS )
+
       END
 * $Id$
