@@ -1,5 +1,5 @@
       SUBROUTINE KPG1_ASFRM( PARAM, EPARAM, IWCS, WCDOM, DCDOM, PROMPT,
-     :                       STATUS )
+     :                       TOKEN, STATUS )
 *+
 *  Name:
 *     KPG1_ASFRM
@@ -12,7 +12,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG1_ASFRM( PARAM, EPARAM, IWCS, WCDOM, DCDOM, PROMPT, STATUS )
+*     CALL KPG1_ASFRM( PARAM, EPARAM, IWCS, WCDOM, DCDOM, PROMPT, TOKEN,
+*                      STATUS )
 
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
@@ -67,6 +68,12 @@
 *        flushed, the parameter is cancelled, and the user is re-prompted 
 *        for a new %PARAM value. Otherwise, the error is retained, and the 
 *        routine exits with STATUS set to SAI__ERROR.
+*     TOKEN = CHARACTER * ( * ) (Given)
+*        A string containing an MSG message token reference (eg "^FRED"). 
+*        The value of the token is used within error messages and should 
+*        describe the object (NDF, catalogue, etc) from which the supplied 
+*        FrameSet is derived. If the token reference string is blank it is 
+*        ignored.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -86,6 +93,8 @@
 *     16-DEC-1998 (DSB):
 *        Ensure each Domain is only included once in the list of available
 *        Domains.
+*     25-AUG-1999 (DSB):
+*        Added argument TOKEN.
 *     {enter_further_changes_here}
 
 *-
@@ -106,6 +115,7 @@
       CHARACTER WCDOM*(*)
       CHARACTER DCDOM*(*)
       LOGICAL PROMPT
+      CHARACTER TOKEN*(*)
 
 *  Status:
       INTEGER STATUS
@@ -118,28 +128,39 @@
 *  Local Variables:
       CHARACTER AVDOMS*128       ! List of the main available Domains
       CHARACTER BJ*1		 ! B for Besselian, or J for Julian equinox
-      CHARACTER FRAME*30         ! Co-ordinate Frame specification
       CHARACTER DOM*15           ! Domain name
+      CHARACTER FRAME*30         ! Co-ordinate Frame specification
+      CHARACTER OBJ*255          ! The value of the supplied message TOKEN
       CHARACTER SCSNAM*(IRA__SZSCS) ! IRAS90 name for sky coordinate system
       CHARACTER T1*16            ! Terminated domain name
       CHARACTER TEXT*50          ! Text 
       DOUBLE PRECISION DEFEP     ! Epoch of observation
       DOUBLE PRECISION EPOCH     ! Epoch of observation
       DOUBLE PRECISION EQU       ! Equinox 
-      INTEGER SKYFRM             ! Pointer to SkyFrame
       INTEGER FRM                ! Pointer to matching Frame
       INTEGER IAT	         ! Current length of string
       INTEGER IFRM               ! Sub-Frame index
       INTEGER JAT	         ! Current length of string
       INTEGER LSTAT              ! CHR status 
       INTEGER MAP                ! Pointer to mapping
+      INTEGER OBJLEN             ! The used length of the supplied message TOKEN
       INTEGER SF2                ! Copy of SkyFrame
+      INTEGER SKYFRM             ! Pointer to SkyFrame
       LOGICAL ISSCS              ! Is FRAME an IRAS90 SCS?
       LOGICAL THERE              ! Is the Domain already in the list?
 *.
 
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Get the value of any supplied message token. Do it now while we know
+*  the token is still defined.
+      IF( TOKEN .NE. ' ' ) THEN 
+         CALL MSG_LOAD( ' ', TOKEN, OBJ, OBJLEN, STATUS ) 
+      ELSE
+         OBJ = ' '
+         OBJLEN = 0
+      END IF        
 
 *  Begin an AST context.
       CALL AST_BEGIN( STATUS )
@@ -317,18 +338,33 @@
                CALL MSG_SETC( 'PAR', PARAM )
                CALL MSG_SETC( 'AVDOMS', AVDOMS )
    
-               CALL ERR_REP( 'KPG1_ASFRM_1', 'The co-ordinate system '//
-     :                    '(^FRAME) requested using parameter %^PAR '//
-     :                    'is not available. The available Frames '//
-     :                    'include ^AVDOMS.', STATUS )
+               IF( OBJLEN .EQ. 0 ) THEN
+                  CALL ERR_REP( 'KPG1_ASFRM_1', 'The co-ordinate '//
+     :                    'system (^FRAME) requested using parameter '//
+     :                    '%^PAR is not available. The available '//
+     :                    'Frames include ^AVDOMS.', STATUS )
+               ELSE
+                  CALL MSG_SETC( 'N', OBJ( : OBJLEN ) )
+                  CALL ERR_REP( 'KPG1_ASFRM_1b', 'The co-ordinate '//
+     :                    'system (^FRAME) requested using parameter '//
+     :                    '%^PAR is not available in ^N. The '//
+     :                    'available Frames include ^AVDOMS.', STATUS )
+               END IF
 
             ELSE
                CALL MSG_SETC( 'FRAME', FRAME )
                CALL MSG_SETC( 'PAR', PARAM )
    
-               CALL ERR_REP( 'KPG1_ASFRM_1', 'The co-ordinate system '//
-     :                    '(^FRAME) requested using parameter %^PAR '//
-     :                    'is not available.', STATUS )
+               IF( OBJLEN .EQ. 0 ) THEN
+                  CALL ERR_REP( 'KPG1_ASFRM_1c', 'The co-ordinate '//
+     :                    'system (^FRAME) requested using parameter '//
+     :                    '%^PAR is not available.', STATUS )
+               ELSE
+                  CALL MSG_SETC( 'N', OBJ( : OBJLEN ) )
+                  CALL ERR_REP( 'KPG1_ASFRM_1d', 'The co-ordinate '//
+     :                    'system (^FRAME) requested using parameter '//
+     :                    '%^PAR is not available in ^N.', STATUS )
+               END IF
             END IF
 
 *  If re-prompting is required, flush the error, cancel the parameters.

@@ -403,6 +403,8 @@
 *        co-ordinate handling.
 *     14-DEC-1998 (DSB):
 *        Added parameter JUST.
+*     25-AUG-1999 (DSB):
+*        Add TOKEN arg in call to KPG1_ASFRM.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -909,7 +911,8 @@
 *  requested Frame is not available in the Plot, re-prompt for a new
 *  FRAME only if we are not using DYNAMIC mode.
                CALL KPG1_ASFRM( 'FRAME', 'EPOCH', IPLOT, ' ', 
-     :                          'AGI_DATA', ( IMODE .NE. DYN ), STATUS )
+     :                          'AGI_DATA', ( IMODE .NE. DYN ), 
+     :                          ' ', STATUS )
 
 *  If the requested Frame was not available, annul the error.
                IF( STATUS .EQ. SAI__ERROR ) CALL ERR_ANNUL( STATUS )
