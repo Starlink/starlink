@@ -133,7 +133,7 @@
 *        [1]
 
 *  Examples:
-*     wcsreg * "ccd_reg,sky"
+*     wcsreg * [ccd_reg,sky]
 *        In this example all the NDFs in the current directory are
 *        being aligned.  All contain a frame in their WCS components
 *        in the SKY domain with approximate information about the 
@@ -151,7 +151,7 @@
 *        After this process, the NDFs can be presented to TRANNDF for
 *        resampling prior to making a mosaic.
 *     wcsreg "obs1_*,obs2_*" outdomain=final 
-*            domains="ccd_reg,inst_obs1,inst_obs2"
+*            domains=[ccd_reg,inst_obs1,inst_obs2]
 *        NDFs with names starting 'obs1_' and 'obs2_' are aligned.
 *        Where they share the CCD_REG domain this will be used for  
 *        alignment, but otherwise the domains INST_OBS1 and INST_OBS2
