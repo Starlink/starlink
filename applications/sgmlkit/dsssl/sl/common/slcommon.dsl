@@ -241,17 +241,19 @@ required.
 					    (nums (cdr hier-nums))
 					    (fmts (if inappendix
 						      %appendix-fmts
-						      %section-fmts)))
+						      %section-fmts))
+					    (sep ""))
 				   (if (or (null? nums)
 					   (= (car nums) 0))
 				       res
 				       (loop (string-append
 					      res
+					      sep
 					      (format-number (car nums)
-							     (car fmts))
-					      ".")
+							     (car fmts)))
 					     (cdr nums)
-					     (cdr fmts))))))
+					     (cdr fmts)
+					     ".")))))
 			(literal (if specify-type
 				     (if inappendix "Appendix " "Section ")
 				     "")
@@ -1200,6 +1202,23 @@ MLABEL child in the document instance.
     (if mlabel
 	(number->string (element-number mlabel))
 	#f)))
+
+<func>
+<name>nl-to-pairs
+<description>
+Transform a node-list into a list of pairs, where each pair consists of the 
+GI of the node, and the node.  This is useful when combinde with
+<funcname/assoc/.
+<returnvalue type='list of pairs'>List of pairs of GI plus node.
+<parameter>nl
+  <type>node-list
+  <description>A node-list to be transformed.
+<codebody>
+(define (nl-to-pairs nl)
+  (node-list-reduce nl
+		    (lambda (result nd)
+		      (append result (list (cons (gi nd) nd))))
+		    '()))
 
 <!-- now scoop up the remaining common functions, from sl-gentext.dsl -->
 <misccode>
