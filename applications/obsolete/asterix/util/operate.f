@@ -208,6 +208,12 @@
       CALL USI_NAMES( 'I', IFILES, STATUS )
       CALL ADI_CGET0C( IFID, 'TYPE', TYPE, STATUS)
 
+*  If overwriting required
+      IF ( STATUS .NE. SAI__OK ) THEN
+              CALL ERR_ANNUL(STATUS)
+              CALL ADI_CGET0C( OFID, 'TYPE', TYPE, STATUS)
+      ENDIF
+
 *  Is input a structured data object?
       CALL ADI_DERVD( OFID, 'Array', PRIM, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
