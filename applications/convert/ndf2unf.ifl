@@ -1,0 +1,74 @@
+## NDF2UNF - Converts an NDF to an unformatted file.
+
+#+
+#  Name:
+#     NDF2UNF.IFL
+
+#  Type of module:
+#     ADAM A-task parameter interface.
+
+#  Author:
+#     MJC: Malcolm J. Currie (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     1992 September 16 (MJC):
+#	 Original version.
+#     {enter_changes_here}
+
+#-
+
+interface NDF2UNF
+
+   helplib        'CONVERT_DIR:CONVERT'
+
+   parameter      COMP           # Data, quality or variance?
+      position    3
+      type        'LITERAL'
+      vpath       'DEFAULT'
+      ppath       'CURRENT,DYNAMIC'
+      prompt      'Array component to copy to the ASCII file'
+      helpkey     '*'
+#     in          'Data', 'Quality', 'Variance'
+      default     'Data'
+   endparameter
+
+   parameter      FITS           # Extract the FITS file
+      type        '_LOGICAL'
+      prompt      'Write a FITS header in the unformatted file?'
+      vpath       'DEFAULT'
+      default     FALSE
+      helpkey     '*'
+   endparameter
+
+   parameter      IN             # Input NDF
+      position    1
+      type        'NDF'
+      access      'READ'
+      vpath       'PROMPT'
+      ppath       'GLOBAL,CURRENT'
+      association '<->GLOBAL.DATA_ARRAY'
+      prompt      'Input NDF data structure'
+      helpkey     '*'
+   endparameter
+
+   parameter      NOPEREC        # Number of values per output record
+      position    4 
+      type        '_INTEGER'
+      vpath       'DYNAMIC'
+      ppath       'CURRENT,DYNAMIC'
+      prompt      'Number of data values per output record'
+      helpkey     '*'
+   endparameter
+
+   parameter      OUT            # Output unformatted file
+      position    2
+      type        'FILENAME'
+      access      'WRITE'
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'Sequential unformatted file'
+      helpkey     '*'
+   endparameter
+
+endinterface
