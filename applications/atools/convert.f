@@ -91,7 +91,9 @@
       INTEGER STATUS
 
 *  Local Variables:
+      CHARACTER BFD*50
       CHARACTER DOMLST*255
+      INTEGER BFI
       INTEGER FROM
       INTEGER RESULT
       INTEGER TO
@@ -134,8 +136,58 @@
      :                 'between the two supplied coordinate systems.', 
      :                 STATUS )
       
-*  Otherwise, write the FrameSet out to a text file.
+*  Otherwise, tell the user which Base Frames were used.
       ELSE
+
+         CALL MSG_BLANK( STATUS )
+         CALL MSG_OUT( 'CONVERT_MSG1', 'Conversion was achieved '//
+     :                 'by aligning the following Frames:', STATUS )
+
+         IF( AST_ISAFRAMESET( FROM, STATUS ) ) THEN 
+            BFI = AST_GETI( FROM, 'BASE', STATUS )
+            BFD = AST_GETC( AST_GETFRAME( FROM, AST__BASE, STATUS ), 
+     :                     'Domain', STATUS )
+
+            CALL MSG_SETI( 'BFI', BFI )
+            IF( BFD .NE. ' ' ) THEN 
+               CALL MSG_SETC( 'BFD', '(' )
+               CALL MSG_SETC( 'BFD', BFD )
+               CALL MSG_SETC( 'BFD', ')' )
+            ELSE
+               CALL MSG_SETC( 'BFD', ' ' )
+            ENDIF
+   
+            CALL MSG_OUT( 'CONVERT_MSG2', '   Frame ^BFI ^BFD in the '//
+     :                    '''FROM'' FrameSet.', STATUS )
+         ELSE
+            CALL MSG_OUT( 'CONVERT_MSG3', '   The supplied ''FROM'' '//
+     :                    'Frame.', STATUS )
+         END IF
+
+         IF( AST_ISAFRAMESET( TO, STATUS ) ) THEN 
+            BFI = AST_GETI( TO, 'BASE', STATUS )
+            BFD = AST_GETC( AST_GETFRAME( TO, AST__BASE, STATUS ), 
+     :                     'Domain', STATUS )
+
+            CALL MSG_SETI( 'BFI', BFI )
+            IF( BFD .NE. ' ' ) THEN 
+               CALL MSG_SETC( 'BFD', '(' )
+               CALL MSG_SETC( 'BFD', BFD )
+               CALL MSG_SETC( 'BFD', ')' )
+            ELSE
+               CALL MSG_SETC( 'BFD', ' ' )
+            ENDIF
+   
+            CALL MSG_OUT( 'CONVERT_MSG2', '   Frame ^BFI ^BFD in the '//
+     :                    '''TO'' FrameSet.', STATUS )
+         ELSE
+            CALL MSG_OUT( 'CONVERT_MSG3', '   The supplied ''TO'' '//
+     :                    'Frame.', STATUS )
+         END IF
+
+         CALL MSG_BLANK( STATUS )
+
+*  Write the FrameSet out to a text file.
          CALL ATL1_PTOBJ( 'RESULT', ' ', RESULT, STATUS )
       END IF
 
