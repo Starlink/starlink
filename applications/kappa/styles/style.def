@@ -78,7 +78,10 @@
       textlabgap(1)=0.03
       textlabgap(2)=0.03
 
+#  Use 2 divisions between major tick marks.
+      mintick=2
+
 #  Make the ticks marks (both major and minor) longer. The defaults are
 #  0.015 for major ticks and 0.007 for minor ticks.
-      majticklen=0.025
-      minticklen=0.012
+      majticklen=0.02
+      minticklen=0.01
