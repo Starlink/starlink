@@ -300,17 +300,17 @@
                ccdTclGetD( cinterp, buffer, py2 + j, status );
             }
          }
+         ccdTclGetD( cinterp, "set ZOOM", zoom, status );
+         ccdTclGetI( cinterp, "set MAXCANV", maxcnv, status );
+         ccdTclGetI( cinterp, "set WINX", windim + 0, status );
+         ccdTclGetI( cinterp, "set WINY", windim + 1, status );
+         ccdTclGetI( cinterp, "set PREVX", prvdim + 0, status );
+         ccdTclGetI( cinterp, "set PREVY", prvdim + 1, status );
+         cnfExprt( ccdTclGetC( cinterp, "set MARKSTYLEA", status ),
+                   mstya, mstya_length );
+         cnfExprt( ccdTclGetC( cinterp, "set MARKSTYLEB", status ),
+                   mstyb, mstyb_length );
       }
-      ccdTclGetD( cinterp, "set ZOOM", zoom, status );
-      ccdTclGetI( cinterp, "set MAXCANV", maxcnv, status );
-      ccdTclGetI( cinterp, "set WINX", windim + 0, status );
-      ccdTclGetI( cinterp, "set WINY", windim + 1, status );
-      ccdTclGetI( cinterp, "set PREVX", prvdim + 0, status );
-      ccdTclGetI( cinterp, "set PREVY", prvdim + 1, status );
-      cnfExprt( ccdTclGetC( cinterp, "set MARKSTYLEA", status ),
-                mstya, mstya_length );
-      cnfExprt( ccdTclGetC( cinterp, "set MARKSTYLEB", status ),
-                mstyb, mstyb_length );
       free( cmstya );
       free( cmstyb );
 
