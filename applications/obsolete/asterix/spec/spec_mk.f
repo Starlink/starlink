@@ -251,6 +251,8 @@
 	INTEGER MAXDATASET 	        ! highest dataset yet used
 	DATA MAXDATASET /0/
 
+        INTEGER L
+
 *    Global variables :
         INCLUDE 'SPEC_CMN_RZ'
 *-
@@ -346,7 +348,8 @@ D	        type*,'  energy bounds values dont agree'
               GOTO 9000
             END IF
 
-            CALL PSX_GETENV( 'MK_CUBE', MKCUBEFILE, STATUS )
+            CALL AST_PATH('SPEC_DIR','MK_CUBE','mkl_cube.sdf',
+     :                                    MKCUBEFILE,L,STATUS)
             CALL HDS_OPEN( MKCUBEFILE, 'READ', S_MKLOC(NDS), STATUS )
             IF(STATUS.NE.SAI__OK) GO TO 9000
 

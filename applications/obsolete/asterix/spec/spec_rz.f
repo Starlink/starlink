@@ -356,7 +356,8 @@ D	        type*,'  energy bounds values dont agree'
               GOTO 9000
             END IF
 
-            CALL PSX_GETENV( 'RZ_CUBE', RZCUBEFILE, STATUS )
+            CALL AST_PATH('SPEC_DIR','RZ_CUBE','rz_cube.sdf',
+     :                                   RZCUBEFILE,L,STATUS)
             CALL HDS_OPEN( RZCUBEFILE, 'READ', S_RZLOC(NDS), STATUS )
             IF(STATUS.NE.SAI__OK) GO TO 9000
 
