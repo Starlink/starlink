@@ -275,7 +275,7 @@ PACKAGE_STRING='star-applications 1.0'
 PACKAGE_BUGREPORT='ussc@star.rl.ac.uk'
 
 ac_unique_file="bootstrap"
-ac_subdirs_all="$ac_subdirs_all messgen"
+ac_subdirs_all="$ac_subdirs_all messgen sst"
 ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO AMTAR install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot subdirs LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
@@ -1667,7 +1667,7 @@ INSTALL_STRIP_PROGRAM="\${SHELL} \$(install_sh) -c -s"
 
 
 
-subdirs="$subdirs messgen"
+subdirs="$subdirs messgen sst"
 
 
           ac_config_files="$ac_config_files Makefile"
