@@ -1,4 +1,4 @@
-lib_LTLIBRARIES = libccdpack_gen.la
+noinst_LTLIBRARIES = libccdpack_gen.la
 libccdpack_gen_la_SOURCES = $(GENSRC:.gen=.f) \
                             $(GENRDSRC:.grd=.f) \
                             $(GENLRDICSRC:.glrdic=.f) \
