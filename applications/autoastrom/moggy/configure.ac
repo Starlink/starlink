@@ -9,7 +9,6 @@ dnl   $Id$
 AC_REVISION($Revision$)dnl
 
 
-dnl AC_INIT(moggy.C)
 AC_INIT(moggy, 0.1, [norman@astro.gla.ac.uk])
 
 AM_INIT_AUTOMAKE
@@ -267,12 +266,8 @@ dnl   makefile, if it is present in ast_wcslib).  If we can't find a
 dnl   copy, we supply one ourselves in SkyCatHoles.c -- see the
 dnl   discussion of this problem in that file.
 AC_LANG_PUSH(C)
-dnl AC_CHECK_FUNCS(glsfwd)
 AC_REPLACE_FUNCS([glsfwd slaDeuler])
 AC_LANG_POP(C)
-
-dnl echo LIBS=$LIBS
-dnl echo glsfwd=$ac_cv_func_glsfwd
 
 
 AC_CONFIG_FILES(Makefile t/Makefile t/runtests)
