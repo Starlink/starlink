@@ -4,6 +4,10 @@
 #
 # $Id$
 
+# C++ all-warnings flags:
+#  g++ -Wall  (GNU)
+#  CC +w2     (Sun Workshop compilers)
+#  cxx -w0    (Compaq compilers)
 CXX=@CXX@
 CXXFLAGS=@CXXFLAGS@
 DEFS=@DEFS@
