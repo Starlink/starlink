@@ -298,9 +298,10 @@ c      CHARACTER * ( DAT__SZLOC ) TSPLOC,ILOC,SLOC,QLOC,ULOC
 *  Determine the number of validated input images. If there are no valid
 *  input images then report an error and abort.
       NVAL = IVAL - 1
-      IF ( NVAL .EQ. 0 ) THEN
+      IF ( NVAL .EQ. 0 .AND. STATUS .EQ. SAI__OK ) THEN
+         STATUS = SAI__ERROR
          CALL ERR_REP( 'POLCAL_NOVALID', 'POLCAL: None of the input ' //
-     :        'NDFs have valid polarimetry extensions' , STATUS )
+     :        'NDFs have valid POLPACK extensions' , STATUS )
          GO TO 99
       ENDIF
 
@@ -388,9 +389,9 @@ c      CHARACTER * ( DAT__SZLOC ) TSPLOC,ILOC,SLOC,QLOC,ULOC
       
 *  If there are no valid pairs then quit.
       IF ( NPAIR .EQ. 0 ) THEN
-         CALL ERR_REP( 'POLCAL_NOPAIRS', ' POLCAL: There are no ' //
-     :        'valid polarimetry images. Cannot continue.', STATUS )
          STATUS = SAI__ERROR
+         CALL ERR_REP( 'POLCAL_NOPAIRS', 'POLCAL: There are no ' //
+     :        'usable images. Cannot continue.', STATUS )
          GO TO 99
       ENDIF
          
@@ -456,23 +457,30 @@ c      CHARACTER * ( DAT__SZLOC ) TSPLOC,ILOC,SLOC,QLOC,ULOC
 *  Consistency check: In linear mode both NQ and NU should be non-zero
 *  otherwise the polarisation cannot be calculated. In circular mode
 *  only NQ should ne non-zero.
+      IF ( STATUS .NE. SAI__OK ) GOTO 99
+
       IF ( NQ .EQ. 0 ) THEN
+         STATUS = SAI__ERROR
          CALL ERR_REP( 'POLCAL_BADLIN', 'POLCAL: There is not ' //
      :        'enough information to calculate the ' //
      :        'polarisation. Cannot continue', STATUS )
-         STATUS = SAI__ERROR
+         GO TO 99
+
       ELSE IF ( MODE .EQ. 'LINEAR' .AND. NU .EQ. 0 ) THEN
+         STATUS = SAI__ERROR
          CALL ERR_REP( 'POLCAL_BADLIN', 'POLCAL: There is not ' //
      :        'enough information to calculate the linear ' //
      :        'polarisation. Cannot continue', STATUS )
-         STATUS = SAI__ERROR
+         GO TO 99
+
       ELSE IF ( MODE .EQ. 'CIRCULAR' .AND. NU .NE. 0 ) THEN
+         STATUS = SAI__ERROR
          CALL ERR_REP( 'POLCAL_BADCIR', 'POLCAL: The detected ' //
      :        'images are compatible with linear polarimetry ' //
      :        'but MODE=CIRCULAR is selected. Cannot continue', STATUS )
-         STATUS = SAI__ERROR
+         GO TO 99
+
       ENDIF
-      IF ( STATUS .NE. SAI__OK ) GOTO 99
          
 *  Loop to map the input data and variances (if required). Loop through
 *  the polarisation data sets including partially complete ones.

@@ -391,8 +391,8 @@
          
 * If no estimates were possible then exit with an error and add context.
 
-      ELSE
-         IF ( STATUS .EQ. SAI__OK ) STATUS = SAI__ERROR
+      ELSE IF ( STATUS .EQ. SAI__OK ) THEN
+         STATUS = SAI__ERROR
          CALL ERR_REP( 'POL_CALF_NOF', 'POL_CALF: No F factor '//
      :                 'estimates could be made', STATUS )
       ENDIF
