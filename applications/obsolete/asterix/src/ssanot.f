@@ -56,6 +56,7 @@
 
       REAL			AXLO(2), AXHI(2)	! Axis limits
       REAL			AXPOS(2)       		! Axis position
+      REAL			LO, HI			! Axis extrema
       REAL                  	XC, YC                  ! Image coordinates
 
       INTEGER			APTR			! Axis data
@@ -201,10 +202,11 @@
 *    Get axis values for dataset
         CALL BDI_GETSHP( GID, 2, DIMS, NDIM, STATUS )
         DO IAX = 1, 2
-          CALL BDI_AXMAPR( GID, 1, 'Data', 'READ', APTR, STATUS )
-          CALL ARR_ELEM1R( APTR, DIMS(IAX), 1, AXLO(IAX), STATUS )
-          CALL ARR_ELEM1R( APTR, DIMS(IAX), DIMS(IAX), AXHI(IAX),
-     :                     STATUS )
+          CALL BDI_AXMAPR( GID, IAX, 'Data', 'READ', APTR, STATUS )
+          CALL ARR_ELEM1R( APTR, DIMS(IAX), 1, LO, STATUS )
+          CALL ARR_ELEM1R( APTR, DIMS(IAX), DIMS(IAX), HI, STATUS )
+          AXLO(IAX) = MIN(LO,HI)
+          AXHI(IAX) = MIN(LO,HI)
         END DO
 
 *    For each source
