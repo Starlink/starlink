@@ -85,14 +85,11 @@
       DOUBLE PRECISION   BASE_TAI               ! Atomic time
       DOUBLE PRECISION   ZEROEPOCH              ! Epoch of phase zero
       DOUBLE PRECISION   ZEROOFFSET             ! offset of zeroepoch from base_tai
-      DOUBLE PRECISION   AXZERO                 ! Axis1 zero time
 
       REAL               BASE, SCALE            ! Axis attributes
-      REAL               SUM                    ! General summation variable
       REAL               PERIOD                 ! Folding period
       REAL               CHISQ                  ! Chi-squared fit to constant
                                                 ! level (i.e.phase indept.)
-      REAL               TEM                    ! Dummy
 
       INTEGER            HLEN                   ! Length of a history string
       INTEGER            I                      ! Dummy variable for loops.
@@ -104,7 +101,6 @@
       INTEGER            NELM
       INTEGER            NELM2
       INTEGER            NACTDIM                ! Dimensionality of data
-      INTEGER            NVAL                   ! No.of values read
       INTEGER            VNDIM                  ! Dimensions of variance
       INTEGER            VDIMS(DAT__MXDIM)      ! size of variance
       INTEGER            VDIM(DAT__MXDIM)
@@ -132,7 +128,6 @@
       INTEGER            NDOF                   ! No. of d.o.f. for chi-squared
       INTEGER            IDIM(DAT__MXDIM)       ! Size of each dimension
       INTEGER            ODIM(DAT__MXDIM)
-      INTEGER            SAX(DAT__MXDIM)
       INTEGER            OAX(DAT__MXDIM)
       INTEGER            AXDIM
       INTEGER            INBINS                 ! Number of input bins/ period.
@@ -141,7 +136,7 @@
 
       BYTE               MASK                   ! Quality mask
 
-      LOGICAL            LOG,OK                 ! things ok?
+      LOGICAL            OK                 	! things ok?
       LOGICAL            VOK                    ! Variance present?
       LOGICAL            QOK                    ! Data quality present?
       LOGICAL            INPRIM                 ! Is input primitive object?
@@ -559,7 +554,7 @@ C            CALL MSG_PRNT( 'Maximum number of phase bins is ^INBINS' )
 *
 *    Local variables
 *
-      INTEGER            I,J,NB,NUM
+      INTEGER            NB,NUM
       REAL               DVAR, YBAR(1,L2,L3,L4,L5,L6,L7), PHA
       REAL               SUMVAR(1,L2,L3,L4,L5,L6,L7)
 *-
@@ -744,8 +739,8 @@ C            CALL MSG_PRNT( 'Maximum number of phase bins is ^INBINS' )
 *
 *    Local variables
 *
-      INTEGER            I,J,NB,NUM,NUM1,NBAD
-      REAL               DVAR, YBAR(1,L2,L3,L4,L5,L6,L7), PHA
+      INTEGER            NB,NUM,NUM1,NBAD
+      REAL               YBAR(1,L2,L3,L4,L5,L6,L7), PHA
       LOGICAL LMESS
 *-
 

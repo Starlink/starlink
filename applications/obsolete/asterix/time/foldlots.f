@@ -94,36 +94,23 @@
 
       DOUBLE PRECISION   BASE_TAI               ! Atomic time
       DOUBLE PRECISION   ZEROEPOCH              ! Epoch of phase zero
-      DOUBLE PRECISION   AXZERO                 ! Axis1 zero time
 
-      REAL               BASE, SCALE            ! Axis attributes
-      REAL               SUM                    ! General summation variable
       REAL               PERIOD                 ! Original period variable
       REAL               PSTART			! Start period
       REAL 		 PINC			! Period increment for range
 
       REAL               CHISQ			! Chi-squared fit to constant
                                                 ! level (i.e.phase indept.)
-      REAL               TEM                    ! Dummy
       REAL               TMIN, TMAX             ! Min and max times
       REAL               TSCALE                 ! Mean time increment
 
       INTEGER            HLEN                   ! Length of a history string
-      INTEGER            I                      ! Dummy variable for loops.
-      INTEGER            N
-      INTEGER            L
       INTEGER            NTOT                   ! Total no.of data points
       INTEGER            NGOOD                  ! Total no.of good data points
       INTEGER		 NPER			! No. of periods to fold at
       INTEGER            IERR                   ! Error flag from TIM_FOLD
       INTEGER            NBINS                  ! No. of phase bins
-      INTEGER            NELM
       INTEGER            NELM2
-      INTEGER            NACTDIM                ! Dimensionality of data
-      INTEGER            NVAL                   ! No.of values read
-      INTEGER            VNDIM                  ! Dimensions of variance
-      INTEGER            VDIMS(DAT__MXDIM)      ! size of variance
-      INTEGER            VDIM(DAT__MXDIM)
       INTEGER            DPNTR                  ! Pointer to data array
       INTEGER            TPNTR                  ! Pointer to axis data
       INTEGER            TWPNTR                 ! Pointer to width data
@@ -138,19 +125,14 @@
       INTEGER	 	 CQPTR			! Pointer to chi quality data
       INTEGER            WPTR                   ! Pointer to work array
       INTEGER            DELPTR
-      INTEGER            PTR
       INTEGER            NDOF                   ! No. of d.o.f. for chi-squared
-      INTEGER            ODIM(DAT__MXDIM)
       INTEGER            INBINS                 ! Number of input bins/ period.
-      INTEGER            SIZ
       INTEGER            USED                   ! # history text lines
 
       BYTE               MASK                   ! Quality mask
 
       LOGICAL            LVAR                   ! Is variance present ?
-      LOGICAL            LOG,OK                 ! things ok?
       LOGICAL            BOK                    ! BASE_TAI present
-      LOGICAL            BAD                    ! Any BAD data?
       LOGICAL            WEIGHT
 *
 *    Version id
@@ -520,7 +502,7 @@ C          NBINS = INBINS
 *    Local variables
 *
       INTEGER            A
-      INTEGER            I,J,NB,NUM,PCOUNTER
+      INTEGER            NB,NUM,PCOUNTER
       REAL               DVAR,YBAR,PHA
       REAL               SUMVAR
       REAL               CHIBEST
@@ -735,9 +717,8 @@ C          NBINS = INBINS
 *    Local variables
 *
       INTEGER            A
-      INTEGER            I,J,NB,PCOUNTER
-      REAL               DVAR, YBAR,PHA
-      REAL               SUMVAR
+      INTEGER            NB,PCOUNTER
+      REAL               YBAR,PHA
       REAL		 CHIBEST
       REAL 	 	 PSTART,PBEST
 *-
