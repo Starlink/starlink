@@ -124,12 +124,8 @@ more-or-less as much like the existing star2html output as possible.
 <codebody>
 (element docbody
    (let* ((title (getdocinfo 'title))
-          (authors (children (getdocinfo 'authorlist)))
           (rel (document-release-info))
           (vers (caddr rel))
-          (reldate (if (car rel)
-                       (format-date (car rel))
-                       "not released"))
           (dotvers (if vers (string-append "." vers) ""))
           (docwordref 
              (string-append (getdocnumber (current-node) 'asString) dotvers))
@@ -163,20 +159,9 @@ more-or-less as much like the existing star2html output as possible.
                        (literal docwordref) 
                        (make empty-element gi: "br")) 
                     (empty-sosofo))
-                (let loop ((to (empty-sosofo))
-                           (from authors))
-                   (if (node-list-empty? from)
-                       to
-                       (loop 
-                          (sosofo-append 
-                             to 
-                             (process-node-list (node-list-first from))
-                             (if (node-list-empty? (node-list-rest from))
-                                 (empty-sosofo)
-                                 (literal ", ")))
-                          (node-list-rest from))))
+                (getdocauthors)
                 (make empty-element gi: "br")
-                (literal reldate)))
+                (literal (getdocdate))))
          (if (and %starlink-banner% (not suppress-banner))
              (make element gi: "p" %starlink-banner%)
              (empty-sosofo))
@@ -186,11 +171,13 @@ more-or-less as much like the existing star2html output as possible.
                       attributes: (list (list "href" (starlink-hardcopy-server 
                                                       docref)))
                    (make empty-element gi: "img"
-                               attributes: '(("border" "0") 
-                                             ("src" "source.gif")))
+                               attributes: 
+                                  (list (list "border" "0") 
+                                        (list "src" (file-href "hardcopy"))))
                    (literal "Retrieve hardcopy")))
              (empty-sosofo))
          (make empty-element gi: "hr")
+         (process-children)
          (process-backmatter))))
         
 
