@@ -115,7 +115,7 @@
 *    Local variables :
 *
       CHARACTER*80           	HTXT(MXLINES)         	! History text
-      CHARACTER*30           	STR                   	! Format string
+      CHARACTER*(ADI__MXDIM)    STR                   	! Format string
 
       REAL			BIAS			! Data bias
       REAL                   	DMAX, DMIN            	! Max & min of data
@@ -358,11 +358,13 @@ c        CALL BDI_DELETE( OFID, 'Variance', STATUS )
       CALL AR7_PAD( NDIM, DIMS, STATUS )
 
 *  Get list of axis numbers into string
-      CALL STR_DIMTOC( NSDIM, SDIMS, STR )
+      DO I = 1, NSDIM
+        WRITE( STR(I:I), '(I1)' ) SDIMS(I)
+      END DO
 
 *  Construct transformation matrix
-      CALL AXIS_TGETORD( IFID, STR(2:CHR_LEN(STR)-1), REORDER, TRORD,
-     :                                        NSDIM, TRDIMS, STATUS )
+      CALL AXIS_TGETORD( IFID, STR(:NSDIM), REORDER, TRORD,
+     :                              NSDIM, TRDIMS, STATUS )
 
 *  Transformation of axes required? If so create temporary space
 *  and unmap originals to save space

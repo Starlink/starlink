@@ -84,7 +84,7 @@
             DO IAX = 1, LEN(AXORD)
 
 *          Try to locate next axis quantity
-              IF ( CHR_ISDIG( AXORD(IAX:IAX) ) THEN
+              IF ( CHR_ISDIG( AXORD(IAX:IAX) ) ) THEN
                 CALL CHR_CTOI( AXORD(IAX:IAX), MIAX, STATUS )
               ELSE
                 CALL BDI0_FNDAXC( FID, AXORD(IAX:IAX), MIAX, STATUS )
