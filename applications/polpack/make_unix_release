@@ -50,7 +50,7 @@
 
 # Copy the surfit files to the release directory.
       cp ${POLPACK_DEV}/../surfit.ifl ${REL_DIR}
-      cp ${POLPACK_DEV}/../surfit.${SYSTEM} ${REL_DIR}
+      cp ${POLPACK_DEV}/../surfit.${SYSTEM} ${REL_DIR}/surfit
 
 #  Copy the ndg tar file to the release directory.
       cp ${POLPACK_DEV}/../ndg.tar ${REL_DIR}
@@ -59,7 +59,7 @@
       chmod 777 *
 
 #  Tar up the source files and then remove them.
-      tar -cvh -f ${TEMPDIR}/polpack_source.tar `grp unix_source` surfit.*
+      tar -cvh -f ${TEMPDIR}/polpack_source.tar `grp unix_source` surfit*
       rm -f `grp unix_source`
       mv ${TEMPDIR}/polpack_source.tar ${REL_DIR}
 
