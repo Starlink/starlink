@@ -39,8 +39,13 @@
 *     CONSERVE = _LOGICAL (Read)
 *        If CONSERVE is TRUE, the output values are normalised by the
 *        ratio of the output-to-input pixel areas.  In other words this
-*        conserves flux.  If CONSERVE is FALSE, there is no
-*        normalisation.  [TRUE]
+*        conserves flux.  If CONSERVE is FALSE, there is no normalisation.
+*        If the NDFs WCS component (see USEWCS parameter) is used to define the
+*        transformation then the program will be unable to determine whether 
+*        the transformation is of a linear nature. If CONSERVE is set to TRUE,
+*        the program will warn the user that although it is atempting to
+*        conserve flux it may do so corretly if the transform is non-linear.
+*        [TRUE]
 *     IN = NDF (Read)
 *        A list of NDF names whose data are to be transformed. The NDF
 *        names should be separated by commas and may include wildcards.
@@ -171,16 +176,15 @@
 *        It uses nearest-neighbour resampling.  All the output NDFs
 *        have size 256 x 192 pixels and origin (1,-20).
 
-*  Notes:
-*     - This application is a restricted form of the KAPPA routine
-*       TRANSFORMER. If additional functionality is required then
-*       look at TRANSFORMER.
-
 *  Implementation Status:
 *     - Flux conservation can only be applied to constant-determinant
 *       or linear transformations. Since we currently can't tell 
-*       whether AST Mappings are linear, flux conservation is turned
-*       off when using WCS.
+*       whether AST Mappings are linear, flux conservation should be
+*       turned off when using the NDFs WCS component to perform the
+*       mapping. If left on the program will warn the user that it
+*       may not be performing flux conservation correctly (N.B. if
+*       the WCS transform is linear however, flux conservation will
+*       be calculated correctly).
 *     - The NDF components are processed by this application as
 *       follows:
 *        -  AXES, LABEL, UNITS, HISTORY, and extensions are merely
@@ -189,7 +193,7 @@
 *           interpolated NDF. The DATA and VARIANCE arrays are
 *           resampled.
 *        -  If USEWCS is .TRUE. then the NDF WCS extension is updated
-*           and propogated, otherwise it will merely be propogated
+*           and propagated.
 *     -  Bad pixels, including automatic quality masking, are supported.
 *     -  All non-complex numeric data types are supported.
 *     -  There can be an arbitrary number of NDF dimensions.
@@ -252,6 +256,8 @@
 *        Final tweaks for shipping.
 *     20-MAY-1999 (MBT):
 *        Mucked about a bit.
+*     07-SEP-1999 (AALLAN):
+*        Renamed some KPG1_* routines and propogated changes
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -299,8 +305,10 @@
       DOUBLE PRECISION ASTART( NDF__MXDIM ) ! Start co-ord of each axis
       DOUBLE PRECISION COIN( 0:NDF__MXDIM, NDF__MXDIM ) ! Input coord for determinant finding
       DOUBLE PRECISION COOUT( 0:NDF__MXDIM, NDF__MXDIM ) ! Output coord for determinant finding
-      DOUBLE PRECISION DDLBND( NDF__MXDIM ) ! Data coordinate lower bounds of output NDF
-      DOUBLE PRECISION DDUBND( NDF__MXDIM ) ! Data coordinate upper bounds of output NDF
+      DOUBLE PRECISION DDLBND( NDF__MXDIM ) ! Data coord lower bnds of out NDF
+      DOUBLE PRECISION DDUBND( NDF__MXDIM ) ! Data coord upper bnds of out NDF
+      DOUBLE PRECISION DDXL( NDF__MXDIM ) ! Co-ord of input pnt gives lower bnd
+      DOUBLE PRECISION DDXU( NDF__MXDIM ) ! Co-ord of input pnt gives upper bnd
       DOUBLE PRECISION FLUX      ! Flux conservation factor
       DOUBLE PRECISION JACOB( NDF__MXDIM, NDF__MXDIM ) ! Jacobian matrix
       DOUBLE PRECISION VARD      ! Dummy input variance
@@ -321,9 +329,10 @@
       INTEGER ELOUT              ! Number of elements in output array
       INTEGER FRCUR              ! Pointer to the Current AST Frame
       INTEGER FRNEW             ! Pointer to the New AST Frame
+      INTEGER FRM                ! AST pointer to frame under consideration
       INTEGER GIDIN              ! Input NDF group identifier
       INTEGER GIDOUT             ! Output NDF group identifier
-      INTEGER I, J                  ! Loop counter
+      INTEGER I, J, K            ! Loop counters
       INTEGER IAXIS              ! Loop counter through the axes
       INTEGER ICOMP              ! Loop counter through array components
       INTEGER IDIMS( NDF__MXDIM ) ! Dimensions of the input NDF
@@ -339,11 +348,10 @@
       INTEGER JREG              ! Index of the CCD_REG frame in the input NDF
       INTEGER JGEN              ! Index of the CCD_GEN frame in the input NDF
       INTEGER JPIX              ! Index of the PIXEL frame in the output NDF
-      INTEGER MPCUR             ! Pointer to current mapping between CURRENT and PIXEL domains
-      INTEGER MPINV             ! Inverse map of MPCUR
       INTEGER MAP                ! Mapping to use
       INTEGER NBAD               ! Number of bad elements in output array
       INTEGER NDIMI              ! Number of dimensions in input NDF
+      INTEGER NFRM               ! Number of frames in frameset
       INTEGER NNDF               ! Number of NDFs to process
       INTEGER NVIN               ! Number of input variables in the transformation
       INTEGER NVOUT              ! Number of output variables in the transformation
@@ -353,6 +361,7 @@
       INTEGER OPNTR( 2 )         ! Pointers to the output arrays
       INTEGER OPNTRW             ! Pointer to the output array or workspace for flux conservation
       INTEGER OUBND( NDF__MXDIM ) ! Upper bounds of the output NDF
+      INTEGER PFRAME               ! Index of the PIXEL frame
       INTEGER SHADEF( NDF__MXDIM ) ! Suggested default output NDF shape upper bound
       INTEGER TRIDF              ! Identifier to the forward input transformation
       INTEGER TRIDI              ! Identifier to the inverse input transformation
@@ -422,12 +431,10 @@
 *  =======================
 
 *  Are we using AST FrameSets or TRN structures?
-
       CALL PAR_GET0L( 'USEWCS', USEWCS, STATUS )
       
 *  If using AST FrameSets then we can't tell whether we have linear
 *  or non-linear mappings, turn flux conservation OFF
-
       IF ( USEWCS .AND. NORM) THEN
          CALL CCD1_MSG( ' ', ' ', STATUS)
          CALL CCD1_MSG( ' ',
@@ -495,7 +502,6 @@
       END IF
 
 *  Are we using AST FrameSets or TRN structures?
-
       IF( USEWCS ) THEN
          CALL CCD1_MSG( ' ',
      :'  Using AST FrameSet in NDF extensions', STATUS )
@@ -547,14 +553,12 @@
          CALL CCD1_MSG( ' ',  ' ', STATUS )
 
 *  Decide whether we're using AST or TRN structres
-
          IF ( USEWCS ) THEN
                               
 *  Get the transformation associated with this NDF. This should be
 *  stored in the WCS extention of the NDF.
 
 *  First check that there is an existing WCS FrameSet
-
             CALL NDF_STATE(IDIN, 'WCS', SWCS, STATUS)
             IF( .NOT. SWCS ) THEN
                STATUS = SAI__ERROR
@@ -566,22 +570,20 @@
             ENDIF  
             
 *  It appears we have a WCS component, get a pointer to the current FrameSet
-            
             CALL CCD1_GTWCS(IDIN, IWCS, STATUS)
             MAP = AST_GETMAPPING( IWCS, 2, AST__CURRENT, STATUS )
             MAP = AST_SIMPLIFY( MAP, STATUS )
             FRCUR = AST_GETFRAME( IWCS, AST__CURRENT, STATUS )
 
 *  Get the index of the current frame for future use 
-
             CFRAME = AST_GETI(IWCS, 'Current', STATUS)
                                      
          ELSE
 
 *  The user is back in the dark ages and insists that they want
 *  to use TRN structures, lets humour them.
-         
             IF ( INEXT ) THEN
+            
 *  Get the transformation associated with this NDF. This should be
 *  stored in the CCDPACK extension item TRANSFORM.
 
@@ -621,17 +623,16 @@
          
                   
 *  We need to validate the transformations
-
          IF( USEWCS ) THEN
          
 *  We are using AST FrameSets
 *  ==========================
 
-*  Since AST transformations are linear in nature we do not need 
-*  to check whether flux conservation is turned on or off.
+*  Most AST transformations are linear, if flux conservation is turned
+*  on the the user will have been warned that we're using WCS transforms
+*  and the code may not be able to conserve flux correctly. 
 
 *  Validate the transformation
-
            IF ( IWCS .EQ. AST__NULL ) THEN
                STATUS = SAI__ERROR
                CALL NDF_MSG( 'NDFNAME', IDIN )
@@ -647,14 +648,12 @@
            ELSE 
                               
 *  Make sure the user has actually run REGISTER, if not warn them
-
                CALL CCD1_FRDM( IWCS, 'CCD_REG', JREG, STATUS )
                CALL CCD1_FRDM( IWCS, 'CCD_GEN', JGEN, STATUS )
               
                IF( JREG .EQ. 0 ) THEN
                
 *  There is no CCD_REG Frame, warn the user (bad things may happen!)
-
                     CALL CCD1_MSG( ' ',
      :'  WARNING - NDF does not have an AST CCD_REG Frame, '//
      :'attempting alignment',STATUS)
@@ -665,7 +664,6 @@
                ENDIF
 
 *  Tell the user which co-ordinate domain we'll be transforming too
-
                CALL MSG_SETC('CURRENT', 
      :                       AST_GETC(FRCUR, 'Domain', STATUS))
                CALL CCD1_MSG(' ','  The current AST Frame has '//
@@ -673,7 +671,6 @@
            ENDIF
 
 *  Obtain the number of input and output co-ordinates for a Mapping
-
            NVIN = AST_GETI( MAP, 'Nin', STATUS )
            NVOUT = AST_GETI( MAP, 'Nout', STATUS )    
                                
@@ -730,7 +727,6 @@
 *  Check that processing is possible.  The number of dimensions in the
 *  NDF must be at least the number of input variables for the
 *  transformation to be applied.
-        
          IF ( NVIN .GT. NDIMI .AND. STATUS .EQ. SAI__OK ) THEN
             STATUS = SAI__ERROR
             CALL NDF_MSG( 'NDF', IDIN )
@@ -775,14 +771,21 @@
 *  an estimate of the extent of the output NDF's coordinates.  This
 *  assumes that the transformation does not move the innards of the
 *  input array to the outside of the output array.
-
          IF ( USEWCS ) THEN
-*  We're using AST FrameSets, the KPG1_ASBOx routine does the same job
-*  as the AST_MAPBOX routine, probably should be changed to this at
-*  some point in the future.
-            CALL KPG1_ASBOD( NVIN, ASTART, AEND, MAP, NVOUT, DDLBND,
-     :                       DDUBND, STATUS )             
+         
+*  We're using AST FrameSets
+*
+*            CALL CCG1_ASBOD( NVIN, ASTART, AEND, MAP, NVOUT, DDLBND,
+*     :                       DDUBND, STATUS ) 
+*            
+*  Replaced CCG1_ASBOx with AST_MAPBOX, does the same job
+            DO IAXIS = 1, NVIN
+               CALL AST_MAPBOX( MAP, ASTART, AEND, .TRUE., IAXIS,
+     :                          DDLBND(IAXIS), DDUBND(IAXIS), DDXL, 
+     :                          DDXU, STATUS )
+            END DO                   
          ELSE
+         
 *  We're using old fashioned TRN structures
             CALL KPG1_TRBOD( NVIN, ASTART, AEND, TRIDF, NVOUT, DDLBND,
      :                       DDUBND, STATUS )
@@ -798,7 +801,6 @@
 *  present. If same is specified then the output NDFs will have the
 *  same bounds as the input NDFs, otherwise the user will be prompted
 *  once for bounds which will apply to all output NDFs.
-
          IF ( SHAPE .EQ. 'SPECIFY' ) THEN
            IF ( INDEX .EQ. 1 ) THEN
 
@@ -920,17 +922,17 @@
 
 *  Report the extent of the input NDF, useful if using shape=auto to compare
 *  with the ouptut NDF shape and see if something stupid is happening. 
-      DO IAXIS = 1, NVIN
-        CALL MSG_SETI( 'LOW', ILBND( IAXIS ) )
-        CALL MSG_SETI( 'HIGH', IUBND( IAXIS ) )
-        IF ( IAXIS .EQ. 1 ) THEN
-          CALL CCD1_MSG( 'INBOUNDS',
+         DO IAXIS = 1, NVIN
+            CALL MSG_SETI( 'LOW', ILBND( IAXIS ) )
+            CALL MSG_SETI( 'HIGH', IUBND( IAXIS ) )
+            IF ( IAXIS .EQ. 1 ) THEN
+               CALL CCD1_MSG( 'INBOUNDS',
      :'  Input NDF bounds : ^LOW to ^HIGH', STATUS )
-        ELSE 
-          CALL CCD1_MSG( 'INBOUNDS',
+            ELSE 
+               CALL CCD1_MSG( 'INBOUNDS',
      :'                   : ^LOW to ^HIGH', STATUS )      
-        END IF
-      END DO
+            END IF
+         END DO
 
 *  And report the actual extent of the output NDF (before creating
 *  an NDF of this actual extent - useful if shape=auto and funny
@@ -1042,7 +1044,7 @@
 
 *  Generate the list of vector indices for the resampling.
             IF( USEWCS ) THEN
-                CALL KPG1_ASPID( NDIMI, IDIMS, MAP, %VAL( CAXPTR ),
+                CALL CCG1_ASPID( NDIMI, IDIMS, MAP, %VAL( CAXPTR ),
      :                           WDIMS( 1 ), NVOUT, OLBND, ODIMS,
      :                           %VAL( WPNTR1 ), %VAL( WPNTR3 ),
      :                           %VAL( WPNTR2 ), %VAL( INPNTR ), 
@@ -1206,7 +1208,7 @@
 *  type.  First apply to a byte array.
                IF ( ITYPE .EQ. '_BYTE' ) THEN
                   IF( USEWCS ) THEN 
-                    CALL KPG1_ASLIB( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
+                    CALL CCG1_ASLIB( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
      :                             VAR, %VAL( IPNTR( 2 ) ), MAP,
      :                             FLUX, %VAL( CAXPTR ), ODIMS( 1 ),
      :                             NDIMI, OLBND, ODIMS,
@@ -1227,7 +1229,7 @@
 *  Transform a double-precision array.
                ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
                   IF( USEWCS ) THEN 
-                    CALL KPG1_ASLID( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
+                    CALL CCG1_ASLID( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
      :                             VAR, %VAL( IPNTR( 2 ) ), MAP,
      :                             FLUX, %VAL( CAXPTR ), ODIMS( 1 ),
      :                             NDIMI, OLBND, ODIMS,
@@ -1248,7 +1250,7 @@
 *  Transform an integer array.
                ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
                   IF ( USEWCS ) THEN
-                    CALL KPG1_ASLII( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
+                    CALL CCG1_ASLII( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
      :                             VAR, %VAL( IPNTR( 2 ) ), MAP,
      :                             FLUX, %VAL( CAXPTR ), ODIMS( 1 ),
      :                             NDIMI, OLBND, ODIMS,
@@ -1269,7 +1271,7 @@
 *  Transform a single-precision array.
                ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
                   IF (USEWCS) THEN
-                    CALL KPG1_ASLIR( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
+                    CALL CCG1_ASLIR( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
      :                             VAR, %VAL( IPNTR( 2 ) ), MAP,
      :                             FLUX, %VAL( CAXPTR ), ODIMS( 1 ),
      :                             NDIMI, OLBND, ODIMS,
@@ -1290,7 +1292,7 @@
 *  Transform an unsigned-byte array.
                ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
                   IF (USEWCS ) THEN
-                    CALL KPG1_ASLIUB( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
+                    CALL CCG1_ASLIUB( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
      :                              VAR, %VAL( IPNTR( 2 ) ), MAP,
      :                              FLUX, %VAL( CAXPTR ), ODIMS( 1 ),
      :                              NDIMI, OLBND, ODIMS,
@@ -1311,7 +1313,7 @@
 *  Transform an unsigned-word array.
                ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
                   IF (USEWCS) THEN
-                    CALL KPG1_ASLIUW( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
+                    CALL CCG1_ASLIUW( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
      :                              VAR, %VAL( IPNTR( 2 ) ), MAP,
      :                              FLUX, %VAL( CAXPTR ), ODIMS( 1 ),
      :                              NDIMI, OLBND, ODIMS,
@@ -1332,7 +1334,7 @@
 *  Transform a word array.
                ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
                   IF(USEWCS) THEN
-                    CALL KPG1_ASLIW( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
+                    CALL CCG1_ASLIW( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
      :                             VAR, %VAL( IPNTR( 2 ) ), MAP,
      :                             FLUX, %VAL( CAXPTR ), ODIMS( 1 ),
      :                             NDIMI, OLBND, ODIMS,
@@ -1367,7 +1369,7 @@
 *  type.  First apply to a byte array.
                IF ( ITYPE .EQ. '_BYTE' ) THEN
                   IF (USEWCS) THEN
-                    CALL KPG1_ASLIB( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
+                    CALL CCG1_ASLIB( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
      :                             VAR, VARB, MAP, FLUX,
      :                             %VAL( CAXPTR ), ODIMS( 1 ), NDIMI,
      :                             OLBND, ODIMS, %VAL( OPNTR( 1 ) ),
@@ -1387,7 +1389,7 @@
 *  Transform a double-precision array.
                ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
                   IF (USEWCS) THEN
-                    CALL KPG1_ASLID( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
+                    CALL CCG1_ASLID( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
      :                             VAR, VARD, MAP, FLUX,
      :                             %VAL( CAXPTR ), ODIMS( 1 ), NDIMI,
      :                             OLBND, ODIMS, %VAL( OPNTR( 1 ) ),
@@ -1407,7 +1409,7 @@
 *  Transform an integer array.
                ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
                   IF (USEWCS) THEN
-                    CALL KPG1_ASLII( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
+                    CALL CCG1_ASLII( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
      :                             VAR, VARI, MAP, FLUX,
      :                             %VAL( CAXPTR ), ODIMS( 1 ), NDIMI,
      :                             OLBND, ODIMS, %VAL( OPNTR( 1 ) ),
@@ -1427,7 +1429,7 @@
 *  Transform a single-precision array.
                ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
                   IF (USEWCS) THEN
-                    CALL KPG1_ASLIR( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
+                    CALL CCG1_ASLIR( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
      :                             VAR, VARR, MAP, FLUX,
      :                             %VAL( CAXPTR ), ODIMS( 1 ), NDIMI,
      :                             OLBND, ODIMS, %VAL( OPNTR( 1 ) ),
@@ -1447,7 +1449,7 @@
 *  Transform an unsigned-byte array.
                ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
                   IF (USEWCS) THEN
-                    CALL KPG1_ASLIUB( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
+                    CALL CCG1_ASLIUB( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
      :                              VAR, VARB, MAP, FLUX,
      :                              %VAL( CAXPTR ), ODIMS( 1 ),
      :                              NDIMI, OLBND, ODIMS,
@@ -1467,7 +1469,7 @@
 *  Transform an unsigned-word array.
                ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
                   IF (USEWCS) THEN
-                    CALL KPG1_ASLIUW( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
+                    CALL CCG1_ASLIUW( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
      :                              VAR, VARW, MAP, FLUX,
      :                              %VAL( CAXPTR ), ODIMS( 1 ),
      :                              NDIMI, OLBND, ODIMS,
@@ -1487,7 +1489,7 @@
 *  Transform a word array.
                ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
                   IF (USEWCS) THEN
-                    CALL KPG1_ASLIW( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
+                    CALL CCG1_ASLIW( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
      :                             VAR, VARW, MAP, FLUX,
      :                             %VAL( CAXPTR ), ODIMS( 1 ), NDIMI,
      :                             OLBND, ODIMS, %VAL( OPNTR( 1 ) ),
@@ -1515,6 +1517,7 @@
 *  Add a title to the new NDF.
          CALL NDF_CINP( 'TITLE', IDOUT, 'TITLE', STATUS )
 
+*  Propogate the WCS component
          IF (USEWCS) THEN
 
 *  A reminder of the various pointers and indices we have to play with
@@ -1526,54 +1529,43 @@
 *       IWCS    Pointer to input AST FrameSet
 *       OWCS    Pointer to output AST FrameSet
 
-*  Make a copy of the input NDF's WCS component
-            OWCS = AST_COPY(IWCS, STATUS)
-            CALL NDF_PTWCS( OWCS, IDOUT, STATUS )
+*  Get default WCS component (just GRID, PIXEL, AXIS) for the output NDF.
+                CALL CCD1_GTWCS( IDOUT, OWCS, STATUS )
+    
+*  Remove GRID, PIXEL, AXIS frames from original frameset since they're
+*  out of date now...
+*
+*  Uses CCD1_DMSPRG rather than CCD1_DMPRG to purge the domain since
+*  the later prints annoying status messages. These routines could be
+*  combined fairly simply if needed.
+                CALL AST_SETI( IWCS, 'Current', CFRAME, STATUS )
+                CALL CCD1_DMSPRG( IWCS, 'PIXEL', 0, STATUS )
+                CALL CCD1_DMSPRG( IWCS, 'AXIS', 0, STATUS )
+                CALL CCD1_DMSPRG( IWCS, 'GRID', 0, STATUS )
+    
+*  We now just have the non-automatic frames of the input WCS component.
+*  This will contain the Current frame (which may or may not be CCD_REG)
+*  and an indeterminate number of other ones which we know nothing about,
+*  perhaps including CCD_GEN.  Now attach these to the default frameset
+*  generated by CCD1_GTWCS, using the fact that the PIXEL domain of that
+*  should be Unit mapped to the Current frame of the old one.
 
-*  GRID, PIXEL and AXIS domains updated by writing it to
-*  the output NDF. So get a pointer to the new WCS FrameSet         
-            CALL CCD1_GTWCS(IDOUT, OWCS, STATUS)
-
-*  Make the mapping between CURRENT and PIXEL domains a UnitMap 
-
-            CALL CCD1_FRDM( OWCS, 'PIXEL', JPIX, STATUS )
+*  Lets find out which frame contains the PIXEL domain (its going to be
+*  frame 2, but we may as well do it properly) in the output WCS frameset.
+                NFRM = AST_GETI( OWCS, 'Nframe', STATUS )
+                DO K = 1, NFRM
+                   FRM = AST_GETFRAME( OWCS, K, STATUS )
+                   IF( AST_GETC( FRM, 'Domain', STATUS ) 
+     :                 .EQ. 'PIXEL' ) PFRAME = K
+                END DO
                 
-            MPCUR = AST_GETMAPPING( OWCS, JPIX, CFRAME, STATUS )
-            MPINV = AST_GETMAPPING( OWCS, JPIX, CFRAME, STATUS )
-            CALL AST_INVERT( MPINV, STATUS )
-            CALL AST_REMAPFRAME( OWCS, CFRAME, MPINV, STATUS )     
-            
-*  The current frame is not CCD_REG. We're assumed we can do a
-*  mapping anyway, we may have done something very dodgy. We'd 
-*  better warn the user...
-
-            IF( JREG .EQ. 0 ) THEN
-               CALL CCD1_MSG(' ',' ', STATUS )     
-               CALL MSG_SETC('CURRENT', 
-     :                       AST_GETC(FRCUR, 'Domain', STATUS))      
-               CALL CCD1_MSG( ' ',
-     :'  WARNING - Mapping between the ^CURRENT and '//
-     :'PIXEL frames is now a unit map',STATUS)
-               CALL CCD1_MSG(' ',' ', STATUS )     
-            ENDIF
-                                                           
-*  Remove CCD_GEN Frame from the FrameSet if it exists (not needed?)
-*
-*  Comment to Mark - The mapping in the FrameSet between the CCD_GEN
-*                    and PIXEL domains is invalid. Surely its tidier 
-*                    to remove the frame at this stage? Your call...
-*
-*            CALL CCD1_FRDM( OWCS, 'CCD_GEN', JGEN, STATUS )
-*            IF( JGEN .NE. 0 ) THEN
-*                CALL AST_REMOVEFRAME(OWCS, JGEN, STATUS )
-*            ENDIF
-
-*  Reset AST__CURRENT to its correct value, the call to CCD1_FRDM()
-*  has left AST__CURRENT pointing to the PIXEL domain.
-
-            CALL AST_SETI( OWCS, 'Current', CFRAME, STATUS )
-
-            CALL NDF_PTWCS( OWCS, IDOUT, STATUS )
+*  And add the remaining bits of IWCS to OWCS
+                CALL AST_ADDFRAME( OWCS, PFRAME, 
+     :                             AST_UNITMAP( NDIMI, ' ', STATUS ),
+     :                             IWCS, STATUS )
+    
+*  Write it out.
+                CALL NDF_PTWCS( OWCS, IDOUT, STATUS )
             
          END IF
 
@@ -1583,8 +1575,7 @@
             CALL AST_ANNUL( IWCS, STATUS )
             CALL AST_ANNUL( FRCUR, STATUS )
             CALL AST_ANNUL( OWCS, STATUS )
-            CALL AST_ANNUL( MPCUR, STATUS )
-            CALL AST_ANNUL( MPINV, STATUS )
+            CALL AST_ANNUL( FRM, STATUS )
          ELSE IF( INEXT ) THEN
             CALL DAT_ANNUL( LOCEXT, STATUS )
             CALL DAT_ANNUL( LOCTR, STATUS )
