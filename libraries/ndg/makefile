@@ -313,7 +313,7 @@ PKG_NUM =
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
-PKG_VERS = 4.0
+PKG_VERS = 4.0-1
 
 #  Library version number.
 #
@@ -368,7 +368,7 @@ PRIVATE_INCLUDES = $(PKG_NAME)_const
 #  reference the files within the source code, not the actual names of
 #  the files.
 
-EXTERNAL_INCLUDES = DAT_PAR GRP_ERR GRP_PAR NDF_ERR NDF_PAR PAR_ERR \
+EXTERNAL_INCLUDES = DAT_PAR DAT_ERR GRP_ERR GRP_PAR NDF_ERR NDF_PAR PAR_ERR \
 PSX_ERR SAE_PAR PRM_PAR
 
 #  List of Fortran routines required for building the package.  This is
@@ -423,7 +423,7 @@ FAC_ERRS =
 #  Lists of Latex and hypertext documents.
 
 LATEX_DOCS = sun2.tex
-HYPERTEXT_DOCS = 
+HYPERTEXT_DOCS = sun2.htx
 
 #  List of documentation files.
 
@@ -463,7 +463,7 @@ INCLUDE_LINKS = $(EXTERNAL_INCLUDES) $(PKG_LINK)_ERR $(PKG_LINK)_CONST $(PKG_LIN
 $(PKG_LINK)_ERR:   $(PKG_NAME)_err;               $(LINK) $? $@
 $(PKG_LINK)_CONST: $(PKG_NAME)_const;             $(LINK) $? $@
 DAT_PAR:   $(STAR_INC)/dat_par;   $(LINK) $? $@ 
-DAT_ERR:   $(STAR_INC)/dat_err;   $(LINK) $? $@ 
+DAT_ERR:   $(STAR_INC)/dat_err;   $(LINK) $? $@
 GRP_ERR:   $(STAR_INC)/grp_err;   $(LINK) $? $@ 
 GRP_PAR:   $(STAR_INC)/grp_par;   $(LINK) $? $@ 
 NDF_ERR:   $(STAR_INC)/ndf_err;   $(LINK) $? $@ 
