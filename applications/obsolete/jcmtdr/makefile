@@ -143,6 +143,7 @@
 #        ndf_link_adam
 #        prm_link_adam
 #        fio_link_adam
+# 	 gsd_link_adam
 #        hlp_link
 #        fio_link
 #        cnf_link
@@ -420,15 +421,14 @@ DATE_STAMP = $(PKG_NAME)_datestamp
 
 #  Things needed for linking the monolith.
 
-FIG_LIB = $(STARLINK)/figaro/lib
-I90_LIB = $(STARLINK)/iras90
+FIG_LIB = $(STARLINK)/sources/figaro
+I90_LIB = $(STARLINK)/sources/kappa
 
-LINK_OPTIONS = \
+LINK_OPTIONS =  \
    -L$(FIG_LIB) -lfig -ldsa -ldta -lgen -lpar -lich \
    -L$(I90_LIB) -lira \
-   -L$(STAR_LIB)   `sla_link_adam` `hlp_link_adam` `ndf_link_adam` \
-   `prm_link_adam` `fio_link_adam` \
-   -lnag
+   -L$(STAR_LIB) `sla_link_adam` `hlp_link_adam` `ndf_link_adam` \
+   `prm_link_adam` `fio_link_adam` `gsd_link` `pda_link_adam`
 
 INCLUDE_LINKS = $(EXTERNAL_INCLUDES)
 
@@ -449,12 +449,12 @@ EXTERNAL_INCLUDES = SAE_PAR PAR_PAR
 #  there is no rule in this makefile to build the object library. Object
 #  libraries are built as a side effect of the main build target.
 
-OBJECT_LIBRARIES = applic/libapplic.a subs/libsubs.a gsd/libgsd.a
+OBJECT_LIBRARIES = applic/libapplic.a subs/libsubs.a
 
 #  List of object library subdirectories. These directories hold the library
 #  together with the source code and makefile for building the library.
 
-LIB_NAMES = applic subs gsd
+LIB_NAMES = applic subs
 
 #  List of sub-directories. Based on the list of libraries. HTML_DIR is not
 #  among these, since it has no makefile.
@@ -560,9 +560,6 @@ install: $(INSTALL_DIRSTOP) $(INSTALL_DIRS)
 	$(LINK) $(INSTALL_BIN)/$(HELPSHL) $(INSTALL_HELP)/$(HELPSHL); \
 	$(RM) $(HELPSHL); \
 	$(LINK) $(INSTALL_BIN)/$(HELPSHL) $(HELPSHL)
-#  GSD print utility.
-	$(CP) gsd/gsd_print $(INSTALL_BIN)
-	chmod 755 $(INSTALL_BIN)/gsd_print
 #  Copy and back-link the date stamp. The installed file is write-protected.
 	$(CP) $(DATE_STAMP) $(INSTALL_DATES)
 	chmod 444 $(INSTALL_DATES)/$(DATE_STAMP)
@@ -771,10 +768,6 @@ deinstall:
 	   $(RM) $(INSTALL_HELP)/$(HELPSHL); \
 	   $(CP) $(INSTALL_BIN)/$(HELPSHL) $(HELPSHL); \
 	   $(RM) $(INSTALL_BIN)/$(HELPSHL); \
-	else :; fi
-#  Deinstall GSD print utility.
-	- if test -f $(INSTALL_BIN)/gsd_print; then \
-	   $(RM) $(INSTALL_BIN)/gsd_print; \
 	else :; fi
 #  Deinstall the date stamp. The installed file is write-protected.
 	- if test -f $(INSTALL_DATES)/$(DATE_STAMP); then \
