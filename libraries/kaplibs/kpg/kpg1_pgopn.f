@@ -39,6 +39,8 @@
 *  History:
 *     1-OCT-1999 (DSB):
 *        Original version.
+*     10-DEC_2002 (DSB):
+*        Re-clear the screen after loading the user's pallette if MODE=W.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -62,9 +64,13 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
+*  External References:
+      CHARACTER CHR_UPPER        ! Return an uppercase character
+
 *  Local Variables:
       INTEGER IPICB              ! Base picture identifier
-
+      REAL ROLD, GOLD, BOLD      ! Default background RGB values 
+      REAL R, G, B               ! User's background RGB values 
 *.
 
 *  Check the inherited global status.
@@ -82,11 +88,28 @@
 *  Create a viewport for the current picture.
       CALL AGP_NVIEW( .FALSE., STATUS )
 
+*  Save the current background RGB values (these will eb the PGPLOT
+*  default values since PGPLOT re-instates the default colour table on
+*  opening a device).
+      CALL PGQCR( 0, ROLD, GOLD, BOLD )
+
 *  PGPLOT resets the colour table each time it is opened. So re-instate
 *  the user's pallette and LUT by loading them from previously saved files 
 *  (see KPG1_PLSAV and KPG1_LTSAV).
       CALL KPG1_PLLOD( STATUS )
       CALL KPG1_LTLOD( STATUS )
+
+*  If the device was cleared on opening (within AGI_ASSOC), it will have 
+*  been cleared using the default background colour provided by PGPLOT.
+*  We have now loaded a potentially different user pallette, which may
+*  have a different background colour, so clear the screen again if the
+*  backgrond colour has changed.
+      IF( CHR_UPPER( MODE( 1:1 ) ) .EQ. 'W' ) THEN
+         CALL PGQCR( 0, R, G, B )
+         IF( R .NE. ROLD .OR. G .NE. GOLD .OR. B .NE. BOLD ) THEN
+            CALL PGERAS
+         END IF
+      END IF
 
 *  Attempt to close down the device if an error has occurred.
       IF( STATUS .NE. SAI__OK ) CALL KPG1_PGCLS( PNAME, .FALSE., 
