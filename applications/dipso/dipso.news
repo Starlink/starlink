@@ -7,16 +7,3 @@
     o A bug in the READ and SP0RD commands has been fixed which could cause 
     usable AXIS structures in the supplied NDF to be ignored.
 
-    -----------
-
-    o  The READ command has been modified so that it will attempt to read
-    spectral axis information from the WCS component of an NDF if the NDF
-    was not created by DIPSO. If the NDF has no WCS component, the
-    spectral axis information will be read from the FITS header cards in
-    the NDF FITS extension (if any). Details of the spectral axis are
-    displayed.
-
-    o  The WRITE command has been modified so that it will add a WCS
-    component to the output NDF describing the spectral axis. This allows
-    it to be used by other Starlink applications such as SPLAT, KAPPA,
-    etc.
