@@ -4,6 +4,7 @@ bin_SCRIPTS = bin/sgml2docs bin/sgml2hlp
 nobase_pkglib_SCRIPTS = lib/img-eqlist.pl
 nobase_pkglib_DATA = \
 	lib/plainhtml.bst lib/plainlatex.bst lib/postprocess-bbl.sed \
+	lib/icons.tar \
 	$(SL_COMMON) \
 	$(SL_HLP) \
 	$(SL_LIB) \
@@ -12,11 +13,12 @@ nobase_pkglib_DATA = \
 
 stardocs_DATA = doc/ssn70/ssn70.htx_tar
 
-# There are too many DTDs to list reliably.
-# Install them by copying the tree into place.
-install-data-local:
+# The list of DTDs to install is maintained within the dtd/ directory,
+# in file dtd/manifest.  Install them by copying the tree into place.
+install-data-local: dtd/manifest
 	$(mkdir_p) $(DESTDIR)$(pkglibdir)
-	@PAX@ -r -w -v dtd $(DESTDIR)$(pkglibdir) \
+	@PAX@ -r -w -v $(DESTDIR)$(pkglibdir) \
+		<dtd/manifest \
 		2>>$${MANIFEST_FILE=/dev/null}
 
 EXTRA_DIST = dsssl dtd
@@ -78,3 +80,6 @@ bin/sgml2hlp: bin/sgml2hlp.x
 	$(edit) $(srcdir)/$@.x >$@.tmp
 	chmod +x $@.tmp
 	mv $@.tmp $@
+
+dtd/manifest:
+	cd dtd; make manifest
