@@ -603,9 +603,13 @@
 
           CALL IMG_NBGET0I('PAR_I1',N,STATUS)
           CALL GCB_SETI('TITLE_N',N,STATUS)
+	print *,n,' lines**'
+	call flush(6)
           I=1
           DO WHILE (I.LE.N)
             FLAG=-1
+	print *,'line',i,'**'
+	call flush(6)
             DO WHILE (FLAG.EQ.-1)
               CALL IMG_NBGET0I('FLAG',FLAG,STATUS)
             ENDDO
@@ -629,7 +633,8 @@
             CALL GCB_SET1C('TITLE_JUST',I,1,JUST,STATUS)
 
             CALL IMG_NBPUT0I('FLAG',-1,STATUS)
-
+	print *,'done**'
+	call flush(6)
             I=I+1
 
           ENDDO
