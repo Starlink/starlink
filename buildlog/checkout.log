@@ -7297,12 +7297,8 @@ cvs checkout: Updating java/source/table
 U java/source/table/build.xml
 cvs checkout: Updating java/source/table/src
 cvs checkout: Updating java/source/table/src/docs
-U java/source/table/src/docs/JEL-licence
-U java/source/table/src/docs/Ptplot-licence
-U java/source/table/src/docs/TableViewer.txt
+U java/source/table/src/docs/table.txt
 cvs checkout: Updating java/source/table/src/lib
-U java/source/table/src/lib/jel_g.jar
-U java/source/table/src/lib/plot.jar
 cvs checkout: Updating java/source/table/src/main
 cvs checkout: Updating java/source/table/src/main/uk
 cvs checkout: Updating java/source/table/src/main/uk/ac
@@ -7372,32 +7368,6 @@ U java/source/table/src/main/uk/ac/starlink/table/jdbc/JDBCStarTable.java
 U java/source/table/src/main/uk/ac/starlink/table/jdbc/SwingAuthenticator.java
 U java/source/table/src/main/uk/ac/starlink/table/jdbc/TerminalAuthenticator.java
 cvs checkout: Updating java/source/table/src/main/uk/ac/starlink/table/view
-U java/source/table/src/main/uk/ac/starlink/table/view/AuxWindow.java
-U java/source/table/src/main/uk/ac/starlink/table/view/BasicAction.java
-U java/source/table/src/main/uk/ac/starlink/table/view/BitsRowSubset.java
-U java/source/table/src/main/uk/ac/starlink/table/view/CheckBoxMenu.java
-U java/source/table/src/main/uk/ac/starlink/table/view/ColumnDialog.java
-U java/source/table/src/main/uk/ac/starlink/table/view/ColumnInfoWindow.java
-U java/source/table/src/main/uk/ac/starlink/table/view/ColumnsDisplay.java
-U java/source/table/src/main/uk/ac/starlink/table/view/JELRowReader.java
-U java/source/table/src/main/uk/ac/starlink/table/view/MetaColumn.java
-U java/source/table/src/main/uk/ac/starlink/table/view/MetaColumnTableModel.java
-U java/source/table/src/main/uk/ac/starlink/table/view/MirageHandler.java
-U java/source/table/src/main/uk/ac/starlink/table/view/OptionsListModel.java
-U java/source/table/src/main/uk/ac/starlink/table/view/ParameterWindow.java
-U java/source/table/src/main/uk/ac/starlink/table/view/PlasticStarTable.java
-U java/source/table/src/main/uk/ac/starlink/table/view/PlotWindow.java
-U java/source/table/src/main/uk/ac/starlink/table/view/ResourceIcon.java
-U java/source/table/src/main/uk/ac/starlink/table/view/RowSubset.java
-U java/source/table/src/main/uk/ac/starlink/table/view/SizingScrollPane.java
-U java/source/table/src/main/uk/ac/starlink/table/view/StatsWindow.java
-U java/source/table/src/main/uk/ac/starlink/table/view/SubsetDialog.java
-U java/source/table/src/main/uk/ac/starlink/table/view/SubsetsDisplay.java
-U java/source/table/src/main/uk/ac/starlink/table/view/SyntheticColumn.java
-U java/source/table/src/main/uk/ac/starlink/table/view/SyntheticRowSubset.java
-U java/source/table/src/main/uk/ac/starlink/table/view/TableColumnModelAdapter.java
-U java/source/table/src/main/uk/ac/starlink/table/view/TableViewer.java
-U java/source/table/src/main/uk/ac/starlink/table/view/ViewerTableModel.java
 cvs checkout: Updating java/source/table/src/resources
 cvs checkout: Updating java/source/table/src/resources/uk
 cvs checkout: Updating java/source/table/src/resources/uk/ac
@@ -7406,9 +7376,13 @@ cvs checkout: Updating java/source/table/src/resources/uk/ac/starlink/table
 cvs checkout: Updating java/source/table/src/resources/uk/ac/starlink/table/text
 U java/source/table/src/resources/uk/ac/starlink/table/text/UCDs
 cvs checkout: Updating java/source/table/src/script
-U java/source/table/src/script/startab
 U java/source/table/src/script/tablecopy
-U java/source/table/src/script/topcat
+cvs checkout: Updating java/source/table/src/testcases
+cvs checkout: Updating java/source/table/src/testcases/uk
+cvs checkout: Updating java/source/table/src/testcases/uk/ac
+cvs checkout: Updating java/source/table/src/testcases/uk/ac/starlink
+cvs checkout: Updating java/source/table/src/testcases/uk/ac/starlink/table
+U java/source/table/src/testcases/uk/ac/starlink/table/TableTest.java
 cvs checkout: Updating java/source/tamfits
 U java/source/tamfits/README
 U java/source/tamfits/build.xml
@@ -7532,6 +7506,58 @@ cvs checkout: Updating java/source/templates/classlibrary
 U java/source/templates/classlibrary/build.xml
 cvs checkout: Updating java/source/templates/thirdparty
 U java/source/templates/thirdparty/build.xml
+cvs checkout: Updating java/source/topcat
+U java/source/topcat/build.xml
+cvs checkout: Updating java/source/topcat/src
+cvs checkout: Updating java/source/topcat/src/docs
+U java/source/topcat/src/docs/JEL-licence
+U java/source/topcat/src/docs/Ptplot-licence
+U java/source/topcat/src/docs/Topcat.txt
+cvs checkout: Updating java/source/topcat/src/lib
+U java/source/topcat/src/lib/jel_g.jar
+U java/source/topcat/src/lib/plot.jar
+cvs checkout: Updating java/source/topcat/src/main
+cvs checkout: Updating java/source/topcat/src/main/uk
+cvs checkout: Updating java/source/topcat/src/main/uk/ac
+cvs checkout: Updating java/source/topcat/src/main/uk/ac/starlink
+cvs checkout: Updating java/source/topcat/src/main/uk/ac/starlink/topcat
+U java/source/topcat/src/main/uk/ac/starlink/topcat/AuxWindow.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/BasicAction.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/BitsRowSubset.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/CheckBoxMenu.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/ColumnDialog.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/ColumnInfoWindow.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/ColumnsDisplay.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/JELRowReader.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/MetaColumn.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/MetaColumnTableModel.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/MirageHandler.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/OptionsListModel.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/ParameterWindow.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/PlasticStarTable.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/PlotWindow.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/ResourceIcon.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/RowSubset.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/SizingScrollPane.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/StatsWindow.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/SubsetDialog.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/SubsetsDisplay.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/SyntheticColumn.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/SyntheticRowSubset.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/TableColumnModelAdapter.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/TableViewer.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/ViewerTableModel.java
+cvs checkout: Updating java/source/topcat/src/resources
+cvs checkout: Updating java/source/topcat/src/resources/uk
+cvs checkout: Updating java/source/topcat/src/resources/uk/ac
+cvs checkout: Updating java/source/topcat/src/resources/uk/ac/starlink
+cvs checkout: Updating java/source/topcat/src/resources/uk/ac/starlink/topcat
+cvs checkout: Updating java/source/topcat/src/resources/uk/ac/starlink/topcat/images
+U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/burst.gif
+U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/multiply3.gif
+U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/open3.gif
+cvs checkout: Updating java/source/topcat/src/script
+U java/source/topcat/src/script/topcat
 cvs checkout: Updating java/source/treeview
 U java/source/treeview/build.xml
 cvs checkout: Updating java/source/treeview/src
