@@ -174,13 +174,12 @@ tempdest=tmp.stamp
 #DVI2BITMAPVERSION=`$DVI2BITMAP -V | sed -n '1s/[-.,]/ /gp'|awk '{print $3}'`
 d2bv=`$DVI2BITMAP -V | sed -n '1s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\([^0-9]*\([0-9][0-9]*\)\).*/\1 \2 \4 \3/p' | awk '{print $2}'`
 case $d2bv in
-	9|10|11) d2bv10=false;;
-	*) 
-		echo "Using" $DVI2BITMAP "at"
-		which `echo $DVI2BITMAP | awk '{print $1}'`
-		echo "Need dvi2bitmap version 0.9--0.11, but $DVI2BITMAP is version "`$DVI2BITMAP -V|sed -n 1p`
-		exit 1
-		;;
+    11) echo "Using $DVI2BITMAP"
+        ;;
+    *)
+	echo "Need dvi2bitmap version 0.11, but $DVI2BITMAP is version "`$DVI2BITMAP -V|sed -n 1p`
+	exit 1
+	;;
 esac
 
 PROGNAME=`basename $0`
@@ -252,8 +251,6 @@ while [ $# -gt 0 ]; do
 	--ignore-manifest) USEMANIFEST=false ;;
 	--quiet) VERBOSE=false
             case $d2bv in
-                9)  DVI2BITMAP="$DVI2BITMAP -q" ;;
-                10) DVI2BITMAP="$DVI2BITMAP --verbose=quiet" ;;
                 11) DVI2BITMAP="$DVI2BITMAP --verbose=quiet" ;;
             esac
        		;;
@@ -412,39 +409,33 @@ if [ $TARGETFORMAT -eq 0 ]; then
     # element <mdefs>.
     if [ -s "$ROOT.imgeq.list" ]; then
 	# Find dvi2bitmap's default format
-	# Default to gif if the dvi2bitmap version doesn't have the -Qt option
         case $d2bv in
-            9)  imgfmt=`($DVI2BITMAP -Qt 2>/dev/null || echo gif gif) | awk '{print $2}'`
-                ;;
-            10) imgfmt=`$DVI2BITMAP --query=types --process=options-only | awk '{print $2}'`
-                ;;
             11) imgfmt=`$DVI2BITMAP --query=types --process=options | awk '{print $2}'`
                 ;;
+            *)  echo "Can't use that version of dvi2bitmap"
+                exit 1
+                ;;
         esac
 
-	# Force the image format to be gif -- PNG transparency isn't
-	# yet well-enough supported in browsers.
-	#imgfmt='gif'
+	# We can force the image format to be gif by setting imgfmt='gif'
 	$VERBOSE && echo "$PROGNAME:I: $IMGEQ --imgformat $imgfmt $ROOT.imgeq.list"
-	$run $IMGEQ --imgformat $imgfmt $ROOT.imgeq.list
 
-	$VERBOSE && echo "$PROGNAME:I: $LATEX $ROOT.imgeq.tex"
-	$run $LATEX $ROOT.imgeq.tex $OUTPUTDEST
-
-        case $d2bv in
-            9)  
-                $VERBOSE && echo "$PROGNAME:I: $DVI2BITMAP -m 3 -s 3 -Pt $ROOT.imgeq.dvi" 
-                $run $DVI2BITMAP -m 3 -s 3 -Pt -q -Qb $ROOT.imgeq.dvi >dvi2bitmap.log
-                ;;
-            10)
-                $VERBOSE && echo "$PROGNAME:I: $DVI2BITMAP --magnification=3 --scale=3 --process=transparency=true $ROOT.imgeq.dvi"
-                $run $DVI2BITMAP --magnification=3 --scale=3 --process=transparent=true --verbose=quiet --query=bitmaps $ROOT.imgeq.dvi >dvi2bitmap.log
-                ;;
-            11)
-                $VERBOSE && echo "$PROGNAME:I: $DVI2BITMAP --magnification=3 --scale=3 --process=transparency $ROOT.imgeq.dvi"
-                $run $DVI2BITMAP --magnification=3 --scale=3 --process=transparent --verbose=quiet --query=bitmaps $ROOT.imgeq.dvi >dvi2bitmap.log
-                ;;
-        esac
+        mkfifo $ROOT.imgeq.tex $ROOT.imgeq.dvi
+        if [ -n "$run" ]; then
+            echo "Would create bitmaps here!"
+        else
+            if $DEBUGGING; then
+                latexlog=$ROOT.imgeq.stdout
+            else
+                latexlog=/dev/null
+            fi
+            echo "$PROGNAME:I: Generating equations..."
+            $IMGEQ --imgformat $imgfmt $ROOT.imgeq.list & \
+                $LATEX "\\input $ROOT.imgeq.tex" >$latexlog & \
+                $DVI2BITMAP --magnification=2 --scale=4 --font-mode=nec --resolution=180 --process=transparent --verbose=quiet --query=bitmaps --pipe $ROOT.imgeq.dvi >dvi2bitmap.log 
+#                $DVI2BITMAP --magnification=3 --scale=3 --process=transparent --verbose=quiet --query=bitmaps --pipe $ROOT.imgeq.dvi >dvi2bitmap.log 
+            echo "$PROGNAME:I: ...done"
+        fi
 
 	if [ -r dvi2bitmap.log -a -r $ROOT.imgeq.labelmap ]; then
 	    awk '
