@@ -137,13 +137,9 @@ gaia_stcl.c: $(MKTCLAPP) library/gaia_stcl.tcl
 	$(MKTCLAPP) -header > gaia_stcl.h
 	$(MKTCLAPP) -f gaia_stcl.mta > gaia_stcl.c
 
-#  Link wish. Note we remove proj.o from Skycat to ensure that the AST
-#  version is used (this is also very different and the linker
-#  complains object size changes). Note we did remove wcstrig.o as
-#  well, but the names of these routines no longer clash.
+#  Link wish. 
 $(TKPROG): $(MKTCLAPP) gaia_swish.o tkAppInit.o FORCE
 	@echo "linking \"$(TKPROG)\"..."
-	- ar d $(LIBDIR)/libskycat.a proj.o
 	- @RANLIB@ $(LIBDIR)/libskycat.a
 	$(CXX) $(CC_SWITCHES) tkAppInit.o gaia_swish.o -o $(TKPROG)  \
 	   $(LDFLAG1) $(ADDLIBS) $(LD_SEARCH_FLAGS) $(AST_LIBS) \

@@ -152,13 +152,9 @@ LN           = ln -s
 # ------------------------------------------------------------------------
 all: $(DEMO_WISH) $(DEMO_TCL) $(GAIAMON)
 
-#  Link wish. Note we remove proj.o from Skycat to ensure that the AST
-#  version is used (this is also very different and the linker
-#  complains object size changes). Note we did remove wcstrig.o as
-#  well, but the names of these routines no longer clash.
+#  Link wish. 
 $(DEMO_WISH): normallib tkAppInit.o FORCE
 	@echo "linking \"$(DEMO_WISH)\"..."
-	- ar d $(LIBDIR)/libskycat.a proj.o
 	- @RANLIB@ $(LIBDIR)/libskycat.a
 	$(CXX) $(CC_SWITCHES) tkAppInit.o -o $(DEMO_WISH)  \
 	       $(LDFLAG1) $(ADDLIBS) $(LD_SEARCH_FLAGS) $(AST_LIBS) \
