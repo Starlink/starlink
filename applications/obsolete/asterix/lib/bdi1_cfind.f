@@ -577,10 +577,20 @@
 
 *  Status:
       INTEGER 			STATUS             	! Global status
+
+*  Local Variables:
+      INTEGER			ENDIM, EDIMS(DAT__MXDIM)! Existing dimensions
+      INTEGER			I			! Loop over dimensions
+
+      LOGICAL			DOCRE			! Create object?
+      LOGICAL			SAME			! Dims the same?
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Initialise
+      DOCRE = .FALSE.
 
 *  Does the named object exist?
       CALL DAT_THERE( LOC, NAME, THERE, STATUS )
@@ -591,10 +601,39 @@
           CALL ERR_REP( ' ', 'Insufficient type or dimensions '/
      :          /'information to create object '//NAME, STATUS )
         ELSE
-          CALL DAT_NEW( LOC, NAME, TYPE, NDIM, DIMS, STATUS )
+          DOCRE = .TRUE.
         END IF
+
+*  If object exists, make sure dimensions are ok. If they are not, coerce
+*  them to the correct ones
+      ELSE IF ( CREATE .AND. THERE ) THEN
+
+*    Get existing dimensions
+        CALL CMP_SHAPE( LOC, NAME, DAT__MXDIM, EDIMS, ENDIM, STATUS )
+
+*    Are they the same as those required?
+        SAME = (NDIM.EQ.ENDIM)
+        I = 1
+        DO WHILE ( (I.LE.NDIM) .AND. SAME )
+          SAME = (DIMS(I).EQ.EDIMS(I))
+          I = I + 1
+        END DO
+
+*    If not the same, recreate the object
+        IF ( .NOT. SAME ) THEN
+          CALL DAT_ERASE( LOC, NAME, STATUS )
+          DOCRE = .TRUE.
+        END IF
+
+      END IF
+
+*  Create it?
+      IF ( DOCRE ) THEN
+        CALL DAT_NEW( LOC, NAME, TYPE, NDIM, DIMS, STATUS )
         THERE = (STATUS.EQ.SAI__OK)
       END IF
+
+*  Locate if object exists
       IF ( THERE ) THEN
         CALL DAT_FIND( LOC, NAME, CLOC, STATUS )
       END IF
