@@ -148,7 +148,6 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'PAR_ERR'          ! Parameter-system errors
       INCLUDE 'PRM_PAR'          ! Magic-value definitions
 
 *  Arguments Given:
@@ -237,11 +236,9 @@
       REAL
      :  FUNCT,                   ! Gaussian function at a bin
      :  FW,                      ! Weighted Gaussian function at a bin
-     :  RADIUS,                  ! Current mean profile radius
      :  RAXISR,                  ! Reciprocal minor-axis squared
      :  RDASH,                   ! Effective radius
      :  RLIMIT,                  ! Radius limit in the minor axis
-     :  RMAX,                    ! Maximum radius mean profile
      :  RSIG,                    ! Reciprocal sigma
      :  S                        ! Sine of the orientation
 
@@ -268,9 +265,6 @@
      :  SUMF,                    ! Sum of Gaussian weights
      :  SUMF2,                   ! Sum of Gaussian weights squared
      :  SUMW                     ! Sum of the number of points
-
-      CHARACTER
-     :  BUFFER * 80              ! Buffer to write results
 
 *.
 
@@ -363,7 +357,7 @@
 
 *                   Find the radial bin.
 
-                     BIN = RDASH * RSCALE
+                     BIN = INT( RDASH * RSCALE )
 
                      IF ( BIN .LT. NBIN1 .AND. RDASH .LE. RLIMIT ) THEN
 
@@ -449,18 +443,18 @@
 
 *          Solve the normal equations for the Gaussian fit.
 
-            DET = SUMF2 * SUMW - SUMF * SUMF
+            DET = REAL( SUMF2 * SUMW - SUMF * SUMF )
 
             IF ( DET .NE. 0.0 ) THEN
-               AMP = ( SUMW * SUMDF - SUMD * SUMF ) / DET
-               BACK = ( SUMF2 * SUMD - SUMDF * SUMF ) / DET
+               AMP = REAL( SUMW * SUMDF - SUMD * SUMF ) / DET
+               BACK = REAL( SUMF2 * SUMD - SUMDF * SUMF ) / DET
 
 *             Insert the star profile into the mean-profile bins.
 
                DO BIN = 0, NBIN1 - 1
 
                   IF ( LSTART( BIN ) .GT. 0 ) THEN
-                     BIN2 = R( BIN ) * RSCL2
+                     BIN2 = INT( R( BIN ) * RSCL2 )
 
                      IF ( BIN2 .LE. NBIN2 - 1 ) THEN
 
