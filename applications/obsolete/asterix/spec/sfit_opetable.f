@@ -1,6 +1,6 @@
 *+  SFIT_OPETABLE - Write an error table to a specified o/p unit
       SUBROUTINE SFIT_OPETABLE( NPAR, PARAM, NEPAR, PARS, LE, UE,
-     :                          FROZEN, PEGCODE, IMOD, OCI, STATUS )
+     :                          FROZEN, PEGCODE, MODEL, OCI, STATUS )
 *
 *    Description :
 *
@@ -44,14 +44,13 @@
       INTEGER               NPAR          ! Number of parameters
       REAL                  PARAM(NPAR)   ! Parameter values
       INTEGER               NEPAR         ! Number of parameters with new errors
-      INTEGER		    PARS(*)	  ! Pars with new errors
+      INTEGER			PARS(*)	  ! Pars with new errors
       REAL                  LE(NPAR)      ! Parameter lower bounds
       REAL                  UE(NPAR)      ! Parameter upper bounds
-      LOGICAL		    FROZEN(NPAR)
+      LOGICAL			FROZEN(NPAR)
       INTEGER               PEGCODE(NPAR) ! Pegging codes
-c     RECORD /MODEL_SPEC/   MODEL	  ! Model specification
-      INTEGER		    IMOD
-      INTEGER		    OCI	          ! AIO stream id
+      RECORD /MODEL_SPEC/   MODEL	  ! Model specification
+      INTEGER			OCI			! AIO stream id
 *
 *    Local parameters :
 *
@@ -126,21 +125,27 @@ c     RECORD /MODEL_SPEC/   MODEL	  ! Model specification
 
 *      Make model parameter upper case if this is one of the parameters
 *      whose errors have been found on this iteration
-        PNAM = MODEL_SPEC_PARNAME(IMOD,J)
+        PNAM = MODEL.PARNAME(J)
         IF ( ISNEW .AND. .NOT. FROZEN(J) ) THEN
           CALL CHR_UCASE( PNAM )
         END IF
 
 *      Format the parameter information. Only write model component name
 *      for the first component in each model.
-        IF ( J .EQ. MODEL_SPEC_ISTART(IMOD,NC) ) THEN
-          WRITE(OTXT,115) MODEL_SPEC_KEY(IMOD,NC), PNAM, PARAM(J),
+        IF ( J .EQ. MODEL.ISTART(NC) ) THEN
+          WRITE(OTXT,115) MODEL.KEY(NC), PNAM, PARAM(J),
      :                    LCON, UCON, HW
- 115      FORMAT( A4, 1X, A23, 1PG12.4, 3(1X,1PG12.4) )
+ 115      FORMAT( A4, 1X, A23, 1PG12.5, 3(1X,1PG12.5) )
           NC = NC + 1
         ELSE
-          WRITE(OTXT,120) PNAM, PARAM(J), LCON, UCON, HW
- 120      FORMAT( 5X, A23, 1PG12.4, 3(1X,1PG12.4) )
+          IF ( ( LCON .GT. -1.0e+3 .AND. UCON .LT. -1.0e-4 ) .OR.
+     :         ( LCON .GT. +1.0e-4 .AND. UCON .LT. +1.0e+3 ) ) THEN
+            WRITE(OTXT,120) PNAM, PARAM(J), LCON, UCON, HW
+          ELSE
+            WRITE(OTXT,121) PNAM, PARAM(J), LCON, UCON, HW
+          END IF
+ 120      FORMAT( 5X, A23, F12.7, 2(1X,F12.7) 1x, 1PG12.5)
+ 121      FORMAT( 5X, A23, 1PG12.5, 3(1X,1PG12.5) )
         END IF
 
 *      Write line describing parameters
