@@ -1,24 +1,11 @@
 FLUXES -- JCMT planetary position and flux density calibration
                                                             Expires: ??.??.??
 
-Version 1.1????
+Version 1.1-2
 
-Changes in this release (Spring 1999):
+Changes in this release (Spring 2001):
 
-  
-This release mainly contains fixes related to running fluxes in batch mode.
+   - Extends the Mars model to 2011 (it expired in April 2001).
+     Thanks to Ned Wright for providing updated temperatures.
 
-  - When a planet is specified only the fluxes for that planet are returned
-  - A single filter can be specified using the FILTER parameter
-    [The parameter is not requested by default]
-  - When a filter and planet combination are requested, the results are
-    stored in ADAM parameters.
-  - Fluxes will now run without output to screen or file
-    [useful when run in conjunction with the filter parameter in
-    batch mode]
-  - parameters can now be specified on the command line
-  - minor changes to internals for consistency in planet numbering
-  - output reporting level can be set by MSG_FILTER
-  - the SCUBA beam sizes have been modified to more reflect
-    reality.
 
