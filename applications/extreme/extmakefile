@@ -33,7 +33,7 @@
 #     non-Fortran files can be extracted using the old rule, but the
 #     Fortran files can be extracted using the new rule inserted by this
 #     script (the dummy target '$(FORTRAN_FILES)' is written as a 
-#     placeholder for these files).  This may require splitting up 
+#     placeholder for such files).  This may require splitting up 
 #     existing macros, for instance splitting PRIVATE_INCLUDES into 
 #     PRIVATE_C_INCLUDES and PRIVATE_F_INCLUDES.
 #   
@@ -130,13 +130,14 @@
             my( $extract_f ) = "";
             if ( $extract =~ /\$\(TAR_OUT\).*\$\@ *\n/ ) {
                $comm_f = $comm;
+               $comm_f =~ s/^\n//;
                $comm_f =~ s/source files/Fortran source files/;
                $extract_f = 
                   $extract .
                   "\tif test \$(INTEGER8); then \\\n" . 
                   "           \$(REPLACE_INTEGER8) < \$\@ > \$\@_tmp; \\\n" .
                   "           mv \$\@_tmp \$\@; \\\n" .
-                  "        else :; fi\n";
+                  "        else :; fi\n\n";
                $extract_f =~ s/^\n*//;
                $extract_f =~ s/^([^\t].*\n)*/\$(FORTRAN_FILES):\n/;
                $done{ "Add rule for extracting Fortran source files" } = 1;
@@ -187,7 +188,7 @@
 #  Reminder that hand editing is required.
       print( STDERR "\n" );
       print( STDERR join( "\n      ",
-            "The following must still be done:",
+            "The following are not done by this script:",
             "Extract Fortran files using new extraction rule",
             "Locate any other extractions of Fortran files from archives",
             "Add new include files and dependencies if required",
