@@ -60,8 +60,8 @@
       INCLUDE 'PRM_PAR'                          ! VAL__ constants
 
 *  Arguments Given:
-      REAL    DATA_IN ( NDP )
       INTEGER NDP
+      REAL    DATA_IN ( NDP )
       INTEGER N_PTS
       REAL    X_IN ( NDP )
       REAL    X_OUT( N_PTS )
