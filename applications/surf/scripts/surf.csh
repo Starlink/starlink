@@ -44,6 +44,8 @@
 #     30-NOV-1997 (TIMJ):
 #        Add some more commands for release 1.1: pltbol, rlinplot,
 #        scuplot and dspbol
+#     26-JAN-1997 (TIMJ)
+#        Add SCUBA2MEM
 #     {enter_changes_here}
 #
 #-
@@ -69,6 +71,7 @@ alias reduce_switch   ${SURF_DIR}/reduce_switch
 alias remsky          ${SURF_DIR}/remsky
 alias restore         ${SURF_DIR}/restore
 alias scan_rlb        ${SURF_DIR}/scan_rlb
+alias scuba2mem       ${SURF_DIR}/scuba2mem
 alias scucat          ${SURF_DIR}/scucat
 alias scuclip         ${SURF_DIR}/scuclip
 alias scuhelp         ${SURF_DIR}/scuhelp
@@ -93,6 +96,7 @@ alias surf_reduce_switch   ${SURF_DIR}/reduce_switch
 alias surf_remsky          ${SURF_DIR}/remsky
 alias surf_restore         ${SURF_DIR}/restore
 alias surf_scan_rlb        ${SURF_DIR}/scan_rlb
+alias surf_scuba2mem       ${SURF_DIR}/scuba2mem
 alias surf_scucat          ${SURF_DIR}/scucat
 alias surf_scuclip         ${SURF_DIR}/scuclip
 alias surf_scuhelp         ${SURF_DIR}/scuhelp
