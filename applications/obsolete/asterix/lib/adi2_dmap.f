@@ -290,7 +290,8 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
       DO I = 1, NELM
-        AXDAT(I) = REAL( (I - BASE - 0.5D0) * DELTA )
+c       AXDAT(I) = REAL( (I - BASE - 0.5D0) * DELTA )
+        AXDAT(I) = REAL( (I - BASE) * DELTA )
       END DO
 
       END
