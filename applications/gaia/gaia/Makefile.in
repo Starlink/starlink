@@ -30,6 +30,10 @@ FFLAGS       = @FFLAGS@
 ALINK        = @ALINK@
 LINK         = @LINK@
 
+# Static/dynamic non-atask linker flags
+LDFLAG1 =
+LDFLAG2 =
+
 # -D flags
 DEFINES      = 	-DSHARED=@SHARED@ @TCLUTIL_DEFS@
 
@@ -150,25 +154,26 @@ LN 	     = ln -s
 all: $(demo_wish) $(demo_tcl) $(ardstat) $(autocrop) $(cat2tab) $(tab2cat) \
 	$(asc2tab) $(tab2asc)
 
-#  Link wish. Note we need proj.o and wcstrig.o from AST extracting to 
+#  Link wish. Note we need proj.o and wcstrig.o from AST extracting to
 #  ensure that these are used in preference to the versions in Skycat.
 $(demo_wish): normallib tkAppInit.o FORCE
 	@echo "linking \"$(demo_wish)\"..."
 	ar x $(STARLINK)/lib/libast_wcslib.a proj.o wcstrig.o
 	$(CXX) $(CC_SWITCHES) tkAppInit.o -o $(demo_wish)  \
 	       proj.o wcstrig.o $(LD_SEARCH_FLAGS) $(SKYCAT_LIB) $(CAT_LIB) \
-	       $(ADDLIBS) $(AST_LIBS) \
+	       $(LDFLAG1) $(ADDLIBS) $(AST_LIBS) \
 	       $(RTD_LIB) $(ASTROTCL_LIB) \
 	       $(TCLUTIL_LIB) $(LOCAL_LIBRARY) $(ADDLIBS) \
 	       $(AST_LIBS) $(TCLUTIL_LIB_STATIC) $(ADAM_LIBS) $(TCLTKLIBS) \
-	       $(X_LIB) $(EXTRA_LIBS)
+	       $(X_LIB) $(LDFLAG2) $(EXTRA_LIBS)
 	$(RM) proj.o wcstrig.o
 
 $(demo_tcl): normallib tclAppInit.o FORCE
 	@echo "linking \"$(demo_tcl)\"..."
 	$(CXX) $(CC_SWITCHES)  tclAppInit.o -o $(demo_tcl) \
-	       $(LD_SEARCH_FLAGS) $(LOCAL_LIBRARY) $(ADDLIBS) $(ADAM_LIBS) \
-	       $(TCLTKLIBS) $(EXTRA_LIBS)
+	       $(LD_SEARCH_FLAGS) $(LOCAL_LIBRARY) $(LDFLAG1) \
+               $(ADDLIBS) $(ADAM_LIBS) \
+	       $(TCLTKLIBS) $(LDFLAG2) $(EXTRA_LIBS)
 
 $(ardstat): normallib ardstat.o
 	echo "linking \"$(ardstat)\"..."

@@ -15,6 +15,10 @@ CC 	     = @CC@
 #  C++ compiler
 CXX          = @CXX@
 
+# Static/dynamic non-atask linker flags
+LDFLAG1 =
+LDFLAG2 =
+
 #  -D flags
 DEFINES      = -DSHARED=@SHARED@ @TCLUTIL_DEFS@
 
@@ -90,8 +94,8 @@ COMPIFL  = @STARLINK@/bin/compifl
 #  Define sets of ADAM libraries we need to link against. Note that
 #  ast_link and ndf_link must be carefully managed to avoid picking up
 #  default AST libraries for errors and graphics.
-AST_LIBS = $(ADDLIBS) -L$(STAR_LIB) `ast_link -myerr -mygrf`
-ADAM_LIBS = $(ADDLIBS) -L$(STAR_LIB) `ard_link` `ams_link_adam` `fio_link` `cat_link_adam` `subpar_link_adam` `ndf_link`  -lpda
+AST_LIBS = -L$(STAR_LIB) `ast_link -myerr -mygrf`
+ADAM_LIBS = -L$(STAR_LIB) `ard_link` `ams_link_adam` `fio_link` `cat_link_adam` `subpar_link_adam` `ndf_link`  -lpda
 
 #  Name of single binaries
 TKPROG = bin/gaia_swish
@@ -139,18 +143,18 @@ $(TKPROG): $(MKTCLAPP) gaia_swish.o tkAppInit.o FORCE
 	ar x $(STARLINK)/lib/libast_wcslib.a proj.o wcstrig.o
 	$(CXX) $(CC_SWITCHES) tkAppInit.o gaia_swish.o -o $(TKPROG)  \
 	       proj.o wcstrig.o $(LD_SEARCH_FLAGS) $(SKYCAT_LIB) $(CAT_LIB)  \
-	       $(AST_LIBS) $(RTD_LIB) $(ASTROTCL_LIB) \
+	       $(LDFLAG1) $(ADDLIBS) $(AST_LIBS) $(RTD_LIB) $(ASTROTCL_LIB) \
 	       $(TCLUTIL_LIB) $(LOCAL_LIBRARY) \
 	       $(AST_LIBS) $(TCLUTIL_LIB) $(ADAM_LIBS) $(TCLTKLIBS) \
-	       $(X_LIB) $(EXTRA_LIBS)
+	       $(X_LIB) $(LDFLAG2) $(EXTRA_LIBS)
 	$(RM) proj.o wcstrig.o
 
 $(TCLPROG): $(MKTCLAPP) gaia_stcl.o tclAppInit.o FORCE
 	@echo "linking \"$(TCLPROG)\"..."
 	$(CXX) $(CC_SWITCHES) tclAppInit.o gaia_stcl.o -o $(TCLPROG)  \
 	       $(LD_SEARCH_FLAGS) $(LOCAL_LIBRARY) \
-	       $(ADAM_LIBS) $(TCLTKLIBS) \
-	       $(EXTRA_LIBS)
+	       $(LDFLAG1) $(ADDLIBS) $(ADAM_LIBS) $(TCLTKLIBS) \
+	       $(LDFLAG2) $(EXTRA_LIBS)
 
 install: install-top install-bin
 
