@@ -8215,6 +8215,8 @@ U java/source/splat/src/main/uk/ac/starlink/splat/data/SpecDataFactory.java
 U java/source/splat/src/main/uk/ac/starlink/splat/data/SpecDataImpl.java
 U java/source/splat/src/main/uk/ac/starlink/splat/data/SpecList.java
 U java/source/splat/src/main/uk/ac/starlink/splat/data/TXTSpecDataImpl.java
+U java/source/splat/src/main/uk/ac/starlink/splat/data/TableColumnChooser.java
+U java/source/splat/src/main/uk/ac/starlink/splat/data/TableSpecDataImpl.java
 cvs checkout: Updating java/source/splat/src/main/uk/ac/starlink/splat/help
 U java/source/splat/src/main/uk/ac/starlink/splat/help/HelpHolder.java
 cvs checkout: Updating java/source/splat/src/main/uk/ac/starlink/splat/iface

@@ -861,4 +861,4 @@ export-full-built:
       [tar] Building tar: /apps/cvsbuild/export/starjava-i386.tar.gz
 
 BUILD SUCCESSFUL
-Total time: 5 minutes 33 seconds
+Total time: 3 minutes 32 seconds
