@@ -99,10 +99,10 @@
             NAXIS2 = 100
          END IF
 
-         PBOX(3) = 0.0
-         PBOX(2) = 0.0
-         PBOX(1) = DBLE( NAXIS1 )
-         PBOX(4) = DBLE( NAXIS2 )
+         PBOX(1) = 0.5
+         PBOX(2) = 0.5
+         PBOX(3) = DBLE( NAXIS1 )+0.5
+         PBOX(4) = DBLE( NAXIS2 )+0.5
       END IF
 
 * 
@@ -151,13 +151,15 @@
             GBOX(2) = GBOX(2) + 0.05*RANGE
             GBOX(4) = GBOX(4) - 0.05*RANGE
 
-            ASP = REAL( PBOX(4) )/REAL( PBOX(1) )
+            ASP = REAL( PBOX(4) - PBOX(2) )/REAL( PBOX(3) - PBOX(1) )
             IF( ASP .GT. 1.0 ) THEN
-               DELTA = ( ASP - 1.0 )*( GBOX(3) - GBOX(1) )/( 2.0*ASP )
+               DELTA = 0.5*( ( GBOX(4) - GBOX(2) )/ASP - 
+     :                       ( GBOX(3) - GBOX(1) ) )
                GBOX(3) = GBOX(3) - DELTA
                GBOX(1) = GBOX(1) + DELTA
             ELSE
-               DELTA = ( 1.0 - ASP )*( GBOX(4) - GBOX(2) )/2.0
+               DELTA = 0.5*( ( GBOX(4) - GBOX(2) ) - 
+     :                       ASP*( GBOX(3) - GBOX(1) ) )
                GBOX(4) = GBOX(4) - DELTA
                GBOX(2) = GBOX(2) + DELTA
             END IF
