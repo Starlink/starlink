@@ -31,12 +31,16 @@ dnl    Should investigate whether we really need this for a non-starlink
 dnl    encumbered pgplot
 STAR_CNF_COMPATIBLE_SYMBOLS
 
-#   Test what features the OPEN command can support
+dnl   Test what features the OPEN command can support
 AC_FC_OPEN_SPECIFIERS(readonly)
+
+dnl    documentation
+STAR_LATEX_DOCUMENTATION(sun88)
 
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.
-AC_CONFIG_FILES(Makefile)
+
+AC_CONFIG_FILES(Makefile component.xml)
 
 dnl    This is the bit that does the actual work
 AC_OUTPUT

@@ -74,7 +74,7 @@ noinst_PROGRAMS = convrt pcrbin
 convrt_SOURCES = $(CONVRT_ROUTINES)
 CONVERT_ROUTINES = convrt.f
 
-pwritx_SOURCES = $(PWRITX_ROUTINES)
+pcrbin_SOURCES = $(PWRITX_ROUTINES)
 PWRITX_ROUTINES = pcrbin.f
 
 ezmap.dat: convrt
