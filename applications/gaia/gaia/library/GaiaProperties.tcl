@@ -74,8 +74,8 @@ itcl::class gaia::GaiaProperties {
 
       #  Stop extra instances from being instantiated.
       set caller [info level [expr [info level] - 1]]
-      if { ![string match "GaiaProperties::instance" $caller] } {
-         error "GaiaProperties cannot be instantiated - use instance proc"
+      if { ![string match "::gaia::GaiaProperties::instance" $caller] } {
+         error "GaiaProperties cannot be instantiated - use ::instance proc"
       }
 
       #  Set name of backing file.

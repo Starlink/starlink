@@ -36,6 +36,8 @@ cat > ${script_dir}/tclIndex <<EOF
 set auto_index(::gaia::Gaia) [list source [file join \$dir start_script.tcl]]
 set auto_index(::gaia::Gaia::startGaia) [list source [file join \$dir start_script.tcl]]
 set auto_index(::gaia::GaiaImageName) [list source [file join \$dir GaiaImageName.tcl]]
+set auto_index(::gaia::GaiaProperties) [list source [file join \$dir GaiaProperties.tcl]]
+set auto_index(::gaia::GaiaProperties::instance) [list source [file join $dir GaiaProperties.tcl]]
 EOF
 
 # - GaiaImageName.tcl
