@@ -9,7 +9,7 @@
 *
 *	Contents:	global definitions.
 *
-*	Last modify:	20/08/98 (EB):
+*	Last modify:	08/02/2000 (EB):
 *                       14/07/98 (AJC)
 *                          QFTELL, QFSEEK work with mapped NDF
 *                          NPRINTF, FPRINTF, NFPRINTF use adamprint
@@ -17,7 +17,8 @@
 *                          FITSTOx use AST
 *                       27/10/98 (AJC)
 *                          Add AFPRINTF to always print
-*	Last modify:	13/01/99 (EB):
+*                       27/10/98 (PWD)
+*                          New QPRINTF uses adamprint
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -25,12 +26,12 @@
 /*------------------------ what, who, when and where ------------------------*/
 
 #define		BANNER		"SExtractor"
-#define		VERSION		"2.0.19 (January 13, 1999)"
+#define		VERSION		"2.1.5 (Feb 08, 2000)"
 #define		COPYRIGHT	"Emmanuel BERTIN (bertin@iap.fr)"
 #define		WEBSITE		"http://terapix.iap.fr/sextractor"
 #define	       	MAILINGLIST	"sextractor@iap.fr"
 #define	       	MAILINGLISTREQ	"sextractor-request@iap.fr"
-#define		INSTITUTE	"IAP,Leiden & ESO"
+#define		INSTITUTE	"IAP"
 
 /*--------------------------- Internal constants ----------------------------*/
 
@@ -47,6 +48,7 @@
 #define	MAXPICSIZE		1048576		/* max. image size */
 #define	NISO			8		/* number of isophotes */
 #define	OUTPUT			stderr		/* where all msgs are sent */
+#define PSF_NPSFMAX		11		/* Max number of fitted PSFs */
 
 #ifndef PI
 #define	PI			3.1415926535898	/* never met before? */
@@ -65,6 +67,7 @@
  *			1 <= MAXNASSOC <= MAXLIST (see prefs.h)
  *			MAXPICSIZE > size of any image!!
  *			NISO = 8 (otherwise need to change prefs.h)
+ *			1 <= PSF_NPSFMAX
 */
 
 /*---- Set defines according to machine's specificities and customizing -----*/
@@ -245,9 +248,11 @@
 			else if (prefs.verbose_type == FULL) \
 				adamprint(w, "%s.\n", x);}
 
-#define	FPRINTF		if (prefs.verbose_type == FULL)	adamprint
+#define	QPRINTF		if (prefs.verbose_type != QUIET) adamprint
 
 #define	AFPRINTF	adamprint
+
+#define	FPRINTF		if (prefs.verbose_type == FULL)	adamprint
 
 #define	QWARNING       	if (prefs.verbose_type==WARN \
 				|| prefs.verbose_type==FULL)	warning

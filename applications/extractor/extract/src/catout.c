@@ -9,15 +9,14 @@
 *
 *	Contents:	functions for output of catalog data.
 *
-*	Last modify:	11/08/98 (EB):
-*                       23/10/98 (AJC):
+*	Last modify:	20/07/99 (EB):
+*	Last modify:	23/10/98 (AJC):
 *                          Make SKYCAT header have correct column headings
 *                          Assume 1 block header for FITS.
 *                       25/11/98 (PWD):
 *                          SKYCAT_ASCII files where closed before the
 *                          skycattail string was written, this crashed
 *                          on Linux.
-*	Last modify:	28/12/98 (EB):
 *                       09/04/99 (PWD):
 *                          Added restore for objkey. The dynamic
 *                          memory entries in this list are "destroyed"
@@ -217,6 +216,12 @@ void	updateparamflags()
   FLAG(obj2.flux_aper) |= FLAG(obj2.mag_aper)|FLAG(obj2.magerr_aper)
 			    | FLAG(obj2.fluxerr_aper);
 
+  FLAG(obj.flux_prof) |= FLAG(obj2.mag_prof)|FLAG(obj2.magerr_prof)
+			    | FLAG(obj2.flux_prof) | FLAG(obj2.fluxerr_prof);
+
+  FLAG(obj2.flux_galfit) |= FLAG(obj2.mag_galfit) | FLAG(obj2.magerr_galfit)
+			    | FLAG(obj2.fluxerr_galfit);
+
 /*---------------------------- External flags -------------------------------*/
   VECFLAG(obj.imaflag) |= VECFLAG(obj.imanflag);
 
@@ -228,7 +233,7 @@ void	updateparamflags()
 				| FLAG(obj2.poserrtheta2000_psf);
   FLAG(obj2.poserrthetaw_psf) |= FLAG(obj2.poserrthetas_psf);
 
-  FLAG(obj2.poserr_mx2w) |= FLAG(obj2.poserrmy2w_psf)
+  FLAG(obj2.poserrmx2w_psf) |= FLAG(obj2.poserrmy2w_psf)
 			| FLAG(obj2.poserrmxyw_psf)
 			| FLAG(obj2.poserrthetaw_psf) | FLAG(obj2.poserraw_psf)
 			| FLAG(obj2.poserrcxxw_psf);
@@ -256,7 +261,12 @@ void	updateparamflags()
 
   FLAG(obj2.mx2_pc) |= FLAG(obj2.my2_pc) | FLAG(obj2.mxy_pc)
 			| FLAG(obj2.a_pc) | FLAG(obj2.b_pc)
-			| FLAG(obj2.theta_pc);
+			| FLAG(obj2.theta_pc) | FLAG(obj2.vector_pc)
+			| FLAG(obj2.gdposang) | FLAG(obj2.gdscale)
+			| FLAG(obj2.gdaspect) | FLAG(obj2.flux_galfit)
+			| FLAG(obj2.gde1) | FLAG(obj2.gde2)
+			| FLAG(obj2.gbposang) | FLAG(obj2.gbscale)
+			| FLAG(obj2.gbaspect) | FLAG(obj2.gbratio);
 
   FLAG(obj2.flux_psf) |= FLAG(obj2.mag_psf) | FLAG(obj2.x_psf)
 			| FLAG(obj2.y_psf) | FLAG(obj2.xw_psf)
@@ -464,7 +474,6 @@ void	endcat()
    keystruct	*key;
    tabstruct	*tab;
    char		*head;
-   long		pos;
    int		i;
 
 /* Free allocated memory for arrays */
@@ -479,9 +488,6 @@ void	endcat()
     case ASCII_HEAD:
       if (!prefs.pipe_flag)
         fclose(ascfile);
-      objtab->key = NULL;
-      objtab->nkey = 0;
-      free_tab(objtab);
       break;
 
     case ASCII_SKYCAT:
@@ -508,8 +514,6 @@ void	endcat()
       QFSEEK(fitscat->file, tab->bodypos-FBSIZE*tab->headnblock, SEEK_SET,
 	fitscat->filename);
       save_tab(fitscat, tab);
-      objtab->key = NULL;
-      objtab->nkey = 0;
       free_cat(fitscat,1);
       break;
 
@@ -519,8 +523,6 @@ void	endcat()
       fitswrite(fitscat->tab->headbuf, "SEXNFIN ", &cat.ntotal, H_INT,T_LONG);
       QFSEEK(fitscat->file, 0, SEEK_SET, fitscat->filename);
       save_tab(fitscat, fitscat->tab);
-      objtab->key = NULL;
-      objtab->nkey = 0;
       free_cat(fitscat,1);
       break;
 
@@ -530,6 +532,10 @@ void	endcat()
     default:
       break;
     }
+
+  objtab->key = NULL;
+  objtab->nkey = 0;
+  free_tab(objtab);
 
   return;
   }

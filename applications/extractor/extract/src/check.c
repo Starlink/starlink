@@ -9,14 +9,13 @@
 *
 *	Contents:	handling of "check-images".
 *
-*	Last modify:	04/02/98
+*	Last modify:	10/05/99 (EB):
 *                       28/10/98 (AJC):
 *                          Major remodel to produce NDFs
 *                          N.B. Header information lost.
 *                       22/10/99 (PWD):
 *                          Added initialisation of overlay, this fixes
 *                          a problem with aperture display.
-*	Last modify:	23/11/98
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -368,6 +367,9 @@ void	endcheck(picstruct *field, checkstruct *check)
     case CHECK_FILTERED:
     case CHECK_SUBTRACTED:
       free(check->pix);
+      free(check->line);
+      check->line = NULL;
+      padsize = (FBSIZE -((check->npix*sizeof(PIXTYPE))%FBSIZE)) % FBSIZE;
       break;
 
     case CHECK_OBJECTS:
