@@ -36,6 +36,11 @@
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'PSF_PAR'
+      INCLUDE 'PAR_PAR'
+*
+*    Global variables :
+*
+      INCLUDE 'PSF_CMN'
 *
 *    Import :
 *
@@ -162,7 +167,7 @@
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'PSF_PAR'
-<*
+*
 *    Import :
 *
       CHARACTER*(*)            STR                     ! The model spec
@@ -179,12 +184,13 @@
 *
 *    Local variables :
 *
-      INTEGER                  BPOS                    ! Character pointer
-      INTEGER                  IC                      ! Character pointer
-      INTEGER                  NBIN                    ! # model energy bins
-      INTEGER                  NB_B, NB_E              ! nbin bit
-      INTEGER                  S_B, S_E                ! Spatial bit
-      INTEGER                  SP_B, SP_E              ! Spectral bit
+      INTEGER                   BPOS                    ! Character pointer
+      INTEGER                   IC                      ! Character pointer
+      INTEGER			MODE			! Energy mode
+      INTEGER                   NBIN                    ! # model energy bins
+      INTEGER                   NB_B, NB_E              ! nbin bit
+      INTEGER                   S_B, S_E                ! Spatial bit
+      INTEGER                   SP_B, SP_E              ! Spectral bit
 
       LOGICAL                   AT_END                  ! End of parse?
       LOGICAL			EMOK			! Modelling ok?
@@ -413,6 +419,7 @@
 *    Local variables :
 *
       INTEGER                   APTR                    ! Axis pointer
+      INTEGER                   CBPTR                   ! Channel bounds ptr
       INTEGER                   NDIM, DIMS(1)        	! Spectrum dimensions
       INTEGER                   DPTR                    ! Data pointer
       INTEGER                   NSBIN                   ! # spectral bins
