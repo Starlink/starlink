@@ -1,3 +1,8 @@
+2000-06-26  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* src/surf_read_rebin_ndf.f (SURF_READ_REBIN_NDF): Wavelengths of
+	files can now be up to 20 microns apart.
+
 2000-06-23  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* surflib/surflib_process_bols.f (SURFLIB_PROCESS_BOLS): Add
