@@ -58,6 +58,9 @@
 #        images is PIXEL. 
 #     22-MAR-1999 (DSB):
 #        Make rotation available in single-beam mode.
+#     22-APR-1999 (DSB):
+#        Modified to use a private colour map automatically if a GWM canvas
+#        item cannot be producing without a private colour map.
 #-
 
 # Uncomment this section to see the names of all procedure as they are 
@@ -145,6 +148,7 @@
    set CURSOR_STACK ""
    set CURITEM "" 
    set DEFAULT_INFO ""
+   set DEF_OEMAP ""
    set DOING_DOUBLE 0
    set INFO_TEXT ""
    set F3 ""
@@ -524,16 +528,25 @@
                          }"
 
 
+# Loop round until we have succesully create a gwm canvas item. The first
+# pass round this loop attempts to manage without a private colour map.
+# If the gwm canvas item cannot be created, then a second pass occurs in
+# which a private colour map is used. If this also fails, then the
+# application exists.
+   set gotgwm 0
+   set usingnewcmap 0
+   while { !$gotgwm } {
+
 # Create an all encompassing frame. Give it a new colour map if requested.
-   if { [info exists NEWCOLMAP] } {
-      set usingnewcmap 1
-      set TOP [frame .top -relief raised -bd 2 -colormap new]
-      wm colormapwindows . "$TOP ."
-   } {
-      set usingnewcmap 0
-      set TOP [frame .top -relief raised -bd 2]
-   }
-   pack $TOP -padx 2m -pady 2m 
+# It is not packed yet, so that it does not appear on the screen. All the
+# component widgets are created first, so that they can all appear together
+# when $TOP is packed, rather than in dribs and drabs.
+      if { $usingnewcmap } {
+         set TOP [frame .top -relief raised -bd 2 -colormap new]
+         wm colormapwindows . "$TOP ."
+      } {
+         set TOP [frame .top -relief raised -bd 2]
+      }
 
 # Create a frame which goes at the top of the screen but contains nothing. 
 # X events will be directed to this window during any pauses
@@ -541,8 +554,8 @@
 # "safe" (i.e. it will just ignore any button presses, mouse movements, etc). 
 # This ensures that new commands cannot be initiated by the user before 
 # previous ones have finished.
-   set SAFE [frame $TOP.dummy ]
-   pack $SAFE
+      set SAFE [frame $TOP.dummy ]
+      pack $SAFE
 
 # Divide the top window into four horizontal frames. The top one is the
 # menu bar. The next contains the GWM canvas and controls. The next displays
@@ -550,11 +563,91 @@
 # under the cursor. The bottom two frames may or may not be displayed,
 # depending on the options slected by the user. The display of the two
 # bottom frames is controlled by procedures HelpArea and StatusArea.
-   set F1 [frame $TOP.menubar -relief raised -bd 2 -background $MENUBACK ]
-   set F2 [frame $TOP.main ]
-   pack $F1 $F2 -fill x -expand 1
+      set F1 [frame $TOP.menubar -relief raised -bd 2 -background $MENUBACK ]
+      set F2 [frame $TOP.main ]
+      pack $F1 $F2 -fill x -expand 1
 
-# Build the menu bar and menus.
+# Set up the main frame (F2) first so that if the gwm canvas item cannot
+# be created we can quickly go back and try again with a private colour map.
+# It is made up from three columns arranged horizontally...
+      set col1 [frame $F2.col1 -bd 0]   
+      set col2 [frame $F2.col2 -bd 0]
+      set col3 [frame $F2.col3 -bd 0]   
+      pack $col1 $col2 $col3 -side left -fill y -ipadx 2m -ipady 2m -expand 1
+
+# Create the third column first since it contains the GWM canvas item...
+
+# Create a label displaying a description of the current canvas
+# interaction mode.
+      set DESC [label $col3.desc -textvariable INFO_TEXT -relief raised -bd 2 -font $RB_FONT -pady 1m]
+      pack $DESC -padx 3m -pady 2m -expand 1 -fill x
+
+# Create the canvas in column 3...
+      set CAN [canvas $col3.can1 -height $SIZE -width $SIZE]
+      pack $CAN -padx 3m -expand 1
+
+# Create a GWM canvas items which fills the canvas.
+      if { [catch {set gwm [$CAN create gwm 0 0 -height $SIZE -width $SIZE -name $GWM_NAME -mincolours $COLOURS -tags gwm]} mess] } {
+
+# If this failed, prepare to try again with a private colour map. Destroy
+# the all--encompassing frame, and set a flag to indicate that a private
+# colour map should be used.
+         if { !$usingnewcmap } {
+            destroy $TOP
+            set usingnewcmap 1 
+
+# If we failed while using a private colour map, give up.
+         } {
+            Message "Failed to create the image display.\n\n$mess"
+            exit
+         }
+
+#  Set a flag if the GWM canvas item was created succesfully.
+      } {
+         set gotgwm 1
+      }
+
+   }
+
+# Reset the pointer coordinates string to null when the pointer leaves
+# the canvas, and ensure any cross hair is lowered below the GWM canvas
+# item so that it cannot be seen. Raise it back again when the pointer
+# enters the canvas.
+   bind $CAN <Leave> "+
+      set POINTER_PXY \"\"
+      set POINTER_CXY \"\"
+      if { \$XHAIR_IDH != \"\" } {
+         $CAN lower \$XHAIR_IDH $gwm
+         $CAN lower \$XHAIR_IDV $gwm
+      }"
+
+   bind $CAN <Enter> "+
+      if { \$XHAIR_IDH != \"\" } {
+         set cx \[$CAN canvasx %x\]
+         set cy \[$CAN canvasy %y\]
+         $CAN coords \$XHAIR_IDH 0 \$cy $SIZE \$cy
+         $CAN coords \$XHAIR_IDV \$cx 0 \$cx $SIZE
+         $CAN raise \$XHAIR_IDH $gwm
+         $CAN raise \$XHAIR_IDV $gwm
+      }"
+
+# Execute procedure SingleBind when button 1 is clicked over the canvas.
+   $CAN bind current <ButtonPress-1> "SingleBind %x %y 0"
+   $CAN bind current <Shift-ButtonPress-1> "SingleBind %x %y 1"
+
+# Execute procedure ReleaseBind when button 1 is released over the canvas.
+   $CAN bind current <ButtonRelease-1> "ReleaseBind %x %y"
+
+# Execute procedure B1MotionBind when the pointer is moved over the canvas 
+# with button 1 pressed.
+   $CAN bind current <B1-Motion> "B1MotionBind %x %y"
+
+# Execute procedure MotionBind when the pointer is moved over the canvas 
+# with no buttons pressed.
+   $CAN bind current <Motion> "MotionBind %x %y"
+
+# Leave the rest of the main Frame (col1 and col2) until later. Go on to 
+# build the menu bar and menus.
    set file [menubutton $F1.file -text File -menu $F1.file.menu -background $MENUBACK ]
    set filemenu [menu $file.menu]
    SetHelp $file ".  Menu of commands for exiting, saving, loading, etc..." POLKA_FILE_MENU
@@ -907,9 +1000,10 @@
       $edmapmenu add command -label $image -command "EditMapping $image im"
       MenuHelp $edmapmenu $image ".  Edit the mappings associated with image \"$image\"."
 
-# Indicate that we have no mapping information for any images.
-      set RECALC_IMMAP($image) 1
-      set RECALC_OEMAP($image) 1
+# Indicate the stored (null) mappings are up-to-date with respect to the
+# feature positions currently stored for each image. 
+      set RECALC_IMMAP($image) 0
+      set RECALC_OEMAP($image) 0
 
 # Initialise the lists holding information about the positions identified
 # in the image.
@@ -948,14 +1042,8 @@
    pack $file $edit $opts $images $effects -side left 
    pack $help -side right
 
-# Now deal with the middle horizontal frame ($F2). It is made up from
-# the following items arranged horizontally...
-   set col1 [frame $F2.col1 -bd 0]   
-   set col2 [frame $F2.col2 -bd 0]
-   set col3 [frame $F2.col3 -bd 0]   
-   pack $col1 $col2 $col3 -side left -fill y -ipadx 2m -ipady 2m -expand 1
-
-# Create the first column...
+# The menu bar is now complete. Go back and create the remaining two
+# columns (col1 and col2) of the main frame (F2). Create the first column...
 
 # The radiobutton array which selects the current object...
 
@@ -1162,62 +1250,6 @@
    SetHelp $LOCK ".  Check to use the current data limits to display subsequent images. This causes the percentiles entered in the \"% black\" and \"% not white\" entry boxes to be ignored." POLKA_LOCK_SCALING
    pack $LOCK -pady 5 -expand 1
 
-# Create a label displaying a description of the current canvas
-# interaction mode.
-   set DESC [label $col3.desc -textvariable INFO_TEXT -relief raised -bd 2 -font $RB_FONT -pady 1m]
-   pack $DESC -padx 3m -pady 2m -expand 1 -fill x
-
-# Create the canvas in column 3...
-   set CAN [canvas $col3.can1 -height $SIZE -width $SIZE]
-   pack $CAN -padx 3m -expand 1
-
-# Create a GWM canvas items which fills the canvas.
-   if { [catch {set gwm [$CAN create gwm 0 0 -height $SIZE -width $SIZE -name $GWM_NAME -mincolours $COLOURS -tags gwm]} mess] } {
-      if { $usingnewcmap } {
-         Message "Failed to create the image display.\n\nIt may be possible to overcome this problem by closing down some other X applications, and then re-running polka."
-      } {
-         Message "Failed to create the image display.\n\nIt may be possible to overcome this problem by re-running polka giving a true value for the NEWCOLMAP parameter."
-      }
-      exit
-   }
-
-# Reset the pointer coordinates string to null when the pointer leaves
-# the canvas, and ensure any cross hair is lowered below the GWM canvas
-# item so that it cannot be seen. Raise it back again when the pointer
-# enters the canvas.
-   bind $CAN <Leave> "+
-      set POINTER_PXY \"\"
-      set POINTER_CXY \"\"
-      if { \$XHAIR_IDH != \"\" } {
-         $CAN lower \$XHAIR_IDH $gwm
-         $CAN lower \$XHAIR_IDV $gwm
-      }"
-
-   bind $CAN <Enter> "+
-      if { \$XHAIR_IDH != \"\" } {
-         set cx \[$CAN canvasx %x\]
-         set cy \[$CAN canvasy %y\]
-         $CAN coords \$XHAIR_IDH 0 \$cy $SIZE \$cy
-         $CAN coords \$XHAIR_IDV \$cx 0 \$cx $SIZE
-         $CAN raise \$XHAIR_IDH $gwm
-         $CAN raise \$XHAIR_IDV $gwm
-      }"
-
-# Execute procedure SingleBind when button 1 is clicked over the canvas.
-   $CAN bind current <ButtonPress-1> "SingleBind %x %y 0"
-   $CAN bind current <Shift-ButtonPress-1> "SingleBind %x %y 1"
-
-# Execute procedure ReleaseBind when button 1 is released over the canvas.
-   $CAN bind current <ButtonRelease-1> "ReleaseBind %x %y"
-
-# Execute procedure B1MotionBind when the pointer is moved over the canvas 
-# with button 1 pressed.
-   $CAN bind current <B1-Motion> "B1MotionBind %x %y"
-
-# Execute procedure MotionBind when the pointer is moved over the canvas 
-# with no buttons pressed.
-   $CAN bind current <Motion> "MotionBind %x %y"
-
 # Identify all the status items which can be displayed in the status area.
    StatusItem DBEAM_TEXT   "Mode: "                  "The mode (single-beam or dual-beam) in which Polka is running. In single-beam mode all the controls related to E-ray objects or O-E mappings are disabled." 11
    StatusItem IMAGE_DISP   "Displayed image: "       "The name of the displayed image.\n(To change the displayed image, use the \"Images\" menu.)" $maximwid
@@ -1244,6 +1276,9 @@
 # Destroy the "please wait" label, displayed while the main interface is
 # being created.
    destroy $wait
+
+# Pack the top level frame. This make it appear on the screen.
+   pack $TOP -padx 2m -pady 2m 
 
 # Create the status area if required.
    StatusArea $SAREA

@@ -28,6 +28,10 @@
 #        image (see CheckSky).
 #     24-FEB-1999 (DSB):
 #        Modified to allow creation of Stokes vectors in single-beam mode.
+#     22-APR-1999 (DSB):
+#        Proc OEMapping changed to avoid expensive search for a default
+#        OEMapping if supplied image has no OEMap. A Default OEMapping is
+#        now stored in global DEF_OEMAP.
 #---------------------------------------------------------------------------
 
 proc Accept {} {
@@ -4966,6 +4970,8 @@ proc MappingMod {image map undo} {
 #     etc, are left unchanged).
 #
 #  Globals:
+#     DEF_OEMAP (Read and Write)
+#       The most recent OE Mapping to be found succesfully.
 #     E_RAY_FEATURES (Read)
 #        An integer representing the "E-ray features" object type.
 #     E_RAY_MASK (Read)
@@ -4991,6 +4997,7 @@ proc MappingMod {image map undo} {
 #        A 2-d array indexed by image and object type. Each element
 #        is a list of pixel Y coordinates. 
 #-
+   global DEF_OEMAP
    global E_RAY_FEATURES
    global E_RAY_MASK
    global E_RAY_SKY
@@ -5032,6 +5039,7 @@ proc MappingMod {image map undo} {
 
    set old_immap [ImageMapping $image]
    set old_oemap [OEMapping $image]
+   set old_defoemap $DEF_OEMAP 
    set old_sec_stack $SECTION_STACK
    set old_sec_req $SECTION_REQ
 
@@ -5082,6 +5090,13 @@ proc MappingMod {image map undo} {
             set ok 0
          }
       }
+      if { $old_defoemap != "" } {
+         set DEF_OEMAP [ConcMap [ConcMap $map $back $old_defoemap 0] \
+                                    0 $map $for]
+         if { $DEF_OEMAP == "" } {
+            set ok 0
+         }
+      }
    }
 
 # If anything went wrong, re-istate the original values.
@@ -5104,6 +5119,7 @@ proc MappingMod {image map undo} {
          unset OEMAP($image)
       }
 
+      set DEF_OEMAP $old_defoemap
       set SECTION_STACK $old_sec_stack
       set SECTION_REQ $old_sec_req
    }
@@ -9183,7 +9199,7 @@ proc Obey {task action params args} {
    return $ok
 }
 
-proc OEMapping {image args} {
+proc OEMapping {image} {
 #+
 #  Name:
 #     OEMapping
@@ -9197,7 +9213,7 @@ proc OEMapping {image args} {
 #     If no OE mapping can be created for the specified image (for
 #     instance, if the required image features have not yet been given by
 #     the user), then a default mapping is returned if possible. This is 
-#     the most recent OE mapping determined for any image (this is done on
+#     the most recent OE mapping to be determined (this is done on
 #     the assumption that OE mappings will be more or less the same for 
 #     all images). No errors are reported if the mapping cannot be created
 #     due to lack of image features.
@@ -9205,15 +9221,13 @@ proc OEMapping {image args} {
 #  Arguments:
 #     image
 #        The name of the image.
-#     args
-#        An optional argument which should only be set if this procedure
-#        was called recursively from within itself. It is used to prevent
-#        infinite recursion.
 #
 #  Returned Value:
 #     A list of 6 parameter values describing the linear mapping.
 #
 #  Globals:
+#     DEF_OEMAP (Read and Write)
+#       The most recent OE Mapping to be found succesfully.
 #     E_RAY_FEATURES (Read)
 #        An integer representing the "E-ray features" object type.
 #     MAPTYPE (Read)
@@ -9246,6 +9260,7 @@ proc OEMapping {image args} {
 #        indicating if the image features for the corresponding image 
 #        have changed since the image's E to O mapping was last found.
 #-
+   global DEF_OEMAP
    global E_RAY_FEATURES
    global IMAGES
    global MAPTYPE
@@ -9258,28 +9273,24 @@ proc OEMapping {image args} {
    global PROT_OEMAP
    global RECALC_OEMAP
 
-# Initially assume the mapping can be found.
-   set ok 1
-
-# Get the name of the first of the supplied images.
-   set im0 [lindex $IMAGES 0]
-
-# First decide whether we need to calculate the mapping. We don't need
-# to if the existing mapping is up-to-date with respect to the positions 
-# lists for the supplied image. If an existing mapping is protected, we 
-# leave it unchanged.
-   set calc 0
+# If this is the first time the mapping has been requested, create a
+# default null mapping, and indicate it is not protected.
    if { ![info exists OEMAP($image)] } {
-      set calc 1
+      set OEMAP($image) ""
       set PROT_OEMAP($image) normal
+
+# Otherwise, if the stored OE mapping is out-of-date (i.e. if the image 
+# features have changed since the stored mapping was calculated) then we 
+# cannot use the stored mapping, so clear it. We only do this if the 
+# stored mapping is not protected.
    } {
       if { $RECALC_OEMAP($image) && $PROT_OEMAP($image) == "normal" } {
-         set calc 1
+         set OEMAP($image) ""
       }
-   }           
+   }
 
-# Find a new mapping if necessary.
-   if { $calc } {
+# If we now have no mapping, we need to find a new mapping (if allowed).
+   if { $OEMAP($image) == "" && $PROT_OEMAP($image) == "normal" } {
 
 # Tell the user what is happening.
       set told [SetInfo "Determining an O-E mapping. Please wait... " 0]
@@ -9289,7 +9300,8 @@ proc OEMapping {image args} {
          if { $MAPTYPE($fittype) == $OEFITTYPE } { break } 
       }
 
-# Do the fit.
+# Attempt to do the fit. This will return a null string if there are
+# currently insufficient image features defined to do the fit.
       set ret [Fit $PNTLBL($image,$E_RAY_FEATURES) \
                    $PNTPX($image,$E_RAY_FEATURES) \
                    $PNTPY($image,$E_RAY_FEATURES) \
@@ -9297,68 +9309,28 @@ proc OEMapping {image args} {
                    $PNTPX($image,$O_RAY_FEATURES) \
                    $PNTPY($image,$O_RAY_FEATURES) $fittype \
                    "OE mapping for $image"]
-      if { $ret == "" } {
-         set ok 0
 
-# If succesfull, get the parameter values which make up the mapping, and
-# store them.
-      } {
+# If the fit was done succesfully, store the mapping. Also store a copy
+# of it as the current default OE Mapping.
+      if { $ret != "" } {
          set OEMAP($image) $ret
+         set DEF_OEMAP $ret
 
-# If the first image does not yet have an OE mapping we give it the OE 
-# mapping just created. 
-         if { $image != $im0 } {
-            set oe0 [OEMapping $im0 1]
-            if { $oe0 == "" } { set OEMAP($im0) $ret }
-         }
+# If the fit could not be performed, use the current default OE mapping.
+      } {
+         set OEMAP($image) $DEF_OEMAP         
       }
 
-# If the mapping is now up-to-date with respect to the positions lists,
-# clear the flag to indicate this.
-      if { $ok } {
-         set RECALC_OEMAP($image) 0
-      }
+# Indicate the mapping is now up-to-date.
+      set RECALC_OEMAP($image) 0
 
 # Cancel the informative text set earlier in this procedure.
       if { $told } { SetInfo "" 0 }
 
    }
 
-# If an OE mapping is available for this image, return it. 
-   if { [info exists OEMAP($image)] } {
-      set ret $OEMAP($image)
-
-# Otherwise we may be able to use the OE mapping from another image.
-# Only do this if we have not entered this procedure recursively (to
-# avoid infinite recursion loops).
-   } elseif { $args == "" } {
-
-# Check each image in turn.
-      set ret ""
-      foreach im $IMAGES {
-
-# Try to create the OE mapping for this image (so long as it is
-# not the current image).
-         if { $im != $image } {
-            OEMapping $im 1
-
-# See if the first image now has an OE mapping, if so use it as the mapping
-# for the required image.
-            set oe0 [OEMapping $im0 1]
-            if { $oe0 != "" } {
-               set OEMAP($image) $oe0
-               set ret $oe0
-               break
-            }
-         }
-      }
-
-# If no OE mapping is available from anywhere, return a null string.
-   } {
-      set ret ""
-   }
-
-   return $ret
+# Return the stored OE mapping.
+   return $OEMAP($image)
 }
 
 proc OpenFile {mode title text lfile lfd} {
@@ -10242,6 +10214,7 @@ proc Restore {file} {
          if { $line != "" } {
             if { [llength $line] == 6 } {
                set OEMAP($image) $line
+               set DEF_OEMAP $line
             } {
                set bad 1
                break
