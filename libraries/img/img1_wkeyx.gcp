@@ -62,7 +62,11 @@
 *     22-JUL-1994 (PDRAPER):
 *        Original version.
 *     30-NOV-1994 (PDRAPER):
-*        Added checj that non-compound names are only 8 characters.
+*        Added check that non-compound names are only 8 characters.
+*     11-NOV-2002 (PDRAPER):
+*        Modified to use "free-format" character strings (terminating
+*        quote allowed anywhere, previous fixed format required it
+*        not before column 20).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -177,21 +181,24 @@
       END IF
 
 *  If the type is character we need to add quotes (unless it's a
-*  special). The standard also specifies that the end-quote should not
-*  occur before column 21, so align it with column before usual
-*  comments.
+*  special). Use "free-format", which allows us to add the terminating
+*  quote immediately after the string (fixed format requires it not
+*  before column 20, which is what a earlier version did).
       IF ( '<T>' .EQ. 'C' .AND. .NOT. SPEC ) THEN
-         BLOCK( CARD )( IAT: ) = ''''//LKEY( :MAX( 1, NOWAT ) )
-         IAT = MAX( NOWAT + IAT + 1, 30 )
-         BLOCK( CARD )( IAT: IAT) = ''''
-         IAT = MAX( IAT + 1, 32 )
+         BLOCK( CARD )( IAT: ) = ''''//LKEY( :MAX( 1, NOWAT ) )//''''
+         IAT = IAT + NOWAT + 3 
       ELSE 
          BLOCK( CARD )( IAT: ) = LKEY( : MAX( 1, NOWAT ) )
          IAT = IAT + NOWAT + 1
       END IF
 
-*  Now add the comment.
-      IF ( .NOT. SPEC ) BLOCK( CARD )( IAT: ) = '/ '//COMMEN
+*  Now add the comment. For tidyness, align with usual comments (ones
+*  for fixed format values), but not necessary, comments can start in
+*  any column after the value. 32 = reserve up to column 30 + a space.
+      IF ( .NOT. SPEC ) THEN
+         IAT = MAX( 32, IAT )
+         BLOCK( CARD )( IAT: ) = '/ '//COMMEN
+      END IF
 
 *  Finally add an extra 'END' record if asked.
       IF ( NEWEND ) BLOCK( CARD + 1 ) = 'END'
