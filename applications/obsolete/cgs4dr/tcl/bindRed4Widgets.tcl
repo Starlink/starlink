@@ -333,7 +333,7 @@ proc red4DoSomething {taskname dowhat inputs} {
     list_fits_header_to_file
       {
        if {$dowhat=="action"} {
-         red4Package $taskname kappa fitslist file
+         red4Package $taskname ndfpack_mon fitslist file
        } elseif {$dowhat=="help"} {
          cgs4drHelpDialog .helpDialog $cgs4drHtml/red4PackageBox2.html
        }
@@ -341,7 +341,7 @@ proc red4DoSomething {taskname dowhat inputs} {
     list_fits_header_to_screen
       {
        if {$dowhat=="action"} {
-         red4Package $taskname kappa fitslist
+         red4Package $taskname ndfpack_mon fitslist screen
        } elseif {$dowhat=="help"} {
          cgs4drHelpDialog .helpDialog $cgs4drHtml/red4PackageBox3.html
        }

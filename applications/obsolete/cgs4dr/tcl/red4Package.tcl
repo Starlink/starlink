@@ -38,8 +38,8 @@ proc red4Package {taskname args} {
         if {[info commands $pack*] == ""} {
           set message "Loading ${pack}"
           cgs4drInform $taskname $message
-          if {$pack == "kappa"} {
-            adamtask kappa /star/bin/kappa/kappa_pm
+          if {$pack == "ndfpack_mon"} {
+            adamtask ndfpack_mon /star/bin/kappa/ndfpack_mon
           } elseif {$pack == "figaro1"} {
             adamtask figaro1 /star/bin/figaro/figaro1
           } elseif {$pack == "figaro2"} {
@@ -62,11 +62,11 @@ proc red4Package {taskname args} {
         }
 
         set Red4Widgets(RO) $obs
-        if {$args=="kappa fitslist"} {
+        if {$args=="ndfpack_mon fitslist screen"} {
           set message "Listing FITS file headers for $obs to screen"
           cgs4drInform $taskname $message
-          kappa obey fitslist "in=$obs" -inform "cgs4drInform $taskname %V"
-        } elseif {$args=="kappa fitslist file"} {
+          ndfpack_mon obey fitslist "in=$obs logfile=!" -inform "cgs4drInform $taskname %V"
+        } elseif {$args=="ndfpack_mon fitslist file"} {
           set spos [string last "/" $obs]
           if {$spos>0} {
             set out [string range $obs [expr $spos + 1] end]
@@ -76,7 +76,8 @@ proc red4Package {taskname args} {
           }
           set message "Listing FITS file headers for $obs to file ${out}"
           cgs4drInform $taskname $message
-          kappa obey fitslist "in=$obs logfile=$out" -inform "cgs4drInform $taskname %V"
+          if {[file exists $out] == 1} {exec /usr/bin/rm -rf $out}
+          ndfpack_mon obey fitslist "in=$obs logfile=$out" -inform "cgs4drInform $taskname %V"
         } elseif {$args=="figaro1 exam"} {
           set message "Examining data structure $obs"
           cgs4drInform $taskname $message
