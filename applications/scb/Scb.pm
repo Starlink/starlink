@@ -60,6 +60,7 @@ require Exporter;
              $incdir $srcdir $bindir $scb_tmpdir $scbindex_tmpdir
              $mimetypes_file
              $htxserver
+             $docslisfile
              $func_indexfile $file_indexfile $taskfile
              %tagger/;
 
@@ -103,6 +104,7 @@ $star = "$STARLINK";
 $srcdir = $ENV{'SCB_SOURCES'} || "$SCB_SOURCES";
 $bindir = "$star/bin";
 $incdir = "$star/include";
+$docslisfile = "$star/docs/docs_lis";
 
 #  Temporary directory locations.
 

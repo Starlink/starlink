@@ -135,6 +135,7 @@ sub query_form;
 sub extract_file;
 sub search_keys;
 sub package_list;
+sub getdoctitles;
 sub output;
 sub error;
 sub mimetype;
@@ -615,13 +616,15 @@ sub package_list {
       }
 
       if (@docs) {
+         my $rdoctitles = getdoctitles;
          hprint "
             <hr>
             <h3>Starlink documents in package <b>$package</b>:</h3>
             <dl>
          ";
          foreach $doc (sort @docs) {
-            print "<dt><a href='", docurl ($doc), "'>", uc ($doc), "</a><dd>\n";
+            print "<dt><a href='", docurl ($doc), "'>", uc ($doc), "</a>",
+                  "<dd>", $rdoctitles->{$doc}, "\n";
          }
          print "</dl>\n";
       }
@@ -1722,6 +1725,99 @@ sub footer {
 }
 
 
+########################################################################
+sub getdoctitles {
+
+#+
+#  Name:
+#     getdoctitles
+
+#  Purpose:
+#     Reads the docs_lis file to determine the titles of Starlink documents.
+
+#  Language:
+#     Perl 5
+
+#  Invocation:
+#     $rdoctitles = getdoctitles;
+
+#  Description:
+#     Reads the standard docs_lis file, whose filename is stored in the
+#     global variable $docslisfile (usually /star/docs/docs_lis) to 
+#     generate a hash of all the titles of the Starlink documents 
+#     keyed by the document ids (e.g. {sun221 => "KAPPA for IRAF"}).
+#     If the file named in $docslisfile does not exist or cannot be 
+#     opened the routine simply returns a reference to an empty hash.
+
+#  Arguments:
+#     None.
+
+#  Return value:
+#     \%doctitles = reference to hash.
+#        The hash contains title text keyed by document name (lower case
+#        document type followed by the number without leading zeroes),
+#        e.g. {sun221 => "KAPPA for IRAF"}.
+
+#  Notes:
+#     Clearly, this routine relies heavily on the docs_lis file having
+#     the right format, and is best understood by examining the form
+#     of that file.
+
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
+
+#  Authors:
+#     MBT: Mark Taylor (IoA, Starlink)
+#     {enter_new_authors_here}
+
+#  History:
+#     03-NOV-1998 (MBT):
+#       Initial revision.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#  Declare local variables.
+
+   my (%doctitles, $id, $title);
+
+#  Attempt to open file containing information, otherwise return.
+
+   open DOCSLIS, $docslisfile or return {};
+
+#  Go through file looking for a line introducing information for documents
+#  of a given type (SC, SG, SGP, SSN, SUN).
+
+   while (<DOCSLIS>) {
+      $doctype = (split)[0] || '';
+      if ($doctype =~ /^(SC|SG|SGP|SSN|SUN)$/) {
+
+#        Lines in this stanza each describe a single document.  Field
+#        zero is of the form "document_number.revision_number", and 
+#        everything after field three is the text of the title.
+
+         while (<DOCSLIS>) {
+
+#           A blank line indicates the end of this stanza - exit the loop.
+
+            last if (/^\s*$/);
+            @words = split ' ', $_;
+            $id = lc ($doctype) . int $words[0];
+            $title = join (' ', splice (@words, 4));
+            $doctitles{$id} = $title;
+         }
+      }
+   }
+
+#  Return reference to title hash.
+
+   return \%doctitles;
+}
+            
+         
 ########################################################################
 sub mimetype {
 
