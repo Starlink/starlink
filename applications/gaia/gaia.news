@@ -74,7 +74,20 @@
 
       gaia@star.rl.ac.uk
 
-  Peter W. Draper (P.W.Draper@durham.ac.uk) & 
-  Norman Gray (ESP toolbox - norman@astro.gla.ac.uk) 
+  Peter W. Draper (P.W.Draper@durham.ac.uk) &
+  Norman Gray (ESP toolbox - norman@astro.gla.ac.uk)
 
   27th January 2000.
+
+
+  2.5 - MEF support / multiple NDF access support.
+
+      - EXTRACTOR updates
+
+      - EXTRACTOR toolbox, removed need to press <Return> to update
+        values
+
+      - New command-line option -quiet_exit.
+
+      - File selection dialog now attempts to preserve filter pattern.
+        (stops empty file lists).
