@@ -1005,7 +1005,7 @@
 
       INTEGER           I        		! Loop over sources
       INTEGER           IFAIL        		! PDA status code
-      INTEGER		SEED, TICKS, STATUS
+      INTEGER		SEED, TICKS
 *
 *    External references :
 *
