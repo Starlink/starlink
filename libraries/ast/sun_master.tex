@@ -13219,10 +13219,110 @@ thus allowing such software to be used.
 Currently, there is no DTD or schema defining the structure of data produced 
 by an XmlChan. At the moment, such data is limited to be a fairly close
 transliteration of the AST native format produced by the basic Channel
-class. The following is the native AST representation of a simple FrameSet:
+class. The following is a native AST representation of a simple 1-D Frame
+(including comments and with the Full attribute set to zero so that some
+default attribute values are included as extra comments):
 
-xxx
+\begin{quote}
+\small
+\begin{verbatim}
+ Begin Frame    # Coordinate system description
+#   Title = "1-d coordinate system"     # Title of coordinate system
+    Naxes = 1   # Number of coordinate axes
+    Domain = "SCREEN"   # Coordinate system domain
+#   Lbl1 = "Axis 1"     # Label for axis 1
+#   Uni1 = "cm"         # Units for axis 1
+    Ax1 =       # Axis number 1
+       Begin Axis       # Coordinate axis
+          Unit = "cm"   # Axis units
+       End Axis
+ End Frame
+\end{verbatim}
+\normalsize
+\end{quote}
 
+The corresponding XmlChan output would look like:
+
+\begin{quote}
+\small
+\begin{verbatim}
+ <Frame xmlns="http://www.starlink.ac.uk/ast/xml/" 
+        desc="Coordinate system description">
+    <_attribute name="Title" quoted="true" value="1-d coordinate system"
+                desc="Title of coordinate system" default="true"/>
+    <_attribute name="Naxes" value="1" desc="Number of coordinate axes"/>
+    <_attribute name="Domain" quoted="true" value="SCREEN"
+                desc="Coordinate system domain"/>
+    <_attribute name="Lbl1" quoted="true" value="Axis 1" 
+                desc="Label for axis 1" default="true"/>
+    <_attribute name="Uni1" quoted="true" value="cm" 
+                desc="Units for axis 1" default="true"/>
+    <Axis label="Ax1" desc="Coordinate axis">
+       <!--Axis number 1-->
+       <_attribute name="Unit" quoted="true" value="cm" desc="Axis units"/>
+    </Axis>
+ </Frame>
+\end{verbatim}
+\normalsize
+\end{quote}
+
+
+Notes:
+
+\begin{enumerate}
+\item The AST class name is used as the name for an XML element which contain 
+a description of an AST object.
+
+\item AST attributes are described by XML elements with the name
+``_attribute''. Unfortunately, the word ``attribute'' is also used by XML
+to refer to a ``name=value'' pair within an element start tag. So for
+instance, the ``Title'' attribute of the AST Frame object is described
+within an XML element with name ``_attribute'' in which the XML attribute
+``name'' has the value ``Title'', and the XML attribute ``value'' has the 
+value ``1-d coordinate system''. The moral is always to be clear clear 
+about the context (AST or XML) in which the word \emph{attribute} is being 
+used!
+
+\item The XML includes comments both as XML attributes with the name ``desc'', 
+and as separate comment tags.
+
+\item Elements which describe default values are identified by the fact
+that they have an XML attribute called ``default'' set to the value
+``true''. These elements are ignored when being read back into an XmlChan.
+
+\item The outer-most XML element of an AST object will set the default
+namespace to \verb+http://www.starlink.ac.uk/ast/xml/+ which will be
+inherited by all nested elements.
+
+\end{enumerate}
+
+
+The XmlChan class changes the default value for the Comment and Full
+attributes (inherited from the base Channel class) to zero and -1,
+resulting in terse output by default. With the default values for these
+attributes, the above XML is reduced to the following:
+
+\begin{quote}
+\small
+\begin{verbatim}
+ <Frame xmlns="http://www.starlink.ac.uk/ast/xml/">
+    <_attribute name="Naxes" value="1"/>
+    <_attribute name="Domain" quoted="true" value="SCREEN"/>
+    <Axis label="Ax1">
+       <_attribute name="Unit" quoted="true" value="cm"/>
+    </Axis>
+ </Frame>
+\end{verbatim}
+\normalsize
+\end{quote}
+
+
+The XmlChan class uses the Skip attributes very similarly to the Channel
+class. If Skip is zero (the default) then an error will be reported if the text
+supplied by the source function does not begin with an AST Object. If
+Skip is non-zero, then initial text is skipped over without error until
+the start of an AST object is found. this allows an AST object to be
+located within a larger XML document.
 
 
 \cleardoublepage
