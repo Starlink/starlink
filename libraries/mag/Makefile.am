@@ -1,0 +1,66 @@
+## Process this file with automake to produce Makefile.in
+
+bin_SCRIPTS = mag_link mag_link_adam create_tape_dev
+
+bin_MONOLITHS = tapecreate
+
+tapecreate_SOURCES = \
+	tapecreate.f
+
+# There is only one task and that is the same as the monolith name
+
+tapecreate_TASKS =
+
+# Alink needs to know about libtool so that we can use libmag.la etc
+tapecreate_LDADD = $(LDADD) .libs/libmag_adam.a .libs/libmag.a
+
+lib_LTLIBRARIES = libmag.la libmag_adam.la
+
+libmag_la_SOURCES = $(F_ROUTINES) $(C_ROUTINES) \
+	$(PUBLIC_INCLUDES) $(PRIVATE_INCLUDES) $(BLOCKDATA)
+
+libmag_adam_la_SOURCES = $(F_ROUTINES_ADAM) \
+	$(PUBLIC_INCLUDES) $(PRIVATE_INCLUDES) $(BLOCKDATA_ADAM)
+
+include_HEADERS = $(PUBLIC_INCLUDES)
+
+PUBLIC_INCLUDES = MAG_ERR
+
+PRIVATE_INCLUDES = MAGGO_SCL MAGIO_CMN MAGPA_SCL MAGSCL_PAR MAG_SYS \
+                   MIOBUF_CMN MIOFIL_CMN MIO_ERR MIO_SYS ioc_incl.h mio_err.h
+
+
+F_ROUTINES = mag1_code.f mag1_dev.f mag1_end.f mag1_ernam.f mag1_err.f \
+mag1_errtp.f mag1_fxpos.f mag1_gettd.f mag1_init.f mag_close.f	       \
+mag_jeov.f mag_jump.f mag_move.f mag_open.f mag_pos.f mag_read.f       \
+mag_rew.f mag_set.f mag_skip.f mag_write.f mag_wtm.f mio1_chan.f       \
+mio1_code.f mio1_devn.f mio1_gettd.f mio1_trln.f mio_activ.f	       \
+mio_aloc.f mio_bread.f mio_bwrit.f mio_close.f mio_deact.f mio_deal.f  \
+mio_dism.f mio_flush.f mio_mount.f mio_open.f mio_read.f mio_rew.f     \
+mio_setrb.f mio_skipb.f mio_skipf.f mio_skipv.f mio_start.f mio_stop.f \
+mio_write.f mio_wtm.f
+
+F_ROUTINES_ADAM = mag1_chktd.f mag1_chktp.f mag1_cktds.f mag1_cntds.f \
+mag1_cptds.f mag1_crtds.f mag1_fndtp.f mag1_gettp.f mag1_gtmpl.f      \
+mag1_rdtds.f mag1_wrtds.f mag_activ.f mag_aloc.f mag_annul.f	      \
+mag_assoc.f mag_cancl.f mag_deact.f mag_deal.f mag_dism.f mag_mount.f \
+mag_start.f mag_stop.f
+
+BLOCKDATA = mag1_blk.f mio1_blk.f
+
+BLOCKDATA_ADAM = mag_blk.f
+
+C_ROUTINES = ioc.c
+
+
+BUILT_SOURCES = MAG_ERR MIO_ERR mio_err.h
+
+
+# Do not know how to test the ADAM monolith versions (mgtest.f and mag_test.f)
+
+TESTS = ioctest
+
+check_PROGRAMS = ioctest
+
+ioctest_SOURCES = ioctest.f
+ioctest_LDADD = libmag.la `err_link` `psx_link`

@@ -13,4 +13,4 @@
 #include <sys/ioctl.h>
 #include <sys/mtio.h>
 #include <errno.h>
-#include "iocerr.h"
+#include "mio_err.h"

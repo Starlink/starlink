@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="ref">
+  <version>1.1-4</version>
+  <path>libraries/mag</path>
+  <description>Fortran access to magentic tape devices</description>
+  <abstract><p>
+The MAG subroutine library allows a programmer to write portable programs
+which access data stored on magnetic tapes.
+
+By using the MAG routines, a program can read and write tapes, position the
+tape (both in absolute terms and relative to the current position) and can
+control the allocation of the tape drive and the physical mounting of the tape
+on systems which provide that facility.
+
+The library is currently supported for Sun Sparcstations running Solaris and
+for DEC Alphas running OSF/1. Historically it has been supported for DEC
+Ultrix and for SunOS and may still work for them.
+    </p></abstract>
+  <dependencies >
+    <build>parsecon</build><build>dtask</build><build>sae</build><build>par</build><build>hds</build><build>psx</build><build>err</build><link>par</link><link>hds</link><link>psx</link><link>err</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Sid Wright</name>
+      <uname>slw</uname>
+    </person>
+    <person>
+      <name>Ken Hartley</name>
+      <uname>kfh</uname>
+    </person>
+    <person>
+      <name>P M Allan</name>
+      <uname>pma</uname>
+    </person>
+    <person>
+      <name>Alan J Chipperfield</name>
+      <uname>ajc</uname>
+    </person>
+  </developers>
+  <documentation> sun171</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
