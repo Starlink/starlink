@@ -1,13 +1,16 @@
-#!/bin/csh
+#!/bin/csh -f
 
 # Set up variables
 set logfile = test.log
+if ("$1" != "") set logfile = "$1"
+set labelfile = current_label
+set tmpfile = ./tmpfile
 set interval = 10
 
 # Print out header
-set  format = "%10d %10d %10d %10d  %s\n"
-set hformat = "%10s %10s %10s %10s\n"
-printf "$hformat" "Elapsed(s)" "CPU(s)" "RSS(k)" "Size(k)" >>$logfile
+set  format = "%28s %10d %10d %10d %10d  %s\n"
+set hformat = "%28s %10s %10s %10s %10s\n"
+printf "$hformat" "#" "Elapsed(s)" "CPU(s)" "RSS(k)" "Size(k)" >>$logfile
 
 # Classify operating system 
 # (currently works for Red Hat Linux, Solaris, Digital Unix) 
@@ -30,9 +33,9 @@ alias tosec awk -F: "'\\
    {mult=1; for (i=NF;i>0;i--) {sec += "\$"i * mult; mult *= 60} print sec }'"
 
 # Some initialisation
-set dirent = "`ls -l $logfile`"
 set size_max = 0
 set rss_max = 0
+set label = ""
 onintr SIGNAL
 
 # Work out parent's PID
@@ -53,6 +56,20 @@ else
 endif
 
 while (`$parent_pscmd | getfield field=PID`) 
+   # See what is the currently active application
+   set label_last = "$label"
+   if (-e $labelfile) set label = "`cat $labelfile`"
+
+   if ("$label_last" != "" && "$label" != "$label_last" && $?elapsed_major) then
+   # Application has changed since we last looked.  
+   # Write summary to log and reset values.
+      printf >> $logfile "$format" \
+        "$label_last" \
+        "$elapsed_major" "$cpu_major" "$rss_max" "$size_max" "$command_major"
+      set rss_max = 0
+      set size_max = 0
+   endif
+
    # Find the process we're interested in.
    # We do this (somewhat haphazardly) by checking the processes which have
    # the same parent as this one, and then selecting the one with the 
@@ -60,58 +77,62 @@ while (`$parent_pscmd | getfield field=PID`)
    if ("$pstype" == "BSD") then
       set pscmd = "ps lx"
    else
-      set pscmd = "ps -oppid,vsz='        SIZE'"
+      set pscmd = "ps -oppid,vsz=TOTALSIZE"
    endif 
 
    # The awk here is to select only processes with the right PPID
    set awkprog = 'NR==1{for (i=1;i<=NF;i++) {if ($i=="PPID") f_i=i} print;} \\
                   NR>1 && $f_i=="'$ppid'" {print;}'
-   set pid = `$pscmd | awk $awkprog:q  | getfield field=PID sortby=SIZE`
+   set pid = `$pscmd | awk $awkprog:q  | getfield field=PID sortby=TOTALSIZE`
 
    
    # Find out the stats we want (cpu, elapsed, size, rss)
    if ("$pstype" == "BSD") then
-      set pscmd = "ps u $pid"
-      set command = `$pscmd | getfield field=COMMAND`
-      set cpu     = `$pscmd | getfield field=TIME | tosec`
-      set size    = `$pscmd | getfield field=SIZE`
-      set rss     = `$pscmd | getfield field=RSS`
-      set percent = `$pscmd | getfield field=%CPU`
-      set elapsed = `echo $cpu $percent | awk '{print ($2>0) ? int(100.*$1/$2):0}'`
+      (ps u $pid > $tmpfile) >& /dev/null
+      @ ps_worked = (`cat $tmpfile | wc -l` == 2)
+      if ($ps_worked) then
+#debug
+         tail -1 $tmpfile >> $logfile
+         set command = `cat $tmpfile | getfield field=COMMAND`
+         set cpu     = `cat $tmpfile | getfield field=TIME | tosec`
+         set size    = `cat $tmpfile | getfield field=SIZE`
+         set rss     = `cat $tmpfile | getfield field=RSS`
+         set percent = `cat $tmpfile | getfield field=%CPU`
+         set elapsed = `echo $cpu $percent | awk '{print ($2>0) ? int(100.*$1/$2):0}'`
+      endif
    else
       set pscmd = "ps -p $pid -otime=TIME,etime=ETIME,vsz='       VSZ',rss='        RSS',command"
-      set command = `$pscmd | getfield field=COMMAND`
-      set cpu     = `$pscmd | getfield field=TIME | tosec`
-      set size    = `$pscmd | getfield field=VSZ`
-      set rss     = `$pscmd | getfield field=RSS`
-      set elapsed = `$pscmd | getfield field=ETIME | tosec`
+      (ps -p $pid -o'time=TIME,etime=ETIME,vsz=     VSZ,rss=     RSS,command' \
+         > $tmpfile ) >& /dev/null
+      @ ps_worked = (`cat $tmpfile | wc -l` == 2)
+      if ($ps_worked) then
+         set command = `$pscmd | getfield field=COMMAND`
+         set cpu     = `$pscmd | getfield field=TIME | tosec`
+         set size    = `$pscmd | getfield field=VSZ`
+         set rss     = `$pscmd | getfield field=RSS`
+         set elapsed = `$pscmd | getfield field=ETIME | tosec`
+      endif
    endif
    
    # Update maxima and make sure the current stats are those for the 
    # so far biggest process
-   if ($size > $size_max || $rss > $rss_max) then
+
+
+   if ($ps_worked) then
+      # The major process is the one which has had the largest SIZE or RSS
+      # since the last reset.
+      # Check if the major process is the same as last time
+      if ($size > $size_max || $rss > $rss_max) set pid_major = $pid
       if ($size > $size_max) set size_max = $size
       if ($rss  > $rss_max)  set rss_max  = $rss
-      set command_major = "$command"
-      set elapsed_major = "$elapsed"
-      set cpu_major     = "$cpu"
+      # Update the times as long as we're still looking at the major process
+      if ($pid_major == $pid) then
+         set command_major = "$command"
+         set elapsed_major = "$elapsed"
+         set cpu_major     = "$cpu"
+      endif
    endif
    
-   
-   # See if log file has been altered since last time we did it
-   set dirent_last = "$dirent"
-   set dirent = "`ls -l $logfile`"
-   set lines = `printf "%s\n%s\n" "$dirent_last" "$dirent" | uniq | wc -l`
-   
-   if ("$lines" == "2") then
-   # File has been written to.  Write our summary and reset values.
-      printf >> $logfile "$format" \
-        "$elapsed_major" "$cpu_major" "$rss_max" "$size_max" "$command_major"
-      set rss_max = 0
-      set size_max = 0
-      set dirent = "`ls -l $logfile`"
-   endif
-
    # Go back to sleep for a while
    sleep $interval
    
