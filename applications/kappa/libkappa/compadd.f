@@ -124,6 +124,11 @@
 *        adding every three pixels to form the NDF called arp244cs.
 
 *  Notes:
+*     -  The compression is centred on the origin of the pixel co-ordinate
+*     Frame. That is, if a position has a value p(i) on the i'th pixel 
+*     co-ordinate axis of the input NDF, then it will have position 
+*     p(i)/COMPRESS(i) on the corresponding axis of the output NDF. The
+*     pixel index bounds of the output NDF are chosen accordingly.
 *     -  The axis centres and variances are averaged, whilst the widths
 *     are summed and always normalised for bad values.
 
@@ -188,6 +193,9 @@
 *     10-JUN-1998 (DSB):
 *        Propagate WCS component. Ensure each output dimension is at least
 *        one pixel long. 
+*     12-OCT-1998 (DSB):
+*        Changed the way in which the bounds of the output image are
+*        determined so that pixel origin information is retained.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -205,6 +213,10 @@
 
 *  Status:
       INTEGER STATUS
+
+*  External References:
+      INTEGER KPG1_FLOOR       ! Most positive integer .LE. a given real
+      INTEGER KPG1_CEIL        ! Most negative integer .GE. a given real
 
 *  Local Variables:
       CHARACTER
@@ -242,6 +254,7 @@
 
       INTEGER
      :  NDFI,                  ! Identifier to the input NDF
+     :  NDFIS,                 ! Identifier to the used section of the input NDF
      :  NDFO,                  ! Identifier to the output NDF
      :  NDFS,                  ! Identifier to the section of the input
                                ! NDF
@@ -367,15 +380,33 @@
 *  Compute the output NDF's dimensions.
 *  ====================================
 
-*  Work out the size of the output array from the input array
-*  dimensions and the compression factor.  It relies on integer
-*  arithmetic truncation.  Also derive bounds for the output array.
-*  These are somewhat arbitrary.
+*  Work out the bounds for the output array and the size of the output 
+*  array from the input array dimensions and the compression factor.  
+*  The pixel origin is retained. Also modify the input bounds so that
+*  they correspond to the section of the input image which is actually
+*  used.
       DO I = 1, NDIM
-         ODIMS( I ) = MAX( 1, IDIMS( I ) / COMPRS( I ) )
-         LBNDO( I ) = 1
-         UBNDO( I ) = ODIMS( I )
+
+         LBNDO( I ) = 1 + KPG1_CEIL( REAL( LBND( I ) - 1 )/
+     :                               REAL( COMPRS( I ) ) )
+
+         UBNDO( I ) = MAX( LBNDO( I ), KPG1_FLOOR( REAL( UBND( I ) )/
+     :                                           REAL( COMPRS( I ) ) ) )
+         ODIMS( I ) = UBNDO( I ) - LBNDO( I ) + 1
+         
+         LBND( I ) = 1 + COMPRS( I )*( LBNDO( I ) - 1 )
+         UBND( I ) = COMPRS( I )*UBNDO( I )
+         IDIMS( I ) = UBND( I ) - LBND( I ) + 1
       END DO
+
+*  Create a section of the input NDF containing the region will actually
+*  be used (i.e. excluding any pixels which lie over the edge of the
+*  output image).
+      CALL NDF_SECT( NDFI, NDIM, LBND, UBND, NDFIS, STATUS )
+
+*  Annul the original input NDF and use the section create above instead.
+      CALL NDF_ANNUL( NDFI, STATUS )
+      NDFI = NDFIS
 
 *  Create the output NDF.
 *  ======================
