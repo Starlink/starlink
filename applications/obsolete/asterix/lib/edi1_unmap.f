@@ -246,6 +246,6 @@
 
 *  Write property containing locator used for mapping. This is need to
 *  unmap cleanly
-      CALL ADI_CERASE( LID, '.MappedComponent', STATUS )
+      CALL ADI_DELPRP( LID, '.MappedComponent', STATUS )
 
       END
