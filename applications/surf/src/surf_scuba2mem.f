@@ -114,6 +114,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.12  2002/09/09 21:34:13  timj
+*     Correctly initialize LST_PTR to 0
+*
 *     Revision 1.11  1999/08/03 20:01:41  timj
 *     Add copyright message to header.
 *     Minor fixes to header style.
@@ -289,6 +292,10 @@
 *.
  
       IF (STATUS .NE. SAI__OK) RETURN
+
+*     Init pointers
+      LST_PTR(1) = 0
+      LST_PTR(2) = 0
  
 *     Set the MSG output level (for use with MSG_OUTIF)
       CALL MSG_IFGET('MSG_FILTER', STATUS)

@@ -1,3 +1,8 @@
+2002-09-09  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* src/surf_scuba2mem.f (SURF_SCUBA2MEM): Fix pointer
+	initialisation problem with LST_PTR
+
 2002-06-27  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* sculib/sculib_calc_bol_coords.f: AZ jiggle offsets were only
