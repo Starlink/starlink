@@ -4,6 +4,19 @@
 
   Copyright (C) 2004 Tim Jenness. All Rights Reserved.
 
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation; either version 2 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be useful,but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with
+this program; if not, write to the Free Software Foundation, Inc., 59 Temple
+Place,Suite 330, Boston, MA  02111-1307, USA
+
 */
 
 #ifdef __cplusplus
@@ -15,6 +28,12 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
+
+/* typedef some common types so that the typemap can bless constants
+   into correct namespaces */
+
+typedef int StatusType;
+typedef int WcsMapType;
 
 
 #include "ast.h"
@@ -45,7 +64,7 @@ char ** pack1Dchar( AV * avref ) {
   return outarr;
 }
 
-MODULE = Starlink::AST     PACKAGE = Starlink::AST
+MODULE = Starlink::AST     PACKAGE = Starlink::AST PREFIX = ast
 
 
 void
@@ -71,13 +90,39 @@ astIntraReg()
  CODE:
    Perl_croak(aTHX_ "astIntraReg Not yet implemented\n");
 
-MODULE = Starlink::AST  PACKAGE = Starlink::AST        PREFIX = ast
-
-int
-astVersion( class )
-  char * class
+void
+astClearStatus()
  CODE:
-  RETVAL = astVersion;
+  astClearStatus;
+
+bool
+astOK()
+ CODE:
+  RETVAL = astOK;
+ OUTPUT:
+  RETVAL
+
+void
+astSetStatus( status )
+  StatusType status
+ CODE:
+  astSetStatus( status );
+
+StatusType
+astStatus()
+ CODE:
+  RETVAL = astStatus;
+ OUTPUT:
+  RETVAL
+
+MODULE = Starlink::AST  PACKAGE = Starlink::AST::Status
+
+# Translate status values
+int
+value( this )
+  StatusType this
+ CODE:
+  RETVAL = this;
  OUTPUT:
   RETVAL
 
@@ -412,7 +457,7 @@ AstWcsMap *
 new( class, ncoord, type, lonax, latax, options )
   char * class
   int ncoord
-  int type
+  WcsMapType type
   int lonax
   int latax
   char * options
@@ -470,7 +515,7 @@ astAnnul( this )
   astAnnul( this );
 
 AstObject *
-astClone( this )
+ast_Clone( this )
   AstObject * this
  CODE:
   RETVAL = astClone( this );
@@ -478,7 +523,7 @@ astClone( this )
   RETVAL
 
 AstObject *
-astCopy( this )
+ast_Copy( this )
   AstObject * this
  CODE:
   RETVAL = astCopy( this );
@@ -529,22 +574,15 @@ int
 astGetI( this, attrib )
   AstObject * this
   char * attrib
+ ALIAS:
+  astGetL = 1
  CODE:
   RETVAL = astGetI( this, attrib );
  OUTPUT:
   RETVAL
 
-long
-astGetL( this, attrib )
-  AstObject * this
-  char * attrib
- CODE:
-  RETVAL = astGetL( this, attrib );
- OUTPUT:
-  RETVAL
-
 # Need to decide later whether the astIsA functions need to be
-# implemented
+# implemented since Perl can do that - XXXX
 
 
 
@@ -583,17 +621,10 @@ astSetI( this, attrib, value )
   AstObject * this
   char * attrib
   int value
+ ALIAS:
+  astSetL = 1
  CODE:
   astSetI( this, attrib, value );
-
-
-void
-astSetL( this, attrib, value )
-  AstObject * this
-  char * attrib
-  long value
- CODE:
-  astSetL( this, attrib, value );
 
 void
 astShow( this )
@@ -610,7 +641,8 @@ astTest( this, attrib )
  OUTPUT:
   RETVAL
 
-# This duplicates the Starlink::AST->Version method
+# This duplicates the Starlink::AST::Version method.
+# Maybe a bad idea
 
 int
 astVersion(class)
@@ -623,9 +655,10 @@ astVersion(class)
 # Use annul as automatic destructor
 
 void
-ast_DESTROY( this )
+astDESTROY( this )
   AstObject * this
  CODE:
+  printf("In destructor\n");
   astAnnul( this );
 
 MODULE = Starlink::AST   PACKAGE = AstFramePtr PREFIX = ast
@@ -1006,7 +1039,7 @@ astDecompose( this )
   int invert1;
   int invert2;
  PPCODE:
-  Perl_croak("astDecompose not yet implemented\n");
+  Perl_croak(aTHX_ "astDecompose not yet implemented\n");
   astDecompose(this, &map1, &map2, &series, &invert1, &invert2);
 
 void
@@ -1045,7 +1078,7 @@ astSimplify( this )
 MODULE = Starlink::AST   PACKAGE = AstChannelPtr PREFIX = ast
 
 AstObject *
-astRead( channel )
+ast_Read( channel )
   AstChannel * channel
  CODE:
   RETVAL = astRead( channel );
@@ -1145,3 +1178,14 @@ astSpecAdd( this, cvt, args )
  CODE:
   cargs = pack1D((SV*)args, 'd');
   astSpecAdd( this, cvt, cargs );
+
+# Constants
+
+# Start with errors. Bless them into class Starlink::AST::Status
+
+INCLUDE: AST_ERR.xsh
+
+# Then the WcsMap constants
+
+INCLUDE: AST_WCSMAP.xsh
+
