@@ -163,10 +163,10 @@ interface GSET
      default !
    endparameter
    parameter TABLE
-     type 'UNIV'
+     type '_CHAR'
      default !
      prompt 'Colour table'
-     help 'Object containing colour table to be read in'
+     help 'File containing colour table to be read in'
    endparameter
    parameter EDIT
      type '_LOGICAL'
