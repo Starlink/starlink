@@ -20,7 +20,7 @@ agi_nest agi_pfree ags_wkids
 lib_LTLIBRARIES = libagi.la libagi_adam.la libagp.la libagp_adam.la
 
 # AGI libraries
-libagi_la_SOURCES = $(COMMON_F_ROUTINES) $(BLOCK_DATA_ROUTINES)
+libagi_la_SOURCES = $(COMMON_F_ROUTINES) $(AGI_F_ROUTINES) $(BLOCK_DATA_ROUTINES)
 libagi_adam_la_SOURCES = $(AGI_ADAM_F_ROUTINES)
 
 # Shared AGP infrastructure
@@ -70,3 +70,12 @@ BLOCK_DATA_ROUTINES = agi_block.f
 
 
 BUILT_ROUTINES = AGI_ERR
+
+
+# Testing
+
+TESTS = agi_test
+check_PROGRAMS = agi_test
+
+agi_test_SOURCES = agi_test.fpp
+agi_test_LDADD = libagi.la `ref_link` `trn_link` `sgs_link` `pgp_link` `idi_link`

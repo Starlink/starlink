@@ -19,11 +19,13 @@ STAR_DEFAULTS
 dnl    Find required versions of the programs we need for configuration
 AC_PROG_CC
 AC_PROG_FC
+AC_PROG_FPP
 AC_PROG_LIBTOOL
 
 dnl    Other options here, such as
 dnl STAR_HAVE_FC_OPEN_READONLY
 STAR_CNF_COMPATIBLE_SYMBOLS
+AC_FC_CHECK_INTRINSICS([SLEEP])
 
 dnl    Declare the build and use dependencies for this package
 STAR_DECLARE_DEPENDENCIES(build, [cnf psx gks sae hds par])

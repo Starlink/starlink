@@ -149,7 +149,11 @@
          DX = XOFF + XSIZE * ( X( J ) - WX1 ) / ( WX2 - WX1 )
          DY = YOFF + YSIZE * ( Y( J ) - WY1 ) / ( WY2 - WY1 )
          CALL IICWCP( DISPID, MEMID, NUMCUR, DX, DY, STATUS )
+#if HAVE_INTRINSIC_SLEEP
          CALL SLEEP( 1 )
+#else
+# warn "No SLEEP call so crossing fingers"
+#endif
   20  CONTINUE
 
 *   Switch off the cursor
