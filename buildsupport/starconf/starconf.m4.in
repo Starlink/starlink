@@ -146,9 +146,10 @@ fi
 
 # Installation directory options.  This must match the variables handled
 # by _STAR_EXTRADIR_COMMON
-AC_SUBST([stardocsdir], ['${prefix}/docs'])dnl
-AC_SUBST([starhelpdir], ['${prefix}/help'])dnl
-AC_SUBST([staretcdir],  ['${prefix}/etc'])dnl
+AC_SUBST([stardocsdir],     ['${prefix}/docs'])dnl
+AC_SUBST([starhelpdir],     ['${prefix}/help'])dnl
+AC_SUBST([staretcdir],      ['${prefix}/etc'])dnl
+AC_SUBST([starexamplesdir], ['${prefix}/examples'])dnl
 
 # Certain directories are affected by the $_star_per_package_dir variable;
 # if it's true, then add the $PACKAGE_NAME to the directory.
@@ -862,13 +863,22 @@ AC_DEFUN([STAR_ETC_FILES],
          [_STAR_EXTRADIR_COMMON([etc], [$1])])
 
 
-# STAR_DOC_FILES(docfiles)
-# ------------------------
+# STAR_DOCS_FILES(docfiles)
+# -------------------------
 # Declare a list of files to be installed into the Starlink
 # documentation directory.  This can be used both internally and in
 # user configure.ac files.
-AC_DEFUN([STAR_DOC_FILES],
+AC_DEFUN([STAR_DOCS_FILES],
          [_STAR_EXTRADIR_COMMON([docs], [$1])])
+
+
+# STAR_EXAMPLES_FILES(examplesfiles)
+# ----------------------------------
+# Declare a list of files to be installed into the Starlink
+# examples directory.  This can be used both internally and in
+# user configure.ac files.
+AC_DEFUN([STAR_EXAMPLES_FILES],
+         [_STAR_EXTRADIR_COMMON([examples], [$1])])
 
 
 # STAR_DECLARE_DEPENDENCIES(type, deplist, option='')
@@ -1059,19 +1069,22 @@ AC_DEFUN([_STAR_UPCASE],
 # _STAR_EXTRADIR_COMMON(dir-type, file-list)
 # ------------------------------------------
 #
-# Common handler for STAR_HELP_FILES, etc.  DIR-TYPE is one of `help',
-# `etc', `docs', and `FILE-LIST' is a list of files to be installed in
+# Common handler for STAR_HELP_FILES, etc.  DIR-TYPE is one of
+#
+#    help, etc, docs, examples
+#
+# and `FILE-LIST' is a list of files to be installed in
 # the directory STAR_[DIR-TYPE]_DIR.  This works by defining and
 # AC_SUBSTing the variables `starX_DATA for X=dir-type (eg, `stardocs_DATA').
 #
-# The variables starXdir (for X in {help, etc, docs}) are defined in
+# The variables starXdir (for X in the list above) are defined in
 # STAR_DEFAULTS, and the prefixes starX are added to the legal 'DATA'
 # prefixes in automake:handle_data.
 AC_DEFUN([_STAR_EXTRADIR_COMMON],
          [m4_ifval([$1], [], [AC_FATAL([$0: must have two args])])dnl
           m4_ifval([$2], [], [AC_FATAL([$0: must have two args])])dnl
           m4_if(m4_bregexp([$1],
-                           [^\(docs\|etc\|help\)$]),
+                           [^\(docs\|etc\|help\|examples\)$]),
                 [0],
                 [],
                 [AC_FATAL([$0: unrecognised type $1])])dnl
