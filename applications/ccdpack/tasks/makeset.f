@@ -132,6 +132,7 @@
 *        same Current coordinate system when the program is run
 *        (i.e. they do not all have the same Domain), then a warning
 *        will be issued.
+*
 *     makeset * setsize=4
 *        This will add Set information to all the NDFs in the current
 *        directory, grouping them into Sets of 4 NDFs each.  If MAKESET
@@ -149,6 +150,7 @@
 *        you should pay careful attention to the log output of 
 *        MAKESET to check that the order is correct.  It is safest
 *        to list Set members explicitly as in the previous example.
+*
 *     makeset "d1,d2,d3,e1,e2,e3" name=night1-* setsize=3
 *        This will construct two Sets, which will be given Set Name
 *        attributes of "night1-d1" and "night1-e1" respectively.
@@ -156,12 +158,14 @@
 *        files along with other Sets generated from files with the
 *        names the same as these.
 *        Set Name attribute
+*
 *     makeset "d1,d3" indices=[1,3]
 *        This will construct a Set of the two named NDFs, giving them
 *        the Set Index attributes of 1 and 3 respectively.  This
 *        might be necessary for comparison with 3-member sets if the
 *        Index=2 one is absent in this case due to a loss of the data
 *        file for some reason.
+*
 *     makeset * erase
 *        All Set information (the .MORE.CCDPACK.SET headers and any
 *        CCD_SET frames from the WCS component) are removed from all

@@ -131,20 +131,24 @@
 *        This will list all the NDFs in the current directory which
 *        contain Set header information; the listing will be grouped
 *        by the Set Name attribute and Set Index will be shown.
+*
 *     showset * setless=true
 *        This will do the same as the previous example, except that
 *        those NDFs with no Set header information will be displayed
 *        as well.
+*
 *     showset * namelike=true name="gc6235a,gc4021a" namelist=gc.lis
 *        This will list all the NDFs in the current directory which
 *        are in the same Set as the NDFs gc6235a and gc4021a.
 *        As well as showing the Set information of these files on
 *        the screen, the names of the files thus selected will be
 *        written to the file gc.lis.
+*
 *     showset fdata reset
 *        This will just show the Name and Set information of the file
 *        fdata.  If fdata is a container file, it will show the
 *        Set information for all the datasets within it.
+*
 *     showset dat* indexlike=false index=3 logto=neither namelist=out.lis
 *        This will write a list of NDF names to the file out.lis
 *        choosing only those which have a Set Index attribute value
