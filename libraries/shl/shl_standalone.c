@@ -12,7 +12,7 @@
  *    Library function
 
  * Invocation:
- *    shl_standalone( helplb, argc, argv );
+ *    status = shl_standalone( helplb, isenv, argc, argv );
  
  * Arguments:
  *    helplb = char * (Given)
@@ -22,10 +22,20 @@
  *       Can be a NULL pointer only if -l is guaranteed. _HELP is added
  *       to the parameter automatically if not present. ".shl" is added
  *       if not present.
+ *    isenv = int (Given)
+ *       If 1, indicates that helplb refers to a environment variable.
+ *       If 0, indicates that it refers to a file. Ignored if -l
+ *       option is present in argv or if helplb is NULL
  *    argc = int (Given)
  *       The number of elements in argv.
  *    argv = char ** (Given)
  *       Array of strings, ostensibly read from the command line.
+
+ * Return value:
+ *    status = int
+ *       Contains EXIT_SUCCESS on success and EXIT_FAILURE on failure.
+ *       These can be passed directly to main(). They are defined
+ *       in stdlib.h
 
  * Usage:
  *    helpc [-l library.shl] [topic [subtopic [subsubtopic ...]]]
@@ -37,6 +47,9 @@
  *    code re-use. Whenever "application" is used it refers to this 
  *    library function. The usage described above is assumed since this
  *    module process the command line arguments.
+ *
+ *    The subroutine is designed to be called with argv and returned
+ *    directly to the main routine.
  *
  *    This application is an interactive browser to display the contents of a
  *    Starlink help library on an alphanumeric terminal. The user can navigate
@@ -85,7 +98,7 @@
  *    #include "shl.h"
  *    void main( int argc, char **argv )
  *    { 
- *       (void) shl_standalone( "KAPPA", argc, argv );
+ *       (void) shl_standalone( "KAPPA", 1, argc, argv );
  *    }
  *
  *    Where the first argument is the name of the application help
@@ -121,9 +134,23 @@
  *       Incorporate into SHL library. Now standalone.
  *       Uses one_scrsz. Allows for envvar to have optional _HELP
  *       in supplied value, and optional .shl
+ *    28 Jul 2004 (timj):
+ *       Add isenv. Now call fortran SHL code rather than duplicate loads
+ *       of that code in C.
+
+ * ToDo:
+ *    It probably makes sense for this routine to be rewritten
+ *    to simply call SHL_TRNVAR and SHL_GETHELP. There does not
+ *    seem to be a good reason for keeping this C code separate
+ *    from the fortran code which duplicates it. This is historically
+ *    in place as the figaro version of help (or specdre) and
+ *    so long as the calling interface is retained (and the trapping
+ *    of -l) then there is no reason to keep the bulk of the callback
+ *    C code. 
+ 
 
  * Bugs: 
- *    It's arguably a bug that status is not returned by this *
+ *    It's arguably a bug that status is not returned by this
  *    function.  on abort (or bad Starlink status) this should return
  *    some kind of status (either throught inherited status or by return
  *    value) such that the caller can report the error to the shell.
@@ -136,86 +163,40 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "ems.h"
 #include "sae_par.h"
 #include "cnf.h"
+#include "shl.h"
 
-/* FIO Prototypes.
- */
-extern F77_SUBROUTINE(fio_gunit)( INTEGER(unit), INTEGER(status) );
-extern F77_SUBROUTINE(fio_punit)( INTEGER(unit), INTEGER(status) );
+/* SHL fortran interface prototype */
+extern F77_SUBROUTINE(shl_trnvar)
+     ( CHARACTER(envvar), LOGICAL(isenv), CHARACTER(libray),
+       INTEGER(status) TRAIL(envvar) TRAIL(libray)
+       );
 
-/* HLP Prototypes.
- */
-extern F77_INTEGER_FUNCTION(hlp_help)
-(  F77_INTEGER_FUNCTION(output)( CHARACTER(string) TRAIL(string) ),
-   INTEGER(width), CHARACTER(topic), INTEGER(unit), CHARACTER(library),
-   INTEGER(jflags),
-   F77_INTEGER_FUNCTION(input)
-   (  CHARACTER(string), CHARACTER(prompt), INTEGER(length)
-      TRAIL(string) TRAIL(prompt)
-   ),
-   F77_INTEGER_FUNCTION(hlp_nametr)
-   (  INTEGER(kmd), CHARACTER(instr), CHARACTER(outstr), INTEGER(jstat)
-      TRAIL(instr) TRAIL(outstr)
-   )
-   TRAIL(topic) TRAIL(library)
+extern F77_SUBROUTINE(shl_gethlp)
+     ( CHARACTER(libray), CHARACTER(topic), INTEGER(status)
+       TRAIL(libray) TRAIL(topic)
 );
-extern F77_SUBROUTINE(hlp_errmes)
-(  INTEGER(status), CHARACTER(message) TRAIL(message)
-);
-extern F77_INTEGER_FUNCTION(hlp_nametr)
-(  INTEGER(kmd), CHARACTER(instr), CHARACTER(outstr), INTEGER(jstat)
-   TRAIL(instr) TRAIL(outstr)
-);
-
-/* ONE */
-extern F77_SUBROUTINE(one_scrsz)
-( INTEGER(width), INTEGER(height), INTEGER(status));
-
-/* Function Prototypes.
- */
-extern F77_SUBROUTINE(dummy)();
-extern F77_INTEGER_FUNCTION(input)
-(  CHARACTER(string), CHARACTER(prompt), INTEGER(length)
-   TRAIL(string) TRAIL(prompt)
-);
-extern F77_INTEGER_FUNCTION(output)( CHARACTER(string) TRAIL(string) );
 
 /* Macros.
  */
-#define WIDTH   80   /* Fallback terminal width  */
-#define PAGE    24   /* Fallback terminal height */
 #define LENSTR 512   /* Maximum string length (was STRLEN)
 			change name to avoid confusion with the STRLEN type */
 
-/* Global variables.
- */
-int width;  /* Terminal width  */
-int page;   /* Terminal height */
-int line;   /* Lines written   */
 
 /*:
  */
 
-void shl_standalone( char * help_library, int argc, char **argv )
+int shl_standalone( char * help_library, int isenv, int argc, char **argv )
 {
-   extern int width;
-   extern int page;
-   extern int line;
-
-   DECLARE_INTEGER(unit);              /* Fortran unit number         */
    DECLARE_INTEGER(status);            /* Starlink status             */
-   DECLARE_INTEGER(jflags);            /* == 1                        */
-   DECLARE_INTEGER(f77width);          /* width as f77 integer        */
-   DECLARE_INTEGER(f77height);         /* height as f77 integer       */
-   DECLARE_INTEGER(hstat);             /* Help system status          */
+   DECLARE_CHARACTER(f77envvar,LENSTR);/* env var name as f77 string */
    DECLARE_CHARACTER(f77libra,LENSTR);  /* Library as f77 string       */
    DECLARE_CHARACTER(f77topic,LENSTR); /* Topic as f77 string         */
-   DECLARE_CHARACTER(message,LENSTR);  /* Error message as f77 string */
+   DECLARE_LOGICAL(f77isenv);          /* F77 is this an env var? */
 
-   char    envvar[LENSTR];  /* Name of environment variable */
-   char    library[LENSTR]; /* Environment variable contents*/
-   char   *p;               /* Error message        */
+   int     retval;          /* Return status 0=good 1=bad */
    char    topic[LENSTR];   /* Topic as C string    */
    int     i;               /* Parameter counter    */
    size_t  nleft;           /* Space left in string */
@@ -226,19 +207,7 @@ void shl_standalone( char * help_library, int argc, char **argv )
 /* Initialise Starlink status.
  */
    status = SAI__OK;
-
-/* Find out the terminal size.
- */
-   F77_CALL(one_scrsz)(INTEGER_ARG(&f77width), INTEGER_ARG(&f77height),
-		       INTEGER_ARG(&status) );
-   width = f77width;
-   page = f77height;
-   if ( width <= 0 ) width = WIDTH;
-   if ( page  <= 0 ) page  = PAGE;
-
-/* Reset the line counter.
- */
-   line = 0;
+   emsBegin( &status );
 
 /* Find out the library name from the first few arguments.
  * Export it to Fortran.
@@ -246,55 +215,50 @@ void shl_standalone( char * help_library, int argc, char **argv )
  */
    if ( argv[1] && !strcmp( "-l", argv[1] ) )      /* library is in argv[2] */
    {  
-     *library = '\0'; nleft = LENSTR - 1;
-     strncat(library, argv[2], nleft); nleft -= strlen(argv[2]);
-     /* Append a .shl if one is missing */
-     if (!strstr(library, ".shl")) {
-       strncat(library, ".shl", nleft); nleft -= 4;
-     }
-     (void) cnf_expn( library, LENSTR, f77libra, f77libra_length );
+
+     /* Export the supplied string to fortran */
+     cnf_expn( argv[2], LENSTR, f77envvar, f77envvar_length );
+
+     /* Need to generate the environment variable name from the supplied
+	argument and store the resulting file name in an f77 string
+	suitable for the HLP library. */
+     f77isenv = F77_FALSE;
+     F77_CALL( shl_trnvar )(CHARACTER_ARG(f77envvar), LOGICAL_ARG(&f77isenv), 
+			    CHARACTER_ARG(f77libra), INTEGER_ARG(&status)
+			    TRAIL_ARG(f77envvar) TRAIL_ARG(f77libra) );
+
      i = 3;
    }
    else                               /* library is in environment variable */
    {  
      if ( help_library == NULL ) {
        /* make sure we have a string */
-       printf( "Error: no default library supplied and no -l option on command line.\n");
+       /* This should be an SHL error ! */
+       status = SAI__ERROR;
+       emsRep("SHL_ERR", "No default library supplied and no -l option on command line.", &status);
        goto abort;
      }
-     /* Need to generate the environment variable name from the supplied
-	argument. */
-     *(envvar+LENSTR) = '\0'; /* terminate even if input is not */
-     strncpy( envvar, help_library, LENSTR - 1 );
 
-     /* See if we need to append _HELP to the supplied string */
-     if ( !strstr(envvar, "_HELP") ) {
+     /* Export the supplied string to fortran */
+     cnf_expn( help_library, LENSTR, f77envvar, f77envvar_length );
 
-       /* form the library env var from the supplied base string (add _HELP) */
-       /* make sure we have enough space in buffer */
-       if (strlen(help_library) > (LENSTR - 6) ) {
-	 printf ("Base env var name is too long too append _HELP\n");
-	 goto abort;
-       }
-       strcat(envvar, "_HELP");
+     /* Copy isenv status */
+     if (isenv) {
+       f77isenv = F77_TRUE;
+     } else {
+       f77isenv = F77_FALSE;
      }
 
-     /* Now try to translate the environment variable and append .shl
-        (but only if .shl is not there already) */
-     if ( p = getenv(envvar) )
-      {  *library = '\0'; nleft = LENSTR - 1;
-         (void) strncat( library, p, nleft ); nleft -= strlen(p);
-	 if (!strstr(library, ".shl")) {
-	   (void) strncat( library, ".shl", nleft ); nleft -= 4;
-	 }
-         (void) cnf_expn( library, LENSTR, f77libra, f77libra_length );
-      }
-      else
-      {  (void) printf( "Error: could not open Starlink help library specified in environment variable '%s'.\n", envvar );
-         goto abort;
-      }
+     /* Need to generate the environment variable name from the supplied
+	argument and store the resulting file name in an f77 string
+	suitable for the HLP library. */
+     F77_CALL( shl_trnvar )(CHARACTER_ARG(f77envvar), LOGICAL_ARG(&f77isenv), 
+			    CHARACTER_ARG(f77libra), INTEGER_ARG(&status)
+			    TRAIL_ARG(f77envvar) TRAIL_ARG(f77libra) );
+
       i = 1;
    }
+
 
 /* Assemble the topic string from remaining parameters.
  * Export it to Fortran.
@@ -305,139 +269,28 @@ void shl_standalone( char * help_library, int argc, char **argv )
    }
    (void) cnf_expn( topic, LENSTR, f77topic, f77topic_length );
 
-/* Get a Fortran file unit.
- */
-   F77_CALL(fio_gunit)( INTEGER_ARG(&unit), INTEGER_ARG(&status) );
-   if ( status != SAI__OK ) goto abort;
 
-/* Call the help system.
- */
-   jflags = 1; f77width = width;
-   hstat = F77_CALL(hlp_help)
-   (  F77_CALL(output), INTEGER_ARG(&f77width), CHARACTER_ARG(f77topic),
-      INTEGER_ARG(&unit), CHARACTER_ARG(f77libra), INTEGER_ARG(&jflags),
-      F77_CALL(input), F77_CALL(hlp_nametr)
-      TRAIL_ARG(f77topic) TRAIL_ARG(f77libra)
-   );
-
-/* Handle any error returned by the help system.
- * If there was an error detected by the help system, make sure it is
- * reported. The exception are errors -12 and -13 line output and line
- * input failure. These are caused by our I/O routines, and a failure is
- * equivalent to requesting an immediate exit from the application. It
- * should not constitute an error condition and not cause an error
- * report.
- */
-   if ( hstat != 1 && hstat != -12 && hstat != -13 )
-   {  (void) F77_CALL(hlp_errmes)
-      (  INTEGER_ARG(&hstat), CHARACTER_ARG(message) TRAIL_ARG(message)
-      );
-      p = cnf_creim( message, message_length );
-      (void) printf( "%s\n", p );
-      (void) cnf_free(p);
-   }
-
-/* Release the Fortran unit.
- */
-   F77_CALL(fio_punit)( INTEGER_ARG(&unit), INTEGER_ARG(&status) );
+   /* Call the SHL fortran interface for the actual help 
+      functionality */
+   F77_CALL(shl_gethlp)(CHARACTER_ARG(f77libra),CHARACTER_ARG(f77topic),
+			INTEGER_ARG(&status)
+			TRAIL_ARG(f77libra) TRAIL_ARG(f77topic));
 
 abort:
 
+   if (status == SAI__OK) {
+     retval = EXIT_SUCCESS;
+   } else {
+     retval = EXIT_FAILURE;
+   }
+
+
+   /* This will flush the error stack. Currently we do not return
+      a 1/0 status to the caller. We should. */
+   emsEnd( &status );
+
 /* Return.
  */
-   return;
+   return(retval);
 }
 
-extern F77_INTEGER_FUNCTION(input)
-(  CHARACTER(string), CHARACTER(prompt), INTEGER(length)
-   TRAIL(string) TRAIL(prompt)
-)
-{
-   extern int line;
-
-   GENPTR_CHARACTER(string)
-   GENPTR_CHARACTER(prompt)
-   GENPTR_INTEGER(length)
-
-   char *p;
-   char  s[LENSTR];
-
-/*.
- */
-
-/* Display prompt.
- */
-   p = cnf_creim( prompt, prompt_length );
-   (void) printf( "%s ", p );
-   (void) cnf_free(p);
-
-/* Get at most 512 characters back as reply.
- * If fgets returns NULL, an EOF has been read without any text before
- * it. This will be reported back as an error.
- */
-   if ( fgets( s, LENSTR, stdin ) == NULL )
-   {  (void) printf("\n");
-      return -1;
-   }
-
-/* If the reply ends with a newline, strip that off.
- * Else (input ended without newline), better print a newline for more
- * tidy screen output.
- */
-   if ( s[strlen(s)-1] == '\n' ) s[strlen(s)-1] = '\0';
-   else                          (void) printf( "\n" );
-
-/* Export the reply string to Fortran.
- */
-   (void) cnf_exprt( s, string, string_length );
-
-/* Set the returned length.
- */
-   *length = strlen(s);
-
-/* Reset line counter.
- */
-   line = 0;
-
-/* Return with good status.
- */
-   return 1;
-}
-
-extern F77_INTEGER_FUNCTION(output)( CHARACTER(string) TRAIL(string) )
-{
-   extern int page;
-   extern int line;
-
-   GENPTR_CHARACTER(string)
-
-   char *p;
-   char  c;
-
-/*.
- */
-
-/* If page is full, prompt for new page. EOF will cause exit.
- * Else (page not full), just increment line counter.
- */
-   if ( page > 0 && page <= line + 3 )
-   {  (void) printf( "\nPress Return to continue ..." );
-      for( c = '\0'; ( c != '\n' ) && ( c != EOF ); c = fgetc( stdin ) );
-      (void) printf( "\n" );
-      if ( c == EOF ) return -1;
-      line = 1;
-   }
-   else
-   {  line++;
-   }
-
-/* Display string.
- */
-   p = cnf_creim( string, string_length );
-   (void) printf( "%s\n", p );
-   (void) cnf_free(p);
-
-/* Return with good status.
- */
-   return 1;
-}

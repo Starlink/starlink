@@ -15,9 +15,12 @@
  * History:
  *    24-JUL-2004 (TIMJ):
  *       Original version.
+ *    28-JUL-2004 (TIMJ):
+ *       Add isenv argument to shl_standalone.
+ *       Return value indicates success or failure.
  *    {enter_further_changes_here}
  *
  */
 
-void shl_standalone( char * hlp_library, int argc, char ** argv );
+int shl_standalone( char * hlp_library, int isenv, int argc, char ** argv );
 
