@@ -130,7 +130,7 @@
         DO I = 1, ANDIM
           FPIX(I) = 1
           LPIX(I) = MIN( DIMS(I), ADIMS(I) )
-          PAD = (PAD .OR (DIMS(I).NE.ADIMS(I)))
+          PAD = (PAD .OR. (DIMS(I).NE.ADIMS(I)))
         END DO
 
 *    Extract the logical unit

@@ -13,7 +13,9 @@
 *     CALL GCB2_LOAD( NARG, ARGS, OARG, STATUS )
 
 *  Description:
-*     {routine_description}
+*     The partially compressed GCB is read from the GCB extension of the
+*     specified FITS file, uncompressed and installed as the current GCB.
+*     If an error occurs, it is annulled and the current GCB reset.
 
 *  Arguments:
 *     NARG = INTEGER (given)
@@ -103,13 +105,11 @@
 *  Status:
       INTEGER 			STATUS             	! Global status
 
-*  External References:
-      [external_declaration]
-      {data_type} {external_name} ! [external_description]
-
 *  Local Variables:
+      INTEGER			GCBPTR			! Workspace GCB
       INTEGER			NBYTE			! Length of GCB
       INTEGER			NDIM			! Image of data (=1)
+
       LOGICAL			OK			! GCB data found ok?
 *.
 
