@@ -28,10 +28,11 @@
 *     or bad. A `yes' answer will mark the area bad, a `no' answer will
 *     mark the area good (an area will only be good if no other QUALITY 
 *     bits are set - CHANGE_QUALITY only uses QUALITY bit 3). The section
-*     can be inverted by using setting the USE_SECTION parameter to false.
+*     can be inverted by using the negation character at the end of the
+*     section.
 
 *  Usage:
-*     change_quality ndf{spec1}{spec} bad_quality
+*     change_quality ndf{spec1}{specn} bad_quality
 
 *  ADAM Parameters:
 *     BAD_QUALITY = LOGICAL (Read)
@@ -60,21 +61,27 @@
 *         system will split multiple entries on commas unless the entire
 *         section is quoted:
 *
-*             SECTION > [ '{b3,5}' , {i2} ]
+*             SECTION > [ "{b3,5}" , {i2} ]
+*
+*         If necessary the negation character should come after a
+*         section (ie after the closing curly bracket) and that 
+*         negation applies to the combined section and not just the string 
+*         containing the negation character:
+*
+*             SECTION > [ {b3}-, {i2} ]
+*
+*         implies that the section consists of everything except bolometer 3
+*         and integration 2.
 *
 *         This parameter is only used when no SCUBA section was specified
 *         via the IN parameter.
-*     USE_SECTION = LOGICAL (Read)
-*         This parameter specified whether the specified SCUBA section
-*         should be changed (TRUE) or the data not specified by the
-*         section (FALSE). Default is TRUE.
 
 *  Examples:
 *     change_quality 'ndf{}' BAD_QUALITY=false
 *         Select the entire array and unset bit 3.
 *     change_quality 'ndf{b2}' BAD_QUALITY
 *         Select the second bolometer and mark it bad.
-*     change_quality 'ndf{b2;i3}' BAD_QUALITY USE_SECTION=no
+*     change_quality 'ndf{b2;i3}-' BAD_QUALITY
 *         Select the third integration of bolometer two but set all
 *         other data points bad by inverting the section.
 *     change_quality 'ndf{b16}{i2}' BAD_QUALITY
@@ -88,6 +95,8 @@
 *         Set bolometers 41 and 52 as well as integration 3 to bad quality.
 *         Use of SECTION here is not recommended given the complication
 *         when using commas and square brackets.
+*     change_quality test SECTION='[{b2;i2}-]' BAD_QUALITY
+*         Set everything bad except bolometer 2 and integration 2.
 
 *  Notes:
 *     Samples are marked bad by setting bit 3 of the quality array. 
@@ -130,12 +139,16 @@
 *    Status :
       INTEGER STATUS
 *    External references :
+      INTEGER CHR_LEN                     ! Length of string
+      EXTERNAL CHR_LEN
       BYTE SCULIB_BITON                   ! function to set a specified
                                           ! bit in a byte 
 *    Global variables :
 *    Local Constants :
       INTEGER          MAX__DIM           ! max number of dimensions in
       PARAMETER (MAX__DIM = 4)            ! array
+      CHARACTER * 1    NEGCHAR            ! Character used to negate a section
+      PARAMETER (NEGCHAR = '-')           ! 
       CHARACTER * 14   TSKNAME            ! Name of task
       PARAMETER (TSKNAME = 'CHANGE_QUALITY')
       INTEGER          BITNUM             ! Bit affected by this task
@@ -165,6 +178,7 @@
                                           ! HDS locator of .SCUBA extension
       INTEGER          ITEMP              ! scratch integer
       INTEGER          NDIM               ! number of dimensions in array
+      INTEGER          NEGPOS             ! Position of NEGCHAR
       INTEGER          NREC               ! number of history records in
                                           ! input file
       INTEGER          N_BEAM             ! the 'beam' dimension of the
@@ -219,9 +233,10 @@
 
       CALL PAR_GET0C ('IN', IN, STATUS)
 
+
 *     Split up into filename and data spec
       CALL SCULIB_SPLIT_FILE_SPEC(IN, SCUBA__MAX_SECT, FILE, N_SPEC,
-     :     DATA_SPEC, STATUS)
+     :     DATA_SPEC, USE_SECT, STATUS)
 
 *     open the data NDF
 
@@ -418,11 +433,38 @@
          CALL PAR_GET1C('SECTION', SCUBA__MAX_SECT, DATA_SPEC,
      :        N_SPEC, STATUS)
 
+*     Check to see if someone has slipped a NEGCHAR in there to negate it
+
+         USE_SECT = .TRUE.
+
+         DO I = 1, N_SPEC
+
+            NEGPOS = 1
+            CALL CHR_FIND(DATA_SPEC(I), NEGCHAR, .TRUE., NEGPOS)
+
+*     If the string contains the character remove it and set USE_SECT
+            IF (NEGPOS .LE. CHR_LEN(DATA_SPEC(I))) THEN
+               USE_SECT = .FALSE.
+               CALL CHR_RMCHR(NEGCHAR, DATA_SPEC(I))
+            END IF
+
+         END DO
+
+
       END IF
 
-*     Do I want to change the section or the non-sections?
 
-      CALL PAR_GET0L ('USE_SECTION', USE_SECT, STATUS)
+*     Report that we are using an inverted section if necessary
+      IF (.NOT.USE_SECT) THEN
+
+         CALL MSG_SETC('TASK', TSKNAME)
+
+         CALL MSG_OUTIF(MSG__NORM,' ','^TASK: The inverse section '//
+     :        'has been selected', STATUS)
+
+      END IF
+
+
 
 *     do we want to set quality bad or good
 
