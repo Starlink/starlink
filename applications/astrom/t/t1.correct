@@ -219,8 +219,8 @@ CTYPE2  = 'DEC--TAN'           / DEC -- tangent-plane projection
 RADESYS = 'FK5     '           / Celestial coordinates in FK5 system            
 EQUINOX =               2000.0 / Equator and equinox of J2000.0                 
 LONPOLE =                  180 / Native longitude of celestial pole             
-CRVAL1  =          261.7880000 / Projection pole -- RA                          
-CRVAL2  =           74.3356000 / Projection pole -- DEC                         
+CRVAL1  =          261.7880000 / Projection pole -- RA =   17:27:09.1           
+CRVAL2  =           74.3356000 / Projection pole -- Dec = +74:20:08             
 CRPIX1  =         1012.5201473 / Projection pole -- x-pixels                    
 CRPIX2  =         2018.9278316 / Projection pole -- y-pixels                    
 CUNIT1  = 'deg     '           / RA always given in degrees                     
@@ -268,8 +268,8 @@ CTYPE2  = 'DEC--TAN'           / DEC -- tangent-plane projection
 RADESYS = 'FK5     '           / Celestial coordinates in FK5 system            
 EQUINOX =               2000.0 / Equator and equinox of J2000.0                 
 LONPOLE =                  180 / Native longitude of celestial pole             
-CRVAL1  =          261.7880000 / Projection pole -- RA                          
-CRVAL2  =           74.3356000 / Projection pole -- DEC                         
+CRVAL1  =          261.7880000 / Projection pole -- RA =   17:27:09.1           
+CRVAL2  =           74.3356000 / Projection pole -- Dec = +74:20:08             
 CRPIX1  =         1011.7752847 / Projection pole -- x-pixels                    
 CRPIX2  =         2020.0308714 / Projection pole -- y-pixels                    
 CUNIT1  = 'deg     '           / RA always given in degrees                     
