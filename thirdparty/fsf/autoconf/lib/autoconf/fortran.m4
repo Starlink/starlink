@@ -335,6 +335,46 @@ m4_define([AC_LANG_CALL(Preprocessed Fortran)],
 [      call $2])])
 
 
+# AC_LANG_FUNC_LINK_TRY(Fortran)(FUNCTION)
+# ----------------------------------------
+# Produce a source which links correctly iff the Fortran FUNCTION exists.
+# Note that the generic AC_LANG_FUNC_LINK_TRY macro is deemed severely
+# broken, and is deprecated.  The macro still currently exists, however,
+# and so if macros like AC_CHECK_FUNCS are to work with
+# AC_LANG(Fortran) (and friends), then these macros have to be defined.
+m4_define([AC_LANG_FUNC_LINK_TRY(Fortran)],
+[AC_LANG_SOURCE(
+[      PROGRAM TEST
+      INTEGER $1, X
+      X=$1()
+      END
+])])
+
+
+# AC_LANG_FUNC_LINK_TRY(Preprocessed Fortran)(FUNCTION)
+# -----------------------------------------------------
+# Ditto, for Preprocessed Fortran
+m4_define([AC_LANG_FUNC_LINK_TRY(Preprocessed Fortran)],
+[AC_LANG_SOURCE(
+[      PROGRAM TEST
+      INTEGER $1, X
+      X=$1()
+      END
+])])
+
+
+# AC_LANG_FUNC_LINK_TRY(Fortran 77)(FUNCTION)
+# -------------------------------------------
+# Ditto, for Fortran 77
+m4_define([AC_LANG_FUNC_LINK_TRY(Fortran 77)],
+[AC_LANG_SOURCE(
+[      PROGRAM TEST
+      INTEGER $1, X
+      X=$1()
+      END
+])])
+
+
 
 ## -------------------------------------------- ##
 ## 3. Looking for Compilers and Preprocessors.  ##
