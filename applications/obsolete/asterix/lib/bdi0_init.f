@@ -92,7 +92,6 @@
       EXTERNAL			BDI0_SCARCHK
 
       EXTERNAL			BDI1_CHK
-      EXTERNAL			BDI1_CREAT
       EXTERNAL			BDI1_GET
       EXTERNAL			BDI1_MAP
       EXTERNAL			BDI1_PUT
@@ -142,10 +141,6 @@
         CALL ADI_DEFFUN(
      :       'FileItemChk(_,_HDSfile,_CHAR)',
      :                   BDI1_CHK, DID, STATUS )
-
-        CALL ADI_DEFFUN(
-     :       'FileItemCreat(_BinDS,_HDSfile,_CHAR)',
-     :                   BDI1_CREAT, DID, STATUS )
 
         CALL ADI_DEFFUN(
      :       'FileItemGet(_,_HDSfile,_CHAR)',
