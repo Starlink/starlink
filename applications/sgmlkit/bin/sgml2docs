@@ -172,15 +172,13 @@ tempdest=tmp.stamp
 # depend rather heavily on the dvi2bitmap version, but on the other,
 # this logic is just begging to go wrong somewhere....
 #DVI2BITMAPVERSION=`$DVI2BITMAP -V | sed -n '1s/[-.,]/ /gp'|awk '{print $3}'`
-d2bv=`$DVI2BITMAP -V | sed -n '1s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\([^0-9]*\([0-9][0-9]*\)\).*/\1 \2 \4 \3/p' | awk '{print $2}'`
-case $d2bv in
-    11) echo "Using $DVI2BITMAP"
-        ;;
-    *)
-	echo "Need dvi2bitmap version 0.11, but $DVI2BITMAP is version "`$DVI2BITMAP -V|sed -n 1p`
-	exit 1
-	;;
-esac
+d2bv=`$DVI2BITMAP -V | sed -n '1s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\([^0-9]*\([0-9][0-9]*\)\)\?.*/\1 \2 \4 \3/p' | awk '{print $2}'`
+if [ $d2bv -ge 11 ]; then
+    echo "Using $DVI2BITMAP"
+else
+    echo "Need dvi2bitmap version 0.11 or better, but $DVI2BITMAP is version "`$DVI2BITMAP -V|sed -n 1p`
+    exit 1
+fi
 
 PROGNAME=`basename $0`
 
@@ -250,10 +248,8 @@ while [ $# -gt 0 ]; do
 	    ;;
 	--ignore-manifest) USEMANIFEST=false ;;
 	--quiet) VERBOSE=false
-            case $d2bv in
-                11) DVI2BITMAP="$DVI2BITMAP --verbose=quiet" ;;
-            esac
-       		;;
+            DVI2BITMAP="$DVI2BITMAP --verbose=quiet"
+       	    ;;
 	--debug) DEBUGGING=true ;;
 	--help) echo $USAGE; exit 0;;
 	--version) echo "$PROGNAME:I:" $ident_string; echo "$PROGNAME:I:" $RCSID; exit 0;;
@@ -409,13 +405,7 @@ if [ $TARGETFORMAT -eq 0 ]; then
     # element <mdefs>.
     if [ -s "$ROOT.imgeq.list" ]; then
 	# Find dvi2bitmap's default format
-        case $d2bv in
-            11) imgfmt=`$DVI2BITMAP --query=types --process=options | awk '{print $2}'`
-                ;;
-            *)  echo "Can't use that version of dvi2bitmap"
-                exit 1
-                ;;
-        esac
+        imgfmt=`$DVI2BITMAP --query=types --process=options | awk '{print $2}'`
 
 	# We can force the image format to be gif by setting imgfmt='gif'
 	$VERBOSE && echo "$PROGNAME:I: $IMGEQ --imgformat $imgfmt $ROOT.imgeq.list"
