@@ -20,7 +20,7 @@
       User Note SUN/144.</p>
   </abstract> 
   <dependencies >
-    <build>cnf</build><build>ems</build><build>hds</build><build>hlp</build><build>psx</build><build>sae</build><build option='link'>chr</build><link>chr</link><link>ems</link><link>hds</link><link>hlp</link><link>mers</link><link>psx</link><sourceset>messgen</sourceset>
+    <build>cnf</build><build>ems</build><build>hds</build><build>hlp</build><build>mers</build><build>psx</build><build>sae</build><build option='link'>chr</build><link>chr</link><link>ems</link><link>hds</link><link>hlp</link><link>mers</link><link>psx</link><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <!-- The following people list was assembled from the individual
