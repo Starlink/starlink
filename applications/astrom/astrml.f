@@ -1699,10 +1699,8 @@
          ELSE
 *         3 <= NSOL,NSOLS <= MAXSOL
             NITS=20
-*         XXX I should reset both DISTE and PC to the same values each extra 
-*         time round here 
-            WRITE (LUX, '("INFO TEMP DISTE=",F10.3," DISTOR=",F10.3)')
-     :           DISTE,DISTOR
+*         XXX Should I reset both DISTE and PC to the same (initial)
+*         values each extra time round here?
             DISTE=DISTOR
 *         Which combination of non-linear fits are we attempting this time?
             IF (EXTRAFITS(NSOL).EQ.7) THEN
