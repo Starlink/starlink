@@ -76,7 +76,7 @@ unf2ndf ngc253.dat ngc253 shape=[100,60] noperec=8
    by 60 in y.  Its data array has type _REAL.  The data records
    each have 8 values.
 
-unf2ndf ngc253q.dat ngc253 q 100 shape=[100,60] update
+unf2ndf ngc253q.dat ngc253 q 100 shape=[100,60]
    This copies a quality array from the unformatted file
    ngc253q.dat to an existing NDF called ngc253 (such as created
    in the first example).  ngc253q.dat does not contain a header
