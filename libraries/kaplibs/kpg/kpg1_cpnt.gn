@@ -1,8 +1,8 @@
-      SUBROUTINE KPG_$CPNT<T>( PNNDF, PNTIT, NDIM, DIMS, ARRAY, NULL,
+      SUBROUTINE KPG1_CPNT<T>( PNNDF, PNTIT, NDIM, DIMS, ARRAY, NULL,
      :                         STATUS )
 *+
 *  Name:
-*     KPG_$CPNTx
+*     KPG1_CPNTx
 
 *  Purpose:
 *     Creates a primitive NDF with a title via the parameter system.
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG_$CPNTx( PNNDF, PNTIT, NDIM, DIMS, ARRAY, NULL, STATUS )
+*     CALL KPG1_CPNTx( PNNDF, PNTIT, NDIM, DIMS, ARRAY, NULL, STATUS )
 
 *  Description:
 *     This routine packages a common series of NDF calls when creating

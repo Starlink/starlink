@@ -1,7 +1,7 @@
-      SUBROUTINE KPG_$CMUL<T>( BAD, EL, A, CONST, B, NBAD, STATUS )
+      SUBROUTINE KPG1_CMUL<T>( BAD, EL, A, CONST, B, NBAD, STATUS )
 *+
 *  Name:
-*     KPG_$CMULx
+*     KPG1_CMULx
 
 *  Purpose:
 *     Multiply each element of a vectorised array by a constant.
@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG_$CMULx( BAD, EL, A, CONST, B, NBAD, STATUS )
+*     CALL KPG1_CMULx( BAD, EL, A, CONST, B, NBAD, STATUS )
 
 *  Description:
 *     The routine multiplies each element of a vectorised array by a

@@ -1,8 +1,8 @@
-      SUBROUTINE KPG_$DIV<T>( BAD, VAR, EL, A, VA, B, VB, C, VC, NERR,
+      SUBROUTINE KPG1_DIV<T>( BAD, VAR, EL, A, VA, B, VB, C, VC, NERR,
      :                        STATUS )
 *+
 *  Name:
-*     KPG_$DIVx
+*     KPG1_DIVx
 
 *  Purpose:
 *     Divide two vectorised arrays with optional variance information.
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG_$DIVx( BAD, VAR, EL, A, VA, B, VB, C, VC, NERR, STATUS )
+*     CALL KPG1_DIVx( BAD, VAR, EL, A, VA, B, VB, C, VC, NERR, STATUS )
 
 *  Description:
 *     The routine divides one vectorised array by another, with

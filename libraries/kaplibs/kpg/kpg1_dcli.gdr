@@ -1,8 +1,8 @@
-      SUBROUTINE KPG_$DCLI<T>( NDIM, NDF, DALBND, DAUBND, SCALE, OFFSET,
+      SUBROUTINE KPG1_DCLI<T>( NDIM, NDF, DALBND, DAUBND, SCALE, OFFSET,
      :                       LINEAR, STATUS )
 *+
 *  Name:
-*     KPG_$DCLIx
+*     KPG1_DCLIx
 
 *  Purpose:
 *     Determines a linear transformation from pixel to NDF-axis
@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG_$DCLIx( NDIM, NDF, DALBND, DAUBND, SCALE, OFFSET, LINEAR,
+*     CALL KPG1_DCLIx( NDIM, NDF, DALBND, DAUBND, SCALE, OFFSET, LINEAR,
 *                      STATUS )
 
 *  Description:
@@ -155,7 +155,7 @@
 *       Find the range of the axis co-ordinates and whether or
 *       not the axis is linear.
 
-         CALL KPG_$AXLI<T>( AEL, %VAL( AXPNTR( 1 ) ), DALBND( I ),
+         CALL KPG1_AXLI<T>( AEL, %VAL( AXPNTR( 1 ) ), DALBND( I ),
      :                    DAUBND( I ), AXLIN( I ), STATUS )
 
 *       Let the application complete without an error if the
