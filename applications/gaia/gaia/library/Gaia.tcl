@@ -763,7 +763,7 @@ itcl::class gaia::Gaia {
    #  Start the demonstration toolbox.
    public method make_demo_toolbox {name {cloned 0}} {
       itk_component add $name {
-         StarDemo .\#auto \
+         GaiaDemo .\#auto \
             -gaiamain $w_ \
             -rtdimage [$image_ get_image] \
             -gaiactrl $image_ \

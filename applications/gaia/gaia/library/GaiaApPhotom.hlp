@@ -1,6 +1,6 @@
 
-                       The photometry toolboxes
-                       ========================
+		  The aperture photometry toolboxes
+		  =================================
 
    How to use this window to:
    --------------------------
@@ -26,6 +26,12 @@
 In this example the sky background is estimated using the region
 between the outer and inner annuli. If this region contains any
 contamination then you will need to create sky apertures.
+
+   --- Measure several stars:
+
+You can create as many apertures as you like by repeating the stages
+described above. All apertures are re-measured each time the "Calculate
+results" button is pressed.
 
 
    --- Make measurements without an annulus:
@@ -58,21 +64,21 @@ and entry windows only work on the selected aperture. To activate a
 value you type into a entry window press the <Return> key.
 
 
-   --- Fix the aperture size:
+   --- Make all apertures the same size:
 
-To create apertures of a fixed size which cannot be resized using
-grips open the "Options" menu and select the "Allow interactive
-aperture adjustment" option. Apertures will now be created with the
+To create apertures with a fixed size, or which are constrained to be
+the same size, choose the "Options" menu and select the "Keep
+apertures same size" option. Apertures will now be created with the
 values shown in the "Semimajor axis:", "Eccentricity:", "Position
 angle:", "Annulus inner scale:" and "Annulus outer scale:" windows.
 
-These apertures can now only be changed by using the sliders and entry
-windows when they are selected.
+If you select one of these apertures and resize (or reorient) it, in
+some way, then all the other apertures will track these changes.
 
 
    --- Resize more than one aperture at time:
 
-To do this you must select more all the apertures you want to modify
+To do this you must select all the apertures you want to modify
 together. To do this select an aperture, then hold down the <Control>
 button and select the next aperture etc. You can now say change all
 the apertures to the same radius by typing a value into the "Semimajor
@@ -89,17 +95,21 @@ the grips to reorient and resize the aperture.
 
    --- View all the measurements at once:
 
-Just open the "Options" menu and select "View all measurements". This
-creates a new window just above the "Close" button that lists all the
-current apertures and their related values. Double click on a line to
-make that aperture current.
+Just select "Results" tab and press "View all measurements". This
+creates a new window that lists all the current apertures and their
+related values. Double click on a line to make that aperture current.
 
 
    --- Save the measurements:
 
-The save the measurements open the "File" menu and select "Save
-measurements...". This creates a file browser window in which you can
-give a new file name or select from your existing files.
+Just press the "Save" button. This will write all the current
+measurements to a file "GaiaPhotomLog.Dat" by default. You can write
+to a different file using the "Results" entry field.
+
+The "Append" button appends the current measurements to the end of the 
+results file (preceded by the name of the current image in a
+comment). Note the "Save" option overwrites the results file without
+prompting.
 
 
    --- Make the same measurements on other images:
@@ -109,6 +119,9 @@ the existing image) and then open the "File" menu and select the "Read
 measurements..." item. This allows you to select a file with your
 existing measurements in. These apertures will now be redrawn. Press
 "Calculate results" and then save the new measurements to a new file.
+
+You can also use the results files together with the AUTOPHOTOM
+program (see SUN/45) to redo the same measurements non-interactively.
 
 
    --- Change the frame zero point (magnitudes only):
@@ -121,8 +134,9 @@ return. All the existing apertures will now be re-measured.
 
 The easiest way to set the exposure time (so you can normalize all
 your observations) is to just enter the exposure time in seconds in
-the "Exposure time/qualifier:" entry, after making sure that the
-"Exposure time source:" menu is set to "simple constant". 
+the "Exposure time/qualifier:" entry, (found under the "Parameters"
+tab) after making sure that the "Exposure time source:" menu is set to
+"simple constant".
 
 Note that the exposure time is just used as a ratio to scale the
 intensities, so using seconds is only a convenience.
@@ -132,15 +146,15 @@ If your data have their exposure time set in the image headers
 "FITS keyword" and enter the header item name in the "Exposure
 time/qualifier" entry.
 
+
    --- Control the centroiding, noise characteristics, sky estimators...:
 
 The aperture photometry is actually performed by the PHOTOM program
 AUTOPHOTOM. This is described in SUN/45. All the additional parameters
 that define the conversion factor from data units to photons, any bias
 in the data and modify the way that the sky background is estimated
-can be set by opening the "Options" menu and selecting the "Set
-additional parameters" item. You should read SUN/45 to understand
-these parameters. 
+can be set by selecting the "Parameters" tab. You should read SUN/45
+(showme sun45) to understand these parameters.
 
 WARNING: the error estimates in the measurements will be wrong unless
 you set the image bias and data units to photons conversion factor

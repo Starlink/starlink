@@ -1151,35 +1151,21 @@ itcl::class gaia::GaiaDemo {
  in a shift).
       }
       short_display {Displaying an image without any astrometry...}
-      puts "1"
       show_image_ ngc1275_nowcs.fits 95 3
-      puts "2"
       scroll_ 1
-      puts "3"
       short_display {Copying solution from similar image...}
-      puts "4"
       $itk_option(-gaiamain) make_toolbox astcopy
-      puts "5"
       set toolbox [$itk_option(-gaiamain) component astcopy]
-      puts "6"
       refresh_
-      puts "7"
       move_to_side_ $toolbox
-      puts "8"
       refresh_
-      puts "9"
       $toolbox default_file $demo_dir_/ngc1275.fits
-      puts "10"
       $toolbox test
-      puts "11"
       display {
   Astrometry has now been copied from another image.
       }
-      puts "12"
       scroll_ 1
-      puts "13"
       $toolbox cancel
-      puts "14"
    }
 
    #  Display show results from on-line catalogues. Need to
@@ -1414,11 +1400,10 @@ $catlist
    protected variable running_ 0
 
    #  List of all known demos.
-    protected variable demolist_ astcopy_
-#    protected variable demolist_ \
-#       "basic_ scroll_ slice_ annotate_ photom_ regions_ patch_ \
-#        blink_ grid_ astdefine_ astreference_ astrefine_ astcopy_\
-#        skycat_ archives_"
+   protected variable demolist_ \
+      "basic_ scroll_ slice_ annotate_ photom_ regions_ patch_ \
+        blink_ grid_ astdefine_ astreference_ astrefine_ astcopy_\
+        skycat_ archives_"
    
    #  Interval to wait while reading text
    protected variable readtime_ 15000

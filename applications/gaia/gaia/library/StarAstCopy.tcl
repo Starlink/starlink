@@ -123,7 +123,7 @@ itcl::class gaia::StarAstCopy {
       #  Create the button bar
       itk_component add actionframe {frame $w_.action}
 
-      #  Add a button to filter the available files. 
+      #  Add a button to filter the available files.
       itk_component add filter {
 	  button $itk_component(actionframe).filter -text Filter \
 		  -command [code $this _filtercmd]
@@ -191,7 +191,7 @@ itcl::class gaia::StarAstCopy {
          eval $itk_option(-clone_cmd)
       }
    }
-   
+
    #  Withdraw this window without accepting any new WCS information.
    public method cancel {} {
 
@@ -265,7 +265,7 @@ itcl::class gaia::StarAstCopy {
 
    #  Do the notify_cmd option if needed.
    protected method notify_ {} {
-      if { $itk_option(-notify_cmd) != {} } { 
+      if { $itk_option(-notify_cmd) != {} } {
          eval $itk_option(-notify_cmd)
       }
    }
@@ -285,7 +285,7 @@ itcl::class gaia::StarAstCopy {
    #  Identifying number for toolbox (shown in () in window title).
    itk_option define -number number Number 0 {}
 
-   #  Names and extensions of known data types. Note this option 
+   #  Names and extensions of known data types. Note this option
    #  overrides those of the parent class and hence repeats its
    #  functionality.
    itk_option define -filter_types filter_types Filter_Types \
@@ -307,7 +307,7 @@ itcl::class gaia::StarAstCopy {
 	   }
        }
    }
-   
+
    #  Command to execute when the WCS is changed.
    itk_option define -notify_cmd notify_cmd Notify_Cmd {}
 

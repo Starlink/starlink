@@ -28,7 +28,7 @@ FILES        = \
  StarArdTool.tcl StarAstCopy.tcl StarAstDefine.tcl StarAstGrid.tcl \
  StarAstReference.tcl StarAstRefine.tcl StarAstSystem.tcl \
  StarAstTable.tcl StarBlink.tcl StarCanvasDraw.tcl StarCanvasObject.tcl \
- StarDemo.tcl StarEnterObject.tcl StarLabelCheck.tcl StarPatch.tcl \
+ GaiaDemo.tcl StarEnterObject.tcl StarLabelCheck.tcl StarPatch.tcl \
  GaiaApPhotom.tcl GaiaOptPhotom.tcl GaiaPhotomDetails.tcl \
  GaiaPhotomExtras.tcl GaiaPhotomList.tcl GaiaPhotomObject.tcl \
  gaia2astrom.tcl gaiaMain.tcl \
