@@ -833,7 +833,7 @@
 *     from the chosen output centre
 
          SHIFT_DX = 0.0         ! dont support shift yet
-         SHIFT_DX = 0.0
+         SHIFT_DY = 0.0
 
          IF (STATUS .EQ. SAI__OK) THEN
             CALL SCULIB_APPARENT_2_TP (N_BOL, 
