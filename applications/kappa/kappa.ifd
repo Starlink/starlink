@@ -2184,8 +2184,8 @@ package kappa {
          parameter simpfi {
             type _LOGICAL
             access READ
-            vpath PROMPT
-            ppath DEFAULT
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
             prompt {Simplify forward plus inverse to unit mapping?}
             default TRUE
             helpkey *
@@ -2194,8 +2194,8 @@ package kappa {
          parameter simpif {
             type _LOGICAL
             access READ
-            vpath PROMPT
-            ppath DEFAULT
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
             prompt {Simplify inverse plus forward to unit mapping?}
             default TRUE
             helpkey *
