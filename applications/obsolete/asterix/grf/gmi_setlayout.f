@@ -107,7 +107,7 @@
 
 *  Just invoke HDS version
       CALL ADI1_GETLOC( ID, LOC, STATUS )
-      CALL GMD_SETPLOTS( LOC, STATUS )
+      CALL GMD_SETLAYOUT( LOC, SETX, NX, SETY, NY, STATUS )
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) THEN

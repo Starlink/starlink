@@ -116,7 +116,7 @@
       CALL ADI_EXEC( 'FileObjName', 1, FID, OARG, STATUS )
 
 *  Extract data from the returned object
-      CALL ADI_CGET0C( OARG, 'File', NAME, STATUS )
+      CALL ADI_GET0C( OARG, NAME, STATUS )
       NLEN = CHR_LEN(NAME)
 
 *  And destroy the result
