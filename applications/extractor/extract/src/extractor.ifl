@@ -1,0 +1,36 @@
+interface SEX
+   parameter IMAGE
+      position 1
+      type LITERAL
+      vpath prompt
+      ppath 'current,default'
+      default '../calibrated'
+   endparameter
+
+   parameter CONFIG
+      position 2
+      type LITERAL
+      vpath prompt
+      ppath 'current,default'
+      default 'default.sex'
+   endparameter
+
+   parameter KEYWORDS
+      position 3
+      type _LOGICAL
+      vpath DEFAULT
+      ppath DEFAULT
+      default NO
+   endparameter
+
+   parameter NAME
+      type LITERAL
+      vpath PROMPT
+   endparameter
+
+   parameter VALUE
+      type LITERAL
+      vpath PROMPT
+   endparameter
+
+endinterface
