@@ -69,6 +69,10 @@
 
 *  History:
 *     $Log$
+*     Revision 1.7  2002/09/19 21:12:14  timj
+*     Fix problem with terminated polarimetery observations where the
+*     WPLATE array size did not match the aborted measurement count
+*
 *     Revision 1.6  2002/09/09 21:43:33  timj
 *     Fix "use of unintialized value" warning with LONG2_RAD
 *
@@ -614,15 +618,23 @@
 
 *     Check dimension [it has not been decided whether
 *     the WPLATE array will match N_MEAS or whether it will auto
-*     wrap round]
+*     wrap round]. We allow the observation to be terminated (ie
+*     number of wplates greater than number of measurements
          IF (STATUS .EQ. SAI__OK .AND. N_WP_POS.NE.N_MEASUREMENTS) THEN
-            STATUS = SAI__ERROR
-            CALL MSG_SETC('TSK',TSKNAME)
-            CALL MSG_SETI('NW', ITEMP)
-            CALL MSG_SETI('NM', N_MEASUREMENTS)
-            CALL ERR_REP(' ','^TSK: Dimensions of WPLATE array '//
-     :           '(^NW) do not match number of measurements (^NM)',
-     :           STATUS)
+
+            IF (N_WP_POS .GT. N_MEASUREMENTS) THEN
+*     Make sure they agree for the rest of the run
+               N_WP_POS = N_MEASUREMENTS
+            ELSE
+*     We do not yet allow wraparound
+               STATUS = SAI__ERROR
+               CALL MSG_SETC('TSK',TSKNAME)
+               CALL MSG_SETI('NW', N_WP_POS)
+               CALL MSG_SETI('NM', N_MEASUREMENTS)
+               CALL ERR_REP(' ','^TSK: Dimensions of WPLATE array '//
+     :              '(^NW) is less than number of measurements (^NM)',
+     :              STATUS)
+            END IF
          END IF
 
       END IF
@@ -684,18 +696,21 @@
 
 *     Since the IPFILE sets the fast axis angle we need to read
 *     the filter names from the FITS header
+      N_SUB = 0
       CALL SCULIB_GET_FITS_I (N_FITS, N_FITS, FITS, 'N_SUBS',
      :     N_SUB, STATUS)
       
 *     Code copied from SCULIB_GET_SUB_INST
       STEMP = 'FILT_'
-      DO I = 1, N_SUB
-         ITEMP = 5
-         CALL CHR_PUTI (I, STEMP, ITEMP)
-         CALL SCULIB_GET_FITS_C (N_FITS, N_FITS, FITS,
-     :        STEMP, FILTERS(I), STATUS)
-         CALL CHR_UCASE (FILTERS(I))
-      END DO
+      IF (STATUS .EQ. SAI__OK) THEN
+         DO I = 1, N_SUB
+            ITEMP = 5
+            CALL CHR_PUTI (I, STEMP, ITEMP)
+            CALL SCULIB_GET_FITS_C (N_FITS, N_FITS, FITS,
+     :           STEMP, FILTERS(I), STATUS)
+            CALL CHR_UCASE (FILTERS(I))
+         END DO
+      END IF
 
 *     Now read it
       
@@ -779,12 +794,14 @@
       
       CALL NDF_XSTAT(OUT_NDF, 'REDS', THERE, STATUS)
 
-      IF (THERE) THEN
-         CALL NDF_XLOC(OUT_NDF, 'REDS', 'UPDATE', OUT_REDSX_LOC, 
-     :        STATUS)
-      ELSE
-         CALL NDF_XNEW (OUT_NDF, 'REDS', 'SURF_EXTENSION',
-     :        0, 0, OUT_REDSX_LOC, STATUS)
+      IF (STATUS .EQ. SAI__OK) THEN
+         IF (THERE) THEN
+            CALL NDF_XLOC(OUT_NDF, 'REDS', 'UPDATE', OUT_REDSX_LOC, 
+     :           STATUS)
+         ELSE
+            CALL NDF_XNEW (OUT_NDF, 'REDS', 'SURF_EXTENSION',
+     :           0, 0, OUT_REDSX_LOC, STATUS)
+         END IF
       END IF
 
 *     Write the fast axis information to the REDS extension

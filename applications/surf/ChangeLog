@@ -1,3 +1,9 @@
+2002-09-19  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* src/surf_remip.f (SURF_REMIP): Fix problem when reducing aborted
+	or terminated observations - the waveplate array was larger than
+	the number of measurements.
+
 2002-09-18  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* src/surf_rebin.f (SURF_REBIN): bolrebin has a problem on linux
