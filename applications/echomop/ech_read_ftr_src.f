@@ -338,8 +338,10 @@ C
          REPORT_STRING = ' I/O error from arc file ' //
      :         ARCS( FNPTR : LPTR )
          CALL ECH_REPORT( 0, REPORT_STRING )
-         CALL GEN_FORTERR( FSTAT, .FALSE., CARD )
-         CALL ECH_REPORT( 0, CARD( :CHR_LEN( CARD ) ) )
+*      There's no generic way to translate Fortran I/O errors into text,
+*      so it might be best not to try.  ems_fioer tries, but is dangerously
+*      compiler-specific.  This used to use Figaro gen_forterr (from a
+*      non-installed Figaro library).
          GO TO 530
 
 *     File opening failure.  Treat this as a serious error.
