@@ -10,7 +10,7 @@
 #  Description:
 #     If you build the tagging routines using flex in its default
 #     configuration, it fails on some files with very long tokens
-#     (usuall yC comments).  Good examples are to be found in the 
+#     (usually comments).  Good examples are to be found in the 
 #     AST package.  This script tries the C tagger against some of
 #     these to see whether it chokes or not.
 #
@@ -26,10 +26,7 @@
 #        Original version.
 #-
 
-#  Test files
-      ast_dir=../../libraries/ast
-
-      ./ctag $ast_dir/frame.c >/dev/null && \
-      ./ctag $ast_dir/plot.c >/dev/null && \
-      ./ctag $ast_dir/mapping.c >/dev/null
+#  Test file.  This is a copy of a file from AST which is known to
+#  cause long-token problems.
+      ./ctag test_frame.c >/dev/null
 
