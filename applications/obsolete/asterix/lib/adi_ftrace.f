@@ -13,7 +13,12 @@
 *     CALL ADI_FTRACE( ID, NLEV, PATH, FILE, STATUS )
 
 *  Description:
-*     {routine_description}
+*     Returns a description of the full specification of a file based
+*     data object. This is split into 2 parts. The FILE part gives the
+*     operating system filename containing the data object. The PATH
+*     contains any sub-file specification required. NLEV contains a
+*     count of the number of levels of sub-structure within the PATH
+*     value.
 
 *  Arguments:
 *     ID = INTEGER (given)
@@ -59,20 +64,14 @@
 *  Implementation Deficiencies:
 *     {routine_deficiencies}...
 
-*  {machine}-specific features used:
-*     {routine_machine_specifics}...
-
-*  {DIY_prologue_heading}:
-*     {DIY_prologue_text}
-
 *  References:
-*     {routine_references}...
+*     ADI Subroutine Guide : http://www.sr.bham.ac.uk:8080/asterix-docs/Programmer/Guides/adi.html
 
 *  Keywords:
-*     {routine_keywords}...
+*     package:adi, usage:public
 
 *  Copyright:
-*     {routine_copyright}
+*     Copyright (C) University of Birmingham, 1995
 
 *  Authors:
 *     DJA: David J. Allan (Jet-X, University of Birmingham)
@@ -93,7 +92,6 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'DAT_PAR'
 
 *  Arguments Given:
       INTEGER			ID			! File identifier
@@ -106,17 +104,22 @@
       INTEGER 			STATUS             	! Global status
 
 *  Local Variables:
-      CHARACTER*(DAT__SZLOC)	LOC			! File handle
+      INTEGER			OARG			! Method output
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Extract locator
-      CALL ADI1_GETLOC( ID, LOC, STATUS )
+*  Invoke the method
+      CALL ADI_EXEC( 'FileTrace', 1, ID, OARG, STATUS )
 
-*  Do the trace
-      CALL HDS_TRACE( LOC, NLEV, PATH, FILE, STATUS )
+*  Extract data from the returned object
+      CALL ADI_CGET0C( OARG, 'File', FILE, STATUS )
+      CALL ADI_CGET0C( OARG, 'Path', PATH, STATUS )
+      CALL ADI_CGET0C( OARG, 'Nlev', NLEV, STATUS )
+
+*  And destroy the result
+      CALL ADI_ERASE( OARG, STATUS )
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'ADI_FTRACE', STATUS )

@@ -3,6 +3,7 @@
         INTEGER         STATUS
 	INTEGER ID,DID
         EXTERNAL        ADI1_FCREAT
+        EXTERNAL        ADI1_FTRACE
         EXTERNAL        ADI1_OPEN
         EXTERNAL        ADI1_NATRL
 
@@ -13,7 +14,10 @@
 	CALL ADI_DEFCLS( 'HDSlocator', ' ', 'Locator', DID,
      :                   STATUS )
 
-	CALL ADI_DEFCLS( 'HDSfile', 'FileObject,HDSlocator', 'x', DID,
+	CALL ADI_DEFCLS( 'HDSfile', 'FileObject,HDSlocator', ' ', DID,
+     :                   STATUS )
+
+        CALL ADI_DEFMTH( 'FileTrace(HDSlocator)', ADI1_FTRACE, DID,
      :                   STATUS )
 
 c        CALL ADI_DEFRCB( ID, 'NATRL_RTN', ADI1_NATRL, STATUS )
