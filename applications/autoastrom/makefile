@@ -330,6 +330,7 @@ EXPORT = .
 #CFLAGS = -O
 FC = fort77
 FFLAGS = -O
+CXX = CC
 
 #  Command for forming a link to a file.
 LINK = ln
@@ -597,6 +598,7 @@ build:
 	@ echo '   AR_IN   : $(AR_IN)'        >>$(DATE_STAMP)
 	@ echo '   BLD_SHR : $(BLD_SHR)'      >>$(DATE_STAMP)
 	@ echo '   CC      : $(CC)'           >>$(DATE_STAMP)
+	@ echo '   CXX     : $(CXX)'          >>$(DATE_STAMP)
 	@ echo '   CFLAGS  : $(CFLAGS)'       >>$(DATE_STAMP)
 	@ echo '   FC      : $(FC)'           >>$(DATE_STAMP)
 	@ echo '   FFLAGS  : $(FFLAGS)'       >>$(DATE_STAMP)
@@ -1034,9 +1036,14 @@ clean:
 #  doc removes the documentation tarballs, which are regarded as part
 #  of the source distribution for the purposes of this makefile;
 #  therefore we shouldn't make that as part of this target.
+#
+#  Within moggy, a simple `make -f Makefile.in' won't do, since the
+#  unconfigured Makefile will fail to clean out the SkyCat directories
+#  (if the directory hasn't been configured, then there's probably not
+#  much to clean out, in fact).
 unbuild: clean
 	-cd astrom && ./mk unbuild
-	-cd moggy && make -f Makefile.in clean
+	-cd moggy && if test -f Makefile; then make distclean; else make -f Makefile.in distclean; fi
 	-cd doc && make unbuild
 	@- $(RMF) $(BUILT_FILES) $(DATE_STAMP) .BUILT 1>/dev/null 2>/dev/null
 	@ echo '*** Built files removed'
@@ -1069,7 +1076,7 @@ sun242.xml: doc/sun242.xml
 
 # First configure and build the moggy package.
 moggy/moggy: moggy/Makefile
-	cd moggy && unset INSTALL && make
+	cd moggy && unset INSTALL; make
 
 moggy/Makefile: moggy
 	@ if test ! -r $(CATLIB_DISTRIBUTION); then \
@@ -1077,7 +1084,7 @@ moggy/Makefile: moggy
 		echo "    (expected in $(CATLIB_DISTRIBUTION))"; \
 		false; \
 	fi
-	cd moggy && unset INSTALL && ./configure --with-catlib=../$(CATLIB_DISTRIBUTION)
+	cd moggy && unset INSTALL; CXX=$(CXX) CC=$(CC) ./configure --with-catlib=../$(CATLIB_DISTRIBUTION)
 
 astrom/astrom.x: astrom
 	cd astrom && ./mk build
