@@ -54,7 +54,7 @@
         CALL GDV_DEVICE(DEV,STATUS)
         CALL GDV_CLOSE(STATUS)
         CALL MSG_SETC('DEV',DEV)
-        CALL MSG_PRNT('Device ^DEV now closed')
+        CALL MSG_PRNT('^DEV now closed')
       ENDIF
 
       CALL USI_CLOSE()
