@@ -1,7 +1,7 @@
   INTERFACE VARTEST
 
     PARAMETER INP
-       TYPE      'UNIV'
+       TYPE      'LITERAL'
        PPATH     'GLOBAL'
        ASSOCIATION '<-GLOBAL.BINDS'
        PROMPT 'Source time series'
@@ -9,7 +9,7 @@
     ENDPARAMETER
 
     PARAMETER BACK
-       TYPE      'UNIV'
+       TYPE      'LITERAL'
        PROMPT 'Background time series'
        POSITION 2
     ENDPARAMETER
