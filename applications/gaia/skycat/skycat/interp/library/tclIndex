@@ -6,19 +6,6 @@
 # element name is the name of a command and the value is
 # a script that loads the command.
 
-set auto_index(::cat::AstroCat) [list source [file join $dir AstroCat.tcl]]
-set auto_index(::cat::AstroCat::add_catalog_menu) [list source [file join $dir AstroCat.tcl]]
-set auto_index(::cat::AstroCat::reload_config_file) [list source [file join $dir AstroCat.tcl]]
-set auto_index(::cat::AstroCat::catalog_directory) [list source [file join $dir AstroCat.tcl]]
-set auto_index(::cat::AstroCat::update_catalog_menus) [list source [file join $dir AstroCat.tcl]]
-set auto_index(::cat::AstroCat::is_tcs_catalog) [list source [file join $dir AstroCat.tcl]]
-set auto_index(::cat::AstroCat::local_catalog) [list source [file join $dir AstroCat.tcl]]
-set auto_index(::cat::AstroCat::fill_catalog_menu) [list source [file join $dir AstroCat.tcl]]
-set auto_index(::cat::AstroCat::select_catalog) [list source [file join $dir AstroCat.tcl]]
-set auto_index(::cat::AstroCat::new_catalog) [list source [file join $dir AstroCat.tcl]]
-set auto_index(::cat::AstroCat::new_archive) [list source [file join $dir AstroCat.tcl]]
-set auto_index(::cat::AstroCat::instances) [list source [file join $dir AstroCat.tcl]]
-set auto_index(::cat::AstroCat::list_windows) [list source [file join $dir AstroCat.tcl]]
 set auto_index(::skycat::SkyCat) [list source [file join $dir SkyCat.tcl]]
 set auto_index(::skycat::SkyCat::startSkyCat) [list source [file join $dir SkyCat.tcl]]
 set auto_index(::skycat::SkyCat::get_catalog) [list source [file join $dir SkyCat.tcl]]
@@ -51,6 +38,5 @@ set auto_index(::skycat::SkySearch::apply_history) [list source [file join $dir 
 set auto_index(::skycat::SkySearch::add_history_menu_items) [list source [file join $dir SkySearch.tcl]]
 set auto_index(::hmstod) [list source [file join $dir SkySearch.tcl]]
 set auto_index(::dtohms) [list source [file join $dir SkySearch.tcl]]
-set auto_index(::cat::setXdefaults) [list source [file join $dir catdefaults.tcl]]
 set auto_index(::skycat::setXdefaults) [list source [file join $dir skycat_defaults.tcl]]
 set auto_index(::skycat_version) [list source [file join $dir skycat_version.tcl]]
