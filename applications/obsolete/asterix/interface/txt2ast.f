@@ -79,7 +79,8 @@
 *     21 Feb 94 : V1.7-1  Fixed bug uncovered by last change in handling
 *                         non-scalar widths (DJA)
 *     31 Jul 94 : V1.7-2  Added LOLIM/UPLIM option for DATA values (ISH)
-*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
+*     24 Nov 94 : V1.8-0  Now use USI for user interface (DJA)
+*     12 Feb 95 : V1.8-1  Use new BDI, don't use FIO ADAM calls (DJA)
 *
 *    Type definitions :
 *
@@ -88,7 +89,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
       INCLUDE 'QUAL_PAR'
 *
 *    Status :
@@ -126,11 +127,11 @@
 *
 *    Local variables :
 *
-      CHARACTER*80		AX_LABEL(DAT__MXDIM) 	! Axis labels
-      CHARACTER*80		AX_UNITS(DAT__MXDIM) 	! Axis labels
+      CHARACTER*80		AX_LABEL(ADI__MXDIM) 	! Axis labels
+      CHARACTER*80		AX_UNITS(ADI__MXDIM) 	! Axis labels
       CHARACTER           	CHA
+      CHARACTER*132		FNAME			! User supplied file
       CHARACTER           	FILE_NAME*200   	! The full-file name
-      CHARACTER*(DAT__SZLOC)	OLOC			! Output object
       CHARACTER           	HTEXT*80        	! History text
       CHARACTER*80		LABEL_DATA		! Output object label
       CHARACTER*80		QMASK			! Output quality mask
@@ -142,7 +143,7 @@
 
       REAL                DATAROW(MAX_DESCS)! The values read from a data line
       REAL                LASTROW(MAX_DESCS)! Last values read from a data line
-      REAL			AX_SCADAT(DAT__MXDIM)	! Scalar axis widths
+      REAL			AX_SCADAT(ADI__MXDIM)	! Scalar axis widths
 
       INTEGER             BLOCK(PTR_TABLES) ! Pointers to data blocks
       INTEGER             DEF_VALS(MAX_DESCS)! The default values for each column
@@ -151,7 +152,7 @@
       INTEGER             	CURBLOCK          	! Current block in use
       INTEGER             CURROW            ! Current row in current block
       INTEGER             DATA_LEN          ! Number of char in a real string
-      INTEGER			DIMS(DAT__MXDIM)	! Output dimensions
+      INTEGER			DIMS(ADI__MXDIM)	! Output dimensions
       INTEGER             HTLEN             ! Length of history text
       INTEGER             IFD               ! Input file descriptor
       INTEGER             	I                 	! Loop variable
@@ -161,18 +162,19 @@
       INTEGER			NDIM			! Output dimensionality
       INTEGER			NELM			! Number of data recs
       INTEGER             NUM_DESCS         ! Number of record descriptors
+      INTEGER			OFID			! Output file identifier
       INTEGER             ORIG_PTR          ! Original order of MASTER_PTR table
       INTEGER             	QVAL              	! Quality value
       INTEGER             ROWADDR           ! Address of a start of a data row
       INTEGER             WPTR,WPTR2,WPTR3,WPTRW  ! Workspace arrays
 
-      LOGICAL			AX_DECR(DAT__MXDIM)	! Axis decreasing?
-      LOGICAL			AX_LABEL_OK(DAT__MXDIM)	! Axis labels ok?
-      LOGICAL			AX_NORM(DAT__MXDIM)	! Axis normalised?
-      LOGICAL                   AX_SCALAR(DAT__MXDIM)
-      LOGICAL			AX_SYMWID(DAT__MXDIM)	! Axis widths symmetric?
-      LOGICAL			AX_UNITS_OK(DAT__MXDIM)	! Axis labels ok?
-      LOGICAL			AX_WOK(DAT__MXDIM)	! Axis widths ok?
+      LOGICAL			AX_DECR(ADI__MXDIM)	! Axis decreasing?
+      LOGICAL			AX_LABEL_OK(ADI__MXDIM)	! Axis labels ok?
+      LOGICAL			AX_NORM(ADI__MXDIM)	! Axis normalised?
+      LOGICAL                   AX_SCALAR(ADI__MXDIM)
+      LOGICAL			AX_SYMWID(ADI__MXDIM)	! Axis widths symmetric?
+      LOGICAL			AX_UNITS_OK(ADI__MXDIM)	! Axis labels ok?
+      LOGICAL			AX_WOK(ADI__MXDIM)	! Axis widths ok?
       LOGICAL			ERROR_TO_VAR		! Error to variance?
       LOGICAL             	EXTRA             	! Any garbage on a line?
       LOGICAL             	GOOD_LINE         	! Good line read in?
@@ -205,7 +207,7 @@
 *    Version :
 *
       CHARACTER*30        VERSION
-         PARAMETER        ( VERSION = 'IMPORT Version 1.8-0' )
+         PARAMETER        ( VERSION = 'IMPORT Version 1.8-1' )
 *-
 
 *    Check status
@@ -228,7 +230,7 @@
       UNITS_OK = .FALSE.
       VRNT_OK = .FALSE.
 
-      DO I = 1, DAT__MXDIM
+      DO I = 1, ADI__MXDIM
         AX_LABEL_OK(I) = .FALSE.
         AX_UNITS_OK(I) = .FALSE.
         AX_WOK(I) = .FALSE.
@@ -258,11 +260,12 @@
       CALL ARR_INIT1L( .FALSE., MAX_DESCS, IGNORE, STATUS )
 
 *    Get the name of and open the input text file
-      CALL FIO_ASSOC( 'INP', 'READ', 'LIST', DEFAULT, IFD, STATUS )
+      CALL USI_GET0C( 'INP', FNAME, STATUS )
+      CALL FIO_OPEN( FNAME, 'READ', 'LIST', DEFAULT, IFD, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Get the first input line
-      CALL IMPORT_NEXTLINE( OLOC, IFD, CLINE, STATUS )
+      CALL IMPORT_NEXTLINE( OFID, IFD, CLINE, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
         CALL MSG_PRNT( 'TOPLEVEL or data descriptor expected.' )
         STATUS = SAI__ERROR
@@ -316,10 +319,10 @@
           PRIM = .TRUE.
         ELSE
           PRIM = .FALSE.
-          CALL USI_ASSOCO( 'OUT', TYPE_DATA, OLOC, STATUS )
+          CALL USI_TASSOCO( 'OUT', TYPE_DATA, OFID, STATUS )
         END IF
       ELSE
-        CALL USI_ASSOCO( 'OUT', 'UNKNOWN', OLOC, STATUS )
+        CALL USI_TASSOCO( 'OUT', 'UNKNOWN', OFID, STATUS )
         PRIM = .FALSE.
       END IF
 
@@ -328,15 +331,15 @@
       IF ( .NOT. PRIM ) THEN
 
 *      Create HISTORY structure
-        CALL HIST_NEW( OLOC, STATUS )
-        CALL HIST_ADD( OLOC, VERSION, STATUS )
+        CALL HSI_NEW( OFID, STATUS )
+        CALL HSI_ADD( OFID, VERSION, STATUS )
         CALL MSG_SETC( 'FILE', FILE_NAME )
         CALL MSG_MAKE( 'Created from text file ^FILE', HTEXT, HTLEN )
-        CALL HIST_PTXT( OLOC, 1, HTEXT(:HTLEN), STATUS )
+        CALL HSI_PTXT( OFID, 1, HTEXT(:HTLEN), STATUS )
 
 *      Output buffered comments
         IF ( CMT_N .GT. 0 ) THEN
-          CALL HIST_PTXT( OLOC, CMT_N, CMT, STATUS )
+          CALL HSI_PTXT( OFID, CMT_N, CMT, STATUS )
         END IF
         CMT_BUF = .FALSE.
 
@@ -347,7 +350,7 @@
         IF ( PRIM ) THEN
           CALL MSG_PRNT( 'Cannot write TITLE to primitive output' )
         ELSE
-          CALL BDA_PUTTITLE( OLOC, TITLE_DATA, STATUS )
+          CALL BDI_PUTTITLE( OFID, TITLE_DATA, STATUS )
         END IF
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
@@ -367,7 +370,7 @@
       DO WHILE ( MORE_DESCS .AND. (STATUS .EQ. SAI__OK) )
 
         IF ( TOP_LEVEL ) THEN
-          CALL IMPORT_NEXTLINE( OLOC, IFD, CLINE, STATUS )
+          CALL IMPORT_NEXTLINE( OFID, IFD, CLINE, STATUS )
         END IF
         TOP_LEVEL= .TRUE.
 
@@ -391,7 +394,7 @@
               END IF
             END IF
 
-            IF ( NAXES .EQ. DAT__MXDIM ) THEN
+            IF ( NAXES .EQ. ADI__MXDIM ) THEN
               CALL IMPORT_ERROR( 'Maximum number of axes exceeded',
      :                                                    CLINE )
             ELSE
@@ -691,33 +694,33 @@
 
 *      If we've got a data label then create it
         IF ( LABEL_OK ) THEN
-          CALL BDA_PUTLABEL( OLOC, LABEL_DATA, STATUS )
+          CALL BDI_PUTLABEL( OFID, LABEL_DATA, STATUS )
         END IF
 
 *      If we've got data units then create it
         IF ( UNITS_OK ) THEN
-          CALL BDA_PUTUNITS( OLOC, UNITS_DATA, STATUS )
+          CALL BDI_PUTUNITS( OFID, UNITS_DATA, STATUS )
         END IF
 
 *      Create axis structure with as many axes as are required.
         IF ( NAXES .GT. 0 ) THEN
-          CALL BDA_CREAXES( OLOC, NAXES, STATUS )
+          CALL BDI_CREAXES( OFID, NAXES, STATUS )
         END IF
         IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *      Set 'easy' axis components
         DO N = 1, NAXES
           IF ( AX_LABEL_OK(N) ) THEN
-            CALL BDA_PUTAXLABEL( OLOC, N, AX_LABEL(N), STATUS )
+            CALL BDI_PUTAXLABEL( OFID, N, AX_LABEL(N), STATUS )
           END IF
           IF ( AX_UNITS_OK(N) ) THEN
-            CALL BDA_PUTAXUNITS( OLOC, N, AX_UNITS(N), STATUS )
+            CALL BDI_PUTAXUNITS( OFID, N, AX_UNITS(N), STATUS )
           END IF
           IF ( AX_NORM(N) ) THEN
-            CALL BDA_PUTAXNORM( OLOC, N, .TRUE., STATUS )
+            CALL BDI_PUTAXNORM( OFID, N, .TRUE., STATUS )
           END IF
           IF ( AX_SCALAR(N) ) THEN
-            CALL BDA_PUTAXWID( OLOC, N, AX_SCADAT(N), STATUS )
+            CALL BDI_PUTAXWID( OFID, N, AX_SCADAT(N), STATUS )
           END IF
         END DO
 
@@ -880,7 +883,7 @@
         END IF
 
 *      Get the next data row
-        CALL IMPORT_NEXTLINE( OLOC, IFD, CLINE, STATUS )
+        CALL IMPORT_NEXTLINE( OFID, IFD, CLINE, STATUS )
 
         IF ( STATUS .NE. SAI__OK ) THEN
           MORE_DATA = .FALSE.
@@ -968,7 +971,7 @@
       CALL MSG_PRNT( '^NREC data records read in from ^FILE' )
 
 *    Process the data
-      CALL IMPORT_CRUNCH( OLOC, TYPE_DATA, prim, NAXES, NELM, NDIM,
+      CALL IMPORT_CRUNCH( OFID, TYPE_DATA, prim, NAXES, NELM, NDIM,
      :                    DIMS, AX_WOK, AX_DECR, AX_SYMWID, AX_SCALAR,
      :                    QMASK_OK, QMASK, ERROR_TO_VAR,
      :                    %VAL(MASTER_PTR),
@@ -978,13 +981,10 @@
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Close input file
-      CALL FIO_CANCL( 'INP', STATUS )
+      CALL FIO_CLOSE( IFD, STATUS )
 
 *    Close down dataset
-      CALL BDA_RELEASE( OLOC, STATUS )
-
-*    Free dataset from parameter system
-      CALL USI_ANNUL( OLOC, STATUS )
+      CALL BDI_RELEASE( OFID, STATUS )
 
 *    Close down ASTERIX
  99   CALL AST_CLOSE
@@ -994,7 +994,7 @@
 
 
 *+  IMPORT_NEXTLINE - Returns next useful line from input
-      SUBROUTINE IMPORT_NEXTLINE( OLOC, INFILE, CURLINE, STATUS )
+      SUBROUTINE IMPORT_NEXTLINE( OFID, INFILE, CURLINE, STATUS )
 *
 *    Description :
 *
@@ -1018,7 +1018,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
       INCLUDE 'FIO_PAR'
       INCLUDE 'FIO_ERR'
 *
@@ -1032,7 +1032,7 @@
 *
 *    Import :
 *
-      CHARACTER*(DAT__SZLOC)	OLOC			! Output object
+      INTEGER			OFID			! Output file object
       INTEGER             	INFILE            	! Input file descriptor
 *
 *    Import-Export :
@@ -1112,7 +1112,7 @@
                       CMT(CMT_N) = BTEXT(CPOS+1:)
                     END IF
                   ELSE
-                    CALL HIST_PTXT( OLOC, 1, BTEXT(CPOS+1:), STATUS )
+                    CALL HSI_PTXT( OFID, 1, BTEXT(CPOS+1:), STATUS )
                   END IF
                 END IF
                 GOTO 23
@@ -1218,7 +1218,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *
 *    Import :
 *
@@ -1255,7 +1254,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
 *
 *    Status :
 *
@@ -1340,7 +1339,7 @@
 *    Local constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
 *
 *    Global variables :
 *
@@ -1403,7 +1402,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PRM_PAR'
 *
 *    Status :
@@ -1441,7 +1439,7 @@
 
 
 *+  IMPORT_CRUNCH - Do main data manipulation for IMPORT
-      SUBROUTINE IMPORT_CRUNCH( OLOC, TYPE, PRIM, NAXES, N, NDIM, DIMS,
+      SUBROUTINE IMPORT_CRUNCH( OFID, TYPE, PRIM, NAXES, N, NDIM, DIMS,
      :                AX_WOK, AX_DECR, AX_SYMWID, AX_SCALAR,
      :                QMASK_OK, CQMASK, ERROR_TO_VAR, MASTER, ORIG,
      :                NCOLS, WORK,
@@ -1484,7 +1482,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
       INCLUDE 'PRM_PAR'
       INCLUDE 'QUAL_PAR'
 *
@@ -1498,7 +1496,7 @@
 *
 *    Import :
 *
-      CHARACTER*(DAT__SZLOC)	OLOC			! Output object
+      INTEGER			OFID			! Output file object
       CHARACTER*(*)		TYPE			! Output object type
       LOGICAL			PRIM			! Output primitive?
       INTEGER             	NCOLS                   ! Number of items in a
@@ -1531,15 +1529,15 @@
       REAL                DVAL                   ! Two data values
       REAL                RQUAL                  ! Quality value
 
-      INTEGER             AX_DPTR(DAT__MXDIM)		! Axis data pointers
-      INTEGER             AX_HIWPTR(DAT__MXDIM)		! Axis hi width pointers
-      INTEGER             AX_LOWPTR(DAT__MXDIM)		! Axis lo width pointers
-      INTEGER             AX_SIZE(DAT__MXDIM)		! Values per axis
-      INTEGER             AX_WPTR(DAT__MXDIM)		! Axis widths pointers
+      INTEGER             AX_DPTR(ADI__MXDIM)		! Axis data pointers
+      INTEGER             AX_HIWPTR(ADI__MXDIM)		! Axis hi width pointers
+      INTEGER             AX_LOWPTR(ADI__MXDIM)		! Axis lo width pointers
+      INTEGER             AX_SIZE(ADI__MXDIM)		! Values per axis
+      INTEGER             AX_WPTR(ADI__MXDIM)		! Axis widths pointers
       INTEGER             I, J, K                ! Loop counter
       INTEGER             IQMASK                 ! Integer quality mask
       INTEGER             IQUAL                  ! Integer quality value
-      INTEGER             INDS(DAT__MXDIM)       !
+      INTEGER             INDS(ADI__MXDIM)       !
       INTEGER             NELM
 
       BYTE                BQUAL                  ! Quality value
@@ -1632,20 +1630,20 @@
 
 *        Create the axis array, map it and copy in the
 *        data collected in WORK(1:K)
-          CALL BDA_CREAXVAL( OLOC, I, .FALSE., AX_SIZE(I), STATUS )
-          CALL BDA_MAPAXVAL( OLOC, 'WRITE', I, AX_DPTR(I), STATUS )
+          CALL BDI_CREAXVAL( OFID, I, .FALSE., AX_SIZE(I), STATUS )
+          CALL BDI_MAPAXVAL( OFID, 'WRITE', I, AX_DPTR(I), STATUS )
           CALL ARR_COP1R( AX_SIZE(I), WORK, %VAL(AX_DPTR(I)), STATUS )
 
 *        Are vector widths wanted
           IF ( VECTOR_WIDTHS ) THEN
             IF ( AX_SYMWID(I) ) THEN
-              CALL BDA_CREAXWID( OLOC, I, .FALSE., AX_SIZE(I), STATUS )
-              CALL BDA_MAPAXWID( OLOC, 'WRITE', I, AX_WPTR(I), STATUS )
+              CALL BDI_CREAXWID( OFID, I, .FALSE., AX_SIZE(I), STATUS )
+              CALL BDI_MAPAXWID( OFID, 'WRITE', I, AX_WPTR(I), STATUS )
               CALL ARR_COP1R( AX_SIZE(I), WWORK(1,1),
      :                        %VAL(AX_WPTR(I)), STATUS )
             ELSE
-              CALL BDA_CREXERR( OLOC, AX_SIZE(I), STATUS )
-              CALL BDA_MAPXERR( OLOC, 'WRITE', AX_LOWPTR(I),
+              CALL BDI_CREXERR( OFID, AX_SIZE(I), STATUS )
+              CALL BDI_MAPXERR( OFID, 'WRITE', AX_LOWPTR(I),
      :                          AX_HIWPTR(I), STATUS )
               CALL ARR_COP1R( AX_SIZE(I), WWORK(1,1),
      :                        %VAL(AX_LOWPTR(I)), STATUS )
@@ -1661,12 +1659,12 @@
      :                     REGULAR, BASE, SCALE, STATUS )
 
 *        Free axis info
-          CALL BDA_UNMAPAXIS( OLOC, I, STATUS )
+          CALL BDI_UNMAPAXIS( OFID, I, STATUS )
 
 *        Convert to regular?
           IF ( REGULAR ) THEN
-            CALL BDA_CREAXVAL( OLOC, I, REGULAR, AX_SIZE(I), STATUS )
-            CALL BDA_PUTAXVAL( OLOC, I, BASE, SCALE, AX_SIZE(I),
+            CALL BDI_CREAXVAL( OFID, I, REGULAR, AX_SIZE(I), STATUS )
+            CALL BDI_PUTAXVAL( OFID, I, BASE, SCALE, AX_SIZE(I),
      :                                                  STATUS )
           END IF
 
@@ -1679,7 +1677,7 @@
       DO I = 1, NAXES
         DIMS(I) = AX_SIZE(I)
       END DO
-      DO I = NAXES+1, DAT__MXDIM
+      DO I = NAXES+1, ADI__MXDIM
         DIMS(I) = 1
       END DO
 
@@ -1706,21 +1704,21 @@
       IF ( USE_DATA ) THEN
         IF ( PRIM ) THEN
           CALL USI_DCREAT( 'OUT', TYPE, NDIM, DIMS, STATUS )
-          CALL USI_DASSOC( 'OUT', 'WRITE', OLOC, STATUS )
-          CALL DAT_MAPR( OLOC, 'WRITE', NDIM, DIMS, PTR_DATA, STATUS )
-          CALL USI_STORE( OLOC, 'O', STATUS )
+          CALL USI_DASSOC( 'OUT', 'WRITE', OFID, STATUS )
+          CALL DAT_MAPR( OFID, 'WRITE', NDIM, DIMS, PTR_DATA, STATUS )
+          CALL USI_STORE( OFID, 'O', STATUS )
         ELSE
-          CALL BDA_CREDATA( OLOC, NDIM, DIMS, STATUS )
-          CALL BDA_MAPDATA( OLOC, 'WRITE', PTR_DATA, STATUS )
+          CALL BDI_CREDATA( OFID, NDIM, DIMS, STATUS )
+          CALL BDI_MAPDATA( OFID, 'WRITE', PTR_DATA, STATUS )
         END IF
         CALL ARR_INIT1R( 0.0, NELM, %VAL(PTR_DATA), STATUS )
       END IF
       IF ( USE_VAR ) THEN
-        CALL BDA_CREVAR( OLOC, NDIM, DIMS, STATUS )
+        CALL BDI_CREVAR( OFID, NDIM, DIMS, STATUS )
         IF ( ERROR_TO_VAR ) THEN
-          CALL BDA_MAPERR( OLOC, 'WRITE', PTR_VAR, STATUS )
+          CALL BDI_MAPERR( OFID, 'WRITE', PTR_VAR, STATUS )
         ELSE
-          CALL BDA_MAPVAR( OLOC, 'WRITE', PTR_VAR, STATUS )
+          CALL BDI_MAPVAR( OFID, 'WRITE', PTR_VAR, STATUS )
         END IF
         CALL ARR_INIT1R( 0.0, NELM, %VAL(PTR_VAR), STATUS )
       END IF
@@ -1729,7 +1727,7 @@
       IF ( USE_QUAL ) THEN
 
 *      Create QUALITY
-        CALL BDA_CREQUAL( OLOC, NDIM, DIMS, STATUS )
+        CALL BDI_CREQUAL( OFID, NDIM, DIMS, STATUS )
 
 *      Write the quality byte mask
         IF ( QMASK_OK ) THEN
@@ -1738,10 +1736,10 @@
         ELSE
          QMASK = QUAL__MASK
         END IF
-        CALL BDA_PUTMASK( OLOC, QMASK, STATUS )
+        CALL BDI_PUTMASK( OFID, QMASK, STATUS )
 
 *      Map it
-        CALL BDA_MAPQUAL( OLOC, 'WRITE', PTR_QUAL, STATUS )
+        CALL BDI_MAPQUAL( OFID, 'WRITE', PTR_QUAL, STATUS )
 
 *      Initialise quality values to MISSING
         CALL ARR_INIT1B( QUAL__MISSING, NELM, %VAL(PTR_QUAL), STATUS )
@@ -1749,8 +1747,8 @@
       END IF
 
       IF ( USE_LOERR ) THEN
-        CALL BDA_CREYERR( OLOC, DIMS, STATUS )
-        CALL BDA_MAPYERR( OLOC, 'WRITE', PTR_LOERR, PTR_UPERR, STATUS )
+        CALL BDI_CREYERR( OFID, DIMS, STATUS )
+        CALL BDI_MAPYERR( OFID, 'WRITE', PTR_LOERR, PTR_UPERR, STATUS )
         CALL ARR_INIT1R( 0.0, NELM, %VAL(PTR_LOERR), STATUS )
         CALL ARR_INIT1R( 0.0, NELM, %VAL(PTR_UPERR), STATUS )
       END IF
@@ -1792,8 +1790,8 @@
       ELSE
 
 *      Initialise unused bits of INDS
-        IF ( NDIM .LT. DAT__MXDIM ) THEN
-          DO I = NDIM + 1, DAT__MXDIM
+        IF ( NDIM .LT. ADI__MXDIM ) THEN
+          DO I = NDIM + 1, ADI__MXDIM
             INDS(I) = 1
           END DO
         END IF
@@ -1881,7 +1879,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PRM_PAR'
 *
 *    Status :
