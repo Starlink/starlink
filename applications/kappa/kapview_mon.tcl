@@ -3,17 +3,17 @@
 # 19Dec97
 #
 set OutputParList(contour) {length number}
-set DynParList(contour) {cosys device}
+set DynParList(contour) {margin device useaxis}
 set OutputParList(contover) {}
 set DynParList(contover) {device}
 set OutputParList(crelut) {}
 set DynParList(crelut) {device}
-set OutputParList(cursor) {number xc xp yc yp}
-set DynParList(cursor) {cosys device}
+set OutputParList(cursor) {lastdim lastpos number}
+set DynParList(cursor) {device}
 set OutputParList(drawsig) {}
 set DynParList(drawsig) {device}
 set OutputParList(display) {scahigh scalow}
-set DynParList(display) {centre cosys device}
+set DynParList(display) {centre fill margin device useaxis}
 set OutputParList(elprof) {}
 set DynParList(elprof) {}
 set OutputParList(gdclear) {}
@@ -39,7 +39,7 @@ set DynParList(idstate) {device}
 set OutputParList(inspect) {}
 set DynParList(inspect) {mode_ overlay}
 set OutputParList(linplot) {}
-set DynParList(linplot) {cosys device}
+set DynParList(linplot) {align axes key margin useaxis xleft xright ytop ybot device}
 set OutputParList(lutable) {}
 set DynParList(lutable) {device}
 set OutputParList(lutflip) {}
