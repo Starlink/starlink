@@ -73,3 +73,30 @@ be declared <em>somewhere</>: the default is declared in the General DTD.
 <codebody>
 (define %copyright-string%
   "Copyright 1999, Central Laboratories for the Research Councils")
+
+<routine>
+<routinename>%display-programcode-elements%
+<purpose>List of programcode routineprologue elements to be displayed.
+<description>This is a list of the GIs of the elements which are to be
+displayed, if present in the document, when routineprologues are
+formatted.  If "diytopic" is present in this list, it represents all
+the diytopic elements, which are formatted together.
+<returnvalue type='list of strings'>List of string names of element
+types.
+<codebody>
+(define %display-programcode-elements%
+  '("description"
+    "invocation"
+    "argumentlist"			;shouldn't have both argumentlist
+    "parameterlist"			;and parameterlist in same prologue
+    "returnvalue"
+    "examplelist"
+    "implementationstatus"
+    "diytopic")
+  ;; Alternative is
+  ;;'("routinename" "purpose" "description" "returnvalue"
+  ;;  "argumentlist" "parameterlist" "authorlist" "history"
+  ;;  "usage" "invocation" "examplelist"
+  ;;  "diytopic"
+  ;;  "implementationstatus" "bugs")
+  )

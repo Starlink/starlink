@@ -8,7 +8,7 @@ Author:
 Revision history
   February 1999 (original version)
 
-Copyright 1999, Particle Physics and Astronomy Research Council
+Copyright 1999, 2000, Council for the Central Laboratories of the Research Councils
 
 $Id$
 -->
@@ -282,56 +282,70 @@ $Id$
       (process-children)))
   (element history
     (make sequence
-      (make element gi: "h3"
-	    (literal "Change history"))
-      (make element gi: "dl"
-	    (process-children))))
+      (make element gi: "dt"
+	    (make element gi: "strong"
+		  (literal "Change history")))
+      (make element gi: "dd"
+	    (make element gi: "dl"
+		  (process-children)))))
   (element change
     (let ((auth-id (attribute-string (normalize "author")))
 	  (date-str (attribute-string (normalize "date"))))
       (make sequence
 	(make element gi: "dt"
-	      (literal (string-append (data (element-with-id auth-id))
-				      ", "
-				      (format-date date-str))))
+	      (make element gi: "strong"
+		    (literal (string-append (data (element-with-id auth-id))
+					    ", "
+					    (format-date date-str)))))
 	(make element gi: "dd"
 	      (process-children)))))
   (element routineprologue
     (let ((kids (nl-to-pairs (children (current-node)))))
       (make sequence
 	(apply sosofo-append
-	       (map (lambda (gi)
-		      (let ((gi-and-nd (assoc (normalize gi) kids)))
-			(if gi-and-nd
-			    (process-node-list (cdr gi-and-nd))
+	       (map (lambda (thisgi)
+		      (let ((gi-and-nd (assoc (normalize thisgi) kids)))
+			(if gi-and-nd	; there is an element with this gi
+			    (if (string=? (normalize thisgi)
+					  (normalize "diytopic"))
+				;; process multiple diytopics all together
+				(node-list-reduce
+				 (children (current-node))
+				 (lambda (result i)
+				   (if (string=? (gi i) (normalize "diytopic"))
+				       (sosofo-append result
+						      (process-node-list i))
+				       result))
+				 (empty-sosofo))
+				;; else just process this node
+				(process-node-list (cdr gi-and-nd)))
 			    (empty-sosofo))))
-		    '("routinename" "purpose" "description" "returnvalue"
-		      "argumentlist" "parameterlist" "authorlist" "history"
-		      "usage" "invocation" "examplelist"
-		      "implementationstatus" "bugs")))
-	; now collect together all the diytopics
-	(apply sosofo-append
-	       (map (lambda (gi-and-nd)
-		      (if (string=? (normalize (car gi-and-nd))
-				    (normalize "diytopic"))
-			  (process-node-list (cdr gi-and-nd))
-			  (empty-sosofo)))
-		    kids)))))
+		    %display-programcode-elements%))
+	;; now collect together all the diytopics
+	;;(apply sosofo-append
+	;;       (map (lambda (gi-and-nd)
+	;;	      (if (string=? (normalize (car gi-and-nd))
+	;;			    (normalize "diytopic"))
+	;;		  (process-node-list (cdr gi-and-nd))
+	;;		  (empty-sosofo)))
+	;;	    kids))
+	)))
   (element routine
     (let* ((rp (select-elements (children (current-node)) 'routineprologue))
 	   (rn (and (not (node-list-empty? rp))
 		    (select-elements (children rp) 'routinename))))
       (make sequence
 	(make empty-element gi: "hr")
-	(make element gi: "h3"
+	(make element gi: "h2"
 	      (make element gi: "a"
 		    attributes: `(("name" ,(href-to (current-node)
 						    frag-only: #t)))
 		    (if (node-list-empty? rn)
 			(literal "Anonymous routine")
 			(with-mode routine-ref-get-reference
-			  (process-node-list rn)))))
-	(process-children))))
+			  (process-node-list rp)))))
+	(make element gi: "dl"
+	      (process-children)))))
 ;  (element routinename
 ;    (make sequence
 ;      (make empty-element gi: "hr")
@@ -362,51 +376,68 @@ $Id$
 		  (literal "Purpose: "))
 	    (process-children))))
   (element description
-    (process-children))
+    (make sequence
+      (make element gi: "dt"
+	    (make element gi: "strong"
+		  (literal "Description")))
+      (make element gi: "dd"
+	    (make element gi: "dl"	; hack text further in, to line up
+		  (make element gi: "dd"
+			(process-children))))))
   (element userkeywords
     (make sequence
-      (make element gi: "h4"
-	    (literal "Keywords"))
+      (make element gi: "dt"
+	    (make element gi: "strong"
+		  (literal "Keywords")))
       (make element gi: "p"
 	    (process-children))))
   (element softwarekeywords
     (make sequence
-      (make element gi: "h4"
-	    (literal "Software group"))
+      (make element gi: "dt"
+	    (make element gi: "strong"
+		  (literal "Software group")))
       (make element gi: "p"
 	    (process-children))))
   (element returnvalue
     (let ((none-att (attribute-string (normalize "none")))
 	  (type-att (attribute-string (normalize "type"))))
-      (if none-att
-	  (make element gi: "h4"
-		(literal "No return value")) ;...and discard any data
-	  (make sequence
-	    (make element gi: "h4"
-		  (literal "Return value"))
-	    (if type-att
-		(make element gi: "p"
-		      (literal (string-append "Type: " type-att)))
-		(empty-sosofo))
-	    (process-children)))))
+      (make sequence
+	(make element gi: "dt"
+	      (make element gi: "strong"
+		    (literal "Return value")))
+	(make element gi: "dd"
+	      (if none-att
+		  (literal "None") ;...and discard any data
+		  (make sequence
+		    (if type-att
+			(make element gi: "p"
+			      (literal (string-append "Type: " type-att)))
+			(empty-sosofo))
+		    (process-children)))))))
   (element argumentlist
     (let ((none-att (attribute-string (normalize "none"))))
-      (if none-att
-	  (make element gi: "h4"
-		(literal "No arguments"))
-	  (make sequence
-	    (make element gi: "h4"
-		  (literal "Argument list"))
-	    (process-children)))))
+      (make sequence
+	(make element gi: "dt"
+	      (make element gi: "strong"
+		    (literal "Argument list")))
+	(make element gi: "dd"
+	      (if none-att
+		  (make element gi: "p"
+			(literal "None"))
+		  (make element gi: "dl"
+			(process-children)))))))
   (element parameterlist
     (let ((none-att (attribute-string (normalize "none"))))
-      (if none-att
-	  (make element gi: "h4"
-		(literal "No parameters"))
-	  (make sequence
-	    (make element gi: "h4"
-		  (literal "Parameter list"))
-	    (process-children)))))
+      (make sequence
+	(make element gi: "dt"
+	      (make element gi: "strong"
+		    (literal "Parameter list")))
+	(make element gi: "dd"
+	      (if none-att
+		  (make element gi: "p"
+			(literal "None"))
+		  (make element gi: "dl"
+			(process-children)))))))
   (element parameter
     (let* ((kids (children (current-node)))
 	   (name (select-elements kids (normalize "name")))
@@ -416,62 +447,90 @@ $Id$
 	   (given-att (attribute-string (normalize "given")))
 	   (returned-att (attribute-string (normalize "returned"))))
       (make sequence
-	(make element gi: "h5"
-	      (process-node-list name)
-	      (literal (string-append " (" (data type) ") "
-				      (cond
-				       ((and given-att returned-att)
-					"given and returned")
-				       (given-att "given")
-				       (returned-att "returned")
-				       (else ;default is given
-					"given"))
-				      (if opt-att
-					  (string-append ", " opt-att)
-					  ""))))
-	(process-node-list desc))))
+	(make element gi: "dt"
+	      (make element gi: "strong"
+		    (process-node-list name)
+		    (literal (string-append " (" (data type) ") "
+					    (cond
+					     ((and given-att returned-att)
+					      "given and returned")
+					     (given-att "given")
+					     (returned-att "returned")
+					     (else ;default is given
+					      "given"))
+					    (if opt-att
+						(string-append ", " opt-att)
+						"")))))
+	(make element gi: "dd"
+	      (with-mode routine-ref-plain
+		(process-node-list desc))))))
   (element usage
     (make sequence
-      (make element gi: "h4"
-	    (literal "Usage"))
-      (process-children)))
+      (make element gi: "dt"
+	    (make element gi: "strong"
+		  (literal "Usage")))
+      (make element gi: "dd"
+	    (process-children))))
   (element moduletype
     (make sequence
-      (make element gi: "h4"
-	    (literal "Type of Module"))
-      (process-children)))
+      (make element gi: "dt"
+	    (make element gi: "strong"
+		  (literal "Type of Module")))
+      (make element gi: "dd"
+	    (process-children))))
   (element invocation
     (make sequence
-      (make element gi: "h4"
-	    (literal "Invocation"))
-      (process-children)))
+      (make element gi: "dt"
+	    (make element gi: "strong"
+		  (literal "Invocation")))
+      (make element gi: "dd"
+	    (process-children))))
   (element implementationstatus
     (make sequence
-      (make element gi: "h4"
-	    (literal "Implementation Status"))
-      (process-children)))
+      (make element gi: "dt"
+	    (make element gi: "strong"
+		  (literal "Implementation Status")))
+      (make element gi: "dd"
+	    (process-children))))
   (element bugs
     (make sequence
-      (make element gi: "h4"
-	    (literal "Bugs"))
-      (process-children)))
+      (make element gi: "dt"
+	    (make element gi: "strong"
+		  (literal "Bugs")))
+      (make element gi: "dd"
+	    (process-children))))
   (element diytopic
     (let ((kids (children (current-node))))
       (make sequence
-	(make element gi: "h4"
-	      (literal (data (node-list-first kids))))
-	(process-node-list (node-list-rest kids)))))
+	(make element gi: "dt"
+	      (make element gi: "strong"
+		    (literal (data (node-list-first kids)))))
+	(make element gi: "dd"
+	      (process-node-list (node-list-rest kids))))))
   (element examplelist
     (make sequence
-      (make element gi: "h4"
-	    (literal "Examples"))
-      (process-children)))
+      (make element gi: "dt"
+	    (make element gi: "strong"
+		  (literal "Examples")))
+      (make element gi: "dd"
+	    (make empty-element gi: "br")
+	    (make element gi: "dl"
+		  (process-children)))))
+  ;;(element example
+  ;;  (make sequence
+  ;;    (make element gi: "dt"
+  ;;	  (literal "Example " (number->string (child-number (current-node)))))
+  ;;    (make empty-element gi: "br")
+  ;;    (make element gi: "code"
+  ;;	    (process-children))))
   (element example
     (make sequence
-      (make element gi: "h5"
-	  (literal "Example " (number->string (child-number (current-node)))))
-      (make element gi: "code"
-	    (process-children))))
+      (make element gi: "dt"
+	    (make element gi: "code"
+		  (process-children)))))
+  (element examplenote
+    (make element gi: "dd"
+	  (process-children)))
   ;; The funcname element could be made more sophisticated, so that
   ;; it includes a link (possibly using the source-code browser) to
   ;; the function definition/documentation.
@@ -484,6 +543,11 @@ $Id$
   ;(element misccode
   ;  (empty-sosofo))
   )
+
+;; Mode of exceptions from the above
+(mode routine-ref-plain
+  (element description
+    (process-children)))
 
 ;; Mode which includes assorted variants of the handlers above, designed
 ;; to extract information to which other handlers have made cross-reference.
@@ -504,6 +568,17 @@ $Id$
 	      (empty-sosofo)))))
   (element name
     (process-children))
+  (element routineprologue
+    (let* ((kids (children (current-node)))
+	   (rn (select-elements kids 'routinename))
+	   (rp (select-elements kids 'purpose)))
+      (if (node-list-empty? rn)
+	  (literal "Anonymous routine")
+	  (sosofo-append (process-node-list rn)
+			 (if (node-list-empty? rp)
+			     (empty-sosofo)
+			     (literal (string-append " - "
+						     (data rp))))))))
   (element routinename
     (process-children)))
 
