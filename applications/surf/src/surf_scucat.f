@@ -17,9 +17,12 @@
 *    History:
 *     $Id$
 *     $Log$
-*     Revision 1.5  1996/10/19 00:07:04  timj
-*     Use GLOBAL.sdf and DAT_ASSOC, remove FILENAME(FILE)
+*     Revision 1.6  1996/10/24 21:29:09  timj
+*     Fixed GLOBAL default problem (use DUMMY PARAMETER)
 *
+c Revision 1.5  1996/10/19  00:07:04  timj
+c Use GLOBAL.sdf and DAT_ASSOC, remove FILENAME(FILE)
+c
 c     Revision 1.4  1996/10/17  18:13:49  timj
 c     Open OUT after reporting information on first input file
 c     
@@ -89,7 +92,7 @@ c
       LOGICAL       READING     ! Logical to control file reading
       CHARACTER*40  TITLE       ! Title of observation
       INTEGER       UBND(1)     ! Upper bound of output array
-      
+      LOGICAL       USE_OUT     ! Have I opened an output file
       CHARACTER*(DAT__SZLOC) USE_LOC ! Locator to selected file
 *     Internal references:
 *     Local data:
@@ -101,6 +104,7 @@ c
       
       CALL NDF_BEGIN
       
+      USE_OUT = .FALSE.
       READING = .TRUE.
       LOOPING = .TRUE.
       FILE = 0
@@ -111,19 +115,27 @@ c
          
 *     read the name of the file to be read
          
-         IF (FILE .GT. 1) CALL PAR_DEF0C ('IN', '!', STATUS) 
+*     Read in the GLOBAL value first
+         IF (FILE .EQ. 1) THEN
+            CALL SUBPAR_FINDPAR( 'DUMMY', IPAR, STATUS)
+            CALL SUBPAR_GETNAME(IPAR, FILENAME, STATUS)
+            CALL PAR_DEF0C('IN', FILENAME, STATUS)
+         ELSE
+*           Make sure the parameter is cancelled and DEFAULT (NULL) used
+            CALL PAR_CANCL('IN', STATUS)
+            CALL PAR_UNSET('IN', 'DEFAULT', STATUS)
+         END IF
 
-C     Read in the latest file
-         CALL DAT_ASSOC('IN', 'READ', LOC, STATUS)
-
-         CALL SUBPAR_FINDPAR( 'IN', IPAR, STATUS)
-         CALL SUBPAR_GETNAME(IPAR, FILENAME, STATUS)
-C         CALL DAT_CANCL('IN', STATUS)
+*     Read in the latest file
+*         CALL DAT_ASSOC('IN', 'READ', LOC, STATUS)
+         CALL PAR_GET0C('IN', FILENAME, STATUS)
+         CALL HDS_OPEN(FILENAME, 'READ', LOC, STATUS)
 
          IF (STATUS .EQ. PAR__NULL .OR. FILENAME.EQ.'!') THEN
             CALL ERR_ANNUL(STATUS)
             LOOPING = .FALSE.
             READING = .FALSE.
+            FILE = FILE - 1
          ELSE
 *     Try to open the HDS file and find out how many components are there
 
@@ -260,6 +272,7 @@ C         CALL DAT_CANCL('IN', STATUS)
                UBND(1) = 2
                CALL NDF_CREAT('OUT', '_REAL', 1, LBND, UBND, OUT_NDF, 
      :              STATUS)
+               IF (OUT_NDF .NE. NDF__NOID) USE_OUT = .TRUE.
                UBND(1) = 0
             END IF
 
@@ -316,11 +329,11 @@ C         CALL DAT_CANCL('IN', STATUS)
 
 *     Setup the axis
 
-      IF (FILE .GT. 0) THEN
+      IF (USE_OUT) THEN
          CALL NDF_AMAP(OUT_NDF, 'CENTRE', 1, '_REAL', 'WRITE', OUT_APTR,
      :        ITEMP, STATUS)
 
-         CALL SCULIB_NFILLR(ITEMP, %VAL(OUT_APTR))
+         IF (STATUS.EQ.SAI__OK) CALL SCULIB_NFILLR(ITEMP,%VAL(OUT_APTR))
          CALL NDF_ACPUT('Integration',OUT_NDF,'LABEL',1,STATUS)
          CALL NDF_CPUT('Volts', OUT_NDF, 'UNITS', STATUS)
          CALL NDF_CPUT(TITLE, OUT_NDF, 'Title', STATUS)
@@ -331,10 +344,10 @@ C         CALL DAT_CANCL('IN', STATUS)
       ELSE 
          IF (STATUS .EQ. SAI__OK) THEN
             STATUS = SAI__ERROR
-            CALL ERR_REP (' ', 'REDS_CONCAT: there was no '//
+            CALL ERR_REP (' ', 'REDS_SCUCAT: there was no '//
      :           'input data', STATUS)
          ELSE
-            CALL ERR_REP(' ','REDS_CONCAT: No data found', STATUS)
+            CALL ERR_REP(' ','REDS_SCUCAT: No data found', STATUS)
          END IF
 
       END IF
