@@ -421,7 +421,7 @@
       END IF
 
 *  Set the bad pixel flags for the output DATA and VARIANCE arrays.
-      IF ( RESULT .GT. 0 ) THEN 
+      IF ( BAD_PIXELS .GT. 0 ) THEN 
          CALL NDF_SBAD( .TRUE., INDF2, 'DATA', STATUS )
          CALL NDF_SBAD( .TRUE., INDF2, 'VARIANCE', STATUS )
       END IF
