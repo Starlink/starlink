@@ -103,18 +103,28 @@ if ($status == $good) {
 }
 
 # Now read the HISTORY and make sure that EXTINCTION is not present
-ndf_hnrec($indf,$nrec,$status);
+# A history field must be present. If it is not present then
+# it may be that people are trying to change their original data
+# before running reduce_switch
+
+if ($status == $good) {
+
+  ndf_hnrec($indf,$nrec,$status);
  
-# if there is history...
-if ($status == &NDF::SAI__OK) {
+  # if there is history...
+  if ($status == &NDF::SAI__OK) {
   
-  # Loop through the history components and find last "APPLICATION"
-  for ($i=$nrec; $i > 0; $i--) {
-    ndf_hinfo($indf, 'APPLICATION', $i, $value, $status);
-    die "Sorry - scushift must be run before EXTINCTION\n" 
-      if $value =~ /extinction/i;
+    # Loop through the history components and find last "APPLICATION"
+    for ($i=$nrec; $i > 0; $i--) {
+      ndf_hinfo($indf, 'APPLICATION', $i, $value, $status);
+      die "Sorry - scushift must be run before EXTINCTION\n" 
+	if $value =~ /extinction/i;
+    }
+  } else {
+    err_rep(' ', "Error reading HISTORY extension. Has the data been processed with REDUCE_SWITCH?", $status);
   }
-}
+} 
+
 
 
 
@@ -264,7 +274,7 @@ __END__
 *    Perl 5
 
 *  Description:
-*    This script corrects for the ADC communications error and shifts
+*    This script corrects for the DAQ communications error and shifts
 *    the data from ADC cards along by a specified amount.
 *    Since all channels are read from a particular ADC card but only some
 *    of them are actually stored in the demodulated data file, the shift
@@ -305,6 +315,10 @@ __END__
 *
 *  History:
 *     $Log$
+*     Revision 1.3  1997/11/30 03:05:56  timj
+*     Tweak documentation. Add note that can't work for photom.
+*     Check that a HISTORY component exists.
+*
 *     Revision 1.2  1997/08/25 20:23:09  timj
 *     Fix to use the correct shift algorithm (so now works on Long wave array
 *     and F card)
@@ -316,5 +330,11 @@ __END__
 *     - If the system stores channels 1,2,3,6,7,8,10 but we know that we
 *       have a shift of -1 in the system (ie an extra byte is present).
 *       This implies that we have actually stored channels 16,1,2,5,6,7,9
-*       but only bolometers 1,2,6,7 are from the required sub-instrument.
-*       In this example we have to throw away data from channels 15,5 and 9.
+*       and if  only bolometers 1,2,6,7 are from the required sub-instrument
+*       we have to throw away data from channels 15,5 and 9.
+*     - The DAQ hardware fault always introduced extra bytes and therefore
+*       a negative shift should be used in scushift.
+*     - Currently PHOTOMETRY data is not corrected properly (the PHOT_BB
+*       extension is not modified so the correct bolometer will not be 
+*       extracted by SCUPHOT). This can be overcome by using the 
+*       ALLBOLS parameter in SCUPHOT.
