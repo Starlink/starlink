@@ -1012,4 +1012,4 @@ create_archives:
    [delete] Deleting: /apps/cvsbuild/java/source/frog/frog-0.6.0.tar
 
 BUILD SUCCESSFUL
-Total time: 14 minutes 44 seconds
+Total time: 14 minutes 32 seconds
