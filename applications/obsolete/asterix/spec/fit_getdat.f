@@ -790,7 +790,7 @@ D	    print *,'ldim,udim :',ldim,udim
               PREDDAT(N).CONVOLVE = .FALSE.
             ELSE
 *      Look for instrument response, set up INSTR if found, and report
-	      CALL FIT_GETINS( OBDAT(NDS).D_ID, SPECNO,
+	      CALL FIT_GETINS( OBDAT(NDS).D_ID, SPECNO, 1,
      :               PREDDAT(NDS).CONVOLVE, INSTR(NDS), STATUS )
 	      IF (STATUS.NE.SAI__OK) GOTO 99
             END IF

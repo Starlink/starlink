@@ -1,5 +1,5 @@
 *+  FIT_GETINS - Gets instrument energy response and checks against axis values
-      SUBROUTINE FIT_GETINS( ID, INDEX, FOUND, INSTR, STATUS )
+      SUBROUTINE FIT_GETINS( ID, INDEX, E_AX, FOUND, INSTR, STATUS )
 *
 *    Description :
 *
@@ -23,6 +23,8 @@
 *     20 Oct 88: Response locator included in INSTR structure (TJP)
 *     15 Feb 89: ASTERIX88 version - SPECTRAL_SET handling (TJP)
 *     20 Mar 91: Fix for case where no axis data are present (TJP)
+*      2 Aug 95: Specify energy axis by argument (DJA)
+*
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -35,6 +37,7 @@
 *    Import :
       INTEGER			ID			! Dataset identifier
       INTEGER 			INDEX			! Position in spectral set (0 if not)
+      INTEGER			E_AX			! Energy axis number
 *
 *    Export :
 *
@@ -69,7 +72,7 @@
       IF ( STATUS .EQ. SAI__OK ) THEN
 
 *  Axis values exist?
-	CALL BDI_CHKAXVAL( ID, 1, OK, REG, NAX, STATUS )
+	CALL BDI_CHKAXVAL( ID, E_AX, OK, REG, NAX, STATUS )
 	IF ( OK ) THEN
 
 *    Response dimensions must
@@ -89,7 +92,7 @@
      :                        RCPTR, STATUS )
 
 *      Map in axis values
-              CALL BDI_MAPAXVAL( ID, 'READ', 1, AXPTR, STATUS )
+              CALL BDI_MAPAXVAL( ID, 'READ', E_AX, AXPTR, STATUS )
 
 *      And check against dataset channels...
 	      CALL FIT_INSGET_CCHECK( NAX, %VAL(AXPTR), NCB-1,
@@ -98,7 +101,7 @@
 *      Release the axis and spec array
               CALL ADI_CUNMAP( INSTR.R_ID, 'ChannelSpec',
      :                          RCPTR, STATUS )
-	      CALL BDI_UNMAPAXVAL( ID, 1, STATUS )
+	      CALL BDI_UNMAPAXVAL( ID, E_AX, STATUS )
 
             END IF
 

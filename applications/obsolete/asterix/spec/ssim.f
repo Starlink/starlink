@@ -140,7 +140,7 @@
 
 *  Read input file
       CALL USI_TASSOCI( 'INP', '*', 'READ', IFID, STATUS )
-      CALL FIT_GETINS( IFID, 0, FOUND, INSTR, STATUS )
+      CALL FIT_GETINS( IFID, 0, 1, FOUND, INSTR, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
       IF(.NOT.FOUND)THEN
 	CALL MSG_PRNT( 'No instrument response component found' )
