@@ -64,9 +64,17 @@
 
 *  Notes:
 
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
 *  History:
 *     Original version: Timj, 1997 Oct 21
 *     $Log$
+*     Revision 1.3  1999/08/03 19:32:48  timj
+*     Add copyright message to header.
+*
 *     Revision 1.2  1997/11/12 00:10:48  timj
 *     Pass STATS into subroutine rather than calculating inside.
 *

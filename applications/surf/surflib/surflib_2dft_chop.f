@@ -57,8 +57,16 @@
 *     Tim Jenness (JACH)
 *     John Lightfoot (RoE)
  
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
 *    History:
 *     $Log$
+*     Revision 1.4  1999/08/03 19:32:47  timj
+*     Add copyright message to header.
+*
 *     Revision 1.3  1998/06/18 02:27:33  timj
 *     Replace IDIMS with NX and NY since Linux (g77) can not handle
 *     arrays that control dimensions of other arrays.

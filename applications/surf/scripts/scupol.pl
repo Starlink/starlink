@@ -8,6 +8,17 @@
 # In fact the w/plate makes a complete rotation, sampling at every 22.5 deg
 # of the waveplate.
 #
+
+#  Authors:
+#    Antonio Chrysostomou (JAC/U.Herts)
+#    Tim Jenness (JAC)
+
+
+#  Copyright:
+#     Copyright (C) 1998,1999 Particle Physics and Astronomy
+#     Research Council. All Rights Reserved.
+
+
 #
 # 5-Aug-1998 : ACC (modified to Perl from original C-Shell script)
 #

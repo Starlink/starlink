@@ -263,10 +263,18 @@
 *     TIMJ: Tim Jenness (JACH)
 *     JFL:  John Lightfoot (RoE)
 
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
 *  History:
 *     1997 March 20 (TIMJ)
 *        Extract from main tasks
 *     $Log$
+*     Revision 1.6  1999/08/03 19:32:51  timj
+*     Add copyright message to header.
+*
 *     Revision 1.5  1999/07/29 03:50:29  timj
 *     Fix call to sculib_calc_apparent
 *

@@ -739,8 +739,16 @@ exit
 *    R.P.J. Tilanus (JACH)
 *    {enter_new_authors_here}
 *
+
+*  Copyright:
+*     Copyright (C) 1997,1998 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
 *  History:
 *     $Log$
+*     Revision 1.7  1999/08/03 19:32:34  timj
+*     Add copyright message to header.
+*
 *     Revision 1.6  1998/12/10 20:36:39  timj
 *     Make sure that $ddf uses the PIXEL frame
 *

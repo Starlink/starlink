@@ -25,6 +25,12 @@
 #     TIMJ: T. Jenness (JACH)
 #     {enter_new_authors_here}
 #
+
+#  Copyright:
+#     Copyright (C) 1997,1998,1999 Particle Physics and Astronomy
+#     Research Council. All Rights Reserved.
+
+#
 #  History:
 #     13-OCT-1994 (BLY);
 #        Original for PHOTOM

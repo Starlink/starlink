@@ -123,8 +123,16 @@
 *     J.Lightfoot (jfl@roe.ac.uk)
 *     T.Jenness (timj@jach.hawaii.edu)
 
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
 *    History:
 *     $Log$
+*     Revision 1.3  1999/08/03 19:32:49  timj
+*     Add copyright message to header.
+*
 *     Revision 1.2  1998/06/03 22:02:17  timj
 *     Major upgrade (finished ages ago).
 *

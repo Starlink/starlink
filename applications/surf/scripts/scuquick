@@ -584,6 +584,15 @@ __END__
 *    SURF: REDUCE_SWITCH, CHANGE_FLAT, FLATFIELD, EXTINCTION, REBIN, REMSKY,
 *          SCUPHOT, SCUCLIP
 
+*  Authors:
+*    Tim Jenness (JAC)
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+
 *-
 
 

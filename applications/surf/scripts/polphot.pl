@@ -9,6 +9,15 @@
 # a number of different wave plate positions.
 # 
 
+#  Authors:
+#     Tim Jenness (JAC)
+
+#  Copyright:
+#     Copyright (C) 1998,1999 Particle Physics and Astronomy
+#     Research Council. All Rights Reserved.
+
+
+
 # Needs READLINE and NDF
 
 use NDF;

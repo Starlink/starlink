@@ -2536,6 +2536,14 @@ __END__
 *    - The images must be rebinned in the same coordinate system
 *      as the chop throw.
 
+*  Authors:
+*    Tim Jenness (JAC)
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
 *  Related Applications:
 *    SURF: SCUMAKEWT
 *    KAPPA: FOURIER

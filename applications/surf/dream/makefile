@@ -9,6 +9,9 @@
 #  Hans' home directory.
 #    source ~greve/.scuba
 
+#  Copyright:
+#     Copyright (C) 1998 Particle Physics and Astronomy
+#     Research Council. All Rights Reserved.
 
 
 .SUFFIXES : .ifl .ifc

@@ -149,8 +149,15 @@ exit
 *    Tim Jenness (JACH)
 *    {enter_new_authors_here}
 
+*  Copyright:
+*     Copyright (C) 1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
 *  History:
 *    $Log$
+*    Revision 1.4  1999/08/03 19:32:35  timj
+*    Add copyright message to header.
+*
 *    Revision 1.3  1999/06/19 03:01:25  timj
 *    Correct name in example
 *

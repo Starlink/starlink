@@ -131,6 +131,13 @@ __END__
 *     - The program must have two arguments. Parameters are not requested
 *       if an argument is omitted from the command line.
 
+*  Authors:
+*    Tim Jenness (JAC)
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
 *-
 *.
 

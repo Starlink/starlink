@@ -48,9 +48,17 @@
 *     Tim Jenness (timj@jach.hawaii.edu)
 *     John Lightfoot (jfl@roe.ac.uk)
 
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
 *  History:
 *     Original version: Timj, 1997 Oct 20 - taken from SURF_REBIN.F
 *     $Log$
+*     Revision 1.4  1999/08/03 19:32:48  timj
+*     Add copyright message to header.
+*
 *     Revision 1.3  1999/07/29 21:53:30  timj
 *     Add status checking for sculib_ranged.
 *     Parametrize the max size of grid.

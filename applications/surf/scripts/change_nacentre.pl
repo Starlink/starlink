@@ -175,6 +175,13 @@ __END__
 *    file will contain more than 1 array) -- this is not checked
 *    for explicitly.
 
+*  Authors:
+*    Tim Jenness (JAC)
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
 *  Related Applications:
 *    SURF: REBIN
 

@@ -84,8 +84,16 @@
 *  Authors:
 *     Tim Jenness (JACH)
 
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
 *  History:
 *     $Log$
+*     Revision 1.3  1999/08/03 19:32:53  timj
+*     Add copyright message to header.
+*
 *     Revision 1.2  1999/07/15 01:45:52  timj
 *     Check for division by zero in IP variance calculation
 *

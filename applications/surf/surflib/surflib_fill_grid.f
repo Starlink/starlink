@@ -71,9 +71,17 @@
 *       the model area. It is up to the calling routine to decide
 *       whether to halt.
 
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
 *  History:
 *     Original version: Timj, 1997 Oct 21
 *     $Log$
+*     Revision 1.5  1999/08/03 19:32:49  timj
+*     Add copyright message to header.
+*
 *     Revision 1.4  1999/07/17 02:49:48  timj
 *     Check for a bad value in the index array
 *

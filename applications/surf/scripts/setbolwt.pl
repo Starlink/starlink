@@ -533,6 +533,15 @@ __END__
 *      Set the weights of the files listed in rebin.inp to those
 *      stored in wt.dat (same weights for each file).
 
+*  Authors:
+*    Tim Jenness (JAC)
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+
 *  Notes:
 *    - Input files must have been extinction corrected so that only
 *      one sub-instrument is present per file.

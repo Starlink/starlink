@@ -1,6 +1,14 @@
 #!/bin/perl -s
 
-# Script to calculate the faltfield by analysing the output of BOLREBIN
+# Script to calculate the flatfield by analysing the output of BOLREBIN
+
+#  Authors:
+#     Tim Jenness (JAC)
+
+#  Copyright:
+#     Copyright (C) 1998 Particle Physics and Astronomy
+#     Research Council. All Rights Reserved.
+
 
 use PDL;
 use PDL::JAC::Timj qw/:Func/;

@@ -237,6 +237,13 @@ __END__
 *     The $KAPPA_DIR environment variable must point to the location
 *     of the KAPPA binaries (this is usually done during a Starlink login).
 
+*  Authors:
+*    Tim Jenness (JAC)
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
 *  Related Applications:
 *    SURF: SCUCAT, SCUPHOT;
 *    KAPPA: STATS, LINPLOT, DRAWSIG

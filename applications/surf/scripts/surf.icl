@@ -22,6 +22,13 @@
 {     Martin Bly (Starlink, RAL)
 {     {enter_new_authors_here}
 {
+{  Authors:
+{    Tim Jenness (JAC)
+{
+{  Copyright:
+{     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+{     Research Council. All Rights Reserved.
+{
 {  History:
 {     199? (JFL):
 {       Original

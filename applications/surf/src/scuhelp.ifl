@@ -7,15 +7,23 @@
 #  Type of module:
 #     ADAM A-task parameter interface.
 
-#  Author:
+#  Authors:
 #     MJC: Malcolm J. Currie (STARLINK)
+#     TIMJ: Tim Jenness (JAC)
 #     {enter_new_authors_here}
+
+
+#  Copyright:
+#     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+#     Research Council. All Rights Reserved.
 
 #  History:
 #     1986 November 14 (MJC):
 #	 Original version.
 #     1992 August 19 (MJC):
 #     	 Added prologue, and access to help library.
+#     1997 (TIMJ)
+#        Rename as scuhelp and include in SURF.
 #     {enter_further_changes_here}
 
 #-

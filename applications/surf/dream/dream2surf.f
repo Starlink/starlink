@@ -50,8 +50,16 @@
 *     TIMJ: T. Jenness (timj@jach.hawaii.edu)
 *     GREVE: H.W. van Someren Greve (greve@nfra.nl)
 
+*  Copyright:
+*     Copyright (C) 1998 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
 *  History:
 *     $Log$
+*     Revision 1.4  1999/08/03 19:32:28  timj
+*     Add copyright message to header.
+*
 *     Revision 1.3  1998/06/24 19:26:03  timj
 *     Finally get jiggle pattern to work for new format sol files.
 *
@@ -925,6 +933,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.4  1999/08/03 19:32:28  timj
+*     Add copyright message to header.
+*
 *     Revision 1.3  1998/06/24 19:26:03  timj
 *     Finally get jiggle pattern to work for new format sol files.
 *
@@ -1049,6 +1060,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.4  1999/08/03 19:32:28  timj
+*     Add copyright message to header.
+*
 *     Revision 1.3  1998/06/24 19:26:03  timj
 *     Finally get jiggle pattern to work for new format sol files.
 *

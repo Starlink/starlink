@@ -55,9 +55,17 @@
 
 *  Notes:
 
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
 *  History:
 *     Original version: Timj, 1997 Oct 21
 *     $Log$
+*     Revision 1.5  1999/08/03 19:32:51  timj
+*     Add copyright message to header.
+*
 *     Revision 1.4  1998/06/03 22:00:56  timj
 *     Protect against all points being bad.
 *

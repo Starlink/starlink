@@ -69,9 +69,17 @@
 *       are exceeded. It is up to the caller to decide whether this
 *       is a fatal error.
 
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
 *  History:
 *     Original version: Timj, 1997 Oct 21
 *     $Log$
+*     Revision 1.4  1999/08/03 19:32:50  timj
+*     Add copyright message to header.
+*
 *     Revision 1.3  1999/07/17 02:49:49  timj
 *     Check for a bad value in the index array
 *

@@ -1,5 +1,9 @@
 # makefile for SURF package
 
+#  Copyright:
+#     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+#     Research Council. All Rights Reserved.
+
 .SUFFIXES : .ifl .ifc
 
 # Version string

@@ -223,6 +223,11 @@ exit
 *  Authors:
 *    Tim Jenness (JACH)
 *    {enter_new_authors_here}
+
+*  Copyright:
+*     Copyright (C) 1997,1998 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
 *
 *  History:
 *    1997 June 20 (TIMJ):
