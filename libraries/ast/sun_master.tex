@@ -17,13 +17,13 @@
 
 % Variable part - replace [xxx] as appropriate.
 c+
-\newcommand{\stardocnumber}    {211.6}
+\newcommand{\stardocnumber}    {211.7}
 c-
 f+
-\newcommand{\stardocnumber}    {210.6}
+\newcommand{\stardocnumber}    {210.7}
 f-
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {2nd April 2000}
+\newcommand{\stardocdate}      {23rd May 2000}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
@@ -17092,13 +17092,19 @@ conforms to the FITS-WCS model has been improved so that FrameSets
 including more complex mixtures of parallel and serial Mappings
 can be written out using the FITS-WCS encoding.
 
-\item The FitsChan class has been changed so that long strings included in 
+\item The FitsChan class has been changed so that long strings included in
 the description of an Object can be saved and restored without truncation
 when using the NATIVE encoding. Previously, very long Frame titles,
 mathematical expressions, {\em etc.} were truncated if they exceeded the
 capacity of a single FITS header card. They are now split over several
 header cards so that they can be restored without truncation. Note, this
 facility is only available when using NATIVE encoding.
+
+\item The FitsChan class has a new attribute called Warnings which
+can be used to select potentially dangerous conditions under which
+warnings should be issued. These conditions include (for instance)
+unsupported features within non-standard projections, missing keywords
+for which default values will be used, {\em etc}.
 
 \item The WcsMap class has been changed to support the changes made to the
 FITS-WCS encoding in the FitsChan class:
