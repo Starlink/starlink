@@ -13,6 +13,7 @@
 *     20 Jan 93: V1.7-0  uses GCB etc (RJV)
 *      1 Jul 93: V1.7-1  GTR used (RJV)
 *      9 Aug 94: V1.7-2  really handles QUALITY (RJV)
+*     31 Jan 95: V1.8-0  bug fix to keyboard mode (RJV)
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -48,7 +49,7 @@
       INTEGER LS
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'ISLICE Version 1.7-2')
+      PARAMETER (VERSION = 'ISLICE Version 1.8-0')
 *-
       CALL USI_INIT()
 
@@ -135,11 +136,13 @@
           ANGLE=ANGLE*DTOR
 *  convert to pixel coords
           CALL IMG_WORLDTOPIX(XCENT,YCENT,PXCENT,PYCENT,STATUS)
-          PLENGTH = LENGTH/(ABS(I_XSCALE*COS(ANGLE)) +
-     :                        ABS(I_YSCALE*SIN(ANGLE)))
+c          PLENGTH = LENGTH/(ABS(I_XSCALE*COS(ANGLE)) +
+c     :                        ABS(I_YSCALE*SIN(ANGLE)))
+          PLENGTH=LENGTH/ABS(I_XSCALE)
           PLENGTH=MAX(2.0,PLENGTH)
-          PWIDTH = WIDTH/(ABS(I_XSCALE*SIN(ANGLE))   +
-     :                        ABS(I_YSCALE*COS(ANGLE)))
+c          PWIDTH = WIDTH/(ABS(I_XSCALE*SIN(ANGLE))   +
+c     :                        ABS(I_YSCALE*COS(ANGLE)))
+          PWIDTH=WIDTH/ABS(I_XSCALE)
           PWIDTH=MAX(1.0,PWIDTH)
           PHWID=PWIDTH/2.0
           PHLEN=PLENGTH/2.0
