@@ -111,6 +111,7 @@
       INTEGER FRAME
       INTEGER IXPMAX,IYPMAX
       INTEGER IXP,IYP
+      INTEGER FLAG
       LOGICAL FOK
 *    Global Variables :
       INCLUDE 'IMG_CMN'
@@ -197,9 +198,6 @@
 
               ENDIF
 
-              CALL IMG_NBGET0R('PAR_R1',XC,STATUS)
-              CALL IMG_NBGET0R('PAR_R2',YC,STATUS)
-              CALL IMG_NBGET0R('PAR_R3',RAD,STATUS)
             ENDIF
           ENDIF
 
