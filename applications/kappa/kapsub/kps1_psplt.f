@@ -216,17 +216,20 @@
       DMAX = VAL__MINR
       DMIN = VAL__MAXR
 
+*  Initialise counter of good bins.
+      NDATA = -1
+
 *  Loop through all the bins in the mean profile, scaling the data to the 
-*  units.
+*  units. Also compress the data arrays to remove empty bins. 
       DO BIN = 0, NBIN - 1
          IF ( PROFWT( BIN ) .GT. 0.0 ) THEN
-            PROFIL( BIN ) = YSCALE*( PROFIL( BIN ) - BACK )
-            PROFR( BIN ) = PROFR( BIN ) * SCALE * RAXIS
-            DMAX = MAX( DMAX, PROFIL( BIN ) )
-            DMIN = MIN( DMIN, PROFIL( BIN ) )
-         ELSE
-            PROFIL( BIN ) = VAL__BADR
-            PROFR( BIN ) = VAL__BADR
+            NDATA = NDATA + 1
+            PROFIL( NDATA ) = YSCALE*( PROFIL( BIN ) - BACK )
+            PROFR( NDATA ) = PROFR( BIN ) * SCALE * RAXIS
+            PROFWT( NDATA ) = 0.0
+
+            DMAX = MAX( DMAX, PROFIL( NDATA ) )
+            DMIN = MIN( DMIN, PROFIL( NDATA ) )
          END IF
       END DO
 
@@ -234,7 +237,8 @@
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Attempt to get an output NDF to hold the profile.
-      CALL LPG_CREAT( 'PROFOUT', '_REAL', 1, 1, NBIN, INDF, STATUS )
+      CALL LPG_CREAT( 'PROFOUT', '_REAL', 1, 1, NDATA + 1, INDF, 
+     :                STATUS )
 
 *  If a null was supplied, annul the error.
       IF( STATUS .EQ. PAR__NULL ) THEN
@@ -243,33 +247,34 @@
 *  Otherwise, produce the NDF.
       ELSE
 
-*  Map the DATA array (leaving it empty for the moment).
+*  Store the fit values corresponding to each bin in work(,1) and the
+*  squared residual between the fit value and the data in work(,2)
+         DO BIN = 0, NDATA
+            RADIUS= PROFR( BIN )/SCALE
+            WORK( BIN, 1 ) = YSCALE*AMP * EXP( - 0.5 * ( ( RADIUS /
+     :                       MAX( 0.001, AXSIG ) ) *  * GAMMA ) )
+            WORK( BIN, 2 ) = ( WORK( BIN, 1 ) - PROFIL( BIN ) )**2
+         END DO
+
+*  Map the DATA array, and copy the fit values into it.
          CALL NDF_MAP( INDF, 'DATA', '_DOUBLE', 'WRITE', IPDAT, EL, 
      :                 STATUS ) 
+         CALL KPG1_CPNDD( 1, 0, NDATA, WORK( 0, 1 ), 0, NDATA, 
+     :                    %VAL( IPDAT ), EL, STATUS )
 
-*  Map the DATA array and copy the supplied profile data values into it.
-         CALL NDF_MAP( INDF, 'VARIANCE', '_REAL', 'WRITE', IPVAR, EL, 
+*  Map the VARIANCE array, and copy the squared residuals into it.
+         CALL NDF_MAP( INDF, 'VARIANCE', '_DOUBLE', 'WRITE', IPVAR, EL, 
      :                 STATUS ) 
-         CALL KPG1_CPNDR( 1, 1, NBIN, PROFIL, 1, NBIN, %VAL( IPVAR ),
+         CALL KPG1_CPNDD( 1, 0, NDATA, WORK( 0, 2 ), 0, NDATA, 
+     :                    %VAL( IPVAR ), EL, STATUS )
+
+*  Map the AXIS CENTRE array, and copy the radii values to it.
+         CALL NDF_AMAP( INDF, 'CENTRE', 1, '_REAL', 'WRITE', IPAX, EL, 
+     :                  STATUS ) 
+         CALL KPG1_CPNDR( 1, 0, NDATA, PROFR, 0, NDATA, %VAL( IPAX ),
      :                    EL, STATUS )
 
-*  Map the AXIS CENTRE array, leaving it empty for the moment.
-         CALL NDF_AMAP( INDF, 'CENTRE', 1, '_DOUBLE', 'WRITE', IPAX, EL, 
-     :                  STATUS ) 
       END IF
-
-*  Initialise counter of good bins.
-      NDATA = -1
-
-*  Compress the data arrays to remove empty bins. 
-      DO BIN = 0, NBIN - 1
-         IF ( PROFWT( BIN ) .GT. 0.0 ) THEN
-            NDATA = NDATA + 1
-            PROFIL( NDATA ) = PROFIL( BIN ) 
-            PROFR( NDATA ) = PROFR( BIN ) 
-            PROFWT( NDATA ) = 0.0
-         END IF
-      END DO
 
 *  Calculate the fitted profile over the data range for each of the points 
 *  where the mean profile is known.  Apply the scaling to the radius.
@@ -333,29 +338,14 @@
 
       END IF
 
-*  If an output NDF is being produced, fill the arrays, etc.
-      IF( INDF .NE. NDF__NOID  ) THEN
+*  If an output NDF is being created...
+      IF( INDF .NE. NDF__NOID ) THEN
 
-*  Copy the fitted profile data into the DATA array.
-         CALL KPG1_CPNDD( 1, 1, NBIN, WORK( 0, 2 ), 1, NBIN, 
-     :                    %VAL( IPDAT ), EL, STATUS )
-
-*  The VARIANCE array is currently filled with the rmean data value in
-*  each bin. We want to replace this with the square of the residuals 
-*  at each bin. Calculate these now.
-         CALL KPS1_PSRSV( NBIN, WORK( 1, 2 ), %VAL( IPVAR ), STATUS )
-
-*  Store TITLE, LABEL and UNITS component.
+*  Store labels, etc.
          CALL NDF_CPUT( DEFTTL, INDF, 'TITLE', STATUS ) 
          CALL NDF_CPUT( NDFLBY, INDF, 'LABEL', STATUS ) 
          IF( YUNITS .NE. ' ' ) CALL NDF_CPUT( YUNITS, INDF, 'UNITS', 
      :                                        STATUS ) 
-
-*  Copy the radii values to the AXIS CENTRE array.
-         CALL KPG1_CPNDD( 1, 1, NBIN, WORK( 0, 1 ), 1, NBIN, 
-     :                    %VAL( IPAX ), EL, STATUS )
-
-*  Store the axis label and units.
          CALL NDF_ACPUT( NDFLBX, INDF, 'LABEL', 1, STATUS ) 
          IF( RUNITS .NE. ' ' ) CALL NDF_ACPUT( RUNITS, INDF, 'UNITS', 1, 
      :                                         STATUS )

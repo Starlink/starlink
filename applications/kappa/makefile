@@ -616,7 +616,7 @@ kps1_mdrpb.f kps1_mdrfw.f kps1_nom1w.f kps1_nom1uw.f kps1_nom1ub.f \
 kps1_nom1r.f kps1_nom1i.f kps1_nom1d.f kps1_nom1b.f kps1_ncuco.f \
 kps1_op1.f kps1_op2.f kps1_putw.f kps1_putuw.f kps1_putub.f kps1_puts.f \
 kps1_putr.f kps1_putl.f kps1_puti.f kps1_putd.f kps1_putb.f kps1_psplt.f \
-kps1_psrsv.f kps1_psevl.f kps1_psdim.f kps1_prfsm.f kps1_prfmk.f kps1_prflt.f \
+kps1_psevl.f kps1_psdim.f kps1_prfsm.f kps1_prfmk.f kps1_prflt.f \
 kps1_putc.f kps1_plmsk.f kps1_plcpy.f kps1_plcpw.f kps1_plcpub.f \
 kps1_plcpr.f kps1_plcpi.f kps1_plcpd.f kps1_putvl.f kps1_plclc.f \
 kps1_pgftr.f kps1_rprfw.f kps1_rprfub.f kps1_rprfr.f kps1_rprfi.f \
