@@ -45,11 +45,13 @@
  */
 #undef HAVE_ASSERT_H
 #undef HAVE_UNISTD_H
+#undef HAVE_FCNTL_H
 #undef HAVE_SSTREAM
 
 /* Specific functions */
 #undef HAVE_POPEN
 #undef HAVE_PIPE
+#undef HAVE_SNPRINTF
 #undef HAVE___STRCHRNUL
 /* Define as 1 if the getopt function (and thus, which is more
  * important to us, the getopt globals, optarg, optind, opterr and
