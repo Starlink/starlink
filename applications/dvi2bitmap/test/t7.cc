@@ -22,7 +22,7 @@ using std::endl;
 
 // could do with boosting accuracy, but that would involve being
 // cleverer in convertUnits
-#define EQTOL(a,b) (fabs((a)-(b))<2e-5)
+#define EQTOL(a,b) (fabs((a)/(b)-1)<2e-5)
 
 int testConvertFromScaledPoints(void)
 {
@@ -151,13 +151,68 @@ int testConvertUnits(void)
     return nerrors;
 }
 
+int testDviFile()
+{
+    string fn = "t5.dvi";
+    DviFile *dvif = new DviFile(fn);
+    DviFilePreamble *p = dynamic_cast<DviFilePreamble*>(dvif->getEvent());
+    
+    if (! p) {
+	cerr << "Eeek!  First event from DVI file is not DviFilePreamble"
+	     << endl;
+	return 1;		// JUMP OUT
+    }
+    
+    int nerrors = 0;
+
+    struct {
+	double testvalue;	// in points
+	double expected_sp;
+	double expected_px;
+    } testset[] = {
+	{ 72.27, 65536*72.27, 110 },
+    };
+    int ntests = sizeof(testset)/sizeof(testset[0]);
+
+    for (int i=0; i<ntests; i++) {
+	double tvalue_sp = DviFile::convertUnits(testset[i].testvalue,
+						 DviFile::unit_pt,
+						 DviFile::unit_sp,
+						 dvif);
+	double tvalue_px = DviFile::convertUnits(testset[i].testvalue,
+						 DviFile::unit_pt,
+						 DviFile::unit_pixels,
+						 dvif);
+	if (! (EQTOL(tvalue_sp,testset[i].expected_sp)
+	       && EQTOL(tvalue_px,testset[i].expected_px))) {
+	    cerr << "Converting "
+		 << testset[i].testvalue << "pt: got "
+		 << tvalue_sp << "sp," << tvalue_px << "px, expected "
+		 << testset[i].expected_sp << "sp,"
+		 << testset[i].expected_px << "px (diff="
+		 << tvalue_sp - testset[i].expected_sp
+		 << ","
+		 << tvalue_px - testset[i].expected_px
+		 << ")" << endl;
+	    nerrors++;
+	}
+    }
+    return nerrors;
+}
+
+
 int main(int argc, char** argv)
 {
     int nerrors = 0;
 
-    nerrors += testConvertFromScaledPoints();
-    nerrors += testConvertToScaledPoints();
-    nerrors += testConvertUnits();
+    try {
+	nerrors += testConvertFromScaledPoints();
+	nerrors += testConvertToScaledPoints();
+	nerrors += testConvertUnits();
+	nerrors += testDviFile();
+    } catch (DviError &e) {
+	cerr << "Test threw DviError: " << e.problem() << endl;
+    }
 
     exit(nerrors);
 }
