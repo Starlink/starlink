@@ -6,7 +6,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Global variables :
       INCLUDE 'GDV_CMN'
 *    Structure definitions :
@@ -33,7 +32,7 @@
         ENDIF
 
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from GDV_CURSOR',STATUS)
+          CALL AST_REXIT('GDV_CURSOR',STATUS)
         ENDIF
 
       ENDIF

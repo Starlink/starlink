@@ -6,7 +6,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Global variables :
       INCLUDE 'GDV_CMN'
 *    Structure definitions :
