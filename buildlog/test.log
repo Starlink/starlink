@@ -1,6 +1,122 @@
-shell-init: could not get current directory: getcwd: cannot access parent directories: No such file or directory
 /apps/jdk
-pwd: could not get current directory: getcwd: cannot access parent directories: No such file or directory
-chdir: could not get current directory: getcwd: cannot access parent directories: No such file or directory
-Buildfile: build.xml does not exist!
-Build failed
+Buildfile: build.xml
+
+prepare:
+
+test:
+
+call_package_ant:
+     [echo] Executing JUnit target: test
+
+test:
+     [echo] Executing tamfits target: test
+
+test:
+     [echo] Executing axis target: test
+
+test:
+     [echo] Executing Jetty target: test
+
+test:
+     [echo] Executing UTIL target: test
+
+prepare:
+
+check_packages:
+
+build:
+
+compile-tests:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/util/build/testcases
+    [javac] Compiling 13 source files to /apps/cvsbuild/java/source/util/build/testcases
+
+run-tests:
+    [junit] Testsuite: uk.ac.starlink.util.DOMUtilsTest
+    [junit] Tests run: 4, Failures: 0, Errors: 0, Time elapsed: 0.587 sec
+
+    [junit] Testcase: testGetChildElementByName took 0.238 sec
+    [junit] Testcase: testGetTextContent took 0.052 sec
+    [junit] Testcase: testNewDocument took 0.032 sec
+    [junit] Testcase: testRelativizeDOM took 0.261 sec
+    [junit] Testsuite: uk.ac.starlink.util.DataSourceTest
+    [junit] Tests run: 6, Failures: 0, Errors: 0, Time elapsed: 4.186 sec
+
+    [junit] Testcase: testData took 1.065 sec
+    [junit] Testcase: testIntro took 0.809 sec
+    [junit] Testcase: testStream took 0.69 sec
+    [junit] Testcase: testHybridStream took 0.696 sec
+    [junit] Testcase: testCombo1 took 0.737 sec
+    [junit] Testcase: testResourceStream took 0.186 sec
+    [junit] Testsuite: uk.ac.starlink.util.IOUtilsTest
+    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.015 sec
+
+    [junit] Testcase: testDataInput took 0.01 sec
+    [junit] Testcase: testInputStream took 0.001 sec
+    [junit] Testsuite: uk.ac.starlink.util.NodeDescendantsTest
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.138 sec
+
+    [junit] Testcase: testTraversal took 0.134 sec
+    [junit] Testsuite: uk.ac.starlink.util.PipeReaderThreadTest
+    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.069 sec
+
+    [junit] Testcase: testPipe1 took 0.043 sec
+    [junit] Testcase: testPipeBlock took 0.023 sec
+    [junit] Testsuite: uk.ac.starlink.util.ReaderThreadTest
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 1.02 sec
+
+    [junit] Testcase: testThread took 1.016 sec
+    [junit] Testsuite: uk.ac.starlink.util.SourceReaderTest
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.678 sec
+
+    [junit] Testcase: testGetDOM took 0.674 sec
+    [junit] Testsuite: uk.ac.starlink.util.TestCaseTest
+    [junit] Tests run: 3, Failures: 0, Errors: 0, Time elapsed: 0.407 sec
+
+    [junit] Testcase: testFlags took 0.297 sec
+    [junit] Testcase: testAssertSource took 0.052 sec
+    [junit] Testcase: testValidation took 0.051 sec
+    [junit] Testsuite: uk.ac.starlink.util.URLUtilsTest
+    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.02 sec
+
+    [junit] Testcase: testMakeURL took 0.012 sec
+    [junit] Testcase: testUrlToUri took 0.003 sec
+    [junit] Xlib: connection to "europa:0.0" refused by server
+    [junit] Xlib: No protocol specified
+
+    [junit] Testsuite: uk.ac.starlink.util.XMLUtilTest
+    [junit] Tests run: 1, Failures: 0, Errors: 1, Time elapsed: 0.929 sec
+
+    [junit] Testcase: testXMLEncodeDecode took 0.921 sec
+    [junit] 	Caused an ERROR
+    [junit] Can't connect to X11 window server using 'europa:0.0' as the value of the DISPLAY variable.
+    [junit] java.lang.InternalError: Can't connect to X11 window server using 'europa:0.0' as the value of the DISPLAY variable.
+    [junit] 	at sun.awt.X11GraphicsEnvironment.initDisplay(Native Method)
+    [junit] 	at sun.awt.X11GraphicsEnvironment.<clinit>(X11GraphicsEnvironment.java:125)
+    [junit] 	at java.lang.Class.forName0(Native Method)
+    [junit] 	at java.lang.Class.forName(Class.java:140)
+    [junit] 	at java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment(GraphicsEnvironment.java:62)
+    [junit] 	at java.awt.Font.initializeFont(Font.java:309)
+    [junit] 	at java.awt.Font.<init>(Font.java:345)
+    [junit] 	at uk.ac.starlink.util.XMLUtilTest$TestXMLEncodeDecode.<init>(XMLUtilTest.java:55)
+    [junit] 	at uk.ac.starlink.util.XMLUtilTest.testXMLEncodeDecode(XMLUtilTest.java:36)
+    [junit] 	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+    [junit] 	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)
+    [junit] 	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+    [junit] 	at java.lang.reflect.Method.invoke(Method.java:324)
+    [junit] 	at junit.framework.TestCase.runTest(TestCase.java:166)
+    [junit] 	at junit.framework.TestCase.runBare(TestCase.java:140)
+    [junit] 	at junit.framework.TestResult$1.protect(TestResult.java:106)
+    [junit] 	at junit.framework.TestResult.runProtected(TestResult.java:124)
+    [junit] 	at junit.framework.TestResult.run(TestResult.java:109)
+    [junit] 	at junit.framework.TestCase.run(TestCase.java:131)
+    [junit] 	at junit.framework.TestSuite.runTest(TestSuite.java:173)
+    [junit] 	at junit.framework.TestSuite.run(TestSuite.java:168)
+    [junit] 	at org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner.run(JUnitTestRunner.java:325)
+    [junit] 	at org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner.main(JUnitTestRunner.java:536)
+
+    [junit] Testcase: testXMLEncodeDecode
+
+BUILD FAILED
+file:/apps/cvsbuild/java/source/util/build.xml:913: Test uk.ac.starlink.util.XMLUtilTest failed
+
+Total time: 23 seconds
