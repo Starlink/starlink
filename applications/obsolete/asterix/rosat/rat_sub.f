@@ -396,7 +396,9 @@
 * Bugs :
 *     <description of any "bugs" which have not been fixed>
 * Author: Jeremy Ashley 1993-sept
-* History :
+*         Richard Beard (University of Birmingham)
+* History:
+*         14 May 1997: Handle GTIs as DOUBLE (RB)
 *    Type Definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -430,8 +432,8 @@
       CALL HDX_PUTR(ALOC,'PIXEL',1,HEAD.PIXEL,STATUS)
       CALL HDX_PUTI(ALOC,'NTRANGE',1,HEAD.NTRANGE,STATUS)
       CALL HDX_PUTD(ALOC,'BASE_SCTIME',1,HEAD.BASE_SCTIME,STATUS)
-      CALL HDX_PUTR(ALOC,'TSTART',MAXRAN,HEAD.TSTART,STATUS)
-      CALL HDX_PUTR(ALOC,'TEND',MAXRAN,HEAD.TEND,STATUS)
+      CALL HDX_PUTD(ALOC,'TSTART',MAXRAN,HEAD.TSTART,STATUS)
+      CALL HDX_PUTD(ALOC,'TEND',MAXRAN,HEAD.TEND,STATUS)
       CALL HDX_PUTI(ALOC,'ASTART',1,HEAD.ASTART,STATUS)
       CALL HDX_PUTI(ALOC,'AEND',1,HEAD.AEND,STATUS)
       CALL HDX_PUTI(ALOC,'CSTART',1,HEAD.CSTART,STATUS)
@@ -501,7 +503,9 @@
 * Bugs :
 *     <description of any "bugs" which have not been fixed>
 * Author: Jeremy Ashley 1993-sept
-* History :
+*         Richard Beard (University of Birmingham)
+* History:
+*         14 May 1997: Handle GTIs as DOUBLE (RB)
 *    Type Definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -532,8 +536,8 @@
       CALL CMP_GET0R(ALOC,'PIXEL',HEAD.PIXEL,STATUS)
       CALL CMP_GET0I(ALOC,'NTRANGE',HEAD.NTRANGE,STATUS)
       CALL CMP_GET0D(ALOC,'BASE_SCTIME',HEAD.BASE_SCTIME,STATUS)
-      CALL CMP_GET1R(ALOC,'TSTART',MAXRAN,HEAD.TSTART,DUMMY,STATUS)
-      CALL CMP_GET1R(ALOC,'TEND',MAXRAN,HEAD.TEND,DUMMY,STATUS)
+      CALL CMP_GET1D(ALOC,'TSTART',MAXRAN,HEAD.TSTART,DUMMY,STATUS)
+      CALL CMP_GET1D(ALOC,'TEND',MAXRAN,HEAD.TEND,DUMMY,STATUS)
       CALL CMP_GET0I(ALOC,'ASTART',HEAD.ASTART,STATUS)
       CALL CMP_GET0I(ALOC,'AEND',HEAD.AEND,STATUS)
       CALL CMP_GET0I(ALOC,'CSTART',HEAD.CSTART,STATUS)
@@ -859,8 +863,10 @@
 * Bugs :
 * Authors :
 *     Richard Saxton
+*     Richard Beard (University of Birmingham)
 * History :
 *     12-Aug-1992   Original
+*     14 May 1997   Fource calculations to DP (RB)
 * Type Definitions :
       IMPLICIT NONE
 * Global constants :
@@ -915,8 +921,8 @@
       READ(TIME_OBS(K+1:K+2), FMT='(I2)')MIN
       READ(TIME_OBS(K+4:K+5), FMT='(I2)')SEC
 *
-      MJDBIT=HRS*3600.0 + MIN*60.0 + SEC
-      HEAD.BASE_MJD=DBLE(IMJD1) + MJDBIT/86400.0
+      MJDBIT=HRS*3600.0D0 + MIN*60.0D0 + DBLE(SEC)
+      HEAD.BASE_MJD=DBLE(IMJD1) + MJDBIT/86400.0D0
 
 * Convert end MJD
       K=INDEX(DATE_END, '/')
@@ -935,17 +941,17 @@
       READ(TIME_END(K+1:K+2), FMT='(I2)')MIN
       READ(TIME_END(K+4:K+5), FMT='(I2)')SEC
 *
-      MJDBIT=HRS*3600.0 + MIN*60.0 + SEC
-      HEAD.END_MJD=DBLE(IMJD2) + MJDBIT/86400.0
+      MJDBIT=HRS*3600.0D0 + MIN*60.0D0 + DBLE(SEC)
+      HEAD.END_MJD=DBLE(IMJD2) + MJDBIT/86400.0D0
 *
 * Calculate the MJD offset from the start of the Rosat clock
       MJDOFF = HEAD.BASE_MJD - (XS_MJDRD + XS_MJDRF)
 *
 * Convert to seconds
-      HEAD.BASE_SCTIME = MJDOFF * 86400.0
+      HEAD.BASE_SCTIME = MJDOFF * 86400.0D0
 *
 * Set the S/C to MJD conversion factor to one
-      HEAD.SCCONV=1.0
+      HEAD.SCCONV=1.0D0
 *
       IF (STATUS .NE. SAI__OK) THEN
          CALL ERR_REP(' ','from FX_TMCONV',STATUS)
@@ -1225,8 +1231,10 @@
 *     <description of any "bugs" which have not been fixed >
 *    Authors :
 *     Jeremy Ashley
+*     Richard Beard (University of Birmingham)
 *    History :
 *     23-Sep-1993   - Converted from old FX_RDHDR
+*     14 May 1997   - Read times as DOUBLE (RB)
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -1287,8 +1295,8 @@ C - MOVE TO EVENTS HEADER
 *
 * Get exposure time info
       HEAD.NTRANGE=1
-      HEAD.TSTART(1)=0.0
-      CALL FTGKYE(IUNIT,'XS-LIVTI',HEAD.TEND(1),CDUMMY,STATUS)
+      HEAD.TSTART(1)=0.0D0
+      CALL FTGKYD(IUNIT,'XS-LIVTI',HEAD.TEND(1),CDUMMY,STATUS)
 
 * The next parameters will not exist for image data so ignore errors
       HEAD.XSTART = 1
@@ -1338,8 +1346,8 @@ C - READ TIME RANGE INFORMATION
       CALL FTGKYJ(IUNIT,'NAXIS2',HEAD.NTRANGE,CDUMMY,STATUS)
 C - CHECK NUMBER OF TIME RANGES DOESN'T EXCEED MAXIMUM
       IF (HEAD.NTRANGE.GT.MAXRAN) HEAD.NTRANGE = MAXRAN
-      CALL FTGCVE(IUNIT,1,1,1,HEAD.NTRANGE,0,HEAD.TSTART,LDUMMY,STATUS)
-      CALL FTGCVE(IUNIT,2,1,1,HEAD.NTRANGE,0,HEAD.TEND,LDUMMY,STATUS)
+      CALL FTGCVD(IUNIT,1,1,1,HEAD.NTRANGE,0,HEAD.TSTART,LDUMMY,STATUS)
+      CALL FTGCVD(IUNIT,2,1,1,HEAD.NTRANGE,0,HEAD.TEND,LDUMMY,STATUS)
       DO I = 1,HEAD.NTRANGE
          HEAD.TSTART(I) = HEAD.TSTART(I) - HEAD.BASE_SCTIME
          HEAD.TEND(I) = HEAD.TEND(I) - HEAD.BASE_SCTIME
@@ -1377,8 +1385,10 @@ C - CHECK NUMBER OF TIME RANGES DOESN'T EXCEED MAXIMUM
 *     <description of any "bugs" which have not been fixed >
 *    Authors :
 *     Jeremy Ashley
+*     Richard Beard (University of Birmingham)
 *    History :
 *     29-Sep-1993   - J.ASHLEY
+*     14 May 1997   - Read times as DOUBLE (RB)
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -1465,10 +1475,10 @@ C - MOVE TO EVENTS HEADER
 *
 * Get exposure time info
       HEAD.NTRANGE=1
-      HEAD.TSTART(1)=0.0
+      HEAD.TSTART(1)=0.0D0
 
       CALL RAT_FITSKEY('RDF',VERSION,'TEND',KEYWORD,STATUS)
-      CALL FTGKYE(IUNIT,KEYWORD,HEAD.TEND(1),CDUMMY,STATUS)
+      CALL FTGKYD(IUNIT,KEYWORD,HEAD.TEND(1),CDUMMY,STATUS)
 
 * The next parameters will not exist for image data so ignore errors
       HEAD.XSTART = 1
@@ -1554,8 +1564,8 @@ C - READ TIME RANGE INFORMATION
       CALL FTGKYJ(IUNIT,'NAXIS2',HEAD.NTRANGE,CDUMMY,STATUS)
 C - CHECK NUMBER OF TIME RANGES DOESN'T EXCEED MAXIMUM
       IF (HEAD.NTRANGE.GT.MAXRAN) HEAD.NTRANGE = MAXRAN
-      CALL FTGCVE(IUNIT,1,1,1,HEAD.NTRANGE,0,HEAD.TSTART,LDUMMY,STATUS)
-      CALL FTGCVE(IUNIT,2,1,1,HEAD.NTRANGE,0,HEAD.TEND,LDUMMY,STATUS)
+      CALL FTGCVD(IUNIT,1,1,1,HEAD.NTRANGE,0,HEAD.TSTART,LDUMMY,STATUS)
+      CALL FTGCVD(IUNIT,2,1,1,HEAD.NTRANGE,0,HEAD.TEND,LDUMMY,STATUS)
       DO I = 1,HEAD.NTRANGE
          HEAD.TSTART(I) = HEAD.TSTART(I) - HEAD.BASE_SCTIME
          HEAD.TEND(I) = HEAD.TEND(I) - HEAD.BASE_SCTIME
@@ -1853,8 +1863,10 @@ C -   CHECK STATUS
 *     <description of any "bugs" which have not been fixed >
 *    Authors :
 *     Jeremy Ashley
+*     Richard Beard (University of Birmingham)
 *    History :
 *     23-Sep-1993   - Converted from old FX_RDHDR
+*     14 May 1997   - Read times as DOUBLE (RB)
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -1906,8 +1918,8 @@ C - MOVE TO PRIMARY HEADER
 *
 * Get exposure time info
       HEAD.NTRANGE=1
-      HEAD.TSTART(1)=0.0
-      CALL FTGKYE(IUNIT,'XS-LIVTI',HEAD.TEND(1),CDUMMY,STATUS)
+      HEAD.TSTART(1)=0.0D0
+      CALL FTGKYD(IUNIT,'XS-LIVTI',HEAD.TEND(1),CDUMMY,STATUS)
 
       CALL FTGKYS(IUNIT,'XS-SEQPI',CVAL,CDUMMY,STATUS)
       HEAD.OBSERVER = CVAL(1:20)
@@ -1951,8 +1963,10 @@ C - CONVERT TIME FORMATS
 *     formats - 25th October 1993 (JKA)
 *    Authors :
 *     Jeremy Ashley
+*     Richard Beard (University of Birmingham)
 *    History :
 *     29-Sep-1993   - J.ASHLEY
+*     14 May 1997   - Read times as DOUBLE (RB)
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -2015,8 +2029,8 @@ C - GET FITS FILE VERSION NUMBER
 *
 * Get exposure time info
       HEAD.NTRANGE=1
-      HEAD.TSTART(1)=0.0
-      CALL FTGKYE(IUNIT,'LIVETIME',HEAD.TEND(1),CDUMMY,STATUS)
+      HEAD.TSTART(1)=0.0D0
+      CALL FTGKYD(IUNIT,'LIVETIME',HEAD.TEND(1),CDUMMY,STATUS)
 *
       CALL FTGKYS(IUNIT,'OBSERVER',HEAD.OBSERVER,CDUMMY,STATUS)
       CALL FTGKYS(IUNIT,'TELESCOP',HEAD.OBSERVATORY,CDUMMY,STATUS)
