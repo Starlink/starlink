@@ -6,7 +6,7 @@ OBJ=	reds.o reds_bessel_rebin.o reds_crosstalk.o reds_extinction.o \
 .f.o:	f77 -c $*.f
 MAIN:	$(OBJ)
 	alink $(OBJ) \
-	-L/home/jfl/v200/sculib -lsculib -lV77 \
+	-L/jcmt_sw/sun4_Solaris/lib -lsculib -lV77 \
 	-L$(IRAS90_SOURCE) -lira `ndf_link_adam` \
 	`fio_link_adam` `sla_link_adam`
 	rm *.o
