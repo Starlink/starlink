@@ -85,14 +85,16 @@
 
 *  Check that an AST Plot has been supplied.
       IF( IPLOT .NE. AST__NULL ) THEN 
-         IF( .NOT. AST_ISAPLOT( IPLOT, STATUS ) .AND.
-     :       STATUS .EQ. SAI__OK ) THEN
-            CALL MSG_SETC( 'CLASS', AST_GETC( IPLOT, 'CLASS', STATUS ) )
-            STATUS = SAI__ERROR
-            CALL ERR_REP( 'KPG1_GDPUT_1', 'KPG1_GDPUT: Programming '//
-     :                    'error - an AST ^CLASS has been supplied '//
+         IF( .NOT. AST_ISAPLOT( IPLOT, STATUS ) ) THEN
+            IF( STATUS .EQ. SAI__OK ) THEN
+               CALL MSG_SETC( 'CLASS', AST_GETC( IPLOT, 'CLASS', 
+     :                                           STATUS ) )
+               STATUS = SAI__ERROR
+               CALL ERR_REP( 'KPG1_GDPUT_1', 'KPG1_GDPUT: Programming'//
+     :                    ' error - an AST ^CLASS has been supplied '//
      :                    'when a Plot was needed.', STATUS )
-            GO TO 999
+               GO TO 999
+            END IF
          END IF
       END IF
 

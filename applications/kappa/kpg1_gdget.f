@@ -226,21 +226,23 @@
 
 *  If the AST Object read from the database is not a Plot, report an error.
          IF( IPLOT .NE. AST__NULL ) THEN
-            IF( .NOT. AST_ISAPLOT( IPLOT, STATUS ) .AND. 
-     :          STATUS .EQ. SAI__OK ) THEN
-               CALL AST_ANNUL( IPLOT, STATUS )
+            IF( .NOT. AST_ISAPLOT( IPLOT, STATUS ) ) THEN
+               IF( STATUS .EQ. SAI__OK ) THEN
+                  CALL AST_ANNUL( IPLOT, STATUS )
 
-               CALL AGI_INAME( NAME, STATUS )
-               CALL MSG_SETC( 'NAME', NAME )
-               CALL MSG_SETC( 'CLASS', AST_GETC( IPLOT, 'CLASS',
-     :                                              STATUS ) )
+                  CALL AGI_INAME( NAME, STATUS )
+                  CALL MSG_SETC( 'NAME', NAME )
+                  CALL MSG_SETC( 'CLASS', AST_GETC( IPLOT, 'CLASS',
+     :                                                 STATUS ) )
 
-               STATUS = SAI__ERROR
-               CALL ERR_REP( 'KPG1_GDGET_1', 'The required ^NAME '//
+                  STATUS = SAI__ERROR
+                  CALL ERR_REP( 'KPG1_GDGET_1', 'The required ^NAME '//
      :                       'picture has an AST ^CLASS associated '//
      :                       'with it in the AGI database. This '//
      :                       'application requires an AST Plot.',
      :                       STATUS )
+               END IF
+
             END IF
 
          END IF
