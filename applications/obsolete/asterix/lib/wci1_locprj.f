@@ -102,6 +102,8 @@
       INTEGER 			STATUS             	! Global status
 
 *  External References:
+      EXTERNAL			WCI1_XPARC		! Zenithal equidistant
+      EXTERNAL			WCI1_XPAZP		! Zenithal perspective
       EXTERNAL			WCI1_XPCAR		! Cartesian
       EXTERNAL			WCI1_XPTAN		! Tan/Gnomonic
 
@@ -118,6 +120,12 @@
 
       ELSE IF ( NAME .EQ. 'TAN' ) THEN
         PTR = UTIL_PLOC( WCI1_XPTAN )
+
+      ELSE IF ( NAME .EQ. 'AZP' ) THEN
+        PTR = UTIL_PLOC( WCI1_XPAZP )
+
+      ELSE IF ( NAME .EQ. 'ARC' ) THEN
+        PTR = UTIL_PLOC( WCI1_XPARC )
 
 *  Not implemented yet...
       ELSE
