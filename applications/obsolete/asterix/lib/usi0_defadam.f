@@ -15,6 +15,7 @@
 *    History :
 *
 *     21 May 93 : Original (DJA)
+*     24 Nov 94 : Added _DELET method (DJA)
 *
 *    Type definitions :
 *
@@ -73,6 +74,7 @@
       EXTERNAL                  PAR_STATE
       EXTERNAL                  DAT_ASSOC
       EXTERNAL                  DAT_CREAT
+      EXTERNAL                  DAT_DELET
 *-
 
 *   Define the new system
@@ -127,5 +129,6 @@
       CALL USI0_DEFRTN( PARID, USI__F_STATE, PAR_STATE, STATUS )
       CALL USI0_DEFRTN( PARID, USI__F_DASSOC, DAT_ASSOC, STATUS )
       CALL USI0_DEFRTN( PARID, USI__F_DCREAT, DAT_CREAT, STATUS )
+      CALL USI0_DEFRTN( PARID, USI__F_DELET, DAT_DELET, STATUS )
 
       END
