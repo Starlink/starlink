@@ -38,15 +38,17 @@
 #     skycat::SkySearch
 
 #  Copyright:
-#     Copyright (C) 1998 Central Laboratory of the Research Councils
+#     Copyright (C) 1998-2001 Central Laboratory of the Research Councils
 
 #  Authors:
-#     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     PWD: Peter Draper (STARLINK - Durham University)
 #     {enter_new_authors_here}
 
 #  History:
-#     14-SEP-1998 (PDRAPER):
+#     14-SEP-1998 (PWD):
 #        Original version.
+#     09-AUG-2001 (PWD):
+#        Added the "Extract selected..." item to the Options menu.
 #     {enter_further_changes_here}
 
 #-
@@ -87,13 +89,25 @@ itcl::class gaia::GaiaSearch {
       #  catalogue windows, not image servers.
       if { $iscat_ } {
 
-         #  Add centre on selected object option.
+         #  Add our local options.
          set m [get_menu Options]
          $m add separator
+
+         #  Add the ability to extract the selected rows to a new
+         #  catalogue and display in a window.
+         add_menuitem $m command "Extract selected" \
+            {Extract any selected rows and display as a new catalog} \
+            -command [code $this extract_selected_]
+
+         #  Add centre on selected object option.
          add_menuitem $m command "Center on selected row" \
             {Centre main image on selected object (also bound to {bitmap b2} in table)} \
             -command [code $this centre_selected_object_]
 
+         #  Add labels to all objects.
+         add_menuitem $m command "Label all objects" \
+            {Label all objects displayed on image (same as double clicking on all rows)} \
+            -command [code $this label_all_objects]
 
          #  Add interpret X and Y coordinates as pixel coordinate option.
          $m add checkbutton  -label {Use NDF origins} \
@@ -245,6 +259,22 @@ itcl::class gaia::GaiaSearch {
       }
    }
 
+   #  Display any selected rows in a new catalogue window.
+   protected method extract_selected_ {} {
+      set selected [$results_ get_selected]
+      if { $selected == "" } {
+         error_dialog "No table rows are selected"
+         return
+      }
+
+      #  Save these to a temporary catalogue.
+      set name "GaiaTableExtract[incr count_].TAB"
+      $results_ save_to_file  $name $selected [$results_ get_headings]
+
+      #  And display it.
+      new_local_catalog $name $itk_option(-id) gaia::GaiaSearch
+   }
+
    #  Override plot to stop use of image WCS system if asked.
    public method plot {} {
       if { ! $itk_option(-plot_wcs) } {
@@ -271,6 +301,15 @@ itcl::class gaia::GaiaSearch {
    #  protected method in SkySearch).
    public method label_selected_row {} {
       label_selected_object
+   }
+
+   #  Label all the objects!
+   public method label_all_objects {} {
+      set name [$w_.cat shortname $itk_option(-catalog)]
+      foreach line [$results_ get_contents] {
+         set id [lindex $line [$w_.cat id_col]]
+         label_object_in_image $id $name
+      }
    }
 
    #  This member procedure is used to open a window for the named
@@ -341,4 +380,7 @@ itcl::class gaia::GaiaSearch {
 
    #  Allow/disallow searches (temporarily).
    common allow_searches_ 1
+
+   #  Reference counter for creating unique files.
+   common count_ 0
 }
