@@ -9,6 +9,10 @@
 
  More minor changes include:
 
+    o  An error in calculating the variances when median stacking
+       2 images has been corrected (previous values where an
+       underestimate).
+
     o  The restoration output from CCDSETUP is fixed to work
        correctly when just recording two bias strip bounds.
 
@@ -32,10 +36,11 @@
     o  HDS files with an object called DATA_ARRAY which are not NDFs
        are now correctly ignored.
 
+
  CCDPACK is fully described in SUN/139 and can be viewed on-line using 
  the "showme sun139" command. The latest information about CCDPACK 
  problems is always available at:
 
     <URL: http://star-www.dur.ac.uk/~pdraper/ccdpack>
 
- Peter Draper 12th November 1997, (P.W.Draper@durham).
+ Peter Draper 29th January 1998, (P.W.Draper@durham.ac.uk).
