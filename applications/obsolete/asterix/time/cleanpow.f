@@ -1265,7 +1265,7 @@ C           ENDIF
 
            ENDIF
 
-           XMAX = AXMAX+(AXMAX-AXMIX)*.002
+           XMAX = AXMAX+(AXMAX-AXMIN)*.002
            XMIN = AXMIN-(AXMAX-AXMIN)*.002
            YMAX = AYMAX+(AYMAX-AYMIN)*.002
            YMIN = AYMIN-(AYMAX-AYMIN)*.002
