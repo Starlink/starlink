@@ -1746,9 +1746,6 @@ D          WRITE(1,*)HEAD.OFFAX
 *    Export :
 *    Status :
       INTEGER STATUS
-*    Functions :
-      INTEGER CHR_LEN
-*    Local constants :
 *    Local variables :
       INTEGER XLP,YLP
       REAL VTOT
@@ -1931,9 +1928,6 @@ D          WRITE(1,*)HEAD.OFFAX
 *    Import-Export :
 *    Export :
       REAL QE			! QE factor
-*    Status :
-      INTEGER STATUS
-*    Functions :
 *    Local constants :
       REAL OFFMAX
       PARAMETER (OFFMAX=22.0)
@@ -1992,9 +1986,6 @@ D          WRITE(1,*)HEAD.OFFAX
 *    Import-Export :
 *    Export :
       REAL VIG			! VIG factor
-*    Status :
-      INTEGER STATUS
-*    Functions :
 *    Local constants :
       REAL OFFMAX
       PARAMETER (OFFMAX=22.0)
@@ -2008,7 +1999,6 @@ D          WRITE(1,*)HEAD.OFFAX
 *    Set vignetting correction according to formula in HRI calibration
 *    report  (December 93)
       VIG=1.0 - 1.49E-3*OFF -3.07E-4*OFF**2
-
 
       END
 
@@ -3516,8 +3506,6 @@ c     &              (EPHA_BOUNDS(2) - EPHA_BOUNDS(1))
 *    Status :
       INTEGER STATUS
 *    Local constants :
-*    Functions :
-      INTEGER CHR_LEN
 *    Local variables :
       REAL VIG,QE
 *-
