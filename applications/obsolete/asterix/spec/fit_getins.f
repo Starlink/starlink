@@ -25,6 +25,7 @@
 *     20 Mar 1991 : Fix for case where no axis data are present (TJP)
 *      2 Aug 1995 : Specify energy axis by argument (DJA)
 *     30 Nov 1995 : New data interface routines (DJA)
+*     11 Jan 1996 : Only verify using BDI if input is derived from BinDS (DJA)
 *
 *    Type definitions :
       IMPLICIT NONE
@@ -57,6 +58,7 @@
       INTEGER			NDIM			! Input dimensionality
       INTEGER			RCPTR			! Channel bounds
 
+      LOGICAL			ISBIN			! Input is a binned d/s
       LOGICAL 			OK			! Present & correct?
 *-
 
@@ -69,8 +71,11 @@
 *  Locate the response data
       CALL ERI_GETIDS( ID, INDEX, INSTR.R_ID, INSTR.A_ID, STATUS )
 
+*  Input is a binned dataset?
+      CALL ADI_DERVD( ID, 'BinDS', ISBIN, STATUS )
+
 *  Went ok?
-      IF ( STATUS .EQ. SAI__OK ) THEN
+      IF ( (STATUS .EQ. SAI__OK) .AND. ISBIN ) THEN
 
 *  Axis values exist?
         CALL BDI_AXCHK( ID, E_AX, 'Data', OK, STATUS )
@@ -115,7 +120,7 @@
 
         END IF
 
-      ELSE
+      ELSE IF ( STATUS .NE. SAI__OK ) THEN
         CALL ERR_FLUSH( STATUS )
         CALL MSG_PRNT( 'WARNING : Energy response not found, '/
      :            /'channels are assumed to be energy in keV' )
