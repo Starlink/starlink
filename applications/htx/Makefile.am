@@ -1,0 +1,43 @@
+#  List of public script files.  These are scripts which form part of
+#  the package and will be required by users of it.  They will be
+#  installed in the $(INSTALL_BIN) directory with execute permission
+#  set.
+
+PUBLIC_SCR = hlink findme showme
+
+#  List of private scripts, not usually seen by the user. These will be
+#  installed in the $(INSTALL_BIN_PKG) directory.
+
+PRIVATE_SCR =  allfind browse creindex depends docfind dockey gettitle \
+homepage htxpath moveddocs msgover multised newdocs newindex oldindex reffind \
+relink resolve settrap showhtml stdfile urlgen wrfiles
+
+#  List of private sed scripts (N.B. these contain comments which MUST be
+#  removed before use).
+
+PRIVATE_SED_SCR = creindex.sed edhead.sed edtail.sed gethead.sed \
+gettitle.sed
+
+SUFFIXES = .sed.in .sed
+
+.sed.in.sed:
+	@SED@ -e '/^#/d' \
+              -e '/^[  ]*$$/d' $< > $*.sed
+
+bin_SCRIPTS = $(PUBLIC_SCR)
+
+htxsupportdir = $(bindir)/htx-scripts
+htxsupport_SCRIPTS = $(PRIVATE_SCR)
+htxsupport_DATA = $(PRIVATE_SED_SCR)
+
+htxpath: $(srcdir)/htxpath.in Makefile
+	rm -f htxpath htxpath.tmp
+	@SED@ -e 's%|INSTALL|%$(prefix)%' \
+              -e 's%|STARLINK|%$(STARLINK)%' \
+              $(srcdir)/htxpath.in >htxpath.tmp
+	chmod +x htxpath.tmp
+	mv htxpath.tmp htxpath
+              
+
+BUILT_SOURCES = $(PRIVATE_SED_SCR) htxpath
+
