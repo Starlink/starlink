@@ -1,5 +1,6 @@
 *+ SPEC_DM - Computes spectra from a differential emission measure model
-	SUBROUTINE SPEC_DM(NDS,NEN,ELBOUND,EUBOUND,PARAM,FLUX,STATUS)
+	SUBROUTINE SPEC_DM(GENUS,NDS,NEN,ELBOUND,EUBOUND,PARAM,FLUX,
+     :            STATUS)
 
 * Description:
 *  Returns the flux in each energy channel from a differential emission
@@ -47,6 +48,7 @@
 *                 details) (MPW)
 *      7 May 91 : Tidied for release (MPW)
 *      7 Oct 92 : ARR_INITR call changed to ARR_INIT1R (DJA)
+*       9 Jan 1996 : Added GENUS argument (DJA)
 *
 *    Type Definitions :
 *
@@ -55,10 +57,10 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *
 *    Import :
 *
+      CHARACTER*(*)	GENUS
 	INTEGER NDS			! dataset number
 	INTEGER NEN			! No of energy channels
 	REAL ELBOUND(NEN)		! Lower bin bounds (keV)
@@ -182,7 +184,7 @@
 	  BRPARAM(3)=METALS
 
 *        Compute interpolated emissivity (in units of 1E-23 photons*cm**3/s)
-          CALL SPEC_RZ_EMISS('SPEC',NDS,T,METALS,NEN,ELBOUND,EUBOUND,
+          CALL SPEC_RZ_EMISS(GENUS,NDS,T,METALS,NEN,ELBOUND,EUBOUND,
      :                       BRPARAM,TEMPFLUX,STATUS)
           IF(STATUS.NE.SAI__OK) GO TO 9000
 
