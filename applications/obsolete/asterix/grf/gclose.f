@@ -20,7 +20,9 @@
 *    Function declarations :
 *    Local constants :
 *    Local variables :
+      CHARACTER*20 DEV
       INTEGER N
+
 *    Version :
       CHARACTER*30 VERSION
       PARAMETER (VERSION = 'GCLOSE Version 1.7-0')
@@ -30,6 +32,7 @@
       CALL MSG_PRNT(VERSION)
 
       IF (G_OPEN) THEN
+        CALL MSG_PRNT('Releasing dataset...')
         CALL GCB_ATTACH('GRAFIX',STATUS)
         IF (G_MULTI) THEN
           CALL HDS_CLOSE(G_MLOC,STATUS)
@@ -47,7 +50,11 @@
         CALL MSG_PRNT('****** Graphics device not closed ******')
         CALL MSG_PRNT('****** other contexts are active  ******')
       ELSE
+        CALL MSG_PRNT('Closing device...')
+        CALL GDV_DEVICE(DEV,STATUS)
         CALL GDV_CLOSE(STATUS)
+        CALL MSG_SETC('DEV',DEV)
+        CALL MSG_PRNT('Device ^DEV now closed')
       ENDIF
 
       CALL USI_CLOSE()
