@@ -1,5 +1,5 @@
 FC    = f77
-FFLAGS = -O4 -C
+FFLAGS = -g -C
 CFLAGS = 
 
 # install
@@ -13,7 +13,7 @@ INSTOPTS = -g jcmtsw
 FSOURCES= sculib_1d2_jiggle.f sculib_2pos_deconv.f sculib_3pos_deconv.f \
 	sculib_analyse_photom_jiggle.f sculib_remsky.f sculib_clip_bol.f \
 	sculib_2pos_confn.f sculib_3pos_confn.f sculib_statr.f \
-	sculib_add_demod_exposure.f sculib_addare.f \
+	sculib_add_demod_exposure.f sculib_addare.f sculib_statd.f\
 	sculib_extract_bol.f sculib_insert_bol.f \
 	sculib_addcai.f sculib_addcad.f sculib_addcar.f sculib_airmass.f \
 	sculib_apparent_2_tp.f sculib_wtfn_regrid_1.f \
@@ -69,10 +69,15 @@ FSOURCES= sculib_1d2_jiggle.f sculib_2pos_deconv.f sculib_3pos_deconv.f \
 	sculib_spline_regrid_1.f sculib_spline_pda_idbvip.f\
 	sculib_spline_pda_idsfft.f sculib_spline_pda_surfit.f\
 	sculib_coadd_maps.f sculib_set_data_ub.f\
-	sculib_scan_apparent_tp_2_azna.f \
-	sculib_skydip_xisq.f\
+	sculib_scan_apparent_tp_2_azna.f sculib_mulcad.f\
+	sculib_skydip_xisq.f sculib_calc_skydip_temps.f\
 	sculib_split_file_spec.f sculib_decode_rebin_line.f \
-	sculib_set_qual.f sculib_set_data_bit.f sculib_mask_data.f
+	sculib_set_qual.f sculib_set_data_bit.f sculib_mask_data.f \
+	sculib_construct_out.f sculib_get_filename.f sculib_par_get.f \
+	sculib_apparent_2_mp.f sculib_scan_2_rd.f sculib_add_chop.f \
+	sculib_fix_scan_v10.f sculib_gauss_wtinit.f sculib_skydip_var.f \
+	sculib_noise_mean.f
+
 
 CSOURCES = sculib_linux.c
 
