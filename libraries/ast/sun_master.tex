@@ -9414,10 +9414,10 @@ follows:
 
 \begin{quote}
 \begin{small}
-\begin{eqnarray}
+\begin{equation}
 \label{eqn:dsb}
-   f_{lsb} & = & 2.f_{LO} - f_{usb}
-\end{eqnarray}
+   f_{lsb} = 2.f_{LO} - f_{usb}
+\end{equation}
 \end{small}
 \end{quote}
 
@@ -9488,17 +9488,17 @@ oscillator. So:
 
 \begin{quote}
 \begin{small}
-\begin{eqnarray}
+\begin{equation}
 \label{eqn:dsb}
-   f_{LO} & = & f_{central} + f_{IF}
-\end{eqnarray}
+   f_{LO} = f_{central} + f_{if}
+\end{equation}
 \end{small}
 \end{quote}
 
-The DSBSpecFrame class uses the DSBCentre attribute to
-specify the central spectral position, and the IF attribute to specify
-the intermediate frequency. The DSBCentre value is given and returned in the
-spectral system described by the DSBSpecFrame (thus you do not need to
+The DSBSpecFrame class uses the DSBCentre attribute to specify the central 
+spectral position ($f_{central}$), and the IF attribute to specify the 
+intermediate frequency ($f_{if}$). The DSBCentre value is given and returned 
+in the spectral system described by the DSBSpecFrame (thus you do not need to
 calculate the corresponding topocentric frequency yourself - this will be
 done automatically by the DSBSpecFrame when you assign a new value to the
 DSBCentre attribute). The value assigned to the IF attribute should
