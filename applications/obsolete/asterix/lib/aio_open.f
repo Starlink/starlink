@@ -211,17 +211,18 @@
 
 *      Set mode
         ID = AIO__M_CONSOLE
-        CALL PSX_GETENV( 'COLUMNS', COLS, STATUS )
-        IF ( STATUS .EQ. SAI__OK ) THEN
-          CALL CHR_CTOI( COLS, AIO_WIDTH, STATUS )
-          IF ( STATUS .NE. SAI__OK .OR. AIO_WIDTH .LE. 0 ) THEN
-            CALL ERR_ANNUL( STATUS )
-            AIO_WIDTH = 80
-          END IF
-        ELSE
-          CALL ERR_ANNUL( STATUS )
-          AIO_WIDTH = 80
-        END IF
+        AIO_WIDTH = 80
+c       CALL PSX_GETENV( 'COLUMNS', COLS, STATUS )
+c       IF ( STATUS .EQ. SAI__OK ) THEN
+c         CALL CHR_CTOI( COLS, AIO_WIDTH, STATUS )
+c         IF ( STATUS .NE. SAI__OK .OR. AIO_WIDTH .LE. 0 ) THEN
+c           CALL ERR_ANNUL( STATUS )
+c           AIO_WIDTH = 80
+c         END IF
+c       ELSE
+c         CALL ERR_ANNUL( STATUS )
+c         AIO_WIDTH = 80
+c       END IF
 
 *    Simple filename mode
       ELSE
