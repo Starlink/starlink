@@ -724,7 +724,7 @@ rotate.f segment.f setmagic.f shadow.f slide.f \
 sqorst.f stats.f sub.f substitute.f surfit.f thresh.f \
 trandat.f traninvert.f tranjoin.f tranmake.f \
 transformer.f trantrace.f trig.f wiener.f zaplin.f \
-listmake.f listshow.f profile.f wcsalign.f wcstran.f version.f
+listmake.f listshow.f profile.f wcsalign.f wcstran.f kapversion.f
 
 #  kappa routines for which the atask action name can be derived from the 
 #  the f file name by remving the .f file suffix.
@@ -3669,7 +3669,7 @@ turbocont.o:	 SAE_PAR DAT_PAR PRM_PAR NDF_PAR NDF_ERR PAR_ERR GKS_PAR
 uget.o:          ME_COM C1_COM
 uput.o:	         ME_COM C1_COM
 vecplot.o:	 SAE_PAR PRM_PAR NDF_PAR CTM_PAR GKS_PAR
-version.o:	 SAE_PAR PAR_ERR
+kapversion.o:	 SAE_PAR PAR_ERR
 wcsadd.o:	 SAE_PAR NDF_PAR PAR_ERR AST_PAR
 wcsalign.o:	 SAE_PAR PRM_PAR PAR_ERR GRP_PAR
 wcsattrib.o:	 SAE_PAR NDF_PAR PAR_ERR AST_PAR

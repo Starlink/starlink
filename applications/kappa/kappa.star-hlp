@@ -31828,12 +31828,12 @@ MJC: Malcolm J. Currie (STARLINK)
 
    -  Bad pixels and automatic quality masking are supported.
 
-1 VERSION
+1 KAPVERSION
 Checks the package version number.
 
 Usage:
 
-   version [compare]
+   kapversion [compare]
 
 Description:
 
@@ -31871,10 +31871,10 @@ RESULT = INTEGER (Write)
 
    The same value is also written to standard output.
 2 Examples
-version
+kapversion
    Displays the version number of the installed package.
 
-version compare="V0.14-1"
+kapversion compare="V0.14-1"
    Compares the version of the installed package with the version
    "V0.14-1", and sets the RESULT parameter appropriately. For
    instance, if the installed package was "V0.13-6" then RESULT

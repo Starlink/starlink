@@ -253,6 +253,10 @@
          ELSE IF ( NAME .EQ. 'KAPHELP' ) THEN
             CALL KAPHELP ( STATUS )
 
+*  Check the package version number.
+         ELSE IF ( NAME .EQ. 'KAPVERSION' ) THEN
+            CALL KAPVERSION ( STATUS )
+
 *  Compares data sets using the Kolmogorov-Smirnov test
          ELSE IF ( NAME .EQ. 'KSTEST' ) THEN
             CALL KSTEST ( STATUS )
@@ -449,10 +453,6 @@
 *  Performs a trigonometric transformation on a data array.
          ELSE IF ( NAME .EQ. 'TRIG' ) THEN
             CALL TRIG ( STATUS )
-
-*  Check the package version number.
-         ELSE IF ( NAME .EQ. 'VERSION' ) THEN
-            CALL VERSION ( STATUS )
 
 *  Align a group of NDFs using the WCS components.
          ELSE IF ( NAME .EQ. 'WCSALIGN' ) THEN
