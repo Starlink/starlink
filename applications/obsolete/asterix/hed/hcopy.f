@@ -86,7 +86,7 @@
         INTEGER ONDIM                    ! Input dimensionality
         INTEGER DIMS(DAT__MXDIM)        ! Input dimensions
         INTEGER ODIMS(DAT__MXDIM)        ! Input dimensions
-        INTEGER PPOS, IPTR, IID
+        INTEGER PPOS, IPTR
 
       LOGICAL			ALLONES
       LOGICAL 			STRUC, PRIM		! Input attributes
@@ -106,8 +106,7 @@
       CALL AST_INIT()
 
 *    Associate the input object file
-      CALL USI_ASSOC( 'INP', '*', 'READ', IID, STATUS )
-      CALL ADI1_GETLOC( IID, ILOC, STATUS )
+      CALL USI_DASSOC( 'INP', 'READ', ILOC, STATUS )
 
 *    Get specification of output object
       CALL USI_GET0C( 'OUT', OUT, STATUS )
