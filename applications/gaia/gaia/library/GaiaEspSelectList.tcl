@@ -84,6 +84,11 @@ itcl::class gaia::GaiaEspSelectList {
     # Maximum number of objects to be drawn
     public variable maxobjects {} {}
 
+    # Colour of selection shapes
+    public variable selection_colour white {
+	config_all selection_colour $selection_colour
+    }
+
     # Create an editor panel, which manipulates the list of objects.
     public method edit_sourcelist {parent}
 
@@ -102,6 +107,9 @@ itcl::class gaia::GaiaEspSelectList {
 
     # default_config: (re-)initialise.
     public method default_config {}
+
+    # Set a configuration option for all objects.
+    public method config_all {item value}
 
     # --- Protected variables
     # None
@@ -147,4 +155,14 @@ body gaia::GaiaEspSelectList::get_sourcelist {} {
 body gaia::GaiaEspSelectList::default_config {} {
     set sourceshape circle
     set maxobjects 0
+}
+
+# Set a configuration option for all objects.  Note that it is
+# important to make sure that the object is drawn, using sync,
+# before applying the update.
+body gaia::GaiaEspSelectList::config_all {item value} {
+    foreach o $object_list_ {
+	#$o sync
+	$o configure -$item $value
+    }
 }

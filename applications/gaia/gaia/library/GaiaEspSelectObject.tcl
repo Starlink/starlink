@@ -106,6 +106,16 @@ itcl::class gaia::GaiaEspSelectObject {
     # when an object is updated
     public variable update_callback {} {}
 
+    #  Colour of selection shapes
+    #public variable selection_colour white {
+	#puts "selection colour now $selection_colour"
+	#$canvasdraw configure -outlinecolor $selection_colour
+	##$canvasdraw itemconfigure esp_sel -outline $selection_colour
+    #}
+    itk_option define -selection_colour selection_colour Selection_colour {white} {
+	$canvasdraw configure -outlinecolour $itk_option(-selection_colour)
+    }
+
 
     # --- Protected variables (available to inheritors)
 

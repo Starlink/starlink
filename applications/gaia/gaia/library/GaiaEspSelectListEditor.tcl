@@ -78,6 +78,10 @@ itcl::class gaia::GaiaEspSelectListEditor {
 	$itk_component(objlist) set_option Y Precision 1
 	$itk_component(objlist) set_option Radius Precision 1
 	pack $itk_component(objlist) -fill both -expand 1
+	# Now clear the table, even though there's nothing in it.
+	# This repaints the table, so that the canvasid column will be
+	# properly hidden as required.
+	$itk_component(objlist) clear
 
 	# Initialise the table with the current list of sources, if any
 	if { $object_list_ != {} } {
@@ -228,11 +232,18 @@ body gaia::GaiaEspSelectListEditor::delete_source {} {
 	# go through the list is descending order, so we remove items from
 	# object_list_ from the end
 	set sdlist [lsort -decreasing $dlist]
+	puts "Editor: dlist=$dlist  sdlist=$sdlist"
 	foreach row $sdlist {
 	    set rownum [lindex $row 0]
 	    set rowval [lindex $row 1]
-	    # delete from object_list_
-	    set object_list_ [lreplace $object_list_ $rownum $rownum]
+	    # delete from object_list_.  The object _should_ be in the
+	    # correct place in the object_list_, but put in an extra
+	    # test just in case something's been messed up.
+	    # Everything should come out in the wash with
+	    # remake_table_ anyway.
+	    if {[llength $object_list_] < $rownum} {
+		set object_list_ [lreplace $object_list_ $rownum $rownum]
+	    }
 	    # Delete from canvas last.  This update to the canvas calls
 	    # update_source_, which in turn calls remake_table_.
 	    $canvasdraw delete_object [lindex $rowval 3]

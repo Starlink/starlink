@@ -74,6 +74,10 @@ itcl::class gaia::GaiaEsp {
 	add_menubar
 	set File [add_menubutton "File" left]
 	configure_menubutton File -underline 0
+	set Options [add_menubutton "Options" left]
+	configure_menubutton Options -underline 0
+	set Colours [add_menubutton "Colours" left]
+	configure_menubutton Colours -underline 0
 
 	# Add window help
 	global gaia_dir
@@ -81,20 +85,46 @@ itcl::class gaia::GaiaEsp {
 	add_short_help $itk_component(menubar).help \
 		{Help menu: get some help about this window}
 
-	# Dummy command menu item
-	$File add command -label {Log ESP command} \
-		-command [code $this run 0 1]
 	# Create a new toolbox window
 	$File add command -label {New window} \
 		-command [code $this clone_me_] \
 		-accelerator {Control-n}
 	bind $w_ <Control-n> [code $this clone_me_]
 	add_menu_short_help $File {New window} {Create a new toolbox}
+	# Dummy command menu item
+	$File add command -label {Show ESP command} \
+		-command [code $this run 0 1]
 	# Exit menu item
 	$File add command -label Exit \
 		-command [code $this close] \
 		-accelerator {Control-c}
 	bind $w_ <Control-c> [code $this close]
+
+	#  Control of options
+	$Options add checkbutton \
+		-label {Warn if overwriting files?} \
+		-variable [scope itk_option(-warn-if-overwrite)]
+	$Options add checkbutton \
+		-label {Automatically fit background if necessary?} \
+		-variable [scope itk_option(-auto-fit-background)]
+
+	#  Control of colours of selections and result ellipses.
+	$Colours add cascade -label {Selections} \
+		-menu [menu $Colours.selcol]
+	$Colours add cascade -label {Result ellipses} \
+		-menu [menu $Colours.resellcol]
+	foreach {menu name} {\
+		selcol selection_colour \
+		resellcol ellipse_colour} {
+	    foreach c $itk_option(-colors) {
+		$Colours.$menu add radiobutton \
+			-value $c \
+			-background $c \
+			-command [code $this configure -$name $c] \
+			-variable [scope itk_option(-$name)]
+	    }
+	    configure -$name $itk_option(-$name)
+	}
 
 	#  Establish the defaults
 	set_defaults_
@@ -187,7 +217,7 @@ itcl::class gaia::GaiaEsp {
 	#set notebook_characteristics_(disable,mask) \
 	#	{outtextname  back nsigma}
 	#set notebook_characteristics_(reqsrc,mask) 0
-
+	
 	#  MIXUP
 	#set thisnum [get_panel_number_]
 	#$itk_component(notebook) add -label Mixup \
@@ -333,16 +363,15 @@ itcl::class gaia::GaiaEsp {
 
     # Destructor
     destructor {
-       puts "GaiaEsp destructor: delete files..."
-       foreach f $temporary_files_ {
-          catch {file delete $f}
-       }
-       if {$star_app_ != {} } {
-          $star_app_ delete_sometime
-       }
-       if {$hsub_star_app_ != {} } {
-          $hsub_star_app_ delete_sometime
-       }
+	puts "GaiaEsp destructor: delete files..."
+	foreach f $temporary_files_ {
+	    puts "deleting file $f..."
+	    exec rm $f
+	}
+	if { $star_app_ != {} } {
+	    catch {$star_app_ delete_sometime}
+	    set star_app_ {}
+	}
     }
 
     # Methods
@@ -366,19 +395,6 @@ itcl::class gaia::GaiaEsp {
 
     #  Actually run the command
     public method run {execit showit} {
-	#if {$values_($this,sourcefile) == {}} {
-	#    set values_($this,sourcefile) [temp_file_name_ "/tmp/GAIA_source"]
-	#}
-	#if {$values_($this,outputndffile) == {}} {
-	#    set values_($this,outputndffile) [temp_file_name_ "/tmp/GaiaEsp_outputndf"]
-	#}
-	#if {$values_($this,outputtextfile) == {}} {
-	#    set values_($this,outputtextfile) [temp_file_name_ "/tmp/GaiaEsp_outputtxt"]
-	#}
-	#if {$values_($this,outputstlfile) == {}} {
-	#    set values_($this,outputstlfile) [temp_file_name_ "/tmp/GaiaEsp_outputstl" ".txt"]
-	#}
-
 	# delete the results of any previous run from this toolbox
 	delete_canvas_graphics_ esp_out$w_
 
@@ -408,17 +424,22 @@ itcl::class gaia::GaiaEsp {
 		}
 	    }
 	    if {$fileexists != ""} {
-		set w [DialogWidget $w_.dialog \
-			-text [format "I'll overwrite output files\n%s.\nIs that OK?" $fileexists] \
-			-bitmap warning \
-			-buttons {OK Cancel} \
-			-default 1 \
-			-modal 1]
-		set answer [$w activate]
-		if {$answer == 0} {
-		    eval exec rm $fileexists
+		if {$itk_option(-warn-if-overwrite)} {
+		    set w [DialogWidget $w_.dialog \
+			    -text [format "I'll overwrite output files\n%s.\nIs that OK?" $fileexists] \
+			    -bitmap warning \
+			    -buttons {OK Cancel} \
+			    -default 1 \
+			    -modal 1]
+		    set answer [$w activate]
+		    if {$answer == 0} {
+			eval exec rm $fileexists
+		    } else {
+			return {}
+		    }
 		} else {
-		    return {}
+		    # Delete silently
+		    eval exec rm $fileexists
 		}
 	    }
 	}
@@ -428,7 +449,7 @@ itcl::class gaia::GaiaEsp {
 	set allok 1
 	if {$arglist == {}} {
 	    set allok 0
-	    # ...but don't put out another error message, since the
+	    # ...but don't put out another error message, since the 
 	    # make_..._command_ should have done that
 	} elseif {$image == {}} {
 	    set allok 0
@@ -441,23 +462,23 @@ itcl::class gaia::GaiaEsp {
 	    error_dialog "Can't save sources"
 	}
 
-	if {[info exists notebook_characteristics_(disable,$whichpage)]} {
-	    set disable_chars $notebook_characteristics_(disable,$whichpage)
-	} else {
-	    set disable_chars {}
-	}
-	if {[lsearch $disable_chars {outndfname}] < 0} {
-	    if {[file exists $values_($this,outputndffile)]} {
-		set allok 0
-		error_dialog "Output NDF file $values_($this,outputndffile) already exists"
-	    }
-	}
-	if {[lsearch $disable_chars {outtextname}] < 0} {
-	    if {[file exists $values_($this,outputtextfile)]} {
-		set allok 0
-		error_dialog "Output text file $values_($this,outputtextfile) already exists"
-	    }
-	}
+	#if {[info exists notebook_characteristics_(disable,$whichpage)]} {
+	#    set disable_chars $notebook_characteristics_(disable,$whichpage)
+	#} else {
+	#    set disable_chars {}
+	#}
+	#if {[lsearch $disable_chars {outndfname}] < 0} {
+	#    if {[file exists $values_($this,outputndffile)]} {
+	#	set allok 0
+	#	error_dialog "Output NDF file $values_($this,outputndffile) already exists"
+	#    }
+	#}
+	#if {[lsearch $disable_chars {outtextname}] < 0} {
+	#    if {[file exists $values_($this,outputtextfile)]} {
+	#	set allok 0
+	#	error_dialog "Output text file $values_($this,outputtextfile) already exists"
+	#    }
+	#}
 
 	if {$allok} {
 
@@ -531,7 +552,7 @@ itcl::class gaia::GaiaEsp {
 	if {[lsearch $disable_chars {outtextname}] < 0} {
 	    set s "${s}Text output in file $values_($this,outputtextfile)\n"
 	}
-
+	
 	info_dialog $s
     }
 
@@ -540,14 +561,23 @@ itcl::class gaia::GaiaEsp {
 
 	# Get rid of the scrawls on the canvas,
 	# and replace them with the result ellipses.
-	$itk_option(-canvasdraw) clear
+	#$itk_option(-canvasdraw) clear
+
+	if {! $revealed_($indexes_(results))} {
+	    # This has to be revealed (ie, constructed) before we can
+	    # add material to the results-menu component below.
+	    reveal_ $indexes_(results)
+	}
 
 	set stl [gaia::StarSTLFile #auto $values_($this,outputstlfile)]
 	if {[$stl status]} {
 	    set nellipses [$stl parameter _nrows]
-	    set resultscontents {}
+	    set ESP_results_ {}
+	    $itk_component(results-menu) clear
+	    set sourcen 0
 	    for {set elln 1} {$elln <= $nellipses} {incr elln} {
 		$stl reset_isvalid
+		set ell_src [$stl table $elln sourcen]
 		set ell_x   [$stl table $elln x]
 		set ell_y   [$stl table $elln y]
 		set ell_sma [$stl table $elln semimajor]
@@ -570,30 +600,51 @@ itcl::class gaia::GaiaEsp {
 			    $ell_sma 0 image canvd1 canvd2 canvas
 		    set canvsma [expr $canvd1+$canvd2]
 		    set canvpa [expr $ell_pos - 90]
-		    #lappend canvas_scrawls_ [
 		    $itk_option(-canvas) \
 			    create rtd_ellipse \
 			    $canvx $canvy \
 			    -semimajor $canvsma \
 			    -semiminor [expr $canvsma * $ell_invell] \
 			    -angle $canvpa \
-			    -outline white \
+			    -outline $itk_option(-ellipse_colour) \
 			    -tags esp_out$w_
-		    #]
+
+		    if {$ell_src != $sourcen} {
+			incr sourcen
+			$itk_component(results-menu) add \
+				-label [format "Galaxy %d: (%.1f,%.1f)" $sourcen $ell_x $ell_y] \
+				-command [code $this show_ellprofou_results_ $sourcen]
+		    }
 		} else {
 		    puts "can't read details of ellipse $elln"
 		}
 
-		lappend resultscontents \
-		    [list $ell_x $ell_y $ell_sma $ell_pos [expr 1/$ell_invell]]
+		lappend ESP_results_ \
+		    [list $sourcen $ell_x $ell_y $ell_sma $ell_pos [expr 1/$ell_invell]]
 	    }
-	    reveal_ $indexes_(results)
-	    $itk_component(results) clear
-	    $itk_component(results) append_rows $resultscontents
-	    $itk_component(results) new_info
+	    show_ellprofou_results_ 1
+	    #  There's a problem here: after clearing the menu and
+	    #  adding more items, the menu still shows the label it
+	    #  had before being cleared.  I thought
+	    #  `update_menubutton' would fix this, but it doesn't seem
+	    #  to have any effect.
+	    $itk_component(results-menu) update_menubutton
 	} else {
 	    error_dialog "Error reading ELLPRO output file:\n[$stl error_msg]"
 	}
+    }
+
+    private method show_ellprofou_results_ {sourcen} {
+	if {! $revealed_($indexes_(results))} {
+	    reveal_ $indexes_(results)
+	}
+	$itk_component(results) clear
+	foreach row $ESP_results_ {
+	    if {[lindex $row 0] == $sourcen} {
+		$itk_component(results) append_row $row
+	    }
+	}
+	$itk_component(results) new_info
     }
 
     # return `true' or `false' depending on whether $value_($this,$var) is
@@ -710,7 +761,7 @@ itcl::class gaia::GaiaEsp {
 	    error_dialog "Need to have BACK and SIGMA specified"
 	    return {}
 	}
-
+	
 	set arglist {}
 
 	lappend arglist "$itk_option(-esp_dir)/corr"
@@ -811,14 +862,20 @@ itcl::class gaia::GaiaEsp {
 	# insist that back and sigma be specified, otherwise return ""
 	if {$values_($this,sigma) <= 0} {
 	    # If Sigma is null, that's an error, because ELLPRO/FOU
-	    # refuse to deal with that.
-	    set w [DialogWidget $w_.dialog \
-		    -text "No background or standard deviation\nspecified.  Should I estimate them?" \
-		    -bitmap warning \
-		    -buttons {OK Cancel} \
-		    -default 1 \
-		    -modal 1]
-	    set answer [$w activate]
+	    # refuse to deal with that.  If -auto-fit-background is
+	    # true, then automatically fit the background, if false,
+	    # then ask for permission, in case this is an error.
+	    if {$itk_option(-auto-fit-background)} {
+		set answer 0
+	    } else {
+		set w [DialogWidget $w_.dialog \
+			-text "No background or standard deviation\nspecified.  Should I estimate them?" \
+			-bitmap warning \
+			-buttons {OK Cancel} \
+			-default 1 \
+			-modal 1]
+		set answer [$w activate]
+	    }
 	    if {$answer == 0} {
 		bg_from_hsub_ 1
 	    } else {
@@ -868,7 +925,7 @@ itcl::class gaia::GaiaEsp {
 	}
 	# Catalogue name (after path, and before ".txt") may contain
 	# only alphanumerics plus underscore.  This isn't obviously documented
-	# anywhere, but can be discovered from an inspection of
+	# anywhere, but can be discovered from an inspection of 
 	# cat1_cnmpr.f in the CAT library.
 	if {! [regexp {^(.*/)?[A-Za-z0-9_]+\.txt$} $ofname]} {
 	    error_dialog "STL catalogue name may include only\nalphanumeric characters plus underscore"
@@ -1203,7 +1260,7 @@ itcl::class gaia::GaiaEsp {
 	    error_dialog "Need to have BACK and SIGMA specified"
 	    return {}
 	}
-
+	
 	set arglist {}
 
 	lappend arglist "$itk_option(-esp_dir)/fastmed"
@@ -1212,7 +1269,7 @@ itcl::class gaia::GaiaEsp {
 	lappend arglist "out=$values_($this,outputndffile)"
 	lappend arglist "back=$values_($this,back)"
 	lappend arglist "sigma=$values_($this,sigma)"
-	lappend arglist "width=$values_($this,width)"
+	lappend arglist "width=$values_($this,width)"	
 
 	return $arglist
     }
@@ -1323,7 +1380,7 @@ itcl::class gaia::GaiaEsp {
 	#}
 	#pack $itk_component(gaufitnotebook) -side top -fill both -expand 1 \
 	#	-ipadx 1m -ipady 1m
-
+	    
 	#  Do we use the least-squares fit or not?
 	#  (it might be better to use radiobuttons for
 	#  least-squares/search)
@@ -1353,7 +1410,7 @@ itcl::class gaia::GaiaEsp {
 	}
 	pack $itk_component(autol-gaufit) -side top -fill x -ipadx 1m -ipady 1m
 	add_short_help $itk_component(autol-gaufit) \
-		{Is the source origin provided to be refined?}
+		{Is the source origin provided to be refined?}		    
 
 	itk_component add anginc {
 	    LabelEntryScale $parent.anginc \
@@ -1475,7 +1532,7 @@ itcl::class gaia::GaiaEsp {
 	add_short_help $itk_component(yinc) \
 		{The amount by which the Y-coordinate of a source may vary, from 0 (fixed) to 1 (completely free)}
 
-
+	
 	#  Fit background?
 	#  If not, then also back, sigma, nsigma
 
@@ -1545,7 +1602,7 @@ itcl::class gaia::GaiaEsp {
     }
 
     private method make_gaufit_command_ {image} {
-	# insist that either fitback is true, or else
+	# insist that either fitback is true, or else 
 	# back, sigma and nsigma have values.
 	if {! $values_($this,fitback)
 	&& ($values_($this,back) < 0
@@ -1663,7 +1720,7 @@ itcl::class gaia::GaiaEsp {
 		-wrap 0
 	pack $cs.f1 $cs.f2 -side top -anchor w
 	pack $cs.rb1 $cs.rb2 -side top -anchor w -in $cs.f1 -ipady 1m
-	pack $cs.rb3 $cs.e -side left -in $cs.f2
+	pack $cs.rb3 $cs.e -side left -in $cs.f2 
 	pack $itk_component(sfact-hsub) -side top -fill x -ipadx 1m -ipady 1m
 	add_short_help $itk_component(sfact-hsub) \
 		{Type of Gaussian smoothing requested}
@@ -1786,7 +1843,7 @@ documentation which you should refer to for further details"
 		-wrap 0
 	pack $cs.f1 $cs.f2 -side top -anchor w
 	pack $cs.rb1 $cs.rb2 -side top -anchor w -in $cs.f1 -ipady 1m
-	pack $cs.rb3 $cs.e -side left -in $cs.f2
+	pack $cs.rb3 $cs.e -side left -in $cs.f2 
 	pack $itk_component(sfact-loback) -side top -fill x -ipadx 1m -ipady 1m
 	add_short_help $itk_component(sfact-loback) \
 		{Type of Gaussian smoothing requested}
@@ -1920,7 +1977,7 @@ to be specified"
 	lappend arglist "cursor=no"
 	lappend arglist "again=no"
 
-	return $arglist
+	return $arglist	
     }
 
     private method reset_sector_ {} {
@@ -2165,13 +2222,13 @@ to be specified"
     ### SKEW...
     private method make_skew_command_ {image} {
 	# insist that back and sigma be specified, otherwise return ""
-	if {$values_($this,back) <= 0
+	if {$values_($this,back) <= 0 
 		|| $values_($this,sigma) <= 0
     		|| $values_($this,nsigma) <= 0} {
 	    error_dialog "Need to have BACK, SIGMA, NSIGMA specified"
 	    return {}
 	}
-
+	
 	set arglist {}
 
 	lappend arglist "$itk_option(-esp_dir)/skew"
@@ -2262,13 +2319,13 @@ to be specified"
     ### TOPPED...
     private method make_topped_command_ {image} {
 	# insist that back and sigma be specified, otherwise return ""
-	if {$values_($this,back) <= 0
+	if {$values_($this,back) <= 0 
 		|| $values_($this,sigma) <= 0
     		|| $values_($this,nsigma) <= 0} {
 	    error_dialog "Need to have BACK, SIGMA, NSIGMA specified"
 	    return {}
 	}
-
+	
 	set arglist {}
 
 	lappend arglist "$itk_option(-esp_dir)/topped"
@@ -2338,23 +2395,36 @@ to be specified"
     private method reset_results_ {} {
 	# Clear the page of results, if it's present
 	if {$revealed_($indexes_(results))} {
+	    $itk_component(results-menu) clear
 	    $itk_component(results) clear
 	}
     }
 
     private method add_results_selections_ {parent} {
+	itk_component add results-menu {
+	    LabelMenu $parent.results-menu \
+		    -text "Source:"
+	}
+	$itk_component(results-menu) add -label "None" -value 0
+	pack $itk_component(results-menu) -side top
+
 	itk_component add results {
 	    TableList $parent.results \
 		    -title "Results" \
-		    -headings {X Y SemiMajor PA Ellipt} \
-		    -sizes {10 10 10 10 10}
+		    -headings {SourceN X Y SemiMajor PA Ellipt} \
+		    -sizes {10 10 10 10 10 10}
 	}
 	$itk_component(results) set_option X Precision 1
 	$itk_component(results) set_option Y Precision 1
 	$itk_component(results) set_option SemiMajor Precision 1
 	$itk_component(results) set_option PA Precision 3
 	$itk_component(results) set_option Ellipt Precision 3
+	$itk_component(results) set_option SourceN Show 0
 	pack $itk_component(results) -fill both -expand 1
+	# Now clear the table, even though there's nothing in it.
+	# This repaints the table, so that the SourceN column will be
+	# properly hidden as required.
+	$itk_component(results) clear
     }
 
     #  Set an element of the values_ array
@@ -2552,10 +2622,10 @@ ardfile
 
     # If values_($this,expert) is now `true', then enable a set of
     # fields; if it is now `false',
-    # switch that set off.  The set consists of $expert_parameter_list_ if
+    # switch that set off.  The set consists of $expert_parameter_list_ if 
     # `useellpromethod' is pro or proslow, but if that is false, then
-    # the set consists of
-    # {$expert_parameter_list_ \ $ellpro_only_}, and the members of
+    # the set consists of 
+    # {$expert_parameter_list_ \ $ellpro_only_}, and the members of 
     # $ellpro_only_ should all be disabled.
     private method toggle_expert_ {} {
 	if {$values_($this,expert)} {
@@ -2638,13 +2708,12 @@ ardfile
 
 	# Establish a control object for this task, if not already done
 	blt::busy hold $w_
-        if { $hsub_star_app_ == {} } { 
-           set hsub_star_app_ [StarApp #auto \
-                                  -show_output $itk_component(status) \
-                                  -notify [code $this completed_bg_from_hsub_] \
-                                  -application $invoke_cmd
-                              ]
-        }
+
+	set hsub_star_app_ [StarApp #auto \
+		-show_output $itk_component(status) \
+		-notify [code $this completed_bg_from_hsub_] \
+		-application $invoke_cmd
+	]
 
 	# Clear the log window
 	$itk_component(status) clear 0 end
@@ -2703,7 +2772,7 @@ ardfile
 	    add_short_help $itk_component(inardname-$toolname) \
 		    {Name of input ARD file}
 	}
-
+	    
 	if {[lsearch $panellist outndfname] >= 0} {
 	    itk_component add outndfname-$toolname {
 		LabelFileChooser $parent.outndfname \
@@ -2716,7 +2785,7 @@ ardfile
 	    add_short_help $itk_component(outndfname-$toolname) \
 		    {Name of output NDF file}
 	}
-
+	    
 	if {[lsearch $panellist outtextname] >= 0} {
 	    itk_component add outtextname-$toolname {
 		LabelFileChooser $parent.outtextname \
@@ -2824,12 +2893,29 @@ ardfile
 
     #  Name of rtdimage widget
     itk_option define -rtdimage rtdimage RtdImage {} {}
-
+    
     #  Name of RtdImageCtrl widget or a derived class.
     itk_option define -image image Image {} {}
 
     #  Identifying number for toolbox (shown in () in window title).
     itk_option define -number number Number 0 {}
+
+    #  Colours
+    itk_option define -ellipse_colour ellipse_colour Ellipse_colour {white} {
+	$itk_option(-canvas) itemconfigure esp_out$w_ \
+		-outline $itk_option(-ellipse_colour)
+    }
+    itk_option define -selection_colour selection_colour Selection_colour {white} {
+	$itk_option(-canvas) itemconfigure esp_sel \
+		-outline $itk_option(-selection_colour)
+	$itk_option(-canvasdraw) configure \
+		-outlinecolor $itk_option(-selection_colour)
+	#if { $objectlist_ != {} } {
+	#    foreach o $objectlist_ {
+	#	$o configure -selection_colour $itk_option(-selection_colour)
+	#    }
+	#}
+    }
 
     #  Command to execute to create a new instance of this object.
     itk_option define -clone_cmd clone_cmd Clone_Cmd {}
@@ -2840,6 +2926,19 @@ ardfile
     #  How wide should the panel be (minimum)?
     itk_option define -width gaiaespwidth GaiaEspWidth 350
     itk_option define -height gaiaespheight GaiaEspHeight 500
+
+    #  Possible colours.
+    itk_option define -colors colors Colors {
+	red green blue cyan magenta yellow white grey90 grey40 grey10 black
+    }
+
+    #  Should the application warn if output files are about to be overwritten?
+    itk_option define -warn-if-overwrite warn-if-overwrite Warn-if-overwrite 1
+
+    #  Should the application ask for permission before automatically
+    #  fitting a background
+    itk_option define -auto-fit-background \
+	    auto-fit-background Auto-fit-background 0
 
     #  Define ESP directory
     itk_option define -esp_dir esp_dir Esp_Dir {} {
@@ -2875,7 +2974,6 @@ ardfile
 
     #  The interaction with the actual application
     private variable star_app_ {}
-    private variable hsub_star_app_ {}
     #  The command the star_app_ was invoked with, if any
     private variable star_app_name_ {}
 
@@ -2894,6 +2992,9 @@ ardfile
 
     #  Options which are specific to ellpro.  All of these are expert-only
     private variable ellpro_only_ {lim3 minmod}
+
+    #  List/table of results obtained from ESP run
+    private variable ESP_results_
 
     # Files to be deleted within destructor
     private variable temporary_files_ {}
