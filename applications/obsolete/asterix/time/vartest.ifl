@@ -5,11 +5,13 @@
        PPATH     'GLOBAL'
        ASSOCIATION '<-GLOBAL.BINDS'
        PROMPT 'Source time series'
+       POSITION 1
     ENDPARAMETER
 
     PARAMETER BACK
        TYPE      'UNIV'
        PROMPT 'Background time series'
+       POSITION 2
     ENDPARAMETER
 
     PARAMETER AREA
