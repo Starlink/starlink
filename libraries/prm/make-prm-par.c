@@ -473,9 +473,9 @@ int main (int argc, char **argv)
 
     
     comment("Bad values, used for flagging undefined data.");
-    par_i(-1, "VAL__BADUB",  UINT8_MAX);
+    par_i(1, "VAL__BADUB",  UINT8_MAX);
     par_i(-1, "VAL__BADB",    INT8_MIN);
-    par_i(-2, "VAL__BADUW", UINT16_MAX);
+    par_i(2, "VAL__BADUW", UINT16_MAX);
     par_i(-2, "VAL__BADW",   INT16_MIN);
     par_i(-4, "VAL__BADI",   INT32_MIN);
     par_f(1, "VAL__BADR", -FLT_MAX);
