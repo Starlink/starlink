@@ -833,7 +833,7 @@
                   ELSE
                     CALL MSG_SETC( 'TXT', 'data = ' )
                   END IF
-                  CALL MSG_SETC( 'DAT', DATAROW(I) )
+                  CALL MSG_SETC( 'DAT', WD_DATA(I)(:DATA_LEN) )
                   CALL IMPORT_ERROR( 'Read error, ^TXT "^DAT"', CLINE )
                   STATUS = SAI__ERROR
                   GOTO 99
@@ -863,7 +863,7 @@
                 ELSE
                   CALL MSG_SETC( 'TXT', 'data =' )
                 END IF
-                CALL MSG_SETC( 'DAT', DATAROW(I) )
+                CALL MSG_SETC( 'DAT', WD_DATA(I)(:DATA_LEN) )
                 CALL IMPORT_ERROR( 'Read error, ^TXT "^DAT"', CLINE )
                 STATUS = SAI__ERROR
                 GOTO 99
