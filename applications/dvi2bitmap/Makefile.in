@@ -55,7 +55,7 @@ D2BLIB=libdvi2bitmap.a
 .cc.o:
 	$(CXX) $(CXXFLAGS) -c $<
 .c.o:
-	$(CC) $(CPPFLAGS) $(DEFS) -c $<
+	$(CC) $(CPPFLAGS) -I. $(DEFS) -c $<
 
 $(EXEC): dvi2bitmap.o $(OBJS)
 	$(CXX) dvi2bitmap.o $(OBJS) $(LIBS) -o $@
