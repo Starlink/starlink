@@ -73,7 +73,7 @@ require DynaLoader;
 
 Exporter::export_tags('ams','adam');
 
-$VERSION = '0.01';
+$VERSION = '1.00';
 
 sub AUTOLOAD {
     # This AUTOLOAD is used to 'autoload' constants from the constant()
