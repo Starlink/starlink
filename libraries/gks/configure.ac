@@ -29,7 +29,7 @@ dnl STAR_HAVE_FC_OPEN_READONLY
 STAR_CNF_COMPATIBLE_SYMBOLS
 
 dnl    Declare the build and use dependencies for this package
-STAR_DECLARE_DEPENDENCIES(build, [cnf])
+STAR_DECLARE_DEPENDENCIES(build, [cnf gwm])
 STAR_DECLARE_DEPENDENCIES(link,  [gwm ems])
 
 dnl    List the sun/ssn/... numbers which document this package and
