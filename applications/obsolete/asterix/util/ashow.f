@@ -84,6 +84,8 @@
 *  History:
 *     13 Apr 1995 1.8-0 (DJA):
 *        Original version.
+*     14 Aug 1995 1.8-1 (DJA):
+*        Improved timing report and added links option.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -111,11 +113,13 @@
         PARAMETER ( IC_MIS = 2 )
       INTEGER			IC_TIM
         PARAMETER ( IC_TIM = 4 )
+      INTEGER			IC_LNK
+        PARAMETER ( IC_LNK = 8 )
       INTEGER			IC_ALL
-        PARAMETER ( IC_ALL = IC_WCS+IC_MIS+IC_TIM )
+        PARAMETER ( IC_ALL = IC_WCS+IC_MIS+IC_TIM+IC_LNK )
 
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'ASHOW Version 1.8-0' )
+        PARAMETER		( VERSION = 'ASHOW Version 1.8-1' )
 
 *  Local Variables:
       CHARACTER*200		FILE, PATH		! File path info
@@ -156,7 +160,13 @@
             ITEMC = ITEMC + IC_WCS
 
           ELSE IF ( CHR_INSET( ITEM, 'MISS' ) ) THEN
-            ITEMC = ITEMC + IC_WCS
+            ITEMC = ITEMC + IC_MIS
+
+          ELSE IF ( CHR_INSET( ITEM, 'TIME' ) ) THEN
+            ITEMC = ITEMC + IC_TIM
+
+          ELSE IF ( CHR_INSET( ITEM, 'LINKS' ) ) THEN
+            ITEMC = ITEMC + IC_LNK
 
 *      Otherwise error
           ELSE
@@ -193,6 +203,11 @@
 *    World coordinates?
         IF ( IAND( ITEMC, IC_WCS ) .NE. 0 ) THEN
           CALL ASHOW_WCS( IFID, OCH, STATUS )
+        END IF
+
+*    File links
+        IF ( IAND( ITEMC, IC_LNK ) .NE. 0 ) THEN
+          CALL ASHOW_LNK( IFID, OCH, STATUS )
         END IF
 
       END IF
@@ -641,6 +656,10 @@
       INTEGER 			STATUS             	! Global status
 
 *  Local Variables:
+      CHARACTER*8		DSTR, TSTR		! Date and time
+
+      DOUBLE PRECISION		MJD			! MJD at start
+
       INTEGER			TIMID			! TCI info
 *.
 
@@ -663,8 +682,14 @@
      :                  STATUS )
       CALL AIO_BLNK( OCH, STATUS )
 
-      CALL ASHOW_OB( TIMID, 'DateObs', 'C', 'Date at start', ' ',
-     :                'np', OCH, STATUS )
+      CALL ADI_CGET0D( TIMID, 'MJDObs', MJD, STATUS )
+      IF ( STATUS .EQ. SAI_OK ) THEN
+        CALL TCI_MJD2DT( MJD, DSTR, TSTR, STATUS )
+        CALL ASHOW_VAL( DSTR//' '//TSTR, 'Date/time at start', ' ',
+     :                  OCH, STATUS )
+      ELSE
+        CALL ERR_ANNUL( STATUS )
+      END IF
       CALL ASHOW_OB( TIMID, 'MJDObs', 'D', 'MJD at start', ' ',
      :                'np', OCH, STATUS )
       CALL ASHOW_OB( TIMID, 'TAIObs', 'C', 'TAI at start', 'days',
@@ -679,6 +704,145 @@
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'ASHOW_TIM', STATUS )
+
+      END
+
+
+
+      SUBROUTINE ASHOW_LNK( IFID, OCH, STATUS )
+*+
+*  Name:
+*     ASHOW_LNK
+
+*  Purpose:
+*     Display file links
+
+*  Language:
+*     Starlink Fortran
+
+*  Invocation:
+*     CALL ASHOW_TIM( IFID, OCH, STATUS )
+
+*  Description:
+*     {routine_description}
+
+*  Arguments:
+*     IFID = INTEGER (given)
+*        Input dataset identifier
+*     OCH = INTEGER (given)
+*        Output channel identifier
+*     STATUS = INTEGER (given and returned)
+*        The global status.
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
+*     {algorithm_description}...
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
+*     {routine_deficiencies}...
+
+*  Keywords:
+*     ashow, usage:private
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1995
+
+*  Authors:
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*     13 Apr 1995 (DJA):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'ADI_PAR'
+
+*  Arguments Given:
+      INTEGER			IFID			! Input dataset id
+      INTEGER			OCH			! Output channel
+
+*  Status:
+      INTEGER 			STATUS             	! Global status
+
+*  Local Constants:
+      INTEGER			NLINK
+        PARAMETER		( NLINK = 2 )
+
+*  Local Variables:
+      CHARACTER*4		LNAMS(NLINK)		! Link names
+      CHARACTER*40		LDESC(NLINK)		! Link descriptions
+      CHARACTER*132		LINK			! Link value
+
+      INTEGER			I			! Loop over links
+
+      LOGICAL			OK			! Link is present
+
+*  Local Data:
+      DATA			LNAMS/'BGND', 'VIGN'/
+      DATA			LDESC/'Background dataset',
+     :                                'Vignetting factors dataset'/
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Write heading
+      CALL AIO_BLNK( OCH, STATUS )
+      CALL AIO_IWRITE( OCH, 2, 'File link information :', STATUS )
+      CALL AIO_BLNK( OCH, STATUS )
+
+*  Write each link
+      DO I = 1, NLINK
+
+*    Link is present
+        CALL FRI_CHK( IFID, LNAMS(I)(:CHR_LEN(LNAMS(I))), OK, STATUS )
+        IF ( OK ) THEN
+          CALL ASHOW_VAL( LINK, LDESC(I), ' ', OCH, STATUS )
+        ELSE
+          CALL ASHOW_VAL( '* not set *', LDESC(I), ' ', OCH, STATUS )
+        END IF
+
+      END DO
+
+
+*  Report any errors
+      IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'ASHOW_LNK', STATUS )
 
       END
 
@@ -862,5 +1026,124 @@
         END IF
 
       END IF
+
+      END
+
+
+      SUBROUTINE ASHOW_VAL( CVALUE, DESCRIP, UNITS, OCH, STATUS )
+*+
+*  Name:
+*     ASHOW_VAL
+
+*  Purpose:
+*     Format an ADI item
+
+*  Language:
+*     Starlink Fortran
+
+*  Invocation:
+*     CALL ASHOW_OBI( CVALUE, DESCRIP, UNITS, OCH, STATUS )
+
+*  Description:
+*     {routine_description}
+
+*  Arguments:
+*     CVALUE = CHARACTER*(*) (given)
+*        Value to format
+*     DESCRIP = CHARACTER*(*)
+*        Description of the object
+*     UNITS = CHARACTER*(*)
+*        Units of the object
+*     OCH = INTEGER (given)
+*        Output channel identifier
+*     STATUS = INTEGER (given and returned)
+*        The global status.
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
+*     {algorithm_description}...
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
+*     {routine_deficiencies}...
+
+*  Keywords:
+*     ashow, usage:private
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1995
+
+*  Authors:
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*     13 Apr 1995 (DJA):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+
+*  Arguments Given:
+      CHARACTER*(*)		CVALUE, DESCRIP, UNITS
+      INTEGER			OCH			! Output channel
+
+*  Status:
+      INTEGER 			STATUS             	! Global status
+
+*  Local Constants:
+      INTEGER			IND			! Indentation
+        PARAMETER		( IND = 6 )
+
+*  Local Variables:
+      CHARACTER*20		LDESCRIP
+
+      LOGICAL			OK			! Data is ok?
+      LOGICAL			THERE			! Member exists?
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Local copy of description
+      LDESCRIP = DESCRIP
+
+*    Set tokens
+      CALL MSG_SETC( 'VAL', CVALUE )
+      CALL MSG_SETC( 'UNITS', UNITS )
+      CALL AIO_IWRITE( OCH, IND, LDESCRIP//' : ^VAL ^UNITS', STATUS )
 
       END
