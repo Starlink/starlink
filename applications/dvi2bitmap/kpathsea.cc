@@ -76,6 +76,8 @@ extern "C" {
 #include <kpathsea/debug.h>
 #include <kpathsea/proginit.h>
 #include <kpathsea/tex-glyph.h>
+
+    kpse_format_info_type kpse_format_info[kpse_last_format] = { 0 };
 }
 #undef STDC_HEADERS
 #undef HAVE_PROTOTYPES
