@@ -166,7 +166,7 @@ proc unknown args {
 	if {![array size unknown_pending]} {
 	    unset unknown_pending
 	}
-	if {$msg} {
+	if {$msg != 0} {
 	    set errorCode $savedErrorCode
 	    set errorInfo $savedErrorInfo
 	    set code [catch {uplevel 1 $args} msg]
@@ -315,6 +315,7 @@ proc auto_load_index {} {
 	if {$issafe} {
 	    catch {source [file join $dir tclIndex]}
 	} elseif {[catch {set f [open [file join $dir tclIndex]]}]} {
+            catch {source [file join $dir tclIndex]}
 	    continue
 	} else {
 	    set error [catch {
