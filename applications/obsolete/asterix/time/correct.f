@@ -53,7 +53,8 @@
 *
 *     12 Nov 93 : V1.7-0 Original (DJA)
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
-*     30 JUL 95 : V1.8-1 Preliminary ADI conversions (DJA)
+*     30 Jul 95 : V1.8-1 Preliminary ADI conversions (DJA)
+*      5 Sep 95 : V1.8-2 Better treatment of live times (DJA)
 *
 *    Type definitions :
 *
@@ -63,7 +64,6 @@
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'ADI_PAR'
-      INCLUDE 'DAT_PAR'
 *
 *    Status :
 *
@@ -80,9 +80,6 @@
 *
 *    Local variables :
 *
-      CHARACTER*(DAT__SZLOC)	HLOC			! Input dataset header
-      CHARACTER*(DAT__SZLOC)	LLOC			! Output LIVE_TIMEs
-      CHARACTER*(DAT__SZLOC)	OLOC			! Output dataset
       CHARACTER*80		HTXT(MAXHTEXT)		! History text
       CHARACTER*80		TEXT			!
 
@@ -104,6 +101,7 @@
       INTEGER			QPTR			! Quality pointer
       INTEGER                   T_AX, X_AX, Y_AX 	! Axis numbers
       INTEGER			TDIMS(ADI__MXDIM)	! Temp dimensions
+      INTEGER			TIMID			! I/p timing
       INTEGER                   TLEN			! Length of a string!
       INTEGER			TNDIM			! Temp dimensionality
       INTEGER			VPTR			! Variance pointer
@@ -123,23 +121,23 @@
 *    Version :
 *
       CHARACTER*30 VERSION
-        PARAMETER  ( VERSION = 'CORRECT Version 1.8-1' )
+        PARAMETER  ( VERSION = 'CORRECT Version 1.8-2' )
 *-
 
-*    Check status
+*  Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Initialise Asterix
+*  Initialise Asterix
       CALL AST_INIT()
 
-*    Version id
+*  Version id
       CALL MSG_PRNT( VERSION )
 
-*    Overwrite input?
+*  Overwrite input?
       CALL USI_GET0L( 'OVER', OVER, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Get either one or two dataset names
+*  Get either one or two dataset names
       IF ( OVER ) THEN
         CALL USI_TASSOCI( 'INP', '*', 'UPDATE', IFID, STATUS )
         CALL ADI_CLONE( IFID, OFID, STATUS )
@@ -150,10 +148,7 @@
 
       END IF
 
-*    Extract locators
-      CALL ADI1_GETLOC( OFID, OLOC, STATUS )
-
-*    See if corrected structure is there
+*  See if corrected structure is there
       CALL PRF_GET( OFID, 'CORRECTED.EXPOSURE', OK, STATUS )
       IF ( OK ) THEN
         STATUS = SAI__ERROR
@@ -162,7 +157,7 @@
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Get input data
+*  Get input data
       CALL BDI_CHKDATA( OFID, OK, NDIM, DIMS, STATUS )
       IF ( .NOT. OK ) THEN
         STATUS = SAI__ERROR
@@ -172,20 +167,20 @@
       CALL BDI_MAPDATA( OFID, 'UPDATE', DPTR, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Total number of data points
+*  Total number of data points
       CALL ARR_SUMDIM( NDIM, DIMS, NELM )
 
-*    Variance present?
+*  Variance present?
       CALL BDI_CHKVAR( OFID, VOK, TNDIM, TDIMS, STATUS )
       IF ( VOK ) THEN
         CALL BDI_MAPVAR( OFID, 'UPDATE', VPTR, STATUS )
 
-*    Given user option of creating Poisson array
+*  Given user option of creating Poisson array
       ELSE
         CALL USI_GET0L( 'POISS', POISS, STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*      Create variance array from data?
+*    Create variance array from data?
         IF ( POISS ) THEN
           CALL BDI_CREVAR( OFID, NDIM, DIMS, STATUS )
           CALL BDI_MAPVAR( OFID, 'WRITE', VPTR, STATUS )
@@ -196,7 +191,7 @@
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Quality present?
+*  Quality present?
       CALL BDI_CHKQUAL( OFID, QOK, TNDIM, TDIMS, STATUS )
       IF ( QOK ) THEN
         CALL BDI_MAPLQUAL( OFID, 'READ', ANYBAD, QPTR, STATUS )
@@ -207,92 +202,76 @@
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Initialise
+*  Initialise
       T_RESOLVED = .FALSE.
       GOT_TEXP = .FALSE.
 
-*    Get exposure information. First try for the MORE.ASTERIX component. If
-*    absent we can't get either LIVE_TIMEs or exposure times.
-      CALL BDA_CHKAST( OLOC, OK, STATUS )
-      IF ( OK ) THEN
+*  Get timing info
+      CALL TCI_GETID( OFID, TIMID, STATUS )
+      IF ( TIMID .NE. ADI__NULLID ) THEN
 
-*      Live time structure present?
-        CALL BDA_CHKLIVE( OLOC, LIVE_OK, STATUS )
-        IF ( LIVE_OK ) THEN
+*      Are the 3 supported live time objects present?
+        CALL ADI_THERE( TIMID, 'LiveOn', L_ON, STATUS )
+        CALL ADI_THERE( TIMID, 'LiveOff', L_OFF, STATUS )
+        CALL ADI_THERE( TIMID, 'LiveDur', L_DUR, STATUS )
+        LIVE_OK = (L_ON .AND. L_OFF .AND. L_DUR)
 
-*        Locate it and check whether the 3 supported structures are present
-          CALL BDA_LOCLIVE( OLOC, LLOC, STATUS )
-          CALL DAT_THERE( LLOC, 'ON', L_ON, STATUS )
-          CALL DAT_THERE( LLOC, 'OFF', L_OFF, STATUS )
-          CALL DAT_THERE( LLOC, 'DURATION', L_DUR, STATUS )
-
-*        We must have ON, OFF and DURATION
-          IF ( .NOT. (L_ON .AND. L_OFF .AND. L_DUR) ) THEN
-            CALL MSG_PRNT( '** LIVE_TIME structure does not contain'/
+*    We must have ON, OFF and DURATION
+        IF ( (L_ON.OR.L_OFF.OR.L_DUR) .AND. .NOT. LIVE_OK ) THEN
+          CALL MSG_PRNT( '** LIVE_TIME structure does not contain'/
      :               /' expected components and will be ignored **' )
 
-          ELSE
+        ELSE
 
-*          Map LIVE_TIME data
-            CALL CMP_MAPV( LLOC, 'ON', '_REAL', 'READ', ON_PTR, NSLOT,
-     :                     STATUS )
-            CALL CMP_MAPV( LLOC, 'OFF', '_REAL', 'READ', OFF_PTR, NSLOT,
-     :                     STATUS )
-            CALL CMP_MAPV( LLOC, 'DURATION', '_REAL', 'READ', DUR_PTR,
-     :                     NSLOT, STATUS )
+*      Map live time data
+          CALL ADI_CSIZE( TIMID, 'LiveOn', NSLOT, STATUS )
+          CALL ADI_CMAPR( TIMID, 'LiveOn', 'READ', ON_PTR, STATUS )
+          CALL ADI_CMAPR( TIMID, 'LiveOff', 'READ', OFF_PTR, STATUS )
+          CALL ADI_CMAPR( TIMID, 'LiveDur', 'READ', DUR_PTR, STATUS )
 
-*          Set flags
-            T_RESOLVED = (STATUS.EQ.SAI__OK)
-            CALL MSG_SETC( 'WHERE', 'LIVE_TIME slots' )
-
-          END IF
+*      Set flags
+          T_RESOLVED = (STATUS.EQ.SAI__OK)
+          CALL MSG_SETC( 'WHERE', 'LIVE_TIME slots' )
 
         END IF
 
-*      Is HEADER present?
-        CALL BDA_CHKHEAD( OLOC, OK, STATUS )
+*    Effective exposure present?
+        CALL ADI_THERE( TIMID, 'EffExposure', OK, STATUS )
         IF ( OK ) THEN
+          CALL ADI_CGET0R( TIMID, 'EffExposure', TEXP, STATUS )
+          IF ( STATUS .EQ. SAI__OK ) THEN
+            CALL MSG_SETC( 'WHERE', 'effective exposure time' )
+            GOT_TEXP = .TRUE.
+          END IF
+        END IF
 
-*        Locate the header
-          CALL BDA_LOCHEAD( OLOC, HLOC, STATUS )
-
-*        Effective exposure present?
-          CALL DAT_THERE( HLOC, 'EFF_EXPOSURE', OK, STATUS )
+*      Try simple exposure time
+        IF ( .NOT. GOT_TEXP ) THEN
+          CALL ADI_THERE( TIMID, 'Exposure', OK, STATUS )
           IF ( OK ) THEN
-            CALL CMP_GET0R( HLOC, 'EFF_EXPOSURE', TEXP, STATUS )
+            CALL ADI_CGET0R( TIMID, 'Exposure', TEXP, STATUS )
             IF ( STATUS .EQ. SAI__OK ) THEN
-              CALL MSG_SETC( 'WHERE', 'effective exposure time' )
+              CALL MSG_SETC( 'WHERE', 'exposure time in header' )
               GOT_TEXP = .TRUE.
             END IF
           END IF
-
-*        Try simple exposure time
-          IF ( .NOT. GOT_TEXP ) THEN
-            CALL DAT_THERE( HLOC, 'EXPOSURE_TIME', OK, STATUS )
-            IF ( OK ) THEN
-              CALL CMP_GET0R( HLOC, 'EXPOSURE_TIME', TEXP, STATUS )
-              IF ( STATUS .EQ. SAI__OK ) THEN
-                CALL MSG_SETC( 'WHERE', 'exposure time in header' )
-                GOT_TEXP = .TRUE.
-              END IF
-            END IF
-          END IF
+        END IF
 
         END IF
 
       END IF
 
-*    Default dead time correction
+*  Default dead time correction
       DEADC = 1.0
 
-*    Time resolved correction possible? We only do this if dataset contains
-*    a time like axis
+*  Time resolved correction possible? We only do this if dataset contains
+*  a time like axis
       IF ( T_RESOLVED ) THEN
 
-*      Look for time axis
+*    Look for time axis
         CALL AXIS_TFINDXYT( OFID, NDIM, X_AX, Y_AX, T_AX, STATUS )
 
-*      No time axis?
+*    No time axis?
         IF ( T_AX .EQ. 0 ) THEN
           CALL CORRECT_DEAD0( NSLOT, %VAL(ON_PTR), %VAL(OFF_PTR),
      :                             %VAL(DUR_PTR), DEADC, STATUS )
@@ -300,7 +279,7 @@
 
         ELSE
 
-*        Ambiguous axis?
+*      Ambiguous axis?
           IF ( T_AX .LT. 0 ) THEN
             T_AX = - T_AX
             CALL BDI_GETAXLABEL( OFID, T_AX, TEXT, STATUS )
@@ -309,7 +288,7 @@
      :                                           /' axis ^LABEL' )
           END IF
 
-*        Warn if not 1st dimension
+*      Warn if not 1st dimension
           IF ( T_AX .NE. 1 ) THEN
             CALL MSG_PRNT( '** CORRECT cannot handle dead time '/
      :             /'correction unless the time axis is the **' )
@@ -320,27 +299,27 @@
 
           ELSE
 
-*          Map time axis data and widths
+*        Map time axis data and widths
             CALL BDI_MAPAXVAL( OFID, 'READ', T_AX, APTR, STATUS )
             CALL BDI_MAPAXWID( OFID, 'READ', T_AX, AWPTR, STATUS )
 
-*          Has data been normalised wrt the time axis already?
+*        Has data been normalised wrt the time axis already?
             CALL BDI_GETAXNORM( OFID, T_AX, AXNORM, STATUS )
 
-*          If it has, we have to denormalise and renormalise again afterwards
+*        If it has, we have to denormalise and renormalise again afterwards
             IF ( AXNORM ) THEN
 
-*            Pad dimensions to 7D
+*          Pad dimensions to 7D
               CALL AR7_PAD( NDIM, DIMS, STATUS )
 
-*            Issue warning
+*          Issue warning
               CALL MSG_PRNT( 'Denormalising wrt time axis...' )
 
-*            Denormalise data
+*          Denormalise data
               CALL AR7_DENORM( %VAL(AWPTR), DIMS, T_AX, %VAL(DPTR),
      :                         STATUS )
 
-*            and variance if present
+*          and variance if present
               IF ( VOK ) THEN
                 CALL AR7_DENORMV( %VAL(AWPTR), DIMS, T_AX, %VAL(DPTR),
      :                           STATUS )
@@ -348,10 +327,10 @@
 
             END IF
 
-*          Construct dead time correction array
+*        Construct dead time correction array
             CALL DYN_MAPR( 1, DIMS(T_AX), DCPTR, STATUS )
 
-*          Find dead time correction as function of time
+*        Find dead time correction as function of time
             CALL CORRECT_DEAD1( DIMS(T_AX), %VAL(APTR), %VAL(AWPTR),
      :                          NSLOT, %VAL(ON_PTR), %VAL(OFF_PTR),
      :                          %VAL(DUR_PTR), %VAL(DCPTR), STATUS )
@@ -362,37 +341,32 @@
 
       END IF
 
-*    Inform user of where we got the exposure time
+*  Inform user of where we got the exposure time
       IF ( GOT_TEXP ) THEN
         CALL MSG_SETR( 'T', TEXP )
         CALL MSG_PRNT( 'Exposure of ^T seconds derived from ^WHERE' )
 
       ELSE
 
-*      Get it from the user
+*    Get it from the user
         CALL USI_GET0R( 'TEXP', TEXP, STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*      Write it into the EXPOSURE_TIME field in the header
-        CALL BDA_CHKHEAD( OLOC, OK, STATUS )
-        IF ( .NOT. OK ) THEN
-          CALL BDA_CREHEAD( OLOC, STATUS )
-        END IF
-        CALL BDA_LOCHEAD( OLOC, HLOC, STATUS )
-        CALL DAT_NEW0R( HLOC, 'EXPOSURE_TIME', STATUS )
-        CALL CMP_PUT0R( HLOC, 'EXPOSURE_TIME', TEXP, STATUS )
+*    Write it to the file
+        CALL ADI_CPUT0R( TIMID, 'Exposure', TEXP, STATUS )
+        CALL TCI_PUTID( OFID, TIMID, STATUS )
 
       END IF
 
-*    Simply divide the data by the exposure time multiplied by the global
-*    dead time correction.
+*  Simply divide the data by the exposure time multiplied by the global
+*  dead time correction.
       CALL CORRECT_INT( NELM, %VAL(DPTR), VOK, %VAL(VPTR), QOK,
      :                  %VAL(QPTR), TEXP*DEADC, STATUS )
 
-*    Time resolved and dataset has time axis
+*  Time resolved and dataset has time axis
       IF ( LIVE_OK ) THEN
 
-*      Apply the dead time correction
+*    Apply the dead time correction
         CALL CORRECT_DEADCOR( DIMS(T_AX), NELM/DIMS(T_AX), %VAL(DCPTR),
      :                        %VAL(DPTR), VOK, %VAL(VPTR), QOK,
      :                        %VAL(QPTR), STATUS )
@@ -404,38 +378,44 @@
           CALL MSG_SETR( 'DEAD', DEADC )
           CALL MSG_PRNT( 'Applied a total dead time correction of ^D' )
         END IF
+
+*    Release live times
+        CALL ADI_CUNMAP( TIMID, 'LiveOn', ON_PTR, STATUS )
+        CALL ADI_CUNMAP( TIMID, 'LiveOff', OFF_PTR, STATUS )
+        CALL ADI_CUNMAP( TIMID, 'LiveDur', DUR_PTR, STATUS )
+
       END IF
 
-*    Renormalise?
+*  Renormalise?
       IF ( AXNORM .AND. T_RESOLVED ) THEN
 
-*      Issue warning
+*    Issue warning
         CALL MSG_PRNT( 'Renormalising wrt time axis...' )
 
-*      Renormalise data
+*    Renormalise data
         CALL AR7_NORM( %VAL(AWPTR), DIMS, T_AX, %VAL(DPTR), STATUS )
 
-*      and variance if present
+*    and variance if present
         IF ( VOK ) THEN
           CALL AR7_NORMV( %VAL(AWPTR), DIMS, T_AX, %VAL(VPTR), STATUS )
         END IF
 
       END IF
 
-*    Adjust the data label
+*  Adjust the data label
       CALL BDI_GETLABEL( OFID, TEXT, STATUS )
       IF ( TEXT .GT. ' ' ) THEN
         CALL BDI_PUTLABEL( OFID, '('//TEXT(:CHR_LEN(TEXT))//') / s',
      :                     STATUS )
       END IF
 
-*    Flag dataset as corrected
+*  Flag dataset as corrected
       CALL PRF_SET( OFID, 'CORRECTED.EXPOSURE', .TRUE., STATUS )
       IF ( LIVE_OK ) THEN
         CALL PRF_SET( OFID, 'CORRECTED.DEAD_TIME', .TRUE., STATUS )
       END IF
 
-*    Update HISTORY
+*  Update HISTORY
       CALL HSI_ADD( OFID, VERSION, STATUS )
       HTXT(1) = 'Input {INP}'
       NLINES = MAXHTEXT
