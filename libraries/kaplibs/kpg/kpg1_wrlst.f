@@ -159,7 +159,8 @@
 
 *  Set the base Frame equal to the new current Frame, and then re-instate 
 *  the original current Frame.
-         CALL AST_SETI( IWCS, 'BASE', AST_GETI( IWCS, 'CURRENT', STATUS ),
+         CALL AST_SETI( IWCS, 'BASE', AST_GETI( IWCS, 'CURRENT', 
+     :                                          STATUS ),
      :                  STATUS )
          CALL AST_SETI( IWCS, 'CURRENT', ICURR, STATUS )
 
