@@ -18,7 +18,7 @@
 *  Arguments:
 *     NUM = BYTE (given)
 *        The byte value to convert
-*     STRING = CHARACTER*(*)
+*     STRING = CHARACTER*(*) (returned)
 *        The string representation of NUM
 *     STATUS = INTEGER (given and returned)
 *        The global status.
