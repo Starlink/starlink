@@ -251,6 +251,10 @@
 *     1997 March 20 (TIMJ)
 *        Extract from main tasks
 *     $Log$
+*     Revision 1.15  1998/10/06 21:10:19  timj
+*     Check the range of JIGGLE to make sure that it does not exceed the
+*     size of the jiggle pattern (happens when DEM_PNTR is truncated)
+*
 *     Revision 1.14  1998/05/05 21:27:41  timj
 *     Only call sculib_fix_scan_v10 when using RJ centre
 *
@@ -645,6 +649,11 @@
                   CALL MSG_SETI ('M', MEASUREMENT)
                   CALL MSG_OUT (' ', 'SCULIB_PROCESS_BOLS: no data '//
      :                 'for exp ^E in int ^I, meas ^M', STATUS)
+
+*     Else check for the possibility that EXP_END is too large
+*     (eg aborted data) where EXP_END - EXP_START > JIGGLE_COUNT
+*     This is only valid for jiggle maps though...
+
                ELSE
 
 *     OK, there is some data, first calculate mean LST for the switch
@@ -822,8 +831,30 @@
                            JIGGLE = MOD (I - EXP_START,
      :                          JIGGLE_COUNT) + 1
                         END IF
-                        OFFSET_X = JIGGLE_X (JIGGLE)
-                        OFFSET_Y = JIGGLE_Y (JIGGLE)
+
+*     Check that offset is in range
+
+                        IF (JIGGLE .LE. JIGGLE_COUNT) THEN
+                           OFFSET_X = JIGGLE_X (JIGGLE)
+                           OFFSET_Y = JIGGLE_Y (JIGGLE)
+                        ELSE
+                           IF (STATUS .EQ. SAI__OK) THEN 
+                              STATUS = SAI__ERROR
+                              CALL MSG_SETI('JIG', JIGGLE)
+                              CALL MSG_SETI('COUNT',JIGGLE_COUNT)
+                              CALL ERR_REP(' ','SCULIB_PROCESS_BOLS: '//
+     :                             'Jiggle index out of range - was ' //
+     :                             '^JIG when max is ^COUNT', STATUS)
+                              CALL MSG_SETI ('E', EXPOSURE)
+                              CALL MSG_SETI ('I', INTEGRATION)
+                              CALL MSG_SETI ('M', MEASUREMENT)
+                              CALL ERR_REP(' ','SCULIB_PROCESS_BOLS: '//
+     :                             '- for exp ^E in int ^I, meas ^M', 
+     :                             STATUS)
+
+                           END IF
+                        END IF
+
 
                      ELSE IF (SAMPLE_MODE .EQ. 'RASTER') THEN
 
@@ -967,16 +998,23 @@
                            END IF
                            
 *     correct the bolometer data for the sky opacity
+*     Check for status here since the bounds can be exceeded
+*     before we enter the subroutine (DATA_OFFSET can be too large)
 
-                           DO BEAM = 1, N_BEAMS
+                           IF (STATUS .EQ. SAI__OK) THEN
+                           
+                              DO BEAM = 1, N_BEAMS
 
-                              CALL SCULIB_CORRECT_EXTINCTION (
-     :                             NUM_ADC * NUM_CHAN, N_BOL,
-     :                             NDATA(1, DATA_OFFSET, BEAM), 
-     :                             NVARIANCE(1, DATA_OFFSET, BEAM),
-     :                             BOL_RA, BOL_DEC, LST, LAT_OBS, TAUZ,
-     :                             STATUS)
-                           END DO
+                                 
+                                 CALL SCULIB_CORRECT_EXTINCTION (
+     :                                NUM_ADC * NUM_CHAN, N_BOL,
+     :                                NDATA(1, DATA_OFFSET, BEAM), 
+     :                                NVARIANCE(1, DATA_OFFSET, BEAM),
+     :                                BOL_RA,BOL_DEC,LST, LAT_OBS, TAUZ,
+     :                                STATUS)
+                              END DO
+                           END IF
+
                         ELSE
                            
 *     Convert the apparent RA/Decs to tangent plane offsets
@@ -985,31 +1023,38 @@
 
                            IF (OUT_COORDS .EQ. 'PL' .OR. AZNASCAN) THEN
 
-                              CALL SCULIB_APPARENT_2_TP (N_BOL,
-     :                             BOL_RA(1,DATA_OFFSET, BM), 
-     :                             BOL_DEC(1,DATA_OFFSET, BM),
-     :                             MAP_RA_CEN, MAP_DEC_CEN, 0.0D0,
-     :                             0.0D0, 0.0D0, STATUS)
-                              
+                              IF (STATUS .EQ. SAI__OK) THEN
+                                 CALL SCULIB_APPARENT_2_TP (N_BOL,
+     :                                BOL_RA(1,DATA_OFFSET, BM), 
+     :                                BOL_DEC(1,DATA_OFFSET, BM),
+     :                                MAP_RA_CEN, MAP_DEC_CEN, 0.0D0,
+     :                                0.0D0, 0.0D0, STATUS)
+                              END IF
+
 *     If we are trying to do NA/AZ for RASTER data then we have to convert
 *     the coordinates from apparent RA/Dec to tangent plane offsets and
 *     then into Az or NA coordinates using an elevation dependent rotation.
 *     Convert these TP offsets to Az or NA
                               IF (AZNASCAN) THEN
 
-                                 CALL SCULIB_SCAN_APPARENT_TP_2_AZNA(
-     :                                OUT_COORDS, 1, N_BOL, ELEVATION,
-     :                                PAR_ANGLE, 
-     :                                BOL_RA(1, DATA_OFFSET, BM),
-     :                                BOL_DEC(1,DATA_OFFSET, BM), 
-     :                                STATUS)
+
+                                 IF (STATUS .EQ. SAI__OK) THEN
+                                    CALL SCULIB_SCAN_APPARENT_TP_2_AZNA(
+     :                                   OUT_COORDS,1, N_BOL, ELEVATION,
+     :                                   PAR_ANGLE, 
+     :                                   BOL_RA(1, DATA_OFFSET, BM),
+     :                                   BOL_DEC(1,DATA_OFFSET, BM), 
+     :                                   STATUS)
+
+                                 END IF
 
                               END IF
 
                            ELSE
 *     convert the coordinates to apparent RA,Dec on MJD_STANDARD
                               IF (OUTCRDS .EQ. 'RA') THEN
-                                 IF (N_MAP .NE. 1) THEN
+                                 IF (N_MAP .NE. 1 .AND. 
+     :                                STATUS .EQ. SAI__OK) THEN
                                     CALL SCULIB_STANDARD_APPARENT (
      :                                   N_BOL, 
      :                                   BOL_RA(1,DATA_OFFSET, BM), 
