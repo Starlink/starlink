@@ -1,0 +1,1109 @@
+#+
+#  Name:
+#     makefile
+#
+#  Version:
+#     Library makefile Mk IV
+#
+#  Purpose:
+#     Build and install the NCAR-EXAMPLES package.
+#
+#  Type of Module:
+#     Description file for the make utility.
+#
+#  Description:
+#     This description file is used by the make utility to build the
+#     NCAR-EXAMPLES package from the distributed source files, to install
+#     the resulting system for use, and to perform other housekeeping
+#     tasks.
+#
+#  Invocation:
+#     This makefile is not intended to be used by make when invoked
+#     directly (although this is possible), but instead to be used via
+#     the accompanying mk script.  This script sets up a number of
+#     environment variables which are used as macros within the
+#     makefile and which accommodate differences between machines and
+#     operating systems (it invokes make with the -e option).  Please
+#     consult the mk script prologue for full details.
+#
+#  Targets:
+#     The following make targets are defined in this script for
+#     external use:
+#
+#        [help]
+#           This is the default target.  It outputs a message describing
+#           the mk script and lists the targets provided.
+#
+#        check
+#           Performs a simple check that all necessary source files are
+#           present, and displays the version number and current state
+#           of the package (built/installed/tested, etc.).
+#
+#        build
+#           Compiles the source files and creates all files needed
+#           prior to installing the package for use.
+#
+#        install
+#           Installs the package for use by putting the necessary files
+#           into sub-directories of the $INSTALL directory (the $HOME
+#           directory is used if the environment variable INSTALL is
+#           not defined).  Links to the installed files are left in the
+#           source directory.
+#
+#        deinstall
+#           Reverses the action of the install target, removing files
+#           from sub-directories of the $INSTALL directory and
+#           restoring them to the source directory (the $HOME directory
+#           is used by default if the environment variable INSTALL is
+#           not defined).
+#
+#        test
+#           Builds and runs a simple test program to check for correct
+#           installation of the package.
+#
+#        export
+#           Produces an export copy of the built package suitable for
+#           passing to another user.  A compressed tar file is created
+#           in the $EXPORT directory containing copies of the source
+#           files and built files for the package (the current
+#           directory is used by default if the environment variable
+#           EXPORT is not defined).  The package should normally be
+#           built, installed and tested (see above) before using this
+#           target.  After unpacking the exported file on a similar
+#           machine, the recipient may simply install it for use.
+#
+#        export_source
+#           Produces an export copy of the source for the package
+#           suitable for passing to another user to build (possibly on
+#           a different type of machine).  A compressed tar file is
+#           created in the $EXPORT directory containing copies of just
+#           the source files for the package (the current directory is
+#           used by default if the environment variable EXPORT is not
+#           defined).  After unpacking the exported file, the recipient
+#           must build the package before installing it for use.
+#
+#        export_run
+#           Produces an export copy of the built package suitable for
+#           passing to another user.  A compressed tar file is created
+#           in the $EXPORT directory containing copies of the built
+#           files for the package (the current directory is used by
+#           default if the environment variable EXPORT is not defined).
+#           The package should normally be built, installed and tested
+#           (see above) before using this target.
+#           After unpacking the exported file on a similar machine,
+#           the recipient may simply install it for use.
+#
+#        clean
+#           Cleans up after building the package, removing all
+#           intermediate files created during the building process, but
+#           leaving the built files themselves.
+#
+#        unbuild
+#           Reverses the building process, removing all intermediate
+#           files along with all the built files.
+#
+#
+#  External Dependencies:
+#     The NCAR-EXAMPLES package depends on the following other Starlink
+#     packages which must previously have been installed into the
+#     appropriate sub-directories of the $STARLINK directory (/star is
+#     used if the environment variable STARLINK is not defined).
+#        GKS
+#           Graphical Kernel System
+#        NCAR
+#           NACR Graphics system
+#        SGS
+#           Simple Graphics System
+#        CNF
+#           Mixed C and Fortran programming interface routines
+#
+#  Notes:
+#     This makefile uses the presence/absence of the hidden files
+#     .BUILT, .INSTALLED_$(SYSTEM) and .TESTED_$(SYSTEM) to record the
+#     current state of the system during housekeeping operations.
+#
+#  Implementation Deficiencies:
+#     The method of generating the list of external libraries passed to
+#     the $(BLD_SHR) command is still preliminary.
+#
+#  Copyright:
+#     Copyright (C) 1993 Science & Engineering Research Council
+#
+#  Authors:
+#     RFWS: R.F.Warren-Smith (Starlink, RAL)
+#     PMA: P.M.Allan (Starlink, RAL)
+#     PTW: P.T.Wallace (Starlink, RAL)
+#     BLY: M.J.Bly (Starlink, RAL)
+#     AJC: A.J.Chipperfield (Starlink, RAL)
+#     {enter_new_authors_here}
+#
+#  History:
+#     4-JAN-1993 (RFWS):
+#        Original version.
+#     15-MAR-1993 (RFWS):
+#        Adapted for use on sun4_Solaris.
+#     11-JUN-1993 (PMA):
+#        Added parts for handling platform specific files.
+#     27-SEP-1993 (PMA):
+#        Added the target "filler1" to prevent the list of platform
+#        specific files being empty, thereby causing a make syntax error.
+#     3-NOV-1993 (PMA):
+#        Change the check target to print out for which system the
+#        software has been built.
+#     3-NOV-1993 (PMA):
+#        Add a test to check that files really are extracted from the
+#        tar file.
+#     18-NOV-1993 (PTW):
+#        Cosmetics.
+#     26-NOV-1993 (PMA):
+#        Remove the dummy file "filler1" and add a dummy target called
+#        dummy_target1.
+#        Add a file called " " to all of the for loops that install and
+#        deinstall files to prevent syntax errors if any of the relevent
+#        macros are null.
+#        Add a macro STARTUP_SCRIPT that is the name of the startup
+#        script.
+#     4-JAN-1994 (PMA):
+#        Add some missing semicolons to for loops. This seems not to
+#        cause errors on our systems, but it is a syntax error.
+#     7-FEB-1994 (PMA):
+#        Move the block data files to the beginning of the definition of
+#        OBJECT_FILES. This makes it possible to extract the block data
+#        modules with the -u loader flag. This is needed when using f2c.
+#     8-AUG-1994 (BLY):
+#        Add dependency on source archive to extraction targets.
+#     30-NOV-1994 (AJC):
+#        Add facility error files
+#        Add export_run target
+#        Add where installed
+#        Prevent installation if not built for this SYSTEM
+#        Ensure deinstall is from where it is installed
+#        Revise use of package name variables, adding PACK_NAME for
+#        use in messages and PKG_LINK for use in INCLUDE FILE links.
+#        Use variables in all references.
+#        Use installed $(PKG_NAME)_dev to handle INCLUDE files for test.
+#     1-MAR-1995 (BLY):
+#        Version for NCAR examples.
+#     02-SEP-1997 (BLY):
+#        Replace all export type targets for Autumn 1997 CD-ROM distribution.
+#
+#     NOTE: full upgrade to Mk V std required.
+#
+#     {enter_further_changes_here}
+#
+#  Bugs:
+#     {note_any_bugs_here}
+#
+#-------------------------------------------------------------------------------
+
+#  Help target.
+#  ===========
+#
+#  This is the default target, so it appears first.
+
+#  Display information about the mk script and the make targets.
+
+help:
+	@ echo \
+   '   The makefile provided is intended to be used by the make utility when';\
+        echo \
+   '   invoked via the associated mk script.  This script defines environment';\
+        echo \
+   '   variables which are used by make to accommodate differing machine and';\
+        echo \
+   '   operating system characteristics.  Please see the mk script prologue';\
+        echo \
+   '   for full details.';\
+        echo;\
+        echo \
+   '   The following targets are provided:';\
+        echo;\
+        echo \
+   '      help          - Print out this message';\
+        echo \
+   '      check         - Check source file presence and show current state';\
+        echo \
+   '      build         - Build the package from source';\
+        echo \
+   '      install       - Install the built package for use';\
+        echo \
+   '      deinstall     - Deinstall the package';\
+        echo \
+   '      test          - Perform a quick test of the installation';\
+        echo \
+   '      export        - Make a compressed tar file for exporting the'\
+   'built package';\
+        echo \
+   '                      complete with source and documentation';\
+        echo \
+   '      export_run    - Make a compressed tar file for exporting the'\
+   'built package';\
+        echo \
+   '                      with documentation but no source';\
+        echo \
+   '      export_source - Make a compressed tar file for exporting the'\
+   'source files';\
+        echo \
+   '      clean         - Tidy up after building the package';\
+        echo \
+   '      unbuild       - Remove all the built files';\
+        echo;\
+        echo \
+   '   To build and install the $(PACK_NAME) package on a supported system:';\
+        echo;\
+        echo \
+   '      mk build; mk install; mk test; mk clean';\
+        echo
+
+#-------------------------------------------------------------------------------
+
+#  Defaults.
+#  ========
+#
+#  This section defines default macros and should rarely need changing.
+#  The values given here should be overridden externally to adapt to
+#  the local system setup (either use the mk script or use environment
+#  variables and invoke "make" with the "-e" option).
+
+#  Name of computer hardware/OS combination.
+
+SYSTEM = unknown
+
+#  Name used to distinguish platform-specific source files.
+
+SOURCE_VARIANT = $(SYSTEM)
+
+#  Pathname of the root directory beneath which other Starlink software
+#  is currently installed.
+
+STARLINK = /star
+
+#  Pathnames of Starlink sub-directories that may be referenced when
+#  building this package.
+
+STAR_BIN = $(STARLINK)/bin
+STAR_DATES = $(STARLINK)/dates
+STAR_ETC = $(STARLINK)/etc
+STAR_HELP = $(STARLINK)/help
+STAR_INC = $(STARLINK)/include
+STAR_LIB = $(STARLINK)/lib
+STAR_SHARE = $(STARLINK)/share
+
+#  Pathname of the root directory beneath which the built files for
+#  this package should be installed for use.  This defaults to the
+#  user's home directory.
+
+INSTALL = $(HOME)
+
+#  Pathname of the directory into which exported tar files will be
+#  placed.  This defaults to the current working directory.
+
+EXPORT = .
+
+#  Default macros for compiling C and Fortran source code.
+
+CC = c89
+CFLAGS = -O
+FC = fort77
+FFLAGS = -O
+
+#  Command for forming a link to a file.
+
+LINK = ln
+
+#  Command for "randomizing" an object library.  The default acts as a
+#  null command.
+
+RANLIB = echo > /dev/null
+
+#  Commands for adding to and extracting from an archive file (.tar).
+
+TAR_IN = pax -w -v -x ustar -f
+TAR_OUT = pax -r -f
+
+#  Command for adding a file to an object archive (.a).
+
+AR_IN = ar -r
+
+#  Default file type extension for a shareable library and command for
+#  building a shareable library (the default acts as a null command).
+
+SHARE = .so
+BLD_SHR = echo > /dev/null
+
+#-------------------------------------------------------------------------------
+################################################################################
+#
+#  Define package source files.
+#  ===========================
+#
+#  This section defines the set of source files for the package.
+
+#  Name of the package as specified in documentation
+#  The value is used in messages from make to the user.
+PACK_NAME = NCAR-EXAMPLES
+ 
+#  Prefix for the package in lower case as used in filenames etc.
+PKG_NAME = ncar-examples
+
+#  Version number (as in the documentation - i.e. not the same thing
+#  as the shared library version number).
+#
+#  The major component of the version number (before the dot) should
+#  normally only be incremented following major changes to the package.
+#  The minor version number (after the dot) is the number normally
+#  incremented following development which introduces new documented
+#  functionality.  Any revision number (appended after a dash) should
+#  be incremented for other minor changes (bug fixes, etc.) which do
+#  not merit documentation changes.
+
+PKG_VERS = 1.0
+
+#  Library version number.
+#
+#  n.b. Care needed - may affect existing applications.
+#
+#  The minor component of this number (following the dot) should be
+#  incremented whenever a new routine is added to a library or some
+#  other change is made such that programs built with the latest
+#  version would fail to run using an earlier version.  The major number
+#  should be incremented if a change is made such that existing
+#  programs would have to be re-built in order to work with the new
+#  version.
+
+LIB_VERS =
+
+#  List of files comprising the distributed source-only system.  This
+#  defines the minimum set of files required to completely rebuild the
+#  package from source (including this makefile, the associated mk
+#  script and any documentation files).
+
+SOURCE_FILES = $(PKG_NAME)_source.tar makefile mk
+
+#  List of Fortran sources for the example files.
+
+EXAMPLE_SOURCES = exampl.f ncarex.f tautog.f tcnqck.f tcnsmt.f tcnsup.f \
+tconan.f tconaq.f tconas.f tconre.f tdashc.f tdashl.f tdashp.f tdashs.f \
+tezmap.f tgrida.f thafto.f thstgr.f tisohr.f tisosr.f tlocal.f tpwrtx.f \
+tpwry.f tpwrzi.f tpwrzs.f tpwrzt.f tsrfac.f tthree.f tvelvc.f
+
+#  List of Example binaries.
+
+EXAMPLE_EXES = exampl tautog tcnqck tcnsmt tcnsup tconan tconaq tconas \
+tconre tdashc tdashl tdashp tdashs tezmap tgrida thafto thstgr tisohr \
+tisosr tlocal tpwrtx tpwry tpwrzi tpwrzs tpwrzt tsrfac tthree tvelvc
+
+#  List of External Objects.  These are the substitute NCAR object files.
+
+EXTERNAL_OBJECTS = conrecqck.o conrecsupr.o dashline.o dashsmth.o dashsupr.o \
+		   conras.o conpms.o
+
+################################################################################
+#-------------------------------------------------------------------------------
+
+#  Define files required for building the package.
+#  ==============================================
+#
+#  This section defines the set of files produced from the source files
+#  when the package is built and installed.
+
+#  Use only .o and .f suffix rules.
+
+.SUFFIXES:
+.SUFFIXES: .o .f
+
+#  List of files which must be built from the source files before the
+#  package can be installed for use.  This should comprise all the files
+#  that are required to use the package (but excluding the date stamp
+#  file).
+
+BUILT_FILES = $(EXAMPLE_EXES)
+
+#  List of links used to access object files during linking.  This
+#  should comprise all the external object files.
+
+OBJECT_LINKS = $(EXTERNAL_OBJECTS)
+
+#  Rules to set up links to locate each of the above object files.
+
+conras.o:     $(STAR_LIB)/conras.o;     $(LINK) $? $@
+conpms.o:     $(STAR_LIB)/conpms.o;     $(LINK) $? $@
+conrecqck.o:  $(STAR_LIB)/conrecqck.o;  $(LINK) $? $@
+conrecsupr.o: $(STAR_LIB)/conrecsupr.o; $(LINK) $? $@
+dashline.o:   $(STAR_LIB)/dashline.o;   $(LINK) $? $@
+dashsmth.o:   $(STAR_LIB)/dashsmth.o;   $(LINK) $? $@
+dashsupr.o:   $(STAR_LIB)/dashsupr.o;   $(LINK) $? $@
+
+#  Rules for extracting source files from the source archive.
+
+$(EXAMPLE_SOURCES): $(PKG_NAME)_source.tar
+	$(TAR_OUT) $(PKG_NAME)_source.tar $@
+	@ if test -f $@; then :;\
+           else echo $@ is not in the tar file; exit 1; fi
+
+#  Rules for building the example binaries.  The dependencies are
+#  specific to each binary but the rules are generic.
+
+exampl: exampl.f
+	$(FC) $(FFLAGS) $? -o $@ \
+           $(LDFLAG1) $(ADDLIBS) -L$(STAR_LIB) \
+           `ncar_link` `cnf_link` `sgs_link` \
+           $(LDFLAG2)
+
+tautog: ncarex.f tautog.f
+	sed s/"prog_name"/"$@"/ $? > temp.f
+	$(FC) $(FFLAGS) temp.f -o $@ \
+           $(LDFLAG1) $(ADDLIBS) -L$(STAR_LIB) \
+           `ncar_link` `cnf_link` \
+           $(LDFLAG2)
+	- rm -f temp.f
+
+tcnqck: ncarex.f tcnqck.f conrecqck.o dashline.o
+	sed s/"prog_name"/"$@"/ ncarex.f tcnqck.f > temp.f
+	$(FC) $(FFLAGS) temp.f conrecqck.o dashline.o -o $@ \
+           $(LDFLAG1) $(ADDLIBS) -L$(STAR_LIB) \
+           `ncar_link` `cnf_link` \
+           $(LDFLAG2)
+	- rm -f temp.f
+
+tcnsmt: ncarex.f tcnsmt.f dashsmth.o
+	sed s/"prog_name"/"$@"/ ncarex.f tcnsmt.f > temp.f
+	$(FC) $(FFLAGS) temp.f dashsmth.o -o $@ \
+           $(LDFLAG1) $(ADDLIBS) -L$(STAR_LIB) \
+           `ncar_link` `cnf_link` \
+           $(LDFLAG2)
+	- rm -f temp.f
+
+tcnsup: ncarex.f tcnsup.f conrecsupr.o dashsupr.o
+	sed s/"prog_name"/"$@"/ ncarex.f tcnsup.f > temp.f
+	$(FC) $(FFLAGS) temp.f conrecsupr.o dashsupr.o -o $@ \
+           $(LDFLAG1) $(ADDLIBS) -L$(STAR_LIB) \
+           `ncar_link` `cnf_link` \
+           $(LDFLAG2)
+	- rm -f temp.f
+
+tconan: ncarex.f tconan.f dashsmth.o
+	sed s/"prog_name"/"$@"/ ncarex.f tconan.f > temp.f
+	$(FC) $(FFLAGS) temp.f dashsmth.o -o $@ \
+           $(LDFLAG1) $(ADDLIBS) -L$(STAR_LIB) \
+           `ncar_link` `cnf_link` \
+           $(LDFLAG2)
+	- rm -f temp.f
+
+tconaq: ncarex.f tconaq.f dashline.o
+	sed s/"prog_name"/"$@"/ ncarex.f tconaq.f > temp.f
+	$(FC) $(FFLAGS) temp.f dashline.o -o $@ \
+           $(LDFLAG1) $(ADDLIBS) -L$(STAR_LIB) \
+           `ncar_link` `cnf_link` \
+           $(LDFLAG2)
+	- rm -f temp.f
+
+tconas: ncarex.f tconas.f dashsupr.o conras.o conpms.o
+	sed s/"prog_name"/"$@"/ ncarex.f tconas.f > temp.f
+	$(FC) $(FFLAGS) temp.f dashsupr.o conras.o conpms.o -o $@ \
+           $(LDFLAG1) $(ADDLIBS) -L$(STAR_LIB) \
+           `ncar_link` `cnf_link` \
+           $(LDFLAG2)
+	- rm -f temp.f
+
+tconre: ncarex.f tconre.f
+	sed s/"prog_name"/"$@"/ $? > temp.f
+	$(FC) $(FFLAGS) temp.f -o $@ \
+           $(LDFLAG1) $(ADDLIBS) -L$(STAR_LIB) \
+           `ncar_link` `cnf_link` \
+           $(LDFLAG2)
+	- rm -f temp.f
+
+tdashc: ncarex.f tdashc.f
+	sed s/"prog_name"/"$@"/ $? > temp.f
+	$(FC) $(FFLAGS) temp.f -o $@ \
+           $(LDFLAG1) $(ADDLIBS) -L$(STAR_LIB) \
+           `ncar_link` `cnf_link` \
+           $(LDFLAG2)
+	- rm -f temp.f
+
+tdashl: ncarex.f tdashl.f dashline.o
+	sed s/"prog_name"/"$@"/ ncarex.f tdashl.f > temp.f
+	$(FC) $(FFLAGS) temp.f dashline.o -o $@ \
+           $(LDFLAG1) $(ADDLIBS) -L$(STAR_LIB) \
+           `ncar_link` `cnf_link` \
+           $(LDFLAG2)
+	- rm -f temp.f
+
+tdashp: ncarex.f tdashp.f dashsupr.o
+	sed s/"prog_name"/"$@"/ ncarex.f tdashp.f > temp.f
+	$(FC) $(FFLAGS) temp.f dashsupr.o -o $@ \
+           $(LDFLAG1) $(ADDLIBS) -L$(STAR_LIB) \
+           `ncar_link` `cnf_link` \
+           $(LDFLAG2)
+	- rm -f temp.f
+
+tdashs: ncarex.f tdashs.f dashsmth.o
+	sed s/"prog_name"/"$@"/ ncarex.f tdashs.f > temp.f
+	$(FC) $(FFLAGS) temp.f dashsmth.o -o $@ \
+           $(LDFLAG1) $(ADDLIBS) -L$(STAR_LIB) \
+           `ncar_link` `cnf_link` \
+           $(LDFLAG2)
+	- rm -f temp.f
+
+tezmap: ncarex.f tezmap.f dashline.o
+	sed s/"prog_name"/"$@"/ ncarex.f tezmap.f > temp.f
+	$(FC) $(FFLAGS) temp.f dashline.o -o $@ \
+           $(LDFLAG1) $(ADDLIBS) -L$(STAR_LIB) \
+           `ncar_link` `cnf_link` \
+           $(LDFLAG2)
+	- rm -f temp.f
+
+tgrida: ncarex.f tgrida.f
+	sed s/"prog_name"/"$@"/ $? > temp.f
+	$(FC) $(FFLAGS) temp.f -o $@ \
+           $(LDFLAG1) $(ADDLIBS) -L$(STAR_LIB) \
+           `ncar_link` `cnf_link` \
+           $(LDFLAG2)
+	- rm -f temp.f
+
+thafto: ncarex.f thafto.f
+	sed s/"prog_name"/"$@"/ $? > temp.f
+	$(FC) $(FFLAGS) temp.f -o $@ \
+           $(LDFLAG1) $(ADDLIBS) -L$(STAR_LIB) \
+           `ncar_link` `cnf_link` \
+           $(LDFLAG2)
+	- rm -f temp.f
+
+thstgr: ncarex.f thstgr.f
+	sed s/"prog_name"/"$@"/ $? > temp.f
+	$(FC) $(FFLAGS) temp.f -o $@ \
+           $(LDFLAG1) $(ADDLIBS) -L$(STAR_LIB) \
+           `ncar_link` `cnf_link` \
+           $(LDFLAG2)
+	- rm -f temp.f
+
+tisohr: ncarex.f tisohr.f
+	sed s/"prog_name"/"$@"/ $? > temp.f
+	$(FC) $(FFLAGS) temp.f -o $@ \
+           $(LDFLAG1) $(ADDLIBS) -L$(STAR_LIB) \
+           `ncar_link` `cnf_link` \
+           $(LDFLAG2)
+	- rm -f temp.f
+
+tisosr: ncarex.f tisosr.f
+	sed s/"prog_name"/"$@"/ $? > temp.f
+	$(FC) $(FFLAGS) temp.f -o $@ \
+           $(LDFLAG1) $(ADDLIBS) -L$(STAR_LIB) \
+           `ncar_link` `cnf_link` \
+           $(LDFLAG2)
+	- rm -f temp.f
+
+tlocal: tlocal.f
+	$(FC) $(FFLAGS) $? -o $@ \
+           $(LDFLAG1) $(ADDLIBS) -L$(STAR_LIB) \
+           `ncar_link` `cnf_link` \
+           $(LDFLAG2)
+
+tpwrtx: ncarex.f tpwrtx.f
+	sed s/"prog_name"/"$@"/ $? > temp.f
+	$(FC) $(FFLAGS) temp.f -o $@ \
+           $(LDFLAG1) $(ADDLIBS) -L$(STAR_LIB) \
+           `ncar_link` `cnf_link` \
+           $(LDFLAG2)
+	- rm -f temp.f
+
+tpwry: ncarex.f tpwry.f
+	sed s/"prog_name"/"$@"/ $? > temp.f
+	$(FC) $(FFLAGS) temp.f -o $@ \
+           $(LDFLAG1) $(ADDLIBS) -L$(STAR_LIB) \
+           `ncar_link` `cnf_link` \
+           $(LDFLAG2)
+	- rm -f temp.f
+
+tpwrzi: ncarex.f tpwrzi.f
+	sed s/"prog_name"/"$@"/ $? > temp.f
+	$(FC) $(FFLAGS) temp.f -o $@ \
+           $(LDFLAG1) $(ADDLIBS) -L$(STAR_LIB) \
+           `ncar_link` `cnf_link` \
+           $(LDFLAG2)
+	- rm -f temp.f
+
+tpwrzs: ncarex.f tpwrzs.f
+	sed s/"prog_name"/"$@"/ $? > temp.f
+	$(FC) $(FFLAGS) temp.f -o $@ \
+           $(LDFLAG1) $(ADDLIBS) -L$(STAR_LIB) \
+           `ncar_link` `cnf_link` \
+           $(LDFLAG2)
+	- rm -f temp.f
+
+tpwrzt: ncarex.f tpwrzt.f
+	sed s/"prog_name"/"$@"/ $? > temp.f
+	$(FC) $(FFLAGS) temp.f -o $@ \
+           $(LDFLAG1) $(ADDLIBS) -L$(STAR_LIB) \
+           `ncar_link` `cnf_link` \
+           $(LDFLAG2)
+	- rm -f temp.f
+
+tsrfac: ncarex.f tsrfac.f
+	sed s/"prog_name"/"$@"/ $? > temp.f
+	$(FC) $(FFLAGS) temp.f -o $@ \
+           $(LDFLAG1) $(ADDLIBS) -L$(STAR_LIB) \
+           `ncar_link` `cnf_link` \
+           $(LDFLAG2)
+	- rm -f temp.f
+
+tthree: ncarex.f tthree.f
+	sed s/"prog_name"/"$@"/ $? > temp.f
+	$(FC) $(FFLAGS) temp.f -o $@ \
+           $(LDFLAG1) $(ADDLIBS) -L$(STAR_LIB) \
+           `ncar_link` `cnf_link` \
+           $(LDFLAG2)
+	- rm -f temp.f
+
+tvelvc: ncarex.f tvelvc.f
+	sed s/"prog_name"/"$@"/ $? > temp.f
+	$(FC) $(FFLAGS) temp.f -o $@ \
+           $(LDFLAG1) $(ADDLIBS) -L$(STAR_LIB) \
+           `ncar_link` `cnf_link` \
+           $(LDFLAG2)
+	- rm -f temp.f
+
+#  Name of the date stamp file.  This is used to record the time of the
+#  most recent build for use in subsequent operations that require it.
+#  There must be no rule for generating this file; it is only updated
+#  as a side effect of building the package.
+
+DATE_STAMP = $(PKG_NAME)_datestamp
+
+#  Pathnames of directories into which files may be placed when the
+#  package is installed.
+
+INSTALL_BIN = $(INSTALL)/bin/examples/ncar
+INSTALL_DATES = $(INSTALL)/dates
+
+#  List of directories actually used for installation (selected from
+#  those above) and rules to create them.
+
+INSTALL_DIRS = $(INSTALL_BIN) $(INSTALL_DATES)
+
+$(INSTALL_DIRS):
+	mkdir -p $@
+
+#-------------------------------------------------------------------------------
+
+#  Primary targets.
+#  ===============
+#
+#  These are the targets intended for normal external use (apart from
+#  help, which appears at the start of the file).
+
+#  check: Check source file presence and show current state.
+#  --------------------------------------------------------
+
+#  The check target simply depends on all the source files being
+#  present.
+
+check: $(SOURCE_FILES)
+	@ echo
+	@ echo \
+   '*** This is $(PACK_NAME) version V$(PKG_VERS) on system $(SYSTEM)'
+	@ echo
+	@ echo '    All essential source files are present'
+	@ echo
+#
+#  Display the current state.
+	@ if test -f .BUILT;\
+          then echo '    The package is currently:  built for system'\
+             `cat .BUILT`;\
+          else echo '    The package is currently:  not built';fi
+	@ if test -f .INSTALLED_$(SYSTEM);\
+          then echo '                               installed in'\
+             `cat .INSTALLED_$(SYSTEM)`;\
+          else echo '                               not installed';fi
+	@ if test -f .TESTED_$(SYSTEM);\
+          then echo '                               tested';\
+          else echo '                               not tested';fi
+	@ echo
+	@ if test -f .BUILT;\
+          then if test "$(SYSTEM)" != "`cat .BUILT`";\
+             then echo '***  WARNING  ***';\
+                echo \
+'    The package is built for a system other than the current one';\
+                echo ;\
+             else :;fi;\
+          else :;fi
+
+#  build: Build the system.
+#  -----------------------
+#
+#  Compile the source and build the required files in the source
+#  directory.
+
+#  The build target first checks that the package is not installed.  If
+#  not, it then causes the .BUILT target to be made which ensures that
+#  the package has been built.
+
+build:
+	@ if test -f .INSTALLED_$(SYSTEM); then \
+           echo;\
+           echo \
+   '*** The $(PACK_NAME) package is currently installed -- please use the';\
+           echo '    "deinstall" target before re-building it';\
+           echo;\
+        elif $(MAKE) .BUILT; then \
+           echo;\
+           echo '*** The $(PACK_NAME) package has been built';\
+           echo;\
+        fi
+
+#  The .BUILT target records the time of the most recent build which
+#  modified any of the built files.  It depends on all the built files
+#  being up to date (which causes them to be built).
+
+.BUILT: $(BUILT_FILES)
+#
+#  Enter information about the current machine and build environment
+#  into the date stamp file.
+	@ echo 'Package : $(PACK_NAME)'        >$(DATE_STAMP)
+	@ echo 'Version : V$(PKG_VERS)'       >>$(DATE_STAMP)
+	@ echo ''                             >>$(DATE_STAMP)
+	@ echo "Built by: $(USER) on node `uname -n`" \
+                                              >>$(DATE_STAMP)
+	@ echo "On      : `date`"             >>$(DATE_STAMP)
+	@ echo ''                             >>$(DATE_STAMP)
+	@ echo \
+  "Machine : `uname -m` running `uname -s` `uname -v` (release `uname -r`)" \
+                                              >>$(DATE_STAMP)
+	@ echo ''                             >>$(DATE_STAMP)
+	@ echo 'make macros:'                 >>$(DATE_STAMP)
+	@ echo ''                             >>$(DATE_STAMP)
+	@ echo '   SYSTEM  : $(SYSTEM)'       >>$(DATE_STAMP)
+	@ echo ''                             >>$(DATE_STAMP)
+	@ echo '   EXPORT  : $(EXPORT)'       >>$(DATE_STAMP)
+	@ echo '   INSTALL : $(INSTALL)'      >>$(DATE_STAMP)
+	@ echo '   STARLINK: $(STARLINK)'     >>$(DATE_STAMP)
+	@ echo ''                             >>$(DATE_STAMP)
+	@ echo '   AR_IN   : $(AR_IN)'        >>$(DATE_STAMP)
+	@ echo '   BLD_SHR : $(BLD_SHR)'      >>$(DATE_STAMP)
+	@ echo '   CC      : $(CC)'           >>$(DATE_STAMP)
+	@ echo '   CFLAGS  : $(CFLAGS)'       >>$(DATE_STAMP)
+	@ echo '   FC      : $(FC)'           >>$(DATE_STAMP)
+	@ echo '   FFLAGS  : $(FFLAGS)'       >>$(DATE_STAMP)
+	@ echo '   LINK    : $(LINK)'         >>$(DATE_STAMP)
+	@ echo '   RANLIB  : $(RANLIB)'       >>$(DATE_STAMP)
+	@ echo '   SHARE   : $(SHARE)'        >>$(DATE_STAMP)
+	@ echo '   SOURCE_VARIANT: $(SOURCE_VARIANT)' \
+                                              >>$(DATE_STAMP)
+	@ echo '   TAR_IN  : $(TAR_IN)'       >>$(DATE_STAMP)
+	@ echo '   TAR_OUT : $(TAR_OUT)'      >>$(DATE_STAMP)
+	@ echo ''                             >>$(DATE_STAMP)
+#
+#  Record completion of the build.
+	@ echo '$(SYSTEM)' > .BUILT
+
+#  install: Install the package for use.
+#  ------------------------------------
+#
+#  Copy the built files to their installation directories, from where
+#  they may be accessed.
+
+#  The install target first checks if any part of the package is
+#  already installed.  If not, it check that the system is built for this
+#  SYSTEM and, if it is, causes the .INSTALLED_$(SYSTEM) target to be made
+#  which performs the installation.
+
+install:
+	@ if test -f .INSTALLED_$(SYSTEM); then \
+           echo;\
+           echo \
+   '*** The $(PACK_NAME) package has already been installed -- please use the';\
+           echo \
+   '    "deinstall" target first if you wish to reinstall it';\
+           echo;\
+        elif test -f .BUILT; then \
+           if test "`cat .BUILT`" = "$(SYSTEM)"; then \
+              if $(MAKE) .INSTALLED_$(SYSTEM); then \
+                 echo;\
+                 echo \
+   '*** The $(PACK_NAME) package has been installed in directory $(INSTALL)';\
+                 echo;\
+              fi; \
+           else \
+              echo;\
+              echo \
+   "*** The $(PACK_NAME) package is built for system `cat .BUILT` -"\
+   'so cannot be installed on system $(SYSTEM)';\
+              echo;\
+           fi; \
+        else \
+           echo;\
+           echo \
+   '*** The $(PACK_NAME) package has been installed in directory $(INSTALL)';\
+           echo;\
+        fi
+
+#  The .INSTALLED_$(SYSTEM) target copies each file from the source
+#  directory using "cp -p" to preserve its date, and replaces each
+#  original file by a link to the installed copy.
+
+.INSTALLED_$(SYSTEM): $(INSTALL_DIRS)
+#
+#  Create .INSTALLED_$(SYSTEM), containing $INSTALL, to record that the
+#  package is installed (at least in part).
+	@ echo $(INSTALL) > .INSTALLED_$(SYSTEM)
+#
+#  Install the example binaries, giving them world execute permission.
+	for f in $(EXAMPLE_EXES) " "; do \
+           if test -f "$$f"; then \
+              cp -p $$f $(INSTALL_BIN);\
+              chmod 755 $(INSTALL_BIN)/$$f;\
+              rm $$f;\
+              $(LINK) $(INSTALL_BIN)/$$f $$f;\
+           else :; fi;\
+        done
+#
+#  Install the date stamp file and make it read-only to prevent its
+#  date being changed.
+	cp -p $(DATE_STAMP) $(INSTALL_DATES)
+	chmod 444 $(INSTALL_DATES)/$(DATE_STAMP)
+	chmod 644 $(DATE_STAMP)
+	rm $(DATE_STAMP)
+	$(LINK) $(INSTALL_DATES)/$(DATE_STAMP) $(DATE_STAMP)
+
+#  deinstall: Deinstall the package.
+#  --------------------------------
+#
+#  Reverse the action of the install target, removing the installed
+#  files and returning them to the source directory.
+
+#  The deinstall target checks that the package is installed in the INSTALL
+#  directory.  If so, it causes the do_deinstall target to be made which
+#  performs the deinstallation.
+
+deinstall:
+	@ if test ! -f .INSTALLED_$(SYSTEM); then \
+           echo;\
+           echo '*** The $(PACK_NAME) package is not currently installed';\
+           echo;\
+        else \
+           if test "`cat .INSTALLED_$(SYSTEM)`" = "$(INSTALL)"; then \
+              $(MAKE) do_deinstall;\
+              echo;\
+              echo \
+'*** The $(PACK_NAME) package has been deinstalled from directory $(INSTALL)';\
+              echo;\
+           else \
+              echo;\
+              echo \
+"*** The $(PACK_NAME) package is installed in `cat .INSTALLED_$(SYSTEM)`";\
+              echo \
+"*** and not in your INSTALL directory ($(INSTALL))";\
+              echo '*** Not deinstalled';\
+           fi; \
+        fi
+
+#  The do_deinstall target (which should never exist) checks that an
+#  installed version of each file exists (in case an install failed
+#  part of the way through) and returns it to the source directory,
+#  using "cp -p" to preserve file dates.  Links are removed from the
+#  source directory before copying.
+
+do_deinstall:
+#
+#  Note the package will need to be tested again.
+	@- if test -f .TESTED_$(SYSTEM); then rm .TESTED_$(SYSTEM); else :; fi
+#
+#  Deinstall the example binaries, if installed versions exist.
+	- for f in $(EXAMPLE_EXES) " "; do \
+           if test -f $(INSTALL_BIN)/$$f; then \
+              rm $$f;\
+              cp -p $(INSTALL_BIN)/$$f ./;\
+              rm $(INSTALL_BIN)/$$f;\
+           else :; fi; \
+        done
+#
+#  Deinstall the date stamp file after setting its protection so it may
+#  be removed.
+	- if test -f $(INSTALL_DATES)/$(DATE_STAMP); then \
+           chmod 644 $(DATE_STAMP); rm $(DATE_STAMP);\
+           chmod 644 $(INSTALL_DATES)/$(DATE_STAMP);\
+           cp -p $(INSTALL_DATES)/$(DATE_STAMP) ./;\
+           rm $(INSTALL_DATES)/$(DATE_STAMP);\
+        else :; fi
+#
+#  Note the system is no longer installed.  Re-create .BUILT, since we have
+#  returned the built files to the source directory but an unbuild may have
+#  been done.
+	@- rm .INSTALLED_$(SYSTEM) 1>/dev/null 2>/dev/null
+	@ echo '$(SYSTEM)' > .BUILT
+
+#  test: Perform an installation test.
+#  ----------------------------------
+#
+#  Check that installed files are in their correct places and that a
+#  simple test program will run correctly.
+
+#  The test target checks that the package is currently installed.  If
+#  so, it causes the do_test target to be made, which performs the
+#  installation test.
+
+test:
+	@ if test ! -f .INSTALLED_$(SYSTEM); then \
+           echo;\
+           echo '*** The $(PACK_NAME) package is not currently installed';\
+           echo;\
+        elif $(MAKE) do_test; then\
+           echo;\
+           echo \
+           '*** Installation test for the $(PACK_NAME) package has been run';\
+           echo;\
+        fi
+
+#  The do_test target performs the installation test. A file named do_test
+#  should never exist.
+
+do_test:
+#
+#  Note the test has not yet succeeded.
+	@- if test -f .TESTED_$(SYSTEM); then rm .TESTED_$(SYSTEM); else :; fi
+#
+#  Extract the test data file from the source archive.
+	$(TAR_OUT) $(PKG_NAME)_source.tar $(PKG_NAME)_test.dat
+	@ if test -f $(PKG_NAME)_test.dat; then :;\
+           else echo $(PKG_NAME)_test.dat is not in the tar file; exit 1; fi
+#
+#  Execute one of the example programs. Note that any external mechanism 
+#  for locating shareable libraries (e.g. a search path) must previously 
+#  have been set up.
+	./tezmap < $(PKG_NAME)_test.dat
+	rm $(PKG_NAME)_test.dat
+#
+#  Note the test has been run.
+	@ touch .TESTED_$(SYSTEM)
+
+#  export: Export the installed system.
+#  -----------------------------------
+#
+#  Export the source plus all the built files to a new user.
+
+#  The export target depends on the resulting compressed tar file being
+#  up to date.
+
+export: $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z
+	@ echo
+	@ echo \
+'*** Export copy of the built $(PACK_NAME) package is in the compressed'
+	@ echo \
+'    tar file $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z'
+	@ echo
+
+#  The compressed tar file is up to date if it exists and is more
+#  recent than all the source files and the date stamp file (which
+#  records the time of the last build which modified any files).
+
+$(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z: $(SOURCE_FILES) $(DATE_STAMP)
+#
+#  Issue a warning if the package has not been tested.
+	@ if test ! -f .TESTED_$(SYSTEM); then \
+           echo;\
+           echo '*** Warning: the $(PACK_NAME) package has not been tested';\
+           echo;\
+        else :; fi
+#
+#  Remove any pre-existing tar files before creating new ones.
+	if test -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z; then \
+           rm -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z; else :; fi
+	$(TAR_IN) - $(SOURCE_FILES) $(BUILT_FILES) $(DATE_STAMP) .BUILT \
+           | compress -v > $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z
+
+#  export_run: Export the built system (without source).
+#  -----------------------------------------------------
+#
+#  Export all the built files to a new user.
+
+#  The export_run target depends on the resulting compressed tar file being
+#  up to date.
+
+export_run: $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z
+	@ echo
+	@ echo \
+'*** Export copy of the "runtime" $(PACK_NAME) package is in the compressed'
+	@ echo \
+'    tar file $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z'
+	@ echo
+
+#  The compressed tar file is up to date if it exists and is more
+#  recent than all the source files and the date stamp file (which
+#  records the time of the last build which modified any files).
+
+$(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z: $(SOURCE_FILES) $(DATE_STAMP)
+#
+#  Issue a warning if the package has not been tested.
+	@ if test ! -f .TESTED_$(SYSTEM); then \
+           echo;\
+           echo '*** Warning: the $(PACK_NAME) package has not been tested';\
+           echo;\
+        else :; fi
+#
+#  Remove any pre-existing tar files before creating new ones.
+	if test -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z; then \
+           rm -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z; else :; fi
+	$(TAR_IN) - mk makefile $(DOCUMENTATION) $(BUILT_FILES) \
+           $(DATE_STAMP) .BUILT \
+           | compress -v > $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z
+
+#  export_source: Export the source.
+#  --------------------------------
+#
+#  Export the source files only to a new user.
+
+#  This target depends on the resulting compressed tar file being up to
+#  date.
+
+export_source: $(EXPORT)/$(PKG_NAME).tar.Z
+	@ echo
+	@ echo \
+'*** Export copy of the $(PACK_NAME) package source is in the compressed'
+	@ echo \
+'    tar file $(EXPORT)/$(PKG_NAME).tar.Z'
+	@ echo
+
+#  The compressed tar file is up to date if it exists and is more
+#  recent than all the source files.
+
+$(EXPORT)/$(PKG_NAME).tar.Z: $(SOURCE_FILES)
+#
+#  Remove any pre-existing tar files before creating new ones.
+	if test -f $(EXPORT)/$(PKG_NAME).tar.Z; then \
+           rm -f $(EXPORT)/$(PKG_NAME).tar.Z; else :; fi
+	$(TAR_IN) - $(SOURCE_FILES) \
+           | compress -v > $(EXPORT)/$(PKG_NAME).tar.Z
+
+#  clean: Clean up the source directory.
+#  ------------------------------------
+#
+#  Remove all intermediate files.  Do not remove built files.
+
+clean:
+	@- rm -f $(OBJECT_LINKS) $(EXAMPLE_SOURCES) 1>/dev/null 2>/dev/null
+	@ echo
+	@ echo '*** Intermediate files removed'
+	@ echo
+
+#  unbuild: Reverse the build process.
+#  ----------------------------------
+
+#  Remove all intermediate files and all built files, and note that the
+#  package is no longer built or tested.
+
+unbuild: clean
+	@- rm -f $(BUILT_FILES) $(DATE_STAMP) .BUILT 1>/dev/null 2>/dev/null
+	@ echo '*** Built files removed'
+	@ echo
+
+#  strip: strip the executables of debug information.
+#  -------------------------------------------------
+
+strip:
+	strip $(EXAMPLE_EXES)
+	@ echo '*** Executables stripped'
+
+#-------------------------------------------------------------------------------
+
+
