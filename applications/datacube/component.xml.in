@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>applications/datacube</path>
+  <description>DATACUBE - An IFS datacube manipulation package</description>
+  <abstract><p>DATACUBE is a package which includes the IFU Data Product Co
+okbook (SC/16), a small number of applications used for AXIS and  WCS
+manipulation, and a collection of example shell and IDL scripts for IFS data
+cube manipulation. </p></abstract>
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <!--
+  <developers>
+    <person>
+      <name></name>
+      <uname></uname>
+      <email></email>
+    </person>
+  </developers>
+  -->
+  <!-- <documentation>@STAR_DOCUMENTATION@</documentation> -->
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
