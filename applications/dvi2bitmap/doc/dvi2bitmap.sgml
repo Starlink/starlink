@@ -111,7 +111,7 @@ fonts.</px>
 </history>
 
 <copyright>
-Copyright 1999--2003, Council for the Central Laboratories of the
+Copyright 1999--2003, Council for the Central Laboratory of the
 Research Councils.
 </copyright>
 
@@ -1301,7 +1301,7 @@ successfully on (at least):
 <tbody>
 <row>
   <entry>i686-pc-linux-gnu (RedHat 7.3)</entry>
-  <entry>0.10b1</entry>
+  <entry>0.10</entry>
   <entry>gcc 2.96</entry>
 </row>
 <row>
@@ -1313,11 +1313,13 @@ successfully on (at least):
                       <entry>powerpc-apple-darwin6.4 (MacOSX 10.2)</entry>
                       <entry>0.10</entry>
                       <entry>g++ 3.1 20020420 (prerelease)</entry>
+		      <!-- g++ -version -->
                     </row>
 <row>
 <entry>sparc-sun-solaris2.8</entry>
-<entry>0.10b1</entry>
+<entry>0.10</entry>
 <entry>Sun WorkShop 6 update 2 C++ 5.3</entry>
+<!-- CC -V -->
 </row>
 <row>
 <entry>sparc-sun-solaris2.8</entry>
@@ -1326,8 +1328,9 @@ successfully on (at least):
 </row>
 <row>
 <entry>alphaev56-dec-osf5.0</entry>
-<entry>0.10b1</entry>
+<entry>0.10</entry>
 <entry>Compaq C++ V6.5-014 for Compaq Tru64 UNIX V5.0A</entry>
+<!-- cxx -V -->
 </row>
 <row>
 <entry>alphaev56-dec-osf5.0</entry>
@@ -1345,8 +1348,8 @@ successfully on (at least):
 </tabular>
 </blockquote>
 The `version' column is the last version which was actually tested on
-that platform.  Reports of compilations on other platform/compiler
-combinations gratefully received.
+that platform/compiler combination.  Reports of compilations on other
+platform/compiler combinations gratefully received.
 
 <p>It should be written in
 standards-conforming C++, so if it doesn't build then (1) it's not as
