@@ -191,7 +191,826 @@ unpack_jni_arch:
 unpack_jni_arch:
     [unjar] Expanding: /apps/cvsbuild/java/source/jniast/src/lib/ppc/jniast_libs.jar into /apps/cvsbuild/java/source/jniast/lib/ppc
 
-BUILD FAILED
-file:/apps/cvsbuild/java/source/jniast/build.xml:426: Error while expanding /apps/cvsbuild/java/source/jniast/src/lib/ppc/jniast_libs.jar
+build:
 
-Total time: 4 minutes 16 seconds
+jars:
+      [jar] Building jar: /apps/cvsbuild/java/source/jniast/lib/jniast/jniast.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/jniast/lib/jniast/jniast.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/jniast/lib/i386/jniast_libs.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/jniast/lib/sparc/jniast_libs.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/jniast/lib/x86/jniast_libs.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/jniast/lib/ppc/jniast_libs.jar
+
+javadoc_check:
+
+javadocs:
+
+webstart:
+
+dist:
+
+create_archives:
+      [zip] Building zip: /apps/cvsbuild/export/jniast-3.2-8-Linux.zip
+      [tar] Building tar: /apps/cvsbuild/java/source/jniast/jniast-3.2-8-Linux.tar
+     [gzip] Building: /apps/cvsbuild/export/jniast-3.2-8-Linux.tar.gz
+    [bzip2] Building: /apps/cvsbuild/export/jniast-3.2-8-Linux.tar.bz2
+   [delete] Deleting: /apps/cvsbuild/java/source/jniast/jniast-3.2-8-Linux.tar
+     [echo] Executing DIVA target: export
+
+export:
+
+prepare:
+
+check_packages:
+
+build:
+
+jars:
+      [jar] Building jar: /apps/cvsbuild/java/source/diva/lib/diva/diva.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/diva/lib/diva/acme.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/diva/lib/diva/aelfred.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/diva/lib/diva/diva.jar
+
+javadoc_check:
+
+javadocs:
+
+webstart:
+
+dist:
+
+create_archives:
+      [zip] Building zip: /apps/cvsbuild/export/diva-0.3.zip
+      [tar] Building tar: /apps/cvsbuild/java/source/diva/diva-0.3.tar
+     [gzip] Building: /apps/cvsbuild/export/diva-0.3.tar.gz
+    [bzip2] Building: /apps/cvsbuild/export/diva-0.3.tar.bz2
+   [delete] Deleting: /apps/cvsbuild/java/source/diva/diva-0.3.tar
+     [echo] Executing HELP target: export
+
+export:
+
+prepare:
+
+check_packages:
+
+build:
+
+jars:
+      [jar] Building jar: /apps/cvsbuild/java/source/help/lib/help/help.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/help/lib/help/help.jar
+
+javadoc_check:
+
+javadocs:
+
+webstart:
+
+dist:
+
+create_archives:
+      [zip] Building zip: /apps/cvsbuild/export/help-1.0.zip
+      [tar] Building tar: /apps/cvsbuild/java/source/help/help-1.0.tar
+     [gzip] Building: /apps/cvsbuild/export/help-1.0.tar.gz
+    [bzip2] Building: /apps/cvsbuild/export/help-1.0.tar.bz2
+   [delete] Deleting: /apps/cvsbuild/java/source/help/help-1.0.tar
+     [echo] Executing ASTGUI target: export
+
+export:
+
+prepare:
+
+check_packages:
+
+build:
+
+jars:
+      [jar] Building jar: /apps/cvsbuild/java/source/astgui/lib/astgui/astgui.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/astgui/lib/astgui/astgui.jar
+
+javadoc_check:
+
+javadocs:
+
+webstart:
+
+dist:
+
+create_archives:
+      [zip] Building zip: /apps/cvsbuild/export/astgui-1.0.zip
+      [tar] Building tar: /apps/cvsbuild/java/source/astgui/astgui-1.0.tar
+     [gzip] Building: /apps/cvsbuild/export/astgui-1.0.tar.gz
+    [bzip2] Building: /apps/cvsbuild/export/astgui-1.0.tar.bz2
+   [delete] Deleting: /apps/cvsbuild/java/source/astgui/astgui-1.0.tar
+     [echo] Executing JNIHDS target: export
+
+export:
+
+prepare:
+
+check_packages:
+
+build_classes:
+
+unpack_jni:
+
+unpack_jni_arch:
+    [unjar] Expanding: /apps/cvsbuild/java/source/jnihds/src/lib/i386/jnihds_libs.jar into /apps/cvsbuild/java/source/jnihds/lib/i386
+
+unpack_jni_arch:
+    [unjar] Expanding: /apps/cvsbuild/java/source/jnihds/src/lib/sparc/jnihds_libs.jar into /apps/cvsbuild/java/source/jnihds/lib/sparc
+
+unpack_jni_arch:
+    [unjar] Expanding: /apps/cvsbuild/java/source/jnihds/src/lib/x86/jnihds_libs.jar into /apps/cvsbuild/java/source/jnihds/lib/x86
+
+unpack_jni_arch:
+    [unjar] Expanding: /apps/cvsbuild/java/source/jnihds/src/lib/ppc/jnihds_libs.jar into /apps/cvsbuild/java/source/jnihds/lib/ppc
+
+build:
+
+jars:
+      [jar] Building jar: /apps/cvsbuild/java/source/jnihds/lib/jnihds/jnihds.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/jnihds/lib/jnihds/jnihds.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/jnihds/lib/i386/jnihds_libs.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/jnihds/lib/sparc/jnihds_libs.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/jnihds/lib/x86/jnihds_libs.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/jnihds/lib/ppc/jnihds_libs.jar
+
+javadoc_check:
+
+javadocs:
+
+webstart:
+
+dist:
+
+create_archives:
+      [zip] Building zip: /apps/cvsbuild/export/jnihds-0.3-Linux.zip
+      [tar] Building tar: /apps/cvsbuild/java/source/jnihds/jnihds-0.3-Linux.tar
+     [gzip] Building: /apps/cvsbuild/export/jnihds-0.3-Linux.tar.gz
+    [bzip2] Building: /apps/cvsbuild/export/jnihds-0.3-Linux.tar.bz2
+   [delete] Deleting: /apps/cvsbuild/java/source/jnihds/jnihds-0.3-Linux.tar
+     [echo] Executing HDX target: export
+
+export:
+
+prepare:
+
+check_packages:
+
+build:
+
+jars:
+      [jar] Building jar: /apps/cvsbuild/java/source/hdx/lib/hdx/hdx.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/hdx/lib/hdx/hdx.jar
+
+javadoc_check:
+
+javadocs:
+
+webstart:
+
+dist:
+
+create_archives:
+      [zip] Building zip: /apps/cvsbuild/export/hdx-0.1.zip
+      [tar] Building tar: /apps/cvsbuild/java/source/hdx/hdx-0.1.tar
+     [gzip] Building: /apps/cvsbuild/export/hdx-0.1.tar.gz
+    [bzip2] Building: /apps/cvsbuild/export/hdx-0.1.tar.bz2
+   [delete] Deleting: /apps/cvsbuild/java/source/hdx/hdx-0.1.tar
+     [echo] Executing NDArray target: export
+
+export:
+
+prepare:
+
+check_packages:
+
+assemble_java:
+
+build_classes:
+
+build:
+
+jars:
+      [jar] Building jar: /apps/cvsbuild/java/source/array/lib/array/array.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/array/lib/array/array.jar
+
+javadoc_check:
+
+javadocs:
+
+webstart:
+
+dist:
+
+create_archives:
+      [zip] Building zip: /apps/cvsbuild/export/array-0.2.zip
+      [tar] Building tar: /apps/cvsbuild/java/source/array/array-0.2.tar
+     [gzip] Building: /apps/cvsbuild/export/array-0.2.tar.gz
+    [bzip2] Building: /apps/cvsbuild/export/array-0.2.tar.bz2
+   [delete] Deleting: /apps/cvsbuild/java/source/array/array-0.2.tar
+     [echo] Executing NDX target: export
+
+export:
+
+prepare:
+
+check_packages:
+
+build:
+
+jars:
+      [jar] Building jar: /apps/cvsbuild/java/source/ndx/lib/ndx/ndx.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/ndx/lib/ndx/ndx.jar
+
+javadoc_check:
+
+javadocs:
+
+webstart:
+
+dist:
+
+create_archives:
+      [zip] Building zip: /apps/cvsbuild/export/ndx-0.1.zip
+      [tar] Building tar: /apps/cvsbuild/java/source/ndx/ndx-0.1.tar
+     [gzip] Building: /apps/cvsbuild/export/ndx-0.1.tar.gz
+    [bzip2] Building: /apps/cvsbuild/export/ndx-0.1.tar.bz2
+   [delete] Deleting: /apps/cvsbuild/java/source/ndx/ndx-0.1.tar
+     [echo] Executing Table target: export
+
+export:
+
+prepare:
+
+check_packages:
+
+build:
+
+jars:
+      [jar] Building jar: /apps/cvsbuild/java/source/table/lib/table/table.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/table/lib/table/table.jar
+
+javadoc_check:
+
+javadocs:
+
+webstart:
+
+dist:
+
+create_archives:
+      [zip] Building zip: /apps/cvsbuild/export/table-1.0.zip
+      [tar] Building tar: /apps/cvsbuild/java/source/table/table-1.0.tar
+     [gzip] Building: /apps/cvsbuild/export/table-1.0.tar.gz
+    [bzip2] Building: /apps/cvsbuild/export/table-1.0.tar.bz2
+   [delete] Deleting: /apps/cvsbuild/java/source/table/table-1.0.tar
+     [echo] Executing NDTools target: export
+
+export:
+
+prepare:
+
+check_packages:
+
+build:
+
+jars:
+      [jar] Building jar: /apps/cvsbuild/java/source/ndtools/lib/ndtools/ndtools.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/ndtools/lib/ndtools/ndtools.jar
+
+javadoc_check:
+
+javadocs:
+
+webstart:
+
+dist:
+
+create_archives:
+      [zip] Building zip: /apps/cvsbuild/export/ndtools-0.1.zip
+      [tar] Building tar: /apps/cvsbuild/java/source/ndtools/ndtools-0.1.tar
+     [gzip] Building: /apps/cvsbuild/export/ndtools-0.1.tar.gz
+    [bzip2] Building: /apps/cvsbuild/export/ndtools-0.1.tar.bz2
+   [delete] Deleting: /apps/cvsbuild/java/source/ndtools/ndtools-0.1.tar
+     [echo] Executing HDS target: export
+
+export:
+
+prepare:
+
+check_packages:
+
+build:
+
+jars:
+      [jar] Building jar: /apps/cvsbuild/java/source/hds/lib/hds/hds.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/hds/lib/hds/hds.jar
+
+javadoc_check:
+
+javadocs:
+
+webstart:
+
+dist:
+
+create_archives:
+      [zip] Building zip: /apps/cvsbuild/export/hds-0.1.zip
+      [tar] Building tar: /apps/cvsbuild/java/source/hds/hds-0.1.tar
+     [gzip] Building: /apps/cvsbuild/export/hds-0.1.tar.gz
+    [bzip2] Building: /apps/cvsbuild/export/hds-0.1.tar.bz2
+   [delete] Deleting: /apps/cvsbuild/java/source/hds/hds-0.1.tar
+     [echo] Executing FITS target: export
+
+export:
+
+prepare:
+
+check_packages:
+
+build:
+
+jars:
+      [jar] Building jar: /apps/cvsbuild/java/source/fits/lib/fits/fits.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/fits/lib/fits/fits.jar
+
+javadoc_check:
+
+javadocs:
+
+webstart:
+
+dist:
+
+create_archives:
+      [zip] Building zip: /apps/cvsbuild/export/fits-0.1.zip
+      [tar] Building tar: /apps/cvsbuild/java/source/fits/fits-0.1.tar
+     [gzip] Building: /apps/cvsbuild/export/fits-0.1.tar.gz
+    [bzip2] Building: /apps/cvsbuild/export/fits-0.1.tar.bz2
+   [delete] Deleting: /apps/cvsbuild/java/source/fits/fits-0.1.tar
+     [echo] Executing JSky target: export
+
+export:
+
+prepare:
+
+check_packages:
+
+build:
+
+jars:
+      [jar] Building jar: /apps/cvsbuild/java/source/jsky/lib/jsky/jsky.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/jsky/lib/jsky/jfreechart.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/jsky/lib/jsky/jcommon.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/jsky/lib/jsky/log4j.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/jsky/lib/jsky/dom4j.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/jsky/lib/jsky/jel.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/jsky/lib/jsky/hcompress.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/jsky/lib/jsky/jsky.jar
+
+javadoc_check:
+
+javadocs:
+
+webstart:
+
+dist:
+    [chmod] Result: -1
+
+create_archives:
+      [zip] Building zip: /apps/cvsbuild/export/jsky-2.0.zip
+      [tar] Building tar: /apps/cvsbuild/java/source/jsky/jsky-2.0.tar
+     [gzip] Building: /apps/cvsbuild/export/jsky-2.0.tar.gz
+    [bzip2] Building: /apps/cvsbuild/export/jsky-2.0.tar.bz2
+   [delete] Deleting: /apps/cvsbuild/java/source/jsky/jsky-2.0.tar
+     [echo] Executing Pal target: export
+
+export:
+
+prepare:
+
+check_packages:
+
+build:
+
+jars:
+      [jar] Building jar: /apps/cvsbuild/java/source/pal/lib/pal/pal.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/pal/lib/pal/pal.jar
+
+javadoc_check:
+
+javadocs:
+
+webstart:
+
+dist:
+
+create_archives:
+      [zip] Building zip: /apps/cvsbuild/export/pal-1.0.zip
+      [tar] Building tar: /apps/cvsbuild/java/source/pal/pal-1.0.tar
+     [gzip] Building: /apps/cvsbuild/export/pal-1.0.tar.gz
+    [bzip2] Building: /apps/cvsbuild/export/pal-1.0.tar.bz2
+   [delete] Deleting: /apps/cvsbuild/java/source/pal/pal-1.0.tar
+     [echo] Executing VOTable target: export
+
+export:
+
+prepare:
+
+check_packages:
+
+build:
+
+jars:
+      [jar] Building jar: /apps/cvsbuild/java/source/votable/lib/votable/votable.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/votable/lib/votable/votable.jar
+
+javadoc_check:
+
+javadocs:
+
+webstart:
+
+dist:
+
+create_archives:
+      [zip] Building zip: /apps/cvsbuild/export/votable-2.0.zip
+      [tar] Building tar: /apps/cvsbuild/java/source/votable/votable-2.0.tar
+     [gzip] Building: /apps/cvsbuild/export/votable-2.0.tar.gz
+    [bzip2] Building: /apps/cvsbuild/export/votable-2.0.tar.bz2
+   [delete] Deleting: /apps/cvsbuild/java/source/votable/votable-2.0.tar
+     [echo] Executing JAIUtil target: export
+
+export:
+
+prepare:
+
+check_packages:
+
+build:
+
+jars:
+      [jar] Building jar: /apps/cvsbuild/java/source/jaiutil/lib/jaiutil/jaiutil.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/jaiutil/lib/jaiutil/jaiutil.jar
+
+javadoc_check:
+
+javadocs:
+
+webstart:
+
+dist:
+
+create_archives:
+      [zip] Building zip: /apps/cvsbuild/export/jaiutil-1.0.zip
+      [tar] Building tar: /apps/cvsbuild/java/source/jaiutil/jaiutil-1.0.tar
+     [gzip] Building: /apps/cvsbuild/export/jaiutil-1.0.tar.gz
+    [bzip2] Building: /apps/cvsbuild/export/jaiutil-1.0.tar.bz2
+   [delete] Deleting: /apps/cvsbuild/java/source/jaiutil/jaiutil-1.0.tar
+     [echo] Executing SOAPSERVER target: export
+
+export:
+
+prepare:
+
+check_packages:
+
+build:
+
+jars:
+      [jar] Building jar: /apps/cvsbuild/java/source/soapserver/lib/soapserver/soapserver.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/soapserver/lib/soapserver/soapserver.jar
+
+javadoc_check:
+
+javadocs:
+
+webstart:
+
+dist:
+
+create_archives:
+      [zip] Building zip: /apps/cvsbuild/export/soapserver-0.1.zip
+      [tar] Building tar: /apps/cvsbuild/java/source/soapserver/soapserver-0.1.tar
+     [gzip] Building: /apps/cvsbuild/export/soapserver-0.1.tar.gz
+    [bzip2] Building: /apps/cvsbuild/export/soapserver-0.1.tar.bz2
+   [delete] Deleting: /apps/cvsbuild/java/source/soapserver/soapserver-0.1.tar
+     [echo] Executing JPCS target: export
+
+export:
+
+prepare:
+
+check_packages:
+
+build_classes:
+
+assemble_jni:
+
+build_jni:
+
+execute_mk_script:
+     [echo] java.home=/apps/j2sdk1.4.1_06/jre
+     [exec] mk: Environment variables defined for ix86_Linux system
+     [exec] make -e shared
+     [exec] make: Nothing to be done for `shared'.
+
+build:
+
+jars:
+
+javadoc_check:
+
+javadocs:
+
+dist:
+
+create_archives:
+      [zip] Building zip: /apps/cvsbuild/export/jpcs-0.1-Linux.zip
+      [tar] Building tar: /apps/cvsbuild/java/source/jpcs/jpcs-0.1-Linux.tar
+     [gzip] Building: /apps/cvsbuild/export/jpcs-0.1-Linux.tar.gz
+    [bzip2] Building: /apps/cvsbuild/export/jpcs-0.1-Linux.tar.bz2
+   [delete] Deleting: /apps/cvsbuild/java/source/jpcs/jpcs-0.1-Linux.tar
+     [echo] Executing SOG target: export
+
+export:
+
+prepare:
+
+check_packages:
+
+build:
+
+jars:
+      [jar] Building jar: /apps/cvsbuild/java/source/sog/lib/sog/sog.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/sog/lib/sog/sog.jar
+
+javadoc_check:
+
+javadocs:
+
+webstart:
+
+dist:
+
+create_archives:
+      [zip] Building zip: /apps/cvsbuild/export/sog-0.1.zip
+      [tar] Building tar: /apps/cvsbuild/java/source/sog/sog-0.1.tar
+     [gzip] Building: /apps/cvsbuild/export/sog-0.1.tar.gz
+    [bzip2] Building: /apps/cvsbuild/export/sog-0.1.tar.bz2
+   [delete] Deleting: /apps/cvsbuild/java/source/sog/sog-0.1.tar
+     [echo] Executing SPLAT target: export
+
+export:
+
+prepare:
+
+check_packages:
+
+build:
+
+execute_mk_script:
+     [echo] java.home=/apps/j2sdk1.4.1_06/jre
+     [exec] Running MK script...
+     [exec] mk: Environment variables defined for ix86_Linux system
+     [exec] make -e build
+     [exec] make: Nothing to be done for `build'.
+
+jars:
+      [jar] Building jar: /apps/cvsbuild/java/source/splat/lib/splat/splat.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/splat/lib/splat/splat_colt.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/splat/lib/splat/splat_help.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/splat/lib/splat/jdom.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/splat/lib/splat/jsci_wavelet.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/splat/lib/splat/jsci_core.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/splat/lib/splat/bsh-1.2b7.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/splat/lib/splat/splat.jar
+
+javadoc_check:
+
+javadocs:
+
+webstart:
+
+dist:
+    [chmod] Skipping fileset for directory /apps/cvsbuild/java/source/splat/lib. It is empty.
+
+create_archives:
+      [zip] Building zip: /apps/cvsbuild/export/splat-2.0.zip
+      [tar] Building tar: /apps/cvsbuild/java/source/splat/splat-2.0.tar
+     [gzip] Building: /apps/cvsbuild/export/splat-2.0.tar.gz
+    [bzip2] Building: /apps/cvsbuild/export/splat-2.0.tar.bz2
+   [delete] Deleting: /apps/cvsbuild/java/source/splat/splat-2.0.tar
+     [echo] Executing Mirage target: export
+
+export:
+
+prepare:
+
+check_packages:
+
+build:
+
+jars:
+      [jar] Building jar: /apps/cvsbuild/java/source/mirage/lib/mirage/mirage.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/mirage/lib/mirage/mirage.jar
+
+javadoc_check:
+
+javadocs:
+
+webstart:
+
+dist:
+
+create_archives:
+      [zip] Building zip: /apps/cvsbuild/export/mirage-0.1.zip
+      [tar] Building tar: /apps/cvsbuild/java/source/mirage/mirage-0.1.tar
+     [gzip] Building: /apps/cvsbuild/export/mirage-0.1.tar.gz
+    [bzip2] Building: /apps/cvsbuild/export/mirage-0.1.tar.bz2
+   [delete] Deleting: /apps/cvsbuild/java/source/mirage/mirage-0.1.tar
+     [echo] Executing TOPCAT target: export
+
+export:
+
+prepare:
+
+check_packages:
+
+build_demo:
+   [delete] Deleting: /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat/demo/demo_list
+    [touch] Creating /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat/demo/demo_list
+     [gzip] Nothing to do: /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat/demo/tables.fit.gz is up to date.
+      [tar] Nothing to do: /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat/demo/demo.tar.bz2 is up to date.
+
+build:
+
+docs_check:
+
+docs:
+
+jars:
+      [jar] Building jar: /apps/cvsbuild/java/source/topcat/lib/topcat/topcat.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/topcat/lib/topcat/jel_g.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/topcat/lib/topcat/plot.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/topcat/lib/topcat/topcat.jar
+
+javadoc_check:
+
+javadocs:
+
+webstart:
+
+dist:
+
+create_archives:
+      [zip] Building zip: /apps/cvsbuild/export/topcat-1.1.zip
+      [tar] Building tar: /apps/cvsbuild/java/source/topcat/topcat-1.1.tar
+     [gzip] Building: /apps/cvsbuild/export/topcat-1.1.tar.gz
+    [bzip2] Building: /apps/cvsbuild/export/topcat-1.1.tar.bz2
+   [delete] Deleting: /apps/cvsbuild/java/source/topcat/topcat-1.1.tar
+     [echo] Executing Treeview target: export
+
+export:
+
+prepare:
+
+really_check_packages:
+
+check_packages:
+
+build_demo:
+     [gzip] Nothing to do: /apps/cvsbuild/java/source/treeview/build/etc/demo/votable/vizier.xml.gz is up to date.
+      [tar] Nothing to do: /apps/cvsbuild/java/source/treeview/build/etc/demo/tar/demo.tar.gz is up to date.
+
+build:
+
+jars:
+      [jar] Building jar: /apps/cvsbuild/java/source/treeview/lib/treeview/treeview.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/treeview/lib/treeview/commons-net-1.0.0.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/treeview/lib/treeview/treeview.jar
+
+javadoc_check:
+
+javadocs:
+
+webstart:
+
+dist:
+
+create_archives:
+      [zip] Building zip: /apps/cvsbuild/export/treeview-2.2.zip
+      [tar] Building tar: /apps/cvsbuild/java/source/treeview/treeview-2.2.tar
+     [gzip] Building: /apps/cvsbuild/export/treeview-2.2.tar.gz
+    [bzip2] Building: /apps/cvsbuild/export/treeview-2.2.tar.bz2
+   [delete] Deleting: /apps/cvsbuild/java/source/treeview/treeview-2.2.tar
+     [echo] Executing Coco target: export
+
+export:
+
+prepare:
+
+check_packages:
+
+build:
+
+jars:
+      [jar] Building jar: /apps/cvsbuild/java/source/coco/lib/coco/coco.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/coco/lib/coco/coco.jar
+
+javadoc_check:
+
+javadocs:
+
+webstart:
+
+dist:
+
+create_archives:
+      [zip] Building zip: /apps/cvsbuild/export/coco-1.0.zip
+      [tar] Building tar: /apps/cvsbuild/java/source/coco/coco-1.0.tar
+     [gzip] Building: /apps/cvsbuild/export/coco-1.0.tar.gz
+    [bzip2] Building: /apps/cvsbuild/export/coco-1.0.tar.bz2
+   [delete] Deleting: /apps/cvsbuild/java/source/coco/coco-1.0.tar
+     [echo] Executing RV target: export
+
+export:
+
+prepare:
+
+check_packages:
+
+build:
+
+jars:
+      [jar] Building jar: /apps/cvsbuild/java/source/rv/lib/rv/rv.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/rv/lib/rv/rv.jar
+
+javadoc_check:
+
+javadocs:
+
+webstart:
+
+dist:
+
+create_archives:
+      [zip] Building zip: /apps/cvsbuild/export/rv-1.0.zip
+      [tar] Building tar: /apps/cvsbuild/java/source/rv/rv-1.0.tar
+     [gzip] Building: /apps/cvsbuild/export/rv-1.0.tar.gz
+    [bzip2] Building: /apps/cvsbuild/export/rv-1.0.tar.bz2
+   [delete] Deleting: /apps/cvsbuild/java/source/rv/rv-1.0.tar
+     [echo] Executing FROG target: export
+
+export:
+
+prepare:
+
+check_packages:
+
+build:
+
+execute_mk_script:
+     [echo] java.home=/apps/j2sdk1.4.1_06/jre
+     [exec] Running MK script...
+     [exec] mk: Environment variables defined for ix86_Linux system
+     [exec] make -e build
+     [exec] mkdir temp
+     [exec] (cd temp; \
+     [exec]    for f in `../frog_libraries` ""; do \
+     [exec]       echo "Processing $f"; \
+     [exec]       if test -n "$f"; then \
+     [exec]          ar x $f; \
+     [exec]       fi;\
+     [exec] done)
+     [exec] Processing 
+     [exec] f() { g77 -shared -o $1 $2 -lg2c -lm -lgcc -lc;}; f /apps/cvsbuild/java/source/frog/lib/libfrog.so 'Dummy.o temp/*.o -L/apps/cvsbuild/starjava/lib -L/apps/cvsbuild/java/source/jniast/lib -ljniast' '';\
+     [exec] rm -r -f temp
+     [exec] g77: temp/*.o: No such file or directory
+
+jars:
+      [jar] Building jar: /apps/cvsbuild/java/source/frog/lib/frog/frog.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/frog/lib/frog/jama.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/frog/lib/frog/frog_help.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/frog/lib/frog/jhall.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/frog/lib/frog/frog.jar
+
+javadoc_check:
+
+javadocs:
+
+webstart:
+
+dist:
+    [chmod] Skipping fileset for directory /apps/cvsbuild/java/source/frog/lib. It is empty.
+
+create_archives:
+      [zip] Building zip: /apps/cvsbuild/export/frog-0.6.0.zip
+      [tar] Building tar: /apps/cvsbuild/java/source/frog/frog-0.6.0.tar
+     [gzip] Building: /apps/cvsbuild/export/frog-0.6.0.tar.gz
+    [bzip2] Building: /apps/cvsbuild/export/frog-0.6.0.tar.bz2
+   [delete] Deleting: /apps/cvsbuild/java/source/frog/frog-0.6.0.tar
+
+BUILD SUCCESSFUL
+Total time: 24 minutes 31 seconds

@@ -6472,6 +6472,8 @@ cvs checkout: Updating java/source/jniast/src/lib
 U java/source/jniast/src/lib/README.updates
 cvs checkout: Updating java/source/jniast/src/lib/i386
 U java/source/jniast/src/lib/i386/jniast_libs.jar
+cvs checkout: Updating java/source/jniast/src/lib/ppc
+U java/source/jniast/src/lib/ppc/jniast_libs.jar
 cvs checkout: Updating java/source/jniast/src/lib/sparc
 U java/source/jniast/src/lib/sparc/jniast_libs.jar
 cvs checkout: Updating java/source/jniast/src/lib/x86
@@ -6598,6 +6600,8 @@ cvs checkout: Updating java/source/jnihds/src/lib
 U java/source/jnihds/src/lib/README.updates
 cvs checkout: Updating java/source/jnihds/src/lib/i386
 U java/source/jnihds/src/lib/i386/jnihds_libs.jar
+cvs checkout: Updating java/source/jnihds/src/lib/ppc
+U java/source/jnihds/src/lib/ppc/jnihds_libs.jar
 cvs checkout: Updating java/source/jnihds/src/lib/sparc
 U java/source/jnihds/src/lib/sparc/jnihds_libs.jar
 cvs checkout: Updating java/source/jnihds/src/lib/x86
@@ -8807,6 +8811,29 @@ U java/source/topcat/src/docs/sun253.xml
 U java/source/topcat/src/docs/toHTML.xslt
 U java/source/topcat/src/docs/toHTML1.xslt
 U java/source/topcat/src/docs/toHelp.xslt
+cvs checkout: Updating java/source/topcat/src/docs/figures
+U java/source/topcat/src/docs/figures/ColumnInfoWindow.gif
+U java/source/topcat/src/docs/figures/ConcatWindow.gif
+U java/source/topcat/src/docs/figures/ControlWindow.gif
+U java/source/topcat/src/docs/figures/HelpWindow.gif
+U java/source/topcat/src/docs/figures/JFileChooserLoad.gif
+U java/source/topcat/src/docs/figures/JFileChooserSave.gif
+U java/source/topcat/src/docs/figures/JTable.gif
+U java/source/topcat/src/docs/figures/LoadQueryWindow.gif
+U java/source/topcat/src/docs/figures/MatchWindow.gif
+U java/source/topcat/src/docs/figures/MatchWindow1.gif
+U java/source/topcat/src/docs/figures/MethodWindow.gif
+U java/source/topcat/src/docs/figures/ParameterWindow.gif
+U java/source/topcat/src/docs/figures/PlotWindow.gif
+U java/source/topcat/src/docs/figures/SQLReadDialog.gif
+U java/source/topcat/src/docs/figures/SQLWriteDialog.gif
+U java/source/topcat/src/docs/figures/StarTableNodeChooser.gif
+U java/source/topcat/src/docs/figures/StarTableSaver.gif
+U java/source/topcat/src/docs/figures/StatsWindow.gif
+U java/source/topcat/src/docs/figures/SubsetWindow.gif
+U java/source/topcat/src/docs/figures/SyntheticColumnQueryWindow.gif
+U java/source/topcat/src/docs/figures/SyntheticSubsetQueryWindow.gif
+U java/source/topcat/src/docs/figures/TableViewerWindow.gif
 cvs checkout: Updating java/source/topcat/src/etc
 cvs checkout: Updating java/source/topcat/src/etc/demo
 cvs checkout: Updating java/source/topcat/src/etc/demo/fits
@@ -8958,7 +8985,9 @@ cvs checkout: Updating java/source/topcat/src/testcases/uk
 cvs checkout: Updating java/source/topcat/src/testcases/uk/ac
 cvs checkout: Updating java/source/topcat/src/testcases/uk/ac/starlink
 cvs checkout: Updating java/source/topcat/src/testcases/uk/ac/starlink/topcat
+U java/source/topcat/src/testcases/uk/ac/starlink/topcat/DocTest.java
 U java/source/topcat/src/testcases/uk/ac/starlink/topcat/HelpTest.java
+U java/source/topcat/src/testcases/uk/ac/starlink/topcat/LinkChecker.java
 U java/source/topcat/src/testcases/uk/ac/starlink/topcat/ResourceTest.java
 cvs checkout: Updating java/source/treeview
 U java/source/treeview/.properties
