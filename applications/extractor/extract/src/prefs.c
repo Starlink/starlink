@@ -50,6 +50,7 @@ void    readprefs(char *filename, char **argkey, char **argval, int narg)
 
 /* PWD: open the configuration file. Check for environment variables
    in name, code copied from below */
+   name = filename;
 #ifndef	NO_ENVVAR
    if ( dolpos = strchr( filename, '$' ) ) {
      int        nc;
@@ -87,8 +88,6 @@ void    readprefs(char *filename, char **argkey, char **argval, int narg)
      }
      name = str;
    }
-#else 
-   name = filename;
 #endif
 
 /*  Now open file. */
