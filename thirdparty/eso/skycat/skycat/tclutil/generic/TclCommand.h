@@ -56,7 +56,7 @@ protected:
 
 protected:
     // tcl command proc, called by tcl, calls the correct member function
-    static tclCmdProc(ClientData, Tcl_Interp* interp, int argc, char* argv[]);
+    static int tclCmdProc(ClientData, Tcl_Interp* interp, int argc, char* argv[]);
 
     // tcl delete proc, called when tcl object is deleted
     static void tclDeleteProc(ClientData);
