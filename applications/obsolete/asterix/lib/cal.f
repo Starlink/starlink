@@ -293,7 +293,6 @@ C Queue introduces a knee
         INCLUDE 'DAT_PAR'
       CHARACTER*(DAT__SZLOC) ALOC,CELL, KLOC, RLOC
       CHARACTER*20 LOCATOR, REL_DATE
-      CHARACTER*64 LOCALIGN
       INTEGER NREC, ISET, NGOT
       CHARACTER*(DAT__SZLOC)  LOC			! Locator to MCF
       DOUBLE PRECISION MJDLO,MJDHI
@@ -823,7 +822,7 @@ C Evalutate function over grid
 * Modified status handling and detector/filter Dick Willingale 1990-Apr-25
 *-
        PARAMETER (N=11,RTOA=206264.8062,PIX=36.0/RTOA)
-       REAL D,AREA,T,TX,TXS,TXYS,TXD,TYD,X,Y,PARTX,PARTY,PX,PY
+       REAL D,T,TXS,TXYS,TYD,X,Y,PARTX,PARTY,PY
        INTEGER NX,NY,IX,IY
 C
 	IF(ISTAT.NE.0) RETURN
@@ -1177,7 +1176,6 @@ C Generate samples
 	REAL*8		MJDLO,MJDHI	  ! Last epoch window
 	LOGICAL		CIN_VALID
 	INTEGER 	FNOW		  ! Last filter
-	CHARACTER*(DAT__SZLOC) LOC1,LOC2,LOC3,LOC4,LOC5
 	SAVE MJDLO,MJDHI,FNOW
 	DATA NELS /65, 65, 2/
 	DATA FNOW/-1/
@@ -1338,9 +1336,6 @@ C Interpolate
 * Modified to fix valid time error MJR 30-Jun-90
 * Revised version placed in library, RW 4-Jul-90
 *-
-*  Local Variables
-      REAL DVALID,DAYS_VALID
-      REAL*8 DIFMJD
 
       IF (REL_DATE.NE.'NONE') THEN
        IF (REL_DATE.EQ.'BETWEEN') THEN
