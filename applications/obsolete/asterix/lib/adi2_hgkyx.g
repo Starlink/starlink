@@ -1,4 +1,4 @@
-      SUBROUTINE ADI2_HGKY<T>( HDUID, KEY, VALUE, STATUS )
+      SUBROUTINE ADI2_HGKY<T>( HDUID, KEY, VALUE, CMNT, STATUS )
 *+
 *  Name:
 *     ADI2_HGKY<T>
@@ -10,11 +10,12 @@
 *     Starlink Fortran
 
 *  Invocation:
-*     CALL ADI2_HGKY<T>( HDUID, KEY, VALUE, STATUS )
+*     CALL ADI2_HGKY<T>( HDUID, KEY, VALUE, CMNT, STATUS )
 
 *  Description:
 *     Get value of keyword from specified HDU. It is an error for the
-*     keyword not to exist.
+*     keyword not to exist. If the first character of the keyword is
+*     '>' then the Written flag is set for the keyword.
 
 *  Arguments:
 *     HDUID = INTEGER (given)
@@ -23,6 +24,8 @@
 *        The name of the keyword to be extracted
 *     VALUE = <TYPE> (returned)
 *        The keyword value
+*     CMNT = CHARACTER*(*) (returned)
+*        Comment string
 *     STATUS = INTEGER (given and returned)
 *        The global status.
 
@@ -86,6 +89,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'ADI_PAR'
 
 *  Arguments Given:
       INTEGER			HDUID
@@ -93,47 +97,55 @@
 
 *  Arguments Returned:
       <TYPE>			VALUE
+      CHARACTER*(*)		CMNT
 
 *  Status:
       INTEGER 			STATUS             	! Global status
 
 *  Local Variables:
-      INTEGER			KID			! Keywords list
+      INTEGER			CID			! Keyword cache obhect
+      INTEGER			FC			! First char of
+							! keyword name
 
-      LOGICAL			SCAND			! HDU has been scanned?
       LOGICAL			THERE			! Keyword exists?
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Have keywords been scanned for this HDU
-      CALL ADI_CGET0L( HDUID, 'Scanned', SCAND, STATUS )
-      IF ( .NOT. SCAND ) THEN
-        CALL ADI2_SCAN( HDUID, STATUS )
-      END IF
+*  Look for special character
+      FC = 1
+      IF ( KEY(1:1) .EQ. '>' ) FC = 2
 
-*  Locate keywords container
-      CALL ADI_FIND( HDUID, 'Keys', KID, STATUS )
+*  Locate keyword
+      CALL ADI2_CFIND_KEY( HDUID, KEY(FC:), .FALSE., CID, .FALSE.,
+     :                     STATUS )
 
-*  Does our keyword exist?
-      CALL ADI_THERE( KID, KEY, THERE, STATUS )
-      IF ( THERE ) THEN
-
-*    Extract its value
-        CALL ADI_CGET0<T>( KID, KEY, VALUE, STATUS )
-
-      ELSE
+*  Keyword doesn't exist?
+      IF ( CID .EQ. ADI__NULLID ) THEN
         STATUS = SAI__ERROR
-        CALL MSG_SETC( 'KEY', KEY )
-        CALL ERR_REP( ' ', 'Keyword /^KEY/ does not exist in HDU',
-     :                STATUS )
-      END IF
+        CALL MSG_SETC( 'K', KEY(FC:) )
+        CALL ERR_REP( ' ', 'No such keyword value ^K', STATUS )
 
-*  Release keyword container
-      CALL ERR_BEGIN( STATUS )
-      CALL ADI_ERASE( KID, STATUS )
-      CALL ERR_END( STATUS )
+*  Keyword exists
+      ELSE
+        CALL ADI_CGET0<T>( CID, 'Value', VALUE, STATUS )
+        CALL ADI_FIND( CID, 'Comment', THERE, STATUS )
+        IF ( THERE ) THEN
+          CALL ADI_CGET0C( CID, 'Comment', CMNT, STATUS )
+        ELSE
+          CMNT = ' '
+        END IF
+
+*    Mark as written?
+        IF ( FC .EQ. 2 ) THEN
+          CALL ADI_CPUT0L( CID, 'Written', .TRUE., STATUS )
+        END IF
+
+*    Release key
+        CALL ADI_ERASE( CID, STATUS )
+
+      END IF
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'ADI2_HGKY<T>', STATUS )
