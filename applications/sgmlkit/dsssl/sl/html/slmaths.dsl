@@ -28,7 +28,7 @@ extract all the maths from a document.
 <description>Unlike the <code/code.maths.tth/ codegroup below, the
 code here extracts the maths into a file ready for quite substantial
 postprocessing using Perl, LaTeX, dvips, and convert, to turn the maths
-fragments into GIFs.  We write out a file ready too be munged into a LaTeX 
+fragments into GIFs (or JPEGs or PNGs, or whatever -- this code doesn't depend on the actual format).  We write out a file ready too be munged into a LaTeX 
 file by a Perl script -- we use this extra step so that the Perl can try to
 reuse equations wherever possible, the logic for which is probably rather
 difficult in DSSSL.
@@ -37,7 +37,7 @@ difficult in DSSSL.
 <func>
 <routinename>get-maths
 <description>Create an external entity, and write out a document ready
-  for post-processing.  Process all the elements with GIs which math
+  for post-processing.  Process all the elements with GIs which match
   elements in <code/maths-element-list/, spitting them out into this
   document accompanied by directives to the post-processor.
   <p>If there are no maths elements, return <code/(empty-sosofo)/.
@@ -76,8 +76,32 @@ appropriate arguments
     (img-equation "inline"))
   (element mequation
     (img-equation "equation"))
+  (element mline
+    (make sequence
+      (make formatting-instruction data: (data (current-node)))
+      (literal (if (last-sibling?) "" "\\\\"))))
   (element meqnarray
-    (img-equation "eqnarray")))
+    (make sequence
+      (process-children)
+      (make formatting-instruction data: (string-append "
+%%imgmath eqnarray " (img-eqnref) "
+")))))
+
+
+;   (element mline
+;     (if (string=? (gi (parent))
+; 		  (normalize "meqnarray"))
+; 	(make sequence
+; 	  (make formatting-instruction data: (data (current-node)))
+; 	  (literal (if (last-sibling?) "" "\\\\")))
+; 	(img-equation "equation")))
+;   (element meqnarray
+;     (make sequence
+;       (process-children)
+;       (make formatting-instruction
+; 	data: (string-append "
+; %%imgmath eqnarray " (img-eqnref) "
+; ")))))
 
 <func>
 <routinename>img-equation
@@ -144,8 +168,8 @@ appropriate arguments
 <routinename>img-equation-sysid
 <description>Extracts from the <code/img-eqlist/ document the sysid of the
 image which corresponds to the current element, and returns it as a string.
-<returnvalue type=string>sysid of the GIF holding this equations's 
-representation, or <code/#f/ if none can be found.
+<returnvalue type=string>sysid of the GIF (or whatever) holding this
+equations's representation, or <code/#f/ if none can be found.
 <argumentlist>
 <parameter optional default='(current-node)'>
   nd
