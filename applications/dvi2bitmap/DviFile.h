@@ -73,10 +73,13 @@ class DviFile {
 public:
     // magmag is a factor by which the file's internal
     // magnification should be increased.
-    DviFile (string& s, int resolution,
-	     double magmag=1.0, bool read_postamble=true);
-    DviFile (const char* s, int resolution,
-	     double magmag=1.0, bool read_postamble=true);
+    DviFile (string& s,
+	     int resolution,
+	     double magmag=1.0,
+	     bool read_postamble=true,
+	     bool seekable=true);
+/*     DviFile (const char* s, int resolution, */
+/* 	     double magmag=1.0, bool read_postamble=true); */
     ~DviFile();
     bool eof();
     DviFileEvent *getEvent();
