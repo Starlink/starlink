@@ -28,8 +28,8 @@ dnl    Other options here, such as
 STAR_CNF_COMPATIBLE_SYMBOLS
 
 dnl    Declare the build and use dependencies for this package
-STAR_DECLARE_DEPENDENCIES([build], [cnf gwm])
-STAR_DECLARE_DEPENDENCIES([link],  [gwm cnf])
+STAR_DECLARE_DEPENDENCIES([build], [cnf gwm psx mers chr])
+STAR_DECLARE_DEPENDENCIES([link],  [gwm cnf psx mers chr])
 
 
 dnl    If you wish to configure extra files, you can add them to this
