@@ -7656,6 +7656,7 @@ U java/source/sog/build.xml
 U java/source/sog/runLocal
 cvs checkout: Updating java/source/sog/src
 cvs checkout: Updating java/source/sog/src/docs
+U java/source/sog/src/docs/sog.news
 cvs checkout: Updating java/source/sog/src/etc
 cvs checkout: Updating java/source/sog/src/etc/data
 U java/source/sog/src/etc/data/cobe.fit
@@ -9273,6 +9274,7 @@ U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/redo3.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/selrows3.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/sigma0.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/spoints5.gif
+U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/starlinklogo1b.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/starlinklogo3.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/tablemeta0.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/tc3.gif

@@ -285,139 +285,6 @@ javadoc-sources:
   [javadoc] Loading source files for package jsky.science...
   [javadoc] Loading source files for package jsky.app.jskycat...
   [javadoc] Constructing Javadoc information...
-  [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/join/HTMMatchEngine.java:3: package edu.jhu.htm.core does not exist
-  [javadoc] import edu.jhu.htm.core.HTMException;
-  [javadoc]                         ^
-  [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/join/HTMMatchEngine.java:4: package edu.jhu.htm.core does not exist
-  [javadoc] import edu.jhu.htm.core.HTMindex;
-  [javadoc]                         ^
-  [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/join/HTMMatchEngine.java:5: package edu.jhu.htm.core does not exist
-  [javadoc] import edu.jhu.htm.core.HTMindexImp;
-  [javadoc]                         ^
-  [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/join/HTMMatchEngine.java:6: package edu.jhu.htm.core does not exist
-  [javadoc] import edu.jhu.htm.core.HTMrange;
-  [javadoc]                         ^
-  [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/join/HTMMatchEngine.java:7: package edu.jhu.htm.core does not exist
-  [javadoc] import edu.jhu.htm.core.HTMrangeIterator;
-  [javadoc]                         ^
-  [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/join/HTMMatchEngine.java:8: package edu.jhu.htm.geometry does not exist
-  [javadoc] import edu.jhu.htm.geometry.Circle;
-  [javadoc]                             ^
-  [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/join/HTMMatchEngine.java:34: cannot resolve symbol
-  [javadoc] symbol  : class HTMindex 
-  [javadoc] location: class uk.ac.starlink.table.join.HTMMatchEngine
-  [javadoc]     private HTMindex htm;
-  [javadoc]             ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/fits/codec/FITSImage.java:46: package ca.nrc.cadc.arch.io does not exist
-  [javadoc] import ca.nrc.cadc.arch.io.FitsFilterInputStream;
-  [javadoc]                            ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/catalog/TablePlotSymbol.java:19: package gnu.jel does not exist
-  [javadoc] import gnu.jel.DVResolver;
-  [javadoc]                ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/catalog/TablePlotSymbol.java:33: cannot resolve symbol
-  [javadoc] symbol  : class DVResolver 
-  [javadoc] location: class jsky.catalog.TablePlotSymbol
-  [javadoc] public class TablePlotSymbol implements DVResolver {
-  [javadoc]                                         ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/util/JavaExpr.java:10: package gnu.jel does not exist
-  [javadoc] import gnu.jel.CompilationException;
-  [javadoc]                ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/util/JavaExpr.java:11: package gnu.jel does not exist
-  [javadoc] import gnu.jel.CompiledExpression;
-  [javadoc]                ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/util/JavaExpr.java:12: package gnu.jel does not exist
-  [javadoc] import gnu.jel.DVResolver;
-  [javadoc]                ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/util/JavaExpr.java:13: package gnu.jel does not exist
-  [javadoc] import gnu.jel.Evaluator;
-  [javadoc]                ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/util/JavaExpr.java:14: package gnu.jel does not exist
-  [javadoc] import gnu.jel.Library;
-  [javadoc]                ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/util/JavaExpr.java:27: cannot resolve symbol
-  [javadoc] symbol  : class DVResolver 
-  [javadoc] location: class jsky.util.JavaExpr
-  [javadoc] public class JavaExpr implements DVResolver {
-  [javadoc]                                  ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/util/JavaExpr.java:30: cannot resolve symbol
-  [javadoc] symbol  : class CompiledExpression 
-  [javadoc] location: class jsky.util.JavaExpr
-  [javadoc]     private CompiledExpression _expr;
-  [javadoc]             ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/util/JavaExpr.java:90: cannot resolve symbol
-  [javadoc] symbol  : class DVResolver 
-  [javadoc] location: class jsky.util.JavaExpr
-  [javadoc]     public JavaExpr(String exprStr, DVResolver resolver) throws Throwable {
-  [javadoc]                                     ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/catalog/astrocat/AstroCatXML.java:30: package org.dom4j.io does not exist
-  [javadoc] import org.dom4j.io.OutputFormat;
-  [javadoc]                     ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/catalog/astrocat/AstroCatXML.java:31: package org.dom4j.io does not exist
-  [javadoc] import org.dom4j.io.XMLWriter;
-  [javadoc]                     ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/catalog/astrocat/AstroCatXML.java:433: cannot resolve symbol
-  [javadoc] symbol  : class XMLWriter 
-  [javadoc] location: class jsky.catalog.astrocat.AstroCatXML
-  [javadoc]     private static void _saveCatalogs(XMLWriter xml, List catalogs) throws SAXException {
-  [javadoc]                                       ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/catalog/astrocat/AstroCatXML.java:453: cannot resolve symbol
-  [javadoc] symbol  : class XMLWriter 
-  [javadoc] location: class jsky.catalog.astrocat.AstroCatXML
-  [javadoc]     private static void _saveCatalog(XMLWriter xml, Catalog catalog) throws SAXException {
-  [javadoc]                                      ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/catalog/astrocat/AstroCatXML.java:500: cannot resolve symbol
-  [javadoc] symbol  : class XMLWriter 
-  [javadoc] location: class jsky.catalog.astrocat.AstroCatXML
-  [javadoc]     private static void _saveSymbols(XMLWriter xml, TablePlotSymbol[] symbols) throws SAXException {
-  [javadoc]                                      ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/catalog/astrocat/AstroCatXML.java:513: cannot resolve symbol
-  [javadoc] symbol  : class XMLWriter 
-  [javadoc] location: class jsky.catalog.astrocat.AstroCatXML
-  [javadoc]     private static void _saveSymbol(XMLWriter xml, TablePlotSymbol symbol) throws SAXException {
-  [javadoc]                                     ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/gui/ImageCutLevels.java:17: package com.jrefinery.chart does not exist
-  [javadoc] import com.jrefinery.chart.ChartFactory;
-  [javadoc]                            ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/gui/ImageCutLevels.java:18: package com.jrefinery.chart does not exist
-  [javadoc] import com.jrefinery.chart.JFreeChart;
-  [javadoc]                            ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/gui/ImageCutLevels.java:19: package com.jrefinery.chart does not exist
-  [javadoc] import com.jrefinery.chart.ChartPanel;
-  [javadoc]                            ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/gui/ImageCutLevels.java:20: package com.jrefinery.chart does not exist
-  [javadoc] import com.jrefinery.chart.Plot;
-  [javadoc]                            ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/gui/ImageCutLevels.java:21: package com.jrefinery.data does not exist
-  [javadoc] import com.jrefinery.data.DatasetChangeListener;
-  [javadoc]                           ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/gui/ImageCutLevels.java:22: package com.jrefinery.data does not exist
-  [javadoc] import com.jrefinery.data.XYDataset;
-  [javadoc]                           ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/gui/ImageCutLevels.java:65: cannot resolve symbol
-  [javadoc] symbol  : class JFreeChart 
-  [javadoc] location: class jsky.image.gui.ImageCutLevels
-  [javadoc]     protected JFreeChart chart;
-  [javadoc]               ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/gui/ImageCutLevels.java:127: cannot resolve symbol
-  [javadoc] symbol  : class ChartPanel 
-  [javadoc] location: class jsky.image.gui.ImageCutLevels
-  [javadoc]     ChartPanel makeGraph() {
-  [javadoc]     ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/gui/ImageCutLevels.java:377: cannot resolve symbol
-  [javadoc] symbol  : class XYDataset 
-  [javadoc] location: class jsky.image.gui.ImageCutLevels.SimpleDataset
-  [javadoc]     class SimpleDataset implements XYDataset {
-  [javadoc]                                    ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/gui/ImageCutLevels.java:414: cannot resolve symbol
-  [javadoc] symbol  : class DatasetChangeListener 
-  [javadoc] location: class jsky.image.gui.ImageCutLevels.SimpleDataset
-  [javadoc]         public void addChangeListener(DatasetChangeListener listener) {
-  [javadoc]                                       ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/gui/ImageCutLevels.java:421: cannot resolve symbol
-  [javadoc] symbol  : class DatasetChangeListener 
-  [javadoc] location: class jsky.image.gui.ImageCutLevels.SimpleDataset
-  [javadoc]         public void removeChangeListener(DatasetChangeListener listener) {
-  [javadoc]                                          ^
   [javadoc] Standard Doclet version 1.4.1
 
   [javadoc] Building tree for all the packages and classes...
@@ -523,11 +390,11 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/AbstractGraphModel.java:52: warning - Tag @see: missing #: "setDispatchEnabled(boolean)"
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/GraphModel.java:54: warning - Tag @see: missing #: "setDispatchEnabled(boolean)"
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/pod/package.html: warning - The first sentence is interpreted to be:
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/package.html: warning - The first sentence is interpreted to be:
   [javadoc] "A Pod, in Diva, is an object that contains a "pile of data."  This is
   [javadoc] our term for complex data structures that evolve with time."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "A Pod, in Diva, is an object that contains a "pile of data."  "
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/package.html: warning - The first sentence is interpreted to be:
   [javadoc] "This package contains general utilities for applications that use
   [javadoc] recognition, such as:
   [javadoc] <ol>
@@ -1671,7 +1538,7 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstDoubleDocument.java:33: warning - Tag @link: reference not found: Plot
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstDoubleField.java:29: warning - Tag @link: reference not found: Frame
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/stylesheet.css...
-  [javadoc] 612 warnings
+  [javadoc] 577 warnings
 
 BUILD SUCCESSFUL
-Total time: 1 minute 5 seconds
+Total time: 1 minute 7 seconds
