@@ -53,8 +53,8 @@ noinst_PROGRAMS = gksbuild idibuild
 gksbuild_SOURCES = gksbuild.fpp
 idibuild_SOURCES = idibuild.fpp
 
-gksbuild.o: gksbuild.f
-idibuild.o: idibuild.f
+gksbuild.f: gksbuild.fpp
+idibuild.f: idibuild.fpp
 
 gns_gksdevices : gksbuild gksdevices.txt
 	-rm -f gns_gksdevices
