@@ -476,7 +476,7 @@ I_SUB2 =
 #  the files.
 
 EXTERNAL_INCLUDES = SAE_PAR NDF_PAR NDF_ERR GRP_PAR PRM_PAR PAR_ERR \
-PAR_PAR AGI_ERR FIO_ERR MSG_PAR SUBPAR_PAR DAT_PAR PSX_ERR AST_PAR
+PAR_PAR AGI_ERR FIO_ERR MSG_PAR SUBPAR_PAR DAT_PAR PSX_ERR AST_PAR AST_ERR
 
 #  List of Fortran routines required for building the package.  This is
 #  just a list of all the Fortran source files (excluding BLOCK DATA
@@ -672,7 +672,7 @@ $(F_SUB2) $(I_SUB2) $(B_SUB2) $(C_SUB2):
 #	mv $@_$(SOURCE_VARIANT) $@
 
 d1mach.f: d1mach.f_$(SOURCE_VARIANT)
-	$(LINK) $< $@
+	$(LINK) $? $@
 
 $(PF_SUB2) dummy_target2:
 	$(TAR_OUT) $(PKG_NAME)_sub2.tar $@_$(SOURCE_VARIANT)
