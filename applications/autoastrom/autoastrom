@@ -269,26 +269,27 @@ defined ($cmdlineobsdata) || ($cmdlineobsdata = 'source=AST:FITS'); # default
 my %obsdata;
 foreach my $p (split (/ *, */, $cmdlineobsdata)) {
     if (my ($k,$v) = ($p =~ /^ *([A-Za-z]+) *= *(\S+) *$/)) {
+	print STDERR "obsdata{$k}=$v\n";
 	$obsdata{$k} = $v;
     } else {
 	print STDERR "obsdata keyword <$p> malformed (ignored)\n";
     }
 }
-my $kwcheck = check_kwd_list (\%obsdata,
-			      {
-			       'ra' => '[0-9:.]*',
-			       'dec' => '[0-9:.]*',
-			       'scale' => '[0-9.]*',
-			       'invert' => '[01]',
-			       'pa' => '[0-9.]*',
-			       'source' => '(AST|FITS|AST:FITS|FITS:AST)',
-			       'time' => '\s*(\d+\.\d+|\d{4}([: ]+\d{1,2}){4}(\.\d+)?|\d{1,2}[: ]+\d{1,2}(\.\d+)?)\s*',
-			       'obs' => '\s*(\w+|([: ]*-?\d+[: ]+\d+(\.\d*)?){2}([: ]*\d*(\.\d*)?)?)\s*',
-			       'met' => '\s*\d+(\.\d+)?([: ]*\d+(\.\d+)?)\s*',
-			       'col' => '\s*\d+\s*'
-			      });
+my %goodkws = (
+	    'ra' => '\s*[+-]?\d{1,3}((:\d{1,2}){0,2}(\.\d+)?)\s*',
+	    'dec' => '\s*[+-]?\d{1,2}((:\d{1,2}){0,2}(\.\d+)?)\s*',
+	    'scale' => '\s*\d+(\.\d+)?\s*',
+	    'invert' => '\s*[01]\s*',
+	    'pa' => '\s*[+-]?\d+(\.\d+)?\s*',
+	    'source' => '(AST|FITS|AST:FITS|FITS:AST)',
+	    'time' => '\s*(\d+\.\d+|\d{4}([: ]+\d{1,2}){4}(\.\d+)?|\d{1,2}[: ]+\d{1,2}(\.\d+)?)\s*',
+	    'obs' => '\s*(\w+|([: ]*-?\d+[: ]+\d+(\.\d*)?){2}([: ]*\d*(\.\d*)?)?)\s*',
+	    'met' => '\s*\d+(\.\d+)?([: ]*\d+(\.\d+)?)\s*',
+	    'col' => '\s*\d+\s*'
+	   );
+my $kwcheck = check_kwd_list (\%obsdata, \%goodkws);
 if (defined($kwcheck)) {
-    wmessage ('fatal', "obsdata keyword $kwcheck unrecognised or malformed");
+    wmessage ('fatal', "obsdata value $kwcheck unrecognised or malformed");
 }
 
 
