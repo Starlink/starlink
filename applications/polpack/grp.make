@@ -5,12 +5,6 @@
 #
 #           Fri Jul 18 14:17:30 BST 1997
 
-
-#  The POLSTACK application is a stand-alone application requested by the
-#  JACH for analysing SCUBA data. It is not part of the package.
-POLSTACK = pol1_srtim.f pol1_stkim.f pol1_stknm.f pol1_stksm.f polstack.f \
-polstack.ifl make_polstack
-
 #  .eps files holding figures used in sun223
 FIGS = grids.eps dataflow.eps optical.eps extract.eps polext.eps \
 polka.eps map2.eps gaia1.eps gaia2.eps gaia3.eps effan.eps \
@@ -19,11 +13,11 @@ quadfit.eps varest.eps singopt.eps fig.eps
 #  The fortran A-task files containing prologues to be included in the
 #  on-line help file.
 USER_TASKS = polcal.f polexp.f polhelp.f polimp.f polka.f \
-polvec.f polplot.f polbin.f polext.f polimage.f polsim.f
+polvec.f polplot.f polbin.f polext.f polimage.f polsim.f polstack.f
 
 #  The tasks visible within IRAF.
 IRAF_TASKS = polcal polexp polimp polka polvec polplot polbin polext \
-polimage polsim
+polimage polsim polstack
 
 #  Fixed KAPPA subroutines which are here only until the fixes are
 #  available in KAPPA.
@@ -60,6 +54,7 @@ pol1_sngsv.f pol1_dulbm.f pol1_fillr.f pol1_xeval.f polimpx.f polimpx.ifl \
 pol1_sngsm.f polsim.f pol1_simcl.f polsim.ifl pol1_gtvrs.f pol1_sngmn.f \
 pol1_prsvr.f pol1_gtvrc.f polimage.f polimage.ifl pol1_axset.f pol1_gtang.f \
 pol1_ptang.f pol1_stftr.f pol1_blocr.f pol1_sngva.f pol1_sngct.f pol1_sngvn.f \
+pol1_srtim.f pol1_stkim.f pol1_stknm.f pol1_stksm.f polstack.f polstack.ifl \
 $(KAPFIX)
 
 # The other files which need to be extracted from the source code
