@@ -1,4 +1,4 @@
-      SUBROUTINE REDS_EXTINCTION (STATUS)
+      SUBROUTINE SURF_EXTINCTION (STATUS)
 *+
 *  Name:
 *     EXTINCTION
@@ -13,7 +13,7 @@
 *     ADAM A-task
  
 *  Invocation:
-*     CALL REDS_EXTINCTION( STATUS )
+*     CALL SURF_EXTINCTION( STATUS )
 
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
@@ -28,38 +28,55 @@
 *     the line of sight. The data point in question is then multiplied by the
 *     exponential of the optical depth to give the value that would have been
 *     measured in the absence of the atmosphere.
+*
 *       The zenith optical depth is assumed to vary linearly with time between
 *     the values input in parameters FIRST_TAU and LAST_TAU. If the measurement
 *     was taken at a time outside the range covered by FIRST_TAU and LAST_TAU
 *     then the value closest in time will be used.
 
 *  Usage:
-*     extinction IN SUB_INSTRUMENT FIRST_TAU FIRST_LST SECOND_TAU 
-*                SECOND_LST OUT
+*     extinction in sub_instrument first_tau first_lst
+*                second_tau second_lst out
 
 *  ADAM Parameters:
-*     FIRST_LST = _CHAR (Read)
+*     FIRST_LST = CHAR (Read)
 *        The local sidereal time at which FIRST_TAU was
 *        the zenith sky opacity, in hh mm ss.ss format.
-*     FIRST_TAU = _REAL (Read)
+*     FIRST_TAU = REAL (Read)
 *        The zenith sky opacity before the observation.
 *     IN = NDF (Read)
 *        The name of the input file containing demodulated SCUBA data.
+*     MSG_FILTER = CHAR (Read)
+*        Message filter level. Default is NORM.
 *     OUT = NDF (Write)
 *        The name of the output file to contain the
 *        extinction corrected data for the specified
 *        sub-instrument.
-*     SECOND_LST = _CHAR (Read)
+*     SECOND_LST = CHAR (Read)
 *        The local sidereal time at which SECOND_TAU was
 *        the zenith sky opacity, in hh mm ss.ss format.
-*     SECOND_TAU = _REAL (Read)
+*     SECOND_TAU = REAL (Read)
 *        The zenith sky opacity after the observation.
-*     SUB_INSTRUMENT = _CHAR (Read)
+*     SUB_INSTRUMENT = CHAR (Read)
 *        The name of the sub-instrument whose data are to
 *        be selected from the input file and extinction
 *        corrected. Permitted values are SHORT, LONG,
-*        P1100, P1300 and P2000. This parameter is only used if more than
-*        one sub-instrument is present in the file.
+*        P1100, P1350 and P2000. This parameter is only used if
+*        more than one sub-instrument is present in the file.
+
+*  Examples:
+*     extinction flat long 0.24 '01 00 00' 0.3 '02 00 00' corr
+*        Process the LONG sub-instrument from flat.sdf using the 
+*        knowledge that the 850 tau (assuming LONG refers to the 850
+*        micron filter) was 0.24 at 1h LST and 0.3 at 2h LST. The 
+*        output is written to corr.sdf
+*     extinction test short 0.6 0 0.6 0 test2
+*        Process the SHORT sub-instrument from test.sdf assuming
+*        a constant tau of 0.6 (since FIRST_LST = SECOND_LST) and write
+*        the result to test2.sdf
+
+*  Related Applications:
+*     SURF: SCUQUICK, REBIN, SCUPHOT
 
 *  Algorithm:
 *     If status is good on entry the routine will open the IN file, read
@@ -135,7 +152,7 @@
       INCLUDE 'SAE_PAR'                 ! SSE global definitions
       INCLUDE 'DAT_PAR'                 ! for DAT__SZLOC
       INCLUDE 'PRM_PAR'                 ! for VAL__xxxx
-      INCLUDE 'REDS_SYS'                ! REDS constants
+      INCLUDE 'SURF_PAR'                ! SURF constants
       INCLUDE 'MSG_PAR'                 ! MSG constants
 
 *  Status :
