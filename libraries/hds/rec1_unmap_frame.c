@@ -1,3 +1,5 @@
+#include <config.h>
+
 #include "hds1_feature.h"	 /* Define feature-test macros, etc.	    */
 
 /* VMS version include files:						    */
@@ -9,7 +11,7 @@
 
 /* Include files for version using mmap:				    */
 /* ====================================					    */
-#if defined( _mmap )
+#if defined( _mmap) || defined( HAVE_MMAP ) 
 #include <sys/mman.h>		 /* Definitions for memory management	    */
 #endif
 
@@ -138,7 +140,8 @@
       unsigned int systat;	 /* System status code			    */
 #else
 
-#if defined( _mmap )		 /* Local variables for version using mmap: */
+#if defined( _mmap) || defined( HAVE_MMAP ) 
+                         	 /* Local variables for version using mmap: */
       size_t len;		 /* Length of data to unmap		    */
       unsigned long int ipntr;	 /* Pointer value cast to an integer	    */
       unsigned long int pagesize; /* System page size			    */
@@ -158,7 +161,7 @@
 	   int acmode );	 /* Not used				    */
 
                                  /* System calls for version using mmap:    */
-#elif defined( _mmap ) && \
+#elif ( defined( _mmap) || defined( HAVE_MMAP ) ) && \
       !defined( _POSIX_MAPPED_FILES ) /* Use POSIX.4 mapped files           */
       int munmap		 /* Unmap pages of memory		    */
          ( void *addr,
@@ -289,7 +292,7 @@
 
 /* Version using file mapping (mmap).					    */
 /* =================================					    */
-#if defined( _mmap )
+#if defined( _mmap) || defined( HAVE_MMAP ) 
 	 if ( hds_gl_map )
 	 {
 

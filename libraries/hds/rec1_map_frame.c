@@ -1,3 +1,5 @@
+#include <config.h>
+
 #include "hds1_feature.h"	 /* Define feature-test macros, etc.	    */
 
 /* C include files:							    */
@@ -13,7 +15,7 @@
 
 /* Include files for version using mmap:				    */
 /* ====================================					    */
-#if defined( _mmap )
+#if defined( _mmap) || defined( HAVE_MMAP ) 
 #include <sys/mman.h>            /* Memory management definitions	    */
 #endif
 
@@ -137,7 +139,8 @@
       unsigned short int iochan; /* File I/O channel			    */
 #else
 
-#if defined( _mmap )		 /* Local variables for version using mmap: */
+#if defined( _mmap) || defined( HAVE_MMAP ) 
+                                 /* Local variables for version using mmap: */
       int fd;			 /* File descriptor			    */
       int flags;		 /* Mapping flags			    */
       int pagesize;		 /* System page size			    */
@@ -190,7 +193,7 @@
 	   unsigned int region );
 
                                  /* System calls for version using mmap:    */
-#elif defined( _mmap ) && \
+#elif ( defined( _mmap) || defined( HAVE_MMAP ) ) && \
       !defined( _POSIX_MAPPED_FILES ) /* Use POSIX.4 mapped files           */
       void *mmap		 /* Map file contents to pages of memory    */
          ( void *addr,
@@ -525,7 +528,7 @@ protect address space while mapping the file ^FILE - ^MESSAGE.",
 
 /* Version using file mapping (mmap).					    */
 /* =================================					    */
-#if defined( _mmap )
+#if defined( _mmap) || defined( HAVE_MMAP ) 
       if ( hds_gl_map )
       {
 
