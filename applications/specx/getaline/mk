@@ -287,7 +287,6 @@
                CFLAGS='-O -D${SYSTEM} -D${READLINE} -D${RINDEX}'
                FC='g77'
                FFLAGS='-fno-second-underscore -O1 -w -temp=. -e -D${SYSTEM} -D${READLINE} -D${RINDEX}'
-               FCPPFLAGS="-D$SYSTEM"
                LINK='ln -s'
                RANLIB='ranlib'
                TAR_IN='tar -cvhf'
