@@ -748,11 +748,15 @@ sub _find_loc {
 sub _split_path {
   my $path = shift;
 
+  # Make sure that we can have a . in the directory name
+  # without this getting confused
+  my ($vol, $dir, $file) = File::Spec->splitpath($path);
+
   # Chop off the last component
   # need a non-greedy pattern match that starts from the back...
   # benchmarking shows that reverse is twice as fast a joining
   # back together after splitting.
-  my ($last, $root) = split(/\./, reverse($path), 2);
+  my ($last, $root) = split(/\./, reverse($file), 2);
   $last = reverse($last);
   $root = reverse($root);
 
@@ -760,6 +764,16 @@ sub _split_path {
   if ($last eq 'sdf') {
     $last = $root;
     $root = '';
+  }
+
+  # Now need to attach the path that we removed
+  if (length($root)) {
+    # We have a root path so prepend to that
+    $root = File::Spec->catpath($vol, $dir, $root);
+  } else {
+    # Was given a file without extensions so need to prepend
+    # to $last
+    $last = File::Spec->catpath($vol, $dir, $last);
   }
 
   return($root, $last);
@@ -777,7 +791,13 @@ sub _status_toperl {
   if ($status == SAI__OK) {
     $pstat = 1;
   } else {
-    err_annul($status);
+    # flush errors rather than annul them if DEBUG is set
+    if ($DEBUG) {
+      err_flush($status);
+    } else {
+      err_annul($status);
+    }
+
     $pstat = 0;
   }
 
