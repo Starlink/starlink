@@ -1373,7 +1373,9 @@ static int FrameChange( int cvt_code, int np, double *ra, double *dec, double *f
          if( *fcorr != AST__BAD && *fcorr != 0.0 ) {
             factor = forward ? *fcorr : 1.0 / ( *fcorr );
             pf = freq;
-            for( i = 0; i < np; i++ ) *(pf++) *= factor;
+            for( i = 0; i < np; i++, pf++ ) {
+               if( *pf != AST__BAD ) *pf *= factor;
+            }
 
 /* Set returned values bad if the velocity correction is un-physical. */
          } else {
@@ -1395,8 +1397,8 @@ static int FrameChange( int cvt_code, int np, double *ra, double *dec, double *f
          for( i = 0; i < np; i++ ) {
 
 /* If the ra or dec is bad, store a bad frequency. */
-            if( *pra == AST__BAD || *pdec == AST__BAD ) {
-               *(pf++) = AST__BAD;
+            if( *pra == AST__BAD || *pdec == AST__BAD || *pf == AST__BAD ) {
+               *pf = AST__BAD;
 
 /* Otherwise, produce a corrected frequency. */
             } else {
@@ -1406,13 +1408,14 @@ static int FrameChange( int cvt_code, int np, double *ra, double *dec, double *f
 
 /* Correct this frequency, if possible. Otherwise set bad. */
                if( s < AST__C && s > -AST__C ) {
-                  *(pf++) *= sqrt( ( AST__C - s )/( AST__C + s ) );
+                  *pf *= sqrt( ( AST__C - s )/( AST__C + s ) );
                } else {
-                  *(pf++) = AST__BAD;
+                  *pf = AST__BAD;
                }
             }
 
 /* Move on to the next position. */
+            pf++;
             pra++;
             pdec++;
          }
