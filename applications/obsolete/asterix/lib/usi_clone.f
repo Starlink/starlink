@@ -7,7 +7,7 @@
 *     Create a cloned copy of input, getting name from environment
 
 *  Language:
-*     Starlink Fortran 77
+*     Starlink Fortran
 
 *  Invocation:
 *     CALL USI_CLONE( INP, OUT, CLASS, ID, STATUS )
@@ -21,7 +21,8 @@
 *     OUT = CHARACTER*(*) (given)
 *        Name of environment parameter specifying new file
 *     CLASS = CHARACTER*(*) (given)
-*        Class of object to associate
+*        Class of object to associate. If the string '*' is supplied then
+*        the same class as the object associated with INP is used.
 *     ID = INTEGER (returned)
 *        ADI identifier of opened object
 *     STATUS = INTEGER (given and returned)
@@ -75,8 +76,8 @@
 *  History:
 *     12 Jan 1995 (DJA):
 *        Original version.
-*
-*
+*     19 Dec 1995 (DJA):
+*        Added special treatment of CLASS = '*'
 *     {enter_changes_here}
 
 *  Bugs:
@@ -105,9 +106,11 @@
 
 *  Local Variables:
       CHARACTER*200		FNAME			! Input object
+      CHARACTER*50		LCLASS			! Local copy of CLASS
 
       INTEGER			EP, PPOS		! Character pointers
       INTEGER			IFID			! INP's ADI identifier
+      INTEGER			LCLL			! Length of LCLASS
 *.
 
 *  Check inherited global status.
@@ -124,6 +127,15 @@
 *  Get ADI identifier of already associated object
       CALL USI0_FNDADI( INP, IFID, STATUS )
 
+*  Has user specified the special value '*' for CLASS?
+      IF ( CLASS .EQ. '*' ) THEN
+        CALL ADI_TYPE( IFID, LCLASS, STATUS )
+        LCLL = CHR_LEN( LCLASS )
+      ELSE
+        LCLASS = CLASS
+        LCLL = LEN(CLASS)
+      END IF
+
 *  Get output file name
       CALL USI_GET0C( OUT(:EP), FNAME, STATUS )
       IF ( STATUS .EQ. SAI__OK ) THEN
@@ -131,10 +143,10 @@
 *      If caller specified a representation on the parameter, glue it
 *      on to the file name
         IF ( PPOS .EQ. 0 ) THEN
-          CALL ADI_FCLONE( IFID, FNAME, CLASS, ID, STATUS )
+          CALL ADI_FCLONE( IFID, FNAME, LCLASS, ID, STATUS )
         ELSE
           CALL ADI_FCLONE( IFID, FNAME(:MAX(1,CHR_LEN(FNAME)))/
-     :                         /OUT(PPOS:), CLASS, ID, STATUS )
+     :                         /OUT(PPOS:), LCLASS, ID, STATUS )
         END IF
 
 *    Store in common
