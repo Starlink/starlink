@@ -1,6 +1,6 @@
       SUBROUTINE ARD1_NLNR( RINDEX, TYPE, NDIM, LBND, UBND, MSKSIZ, 
-     :                      NPAR, PAR, IWCS, DPP, IPB, LBEXTB, UBEXTB, 
-     :                      LBINTB, UBINTB, STATUS )
+     :                      NPAR, PAR, CFRM, IWCS, DPP, IPB, LBEXTB, 
+     :                      UBEXTB, LBINTB, UBINTB, STATUS )
 *+
 *  Name:
 *     ARD1_NLNR
@@ -14,8 +14,8 @@
 
 *  Invocation:
 *     CALL ARD1_NLNR( RINDEX, TYPE, NDIM, LBND, UBND, MSKSIZ, NPAR,
-*                     PAR, IWCS, DPP, IPB, LBEXTB, UBEXTB, LBINTB, UBINTB,
-*                     STATUS )
+*                     PAR, CFRM, IWCS, DPP, IPB, LBEXTB, UBEXTB, LBINTB, 
+*                     UBINTB, STATUS )
 
 *  Description:
 *     The array B is initialised by setting all values within the
@@ -42,6 +42,8 @@
 *     PAR( * ) = DOUBLE PRECISION (Given)
 *        The region parameters, as supplied in the ARD expression. The
 *        length of this array should be MAX( 16, NPAR ).
+*     CFRM = INTEGER (Given)
+*        Pointer to a Frame describing user coordinates.
 *     IWCS = INTEGER (Given)
 *        An AST FrameSet. The Base Frame should be pixel coords within
 *        the B array, and the Current Frame should be used cords.
@@ -125,6 +127,7 @@
       INTEGER MSKSIZ
       INTEGER NPAR
       DOUBLE PRECISION PAR( * )
+      INTEGER CFRM
       INTEGER IWCS
       DOUBLE PRECISION DPP
       INTEGER IPB
@@ -165,7 +168,6 @@
      :      XU( ARD__MXDIM )     ! User coords at axis upper bound
 
       INTEGER
-     :        CFRM,              ! User coords Frame
      :        GMAP,              ! Mapping from grixel to user
      :        I,                 ! Loop count
      :        LBIN( ARD__MXDIM ),! Lower bounds for pretend input image
@@ -221,9 +223,6 @@
 
 *  Begin an AST context.
          CALL AST_BEGIN( STATUS )
-
-*  Get a pointer to the user coords Frame.
-         CFRM = AST_GETFRAME( IWCS, AST__CURRENT, STATUS )
 
 *  We can simplify some regions...
 

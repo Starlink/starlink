@@ -73,8 +73,8 @@
 
 *  Arguments Given:
       INTEGER MAP
-      INTEGER DLBND( * )
-      INTEGER DUBND( * )
+      DOUBLE PRECISION DLBND( * )
+      DOUBLE PRECISION DUBND( * )
 
 *  Arguments Returned:
       LOGICAL LINEAR

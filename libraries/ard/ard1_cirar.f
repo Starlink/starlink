@@ -127,7 +127,7 @@
 *  the number of arguments obtained is incorrect.
          ELSE IF( .NOT. KEYW ) THEN
  
-            IF( NARG .NE. 2*NDIM + 1 .AND. STATUS .EQ. SAI__OK ) THEN
+            IF( NARG .NE. NDIM + 1 .AND. STATUS .EQ. SAI__OK ) THEN
                STATUS = ARD__ARGS
                CALL ERR_REP( 'ARD1_CIRAR_ERR1', 'Incorrect number of '//
      :                       'arguments found.', STATUS )

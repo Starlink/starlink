@@ -484,20 +484,17 @@ NDFs of any dimensionality up to the limit imposed by the NDF\_ system.
       CALL MSG_OUT( 'ARD_TEST_MSG1', '  Data sum: ^SUM',        [15]
      :               STATUS )                                 
                                                               
-*  Release the resources used by ARD to store the FrameSet.
-      CALL ARD_WCS( AST__NULL, STATUS )                         [16]
-
 *  Release the work space used to hold the pixel mask.        
-      CALL PSX_FREE( IPMASK, STATUS )                           [17]
+      CALL PSX_FREE( IPMASK, STATUS )                           [16]
                                                               
 *  Delete the group used to hold the ARD description.         
-      CALL GRP_DELET( IGRP, STATUS )                            [18]
+      CALL GRP_DELET( IGRP, STATUS )                            [17]
                                                               
 *  Annul the AST FrameSet identifier.                                  
-      CALL AST_ANNUL( IWCS, STATUS )                            [19]
+      CALL AST_ANNUL( IWCS, STATUS )                            [18]
                                                               
 *  Annul the NDF identifier.                                  
-      CALL NDF_ANNUL( INDF, STATUS )                            [20]
+      CALL NDF_ANNUL( INDF, STATUS )                            [19]
                                                               
       END                                                     
 \end{verbatim}
@@ -575,10 +572,8 @@ AST FrameSet which is a representation of the WCS component. The facilities
 of the \xref{AST library}{sun210}{} can then be used to manipulate the WCS 
 information in many different ways.
 
-\item ARD\_WCS takes a copy of the supplied FrameSet and stores it
-internally for later use by the ARD\_WORK routine (we will call
-ARD\_WCS again towards the end of the application to release the 
-resources used to store this copy). Making this call to ARD\_WCS is
+\item ARD\_WCS stores the supplied FrameSet pointer for later use by the 
+ARD\_WORK routine. Making this call to ARD\_WCS is
 optional. If it were not made, then positions within the ARD description  
 would have to be supplied in pixel co-ordinates. Since we are in fact
 calling ARD\_WCS, positions within the ARD description can be supplied in
@@ -668,11 +663,6 @@ same size and shape. This makes it easy to process arrays of any dimensionality.
 \item The data sum is displayed by assigning its value to an ``MSG token'' and 
 then incorporating this token into a message to be displayed on the standard 
 output device. See SUN/104 for a description of the MSG package.
-
-\item The previous call to ARD\_WCS took a copy of the supplied FrameSet.
-We now call ARD\_WCS again to release the resources used to store this copy,
-this time supplying the ``null'' FrameSet pointer, AST\_\_NULL (a symbolic 
-constant defined within the AST\_PAR include file). 
 
 \item The storage space used to hold the pixel mask is released so that it can 
 be re-used.

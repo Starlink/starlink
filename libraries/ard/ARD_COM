@@ -163,8 +163,14 @@
 *  The maximum number of points which can be stored in CMN_PSET.
       INTEGER CMN_PMAX
 
-*  The application FrameSet supplied to ARD_WCS.
+*  The application FrameSet used by ARD_WORK
       INTEGER CMN_AWCS
+
+*  The index of ht enext GRP element to be read.
+      INTEGER CMN_ASTLN
+
+*  The index of the GRP group to use.
+      INTEGER CMN_AGRP
 
 *  Declare the common block /ARD_C1/, to hold non-character variables.
       COMMON /ARD_C1/ CMN_DSTK, CMN_KWLEN, CMN_NARG, CMN_OPCOD,
@@ -174,7 +180,7 @@
      :                CMN_LBNDC, CMN_UBNDC, CMN_LBIBC, CMN_UBIBC,
      :                CMN_MSKSC, CMN_RNDXC, CMN_TYPEC, CMN_NPARC,
      :                CMN_FRMC, CMN_IPPAR, CMN_INIT, CMN_IGRP,
-     :                CMN_NXTLN, CMN_AWCS
+     :                CMN_NXTLN, CMN_AWCS, CMN_AGRP, CMN_ASTLN
 
 *  Declare the common block /ARD_C2/, to hold character variables.
       COMMON /ARD_C2/ CMN_OPSYM, CMN_KWSYM, CMN_STSYM, CMN_INSTR

@@ -64,6 +64,7 @@
       DOUBLE PRECISION INA( ARD__MXDIM ) ! Position A without offset
       DOUBLE PRECISION INB( ARD__MXDIM ) ! Position B without offset
       DOUBLE PRECISION OFFV              ! Offset term
+      DOUBLE PRECISION SIDE              ! Distance between window corners
       DOUBLE PRECISION OUTA( ARD__MXDIM )! Position A with offset
       DOUBLE PRECISION OUTB( ARD__MXDIM )! Position B with offset
       INTEGER I                          ! Axis index
@@ -101,10 +102,11 @@
 *  Create a WinMap from old ARDAPP coords to new ARDAPP coords.
       DO I = 1, NDIM
          OFFV = PAR( I )
+         SIDE = MAX( ABS( OFFV ), 1.0D-6 )
          INA( I ) = 0.0
-         INB( I ) = -OFFV
+         INB( I ) = -SIDE
          OUTA( I ) = OFFV
-         OUTB( I ) = 0.0
+         OUTB( I ) = OFFV - SIDE
       END DO
 
       M1 = AST_WINMAP( NDIM, INA, INB, OUTA, OUTB, ' ', STATUS ) 

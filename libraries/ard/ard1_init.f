@@ -38,10 +38,13 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants.
       INCLUDE 'ARD_CONST'        ! ARD private constants.
-      INCLUDE 'AST_PAR'          ! AST constants.
 
 *  Global Variables:
       INCLUDE 'ARD_COM'          ! ARD common blocks.
+
+*  Local Constants:
+      INTEGER AST__NULL
+      PARAMETER ( AST__NULL = 0 )
 
 *  Local Variables:
       INTEGER I                  ! Implicit loop count.

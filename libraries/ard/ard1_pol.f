@@ -267,7 +267,7 @@
 *  If the storage for intersections is exceeded, return with a bad
 *  status and report an error.
                ELSE
-                  STATUS = SAI__ERROR
+                  STATUS = ARD__BADAR
                   CALL ERR_REP ( 'ARD1_POL_ERR2', 'There were too '//
      :                           'many intersections of an ARD '//
      :                           'polygon region with array lines.',

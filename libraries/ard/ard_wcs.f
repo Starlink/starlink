@@ -4,7 +4,7 @@
 *     ARD_WCS
 
 *  Purpose:
-*     Specify coordinates systems available in the next call to ARD_WORK.
+*     Specify WCS information to be used in future calls to ARD_WORK.
 
 *  Language:
 *     Starlink Fortran 77
@@ -13,38 +13,33 @@
 *     CALL ARD_WCS( IWCS, STATUS )
 
 *  Description:
-*     This routine can be used to supply additional information about
-*     coordinate transformations to the ARD_WORK routine. This
-*     information enables ARD_WORK to interpret ARD expressions containing
-*     positions in any coordinate system implied by the supplied FrameSet
-*     (IWCS). Without this extra information, only positions supplied in 
-*     "ARD User cordinates" (as defined by the TR argument to ARD_WORK, and 
-*     any COEFFS, OFFSET, SCALE, STRETCH or TWIST statements in the ARD 
-*     expression) can be interpreted by ARD_WORK.
+*     This routine can be used to specify the cooordinate systems
+*     which can be used in subsequent calls to ARD_WORK. The supplied
+*     FrameSet must include a Frame with Domain "PIXEL". ARD expressions
+*     passed to subsequent calls to ARD_WORK can include positions in any
+*     of the Frames included in the supplied FrameSet (the ARD expression
+*     should include suitable COFRAME or WCS statements to indicate which
+*     coordinate system is being used).
+*   
+*     If this routine is not called prior to ARD_WORK (or if it is
+*     called with IWCS set AST__NULL), then the ARD expression must
+*     provide (either directly or through a WCS statement) positions in 
+*     pixel coordinates.
 *
-*     If used, this routine should be called prior to calling ARD_WORK.
+*     The FrameSet pointer supplied is simply stored by this routine.
+*     If any changes are subsequently made to the FrameSet by the calling 
+*     routine, then these changes will be visible within ARD_WORK. In 
+*     particular, if the calling routine annulls the FrameSet pointer, 
+*     then ARD_WORK will fail.
+*
 *     The supplied FrameSet will be used by all subsequent calls to ARD_WORK 
-*     until a new FrameSet is specified by calling ARD_WCS again. Once all
-*     calls to ARD_WORK have been made, ARD_WCS should be called again,
-*     supplying AST__NULL for IWCS. This will free the internal resources
-*     used to store the FrameSet.
+*     until a new FrameSet is specified by calling ARD_WCS again. 
 
 *  Arguments:
 *     IWCS = INTEGER (Given)
-*        An AST pointer to a FrameSet. This FrameSet should contain a Frame
-*        with Domain PIXEL, corresponding to pixel coordinates with the
-*        mask array supplied to ARD_WORK. A copy of the supplied FrameSet
-*        is taken by this routine, and so any subsequent changes to the
-*        FrameSet will not make any changes to ARD_WORK. If AST__NULL is
-*        supplied, any FrameSet stored by a previous call to this routine
-*        is deleted.
+*        An AST pointer to a FrameSet, or AST__NULL.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
-
-*  Notes:
-*     - If IWCS is set to AST__NULL, then this routine attempts to execute 
-*     even if an error has already occurred, although no error will be
-*     reported if this routine subsequently fails.
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
@@ -65,9 +60,9 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'AST_PAR'          ! AST_ constants and functions
-      INCLUDE 'ARD_CONST'        ! ARD_ private constants
-      INCLUDE 'ARD_ERR'          ! ARD_ error constants
+      INCLUDE 'ARD_ERR'          ! ARD error constants
+      INCLUDE 'ARD_CONST'        ! ARD private constants
+      INCLUDE 'AST_PAR'          ! AST constants and function declarations
 
 *  Global Constants:
       INCLUDE 'ARD_COM'          ! ARD common blocks
@@ -84,55 +79,39 @@
       EXTERNAL ARD1_INIT         ! Initialise ARD common blocks
 
 *  Local Variables:
-      INTEGER IPIX               ! Index of PIXEL Frame
-      INTEGER I                  ! Loop counter
-      INTEGER FR                 ! Pointer to Frame
+      LOGICAL OK                 ! Is the pointer usable?
 *.
 
-*  Annul any existing Application FrameSet stored in common. Do this
-*  before checking the global status so that resources are freed even if
-*  an error has occurred.
-      IF( CMN_AWCS .NE. AST__NULL ) CALL AST_ANNUL( CMN_AWCS, STATUS )
+*  Check the inherited global status.
+      IF( STATUS .NE. SAI__OK ) RETURN
 
-*  Check the inherited global status and also check a FrameSet has been
-*  supplied.
-      IF ( STATUS .NE. SAI__OK .OR. IWCS .EQ. AST__NULL ) RETURN
+*  Start an new error reporting context.
+      CALL ERR_MARK     
 
-*  Take a copy of the supplied FrameSet.
-      CMN_AWCS = AST_COPY( IWCS, STATUS )
-
-*  Check each Frame until one is found with Domain PIXEL.
-      IPIX = AST__NOFRAME       
-      DO I = 1, AST_GETI( IWCS, 'NFRAME', STATUS )
-         FR = AST_GETFRAME( IWCS, I, STATUS )
-
-         IF( AST_GETC( FR, 'DOMAIN', STATUS ) .EQ. 'PIXEL' ) THEN
-            CALL AST_ANNUL( FR, STATUS )
-            IPIX = I
-            GO TO 10
-         END IF
-
-         CALL AST_ANNUL( FR, STATUS )
-
-      END DO
-
- 10   CONTINUE
-
-*  Report an error if no pixel frame was found.
-      IF( IPIX .EQ. AST__NOFRAME .AND. STATUS .EQ. SAI__OK ) THEN
-         STATUS = ARD__NOPIX 
-         CALL ERR_REP( 'ARD_WCS_ERR', 'The supplied FrameSet has '//
-     :                 'no PIXEL Frame (possible programming error).',
-     :                 STATUS )
+*  If the supplied value is not AST__NULL or a FrameSet, set a flag.
+      IF( IWCS .NE. AST__NULL ) THEN 
+         OK = AST_ISAFRAMESET( IWCS, STATUS ) 
+      ELSE
+         OK = .TRUE.
       END IF
 
-*  Make the PIXEL Frame the Base Frame.
-      CALL AST_SETI( CMN_AWCS, 'BASE', IPIX, STATUS )
+*  If an error occurred above, annull it.
+      IF( STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
 
-*  If an error has occured, give a context message.
-      IF ( STATUS .NE. SAI__OK ) THEN
-         CALL ERR_REP( 'ARD_WCS_ERR3', 'ARD_WCS: Unable to convert '//
-     :                 'an ARD description into a pixel mask.', STATUS )
+*  End the error reporting context.
+      CALL ERR_RLSE
+
+*  If a valid FrameSet pointer (or AST__NULL) was supplied, store it.
+      IF( OK ) THEN 
+         CMN_AWCS = IWCS
+
+*  Otherwise, report an error.
+      ELSE
+         STATUS = ARD__BADAR
+         CALL MSG_SETI( 'I', IWCS )
+         CALL ERR_REP( 'ARD_WCS_ERR', 'ARD_WCS: The supplied value '//
+     :                 '(^I) is not a valid FrameSet pointer '//
+     :                 '(programming error).', STATUS )
       END IF
 
       END

@@ -1,2 +1,2 @@
-echo -lard `sla_link` `grp_link` `chr_link` `err_link`  `psx_link` \
+echo -lard `ast_link` `sla_link` `grp_link` `chr_link` `err_link`  `psx_link` \
 | awk '{for(f=NF;f;f--)if(!w[$f]++)l=$f" "l;print l}'

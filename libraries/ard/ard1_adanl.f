@@ -228,10 +228,9 @@
       UWCS = AST__NULL
       CALL ARD1_COWCS( NDIM, AST__BAD, UWCS, STATUS )
 
-*  The total Mapping from PIXEL to user coords is currently just the 
-*  supplied FrameSet.
-      MAP = AST_SIMPLIFY( AST_GETMAPPING( AWCS, AST__BASE, AST__CURRENT, 
-     :                                    STATUS ), STATUS )
+*  Merge the UWCS and AWCS to get the Mapping from PIXEL to user coords.
+      CALL ARD1_MERGE( UWCS, AWCS, DLBND, DUBND, MAP, IWCS, WCSDAT, 
+     :                 STATUS )
 
 *  Initialise a flag to show that no INPUT keywords have yet been found.
       INP = .FALSE.
@@ -296,7 +295,7 @@
 *  GRP element into the returned operand array.
          ELSE IF( KEYW ) THEN
             CALL ARD1_KEYW( TYPE, NEEDIM, NDIM, IWCS, WCSDAT, ELEM, L, 
-     :                      IPOPND, IOPND, PNARG, SZOPND, NARG, I, 
+     :                      UWCS, IPOPND, IOPND, PNARG, SZOPND, NARG, I, 
      :                      KEYW, STATUS )
 
 *  If we are in the middle of processing a statement field, obtain any 
@@ -354,7 +353,8 @@
 *  and set a flag to indicate that the ARD description contained at
 *  least one INPUT keyword.
                ELSE
-                  CALL ARD1_STORD( 0.0D0, SZOPND, IOPND, IPOPND, STATUS )
+                  CALL ARD1_STORD( 0.0D0, SZOPND, IOPND, IPOPND, 
+     :                             STATUS )
                   INP = .TRUE.
                END IF
 

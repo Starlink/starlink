@@ -227,7 +227,7 @@
       ELSE
          LINEAR = .TRUE.
          ICOEFF = IOPND + 4 + NPAR
-         LASTOP = IOPND + 4 + NPAR + NDIM*( NDIM + 1 )
+         LASTOP = IOPND + 3 + NPAR + NDIM*( NDIM + 1 ) 
       END IF
 
 *  Report an error if there are insufficient values in OPRNDS.

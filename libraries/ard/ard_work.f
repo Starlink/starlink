@@ -227,7 +227,7 @@
       CALL PSX_CALLOC( SZEXPR, '_INTEGER', IPEXPR, STATUS )
 
       SZOPND = 200
-      CALL PSX_CALLOC( SZOPND, '_DOUBLE PRECISION', IPOPND, STATUS )
+      CALL PSX_CALLOC( SZOPND, '_DOUBLE', IPOPND, STATUS )
 
 *  Store _DOUBLE versions of the mask pixel bounds.
       DO I = 1, NDIM

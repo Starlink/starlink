@@ -66,6 +66,7 @@
       DOUBLE PRECISION INB( ARD__MXDIM ) ! Position B without offset
       DOUBLE PRECISION M( ARD__MXDIM*ARD__MXDIM ) ! Matrix elements
       DOUBLE PRECISION OFFV              ! Offset term
+      DOUBLE PRECISION STEP              ! Step between window corners
       DOUBLE PRECISION OUTA( ARD__MXDIM )! Position A with offset
       DOUBLE PRECISION OUTB( ARD__MXDIM )! Position B with offset
       INTEGER F1                 ! User coords Frame
@@ -111,10 +112,11 @@
 *  Now create a WinMap representing the vector offset elements.
          DO I = 1, NDIM
             OFFV = C( ( 1 + NDIM )*I - NDIM )
+            STEP = MIN( OFFV, 1.0D-6 )
             INA( I ) = 0.0
-            INB( I ) = OFFV
+            INB( I ) = STEP
             OUTA( I ) = OFFV
-            OUTB( I ) = 2*OFFV
+            OUTB( I ) = STEP + OFFV
          END DO
    
          M2 = AST_WINMAP( NDIM, INA, INB, OUTA, OUTB, ' ', STATUS ) 
@@ -123,10 +125,15 @@
 *  user coords to application coords.
          M3 = AST_CMPMAP( M1, M2, .TRUE., ' ', STATUS )
 
+*  Invert the Mapping so that the forward transformation goes from
+*  application coordinates to user coordinates.
+         CALL AST_INVERT( M3, STATUS )
+
 *  Annull AST objects.
          CALL AST_ANNUL( M1, STATUS )
          CALL AST_ANNUL( M2, STATUS )
-      }
+
+      END IF
 
 *  Now create a Frame to represent user coords.
       F1 = AST_FRAME( NDIM, 'DOMAIN=ARDUSER,Title=ARD user coordinates',
@@ -136,14 +143,11 @@
       F2 = AST_FRAME( NDIM, 'DOMAIN=ARDAPP,Title=ARD application '//
      :                ' coordinates', STATUS )
 
-*  Constrct the FrameSet, initially with user coords as Base Frame, and
-*  application coords as current Frame.
-      UWCS = AST_FRAMESET( F1, ' ', STATUS ) 
-      CALL AST_ADDFRAME( UWCS, AST__BASE, M3, F2, STATUS ) 
+*  Construct the FrameSet, with user coords as Current Frame, and
+*  application coords as Base Frame.
+      UWCS = AST_FRAMESET( F2, ' ', STATUS ) 
+      CALL AST_ADDFRAME( UWCS, AST__BASE, M3, F1, STATUS ) 
       
-*  Now invert the FrameSet to get the required Base and Current Frames.
-      CALL AST_INVERT( UWCS, STATUS )
-
 *  Annull AST objects.
       CALL AST_ANNUL( M3, STATUS )
       CALL AST_ANNUL( F1, STATUS )

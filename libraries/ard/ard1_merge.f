@@ -117,6 +117,6 @@
       CALL ARD1_LINMP( MAP, DLBND, DUBND, LINEAR, WCSDAT, STATUS )
 
 *  If so, annul the FrameSet.
-      IF( LINEAR ) CALL AST__ANULL( IWCS, STATUS )
+      IF( LINEAR ) CALL AST_ANNUL( IWCS, STATUS )
 
       END

@@ -230,11 +230,6 @@
 *  Miscellaneous.
 *  =============
 
-*  Maximum number of continuation lines in an AST FrameSet supplied as part of 
-*  an ARD expression.
-      INTEGER ARD__MXACL
-      PARAMETER( ARD__MXACL = 5 )
-
 *  Factor for converting degrees to radians
       REAL ARD__DTOR
       PARAMETER ( ARD__DTOR = 1.7453293E-2 )
@@ -266,5 +261,13 @@
 *  each time the size is increased.
       INTEGER ARD__SZINC
       PARAMETER ( ARD__SZINC = 20 )
+
+*  Maximum number of continuation lines (i.e. array elements of size
+*  ARD__SZAST) to be used when storing a single line of AST data in
+*  a group.  Continuation lines are indicated by a '+' as the first
+*  character (normally this is a space). AST data lines which are still
+*  too long to be accommodated will cause an error.
+      INTEGER ARD__MXACL
+      PARAMETER ( ARD__MXACL = 64 )
 
 *.

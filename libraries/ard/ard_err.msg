@@ -12,6 +12,8 @@ INTER	<Internal programming error>
 MISOP	<Missing operand >
 MSPAR	<Missing parenthesis>
 NOT2D	<ARD description is not 2-D>
+NOTAL   <Could not find any common coordinate Frame for alignment>
+NONLN   <Current mapping is not linear>
 SCALE	<Current mapping is not isotropic>
 BLANK   <Blank ARD expression supplied>
 NOPIX   <No PIXEL coordinate Frame supplied>

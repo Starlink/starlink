@@ -1,6 +1,6 @@
       SUBROUTINE ARD1_KEYW( TYPE, NEEDIM, NDIM, IWCS, WCSDAT, ELEM, L, 
-     :                      IPOPND, IOPND, PNARG, SZOPND, NARG, I, KEYW,
-     :                      STATUS )
+     :                      CFRM, IPOPND, IOPND, PNARG, SZOPND, NARG, I, 
+     :                      KEYW, STATUS )
 *+
 *  Name:
 *     ARD1_KEYW
@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ARD1_KEYW( TYPE, NEEDIM, NDIM, IWCS, WCSDAT, ELEM, L, IPOPND, 
+*     CALL ARD1_KEYW( TYPE, NEEDIM, NDIM, IWCS, WCSDAT, ELEM, L, CFRM, IPOPND, 
 *                     IOPND, PNARG, SZOPND, NARG, I, KEYW, STATUS )
 
 *  Description:
@@ -46,6 +46,8 @@
 *        The text of the current element of the ARD description.
 *     L = INTEGER (Given)
 *        The index of the last non-blank character in ELEM.
+*     CFRM = INTEGER (Given)
+*        Pointer to a Frame describing user coordinates.
 *     IPOPND = INTEGER (Given and Returned)
 *        A pointer to the one dimensional _double work array holding the
 *        operand stack. The array is extended if necessary. See ARD1_LKR
@@ -95,6 +97,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'ARD_ERR'          ! ARD_ error constants
+      INCLUDE 'AST_PAR'          ! AST constants and functions
       INCLUDE 'ARD_CONST'        ! ARD_ private constants
 
 *  Global Variables:
@@ -120,6 +123,7 @@
       INTEGER SZOPND
       INTEGER NARG
       INTEGER I
+      INTEGER CFRM
 
 *  Arguments Returned:
       LOGICAL KEYW
@@ -214,9 +218,6 @@
 *  If an argument list has been started...
       ELSE
 
-*  Get a pointer to the user coord Frame.
-         CFRM = AST_GETFRAME( IWCS, AST__CURRENT, STATUS )
-
 *  ... call a routine to read the keyword argument list from the ARD
 *  description and store appropriate values in the returned operand
 *  array. Note, keywords which do not have an argument list are not
@@ -288,15 +289,16 @@
 *  Also store WCS Information in the operand stack. First deal with
 *  linear Mappings... store the transformation coefficients.
             IF( IWCS .EQ. AST__NULL ) THEN
-               CALL ARD1_STORD( 0.0D0, SZOPND, PNARG, IPOPND, STATUS )
+               CALL ARD1_STORD( 1.0D0, SZOPND, IOPND, IPOPND, STATUS )
                DO J = 1, NDIM*( NDIM + 1 )               
-                  CALL ARD1_STORD( WCSDAT( J ), SZOPND, PNARG, IPOPND, 
+                  CALL ARD1_STORD( WCSDAT( J ), SZOPND, IOPND, IPOPND, 
      :                             STATUS )
                END DO
 
 *  Now deal with non-linear Mappings, store the FrameSet pointer and the 
 *  user distance per pixel.
             ELSE
+               CALL ARD1_STORD( 0.0D0, SZOPND, IOPND, IPOPND, STATUS )
 
 *  In order to store an integer AST pointer on the DOUBLE PRECISION
 *  operands stack, we make the double precision DWCS use the same memory as 
@@ -305,18 +307,15 @@
 *  first element of the integer array, and store the equivalent double
 *  precision value on the stack.
                JWCS( 1 ) = AST_CLONE( IWCS, STATUS )
-               CALL ARD1_STORD( RWCS, SZOPND, PNARG, IPOPND, STATUS )
+               CALL ARD1_STORD( DWCS, SZOPND, IOPND, IPOPND, STATUS )
 
 *  Now store the user distance per pixel.
-               CALL ARD1_STORD( WCSDAT( 1 ), SZOPND, PNARG, IPOPND, 
+               CALL ARD1_STORD( WCSDAT( 1 ), SZOPND, IOPND, IPOPND, 
      :                          STATUS )
 
             END IF
 
          END IF
-
-*  Annul the AST Pointers.
-         CALL AST_ANNUL( CFRM, STATUS )
 
       END IF
 

@@ -79,7 +79,9 @@
       DOUBLE PRECISION OUTB( ARD__MXDIM )! Position B with offset
       INTEGER F1                 ! Application coords Frame
       INTEGER F2                 ! Pixel coords Frame
+      INTEGER FR                 ! Another Frame
       INTEGER I                  ! Row index
+      INTEGER IPIX               ! Index of PIXEL Frame
       INTEGER J                  ! Column index
       INTEGER K                  ! Index into matrix element array
       INTEGER L                  ! Index into supplied coefficient array
@@ -151,6 +153,35 @@
 *  ARD_WCS.
       IF( CMN_AWCS .NE. AST__NULL ) THEN
          AWCS = AST_COPY( CMN_AWCS, STATUS )
+
+*  Check each Frame until one is found with Domain PIXEL.
+         IPIX = AST__NOFRAME       
+         DO I = 1, AST_GETI( AWCS, 'NFRAME', STATUS )
+            FR = AST_GETFRAME( AWCS, I, STATUS )
+   
+            IF( AST_GETC( FR, 'DOMAIN', STATUS ) .EQ. 'PIXEL' ) THEN
+               CALL AST_ANNUL( FR, STATUS )
+               IPIX = I
+               GO TO 10
+            END IF
+   
+            CALL AST_ANNUL( FR, STATUS )
+   
+         END DO
+
+ 10      CONTINUE
+
+*  If a PIXEL Frame was found make it the Base Frame.
+         IF( IPIX .NE. AST__NOFRAME ) THEN
+            CALL AST_SETI( AWCS, 'BASE', IPIX, STATUS )
+         
+*  Report an error if no pixel frame was found.
+         ELSE IF( STATUS .EQ. SAI__OK ) THEN
+            STATUS = ARD__NOPIX 
+            CALL ERR_REP( 'ARD1_APWCS_ERR1', 'The FrameSet specified '//
+     :                  'using ARD_WCS has no PIXEL Frame (possible '//
+     :                  'programming error).', STATUS )
+         END IF
 
 *  Otherwise, create a new FrameSet containing just a PIXEL Frame.
       ELSE
