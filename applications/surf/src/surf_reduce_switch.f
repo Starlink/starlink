@@ -146,6 +146,9 @@
 *      9-JUL-1996: modified to handle v200 data with 5 data per demodulated
 *                  point (JFL).
 *     $Log$
+*     Revision 1.33  2005/03/18 06:28:21  timj
+*     Initialise some variables
+*
 *     Revision 1.32  2004/09/08 02:03:34  timj
 *     Add CNF_PVAL where appropriate
 *
@@ -320,7 +323,7 @@ c
       CHARACTER*80 FITS (SCUBA__MAX_FITS)
                                        ! array of FITS keyword lines
       CHARACTER*(DAT__SZLOC) FITS_LOC  ! HDS locator to FITS structure
-      INTEGER I                        ! DO loop index
+      INTEGER      I                   ! DO loop index
       INTEGER      IERR                ! Location of error returned from VEC_ITOI
       INTEGER      IN_NDF              ! NDF identifier of input file
       INTEGER      INTEGRATION         ! integration index in DO loop
@@ -420,6 +423,10 @@ c
       DEMOD_CAL_VARIANCE_END = 0
       DEMOD_QUALITY_PTR = 0
       DEMOD_QUALITY_END = 0
+      SWITCHES = 0
+      DO I = 1, SCUBA__MAX_BEAM
+         BEAM_WEIGHT(I) = 0
+      END DO
 
 *     Set the MSG output level (for use with MSG_OUTIF)
       CALL MSG_IFGET('MSG_FILTER', STATUS)
