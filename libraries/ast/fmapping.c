@@ -262,7 +262,7 @@ F77_INTEGER_FUNCTION(ast_resample##f)( INTEGER(THIS), \
 \
 /* If *INTERP is set to a value that requires a user-supplied \
    interpolation function, then store a pointer to the supplied \
-   FORTRAN 77 version of this routine and use the appropriate C \
+   FORTRAN 77 version of this function and use the appropriate C \
    wrapper function (defined above) to invoke it. */ \
       if ( *INTERP == AST__UINTERP ) { \
          ast_resample_FINTERP = FINTERP; \
