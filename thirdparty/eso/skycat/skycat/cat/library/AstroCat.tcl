@@ -8,7 +8,9 @@
 # who         when       what
 # --------   ---------   ----------------------------------------------
 # A.Brighton 14 Dec 95   created
-# P.W.Draoer 12 Dec 97   added methods to get equinox and table name
+# P.W.Draper 12 Dec 97   added methods to get equinox and table name
+#            11 May 00   stop immediate delete of images, need backing 
+#                        store for my catalogue handling commands.
 
 
 itk::usual AstroCat {}
@@ -48,6 +50,11 @@ itcl::class cat::AstroCat {
 		}
 	    }
 	}
+        catch {
+           if {tempimage_ != {} } { 
+              file delete $tempimage_
+           }
+        }
 	catch {$w_.cat delete}
 	catch {close $rfd_}
 	catch {close $wfd_}
@@ -1202,7 +1209,10 @@ itcl::class cat::AstroCat {
 		set filename $info
 		# load the image and remove the temp file
 		display_image_file $filename
-		catch {file delete $filename}
+                if { $tempimage_ != {} } { 
+                   catch {file delete $tempimage_}
+                }
+                set tempimage_ $filename
 	    } else {
 		busy {
 		    set prev_headings $headings_
@@ -1796,6 +1806,9 @@ itcl::class cat::AstroCat {
     # flag: true if searching is allowed
     protected variable search_state_ normal
 
+    # name of temporary image file, deleted when new image is
+    # obtained, or when object destroyed.
+    protected variable tempimage_ {}
 
     # -- common variables (common to all instances of this class) --
     
