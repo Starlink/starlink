@@ -110,6 +110,8 @@
       CALL GMD_SETPLOTS( LOC, STATUS )
 
 *  Report any errors
-      IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'GMI_SETLAYOUT', STATUS )
+      IF ( STATUS .NE. SAI__OK ) THEN
+        CALL AST_REXIT( 'GMI_SETLAYOUT', STATUS )
+      END IF
 
       END

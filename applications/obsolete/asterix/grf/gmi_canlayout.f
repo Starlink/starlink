@@ -101,6 +101,8 @@
       CALL GMD_CANLAYOUT( LOC, STATUS )
 
 *  Report any errors
-      IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'GMI_CANLAYOUT', STATUS )
+      IF ( STATUS .NE. SAI__OK ) THEN
+        CALL AST_REXIT( 'GMI_CANLAYOUT', STATUS )
+      END IF
 
       END
