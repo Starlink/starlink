@@ -1,6 +1,6 @@
-<!doctype ssn public "-//Starlink//DTD Starlink SSN//EN" [
-  <!entity releasenotes system "ReleaseNotes">
-  <!entity ddash cdata "--">
+<!DOCTYPE ssn PUBLIC "-//Starlink//DTD Starlink SSN//EN" [
+  <!ENTITY releasenotes SYSTEM "ReleaseNotes">
+  <!ENTITY ddash CDATA "--">
 ]>
 <!-- $Id$ -->
 
@@ -595,7 +595,7 @@ configuration file as other &tex;ware, then give the configure option
 <code/&ddash;with-kpathsea/, and make sure that the <code/kpathsea/ include
 files and library are somewhere the compiler will find them.  
 
-<![ ignore [
+<![ IGNORE [
 For this
 library to find its configuration files, you will either have to
 install the program where the rest of the &tex;ware lives (you can
