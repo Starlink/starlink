@@ -136,35 +136,35 @@
 *    Get length of string
         CALL ADI_CLEN( MID, CLEN, STATUS )
 
-*    Length to use
-        ULEN = MIN( MAXLEN, CLEN )
+*    Not zero length?
+        IF ( CLEN .GT. 0 ) THEN
 
-*    Get dimensions
-        CALL ADI_SHAPE( MID, ADI__MXDIM, DIMS, NDIM, STATUS )
+*      Length to use
+          ULEN = MIN( MAXLEN, CLEN )
 
-*    HDS value already exists? If so, delete it
-        IF ( CMP .GT. ' ' ) THEN
-          CALL DAT_THERE( LOC, CMP, THERE, STATUS )
-          IF ( THERE ) THEN
-            CALL DAT_ERASE( LOC, CMP, STATUS )
+*      Get dimensions
+          CALL ADI_SHAPE( MID, ADI__MXDIM, DIMS, NDIM, STATUS )
+
+*      HDS value already exists? If so, delete it
+          IF ( CMP .GT. ' ' ) THEN
+            CALL DAT_THERE( LOC, CMP, THERE, STATUS )
+            IF ( THERE ) THEN
+              CALL DAT_ERASE( LOC, CMP, STATUS )
+            END IF
+
+*        Create the HDS value
+            CALL DAT_NEWC( LOC, CMP, ULEN, NDIM, DIMS, STATUS )
+
+*        Locate it
+            CALL DAT_FIND( LOC, CMP, CLOC, STATUS )
+
+          ELSE
+            CALL DAT_CLONE( LOC, CLOC, STATUS )
+
           END IF
 
-*      Create the HDS value
-          CALL DAT_NEWC( LOC, CMP, ULEN, NDIM, DIMS, STATUS )
-
-*      Locate it
-          CALL DAT_FIND( LOC, CMP, CLOC, STATUS )
-
-        ELSE
-          CALL DAT_CLONE( LOC, CLOC, STATUS )
-
-        END IF
-
-*    Scalar?
-        IF ( NDIM .EQ. 0 ) THEN
-
-*      ADI allows zero length strings
-          IF ( CLEN .GT. 0 ) THEN
+*      Scalar?
+          IF ( NDIM .EQ. 0 ) THEN
 
 *        Read the ADI data
             CALL ADI_GET0C( MID, VALUE(:ULEN), STATUS )
@@ -172,11 +172,11 @@
 *        Write to HDS
             CALL DAT_PUT0C( CLOC, VALUE(:ULEN), STATUS )
 
-          END IF
-
-        ELSE
+          ELSE
 
 *      Otherwise copy using cells
+
+          END IF
 
         END IF
 
