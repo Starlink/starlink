@@ -354,10 +354,10 @@ BLD_SHR = :
 
 #  Name of the package as specified in documentation
 #  The value is used in messages from make to the user.
-PACK_NAME = StarSGML
+PACK_NAME = StarSGMLKit
 
 #  Prefix for the package in lower-case as used in filenames etc.
-PKG_NAME = starsgml
+PKG_NAME = sgmlkit
 
 #  Version number (as in the documentation - i.e. not the same thing
 #  as the shared library version number).
@@ -372,24 +372,27 @@ PKG_NAME = starsgml
 
 PKG_VERS = 0.6-1
 
-#  List of public script files.  These are scripts which form part of
-#  the package and will be required by users of it.  They will be
-#  installed in the $(INSTALL_BIN) directory with execute permission
-#  set.
-#PUBLIC_SCRIPTS = sgml_set.sh sgml_set.csh
-PUBLIC_SCRIPTS=
+##  List of public script files.  These are scripts which form part of
+##  the package and will be required by users of it.  They will be
+##  installed in the $(INSTALL_BIN) directory with execute permission
+##  set.
+##PUBLIC_SCRIPTS = sgml_set.sh sgml_set.csh
+#PUBLIC_SCRIPTS=
+
+#  List of files which need to be unpacked before the package can be installed.
+#  This is done in lieu of `building' the package
+UNPACK_FILES = lib
+
+#  List of documentation files.
+#DOCUMENTATION = $(PKG_NAME).news
+#DOCUMENTATION = NEWS ssn70.tar-htx ssn70.tar-tex
+DOCUMENTATION = NEWS doc/ssn70/ssn70.tar-htx doc/ssn70/ssn70.tar-tex
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the
 #  package from source (including this makefile, the associated mk
 #  script and any documentation files).
-SOURCE_FILES = $(PKG_NAME)_source.tar makefile mk $(PUBLIC_SCRIPTS)
-
-
-
-#  List of documentation files.
-#DOCUMENTATION = $(PKG_NAME).news
-DOCUMENTATION = NEWS ssn70.tar-htx ssn70.tar-tex
+SOURCE_FILES = $(PKG_NAME)_source.tar makefile mk $(DOCUMENTATION)
 
 ################################################################################
 #-------------------------------------------------------------------------------
@@ -404,6 +407,9 @@ DOCUMENTATION = NEWS ssn70.tar-htx ssn70.tar-tex
 #  package can be installed for use.  This should comprise all the files
 #  that are required to use the package (but excluding the date stamp
 #  file).
+#
+#  There are no files which need to be build in this package.
+BUILT_FILES = 
 
 #BUILT_FILES = jade/BUILT dvi2bitmap/BUILT
 #BUILT_FILES = sgml/doc/ssn70/ssn70.html.stamp sgml/doc/ssn70/ssn70.ps.stamp
@@ -433,6 +439,7 @@ DATE_STAMP = $(PKG_NAME)_datestamp
 # by this package. The deinstallation target below deinstalls things
 # by deleting the entire contents of this directory.
 #
+# This is not true of the INSTALL_BIN directory.
 ## In the case of the INSTALL_BIN directory this is necessary since the
 ## Jade installation procedure is sufficiently elaborate that it would
 ## be complicated (and hence errorprone) to work out and record exactly
@@ -643,10 +650,12 @@ install:
 
 # The .INSTALLED_$(SYSTEM) target dumps the sgml/{dtd,dsssl,lib}
 # directories into $(INSTALL_LIB), then tweaks the .../lib/*.pl files
-# to adjust the Perl path and update the ((PKG_VERS)) string.  It
-# installs dvi2bitmap by copying it, and Jade by invoking the Jade
-# install target.
-.INSTALLED_$(SYSTEM): $(INSTALL_DIRS) $(BUILT_FILES)
+# to adjust the Perl path and update the ((PKG_VERS)) string. 
+#
+## It
+## installs dvi2bitmap by copying it, and Jade by invoking the Jade
+## install target.
+.INSTALLED_$(SYSTEM): $(INSTALL_DIRS) $(UNPACK_FILES)
 #	# Create .INSTALLED_$(SYSTEM), containing $INSTALL, to record that the 
 #	# package is installed (at least in part).
 	@ echo $(INSTALL) > .INSTALLED_$(SYSTEM)
@@ -681,20 +690,22 @@ install:
 #	# Warn folk not to install anything by hand into these dirs
 	echo "This directory is owned by the $(PACK_NAME) package.  If you install things here they will be overwritten or deleted." > $(INSTALL_LIB)/DO-NOT-INSTALL-HERE
 #	# Install documentation.
-	UNPACKDIR=`pwd`; \
+	UNPACKDIR=$$PWD; \
 		test -r ssn70.tar-htx && \
-		(cd $(INSTALL_DOCS); tar xf $$UNPACKDIR/ssn70.tar-htx)
+		cd $(INSTALL_DOCS) && \
+		tar xf $$UNPACKDIR/doc/ssn70/ssn70.tar-htx
 #	# hlink the installed documentation,
 #	# but don't fail if hlink isn't in the path
 	- which hlink >/dev/null && hlink $(INSTALL_DOCS)
 #	# ssn70.tar-tex unpacks to directory ssn70.latex
-	$(TAR_OUT) ssn70.tar-tex
-	cd ssn70.latex; \
-		for f in `cat MANIFEST`; do \
+	cd doc/ssn70; \
+		$(TAR_OUT) ssn70.tar-tex; \
+		cd ssn70.latex; \
+		for f in `awk '{print $$1}' MANIFEST`; do \
 			cp $$f $(INSTALL_DOCS); \
 		done
-	rm -Rf ssn70.latex
-	test -f $(INSTALL_DATES)/$(DATE_STAMP) && \
+#	rm -Rf ssn70.latex
+	- test -f $(INSTALL_DATES)/$(DATE_STAMP) && \
 		chmod 644 $(INSTALL_DATES)/$(DATE_STAMP) && \
 		rm -f $(INSTALL_DATES)/$(DATE_STAMP)
 	cp -p $(DATE_STAMP) $(INSTALL_DATES)
@@ -749,12 +760,13 @@ do_deinstall:
 #	# Delete all the files we installed in the .INSTALL target
 	rm -Rf $(INSTALL_LIB)
 	for f in `cd bin; ls`; do \
+		echo "Uninstalling $(INSTALL_BIN)/$$f"; \
 		rm -f $(INSTALL_BIN)/$$f; \
 	done
 #	# Remove the installed documentation
 	rm -Rf $(INSTALL_DOCS)/ssn70.htx
 	$(TAR_OUT) ssn70.tar-tex ssn70.latex/MANIFEST
-	for f in `cat ssn70.latex/MANIFEST`; do \
+	for f in `awk '{print $$1}' ssn70.latex/MANIFEST`; do \
 		rm -f $(INSTALL_DOCS)/$$f; \
 	done
 	rm -Rf ssn70.latex
@@ -806,32 +818,27 @@ test:
 #
 #  Export the source plus all the built files to a new user.
 #
+#  NOTE: Since there are no `built' files for this package, the
+#  export, export_run and export_source packages are identical.
+#
+#  Some package makefiles seem to include the
+#  documentation in some packages but not in others, but the
+#  standard definition of the different packages at the top of this
+#  file makes no mention of documentation, so for simplicity I've
+#  chosen to interpret this as meaning that all the packages should
+#  include documentation.
+#
 #  The export target depends on the resulting compressed tar file being
 #  up to date.
-export: $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z
+export: CVS-CHECK $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z
 	@ echo
 	@ echo '*** Export copy of the built $(PACK_NAME) package is in the compressed'
 	@ echo '    tar file $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z'
 	@ echo
 
-#  The compressed tar file is up to date if it exists and is more
-#  recent than all the source files and the date stamp file (which
-#  records the time of the last build which modified any files).
-
-$(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z: $(SOURCE_FILES) $(DATE_STAMP)
-	echo '*** export target not currently supported ***'
-	echo '*** use export_source target instead      ***'
-	##  Issue a warning if the package has not been tested.
-	#@ if test ! -f .TESTED_$(SYSTEM); then \
-        #   echo;\
-        #   echo '*** Warning: the $(PACK_NAME) package has not been tested';\
-        #   echo;\
-        #else :; fi
-	##  Remove any pre-existing tar files before creating new ones.
-	#if test -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z; then \
-        #   rm -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z; else :; fi
-	#$(TAR_IN) - $(SOURCE_FILES) $(BUILT_FILES) $(DATE_STAMP) .BUILT \
-        #   | compress -v > $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z
+$(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z: $(EXPORT)/$(PKG_NAME).tar.Z
+#	# make a hard link
+	ln $< $@
 
 #  export_run: Export the built system (without source).
 #  -----------------------------------------------------
@@ -840,28 +847,15 @@ $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z: $(SOURCE_FILES) $(DATE_STAMP)
 #
 #  The export_run target depends on the resulting compressed tar file being
 #  up to date.
-export_run: $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z
+export_run: CVS-CHECK $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z
 	@ echo
 	@ echo '*** Export copy of the "runtime" $(PACK_NAME) package is in the compressed'
 	@ echo '    tar file $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z'
 	@ echo
 
-#  The compressed tar file is up to date if it exists and is more
-#  recent than all the source files and the date stamp file (which
-#  records the time of the last build which modified any files).
-$(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z: $(SOURCE_FILES) $(DATE_STAMP)
-	#  Issue a warning if the package has not been tested.
-	@ if test ! -f .TESTED_$(SYSTEM); then \
-           echo;\
-           echo '*** Warning: the $(PACK_NAME) package has not been tested';\
-           echo;\
-        else :; fi
-	#  Remove any pre-existing tar files before creating new ones.
-	if test -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z; then \
-           rm -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z; else :; fi
-	$(TAR_IN) - mk makefile $(DOCUMENTATION) $(BUILT_FILES) \
-           $(DATE_STAMP) .BUILT l2hsys_source.tar \
-           | compress -v > $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z
+$(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z: $(EXPORT)/$(PKG_NAME).tar.Z
+#	# make a hard link
+	ln $< $@
 
 #  export_source: Export the source.
 #  --------------------------------
@@ -870,7 +864,7 @@ $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z: $(SOURCE_FILES) $(DATE_STAMP)
 
 #  This target depends on the resulting compressed tar file being up to
 #  date.
-export_source: $(EXPORT)/$(PKG_NAME).tar.Z
+export_source: CVS-CHECK $(EXPORT)/$(PKG_NAME).tar.Z
 	@ echo
 	@ echo '*** Export copy of the $(PACK_NAME) package source'
 	@ echo '    is in the compressed tar file'
@@ -880,19 +874,32 @@ export_source: $(EXPORT)/$(PKG_NAME).tar.Z
 #  The compressed tar file is up to date if it exists and is more
 #  recent than all the source files.
 $(EXPORT)/$(PKG_NAME).tar.Z: $(SOURCE_FILES)
-	# Remove any pre-existing tar files before creating new ones.
+#	# Remove any pre-existing tar files before creating new ones.
 	if test -f $(EXPORT)/$(PKG_NAME).tar.Z; then \
            rm -f $(EXPORT)/$(PKG_NAME).tar.Z; else :; fi
 	$(TAR_IN) - $(SOURCE_FILES) \
            | compress -v > $(EXPORT)/$(PKG_NAME).tar.Z
 
+# The following target, which should never exist, tests for the
+# presence of a CVS directory.  If it finds one, it refuses to 
+# proceed, and fails (so that the make stops).
+CVS-CHECK:
+	@ if test -d CVS; then \
+	    echo "*** I found a CVS directory.  I will not proceed."; \
+	    echo "*** You must export the source first."; \
+	    false; \
+	fi
+
 # Before packaging up the SGML kit, go to the dtd2sgml directory and do a make.
-# This builds the DTD description files, which process relies on a Perl
-# module (perlSGML) which I don't distribute.
+# This builds the DTD description files; this relies on a Perl
+# module (perlSGML) which I don't distribute.  Thus, the
+# sgmltext.stamp file cannot be generated in the source as
+# distributed, but it will not have to be, as long as the stamp file
+# is newer than its dependencies.
 $(PKG_NAME)_source.tar:
 	cd doc/dtd2sgml; \
 		$(MAKE) sgmltext.stamp
-	$(TAR_IN) $@ .
+	$(TAR_IN) $@ bin doc dsssl dtd lib
 
 #  clean: Clean up the source directory.
 #  ------------------------------------
@@ -909,12 +916,14 @@ clean:
 
 #  Remove all intermediate files and all built files, and note that the
 #  package is no longer built or tested.
-
+#
+#  Since there was nothing to do in building the package other than
+#  unpacking it, there's nothing to here.
 unbuild: clean
-	test -r doc/ssn70/docset.manifest && \
-		cd doc/ssn70; \
-		rm `cat docset.manifest` ; \
-		$(MAKE) clean
+#	test -r doc/ssn70/docset.manifest && \
+#		cd doc/ssn70; \
+#		rm `cat docset.manifest` ; \
+#		$(MAKE) clean
 	@- rm -f $(BUILT_FILES) $(DATE_STAMP) .BUILT 1>/dev/null 2>/dev/null
 	@ echo '*** Built files removed'
 	@ echo
@@ -941,14 +950,20 @@ unbuild: clean
 #	$(MAKE) docset.manifest
 
 # Build the documentation at export time
-ssn70.tar-htx: docs/ssn70/ssn70.sgml
-	(cd docs/ssn70; $(MAKE) ssn70.tar-htx)
-	mv docs/ssn70/ssn70.tar-htx .
+doc/ssn70/ssn70.tar-htx: doc/ssn70/ssn70.sgml
+	cd doc/ssn70; $(MAKE) ssn70.tar-htx
+	#$(LINK) doc/ssn70/ssn70.tar-htx $@
 
-ssn70.tar-tex: docs/ssn70/ssn70.sgml
-	(cd docs/ssn70; $(MAKE) ssn70.tar-tex)
-	mv docs/ssn70/ssn70.tar-tex .
+doc/ssn70/ssn70.tar-tex: doc/ssn70/ssn70.sgml
+	cd doc/ssn70; $(MAKE) ssn70.tar-tex
+	#$(LINK) doc/ssn70/ssn70.tar-tex $@
 
+#  Unpacking.  Use the presence of the $(UNPACK_FILES) variable (=lib)
+#  to determine whether we need to unpack the source tarball.  Don't
+#  include a dependency on the tarball, to avoid any danger of a
+#  circular dependency.
+$(UNPACK_FILES):
+	$(TAR_OUT) $(PKG_NAME)_source.tar
 
 #--------------------------------------------------------------------------
 
