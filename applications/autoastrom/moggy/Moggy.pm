@@ -79,7 +79,7 @@ sub resulthascolumn ($$);
 sub resultnrows ($);
 sub resultncols ($);
 sub version ($);
-sub debug ($);
+sub debug ($;$);
 sub status_ok ($);
 sub status_continue ($);
 sub status_clear ($);
@@ -532,17 +532,20 @@ sub astdomain ($) {
 #   <parameter>
 #     <name>arg1
 #     <type>double
-#     <description>If the third parameter is false, then this must be a 
-#       right-ascention in decimal degrees.  If the third parameter is false,
-#       then it is the first parameter in the domain specified by the
-#       AST information.
+#     <description>If the third parameter is false, then we are
+#       converting from SKY coordinates to the domain specified by the
+#       AST information, and this must be a right-ascention in decimal
+#       degrees.  If the third parameter is true, then we are
+#       converting <em>to</em> the SKY domain, and this must be the
+#       first parameter in the specified domain.
+#
 #   <parameter>
 #     <name>arg2
 #     <type>double
-#     <description>If the third parameter is false, then this must be a 
-#       declination in decimal degrees.  If the third parameter is false,
-#       then it is the second parameter in the domain specified by the
-#       AST information.
+#     <description>As with parameter 1, but this must be the
+#     declination if we are converting from SKY coordinates, and must
+#     be the second domain parameter if we are going the other way.
+
 #   <parameter>
 #     <name>tosky
 #     <type>boolean
@@ -770,9 +773,10 @@ sub version ($) {
 # Debugging method -- send the debug string to moggy.  Argument is a
 # sequence of keywords chosen from `moggy', `commandparse',
 # `asthandler' and `cataloguehandler', separated by non-characters.
-sub debug ($) {
+sub debug ($;$) {
     my $self = shift;
     my $dbgstring = shift;
+    my $dbgf = shift;   # may be undefined
 
     my %kwdtomask = ( "moggy" => 1 ,
 		      "commandparse" => 2,
@@ -788,7 +792,11 @@ sub debug ($) {
 	    $mask += $kwdtomask{$kwd} if (defined($kwdtomask{$kwd}));
 	}
 	print STDERR "Debugging: <$dbgstring> -> $mask\n";
-	$self->send_command_to_slave_("DEBUG", $mask, "/tmp/moggylog.txt");
+	$self->send_command_to_slave_("DEBUG",
+                                      $mask,
+                                      (defined($dbgf) ?
+                                       $dbgf
+                                       : "/tmp/moggylog.txt"));
     }
 
     return "debug";
