@@ -1,5 +1,4 @@
 MANIFEST
-sun222.tex
 Makefile.PL
 NDF.pm
 NDF.xs
