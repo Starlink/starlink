@@ -85,7 +85,8 @@ itcl::class gaia::GaiaPolCat {
 
 #  If a large GaiaPolData is about to be destroyed, display a message 
 #  explaining what is going on and that it could take some time to complete...
-      if { [$data_ getNrow] > 10000 && [$data_ refCount] == 1 } {
+      if { [catch {set nrow [$data_ getNrow]}] } { set nrow 0 }
+      if { $nrow > 10000 && [$data_ refCount] == 1 } {
          set w .info_dialog
          catch {destroy $w}
          util::DialogWidget $w \
@@ -98,14 +99,14 @@ itcl::class gaia::GaiaPolCat {
          update idletasks
          tkwait variable a
 
-         $data_ annull 
+         catch {$data_ annull}
 
          catch {destroy $w}
 
 #  If the catalogue is small, or if this is not the final reference to
 #  the GaiaPolData, then just do it.
       } else {
-         $data_ annull 
+         catch {$data_ annull}
       }
    }
 

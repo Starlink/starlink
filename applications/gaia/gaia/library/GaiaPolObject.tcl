@@ -157,6 +157,18 @@ itcl::class gaia::GaiaPolObject {
       return $refCount_ 
    }
 
+#  Return the object parent.
+#  -------------------------
+   public method getParent {} {
+      return $parent_ 
+   }
+
+#  Return the head of the clan.
+#  -------------------------
+   public method getTop {} {
+      return $top_ 
+   }
+
 #  Call this to create a clone of (i.e. a new handle for) a GaiaPolObject. 
 #  it increases the reference count for the object by one, and returns the 
 #  object name. Note, no new GaiaPolObject is created.
@@ -170,6 +182,18 @@ itcl::class gaia::GaiaPolObject {
 #  ---------------------------------------
    public method toString {} {
       return "GaiaPolObject: $this"
+   }
+
+#  Annull all GaiaPolObjects with a given head of clan.
+#  ---------------------------------------------------
+   public proc annullAll {top} {
+      foreach obj $objects_ {
+         if { ![catch {set topper [$obj getTop]}] } {
+            if { $topper == $top } { 
+               $obj annull
+            }
+         }
+      }
    }
 
 #  Report any currently active PolObjects.
@@ -228,15 +252,49 @@ itcl::class gaia::GaiaPolObject {
       return $tempdir_
    }
 
-
 #  Protected methods:
 #  ==================
+
+#  Returns a list holding the names of all PolObjects with a given parent.
+#  -----------------------------------------------------------------------
+   public proc findChildren {top} {
+      set ret ""
+      if { $top != "" } {
+         foreach obj $objects_ {
+            set p [$obj getParent]
+            if { $p == $top } {
+                lappend ret $obj
+                lappend ret [::gaia::GaiaPolObject::findChildren $obj]
+            }
+         }
+      }
+      return $ret
+   }
 
 #  Initialise the contents of the memory allocated by the 
 #  GaiaPolObject constructor using a user-supplied argument list.
 #  -------------------------------------------------------
    protected method init {} {
       set refCount_ 1
+
+#  Record the name of the object which is creating this GaiaPolObject
+      set parent_ ""
+      set n 1
+      upvar this parent
+      while { [info exists parent] } {
+         if { $parent != $this } {
+            set parent_ $parent
+            break 
+         }
+         upvar [incr n] this parent
+      }
+
+#  Find the first ancestor which is not a GaiaPolObject.
+      set top_ $parent_
+      while { [$top_ isa ::gaia::GaiaPolObject] } {
+         set top_ [$top_ getTop]
+      }
+
    }
 
 #  Private methods:
@@ -286,6 +344,12 @@ itcl::class gaia::GaiaPolObject {
 
 #  No. of references currently in use for this GaiaPolObject.
       variable refCount_ 1
+
+#  The parent object
+      variable parent_ ""
+
+#  The first ancestor of $this which is not a PolObject.
+      variable top_ ""
 
    }
 

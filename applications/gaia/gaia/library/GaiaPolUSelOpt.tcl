@@ -82,8 +82,11 @@ itcl::class gaia::GaiaPolUSelOpt {
             puts "Error writing defaults to file '$optfile' for the polarimetry toolbox 'Selecting' panel : $mess"
          } else {
             foreach name [array names values_] {
-               if { [regexp {[^,]+,(.*)} $name match elem] } {
-                  puts $fd "set option($elem) \{$values_($name)\}"
+               if { [regexp {([^,]+),(.*)} $name match obj elem] } {
+                  if { $obj == $this } {
+                     puts $fd "set option($elem) \{$values_($name)\}"
+                     unset values_($name)
+                  }
                }
             }
             close $fd
@@ -128,17 +131,20 @@ itcl::class gaia::GaiaPolUSelOpt {
       set desc_(sexp) "the algebraic selection expression"
       set desc_(select) "whether to select or de-select chosen vectors"
       set desc_(shape) "the shape used to choose vectors with the cursor"
+      set desc_(freeze) "whether vectors can be selected by clicking and dragging"
 
 #  Store attribute names (i.e. the name for the corresponding get/set
 #  methods)
       set attr_(sexp) Sexp
       set attr_(select) Select
       set attr_(shape) Shape
+      set attr_(freeze) Freeze
 
 #  Set the hard-wired defaults.
       set values_($this,select) 1
       set values_($this,shape) "box"
       set values_($this,sexps) ""
+      set values_($this,freeze) 0
 
 #  Over-write these with the values read from the options file created when
 #  the last used instance of this class was destroyed.
@@ -157,6 +163,7 @@ itcl::class gaia::GaiaPolUSelOpt {
 #  defaults.
       if { $values_($this,select) == "" } { set values_($this,select) 1 }
       if { $values_($this,shape) == "" } { set values_($this,shape) "box" }
+      if { $values_($this,freeze) == "" } { set values_($this,freeze) 0 }
 
 #  Set hard-wired defaults for things which are data dependant.
       set values_($this,sexp) ""
@@ -205,6 +212,9 @@ itcl::class gaia::GaiaPolUSelOpt {
    public method getSexp {} {return $values_($this,sexp)}
 
    public method setSaveOpt {x} {set saveopt_ $x}
+
+   public method setFreeze {x} {set values_($this,freeze) $x}
+   public method getFreeze {} {return $values_($this,freeze)}
 
 #  Called to add a new action to the current list of undoable actions.
 #  Note, a new selection expression does not generate a new undoable action
@@ -395,6 +405,26 @@ itcl::class gaia::GaiaPolUSelOpt {
                                     -command "[code $this activ shape]"
          $itk_component(shape) add -label "Circle" -value circle \
                                     -command "[code $this activ shape]"
+
+#  Vertical space.
+         grid [frame $w_.space2b -height $vspace2] -row [incr r] 
+
+#  Next row
+         incr r
+
+#  Create a LabelCheck to disable clicking and dragging as a means of
+#  selecting vectors.
+         itk_component add freeze {
+            StarLabelCheck $w_.freeze -text "Disable mouse:" \
+                                     -onvalue 1 \
+                                     -offvalue 0 \
+                                     -labelwidth $lwidth \
+                                     -command [code $this activ freeze] \
+                                     -anchor nw \
+                                     -variable [scope values_($this,freeze)] 
+         }
+         grid $itk_component(freeze) -row $r -column 0 -columnspan $ncol -sticky nw -padx $px
+         add_short_help $itk_component(freeze) {Click to prevent vectors being selected or deselected by clicking and dragging over the vector map}
 
 #  Vertical space.
          grid [frame $w_.space3 -height $vspace2] -row [incr r] 

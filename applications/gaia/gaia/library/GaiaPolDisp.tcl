@@ -66,6 +66,7 @@ itcl::class gaia::GaiaPolDisp {
 #  Constructor
 #  -----------
    constructor { w image rtdimage canvas pbar selcmd hgFont klfont actcmd} {
+      upvar this parent
 
 #  Now initialize the class data. If this constructor has been invoked 
 #  to construct the base class part of some super class, do not 
@@ -93,7 +94,7 @@ itcl::class gaia::GaiaPolDisp {
          trace vdelete $var w [code $this newZoom]
 
 #  Clear the data.
-         clear
+         catch {clear}
       }
    }
 
@@ -169,18 +170,23 @@ itcl::class gaia::GaiaPolDisp {
       if { $style_ != "" } {set style_ [$style_ annull] }
 
 #  If the catalogue was displayed over a blank image created by a
-#  GaiaPolDisp, check its reference count. If zero, remove the blank image.
-      if { [info exists blankref_($rtdimage_)] } {
-         if { $blankref_($rtdimage_) -1 <= 0 } {
+#  GaiaPolDisp, decrement its reference count. If zero, remove the blank image.
+      if { $blankimage_ } { 
+         set blankimage_ 0
+
+         if { [info exists blankref_($rtdimage_)] } {
+            incr blankref_($rtdimage_) -1
+            if { $blankref_($rtdimage_) <= 0 } {
 
 #  Reset the zoom factors.
-            $image_ scale 1 1
+               $image_ scale 1 1
 
 #  Clear the image
-            $rtdimage_ clear
+               $rtdimage_ clear
 
 #  Unset the array variable.
-            unset blankref_($rtdimage_)
+               unset blankref_($rtdimage_)
+            }
          }
       }
    }
@@ -296,13 +302,8 @@ itcl::class gaia::GaiaPolDisp {
 #  Ensure canvas bindings are set up.
          setBindings
 
-#  If the canvas was cleared, draw a new key. Otherwise, ensure the
-#  current key is raised above everything else.
-         if { $clear } { 
-            Key 
-         } else {
-            raiseKey
-         }
+#  Draw a new key. 
+         Key 
 
 #  If a suitable action command has been supplied, add actions to the undoable 
 #  action list, unless inhibited by the caller.
@@ -351,6 +352,7 @@ itcl::class gaia::GaiaPolDisp {
 #  coords (0,0) and is later moved to its correct position.
          set klid_ [$canvas_ create text 0 0 -anchor center \
                                              -font $klfont_ \
+                                             -tags PolKey \
                                              -fill $klcol_ \
                                              -text [format "$klfmt_" $kvval]]
 
@@ -369,10 +371,19 @@ itcl::class gaia::GaiaPolDisp {
          set vx0 [expr - 0.5*$vcl]
          set vx1 [expr 0.5*$vcl]
 
+#  If the vector is to be drawn in the current vector colour, get the
+#  colour.
+         if { $kvcol_ == "current" } {
+            set vcol [$style_ getUclr]
+         } else {
+            set vcol $kvcol_
+         }
+
 #  Create a canvas line item for the vector, half a text height under the 
 #  text label.
 	 set vy [expr 1.0*$lh]
-         set kvid_ [$canvas_ create line $vx0 $vy $vx1 $vy -fill $kvcol_ \
+         set kvid_ [$canvas_ create line $vx0 $vy $vx1 $vy -fill $vcol \
+                                                           -tags PolKey \
 	                                                   -width $kvwid_ ]
 	 
 #  Find the bounding box of the label and vector.
@@ -392,10 +403,11 @@ itcl::class gaia::GaiaPolDisp {
          set kbid_ [$canvas_ create rectangle $kx0 $ky0 $kx1 $ky1 \
                                               -fill $kbgcol_ \
 					      -outline $kbdcol_ \
+                                              -tags PolKey \
                                               -width $kbdwid_ ]
 
 #  We now need to move the all components to their correct initial positions.
-#  Get the bounding box of the whole key key.
+#  Get the bounding box of the whole key.
          lassign [$canvas_ bbox $kbid_ $kvid_ $klid_] kx0 ky0 kx1 ky1
 	    
 #  Find the width and height of the whole key. 
@@ -522,11 +534,11 @@ itcl::class gaia::GaiaPolDisp {
 
       if { $bound_ } {
          if { $hgEnabled_ && !$enabled } {
-            $canvas_ bind $disid_ <Enter> {}
-            $canvas_ bind $disid_ <Leave> {}
+            canvasbind $this $canvas_ $disid_ <Enter> remove {}
+            canvasbind $this $canvas_ $disid_ <Leave> remove {}
          } elseif { !$hgEnabled_ && $enabled } {
-            $canvas_ bind $disid_ <Enter> "[code $this LabelBind 1 %x %y]"
-            $canvas_ bind $disid_ <Leave> "[code $this LabelBind 0 %x %y]"
+            canvasbind $this $canvas_ $disid_ <Enter> add "[code $this LabelBind 1 %x %y]"
+            canvasbind $this $canvas_ $disid_ <Leave> add "[code $this LabelBind 0 %x %y]"
          }
       }
 
@@ -703,7 +715,7 @@ itcl::class gaia::GaiaPolDisp {
       set cx [$canvas_ canvasx $x]
       set cy [$canvas_ canvasy $y]
 
-#  First handle dragging of the key.
+#  First handle dragging of the key for $this.
       if { $root_item_ == "key" } {
 
 #  Find the shift in X and Y from the previous position to the supplied 
@@ -719,6 +731,9 @@ itcl::class gaia::GaiaPolDisp {
 #  Save the current position.
          set rootx_ $cx 
          set rooty_ $cy 
+
+#  Do nothing if we are dragging the key for another GaiaPolDisp.
+      } elseif { $root_item_ == "akey" } {
 
 #  Now handle rectangular vector selection...
       } elseif { $selshape_ == "box" } {
@@ -754,7 +769,7 @@ itcl::class gaia::GaiaPolDisp {
          set sarea_ [list $xmin $ymin $xmax $ymax]
 
 # Now handle circular vector selection...
-      } else {
+      } elseif { $selshape_ == "circle" } {
 
 # Find the the coordinates of two diagonally opposite corners of a 
 # rectangular region enclosing the circle. The centre is the 
@@ -807,6 +822,7 @@ itcl::class gaia::GaiaPolDisp {
 #  Indicate that this new blank image is currently used as the background
 #  for just one catalogue.
             set blankref_($rtdimage_) 1
+            set blankimage_ 1
 
 #  If something went wrong creating the image, attempt to delete the image.
          } else {
@@ -818,9 +834,11 @@ itcl::class gaia::GaiaPolDisp {
       } else {
 
 #  If it is a blank image created by a GaiaPolDisp, then increment its
-#  reference count.
-         if { [info exists blankref_($rtdimage_)] } {
+#  reference count so long as this GaiaPolDisp has not already registered 
+#  an interest in the image.
+         if { !$blankimage_ && [info exists blankref_($rtdimage_)] } {
             incr blankref_($rtdimage_) 
+            set blankimage_ 1
          }
       }
    }
@@ -852,11 +870,6 @@ itcl::class gaia::GaiaPolDisp {
          if { [info exists vrows_] } { unset vrows_ }
          if { [info exists vectors_] } { unset vectors_ }
 
-#  If the vectors were displayed over a blank image created by a
-#  GaiaPolDisp, decrement its reference count. 
-         if { [info exists blankref_($rtdimage_)] } {
-            incr blankref_($rtdimage_) -1
-         }
       }
 
 #  Allow the key to be updated due to changes in the image controls.
@@ -1211,6 +1224,20 @@ itcl::class gaia::GaiaPolDisp {
 #  Get the angle to add on to the angle column values (degrees).
       set rot [$style getArot]
 
+#  Get the pixel origin of the displayed image. If the vectors are
+#  displayed over a blank image use the lower pixel bounds stored with 
+#  the catalogue. Otherwise, use the origin of the displayed ndf.
+      if { [info exists blankref_($rtdimage_)] && 
+           $blankref_($rtdimage_) > 0 } {
+         lassign [$cat getPixBounds] xo yo xh yh
+      } else {
+         $rtdimage_ origin xo yo
+      }
+
+#  Find the offset from pixel coords to grid coords.
+      set ox_ [expr $xo - 1.5]
+      set oy_ [expr $yo - 1.5]
+
 #  If both the catalogue and the image have WCS, align in ra/dec.
       if { [$cat gotWcs] && [$rtdimage_ wcsradius] != "" } {
 
@@ -1238,9 +1265,9 @@ itcl::class gaia::GaiaPolDisp {
 #  Store units.
             set units "deg $equ" 
 
-#  Store zero offset from pixel coords to grid coords.
-            set ox_ 0 
-            set oy_ 0
+#  Store zero offsets
+            set ox 0 
+            set oy 0
 
          } else {
             error_dialog "RA and DEC columns are not available.\nSee the\"Column names\" panel."
@@ -1266,19 +1293,9 @@ itcl::class gaia::GaiaPolDisp {
                $cat setWarned
             }
 
-#  Get the pixel origin of the displayed image. If the vectors are
-#  displayed over a blank image use the lower pixel bounds stored with 
-#  the catalogue. Otherwise, use the origin of the displayed ndf.
-            if { [info exists blankref_($rtdimage_)] && 
-                 $blankref_($rtdimage_) > 0 } {
-               lassign [$cat getPixBounds] xo yo xh yh
-            } else {
-               $rtdimage_ origin xo yo
-            }
-
-#  Find the offset from pixel coords to grid coords.
-            set ox_ [expr $xo - 1.5]
-            set oy_ [expr $yo - 1.5]
+#  Store the offset from pixel coords to grid coords.
+            set ox $ox_
+            set oy $oy_
 
 #  Store the name of the procedure to use to find the canvas coords at the 
 #  end points of the vector.
@@ -1388,8 +1405,8 @@ itcl::class gaia::GaiaPolDisp {
                   set ang [expr 0.017453293*([lindex $rowdata $acol] + $rot) ]
 
 #  Get the required vector centre position.
-                  set a1 [expr [lindex $rowdata $col1] - $ox_]
-                  set a2 [expr [lindex $rowdata $col2] - $oy_]
+                  set a1 [expr [lindex $rowdata $col1] - $ox]
+                  set a2 [expr [lindex $rowdata $col2] - $oy]
 
 #  Get the canvas coords at the end points of the vector.
                   $draw $rtdimage_ $a1 $a2 $units $xsz $ysz $len $ang \
@@ -1483,8 +1500,8 @@ itcl::class gaia::GaiaPolDisp {
                                    [expr 0.5*( $ly0 + $ly1 )] "canvas" \
                                    klx_ kly_ "image"
 
-#  If we have not been been dragging the key...
-      } else {
+#  If we have not been been dragging a key...
+      } elseif { $root_item_ != "akey" } {
 
 #  We have no selection as yet
          set type ""
@@ -1530,9 +1547,11 @@ itcl::class gaia::GaiaPolDisp {
 
 #  Convert the canvas coords to X and Y column values, including the
 #  shift of origin.
+
             $rtdimage_ convert coords $x1 $y1 "canvas" xc1 yc1 "image"
             set xc1 [expr $xc1 + $ox_]
             set yc1 [expr $yc1 + $oy_]
+
             $rtdimage_ convert coords $x2 $y2 "canvas" xc2 yc2 "image"
             set xc2 [expr $xc2 + $ox_]
             set yc2 [expr $yc2 + $oy_]
@@ -1545,41 +1564,32 @@ itcl::class gaia::GaiaPolDisp {
 
 #  Remove the bindings (except for the button press bindings which are
 #  left in place in order to allow new selections to be made).
-      bind $canvas_ <ButtonRelease-1> {}
-      bind $canvas_ <B1-Motion> {}
+      widgetbind $this $canvas_ <ButtonRelease-1> remove {}
+      widgetbind $this $canvas_ <B1-Motion> remove {}
 
+#  Indicate that another <ButtonPress> event can now be processed.
+      set sb_active_ 0
    }
 
-#  Re-instate original canvas and image bindings.
-#  ----------------------------------------------
+#  Remove the bindings set up by setBindings.
+#  -----------------------------------------
    protected method resetBindings {} {
       if { $bound_ } {
-
-#  Remove the bindings set up by setBindings.
-         bind $canvas_ <ButtonPress-1> {}
-         bind $canvas_ <Control-Shift-ButtonPress-1> {}
-         $canvas_ bind $disid_ <ButtonPress-1> {}
-         $canvas_ bind $disid_ <Control-Shift-ButtonPress-1> {}
+         widgetbind $this $canvas_ <ButtonPress-1> remove {}
+         widgetbind $this $canvas_ <Control-Shift-ButtonPress-1> remove {}
+         canvasbind $this $canvas_ $disid_ <ButtonPress-1> remove {}
+         canvasbind $this $canvas_ $disid_ <Control-Shift-ButtonPress-1> remove {}
 
          if { $hgEnabled_ } {
-            $canvas_ bind $disid_ <Enter> {}
-            $canvas_ bind $disid_ <Leave> {}
+            canvasbind $this $canvas_ $disid_ <Enter> remove {}
+            canvasbind $this $canvas_ $disid_ <Leave> remove {}
          }
 
          if { $image_id_ != "" } {
-            $canvas_ bind $image_id_ <ButtonPress-1> {}
-            $canvas_ bind $image_id_ <Control-Shift-ButtonPress-1> {}
+            canvasbind $this $canvas_ $image_id_ <ButtonPress-1> remove {}
+            canvasbind $this $canvas_ $image_id_ <Control-Shift-ButtonPress-1> remove {}
          }
 
-#  Re-instate the original bindings over-ridden by setBindings.
-         foreach ev [array names cb_] {
-            bind $canvas_ $ev $cb_($ev)
-         }
-         if { $image_id_ != "" } {
-            foreach ev [array names ib_] {
-               $canvas_ bind $image_id_ $ev $ib_($ev)
-            }
-         }
          set bound_ 0
       }
    }
@@ -1600,25 +1610,7 @@ itcl::class gaia::GaiaPolDisp {
 #  Only set them up if they have not been set up already.
       if { !$bound_ } {
 
-#  This class uses certain events to initiate certain behaviour. It is
-#  possible that other classes already have bindings for these events.
-#  This class therefore saves any current bindings for the events it
-#  uses, before replacing them with its own bindings. The saved
-#  bindings are re-instated when the GaiaPolDisp is cleared. We need to
-#  check for binding for both the canvas as a whole, and for items within
-#  the canvas. Store a list of the events hijacked by this class.
-         set events [list "<ButtonPress-1>" "<Control-Shift-ButtonPress-1>"]
-
-#  First save the bindings for the canvas as a whole. 
-         foreach ev $events {
-            if { ![catch { set b  [bind $canvas_ $ev] } msg] } {
-               set cb_($ev) $b
-            } else {
-               catch {unset cb_($ev)}
-            }
-         }
-
-#  Now find the canvas id for the image.
+#  Find the canvas id for the image.
          set image_id_ ""
          foreach id [$canvas_ find all] {
             if { [$canvas_ type $id] == "image" } {
@@ -1627,42 +1619,31 @@ itcl::class gaia::GaiaPolDisp {
             }
          }
 
-#  Save the bindings for the image item.
-         if { $image_id_ != "" } {
-            foreach ev $events {
-               if { ![catch { set b  [$canvas_ bind $image_id_ $ev] } msg] } {
-                  set ib_($ev) $b
-               } else {
-                  catch {unset ib_($ev)}
-               }
-            }
-         }
-
-#  Now set up bindings for the whole canvas so that procedure SingleBind
+#  Set up bindings for the whole canvas so that procedure SingleBind
 #  is called when button 1 is pressed anywhere in the canvas. If the
 #  shift and control keys are also pressed, set the 3rd arg to 0.
-         bind $canvas_ <ButtonPress-1> "[code $this SingleBind %x %y 1]"
-         bind $canvas_ <Control-Shift-ButtonPress-1> "[code $this SingleBind %x %y 0]"
+         widgetbind $this $canvas_ <ButtonPress-1> add "[code $this SingleBind %x %y 1]"
+         widgetbind $this $canvas_ <Control-Shift-ButtonPress-1> add "[code $this SingleBind %x %y 0]"
 
 #  Now set up bindings for the image so that procedure SingleBind
 #  is called when button 1 is pressed anywhere in the image. If the
 #  shift and control keys are also pressed, set the 3rd arg to 0.
          if { $image_id_ != "" } {
-            $canvas_ bind $image_id_ <ButtonPress-1> "[code $this SingleBind %x %y 1]"
-            $canvas_ bind $image_id_ <Control-Shift-ButtonPress-1> "[code $this SingleBind %x %y 0]"
+            canvasbind $this $canvas_ $image_id_ <ButtonPress-1> add "[code $this SingleBind %x %y 1]"
+            canvasbind $this $canvas_ $image_id_ <Control-Shift-ButtonPress-1> add "[code $this SingleBind %x %y 0]"
          }
 
 #  Now set up bindings for the image so that procedure SingleBind is called 
 #  when button 1 is pressed over any vector drawn by this class. If the
 #  shift and control keys are also pressed, set the 3rd arg to 1.
-         $canvas_ bind $disid_ <ButtonPress-1> "[code $this SingleBind %x %y 1]"
-         $canvas_ bind $disid_ <Control-Shift-ButtonPress-1> "[code $this SingleBind %x %y 0]"
+         canvasbind $this $canvas_ $disid_ <ButtonPress-1> add "[code $this SingleBind %x %y 1]"
+         canvasbind $this $canvas_ $disid_ <Control-Shift-ButtonPress-1> add "[code $this SingleBind %x %y 0]"
 
 #  Now set up bindings for the canvas so that procedure LabelBind
 #  is called when the pointer enters or leaves a vector.
          if { $hgEnabled_ } {
-            $canvas_ bind $disid_ <Enter> "[code $this LabelBind 1 %x %y]"
-            $canvas_ bind $disid_ <Leave> "[code $this LabelBind 0 %x %y]"
+            canvasbind $this $canvas_ $disid_ <Enter> add "[code $this LabelBind 1 %x %y]"
+            canvasbind $this $canvas_ $disid_ <Leave> add "[code $this LabelBind 0 %x %y]"
          }
 
 #  Indicate that the bindings have now been set up.
@@ -1714,40 +1695,60 @@ itcl::class gaia::GaiaPolDisp {
 #  ----------------------------------------------------
    protected method SingleBind {x y reset} {
 
+      if { !$sb_active_ } {
+
 #  Get the canvas identifier for the top-most item under the pointer.
-      set root_id_ [$canvas_ find withtag current]
+         set root_id_ [$canvas_ find withtag current]
 
 #  If there is no canvas item under the pointer, then note it.
-      if { $root_id_ == "" } {
-         set root_item_ ""
-	 
+         if { $root_id_ == "" } {
+            set root_item_ ""
+
+#  Otherwise, get a list of tags for the item under the pointer. 	 
+         } else {
+            set tags [$canvas_ gettags $root_id_]
+
 #  If the current item is part of the key created by this PolDisp, then note 
 #  it.
-      } elseif { $root_id_ == $kbid_ || $root_id_ == $klid_ || $root_id_ == $kvid_ } {
-         set root_item_ key
+            if { $root_id_ == $kbid_ || $root_id_ == $klid_ || $root_id_ == $kvid_ } {
+               set root_item_ key
+
+#  If the current item is part of the key created by another PolDisp, then 
+#  note it.
+            } elseif { [lsearch -exact $tags PolKey] != -1 } {
+               set root_item_ akey
+
+#  If the current item is part of the key created by another PolDisp,
+#  then note it.
+            } elseif { [lsearch -exact $tags $disid_ ] != -1 } {
+               set root_item_ vector
 
 #  If the current item is a vector drawn by this PolDisp, then note it.
-      } elseif { [lsearch -exact [$canvas_ gettags $root_id_] $disid_ ] != -1 } {
-         set root_item_ vector
+            } elseif { [lsearch -exact [$canvas_ gettags $root_id_] $disid_ ] != -1 } {
+               set root_item_ vector
 
 #  Otherwise, note that the root object is something else.
-      } else {
-         set root_item_ ""
-      }
+            } else {
+               set root_item_ ""
+            }
+         }
 
 #  Convert the screen coords to canvas coords, and record this position as
 #  the "root" position which is available for use by other procedures.
-      set rootx_ [$canvas_ canvasx $x]
-      set rooty_ [$canvas_ canvasy $y]
+         set rootx_ [$canvas_ canvasx $x]
+         set rooty_ [$canvas_ canvasy $y]
 
 #  Indicate if the selection is to be reset before including the chosen
 #  vectors.
-      set reset_ $reset
+         set reset_ $reset
 
 #  Set up bindings to allow ther user to drag out a region.
-      bind $canvas_ <ButtonRelease-1> "[code $this ReleaseBind %x %y]"
-      bind $canvas_ <B1-Motion> "[code $this B1MotionBind %x %y]"
+         widgetbind $this $canvas_ <ButtonRelease-1> add "[code $this ReleaseBind %x %y]"
+         widgetbind $this $canvas_ <B1-Motion> add "[code $this B1MotionBind %x %y]"
 
+#  Indicate that binds have been set up to drag.
+         set sb_active_ 1
+      }
    }
 
 
@@ -1815,6 +1816,134 @@ itcl::class gaia::GaiaPolDisp {
 
 #  Static methods (procs)
 #  ======================
+
+#  Allows a GaiaPolDisp to register or de-register bindings with a given
+#  widget. $disp is the GaiaPolDisp, $w is the widget, $ev is the event, 
+#  $opt is "add" or "remove", $cmd is the command to be bound to the event 
+#  (only used if $opt is "add").
+#
+#  Any bindings which exist before the first GaiaPolDisp is created are
+#  saved and removed before binding the supplied command to the event.
+#  These original bindings are re-instated when the bindigns for the final 
+#  active GaiaPolDisp are removed.
+#  ----------------------------------------------------------------------
+   proc widgetbind {disp w ev opt cmd} {
+
+#  First deal with cases where a supplied binding is to be added to the
+#  widget.
+      if { $opt == "add" } {
+
+#  Has any original binding (present before the first active GaiaPolDisp
+#  was created) been saved? If not save it now in the wobind_ class array,
+#  and remove it from the widget.
+         if { ![info exists wobind_($w,$ev)] } {
+            if { ![catch { set b  [bind $w $ev] } msg] } {
+               set wobind_($w,$ev) $b
+               bind $w $ev ""
+            } else {
+               set wobind_($w,$ev) ""
+            }
+         }
+
+#  Add the new binding.
+         bind $w $ev "+$cmd"
+
+#  Save the binding in a common array.
+         set wbind_($disp,$w,$ev) $cmd
+
+#  Now deal with cases where a binding is to be removed from the widget.
+      } elseif { $opt == "remove" } {
+
+#  Remove the entry in the class array which holds all bindings.
+         unset wbind_($disp,$w,$ev)
+
+#  Remove all bindings from the widget for this event.
+         bind $w $ev ""
+
+#  Get a list of any bindings for the GaiaPolDisp class which now 
+#  need to be reinstated.
+         set bs [array names wbind_ "*,$w,$ev" ]         
+
+#  If there are now none left, reinstate the original bindings present
+#  before the first active GaiaPolDisp was created.
+         if { $bs == "" } {
+            if { $wobind_($w,$ev) != "" } {
+               bind $w $ev $wobind_($w,$ev)
+            }
+            unset wobind_($w,$ev)
+
+#  Otherwise, reinstate all remaining bindings for this class.
+         } else {
+            foreach b $bs {
+               bind $w $ev "+$wbind_($b)"
+            }
+         }
+      }
+   }
+
+#  Allows a GaiaPolDisp to register or de-register bindings with a given
+#  canvas item. $disp is the GaiaPolDisp, $c is the canvas, $tag is the 
+#  item, $ev is the event, $opt is "add" or "remove", $cmd is the 
+#  command to be bound to the event (only used if $opt is "add").
+#
+#  Any bindings which exist before the first GaiaPolDisp is created are
+#  saved and removed before binding the supplied command to the event.
+#  These original bindings are re-instated when the bindigns for the final 
+#  active GaiaPolDisp are removed.
+#  ----------------------------------------------------------------------
+   proc canvasbind { disp c tag ev opt cmd} {
+
+#  First deal with cases where a supplied binding is to be added to the
+#  canvas item.
+      if { $opt == "add" } {
+
+#  Has any original binding (present before the first active GaiaPolDisp
+#  was created) been saved? If not save it now in the cobind_ class array,
+#  and remove it from the canvas item.
+         if { ![info exists cobind_($c,$tag,$ev)] } {
+            if { ![catch { set b  [$c bind $tag $ev] } msg] } {
+               set cobind_($c,$tag,$ev) $b
+               $c bind $tag $ev ""
+            } else {
+               set cobind_($c,$tag,$ev) ""
+            }
+         }
+
+#  Add the new binding.
+         $c bind $tag $ev "+$cmd"
+
+#  Save the binding in a common array.
+         set cbind_($disp,$c,$tag,$ev) $cmd
+
+#  Now deal with cases where a binding is to be removed from the canvas item.
+      } elseif { $opt == "remove" } {
+
+#  Remove the entry in the class array which holds all bindings.
+         unset cbind_($disp,$c,$tag,$ev)
+
+#  Remove all bindings from the canvas item for this event.
+         $c bind $tag $ev ""
+
+#  Get a list of any bindings for the GaiaPolDisp class which now 
+#  need to be reinstated.
+         set bs [array names cbind_ "*,$c,$tag,$ev"]         
+
+#  If there are now none left, reinstate the original bindings present
+#  before the first active GaiaPolDisp was created.
+         if { $bs == "" } {
+            if { $cobind_($c,$tag,$ev) != "" } {
+               $c bind $tag $ev $cobind_($c,$tag,$ev)
+            }
+            unset cobind_($c,$tag,$ev)
+
+#  Otherwise, reinstate all remaining bindings for this class.
+         } else {
+            foreach b $bs {
+               $c bind $tag $ev "+$cbind_($b)"
+            }
+         }
+      }
+   }
 
 #  Returns a uniform random number in range 0 - 1.
 #  -----------------------------------------------
@@ -1949,6 +2078,9 @@ proc StackDump {} {
 #  =======================
    protected {
 
+#  Are the vectors displayed over a blank image?
+      variable blankimage_ 0
+
 #  A command to call to add an undoable action to the current list of
 #  undoable actions. The command is called with 3 args; 
 #  1 - the string "cat" or "style" indicating if a cat or style has changed
@@ -2007,7 +2139,7 @@ proc StackDump {} {
       variable kvdef_ ""
       variable kvval_ ""
       variable kvid_ ""
-      variable kvcol_ "#fff"
+      variable kvcol_ "current"
       variable kvwid_ "1"
       variable kbid_ ""
       variable kbgcol_ "#000"
@@ -2050,11 +2182,11 @@ proc StackDump {} {
 #  The currently selected canvas area.
       variable sarea_ ""
 
+#  Has the user pressed the left mouse button, but not yet released it?
+      variable sb_active_ 0
+
 #  Command to call when vectors are selected.
       variable selcmd_ ""
-
-#  Shape of selection region.
-      variable selshape_ "box"
 
 #  A clone of the most recently used style (GaiaPolStyle).
       variable style_ ""
@@ -2086,6 +2218,24 @@ proc StackDump {} {
 #  Common (i.e. static) data members:
 #  ==================================
 
+#  An array of canvas item binding scripts, indexed by ($canvas,$tag,$event). 
+#  These are the bindings which existed before the first GaiaPolDisp was 
+#  created.
+   common cobind_
+
+#  An array of canvas item binding scripts, indexed by 
+#  ($this,$canvas,$tag,$event). These are the bindings which are created by 
+#  instances of GaiaPolDisp.
+   common cbind_
+
+#  An array of widget binding scripts, indexed by ($widget,$event). These are 
+#  the bindings which existed before the first GaiaPolDisp was created.
+   common wobind_
+
+#  An array of widget binding scripts, indexed by ($this,$widget,$event). 
+#  These are the bindings which are created by instances of GaiaPolDisp.
+   common wbind_
+
 #  A count of the number of GaiaPolDisps  created so far.
    common count_ 0
 
@@ -2095,6 +2245,9 @@ proc StackDump {} {
 
 #  Random number seed
    common r_  0.123456
+
+#  Shape of selection region.
+   common selshape_ "box"
 
 #  End of class definition.
 }

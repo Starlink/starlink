@@ -76,7 +76,7 @@ itcl::class gaia::GaiaPolUSpec {
 
 #  Annul any reference to the displayed GaiaPolCat.
       if { $cat_ != "" } { 
-         set cat_ [$cat_ annull]
+         catch {set cat_ [$cat_ annull]}
       }
 
 #  Save the current options values to the options file, over-writing any
@@ -87,8 +87,11 @@ itcl::class gaia::GaiaPolUSpec {
             puts "Error writing defaults to file '$optfile' for the polarimetry toolbox 'SpecPol' panel : $mess"
          } else {
             foreach name [array names values_] {
-               if { [regexp {[^,]+,(.*)} $name match elem] } {
-                  puts $fd "set option($elem) \{$values_($name)\}"
+               if { [regexp {([^,]+),(.*)} $name match obj elem] } {
+                  if { $obj == $this } {
+                     puts $fd "set option($elem) \{$values_($name)\}"
+                     unset values_($name)
+                  }
                }
             }
             close $fd

@@ -83,8 +83,11 @@ itcl::class gaia::GaiaPolUCols {
             puts "Error writing defaults to file '$optfile' for the polarimetry toolbox 'Column Names' panel : $mess"
          } else {
             foreach name [array names values_] {
-               if { [regexp {[^,]+,(.*)} $name match elem] } {
-                  puts $fd "set option($elem) \{$values_($name)\}"
+               if { [regexp {([^,]+),(.*)} $name match obj elem] } {
+                  if { $obj == $this } {
+                     puts $fd "set option($elem) \{$values_($name)\}"
+                     unset values_($name)
+                  }
                }
             }
             close $fd

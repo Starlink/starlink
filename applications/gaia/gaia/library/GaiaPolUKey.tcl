@@ -68,10 +68,14 @@ itcl::class gaia::GaiaPolUKey {
 #  Initialise data for this object.
       set created_ 0
 
-#  Create a font for the key label. Name not unique so can fail.
-      catch {
-         font create $lfont_
-      } msg
+#  Increment the number of objects created.
+      incr id_
+
+#  Create a unique font name for key labels. 
+      set lfont_ "GaiaPolKeyFont$id_"
+
+#  Create the font
+      font create $lfont_
 
 #  Set defaults.
       reset
@@ -89,8 +93,11 @@ itcl::class gaia::GaiaPolUKey {
             puts "Error writing defaults to file '$optfile' for the polarimetry toolbox 'key' panel : $mess"
          } else {
             foreach name [array names values_] {
-               if { [regexp {[^,]+,(.*)} $name match elem] } {
-                  puts $fd "set option($elem) \{$values_($name)\}"
+               if { [regexp {([^,]+),(.*)} $name match obj elem] } {
+                  if { $obj == $this } {
+                     puts $fd "set option($elem) \{$values_($name)\}"
+                     unset values_($name)
+                  }
                }
             }
             close $fd
@@ -98,7 +105,7 @@ itcl::class gaia::GaiaPolUKey {
       }
 
 #  Delete the font
-      font delete $lfont_
+      if { $lfont_ != "" } { font delete $lfont_ }
    }
 
 #  Public methods:
@@ -246,7 +253,7 @@ itcl::class gaia::GaiaPolUKey {
       set values_($this,ffam) "courier"
       set values_($this,fsize) 15
       set values_($this,fbold) 0
-      set values_($this,vclr) "#0ff"
+      set values_($this,vclr) "current"
       set values_($this,vwid) 2
       set values_($this,bgclr) "#000"
       set values_($this,pad) 0.5
@@ -273,7 +280,7 @@ itcl::class gaia::GaiaPolUKey {
       if { $values_($this,ffam) == "" } { set values_($this,ffam) "courier" }
       if { $values_($this,fsize) == "" } { set values_($this,fsize) 15 }
       if { $values_($this,fbold) == "" } { set values_($this,fbold) 0 }
-      if { $values_($this,vclr) == "" } { set values_($this,vclr) "#0ff" }
+      if { $values_($this,vclr) == "" } { set values_($this,vclr) "current" }
       if { $values_($this,vwid) == "" } { set values_($this,vwid) 2 }
       if { $values_($this,bgclr) == "" } { set values_($this,bgclr) "#000" }
       if { $values_($this,pad) == "" } { set values_($this,pad) 0.5 }
@@ -528,6 +535,12 @@ itcl::class gaia::GaiaPolUKey {
                -value $clr
          }
 
+         $itk_component(vclr) add \
+               -value "current" \
+               -command [code $this activ vclr] \
+               -background "#fff" \
+               -label "current"
+
 #  Create a LabelEntry to control the width of the vector.
          itk_component add vwid {
             LabelEntry $w_.vwid -text "Thickness:" \
@@ -705,7 +718,7 @@ itcl::class gaia::GaiaPolUKey {
        variable attr_
 
 #  The name of the font used for the key label.
-       variable lfont_ GaiaPolKeyFont
+       variable lfont_ ""
 
 #  An array of the previous control values.
        variable oldvals_
@@ -720,6 +733,9 @@ itcl::class gaia::GaiaPolUKey {
 
 #  Common (i.e. static) data members:
 #  ==================================
+
+#  The number of instances of this class created.
+   common id_ 0
 
 #  Array for passing around at global level. Indexed by ($this,param).
    common values_

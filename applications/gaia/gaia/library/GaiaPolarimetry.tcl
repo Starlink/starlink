@@ -66,11 +66,14 @@ itcl::class gaia::GaiaPolarimetry {
    constructor {args} {
       global ::env
 
+#  Add the name of this toolbox to the list of created toolboxes.
+      lappend these_ $this
+
 #  Evaluate any options.
       eval itk_initialize $args
 
 #  Set the top-level window title.
-      wm title $w_ "GAIA: Polarimetry ($itk_option(-number))"
+      wm title $w_ "GAIA: Polarimetry "
 
 #  Ensure that resources are released if the window manager closes the
 #  window.
@@ -88,6 +91,11 @@ itcl::class gaia::GaiaPolarimetry {
 #  Indicate that there is currently nothing to undo or redo.
       set canundo_ 0
       set canredo_ 0
+
+#  Set defaults for options
+      set values_($this,usetab) 1
+      set values_($this,saveopt) 1
+      set values_($this,page) 0
 
 #  Create GaiaPolLists to hold the displayed catalogues, and the
 #  styles used to display each catalogue. Set their maximum lengths to 20.
@@ -180,7 +188,7 @@ itcl::class gaia::GaiaPolarimetry {
 #  Add a menu item to the Options menu to empty the list of recently accessed
 #  catalogues shown int he File menu.
       $Options add command -label {Forget Recent} \
-                           -command [code $this resetRecent] 
+                           -command "::gaia::GaiaPolarimetry::resetAllRecent"
       $short_help_win_ add_menu_short_help $Options \
          {Forget Recent} {Reset the list of recently accessed catalogues in the File menu}
 
@@ -273,6 +281,7 @@ itcl::class gaia::GaiaPolarimetry {
                                -command [code $this selectPage key]
       pack $itk_component(key) -in [$itk_component(notebook) childsite 2] \
                                -anchor nw  -expand 1 -fill x
+
 
 #  Add a page for the selection options.
       itk_component add sel {
@@ -431,6 +440,8 @@ itcl::class gaia::GaiaPolarimetry {
       $display_ setHgColour [$itk_component(highlight) getColour]
       $display_ setHgFormat [$itk_component(highlight) getFormat]
 
+      $display_ setSelShape [$itk_component(sel) getShape]
+
 #  Create a GaiaPolTable object to handle the display of vectors in the table.
       set table_ [::gaia::GaiaPolTable tab#auto $w_ \
                                $itk_option(-rtdimage) \
@@ -445,12 +456,6 @@ itcl::class gaia::GaiaPolarimetry {
 #  Add binding for the table.
       bind $tablelist_.listbox <ButtonRelease-1> +[code $table_ tabSel]
 
-#  Set defaults for options
-      set values_($this,usetab) 1
-      set values_($this,saveopt) 1
-      set values_($this,page) 0
-      set values_($this,recent) ""
-
 #  Override these values with values read from the options file created when 
 #  the last used instance of this class was destroyed.
       set optfile "$optdir_/GaiaPolarimetry.opt"
@@ -461,12 +466,18 @@ itcl::class gaia::GaiaPolarimetry {
             foreach elem [array names option] {
                set values_($this,$elem) "$option($elem)"
             }
+            if { $recent_ == "" } {
+               if { [info exists values_($this,recent)] } {
+                  set recent_ $values_($this,recent)
+                  unset values_($this,recent)
+               }
+            }
          }
       }
 
 #  Add items to the File menu for recently accessed files.
       set recentFile_ ""
-      updateRecent
+      ::gaia::GaiaPolarimetry::updateAllRecent
 
 #  Select the required options page in the notebook.
       $itk_component(notebook) select $values_($this,page)
@@ -483,36 +494,28 @@ itcl::class gaia::GaiaPolarimetry {
 #  -----------
    destructor  {
 
+#  Remove $this from the list of polarimetry toolboxes.
+      set i [lsearch -exact $these_ $this]
+      if { $i != -1 } { set these_ [lreplace $these_ $i $i] }
+
 #  Close the catalogue.
       catch {close_cat}
 
-#  Save the current options values to the options file, over-writing any
-#  existing options file.
-      if { [file isdirectory $optdir_] } {
-         set optfile "$optdir_/GaiaPolarimetry.opt"
-         if { [catch {set fd [open $optfile w]} mess] } {
-            puts "Error writing defaults to file '$optfile' for the polarimetry toolbox : $mess"
-         } else {
-            foreach name [array names values_] {
-               if { [regexp {[^,]+,(.*)} $name match elem] } {
-                  puts $fd "set option($elem) \{$values_($name)\}"
-               }
-            }
-            close $fd
-         }
-      }
-
-#  Delete all currently active PolObjects.
-      ::gaia::GaiaPolObject::deleteActiveObjects
+#  Delete all currently active PolObjects created by this toolbox.
+      ::gaia::GaiaPolObject::annullAll $this 
       
-#  Ensure the directory used to store temporary objects is deleted.
-      ::gaia::GaiaPolObject::rmDir
+#  If no polarimetry toolboxes are currently in existence, ensure the 
+#  directory used to store temporary objects is deleted.
+      if { $these_ == "" } { 
+         ::gaia::GaiaPolObject::rmDir
+      }
    }
 
 #  Public Methods:
 #  ===============
 
-#  Called to update the list of recently accessed files in the File menu.
+#  Called to update the list of recently accessed files in the File menu
+#  of this toolbox.
 #  ----------------------------------------------------------------------
    public method updateRecent {} {
 
@@ -522,13 +525,13 @@ itcl::class gaia::GaiaPolarimetry {
       } 
 
 #  If there are any recently acessed files to add...
-      if { [llength $values_($this,recent)] > 0 } {
+      if { [llength $recent_] > 0 } {
 
 #  Store the index within the File menu for the first one.
          set recentFile_ [expr [$File_ index end] + 1]
 
 #  Add an item to the File menu for each recently accessed file.
-         foreach desc $values_($this,recent) {
+         foreach desc $recent_ {
             set label [lindex $desc 0]
             set file [lindex $desc 1]
 
@@ -637,7 +640,7 @@ itcl::class gaia::GaiaPolarimetry {
                set ret 1
 
 #  Add it to the list of recently accessed files.
-               addRecent $file
+               ::gaia::GaiaPolarimetry::addAllRecent $file
 
             }
          }
@@ -647,14 +650,44 @@ itcl::class gaia::GaiaPolarimetry {
       return $ret
    }
 
+#  Save the current options values to the options file, over-writing any
+#  existing options file. Include the list of recently accessed catalogues.
+#  If required, unset the variables so that other toolboxes wont pick them 
+#  up. 
+#  ------------------------------------------------------------------------
+   public method saveOpts {remove} {
+      set values_($this,recent) $recent_
+      if { [file isdirectory $optdir_] } {
+         set optfile "$optdir_/GaiaPolarimetry.opt"
+         if { [catch {set fd [open $optfile w]} mess] } {
+            puts "Error writing defaults to file '$optfile' for the polarimetry toolbox : $mess"
+         } else {
+            foreach name [array names values_] {
+               if { [regexp {([^,]+),(.*)} $name match obj elem] } {
+                  if { $obj == $this } {
+                     puts $fd "set option($elem) \{$values_($name)\}"
+                     if { $remove } { unset values_($name) }
+                  }
+               }
+            }
+            close $fd
+         }
+      }
+      if { !$remove } { unset values_($this,recent) }
+   }
+
 #  Close this window, kill it if needed, otherwise clear the displayed
 #  information and withdraw.
 #  -------------------------------------------------------------------
    public method close_win {} {
+
+#  Now close the window.
       if { [close_cat] } {
          if { $itk_option(-really_die) } {
+            saveOpts 1
             delete object $this
          } else {
+            saveOpts 0
             wm withdraw $w_
          }
       }
@@ -772,6 +805,12 @@ itcl::class gaia::GaiaPolarimetry {
 #  Return if no catalogue is displayed.
       if { $newcat_ == "" } { return 0 }
 
+#  If the choice was made using the canvas, return if selection using the
+#  canvas is currently disabled.
+      if { $origin == 0 } {
+         if { [$itk_component(sel) getFreeze] } { return 0 }
+      }
+
 #  Indicate what is happening.
       setHold "Updating vector selection" 
 
@@ -882,6 +921,33 @@ itcl::class gaia::GaiaPolarimetry {
       }
    }
 
+#  Called to update the list of recently accessed files in the File menus
+#  of all polarimetry toolboxes.
+#  ----------------------------------------------------------------------
+   public proc updateAllRecent {} {
+      foreach toolbox $these_ {
+         $toolbox updateRecent
+      }
+   }
+
+#  Ensure a file is on the recently accessed list in the File menus of
+#  all polarimetry toolboxes.
+#  -----------------------------------------------------------------
+   public proc addAllRecent {file} {
+      foreach toolbox $these_ {
+         $toolbox addRecent $file
+      }
+   }
+
+#  Reset the list of recently accessed catalogues in the File menus of 
+#  all polarimetry toolboxes.
+#  -----------------------------------------------------------------
+   public proc resetAllRecent {} {
+      foreach toolbox $these_ {
+         $toolbox resetRecent 
+      }
+   }
+
 #  Protected Methods:
 #  =================
 
@@ -956,7 +1022,16 @@ itcl::class gaia::GaiaPolarimetry {
 
 #  Ensure the cursor selection shape used by the GaiaPolDisp is the value
 #  selected by the user.
-      $display_ setSelShape [$itk_component(sel) getShape]
+      set shape [$itk_component(sel) getShape]
+      $display_ setSelShape $shape
+
+#  Ensure that the same selection shape is used by all other polarimetry
+#  toolboxes.
+      foreach toolbox $these_ {
+         if { [ [$toolbox component sel] getShape] != $shape } {
+            [$toolbox component sel] setShape $shape
+         }
+      }
 
 #  If all vectors are to be selected.
       if { $item == "all" } {
@@ -1193,7 +1268,7 @@ itcl::class gaia::GaiaPolarimetry {
       catch {$itk_component(integ) setHeadings ""}
 
 #  Set the top-level window title.
-      wm title $w_ "GAIA: Polarimetry ($itk_option(-number))"
+      wm title $w_ "GAIA: Polarimetry "
 
       resetHold
       return 1
@@ -1233,11 +1308,11 @@ itcl::class gaia::GaiaPolarimetry {
 #  Reset the list of recently accessed catalogues in the File menu.
 #  -----------------------------------------------------------------
    protected method resetRecent {} {
-      set values_($this,recent) ""
+      set recent_ ""
       updateRecent
    }
 
-#  Ensure a file is on the erecently accessed list in the File menu.
+#  Ensure a file is on the recently accessed list in the File menu.
 #  -----------------------------------------------------------------
    protected method addRecent {file} {
 
@@ -1248,18 +1323,18 @@ itcl::class gaia::GaiaPolarimetry {
 #  If so, use its label instead of the basename found above, and remove 
 #  the existing entry for this file.
    set i -1
-   foreach desc $values_($this,recent) {
+   foreach desc $recent_ {
       incr i
       if { [lindex $desc 1] == $file } {
          set label [lindex $desc 0]
-         set values_($this,recent) [lreplace $values_($this,recent) $i $i]
+         set recent_ [lreplace $recent_ $i $i]
          break
       }
    }
 
 #  Check that the label is unique. Unique labels are created by adding a
 #  sequence number in parenthesise to the end of the file basename.
-   foreach desc $values_($this,recent) {
+   foreach desc $recent_ {
       set oldlabel [lindex $desc 0]
       if { $oldlabel == $label } {
          set used(1) 1
@@ -1279,11 +1354,11 @@ itcl::class gaia::GaiaPolarimetry {
       set desc [list $label $file]
 
 #  Add the new description to the start of the list.
-      set values_($this,recent) [lreplace $values_($this,recent) 0 -1 $desc]
+      set recent_ [lreplace $recent_ 0 -1 $desc]
 
 #  If the list is now longer than 10, retain only the first ten items.
-      if { [llength $values_($this,recent)] > 10 } {
-         set values_($this,recent) [lrange $values_($this,recent) 0 9]
+      if { [llength $recent_] > 10 } {
+         set recent_ [lrange $recent_ 0 9]
       } 
 
 #  Update the list of recently accessed files in the File menu.
@@ -1324,7 +1399,7 @@ itcl::class gaia::GaiaPolarimetry {
 #  Save the catalogue with this name. If succesful, add the file name to
 #  the list of recently accessed files in the File menu.
             if { [$newcat_ save $file] } {
-               addRecent $file
+               ::gaia::GaiaPolarimetry::addAllRecent $file
             }
          }
       }
@@ -1464,6 +1539,7 @@ itcl::class gaia::GaiaPolarimetry {
 #  Check we have a usable version of polpack
 #  -----------------------------------------
    private method checkPolpack {v} {
+      global ::env
       set ok 0
 
 #  Get a GaiaApp which provides access to the Polpack "polversion" command.
@@ -1628,6 +1704,12 @@ itcl::class gaia::GaiaPolarimetry {
 
 #  Array for passing around at global level. Indexed by ($this,param).
    common values_
+
+#  List of recently accessed files (the same list is used by all toolboxes)
+   common recent_ ""
+
+#  List of all currently existing polarimetry toolbox objects
+   common these_ ""
 
 #  End of class definition.
 }

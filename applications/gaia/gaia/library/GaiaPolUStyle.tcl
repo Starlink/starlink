@@ -101,7 +101,7 @@ itcl::class gaia::GaiaPolUStyle {
    destructor {
 
 #  Annul any catalogue reference.
-      if { $cat_ != "" } { $cat_ annull }
+      if { $cat_ != "" } { catch { $cat_ annull } }
 
 #  Save the current options values to the options file, over-writing any
 #  existing options file.
@@ -111,8 +111,11 @@ itcl::class gaia::GaiaPolUStyle {
             puts "Error writing defaults to file '$optfile' for the polarimetry toolbox 'Rendering' panel : $mess"
          } else {
             foreach name [array names values_] {
-               if { [regexp {[^,]+,(.*)} $name match elem] } {
-                  puts $fd "set option($elem) \{$values_($name)\}"
+               if { [regexp {([^,]+),(.*)} $name match obj elem] } {
+                  if { $obj == $this } {
+                     puts $fd "set option($elem) \{$values_($name)\}"
+                     unset values_($name)
+                  }
                }
             }
             close $fd
@@ -456,7 +459,7 @@ itcl::class gaia::GaiaPolUStyle {
 #  Do nothing if the controls have already been created.
       if { ! $created_ } {
 
-#  Save the values_ array so that hey can be reinstated later (the widget 
+#  Save the values_ array so that they can be reinstated later (the widget 
 #  creation commands seem to reset them to blank).
          foreach name [array names values_] {
             set temp($name) $values_($name)
@@ -696,8 +699,8 @@ itcl::class gaia::GaiaPolUStyle {
          }
 
 #  Re-instate the original values_ array.
-         foreach name [array names values_] {
-            set values_($name) $temp($name) 
+         foreach name [array names temp] {
+            set values_($name) $temp($name)
          }
 
       }

@@ -70,10 +70,14 @@ itcl::class gaia::GaiaPolUHigh {
 #  Initialise data for this object.
       set created_ 0
 
-#  Create a font for highlight labels. Name not unique so can fail.
-      catch {
-         font create $font_
-      } msg 
+#  Increment the number of GaiaPolUHigh objects created.
+      incr id_
+
+#  Create a unique font name for highlight labels. 
+      set font_ "GaiaPolHighFont$id_"
+
+#  Create the font
+      font create $font_
 
 #  Set defaults
       reset
@@ -91,8 +95,11 @@ itcl::class gaia::GaiaPolUHigh {
             puts "Error writing defaults to file '$optfile' for the polarimetry toolbox 'Highlighting' panel : $mess"
          } else {
             foreach name [array names values_] {
-               if { [regexp {[^,]+,(.*)} $name match elem] } {
-                  puts $fd "set option($elem) \{$values_($name)\}"
+               if { [regexp {([^,]+),(.*)} $name match obj elem] } {
+                  if { $obj == $this } {
+                     puts $fd "set option($elem) \{$values_($name)\}"
+                     unset values_($name)
+                  }
                }
             }
             close $fd
@@ -100,7 +107,7 @@ itcl::class gaia::GaiaPolUHigh {
       }
 
 #  Delete the font
-      font delete $font_
+      if { $font_ != "" } { font delete $font_ }
    }
 
 #  Public methods:
@@ -514,7 +521,7 @@ itcl::class gaia::GaiaPolUHigh {
        variable attr_
 
 #  The name of the font used for highlight labels.
-      variable font_ GaiaPolHighFont
+      variable font_ ""
 
 #  An array of the previous control values.
        variable oldvals_
@@ -529,6 +536,9 @@ itcl::class gaia::GaiaPolUHigh {
 
 #  Common (i.e. static) data members:
 #  ==================================
+
+#  The number fo GaiaPolUHigh objects created so far.
+   common id_ 0
 
 #  Array for passing around at global level. Indexed by ($this,param).
    common values_
