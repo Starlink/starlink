@@ -26,10 +26,13 @@ f     AST_LUTMAP
 *     linearly between the appropriate entries in the table. If the
 *     index lies outside the range of the table, linear extrapolation
 *     is used based on the two nearest entries (i.e. the two entries
-*     at the start or end of the table, as appropriate).
+*     at the start or end of the table, as appropriate). If either of the
+*     entries used for the interplation has a value of AST__BAD, then the 
+*     interpolated value is returned as AST__BAD.
 *
-*     If the lookup table entries increase or decrease monotonically,
-*     then the inverse transformation may also be performed.
+*     If the lookup table entries increase or decrease monotonically (and
+*     if the table contains no AST__BAD values), then the inverse 
+*     transformation may also be performed.
 
 *  Inheritance:
 *     The LutMap class inherits from the Mapping class.
@@ -57,6 +60,8 @@ f     The LutMap class does not define any new routines beyond those
 *     8-JAN-2003 (DSB):
 *        Changed private InitVtab method to protected astInitLutMapVtab
 *        method.
+*     12-JAN-2004 (DSB):
+*        Check for AST__BAD values in the supplied lut array.
 *class--
 */
 
@@ -639,20 +644,34 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 /* If the input value lies below the first lookup table entry,
    extrapolate using the first two table values. */
                if ( ix < 0 ) {
-                  value_out = lut[ 0 ] + x * ( lut[ 1 ] - lut[ 0 ] );
+                  if( lut[ 0 ] != AST__BAD && lut[ 1 ] != AST__BAD ) {
+                     value_out = lut[ 0 ] + x * ( lut[ 1 ] - lut[ 0 ] );
+                  } else {
+                     value_out = AST__BAD;
+                  }
 
 /* If the input value lies above the last lookup table entry (or
    equals it), extrapolate using the last two table values. */
                } else if ( ix >= ( nlut - 1 ) ) {
-                  value_out = lut[ nlut - 1 ] +
-                              ( x - (double) ( nlut - 1 ) ) *
-                              ( lut[ nlut - 1 ] - lut[ nlut - 2 ] );
+                  if( lut[ nlut - 1 ] != AST__BAD && 
+                      lut[ nlut - 2 ] != AST__BAD ) {
+                     value_out = lut[ nlut - 1 ] +
+                                 ( x - (double) ( nlut - 1 ) ) *
+                                 ( lut[ nlut - 1 ] - lut[ nlut - 2 ] );
+                  } else {
+                     value_out = AST__BAD;
+                  }
 
 /* Otherwise, interpolate between the adjacent entries. */
                } else {
-                  fract = x - xi;
-                  value_out = lut[ ix ] * ( 1.0 - fract ) +
-                              lut[ ix + 1 ] * fract;
+                  if( lut[ ix ] != AST__BAD && 
+                      lut[ ix + 1 ] != AST__BAD ) {
+                     fract = x - xi;
+                     value_out = lut[ ix ] * ( 1.0 - fract ) +
+                                 lut[ ix + 1 ] * fract;
+                  } else {
+                     value_out = AST__BAD;
+                  }
                }
             }
 
@@ -1204,18 +1223,27 @@ AstLutMap *astInitLutMap_( void *mem, size_t size, int init,
       astError( AST__LUTII, "astInitLutMap(%s): An input value increment of "
                 "zero between lookup table elements is not allowed.", name );
 
-/* Determine if the element values are all distinct and increase or
-   decrease monotonically. We can only implement the inverse
+/* Determine if the element values are all good, distinct and increase 
+   or decrease monotonically. We can only implement the inverse
    transformation if this is so. */
    } else {
-      up = ( lut[ nlut - 1 ] > lut[ 0 ] );
-      down = ( lut[ nlut - 1 ] < lut[ 0 ] );
-      monotonic = up || down;
-      if ( monotonic ) {
-         for ( ilut = 0; ilut < ( nlut - 1 ); ilut++ ) {
-            monotonic = up ? ( lut[ ilut + 1 ] > lut[ ilut ] ) :
-                             ( lut[ ilut + 1 ] < lut[ ilut ] );
-            if ( !monotonic ) break;
+      if( lut[ 0 ] == AST__BAD ) {
+         monotonic = 0;
+
+      } else {
+         up = ( lut[ nlut - 1 ] > lut[ 0 ] );
+         down = ( lut[ nlut - 1 ] < lut[ 0 ] );
+         monotonic = up || down;
+         if ( monotonic ) {
+            for ( ilut = 0; ilut < ( nlut - 1 ); ilut++ ) {
+               if( lut[ ilut  + 1 ] == AST__BAD ) {
+                  monotonic = 0;
+               } else {
+                  monotonic = up ? ( lut[ ilut + 1 ] > lut[ ilut ] ) :
+                                   ( lut[ ilut + 1 ] < lut[ ilut ] );
+               }
+               if ( !monotonic ) break;
+            }
          }
       }
 
