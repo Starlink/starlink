@@ -337,7 +337,7 @@
       ENDIF
 *
 *    Map vig. correction array - for one radial bin or image pixel
-      CALL DYN_MAPR(1,NENERGY,TCVPTR,STATUS)
+      CALL DYN_MAPD(1,NENERGY,TCVPTR,STATUS)
 *
 *    Map single energy vignetting correction factor array
       CALL DYN_MAPR(1,NR,PVSING,STATUS)
@@ -486,7 +486,7 @@
       IF (LECORR) THEN
 
 * Map a dynamic array to hold the exposure & time values for each time bin.
-        CALL DYN_MAPR(1, NT, DXPNTR, STATUS)
+        CALL DYN_MAPD(1, NT, DXPNTR, STATUS)
         CALL DYN_MAPD(1, NT, SXPNTR, STATUS)
         CALL DYN_MAPD(1, NT, EXPNTR, STATUS)
 *
