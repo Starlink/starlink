@@ -45,7 +45,8 @@
 *     on both images.
 *
 *     Operation is as follows.  You must first use the chooser window
-*     to select a pair of images which have a region in common.
+*     to select a pair of images which have a region in common
+*     (if you only have two images this step may be skipped).
 *     Use the tabs at either side of the screen to pick the image to
 *     appear on that side.  You can use the "Show FITS" button to
 *     select one or more FITS headers to be displayed alongside
@@ -54,10 +55,9 @@
 *     controlling the brightness of each pixel; alignment is easier if
 *     the same features are of a similar brightness in different images.
 *     The images are displayed resampled into their Current coordinates,
-*     so that their orientation (though not necessarily their size) 
-*     will be the same as in the aligner.  You can only align 
-*     them using this program if a simple offset (translation)
-*     maps one onto another in these 
+*     so that their orientation will be the same as in the aligner.
+*     You can only align them using this program if a simple offset 
+*     (translation) maps one onto another in these 
 *     coordinates (or very nearly does so).  If that is not the case,
 *     you will have to set their Current coordinate system 
 *     to a different value (see WCSEDIT) or align them using a 
@@ -107,6 +107,16 @@
 *     pairndf in outlist percentiles
 
 *  ADAM Parameters:
+*     CHOOSER = _LOGICAL (Read)
+*        If only two images are presented in the IN list, then this 
+*        parameter determines whether they should be previewed in
+*        the chooser widget before they are presented for alignment.
+*        With only two, the chooser is not normally necessary since
+*        there is only one possible pair to select for alignment,
+*        but if you want to equalise the image brightnesses using 
+*        the "Display cutoff" button or preview FITS headers you 
+*        may wish to respond true to this.
+*        [FALSE]
 *     IN = LITERAL (Read)
 *        A list of NDF names whose data are to be transformed. The NDF
 *        names should be separated by commas and may include wildcards.
@@ -461,6 +471,7 @@
       INTEGER TOTNOD            ! Total number of nodes in graph
       INTEGER UBND( 2 )         ! Upper bounds of NDF
       INTEGER WINDIM( 2 )       ! Window dimensions for display
+      LOGICAL CHOOSR            ! True if we definitely want a chooser widget 
       LOGICAL COMPL             ! True if graph is complete
       LOGICAL CYCLIC            ! True if graph is cyclic
       LOGICAL OVERRD            ! True if continue with incomplete graph
@@ -507,11 +518,18 @@
       CALL CCD1_SETSW( NDFGR, NNDF, USESET, ISET, NSET, IMEM, IMEMOF,
      :                 SNAMGR, MAPSET, STATUS )
 
+*  If there are only two NDFs, see whether we want to bother the user
+*  with presenting a Chooser widget.
+      IF ( NSET .EQ. 2 ) THEN
+         CALL PAR_GET0L( 'CHOOSER', CHOOSR, STATUS )
+      END IF
+
 *  Call the routine which does all the user interaction and obtains a
 *  list of pairings with associated offsets.
-      CALL CCD1_PNDF( NDFGR, NSET, IMEM, IMEMOF, SNAMGR, PERCNT, ZOOM,
-     :                MAXCNV, WINDIM, PRVDIM, MSTYLE, COUNT, NODES,
-     :                NMAT, XOFF, YOFF, IPX1, IPY1, IPX2, IPY2, STATUS )
+      CALL CCD1_PNDF( NDFGR, NSET, IMEM, IMEMOF, SNAMGR, PERCNT, 
+     :                .NOT. CHOOSR, ZOOM, MAXCNV, WINDIM, PRVDIM,
+     :                MSTYLE, COUNT, NODES, NMAT, XOFF, YOFF, IPX1, 
+     :                IPY1, IPX2, IPY2, STATUS )
 
 *  Release resources.
       CALL CCD1_GRDEL( SNAMGR, STATUS )

@@ -60,6 +60,10 @@
 #     PREVY = integer (Given and Returned)
 #        Y dimension of the preview window for each NDF Set in the chooser
 #        widget.
+#     SKIP2 = boolean (Given)
+#        If true and there are only two NDF Sets supplied, then no user
+#        interaction via the chooser will be solicited - the user will
+#        simply be presented with those two in the aligner.
 #     WINX = integer (Given and Returned)
 #        X dimension of the window used for NDF display.
 #     WINY = integer (Given and Returned)
@@ -80,11 +84,12 @@
 
 #  Global variables.
       global Done
+      global Pairs
 
 #  Set defaults for some arguments.
       foreach pair { { MARKSTYLE "" } { MAXCANV 0 } { MAXPOS 100 } \
                      { PERCLO 5 } { PERCHI 95 } { PREVX 300 } { PREVY 300 } \
-                     { WINX 300 } { WINY 300 } { ZOOM 1 } } {
+                     { SKIP2 0 } { WINX 300 } { WINY 300 } { ZOOM 1 } } {
          if { ! [ info exists [ lindex $pair 0 ] ] } {
             eval set $pair
          }
@@ -150,6 +155,9 @@
         }
      }
 
+#  See if we will be presenting a chooser widget to the user.
+      set nochooser [ expr $SKIP2 && $nndfset == 2 ]
+
 #  Create an NDF pair alignment widget.
       set aligner [ ndfalign .a ]
       wm withdraw $aligner
@@ -212,9 +220,13 @@
       set choosestatus ""
       proc pairok { a b } {
          global Done
-         if { ( $a != "" && $b != "" ) && ( [ array size Done ] == 0 || \
-                                            [ array names Done $a ] != "" || \
-                                            [ array names Done $b ] != "" ) } { 
+         global Pairs
+         if { ( $a != "" && $b != "" )
+           && ( [ array size Done ] == 0 || \
+                [ array names Done $a ] != "" || \
+                [ array names Done $b ] != "" ) \
+           && ( [ array names Pairs "$a,$b" ] == "" && \
+                [ array names Pairs "$b,$a" ] == "" ) } { 
             return 1 
          } else {
             return 0
@@ -243,6 +255,7 @@
                          -watchstatus choosestatus \
                          -choosepercentiles 1 \
                          -choosewcsframe 0 \
+                         -skip2 $SKIP2 \
                          -validpair [ code pairok %A %B ] \
                          -viewport [ list $PREVX $PREVY ] \
                          -percentiles [ list $PERCLO $PERCHI ] 
@@ -273,7 +286,11 @@
                            -bitmap questhead \
                            -master $aligner \
                            -title "PAIRNDF: No pairs" ]
-      $aligndialog buttonconfigure Cancel -text "Pick another pair"
+      if { $nochooser } {
+         $aligndialog buttonconfigure Cancel -text "Abort PAIRNDF"
+      } else {
+         $aligndialog buttonconfigure Cancel -text "Pick another pair"
+      }
       $aligndialog buttonconfigure OK -text "Complete this alignment"
       $aligndialog hide Help
       proc carryon { args } {
@@ -304,7 +321,8 @@
    "" \
    "You can change the style of image display using the `Grid' button, and " \
    "select FITS headers to be shown below using the `FITS' button." \
-   "If you resize the window, the displayed images will grow or shrink to fit."\
+   "If you resize the window, the displayed images will grow or shrink to fit"\
+   "(in this case they will be replotted, which may be slow)." \
    "" \
    "You can individually change the brightness of each displayed image by" \
    "using the `Display cutoff' control in its information panel." \
@@ -316,39 +334,58 @@
    "first time, you will only be allowed to select a pair for alignment if" \
    "at least one of them has already been aligned.  Images which have already" \
    "been aligned are marked with a `+' symbol on their selection tabs." \
+   "You will not be allowed to align the same pair twice." \
    "" \
    "When all of the images have been aligned in pairs, the program will" \
    "automatically move to the next stage, and mutually register them all."
       $chooser configure -helptext [ join $helplines "\n" ]
 
 #  Loop until all the NDF Sets have been paired.
-      while { [ array size Done ] < $nndfset } {
+      set first 1
+      while { [ array size Done ] < $nndfset && ( $first || ! $nochooser ) } {
 
-#  Get the user to pick a pair of NDF Sets.
-         wm deiconify $chooser
-         raise $chooser
-         set pair ""
-         while { [ llength $pair ] != 2 } {
-            $chooser configure -status active
-            tkwait variable choosestatus
-  
+#  Get a valid pair of NDF Sets from the chooser.
+         if { $nochooser } {
+
+#  If no chooser is being used, do it without any user interaction.
             set pair [ $chooser getpair ]
-            set iA [ lindex $pair 0 ]
-            set iB [ lindex $pair 1 ]
- 
-            if { [ $chooser cget -status ] == "done" } {
-               $quitdialog center $chooser
-               set response [ $quitdialog activate ]
-               if { $response } {
-                  set pair ""
-               } else {
-                  break
+         } else {
+
+#  The user is being asked to interact with the chooser.  Ensure that 
+#  it is visible.
+            wm deiconify $chooser
+            raise $chooser
+            set pair ""
+            while { [ llength $pair ] != 2 } {
+
+#  Wait for and get the (possibly invalid) selected pair.
+               $chooser configure -status active
+               tkwait variable choosestatus
+               set pair [ $chooser getpair ]
+
+#  If the user has hit the "Done" button initiate a confirmation dialogue.
+               if { [ $chooser cget -status ] == "done" } {
+                  $quitdialog center $chooser
+                  set response [ $quitdialog activate ]
+                  if { $response } {
+                     set pair ""
+                  } else {
+                     break
+                  }
                }
             }
-         }
+
+#  Hide the chooser window until next time.
+            wm positionfrom $chooser user
+            wm withdraw $chooser
 
 #  Exit the loop if the user has indicated that the session is at an end.
-         if { $choosestatus == "done" } break
+            if { $choosestatus == "done" } break
+         }
+
+#  We now have two valid images to align.
+         set iA [ lindex $pair 0 ]
+         set iB [ lindex $pair 1 ]
 
 #  Log to the user.
          ccdputs -log "  "
@@ -356,14 +393,13 @@
 
 #  Load the NDF Set pair into the aligner widget and wait for the user to 
 #  select some positions in common.
-         wm positionfrom $chooser user
-         wm withdraw $chooser
          wm deiconify $aligner
          raise $aligner
          set percA [ $chooser percentiles $iA ]
          set percB [ $chooser percentiles $iB ]
-         $aligner loadndf A $ndfsets($iA) CURRENT $percA $MAXCANV
-         $aligner loadndf B $ndfsets($iB) CURRENT $percB $MAXCANV
+         $aligner loadndf A $ndfsets($iA) CURRENT $percA $MAXCANV $first
+         $aligner loadndf B $ndfsets($iB) CURRENT $percB $MAXCANV $first
+         set first 0
 
 #  Loop until the user is happy with the outcome.
          set tryagain 1
@@ -422,7 +458,7 @@
                                           [ lindex $pt 0 ] [ lindex $pt 1 ] ]
                      }
                   }
-                  set pairs($key) [ list $nmatch $xo $yo $mp ]
+                  set Pairs($key) [ list $nmatch $xo $yo $mp ]
 
 #  Record the fact that these images have been connected.
                   set Done($iA) 1
@@ -468,9 +504,9 @@
 
 #  Write the returned PAIRS list.
       set PAIRS {}
-      foreach key [ array names pairs ] {
+      foreach key [ array names Pairs ] {
          regexp {^([0-9]+),([0-9]+)$} $key dummy iA iB
-         set val $pairs($key)
+         set val $Pairs($key)
          set nmatch [ lindex $val 0 ]
          set xoff [ lindex $val 1 ]
          set yoff [ lindex $val 2 ]

@@ -30,11 +30,11 @@
 #        After a call to this method, the user may no longer interact 
 #        with the widget to add points etc.
 #
-#     loadndf slot ndf ?frame? ?percs? ?maxcanv?
+#     loadndf slot ndf ?frame? ?percs? ?maxcanv? ?fillwin?
 #        This method loads an NDF Set into the viewer.
 #           - slot     -- Either "A" or "B", to identify whether this is
 #                         the A or B NDF.
-#           - ndf      -- an ndf or ndfset object
+#           - ndf      -- An ndf or ndfset object
 #           - frame    -- The frame into which to resample the NDFs before
 #                         plotting.  If absent, the current frame is used.
 #           - percs    -- If present, this is a two-element list giving the 
@@ -42,6 +42,9 @@
 #                         NDF should be made.  If absent, a default is used.
 #           - maxcanv  -- If given and non-zero, the GWM widget will not 
 #                         be more than maxcanv pixels in either direction.
+#           - fillwin  -- If true, the zoom factor will be increased until
+#                         the display is as big as it can be without 
+#                         exceeding the displayed size of the window.
 #
 #     maxcanvas
 #        Returns a number a bit bigger than the larger of the width and
@@ -172,8 +175,8 @@
 ########################################################################
 
 #-----------------------------------------------------------------------
-      public method loadndf { slot ndfob { frame CURRENT } \
-                              { percs { 0 100 } } { maxcanv 0 } } {
+      public method loadndf { slot ndfob { frame CURRENT } { percs { 0 100 } } \
+                              { maxcanv 0 } { fillwin 1 } } {
 #-----------------------------------------------------------------------
 
 #  Validate the slot identifier.
@@ -298,7 +301,7 @@
 #  widget (but not necessarily than the canvas itself), enlarge it 
 #  until it takes up the available space.
             set enlarge 0
-            while { 1 } {
+            while { $fillwin } {
                set z [ zoominc $zoom [ expr $enlarge + 1 ] ]
 
 #  Set the initial offset.  The images should be adjacent to each other

@@ -73,6 +73,11 @@
 #        as a default percentile cutoff limit for NDF display, but the
 #        user can select different values for different images.
 #
+#     skip2 = boolean
+#        If true, and the chooser is constructed with only two images
+#        to choose from, then the chooser will automatically select
+#        that pair with no user interaction at all.
+#
 #     status = string
 #        A value which gives the status of the object.  It may have the
 #        following values:
@@ -152,9 +157,9 @@
                } else {
                   error "Argument \"$ndfob\" is an invalid ndf."
                }
-            } elseif { ! [ catch { $ndfob validndfset } valid ] } {
+            } elseif { ! [ catch { $ndfob validndf } valid ] } {
                if { $valid } {
-                  set ndfset [ ndfset $ndfob ]
+                  set ndfset [ ndfset "" [ $ndfob name ] ]
                } else {
                   error "Argument \"$ndfob\" is an invalid ndfset."
                }
@@ -167,6 +172,22 @@
          }
          if { $nndfset == 0 } {
             error "No ndfset objects supplied"
+         }
+
+#  Work out the maximum X and Y dimensions of any of the images.  These
+#  are required for working out relative sizes of displayed images - 
+#  only required if the user is not permitted to change the selected
+#  WCS frame.
+         if { ! $choosewcsframe } {
+            for { set i 1 } { $i <= $nndfset } { incr i } {
+               set bbox [ [ lindex $ndfsetlist $i ] bbox [ wcsframe $i ] ]
+               set xmax [ max $xmax \
+                              [ expr [ lindex [ lindex $bbox 0 ] 1 ] - \
+                                     [ lindex [ lindex $bbox 0 ] 0 ] ] ]
+               set ymax [ max $ymax \
+                              [ expr [ lindex [ lindex $bbox 1 ] 1 ] - \
+                                     [ lindex [ lindex $bbox 1 ] 0 ] ] ]
+            }
          }
 
 #  Initialise values of selected images.
@@ -506,60 +527,84 @@
 #  The window does not currently exist; we need to create and fill it.
 #  Create the containing frame.
             container plot$index $itk_component(choosearea) \
-                      [ expr "{$index}" == "{1}" ]
+                                 [ expr "{$index}" == "{1}" ]
+
+#  Only proceed if the widget is in the active state.
+            if { $status == "active" } {
 
 #  Create the GWM widget.
-            if { $isndfset } {
+               if { $isndfset } {
 
 #  Display might be time-consuming: post a busy window.
-               waitpush "Drawing image [ $ndfset name ]"
+                  waitpush "Drawing image [ $ndfset name ]"
+
+#  Work out the dimensions of the GWM widget.  Only attempt to adjust the
+#  sizes for consistency if there is no possibility of the user changing 
+#  the WCS frame out from under us, since this would make it difficult 
+#  to keep the relative sizes in step.
+                  if { $choosewcsframe } {
+                     set scale 1
+                  } else {
+                     set bbox [ $ndfset bbox $wcsframe ]
+                     if { [ expr $xmax / $ymax ] > [ expr $width / $height ] } {
+                        set scale \
+                            [ expr ( [ lindex [ lindex $bbox 0 ] 1 ] - \
+                                     [ lindex [ lindex $bbox 0 ] 0 ] ) / $xmax ]
+                     } else {
+                        set scale \
+                            [ expr ( [ lindex [ lindex $bbox 1 ] 1 ] - \
+                                     [ lindex [ lindex $bbox 1 ] 0 ] ) / $ymax ]
+                     }
+                  }
 
 #  Construct the GWM widget.
-               set gwmname [ winfo id $itk_component(choosearea) ]_$index
-               itk_component add plot$index:display {
-                  gwm $itk_component(plot$index).gwm \
-                      -width $width \
-                      -height $height \
-                      -name $gwmname
-               }
+                  set gwmname [ winfo id $itk_component(choosearea) ]_$index
+                  itk_component add plot$index:display {
+                     gwm $itk_component(plot$index).gwm \
+                         -width [ expr $width * $scale ] \
+                         -height [ expr $height * $scale ] \
+                         -name $gwmname
+                  }
 
 #  Plot the NDF inside the GWM.
-               set options {border=1 drawtitle=0 textlab=0 tickall=1 \
-                            colour=3 colour(numlab)=5 colour(border)=4}
-               lappend options $displaystyle
-               $ndfset display -resamp "$gwmname/GWM" \
-                               [ lindex $percs 0 ] [ lindex $percs 1 ] \
-                               $wcsframe [ join $options "," ]
+                  set options {border=0 drawtitle=0 textlab=0 tickall=0 \
+                               colour=3 colour(numlab)=5 colour(border)=4 \
+                               minticklen=0 majticklen=0}
+                  lappend options $displaystyle
+                  $ndfset display -resamp "$gwmname/GWM" \
+                                  [ lindex $percs 0 ] [ lindex $percs 1 ] \
+                                  $wcsframe [ join $options "," ]
 
 #  It may be a good idea to unmap the NDF here (although it may not).
-               $ndfset mapped 0
+                  $ndfset mapped 0
 
 #  Remove the busy window.
-               waitpop
+                  waitpop
 
 #  This is a blank window; write instructions to the user.
-            } else {
-               itk_component add plot$index:display {
-                  frame $itk_component(plot$index).blank \
-                      -width $width \
-                      -height $height
+               } else {
+                  itk_component add plot$index:display {
+                     frame $itk_component(plot$index).blank \
+                         -width $width \
+                         -height $height
+                  }
+                  set msg \
+                     "Use the tabs to\npick an image for\ndisplay on the $side"
+                  itk_component add plot$index:instructions {
+                     label $itk_component(plot$index:display).instruct$index \
+                        -justify $side -text $msg
+                  }
+                  itk_component add plot$index:arrow {
+                     label $itk_component(plot$index:display).arrow$index \
+                        -bitmap @$CCDdir/arrow_$side.xbm
+                  }
+                  pack $itk_component(plot$index:arrow) \
+                     -side $side -anchor n -expand 0
+                  pack $itk_component(plot$index:instructions) \
+                     -side $side -anchor n -expand 1 -fill both
                }
-               set msg \
-                  "Use the tabs to\npick an image for\ndisplay on the $side"
-               itk_component add plot$index:instructions {
-                  label $itk_component(plot$index:display).instruct$index \
-                     -justify $side -text $msg
-               }
-               itk_component add plot$index:arrow {
-                  label $itk_component(plot$index:display).arrow$index \
-                     -bitmap @$CCDdir/arrow_$side.xbm
-               }
-               pack $itk_component(plot$index:arrow) \
-                  -side $side -anchor n -expand 0
-               pack $itk_component(plot$index:instructions) \
-                  -side $side -anchor n -expand 1 -fill both
+               pack $itk_component(plot$index:display) -expand 1 -fill both
             }
-            pack $itk_component(plot$index:display) -expand 1 -fill both
 
 #  Store characteristics of this plot so that we know whether subsequent 
 #  plot requests are out of date.
@@ -651,12 +696,12 @@
             set pairs {}
             lappend pairs [ list "Name" $name ]
             lappend pairs [ list "Pixels" $dims ]
-            if { ! $choosepercentiles } {
-               lappend pairs [ list "Display cutoff" \
-                            "[ lindex $percval 0 ]% - [ lindex $percval 1]%" ]
-            }
             if { ! $choosewcsframe } {
                lappend pairs [ list "WCS frame" $wcsval ]
+            }
+            if { ! $choosepercentiles } {
+               lappend pairs [ list "Display cutoff" \
+                            "[ lindex $percval 0 ]% - [ lindex $percval 1 ]%" ]
             }
             foreach fh $showfits {
                set key [ lindex $fh 1 ]
@@ -806,9 +851,12 @@
             } elseif { $slot == "B" } {
                set pos "-relx 1 -rely 0 -anchor ne"
             }
+            $itk_component(view$slot) configure -bg \
+                 [ lindex [ $itk_component(view$slot) configure -bg ] 3 ]
          } else {
             set item $index
             set pos "-relx 0.5 -rely 0.5 -anchor center"
+            $itk_component(view$slot) configure -bg black
          }
          set inview($slot) $item
          eval place [ ndfplotwindow $item ] \
@@ -978,6 +1026,16 @@
       }
 
 
+#-----------------------------------------------------------------------
+      public variable skip2 { 0 } {
+#-----------------------------------------------------------------------
+         if { $skip2 && $nndfset == 2 } {
+            set inview(A) 1
+            set inview(B) 2
+         }
+      }
+
+
 ########################################################################
 #  Private variables.
 ########################################################################
@@ -992,6 +1050,9 @@
       private variable plotted         ;# Array containing plot characteristics
       private variable showfits {}     ;# FITS headers to display for each image
       private variable wcsframecontrol ;# Frame control widgets for each image
+      private variable xmax 0          ;# Largest image current coords X size
+      private variable ymax 0          ;# Largest image current coords Y size
+      
 
       private common CCDdir $env(CCDPACK_DIR)
 

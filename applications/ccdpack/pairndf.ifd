@@ -113,7 +113,17 @@
             default TRUE
             helpkey *
          }
-            
+
+         parameter chooser {
+                            # Use a chooser if it's not necessary?
+            type _LOGICAL
+            access READ
+            vpath CURRENT PROMPT
+            ppath CURRENT DEFAULT
+            prompt "Preview images in chooser widget before alignment?"
+            default FALSE
+            helpkey *
+         }
 
          parameter zoom {
                          # Zoom factor

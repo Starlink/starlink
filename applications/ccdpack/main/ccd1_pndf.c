@@ -13,7 +13,7 @@
    F77_SUBROUTINE(ccd1_pndf)( INTEGER(ndfgid), INTEGER(nset),
                               INTEGER_ARRAY(imem), INTEGER_ARRAY(imemof), 
                               INTEGER(namgid), DOUBLE_ARRAY(percnt), 
-                              DOUBLE(zoom), INTEGER(maxcnv), 
+                              LOGICAL(skip2), DOUBLE(zoom), INTEGER(maxcnv), 
                               INTEGER_ARRAY(windim), INTEGER_ARRAY(prvdim),
                               CHARACTER(mstyle), INTEGER(count), 
                               INTEGER_ARRAY(nodes), INTEGER_ARRAY(nmat),
@@ -34,8 +34,8 @@
 *     ANSI C.
 
 *  Invocation:
-*     CALL CCD1_PNDF( NDFGID, NSET, IMEM, IMEMOF, NAMGID, PERCNT, ZOOM,
-*                     MAXCNV, WINDIM, PRVDIM, MSTYLE, COUNT, NODES,
+*     CALL CCD1_PNDF( NDFGID, NSET, IMEM, IMEMOF, NAMGID, PERCNT, SKIP2, 
+*                     ZOOM, MAXCNV, WINDIM, PRVDIM, MSTYLE, COUNT, NODES,
 *                     NMAT, XOFF, YOFF, IPX1, IPY1, IPX2, IPY2, STATUS )
 
 *  Description:
@@ -63,6 +63,10 @@
 *     PERCNT( 2 ) = DOUBLE PRECISION (Given)
 *        Lower and higher percentiles to use in displaying the images.
 *        They should satisfy 0 <= PERCNT( 0 ) <= PERCNT( 1 ) <= 100.
+*     SKIP2 = LOGICAL (Given)
+*        If true, then don't bother to present the user with a Chooser
+*        widget in the case where it's not required because there are
+*        only two NDFs.
 *     ZOOM = DOUBLE PRECISION (Given and Returned)
 *        The zoom factor for the initial display.  May be limited by MAXCNV.
 *     MAXCNV = INTEGER (Given and Returned)
@@ -155,6 +159,7 @@
       GENPTR_INTEGER_ARRAY(imemof)
       GENPTR_INTEGER(namgid)
       GENPTR_DOUBLE_ARRAY(percnt)
+      GENPTR_LOGICAL(skip2)
 
 /* Arguments Given and Returned. */
       GENPTR_DOUBLE(zoom)
@@ -228,6 +233,7 @@
          return;
       }
       cnfImprt( mstyle, mstyle_length, cmstyle );
+      ccdTclSetI( cinterp, "SKIP2", F77_ISTRUE(*skip2), status );
       ccdTclSetD( cinterp, "PERCLO", percnt[ 0 ], status );
       ccdTclSetD( cinterp, "PERCHI", percnt[ 1 ], status );
       ccdTclSetI( cinterp, "MAXPOS", 0, status );
