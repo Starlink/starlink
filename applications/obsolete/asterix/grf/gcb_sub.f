@@ -1273,6 +1273,58 @@
 
       END
 
+*+  GCB_FILLSHADOW - fill shadow from GCB
+      SUBROUTINE GCB_FILLSHADOW(ID,STATUS)
+*    Description :
+*    Method :
+*    Deficiencies :
+*    Authors :
+*    History :
+*    Type definitions :
+      IMPLICIT NONE
+*    Global constants :
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'DAT_PAR'
+      INCLUDE 'PAR_ERR'
+      INCLUDE 'GCB_PAR'
+*    Global variables :
+      INCLUDE 'GCB_CMN'
+*    Structure definitions :
+*    Import :
+      INTEGER ID
+*    Import-Export :
+*    Export :
+*    Status :
+      INTEGER STATUS
+*    Function declarations :
+*    Local constants :
+*    Local variables :
+      CHARACTER*132 BUFFER
+      INTEGER NSCAL,NSTRUC,NCOMP,ITEMID
+      INTEGER DISP,L
+*-
+      IF (STATUS.EQ.SAI__OK) THEN
+
+        DO NSCAL=1,G_NSCAL
+          CALL NBS_FIND_ITEM(ID,G_SCNAME(NSCAL),ITEMID,STATUS
+          DISP=G_SCDISP(NSCAL)
+          L=G_SCSIZ(NSCAL)
+          CALL GCB_GETSTR(%val(MEMPTR),DISP,L,BUFFER,STATUS)
+          CALL NBS_PUT_CVALUE(ITEMID,0,BUFFER(:L),STATUS)
+        ENDDO
+
+
+C        DO NSTRUC=1,G_NSTRUC
+C          DO NCOMP=1,G_NCOMP(NSTRUC)
+C            CALL NBS_DEFINE_PRIMITIVE(ID,G_CNAME(NSTRUC,NCOMP),'_CHAR',
+C     :                               0,G_CSIZ(NSTRUC,NCOMP),SID,STATUS)
+C          ENDDO
+C        ENDDO
+
+      ENDIF
+
+      END
+
 
 *+  GCB_PUTSTR - write string into specified location in GCB
       SUBROUTINE GCB_PUTSTR(STR,DISP,SIZ,GCB,STATUS)
