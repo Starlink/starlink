@@ -7,6 +7,22 @@ package ccdpack
 # Get the Starlink setup.
 cl < "starlink$irafstar/zzsetenv.def"
 
+
+
+# Change the following to allow fillbad to be set to ! and preserve
+# bad pixels.
+reset ndf2iraf='eval cvt() { \
+             unset ICL_TASK_NAME;\
+             x=\"`$CONVERT_DIR/ndf2iraf out=$2$3 fillbad=! in=$1`\";\
+             if test -n \"$x\"; then \
+                rm -f $3.imh;\
+                echo \"$x\" >&2;\
+                exit 1;\
+             else \
+                exit 0;\
+             fi; \
+          }'
+
 task nagmakemos = "ccdpack$ccdpack_nag.e"
 task makebias = "ccdpack$ccdpack_red.e"
 task debias = "ccdpack$ccdpack_red.e"
@@ -46,6 +62,9 @@ task use_globals = "ccdpack$use_globals.cl"
 
 #  IRAF environment variables
 set CCDPACK_GLOBALS="yes"
+
+#  Exercise script.
+task ccdexercise = ccdpack$ccdexercise.cl
 
 #   Setup conversion of header information for when using foreign data
 #   access.
