@@ -1,7 +1,7 @@
 #!perl
 
 use strict;
-use Test::More tests => 6;
+use Test::More tests => 10;
 
 require_ok("Starlink::AST");
 
@@ -18,18 +18,26 @@ isa_ok( $wcsinfo, "AstFrameSetPtr" );
 
 my ( @x, @y );
 $x[0] = 0;
-$y[0] = 0;
+$y[0] = 0;;
+$x[1] = 114;
+$y[1] = 128;
 my $xpixel = \@x;
 my $ypixel = \@y;
 my ( $xworld, $yworld) = $wcsinfo->Tran2( $xpixel, $ypixel, 1 );
-is( $$xworld[0], 4.5, "Forward mapping of X co-ordinate" ); 
-is( $$yworld[0], -0.5, "Forward mapping of Y co-ordinate" );
+is( $$xworld[0], 4.5, "Forward mapping of lower bound X co-ordinate" ); 
+is( $$yworld[0], -0.5, "Forward mapping of lower bound Y co-ordinate" );
+is( $$xworld[1], 118.5, "Forward mapping of upper bound X co-ordinate" ); 
+is( $$yworld[1], 127.5, "Forward mapping of upper bound Y co-ordinate" );
 
 $x[0] = 4.5;
 $y[0] = -0.5;
+$x[1] = 118.5;
+$y[1] = 127.5;
 my ( $xworld, $yworld) = $wcsinfo->Tran2( $xpixel, $ypixel, 0 );
-is( $$xworld[0], 0, "Reverse mapping of X co-ordinate" ); 
-is( $$yworld[0], 0, "Reverse mapping of Y co-ordinate" );
+is( $$xworld[0], 0, "Reverse mapping of lower bound X co-ordinate" ); 
+is( $$yworld[0], 0, "Reverse mapping of lower bound Y co-ordinate" );
+is( $$xworld[1], 114, "Reverse mapping of upper bound X co-ordinate" ); 
+is( $$yworld[1], 128, "Reverse mapping of upper bound Y co-ordinate" );
 
 
 __DATA__
