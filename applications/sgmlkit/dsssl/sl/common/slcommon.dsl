@@ -474,6 +474,8 @@ Returns the filename to be used for the root HTML file, based on
 document type and DOCNUMBER if present (which need not be the case for
 all document types). Another way to set this might be through a
 processing-instruction.
+<p>This is also used by the LaTeX stylesheet, when generating the names
+of various auxiliary files.
 <returnvalue type=string>Complete filename for the `entry-point' HTML file.
 <argumentlist>
 <parameter optional default='(current-node)'>
