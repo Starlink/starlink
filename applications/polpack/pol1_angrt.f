@@ -22,7 +22,9 @@
 *     reference direction is the direction of increasing latitude at the 
 *     supplied pixel co-ordinates. If no SkyFrame can be found, the 
 *     reference direction is the positive Y axis (i.e. the second pixel
-*     axis).
+*     axis). Note, the current Frame is checked first. This means that
+*     the specific flavour of "north" can be selected by setting the 
+*     Current Frame (e.g. to a galactic, equatorial or ecliptic Frame).
 
 *  Arguments:
 *     IWCS = INTEGER (Given)

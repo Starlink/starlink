@@ -14,7 +14,7 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 \newcommand{\stardocnumber}    {223.3}
 \newcommand{\stardocauthors}   {D.S. Berry \& T.M. Gledhill }
-\newcommand{\stardocdate}      {9 February 1999}
+\newcommand{\stardocdate}      {24 March 1999}
 \newcommand{\stardoctitle}     {POLPACK}
 \newcommand{\stardoconeline}   {An Imaging Polarimetry Reduction Package}
 \newcommand{\stardocversion}   {Version 2.0}
@@ -331,13 +331,9 @@ parameters, and display of vector maps.
 
 \section{\xlabel{introduction}Introduction}
 POLPACK is a package of applications for mapping the linear or circular
-polarization of extended astronomical objects, using data obtained from a
-dual-beam polarimeter\footnote{At the moment, Stokes vectors cannot be
-produced for single-beam data. It is hoped that this restriction will be
-removed at the next release.}. It is assumed that the analyser is stepped
-in units of 45\dgs\ and that no rotation occurs between target exposures.
-Other assumptions regarding the specific form of the data or the
-polarimeter have, as far as possible, been avoided.
+\footnote{At the moment, circular polarization can only be measured when
+using dual-beam data.} polarization of extended astronomical objects. Data 
+from both single and dual beam polarimeters can be processed. 
 
 POLPACK processes data in \emph{NDF} format. This is the standard data
 format used by most Starlink software, and is described fully in
@@ -350,7 +346,8 @@ The facilities provided by POLPACK include:
 
 \begin{itemize}
 \item alignment of images on the sky.
-\item extraction of $O$ and $E$ images from a single frame.
+\item extraction of $O$ and $E$ images from a single frame of dual-beam
+data.
 \item sky subtraction.
 \item calculation of Stokes parameters.
 \item binning of Stokes parameters.
@@ -365,13 +362,75 @@ assume that pixel values are proportional to the combined intensity of
 sky and object. Further comments on these corrections can be found
 \hyperref{here}{in section }{}{SEC:CCDPACK}.
 
-POLPACK can, however, apply certain corrections to the supplied data when
-calculating Stokes parameters. These corrections take account of any
-differences in the exposure times between raw frames, and any difference
-in the sensitivity of the two channels of the dual-beam polarimeter. They
-rely on redundancy in the supplied data, and require a specific set of
-analyser positions to be used (described \hyperref{here}{in section }{}
-{SEC:DETCOR}) when obtaining the data.
+Slightly different facilities are available when using single-beam or
+dual-beam data, as described in the following sections\footnote{It is
+hoped to rationalize the differences between these two modes in future
+releases.}.
+
+\subsection{Single-beam Facilities}
+
+\begin{itemize}
+
+\item Data from polarimeters containing the following optical components 
+can be processed:
+
+\begin{enumerate}
+\item A fixed analyser and a rotating half-wave plate.
+\item Multiple fixed analysers.
+\item A single rotating analyser.
+\end{enumerate}
+
+\item Only linear polarization can be measured. 
+
+\item Different target exposures can be rotated with respect to one
+another. That is, the linear mapping between positions in any two target 
+exposures can include rotation, as well as magnification and a shift of 
+origin (shear is not allowed).
+
+\item The transmission and efficiency of non-perfect analysers can be
+taken into account, if you have known values for these quantities.
+
+\item Estimates of the variance in the input data can be made if necessary.
+This is useful if your data does not have usable variance information
+associated with it. Variances on the reduced quantities (Stokes vectors,
+polarization vectors, \emph{etc}) can be made on the basis either of these
+input variance estimates or of the variances supplied with the input data.
+
+\item The input intensity Frames must all have the same normalization.
+That is, the ``exposure times'' are all assumed to be equal.
+
+\end{itemize}
+
+\subsection{Dual-beam Facilities}
+
+\begin{itemize}
+
+\item It is assumed that the polarimeter contains a fixed analyser and a
+rotating half or quarter wave-plate which is stepped in units of 45\dgs. 
+
+\item Both linear and circular polarization can be measured. 
+
+\item Different target exposures must not be rotated with respect to one
+another. That is, the linear mapping between positions in any two target 
+exposures can only include magnification and a shift of origin (rotation 
+and shear are not allowed).
+
+\item The Analyser is assumed to be perfect (\emph{i.e.} the transmission and
+efficiency of the analyser are both assumed to be $1.0$).
+
+\item Variances can only be estimated for the reduced quantities (Stokes
+vectors, polarization vectors, \emph{etc}) if the input data has usable
+variances associates with it (\emph{i.e.} input variances cannot be estimated for
+dual-beam data).
+
+\item Corrections can be applied when calculating the Stokes vectors which
+take account of any differences in the exposure times between raw frames,
+and any difference in the sensitivity of the two channels of the
+dual-beam polarimeter. They rely on redundancy in the supplied data, and
+require a specific set of analyser positions to be used (described
+\hyperref{here}{in section }{} {SEC:DETCOR}) when obtaining the data.
+
+\end{itemize}
 
 \section{\label{SEC:DBPOL}\xlabel{dualbeampolarimetry}Dual-beam Polarimetry}
 This section gives a brief introduction to the general principles of
@@ -512,7 +571,7 @@ single master flat-field (although it is not strictly necessary to use
 different half-wave plate positions). Further discussion of the flat-fielding
 procedure is given \hyperref{here}{in section }{}{SEC:DETCOR}. 
 
-\subsection{The Data Reduction}
+\subsection{\label{SEC:DBRED}\xlabel{thedatareduction}The Data Reduction}
 Several steps are involved in the production of a polarization map from
 the raw exposures recorded by the detector. An over-view of these steps
 is given here. Details of how they may be implemented in practice using
@@ -669,12 +728,226 @@ or contour map of the object to emphasize any correlation between the
 visual appearance of the object and the morphology of the polarization
 map.
 
-\section{\xlabel{datareductionusingpolpack}Data Reduction Using POLPACK}
+\section{\label{SEC:SBPOL}\xlabel{singlebeampolarimetry}Single-beam Polarimetry}
+This section gives a brief introduction to the general principles of
+single-beam polarimetry. It explains words and concepts used later, and
+defines the data model used by POLPACK. 
+
+\subsection{\label{SEC:SBPOLARIM}The Polarimeter}
+An exposure from a single-beam polarimeter consists of an image of the sky 
+in a single state of polarization. Some form of \emph{analyser} within
+the polarimeter removes all but the required state of polarization from
+the incoming light, which then goes on to be recorded on a suitable
+imaging device such as a CCD camera. A series of exposures is usually taken
+with a different state of polarization being recorded by each exposure.
+These exposures allow both the degree and orientation of the polarization
+to be estimated.
+
+Several analyser arrangements are commonly used. POLPACK can handle data 
+from the following forms:
+
+\begin{enumerate}
+
+\item A single analyser which passes only light polarized parallel to a
+specified axis. The analyser is rotated to measure light polarized in
+different directions.
+
+\item Several fixed analysers, each of which passes only light polarized 
+parallel to its axis. The required analyser is inserted into the light path
+to measure light polarized in different directions.
+
+\item A single fixed analyser passes light polarized parallel to its axis.
+A \emph{half-wave plate} is placed in the light path in front of the
+analyser which rotates the plane of polarization of the incoming light
+before it reaches the analyser. Light polarized in different directions
+can thus be measured by rotating the half-wave plate.
+
+A half-wave plate has a preferred axis. Light polarized parallel to this
+axis passes through the half-wave plate unchanged. Light polarized
+perpendicular to the axis is retarded by half a wavelength. The net
+effect of this is to  rotate the plane of polarization of the light so
+that the axis of the half-wave plate bisects the angle between the planes 
+of polarization in the incoming and outgoing light.
+
+This form of polarimeter is shown diagramatically in Figure~\ref{fig:singopt}.
+
+\begin{latexonly}
+  \vspace{2mm}
+  \begin{figure}[htb]
+  \begin{center}
+  \includegraphics[clip,scale=0.5]{sun223_figures/singopt.eps}
+  \caption{The main optical components in a typical single-beam imaging polarimeter.}
+  \label{fig:singopt}
+  \end{center}
+  \end{figure}
+\end{latexonly}
+\begin{htmlonly}
+   \begin{quote}
+   \begin{figure}[bhtp]
+   \label{fig:singopt}
+   \includegraphics{sun223_figures/singopt_htx.eps}
+   \caption{The main optical components in a typical single-beam imaging polarimeter.}
+   \end{figure}
+   \end{quote}
+\end{htmlonly}
+
+\end{enumerate}
+
+There will be a \emph{reference direction} within the focal plane. The
+orientation of the analyser (or half-wave plate) is specified by giving the
+angle between this reference direction and the analyser (or half-wave
+plate). In POLPACK, the reference direction is specified by giving the
+anti-clockwise angle from the first image axis to the reference
+direction. This angle is referred to as $ANGROT$, and is specified in
+degrees.
+
+The combination of a fixed analyser and a rotating half-wave plate can be
+thought of as equivalent to a single rotating analyser, in which the
+analyser rotates twice as fast as the half-wave plate. If the
+anti-clockwise angle from the reference direction to the half-wave plate
+is $WPLATE$, then the \emph{effective analyser position} is given by:
+
+\begin{myquote}
+\begin{eqnarray*}
+  \phi & = & ANGROT + 2.WPLATE
+\end{eqnarray*}
+\end{myquote}
+
+This is the angle from the first image axis to a hypothetical analyser
+which would give the same effect as the combination of the fixed analyser 
+and half-wave plate (see Figure~\ref{fig:effan}).
+
+\begin{latexonly}
+  \begin{figure}[htpb]
+  \begin{center}
+  \includegraphics[clip,scale=0.5]{sun223_figures/effan.eps}
+  \vspace{4mm}
+  \caption{The effective analyser position for a rotating half-wave plate.}
+  \label{fig:effan}
+  \end{center}
+  \end{figure}
+\end{latexonly}
+\begin{htmlonly}
+   \begin{quote}
+   \begin{figure}[bhtp]
+   \label{fig:effan}
+   \includegraphics{sun223_figures/effan_htx.eps}
+    \caption{The effective analyser position for a rotating half-wave plate.}
+   \end{figure}
+   \end{quote}
+\end{htmlonly}
+
+The recorded intensity for an analyser position (or effective analyser 
+position) of $\phi$ will be:
+
+\begin{myquote}
+\begin{eqnarray}
+\label{EQN:IREC}
+  I_{rec} & = & \frac{t}{2}.( I + \epsilon.( Q.\cos 2.\phi + U.\sin 2.\phi ) )
+\end{eqnarray}
+\end{myquote}
+
+Here $I$, $Q$ and $U$ are the \emph{Stokes parameters} describing the
+incoming partially plane polarized light. $I$ is the total intensity,
+\emph{i.e.} the sum of the polarized and unpolarized intensities. If a
+fraction $p$ of the incoming light is totally plane polarized, then:
+
+\begin{myquote}
+\begin{eqnarray*}
+  I_{p} & = & I.p \\
+  I & = & I_{p} + I_{u} 
+\end{eqnarray*}
+\end{myquote}
+
+where $I_{p}$ is the polarized intensity, and $I_{u}$ is the unpolarized
+intensity. Q measures the intensity polarized parallel to the reference
+direction, and U measures the intensity polarized perpendicular to the 
+reference direction. They are given by:
+
+\begin{myquote}
+\begin{eqnarray*}
+  Q & = & I_{p}.\cos 2.\theta \\
+  U & = & I_{p}.\sin 2.\theta
+\end{eqnarray*}
+\end{myquote}
+
+Here, $\theta$ is the anti-clockwise angle from the reference direction to 
+the direction of polarization of the incoming light.
+
+The two other values, $t$ and $\epsilon$ in the above expression for the
+record intensity, $I_{rec}$, are the \emph{analyser transmission} and the
+\emph{analyser efficiency}. The transmission measures the total
+throughput of the analyser, and the efficiency measures the ability of
+the analyser to select a single state of polarization. A perfect analyser
+would have a value of $1.0$ for both. A perfectly \emph{bad}
+analyser such as a piece of high quality glass, would have a transmission
+of $2.0$ and an efficiency of zero. If you know the transmission and
+efficiency of your analysers, then POLPACK can take account of them when
+estimating the values of the Stokes parameters, $I$, $Q$ and $U$. If you
+do not known them, then don't worry... just use values of $1.0$ for both.
+These will probably be acceptable since instrument makers usually go to
+some trouble to make their analysers as perfect as possible. If in doubt,
+you could try re-processing your data with different values for the
+analyser transmission and efficiency. This will give you some idea of
+how sensitive the final results are to the values used.
+
+\subsection{The Observational Procedure}
+At least three exposures with different analyser or half-wave plate
+positions are required to estimate the degree and orientation of the
+polarization. However, if you can, you should take some extra analyser 
+positions. Not only does this reduce the noise, but it also allows 
+consistency checks to be performed, since the recorded intensity should 
+be a \hyperref{sinusoidal function}{sinusoidal function (see equation }
+{)}{EQN:IREC} of analyser (or half-wave plate) position. POLPACK provides 
+facilities to reject data values which are more than a given distance from 
+the best fitting sine curve (\hyperref{more details here}{see appendix }{}
+{APP:SNGBM}).
+
+\subsection{The Data Reduction}
+There are many similarities between the reduction of single and dual beam
+imaging polarimetry data. The basic difference is that each target
+exposure contains only a single image of the sky (instead of the two
+images produced by a dual-beam polarimeter). The various steps involved
+are summarised below. For more details see \hyperref{go here}{see section }
+{}{SEC:DBRED}. Details of how POLPACK can be used to implement these ideas 
+in practice are given in later sections of this document. For a
+mathematical description of the reduction of single-beam imaging
+polarimeter data, see Sparks \& Axon (\emph{P.A.S.P.} in prep.).
+
+\begin{description}
+\item [Detector corrections] - The objective is to correct your data values
+so that they are proportional to the combined sky and object intensity
+transmitted by the analyser (plus noise). The details will depend on your
+detector. Ideally, the noise in each data value should be independant of
+the noise in the neighbouring data values. 
+
+\item [Image alignment] - The images need to be aligned so that a given
+pixel corresponds to the same point on the sky in all images. This
+alignment can involved a shift of origin, magnification and rotation.
+Note, if the images are rotated, the reference direction must also be
+rotated.
+
+\item [Sky subtraction] - Just the same as for dual-beam reduction.
+
+\item [Estimation of the Stokes parameters] - For dual-beam data, the
+Stokes parameters are derived from the \emph{difference} between two
+images recorded simultaneously on the same detector. Thus drifts in zero 
+point offsets in the detector, \emph{etc}, are cancelled out. However, 
+for single-beam data the Stokes values depend on the absolute data values
+in each target exposure, and so are more susceptible to these effects.
+ 
+\item [Binning of the Stokes parameters] - Just the same as for dual-beam reduction.
+\item [Calculation of the polarization vectors] - Just the same as for dual-beam reduction.
+\item [Displaying the results] - Just the same as for dual-beam reduction.
+
+\end{description}
+
+\section{\label{SEC:POLRED}\xlabel{datareductionusingpolpack}Data Reduction Using POLPACK}
 This section gives a detailed description of the steps involved in using
-POLPACK to produce a vector map from dual-beam polarimetry data. It is
-assumed that the data conforms to the model outlines in the previous
-section. An over-view of the data reduction process is given in
-Figure~\ref{fig:dataflow}.
+POLPACK to produce a vector map from single-beam or dual-beam polarimetry
+data. It is assumed that the data conforms to the model outlined in one
+of the two previous sections. An over-view of the data reduction process
+is given in Figure~\ref{fig:dataflow}.
 
 \begin{latexonly}
   \begin{figure}[htpb]
@@ -777,7 +1050,8 @@ proceeding to use POLPACK. The details will obviously depend on your
 detector, but if you are using a CCD camera, then \xref{CCDPACK}{sun139}{} 
 {\latexonly (see SUN/139)} will usually be able to perform these corrections.
 
-If target exposures are available at half-wave plate positions of
+If you are using dual-beam data, and target exposures are available at 
+half-wave plate positions of
 45.0\dgs\ and 67.5\dgs\ (as well as 0\dgs\ and 22.5\dgs), then POLPACK can
 make corrections for the following effects when calculating the Stokes
 vectors:
@@ -790,10 +1064,11 @@ channels.
 
 These effects therefore do not need to be calibrated out of the raw data.
 
-One aspect of calibration common to all detectors is flat-fielding. If
+One aspect of calibration common to most detectors is flat-fielding. If
 your flat-fields are obtained in polarized light (such as produced by
 reflection or scattering, for instance), then the mean signals measured
-in the $O$ and $E$ ray images will be different. When such a flat-field
+in the $O$ and $E$ ray images of dual-beam data will be different. When 
+such a flat-field
 is used to calibrate your target exposures, these different mean levels
 will introduce an apparent difference in sensitivity between the $O$ and
 $E$ ray channels. If the \emph{same} flat-field is used for all target
@@ -801,13 +1076,14 @@ exposures, then this difference in sensitivity will be constant and can
 be removed while calculating the Stokes parameters (provided you have
 target exposures at half-wave plate positions of 0, 22.5, 45 and 67.5
 degrees). \hyperref{Go here for}{Appendix }{ contains}{APP:FFCOR} a
-mathematical description of the flat-fielding process, and the
-corrections applied by POLPACK when calculating the Stokes parameters.
+mathematical description of the flat-fielding process for dual-beam data, 
+and the corrections applied by POLPACK when calculating the Stokes parameters.
 
-\emph{Do not forget to use the same flat-field to correct \textbf{all} target
-exposures}. This will usually be a master flat-field formed by co-adding
-several individual flat-field exposures. This reduces the noise in the
-master flat-field. This is important for two reasons:
+Whether you are using dual or single-beam data, \emph{do not forget to
+use the same flat-field to correct \textbf{all} target exposures}. This
+will usually be a master flat-field formed by co-adding several
+individual flat-field exposures. This reduces the noise in the master
+flat-field. This is important for two reasons:
 
 \begin{enumerate}
 \item Any noise in the flat-field gets passed directly into the final results.
@@ -828,6 +1104,14 @@ present, POLPACK will process this information to obtain estimates of the
 uncertainty in the final polarization parameters. If you use CCDPACK to
 calibrate your data, then the \xref{DEBIAS}{sun139}{DEBIAS} application
 can be used to create a VARIANCE component.
+
+If you are using single-beam data, there is an option to estimate the 
+variances associated with the input data, while calculating the Stokes 
+vectors (see the WEIGHTS parameter for application \htmlref{POLCAL}{POLCAL}). 
+This enables variances to be found for the Stokes vectors even if your 
+input data has no usable variance information. \hyperref{Go here}{see section }
+{}{APP:SNGBM} for details of the algorithm used to estimate the input
+variances.
 
 \subsection{\label{SEC:START}\xlabel{startup}Starting up POLPACK}
 
@@ -904,7 +1188,7 @@ data values the keyword can take. For instance:
 \end{myquote}
 
 converts the value of the FITS keyword \verb+ROTA+ from radians to
-degrees, and assigns the result to the item ANGROT in the POLPACK extension.
+degrees, and assigns the result to the item ANGROT.
 The first line informs POLIMP that the keyword \verb+ROTA+ should be
 treated as a single precision floating point value. The recognized data
 types are:
@@ -944,17 +1228,46 @@ the contents of the POLPACK extension in the NDF \verb+partproc.sdf+, do:
 \end{verbatim}
 \end{myquote}
 
+\subsection{Reference Directions}
+The reference direction within each image is recorded by adding a new
+co-ordinate Frame to the World Co-ordinate System (WCS) information
+stored with the image (see \hyperref{here}{section }{}{SEC:WCS}). The new 
+Frame has the Domain name \verb+POLANAL+,
+and its first axis is parallel to the reference direction. This Frame
+will be updated by any POLPACK application which causes the orientation
+of the reference direction within the image to change. This will happen
+for instance if \htmlref{POLKA}{POLKA} introduces a rotation into the
+images during the alignment process\footnote{Rotation is currently only
+possible when processing single-beam data.}. If you process your images
+using applications from another package, then be aware that the Frame
+defining the reference direction may be lost or invalidated. Basically,
+you will probably be safe if you only use packages which correctly
+propagate WCS information in form of Starlink AST FrameSets (see
+\xref{SUN/210}{sun210}{}). KAPPA, for instance, is such a package.
+
+You specify the reference direction when you run POLIMP or POLEXT by
+giving a value for the ANGROT item (the anti-clockwise angle in degrees
+from the first image axis to the reference direction). In versions of
+POLPACK prior to V2.0, ANGROT was stored explicitly as a floating point
+value within the POLPACK extension. As of V2.0, ANGROT is no longer
+stored in the POLPACK extension. Instead, its value is implied by the
+orientation of the \verb+POLANAL+ Frame within the WCS information.
+However, you can consider this an ``implementation detail'' -- as far as
+the general user is concerned, ANGROT can be treated like any of the
+genuine extension items. In particular, it can be set or examined using
+POLIMP, POLEXT and POLEXP just like any other POLPACK header item.
+
 \subsection{Creation of Stokes Parameters}
 The creation of Stokes vectors from the calibrated, imported 
 target exposures involves the following steps:
 
 \begin{itemize}
 \item The extraction of the $O$ and $E$ ray images in each target
-exposure into separate files.
-\item The alignment of all these separated $O$ and $E$ ray images, so
+exposure into separate files (dual-beam data only).
+\item The alignment of all images, so
 that a given pixel position corresponds to the same place on the sky in
 all images.
-\item The subtraction of a sky background from each $O$ and $E$ ray image.
+\item The subtraction of a sky background from each image.
 \item The calculation of the Stokes vectors from these sky-subtracted
 images.
 \end{itemize}
@@ -979,7 +1292,7 @@ POLKA requires you to identify the following features within the supplied
 images:
 
 \begin{itemize}
-\item The areas containing the $O$ and $E$ ray images.
+\item The areas containing the $O$ and $E$ ray images (dual-beam data only).
 \item The sky areas.
 \item Any star-like features which can be used to align the images.
 \end{itemize}
@@ -1019,9 +1332,29 @@ Once complete, a 3D cube is created in which the x-y plane corresponds to
 pixel positions within the extracted, aligned intensity images. Each
 plane in the cube contains a single Stokes parameter. The lowest plane is
 always the total intensity. The other planes contain either Q and U for
-linear polarization, or V for circular polarization. In addition, the
-separate intensity images on which the Stokes parameters were based may
-be saved once the processing is complete.
+linear polarization, or V for circular polarization\footnote{POLPACK can 
+currently only measure circular polarization for dual-beam data.}. In 
+addition, the separate intensity images on which the Stokes parameters
+were based may be saved once the processing is complete.
+
+The reference direction (see \hyperref{this section}{section }
+{}{SEC:SBPOLARIM}) for the Stokes vectors in the output cube will
+not in general be the same as in the input intensity images. The
+output reference direction is chosen as follows:
+
+\begin{itemize}
+\item If the input data has World Co-ordinate System (WCS) information
+which describes a celestial co-ordinate system such as RA/DEC, galactic 
+longitude/latitude, etc, then the reference direction in the output cube
+will be north within the specific celestial co-ordinate system found.
+Instructions on setting up such WCS information is available
+\hyperref{here}{in section }{}{SEC:WCS}.
+
+\item If the input data does not contain WCS information for a celestial
+co-ordinate system, then the reference direction will be the second pixel
+axis within the image (i.e. ``Y'', or ``upwards'' if the image is
+displayed normally).
+\end{itemize}
 
 The POLKA application has many parameters. The values used for some of
 these may be changed from within the GUI. However, some may not be
@@ -1035,11 +1368,14 @@ calibrated and imported. The list may be supplied in several forms
 (described \hyperref{here}{in section }{}{SEC:GRPEXP}).
 \item [MODE]	- Indicates what sort of polarization you are measuring. It 
 can be ``CIRCULAR'' or ``LINEAR''.
+\item [OUT]	- A list of the output images to receive the aligned, 
+sky-subtracted images. If a null value (!) is supplied, these images are 
+not saved. Only used in single-beam mode, or for non-polarimetric data.
 \item [OUT\_E]	- A list of the output images to receive the extracted,
 aligned, sky-subtracted $E$ ray images. If a null value (!) is supplied, 
-these images are not saved.
+these images are not saved. Only used in dual-beam mode.
 \item [OUT\_O]	- This is like OUT\_E, but refers to the $O$ ray images
-instead of the $E$ ray images.
+instead of the $E$ ray images. Only used in dual-beam mode.
 \item [OUT\_S]	- The name of the output cube to receive the Stokes
 parameters. If a null value (!) is supplied, no Stokes parameters are
 created.
@@ -1059,7 +1395,7 @@ surface is then fitted to these areas and used as the sky background.
 \end{description}
 \end{quote}
 
-A separate guide is available describing POLKA in detail. This guide
+A separate guide is available describing POLKA in detail. It 
 contains a step-by-step tutorial, detailed descriptions of 
 each control in the GUI, answers to some common questions, \emph{etc}. It may be
 accessed using the \verb+Help+ menu within the GUI. When POLKA is
@@ -1085,23 +1421,26 @@ following columns:
 
 \begin{quote}
 \begin{description}
-\item [X] - X pixel coordinates within the supplied cube.
-\item [Y] - Y pixel coordinates within the supplied cube.
+\item [X] - X pixel co-ordinates within the supplied cube.
+\item [Y] - Y pixel co-ordinates within the supplied cube.
 \item [I] - Total intensity.
 \item [Q] - Stokes parameter Q.
 \item [U] - Stokes parameter U.
 \item [P] - Percentage polarization.
-\item [ANG] - The anti-clockwise angle from the X pixel axis to the plane of 
-polarization, in degrees.
+\item [ANG] - The anti-clockwise angle from the reference direction to 
+the plane of polarization, in degrees.
 \end{description}
 \end{quote}
 
 For circular polarimetry, the Q and U columns are replaced by a single V
-column. If variance information is available (see
-\hyperref{here}{section }{}{SEC:CCDPACK}) then columns are also produced
-holding the standard deviations associated with each of the above
-quantities (except X and Y). The catalogue contains a single row for each
-pixel in the x-y plane of the supplied cube.
+column. If variance information is available (see \hyperref{here}{section }
+{}{SEC:CCDPACK}) then columns are also produced holding the standard
+deviations associated with each of the above quantities (except X and Y).
+The catalogue contains a single row for each pixel in the x-y plane of
+the supplied cube. The reference direction for the $Q$, $U$ and $ANG$
+columns is chosen in the same way as when producing the Stokes vectors
+(\emph{i.e.} north, if WCS information is available to define north, or
+the second image axis otherwise).
 
 POLVEC can also produce a set of 2D images holding the above quantities.
 
@@ -1147,7 +1486,7 @@ would involve the following steps:
 
 \begin{enumerate}
 
-\item Convert the 3D NDF in file \verb+cube.sdf+ containing Stokes vector 
+\item Convert the 3D NDF in file \verb+cube.sdf+ containing Stokes vectors
 (created by POLKA) into a catalogue stored in file \verb+cat.FIT+:
 
 \begin{myquote}
@@ -1157,7 +1496,8 @@ would involve the following steps:
 \end{myquote}
 
 \item Bin the catalogue to reduce the noise and decrease the density
-of vectors in the final map. The bins used are 8 by 8 pixels (measured in
+of vectors in the final map. The bins used in yjis example are 8 by 
+8 pixels (measured in
 the x-y plane of the Stokes parameter NDF \verb+cube.sdf+), and the
 Stokes parameters are combined using a median. The binned catalogue is
 stored in file \verb+bincat.FIT+:
@@ -1252,7 +1592,7 @@ The above basic recipe can be modified in many ways. For instance:
 \item If you want to display only a sub-section of the map, specify the
 sub-section in step \ref{STEP:DISPLAY} by including bounds for the
 first and second axes of input cube. For instance, to restrict the
-display to X pixel coordinates 50 to 100, and Y pixel coordinates 300 
+display to X pixel co-ordinates 50 to 100, and Y pixel co-ordinates 300 
 to 380, do:
 
 \begin{myquote}
@@ -1403,7 +1743,7 @@ GUI is available from the \emph{Help} menu within the GUI.
 
 \end{itemize}
 
-\subsection{\xlabel{usingradecinformation}Using RA/DEC Information}
+\subsection{\label{SEC:WCS}\xlabel{usingradecinformation}Using RA/DEC Information}
 Information describing spatial co-ordinate Frames can be stored within the 
 WCS component of the standard NDF structure. All NDFs know about ``pixel
 co-ordinates'', but additional co-ordinate Frames can be added. In the context 
@@ -1416,18 +1756,20 @@ ways:
 \end{enumerate}
 
 \subsubsection {Adding an RA/DEC Calibration to your Data}
-The simplest method is probably to define the RA/DEC calibration once the
-$O$ and $E$ ray images have been extracted into separate images (i.e.
-after running POLKA). So, the procedure is:
+If you are using dual-beam data, the simplest method is probably to define the 
+RA/DEC calibration once the $O$ and $E$ ray images have been extracted into 
+separate images (\emph{i.e.} after running POLKA). With single-beam data,
+you can define the RA/DEC calibration at any point. So, the procedure is:
 
 \begin{itemize}
 
-\item Extract and align the $O$ and $E$ ray intensity images using
-\htmlref{POLKA}{POLKA}. Specify the output images using parameters OUT\_O
-and OUT\_E, and give a null value (``!'') for parameter OUT\_S since we will
-be using \htmlref{POLCAL}{POLCAL} to create the Stokes parameters later.
+\item For dual-beam data, extract and align the $O$ and $E$ ray intensity 
+images using \htmlref{POLKA}{POLKA}. Specify the output images using 
+parameters OUT\_O and OUT\_E, and give a null value (``!'') for parameter 
+OUT\_S since we will be using \htmlref{POLCAL}{POLCAL} to create the Stokes 
+parameters later.
 
-\item Add an RA/DEC calibration to one of the $O$ or $E$ ray images 
+\item Add an RA/DEC calibration to one of the aligned images 
 created by POLKA (it doesn't really matter which one). This will usually 
 require you to know the RA and DEC of at least two features in the image. 
 See \hyperref{here}{appendix }{}{APP:GAIA} for a simple description of how 
@@ -1440,7 +1782,7 @@ POLCAL for parameter IN should be the one containing the RA/DEC calibration
 created in the previous step.
 
 \item Continue to create a catalogue of polarization vectors as normal using 
-\htmlref{POLVEC}{POLVEC}, \htmlref{POLBIN}{POLBIN}, etc.
+\htmlref{POLVEC}{POLVEC}, \htmlref{POLBIN}{POLBIN}, \emph{etc}.
 
 \end{itemize}
 
@@ -1454,9 +1796,9 @@ celestial co-ordinate Frames by supplying suitable values for parameter
 FRAME. Some examples:
 
 \begin{description}
-\item [FRAME=GAL] -- this will result in the axes being annotated with
+\item [FRAME=GAL] - this will result in the axes being annotated with
 galactic co-ordinates.
-\item [FRAME=ECL] -- this will result in the axes being annotated with
+\item [FRAME=ECL] - this will result in the axes being annotated with
 ecliptic co-ordinates (referred to the B1950.0 equinox). 
 \end{description}
 
@@ -1465,10 +1807,10 @@ equinox. The required equinox can be included, in parentheses, following the
 co-ordinate system name. For instance:
 
 \begin{description}
-\item [FRAME=EQU(J2000)] -- this will result in the axes being annotated with
+\item [FRAME=EQU(J2000)] - this will result in the axes being annotated with
 RA/DEC referred to the J2000.0 equinox. The RA/DEC calibration stored
 with the catalogue will be precessed if necessary.
-\item [FRAME=ECL(B1983.4)] -- this will result in the axes being annotated with
+\item [FRAME=ECL(B1983.4)] - this will result in the axes being annotated with
 ecliptic co-ordinates referred to the B1983.4 equinox. 
 \end{description}
 
@@ -1773,7 +2115,7 @@ mean that the output catalogue cannot be aligned with other images.
 \item [``\texttt{Command not found}''] - Have you started up POLPACK
 as described \hyperref{here}{in section }{}{SEC:START}?
 
-\item [``POLIMP will not accept my IRAF/FITS/etc data files''] - Have
+\item [``POLIMP will not accept my IRAF/FITS/\emph{etc} data files''] - Have
 you started up the CONVERT package has described \hyperref{here}{in section }
 {}{SEC:CONVERT}?
 
@@ -1904,11 +2246,17 @@ extension.}{ POLEXP }
 \quickdes{POLHELP}{Displays textual help information for POLPACK.}{
 POLHELP }
 
+\quickdes{POLIMAGE}{Converts a catalogue into a 1 or 2-dimensional NDF.}
+{ POLIMAGE }
+
 \quickdes{POLKA}{An X-based GUI which converts raw photometric images
 into Stokes vectors.}{ POLKA }
 
 \quickdes{POLPLOT}{Displays polarization vectors supplied in a
 catalogue.}{ POLPLOT }
+
+\quickdes{POLSIM}{Produces intensity images corresponding to given Stokes
+vectors.}{ POLSIM }
 
 \quickdes{POLVEC}{Converts a Stokes vector cube into a catalogue of
 polarization vectors.}{ POLVEC }
@@ -2222,7 +2570,7 @@ for NDF applications.
       \sstsubsection{
          BOX( 2 ) = \_REAL (Read)
       }{
-         The x and y bin sizes. These values refer to the coordinate Frame
+         The x and y bin sizes. These values refer to the co-ordinate Frame
          defined by columns \texttt{"}X\texttt{"} and \texttt{"}Y\texttt{"} and will usually be in units of pixels.
       }
       \sstsubsection{
@@ -2329,7 +2677,7 @@ for NDF applications.
          If FALSE they are processed as single-beam data. If a null (!)
          value is supplied, the dual-beam algorithm is used if all the input
          images contain a legal value for the RAY item in the POLPACK
-         extension (i.e. either {\tt "}E{\tt "} or {\tt "}O{\tt "}). Otherwise, the single-beam
+         extension (\emph{i.e.} either {\tt "}E{\tt "} or {\tt "}O{\tt "}). Otherwise, the single-beam
          algorithm is used. It is possible to process dual-beam data using
          the single-beam algorithm, so DUALBEAM may be set to FALSE even
          if the input images hold dual-beam data. However, the opposite
@@ -2433,7 +2781,7 @@ for NDF applications.
 
          A SKYSUP value of unity can often be effective, but a value
          set by the approximate ratio of sky pixels to useful object
-         pixels (i.e. those containing non-sky signal) in a {\tt "}typical{\tt "}
+         pixels (\emph{i.e.} those containing non-sky signal) in a {\tt "}typical{\tt "}
          image will usually be better. The precise value
          is not critical. A value of zero disables the sky noise
          suppression algorithm completely. The default value for SKYSUP
@@ -2536,10 +2884,10 @@ for NDF applications.
       residuals in the current image otherwise.
 
       Single beam mode can take account of imperfections in the analyser.
-      The transmission (i.e. the overall throughput) and efficiency
-      (i.e. the ability to reject light polarized across the axis) of the
+      The transmission (\emph{i.e.} the overall throughput) and efficiency
+      (\emph{i.e.} the ability to reject light polarized across the axis) of the
       analyser are read from the POLPACK extension. If not found, values
-      of 1.0 are used for both. These values are appropriate for a
+      of $1.0$ are used for both. These values are appropriate for a
       perfect analyser. A perfectly bad analyser (a piece of high quality
       glass for instance) would have a transmission of 2.0 and an
       efficiency of zero. The extension items named T and EPS hold the
@@ -2554,7 +2902,7 @@ for NDF applications.
       angle between the rotating or fixed analyser and the polarimeter
       reference direction). Only one of these two extension items
       should be present. The WPLATE and ANLANG items are free to take
-      any value (i.e. they are not restricted to the values 0.0, 22.5,
+      any value (\emph{i.e.} they are not restricted to the values 0.0, 22.5,
       45.0 and 67.5 degrees as in the dual-beam algorithm).
 
       There are a couple of restrictions in single-beam mode. Firstly,
@@ -2567,7 +2915,7 @@ for NDF applications.
       The Dual-beam Algorithm
    }{
       In dual-beam mode, Q and U are estimated by taking the difference
-      between pairs of orthogonally polarized images (i.e. the O and E
+      between pairs of orthogonally polarized images (\emph{i.e.} the O and E
       ray images extracted from a single dual-beam image). The total
       intensity I is estimated by summing such pairs of images. The
       various estimates of these quantities provided by different pairs
@@ -2588,7 +2936,7 @@ for NDF applications.
       based on the redundancy provided by using four half-wave plate
       positions. If images with the required half-wave plate positions
       are not provided, then it is assumed that the two channels are
-      equally sensitive (that is, an F-factor of 1.0 is used).
+      equally sensitive (that is, an F-factor of $1.0$ is used).
 
       Corrections are also made for any difference in exposure times
       for the supplied intensity images. These are based on the fact
@@ -2818,7 +3166,7 @@ for NDF applications.
          \sstitem
          If a new POLPACK extension is created, a new Frame is also added to
          the WCS component of the NDF and is given the Domain {\tt "}POLANAL{\tt "}. This
-         Frame is formed by rotating the pixel coordinates Frame so that the
+         Frame is formed by rotating the pixel co-ordinates Frame so that the
          first axis is parallel to the analyser axis. The angle of rotation is
          given by the ANGROT item in the POLPACK extension.
       }
@@ -3035,7 +3383,7 @@ for NDF applications.
 
          \sstitem
          A new Frame is added to the WCS component of each NDF and is given the
-         Domain \texttt{"}POLANAL\texttt{"}. This Frame is formed by rotating the pixel coordinates
+         Domain \texttt{"}POLANAL\texttt{"}. This Frame is formed by rotating the pixel co-ordinates
          Frame so that the first axis is parallel to the analyser axis. The
          angle of rotation is given by the ANGROT item in the POLPACK extension
          and defaults to zero if ANGROT is not specified in the control table.
@@ -3206,7 +3554,7 @@ for NDF applications.
 
       The inputs to this application are a set of intensity frames which
       have been corrected to remove any instrumental effects
-      introduced by the detector (such as de-biassing, flat-fielding, etc).
+      introduced by the detector (such as de-biassing, flat-fielding, \emph{etc}).
       Output Stokes vectors can only be produced if all input frames contain
       a POLPACK extension (see application POLIMP). In dual-beam mode, each
       input frame contains two images of the sky (the O and E ray images).
@@ -3264,7 +3612,7 @@ for NDF applications.
       \sstsubsection{
          CURCOL = LITERAL (Update)
       }{
-         The colour with which to mark the objects (i.e. image features and
+         The colour with which to mark the objects (\emph{i.e.} image features and
          masks) currently being entered by the user. This should be
          one of RED, BLUE, GREEN, CYAN, MAGENTA, YELLOW, BLACK. Any
          unambiguous abbreviation can be supplied, and the value is
@@ -3350,7 +3698,7 @@ for NDF applications.
          If a TRUE value is supplied for NEWCOLMAP, then the GUI will use
          its own private X colour map. Otherwise it will share the standard
          X colour map. Note, with a FALSE value for NEWCOLMAP, there may
-         be insufficient free colours in the standard colour map (i.e. if
+         be insufficient free colours in the standard colour map (\emph{i.e.} if
          other X applications are running). In this case POLKA will report
          an error and abort. If this happens, try re-running with a true
          value for NEWCOLMAP. Note, when using a private X colour map, the
@@ -3423,7 +3771,7 @@ for NDF applications.
       }{
          The type of polarization being measured; Linear or Circular. This
          parameter is only accessed if an output cube holding Stokes
-         parameters is being created (i.e. if OUT\_S is not given a null (!)
+         parameters is being created (\emph{i.e.} if OUT\_S is not given a null (!)
          value). [Linear]
       }
       \sstsubsection{
@@ -3453,7 +3801,7 @@ for NDF applications.
       \sstsubsection{
          REFCOL = LITERAL (Update)
       }{
-         The colour with which to mark the reference objects (i.e. image
+         The colour with which to mark the reference objects (\emph{i.e.} image
          features or masks). This should be one of RED, BLUE, GREEN, CYAN,
          MAGENTA, YELLOW, BLACK. Any unambiguous abbreviation can be supplied,
          and the value is case-insensitive. [GREEN]
@@ -3486,8 +3834,8 @@ for NDF applications.
          the sky in each output image will be fitted using a polynomial
          surface. The order of the fit on each axis is given by this
          parameter (SKYPAR). A value of 0 will result in a flat surface
-         (i.e. a constant value) being used, 1 will result in a linear
-         surface, 2 in a quadratic surface, etc. The supplied value
+         (\emph{i.e.} a constant value) being used, 1 will result in a linear
+         surface, 2 in a quadratic surface, \emph{etc}. The supplied value
          must be in the range 0 to 14. [0]
       }
       \sstsubsection{
@@ -3512,7 +3860,7 @@ for NDF applications.
          STATUSAREA = \_LOGICAL (Update)
       }{
          If a TRUE value is supplied, then information describing the
-         currently displayed image, current options values, etc, will be
+         currently displayed image, current options values, \emph{etc}, will be
          displayed in a box underneath the displayed image. The contents
          of this box can be selected using the {\tt "}Options{\tt "} menu in the GUI.
          [TRUE]
@@ -3675,7 +4023,7 @@ for NDF applications.
          AXES = \_LOGICAL (Read)
       }{
          TRUE if labelled and annotated axes are to be drawn around the
-         vector map, showing the coordinate Frame specified by parameter
+         vector map, showing the co-ordinate Frame specified by parameter
          FRAME. The appearance of the axes can be controlled using
          the STYLE parameter. [TRUE]
       }
@@ -3776,7 +4124,7 @@ for NDF applications.
          \sstitemlist{
 
             \sstitem
-            A domain name such as SKY, AXIS, PIXEL, etc. The two
+            A domain name such as SKY, AXIS, PIXEL, \emph{etc}. The two
             {\tt "}pseudo-domains{\tt "} WORLD and DATA may be supplied and will be
             translated into PIXEL and AXIS respectively, so long as the WCS
             component of the NDF does not contain Frames with these domains.
@@ -3799,15 +4147,15 @@ for NDF applications.
 
             \sstitem
                CENTRE -- the vectors are drawn centred on the
-               corresponding pixel coordinates.
+               corresponding pixel co-ordinates.
 
             \sstitem
                START -- the vectors are drawn starting at the
-               corresponding pixel coordinates.
+               corresponding pixel co-ordinates.
 
             \sstitem
                END -- the vectors are drawn ending at the corresponding
-               pixel coordinates.
+               pixel co-ordinates.
             [{\tt "}Centre{\tt "}]
          }
       }
@@ -3821,11 +4169,11 @@ for NDF applications.
       }{
          Two values giving the position of the key. The first value gives
          the gap between the right hand edge of the contour map and the left
-         hand edge of the key (0.0 for no gap, 1.0 for the largest gap). The
+         hand edge of the key (0.0 for no gap, $1.0$ for the largest gap). The
          second value gives the vertical position of the top of the key (1.0
          for the highest position, 0.0 for the lowest). If the second value
          is not given, the top of the key is placed level with the top of the
-         vector map. Both values should be in the range 0.0 to 1.0. If a
+         vector map. Both values should be in the range 0.0 to $1.0$. If a
          key is produced, then the right hand margin specified by parameter
          MARGIN is ignored. [current value]
       }
@@ -3856,23 +4204,23 @@ for NDF applications.
          reported).
 
          The appearance of the text in the key is controlled using {\tt "}String{\tt "}
-         attributes (e.g. COLOUR(STRINGS), FONT(STRINGS), etc - the synonym
+         attributes (\emph{e.g.} COLOUR(STRINGS), FONT(STRINGS), \emph{etc} - the synonym
          TEXT can be used in place of STRINGS). Note, the Size attribute
          specifies the size of key text relative to the size of the numerical
          labels on the vector map axes. Thus a value of 2.0 for Size will
          result in text which is twice the size of the numerical axis labels.
          The appearance of the example vector is controlled using {\tt "}Curve{\tt "}
-         attributes (e.g. COLOUR(CURVES), etc - the synonym VECTOR can be
+         attributes (\emph{e.g.} COLOUR(CURVES), \emph{etc} - the synonym VECTOR can be
          used in place of CURVES). The numerical scale value is formatted as
-         an axis 1 value (using attributes FORMAT(1), DIGITS(1), etc - the
+         an axis 1 value (using attributes FORMAT(1), DIGITS(1), \emph{etc} - the
          synonym SCALE can be used in place of the value 1). The length of
          the example vector is formatted as an axis 2 value (using attribute
-         FORMAT(2), etc - the synonym VECTOR can be used in place of the
+         FORMAT(2), \emph{etc} - the synonym VECTOR can be used in place of the
          value 2). The vertical space between lines in the key can be
-         controlled using attribute TextLabGap. A value of 1.0 is used if
+         controlled using attribute TextLabGap. A value of $1.0$ is used if
          no value is set for this attribute, and produces default vertical
-         spacing. Values larger than 1.0 increase the vertical space, and
-         values less than 1.0 decrease the vertical space. [current value]
+         spacing. Values larger than $1.0$ increase the vertical space, and
+         values less than $1.0$ decrease the vertical space. [current value]
       }
       \sstsubsection{
          KEYVEC = \_REAL (Read)
@@ -3884,8 +4232,8 @@ for NDF applications.
       \sstsubsection{
          LBND(2) = \_REAL (Read)
       }{
-         The coordinates to put at the lower left corner of the plotting
-         area, in the coordinates system specified by parameters COLX and
+         The co-ordinates to put at the lower left corner of the plotting
+         area, in the co-ordinates system specified by parameters COLX and
          COLY. If a null value is supplied then an area is used which just
          encloses all the data in the supplied catalogue. [!]
       }
@@ -3907,7 +4255,7 @@ for NDF applications.
          NEGATE = \_LOGICAL (Read)
       }{
          If a TRUE value is supplied, then the angles giving the
-         orientation of the polarization (i.e. the values in the column
+         orientation of the polarization (\emph{i.e.} the values in the column
          specified by parameter COLANG) are negated before adding on any
          value specified by parameter ANGROT. [FALSE]
       }
@@ -3938,14 +4286,14 @@ for NDF applications.
          reported).
 
          The appearance of the vectors is controlled by the attributes
-         Colour(Curves), Width(Curves), etc (the synonym Vectors may be
+         Colour(Curves), Width(Curves), \emph{etc} (the synonym Vectors may be
          used in place of Curves). [current value]
       }
       \sstsubsection{
          UBND(2) = \_REAL (Read)
       }{
-         The coordinates to put at the top right corner of the plotting
-         area, in the coordinates system specified by parameters COLX and
+         The co-ordinates to put at the top right corner of the plotting
+         area, in the co-ordinates system specified by parameters COLX and
          COLY. If a null value is supplied then an area is used which just
          encloses all the data in the supplied catalogue. [!]
       }
@@ -3964,7 +4312,7 @@ for NDF applications.
          Produces a vector map on the current graphics device with
          vectors defined in the FITS binary table {\tt "}poltab{\tt "}. The magnitudes
          are taken from column P, the orientations from column ANG and
-         the coordinates of each vector from columns X and Y.
+         the co-ordinates of each vector from columns X and Y.
       }
       \sstexamplesubsection{
          polplot poltab style=$\wedge$mystyle.dat
@@ -3994,13 +4342,13 @@ for NDF applications.
          position angle 23.4 degrees (measured anti-clockwise from the
          positive y axis) in the displayed map. The position of each vector
          is specified by columns {\tt "}ra{\tt "} and {\tt "}dec{\tt "}. The annotated axes give
-         equatorial (RA/DEC) coordinates referred to the equinox of B1950.
+         equatorial (RA/DEC) co-ordinates referred to the equinox of B1950.
          If the vector map is displayed over an existing DATA picture, then
          the vector map will be aligned on the sky with the previously
-         displayed data if possible (i.e. the FrameSet associated with the
-         existing picture in the AGI database contains a sky coordinate
+         displayed data if possible (\emph{i.e.} the FrameSet associated with the
+         existing picture in the AGI database contains a sky co-ordinate
          Frame). If this is not possible, then the vector map will be
-         aligned in pixel or grid coordinates. A message is displayed
+         aligned in pixel or grid co-ordinates. A message is displayed
          indicating the domain in which alignment took place.
       }
       \sstexamplesubsection{
@@ -4017,7 +4365,7 @@ for NDF applications.
          vector for every row defined by the catalogue columns {\tt "}l{\tt "} and {\tt "}b{\tt "}.
          The position of each vector is given by columns {\tt "}ra{\tt "} and {\tt "}dec{\tt "}.
          If a previous DATA picture has been displayed, and has a calibration
-         in terms of any of the common sky coordinate systems, then the
+         in terms of any of the common sky co-ordinate systems, then the
          vectors are aligned with the existing DATA picture.
       }
    }
@@ -4034,7 +4382,7 @@ for NDF applications.
 
          \sstitem
          The columns specified by parameters COLX and COLY should hold
-         coordinates in the {\tt "}Base Frame{\tt "} of the WCS information stored as
+         co-ordinates in the {\tt "}Base Frame{\tt "} of the WCS information stored as
          an AST FrameSet (see SUN/210) in the supplied catalogue. If the
          catalogue has been produced by one of the POLPACK application polvec
          or polbin, then the Base Frame will be pixel co-ordinates within the
@@ -4043,13 +4391,13 @@ for NDF applications.
          may have no usable WCS information, in which case the supplied
          positions are mapped linearly onto the screen. There is one
          exception to this; if the columns have names RA and DEC then they
-         are assumed to be equatorial sky coordinates with epoch and equinox
+         are assumed to be equatorial sky co-ordinates with epoch and equinox
          specified by the optional catalogue parameters EPOCH and EQUINOX
          (defaults are used for these parameters if they are not present in the
          catalogue). If the vector map is displayed over an existing DATA
-         picture (i.e. if CLEAR=NO) then these RA/DEC positions will be aligned
-         with the existing DATA picture if possible (i.e. if the existing
-         picture has sky coordinate information stored with it).
+         picture (\emph{i.e.} if CLEAR=NO) then these RA/DEC positions will be aligned
+         with the existing DATA picture if possible (\emph{i.e.} if the existing
+         picture has sky co-ordinate information stored with it).
       }
    }
 }
@@ -4109,10 +4457,10 @@ for NDF applications.
          \sstitemlist{
 
             \sstitem
-               X  -- The pixel X coordinate at the tabulated point.
+               X  -- The pixel X co-ordinate at the tabulated point.
 
             \sstitem
-               Y  -- The pixel Y coordinate at the tabulated point.
+               Y  -- The pixel Y co-ordinate at the tabulated point.
 
             \sstitem
                I  -- The total intensity.
@@ -4145,11 +4493,11 @@ for NDF applications.
          the ANG value will be zero if the normalised Stokes parameter V
          is positive, and 90 otherwise.
 
-         The coordinates contained in columns X and Y refer to pixel
-         coordinates after any binning. For this reason it is usually better to avoid
+         The co-ordinates contained in columns X and Y refer to pixel
+         co-ordinates after any binning. For this reason it is usually better to avoid
          binning the Stokes vectors in this application (see parameter BOX).
-         Information describing the mappings between pixel coordinates and
-         any other known coordinate Frames will be stored in the catalogue
+         Information describing the mappings between pixel co-ordinates and
+         any other known co-ordinate Frames will be stored in the catalogue
          in textual form, as an AST FrameSet (see \xref{SUN/210}{sun210}{}).
 
          The storage format of the catalogue is determined by the {\tt "}file
@@ -4261,7 +4609,7 @@ for NDF applications.
          generate a good output vector. If this specified minimum fraction
          of good input pixels is not present, then a bad output vector
          will result. The value of this parameter should lie between 0.0
-         and 1.0 (the actual number used will be rounded up if necessary
+         and $1.0$ (the actual number used will be rounded up if necessary
          to correspond to at least 1 pixel). [0.0]
       }
    }
@@ -4275,11 +4623,12 @@ for NDF applications.
    }
 }
 \newpage
-\section{\label{APP:POL}\xlabel{calculatingthepolarization}Calculating the Polarization}
+\section{\label{APP:POL}\xlabel{calculatingthepolarization}Calculating the Polarization for Dual-beam Data}
 This section gives a mathematical description of the calculation of the
-degree and orientation of the polarization, based on the observed
-intensities. It is assumed that any required corrections (such as
-flat-fielding, sky-subtraction, \emph{etc}), have already been applied.
+degree and orientation of the polarization for dual-beam data, based on
+the observed intensities. It is assumed that any required corrections
+(such as flat-fielding, sky-subtraction, \emph{etc}), have already been
+applied.
 
 Each target exposure measures the components of the incoming light
 polarized in two different orthogonal directions (depending on the
@@ -4393,10 +4742,10 @@ the two channels of the polarimeter (such as may be produced for instance
 by a polarized flat-field).
 
 \newpage
-\section{\label{APP:FFCOR}\xlabel{flatfieldcorrectionsandtheFFactor}Flat-field
-          Corrections, and the E and F-Factors}
-This section describes the flat-fielding process, and the E and F-factor 
-corrections in mathematical terms.
+\section{\label{APP:FFCOR}\xlabel{flatfieldcorrectionsandtheFFactor}Dual-beam
+Flat-field Corrections, and the E and F-Factors}
+This section describes the flat-fielding process for dual-beam data, and the 
+E and F-factor corrections in mathematical terms.
 
 Let the intensity in the $O$ and $E$ beams transmitted by the analyser be
 $I_{o}(\alpha)$ and $I_{e}(\alpha)$, where $\alpha$ is the effective 
@@ -4634,7 +4983,7 @@ dialogue box shown in Figure~\ref{fig:gaia1}.
 \end{htmlonly}
 
 \item Indicate the co-ordinate system in which your feature positions are
-expressed. Do this by specifying suitable values using the \emph{Coordinate
+expressed. Do this by specifying suitable values using the \emph{co-ordinate
 system:}, \emph{Equinox:} and \emph{Epoch:} buttons. You will usually have
 either (FK4, equinox B1950) or (FK5, equinox J2000) positions. The epoch 
 defaults to B1950 for FK4 positions, and J2000 for FK5 positions.
@@ -4703,7 +5052,7 @@ X and Y fields. Click in the \emph{ra} field, and enter the RA of the
 star (eg "12:23:34.1"). Then do the same with the \emph{dec} field. Then
 click in the \emph{id} field, and enter an integer value which can be
 used to identify the star (for instance, use 1 for your first star, 2 for
-your second, etc). The star is now fully specified, so press the
+your second, \emph{etc}). The star is now fully specified, so press the
 \emph{Enter} button. After confirmation, this will add the object into
 the list of reference objects in the dialogue box shown in
 Figure~\ref{fig:gaia1}. 
@@ -4744,6 +5093,222 @@ displayed saying that the WCS could only be saved as an AST native
 representation.
 
 \end{enumerate}
+
+\newpage
+
+\section{\label{APP:SNGBM}\xlabel{CalculationofStokesVectorsinSingle-beamMode}
+Calculation of Stokes Vectors in Single-beam Mode}
+
+This section describes the algorithm used by \htmlref{POLCAL}{POLCAL} to 
+created Stokes vectors from single-beam data.
+
+Given a set if input intensity values, and corresponding variance values,
+a set of Stokes vectors with associated variances can be produced
+following the technique described by Sparks \& Axon (\emph{P.A.S.P.} in
+prep.). The full error analysis given by Sparks \& Axon also allows the
+estimation of the co-variance between Q and U which occurs when
+non-orthogonal analyser positions are used. POLCAL produces these
+co-variances and stores them as a separate 2D NDF within the POLPACK
+extension of the output cube. However, the calculation of the degree and
+orientation of the polarization performed by \htmlref{POLVEC}{POLVEC} and
+\htmlref{POLBIN}{POLBIN} do not as yet use these co-variances\Neither do
+they use the improved de-biassing technique described by Sparks \&
+Axon.}. It is hoped that this will be rectified in a future release of
+POLPACK.
+
+The technique described by Sparks \& Axon is basically a case of fitting
+the intensity values at each pixel with the following function:
+
+\begin{myquote}
+\begin{eqnarray}
+  \label{EQN:IEXP}
+  I'_{k} & = & \frac{t}{2}.( I + \epsilon.( Q.\cos 2.\phi_{k} + U.\sin 2.\phi_{k} ) )
+\end{eqnarray}
+\end{myquote}
+
+where $I'_{k}$ is the expected intensity in image $k$, $t$ is the analyser
+transmission factor, $\epsilon$ is the analyser efficiency factor, and
+$\phi_{k}$ is the anti-clockwise angle from the reference direction to the
+analyser position (or effective analyser position if using a half-wave
+plate) for image $k$. The Stokes parameters $I$, $Q$ and $U$ are chosen
+to minimize $\chi^2$, half the weighted sum of the squared residuals between 
+the expected intensity $I'_{k}$ and observed intensity $I_{k}$, where the sum is taken over all images
+(\emph{i.e.} all values of $k$). The weights used are the reciprocals of
+the variances associated with the observed intensity values:
+
+\begin{myquote}
+\begin{eqnarray*}
+  \chi^2 & = & \frac{1}{2}.\sum_{k} \frac{(I_{k}-I'_{k})^2}{\sigma^2_{k}}
+\end{eqnarray*}
+\end{myquote}
+
+A minimum of three images are required, taken at different analyser
+positions, to perform this fit. The basic algorithm gives little
+protection against badly aberrant input values (\emph{e.g.} cosmic rays,
+etc) which can corrupt the fit. However, if more than three images are
+obtained with different half-wave plate positions, then an iterative
+process can be used to identify and reject such aberrant data values.
+This process works by first calculating the Stokes vectors using all
+input data values. The expected intensity value at each input pixel is
+then found from these Stokes vectors using equation \ref{EQN:IEXP}. The
+residual between this expected intensity value and the observed intensity
+value is then found. If this residual is larger than a specified multiple
+\footnote{Specified by POLCAL parameter NSIGMA.} of the standard deviation 
+associated with the observed intensity value, $\sigma_k$, then the observed 
+intensity value is rejected. The Stokes vectors are calculated again,
+excluding all the rejected intensity values. This process is repeated a
+number of times, as specified by POLCAL parameter NITER. The number of
+pixels rejected in each image at each iteration can be displayed by
+setting POLCAL parameter ILEVEL to 3.
+
+If no usable variances are available for the observed data values, the
+simplest option is to assume a constant value of $1.0$ for $\sigma^2_{k}$ 
+(\emph{i.e.} give all input values equal weight). In this case no
+variances for $I$, $Q$ and $U$ can be produced, and the iterative rejection
+of input data described above cannot be performed. This option can be
+used by setting POLCAL parameter WEIGHTS to 4.
+
+Another option is to estimate the variances associated with the input data 
+by looking at the deviations of the observed intensity values from the 
+best fitting sine curve given by equation \ref{EQN:IEXP}. This allows
+variances for the output Stokes vectors to be created, and also allows
+the iterative rejection of bad data. This option can be used by setting 
+POLCAL parameter WEIGHTS to 3. The technique is described in the
+following pseudo-code, and is illustrated diagramatically in Figure
+Figure~\ref{fig:varest}:
+
+\begin{enumerate}
+
+\item \label{STEP1}  \verb;  Fill the variance image with the value 1.0;
+\item \label{STEP2}  \vspace{-3mm} \verb;  Calculate Stokes vectors;
+\item \label{STEP3}  \vspace{-3mm} \verb;  Set ITER = 0;
+\item \label{STEP4}  \vspace{-3mm} \verb;  While ( ITER < NITER ) do...;
+\item \label{STEP5}  \vspace{-3mm} \verb;     Reduce the noise in the Stokes vectors;
+\item \label{STEP6}  \vspace{-3mm} \verb;     Calculate expected intensity values implied by the smoothed I, Q and;
+                     \\            \verb;     U values;
+\item \label{STEP7}  \vspace{-3mm} \verb;     Find the squared residuals between these intensity estimates and the;
+                     \\            \verb;     observed intensity values;
+\item \label{STEP8}  \vspace{-3mm} \verb;     Find the mean squared residual at each pixel position;
+\item \label{STEP9}  \vspace{-3mm} \verb;     Smooth the image holding these mean squared residual values;
+\item \label{STEP10} \vspace{-3mm} \verb;     Copy this smoothed image to the current variance image;
+\item \label{STEP11} \vspace{-3mm} \verb;     Copy the input intensity values, excluding values for which the;
+                     \\            \verb;     squared residual found above is too large;
+\item \label{STEP12} \vspace{-3mm} \verb;     Calculate I, Q and U again using only the copied input values, and;
+                     \\            \verb;     the current variance image;
+\item \label{STEP13} \vspace{-3mm} \verb;     Set ITER = ITER + 1;
+\item \label{STEP14} \vspace{-3mm} \verb;  End do;
+
+\end{enumerate}
+
+Each step in this process is described further below:
+
+\begin{enumerate}
+
+\item The \emph{variance image} holds the variance to associate with each
+input intensity value. Initially, all variances are set to $1.0$ so that
+all input data values have equal weight. Note, there is only one variance
+image. A given input pixel is given the same variance in equation
+\xref{EQN:CHI}, no matter which input image it comes from. If this were
+not the case (\emph{i.e.} if each input image had its own variance image)
+the better images would receive higher weight, resulting in them being
+fitted more closely. On the next iteration, they would then be found to
+have smaller residuals, and so would receive even higher weight,
+resulting in them being fitted even more closely. This circular process
+would repeat until the fit was totally dominated by the best input image. 
+
+\item The Stokes vectors are calculated using the constant weights set up
+in step \ref{STEP1}. All input data is used.
+
+\item The variable \verb+ITER+ counts the number of iterations which have
+been performed. 
+
+\item Loop round performing the number of iterations specified by
+parameter NITER. If NITER is zero, the Stokes vectors produced in step
+\ref{STEP2} are returned.
+
+\item The three images holding $I$, $Q$ and $U$ are smoothed to reduce
+the noise. The extent of the smoothing (in pixels) is controlled by POLCAL 
+parameter SMBOX. Setting SMBOX to 1 (or zero) results in no smoothing
+being performed. 
+
+As mentioned above, the likely error in an observed intensity value can be 
+estimated by comparing it with the best fitting sine curve defined by the
+current Stokes vectors. However, another handle on the errors can be
+obtained by requiring the Stokes vectors to be spatially smooth over some
+small scale. The smoothing introduced in this step, for instance, makes
+it possible for the variance estimation process to work even if only
+three input images are available. Without this smoothing, the best
+fitting sine curve would always be an exact fit to any set of three 
+observed intensity values, no matter what the noise on them may be.
+Without smoothing this would result in the variance estimates always
+being zero. The smoothing results in the $I$, $Q$ and $U$ values being
+modified slightly so that they no longer correspond exactly to the
+observed intensity values. Thus the residuals between the expected and
+observed intensities are no longer zero, and a non-zero variance can be
+obtained.
+
+
+Why is thsi necessary?
+
+How is it done?
+
+What are the problems?
+
+
+The quadfit figure.
+
+
+
+\end{enumerate}
+
+\begin{latexonly}
+  \vspace{2mm}
+  \begin{figure}[htb]
+  \begin{center}
+  \includegraphics[clip,scale=0.5]{sun223_figures/varest.eps}
+  \caption{The estimation of input variances. The observed and expected
+           intensity images are combined to form a single variance image.}
+  \label{fig:varest}
+  \end{center}
+  \end{figure}
+\end{latexonly}
+\begin{htmlonly}
+   \begin{quote}
+   \begin{figure}[bhtp]
+   \label{fig:varest}
+   \includegraphics{sun223_figures/varest.eps}
+   \caption{The estimation of input variances. The observed and expected
+            intensity images are combined to form a single variance image.}
+   \end{figure}
+   \end{quote}
+\end{htmlonly}
+
+
+
+
+
+
+
+Only *one* variance image.
+
+Variance for *each* image is displayed if ILEVEL = 3.
+
+Spatial smoothing
+
+
+
+
+
+
+
+
+
+Estimation of input variances.
+
+Rejection of bad input values.
+
+
+
 
 \section{\label{APP:POLEXT}\xlabel{thepolpackndfextension}The POLPACK NDF Extension}
 
@@ -4796,11 +5361,11 @@ catalogue (since there is no data grid defined within a catalogue).
 \item WCS information can now be read from a FITS or IRAS90 NDF extension
 if the NDF has no WCS component.
 \item A bug has been fixed which caused POLPLOT to display vectors in 
-incorrect positions when annotating the axes with sky coordinates. This bug
+incorrect positions when annotating the axes with sky co-ordinates. This bug
 was not seen if the vectors were plotted over an existing picture.
-\item Catalogues created by POLVEC now inherit the Current coordinate Frame 
+\item Catalogues created by POLVEC now inherit the Current co-ordinate Frame 
 from the supplied Stokes cube. Previously the Current Frame was always reset to
-pixel coordinates.
+pixel co-ordinates.
 \item The vector positions in the catalogue supplied to POLPLOT must now
 be given in the Base Frame of the WCS information stored in the catalogue.
 \end{itemize}
