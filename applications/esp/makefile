@@ -1461,10 +1461,11 @@ clean:
 #  ----------------------------------
 
 #  Remove all intermediate files and all built files, and note that the
-#  package is no longer built or tested.
+#  package is no longer built or tested or unpacked.
 
 unbuild: clean
-	@- rm -f $(BUILT_FILES) $(DATE_STAMP) .BUILT 1>/dev/null 2>/dev/null
+	@- rm -f $(BUILT_FILES) $(DATE_STAMP) .BUILT source-unpacked \
+		1>/dev/null 2>/dev/null
 	@ echo '*** Built files removed'
 	@ echo
 
