@@ -39,12 +39,17 @@ C         Modified 20-Jul-84 by J.V.Carey
 C         Modified  7-Feb-85 by B.M.Harris
 *     3-MAR-1993 (AJJB):
 *       STATUS argument added.
+*     3-AUG-2004 (TIMJ):
+*       Remove non-portable COSD,SIND,ATAND
 C
 C-------------------------------------------------------------------------- 
 
       IMPLICIT NONE
 
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+
+      REAL PI
+      PARAMETER ( PI = 3.141592654 )
 
       INTEGER I,N
 *  Status:
@@ -67,17 +72,19 @@ C--------------------------------------------------------------------------
 
       IF (A.GT.0.0) THEN
 
-         PA1  = PA + 90.0
+         PA1  = (PA + 90.0) * PI / 180.0
 
          IF (AA.GT.0.0) THEN
+*     Step in degrees
             STEP = 360.0/REAL(N-1)
-            X(1) = AA*COSD(PA1)
-            Y(1) = AA*SIND(PA1)
+            X(1) = AA*COS(PA1)
+            Y(1) = AA*SIN(PA1)
 
             DO I = 2,N
-               TH   = STEP*REAL(I-1)
-               X(I) = AA*COSD(PA1)*COSD(TH) - BB*SIND(PA1)*SIND(TH)
-               Y(I) = AA*SIND(PA1)*COSD(TH) + BB*COSD(PA1)*SIND(TH)
+*     Converted to radians
+               TH   = STEP*REAL(I-1) * PI / 180.0
+               X(I) = AA*COS(PA1)*COS(TH) - BB*SIN(PA1)*SIN(TH)
+               Y(I) = AA*SIN(PA1)*COS(TH) + BB*COS(PA1)*SIN(TH)
             ENDDO
 
          ENDIF
@@ -96,24 +103,24 @@ C--------------------------------------------------------------------------
 *       the centre point, adding the angle through which the user wishes
 *       to rotate the major axis.
 *
-         ANG1 = ATAND(AA/BB)
-         ANG2 = 180.0 - ANG1
+         ANG1 = ATAN(AA/BB)
+         ANG2 = PI - ANG1
 
          ANGR1 = PA + ANG1
          ANGR2 = PA + ANG2
-         ANGR3 = 180.0 + ANGR1
-         ANGR4 = 180.0 + ANGR2
+         ANGR3 = PI + ANGR1
+         ANGR4 = PI + ANGR2
 *
 *       Now calculate the x,y values for the four corner points.
 *
-         X(1) =   AABB*COSD(ANGR1)
-         Y(1) =   AABB*SIND(ANGR1)
-         X(2) =   AABB*COSD(ANGR2)
-         Y(2) =   AABB*SIND(ANGR2)
-         X(3) =   AABB*COSD(ANGR3)
-         Y(3) =   AABB*SIND(ANGR3)
-         X(4) =   AABB*COSD(ANGR4)
-         Y(4) =   AABB*SIND(ANGR4)
+         X(1) =   AABB*COS(ANGR1)
+         Y(1) =   AABB*SIN(ANGR1)
+         X(2) =   AABB*COS(ANGR2)
+         Y(2) =   AABB*SIN(ANGR2)
+         X(3) =   AABB*COS(ANGR3)
+         Y(3) =   AABB*SIN(ANGR3)
+         X(4) =   AABB*COS(ANGR4)
+         Y(4) =   AABB*SIN(ANGR4)
       ENDIF
 
       END
