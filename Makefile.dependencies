@@ -60,6 +60,7 @@ $(MANIFEST)/agi: \
 		$(MANIFEST)/psx \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/star2html \
+		$(MANIFEST)/starx \
 		$(MANIFEST)/string \
 		$(MANIFEST)/subpar
 	cd libraries/agi \
@@ -149,6 +150,7 @@ $(MANIFEST)/atools: \
 		$(MANIFEST)/dtask \
 		$(MANIFEST)/ems \
 		$(MANIFEST)/fio \
+		$(MANIFEST)/generic \
 		$(MANIFEST)/gks \
 		$(MANIFEST)/gns \
 		$(MANIFEST)/grp \
@@ -176,6 +178,7 @@ $(MANIFEST)/atools: \
 		$(MANIFEST)/snx \
 		$(MANIFEST)/sst \
 		$(MANIFEST)/star2html \
+		$(MANIFEST)/starx \
 		$(MANIFEST)/string \
 		$(MANIFEST)/subpar
 	cd applications/atools \
@@ -387,6 +390,7 @@ $(MANIFEST)/convert: \
 		$(MANIFEST)/shl \
 		$(MANIFEST)/sla \
 		$(MANIFEST)/star2html \
+		$(MANIFEST)/starx \
 		$(MANIFEST)/string \
 		$(MANIFEST)/subpar
 	cd applications/convert \
@@ -454,6 +458,7 @@ $(MANIFEST)/daophot: \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/sla \
 		$(MANIFEST)/star2html \
+		$(MANIFEST)/starx \
 		$(MANIFEST)/string \
 		$(MANIFEST)/subpar
 	cd applications/daophot \
@@ -474,6 +479,7 @@ $(MANIFEST)/datacube: \
 		$(MANIFEST)/ems \
 		$(MANIFEST)/figaro \
 		$(MANIFEST)/fio \
+		$(MANIFEST)/generic \
 		$(MANIFEST)/gks \
 		$(MANIFEST)/gns \
 		$(MANIFEST)/grp \
@@ -503,6 +509,7 @@ $(MANIFEST)/datacube: \
 		$(MANIFEST)/shl \
 		$(MANIFEST)/sla \
 		$(MANIFEST)/snx \
+		$(MANIFEST)/starx \
 		$(MANIFEST)/string \
 		$(MANIFEST)/subpar \
 		$(MANIFEST)/tcl \
@@ -522,6 +529,7 @@ $(MANIFEST)/dipso: \
 		$(MANIFEST)/dtask \
 		$(MANIFEST)/ems \
 		$(MANIFEST)/fio \
+		$(MANIFEST)/generic \
 		$(MANIFEST)/gks \
 		$(MANIFEST)/gns \
 		$(MANIFEST)/grp \
@@ -547,6 +555,7 @@ $(MANIFEST)/dipso: \
 		$(MANIFEST)/sla \
 		$(MANIFEST)/snx \
 		$(MANIFEST)/star2html \
+		$(MANIFEST)/starx \
 		$(MANIFEST)/string \
 		$(MANIFEST)/subpar
 	cd applications/dipso \
@@ -783,6 +792,7 @@ $(MANIFEST)/figaro: \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/sla \
 		$(MANIFEST)/star2html \
+		$(MANIFEST)/starx \
 		$(MANIFEST)/string \
 		$(MANIFEST)/subpar
 	cd applications/figaro \
@@ -1073,6 +1083,7 @@ $(MANIFEST)/idi: \
 		$(MANIFEST)/psx \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/star2html \
+		$(MANIFEST)/starx \
 		$(MANIFEST)/string \
 		$(MANIFEST)/subpar
 	cd libraries/idi \
@@ -1157,6 +1168,7 @@ $(MANIFEST)/iras90: \
 		$(MANIFEST)/sla \
 		$(MANIFEST)/snx \
 		$(MANIFEST)/star2html \
+		$(MANIFEST)/starx \
 		$(MANIFEST)/string \
 		$(MANIFEST)/subpar
 	cd applications/obsolete/iras90 \
@@ -1226,6 +1238,7 @@ $(MANIFEST)/kaplibs: \
 		$(MANIFEST)/dtask \
 		$(MANIFEST)/ems \
 		$(MANIFEST)/fio \
+		$(MANIFEST)/generic \
 		$(MANIFEST)/gks \
 		$(MANIFEST)/gns \
 		$(MANIFEST)/grp \
@@ -1249,6 +1262,7 @@ $(MANIFEST)/kaplibs: \
 		$(MANIFEST)/sla \
 		$(MANIFEST)/snx \
 		$(MANIFEST)/star2html \
+		$(MANIFEST)/starx \
 		$(MANIFEST)/string \
 		$(MANIFEST)/subpar
 	cd libraries/kaplibs \
@@ -1267,6 +1281,7 @@ $(MANIFEST)/kappa: \
 		$(MANIFEST)/dtask \
 		$(MANIFEST)/ems \
 		$(MANIFEST)/fio \
+		$(MANIFEST)/generic \
 		$(MANIFEST)/gks \
 		$(MANIFEST)/gns \
 		$(MANIFEST)/grp \
@@ -1295,6 +1310,7 @@ $(MANIFEST)/kappa: \
 		$(MANIFEST)/sla \
 		$(MANIFEST)/snx \
 		$(MANIFEST)/star2html \
+		$(MANIFEST)/starx \
 		$(MANIFEST)/string \
 		$(MANIFEST)/subpar \
 		$(MANIFEST)/tcl \
@@ -1314,6 +1330,7 @@ $(MANIFEST)/kaprh: \
 		$(MANIFEST)/dtask \
 		$(MANIFEST)/ems \
 		$(MANIFEST)/fio \
+		$(MANIFEST)/generic \
 		$(MANIFEST)/gks \
 		$(MANIFEST)/gns \
 		$(MANIFEST)/grp \
@@ -1340,6 +1357,7 @@ $(MANIFEST)/kaprh: \
 		$(MANIFEST)/sla \
 		$(MANIFEST)/snx \
 		$(MANIFEST)/star2html \
+		$(MANIFEST)/starx \
 		$(MANIFEST)/string \
 		$(MANIFEST)/subpar \
 		$(MANIFEST)/trn
@@ -1625,6 +1643,7 @@ $(MANIFEST)/photom: \
 		$(MANIFEST)/sgs \
 		$(MANIFEST)/sla \
 		$(MANIFEST)/star2html \
+		$(MANIFEST)/starx \
 		$(MANIFEST)/string \
 		$(MANIFEST)/subpar
 	cd applications/photom \
@@ -1663,6 +1682,7 @@ $(MANIFEST)/pisa: \
 		$(MANIFEST)/shl \
 		$(MANIFEST)/sla \
 		$(MANIFEST)/star2html \
+		$(MANIFEST)/starx \
 		$(MANIFEST)/string \
 		$(MANIFEST)/subpar
 	cd applications/pisa \
@@ -1681,6 +1701,7 @@ $(MANIFEST)/polpack: \
 		$(MANIFEST)/dtask \
 		$(MANIFEST)/ems \
 		$(MANIFEST)/fio \
+		$(MANIFEST)/generic \
 		$(MANIFEST)/gks \
 		$(MANIFEST)/gns \
 		$(MANIFEST)/grp \
@@ -1708,6 +1729,7 @@ $(MANIFEST)/polpack: \
 		$(MANIFEST)/sla \
 		$(MANIFEST)/snx \
 		$(MANIFEST)/star2html \
+		$(MANIFEST)/starx \
 		$(MANIFEST)/string \
 		$(MANIFEST)/subpar
 	cd applications/polpack \
@@ -1739,6 +1761,7 @@ $(MANIFEST)/pongo: \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/sla \
 		$(MANIFEST)/star2html \
+		$(MANIFEST)/starx \
 		$(MANIFEST)/string \
 		$(MANIFEST)/subpar
 	cd applications/pongo \
