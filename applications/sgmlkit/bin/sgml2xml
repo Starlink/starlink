@@ -1,0 +1,237 @@
+#! /usr/bin/perl -w
+#
+# $Id$
+
+$SX = 'sx';
+$catalogue_server = 'http://goedel.astro.gla.ac.uk/catalogue/public';
+$found_subdoc = 0;		# used/set in parse_entitydef
+
+#  Following parsing of doctype declaration line will get confused unless
+#  (a) a simple declaration is on a single line;
+#  (b) any declaration subset starts on the same line as the declaration; 
+#  (c) the declaration subset does not have the pair `]>' in any
+#  comment or string.
+while (defined($line = <>)) {
+    if ($line =~ /<!DOCTYPE/i) {
+	if ($line =~ /\[/) {	# there's a declaration subset
+	    while ($line !~ /\]>/) {
+	        $line .= <>;	# gobble the whole declaration subset
+	    }
+	    $line =~ /\[(.*)\]/s;
+	    $subset = $1;
+	    while ($subset =~ /<!(\B(?=--)|[A-Za-z]*) *(('.*?'|".*?"|--.*?--|.)+?)>/sg) {
+		($dectype,$decvalue) = ($1,$2);
+		if ($dectype =~ /entity/i) {
+		    # split the value into tokens
+		    @tokens = ($decvalue =~ /('.*?'|".*?"|--.*?--|\S+)\s*/sg);
+		    parse_entitydef (@tokens);
+		} elsif ($dectype eq '') {
+		    # It's a comment declaration -- collapse possibly
+		    # multiple included comments into one.
+		    $decvalue =~ s/--(\s*)--/$1/sg;
+		    print "<!$decvalue>\n";
+		} else {
+		    print STDERR "declaration $dectype discarded\n";
+		}
+	    }
+	} else {
+	    print "simple doctype ($line)\n";
+	}
+	last;
+    } else {
+	print $line;
+    }
+}
+
+exit 0;
+
+sub parse_entitydef {
+    #  Parse an entity definition, given the arguments, tokenised in an array
+    #  A selection of relevant productions are as follows
+    #  (see http://www.tiac.net/users/bingham/sgmlsyn/sgmlsyn.htm, or
+    #  http://www.oreilly.com/people/staff/crism/sgmldefs.html, or
+    #  ftp://ftp.ifi.uio.no/pub/SGML/productions).
+    #
+    #  What we want to do here is to parse the entity, and reexpress
+    #  it in an XML-conformant fashion.  See James Clark's SGML-XML
+    #  notes at http://www.w3.org/TR/NOTE-sgml-xml-971215, section on
+    #  entity declarations.
+    #
+    #  We do some basic sanity-checking of the validity of the entity, but
+    #  don't bust a gut -- the input is supposed to be valid SGML.  We
+    #  produce output which is valid XML as described in Clark's
+    #  notes, but don't check the last two points, requiring that the
+    #  replacement text be well-formed and that entity references are
+    #  syntactically correct.
+    #
+    #  We convert entity definitions where the entity text is a
+    #  `parameter literal' or `external entity specification', with
+    #  the exception that SUBDOC entities are converted to NDATA XML
+    #  entities, and SDATA or CDATA external entities are converted to
+    #  NDATA entities (is this sensible).  We reject bracketed text
+    #  entities with a warning.  We do the same for data text entities
+    #  -- could we convert these to parameter literal definitions
+    #  (don't think so)?
+    #
+    #
+    #  
+    #  [66] parameter literal (10.1.2, 373:1) =
+    #          ( ( lit ("\""),
+    #              replaceable parameter data [67],
+    #              lit ("\"") )
+    #          | ( lita ("'"),
+    #              replaceable parameter data [67],
+    #              lita ("'") ) )
+    #  
+    #  [73] external identifier (10.1.6, 379:1) =
+    #          ( ( "SYSTEM"
+    #            | ( "PUBLIC",
+    #                +ps [65],
+    #                public identifier [74] ) ),
+    #            ?( +ps [65],
+    #               system identifier [75] ) )
+    #  
+    #  [101] entity declaration (10.5, 394:18) =
+    #          ( mdo ("<!"),
+    #            "ENTITY",
+    #            +ps [65],
+    #            entity name [102],
+    #            +ps [65],
+    #            entity text [105],
+    #            *ps [65],
+    #            mdc (">") )
+    #  
+    #  [102] entity name (10.5.1, 395:1) =
+    #          ( general entity name [103]
+    #          | parameter entity name [104] )
+    #  
+    #  [105] entity text (10.5.2, 396:18) =
+    #          ( parameter literal [66]
+    #          | data text [106]
+    #          | bracketed text [107]
+    #          | external entity specification [108] )
+    #  
+    #  [106] data text (10.5.3, 397:14) =
+    #          ( ( "CDATA"
+    #            | "SDATA"
+    #            | "PI" ),
+    #            +ps [65],
+    #            parameter literal [66] )
+    #  
+    #  [107] bracketed text (10.5.4, 399:1) =
+    #          ( ( "STARTTAG"
+    #            | "ENDTAG"
+    #            | "MS"
+    #            | "MD" ),
+    #            +ps [65],
+    #            parameter literal [66] )
+    #  
+    #  [108] external entity specification (10.5.5, 400:1) =
+    #          ( external identifier [73],
+    #            ?( +ps [65],
+    #               entity type [109] ) )
+    #  
+    #  [109] entity type (10.5.5, 400:5) =
+    #          ( "SUBDOC"
+    #          | ( ( "CDATA"
+    #              | "NDATA"
+    #              | "SDATA" ),
+    #              +ps [65],
+    #              notation name [41],
+    #              ?data attribute specification [149.2] ) )
+
+
+    my @tokens = ();
+    my @comments = ();
+    foreach $t (@_) {
+	if ($t =~ /^--/) {
+	    push (@comments, $t);
+	} else {
+	    push (@tokens, $t);
+	}
+    }
+
+    $name = shift (@tokens);
+    if ($name eq '%') {
+	$name = "% " . shift (@tokens);
+    }
+
+    if ($name =~ /#default/i) {
+	# default entity[103]
+	print STDERR "No #DEFAULT entity in XML (ignored)\n";
+
+    } elsif ($tokens[0] =~ /^[\'\"]/) {
+	# parameter literal[66]
+	print "<!ENTITY $name $tokens[0]>\n";
+
+    } elsif ($tokens[0] =~ /^(cdata|sdata|pi)/i) {
+	# data text[106]
+	print STDERR "No data entities in XML (ignored)\n";
+
+    } elsif ($tokens[0] =~ /^(starttag|endtag|ms|md)/i) {
+	# bracketed text[107]
+	print STDERR "No bracketed text entities in XML (ignored)\n";
+
+    } elsif ($tokens[0] =~ /^(public|system)/i) {
+	# external entity specification[108]
+	# is...
+	# external identifier[73]
+	my $pubid = '';
+	my $sysid = '';
+	my $entitytype = '';
+	if ($tokens[0] =~ /^public/i) {
+	    shift (@tokens);
+	    ($pubid = $tokens[0]) =~ s/[\'\"]//g;
+	}
+	shift (@tokens);
+	if ($tokens[0] =~ /^[\'\"]/) { # system id
+	    ($sysid = $tokens[0]) =~ s/[\'\"]//g;
+	    shift (@tokens);
+	}
+	if ($pubid ne '' && $sysid eq '') {
+	    $sysid = $catalogue_server . '/' . $pubid;
+	    $sysid =~ s/ /%20/g;
+	}
+	if ($#tokens >= 0) {
+	    # ...followed by entity type[109]
+	    if ($tokens[0] =~ /^subdoc/i) {
+		if (! $found_subdoc) {
+		    print "<!NOTATION XML 'http://www.w3.org/TR/1998/REC-xml-19980210'>\n";
+		    $found_subdoc = 1;
+		}
+		$entitytype = 'NDATA XML';
+		shift (@tokens);
+		if ($#tokens >= 0) {
+		    print STDERR "Malformed entity (extra text '@tokens' ignored)\n";
+		}
+		shift(@tokens);
+	    } else {
+		if ($tokens[0] =~ /^[cs]data/i) {
+		    print STDERR "External CDATA and SDATA entities not allowed in XML (taken to be NDATA)\n";
+		}
+		shift (@tokens);
+		$entitytype = "NDATA $tokens[0]";
+		shift (@tokens);
+		if ($#tokens >= 0) {
+		    # data attribute specification[149.2]
+		    print STDERR "No data attribute specifications in XML (ignored)\n";
+		}
+	    }
+	}
+	print "<!ENTITY $name ";
+	if ($pubid ne '') {
+	    print "PUBLIC '$pubid' '$sysid'";
+	} else {
+	    print "SYSTEM '$sysid'";
+	}
+	print " $entitytype" if ($entitytype ne '');
+	print ">\n";
+    } else {
+	print STDERR "Unrecognised entity declaration '@tokens'\n";
+    }
+    if ($#comments >= 0) {
+	$commentstring = join ("\n", @comments);
+	$commentstring =~ s/--//g;
+	print "<!--$commentstring-->\n";
+    }
+}	
