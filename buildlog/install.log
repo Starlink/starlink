@@ -319,7 +319,7 @@ install:
 prepare:
 
 check_packages:
-[available] Jan 31, 2004 5:18:57 AM uk.ac.starlink.util.Loader starjavaDirectory
+[available] Feb 1, 2004 5:18:25 AM uk.ac.starlink.util.Loader starjavaDirectory
 [available] WARNING: Loader.class location file:/apps/cvsbuild/java/source/util/build/classes/uk/ac/starlink/util/Loader.class unexpected
 
 build:
@@ -481,4 +481,4 @@ build:
 BUILD FAILED
 file:/apps/cvsbuild/java/source/astgui/build.xml:355: Compile failed; see the compiler error output for details.
 
-Total time: 1 minute 21 seconds
+Total time: 1 minute 25 seconds
