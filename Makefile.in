@@ -148,7 +148,7 @@ world: $(ALL_TARGETS)
 # remake Makefile.dependencies. 
 #
 Makefile.dependencies:
-	rm -f componentset.xml
+	rm -f componentset.xml Makefile.dependencies Makefile.dependencies.tmp
 	exec 5>componentset.xml; \
 	  echo '<!DOCTYPE componentset SYSTEM "componentinfo.dtd">' >&5; \
 	  echo '<componentset>' >&5; \
@@ -157,12 +157,11 @@ Makefile.dependencies:
 	    sed '/^<?/d;/^<!DOCTYPE/d' >&5; \
 	  echo '</componentset>' >&5
 	if test "$(JAVA)" != NOJAVA -a -f buildsupport/starconf/java/Makefile; then \
-	  rm -f Makefile.dependencies.tmp \
 	  && (cd buildsupport/starconf/java \
 	      && $(MAKE) GenerateDependencies.class) \
 	  && $(JAVA) -classpath buildsupport/starconf/java \
-	    GenerateDependencies componentset.xml \
-	    >Makefile.dependencies.tmp \
+	        GenerateDependencies componentset.xml \
+	        >Makefile.dependencies.tmp \
 	  && mv Makefile.dependencies.tmp $@; \
 	else \
 	  touch $@; \
