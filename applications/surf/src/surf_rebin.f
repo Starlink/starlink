@@ -186,6 +186,9 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
+*     Revision 1.44  1998/01/22 02:06:28  timj
+*     Allow the size of the output grid to be modified
+*
 *     Revision 1.43  1997/11/19 18:53:15  timj
 *     Fix some logic problems with errors being annulled by CHR_STATUS
 *
@@ -437,6 +440,8 @@ c
                                        ! data variance from input files
       INTEGER          IPOSN           ! Position in string
       INTEGER          ITEMP           ! scratch integer
+      INTEGER          IX              ! Temporary X integer
+      INTEGER          IY              ! Temporary Y integer
       INTEGER          I_CENTRE        ! I index of central pixel in output
                                        ! map
       INTEGER          J_CENTRE        ! J index of central pixel in output
@@ -444,6 +449,7 @@ c
       INTEGER          LBND (MAX_DIM)  ! pixel indices of bottom left 
                                        ! corner of output image
       CHARACTER * (5)  MAPNAME         ! Name of each bolometer
+      INTEGER          MAP_SIZE(2)     ! Number of pixels in map (x,y)
       CHARACTER* (15)  METHOD          ! rebinning method
       DOUBLE PRECISION MJD_STANDARD    ! date for which apparent RA,Decs
                                        ! of all
@@ -452,8 +458,6 @@ c
       INTEGER          NFILES          ! Number of files in INTREBIN/REBIN
       INTEGER          NPARS           ! Number of dummy pars
       INTEGER          NSPIKES(MAX_FILE) ! Number of spikes per file
-      INTEGER          NX_OUT          ! x dimension of output map
-      INTEGER          NY_OUT          ! y dimension of output map
       INTEGER          N_BOL (MAX_FILE)! number of bolometers measured in input
                                        ! files
       INTEGER          N_FILE_LOOPS    ! Number of loops for INTREBIN/REBIN
@@ -1028,7 +1032,7 @@ c
             CALL SURF_GRID_DESPIKE(FILE, N_PTS, N_POS, N_BOL, BITNUM,
      :           WAVELENGTH, DIAMETER, BOL_RA_PTR, BOL_DEC_PTR, 
      :           IN_DATA_PTR, IN_QUALITY_PTR, 
-     :           NX_OUT, NY_OUT, I_CENTRE, J_CENTRE, NSPIKES,
+     :           MAP_SIZE(1), MAP_SIZE(2), I_CENTRE, J_CENTRE, NSPIKES,
      :           QBITS, STATUS)
 
 *     Look through NSPIKES and see whether any spikes were detected
@@ -1277,9 +1281,28 @@ c
 *     find the extent of the input data
 
             CALL SURFLIB_CALC_OUTPUT_GRID(FILE, N_PTS, OUT_PIXEL,
-     :           ABOL_RA_PTR, ABOL_DEC_PTR, NX_OUT, NY_OUT,
+     :           ABOL_RA_PTR, ABOL_DEC_PTR, MAP_SIZE(1), MAP_SIZE(2),
      :           I_CENTRE, J_CENTRE, STATUS)
 
+*     Ask for confirmation of the map size
+
+            IX = MAP_SIZE(1)
+            IY = MAP_SIZE(2)
+
+            CALL PAR_GDR1I('SIZE', 2, MAP_SIZE, 5, 1000, .TRUE.,
+     :           MAP_SIZE, STATUS)
+
+*     Need to redefine I_CENTRE and J_CENTRE 
+*     Put the reference pixels into the centre of the new grid
+*     if the size has changed
+
+            IF (MAP_SIZE(1) .NE. IX) THEN
+               I_CENTRE = INT(MAP_SIZE(1) / 2)
+            END IF
+
+            IF (MAP_SIZE(2) .NE. IY) THEN
+               J_CENTRE = INT(MAP_SIZE(2) / 2)
+            END IF
 
 *     Now that the size of the map is determined we have to work out whether
 *     we are rebinning all integrations into one image (REBIN/BOLREBIN) or 
@@ -1357,8 +1380,8 @@ c
 
                   LBND (1) = 1
                   LBND (2) = 1
-                  UBND (1) = NX_OUT
-                  UBND (2) = NY_OUT
+                  UBND (1) = MAP_SIZE(1)
+                  UBND (2) = MAP_SIZE(2)
 
                   IF (BOLREBIN.OR.INTREBIN) THEN
                      CALL NDF_PLACE(OUT_LOC, MAPNAME, PLACE, STATUS)
@@ -1394,7 +1417,8 @@ c
 *     Fill Quality array with bad data
 
                   IF (STATUS .EQ. SAI__OK) THEN
-                     CALL SCULIB_CFILLB (NX_OUT * NY_OUT, BADBIT, 
+                     CALL SCULIB_CFILLB (MAP_SIZE(1) * MAP_SIZE(2), 
+     :                    BADBIT, 
      :                    %val(OUT_QUALITY_PTR))
                   END IF
 
@@ -1414,7 +1438,8 @@ c
 *     Rebin the data using weighting function
                      CALL SCULIB_WTFN_REGRID( NFILES, N_PTS, WTFNRAD, 
      :                    WTFNRES, WEIGHTSIZE, DIAMETER, WAVELENGTH, 
-     :                    OUT_PIXEL, NX_OUT, NY_OUT, I_CENTRE, J_CENTRE, 
+     :                    OUT_PIXEL, MAP_SIZE(1), MAP_SIZE(2), 
+     :                    I_CENTRE, J_CENTRE, 
      :                    WTFN, WEIGHT, ABOL_DATA_PTR, ABOL_VAR_PTR, 
      :                    ABOL_RA_PTR, ABOL_DEC_PTR, %VAL(OUT_DATA_PTR), 
      :                    %VAL(OUT_VARIANCE_PTR), %VAL(OUT_QUALITY_PTR), 
@@ -1426,7 +1451,8 @@ c
                         SPMETHOD = 'IDBVIP'
                      ELSE IF (METHOD .EQ. 'SPLINE2') THEN
                         SPMETHOD = 'SURFIT'
-                        CALL PAR_DEF0R('SFACTOR',NX_OUT*NY_OUT/2.0,
+                        CALL PAR_DEF0R('SFACTOR',
+     :                       MAP_SIZE(1)*MAP_SIZE(2) / 2.0,
      :                       STATUS)
                         CALL PAR_GET0R('SFACTOR', SFACTOR, STATUS)
                      ELSE 
@@ -1436,8 +1462,9 @@ c
 *     Regrid with SPLINE interpolation
                      CALL SCULIB_SPLINE_REGRID(SPMETHOD, SFACTOR, 
      :                    MAX_FILE, NFILES, N_BOL, SCUBA__MAX_INT, 
-     :                    N_INTS, DIAMETER, WAVELENGTH,OUT_PIXEL,NX_OUT, 
-     :                    NY_OUT, I_CENTRE, J_CENTRE, WEIGHT, INT_LIST, 
+     :                    N_INTS, DIAMETER, WAVELENGTH,OUT_PIXEL,
+     :                    MAP_SIZE(1), MAP_SIZE(2),
+     :                    I_CENTRE, J_CENTRE, WEIGHT, INT_LIST, 
      :                    ABOL_DATA_PTR, ABOL_VAR_PTR, ABOL_RA_PTR, 
      :                    ABOL_DEC_PTR, %VAL(OUT_DATA_PTR), 
      :                    %VAL(OUT_VARIANCE_PTR), %VAL(OUT_QUALITY_PTR), 
@@ -1469,7 +1496,7 @@ c
                   CALL SURF_WRITE_MAP_INFO (OUT_NDF, OUT_COORDS, 
      :                 OUT_TITLE, MJD_STANDARD, FILE, FILENAME, 
      :                 OUT_LONG, OUT_LAT, OUT_PIXEL, I_CENTRE, J_CENTRE, 
-     :                 NX_OUT, NY_OUT, WAVELENGTH, STATUS )
+     :                 MAP_SIZE(1), MAP_SIZE(2), WAVELENGTH, STATUS )
                   
 *     Tidy up each loop
 
