@@ -1,0 +1,294 @@
+.help centroid Starlink kappa
+.nf
+Finds the centroids of star-like features in an NDF.
+
+Usage:
+
+   centroid ndf [mode] init [search] [maxiter] [maxshift] [toler]
+
+Description:
+
+   This routine takes an NDF and returns the co-ordinates of the
+   centroids of features in its data array given approximate initial
+   co-ordinates.  A feature is a set of connected pixels which are
+   above or below the surrounding background region.  For example, a
+   feature could be a star or galaxy on the sky.  The centroid is
+   obtained iteratively from computing marginal profiles in a
+   search region about the initial position, and subtracting the
+   background.  The loop is repeated up to a maximum number of
+   iterations, though it normally terminates when a desired accuracy
+   has been achieved.  Typically, for stars better than 0.1 pixel
+   is readily attainable, but the accuracy is affected by noise,
+   non-Gaussian and overlapping features.  The error in the centroid
+   position may be estimated by a Monte-Carlo method using the
+   data variance to generate realisations of the data about the
+   feature.  Each realisation is processed identically to the actual
+   data, and statistics are formed to derive the standard deviations.
+
+   Positions may be expressed in either pixel or data co-ordinates.
+   Three methods are available for obtaining the initial positions.
+
+   1. From the parameter system, usually in response to prompting.
+   2. By a placing a graphics cursor of a nominated device on the
+      feature.  To do this the data array must already be
+      displayed as an image, or a contour or line plot, and the
+      picture stored in the graphics database.
+   3. By reading a text file containing a list of co-ordinates
+      in free format, one object per record.  There may be
+      commentary lines in the file beginning with '#' or '!'.
+
+   In the first two modes the application loops asking for new
+   feature co-ordinates until told to quit or encounters an error.
+   Features within NDFs of dimension 1 to 7 may be located, except
+   in the second method, where the graphics interface limits
+   constrain the NDF to be one- or two-dimensional---the most common
+   cases.
+
+   The results may optionally be written to a log file that includes
+   details of the input parameters.  This is intended for the human
+   reader.  If the centroid positions are to be fed into another
+   application requiring a list of co-ordinates, e.g. for photometry,
+   a co-ordinate list file may also be written.
+
+Parameters
+
+For information on individual parameters, select from the list below:
+
+CENTRE
+
+CENTRE()  = _DOUBLE (Write)
+   Co-ordinates of the centroid of the feature.  Note
+   that only the last centroid is recorded in this parameter.
+
+CERROR
+
+CERROR = _LOGICAL (Read)
+   If TRUE, errors in the centroid position will be calculated.
+   The input NDF must contain the data's variance in order
+   to compute errors. [FALSE]
+
+COIN
+
+COIN =  FILENAME (Read)
+   Name of the text file containing the initial co-ordinates
+   of star-like images.   The co-ordinates should be arranged
+   in free-format columns x then y then z etc., one record per
+   image.  The file may contain comment lines with the first
+   character # or !.  (XYlist mode)
+
+COOUT
+
+COOUT =  FILENAME (Read)
+   Name of the text file to contain the centroid co-ordinates
+   of the star-like images.  It is a co-ordinate file which can
+   be used by other applications, and contains the position of
+   one object per record.  If COOUT is null, !, no output
+   co-ordinate file will be created. [!]
+
+COSYS
+
+COSYS = LITERAL (Read)
+   The co-ordinate system to be used.  This can be either "World"
+   or "Data".  If COSYS = "Data" the input co-ordinates and the
+   centroids are to be expressed in data co-ordinates, otherwise
+   pixel (world) co-ordinates are used.  The data co-ordinates
+   are converted to and from pixel indices via the NDF's axis
+   values; if there is no axis information within the NDF, world
+   co-ordinates are then used, except in Cursor mode where the
+   transformation, if present, is taken from the last DATA
+   picture in the graphics database.  If COSYS = "World" pixel
+   co-ordinates are used throughout.  [Current co-ordinate
+   system]
+
+DEVICE
+
+DEVICE = DEVICE (Read)
+   The graphics device whose the cursor is used to select the
+   images for which centroids are to be calculated. (Cursor
+   mode) [Current graphics device]
+
+INIT
+
+INIT()  = _DOUBLE (Read)
+   Guess co-ordinates of the feature to be centroided.  The
+   co-ordinates must lie within the bounds of the NDF.  If
+   the initial co-ordinates are supplied on the command line
+   only one centroid will be found; otherwise the application
+   will ask for further guesses, which may be terminated by
+   supplying the null value (!). (Interface mode)
+
+LOGFILE
+
+LOGFILE  =  FILENAME (Read)
+   Name of the text file to log the results.  If null, there
+   will be no logging.  Note this is intended for the human reader
+   and is not intended for passing to other applications. [!]
+
+MARK
+
+MARK = _LOGICAL (Read)
+   If TRUE, the point selected by the cursor will be marked by a
+   cross. (Cursor mode) [FALSE]
+
+MAXITER
+
+MAXITER  =  _INTEGER (Read)
+   Maximum number of iterations to be used in the search.  It must
+   be in the range 1--9.  The dynamic default is 3. [9]
+
+MAXSHIFT
+
+MAXSHIFT()  =  _REAL (Read)
+   Maximum shift in each dimension allowed between the guess and
+   output positions in pixels.  Each must lie in the range
+   0.0--26.0.  If only a single value is given, then it will be
+   duplicated to all dimensions. The dynamic default is half of
+   SEARCH + 1. [9.0]
+
+MODE
+
+MODE  =  LITERAL (Read)
+   The mode in which the initial co-ordinates are to be obtained.
+   "Interface" means from the parameter system, "Cursor"
+   enables selection by graphics cursor, and "File" reads
+   them from an text file. [Current interaction mode]
+
+NDF
+
+NDF = NDF (Read)
+   The NDF structure containing the data array to be analysed.
+
+NSIM
+
+NSIM =  _INTEGER (Read)
+   The number of simulations or realisations using the variance
+   information in order to estimate the error in the centroid
+   position.  The uncertainty in the centroid error decreases
+   as one over the square root of NSIM. The range of acceptable
+   values is 3--10000. [100]
+
+POSITIVE
+
+POSITIVE  =  _LOGICAL (Read)
+   TRUE, if array features are positive above the background.
+   [TRUE]
+
+SEARCH
+
+SEARCH()  =  _INTEGER (Read)
+   Size in pixels of the search box to be used. If only a single
+   value is given, then it will be duplicated to all dimensions
+   so that a square, cube or hypercube region is searched.
+   Each value must be odd and lie in the range 3--51.  [9]
+
+TOLER
+
+TOLER  =  _REAL (Read)
+   Accuracy in pixels required in centroiding.  Iterations will
+   stop when the shift between successive centroid positions
+   is less than the accuracy.  The accuracy must lie in the range
+   0.0--2.0. [0.05]
+
+XCEN
+
+XCEN  =  _DOUBLE (Write)
+   x co-ordinate of the centroid of the star-like feature.  Note
+   that only the last centroid is recorded in this parameter.
+   This provided in addition to CENTRE for convenience until ICL
+   permits arrays.
+
+YCEN
+
+YCEN  =  _DOUBLE (Write)
+   y co-ordinate of the centroid of the star-like feature.  Note
+   that only the last centroid is recorded in this parameter.
+   This provided in addition to CENTRE for convenience until ICL
+   permits arrays.
+
+Examples
+
+centroid cluster cu
+   This finds the centroids in the NDF called cluster via the
+   graphics cursor on the current graphics device.
+
+centroid cluster cu search=21
+   This finds the centroids in the NDF called cluster via the
+   graphics cursor on the current graphics device.  The search
+   box for the centroid is 21 pixels in each dimension.
+
+centroid cluster i [21.7,5007.1] cosys=d
+   This finds the centroid of the object in the 2-dimensional NDF
+   called cluster around the data co-ordinate (21.7,5007.1).
+
+centroid arp244(6,,) i [40,30] cosys=w toler=0.01
+   This finds the 2-dimensional centroid of the feature near
+   pixel (6,40,30) in the 3-dimensional NDF called arp244 via the
+   graphics cursor on the current graphics device.  The centroid
+   must be found to 0.01 pixels.
+
+centroid cluster i [40,30] cosys=w xcen=(xp) ycen=(yp)
+   This finds the centroid of the object in the 2-dimensional NDF
+   called cluster around the pixel co-ordinate (40.0,30.0).  The
+   centroid co-ordinates are written to ICL variables XP and YP
+   for use in other applications.
+
+centroid cluster mode=xy coin=objects.dat logfile=centroids.log
+   This finds the centroids in the NDF called cluster.  The
+   initial positions are given in the text file objects.dat in
+   the current co-ordinate system.  A log of the input parameter
+   values, initial and centroid positions is written to the text
+   file centroids.log.
+
+centroid cluster mode=xy coin=objects.dat coout=centres.dat
+   As above, except there is no logfile; instead a co-ordinate
+   file called centres.dat is generated.
+
+centroid cluster i [40,30] cosys=w nopositive
+   This finds the centroid of the object in the 2-dimensional NDF
+   called cluster around the pixel co-ordinate (40.0,30.0).  The
+   feature must have values below that of the surrounding
+   background.
+
+Related_Applications
+
+   KAPPA: PSF.
+
+Authors
+
+MJC: Malcolm J. Currie  (STARLINK)
+
+History
+
+ 1991 March 24 (MJC):
+    Original NDF version based on the pre-0.8 version.
+
+ 1991 July 12 (MJC):
+    Added COOUT file.
+
+ 1992 March 3 (MJC):
+    Replaced AIF parameter-system calls by the extended PAR
+    library.
+
+ 1992 April 14 (MJC):
+    Handles arbitrary user-defined sections.
+
+ 1992 November 30 (MJC):
+    Does not use non-monotonic axis centres.
+
+Implementation_Status
+
+   -  The processing of bad pixels and all non-complex numeric types
+   is supported.
+
+   -  Data co-ordinates are processed in double precision.  When data
+   co-ordinates are being used, and the cursor mode is selected or
+   the NDF contains axis information, the results appear in double
+   precision.  Double precision arithmetic is needed to prevent
+   a loss of precision for certain co-ordinate transformations stored
+   within the graphics database or for double-precision axis centres.
+
+   -  The format of the logfile is different for 2-d from other
+   dimensions for historical reasons.  The 2-d has a tabular layout
+   with headings.  Logging awaits a proper table system to make this
+   consistent.
+.endhelp

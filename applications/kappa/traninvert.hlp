@@ -1,0 +1,62 @@
+.help traninvert Starlink kappa
+.nf
+Inverts a transformation.
+
+Usage:
+
+   traninvert transform
+
+Description:
+
+   This inverts a transformation stored in the TRANSFORM (SUN/61)
+   format within an existing HDS file.
+
+Parameters
+
+For information on individual parameters, select from the list below:
+
+TRANSFORM
+
+TRANSFORM = TRN (Read and Write)
+   The transformation structure to be inverted.  This may be an
+   HDS container file, in which case the transformation structure
+   is assumed to be called TRANSFORM at the top level of the
+   file; or a path to the HDS object.  The suggested default is
+   the current transformation structure.
+
+Examples
+
+traninvert shear.transform
+   This inverts the transformation structure stored in object
+   TRANSFORM within the HDS file called shear.
+
+traninvert shear
+   This does the same as above.
+
+traninvert \
+   This inverts the current transformation structure.
+
+traninvert m51.more.polar
+   This inverts the transformation structure called POLAR in
+   the extension of the NDF called m51.
+
+Notes
+
+-  On completion, the destination structure for the
+transformation information equates to the current transformation
+global parameter.
+
+Related_Applications
+
+   KAPPA: TRANSFORMER, TRANJOIN, TRANMAKE, TRANTRACE;
+   CCDPACK: CCDEDIT, TRANLIST, TRANNDF.
+
+Authors
+
+MJC: Malcolm J. Currie (STARLINK)
+
+History
+
+ 1995 March 9 (MJC):
+    Original version.
+.endhelp

@@ -1,0 +1,8 @@
+in,f,a,,,,"NDF to have thresholds applied"
+out,f,a,,,,"NDF to hold data after application of thresholds"
+thrlo,r,a,,,,"Lower threshold cutoff"
+thrhi,r,a,,,,"Higher threshold cutoff"
+newlo,s,a,,,,"New value for pixels below lower threshold"
+newhi,s,a,,,,"New value for pixels above upper threshold"
+comp,s,h,"Data",,,"Array component to process"
+title,s,h,INDEF,,,"Title for output NDF"

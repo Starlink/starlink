@@ -1,0 +1,141 @@
+.help outset Starlink kappa
+.nf
+    Sets pixels outside a specified circle in a 2-d data array to a
+    specified value
+ 
+   A circle of a given centre and diameter within the 2-d data array
+   of the input IMAGE structure is specified.  The data array written
+   to the output IMAGE structure, is a copy of the input data array
+   except pixels outside the circle are set to a specified value.
+
+AUTHORS
+
+   Mark McCaughrean UoE (REVA::MJM)
+   Malcolm Currie  STARLINK (RAL::CUR)
+
+BUGS
+
+   None known.
+
+HISTORY
+
+   17-09-1985 : First implementation (REVA::MJM)
+   03-07-1986 : Tidied and more error checking (REVA::MJM)
+   1986 Aug 7 : Renamed algorithmic routine to OTSTSB, reordered
+                arguments (2nd to 7th). (RAL::CUR).
+   1986 Aug 29: Added arguments section to the prologue, nearly
+                conformed to Starlink standards (RAL::CUR).
+   1988 Mar 17: Referred to `array' rather than `image'
+                (RAL::CUR)
+   1988 May 31: More reporting of error context (RAL::CUR)
+   1989 Jun 13: Allow for processing primitive NDFs (RAL::CUR)
+   1989 Aug  8: Passed array dimensions as separate variables
+                to OTSTSB (RAL::CUR).
+   1990 Oct  9: x-y centre is co-ordinates rather than pixel
+                indices; added bad-value option for the replacement
+                value (RAL::CUR).
+   1991 Oct 25: Propagates AXIS, UNITS, LABEL, and HISTORY
+                (RAL::CUR).
+   1992 Feb 25: Limited processing of simple NDFs (RAL::CUR).
+   1992 Mar  3: Replaced AIF parameter-system calls by the extended
+                PAR library (RAL::CUR).
+
+PARAMETERS
+
+   INPIC  =  IMAGE( READ )
+       IMAGE structure containing the array to be modified
+   OUTPIC  =  IMAGE( WRITE )
+       Output IMAGE structure containing the modified array
+   OTITLE  =  CHARACTER( READ )
+       Title for the output IMAGE structure
+   XCENTRE  =  REAL( READ )
+       x co-ordinate of the centre of the circle to be used
+   YCENTRE  =  REAL( READ )
+       y co-ordinate of the centre of the circle to be used
+   DIAMETER  =  REAL( READ )
+       Diameter of the circle to be used
+   NEWVAL  =  REAL( READ )
+       Value to replace old values in the pixels outside the circle
+       If this is set to 'Bad' the magic-value is used.
+
+INPIC
+
+  position    1
+  keyword     'INPIC'
+  type        'IMAGE'
+  access      'READ'
+  vpath       'PROMPT'
+  ppath       'GLOBAL'
+  association '<-GLOBAL.DATA_ARRAY'
+  prompt      'Image to be modified'
+  help        'Name of IMAGE structure containing the 2-d data array 
+              to be modified'
+
+OUTPIC
+
+  position    2
+  keyword     'OUTPIC'
+  type        'IMAGE'
+  access      'WRITE'
+  vpath       'PROMPT'
+  association '->GLOBAL.DATA_ARRAY'
+  prompt      'Image after being modified'
+  help        'Name given to the IMAGE structure to hold the data 
+              array after being modified'
+
+OTITLE
+
+  position    3
+  keyword     'OTITLE'
+  type        '_CHAR'
+  vpath       'DEFAULT'
+  prompt      'Title for output image'
+  default     'KAPPA - Outset'
+  help        'Character string used as a title for the output IMAGE 
+              structure.'
+
+XCENTRE
+
+  position    4
+  keyword     'XCENTRE'
+  type        '_REAL'
+  vpath       'PROMPT'
+  ppath       'DYNAMIC'
+  prompt      'x co-ordinate of circle centre'
+  help        'Give the x co-ordinate of the centre of the circle to 
+              be used'
+
+YCENTRE
+
+  position    5
+  keyword     'YCENTRE'
+  type        '_REAL'
+  vpath       'PROMPT'
+  ppath       'DYNAMIC'
+  prompt      'y co-ordinate of circle centre'
+  help        'Give the y co-ordinate of the centre of the circle to 
+              be used'
+
+DIAMETER
+
+  position    6
+  keyword     'DIAMETER'
+  type        '_REAL'
+  vpath       'PROMPT'
+  ppath       'DYNAMIC'
+  prompt      'Diameter of circle'
+  help        'Give the diameter in pixels of the circle to be used'
+
+NEWVAL
+
+  position    7
+  keyword     'NEWVAL'
+  type        '_LITERAL'
+  vpath       'PROMPT'
+  ppath       'DEFAULT'
+  prompt      'New value for pixels outside circle'
+  default     0.0
+  help        'This will become the new value for all pixels outside 
+              the circle.  BAD gives the bad-pixel value.'
+
+.endhelp

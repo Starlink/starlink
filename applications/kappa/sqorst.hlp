@@ -1,0 +1,125 @@
+.help sqorst Starlink kappa
+.nf
+    Squashes or stretches a 2-d data array in either or both axes
+ 
+   The output data array, written to an IMAGE structure, is produced
+   by either squashing or stretching the 2-d data array, in the input
+   IMAGE structure, in either or both of the x and y axes. The
+   dimensions of the output data array, are given by the user. The
+   stretching is performed by keeping the edge pixels fixed and
+   calculating the intervening pixels by bi-linear interpolation. The
+   squashing is performed by calculating each pixel in the output
+   array as the mean of the corresponding pixels in the input array.
+ 
+   The magic-value method is used for processing bad data.
+
+AUTHORS
+
+   Dave Baines (ROE::ASOC5)
+   Malcolm Currie  STARLINK (RAL)
+
+BUGS
+
+   None known.
+
+HISTORY
+
+   18/08/1983 : Original version                (ROE::ASOC5)
+   19/02/1984 : Modified to use TITLE component (ROE::ASOC5)
+   1986 Aug 8 : Standardised prologue formatting. Added status check
+                on entry (RAL::CUR).
+   1986 Sep 1 : Added arguments section to prologue, renamed APPG0I
+                routine to AIF_GET0I and tidied (RAL::CUR).
+   1987 Oct 16: Reordered tidying and extra status checks
+                (RAL::CUR)
+   1988 Feb 19: Extra error report (RAL::CUR).
+   1988 Mar 16: Substituted AIF_ANTMP to annul workspace
+                (RAL::CUR).
+   1988 Mar 17: Referred to `array' rather than `image'
+                (RAL::CUR)
+   1988 Jun 20: More reporting of error context (RAL::CUR)
+   1989 Jun 13: Allow for processing primitive NDFs (RAL::CUR)
+   1989 Aug  7: Passed array dimensions as separate variables
+                to STRX, STRY, SQSHX and SQSHY (RAL::CUR).
+   1989 Dec 21: Workspace managed by AIF_TEMP (RAL::CUR).
+   1990 Jun 25: Fixed bug that occurred when an output dimension is
+                the same as the input (RAL::CUR).
+   1991 Oct 25: Propagates UNITS, LABEL, and HISTORY (RAL::CUR).
+   1992 Feb 25: Limited processing of simple NDFs (RAL::CUR).
+   1992 Mar  3: Replaced AIF parameter-system calls by the extended
+                PAR library (RAL::CUR).
+
+PARAMETERS
+
+   INPIC  = IMAGE( READ )
+       IMAGE structure containing the 2-d data array to be squashed
+         or stretched.
+   XDIM   = INTEGER( READ )
+       First dimension for the output 2-d data array.
+   YDIM   = INTEGER( READ )
+       Second dimension for the output 2-d data array.
+   OUTPIC = IMAGE( WRITE )
+       IMAGE structure to contain the 2-d data array after being
+         squashed or stretched.
+   OTITLE = CHAR( READ )
+       Will form the TITLE component for the output IMAGE structure.
+
+INPIC
+
+  position    1
+  keyword     'INPIC'
+  type        'IMAGE'
+  access      'READ'
+  vpath       'PROMPT'
+  ppath       'GLOBAL'
+  association '<-GLOBAL.DATA_ARRAY'
+  prompt      'Input image'
+  help        'Name of the IMAGE structure containing the 2-d data 
+              array to be modified'
+
+XDIM
+
+  position    2
+  keyword     'XDIM'
+  type        '_INTEGER'
+  vpath       'PROMPT'
+  ppath       'CURRENT,DYNAMIC'
+  prompt      'First dimension of output image'
+  help        'First scaling factor is this value divided by the 
+              first dimension of the input data array'
+
+YDIM
+
+  position    3
+  keyword     'YDIM'
+  type        '_INTEGER'
+  vpath       'PROMPT'
+  ppath       'CURRENT,DYNAMIC'
+  prompt      'Second dimension of output image'
+  help        'Second scaling factor is this value divided by the 
+              second dimension of the input data array'
+
+OUTPIC
+
+  position    4
+  keyword     'OUTPIC'
+  type        'IMAGE'
+  access      'WRITE'
+  vpath       'PROMPT'
+  association '->GLOBAL.DATA_ARRAY'
+  prompt      'Output image'
+  help        'Name of the IMAGE structure to contain the data array 
+              after modification'
+
+OTITLE
+
+  position    5
+  keyword     'OTITLE'
+  type        '_CHAR'
+  vpath       'DEFAULT'
+  prompt      'Title for output image'
+  default     'KAPPA - Sqorst'
+  help        'Character string to be used as a title for the output 
+              IMAGE structure'
+
+.endhelp

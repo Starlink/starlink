@@ -1,0 +1,188 @@
+.help slide Starlink kappa
+.nf
+    Realigns a 2-d data array via an x,y shift.
+ 
+   The data array in the input IMAGE structure is shifted, in either
+   or both of the x and y axes, to produce the new array, in the
+   output image structure. The shifts in x and y are either input as
+   absolute x and y shifts by the user, or alternatively, are
+   calculated from the co-ordinates of two points provided by the
+   user. These are a fiducial point, with co-ordinates %FIDX, %FIDY,
+   and a standard object, with co-ordinates %OBJX, %OBJY. The shift
+   in x is then given by %FIDX - %OBJX and the shift in y is given by
+   %FIDY - %OBJY. The output data array is padded with zeros in the
+   regions not occupied by the shifted input array.  Fractional
+   shifts are computed by bilinear interpolation.
+ 
+   The magic-value method is used for processing bad data.
+
+AUTHORS
+
+   Dave Baines (ROE::ASOC5)
+   Mark McCaughrean (REVA::MJM)
+   Malcolm Currie  STARLINK (RAL::CUR)
+
+BUGS
+
+   None known.
+
+HISTORY
+
+   18/08/1983 : Original version                   (ROE::ASOC5)
+   19/02/1984 : Modified to use new SHIFTS routine (ROE::ASOC5)
+   03/06/1985 : Modified to allow Relative or Absolute
+              : shifting                           (REVA::MJM)
+   1986 Aug 8 : Standardised prologue formatting. Added status check
+                on entry (RAL::CUR).
+   1986 Sep 1 : Added arguments section to the prologue and tidied
+                (RAL::CUR).
+   1987 Oct 16: Reordered tidying and extra status checks
+                (RAL::CUR)
+   1988 Mar 16: Substituted AIF_ANTMP to annul workspace
+                (RAL::CUR).
+   1988 Mar 17: Referred to `array' rather than `image'
+                (RAL::CUR)
+   1988 May 31: More reporting of error context (RAL::CUR)
+   1989 Jun 13: Allow for processing primitive NDFs (RAL::CUR)
+   1989 Aug  7: Passed array dimensions as separate variables
+                to SHIFTX and SHIFTY (RAL::CUR).
+   1989 Dec 21: Workspace managed by AIF_TEMP (RAL::CUR).
+   1991 Oct 25: Propagates UNITS, LABEL, and HISTORY (RAL::CUR).
+   1992 Feb 25: Limited processing of simple NDFs (RAL::CUR).
+   1992 Mar  3: Replaced AIF parameter-system calls by the extended
+                PAR library (RAL::CUR).
+   1995 Oct 29: Renamed from SHIFT to avoid name clash with the
+                C-shell shift built-in function (mjc@star.rl.ac.uk).
+
+PARAMETERS
+
+   INPIC  = IMAGE( READ )
+       IMAGE structure containing the 2-d data array to be shifted.
+   STYPE  = CHAR( READ )
+       The sort of shift is to be used. The choice is 'Relative'
+         or 'Absolute'.
+   ABSX   = REAL( READ )
+       Absolute x shift in pixels. (Absolute shift)
+   ABSY   = REAL( READ )
+       Absolute y shift in pixels. (Absolute shift)
+   FIDX   = REAL( READ )
+       X-co-ordinate of the fiducial point. (Relative shift)
+   FIDY   = REAL( READ )
+       Y-co-ordinate of the fiducial point. (Relative shift)
+   OBJX   = REAL( READ )
+       X-co-ordinate of the standard object. (Relative shift)
+   OBJY   = REAL( READ )
+       Y-co-ordinate of the standard object. (Relative shift)
+   OUTPIC = IMAGE( WRITE )
+       IMAGE structure to contain the 2-d data array after being
+         shifted.
+   OTITLE = CHAR( READ )
+       Will be used as the TITLE component for the output IMAGE
+         structure.
+
+INPIC
+
+  position    1
+  keyword     'INPIC'
+  type        'IMAGE'
+  access      'READ'
+  vpath       'PROMPT'
+  ppath       'GLOBAL'
+  association '<-GLOBAL.DATA_ARRAY'
+  prompt      'Image to be shifted'
+  help        'Name of the IMAGE structure containing the 2-d data 
+              array to be shifted.'
+
+OUTPIC
+
+  position    2
+  keyword     'OUTPIC'
+  type        'IMAGE'
+  access      'WRITE'
+  vpath       'PROMPT'
+  association '->GLOBAL.DATA_ARRAY'
+  prompt      'Image after being shifted'
+  help        'Name given to the IMAGE structure to hold the data 
+              array after being shifted.'
+
+OTITLE
+
+  position    3
+  keyword     'OTITLE'
+  type        '_CHAR'
+  vpath       'DEFAULT'
+  prompt      'Title for output image'
+  default     'KAPPA - Slide'
+  help        'Character string used as a title for the output IMAGE 
+              structure.'
+
+STYPE
+
+  position    4
+  keyword     'STYPE'
+  type        '_CHAR'
+  vpath       'PROMPT'
+  ppath       'DYNAMIC'
+  prompt      'Shift type: Relative or Absolute'
+  help        'Shift relative a to known fiducial point or an absolute
+              shift to be applied to the data array.'
+ #in          'Relative', 'Absolute'
+
+ABSX
+
+  position    5
+  keyword     'ABSX'
+  type        '_REAL'
+  vpath       'PROMPT'
+  prompt      'Absolute shift in x'
+  help        'Give the absolute shift of the data array in pixels in 
+              the x direction.'
+
+ABSY
+
+  position    6
+  keyword     'ABSY'
+  type        '_REAL'
+  vpath       'PROMPT'
+  prompt      'Absolute shift in y'
+  help        'Give the absolute shift of the data array in pixels in 
+              the y direction.'
+
+FIDX
+
+  position    7
+  keyword     'FIDX'
+  type        '_REAL'
+  vpath       'PROMPT'
+  prompt      'x position of fiducial point'
+  help        'The x position of where you would like the standard 
+              object to be.'
+
+FIDY
+
+  position    8
+  keyword     'FIDY'
+  type        '_REAL'
+  vpath       'PROMPT'
+  prompt      'y position of fiducial point'
+  help        'The y position of where you would like the standard 
+              object to be.'
+
+OBJX
+
+  position    9
+  keyword     'OBJX'
+  type        '_REAL'
+  vpath       'PROMPT'
+  prompt      'x position of standard object'
+  help        'The x position of where the standard object is.'
+
+OBJY
+
+  position    10
+  keyword     'OBJY'
+  type        '_REAL'
+  vpath       'PROMPT'
+  prompt      'y position of standard object'
+  help        'The y position of where the standard object is.'
+.endhelp

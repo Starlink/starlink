@@ -1,0 +1,45 @@
+.help lutcont Starlink kappa
+.nf
+Loads a lookup table to give the display the appearance of a
+contour plot.
+
+Usage:
+
+   lutcont
+
+Description:
+
+   This procedure loads a lookup table that gives a contour-plot
+   appearance into the current image-display device.  The lookup table
+   is mainly black with a set of white stripes and it is loaded with
+   linear scaling.
+
+Parameters
+
+For information on individual parameters, select from the list below:
+
+DEVICE
+
+DEVICE = DEVICE (Read)
+   Name of the image display whose colour table is to be changed.
+   [Current image-display device]
+
+Notes
+
+This is a procedure that calls LUTABLE.  Therefore, the parameter
+cannot be specified on the command line.  You will only be
+prompted for the DEVICE parameter if the current image display
+is not suitable or not available.
+
+Authors
+
+MJC: Malcolm J. Currie (STARLINK)
+
+History
+
+ 1990 Apr 16 (MJC):
+    Original version.
+
+ 1991 April 24 (MJC):
+    NDF version of LUTABLE and extended the prologue.
+.endhelp

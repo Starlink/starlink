@@ -1,0 +1,170 @@
+.help snapshot Starlink kappa
+.nf
+Dumps an image-display memory to a graphics hardcopy and
+optionally to an NDF.
+
+Usage:
+
+   snapshot odevice [out] [whole] [scale] [negativ] [title] [planes]
+
+Description:
+
+   This routine captures the data in the memory of an image-display
+   device, and writes these data to a different GKS device.  For
+   example, the contents of an X-windows memory might be captured and
+   sent to a PostScript laser printer.
+
+   Various options are available:
+      o you may choose to capture a whole or part of what is visible
+        on the screen, or the entire contents of the memory.  For the
+        former you adjust a rubber-band region until the desired
+        area is enclosed. Instructions for controlling the
+        rubber-band are given at run time.
+      o A title may be included in the output.
+      o The array may be output to an NDF.
+
+Parameters
+
+For information on individual parameters, select from the list below:
+
+DEVICE
+
+DEVICE = DEVICE (Read)
+   Input image-display device.  [Current image-display device]
+
+NEGATIVE
+
+NEGATIVE = _LOGICAL (Read)
+   If TRUE, the output hardcopy is a negative version of what is
+   stored in the image display.  On some output devices a
+   constant dark background can give a non-uniform result, and
+   so a negative representation is the default. [TRUE]
+
+ODEVICE
+
+ODEVICE = DEVICE (Read)
+   Name of the output device.  The suggested default is the
+   graphics device last used in SNAPSHOT, and if there is not one,
+   the suggested default is the global current graphics device.
+   The device must be in the GNS category MATRIX_PRINTER, and
+   have at least 24 greyscale intensities.
+
+OUT
+
+OUT = NDF (Write)
+   Name given to the output NDF data structure used to store the
+   contents of the image-display memory.  If it is null (!) no
+   NDF will be created. [!]
+
+PLANES
+
+PLANES() = _INTEGER (Read)
+   The numbers of the image memory planes not be output.  All
+   unspecified planes become visible.  If PLANES is null (!), all
+   memory planes will be used to form the snapshot.  The base
+   memory is 0 and overlays are numbered consecutively from 1.
+   The value must be between 0 and the number of image memories
+   minus 1.  For an Ikon the only overlay plane is 1.  [!]
+
+SCALE
+
+SCALE = _REAL (Read)
+   Scale factor for output.  Unity gives the largest possible
+   output, but it takes longest to compute and print (goes as the
+   square of the scale factor).  On the other hand unity does
+   provide maximum resolution. SCALE must be between 0 and 1.
+   [0.707]
+
+TITLE
+
+TITLE = LITERAL (Read)
+   Title of the plot and the output NDF.  There is only space on
+   the plot for about 25 characters in the title.  If it is null
+   (!) no title will be plotted, and the title in the output NDF
+   becomes "KAPPA - Snapshot". [!]
+
+WHOLE
+
+WHOLE = _LOGICAL (Read)
+   If TRUE, the whole image-display memory is recorded, otherwise
+   a selected region of what is visible on the screen is plotted.
+   Dumping the whole memory can require considerable disc space
+   for work arrays and the output NDF. [FALSE]
+
+Examples
+
+snapshot whole odevice=canon_l
+   This will dump the whole of the current image display's
+   memories to the canon_l device.  The plot will occupy half
+   of the maximum area available on the device, i.e. half of
+   root 2 magnification.
+
+snapshot scale=1.0 \
+   This will capture a whole or part of what is visible on the
+   screen of the current image display, and dump it to the current
+   snapshot device at the largest magnification.
+
+snapshot postscript views device=xw whole
+   This dumps the whole of the xw device's memories to the
+   postscript device, and also to a NDF called views.  The
+   magnification is a half of root 2.
+
+snapshot ps_l device=xw whole planes=0 title="Hardcopy Base"
+   This dumps the whole of the xw device's base memory to the
+   ps_l device.  The plot is entitled "Hardcopy Base".  The
+   entire output plot occupies half of the maximum area available
+   on the device.
+
+Notes
+
+-  The whole of the screen and the whole of the memory may be
+different, for example, the image may have been zoomed or panned.
+
+-  Files are not spooled to laserprinters.  They must be printed
+outside this application.
+
+Related_Applications
+
+   KAPPA: DISPLAY, GREYPLOT.
+
+Authors
+
+JM: Jo Murray (STARLINK)
+
+MJC: Malcolm J. Currie (STARLINK)
+
+History
+
+ August 1989 (JM):
+    Original version.
+
+ March  1990 (JM):
+    Option added to write snapshot array to an NDF.
+
+ 1990 May 2 (MJC):
+    Fixed bugs in obtaining depth capability, obtaining a null
+    title and ordering of closedown operations, corrected and
+    expanded the ADAM Parameters section, added a default title
+    for the output NDF and tidied.
+
+ 1991 March 18 (MJC):
+    Region of interest added to obtain subsets.
+
+ 1991 July 31 (MJC):
+    No longer redefines colours of SGS pens to predefined state if
+    workstation has dynamic colour representation, now there is
+    palette control.
+
+ 1992 March 26 (MJC):
+    Replaced AIF parameter-system calls by the extended PAR
+    library.
+
+ 1992 October 12 (MJC):
+    Added calls to make the memories visible on the Ikon.  To
+    enable planes not to be output, a new parameter, PLANES, has
+    been added.
+
+Implementation_Status
+
+   No origin information is passed to the output NDF.
+.endhelp

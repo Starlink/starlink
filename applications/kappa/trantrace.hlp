@@ -1,0 +1,150 @@
+.help trantrace Starlink kappa
+.nf
+Lists the contents of a transformation structure.
+
+Usage:
+
+   trantrace transform [logfile]
+
+Description:
+
+   This application reports or write to a text file the contents of
+   a TRANSFORM structure.  Items listed include:
+
+      - the structure's name;
+
+      - the version of the TRANSFORM software used to write the
+        structure;
+
+      - the number of input and output variables for the nett
+      transformation and for each transformation where the structure
+      contains more than one;
+
+      - the classification of the forward and inverse mappings; and
+
+      - for each transformation its precision, comment, forward and
+      inverse functions.
+
+Parameters
+
+For information on individual parameters, select from the list below:
+
+CLASSFOR
+
+CLASSFOR = LITERAL (Write)
+   A comma-separated list of classifications that describe the
+   properties of the forward mapping of the transformation.  The
+   possible values in the list are:
+      "Linear"       --- linear and preserves straight lines,
+      "Independent"  --- preserves the independence of the axes,
+      "Diagonal"     --- preserves the axes themselves,
+      "Isotropic"    --- preserves angles and shapes,
+      "Positive_det" --- a component of reflection is absent,
+      "Negative_det" --- a component of reflection is present,
+      "Constant_det" --- the scale factor is constant,
+      "Unit_det"     --- areas (or volumes etc.) are preserved.
+
+   See SUN/61 Appendix B for more details of transformation
+   classification and a table of the classifications of common
+   mappings.
+
+CLASSINV
+
+CLASSINV = LITERAL (Write)
+   A comma-separated list of classifications that describe the
+   properties of the inverse mapping of the transformation.  See
+   parameter CLASSFOR for further details.
+
+COMMENT
+
+COMMENT = LITERAL (Write)
+   The comment string associated with the transformation.  A
+   "-->" symbol, if present, indicates the forward
+   transformation.
+
+FORWARD
+
+FORWARD = LITERAL (Write)
+   The expression that defines the last forward mapping of the
+   transformation.
+
+INVERSE
+
+INVERSE = LITERAL (Write)
+   The expression that defines the last inverse mapping of the
+   transformation.
+
+LOGFILE
+
+LOGFILE = FILENAME (Write)
+   The name of the text file to store a list of the
+   transformation structure.  If it is null (!) the list of the
+   transformation structure is reported directly to you. [!]
+
+PREC
+
+PREC = LITERAL (Write)
+   The arithmetic precision of the transformation.  This may be
+   either "_REAL" for single precision, "_DOUBLE" for double
+   precision, or "_INTEGER" for integer precision.
+
+TRANSFORM
+
+TRANSFORM = TRN (Read)
+   The transformation structure to be listed.  This may be an HDS
+   container file, in which case the transformation structure is
+   assumed to be called TRANSFORM at the top level of the file;
+   or a path to the HDS object.  The suggested default is the
+   current transformation structure.
+
+VERSION
+
+VERSION = LITERAL (Write)
+   The version number of the TRANSFORM software used to write the
+   transformation structure.
+
+Examples
+
+trantrace rot45.transform
+   This reports the contents of the transformation structure
+   within the HDS container file rot45.sdf, component TRANSFORM.
+
+trantrace rot45
+   This has the same affect as the previous example.
+
+trantrace \
+   This reports the contents of the current TRANSFORM structure.
+
+trantrace jkt256.more.ccdpack.transform trn.lis
+   This lists to the text file trn.lis the contents of the
+   transformation structure located within the HDS file
+   jkt256.sdf, as component MORE.CCDPACK.TRANSFORM.
+
+trantrace stretch.limit nvin=(nvi) comment=(trncom)
+   This reports the contents of the transformation structure
+   within the HDS container file stretch.sdf, component LIMIT.
+   The number of input transformation variables is written to the
+   ICL variable called NVI, and the transformation comment is
+   stored in ICL variable TRNCOM.
+
+Notes
+
+-  Where a value is not optional but is absent, "<undefined>" appears
+in the listing.
+
+-  TRANTRACE attempts to compile the forward and inverse mappings
+to check that it is a TRANSFORM structure, and will exit with an
+error if both of these compilations fail.
+
+-  On completion, the current transformation global parameter
+takes the value of parameter TRANSFORM.
+
+Authors
+
+MJC: Malcolm J. Currie (STARLINK)
+
+History
+
+ 1993 June 18 (MJC):
+    Original version.
+.endhelp

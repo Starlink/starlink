@@ -1,0 +1,3 @@
+palnum,i,a,,,,"Number of the palette entry to be modified"
+colour,s,a,,,,"New palette colour"
+device,f,a,,,,"*! Image-display device"

@@ -1,0 +1,245 @@
+.help histogram Starlink kappa
+.nf
+Computes an histogram of an NDF's values.
+
+Usage:
+
+   histogram in numbin range [comp] [logfile]
+
+Description:
+
+   This application derives histogram information for an NDF array
+   between specified limits.  The histogram is reported, and may
+   optionally be written to a text log file, and/or plotted
+   graphically.
+
+Parameters
+
+For information on individual parameters, select from the list below:
+
+ABSLAB
+
+ABSLAB = LITERAL (Read)
+   Label for the plot's abscissa.  NCAR fancy founts may be
+   embedded when FONT = "NCAR".  Only the first 50 characters are
+   used.  If axis information is present in the NDF the suggested
+   default is the NDF's axis label followed by the units, in
+   parentheses.  If an error occurs obtaining the label or there
+   is no axis information, the label takes its current value,
+   which initially is "COMP values", where COMP is the value of
+   parameter COMP.  []
+
+CLEAR
+
+CLEAR = _LOGICAL (Read)
+   Determines if the graphics workstation is to be cleared before
+   producing the plot. [TRUE]
+
+COMP
+
+COMP = LITERAL (Read)
+   The name of the NDF array component to have its histogram
+   computed: "Data", "Error", "Quality" or "Variance" (where
+   "Error" is the alternative to "Variance" and causes the square
+   root of the variance values to be taken before computing the
+   statistics).  If "Quality" is specified, then the quality
+   values are treated as numerical values (in the range 0 to
+   255).  ["Data"]
+
+DEVICE
+
+DEVICE = DEVICE (Read)
+   The graphics workstation on which to produce the plot.  If it
+   is null, !, there will be no plot made.
+   [Current graphics device]
+
+FONT
+
+FONT = LITERAL (Read)
+   The fount to be used for the histogram plot.  It can be either
+   "NCAR" for the NCAR fancy characters and "GKS" for the standard
+   GKS san-serif fount.  The former is intended for hardcopy
+   publication-quality plots, since it is relatively slow; the
+   latter is intended for normal interactive graphics requiring
+   rapid plotting, and it is clearer on small plots.  The
+   suggested default is the current value. ["GKS"]
+
+IN
+
+IN = NDF (Read)
+   The NDF data structure to be analysed.
+
+LOGFILE
+
+LOGFILE = FILENAME (Write)
+   A text file into which the results should be logged. If a null
+   value is supplied (the default), then no logging of results
+   will take place. [!]
+
+MAJTIC
+
+MAJTIC( 2 ) = _REAL (Read)
+   The parameter controlling the numbers of major tick marks
+   for the x and y axes.  (Number used is between MAJTIC+2 and
+   5*MAJTIC/2+4.) [4.,4.]
+
+MINTIC
+
+MINTIC( 2 ) = _REAL (Read)
+   The number of minor tick marks between each major tick mark
+   for the x and y axes.  A negative value forces the graphics
+   package to compute appropriate values. [-1.,-1.]
+
+NUMBIN
+
+NUMBIN = _INTEGER (Read)
+   The number of histogram bins to be used. This must lie in the
+   range 2 to 10000.  The suggested default is the current value.
+
+ORDLAB
+
+ORDLAB = LITERAL (Read)
+   A label for the plot's ordinate axis.  NCAR fancy founts may be
+   embedded when FONT = "NCAR".  Only the first 50 characters are
+   used.  ["Number"]
+
+OUT
+
+OUT = NDF (Read)
+   Name of the NDF structure to save the histogram in its data
+   array.  If null, !, is entered the histogram NDF is not
+   created. [!]
+
+OUTTIC
+
+OUTTIC = _LOGICAL (Read)
+   TRUE if the axis tick marks are to appear on the outside of
+   the axes instead of inside. [FALSE]
+
+PLTITL
+
+PLTITL = LITERAL (Read)
+   A title for the histogram plot, in which NCAR fancy founts may
+   be embedded.  The default is to use the NDF's title if present
+   and no error occurs, otherwise the current value becomes the
+   suggested default.  This is initially "Histogram".  Only the
+   first 50 characters are used.  []
+
+PXSIZE
+
+PXSIZE = _REAL (Read)
+   The length (x axis) of the plot in metres. [Maximum that can
+   fit in the current picture whilst preserving square pixels]
+
+PYSIZE
+
+PYSIZE = _REAL (Read)
+   The length (y axis) of the plot in metres. [Maximum that can
+   fit in the current picture whilst preserving square pixels]
+
+RANGE
+
+RANGE( 2 ) = _DOUBLE (Write)
+   The range of values for which the histogram is to be computed.
+   A null value (!) selects the minimum and maximum array values.
+   If RANGE is specified on the command line, the extreme values
+   are not calculated and reported.  The suggested defaults are
+   the current values, or ! if these do not exist.
+
+THICK
+
+THICK = _REAL (Read)
+   The thickness of the axes and annotations in the histogram
+   plots, where 1.0 is the normal thickness.  Currently,
+   this is only available on a few devices.  It must take a value
+   in the range 0.5--5.0. [1.0]
+
+TITLE
+
+TITLE = LITERAL (Read)
+   Title for the histogram NDF.  ["KAPPA - Histogram"]
+
+XLOG
+
+XLOG = _LOGICAL (Read)
+   TRUE if the plot abscissa is to be logarithmic.  It is
+   unlikely that you would want to do this.  By default, the
+   abscissa is linear. [FALSE]
+
+YLOG
+
+YLOG = _LOGICAL (Read)
+   TRUE if the plot ordinate is to be logarithmic.  By default,
+   the ordinate is linear.  [FALSE]
+
+Examples
+
+histogram image 100 ! device=!
+   Computes and reports the histogram for the data array in the
+   NDF called image.  The histogram has 100 bins and spans the
+   full range of data values.
+
+histogram ndf=spectrum comp=variance range=[100,200] numbin=20
+   Computes and reports the histogram for the variance array in
+   the NDF called spectrum.  The histogram has 20 bins and spans
+   the values between 100 and 200.  A plot is made to the current
+   graphics device.
+
+histogram cube(3,4,) 10 ! out=c3_4_hist device=!
+   Computes and reports the histogram for the z-vector at (x,y)
+   element (3,4) of the data array in the 3-dimensional NDF called
+   cube.  The histogram has 10 bins and spans the full range of
+   data values.  The histogram is written to a one-dimensional
+   NDF called c3_4_hist.
+
+histogram cube numbin=32 ! device=xwindows
+   Computes and reports the histogram for the data array in
+   the NDF called cube.  The histogram has 32 bins and spans the
+   full range of data values.  A plot of the histogram is made to
+   the XWINDOWS device.
+
+histogram cube numbin=32 ! device=xwindows ylog pltitl="Taurus 2"
+   As in the previous example except the logarithm of the number
+   in each histogram bin is plotted, and the plot title is
+   "Taurus 2".
+
+histogram halley(~200,~300) range=[-1000,1000] logfile=hist.dat \
+   Computes the histogram for the central 200 by 300 elements of
+   the data array in the NDF called halley, and writes the
+   results to a logfile called hist.dat.  The histogram uses the
+   current number of bins, and includes data values between -1000
+   and 1000.  A plot appears on the current graphics device.
+
+Related_Applications
+
+   KAPPA: HISTAT, INSPECT, MSTATS, NUMB, STATS; Figaro: HIST, ISTAT.
+
+Authors
+
+MJC: Malcolm J. Currie (STARLINK)
+
+History
+
+ 1992 March 9 (MJC):
+    Original NDF version.
+
+ 1995 May 1 (MJC):
+    Made examples and usage lowercase.  Moved position of COMP
+    parameter.  Added Related Applications.  Shortened the section
+    getting the range values.  Used PSX for workspace.  Fixed a
+    bug in RANGE reporting.  Allowed for Error as a COMP option.
+    Added PXSIZE and PYSIZE parameters.
+
+Implementation_Status
+
+   -  This routine correctly processes the AXIS, DATA, VARIANCE,
+   QUALITY, LABEL, TITLE, UNITS, and HISTORY components of the input
+   NDF.
+
+   -  Processing of bad pixels and automatic quality masking are
+   supported.
+
+   -  All non-complex numeric data types can be handled.
+
+   -  Any number of NDF dimensions is supported.
+.endhelp

@@ -1,0 +1,49 @@
+.help picframe Starlink kappa
+.nf
+Selects the last FRAME picture from the graphics database.
+
+Usage:
+
+   picframe
+
+Description:
+
+   This command selects the last-created FRAME picture.  Subsequent
+   plotting for the chosen device will be in this new current
+   picture.  By default the chosen device is the current one.
+
+   This command is a synonym for "piclist name=frame picnum=last".
+
+
+Parameters
+
+For information on individual parameters, select from the list below:
+
+DEVICE
+
+DEVICE = DEVICE (Read)
+   The graphics workstation. [The current graphics device]
+
+Examples
+
+picframe
+   This selects the last FRAME picture for the current graphics
+   device.
+
+picframe device=xw
+   This selects the last FRAME picture for the xw device.
+
+Related_Applications
+
+   KAPPA: PICBASE, PICCUR, PICDATA, PICLAST, PICLIST, PICSEL.
+
+Authors
+
+MJC: Malcolm J. Currie (STARLINK)
+
+History
+
+ 1995 August 23 (MJC):
+    Original version.
+
+.endhelp

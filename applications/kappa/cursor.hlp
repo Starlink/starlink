@@ -1,0 +1,315 @@
+.help cursor Starlink kappa
+.nf
+Reports the co-ordinates of points selected using the cursor.
+
+Usage:
+
+   cursor [mode] [name] [logfile] [device]
+
+Description:
+
+   This reads co-ordinates from the chosen graphics device and
+   displays them on your terminal.  There is commentary that
+   describes which buttons should be pressed to select or erase a
+   point, or exit.  Optionally, the co-ordinates may be stored in a
+   text file.
+
+   For each selected cursor position its Cartesian co-ordinates are
+   reported.  If the co-ordinate frame changes between selected
+   positions the comment, name and any label associated with the new
+   graphics-database picture are appended to the message.
+
+   There are three modes of operation to define which co-ordinate
+   system/picture is to be used.  These are ANCHOR, CURRENT and
+   DYNAMIC.  See the parameter MODE for details.
+
+   In ANCHOR or DYNAMIC modes there is an option to select only
+   pictures of a certain name in the database.  This is most useful
+   when DATA pictures are covered by transparent FRAME pictures.
+
+Parameters
+
+For information on individual parameters, select from the list below:
+
+COLOUR
+
+COLOUR = LITERAL (Read)
+   The colour in which to draw any graphics specified by
+   parameter PLOT.  The options are described below.
+
+     "MAX"          - The maximum colour index used for the
+                      display of the image.
+     "MIN"          - The minimum colour index used for the
+                      display of the image.
+     An integer     - The actual colour index.  It is constrained
+                      between 0 and the maximum colour index
+                      available on the device.
+     A named colour - Uses the named colour from the palette, and
+                      if it is not present, the nearest colour
+                      from the palette is selected.
+
+   If the colour is to remain unaltered as the lookup table is
+   manipulated choose an integer between 0 and 15, or a named
+   colour.  The suggested default is the current value.
+
+   This parameter is ignored on window overlays, where the
+   overlay colour is used.  (Use the PALENTRY command to change
+   this colour.)  An overlay has the advantage that the crosses
+   or polygon can be erased using OVCLEAR once this task is
+   completed.  The parameter is also ignored for character-cell
+   terminals.
+   [The current value, but equals "Green" if there is no current
+   value.]
+
+COSYS
+
+COSYS = LITERAL (Read)
+   The co-ordinate system to be used.  This can be either "World"
+   or "Data".  "World" makes the world co-ordinates of the cursor
+   position to be reported.  World co-ordinates that relate to a
+   location in a data array will be in array pixels.  If COSYS =
+   "Data" the graphics database is examined for data co-ordinates
+   stored via a transformation.  Data co-ordinates are arbitrary
+   but most often they will be a linear or logarithmic
+   transformation of the world co-ordinates.  For example, the x
+   co-ordinate of a spectrum would be given in pixels if COSYS =
+   "World", but if COSYS = "Data" the x co-ordinate could be in
+   wavelength units, such as Angstroms.  If the database does not
+   have a world-to-data transformation for a given picture, the
+   value of this parameter is irrelevant and world co-ordinates
+   will be reported for that picture. [Current co-ordinate system]
+
+DEVICE
+
+DEVICE = DEVICE (Read)
+   The graphics workstation.  This device must support cursor
+   interaction, and belong to one of the following classes:
+   TERMINAL, IMAGE_DISPLAY, IMAGE_OVERLAY, WINDOW, and
+   WINDOW_OVERLAY.  [The current graphics device]
+
+DOUBLE
+
+DOUBLE = _LOGICAL (Read)
+   If true co-ordinates will be reported, written to the output
+   parameters, and stored in the text file in double precision,
+   otherwise single precision is used.  [FALSE]
+
+LOGFILE
+
+LOGFILE = FILENAME (Write)
+   The name of the text file in which the co-ordinates of points
+   selected with the cursor may be stored.  A null string (!)
+   means that no file is created.  The suggested default is the
+   current value. [!]
+
+MODE
+
+MODE = LITERAL (Read)
+   The mode defining the co-ordinate system/picture in which
+   cursor positions are returned.  There are three options.
+
+      "Current" selects the current picture in the AGI
+      database and reports the position of a point selected by
+      the cursor.  If the point does not lie within the picture,
+      an extrapolated position is reported.
+
+      "Dynamic" selects the topmost picture in the AGI
+      database which encompasses that position selected.  Thus
+      the second and subsequent cursor hits may result in the
+      selection of a new picture.
+
+      "Anchor" lets the first cursor hit select a
+      picture which remains current throughout the running of
+      the application.  If subsequent cursor hits fall outside
+      the extent of this picture, a position extrapolated from
+      the picture's co-ordinate system is reported.
+   ["Dynamic"]
+
+NAME
+
+NAME = LITERAL (Read)
+   Only pictures of this name are to be selected.  A null string
+   (!) or blanks means that pictures of all names may be selected.
+   NAME is ignored when MODE = "Current".
+   [!]
+
+NUMBER
+
+NUMBER = _DOUBLE (Write)
+   The number of points selected with the cursor and stored in
+   output parameters XP and YP.
+
+PLOT
+
+PLOT = LITERAL (Read)
+   The type of graphics to be used to mark the position of each
+   selected point.  PLOT can take any of the following values:
+
+     "Cross" - Each vertex is marked by a cross.
+
+     "None"  - No graphics are produced.
+
+     "Poly"  - Causes each point to be joined by a straight line
+               to the previous point.  The last point is joined
+               to the first point.
+
+   The initial default is "None", then subsequently it is the
+   current value.  []
+
+XC
+
+XC = _DOUBLE (Write)
+   The x co-ordinate of the last point selected with the cursor.
+   This is only written when parameter NUMBER is positive.
+
+XP
+
+XP() = _DOUBLE (Write)
+   The x co-ordinates of the points selected with the cursor.
+   The number of values is given by parameter NUMBER, and
+   therefore this parameter is only written when parameter NUMBER
+   is positive.
+
+YC
+
+YC = _DOUBLE (Write)
+   The y co-ordinate of the last point selected with the cursor.
+   This is only written when parameter NUMBER is positive.
+
+YP
+
+YP() = _DOUBLE (Write)
+   The y co-ordinates of the points selected with the cursor.
+   The number of values is given by parameter NUMBER, and
+   therefore this parameter is only written when parameter NUMBER
+   is positive.
+
+Examples
+
+cursor
+   This obtains the co-ordinates of any visible picture for the
+   current graphics device by use of the cursor.
+
+cursor colour=blue plot=cross
+   As above except that the points are marked with blue crosses.
+
+cursor xc=(xpos) yc=(ypos)
+   As the first example.  The x and y co-ordinates of the
+   last-selected point is written to ICL variables xpos and ypos.
+
+cursor cosys=w
+   This obtains the world co-ordinates of any visible picture for
+   the current graphics device by use of the cursor.
+
+cursor current device=graphon
+   This obtains the co-ordinates of any visible picture in the
+   reference frame of the current picture of the Graphon device.
+
+cursor logfile=stars.dat name=data
+   This obtains the co-ordinates of any visible DATA picture
+   for the current graphics device.  The x-y co-ordinates are
+   stored in the text file called stars.dat.
+
+Notes
+
+-  Should an error occur trying to obtain the BASE picture for
+ANCHOR or DYNAMIC modes, the current picture is unchanged.
+
+-  In DYNAMIC and ANCHOR modes, if the cursor is situated at a
+point where there are no pictures of the selected name, the
+co-ordinates in the BASE picture are reported.
+
+-  The maximum number of points is 500.
+
+-  Points can be removed (the instructions state how), starting
+from the most-recent one.  For an overlay device, the plotted
+points or polygon lines disappear.  For other devices, the
+erroneous points and lines are plotted with pen 4 of the palette.
+
+Related_Applications
+
+   KAPPA: CURSOR, INSPECT, PICCUR; Figaro: ICUR, IGCUR.
+
+Authors
+
+JM: Jo Murray  (STARLINK)
+
+MJC: Malcolm J. Currie  (STARLINK)
+
+History
+
+ 22-MAY-1989 (JM):
+    Original version.
+
+ 1989 Jun 28 (MJC):
+    Added error checking, some tidying, fixed several bugs, only
+    reports the picture name and comment when it changes.
+
+ 1989 Jul 10 (MJC):
+    Fixed "SGS zone too small" bug by reordering the code so that
+    the MODE is obtained before the device; extended the prologue.
+
+ 1989 Oct 19 (MJC):
+    Fixed the synchronisation for terminals, and added commentary
+    for both terminals and image displays.
+
+ 1989 Oct 24 (MJC):
+    Added the log file and name options, and redesigned the
+    description.
+
+ 1989 Nov 10 (MJC):
+    Calls a subroutine to prepare the cursor.
+
+ 1990 Jan 9 (MJC):
+    Corrected SGS status.
+
+ 1990 Apr 20:
+    Added output of the current picture's label, if it exists.
+
+ 1991 February 8 (MJC):
+    Added AGI context control, and tidied unwanted picture
+    identifiers.
+
+ 1991 March 19 (MJC):
+    Converted to SST prologue.
+
+ 1991 April 9 (MJC):
+    Added AGI begin-and-end block.  Obtains data co-ordinates if
+    present.
+
+ 1991 May 14 (MJC):
+    Added COSYS parameter.
+
+ 1992 January 29 (MJC):
+    Fixed bug in list of options for MODE.
+
+ 1992 February 19 (MJC):
+    AGI behaviour has changed, so call new AGI routine to test
+    whether or not the picture has changed between cursor
+    selections.
+
+ 1992 March 3 (MJC):
+    Replaced AIF parameter-system calls by the extended PAR
+    library.
+
+ 1993 May 24 (MJC):
+    Added XC and YC output parameters.
+
+ 1995 August 24 (MJC):
+    Added the COLOUR and PLOT parameters and example of their use.
+    No longer selects a new current picture (use PICCUR instead).
+    Made usage and examples lowercase.  Added Related Applications.
+
+ 1995 December 16 (MJC):
+    Added NUMBER, XP, and YP output parameters.  Allowed erasure
+    of previous point.
+
+ 1996 May 31 (MJC):
+    Improved and simplified the graphics, so the marker has a
+    uniform size, and plotting can occur outside the current
+    SGS picture in ANCHOR and CURRENT modes.
+
+ 1997 March 11 (MJC):
+    Fixed initialisation bug for parameter NUMBER, and hence XP and
+    YP.  Fixed bug where SGS pen was being set when PLOT="None".
+.endhelp

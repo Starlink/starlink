@@ -1,0 +1,3 @@
+device,f,a,,,,"*! Name of display device"
+plane,i,h,0,,,"Memory plane number"
+full,b,h,n,,,"Rotate the full colour table?"

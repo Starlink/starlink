@@ -1,0 +1,5 @@
+inpic,f,a,,,,"Input image"
+xdim,i,a,,,,"First dimension of output image"
+ydim,i,a,,,,"Second dimension of output image"
+outpic,f,a,,,,"Output image"
+otitle,s,h,"KAPPA - Sqorst",,,"Title for output image"

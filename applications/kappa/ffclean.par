@@ -1,0 +1,11 @@
+in,f,a,,,,"Give image to be cleaned"
+out,f,a,,,,"NDF to hold the cleaned image"
+clip,struct,a,,,,"Clipping levels"
+3.0 3.0 3.0
+box,struct,a,,,,"Smoothing box size"
+3 3
+thresh,r,h,INDEF,,,"Data-value limits"
+wlim,r,h,INDEF,,,"Weight limit for good output pixels"
+ilevel,i,h,2,,,"Interaction level"
+sigma,r,h,0.0,,,"Object to contain the RMS noise per pixel"
+title,s,h,INDEF,,,"Title for output NDF"

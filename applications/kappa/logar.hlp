@@ -1,0 +1,98 @@
+.help logar Starlink kappa
+.nf
+    Takes the logarithm of each pixel of a data array (specified
+    base)
+ 
+   This routine takes the logarithm to a specified base of each
+   pixel of a data array. The result goes into a new output data
+   array. Both data arrays are stored in the IMAGE format.
+ 
+   The magic-value method is used for processing bad data.
+
+AUTHORS
+
+   Mark McCaughrean UoE ( REVA::MJM )
+   Malcolm Currie  STARLINK (RAL::CUR)
+
+BUGS
+
+   None known.
+
+HISTORY
+
+   02-07-1986 : First implementation (REVA::MJM)
+   1986 Aug 7 : Renamed algorithm subroutine (LOGARR), changed new
+                2nd argument to total number of pixels. (RAL::CUR)
+   1986 Aug 29: Added argument section, generalised to vectors and
+                tidied (RAL::CUR).
+   1987 Oct 15: Reordered tidying and used CMP_SHAPE (RAL::CUR)
+   1988 Mar 17: Referred to `array' rather than `image'
+                (RAL::CUR)
+   1988 May 30: More reporting of error context (RAL::CUR)
+   1989 Jun 13: Allow for processing primitive NDFs (RAL::CUR)
+   1991 Oct 25: Propagates AXIS, LABEL, and HISTORY (RAL::CUR).
+   1992 Feb 25: Limited processing of simple NDFs (RAL::CUR).
+   1992 Mar  3: Replaced AIF parameter-system calls by the extended
+                PAR library (RAL::CUR).
+
+PARAMETERS
+
+   INPIC  =  IMAGE( READ )
+       Input IMAGE structure containing the data array
+   BASE  =  REAL( READ )
+       Base of logarithm to be taken of each input data array pixel
+   OUTPIC  =  IMAGE( WRITE )
+       Output IMAGE structure holding result of processed data
+   OTITLE  =  CHAR( READ )
+       Title string for the output IMAGE structure
+
+INPIC
+
+  position    1
+  keyword     'INPIC'
+  type        'IMAGE'
+  access      'READ'
+  vpath       'PROMPT'
+  ppath       'GLOBAL'
+  association '<-GLOBAL.DATA_ARRAY'
+  prompt      'Input image'
+  help        'Name of the IMAGE structure containing the input data 
+              array'
+
+BASE
+
+  position    2
+  keyword     'BASE'
+  type        '_REAL'
+  access      'READ'
+  vpath       'PROMPT'
+  ppath       'CURRENT,DYNAMIC,DEFAULT'
+  prompt      'Base'
+  default     2.718282
+  help        'Base of the logarithm to be taken of each input 
+              data-array pixel'
+
+OUTPIC
+
+  position    3
+  keyword     'OUTPIC'
+  type        'IMAGE'
+  access      'WRITE'
+  vpath       'PROMPT'
+  association '->GLOBAL.DATA_ARRAY'
+  prompt      'Output image'
+  help        'Name given to the IMAGE structure holding the data 
+              array resulting from taking logs'
+
+OTITLE
+
+  position    4
+  keyword     'OTITLE'
+  type        'LITERAL'
+  vpath       'DEFAULT'
+  prompt      'Title for output image'
+  default     'KAPPA - Logar'
+  help        'Character string used as a title for the output IMAGE 
+              structure.'
+
+.endhelp

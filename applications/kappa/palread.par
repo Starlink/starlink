@@ -1,0 +1,2 @@
+palette,f,a,,,,"NDF containing the palette of reserved colours"
+device,f,a,,,,"*! Image-display device"

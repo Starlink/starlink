@@ -1,0 +1,4 @@
+in,f,a,,,,"Input NDF data structure"
+scalar,r,a,,,,"Value to be subtracted"
+out,f,a,,,,"Output NDF"
+title,s,h,INDEF,,,"Title for output NDF"

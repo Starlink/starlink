@@ -1,0 +1,333 @@
+.help data_structures Starlink kappa
+.nf
+In an ideal world you would not need to know how your data are
+stored.  It would be transparent.  (The trendies call it object
+orientation.)  To some extent Starlink applications achieve that
+through standard, but extensible, data structures, and the ability
+to apparently operate on other formats through the so-called
+`on-the-fly conversion' (see topic "Automatic_format_conversion"
+and SUN/55).  However, for historical reasons there are a number of
+data formats in Starlink software, and at the moment KAPPA is no
+exception in that it has two formats.
+
+The main one is official standard data format for Starlink
+applications---the NDF (Extensible N-dimensional Data Format,
+SUN/33).  The second is the historical and flawed IMAGE structure,
+which is gradually being phased out, and only affects twenty-one
+commands (the functionality of which can mostly be achieved with
+other applications).  Both formats, though, use HDS which has
+numerous advantages, not least that _HDS files are portable between
+operating systems_; both have file extension .sdf.
+
+The NDF is more detailed and has been carefully designed to
+facilitate processing by both general applications like KAPPA and
+specialist packages.  It contains an n-dimensional data array that
+can store most astronomical data such as spectra, images and
+spectral-line data cubes.  The NDF may also contain information like
+a title, axis labels and units, error and quality arrays.  There are
+also places in the NDF, called extensions, to store any ancillary
+data associated with the data array, even other NDFs.
+
+The two formats and the meaning of their components are described in
+topics "NDF_format" and "IMAGE_format".   The former includes the
+commands for manipulating the components.  Suffice to say here that
+the IMAGE format is more or less a degenerate form of the NDF, and
+so both formats can be used in parallel throughout KAPPA; those
+applications using the IMAGE format will have restricted
+functionality, for example limited axis and quality processing, an
+inability to handle NDF sections (cf. topic "NDF_sections") and
+cannot use the `on-the-fly' data-conversion scheme (cf. topic
+"Automatic_Format_Conversion").
+
+Both formats permit arrays to have seven dimensions, but some
+applications only handle one-dimensional and/or two-dimensional data
+arrays.  The data and variance arrays are not constrained to a
+single data type.  Valid types are the HDS numeric primitive types,
+see topic "HDS_Data_Types"
+
+Many applications are generic, that is they can work on all or some
+of these data types directly.  This makes these applications faster,
+since there is no need to make a copy of the data converted to the
+type supported by the application.  If an application is not generic
+it only processes _REAL data.   Look in the "Implementation_Status"
+in the help or the reference manual.  If none is given you can
+assume that processing will occur in _REAL.
+
+In KAPPA the elements of the data array are often called pixels,
+even if the NDF is not two-dimensional.
+
+
+Looking_at_the_Data_Structures
+
+
+You can look at a summary of the NDF or IMAGE structure using the
+task NDFTRACE, and obtain the values of NDF extension components
+with the
+
+     % setext option=get
+
+command.  HDSTRACE (SUN/102) can be used to look at array values
+and extensions.
+
+
+Editing_the_Data_Structures
+
+
+There are facilities for editing HDS components, though these should
+be used with care, lest you invalidate the file.  For instance, if
+you were to erase the DATA_ARRAY component of an NDF, the file would
+no longer be regarded as an NDF by applications software.
+
+In KAPPA, ERASE will let you remove any component from within
+an HDS container file, but you have to know the full path to the
+component.  SETEXT has options to erase extensions and their
+contents, without needing to know how these are stored within the
+HDS file.  It also permits you to create and rename extension
+components, and assign new values to existing components.  There are
+a number of commands for manipulating FITS-header information stored
+in the NDF's FITS extension.  These are described in the topic
+"FITS_Airlock".
+
+Figaro offers some additional tasks (CREOBJ, DELOBJ, and RENOBJ) for
+editing HDS components.
+
+
+Native_Format
+
+
+Although HDS files are portable you are recommended to copy them to
+the host machine, and run application NATIVE on them for efficiency
+gains.  NATIVE converts the data to the native format of the machine
+on which you issue the command.  If you don't do this, every time
+you access the data in your NDF, say, this conversion process occurs.
+In the C-shell you can use a foreach construct to process several
+files.  The following converts all the HDS files in the current
+directory.
+
+     % foreach file (*.sdf)
+     > native $file:r
+     > echo Converted $file
+     > end
+
+The > is a prompt from the shell, which you don't type.
+
+
+NDF_format
+
+
+An NDF comprises a main data array plus a collection of objects
+drawn from a set of standard items and extensions (see SUN/33).
+Only the main data array must be present; all the other items are
+optional.
+
+$KAPPA_DIR/example.sdf is an NDF which contains all the standard 
+NDF components, except a FITS extension; it also has a FIGARO
+extension.  The structure of the file (as revealed by
+
+     % hdstrace $KAPPA_DIR/example
+
+is shown below.  The layout is
+
+     NAME(dimensions)    <TYPE>     VALUE(S)
+
+Note that scalar objects have no dimensions and that each level down
+the hierarchy is indented.
+
+   EXAMPLE  <NDF>
+
+      DATA_ARRAY(856)  <_REAL>       *,0.2284551,-2.040089,45.84504,56.47374,
+                                     ... 746.2602,820.8976,570.0729,*,449.574
+      TITLE          <_CHAR*30>      'HR6259 - AAT fibre data'
+      LABEL          <_CHAR*20>      'Flux'
+      UNITS          <_CHAR*20>      'Counts/s'
+      QUALITY        <QUALITY>       {structure}
+         BADBITS        <_UBYTE>        1
+         QUALITY(856)   <_UBYTE>        1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,
+                                     ... 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0
+
+      VARIANCE(856)  <_REAL>         2.1,0.1713413,1.5301,34.38378,42.35531,
+                                     ... 615.6732,427.5547,353.9127,337.1805
+      AXIS(1)        <AXIS>          {structure}
+
+      Contents of AXIS(1)
+         DATA_ARRAY(856)  <_REAL>       3847.142,3847.672,3848.201,3848.731,
+                                        ... 4298.309,4298.838,4299.368,4299.897
+         LABEL          <_CHAR*20>      'Wavelength'
+         UNITS          <_CHAR*20>      'Angstroms'
+
+      HISTORY        <HISTORY>       {structure}
+         CREATED        <_CHAR*30>      '1990-DEC-12 08:21:02.324'
+         CURRENT_RECORD  <_INTEGER>     3
+         RECORDS(10)    <HIST_REC>      {array of structures}
+
+         Contents of RECORDS(1)
+            TEXT           <_CHAR*40>      'Extracted spectrum from fibre data.'
+            DATE           <_CHAR*25>      '1990-DEC-19 08:43:03.08'
+            COMMAND        <_CHAR*30>      'FIGARO V2.4 FINDSP command'
+
+
+      MORE           <EXT>           {structure}
+         FIGARO         <EXT>           {structure}
+            TIME           <_REAL>         1275
+            SECZ           <_REAL>         2.13
+
+   End of Trace.
+
+Of course, this is only an example format.  There are various ways
+of representing some of the components.  These _variants_ are
+described in SGP/38, but not all are currently supported.
+
+The components are considered in detail below.  The names (in bold
+typeface) are significant as they are used by the NDF access
+routines to identify the components. 
+
+
+DATA
+
+The main data array is the only component which must be present in
+an NDF.  In the case of example.sdf, the data component is a
+1-dimensional array of real type with 856 elements.  It can have up
+to seven dimensions.  It is particularly referenced via parameter
+names IN, OUT, and NDF.
+
+
+TITLE
+
+The character string "HR6259 - AAT fibre data" describes the contents
+of the NDF.  The NDF's TITLE might be used as the title of a graph
+etc.  It may be set with task SETTITLE.  Applications that create an
+NDF assign a TITLE to the NDF via a parameter, called TITLE unless
+the application generates several NDFs.
+
+
+LABEL
+
+The character string "Flux" describes the quantity represented in
+the NDF's main data array.  The LABEL is intended for use on the
+axis of graphs etc.  It may be set using the task SETLABEL.
+
+
+UNITS
+
+This character string describes the physical units of the quantity
+stored in the main data array, in this case, "Counts/s".  It may be
+set via the command SETUNITS.  
+
+
+QUALITY
+
+This component is used to indicate the quality of each element in
+the main data array, for example whether each pixel is vignetted
+or not.  The quality structure contains a quality array and a
+BADBITS value, both of which must be of type _UBYTE.  The quality
+array has the same shape and size as the main data array and is
+used in conjunction with the BADBITS value to decide the quality of
+a pixel in the main data array.  In example.sdf the BADBITS
+component has value 1.  This means that a value of 1 in the quality
+array indicates a bad pixel in the main data array, whereas any
+other value indicates that the associated pixel is good.  (Note
+that the pixel is bad if the bit-wise comparison QUALITY "AND"
+BADBITS is non-zero).  The meanings of the QUALITY bits are
+arbitrary.  See the command SETBB.  To enter new quality
+information, use the SETQUAL command of IRAS90.
+
+
+VARIANCE
+
+The variance array is the same shape and size as the main data array
+and contains the errors associated with the individual data values.
+These are stored as variance estimates for each pixel.  VARIANCE may
+be set with the SETVAR command.
+
+
+AXIS
+
+The AXIS structure may contain axis information for any dimension
+of the NDF's main array.  In this case, the main data array is only
+1-dimensional, therefore only the AXIS(1) structure is present.
+This structure contains the actual axis data array of pixel
+centres, and also label and units information.  KAPPA uses the
+label and units for axis annotations.  Not shown in this example
+are optional array components for storing pixel widths and the
+variance of the axis centres.  All axes or none must be present.
+Use SETAXIS to set the values of an AXIS array component; AXLABEL
+and AXUNITS to set an axis LABEL or UNITS component; and SETNORM
+to set an axis normalisation flag.
+
+
+HISTORY
+
+This component provides a record of the processing history of the
+NDF.  Only the first of three records is shown for example.sdf.
+This indicates that the spectrum was extracted from fibre data
+using the Figaro FINDSP command on 1990 December 19.  The history
+recording level is set by task HISSET.  This task also allows you
+to switch off history recording or delete the history records.
+HISLIST lists an NDF's history.  You can add commentary with HISCOM.
+
+
+EXTENSIONs
+
+The purpose of extensions is to store non-standard items.  These
+auxiliary data could be information about the original observing
+setup, such as the airmass during the observation or the
+temperature of the detector; they may be calibration data or results
+produced during processing of the data array, e.g. spectral-line
+fits.  example.sdf began life as a Figaro file.  It was converted
+to an NDF using the command DST2NDF (see SUN/55).  It contains
+values for the airmass and exposure time associated with the
+observations.  These are stored in the FIGARO extension, and the
+intention is that the Figaro applications which use these values
+will know where to find them.  Task SETEXT lets the contents of
+extensions be listed, created, deleted, renamed and assigned new
+values.
+
+One extension that is used by KAPPA is the FITS extension.  This
+holds the FITS headers as an array of 80-character elements,
+i.e. one FITS card image per array element.  You can extract the
+values of ancillary items from the FITS extension to a non-standard
+extension via FITSIMP.  Use FITSEXP to do the reverse operation.
+The extension can be listed via the command FITSLIST.  FITSEDIT
+allows you to edit the headers prior to export of the dataset to
+another format such as FITS or IRAF.
+
+
+IMAGE_format
+
+
+The IMAGE format as used by some of KAPPA is a simple HDS structure,
+comprising a floating-point data array, a character title, and the
+maximum and minimum data values.  It is variant of the original
+Wright-Giddings IMAGE structure.  There are others is use that
+contain more items.  An example structure is shown schematically
+below using the HDSTRACE (SUN/102) notation; see topic "NDF_format".
+
+   HORSEHEAD  <IMAGE>
+
+      DATA_ARRAY(384,512)  <_REAL>   100.5,102.6,110.1,109.8,105.3,107.6,
+                                     ... 123.1,117.3,119,120.5,127.3,108.4
+      TITLE          <_CHAR*72>      'KAPPA - Flip'
+      DATA_MIN       <_REAL>         28.513
+      DATA_MAX       <_REAL>         255.94
+
+   End of Trace.
+
+Currently, the DATA_ARRAY may have up to seven dimensions.  IMAGE
+structures are associated with parameters like INPIC and OUTPIC.
+The TITLE object of new IMAGE structures takes the value of the
+parameter OTITLE.  DATA_MIN and DATA_MAX are now ignored in KAPPA.
+
+The IMAGE format is not too dissimilar from a primitive NDF with
+no extensions.  Indeed if it did not have DATA_MAX and DATA_MIN it
+would be a bona fide NDF.  Thus applications that handle the IMAGE 
+format can follow the rules of SGP/38 and process it like an NDF.
+In effect this means that all extensions are propagated to output
+files, and a quality array is propagated where the processing does
+not invalidate its values.  The IMAGE applications also handle most
+simple NDFs correctly (those where the data array is an array of
+numbers at the second level of the hierarchical structure).  This
+similarity in formats enables NDF and IMAGE applications to work in
+co-operation, and the conversion within KAPPA can be undertaken
+piecemeal.  Note that the primitive variant is no longer the norm
+for NDFs, since for example, it does not support origin information.
+.endhelp

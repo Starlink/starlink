@@ -1,0 +1,203 @@
+.help ndf_sections Starlink kappa
+.nf
+ You will frequently want to examine or process only a portion of
+ your dataset, be it to focus on a given object in an image, or a
+ single spectrum between nominated wavelengths, or a plane of a
+ cube.  You could use NDFCOPY or MANIC in some circumstances to
+ make a new NDF containing the required data, but this would be
+ inconvenient as you would need more disc space, and to invent and
+ remember a new filename.  In addition, MANIC currently does not
+ fully support the NDF, and so you could lose axis information, for
+ example.  You will be pleased to learn that there is a succinct and
+ powerful alternative that obviates the need to create a new
+ file---the NDF section.  The application just processes a
+ `rectangular' subset, or section, of the NDF that you nominate.
+ Certainly, it requires you to learn a little syntax, but after you
+ use it a few times it will seem cheap at the price for the
+ advantages it offers.  Please note however, that sections
+ cannot be given to an IMAGE-format application. 
+
+ An NDF section is defined by specifying the bounds of the portion
+ of the NDF to be processed immediately following the name of the
+ NDF.  You can do this in any place where an NDF name alone would
+ suffice, for example, on the command line or in response to a
+ prompt or as a default in an interface file.  The syntax is a
+ series of subscripts within parentheses and may be given in several
+ ways.  Here is a simple example.
+
+      ICL> stats cluster(101:200,51:150)
+
+ This would derive statistics of a 100-by-100-pixel region starting
+ at pixel indices (101,51) in the NDF called cluster. 
+ Alternatively, ranges of axis co-ordinates may be given instead of
+ pixel indices.  Besides giving lower and upper bounds as above, you
+ may specify a centre and extent.  Sections are not limited to
+ subsets---supersets are allowed.  See the subtopic below for more
+ details of these features.
+
+ If you do want to make a new NDF from a portion of an existing one,
+ you should use the command NDFCOPY.  An NDF's shape may be changed
+ in situ by SETBOUND.
+
+ ******************************************************************
+ *  Note if you supply an NDF section on a C-shell command line,  *
+ *  you must escape the parentheses.  For example,                *
+ *                                                                *
+ *     % stats cluster"(101:200,51:150)"                          *
+ *     % stats cluster\(101:200,51:150\)                          *
+ *                                                                *
+ *  are both equivalent to the earlier example.                   *
+ ******************************************************************
+
+
+Specifying_Lower_and_Upper_Bounds
+
+
+ The subscript expression appended to an NDF name to specify a
+ section may be given as the lower and upper bounds in each
+ dimension, as follows
+
+                      NAME( a:b, c:d, ... )
+
+ where `a:b', `c:d', (etc.) specify the lower and upper bounds.  The
+ bounds specified need not necessarily lie within the actual bounds
+ of the NDF, because bad pixels will be supplied in the usual way,
+ if required, to pad out the NDF's array components whenever they
+ are accessed.  However, none of the lower bounds should exceed the
+ corresponding upper bound. 
+
+ Omitting any of the bounds from the subscript expression will cause
+ the appropriate (lower or upper) bound of the NDF to be used
+ instead. If you also omit the separating `:', then the lower and
+ upper bounds of the section will both be set to the same value, so
+ that a single pixel will be selected for that dimension.  Omitting
+ the bounds entirely for a dimension (but still retaining the comma)
+ will cause the entire extent of that dimension to be used. Thus, 
+
+                            IMAGE(,64)
+
+ could be used to specify row 64 of a 2-dimensional image, while:
+
+                       CUBE( 1, 257:, 100 )
+
+ would specify column 1, pixels 257 onwards, selected from plane
+ number 100 of a 3-dimensional `data cube', forming a
+ one-dimensional section.
+
+
+Specifying_Centre_and_Extent
+
+
+ An alternative form for the subscript expression involves
+ specifying the centre and extent of the region required along each
+ dimension, as follows
+
+                       NAME( p~q, r~s, ... )
+
+ where `p~q', `r~s', etc. specify the centre and extent. Thus, 
+
+                        NAME(100~11,200~5)
+
+ would refer to an 11-by-5-pixel region of an image centred on pixel
+ (100, 200).
+
+ If the value before the delimiting `~' (tilde) is omitted, it will
+ default to the index of the central pixel in that dimension
+ (rounded downwards if there are an even number of pixels).  If the
+ value following the `~' is omitted, it will default to the number
+ of pixels in that dimension. Thus, 
+
+                        IMAGE( ~100, ~100)
+
+ could be used to refer to a 100-by-100-pixel region located
+ centrally within an image, while 
+
+                         IMAGE( 10~, 20~)
+
+ would specify a section which is the same size as the original
+ image, but displaced so that it is centred on pixel (10,20). 
+
+
+Using_Axis_Co-ordinates_to_Specify_Sections
+
+
+ A further variation is that numerical values in subscript
+ expressions may be specified either as integers, in which case they
+ refer to pixel indices, or as floating-point numbers, in which case
+ they refer to axis or data co-ordinates (for a description of data
+ co-ordinates, see topic "Co-ordinate_systems").  Here, a
+ floating-point number is one containing a decimal point and/or an
+ exponent. Double precision arithmetic is used to process these
+ values, but either double- or single-precision notation may be used
+ when supplying them. Both linear and non-linear axis co-ordinates
+ are supported, the values supplied being automatically converted
+ into the corresponding pixel indices before use.  For instance
+
+                    SPECTRUM(6500.0:7250.0)
+
+ could be used to select the appropriate region of a spectrum
+ calibrated in Angstroms, while
+
+                    SPECTRUM(6000.0~500.0)
+
+ would select a region of the spectrum approximately from 5750 to 
+ 6250.0 Angstroms (the exact extent depending the values of the axis
+ co-ordinates), and
+
+                      SPECTRUM(5500.0~21)
+
+ would select a 21-pixel-wide region of the spectrum centred on
+ 5500.0 Angstroms. 
+
+ Command NDFTRACE will show whether or not an NDF has axis
+ co-ordinates, and if so, it reports their extents.
+
+
+
+Changing_Dimensionality
+
+
+ The number of dimensions given when specifying an NDF section need
+ not necessarily correspond with the actual number of NDF
+ dimensions, although usually it will do so. 
+
+ If you specify fewer dimensions than there are NDF dimensions, then
+ any unspecified bounds will be set to (1:1) for the purposes of
+ identifying the pixels to which the section should refer.
+ Conversely, if extra dimensions are given, then the shape of the
+ NDF will be padded with extra bounds set to (1:1) in order to match
+ the number of dimensions.  In all cases, the resulting section will
+ have the number of dimensions you have actually specified, the
+ padding serving only to identify the pixels to which the section
+ should refer. 
+
+ In KAPPA there are a number of applications that can only handle a
+ fixed number of dimensions (e.g. DISPLAY, LINPLOT).  NDF sections
+ permit such applications to have wider applicability since they can
+ operate on full NDFs of arbitrary dimensionality.  So for instance,
+ DISPLAY could show planes of a datacube.
+
+
+
+Mixing_Bounds_Expressions
+
+
+ Any of the features described in the other subtopics may be
+ combined when specifying an NDF section, the only restriction being
+ that when the shape of the resulting section is expressed in pixel
+ indices, the lower bound must not exceed the upper bound in any
+ dimension. Thus, all the following might be used as valid
+ specifications for NDF sections
+
+                        NDF(3.7)
+                        NDF(,5:)
+                        NDF(-77:13.8,,4)
+                        NDF(66~9,4:17)
+                        NDF(~5,6~)
+                        NDF(~,:)
+                        NDF(5500.0~150,)
+                        NDF(3.0~1.5,-78.06D-3:13.0545,,,,)
+
+ Many other combinations are obviously possible.
+
+.endhelp

@@ -1,0 +1,156 @@
+.help convolve Starlink kappa
+.nf
+Convolves a pair of 1- or 2-dimensional NDFs together
+
+Usage:
+
+   convolve in psf out xcentre ycentre
+
+Description:
+
+   This application smooths a 1- or 2-dimensional NDF using a Point-
+   Spread Function given by a second NDF.  The output NDF is
+   normalised to the same mean data value as the input NDF,
+   and is the same size as the input NDF.
+
+Parameters
+
+For information on individual parameters, select from the list below:
+
+IN
+
+IN = NDF (Read)
+   The input NDF containing the array to be smoothed.
+
+OUT
+
+OUT = NDF (Write)
+   The output NDF which is to contain the smoothed array.
+
+PSF
+
+PSF = NDF (Read)
+   An NDF holding the Point-Spread Function (PSF) with which the
+   input array is to be smoothed.  An error is reported if the
+   PSF contains any bad pixels.  The PSF can be centred anywhere
+   within the array (see parameters XCENTRE and YCENTRE).  A
+   constant background is removed from the PSF before use.  This
+   background level is equal to the minimum of the absolute value
+   in the four corner pixel values.  The PSF is assumed to be
+   zero beyond the bounds of the supplied NDF.
+
+TITLE
+
+TITLE = LITERAL (Read)
+   A title for the output NDF.  A null (!) value means using the
+   title of the input NDF. [!]
+
+WLIM
+
+WLIM = _REAL (Read)
+   If the input array contains bad pixels, then this parameter
+   may be used to determine the number of good pixels which must
+   be present within the smoothing box before a valid output
+   pixel is generated.  It can be used, for example, to prevent
+   output pixels from being generated in regions where there are
+   relatively few good pixels to contribute to the smoothed
+   result.
+
+   By default, a null (!) value is used for WLIM, which causes
+   the pattern of bad pixels to be propagated from the input
+   array to the output array unchanged.  In this case, smoothed
+   output values are only calculated for those pixels which are
+   not bad in the input array.
+
+   If a numerical value is given for WLIM, then it specifies the
+   minimum total weight associated with the good pixels in the
+   smoothing box required to generate a good output pixel
+   (weights for each pixel are defined by the normalised PSF).
+   If this specified minimum weight is not present, then a bad
+   output pixel will result, otherwise a smoothed output value
+   will be calculated.  The value of this parameter should lie
+   between 0.0 and 1.0.  A value of 0.0 will result in a good
+   output pixel being created even if only one good input pixel
+   contributes to it.  A value of 1.0 will result in a good output
+   pixel being created only if all the input pixels which
+   contribute to it are good. [!]
+
+XCENTRE
+
+XCENTRE = _INTEGER (Read)
+   The x pixel index (column number) of the centre of the PSF
+   within the supplied PSF array.  The suggested default is the
+   centre of the PSF array.  (This is how the PSF command would
+   generate the array.)
+
+YCENTRE
+
+YCENTRE = _INTEGER (Read)
+   The y pixel index (line number) of the centre of the PSF
+   within the supplied PSF array.  The suggested default is the
+   centre of the PSF array.  (This is how the PSF command would
+   generate the array.)
+
+Examples
+
+convolve ccdframe iraspsf ccdlores 50 50
+   The image in the NDF called ccdframe is convolved using the
+   PSF in NDF iraspsf to create the smoothed image ccdlores.  The
+   centre of the PSF image in iraspsf is at pixel indices
+   (50,50).  Any bad pixels in the input image are propagated to
+   the output.
+
+convolve ccdframe iraspsf ccdlores 50 50 wlim=1.0
+   As above, but good output values are only created for pixels
+   which have no contributions from bad input pixels.
+
+convolve ccdframe iraspsf ccdlores \
+   As in the first example except the centre of the PSF is located
+   at the centre of the PSF array.
+
+Notes
+
+-  The algorithm used is based on the multiplication of the
+Fourier transforms of the input array and PSF array.
+
+-  A PSF can be created using the PSF command or MATHS if the
+PSF is an analytic function.
+
+Related_Applications
+
+   KAPPA: BLOCK, FFCLEAN, GAUSMOOTH, MATHS, MEDIAN, PSF; Figaro:
+   ICONV3, ISMOOTH, IXSMOOTH, MEDFILT.
+
+Authors
+
+RAHM: Rhys Morris (STARLINK, University of Wales, Cardiff)
+
+DSB: David Berry (STARLINK)
+
+MJC: Malcolm J. Currie (STARLINK)
+
+History
+
+ 12-MAY-1992 (RAHM):
+    Original version.
+
+ 10-JAN-1995 (DSB):
+    Major changes for inclusion in KAPPA.
+
+ 1995 March 17 (MJC):
+    Improvements to the documentation including remarks about
+    suggested defaults for XCENTRE and YCENTRE, and a related
+    example, and a list of related applications.
+
+Implementation_Status
+
+   -  This routine correctly processes the AXIS, DATA, QUALITY,
+   VARIANCE, LABEL, TITLE, UNITS, and HISTORY components of the
+   input NDF and propagates all extensions.
+
+   -  Processing of bad pixels and automatic quality masking are
+   supported.
+
+   -  All non-complex numeric data types can be handled.  Arithmetic
+   is performed using double-precision floating point.
+.endhelp

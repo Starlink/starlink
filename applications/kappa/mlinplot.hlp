@@ -1,0 +1,430 @@
+.help mlinplot Starlink kappa
+.nf
+Draws a multi-line plot of a 2-d NDF's data values against their
+axis co-ordinates.
+
+Usage:
+
+   mlinplot ndf [comp] lnindx ylimit [pltitl] [abslab] [ordlab]
+     [device]
+
+Description:
+
+   This application takes one dimension of a 2-dimensional NDF as a
+   line index and draws a multi-line plot of the NDF's data values
+   against selected line indices from its other dimension.  Thus one
+   obvious application is the display of 2-dimensional spectra.
+
+   By default, this application selects the first dimension of the
+   NDF as the abscissa of the plot and the second dimension of the
+   NDF as the line index.  However, you can choose the opposite.
+   The vertical axis of the plot is the value of the data lines
+   after offsetting.  The horizontal axis of the plot is the axis
+   co-ordinates of the selected dimension of the NDF.  If the axis
+   co-ordinates are not defined in the NDF, the pixel co-ordinates
+   of that dimension will be used in the plot.  The plot is situated
+   within the current picture on the current graphics device.
+
+   To separate the data lines from each other, there is a choice of
+   three methods by which to offset the lines.  By default, each
+   line is annotated with its line index (the indices of the
+   dimension are selected for this purpose), and the offsets of the
+   lines display in a table.
+
+Parameters
+
+For information on individual parameters, select from the list below:
+
+ABSLAB
+
+ABSLAB = LITERAL (Read)
+   Label for the plot abscissa.  If axis information is present
+   the suggested default is the NDF's axis label followed by
+   the units, in parentheses.  If an error occurs obtaining the
+   label the default is "Pixel co-ordinates". []
+
+ABSAXS
+
+ABSAXS = _INTEGER (Read)
+   If it is 1, the first significant dimension of the input NDF
+   will be taken as the abscissa of the plot.  If it is 2, the
+   second significant dimension will be taken as the abscissa. [1]
+
+CLEAR
+
+CLEAR = _LOGICAL (Read)
+   TRUE if the current picture is to be cleared before the line
+   plot is drawn. [TRUE]
+
+COMP
+
+COMP = LITERAL (Read)
+   The NDF component to be plotted.  It may be "Data", "Quality",
+   "Variance", or "Error" (where "Error" is the alternative to
+   "Variance" and causes the square root of the variance values
+   to be displayed).  If "Quality" is specified, then the quality
+   values are treated as numerical values (in the range 0 to
+   255). ["Data"]
+
+DEVICE
+
+DEVICE = DEVICE (Read)
+   The plotting device. [Current graphics device]
+
+FONT
+
+FONT = LITERAL (Read)
+   The fount to be used for the line graphics.  It can be either
+   "NCAR" for the NCAR fancy characters and "GKS" for the standard
+   GKS san-serif fount.  The former is intended for hardcopy
+   publication-quality plots, since it is relatively slow; the
+   latter is intended for normal interactive graphics requiring
+   rapid plotting, and it is clearer on small plots.  The
+   suggested default is the current value. ["GKS"]
+
+KEY
+
+KEY = _LOGICAL (Read)
+   When KEY is TRUE a key of the line offsets will be drawn to
+   the right of the line plots.  A maximum of 50 values are shown.
+   When there are more than 50 lines displayed, the frequency of
+   the offsets in the table decreases.  KEY set to TRUE also
+   causes the line numbers to be drawn to the right of the main
+   plot and adjacent to their corresponding lines.  These are
+   present to identify the lines when LINLAB is FALSE or there are
+   more than 26 lines plotted.  They too decrease in frequency
+   when there is insufficient room to accommodate them all.  Their
+   size is controlled by parameter LBSIZE; they are plotted with
+   palette entry 3 when the chosen device supports at least four
+   colours.
+
+   When KEY is FALSE there will be no key or annotations, enabling
+   the plots to be seen at about 40 per cent greater resolution.
+   The value of KEY is ignored when parameter YLOG is TRUE.
+   [TRUE]
+
+LBSIZE
+
+LBSIZE = _REAL (Read)
+   The text width of the horizontal and vertical axis labels
+   given as a fraction of the smaller dimension of the display
+   window.  The value less than or equal to zero means using NCAR
+   default setting.  The title of the display will have the text
+   width of 1.2 * LBSIZE, and the numerical label of the axes
+   will have the text width of 0.8 * LBSIZE for mantissa, and
+   0.55 * LBSIZE for exponent.  The permitted range is 0.0--0.05. [0.025]
+
+LINLAB
+
+LINLAB = _LOGICAL (Read)
+   If LINLAB is TRUE, the lines in the plot will be interrupted
+   and be labelled by their line indices.  If LINLAB is FALSE
+   the lines will be solid.  There is a maximum of 26 annotated
+   lines.  When there are more lines than 26, all the lines are
+   solid regardless of the value of LINLAB.  The annotations are
+   plotted with palette entry 2 when using a device that supports
+   at least four colours. [TRUE]
+
+LNINDX
+
+LNINDX = LITERAL (Read)
+   A comma-separated number string specifies the line-index number
+   to be displayed.  It can take any of the following values:
+
+      "ALL" or "*": All lines
+
+      "xx,yy,zz": A list of line indices.
+
+      "xx-yy": Line indices between xx and yy inclusively.  When
+               xx is omitted the range begins from the lower bound
+               of the line dimension; when yy is omitted the range
+               ends with the maximum value it can take, that is
+               the upper bound of the line dimension or the
+               maximum number of lines this routine can plot.
+
+      Any reasonable combination of above values separated by
+      commas.  A maximum of 100 lines may be selected.  The
+      suggested default is the current value, initially "1-5".
+
+MAJTIC
+
+MAJTIC( 2 ) = _REAL (Read)
+   The parameter controlling the number of major tick marks for
+   the x and y axes. (Number used is between MAJTIC+2 and
+   5*MAJTIC / 2 + 4 ) [4.0, 4.0]
+
+MINTIC
+
+MINTIC( 2 ) = _REAL (Read)
+   The number of minor tick marks between each major tick mark for
+   the x and y axes.  A negative value forces the graphics package
+   to compute appropriate values.  The number of minor tick marks
+   per major tick is fixed ( 8 ) for a logarithmic axis.
+   [-1.0, -1.0]
+
+NDF
+
+NDF = NDF (Read)
+   NDF structure containing the array to be plotted.
+
+OFFSET
+
+OFFSET() = _REAL (Read)
+   When the offset method is specified as "Free", this parameter is
+   obtains the offset values for each locus of data values.
+
+ORDLAB
+
+ORDLAB = LITERAL (Read)
+   Label for the vertical axis of the plot.  The suggested default
+   is the NDF's label followed by the units, if present, in
+   parentheses.  If an error occurs obtaining the label the
+   default, is the component name followed by " values". []
+
+OUTTIC
+
+OUTTIC = _LOGICAL (Read)
+   TRUE if the axis tick marks are to appear on the outside of
+   the axes instead of inside.  By default, the tick marks are
+   drawn inside the plot region. [FALSE]
+
+PLTITL
+
+PLTITL = LITERAL (Read)
+   The title of the plot.  Up to about 40 characters can be
+   accommodated, and NCAR fancy founts may be embedded.  The
+   suggested default is the title of the NDF.  If an error occurs
+   obtaining the title, it is defaulted to "Lines plot".  []
+
+PXSIZE
+
+PXSIZE = _REAL (Read)
+   The horizontal size of the display in metres.  If a value less
+   than the default is requested, the display will appear at
+   the bottom left of the current device.  There is an upper
+   limit given by the x size of the current picture. [Maximum
+   that can fit in the current picture]
+
+PYSIZE
+
+PYSIZE = _REAL (Read)
+   The vertical size of the display in metres.  If a value less
+   than the default is requested, then the display will appear at
+   the bottom left of the current device.  There is an upper
+   limit given by the y size of the current picture. [Maximum
+   that can fit in the current picture]
+
+SPACE
+
+SPACE = LITERAL (Read)
+   The value of this parameter specifies the method by which
+   the data lines or loci in the plot are offset.  It can be
+   given the values:
+
+   "Free":
+     The offset of each data locus is specified by you.
+
+   "Constant":
+     The base lines of the curves are evenly spaced between upper
+     and lower limits of the plotting box.  The width of any line-
+     to-line strip is constant, which could result in the loci
+     becoming confused when the biases of some loci from their
+     base lines are so large that these loci lie totally in the
+     strips of other curves.
+
+   "Average":
+     This method uses an average data value for each locus and
+     produces offsets which ensure that these average data
+     values are equally spaced over the plotting area.  Any line-
+     to-line striping is thus hidden and the amount of overlap of
+     adjacent traces is minimised.
+
+   The input can be abbreviated to an unambiguous length and
+   is case insensitive. ["Average"]
+
+TICLN
+
+TICLN = _REAL (Read)
+   The length of the major tick marks given in the fraction of the
+   small dimension of the plot box.  Its value should be within
+   range 0.0--0.05.  A value outside this range means using NCAR
+   default.  The minor tick marks will have the length 0.66*TICLN.
+   [0.015]
+
+XLOG
+
+XLOG = _LOGICAL (Read)
+   TRUE if the abscissa is to be logarithmic.  It is unlikely that
+   you would want to do this. [FALSE]
+
+YLIMIT
+
+YLIMIT( 2 ) = _REAL (Read)
+   Used to get the lower and upper vertical display limits.  The
+   suggest default lower limit is the minimum value of the bottom
+   line in the display.  The default upper limit is such that
+   no line will ever overlap.
+
+YLOG
+
+YLOG = _LOGICAL (Read)
+   TRUE if the vertical axis is to be logarithmic.  This is useful
+   when the data have a wide dynamic range.  In order to
+   discriminate between the lines, the lines are plotted using
+   the first four pens in a cyclic fashion.  Note that no key is
+   drawn when YLOG is TRUE. [FALSE]
+
+Examples
+
+mlinplot rcw3_b1 reset \
+   Plot the first five lines of the 2-dimensional NDF file,
+   rcw3_b1, against its first significant dimension on the
+   current graphics device.  The data co-ordinate will be in
+   pixels if rcw3_b1 does not have an axis component.  The lines
+   are offset such that the averages of the lines are evenly
+   separated in the direction of the vertical axis.
+
+mlinplot rcw3_b1 lnindx="1,3,5,7-10" \
+   Plot the lines 1, 3, 5, 7, 8, 9 and 10 of the 2-dimensional
+   NDF file, rcw3_b1, against its first significant dimension on
+   the current graphics device.
+
+mlinplot rcw3_b1 lnindx=* \
+   Plot all lines of the 2-dimensional NDF file, rcw3_b1, against
+   its first significant dimension on the current graphics
+   device.
+
+mlinplot rcw3_b1 absaxs=2 lnindx="20-25,30,31" \
+   Plot lines 20, 21, 22, 23, 24, 25, 30 and 31 of the
+   2-dimensional NDF file, rcw3_b1, against its second
+   significant dimension on the current graphics device.
+
+mlinplot rcw3_b1 pltitl="CRDD rcw3_b1" \
+   Plot the currently selected lines of the 2-dimensional NDF
+   file, rcw3_b1, against its first significant dimension on the
+   current graphics device.  The plot has a title of "CRDD
+   rcw3_b1".
+
+mlinplot rcw3_b1(100.0:500.0,) ylimit=[0.0,1.0E-3] \
+   Plot the currently selected lines of the 2-dimensional NDF
+   file, rcw3_b1, against its first significant dimension within
+   co-ordinates 100.0 to 500.0.  The vertical display range is
+   from 0.0 to 1.0E-3.
+
+mlinplot rcw3_b1 space=constant device=ps_p \
+   Plot the currently selected lines of the 2-dimensional NDF
+   file, rcw3_b1, against its first significant dimension on the
+   ps_p device.  The base lines of them are evenly distributed in
+   the range of vertical axis.
+
+mlinplot rcw3_b1 space=free offset=[0.,2.0E-4,4.0E-4,6.0E-4,0.1] \
+   Plot the currently selected lines of the 2-dimensional NDF
+   file, rcw3_b1, against its first significant dimension.  The
+   base lines are set at 0.0 for the first line, 2.0E-4 for the
+   second, 4.0E-4 for the third, 6.0E-4 for the fourth and 0.1
+   for the fifth.
+
+Notes
+
+-  The application stores a number of pictures in the graphics
+database in the following order: a FRAME of the specified size
+containing the title, annotated axes, and line plot; and a DATA
+picture, which has world co-ordinates for linear axes measured in
+pixels along the x axis and data values along y, and their
+logarithms if a logarithmic axis is selected.  The DATA picture
+also has data co-ordinates stored; for a linear axis this
+requires that the NDF's axis units are not pixel co-ordinates;
+for a logarithmic axis the actual data co-ordinate or value is
+recorded.  If there is no NDF axis information and a logarithmic
+abscissa, the DATA co-ordinates are pixel co-ordinates.  The NDF
+associated with the plot is stored by reference with the DATA
+picture.  On exit the current database picture for the chosen
+device reverts to the input picture.
+
+-  In a logarithmic plot only positive data along each
+logarithmic axis can be displayed, therefore non-positive data
+are excluded.  A logarithmic axis will always increase from left
+to right, and from bottom to top.
+
+-  Bad pixels appear as gaps in the plot, and they do not affect
+the limits of the ordinate.  The same applies to zero or negative
+data values if the plot is to have a logarithmic ordinate.
+
+-  On colour graphics devices the actual colours used for
+different portions of the plot may be adjusted using the PAL*
+commands.
+
+Related_Applications
+
+   KAPPA: INSPECT, LINPLOT; Figaro: ESPLOT, IPLOTS, MSPLOT, SPLOT;
+   SPECDRE: SPECGRID.
+
+Authors
+
+WG: Wei Gong (IPMAF)
+
+MJC: Malcolm J. Currie (STARLINK)
+
+History
+
+ 11-APR-1991 (WG):
+    Original version.
+
+ 1991 June 20 (MJC):
+    Added world and data co-ordinate systems. Completed the Usage
+    Examples, Notes and Implementation Status in the prologue plus
+    corrected other typo's.  Renamed or replaced some of the
+    routine calls.  Default line numbers constructed here. Fixed a
+    couple of bugs.  Moved error reports to subroutines.
+
+ 1991 June 23 (WG):
+    Added parameters to control line labelling and text height.
+    Cycle the pen numbers for the lines in a logarithmic-ordinate
+    plot.
+
+ 1991 July 7 (MJC and WG):
+    Allowed for a larger number of lines.  Only draw offset lines
+    when there are less than 27 data lines.  Only draw the offset
+    table when there are less than 51 data lines.  Increased margin
+    between plot and table for longer line numbers.  NCAR settings
+    saved and restored.
+
+ 1991 July 31 (MJC):
+    No longer redefines colours of SGS pens to predefined state if
+    workstation has dynamic colour representation, now there is
+    palette control.
+
+ 1991 August 20 (MJC):
+    Added FONT parameter.
+
+ 1992 March 3 (MJC):
+    Replaced AIF parameter-system calls by the extended PAR
+    library.
+
+ 1992 April 23 (MJC):
+    Removed XLIMIT parameter.
+
+ 1992 November 30 (MJC):
+    Does not use non-monotonic axis centres.
+
+ 1993 February 12 (MJC):
+    For large numbers of lines the key line annotations and key
+    offsets are plotted at lower frequency.  Added KEY parameter.
+    Corrected omissions in the documentation.
+
+ 1995 October 19 (MJC):
+    Supports Error component.
+
+Implementation_Status
+
+   -  This routine correctly processes the AXIS, DATA, VARIANCE,
+   QUALITY, LABEL, TITLE, and UNITS components of the NDF.
+
+   -  Processing of bad pixels and automatic quality masking are
+   supported.
+
+   -  All non-complex numeric data types can be handled.  Only
+   single-precision floating-point data can be processed directly.
+   Other non-complex data types will undergo a type conversion
+   before the line plot is drawn.
+.endhelp

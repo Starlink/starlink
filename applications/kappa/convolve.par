@@ -1,0 +1,7 @@
+in,f,a,,,,"The input NDF"
+psf,f,a,,,,"NDF containing the convolution function or PSF"
+out,f,a,,,,"The output NDF"
+xcentre,i,a,,,,"X pixel index of the PSF centre within the PSF image"
+ycentre,i,a,,,,"Y pixel index of the PSF centre within the PSF image"
+title,s,h,INDEF,,,"Output title"
+wlim,r,h,INDEF,,,"Weight limit for good output pixels"

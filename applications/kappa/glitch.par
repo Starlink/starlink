@@ -1,0 +1,8 @@
+inpic,f,a,,,,"Image to be deglitched"
+outpic,f,a,,,,"Image after being deglitched"
+otitle,s,h,"KAPPA - Glitch",,,"Title for output image"
+where,s,a,,,,"Source of glitch positions"
+filename,f,a,glitch.lis,,,"Glitch list file name"
+xcoord,i,a,,,,"x pixel index of pixel to be replaced"
+ycoord,i,a,,,,"y pixel index of pixel to be replaced"
+again,b,a,y,,,"Another pixel ?"

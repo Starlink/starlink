@@ -1,0 +1,20 @@
+ndf,f,a,,,,"Data structure to analyse"
+comp,s,h,"DATA",,,"NDF array component to analyse"
+clip,r,h,INDEF,,,"Clipping levels"
+logfile,f,h,!,,,"File for logging results"
+maxcoord,struct,h,,,,""
+
+maximum,r,h,0.0D0,,,""
+maxpos,struct,h,,,,""
+
+mean,r,h,0.0D0,,,""
+mincoord,struct,h,,,,""
+
+minimum,r,h,0.0D0,,,""
+minpos,struct,h,,,,""
+
+numbad,i,h,0,,,""
+numgood,i,h,0,,,""
+numpix,i,h,0,,,""
+sigma,r,h,0.0D0,,,""
+total,r,h,0.0D0,,,""

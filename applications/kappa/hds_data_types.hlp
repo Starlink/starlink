@@ -1,0 +1,23 @@
+.help hds_data_types Starlink kappa
+.nf
+KAPPA applications can process NDFs in one or more of the following
+HDS data types. The correspondence between Fortran types and HDS
+data types is as follows: 
+
+   ------------------------------------------
+   | HDS Type | Number   | VAX FORTRAN Type |
+   |          | of bytes |                  |
+   ------------------------------------------
+   | _DOUBLE  |    8     | DOUBLE PRECISION |
+   | _INTEGER |    4     | INTEGER          |
+   | _REAL    |    8     | REAL             |
+   | _UBYTE   |    1     | BYTE             |
+   | _BYTE    |    1     | BYTE             |
+   | _UWORD   |    2     | INTEGER*2        |
+   | _WORD    |    2     | INTEGER*2        |
+   ------------------------------------------
+
+_UBYTE and _UWORD types are unsigned and so permit data ranges of
+0--255 and 0--65535 respectively.
+
+.endhelp

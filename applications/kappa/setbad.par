@@ -1,0 +1,5 @@
+ndf,f,a,,,,"Data structure"
+value,b,h,INDEF,,,"New bad-pixel flag value"
+data,b,h,y,,,"Process the data array?"
+modify,b,h,y,,,"Modify the NDF?"
+variance,b,h,y,,,"Process the variance array?"

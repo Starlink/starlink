@@ -1,0 +1,60 @@
+.help axconv Starlink kappa
+.nf
+Expands spaced axes in an NDF into the primitive form.
+
+Usage:
+
+   axconv ndf
+
+Description:
+
+   This application routine converts in situ an NDF's axis centres
+   in the `spaced' form into `simple' form.  Applications using the
+   NDF_ library, such as KAPPA, are not currently capable of
+   supporting spaced arrays, but there are packages that produce NDF
+   files with this form of axis, notably Asterix.  This application
+   provides a temporary method of allowing KAPPA et al. to handle
+   these NDF datasets.
+
+Parameters
+
+For information on individual parameters, select from the list below:
+
+NDF
+
+NDF = NDF (Read and Write)
+   The NDF to be modified.
+
+Examples
+
+axconv rosat256
+   This converts the spaced axes in the NDF called rosat256 into
+   simple form.
+
+Related_Applications
+
+   KAPPA: SETAXIS.
+
+Authors
+
+RDS: Richard Saxton  (STARLINK, Leicester)
+
+MJC: Malcolm J. Currie (STARLINK)
+
+History
+
+ 22-JUN-1992 (RDS):
+    Original version.
+
+ 1992 November 26 (MJC):
+    Brought up to KAPPA standards, and various improvements to the
+    prologue.
+
+ 1995 April 24 (MJC):
+    Made Usage lowercase.  Added Related Applications and an
+    example.  Guessed previous history entry.
+
+Implementation_Status
+
+   -  Only axes with a real data type are created.
+.endhelp

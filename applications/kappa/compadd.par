@@ -1,0 +1,8 @@
+in,f,a,,,,"NDF to be compressed"
+out,f,a,,,,"NDF after being compressed"
+compress,i,a,,,,"Compression factors"
+wlim,r,h,0.3,,,"Weight limit for good output pixels"
+axweight,b,h,n,,,"Compute weighted axis centres?"
+normal,b,h,y,,,"Normalise summations for bad values?"
+preserve,b,h,n,,,"Preserve input data type in output NDF?"
+title,s,h,INDEF,,,"Title for output NDF"

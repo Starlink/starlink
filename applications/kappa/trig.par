@@ -1,0 +1,4 @@
+inpic,f,a,,,,"Input to be operated on"
+trigfunc,s,a,,,,"Trig function to be used"
+outpic,f,a,,,,"Image for output data"
+otitle,s,h,"KAPPA - Trig",,,"Title for output image"

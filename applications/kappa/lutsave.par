@@ -1,0 +1,5 @@
+lut,f,a,,,,"Lookup-table NDF"
+device,f,a,,,,"*! Name of display device"
+plane,i,h,0,,,"Memory plane number?"
+full,b,h,n,,,"Is the full colour-table to be saved?"
+title,s,h,"KAPPA - Lutsave",,,"Title for output NDF"

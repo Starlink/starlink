@@ -1,0 +1,3 @@
+ndf,f,a,,,,"Data structure"
+label,s,a,,,,"New NDF axis label"
+dim,i,a,,,,"Dimension of axis to modify"

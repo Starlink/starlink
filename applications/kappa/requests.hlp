@@ -1,0 +1,16 @@
+.help requests Starlink kappa
+.nf
+KAPPA is continuing to be developed and additional applications
+functionality are envisaged, particularly a graphical-user interface
+for image processing.  If you wish to suggest new tasks or
+enhancements to existing ones please contact the author
+(mjc@star.rl.ac.uk).  Small jobs may be undertaken quite quickly.
+Requests involving substantial pieces of work need to gain the
+support of others to be included in Starlink's software plans, and
+so the best way to influence the priority given to KAPPA is to
+contact the chairman of the Image Processing Software Strategy
+Group. The Starlink World Wide Web pages will periodically contain
+news of plans and work in progress.  KAPPA also receives a high
+level of support, and bug reports are dealt with promptly. 
+
+.endhelp

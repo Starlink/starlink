@@ -1,0 +1,7 @@
+inpic,f,a,,,,"Image to be modified"
+outpic,f,a,,,,"Image after being modified"
+otitle,s,h,"KAPPA - Outset",,,"Title for output image"
+xcentre,r,a,,,,"x co-ordinate of circle centre"
+ycentre,r,a,,,,"y co-ordinate of circle centre"
+diameter,r,a,,,,"Diameter of circle"
+newval,s,a,"0.0",,,"New value for pixels outside circle"

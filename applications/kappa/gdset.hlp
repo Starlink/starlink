@@ -1,0 +1,41 @@
+.help gdset Starlink kappa
+.nf
+Selects a current graphics device.
+
+Usage:
+
+   gdset device
+
+Description:
+
+   This application selects a current graphics device.  This device
+   will be used for all applications requiring an image-display
+   until changed explicitly.
+
+Parameters
+
+For information on individual parameters, select from the list below:
+
+DEVICE
+
+DEVICE = DEVICE (Read)
+   The graphics device to become the current graphics device.
+
+Examples
+
+gdset xwindows
+   Makes the xwindows device the current graphics device.
+
+Authors
+
+MJC: Malcolm J. Currie  (STARLINK)
+
+History
+
+ 1991 June 27 (MJC):
+    Original version.
+
+ 1991 October 17 (MJC):
+    Added an AGI_ANNUL to ensure that the global parameter is
+    updated every invocation.
+.endhelp

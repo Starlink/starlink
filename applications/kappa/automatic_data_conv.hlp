@@ -1,0 +1,118 @@
+.help automatic_data_conv Starlink kappa
+.nf
+Although KAPPA tasks do not work directly with `foreign' formats,
+they can made to appear that they do.  What happens is that the
+format is converted `on-the-fly' to a scratch NDF, which is then
+processed by KAPPA.  If the processing creates an output NDF or
+modifies the scratch NDF, this may be back-converted `on-the-fly'
+too, and not necessarily to the original data format.  At the end,
+the scratch NDF is deleted.  So for example you could have an IRAF
+image file, use BLOCK to filter the array, and output the
+resultant array as a FITS file.
+
+We must first define the names of the recognised formats and a file
+extension associated with each format.  In practice you'll most
+likely do this with the convert command, which creates these
+definitions for many popular formats.  The file extension determines
+in which format a file is written.  There is an environment variable
+called NDF_FORMATS_IN which defines the allowed formats in a
+comma-separated list with the file extensions in parentheses.  Here
+is an example. 
+
+     % setenv NDF_FORMATS_IN 'FITS(.fit),IRAF(.imh),FIGARO(.dst)'
+
+Once defined it lets you run KAPPA tasks on FITS, IRAF, or Figaro
+files, like
+
+     % stats m51.fit
+     % stats m51.dst
+
+would compute the statistics of a FITS file m51.fit, and then a
+Figaro file m51.dst.
+
+The environment variable also defines a search order.  Had you entered
+
+     % stats m51
+
+STATS would first look for an NDF called m51 (stored in file
+m51.sdf).  If it could not locate that NDF, STATS would then look
+for a file called m51.fit, and then m51.imh, and finally m51.dst,
+stopping once a file was found and associating the appropriate
+format with it.  If none of the files exist, you'll receive a
+``file not found'' error message.
+
+You can still define an NDF section (see topic "NDF_Sections") when
+you access an existing data file in a foreign format.  Thus
+
+     % stats m51.imh"(100:200,200~81)"
+
+would derive the statistics for x pixels between 100 and 200, and
+y pixels 160 to 240 in the IRAF file m51.imh.
+
+The conversion tasks may be your own for some private format, but
+normally they will come from the CONVERT package (SUN/55).  If you
+want to learn how to add conversions to the standard ones, you
+should consult SSN/20.
+
+There is an environment variable that defines the format of new data
+files.  This could be assigned the same value as NDF_FORMATS_OUT,
+though they don't have to be.
+
+     % setenv NDF_FORMATS_OUT 'FITS(.fit),IRAF(.imh),FIGARO(.dst)'
+
+If you supply the file extension when a KAPPA task creates a new
+dataset, and it appears in NDF_FORMATS_OUT, you'll get a file in
+that format.  So for instance,
+
+     % ffclean in=m51.dst out=m51_cleaned.dst \\
+
+cleans m51.dst and stores the result in m51_cleaned.dst.  On the
+other hand, if you only give the dataset name
+
+     % ffclean in=m51.dst out=m51_cleaned \\
+
+the output dataset would be the first in the NDF_FORMATS_OUT list.
+Thus if you want to work predominantly in a foreign format, place it
+first in the NDF_FORMATS_IN and NDF_FORMATS_OUT lists.
+
+If you want to create an output NDF, you must insert a full stop at
+the head of the list.
+
+     % setenv NDF_FORMATS_OUT '.,FITS(.fit),IRAF(.imh),FIGARO(.dst)'
+
+This is the recommended behaviour.
+
+If you just want to propagate the input data format, insert an asterisk
+at the start of the output-format list.
+
+     % setenv NDF_FORMATS_OUT '*,.,FITS(.fit),IRAF(.imh),FIGARO(.dst)'
+
+This only affects applications which create a dataset using information
+propagated from an existing dataset.  For instance, if the above
+NDF_FORMATS_OUT were defined,
+
+     % ffclean in=m51.dst out=m51_cleaned \\
+
+would now create m51_cleaned.dst.  If there is no propagation
+in the given application, the asterisk is ignored. 
+
+You can retain the scratch NDF by setting the environment variable
+NDF_KEEP to 1.  This is useful if you intend to work mostly with NDFs
+and will save the conversion each time you access the dataset.
+
+The convert command, which sets up definitions for the CONVERT package
+defines the lists of input and output formats as follows.
+
+     % setenv NDF_FORMATS_IN \
+     'FITS(.fit),FIGARO(.dst),IRAF(.imh),GASP(.hdr),UNFORMATTED(.unf),
+     UNF0(.dat),ASCII(.asc),TEXT(.txt),GIF(.gif),TIFF(.tif),
+     COMPRESSED(.sdf.Z)'
+
+     % setenv NDF_FORMATS_OUT \
+     '.,FITS(.fit),FIGARO(.dst),IRAF(.imh),GASP(.hdr),UNFORMATTED(.unf),
+     UNF0(.dat),ASCII(.asc),TEXT(.txt),GIF(.gif),TIFF(.tif),
+     COMPRESSED(.sdf.Z)'
+
+See the CONVERT documentation for more details of these conversions.
+
+.endhelp

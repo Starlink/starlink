@@ -1,0 +1,153 @@
+.help rotate Starlink kappa
+.nf
+Rotates a 2-dimensional NDF about its centre through any angle.
+
+Usage:
+
+   rotate in out angle
+
+Description:
+
+   This rotates a 2-dimensional array stored in an NDF data
+   structure by an arbitrary angle.  The origin of the rotation is
+   the centre of the array.  The output array dimensions just
+   accommodate the rotated array.  Output pixels can be generated
+   from the input array by one of two methods: nearest-neighbour
+   substitution or by bi-linear interpolation.  The latter is
+   slower, but gives better results.  Output pixels not
+   corresponding to input pixels take the bad value.
+
+Parameters
+
+For information on individual parameters, select from the list below:
+
+ANGLE
+
+ANGLE  = _REAL (Read)
+   Number of clockwise degrees by which the data array is to be
+   rotated.  It must lie between 0 and 360 degrees.  The suggested
+   default is the current value.
+
+IN
+
+IN = NDF (Read)
+   NDF structure containing the 2-dimensional array to be rotated.
+
+NNMETH
+
+NNMETH = _LOGICAL (Read)
+   If TRUE, the nearest-neighbour method will be used to evaluate
+   the output data-array pixels.  This is only accessed when the
+   rotation is not a multiple of 90 degrees.  [FALSE]
+
+OUT
+
+OUT = NDF (Write)
+   Output NDF to contain the rotated arrays.
+
+QUALITY
+
+QUALITY = _LOGICAL (Read)
+   This parameter is only accessed when NNMETH is FALSE and ANGLE
+   is not a multiple of 90 degrees.  Strictly, the quality values
+   are undefined by the bi-linear interpolation and hence cannot
+   be propagated.  However, QUALITY = TRUE offers an
+   approximation to the quality array by propagating the
+   nearest-neighbour quality to the output NDF. [FALSE]
+
+TITLE
+
+TITLE = LITERAL (Read)
+   A title for the output NDF.  A null value will cause the title
+   of the NDF supplied for parameter IN to be used instead. [!]
+
+VARIANCE
+
+VARIANCE = _LOGICAL (Read)
+   VARIANCE = TRUE instructs that variance values weight the
+   pixels in the bi-linear interpolation and that output variance
+   is derived from the neighbouring pixels' variance values,
+   otherwise the data values are given equal weight.  This
+   parameter is ignored if ANGLE is a multiple of 90 degrees or
+   NNMETH=TRUE; in these cases the variance array is merely
+   propagated.  The run-time default is TRUE if the input NDF has
+   a VARIANCE component, and FALSE otherwise.  Note that
+   following this operation the errors are no longer independent.
+   []
+
+Examples
+
+rotate ns ew 90
+   This rotates the array components in the NDF called ns by 90
+   degrees clockwise, and stores the result in the NDF called
+   ew.  The former x axis becomes the new y axis, and the former
+   y axis becomes the new x axis.  The former y-axis arrays are
+   also reversed in the process.
+
+rotate angle=180 out=sn in=ns
+   This rotates the array components in the NDF called ns by 180
+   degrees clockwise, and stores the result in the NDF called
+   sn.  The axis arrays are flipped in the output NDF.
+
+rotate f1 f1r 37.2 novariance
+   This rotates the array components in the NDF called f1 by 37.2
+   degrees clockwise, and stores the result in the NDF called
+   f1r.  The original axis information is lost.  Bi-linear
+   interpolation is used without variance information.  No
+   quality or variance information is propagated.
+
+rotate f1 f1r 106 nnmeth title="Reoriented features map"
+   This rotates the array components in the NDF called f1 by 106
+   degrees clockwise, and stores the result in the NDF called
+   f1r.  The original axis information is lost.  The resultant
+   array components, all of which are propagated, are calculated
+   by the nearest-neighbour method.  The title of the output
+   NDF is "Reoriented features map".
+
+Notes
+
+-  Bad pixels are ignored in the bi-linear interpolation.  If all
+four pixels are bad, the result is bad.
+
+Related_Applications
+
+   KAPPA: FLIP, TRANSFORMER; Figaro: IREVX, IREVY, IROT90.
+
+Authors
+
+MJC: Malcolm J. Currie (STARLINK)
+
+History
+
+ 1995 May 14 (MJC):
+    Original NDF version.
+
+
+Implementation_Status
+
+   The propagation rules depend on parameters ANGLE and NNMETH.
+
+   -  For rotations that are multiples of 90-degrees, VARIANCE,
+   QUALITY, AXIS, HISTORY, LABEL and UNITS components of the input
+   NDF are propagated to the output NDF.  The axis components are
+   switched and flipped as appropriate.
+
+   -  For the nearest-neighbour method VARIANCE, QUALITY, HISTORY,
+   LABEL and UNITS components of the input NDF are propagated to the
+   output NDF.
+
+   -  For the linear interpolation method HISTORY, LABEL and
+   UNITS components of the input NDF are propagated to the output
+   NDF.  In addition if parameter VARIANCE is TRUE, variance
+   information is derived from the input variance; and if parameter
+   QUALITY is TRUE, QUALITY is propagated using the nearest
+   neighbour.
+
+   -  Processing of bad pixels and automatic quality masking are
+   supported.
+
+   -  All non-complex numeric types are supported, though for linear
+   interpolation the arithmetic is performed using single- or
+   double-precision floating point as appropriate; and for 90 and
+   270-degree rotations _INTEGER is used for all integer types.
+.endhelp

@@ -1,0 +1,148 @@
+.help custom_kappa Starlink kappa
+.nf
+KAPPA applications can be modified to suit your particular
+requirements.  Since this help documentation is not a programmer's
+guide, instructions are not given here.  Programmers should contact
+the author for details until a new Programmer's Guide appears to
+replace the old SUN/101, which was a good summary of Starlink
+infrastructure libraries and programming. 
+
+All the source files can be found in /star/kappa/*.tar on Starlink
+machines.  The /star path may be different outside of Starlink, so
+check with your computer manager.  There is a separate tar file for
+each KAPPA subroutine library (with a _sub suffix) and the
+interface files, with obvious names.  The remaining files: the
+monolith routines, link scripts, include files, the help source,
+shell scripts, ICL procedures, and test data are in
+kappa_source.tar.  There is also a Starlink standard makefile and
+mk script. 
+
+Here is a worked example.  Suppose that you have _REAL-type datasets
+for which you want to compute statistics including the skewness and
+kurtosis.  One way is to modify STATS.  First to save typing define
+environment variables, say STAR and KAP to point to where the
+Starlink software and KAPPA source is stored.  Next we extract the
+source files to change. 
+
+     % setenv STAR /star
+     % setenv KAP /star/kappa
+     % tar xf $KAP/kappa_sub.tar stats.
+     % tar xf $KAP/kappa_ifls.tar stats.ifl
+     % tar xf $KAP/kapgen_sub.tar kpg1_statr.f
+     % tar xf $KAP/kapgen_sub.tar kpg1_stdsr.f
+     % tar xf $KAP/kappa_source.tar kappa_link_adam
+
+We modify kpg1_statr.f to compute the additional statistics;
+kpg1_stdsr.f to list the statistics; stats.f to update the
+documentation, to use the revised argument lists of the subroutines,
+and to output the new statistics to parameters; and stats.ifl to add
+the output parameters.  kappa_link_adam need not be modified, but it
+is needed during linking. 
+
+Next some soft links to include files need to be made.
+
+     % star_dev
+     % ndf_dev
+     % prm_dev
+     % par_dev
+
+For some other application and subroutines, you can find what is
+needed by trying to compile them and see which include files the
+compiler cannot locate.  You then invoke the appropriate package
+definitions: pkg_dev, where pkg is the three-letter package
+abbreviation.  Now compile the modified code.  This is for OSF/1 
+
+     % f77 -O -c -nowarn stats.f kpg1_statr.f kpg1_stdsr.f
+
+and this is for Solaris.
+
+     % f77 -O -PIC -c -w stats.f kpg1_statr.f kpg1_stdsr.f
+
+The -nowarn and -w prevent warning messages appearing.
+
+Now link the task to produce a new stats executable.
+
+     % alink stats.o -o stats kpg1_statr.o kpg1_stdsr.o \
+     $KAPPA_DIR/libkapgen.a -L$STAR/lib `./kappa_link_adam`
+
+For other tasks you may need more KAPPA object libraries in addition
+to libkapgen.a.  There is a full list in $KAP/makefile
+(look for OBJECT_LIBRARIES).  If you add further libraries, add
+them in the order given within the makefile.
+
+If you want to use KAPPA subroutines for your own application here
+are words of warning: the code may undergo alterations of subroutine
+name or argument lists, and those without a pkg_ prefix will either
+be replaced or renamed. Therefore, you should copy the modules you
+need. 
+
+
+Parameters
+
+
+If you don't like KAPPA's parameter defaults, or its choice of which
+parameters get prompted for and which get defaulted, then you can
+change them.  Extract the interface file from
+/star/kappa/kappa_ifls.tar to your work directory and make the
+required modifications, and then recompile it.  See SUN/115 on the
+meanings and possible values of the fieldnames, and how to recompile
+the interface file.  If you use ICL, you'll need to modify a
+monolith interface file: $KAPPA_DIR/kappa_mon.ifl, kapview_mon.ifl
+or ndfpack_mon.ifl.  Finally, you will need to specify a search path
+that includes the directory containing your modified interface file.
+
+     % setenv ADAM_IFL /home/scratch/dro/ifls:/usr/local/kappa
+
+This asks Starlink programmes to look in /home/scratch/dro/ifls to
+find the interface file, and if there isn't one to look in
+/usr/local/kappa.  If the interface file search is unsuccessful, the
+directory containing the executable is assumed.  Thus if you've not
+created your own interface file for a task, you'll get the released
+version.  Of course, once you have done this, the documentation in
+the application specifications in this help will no longer be correct.
+
+
+Commands
+
+
+There is an easier method of tailoring KAPPA to your requirements. 
+If you frequently use certain commands, especially those with a long
+list of keywords and fixed values, you can define some C-shell
+aliases or ICL symbols for the commands.  Like the shell's
+$HOME/.login, ICL has a login file. (See the ``ICL for Unix''
+Appendix in SUN/144, or SSN/64 for details.)  If you add symbols to
+this file, each time you activate ICL these abbreviations will be
+available to you without further typing.  What you should do is to
+create a login.icl in a convenient directory, and assign the
+environment variable ICL_LOGIN to that directory in your
+$HOME/.login file. 
+
+It is possible to have several ICL login files, each for different
+work in different directories.  Now to abbreviate a command you put
+a DEFSTRING entry into the ICL login file.  For example, 
+
+     DEFSTRING MYC{ON} TURBOCONT CLEAR=F PENROT MODE=AU NCONT=7
+
+defines MYC or MYCO or MYCON to run TURBOCONT without clearing the
+screen, with pen rotation and seven equally spaced contour heights. 
+The symbols are not limited to KAPPA.  Indeed they can include
+shorthands for shell commands.  For example, 
+
+     DEFSTRING DA ls -al 
+
+would make DA produce a directory listing of all files with sizes and
+modification dates.
+
+You can check what the current login files are as follows.
+
+     % printenv | grep ICL_LOGIN
+
+For shell usage similar definitions can be made with aliases.  For
+example, 
+
+     % alias mycon turbocont clear=f penrot mode=au ncont=7
+
+is the equivalent of the DEFSTRING above, except that in keeping with
+UNIX tradition the command is in lowercase, and the alias cannot be
+abbreviated.
+.endhelp

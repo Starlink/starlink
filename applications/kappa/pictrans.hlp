@@ -1,0 +1,117 @@
+.help pictrans Starlink kappa
+.nf
+Transforms co-ordinates between the current and BASE pictures.
+
+Usage:
+
+   pictrans inxy [outx] [outy] [bound]
+
+Description:
+
+   This application converts a position's co-ordinates from the
+   current picture to their equivalent in the BASE picture, or
+   vice versa.
+
+Parameters
+
+For information on individual parameters, select from the list below:
+
+BOUND
+
+BOUND = _LOGICAL (Write)
+   BOUND is TRUE when the transformed co-ordinates lie within the
+   bounds of their associated picture.
+
+COSYS
+
+COSYS = LITERAL (Read)
+   The co-ordinate system to be used.  This can be either "World"
+   or "Data".  "World" makes the application convert between the
+   world co-ordinates of the position in the two pictures.  World
+   co-ordinates that relate to a location in a data array will be
+   in array pixels.  For COSYS = "Data" the conversion is between
+   data co-ordinates, stored via a transformation.  The BASE
+   picture will not normally have data co-ordinates, so the value
+   of COSYS usually selects in which co-ordinate system positions
+   in the current picture are specified.
+
+   Data co-ordinates are arbitrary but most often they will be a
+   linear or logarithmic transformation of the world
+   co-ordinates.  For example, the x co-ordinate of a spectrum
+   would be given in pixels if COSYS = "World", but if COSYS =
+   "Data" the x co-ordinate could be in wavelength units, such as
+   Angstroms.  If the database does not have a world-to-data
+   transformation for a given picture, the value of this
+   parameter is ignored for that picture, and supplied or
+   computed positions in that picture will be in world
+   co-ordinates.  [Current co-ordinate system]
+
+DEVICE
+
+DEVICE = DEVICE (Read)
+   The graphics workstation. [The current graphics device]
+
+INXY
+
+INXY( 2 ) = _DOUBLE (Read)
+   The x-y co-ordinates to be transformed.  These need not lie
+   within the physical bounds of their associated picture.  The
+   suggested value is the current value.
+
+OUTX
+
+OUTX = _DOUBLE (Write)
+   The transformed x co-ordinate.
+
+OUTY
+
+OUTY = _DOUBLE (Write)
+   The transformed y co-ordinate.
+
+TOBASE
+
+TOBASE = _LOGICAL (Read)
+   This decides the direction of the transformation.  If TOBASE
+   is TRUE, the conversion is from the current to the BASE
+   picture.  If TOBASE is FALSE, BASE-picture co-ordinates are
+   converted to a position within the current picture.
+   The suggested value is the current value.  [TRUE]
+
+Examples
+
+pictrans [100.3,-20.1] outx=(dx) outy=(dy) cosys=w
+   This converts the position (100.3,-20.1), in world co-ordinates
+   of the current picture of the current graphics device, to the
+   world co-ordinates of that point in the BASE picture.  The base
+   co-ordinates are written to ICL variables DX and DY (as well as
+   the application's parameter file).
+
+pictrans [-1.e4,2.56] outy=(dy) device=xwindows
+   This converts the position (-10000.0,2.56), in the current
+   picture of the xwindows device, to the co-ordinates of that
+   point in the BASE picture.  All positions use the current
+   co-ordinate system.  The base y co-ordinate is written to ICL
+   variable DY.
+
+pictrans [0.314,0.137] (dx) (dy) (within) cosys=d notobase
+   This converts the position (0.314,0.137), in the data
+   co-ordinates of the BASE picture of the current graphics
+   device, to the data co-ordinates of that point in the current
+   picture.  The transformed co-ordinates are written to ICL
+   variables DX and DY.  ICL variable WITHIN contains a flag
+   to indicate whether or not the point lies within the current
+   picture.
+
+Related_Applications
+
+   KAPPA: GDSTATE, PICIN, PICXY.
+
+Authors
+
+MJC: Malcolm J. Currie (STARLINK)
+
+History
+
+ 1993 August 19 (MJC):
+    Original version.
+.endhelp

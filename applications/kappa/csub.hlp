@@ -1,0 +1,83 @@
+.help csub Starlink kappa
+.nf
+Subtracts a scalar from an NDF data structure.
+
+Usage:
+
+   csub in scalar out
+
+Description:
+
+   The routine subtracts a scalar (i.e. constant) value from each
+   pixel of an NDF's data array to produce a new NDF data structure.
+
+Parameters
+
+For information on individual parameters, select from the list below:
+
+IN
+
+IN = NDF (Read)
+   Input NDF data structure, from which the value is to be
+   subtracted.
+
+OUT
+
+OUT = NDF (Write)
+   Output NDF data structure.
+
+SCALAR
+
+SCALAR = _DOUBLE (Read)
+   The value to be subtracted from the NDF's data array.
+
+TITLE
+
+TITLE = LITERAL (Read)
+   Value for the title of the output NDF.  A null value will cause
+   the title of the NDF supplied for parameter IN to be used
+   instead. [!]
+
+Examples
+
+csub a 10 b
+   This subtracts ten from the NDF called a, to make the NDF
+   called b.  NDF b inherits its title from a.
+
+csub title="HD123456" out=b in=a scalar=21.9
+   This subtracts 21.9 from the NDF called a, to make the NDF
+   called b.  NDF b has the title "HD123456".
+
+Related_Applications
+
+   KAPPA: ADD, CADD, CDIV, CMULT, DIV, MATHS, MULT, SUB.
+
+Authors
+
+RFWS: R.F. Warren-Smith (STARLINK)
+
+MJC: Malcolm J. Currie (STARLINK)
+
+History
+
+ 12-APR-1990 (RFWS):
+    Original version.
+
+ 1992 January 15 (MJC):
+    Added Usage and Examples items.
+
+ 1995 September 12 (MJC):
+    Title inherited by default.  Usage and examples to lowercase.
+    Added Related Applications.
+
+Implementation_Status
+
+   -  This routine correctly processes the AXIS, DATA, QUALITY,
+   LABEL, TITLE, UNITS, HISTORY, and VARIANCE components of an NDF
+   data structure and propagates all extensions.
+
+   -  Processing of bad pixels and automatic quality masking are
+   supported.
+
+   -  All non-complex numeric data types can be handled.
+.endhelp

@@ -1,0 +1,163 @@
+.help piccur Starlink kappa
+.nf
+Uses a cursor to select the current picture and to report the
+co-ordinates of points.
+
+Usage:
+
+   piccur [mode] [name] [logfile] [device]
+
+Description:
+
+   This application allows you to select a new current picture in
+   the graphics database using the cursor.  The picture associated
+   with the last-selected point becomes the new current picture.
+
+   This task also uses the cursor to read Cartesian co-ordinates
+   from the chosen graphics device and displays them on your
+   terminal.  In addition if the co-ordinate frame changes between
+   selected positions, the comment, name, and any label associated
+   with the new picture are appended to the message.  There is an
+   option to let you store the co-ordinates, and their picture names
+   and labels in a text file.
+
+   There are three modes of operation to define which co-ordinate
+   system/picture is to be used.  These are ANCHOR, CURRENT and
+   DYNAMIC.  See the parameter MODE for details.
+
+   In ANCHOR or DYNAMIC modes there is an option to select only
+   pictures of a certain name in the database.  This is most useful
+   when DATA pictures are covered by transparent FRAME pictures.
+
+Parameters
+
+For information on individual parameters, select from the list below:
+
+COSYS
+
+COSYS = LITERAL (Read)
+   The co-ordinate system to be used.  This can be either "World"
+   or "Data".  "World" makes the world co-ordinates of the cursor
+   position to be reported.  World co-ordinates that relate to a
+   location in a data array will be in array pixels.  If COSYS =
+   "Data" the graphics database is examined for data co-ordinates
+   stored via a transformation.  Data co-ordinates are arbitrary
+   but most often they will be a linear or logarithmic
+   transformation of the world co-ordinates.  For example, the x
+   co-ordinate of a spectrum would be given in pixels if COSYS =
+   "World", but if COSYS = "Data" the x co-ordinate could be in
+   wavelength units, such as Angstroms.  If the database does not
+   have a world-to-data transformation for a given picture, the
+   value of this parameter is irrelevant and world co-ordinates
+   will be reported for that picture. [Current co-ordinate system]
+
+DEVICE
+
+DEVICE = DEVICE (Read)
+   The graphics workstation. [The current graphics device]
+
+DOUBLE
+
+DOUBLE = _LOGICAL (Read)
+   If TRUE, co-ordinates will be reported, written to the output
+   parameters, and stored in the text file in double precision,
+   otherwise single precision is used.  [FALSE]
+
+LOGFILE
+
+LOGFILE = FILENAME (Write)
+   The name of the text file in which the co-ordinates of points
+   selected with the cursor may be stored.  A null string (!)
+   means that no file is created.  The suggested default is the
+   current value. [!]
+
+MODE
+
+MODE = LITERAL (Read)
+   The mode defining the co-ordinate system/picture in which
+   cursor positions are returned.  There are three options.
+
+      "Current" selects the current picture in the AGI
+      database and reports the position of a point selected by
+      the cursor.  If the point does not lie within the picture,
+      an extrapolated position is reported.
+
+      "Dynamic" selects the topmost picture in the AGI
+      database which encompasses that position selected.  Thus
+      the second and subsequent cursor hits may result in the
+      selection of a new picture.  On exit the last picture
+      selected becomes the current picture.
+
+      "Anchor" lets the first cursor hit select a
+      picture which remains current throughout the running of
+      the application.  If subsequent cursor hits fall outside
+      the extent of this picture, a position extrapolated from
+      the picture's co-ordinate system is reported.  On exit the
+      anchor picture becomes the current picture.
+   ["Dynamic"]
+
+NAME
+
+NAME = LITERAL (Read)
+   Only pictures of this name are to be selected.  A null string
+   (!) or blanks means that pictures of all names may be selected.
+   [!]
+
+XC
+
+XC = _DOUBLE (Write)
+   The x co-ordinate of the last point selected with the cursor.
+
+YC
+
+YC = _DOUBLE (Write)
+   The y co-ordinate of the last point selected with the cursor.
+
+Examples
+
+piccur
+   This obtains the co-ordinates of any visible picture for the
+   current graphics device by use of the cursor.  In this and all
+   the examples, the picture containing the last-selected point
+   becomes the new picture.
+
+piccur cosys=w
+   This obtains the world co-ordinates of any visible picture for
+   the current graphics device by use of the cursor.
+
+piccur current device=graphon
+   This obtains the co-ordinates of any visible picture in the
+   reference frame of the current picture of the Graphon device.
+
+piccur logfile=stars.dat name=data
+   This obtains the co-ordinates of any visible DATA picture for
+   the current graphics device.  The x-y co-ordinates, and their
+   picture names and labels are stored in the text file called
+   stars.dat.
+
+Notes
+
+-  Should an error occur trying to obtain the base picture for
+ANCHOR or DYNAMIC modes, the current picture is unchanged.
+
+-  In DYNAMIC and ANCHOR modes, if the cursor is situated at a
+point where there are no pictures of the selected name, the
+co-ordinates in the base picture are reported.
+
+Related_Applications
+
+   KAPPA: CURSOR, PICBASE, PICDATA, PICEMPTY, PICENTIRE, PICFRAME,
+   PICLIST, PICSEL, PICVIS.
+
+Authors
+
+JM: Jo Murray  (STARLINK)
+
+MJC: Malcolm J. Currie  (STARLINK)
+
+History
+
+ 1995 August 25 (MJC):
+    Original version based on CURSOR by MJC and JM.
+
+.endhelp

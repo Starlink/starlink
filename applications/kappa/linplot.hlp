@@ -1,0 +1,507 @@
+.help linplot Starlink kappa
+.nf
+Draws a line plot of a 1-d NDF's data values against their axis
+co-ordinates.
+
+Usage:
+
+   linplot ndf [comp] [mode] [pltitl] [abslab] [ordlab] [device]
+
+Description:
+
+   This application creates a line plot of an array versus its
+   co-ordinates for a 1-dimensional NDF on the current graphics
+   device.  Thus it could be used to display a spectrum.  The array
+   may be part or whole of the data array, but also the error,
+   variance, or quality can be shown.  The plot is situated within
+   the current graphics-database picture.
+
+   The graph of the x-y data points can take one of a number of
+   forms:
+
+      o straight lines connecting successive points;
+      o histogram, where the y co-ordinate is the histogram height;
+      o symbols (from a selection of five) drawn at each point; and
+      o horizontal lines, whose length is specified by the axis
+        width of each pixel.
+
+   Error bars may be plotted too.  There is control of the colour
+   of the components of the plot.
+
+   The graph resides within labelled and enumerated axes
+   corresponding to pixel or data co-ordinates and data value
+   respectively.  The data co-ordinates are derived from the NDF's
+   axis component.  A title and axis labels may be specified.
+
+Parameters
+
+For information on individual parameters, select from the list below:
+
+ABSLAB
+
+ABSLAB = LITERAL (Read)
+   Label for the plot abscissa, in which NCAR fancy founts may be
+   embedded when FONT = "NCAR".  If axis information is present
+   the suggested default is the NDF's axis label followed by the
+   units, in parentheses.  If an error occurs obtaining the label
+   the default is "Pixel co-ordinates". []
+
+ABSLIM
+
+ABSLIM( 2 ) = _REAL (Read)
+   The abscissa limits when AXLIM is TRUE.  The limits may extend
+   beyond the extreme axis values present in the dataset, however,
+   the values must be distinct, and positive when XLOG=TRUE.  The
+   order you supply the limits is unimportant; the first value
+   will always have the lower pixel co-ordinate, and the second
+   will always have the larger pixel co-ordinate.  (This
+   restriction arises because graphics database only permits this
+   order.  Use the FLIP command if you want to reverse the axis.)
+
+   The suggested defaults are the values that would have been used
+   had AXLIM=FALSE, and depend on the value of parameter CLEAR.
+   See parameter AXLIM for details.
+
+AXLIM
+
+AXLIM = _LOGICAL (Read)
+   If TRUE, you decide the upper and lower limits of the axes via
+   parameters ABSLIM and ORDLIM.  Otherwise, LINPLOT calculates
+   sensible limits as described below.
+
+   When CLEAR=TRUE the limits of the ordinate are derived after
+   applying a margin of 3-percent of the data range to the
+   maximum combined data value and error, and from the minimum
+   combined value and error.  The default abscissa limits are the
+   axis co-ordinate limits after correction for pixel width and
+   axis error.  There may also be up to a half-pixel enlargement
+   if MODE="Histogram".
+
+   When CLEAR=FALSE the plot limits are derived from the previous
+   plot (DATA picture), thus allowing composite pictures to be
+   formed.
+   [FALSE]
+
+CLEAR
+
+CLEAR = _LOGICAL (Read)
+   If TRUE the current picture is to be cleared before the
+   line plot is drawn.  If CLEAR is FALSE not only is the existing
+   plot retained, but also the previous plot (DATA picture) is
+   deemed to specify the axis limits when AXLIM=FALSE, and the
+   suggested defaults for parameters ABSLIM and ORDLIM when
+   AXLIM=TRUE.  Thus you can generate a composite plot within
+   a single set of axes, say using different colours or modes to
+   distinguish data from different datasets.
+
+COMP
+
+COMP = LITERAL (Read)
+   The NDF component to be plotted.  It may be "Data", "Quality",
+   "Variance", or "Error" (where "Error" is the alternative to
+   "Variance" and causes the square root of the variance values
+   to be displayed).  If "Quality" is specified, then the quality
+   values are treated as numerical values (in the range 0 to
+   255). ["Data"]
+
+COSYS
+
+COSYS = LITERAL (Read)
+   The co-ordinate system to be used.  This can be either "World"
+   or "Data".  "World" makes pixel co-ordinates to appear on axes
+   and the bounds are obtained in pixel indices.  If COSYS =
+   "Data" the NDF's axis information is used to annotate axes and
+   the bounds are specified in that co-ordinate system.
+   [Current co-ordinate system]
+
+DEVICE
+
+DEVICE = DEVICE (Read)
+   The plotting device. [Current graphics device]
+
+ERRBAR
+
+ERRBAR = _LOGICAL (Read)
+   TRUE if error bars are to be drawn.  The error bars can
+   comprise either or both of the data and axis-centre errors,
+   depending on what is available in the supplied dataset.  See
+   parameter SHAPE to control the appearance of the error bars.
+   This parameter is ignored unless COMP="Data". [FALSE]
+
+ERRCOL
+
+ERRCOL = LITERAL (Read)
+   The colour of the error bars (on devices that support colour).
+   See parameter LINCOL for the available options and their
+   meanings.  ERRCOL is only accessed when ERRBAR=TRUE.  [The
+   current value, but equals "1" (the foreground colour) if there
+   is no current value.]
+
+FONT
+
+FONT = LITERAL (Read)
+   The fount to be used for the line graphics.  It can be either
+   "NCAR" for the NCAR fancy characters and "GKS" for the
+   standard GKS san-serif fount.   The former is intended for
+   hardcopy publication-quality plots, since it is relatively
+   slow; the latter is intended for normal interactive graphics
+   requiring rapid plotting, and it is clearer on small plots.
+   The suggested default is the current value. ["GKS"]
+
+FREQ
+
+FREQ = _INTEGER (Read)
+   The frequency at which error bars are to be plotted.  For
+   instance, a value of 2 would mean that alternative points have
+   error bars plotted.  This lets some plots be less cluttered.
+   FREQ must lie in the range 1 to half of the number of points
+   to be plotted.  FREQ is only accessed when ERRBAR=TRUE.  [1]
+
+LINCOL
+
+LINCOL = LITERAL (Read)
+   The colour of the lines showing the data (so this excludes the
+   annotated axes) on devices that support colour.  The options
+   are described below.
+
+     "MAX"          - The maximum colour index in the image
+                      display colour lookup table.
+     "MIN"          - The minimum (non-reserved) colour index in
+                      the image-display colour lookup table.
+     An integer     - The actual colour index.  It is constrained
+                      between 0 and the maximum colour index
+                      available on the device.
+     A named colour - Uses the named colour from the palette, and
+                      if it is not present, the nearest colour
+                      from the palette is selected.
+
+   If the colour is to remain unaltered as the lookup table is
+   manipulated choose an integer between 0 and 15, or a named
+   colour.  This parameter will be ignored if symbols are plotted.
+   [The current value, but equals "1" (the foreground colour) if
+   there is no current value.]
+
+MAJTIC
+
+MAJTIC( 2 ) = _REAL (Read)
+   The parameter controlling the numbers of major tick marks
+   for the x and y axes.  (Number used is between MAJTIC+2 and
+   5*MAJTIC/2+4.) [4.,4.]
+
+MINTIC
+
+MINTIC( 2 ) = _REAL (Read)
+   The number of minor tick marks between each major tick mark
+   for the x and y axes.  A negative value forces the graphics
+   package to compute appropriate values.  The number of
+   minor tick marks per major tick is fixed (8) for a logarithmic
+   axis. [-1.,-1.]
+
+MODE
+
+MODE = LITERAL (Read)
+   The type of the line plot.  This can be one of the following
+   values.
+
+      "Histogram"   - An histogram of the points is plotted (with
+                      vertical lines only joining the y values and
+                      not extending to the base of the plot).  The
+                      vertical lines are placed midway between
+                      adjacent x positions.
+      "Line"        - The points are joined by straight lines.
+      "Point"       - A dot is plotted at each point.
+      "Step"        - Each point is displayed as a horizontal
+                      line, whose length is specified by the axis
+                      width of the pixel.
+      1             - A synonym for "Point".
+      2--5          - These are similar to "Point", but give
+                      different symbols.  2 gives plus signs,  3
+                      generates asterisks, 4 produces circles, and
+                      5 creates multiplication crosses.
+
+   Where colour is available the lines of the "Histogram", "Line",
+   and "Step" options are plotted in the colour defined by
+   parameter LINCOL; likewise the symbols of options "Point" and
+   the integers is plotted in the colour specified through
+   parameter SYMCOL.
+
+   MODE is defaulted to the current value, which is initially
+   "Line". []
+
+NDF
+
+NDF = NDF (Read)
+   NDF structure containing the array to be plotted.
+
+ORDLAB
+
+ORDLAB = LITERAL (Read)
+   Label for the plot ordinate, in which NCAR fancy founts may be
+   embedded when FONT = "NCAR".  The suggested default is the
+   NDF's label followed by the units, if present, in parentheses.
+   If an error occurs obtaining the label the default is the
+   component name followed by " values". []
+
+ORDLIM
+
+ORDLIM( 2 ) = _REAL (Read)
+   The ordinate limits when AXLIM is TRUE.  The limits may extend
+   beyond the extreme data values present in the dataset, however,
+   the values must be distinct, and positive when YLOG=TRUE.
+   It is usually best to allow some margin to prevent the plotted
+   values hitting the axes.  The order you supply the limits is
+   unimportant; the smaller value will become the lower limit,
+   and the larger the upper limit.
+
+   The suggested defaults are the values that would have been used
+   had AXLIM=FALSE, and depend on the value of parameter CLEAR.
+   See parameter AXLIM for details.
+
+OUTTIC
+
+OUTTIC = _LOGICAL (Read)
+   TRUE if the axis tick marks are to appear on the outside of
+   the axes instead of inside. By default, the tick marks are
+   drawn inside the plot region.  [FALSE]
+
+PLTITL
+
+PLTITL = LITERAL (Read)
+   The title of the plot.  Up to about 40 characters can be
+   accommodated, and NCAR fancy founts may be embedded when
+   FONT = "NCAR".  The suggested default is the title of the NDF.
+   If an error occurs obtaining the title, it is defaulted to
+   "Line plot".  []
+
+PXSIZE
+
+PXSIZE = _REAL (Read)
+   The horizontal size of the display in metres. If a value less
+   than the default is requested, the display will appear at
+   the bottom left of the current device.  There is an upper
+   limit given by the x size of the current picture. [Maximum
+   that can fit in the current picture]
+
+PYSIZE
+
+PYSIZE = _REAL (Read)
+   The vertical size of the display in metres. If a value less
+   than the default is requested, then the display will appear at
+   the bottom left of the current device.  There is an upper
+   limit given by the y size of the current picture. [Maximum
+   that can fit in the current picture]
+
+SHAPE
+
+SHAPE = LITERAL (Read)
+   The way the errors are to be represented graphically.  SHAPE
+   can take the following values.
+
+      "Bars"     - A cross with serifs is plotted joining the x
+                   error limits and then the y error limits.
+      "Cross"    - A san-serif cross is plotted joining the x
+                   error limits and then the y error limits.
+      "Diamond"  - Adjacent error limits are joined to form an
+                   error diamond.
+
+   SHAPE is defaulted to the current value, which is initially
+   "Bars".  SHAPE is only accessed when ERRBAR=TRUE.  []
+
+SYMCOL
+
+SYMCOL = LITERAL (Read)
+   The colour of the plotted symbols (on devices that support
+   colour).  See parameter LINCOL for the available options and
+   their meanings.  SYMCOL is only accessed when MODE="Point"
+   or has a integer value.   [The current value, but equals "1"
+   (the foreground colour) if there is no current value.]
+
+THICK
+
+THICK = _REAL (Read)
+   The thickness of the axes and annotations in the plot, where
+   1.0 is the normal thickness.  Currently, this is only available
+   on a few devices.  When FONT="GKS", axis annotations are
+   unaffected by THICK.  It must take a value in the range
+   0.5--10.0.  [1.0]
+
+XLOG
+
+XLOG = _LOGICAL (Read)
+   TRUE if the abscissa (pixel number) is to be logarithmic.  It
+   is unlikely that you would want to do this.  The chosen
+   array may be truncated to include only positive co-ordinates.
+   [FALSE]
+
+YLOG
+
+YLOG = _LOGICAL (Read)
+   TRUE if the ordinate (data value) is to be logarithmic.  This
+   is useful when the data have wide dynamic range. [FALSE]
+
+Examples
+
+linplot spectrum cosys=d
+   Plots data values versus data co-ordinate for the whole of the
+   1-dimensional NDF called spectrum on the current graphics
+   device.  The data co-ordinates will be in pixels if spectrum
+   does not have an axis component (this remark applies to all
+   the examples save the last where world co-ordinates are
+   plotted).
+
+linplot spectrum(1:500) device=graphon
+   Plots data values versus the data or pixel co-ordinates
+   (whichever is the current system) for the first 500 elements
+   of the 1-dimensional NDF called spectrum on the Graphon
+   device.
+
+linplot ironarc v pltitl="Fe Arc variance"
+   Plots variance values versus data or pixel co-ordinate for the
+   whole of the 1-dimensional NDF called ironarc on the current
+   graphics device.  The plot has a title of "Fe Arc variance".
+
+linplot rscvn(3000.42:3994.) noclear abslab="Epoch" cosys=d
+   This plots on the current graphics device data values versus
+   data co-ordinates for those elements of the 1-dimensional NDF
+   called rscvn whose axis values lie between 3000.42 and 3994.0.
+   If the current co-ordinate system is already "Data", the COSYS
+   parameter may be dispensed with.  The device is not cleared so
+   the plot will overlay the existing picture.  The abscissa has
+   label "Epoch".
+
+linplot frequencies mode=h lincol=red ylog
+   This draws a red histogram of the 1-dimensional dataset called
+   frequencies.  The red colour will continue to be used in
+   subsequent plots.  The data values will be plotted
+   logarithmically.
+
+linplot xspec mode=p errbar shape=d errcol=pink symcol=1 xlog
+   This plots the data values versus the logarithm of the axis
+   centres for the dataset called xspec.  Each pixel is plotted
+   as a point surrounded by diamond-shaped error bars.  The
+   points are drawn in the foreground colour and the error
+   diamonds are displayed in pink.
+
+linplot ndf=spectrum axlim ordlim=[100,250] cosys=w accept
+   Plots data values versus pixel co-ordinate for the whole of
+   the 1-dimensional NDF called spectrum on the current graphics
+   device.  The limits of the ordinate axis are 100 and 250, so
+   data values outside this range will be clipped.
+
+linplot ndf=spectrum2 lincol=yellow noclear
+   This plots data values versus pixel co-ordinate, overlaid on
+   the previous example, for the 1-dimensional NDF called
+   spectrum2.  The new locus is plotted in yellow.
+
+Notes
+
+-  The application stores a number of pictures in the graphics
+database in the following order: a FRAME of the specified size
+containing the title, annotated axes, and line plot; and a DATA
+picture, which has world co-ordinates for linear axes measured in
+pixels along the x axis and data values along y, and their
+logarithms if a logarithmic axis is selected.  The DATA picture
+also has data co-ordinates stored; for a linear axis this
+requires that the NDF's axis units are not pixel co-ordinates;
+for a logarithmic axis the actual data co-ordinate or value is
+recorded.  If there is no NDF axis information and a logarithmic
+abscissa, the DATA co-ordinates are pixel co-ordinates.  The NDF
+associated with the plot is stored by reference with the DATA
+picture.  On exit the current database picture for the chosen
+device reverts to the input picture.
+
+-  In a logarithmic plot only positive data along each
+logarithmic axis can be displayed, therefore negative data are
+excluded.  Likewise any error bar which has a non-positive
+limit is not plotted, even though the data point itself can
+appear if it has positive co-ordinates.  A logarithmic axis will
+always increase from left to right, and from bottom to top.
+
+-  Bad pixels are excluded from the plot, and they do not affect
+the limits of the ordinate.  The same applies to zero or negative
+data values if the plot is to have a logarithmic ordinate.
+
+-  When COSYS="World", default axis errors and widths are used,
+if needed.  The defaults are the constants 0 and 1 respectively.
+
+-  If you wish to make a composite plot, ensure that parameters
+ABSLAB, ORDLAB, COSYS, XLOG, and YLOG do not change between plots.
+For COSYS="Data" and XLOG=FALSE, the data co-ordinates must
+be linear.
+
+Related_Applications
+
+   KAPPA: INSPECT, MLINPLOT; Figaro: ESPLOT, IPLOTS, MSPLOT, SPLOT;
+   SPECDRE: SPECGRID.
+
+Authors
+
+Malcolm Currie STARLINK (RAL::CUR)
+
+History
+
+ 1991 February 11 (MJC):
+    Original NDF version.
+
+ 1991 April 27 (MJC):
+    Stored both world and data co-ordinates in the graphics
+    database.
+
+ 1991 May 1 (MJC):
+    Renamed IN parameter to NDF for consistency.
+
+ 1991 May 24 (MJC):
+    Added world co-ordinates option.
+
+ 1991 July 31 (MJC):
+    No longer redefines colours of SGS pens to predefined state if
+    workstation has dynamic colour representation, now there is
+    palette control.
+
+ 1991 August 20 (MJC):
+    Added FONT parameter.
+
+ 1992 March 3 (MJC):
+    Replaced AIF parameter-system calls by the extended PAR
+    library.
+
+ 1992 April 14 (MJC):
+    Handles arbitrary user-defined sections from non-1-dimensional
+    NDFs.  Removed XLIMIT parameter.
+
+ 1992 November 30 (MJC):
+    Does not use non-monotonic axis centres.
+
+ 1995 October 19 (MJC):
+    Supports Error component.
+
+ 1996 October 3 (MJC):
+    Added several new facilities: error-bar option with choice of
+    styles, choice of plot styles via parameter MODE, use of
+    different colours for the lines, symbols, and error bars.
+
+ 1997 January 12 (MJC):
+    Used PSX to obtain workspace more efficiently.  Made thick
+    lines work for all parts of the plot.
+
+ 1997 April 7 (MJC):
+    Redesigned to allow easy production of composite plots,
+    controlled using the CLEAR parameter.  Parameter AXLIM
+    introduced to replace ORDLIM.  ORDLIM is now the ordinate
+    limits, replacing ORDLOW and ORDUPP.  Added control of the
+    x-limits via parameter ABSLIM.  Used dynamic defaults for
+    ABSLIM and ORDLIM.  Increased the maximum line thickness.
+
+Implementation_Status
+
+   -  This routine correctly processes the AXIS, DATA, VARIANCE,
+   QUALITY, LABEL, TITLE, and UNITS components of the NDF.
+
+   -  Processing of bad pixels and automatic quality masking are
+   supported.
+
+   -  All non-complex numeric data types can be handled.  Only
+   single-precision floating-point data can be processed directly.
+   Other non-complex data types will undergo a type conversion
+   before the line plot is drawn.
+.endhelp

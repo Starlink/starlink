@@ -1,0 +1,4 @@
+in1,f,a,,,,"First input NDF"
+in2,f,a,,,,"Second input NDF"
+out,f,a,,,,"Output NDF"
+title,s,h,INDEF,,,"Title for output NDF"

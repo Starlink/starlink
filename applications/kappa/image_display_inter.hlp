@@ -1,0 +1,28 @@
+.help image_display_inter Starlink kappa
+.nf
+KAPPA utilises IDI (Image-display Interface) for some interactions
+with images.  However, GKS is still called to display images, plot
+line graphics, and perform cursor interactions.  IDI is much faster
+for some interactions, such as manipulating the colour table, and
+provides functionality that is excluded from GKS, such as pan and
+zoom.  The two graphics packages share windows through the
+Graphics Window Manager (GWM, SUN/130) so that you need not know
+which KAPPA command calls which package.
+
+Not all IDI functionality is available in the Starlink X-windows
+implementation.  For instance, there is no blinking capability on
+X-windows.  IDUNZOOM is ineffective, since once a window is panned
+and/or zoomed, the original data are lost due to a not unreasonable
+limitation of GWM.  The same applies if you run IDINVISIBLE;
+IDVISIBLE is unable to restore the window.  This is actually not
+serious since images cannot be displayed on the X-windows overlay.
+You will probably want IDINVISIBLE to erase only the overlay plane
+of an X-window.
+
+IDI and GKS were selected for device independence, but since this
+is less important today as X-windows and PostScript have become de
+facto standards.  By relaxing the GKS straightjacket, GUI-based
+image-processing and display tools dedicated to X-windows, will
+offer much-improved interaction and performance.
+
+.endhelp

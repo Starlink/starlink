@@ -1,0 +1,4 @@
+ndf,f,a,,,,"NDF containing FITS extension to edit"
+keyword,s,a,,,,"Keyword to edit"
+value,s,a,,,,"Value to write"
+comment,s,a,,,,"Comment to write"

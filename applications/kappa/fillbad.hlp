@@ -1,0 +1,216 @@
+.help fillbad Starlink kappa
+.nf
+Removes regions of bad values from a 2-dimensional NDF.
+
+Usage:
+
+   fillbad in out [niter] [size]
+
+Description:
+
+   This application replaces bad values in a 2-dimensional NDF with
+   a smooth function which matches the surrounding data.  It can fill
+   arbitrarily shaped regions of bad values within images.
+
+   It forms a smooth replacement function for the regions of bad
+   values by forming successive approximations to a solution of
+   Laplace's equation, with the surrounding valid data providing the
+   boundary conditions.
+
+Parameters
+
+For information on individual parameters, select from the list below:
+
+BLOCK
+
+BLOCK = _INTEGER (Read)
+   The maximum number of pixels along either dimension when the
+   array is divided into blocks for processing.  It is ignored
+   unless MEMORY=TRUE.  This must be at least 256.  [512]
+
+CNGMAX
+
+CNGMAX = _DOUBLE (Write)
+   The maximum absolute change in output values which occurred in
+   the final iteration.
+
+CNGRMS
+
+CNGRMS = _DOUBLE (Write)
+   The root-mean-squared change in output values which occurred
+   in the last iteration.
+
+IN
+
+IN = NDF (Read)
+   The 2-dimensional NDF containing the input image with bad
+   values.
+
+MEMORY
+
+MEMORY = _LOGICAL (Read)
+   If this is FALSE, the whole array is processed at the same
+   time.  If it is TRUE, the array is divided into chunks whose
+   maximum dimension along an axis is given by parameter BLOCK.
+   [FALSE]
+
+NITER
+
+NITER = INTEGER (Given)
+   The number of iterations of the relaxation algorithm.  This
+   value cannot be less than two, since this is the minimum
+   number required to ensure that all bad values are assigned a
+   replacement value.  The more iterations used, the finer the
+   detail in the replacement function and the closer it will
+   match the surrounding good data.  [2]
+
+OUT
+
+OUT = NDF (Write)
+   The NDF to contain the image free of bad values.
+
+SIZE
+
+SIZE  = _REAL (Read)
+   The initial scale length in pixels to be used in the first
+   iteration.  For maximum efficiency, it should normally have a
+   value about half the `size' of the largest invalid region to
+   be replaced.  (See the Notes section for more details.) [5.0]
+
+TITLE
+
+TITLE = LITERAL (Read)
+   The title of the output NDF.  A null (!) value means using the
+   title of the input NDF. [!]
+
+VARIANCE
+
+VARIANCE = _LOGICAL (Read)
+   If VARIANCE is TRUE, variance information is to be propagated;
+   any bad values therein are filled.  Also the variance is used
+   to weight the calculation of the replacement data values.  If
+   VARIANCE is FALSE, there will be no variance processing thus
+   requiring two less arrays in memory.  This parameter is only
+   accessed if the input NDF contains a VARIANCE component.
+   [TRUE]
+
+Examples
+
+fillbad aa bb
+   The NDF called aa has its bad pixels replaced by good values
+   derived from the surrounding good pixel values using two
+   iterations of a relaxation algorithm.  The initial scale length
+   is 5 pixels.  The resultant NDF is called bb.
+
+fillbad aa bb 6 20 title="Cleaned image"
+   As above except the initial scale length is 20 pixels, 5
+   iterations will be performed, and the output title is "Cleaned
+   image" instead of the title of NDF aa.
+
+fillbad aa bb memory novariance
+   As in the first example except that processing is performed
+   with blocks up to 512 by 512 pixels to reduce the memory
+   requirements, and no variance information will be used or
+   propagated.
+
+Notes
+
+-  The algorithm is based on the relaxation method of repeatedly
+replacing each bad pixel with the mean of its four nearest
+neighbours.  Such a method converges to the required solution,
+but information about the good regions only propagates at a rate
+of about one pixel per iteration into the bad regions, resulting
+in slow convergence if large areas are to be filled.
+
+This application speeds convergence to an acceptable function by
+forming the replacement mean from all the pixels in the same
+image row and column, using a weight which decreases
+exponentially with distance and goes to zero after the first good
+pixel is encountered in any direction.  If there is variance
+information, this is included in the weighting so as to give more
+weight to surrounding values with lower variance.  The scale
+length of the exponential weight is initially set large, to allow
+rapid propagation of an approximate `smooth' solution into the
+bad regions---an initially acceptable solution is thus rapidly
+obtained (often in the first one or two iterations).  The scale
+length is subsequently reduced by a factor of 2 whenever the
+maximum absolute change occurring in an iteration has decreased
+by a factor of 4 since the current scale length was first used.
+In this way, later iterations introduce progressively finer
+detail into the solution.  Since this fine detail occurs
+predominantly close to the `crinkly' edges of the bad regions,
+the slower propagation of the solution in the later iterations is
+then less important.
+
+When there is variance processing the output variance is
+reassigned if either the input variance or data value was bad.
+Where the input value is good but its associated variance is bad,
+the calculation proceeds as if the data value were bad, except
+that only the variance is substituted in the output.  The new
+variance is approximated as twice the inverse of the sum of the
+weights.
+
+-  The price of the above efficiency means that considerable
+workspace is required, typically two or three times the size of
+the input image, but even larger for the one and two-byte integer
+types.  If memory is at a premium, there is an option to process
+in blocks (cf. parameter MEMORY).  However, this may not give as
+good results as processing the array in full, especially when the
+bad-pixel regions span blocks.
+
+-  The value of the parameter SIZE is not critical and the
+default value will normally prove effective.  It primarily
+affects the efficiency of the algorithm on various size scales.
+If the smoothing scale is set to a large value, large scale
+variations in the replacement function are rapidly found, while
+smaller scale variations may require many iterations.
+Conversely, a small value will rapidly produce the small scale
+variations but not the larger scale ones.  The aim is to select
+an initial value SIZE such that during the course of a few
+iterations, the range of size scales in the replacement function
+are all used.  In practice this means that the value of SIZE
+should be about half the size of the largest scale variations
+expected.  Unless the valid pixels are very sparse, this is
+usually determined by the `size' of the largest invalid region to
+be replaced.
+
+-  An error results if the input NDF has no bad values to replace.
+
+-  The progress of the iterations is reported.
+
+Timing
+
+   The time taken increases in proportion to the value of NITER.
+   Adjusting the SIZE parameter to correspond to the largest regions
+   of bad values will reduce the processing time.  See the Notes
+   section.
+
+Related_Applications
+
+   KAPPA: CHPIX, GLITCH, MEDIAN, ZAPLIN; Figaro: BCLEAN,
+   COSREJ, CLEAN, ISEDIT, MEDFILT, MEDSKY, REMBAD, TIPPEX.
+
+Authors
+
+MJC: Malcolm J. Currie (STARLINK)
+
+History
+
+ 1995 April 16 (MJC):
+    Original version.  Some of the documentation was derived from
+    R.F. Warren-Smith's EDRS manual.
+
+Implementation_Status
+
+   -  This routine correctly processes the AXIS, DATA, QUALITY,
+   VARIANCE, LABEL, TITLE, UNITS, and HISTORY components of an NDF
+   data structure and propagates all extensions.
+
+   -  Processing of bad pixels and automatic quality masking are
+   supported.  The output bad-pixel flag is set to indicate no bad
+   values in the data and variance arrays.
+
+   -  All non-complex numeric data types can be handled.  Arithmetic
+   is performed using single- or double-precision floating point as
+   appropriate.
+.endhelp

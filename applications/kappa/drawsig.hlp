@@ -1,0 +1,184 @@
+.help drawsig Starlink kappa
+.nf
+Draws +/-n standard-deviation lines on a line plot.
+
+Usage:
+
+   drawsig ndf nsigma [axis] [comp] [sigcol] [linestyle]
+
+Description:
+
+   This routine draws straight lines on an existing plot stored in
+   the graphics database, such as produced by LINPLOT or HISTOGRAM.
+   The lines are located at arbitrary multiples of the standard
+   deviation (NSIGMA) either side of the mean of a given dataset.
+   The default dataset is the one used to draw the existing plot.
+   You can plot the lines horizontally or vertically as appropriate.
+   The lines extend the full width or height of the plot's data
+   area.  Up to five different multiples of the standard deviation
+   may be presented in this fashion.
+
+   The application also computes statistics for those array values
+   that lie between each pair of plotted lines.  In other words it
+   finds the statistics between clipping limits defined by each
+   2*NSIGMA range centred on the unclipped mean.
+
+   The task tabulates NSIGMA, the mean, the standard deviation, and
+   the error in the mean after the application of each pair of
+   clipping limits.  For comparison purposes the first line of the
+   table presents these values without clipping.  The table is
+   written at the normal reporting level.
+
+Parameters
+
+For information on individual parameters, select from the list below:
+
+AXIS
+
+AXIS = LITERAL (Read)
+   The orientation of the lines, or put another way, the axis
+   which represents data value.  Thus the allowed values are
+   "Horizontal", "Vertical", "X", or "Y".  "Horizontal" is
+   equivalent to "Y" and "Vertical" is a synonym for "X".  On
+   LINPLOT output AXIS would be "Y", but on a plot from HISTOGRAM
+   it would be "X".  The suggested default is the current value.
+   ["Y"]
+
+COMP
+
+COMP = LITERAL (Read)
+   The name of the NDF array component from which to derive the
+   mean and standard deviation used to draw the lines: "Data",
+   "Error", "Quality" or "Variance" (where "Error" is the
+   alternative to "Variance" and causes the square root of the
+   variance values to be taken before computing the statistics).
+   If "Quality" is specified, then the quality values are treated
+   as numerical values (in the range 0 to 255).  ["Data"]
+
+DEVICE
+
+DEVICE = DEVICE (Read)
+   The graphics device to draw the sigma lines on.
+   [Current graphics device]
+
+LINESTYLE
+
+LINESTYLE = _INTEGER (Read)
+   Line style to be used.  The allowed values produce the
+   following styles.
+        1 = solid
+        2 = dashed
+        3 = dotted
+        4 = dot-dashed
+
+   LINESTYLE defaults to the current value, which is initially 3,
+   giving dotted lines. []
+
+NDF
+
+NDF = NDF (Read)
+   The NDF structure containing the data array whose error limits
+   are to be plotted.  Usually this parameter is not defined
+   thereby causing the statistics to be derived from the dataset
+   used to draw the plot.  If, however, you had plotted a section
+   of a dataset but wanted to plot the statistics from the whole
+   dataset, you would specify the full dataset with parameter NDF.
+   [The dataset used to create the existing plot.]
+
+NSIGMA
+
+NSIGMA() = _REAL (Read)
+   Number of standard deviations about the mean at which the
+   lines should be drawn.  The null value or 0.0 causes a line to
+   be drawn at the mean value.
+
+SIGCOL
+
+SIGCOL = _INTEGER (Read)
+   The colour in which to draw any graphics specified by
+   parameter LINESTYLE.  The options are described below.
+
+     "MAX"          - The maximum colour index used for the
+                      display of the image.
+     "MIN"          - The minimum colour index used for the
+                      display of the image.
+     An integer     - The actual colour index.  It is constrained
+                      between 0 and the maximum colour index
+                      available on the device.
+     A named colour - Uses the named colour from the palette, and
+                      if it is not present, the nearest colour
+                      from the palette is selected.
+
+   If the colour is to remain unaltered as the lookup table is
+   manipulated choose an integer between 0 and 15, or a named
+   colour.  The suggested default is the current value.
+
+THICK
+
+THICK = _REAL (Read)
+   The thickness of the lines in the plot, where 1.0 is the
+   normal thickness.  It must take a value in the range
+   0.5--10.0.  [1.0]
+
+Examples
+
+drawsig nsigma=3 linestyle=1
+   This draws solid horizontal lines on the last DATA picture on
+   the current graphics device located at plus and minus 3
+   standard deviations about the mean.  The statistics come from
+   the data array used to draw the DATA picture.
+
+drawsig phot 2.5
+   This draws horizontal plus and minus 2.5 standard-deviation
+   lines about the mean for the data in the NDF called phot on
+   the default graphics device.
+
+drawsig cluster [2,3] X Error
+   This draws vertical lines at plus and minus 2 and 3
+   standard deviations about the mean for the error data in the
+   NDF called cluster on the default graphics device.
+
+drawsig device=xwindows phot(20:119) 3 linestyle=3 sigcol=red
+   This draws red dotted horizontal lines on the xwindows device
+   at +/- 3 standard deviations using the 100 pixels in NDF
+   phot(20:119).
+
+Notes
+
+There must be an existing DATA picture stored within the graphics
+database for the chosen device.  Lines will only be plotted
+within this picture.
+
+Related_Applications
+
+   KAPPA: HISTOGRAM, LINPLOT, MLINPLOT, STATS.
+
+Authors
+
+TIMJ: Tim Jenness (JACH)
+
+MJC: Malcolm J. Currie (STARLINK)
+
+History
+
+ 1996 October 14 (TIMJ):
+    Original version
+
+ 1996 October 16 (MJC):
+    Expanded the documentation.  Fixed a bug that caused the final
+    line always to be solid.  Added AXIS parameter.  Standardised
+    the code style.  Renamed parameter LINSTYLE to LINESTYLE.
+
+Implementation_Status
+
+   -  This routine correctly processes the DATA, VARIANCE, and
+   QUALITY, components of the NDF.
+
+   -  Processing of bad pixels and automatic quality masking are
+   supported.
+
+   -  All non-complex numeric data types can be handled.  The
+   statistics are calculated using double-precision floating point.
+
+   -  Any number of NDF dimensions is supported.
+.endhelp

@@ -1,0 +1,242 @@
+.help histat Starlink kappa
+.nf
+Computes ordered statistics for an NDF's pixels using an
+histogram.
+
+Usage:
+
+   histat ndf [comp] [percentiles] [logfile] [numbin]
+
+Description:
+
+   This application computes and displays simple ordered statistics
+   for the pixels in an NDF's data, quality, error, or variance
+   array.  The statistics available are:
+
+   -  the pixel sum,
+
+   -  the pixel mean,
+
+   -  the pixel median,
+
+   -  the pixel mode,
+
+   -  the pixel value at selected percentiles,
+
+   -  the value and position of the minimum- and maximum-valued
+   pixels,
+
+   -  the total number of pixels in the NDF,
+
+   -  the number of pixels used in the statistics, and
+
+   -  the number of pixels omitted.
+
+Parameters
+
+For information on individual parameters, select from the list below:
+
+COMP
+
+COMP = LITERAL (Read)
+   The name of the NDF array component for which statistics are
+   required.  The options are limited to the arrays within the
+   supplied NDF.  In general the value may "Data", "Error",
+   "Quality" or "Variance" (note that "Error" is the alternative
+   to "Variance" and causes the square root of the variance
+   values to be taken before computing the statistics).  If
+   "Quality" is specified, then the quality values are treated as
+   numerical values (in the range 0 to 255).  ["Data"]
+
+LOGFILE
+
+LOGFILE = FILENAME (Write)
+   A text file into which the results should be logged.  If a null
+   value is supplied (the default), then no logging of results
+   will take place. [!]
+
+MAXCOORD
+
+MAXCOORD( ) = _DOUBLE (Write)
+   A 1-dimensional array of values giving the user co-ordinates of
+   the centre of the (first) maximum-valued pixel found in the
+   NDF array.  The number of co-ordinates is equal to the number
+   of NDF dimensions.
+
+MAXIMUM
+
+MAXIMUM = _DOUBLE (Write)
+   The maximum pixel value found in the NDF array.
+
+MAXPOS
+
+MAXPOS( ) = _INTEGER (Write)
+   A 1-dimensional array of pixel indices identifying the (first)
+   maximum-valued pixel found in the NDF array.  The number of
+   indices is equal to the number of NDF dimensions.
+
+MEAN
+
+MEAN = _DOUBLE (Write)
+   The mean value of all the valid pixels in the NDF array.
+
+MEDIAN
+
+MEDIAN = _DOUBLE (Write)
+   The median value of all the valid pixels in the NDF array.
+
+MINCOORD
+
+MINCOORD( ) = _DOUBLE (Write)
+   A 1-dimensional array of values giving the user co-ordinates of
+   the centre of the (first) minimum-valued pixel found in the
+   NDF array.  The number of co-ordinates is equal to the number
+   of NDF dimensions.
+
+MINIMUM
+
+MINIMUM = _DOUBLE (Write)
+   The minimum pixel value found in the NDF array.
+
+MINPOS
+
+MINPOS( ) = _INTEGER (Write)
+   A 1-dimensional array of pixel indices identifying the (first)
+   minimum-valued pixel found in the NDF array. The number of
+   indices is equal to the number of NDF dimensions.
+
+MODE
+
+MODE = _DOUBLE (Write)
+   The modal value of all the valid pixels in the NDF array.  It
+   is estimated from 3 * median - 2 * mean.  This is only valid
+   for moderately skew distributions.
+
+NDF
+
+NDF = NDF (Read)
+   The NDF data structure to be analysed.
+
+NUMBAD
+
+NUMBAD = _INTEGER (Write)
+   The number of pixels which were either not valid or were
+   rejected from the statistics during iterative K-sigma
+   clipping.
+
+NUMBIN
+
+NUMBIN = _INTEGER (Read)
+   The number of histogram bins to be used.  There is a tradeoff
+   between accuracy and processing time depending on the value
+   of NUMBIN. Increasing the number of bins yields more accurate
+   results, because it reduces quantisation errors biasing
+   the computed statistics, but takes longer to compute.  The
+   bias is in the same sense as the skewness, so generally it
+   will add positive bias.  The default value of NUMBIN is a
+   compromise and generally will give satisfactory results.
+
+   It is hard to quantify the tradeoff precisely; testing with a
+   typical CCD image of stars and galaxies the increase in time
+   went approximately as log of the number of bins, and the
+   accuracy of the pixel sum for some values of NUMBIN were: 100,
+   2.8%; 1000, 0.1% 10000, 0.03%; and 100000, 0.002%.
+
+   NUMBIN must be in the range 100 to 100000. [2048]
+
+NUMGOOD
+
+NUMGOOD = _INTEGER (Write)
+   The number of NDF pixels which actually contributed to the
+   computed statistics.
+
+NUMPIX
+
+NUMPIX = _INTEGER (Write)
+   The total number of pixels in the NDF (both good and bad).
+
+PERCENTILES
+
+PERCENTILES( 100 ) = _REAL (Read)
+   A list of percentiles to be found.  None are computed if this
+   parameter is null (!).  The percentiles must be in the range
+   0.0 to 100.0 [!]
+
+PERVAL
+
+PERVAL() = _DOUBLE (Write)
+   The values of the percentiles of the good pixels in the NDF
+   array.  This parameter is only written when one or more
+   percentiles have been requested.
+
+TOTAL
+
+TOTAL = _DOUBLE (Write)
+   The sum of the pixel values in the NDF array.
+
+Examples
+
+histat image
+   Computes and displays simple ordered statistics for the data
+   array in the NDF called image.
+
+histat ndf=spectrum variance
+   Computes and displays simple ordered statistics for the
+   variance array in the NDF called spectrum.
+
+histat spectrum error
+   Computes and displays ordered statistics for the variance
+   array in the NDF called spectrum, but takes the square root of
+   the variance values before doing so.
+
+histat halley logfile=stats.dat
+   Computes ordered statistics for the data array in the NDF
+   called halley, and writes the results to a logfile called
+   stats.dat.
+
+histat ngc1333 percentiles=[0.25,0.75] numbin=100000
+   Computes ordered statistics for the data array in the NDF
+   called ngc1333, including the quartile values.  The highest
+   accuracy is used.
+
+Notes
+
+-  If the array has a few extreme outliers this can bias the
+statistics unless the number of bins in the histogram is large,
+or the outliers are removed (flagged) via application THRESH.
+
+-  There is quantisation bias in the statistics.  See parameter
+NUMBIN.
+
+Related_Applications
+
+   KAPPA: HISTOGRAM, INSPECT, MSTATS, NDFTRACE, NUMB, STATS;
+   Figaro: ISTAT.
+
+Authors
+
+MJC: Malcolm J. Currie (STARLINK)
+
+History
+
+ 1991 November 13 (MJC):
+    Original NDF version.
+
+ 1994 September 27 (MJC):
+    Replaced AIF calls with PAR, FIO, and PSX.  Made messages
+    conditional and used modern names for subroutines (_$ to 1_).
+
+Implementation_Status
+
+   -  This routine correctly processes the AXIS, DATA, VARIANCE,
+   QUALITY, TITLE, and HISTORY components of the NDF.
+
+   -  Processing of bad pixels and automatic quality masking are
+   supported.
+
+   -  All non-complex numeric data types can be handled.  Arithmetic
+   is performed using single- or double-precision floating point,
+   as appropriate.
+
+   -  Any number of NDF dimensions is supported.
+.endhelp

@@ -1,0 +1,6 @@
+in,f,a,,,,"NDF to be modified"
+out,f,a,,,,"Output NDF"
+section,s,a,,,,"Section to be set to a constant"
+newval,s,a,"0.0",,,"New value for the section"
+comp,s,h,"DATA",,,"NDF array component to analyse"
+title,s,h,INDEF,,,"Title for output NDF"

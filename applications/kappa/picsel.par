@@ -1,0 +1,2 @@
+label,s,a,,,,"Label of the picture to be selected"
+device,f,a,,,,"*! Name of graphics device"

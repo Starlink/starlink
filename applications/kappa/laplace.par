@@ -1,0 +1,4 @@
+inpic,f,a,,,,"Image to be convolved"
+number,i,h,1,,,"Number of Laplacians removed"
+outpic,f,a,,,,"Image after convolution"
+otitle,s,h,"KAPPA - Laplace",,,"Title for output image"

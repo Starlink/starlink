@@ -1,0 +1,12 @@
+in,f,a,,,,"NDF containing coefficients"
+out,f,a,,,,"NDF to contain surface"
+lbound,struct,a,,,,"Lower bounds of the output NDF"
+1 1
+like,f,h,!,,,"Template NDF (null for none)"
+title,s,h,INDEF,,,"Title for the new NDF"
+type,s,a,"_DOUBLE",,,"Data type of output NDF"
+ubound,struct,a,,,,"Upper bounds of the output NDF"
+512 512
+variance,b,h,n,,,"Create a variance error?"
+xlimit,r,a,,,,"X co-ordinate limits (lower then upper)"
+ylimit,r,a,,,,"Y co-ordinate limits (lower then upper)"

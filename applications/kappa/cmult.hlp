@@ -1,0 +1,86 @@
+.help cmult Starlink kappa
+.nf
+Multiplies an NDF by a scalar.
+
+Usage:
+
+   cmult in scalar out
+
+Description:
+
+   This application multiplies each pixel of an NDF by a scalar
+   (constant) value to produce a new NDF.
+
+Parameters
+
+For information on individual parameters, select from the list below:
+
+IN
+
+IN = NDF (Read)
+   Input NDF structure whose pixels are to be multiplied by a
+   scalar.
+
+OUT
+
+OUT = NDF (Write)
+   Output NDF structure.
+
+SCALAR
+
+SCALAR = _DOUBLE (Read)
+   The value by which the NDF's pixels are to be multiplied.
+
+TITLE
+
+TITLE = LITERAL (Read)
+   A title for the output NDF.  A null value will cause the title
+   of the NDF supplied for parameter IN to be used instead.
+   [!]
+
+Examples
+
+cmult a 12.5 b
+   Multiplies all the pixels in the NDF called a by the constant
+   value 12.5 to produce a new NDF called b.
+
+cmult in=rawdata out=newdata scalar=-19
+   Multiplies all the pixels in the NDF called rawdata by -19 to
+   give newdata.
+
+Related_Applications
+
+   KAPPA: ADD, CADD, CDIV, CSUB, DIV, MATHS, MULT, SUB.
+
+Authors
+
+RFWS: R.F. Warren-Smith (STARLINK)
+
+MJC: Malcolm J. Currie (STARLINK)
+
+History
+
+ 17-APR-1990 (RFWS):
+    Original version.
+
+ 11-MAR-1991 (RFWS):
+    Finished writing the new prologue and fixed a minor typo in
+    the code.
+
+ 1995 September 12 (MJC):
+    Title inherited by default.  Usage and examples to lowercase.
+    Added Related Applications.
+
+Implementation_Status
+
+   -  This routine correctly processes the AXIS, DATA, QUALITY,
+   LABEL, TITLE, UNITS, HISTORY, and VARIANCE components of an NDF
+   data structure and propagates all extensions.
+
+   -  Processing of bad pixels and automatic quality masking are
+   supported.
+
+   -  All non-complex numeric data types can be handled.  Arithmetic
+   is carried out using the appropriate floating-point type, but the
+   numeric type of the input pixels is preserved in the output NDF.
+.endhelp

@@ -1,0 +1,8 @@
+files,s,a,,,,"Give a list of the FITS files to be processed"
+out,f,a,,,,"Output image"
+auto,b,h,n,,,"Automatic mode?"
+fmtcnv,b,a,y,,,"Convert data?"
+logfile,f,h,!,,,"Filename to store FITS headers"
+glocon,b,h,n,,,"Data-conversion switch to apply globally?"
+dscftable,f,a,,,,"Name of FACTS description file"
+table,f,a,,,,"Name of output table"

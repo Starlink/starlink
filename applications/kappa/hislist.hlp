@@ -1,0 +1,63 @@
+.help hislist Starlink kappa
+.nf
+Lists NDF history records.
+
+Usage:
+
+   hislist ndf
+
+Description:
+
+   This lists all the history records in an NDF.  The reported
+   information comprises the date, time, and application name,
+   and optionally the history text.
+
+Parameters
+
+For information on individual parameters, select from the list below:
+
+BRIEF
+
+BRIEF = _LOGICAL (Read)
+   This controls whether a summary or the full history information
+   is reported.  BRIEF=TRUE requests that only the date and
+   application name in each history record is listed.  BRIEF=FALSE
+   causes the task to report the history text in addition.
+   [FALSE]
+
+NDF
+
+NDF = NDF (Read)
+   The NDF whose history information is to be reported.
+
+Examples
+
+hislist vcc953
+   This lists the full history information for the NDF called
+   vcc935.  The information comprises the names of the
+   applications and the times they were used, and the associated
+   history text.
+
+hislist vcc953 brief
+   This gives a summary of the history information for the NDF
+   called vcc935.  It comprises the names of the applications
+   and the times they were used.
+
+Related_Applications
+
+   KAPPA: HISCOM, HISSET, NDFTRACE.
+
+Authors
+
+RFWS: R.F.Warren-Smith (STARLINK, RAL)
+
+MJC: Malcolm J. Currie (STARLINK)
+
+History
+
+ 1993 June 2 (RFWS):
+    Original version.
+
+ 1995 June 24 (MJC):
+    Added the documentation.
+.endhelp

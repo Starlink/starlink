@@ -1,0 +1,494 @@
+.help greyplot Starlink kappa
+.nf
+Produces a greyscale plot of a 1-d or 2-d NDF.
+
+Usage:
+
+   greyplot in [comp] key [device] mode [pxsize] [pysize] [out]
+      { white=? black=?
+      { percentiles=?
+      { sigmas=?
+      mode
+
+Description:
+
+   This application produce a greyscale plot of a 1- or
+   2-dimensional NDF, especially for a hardcopy device.  The image
+   is usually the data array, but may also be the variance or
+   quality.  The plot appears in the current graphics-database
+   picture.
+
+   The greyscale plot resides within optional, annotated and
+   enumerated axes. An optional key may be drawn to the right of the
+   greyscale plot comprising a title and grey blocks annotated with
+   the corresponding array value.  There are a number of scaling
+   methods to map array values to grey levels in the plot.
+
+   The time to output to hardcopy devices can be quite lengthy
+   and generally depends on the size of the greyscale plot.
+   Therefore, there are parameters for controlling the size of
+   the plot.
+
+Parameters
+
+For information on individual parameters, select from the list below:
+
+ABSLAB
+
+ABSLAB  =  LITERAL (Read)
+   Label for the plot abscissa, in which NCAR fancy founts
+   may be embedded when FONT = "NCAR".  This parameter is only
+   used when the axes option is selected.  If axis information is
+   present the suggested default is the NDF's axis label followed
+   by the units, in parentheses.  If an error occurs obtaining
+   the label the suggested default is "X". []
+
+AXES
+
+AXES = _LOGICAL (Read)
+   TRUE if annotated axes are to be drawn around the displayed
+   image.  The annotations are either the data co-ordinates from
+   the NDF axis components, provided these are present and linear
+   and COSYS = "Data"; otherwise pixel co-ordinates are used.
+   [FALSE]
+
+BADCOL
+
+BADCOL = LITERAL (Read)
+   The grey level to give a bad pixel in the display.  There are
+   a number of options described below.
+
+     "MAX"       - Black
+     "MIN"       - White
+     An integer  - The actual 'colour' index.  It is constrained
+                   to be between 0 and the maximum colour index
+                   available on the device, and so gives a shade
+                   of grey.  0 gives the background colour.
+     A named     - Uses the named `colour' from the palette, and
+     `colour'      if it is not present, the nearest colour from
+                   the palette is selected.  The palette contains
+                   grey levels at percentages from black to white,
+                   e.g. GREY50 is midway between black and white.
+
+   If this application is run on a device that supports colour
+   it is possible to mark the bad pixels in colour on the
+   greyscale provided BADCOL is an integer between 0 and 15, or
+   a named colour.  The bad pixels will remain unaltered if the
+   lookup table is manipulated.  The suggested default is the
+   current value. [The current value, but equals "MIN" if there
+   is no current value.]
+
+BLACK
+
+BLACK = _DOUBLE (Read)
+   The array value that scales to the black in the greyscale
+   colour table.  All smaller array values appear black when
+   BLACK is less than WHITE, otherwise all array values
+   smaller than BLACK appear white.  The dynamic default is the
+   minimum data value.   There is an efficiency gain when both
+   BLACK and WHITE are given on the command line, because the
+   extreme values need not be computed.  (Scale mode)
+
+COMP
+
+COMP = LITERAL (Read)
+   The NDF component to be displayed.  It may be "Data",
+   "Quality", "Variance", or "Error" (where "Error" is the
+   alternative to "Variance" and causes the square root of the
+   variance values to be displayed).  If "Quality" is specified,
+   then the quality values are treated as numerical values (in
+   the range 0 to 255). ["Data"]
+
+COSYS
+
+COSYS = LITERAL (Read)
+   The co-ordinate system to be used.  This can be either "World"
+   or "Data".  "World" makes pixel co-ordinates to appear on axes.
+   If COSYS = "Data" the NDF's axis information is used to
+   annotate axes.  [Current co-ordinate system]
+
+DEVICE
+
+DEVICE = DEVICE (Read)
+   The name of the graphics device used to display the image.
+   The device must be in one of the following GNS categories:
+   IMAGE_DISPLAY, IMAGE_OVERLAY, MATRIX_PRINTER, or WINDOW, and
+   have at least 24 greyscale intensities.
+   [Current image-display device]
+
+FILL
+
+FILL = _LOGICAL (Read)
+   The greyscale plot normally has square pixels, in other words
+   a length along each axis corresponds to the same number of
+   pixels.  However, for images with markedly different
+   dimensions, such as two-dimensional spectra, this default
+   behaviour may not be suitable or give the clearest plot.  When
+   FILL is TRUE, the square-pixel constraint is relaxed and the
+   greyscale plot is the largest possible within the current
+   picture.  When FILL is FALSE, the pixels are square.  The
+   suggested default is the current value.  [FALSE]
+
+FONT
+
+FONT = LITERAL (Read)
+   The fount to be used for the line graphics.  It can be either
+   "NCAR" for the NCAR fancy characters and "GKS" for the standard
+   GKS san-serif fount.   The former is intended for hardcopy
+   publication-quality plots, since it is relatively slow; the
+   latter is intended for normal interactive graphics requiring
+   rapid plotting, and it is clearer on small plots. The
+   suggested default is the current value. ["GKS"]
+
+FULL
+
+FULL = _LOGICAL (Read)
+   If TRUE, the whole greyscale lookup table for the device is
+   used including the normally reserved pens.  Thus all but two
+   of the available intensities participate in the greyscale,
+   which improves the photographic quality of the image.  The
+   remaining pens are for the background, and for the key and
+   axes.  This option is only available for devices that reset
+   their `colour' tables when the device is opened, such as
+   Laserprinters. (This restriction prevents problems on devices
+   that retain their "colour tables", where using the normally
+   reserved pens would mean that either part of the greyscale
+   would be emphemeral---departing when the application
+   completes if the reserved pens are stored and reinstated on
+   completion, or earlier plots drawn by other applications would
+   be altered.)
+
+   If FULL = FALSE, only non-reserved intensities will form the
+   greyscale.  The default is TRUE when the non-reserved pens
+   is less than 32, and FALSE otherwise.  (This figure was chosen
+   because it is roughly the number of grey levels at which the
+   eye will clearly detect the quantisation in a complex scene.)
+   []
+
+IN
+
+IN = NDF (Read)
+   Input NDF data structure containing the image to be displayed.
+
+KEY
+
+KEY = _LOGICAL (Read)
+   A key of the greyscale versus pixel value and title is to be
+   produced when this is TRUE. [TRUE]
+
+MAJTIC
+
+MAJTIC( 2 ) = _REAL (Read)
+   The parameter controlling the numbers of major tick marks
+   for the x and y axes.  (Number used is between MAJTIC+2 and
+   5*MAJTIC/2+4.)   A negative value for an axis makes the
+   graphics package decide an appropriate value.  This parameter
+   is only used when the axes option is selected. [3.,3.]
+
+MINTIC
+
+MINTIC( 2 ) = _REAL (Read)
+   The number of minor tick marks between each major tick mark
+   for the x and y axes.  A negative value forces the graphics
+   package to compute appropriate values.   This parameter is
+   only used when the axes option is selected. [-1.,-1.]
+
+MODE
+
+MODE = LITERAL (Read)
+   The type of scaling to be applied to the array.  There are a
+   number of options described below.
+     "Faint"       - The image is scaled from the mean minus one
+                     standard deviation to the mean plus seven
+                     standard deviations.  The scaling values are
+                     reported so that the faster Scale mode may be
+                     utilised later.
+     "Flash"       - The image is flashed onto the screen without
+                     any scaling at all.  This is the fastest
+                     option.  Since there is no longer a
+                     one-to-one mapping between data values and
+                     grey levels this scaling mode is not
+                     available with a key.
+     "Percentiles" - The image is scaled between the values
+                     corresponding to two percentiles.  The
+                     scaling values are reported so that the
+                     faster Scale mode may be utilised later.
+     "Range"       - The image is scaled between the minimum and
+                     maximum data values.
+     "Scale"       - You define the upper and lower limits
+                     between which the image is to be scaled.  The
+                     application reports the maximum and the
+                     minimum values for reference and makes these
+                     defaults respectively.
+     "Sigmas"      - The image is scaled between two standard-
+                     deviation limits.  The scaling values used
+                     are reported so that the faster Scale mode
+                     may be utilised later.
+
+NUMBIN
+
+NUMBIN  =  _INTEGER (Read)
+   The number of histogram bins used to compute percentiles for
+   scaling. (Percentiles mode) [2048]
+
+ORDLAB
+
+ORDLAB  =  LITERAL (Read)
+   Label for the plot ordinate, in which NCAR fancy founts
+   may be embedded when FONT = "NCAR".   This parameter is only
+   used when the axes option is selected.  If axis information is
+   present the suggested default is the NDF's axis label followed
+   by the units, in parentheses.  If an error occurs obtaining
+   the label the suggested default is "Y". []
+
+OUT
+
+OUT = NDF (Write)
+   The scaled NDF that is displayed; it also does not have
+   values that equal the reserved portion of the colour table.
+   The output NDF is intended to be used as the input data in
+   conjunction with SCALE=FALSE.  It will be vertically
+   inverted with respect to the input array because of GKS
+   convention.  If it has a null value (!) no output NDF will be
+   created.  This parameter is ignored when SCALE=FALSE. [!]
+
+OUTTIC
+
+OUTTIC = _LOGICAL (Read)
+   True if the axis tick marks are to appear on the outside of
+   the axes instead of inside.   This parameter is only used
+   when the axes option is selected. [TRUE]
+
+PERCENTILES
+
+PERCENTILES( 2 ) = _REAL (Read)
+   The percentiles that define the scaling limits. For example,
+   [75,25] would scale between the quartile values. (Percentile
+   mode)
+
+PLTITL
+
+PLTITL = LITERAL (Read)
+   The title of the plot.  Up to about 25 characters can be
+   accommodated when there are no axes, and about 40 otherwise.
+   NCAR fancy founts may be embedded (cf. SUN/90) when FONT =
+   "NCAR".  This parameter is only used when either the axes or
+   key option is selected. [The NDF title]
+
+PXSIZE
+
+PXSIZE = _REAL (Read)
+   The length (x axis) of the plot in metres.  [Maximum that can
+   fit in the current picture whilst preserving square pixels.]
+
+PYSIZE
+
+PYSIZE = _REAL (Read)
+   The length (y axis) of the plot in metres.  [Maximum that can
+   fit in the current picture whilst preserving square pixels.]
+
+REDUCT
+
+REDUCT = _REAL (Read)
+   The reduction factor of the array, and must be in the range
+   1/MAX(NX,NY)--1.0, where NX and NY are the number of pixels
+   in the image along the x and y directions.  Since the output
+   to the hardcopy device may be long, the size of the image
+   with respect to the key can be reduced by lowering REDUCT.
+   The spooling time goes approximately proportional to the
+   square of REDUCT.  1.0 means the array fills the plotting zone.
+   [1.0]
+
+SCAHIGH
+
+SCAHIGH = _DOUBLE (Write)
+   The array value scaled to white in the greyscale display.
+   In Flash mode or when there is no scaling the colour index of
+   white is used.  The current display linear-scaling maximum is
+   set to this value.
+
+SCALE
+
+SCALE = _LOGICAL (Read)
+   If TRUE the input array is scaled according to the value of
+   parameter MODE.  If it is FALSE, MODE is ignored, and the input
+   array is displayed as is.  There is no scaling, inversion
+   or avoidance of annotation pens.  SCALE=FALSE is intended to
+   be used with arrays previously scaled by this or similar
+   applications which have already performed the scaling,
+   inversion and exclusion.  It provides the quickest method of
+   image display within this application. [TRUE]
+
+SCALOW
+
+SCALOW = _DOUBLE (Write)
+   The array value scaled to black in the greyscale display.
+   In Flash mode or when there is no scaling the colour index of
+   black is used.  The current display linear-scaling minimum is
+   set to this value.
+
+SIGMAS
+
+SIGMAS( 2 ) = _REAL (Read)
+   The standard-deviation bounds that define the scaling limits.
+   To obtain values either side of the mean both a negative and
+   a positive value are required.  Thus [-2,3] would scale
+   between the mean minus two and the mean plus three standard
+   deviations.  [3,-2] would give the negative of that. (Sigmas
+   mode).
+
+THICK
+
+THICK = _REAL (Read)
+   The thickness of the axes and annotations in the plot, where
+   1.0 is the normal thickness.  It should be between 0.5 and 5.
+   This feature is only available on some devices.   This
+   parameter is only used when the axes option is selected. [1.0]
+
+WHITE
+
+WHITE = _DOUBLE (Read)
+   The array value that scales to white in the greyscale
+   colour table.  All larger array values appear white when
+   WHITE is greater than BLACK, otherwise all array values
+   larger than WHITE appear black.  The dynamic default is the
+   maximum data value.   There is an efficiency gain when both
+   BLACK and WHITE are given on the command line, because the
+   extreme values need not be computed.  (Scale mode)
+
+Examples
+
+greyplot sdor key mode=sc black=1 white=5.2
+   Makes a greyscale display of the data component of the NDF
+   called sdor on the current image-display device, scaling
+   between 1 and 5.2.  Values up to 1.0 in the data array will
+   appear black in the plot, and values larger than 5.2 will be
+   white.  Intermediate values will a grey level determined by
+   linear interpolation.  A key is drawn to the right of the
+   greyscale.
+
+greyplot in=sdor nokey mode=p percentiles=[10,90] badcol="Black"
+   This makes a greyscale plot of the NDF called sdor on the
+   current image-display device. The scaling is between the 10 and
+   90 per cent percentiles of the image.  No key is drawn.  Bad
+   data appear black in the plot.
+
+greyplot mode=fa axes out=video cosys=d \
+   Displays a greyscale of the current NDF data component with
+   annotated axes on the current image-display device.  The axes
+   take the axis labels and title from the NDF, and are annotated
+   in data co-ordinates.  The scaling is between the -1 and +7
+   standard deviations of the image around its mean.  A key is
+   drawn.  The scaled data are stored in an NDF called video.
+
+greyplot video noscale \
+   Displays the data component of the NDF called video (created
+   in the previous example) without scaling within the current
+   picture on the current image-display device.
+
+greyplot cgs4k v key mode=ra device=canon_l
+   Makes a greyscale display of the variance component of NDF
+   cgs4k on the Canon_l device, scaling between the minimum and
+   maximum variance values.
+
+Notes
+
+-  The application stores a number of pictures in the graphics
+database in the following order: a FRAME of the specified size
+containing the title, annotated axes, and the image area
+(provided AXES is TRUE), whose world co-ordinates are in pixels;
+a DATA picture with world co-ordinates in units of data pixels;
+and a KEY.  The DATA picture also may have double-precision data
+co-ordinates derived from the NDF axis component provided these
+are linear and different from pixel co-ordinates; the data
+co-ordinates are stored via a linear transformation.  The NDF
+associated with the plot is stored by reference with the DATA
+picture.  On exit the current database picture for the chosen
+device reverts to the input picture.
+
+-  When axes are requested the axis annotations are defined by
+their lower and upper bounds, i.e. a regular array is assumed.
+The bounds are in pixel or data co-ordinates.
+
+-  The data type of the output NDF depends on the number of colour
+indices: _UBYTE for no more than 256, _UWORD for 257 to 65535,
+and _INTEGER otherwise.   The output NDF will not contain any
+extensions, UNITS, QUALITY, and VARIANCE; but LABEL, TITLE, and
+AXIS information are propagated from the input NDF.  The output
+NDF does not become the new current data array.  It is a Simple
+NDF (because the bad-pixel flag is set to false in order to
+access the maximum grey level), therefore only NDF-compliant
+applications can process it.
+
+Related_Applications
+
+   KAPPA: DISPLAY; Figaro: IGREY, IMAGE; SPECDRE: MOVIE.
+
+Authors
+
+MJC: Malcolm J. Currie (STARLINK)
+
+History
+
+ 1991 February 7 (MJC):
+    NDF version based on the pre-0.8 version.
+
+ 1991 March 19 (MJC):
+    Added output parameters for the scaling limits.
+
+ 1991 April 5 (MJC):
+    Added data co-ordinate transformation and optional axes.
+
+ 1991 May 7 (MJC):
+    Added the input and output of NDFs containing scaled data.
+
+ 1991 May 14 (MJC):
+    Added direct processing of _BYTE and _WORD data.
+
+ 1991 July 22 (MJC):
+    Added user-controlled appearance of bad pixels.
+
+ 1991 August 20 (MJC):
+    Added FONT parameter.
+
+ 1992 January 29 (MJC):
+    Removed line that resets the background to black.
+
+ 1992 March 3 (MJC):
+    Replaced AIF parameter-system calls by the extended PAR
+    library.
+
+ 1992 March 30 (MJC):
+    Revised defaulting behaviour of BADCOL and corrected the notes.
+    Included BADCOL in one of the examples.
+
+ 1992 April 13 (MJC):
+    Made to handle significant dimensions for user-defined
+    sections.
+
+ 1992 November 28 (MJC):
+    Does not use non-monotonic axis centres.
+
+ 1992 December 17 (MJC):
+    Added the FILL option.
+
+ 1995 October 19 (MJC):
+    Supports Error component.
+
+ 1997 May 28 (MJC):
+    QUALITY and HISTORY no longer propagated to the OUT NDF.
+
+Implementation_Status
+
+   -  This routine correctly processes the AXIS, DATA, QUALITY,
+   VARIANCE, LABEL, TITLE, and UNITS components of the input NDF.
+
+   -  Processing of bad pixels and automatic quality masking are
+   supported.
+
+   -  This application will handle data in all numeric types, though
+   type conversion to integer will occur for unsigned byte and word
+   images.  However, when there is no scaling only integer data will
+   not be type converted, but this is not expensive for the expected
+   byte-type data.
+.endhelp

@@ -1,0 +1,18 @@
+.help feedback Starlink kappa
+.nf
+Bug reports should be mailed to ussc@star.rl.ac.uk in the normal
+way.  A copy to the author (mjc@star.rl.ac.uk) may accelerate a fix.
+Normally, fix will be made the same day, and often immediately; you
+will be told from where you can copy a revised application until
+KAPPA is re-released.
+
+Constructive comments are always welcome.  If you wish to suggest
+new tasks or enhancements to existing ones please contact the
+author.  Small jobs may be undertaken quite quickly.  Requests
+involving substantial pieces of work need to gain the support of
+others to be included in Starlink's, and so the best way to
+influence the priority given to KAPPA is to contact the chairman of
+the Image Processing Software Strategy Group.  The Starlink
+World-Wide-Web pages will periodically contain news of plans and
+work in progress.
+.endhelp

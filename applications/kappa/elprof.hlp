@@ -1,0 +1,234 @@
+.help elprof Starlink kappa
+.nf
+Creates a radial or azimuthal profile of a 2-dimensional image.
+
+Usage:
+
+   elprof in out nbin xc yc { angmaj=?
+                            { ratio=?
+                            { rmin=?
+                            { rmax=?
+                            radial
+
+Description:
+
+   This application will bin the input image into elliptical annuli,
+   or into a `fan' of adjacent sectors, centred on a specified
+   position.  The mean data values in each bin are found, and stored
+   in a 1-dimensional NDF which can be examined using LINPLOT,
+   INSPECT, etc.  Options exist to restrict the area binned to a
+   given range of radial distance and/or azimuthal angle.  A
+   2-dimensional mask image can optionally be produced indicating
+   which bin each input pixel was placed in.
+
+   If radial binning is selected (the default), then each bin is an
+   elliptical annulus of shape and size determined by parameters
+   RMIN, RMAX, ANGMAJ, RATIO, XC, YC, and WIDTH.  The bins can be
+   restricted to a specified sector of these annuli using parameter
+   ANGLIM.
+
+   If azimuthal binning is selected, then each bin is a sector
+   (i.e. a wedge-shape), with its vertex given by parameters XC and
+   YC, and its opening angle given by parameters WIDTH.  The range of
+   azimuthal angles to be binned can be specified by parameter
+   ANGLIM.  The bins can be restricted to the intersection of these
+   sectors with an elliptical annulus by specified values for
+   parameters RMIN, RMAX, ANGMAJ and RATIO.
+
+Parameters
+
+For information on individual parameters, select from the list below:
+
+ANGLIM
+
+ANGLIM( 2 ) = _REAL (Read)
+   Defines the wedge-shaped sector within which binning is to be
+   performed.  The first value should be the azimuthal angle of
+   the clockwise boundary of the sector, and the second should be
+   the azimuthal angle of the anti-clockwise boundary.  The angles
+   are measured in degrees from the x-axis, and rotation from the
+   x-axis to the y-axis is positive.  If only a single value is
+   supplied, or if both values are equal, the sector starts at
+   the given angle and extends for 360 degrees. [0]
+
+ANGMAJ
+
+ANGMAJ = _REAL (Read)
+   The angle between the x-axis and the major axis of the
+   ellipse, in degrees.  Rotation from the x-axis to the y-axis is
+   positive.  If an azimuthal profile (see parameter RADIAL) is
+   being produced a run-time default of zero is used, otherwise
+   you will be prompted for a value. []
+
+IN
+
+IN = NDF (Read)
+   The input NDF containing the 2-dimensional image from which a
+   profile is to be generated.
+
+MASK
+
+MASK = NDF (Write)
+   An output NDF of the same shape and size as the input NDF
+   indicating the bin into which each input pixel was placed.
+   For radial profiles, the bins are identified by a mask value
+   equal to the radius (in pixels) measured on the major axis, at
+   the centre of the annular bin.  For azimuthal profiles, the
+   bins are identified by a mask value equal to the angle from
+   the x-axis to the centre of the sector-shaped bin (in
+   degrees).  If a null value is supplied, then no mask NDF is
+   produced. [!]
+
+MTITLE
+
+MTITLE = LITERAL (Read)
+   A title for the mask NDF.  If a null value is given, the title
+   is propagated from the input NDF.  This is only prompted for
+   if MASK is given a non-null value. ["Mask created by KAPPA -
+   Elprof"]
+
+NBIN
+
+NBIN = _INTEGER (Read)
+   The number of radial or azimuthal bins required.
+
+OUT
+
+OUT = NDF (Write)
+   The output 1-dimensional NDF containing the required profile.
+   For radial profiles, it has associated axis information
+   describing the radius, in pixels, at the centre of each
+   annular bin (the radius is measured on the major axis).  For
+   azimuthal profiles, the axis information describes the
+   azimuthal angle, in degrees, at the centre of each
+   sector-shaped bin.  It will contain associated variance
+   information if the input NDF has associated variance
+   information.
+
+RADIAL
+
+RADIAL = _LOGICAL (Read)
+   Specifies the sort of profile required.  If RADIAL is TRUE,
+   then a radial profile is produced in which each bin is an
+   elliptical annulus.  Otherwise, an azimuthal profile is
+   produced in which each bin is a wedge-shaped sector. [TRUE]
+
+RATIO
+
+RATIO = _REAL (Read)
+   The ratio of the length of the minor axis of the ellipse to
+   the length of the major axis.  It must be in the range 0.0 to
+   1.0.  If an azimuthal profile (see parameter RADIAL) is being
+   produced a run-time default of 1.0 is used, otherwise you are
+   prompted for a value. []
+
+RMAX
+
+RMAX = _REAL (Read)
+   The radius in pixels, measured on the major axis, at the outer edge
+   of the elliptical region to be binned.  If an azimuthal profile
+   (see parameter RADIAL) is being produced, a large run-time
+   default is used which results in the entire image being
+   binned, otherwise you are prompted for a value. []
+
+RMIN
+
+RMIN = _REAL (Read)
+   The radius in pixels, measured on the major axis, at the inner edge
+   of the elliptical region to be binned.  If an azimuthal profile
+   (see parameter RADIAL) is being produced a run-time default of
+   0.0 is used, otherwise you are prompted a value. []
+
+TITLE
+
+TITLE = LITERAL (Read)
+   A title for the output profile NDF.  If a null value is
+   supplied the title is propagated from the input NDF. ["KAPPA -
+   Elprof"]
+
+WIDTH
+
+WIDTH = _REAL (Read)
+   The width of each bin.  If a radial profile is being created
+   (see parameter RADIAL) this is the width of each annulus in
+   pixels (measured on the major axis).  If an azimuthal profile
+   is being created, it is the opening angle of each sector, in
+   degrees.  The run-time default is chosen so that there are no
+   gaps between adjacent bins.  Smaller values will result in gaps
+   appearing between adjacent bins.  The supplied value must be
+   small enough to ensure that adjacent bins do not overlap. []
+
+XC
+
+XC = _REAL (Read)
+   The x pixel co-ordinate of the centre of the ellipse, and the
+   vertex of the sectors.
+
+YC
+
+YC = _REAL (Read)
+   The y pixel co-ordinate of the centre of the ellipse, and the
+   vertex of the sectors.
+
+Examples
+
+elprof galaxy galprof 20 113 210 angmaj=49 rmin=10 rmax=210 ratio=0.5
+   This example will create a 1-dimensional NDF called galprof
+   containing a radial profile of the 2-dimensional NDF called
+   galaxy.  The profile will contain 20 bins and it will be
+   centred on the pixel co-ordinates (113,210).  Each bin will be
+   an annulus of an ellipse with axis ratio of 0.5 and
+   inclination of 49 degrees to the x-axis.  The image will be
+   binned between radii of 10 pixels, and 210 pixels (measured on
+   the major axis), and there will be no gaps between adjacent
+   bins (i.e. each bin will have a width on the major axis of
+   about 10 pixels).
+
+elprof galaxy galprof 10 113 210 radial=f anglim=20 rmin=50
+
+rmax=60
+   This example also creates a 1-dimensional NDF called galprof,
+   this time containing an azimuthal profile of the 2-dimensional
+   NDF called "galaxy", containing 10 bins.  Each bin will be a
+   wedge-shaped sector with vertex at pixel co-ordinates
+   (113,210).  The clockwise edge of the first bin will be at an
+   angle of 20 degrees to the x-axis, and each bin will have a
+   width (opening angle) of 36 degrees (so that 360 degrees are
+   covered in total).  Only the section of each sector bounded by
+   radii of 50 and 60 pixels is included in the profile.  In this
+   case the default value of 1.0 is accepted for parameter RATIO
+   and so the bins will form a circular annulus of width 10
+   pixels.
+
+Related_Applications
+
+   KAPPA: INSPECT; ESP: ELLFOU, ELLPRO, SECTOR.
+
+Authors
+
+DSB: David Berry (STARLINK)
+
+MJC: Malcolm J. Currie (STARLINK)
+
+History
+
+ 2-FEB-1995 (DSB):
+    Original version.
+
+ 1995 March 27 (MJC):
+    Some improvements to the documentation, removed tabs, used
+    modern variable-declaration style and other stylish changes,
+    removed long lines, mapped the input arrays together for
+    efficiency.
+
+Implementation_Status
+
+   -  This routine correctly processes the DATA, VARIANCE, TITLE,
+   UNITS, and HISTORY components of the input NDF.
+
+   -  Processing of bad pixels and automatic quality masking are
+   supported.
+
+   -  All non-complex numeric data types can be handled.  Arithmetic
+   is performed using single-precision floating point.
+.endhelp

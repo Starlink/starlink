@@ -1,0 +1,98 @@
+.help histeq Starlink kappa
+.nf
+Performs an histogram equalisation on an NDF.
+
+Usage:
+
+   histeq in out [numbin]
+
+Description:
+
+   This application transforms an NDF via histogram equalisation.
+   Histogram equalisation is an image-processing technique in which
+   the distribution (between limits) of data values in the input
+   array is adjusted so that in the output array there are
+   approximately equal numbers of elements in each histogram bin.
+   To achieve this the histogram bin size is no longer a constant.
+   This technique is commonly known as histogram equalisation.  It
+   is useful for displaying features across a wide dynamic range,
+   sometimes called a maximum information picture.  The transformed
+   array is output to a new NDF.
+
+Parameters
+
+For information on individual parameters, select from the list below:
+
+IN
+
+IN  = NDF (Read)
+   The NDF structure to be transformed.
+
+NUMBIN
+
+NUMBIN = INTEGER (Read)
+   The number of histogram bins to be used.  This should be a
+   large number, say 2000, to reduce quantisation errors.  It
+   must be in the range 100 to 10000. [2048]
+
+OUT
+
+OUT = NDF (Write)
+   The NDF structure to contain the transformed data array.
+
+TITLE
+
+TITLE = LITERAL (Read)
+   Title for the output NDF structure.  A null value (!)
+   propagates the title from the input NDF to the output NDF. [!]
+
+Examples
+
+histeq halley maxinf
+   The data array in the NDF called halley is remapped via
+   histogram equalisation to form the new NDF called maxinf.
+
+histeq halley maxinf 10000 title="Maximum information of Halley"
+   The data array in the NDF called halley is remapped via
+   histogram equalisation to form the new NDF called maxinf.
+   Ten thousand bins in the histogram are required rather than
+   the default of 2048.  The title of NDF maxinf is
+   "Maximum information of Halley".
+
+Notes
+
+If there are a few outliers in the data and most of the points
+concentrated about a value it may be wise to truncate the
+data array via THRESH, or have a large number of histogram bins.
+
+Related_Applications
+
+   KAPPA: LAPLACE, LUTABLE, SHADOW, THRESH; Figaro: HOPT.
+
+Authors
+
+MJC: Malcolm J. Currie (STARLINK)
+
+History
+
+ 1991 November 8 (MJC):
+    Original NDF version.
+
+ 1995 January 12 (MJC):
+    Replaced AIF calls with PAR and PSX.  Lowercase examples and
+    usage.
+
+Implementation_Status
+
+   -  This routine correctly processes the AXIS, DATA, QUALITY,
+   LABEL, TITLE, and HISTORY components of an NDF data structure and
+   propagates all extensions.  UNITS and VARIANCE become undefined
+   by the transformation, and so are not propagated.
+
+   -  Processing of bad pixels and automatic quality masking are
+   supported.
+
+   -  All non-complex numeric data types can be handled.
+
+   -  Any number of NDF dimensions is supported.
+.endhelp

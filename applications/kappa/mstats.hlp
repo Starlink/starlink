@@ -1,0 +1,328 @@
+.help mstats Starlink kappa
+.nf
+    Does cumulative statistics on a 2-d sub-array over a sequence of
+    data arrays
+ 
+   This routine is used for the statistics of multiple 2-d data
+   arrays. The data arrays must have the same dimensions and reside
+   in IMAGE structures. The user is asked to specify a number of
+   data arrays (up to a fixed limit) either by naming each file
+   or defining a sequence of IMAGE structures (frames). If the latter
+   option is chosen the files must adopt the following naming scheme:
+   groupnamennnn, where nnnn is a four-digit number, and groupname is
+   the collective name for the set of arrays, e.g. ORION0001. Missing
+   container files, data arrays, or data arrays of the wrong
+   dimensions are skipped. The maximum number of data files is 1000.
+ 
+   Then either Single pixel or Box mode is chosen. In the former
+   case the pixel of interest is specified, and in the latter, the
+   sub-array of interest. In the Single pixel mode, the value for the
+   same pixel is pulled out of each array in sequence, and this
+   sequence of values is then statistically analysed over the
+   sequence of input frames. The resultant values (mean, median
+   and standard deviation) are reported directly to the user.
+   In Box mode, a choice of statistics is selected.  The alternatives
+   are mean and standard deviation (the default), or median. The
+   statistic(s) are formed over the sequence of arrays at each pixel
+   position in the box. The output is in the form of one or two 2-d
+   data arrays, each being the size of the defined sub-array and
+   contains a chosen statistic (mean, standard deviation or median)
+   in each pixel. Each output data array is stored in an IMAGE
+   structure.
+ 
+   The magic-value method is used for processing bad data.
+
+AUTHORS
+
+   Mark McCaughrean UoE ( REVA::MJM )
+   Malcolm Currie  STARLINK (RAL::CUR)
+
+BUGS
+
+   None known.
+
+HISTORY
+
+   03-06-1986 : First implementation (REVA::MJM)
+   15-06-1986 : Major upgrade for result image outputting (REVA::MJM)
+   1986 Aug 7 : Renamed routines NEXT_NAME, SLICE2TO3, STATS3D to
+                NXTNAM, SLC2T3, STAT3D respectively. SLC2T3 parameter
+                order corrected (7th to 9th) (RAL::CUR).
+   1986 Sep 1 : Added arguments section, nearly conformed to Starlink
+                standards, replaced UPCASE by CHR_UCASE and tidied
+                (RAL::CUR).
+   1987 Oct 17: Two extra status checks (RAL::CUR)
+   1988 Feb 19: Added check for equality of arrays' dimensions
+                (RAL::CUR).
+   1988 Mar 16: Tidied workspace using AIF_ANTMP (RAL::CUR).
+   1988 Mar 17: Referred to `array' rather than `image'
+                (RAL::CUR)
+   1988 Jun 21: More reporting of error context and tidying
+                (RAL::CUR)
+   1989 May 26: Added ordered statistics option (RAL::CUR).
+   1989 Aug  8: Passed array dimensions as separate variables
+                to MED3D, SLC2T3 and STAT3D (RAL::CUR).
+   1989 Dec 21: Workspace managed by AIF_TEMP (RAL::CUR).
+   1990 Feb 22: Replaced SUBPAR calls by AIF_PTFNM (RAL::CUR).
+   1992 Feb 26: Limited processing of simple NDFs (RAL::CUR).
+   1992 Mar  3: Replaced AIF parameter-system calls by the extended
+                PAR library (RAL::CUR).
+
+PARAMETERS
+
+   INMODE  =  CHAR( READ )
+       Mode of data array input, the alternatives being
+         'Sequential' or 'Random'.
+   PIXMODE  =  CHAR( READ )
+       Mode of calculation, the alternatives being a 'Single'
+         pixel or a 'Box' of pixels.
+   INPIC  =  IMAGE( READ )
+       One of the sequence of input IMAGE structures.
+   FIRSTFILE  =  CHAR( READ )
+       Name of first container filename in the sequence.
+   NUMSEQ  =  INTEGER( READ )
+       Number of sequential frames to be processed.
+   NUMRAN  =  INTEGER( READ )
+       Number of random frames to be processed.
+   XPIX  = INTEGER( READ )
+       x pixel index of the pixel to be used in Single mode.
+   YPIX  = INTEGER( READ )
+       y pixel index of the pixel to be used in Single mode.
+   ORDRST  =  LOGICAL( READ )
+       If true ordered statistics will be computed in Box mode,
+         currently only the median, otherwise the mean and standard
+         deviation are derived.
+   XSTART  =  INTEGER( READ )
+       x start pixel index of the sub-arrays to be analysed.
+   YSTART  =  INTEGER( READ )
+       y start pixel index of the sub-arrays to be analysed.
+   XSIZE  =  INTEGER( READ )
+       x size of the sub-array to be analysed.
+   YSIZE  =  INTEGER( READ )
+       y size of the sub-array to be analysed.
+   MEDIAN  =  IMAGE( WRITE )
+       Output IMAGE structure containing array of medians for Box
+         option.
+   OMTITLE  =  CHAR( READ )
+       Title string for IMAGE structure containing the median array.
+   MEAN  =  IMAGE( WRITE )
+       Output IMAGE structure containing array of means for Box
+         option.
+   MTITLE  =  CHAR( READ )
+       Title string for IMAGE structure containing the mean array.
+   STDDEV  =  IMAGE( WRITE )
+       Output IMAGE structure containing standard deviations for Box
+         option.
+   STITLE  =  CHAR( READ )
+       Title string for IMAGE structure containing the standard-
+         deviation array.
+
+INMODE
+
+  keyword     'INMODE'
+  type        'LITERAL'
+  vpath       'PROMPT'
+  ppath       'CURRENT,DYNAMIC,DEFAULT'
+  prompt      'File input mode'
+  default     'Sequential'
+  help        'Sequential works out a sequence from the first
+              IMAGE name, Random asks for each name.'
+ #in          'Sequential', 'Random'
+
+PIXMODE
+
+  keyword     'PIXMODE'
+  type        'LITERAL'
+  vpath       'PROMPT'
+  ppath       'CURRENT,DYNAMIC,DEFAULT'
+  prompt      'Pixel mode'
+  default     'Box'
+  help        'Single is for just one pixel, Box is for a defined 
+              sub-array'
+ #in          'Box', 'Single'
+
+INPIC
+
+  keyword     'INPIC'
+  type        'IMAGE'
+  access      'READ'
+  vpath       'PROMPT'
+  ppath       'GLOBAL'
+  association '<->GLOBAL.DATA_ARRAY'
+  prompt      'Image to be processed'
+  help        'Give name of the IMAGE structure holding the 2-d data 
+              array to be processed.'
+
+FIRSTFILE
+
+  keyword     'FIRSTFILE'
+  type        'LITERAL'
+  access      'READ'
+  vpath       'PROMPT'
+  prompt      'Name of first file'
+  help        'Give name of first IMAGE file in sequence to be 
+              processed. Format for sequential is namennnn, e.g. 
+              SKY0010.'
+
+NUMSEQ
+
+  keyword     'NUMSEQ'
+  type        '_INTEGER'
+  access      'READ'
+  vpath       'PROMPT'
+  ppath       'DYNAMIC'
+  prompt      'Number of frames in sequence'
+  help        'Give the number of frames in sequence (including first 
+              and last), e.g. there are 10 frames in F0011 to F0020.'
+
+NUMRAN
+
+  keyword     'NUMRAN'
+  type        '_INTEGER'
+  access      'READ'
+  vpath       'PROMPT'
+  ppath       'DYNAMIC'
+  prompt      'Number of random frames'
+  help        'Give the number of frames to be typed in by hand, one 
+              by one.'
+
+XPIX
+
+  keyword     'XPIX'
+  type        '_INTEGER'
+  access      'READ'
+  vpath       'PROMPT'
+  ppath       'DYNAMIC'
+  prompt      'x pixel index of pixel'
+  help        'Give the x pixel index of the single pixel to be 
+              examined.'
+
+YPIX
+
+  keyword     'YPIX'
+  type        '_INTEGER'
+  access      'READ'
+  vpath       'PROMPT'
+  ppath       'DYNAMIC'
+  prompt      'y pixel index of pixel'
+  help        'Give the y pixel index of the single pixel to be 
+              examined.'
+
+ORDRST
+
+  keyword     'ORDRST'
+  type        '_LOGICAL'
+  access      'READ'
+  vpath       'DEFAULT'
+  ppath       'DYNAMIC,DEFAULT'
+  prompt      'Are ordered statistics required ?'
+  default     NO
+  help        'If no arrays containing means and standard deviations 
+              will be created, else an array of medians is produced.'
+
+XSTART
+
+  keyword     'XSTART'
+  type        '_INTEGER'
+  access      'READ'
+  vpath       'PROMPT'
+  ppath       'DYNAMIC'
+  prompt      'x start pixel index of sub-array'
+  help        'Give the x start pixel index of the sub-array to be 
+              analysed.'
+
+YSTART
+
+  keyword     'YSTART'
+  type        '_INTEGER'
+  access      'READ'
+  vpath       'PROMPT'
+  ppath       'DYNAMIC'
+  prompt      'y start pixel index of sub-array'
+  help        'Give the y start pixel index of the sub-array to be 
+              analysed.'
+
+XSIZE
+
+  keyword     'XSIZE'
+  type        '_INTEGER'
+  access      'READ'
+  vpath       'PROMPT'
+  ppath       'DYNAMIC'
+  prompt      'x size of sub-array'
+  help        'Give the x size of the sub-array to be analysed.'
+
+YSIZE
+
+  keyword     'YSIZE'
+  type        '_INTEGER'
+  access      'READ'
+  vpath       'PROMPT'
+  ppath       'DYNAMIC'
+  prompt      'y size of sub-array'
+  help        'Give the y size of the sub-array to be analysed.'
+
+MEDIAN
+
+  keyword     'MEDIAN'
+  type        'IMAGE'
+  access      'WRITE'
+  vpath       'PROMPT'
+  prompt      'Output array for medians'
+  help        'Give the name of the IMAGE structure to hold the array 
+              of medians.'
+
+OMTITLE
+
+  keyword     'OMTITLE'
+  type        'LITERAL'
+  access      'READ'
+  vpath       'DEFAULT'
+  default     'KAPPA - Mstats - Medians'
+  prompt      'Title for medians array'
+  help        'Character string used as title for the IMAGE structure 
+              holding medians array.'
+
+MEAN
+
+  keyword     'MEAN'
+  type        'IMAGE'
+  access      'WRITE'
+  vpath       'PROMPT'
+  prompt      'Output array for means'
+  help        'Give the name of the IMAGE structure to hold the array 
+              of means.'
+
+MTITLE
+
+  keyword     'MTITLE'
+  type        'LITERAL'
+  access      'READ'
+  vpath       'DEFAULT'
+  default     'KAPPA - Mstats - Means'
+  prompt      'Title for means array'
+  help        'Character string used as title for the IMAGE structure 
+              holding means array.'
+
+STDDEV
+
+  keyword     'STDDEV'
+  type        'IMAGE'
+  access      'WRITE'
+  vpath       'PROMPT'
+  prompt      'Output array for standard deviations'
+  help        'Give the name of the IMAGE structure to hold the array 
+              of standard deviations.'
+
+STITLE
+
+  keyword     'STITLE'
+  type        'LITERAL'
+  access      'READ'
+  vpath       'DEFAULT'
+  prompt      'Title for standard deviation array'
+  default     'KAPPA - Mstats - Stddevs'
+  help        'Character string used as title for the IMAGE structure 
+              holding standard-deviation array.'
+
+.endhelp

@@ -1,0 +1,12 @@
+ardout,f,a,ardfile.dat,,,"Name of the output text file"
+shape,s,a,"CIRCLE",,,"Region shape"
+option,s,a,"MULTI",,,"Next operation to perform"
+device,f,a,,,,"*! Name of graphics device"
+startup,s,h,"Multi",,,"Start up mode"
+palnum,i,h,3,,,"Pen number"
+poicol,i,h,2,,,"Points pen number?"
+operands,struct,a,,,,"Indices of regions to combine or invert"
+
+operator,s,a,"AND",,,"How to combine the regions"
+regions,struct,a,,,,"Give a list of the indices of the regions to be deleted"
+

@@ -1,0 +1,4 @@
+inpic,f,a,,,,"Input image"
+base,r,h,10.0,,,"Base"
+outpic,f,a,,,,"Output image"
+otitle,s,h,"KAPPA - Exp10",,,"Title for output image"

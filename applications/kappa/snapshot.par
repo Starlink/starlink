@@ -1,0 +1,8 @@
+odevice,f,a,,,,"Name of output device"
+out,f,h,!,,,"Output NDF"
+whole,b,h,n,,,"Whole memory? (As opposed to what is visible.) "
+scale,r,h,0.707,,,"Scale factor for output"
+negative,b,h,y,,,"Negative of the display?"
+title,s,h,INDEF,,,"Give the title of the plot"
+planes,i,h,INDEF,,,"Image memory planes to dump"
+device,f,a,,,,"*! Display device"

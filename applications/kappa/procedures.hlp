@@ -1,0 +1,397 @@
+.help procedures Starlink kappa
+.nf
+Applications from KAPPA and other packages can be combined in
+procedures and scripts to customise and automate data processing.
+In addition to giving literal values to application parameters, you
+can include ICL or C-shell variables on the command line, whose
+values are substituted at run time.  It is also possible to write
+parameter data into variables, and hence pass them to another
+application, or use the variables to control subsequent processing.
+
+
+C-shell_scripts
+
+
+The "C-shell Cookbook" (SC/4) contains many ingredients and recipes,
+and features many KAPPA commands.  So there is little point
+repeating them here other than to direct you to a documented script
+in $KAPPA_DIR/multiplot.csh.
+ 
+
+ICL_Procedures
+
+
+You should consult the "ICL Users' Guide" (SG/5) for details
+about writing ICL syntax, procedures, and functions, but you're
+a busy researcher...   For a quick overview the *two-page* summary
+on "Writing ICL command files and procedures" in SUN/101 is
+recommended reading, even though much of the document is dated and
+still refers to VMS.  Here we'll just show some example procedures
+that can be adapted and cover points not mentioned in SUN/101.
+
+Let's start with something simple.  You want to `flash' a series of
+images, each with a yellow border.  First you write the following
+procedure called FLASH.  It has one argument INPIC, that passes the
+name of the NDF you want to display.  When you substitute an ICL
+variable for a parameter value you enclose it in parentheses.  The
+lines beginning with { are comments.
+
+     PROC FLASH INPIC
+     {
+     { Procedure for displaying an image without scaling and a
+     { yellow border.
+     {
+        DISPLAY IN=(INPIC) MODE=FL BORDER BCOLOUR=Yellow
+     END PROC
+
+To make ICL recognise your procedure you must `load' it.  The command
+
+     ICL> LOAD FLASH
+
+will load the file FLASH.ICL.  Thereafter in the ICL session you can
+invoke FLASH for many NDFs.  The following will display the NDFs
+called GORDON and FLOOD side-by-side.
+
+     ICL> PICGRID 2 1 
+     ICL> FLASH GORDON
+     ICL> PICSEL 2
+     ICL> FLASH FLOOD
+
+It would be tedious to have to load lots of individual procedures,
+but you don't.  If you have related procedures that you regularly
+require they can be concatenated into a single file which you load.
+Better still is to add definitions for each of the procedures in
+your ICL login file.  This is defined as the value of the ICL_LOGIN
+environment variable.  A reasonable place is in your home directory
+and you'd define it like this.
+
+     % setenv ICL_LOGIN $HOME/login.icl
+
+However, the file doesn't have to be in your home directory, or
+called login.icl, but it's convenient to do so.  Suppose you have
+three procedures: FLASH, PICGREY in file $MY_DIR/display_proc.icl,
+and FILTER in /home/user1/dro/improc.icl.  In your $HOME/login.icl
+you could add the following
+
+     defproc  flash     $MY_DIR/display_proc.icl
+     defproc  sfilt     $HOME/user1/dro/improc.icl filter
+     defproc  picgr(ey) $MY_DIR/display_proc.icl
+
+which defines three commands that will be available each time you
+use ICL: FLASH which will run your FLASH procedure, PICGREY to
+execute the PICGREY procedure, and SFILT which runs the FILTER
+procedure.  In addition PICGREY can be abbreviated to PICGR or
+PICGRE.  So now you can load and run your procedure.
+
+Let's have some more example procedures.  Suppose you have a series
+of commands to run on a number of files.  You could create a
+procedure to perform all the stages of the processing, deleting the
+intermediate files that it creates.
+
+     PROC UNSHARPMASK NDFIN CLIP NDFOUT
+
+     { Insert ampersands to tell the command-line interpreter than
+     { these strings are file names.
+        IF SUBSTR( NDFIN, 1, 1 ) <> '@'
+           NDFIN = '@' & (NDFIN)
+        END IF
+        IF SUBSTR( JUNK, 1, 1 ) <> '@'
+           NDFOUT = '@' & (NDFOUT)
+        END IF
+
+     { Clip the image to remove the cores of stars and galaxies
+     { above a nominated threshold.
+        THRESH (NDFIN) TMP1 THRHI=(CLIP) NEWHI=(CLIP) \
+
+     { Apply a couple of block smoothings with boxsizes of 5 and 13
+     { pixels.  Delete the temporary files as we go along.
+        BLOCK tmp1 tmp2 BOX=5
+        ! rm tmp1.sdf
+        BLOCK tmp2 tmp3 BOX=13
+        ! rm tmp2.sdf
+
+     { Multiply the smoothed image by a scalar.
+        CMULT tmp3 0.8 tmp4
+        ! rm tmp3.sdf
+
+     { Subtract the smoothed and renormalised image from the input
+     { image.   The effect is to highlight the fine detail, but
+     { still retain some of the low-frequency features.
+        SUB (NDFIN) tmp4 (NDFOUT)
+        ! rm tmp4.sdf
+     END PROC
+
+There is a piece of syntax to note which often catches people out.
+Filenames, data objects, and devices passed via ICL variables
+to applications, such as NDFIN and NDFOUT in the above example,
+must be preceded by an @.
+
+A common use of procedures is likely to be to duplicate processing
+for several files.  Here is an example procedure that does that.
+It uses some intrinsic functions which look just like Fortran.
+
+     PROC MULTISTAT
+
+     { Prompt for the number of NDFs to analyse.  Ensure that it
+     { is positive.
+        INPUTI Number of frames:  (NUM)
+        NUM = MAX( 1, NUM )
+
+     { Find the number of characters required to format the number
+     { as a string using a couple of ICL functions.
+        NC = INT( LOG10( I ) ) + 1
+
+     { Loop NUM times.
+        LOOP FOR I=1 TO (NUM)
+
+     { Generate the name of the NDF to be analysed via the ICL
+     { function SNAME.
+          FILE = '@' & SNAME('REDX',I,NC)
+
+     { Form the statistics of the image.
+          STATS NDF=(FILE)
+        END LOOP
+     END PROC
+
+If NUM is set to 10, the above procedure obtains the statistics of
+the images named REDX1, REDX2, ... REDX10.  The ICL variable FILE
+is in parentheses because its value is to be substituted into
+parameter NDF. 
+
+Here is another example, which could be used to flat field a series
+of CCD frames.  Instead of executing a specific number of files, you
+can enter an arbitrary sequence of NDFs.  When processing is
+completed a !! is entered rather than an NDF name, and that exits
+the loop.  Note the ~ continuation character (it's not required but
+it's included for pedagogical reasons).
+
+     PROC FLATFIELD
+
+     { Obtain the name of the flat-field NDF.  If it does not have
+     { a leading @ insert one.
+        INPUT "Which flat field frame?: " (FF)
+        IF SUBSTR( FF, 1, 1 ) <> '@'
+           FF = '@' & (FF)
+        END IF
+
+     { Loop until there are no further NDFs to flat field.
+        MOREDATA = TRUE
+        LOOP WHILE MOREDATA
+
+     { Obtain the frame to flat field.  Assume that it will not have
+     { an @ prefix.  Generate a title for the flattened frame.
+           INPUT "Enter frame to flat field (!! to exit): " (IMAGE)
+           MOREDATA = IMAGE <> '!!'
+           IF MOREDATA
+              TITLE = 'Flat field of ' & (IMAGE)
+              IMAGE = '@' & (IMAGE)
+
+     { Generate the name of the flattened NDF.
+              IMAGEOUT = (IMAGE) & 'F'
+              PRINT Writing to (IMAGEOUT) 
+
+     { Divide the image by the flat field.
+              DIV IN1=(IMAGE) IN2=(FF) OUT=(IMAGEOUT) ~
+                TITLE=(TITLE)
+           END IF
+        END LOOP
+     END PROC
+
+
+Some KAPPA applications, particularly the statistical ones, produce
+output parameters which can be passed between applications via ICL
+variables.  Here is an example to draw a contour plot centred about
+a star in a nominated data array from only the star's approximate
+position.  The region about the star is stored in an output NDF file.
+Note the syntax required to define the value of parameter INIT; the
+space between the left bracket and parenthesis is essential.
+
+     PROC COLSTAR FILE,X,Y,SIZE,OUTFILE
+
+     {+
+     {  Arguments:
+     {     FILE = FILENAME (Given)
+     {        Input NDF containing one or more star images.
+     {     X = REAL (Given)
+     {        The approximate x position of the star.
+     {     Y = REAL (Given)
+     {        The approximate y position of the star.
+     {     SIZE = REAL (Given)
+     {        The half-width of the region about the star's centroid to be
+     {        plotted and saved in the output file.
+     {     OUTFILE = FILENAME (Given)
+     {        Output primitive NDF of 2*%SIZE+1 pixels square (unless
+     {        constrained by the size of the data array or because the
+     {        location of the star is near an edge of the data array.
+     {-
+
+     { Ensure that the filenames have the @ prefix.
+        IF SUBSTR( FILE, 1, 1 ) <> '@'
+           NDF = '@' & (FILE)
+        ELSE
+           NDF = (FILE)
+        END IF
+        IF SUBSTR( OUTFILE, 1, 1 ) <> '@'
+           NDFOUT = '@' & (OUTFILE)
+        ELSE
+           NDFOUT = (OUTFILE)
+        END IF
+
+     { Search for the star in a 21x21 pixel box.  The centroid of the
+     { star is stored in the ICL variables XC and YC.
+        CENTROID NDF=(NDF) INIT=[ (X&','&Y)] XCEN=(XC) YCEN=(YC) ~
+          MODE=INTERFACE SEARCH=21 MAXSHIFT=14
+
+     { Convert the co-ordinates to pixel indices.
+        IX = NINT( XC + 0.5 )
+        IY = NINT( YC + 0.5 )
+
+     { Find the upper and lower bounds of the data array to plot.  Note
+     { this assumes no origin information in stored in the data file.
+        XL = MAX( 1, IX - SIZE )
+        YL = MAX( 1, IY - SIZE )
+        XU = MAX( 1, IX + SIZE )
+        YU = MAX( 1, IY + SIZE )
+
+     { Create a new NDF centred on the star.
+        NDFCOPY IN=(NDF)((XL):(XU),(YL):(YU)) OUT=(NDFOUT)
+
+     { Draw a contour plot around the star on the current graphics
+     { device at the given percentiles.
+        TURBOCONT NDF=(NDFOUT) MODE=PE PERCENTILES=[80,90,95,99]
+
+     { Exit if an error occurred, such as not being able to find a star
+     { near the supplied position, or being unable to make the plot.
+        EXCEPTION ADAMERR
+           PRINT Unable to find or plot the star.
+        END EXCEPTION
+     END PROC
+\end{verbatim}
+\normalsize
+
+Here is another that creates a fancy display of an image with axes and
+a key showing data values.  Besides ICL syntax, it illustrates the use
+of some graphics-database commands.  Again note the need to give an
+expression combining the $x$-$y$ bounds of the key to the LBOUND and
+UBOUND parameter arrays.
+
+     PROC FANCYLOOK NDF
+
+     { Function:
+     {    Plots a image with axes and colour-table key.
+
+     { Insert the prefix to tell the parser that this is a file.
+        IF SUBSTR( NDF, 1, 1 ) <> '@'
+           FILE = '@' & (NDF)
+        ELSE
+           FILE = (NDF)
+        END IF
+
+     { Clear the current window.
+        GDCLEAR CURRENT
+
+     { Set the background and annotation colours.
+        PALENTRY 0 Sienna
+        PALENTRY 1 Yellow
+
+     { Find the extent of the current picture and its aspect ratio.
+        GDSTATE NCX1=(FX1) NCX2=(FX2) NCY1=(FY1) NCY2=(FY2) NOREPORT
+        ASP = ( FX2 - FX1 ) / ( FY2 - FY1 )
+
+     { Inquire the label of the current picture.  If it does not
+     { have one label the current picture
+        PICIN CURRENT LABEL=(ORIGLABEL) NOREPORT NAME=!
+        IF ORIGLABEL = " "
+           PICLABEL ORIGIN
+           ORIGLABEL = "ORIGIN"
+        END IF
+
+     { Display the image with axes using the most-ornate fount.
+        DISPLAY (FILE) MODE=PE AXES FONT=NCAR COSYS=D ~
+                SCALOW=(LOW) SCAHIGH=(HIGH) \
+
+     { Find the extent of the last frame picture, i.e. the one
+     { associated with the last displayed image.
+        PICFRAME
+        GDSTATE NCX1=(DX1) NCX2=(DX2) NCY1=(DY1) NCY2=(DY2) NOREPORT
+
+     { Determine the widths of the borders.
+        XL = DX1 - FX1
+        XR = FX2 - DX2
+        YB = DY1 - FY1
+        YT = FY2 - DY2
+
+     { Restore the original current picture.
+        PICSEL (ORIGLABEL)
+
+     { Only plot a key if there is room. 
+        IF MAX( XL, XR, YB, YT ) > 0.055
+
+     { Determine which side has most room for the key.  First, see if
+     { the key is vertical.
+           IF MAX( XL, XR ) >= MAX( YB, YT )
+
+     { Determine the width and height of the vertical key.  Bias to
+     { select the right-hand side.  Part of the 0.75 is to allow for
+     { the wider border to the left (0.19:0.05 of frame).  Try to
+     { obtain the same width, subject to the constraint that it must
+     { fit inside the current picture. 
+              ASPOBL = MAX( ASP, 1.0 )
+              WIDTH = MIN( 1.2 * MAX( 0.75 * XL, XR ), 0.14 / ASPOBL )
+              HEIGHT = 0.7 * ( DY2 - DY1 )
+
+     { Define the bounds of the colour-table key.   Offset the key so
+     { that there is no large gap between it and the image's axes.
+     { The factors are empirical, and no doubt could be improved with
+     { a more-sophisticated algorithm.
+              DELTA = 0.12 * MAX( 0.0, DX2 - DX1 - 0.6 / ASPOBL )
+              IF XL > 1.333 * XR
+                 XK1 = MAX( 0.01, DX1 - WIDTH + DELTA )
+              ELSE
+                 XK1 = DX2 - DELTA * 5.0 / 19.0
+              END IF
+              XK2 = XK1 + WIDTH
+              YK1 = 0.5 * ( DY2 + DY1 - HEIGHT )
+              YK2 = YK1 + HEIGHT
+           ELSE
+
+     { Determine the width and height of the horizontal key.  Try to
+     { obtain the same width, subject to the constraint that it must
+     { fit inside the current picture. 
+              ASPPRO = MIN( ASP, 1.0 )
+              WIDTH = MIN( 1.2 * MAX( YB, YT ), 0.1 * ASPPRO )
+              HEIGHT = 0.7 * ( DX2 - DX1 )
+
+     { Define the bounds of the colour-table key.   Offset the key so
+     { that there is no large gap between it and the image's axes.
+     { The factors are empirical, and no doubt could be improved with
+     { a more-sophisticated algorithm.
+              DELTA = 0.11 * MAX( 0.0, DY2 - DY1 - 0.6 * ASPPRO )
+              IF YB > YT
+                 YK1 = MAX( 0.01, DY1 - WIDTH + DELTA )
+              ELSE
+                 YK1 = DY1 - DELTA * 9.0 / 15.0
+              END IF
+              YK2 = YK1 + WIDTH
+              XK1 = 0.5 * ( DX2 + DX1 - HEIGHT )
+              XK2 = XK1 + HEIGHT
+           END IF
+
+     { So far the units are in NDC.  LUTVIEW uses co-ordinates which
+     { go from (0,0) to (1,1) for both axes.  So transform some of the
+     { co-ordinates.
+           IF ASP >= 1
+              YK1 = YK1 * ASP
+              YK2 = YK2 * ASP
+           ELSE
+              XK1 = XK1 / ASP
+              XK2 = XK2 / ASP
+           END IF
+
+     { Draw the key to fit within the current picture annotating with 
+     { the scaling used in DISPLAY.
+           LUTVIEW LOW=(LOW) HIGH=(HIGH) LBOUND=[ (XK1&','&YK1)] ~
+             UBOUND=[ (XK2&','&YK2)] MODE=XY
+        END IF
+     END PROC
+.endhelp

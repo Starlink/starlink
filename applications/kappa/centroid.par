@@ -1,0 +1,23 @@
+ndf,f,a,,,,"Array to be analysed"
+mode_,s,a,"Interface",,,"*! Mode to obtain initial centroid x-y positions"
+init,struct,a,,,,"Guess at co-ordinates of star-like feature"
+
+search,struct,h,,,,"Size of search box in pixels"
+9
+maxiter,i,h,9,,,"Maximum number of iterations"
+maxshift,struct,h,,,,"Maximum shift between guess and output"
+9.0
+toler,r,h,0.05,,,"Accuracy required"
+centre,struct,h,,,,"Object to contain the centroid position"
+
+cerror,b,h,n,,,"Calculate centroid errors?"
+coin,f,a,,,,"File of initial positions"
+cosys,s,a,"World",,,"*! Co-ordinate system"
+coout,f,h,!,,,"Co-ordinate file to hold centroid positions"
+device,f,a,,,,"*! Name of graphics device"
+logfile,f,h,!,,,"Filename to store the results"
+mark,b,h,n,,,"Mark the point?"
+nsim,i,h,100,,,"Number of simulations to estimate the errors"
+positive,b,h,y,,,"Array features positive"
+xcen,r,h,0.0,,,"Object to contain the x centroid position"
+ycen,r,h,0.0,,,"Object to contain the y centroid position"

@@ -1,0 +1,243 @@
+           add - Add two NDF data structures.
+       aperadd - Derive statistics within a specified circle of a 2-d array.
+        ardgen - Create a text file describing selected regions of an image.
+       ardmask - Use an ARD file to set some pixels of an NDF to be bad.
+automatic_data_conversion - 
+        axconv - Expand spaced axes in an NDF into the primitive form.
+       axlabel - Set a new label value for an axis within an NDF data structure.
+       axunits - Set a new units value for an axis within an NDF data structure.
+         block - Smooth a 1- or 2-d image using a square or rectangular box
+                  filter.
+          cadd - Add a scalar to an NDF data structure.
+          calc - Evaluate a mathematical expression.
+        calpol - Calculate polarisation parameters.
+          cdiv - Divide an NDF by a scalar.
+      centroid - Find the centroids of star-like features in an NDF.
+changes_to_kappa - 
+         chpix - Replace the values of selected pixels in an NDF.
+classified_commands - 
+         cmult - Multiply an NDF by a scalar.
+co-ordinate_systems - 
+    colour_set - 
+colour_table_and_palette - 
+       compadd - Reduce the size of an NDF by adding in rectangular boxes.
+       compave - Reduce the size of an NDF by averaging in rectangular
+       compick - Reduce the size of an NDF by picking equally spaced pixels.
+       contour - Contour a 2-d NDF.
+      contover - Contour a 2-d NDF overlaid on an image displayed previously.
+      convolve - Convolve a pair of 1- or 2-d NDFs together.
+      creframe - Generate a test 2-d data array from a choice of several types.
+        crelut - Create or manipulate an image-display lookup table using a
+                  palette.
+          csub - Subtract a scalar from an NDF data structure.
+        cursor - Report the co-ordinates of points selected using the cursor.
+  custom_kappa - 
+data_structures - 
+       display - Display a 1-d or 2-d NDF.
+           div - Divide one NDF data structure by another.
+       drawsig - Draw +/-n standard-deviation lines on a line plot.
+        elprof - Create a radial or azimuthal profile of a 2-d image.
+         erase - Erase an HDS object.
+       errclip - Remove pixels with large errors from an NDF.
+         exp10 - Take the base-10 exponential of each pixel of a data array.
+          expe - Take the exponential of each pixel of a data array (base e).
+         expon - Take the exponential of each pixel of a data array.
+      feedback - 
+       ffclean - Remove defects from a substantially flat 1- or 2-d NDF.
+       fillbad - Remove regions of bad values from a 2-d NDF.
+       fitsdin - Read a FITS disc file - simple, group or table objects.
+      fitsedit - Edit the FITS extension of an NDF.
+     fitsexist - Inquire whether or not a keyword exists in a FITS extension.
+       fitsexp - Export NDF-extension information into an NDF FITS extension.
+      fitshead - List the headers of FITS files.
+       fitsimp - Import FITS information into an NDF extension.
+        fitsin - Read a FITS tape composed of simple, group or table files.
+      fitslist - List the FITS extension of an NDF.
+       fitsmod - Edit an NDF FITS extension via a text file or parameters.
+      fitstext - Create an NDF FITS extension from a text file.
+    fitsurface - Fit a polynomial surface to 2-d data array.
+       fitsval - Report the value of a keyword in the FITS extension.
+     fitswrite - Write a new keyword to the FITS extension.
+          flip - Reverse an NDF's pixels along a specified dimension.
+       fourier - Perform forward and inverse Fourier transforms of 1- or
+     gausmooth - Smooth a 1- or 2-d image using a Gaussian filter.
+       gdclear - Clear a graphics device and purges its database entries.
+       gdnames - Show which graphics devices are available.
+         gdset - Select a current graphics device.
+       gdstate - Show the current status of a graphics device.
+getting_data_into_kappa - 
+getting_started - 
+        glitch - Replace bad pixels in a 2-d data array with the local median.
+       globals - Display the values of the KAPPA global parameters.
+graphics_database - 
+      greyplot - Produce a greyscale plot of a 1-d or 2-d NDF.
+hds_data_types - 
+         hints - This topic contains hints for new and intermediate user.
+        hiscom - Add commentary to the history of an NDF.
+       hislist - List NDF history records.
+        hisset - Set the NDF history update mode.
+        histat - Compute ordered statistics for an NDF's pixels using an
+                  histogram.
+        histeq - Perform an histogram equalisation on an NDF.
+     histogram - Compute an histogram of an NDF's values.
+       idclear - Clear an image display and purges its database entries.
+   idinvisible - Make memory planes of an image-display device invisible.
+        idpazo - Pan and zoom an image-display device.
+         idset - Select a current image-display device.
+       idstate - Show the current status of an image display.
+image-display_interface - 
+       inspect - Inspect a 2-d NDF in a variety of ways.
+interaction_mode - 
+    iraf_usage - Using KAPPA from IRAF CL.
+         kappa - KAPPA---the Kernel APplication PAckage.
+        kstest - Compare data sets using the Kolmogorov-Smirnov test.
+       laplace - Perform a Laplacian convolution as an edge detector in a 2-d
+                  data array.
+       linplot - Draw a line plot of a 1-d NDF's data values against their axis
+                  co-ordinates.
+         log10 - Take the base-10 logarithm of each pixel of a data array.
+         logar - Take the logarithm of each pixel of a data array (specified
+                  base).
+          loge - Take the natural logarithm of each pixel of a data array.
+          look - Output the values of a sub-array of a 2-d data array to the
+                  screen or a text file.
+          lucy - Perform a Richardson-Lucy deconvolution of a 1- or 2-d array.
+       lutable - Manipulate an image-display colour table.
+      lutbgyrw - Load the BGYRW lookup table.
+        lutcol - Load the standard colour lookup table.
+       lutcont - Load a lookup table to give the display the appearance of a
+                  contour plot.
+         lutfc - Load the standard false-colour lookup table.
+       lutflip - Flip the colour table of an image-display device.
+       lutgrey - Load the standard greyscale lookup table.
+       lutheat - Load the heat lookup table.
+     luthilite - Highlight a colour table of an image-display device.
+       lutikon - Load the default Ikon lookup table.
+        lutneg - Load the standard negative greyscale lookup table.
+      lutramps - Load the coloured-ramps lookup table.
+       lutread - Load an image-display lookup table from an NDF.
+        lutrot - Rotate the colour table of an image-display device.
+       lutsave - Save the current colour table of an image-display device
+       lutspec - Load a spectrum-like lookup table.
+      luttweak - Tweak a colour table of an image-display device.
+       lutview - Draw a colour-table key.
+      lutzebra - Load a pseudo-contour lookup table.
+   makesurface - Create a 2-d NDF from the coefficients of a polynomial
+         manic - Convert all or part of a data array from one dimensionality
+                  to another.
+masking_bad_values_and_quality - 
+         maths - Evaluate mathematical expressions applied to NDF data 
+                  structures.
+        median - Smooth a 2-d data array using a weighted median filter.
+         mem2d - Perform a Maximum-Entropy deconvolution of a 2-d NDF.
+      mlinplot - Draw a multi-line plot of a 2-d NDF's data values against
+                  their axis co-ordinates.
+        mosaic - Merge several non-congruent 2-d data arrays into one output
+        mstats - Do cumulative statistics on a 2-d sub-array over a sequence 
+                  of data arrays.
+          mult - Multiply two NDF data structures.
+        native - Convert an HDS object to native machine data representation.
+       ndfcopy - Copy an NDF (or NDF section) to a new location.
+      ndftrace - Display the attributes of an NDF data structure.
+   ndf_history - 
+  ndf_sections - 
+     noglobals - Reset the KAPPA global parameters.
+       nomagic - Replace all occurrences of magic value pixels in an NDF array
+                  with a new value.
+     normalize - Normalise one NDF to a similar NDF by calculating a scale 
+                  factor and zero-point difference.
+          numb - Count the number of elements of an NDF with values or absolute
+                  values above or below a threshold.
+        outset - Set pixels outside a specified circle in a 2-d data array to a
+                  specified value.
+       ovclear - Clear an image-display overlay.
+         ovset - Select a current image-display overlay.
+        paldef - Load the default palette to a colour table.
+      palentry - Enter a colour into an image display's palette.
+       palread - Fill the palette of a colour table from an NDF.
+       palsave - Save the current palette of a colour table to an NDF.
+    parameters - 
+        parget - Obtain the value or values of an application parameter.
+         paste - Paste a series of NDFs upon each other.
+       picbase - Select the BASE picture from the graphics database.
+        piccur - Use a cursor to select the current picture and to report the
+                  co-ordinates of points.
+       picdata - Select the last DATA picture from the graphics database.
+        picdef - Define a new graphics-database FRAME picture or an array of
+                  FRAME pictures.
+      picempty - Find the first empty FRAME picture in the graphics database.
+     picentire - Find the first unobscured and unobscuring FRAME picture in the
+                  graphics database.
+      picframe - Select the last FRAME picture from the graphics database.
+       picgrid - Create an array of FRAME pictures.
+         picin - Find the attributes of a picture interior to the current
+                  picture.
+      piclabel - Label the current graphics-database picture.
+       piclast - Select the last picture from the graphics datalast.
+       piclist - List the pictures in the graphics database for a device.
+        picsel - Select a graphics-database picture by its label.
+      pictrans - Transform co-ordinates between the current and BASE pictures.
+        picvis - Find the first unobscured FRAME picture in the graphics 
+                  database.
+         picxy - Create a new FRAME picture defined by co-ordinate bounds.
+       pixdupe - Expand an NDF by pixel duplication.
+           pow - Take the specified power of each pixel of a data array.
+problems_problems - 
+    procedures - 
+           psf - Determine the parameters of a model star profile by fitting 
+                  star images in a 2-d NDF.
+         quilt - Generate a mosaic from equally sized 2-d data arrays,
+                  optionally specified from an ASCII file.
+      requests - 
+          rift - Add a scalar to a section of an NDF data structure to correct
+                  rift-valley defects.
+ role_of_kappa - 
+        rotate - Rotate a 2-d NDF about its centre through any angle.
+       segment - Copy polygonal segments from one NDF to another.
+selecting_graphics_devices - 
+       setaxis - Sets values for an axis array component within an NDF data
+                  structure.
+        setbad - Set new bad-pixel flag values for an NDF.
+         setbb - Set a new value for the quality bad-bits mask of an NDF.
+      setbound - Set new bounds for an NDF.
+        setext - Manipulate the contents of a specified NDF extension.
+      setlabel - Set a new label for an NDF data structure.
+      setmagic - Replace all occurrences of a given value in an NDF array with
+                  the bad value.
+       setnorm - Set a new value for one or all of an NDF's axis-normalisation
+                  flags.
+     setorigin - Set a new pixel origin for an NDF.
+        setsky - Make an IRAS astrometry extension.
+      settitle - Set a new title for an NDF data structure.
+       settype - Set a new numeric type for the data and variance components of
+                  an NDF.
+      setunits - Set a new units value for an NDF data structure.
+        setvar - Set new values for the variance component of an NDF data
+                  structure.
+        shadow - Enhance edges in a 2-d NDF using a shadow effect.
+         slide - Realign a 2-d data array via an x,y shift.
+      snapshot - Dump an image-display memory to a graphics hardcopy and
+                  optionally to an NDF.
+        sqorst - Squash or stretch a 2-d data array in either or both axes.
+         stats - Compute simple statistics for an NDF's pixels.
+           sub - Subtract one NDF data structure from another.
+    substitute - Replace all occurrences of a given value in an NDF array with
+                  another value.
+       summary - 
+        surfit - Fit a polynomial or bi-cubic spline surface to 2-d data
+                  array.
+        thresh - Edit an NDF such that array values below and above two 
+                  thresholds take constant values.
+       trandat - Convert free-format text data into an NDF.
+    traninvert - Invert a transformation.
+      tranjoin - Join two transformations.
+      tranmake - Make a transformation structure given its co-ordinate mappings.
+   transformer - Apply a transformation to an NDF.
+     trantrace - List the contents of a transformation structure.
+          trig - Perform a trigonometric transformation on a data array
+     turbocont - Contour a 2-d NDF quickly.
+    unix_usage - Using KAPPA from Unix shell.
+       vecplot - Plot a 2-d vector map.
+        wiener - Apply a Wiener filter to a 1- or 2-d array.
+        zaplin - Replace regions in a 2-d NDF by bad values or by linear
+                  interpolation.

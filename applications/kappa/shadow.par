@@ -1,0 +1,5 @@
+in,f,a,,,,"NDF to be enhanced"
+out,f,a,,,,"NDF after being enhanced"
+shift,struct,h,,,,"Shift in x-y indices"
+1 1
+title,s,h,INDEF,,,"Title for output NDF"

@@ -1,0 +1,5 @@
+in,f,a,,,,"Input NDF data structure"
+scalar,r,a,,,,"Value to be added"
+out,f,a,,,,"Output NDF"
+section,s,a,,,,"Section to which to add a constant"
+title,s,h,INDEF,,,"Title for output NDF"

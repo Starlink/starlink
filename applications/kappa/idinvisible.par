@@ -1,0 +1,2 @@
+planes,i,h,0,,,"Memory plane number(s)?"
+device,f,a,,,,"*! Name of display device"

@@ -1,0 +1,54 @@
+.help role_of_kappa Starlink kappa
+.nf
+It is Starlink's aim to provide maintainable, portable, and
+extensible applications packages that work in harmony by sharing a
+common infrastructure toolkit, standards, conventions and above all,
+a standard data format.  Individual packages are no longer required
+to perform all functions, thus carry less inertia, and are more
+adaptable to outside developments.  Additional functionality can be
+added piecemeal to the relevant package.  New user interfaces, such
+as graphical, could be layered within the toolkit for obtaining
+parameters and so make the enhancement available to all applications
+that make use of those tools.  A recent example of this approach has
+allowed us to access `foreign data formats' throughout Starlink
+packages, because the packages use a common infrastructure library. 
+
+An important part of the rationalisation is that applications are
+unified by sharing the same basic data structure---the NDF
+(Extensible N-dimensional Data Format).  This contains an
+n-dimensional data array that can store most astronomical data such
+as spectra, images and spectral-line data cubes.  The NDF may also
+contain information like a title, axis labels and units, error and
+quality arrays.  There are also places in the NDF, called
+extensions, to store any ancillary data associated with the data
+array, even other NDFs. 
+
+The backbone of the applications packages is KAPPA (Kernel
+APplication PAckage).  It provides general-purpose applications that
+have wide applicability, concentrating on image processing, data
+visualisation, and manipulating NDF components.  KAPPA provides
+facilities that integrate with specialised Starlink packages such as
+those for CCD reduction (CCDPACK), stellar and galaxy photometry
+(PHOTOM, PISA, ESP), spectroscopy (ECHOMOP, Figaro, SPECDRE,
+TWODSPEC), X-ray (ASTERIX), graphics (PONGO), time-series
+polarimetry (TSP), instrument-specific (CGS4DR, IRAS90, IRCAMPACK,
+JCMTDR) etc.  Thus the functionality of KAPPA should not be regarded
+in isolation. 
+
+Nor KAPPA should not be perceived as a rival to Figaro.  As Figaro
+applications become more integrated with Starlink packages, for
+example by using the NDF library, they should be seen as
+complementary, with Figaro concentrating on spectroscopy and KAPPA
+image processing.  Of course, there is some duplication for
+historical and ease-of-use reasons. 
+
+In a wider context, KAPPA offers facilities not in IRAF, for
+instance handling of data errors, quality masking, a graphics
+database, availability from the shell, as well as more n-dimensional
+applications, widespread use of data axes, and a different style. 
+It integrates with instrument packages developed at UK
+observatories.  With the automatic data conversion and the
+likelihood the KAPPA and other Starlink packages will be available
+from within the IRAF command language, you should be able to pick
+the best or relevant tools from both systems to get the job done. 
+.endhelp

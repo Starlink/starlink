@@ -1,0 +1,3 @@
+xpic,i,a,,,,"Number of pictures per line of the array"
+ypic,i,a,,,,"Number of pictures per column of the array"
+fill,r,h,1.0,,,"Linear filling factor"

@@ -1,0 +1,597 @@
+.help display Starlink kappa
+.nf
+Displays a 1-d or 2-d NDF.
+
+Usage:
+
+   display in [comp] clear [device] mode [centre] [xmagn] [ymagn]
+      [out] { low=? high=?
+            { percentiles=?
+            { sigmas=?
+            mode
+
+Description:
+
+   This application displays an image of a 1- or 2-dimensional NDF
+   on the current image-display device.  The image may be the data
+   array, but also variance or quality can be shown.  The image is
+   situated within the current picture with the maximum
+   magnification without clipping or distorting the image, though
+   the exact positioning and magnification can be controlled.  The
+   colour mapping has several scaling methods described below.  All
+   the available colour indices are used save a few reserved for
+   annotations.
+
+   Only the parts of the displayed image that lie within the current
+   picture are visible;  the rest is clipped.  Should the image be
+   too large to fit onto the current picture at unit magnification
+   (if you demand this magnification), then there is an option to
+   squash the array in order to make it just fit; otherwise the
+   portion of the data array visible within the current picture is
+   displayed as originally requested.
+
+   Annotated axes and a title, or a coloured border may be drawn
+   around the displayed image.
+
+Parameters
+
+For information on individual parameters, select from the list below:
+
+ABSLAB
+
+ABSLAB  =  LITERAL (Read)
+   Label for the plot abscissa, in which NCAR fancy founts
+   may be embedded when FONT = "NCAR".  This parameter is only
+   used when the axes option is selected.  If axis information is
+   present the suggested default is the NDF's axis label followed
+   by the units, in parentheses.  If an error occurs obtaining
+   the label the suggested default is "X". []
+
+AXES
+
+AXES = _LOGICAL (Read)
+   TRUE if labelled and annotated axes are to be drawn around the
+   displayed image.  The annotations are either the data
+   co-ordinates from the NDF axis components, provided these are
+   present and linear and COSYS = "Data"; otherwise pixel
+   co-ordinates are used.  [FALSE]
+
+BADCOL
+
+BADCOL = LITERAL (Read)
+   The colour to give a bad pixel in the display.  There are a
+   number of options described below.
+
+     "MAX"          - The maximum colour index used for the
+                      display of the image.
+     "MIN"          - The minimum colour index used for the
+                      display of the image.
+     An integer     - The actual colour index.  It is constrained
+                      between 0 and the maximum colour index
+                      available on the device.
+     A named colour - Uses the named colour from the palette, and
+                      if it is not present, the nearest colour
+                      from the palette is selected.
+
+   If the colour is to remain unaltered as the lookup table is
+   manipulated choose an integer between 0 and 15, or a named
+   colour.  The suggested default is the current value. [The
+   current value, but equals "MIN" if there is no current value.]
+
+BCOLOUR
+
+BCOLOUR = LITERAL (Read)
+   The colour of the border.  It is only accessed if BORDER is
+   TRUE.  There are a number of options described below.
+
+     "MAX"          - The maximum palette colour index.
+     "MIN"          - The background colour.
+     An integer     - The actual colour index in the palette.  It
+                      is constrained to be between 0 and 15.
+     A named colour - Uses the named colour from the palette, and
+                      if it is not present, the nearest colour
+                      from the palette is selected.
+
+   The suggested default is the current value. [The current value,
+   but equals "Yellow" if there is no current value.]
+
+BORDER
+
+BORDER = _LOGICAL (Read)
+   TRUE if a coloured border is to be drawn around the
+   displayed image.  If AXES is TRUE the value of BORDER will
+   be ignored and no border will be drawn.  The colour and width
+   of the border is controlled by parameters BCOLOUR and
+   BWIDTH. [FALSE]
+
+BWIDTH
+
+BWIDTH( 2 ) = _REAL (Read)
+   The width of the border along each axis in device pixels.  It
+   is only obtained when BORDER is TRUE.  If only a single value
+   is given it is duplicated to the second dimension.  The
+   suggested default is the current value.  The widths must lie
+   in the range 1.0--20.0. [4.0]
+
+CENTRE
+
+CENTRE( 2 ) = _DOUBLE (Read)
+   These two values control the position of the displayed image.
+   Specifically, if COSYS = "World" they are the pixel indices of
+   the NDF image that are to lie at the centre of the current
+   picture, but they are not limited to the bounds of the NDF
+   array.  If COSYS = "Data" they are the data co-ordinates to
+   lie at the centre of the picture, and are limited by the
+   bounds of the NDF array.  The CENTRE parameters permit you to
+   display a portion of an NDF about a specified pixel at high
+   magnification.  The application attempts to display as much of
+   the NDF array it can at the magnification, so do not expect a
+   symmetric image about the chosen centre.  If you do not
+   specify a magnification with centering, it may result in a
+   small displayed image.  Further it may not be possible to have
+   precisely the pixel you want at the centre of the image; the
+   displacement decreases as the magnification is increased.
+   CENTRE is disabled when FILL is TRUE.  [Centre of the image]
+
+CLEAR
+
+CLEAR = _LOGICAL (Read)
+   TRUE if the current picture is to be cleared before the
+   display of the image. [FALSE]
+
+COMP
+
+COMP = LITERAL (Read)
+   The NDF component to be displayed.  It may be "Data",
+   "Quality", "Variance", or "Error" (where "Error" is the
+   alternative to "Variance" and causes the square root of the
+   variance values to be displayed).  If "Quality" is specified,
+   then the quality values are treated as numerical values (in
+   the range 0 to 255). ["Data"]
+
+COSYS
+
+COSYS = LITERAL (Read)
+   The co-ordinate system to be used.  This can be either "World"
+   or "Data".  "World" makes pixel co-ordinates to appear on axes
+   and the centering is defined in pixels.  If COSYS = "Data" the
+   NDF's axis information is used to annotate axes and to control
+   the position of the displayed image.  [Current co-ordinate
+   system]
+
+DEVICE
+
+DEVICE = DEVICE (Read)
+   The name of the graphics device used to display the image.
+   The device must be in one of the following GNS categories:
+   IMAGE_DISPLAY, IMAGE_OVERLAY, MATRIX_PRINTER, or WINDOW, and
+   have at least 24 colour indices or greyscale intensities.
+   [Current image-display device]
+
+FILL
+
+FILL = _LOGICAL (Read)
+   The display normally has square pixels, in other words a
+   length along each axis corresponds to the same number of
+   pixels.  However, for images with markedly different
+   dimensions, such as two-dimensional spectra, this default
+   behaviour may not be suitable or give the clearest plot.  When
+   FILL is TRUE, the square-pixel constraint is relaxed and the
+   displayed image is the largest possible within the current
+   picture.  When FILL is FALSE, the pixels are square.  When
+   FILL is TRUE it disables the CENTRE, XMAGN, and YMAGN
+   parameters.  The suggested default is the current value.
+   [FALSE]
+
+FONT
+
+FONT = LITERAL (Read)
+   The fount to be used for the line graphics.  It can be either
+   "NCAR" for the NCAR fancy characters and "GKS" for the standard
+   GKS san-serif fount.  The former is intended for hardcopy
+   publication-quality plots, since it is relatively slow; the
+   latter is intended for normal interactive graphics requiring
+   rapid plotting, and it is clearer on small plots. The
+   suggested default is the current value. ["GKS"]
+
+HIGH
+
+HIGH = _DOUBLE (Read)
+   The array value that scales to the highest pen in the colour
+   table.  All larger array values are set to the highest colour
+   index when HIGH is greater than LOW, otherwise all array values
+   greater than HIGH are set to the lowest colour index.  The
+   dynamic default is the maximum data value.  There is an
+   efficiency gain when both LOW and HIGH are given on the
+   command line, because the extreme values need not be computed.
+   (Scale mode)
+
+IN
+
+IN = NDF (Read)
+   Input NDF data structure containing the image to be displayed.
+
+LOW
+
+LOW = _DOUBLE (Read)
+   The array value that scales to the lowest pen in the colour
+   table.  All smaller array values are set to the lowest colour
+   index when LOW is less than HIGH, otherwise all array values
+   smaller than LOW are set to the highest colour index.   The
+   dynamic default is the minimum data value.  There is an
+   efficiency gain when both LOW and HIGH are given on the
+   command line, because the extreme values need not be computed.
+   (Scale mode)
+
+LUT
+
+LUT = NDF (Read)
+   Name of the NDF containing a lookup table as its data array;
+   the lookup table is written to the image-display's colour
+   table.  The purpose of this parameter is to provide a means of
+   controlling the appearance of the image on certain devices,
+   such as colour printers, that do not have a dynamic colour
+   table, i.e. the colour table is reset when the device is
+   opened.  If used with dynamic devices, such as windows or
+   Ikons, the new colour table remains after this application has
+   completed. A null, !, means that the existing colour table will
+   be used.
+
+   The LUT must be 2-dimensional, the first dimension
+   being 3, and the second being arbitrary.  The method used to
+   compress or expand the colour table if the second dimension is
+   different from the number of unreserved colour indices is
+   controlled by parameter NN.  Also the LUT's values must lie in
+   the range 0.0--1.0. [!]
+
+MAJTIC
+
+MAJTIC( 2 ) = _REAL (Read)
+   The parameter controlling the numbers of major tick marks
+   for the x and y axes.  (Number used is between MAJTIC+2 and
+   5*MAJTIC/2+4.)   A negative value for an axis makes the
+   graphics package decide an appropriate value.  This parameter
+   is only used when the axes option is selected. [3.,3.]
+
+MINTIC
+
+MINTIC( 2 ) = _REAL (Read)
+   The number of minor tick marks between each major tick mark
+   for the x and y axes.  A negative value forces the graphics
+   package to compute appropriate values.   This parameter is
+   only used when the axes option is selected. [-1.,-1.]
+
+MODE
+
+MODE = LITERAL (Read)
+   The type of scaling to be applied to the array.  The options
+   are described below.
+     "Faint"       - The image is scaled from the mean minus one
+                     standard deviation to the mean plus seven
+                     standard deviations.  The scaling values are
+                     reported so that the faster Scale mode may be
+                     utilised later.
+     "Flash"       - The image is flashed onto the screen without
+                     any scaling at all.  This is the fastest
+                     option.
+     "Percentiles" - The image is scaled between the values
+                     corresponding to two percentiles.  The
+                     scaling values are reported so that the
+                     faster Scale mode may be utilised later.
+     "Range"       - The image is scaled between the minimum and
+                     maximum data values.
+     "Scale"       - You define the upper and lower limits
+                     between which the image is to be scaled.  The
+                     application reports the maximum and the
+                     minimum values for reference and makes these
+                     defaults respectively.
+     "Sigmas"      - The image is scaled between two standard-
+                     deviation limits.  The scaling values used
+                     are reported so that the faster Scale mode
+                     may be utilised later.
+
+NN
+
+NN = _LOGICAL (Read)
+   If TRUE the input lookup table is mapped to the colour table by
+   using the nearest-neighbour method.  This preserves sharp
+   edges and is better for lookup tables with blocks of colour.
+   If NN is FALSE linear interpolation is used, and this is
+   suitable for smoothly varying colour tables.  NN is ignored
+   unless LUT is not null. [FALSE]
+
+NUMBIN
+
+NUMBIN  =  _INTEGER (Read)
+   The number of histogram bins used to compute percentiles for
+   scaling. (Percentiles mode) [2048]
+
+ORDLAB
+
+ORDLAB  =  LITERAL (Read)
+   Label for the plot ordinate, in which NCAR fancy founts
+   may be embedded when FONT = "NCAR".   This parameter is only
+   used when the axes option is selected.  If axis information is
+   present the suggested default is the NDF's axis label followed
+   by the units, in parentheses.  If an error occurs obtaining
+   the label the suggested default is "Y". []
+
+OUT
+
+OUT = NDF (Write)
+   The scaled section of the NDF displayed; it also does not have
+   values that equal the reserved portion of the colour table.
+   The output NDF is intended to be used as the input data in
+   conjunction with SCALE=FALSE.  It will be vertically inverted
+   with respect to the input array because of GKS convention.  If
+   it has a null value (!) no output NDF will be created.  This
+   parameter is ignored when SCALE=FALSE. [!]
+
+OUTTIC
+
+OUTTIC = _LOGICAL (Read)
+   TRUE if the axis tick marks are to appear on the outside of
+   the axes instead of inside.  This parameter is only used
+   when the axes option is selected. [TRUE]
+
+PERCENTILES
+
+PERCENTILES( 2 ) = _REAL (Read)
+   The percentiles that define the scaling limits. For example,
+   [25,75] would scale between the quartile values. (Percentile
+   mode)
+
+PLTITL
+
+PLTITL = LITERAL (Read)
+   The title of the plot.  Up to about 40 characters can be
+   accommodated, and NCAR fancy founts may be embedded (cf.
+   SUN/90) when FONT = "NCAR".  This parameter is only used when
+   the axes option is selected. [The NDF title]
+
+SCAHIGH
+
+SCAHIGH = _DOUBLE (Write)
+   The array value scaled to the maximum colour index for display.
+   In Flash mode or when there is no scaling the highest colour
+   index is used.  The current display linear-scaling maximum is
+   set to this value.
+
+SCALE
+
+SCALE = _LOGICAL (Read)
+   If TRUE the input array is scaled according to the value of
+   parameter MODE.  If it is FALSE, MODE is ignored, and the input
+   array is displayed as is.  There is no scaling, inversion
+   or avoidance of annotation pens.  SCALE = FALSE is intended to
+   be used with arrays previously scaled by this or similar
+   applications which have already performed the scaling,
+   inversion and exclusion.  It provides the quickest method of
+   image display within this application. [TRUE]
+
+SCALOW
+
+SCALOW = _DOUBLE (Write)
+   The array value scaled to the minimum colour index for display.
+   In Flash mode or when there is no scaling the lowest colour
+   index is used.  The current display linear-scaling minimum is
+   set to this value.
+
+SIGMAS
+
+SIGMAS( 2 ) = _REAL (Read)
+   The standard-deviation bounds that define the scaling limits.
+   To obtain values either side of the mean both a negative and
+   a positive value are required.  Thus [-2,3] would scale
+   between the mean minus two and the mean plus three standard
+   deviations.  [3,-2] would give the negative of that.
+
+SQUASH
+
+SQUASH = _LOGICAL (Read)
+   TRUE if the array is to be squashed otherwise it is displayed
+   as is with clipping.  This parameter is only used when the x
+   and y magnifications are both one, and the image would be
+   clipped.  It is not used in Flash mode.
+
+THICK
+
+THICK = _REAL (Read)
+   The thickness of the axes and annotations in the plot, where
+   1.0 is the normal thickness.  It should be between 0.5 and 5.
+   This feature is only available on some devices.   This
+   parameter is only used when the axes option is selected. [1.0]
+
+XMAGN
+
+XMAGN = _REAL (Read)
+   The magnification (zooming) in the x direction.  Unit
+   magnification means that one NDF pixel maps to one
+   display-device pixel.  It is ignored when FILL is TRUE.
+   [Maximum that gives square pixels and just fills the current
+   database picture]
+
+YMAGN
+
+YMAGN = _REAL (Read)
+   The magnification (zooming) in the y direction.  Unit
+   magnification means that one NDF pixel maps to one
+   display-device pixel.  It is ignored when FILL is TRUE.
+   [%XMAGN]
+
+Examples
+
+display ngc6872 mode=p percentiles=[10,90]
+   Displays the NDF called ngc6872 on the current image-display
+   device.  The scaling is between the 10 and 90 per cent
+   percentiles of the image.
+
+display vv256 mode=flash border bwidth=6.0 badcol="Red"
+   Displays the NDF called vv256 on the current image-display
+   device.  There is no scaling of the data; instead the modulus
+   of each pixel with respect to the number of colour-table
+   indices is shown.  Any bad data will be displayed in red.  A
+   coloured border, of width six device pixels, is drawn around
+   the image; it will have the current border colour.
+
+display mode=fa axes clear out=video cosys=d \
+   Displays the current NDF data component with annotated axes
+   after clearing the current picture on the current image-display
+   device.  The axes take the axis labels and title from the NDF,
+   and are annotated in data co-ordinates.  The scaling is
+   between the -1 and +7 standard deviations of the image around
+   its mean. The scaled data are stored in an NDF called video.
+
+display video noscale \
+   Displays the data component of the NDF called video (created
+   in the previous example) without scaling within the current
+   picture on the current image-display device.
+
+display in=cgs4a comp=v mode=sc low=1 high=5.2 device=xwindows
+   Displays the variance component of NDF cgs4a on the xwindows
+   device, scaling between 1 and 5.2.
+
+display redrectangle xmagn=4 centre=[300,200] \
+   Displays the redrectangle NDF with a magnification of four
+   times, so that four device pixels corresponds to one image
+   pixel, on the current device.  The exact portion of the image
+   visible will depend on the size and location of the current
+   picture, however the displayed portion will have pixel
+   (300,200) at the centre of the current picture.  The current
+   scaling is used.
+
+display ngc6872 mode=ra device=lj250 lut=pizza
+   Displays the NDF called ngc6872 on the LJ250 device. The
+   lookup table in the NDF called pizza is mapped on the LJ250's
+   colour table.  The scaling is between the minimum and maximum
+   of the image.
+
+Notes
+
+-  The application stores a number of pictures in the graphics
+database in the following order: a FRAME of the specified size
+containing the title, annotated axes, and the image area
+(provided AXES is TRUE) or the border (if BORDER is TRUE), whose
+world co-ordinates are in device pixels; a DATA picture with
+world co-ordinates in pixel co-ordinates.  The DATA picture also
+may have data co-ordinates derived from the NDF axis components
+provided these are linear and different from pixel co-ordinates;
+the data co-ordinates are stored via a double-precision linear
+transformation.  The NDF associated with the plot is stored by
+reference with the DATA picture.  On exit the current database
+picture for the chosen device reverts to the input picture.
+
+-  When axes are requested the axis annotations are defined by
+their lower and upper bounds, i.e. a regular array is assumed.
+The bounds are derived from the part of NDF being displayed, and
+will be in pixel or data co-ordinates.
+
+-  The data type of the output NDF depends on the number of colour
+indices: _UBYTE for no more than 256, _UWORD for 257 to 65535,
+and _INTEGER otherwise.   The output NDF will not contain any
+extensions, UNITS, QUALITY, and VARIANCE; but LABEL, TITLE, and
+AXIS information are propagated from the input NDF.  The output
+NDF does not become the new current data array.  It is a Simple
+NDF (because the bad-pixel flag is set to false in order to
+access the maximum colour index, and to handle sections),
+therefore only NDF-compliant applications can process it.
+
+-  For images much larger than the current picture size measured
+in device pixels, the resolution of the device will allow only a
+fraction of the detail in the array to be plotted.  Therefore,
+the application compresses the image by block averaging when it
+can do so without loss of resolution when displayed.  This saves
+time scaling the data and transmitting them to the image display.
+Note that the default values for parameters LOW and HIGH are
+the minimum and maximum values in the compressed floating-point
+array.
+
+Related_Applications
+
+   KAPPA: GREYPLOT; Figaro: IGREY, IMAGE; SPECDRE: MOVIE.
+
+Authors
+
+MJC: Malcolm J. Currie (STARLINK)
+
+History
+
+ 1990 July 12 (MJC):
+    Original version based on the pre-V0.7 DISPLAY.
+
+ 1990 August 19 (MJC):
+    Only the visible portion is scaled and displayed.  Redefined
+    CENTRE (ex XCENTR and YCENTR) in terms of image pixels.
+
+ 1990 November 9 (MJC):
+    Block averaging added.
+
+ 1991 February 7 (MJC):
+    Added NDF reference into the database, AGI context control and
+    removed fuzzy-picture fudge.
+
+ 1991 March 19 (MJC):
+    Added output parameters for the scaling limits.
+
+ 1991 April 4 (MJC):
+    Added data co-ordinate transformation.
+
+ 1991 May 7 (MJC):
+    Added the input and output of NDFs containing scaled data.
+
+ 1991 May 14 (MJC):
+    Added direct processing of _BYTE and _WORD data.
+
+ 1991 July 22 (MJC):
+    Added coloured-border option, and user-controlled colouring of
+    bad pixels.
+
+ 1991 July 31 (MJC):
+    No longer redefines first SGS pen to white if workstation has
+    dynamic colour representation, now there is palette control.
+
+ 1991 August 20 (MJC):
+    Added FONT parameter.
+
+ 1991 August 22 (MJC):
+    Added input lookup-table facility via LUT and NN parameters,
+    and an illustrative example of same.
+
+ 1992 January 22 (MJC):
+    Fixed a bug that could cause the NOSCALE option to scale.
+
+ 1992 March 3 (MJC):
+    Replaced AIF parameter-system calls by the extended PAR
+    library.
+
+ 1992 March 30 (MJC):
+    Revised defaulting behaviour of BADCOL and BCOLOUR, and
+    corrected the notes.  Added an example of their use.  Handles
+    arbitrary user-defined 2-d sections.
+
+ 1992 November 27 (MJC):
+    Does not use non-monotonic axis centres.
+
+ 1992 December 17 (MJC):
+    Added the FILL option.
+
+ 1995 October 19 (MJC):
+    Supports Error component.
+
+ 1997 May 28 (MJC):
+    QUALITY and HISTORY no longer propagated to the OUT NDF.
+
+Implementation_Status
+
+   -  This routine correctly processes the AXIS, DATA, QUALITY,
+   VARIANCE, LABEL, TITLE, and UNITS components of the input NDF.
+
+   -  Processing of bad pixels and automatic quality masking are
+   supported.
+
+   -  This application will handle data in all numeric types, though
+   type conversion to integer will occur for unsigned byte and word
+   images.  However, when there is no scaling only integer data will
+   not be type converted, but this is not expensive for the expected
+   byte-type data.
+.endhelp

@@ -1,0 +1,82 @@
+.help cdiv Starlink kappa
+.nf
+Divides an NDF by a scalar.
+
+Usage:
+
+   cdiv in scalar out
+
+Description:
+
+   This application divides each pixel of an NDF by a scalar
+   (constant) value to produce a new NDF.
+
+Parameters
+
+For information on individual parameters, select from the list below:
+
+IN
+
+IN = NDF (Read)
+   Input NDF structure whose pixels are to be divided by a
+   scalar.
+
+OUT
+
+OUT = NDF (Write)
+   Output NDF structure.
+
+SCALAR
+
+SCALAR = _DOUBLE (Read)
+   The value by which the NDF's pixels are to be divided.
+
+TITLE
+
+TITLE = LITERAL (Read)
+   A title for the output NDF.  A null value will cause the title
+   of the NDF supplied for parameter IN to be used instead.
+   [!]
+
+Examples
+
+cdiv a 100.0 b
+   Divides all the pixels in the NDF called a by the constant
+   value 100.0 to produce a new NDF called b.
+
+cdiv in=data1 out=data2 scalar=-38
+   Divides all the pixels in the NDF called data1 by -38 to give
+   data2.
+
+Related_Applications
+
+   KAPPA: ADD, CADD, CMULT, CSUB, DIV, MATHS, MULT, SUB.
+
+Authors
+
+RFWS: R.F. Warren-Smith (STARLINK)
+
+MJC: Malcolm J. Currie (STARLINK)
+
+History
+
+ 12-MAR-1991 (RFWS):
+    Original version.
+
+ 1995 September 12 (MJC):
+    Title inherited by default.  Usage and examples to lowercase.
+    Added Related Applications.
+
+Implementation_Status
+
+   -  This routine correctly processes the AXIS, DATA, QUALITY,
+   LABEL, TITLE, UNITS, HISTORY, and VARIANCE components of an NDF
+   data structure and propagates all extensions.
+
+   -  Processing of bad pixels and automatic quality masking are
+   supported.
+
+   -  All non-complex numeric data types can be handled.  Arithmetic
+   is carried out using the appropriate floating-point type, but the
+   numeric type of the input pixels is preserved in the output NDF.
+.endhelp

@@ -1,0 +1,9 @@
+ndf,f,a,,,,"Array to be analysed"
+nsigma,struct,a,,,,"Sigma levels"
+1.0
+axis,s,h,"Y",,,"Orientation of lines"
+comp,s,h,"Data",,,"Array component to process"
+sigcol,s,h,"1",,,"Colour of graph lines"
+linestyle,i,h,2,,,"Line style"
+device,f,a,,,,"*! Name of graphics device"
+thick,r,h,1.0,,,"Give the relative thickness of plotted lines"

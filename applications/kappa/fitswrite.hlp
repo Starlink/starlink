@@ -1,0 +1,162 @@
+.help fitswrite Starlink kappa
+.nf
+Writes a new keyword to the FITS extension.
+
+Usage:
+
+   fitswrite ndf keyword value=? comment=?
+
+Description:
+
+   This application writes a new keyword in an NDF's FITS extension
+   given a value and an optional inline comment.  It allows the
+   location of the new keyword to be specified.  The FITS extension
+   is created if it does not exist.
+
+   It is a synonym for "fitsmod edit=write mode=interface position=!".
+
+Parameters
+
+For information on individual parameters, select from the list below:
+
+COMMENT
+
+COMMENT = LITERAL (Given)
+   The comments to be written to the KEYWORD keyword.  A null value
+   (!) gives a blank comment.  The special value "$C" means use the
+   current comment.  In addition "$C(keyword)" requests that the
+   comment of the keyword given between the parentheses be assigned
+   to the keyword being edited.  If this positional keyword does not
+   exist, the comment is is blank.
+
+KEYWORD
+
+KEYWORD = LITERAL (Given)
+   The name of the new keyword in the FITS extension.  A name may
+   be compound to handle hierarchical keywords, and it has the
+   form keyword1.keyword2.keyword3 etc.  The maximum number of
+   keywords per FITS card is 20.  Each keyword must be no longer than
+   8 characters, and be a valid FITS keyword comprising only
+   alphanumeric characters, hyphen, and underscore.  Any lowercase
+   letters are converted to uppercase and blanks are removed before
+   comparison with the existing keywords.
+
+   Note that it is not normal to have multiple occurrences of a
+   keyword in a FITS header, unless it is blank, COMMENT or HISTORY.
+
+   The suggested value is the current value.
+
+NDF
+
+NDF = NDF (Read)
+   The NDF containing the FITS extension into which the new FITS
+   keyword.
+
+POSITION
+
+POSITION = LITERAL (Given)
+   The position keyword name.  A position name may be compound to
+   handle hierarchical keywords, and it has the form
+   keyword1.keyword2.keyword3 etc.  The maximum number of keywords
+   per FITS card is 20.  Each keyword must be no longer than 8
+   characters.  When locating the position card, comparisons are
+   made in uppercase and with the blanks removed.  An occurrence
+   may be specified (see parameter KEYWORD for details).
+
+   The new keywords are inserted immediately before each
+   corresponding position keyword.  If any name in it does not
+   exist in FITS array, or the null value (!) is supplied, the
+   KEYWORD keyword will be inserted just before the END card
+   or appended to FITS array when the END card does not exist. [!]
+
+STRING
+
+STRING = _LOGICAL (Read)
+   When STRING is FALSE, inferred data typing is used.  So for
+   instance if parameter VALUE = "Y", it would appears as logical
+   TRUE rather than the string 'Y       ' in the FITS header.  See
+   topic "Value Data Type".  When STRING is TRUE, the value will be
+   treated as a string for the purpose of writing the FITS header.
+   [FALSE]
+
+VALUE
+
+VALUE = LITERAL (Given)
+   The new value of the KEYWORD keyword.  The special value "$V"
+   means use the current value of the KEYWORD keyword.  This makes
+   it possible to modify a comment, leaving the value unaltered.
+   In addition "$V(keyword" requests that the value of the
+   reference keyword given between the parentheses be assigned to
+   the keyword being written.  This reference keyword must exist and
+   have a value.
+
+Examples
+
+fitswrite abc bscale value=1.234
+   This writes the FITS keyword BSCALE just before the end of the
+   FITS extension, which is located within the NDF called abc.  It
+   assigns BSCALE a value of 1.234.  There is no inline comment.
+
+fitswrite @100 airmass value=1.456 comment="Airmass at mid-observation"
+   This creates the keyword AIRMASS in the FITS extension of the
+   NDF called 100, assigning the keyword the real value 1.456 and
+   comment "Airmass at mid-observation".  The header is located just
+   before the end.
+
+fitswrite @100 airmass value=1.456 "Airmass at mid-observation"
+  position=phase
+    As the previous example except that the new keyword is written
+    immediately before keyword PHASE.
+
+fitswrite afcyg observer value="O'Leary" comment=$C(prininv)
+   This writes the keyword OBSERVER with value "O'Leary", and its
+   comment is copied from keyword PRININV.  The modified FITS
+   extension lies within the NDF called afcyg.
+
+fitswrite test filter position=end value=27 comment=! string
+   This creates the keyword FILTER in the FITS extension of the
+   NDF called test, assigning the keyword the string value "27".
+   There is no comment.  The keyword is located at the end of the
+   headers, but before any END card.
+
+fitswrite ndf=test keyword=detector comment="    Detector name"
+  value=$V(ing.dethead) accept
+   This creates the keyword DETECTOR in the FITS extension of the
+   NDF called test, assigning the keyword the value of the
+   existing hierarchical keyword ING.DETHEAD.  The comment is
+   "    Detector name", the leading spaces are significant.  The
+   keyword is located at the current position keyword.
+
+Value_Data_Type
+
+   The data type of a value is determined as follows:
+
+      -  For the text-file, values enclosed in quotes (') or doubled
+      quotes (") are strings.  Note that numeric or logical string
+      values must be quoted to prevent them being converted to a
+      numeric or logical value in the FITS extension.
+
+      -  For prompting the value is a string when parameter STRING
+      is TRUE.
+
+      -  Otherwise type conversions of the first word after the
+      keywords are made to integer, double precision, and logical
+      types in turn.  If a conversion is successful, that becomes the
+      data type.  In the case of double precision, the type is set
+      to real when the number of significant digits only warrants
+      single precision.  If all the conversions failed the value
+      is deemed to be a string.
+
+Related_Applications
+
+   KAPPA: FITSEDIT, FITSEXP, FITSMOD.
+
+Authors
+
+MJC: Malcolm J. Currie (STARLINK)
+
+History
+
+ 1996 December 4 (MJC):
+    Original version.
+.endhelp

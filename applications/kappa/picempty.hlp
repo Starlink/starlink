@@ -1,0 +1,60 @@
+.help picempty Starlink kappa
+.nf
+Finds the first empty FRAME picture in the graphics database.
+
+Usage:
+
+   picempty [device]
+
+Description:
+
+   This application selects the first, i.e. oldest, empty FRAME
+   picture in the graphics database for a graphics device.  Empty
+   means that there is no additional picture lying completely with
+   its bounds.  This implies that the FRAME is clear for plotting.
+   This task is probably most useful for plotting data in a grid of
+   FRAME pictures.
+
+Parameters
+
+For information on individual parameters, select from the list below:
+
+DEVICE
+
+DEVICE = DEVICE (Read)
+   The graphics workstation. [The current graphics device]
+
+Examples
+
+picempty
+   This selects the first empty FRAME picture for the current
+   graphics device.
+
+picempty xwindows
+   This selects the first empty FRAME picture for the xwindows
+   graphics device.
+
+Notes
+
+-  An error is returned if there is no empty FRAME picture, and
+the current picture remains unchanged.
+
+Related_Applications
+
+   KAPPA: PICENTIRE, PICGRID, PICLAST, PICLIST, PICSEL, PICVIS.
+
+Timing
+
+   The execution time is approximately proportional to the number of
+   pictures in the database before the first empty FRAME picture is
+   identified.
+
+Authors
+
+MJC: Malcolm J. Currie (STARLINK)
+
+History
+
+ 1995 October 29 (MJC):
+    Original version.
+.endhelp

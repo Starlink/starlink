@@ -1,0 +1,7 @@
+in,f,a,,,,"Input NDF"
+out,f,a,,,,"Output NDF"
+box,struct,a,,,,"Smoothing box size"
+3 3
+estimator,s,h,"Mean",,,"Method for estimating smoothed pixel values"
+title,s,h,INDEF,,,"Output title"
+wlim,r,h,INDEF,,,"Weight limit for good output pixels"

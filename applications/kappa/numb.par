@@ -1,0 +1,6 @@
+in,f,a,,,,"Input image"
+value,r,a,,,,"Test value"
+comp,s,h,"Data",,,"Array component to process"
+abs,b,h,n,,,"Test absolute array values?"
+above,b,h,y,,,"Count above threshold?"
+number,i,h,0,,,""

@@ -1,0 +1,167 @@
+.help gdstate Starlink kappa
+.nf
+Shows the current status of a graphics device.
+
+Usage:
+
+   gdstate [device]
+
+Description:
+
+   This application displays the current status of a graphics
+   device, including details of the current graphics-database
+   picture (e.g. its co-ordinate system and position on the display
+   surface).
+
+Parameters
+
+For information on individual parameters, select from the list below:
+
+COMMENT
+
+COMMENT = LITERAL (Write)
+   The comment of the current picture.  Up to 132 characters
+   will be written.
+
+DEVICE
+
+DEVICE = DEVICE (Read)
+   Name of the graphics device about which information is
+   required. [Current graphics device]
+
+LABEL
+
+LABEL = LITERAL (Write)
+   The label of the current picture.  It is blank if there is no
+   label.
+
+NAME
+
+NAME = LITERAL (Write)
+   The name of the current picture.
+
+NCX1
+
+NCX1 = _REAL (Write)
+   The lower x normalised device co-ordinate of the current
+   picture.
+
+NCX2
+
+NCX2 = _REAL (Write)
+   The upper x normalised device co-ordinate of the current
+   picture.
+
+NCY1
+
+NCY1 = _REAL (Write)
+   The lower y normalised device co-ordinate of the current
+   picture.
+
+NCY2
+
+NCY2 = _REAL (Write)
+   The upper y normalised device co-ordinate of the current
+   picture.
+
+OUTLINE
+
+OUTLINE = _LOGICAL (Read)
+   If OUTLINE is TRUE, then an outline will be drawn around the
+   current picture to indicate its position. [FALSE]
+
+REFNAM
+
+REFNAM = LITERAL (Write)
+   The reference object associated with the current picture.  It
+   is blank if there is no reference object.  Up to 132 characters
+   will be written.
+
+REPORT
+
+REPORT = _LOGICAL (Read)
+   If this is FALSE the state of the graphics device is not
+   reported, merely the results are written to the output
+   parameters.  It is intended for use within procedures. [TRUE]
+
+WCX1
+
+WCX1 = _REAL (Write)
+   The lower x world co-ordinate of the current picture.
+
+WCX2
+
+WCX2 = _REAL (Write)
+   The upper x world co-ordinate of the current picture.
+
+WCY1
+
+WCY1 = _REAL (Write)
+   The lower y world co-ordinate of the current picture.
+
+WCY2
+
+WCY2 = _REAL (Write)
+   The upper y world co-ordinate of the current picture.
+
+Examples
+
+gdstate
+   Shows the status of the current graphics device.
+
+gdstate ps_l
+   Shows the status of the ps_l device.
+
+gdstate outline
+   Shows the status of the current graphics device and draws an
+   outline around the current database picture.
+
+gdstate refnam=(ndfname)
+   Shows the status of the current graphics device.  If there
+   is a reference data object, its name is written to the ICL
+   variable NDFNAME.
+
+gdstate ncx1=(x1) ncx2=(x2) ncy1=(y1) ncy2=(y2)
+   Shows the status of the current graphics device.  The bounds
+   of the current picture in normalised device co-ordinates
+   are written to the ICL variables: X1, X2, Y1, Y2.
+
+Notes
+
+-  If a channel to the graphics device cannot be opened, then
+this application will still execute without error, but a reduced
+amount of information will be displayed and an outline around the
+current picture (if requested) will not be drawn.
+
+Related_Applications
+
+   KAPPA: IDSTATE.
+
+Authors
+
+RFWS: R.F. Warren-Smith (STARLINK)
+
+MJC: Malcolm J. Currie (STARLINK)
+
+History
+
+ 1-DEC-1989 (RFWS):
+    Original version.
+
+ 13-DEC-1989 (RFWS):
+    Added call to MSG_SYNC to synchonise message system and
+    graphical output.
+
+ 1990 Jan 16 (MJC):
+    Added output of the current picture's label, if it exists.
+
+ 1991 February 8 (MJC):
+    Added output of the current picture's reference object, if it
+    exists.
+
+ 1991 March 24 (MJC):
+    Converted to SST prologue.
+
+ 1991 August 20 (MJC):
+    Added output parameters and REPORT parameter.
+.endhelp

@@ -1,0 +1,137 @@
+.help interaction_mode Starlink kappa
+.nf
+This topic addresses how the applications obtain co-ordinate
+information.  See topic "Co-ordinate_Systems" for details of the
+different co-ordinate systems KAPPA uses.
+Applications that require co-ordinates are being modified to permit
+a variety of mechanisms for obtaining those co-ordinates.  Those
+converted so far are ARDMASK, CENTROID, INSPECT and ZAPLIN.  The
+possibilities are as follows. 
+
+   o  Cursor    --- This mode utilises the cursor of the current
+                    graphics device. For this to work the array must
+                    already be displayed as an image, or a contour
+                    plot, or line plot (provided the application
+                    handles 1-dimensional data), and the picture is
+                    stored in the graphics database.
+   o  Interface --- This mode obtains co-ordinates from the
+                    parameter system, usually in response to
+                    prompting.
+   o  File      --- In this mode the application reads a text file
+                    containing a list of co-ordinates in free
+                    format, one object per record.  There may be
+                    commentary lines in the file beginning with
+                    # or !.  The format and syntax of the files are
+                    ad hoc, and are described in the application
+                    documentation.
+
+Applications that permit these options have a parameter, called
+MODE, by which you can control how positional data are to be
+acquired.  It would be tedious to have to specify a mode for each
+application, therefore KAPPA has a global parameter---the
+interaction mode---to which each application's interaction-mode
+parameter is defaulted.  The global value remains in force until you
+change it by assigning an application's interaction mode on the
+command line.  The following examples shows the effect of the global
+parameter.  For compactness GLOBALS will merely show the interaction
+mode.
+
+First we display an image on the xw windows device.
+ 
+     ICL> gdset xw
+     ICL> idset xw
+     ICL> display $KAPPA_DIR/ccdframec mode=pe \ 
+     Data will be scaled from 2366.001 to 2614.864. 
+     ICL> globals 
+     The current interaction mode is      : <undefined>
+ 
+Now we obtain the centroids of a couple of stellar/galaxian images
+via each of the interaction modes.  First in cursor mode.  Note that
+CENTROID obtains the name of the input NDF from the graphics
+database in this mode.  If you need to preview which NDF is going to
+be selected use the PICIN command.
+ 
+     ICL> centroid mode=c
+     Current picture has name: DATA, comment: KAPPA_DISPLAY. 
+     Using /star/bin/kappa/ccdframec as the input NDF
+      
+     To select a point press the left button on the mouse or trackerball. 
+     To exit press the right button. 
+     Use the cursor to select one point. 
+  
+     Input guess position was     86.23534, 295.0848
+     Output centroid position is  86.41057, 295.1141
+  
+     Use the cursor to select one point. 
+  
+     Input guess position was     73.32529, 318.9757
+     Output centroid position is  72.76437, 318.9484
+  
+     Use the cursor to select one point. 
+ 
+If we look at the global parameters again, indeed we see that it has
+become cursor mode.  To show that it is global we can run INSPECT.
+Yes a cursor appears rather than a prompt for the pixel value.
+ 
+     ICL> globals 
+     The current interaction mode is      : CURSOR
+     ICL> inspect 
+
+     For certain options, boxes will appear.  The functions are controlled
+     by the mouse/trackerball buttons and keyboard...
+        Press left button to select the operation shown in the left box.
+        Press middle button/keyboard "2" to select the operation shown in the middle box
+        Press right button to select the operation shown in the right box.
+
+     Current picture has name: DATA, comment: KAPPA_DISPLAY. 
+     Using /star/bin/kappa/ccdframec as the input NDF
+     GDEVICE - Graphics device to be used for line plots /@xov/ > 
+     OPTION - Option required /'Region'/ > VA 
+  
+        VALUE of image at 59, 294 is 2753.928 
+        
+        VALUE of image at 149, 311 is 3727.465 
+  
+     OPTION - Option required /'Region'/ > ex 
+ 
+Now we'll see the effect of changing the mode parameter.  Note that
+unless it is undefined or the application does not support the
+current mode, you must change the mode on the command line.  First
+we shall prompt for the co-ordinates.  A null ends the loop.
+ 
+     ICL> centroid mode=i 
+     NDF - Array to be analysed /@/star/bin/kappa/ccdframec/ >
+     INIT - Guess at co-ordinates of star-like feature /108.8,403.5/ > 86,295 
+
+     Input guess position was     86, 295 
+     Output centroid position is  86.41057, 295.1141
+      
+     INIT - Guess at co-ordinates of star-like feature /86,295/ > 73.3,319 
+  
+     Input guess position was     73.3, 319 
+     Output centroid position is  72.76437, 318.9484
+  
+     INIT - Guess at co-ordinates of star-like feature /73.3,319/ > !
+ 
+Finally, we can create a text file called starlist.dat and run
+CENTROID in file mode.   
+ 
+     ICL> cat > starlist.dat 
+     Creating DCL subprocess 
+     86 295
+     73 320
+     CTRL/D
+     ICL> centroid mode=f 
+     COIN - File of initial positions /@centroid.lis/ > starlist.dat
+     NDF - Array to be analysed /@$KAPPA_DIR/ccdframec/ >
+
+     Input guess position was     86, 295 
+     Output centroid position is  86.41057, 295.1141
+  
+     Input guess position was     73, 320 
+     Output centroid position is  72.76437, 318.9484
+ 
+Such co-ordinate files can also be created interactively with images by
+CURSOR, PICCUR, or the XYcur mode of INSPECT.
+
+.endhelp

@@ -1,0 +1,105 @@
+.help fitshead Starlink kappa
+.nf
+Lists the headers of FITS files.
+
+Usage:
+
+   fitshead file [block] [start] [finish]
+
+Description:
+
+   This procedure lists to standard output the headers of the primary
+   header and data unit, and any extensions present that are
+   contained within a set of input FITS files, or a range of
+   specified files on a tape.
+
+Parameters
+
+For information on individual parameters, select from the list below:
+
+FILE
+
+FILE  = FILENAME (Read)
+   A space-separated list of FITS files whose headers are to be
+   listed, or the name of a single no-rewind tape device.  The list
+   of files can include wildcard characters.
+
+BLOCK
+
+BLOCK = _INTEGER (Read)
+   The FITS blocking factor of the tape to list.  This is the tape
+   blocksize in bytes divided by the FITS record length of 2880
+   bytes.  BLOCK must be a positive integer, between 1 and 12,
+   otherwise you will be prompted for a new value.  Should the first
+   argument not be a tape device, this argument will be treated as
+   a file name. [1]
+
+START
+
+START = _INTEGER (Read)
+   The first file on the tape to list.  This defaults to 1, i.e.
+   the start of the tape.  It must be a positive integer,
+   otherwise you will be prompted for a new value.  Should the
+   first argument not be a tape device, this argument will be
+   treated as a file name. [1]
+
+FINISH
+
+FINISH = _INTEGER (Read)
+   The last file on the tape to list.  This defaults to the end
+   of the tape.  It must be a positive integer and at least equal
+   to the value of start, otherwise you will be prompted for a new
+   value.  Should the first argument not be a tape device, this
+   argument will be treated as a file name. []
+
+Examples
+
+fitshead /dev/nrmt1
+   This lists the FITS headers for all the files of the tape mounted
+   on device /dev/nrmt1.  The tape block size is 2880 bytes.
+
+fitshead /dev/nrmt1 10 > tape.lis
+   This lists to file tape.lis the FITS headers for all the files of
+   the tape mounted on device /dev/nrmt1.  The tape blocking factor is
+   10, the tape's blocksize is 28800 bytes.
+
+fitshead /dev/rmt/0n 2 3 5 >> tape.lis
+   This appends the FITS headers for files 3 to 5 of the tape mounted
+   on device /dev/rmt/0n to the file tape.lis.  The tape blocking factor
+   is 2, i.e. the tape's blocksize is 5760 bytes.
+
+fitshead /dev/nrst2 prompt
+   This lists the FITS headers for files of the tape mounted on
+   device /dev/nrst2.  The command prompts you for the file limits
+   and tape blocking factor.
+
+fitshead ~/fits/*.fit ~/data/p?.fi* | lpr
+   This prints the FITS headers in the files ~/fits/*.fit and
+   ~/data/p?.fi*.
+
+Notes
+
+-  Prompting is directed to the standard error, so that the listings
+may be redirected to a file.
+
+-  If the blocking factor is unknown it is possible to obtain only
+a part of the headers and some of the FITS data.  Unless the FITS
+file is small, it is usually safe to set parameter BLOCK higher
+than its true value.
+
+Related_Applications
+
+   KAPPA: FITSEDIT, FITSEXP, FITSIMP, FITSLIST; Figaro: FITSKEYS.
+
+Authors
+
+Malcolm J. Currie (STARLINK)
+
+History
+
+ 1994 November 4 (MJC):
+    Original version.
+
+ 1994 November 10 (MJC):
+    Added ADAM-like prompting user interface.
+.endhelp

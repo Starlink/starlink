@@ -1,0 +1,48 @@
+.help piclast Starlink kappa
+.nf
+Selects the last picture from the graphics datalast.
+
+Usage:
+
+   piclast
+
+Description:
+
+   This command selects the last-created picture.  Subsequent plotting
+   for the chosen device will be in this new current picture.
+   By default the chosen device is the current one.
+
+   This command is a synonym for "piclist picnum=1".
+
+
+Parameters
+
+For information on individual parameters, select from the list below:
+
+DEVICE
+
+DEVICE = DEVICE (Read)
+   The graphics workstation. [The current graphics device]
+
+Examples
+
+piclast
+   This selects the last picture for the current graphics device.
+
+piclast device=x2w
+   This selects the last picture for the x2w device.
+
+Related_Applications
+
+   KAPPA: PICBASE, PICCUR, PICDATA, PICFRAME, PICLIST, PICSEL.
+
+Authors
+
+MJC: Malcolm J. Currie (STARLINK)
+
+History
+
+ 1995 August 23 (MJC):
+    Original version.
+
+.endhelp

@@ -1,0 +1,324 @@
+.help fourier Starlink kappa
+.nf
+Performs forward and inverse Fourier transforms of 1- or
+2-dimensional NDFs.
+
+Usage:
+
+   fourier in hermout
+
+Description:
+
+   This application performs forward or reverse Fast Fourier
+   Transforms (FFTs) of 1- or 2-dimensional NDFs.  The output in the
+   forward transformation (from the space domain to the Fourier) can
+   be produced in Hermitian form in a single NDF, or as two NDFs
+   giving the real and imaginary parts of the complex transform, or
+   as two NDFs giving the power and phase of the complex transform.
+   Any combination of these may also be produced.  The inverse
+   procedure accepts any of these NDFs and produces a purely real
+   output NDF.
+
+   Any bad pixels in the input NDF may be replaced by a constant
+   value.  Input NDFs need neither be square, nor be a power of 2 in
+   size in either dimension; their shape is arbitrary.
+
+   The Hermitian transform is a single image in which each quadrant
+   consists of a linear combination of the real and imaginary
+   parts of the transform.  This form is useful if you just want to
+   multiply the Fourier transform by some known purely real mask and
+   then invert it to get a filtered image.  However, if you want to
+   multiply the Fourier transform by a complex mask (e.g. the
+   Fourier transform of another NDF), or do any other operation
+   involving combining complex values, then the Hermitian NDF must
+   be untangled into separate real and imaginary parts.
+
+   There is an option to swap the quadrants of the input NDF around
+   before performing a forward FFT.  This is useful if you want to
+   perform convolutions with the FFTs, since the point-spread
+   function (PSF) image can be created with the PSF centre at the
+   array centre, rather than at pixel (1,1) as is usually required.
+
+Parameters
+
+For information on individual parameters, select from the list below:
+
+FILLVAL
+
+FILLVAL = LITERAL (Read)
+   A value to replace bad pixels before performing the transform.
+   The input image is also padded with this value if necessary to
+   form an image of acceptable size.  A value of "Mean" will cause
+   the mean value in the array to be used. [0.0]
+
+HERMIN
+
+HERMIN = NDF (Read)
+   Hermitian frequency-domain input NDF containing the complex
+   transform.  If null is entered no Hermitian NDF is read and
+   then the application should be supplied either separate real
+   and imaginary NDFs, or the power and phase NDFs. Prompting
+   will not occur if one of the other (inverse) input NDFs has
+   been given on the command line, but not HERMIN as well.  This
+   parameter is only relevant for an inverse transformation.
+
+HERMOUT
+
+HERMOUT = NDF (Write)
+   Hermitian output NDF from a forward transform.  If a null value
+   is given then this NDF is not produced.
+
+HM_TITLE
+
+HM_TITLE = LITERAL (Read)
+   Title for the Hermitian Fourier-transform output NDF.
+   A null (!) value means using the title of the input NDF.
+   ["KAPPA - Fourier - Hermitian"]
+
+IM_TITLE
+
+IM_TITLE = LITERAL (Read)
+   Title for the frequency-domain imaginary output NDF.
+   A null (!) value means using the title of the input NDF.
+   ["KAPPA - Fourier - Imaginary"]
+
+IMAGIN
+
+IMAGIN = NDF (Read)
+   Input frequency-domain NDF containing the real part of the
+   complex transform.  If a null is given then an image of zeros
+   is assumed unless a null is also given for REALIN, in which
+   case the input is requested in power and phase form.  This
+   parameter is only available if HERMIN is not used.  One way to
+   achieve that is to supply IMAGIN, but not HERMIN, on the
+   command line.  This parameter is only relevant for an inverse
+   transformation.
+
+IMAGOUT
+
+IMAGOUT = NDF (Write)
+   Frequency-domain output NDF containing the imaginary part of
+   the complex Fourier transform.  If a null value is given then
+   this NDF is not produced. [!]
+
+IN
+
+IN = NDF (Read)
+   Real (space-domain) input NDF for a forward transformation.
+   There are no restrictions on the size or shape of the input
+   NDF, although the it may have to be padded or trimmed before
+   being transformed. This parameter is only used if a forward
+   transformation was requested.
+
+INVERSE
+
+INVERSE = _LOGICAL (Read)
+   If TRUE, then the inverse transform---frequency domain to
+   space domain---is required, otherwise a transform from the
+   space to the frequency domain is undertaken. [FALSE]
+
+OUT
+
+OUT = NDF (Write)
+   Real space-domain output NDF.  This parameter is only used if
+   an inverse transformation is requested.
+
+PH_TITLE
+
+PH_TITLE = LITERAL (Read)
+   Title for the frequency-domain phase output NDF.
+   A null (!) value means using the title of the input NDF.
+   ["KAPPA - Fourier - Phase"]
+
+PHASEIN
+
+PHASEIN = NDF (Read)
+   Input frequency-domain NDF containing the phase of the complex
+   transform.  If a null is given then an image of zeros is
+   assumed unless a null is also given for PHASEIN, in which
+   case the application quits.  This parameter is only available
+   if HERMIN, REALIN and IMAGIN are all not used.   One way to
+   achieve that is to supply PHASEIN, but none of the
+   aforementioned parameters, on the command line.  This
+   parameter is only relevant for an inverse transformation.
+
+PHASEOUT
+
+PHASEOUT = NDF (Write)
+   Frequency-domain output NDF containing the phase of the
+   complex Fourier transform.  If a null value is given then this
+   NDF is not produced. [!]
+
+POWERIN
+
+POWERIN = NDF (Read)
+   Input frequency-domain NDF containing the modulus of the
+   complex transform.  Note, this should be the square root of the
+   power rather than the power itself.  If a null is given then an
+   image of zeros is assumed unless a null is also given for
+   PHASEIN, in which case the application quits.  This parameter
+   is only available if HERMIN, REALIN and IMAGIN are all not
+   used.  One way to achieve that is to supply POWERIN, but none
+   of the aforementioned parameters, on the command line.  This
+   parameter is only relevant for an inverse transformation.
+
+POWEROUT
+
+POWEROUT = NDF (Write)
+   Frequency-domain output NDF containing the modulus of the
+   complex Fourier transform.  Note, this is the square root of
+   the power rather than the power itself.  If a null value is
+   given then this NDF is not produced. [!]
+
+PW_TITLE
+
+PW_TITLE = LITERAL (Read)
+   Title for the frequency-domain power output NDF.
+   A null (!) value means using the title of the input NDF.
+   ["KAPPA - Fourier - Power"]
+
+REALIN
+
+REALIN = NDF (Read)
+   Input frequency-domain NDF containing the real part of the
+   complex transform.  If a null is given then an image of zeros is
+   assumed unless a null is also given for IMAGIN, in which case
+   the input is requested in power and phase form.  This parameter
+   is only available if HERMIN is not used.  One way to achieve
+   that is to supply REALIN, but not HERMIN, on the command
+   line.  This parameter is only relevant for an inverse
+   transformation.
+
+REALOUT
+
+REALOUT = NDF (Write)
+   Frequency-domain output NDF containing the real part of the
+   complex Fourier transform.  If a null value is given then this
+   NDF is not produced. [!]
+
+RL_TITLE
+
+RL_TITLE = LITERAL (Read)
+   Title for the frequency-domain real output NDF.
+   A null (!) value means using the title of the input NDF.
+   ["KAPPA - Fourier - Real"]
+
+SHIFT
+
+SHIFT = _LOGICAL (Read)
+   If TRUE, the transform origin is to be located at the array's
+   centre.  This is implemented by swapping bottom-left and
+   top-right, and bottom-right and top-left array quadrants,
+   before doing the transform.  This results in the transformation
+   effectively being done about pixel x = INT(NAXIS1/2)+1 and
+   y = INT(NAXIS2/2)+1, where NAXISn are the padded or trimmed
+   dimensions of the NDF. [FALSE]
+
+TRIM
+
+TRIM = LOGICAL (Read)
+   If TRUE, when the input array dimension cannot be processed by
+   the transform, the output arrays will be trimmed rather than
+   padded with the fill value. [FALSE]
+
+TITLE
+
+TITLE = LITERAL (Read)
+   Title for the real space-domain output NDF.
+   A null (!) value means using the title of the input NDF.
+   ["KAPPA - Fourier"]
+
+Examples
+
+fourier galaxy ft_gal
+   Makes an Hermitian Fourier transform stored in an NDF called
+   ft_gal from the 2-d NDF called galaxy.
+
+fourier hermin=ft_gal out=galaxy inverse
+   Takes an Hermitian Fourier transform stored in an NDF called
+   ft_gal and performs the inverse transformation to yield a
+   normal (spatial domain) image in NDF galaxy.
+
+fourier in=galaxy powerout=galpow hermout=ft_gal fillval=mean
+   Makes an Hermitian Fourier transform stored in an NDF called
+   ft_gal from the 2-d NDF called galaxy.  Any bad values in
+   galaxy are replaced by the mean data value of galaxy.  In
+   addition the power of the transform is written to an NDF
+   called galpow.
+
+fourier realin=real_gal out=galaxy inverse
+   Takes the real component of a Fourier transform stored in an
+   NDF called real_gal and performs the inverse transformation to
+   yield a normal image in NDF galaxy.
+
+Notes
+
+- See the NAG documentation, Chapter C06, and/or KAPPA routine
+KPG1_HMLTX.GEN for more details of Hermitian Fourier transforms.
+
+Related_Applications
+
+   KAPPA: CONVOLVE, LUCY, MEM2D, WIENER; Figaro: BFFT, CMPLX*,
+   COSBELL, FFT, *2CMPLX.
+
+Authors
+
+DSB: D.S. Berry (STARLINK)
+
+MJC: Malcolm J. Currie (STARLINK)
+
+History
+
+ 1988 Jun 6 (DSB):
+    Original version.
+
+ 1990 Mar 19 (MJC):
+    Converted to KAPPA/ADAM style.
+
+ 1990 Mar 29 (MJC):
+    Added mean option for fill values and the trim option.
+
+ 20-MAY-1991 (DSB):
+    Bug fixed which caused incorrect power and phase images to be
+    used when performing an inverse transformation.
+
+ 1991 May 20 (MJC):
+    Added error reports when no input or output NDFs are specified.
+    There is less prompting for input NDFs during an inverse
+    transformation when the values of one or more input NDFs are
+    supplied on the command line.
+
+ 1992 March 3 (MJC):
+    Replaced AIF parameter-system calls by the extended PAR
+    library.
+
+ 1992 April 21 (MJC):
+    Made to handle significant dimensions for user-defined
+    sections.
+
+ 6-JAN-1995 (DSB):
+    SUBPAR constants replaced by PAR constants.  AIF VM routines
+    replaced by PSX routines.  Re-format to edstar-style
+    commenting.  Add final context error report.  Changed to use
+    double precision arithmetic.  Use of STATV replaced by
+    KPG1_MEAND.
+
+ 1995 March 29 (MJC):
+    Changed the Usage and Examples to lowercase, added Related
+    Applications section, removed redundant variables previously
+    needed by STATV, used a modern-style variable declaration,
+    made message reporting conditional, revised the commentary for
+    the 1-d case and no NAG usage and used headings to break up
+    the code, and various minor stylistic changes.
+
+ 1995 March 30 (MJC):
+    Made to work on single precision too.
+
+Implementation_Status
+
+   - AXIS, VARIANCE and QUALITY are not propagated from the input to
+     output NDFs, but the LABEL, TITLE, HISTORY components and all
+     extensions are.  Arithmetic is performed using single- or
+     double-precision floating point, as appropriate for the type of
+     the data array.
+.endhelp

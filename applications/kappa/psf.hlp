@@ -1,0 +1,390 @@
+.help psf Starlink kappa
+.nf
+Determines the parameters of a model star profile by fitting star
+images in a two-dimensional NDF.
+
+Usage:
+
+   psf in cofile device out [cut] [range] [isize] [poscols] [clear]
+
+Description:
+
+   This application finds a set of parameters to describe a model
+   Gaussian star image.  It can be used for profile-fitting stellar
+   photometry, to evaluate correction terms to aperture
+   photometry, or for filtering.
+
+   The model has a radial profile:
+      D =  A exp(-0.5 * (r/sigma) ** gamma )
+   where r is calculated from the true radial distance from the star
+   centre allowing for image ellipticity, sigma is the Gaussian
+   precision constant or profile width.  The application combines a
+   number of star images you specify and determines a mean
+   seeing-disc size, radial fall-off parameter (gamma), axis ratio,
+   and orientation of a model star image.
+
+   A table, giving details of the seeing and ellipticity of each
+   star image used can be reported to an output text file.  This
+   table indicates if any star could not be used.  Reasons for
+   rejecting stars are too-many bad pixels present in the image,
+   the star is too close to the edge of the data array, the
+   `star' is a poor fit to model or it could not be located.
+
+   An optional plot of the mean profile and the fitted function may
+   be produced.  The point-spread function may be stored in an NDF
+   for later use.
+
+Parameters
+
+For information on individual parameters, select from the list below:
+
+ABSLAB
+
+ABSLAB = LITERAL (Read)
+   Label for the plot abscissa, in which NCAR fancy founts may be
+   embedded when FONT = "NCAR".  The default is "^AXIS-axis
+   Distance (^RADUNITS)" where ^RADUNITS is replaced by the value
+   of parameter RADUNITS, and ^AXIS is "Minor" when MINOR=TRUE
+   and is "Major" when MINOR=FALSE.
+
+AXISR
+
+AXISR = _REAL (Write)
+   The axis ratio of the star images: the ratio of the major
+   axis length to that of the minor axis.
+
+CLEAR
+
+CLEAR = _LOGICAL (Read)
+   Determines if the graphics workstation is to be cleared before
+   producing the plot.  It is ignored if no plotting is required
+   defined by DEVICE. [TRUE]
+
+COFILE
+
+COFILE = FILENAME (Read)
+   Text file containing the x and y co-ordinates.  The data
+   should be in columns separated by spaces or tabs, however
+   precise alignment is not necessary.
+
+COSYS
+
+COSYS = LITERAL (Read)
+   The co-ordinate system to be used.  This can be either "World"
+   or "Data".  If COSYS = "Data" the input co-ordinates are to be
+   expressed in data co-ordinates, otherwise pixel (world)
+   co-ordinates are used.  In order to compute the point-spread
+   function data co-ordinates are converted to pixel indices via
+   the NDF's axis values; if there is no axis information within
+   the NDF, world co-ordinates are then used.  If COSYS = "World"
+   pixel co-ordinates are used throughout.  [Current co-ordinate
+   system]
+
+CUT
+
+CUT = _REAL (Read)
+   This parameter controls the size of the output NDF.  If it is
+   null, !, the dimension of the square NDF will be the size of
+   the region used to calculate the radial profile, which usually
+   is given by RANGE * width in pixels * AXISR, unless truncated.
+   If CUT has a value it is the threshold which must be included
+   in the PSF NDF, and it is given as the fraction of the peak
+   amplitude of the PSF.  For example, if CUT=0.5 the NDF would
+   contain the point-spread function to half maximum.  CUT must
+   be greater than 0 and less than 1.  The suggested default is
+   0.0001 [!]
+
+DEVICE
+
+DEVICE = DEVICE (Read)
+   The graphics workstation on which to produce a plot of the
+   mean radial profile of the stars and the fitted function.  A
+   null (!) name indicates that no plot is required.  The
+   suggested default is the current graphics device.
+
+FONT
+
+FONT = LITERAL (Read)
+   The fount to be used for the line graphics.  It can be either
+   "NCAR" for the NCAR fancy characters and "GKS" for the standard
+   GKS san-serif fount.   The former is intended for hardcopy
+   publication-quality plots, since it is relatively slow; the
+   latter is intended for normal interactive graphics requiring
+   rapid plotting, and it is clearer on small plots. The
+   suggested default is the current value. ["GKS"]
+
+FWHM
+
+FWHM = _REAL (Write)
+   The seeing-disc size: the full width at half maximum across the
+   minor axis of the stars.  It is in the units defined by
+   parameters SCALE and RADUNITS.  By default this will be in
+   pixels.
+
+GAMMA
+
+GAMMA = _REAL (Write)
+   The radial fall-off parameter of the star images. See the
+   description for more details.  A gamma of two would be a
+   Gaussian.
+
+IN
+
+IN = NDF (Read)
+   The NDF containing the star images to be fitted.
+
+ISIZE
+
+ISIZE = _INTEGER (Read)
+   The side of the square area to be used when forming the
+   marginal profiles for a star image.  It should be sufficiently
+   large to contain the entire star image.  It should be an odd
+   number and must lie in the range from 3 to 101.  If an even
+   value is given, the next largest odd number is used instead.
+   [15]
+
+LOGFILE
+
+LOGFILE = FILENAME (Read)
+   Text file to contain the table of parameters for each star.  A
+   null (!) name indicates that no log file is required. [!]
+
+MAJTIC
+
+MAJTIC( 2 ) = _REAL (Read)
+   The parameter controlling the numbers of major tick marks
+   for the x and y axes.  (Number used is between MAJTIC+2 and
+   5*MAJTIC/2+4.) [3.,3.]
+
+MINOR
+
+MINOR = _LOGICAL (Read)
+   If MINOR is TRUE the plot abscissa is the distance along the
+   minor axis from the centre of the PSF.  If MINOR is FALSE, the
+   major axis is plotted.  [TRUE]
+
+MINTIC
+
+MINTIC( 2 ) = _REAL (Read)
+   The number of minor tick marks between each major tick mark
+   for the x and y axes.  A negative value forces the graphics
+   package to compute appropriate values. [-1.,-1.]
+
+ORDLAB
+
+ORDLAB = LITERAL (Read)
+   Label for the plot ordinate, in which NCAR fancy founts may be
+   embedded when FONT = "NCAR".  ["Intensity"]
+
+ORIENT
+
+ORIENT = _REAL (Write)
+   The orientation of the major axis of the star images to the x
+   axis (increasing pixel-index direction).  This value is in
+   degrees, x through y being considered positive.
+
+OUT
+
+OUT = NDF (Write)
+   The NDF containing the fitted point-spread function evaluated
+   at each pixel. Its dimensions are always odd numbered and
+   the centre of the PSF is located at the centre of the image.
+   If null, !, is entered no output NDF will be created.  The
+   dimensions of the array are controlled by parameter CUT. [!]
+
+OUTTIC
+
+OUTTIC = _LOGICAL (Read)
+   OUTTIC is TRUE if the axis tick marks are to appear on the
+   outside of the axes instead of inside. [FALSE]
+
+PLTITL
+
+PLTITL = LITERAL (Read)
+   The title of the plot.  Up to about 40 characters can be
+   accommodated, and NCAR fancy founts may be embedded when
+   FONT = "NCAR".  ["Mean Star Profile"]
+
+POSCOLS
+
+POSCOLS = _INTEGER (Read)
+   Column positions of the co-ordinates in an input record of the
+   Text file, x then y.  The columns must be different amongst
+   themselves. If there is duplication new values will be
+   requested.  [1,2]
+
+PXSIZE
+
+PXSIZE = _REAL (Read)
+   The horizontal size of the plot in metres. If a value less
+   than the default is requested, then the plot will appear at
+   the bottom left of the current picture. [The size of the
+   current picture]
+
+PYSIZE
+
+PYSIZE = _REAL (Read)
+   The vertical size of the plot in metres. If a value less than
+   the default is requested, then the plot will appear at the
+   bottom left of the current picture. [The size of the current
+   picture]
+
+RADUNITS
+
+RADUNITS = LITERAL (Read)
+   The units of the radial profile after applying parameter SCALE
+   to the pixels.  RADUNITS defaults to "pixels" when SCALE is
+   1.0. []
+
+RANGE
+
+RANGE = _REAL (Read)
+   The number of image profile widths out to which the radial
+   star profile is to be fitted.  (There is an upper limit of 100
+   pixels to the radius at which data are actually used.) [4.0]
+
+SCALE
+
+SCALE = _REAL (Read)
+   A scale factor to convert pixels to some physical units such
+   as arcseconds.  This factor is applied to the reported FWHM
+   and to the radial distances in the plotted profile. [1.0]
+
+TITLE
+
+TITLE = LITERAL (Read)
+   The title for the NDF to contain the fitted point-spread
+   function.  If null, !, is entered the NDF will not contain a
+   title.  ["KAPPA - PSF"]
+
+Examples
+
+psf ngc6405i starlist.dat \
+   Derives the mean point-spread function for the stars images
+   in the NDF called ngc6405i that are situated near the x-y
+   co-ordinates given in the first two columns of file starlist.
+   A plot of the profile is drawn on the current graphics device.
+   The results are stored in the parameter file psf.sdf.
+
+psf ngc6405i starlist device=!
+   As above but there is no graphical output.
+
+psf cofile=starlist in=ngc6405i logfile=fit.log fwhm=(seeing) \
+   As the first example, but the results, including the fits to
+   each star, are written to the text file fit.log.  The
+   full-width half-maximum is written to the ICL variable SEEING
+   rather than the parameter file.
+
+psf ngc6405i starlist isize=31 \
+   As the first example, but the area including a star image is
+   31 pixels square, say because the seeing is poor or the pixels
+   are smaller than normal.
+
+psf ngc6405i starlist out=starpsf cut=1.0e-3 scale=0.52
+
+radunits="arcseconds"
+   As the first example, but the resultant point-spread function
+   is stored in the NDF called starpsf, and will contain signals
+   as low as 1.0E-3.  The FWHM and plot abscissa are scaled to
+   arcseconds, where a pixel corresponds to 0.52 arcseconds.
+
+Notes
+
+-  The stars used to determine the mean image parameters should
+be chosen to represent those whose magnitudes are to be found
+using a stellar photometry application, and to be sufficiently
+bright, uncrowded, and noise-free to allow an accurate fit to be
+made.
+
+-  The method to calculate the fit is as follows.
+   o   Marginal profiles of each star image are formed in four
+   directions, inclined at 45-degree intervals.  A Gaussian curve
+   and background is fitted to each profile.  Using the resulting
+   four Gaussian centres, a mean centre is found for each star.
+   o  The four Gaussian widths of all the stars are combined,
+   using a weighted average with rejection of erroneous data, and
+   from the four average widths the seeing-disc size, axis ratio
+   and axis inclination are calculated.
+   o  The data surrounding each star is then binned into
+   isophotal zones which are elliptical annuli centred on the
+   star---the ellipse parameters being those just calculated.
+   The data in each zone is processed to remove erroneous points
+   and to find an average value.  A Gaussian profile is fitted to
+   these average values and the derived amplitude is used to
+   normalise the values to an amplitude of unity.  The normalised
+   values are put into bins together with the corresponding data
+   from all other stars and this binned data represents a
+   weighted average radial profile for the set of stars, with the
+   image ellipticity removed.  Finally a radial profile is fitted
+   to these data, giving the radial profile parameter gamma and a
+   final re-estimate of the seeing-disc size.
+
+-  If a plot was requested the application stores two pictures in
+the graphics database in the following order: a FRAME of the
+specified size containing the title, annotated axes, and line
+plot; and a DATA picture, which has world co-ordinates measured
+in pixels along the x axis and normalized intensity values along
+y.  The NDF associated with the plot is not stored by reference
+with the DATA picture.  On exit the current database picture for
+the chosen device reverts to the input picture.
+
+Timing
+
+   Approximately proportional to the number of stars used and the
+   image area which each occupies.
+
+Related_Applications
+
+   PHOTOM; Starman.
+
+Authors
+
+MJC: Malcolm J. Currie (STARLINK)
+
+History
+
+ 1990 Sep 25 (MJC):
+    Original version with commentary from Rodney Warren-Smith's
+    EDRS documentation.
+
+ 1991 July 6 (MJC):
+    Added Usage, Notes on graphics pictures stored in the database,
+    and more on the Implementation Status in the documentation.
+
+ 1991 July 9 (MJC):
+    An output NDF containing the PSF may now be created.  There are
+    three new parameters: CUT, OUT and TITLE.
+
+ 1991 July 12 (MJC):
+    Support for data co-ordinates added via new parameter COSYS.
+
+ 1991 August 20 (MJC):
+    Added FONT parameter.
+
+ 1992 March 3 (MJC):
+    Replaced AIF parameter-system calls by the extended PAR
+    library.
+
+ 1992 April 21 (MJC):
+    Made to handle significant dimensions for user-defined
+    sections.
+
+ 1992 November 30 (MJC):
+    Does not use non-monotonic axis centres.
+
+ 1993 August 27 (MJC):
+    Added ABSLAB, ORDLAB, PLTITL, RADUNITS, SCALE, and MINOR
+    parameters for adjustment of the plotting style, for scaling
+    from pixels to physical units, and for minor-axis profiles.
+
+Implementation_Status
+
+   -  This routine correctly processes the AXIS, DATA, QUALITY,
+   LABEL, and TITLE components of an NDF data structure.
+
+   -  Processing of bad pixels and automatic quality masking are
+   supported.
+
+   -  All non-complex numeric data types can be handled.  The output
+   point-spread-function NDF has type _REAL.
+.endhelp

@@ -1,0 +1,7 @@
+in,f,a,,,,"Input NDF"
+out,f,a,,,,"Output NDF"
+fwhm,r,a,2.0,,,"Gaussian PSF full-width(s) at half-maximum"
+box,i,h,,,,"Smoothing box size"
+orient,r,a,,,,"Orientation of the elliptical PSF"
+title,s,h,INDEF,,,"Output title"
+wlim,r,h,INDEF,,,"Weight limit for good output pixels"

@@ -1,0 +1,223 @@
+.help lutview Starlink kappa
+.nf
+Draws a colour-table key.
+
+Usage:
+
+   lutview [mode] [low] [high] [annota] [curpic] [device] lbound=?
+     ubound=?
+
+Description:
+
+   This application draws a key of the colour table at a location
+   you select.  You can constrain the key to lie within either the
+   current or the BASE picture.  The key may be annotated, in which
+   case you must allow sufficient room for the annotations.  For
+   oblate regions colour index increases from left to right, and for
+   prolate it increases from bottom to top; the annotations
+   appearing to the top and right respectively.  The annotations
+   scale linearly between the values corresponding to the lower and
+   upper indices of the colour table.
+
+   The situation of the key is defined by the co-ordinates of a pair
+   of opposite corners of a rectangular region.  You may specify
+   these using one of the following methods:
+     1.  moving a cursor and pressing a button on the mouse or
+         trackerball;
+     2.  obtaining bounds from the environment (in normalised
+         co-ordinates of the reference picture).
+
+Parameters
+
+For information on individual parameters, select from the list below:
+
+ANNOTA
+
+ANNOTA = _LOGICAL (Read)
+   ANNOTA is TRUE if the colour table is to be annotated with the
+   pen numbers.  Note a squarer picture should be created so that
+   the annotations are legible. [FALSE]
+
+CURPIC
+
+CURPIC = _LOGICAL (Read)
+   If CURPIC is TRUE, the colour table key is to lie within the
+   current picture, otherwise the new picture can lie anywhere
+   within the BASE picture.  It is ignored when the
+   current-picture mode is selected. [FALSE]
+
+DEVICE
+
+DEVICE = DEVICE (Read)
+   The image-display device on which the colour table is to be
+   drawn.  The device must be in one of the following GNS
+   categories: IMAGE_DISPLAY, IMAGE_OVERLAY, MATRIX_PRINTER, or
+   WINDOW, and have at least 24 greyscale intensities or colour
+   indices.  It must also not reset when the device is opened
+   (since the colour table would be lost) unless parameter LUT
+   does not have the null value.  [Current image-display device]
+
+HIGH
+
+HIGH = _REAL (Read)
+   The value corresponding to the maximum colour index.  It is
+   used to calculate the annotation scale for the key.  If it
+   is null (!) the maximum colour index is used.
+   [Current display linear-scaling maximum]
+
+LBOUND
+
+LBOUND( 2 ) = _REAL (Read)
+   Co-ordinates of the lower bound that defines the location of
+   the colour-table plot.  These are in the world system of the
+   BASE or current picture. (XY mode)
+
+LOW
+
+LOW = _REAL (Read)
+   The value corresponding to the minimum colour index.  It is
+   used to calculate the annotation scale for the key.  If it
+   is null (!) the minimum colour index is used.
+   [Current display linear-scaling minimum]
+
+LUT
+
+LUT = NDF (Read)
+   Name of the NDF containing a lookup table as its data array;
+   the lookup table is written to the image-display's colour
+   table.  The purpose of this parameter is to provide a means of
+   controlling the appearance of the image on certain devices,
+   such as colour printers, that do not have a dynamic colour
+   table, i.e. the colour table is reset when the device is
+   opened.  If used with dynamic devices, such as windows or
+   Ikons, the new colour table remains after this application has
+   completed.  A null, !, means that the existing colour table
+   will be used.
+
+   The LUT must be two-dimensional, the first dimension
+   being 3, and the second being arbitrary.  The method used to
+   compress or expand the colour table if the second dimension is
+   different from the number of unreserved colour indices is
+   controlled by parameter NN.  Also the LUT's values must lie in
+   the range 0.0--1.0. [!]
+
+MODE
+
+MODE = LITERAL (Read)
+   Method for defining the position, size and shape of the
+   colour-table key.  The options are "Cursor" for cursor mode
+   (provided the graphics device has one), "XY" to select x-y
+   limits via the parameter system, and "Picture" where the
+   whole of the current picture is used.  Additional positioning
+   options are available by using other KAPPA applications to
+   create new pictures and then specifying the picture mode.
+   ["Cursor"]
+
+NN
+
+NN = _LOGICAL (Read)
+   If NN is TRUE, the input lookup table is mapped to the colour
+   table by using the nearest-neighbour method.  This preserves
+   sharp edges and is better for lookup tables with blocks of
+   colour.  If NN is FALSE, linear interpolation is used, and
+   this is suitable for smoothly varying colour tables.  NN is
+   ignored unless LUT is not null. [FALSE]
+
+OUTLINE
+
+OUTLINE = _LOGICAL (Read)
+   If OUTLINE is TRUE, a box that delimits the key is drawn.  A
+   box is always drawn when there are annotations. [TRUE]
+
+UBOUND
+
+UBOUND( 2 ) = _REAL (Read)
+   Co-ordinates of the upper bound that defines the location
+   of the colour-table plot.  These are in the world system of the
+   BASE or current picture. (XY mode)
+
+Examples
+
+lutview annota
+   Draws an annotated colour table at a position selected via
+   the cursor on the current image-display device.
+
+lutview p
+   Draws a colour table that fills the current picture on the
+   current image-display device.
+
+lutview curpic
+   Draws a colour table within the current picture positioned
+   via the cursor.
+
+lutview mode=xy outline device=ikon \
+   Draws a outlined colour table within the BASE picture
+   on the Ikon, defined by x-y extents.
+
+lutview xy lut=my_lut device=lj250_p lbound=[0.92,0.2]
+
+ubound=[0.98,0.8]
+   Draws the colour table in the NDF called my_lut with an
+   outline within the BASE picture on the device lj250_p, defined
+   by the x-y bounds (0.92,0.2) and (0.98,0.8).  In other words
+   the plot is to the right-hand side with increasing colour
+   index with increasing y position.
+
+Notes
+
+-  When annotations are selected their precise height and the
+width of the colour table, depend on the largest number of
+significant figures in an annotation.  The colour table will have
+an aspect ratio in the range 0.17--0.45, and the text height is
+adjusted to fit the characters within the available room.  The
+default aspect ratio is 0.275.
+
+-  The text has a maximum height as a fraction of width (if
+oblate) or height of the initial picture (BASE or current) so
+that ridiculously large characters are drawn for big keys.
+However, this can result in characters which are too small if for
+example a highly oblate colour table is plotted within a strongly
+prolate current picture.
+
+-  A FRAME picture (when there are annotations) and the
+colour-table picture are stored in the graphics database. These
+have names FRAME and KEY respectively.  On completion the
+current picture is unchanged.
+
+-  Parameters LOW and HIGH are single precision because they are
+also required to define world co-ordinates of the graphics.  Thus
+this application is not suitable for double-precision data that
+have been scaled over a range near the precision of real values.
+
+Related_Applications
+
+   KAPPA: DISPLAY, LUTABLE; Figaro: COLOUR.
+
+Authors
+
+MJC: Malcolm J. Currie  (STARLINK)
+
+History
+
+ 1990 July 24 (MJC):
+    Original version.
+
+ 1991 April 9 (MJC):
+    Added AGI begin-and-end block.  Added LOW and HIGH parameters
+    and made to display only the non-reserved pens.
+
+ 1991 July 31 (MJC):
+    No longer redefines colours of SGS pens to predefined state if
+    workstation has dynamic colour representation, now there is
+    palette control.
+
+ 1992 March 3 (MJC):
+    Replaced AIF parameter-system calls by the extended PAR
+    library.
+
+ 1992 December 1 (MJC):
+    LOW and HIGH default to the current linear scaling limits.
+
+ 1993 January 14 (MJC):
+    Added LUT and NN parameters.
+.endhelp

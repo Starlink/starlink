@@ -1,0 +1,271 @@
+.help ndftrace Starlink kappa
+.nf
+Displays the attributes of an NDF data structure.
+
+Usage:
+
+   ndftrace ndf
+
+Description:
+
+   This routine displays the attributes of an NDF data structure
+   including:
+
+   -  its name;
+
+   -  the values of its character components (title, label and
+   units);
+
+   -  its shape (pixel bounds, dimension sizes, number of dimensions
+   and total number of pixels);
+
+   -  zxis co-ordinate information (axis labels, units and extents);
+
+   -  optionally, axis array attributes (type and storage form) and
+   the values of the axis normalisation flags;
+
+   -  attributes of the main data array and any other array
+   components present (including the type and storage form and an
+   indication of whether `bad' pixels may be present);
+
+   -  a list of any NDF extensions present, together with their data
+   types; and
+
+   -  history information (creation and last-updated dates, the
+   update mode and the number of history records).
+
+   Most of this information is output to parameters.
+
+Parameters
+
+For information on individual parameters, select from the list below:
+
+AEND
+
+AEND( ) = _DOUBLE (Write)
+   The axis upper extents of the NDF.  For non-monotonic axes,
+   zero is used.  See parameter AMONO.  This is not assigned if
+   AXIS is FALSE.
+
+AFORM
+
+AFORM( ) = LITERAL (Write)
+   The storage forms of the axis centres of the NDF.  This is
+   only written when FULLAXIS is TRUE and AXIS is TRUE.
+
+ALABEL
+
+ALABEL( ) = LITERAL (Write)
+   The axis labels of the NDF.  This is not assigned if AXIS is
+   FALSE.
+
+AMONO
+
+AMONO( ) = _LOGICAL (Write)
+   These are TRUE when the axis centres are monotonic, and FALSE
+   otherwise.  This is not assigned if AXIS is FALSE.
+
+ANORM
+
+ANORM( ) = _LOGICAL (Write)
+   The axis normalisation flags of the NDF.  This is only written
+   when FULLAXIS is TRUE and AXIS is TRUE.
+
+ASTART
+
+ASTART( ) = _DOUBLE (Write)
+   The axis lower extents of the NDF.  For non-monotonic axes,
+   zero is used.  See parameter AMONO.  This is not assigned if
+   AXIS is FALSE.
+
+ATYPE
+
+ATYPE( ) = LITERAL (Write)
+   The data types of the axis centres of the NDF.  This is only
+   written when FULLAXIS is TRUE and AXIS is TRUE.
+
+AUNITS
+
+AUNITS( ) = LITERAL (Write)
+   The axis units of the NDF.  This is not assigned if AXIS is
+   FALSE.
+
+AVARIANCE
+
+AVARIANCE( ) = _LOGICAL (Write)
+   Whether or not there are axis variance arrays present in the
+   NDF.  This is only written when FULLAXIS is TRUE and AXIS is
+   TRUE.
+
+AXIS
+
+AXIS = _LOGICAL (Write)
+   Whether or not the NDF has an axis system.
+
+BAD
+
+BAD = _LOGICAL (Write)
+   If TRUE, the NDF's data array may contain bad values.
+
+BADBITS
+
+BADBITS = LITERAL (Write)
+   The BADBITS mask.  This is only valid when QUALITY is TRUE.
+
+DIMS
+
+DIMS( ) = _INTEGER (Write)
+   The dimensions of the NDF.
+
+EXTNAME
+
+EXTNAME( ) = LITERAL (Write)
+   The names of the extensions in the NDF.  It is only written
+   when NEXTN is positive.
+
+EXTTYPE
+
+EXTTYPE( ) = LITERAL (Write)
+   The types of the extensions in the NDF.  Their order
+   corresponds to the names in EXTNAME.  It is only written when
+   NEXTN is positive.
+
+FORM
+
+FORM = LITERAL (Write)
+   The storage form of the NDF's data array.
+
+FULLAXIS
+
+FULLAXIS = _LOGICAL (Read)
+   If the NDF being examined has an axis co-ordinate system
+   defined, then by default only the label, units and extent of
+   each axis will be displayed.  However, if a TRUE value is given
+   for this parameter, full details of the attributes of all the
+   axis arrays will also be given. [FALSE]
+
+HISTORY
+
+HISTORY = _LOGICAL (Write)
+   Whether or not the NDF contains HISTORY records.
+
+LABEL
+
+LABEL = LITERAL (Write)
+   The label of the NDF.
+
+LBOUND
+
+LBOUND( ) = _INTEGER (Write)
+   The lower bounds of the NDF.
+
+NDF
+
+NDF = NDF (Read)
+   The NDF data structure whose attributes are to be displayed.
+
+NDIM
+
+NDIM = _INTEGER (Write)
+   The number of dimensions of the NDF.
+
+NEXTN
+
+NEXTN = _INTEGER (Write)
+   The number of extensions in the NDF.
+
+QUALITY
+
+QUALITY = _LOGICAL (Write)
+   Whether or not the NDF contains a QUALITY array.
+
+QUIET
+
+QUIET = _LOGICAL (Read)
+   A TRUE value suppresses the reporting of the NDF's attributes.
+   It is intended for procedures and scripts where only the
+   output parameters are needed. [FALSE]
+
+TITLE
+
+TITLE = LITERAL (Write)
+   The title of the NDF.
+
+TYPE
+
+TYPE = LITERAL (Write)
+   The data type of the NDF's data array.
+
+UBOUND
+
+UBOUND( ) = _INTEGER (Write)
+   The upper bounds of the NDF.
+
+UNITS
+
+UNITS = LITERAL (Write)
+   The units of the NDF.
+
+VARIANCE
+
+VARIANCE = _LOGICAL (Write)
+   Whether or not the NDF contains a VARIANCE array.
+
+WIDTH
+
+WIDTH( ) = _LOGICAL (Write)
+   Whether or not there are axis width arrays present in the NDF.
+   This is only written when FULLAXIS is TRUE and AXIS is TRUE.
+
+Examples
+
+ndftrace mydata
+   Displays information about the attributes of the NDF structure
+   called mydata.
+
+ndftrace ndf=r106 fullaxis
+   Displays information about the NDF structure r106, including
+   full details of any axis arrays present.
+
+ndftrace mydata quiet ndim=(mdim)
+   Passes the number of dimensions of the NDF called mydata
+   into the ICL variable mdim.  No information is displayed.
+
+Related_Applications
+
+   HDSTRACE.
+
+Authors
+
+RFWS: R.F. Warren-Smith (STARLINK)
+
+MJC: Malcolm J. Currie (STARLINK)
+
+History
+
+ 1990 April 6 (RFWS):
+    Original version.
+
+ 1991 April 29 (RFWS):
+    Added support for axis components and added the usage and
+    examples sections to the prologue.
+
+ 1992 November 30 (MJC):
+    Reports non-monotonic axis centres.
+
+ 1993 February 4 (MJC):
+    Fixed bug that caused incorrect axis extents to be reported
+    when there were no axis-width arrays and the axis centres did
+    not increment by one.
+
+ 1994 July 29 (RFWS):
+    Adapted to handle history information.
+
+ 1995 April 24 (MJC):
+    Made usage and examples lowercase.  Added Related Applications.
+    Added History to the Description.  Sorted the variable
+    declarations and other tidying.
+
+ 1995 June 18 (MJC):
+    Added QUIET option and the output parameters.
+.endhelp

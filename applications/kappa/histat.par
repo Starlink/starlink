@@ -1,0 +1,23 @@
+ndf,f,a,,,,"Data structure to analyse"
+comp,s,h,"DATA",,,"NDF array component to analyse"
+percentiles,r,h,INDEF,,,"List of percentiles"
+logfile,f,h,!,,,"File for logging results"
+numbin,i,h,2048,,,"Number of histogram bins"
+maxcoord,struct,h,,,,""
+
+maximum,r,h,0.0D0,,,""
+maxpos,struct,h,,,,""
+
+mean,r,h,0.0D0,,,""
+median,r,h,0.0D0,,,""
+mincoord,struct,h,,,,""
+
+minimum,r,h,0.0D0,,,""
+minpos,struct,h,,,,""
+
+mode_,r,h,0.0D0,,,""
+numbad,i,h,0,,,""
+numgood,i,h,0,,,""
+numpix,i,h,0,,,""
+perval,r,h,,,,""
+total,r,h,0.0D0,,,""

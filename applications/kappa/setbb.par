@@ -1,0 +1,4 @@
+ndf,f,a,,,,"Data structure to modify"
+bb,s,a,,,,"New bad-bits mask value"
+and,b,h,n,,,"Perform bit-wise AND with existing mask value?"
+or,b,h,n,,,"Perform bit-wise OR with existing mask value?"

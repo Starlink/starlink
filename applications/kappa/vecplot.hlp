@@ -1,0 +1,346 @@
+.help vecplot Starlink kappa
+.nf
+Plots a 2-dimensional vector map.
+
+Usage:
+
+   vecplot ndf1 ndf2 [comp] [step] [vscale] [vtype] [just] [device]
+
+Description:
+
+   This application plots vectors defined by the values contained
+   within a pair of 2-dimensional NDFs, the first holding the
+   magnitude of the vector quantity at each pixel, and the second
+   holding the corresponding vector orientations.  The number of
+   vectors in the plot is kept to a manageable value by only
+   plotting vectors for pixels on a sparse regular matrix.  The
+   increment (in pixels) between plotted vectors is given by
+   parameter STEP.  Zero orientation may be fixed at any position
+   angle within the plot by specifying an appropriate value for
+   parameter ANGROT.  Each vector may be represented either by an
+   arrow or by a simple line, as selected by parameter VTYPE.
+
+   The plot is situated within the current graphics-database
+   picture, and may reside within optional, annotated and enumerated
+   axes.  An optional, but recommended, key may be drawn to the
+   right of the plot.  It reports the data units if there are any
+   (taken from the NDF associated with parameter NDF1) and gives the
+   scale used for drawing the vectors in data units per centimetre.
+   It also displays a typical vector and the corresponding data
+   value.  The justification of the vector is indicated by a small
+   circle placed at the position of the corresponding pixel centre.
+
+Parameters
+
+For information on individual parameters, select from the list below:
+
+ABSLAB
+
+ABSLAB  =  LITERAL (Read)
+   Label for the plot abscissa, in which NCAR fancy founts may be
+   embedded when FONT = "NCAR".  If axis information is present
+   in NDF1 the suggested default is the axis label from NDF1
+   followed by the units, in parentheses.  If an error occurs
+   obtaining the label the suggested default is "X". []
+
+ANGROT
+
+ANGROT = _REAL (Read)
+   A rotation angle in degrees to be added to each vector
+   orientation before plotting the vectors (see parameter NDF2).
+   It should be in the range 0--360. [0.0]
+
+AXES
+
+AXES = _LOGICAL (Read)
+   TRUE if labelled and annotated axes are to be drawn around the
+   plot.  The annotations are either the data co-ordinates from
+   the axis components of NDF1, provided these are present and
+   linear and COSYS = "Data"; otherwise pixel co-ordinates are
+   used. [TRUE]
+
+BORDER
+
+BORDER = _LOGICAL (Read)
+   TRUE if a box is to be drawn about the plot.  This is only
+   accessed if no axes are drawn. [TRUE]
+
+CLEAR
+
+CLEAR = _LOGICAL (Read)
+   TRUE if the graphics device is to be cleared before display
+   of the array. [TRUE]
+
+COMP
+
+COMP = LITERAL (Read)
+   The component of NDF1 which is to be used to define the vector
+   magnitudes.  It may be "Data", "Error" or "Variance".  The
+   last two are not available if NDF1 does not contain a VARIANCE
+   component.  The vector orientations are always defined by the
+   "Data" component of NDF2. ["Data"]
+
+COSYS
+
+COSYS = LITERAL (Read)
+   The co-ordinate system to be used.  This can be either "World"
+   or "Data".  "World" makes pixel co-ordinates to appear on axes.
+   If COSYS = "Data" the axis information from NDF1 is used to
+   annotate axes (if it exists).  [Current co-ordinate system]
+
+DEVICE
+
+DEVICE = DEVICE (Read)
+   The plotting device. [Current graphics device]
+
+FONT
+
+FONT = LITERAL (Read)
+   The fount to be used for the line graphics.  It can be either
+   "NCAR" for the NCAR fancy characters and "GKS" for the standard
+   GKS san-serif fount.  The former is intended for hardcopy
+   publication-quality plots, since it is relatively slow; the
+   latter is intended for normal interactive graphics requiring
+   rapid plotting, and it is clearer on small plots.  The
+   suggested default is the current value. ["GKS"]
+
+JUST
+
+JUST = LITERAL (Read)
+   The justification for each vector; it can take any of the
+   following values:
+
+    "Centre" - the vectors are drawn centred on the
+               corresponding pixel,
+
+    "Start"  - the vectors are drawn starting at the
+               corresponding pixel,
+
+    "End"    - the vectors are drawn ending at the corresponding
+               pixel.
+
+   ["Centre"]
+
+KEY
+
+KEY = _LOGICAL (Read)
+   TRUE if a key is to be produced. [TRUE]
+
+KEYVEC
+
+KEYVEC = _REAL (Read)
+   Length of the vector to be displayed in the key, in data units.
+   A default value is generated based on the spread of vector
+   lengths in the plot. []
+
+MAJTIC
+
+MAJTIC( 2 ) = _REAL (Read)
+   The parameter controlling the numbers of major tick marks
+   for the x and y axes.  (Number used is between MAJTIC+2 and
+   5*MAJTIC/2+4.) [3.,3.]
+
+MINTIC
+
+MINTIC( 2 ) = _REAL (Read)
+   The number of minor tick marks between each major tick mark
+   for the x and y axes.  A negative value forces the graphics
+   package to compute appropriate values. [-1.,-1.]
+
+NDF1
+
+NDF1 = NDF (Read)
+   NDF structure containing the 2-dimensional image giving the
+   vector magnitudes.
+
+NDF2
+
+NDF2 = NDF (Read)
+   NDF structure containing the 2-dimensional image giving the
+   vector orientations.  The values are considered to be in units
+   of degrees unless the UNITS component of the NDF has the value
+   "Radians" (case insensitive).  The positive y axis defines
+   zero orientation, and rotation from the x axis to the y axis
+   is considered positive.  The suggested default is the current
+   value.
+
+ORDLAB
+
+ORDLAB  =  LITERAL (Read)
+   Label for the plot ordinate, in which NCAR fancy founts may be
+   embedded when FONT = "NCAR".  If axis information is present
+   in NDF1 the suggested default is the axis label from NDF1
+   followed by the units, in parentheses.  If an error occurs
+   obtaining the label the suggested default is "Y". []
+
+OUTTIC
+
+OUTTIC = _LOGICAL (Read)
+   TRUE if the axis tick marks are to appear on the outside of
+   the axes instead of inside.  By default, the tick marks are
+   drawn outside the plotting region to eliminate
+   intersections of ticks with the vectors. [TRUE]
+
+PLTITL
+
+PLTITL = LITERAL (Read)
+   The title of the plot.  Up to about 40 characters can be
+   accommodated, and NCAR fancy founts may be embedded when FONT =
+   "NCAR".  If an error occurs obtaining the title, it is
+   defaulted to "VECPLOT map".  [The title from NDF1]
+
+PXSIZE
+
+PXSIZE = _REAL (Read)
+   The length (x axis) of the plot in metres. [Maximum that can
+   fit in the current picture whilst preserving square pixels]
+
+PYSIZE
+
+PYSIZE = _REAL (Read)
+   The length (y axis) of the plot in metres. [Maximum that can
+   fit in the current picture whilst preserving square pixels]
+
+STEP
+
+STEP = _INTEGER (Read)
+   The number of pixels between adjacent displayed vectors (along
+   both axes).  Increasing this value reduces the number of
+   displayed vectors.  The default value gives about 30 vectors
+   along the longest axis of the plot. []
+
+THICK
+
+THICK = _REAL (Read)
+   The thickness of the axes and annotations in the plot, where
+   1.0 is the normal thickness.  Currently, this is only available
+   on a few devices.  It must take a value in the range 0.5--5.0.
+   [1.0]
+
+VECCOL
+
+VECCOL = LITERAL (Read)
+   The colour for the vectors.  The options are described below.
+     "MAX"          - The maximum colour index in the image
+                      display colour lookup table.
+     "MIN"          - The minimum (non-reserved) colour index in
+                      the image display colour lookup table.
+     An integer     - The actual colour index. It is constrained
+                      between 0 and the maximum colour index
+                      available on the device.
+     A named colour - Uses the named colour from the palette, and
+                      if it is not present, the nearest colour
+                      from the palette is selected.
+
+   If the colour is to remain unaltered as the lookup table is
+   manipulated choose an integer between 0 and 15, or a named
+   colour.  The suggested default is the current value. [The
+   current value, but equals "MIN" if there is no current value.]
+
+VSCALE
+
+VSCALE = _REAL (Read)
+   The scale to be used for the vectors.  The supplied value
+   should give the data value corresponding to a vector length of
+   one centimetre.  The default makes 5% of all displayed vectors
+   larger than the interval between adjacent vectors. []
+
+VTYPE
+
+VTYPE = LITERAL (Read)
+   The type of vector to be plotted; it can take the value "Arrow"
+   or "Line".  Vectors are drawn as arrows or lines accordingly.
+   ["Line"]
+
+Examples
+
+vecplot polint polang
+   Produces a vector map on the current graphics device with
+   vector magnitude taken from the NDF called polint and vector
+   orientation taken from NDF polang.  All other settings are
+   defaulted, so for example about 20 vectors are displayed along
+   the longest axis, and a key is plotted.
+
+vecplot polint polang angrot=23.4
+   Produces a vector map in which the primary axis of the vectors
+   (as defined by the value zero in the NDF polang) is at the
+   position angle 23.4 degrees (measured anti-clockwise from the
+   positive y axis) in the displayed map.
+
+vecplot stack(,,2) stack(,,1) vtype=arrow just=start nokey
+   Produces a vector map in which the vectors are defined by two
+   planes in the 3-dimensional NDF called stack.  There is no
+   need to copy the two planes into two separate NDFs before
+   running VECPLOT.  Each vector is represented by an arrow,
+   starting at the position of the corresponding pixel.  No key
+   to the vector scale and justification is produced.
+
+Notes
+
+-  If the current graphics-database picture is a DATA picture or
+contains a DATA picture (such as created by the applications
+DISPLAY, CONTOUR, etc.), then the vector plot is overlaid on top
+of the existing DATA plot.  In this case any requested annotation
+and key are drawn outside the DATA picture but within the current
+picture.  If there is insufficient room within the current
+picture, then the annotation and/or key may not be drawn.  You
+are warned if this happens but the application continues.  If no
+DATA picture can be found within the current picture then you
+specify the total size of the plot frame using parameters PXSIZE
+and PYSIZE, but the application itself chooses how to position
+the vector plot and key within this frame.
+
+-  The application stores a number of pictures in the graphics
+database in the following order: a FRAME of the specified size
+containing the title, annotated axes, vector map and key; a DATA
+picture which is stored with world co-ordinates in units of data
+pixels; and a KEY picture to store the key if present.  The DATA
+picture may also have double-precision data co-ordinates derived
+from the axis components of NDF1 provided these are linear and
+different from pixel co-ordinates; the data co-ordinates are
+stored via a linear transformation.  A reference to NDF1 is
+stored with the DATA picture.  On exit the current database
+picture for the chosen device reverts to the input picture.
+
+-  The units string in the key may be truncated with an ellipsis
+if it cannot be accommodated in full at the smallest allowed
+character height.  Generally the maximum length will be between
+18 and 27 characters, the exact value depending on the number of
+digits in the scale factors.
+
+Related_Applications
+
+   KAPPA: CALPOL.
+
+Authors
+
+DSB: David Berry (STARLINK)
+
+MJC: Malcolm J. Currie (STARLINK)
+
+History
+
+ 16-AUG-1993 (DSB):
+    Original version.
+
+ 21-SEP-1993 (DSB):
+    Modified to overlay the vector plot on any existing DATA plot
+    contained within the current picture.
+
+ 1995 April 12 (MJC):
+    Added Related Applications and Implementation Status, and a
+    further example.  Moved last paragraph of the long Description
+    to Notes.  Made Examples and Usage lowercase.  KEY is no longer
+    a position parameter.  Various tidying and stylistic changes,
+    and typo's corrected.  Called KPG1_GTNDF.  Constrained ANGROT.
+    Used modern-style variable declarations.  Added headings to
+    the commentary.
+
+Implementation_Status
+
+   -  Only real data can be processed directly.  Other non-complex
+   numeric data types will undergo a type conversion before the
+   vector plot is drawn.
+
+   -  Bad pixels and automatic quality masking are supported.
+.endhelp

@@ -1,0 +1,8 @@
+mode_,s,h,"Dynamic",,,"Co-ordinate system/picture mode"
+name,s,h,INDEF,,,"Name of pictures to be selected"
+logfile,f,h,!,,,"File to store cursor co-ordinates"
+device,f,a,,,,"*! Name of graphics device"
+cosys,s,a,"Data",,,"*! Co-ordinate system"
+double,b,h,n,,,"Report co-ordinates in double precision?"
+xc,r,h,0.0D0,,,""
+yc,r,h,0.0D0,,,""

@@ -1,0 +1,3 @@
+ndf,f,a,,,,"Dataset"
+mode_,s,h,"Normal",,,"History update mode"
+ok,b,a,n,,,"Erase history?"

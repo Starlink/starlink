@@ -1,0 +1,7 @@
+in,f,a,,,,"NDF to be rotated"
+out,f,a,,,,"Rotated NDF"
+angle,r,a,,,,"Number of degrees clockwise rotation"
+nnmeth,b,h,n,,,"Do you want to use the nearest-neighbour method?"
+quality,b,h,n,,,"Propagate QUALITY (using nearest-neighbour method)?"
+title,s,h,INDEF,,,"Title for output NDF"
+variance,b,h,n,,,"Use variance in the weighting?"

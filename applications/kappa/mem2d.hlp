@@ -1,0 +1,471 @@
+.help mem2d Starlink kappa
+.nf
+Performs a Maximum-Entropy deconvolution of a 2-dimensional NDF.
+
+Usage:
+
+   mem2d in out mask=? { fwhmpsf=?
+                       { psf=?
+                       psftype
+
+Description:
+
+   MEM2D is based on the Gull and Skilling Maximum-Entropy package
+   MEMSYS3.  It takes an image and a Point-Spread Function as input
+   and produces an equal-sized image as output with higher
+   resolution.  Facilities are provided to `analyse' the resulting
+   deconvolved image, i.e. to calculate an integrated flux in some
+   area of the deconvolved image and also an estimate of the
+   uncertainty in the integrated flux.  This allows the significance
+   of structure visible in the deconvolution to be checked.
+
+   For a detailed description of the algorithm, and further
+   references, see the MEMSYS Users' Manual, and SUN/117.
+
+Parameters
+
+For information on individual parameters, select from the list below:
+
+ANALYSE
+
+ANALYSE = _LOGICAL (Read)
+   ANALYSE should be given a TRUE value if an analysis of a
+   previously generated deconvolution is to be performed, instead
+   of a whole new deconvolution being started.  An analysis
+   returns the integrated flux in some area of the deconvolved
+   image you specify, together with the standard deviation on the
+   integrated flux value.  The area to be integrated over is
+   specified by an image associated with parameter MASK.  This
+   facility can, for instance, be used to assess the significance
+   of structure seen in the deconvolution.  An analysis can only
+   be performed if the input NDF (see parameter IN) contains a
+   MEM2D extension (see parameter EXTEND).  If the input does
+   contain such an extension, and if the extension shows that the
+   deconvolution was completed, then ANALYSE is defaulted to
+   TRUE, otherwise it is defaulted to FALSE. []
+
+DEF
+
+DEF = _REAL (Read)
+   This is the value to which the output image will default in
+   areas for which there is no valid data in the input.  The `zero
+   entropy' image is defined to be a flat surface with value
+   given by parameter DEF.  Any deviation of the output image away
+   from this image will cause its entropy to become negative.
+   Thus a maximum-entropy criterion causes the output image to be
+   as similar as possible to a flat surface with value DEF
+   (within the constraints of the data).  DEF is defaulted to the
+   mean data value in the input image and must always be strictly
+   positive. []
+
+DSUM
+
+DSUM = _REAL (Write)
+   This is an output parameter to which is written the standard
+   deviation of the integrated-flux value calculated if an
+   analysis is performed (see parameter ANALYSE).
+
+EXTEND
+
+EXTEND = _LOGICAL (Read)
+   If EXTEND has a TRUE value, then the output NDF will contain
+   an extension called MEM2D which will contain all the
+   information required to either restart or analyse the
+   deconvolution.  Note, including this extension makes the output
+   file much bigger (by about a factor of seven).  [TRUE]
+
+FWHMICF
+
+FWHMICF = _REAL (Read)
+   This is the Full Width at Half Maximum (in pixels) of a
+   Gaussian Intrinsic Correlation Function (ICF) to be used in
+   the deconvolution.  The ICF can be used to encode prior
+   knowledge of pixel-to-pixel correlations in the output image.
+   A value of zero for FWHMICF causes no ICF to be used, and so
+   no correlations are expected in the output.  Larger values
+   encourage smoothness in the output on the scale of the ICF.  If
+   a non-zero ICF is used, the image entropy which is maximised
+   is not the output image, but a `hidden' image.  This hidden
+   image is the deconvolution of the output image with the ICF,
+   and is assumed to have no pixel-to-pixel correlations. [2]
+
+FWHMPSF
+
+FWHMPSF = _REAL (Read)
+   This is the Full Width at Half Maximum (in pixels) of a
+   Gaussian Point-Spread Function (PSF).  This PSF is used to
+   deconvolve the input only if parameter PSFTYPE has the value
+   "Gaussian".
+
+ILEVEL
+
+ILEVEL = _INTEGER (Read)
+   ILEVEL controls the amount of information displayed as MEM2D
+   runs.  If set to zero then no information is displayed.  Larger
+   values up to a maximum of 3, give larger amounts of
+   information.  A value of 3 gives full MEMSYS3 diagnostics
+   after each iteration. [1]
+
+IN
+
+IN = NDF (Read)
+   The input NDF.  This can either contain an image to be
+   deconvolved, or the output from a previous run of MEM2D.  The
+   NDF is considered to be an output from MEM2D if it contains an
+   extension called MEM2D (see parameter EXTEND).  If such an
+   extension is found, a check is made to see if the NDF contains
+   a completed deconvolution or a partial deconvolution.  If the
+   deconvolution is complete, the ANALYSE parameter is defaulted
+   to TRUE, and unless you override this default, an analysis of
+   the deconvolution contained in the input NDF is performed.  If
+   the input deconvolution is not complete, then the
+   deconvolution process is restarted from where it left off.  If
+   no MEM2D extension is found, then a new deconvolution is
+   started from scratch.
+
+MASK
+
+MASK = NDF (Read)
+   An image to use as a mask to define the areas to be integrated
+   when performing an analysis (see parameter ANALYSE).  The
+   integrated-flux value calculated by the analysis is actually
+   the total data sum in the product of the mask and the
+   deconvolved image.  Mask pixel values can be positive or
+   negative (or zero) and so, for instance, masks can be arranged
+   which subtract off a background brightness from a source
+   before returning the integrated source flux.
+
+MODEL
+
+MODEL = NDF (Read)
+   An image to use as the default model for the reconstruction.
+   If a null value is given, then a constant value given by the
+   parameter DEF is used to define a flat default model.  The
+   section of the given image which matches the bounds of the
+   input image is used.  Any bad pixels in the image cause the
+   corresponding pixels in the input image to be ignored.  Such
+   pixels are set bad in the output.  The model image should
+   contain no pixels with a value of zero or less.  The default
+   model is defined to have zero entropy.  The hidden image will
+   tend to the default model in the absence of data.  It should be
+   noted that this model applies to the `hidden' image, not the
+   actually required reconstructed image.  The reconstructed image
+   is obtained from the hidden image by blurring the hidden image
+   with the ICF. [!]
+
+MODELOUT
+
+MODELOUT = NDF (Write)
+   An image which can be used for the default model in a further
+   run of MEM2D.  Each pixel value in the created image is a
+   linear combination of the model value at the corresponding
+   pixel in the current reconstruction, and the hidden image
+   pixel value.  Pixels for which the hidden image is well away
+   from the current model, tend towards the value of the hidden
+   image; pixels for which the hidden image is close to the
+   current model tend towards the model.  Running MEM2D several
+   times, using the new model created on the previous run as the
+   model for the current run, can reduce the `mottling' often
+   seen in MEM2D reconstructions. [!]
+
+NITER
+
+NITER = _INTEGER (Read)
+   The maximum number of maximum-entropy iterations to perform.
+   MEM2D continues the deconvolution until either MEMSYS3
+   indicates that the termination criterion (omega=1.0) has been
+   reached, or the maximum number of iterations is reached.  If a
+   deconvolution requires more iterations than was allowed by
+   NITER, then you can choose to continue the deconvolution by
+   giving the prematurely terminated output from MEM2D as the
+   input to another run of MEM2D, specifying a larger value for
+   NITER. [50]
+
+NOISE
+
+NOISE = LITERAL (Read)
+   NOISE defines the noise statistics within the input image.  It
+   can take the value "Gaussian" or "Poisson".  If Gaussian noise
+   is selected, the data variances are set initially to the
+   values stored in the VARIANCE component of the input NDF.  If
+   no such component exists, then the data variances are set to a
+   constant value equal to the RMS difference between adjacent
+   pixels in the x direction.  MEMSYS3 scales these initial noise
+   estimates to maximise the data `evidence'.  The evidence is
+   displayed as "LOG(PROB)" and the noise scaling factor as
+   "SIGMA", if parameter ILEVEL is set to 2 or more.  If Poisson
+   statistics are selected the uncertainty in each data value is,
+   as usual, of the order of the square root of the data value.
+   When using Poisson statistics, there is no equivalent to the
+   noise scaling performed when using Gaussian statistics.  Any
+   input VARIANCE component is ignored. ["Gaussian"]
+
+OUT
+
+OUT = NDF (Write)
+   The output image in a `primitive' NDF.  The output is the same
+   size as the input.  Any pixels which were flagged as bad in
+   the input will also be bad in the output.  If parameter EXTEND
+   is TRUE, then the output NDF contains an extension called
+   MEM2D containing information which allows the deconvolution to
+   be either continued or analysed.  There is no VARIANCE
+   component in the output, but any QUALITY values are propagated
+   from the input to the output.  If parameter UPDATE is TRUE
+   then the output NDF is created after the first iteration and
+   is updated after each subsequent iteration.
+
+PSF
+
+PSF = NDF (Read)
+   An NDF holding an estimate of the Point Spread Function (PSF)
+   of the input image.  This PSF is used to deconvolve the input
+   only if parameter PSFTYPE has the value "NDF".  The PSF can be
+   centred anywhere within the image, the location of the centre
+   is specified using parameters XCENTRE and YCENTRE.  The
+   extent of the PSF actually used is controlled by parameter
+   THRESH.
+
+PSFTYPE
+
+PSFTYPE = LITERAL (Read)
+   PSFTYPE determines if the Point Spread Function used in the
+   deconvolution is to be Gaussian (if PSFTYPE = "Gaussian"), or
+   is to be defined by an image that you supply (if PSFTYPE
+   = "NDF").  ["NDF"]
+
+RATE
+
+RATE = _REAL (Read)
+   This is the value to use for the MEMSYS3 RATE parameter.  It
+   determines the rate at which the convergence is allowed to
+   proceed.  If RATE is high, each maximum-entropy iteration is
+   allowed to make a big change to the current reconstruction.
+   This can cause numeric problems within MEMSYS3 resulting in
+   MEM2D crashing with a "floating overflow" error.  If this
+   happens, try reducing RATE.  Useful values will normally be of
+   the order of unity, and must lie in the interval 0.0001 to
+   100.  [0.5]
+
+SUM
+
+SUM = _REAL (Write)
+   This is an output parameter to which is written the
+   integrated-flux value calculated if an analysis is performed
+   (see parameter ANALYSE).
+
+THRESH
+
+THRESH = _REAL (Read)
+   The fraction of the PSF peak amplitude at which the extents of
+   the NDF PSF are determined.  It must be positive and less than
+   0.5.  This parameter is only used when PSFTYPE = "NDF".  An
+   error will result if the input PSF is truncated above this
+   threshold. [0.0625]
+
+TITLE
+
+TITLE = LITERAL (Read)
+   A title for the output NDF.  A null (!) value means using the
+   title of the input NDF.  [!]
+
+UPDATE
+
+UPDATE = _LOGICAL (Read)
+   If UPDATE is given a TRUE value, then the output NDF will be
+   created after the first iteration, and will then be updated
+   after each subsequent iteration.  This means that the current
+   reconstruction can be examined without aborting the
+   application.  Also, if parameter EXTEND is TRUE, then if the
+   job aborts for any reason, it can be restarted from the last
+   completed iteration (see parameter IN). [TRUE]
+
+XCENTRE
+
+XCENTRE = _INTEGER (Read)
+   The x pixel index of the centre of the PSF within the supplied
+   PSF image.  This is only required if PSFTYPE is NDF.  XCENTRE
+   is defaulted to the middle pixel (rounded down if there are an
+   even number of pixels per line). []
+
+YCENTRE
+
+YCENTRE = _INTEGER (Read)
+   The y pixel index (line number) of the centre of the PSF
+   within the supplied PSF image.  This is only required if
+   PSFTYPE is NDF.  YCENTRE is defaulted to the middle line
+   (rounded down if there are an even number of lines). []
+
+Examples
+
+mem2d m51 m51_hires psftype=gaussian fwhmpsf=3
+   This example deconvolves the data array in the NDF called m51,
+   putting the resulting image in the data array of the NDF called
+   m51_hires.  A circular Gaussian Point-Spread Function is used
+   with a Full Width at Half Maximum of 3 pixels.
+
+mem2d m51 m51_hires psf=star xcentre=20 ycentre=20
+   This example performs the same function as the previous
+   example, but the PSF is defined by the data array of the NDF
+   called star, instead of being defined to be Gaussian.  This
+   allows the PSF to be any arbitrary 2-dimensional function.
+   NDF star could be produced for example, by the KAPPA
+   application called PSF.  Parameters XCENTRE and YCENTRE give
+   the pixel indices of the centre of the beam defined by the PSF
+   in star.  The PSF is truncated to one sixteenth of its peak
+   amplitude.
+
+mem2d m51_hires m51_hires niter=70 psf=star
+   If the previous example failed to converge within the default
+   50 iterations, the deconvolution can be started again from
+   its current state, rather than having to start again from
+   scratch.  Here NITER gives the upper limit on the total number
+   of iterations which can be performed (including those performed
+   in the previous run of MEM2D), NOT just the number performed in
+   this single run of MEM2D.  This facility can also be used if a
+   MEM2D run is interrupted for any reason, such as the host
+   computer going down, or a batch-queue CPU limit being reached.
+   To use this facility the parameters EXTEND and UPDATE should
+   have the default values of TRUE.
+
+mem2d m51_hires mask=nucleus
+   Once a deconvolved image has been produced, the significance
+   of features seen in the deconvolution can be assessed.  This
+   example takes in the NDF m51_hires produced by a previous run
+   of MEM2D.  If this is a completed deconvolution then the
+   parameter ANALYSE will be defaulted to TRUE, and an analysis
+   will be performed.  This effectively results in the
+   deconvolution being multiplied by the data array of the NDF
+   called nucleus, and the total data sum in the resulting image
+   being displayed, together with the standard deviation on the
+   total data sum.  The image in m51_hires is the most probable
+   deconvolution, but there may be other deconvolutions only
+   slightly less probable than m51_hires.  The standard deviation
+   produced by an analysis takes account of the spread between
+   such deconvolutions.  If the total data sum is not
+   significantly greater than the standard deviation, then the
+   feature selected by the mask image (called nucleus in this
+   case) may well be spurious.  The mask image itself may for
+   instance consist of an area of uniform value +1 covering some
+   feature of interest, and the bad value (or equivalently the
+   value zero) everywhere else.  The analysis would then give the
+   integrated flux in the feature, assuming that the background
+   is known to be zero.  If the background is not zero, then the
+   mask may contain a background region containing the value -1,
+   of equal area to the region containing the value +1.  The
+   resulting integrated flux would then be the total flux in the
+   source minus the flux in a background region of equal area.
+
+Notes
+
+-  MEM2D requires a large quantity of memory--- almost as much as
+the rest of KAPPA.  In order for the KAPPA monolith to load
+without you having to increase your memory or datasize resources,
+and because MEM2D is batch oriented (see Timing) it is only
+available as a separate application.
+
+-  Memory is required to store several intermediate images while
+the deconvolution is in progress.  If the input image is small
+enough, these images are stored in a statically declared, internal
+array.  Otherwise, they are stored in dynamically mapped external
+arrays.  There is no limit on the size of image which can be
+processed by MEM2D (other than those imposed by limited resources
+on the host computer).
+
+-  It is sometimes desirable for the pixels in the output image
+to be smaller than those in the input image.  For instance, if
+the input data are critically sampled (two samples per PSF), the
+output image may not be a very good deconvolution.  In such cases
+sub-dividing the output pixels would give better results.  At the
+moment MEM2D cannot do this.  Be warned that sub-dividing the
+input pixels and then running the current version of MEM2D will
+not have the same effect, since the noise in the input image will
+then have pixel-to-pixel correlations, and be interpreted as real
+structure.
+
+Timing
+
+   MEM deconvolution is extremely CPU intensive.  The total CPU time
+   taken depends partly on the size of the image, and partly on the
+   complexity of the structure within the image.  As a typical
+   example, a 100x100 image containing 20 Gaussians on a flat
+   background took about 34 minutes of elapsed time on an unloaded
+   DEC Alpha 2000.  Deconvolution jobs should therefore always be
+   done in batch.  To perform an analysis on a deconvolution takes
+   about the same length of time as a single deconvolution
+   iteration.
+
+Related_Applications
+
+   KAPPA: FOURIER, LUCY, WIENER.
+
+Authors
+
+DSB: David Berry (STARLINK)
+
+MJC: Malcolm J. Currie (STARLINK)
+
+History
+
+ 24-SEP-1990 (DSB):
+    Original version.
+
+ 26-FEB-1991 (DSB):
+    MODEL and MODELOUT parameters added.
+
+ 27-FEB-1991 (DSB):
+    KAPPA subroutine prefixes added (KPS_ and KPG_)
+
+ 1991 July 4 (MJC):
+    Propagated AXIS and UNITS.  Added Usage and Implementation
+    Status to the documentation.  Made error reports more helpful
+    and added a missing bad status assignment.
+
+ 1991 July 18 (MJC):
+    Called renamed routines---KPS1_MEM*.
+
+ 1991 October 18 (MJC):
+    Added the THRESH parameter.
+
+ 1992 March 3 (MJC):
+    Replaced AIF parameter-system calls by the extended PAR
+    library.
+
+ 1992 April 13 (MJC):
+    Made to handle significant dimensions for user-defined
+    sections.
+
+ 1992 October 15 (MJC):
+    Increased the permitted length of the image name stored in the
+    MEM2D extension from 40 to 132.
+
+ 22-FEB-1995 (DSB):
+    Comments re-formatted to edstar style.  Replace AIF VM routines
+    with PSX.  Replaced calls to NDF_ASSOC, KPG1_SGDIM, etc. with a
+    single call to KPG1_GTNDF.  "Usage" and "Examples" commands
+    in the prologue converted to lower case.  Removed calls to
+    FTSIZE since the FFTPACK routines can handled images of any
+    size.  Increased the size of each image until one image will
+    provide enough workspace for the FFT routines.
+
+ 20-MAR-1995 (DSB):
+    Modified to allow use of external storage for intermediate
+    files.  This removes the restriction on the size of image
+    which can be deconvolved using MEM2D.
+
+ 1995 April 10 (MJC):
+    Corrected typo's, and made minor stylistic changes and
+    improvements to the documentation including a Related
+    Applications section.
+
+Implementation_Status
+
+   -  This routine correctly processes the AXIS, DATA, QUALITY,
+   VARIANCE, LABEL, TITLE, UNITS, and HISTORY components of an NDF
+   data structure and propagates all extensions.
+
+   -  Processing of bad pixels and automatic quality masking are
+   supported, though only to remove them by the DEF value.
+
+   -  All non-complex numeric data types can be handled.  Arithmetic is
+   performed using single-precision floating point.
+.endhelp

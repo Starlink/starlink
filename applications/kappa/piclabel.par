@@ -1,0 +1,2 @@
+label,s,a,,,,"Label to be given to the current picture"
+device,f,a,,,,"*! Name of graphics device"

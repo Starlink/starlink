@@ -1,0 +1,336 @@
+.help crelut Starlink kappa
+.nf
+Creates or manipulates an image-display lookup table using a
+palette.
+
+Usage:
+
+   crelut inlut outlut ndf [comp] low high [inpal] [outpal] [device]
+
+Description:
+
+   This application allows a lookup table to be created or modified
+   interactively on a chosen image display from a palette of
+   colours.  All plotting is performed within the current
+   graphics-database picture for that device.  The phases in the
+   creation or manipulation of the lookup table are enumerated below.
+   1. The initial colour table is read from an NDF lookup-table file
+      or a greyscale used if there is no input lookup table.
+   2. The name of an NDF containing a 2-dimensional array is obtained
+      and the array is scaled and displayed in the top half of the
+      picture at the largest magnification without distortion.  Below
+      this an histogram of the values between the scaling limits is
+      drawn with the colour index of each bin corresponding to the
+      bin's scaled value.  Thus colours in the image and the
+      histogram match.   Axes of number versus data value are plotted
+      about the histogram.  If a null character, !, is given then no NDF
+      array is read and a ramp is produced instead of the histogram.
+      An axis of pen numbers in the lookup table is drawn around the
+      ramp.
+   3. A numbered palette is drawn below the histogram.  A palette
+      created in an earlier run of CRELUT may be restored from an
+      NDF.  Otherwise the palette comprises eight coloured blocks
+      (black, white, red, green, blue, yellow, magenta and cyan)
+      with palette numbers 0--7, an eight-level greyscale (8--15)
+      and a sixteen-level greyscale (16--31).  Palette numbers
+      16--31 may be replaced randomly by colours you define.  The
+      colours are specified by either the giving the red, green, blue
+      intensities; or by name.  The loop is terminated by a null.
+   4. Inside a loop you select the palette colour(s) to be assigned
+      to the first and last pen numbers of a band within the lookup
+      table.  For convenience, where there is an image and histogram
+      the equivalent data values are entered rather than pen numbers
+      directly, though they are converted to the nearest pens in the
+      lookup table.  Linear interpolation between the two palette
+      colours yields the lookup-table colours inside the band.
+      Should only one colour be given then all the pens in the
+      requested range are set to that colour.  Pen numbers may be
+      re-used indefinitely and assigned new colours if the desired
+      effect is not obtained.  (The histogram of the array is
+      produced to assist in a sensible choice).  The loop is
+      terminated by a null in response to either of the prompts.
+   5. The lookup table may be saved in an NDF.  A null response, !,
+      to the request for the name of the file in which the table is
+      to be stored will result in the table not being saved.
+      Likewise the palette may be saved in an NDF.
+
+Parameters
+
+For information on individual parameters, select from the list below:
+
+COLOUR
+
+COLOUR() = LITERAL (Read)
+   A colour to be added to the palette at the entry given by
+   parameter PALNUM.  It is specified in one of two ways.
+
+     o  A named colour from the standard colour set, which may
+     be abbreviated.  If the abbreviated name is ambiguous the
+     first match is selected.  The case of the name is ignored.
+     Some examples are "Seagreen", "Violet", and "Orchid".
+
+     o  Normalised red, green, and blue intensities separated by
+     commas or spaces.  Each value must lie in the range 0.0--1.0.
+     For example, "1.0,1.0,0.5" would give a pale yellow.
+
+   To exit the loop that obtains new palette colours enter a null
+   character (!) in response to the prompt.
+
+COLRANGE
+
+COLRANGE() = _INTEGER (Read)
+   The numbers of the palette colours to be allocated to a range
+   of pens within the lookup table.  One or two palette colours
+   may be entered.  If only one is given all the range of pens
+   are assigned that colour.  If two palette colours are given
+   the colour of a pen is obtained by linear interpolation
+   between the two colours at the fractional position of the pen
+   in the range of colour indices.  Allowed values are 0--31.
+
+COMP
+
+COMP = LITERAL (Read)
+   The NDF component to be displayed.  It may be "Data",
+   "Quality", "Variance", or "Error" (where "Error" is the
+   alternative to "Variance" and causes the square root of the
+   variance values to be displayed).  If "Quality" is specified,
+   then the quality values are treated as numerical values (in
+   the range 0 to 255). ["Data"]
+
+DEVICE
+
+DEVICE = DEVICE (Read)
+   Name of the image display to be used.  The device must be in
+   one of the following GNS categories: IMAGE_DISPLAY,
+   IMAGE_OVERLAY, or WINDOW, and have at least 48 colour indices.
+   At least 120 colour indices is recommended.  The device must
+   also not reset when the device is opened (since the new colour
+   table would be lost).  [Current image-display device]
+
+HIGH
+
+HIGH = _DOUBLE (Read)
+   This is the highest value in the 2-dimensional data array used
+   for scaling and computing the histogram.  All larger array
+   values are set to the highest colour index when HIGH is
+   greater than LOW, otherwise all array values greater than HIGH
+   are set to the lowest colour index.  The dynamic default is
+   the maximum data value.
+
+INLUT
+
+INLUT = NDF (Read)
+   Name of the NDF containing the initial lookup table as its data
+   array.  The LUT must be 2-dimensional, the first dimension
+   being 3, and the second being arbitrary.  The method used to
+   compress or expand the colour table if the second dimension is
+   different from the number of unreserved colour indices is
+   controlled by parameter NN.  Also the LUT's values must lie in
+   the range 0.0--1.0.  If INLUT is null (!) a greyscale is used.
+
+INPAL
+
+INPAL = NDF (Read)
+   Name of the NDF containing the initial palette as its data
+   array.  The palette must be 2-dimensional, the first dimension
+   being 3, and the second 32.  If the second dimension is
+   greater than 32 only the first 32 colours are used; if it has
+   less than 32 just fill as much of the palette as is possible
+   starting from the first colour.  The palette's values must lie
+   in the range 0.0--1.0.  If INPAL is null (!) the default
+   palette is loaded.
+
+LOW
+
+LOW = _DOUBLE (Read)
+   The array value that scales to the lowest pen in the colour
+   table, and the minimum value to be included in the histogram.
+   All smaller array values are set to the lowest colour
+   index when LOW is less than HIGH, otherwise all array values
+   smaller than LOW are set to the highest colour index.   The
+   dynamic default is the minimum data value.
+
+NDF
+
+NDF = NDF (Read)
+   Input NDF data structure containing the image to be displayed
+   to show the effect of the created colour table.
+
+NN
+
+NN = _LOGICAL (Read)
+   If TRUE, the input lookup table is mapped to the colour table by
+   using the nearest-neighbour method.  This preserves sharp
+   edges and is better for lookup tables with blocks of colour.
+   If NN is FALSE, linear interpolation is used, and this is
+   suitable for smoothly varying colour tables. [FALSE]
+
+OK
+
+OK = _LOGICAL (Read)
+   TRUE when the palette colour just produced is acceptable.
+
+OUTLUT
+
+OUTLUT = NDF (Write)
+   The output lookup table.
+
+OUTPAL
+
+OUTPAL = NDF (Write)
+   The palette used to create the lookup table.
+
+PALNUM
+
+PALNUM = _INTEGER (Read)
+   The number of the palette entry whose colour is to be
+   modified.  (The numbers are plotted on the palette.) It is
+   used within a loop to modify up to sixteen entries in the
+   palette.  Entering a null, !, will end that loop.  The
+   suggested default is the next palette number.  PALNUM must lie
+   in the range 16--31.
+
+PENRANGE
+
+PENRANGE() = _INTEGER (Read)
+   The range of pen numbers in the lookup table which is about to
+   be allocated a set of colours from the palette.  PENRANGE is
+   only used when there is no image and histogram plotted.  The
+   pen number can be read from the axis below the ramp.  If one
+   pen number is given, only this pen is altered, and it is given
+   the first palette colour of COLRANGE.  If two are supplied,
+   the first pen number entered will take the first palette
+   colour entered, and the second pen is assigned the second
+   palette colour.  The pens must lie in the range zero to the
+   maximum number of available pens.
+
+PTITLE
+
+PTITLE = LITERAL (Read)
+   Title for the output palette NDF. ["KAPPA - Crelut"]
+
+TITLE
+
+TITLE = LITERAL (Read)
+   Title for the output lookup table NDF. ["KAPPA - Crelut"]
+
+VALRANGE
+
+VALRANGE() = _DOUBLE (Read)
+   The range of data values in the histogram/image which is to
+   be allocated a set of colours from the palette, and hence be
+   assigned to a part of the lookup table.  VALRANGE is only used
+   when there is an image and histogram plotted.  The data value
+   may be read from the axis below the histogram.  If one data
+   value is given, only the single pen in the lookup table
+   corresponding to the value is altered, and it is given the
+   first palette colour of COLRANGE.  If two values are supplied,
+   the first data value entered will take the first palette
+   colour entered, and the second data value is assigned the
+   second palette colour.  The data values must lie in the range
+   PVLO--PVHI.
+
+Examples
+
+Note:
+   Since the application is highly interactive and contains loops
+   it is not possible to give one-line commands to perform a
+   complete operation.  Therefore the examples show how to
+   control the input and output data and not the interactive
+   manipulation of the colour table.
+
+crelut heat bizarre hh12 \
+   Reads a lookup table in an NDF called heat.  If resampling of
+   the lookup table is required it achieved via linear
+   interpolation. The lookup table after the manipulation is
+   stored in NDF bizarre.  The data array in NDF hh12 is scaled
+   between its minimum and maximum values and displayed in the
+   top half of the current picture on the current image-display
+   device.  Also drawn is an histogram of the intensities.
+
+crelut heat bizarre hh12 inpal=mypal \
+   As above except a palette created previously via the OUTPAL
+   parameter.  This palette is in an NDF called mypal.
+
+crelut inlut=! deluxe hh12 v low=100 high=400 \
+   A greyscale lookup table is manipulated and the result
+   is stored in NDF deluxe.  The variance array in NDF hh12 is
+   scaled between 100 and 400, and displayed in the top half of
+   the current picture on the current image-display device.  Also
+   drawn is an histogram of the intensities between those limits.
+
+crelut heat bizarre ndf=! device=xwindows \
+   Reads a lookup table in an NDF called heat.  If resampling of
+   the lookup table is required it achieved via the
+   nearest-neighbour method.  The lookup table after the
+   manipulation is stored in NDF bizarre.  A linear ramp is
+   displayed in the lower half of the current picture on the
+   xwindows device.
+
+Notes
+
+-  The application stores, in the order given, the following
+pictures in the graphics database: a frame comprising the data
+picture, the histogram or ramp and the palette; the data-array
+picture with world co-ordinates in units of data pixels; the
+histogram/ramp frame picture including the histogram/ramp plus
+the annotated axes; and the histogram with world co-ordinates in
+units of data values and number, or the ramp with units of pen
+numbers and normalised frequency.   The NDF associated with the
+image/histogram plots is stored by reference with the DATA
+picture.  On exit the current database picture for the chosen
+device reverts to the input picture.
+
+-  Bad pixels will appear with the lowest colour index in the
+plot.
+
+Related_Applications
+
+   KAPPA: LUTABLE, LUTFLIP, LUTREAD, LUTROT, LUTSAVE, LUTTWEAK,
+   LUTVIEW, PALREAD, PALSAVE; Figaro: COLOUR.
+
+Authors
+
+MJC: Malcolm J. Currie  (STARLINK)
+
+History
+
+ 1991 May 10 (MJC):
+    Original NDF version based on the pre-0.8 version.
+
+ 1991 June 27 (MJC):
+    Improved the clarity of the documentation and instructions,
+    especially concerning the meaning of "pen".  Improved the user
+    interface by permitting nominated palette entries to be
+    revised, and showing the value of the existing entry.  Added
+    facilities to save and restore the palette.  Used full axes
+    including a correctly scaled ordinate, and data values on the
+    abscissa of the histogram.  LUT pens can be specified via data
+    values.  Stored data co-ordinates with the DATA picture
+    associated with the image.
+
+ 1991 July 22 (MJC):
+    Replaced the RGB parameter by the more-powerful COLOUR.
+
+ 1992 March 3 (MJC):
+    Replaced AIF parameter-system calls by the extended PAR
+    library.
+
+ 1992 April 23 (MJC):
+    Made to handle significant dimensions for user-defined
+    sections of the image.
+
+ 1992 November 30 (MJC):
+    Does not use non-monotonic axis centres.
+
+ 1995 October 19 (MJC):
+    Supports Error component.
+
+Implementation_Status
+
+   -  The magic-value method is used for processing bad data.
+
+   -  This application will handle data in all numeric types, though
+   type conversion to integer will occur for unsigned byte and word
+   images.
+.endhelp

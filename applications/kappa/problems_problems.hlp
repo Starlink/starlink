@@ -1,0 +1,310 @@
+.help problems_problems Starlink kappa
+.nf
+A detailed list of error codes and their meanings is not available.
+KAPPA produces descriptive contextual error messages, which are
+usually straightforward to comprehend.  Some of these originate in
+the underlying infrastructure software, though there are still some
+systems yet to do that.  These are being corrected, and so imprecise
+error reports should soon be a thing of the past.  Error messages
+from KAPPA begin with the name of the application reporting the
+error. The routine may have detected the error, or it has something
+to say about the context of the error. 
+
+The sub-topics describe some difficulties you may encounter and how
+to hurdle them.  Please suggest additions to this compilation.
+
+
+Unable_to_Obtain_Work_Space
+
+One group of error messages which may puzzle you, mostly because
+they are incomplete reads like ``Unable to create work array''.
+Many applications require temporary or work space to perform their
+calculations.  This space is stored in an HDS file within directory
+$HDS_SCRATCH and most likely is charged to your disc quota.  (If you
+have not redefined this environment variable, it will point to your
+current directory.)  So one cause for the message is insufficient
+disc quota available to store the work space container file or to
+extend it.
+
+A second reason for the message is that your computer cannot provide
+sufficient virtual memory to map the workspace.  In this case you
+can try increasing your process limits using the C-shell built-in
+function called limit.  You can find your current limits by entering
+limit.  You should see a list something like this.
+
+     cputime         unlimited
+     filesize        unlimited
+     datasize        131072 kbytes
+     stacksize       2048 kbytes
+     coredumpsize    unlimited
+     memoryuse       89232 kbytes
+     vmemoryuse      1048576 kbytes
+     descriptors     4096 
+
+The relevant keywords are datasize and the vmemoryuse.  In effect
+datasize specifies the maximum total size of data files you can map at
+one time in a single programme.  The default should be adequate for
+most purposes and only need be modified for those working with large
+images or cubes.  The vmemoryuse specifies the maximum virtual memory
+you can use.
+
+    % limit datasize 32768
+
+sets the maximum size of mapped data to 32 megabytes.  Values cannot
+exceed the system limits.  You can list these with the -h qualifier.
+
+     % limit -h
+     cputime         unlimited
+     filesize        unlimited
+     datasize        1048576 kbytes
+     stacksize       32768 kbytes
+     coredumpsize    unlimited
+     memoryuse       89232 kbytes
+     vmemoryuse      1048576 kbytes
+     descriptors     4096 
+
+Although you can set your limits to the system maxima, it doesn't
+mean that you should just increase your quotas to the limits.  You
+might become unpopular with some of your colleagues, especially if
+you accidentally try to access a huge amount of memory.  
+
+If you cannot accommodate your large datasets this way, you should
+fragment your data array, and process the pieces separately.
+
+After receiving this error message in an ICL session you may need
+to delete the scratch file by hand.  The file is called txxx.sdf,
+where xxxx is a process identifier.  A normal exit from ICL will
+delete the work-space container file.
+
+
+
+Application_Automatically_pPcks_up_the_Wrong_NDF
+
+Some applications read the name of the NDF used to create a plot or
+image from the graphics database in order to save typing.  Rarely,
+you'll say ``that's not the one I wanted''.  This is because AGI
+finds the last DATA picture situated within the current picture.
+Abort the application via !!, then use PICCUR or PICLIST to select
+the required FRAME picture enclosing the DATA picture, or even
+select the latter directly.  You can override the AGI NDF also by
+specifying the required NDF on the command line, provided it has
+pixels whose indices lies within the world co-ordinates of the
+DATA picture.  Thus
+ 
+     % inspect myndf
+ 
+will inspect the NDF called myndf.  The command PICIN will show the
+last DATA picture and its associated NDF.
+
+
+Unable_to_Store_a_Picture_in_the_Graphics_Database
+
+You may receive an error message, which says failed to store
+such-and-such picture in the graphics database.  For some reason the
+database was corrupted due to reasons external to KAPPA.  Don't
+worry, usually your plot will have appeared, and to fix the problem
+run GDCLEAR/IDCLEAR or delete the database file
+($AGI_USER/agi_<node>.sdf, where you substitute your system's node
+name for <node>).  You will need to redraw the last plot if you
+still require it, say for interaction.
+
+
+Line_Graphics_are_Invisible_on_an_Image_Display
+
+The reason for invisible line graphics on your image display is
+because it is drawn in black or a dark grey.  Most likely is that
+some person has been using other software on your image display or
+that is has been reset.  PALDEF will set up the default colours for
+the palette, and so most line graphics will then appear in white.
+Alternatively,
+ 
+     % palentry 1 white
+ 
+will normally suffice.
+
+
+Error_Obtaining_a_Locator_to_a_Slice_of_an_HDS_array
+
+
+If the above error appears from DAT_SLICE and you are (re)prompted
+for an NDF, the most likely cause is that you have asked an IMAGE
+application to process an NDF section.  Use NDFCOPY to make a
+subset before running the application in question, or process the
+whole NDF.
+
+
+Badly_placed_()'s
+
+This means that you have forgotten to `escape' parentheses, probably
+when defining an NDF section.  Try inserting a backslash before each
+parenthesis.
+
+     % stats myndf\(100:200,\)
+
+
+Attempt_to_use_'positional'_parameter_value_(x)_in_an_unallocated_position
+
+Check the usage of the application you are running.  One way of
+adding positional parameters unintentionally, is to forget to escape
+the " from the shell when supplying a string with spaces or
+wildcards.  For example, this error would arise if we entered
+
+     % settitle myndf "A title"
+
+instead of say
+
+     % settitle myndf '"A title"'
+
+which protects all special characters between the single quotes.
+
+
+The_choice_x_is_not_in_the_menu.
+
+You have either made an incorrect selection, or you have forgotten
+to escape a metacharacter.  For the former, you can select a new
+value from the list of valid values presented in the error message.
+For the latter, part of another value is being interpreted as a
+positional value for the parameter the task is complaining about.
+
+     % linplot $KAPPA_DIR/spectrum pltitl="Red-giant plot"
+     !! The choice plot is not in the menu.  The options are
+     !     Data,Quality,Error,Variance.
+     !  Invalid selection for parameter COMP.
+
+Here it thinks that plot is a positional value.  Escape the " to
+cure the problem.
+
+     % linplot $KAPPA_DIR/spectrum pltitl='"Red-giant plot"'
+
+
+I've_Got_This_FITS_Tape
+
+
+Certain combinations of magnetic tape produced on one model of tape
+drive but read on a different model seem to generate parity errors
+that are detected by the MAG_ library that FITSIN uses.  However,
+this doesn't mean that you won't be able to read your FITS tape.
+The UNIX tape-reading commands seem less sensitive to these parity
+errors.
+
+Thus you should first attempt to convert the inaccessible FITS files
+on tape to disc files using the UNIX dd command, and then use the
+FITSDIN application to generate the output NDF or foreign format.
+For example to convert a FITS file from device /dev/nrst0 to an NDF
+called ndfname, you might enter
+
+     % dd if=/dev/nrst0 ibs=2880 of=file.fits
+     % fitsdin files=file.fits out=ndfname
+     % rm file.fits
+
+where file.fits is the temporary disc-FITS file.  The 2880 is the
+length of a FITS record in bytes.   Repeated dd commands to a
+no-rewind tape device (those with the `n' prefix on OSF/1 and the
+`n' suffix on Solaris) will copy successive files.  To skip over
+files or rewind the tape, use the mt command.  For example,
+
+     % mt -f /dev/rmt/1n fsf 3
+           :       :       :
+     % mt -f /dev/rmt/1n asf 4
+
+moves the tape on device /dev/rmt/1n forward three files, then moves
+to the fourth file on the same device,
+
+     % mt bsf 2
+
+moves back two files on the default tape drive (defined by the
+environment variable TAPE), and
+
+     % mt -f /dev/nrmt0h rewind
+
+rewinds to the start of the tape on device /dev/nrmt0h.  Thus it is
+possible to write a script for extracting and converting a series of
+files including ranges, just like FITSIN does.
+
+If the above approach fails, try another tape drive.
+
+
+FITSIN_does_not_Recognise_my_FITS_Tape
+
+
+If you attempt to read a FITS magnetic tape with FITSIN, you might
+receive an error like this
+
+     % fitsin
+     % MT - Tape deck /@/dev/nrmt1h/ > /dev/nrmt3l
+     !! Object '/DEV/NRMT3L' not found.
+     !  DAT_FIND: Error finding a named component in an HDS structure.
+     !  /dev/nrmt3l: MAG__UNKDV, Unable to locate device in DEVDATASET
+
+when you enter the device name.  The magnetic-tape system uses an
+\HDSref\ file called the device dataset (DEVDATASET) to store the
+position of the tape between invocations of Starlink applications.
+
+When FITSIN is given a name, the magnetic-tape system validates the
+name to check that it is a known device.  There should be a
+{\tt devdataset.sdf} file (within {\tt /star/etc} at Starlink sites)
+containing a list of at least all the available drives at your site.
+What FITSIN is complaining about above, is that the device you have
+given is not included in the DEVDATASET file.  Now this might be
+because you mistyped the device name, or that the particular device is
+not accessible on the particular machine, or because your computer
+manager
+has not maintained the DEVDATASET when a drive was added.  You can look
+at the contents of the DEVDATASET with this command.
+
+     % hdstrace /star/etc/devdataset
+
+Oh and one other point: make sure the tape is loaded in the drive.
+Yes this mistake has happened (not mentioning any names) and it is
+very hard to diagnose remotely.
+
+
+It_Used_to_Work... and Weird Errors
+
+There is a class of error that arises when an HDS file is corrupted.
+The specific message will depend on the file concerned and where
+in the file the corruption occurred.  The most likely reason for
+file corruption is breaking into a task at the wrong moment, or
+trying to write to a file at the same time.
+
+If you want to process simultaneously from different sessions---say
+one interactive and another in batch---it is wise to redefine the
+environment variables $ADAM_USER, and $AGI_USER if you want graphics
+on the same machine.  The environment variables should point to a
+separate existing directory for each additional session.  This will
+keep the global and application parameters, and the graphics
+database separate for each session. 
+
+The way to look for corrupted HDS files is trace them.  Assuming
+that $ADAM_USER and $AGI_USER are defined,
+
+     % hdstrace $ADAM_USER/GLOBALS full
+     % hdstrace $ADAM_USER/ardmask full
+     % hdstrace $AGI_USER/agi_cacvad full
+
+traces the GLOBALS file, the application you were running when the
+weird error occurred (here ARDMASK), and the graphics database for
+machine cacvad.  Once you have identified the problem file, delete
+it.  If that proves to be the globals file, you might want to retain
+the output from HDSTRACE, so that you can restore their former
+values.  Deleting the graphics database is something you should do
+regularly, so that's not a problem.
+
+If you have been running KAPPA from ICL, you will need to check of
+the integrity of the monolith parameter file, instead the
+individual parameter file.  It will be one of these depending on
+the type of task that failed: graphics, NDF components, or the
+rest (mostly image processing) corresponding to these three
+monolith interface files.
+
+     % hdstrace $ADAM_USER/kapview_mon full
+     % hdstrace $ADAM_USER/ndfpack_mon full
+     % hdstrace $ADAM_USER/kappa_mon full
+
+
+If that doesn't cure the problem, send me mjc@star.rl.ac.uk or the
+Starlink Software Librarian ussc@star.rl.ac.uk a log of the session
+demonstrating the problem, and we shall endeavour to interpret it
+for you, and find out what's going wrong.
+
+.endhelp

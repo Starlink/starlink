@@ -1,0 +1,372 @@
+.help contover Starlink kappa
+.nf
+Contours a 2-d NDF overlaid on an image displayed previously.
+
+Usage:
+
+   contover ndf [comp] offset mode ncont [device]
+      { firstcnt=? stepcnt=?
+      { heights=?
+      { percentiles=?
+      mode
+
+Description:
+
+   This application draws a contour plot of a 2-dimensional NDF
+   using an efficient algorithm.  The array may be part or whole of
+   the data array, but also the variance or quality can be shown.
+
+   The contour plot is drawn over an existing image that is
+   displayed on the chosen graphics workstation or its overlay,
+   provided the displayed image has been recorded in the graphics
+   database.  (This will be the case for other display routines in
+   KAPPA.)  The contour plotting occurs within the current picture
+   only if it is a DATA picture, otherwise contours are overlaid in
+   the last DATA picture within the current picture.  This
+   application assumes that the world co-ordinate systems of the data
+   array and the displayed image are both in pixel units, but not to
+   the same origins.  Pixel x-y offsets may be given to match the
+   contour plot with the image, provided some contouring will be
+   visible.  These displacements are in the sense image co-ordinate
+   minus the data-array co-ordinate for an arbitrary fiducial point.
+
+   The contouring algorithm has only pixel resolution, and
+   so the contours are not smooth, but this makes the processing
+   much faster.  There are seven methods for selecting contours.
+
+   The best way to use this application is to first display an image
+   on the base plane of an image display, make this the current
+   picture, and then plot contours on the overlay plane, clearing
+   the overlay picture each time. This enables more than one attempt
+   at getting the correct contour heights.  The underlying image will
+   not be erased. (Note that if you do not make the underlying image
+   the current picture, the contour plot becomes the last DATA
+   picture, and so any subsequent x-y offsets should be set to 0,0 to
+   prevent successive contour plots being incorrectly located.)
+
+Parameters
+
+For information on individual parameters, select from the list below:
+
+CLEAR
+
+CLEAR = _LOGICAL (Read)
+   True if the graphics device is to be cleared before display
+   of the array.  It should only be true for an overlay device.
+   [TRUE]
+
+COMP
+
+COMP = LITERAL (Read)
+   The NDF component to be contoured.  It may be "Data",
+   "Quality", "Variance", or "Error" (where "Error" is the
+   alternative to "Variance" and causes the square root of the
+   variance values to be taken before plotting contours).  If
+   "Quality" is specified, then the quality values are treated as
+   numerical values (in the range 0 to 255). ["Data"]
+
+CONCOL
+
+CONCOL = LITERAL (Read)
+   The colour of the contour lines on devices that support colour.
+   The options are described below.
+
+     "MAX"          - The maximum colour index in the image
+                      display colour lookup table.
+     "MIN"          - The minimum (non-reserved) colour index in
+                      the image-display colour lookup table.
+     An integer     - The actual colour index.  It is constrained
+                      between 0 and the maximum colour index
+                      available on the device.
+     A named colour - Uses the named colour from the palette, and
+                      if it is not present, the nearest colour
+                      from the palette is selected.
+
+   If the colour is to remain unaltered as the lookup table is
+   manipulated choose an integer between 0 and 15, or a named
+   colour.  This parameter will be ignored if PENROT = TRUE.
+   [The current value, but equals "1" (the foreground colour) if
+   there is no current value.]
+
+DASHED
+
+DASHED = _REAL (Read)
+   The height below which the contours will be drawn with dashed
+   lines.  A null value (!) means all contours are drawn with
+   solid lines.  This facility is only available when ANNOTA =
+   FALSE. [!]
+
+DEVICE
+
+DEVICE = DEVICE (Read)
+   The plotting device.  The device must be in one of the
+   following GNS categories: IMAGE_DISPLAY, IMAGE_OVERLAY,
+   WINDOW, WINDOW_OVERLAY, or MATRIX_PRINTER.
+   [Current image-display-overlay device]
+
+FIRSTCNT
+
+FIRSTCNT = _REAL (Read)
+   Height of the first contour (Linear and Magnitude modes).
+
+HEIGHTS
+
+HEIGHTS() = _REAL (Read)
+   Contour levels (Free mode).  The suggested default is the
+   current value.
+
+MODE
+
+MODE = LITERAL (Read)
+     "Area"        - The contours enclose areas of the array for
+                     which the equivalent radius increases by
+                     equal increments.  You specify the number of
+                     levels.
+     "Automatic"   - The contour levels are equally spaced between
+                     the maximum and minimum pixel values in the
+                     array.  You supply the number of contour
+                     levels.
+     "Equalised"   - You define the number of equally spaced
+                     percentiles.
+     "Free"        - You specify a series of contour values
+                     explicitly.
+     "Linear"      - You define the number of contours, the start
+                     contour level and linear step between
+                     contours.
+     "Magnitude"   - You define the number of contours, the start
+                     contour level and step between contours.  The
+                     step size is in magnitudes so the nth contour
+                     is dex(-0.4*(n-1)*step) times the start
+                     contour level.
+     "Percentiles" - You specify a series of percentiles.
+
+   The suggested default is the current value, which is initially
+   "Free".
+
+NCONT
+
+NCONT = _INTEGER (Read)
+   The number of contours required (all modes except Free and
+   Percentiles).  It must be between 1 and 50.  If the number is
+   large, the plot may be cluttered and take longer to produce.
+   6, the initial suggested default, gives reasonable results.
+   The current value becomes the suggested default.
+
+NDF
+
+NDF = NDF (Read)
+   NDF structure containing the 2-dimensional image to be
+   contoured.
+
+OFFSET
+
+OFFSET( 2 ) = _INTEGER (Read)
+   X-y offsets of the input data-array with respect to the
+   displayed image (i.e. x_data - x_image followed by
+   y_data - y_image for any fiducial point).   These are
+   constrained so that some part of the contour plot will be
+   overlaid on the displayed image.  The suggested default is
+   [0,0], i.e. no shift.
+
+PENROT
+
+PENROT = _LOGICAL (Read)
+   If TRUE, the plotting pens are cycled through the contours to
+   aid identification of the contour heights.  It is ignored
+   when annotation is selected. [FALSE]
+
+PERCENTILES
+
+PERCENTILES() = _REAL (Read)
+   Contour levels given as percentiles.  The values must lie
+   between 0.0 and 100.0. (Percentiles mode).  The suggested
+   default is the current value.
+
+STEPCNT
+
+STEPCNT = _REAL (Read)
+   Separation between contour levels, linear for Linear mode
+   and in magnitudes for Magnitude mode.
+
+THICK
+
+THICK = _REAL (Read)
+   The thickness of the contours in the plot, where 1.0 is the
+   normal thickness.  Currently, this is only available on a few
+   devices.  It must take a value in the range 0.5--10.0.  [1.0]
+
+Examples
+
+contover myfile d [-20,7] \
+   Contours the data array in the NDF called myfile on the current
+   image-display overlay device; the overlay is displaced such
+   that pixel (i,j) in myfile corresponds to pixel (i-20,j+7) in
+   the displayed image.  All other settings are defaulted, so for
+   example the current method for determining heights is used,
+   and as much of myfile will be contoured that fits into the
+   current picture.
+
+contover ndf=ngc6872 mode=au ncont=5 offset=[0,0]
+   Contours the data array in the NDF called ngc6872 on the
+   current image-display overlay device.  Five equally spaced
+   contours between the maximum and minimum data values are
+   drawn.  There is no offset between the contour plot and the
+   displayed image; this can be useful for comparing an NDF
+   before and after some processing, e.g. smoothing.
+
+contover iras60(200:300,100:350) comp=d offset=[3,5] \
+   Contours the portion of the data array in the NDF called iras60
+   on the current image-display overlay using the current method
+   for height selection.  The maximum portion of the data array
+   that can be contoured goes from pixel (200,100) to (300,350).
+   The overlay is displaced such that pixel (i,j) in the data
+   array corresponds to pixel (i+3,j+5) in the displayed image.
+
+contover comp=v mode=fr heights=[10,20,40,80] device=xov \
+   Contours the variance array in the current NDF on the xov
+   device.  Contours at 10, 20, 40 and 80 are drawn.  There is no
+   displacement between the variance contour plot and the
+   displayed image.
+
+contover mode=eq ncont=5 dashed=15 pencol=blue ndf=skyflux
+   Contours the data array in the NDF called skyflux on the
+   current image-overlay device.  Contours at heights
+   corresponding to the 10, 30, 50, 70 and 90 percentiles are
+   drawn in blue (if available).  Those contours whose values
+   less than 15 will appear as dashed lines.  There is no
+   displacement between the contour plot and the displayed image.
+
+contover xx1 mode=pe percentiles=[90,95,98,99] pencol=white
+
+noclear device=epsf_l
+   Contours the data array in the NDF called xx1 on the epsf_l
+   device.  White contours at heights corresponding to the 90, 95,
+   98, and 99 percentiles are drawn.  The display is not cleared.
+   There is no displacement.  The output file could be combined
+   with a DISPLAY plot (using PSMERGE) to make a hardcopy of a
+   contour plot on a dark image.
+
+Notes
+
+-  The application records the contour plot as a DATA picture
+with world co-ordinates in units of data pixels in the graphics
+database.  The DATA picture may also may have double-precision
+data co-ordinates derived from the NDF axis components provided
+these are linear and different from pixel co-ordinates; the data
+co-ordinates are stored via a linear transformation.  The NDF
+associated with the plot is stored by reference with the DATA
+picture.  On exit the current database picture for the chosen
+device reverts to the input picture.
+
+-  There are some options for setting the characteristics of the
+contour lines.  By default, solid lines are drawn with the same
+colour as the axes and key, namely the foreground colour.  The
+colour will depend on the graphics device chosen, but it is often
+black for printers or white for terminals.  The alternatives to
+override this default behaviour are listed below.
+
+   1. Set a colour for all contours using parameter CONCOL.
+      The choices may be quite restrictive on certain devices,
+      for example a window overlay only has one colour.  Use
+      the PALENTRY command to change this colour.
+   2. Request dashed contours below some threshold given by
+      parameter DASHED and solid lines for other heights.  All
+      contours have either the foreground colour or that
+      prescribed by parameter CONCOL.
+   3. Cycle the pens modulo 3 for each contour height actually
+      plotted by setting PENROT = TRUE.  The characteristics of
+      the second and third line styles will depend on the chosen
+      graphics device.  An image display or pen plotter will draw
+      coloured lines using palette entries 1 to 3; whereas a
+      window overlay, monochrome laser printer or terminal will
+      draw a variety of dashed or thicker lines.
+   4. Combine options 2 and 3.  However, palette colours 1 to 3
+      will always be used and CONCOL ignored.  The contours below
+      the threshold continue the cycle through the three colours.
+      There may be some confusion on devices that already use
+      dashed lines, so this is only suitable for devices
+      supporting at least three colours simultaneously.
+
+Pen rotation takes precedence over colour control through CONCOL.
+
+Related_Applications
+
+   KAPPA: CONTOUR, TURBOCONT; Figaro: ICONT; SPECDRE: SPECCONT.
+
+Authors
+
+MJC: Malcolm J. Currie  (STARLINK)
+
+History
+
+ 1989 Jun 21 (MJC):
+    Original version.
+
+ 1989 Aug  8 (MJC):
+    Passed array dimensions as separate variables
+    to CNTDRW and CNTSEL.
+
+ 1989 Sep  1 (MJC):
+    Converted to use turbo-contouring.
+
+ 1989 Dec 21 (MJC):
+    Workspace managed by AIF_TEMP.
+
+ 1990 Jan 9 (MJC):
+    Corrected SGS status.
+
+ 1990 Mar 30:
+    Reports the chosen contour heights to the user.
+
+ 1991 April 13 (MJC):
+    First NDF version supporting variance and quality.  Added data
+    co-ordinate transformation, NDF reference into the database,
+    and AGI context control.  Re-organised world co-ordinates so
+    that CNTTUR no longer handles the full array, merely the
+    section.
+
+ 1991 May 1 (MJC):
+    Renamed IN parameter to NDF for consistency.
+
+ 1991 July 31 (MJC):
+    No longer redefines colours of SGS pens to predefined state if
+    workstation has dynamic colour representation, now there is
+    palette control.
+
+ 1991 October 17 (MJC):
+    Fixed typo' in calculation of allowed shifts.
+
+ 1992 March 3 (MJC):
+    Replaced AIF parameter-system calls by the extended PAR
+    library.
+
+ 1992 April 4 (MJC):
+    Made to handle significant dimensions for user-defined
+    sections.  Bounds parameters removed.
+
+ 1992 June 16 (MJC):
+    Made to work with WINDOW_OVERLAY class.  The restriction on the
+    number of colour indices has therefore been been relaxed.
+
+ 1992 November 30 (MJC):
+    Does not use non-monotonic axis centres.
+
+ 1995 October 19 (MJC):
+    Supports Error component.
+
+ 1997 May 21 (MJC):
+    Added percentiles and equalised options for the MODE.  New
+    parameter PERCENTILES.  Increased tessellation cell to 512
+    pixels square.  Added CONCOL, DASHED, and THICK parameters,
+    and further examples.  Improved efficiency by using PSX to
+    obtain workspace.  Rewrote the Notes on contour colour and line
+    style.
+
+Implementation_Status
+
+   -  Only real data can be processed directly.  Other data types
+   will undergo a type conversion before the contour plot is drawn.
+
+   -  Processing of bad pixels and automatic quality masking are
+   supported.
+.endhelp

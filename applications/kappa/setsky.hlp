@@ -1,0 +1,309 @@
+.help setsky Starlink kappa
+.nf
+Makes an IRAS astrometry extension.
+
+Usage:
+
+   setsky ndf positions coords epoch [projtype] [lon] [lat]
+          [refcode] [pixelsize] [orient] [tilt] [logfile]
+
+Description:
+
+   This application makes an IRAS astrometry extension within a
+   two-dimensional NDF, therefore allowing sky co-ordinate
+   information to be stored with an arbitrary image.  This
+   information is used by certain IRAS90 applications (those with
+   the SKY prefix) to perform various astrometric operations.  These
+   include annotation of a displayed image with a grid of celestial
+   co-ordinates, marking the location of a given celestial position
+   given a pixel position, and aligning a group of images.  See
+   SUN/163 for details.
+
+   The astrometry is determined either by you supplying explicit
+   values for certain projection parameters, or by you providing the
+   sky and corresponding image co-ordinates for a set of positions
+   (see parameter POSITIONS).  In the latter case, the projection
+   parameters are determined automatically by searching through
+   parameter space in order to minimise the sum of the squared
+   residuals between the supplied pixel co-ordinates and the
+   transformed sky co-ordinates.  You may force particular
+   projection parameters to take certain values by assigning an
+   explicit value to the corresponding application parameter listed
+   below.  The individual residuals at each position can be written
+   out to a logfile so that you can identify any aberrant points.
+   The RMS residual (in pixels) implied by the best-fitting
+   parameters is displayed.
+
+Parameters
+
+For information on individual parameters, select from the list below:
+
+COORDS
+
+COORDS = LITERAL (Read)
+   The sky co-ordinate system to use.  Valid values include
+   "Ecliptic" (IAU 1980), "Equatorial" (FK4 and FK5), and
+   "Galactic" (IAU 1958).  Ecliptic and equatorial co-ordinates
+   are referred to the mean equinox of a given epoch.  This epoch
+   is specified by appending it to the system name, in
+   parentheses, for example, "Equatorial(1994.5)".  The epoch may
+   be preceded by a single character, "B" or "J", indicating that
+   the epoch is Besselian or Julian respectively.  If this letter
+   is missing, a Besselian epoch is assumed.
+
+EPOCH
+
+EPOCH = DOUBLE PRECISION (Read)
+   The Julian epoch at which the observation was made (e.g.
+   "1994.0").
+
+LAT
+
+LAT = LITERAL (Read)
+   The latitude of the reference point, in the co-ordinate system
+   specified by parameter COORDS.  For example, if COORDS is
+   "Equatorial", LAT is the Declination.  See SUN/163, Section
+   4.7.2 for full details of the allowed syntax for specifying
+   this position.  For convenience here are some examples how you
+   may specify the Declination -45 degrees, 12 arcminutes: "-45 12
+   00", "-45 12", "-45d 12m", "-45.2d", "-451200", "-0.78888r".
+   The last of these is a radians value.  A null value causes the
+   latitude of the reference point to be estimated automatically
+   from the data supplied for parameter POSITIONS. [!]
+
+LOGFILE
+
+LOGFILE = FILENAME (Read)
+   Name of the text file to log the final projection parameter
+   values and the residual at each supplied position.  If null,
+   there will be no logging.  This parameter is ignored if a null
+   value is given to parameter POSITIONS. [!]
+
+LON
+
+LON= LITERAL (Read)
+   The longitude of the reference point, in the co-ordinate
+   system specified by parameter COORDS.  For example, if COORDS
+   is "Equatorial", LON is the Right Ascension.  See SUN/163,
+   Section 4.7.2 for full details of the allowed syntax for
+   specifying this position.  For convenience here are some
+   examples how you may specify the Right Ascension 11 hours, 34
+   minutes, and 56.2 seconds: "11 34 56.2", "11h 34m 56.2s", "11
+   34.9366", "11.58228", "113456.2".  See parameter LAT for
+   examples of specifying a non-equatorial longitude.  A null
+   value causes the longitude of the reference point to be
+   estimated automatically from the data supplied for parameter
+   POSITIONS. [!]
+
+NDF
+
+NDF = NDF (Read and Write)
+   The NDF that is to have an IRAS astrometry extension.
+
+ORIENT
+
+ORIENT = LITERAL (Read)
+   The position angle of the NDF's y axis on the celestial
+   sphere, measured from north through east.  North is defined as
+   the direction of increasing sky latitude, and east is the
+   direction of increasing sky longitude.  Values are constrained
+   to the range 0 to two-pi radians.  A null value causes the
+   position angle to be estimated automatically from the data
+   supplied for parameter POSITIONS. [!]
+
+PIXELREF
+
+PIXELREF( 2 ) = REAL (Read)
+   The pixel co-ordinates of the reference pixel (x then y).
+   This parameter is ignored unless REFCODE = "Pixel".  Remember
+   that the centre of a pixel at indices i,j is (i-0.5,j-0.5).  A
+   null value causes the pixel co-ordinates of the reference
+   point to be estimated automatically from the data supplied for
+   parameter POSITIONS. [!]
+
+PIXELSIZE
+
+PIXELSIZE( 2 ) = _REAL (Read)
+   The x and y pixel sizes at the reference position.  If only
+   one value is given, the pixel is deemed to be square.  Values
+   may be given in a variety of units (see parameter LAT).  For
+   example, 0.54 arcseconds could be specified as "0.54s" or
+   "0.009m" or "2.618E-6r".  A null value causes the pixel
+   dimensions to be estimated automatically from the data
+   supplied for parameter POSITIONS. [!]
+
+POSITIONS
+
+POSITIONS = LITERAL (Read)
+   A list of sky co-ordinates and corresponding image
+   co-ordinates for the set of positions which are to be used to
+   determine the astrometry.  If a null value is given then the
+   astrometry is determined by the explicit values you supply for
+   each of the other parameters.  Each position is defined by
+   four values, the sky longitude (in the same format as for
+   parameter LON), the sky latitude (in the same format as for
+   parameter LAT), the image pixel x co-ordinate and the image
+   pixel y co-ordinate (both decimal values).  These should be
+   supplied (in the order stated) for each position.  These
+   values are given in the form of a `group expression' (see
+   SUN/150).  This means that values can be either typed in
+   directly or supplied in a text file.  If typed in directly,
+   the items in the list should be separated by commas, and you
+   are re-prompted for further values if the last supplied value
+   ends in a minus sign.  If conveyed in a text file, they should
+   again be separated by commas, but can be split across lines.
+   The name of the text file is given in response to the prompt,
+   preceded by an `up arrow' symbol (^).
+
+PROJTYPE
+
+PROJTYPE = LITERAL (Read)
+   The type of projection to use.  The options are:
+      "Aitoff"         - Aitoff equal-area,
+      "Gnomonic"       - Gnomonic or tangent plane,
+      "Lambert"        - Lambert normal equivalent cylindrical,
+      "Orthographic"   - Orthographic.
+
+   The following synonyms are also recognised:
+       "All_sky"       - Aitoff,
+       "Cylindrical"   - Lambert,
+       "Tangent_plane" - Gnomonic.
+
+   See SUN/163 for descriptions of these projections.  A null
+   value causes the projection to be determined automatically
+   from the data supplied for parameter POSITIONS. [!]
+
+REFCODE
+
+REFCODE = LITERAL (Read)
+   The code for the reference pixel.  If it has value "Pixel"
+   this requests that pixel co-ordinates for the reference point
+   be obtained through parameter PIXELREF.  The other options are
+   locations specified by two characters, the first corresponding
+   to the vertical position and the second the horizontal.  For
+   the vertical, valid positions are T(op), B(ottom), or
+   C(entre); and for the horizontal the options are L(eft),
+   R(ight), or C(entre).  Thus REFCODE = "CC" means the reference
+   position is at the centre of the NDF image, and "BL" specifies
+   that the reference position is at the centre of the
+   bottom-left pixel in the image.  A null value causes the pixel
+   co-ordinates of the reference point to be estimated
+   automatically from the data supplied for parameter POSITIONS.
+   [!]
+
+TILT
+
+TILT = LITERAL (Read)
+   The angle through which the celestial sphere is to be rotated
+   prior to doing the projection.  The axis of rotation is a
+   radius passing through the reference point.  The rotation is
+   in an anti-clockwise sense when looking from the reference
+   point towards the centre of the celestial sphere.  In common
+   circumstances this can be set to zero.  Values may be given in
+   a variety of units (see parameter LAT).  Values are
+   constrained to the range 0 to two-pi radians.  A null value
+   causes the latitude of the reference point to be estimated
+   automatically from the data supplied for parameter POSITIONS.
+   ["0.0"]
+
+Examples
+
+setsky m51 ^stars.lis ecl(j1994.0) 1994.0 logfile=m51.log
+   This creates an astrometry extension within the two-dimensional
+   NDF called m51.  The values for parameters PROJTYPE, LON, LAT,
+   PIXELREF, PIXELSIZE and ORIENT are determined automatically so
+   that they minimised the sum of the squared residuals (in
+   pixels) at each of the positions specified in the file
+   stars.lis.  This file contains a line for each position, each
+   line containing an ecliptic longitude and latitude, followed
+   by a pair of image co-ordinates.  These values should be
+   separated by commas.  The ecliptic co-ordinates were
+   determined at Julian epoch 1994.0, and are referred to the
+   mean equinox at Julian epoch 1994.0.  The determined parameter
+   values together with the residual at each position are logged
+   to file m51.log.
+
+setsky m51 ^stars.lis ecl(j1994.0) 1994.0 orient=0 projtype=orth
+   This creates an astrometry extension within the
+   two-dimensional NDF called m51.  The values for parameters
+   PROJTYPE, LON, LAT, PIXELREF and PIXELSIZE are determined
+   automatically as in the previous example.  In this example
+   however, an Orthographic projection is forced, and the value
+   zero is assigned to parameter ORIENT, resulting in north being
+   `upwards' in the image.
+
+setsky virgo "!" eq(j2000.0) 1989.3 gn "12 29" "+12 30" bl 1.1s
+       0.0d
+   This creates an astrometry extension within the two-dimensional
+   NDF called virgo.  It is a gnomonic projection in the
+   equatorial system at Julian epoch 2000.0.  The bottom-left
+   pixel of the image is located at Right Ascension 12 hours 29
+   minutes, Declination +12 degrees 30 minutes.  A pixel at that
+   position is square and has angular size of 1.1 arcseconds.
+   The image was observed at epoch 1989.3.  At the bottom-left of
+   the image, north is at the top, parallel to the y-axis of the
+   image.
+
+setsky map "!" galactic(1950.0) 1993.8 aitoff 90 0 cc
+   [0.5d,0.007r] 180.0d
+    This creates an astrometry extension within the two-dimensional
+    NDF called map.  It is an Aitoff projection in the galactic
+    system at Besselian epoch 1950.0.  The centre of the image is
+    located at galactic longitude 90 degrees, latitude 0 degrees.
+    A pixel at that position is rectangular and has angular size
+    of 0.5 degrees by 0.007 radians.  The image was made at epoch
+    1993.8.  At the image centre, south is at the top and is
+    parallel to the y-axis of the image.
+
+setsky zodiac "!" ec 1983.4 or 10.3 -5.6 Pixel 20m 0.3d
+   pixelref=[9.5,-11.2]
+    This creates an astrometry extension within the
+    two-dimensional NDF called zodiac.  It is an orthographic
+    projection in the Ecliptic system at Besselian epoch 1950.0.
+    The reference point at pixel co-ordinates (9.5,-11.2)
+    corresponds to ecliptic longitude 10.3 degrees, latitude
+
+    -5.6 degrees.  A pixel at that position is square and has
+    angular size of 20 arcminutes.  The image was observed at
+    epoch 1983.4.  At the reference point the y-axis of the image
+    points to 0.3 degrees east of north.
+
+Notes
+
+-  SETSKY overwrites an existing astrometry extension within
+the NDF.
+
+-  WARNING: As is standard for NDF extensions, the transformation
+stored in the NDF will be propagated to new NDFs derived from it.
+However, certain operations will invalidate the transformation.
+These include configuration change, a shift of origin, and
+resampling.  Once there is a standard astrometry extension, KAPPA
+applications will be made to process that extension correctly, by
+modifying it where that's possible otherwise not copying it.
+
+Related_Applications
+
+   ASTROM; IRAS90: SKYALIGN, SKYBOX, SKYGRID, SKYLINE, SKYMARK,
+   SKYPOS, SKYWRITE.
+
+Authors
+
+MJC: Malcolm J. Currie (STARLINK)
+
+DSB: David S. Berry (STARLINK)
+
+History
+
+ 1994 April 13 (MJC):
+    Original version.
+
+ 28-OCT-1994 (DSB):
+    Added parameters POSITIONS and LOGFILE.  Modified to determine
+    projection parameters automatically from the data suplied for
+    POSITIONS.
+
+ 1995 February 13 (MJC):
+    Corrected typo's, errors in the examples, output the fitted
+    pixel size in arcseconds if appropriate.  Validated the
+    extension locator before annulling it.
+.endhelp

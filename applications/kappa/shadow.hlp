@@ -1,0 +1,87 @@
+.help shadow Starlink kappa
+.nf
+Enhances edges in a 2-dimensional NDF using a shadow effect.
+
+Usage:
+
+   shadow in out
+
+Description:
+
+   This routine enhances a 2-dimensional NDF by creating a
+   bas-relief or shadow effect, that causes features in an array to
+   appear as though they have been illuminated from the side by some
+   imaginary light source.  The enhancement is useful in locating
+   edges and fine detail in an array.
+
+Parameters
+
+For information on individual parameters, select from the list below:
+
+IN
+
+IN = NDF (Read)
+   The 2-dimensional NDF to be enhanced.
+
+OUT
+
+OUT = NDF (Write)
+   The output NDF containing the enhanced image.
+
+SHIFT
+
+SHIFT( 2 )  =  _INTEGER (Given)
+   The shift in x and y pixel indices to be used in the
+   enhancement.  If the x shift is positive, positive features
+   in the original array will appear to be lit from the positive
+   x direction, i.e. from the right.  Similarly, if the y shift
+   is positive, the light source will appear to be shining from
+   the top of the array.  A one- or two-pixel shift is normally
+   adequate. [1,1]
+
+TITLE
+
+TITLE = LITERAL (Read)
+   Value for the title of the output NDF.  A null value will cause
+   the title of the NDF supplied for parameter IN to be used
+   instead. [!]
+
+Examples
+
+shadow horse horse_bas
+   This enhances the NDF called horse by making it appear to be
+   illuminated from the top right, and stores the result in the
+   NDF called horse_bas.
+
+shadow out=aash in=aa [-1,-1] title="Bas relief"
+   This enhances the NDF called aa by making it appear to be
+   illuminated from the bottom left, and stores the result in the
+   NDF called aash, which has the title "Bas relief".
+
+Related_Applications
+
+   KAPPA: LAPLACE, MEDIAN; Figaro: ICONV3.
+
+Authors
+
+MJC: Malcolm J. Currie (STARLINK)
+
+History
+
+ 1995 April 28 (MJC):
+    Original NDF version.
+
+Implementation_Status
+
+   -  This routine correctly processes the AXIS, DATA, QUALITY,
+   VARIANCE, LABEL, TITLE, UNITS, and HISTORY components of an NDF data
+   structure and propagates all extensions.
+
+   -  Processing of bad pixels and automatic quality masking are
+   supported.
+
+   -  All non-complex numeric data types can be handled.
+
+   -  The output NDF will be trimmed compared with the input NDF
+   by the shifts applied.
+.endhelp

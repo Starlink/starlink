@@ -1,0 +1,129 @@
+.help ardmask Starlink kappa
+.nf
+Uses an ARD file to set some pixels of an NDF to be bad.
+
+Usage:
+
+   ardmask in ardfile out
+
+Description:
+
+   This task allows regions of a NDF's data array to be masked, so
+   that they can be excluded from subsequent data processing.  ARD
+   (ASCII Region Definition) descriptions stored in a text
+   file define which pixels of the data array are masked.  An
+   output NDF is created which is the same as the input file except
+   that all pixels specified by the ARD file have been assigned the
+   bad value.
+
+Parameters
+
+For information on individual parameters, select from the list below:
+
+ARDFILE
+
+ARDFILE = FILENAME (Read)
+   The name of the ARD file containing a description of the parts
+   of the image to be masked out, i.e. set to bad.  The suggested
+   default is the current value or ardfile.dat if there is no
+   current value.
+
+COSYS
+
+COSYS = LITERAL (Read)
+   The co-ordinate system to be used.  This can be either "World"
+   or "Data".  If COSYS = "World" the co-ordinates used in the
+   ARD file are pixel co-ordinates or indices.  If COSYS = "Data"
+   the co-ordinates used in the ARD file are interpreted as data
+   co-ordinates, provided the NDF contains axes that map onto
+   pixel co-ordinates using linear transformations.  If there are
+   no axes, pixel co-ordinates are assumed; if axes are present
+   but non-linear, the task fails.  COSYS="World" is recommended.
+   [Current co-ordinate system]
+
+IN
+
+IN = NDF (Read)
+   The name of the source NDF.
+
+OUT
+
+OUT = NDF (Write)
+   The name of the masked NDF.
+
+TITLE
+
+TITLE = LITERAL (Read)
+   Title for the output NDF structure.  A null value (!)
+   propagates the title from the input NDF to the output NDF. [!]
+
+Examples
+
+ardmask a1060 galaxies.ard a1060_sky title="A1060 galaxies masked"
+   This flags pixels defined by the ARD file galaxies.ard within
+   the NDF called a1060 to create a new NDF called a1060_sky.
+   a1060_sky has a title="A1060 galaxies masked".  This might be
+   to flag the pixels where bright galaxies are located to
+   exclude them from sky-background fitting.
+
+ardmask in=ic3374 ardfil=ardfile.txt out=ic3374a
+   This example uses as the source image the NDF called ic3374
+   and sets the pixels specified by the ARD description contained
+   in ardfile.txt to the bad value.  The resultant image is
+   output to the NDF called ic3374a.  The title is unchanged.
+
+ardmask in=ic3374 ardfil=ardfile.txt out=ic3374a cosys=data
+   As the previous example except that the ARD file is
+   written using data co-ordinates.
+
+ASCII-region-definition_Descriptors
+
+   The ARD file may be created by ARDGEN or written manually.  In the
+   latter case consult SUN/183 for full details of the ARD
+   descriptors and syntax; however, much may be learnt from looking
+   at the ARD files created by ARDGEN and the ARDGEN documentation.
+   There is also a summary with examples in the main body of SUN/95
+   and the online help.
+
+Related_Applications
+
+   KAPPA: ARDGEN.
+
+Authors
+
+GJP: Grant Privett (STARLINK)
+
+MJC: Malcolm J. Currie (STARLINK)
+
+History
+
+ 08-Jun-1994 (GJP):
+    Original version.
+
+ 1995 June 29 (MJC):
+    Converted for KAPPA use: completed and re-ordered the
+    prologue, lowercase usage and examples, various stylistic
+    changes, standard comment indentation, removed unnecessary
+    status checks and code, allowed all numeric data types, added
+    handling of data co-ordinates and COSYS parameter, propagates
+    other components (axes, units, variance and quality), made to
+    work on n-dimensional NDFs, validated the input text file and
+    removed the need for the leading caret, and made the output
+    TITLE a parameter.
+
+ 1996 July 31 (MJC):
+    Made ARDFILE have type FILENAME for IRAF usage.
+
+Implementation_Status
+
+   -  This routine correctly processes the AXIS, DATA, QUALITY,
+   LABEL, TITLE, UNITS, HISTORY, and VARIANCE components of an NDF
+   data structure and propagates all extensions.
+
+   -  Processing of bad pixels and automatic quality masking are
+   supported.
+
+   -  Bad pixels and automatic quality masking are supported.
+
+   -  All non-complex numeric data types can be handled.
+.endhelp

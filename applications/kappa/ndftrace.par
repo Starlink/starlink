@@ -1,0 +1,46 @@
+ndf,f,a,,,,"NDF structure to examine"
+aend,struct,h,,,,""
+
+aform,struct,h,,,,""
+
+alabel,struct,h,,,,""
+
+amono,struct,h,,,,""
+
+anorm,struct,h,,,,""
+
+astart,struct,h,,,,""
+
+atype,struct,h,,,,""
+
+aunits,struct,h,,,,""
+
+avariance,struct,h,,,,""
+
+axis,b,h,n,,,""
+bad,b,h,y,,,""
+badbits,s,h,"000000",,,""
+dims,struct,h,,,,""
+
+extname,struct,h,,,,""
+
+exttype,struct,h,,,,""
+
+form,s,h,"0",,,""
+fullaxis,b,h,n,,,"Display full axis information?"
+history,b,h,n,,,""
+label,s,h,"0",,,""
+lbound,struct,h,,,,""
+
+ndim,i,h,0,,,""
+nextn,i,h,0,,,""
+quality,b,h,n,,,""
+quiet,b,h,n,,,"Display no NDF information?"
+title,s,h,"0",,,""
+type,s,h,"0",,,""
+ubound,struct,h,,,,""
+
+units,s,h,"0",,,""
+variance,b,h,n,,,""
+width,struct,h,,,,""
+

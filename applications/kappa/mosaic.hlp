@@ -1,0 +1,352 @@
+.help mosaic Starlink kappa
+.nf
+    Merges several non-congruent 2-d data arrays into one output
+    data array
+ 
+   Up to 20 non-congruent 2-d data arrays may be input, along with
+   their relative offsets from the first data array, and these are
+   then made into a mosaic into one (usually larger) output 2-d data
+   array. Where the frames overlap, either the mean value or just the
+   sum is inserted into the output data array. Normally averaging is
+   performed. All data arrays are stored in IMAGE structures.
+   The magic-value method is used for processing bad data.  Bad
+   pixels are excluded from the averaging in overlap areas. Output
+   pixels that have been mapped or correspond to one or more input
+   arrays, yet have no good pixels contributing, are set to bad.
+   Pixels in the output data array not mapped by any of the input
+   arrays are set to zero.
+
+AUTHORS
+
+   Malcolm J. Currie  STARLINK (RAL::CUR)
+   Mark McCaughrean UOE (REVA::MJM)
+
+BUGS
+
+   None known.
+
+HISTORY
+
+   16-09-1985 : First implementation (REVA::MJM)
+   1986 Aug 7 : Renamed algorithm subroutines (MOSAIC_ADD to MOSCAD,
+                MOSAIC_DIV to MOSCDV). Correctly ordered arguments
+                in MOSCAD (7th to 5th). Added invocation to prologue
+                (RAL::CUR).
+   1986 Aug 29: Completed prologue (method and arguments), added
+                status checking, and NUMREA variable so that the
+                correct tidying of input structures is done. Nearly
+                conformed to Starlink standards (RAL::CUR).
+   1987 Oct 16: Reordered tidying and extra status checks
+                (RAL::CUR)
+   1988 Mar 16: Substituted AIF_ANTMP to annul workspace
+                (RAL::CUR).
+   1988 Mar 17: Referred to `array' rather than `image'
+                (RAL::CUR)
+   1988 May 31: Separated normalisation operation, and added
+                average option (RAL::CUR).
+   1988 Jun 21: More reporting of error context, added good data
+                flag and checking (RAL::CUR)
+   1988 Oct 20: Bug fix in offsets introduced 1988 May 31
+                (RAL::CUR)
+   1989 Jun 13: Allow for processing primitive NDFs (RAL::CUR)
+   1989 Aug  7: Passed array dimensions as separate variables
+                to MOSCAD, MOSCDV and ZERO2D (RAL::CUR).
+   1989 Dec 21: Workspace managed by AIF_TEMP (RAL::CUR).
+   1990 Jan 13: Input data now unmapped on exit (RAL::CUR).
+   1991 Oct 25: Propagates UNITS, LABEL, and HISTORY (RAL::CUR).
+   1992 Feb 25: Limited processing of simple NDFs (RAL::CUR).
+   1992 Mar  3: Replaced AIF parameter-system calls by the extended
+                PAR library (RAL::CUR).
+
+PARAMETERS
+
+   NUMBER  =  INTEGER( READ )
+       Number of data arrays to be merged
+   AVERAGE  = LOGICAL( READ )
+       If true overlap regions are averaged, alternatively, they are
+         summed
+   INPICn  =  IMAGE( READ )
+       nth IMAGE structure containing a data array to be a
+         constituent of a mosaic
+   OUTPIC  =  IMAGE( WRITE )
+       Output IMAGE structure containing the merged data array
+   OTITLE  =  CHAR( READ )
+       Title for the output IMAGE structure
+   XOFFSET =  INTEGER( READ )
+       x offset of nth data array from the first, in the sense of the
+       x origin of the nth data array minus the x origin of the
+       first
+   YOFFSET =  INTEGER( READ )
+       y offset of nth data array from the first, in the sense of the
+       y origin of the nth data array minus the y origin of the
+       first.
+
+NUMBER
+
+  keyword     'NUMBER'
+  position    1
+  type        '_INTEGER'
+  access      'READ'
+  vpath       'PROMPT'
+  ppath       'CURRENT,DYNAMIC'
+  prompt      'Number of images to be put in a mosaic'
+  help        'Give the total number of data arrays be to made into a 
+              mosaic data array (max. 20)'
+ #range       1, 20
+
+INPIC1
+
+  keyword     'INPIC1'
+  type        'IMAGE'
+  access      'READ'
+  vpath       'PROMPT'
+  ppath       'GLOBAL'
+  association '<-GLOBAL.DATA_ARRAY'
+  prompt      'Image to be added'
+  help        'Name of the IMAGE structure containing the next 2-d 
+              data array to be added'
+
+INPIC2
+
+  keyword     'INPIC2'
+  type        'IMAGE'
+  access      'READ'
+  vpath       'PROMPT'
+  prompt      'Image to be added'
+  help        'Name of the IMAGE structure containing the next 2-d 
+              data array to be added'
+
+INPIC3
+
+  keyword     'INPIC3'
+  type        'IMAGE'
+  access      'READ'
+  vpath       'PROMPT'
+  prompt      'Image to be added'
+  help        'Name of the IMAGE structure containing the next 2-d 
+              data array to be added'
+
+INPIC4
+
+  keyword     'INPIC4'
+  type        'IMAGE'
+  access      'READ'
+  vpath       'PROMPT'
+  prompt      'Image to be added'
+  help        'Name of the IMAGE structure containing the next 2-d 
+              data array to be added'
+
+INPIC5
+
+  keyword     'INPIC5'
+  type        'IMAGE'
+  access      'READ'
+  vpath       'PROMPT'
+  prompt      'Image to be added'
+  help        'Name of the IMAGE structure containing the next 2-d 
+              data array to be added'
+
+INPIC6
+
+  keyword     'INPIC6'
+  type        'IMAGE'
+  access      'READ'
+  vpath       'PROMPT'
+  prompt      'Image to be added'
+  help        'Name of the IMAGE structure containing the next 2-d 
+              data array to be added'
+
+INPIC7
+
+  keyword     'INPIC7'
+  type        'IMAGE'
+  access      'READ'
+  vpath       'PROMPT'
+  prompt      'Image to be added'
+  help        'Name of the IMAGE structure containing the next 2-d 
+              data array to be added'
+
+INPIC8
+
+  keyword     'INPIC8'
+  type        'IMAGE'
+  access      'READ'
+  vpath       'PROMPT'
+  prompt      'Image to be added'
+  help        'Name of the IMAGE structure containing the next 2-d 
+              data array to be added'
+
+INPIC9
+
+  keyword     'INPIC9'
+  type        'IMAGE'
+  access      'READ'
+  vpath       'PROMPT'
+  prompt      'Image to be added'
+  help        'Name of the IMAGE structure containing the next 2-d 
+              data array to be added'
+
+INPIC10
+
+  keyword     'INPIC10'
+  type        'IMAGE'
+  access      'READ'
+  vpath       'PROMPT'
+  prompt      'Image to be added'
+  help        'Name of the IMAGE structure containing the next 2-d 
+              data array to be added'
+
+INPIC11
+
+  keyword     'INPIC11'
+  type        'IMAGE'
+  access      'READ'
+  vpath       'PROMPT'
+  prompt      'Image to be added'
+  help        'Name of the IMAGE structure containing the next 2-d 
+              data array to be added'
+
+INPIC12
+
+  keyword     'INPIC12'
+  type        'IMAGE'
+  access      'READ'
+  vpath       'PROMPT'
+  prompt      'Image to be added'
+  help        'Name of the IMAGE structure containing the next 2-d 
+              data array to be added'
+
+INPIC13
+
+  keyword     'INPIC13'
+  type        'IMAGE'
+  access      'READ'
+  vpath       'PROMPT'
+  prompt      'Image to be added'
+  help        'Name of the IMAGE structure containing the next 2-d 
+              data array to be added'
+
+INPIC14
+
+  keyword     'INPIC14'
+  type        'IMAGE'
+  access      'READ'
+  vpath       'PROMPT'
+  prompt      'Image to be added'
+  help        'Name of the IMAGE structure containing the next 2-d 
+              data array to be added'
+
+INPIC15
+
+  keyword     'INPIC15'
+  type        'IMAGE'
+  access      'READ'
+  vpath       'PROMPT'
+  prompt      'Image to be added'
+  help        'Name of the IMAGE structure containing the next 2-d 
+              data array to be added'
+
+INPIC16
+
+  keyword     'INPIC16'
+  type        'IMAGE'
+  access      'READ'
+  vpath       'PROMPT'
+  prompt      'Image to be added'
+  help        'Name of the IMAGE structure containing the next 2-d 
+              data array to be added'
+
+INPIC17
+
+  keyword     'INPIC17'
+  type        'IMAGE'
+  access      'READ'
+  vpath       'PROMPT'
+  prompt      'Image to be added'
+  help        'Name of the IMAGE structure containing the next 2-d 
+              data array to be added'
+
+INPIC18
+
+  keyword     'INPIC18'
+  type        'IMAGE'
+  access      'READ'
+  vpath       'PROMPT'
+  prompt      'Image to be added'
+  help        'Name of the IMAGE structure containing the next 2-d 
+              data array to be added'
+
+INPIC19
+
+  keyword     'INPIC19'
+  type        'IMAGE'
+  access      'READ'
+  vpath       'PROMPT'
+  prompt      'Image to be added'
+  help        'Name of the IMAGE structure containing the next 2-d 
+              data array to be added'
+
+INPIC20
+
+  keyword     'INPIC20'
+  type        'IMAGE'
+  access      'READ'
+  vpath       'PROMPT'
+  prompt      'Image to be added'
+  help        'Name of the IMAGE structure containing the next 2-d 
+              data array to be added'
+
+XOFFSET
+
+  keyword     'XOFFSET'
+  type        '_INTEGER'
+  vpath       'PROMPT'
+  ppath       'CURRENT,DYNAMIC'
+  prompt      'x offset of the array from the first'
+  help        'Give the x offset in pixels of the current data array 
+              from the first data array input'
+
+YOFFSET
+
+  keyword     'YOFFSET'
+  type        '_INTEGER'
+  vpath       'PROMPT'
+  ppath       'CURRENT,DYNAMIC'
+  prompt      'y offset of the array from the first'
+  help        'Give the y offset in pixels of the current data array 
+              from the first data array input'
+
+OUTPIC
+
+  keyword     'OUTPIC'
+  type        'IMAGE'
+  access      'WRITE'
+  vpath       'PROMPT'
+  association '->GLOBAL.DATA_ARRAY'
+  prompt      'Mosaic image'
+  help        'Name given to the IMAGE structure to hold the mosaic 
+              data array'
+
+OTITLE
+
+  keyword     'OTITLE'
+  type        '_CHAR'
+  vpath       'DEFAULT'
+  prompt      'Title for output image'
+  default     'KAPPA - Mosaic'
+  help        'Character string used as a title for the output IMAGE 
+              structure.'
+
+AVERAGE
+
+  keyword     'AVERAGE'
+  type        '_LOGICAL'
+  access      'READ'
+  vpath       'DEFAULT'
+  prompt      'Are overlapped input pixels to be averaged in the 
+              output array?'
+  help        'Input pixels may be occupy the same position in the 
+              output array. So output pixels can be averaged or 
+              summed'
+  default     YES
+.endhelp

@@ -1,0 +1,95 @@
+.help setvar Starlink kappa
+.nf
+Set new values for the variance component of an NDF data
+structure.
+
+Usage:
+
+   ndf variance
+
+Description:
+
+   This routine sets new values for the variance component of an NDF
+   data structure. The data structure is accessed in `update' mode,
+   and new variance values are generated from the NDF's data array
+   by means of a Fortran-like arithmetic expression.  Any previous
+   variance information is over-written with the new values.
+   Alternatively, if a `null' value (!) is given for the variance,
+   then any pre-existing variance information is erased.
+
+Parameters
+
+For information on individual parameters, select from the list below:
+
+NDF
+
+NDF = NDF (Read and Write)
+   The NDF data structure whose variance values are to be
+   modified.
+
+VARIANCE
+
+VARIANCE = LITERAL (Read)
+   A Fortran-like arithmetic expression giving the variance value
+   to be assigned to each pixel in terms of the variable DATA,
+   which represents the value of the corresponding data array
+   pixel.  For example, VARIANCE="DATA" implies normal `root N'
+   error estimates, whereas VARIANCE="DATA + 50.7" might be used
+   if a sky background of 50.7 units had previously been
+   subtracted.
+
+   If a `null' value (!) is given for this parameter, then no new
+   variance component will be created and any pre-existing
+   variance values will be erased.
+
+Examples
+
+setvar ngc4709 data
+   This sets the variance component within the NDF structure
+   ngc4709 to equal its corresponding data-array component.
+
+setvar ndf=arcspec "data - 0.31"
+   This sets the variance component within the NDF structure
+   arcspec to be its corresponding data-array component less a
+   constant 0.31.
+
+setvar cube4 variance=!
+   This erases the values of the variance component within
+   the NDF structure cube4, if it exists.
+
+Notes
+
+-  All of the standard Fortran 77 intrinsic functions are
+available for use in the variance expression, plus a few others
+(see SUN/61 for details and an up-to-date list).
+
+-  Calculations are performed using real arithmetic (or double
+precision if appropriate) and are constrained to be non-negative.
+
+-  The data type of the variance component is set to match that of
+the data component.
+
+Related_Applications
+
+   KAPPA: ERRCLIP; Figaro: GOODVAR.
+
+Authors
+
+RFWS: R.F. Warren-Smith (STARLINK)
+
+MJC: Malcolm J. Currie (STARLINK)
+
+History
+
+ 19-DEC-1989 (RFWS):
+    Original version.
+
+ 9-APR-1990 (RFWS):
+    Changed name.
+
+ 1992 January 22 (MJC):
+    Added Usage and Examples items.
+
+ 1995 April 24 (MJC):
+    Made usage and examples lowercase.  Added Related Applications.
+.endhelp

@@ -1,0 +1,117 @@
+.help compick Starlink kappa
+.nf
+Reduces the size of an NDF by picking equally spaced pixels.
+
+Usage:
+
+   compick in out compress [origin]
+
+Description:
+
+   This application takes an NDF data structure and reduces it in
+   size by integer factors along each dimension.  The input NDF is
+   sampled at these constant compression factors or intervals along
+   each dimension, starting from a defined origin, to form an output
+   NDF structure.  The compression factors may be different in each
+   dimension.
+
+Parameters
+
+For information on individual parameters, select from the list below:
+
+COMPRESS
+
+COMPRESS( ) = _INTEGER (Read)
+   Linear compression factors to be used to create the output
+   NDF.  There should be one for each dimension of the NDF.  If
+   fewer are supplied the last value in the list of compression
+   factors is given to the remaining dimensions.  Thus if a
+   uniform compression is required in all dimensions, just one
+   value need be entered.  All values are constrained to be in
+   the range one to the size of its corresponding dimension.  The
+   suggested default is the current value.
+
+IN
+
+IN  = NDF (Read)
+   The NDF structure to be reduced in size.
+
+ORIGIN
+
+ORIGIN( ) = _INTEGER (Read)
+   The pixel indices of the first pixel to be selected.
+   Thereafter the selected pixels will be spaced equally by
+   COMPRESS() pixels.  The origin must lie within the first
+   selection intervals, therefore the ith origin must be in the
+   range LBND(i) to LBND(i)+COMPRESS(i)-1, where LBND(i) is the
+   lower bound of the ith dimension.  The suggested default is
+   the first array element.
+
+OUT
+
+OUT = NDF (Write)
+   NDF structure to contain compressed version of the input NDF.
+
+TITLE
+
+TITLE = LITERAL (Read)
+   Title for the output NDF structure.  A null value (!)
+   propagates the title from the input NDF to the output NDF. [!]
+
+Examples
+
+compick cosmos galaxy 4
+   This compresses the NDF called cosmos selecting every fourth
+   array element along each dimension, starting from the first
+   element in the NDF, and stores the reduced data in the NDF
+   called galaxy.
+
+compick cosmos galaxy 4 [3,2]
+   This compresses the two-dimensional NDF called cosmos
+   selecting every fourth array element along each dimension,
+   starting from the pixel index (3,2), and stores the
+   reduced data in the NDF called galaxy.
+
+compick in=arp244 compress=[1,1,3] out=arp244cs
+   Suppose arp244 is a huge NDF storing a spectral-line data
+   cube, with the third dimension being the spectral axis.
+   This command compresses arp244 in the spectral dimension,
+   sampling every third pixel, starting from the first wavelength
+   at each image position, to form the NDF called arp244cs.
+
+Notes
+
+Each output dimension is calculated to give the most elements
+possible given the compression factor.  It is evaluated from the
+expression (input dimension - %ORIGIN) / %COMPRESS + 1.
+
+Related_Applications
+
+   KAPPA: BLOCK, COMPADD, COMPAVE, PIXDUPE, SQORST, TRANSFORMER;
+   Figaro: ISTRETCH.
+
+Authors
+
+MJC: Malcolm J. Currie (STARLINK)
+
+History
+
+ 1991 November 27 (MJC):
+    Original version.
+
+ 1995 January 11 (MJC):
+    Made TITLE propagate from the input NDF.
+
+Implementation_Status
+
+   -  This routine correctly processes the AXIS, DATA, QUALITY,
+   VARIANCE, LABEL, TITLE, UNITS, and HISTORY components of the
+   input NDF and propagates all extensions.
+
+   -  Processing of bad pixels and automatic quality masking are
+   supported.
+
+   -  All non-complex numeric data types can be handled.
+
+   -  Any number of NDF dimensions is supported.
+.endhelp

@@ -1,0 +1,4 @@
+in,f,a,,,,"NDF to be transformed"
+out,f,a,,,,"NDF after transformation"
+numbin,i,h,2048,,,"Number of histogram bins"
+title,s,h,INDEF,,,"Title for output NDF"

@@ -1,0 +1,116 @@
+.help picgrid Starlink kappa
+.nf
+Creates an array of FRAME pictures
+
+Usage:
+
+   picgrid xpic ypic
+
+Description:
+
+   This command creates a two-dimensional grid of equally sized
+   new FRAME pictures in the graphics database.  The array of
+   pictures do not have to abut, but abutting is the default.  The
+   new pictures are formed within either the current or BASE
+   picture, and they adopt the world co-ordinate system of that
+   enclosing picture.  On completion, the bottom-left picture in the
+   array becomes the current picture.
+
+   For easy reference in later processing the pictures have integer
+   labels.  The numbering starts at a defined value, usually one,
+   and increments by one for each new picture starting from the
+   bottom-left corner and moving from left to right to the end of
+   the line.  This is repeated in each line until the top-right
+   picture.
+
+   This command is a synonym for "picdef array 1.0 false prefix=''"}.
+
+Parameters
+
+For information on individual parameters, select from the list below:
+
+CURRENT
+
+CURRENT = _LOGICAL (Read)
+   TRUE if the new pictures are to lie within the current picture,
+   otherwise the new pictures can lie anywhere within the BASE
+   picture.  In other words, when CURRENT is TRUE the current picture
+   is the reference picture, and when it is FALSE the BASE is the
+   reference picture. [FALSE]
+
+DEVICE
+
+DEVICE = DEVICE (Read)
+   The graphics device. [Current graphics device]
+
+FILL
+
+FILL = _REAL (Read)
+   The linear filling factor for the array.  In other words the
+   fractional size (applied to both co-ordinates) of the new
+   picture within each of the XPIC * YPIC abutted sections of
+   the picture being sub-divided.  Each new picture is located
+   centrally within the section.  A filling factor of 1.0 means
+   that the pictures in the array abut.  Smaller factors permit a
+   gap between the pictures.  For example, FILL = 0.9 would give
+   a gap between the created pictures of 10 per cent of the
+   height and width of each picture, with exterior borders of 5
+   per cent.  FILL must lie between 0.1 and 1.0. [1.0]
+
+LABELNO
+
+LABELNO = _INTEGER (Read)
+   The number used to form the label for the first (bottom-left)
+   picture.  It cannot be negative. [1]
+
+OUTLINE
+
+OUTLINE = _LOGICAL (Read)
+   If TRUE, a box that delimits the new picture is drawn. [TRUE]
+
+XPIC
+
+XPIC = _INTEGER (Read)
+   The number of new pictures to be formed horizontally in the
+   BASE picture.  The total number of new pictures is XPIC * YPIC.
+   The value must lie in the range 1--20.  The suggested default is 2.
+
+YPIC
+
+YPIC = _INTEGER (Read)
+   The number of new pictures to be formed vertically in the
+   BASE picture.  The total number of new pictures is XPIC * YPIC.
+   The value must lie in the range 1--20.  The suggested default is 2.
+   The suggested default is the value of parameter XPIC.
+
+Examples
+
+picgrid 3 2
+   Creates six new equally sized and abutting FRAME pictures within
+   the full display area of the current graphics device.  All the
+   pictures are outlined.  They have labels 1, 2, 3, 4, 5, and 6.
+   The bottom-left picture (1) becomes the current picture.
+
+picgrid xpic=3 ypic=2 fill=0.8 labelno=11 nooutline
+   As above except that the pictures do not abut since each is
+   0.8 times smaller in both dimensions, the labels are 11 to
+   16, and there are no picture outlines drawn.
+
+picgrid device=xw current \
+   This creates a 2-by-2 grid of new FRAME pictures within the
+   current picture on device xw.
+
+Related_Applications
+
+   KAPPA: PICCUR, PICDEF, PICGRID, PICSEL.
+
+Authors
+
+MJC: Malcolm J. Currie  (STARLINK)
+
+History
+
+ 1995 August 23 (MJC):
+    Original version.
+
+.endhelp

@@ -1,0 +1,480 @@
+.help getting_data_into_k Starlink kappa
+.nf
+KAPPA utilises general data structures within an HDS container file,
+with file extension .sdf.  Elsewhere in this help, processing was
+performed on data in this format generated from within KAPPA.
+Generally, you will already have data in `foreign' formats, that is
+formats other than the Starlink standard, particularly in the FITS
+(Flexible Image Transport System), IRAF, and Figaro DST formats.
+The topic "Automatic_Data_Conversion" describes how you can make
+these work `directly' with KAPPA.
+
+You can run CONVERT (cf. SUN/55) directly to perform conversions.
+There is also TRANDAT, which will read a text file of data values,
+or co-ordinates and data values into an NDF, and ASCIN in the
+SPECDRE package (SUN/140).
+
+
+FITS_Readers
+
+Automatic conversion does not allow you the full control of the
+conversion that direct use of a FITS reader offers and it does not
+deal with the special properties of tape.  FITSIN will read, amongst
+others, simple FITS files including blocked or group format and
+floating-point data from tape.  FITSDIN is its counterpart for disc
+files.  The sub-topics show the FITS readers in action. 
+
+
+Tape
+
+
+FITSIN reads FITS files stored on tape.  For efficiency, you should
+select the ``no-rewind'' device for the particular tape drive, for
+example /dev/nrmt0h on OSF and /dev/rmt/1n on Solaris.
+
+We ask for the second file on the tape, and the headers are
+displayed so we can decide whether this is the file we want.  It is
+so we supply a name of an NDF to receive the FITS file.  If it
+wasn't we would enter ! to the OUT prompt.  The FMTCNV parameter
+asks whether the data are to be converted to _REAL, using the FITS
+keywords BSCALE and BZERO, if present.  If you are wondering why
+there is (1) after the file number, that's present because FITS
+files can have sub-files, stored as FITS extensions. 
+
+     % fitsin
+     MT - Tape deck /@/dev/nrmt0h/ >
+     The tape is currently positioned at file 1.
+     FILES - Give a list of the numbers of the files to be processed > 2
+     File # 2(1)  Descriptors follow:
+     SIMPLE  =                    T
+     BITPIX  =                   16
+     NAXIS   =                    2
+     NAXIS1  =                  400
+     NAXIS2  =                  590
+     DATE    = '03/07/88'                    /Date tape file created
+     ORIGIN  = 'ING     '                    /Tape writing institution
+     OBSERVER= 'CL      '                    /Name of the Observer
+     TELESCOP= 'JKT     '                    /Name of the Telescope
+     INSTRUME= 'AGBX    '                    /Instrument configuration
+     OBJECT  = 'SYS:ARCCL.002'               /Name of the Object
+     BSCALE  =                  1.0          /Multiplier for pixel values
+     BZERO   =                  0.0          /Offset for pixel values
+     BUNIT   = 'ADU     '                    /Physical units of data array
+     BLANK   =                    0          /Value indicating undefined pixel
+                 :                :                :
+                 :                :                :
+                 :                :                :
+     END
+     FMTCNV - Convert data? /NO/ >
+     OUT - Output image > ff1
+     Completed processing of tape file 2 to ff1.
+     MORE - Any more files? /NO/ >
+
+We can trace the structure to reveal the 2-byte integer CCD image.
+Notice that the FITS headers are stored verbatim in a component
+.MORE.FITS. This is the FITS extension.  The extension contents can
+be listed with FITSLIST.  There is more on this NDF extension and
+its purpose in sub-topic "FITS_Airlock". 
+
+     % hdstrace ff1
+     FF1  <NDF>
+ 
+        DATA_ARRAY(400,590)  <_WORD>   216,204,220,221,202,222,220,206,218,221,
+                                       ... 216,218,218,204,221,218,219,222,221,218
+        TITLE          <_CHAR*13>      'SYS:ARCCL.002'
+        UNITS          <_CHAR*3>       'ADU'
+        MORE           <EXT>           {structure}
+           FITS(84)       <_CHAR*80>      'SIMPLE  =                    T','BI...'
+                                          ... '   ...','         ING PACKEND','END'
+   
+     End of Trace.
+
+If you have many FITS files to read there is a quick method for
+extracting all files or a selection.  In automatic mode the output
+files are generated without manual intervention and the headers
+aren't reported for efficiency.  Should you want to see the headers,
+write them to a text file via the LOGFILE parameter.  The cost of
+automation is a restriction on the names of the output files, but
+if you have over a hundred files on a tape are you really going to
+name them individually?
+
+The following example extracts the fourth to sixth, and eighth files.
+Note that the [] are needed because the value for parameter FILES is
+a character array. 
+
+     % fitsin auto
+     MT - Tape deck /@/dev/nrmt0h/ >
+     FMTCNV - Convert data? /NO/ > y
+     PREFIX - Prefix for the NDF file names? /'FITS'/ > JKT
+     FILES - Give a list of the numbers of the files to be processed > [4-6,8]
+     Completed processing of tape file 4 to JKT4.
+     Completed processing of tape file 5 to JKT5.
+     Completed processing of tape file 6 to JKT6.
+     Completed processing of tape file 8 to JKT8.
+     MORE - Any more files? /NO/ >
+
+You can list selected FITS headers from a FITS tape without
+attempting to read in the data into NDFs by using FITSHEAD.  You can
+redirect its output to a file to browse at your leisure, and
+identify the files you want to convert.  So for instance, 
+
+     % fitshead /dev/nrmt1h > headers.lis
+
+lists all the FITS headers from a FITS tape on device /dev/nrmt1h
+to file headers.lis.
+
+After running FITSIN you may notice a file USRDEVDATASET.sdf in
+the current directory.  This HDS file records the current position
+of the tape, so you can use FITSIN to read a few files, and then run
+it again a little later, and FITSIN can carry on from where you left
+off.  In other words FITSIN does not have to rewind to the beginning
+of the tape to count files.  When you're finished you should delete
+this file.
+
+
+Disc
+
+Until comparatively recently there was officially no such thing as
+disc FITS.  However, for many years ad hoc implementations have
+existed.  Of these, FITSDIN will handle files adhering to the FITS
+rules for blocking (and more), but it doesn't process byte-swapped
+`FITS' files.  Thus it can process files with fixed-length records
+of semi-arbitrary length; so, for example, files mangled during
+network transfer, which have 512-byte records rather than the
+customary 2880, may be read.  However, it will not handle, VAX FITS
+files as may be produced with Figaro's WDFITS.  FITSDIN will accept
+a list of files with wildcards.  However, a comma-separated list
+must be enclosed in quotation marks.  Also wildcards must be
+protected. Here are some examples so you get the idea. 
+
+     % fitsdin '*.fit'
+     % fitsdin \*.fit
+     ICL> fitsdin *.fit
+     % fitsdin '"i*.fit,abc123.fts"'
+     ICL> fitsdin "i*.fit,abc123.fts"
+
+In the following example a floating-point file is read (BITPIX=-32)
+and so FMTCNV is not required.
+
+     % fitsdin '*.fits'
+
+        2 files to be processed...
+
+     Processing file number 1: /home/scratch/dro/gr.fits.
+     File /scratch/dro/gr.fits(1)  Descriptors follow:
+     SIMPLE  =                    T / Standard FITS format
+     BITPIX  =                  -32 / No. of bits per pixel
+     NAXIS   =                    2 / No. of axes in image
+     NAXIS1  =                  512 / No. of pixels
+     NAXIS2  =                  256 / No. of pixels
+     EXTEND  =                    T / FITS extension may be present
+     BLOCKED =                    T / FITS file may be blocked
+     
+     BUNIT   = 'none given      '   / Units of data values
+     
+     CRPIX1  =   1.000000000000E+00 / Reference pixel
+     CRVAL1  =   0.000000000000E+00 / Coordinate at reference pixel
+     CDELT1  =   1.000000000000E+00 / Coordinate increment per pixel
+     CTYPE1  = '                '   / Units of coordinate
+     CRPIX2  =   1.000000000000E+00 / Reference pixel
+     CRVAL2  =   0.000000000000E+00 / Coordinate at reference pixel
+     CDELT2  =   1.000000000000E+00 / Coordinate increment per pixel
+     CTYPE2  = '                '   / Units of coordinate
+ 
+     ORIGIN  = 'ESO-MIDAS'          / Written by MIDAS
+     OBJECT  = 'artificial image'   / MIDAS desc.: IDENT(1)
+             :                :                :
+             :                :                :
+             :                :                :
+     HISTORY  ESO-DESCRIPTORS END     ................
+     
+     END
+     OUT - Output image > gr
+     Completed processing of disk file /home/scratch/dro/gr.fits to gr.
+     File has illegal-length blocks (512). Blocks should be a multiple (1--10) of the
+     FITS record length of 2880 bytes.
+     Processing file number 2: /home/scratch/dro/indef.fits.
+     File /home/scratch/dro/indef.fits(1)  Descriptors follow:
+     SIMPLE  =                    T  /  FITS STANDARD
+     BITPIX  =                   32  /  FITS BITS/PIXEL
+     NAXIS   =                    2  /  NUMBER OF AXES
+     NAXIS1  =                  256  /
+     NAXIS2  =                   20  /
+     BSCALE  =      3.7252940008E28  /  REAL = TAPE*BSCALE + BZERO
+     BZERO   =      7.9999999471E37  /
+     OBJECT  = 'JUNK[1/1]'  /
+     ORIGIN  = 'KPNO-IRAF'  /
+             :                :                :
+             :                :                :
+             :                :                :
+     END
+     OUT - Output image > iraf
+     Completed processing of disk file /home/scratch/dro/indef.fits to iraf.
+
+NDFTRACE shows that the object name is written to the NDF's title,
+that axes derived from the FITS headers are present, and that gr is
+a _REAL NDF.
+
+     % ndftrace gr
+ 
+        NDF structure /home/scratch/dro/iraf:
+           Title:  artificial image
+           Units:  none given
+ 
+        Shape:
+           No. of dimensions:  2
+           Dimension size(s):  512 x 256
+           Pixel bounds     :  1:512, 1:256
+           Total pixels     :  131072
+ 
+        Axes:
+           Axis 1:
+              Label : Axis 1
+              Units : pixel
+              Extent: -0.5 to 511.5
+ 
+           Axis 2:
+              Label : Axis 2
+              Units : pixel
+              Extent: -0.5 to 255.5
+ 
+        Data Component:
+           Type        :  _REAL
+           Storage form:  PRIMITIVE
+           Bad pixels may be present
+ 
+        Extensions:
+              FITS             <_CHAR*80>
+ 
+Both FITSIN and FITSDIN write the FITS headers into an NDF extension
+called FITS within your NDF.  The extension is a literal copy of all
+the 80-character `card images' in order.  These can be inspected or
+written to a file via the command FITSLIST.  There is more on this
+NDF extension and its purpose in topic "FITS_Airlock".
+
+
+FITS_Airlock
+
+
+
+NDF_Extensions
+
+An important feature of the NDF is that it is designed to be
+extensible.  The NDF has components whose meanings are well defined
+and universal, and so they can be accessed by general-purpose
+software, such as KAPPA and CONVERT provide; but the NDF also allows
+independent extensions to be defined and added, which can store
+auxiliary information to suit the needs of a specialised software
+package.  (Note that the term extension here refers to a structure
+within the NDF for storing additional data, and is neither the file
+extension .sdf nor extensions like BINTABLE within the FITS file.)
+An extension is only processed by software that understands the
+meanings obeys the processing rules of the various components of
+the extension. Other programmes propagate the extension information
+unaltered.
+
+The existence of extensions makes it straightforward to write
+general utilities for converting an arbitrary format into an NDF.
+The idea being that every specialist package should not have to
+have its own conversion tools such as a FITS reader.  However, this
+still leaves the additional data that requires specialist knowledge
+to move it into the appropriate extension components.  The aim is to
+make the conversions themselves extensible, with add-on operations
+to move the specialist information to and from the extensions.  This
+is where the FITS `airlock' comes in.
+
+The FITS data format comprises a header followed by the data array
+or table.  The header contains a series of 80-character lines each
+of which contains the keyword name, a value and an optional comment.
+There are also some special keywords for commentary.  The meanings
+of most keywords are undefined, and so can be used to transport
+arbitrary ancillary information, subject to FITS syntax limitations.
+There is a special NDF extension called FITS, which mirrors this
+functionality, and may be added to an NDF.  It therefore can act as
+an airlock between the general-purpose conversion tools and
+specialist packages.
+
+
+Importing_and_Exporting_from_and_to_the_FITS_Extension
+
+
+The FITS extension comprises a 1-dimensional array of 80-character
+strings that follow FITS-header formatting rules.  In the case of
+FITSIN and FITSDIN, each FITS extension is a verbatim copy of the
+FITS header of the input file.  Other conversion tools like
+IRAF2NDF and UNF2NDF of CONVERT can also create a FITS extension in
+the same fashion.  On export, standard conversion tools propagate
+the FITS extension to any FITS headers or equivalent in the foreign
+format.  However, information which is derivable from the standard
+NDF components, such as the array dimensions, data units, and
+linear axes, replaces any equivalent headers from FITS extension.
+
+You use your knowledge, or the writer of the specialist package
+provides import tools, to recognise certain FITS keywords and to
+attribute meaning to them, and then to move or process their values
+to make the specialist extensions.  One such is the PREPARE task in
+IRAS90.  Similarly, the reverse operation---exporting the extension
+information---can occur too, prior to converting the NDF into
+another data format.
+
+KAPPA offers two simple tools for the importing and exporting
+of extension information: FITSIMP and FITSEXP.  They both use a text
+file which acts as a translation table between the FITS keyword and
+extension components.  Starting with FITSIMP, its translation table
+might look like this.
+
+     ORDER_NUMBER _INTEGER  ORDNUM 
+     PLATE_SCALE  _REAL SCALE         ! The plate scale in arcsec/mm
+     SMOOTHED  _LOGICAL FILTERED 
+
+It consists of three fields: the first is the name of the component
+in the chosen extension, the second is the HDS data type of that
+component, and the third is the FITS keyword.  Optional comments can
+appear following an exclamation mark.  So if we placed these lines
+in file imptable, we could create an extension called MYEXT of data
+type MJC_EXT (if it did not already exist) containing components
+ORDER_NUMBER, PLATE_SCALE, and SMOOTHED.
+
+     % fitsimp mydata imptable myext mjc_ext
+
+Should any of the keywords not exist in the FITS extension, you'll
+be warned.  If the extension already exists, you don't need to
+specify the extension data type.  FITSIMP will even handle
+hierarchical keywords and those much-loved ING packets from La
+Palma.
+
+Going in the opposite direction, the text translation file could look
+like this
+
+     MYEXT.ORDER_NUMBER  ORDNUM(LAST) The spectral order number
+     MYEXT.PLATE_SCALE   SCALE   The plate scale in arcsec/mm
+     MYEXT.SMOOTHED  FILTERED 
+
+where the first column is the `name' of the extension component to
+be copied to the FITS extension.  The `name' includes the extension
+name and substructures.  The second column gives the FITS keyword to
+which to write the value.  A further keyword in parentheses
+instructs FITSEXP to place the new FITS header immediately before
+the header with that keyword.  If the second keyword is absent from
+the translation-table record or the FITS extension, the new header
+appears immediately before the END header line in the FITS
+extension.  Thus the value of ORDER_NUMBER in extension MYEXT,
+creates a new keyword in the FITS extension called ORDNUM, and it is
+located immediately prior the keyword LAST.
+
+
+Listing_the_FITS_extension_and_keywords
+
+
+If you don't want to be bothered with NDF extensions, you might just
+want to know the value of some FITS keyword, say the exposure time,
+as part of your data processing.  FITSLIST lists the contents of the
+FITS extension of an NDF or file.  You can even search for keywords
+with grep.
+
+     % fitslist myndf | grep "ELAPSED ="
+
+This would find the keyword ELAPSED in the FITS extension of NDF
+myndf.  (Keywords are 8 characters long and those with values are
+immediately followed by an equals sign.)  However, the recommended
+way is to use the FITSVAL command.  Since this command only reports
+the value, it is particularly useful in scripts that need
+ancillary-data values during processing.  The following obtains the
+value of keyword ELAPSED.
+
+     % fitsval myndf ELAPSED
+
+In a script you may need to know whether the keyword exists and take
+appropriate action.
+
+     filterpre = `fitsexist myndf filter`
+     if ( $filterpre == "TRUE" ) then
+        filter = `fitsval myndf filter`
+     else
+        prompt -n "Filter > "
+        set filter = $<
+     endif
+
+Shell variable filterpres would be assigned "TRUE" when the FILTER
+card is present, and "FALSE" otherwise.  (The ` ` quotes cause the
+enclosed command to be executed.)  So the user of the script would
+be prompted for a filter name whenever the NDF did not contain that
+information.
+
+
+Creating_and_Editing_the_FITS_Extension
+
+
+Besides the conversion utilities, you can import your own FITS
+extension using FITSTEXT.  You first prepare a FITS-like header in
+a text file.  For example,
+
+     % fitstext myndf myfile
+
+places the contents of myfile in the NDF called myndf.  This is not
+advised unless you are familiar with the rules for writing FITS
+headers.  See the NOST "A User's Guide to FITS".  You find this and
+other useful FITS documents, test files, and software at the FITS
+Support Office Home Page (URL
+http://www.gsfc.nasa.gov/astro/fits/fits_home.html).  FITSTEXT does
+perform some limited validation of the FITS headers, and informs you
+of any problems it detects.  See the "FITSHEAD Notes" topic for
+details. 
+
+A safer bet for a hand-crafted FITS extension is to edit an existing
+FITS extension to change a value, or use existing lines as templates
+for any new keywords you wish to add.  FITSEDIT lets you do this
+with your favourite text editor.  Define the environment variable
+EDITOR to your editor, say
+
+     % setenv EDITOR jed
+
+to choose jed.  If you don't do this, and EDITOR is unassigned,
+FITSEDIT selects the vi editor.  Then to edit the NDF extension
+is simple.
+
+     % fitsedit myndf
+
+This edits the FITS extension of the NDF called myndf.  FITSEDIT
+extracts the file into a temporary file (zzfitsedit.tmp) which you
+edit, and then uses FITSTEXT to restore the FITS extension.  It
+therefore has the same parsing of the edited FITS headers as
+FITSTEXT provides.
+
+
+Easy Easy_way_to_create_and_edit_the_FITS_Extension
+
+
+Should you wish to write a new value without knowing about FITS,
+or in a script where manual editing is undesirable, the FITSWRITE
+command does the job.  So for example,
+
+     % fitswrite myndf filter value=K
+
+will create a keyword FILTER with value K in the FITS extension
+of the NDF called myndf.  If the extension does not exist, this
+command will first create it.
+
+The FITSMOD command has several editing options including the
+ability to delete a keyword:
+
+    % fitsmod myndf airmass edit=delete
+
+here it removes the AIRMASS header; or rename a keyword:
+
+     % fitsmod myndf band rename newkey=filter
+
+as in this example, where keyword BAND becomes keyword FILTER; or
+update an existing keyword:
+
+     % fitsmod myndf filter edit=u value=\$V \
+       comment='"Standard filter name"'
+
+this example modifies the comment string associated with the FILTER
+keyword, leaving the value unchanged.
+
+For routine operations requiring many operations on a dataset,
+FITSMOD lets you specify the editing instructions in a text file.
+
+
+.endhelp

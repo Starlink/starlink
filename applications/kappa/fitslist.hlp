@@ -1,0 +1,58 @@
+.help fitslist Starlink kappa
+.nf
+Lists the FITS extension of an NDF.
+
+Usage:
+
+   fitslist in [logfile]
+
+Description:
+
+   This application lists the FITS header stored in an NDF FITS
+   extension.  The list may either be reported directly to you,
+   or written to a text file.
+
+Parameters
+
+For information on individual parameters, select from the list below:
+
+IN
+
+IN = NDF (Read)
+   The NDF whose FITS extension is to be listed.
+
+LOGFILE
+
+LOGFILE = FILENAME (Read)
+   The name of the text file to store a list of the FITS
+   extension.  If it is null (!) the list of the FITS extension
+   is reported directly to you. [!]
+
+Examples
+
+fitslist saturn
+   The contents of the FITS extension in NDF saturn are
+   reported to you.
+
+fitslist ngc205 logfile=ngcfits.lis
+   The contents of the FITS extension in NDF ngc205 are
+   written to the text file ngcfits.lis.
+
+Notes
+
+-  If the NDF does not have a FITS extension the application will
+exit.
+
+Related_Applications
+
+   KAPPA: FITSEDIT, FITSHEAD; Figaro: FITSKEYS.
+
+Authors
+
+MJC: Malcolm J. Currie (STARLINK)
+
+History
+
+ 1991 February 28 (MJC):
+    Original version.
+.endhelp

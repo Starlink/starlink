@@ -1,0 +1,181 @@
+.help makesurface Starlink kappa
+.nf
+Creates a 2-dimensional NDF from the coefficients of a polynomial
+surface
+
+Usage:
+
+   makesurface in out [like] type=? lbound=? ubound=? xlimit=?
+      ylimit=?
+
+Description:
+
+   The coefficients describing a 2-dimensional polynomial surface
+   are read from a SURFACEFIT extension in an NDF (written by
+   FITSURFACE), and are used to create a 2-dimensional surface of
+   specified size and extent.  The surface is written to a new NDF.
+
+   The size and extent of the surface may be obtained from a template
+   NDF or given explicitly.
+
+   Elements in the new NDF outside the defined range of the
+   polynomial will be set to bad values.
+
+Parameters
+
+For information on individual parameters, select from the list below:
+
+IN
+
+IN  = NDF (Read)
+   The NDF containing the SURFACEFIT extension.
+
+LBOUND
+
+LBOUND( 2 ) = _INTEGER (Read)
+   Lower bounds of new NDF (if LIKE=!).  The suggested defaults
+   are the lower bounds of the IN NDF.
+
+LIKE
+
+LIKE = NDF (Read)
+   An optional template NDF which, if specified, will be used to
+   define the labels, size, shape, data type and axis range of
+   the new NDF.  If a null response (!) is given, the label,
+   units, axis labels, and axis units are taken from the IN NDF.
+   The task prompts for the data type and bounds, using those of
+   the IN NDF as defaults, and the axis ranges. [!]
+
+OUT
+
+OUT = NDF (Write)
+   The new NDF to contain the surface fit.
+
+TITLE
+
+TITLE = LITERAL (Read)
+   A title for the new NDF.  If a null response (!) is given,
+   the title will be propagated either from LIKE, or from IN
+   if LIKE=!. [!]
+
+TYPE
+
+TYPE = LITERAL (Read)
+   Data type for the new NDF (if LIKE=!).  It must be one of
+   the following: "_DOUBLE", "_REAL", "_INTEGER", "_WORD",
+   "_BYTE", "_UBYTE".  The suggested default is the data type of
+   the data array in the IN NDF.
+
+UBOUND
+
+UBOUND( 2 ) = _INTEGER (Read)
+   Upper bounds of new NDF (if LIKE=!).  The suggested defaults
+   are the upper bounds of the IN NDF.
+
+VARIANCE
+
+VARIANCE = _LOGICAL (Read)
+   If TRUE, a variance array is created in the output NDF
+   provided the SURFACEFIT.FIT structure contains variance
+   information.  [FALSE]
+
+XLIMIT
+
+XLIMIT( 2 ) = _DOUBLE (Read)
+   Co-ordinates of the left then right edges of the x axis (if
+   LIKE=!).  The suggested defaults are respectively the minimum
+   and maximum x co-ordinates of the IN NDF.
+
+YLIMIT
+
+YLIMIT( 2 ) = _DOUBLE (Read)
+   Co-ordinates of the bottom then top edges of the y axis (if
+   LIKE=!).  The suggested defaults are respectively the minimum
+   and maximum y co-ordinates of the IN NDF.
+
+Examples
+
+makesurface flatin flatout \
+   This generates a 2-dimensional image in the NDF called flatout
+   using the surface fit stored in the 2-dimensional NDF flatin.
+   The created image has the same data type, bounds, and
+   co-ordinate limits as the data array of flatin.
+
+makesurface flatin flatout type=_wo lbound=[1,1] ubound=[320,512]
+   As the previous example, except that the data array in flatout
+   has data type _WORD, and the bounds of flatout are 1:320,
+   1:512.
+
+makesurface flatin flatout like=flatin
+   This has the same effect as the first example, except it has
+   an advantage.  If the current co-ordinate system is "Data" and
+   either or both of the axes are inverted (values decrease with
+   increasing pixel index), the output image will be correctly
+   oriented.
+
+makesurface flatin flatout template title="Surface fit"
+   This generates a 2-dimensional image in the NDF called flatout
+   using the surface fit stored in the 2-dimensional NDF flatin.
+   The created image inherits the attributes of the NDF called
+   template.  The title of flatout is "Surface fit".
+
+Notes
+
+-  The polynomial surface fit is stored in SURFACEFIT extension,
+component FIT of type POLYNOMIAL, variant CHEBYSHEV.  This
+extension is created by FITSURFACE.    Also read from the
+SURFACEFIT extension is the co-ordinate system (component COSYS).
+
+-  When LIKE=!, COSYS="Data" and the original NDF had an axis that
+decreased with increasing pixel index, you may want to flip the
+co-ordinate limits (via parameters XLIMIT or YLIMIT) to match
+the original sense of the axis, otherwise the created surface will
+be flipped with respect to the image from which it was fitted.
+
+Related_Applications
+
+   KAPPA: FITSURFACE, SURFIT.
+
+Authors
+
+SMB: Steven M. Beard (ROE)
+
+MJC: Malcolm J. Currie (STARLINK)
+
+History
+
+ 11-May-1993 (SMB):
+    Original version.
+
+ 03-Jun-1993 (SMB):
+    Modified to read the new data structure produced by FITSURFACE.
+
+ 07-Dec-1993 (SMB):
+    Comments tidied up.
+
+ 1995 August 8 (MJC):
+    Used a modern prologue and completed it.  Corrected the
+    description of LIKE and some data types.  Merged XMIN and XMAX
+    into parameter XLIMIT, and YMIN and YMAX into YLIMIT.  Renamed
+    many of the routines and called existing subroutines rather
+    than use SMB's new ones.  Read COSYS component from the
+    FITSURFACE.  Restructured for clarity and efficiency.  Removed
+    PAR_GETs for labels and units when LIKE=!.  Insisted on two
+    significant dimensions in IN and LIKE.
+
+ 1997 May 10 (MJC):
+    Added support for creating a variance array.  Obtained
+    workspace by PSX for efficiency.
+
+Implementation_Status
+
+   -  This routine correctly processes the AXIS, DATA, QUALITY,
+   VARIANCE, LABEL, TITLE, UNITS, and HISTORY components of an NDF
+   data structure and propagates all extensions.  However, neither
+   QUALITY nor a SURFACEFIT extension is propagated when LIKE is not
+   null.
+
+   -  All non-complex numeric data types can be handled.  Processing
+   is performed in single- or double-precision floating point, as
+   appropriate.
+.endhelp

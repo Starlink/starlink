@@ -1,0 +1,318 @@
+.help segment Starlink kappa
+.nf
+Copies polygonal segments from one NDF to another.
+
+Usage:
+
+   segment in1 in2 out
+
+Description:
+
+   This routine extracts polygonal segments from an NDF, and
+   optionally pastes them into the corresponding positions within
+   another NDF.  The application is intended to allow regions of an
+   NDF to be removed to another for separate processing.  It may
+   also be used to copy bad pixels into a NDF in order to delete a
+   region which is not required.
+
+   The vertices of polygonal segments are defined by lists of
+   co-ordinate pairs.  [For convenience these positions are denoted
+   x-y positions although they may not be literally x and y, for
+   example planes in a cube or hypercube.  See the "Notes" for more
+   details.]  Polygons are completed by connecting the last position
+   in the list to the first.  Pixels within each polygonal segment
+   are copied from the first NDF (IN1) to the corresponding position
+   in the second NDF (IN2).  A sequence of polygons may be supplied,
+   and each is copied in turn.  If a null value is given for either
+   NDF, the routine behaves as if an NDF full of bad pixels had been
+   specified.  Thus if IN1 is given a null value the inside of each
+   polygonal segment will be filled with bad values, and if IN2 is
+   given a null value the region outside the polygonal segments will
+   be filled with bad values.
+
+   The x-y positions may be specified in three ways:
+
+   1) from the parameter system, usually in response to prompting;
+
+   2) within text files (one for each polygon), where the files are
+   free format with x co-ordinates in column one and y co-ordinates
+   in column two (this is the format produced by other KAPPA
+   applications such as CURSOR); and
+
+   3) using a graphics cursor of a nominated device, for which an NDF
+   must already have been displayed on the device.
+
+   The x-y co-ordinates may be given as either data or pixel
+   (`world') co-ordinates.  If data co-ordinates are given, the input
+   NDFs must contain appropriate AXIS structures to allow the
+   corresponding pixel co-ordinates to be found.
+
+Parameters
+
+For information on individual parameters, select from the list below:
+
+AXES
+
+AXES( 2 ) = _INTEGER (Read)
+   The indices of the axes which span the plane containing the
+   polygon.  Two values should be given, each less than or equal
+   to the minimum of the number of dimensions in the two input
+   NDFs. [1,2]
+
+CLEAR
+
+CLEAR = _LOGICAL (Read)
+   Whether or not the image display device should be cleared
+   before opening it. [FALSE]
+
+COLOUR
+
+COLOUR = LITERAL (Read)
+   The colour in which to draw any graphics specified by
+   parameter PLOT.  The options are described below.
+
+     "MAX"          - The maximum colour index used for the
+                      display of the image.
+     "MIN"          - The minimum colour index used for the
+                      display of the image.
+     An integer     - The actual colour index.  It is constrained
+                      between 0 and the maximum colour index
+                      available on the device.
+     A named colour - Uses the named colour from the palette, and
+                      if it is not present, the nearest colour
+                      from the palette is selected.
+
+   If the colour is to remain unaltered as the lookup table is
+   manipulated choose an integer between 0 and 15, or a named
+   colour.  The suggested default is the current value.
+
+   This parameter is ignored on window overlays, where the
+   overlay colour is used.  (Use the PALENTRY command to change
+   this colour.)  An overlay has the advantage that the crosses
+   or polygon can be erased using OVCLEAR once this task is
+   completed.  The parameter is also ignored for terminals.
+   [The current value, but equals "Green" if there is no current
+   value.]
+
+COORDS
+
+COORDS( 2 ) = _REAL (Read)
+   A pair of x-y co-ordinates representing a single vertex.  It
+   is only used if parameter MODE is given the value "Interface".
+   A null value should be given when the final vertex has been
+   specified.
+
+COSYS
+
+COSYS = LITERAL (Read)
+   The co-ordinate system in which the polygon vertices are
+   specified.  This can be either "WORLD" or "DATA".  If COSYS =
+   "DATA" is given, the input co-ordinates (however obtained) are
+   presumed to be data co-ordinates (as defined by AXIS structures
+   within the NDFs).  Otherwise, they are presumed to be world (or
+   `pixel') co-ordinates. [Current co-ordinate system]
+
+DEVICE
+
+DEVICE = DEVICE (Read)
+   The name of the graphics device on which an image is
+   displayed.  This is only used if parameter MODE is given the
+   value "Cursor".  Any graphics specified by parameter PLOT will
+   be produced on this device.  This device must support cursor
+   interaction, and belong to one of the following classes:
+   TERMINAL, IMAGE_DISPLAY, IMAGE_OVERLAY, WINDOW, and
+   WINDOW_OVERLAY.  [Current image-display-overlay device]
+
+IN1
+
+IN1 = NDF (Read)
+   The input NDF containing the data to be copied to the inside of
+   the supplied polygonal segments.  If a null value is supplied,
+   the inside of the polygonal segments will be filled with bad
+   values.
+
+IN2
+
+IN2 = NDF (Read)
+   The input NDF containing the data to be copied to the outside
+   of the supplied polygonal segments.  If a null value is
+   supplied, the outside of the polygonal segments will be filled
+   with bad values.
+
+LOGFILE
+
+LOGFILE = FILENAME (Write)
+   The name of a text file in which the co-ordinates of the
+   polygon vertices are to be stored.  A null value (!) means that
+   no file is created. [!]
+
+MODE
+
+MODE = LITERAL (Read)
+   The mode by which the vertices of the polygonal segments are
+   to be obtained.  The options are as follows: "Interface"
+   defines via the parameter system, "Cursor" enables selection
+   by graphics cursor, and "File" reads them from a text file.
+   [Current interaction mode]
+
+MAXPOLY
+
+MAXPOLY = _INTEGER (Read)
+   The maximum number of polygons which can be used.  For
+   instance, this can be set to 1 to ensure that no more than 1
+   polygon is used (this sort of thing can be useful when writing
+   procedures or scripts).  A null value causes no limit to be
+   imposed (unless MODE="File" in which case a limit of 20 is
+   imposed). [!]
+
+MINPOLY
+
+MINPOLY = _INTEGER (Read)
+   The minimum number of polygons which can be used.  For
+   instance, this can be set to 2 to ensure that at least 2
+   polygons are used.  The supplied value must be less than or
+   equal to the value given for MAXPOLY and must be greater than
+   zero. [1]
+
+OUT
+
+OUT = NDF (Write)
+   The output NDF.
+
+PLOT
+
+PLOT = LITERAL (Read)
+   The type of graphics to be used to mark the position of each
+   selected vertex.  It is only used if parameter MODE is given
+   the value "Cursor".  PLOT can take any of the following values.
+
+     "Poly"  - Causes each vertex to be joined by a straight line
+               to the previous vertex.  The last vertex is joined
+               to the first vertex.
+
+     "Cross" - Each vertex is marked by a cross.
+
+     "None"  - No graphics are produced.
+
+   The initial default is "Poly", then subsequently it is the
+   current value.  []
+
+POLY1-POLY20
+
+POLY1-POLY20 = FILENAME (Read)
+   Each of the parameters POLY1 to POLY20 are used to access text
+   files containing the x-y co-ordinates of the vertices of a
+   single polygon.  If a value is assigned to POLY1 on the
+   command line then only a single polygonal segment is copied,
+   and you are not prompted for any of the remaining parameters
+   in this group.  Otherwise, you are prompted for POLY1, then
+   POLY2, etc. until a null value is given or POLY20 is reached.
+
+QUALITY
+
+QUALITY = _LOGICAL (Read)
+   If a TRUE value is supplied for parameter QUALITY then quality
+   information is copied from the input NDFs to the output NDFs.
+   Otherwise, the quality information is not copied.  This
+   parameter is only accessed if all supplied input NDFs have
+   defined QUALITY components.  If any of the supplied input NDFs
+   do not have defined QUALITY components, then no quality is
+   copied.  Note, if a null input NDF is given then the
+   corresponding output QUALITY values are set to zero. [TRUE]
+
+VARIANCE
+
+VARIANCE = _LOGICAL (Read)
+   If a TRUE value is supplied for parameter VARIANCE then
+   variance information is copied from the input NDFs to the
+   output NDFs.  Otherwise, the variance information is not
+   copied.  This parameter is only accessed if all supplied input
+   NDFs have defined VARIANCE components.  If any of the supplied
+   input NDFs do not have defined VARIANCE components, then no
+   variances are copied.  Note, if a null input NDF is given then
+   the corresponding output VARIANCE values are set bad. [TRUE]
+
+Examples
+
+segment in1=m51a in2=m51b out=m51_comp poly1=co-ords.lis mode=file
+   Copies a region of the NDF m51a to the corresponding position
+   in the output NDF m51_comp.  The region is defined by the list
+   of vertex co-ordinates held in text file co-ords.lis.  All
+   pixels in the output NDF which fall outside this region are
+   given the corresponding pixel values from NDF m51b.
+
+segment in1=m51a out=m51_cut mode=cursor plot=poly accept
+   Copies a region of the NDF m51a to the corresponding position
+   in the output NDF m51_cut.  The region is defined by selecting
+   vertices using a graphics cursor.  The image m51a should
+   previously have been displayed.  Each vertex is joined to the
+   previous vertex by a green line on the graphics device.  The
+   ACCEPT keyword causes the suggested null default value for IN2
+   to be accepted.  This means that all pixels outside the region
+   identified using the cursor will be set bad in the output NDF.
+
+Notes
+
+-  The routine can handle NDFs of arbitrary dimensionality.  If
+either input has three or more dimensions then all planes in the
+NDF are processed in the same way, that is the same polygonal
+regions are extracted from each plane and copied to the
+corresponding plane of the output NDF.  The polygon is usually
+presumed to lie in the x-y plane (i.e. the plane spanned by the
+first two axes of the NDF), but this can be changed by assigning
+appropriate values to parameter AXES so that for instance the
+polygon lies in the y-z plane (i.e. the plane spanned by axes 2
+and 3).
+
+-  The output NDF bounds are defined by the overlap region of the
+input NDFs.
+
+-  The log file has a comment line indicating whether the
+co-ordinates are World or Data.
+
+Related_Applications
+
+   KAPPA: ARDMASK, ERRCLIP, FILLBAD, FFCLEAN, PASTE, SETMAGIC,
+   THRESH.
+
+Authors
+
+DSB: David Berry (STARLINK)
+
+MJC: Malcolm J. Currie (STARLINK)
+
+History
+
+ 9-NOV-1993 (DSB):
+    Original NDF version, based on MJC's IMAGE-format KAPPA
+    implementation.
+
+ 1995 April 11 (MJC):
+    Added Notes and Related Applications, and more examples.
+    Moved old Notes to Implementation Status.  Made Examples and
+    Usage lowercase.  Various tidying and stylistic changes, and
+    typo's corrected.  Renamed parameter XY to COORDS.  Revised
+    call to various routines for obtaining the co-ordinates
+    and KPG1_XYD2W.  Used modern-style variable declarations.
+    Added headings to the commentary.  Made the non-warning
+    messages conditional.  Used AGI_BEGIN/END to delimit picture
+    processing.
+
+Implementation_Status
+
+   -  This routine will propagate VARIANCE component values so long
+   as all supplied input NDFs have defined VARIANCE components, and
+   parameter VARIANCE is not FALSE.
+
+   -  This routine will propagate QUALITY component values so long
+   as all supplied input NDFs have defined QUALITY components, and
+   parameter QUALITY is not FALSE.
+
+   -  The UNITS, AXIS, LABEL, TITLE, and HISTORY components are
+   propagated from the first supplied input NDF, together with all
+   extensions.
+
+   -  All non-complex numeric types are supported.  The following
+   data types are processed directly: _WORD, _INTEGER, _REAL,
+   _DOUBLE.
+.endhelp

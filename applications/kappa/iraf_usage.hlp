@@ -1,0 +1,11 @@
+.help iraf_usage Starlink kappa
+.nf
+KAPPA may be run from the IRAF CL with automatic data conversion to and
+from IRAF or FITS image format. For general advice on running Starlink
+applications from IRAF, see SUN/217.
+
+Assuming that the required software has been installed as recommended,
+KAPPA is loaded by typing kappa at the cl> prompt.  Applications are
+invoked and parameter values generally given as for normal IRAF tasks.
+There are a few anomalies and these are described in SUN/217.
+.endhelp

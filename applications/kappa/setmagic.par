@@ -1,0 +1,5 @@
+in,f,a,,,,"NDF in which values are to be flagged bad"
+out,f,a,,,,"NDF containing flagged values"
+repval,r,a,,,,"The value to be replaced by the bad flag"
+comp,s,h,"Data",,,"Component(s) to process"
+title,s,h,INDEF,,,"Title for output NDF"

@@ -1,0 +1,221 @@
+.help fitsurface Starlink kappa
+.nf
+Fits a polynomial surface to 2-dimensional data array.
+
+Usage:
+
+   fitsurface ndf [fittype] nxpar nypar
+
+Description:
+
+   This task fits a surface to a 2-dimensional data array stored
+   array within an NDF data structure.  At present it only
+   permits a fit with a polynomial, and the coefficients of that
+   surface are stored in a POLYNOMIAL structure (SGP/38) as an
+   extension to that NDF.
+
+   Unlike SURFIT, neither does it bin the data nor does it reject
+   outliers.
+
+Parameters
+
+For information on individual parameters, select from the list below:
+
+COSYS
+
+COSYS = LITERAL (Read)
+   The co-ordinate system to be used.  This can be either "World"
+   or "Data".  If COSYS = "World" the co-ordinates used to fits
+   the surface are pixel co-ordinates.  If COSYS = "Data" the
+   data co-ordinates used are used in the fit, provided there are
+   axis centres present in the NDF.  COSYS="World" is
+   recommended.  [Current co-ordinate system]
+
+FITTYPE
+
+FITTYPE = LITERAL (Read)
+   The type of fit.  It must be either "Polynomial" for a
+   polynomial or "Spline" for a bi-cubic spline. ["Polynomial"]
+
+NDF
+
+NDF  = NDF (Update)
+   The NDF containing the 2-dimensional data array to be fitted.
+
+NXPAR
+
+NXPAR = _INTEGER (Read)
+   The number of fitting parameters to be used in the x
+   direction.  It must be in the range 1 to 15 for a polynomial
+   fit, and 4 to 15 for a bi-cubic-spline fit.  Thus 1 gives a
+   constant, 2 a linear fit, 3 a quadratic etc.  Increasing this
+   parameter increases the flexibility of the surface in the x
+   direction.  The upper limit of acceptable values will be
+   reduced for arrays with an x dimension less than 29.
+
+NYPAR
+
+NYPAR = _INTEGER (Read)
+   The number of fitting parameters to be used in the y
+   direction.  It must be in the range 1 to 15 for a polynomial
+   fit, and 4 to 15 for a bi-cubic-spline fit.  Thus 1 gives a
+   constant, 2 a linear fit, 3 a quadratic etc.  Increasing this
+   parameter increases the flexibility of the surface in the y
+   direction.  The upper limit of acceptable values will be
+   reduced for arrays with a y dimension less than 29.
+
+OVERWRITE
+
+OVERWRITE = _LOGICAL (Read)
+   OVERWRITE=TRUE, allows an NDF extension containing an existing
+   surface fit to be overwritten.  OVERWRITE=FALSE protects an
+   existing surface-fit extension, and should one exist, an error
+   condition will result and the task terminated.  [TRUE]
+
+VARIANCE
+
+VARIANCE = _LOGICAL (Read)
+   A flag indicating whether any variance array present in the
+   NDF is used to define the weights for the fit.  If VARIANCE
+   is TRUE and the NDF contains a variance array this will be
+   used to define the weights, otherwise all the weights will be
+   set equal.  [TRUE]
+
+XMAX
+
+XMAX = _DOUBLE (Read)
+   The maximum x value to be used in the fit.  This must be
+   greater than or equal to the x co-ordinate of the right-hand
+   pixel in the data array.  Normally this parameter is
+   automatically set to the maximum x co-ordinate found in the
+   data, but this mechanism can be overridden by specifying XMAX
+   on the command line.  The parameter is provided to allow the
+   fit limits to be fine tuned for special purposes.  It should
+   not normally be altered. [Maximum x co-ordinate of the fitted
+   data]
+
+XMIN
+
+XMIN = _DOUBLE (Read)
+   The minimum x value to be used in the fit.  This must be
+   smaller than or equal to the x co-ordinate of the left-hand
+   pixel in the data array.  Normally this parameter is
+   automatically set to the minimum x co-ordinate found in the
+   data, but this mechanism can be overridden by specifying XMIN
+   on the command line.  The parameter is provided to allow the
+   fit limits to be fine tuned for special purposes.  It should
+   not normally be altered.  [Minimum x co-ordinate of the fitted
+   data]
+
+YMAX
+
+YMAX = _DOUBLE (Read)
+   The maximum y value to be used in the fit.  This must be
+   greater than or equal to the y co-ordinate of the top pixel in
+   the data array.  Normally this parameter is automatically set
+   to the maximum y co-ordinate found in the data, but this
+   mechanism can be overridden by specifying YMAX on the command
+   line.  The parameter is provided to allow the fit limits to be
+   fine tuned for special purposes.  It should not normally be
+   altered. [Maximum y co-ordinate of the fitted data]
+
+YMIN
+
+YMIN = _DOUBLE (Read)
+   The minimum y value to be used in the fit.  This must be
+   smaller than or equal to the y co-ordinate of the bottom pixel
+   in the data array.  Normally this parameter is automatically
+   set to the minimum y co-ordinate found in the data, but this
+   mechanism can be overridden by specifying YMIN on the command
+   line.  The parameter is provided to allow the fit limits to be
+   fine tuned for special purposes.  It should not normally be
+   altered. [Minimum y co-ordinate of the fitted data]
+
+Examples
+
+fitsurface virgo nxpar=4 nypar=4 novariance
+   This fits a bi-cubic polynomial surface to the data array
+   in the NDF called virgo.  All the data values are given
+   equal weight.  The coefficients of the fitted surface are
+   stored in an extension of virgo.
+
+fitsurface virgo nxpar=4 nypar=4
+   As the first example except the data variance, if present,
+   is used to weight the data values.
+
+fitsurface mkn231 nxpar=6 nypar=2 cosys=d xmin=-10.0 xmax=8.5
+   This fits a polynomial surface to the data array in the NDF
+   called mkn231.  A fifth order is used along the x direction,
+   but only a linear fit along the y direction.  The fit is made
+   between x data co-ordinates -10.0 to 8.5.  The variance
+   weights the data values.  The coefficients of the fitted
+   surface are stored in an extension of mkn231.
+
+Notes
+
+The polynomial surface fit is stored in SURFACEFIT extension,
+component FIT of type POLYNOMIAL, variant CHEBYSHEV.  This is
+read by MAKESURFACE to create a NDF of the fitted surface.  Also
+stored in the SURFACEFIT extension are the r.m.s. deviation to the
+fit (component RMS), the maximum absolute deviation (component
+RSMAX), and the co-ordinate system (component COSYS).
+
+Related_Applications
+
+   KAPPA: MAKESURFACE, SURFIT.
+
+Authors
+
+SMB: Steven M. Beard (ROE)
+
+MJC: Malcolm J. Currie (STARLINK)
+
+History
+
+ 20-Apr-1993 (SMB):
+    Original version, based on the KAPPA function SURFIT written
+    by Malcolm Currie.
+
+ 22-Apr-1993 (SMB):
+    Modified to use PLYPUT2D.
+
+ 23-Apr-1993 (SMB):
+    DAT_PAR included (commented out) so the routine can work in a
+    UNIX environment.
+
+ 06-May-1993 (SMB):
+    DAT_PAR does not need to be commented out.
+
+ 02-Jun-1993 (SMB):
+    Modified to report some goodness of fit information.
+
+ 08-Nov-1993 (SMB):
+    Modified to allow the x and y extrema returned by ARXYZW to be
+    overridden by specifying XMIN, XMAX, YMIN, YMAX parameters.
+
+ 07-Dec-1993 (SMB):
+    Comments tidied up.
+
+ 1995 August 2 (MJC):
+    Used a modern prologue and completed it.  Renamed many of the
+    routines and called existing subroutines rather than use SMB's
+    new ones.  Added COSYS parameter, and stored its value in the
+    SURFACEFIT extension.  Obtain axis centres in double
+    precision.  Insisted on two significant dimensions in the NDF.
+    Used PSX to get workspace to improve efficiency.
+
+ 1996 October 10 (MJC):
+    Remove one work array no longer needed for NAG-free
+    subroutines.
+
+Implementation_Status
+
+   -  This routine correctly processes the AXIS, DATA, QUALITY,
+   VARIANCE, and HISTORY components of an NDF data structure.
+
+   -  Processing of bad pixels and automatic quality masking are
+   supported.
+
+   -  All non-complex numeric data types can be handled.  Arithmetic
+   is performed using double-precision floating point.
+.endhelp

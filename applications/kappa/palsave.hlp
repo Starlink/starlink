@@ -1,0 +1,69 @@
+.help palsave Starlink kappa
+.nf
+Saves the current palette of a colour table to an NDF.
+
+Usage:
+
+   palsave palette [device] [title]
+
+Description:
+
+   This application reads the palette portion of the current image
+   display's colour table and saves it in an NDF.  The palette
+   comprises 16 colours and is intended to provide coloured
+   annotations, borders, axes, graphs etc. that are unaffected by
+   changes to the lookup table used for images.  Thus once you have
+   established a palette of colours you prefer, it is straightforward
+   to recover the palette at a future time.
+
+Parameters
+
+For information on individual parameters, select from the list below:
+
+DEVICE
+
+DEVICE = DEVICE (Read)
+   Name of the image display to be used.  The device must be in
+   one of the following GNS categories: IMAGE_DISPLAY,
+   IMAGE_OVERLAY, or WINDOW, and have at least 24 colour indices.
+   The device must also not reset when the device is opened
+   (since the existing colour table would be lost).  [Current
+   image-display device]
+
+PALETTE
+
+PALETTE = NDF (Write)
+   The NDF in which the current colour-table reserved pens are
+   to be stored.  Thus if you have created non-standard colours
+   for annotation, doodling, colour of axes etc. they may be
+   stored for future use.
+
+TITLE
+
+TITLE = LITERAL (Read)
+   Title for the output NDF. ["KAPPA - Palsave"]
+
+Examples
+
+palsave rustic
+   This saves the palette of the colour table of the current
+   image display into the NDF called RUSTIC.
+
+palsave hitec xwindows title="Hi-tech-look palette"
+   This saves the palette of the colour table of the xwindows
+   device in the NDF called hitec.  The NDF has a title called
+   "Hi-tech-look palette".
+
+Related_Applications
+
+   KAPPA: PALDEF, PALENTRY, PALREAD.
+
+Authors
+
+MJC: Malcolm J. Currie (STARLINK)
+
+History
+
+ 1991 July 19 (MJC):
+    Original version.
+.endhelp

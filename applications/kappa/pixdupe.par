@@ -1,0 +1,4 @@
+in,f,a,,,,"NDF to be expanded"
+out,f,a,,,,"NDF after being expanded"
+expand,i,a,,,,"Expansion factors"
+title,s,h,INDEF,,,"Title for output NDF"

@@ -1,0 +1,206 @@
+.help aperadd Starlink kappa
+.nf
+    Derives statistics of pixels within a specified circle of a 2-d
+    data array.
+ 
+   This routine takes an input 2-d data array in an IMAGE structure
+   and bins up all the pixels that lie within specified circles to
+   either increase the signal-to-noise over that region, or to
+   simulate a circular-aperture measurement of the image.
+
+   WARNING: This simple task does not divide the light of pixels
+   spanning the circle.  If the pixel's centre lies within the circle,
+   its full value is included in the summation; if it lies outside
+   the circle, the pixel value is excluded from the summation.
+   Therefore this task is not suitable for accurate aperture
+   photometry, especially where the aperture diameter is less than
+   about ten times the pixel size.  Use PHOTOM where accuracy, rather
+   than speed, is paramount.
+
+   The following are displayed: the standard deviation of the
+   intensity of the pixels within the aperture before binning, the
+   integrated value over the aperture, and the calculated mean level
+   and reduced noise after binning.
+ 
+   The magic-value method is used for processing bad data.
+
+AUTHORS
+
+   Mark McCaughrean UoE ( REVA::MJM )
+   Malcolm Currie  STARLINK (RAL::CUR)
+
+DEFICIENCIES
+
+   The circle centre must lie somewhere on the array, which is
+   by far the most likely option, but it not totally general.
+
+HISTORY
+
+   22-10-1985 : First implementation (REVA::MJM)
+   17-01-1986 : More error checking and tidying (REVA::MJM)
+   1986 Aug 3 : Renamed algorithm subroutine (APADSB) (RAL::CUR)
+   1986 Aug 27: Argument section added and nearly conformed to
+                Starlink standards (RAL::CUR)
+   1987 Oct 13: Extra status check for mapping image (RAL::CUR)
+   1988 Feb 14: Removed SCALE parameter and references to intensity
+                and referred to `array' rather than `image'
+                (RAL::CUR)
+   1988 Apr 30: Correct labelling of output and a loop introduced
+                to measure in more than one aperture (RAL::CUR).
+   1988 May 29: More reporting of error context (RAL::CUR)
+   1989 Jul 27: Passed array dimensions as separate variables
+                to APADSB (RAL::CUR).
+   1990 Mar 10: Logfile option added (RAL::CUR).
+   1990 Sep 18: Added results parameters (RAL::CUR).
+   1992 Feb 23: Limited processing of simple NDFs (RAL::CUR).
+   1992 Mar  3: Replaced AIF parameter-system calls by the extended
+                PAR library (RAL::CUR).
+   1995 Sep 19: Clarified the limitations of APERADD.  Made it use
+                the floating-point centre co-ordinates rather than
+                pixel indices. (MJC)
+
+PARAMETERS
+
+   LOGFILE = FILENAME( READ )
+       Name of the text file to record the statistics. If null,
+         there will be no logging.
+   INPIC = IMAGE( READ )
+       Input IMAGE structure containing data array to be processed
+   XCEN = REAL( READ )
+       x co-ordinate of the circle centre
+   YCEN = REAL( READ )
+       y co-ordinate of the circle centre
+   DIAM = REAL( READ )
+       Diameter of the circle in pixels
+   AGAIN = LOGICAL( READ )
+       If true then another aperture can be chosen
+   NUMPIX = INTEGER( WRITE )
+       The number of pixels within the aperture.
+   TOTAL = REAL( WRITE )
+       The total of the pixel values within the aperture.
+   MEAN = REAL( WRITE )
+       The mean of the pixel values within the aperture.
+   SIGMA = REAL( WRITE )
+       The standard deviation of the pixel values within the
+       aperture.
+   NOISE = REAL( WRITE )
+       The standard deviation of the pixel values within the
+       aperture after binning.
+
+INPIC
+
+  position    1
+  keyword     'INPIC'
+  type        'IMAGE'
+  access      'READ'
+  vpath       'PROMPT'
+  ppath       'GLOBAL'
+  association '<->GLOBAL.DATA_ARRAY'
+  prompt      'Image to be binned'
+  help        'Name of the IMAGE structure containing the 2-d data 
+              array to be examined'
+
+XCEN
+
+  position    2
+  keyword     'XCEN'
+  type        '_REAL'
+  vpath       'PROMPT'
+  ppath       'DYNAMIC'
+  prompt      'x co-ordinate of circle centre'
+  help        'Give the x co-ordinate of the centre of the circle to 
+              be binned up'
+
+YCEN
+
+  position    3
+  keyword     'YCEN'
+  type        '_REAL'
+  ppath       'DYNAMIC'
+  vpath       'PROMPT'
+  prompt      'y co-ordinate of circle centre'
+  help        'Give the y co-ordinate of the centre of the circle to 
+              be binned up'
+
+DIAM
+
+  position    4 
+  keyword     'DIAM'
+  type        '_REAL'
+  ppath       'DYNAMIC,DEFAULT'
+  vpath       'PROMPT'
+  prompt      'Diameter of circle'
+  help        'Give diameter (in pixels) of the circle to be binned'
+  default     10.0
+
+LOGFILE
+
+  position    5
+  keyword     'LOGFILE'
+  type        'FILENAME'
+  access      'READ'
+  vpath       'DEFAULT'
+  ppath       'CURRENT,DEFAULT'
+  prompt      'File to log the results'
+  default     !
+  help        'Name of the ASCII file to be used to record the 
+              statistics.'
+
+AGAIN
+
+  position    6
+  keyword     'AGAIN'
+  type        '_LOGICAL'
+  ppath       'DEFAULT'
+  vpath       'PROMPT'
+  prompt      'Do you another aperture in the same 2-d array?'
+  help        'Option to select another aperture in same input data 
+              array. Type N to exit'
+  default     N
+
+NUMPIX
+
+  keyword     'NUMPIX'
+  access      'WRITE'
+  type        '_INTEGER'
+  vpath       'DEFAULT'
+  prompt      'Object to contain the number of pixels'
+  default     0
+
+TOTAL
+
+  keyword     'TOTAL'
+  access      'WRITE'
+  type        '_REAL'
+  vpath       'DEFAULT'
+  prompt      'Object to contain the total value'
+  default     0.0
+
+MEAN
+
+  keyword     'MEAN'
+  access      'WRITE'
+  type        '_REAL'
+  vpath       'DEFAULT'
+  prompt      'Object to contain the mean value'
+  default     0.0
+
+SIGMA
+
+  keyword     'SIGMA'
+  access      'WRITE'
+  type        '_REAL'
+  vpath       'DEFAULT'
+  prompt      'Object to contain the standard deviation'
+  default     0.0
+
+NOISE
+
+  keyword     'NOISE'
+  access      'WRITE'
+  type        '_REAL'
+  vpath       'DEFAULT'
+  prompt      'Object to contain the standard deviation after
+              binning'
+  default     0.0
+.endhelp

@@ -1,0 +1,39 @@
+.help lutfc Starlink kappa
+.nf
+Loads the standard false-colour lookup table.
+
+Usage:
+
+   lutfc
+
+Description:
+
+   This procedure loads the standard false-colour lookup table with
+   linear scaling into the current image-display device.
+
+Parameters
+
+For information on individual parameters, select from the list below:
+
+DEVICE
+
+DEVICE = DEVICE (Read)
+   Name of the image display whose colour table is to be changed.
+   [Current image-display device]
+
+Notes
+
+This is a procedure that calls LUTABLE.  Therefore, the parameter
+cannot be specified on the command line.  You will only be
+prompted for the DEVICE parameter if the current image display
+is not suitable or not available.
+
+Authors
+
+MJC: Malcolm J. Currie (STARLINK)
+
+History
+
+ 1991 April 24 (MJC):
+    Original version.
+.endhelp

@@ -1,0 +1,113 @@
+.help laplace Starlink kappa
+.nf
+    Performs a Laplacian convolution as an edge detector in a 2-d
+    data array
+ 
+   This routine works out the Laplacian of the 2-d data array, in the
+   input IMAGE structure, and subtracts it from the original array to
+   create a new data array in the output IMAGE structure. The
+   subtractions can be done a specified integer number of times.
+   This operation can be approximated with a convolution by
+ 
+                         -N   -N   -N
+                         -N   +8N  -N
+                         -N   -N   -N
+ 
+   where N is the integer number of times the Laplacian is
+   subtracted.  This convolution is used as a uni-directional edge
+   detector.  Areas where the input data array is flat become zero
+   in the output data array.
+ 
+   The magic-value method is used for processing bad data.
+
+AUTHORS
+
+   Mark McCaughrean UoE ( REVA::MJM )
+   Malcolm Currie  STARLINK (RAL::CUR)
+
+BUGS
+
+   None known.
+
+HISTORY
+
+   10-12-1985 : First implementation (UKTH::MARK)
+   17-04-1986 : Tidied and more error checking (REVA::MJM)
+   1986 Aug 7 : Renamed algorithmic subroutine to LAPLSB.
+   1986 Aug 29: Added argument section to prologue, and nearly
+                conformed to Starlink standards (RAL::CUR).
+   1987 Oct 15: Reordered tidying and extra status checks
+                (RAL::CUR)
+   1988 Mar 17: Referred to `array' rather than `image'
+                (RAL::CUR)
+   1988 May 31: More reporting of error context (RAL::CUR)
+   1989 Jun 13: Allow for processing primitive NDFs (RAL::CUR)
+   1989 Aug  8: Passed array dimensions as separate variables
+                to LAPLSB (RAL::CUR).
+   1991 Oct 25: Propagates AXIS, LABEL, and HISTORY (RAL::CUR).
+   1992 Feb 25: Limited processing of simple NDFs (RAL::CUR).
+   1992 Mar  3: Replaced AIF parameter-system calls by the extended
+                PAR library (RAL::CUR).
+   1992 Mar  3: Replaced AIF parameter-system calls by the extended
+                PAR library (RAL::CUR).
+
+PARAMETERS
+
+   INPIC = IMAGE( READ )
+       Input IMAGE structure containing the 2-d data array to be
+         processed
+   NUMBER = INTEGER( READ )
+       Number of times the Laplacian is to be subtracted
+   OUTPIC = IMAGE( WRITE )
+       Output IMAGE structure containing the processed data array
+   OTITLE = CHAR( READ )
+       Title string for output IMAGE structure
+
+INPIC
+
+  position    1
+  keyword     'INPIC'
+  type        'IMAGE'
+  access      'READ'
+  vpath       'PROMPT'
+  ppath       'GLOBAL'
+  association '<-GLOBAL.DATA_ARRAY'
+  prompt      'Image to be convolved'
+  help        'Name of the IMAGE structure containing the 2-d data 
+              array on which the Laplacian convolution is performed'
+
+NUMBER
+
+  position    2
+  keyword     'NUMBER'
+  type        '_INTEGER'
+  vpath       'DEFAULT'
+  default     1
+  prompt      'Number of Laplacians removed'
+  help        'Give the integer number of Laplacians to be removed 
+              from the input data array'
+
+OUTPIC
+
+  position    3
+  keyword     'OUTPIC'
+  type        'IMAGE'
+  access      'WRITE'
+  vpath       'PROMPT'
+  association '->GLOBAL.DATA_ARRAY'
+  prompt      'Image after convolution'
+  help        'Name given to the IMAGE structure to hold the 
+              convolved data array'
+
+OTITLE
+
+  position    4
+  keyword     'OTITLE'
+  type        '_CHAR'
+  vpath       'DEFAULT'
+  prompt      'Title for output image'
+  default     'KAPPA - Laplace'
+  help        'Character string to be used as a title for the output 
+              IMAGE data structure'
+
+.endhelp

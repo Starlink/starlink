@@ -1,0 +1,141 @@
+.help selecting_graphics_ Starlink kappa
+.nf
+You can find the list of available devices and their names with task
+GDNAMES.  Names can be abbreviated provided they remain unambiguous.
+
+
+Globals
+
+
+There are global parameters (cf. topic "Parameters Globals") for the
+graphics devices:
+
+   o  Graphics Device  --- The device used for line graphics.
+   o  Image Display    --- The device used for displaying images,
+                           but this does not exclude the possibility
+                           of line graphics, such as axes, when they
+                           are associated with the image.  The
+                           image-display device should be capable of
+                           showing at least 24 colours or grey
+                           levels simultaneously, and more for
+                           certain applications.
+   o  Image-display    --- The device used for overlays on the image
+      Overlay              display.  Again there is a restriction
+                           there should be at least 16 colours, except
+                           for X-windows overlays, since these only
+                           have a single colour.
+
+The purpose of these global parameters is ostensibly to prevent
+unnecessary prompting.  However, there is an ulterior motive as well.
+The selection of devices outside of the graphics applications
+enables us to perform other necessary actions just once.
+
+There are commands for selecting each type of device: GDSET, IDSET
+and OVSET for the graphics device, image display and overlay
+respectively.  For example,
+ 
+     ICL> idset xwindows
+     % gdset ps_l
+ 
+A selection remains in force until you change it via another
+device-selecting command, use NOGLOBALS, or delete the globals
+file.  The current choices can be inspected via the GLOBALS command.
+If the global parameter is undefined you will be prompted for the
+device if an application requires it.
+
+You can override the global parameter for the duration of a single
+application by specifying it by keyword (normally DEVICE=), or in
+some applications, by position.  Here is an example.
+ 
+     ICL> contour device=ps_l
+ 
+
+X-windows
+
+
+The most commonly used devices are X-windows.  These can require a
+little preparation before you select a device.  Starlink graphics
+use GWM to manage windows.  It enables a window to persist between
+separate applications; or to be shared by GKS and IDI applications,
+and even programmes running on different machines.  See SUN/130 for
+details of GWM and how to change your X-defaults file
+($HOME/.Xdefaults), but the salient points are given below.
+
+If the window appears on a terminal or workstation other than the one
+running the KAPPA executables you will need to redirect
+output to your screen, if you have not already done so for some other
+software.  You either use the xdisplay command
+
+    % xdisplay myterm.mysite.mydomain.mycountry
+
+or set the DISPLAY environment variable to point to the address of
+your screen.
+
+    % setenv DISPLAY myterm.mysite.mydomain.mycountry:0
+
+You substitute your machine's address or IP number. (Ask your
+computer manager.)
+
+If you do not create the window before running KAPPA, the first
+graphics application to open an X-windows device will create the
+window, using certain defaults.  The defaults control amongst others
+the foreground and background colours, the number of colours
+allocated, the size and location of the window.  These defaults may
+be altered with an X-defaults file, or a window created with the
+GWM xmake command.
+
+    % xmake xwindows -geom 600x450 -fg yellow -bg black
+
+This example makes a window of dimension 600-by-450 pixels, the
+background colour is black and colour for the line graphics is
+yellow. 
+
+GWM also enables a single-colour overlay to be associated with a
+window.  This lets you clear the overlay independently of the image
+(task OVCLEAR), so you can annotate a picture with other graphics.
+This is most useful in interactive applications like ARDGEN,
+CONTOVER, INSPECT or SEGMENT.  A GWM overlay does have one drawback,
+however: it halves the number of available colour indices.  If you
+want to use an X-windows overlay, you must ensure that you have made
+the window with the -overlay qualifier to xmake, or change your
+X-defaults file, or use a {\tt +} suffix to the device name.
+
+The following set up to place in your X-defaults file is a reasonable
+compromise, as it maximises the number of colour indices for the
+image-display window (xwindows), has a yellow overlay (xoverlay),
+and a line-graphics window (x2windows).  In the defaults file there
+are the following lines
+
+     Gwm*xwindows*colours:         80
+     Gwm*xwindows*overlay:         True
+     Gwm*xwindows*ovcolour:        Yellow
+     Gwm*xwindows2*colours:        20
+
+and you can also set the sizes of the windows too.  Notice that the
+second device name is x2windows, but the window name is xwindows2.
+Don't ask why.  An overlay on this device is called x2overlay.  This
+confusing name rule applies also to all but the first window of the
+maximum of four windows allowed.
+
+The device names can be abbreviated, to give unambiguous names.
+Thus you can enter xw for the xwindows device, and xo for its
+overlay; x2w for the x2windows device, and x2o for its overlay; and
+so on.  This is the reason for having device names as they are.  If
+a window does not exist, you can create one with an overlay by
+appending a + to the name, so for example a device name of x2w+
+would open the x2windows device with an overlay plane.
+
+The following tells KAPPA that these are the current devices.
+These remain as global parameters, so you probably will not need to
+issue these commands that often.
+
+     % idset xwindows
+     % gdset x2windows
+     % ovset xoverlay
+
+
+For an X-windows overlay, INSPECT in the cursor mode uses dashed
+lines instead of changing colour, for example when indicating the
+position of a region or slice.  Similarly for CONTOVER when pen
+rotation is selected, and for annotations in CURSOR and SEGMENT.
+.endhelp

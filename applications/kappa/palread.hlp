@@ -1,0 +1,67 @@
+.help palread Starlink kappa
+.nf
+Fills the palette of a colour table from an NDF.
+
+Usage:
+
+   palread palette [device]
+
+Description:
+
+   This application reads a palette of colours from an NDF, stored as
+   red, green and blue intensities, to fill the portion of
+   the current image display's colour table which is reserved for
+   the palette.  The palette comprises 16 colours and is intended
+   to provide coloured annotations, borders, axes, graphs etc. that
+   are unaffected by changes to the lookup table used for images.
+
+Parameters
+
+For information on individual parameters, select from the list below:
+
+DEVICE
+
+DEVICE = DEVICE (Read)
+   Name of the image display to be used.  The device must be in
+   one of the following GNS categories: IMAGE_DISPLAY,
+   IMAGE_OVERLAY, or WINDOW, and have at least 24 colour indices.
+   The device must also not reset when the device is opened
+   (since the existing colour table would be lost).  [Current
+   image-display device]
+
+PALETTE
+
+PALETTE = NDF (Read)
+   The name of the NDF containing the palette of reserved colours
+   as its data array.  The palette must be 2-dimensional, the
+   first dimension being 3, and the second 16.  If the second
+   dimension is greater than 16 only the first 16 colours are
+   used; if it has less than 16 just fill as much of the palette
+   as is possible starting from the first colour.  The palette's
+   values must lie in the range 0.0--1.0.
+
+Examples
+
+palread rustic
+   This loads the palette stored in the NDF called rustic into
+   the reserved portion of the colour table of the current
+   image display.
+
+palread rustic xwindows
+   This loads the palette stored in the NDF called rustic into
+   the reserved portion of the colour table of the xwindows
+   device.
+
+Related_Applications
+
+   KAPPA: PALDEF, PALENTRY, PALSAVE.
+
+Authors
+
+MJC: Malcolm J. Currie (STARLINK)
+
+History
+
+ 1991 July 19 (MJC):
+    Original version.
+.endhelp

@@ -1,0 +1,7 @@
+in,f,a,,,,"NDF to be compressed"
+out,f,a,,,,"NDF after being compressed"
+compress,struct,a,,,,"Compression factors"
+
+origin,struct,h,,,,"Pixel indices of the first selected element."
+
+title,s,h,INDEF,,,"Title for output NDF"

@@ -1,0 +1,90 @@
+.help pixdupe Starlink kappa
+.nf
+Expands an NDF by pixel duplication.
+
+Usage:
+
+   pixdupe in out expand
+
+Description:
+
+   This routine expands the size of an NDF structure by duplicating
+   each input pixel a specified number of times along each
+   dimension, to create a new NDF structure.
+
+Parameters
+
+For information on individual parameters, select from the list below:
+
+EXPAND
+
+EXPAND() = _INTEGER (Read)
+   Linear expansion factors to be used to create the new data
+   array.  The number of factors should equal the number of
+   dimensions in the input NDF.  If fewer are supplied the last
+   value in the list of expansion factors is given to the
+   remaining dimensions.  Thus if a uniform expansion is required
+   in all dimensions, just one value need be entered.  If the net
+   expansion is one, an error results.  The suggested default is
+   the current value.
+
+IN
+
+IN  = NDF (Read)
+   Input NDF structure to be expanded.
+
+OUT
+
+OUT = NDF (Write)
+   Output NDF structure.
+
+TITLE
+
+TITLE = LITERAL (Read)
+   Title for the output NDF structure.  A null value (!)
+   propagates the title from the input NDF to the output NDF. [!]
+
+Examples
+
+pixdupe aa bb 2
+   This expands the NDF called aa duplicating pixels along each
+   dimension, and stores the enlarged data in the NDF called bb.
+   Thus if aa is 2-dimensional, this command would result in a
+   four-fold increase in the array components.
+
+pixdupe cosmos galaxy [2,1]
+   This expands the NDF called cosmos by duplicating along the
+   first axis, and stores the enlarged data in the NDF called
+   galaxy.
+
+pixdupe cube1 cube2 [3,1,2]  title="Reconfigured cube"
+   This expands the NDF called cube1 by having three pixels for
+   each pixel along the first axis and duplicating along the
+   third axis, and stores the enlarged data in the NDF called
+   cube2.  The title of cube2 is {\tt "Reconfigured cube"}.
+
+Related_Applications
+
+   KAPPA: COMPADD, COMPAVE, COMPICK.
+
+Authors
+
+MJC: Malcolm J. Currie (STARLINK)
+
+History
+
+ 1995 April 28 (MJC):
+    Original NDF version.
+
+
+Implementation_Status
+
+   -  This routine correctly processes the AXIS, DATA, QUALITY,
+   VARIANCE, LABEL, TITLE, UNITS, and HISTORY, components of an NDF
+   data structure and propagates all extensions.  Origin information
+   becomes undefined by the duplication and so is not propagated.
+
+   -  All non-complex numeric data types can be handled.
+
+   -  Any number of NDF dimensions is supported.
+.endhelp

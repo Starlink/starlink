@@ -1,0 +1,45 @@
+.help idset Starlink kappa
+.nf
+Selects a current image-display device.
+
+Usage:
+
+   idset device
+
+Description:
+
+   This application selects a current image-display device. This
+   device will be used for all applications requiring an
+   image-display until changed explicitly.
+
+Parameters
+
+For information on individual parameters, select from the list below:
+
+DEVICE
+
+DEVICE = DEVICE (Read)
+   The image-display device to become the current image-display
+   device.  The device must be in one of the following GNS
+   categories: IMAGE_DISPLAY, IMAGE_OVERLAY, MATRIX_PRINTER, or
+   WINDOW, and have at least 24 colour indices or greyscale
+   intensities.
+
+Examples
+
+idset xwindows
+   Makes the xwindows device the current image-display device.
+
+Related_Applications
+
+   KAPPA: GDSET, IDSTATE, OVSET; Figaro: SOFT.
+
+Authors
+
+MJC: Malcolm J. Currie  (STARLINK)
+
+History
+
+ 1991 June 27 (MJC):
+    Original version.
+.endhelp

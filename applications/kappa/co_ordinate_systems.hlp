@@ -1,0 +1,147 @@
+.help co_ordinate_systems Starlink kappa
+.nf
+KAPPA uses a number of co-ordinate systems; this topic describes
+them, and how to select one.  NDFTRACE reports the bounds of an NDF
+in these various co-ordinate systems. 
+
+
+Pixel_Indices
+
+
+The elements in an NDF's array can be addressed by their
+n-dimensional integer pixel indices.  The first or origin pixel in
+an NDF need not have pixel index equal to one in each dimension,
+though it usually will.  An NDF can have an arbitrary origin.  By
+adjusting the origins of NDFs with SETORIGIN you may combine the
+NDFs differently.  For example, ADD adds two NDFs where they overlap.
+The overlap is defined in terms of pixel indices.  Thus only those
+pixels with the same pixel index in both NDFs will be added.  The
+resultant NDF is the addition in the intersection of the two input
+NDFs. 
+
+If you wish to select rectangular sections of pixels within an NDF
+indices are fine and precise. Since they are integer quantities,
+these indices cannot represent a continuous co-ordinate system,
+although the information stored in an NDF will almost always require
+that positions within it be describable to sub-pixel accuracy.  For
+example, when CENTROID determines the position of a star in a
+2-dimensional image it will inevitably give rise to a non-integer
+result, for which a continuous (x-y) co-ordinate system is required.
+See "Pixel_Co-ordinates".
+
+
+Pixel_Co-ordinates
+
+There are a number of ways in which a continuous co-ordinate system
+can be defined for a regular array of pixels.  In the absence of
+other information, the Starlink convention is to use a pixel
+co-ordinate system in which a pixel with indices (i,j) has its
+centre at the position
+
+                        (i-1/2,j-1/2)
+
+and is taken to be one unit in extent in each dimension.  Pixel
+(1,1) would therefore be centred at the position (0.5,0.5) and would
+have its `lower' and `upper' corners located at positions (0.0,0.0)
+and (1.0,1.0) respectively, as follows
+
+                                      (1.0,1.0)
+                                      v
+                        ---------------
+                        |             |
+                        |             |
+                        |      + <----|---- (0.5,0.5)
+                        |             |
+                        |             |
+                        ---------------
+                        ^
+                (0.0,0.0)
+
+This makes it possible to refer to fractional pixel positions---in
+this case within a 2-dimensional array, although the principle can
+obviously be extended to other numbers of dimensions.
+
+
+Data_Co-ordinates
+
+The pixel co-ordinate system described in subtopic
+"Pixel_Co-ordinates" how to convert pixel indices into a set of
+continuous co-ordinates and therefore introduces a co-ordinate axis
+which runs along each dimension of the NDF.
+
+The use of the pixel size to determine the units of these axes is
+rather restrictive, however, and in practice we may want to use more
+realistic physical units. This would allow a spectrum to be
+calibrated in wavelength, for instance, or the output from a
+plate-measuring machine to be related to axes calibrated in microns.
+In KAPPA these are called Data co-ordinates.
+
+The NDF's axis components are designed to hold the extra information
+needed to define more useful co-ordinate systems, so that realistic
+axes can be associated with a NDF, along with labels and units for
+these axes. 
+
+
+Selecting_a_Co-ordinate_System
+
+The pixel co-ordinate system is the default choice, and although it
+is intended to be used only in the absence of other information,
+KAPPA offers you a choice of co-ordinate system, even if your NDF
+has physical co-ordinates in its axis centres.
+
+There is a global parameter---the current co-ordinate system---that
+may be WORLD or DATA.  It is set by a parameter called COSYS in each
+application that processes data co-ordinates. For instance,
+ 
+     % display cosys=w axes \\
+     % centroid
+ 
+makes the axes about the displayed image and the centroid positions
+in the following task appear in pixel co-ordinates, regardless of
+whether there are axes present or not. 
+
+Conversely,
+ 
+     % display cosys=d axes \\
+     % centroid
+ 
+makes the axes about the displayed image and the centroid positions
+appear in data co-ordinates, provided there are axes present.  Of
+course, the axes may just have a pixel co-ordinate system.
+
+If the global parameter is undefined, applications will adopt 
+a suitable default, depending on the application.  All default to
+"Data" except ARDMASK, CENTROID, FITSURFACE, PSF, SEGMENT,
+TRANSFORMER, and ZAPLIN.
+
+When you draw a plot or an image, the graphics database records the
+co-ordinate extents of the picture.  What was not said explicitly
+was which co-ordinate system.  Looking at the output from GDSTATE
+and CURSOR shows that the database deals in world co-ordinates.
+Graphics packages like GKS require co-ordinates to be linear and
+increase from left to right and bottom to top.  This is not
+necessarily the case for physical axes.  So are we going to lose our
+co-ordinate system between applications?  No... well almost
+certainly not.  KAPPA strives to find a linear transformation
+between your data co-ordinates and pixel co-ordinates, or a
+logarithmic one in some cases.  If it succeeds the transformation is
+stored in the database.  Thus if you plot a spectrum with wavelength
+along the abscissa, you can then use CURSOR to identify lines.
+ 
+     % linplot adam_examples:spectrum cosys=d \\
+     % cursor
+
+     Use the graphics cursor to define the next point...
+        Press left button on mouse/trackerball to select a point.
+        Press right button on mouse/trackerball to end input.
+
+     X=3934.254, Y=196.118 in KAPPA_LINPLOT( DATA )
+     X=3969.148, Y=196.118 in KAPPA_LINPLOT( DATA )
+ 
+The x co-ordinates are the wavelengths in Angstroms of the Calcium
+II H and K lines.
+
+If the global parameter is undefined you will be prompted for a
+co-ordinate as required.
+
+.endhelp

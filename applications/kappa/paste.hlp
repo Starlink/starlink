@@ -1,0 +1,119 @@
+.help paste Starlink kappa
+.nf
+Pastes a series of NDFs upon each other.
+
+Usage:
+
+   paste in p1 [p2] ... [p25] out=?
+
+Description:
+
+   This application copies a series of NDFs, in the order supplied
+   and taking account of origin information, on to a `base' NDF to
+   produce an output NDF.  The output NDF is therefore a copy of the
+   base NDF obscured wholly or partially by the other input NDFs.
+   This operation is analogous to pasting in publishing.  It is
+   intended for image editing and the creation of insets.
+
+   The dimensions of the NDFs may be different, and indeed so may
+   their dimensionalities.  The output NDF can be constrained to
+   have the dimensions of the base NDF, so the pasted NDFs are
+   clipped.  Normally, the output NDF will have dimensions such
+   that all the input NDFs are accommodated in full.
+
+   Bad values in the pasted NDFs are by default transparent, so the
+   underlying data are not replaced during the copying.
+
+Parameters
+
+For information on individual parameters, select from the list below:
+
+CONFINE
+
+CONFINE = _LOGICAL (Read)
+   This parameter controls the dimensions of the output NDF.  If
+   CONFINE is FALSE the output NDF just accommodates all the input
+   NDFs.  If CONFINE is TRUE, the output NDF's dimensions matches
+   those of the base NDF. [FALSE]
+
+IN
+
+IN = NDF (Read)
+   The base NDF on to which the other input NDFs will be pasted.
+
+OUT
+
+OUT = NDF (Write)
+   The NDF resulting from pasting of the input NDFs onto the base
+   NDF.  Its dimensions may be different from the base NDF.  See
+   parameter CONFINE.
+
+P1-P25
+
+P1-P25 = NDF (Read)
+   The NDFs to be pasted on to the base NDF.  The NDFs are pasted
+   in the order P1, P2, ... P25.  There can be no missing NDFs,
+   e.g. in order for P3 to be processed there must be a P2 given
+   as well.  A null value (!) indicates that there is no NDF.
+   NDFs P2 to P25 are defaulted to !.  At least one NDF must be
+   pasted, therefore P1 may not be null.
+
+TITLE
+
+TITLE = LITERAL (Read)
+   Title for the output NDF structure.  A null value (!)
+   propagates the title from the base NDF to the output NDF. [!]
+
+TRANSP
+
+TRANSP = _LOGICAL (Read)
+   If TRANSP is TRUE, bad values within the pasted NDFs are not
+   copied to the output NDF as the bad values were transparent.
+   If TRANSP is FALSE, all values are copied during the paste
+   and a bad value will obscured an underlying value.  [TRUE]
+
+Examples
+
+paste aa inset out=bb
+   This pastes the NDF called inset on to the arrays in the NDF
+   called aa to produce the NDF bb.  Bad values are transparent.
+   The bounds and dimensionality of bb may be larger than those of
+   aa.
+
+paste aa inset out=bb notransp
+   As above except that bad values are copied from the NDF inset
+   to NDF bb.
+
+paste aa inset out=bb confine
+   As the first example except that the bounds of NDF bb match
+   those of NDF aa.
+
+paste ccd fudge inset out=ccdc
+   This pastes the NDF called fudge, followed by NDF inset on to
+   the arrays in the NDF called ccd to produce the NDF ccdc.  Bad
+   values are transparent.  The bounds and dimensionality of ccd
+   may be larger than those of ccdc.
+
+Authors
+
+MJC: Malcolm J. Currie (STARLINK)
+
+History
+
+ 1991 November 15 (MJC):
+    Original version.
+
+Implementation_Status
+
+   -  This routine correctly processes the AXIS, DATA, QUALITY,
+   VARIANCE, LABEL, TITLE, UNITS, and HISTORY, components of an NDF
+   data structure and propagates all extensions.  Propagation is from
+   the base NDF.
+
+   -  Processing of bad pixels and automatic quality masking are
+   supported.
+
+   -  All non-complex numeric data types can be handled.
+
+   -  Any number of NDF dimensions is supported.
+.endhelp

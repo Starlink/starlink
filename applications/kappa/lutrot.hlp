@@ -1,0 +1,122 @@
+.help lutrot Starlink kappa
+.nf
+Rotates the colour table of an image-display device.
+
+Usage:
+
+   lutrot [device] [plane]
+
+Description:
+
+   This routine rotates the colour table of a nominated plane of
+   an IDI-supported image display, such as X-windows.  The rotation
+   is under mouse, joystick or trackerball button control.
+
+   For an Ikon or X-windows, moving the mouse left or right
+   rotates the colour table towards lower and higher pen numbers
+   respectively.  Pressing the left button of the mouse resets the
+   colour table to its input state, and hitting the right-hand
+   button ends the rotation.
+
+Parameters
+
+For information on individual parameters, select from the list below:
+
+DEVICE
+
+DEVICE = DEVICE (Read)
+   The name of the image-display device whose colour table is to
+   be rotated.  The name of the base plane should be given even if
+   the overlay colour table is to be rotated.
+   [Current image-display device]
+
+FULL
+
+FULL = _LOGICAL (Read)
+   If FULL is TRUE, the whole colour-table for the device is
+   rotated, including the reserved pens.  When FULL is FALSE, the
+   reserved pens in the palette are unaltered.  [FALSE]
+
+PLANE
+
+PLANE = _INTEGER (Read)
+   The number of the memory plane whose colour table is to be
+   rotated.  If it is null the base (image) memory's colour table
+   is rotated.  The base memory is 0 and overlays are numbered
+   consecutively from 1.  For an Ikon the only overlay plane is 1.
+   PLANE is only permitted to have a value in the range 0 to the
+   number of planes minus one. [0]
+
+Examples
+
+lutrot
+   This enables rotation of the colour table on the current
+   image-display device.
+
+lutrot xwindows
+   This enables rotation of the colour table on the xwindows
+   device.
+
+lutrot full
+   This enables rotation of the colour table and palette on the
+   current image-display device.
+
+lutrot ikon 1
+   This enables rotation of the colour table on the Ikon overlay
+   plane.
+
+Notes
+
+-  Only Ikons and X-windows are supported.
+
+-  The rate of motion of the colour table is a function of the
+speed of cursor movement in addition to the cursor position.
+For a given cursor displacement slow motion rotates the colour
+table more slowly, and faster motion moves it more rapidly.  This
+permits both fine control and swift rotation.
+
+Related_Applications
+
+   KAPPA: CRELUT, LUTFLIP, LUTHILITE, LUTTWEAK.
+
+Authors
+
+MJC: Malcolm J. Currie (STARLINK)
+
+History
+
+ 1990 Apr 15 (MJC):
+    Original version.
+
+ 1991 April 10 (MJC):
+    Modified for colour-table management, specifically the reserved
+    pens are not rotated.
+
+ 1991 June 5 (MJC):
+    Altered for new, X-windows, IDI.  Capability 14 is 2**n rather
+    than n.
+
+ 1991 November 15 (MJC):
+    Made exit trigger number 2.  Inceased maximum number of
+    triggers to 64.
+
+ 1992 February 10 (MJC):
+    Normalised the rotation displacement by the effective number
+    of colour indices.
+
+ 1992 February 29 (MJC):
+    Added fine tuning using the cursor speed, and computed the
+    displacements in floating point to give a smoother feel.
+
+ 1992 March 26 (MJC):
+    Replaced AIF parameter-system calls by the extended PAR
+    library.
+
+ 1992 August 5 (MJC):
+    Used new capability 18 to obtain the true number of
+    colour-table entries, which may not be a power of 2, as
+    returned by capability 14.
+
+ 1994 April 29 (MJC):
+    Added FULL parameter.
+.endhelp

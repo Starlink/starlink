@@ -1,0 +1,3 @@
+palette,f,a,,,,"NDF to save the palette of reserved colours"
+device,f,a,,,,"*! Image-display device"
+title,s,h,"Kappa - Palsave",,,"Title for the palette NDF"

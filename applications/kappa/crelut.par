@@ -1,0 +1,22 @@
+inlut,f,a,,,,"NDF containing input lookup table"
+outlut,f,a,,,,"NDF to save the lookup table"
+ndf,f,a,,,,"Image to be displayed"
+comp,s,h,"Data",,,"Component to display"
+low,r,a,,,,"Low value for image scaling"
+high,r,a,,,,"High value for image scaling"
+inpal,f,h,!,,,"NDF containing input palette"
+outpal,f,a,!,,,"NDF to save the palette"
+device,f,a,,,,"*! Image-display device"
+colour,struct,a,,,,"New palette colour"
+
+colrange,struct,a,,,,"Select one or two colours from the palette"
+
+nn,b,h,n,,,"Nearest-neighbour mapping?"
+ok,b,a,,,,"Accept this colour (Y/N)?"
+palnum,i,a,,,,"Number of the palette entry to be modified"
+penrange,struct,a,,,,"First and last pen of the LUT to be modified"
+
+ptitle,s,h,"Kappa - Crelut",,,"Title for the palette"
+title,s,h,"Kappa - Crelut",,,"Title for the lookup table"
+valrange,struct,a,,,,"Data-value range to be assigned colours"
+

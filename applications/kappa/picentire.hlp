@@ -1,0 +1,68 @@
+.help picentire Starlink kappa
+.nf
+Finds the first unobscured and unobscuring FRAME picture in the
+graphics database.
+
+Usage:
+
+   picentire [device]
+
+Description:
+
+   This application selects the first, i.e. oldest, FRAME picture in
+   the graphics database for a graphics device, subject to the
+   following criterion.  The picture must not obstruct any other
+   picture except the BASE, and must itself not be obstructed.
+   Unobstructed means that there is no younger picture overlying it
+   either wholly or in part.  This means that plotting can occur
+   within the selected FRAME picture without overwriting or
+   obscuring earlier plots.
+
+Parameters
+
+For information on individual parameters, select from the list below:
+
+DEVICE
+
+DEVICE = DEVICE (Read)
+   The graphics workstation. [The current graphics device]
+
+Examples
+
+picentire
+   This selects the first unobscured and unobscuring FRAME
+   picture for the current graphics device.
+
+picentire xwindows
+   This selects the first unobscured and unobscuring FRAME picture
+   for the xwindows graphics device.
+
+Notes
+
+-  An error is returned if there is no suitable FRAME picture,
+and the current picture remains unchanged.
+
+-  This routine cannot know whether or a picture has been cleared,
+and hence is safe to reuse, as such information is not stored in
+the graphics database.
+
+Related_Applications
+
+   KAPPA: PICEMPTY, PICGRID, PICLAST, PICLIST, PICSEL, PICVIS.
+
+Timing
+
+   The execution time is approximately proportional to a linear
+   combination of the number of pictures in the database before the
+   unobstructed FRAME picture is found, and the square of the number
+   of pictures in the database.
+
+Authors
+
+MJC: Malcolm J. Currie (STARLINK)
+
+History
+
+ 1995 October 30 (MJC):
+    Original version.
+.endhelp

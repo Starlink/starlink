@@ -1,0 +1,5 @@
+in,f,a,,,,"NDF to be masked"
+ardfile,f,a,ardfile.dat,,,"Masking ARD file"
+out,f,a,,,,"Masked NDF"
+cosys,s,a,"World",,,"*! Co-ordinate system used in the ARD file"
+title,s,h,INDEF,,,"Title for output NDF"

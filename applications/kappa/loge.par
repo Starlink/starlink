@@ -1,0 +1,4 @@
+inpic,f,a,,,,"Input image"
+base,r,h,2.718282,,,"Base"
+outpic,f,a,,,,"Output image"
+otitle,s,h,"KAPPA - Loge",,,"Title for output image"

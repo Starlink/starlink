@@ -1,0 +1,5 @@
+ndf,f,a,,,,"NDF to be given commentary"
+mode_,s,h,"Interface",,,"Method by which to obtain commentary"
+comment,s,a,,,,"Comment line"
+file,f,a,,,,"File containing the commentary"
+wrap,b,h,y,,,"Wrap the comments to the maximum width?"

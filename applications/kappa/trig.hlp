@@ -1,0 +1,108 @@
+.help trig Starlink kappa
+.nf
+    Performs a trigonometric transformation on a data array
+ 
+   This routine allows the user to select one of a set of several
+   basic trigonometrical functions (sine, cosine, tangent, arcsine,
+   etc.) and operate on each pixel of the data array, in the input
+   IMAGE structure, with this function, and then to output a
+   transformed version of the array. The trigonometric functions can
+   be selected to act as if the input data are to be treated as
+   radians or degrees. If a scalar value rather than a data array is
+   input, the application acts purely on that scalar value.
+ 
+   The magic-value method is used for processing bad data.  Undefined
+   results are set to the magic value.
+
+AUTHORS
+
+   Mark McCaughrean UoE ( REVA::MJM )
+   Malcolm Currie  STARLINK (RAL)
+
+BUGS
+
+   None known.
+
+HISTORY
+
+   10-12-1985 : First implementation (UKTH::MARK)
+   08-01-1986 : Allowed option of scalar processing (REVA::MJM)
+   1986 Aug 8 : Renamed routines TRIGSCAL and TRIGSUB to TRGSCL and
+                TRIGSB respectively. 2nd argument of TRIGSB changed
+                to the number of pixels in the input array. Status
+                checking of mapping of output array added
+                (RAL::CUR).
+   1986 Sep 1 : Added argument section to prologue, generalised to
+                vector and nearly conformed to Starlink standards
+                (RAL::CUR).
+   1987 Oct 16: Reordered tidying (particularly in VALID loop), extra
+                status checks and used CMP_SHAPE, rewrote method
+                section (RAL::CUR)
+   1988 Mar 17: Referred to `array' rather than `image'
+                (RAL::CUR)
+   1988 Jun 1 : More reporting of error context (RAL::CUR)
+   1989 Jun 13: Allow for processing primitive NDFs (RAL::CUR)
+   1991 Oct 25: Propagates AXIS, LABEL, and HISTORY (RAL::CUR).
+   1992 Feb 25: Limited processing of simple NDFs (RAL::CUR).
+
+PARAMETERS
+
+   INPIC = IMAGE( READ )
+       Input IMAGE structure containing the data array to be
+         transformed.
+   TRIGFUNC = CHAR( READ )
+       Trigonometrical function to be applied.
+   OUTPIC = IMAGE( WRITE )
+       Output IMAGE structure containing the transformed data array.
+   OTITLE = CHAR( READ )
+       Title string for the output IMAGE structure.
+
+INPUT
+
+  position    1
+  keyword     'INPUT'
+  type        'UNIV'
+  access      'READ'
+  vpath       'PROMPT'
+  ppath       'GLOBAL'
+  association '<-GLOBAL.DATA_ARRAY'
+  prompt      'Input to be operated on'
+  help        'Give the IMAGE structure containing the data array, or 
+              the scalar on which the trig function is to operate.'
+
+TRIGFUNC
+
+  position    2
+  keyword     'TRIGFUNC'
+  type        'LITERAL'
+  vpath       'PROMPT'
+  prompt      'Trig function to be used'
+  help        'One of 
+              SIN,COS,TAN,SIND,COSD,TAND,ASIN,ACOS,ATAN,ASIND,ACOSD,ATAND.'
+ #in          'SIN', 'COS', 'TAN', 'SIND', 'COSD', 'TAND', 'ASIN', 
+              'ACOS', 'ATAN', 'ASIND', 'ACOSD', 'ATAND'
+
+OUTPIC
+
+  position    3
+  keyword     'OUTPIC'
+  type        'IMAGE'
+  access      'WRITE'
+  vpath       'PROMPT'
+  association '->GLOBAL.DATA_ARRAY'
+  prompt      'Image for output data'
+  help        'Name given to the IMAGE structure to hold the 
+              generated data array.'
+
+OTITLE
+
+  position    4
+  keyword     'OTITLE'
+  type        '_CHAR'
+  vpath       'DEFAULT'
+  prompt      'Title for output image'
+  default     'KAPPA - Trig'
+  help        'Character string used as a title for the output IMAGE 
+              structure.'
+
+.endhelp

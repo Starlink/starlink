@@ -1,0 +1,82 @@
+.help picxy Starlink kappa
+.nf
+   Creates a new FRAME picture defined by co-ordinate bounds
+
+Usage:
+
+   picxy lbound ubound
+
+Description:
+
+   This command creates a new FRAME picture in the graphics database.
+   The bounds of the new picture are defined through two parameters.
+   The new picture is formed within either the current or BASE
+   picture, and it adopts the world co-ordinate system of that
+   reference picture.  On completion the new picture becomes the
+   current picture.
+
+   This command is a synonym for {\tt picdef xy 1.0}.
+
+
+Parameters
+
+For information on individual parameters, select from the list below:
+
+CURRENT
+
+CURRENT = _LOGICAL (Read)
+   TRUE if the new pictures are to lie within the current picture,
+   otherwise the new pictures can lie anywhere within the BASE
+   picture.  In other words, when CURRENT is TRUE the current picture
+   is the reference picture, and when it is FALSE the base is the
+   reference picture. [FALSE]
+
+DEVICE
+
+DEVICE = DEVICE (Read)
+   The graphics device. [Current graphics device]
+
+LBOUND
+
+LBOUND( 2 ) = _REAL (Read)
+   Co-ordinates of the lower bound that defines the new picture.
+   The suggested default is the bottom-left of the current picture.
+
+OUTLINE
+
+OUTLINE = _LOGICAL (Read)
+   If TRUE, a box that delimits the new picture is drawn. [TRUE]
+
+UBOUND
+
+UBOUND( 2 ) = _REAL (Read)
+   Co-ordinates of the upper bound that defines the new picture.
+   The suggested default is the top-right of the current picture.
+
+Examples
+
+picxy [0.1,0.2] [0.9,0.6]
+   This creates a new FRAME picture in the base picture extending
+   from (0.1,0.2) to (0.9,0.6), which becomes the new current
+   picture.  An outline is drawn around the picture.
+
+picxy ubound=[1.1,0.9] lbound=[0.1,0.2] current nooutline
+   This creates a new FRAME picture in the current picture
+   extending from (0.1,0.2) to (1.1,0.9), which becomes the new
+   current picture.  No outline is drawn.
+
+
+Related_Applications
+
+   KAPPA: PICCUR, PICDEF, PICSEL.
+
+Authors
+
+MJC: Malcolm J. Currie  (STARLINK)
+
+History
+
+ 1995 August 23 (MJC):
+    Original version.
+
+.endhelp

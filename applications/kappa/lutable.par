@@ -1,0 +1,10 @@
+mapping,s,a,,,,"Type of scaling between limits"
+coltab,s,a,,,,"Kind of colour table"
+lut,f,a,,,,"NDF containing input LUT"
+device,f,a,,,,"*! Name of display device"
+ndf,f,a,,,,"Image for histogram equalisation"
+percentiles,struct,a,,,,"Percentile limits for the histogram"
+10 90
+shade,r,a,,,,"Type of shading"
+full,b,h,n,,,"Write to the full colour table?"
+nn,b,h,n,,,"Nearest-neighbour mapping?"

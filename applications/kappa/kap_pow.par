@@ -1,0 +1,4 @@
+inpic,f,a,,,,"Input image"
+power,r,a,,,,"Power"
+outpic,f,a,,,,"Output image"
+otitle,s,h,"KAPPA - Pow",,,"Title for output image"

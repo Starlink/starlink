@@ -1,0 +1,18 @@
+ndf,f,a,,,,"NDF to be contoured"
+comp,s,h,"Data",,,"Component to contour"
+offset,struct,a,,,,"x-y displacement in pixels"
+0 0
+mode_,s,a,,,,"Method for selecting contour heights"
+ncont,i,a,6,,,"Give the number of contour heights"
+device,f,a,,,,"*! Name of display device"
+clear,b,h,y,,,"Is the current picture to be cleared before plotting?"
+concol,s,h,"1",,,"Colour of contours"
+dashed,r,h,INDEF,,,"Height below which contours are dashed"
+firstcnt,r,a,,,,"Give the height of the first contour"
+heights,struct,a,,,,"Give the heights of the contours"
+
+penrot,b,h,n,,,"Is the graphics pen to be cycled through 3 colours?"
+percentiles,struct,a,,,,"Give the heights of the contours as percentiles"
+
+stepcnt,r,a,,,,"Give the interval between contour heights"
+thick,r,h,1.0,,,"Give the relative thickness of contours"

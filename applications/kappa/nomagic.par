@@ -1,0 +1,6 @@
+in,f,a,,,,"NDF from which magic values are to be removed"
+out,f,a,,,,"NDF without magic values"
+repval,r,a,,,,"The value to replace the magic value"
+sigma,r,h,INDEF,,,"The standard deviation of the replacement values"
+comp,s,h,"Data",,,"Component(s) to process"
+title,s,h,INDEF,,,"Title for output NDF"

@@ -1,0 +1,105 @@
+.help flip Starlink kappa
+.nf
+Reverses an NDF's pixels along a specified dimension.
+
+Usage:
+
+   flip in out dim
+
+Description:
+
+   This application reverses the order of an NDF's pixels along a
+   specified dimension, leaving all other aspects of the data
+   structure unchanged.
+
+Parameters
+
+For information on individual parameters, select from the list below:
+
+AXIS
+
+AXIS = _LOGICAL (Read)
+   If a TRUE value is given for this parameter (the default),
+   then any axis values associated with the NDF dimension being
+   reversed will also be reversed in the same way.  If a FALSE
+   value is given, then all axis values will be left unchanged.
+   [TRUE]
+
+DIM
+
+DIM = _INTEGER (Read)
+   The number of the dimension along which the NDF's pixels
+   should be reversed.  The value should lie between 1 and the
+   total number of NDF dimensions.  If the NDF has only a single
+   dimension, then this parameter is not used, a value of 1 being
+   assumed.
+
+IN
+
+IN = NDF (Read)
+   The input NDF data structure whose pixel order is to be
+   reversed.
+
+OUT
+
+OUT = NDF (Write)
+   The output NDF data structure.
+
+TITLE
+
+TITLE = LITERAL (Read)
+   A title for the output NDF.  A null value will cause the title
+   of the NDF supplied for parameter IN to be used instead. [!]
+
+Examples
+
+flip a b 2
+   Reverses the pixels in the NDF called a along its second
+   dimension to create the new NDF called b.
+
+flip specin specout
+   If specin is a 1-dimensional spectrum, then this example
+   reverses the order of its pixels to create a new spectrum
+   specout.  Note that no value for the DIM parameter need be
+   supplied in this case.
+
+flip in=cube out=newcube dim=2 noaxis
+   Reverses the order of the pixels along dimension 2 of the NDF
+   called cube to give newcube, but leaves the associated axis
+   values in their original order.
+
+Notes
+
+The pixel-index bounds of the NDF are unchanged by this routine.
+
+Related_Applications
+
+   KAPPA: ROTATE, TRANSFORMER; Figaro: IREVX, IREVY, IROT90.
+
+Authors
+
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+
+MJC: Malcolm J. Currie (STARLINK)
+
+History
+
+ 13-MAR-1991 (RFWS):
+    Original version.
+
+ 1992 March 3 (MJC):
+    Replaced AIF parameter-system calls by the extended PAR
+    library.
+
+Implementation_Status
+
+   -  This routine correctly processes the AXIS, DATA, QUALITY,
+   VARIANCE, LABEL, TITLE, UNITS, and HISTORY components of the
+   input NDF and propagates all extensions.
+
+   -  Processing of bad pixels and automatic quality masking are
+   supported.
+
+   -  All non-complex numeric data types can be handled.  The data
+   type of the input pixels is preserved in the output NDF.
+.endhelp

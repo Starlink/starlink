@@ -1,0 +1,107 @@
+.help errclip Starlink kappa
+.nf
+Removes pixels with large errors from an NDF.
+
+Usage:
+
+   errclip in out limit [mode]
+
+Description:
+
+   This application produces a copy of the input NDF in which pixels
+   with errors greater than a specified limit are set invalid in
+   both DATA and VARIANCE components.  The error limit may be
+   specified as the maximum acceptable standard deviation (or
+   variance), or the minimum acceptable signal-to-noise ratio.
+
+Parameters
+
+For information on individual parameters, select from the list below:
+
+IN
+
+IN = NDF (Read)
+   The input NDF.  An error is reported if it contains no VARIANCE
+   component.
+
+OUT
+
+OUT = NDF (Write)
+   The output NDF.
+
+LIMIT
+
+LIMIT = _DOUBLE (Read)
+   Either the maximum acceptable standard deviation or variance
+   value, or the minimum acceptable signal-to-noise ratio
+   (depending on the value given for MODE).  It must be positive.
+
+MODE
+
+MODE = LITERAL (Read)
+   Determines how the value supplied for LIMIT is to be
+   interpreted: "Sigma" for a standard deviation, "Variance"
+   for variance, or "SNR" for minimum signal-to-noise ratio.
+   ["Sigma"]
+
+Examples
+
+errclip m51 m51_good 2.0
+   The NDF m51_good is created holding a copy of m51 in which all
+   pixels with standard deviation greater than 2 are set invalid.
+
+errclip m51 m51_good 2.0 snr
+   The NDF m51_good is created holding a copy of m51 in which all
+   pixels with a signal-to-noise ratio less than 2 are set
+   invalid.
+
+errclip m51 m51_good mode=v limit=100
+   The NDF m51_good is created holding a copy of m51 in which all
+   pixels with a variance greater than 100 are set invalid.
+
+Notes
+
+-  The limit and the number of rejected pixels are reported.
+
+-  A pair of output data and variance values are set bad when
+either of the input data or variances values is bad.
+
+-  For MODE="SNR" the comparison is with respect to the absolute
+data value.
+
+Related_Applications
+
+   KAPPA: FFCLEAN, PASTE, SEGMENT, SETMAGIC, THRESH.
+
+Authors
+
+DSB: David Berry (STARLINK)
+
+MJC: Malcolm J. Currie (STARLINK)
+
+History
+
+ 16-SEP-1993 (DSB):
+    Original version.
+
+ 1995 April 11 (MJC):
+    Renamed parameter TYPE to MODE.  Added Notes, Implementation
+    Status, Related Applications sections, and two additional
+    examples.  Corrected typo's.  Made the array mapping more
+    efficient.  Made message reporting conditional.  Ensured that
+    the LIMIT could not be zero. Used a modern-style of variable
+    declaration and other minor stylistic changes.
+
+Implementation_Status
+
+   -  This routine correctly processes the AXIS, DATA, QUALITY,
+   VARIANCE, LABEL, TITLE, UNITS, and HISTORY components of an NDF
+   data structure and propagates all extensions.
+
+   -  Processing of bad pixels and automatic quality masking are
+   supported.
+
+   -  All non-complex numeric data types can be handled.  The output
+   NDF has the same numeric type as the input NDF.  However, all
+   internal calculations are performed in double precision.
+.endhelp

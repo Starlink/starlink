@@ -1,0 +1,5 @@
+in,f,a,,,,"Input NDF data structure"
+out,f,a,,,,"Output NDF data structure"
+dim,i,a,,,,"Dimension to reverse pixels along"
+axis,b,h,y,,,"Flip associated axis values?"
+title,s,h,INDEF,,,"Title for output NDF"

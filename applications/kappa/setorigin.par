@@ -1,0 +1,3 @@
+ndf,f,a,,,,"Data structure"
+origin,i,a,,,,"New pixel origin value(s)"
+like,f,h,!,,,"Template NDF"

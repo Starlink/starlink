@@ -1,0 +1,343 @@
+.help manic Starlink kappa
+.nf
+    Converts all or part of a data array from one dimensionality
+    to another.
+ 
+   This application copies or converts all or part of a 1, 2 or
+   3-dimensional data array to one or more output data arrays, each
+   of 1, 2 or 3 dimensions. All data arrays are stored in IMAGE
+   structures. Windows may be set in any of the dimensions of the
+   input data array. All or part of the input array may be projected
+   on to any of the rectangular planes or axes of the input before
+   being written to an output array; or a 1- or 2-dimensional data
+   array may be grown to more dimensions to fill an output data
+   array. Many output data arrays, each of a different configuration
+   if required, may be extracted from a single input data array with
+   one call to the routine.
+
+AUTHORS
+
+   C D Pike    (RGO::CDP)
+   Roger Wood  (RGO::RW)
+   Dave Baines (ROE::ASOC5)
+   Malcolm Currie  STARLINK (RAL::CUR)
+
+BUGS
+
+   None known.
+
+HISTORY
+
+   15/08/1981 : Original version    (RGO::CDP)
+   30/03/1983 : Amended  version    (RGO::RW)
+   21/02/1984 : Revised SSE version (ROE::ASOC5)
+   1986 Aug 7 : Standardised prologue formatting. Status check on
+                entry added (RAL::CUR).
+   1986 Aug 29: Renamed APP routines into AIF_. Added argument
+                section to prologue and tidied. Revised output
+                of dimensions via DIMLST routine (RAL::CUR).
+   1986 Oct 30: Allowed for bad pixel handling in routines MA3TO1,
+                MA3TO2 and MA2TO1 for which workspace of the
+                appropriate dimension is now found (RAL::CUR).
+   1987 Oct 15: Reordered tidying and extra status checks
+                (RAL::CUR)
+   1988 Mar 16: Substituted AIF_ANTMP to annul workspace
+                (RAL::CUR).
+   1988 Mar 17: Referred to `array' rather than `image'
+                (RAL::CUR).
+   1988 Jun 20: More reporting of error context (RAL::CUR).
+   1989 Jun 13: Allow for processing primitive NDFs (RAL::CUR)
+   1989 Aug  8: Passed array dimensions as separate variables
+                to COPY2D, COPY3D, MA1TO2, MA1TO3, MA2TO1, MA2TO3,
+                MA3TO1 and MA3TO2 (RAL::CUR).
+   1989 Dec 21: Workspace managed by AIF_TEMP (RAL::CUR).
+   1991 Oct 25: Propagates UNITS, LABEL and HISTORY (RAL::CUR).
+   1992 Feb 25: Limited processing of simple NDFs (RAL::CUR).
+   1992 Mar  3: Replaced AIF parameter-system calls by the extended
+                PAR library (RAL::CUR).
+
+PARAMETERS
+
+   INPUT      = IMAGE( READ )
+       IMAGE structure holding the input data array.
+   ONDIM      = INTEGER( READ )
+       Dimensionality of an output data array.
+   XLIMITS(2) = INTEGER( READ )
+       The X-axis window on the input data array to be used in
+         forming an output data array.
+   YLIMITS(2) = INTEGER( READ )
+       The Y-axis window on the input data array to be used in
+         forming an output data array.
+   ZLIMITS(2) = INTEGER( READ )
+       The Z-axis window on the input data array to be used in
+         forming an output data array.
+   XRANGE(2)  = INTEGER( READ )
+       The X-axis range for summation in the input data array in
+         forming an output data array.
+   YRANGE(2)  = INTEGER( READ )
+       The Y-axis range for summation in the input data array in
+         forming an output data array.
+   ZRANGE(2)  = INTEGER( READ )
+       The Z-axis range for summation in the input data array in
+         forming an output data array.
+   EPLANE     = CHAR( READ )
+       Plane to be extracted from the input 3-d data array.  The
+         options are 'XY', 'YZ', 'ZX', 'YX', 'ZY', 'XZ'.
+   GPLANE     = CHAR( READ )
+       Input 2-d data array forms this plane when being grown into
+         a 3-d data array.  The options are 'XY', 'YZ', 'ZX', 'YX',
+         'ZY', 'XZ'.
+   ELINE1     = CHAR( READ )
+       Axis of input 2-d data array to be extracted to form an output
+         1-d data array.  The alternatives are 'X', 'Y'.
+   ELINE2     = CHAR( READ )
+       Axis of input 3-d data array to be extracted to form an output
+         1-d data array.  The options are 'X', 'Y', 'Z'.
+   GLINE1     = CHAR( READ )
+       Input 1-d data array will form this axis of an output 2-d
+         data array.  The alternatives are 'X', 'Y'.
+   GLINE2     = CHAR( READ )
+       Input 1-d data array will form this axis of an output 3-d
+         data array.  The options are 'X', 'Y', 'Z'.
+   XDIM       = INTEGER( READ )
+       X-dimension of output 2-d or 3-d data array grown from input
+         1-d or 2-d data array.
+   YDIM       = INTEGER( READ )
+       Y-dimension of output 2-d or 3-d data array grown from input
+         1-d or 2-d data array.
+   ZDIM       = INTEGER( READ )
+       Z-dimension of output 2-d or 3-d data array grown from input
+         1-d or 2-d data array.
+   OUTPUT     = IMAGE( WRITE )
+       IMAGE structure to hold an output data array.
+   OTITLE     = CHAR( WRITE )
+       Title for IMAGE structure holding an output data array.
+   LOOP       = LOGICAL( READ )
+       Extract or grow further output data arrays from the same input
+         data array.
+
+INPUT
+
+  position    1
+  keyword     'INPUT'
+  type        'IMAGE'
+  access      'READ'
+  vpath       'PROMPT'
+  ppath       'GLOBAL'
+  association '<-GLOBAL.DATA_ARRAY'
+  prompt      'Input image'
+  help        'Name of the IMAGE structure containing the input data 
+              array.'
+
+OUTPUT
+
+  position    2
+  keyword     'OUTPUT'
+  type        'IMAGE'
+  access      'WRITE'
+  vpath       'PROMPT'
+  association '->GLOBAL.DATA_ARRAY'
+  prompt      'Output image'
+  help        'Name of the IMAGE structure to store output data array.'
+
+OTITLE
+
+  position    3
+  keyword     'OTITLE'
+  type        '_CHAR'
+  vpath       'DEFAULT'
+  prompt      'Output image title'
+  default     'KAPPA - Manic'
+  help        'Character string used as a title for the output IMAGE 
+              structure.'
+
+ONDIM
+
+  position    4
+  keyword     'ONDIM'
+  type        '_INTEGER'
+  vpath       'PROMPT'
+  ppath       'DYNAMIC'
+  prompt      'Dimensionality of output image'
+  help        'Number of dimensions for the output image. It must be 1, 2 or 3.'
+ #in          1, 2, 3
+
+XLIMITS
+
+  position    5
+  keyword     'XLIMITS'
+  type        '_INTEGER'
+  vpath       'PROMPT'
+  ppath       'DYNAMIC'
+  prompt      'Window limits for the X-axis of the input data array'
+  help        'Give a contiguous range of X-axis pixels that form the 
+              output data array.'
+
+YLIMITS
+
+  position    6
+  keyword     'YLIMITS'
+  type        '_INTEGER'
+  vpath       'PROMPT'
+  ppath       'DYNAMIC'
+  prompt      'Window limits for the Y-axis of the input data array'
+  help        'Give a contiguous range of Y-axis pixels that form the 
+              output data array.'
+
+ZLIMITS
+
+  position    7
+  keyword     'ZLIMITS'
+  type        '_INTEGER'
+  vpath       'PROMPT'
+  ppath       'DYNAMIC'
+  prompt      'Window limits for the Z-axis of the input data array'
+  help        'Give a contiguous range of Z-axis pixels that form the 
+              output data array.'
+
+XRANGE
+
+  position    8
+  keyword     'XRANGE'
+  type        '_INTEGER'
+  vpath       'PROMPT'
+  ppath       'DYNAMIC'
+  prompt      'Range for summation over the X-axis of the input data
+              array'
+  help        'Give a contiguous range of X-axis pixels that are 
+              going to be summed in forming the output data array'
+
+YRANGE
+
+  position    9
+  keyword     'YRANGE'
+  type        '_INTEGER'
+  vpath       'PROMPT'
+  ppath       'DYNAMIC'
+  prompt      'Range for summation over the Y-axis of the input data
+              array'
+  help        'Give a contiguous range of Y-axis pixels that are 
+              going to be summed in forming the output data array'
+
+ZRANGE
+
+  position    10
+  keyword     'ZRANGE'
+  type        '_INTEGER'
+  vpath       'PROMPT'
+  ppath       'DYNAMIC'
+  prompt      'Range for summation over the Z-axis of the input data
+              array'
+  help        'Give a contiguous range of Z-axis pixels that are 
+              going to be summed in forming the output data array.'
+
+EPLANE
+
+  position    11
+  keyword     'EPLANE'
+  type        '_CHAR'
+  vpath       'PROMPT'
+  ppath       'CURRENT,DYNAMIC'
+  prompt      'Plane of the input data array from which the output
+              array is to be extracted'
+  help        'Options are: XY, YZ, or XZ.'
+ #in          'XY', 'YZ', 'ZX', 'YX', 'ZY', 'XZ'
+
+GPLANE
+
+  position    12
+  keyword     'GPLANE'
+  type        '_CHAR'
+  vpath       'PROMPT'
+  ppath       'CURRENT,DYNAMIC'
+  prompt      'Plane of the output data array which the input
+              data array will form'
+  help        'Options are: XY, YZ, or XZ.'
+ #in          'XY', 'YZ', 'ZX', 'YX', 'ZY', 'XZ'
+
+ELINE1
+
+  position    13
+  keyword     'ELINE1'
+  type        '_CHAR'
+  vpath       'PROMPT'
+  ppath       'CURRENT,DYNAMIC'
+  prompt      'Axis of the input data array that will be used to
+              form the output data array?'
+  help        'Alternatives are X or Y.'
+ #in          'X', 'Y'
+
+ELINE2
+
+  position    14
+  keyword     'ELINE2'
+  type        '_CHAR'
+  vpath       'PROMPT'
+  ppath       'CURRENT,DYNAMIC'
+  prompt      'Axis of the input data array that will be used to
+              form the output data array'
+  help        'Options are X, Y or Z.'
+ #in          'X', 'Y', 'Z'
+
+GLINE1
+
+  position    15
+  keyword     'GLINE1'
+  type        '_CHAR'
+  vpath       'PROMPT'
+  ppath       'CURRENT,DYNAMIC'
+  prompt      'Axis of the output data array that the input data
+              array will form'
+  help        'Alternatives are X or Y.'
+ #in          'X', 'Y'
+
+GLINE2
+
+  position    16
+  keyword     'GLINE2'
+  type        '_CHAR'
+  vpath       'PROMPT'
+  ppath       'CURRENT,DYNAMIC'
+  prompt      'Axis of the output data array that the input data
+              array will form'
+  help        'Options are X, Y or Z.'
+ #in          'X', 'Y', 'Z'
+
+XDIM
+
+  position    17
+  keyword     'XDIM'
+  type        '_INTEGER'
+  vpath       'PROMPT'
+  ppath       'CURRENT,DYNAMIC'
+  prompt      'X-dimension for the output data array'
+
+YDIM
+
+  position    18
+  keyword     'YDIM'
+  type        '_INTEGER'
+  vpath       'PROMPT'
+  ppath       'CURRENT,DYNAMIC'
+  prompt      'Y-dimension for the output data array'
+
+ZDIM
+
+  position    19
+  keyword     'ZDIM'
+  type        '_INTEGER'
+  vpath       'PROMPT'
+  ppath       'CURRENT,DYNAMIC'
+  prompt      'Z-dimension for the output data array'
+
+LOOP
+
+  position    20
+  keyword     'LOOP'
+  type        '_LOGICAL'
+  vpath       'PROMPT'
+  ppath       'DEFAULT'
+  default     N
+  prompt      'Produce another output IMAGE structure and data array?'
+
+.endhelp

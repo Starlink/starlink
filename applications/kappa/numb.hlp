@@ -1,0 +1,112 @@
+.help numb Starlink kappa
+.nf
+Counts the number of elements of an NDF with values or absolute
+values above or below a threshold.
+
+Usage:
+
+   numb in value [comp]
+
+Description:
+
+   This routine counts and reports the number of elements of an
+   array within an input NDF structure that have a value or absolute
+   value greater or less than a specified threshold.  This statistic
+   is also shown as a percentage of the total number of array
+   elements.
+
+Parameters
+
+For information on individual parameters, select from the list below:
+
+ABS
+
+ABS = _LOGICAL (Read)
+   If ABS is TRUE, the criterion is a comparison of the absolute
+   value with the threshold; if FALSE, the criterion is a
+   comparison of the actual value with the threshold.  The
+   current value is the suggested default. [FALSE]
+
+ABOVE
+
+ABOVE = _LOGICAL (Read)
+   If ABOVE is TRUE the criterion tests whether values are
+   greater than the threshold; if FALSE the criterion tests
+   whether values are less than the threshold.  The current value
+   of ABOVE is the suggested default. [TRUE]
+
+COMP
+
+COMP = LITERAL (Read)
+   The components whose flagged values are to be substituted.
+   It may be "Data", "Error", "Variance", or "Quality".  If
+   "Quality" is specified, then the quality values are treated as
+   numerical values in the range 0 to 255. ["Data"]
+
+IN
+
+IN  = NDF (Read)
+   Input NDF structure containing the array to be tested.
+
+NUMBER
+
+NUMBER = _INTEGER (Write)
+   The number of elements that satisfied the criterion.
+
+VALUE
+
+VALUE  = _DOUBLE (Read)
+   Threshold against which the values of the array elements will
+   be tested.  It must lie in within the minimum and maximum
+   values of the data type of the array being processed, unless
+   ABS = TRUE or the component is the variance or quality
+   array, in which case the minimum is zero.  The suggested
+   default is the current value.
+
+Examples
+
+numb image 100
+   This counts the number of elements in the data array of the NDF
+   called image that exceed 100.
+
+numb spectrum 100 noabove
+   This counts the number of elements in the data array of the NDF
+   called spectrum that are less than 100.
+
+numb cube 100 abs
+   This counts the number of elements in the data array of the NDF
+   called cube whose absolute values exceed 100.
+
+numb image -100 number=(count)
+   This counts the number of elements in the data array of the NDF
+   called image that exceed -100 and write the number to ICL
+   variable COUNT.
+
+numb image 200 v
+   This counts the number of elements in the variance array of
+   the NDF called image that exceed 200.
+
+Authors
+
+MJC: Malcolm J. Currie (STARLINK)
+
+History
+
+ 1991 November 11 (MJC):
+    Original NDF version.
+
+ 1995 January 16 (MJC):
+    Replaced AIF by PAR.  Added ERROR option to parameter COMP.
+
+Implementation_Status
+
+   -  This routine correctly processes the DATA, QUALITY,
+   TITLE, and VARIANCE components of an NDF data structure.
+
+   -  Processing of bad pixels and automatic quality masking are
+   supported.
+
+   -  All non-complex numeric data types can be handled.
+
+   -  Any number of NDF dimensions is supported.
+.endhelp

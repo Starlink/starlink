@@ -1,0 +1,4 @@
+ndf,f,a,,,,"Data structure to modify"
+table,f,a,,,,"FITS keyword translation table"
+xname,s,a,,,,"Output extension name"
+xtype,s,a,,,,"Output extension type"

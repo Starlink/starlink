@@ -1,0 +1,49 @@
+.help picbase Starlink kappa
+.nf
+Selects the BASE picture from the graphics database.
+
+Usage:
+
+   picbase
+
+Description:
+
+   This command selects the BASE picture.  Subsequent plotting for
+   the chosen device will be in this new current picture.  The BASE
+   picture is the largest picture available, and encompasses all
+   other pictures.  By default the chosen device is the current one.
+
+   This command is a synonym for "piclist picnum=1".
+
+
+Parameters
+
+For information on individual parameters, select from the list below:
+
+DEVICE
+
+DEVICE = DEVICE (Read)
+   The graphics workstation. [The current graphics device]
+
+Examples
+
+picbase
+   This selects the BASE picture for the current graphics device.
+
+picbase device=x2w
+   This selects the BASE picture for the x2w device.
+
+Related_Applications
+
+   KAPPA: PICCUR, PICDATA, PICFRAME, PICLAST, PICLIST, PICSEL.
+
+Authors
+
+MJC: Malcolm J. Currie (STARLINK)
+
+History
+
+ 1995 August 23 (MJC):
+    Original version.
+
+.endhelp

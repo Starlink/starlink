@@ -1,0 +1,267 @@
+.help quilt Starlink kappa
+.nf
+    Generates a mosaic from equally sized 2-d data arrays,
+    optionally specified from an ASCII file
+ 
+   This routine provides a more-sophisticated version of the MOSAIC
+   application for combining many 2-d data arrays into one large
+   output data array. All the data arrays are stored in IMAGE
+   structures.  The pixels in overlapping regions may be averaged or
+   summed.
+ 
+   The names of IMAGE structures to be concatenated and their
+   respective offsets of their data arrays from a central
+   data array can be input either one by one from the interface, or
+   all at once from a free-format file.  The format of the file is
+   as follows:
+ 
+      Mosaic title                        ! header
+      central_image                       ! name of central IMAGE
+      125                                 ! total no. frames
+      345  229                            ! maximum x-y offsets
+      -356  -232                          ! minimum x-y offsets
+      image_2                             ! subsequent IMAGE and
+      35  34                              ! its x-y offsets
+      image_3
+      36  -33
+      .
+      .
+      .
+      .
+ 
+   Only like-sized data arrays may be input. The reason for this is
+   that it is difficult to work out how big the output data array
+   needs to be until all the input data arrays and their offsets have
+   been read in. By confining the data arrays to be the same size,
+   only the maximum and minimum x and y offsets from the central data
+   array need be input by the user, then the output image size can be
+   worked out from these numbers along with the size of the central
+   data array.
+ 
+   Bad pixels are processed by the magic-value method.
+
+AUTHORS
+
+   Mark McCaughrean UoE ( REVA::MJM )
+   Malcolm J. Currie STARLINK (RAL::CUR)
+
+BUGS
+
+   None known.
+
+DEFICIENCIES
+
+   Works with like-sized images only and uses Fortran i/o for getting
+   stuff from a file. Also, SUBPAR_ calls are used in some of the
+   subroutines to associate a string from the file with an HDS
+   structure.
+
+HISTORY
+
+   29-12-1986 : First implementation (from MOSAIC) (REVA::MJM)
+   1988 May 29: KAPPA version, using magic-value bad pixels only
+                (RAL::CUR).
+   1989 Jun 13: Allow for processing primitive NDFs (RAL::CUR)
+   1989 Aug  7: Passed array dimensions as separate variables
+                to MOSCAD, MOSCDV and ZERO2D (RAL::CUR).
+   1989 Dec 21: Workspace managed by AIF_TEMP (RAL::CUR).
+   1991 Oct 25: Propagates UNITS, LABEL, and HISTORY (RAL::CUR).
+   1992 Feb 26: Limited processing of simple NDFs (RAL::CUR).
+   1992 Mar  3: Replaced AIF parameter-system calls by the extended
+                PAR library (RAL::CUR).
+
+PARAMETERS
+
+   WHERE  =  CHAR( READ )
+       Whether input comes from an ASCII 'File' or from the
+         'Interface'.
+   FNAME  =  CHAR( READ )
+       Name of the ASCII file holding the input information to define
+         the mosaic.
+   NUMBER  =  INTEGER( READ )
+       Number of data arrays to form the mosaic.
+   INPICI  =  IMAGE( READ )
+       IMAGE structure containing the central data array (offset 0,0)
+   MAXX  =  INTEGER( READ )
+       Maximum x offset of any data array from the central data array
+         (must be >= 0) (Interface mode)
+   MAXY  =  INTEGER( READ )
+       Maximum y offset of any data array from the central data array
+         (must be >= 0) (Interface mode)
+   MINX  =  INTEGER( READ )
+       Minimum x offset of any data array from the central data array
+         (must be =< 0) (Interface mode)
+   MINY  =  INTEGER( READ )
+       Minimum y offset of any data array from the central data array
+         (must be =< 0) (Interface mode)
+   AVERAGE  = LOGICAL( READ )
+       If true overlap regions are averaged, alternatively, they are
+         summed.
+   OUTPIC  =  IMAGE( WRITE )
+       Output IMAGE structure.
+   OTITLE  =  CHAR( READ )
+       Title string for output IMAGE structure.
+   CURPIC  =  IMAGE( READ )
+       IMAGE containing the current data array being concatenated to
+         the mosaic.
+   OFFSETX  =  INTEGER( READ )
+       x offset of current data array from the central one (Interface
+         mode).
+   OFFSETY  =  INTEGER( READ )
+       y offset of current data array from the central one (Interface
+         mode).
+
+WHERE
+
+  keyword     'WHERE'
+  type        'LITERAL'
+  vpath       'PROMPT'
+  ppath       'CURRENT,DEFAULT'
+  prompt      'Input source'
+  default     'File'
+  help        'Choose File (ASCII file) or Interface as the source of
+              frames and offsets.'
+
+FNAME
+
+  keyword     'FNAME'
+  type        'FILENAME'
+  access      'READ'
+  vpath       'PROMPT'
+  ppath       'CURRENT'
+  prompt      'Source file name'
+  help        'Name of ASCII file holding mosaic information (header, 
+              number of arrays, max-min offsets, names and offsets).'
+
+NUMBER
+
+  keyword     'NUMBER'
+  type        '_INTEGER'
+  access      'READ'
+  vpath       'PROMPT'
+  prompt      'Number of data arrays'
+  help        'Give total number of 2-d data arrays to form a mosaic, 
+              including the central one.'
+
+INPICI
+
+  keyword     'INPICI'
+  type        'IMAGE'
+  access      'READ'
+  vpath       'PROMPT'
+  ppath       'GLOBAL'
+  association '<-GLOBAL.DATA_ARRAY'
+  prompt      'Central image'
+  help        'Name of IMAGE structure containing the central 2-d 
+              data array to be added.'
+
+MAXX
+
+  keyword     'MAXX'
+  type        '_INTEGER'
+  access      'READ'
+  vpath       'PROMPT'
+  ppath       'DYNAMIC'
+  prompt      'Maximum x offset'
+  help        'Give the maximum x offset of any data array (including 
+              the central one).'
+
+MAXY
+
+  keyword     'MAXY'
+  type        '_INTEGER'
+  access      'READ'
+  vpath       'PROMPT'
+  ppath       'DYNAMIC'
+  prompt      'Maximum y offset'
+  help        'Give the maximum y offset of any data array (including 
+              the central one).'
+
+MINX
+
+  keyword     'MINX'
+  type        '_INTEGER'
+  access      'READ'
+  vpath       'PROMPT'
+  ppath       'DYNAMIC'
+  prompt      'Minimum x offset'
+  help        'Give the minimum x offset of any data array (including 
+              the central one).'
+
+MINY
+
+  keyword     'MINY'
+  type        '_INTEGER'
+  access      'READ'
+  vpath       'PROMPT'
+  ppath       'DYNAMIC'
+  prompt      'Minimum y offset'
+  help        'Give the minimum y offset of any data array (including 
+              the central one).'
+
+AVERAGE
+
+  keyword     'AVERAGE'
+  type        '_LOGICAL'
+  access      'READ'
+  vpath       'PROMPT'
+  prompt      'Are overlapped input pixels to be averaged in the 
+              output array?'
+  help        'Input pixels may be occupy the same position in the 
+              output array. So output pixels can be averaged or 
+              summed.'
+  default     YES
+
+OUTPIC
+
+  keyword     'OUTPIC'
+  type        'IMAGE'
+  access      'WRITE'
+  vpath       'PROMPT'
+  association '->GLOBAL.DATA_ARRAY'
+  prompt      'Output mosaic image'
+  help        'Name given to the IMAGE structure to hold the mosaic 
+              data array.'
+
+OTITLE
+
+  keyword     'OTITLE'
+  type        '_CHAR'
+  vpath       'DEFAULT'
+  prompt      'Title for output image'
+  default     'KAPPA - Quilt'
+  help        'Character string used as a title for the output IMAGE 
+              structure.'
+
+CURPIC
+
+  keyword     'CURPIC'
+  type        'IMAGE'
+  access      'READ'
+  vpath       'PROMPT'
+  prompt      'Next Image'
+  help        'Give the name of the current IMAGE structure 
+              containing the 2-d data array to be part of the
+              mosaic.'
+
+OFFSETX
+
+  keyword     'OFFSETX'
+  type        '_INTEGER'
+  access      'READ'
+  vpath       'PROMPT'
+  prompt      'x offset of the array from the first'
+  help        'Give x offset in pixels of the current data array from 
+              the central one.'
+
+OFFSETY
+
+  keyword     'OFFSETY'
+  type        '_INTEGER'
+  access      'READ'
+  vpath       'PROMPT'
+  prompt      'y offset of the array from the first'
+  help        'Give y offset in pixels of the current data array from 
+              the central one.'
+
+.endhelp

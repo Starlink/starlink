@@ -1,0 +1,3 @@
+ndf,f,a,,,,"Data structure"
+dim,i,a,,,,"Dimension of axis to modify"
+anorm,b,a,,,,"New normalisation flag"

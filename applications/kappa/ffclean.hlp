@@ -1,0 +1,193 @@
+.help ffclean Starlink kappa
+.nf
+Removes defects from a substantially flat 1- or 2-dimensional NDF.
+
+Usage:
+
+   ffclean in out clip box [thresh] [wlim] [ilevel]
+
+Description:
+
+   This application cleans a 1- or 2-dimensional NDF by removing
+   defects smaller than a specified size.  The defects are flagged
+   with the bad value.  The defects are found by looking for pixels
+   that deviate from the image's smoothed version by more than an
+   arbitrary number of standard deviations from the local mean,
+   and that lie within a specified range of values.  Therefore, the
+   image must be substantially flat.  The data variances provide the
+   local-noise estimate for the threshold, but if these are not
+   available a variance for the whole of the image is derived from
+   the mean squared deviations of the original and smoothed images.
+   The smoothed version of the image is obtained by block averaging
+   over a rectangular box.  An iterative process progressively
+   removes the outliers from the image.
+
+Parameters
+
+For information on individual parameters, select from the list below:
+
+BOX
+
+BOX( 2 ) = _INTEGER (Read)
+   The x and y sizes (in pixels) of the rectangular box to be
+   applied to smooth the image.  If only a single value is given,
+   then it will be duplicated so that a square filter is used
+   except where the image is 1-dimensional for which the box size
+   along the insignificant dimension is set to 1.  The values
+   given will be rounded up to positive odd integers if
+   necessary.
+
+CLIP
+
+CLIP( ) = _REAL (Read)
+   The number of standard deviations for the rejection threshold
+   of each iteration.  Pixels that deviate from their counterpart
+   in the smoothed image by more than CLIP times the noise are
+   made bad.  The number of values given specifies the number of
+   iterations.  Values should lie in the range 0.5--100.  Up to
+   one hundred values may be given.  [3.0, 3.0, 3.0]
+
+ILEVEL
+
+ILEVEL = _INTEGER (Read)
+   The interactive level of the routine.  When it is greater or
+   equal to two, the application will report the intermediate
+   results after each iteration during processing.  It should lie
+   between 1 and 3. [2]
+
+IN
+
+IN = NDF (Read)
+   The 1- or 2-dimensional NDF containing the input image to be
+   cleaned.
+
+OUT
+
+OUT = NDF (Write)
+   The NDF to contain the cleaned image.
+
+SIGMA
+
+SIGMA = _DOUBLE (Write)
+   The estimation of the RMS noise per pixel of the output image.
+
+THRESH
+
+THRESH( 2 ) = _DOUBLE (Read)
+   The range between which data values must lie if cleaning is to
+   occur.  Thus it is possible to clean the background without
+   removing the cores of images by a judicious choice of these
+   thresholds.  If null, !, is given, then there is no limit on
+   the data range. [!]
+
+TITLE
+
+TITLE = LITERAL (Read)
+   The title of the output NDF.  A null (!) value means using the
+   title of the input NDF. [!]
+
+WLIM
+
+WLIM = _REAL (Read)
+   If the input image contains bad pixels, then this parameter
+   may be used to determine the number of good pixels which must
+   be present within the smoothing box before a valid output
+   pixel is generated.  It can be used, for example, to prevent
+   output pixels from being generated in regions where there are
+   relatively few good pixels to contribute to the smoothed
+   result.
+
+   By default, a null (!) value is used for WLIM, which causes
+   the pattern of bad pixels to be propagated from the input
+   image to the output image unchanged.  In this case, smoothed
+   output values are only calculated for those pixels which are
+   not bad in the input image.
+
+   If a numerical value is given for WLIM, then it specifies the
+   minimum fraction of good pixels which must be present in the
+   smoothing box in order to generate a good output pixel.  If
+   this specified minimum fraction of good input pixels is not
+   present, then a bad output pixel will result, otherwise a
+   smoothed output value will be calculated.  The value of this
+   parameter should lie between 0.0 and 1.0 (the actual number
+   used will be rounded up if necessary to correspond to at least
+   1 pixel). [!]
+
+Examples
+
+ffclean dirty clean \
+   The NDF called dirty is filtered such that pixels that deviate
+   by more than three standard deviations from the smoothed
+   version of dirty are rejected.  Three iterations are performed.
+   Each pixel in the smoothed image is the average of the
+   neighbouring nine pixels.  The filtered NDF is called clean.
+
+ffclean out=clean in=dirty thresh=[-100,200]
+   As above except only those pixels whose values lie between -100
+   and 200 can be cleaned.
+
+ffclean poxy dazed [2.5,2.8] [5,5]
+   The 2-dimensional NDF called poxy is filtered such that pixels
+   that deviate by more than 2.5 then 2.8 standard deviations from
+   the smoothed version of poxy are rejected.  The smoothing is an
+   average of a 5-by-5-pixel neighbourhood.  The filtered NDF is
+   called dazed.
+
+Related_Applications
+
+   KAPPA: CHPIX, FILLBAD, GLITCH, MEDIAN, MSTATS, ZAPLIN;
+   Figaro: BCLEAN, COSREJ, CLEAN, ISEDIT, MEDFILT, MEDSKY, TIPPEX.
+
+Authors
+
+RFWS: R. F. Warren-Smith (STARLINK)
+
+WG: Wei Gong  (STARLINK)
+
+MJC: Malcolm J. Currie (STARLINK)
+
+History
+
+ 1981 July (RFWS):
+    Original INTERIM version.
+
+ 5-OCT-1990 (WG):
+    Converted to the KAPPA/ADAM version.
+
+ 1991 June 30 (MJC):
+    Made generic; completed and expanded the prologue, renaming
+    some parameters for consistency with other applications;
+    introduced WLIM parameter for fraction; corrected error
+    reporting; and added thresholds.
+
+ 1992 March 3 (MJC):
+    Replaced AIF parameter-system calls by the extended PAR
+    library.
+
+ 1992 April 21 (MJC):
+    Made to handle significant dimensions for user-defined
+    sections.
+
+ 1992 December 17 (MJC):
+    Sets the bad-pixel flag in the output NDF.
+
+ 1995 April 5 (MJC):
+    Renamed from CLEANER to avoid name clash with Figaro.  Made to
+    work on 1-dimensional arrays.  Used lowercase examples and
+    usage.  Added Related Applications and additional commentary.
+    Changed the default of TITLE to null.  Used PSX to obtain
+    workspace.
+
+Implementation_Status
+
+   -  This routine correctly processes the AXIS, DATA, QUALITY,
+   VARIANCE, LABEL, TITLE, UNITS, and HISTORY components of an NDF
+   data structure and propagates all extensions.
+
+   -  Processing of bad pixels and automatic quality masking are
+   supported.
+
+   -  All non-complex numeric data types can be handled.  Arithmetic
+   is performed using single- or double-precision floating point as
+   appropriate.
+.endhelp

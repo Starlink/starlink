@@ -1,0 +1,4 @@
+in,f,a,,,,"Input NDF structure"
+out,f,a,,,,"Output NDF structure"
+like,f,h,!,,,"NDF to use as a shape template"
+title,s,h,INDEF,,,"Title for output NDF"

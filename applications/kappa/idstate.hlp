@@ -1,0 +1,153 @@
+.help idstate Starlink kappa
+.nf
+Shows the current status of an image display.
+
+Usage:
+
+   idstate [device]
+
+Description:
+
+   This application displays the current status of an image-display
+   device, including details of the current graphics-database
+   picture (e.g. its co-ordinate system and position on the display
+   surface), and the reserved colour table.
+
+Parameters
+
+For information on individual parameters, select from the list below:
+
+COMMENT
+
+COMMENT = LITERAL (Write)
+   The comment of the current picture.  Up to 132 characters
+   will be written.
+
+DEVICE
+
+DEVICE = DEVICE (Read)
+   Name of the image-display device about which information is
+   required. [Current image-display device]
+
+LABEL
+
+LABEL = LITERAL (Write)
+   The label of the current picture.  It is blank if there is no
+   label.
+
+NAME
+
+NAME = LITERAL (Write)
+   The name of the current picture.
+
+NCX1
+
+NCX1 = _REAL (Write)
+   The lower x normalised device co-ordinate of the current
+   picture.
+
+NCX2
+
+NCX2 = _REAL (Write)
+   The upper x normalised device co-ordinate of the current
+   picture.
+
+NCY1
+
+NCY1 = _REAL (Write)
+   The lower y normalised device co-ordinate of the current
+   picture.
+
+NCY2
+
+NCY2 = _REAL (Write)
+   The upper y normalised device co-ordinate of the current
+   picture.
+
+OUTLINE
+
+OUTLINE = _LOGICAL (Read)
+   If OUTLINE is TRUE, then an outline will be drawn around the
+   current picture to indicate its position. [FALSE]
+
+REFNAM
+
+REFNAM = LITERAL (Write)
+   The reference object associated with the current picture.  It
+   is blank if there is no reference object.  Up to 132 characters
+   will be written.
+
+REPORT
+
+REPORT = _LOGICAL (Read)
+   If this is FALSE the state of the image-display device is not
+   reported, merely the results are written to the output
+   parameters.  It is intended for use within procedures. [TRUE]
+
+WCX1
+
+WCX1 = _REAL (Write)
+   The lower x world co-ordinate of the current picture.
+
+WCX2
+
+WCX2 = _REAL (Write)
+   The upper x world co-ordinate of the current picture.
+
+WCY1
+
+WCY1 = _REAL (Write)
+   The lower y world co-ordinate of the current picture.
+
+WCY2
+
+WCY2 = _REAL (Write)
+   The upper y world co-ordinate of the current picture.
+
+Examples
+
+idstate
+   Shows the status of the current image-display device.
+
+idstate xwindows
+   Shows the status of the xwindows device.
+
+idstate outline
+   Shows the status of the current image-display device and draws
+   an outline around the current database picture.
+
+idstate refnam=(ndfname)
+   Shows the status of the current image-display device.  If there
+   is a reference data object, its name is written to the ICL
+   variable NDFNAME.
+
+gdstate wcx1=(x1) wcx2=(x2) wcy1=(y1) wcy2=(y2)
+   Shows the status of the current image-display device.  The
+   bounds of the current picture in world co-ordinates are
+   written to the ICL variables: X1, X2, Y1, Y2.
+
+Notes
+
+-  If a channel to the image-display device cannot be opened, then
+this application will still execute without error, but a reduced
+amount of information will be displayed and an outline around the
+current picture (if requested) will not be drawn.
+
+Related_Applications
+
+   KAPPA: GDSTATE.
+
+Authors
+
+RFWS: R.F. Warren-Smith (STARLINK)
+
+MJC: Malcolm J. Currie (STARLINK)
+
+History
+
+ 1991 July 10 (RFWS and MJC):
+    Original version based on GDSTATE.
+
+ 1991 August 20 (MJC):
+    Added output parameters and REPORT parameter.
+.endhelp

@@ -1,0 +1,5 @@
+colour,s,a,,,,"Highlight colour"
+device,f,a,,,,"*! Name of display device"
+plane,i,h,0,,,"Memory plane number"
+view,b,h,n,,,"Display the colour table?"
+full,b,h,n,,,"Highlight the full colour table?"

@@ -1,0 +1,4 @@
+in,f,a,,,,"The input NDF"
+out,f,a,,,,"The output NDF"
+limit,r,a,,,,"Limiting value"
+mode_,s,h,"SIGMA",,,"Quantity to limit"

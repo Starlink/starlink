@@ -1,0 +1,14 @@
+freename,f,a,,,,"Free-format data file"
+ndf,f,a,,,,"Output NDF"
+poscols,struct,h,,,,"Co-ordinate columns"
+1 2
+valcol,i,h,3,,,"Data value column"
+pscale,struct,h,,,,"Pixel-to-pixel distances"
+1.0 1.0
+dtype,s,h,"_REAL",,,"Type of the data values"
+title,s,h,"KAPPA - Trandat",,,"Title for output NDF"
+auto,b,h,n,,,"Automatic calculation of co-ordinates?"
+bad,b,h,y,,,"Initialise array with bad pixels?"
+lbound,i,h,,,,"Pixel lower bounds of the output NDF"
+quantum,i,h,2048,,,"Work array increment"
+shape,i,a,,,,"Shape of the output NDF"

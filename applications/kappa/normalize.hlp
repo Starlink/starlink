@@ -1,0 +1,315 @@
+.help normalize Starlink kappa
+.nf
+Normalises one NDF to a similar NDF by calculating a scale factor
+and zero-point difference.
+
+Usage:
+
+   normalize in1 in2 out
+
+Description:
+
+   This application compares the data values in one NDF against the
+   corresponding values in the other NDF.  A least-squares
+   straight-line is then fitted to the relationship between the two
+   sets of data values in order to determine the relative scale
+   factor and any zero-level offset between the NDFs.  To reduce
+   computation time, the data points are binned according to the
+   data value in the first NDF.  The mean data value within each bin
+   is used to find the fit and weights are applied according to the
+   number of pixels which contribute to each bin.
+
+   To guard against erroneous data values, which can corrupt the fit
+   obtained, the application then performs a number of iterations.
+   It calculates a noise estimate for each bin according to the rms
+   deviation of data values in the bin from the straight-line fit
+   obtained previously.  It then re-bins the data, omitting values
+   which lie more than a specified number of standard deviations
+   from the expected value in each bin.  The straight-line fit is
+   then re-calculated.  You can specify the number of standard
+   deviations and the number of iterations used.
+
+   A plot is produced after the final iteration showing the bin
+   centres, with error bars representing the spread of values in each
+   bin.  This plot is produced within the current AGI picture and is
+   of a size you specify.
+
+   Optionally, an output NDF can be created containing a normalised
+   version of the data array from the first input NDF.
+
+Parameters
+
+For information on individual parameters, select from the list below:
+
+ABSLAB
+
+ABSLAB = LITERAL (Read)
+   A title for the plot's x axis.  Only the first 50 characters
+   are used.  The default is "Data value in ^NDF" where ^NDF is
+   replaced by the name of the NDF associated with IN2. []
+
+CLEAR
+
+CLEAR = _LOGICAL (Read)
+   Determines if the graphics workstation is to be cleared before
+   producing the plot. [TRUE]
+
+DATARANGE
+
+DATARANGE( 2 ) = _REAL (Read)
+   This parameter may be used to override the plot auto-scaling
+   feature.  If given, two real numbers should be supplied
+   specifying the lower and upper data values in IN2, between
+   which data will be used.  If not given, the default is to use
+   the auto-scaled values, calculated according to the value of
+   PCRANGE. [,]
+
+DEVICE
+
+DEVICE = DEVICE (Read)
+   The graphics workstation on which to produce the plot.  If it
+   is null, !, there will be no plot made.
+   [Current graphics device]
+
+FONT
+
+FONT = LITERAL (Read)
+   The fount to be used for the line graphics.  It can be either
+   "NCAR" for the NCAR fancy characters and "GKS" for the standard
+   GKS san-serif fount.   The former is intended for hardcopy
+   publication-quality plots, since it is relatively slow; the
+   latter is intended for normal interactive graphics requiring
+   rapid plotting, and it is clearer on small plots.  The
+   suggested default is the current value. ["GKS"]
+
+IN1
+
+IN1 = NDF (Read)
+   The NDF to be normalised.
+
+IN2
+
+IN2 = NDF (Read)
+   The NDF to which IN1 will be normalised.
+
+MAJTIC
+
+MAJTIC( 2 ) = _REAL (Read)
+   The parameter controlling the numbers of major tick marks
+   for the x and y axes.  (Number used is between MAJTIC+2 and
+   5*MAJTIC/2+4.) [3.,3.]
+
+MINPIX
+
+MINPIX = _INTEGER (Read)
+   The minimum number of good pixels required in a bin before it
+   contributes to the fitted line.  It must be in the range 1 to
+   the number of pixels per bin. [2]
+
+MINTIC
+
+MINTIC( 2 ) = _REAL (Read)
+   The number of minor tick marks between each major tick mark
+   for the x and y axes.  A negative value forces the graphics
+   package to compute appropriate values. [-1.,-1.]
+
+NBIN
+
+NBIN = _INTEGER (Read)
+   The number of bins to use when binning the scatter plot prior
+   to fitting a straight line, in the range 2 to 10000. [50]
+
+NITER
+
+NITER = _INTEGER (Read)
+   The number of iterations performed to reject bad data values
+   in the range 0 to 100. [2]
+
+NSIGMA
+
+NSIGMA = _REAL (Read)
+   The number of standard deviations at which bad data is
+   rejected.  It must lie in the range 0.1 to 1.0E6. [3.0]
+
+OFFSET
+
+OFFSET = _REAL (Write)
+   An output parameter giving the offset in the linear
+   normalisation expression: IN1 = SLOPE * IN2 + OFFSET.
+
+ORDLAB
+
+ORDLAB = LITERAL (Read)
+   A title for the plots y axis.  Only the first 50 characters
+   are used.  The default is "Data value in ^NDF" where ^NDF is
+   replaced by the name of the NDF associated with IN1.
+   []
+
+OUT
+
+OUT = NDF (Write)
+   An optional output NDF to hold a version of IN1 which is
+   normalised to IN2.  A null (!) value indicates that an output
+   NDF is not required.
+
+OUTTIC
+
+OUTTIC = _LOGICAL (Read)
+   TRUE if the axis tick marks are to appear on the outside of
+   the axes instead of inside. [FALSE]
+
+PCRANGE
+
+PCRANGE( 2 ) = _REAL (Read)
+   This parameter takes two real values in the range 0 to 100 and
+   is used to modify the action of the auto-scaling algorithm
+   which scales the plots.  The two values correspond to the
+   percentage points in the histogram of IN2 at which the lower
+   and upper cuts on data value are placed.  With the default
+   value, the plots will omit those pixels which lie in the lower
+   and upper 2 percent intensity range of IN2. [2,98]
+
+PTITLE
+
+PTITLE = LITERAL (Read)
+   A title for the top of the plot.  Only the first 50 characters
+   are used. ["Normalization plot"]
+
+PXSIZE
+
+PXSIZE = _REAL (Read)
+   The horizontal size of the plot in metres.  If a value less
+   than the default is requested, then the plot will appear at
+   the bottom left of the current picture. [The size of the
+   current picture]
+
+PYSIZE
+
+PYSIZE = _REAL (Read)
+   The vertical size of the plot in metres.  If a value less than
+   the default is requested, then the plot will appear at the
+   bottom left of the current picture. [The size of the current
+   picture]
+
+SLOPE
+
+SLOPE = _REAL (Write)
+   An output parameter giving the slope of the linear
+   normalisation expression: IN1 = SLOPE * IN2 + OFFSET.
+
+TITLE
+
+TITLE = LITERAL (Read)
+   Value for the title of the output NDF.  A null value will cause
+   the title of the NDF supplied for parameter IN1 to be used
+   instead. [!]
+
+Examples
+
+normalize cl123a cl123b cl123c
+   This normalises NDF cl123a to the NDF cl123b.  A plot of the
+   fit is made on the current graphics device, and the resulting
+   normalisation scale and offset are written only to the
+   normalize.sdf parameter file (as in the all the examples below
+   except where noted).  The NDF cl123c is the normalised version
+   of the input cl123a.
+
+normalize cl123a cl123b cl123c title="Gain calibration"
+   This normalises NDF cl123a to the NDF cl123b.  A plot of the
+   fit is made on the current graphics device with the title
+   "Gain calibration".  The NDF cl123c is the normalised version
+   of the input cl123a.
+
+normalize cl123a cl123b cl123c offset=(shift) slope=(scale)
+   This normalises NDF cl123a to the NDF cl123b.  A plot of the
+   fit is made on the current graphics device.  The resulting
+   normalisation scale and offset are written to the ICL
+   variables SCALE and SHIFT respectively, where they could be
+   passed to another application via an ICL procedure.  The NDF
+   cl123c is the normalised version of the input cl123a.
+
+normalize in2=old in1=new out=! device=xwindows
+   This normalises NDF new to the NDF old.  A plot of the fit is
+   made on the xwindows device.  No output NDF is produced.
+
+normalize in1=new in2=old out=young niter=5 pcrange=[3,98.5]
+   This normalises NDF new to the NDF old.  It has five iterations
+   to reject outliers from the linear regression, and forms the
+   regression using pixels in old whose data values lie between
+   the 3 and 98.5 percentiles, comparing with the corresponding
+   pixels in new.  A plot of the fit is made on the current
+   graphics device.  The NDF young is the normalised version of
+   the input new.
+
+Notes
+
+-  Provided the application does not fail two pictures are stored
+in the graphics database: a FRAME of the specified size containing
+the title, annotated axes and the plot; and a DATA picture with
+each world co-ordinate being the pixel value of each NDF.  Both
+pictures have comment "KAPPA - Normalize".  The associated NDFs
+are not stored in the database.
+
+Related_Applications
+
+   CCDPACK: MAKEMOS.
+
+Authors
+
+DSB: David Berry (STARLINK)
+
+MJC: Malcolm J. Currie (STARLINK)
+
+History
+
+ 1-JUN-1990 (DSB):
+    Original version.
+
+ 22-JUN-1990 (DSB):
+    Graphics added.
+
+ 1990 October 4 (MJC):
+    Added standard KAPPA axis-style parameters, removed tabs,
+    extended and reformatted the prologue, added some contextual
+    error messages, passed pointers as arrays, and added unmapping
+    calls to prevent the output NDF from being deleted.
+
+ 1991 August 20 (MJC):
+    Added FONT parameter.
+
+ 1992 March 3 (MJC):
+    Replaced AIF parameter-system calls by the extended PAR
+    library.
+
+ 1995 May 2 (MJC):
+    Sets the bad-pixel flags.  Removed old histogram subroutine
+    calls.  Used PSX for workspace.  Made the Usage and Examples
+    lowercase.  Added Related Applications.  Title propagated.
+
+Implementation_Status
+
+   -  The routine correctly processes the AXIS, DATA, QUALITY,
+   VARIANCE, LABEL, TITLE, UNITS, and HISTORY components of an NDF,
+   and propagates all extensions to the output NDF.  All propagated
+   components come from the NDF to be normalised.
+
+   -  At the moment, variance values are not used in the fitting
+   algorithm but are modified in the output NDF to take account of
+   the scaling introduced by the normalisation.  (A later version may
+   take account of variances in the fitting algorithm.)
+
+   -  Processing of bad pixels and automatic quality masking are
+   supported.
+
+   -  Only _REAL data can be processed directly.  Other non-complex
+   numeric data types will undergo a type conversion before
+   processing occurs.  _DOUBLE data cannot be processed due to a
+   loss of precision.
+
+   -  The pixel bounds of the two input NDFs are matched by trimming
+   before calculating the normalisation constants, and are mapped as
+   vectors to allow processing of NDFs of any dimensionality.  An
+   output NDF may optionally be produced which is based on the
+   first input NDF (IN1) by applying the calculated normalisation
+   constants to IN1.
+.endhelp

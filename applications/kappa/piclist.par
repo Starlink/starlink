@@ -1,0 +1,4 @@
+name,s,h,INDEF,,,"Name of pictures to be selected"
+logfile,f,h,!,,,"File to store list of pictures"
+device,f,a,,,,"*! Name of graphics device"
+picnum,s,a,INDEF,,,"Number of new current picture"

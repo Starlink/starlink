@@ -1,0 +1,187 @@
+.help glitch Starlink kappa
+.nf
+    Replaces bad pixels in a 2-d data array with the local median.
+ 
+   This application removes bad pixels from a 2-d data array, stored
+   in the input IMAGE structure, and replaces them with the local
+   median of the eight (or less at the edges) neighbouring pixels.
+   At least three defined pixels must be in the neighbourhood,
+   otherwise the resultant pixel becomes bad.
+ 
+   There are three modes of use:
+ 
+   1. The application can be used interactively until the user is
+      finished cleaning his array. The user specifies the position of
+      `glitches' or bad pixels by their x and y pixel indices.
+   2. The user can give the name of a file which contains a free-
+      format list giving the x and y positions of the pixels to be
+      deglitched. The glitch list file should look like the following
+      example:
+ 
+     Glitch list for SBRC FPA#005
+     22  45
+     19  56
+     2   30
+     .   .
+     .   .
+     .   .
+     <EOF>
+ 
+      i.e. a header string that is output to the user, followed by
+      integer x-y pixel position pairs, terminated just by the
+      end-of-file marker. The header string is output to the user.
+   3. The bad (undefined/magic) pixels are automatically deglitched.
+      (Edge, especially corner pixels will need checking if the
+      density of bad pixels is high, because of the constraints
+      mentioned above. Such conditions may require a repeat dose of
+      this application, probably with option 1 or 2.)
+ 
+   The magic-value method is used for processing bad data.
+
+AUTHORS
+
+   Mark McCaughrean UoE (REVA::MJM)
+   Malcolm Currie  STARLINK (RAL::CUR)
+
+HISTORY
+
+   07-06-1985 : Started A-task implementation (REVA::MJM)
+   28-06-1985 : Changed to continually update the input array
+              : until no more deglitching done, then followed
+              : by request for output array, and copying over.
+              : (REVA::MJM)
+   09-12-1985 : Fixed error checking bug and implemented AIF
+              : dynamic defaulting/checking calls (UKTH::MARK)
+   11-12-1985 : Fixed bug caused by continuous updating of read
+              : only array - changed program order (UKTH::MARK)
+   11-04-1986 : Tidied up and increased error checking (REVA::MJM)
+   24-06-1986 : Included option to deglitch from a free-format list
+              : in a file (REVA::MJM)
+   1986 Aug 5 : Renamed algorithm subroutines (GLTCLT and GLTCSB).
+                Correctly ordered arguments in GLTCLT (2nd to 3rd)
+                and GLTCSB (2nd to 4th) (RAL::CUR).
+   1986 Aug 29: Added arguments section to the prologue, nearly
+                conformed to Starlink standards (RAL::CUR).
+   1987 Oct 15: Reordered tidying and extra status check
+                (RAL::CUR).
+   1988 Mar 17: Referred to `array' rather than `image'. Added
+                automatic removal of bad pixels (RAL::CUR).
+   1988 Jun 6 : More reporting of error context (RAL::CUR)
+   1988 Jun 30: Obtain filename in GLTCLT (RAL::CUR).
+   1989 Jun 13: Allow for processing primitive NDFs (RAL::CUR)
+   1989 Jul 27: Passed array dimensions as separate variables
+                to COPY2D, GLTBSB, GLTCLT and GLTCSB (RAL::CUR).
+   1991 Oct 25: Propagates AXIS, HISTORY, LABEL, and UNITS
+                (RAL::CUR).
+   1992 Feb 25: Limited processing of simple NDFs (RAL::CUR).
+   1992 Mar  3: Replaced AIF parameter-system calls by the extended
+                PAR library (RAL::CUR).
+
+PARAMETERS
+
+   INPIC  =  IMAGE( READ )
+       IMAGE structure containing the 2-d data array to be
+         deglitched.
+   OUTPIC  =  IMAGE( WRITE )
+       Output IMAGE structure containing the deglitched version of
+         the data array.
+   OTITLE  =  CHAR( READ )
+       Title for the output IMAGE structure.
+   WHERE  =  CHAR( READ )
+       Source of glitch positions: 'Interface' or 'File' or 'Bad'.
+   FILENAME  =  CHAR( READ )
+       File containing the free-format glitch list.
+   XCOORD  =  INTEGER( READ )
+       x pixel index of the pixel to be deglitched.
+   YCOORD  =  INTEGER( READ )
+       y pixel index of the pixel to be deglitched.
+   AGAIN  =  LOGICAL( READ )
+       Whether or not user is prompted for another pixel.
+
+INPIC
+
+  position    1
+  keyword     'INPIC'
+  type        'IMAGE'
+  access      'READ'
+  vpath       'PROMPT'
+  ppath       'GLOBAL'
+  association '<-GLOBAL.DATA_ARRAY'
+  prompt      'Image to be deglitched'
+  help        'Name of the IMAGE structure containing the 2-d data 
+              array to be deglitched.'
+
+OUTPIC
+
+  position    2
+  keyword     'OUTPIC'
+  type        'IMAGE'
+  access      'WRITE'
+  vpath       'PROMPT'
+  association '->GLOBAL.DATA_ARRAY'
+  prompt      'Image after being deglitched'
+  help        'Name given to the IMAGE structure to hold the data 
+              array after being deglitched.'
+
+OTITLE
+
+  position    3
+  keyword     'OTITLE'
+  type        'LITERAL'
+  vpath       'DEFAULT'
+  prompt      'Title for output image'
+  default     'KAPPA - Glitch'
+  help        'Character string used as a title for the output IMAGE 
+              structure.'
+
+WHERE
+
+  keyword     'WHERE'
+  type        'LITERAL'
+  vpath       'PROMPT'
+  ppath       'CURRENT,DYNAMIC'
+  prompt      'Source of glitch positions'
+  help        'File for free-format file list, Interface for input
+              from environment, Bad for automatic removal of bad
+              (magic) pixels.'
+ #in          'File', 'Interface', 'Bad'
+
+FILENAME
+
+  keyword     'FILENAME'
+  type        'FILENAME'
+  vpath       'PROMPT'
+  ppath       'DEFAULT'
+  prompt      'Glitch list file name'
+  default     GLITCH.LIS
+  help        'Give the name of the free-format file containing x,y 
+              positions of pixels.'
+
+XCOORD
+
+  keyword     'XCOORD'
+  type        '_INTEGER'
+  vpath       'PROMPT'
+  ppath       'CURRENT,DYNAMIC'
+  prompt      'x pixel index of pixel to be replaced'
+  help        'Give the x pixel index of the pixel to be deglitched.'
+
+YCOORD
+
+  keyword     'YCOORD'
+  type        '_INTEGER'
+  vpath       'PROMPT'
+  ppath       'CURRENT,DYNAMIC'
+  prompt      'y pixel index of pixel to be replaced'
+  help        'Give the y pixel index of the pixel to be deglitched.'
+
+AGAIN
+
+  keyword     'AGAIN'
+  type        '_LOGICAL'
+  vpath       'PROMPT'
+  ppath       'DEFAULT'
+  prompt      'Another pixel ?'
+  default     YES
+  help        'Whether or not another pixel is to be deglitched.'
+.endhelp

@@ -1,0 +1,16 @@
+mode_,s,h,,,,"Which option is required ?"
+fraction,struct,h,,,,"Linear fractions of the picture to form the new picture"
+0.5
+xpic,i,a,,,,"Number of pictures per line of the array"
+ypic,i,a,,,,"Number of pictures per column of the array"
+lbound,struct,a,,,,"Lower bound"
+
+ubound,struct,a,,,,"Upper bound"
+
+aspect,r,h,INDEF,,,"Aspect ratio of the new picture"
+current,b,h,n,,,"Is the current picture to enclose the new picture?"
+device,f,a,,,,"*! Name of graphics device"
+fill,r,h,1.0,,,"Linear filling factor"
+labelno,i,h,1,,,"Label number of the bottom-left picture in the array"
+outline,b,h,y,,,"Mark the new picture with a box?"
+prefix,s,a,INDEF,,,"Label prefix. Type ! to prevent labelling"

@@ -1,0 +1,8 @@
+inxy,struct,a,,,,"Co-ordinates to be converted"
+
+outx,r,h,0.0D0,,,""
+outy,r,h,0.0D0,,,""
+bound,b,h,y,,,""
+cosys,s,a,"Data",,,"*! Co-ordinate system"
+device,f,a,,,,"*! Name of graphics device"
+tobase,b,h,y,,,"Convert to BASE-picture co-ordinates?"

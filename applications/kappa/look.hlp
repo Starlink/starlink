@@ -1,0 +1,194 @@
+.help look Starlink kappa
+.nf
+    Outputs the values of a sub-array of a 2-d data array to the
+    screen or a text file.
+ 
+   This routine reports to user or writes to a text file the values
+   in a specified sub-array of the 2-d data array in the input IMAGE
+   structure.  Three options are allowed --- Peep gives a fixed 7x7
+   box on the screen, centred on a given pixel; Examine gives an NxM
+   box on the screen, with lower left pixel as specified; List
+   outputs the specified sub-array to a text text file (maximum
+   width 132 characters) of a defined name.  Beware that the List
+   option can produce very large files if it is not used sensibly.
+ 
+   The magic-value method is used for processing bad data. Bad pixels
+   are denoted in the display or file by INVALID rather than a
+   numerical value.
+
+AUTHORS
+
+   Mark McCaughrean UoE ( REVA::MJM )
+   Malcolm Currie  STARLINK (RAL::CUR)
+
+BUGS
+
+   None known.
+
+HISTORY
+
+   11-06-1986 : First implementation (REVA::MJM)
+   15-06-1986 : Modified to include Examine option (REVA::MJM)
+   1986 Aug 7 : Renamed algorithmic routines to PEEPSB and LISTSB
+                (RAL::CUR).
+   1986 Aug 29: Added argument section to prologue, and nearly
+                conformed to Starlink standards (RAL::CUR).
+   1987 Oct 15: Reordered tidying and extra status check
+                (RAL::CUR)
+   1988 Mar 17: Referred to `array' rather than `image'
+                (RAL::CUR)
+   1988 Jun 4 : More reporting of error context (RAL::CUR)
+   1988 Jun 30: File name obtained in LISTSB (RAL::CUR).
+   1988 Dec  6: Improved Examine XSIZE default (RAL::CUR).
+   1989 Jul 27: Passed array dimensions to PEEPSB and LISTSB as
+                separate variables (RAL::CUR).
+   1990 Feb 22: Modified the calling sequence for the new
+                more-modular version of LISTSB (RAL::CUR).
+   1992 Feb 25: Limited processing of simple NDFs (RAL::CUR).
+   1992 Mar  3: Replaced AIF parameter-system calls by the extended
+                PAR library (RAL::CUR).
+
+PARAMETERS
+
+   INPIC  =  IMAGE( READ )
+       IMAGE structure containing the 2-d data array to be inspected.
+   CHOICE = LITERAL( READ )
+       The means by which the data array is examined.  The options
+         are 'Peep' --- reports the values in a 7x7 pixel region;
+         'Examine' --- reports the values of a region whose size is
+         defined by the user; and 'List' is similar to 'Examine',
+         but it generates a listing to a text file.
+   XCEN  =  INTEGER( READ )
+       x centre of box to be examined on the screen.
+   YCEN  =  INTEGER( READ )
+       y centre of box to be examined on the screen.
+   XLOW  =  INTEGER( READ )
+       x pixel index of the lower left of the sub-array to be output.
+   YLOW  =  INTEGER( READ )
+       y pixel index of the lower left of the sub-array to be output.
+   XSIZE  =  INTEGER( READ )
+       x size of the sub-array to be output.
+   YSIZE  =  INTEGER( READ )
+       y size of the sub-array to be output.
+   FILENAME  =  FILENAME( READ )
+       Name of the file to be used for the output of the sub-array
+         listing.
+   ANOTHER = LOGICAL( READ )
+       If true, another look at the data is required.
+
+INPIC
+
+  position    1
+  keyword     'INPIC'
+  type        'IMAGE'
+  access      'READ'
+  vpath       'PROMPT'
+  ppath       'GLOBAL'
+  association '<->GLOBAL.DATA_ARRAY'
+  prompt      'Image to be inspected'
+  help        'Give name of the IMAGE structure holding the 2-d data 
+              array to be inspected.'
+
+CHOICE
+
+  position    2
+  keyword     'CHOICE'
+  type        'LITERAL'
+  vpath       'PROMPT'
+  ppath       'CURRENT,DYNAMIC,DEFAULT'
+  default     'Peep'
+  prompt      'Peep, Examine or List'
+  help        'Peep lists a 7x7 neighbourhood to screen, Examine
+              reports an NxM box to screen, List gives a listing to
+              a file.'
+ #in          'Peep', 'Examine', 'List'
+
+XCEN
+
+  keyword     'XCEN'
+  type        '_INTEGER'
+  access      'READ'
+  vpath       'PROMPT'
+  ppath       'CURRENT,DYNAMIC'
+  prompt      'x centre pixel index of 7x7 box'
+  help        'Give the x centre pixel index of the sub-array to be 
+              peeped.'
+
+YCEN
+
+  keyword     'YCEN'
+  type        '_INTEGER'
+  vpath       'PROMPT'
+  access      'READ'
+  ppath       'CURRENT,DYNAMIC'
+  prompt      'y centre pixel index of 7x7 box'
+  help        'Give the y centre pixel index of the sub-array to be 
+              peeped.'
+
+XLOW
+
+  keyword     'XLOW'
+  type        '_INTEGER'
+  vpath       'PROMPT'
+  access      'READ'
+  ppath       'CURRENT,DYNAMIC'
+  prompt      'x start pixel index of sub-array'
+  help        'Give the x start pixel index of the sub-array to be 
+              inspected.'
+
+YLOW
+
+  keyword     'YLOW'
+  type        '_INTEGER'
+  vpath       'PROMPT'
+  access      'READ'
+  ppath       'CURRENT,DYNAMIC'
+  prompt      'y start pixel index of sub-array'
+  help        'Give the y start pixel index of the sub-array to be 
+              inspected.'
+
+XSIZE
+
+  keyword     'XSIZE'
+  type        '_INTEGER'
+  vpath       'PROMPT'
+  access      'READ'
+  ppath       'DYNAMIC'
+  prompt      'x size of sub-array'
+  help        'Give the x size of the sub-array to be inspected.'
+
+YSIZE
+
+  keyword     'YSIZE'
+  type        '_INTEGER'
+  access      'READ'
+  vpath       'PROMPT'
+  ppath       'DYNAMIC'
+  prompt      'y size of sub-array'
+  help        'Give the y size of the sub-array to be inspected.'
+
+FILENAME
+
+  keyword     'FILENAME'
+  type        'FILENAME'
+  access      'READ'
+  vpath       'PROMPT'
+  ppath       'DEFAULT'
+  default     LOOKOUT.LIS
+  prompt      'Name of listing file'
+  help        'Give name of the ASCII file to contain the sub-array 
+              listing.'
+
+ANOTHER
+
+  keyword     'ANOTHER'
+  type        '_LOGICAL'
+  access      'READ'
+  vpath       'PROMPT'
+  ppath       'DEFAULT'
+  default     Y
+  prompt      'Another inspection ?'
+  help        'Answer YES if another sub-array is to be peeped or 
+              listed.'
+
+.endhelp

@@ -1,0 +1,275 @@
+.help transformer Starlink kappa
+.nf
+Applies a transformation to an NDF.
+
+Usage:
+
+   transformer in transform out [method] [shape] { lcoord=? ucoord=?
+                                                 { lbound=? ubound=?
+                                               shape
+
+Description:
+
+   This application performs an arbitrary transformation on an NDF to
+   create an output NDF.  There is full control of the shape, origin,
+   and co-ordinate limits of the output NDF.  The output NDF is
+   calculated by resampling within the input NDF.  Output array
+   elements are set to the bad value if their inverse-transformed
+   co-ordinates lie outside the input NDF's co-ordinate limits.
+
+Parameters
+
+For information on individual parameters, select from the list below:
+
+CONSERVE
+
+CONSERVE = _LOGICAL (Read)
+   If CONSERVE is TRUE, the output values are normalised by the
+   ratio of the output-to-input pixel areas.  In other words this
+   conserves flux.  If CONSERVE is FALSE, there is no
+   normalisation.  [FALSE]
+
+COSYS
+
+COSYS = LITERAL (Read)
+   The co-ordinate system to be used.  This can be either "World"
+   or "Data".  "World" inputs pixel co-ordinates to the supplied
+   transformation to derive the co-ordinates in the output NDF.
+   "Data" causes the NDF's axis information to be the input
+   co-ordinates to the transformation.  See the SHAPE parameter.
+   [Current co-ordinate system]
+
+FULL
+
+FULL = _LOGICAL (Read)
+   When the number of input variables is less than the number
+   of dimensions of input NDF (but not less than the number of
+   output variables), FULL set to TRUE applies the transformation
+   to all the higher dimensions.  For example, FULL = TRUE
+   would apply a 2-dimensional transformation to all the planes
+   along the third dimension of a cube NDF.  FULL = FALSE would
+   only transformed the first plane.  [FALSE]
+
+IN
+
+IN = NDF (Read)
+   The NDF to be transformed.
+
+LBOUND
+
+LBOUND() = _INTEGER (Read)
+   The lower pixel-index bounds of the output NDF.  The number of
+   values should equal the number of output variables in the
+   transformation.  This parameter is only used when SHAPE is
+   "Full" or "Bounds".  The suggested defaults are the lower
+   bounds of the input NDF, and where there are more output than
+   input dimensions they are set to 1.
+
+LCOORD
+
+LCOORD() = _DOUBLE (Read)
+   The lower co-ordinate limits of the output NDF.  The number of
+   values should equal the number of output variables in the
+   transformation.  This parameter is only used when SHAPE is
+   "Full" or "Limits".  The suggested defaults are the lower
+   co-ordinate limits determined from applying the transformation
+   to a series of test points.  Where there are more output than
+   input dimensions they are set to 0.0.
+
+METHOD
+
+METHOD = LITERAL (Read)
+   The interpolation method used to resample the input array.
+   Permitted values are "Nearest" for nearest-neighbour, and
+   "Linint" for linear interpolation.  ["Nearest"]
+
+OUT
+
+OUT = NDF (Write)
+   The transformed NDF.
+
+SHAPE
+
+SHAPE = LITERAL (Read)
+   The method by which to define the bounds and co-ordinate limits
+   of the output NDF.  See Section "Co-ordinate Limits and
+   Bounds".  The options for SHAPE are described below.
+      "Bounds" - Specify the output bounds with LBOUND and UBOUND.
+                 Use the default co-ordinate limits derived from
+                 the transformation of test points in the input
+                 NDF.
+      "Full"   - Specify the output co-ordinate limits and bounds
+                 with LCOORD, UCOORD, LBOUND and UBOUND.
+      "Limits" - Use the bounds of the input NDF and specify the
+                 output co-ordinate limits with LCOORD and UCOORD.
+      "Match"  - Use the co-ordinate limits from transformed test
+                 points of the input NDF, and make a co-ordinate
+                 unit equivalent to one pixel.  The bounds are the
+                 integer-rounded co-ordinate limits.  This option
+                 results in an output NDF that is not clipped and
+                 unlike the other options guarantees no further
+                 linear compression or expansion.
+      "Same"   - Use the bounds of the input NDF and take the
+                 co-ordinate limits from transformed test points
+                 of the input NDF.
+   The first three also cause the co-ordinate limits to be
+   reported before obtaining the limits and/or bounds.
+
+   Not all of these are permitted simultaneously.  "Same" is not
+   allowed when the number of input and output transformation
+   variables are not equal.  Otherwise it is the value of
+   COSYS that controls the options.  When COSYS = "Data" all but
+   "Match" are allowed, and COSYS = "World" excludes "Limits" and
+   "Full".  There is a special case where SHAPE is fixed to be
+   "Bounds".  This is when the number of output variables exceeds
+   the number of input variables, and that in turn equals the
+   number of dimensions in the input NDF.
+
+   SHAPE defaults to the dynamic default.  When COSYS = "Data"
+   this is "Bounds", and when COSYS = "World" the default is
+   "Match".  The suggested default is current value, or the
+   dynamic default if there is not one.  []
+
+TITLE
+
+TITLE = LITERAL (Read)
+   Title for the output NDF structure.  A null value (!)
+   propagates the title from the input NDF to the output NDF. [!]
+
+TRANSFORM
+
+TRANSFORM = TRN (Read)
+   The transformation to be applied.  This may be an HDS
+   container file, in which case the transformation structure is
+   assumed to be called TRANSFORM at the top level of the file;
+   or a path to the HDS object.  For example, a value of
+   distort.mapping would use the transformation structure called
+   MAPPING in the HDS file distort.sdf; and a value of aitoff
+   would make the routine look for the transformation in top-level
+   object TRANSFORM within the HDS file aifoff.sdf.  Normally the
+   object name is TRANSFORM.  The structure must contain both the
+   forward and inverse mappings.
+
+   Structures can be made using CCDEDIT in CCDPACK or TRANMAKE.
+
+UBOUND
+
+UBOUND() = _INTEGER (Read)
+   The upper pixel-index bounds of the output NDF.  The number of
+   values should equal the number of output variables in the
+   transformation.  This parameter is only used when SHAPE is
+   "Full" or "Bounds".  Each suggested-default value is the
+   maximum of the input upper bound and the output lower bound.
+
+UCOORD
+
+UCOORD() = _DOUBLE (Read)
+   The upper co-ordinate limits of the output NDF.  The number of
+   values should equal the number of output variables in the
+   transformation.  This parameter is only used when SHAPE is
+   "Full" or "Limits".  Each suggested-default value is the
+   upper co-ordinate limit determined from applying the
+   transformation to a series of test points.
+
+Examples
+
+transformer curved sdist straight
+   This transforms the NDF called curved into an NDF called
+   straight.sdf, using the transformation TRANSFORM in the HDS
+   file called sdist.sdf.  It uses nearest-neighbour resampling.
+   Assuming the current co-ordinate system is world, the
+   transformation is performed in pixel co-ordinates, setting the
+   bounds to just enclose the transformed input array.
+
+transformer curved sdist.transform straight linint same
+   As above, except linear interpolation is used, and the array
+   of NDF straight array uses the bounds of NDF curved.
+
+transformer a119 proj.merc a119s shape=bounds lbound=[1,-20]
+
+ubound=[256,172]
+   This transforms the NDF called a119, using the transformation
+   MERC in the HDS file called proj.sdf, into an NDF called
+   a119s.  It uses nearest-neighbour resampling.  a119s just
+   encloses the transformed arrays from a119, and has 256 x 192
+   pixels from origin (1,-20).
+
+transformer spec2d scrunch.trn full method=l out=spec2d_l
+
+shape=limits lcoord=5000 ucoord=6500
+   This transforms the 2-dimensional NDF called spec2d, using
+   the 1-dimensional transformation TRN in the HDS file called
+   scrunch.sdf, into an NDF called spec2d_l.  (NDF spec2d might
+   be a set of spectra before scrunching.)  The
+   linear-interpolation resampling is applied to all the lines in
+   spec2d_l.  The NDFs have the same pixel-index bounds.
+   spec2d_l is constrained to contain elements whose transformed
+   co-ordinates lie between 5000 to 6500.
+
+Notes
+
+-  In general the test points to calculate the co-ordinate limits
+for LCOORD and UCOORD are situated at the corners of each pixel,
+assuming spaced axes.  Thus for a 2-dimensional array of 9-by-7
+pixels there are 80 (10*8) test points.  For linear
+transformations there is a smaller set of test points for
+improved efficiency.  These are the corners of each axis and the
+midpoints between them.
+
+-  On completion, the current transformation global parameter
+takes the value of parameter TRANSFORM.
+
+Co-ordinate_Limits_and_Bounds
+
+   The limits are the lower co-ordinates of the first element, and
+   the upper co-ordinates of the last element of the NDF.  Using
+   these limits, TRANSFORMER derives the co-ordinates of the output
+   NDF's pixel centres by linear interpolation.  Therefore, the
+   co-ordinate limits define the region of the input NDF that will
+   appear in the output.
+
+   The bounds of the output NDF define its shape and origin.  So
+   an additional linear scaling transformation can be applied along
+   each axis by adjusting the shape independently of the co-ordinate
+   limits.
+
+Related_Applications
+
+   KAPPA: FLIP, ROTATE, SLIDE, TRANINVERT, TRANJOIN, TRANMAKE,
+   TRANTRACE; CCDPACK: CCDEDIT, TRANLIST, TRANNDF.
+
+Authors
+
+MJC: Malcolm J. Currie (STARLINK)
+
+History
+
+ 1993 March 16 (MJC):
+    Original version.
+
+ 1995 August 17 (MJC):
+    Used PSX for workspace.  Introduced an improved determination
+    of the extreme co-ordinates using the pixel vertices as test
+    points.
+
+Implementation_Status
+
+   -  Flux conservation can only be applied to constant-determinant
+   or linear transformations.
+
+   -  The NDF components are processed by this application as
+   follows.
+      o  LABEL, UNITS, HISTORY, and extensions are propagated.
+      o  TITLE is controlled by the TITLE parameter.
+      o  QUALITY is not derived from the input NDF for a linearly
+      interpolated NDF.  The DATA and VARIANCE arrays are resampled.
+      o  Axis centre arrays are created using the co-ordinate
+      limits for COSYS = "Data".
+
+   -  Processing of bad pixels and automatic quality masking are
+   supported.
+
+   -  All non-complex numeric data types can be handled.
+
+   -  There can be an arbitrary number of NDF dimensions.
+.endhelp
