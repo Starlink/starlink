@@ -927,7 +927,8 @@ Qbitmaps foo-page1.png 80 14 -1 10
                 this text is 10 pixels from the top of the bitmap;
                 this latter information might be useful when working
                 out how to position this bitmap within a generated
-                HTML file.</p>
+                HTML file.  See <ref id="usagenotes.marks"/> for a
+                discussion of how to do that.</p>
 
               <p>Both here and in the support for the `strut' special,
                 there is a great deal of scope for off-by-one errors;
@@ -1609,7 +1610,7 @@ Qbitmaps temp-page1.png 163 14 -1 11
 </verbatim>
           ...where <code>verbose=quiet</code> has been used to turn
           off the usual chatter.  It tells us that the bitmap as a
-          whole is 14pixels deep, and that the mark, which is on the
+          whole is 14 pixels deep, and that the mark, which is on the
           TeX baseline, remember, is at position (-1,11) relative to
           an origin at the top-left of the bitmap; or in other words
           there's 3 pixels of space between the TeX baseline and the
@@ -1630,7 +1631,7 @@ $6-$4}'
           which has the correct `src' attribute (from column 2 of the
           Qbitmaps line) and the correct offset (column6 - column4).
           That uses awk, but if you're generating your HTML pages with
-          something like Perl or Pythn (substantially more sensible
+          something like Perl or Python (substantially more sensible
           than awk...!), say, you could do an analogous thing with the
           dvi2bitmap output, and put the generated
           <code>&lt;img&gt;</code> elements in the correct places in
