@@ -21,6 +21,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.5  1997/09/03 21:54:05  timj
+*     Add more SUFFIX variables and fix a bug in the parameter declaration.
+*
 *     Revision 1.4  1997/09/03 18:25:19  timj
 *     Add SUFFIX_OPTIONS and tidy a little. Add a proper header.
 *
@@ -95,10 +98,14 @@
 *     the output file
 
 *     Name of the environment variable associated with this system
-      CHARACTER * 10 SUFFIX_ENV
+      CHARACTER * 15 SUFFIX_ENV
       PARAMETER (SUFFIX_ENV = 'SCUBA_SUFFIX')
+
+*     Number of SUFFIX options
+      INTEGER SCUBA__N_SUFFIX
+      PARAMETER ( SCUBA__N_SUFFIX = 2)
 
 *     Different types of SUFFIX available.
 
-      CHARACTER * 10 SUFFIX_OPTIONS      
-      DATA SUFFIX_OPTIONS / 'LONG', SHORT' /
+      CHARACTER * 10 SUFFIX_OPTIONS( SCUBA__N_SUFFIX )
+      DATA SUFFIX_OPTIONS /'LONG', 'SHORT'/
