@@ -177,9 +177,15 @@ sub parse_config {
 
 Do the extraction.
 
-  my $catalog = $extractor->extract("gw20041119_112_mos");
+  my $catalog = $extractor->extract( frame => "gw20041119_112_mos",
+                                     filter => $waveband );
 
-The sole mandatory parameter is the NDF to perform the extraction on.
+The two mandatory named parameters are:
+
+  frame - the NDF to perform the extraction on
+
+  filter - an Astro::WaveBand object describing the filter used
+
 This method returns an C<Astro::Catalog> object. Before extraction
 can be done, the EXTRACTOR_DIR environment variable should be set up.
 If this environment variable is not set, then the module will look
@@ -210,7 +216,21 @@ locations of extracted objects are defined as follows:
 
 sub extract {
   my $self = shift;
-  my $ndf = shift;
+
+  my %args = @_;
+
+# Deal with arguments.
+  if( !defined( $args{'frame'} ) ) {
+    croak "Must pass frame name in order to do source extraction.\n";
+  }
+  if( !defined( $args{'filter'} ) ) {
+    croak "Must pass filter in order to do source extraction.\n";
+  }
+  if( !UNIVERSAL::isa( $args{'filter'}, "Astro::WaveBand" ) ) {
+    croak "Must pass filter as Astro::WaveBand object in order to do source extraction.\n";
+  }
+  my $ndf = $args{'frame'};
+  my $filter = $args{'filter'};
 
 # Try to find the extractor binary. First, check to see if
 # the EXTRACTOR_DIR environment variable has been set.
@@ -225,6 +245,7 @@ sub extract {
   } else {
     croak "Could not find EXTRACTOR binary.\n";
   }
+  print "EXTRACTOR binary is in $extractor_bin\n" if $DEBUG;
 
 # Set the defaults, just in case we haven't already.
   $self->defaults;
@@ -244,6 +265,7 @@ sub extract {
 # Form a catalogue from Astro::Catalog.
   my $catalog = new Astro::Catalog( Format => 'SExtractor',
                                     File => $self->_catalog_file_name,
+                                    ReadOpt => { Filter => $filter },
                                   );
 
 # Delete the configuration file.
@@ -251,6 +273,9 @@ sub extract {
 
 # Delete the parameter file.
   $self->_delete_param_temp_file if ! $DEBUG;
+
+# Delete the catalog file.
+  $self->_delete_catalog_temp_file if ! $DEBUG;
 
 # Return the catalogue.
   return $catalog;
@@ -402,6 +427,20 @@ sub _write_param_temp_file {
   print $fh "ISOAREA_IMAGE\n";
 
   close $fh;
+}
+
+=item B<_delete_catalog_temp_file>
+
+Deletes the temporary catalog file.
+
+  $extractor->_delete_catalog_temp_file;
+
+=cut
+
+sub _delete_catalog_temp_file {
+  my $self = shift;
+  my $catfile = $self->_catalog_file_name;
+  unlink $catfile;
 }
 
 =item B<_delete_config_temp_file>
