@@ -1,0 +1,132 @@
+## TRACE - Trace through the contents of a data structure.
+
+#+
+#  Name:
+#     TRACE.IFL
+
+#  Type of module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     MJC: Malcolm J. Currie (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     1991 January 31 (MJC):
+#	 Original version.
+#     {enter_changes_here}
+
+#-
+
+interface TRACE
+
+   helplib     TRACE_DIR:TRACE
+
+   parameter      OBJECT         # Input HDS object to be traced.
+      keyword     'OBJECT'
+      position    1
+      type        'UNIV'
+      access      'READ'
+      vpath       'PROMPT'
+      ppath       'CURRENT,DEFAULT'
+      default     ADAM_USER:GLOBAL
+      prompt      'Object to be examined'
+      helpkey     *
+   endparameter
+
+   parameter      FULL           # Trace through arrays of structures?
+      keyword     'FULL'
+      position    2
+      type        '_LOGICAL'
+      access      'READ'
+      vpath       'DEFAULT'
+      default     N
+      ppath       'CURRENT,DEFAULT'
+      prompt      'Do you want a full trace through arrays of structures?'
+      helpkey     *
+   endparameter
+
+   parameter      NEWLINE        # Values to start on a new line?
+      keyword     'NEWLINE'
+      position    8
+      type        '_LOGICAL'
+      access      'READ'
+      vpath       'DEFAULT'
+      default     NO
+      ppath       'CURRENT,DEFAULT'
+      prompt      'Are values to start on a new line?'
+      helpkey     *
+   endparameter
+
+   parameter      NLINES         # Maximum number of lines of values
+      keyword     'NLINES'
+      position    3
+      type        'LITERAL'
+      vpath       'DEFAULT'
+      default     '1'
+      ppath       'CURRENT,DEFAULT'
+      prompt      'Number of lines to contain the data values'
+      helpkey     *
+   endparameter
+
+   parameter      WIDEPAGE       # 80- or 132-character output
+      position    9
+      keyword     'WIDEPAGE'
+      type        '_LOGICAL'
+      access      'READ'
+      vpath       'DEFAULT'
+      default     NO
+      ppath       'CURRENT,DEFAULT'
+      prompt      'Do you want a wide page?'
+      helpkey     *
+   endparameter
+
+   parameter      TYPIND         # Type indentation
+      keyword     'TYPIND'
+      position    4
+      type        '_INTEGER'
+      access      'READ'
+      vpath       'DEFAULT'
+      default     15
+      ppath       'CURRENT,DEFAULT'
+      prompt      'Indentation of the type w.r.t. to the name'
+      helpkey     *
+   endparameter
+
+   parameter      VALIND         # Value indentation
+      keyword     'VALIND'
+      position    5
+      type        '_INTEGER'
+      access      'READ'
+      vpath       'DEFAULT'
+      default     15
+      ppath       'CURRENT,DEFAULT'
+      prompt      'Indentation of the value w.r.t. to the type'
+      helpkey     *
+   endparameter
+
+   parameter      EACHLINE       # Character-array elements one to a line?
+      position    7
+      keyword     'EACHLINE'
+      type        '_LOGICAL'
+      access      'READ'
+      vpath       'DEFAULT'
+      default     NO
+      ppath       'CURRENT,DEFAULT'
+      prompt      'Is each value of a character array to appear on a separate line?'
+      helpkey     *
+   endparameter
+
+   parameter      LOGFILE        # The log file
+      position    6
+      keyword     'LOGFILE'
+      type        'FILENAME'
+      access      'READ'
+      vpath       'DEFAULT'
+      ppath       'CURRENT,DEFAULT'
+      prompt      'File to store the trace'
+      default     !
+      helpkey     *
+   endparameter
+
+endinterface
