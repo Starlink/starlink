@@ -3,9 +3,9 @@
 # grfont.dat and rgb.txt are not actually programs but they still need to
 # go into bin/
 
-lib_LTLIBRARIES = libpgplot_base.la
+noinst_LIBRARIES = libpgplot_base.a
 
-libpgplot_base_la_SOURCES = $(F_ROUTINES)
+libpgplot_base_a_SOURCES = $(F_ROUTINES)
 
 
 #  List of Fortran routines required for building the package.  This is
