@@ -312,9 +312,16 @@
       args.yorigin = yorigin;
       args.zoom = zoom;
 
-/* Call the routine which will do the rest of the processing in the 
-   background, and return its exit status. */
-      return tclbgcmd( (ClientData) do_ndfdrawpair, interp, 1, ov );
+/* Call the routine which will do the rest of the processing. */
+/* I was experimenting with doing this in a subprocess so that the Tcl
+   event loop was attended to during processing.  this is why 
+   do_ndfdrawpair is implemented as a separate routine here.  It can
+   be invoked in this way using the call:
+      return tclbgcmd( (ClientData) do_ndfdrawpair, interp, 1, ov )
+   However, this doesn't sem to solve enough problems to be worthwhile,
+   so it is currently written to execute in the main process. */
+      return ((Tcl_ObjCmdProc *) do_ndfdrawpair)( (ClientData) NULL,
+                                                  interp, 1, ov );
    }
 
 

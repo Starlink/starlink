@@ -588,8 +588,16 @@
          args.xpix = xpix;
          args.ypix = ypix;
 
-/* Call the routine to do the plotting as a background task. */
-         if ( tclbgcmd( (ClientData) ndfdisplay, interp, 1, ov ) != TCL_OK ) {
+/* Call the routine to do the plotting. */
+/* I was experimenting with doing this in a subprocess so that the Tcl
+   event loop was attended to during processing.  This is why ndfdisplay
+   is implemented as a separate routine here.  It can be invoked in 
+   this way using the call:
+      if ( tclbgcmd( (ClientData) ndfdisplay, interp, 1, ov ) != TCL_OK )
+   However, this doesn't seem to solve enough problems to be worthwhile,
+   so it is currently written to execute in the main process. */
+         if ( ((Tcl_ObjCmdProc *) ndfdisplay)( (ClientData) NULL, 
+                                               interp, 1, ov ) != TCL_OK ) {
             printf( "It's an error" );
             return TCL_ERROR;
          }
