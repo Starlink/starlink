@@ -586,7 +586,7 @@
    $OPTSMENU add cascade -label "Feature Size" -menu $OPTSMENU.psf
    $OPTSMENU add cascade -label "Interpolation method" -menu $OPTSMENU.meth
    $OPTSMENU add cascade -label "Mapping Types" -menu $OPTSMENU.map
-   $OPTSMENU add command -label "Sky" -menu $OPTSMENU.sky -state $skystate
+   $OPTSMENU add cascade -label "Sky" -menu $OPTSMENU.sky -state $skystate
    $OPTSMENU add command -label "Status Items..." -command GetItems
    $OPTSMENU add cascade -label "View" -menu $OPTSMENU.view
    $OPTSMENU add separator
