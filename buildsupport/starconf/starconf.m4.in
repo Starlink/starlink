@@ -12,6 +12,14 @@
 # applications and help to be installed in a package-specific
 # directory.
 #
+# Certain features of this macro are documented in SSN/78, in particular
+#   - Sets STARLINK
+#   - Sets FCFLAGS, FFLAGS, CFLAGS, LDFLAGS to appropriate values
+#   - Sets PACKAGE_VERSION_{MAJOR,MINOR,RELEASE,INTEGER}
+# The behaviour of these should not be changed without changing the
+# documentation, or without due consideration of the package which use
+# the earlier behaviour.  Everything else is, in principle, private
+# (not that that's going to stop folk).
 AC_DEFUN([STAR_DEFAULTS],
 [#
 _star_per_package_dirs=false
