@@ -503,7 +503,7 @@
                                  ! input via continuation lines
       CHARACTER * ( 3 ) COMPS    ! Array-component code
       LOGICAL DATSEL             ! True if DATA component was selected
-      CHARACTER * ( 10 ) ENCOD   ! FITS encoding requested for WCS info
+      CHARACTER * ( 15 ) ENCOD   ! FITS encoding requested for WCS info
       INTEGER FGROUP             ! Group identifier of default list of
                                  ! FITS files
       CHARACTER * ( 255 ) FILNAM ! Name of FITS file
