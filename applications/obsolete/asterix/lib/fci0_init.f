@@ -99,6 +99,9 @@
 *  Check initialised
       IF ( .NOT. AST_QPKGI( FCI__PKG ) ) THEN
 
+*    Require the fitting package
+        CALL ADI_REQPKJG( 'fitting', STATUS )
+
 *    Define methods
         CALL ADI_DEFMTH( 'ShowStatus(_INTEGER,_CurfitControl)',
      :                   FCI1_SHOW, DID, STATUS )
