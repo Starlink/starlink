@@ -1472,7 +1472,7 @@ f        is returned via the CVT pointer which may be used to apply the
 c        conversion to sets of coordinates (e.g. using astTran2).
 f        conversion to sets of coordinates (e.g. using AST_TRAN2).
 c     cvt = astConvert( astSkyFrame(""), astSkyFrame("Equinox=2005"), "" );
-f     CVT = AST_CONVERT(AST_SKYFRAME(' '),AST_SKYFRAME('Equinox=2005'),' ',STATUS)
+f     CVT = AST_CONVERT( AST_SKYFRAME( ' ', STATUS ), AST_SKYFRAME( 'Equinox=2005', STATUS ), ' ', STATUS )
 *        Creates a FrameSet which describes precession in the default
 *        FK5 celestial coordinate system between equinoxes J2000 (also
 c        the default) and J2005. The returned "cvt" pointer may then
@@ -2246,7 +2246,7 @@ f        coordinate system is returned as part of the RESULT
 *        applying built-in conversions to any of the Frames in the
 *        target will a value of AST__NULL be returned.
 c     result = astFindFrame( target, astFrame( 1, "Domain=WAVELENGTH" ), "" );
-f     RESULT = AST_FINDFRAME( TARGET, AST_FRAME( 1, 'Domain=WAVELENGTH', STATUS ),' ',STATUS)
+f     RESULT = AST_FINDFRAME( TARGET, AST_FRAME( 1, 'Domain=WAVELENGTH', STATUS ), ' ', STATUS )
 *        Searches for any 1-dimensional coordinate system in the
 *        target which has the domain "WAVELENGTH".
 c     result = astFindFrame( target, astFrame( 1, "" ), "wavelength" );
@@ -7109,12 +7109,15 @@ AstFrame *astLoadFrame_( void *mem, size_t size, int init,
       vtab = &class_vtab;
       name = "Frame";
    }
+printf("Executing Frame loader\n" );
 
 /* Invoke the parent class loader to load data for all the ancestral
    classes of the current one, returning a pointer to the resulting
    partly-built Frame. */
+printf("Calling Mapping loader\n" );
    new = astLoadMapping( mem, size, init, (AstMappingVtab *) vtab, name,
                          channel );
+printf("Returned to Frame loader\n" );
 
 /* If required, initialise the part of the virtual function table used
    by this class. */
