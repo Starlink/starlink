@@ -85,10 +85,15 @@
 *     -  The log file information is very restricted from this
 *     application, just enough to monitor progress is given.
 *
-*     - The output NDFs are named, dataN, ffN and biasN, where N is the
+*     -  The output NDFs are named dataN, ffN and biasN, where N is the
 *     current sequence number.  Data type of output is as determined
 *     by the DTYPE ADAM parameter.
-
+*
+*     -  Since it is intended to be able to generate very large test
+*     frames without failing, the code is optimised to minimise 
+*     memory use.  This leads to non-optimal CPU time usage, for instance
+*     some sequences of pseudo-random numbers are calculated two or
+*     three times rather than calculated once and stored for later use.
 
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
@@ -485,4 +490,4 @@ C            CALL NDF_HCRE( IDF, STATUS )
       CALL CCD1_END( STATUS )
 
       END
-* $Id: ccdbgen.f,v 1.10 1998/07/03 14:28:35 mbt Exp $
+* $Id: ccdbgen.f,v 1.11 1998/07/03 15:36:52 mbt Exp $
