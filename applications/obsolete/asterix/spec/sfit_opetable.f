@@ -145,7 +145,7 @@ c     RECORD /MODEL_SPEC/   MODEL	  ! Model specification
           ELSE
             WRITE(OTXT,121) PNAM, PARAM(J), LCON, UCON, HW
           END IF
- 120      FORMAT( 5X, A23, F12.7, 2(1X,F12.7) 1x, 1PG12.5)
+ 120      FORMAT( 5X, A23, F12.7, 2(1X,F12.7), 1X, 1PG12.5)
  121      FORMAT( 5X, A23, 1PG12.5, 3(1X,1PG12.5) )
         END IF
 
