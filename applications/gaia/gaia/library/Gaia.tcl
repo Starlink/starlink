@@ -210,7 +210,7 @@ itcl::class gaia::Gaia {
          catch {delete object $importer_}
       }
    }
-   
+
    # Restore the position of the top level window from the previous
    # session, or not depending on mode.
    protected method load_toplevel_geometry {} {
@@ -311,7 +311,7 @@ itcl::class gaia::Gaia {
 
       global ::about_skycat ::gaia_dir
       if { $itk_option(-tabbedgaia) } {
-         
+
          #  If tabbedgaia then use a simple component not a window.
          set w [frame $w_.init]
          place $w  -relx 0.5 -rely 0.5 -anchor s
@@ -611,6 +611,10 @@ itcl::class gaia::Gaia {
          {Create and manipulate astrometry information} \
          -menu [menu $m.astrom]
 
+      add_menuitem $m.astrom command "Simple automated..." \
+         {Create a WCS for image using autoastrom} \
+         -command [code $this make_toolbox autoastrom]
+
       add_menuitem $m.astrom command "Fit to star positions..." \
          {Create a WCS for image using reference positions} \
          -command [code $this make_toolbox astreference] \
@@ -800,6 +804,19 @@ itcl::class gaia::Gaia {
             -number $clone_ \
             -ast_tag $ast_tag_ \
             -clone_cmd [code $this make_toolbox astgrid 1] \
+            -really_die $cloned
+      }
+   }
+
+   #  Make the simple autoastrom toolbox.
+   public method make_autoastrom_toolbox {name {cloned 0}} {
+      itk_component add $name {
+         GaiaAutoAstromSimple $w_.\#auto \
+            -rtdimage [$image_ get_image] \
+            -transient $itk_option(-transient_tools) \
+            -number $clone_ \
+            -notify_cmd [code $this redraw_specials_ 1] \
+            -clone_cmd [code $this make_toolbox astdefine 1] \
             -really_die $cloned
       }
    }
@@ -1640,7 +1657,7 @@ window gives you access to this."
    # -- public variables (also program options) --
 
    #  Is this controlled from the tabbed interface?
-   itk_option define -tabbedgaia tabbedgaia TabbedGaia 0 
+   itk_option define -tabbedgaia tabbedgaia TabbedGaia 0
 
    #  Command invoked when window is closed.
    itk_option define -on_close_cmd on_close_cmd On_Close_Cmd {}
