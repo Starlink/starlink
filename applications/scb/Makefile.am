@@ -14,6 +14,16 @@ AM_YFLAGS = -d
 BUILT_SOURCES = Scb.pm YyTag.pm scb.csh scb.pl scbindex.pl scbcp.pl dbmcat.pl \
                 ctag-y.h ftag-y.h ctag-l.c ftag-l.c
 
+TESTS = scb_test.sh
+check_DATA = scb_test.tar
+
+scb_test.tar:
+	tar cf $@ \
+                  test/Makefile \
+                  test/scb_c_test.c \
+                  test/scb_f_test.f \
+                  test/scb_locase.c
+
 ## Since most of the substitions that have to be done are related to
 ## the installation directory, we do them all here in the cumbersome way,
 ## since you can't get autoconf alone to handle substitutions related
@@ -24,7 +34,8 @@ edit = sed \
            -e 's,@PERL\@,$(PERL),g' \
            -e 's,@bindir\@,$(bindir),g' \
            -e 's,@STARLINK\@,$(STARLINK),g' \
-           -e 's,@SCB_INDEX\@,$(SCB_SOURCES),g' \
+           -e 's,@SCB_SOURCES\@,$(SCB_SOURCES),g' \
+           -e 's,@SCB_INDEX\@,$(SCB_INDEX),g' \
            -e 's,@SCB_BROWSER_TMP\@,$(SCB_BROWSER_TMP),g' \
            -e 's,@SCB_INDEXER_TMP\@,$(SCB_INDEXER_TMP),g' \
            -e 's,@HTX_SERVER\@,$(HTX_SERVER),g'

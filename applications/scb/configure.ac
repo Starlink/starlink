@@ -41,6 +41,7 @@ STAR_LATEX_DOCUMENTATION(sun225)
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.
 AC_CONFIG_FILES([Makefile component.xml])
+AC_CONFIG_FILES(scb_test.sh, [chmod +x scb_test.sh])
 
 dnl    This is the bit that does the actual work
 AC_OUTPUT
