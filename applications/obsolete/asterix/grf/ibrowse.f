@@ -266,14 +266,13 @@
       CHARACTER*80 STRING
       CHARACTER*10 FMT
       CHARACTER*79 LIN1
-     :  /'       Pixel                  - values scaled by 1.0 '/
-      CHARACTER*24 XYSTR/' X=         Y='/
-      CHARACTER*24 RASTR/'RA=          /'/
-      CHARACTER*22 DECSTR/'DEC=         /'/
-      CHARACTER*40  ESTR/' Ecl.long=          Ecl.lat='/
-      CHARACTER*39  GSTR/' Gal.long=          Gal.lat='/
-      CHARACTER*39 CMD1/' X-eXit  D-Data  V-Variance  E-Error  '/
-      CHARACTER*39 CMD2/'S-Signif  Q-Quality   ><-scale up/down'/
+      CHARACTER*24 XYSTR
+      CHARACTER*24 RASTR
+      CHARACTER*22 DECSTR
+      CHARACTER*40  ESTR
+      CHARACTER*39  GSTR
+      CHARACTER*39 CMD1
+      CHARACTER*39 CMD2
       CHARACTER*8 STR8
       INTEGER IX,IY,I,J
       INTEGER I1,I2,J1,J2
@@ -286,6 +285,16 @@
       DOUBLE PRECISION RA,DEC,ELON,ELAT,GLON,GLAT
 *    Global Variables :
       INCLUDE 'IMG_CMN'
+*    Local data:
+      DATA LIN1
+     :  /'       Pixel                  - values scaled by 1.0 '/
+      DATA XYSTR/' X=         Y='/
+      DATA RASTR/'RA=          /'/
+      DATA DECSTR/'DEC=         /'/
+      DATA  ESTR/' Ecl.long=          Ecl.lat='/
+      DATA  GSTR/' Gal.long=          Gal.lat='/
+      DATA CMD1/' X-eXit  D-Data  V-Variance  E-Error  '/
+      DATA CMD2/'S-Signif  Q-Quality   ><-scale up/down'/
 *-
 
       IF (STATUS.EQ.SAI__OK) THEN

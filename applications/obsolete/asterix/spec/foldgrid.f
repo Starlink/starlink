@@ -214,6 +214,7 @@
      :                    %VAL(OAWPTR), STATUS )
 
 *  Write channel bounds component too
+      CALL DAT_NEW1I( OLOC, 'CHANNEL_BOUNDS', ODIMS(1)+1, STATUS )
       CALL CMP_PUT1I( OLOC, 'CHANNEL_BOUNDS', ODIMS(1)+1, %VAL(RCPTR),
      :                STATUS )
 

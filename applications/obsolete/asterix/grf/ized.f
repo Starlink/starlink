@@ -193,7 +193,7 @@
       INTEGER STATUS
 *    Functions :
       LOGICAL IMG_INCIRC
-      BYTE BIT_ANDUB
+      BYTE BIT_ANDUB,BIT_ORUB
 *    Local variables :
       REAL VAL,VAR
       INTEGER IX,IY,IZ,JZ
@@ -236,7 +236,7 @@
 *   Test pixel quality
               IF (I_QOK) THEN
                 GOOD=(BIT_ANDUB(Q(I,J,K),I_MASK).EQ.QUAL__GOOD)
-                QUAL=(QUAL.OR.Q(I,J,K))
+                QUAL=BIT_ORUB(QUAL,Q(I,J,K))
               ELSE
                 GOOD=.TRUE.
               ENDIF

@@ -8,11 +8,11 @@
 *    History :
 *     21 Jan 93: V1.7-0 original
 *     16 Sep 94: V1.7-1 updates data min/max (RJV)
+*      8 Mar 96: V2.0-0 Use BIT_ routines for bit operations (DJA)
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PAR_ERR'
       INCLUDE 'QUAL_PAR'
 *    Global variables :
@@ -20,6 +20,7 @@
 *    Status :
       INTEGER STATUS
 *    Function declarations :
+      BYTE BIT_ANDUB,BIT_ORUB,BIT_NOTUB
 *    Local constants :
 *    Local variables :
       CHARACTER*8 MSTR
@@ -46,10 +47,10 @@
             CALL MSG_BLNK()
             CALL STR_BTOC(I_MASK,MSTR,STATUS)
             CALL MSG_PRNT(' Old mask value: '//MSTR)
-            IF ((I_MASK.AND.QUAL__IGNORE).EQ.QUAL__GOOD) THEN
-              I_MASK=I_MASK.OR.QUAL__IGNORE
+            IF (BIT_ANDUB(I_MASK,QUAL__IGNORE).EQ.QUAL__GOOD) THEN
+              I_MASK=BIT_ORUB(I_MASK,QUAL__IGNORE)
             ELSE
-              I_MASK=I_MASK.AND.(.NOT.QUAL__IGNORE)
+              I_MASK=BIT_ANDUB(I_MASK,BIT_NOTUB(QUAL__IGNORE))
             ENDIF
             CALL STR_BTOC(I_MASK,MSTR,STATUS)
             CALL MSG_PRNT(' New mask value: '//MSTR)

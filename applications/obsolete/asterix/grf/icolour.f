@@ -17,6 +17,7 @@
 *      16 Aug 94: V1.7-7 Bug fix (not reading colours) (RJV)
 *      14 Aug 95: V1.8-0 Interface with GUI (RJV)
 *      11 Jan 96: V1.8-1 Remove edit mode and TSM (RJV)
+*       8 Mar 96: V2.0-0 Fixes for Linux port (DJA)
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -31,7 +32,7 @@
       CHARACTER*10 MODE
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'ICOLOUR Version 1.8-1')
+      PARAMETER (VERSION = 'ICOLOUR Version 2.0-0')
 *-
       CALL USI_INIT()
 
@@ -192,7 +193,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Global variables :
 *    Import :
       INTEGER TAB
@@ -203,13 +203,14 @@
 *    Local constants :
 *    Local variables :
       CHARACTER*80 REC
-      CHARACTER*16 TABS(6)/'default.act','greyscale.act','green.act',
-     :                     'bluegreen.act','red.act','rainbow.act'/
+      CHARACTER*16 TABS(6)
       CHARACTER FILE*132
       REAL COLTAB(3,16)
       INTEGER IFD
       INTEGER I
       INTEGER L
+      DATA TABS/'default.act','greyscale.act','green.act',
+     :                     'bluegreen.act','red.act','rainbow.act'/
 *-
 
       IF (STATUS.EQ.SAI__OK) THEN
@@ -259,7 +260,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Import :
 *    Status :
       INTEGER STATUS

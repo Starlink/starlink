@@ -47,8 +47,6 @@
 *        Asks if data quality is to be used
 *     LOOP = LOGICAL (read)
 *        Loop over rejecting high sigma points
-*     SIMPLE = LOGICAL (read)
-*        Don't calculate kurtosis and skewness
 
 *  Examples:
 *     {routine_example_text}
@@ -142,6 +140,8 @@
 *        Full ADI port.
 *      9 Feb 1996 V2.0-1 (DJA):
 *        Protect against nvalid = 1 in chi-squared calculation
+*      8 Mar 1996 V2.0-2 (DJA):
+*        Removed simple mode
 *     {enter_changes_here}
 
 *  Bugs:
@@ -162,7 +162,7 @@
 
 *  Local Constants:
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'STATISTIX Version V2.0-1' )
+        PARAMETER		( VERSION = 'STATISTIX Version V2.0-2' )
 
 *  Local Variables:
       CHARACTER*150          PATH               ! HDS path to input object
@@ -186,7 +186,6 @@
       LOGICAL                DATAOK, VAROK      ! Various input
       LOGICAL                QUALOK, AXOK       ! objects there?
       LOGICAL                LOOP               ! Loop with sigma rejection?
-      LOGICAL                SIMPLE             ! Simple mode
 *.
 
 *  Check inherited global status.
@@ -213,9 +212,6 @@
         CALL AIO_WRITE( OCH, 'Statistics of '//INPUTFILE, STATUS )
         CALL AIO_BLNK( OCH, STATUS )
       END IF
-
-*  Simple mode?
-      CALL USI_GET0L( 'SIMPLE', SIMPLE, STATUS )
 
 *  Get shape of input data
       CALL BDI_GETSHP( IFID, ADI__MXDIM, DIMS, NDIM, STATUS )
@@ -292,7 +288,7 @@
 *  Do the statistics
       CALL STATISTIX_INT( NELM, %VAL(IDPTR), %VAL(WPTR), VAROK,
      :                  %VAL(IVPTR), QUALOK, %VAL(IQPTR), NDIM,
-     :           DIMS, AXOK, AXPTR, SIMPLE, OCH, LOOP, STATUS )
+     :                   DIMS, AXOK, AXPTR, OCH, LOOP, STATUS )
 
 *  Annul PAR__NULL in loop mode
       IF ( LOOP .AND. (STATUS.EQ.PAR__NULL) ) THEN
@@ -312,11 +308,11 @@
 *+  STATISTIX_INT - Internal routine to evaluate numeric statistics
       SUBROUTINE STATISTIX_INT( N, DATA, WEIGHTS, VAROK, VAR, QUALOK,
      :                          QUAL, NDIM, DIMS, AXOK, AXPTR,
-     :                               SIMPLE, OCH, LOOP, STATUS )
+     :                               OCH, LOOP, STATUS )
 *
 *    Description :
 *
-*     Calls the NAg routine G01AAF to calculate statistics. Observed data
+*     Observed data
 *     errors and data quality are used if supplied. If LOOP is specified,
 *     the user is asked if data > n standard deviations from the mean are
 *     to be ignored. Ignored points are then listed if required,  and new
@@ -372,7 +368,6 @@
       LOGICAL                LOOP               ! Loop over data?
       LOGICAL                QUALOK             ! Use QUALITY array ?
       LOGICAL                VAROK              ! Use VARIANCE array?
-      LOGICAL                SIMPLE             ! Simple mode
 *
 *    Local Constants :
 *
@@ -490,14 +485,14 @@
       NBAD = NBAD + NBIGW
 
 *    Do statistics
-      CALL STATISTIX_CALC( SIMPLE, N, DATA, VAROK, USEWEIGHT, WEIGHTS,
+      CALL STATISTIX_CALC( N, DATA, VAROK, USEWEIGHT, WEIGHTS,
      :                     MEAN, SUM, STDDEV, MEANERR, SKEWNESS,
      :                     KURTOSIS, MINVALUE, MAXVALUE, MINP, MAXP,
      :                     WTSUM, NVALID, CHISQUARE, ENZ, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Display results
-      CALL STATISTIX_DISPLAY( SIMPLE, NDIM, DIMS, N, USEWEIGHT, VAROK,
+      CALL STATISTIX_DISPLAY( NDIM, DIMS, N, USEWEIGHT, VAROK,
      :                        MEAN, SUM,
      :                        STDDEV, SKEWNESS, KURTOSIS, MINVALUE,
      :                        MAXVALUE, MINP, MAXP, MEANERR, NVALID,
@@ -601,13 +596,13 @@
           END IF
 
 *        Do statistics - always use weights
-          CALL STATISTIX_CALC( SIMPLE, N, DATA, VAROK, USEWEIGHT,
+          CALL STATISTIX_CALC( N, DATA, VAROK, USEWEIGHT,
      :                 WEIGHTS, MEAN, SUM, STDDEV, MEANERR, SKEWNESS,
      :                 KURTOSIS, MINVALUE, MAXVALUE, MINP, MAXP,
      :                 WTSUM, NVALID, CHISQUARE, ENZ, STATUS )
 
 *        ...and display
-      CALL STATISTIX_DISPLAY( SIMPLE, NDIM, DIMS, N, USEWEIGHT, VAROK,
+      CALL STATISTIX_DISPLAY( NDIM, DIMS, N, USEWEIGHT, VAROK,
      :                        MEAN, SUM,
      :                  STDDEV, SKEWNESS, KURTOSIS, MINVALUE, MAXVALUE,
      :                   MINP, MAXP, MEANERR, NVALID, CHISQUARE, ENZ,
@@ -710,7 +705,7 @@
 
 
 *+  STATISTIX_DISPLAY - writes the results to appropriate unit.
-      SUBROUTINE STATISTIX_DISPLAY( SIMPLE, NDIM, DIMS, N, WTERR, VAROK,
+      SUBROUTINE STATISTIX_DISPLAY( NDIM, DIMS, N, WTERR, VAROK,
      :                              MEAN, SUM, STDDEV, SKEWNESS,
      :                              KURTOSIS, MINVALUE, MAXVALUE, MINP,
      :                              MAXP,
@@ -736,7 +731,6 @@
 *
 *    Import :
 *
-      LOGICAL                SIMPLE             ! Simple mode?
       INTEGER                NDIM               ! Input dimensionality
       INTEGER                DIMS(ADI__MXDIM)   ! Input dimensions
       INTEGER                OCH                ! Output channel
@@ -812,15 +806,6 @@
         WRITE( OBUF, 10 )
         CALL AIO_WRITE( OCH, OBUF, STATUS )
 
-        IF ( .NOT. SIMPLE ) THEN
- 15       FORMAT( 7X, '*', 2X, A25, 1X, 1PG15.7, 18X, '*' )
-          WRITE( OBUF, 15 ) 'Coefficient of skewness =', SKEWNESS
-          CALL AIO_WRITE( OCH, OBUF, STATUS )
-          WRITE( OBUF, 15 ) 'Coefficient of kurtosis =', KURTOSIS
-          CALL AIO_WRITE( OCH, OBUF, STATUS )
-          WRITE( OBUF, 10 )
-          CALL AIO_WRITE( OCH, OBUF, STATUS )
-        END IF
       END IF
 
 *    Print min and max and pixel in which they occur
@@ -856,7 +841,7 @@
 
 
 *+  STATISTIX_CALC - Perform statistical calculations
-      SUBROUTINE STATISTIX_CALC( SIMPLE, N, DATA, VAROK,USE_WEIGHT,WGT,
+      SUBROUTINE STATISTIX_CALC( N, DATA, VAROK,USE_WEIGHT,WGT,
      :                           MEAN, SUM, STDDEV, MEANERR, SKEWNESS,
      :                           KURTOSIS, MINVALUE, MAXVALUE,
      :                           MINP, MAXP,
@@ -889,7 +874,6 @@
 *
 *    Import :
 *
-      LOGICAL                    SIMPLE               ! Use simple mode?
       INTEGER                    N                    ! # data values
       DOUBLE PRECISION           DATA(N)              ! Data values
       LOGICAL                    VAROK                ! Weights represent errors
@@ -934,7 +918,7 @@
 *    Number of points
       NVALID = N
 
-*    Initialise
+*  Initialise
       MEAN = 0.0D0
       STDDEV = 0.0D0
       SKEWNESS = 0.0D0
@@ -943,52 +927,29 @@
       WTSUM2 = 0.0D0
       SUM = 0.0D0
 
-*    Simple mode?
-      IF ( SIMPLE ) THEN
+*  Switch on use of weights
+      IF ( USE_WEIGHT ) THEN
 
-*      Switch on use of weights
-        IF ( USE_WEIGHT ) THEN
-
-*        Find first valid point
-          I = 1
-          DO WHILE ( (I.LE.N) .AND. (WGT(I).LE.0.0) )
-            I = I + 1
-          END DO
-          IF ( I .GT. N ) GOTO 99
-          NVALID = NVALID - (I-1)
-          MINVALUE = DATA(I)
-          MAXVALUE = DATA(I)
-          AMEAN = DATA(I)
-          J = I
-          MINP = J
-          MAXP = J
-          DO I = J, N
-            IF ( WGT(I) .GT. 0.0 ) THEN
-              WTSUM = WTSUM + WGT(I)
-              WTSUM2 = WTSUM2 + WGT(I)*WGT(I)
-              MEAN = MEAN + DATA(I)*WGT(I)
-              SUM = SUM + DATA(I)
-              STDDEV = STDDEV + WGT(I)*((DATA(I)-AMEAN)**2)
-              IF ( MAXVALUE .LT. DATA(I) ) THEN
-                MAXVALUE = DATA(I)
-                MAXP = I
-              END IF
-              IF ( MINVALUE .GT. DATA(I) ) THEN
-                MINVALUE = DATA(I)
-                MINP = I
-              END IF
-            ELSE
-              NVALID = NVALID - 1
-            END IF
-          END DO
-
-        ELSE
-          MINVALUE = DATA(1)
-          MAXVALUE = DATA(1)
-          MINP = 1
-          MAXP = 1
-          AMEAN = DATA(1)
-          DO I = 1, N
+*    Find first valid point
+        I = 1
+        DO WHILE ( (I.LE.N) .AND. (WGT(I).LE.0.0) )
+          I = I + 1
+        END DO
+        IF ( I .GT. N ) GOTO 99
+        NVALID = NVALID - (I-1)
+        MINVALUE = DATA(I)
+        MAXVALUE = DATA(I)
+        AMEAN = DATA(I)
+        J = I
+        MINP = J
+        MAXP = J
+        DO I = J, N
+          IF ( WGT(I) .GT. 0.0 ) THEN
+            WTSUM = WTSUM + WGT(I)
+            WTSUM2 = WTSUM2 + WGT(I)*WGT(I)
+            MEAN = MEAN + DATA(I)*WGT(I)
+            SUM = SUM + DATA(I)
+            STDDEV = STDDEV + WGT(I)*((DATA(I)-AMEAN)**2)
             IF ( MAXVALUE .LT. DATA(I) ) THEN
               MAXVALUE = DATA(I)
               MAXP = I
@@ -997,79 +958,53 @@
               MINVALUE = DATA(I)
               MINP = I
             END IF
-            SUM = SUM + DATA(I)
-            STDDEV = STDDEV + (DATA(I)-AMEAN)**2
-          END DO
-          MEAN = SUM
-          WTSUM = DBLE(N)
-          WTSUM2 = WTSUM
-        END IF
-
-*      Find values from sums
-        MEAN = MEAN / WTSUM
-        D = WTSUM - WTSUM2/WTSUM
-
-*      Correct standard deviation for assumed mean
-        IF ( NVALID .GT. 1 ) THEN
-          DMEAN = AMEAN - MEAN
-          STDDEV = STDDEV - WTSUM*DMEAN**2
-          STDDEV = SQRT(STDDEV/D)
-        END IF
+          ELSE
+            NVALID = NVALID - 1
+          END IF
+        END DO
 
       ELSE
-
-*      Set integer weights flag
-        IF ( USE_WEIGHT ) THEN
-          USEWEIGHT = 1
-        ELSE
-          USEWEIGHT = 0
-        END IF
-
-*      Set NAG error reporting
-        IFAIL = 1
-
-*      Use NAG routine to do work
-        CALL G01AAF( N, DATA, USEWEIGHT, WGT, MEAN, STDDEV, SKEWNESS,
-     :                   KURTOSIS, MINVALUE, MAXVALUE, WTSUM, IFAIL )
-
-*      Find sum
-        IF ( USE_WEIGHT ) THEN
-          DO I = N, 1, -1
-            IF ( WGT(I) .GT. 0.0D0 ) THEN
-              SUM = SUM + DATA(I)
-              IF ( DATA(I) .EQ. MAXVALUE ) MAXP = I
-              IF ( DATA(I) .EQ. MINVALUE ) MINP = I
-            END IF
-          END DO
-        ELSE
-          DO I = N, 1, -1
-            SUM = SUM + DATA(I)
-            IF ( DATA(I) .EQ. MAXVALUE ) MAXP = I
-            IF ( DATA(I) .EQ. MINVALUE ) MINP = I
-          END DO
-        END IF
-
-*      Create a double precision version of USEWEIGHT as this is now the
-*      number of points used by the NAG routine.
-        NVALID = USEWEIGHT
-
-*      Trap its failure
-        IF ( IFAIL .NE. 0 ) THEN
-          STATUS = SAI__ERROR
-          CALL ERR_REP( ' ', 'Error in NAG routine G01AAF', STATUS )
-          GOTO 99
-        END IF
-
+        MINVALUE = DATA(1)
+        MAXVALUE = DATA(1)
+        MINP = 1
+        MAXP = 1
+        AMEAN = DATA(1)
+        DO I = 1, N
+          IF ( MAXVALUE .LT. DATA(I) ) THEN
+            MAXVALUE = DATA(I)
+            MAXP = I
+          END IF
+          IF ( MINVALUE .GT. DATA(I) ) THEN
+            MINVALUE = DATA(I)
+            MINP = I
+          END IF
+          SUM = SUM + DATA(I)
+          STDDEV = STDDEV + (DATA(I)-AMEAN)**2
+        END DO
+        MEAN = SUM
+        WTSUM = DBLE(N)
+        WTSUM2 = WTSUM
       END IF
 
-*    Find error on mean
+*  Find values from sums
+      MEAN = MEAN / WTSUM
+      D = WTSUM - WTSUM2/WTSUM
+
+*  Correct standard deviation for assumed mean
+      IF ( NVALID .GT. 1 ) THEN
+        DMEAN = AMEAN - MEAN
+        STDDEV = STDDEV - WTSUM*DMEAN**2
+        STDDEV = SQRT(STDDEV/D)
+      END IF
+
+*  Find error on mean
       IF ( VAROK ) THEN
         MEANERR = 1.0D0 / SQRT(WTSUM)
       ELSE
         MEANERR = STDDEV / SQRT(DBLE(NVALID))
       END IF
 
-*    Calculate reduced chi square for fit of data to mean.
+*  Calculate reduced chi square for fit of data to mean.
       CHISQUARE = 0.0D0
       IF ( VAROK .AND. (NVALID .GT. 1) ) THEN
         DO I = 1, N
@@ -1079,13 +1014,13 @@
         END DO
         CHISQUARE = CHISQUARE / ( DBLE(NVALID) - 1.0D0 )
 
-*      Calculate Equivalent normal Z
+*    Calculate Equivalent normal Z
         ENZ = SQRT(2*CHISQUARE*(DBLE(NVALID)-1.0D0))-
      :               SQRT(2*(DBLE(NVALID)-1.0D0)-1.0D0)
 
       END IF
 
-*    Abort point
+*  Abort point
  99   CONTINUE
 
       END

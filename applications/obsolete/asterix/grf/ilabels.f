@@ -22,7 +22,7 @@
 *    Local variables :
       CHARACTER*80 XLABEL,YLABEL
       INTEGER XCOL,YCOL
-      INTEGER XOK,YOK
+      LOGICAL XOK,YOK
 *    Version :
       CHARACTER*30 VERSION
       PARAMETER (VERSION = 'ILABELS Version 1.7-0')

@@ -723,8 +723,9 @@
       INTEGER N
       PARAMETER (N=5)
 *  Local variables :
-      REAL X(N)/0.0,1.0,1.0,0.0,0.0/
-      REAL Y(N)/0.0,0.0,1.0,1.0,0.0/
+      REAL X(N),Y(N)
+      DATA X/0.0,1.0,1.0,0.0,0.0/
+      DATA Y/0.0,0.0,1.0,1.0,0.0/
 *-
       IF (STATUS.EQ.SAI__OK) THEN
 
@@ -1621,7 +1622,7 @@ c     :           I_X1_1D,I_X2_1D,I_Y1_1D,I_Y2_1D,SCALED,STATUS)
         SPARR(1) = I_XBASE_1D
         SPARR(2) = I_XSCALE_1D
         CALL BDI_AXPUT1R( ID, 1, 'SpacedData', 2, SPARR, STATUS )
-        CALL BDI_AXPUT0C(ID,1,'Normalised', .TRUE.,STATUS)
+        CALL BDI_AXPUT0L(ID,1,'Normalised', .TRUE.,STATUS)
         CALL BDI_AXPUT0C(ID,1,'Label', I_XLABEL_1D,STATUS)
         CALL BDI_AXPUT0C(ID,1,'Units', I_XUNITS_1D,STATUS)
 

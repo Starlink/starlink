@@ -188,6 +188,9 @@
       LOGICAL 			NEWL		! New line for object value?
       LOGICAL 			PRIM		! Object is primitive?
       LOGICAL 			VALID		! Object data is ok?
+*  Local Data:
+      CHARACTER*80              BLNK
+      DATA                      BLNK/' '/
 *-
 
 *    Initialise
@@ -228,8 +231,8 @@
       NB3 = MAX(1,VALIND-(TLEN+2))
 
 *    Write the buffer, excluding value
- 10   FORMAT( <NB1>X, A, A, <NB2>X, 3A )
-      WRITE(OUT,10) NAME(:NLEN), DSTR(:DLEN), '<', TYPE(:TLEN), '>'
+      WRITE(OUT,'(7A)') BLNK(:MAX(1,NB1)), NAME(:NLEN), DSTR(:DLEN),
+     :  BLNK(:MAX(1,NB2)), '<', TYPE(:TLEN), '>'
       CURC = NB1 + NLEN + DLEN + NB2 + 1 + TLEN + 1 + NB3
 
 *   Find value string
