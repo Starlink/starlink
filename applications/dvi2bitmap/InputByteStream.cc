@@ -50,6 +50,11 @@
 #include <sys/stat.h>		// for stat
 #endif
 
+#ifdef HAVE_SYS_MMAN_H
+#include <sys/types.h>
+#include <sys/mman.h>
+#endif
+
 #ifdef HAVE_STD_NAMESPACE
 using std::cerr;
 using std::sprintf;
@@ -61,7 +66,7 @@ verbosities InputByteStream::verbosity_ = normal;
 unsigned int InputByteStream::default_buffer_length_ = 0;
 
 InputByteStream::InputByteStream()
-    : eof_(true)
+    : eof_(true), fd_(-1), mappedfd_(-1), buf_(0)
 {
     // empty
 }
@@ -76,9 +81,9 @@ InputByteStream::InputByteStream()
  */
 InputByteStream::InputByteStream(int fd)
     throw (InputByteStreamError)
-    : eof_(true)
+    : eof_(true), fd_(-1), mappedfd_(-1), buf_(0)
 {
-    bindToFileDescriptor(fd, "", 0, false);
+    bindToFileDescriptor(fd, "", 0, false, false);
 }
 
 /**
@@ -100,10 +105,12 @@ InputByteStream::InputByteStream(int fd)
  */
 InputByteStream::InputByteStream(string srcspec)
     throw (InputByteStreamError)
-    : eof_(true)
+    : eof_(true), fd_(-1), mappedfd_(-1), buf_(0)
 {
     int fd = openSourceSpec(srcspec);
-    bindToFileDescriptor(fd, srcspec, 0, false);
+    // Note that, since we don't know that the srcspec isn't a fd or
+    // a pipe, we cannot say that it's definitely seekable
+    bindToFileDescriptor(fd, srcspec, 0, false, false);
 }
 
 /**
@@ -112,8 +119,6 @@ InputByteStream::InputByteStream(string srcspec)
 InputByteStream::~InputByteStream ()
 {
     close();
-    if (buf_ != 0)
-	delete[] buf_;
 }
 
 /**
@@ -147,16 +152,26 @@ bool InputByteStream::eof()
  * accept the default
  * @param fillBufferAndClose if true, read the entire contents of the
  * file into memory
+ * @param assertIsSeekable if true, the caller is asserting that the
+ * given file descriptor points to a seekable object (presumably because
+ * it will depend on it being so).  If this is not the case (the
+ * descriptor refers to a pipe or other non-seekable, and
+ * non-mappable, object), then throw an exception.  If this is false,
+ * no assertion is being made; it is not being asserted that the
+ * object is non-seekable.
  *
  * @throws InputByteStreamError if there is some other problem reading
- * the file, or if a negative buffer size is given.
+ * the file; or if a negative buffer size is given; or if the
+ * assertion described for parameter <code>assertIsSeekable</code>
+ * turns out to be false.
  * 
  * @return true on success
  */
 bool InputByteStream::bindToFileDescriptor(int fileno,
 					   string filename,
 					   int bufsize,
-					   bool fillBufferAndClose)
+					   bool fillBufferAndClose,
+					   bool assertIsSeekable)
     throw (InputByteStreamError)
 {
     fd_ = fileno;
@@ -179,6 +194,7 @@ bool InputByteStream::bindToFileDescriptor(int fileno,
     if (buflen_ == 0 && default_buffer_length_ != 0)
 	buflen_ = default_buffer_length_;
 
+    bool isSeekable;
 #ifdef HAVE_SYS_STAT_H
     struct stat S;
     if (fstat(fd_, &S) == 0) {
@@ -186,41 +202,101 @@ bool InputByteStream::bindToFileDescriptor(int fileno,
 	    cerr << "File descriptor " << fd_ << " OK:"
 		 << " st_rdev=" << S.st_rdev
 		 << " st_mode=" << S.st_mode
-		 << " (pipe? " << S_ISFIFO(S.st_mode) << ")"
+		 << " pipe=" << (S_ISFIFO(S.st_mode) ? "yes" : "no")
 		 << " st_size=" << S.st_size
 		 << " st_blksize=" << S.st_blksize
 		 << endl;
+	isSeekable = S_ISREG(S.st_mode);
+	// This mode can't be S_ISLNK, since this wasn't lstat().
+	// The mode could be a FIFO.  Anything else is probably a
+	// user error, which will be caught with normal processing in
+	// the caller.
 	if (buflen_ == 0)
 	    buflen_ = S.st_blksize;
     } else {
 	string errmsg = strerror(errno);
 	throw InputByteStreamError("File descriptor not open: " + errmsg);
     }
+#else
+    isSeekable = false;		// we don't know it isn't; but we
+				// can't be sure it is, so be safe
 #endif	/* HAVE_SYS_STAT_H */
 
     if (buflen_ == 0)
 	buflen_ = 1024;
 
-    //buflen_ = (bufsize == 0 ? default_buffer_length_ : bufsize);
-    buf_ = new Byte[buflen_];
-    if (verbosity_ > normal)
-	cerr << "InputByteStream: reading from fd " << fileno
-	     << ", name=" << fname_
-	     << ", buffer length=" << buflen_
-	     << endl;
+    bool mapTheFile = false;
+#ifdef HAVE_MMAP
+    if (isSeekable)
+	mapTheFile = true;
+#endif
 
-    if (fillBufferAndClose) {
-	size_t real_length = certainly_read_(fd_, buf_, buflen_);
+    if (assertIsSeekable && !isSeekable)
+	throw InputByteStreamError
+		("File " + fname_ + " is not seekable, contrary to assertion");
+
+    if (mapTheFile) {
+
+#if !(defined(HAVE_MMAP) && defined(HAVE_SYS_STAT_H))
+	// we shouldn't have got here!
+	assert(false);
+#endif	/* ! (HAVE_MMAP && HAVE_SYS_STAT_H) */
+
+	buflen_ = S.st_size;
+	buf_ = static_cast<Byte*>(mmap(0, buflen_, PROT_READ, 0, fd_, 0));
+	if (buf_ == MAP_FAILED) {
+	    string errmsg = strerror(errno);
+	    throw InputByteStreamError
+		    ("Failed to map file " + fname_ + " (" + errmsg + ")");
+	}
+	// Don't ::close(fd_) here: though we don't need it any more,
+	// leaving it open means that the file won't be reclaimed if
+	// it's unlinked while we're mapping it (that would be Bad).
+	// However, we do want fd_ to be negative, as a flag that the
+	// fd is now inaccessible, both in this class and, via
+	// getFD(), to extending classes.  So save the mapped fd, so
+	// ::close(mappedfd_) can be closed explicitly within
+	// InputByteStream::close().
+	//
+	// Now, according to the single-unix spec: ``The mmap() function
+	// adds an extra reference to the file associated with the
+	// file descriptor fildes which is not removed by a subsequent
+	// close() on that file descriptor.  This reference is removed
+	// when there are no more mappings to the file.''  However the
+	// OS X man page (for example) makes no such guarantee.
+	// Therefore don't close it now, postponing the close until
+	// we munmap the file.  This may be belt-and-braces, but it
+	// won't create a problem.
+	mappedfd_ = fd_;
+	fd_ = -1;
+
 	p_ = buf_;
-	eob_ = buf_ + real_length;
-	close();
+	eob_ = buf_ + buflen_;
+	
     } else {
-	eob_ = p_ = buf_;
-	assert(p_ == buf_);
+
+	buf_ = new Byte[buflen_];
+	if (fillBufferAndClose) {
+	    size_t real_length = certainly_read_(fd_, buf_, buflen_);
+	    p_ = buf_;
+	    eob_ = buf_ + real_length;
+	    close();
+	} else {
+	    eob_ = p_ = buf_;
+	    assert(p_ == buf_);
+	}
     }
 
     assert(buf_ <= p_ && p_ <= eob_);
     
+    if (verbosity_ > normal)
+	cerr << "InputByteStream: reading from fd " << fileno
+	     << ", name=" << fname_
+	     << ", buffer length=" << buflen_
+	     << ", seekable=" << (isSeekable ? "yes" : "no")
+	     << ", mapped=" << (mappedfd_ >= 0 ? "yes" : "no")
+	     << endl;
+
     return true;
 }
 
@@ -333,13 +409,17 @@ size_t InputByteStream::certainly_read_(int fd, Byte* b, size_t len)
 Byte InputByteStream::getByte(void)
     throw (InputByteStreamError)
 {
-    if (eof_)
+    if (eof())
 	return 0;
 
-    assert(buf_ <= p_ && p_ <= eob_);
+    if (buf_ == 0)
+	throw InputByteStreamError
+		("InputByteStream::getByte: called after stream closed");
+
+    assert(buf_ != 0 && buf_ <= p_ && p_ <= eob_);
 
     if (p_ == eob_)
-	read_buf_();		// alters p_ and eob_, and possible eof_
+	read_buf_();		// alters p_ and eob_, and possibly eof_
 
     Byte result;
     
@@ -361,14 +441,25 @@ Byte InputByteStream::getByte(void)
  *
  * @return a pointer to a block of bytes
  * @throws InputByteStreamError if the requested number of bytes
- * cannot be read
+ * cannot be read, which includes the case of this method being
+ * called when <code>eof()</code> is true
  */
 const Byte *InputByteStream::getBlock(unsigned int length)
     throw (InputByteStreamError)
 {
     Byte *ret;
 
-    assert(buf_ <= p_ && p_ <= eob_);
+    if (eof())			// slightly redundant check, but gives
+				// distinct report from
+				// not-enough-space error below
+	throw InputByteStreamError
+		("InputByteStream::getBlock called after EOF");
+
+    if (buf_ == 0)
+	throw InputByteStreamError
+		("InputByteStream::getBlock: called after stream closed");
+
+    assert(buf_ != 0 && buf_ <= p_ && p_ <= eob_);
 
     if (length <= eob_-p_) {
 	ret = p_;
@@ -419,12 +510,12 @@ const Byte *InputByteStream::getBlock(unsigned int length)
 	//cerr << "; p=buf+" << p_-buf_ << ", eob=buf+" << eob_-buf_ << endl;
     }
 
-    assert(buf_ <= p_ && p_ <= eob_);
+    assert(buf_ != 0 && buf_ <= p_ && p_ <= eob_);
 
     return ret;
 }
 
-void InputByteStream::read_buf_ ()
+void InputByteStream::read_buf_()
     throw (InputByteStreamError)
 {
     if (fd_ < 0) {
@@ -432,7 +523,7 @@ void InputByteStream::read_buf_ ()
 	return;
     }
     
-    assert(fd_ >= 0);
+    assert(fd_ >= 0 && buf_ != 0);
     
     ssize_t bufcontents = read(fd_, buf_, buflen_);
     if (bufcontents < 0)
@@ -452,7 +543,7 @@ void InputByteStream::read_buf_ ()
 	     << endl;
     p_ = buf_;
 
-    assert(buf_ <= p_ && (eof_ || buf_ < eob_) && p_ <= eob_);
+    assert(buf_ != 0 && buf_ <= p_ && (eof_ || buf_ < eob_) && p_ <= eob_);
 }
 
 /**
@@ -467,7 +558,7 @@ void InputByteStream::skip (unsigned int increment)
     if (eof())
 	throw InputByteStreamError("Skip while at EOF");
 
-    assert(buf_ <= p_ && p_ <= eob_);
+    assert(buf_ != 0 && buf_ <= p_ && p_ <= eob_);
 
     if (fd_ < 0) {
 	// better be in the buffer already
@@ -491,7 +582,7 @@ void InputByteStream::skip (unsigned int increment)
 	p_ += increment;
     }
     
-    assert(buf_ <= p_ && p_ <= eob_);
+    assert(buf_ != 0 && buf_ <= p_ && p_ <= eob_);
 }
 
 /**
@@ -504,14 +595,20 @@ void InputByteStream::skip (unsigned int increment)
  * current position is relocated to
  *
  * @throws InputByteStreamError if the offset would take the pointer
- * outside the buffer
+ * outside the buffer, or if the stream has been closed
  */
 void InputByteStream::bufferSeek(unsigned int offset)
     throw (InputByteStreamError)
 {
+    if (buf_ == 0)
+	throw InputByteStreamError
+		("Call to bufferSeek when stream has been closed");
     if (offset >= (buflen_))	// unsigned offset can't be negative
 	throw InputByteStreamError
 		("Call to protected bufferSeek too large for buffer");
+
+    assert(buf_ != 0 && buf_ <= p_ && p_ <= eob_);
+
     p_ = buf_ + offset;
     eof_ = (p_ == eob_);
     if (verbosity_ > normal)
@@ -519,7 +616,8 @@ void InputByteStream::bufferSeek(unsigned int offset)
 	     << "; eof=" << (eof_ ? "true" : "false")
 	     << ", p=buf+" << p_-buf_ << ", eob=buf+" << eob_-buf_
 	     << endl;
-    assert(buf_ <= p_ && p_ <= eob_);
+
+    assert(buf_ != 0 && buf_ <= p_ && p_ <= eob_);
 }
 
 /**
@@ -530,12 +628,16 @@ void InputByteStream::reloadBuffer(void)
 {
     p_ = eob_;			// triggers reading of buffer
     eof_ = false;		// we guess -- harmless if wrong
+    assert(fd_ >= 0 && buf_ != 0); // We don't rely on this
+				   // assertion in this method, but
+				   // if it is false, there's a
+				   // programming error somewhere
     if (verbosity_ > normal)
 	cerr << "InputByteStream::reloadBuffer: p=buf+" << p_-buf_
 	     << " eob=buf+" << eob_-buf_
 	     << " eof=" << (eof_ ? "true" : "false")
 	     << endl;
-    assert(buf_ <= p_ && p_ <= eob_);
+    assert(buf_ != 0 && buf_ <= p_ && p_ <= eob_);
 }
 
 /**
@@ -545,10 +647,39 @@ void InputByteStream::close(void)
 {
     if (verbosity_ > normal)
 	cerr << "InputByteStream::close" << endl;
-    
+
     if (fd_ >= 0)
-	::close (fd_);
+	::close(fd_);
     fd_ = -1;
+
+    if (mappedfd_ >= 0) {
+#ifdef HAVE_MMAP
+	if (buf_ == 0)
+	    cerr << "InputByteStream::close: -- odd, already deallocated"
+		 << endl;
+	else {
+	    if (munmap(static_cast<void*>(buf_), buflen_) == -1) {
+		string errstr = strerror(errno);
+		cerr << "InputByteStream: close: can't unmap file: "
+		     << errstr << endl;
+	    }
+	    buf_ = 0;
+	}
+	::close(mappedfd_);
+	mappedfd_ = -1;
+#else
+	assert(false);
+#endif
+    }
+
+    if (buf_ != 0) {
+	delete[] buf_;
+	buf_ = 0;
+    }
+
+    eof_ = true;
+
+    assert(fd_ < 0 && mappedfd_ < 0 && buf_ == 0);
 }
 
 /**

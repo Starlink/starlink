@@ -5,10 +5,11 @@ Refactor runCommandPipe as PipeStream, a subclass of InputByteStream
 Reimplement kpathsea as a singleton object
     Done, 3 August 2003
 
-----------------------------------------------------------------------
-
 Have InputByteStream mmap its target file, if possible [very easy,
     really just a matter of the right bookkeeping]
+    Done, 22 August 2003 (pretty easy in fact, barring a couple of gotchas)
+
+----------------------------------------------------------------------
 
 Implement PostscriptImage, either using PipeStream, or using libgs
     [potentially messy, but not terribly hard]

@@ -120,7 +120,8 @@ class InputByteStream {
     bool bindToFileDescriptor(int fileno,
 			      string filename="",
 			      int bufsize=0,
-			      bool fillBufferAndClose=false)
+			      bool fillBufferAndClose=false,
+			      bool assertIsSeekable=false)
 	    throw (InputByteStreamError);
     int openSourceSpec(string srcspec)
 	    throw (InputByteStreamError);
@@ -138,10 +139,11 @@ class InputByteStream {
     void reloadBuffer(void);
 
  private:
-    int fd_;
-    string fname_;
-    size_t buflen_;
+    int fd_;			/* file descriptor of handled file/pipe */
+    int mappedfd_;		/* saved file descriptor of mapped file */
+    string fname_;		/* name of file, or string rep'n of fd */
     Byte *buf_;			/* buffer */
+    size_t buflen_;		/* size of buffer */
     Byte *p_;			/* current position in buffer */
     Byte *eob_;			/* end of buffer */
     bool eof_;			/* true on end of file */

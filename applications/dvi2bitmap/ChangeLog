@@ -1,3 +1,9 @@
+2003-08-22  Norman Gray  <norman@astro.gla.ac.uk>
+
+	* InputByteStream.cc, InputByteStream.h, FileByteStream.cc:
+	input files are now mapped with mmap, if that's available, and if
+	they're determined to be seekable (ie, regular files).
+
 2003-08-21  Norman Gray  <norman@astro.gla.ac.uk>
 
 	* Bitmap.cc Corrected scaleDown method: was working only for

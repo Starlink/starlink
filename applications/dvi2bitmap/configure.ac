@@ -6,7 +6,7 @@ dnl       of the Research Councils
 dnl   See file LICENCE for conditions.
 
 
-AC_INIT(dvi2bitmap, 0.11, norman@astro.gla.ac.uk)
+AC_INIT(dvi2bitmap, 0.12devel, norman@astro.gla.ac.uk)
 AM_INIT_AUTOMAKE
 AC_REVISION($Revision$)
 
@@ -63,11 +63,11 @@ dnl   automatically checked for, and the corresponding HAVE_ macros
 dnl   defined).  Check if we've got sstream; if not, hope we have the
 dnl   older strstream.
 AC_HEADER_STDC
-AC_CHECK_HEADERS(assert.h fcntl.h signal.h sys/stat.h sys/wait.h sys/time.h)
+AC_CHECK_HEADERS(assert.h fcntl.h signal.h sys/stat.h sys/wait.h sys/time.h sys/mman.h)
 AC_HEADER_STAT
 
 dnl   Checks for library functions
-AC_CHECK_FUNCS(pipe snprintf setenv putenv alarm setitimer)
+AC_CHECK_FUNCS(pipe snprintf setenv putenv alarm setitimer mmap)
 
 
 

@@ -35,7 +35,9 @@
 class FileByteStream : public InputByteStream {
 
  public:
-    FileByteStream(string& filename, string tryext="", bool preload=false)
+    FileByteStream(string& filename,
+		   string tryext="",
+		   bool preload=false)
 	    throw (InputByteStreamError);
     ~FileByteStream();
     void seek(int pos)

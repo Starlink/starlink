@@ -12,12 +12,15 @@
 #if HAVE_CSTD_INCLUDE
 #include <cstdio>
 #include <cstdlib>
+#include <cerrno>
 #else
 #include <stdio.h>
 #include <stdlib.h>
+#include <errno.h>
 #endif
 #include <fcntl.h>
 #include <sys/wait.h>
+#include <sys/stat.h>		// for mkfifo
 
 
 #if HAVE_STD_NAMESPACE
@@ -40,7 +43,7 @@ void checkEOF(InputByteStream& IBS)
     throw (InputByteStreamError);
 int exercise_IBS(InputByteStream& IBS);
 int exercise_FBS(FileByteStream& FBS);
-void generate_data(int num);
+void generate_data(int num, FILE* f);
 void echo_envvars(int argc, char** argv);
 int do_stream_tests();
 int do_pipe_tests();
@@ -84,7 +87,6 @@ string report_on_status(int status)
     } else {
         res << "Impossible status " << status;
     }
-    res << ends;
     return SS_STRING(res);
 }
 
@@ -237,16 +239,16 @@ int exercise_FBS(FileByteStream& FBS)
     return nfails;
 }
 
-void generate_data(int num)
+void generate_data(int num, FILE *o)
 {
     int i;
     for (i=0; i <= num - 20; i+=10) {
-	printf("!%03d:56789", i);
+	fprintf(o, "!%03d:56789", i);
     }
-    printf("!end:56789");
+    fprintf(o, "!end:56789");
     i += 10;
     for (int j=0; i<num; j++, i++)
-	printf("%d", j);
+	fprintf(o, "%d", j);
 }
 
 void echo_envvars(int argc, char** argv)
@@ -358,6 +360,48 @@ int do_stream_tests()
 		// tfails++;
 	    }
             IFV cerr << "Stream test 5 " << (tfails==0 ? "OK" : "FAILED") << endl;
+            nfails += tfails;
+	}
+	
+	{
+	    int tfails = 0;
+	    IFV cerr << "===== Stream test 6" << endl;
+	    // Test reading from a named pipe.  Thus opened as a file,
+	    // but not seekable.  Pipe name starts with "temp", so
+	    // it's cleared up with make clean
+#define PIPE_NAME "./temp-t6.pipe"
+	    if (mkfifo(PIPE_NAME, 0644) == -1) {
+		string errmsg = strerror(errno);
+		cerr << "Can't create FIFO: " << errmsg << endl;
+		tfails++;
+	    } else {
+		int pid = fork();
+		if (pid < 0) {
+		    cerr << "Can't fork!" << strerror(errno) << endl;
+		    tfails++;
+		} else if (pid == 0) {
+		    // child
+		    execl("./t6.test",
+			  "./t6.test",
+			  "-o", PIPE_NAME,
+			  "-g", "500",
+			  0);
+		} else {
+		    // parent
+		    InputByteStream IBS("t6.pipe");
+		    tfails += exercise_IBS(IBS);
+		    IBS.close();
+		    int status;
+		    waitpid(pid, &status, 0);
+		    IFV cerr << "Stream test 6: child status="
+			     << status << endl;
+		}
+		if (unlink(PIPE_NAME) == -1) {
+		    cerr << "Can't unlink pipe " << PIPE_NAME << endl;
+		    // but don't fail
+		}
+	    }
+            IFV cerr << "Stream test 6 " << (tfails==0?"OK":"FAILED") << endl;
             nfails += tfails;
 	}
 
@@ -498,6 +542,8 @@ int main (int argc, char **argv)
 #define GENERATE 1
 #define ECHOENVS 2
 
+    FILE *output = stdout;
+
     for (argc--, argv++; argc>0; argc--, argv++) {
 	if (**argv == '-') {
 	    switch (*++*argv) {
@@ -511,6 +557,23 @@ int main (int argc, char **argv)
 		
 	      case 'g':
 		action = GENERATE;
+		break;
+
+	      case 'o':
+		++*argv;
+		if (**argv == '\0') {
+		    argc--;
+		    argv++;
+		}
+		if (argc == 0 || **argv == '-')
+		    Usage();
+		if (**argv != '\0') {
+		    if ((output = fopen(*argv, "w")) == 0) {
+			cerr << "Can't open file " << *argv << " to write"
+			     << endl;
+			exit (1);
+		    }
+		}
 		break;
 
 	      default:
@@ -536,7 +599,7 @@ int main (int argc, char **argv)
 	    int n = strtol(*argv, 0, 10);
 	    if (n <= 0)
 		Usage();
-	    generate_data(n);
+	    generate_data(n, output);
 	    break;
 	}
 		
@@ -558,7 +621,8 @@ int main (int argc, char **argv)
 
 void Usage(void)
 {
-    cerr << "Usage: " << progname << " [-g num] [-e var...]" << endl;
+    cerr << "Usage: " << progname << " [-o output] [-g num] [-e var...]"
+	 << endl;
     exit (1);
 }
 

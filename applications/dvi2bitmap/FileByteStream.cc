@@ -57,11 +57,17 @@ using std::endl;
  * be seeking a lot).  If the file can't be opened, then try adding
  * <code>tryext</code> to the end of it.
  *
+ * <p>The file to be opened must be a seekable object -- that is, it
+ * must be a regular file, rather than a named pipe or a socket.
+ *
  * @param filename the file to be opened
- * @param tryext a file extension which should be added to the end of
- * <code>filename</code> if that cannot be opened; default
- * <code>""</code> suppresses this
+ * @param tryext a file extension, including any dot, which should be
+ * added to the end of <code>filename</code> if that cannot be opened;
+ * default <code>""</code> suppresses this
  * @param preload if true, then the file is read entirely into memory
+ *
+ * @throws InputByteStreamError if there is a problem opening the
+ * file, including the discovery that it is not a seekable object
  */
 FileByteStream::FileByteStream(string& filename,
 			       string tryext,
@@ -86,6 +92,14 @@ FileByteStream::FileByteStream(string& filename,
     }
     assert(newfd >= 0);
 
+    // ermm, we should test for HAVE_SYS_STAT_H, here, but (a) are
+    // there really any platforms which don't have stat?, and (b) we
+    // need the filesize information, and I don't know how else to
+    // get it.  Deal with this if we really do find such a wierd
+    // platform.
+#ifndef HAVE_SYS_STAT_H
+#error "Come on -- you _must_ have stat(2)!"
+#endif
     struct stat S;
     if (fstat (newfd, &S))
     {
@@ -97,7 +111,8 @@ FileByteStream::FileByteStream(string& filename,
     bindToFileDescriptor(newfd,
 			 filename,
 			 (preload ? filesize_ : 0),
-			 preload);
+			 preload,
+			 true);	// assert is seekable
 }
 
 FileByteStream::~FileByteStream()
