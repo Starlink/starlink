@@ -21738,7 +21738,10 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
       } else {
          strcpy( template, "CRPIX%d" );
       }
-      if( !astKeyFields( this, template, 1, &naxis, lbnd ) ) continue;
+      if( !astKeyFields( this, template, 1, &naxis, lbnd ) ) {
+         if( s == ' ' ) s = 'A' - 1;
+         continue;
+      }
 
 /* Find the longitude and latitude axes by examining the CTYPE values.
    They are marked as read. Such markings are only provisional, and they
