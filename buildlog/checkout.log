@@ -8827,6 +8827,7 @@ U java/source/treeview/src/main/uk/ac/starlink/treeview/GridPlotter.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/HDSDataNode.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/HDUDataNode.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/HDXDataNode.java
+U java/source/treeview/src/main/uk/ac/starlink/treeview/HTMLDataNode.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/HTMLDocComponentMaker.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/HTMLProcessor.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/HTMLViewer.java

@@ -143,7 +143,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/treeview/build/java
-     [copy] Copying 112 files to /apps/cvsbuild/java/source/treeview/build/java
+     [copy] Copying 113 files to /apps/cvsbuild/java/source/treeview/build/java
      [copy] Copied 4 empty directories to /apps/cvsbuild/java/source/treeview/build/java
      [echo] Executing Coco target: javadoc-sources
 
@@ -474,4 +474,4 @@ javadoc-sources:
   [javadoc] 91 warnings
 
 BUILD SUCCESSFUL
-Total time: 56 seconds
+Total time: 50 seconds

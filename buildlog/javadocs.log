@@ -61,9 +61,9 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/Compression.java:148: cannot resolve symbol
   [javadoc] symbol: class CBZip2InputStream 
   [javadoc]             return new CBZip2InputStream( raw );
-  [javadoc]                        ^
   [javadoc] Building tree for all the packages and classes...
   [javadoc] Building index for all the packages and classes...
+  [javadoc]                        ^
   [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/gui/SelectCharacters.java:50: warning - Tag @see: malformed: "InsertCharacters, SelectCharactersModel"
   [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/gui/BasicFileFilter.java:46: warning - Tag @link: reference not found: JFileChooser
   [javadoc] Building index for all classes...
@@ -2654,4 +2654,4 @@ javadocs:
   [javadoc] 199 warnings
 
 BUILD SUCCESSFUL
-Total time: 2 minutes 51 seconds
+Total time: 2 minutes 55 seconds
