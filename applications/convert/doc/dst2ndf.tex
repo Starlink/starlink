@@ -1,0 +1,146 @@
+\newpage
+\sstroutine{
+   DST2NDF
+}{
+   Converts a Figaro version 2 DST file to an NDF
+}{
+   \sstdescription{
+      This application converts a Figaro version 2 DST file to a
+      version 3 file, {\it i.e.}\ to an NDF.  The rules for converting the
+      various components of a DST are listed in the notes.  Since
+      both are hierarchical formats most files can be be converted with
+      little or no information lost.
+   }
+   \sstusage{
+      DST2NDF IN OUT
+   }
+   \sstparameters{
+      \sstsubsection{
+         IN = Figaro file (Read)
+      }{
+         The file name of the version 2 file.  A file extension must
+         not be given after the name, since {\tt "}.DST{\tt "} is appended by the
+         application.  The file name is limited to 80 characters.
+      }
+      \sstsubsection{
+         OUT = NDF (Write)
+      }{
+         The file name of the output NDF file.  A file extension must
+         not be given after the name, since {\tt "}.SDF{\tt "} is appended by the
+         application.  Since the NDF\_ library is not used, a section
+         definition may not be given following the name.  The file
+         name is limited to 80 characters.
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         DST2NDF OLD NEW
+      }{
+         This converts the Figaro file OLD.DST file to the NDF file
+         NEW.SDF.
+      }
+      \sstexamplesubsection{
+         DST2NDF HORSE HORSE
+      }{
+         This converts the Figaro file HORSE.DST to the NDF called
+         HORSE in file HORSE.SDF.
+      }
+   }
+   \sstnotes{
+      The rules for the conversion of the various components are as
+      follows:
+      \begin{center}
+      \begin{tabular}{|lcl|p{47mm}|}
+      \hline 
+      \multicolumn{1}{|c}{Figaro file} & & \multicolumn{1}{c}{NDF} &
+      \multicolumn{1}{|c|}{Comments} \\ \hline
+      .Z.DATA   & $\Rightarrow$ & .DATA\_ARRAY & \\
+      .Z.ERRORS & $\Rightarrow$ & .VARIANCE & after processing \\
+      .Z.QUALITY & $\Rightarrow$ & .QUALITY.QUALITY & must be BYTE array
+                                  (see Bad-pixel handling below) \\
+      & $\Rightarrow$ & .QUALITY.BADBITS = 255 & \\
+      .Z.LABEL  & $\Rightarrow$ & .LABEL & \\
+      .Z.UNITS  & $\Rightarrow$ & .UNITS & \\
+      .Z.IMAGINARY & $\Rightarrow$ & .DATA\_ARRAY.IMAGINARY\_DATA & \\
+      .Z.MAGFLAG & $\Rightarrow$ & .MORE.FIGARO.MAGFLAG & \\
+      .Z.RANGE  & $\Rightarrow$ & .MORE.FIGARO.RANGE & \\
+      .Z.xxxx   & $\Rightarrow$ & .MORE.FIGARO.Z.xxxx & \\
+      & & & \\
+      .X.DATA   & $\Rightarrow$ & .AXIS(1).DATA\_ARRAY & \\ 
+      .X.ERRORS & $\Rightarrow$ & .AXIS(1).VARIANCE & after processing \\
+      .X.WIDTH  & $\Rightarrow$ & .AXIS(1).WIDTH & \\
+      .X.LABEL  & $\Rightarrow$ & .AXIS(1).LABEL & \\
+      .X.UNITS  & $\Rightarrow$ & .AXIS(1).UNITS & \\
+      .X.LOG    & $\Rightarrow$ & .AXIS(1).MORE.FIGARO.LOG & \\
+      .X.xxxx   & $\Rightarrow$ & .AXIS(1).MORE.FIGARO.xxxx & \\
+      & & & (Similarly for .Y .T .U .V or .W structures which are
+             renamed to AXIS(2), \ldots, AXIS(6) in the NDF.) \\ \hline
+      \end{tabular}
+      \end{center}
+
+      \begin{center}
+      \begin{tabular}{|lcl|p{43mm}|}
+      \hline 
+      \multicolumn{1}{|c}{Figaro file} & & \multicolumn{1}{c}{NDF} &
+      \multicolumn{1}{|c|}{Comments} \\ \hline
+      .OBS.OBJECT & $\Rightarrow$ & .TITLE & \\
+      .OBS.SECZ & $\Rightarrow$ & .MORE.FIGARO.SECZ & \\
+      .OBS.TIME & $\Rightarrow$ & .MORE.FIGARO.TIME & \\
+      .OBS.xxxx & $\Rightarrow$ & .MORE.FIGARO.OBS.xxxx & \\
+      & & & \\
+      .FITS.xxxx& $\Rightarrow$ & .MORE.FITS.xxxx & into value part of
+         the string \\
+      .COMMENTS.xxxx  & $\Rightarrow$ & .MORE.FITS.xxxx & into comment part of
+         the string \\
+      .FITS.xxxx.DATA & $\Rightarrow$ & .MORE.FITS.xxxx & into value part of
+         the string \\
+      .FITS.xxxx.DESCRIPTION & $\Rightarrow$ & .MORE.FITS.xxxx & into comment
+         part of the string \\
+      & & & \\
+      .MORE.xxxx& $\Rightarrow$ & .MORE.xxxx & \\
+      & & & \\
+      .TABLE    & $\Rightarrow$ & .MORE.FIGARO.TABLE & \\
+      .xxxx     & $\Rightarrow$ & .MORE.FIGARO.xxxx & \\ \hline
+      \end{tabular}
+      \end{center}
+
+      Axis arrays with dimensionality greater than one are not
+      supported by the NDF.  Therefore, if the application encounters
+      such an axis array, it processes the array using the following
+      rules, rather than those given above.
+      \begin{center}
+      \begin{tabular}{|lcl|p{51mm}|}
+      \hline 
+      \multicolumn{1}{|c}{Figaro file} & & \multicolumn{1}{c}{NDF} &
+      \multicolumn{1}{|c|}{Comments} \\ \hline
+      .X.DATA   & $\Rightarrow$ & .AXIS(1).MORE.FIGARO.DATA &
+            AXIS(1).DATA\_ARRAY is filled with pixel co-ordinates \\
+      .X.ERRORS & $\Rightarrow$ & .AXIS(1).MORE.FIGARO.VARIANCE & after
+            processing \\
+      .X.WIDTH  & $\Rightarrow$ & .AXIS(1).MORE.FIGARO.WIDTH & \\ \hline
+      \end{tabular}
+      \end{center}
+   }
+
+   \sstdiytopic{
+   Bad-pixel handling
+   }{
+The QUALITY array is only copied if the bad-pixel flag
+(.Z.FLAGGED) is false or absent.  A simple NDF with the bad-pixel
+flag set to false (meaning that there are no bad-pixels present)
+is created when .Z.FLAGGED is absent or false.  Otherwise a
+primitive NDF, where the data array is at the top level of the
+data structure, is produced.
+   }
+   \sstimplementationstatus{
+      \sstitemlist{
+
+      \sstitem
+      Note the data array in the NDF is of the primitive form.
+
+      \sstitem
+      The maximum number of dimensions is 7.
+      }
+   }
+}
+\end{document}
