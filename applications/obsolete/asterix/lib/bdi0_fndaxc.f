@@ -164,6 +164,7 @@
                ELSE IF ( QCODE .EQ. 'E' ) THEN
                  IF ( CHR_INSET( 'CORR_PHA,PI,PHA,RAW_PHA', LABEL ) .OR.
      :                (INDEX( LABEL, 'CORRECTED PHA' ) .GT. 0) .OR.
+     :                (INDEX( LABEL, 'PULSE' ) .GT. 0) .OR.
      :                (INDEX( LABEL, 'ENERGY' ) .GT. 0) ) THEN
                    FOUND = .TRUE.
                  END IF
