@@ -103,6 +103,7 @@
 
 *  External References:
       EXTERNAL			WCI1_XPCAR		! Cartesian
+      EXTERNAL			WCI1_XPTAN		! Tan/Gnomonic
 
       EXTERNAL			UTIL_PLOC		! Portable %LOC
         INTEGER			UTIL_PLOC
@@ -114,6 +115,9 @@
 *  Switch on projection name
       IF ( NAME .EQ. 'CAR' ) THEN
         PTR = UTIL_PLOC( WCI1_XPCAR )
+
+      ELSE IF ( NAME .EQ. 'TAN' ) THEN
+        PTR = UTIL_PLOC( WCI1_XPTAN )
 
 *  Not implemented yet...
       ELSE
