@@ -1231,9 +1231,13 @@ dnl The problem only affects g77/gcc, so we know we're dealing with these below
             star_cv_restfp_fixup=no
         fi
         ])
-   # Define FCLIBS, just as AC_FC_LIBRARY_LDFLAGS does
    case $star_cv_restfp_fixup in
      lgcc)
+       # Add the required libraries to LIBS, so that the fixup happens
+       # invisibly, rather than requiring extra substitution tokens in
+       # the sources.  AC_FC_LIBRARY_LDFLAGS (which defines FCLIBS) does
+       # things differently, because there the user knows they want these
+       # extra libraries.
        LIBS="$LIBS -L/usr/lib -lgcc"
        ;;
      nofortran)
