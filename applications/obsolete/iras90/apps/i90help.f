@@ -90,7 +90,7 @@
 *  External References:
 
 *  Local Constants:
-      CHARACTER*10 LIBNAM      ! Name of the IRAS90 help library
+      CHARACTER*11 LIBNAM      ! Name of the IRAS90 help library
       PARAMETER ( LIBNAM = 'IRAS90_HELP' )
 
 *  Local Variables:
@@ -103,6 +103,4 @@
 *  Open the help library application layer
       CALL SHL_ADAM( LIBNAM, .TRUE., STATUS)
 
-      END IF
-      
       END
