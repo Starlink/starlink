@@ -27,6 +27,7 @@
 *    Type Definitions :
       IMPLICIT NONE
 *    Global constants :
+      INCLUDE 'PRM_PAR'
 *    Import :
       INTEGER N
       REAL IN (N)
