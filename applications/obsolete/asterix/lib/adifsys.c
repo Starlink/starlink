@@ -167,9 +167,9 @@ void adix_getpath( ADIobj id, ADIboolean nulterm, int mxlen, char *path,
 void adix_fclose_int( ADIobj rtn, ADIobj id, ADIstatus status )
   {
   if ( _eprc_c(rtn) ) 			/* C routine? */
-    ((ADIcoCB) _eprc_prc(rtn))( id, fileid, status );
+    ((ADIoCB) _eprc_prc(rtn))( id, status );
   else					/* Fortran routine */
-    ((ADIfoCB) _eprc_prc(rtn))( &id, fileid, status );
+    ((ADIfoCB) _eprc_prc(rtn))( &id, status );
   }
 
 void ADIfsysFileClose( ADIobj id, ADIstatus status )
