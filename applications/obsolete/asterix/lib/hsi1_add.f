@@ -113,7 +113,6 @@
         PARAMETER		( UMODE = 'NORMAL' )
 
 *  Local Variables:
-      CHARACTER*80		COMMAND			! Creator command
       CHARACTER*(DAT__SZLOC)	CRLOC			! Current record
       CHARACTER*(DAT__SZLOC)	HLOC			! Input HISTORY object
       CHARACTER*(DAT__SZLOC)	LOC			! Output HDS object
