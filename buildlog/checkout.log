@@ -7380,6 +7380,7 @@ cvs checkout: Updating java/source/table/src/main/uk/ac/starlink/table/view
 U java/source/table/src/main/uk/ac/starlink/table/view/AuxWindow.java
 U java/source/table/src/main/uk/ac/starlink/table/view/BasicAction.java
 U java/source/table/src/main/uk/ac/starlink/table/view/BitsRowSubset.java
+U java/source/table/src/main/uk/ac/starlink/table/view/CheckBoxMenu.java
 U java/source/table/src/main/uk/ac/starlink/table/view/ColumnDialog.java
 U java/source/table/src/main/uk/ac/starlink/table/view/ColumnInfoWindow.java
 U java/source/table/src/main/uk/ac/starlink/table/view/ColumnsDisplay.java
