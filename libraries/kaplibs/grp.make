@@ -10,11 +10,11 @@ TAR_FILES_A = kaplibs_source ira_source aif_source fts_source kpg_source
 
 # The contents of the ira_source.tar file:
 KAPLIBS_SOURCE = kaplibs_link_adam kaplibs_dev fac_1522_err kplsearch \
-kaplibs_test.f kaplibs_test.ifl grf.h grf_kaplibs.c
+kaplibs_test.f kaplibs_test.ifl 
 
 # The source RCS files needed to create the kpg_source.tar file:
 KPG_SOURCES = $(KPG_NONGEN) $(KPG_GEN) kpg_ast kpg_par hlpcmd ctm_par \
-ctm_com
+ctm_com grf.h
 
 # Generic source files needed for kpg_source.tar:
 KPG_GEN = kpg1_dara.gen kpg1_frac.gen kpg1_mixv.gen kpg1_hsds.gen \
@@ -143,7 +143,7 @@ kpg1_plotp.f kpg1_plots.f kpg1_pltln.f kpg1_pqvid.f kpg1_prnth.f \
 kpg1_rdast.f kpg1_rdlst.f kpg1_short.f kpg1_verb.f kpg1_fit1d.f \
 kpg1_wrast.f kpg1_wread.f kpg1_wrls2.f kpg1_wrlst.f kpg1_wwrt.f \
 kpg1_tkast.c kpg1_cshft.f kpg1_ctcpd.f kpg1_ctcpi.f kpg1_rcatw.f \
-kpg1_snkta.f kpg1_wcatw.f kpg1_srcta.f \
+grf_kaplibs.c kpg1_snkta.f kpg1_wcatw.f kpg1_srcta.f \
 kpg1_plsav.f kpg1_pllod.f kpg1_plput.f kpg1_plget.f kpg1_mkpos.f \
 kpg1_graph.f kpg1_ndfnm.f kpg1_grphw.f kpg1_assig.f kpg1_cpndb.f \
 kpg1_cpndd.f kpg1_cpndi.f kpg1_cpndr.f kpg1_cpndub.f kpg1_cpnduw.f \
