@@ -56,6 +56,7 @@ my $nx = $header->value("NAXIS1");
 my $ny = $header->value("NAXIS2");
 
 plsdev( "xwin" );
+
 plinit();
 pladv(0);
 plvpor(0,1,0,1);
@@ -64,6 +65,11 @@ plschr(2,1);
 
 plschr(0,2);
 plschr(0,1);
+
+plscmap1n(0);
+plscmap1l(1,[0,1],[1,0],[1,0],[1,0],[0,0]);
+
+
 
 my ( $x1, $x2, $y1, $y2 ) = (0.2,0.8,0.2,0.8);
 
@@ -82,7 +88,7 @@ my $array = read_file( $file );
 Graphics::PLplot::plimage($array, $nx, $ny,
 			  $xleft, $xright, 
 			  $ybottom, $ytop,
-			  0,10000,
+			  0,12000,
 			  $xleft, $xright,
 			  $ybottom, $ytop
 			 );
