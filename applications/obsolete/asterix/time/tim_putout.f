@@ -48,7 +48,7 @@
       IF (STATUS .NE. SAI__OK) GOTO 99
 
 *    Create standard components in output file
-      CALL BDA_CREBDS(OFID, 1, NFREQ, .TRUE., .FALSE., .FALSE., STATUS)
+      CALL BDI_CREBDS(OFID, 1, NFREQ, .TRUE., .FALSE., .FALSE., STATUS)
 
 *    Write data array into output file
       CALL BDI_CREDATA( OFID, 1, NFREQ, STATUS )
