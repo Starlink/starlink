@@ -150,7 +150,7 @@
 *    Local data :
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'XRTCORR Version 2.2-1')
+      PARAMETER (VERSION = 'XRTCORR Version 2.3-0')
 *-
       IF (STATUS .NE. SAI__OK) RETURN
 *
@@ -891,25 +891,26 @@ D            WRITE(3,*)EXPOS(TLP)
          FBEG = 1
          CTR = 0
          DO COLNO = 1,TFIELDS
-            IF (TTYPE(COLNO) .EQ. 'TIME') THEN
+            IF (TTYPE(COLNO)(1:4) .EQ. 'TIME') THEN
                CALL DYN_MAPD(1,NROWS,EV_TPNTR,STATUS)
                CALL FTGCVD(IUNIT, COLNO, FBEG, 1, NROWS, 0.D0,
      :         %VAL(EV_TPNTR),ANYF,STATUS)
                CTR = CTR + 1
             END IF
-            IF (TTYPE(COLNO) .EQ. 'A2_AL') THEN
+            IF (TTYPE(COLNO)(1:5) .EQ. 'A2_AL') THEN
                CALL DYN_MAPR(1,NROWS,EV1_PNTR,STATUS)
                CALL FTGCVE(IUNIT, COLNO, FBEG, 1, NROWS, 0,
      :         %VAL(EV1_PNTR),ANYF,STATUS)
                CTR = CTR + 1
             END IF
-            IF (TTYPE(COLNO) .EQ. 'XACC') THEN
+*        Space prevents confusion with other column names
+            IF (TTYPE(COLNO)(1:5) .EQ. 'XACC ') THEN
                CALL DYN_MAPR(1,NROWS,EV2_PNTR,STATUS)
                CALL FTGCVE(IUNIT, COLNO, FBEG, 1, NROWS, 0,
      :         %VAL(EV2_PNTR),ANYF,STATUS)
                CTR = CTR + 1
             END IF
-            IF (TTYPE(COLNO) .EQ. 'XTRANSM') THEN
+            IF (TTYPE(COLNO)(1:7) .EQ. 'XTRANSM') THEN
                CALL DYN_MAPR(1,NROWS,EV3_PNTR,STATUS)
                CALL FTGCVE(IUNIT, COLNO, FBEG, 1, NROWS, 0,
      :         %VAL(EV3_PNTR),ANYF,STATUS)
@@ -1257,19 +1258,19 @@ D            WRITE(3,*)EXPOS(TLP)
          CTR = 0
          CN = 0
          DO COLNO = 1,TFIELDS
-            IF (TTYPE(COLNO) .EQ. 'TIME') THEN
+            IF (TTYPE(COLNO)(1:4) .EQ. 'TIME') THEN
                CALL DYN_MAPD(1,NROWS,T_PNTR,STATUS)
                CALL FTGCVD(IUNIT, COLNO, FBEG, 1, NROWS, 0.D0,
      :         %VAL(T_PNTR),ANYF,STATUS)
                CTR = CTR + 1
             END IF
-            IF (TTYPE(COLNO) .EQ. 'SECONDARY') THEN
+            IF (TTYPE(COLNO)(1:9) .EQ. 'SECONDARY') THEN
                CALL DYN_MAPR(1,NROWS,PS_PNTR,STATUS)
                CALL FTGCVE(IUNIT, COLNO, FBEG, 1, NROWS, 0,
      :         %VAL(PS_PNTR),ANYF,STATUS)
                 CTR = CTR + 1
             END IF
-            IF (TTYPE(COLNO) .EQ. 'ACCEPTED') CN = COLNO
+            IF (TTYPE(COLNO)(1:8) .EQ. 'ACCEPTED') CN = COLNO
          END DO
 *
 * Use 'ACCEPTED' parameter where 'SECONDARY' parameter not found

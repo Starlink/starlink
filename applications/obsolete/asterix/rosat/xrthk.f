@@ -110,7 +110,7 @@
 *    Local data :
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'XRTHK Version 2.2-1')
+      PARAMETER (VERSION = 'XRTHK Version 2.3-0')
 *-
       CALL AST_INIT(STATUS)
       CALL MSG_PRNT(VERSION)
@@ -124,7 +124,7 @@
       CALL USI_DEF0C('RAWDIR', FITSDIR, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 999
 *
-      CALL USI_GET0C('RAWDIR', FITSDIR, STATUS )
+      CALL USI_GET0C('RAWDIR', FITSDIR, STATUS)
 *  Any FITS files?
       CALL UTIL_FINDFILE(FITSDIR, '*.fits', MAXRAW, FILES, NFILES,
      :                                                       STATUS)
@@ -221,7 +221,7 @@
          COLNO = 0
          LP = 1
          DO WHILE (LP .NE. TFIELDS+1)
-           IF ( TTYPE(LP) .EQ. 'TIME') THEN
+           IF ( TTYPE(LP)(1:4) .EQ. 'TIME') THEN
                COLNO = LP
                LP = TFIELDS
             END IF
@@ -277,7 +277,7 @@
          COLNO = 0
          LP = 1
          DO WHILE (LP .NE. TFIELDS + 1)
-            IF ( TTYPE(LP) .EQ. 'TIME') THEN
+            IF ( TTYPE(LP)(1:4) .EQ. 'TIME') THEN
                COLNO = LP
                LP = TFIELDS
             END IF
@@ -370,14 +370,14 @@
 *         Map the input array - initially try the EVENTRATE file, if this
 *         fails try the ATTITUDE file
 *
-            IF (.NOT.( LEVR .OR. LATT)) THEN
+            IF ( LEVR .EQ. .FALSE. .AND. LATT .EQ. .FALSE.) THEN
               CALL MSG_PRNT('XRTHK : ERROR - cannot find EVRATE or'
      :        // ' ASPECT extension')
               GOTO 999
             END IF
 
             COLNO = 0
-            IF ( LEVR ) THEN
+            IF ( LEVR .EQ. .TRUE.) THEN
 *
 *  Move to the correct position in FITS file
                CALL FTMAHD(IUNIT, EVNHDU, TTYPE, STATUS)
@@ -388,7 +388,8 @@
 *  Locate column
                LP = 1
                DO WHILE (LP .NE. TFIELDS + 1)
-                  IF ( TTYPE(LP) .EQ. HKNAME(1:CHR_LEN(HKNAME)) ) THEN
+                  IF ( TTYPE(LP)(1:CHR_LEN(HKNAME)) .EQ.
+     :               HKNAME(1:CHR_LEN(HKNAME)) ) THEN
                      COLNO = LP
                      LP = TFIELDS
                   END IF
@@ -422,7 +423,7 @@
                END IF
             END IF
 *
-            IF ( LATT  .AND. COLNO .EQ. 0) THEN
+            IF ( LATT .EQ. .TRUE. .AND. COLNO .EQ. 0) THEN
 *  Move to the correct position in FITS file
                CALL FTMAHD(IUNIT, ATNHDU, TTYPE, STATUS)
 *  Renew header information
@@ -432,7 +433,8 @@
 *  Locate column
                LP = 1
                DO WHILE (LP .NE. TFIELDS + 1)
-                  IF ( TTYPE(LP) .EQ. HKNAME(1:CHR_LEN(HKNAME))) THEN
+                  IF ( TTYPE(LP)(1:CHR_LEN(HKNAME))
+     :               .EQ. HKNAME(1:CHR_LEN(HKNAME))) THEN
                      COLNO = LP
                      LP = TFIELDS
                   END IF

@@ -102,7 +102,7 @@
 
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'XSPOKES Version 2.2-2')
+      PARAMETER (VERSION = 'XSPOKES Version 2.3-0')
 *-
       CALL AST_INIT()
       CALL MSG_PRNT(VERSION)
@@ -248,13 +248,13 @@
          FBEG  = 1
          CTR = 0
          DO COLNO = 1,TFIELDS
-            IF (TTYPE(COLNO) .EQ. 'TIME') THEN
+            IF (TTYPE(COLNO)(1:4) .EQ. 'TIME') THEN
                CALL DYN_MAPD(1, NROWS, TPNTR, STATUS)
                CALL FTGCVD(IUNIT,COLNO,FBEG,1,NROWS,0.D0,%VAL(TPNTR),
      :         ANYF,STATUS)
                CTR = CTR + 1
             END IF
-            IF (TTYPE(COLNO) .EQ. 'ROAN_CAS') THEN
+            IF (TTYPE(COLNO)(1:8) .EQ. 'ROAN_CAS') THEN
                CALL DYN_MAPR(1, NROWS, RPNTR, STATUS)
                CALL FTGCVE(IUNIT,COLNO,FBEG,1,NROWS,0,%VAL(RPNTR),
      :         ANYF,STATUS)
@@ -510,7 +510,7 @@
       IF (CNT .GE. 1) THEN
          MEANROLL = RTOT / CNT
 *  convert mean roll to degrees and to the convention of west=+90.
-         IF (HEAD_ORIGIN.EQ.'RDF')
+         IF (HEAD_ORIGIN(1:3).EQ.'RDF')
      &      MEANROLL = (MEANROLL + 180.0) * 7200.0     ! degrees to Arcmin/2
          MEANROLL = 270. - (MEANROLL / 7200.0)         ! Arcmin/2 to degrees
          IF (MEANROLL.LT.0.0) MEANROLL = MEANROLL + 360.0

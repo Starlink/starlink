@@ -62,7 +62,8 @@
 *    24-Apr-1994   (v1.7-0) for new asterix release
 *    15-Aug-1994   V1.7-1 Fix when NOVR=0 in XRTSUB_PARTCNT (DJA)
 *    11 Jan 1996   V1.8-2 ADI port (DJA)
-*     7 Apr 98     v2.2-2 linux port (rjv)
+*     7 Apr 1998   v2.2-1 Linux port (RJV)
+*    13 MAr 1999   v2.3-0 Conversion to input FITS (DGED)
 *
 *    Type definitions :
       IMPLICIT NONE
@@ -136,7 +137,7 @@
 *     <any DATA initialisations for local variables>
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'XRTSUB Version 2.2-2')
+      PARAMETER (VERSION = 'XRTSUB Version 2.3-0')
 *-
       CALL AST_INIT
 *
@@ -249,11 +250,6 @@
          ENDIF
 *
       ENDIF
-*
-* Get rootname of calibration files
-      CALL USI_GET0C('RTNAME', CHEAD_RTNAME, STATUS)
-*
-      IF (STATUS .NE. SAI__OK) GOTO 999
 *
 *
 * Give the option of producing an output background file, which is
@@ -2256,7 +2252,12 @@ C      INCLUDE 'XRT_CORR_SUB_CMN'
       REAL CHANP
       REAL MVMEAN                ! Mean MVR for this time bin
       REAL AVMVR                 ! Average MVR in the whole array
+
       LOGICAL THERE              ! Was the raw data object found ?
+      INTEGER                 MAXRAW            ! Max value
+        PARAMETER (MAXRAW = 500)
+      CHARACTER*132           FROOT             ! Root of FITS filename
+      CHARACTER*100           FILENAME          ! FITS file name
 *-
 *
 * Get a locator to instrument section
@@ -2271,26 +2272,25 @@ C      INCLUDE 'XRT_CORR_SUB_CMN'
          CALL MSG_PRNT('Couldn`t find rawdata origins.  Assuming .OMD')
          RAWDAT = 'OMD'
       ENDIF
-
-*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+*
+*  Get root name of FITS file
+      CALL USI_GET0C ('FITSROOT', FROOT, STATUS )
+*  Append extension of FITS extension containing header
+      FILENAME = FROOT(1:CHR_LEN(FROOT)) // '_bas.fits'
+      CALL MSG_PRNT('XRTSUB : Using FITS file : '// FILENAME)
+*
 *   Create work space to hold the raw selection times
       CALL DYN_MAPD(1, MAXRAN*2, SPTR, STATUS)
 *   Get raw selection times from the header file
-      CALL RAT_RAWTIM(CHEAD_RTNAME, NSEL, %val(SPTR), STATUS)
-      IF (STATUS .NE. SAI__OK) THEN
-         CALL ERR_ANNUL(STATUS)
-         CALL MSG_PRNT('Using alternate header (.hdr)')
-         CALL XRT_RAWTIM(CHEAD_RTNAME, NSEL, %val(SPTR), STATUS)
-      ENDIF
+      CALL XRTSUB_RAWTIM(FILENAME, NSEL, %val(SPTR), STATUS)
 *
       IF (STATUS .NE. SAI__OK) GOTO 999
 *
-
-
+*
 * Get master veto rate times and values for the PSPC
       IF (INDEX(CHEAD_DET, 'PSPC') .NE. 0) THEN
 *
-         CALL XRT_GETMVR(RAWDAT, CHEAD_RTNAME, ERLOC, NMVTIM,
+         CALL XRTSUB_GETMVR(RAWDAT, FROOT, ERLOC, NMVTIM,
      &                      TPNTR, MPNTR, AVMVR, STATUS)
 *
       ENDIF
@@ -2358,7 +2358,6 @@ C      INCLUDE 'XRT_CORR_SUB_CMN'
          GOTO 999
       ENDIF
 *
-*%%%%%%%%%%%%%%%%%%%%%%%%%%
 *   Put user selection times into one array
       CALL XRT_LIVEWIND(CHEAD_NTRANGE,CHEAD_TMIN(1,IDS),
      :                         CHEAD_TMAX(1,IDS), %val(UPTR))
@@ -2513,9 +2512,6 @@ c    &           (PART1(TLP,ELP)+PART2(TLP,ELP)+PART3(TLP,ELP))
       CALL DYN_UNMAP(LPTR,STATUS)
       CALL DYN_UNMAP(TJPTR,STATUS)
       CALL DYN_UNMAP(UPTR,STATUS)
-
-* Close the eventrate file
-      CALL DAT_ANNUL(ERLOC, STATUS)
 *
 999   CONTINUE
 *
@@ -3303,4 +3299,263 @@ c    &           (PART1(TLP,ELP)+PART2(TLP,ELP)+PART3(TLP,ELP))
 *
 999   CONTINUE
 
+      END
+
+*+SUB_RAWTIM  Reads a FITS header file associated with an XRT observation
+        SUBROUTINE XRTSUB_RAWTIM(FILENAME, NSEL, RAWTIM, STATUS)
+*
+* Description :
+*        This routine finds the time ranges in an observation.
+* Environment parameters :
+* Method :
+* Deficiencies :
+* Bugs :
+* Authors :
+*     Richard Saxton
+* History :
+*     5-Aug-1992   Original
+*    13-Mar-1999   Modified to work with FITS. (DGED)
+* Type Definitions :
+      IMPLICIT NONE
+* Global constants :
+      INCLUDE 'SAE_PAR'
+* Global variables :
+      INCLUDE 'XRTHEAD_CMN'
+* Import :
+      CHARACTER*(*) FILENAME                    ! Filename of datafiles
+* Import-Export :
+      INTEGER NSEL
+      DOUBLE PRECISION RAWTIM(MAXRAN*2)         ! Raw sorting times
+* Export :
+* Status :
+      INTEGER STATUS
+* Function declarations :
+* Local constants :
+* Local variables :
+*
+      INTEGER                 BLOCK
+      INTEGER                 IUNIT             ! Logical I/O unit
+      INTEGER                 LP
+      CHARACTER*5             ORIGIN            ! Origin of FITS file
+*-
+* Check status :
+      IF (STATUS .NE. SAI__OK) RETURN
+*
+*  Open the FITS file
+      CALL FIO_GUNIT(IUNIT, STATUS)
+      CALL FTOPEN(IUNIT, FILENAME, 0, BLOCK, STATUS)
+      IF ( STATUS .NE. SAI__OK ) THEN
+	 CALL MSG_SETC('FNAM',FILENAME)
+         CALL MSG_PRNT('XRTSUB : Error - opening file ^FNAM **')
+         GOTO 999
+      ENDIF
+*
+      ORIGIN = 'RDF'
+      CALL USI_PUT0C('ORIGIN', ORIGIN, STATUS)
+*  Read in FITS header
+      CALL RAT_RDHEAD(IUNIT, ORIGIN, STATUS)
+*
+      IF ( STATUS .NE. SAI__OK ) GOTO 999
+*
+*  Copy the times into the right output variables
+      NSEL = HEAD_NTRANGE * 2
+*
+      DO LP=1,HEAD_NTRANGE
+         RAWTIM(1+(LP-1)*2) = HEAD_TSTART(LP)
+         RAWTIM(LP*2) = HEAD_TEND(LP)
+      ENDDO
+*
+*  Close FITS files
+      CALL FTCLOS(IUNIT, STATUS)
+      CALL FIO_PUNIT(IUNIT, STATUS)
+*
+999   CONTINUE
+*
+      IF (STATUS .NE. SAI__OK) THEN
+         CALL ERR_REP(' ','from SUB_RAWTIM',STATUS)
+      ENDIF
+*
+      END
+
+
+*+XRTSUB_GETMVR - Gets Master Veto rate data from the FITS EVENTRATES file
+      SUBROUTINE XRTSUB_GETMVR(ORIGIN,FROOT, ERLOC, NTIMES,
+     &                       TPNTR, MVPNTR, AVMVR, STATUS)
+*    Description :
+*     Returns an array of Master Veto rates from the eventrate file
+*    Method :
+*     <description of how the subroutine works - for programmer info>
+*    Authors :
+*     Richard Saxton (LTVAD::RDS)
+*    History :
+*     18 NOV 1991  ORIGINAL
+*     23 FEB 1994  Modified to use file and field names:INC_RDF (LTVAD::JKA)
+*     17 MAR 1999  Modified to use FITS RDF files.
+*    Type definitions :
+      IMPLICIT NONE
+*    Global constants :
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'DAT_PAR'
+*    Global variables :
+*     <global variables held in named COMMON>
+*    Import :
+      CHARACTER*(*) ORIGIN                  ! Origin of datafiles
+      CHARACTER*(*) FROOT                   ! Rootname for data files
+*    Import-Export :
+*     <declarations and descriptions for imported/exported arguments>
+*    Export :
+      CHARACTER*(DAT__SZLOC) ERLOC          ! Locator to eventrate file
+      INTEGER NTIMES                        ! Number of elements in EVR file
+      INTEGER TPNTR                         ! Pointer to time array
+      INTEGER MVPNTR                        ! Pointer to Master Veto Rate data
+      REAL AVMVR                            ! Average MVR in the array
+*    Status :
+      INTEGER STATUS
+*    Function declarations :
+      INTEGER CHR_LEN
+        EXTERNAL CHR_LEN
+      CHARACTER*20 RAT_LOOKUP
+        EXTERNAL RAT_LOOKUP
+*    Local constants :
+*     <local constants defined by PARAMETER>
+*    Local variables :
+      REAL SD
+
+      INTEGER                 IUNIT             ! Logical I/O unit
+      INTEGER                 MAXRAW            ! Max value
+        PARAMETER (MAXRAW = 500)
+*
+      CHARACTER*132           FILENAME
+
+      INTEGER ANYF               ! Notes undefined array elements
+      INTEGER COLNO                                ! Fits table, column no
+      INTEGER FEOF               ! Marks end of FITS file
+      INTEGER ENTIM
+      INTEGER EVNHDU             ! Position of eventrate in FITS file
+      INTEGER FBEG                                 ! Fits table, start
+      INTEGER HTYPE                                ! Fits header, style
+      INTEGER LP
+      INTEGER MXCOL                                ! Max number of columns
+        PARAMETER (MXCOL = 512)
+      INTEGER NROWS                                ! Fits table, no of rows
+      INTEGER NHDU                                 ! Fits header, unit
+      INTEGER VARIDAT                              ! Fitsio variable
+      INTEGER TFIELDS            ! Fits header, no fields per rows
+      INTEGER BLOCK
+
+      CHARACTER*20  EXTNAME                         ! File extension name
+      CHARACTER*12  TTYPE(MXCOL)                    ! Fits header, col name
+      CHARACTER*40  TFORM(MXCOL)                    ! Fits header, var type
+      CHARACTER*40  TUNIT(MXCOL)  ! Fits header, unit of measurement
+
+*    Local data :
+*     <any DATA initialisations for local variables>
+*-
+*
+*  The EVRATE tables are in _ANC.FITS
+      FILENAME = FROOT(1:CHR_LEN(FROOT))//'_anc.fits'
+*
+*  Open the FITS file
+      CALL FIO_GUNIT(IUNIT,STATUS)
+      CALL FTOPEN(IUNIT,FILENAME,0,BLOCK,STATUS)
+      IF (STATUS .NE. SAI__OK) THEN
+	 CALL MSG_SETC('FNAM',FILENAME)
+         CALL MSG_PRNT('XRTSUB : Error - opening file ^FNAM **')
+         GOTO 999
+      ENDIF
+*
+*  Locate eventrate data
+*  Move to FITS header.
+      NHDU = 1
+      FEOF = 0
+      CALL FTMAHD(IUNIT, 1, HTYPE, STATUS)
+*     Locate EVRATE table in FITS file.
+      DO WHILE (EXTNAME .NE. 'EVRATE' .AND. FEOF .NE. NHDU)
+         FEOF = NHDU
+*        Move to the next data unit.
+         CALL FTMRHD(IUNIT,1,HTYPE,STATUS)
+*         Get the current hdu values
+         CALL FTGHDN(IUNIT,NHDU)
+*        If type is binary table get table details
+         IF (HTYPE .EQ. 2) THEN
+            CALL FTGBNH(IUNIT, NROWS, TFIELDS, TTYPE, TFORM,
+     :      TUNIT, EXTNAME, VARIDAT, STATUS)
+         END IF
+      ENDDO
+      EVNHDU = NHDU
+*
+* Quit if file coundn't be opened
+      IF (NHDU .EQ. FEOF) THEN
+         CALL MSG_PRNT('XRTSUB : Error - failed to find '//
+     :   'EVRATE extension in FITS file')
+         GOTO 999
+      END IF
+*
+*  Find the 'TIME' column position in the EVRATE extension.
+         COLNO = 0
+         LP = 1
+         DO WHILE (LP .NE. TFIELDS+1)
+           IF ( TTYPE(LP)(1:4) .EQ. 'TIME') THEN
+               COLNO = LP
+               LP = TFIELDS
+            END IF
+            LP = LP + 1
+         END DO
+*
+*  Create array and read in selected column details
+         IF (COLNO .NE. 0) THEN
+            FBEG = 1
+            CALL DYN_MAPD(1,NROWS,TPNTR,STATUS)
+            CALL FTGCVD(IUNIT, COLNO, FBEG, 1, NROWS, 0.D0,
+     :      %VAL(TPNTR),ANYF,STATUS)
+            ENTIM = NROWS
+            IF (STATUS .NE. SAI__OK) THEN
+               CALL MSG_PRNT('XRTSUB : Error - array creation error')
+               GOTO 999
+            ENDIF
+         ELSE
+            CALL MSG_PRNT( 'XRTSUB : Error - column TIME not found in '
+     :      // ' EVENTRATE column')
+            STATUS = SAI__ERROR
+            GOTO 999
+         ENDIF
+*
+*  Find the 'MVR' column position in the EVRATE extension.
+         COLNO = 0
+         LP = 1
+         DO WHILE (LP .NE. TFIELDS+1)
+           IF ( TTYPE(LP)(1:6) .EQ. 'MV_ACO') THEN
+               COLNO = LP
+               LP = TFIELDS
+            END IF
+            LP = LP + 1
+         END DO
+*
+*  Create array and read in selected column details
+         IF (COLNO .NE. 0) THEN
+            FBEG = 1
+            CALL DYN_MAPR(1,NROWS,MVPNTR,STATUS)
+            CALL FTGCVE(IUNIT, COLNO, FBEG, 1, NROWS, 0.D0,
+     :      %VAL(MVPNTR),ANYF,STATUS)
+            ENTIM = NROWS
+            IF (STATUS .NE. SAI__OK) THEN
+               CALL MSG_PRNT('XRTSUB : Error - array creation error')
+               GOTO 999
+            ENDIF
+         ELSE
+            CALL MSG_PRNT( 'XRTSUB : Error - column TIME not found in '
+     :      // ' EVENTRATE column')
+            STATUS = SAI__ERROR
+            GOTO 999
+         ENDIF
+*
+*      Find the average MVR value
+            CALL ARR_MEANR(NROWS, %val(MVPNTR), AVMVR, SD, STATUS)
+*
+999   CONTINUE
+*
+      IF (STATUS .NE. SAI__OK) THEN
+         CALL ERR_REP(' ','from XRT_GETMVR',STATUS)
+      ENDIF
+*
       END

@@ -42,7 +42,7 @@
 *  11 Sep 95 V1.8-1   OMD support removed (RJV)
 *  20 Dec 95 V2.0-0   ADI port (DJA)
 *   5 Apr 98 V2.2-1   Structures removed (RJV)
-*  24 Jan 99 V2.3-0   FITS file input (DGED)
+*  24 Jan 99 V2.3-0   FITS file input. Bug in background file. (DGED)
 
 *    Type Definitions :
       IMPLICIT NONE
@@ -66,7 +66,7 @@
         PARAMETER		( ELISTS = 'X_CORR,Y_CORR,X_DET,'/
      :           /'Y_DET,RAW_TIMETAG,PULSE_HEIGHT_CH,CORR_PH_CH' )
       CHARACTER*30            VERSION
-         PARAMETER          ( VERSION = 'XRTSORT Version 2.2-1' )
+         PARAMETER          ( VERSION = 'XRTSORT Version 2.3-0' )
 
 *    Local variables :
 
@@ -95,7 +95,7 @@
         PARAMETER (MAXRAW = 500)
       INTEGER                 NFILES            ! Number of files
 *
-      CHARACTER*100           FILES(MAXRAW)     ! File name aray
+      CHARACTER*100           FILES(MAXRAW)     ! File name array
       CHARACTER*132           FITSDIR           ! Directory for FITS
       CHARACTER*132           FROOT             ! Root of FITS filename
       CHARACTER*5             ORIGIN            ! Origin of FITS file
@@ -1233,9 +1233,7 @@ C              WRITE(*,*)MAP,NINMAP,MAXLIM
 
 *  get ID for ARD description of sort regions
       CALL ARX_OPEN('WRITE',SRT_ARDID(1),STATUS)
-      IF (SRT_BCKGND) THEN
-        CALL ARX_OPEN('WRITE',SRT_ARDID(2),STATUS)
-      ENDIF
+      CALL ARX_OPEN('WRITE',SRT_ARDID(2),STATUS)
 
 * Set a factor for dealing with different orientations of y-axes in raw data
       IF (HEAD_ORIGIN.EQ.'MPE') THEN
@@ -2029,10 +2027,6 @@ C????            SRT.ELBMAX = SRT.ELBMAX * SRT.MAX_X / X_HWIDTH
 *
       IF (STATUS .NE. SAI__OK) GOTO 999
 
-
-
-
-
 * Get RA and DEC of background box in degrees.
       IF (SRT_BCKGND) THEN
 
@@ -2589,33 +2583,35 @@ C????            SRT.ELBMAX = SRT.ELBMAX * SRT.MAX_X / X_HWIDTH
       FBEG  = 1
       DO N1 = 1,7
          COL = N1
-         IF (TTYPE(N1) .EQ. 'TIME') THEN
+         IF (TTYPE(N1)(1:4) .EQ. 'TIME') THEN
             CALL DYN_MAPD(1,NROWS,PTRA(1),STATUS)
             CALL FTGCVD(IUNIT,COL,FBEG,1,NROWS,0.D0,%VAL(PTRA(1)),
      :      ANYF,STATUS)
-         ELSE IF (TTYPE(N1) .EQ. 'X') THEN
+         ELSE IF (TTYPE(N1)(1:1) .EQ. 'X') THEN
             CALL DYN_MAPI(1,NROWS,PTRA(2),STATUS)
             CALL FTGCVJ(IUNIT,COL,FBEG,1,NROWS,0,%VAL(PTRA(2)),
      :      ANYF,STATUS)
-         ELSE IF (TTYPE(N1) .EQ. 'Y') THEN
+         ELSE IF (TTYPE(N1)(1:1) .EQ. 'Y') THEN
             CALL DYN_MAPI(1,NROWS,PTRA(3),STATUS)
             CALL FTGCVJ(IUNIT,COL,FBEG,1,NROWS,0,%VAL(PTRA(3)),
      :      ANYF,STATUS)
 *        RAWX for HSI or DETX for PSPS
-         ELSE IF (TTYPE(N1) .EQ. 'RAWX' .OR. TTYPE(N1) .EQ. 'DETX') THEN
+         ELSE IF (TTYPE(N1)(1:4) .EQ. 'RAWX' .OR. TTYPE(N1)(1:4)
+     :      .EQ. 'DETX') THEN
             CALL DYN_MAPI(1,NROWS,PTRA(4),STATUS)
             CALL FTGCVJ(IUNIT,COL,FBEG,1,NROWS,0,%VAL(PTRA(4)),
      :      ANYF,STATUS)
 *        RAWX for HSI or DETX for PSPS
-         ELSE IF (TTYPE(N1) .EQ. 'RAWY'.OR. TTYPE(N1) .EQ. 'DETY') THEN
+         ELSE IF (TTYPE(N1)(1:4) .EQ. 'RAWY'.OR. TTYPE(N1)(1:4)
+     :      .EQ. 'DETY') THEN
             CALL DYN_MAPI(1,NROWS,PTRA(5),STATUS)
             CALL FTGCVJ(IUNIT,COL,FBEG,1,NROWS,0,%VAL(PTRA(5)),
      :      ANYF,STATUS)
-         ELSE IF (TTYPE(N1) .EQ. 'PHA') THEN
+         ELSE IF (TTYPE(N1)(1:3) .EQ. 'PHA') THEN
             CALL DYN_MAPI(1,NROWS,PTRA(6),STATUS)
             CALL FTGCVJ(IUNIT,COL,FBEG,1,NROWS,0,%VAL(PTRA(6)),
      :      ANYF,STATUS)
-         ELSE IF (TTYPE(N1) .EQ. 'PI') THEN
+         ELSE IF (TTYPE(N1)(1:2) .EQ. 'PI') THEN
             CALL DYN_MAPI(1,NROWS,PTRA(7),STATUS)
             CALL FTGCVJ(IUNIT,COL,FBEG,1,NROWS,0,%VAL(PTRA(7)),
      :      ANYF,STATUS)
@@ -2626,7 +2622,7 @@ C????            SRT.ELBMAX = SRT.ELBMAX * SRT.MAX_X / X_HWIDTH
 
 *     A special case for HRI. If it can't find a PI channel then it
 *     maps to the PHA channel.
-      IF (.NOT. PI ) THEN
+      IF ( PI .EQ. .FALSE. ) THEN
           CALL DYN_MAPI(1,NROWS,PTRA(7),STATUS)
           CALL FTGCVJ(IUNIT,6,FBEG,1,NROWS,0,%VAL(PTRA(7)),
      :    ANYF,STATUS)

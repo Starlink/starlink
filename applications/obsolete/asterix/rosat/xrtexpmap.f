@@ -47,7 +47,7 @@
 *                         record was ok (DJA)
 *     11 Dec 1995 : V2.0-0 ADI port (DJA)
 *     21 Feb 1996 : V2.0-1 Removed SIND,COSD for Linux port (DJA)
-*
+*     17 Mar 1999 : v2.3-0 FITS file input (DGED)
 *    Type definitions :
 *
       IMPLICIT NONE
@@ -85,16 +85,8 @@
 *
 *    Local variables :
 *
-
-      CHARACTER*(DAT__SZNAM)    ACOL 			! FITS column name
-      CHARACTER*132		ATTFIL			! Attitude file name
-      CHARACTER*(DAT__SZLOC)	ATTLOC			! Attitude file handle
       CHARACTER*60		DETDIR			! DET map directory
-      CHARACTER*132		EVRFIL			! Event rate file name
-      CHARACTER*(DAT__SZLOC)	EVRLOC			! Attitude file
-      CHARACTER*10		EXT			! File root extension
       CHARACTER*79		LINE			! Output text
-      CHARACTER*(DAT__SZNAM)    TCOL 			! TIME column name
       CHARACTER 		TIMEFILE*80		! Good times list
 
       DOUBLE PRECISION 		DSCS			! Spacecraft clock
@@ -103,7 +95,6 @@
       DOUBLE PRECISION		GSTART(MAXGTIME)	! Good time starts
       DOUBLE PRECISION		GEND(MAXGTIME)		! Good time ends
 
-      INTEGER			ANDIM			! Attitude dimensionality
       INTEGER			ATT_R_PTR		! Attitude ROLL
       INTEGER			ATT_T_PTR		! Attitude TIME
       INTEGER			ATT_X_PTR		! Attitude XOFFSET
@@ -127,23 +118,56 @@
       INTEGER			NEVRREC			! No. ev rate records
       INTEGER			OFID			! Output dataset id
       INTEGER			TEMP_PTR		! Temp data for RDF
-
+*
       LOGICAL			BAD			! Any bad points?
       LOGICAL 			MAPCHK			! Create map check?
-C
+*
+      INTEGER                   IUNIT                   ! Logical I/O unit
+      INTEGER                   MAXRAW                  ! Max value
+        PARAMETER (MAXRAW = 500)
+      INTEGER                   NFILES                  ! Number of files
+*
+      CHARACTER*100             FILES(MAXRAW)           ! File name aray
+      CHARACTER*132             FITSDIR                 ! Directory for FITS
+      CHARACTER*132             FROOT                   ! Root of FITS filename
+      CHARACTER*5               ORIGIN                  ! Origin of FITS file
+      CHARACTER*132             FILENAME
+*
+      INTEGER ANYF                                 ! Notes undefined array elements
+      INTEGER COLNO                                ! Fits table, column no
+      INTEGER FEOF                                 ! Marks end of FITS file
+      INTEGER ENTIM
+      INTEGER EVNHDU                               ! Position of eventrate in FITS file
+      INTEGER FBEG                                 ! Fits table, start
+      INTEGER HTYPE                                ! Fits header, style
+      INTEGER LP
+      INTEGER MXCOL                                ! Max number of columns
+        PARAMETER (MXCOL = 512)
+      INTEGER NROWS                                ! Fits table, no of rows
+      INTEGER NHDU                                 ! Fits header, unit
+      INTEGER VARIDAT                              ! Fitsio variable
+      INTEGER TFIELDS                              ! Fits header, no fields per rows
+      INTEGER BLOCK
+
+      CHARACTER*20  EXTNAME                         ! File extension name
+      CHARACTER*12  TTYPE(MXCOL)                    ! Fits header, col name
+      CHARACTER*40  TFORM(MXCOL)                    ! Fits header, var type
+      CHARACTER*40  TUNIT(MXCOL)                    ! Fits header, units of measurement
+
+*
         INTEGER IA, IA1LL, IAEXE, IAXE, I,
      +      IASP(3,10000), IDET, IERR, II, III, ILIVEN, IR,
      +      IROLL, ISCS, ISCSO, IX, IXX, IY,
      +      IYY, NB, NB1, NB2, NB3, NG, NUM
-C
+*
         REAL A, ANGLE, ASP(10000),
      +      COSROL, DEADTP, DELT, EXP, EXPARR(512,512), FLIVE,
      +      FLIVE1, FLIVE2, NMV, RMAP(512,512), ROLL,
      +      SCALE1(12), SCALE2(12), SINROL, TEMPAR(512,512),
      +      TMV, TOTEXP, TOTIME, X, XX, Y, YY
-C
+*
 	CHARACTER INSMAP*80
-c	From INTEGER to improve exposure time evaluation
+*	From INTEGER to improve exposure time evaluation
 	DOUBLE PRECISION IACTBE, IACTEN
 *
 *    Local data :
@@ -182,7 +206,7 @@ c	From INTEGER to improve exposure time evaluation
 *    Version :
 *
       CHARACTER*30		VERSION
-        PARAMETER 		( VERSION = 'XRTEXPMAP Version 2.2-1')
+        PARAMETER 		( VERSION = 'XRTEXPMAP Version 2.3-0')
 *-
 
 *    Initialise Asterix
@@ -190,18 +214,64 @@ c	From INTEGER to improve exposure time evaluation
 
 *    Version id
       CALL MSG_PRNT( VERSION )
-
-*    Get directory name from user and display the available observations.
-*    Get rootname of file wanted.
-      CALL XRTSORT_FILESELECT(  STATUS )
+*
+*  Get input file details
+*  Get the current working directory
+      CALL UTIL_GETCWD( FITSDIR, STATUS )
+      CALL USI_DEF0C( 'RAWDIR', FITSDIR, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Read the header
-      CALL RAT_GETXRTHEAD( SRT_ROOTNAME, STATUS )
+      CALL USI_GET0C( 'RAWDIR', FITSDIR, STATUS )
+*  Any FITS files?
+      CALL UTIL_FINDFILE(FITSDIR, '*.fits', MAXRAW, FILES, NFILES,
+     :                                                       STATUS)
+*  If no files - exit
+      IF (NFILES .LE. 0) THEN
+         STATUS = SAI__ERROR
+         CALL MSG_PRNT ('XRTEXPMAP : Error - No FITS file found')
+         CALL MSG_PRNT ('XRTEXPMAP : Uses RDF FITS files only.')
+         CALL MSG_PRNT ('XRTEXPMAP : Please use VERSION V2.2-1 for SDF'
+     :                                                //'file input')
+         GOTO 99
+      END IF
+*
+*  Get root name of FITS file
+      CALL USI_GET0C ('FITSROOT', FROOT, STATUS )
+*  Append extension of FITS extension containing header
+      SRT_ROOTNAME = FROOT(1:CHR_LEN(FROOT)) // '_bas.fits'
+*  Does file exist?
+      CALL UTIL_FINDFILE(FITSDIR, SRT_ROOTNAME, MAXRAW, FILES, NFILES,
+     :                                                       STATUS)
+      IF (NFILES .LE. 0) THEN
+         STATUS = SAI__ERROR
+         CALL MSG_PRNT ('XRTEXPMAP : Error - Header file not found')
+         GOTO 99
+      END IF
 
-*    Create output file
-      CALL USI_CREAT( 'OUT', ADI__NULLID, OFID, STATUS )
-
+      CALL MSG_PRNT('XRTEXPMAP : Using FITS file : '// SRT_ROOTNAME)
+*
+*  Open the FITS file
+      CALL FIO_GUNIT(IUNIT, STATUS)
+      CALL FTOPEN(IUNIT, SRT_ROOTNAME, 0, BLOCK, STATUS)
+      IF ( STATUS .NE. SAI__OK ) THEN
+	 CALL MSG_SETC('FNAM',SRT_ROOTNAME)
+         CALL MSG_PRNT('XRTEXPMAP : Error - opening file ^FNAM **')
+         GOTO 99
+      ENDIF
+*
+      ORIGIN = 'RDF'
+      CALL USI_PUT0C('ORIGIN', ORIGIN, STATUS)
+*  Read in FITS header
+      CALL RAT_RDHEAD(IUNIT, ORIGIN, STATUS)
+*
+      IF ( STATUS .NE. SAI__OK ) GOTO 99
+*
+*  Close FITS files
+      CALL FTCLOS(IUNIT, STATUS)
+      CALL FIO_PUNIT(IUNIT, STATUS)
+*
+      CALL USI_CREAT( 'OUT', ADI__NULLID, OFID, STATUS)
+*
 *    Get observation start time
       BASESC = HEAD_BASE_SCTIME
 
@@ -317,7 +387,7 @@ c	From INTEGER to improve exposure time evaluation
      :        'Detector map', ' ', ' ', MFID, STATUS )
         CALL USI_ANNUL( 'DETMAP', STATUS )
       END IF
-
+*
 *    Center the instrument map, invert the Y-axis, and turn it real.
 *    Also, exclude the "bright line" regions of enhanced particle
 *    background as suggested by Plucinsky et al. (1993)
@@ -333,98 +403,347 @@ c	From INTEGER to improve exposure time evaluation
           END IF
         END DO
       END DO
-
-*    Attempt to open the attitude file
-      CALL RAT_HDLOOKUP(  'ASPDATA', 'EXTNAME', EXT, STATUS )
-      ATTFIL = SRT_ROOTNAME(1:CHR_LEN(SRT_ROOTNAME))//EXT
-      CALL HDS_OPEN( ATTFIL, 'READ', ATTLOC, STATUS )
-
-      IF ( STATUS .EQ. SAI__OK ) THEN
-
-*      Identify the TIME column
-        CALL RAT_HDLOOKUP(  'ASPDATA', 'TIME', TCOL, STATUS )
-        CALL CMP_SHAPE( ATTLOC, TCOL, 1, NATTREC, ANDIM, STATUS )
-        CALL CMP_MAPV( ATTLOC, TCOL, '_DOUBLE', 'READ', ATT_T_PTR,
-     :                 NATTREC, STATUS )
-
-*      The X and Y offsets. In RDF the values have been renamed and
-*      gratuitously divided by 7200
-        CALL RAT_HDLOOKUP(  'ASPDATA', 'XOFFSET', ACOL, STATUS )
-        IF ( HEAD_ORIGIN(1:3) .EQ. 'RDF' ) THEN
-          CALL CMP_MAPV( ATTLOC, ACOL, '_REAL', 'READ', TEMP_PTR,
-     :                   NATTREC, STATUS )
-          CALL DYN_MAPI( 1, NATTREC, ATT_X_PTR, STATUS )
-          CALL XRTEXPMAP_RESCALE( NATTREC, %VAL(TEMP_PTR),
+*
+*  The ASPECT/EVRATE tables are in _ANC.FITS
+      FILENAME = FROOT(1:CHR_LEN(FROOT))//'_anc.fits'
+*
+*  Open the FITS file
+      CALL FIO_GUNIT(IUNIT,STATUS)
+      CALL FTOPEN(IUNIT,FILENAME,0,BLOCK,STATUS)
+      IF (STATUS .NE. SAI__OK) THEN
+	 CALL MSG_SETC('FNAM',FILENAME)
+         CALL MSG_PRNT('XRTEXPMAP: ERROR - opening file ^FNAM **')
+         GOTO 99
+      ENDIF
+*
+*  Locate ATTITUDE data
+*  Move to FITS header.
+      NHDU = 1
+      FEOF = 0
+      CALL FTMAHD(IUNIT, 1, HTYPE, STATUS)
+*     Locate EVRATE table in FITS file.
+      DO WHILE (EXTNAME(1:6) .NE. 'ASPECT' .AND. FEOF .NE. NHDU)
+         FEOF = NHDU
+*        Move to the next data unit.
+         CALL FTMRHD(IUNIT,1,HTYPE,STATUS)
+*         Get the current hdu values
+         CALL FTGHDN(IUNIT,NHDU)
+*        If type is binary table get table details
+         IF (HTYPE .EQ. 2) THEN
+            CALL FTGBNH(IUNIT, NROWS, TFIELDS, TTYPE, TFORM,
+     :      TUNIT, EXTNAME, VARIDAT, STATUS)
+         END IF
+      ENDDO
+      EVNHDU = NHDU
+*
+* Quit if file coundn't be opened
+      IF (NHDU .EQ. FEOF) THEN
+         CALL MSG_PRNT('XRTEXPMAP : ERROR - failed to find '//
+     :   'ASPECT extension in FITS file')
+         GOTO 99
+      END IF
+*
+*  Find the 'TIME' column position in the ASPECT extension.
+         COLNO = 0
+         LP = 1
+         DO WHILE (LP .NE. TFIELDS+1)
+           IF ( TTYPE(LP)(1:4) .EQ. 'TIME') THEN
+               COLNO = LP
+               LP = TFIELDS
+            END IF
+            LP = LP + 1
+         END DO
+*
+*  Create array and read in selected column details
+       IF (COLNO .NE. 0) THEN
+         FBEG = 1
+            CALL DYN_MAPD(1,NROWS,ATT_T_PTR,STATUS)
+            CALL FTGCVD(IUNIT, COLNO, FBEG, 1, NROWS, 0.D0,
+     :      %VAL(ATT_T_PTR),ANYF,STATUS)
+            ENTIM = NROWS
+            IF (STATUS .NE. SAI__OK) THEN
+               CALL MSG_PRNT('XRTEXPMAP : ERROR - array creation error')
+               GOTO 99
+            ENDIF
+         ELSE
+            CALL MSG_PRNT( 'XRTEXPMAP : ERROR - column TIME not found'
+     :      // ' in ASPECT column')
+            STATUS = SAI__ERROR
+            GOTO 99
+         ENDIF
+*
+*  Find the 'XOFFSET' column position in the ASPECT extension.
+         COLNO = 0
+         LP = 1
+         DO WHILE (LP .NE. TFIELDS+1)
+           IF ( TTYPE(LP)(1:6) .EQ. 'RA_CAS') THEN
+               COLNO = LP
+               LP = TFIELDS
+            END IF
+            LP = LP + 1
+         END DO
+*
+*  Create array and read in selected column details
+       IF (COLNO .NE. 0) THEN
+         FBEG = 1
+            CALL DYN_MAPI(1,NROWS,ATT_X_PTR,STATUS)
+            CALL DYN_MAPR(1,NROWS,TEMP_PTR)
+            CALL FTGCVE(IUNIT, COLNO, FBEG, 1, NROWS, 0,
+     :      %VAL(TEMP_PTR),ANYF,STATUS)
+            ENTIM = NROWS
+            IF (STATUS .NE. SAI__OK) THEN
+               CALL MSG_PRNT('XRTEXPMAP : ERROR - array creation error')
+               GOTO 99
+            ENDIF
+         ELSE
+            CALL MSG_PRNT( 'XRTEXPMAP : ERROR - column XOFFSET not'
+     :      // ' found in EVENTRATE column')
+            STATUS = SAI__ERROR
+            GOTO 99
+         ENDIF
+         CALL XRTEXPMAP_RESCALE( NROWS, %VAL(TEMP_PTR),
      :                           %VAL(ATT_X_PTR), STATUS )
-        ELSE
-          CALL CMP_MAPV( ATTLOC, ACOL, '_INTEGER', 'READ', ATT_X_PTR,
-     :                   NATTREC, STATUS )
-        END IF
-        CALL RAT_HDLOOKUP(  'ASPDATA', 'YOFFSET', ACOL, STATUS )
-        IF ( HEAD_ORIGIN(1:3) .EQ. 'RDF' ) THEN
-          CALL CMP_MAPV( ATTLOC, ACOL, '_REAL', 'READ', TEMP_PTR,
-     :                   NATTREC, STATUS )
-          CALL DYN_MAPI( 1, NATTREC, ATT_Y_PTR, STATUS )
-          CALL XRTEXPMAP_RESCALE( NATTREC, %VAL(TEMP_PTR),
+*
+*  Find the 'YOFFSET' column position in the ASPECT extension.
+         COLNO = 0
+         LP = 1
+         DO WHILE (LP .NE. TFIELDS+1)
+           IF ( TTYPE(LP)(1:7) .EQ. 'DEC_CAS') THEN
+               COLNO = LP
+               LP = TFIELDS
+            END IF
+            LP = LP + 1
+         END DO
+*
+*  Create array and read in selected column details
+       IF (COLNO .NE. 0) THEN
+         FBEG = 1
+            CALL DYN_MAPI(1,NROWS,ATT_Y_PTR,STATUS)
+            CALL FTGCVE(IUNIT, COLNO, FBEG, 1, NROWS, 0,
+     :      %VAL(TEMP_PTR),ANYF,STATUS)
+            ENTIM = NROWS
+            IF (STATUS .NE. SAI__OK) THEN
+               CALL MSG_PRNT('XRTEXPMAP : ERROR - array creation error')
+               GOTO 99
+            ENDIF
+         ELSE
+            CALL MSG_PRNT( 'XRTEXPMAP : ERROR - column YOFFSET not'
+     :      // ' found in ASPECT column')
+            STATUS = SAI__ERROR
+            GOTO 99
+         ENDIF
+         CALL XRTEXPMAP_RESCALE( NROWS, %VAL(TEMP_PTR),
      :                           %VAL(ATT_Y_PTR), STATUS )
-        ELSE
-          CALL CMP_MAPV( ATTLOC, ACOL, '_INTEGER', 'READ', ATT_Y_PTR,
-     :                   NATTREC, STATUS )
-        END IF
-
-*      Roll angle
-        CALL RAT_HDLOOKUP(  'ASPDATA', 'ROLL', ACOL, STATUS )
-        IF ( HEAD_ORIGIN(1:3) .EQ. 'RDF' ) THEN
-          CALL CMP_MAPV( ATTLOC, ACOL, '_REAL', 'READ', TEMP_PTR,
-     :                   NATTREC, STATUS )
-          CALL DYN_MAPI( 1, NATTREC, ATT_R_PTR, STATUS )
-          CALL XRTEXPMAP_RESCALE( NATTREC, %VAL(TEMP_PTR),
+*
+*  Find the 'ROLL' column position in the ASPECT extension.
+         COLNO = 0
+         LP = 1
+         DO WHILE (LP .NE. TFIELDS+1)
+           IF ( TTYPE(LP)(1:8) .EQ. 'ROAN_CAS') THEN
+               COLNO = LP
+               LP = TFIELDS
+            END IF
+            LP = LP + 1
+         END DO
+*
+*  Create array and read in selected column details
+       IF (COLNO .NE. 0) THEN
+         FBEG = 1
+            CALL DYN_MAPI(1,NROWS,ATT_R_PTR,STATUS)
+            CALL FTGCVE(IUNIT, COLNO, FBEG, 1, NROWS, 0,
+     :      %VAL(TEMP_PTR),ANYF,STATUS)
+            ENTIM = NROWS
+            IF (STATUS .NE. SAI__OK) THEN
+               CALL MSG_PRNT('XRTEXPMAP : ERROR - array creation error')
+               GOTO 99
+            ENDIF
+         ELSE
+            CALL MSG_PRNT( 'XRTEXPMAP : ERROR - column YOFFSET not'
+     :      // ' found in ASPECT column')
+            STATUS = SAI__ERROR
+            GOTO 99
+         ENDIF
+         CALL XRTEXPMAP_RESCALE( NROWS, %VAL(TEMP_PTR),
      :                           %VAL(ATT_R_PTR), STATUS )
-        ELSE
-          CALL CMP_MAPV( ATTLOC, ACOL, '_INTEGER', 'READ', ATT_R_PTR,
-     :                   NATTREC, STATUS )
-        END IF
-
-      ELSE
-        CALL ERR_REP( ' ', 'Unable to open attitude file', STATUS )
+         NATTREC = NROWS !Number of attribute records
+*
+*  Locate EVENTRATE data
+*  Move to FITS header.
+      NHDU = 1
+      FEOF = 0
+      CALL FTMAHD(IUNIT, 1, HTYPE, STATUS)
+*     Locate EVRATE table in FITS file.
+      DO WHILE (EXTNAME(1:6) .NE. 'EVRATE' .AND. FEOF .NE. NHDU)
+         FEOF = NHDU
+*        Move to the next data unit.
+         CALL FTMRHD(IUNIT,1,HTYPE,STATUS)
+*         Get the current hdu values
+         CALL FTGHDN(IUNIT,NHDU)
+*        If type is binary table get table details
+         IF (HTYPE .EQ. 2) THEN
+            CALL FTGBNH(IUNIT, NROWS, TFIELDS, TTYPE, TFORM,
+     :      TUNIT, EXTNAME, VARIDAT, STATUS)
+         END IF
+      ENDDO
+*
+* Quit if file coundn't be opened
+      IF (NHDU .EQ. FEOF) THEN
+         CALL MSG_PRNT('XRTEXPMAP : ERROR - failed to find '//
+     :   'EVENTRATE extension in FITS file')
+         GOTO 99
       END IF
+*
+*  Find the 'TIME' column position in the EVRATE extension.
+         COLNO = 0
+         LP = 1
+         DO WHILE (LP .NE. TFIELDS+1)
+           IF ( TTYPE(LP)(1:4) .EQ. 'TIME') THEN
+               COLNO = LP
+               LP = TFIELDS
+            END IF
+            LP = LP + 1
+         END DO
+*
+*  Create array and read in selected column details
+       IF (COLNO .NE. 0) THEN
+         FBEG = 1
+            CALL DYN_MAPI(1,NROWS,EVR_T_PTR,STATUS)
+            CALL FTGCVJ(IUNIT, COLNO, FBEG, 1, NROWS, 0.D0,
+     :      %VAL(EVR_T_PTR),ANYF,STATUS)
+            ENTIM = NROWS
+            IF (STATUS .NE. SAI__OK) THEN
+               CALL MSG_PRNT('XRTEXPMAP : ERROR - array creation error')
+               GOTO 99
+            ENDIF
+         ELSE
+            CALL MSG_PRNT( 'XRTEXPMAP : ERROR - column TIME not found'
+     :      // ' in ASPECT column')
+            STATUS = SAI__ERROR
+            GOTO 99
+         ENDIF
+*
+*  Find the 'XTRANSM' column position in the EVRATE extension.
+         COLNO = 0
+         LP = 1
+         DO WHILE (LP .NE. TFIELDS+1)
+           IF ( TTYPE(LP)(1:7) .EQ. 'XTRANSM') THEN
+               COLNO = LP
+               LP = TFIELDS
+            END IF
+            LP = LP + 1
+         END DO
+*
+*  Create array and read in selected column details
+       IF (COLNO .NE. 0) THEN
+         FBEG = 1
+            CALL DYN_MAPI(1,NROWS,EVR_AEXE_PTR,STATUS)
+            CALL FTGCVJ(IUNIT, COLNO, FBEG, 1, NROWS, 0,
+     :      %VAL(EVR_AEXE_PTR),ANYF,STATUS)
+            ENTIM = NROWS
+            IF (STATUS .NE. SAI__OK) THEN
+               CALL MSG_PRNT('XRTEXPMAP : ERROR - array creation error')
+               GOTO 99
+            ENDIF
+         ELSE
+            CALL MSG_PRNT( 'XRTEXPMAP : ERROR - column XTRANSM not'
+     :      // ' found in ASPECT column')
+            STATUS = SAI__ERROR
+            GOTO 99
+         ENDIF
+*
+*  Find the 'A1_AL' column position in the EVRATE extension.
+         COLNO = 0
+         LP = 1
+         DO WHILE (LP .NE. TFIELDS+1)
+           IF ( TTYPE(LP)(1:5) .EQ. 'A1_AL') THEN
+               COLNO = LP
+               LP = TFIELDS
+            END IF
+            LP = LP + 1
+         END DO
+*
+*  Create array and read in selected column details
+       IF (COLNO .NE. 0) THEN
+         FBEG = 1
+            CALL DYN_MAPI(1,NROWS,EVR_A1LL_PTR,STATUS)
+            CALL FTGCVJ(IUNIT, COLNO, FBEG, 1, NROWS, 0,
+     :      %VAL(EVR_A1LL_PTR),ANYF,STATUS)
+            ENTIM = NROWS
+            IF (STATUS .NE. SAI__OK) THEN
+               CALL MSG_PRNT('XRTEXPMAP : ERROR - array creation error')
+               GOTO 99
+            ENDIF
+         ELSE
+            CALL MSG_PRNT( 'XRTEXPMAP : ERROR - column A1_AL not'
+     :      // ' found in ASPECT column')
+            STATUS = SAI__ERROR
+            GOTO 99
+         ENDIF
+*
+*  Find the 'XACC ' column position in the EVRATE extension.
+         COLNO = 0
+         LP = 1
+         DO WHILE (LP .NE. TFIELDS+1)
+*        Note the blank
+           IF ( TTYPE(LP)(1:5) .EQ. 'XACC ') THEN
+               COLNO = LP
+               LP = TFIELDS
+            END IF
+            LP = LP + 1
+         END DO
+*
+*  Create array and read in selected column details
+       IF (COLNO .NE. 0) THEN
+         FBEG = 1
+            CALL DYN_MAPI(1,NROWS,EVR_AXE_PTR,STATUS)
+            CALL FTGCVJ(IUNIT, COLNO, FBEG, 1, NROWS, 0,
+     :      %VAL(EVR_AXE_PTR),ANYF,STATUS)
+            ENTIM = NROWS
+            IF (STATUS .NE. SAI__OK) THEN
+               CALL MSG_PRNT('XRTEXPMAP : ERROR - array creation error')
+               GOTO 99
+            ENDIF
+         ELSE
+            CALL MSG_PRNT( 'XRTEXPMAP : ERROR - column XACC not'
+     :      // ' found in ASPECT column')
+            STATUS = SAI__ERROR
+            GOTO 99
+         ENDIF
+*
+*  Find the 'MVRATE' column position in the EVRATE extension.
+         COLNO = 0
+         LP = 1
+         DO WHILE (LP .NE. TFIELDS+1)
+*        Note the blank
+           IF ( TTYPE(LP)(1:6) .EQ. 'MV_ACO') THEN
+               COLNO = LP
+               LP = TFIELDS
+            END IF
+            LP = LP + 1
+         END DO
+*
+*  Create array and read in selected column details
+       IF (COLNO .NE. 0) THEN
+         FBEG = 1
+            CALL DYN_MAPI(1,NROWS,EVR_MV_PTR,STATUS)
+            CALL FTGCVJ(IUNIT, COLNO, FBEG, 1, NROWS, 0,
+     :      %VAL(EVR_MV_PTR),ANYF,STATUS)
+            ENTIM = NROWS
+            IF (STATUS .NE. SAI__OK) THEN
+               CALL MSG_PRNT('XRTEXPMAP : ERROR - array creation error')
+               GOTO 99
+            ENDIF
+         ELSE
+            CALL MSG_PRNT( 'XRTEXPMAP : ERROR - column MVRATE not'
+     :      // ' found in ASPECT column')
+            STATUS = SAI__ERROR
+            GOTO 99
+         ENDIF
+*
+         NEVRREC = NROWS
+*
       IF ( STATUS .NE. SAI__OK ) GOTO 99
-
-*    Attempt to open the eventrate file
-      CALL RAT_HDLOOKUP(  'EVRATE', 'EXTNAME', EXT, STATUS )
-      EVRFIL = SRT_ROOTNAME(1:CHR_LEN(SRT_ROOTNAME))//EXT
-      CALL HDS_OPEN( EVRFIL, 'READ', EVRLOC, STATUS )
-
-      IF ( STATUS .EQ. SAI__OK ) THEN
-
-*      Identify and map the time column
-        CALL RAT_HDLOOKUP(  'EVRATE', 'TIME', TCOL, STATUS )
-        CALL CMP_SHAPE( EVRLOC, TCOL, 1, NEVRREC, ANDIM, STATUS )
-        CALL CMP_MAPV( EVRLOC, TCOL, '_INTEGER', 'READ',
-     :                 EVR_T_PTR, NEVRREC, STATUS )
-
-        CALL RAT_HDLOOKUP(  'EVRATE', 'XTRANSM', ACOL, STATUS )
-        CALL CMP_MAPV( EVRLOC, ACOL, '_INTEGER', 'READ',
-     :                 EVR_AEXE_PTR, NEVRREC, STATUS )
-
-        CALL RAT_HDLOOKUP(  'EVRATE', 'A1_AL', ACOL, STATUS )
-        CALL CMP_MAPV( EVRLOC, ACOL, '_INTEGER', 'READ',
-     :                 EVR_A1LL_PTR, NEVRREC, STATUS )
-
-        CALL RAT_HDLOOKUP(  'EVRATE', 'XACC', ACOL, STATUS )
-        CALL CMP_MAPV( EVRLOC, ACOL, '_INTEGER', 'READ',
-     :                 EVR_AXE_PTR, NEVRREC, STATUS )
-
-        CALL RAT_HDLOOKUP(  'EVRATE', 'MVRATE', ACOL, STATUS )
-        CALL CMP_MAPV( EVRLOC, ACOL, '_INTEGER', 'READ',
-     :                 EVR_MV_PTR, NEVRREC, STATUS )
-
-      ELSE
-        CALL ERR_REP( ' ', 'Unable to open event rate file', STATUS )
-
-      END IF
-      IF ( STATUS .NE. SAI__OK ) GOTO 99
-
+*
 *    Start the loop over the attitude file
       NUM = 0
       IEVR = 1
@@ -580,11 +899,7 @@ C      MV      MV (master veto) count rate
         ENDIF
 
       END DO
-
-*  Close files
-      CALL HDS_CLOSE( ATTLOC, STATUS )
-      CALL HDS_CLOSE( EVRLOC, STATUS )
-
+*
 *    Print out diagnostic information
       CALL MSG_SETI( 'LEN', IA )
       CALL MSG_SETI( 'NG', NG )
@@ -697,6 +1012,7 @@ C
      :  'Exposure image', 'Exposure', 'seconds',
      :  OFID, STATUS )
 
+
 *  Tidy up
  99   CALL AST_CLOSE()
       CALL AST_ERR( STATUS )
@@ -793,9 +1109,7 @@ C
 
       END
 
-
-
-      subroutine XRTEXPMAP_RESCALE( N, SCALED, ORIGINAL, STATUS )
+      SUBROUTINE XRTEXPMAP_RESCALE( N, SCALED, ORIGINAL, STATUS )
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
       INTEGER N,ORIGINAL(*),STATUS,I
@@ -807,7 +1121,6 @@ C
       END IF
 
       END
-
 
       SUBROUTINE XRTEXPMAP_PUTIM( DIMS, PIXSIZ, DATA, TITLE, LABEL,
      :                            UNITS, OFID, STATUS )
