@@ -710,7 +710,7 @@
       CALL NDF_END( STATUS )
 
 *  End the AST context.
-      CALL AST_BEGIN( STATUS )
+      CALL AST_END( STATUS )
 
 *  Report a contextual message if anything went wrong.
       IF( STATUS .NE. SAI__OK ) THEN
