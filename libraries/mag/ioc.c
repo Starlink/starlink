@@ -1,6 +1,9 @@
 
 /* Global constants:                                                        */
 
+#include <unistd.h>
+#include <ctype.h>
+
 #include "sae_par.h"                  /* ADAM constants                     */
 #include "f77.h"                      /* C - Fortran interface              */
 #include "ioc_incl.h"                 /* IOC constants                      */
