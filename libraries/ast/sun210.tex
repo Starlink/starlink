@@ -4102,14 +4102,17 @@ restriction is necessary, but consider creating a Frame with one
 longitude axis and two latitude axes. Which latitude axis should be
 associated with the longitude axis?}
 
-\subsection{\label{ss:distanceandoffset}Calculating Distances, angles and Offsets}
+\subsection{\label{ss:distanceandoffset}Calculating Distances, Angles and Offsets}
 Some complementary 
 routines 
-are provided for use with Frames to allow you to find the distance
-between two points, to offset a specified distance along a line joining
-two points, {\em{etc.}} In essence, these 
-routines 
-define the metric of the coordinate space which the \htmlref{Frame}{Frame} represents. In
+are provided for use with Frames to allow you to perform geometric
+operations without needing to know the nature of the coordinate system
+represented by the \htmlref{Frame}{Frame}.
+
+Routines 
+are avilable to find the distance between two points, and to offset a 
+specified distance along a line joining two points, {\em{etc.}} In essence, 
+these define the metric of the coordinate space which the Frame represents. In
 the case of a basic Frame, this is a Cartesian metric.
 
 The first of these routines, \htmlref{AST\_DISTANCE}{AST_DISTANCE}, returns a double precision
@@ -4209,7 +4212,7 @@ within a 2 dimensional Frame (an error is reported if the Frame is not
 2 dimensional). Again, the algorithm used is appropriate to the class of
 the Frame.
 
-The AST_RESOLVE routine
+The \htmlref{AST\_RESOLVE}{AST_RESOLVE} routine
 resolves a given displacement within a Frame into two components, parallel and 
 perpendicular to a given reference direction. 
 

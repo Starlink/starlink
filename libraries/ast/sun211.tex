@@ -4464,14 +4464,17 @@ restriction is necessary, but consider creating a Frame with one
 longitude axis and two latitude axes. Which latitude axis should be
 associated with the longitude axis?}
 
-\subsection{\label{ss:distanceandoffset}Calculating Distances, angles and Offsets}
+\subsection{\label{ss:distanceandoffset}Calculating Distances, Angles and Offsets}
 Some complementary 
 functions 
-are provided for use with Frames to allow you to find the distance
-between two points, to offset a specified distance along a line joining
-two points, {\em{etc.}} In essence, these 
-functions 
-define the metric of the coordinate space which the \htmlref{Frame}{Frame} represents. In
+are provided for use with Frames to allow you to perform geometric
+operations without needing to know the nature of the coordinate system
+represented by the \htmlref{Frame}{Frame}.
+
+Functions 
+are avilable to find the distance between two points, and to offset a 
+specified distance along a line joining two points, {\em{etc.}} In essence, 
+these define the metric of the coordinate space which the Frame represents. In
 the case of a basic Frame, this is a Cartesian metric.
 
 The first of these functions, \htmlref{astDistance}{astDistance}, returns a double distance
