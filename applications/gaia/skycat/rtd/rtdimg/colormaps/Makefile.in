@@ -44,7 +44,7 @@ vlt-install-files: install-top
 	    $(INSTALL_DATA) $$i $(RTD_DIR)/colormaps ; \
 	done 
 
-# install: install-files
+install: install-files
 
 # Note: the default colormap files are now compiled in to the binary...
 install: install-top
