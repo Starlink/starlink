@@ -211,13 +211,13 @@
 *     MARGIN( 4 ) = _REAL (Read)
 *        The widths of the margins to leave around the vector map for axis 
 *        annotation. The widths should be given as fractions of the 
-*        corresponding dimension of the DATA picture. 
+*        corresponding dimension of the current picture. 
 *        The actual margins used may be increased to preserve the aspect 
 *        ratio of the DATA picture. Four values may be given, in the order;
 *        bottom, right, top, left. If fewer than four values are given, 
 *        extra values are used equal to the first supplied value. If these 
 *        margins are too narrow any axis annotation may be clipped. The
-*        dynamic default is 0.22 (for all edges) if annotated axes are being 
+*        dynamic default is 0.15 (for all edges) if annotated axes are being 
 *        produced, and zero otherwise. See also parameter KEYPOS. []
 *     NEGATE = _LOGICAL (Read)
 *        If a TRUE value is supplied, then the angles giving the
@@ -358,6 +358,9 @@
 *        parameter.
 *     22-MAR-1999 (DSB):
 *        Get AXES *before* MARGIN.
+*     3-NOV-1999 (DSB):
+*        Margin changed to be a fraction of the current picture instead
+*        of the DATA picture.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -387,6 +390,9 @@
 
       REAL  DTOR                 ! Degrees to radians conversion factor
       PARAMETER ( DTOR = 1.7453293E-2 )
+
+      REAL  KW                   ! Width of key as a fraction of the
+      PARAMETER ( KW = 0.2 )     ! current picture.
 
       INTEGER NBIN               ! No. of bins in histogram used to
       PARAMETER( NBIN = 1000 )   ! find typical magnitude value
@@ -763,12 +769,12 @@
 
 *  Set the dynamic defaults for MARGIN.
       IF( AXES ) THEN
-         CALL PAR_DEF1R( 'MARGIN', 1, 0.22, STATUS )
+         CALL PAR_DEF1R( 'MARGIN', 1, 0.15, STATUS )
       ELSE
          CALL PAR_DEF1R( 'MARGIN', 1, 0.0, STATUS )
       END IF
 
-      CALL PAR_GDRVR( 'MARGIN', 4, -0.49, 10.0, MARGIN, NMARG, STATUS )
+      CALL PAR_GDRVR( 'MARGIN', 4, 0.0, 1.0, MARGIN, NMARG, STATUS )
       NMARG = MIN( 4, NMARG )
 
 *  Abort if an error has occurred.
@@ -797,7 +803,7 @@
 
 *  Start up the graphics system, creating a KEY picture.
          CALL KPG1_PLOT( IWCS, 'UNKNOWN', 'POLPACK_POLPLOT', ' ', 
-     :                   MARGIN, 1, 'KEY', 'R', 0.5, ASPECT, DOMAIN, 
+     :                   MARGIN, 1, 'KEY', 'R', KW, ASPECT, DOMAIN, 
      :                   BOX, IPICD, IPICF, IPICK, IPLOT, NFRM, ALIGN, 
      :                   STATUS )
 
