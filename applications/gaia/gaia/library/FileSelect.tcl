@@ -508,7 +508,6 @@ itcl::class util::FileSelect {
 
     protected method _filldirlist {} {
 	$fs(dirs) delete 0 end
-
 	foreach i [exec /bin/ls -a $itk_option(-dir)] {
            catch {
               if {[file isdirectory $i]} {
