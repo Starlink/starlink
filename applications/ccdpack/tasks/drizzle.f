@@ -104,7 +104,7 @@
 *        values of MULTI, PIXFRAC must also be larger (e.g. for a MULTI 
 *        of 4.0 a PIXFRAC of 0.7 is unacceptably small for simgle image
 *        drizzling, however for a MULTI of 3.0 a PIXFRAC of 0.7 produces
-*        acceptable ouput images).
+*        acceptable output images).
 *        [1.5]
 *     OUT = NDF (Write)
 *        Name of the NDF to contain the output mosaic.
@@ -453,7 +453,7 @@
       DOUBLE PRECISION ASTART( NDF__MXDIM ) ! Start co-ord of each axis
       DOUBLE PRECISION AEND( NDF__MXDIM )   ! End co-ord of each axis
       DOUBLE PRECISION DDLBND( NDF__MXDIM ) ! Co-ord lower bound of input NDF 
-      DOUBLE PRECISION DDUBND( NDF__MXDIM ) ! Co-ord upper bounds of ouput NDF
+      DOUBLE PRECISION DDUBND( NDF__MXDIM ) ! Co-ord upper bounds of output NDF
       DOUBLE PRECISION DDXL( NDF__MXDIM ) ! Co-ord of input pnt gives lower bnd
       DOUBLE PRECISION DDXU( NDF__MXDIM ) ! Co-ord of input pnt gives upper bnd
       DOUBLE PRECISION DSCALE( CCD1__MXNDF + 1 ) ! Scale factor error
@@ -470,7 +470,7 @@
         
       INTEGER CFRAME( CCD1__MXNDF + 1 )   ! Index value of the current AST Frame
       INTEGER DIMSIZ                      ! Output NDF dimension size
-      INTEGER EL                          ! Size of vectorised ouput array
+      INTEGER EL                          ! Size of vectorised output array
       INTEGER FDIN                        ! Pointer to INFILE file descriptor
       INTEGER FRCUR( CCD1__MXNDF + 1 )    ! Pointer to the Current AST Frame
       INTEGER FRM                    ! AST pointer to frame under consideration
@@ -508,9 +508,9 @@
       INTEGER OCNT                   ! Pointer to the Output NDF Counts
       INTEGER ODAT                   ! Pointer to the Output NDF Data component
       INTEGER ODIM ( NDF__MXDIM )    ! Ouptut extension dimension sizes
-      INTEGER OVAR                   ! Pointer to the Ouput NDF Variances
+      INTEGER OVAR                   ! Pointer to the Output NDF Variances
       INTEGER OWCS              ! Pointer to the WCS extension of the output NDF
-      INTEGER OWHT                   ! Pointer to the Ouput NDF Weights
+      INTEGER OWHT                   ! Pointer to the Output NDF Weights
       INTEGER PFRAME                 ! Index of the PIXEL frame
       INTEGER PLACE                  ! NDF place holder
       INTEGER UBNDX( NDF__MXDIM )    ! Maximum (overall) upper bound
@@ -1140,7 +1140,7 @@
      :              ODAT, NPXOUT, STATUS )
 
 *  We want to propagate the variance information, so we need an
-*  ouput variance array. It should be noted, that the propagated
+*  output variance array. It should be noted, that the propagated
 *  variances are STATISTICALLY INCORRECT (error are correlated).
       CALL NDF_MAP( OUTNDF, 'Variance', OTYPE, 'WRITE/BAD', 
      :              OVAR, NPXOUT, STATUS )

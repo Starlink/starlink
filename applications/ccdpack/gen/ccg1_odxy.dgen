@@ -81,8 +81,8 @@
       INTEGER IX, IY                      ! Size of each input NDF dimension
       INTEGER X, Y                        ! Current input pixel
       INTEGER OX, OY                      ! Size of each output NDF dimension
-      INTEGER I, J                        ! Current ouput pixel
-      INTEGER L, M                        ! Current ouput pixel (adjusted)
+      INTEGER I, J                        ! Current output pixel
+      INTEGER L, M                        ! Current output pixel (adjusted)
       
       <TYPE1> IDAT( IX, IY )               ! Input NDF Data array
       <TYPE1> IVAR( IX, IY )               ! Input NDF variance array

@@ -11,7 +11,7 @@
 
 *  Purpose:
 *     Runs though most of the drizzling algorithm, but calls CCD1_ODIZx
-*     to assign the actual input data values IDAT to the ouput data array.
+*     to assign the actual input data values IDAT to the output data array.
 
 *  Language:
 *     Starlink Fortran 77
@@ -229,7 +229,7 @@
          CALL MSG_SETI( 'IN_DIM', NDIMI )
          CALL MSG_SETI( 'OUT_DIM', NDIMO )
          CALL CCD1_MSG( ' ', '    Dimensions: Input (^IN_DIM)'
-     :                  //' = Ouput (^OUT_DIM)', STATUS )        
+     :                  //' = Output (^OUT_DIM)', STATUS )        
 
       ENDIF
 
