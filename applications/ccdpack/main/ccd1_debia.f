@@ -130,6 +130,8 @@
 *        about zero.
 *     19-JUL-1995 (PDRAPER):
 *        Removed AIF_ calls.
+*     03-FEB-1998 (PDRAPER):
+*        Stopped modification of global zero level (was set to UMEAN).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -398,7 +400,9 @@
       ELSE
 
 *  Set level to use for +/- sigma clip.
-          MEAN = UMEAN
+         IF ( .NOT. USECON ) THEN 
+            MEAN = UMEAN
+         END IF
       END IF
 
 *  Call the appropriate version of DEBI
