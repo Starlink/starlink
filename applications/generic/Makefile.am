@@ -29,8 +29,16 @@ dcv_ttoub.f: dcv_ttoub.gen
 	env GENERIC_DIR=. ./generic -t bdirwW dcv_ttoub.gen
 dcv_ttouw.f: dcv_ttouw.gen
 	env GENERIC_DIR=. ./generic -t bBdirw dcv_ttouw.gen
-DCV_FUN: DCV_FUN.fpp
-	$(FPP) $(FPPFLAGS) $(CPPFLAGS) -I. DCV_FUN.fpp $(FPP_OUTPUT)
+
+# Run a .F file through the fpp preprocessor, to produce a file with no
+# The following deals with case-insensitive filesystems, on which
+# foo.f and foo.F would be the same file.  FPP_OUTPUT is
+# either "" (in which case the preprocessor writes to foo.f, and
+# the filesystem is presumably case-sensitive) or ">$@".
+DCV_FUN: DCV_FUN.F
+	rm -f DCV_FUN
+	$(FPP) $(FPPFLAGS) $(CPPFLAGS) -I. DCV_FUN.F $(FPP_OUTPUT)
+	test -f DCV_FUN || mv DCV_FUN.f DCV_FUN
 
 BUILT_SOURCES = DCV_FUN
 
