@@ -216,6 +216,7 @@
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David S. Berry (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     PWD: Peter W. Draper (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -227,6 +228,8 @@
 *        Added mode WCS.
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL
+*     30-SEP-2004 (PWD):
+*        Moved CNF_PAR to declaration section.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -245,6 +248,7 @@
       INCLUDE 'PAR_PAR'          ! PAR__ constants
       INCLUDE 'PAR_ERR'          ! PAR__ error constants
       INCLUDE 'AST_PAR'          ! AST constants and functions
+      INCLUDE 'CNF_PAR'          ! CNF functions
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -314,7 +318,6 @@
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'      ! NUM declarations for conversions
       INCLUDE 'NUM_DEF_CVT'      ! NUM definitions for conversions
-      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *.
 

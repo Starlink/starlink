@@ -99,6 +99,7 @@
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     PWD: Peter W. Draper (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -108,6 +109,8 @@
 *        Replaced AIF by PAR.  Added ERROR option to parameter COMP.
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL
+*     2004 October 1 (PWD):
+*        Moved CNF_PAR into declarations.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -123,6 +126,7 @@
       INCLUDE 'PAR_ERR'        ! Parameter-system errors
       INCLUDE 'NDF_PAR'        ! NDF_ public constants
       INCLUDE 'PRM_PAR'        ! Magic-value pixel definitions
+      INCLUDE 'CNF_PAR'        ! CNF functions
 
 *  Status:
       INTEGER STATUS           ! Global status
@@ -187,7 +191,6 @@
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'      ! Declarations of conversion routines
       INCLUDE 'NUM_DEF_CVT'      ! Definitions of conversion routines
-      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *.
 

@@ -237,6 +237,7 @@
 *     DSB: David S. Berry (STARLINK)
 *     TDCA: Tim Ash (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     PWD: Peter W. Draper (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -266,6 +267,8 @@
 *        parameter to a subroutine.
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL
+*     01-OCT-2004 (PWD):
+*        Moved CNF_PAR into declarations.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -284,6 +287,7 @@
       INCLUDE 'PRM_PAR'          ! VAL__ constants
       INCLUDE 'AST_PAR'          ! AST constants and function
                                  ! declarations
+      INCLUDE 'CNF_PAR'          ! CNF functions
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -345,7 +349,6 @@
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'      ! NUM declarations for conversions
       INCLUDE 'NUM_DEF_CVT'      ! NUM definitions for conversions
-      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *.
 

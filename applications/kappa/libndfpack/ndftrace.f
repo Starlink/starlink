@@ -196,6 +196,7 @@
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David S. Berry (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     PWD: Peter W. Draper (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -230,6 +231,8 @@
 *        Modified to display details of WCS SpecFrames.
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL
+*     30-SEP-2004 (PWD):
+*        Moved CNF_PAR out of executable code.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -246,6 +249,7 @@
       INCLUDE 'NDF_PAR'          ! NDF_ public constants
       INCLUDE 'PRM_PAR'          ! PRIMDAT primitive data constants
       INCLUDE 'AST_PAR'          ! AST_ public constants
+      INCLUDE 'CNF_PAR'          ! CNF functions
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -325,7 +329,6 @@
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'      ! NUM_ type conversion routines
       INCLUDE 'NUM_DEF_CVT'
-      INCLUDE 'CNF_PAR'
 *.
 
 *  Check the inherited global status.

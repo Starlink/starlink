@@ -104,6 +104,7 @@
 *     MJC: Malcolm J. Currie  (STARLINK)
 *     DSB: David S. Berry (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     PWD: Peter W. Draper (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -116,6 +117,8 @@
 *        Added propagation of the WCS component.
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL
+*     01-OCT-2004 (PWD):
+*        Moved CNF_PAR into declarations.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -132,6 +135,7 @@
       INCLUDE 'PAR_ERR'        ! Parameter-system errors
       INCLUDE 'PRM_PAR'        ! Primdat parameter definitions
       INCLUDE 'MSG_PAR'        ! Message constants
+      INCLUDE 'CNF_PAR'        ! CNF functions
 
 *  Status:
       INTEGER STATUS
@@ -180,7 +184,6 @@
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'    ! Declarations of conversion routines
       INCLUDE 'NUM_DEF_CVT'    ! Definitions of conversion routines
-      INCLUDE 'CNF_PAR'        ! For CNF_PVAL function
 
 *.
 

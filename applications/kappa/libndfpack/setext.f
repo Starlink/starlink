@@ -161,6 +161,7 @@
 *     SMB: Steven M Beard (ROE)
 *     MJC: Malcolm J. Currie (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     PWD: Peter W. Draper (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -186,6 +187,8 @@
 *        Also removed references to unused parameter RVALUE.
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL
+*     30-SEP-2004 (PWD):
+*        Moved CNF_PAR to declaration section.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -202,6 +205,7 @@
       INCLUDE 'DAT_ERR'          ! DAT__ error constants
       INCLUDE 'PRM_PAR'          ! VAL__ constants
       INCLUDE 'PAR_ERR'          ! PAR__ error constants
+      INCLUDE 'CNF_PAR'          ! CNF functions
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -258,7 +262,6 @@
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'      ! NUM declarations for conversions
       INCLUDE 'NUM_DEF_CVT'      ! NUM definitions for conversions
-      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *.
 
