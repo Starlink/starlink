@@ -140,6 +140,47 @@ int yydebug;
    }
 
 
+   void *memok( void *ptr ) {
+/*
+*+
+*  Name:
+*     memok
+*
+*  Purpose:
+*     Check that memory has been allocated successfully.
+*
+*  Description:
+*     This routine checks that a pointer does not point to NULL.  It 
+*     should be called on any pointer value which is got by a call to
+*     malloc, realloc or calloc.
+*
+*     If the argument is non-NULL then the routine returns without action.
+*     If it is NULL, the routine terminates the program with an error
+*     status.
+*
+*  Arguments:
+*     memok = void *
+*        A pointer, presumably a return value from malloc, realloc or calloc.
+*
+*  Return value:
+*     The same as the argument ptr.
+*
+*  Authors:
+*     MBT: Mark Taylor (STARLINK)
+*
+*  History:
+*     09-DEC-1999 (MBT):
+*        Initial revision.
+*-
+*/
+      if ( ptr == NULL ) {
+         fprintf( stderr, "Memory allocation failed.\n" );
+         exit( 1 );
+      }
+      return( ptr );
+   }
+
+
    char *scat( int n, ... ) {
 /*+
 *  Name:
@@ -190,7 +231,7 @@ int yydebug;
       va_end( ap );
 
 /* Allocate the memory we will need, and initialise it. */
-      string = (char *) malloc( len + 1 );
+      string = (char *) memok( malloc( len + 1 ) );
       *string = '\0';
 
 /* Copy the arguments into the allocated space .*/
@@ -230,7 +271,7 @@ int yydebug;
    }
 
    void uadd( char *item ) {
-      ulast->next = (ELEMENT *) malloc( sizeof( ELEMENT ) );
+      ulast->next = (ELEMENT *) memok( malloc( sizeof( ELEMENT ) ) );
       ulast = ulast->next;
       ulast->next = NULL;
       ulast->text = item;
@@ -248,7 +289,7 @@ int yydebug;
       }
 
 /* Allocate space for the string. */
-      text = (char *) malloc( leng + 1 );
+      text = (char *) memok( malloc( leng + 1 ) );
       j = 0;
 
 /* Copy the lexically encountered items into the string sequentially. */
@@ -288,11 +329,11 @@ int yydebug;
 /* Extend the allocated space if necessary. */
       while ( preleng + leng > prealloc ) {
          if ( prealloc == 0 ) {
-            preval = (char *) malloc( BUFINC + 1 );
+            preval = (char *) memok( malloc( BUFINC + 1 ) );
             *preval = '\0';
          }
          else {
-            preval = (char *) realloc( preval, prealloc + BUFINC + 1 );
+            preval = (char *) memok( realloc( preval, prealloc + BUFINC + 1 ) );
          }
          prealloc += BUFINC;
       }
@@ -337,9 +378,10 @@ int yydebug;
          default:
             if ( preleng + 1 > prealloc ) {
                if ( prealloc == 0 )
-                  preval = (char *) malloc( BUFINC + 1 );
+                  preval = (char *) memok( malloc( BUFINC + 1 ) );
                else
-                  preval = (char *) realloc( preval, prealloc + BUFINC + 1 );
+                  preval = (char *) memok( realloc( preval, 
+                                                    prealloc + BUFINC + 1 ) );
                prealloc++;
             }
             preval[ preleng ] = c;

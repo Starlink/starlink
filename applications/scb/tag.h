@@ -10,6 +10,9 @@
       void sappend( char *s );
       void cappend( char c );
 
+/* Utility functions. */
+      void *memok( void *ptr );
+
 /* Configuration flags. */
       int strict;
 
