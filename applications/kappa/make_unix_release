@@ -45,6 +45,11 @@
 #         mv ./sun95.htx_tar ${KAPPA_DEV}/..
 #      endif
 
+#  Expand any generic source files.
+      foreach file (`grp generic_sources`)
+         generic -t n -s ${file}
+      end
+
 #  Check for direct calls to NDF parameter routines. These should usually
 #  be replaced by equivalent LPG routines (to allow multiple invocations to 
 #  process groups of NDFs).
@@ -203,5 +208,9 @@ FOO5
 
 #  Compress it.
       compress kappa.tar
+
+# Remove any spare .f files created by the expansion of generic source
+# files but not included in the release. Also remove grp.make.
+      rm -f *.f grp.make
 
       exit

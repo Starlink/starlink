@@ -371,8 +371,18 @@ substitute.f surfit.f thresh.f trandat.f traninvert.f tranjoin.f \
 tranmake.f transformer.f trantrace.f trig.f wiener.f zaplin.f mem2d.f \
 listmake.f listshow.f profile.f wcsalign.f wcstran.f copybad.f kapversion.f
 
+# The source RCS files needed to create the kapsub_sub.tar file:
+KAPSUB_SOURCES = $(KAPSUB_NONGEN) $(KAPSUB_GEN)
+
 # The contents of the kapsub_sub.tar file:
-KAPSUB_SUB = apadsb.f cnthlt.f cntkey.f cntsbp.f crfrsb.f curre.f \
+KAPSUB_SUB = $(KAPSUB_SOURCES) kps1_sparb.f kps1_spard.f kps1_spari.f kps1_sparr.f \
+kps1_sparub.f kps1_sparuw.f kps1_sparw.f 
+
+# Generic source files needed for kapsub_sub.tar:
+KAPSUB_GEN = kps1_sparx.gen
+
+# Non-generic source files needed for kapsub_sub.tar:
+KAPSUB_NONGEN = apadsb.f cnthlt.f cntkey.f cntsbp.f crfrsb.f curre.f \
 ftsize.f ftsizt.f gethlp.f getv2.f gltbsb.f gltclt.f gltcsb.f hstdsp.f \
 hstlo.f hstrep.f imlst.f inhi.f inpe.f inpol.f inre.f insl.f inva.f \
 inxy.f kps1_agncm.f kps1_agncp.f kps1_agncv.f kps1_agndl.f kps1_agndr.f \
@@ -419,9 +429,7 @@ kps1_rorar.f kps1_roraub.f kps1_rorauw.f kps1_roraw.f kps1_rorbb.f \
 kps1_rorbd.f kps1_rorbi.f kps1_rorbr.f kps1_rorbub.f kps1_rorbuw.f \
 kps1_rorbw.f kps1_rosiz.f kps1_rprfb.f kps1_rprfd.f kps1_rprfi.f \
 kps1_rprfr.f kps1_rprfub.f kps1_rprfuw.f kps1_rprfw.f kps1_skyft.f \
-kps1_skyf2.f kps1_skyf3.f kps1_skyf4.f kps1_skyfn.f kps1_sparb.f \
-kps1_spard.f kps1_spari.f kps1_sparr.f kps1_sparub.f kps1_sparuw.f \
-kps1_sparw.f kps1_stpab.f kps1_stpad.f kps1_stpai.f kps1_stpar.f \
+kps1_skyf2.f kps1_skyf3.f kps1_skyf4.f kps1_skyfn.f kps1_stpab.f kps1_stpad.f kps1_stpai.f kps1_stpar.f \
 kps1_stpaub.f kps1_stpauw.f kps1_stpaw.f kps1_subid.f kps1_subir.f \
 kps1_sucld.f kps1_suclr.f kps1_supeb.f kps1_supei.f kps1_supev.f \
 kps1_supf.f kps1_suseb.f kps1_susei.f kps1_susev.f kps1_susf.f \
@@ -471,6 +479,9 @@ setbound.f setext.f setlabel.f setnorm.f setorigin.f setsky.f settitle.f \
 settype.f setunits.f setvar.f wcsadd.f wcsattrib.f wcscopy.f wcsframe.f \
 wcsremove.f wcsshow.f chain.f reshape.f 
 
+# A group of all the generic source files.
+GENERIC_SOURCES = $(KAPSUB_GEN)
+
 # The other files which need to be extracted from the source code
 # repository and which end up in kappa.tar.
 UNIX_OTHERS = makefile mk sun95.tex sun95_gd1.eps sun95_gd2.eps \
@@ -483,7 +494,7 @@ sun95_pixco.eps sun95_gridco.eps kappa.news sun221.tex sun95_gd9.eps
 UNIX_RELEASE =  $(UNIX_OTHERS) kappa.star-hlp kappa.ifd \
 $(KAPPA_SOURCE) $(AIF_SUB) $(FTS_SUB) $(KAPGEN_SUB) $(IRA_SUB) \
 $(KAPPA_DATA_ALPHA_OSF1) $(KAPPA_DATA_IX86_LINUX) $(KAPPA_DATA_SUN4_SOLARIS) \
-$(KAPPA_SOURCE) $(KAPPA_SUB) $(KAPSUB_SUB) $(KAPPA_CCDPACK) $(KAPVIEW_SUB) \
+$(KAPPA_SOURCE) $(KAPPA_SUB) $(KAPSUB_SOURCES) $(KAPPA_CCDPACK) $(KAPVIEW_SUB) \
 $(NDFPACK_SUB) 
 
 #  The contents of kappa.tar.
