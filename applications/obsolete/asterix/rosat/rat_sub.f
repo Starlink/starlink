@@ -647,7 +647,7 @@
 *    Function declarations :
 *    Local constants :
       INTEGER N_VALUE
-       PARAMETER (N_VALUE=101)
+       PARAMETER (N_VALUE=103)
 *    Local variables :
       INTEGER I
       CHARACTER*20 T_VAL
@@ -758,9 +758,10 @@
       DATA VALUES(97) /'US :PSPC:EVRATE :A1_AL    ia1_evr' /
       DATA VALUES(98) /'RDF:PSPC:EVRATE :A1_AL    a1_al' /
       DATA VALUES(99) /'   :PSPC:EVRATE :A1_AL    ee_a1ll' /
-      DATA VALUES(100)/'   :HRI :EVRATE :PS_VALID ps_valid' /
-
+      DATA VALUES(100)/'US :HRI :EVRATE :PS_VALID ps_valid' /
       DATA VALUES(101)/'   :    :       :TIME     time' /
+      DATA VALUES(102)/'RDF:HRI :EVRATE :SECONDARYsecondary' /
+      DATA VALUES(103)/'   :    :       :TIME     time' /
 *-
 *
       RAT_LOOKUP = ' '
