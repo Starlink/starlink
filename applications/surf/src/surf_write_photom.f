@@ -1,5 +1,5 @@
 *+  REDS_WRITE_PHOTOM - routine to output ASCII results of PHOTOM reduction
-      SUBROUTINE REDS_WRITE_PHOTOM (ODF, OBS_DATE, OBS_TIME,
+      SUBROUTINE REDS_WRITE_PHOTOM (ODF, OBS_DATE, OBS_TIME, ANALYSIS,
      :  RUN_NUMBER, OBJECT, SUB_INSTRUMENT, FILTER, CENTRE_COORDS,
      :  LAT, LONG, LAT2, LONG2, MJD1, MJD2, OFFSET_COORDS, MAP_X,
      :  MAP_Y, SAMPLE_COORDS, SAMPLE_PA, SKY_SUBTRACTION, MAX_BEAM, 
@@ -44,6 +44,7 @@
 *                              coord system>
 *      Sky error removal     : <TRUE if the REDS SKY_ERROR application has been
 *                              run on the data>
+*      Analysis mode         : AVERAGE or PARABOLA
 *    
 *     Then, for each bolometer that measured the source:-
 *      Bolometer             : <bolometer name>
@@ -179,6 +180,7 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
+      INCLUDE 'PRM_PAR'
 *    Import :
       CHARACTER*(*) ODF
       CHARACTER*(*) OBS_DATE
@@ -187,6 +189,7 @@
       CHARACTER*(*) OBJECT
       CHARACTER*(*) SUB_INSTRUMENT
       CHARACTER*(*) FILTER
+      CHARACTER*(*) ANALYSIS
       CHARACTER*(*) CENTRE_COORDS
       CHARACTER*(*) LAT
       CHARACTER*(*) LONG
@@ -220,7 +223,7 @@
       BYTE          MEAS_1_Q (MAX_BEAM)
       REAL          MEAS_2_D (MAX_BEAM)
       REAL          MEAS_2_V (MAX_BEAM)
-      BYTE       MEAS_2_Q (MAX_BEAM)
+      BYTE          MEAS_2_Q (MAX_BEAM)
 *    Import-Export :
 *    Export :
 *    Status :
@@ -328,6 +331,9 @@
       CALL FIO_WRITE (FD, LINE, STATUS)
       CALL FIO_WRITE (FD, ' ', STATUS)
 
+      LINE = 'Photometric analysis  : '//ANALYSIS
+      CALL FIO_WRITE (FD, LINE, STATUS)
+
 *  now output the results
 
       DO BEAM = 1, MAX_BEAM
@@ -351,9 +357,11 @@
             CALL FIO_WRITE (FD, LINE, STATUS)
 
             DO I = 1, N_INTEGRATIONS
-               WRITE (LINE, 10) I, PEAK_D(I,BEAM), PEAK_V(I,BEAM),
-     :           PEAK_X(I,BEAM), PEAK_Y(I,BEAM), PEAK_Q(I,BEAM)
-               CALL FIO_WRITE (FD, LINE, STATUS)
+               IF (PEAK_D(I,BEAM).NE.VAL__BADR) THEN
+                  WRITE (LINE, 10) I, PEAK_D(I,BEAM), PEAK_V(I,BEAM),
+     :                 PEAK_X(I,BEAM), PEAK_Y(I,BEAM), PEAK_Q(I, BEAM)
+                  CALL FIO_WRITE (FD, LINE, STATUS)
+               END IF
             END DO
 
 	    CALL FIO_WRITE (FD, ' ', STATUS)
