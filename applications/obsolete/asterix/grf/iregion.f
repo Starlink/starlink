@@ -715,9 +715,6 @@
       CHARACTER*20 TIME                 ! column name
       CHARACTER*80 TEXT
       CHARACTER*(DAT__SZLOC) ALOC       ! Locator to attitude file
-      LOGICAL LOUT                      ! include the region outside the image ?
-      LOGICAL LNEW                      ! create a new ARD file or update ?
-      LOGICAL LPLOT                     ! display the spokes pattern ?
       REAL X1,Y1,X2,Y2,XC,YC
       REAL RAD,RADWID,INNRAD,OUTRAD
       REAL SLENGTH                      ! length of spokes in degs
@@ -728,7 +725,6 @@
       REAL XSP(4),YSP(4)                ! cornes of spoke
       REAL XEND,YEND                    ! centre of end of spoke
       REAL XANG                         ! X value to calc spoke angle from.
-      REAL TRAD                         ! radius of the total circular f.o.v.
       REAL RMEAN                        ! mean roll angle Degrees
       REAL THETA                        ! mean roll angle (radians)
       REAL EXTRA                        ! additional width of ribs (degs)
@@ -738,7 +734,6 @@
       INTEGER RPNTR                     ! pointer to the roll angle array
       INTEGER TPNTR                     ! pointer to the time array
       INTEGER NVALS                     ! number of time/roll values
-      INTEGER SUNIT                     ! Logical unit of ARD file
       INTEGER LP
       LOGICAL AUTO
 *-
@@ -896,9 +891,6 @@
       CALL MSG_SETR('RAD',INNRAD)
       CALL MSG_MAKE(TEXT(:L)//' ^XC , ^YC , ^RAD ))',TEXT,L)
       CALL ARX_PUT(I_ARD_ID,0,TEXT(:L),STATUS)
-
-
-
 
 *  set the length and width of the spokes in degrees. NB: this does assume that
 *  the image axes are degrees.
