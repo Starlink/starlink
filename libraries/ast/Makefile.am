@@ -351,16 +351,21 @@ ast.h: $(AST_H_FILES) ast_err.h makeh
 # It's most straightforward to build it at the beginning.
 BUILT_SOURCES = AST_ERR ast_err.h version.h
 
-#  Form a second link to the main object library. This is used when a second
-#  pass through the library is needed during linking.
-install-exec-local: libast.la
+#  Form second links to the main object library (static and shared). This is 
+#  used when a second pass through the library is needed during linking. Use
+#  target install-exec-hook rather than install-exec-local so that the
+#  soft links are created *after* the main library has been installed. 
+install-exec-hook: libast.la
 	$(mkdir_p) $(DESTDIR)$(libdir) 
-	cd $(DESTDIR)$(libdir) && \
-		rm -f libast_pass2.a && \
-		$(LN_S) $(DESTDIR)$(libdir)/libast.a libast_pass2.a
-	if test -n "$$MANIFEST_FD"; then \
-	    echo "$(DESTDIR)$(libdir)/libast_pass2.a" >&$${MANIFEST_FD-0}; \
-	fi
+	cd $(DESTDIR)$(libdir); \
+	for f in `ls libast.*`; do \
+	   ff=`echo $$f | sed -e 's/libast/libast_pass2/'`; \
+	   if test -e "$$ff"; then rm "$$ff"; fi; \
+	   $(LN_S) $(DESTDIR)$(libdir)/$$f $$ff; \
+	   if test -n "$$MANIFEST_FD"; then \
+	       echo "$(DESTDIR)$(libdir)/$$ff" >&$${MANIFEST_FD-0}; \
+	   fi \
+	done
 
 # Make pre-distribution files.  These are files which are required for
 # building the distribution, but are not themselves distributed.
