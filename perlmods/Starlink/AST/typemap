@@ -26,4 +26,30 @@ AstWcsMap *	T_PTROBJ
 AstWinMap *	T_PTROBJ
 AstXmlChan *	T_PTROBJ
 AstZoomMap *	T_PTROBJ
+StatusType      T_STATUSINT
+WcsMapType      T_WCSMAPINT
+
+
+INPUT
+
+T_STATUSINT
+	if (sv_derived_from($arg, \"Starlink::AST::Status\")) {
+	    $var = ($type)SvIV((SV*)SvRV($arg));
+	}
+	else
+	    Perl_croak(aTHX_ \"$var is not of type Starlink::AST::Status\")
+T_WCSMAPINT
+	if (sv_derived_from($arg, \"Starlink::AST::WcsMap\")) {
+	    $var = ($type)SvIV((SV*)SvRV($arg));
+	}
+	else
+	    Perl_croak(aTHX_ \"$var is not of type Starlink::AST::WcsMap\")
+
+OUTPUT
+
+T_STATUSINT
+	sv_setiv(newSVrv($arg,\"Starlink::AST::Status\"), (IV)$var);
+T_WCSMAPINT
+	sv_setiv(newSVrv($arg,\"Starlink::AST::WcsMap\"), (IV)$var);
+
 
