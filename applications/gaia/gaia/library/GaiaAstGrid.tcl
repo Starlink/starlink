@@ -449,8 +449,12 @@ itcl::class gaia::GaiaAstGrid {
       set options ""
 
       #  Add the position options.
-      lappend options "edge(1)=$position_($this,edge1)"
-      lappend options "edge(2)=$position_($this,edge2)"
+      if { $position_($this,edge1) != "default" } {
+         lappend options "edge(1)=$position_($this,edge1)"
+      }
+      if { $position_($this,edge2) != "default" } {
+         lappend options "edge(2)=$position_($this,edge2)"
+      }
       if { $position_($this,labelat1) != "" } {
          lappend options \
             "labelat(1)=[radec_to_radian_ 1 $position_($this,labelat1)]"
@@ -697,7 +701,7 @@ itcl::class gaia::GaiaAstGrid {
             puts $fid "set Xformat_(\$this,.) $Xformat_($this,.)"
             puts $fid "set Yformat_(\$this,.) $Yformat_($this,.)"
             puts $fid "set format_(\$this,noformat) $format_($this,noformat)"
-            ::close $fid
+            ::close $fid 
          }
       }
    }
@@ -716,7 +720,7 @@ itcl::class gaia::GaiaAstGrid {
             $itk_component(Yfrac) configure -state normal
             source $filename
 
-            #  We now need to update all buttons etc. that so not have an
+            #  We now need to update all buttons etc. that do not have an
             #  associated variable so as to reflect these changes.
 
             #  Position options.
@@ -883,11 +887,11 @@ itcl::class gaia::GaiaAstGrid {
       #  Check if image is rotated. If so then swap lef-right,
       #  top-bottom pairing around.
       if { [$itk_option(-rtdimage) rotate] } {
-         set xpos "left right bottom top"
-         set ypos "bottom top left right"
+         set xpos "default left right bottom top"
+         set ypos "default bottom top left right"
       } else {
-         set xpos "bottom top left right"
-         set ypos "left right bottom top"
+         set xpos "default bottom top left right"
+         set ypos "default left right bottom top"
       }
       foreach {axis lname sides} [list 1 {X Label} $xpos 2 {Y Label} $ypos] {
          itk_component add edge$axis {
@@ -985,32 +989,13 @@ itcl::class gaia::GaiaAstGrid {
       set position_($this,labelup2) 0
    }
 
-   #  Reset the positioning of the edge labels if necessary (basically
-   #  they are guaranteed to be swapped if the image is rotated).
+   #  Reset the positioning of the edge labels. These go back to the
+   #  AST defaults.
    protected method reset_edge_ {} {
-      if { [$itk_option(-rtdimage) rotate] } {
-         if { $position_($this,edge1) != "left" &&
-              $position_($this,edge1) != "right" } {
-            $itk_component(edge1) configure -value "left"
-            set position_($this,edge1) "left"
-         }
-         if { $position_($this,edge2) != "top" &&
-              $position_($this,edge2) != "bottom" } {
-            $itk_component(edge2) configure -value "bottom"
-            set position_($this,edge2) "bottom"
-         }
-      } else {
-         if { $position_($this,edge1) != "top" &&
-              $position_($this,edge1) != "bottom" } {
-            $itk_component(edge1) configure -value "bottom"
-            set position_($this,edge1) "bottom"
-         }
-         if { $position_($this,edge2) != "left" &&
-              $position_($this,edge2) != "right" } {
-            $itk_component(edge2) configure -value "left"
-            set position_($this,edge2) "left"
-         }
-      }
+      $itk_component(edge1) configure -value "default"
+      set position_($this,edge1) "default"
+      $itk_component(edge2) configure -value "default"
+      set position_($this,edge2) "default"
    }
 
    #   Add a series of controls for setting the sizes/scales of the
