@@ -219,10 +219,10 @@
 *        information is present in the input files, then all the
 *        input files are combined together to form the master bias,
 *        so USESET can usually be safely set to TRUE (the default).
-*        [TRUE]
 *
 *        If a global value for this parameter has been set using 
 *        CCDSETUP then that value will be used.
+*        [TRUE]
 *     ZERO = _LOGICAL (Read)
 *        Flag indicating whether the output master bias is to have a
 *        mean value of zero or not. If TRUE the input data components

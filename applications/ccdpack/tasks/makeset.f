@@ -244,7 +244,7 @@
 *        MODE=SPLIT.
 *        [!]
 *     SETSIZE = _INTEGER (Read)
-*        The number of NDFs in each set.  This will default initially 
+*        The number of NDFs in each Set.  This will default initially 
 *        to the number of NDFs in the IN list, but if set to a 
 *        number less than that, then more than one set will be 
 *        generated (the first SETSIZE from IN will become the first 
