@@ -82,9 +82,9 @@
 
       INTEGER BOL_ADC(N_BOL)
       INTEGER BOL_CHAN(N_BOL)
-      REAL    U3(NUM_ADC, NUM_CHAN)
+      REAL    U3(NUM_CHAN, NUM_ADC)
       REAL    U3_CENTRE
-      REAL    U4(NUM_ADC, NUM_CHAN)
+      REAL    U4(NUM_CHAN, NUM_ADC)
       REAL    U4_CENTRE
 
 *  Arguments Returned:
@@ -115,12 +115,12 @@
  
          CHAN = BOL_CHAN (BOL)
          ADC = BOL_ADC (BOL)
-               
-         X_BOL(BOL) = (DBLE(U3(CHAN,ADC)) - DBLE(U3_CENTRE) - 
+
+         X_BOL(BOL) = (DBLE(U3(CHAN,ADC)) - DBLE(U3_CENTRE) -
      :        DBLE(OFFSET_X)) * ARCSEC2RAD
          Y_BOL(BOL) = (DBLE(U4(CHAN,ADC)) - DBLE(U4_CENTRE) -
      :        DBLE(OFFSET_Y)) * ARCSEC2RAD
-            
+
       END DO
 
       END
