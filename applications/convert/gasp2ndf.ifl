@@ -1,0 +1,57 @@
+## GASP2NDF - Converts an image in GASP format to an NDF.
+
+#+
+#  Name:
+#     GASP2NDF.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     RAHM: Rhys Morris (STARLINK, University of Wales, Cardiff)
+#     MJC: Malcolm J. Currie (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     14-JAN-1993 (RAHM):
+#         Original version.
+#     1993 July 27 (MJC):
+#        Renamed parameters for consistency.  Combined NCOLS and NROWS
+#        into SHAPE.  Added help library.  Fixed helpkey bugs.
+#     {enter_further_changes_here}
+
+#-
+
+interface GASP2NDF
+
+   helplib        'CONVERT_HELP:'
+
+   parameter      IN             # Name of the GASP file
+      position    1
+      type        LITERAL
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'Name of GASP file (.dat suffix not required)'
+      helpkey    '*'
+   endparameter
+
+   parameter      OUT            # Name of output NDF
+      position    2
+      type        NDF
+      access      WRITE
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'Output NDF'
+      association '->GLOBAL.DATA_ARRAY'
+      helpkey    '*'
+   endparameter
+
+   parameter      SHAPE          # Dimensions of the GASP image
+      type        _INTEGER
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'Dimensdions of the GASP image'
+      helpkey    '*'
+   endparameter
+
+endinterface
