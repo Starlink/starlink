@@ -265,6 +265,10 @@ TAR_OUT = pax -r -f
 
 AR_IN = ar -r
 
+#  ADAM A-task linker command
+
+ALINK = $(STAR_BIN)/alink
+
 #  Default file type extension for a shareable library and command for
 #  building a shareable library (the default acts as a null command).
 
@@ -339,16 +343,23 @@ DOCUMENTATION = $(LATEX_DOCS) $(HYPERTEXT_DOCS:.htx=.htx_tar) $(PKG_NAME).news
 
 #  List of tasks for compilation.
 
-TASKS = ccdgenerate
+TASKS = ccdbgen
 
 TASKSRC = $(TASKS:=.f)
 
 IFL_FILES = $(TASKS:=.ifl)
 
+SUBSRC = ccdb1_abia.f ccdb1_flmul.f
+
+SUBOBJ = $(SUBSRC:.f=.o)
+
 #  List of data files.
 
 DATA_FILES = ccdtest.ard ccdbig_obj.dat
 
+#  List of object files produced by compiling the source code.
+
+OBJECT_FILES = $(SUBOBJ)
 
 #-------------------------------------------------------------------------------
 
@@ -386,7 +397,7 @@ CCD1_PAR:       ccd1_par;                 $(LINK) $? $@
 
 #  Rules for extracting source files from the source archive.
 
-$(TASKSRC) $(IFL_FILES) $(DATA_FILES) $(PRIVATE_INCLUDES): \
+$(TASKSRC) $(SUBSRC) $(IFL_FILES) $(DATA_FILES) $(PRIVATE_INCLUDES): \
                                                    $(PKG_NAME)_source.tar
 	$(TAR_OUT) $(PKG_NAME)_source.tar $@
 	@ if test -f $@; then :;\
@@ -398,40 +409,48 @@ $(SHELL_SCRIPTS): $(PKG_NAME)_source.tar
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
 
+#  Personal rules for building source code archives from RCS and other places.
+
+check_uptodate:
+	rcsdiff $(TASKSRC) $(SUBSRC) $(IFL_FILES) $(SHELL_SCRIPTS) mk makefile
+
 #  Target for checking existence of all source files.
 
 check_source: $(SOURCE_FILES)
 
 #  Contents of the $(PKG_NAME)_source.tar archive.
 
-SOURCE_CONTENTS = $(TASKSRC) $(IFL_FILES) $(DATA_FILES) $(SHELL_SCRIPTS) \
-                  $(PRIVATE_INCLUDES)
+SOURCE_CONTENTS = $(TASKSRC) $(SUBSRC) $(IFL_FILES) $(DATA_FILES) \
+                  $(SHELL_SCRIPTS) $(PRIVATE_INCLUDES)
+
+#  Rules for building release files from RCS repository.
 
 #  Rules for building source files.
 
-$(PKG_NAME)_source.tar: $(SOURCE_CONTENTS)
+$(PKG_NAME)_source.tar: check_uptodate
+	co $(SOURCE_CONTENTS)
 	$(TAR_IN) $(PKG_NAME)_source.tar $(SOURCE_CONTENTS)
 
 #  Suffix rules.
 
 .f.o:
-        $(FC) $(FFLAGS) -c $<
+	$(FC) $(FFLAGS) -c $<
 
 #  Rules for compiling the tasks.
 
-CCDPACK_SOURCE = $(STAR_SOURCES)/ccdpack
+CCDPACK_SOURCES = $(STAR_SOURCES)/ccdpack
 CCDPACK_LIBS = -lccdpack -lccdpack_gen -lccdpack_tasks
 
-$(TASKS):
-	$(ALINK) $@.f -L$(CCDPACK_SOURCE) $(CCDPACK_LIBS) \
-                      `$(CCDPACK_SOURCES/ccdpack_link_adam`
+$(TASKS): $(SUBOBJ) $$@.o
+	$(ALINK) $@.o $(SUBOBJ) -L$(CCDPACK_SOURCES) $(CCDPACK_LIBS) \
+                      `$(CCDPACK_SOURCES)/ccdpack_link_adam`
 
 #  Rules for compiling the interface files.
 
 IFC_FILES = $(IFL_FILES:.ifl=.ifc)
 
 .ifl.ifc:
-	$(STAR_BIN)/compfil $<
+	$(STAR_BIN)/compifl $<
 
 #  Name of the date stamp file. This is used to record the time of the
 #  most recent build for use in subsequent operations that require it.
@@ -654,7 +673,7 @@ install:
         done
 #
 #  Install the interface files, giving them world read permission.
-        for f in $(IFC_FILES) ""; do \
+	for f in $(IFC_FILES) ""; do \
            if test -n "$$f"; then \
               $(CP) $$f $(INSTALL_BIN);\
               chmod 644 $(INSTALL_BIN)/$$f;\
@@ -664,7 +683,7 @@ install:
         done
 #
 #  Install the data files, giving them world read permission.
-        for f in $(DATA_FILES) ""; do \
+	for f in $(DATA_FILES) ""; do \
            if test -n "$$f"; then \
               $(CP) $$f $(INSTALL_BIN);\
               chmod 644 $(INSTALL_BIN)/$$f;\
@@ -939,8 +958,10 @@ $(EXPORT)/$(PKG_NAME).tar.Z: $(SOURCE_FILES)
 #  Remove all intermediate files.  Do not remove built files.
 
 clean:
+	rm -f $(INCLUDE_LINKS) $(PRIVATE_INCLUDES) $(IFL_FILES) \
+              $(OBJECT_FILES) $(TASKSRC) $(SUBSRC)
 	@ echo
-	@ echo '*** $(PACK_NAME) has no intermediate files to remove'
+	@ echo '*** intermediate files removed.'
 	@ echo
 
 #  unbuild: Reverse the build process.
@@ -953,6 +974,22 @@ unbuild: clean
 	@- rm -f $(BUILT_FILES) $(DATE_STAMP) .BUILT 1>/dev/null 2>/dev/null
 	@ echo '*** Built files removed'
 	@ echo
+
+#  strip: strip the tasks of debug information.
+#  -------------------------------------------
+
+strip:
+	strip $(TASKS)
+	@ echo '*** Tasks stripped'
+
+#-------------------------------------------------------------------------------
+
+#  Include file dependencies.
+#  =========================
+
+ccdb1_abia.o: SAE_PAR
+ccdb1_flmul.o: SAE_PAR
+ccdbgen.o: SAE_PAR DAT_PAR CCD1_PAR
 
 #-------------------------------------------------------------------------------
 #
