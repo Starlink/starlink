@@ -3586,9 +3586,9 @@ AstWinMap *astInitWinMap_( void *mem, size_t size, int init,
                (new->b)[ axis ] = AST__BAD;
                (new->a)[ axis ] = AST__BAD;
 
-/* Otherwise... */        
-            } else if( c2_in[ axis ] != AST__BAD && c1_in[ axis ] != AST__BAD &&
-                       c2_out[ axis ] != AST__BAD && c1_out[ axis ] != AST__BAD ){
+/* Otherwise, check the corners are good (not AST__BAD or NaN)... */        
+            } else if( astISGOOD(c2_in[ axis ]) && astISGOOD(c1_in[ axis ]) &&
+                       astISGOOD(c2_out[ axis ]) && astISGOOD(c1_out[ axis ]) ){
    
                denom = c2_in[ axis ] - c1_in[ axis ];
                if( denom != 0.0 ){

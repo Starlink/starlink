@@ -1198,6 +1198,7 @@ AstLutMap *astInitLutMap_( void *mem, size_t size, int init,
 
 /* Local Variables: */
    AstLutMap *new;               /* Pointer to new LutMap */
+   double *p;                    /* Pointer to next lut element */
    int down;                     /* Values are decreasing? */
    int ilut;                     /* Loop counter for LUT elements */
    int monotonic;                /* LUT elements distinct and monotonic? */
@@ -1225,9 +1226,10 @@ AstLutMap *astInitLutMap_( void *mem, size_t size, int init,
 
 /* Determine if the element values are all good, distinct and increase 
    or decrease monotonically. We can only implement the inverse
-   transformation if this is so. */
+   transformation if this is so. Use the astISBAD macro to include NaNs
+   in the checking as well as AST__BAD values. */
    } else {
-      if( lut[ 0 ] == AST__BAD ) {
+      if( astISBAD(lut[ 0 ]) ) {
          monotonic = 0;
 
       } else {
@@ -1236,7 +1238,7 @@ AstLutMap *astInitLutMap_( void *mem, size_t size, int init,
          monotonic = up || down;
          if ( monotonic ) {
             for ( ilut = 0; ilut < ( nlut - 1 ); ilut++ ) {
-               if( lut[ ilut  + 1 ] == AST__BAD ) {
+               if( astISBAD(lut[ ilut  + 1 ]) ) {
                   monotonic = 0;
                } else {
                   monotonic = up ? ( lut[ ilut + 1 ] > lut[ ilut ] ) :
@@ -1265,6 +1267,12 @@ AstLutMap *astInitLutMap_( void *mem, size_t size, int init,
 
 /* Allocate memory and store the lookup table. */
          new->lut = astStore( NULL, lut, sizeof( double ) * (size_t) nlut );
+
+/* Replace an NaN values by AST__BAD */
+         p = new->lut;
+         for ( ilut = 0; ilut < nlut; ilut++, p++ ) {
+            if( astISNAN(*p) ) *p = AST__BAD;
+         }
 
 /* Initialise the retained input and output coordinate values. */
          new->last_fwd_in = AST__BAD;

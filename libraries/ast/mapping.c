@@ -119,11 +119,6 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 
 /* Include files. */
 /* ============== */
-
-/* Configuration results. */
-/* ---------------------- */
-#include <config.h>
-
 /* Interface definitions. */
 /* ---------------------- */
 #include "error.h"               /* Error reporting facilities */
@@ -145,15 +140,6 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#if !HAVE_DECL_ISNAN
-#  if HAVE_ISNAN
-     /* Seems that math.h does not include a prototype for isnan */
-     int isnan( double );
-#  else
-#    define isnan(x) ((x) != (x))
-#  endif
-#endif
 
 /* Module type definitions. */
 /* ======================== */
@@ -5333,7 +5319,7 @@ static PN *InterpPN( int np, double *x, double *y ) {
 /* If any of the coefficients could not be found return NULL. */
     ret = pn[ 0 ];
     for( i = 0; i < np; i++ ) {
-       if( isnan( ret->coeff[ i ] ) ) {
+       if( astISNAN( ret->coeff[ i ] ) ) {
           ret = astFree( ret );
           break;
        }
@@ -10425,6 +10411,14 @@ f        The global status.
 c     astSimplify()
 f     AST_SIMPLIFY = INTEGER
 *        A new pointer to the (possibly simplified) Mapping.
+
+*  Applicability:
+*     Mapping
+*        This function applies to all Mappings.
+*     FrameSet
+*        If the supplied Mapping is a FrameSet, the returned Mapping
+*        will be a copy of the supplied FrameSet in which all the
+*        inter-Frame Mappings have been simplified.
 
 *  Notes:
 *     - This function can safely be applied even to Mappings which

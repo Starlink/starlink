@@ -143,11 +143,6 @@ f     - AST_SPECADD: Add a celestial coordinate conversion to an SpecMap
 
 /* Include files. */
 /* ============== */
-
-/* Configuration results. */
-/* ---------------------- */
-#include <config.h>
-
 /* Interface definitions. */
 /* ---------------------- */
 #include "slalib.h"              /* SLALIB interface */
@@ -170,15 +165,6 @@ f     - AST_SPECADD: Add a celestial coordinate conversion to an SpecMap
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
-
-#if !HAVE_DECL_ISNAN
-#  if HAVE_ISNAN
-     /* Seems that math.h does not include a prototype for isnan */
-     int isnan( double );
-#  else
-#    define isnan(x) ((x) != (x))
-#  endif
-#endif
 
 /* Module Variables. */
 /* ================= */
@@ -2669,7 +2655,7 @@ static int SystemChange( int cvt_code, int np, double *values, double *args,
                   d = temp + f2;
                   if( d > 0.0 ) {
                      *pv = AST__C*( ( temp - f2 )/d );
-                     if( isnan( *pv ) ) *pv = AST__BAD;
+                     if( astISNAN( *pv ) ) *pv = AST__BAD;
                   } else {
                      *pv = AST__BAD;
                   }
@@ -2698,7 +2684,7 @@ static int SystemChange( int cvt_code, int np, double *values, double *args,
                      d = ( AST__C - ( *pv ) )/d;
                      if( d >= 0.0 ) {
                         *pv = temp*sqrt( d );
-                        if( isnan( *pv ) ) *pv = AST__BAD;
+                        if( astISNAN( *pv ) ) *pv = AST__BAD;
                      } else {
                         *pv = AST__BAD;
                      }
@@ -2784,7 +2770,7 @@ static int SystemChange( int cvt_code, int np, double *values, double *args,
             pv++;
             if( *pv != AST__BAD && *pv != 0.0 ) {
                *pv = AST__C/( *pv );
-               if( isnan( *pv ) ) *pv = AST__BAD;
+               if( astISNAN( *pv ) ) *pv = AST__BAD;
             } else {
                *pv = AST__BAD;
             }
@@ -2802,7 +2788,7 @@ static int SystemChange( int cvt_code, int np, double *values, double *args,
             pv++;
             if( *pv != AST__BAD ) {
                *pv = AST__C/( *pv );
-               if( isnan( *pv ) ) *pv = AST__BAD;
+               if( astISNAN( *pv ) ) *pv = AST__BAD;
             } else {
                *pv = AST__BAD;
             }
@@ -2820,7 +2806,7 @@ static int SystemChange( int cvt_code, int np, double *values, double *args,
             pv++;
             if( *pv != AST__BAD && *pv != 0.0 ) {
                *pv = AST__C/( ( *pv )*Refrac( *pv ) );
-               if( isnan( *pv ) ) *pv = AST__BAD;
+               if( astISNAN( *pv ) ) *pv = AST__BAD;
             } else {
                *pv = AST__BAD;
             }
@@ -2850,7 +2836,7 @@ static int SystemChange( int cvt_code, int np, double *values, double *args,
                *pv = temp;
                for( iter = 0; iter < 3; iter++ ) {
                   *pv = temp/Refrac( *pv );
-                  if( isnan( *pv ) ) {
+                  if( astISNAN( *pv ) ) {
                      *pv = AST__BAD;
                      break;
                   }
@@ -2875,7 +2861,7 @@ static int SystemChange( int cvt_code, int np, double *values, double *args,
                temp = 1.0 - ( *pv )/AST__C;
                temp *= temp;
                *pv = AST__C*( 1.0 - temp )/( 1.0 + temp );
-               if( isnan( *pv ) ) *pv = AST__BAD;
+               if( astISNAN( *pv ) ) *pv = AST__BAD;
             }
          }
       } else {
@@ -2895,7 +2881,7 @@ static int SystemChange( int cvt_code, int np, double *values, double *args,
                   temp = (AST__C - *pv )/temp;
                   if( temp >= 0.0 ) {
                      *pv = AST__C*( 1.0 - sqrt( temp ) );
-                     if( isnan( *pv ) ) *pv = AST__BAD;
+                     if( astISNAN( *pv ) ) *pv = AST__BAD;
                   } else {
                      *pv = AST__BAD;
                   }
@@ -2919,7 +2905,7 @@ static int SystemChange( int cvt_code, int np, double *values, double *args,
                temp = 1.0 + ( *pv )/AST__C;
                temp *= temp;
                *pv = AST__C*( temp - 1.0 )/( temp + 1.0 );
-               if( isnan( *pv ) ) *pv = AST__BAD;
+               if( astISNAN( *pv ) ) *pv = AST__BAD;
             }
          }
       } else {
@@ -2939,7 +2925,7 @@ static int SystemChange( int cvt_code, int np, double *values, double *args,
                   temp = (AST__C + *pv )/temp;
                   if( temp >= 0.0 ) {
                      *pv = AST__C*( sqrt( temp ) - 1.0 );
-                     if( isnan( *pv ) ) *pv = AST__BAD;
+                     if( astISNAN( *pv ) ) *pv = AST__BAD;
                   } else {
                      *pv = AST__BAD;
                   }
@@ -2963,7 +2949,7 @@ static int SystemChange( int cvt_code, int np, double *values, double *args,
                temp = 1.0 + ( *pv );
                temp *= temp;
                *pv = AST__C*( temp - 1.0 )/( temp + 1.0 );
-               if( isnan( *pv ) ) *pv = AST__BAD;
+               if( astISNAN( *pv ) ) *pv = AST__BAD;
             }
          }
       } else {
@@ -2983,7 +2969,7 @@ static int SystemChange( int cvt_code, int np, double *values, double *args,
                   temp = (AST__C + *pv )/temp;
                   if( temp >= 0.0 ) {
                      *pv = sqrt( temp ) - 1.0;
-                     if( isnan( *pv ) ) *pv = AST__BAD;
+                     if( astISNAN( *pv ) ) *pv = AST__BAD;
                   } else {
                      *pv = AST__BAD;
                   }

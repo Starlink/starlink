@@ -2457,7 +2457,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    with the Mappings on either side of it in the list. This can only be
    done in series for a WcsMap. */
 /* ===================================================================== */
-   } else if( series ) {
+   } else if( series && *nmap > 1 ) {
 
 /* Store the classes of the neighbouring Mappings in the list. */
       class1 = ( where > 0 ) ? astGetClass( ( *map_list )[ where - 1 ] ) : NULL;
@@ -2536,6 +2536,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                                ( *invert_list )[ where ], 
                                ( *invert_list )[ where + 1 ], &do2 );
          } else {
+            do2 = 0;
             swaphi = 0;
          }
 
@@ -2577,6 +2578,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                                ( *invert_list )[ where - 1 ], 
                                ( *invert_list )[ where ], &do1 );
          } else {
+            do1 = 0;
             swaplo = 0;
          }
 

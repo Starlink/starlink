@@ -26198,11 +26198,20 @@ AstPlot *astInitPlot_( void *mem, size_t size, int init, AstPlotVtab *vtab,
                 "in the graphics world coordinate system.", name );
    }
 
+/* Check that neither dimension of the graphbox is bad. */
+   if( astISBAD(graphbox[0]) || astISBAD(graphbox[1]) ||
+       astISBAD(graphbox[2]) || astISBAD(graphbox[3]) ) {
+      astError( AST__BADBX, "astInitPlot(%s): The plotting area has undefined limits "
+                "in the graphics world coordinate system.", name );
+   }
+
 /* Check that neither dimension of the basebox is zero. */
-   if( ( basebox[ 2 ] == basebox[ 0 ] ||
-         basebox[ 3 ] == basebox[ 1 ] ) && astOK ){
-      astError( AST__BADBX, "astInitPlot(%s): The plotting area has zero size "
-                "in the coordinate system of the %s.", name, mess );
+   if( astISBAD(basebox[2]) || astISBAD(basebox[0]) ) {
+      astError( AST__BADBX, "astInitPlot(%s): The limits of the horizontal "
+                "axis of the %s are undefined or bad.", name, name );
+   } else if( astISBAD(basebox[3]) || astISBAD(basebox[1]) ) {
+      astError( AST__BADBX, "astInitPlot(%s): The limits of the vertical "
+                "axis of the %s are undefined or bad.", name, name );
    }
 
 /* Create a Frame which describes the graphics world coordinate system. */

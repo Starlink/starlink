@@ -4480,6 +4480,7 @@ AstMatrixMap *astInitMatrixMap_( void *mem, size_t size, int init,
    AstMatrixMap *new;              /* Pointer to new MatrixMap */
    double *fmat;                   /* Pointer to the forward matrix */
    double *imat;                   /* Pointer to the inverse matrix */
+   int i;                          /* Loop count */
    int nel;                        /* No. of elements in matrix array */
    int used_form;                  /* Form limited to 0, 1 or 2 */
 
@@ -4538,6 +4539,10 @@ AstMatrixMap *astInitMatrixMap_( void *mem, size_t size, int init,
    values in it. */
          fmat = (double *) astStore( NULL, (void *) matrix, 
                                      sizeof(double)*(size_t)nel );
+/* Replace any NaNs by AST__BAD */
+         for( i = 0; i < nel; i++ ) {
+            if( astISNAN(fmat[ i ]) ) fmat[ i ] = AST__BAD;
+         }
 
 /* Create an inverse matrix if possible. */
          imat = InvertMatrix( used_form, nout, nin, fmat );

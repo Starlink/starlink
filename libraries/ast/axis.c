@@ -598,6 +598,8 @@ static const char *AxisFormat( AstAxis *this, double value ) {
 
 /* Initialise. */
    result = NULL;
+   nc = 0;
+   x = AST__BAD;
 
 /* Check if a bad coordinate value was supplied and return a pointer to an
    appropriate string if necessary. */

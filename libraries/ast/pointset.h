@@ -93,7 +93,12 @@
 *           Bad value flag for coordinate data.
 *
 *     Protected:
-*        None.
+*        astISBAD
+*           Check if a value is AST__BAD or NaN.
+*        astISGOOD
+*           Check if a value is not AST__BAD or NaN.
+*        astISNAN
+*           Check if a value is NaN.
 
 *  Type Definitions:
 *     Public:
@@ -130,6 +135,11 @@
 
 /* Include files. */
 /* ============== */
+
+/* Configuration results. */
+/* ---------------------- */
+#include <config.h>
+
 /* Interface definitions. */
 /* ---------------------- */
 #include "object.h"              /* Base Object class */
@@ -139,6 +149,17 @@
 #include <float.h>
 #if defined(astCLASS)            /* Protected */
 #include <stddef.h>
+#include <math.h>
+
+#if !HAVE_DECL_ISNAN
+#  if HAVE_ISNAN
+     /* Seems that math.h does not include a prototype for isnan */
+     int isnan( double );
+#  else
+#    define isnan(x) ((x) != (x))
+#  endif
+#endif
+
 #endif
 
 /* Macros. */
@@ -173,6 +194,128 @@
 /* Define AST__BAD to be the most negative (normalised) double
    value. */
 #define AST__BAD (-(DBL_MAX))
+
+#if defined(astCLASS)            /* Protected */
+
+/*
+*+
+*  Name:
+*     astISNAN
+
+*  Type:
+*     Protected macro.
+
+*  Purpose:
+*     Test if a double is NaN.
+
+*  Synopsis:
+*     #include "pointset.h"
+*     astISNAN(value)
+
+*  Class Membership:
+*     Defined by the PointSet class.
+
+*  Description:
+*     This macro expands to a integer valued expression which is zero
+*     if and only if the supplied value equals NaN ("Not a Number").
+
+*  Parameters:
+*     value
+*        The value to be tested. This should be a double.
+
+*  Examples:
+*     if( astISNAN(x) ) x = AST__BAD;
+*        If "x" is NaN replace it with AST__BAD.
+
+*  Notes:
+*     - To avoid problems with some compilers, you should not leave
+*     any white space around the macro arguments.
+*-
+*/
+
+#define astISNAN(value) isnan(value)
+
+/*
+*+
+*  Name:
+*     astISGOOD
+
+*  Type:
+*     Protected macro.
+
+*  Purpose:
+*     Test if a double is neither AST__BAD nor NaN.
+
+*  Synopsis:
+*     #include "pointset.h"
+*     astISGOOD(value)
+
+*  Class Membership:
+*     Defined by the PointSet class.
+
+*  Description:
+*     This macro expands to a integer valued expression which is zero
+*     if and only if the supplied value equals AST__BAD or is NaN ("Not a 
+*     Number").
+
+*  Parameters:
+*     value
+*        The value to be tested. This should be a double.
+
+*  Examples:
+*     if( astISGOOD(x) ) y = x;
+*        Checks that "x" is usable before assigning it to y.
+
+*  Notes:
+*     - To avoid problems with some compilers, you should not leave
+*     any white space around the macro arguments.
+*-
+*/
+
+#define astISGOOD(value) ( (value) != AST__BAD && !astISNAN(value) )
+
+
+/*
+*+
+*  Name:
+*     astISBAD
+
+*  Type:
+*     Protected macro.
+
+*  Purpose:
+*     Test if a double is either AST__BAD or NaN.
+
+*  Synopsis:
+*     #include "pointset.h"
+*     astISBAD(value)
+
+*  Class Membership:
+*     Defined by the PointSet class.
+
+*  Description:
+*     This macro expands to a integer valued expression which is non-zero
+*     if and only if the supplied value equals AST__BAD or is NaN ("Not a 
+*     Number").
+
+*  Parameters:
+*     value
+*        The value to be tested. This should be a double.
+
+*  Examples:
+*     if( astISBAD(x) ) astError( ... );
+*        Reports an error if "x" is bad.
+
+*  Notes:
+*     - To avoid problems with some compilers, you should not leave
+*     any white space around the macro arguments.
+*-
+*/
+
+#define astISBAD(value) ( (value) == AST__BAD || astISNAN(value) )
+
+#endif
+
 
 /* Type Definitions. */
 /* ================= */
