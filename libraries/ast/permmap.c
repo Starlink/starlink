@@ -108,6 +108,8 @@ static void Delete( AstObject * );
 static void Dump( AstObject *, AstChannel * );
 static int *GetOutPerm( AstPermMap * );
 static int *GetInPerm( AstPermMap * );
+static int NullPerm( AstPermMap *, int );
+
 
 /* Member functions. */
 /* ================= */
@@ -923,8 +925,8 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    whereas previously it was stored. */
       permmap = (AstPermMap *) ( *map_list )[ where ];
       if ( !simpler ) {
-         simpler = ( !store_in && permmap->inperm ) ||
-                   ( !store_out && permmap->outperm );
+         simpler = ( !store_in && !NullPerm( permmap, 0 ) ) ||
+                   ( !store_out && !NullPerm( permmap, 1 ) );
       }
 
 /* If we still haven't detected any simplification, then compare the
@@ -1002,6 +1004,110 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 
 /* If an error occurred, clear the returned value. */
    if ( !astOK ) result = -1;
+
+/* Return the result. */
+   return result;
+}
+
+static int NullPerm( AstPermMap *this, int forward ){
+/*
+*  Name:
+*     NullPerm
+
+*  Purpose:
+*     See if a PermMap transformation represents a null axis permutation.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "permmap.h"
+*     int NullPerm( AstPermMap *this, int forward )
+
+*  Class Membership:
+*     PermMap method 
+
+*  Description:
+*     This function returns a logical value indicating if the specified
+*     transformation of the supplied PermMap is a null (i.e. unit)
+*     transformation. 
+
+*  Parameters:
+*     this
+*        Pointer to the PermMap.
+*     forward
+*        Check the forward transformation? Otherise, check the inverse
+*        transformation.
+
+*  Returned Value:
+*     One if the specified transformation is a null axis permutation.
+*     Zero otherwise.
+
+*  Notes:
+*     - A value of zero will be returned if this function is invoked
+*     with the global error status set, or if it should fail for any
+*     reason.
+*/
+
+/* Local Variables: */
+   int i;                     /* Coordinate index */
+   int nin;                   /* Number of Mapping inputs */
+   int nout;                  /* Number of Mapping outputs */
+   int result;                /* Returned value */
+
+/* Initialise the returned result. */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* First check the forward transformation, given by the outperm array. */
+   if( forward ) { 
+
+/* If no outperm array is stored, every output is derived from the
+   corresponding input. Therefore, return 1 indicating a null axis 
+   permutation. */
+      if( !this->outperm ) {
+         result = 1;
+
+/* Otherwise, check that every element in the outperm array indicates
+   that the output is derived from the input with the saem index. */
+      } else {
+         result = 1;
+         nout = astGetNout( this );
+         for( i = 0; i < nout; i++ ) {
+            if( this->outperm[ i ] != i ) {
+               result = 0;
+               break;
+            }
+         }
+      }
+
+/* Now check the inverse transformation, given by the inperm array. */
+   } else {
+
+/* If no inperm array is stored, every input is derived from the
+   corresponding output. Therefore, return 1 indicating a null axis 
+   permutation. */
+      if( !this->inperm ) {
+         result = 1;
+
+/* Otherwise, check that every element in the inperm array indicates
+   that the input is derived from the output with the same index. */
+      } else {
+         result = 1;
+         nin = astGetNin( this );
+         for( i = 0; i < nin; i++ ) {
+            if( this->inperm[ i ] != i ) {
+               result = 0;
+               break;
+            }
+         }
+      }
+   }
+
+/* If an error has occurred, return zero. */
+   if( !astOK ) result = 0;
 
 /* Return the result. */
    return result;
@@ -2252,3 +2358,5 @@ int *astGetOutPerm_( AstPermMap *this ){
    if( !astOK ) return NULL;
    return (**astMEMBER(this,PermMap,GetOutPerm))( this );
 }
+
+

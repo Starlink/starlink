@@ -93,6 +93,7 @@ f     The WinMap class does not define any new routines beyond those
 #include "unitmap.h"             /* Unit mappings */
 #include "zoommap.h"             /* Zoom mappings */
 #include "permmap.h"             /* Axis permutations */
+#include "cmpmap.h"              /* Compound mappings */
 #include "wcsmap.h"              /* Celestial projections */
 #include "mapping.h"             /* Coordinate mappings (parent class) */
 #include "channel.h"             /* I/O channels */
@@ -677,31 +678,41 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 */
 
 /* Local Variables: */
+   AstCmpMap *cm;        /* Pointer to neighbouring CmpMap */
    AstMapping **maplt;   /* New mappings list pointer */
    AstMapping *map2;     /* Pointer to replacement Mapping */
    AstMapping *mc[2];    /* Copies of supplied Mappings to swap */
+   AstMapping *nc[2];    /* Copies of neighbouring Mappings to merge */
    AstMapping *smc0;     /* Simplied Mapping */
    AstMapping *smc1;     /* Simplied Mapping */
-   AstWinMap *newwm;     /* Pointer to replacement WinMap */
    AstMatrixMap *mtr;    /* Pointer to replacement MatrixMap */
+   AstWinMap *newwm2;    /* Second component WinMap */
+   AstWinMap *newwm;     /* Pointer to replacement WinMap */
+   AstWinMap *oldwm;     /* Pointer to supplied WinMap */
    const char *class1;   /* Pointer to first Mapping class string */
    const char *class2;   /* Pointer to second Mapping class string */
    const char *nclass;   /* Pointer to neighbouring Mapping class */
+   double *a;            /* Pointer to zero terms */
    double *b;            /* Pointer to scale terms */
+   int *invlt;           /* New invert flags list pointer */
+   int cmlow;            /* Is lower neighbour a CmpMap? */
    int diag;             /* Is WinMap equivalent to a diagonal matrix? */
    int i1;               /* Index of first WinMap to merge */
    int i2;               /* Index of last WinMap to merge */
    int i;                /* Loop counter */
    int ic[2];            /* Copies of supplied invert flags to swap */
+   int inc[4];           /* Copies of supplied invert flags to merge */
    int invert;           /* Should the inverted Mapping be used? */
-   int *invlt;           /* New invert flags list pointer */
    int neighbour;        /* Index of Mapping with which to swap */
+   int nin2;             /* No. of inputs for second component WinMap */
    int nin;              /* Number of coordinates for WinMap */
    int nmapt;            /* No. of Mappings in list */
    int nstep1;           /* No. of Mappings backwards to next mergable Mapping */
    int nstep2;           /* No. of Mappings forward to next mergable Mapping */
    int old_winv;         /* original Invert value for supplied WinMap */
    int result;           /* Result value to return */
+   int ser;              /* Are Mappings applied in series? */
+   int swap;             /* Is there an advantage in swapping mappings? */
    int swaphi;           /* Can WinMap be swapped with higher neighbour? */
    int swaplo;           /* Can WinMap be swapped with lower neighbour? */
 
@@ -713,6 +724,9 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 
 /* Get the number of axes for the WinMap. */
    nin = astGetNin( ( *map_list )[ where ] );
+
+/* Get a pointer to the WinMap. */
+   oldwm = (AstWinMap *) this;
 
 /* First of all, see if the WinMap can be replaced by a simpler Mapping,
    without reference to the neighbouring Mappings in the list.           */
@@ -846,6 +860,139 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                ( *nmap )--;
                result = i1;
 
+            }
+
+/* If one of the neighbours is a (parallel) CmpMap, we convert the WinMap
+   into an equivalent parallel CmpMap, and then merge this parallel
+   CmpMap with the neighbouring parallel CmpMap to create a parallel CmpMap
+   containing two series CmpMaps. */
+         } else if( ( class1 && !strcmp( "CmpMap", class1 ) ) ||
+                    ( class2 && !strcmp( "CmpMap", class2 ) ) ) {
+
+/* Identify the WinMap and the CmpMap. */
+            if( class1 && !strcmp( "CmpMap", class1 ) ) {
+               i1 = where - 1;
+               i2 = where;
+               cm = (AstCmpMap *) ( *map_list )[ where - 1 ];
+               cmlow = 1;
+
+            } else {
+               i1 = where;
+               i2 = where + 1;
+               cm = (AstCmpMap *) ( *map_list )[ where + 1 ];
+               cmlow = 0;
+
+            }
+
+/* Temporarily set the required Invert attributes in the two Mappings. */
+            inc[ 0 ] = astGetInvert( ( *map_list )[ i1 ] );
+            astSetInvert( ( *map_list )[ i1 ], ( *invert_list )[ i1 ] );
+
+            inc[ 1 ] = astGetInvert( ( *map_list )[ i2 ] );
+            astSetInvert( ( *map_list )[ i2 ], ( *invert_list )[ i2 ] );
+
+/* Now get pointers to the scale and zero terms of the nominated WinMap
+   (these describe the forward transformation, taking into account the 
+   setting of the Invert flag). */
+            (void) astWinTerms( oldwm , &a, &b );   
+
+/* Get pointers to the two components of the parallel CmpMap. */
+            astDecompose( cm, mc, mc + 1, &ser, ic, ic + 1 );
+
+/* Check component Mappings are combined in parallel. */
+            map2 = NULL;
+            if( astOK && !ser ) { 
+
+/* Temporarily set the required Invert attributes in the two component 
+   Mappings to the indicated values. */
+               inc[ 2 ] = astGetInvert( mc[ 0 ] );
+               astSetInvert( mc[ 0 ], ic[ 0 ] );
+
+               inc[ 3 ] = astGetInvert( mc[ 1 ] );
+               astSetInvert( mc[ 1 ], ic[ 1 ] );
+
+/* Create the first of two corresponding WinMaps, initially with undefined 
+   corners. These could be combined into a parallel CmpMap which would be 
+   equivalent to the nominated WinMap. The number of inputs for each WinMap 
+   is equal to either the number of outputs or inputs of the corresponding 
+   component of the CmpMap, depending on whether the CmpMap is upper or lower
+   neighbour. */
+               nin = cmlow ? astGetNout( mc[ 0 ] ):astGetNin( mc[ 0 ] );
+               newwm = astWinMap( nin, NULL, NULL, NULL, NULL, "" );
+               if( astOK ) {
+
+/* Store the first "nin" scale and zero terms from the nominated WinMap
+   in the new WinMap. */
+                  for( i = 0; i < nin; i++ ) {
+                     (newwm->a)[ i ] = a[ i ];
+                     (newwm->b)[ i ] = b[ i ];
+                  }
+               }
+
+/* Now create the second WinMap in the same way, which transforms the
+   remaining outputs of the CmpMap. */
+               nin2 = cmlow ? astGetNout( mc[ 1 ] ):astGetNin( mc[ 1 ] );
+               newwm2 = astWinMap( nin2, NULL, NULL, NULL, NULL, "" );
+               if( astOK ) {
+
+/* Store the remaining scale and zero terms from the nominated WinMap
+   in the new WinMap. */
+                  for( i = 0; i < nin2; i++ ) {
+                     (newwm2->a)[ i ] = a[ i + nin ];
+                     (newwm2->b)[ i ] = b[ i + nin ];
+                  }
+               }
+
+/* Combine the two corresponding lower component Mappings into a series 
+   CmpMap, and likewise combine the two corresponding upper component
+   Mappings into a series CmpMap. */
+               if( cmlow ) {
+                  nc[ 0 ] = (AstMapping *) astCmpMap( mc[ 0 ], newwm, 1, "" );
+                  nc[ 1 ] = (AstMapping *) astCmpMap( mc[ 1 ], newwm2, 1, "" );
+               } else {
+                  nc[ 0 ] = (AstMapping *) astCmpMap( newwm, mc[ 0 ], 1, "" );
+                  nc[ 1 ] = (AstMapping *) astCmpMap( newwm2, mc[ 1 ], 1, "" );
+               }
+               newwm = astAnnul( newwm );
+               newwm2 = astAnnul( newwm2 );
+               
+/* Combine the two series CmpMap into a single parallel CmpMap. */
+               map2 = (AstMapping *) astCmpMap( nc[ 0 ], nc[ 1 ], 0, "" );
+               nc[ 0 ] = astAnnul( nc[ 0 ] );
+               nc[ 1 ] = astAnnul( nc[ 1 ] );
+
+/* Re-instate the original Invert attributes in the two component Mappings. */
+               astSetInvert( mc[ 0 ], inc[ 2 ] );
+               astSetInvert( mc[ 1 ], inc[ 3 ] );
+            }
+
+/* Free resources. */
+            mc[ 0 ] = astAnnul( mc[ 0 ] );
+            mc[ 1 ] = astAnnul( mc[ 1 ] );
+            a = astFree( a );
+            b = astFree( b );
+
+/* Re-instate the original Invert attributes. */
+            astSetInvert( ( *map_list )[ i1 ], inc[ 0 ] );
+            astSetInvert( ( *map_list )[ i2 ], inc[ 1 ] );
+
+/* If the above produced a new Mapping, annul the supplied pointers for
+   the two merged Mappings, store the pointer for the new merged Mapping,
+   and shuffle the remaining Mappings down to fill the space left. Nullify 
+   the end slot which is no longer used, reduce the number of Mappings in 
+   the list by 1, and return the index of the first modified Mapping. */
+            if( map2 ) {
+               astAnnul( ( *map_list )[ i1 ] );
+               astAnnul( ( *map_list )[ i2 ] );
+               ( *map_list )[ i1 ] = map2;
+               ( *invert_list )[ i1 ] = 0;
+               for( i = i2 + 1; i < *nmap; i++ ){
+                  ( *map_list )[ i - 1 ] = ( *map_list )[ i ];
+                  ( *invert_list )[ i - 1 ] = ( *invert_list )[ i ];
+               }
+               ( *map_list )[ *nmap - 1 ] = NULL;
+               (*nmap)--;
+               result = i1;
             }
 
 /* If the WinMap could not merge directly with either of its neighbours,
@@ -997,8 +1144,9 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 
 /* If there is no Mapping available for merging, it may still be
    advantageous to swap with a neighbour because the swapped Mapping may
-   be simpler than the original Mappings. For instance, a PermMap may
-   strip axes of the WinMap leaving only a UnitMap. */
+   be simpler than the original Mappings. For instance, a PermMap may 
+   strip axes of the WinMap leaving only a UnitMap. Also, the two neighbours 
+   may be able to merge. */
             } else if( swaphi || swaplo ) {
 
 /* Try swapping with each possible neighbour in turn. */
@@ -1039,38 +1187,79 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                         WinWcs( mc, ic, where - i1 );
                      }
 
-/* If neither of the swapped Mappings can be simplified further, then there
-   is no point in swapping the Mappings, so just annul the map copies. */
-                     smc0 = astSimplify( mc[0] );
-                     smc1 = astSimplify( mc[1] );
+/* See if the two neighbouring Mappings can merge now that the nominated
+   Mapping is no longer in between them. First get a list of Mapping
+   pointers containing the two Mappings to be merged, and associated
+   invert flags. */
+                     if( i == 0 && where != *nmap - 1 ) {
+                        nc[ 0 ] = astClone( mc[ 1 ] );
+                        nc[ 1 ] = astClone( (*map_list)[ where + 1 ] );
+                        inc[ 0 ] = ic[ 1 ];
+                        inc[ 1 ] = (*invert_list)[ where + 1 ];
 
-                     if( astGetClass( smc0 ) == astGetClass( mc[0] ) &&
-                         astGetClass( smc1 ) == astGetClass( mc[1] ) ) {
-      
-                        mc[ 0 ] = (AstMapping *) astAnnul( mc[ 0 ] );
-                        mc[ 1 ] = (AstMapping *) astAnnul( mc[ 1 ] );
+                     } else if( i == 1 && where > 0 ) {
+                        nc[ 0 ] = astClone( (*map_list)[ where - 1 ] );
+                        nc[ 1 ] = astClone( mc[ 0 ] );
+                        inc[ 0 ] = (*invert_list)[ where - 1 ];
+                        inc[ 1 ] = ic[ 0 ];
 
-/* If one or both of the swapped Mappings could be simplified, then annul
-   the supplied Mappings and return the swapped mappings, storing the index 
-   of the first modified Mapping. */
                      } else {
-                        (void ) astAnnul( ( (*map_list) + i1 )[0] );
-                        (void ) astAnnul( ( (*map_list) + i1 )[1] );
-      
-                        ( (*map_list) + i1 )[0] = mc[ 0 ];
-                        ( (*map_list) + i1 )[1] = mc[ 1 ];
-      
-                        ( (*invert_list) + i1 )[0] = ic[ 0 ];
-                        ( (*invert_list) + i1 )[1] = ic[ 1 ];
-      
-                        result = i1;
-                        break;
+                        nc[ 0 ] = NULL;
+                        nc[ 1 ] = NULL;
                      }
 
-/* Annul the simplied Mappings */
-                     smc0 = astAnnul( smc0 );
-                     smc1 = astAnnul( smc1 );
+/* If both neighbours are available, use astMapMerge to see if it is
+   possible to merge the two Mappings. */
+                     swap = 0;
+                     if( nc[ 0 ] && nc[ 1 ] ) {
+                        nmapt = 2;
+                        maplt = nc;
+                        invlt = inc;
+                        map2 = astClone( nc[ 0 ] );
+                        swap = astMapMerge( map2, 0, series, &nmapt, &maplt, &invlt );
+                        map2 = astAnnul( map2 );
+                        if( swap == -1 ) {
+                           map2 = astClone( nc[ 1 ] );
+                           swap = astMapMerge( map2, 1, series, &nmapt, &maplt, &invlt );
+                           map2 = astAnnul( map2 );
+                        }
+                        swap = ( nmapt < 2 ) ? 1 : 0;
+                     }
 
+/* Free resources. */
+                     if( nc[ 0 ] ) nc[ 0 ] = astAnnul( nc[ 0 ] );
+                     if( nc[ 1 ] ) nc[ 1 ] = astAnnul( nc[ 1 ] );
+
+/* If the neighbours could not merge, see if either swapped Mapping can
+   be simplified. */
+                     if( !swap ) {
+                        smc0 = astSimplify( mc[0] );
+                        if(  smc0 != mc[0] ) {
+                           swap = 1;
+                        } else {
+                           smc1 = astSimplify( mc[1] );
+                           swap = ( smc1 != mc[1] );
+                           smc1 = astAnnul( smc1 );
+                        }
+                        smc0 = astAnnul( smc0 );
+                     }
+
+/* If there is some point in swapping the Mappings, swap them in the
+   supplied lists. Otherwise annul the swapped Mappings. */
+                     if( swap ) {
+                        (*map_list)[ i1 ] = astAnnul( (*map_list)[ i1 ] );
+                        (*map_list)[ i2 ] = astAnnul( (*map_list)[ i2 ] );
+                        (*map_list)[ i1 ] = mc[ 0 ];
+                        (*map_list)[ i2 ] = mc[ 1 ];
+                        (*invert_list)[ i1 ] = ic[ 0 ];
+                        (*invert_list)[ i2 ] = ic[ 1 ];
+                        result = i1;
+                        break;
+
+                     } else {
+                        mc[ 0 ] = astAnnul( mc[ 0 ] );
+                        mc[ 1 ] = astAnnul( mc[ 1 ] );
+                     }
                   }
                }
             }
@@ -2040,7 +2229,7 @@ static void WinPerm( AstMapping **maps, int *inverts, int iwm  ){
          bb = w1->b;
          aa = w1->a;
 
-/* Thinking first about the inverse CmpMap, consider each of the input axes 
+/* Thinking first about the inverse WinMap, consider each of the input axes 
    of the PermMap. */
          for( i = 0; i < npin; i++ ){
 
@@ -2062,7 +2251,7 @@ static void WinPerm( AstMapping **maps, int *inverts, int iwm  ){
 
          }
 
-/* Now consider the forward CmpMap. Any constants produced by the forward
+/* Now consider the forward WinMap. Any constants produced by the forward
    PermMap would previously have been scaled by the forward WinMap. Since
    there will be no forward WinMap to perform this scaling in the returned
    Mappings, we need to change the constant values to be the values after

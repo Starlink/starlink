@@ -19126,6 +19126,16 @@ f-
 function has been added which allows an estimate to be made of the rate of 
 change of a Mapping output with respect to one of the Mapping inputs. 
 
+\item All attribute names for Frames of any class may now include an optional
+axis specifier. This includes those attributes which describe a property
+of the whole Frame. For instance, the Domain attribute may now be
+specified as "Domain(1)" in addition to the simpler "Domain". In cases
+such as this, where the attribute describes a property of the whole
+Frame, axis specifiers will usually be ignored. The exception is that a
+CmpFrame will use the presence of an axis specifier to indicate that the
+attribute name relates to the primary Frame containing the specified
+axis, rather than to the CmpFrame as a whole.
+
 \item A new subclass of Mapping, the GrismMap, has been added which
 models the spectral dispersion produced by a grating, prism or grism.
 
