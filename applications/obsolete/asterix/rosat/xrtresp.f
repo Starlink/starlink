@@ -91,11 +91,9 @@
 
 
       IF (HRI) THEN
-c        CALL AST_PATH('AST_ETC','XRTCAL','hri_drm',CALDIR,L,STATUS)
-        CALDIR='$AST_ETC/hri_drm'
+        CALL AST_PATH('AST_ETC','XRTCAL','hri_drm',CALDIR,L,STATUS)
       ELSE
-c        CALL AST_PATH('AST_ETC','XRTCAL','drmpspc',CALDIR,L,STATUS)
-        CALDIR='$AST_ETC/drmpspc'
+        CALL AST_PATH('AST_ETC','XRTCAL','drmpspc',CALDIR,L,STATUS)
       ENDIF
       L=CHR_LEN(CALDIR)
       CALL USI_DEF0C('RESPFILE', CALDIR(:L), STATUS)

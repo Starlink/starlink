@@ -27,6 +27,7 @@
 *    Local Constants :
 *    Local variables :
       CHARACTER*132 BUFF
+      CHARACTER*12 ISDIR,ISSEQ
       LOGICAL ISAFILE
 *-
       IF (STATUS.EQ.SAI__OK) THEN
@@ -54,10 +55,14 @@
         IF (STATUS.EQ.SAI__OK) THEN
 
           L=CHR_LEN(BUFF)
+
 *  if relative path defined then append it
           IF (CHR_LEN(REL).GT.0) THEN
 *  but first see if what we have already points to a file
-            INQUIRE(FILE=BUFF,EXIST=ISAFILE)
+            INQUIRE(FILE=BUFF,EXIST=ISAFILE,
+     :         DIRECT=ISDIR,SEQUENTIAL=ISSEQ)
+*  exclude directories
+            ISAFILE=(ISAFILE.AND.(ISDIR.EQ.'YES'.OR.ISSEQ.EQ.'YES'))
             IF (.NOT.ISAFILE) THEN
               INQUIRE(FILE=BUFF(1:L)//'.sdf',EXIST=ISAFILE)
             ENDIF
