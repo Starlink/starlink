@@ -137,14 +137,6 @@ class Gwmview {
 #        The name of the GWM and its corresponding device should be got 
 #        using the gwmname or devname methods respectively.
 #
-#     markertype type colour size
-#        Sets the current marker style; any markers subsequently
-#        drawn will be drawn according to the last call of this method.
-#           - type     -- An integer giving the shape.  Currently between
-#                         1 and 8.
-#           - colour   -- The colour to draw in (normal Tk format)
-#           - size     -- Approximate height in canvas pixels of the marker
-#
 #     maxcanvas
 #        Returns a number a bit bigger than the larger of the width and
 #        the height of the most recently created GWM item.  The intention
@@ -262,10 +254,10 @@ class Gwmview {
                -value 1 \
                -valuevar zoom
          }
-         itk_component add marktype {
-            marktypecontrol $panel.marktype \
-               -value "Colour=Red,Size=9,Thickness=3,Shape=Cross" \
-               -valuevar marktype
+         itk_component add markstyle {
+            markstylecontrol $panel.markstyle \
+               -value "" \
+               -valuevar markstyle
          }
          itk_component add marknum {
             marknumcontrol $panel.marknum
@@ -285,7 +277,7 @@ class Gwmview {
 
 #  Add control widgets to the control panel.
          addcontrol $itk_component(zoom) zoom
-         addcontrol $itk_component(marktype) markers
+         addcontrol $itk_component(markstyle) markers
          addcontrol $itk_component(marknum) markers
          addcontrol $itk_component(help) action
          addcontrol $itk_component(exit) action
@@ -600,7 +592,7 @@ class Gwmview {
          if { ! $uselabels } {
             set label ""
          }
-         $itk_component(marktype) draw \
+         $itk_component(markstyle) draw \
              $canvas [ lindex $pos 0 ] [ lindex $pos 1 ] $taglist $label
       }
 
@@ -610,7 +602,7 @@ class Gwmview {
 ########################################################################
 
 #-----------------------------------------------------------------------
-      public variable marktype "Colour=Red,Size=9,Thickness=3,Shape=Cross" {
+      public variable markstyle "" {
 #-----------------------------------------------------------------------
          refreshpoints
       }
@@ -691,10 +683,6 @@ class Gwmview {
       private variable gwmdims {0 0}   ;# Dimensions of the GWM item
       private variable gwmorigin {0 0} ;# View coordinate origin of GWM item
       private variable gwmname ""      ;# Name of the GWM item
-      private variable markcolour ""   ;# Colour in which to draw a marker
-      private variable markconfig ""   ;# Code for configuring a marker
-      private variable markitem ""     ;# Code for drawing a marker
-      private variable marksize ""     ;# Approx size in pixels of a marker
       private variable points {}       ;# List of points {index x y tags}
 
    }
