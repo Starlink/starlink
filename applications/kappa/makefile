@@ -450,9 +450,7 @@ SOURCE_FILES = $(PKG_NAME)_source.tar makefile mk $(DOCUMENTATION) \
                kappa_sub.tar kapsub_sub.tar kappa_ccdpack.tar kapview_sub.tar \
                ndfpack_sub.tar $(PKG_NAME)_ifls.tar $(PKG_NAME)_iraf.tar \
                ctg_source.tar lpg_source.tar \
-               $(PKG_NAME)_data_alpha_OSF1.tar \
-               $(PKG_NAME)_data_ix86_Linux.tar \
-               $(PKG_NAME)_data_sun4_Solaris.tar
+               $(PKG_NAME)_data.tar
 
 #  List of public script files.  These are scripts which form part of
 #  the package and will be required by users of it.  They will be
@@ -1135,7 +1133,7 @@ $(STYLE_FILES) $(DEMO_FILES):
            else echo $@ is not in the tar file; exit 1; fi
 
 $(DATA_FILES):
-	$(TAR_OUT) $(PKG_NAME)_data_$(SYSTEM).tar $@
+	$(TAR_OUT) $(PKG_NAME)_data.tar $@
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
 
@@ -2451,11 +2449,8 @@ ndfpack_sub.tar:
 $(PKG_NAME)_ifls.tar:
 	$(TAR_IN) $(PKG_NAME)_ifls.tar $(IFL_FILES) $(MONO_IFL)
 
-$(PKG_NAME)_data_alpha_OSF1.tar:
-	$(TAR_IN) $(PKG_NAME)_data_alpha_OSF1.tar $(DATA_FILES)
-
-$(PKG_NAME)_data_sun4_Solaris.tar:
-	$(TAR_IN) $(PKG_NAME)_data_sun4_Solaris.tar $(DATA_FILES)
+$(PKG_NAME)_data.tar:
+	$(TAR_IN) $(PKG_NAME)_data.tar $(DATA_FILES)
 
 #----------------------------------------------------------------------------
 
