@@ -545,10 +545,10 @@ public class GenerateDependencies {
                 flatdeps.println("<dependencies>");
                 if (! ssdeps.isEmpty())
                     flatdeps.println("<sourceset>"
-                                     + showSet(ssdeps, "", "")
+                                     + showSet(ssdeps, "", "").replaceAll(" ", "\n       ")
                                      + "</sourceset>");
                 flatdeps.println("<build>"
-                                 + showSet(builddeps,"","")
+                                 + showSet(builddeps,"","").replaceAll(" ", "\n       ")
                                  + "</build>");
                 flatdeps.println("</dependencies>");
                 flatdeps.println("</component>");
