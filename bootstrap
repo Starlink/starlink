@@ -19,6 +19,7 @@ echo "Bootstrapping with STARCONF_DEFAULT_STARLINK=$STARCONF_DEFAULT_STARLINK"
 # Makefile.dependencies uses BUILDSUPPORT_PREFIX to configure
 # the buildsupport tools
 BUILDSUPPORT_PREFIX=$STARCONF_DEFAULT_STARLINK/buildsupport
+echo "Bootstrapping with BUILDSUPPORT_PREFIX=$BUILDSUPPORT_PREFIX"
 
 # We invoke autoconf below, so must make sure it's on the path,
 # and this directory must be on the path before bootstrapping the 
@@ -26,8 +27,10 @@ BUILDSUPPORT_PREFIX=$STARCONF_DEFAULT_STARLINK/buildsupport
 PATH=$BUILDSUPPORT_PREFIX/bin:$PATH
 
 # Configure and build the bootstrap utilities.
+# We make a temporary makefile so that the following can run without
+# being configured.
 tempmakefile=Makefile.tmp
-sed 's/@[a-zA-Z0-9_]*@/#DUMMY/' Makefile.in >$tempmakefile
+sed -e 's/@[a-zA-Z0-9_]*@/#DUMMY/' Makefile.in >$tempmakefile
 (
     MISSING_SUPPRESS_RUN=true
     STAR_MANIFEST_DIR=$STARCONF_DEFAULT_STARLINK/manifests
@@ -41,33 +44,56 @@ sed 's/@[a-zA-Z0-9_]*@/#DUMMY/' Makefile.in >$tempmakefile
         prefix=$BUILDSUPPORT_PREFIX \
         MANIFEST=$STAR_MANIFEST_DIR \
         buildsupport
-)
+) || { echo "Failed to make buildsupport"; exit 1; }
 rm -f $tempmakefile
 
 # Echo a command then run it, terminating the script if the command fails
 echorun() { echo $*; eval $* || exit 1; }
 
-if test -f configure -a configure -nt configure.ac; then
-    : nothing to do
+if test -f configure; then
+    : OK
 else
     echorun autoconf
+fi
+# The default prefix in this configure file MUST be consistent with
+# that in starconf.  The configure.ac has the default prefix set to
+# %%PREFIX%%, which is not a directory; therefore we must substitute
+# this to the correct value after ./configure has been generated.  If
+# you regenerate ./configure and run it, you get an error, and have to
+# do this sed'ding by hand.
+#
+# This is rather ugly, but it's a problem only when someone does
+# auto(re)conf in the top-level directory other than by running
+# ./bootstrap, and they presumaby know what they're doing.
+if grep '%%PREFIX%%' configure >/dev/null 2>&1; then
     def=`starconf --show STARCONF_DEFAULT_PREFIX`
     test -n "$def" || { echo "Eeeek! Can't get default prefix!"; exit 1; }
     echorun "sed -e s,%%PREFIX%%,$def, configure >configure.tmp && mv configure.tmp configure && chmod +x configure"
 fi
-if test ! -x configure; then
-    echo "Ooooh dear, autoconf didn't work -- I can't find ./configure"
-    exit 1
-fi
 
 
-# Bootstrap any child directories
-for d in `autoconf --trace=AC_CONFIG_SUBDIRS:$% configure.ac` ''
+# Bootstrap any child directories.  Each bootstrap file potentially
+# calls autoreconf, and this can take a while.  It's unnecessary, too,
+# since we're about to call autoreconf here, and that will work in all
+# the children.  So set STAR_SUPPRESS_AUTORECONF and export it: all
+# the (standard) bootstrap files are written so as to suppress that
+# autoreconf run if that variable is true in the environment.
+STAR_SUPPRESS_AUTORECONF=true
+export STAR_SUPPRESS_AUTORECONF
+for d in `autoconf --trace=AC_CONFIG_SUBDIRS:$% configure.ac` DUMMY
 do
-    if test -n "$d"; then
-        echo "Bootstrapping $d..."
+    if test -n "$d" -a -d "$d"; then
+        echo "BOOTSTRAPPING $d..."
         (cd $d; ./bootstrap)
     fi
 done
+
+# NOW do the autoreconf in all the children
+echorun autoreconf
+if grep '%%PREFIX%%' configure >/dev/null 2>&1; then
+    def=`starconf --show STARCONF_DEFAULT_PREFIX`
+    test -n "$def" || { echo "Eeeek! Can't get default prefix!"; exit 1; }
+    echorun "sed -e s,%%PREFIX%%,$def, configure >configure.tmp && mv configure.tmp configure && chmod +x configure"
+fi
 
 exit 0
