@@ -38,6 +38,8 @@
 *        stored in the output catalogue.
 *     OUT = LITERAL (Read)
 *        The name of the output catalogue.
+*     CONFIG = LITERAL (Read)
+*        The name of a polpack config file to use. [!]
 
 *  Copyright:
 *     Copyright (C) 2000 Central Laboratory of the Research Councils
@@ -60,6 +62,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PAR_ERR'          ! PAR__ error constants
       INCLUDE 'AST_PAR'          ! AST__ constants
 
 *  Status:
@@ -85,6 +88,14 @@
 
 *  Begin an AST context.
       CALL AST_BEGIN( STATUS )
+
+*  See if a config file has been supplied. If so, use it.
+      CALL PAR_GET0L( 'CONFIG', FILE, STATUS )
+      IF( STATUS .EQ. PAR__NULL ) THEN 
+         CALL ERR_ANNUL( STATUS )
+      ELSE
+         CALL POL1_CNFIG( FILE, STATUS )
+      END IF
 
 *  See if the user wants verbose error messages.
       CALL KPG1_VERB( VERB, 'POLPACK', STATUS )

@@ -96,7 +96,7 @@
       CALL NDF_HAPPN( NAME // ' (POLPACK 2.1-5)', STATUS )
 
 *  Re-read the polpack configuration file.
-      CALL POL1_CNFIG( STATUS )
+      CALL POL1_CNFIG( ' ', STATUS )
 
 *  Check the string against valid A-task names---if matched then call
 *  the relevant A-task

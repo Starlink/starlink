@@ -61,9 +61,11 @@
 *        is assumed to be the external column name, and ENAME is returned 
 *        holding the corresponding internal quantity name, or blank if the
 *        column does not store any of the known quantities).
-*     ENAME = CHARACTER * ( * ) (Returned)
-*        The catalogue column name to use for the given quantity. Not
-*        accessed if INAME is blank.
+*     ENAME = CHARACTER * ( * ) (Given and Returned)
+*        The catalogue column name to use for the given quantity is
+*        returned in ENAME if INAME is not blank. If INAME is blank, 
+*        ENAME optionally supplies the name of the polpack configuration
+*        file to use. 
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -149,17 +151,29 @@
      :      STATUS .EQ. SAI__OK ) THEN
          NCOL = 0
 
+*  If INAME is blank, ENAME can be used to supplied an rc file.
+         IF( INAME .EQ. ' ' ) THEN
+            RCFILE = ENAME
+         ELSE
+            RCFILE = ' '
+         END IF
+
+*  If not supplied...
+         IF( RCFILE .EQ. ' ' ) THEN
+
 *  See if the environment variable POLPACKRC is defined. If it is, is is
 *  assumed to hold the name of the polpack config file.
-         CALL PSX_GETENV( 'POLPACKRC', RCFILE, STATUS )
+            CALL PSX_GETENV( 'POLPACKRC', RCFILE, STATUS )
 
 *  If not, annul the error and construct the name of the file as
 *  "$HOME/.polpackrc"
-         IF( STATUS .NE.SAI__OK ) THEN 
-            CALL ERR_ANNUL( STATUS )
-            CALL PSX_GETENV( 'HOME', RCFILE, STATUS )
-            NC = CHR_LEN( RCFILE )         
-            CALL CHR_APPND( '/.polpackrc', RCFILE, NC )
+            IF( STATUS .NE.SAI__OK ) THEN 
+               CALL ERR_ANNUL( STATUS )
+               CALL PSX_GETENV( 'HOME', RCFILE, STATUS )
+               NC = CHR_LEN( RCFILE )         
+               CALL CHR_APPND( '/.polpackrc', RCFILE, NC )
+            END IF
+
          END IF
 
 *  Attempt to open this file.

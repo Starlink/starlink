@@ -1,4 +1,4 @@
-      SUBROUTINE POL1_CNFIG( STATUS )
+      SUBROUTINE POL1_CNFIG( FILE, STATUS )
 *+
 *  Name:
 *     POL1_CNFIG
@@ -10,12 +10,17 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POL1_CNFIG( STATUS )
+*     CALL POL1_CNFIG( FILE, STATUS )
 
 *  Description:
-*     This routine reads the polpack configuration file.
+*     This routine reads the polpack configuration file. If FILE is not
+*     blank configuration ptions are read from there. Otherwise, they are
+*     read from the fil epointed to by env. variable POLPACKRC. Otherwise
+*     they are read form $HOME/.polpackrc.
 
 *  Arguments:
+*     FILE = CHARACTER * ( * ) (Given)
+*        The config file, or blank.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -42,6 +47,9 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
+*  Arguments Given:
+      CHARACTER FILE*(*)
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -52,6 +60,6 @@
 
 *  At the moment, the config file only holds column definitions. Read
 *  these.
-      CALL POL1_COLNM( ' ', .FALSE., ' ', STATUS )
+      CALL POL1_COLNM( ' ', .FALSE., FILE, STATUS )
 
       END
