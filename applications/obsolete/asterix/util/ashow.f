@@ -398,13 +398,13 @@
       END
 
 
-      SUBROUTINE ASHOW_WCS( IFID, OCH, STATUS )
+      SUBROUTINE ASHOW_MIS( IFID, OCH, STATUS )
 *+
 *  Name:
-*     ASHOW_WCS
+*     ASHOW_MIS
 
 *  Purpose:
-*     Display world coordinates data
+*     Display detector configuration info
 
 *  Language:
 *     Starlink Fortran
@@ -493,10 +493,7 @@
 *  Local Variables:
       CHARACTER*50		STR
 
-      INTEGER			NVAL			! Values read from obj
       INTEGER			DETID			! DCI info
-
-      LOGICAL			THERE			! Object exists?
 *.
 
 *  Check inherited global status.
