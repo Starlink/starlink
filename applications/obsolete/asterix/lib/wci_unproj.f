@@ -106,7 +106,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Check initialised
-      IF ( .NOT. AST_QPKGI( WCI__PKG ) ) CALL WCI0_INIT( STATUS )
+      IF ( .NOT. AST_QPKGI( WCI__PKG ) ) CALL WCI1_INIT( STATUS )
 
 *  Extract projection routine address
       CALL ADI_CGET0I( PRJID, '.WCIRTN', RPTR, STATUS )

@@ -84,11 +84,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          	! Standard SAE constants
       INCLUDE 'WCI_PAR'          	! ASTERIX WCI constants
-
-*  Global Variables:
-      INCLUDE 'WCI_CMN'			! ASTERIX WCI common block
-*       WCS_INIT = LOGICAL (given)
-*         WCI class definitions loaded?
+      INCLUDE 'AST_PKG'
 
 *  Arguments Given:
       CHARACTER*(*)		NAME
@@ -102,7 +98,8 @@
       INTEGER 			STATUS             	! Global status
 
 *  External References:
-      EXTERNAL			WCI1_BLK		! Common block init
+      EXTERNAL			AST_QPKGI
+        LOGICAL			AST_QPKGI
 
 *  Local variables:
       CHARACTER*1		EFORM			! Epoch code
@@ -115,7 +112,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Check initialised
-      IF ( .NOT. WCI_INIT ) CALL WCI1_INIT( STATUS )
+      IF ( .NOT. AST_QPKGI( WCI__PKG ) ) CALL WCI1_INIT( STATUS )
 
 *  Check system name
       CALL WCI1_CHKSNM( NAME, STATUS )

@@ -87,16 +87,14 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-
-*  Global Variables:
-      INCLUDE 'WCI_CMN'					! WCI globals
-*        WCI_INIT = LOGICAL (given and returned)
-*           WCI definitions load attempted?
+      INCLUDE 'AST_PKG'
 
 *  Status:
       INTEGER 			STATUS             	! Global status
 
 *  External References:
+      EXTERNAL			AST_QPKGI
+        LOGICAL			AST_QPKGI
       EXTERNAL			ADI_REQPKG
       EXTERNAL                  WCI1_READ
       EXTERNAL                  WCI2_READ
@@ -112,7 +110,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Check not already initialised?
-      IF ( .NOT. WCI_INIT ) THEN
+      IF ( .NOT. AST_QPKGI( WCI__PKG ) ) THEN
 
 *    Load the ADI classes
         CALL ADI_REQPKG( 'wcs', STATUS )
@@ -133,7 +131,7 @@
      :                   /'_CoordSystem)', WCI2_SPWRITE, DID, STATUS )
 
 *    Now initialised
-	WCI_INIT = .TRUE.
+        CALL AST_SPKGI( WCI__PKG )
 
       END IF
 

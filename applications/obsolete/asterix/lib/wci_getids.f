@@ -126,7 +126,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Check initialised
-      IF ( .NOT. AST_QPKGI( WCI__PKG ) ) CALL WCI0_INIT( STATUS )
+      IF ( .NOT. AST_QPKGI( WCI__PKG ) ) CALL WCI1_INIT( STATUS )
 
 *  Initialise return values
       PIXID = ADI__NULLID

@@ -86,21 +86,21 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-
-*  Global Variables:
-      INCLUDE 'WCI_CMN'                 ! ASTERIX WCI common block
-*       WCS_INIT = LOGICAL (given)
-*         WCI class definitions loaded?
+      INCLUDE 'AST_PKG'
 
 *  Arguments Given:
-      REAL			APOS(2)			! Axis position
-      INTEGER			PIXID			! Pixellation
+      REAL			APOS(2)
+      INTEGER			PIXID
 
 *  Arguments Returned:
-      REAL			PPOS(2)			! Pixel position
+      REAL			PPOS(2)
 
 *  Status:
       INTEGER 			STATUS             	! Global status
+
+*  External References:
+      EXTERNAL			AST_QPKGI
+        LOGICAL			AST_QPKGI
 
 *  Local Variables:
       REAL			ABASE(2)		! Axis val at pix 1
@@ -113,10 +113,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Check initialised
-      IF ( .NOT. WCI_INIT ) THEN
-        STATUS = SAI__ERROR
-        CALL ERR_REP( ' ', 'WCI has not been initialised', STATUS )
-      END IF
+      IF ( .NOT. AST_QPKGI( WCI__PKG ) ) CALL WCI1_INIT( STATUS )
 
 *  Get axis scalings
       CALL ADI_CGET1R( PIXID, 'BASE', 2, ABASE, DUM, STATUS )

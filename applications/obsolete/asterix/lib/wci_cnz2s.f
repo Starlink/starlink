@@ -86,23 +86,21 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-
-*  Global Variables:
-      INCLUDE 'WCI_CMN'                 ! ASTERIX WCI common block
-*       WCS_INIT = LOGICAL (given)
-*         WCI class definitions loaded?
+      INCLUDE 'AST_PKG'
 
 *  Arguments Given:
-      INTEGER			SYS			! Input coord system
-      DOUBLE PRECISION		INP(2)			! Input position
+      INTEGER			SYS
+      DOUBLE PRECISION		INP(2)
 
 *  Arguments Returned:
-      DOUBLE PRECISION		OUT(2)			! Output position
+      DOUBLE PRECISION		OUT(2)
 
 *  Status:
       INTEGER 			STATUS             	! Global status
 
 *  External References:
+      EXTERNAL			AST_QPKGI
+        LOGICAL			AST_QPKGI
       EXTERNAL			SLA_EPCO		! Epoch convertor
         DOUBLE PRECISION	SLA_EPCO
       EXTERNAL			SLA_EPJ2D		! Epoch -> MJD
@@ -124,10 +122,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Check initialised
-      IF ( .NOT. WCI_INIT ) THEN
-        STATUS = SAI__ERROR
-        CALL ERR_REP( ' ', 'WCI has not been initialised', STATUS )
-      END IF
+      IF ( .NOT. AST_QPKGI( WCI__PKG ) ) CALL WCI1_INIT( STATUS )
 
 *  Get the name of the output system
       CALL ADI_CGET0C( SYS, 'NAME', N3, STATUS )

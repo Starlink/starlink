@@ -93,18 +93,13 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          	! Standard SAE constants
       INCLUDE 'WCI_PAR'          	! ASTERIX WCI constants
-
-*  Global Variables:
-      INCLUDE 'WCI_CMN'			! ASTERIX WCI common block
-*       WCS_INIT = LOGICAL (given)
-*         WCI class definitions loaded?
+      INCLUDE 'AST_PKG'
 
 *  Arguments Given:
-      INTEGER			DIMS(2)			! Grid dimensions
-      REAL			BASES(2)		! Axis origins
-      REAL			SCALES(2)		! Pixel widths
-      CHARACTER*(*)		UNITS(2)		! Units in each axis
-      DOUBLE PRECISION		ROTA			! Rotation of Y axis
+      INTEGER			DIMS(2)
+      REAL			BASES(2), SCALES(2)
+      CHARACTER*(*)		UNITS(2)
+      DOUBLE PRECISION		ROTA
 
 *  Arguments Returned:
       INTEGER			ID
@@ -113,7 +108,8 @@
       INTEGER 			STATUS             	! Global status
 
 *  External References:
-      EXTERNAL			WCI1_BLK		! Common block init
+      EXTERNAL			AST_QPKGI
+        LOGICAL			AST_QPKGI
 
 *  Local variables:
       DOUBLE PRECISION		UCONV(2)		! Unit conversions
@@ -123,7 +119,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Check initialised
-      IF ( .NOT. WCI_INIT ) CALL WCI1_INIT( STATUS )
+      IF ( .NOT. AST_QPKGI( WCI__PKG ) ) CALL WCI1_INIT( STATUS )
 
 *  Find axis units to radians conversion
       CALL WCI1_UNIT2R( UNITS(1), UCONV(1), STATUS )
