@@ -175,8 +175,8 @@ itcl::class gaia::GaiaImageCtrl {
    private method do_nothing_ {} {
    }
 
-   #  Display the toolbox window (override to use StarCanvasDraw,
-   #  instead of CanvasDraw).
+   #  Display the graphics toolbox window (override to use
+   #  StarCanvasDraw, instead of CanvasDraw).
    protected method make_toolbox {} {
       itk_component add draw {
          gaia::StarCanvasDraw $w_.draw \
