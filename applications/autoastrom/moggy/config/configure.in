@@ -43,6 +43,14 @@ AC_CHECK_HEADERS(map)
 dnl   Check other functions
 AC_CHECK_FUNCS(setenv)
 
+dnl   Take a `copy' of the means autoconf uses to echo a string
+dnl   without a newline.  This will be a Makefile variable, so double
+dnl   the dollar sign to escape it.
+AC_SUBST(ECHONONL)
+ECHONONL="function echononl () { echo $ac_n \$\$* $ac_c; }"
+
+
+
 dnl   Check whether we need to include `-lnsl -lsocket' to use the
 dnl   socket() call and friends (catlib needs these functions, and you
 dnl   do need these on Solaris)
