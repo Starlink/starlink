@@ -9605,7 +9605,7 @@ proc ScreenSec {section} {
 # to make the section square.
       } elseif { $width > $height } {
          set yl [expr int( floor( $yc - 0.5 * $width ) ) ]
-         set yu [expr itn( floor( $yl + $width - 1 ) ) ]
+         set yu [expr int( floor( $yl + $width - 1 ) ) ]
       }
 
 # Construct a new section string.
