@@ -1,10 +1,14 @@
 proc cred4Display {} {
 
 # Get some global values
+    global cgs4drXopts
     global Cred4Widgets
     global Cred4NoticeBoard
     global cgs4drBitmaps
     global cgs4drHtml
+
+# Use double width for bitmap checkbutton
+    set bw [expr $cgs4drXopts(xCheckbutton.width) * 2]
 
 # Create dialog box
     if {[winfo exists .cred4Dialogue]} {destroy .cred4Dialogue}
@@ -39,15 +43,16 @@ proc cred4Display {} {
 
 # Set flip out frame for integrations
     set ifliptop [frame $flip.ifliptop]
-    pack $ifliptop
+    pack $ifliptop -fill x -expand y
     set ifr 0
     while {$ifr <= 8} {
       set iflip($ifr) [frame $ifliptop.iflip$ifr -relief sunken -bd 2]
-      pack $iflip($ifr) -side top 
-      set ic($ifr) [checkbutton $iflip($ifr).ic$ifr -bitmap @$cgs4drBitmaps/port$ifr.xbm -variable Cred4Widgets(IP$ifr)]
+      pack $iflip($ifr) -side top -fill x -expand y
+      set ic($ifr) [checkbutton $iflip($ifr).ic$ifr -bitmap @$cgs4drBitmaps/port$ifr.xbm -variable Cred4Widgets(IP$ifr) -width $bw]
       set il($ifr) [label $iflip($ifr).il$ifr -text "Overgraph Command:"]
       set Cred4Widgets(DIS_IP$ifr) [entry $iflip($ifr).ie$ifr -width 60]
-      pack $ic($ifr) $il($ifr) $Cred4Widgets(DIS_IP$ifr) -in $iflip($ifr) -side left -fill x -expand yes
+      pack $ic($ifr) -in $iflip($ifr) -side left -fill x -expand yes
+      pack $Cred4Widgets(DIS_IP$ifr) $il($ifr) -in $iflip($ifr) -side right -fill x -expand y
       $Cred4Widgets(DIS_IP$ifr) delete 0 end
       bind $ic($ifr) <Button-2> "cred4Update cred4Display DIS_IP$ifr"
       bind $ic($ifr) <Button-3> "cgs4drHelpDialog .helpDialog $cgs4drHtml/cred4DisplayBox1.html"
@@ -69,15 +74,16 @@ proc cred4Display {} {
 
 # Set flip out frame for observations
     set ofliptop [frame $flip.ofliptop]
-    pack $ofliptop
+    pack $ofliptop -fill x -expand y
     set ofr 0
     while {$ofr <= 8} {
       set oflip($ofr) [frame $ofliptop.oflip$ofr -relief sunken -bd 2]
-      pack $oflip($ofr) -side top 
-      set oc($ofr) [checkbutton $oflip($ofr).oc$ofr -bitmap @$cgs4drBitmaps/port$ofr.xbm -variable Cred4Widgets(OP$ofr)]
+      pack $oflip($ofr) -side top  -fill x -expand y
+      set oc($ofr) [checkbutton $oflip($ofr).oc$ofr -bitmap @$cgs4drBitmaps/port$ofr.xbm -variable Cred4Widgets(OP$ofr) -width $bw]
       set ol($ofr) [label $oflip($ofr).ol$ofr -text "Overgraph Command:"]
       set Cred4Widgets(DIS_OP$ofr) [entry $oflip($ofr).oe$ofr -width 60]
-      pack $oc($ofr) $ol($ofr) $Cred4Widgets(DIS_OP$ofr) -in $oflip($ofr) -side left -fill x -expand yes
+      pack $oc($ofr) -in $oflip($ofr) -side left -fill x -expand yes
+      pack $Cred4Widgets(DIS_OP$ofr) $ol($ofr) -in $oflip($ofr) -side right -fill x -expand y
       $Cred4Widgets(DIS_OP$ofr) delete 0 end
       bind $oc($ofr) <Button-2> "cred4Update cred4Display DIS_OP$ofr"
       bind $oc($ofr) <Button-3> "cgs4drHelpDialog .helpDialog $cgs4drHtml/cred4DisplayBox1.html"
@@ -99,15 +105,16 @@ proc cred4Display {} {
 
 # Set flip out frame for groups
     set gfliptop [frame $flip.gfliptop]
-    pack $gfliptop
+    pack $gfliptop -fill x -expand y
     set gfr 0
     while {$gfr <= 8} {
       set gflip($gfr) [frame $gfliptop.gflip$gfr -relief sunken -bd 2]
-      pack $gflip($gfr) -side top 
-      set gc($gfr) [checkbutton $gflip($gfr).gc$gfr -bitmap @$cgs4drBitmaps/port$gfr.xbm -variable Cred4Widgets(GP$gfr)]
+      pack $gflip($gfr) -side top  -fill x -expand y
+      set gc($gfr) [checkbutton $gflip($gfr).gc$gfr -bitmap @$cgs4drBitmaps/port$gfr.xbm -variable Cred4Widgets(GP$gfr) -width $bw]
       set gl($gfr) [label $gflip($gfr).gl$gfr -text "Overgraph Command:"]
       set Cred4Widgets(DIS_GP$gfr) [entry $gflip($gfr).ge$gfr -width 60]
-      pack $gc($gfr) $gl($gfr) $Cred4Widgets(DIS_GP$gfr) -in $gflip($gfr) -side left -fill x -expand yes
+      pack $gc($gfr) -in $gflip($gfr) -side left -fill x -expand yes
+      pack $Cred4Widgets(DIS_GP$gfr) $gl($gfr) -in $gflip($gfr) -side right -fill x -expand y
       $Cred4Widgets(DIS_GP$gfr) delete 0 end
       bind $gc($gfr) <Button-2> "cred4Update cred4Display DIS_GP$gfr"
       bind $gc($gfr) <Button-3> "cgs4drHelpDialog .helpDialog $cgs4drHtml/cred4DisplayBox1.html"
@@ -129,15 +136,16 @@ proc cred4Display {} {
 
 # Set flip out frame for spectra
     set sfliptop [frame $flip.sfliptop]
-    pack $sfliptop
+    pack $sfliptop -fill x -expand y
     set sfr 0
     while {$sfr <= 8} {
       set sflip($sfr) [frame $sfliptop.sflip$sfr -relief sunken -bd 2]
-      pack $sflip($sfr) -side top 
-      set sc($sfr) [checkbutton $sflip($sfr).sc$sfr -bitmap @$cgs4drBitmaps/port$sfr.xbm -variable Cred4Widgets(SP$sfr)]
+      pack $sflip($sfr) -side top  -fill x -expand y
+      set sc($sfr) [checkbutton $sflip($sfr).sc$sfr -bitmap @$cgs4drBitmaps/port$sfr.xbm -variable Cred4Widgets(SP$sfr) -width $bw]
       set sl($sfr) [label $sflip($sfr).sl$sfr -text "Overgraph Command:"]
       set Cred4Widgets(DIS_SP$sfr) [entry $sflip($sfr).se$sfr -width 60]
-      pack $sc($sfr) $sl($sfr) $Cred4Widgets(DIS_SP$sfr) -in $sflip($sfr) -side left -fill x -expand yes
+      pack $sc($sfr) -in $sflip($sfr) -side left -fill x -expand yes
+      pack $Cred4Widgets(DIS_SP$sfr) $sl($sfr) -in $sflip($sfr) -side right -fill x -expand y
       $Cred4Widgets(DIS_SP$sfr) delete 0 end
       bind $sc($sfr) <Button-2> "cred4Update cred4Display DIS_SP$sfr"
       bind $sc($sfr) <Button-3> "cgs4drHelpDialog .helpDialog $cgs4drHtml/cred4DisplayBox1.html"
