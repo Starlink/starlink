@@ -1,42 +1,60 @@
-1 KAPPA_Version_0.13-6
+1 KAPPA_Version_0.14-1
 
- A minor update to KAPPA (V0.13-6) is now available. It contains 
- fixes for the following bugs:
+   A new release of KAPPA (V0.14-1) has been made. The changes are
+   described fully in sun95.14. The majority of the changes are
+   again in the field of graphics and WCS handling. More
+   applications have been changed to use AST/PGPLOT for these
+   purposes, and now have corresponding increased functionality.
+   This has involved changing the parameter lists for these
+   applications.
 
- -  ARDMASK now sets the bad pixel flag in the output NDF so that 
-    other applications interpret the selected pixels as bad.
+*      Scripts which make use of any of the removed or
+*      modified parameters will fail when run with KAPPA
+*      V0.14-1. Such scripts will need to be changed to
+*      take account of the new features introduced in this
+*      release. Check the lists below for details.}
 
- -  COMPAVE now traps zero variance values, preventing a divide by 
-    zero error.
+   The updated applications include: CENTROID, DRAWSIG, HISTOGRAM,
+   LUTVIEW, MLINPLOT, NORMALIZE, PSF, VECPLOT.
 
- -  CONTOUR no longer draws contours in the background colour if the
-    requested contour colour is not available on the selected device.
-    This previously could cause contours to be invisible when using a
-    monochrome postscript device.
+   Several other applications have been changed to PGPLOT but with
+   no changes in the parameter list or visible functionality (e.g.
+   GDCLEAR, GDSET, IDCLEAR, IDSET, PALREAD, PALDEF, etc).
 
- -  History information written to NDFs now contain the up-to-date
-    KAPPA package version number.
+   Another significant change in this release is that KAPPA commands
+   which process individual NDFs or positions lists can now be
+   supplied with a group of such files, and the application will
+   automatically be re-invoked to process the entire group. Again,
+   full details can be found in SUN/95.
 
- -  DISPLAY now uses independant compression factors for both axes.
-    Previously, an inappropriate compression factor could be used for 
-    one of the axes if the lengths of the two axes were very different.
 
- -  Trailing spaces are now stripped from the Title attribute of the 
-    current WCS Frame.
+   Other changes include:
 
- -  A bug in MATHS which could cause zero variances to be produced sometimes
-    when using double precision data has been fixed.
+     - DISPLAY now has a KEY parameter which causes a colour ramp to be
+     drawn to the right of the image.
 
- -  NOMAGIC and FILLBAD now set the bad bits flag in the output NDF to
-    zero. Previously, NDFs containing QUALITY arrays could still seems
-    to contain bad pixels after running NOMAGIC or FILLBAD. This no
-    longer happens.
+     - The LOGAR and EXPON applications have been converted to use the
+     full NDF structure. The EXP10, EXPE, LOG10 and LOGE applications are
+     now alias for LOGAR and EXPON, using appropriate bases.
 
- -  WCSREMOVE now issues a warning instead of aborting if an attempt is 
-    made to remove the Base Frame of the WCS FrameSet.
+     - FITSMOD now has an EXISTS parameter to store the result of the
+     final "Exist" operation.
 
- -  NATIVE now correctly replaces IEEE NaN and Inf values by Starlink bad
-    values on Solaris systems.
+     - LINPLOT now has an LMODE parameter which allows the default limits
+     for the vertical axis to be chosen in various ways (for instance
+     using percentiles, multiples of the standard deviation, etc).
 
- -  The global parameter POSITIONS_LIST has been replaced by CATALOGUE.
- 
+     - Several new interpolation methods have been added to WCSALIGN, and
+     an improved algorithm is now used which should be more efficient in
+     some cases.
+
+
+   Various bugs have been fixed, the most noticable being:
+
+     - A bug which could prevent numerical labels from being drawn within
+     annotated axes.
+
+     - A bug which caused CURSOR to fail after giving 40 positions.
+
+     - PIXDUPE and ROTATE no longer discards pixel origin information.   
+
