@@ -26,6 +26,7 @@
  *                           making the region used overrun. 
  *                 19/03/01  Made sure that x1 and y1 in getMinMax,
  *                           never run off the edges of image.
+ *                 30/05/03  Skip runs of blank pixels in median estimate
  *
  * This file is included in the .C files for classes derived from class
  * ImageData. The file defines a number of member functions that are
@@ -912,6 +913,12 @@ void CLASS_NAME::medianFilter()
 		}
 	    }
 	    val = medary[nmed/2];
+            if ( val == mval ) {
+                if ( i == y0 ) {
+                    lcut = hcut = 0; // To be safe.
+                }
+                continue; // PWD: Skip runs of blank pixels.
+            }
 
 	    if (i == y0) 
 		// set initial low and high cut values
