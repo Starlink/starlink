@@ -69,4 +69,15 @@ lose the astrom script, and have astrom.f being invoked directly
 `report=' to the first two arguments which don't have `=' signs in
 them).
 
+As a result of all this, the ASTROM regression tests _do_ work, just
+not in the astrom test directory as distributed (because it's not
+configured properly).
+
 Sigh....
+
+
+2003 May 7
+----------
+
+Star2HTML seems unable to find the sun5.bbl file (though it's there --
+stupid program), so I've (temporarily?) edited it in to sun5.tex.
