@@ -1,0 +1,70 @@
+Notes on Creating SSN/72 tex document
+-------------------------------------
+
+The Library API documentation is created using the Starlink Software Tools
+(SST), specifically PROLAT (using the options:
+
+% prolat prompt
+ IN - Input file(s) /'*.f'/ > 
+
+    11 files to be processed...
+
+ OUT - Output file /'prolat_surflib.tex'/ > ssn72_libsurf.tex
+ ATASK - Processing A-task prologues? /FALSE/ > 
+ SINGLE - Process only a single prologue per input file? /TRUE/ > 
+ PAGE - Start each description on a new page? /FALSE/ > 
+ DOCUMENT - Produce a full Latex document? /FALSE/ > 
+
+SINGLE = FALSE for sculib since sculib_bits.f has multiple prologues.
+
+The output files should be called:
+
+  ssn72_libsurf.tex : For non A-task files in surf_*.f/F
+  ssn72_libsurflib.tex : For surflib_*.f
+  ssn72_libsculib.tex : For sculib_*.F/F
+
+
+
+The following files must be edited after conversion to LaTeX:
+
+surf_write_data.f
+surf_write_photom.f
+surf_write_photom_header.f
+
+surflib_decode_remsky_string.f
+surflib_diff_despike.f
+surflib_read_ipfile.f
+surflib_remove_ip.f
+
+sculib_calc_apparent.f
+sculib_calc_flatfield.f
+sculib_convolve.f
+sculib_decode_filter.f
+sculib_fit_2d_gaussian.f
+sculib_fit_2d_parabola.f
+SCULIB_FIT_D2XISQ_DAJ2
+SCULIB_FIT_D2XISQ_DAJK
+sculib_fit_dxisq_daj.f
+sculib_fit_plane.f
+sculib_Fit_skydip.f
+sculib_j_theoretical.f
+sculib_jnu.f
+sculib_map_allan_variance.f
+sculib_readbols.f
+sculib_reduce_switch.f
+sculib_skycon_1.f
+sculib_skydip_allan_variance.f
+sculib_skydip_var.f
+sculib_skydip_xisq.f
+sculib_skyfunc.f
+sculib_skyfunc_1.f
+sculib_skyfunc_2.f
+sculib_skyfuncd.f
+
+
+
++ Change all (C) to \copyright
++ Remove all  '    :' strings so that the invocation section does not include 
+   them. 
++ Remove the newpage from the start of each file
++ Merge sculib .F files with .f

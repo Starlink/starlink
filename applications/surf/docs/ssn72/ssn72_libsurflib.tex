@@ -1,0 +1,2638 @@
+\sstroutine{
+   SURFLIB\_2DFT\_CHOP
+}{
+   Calculate the FT of the 2D chop throw
+}{
+   \sstdescription{
+      Given the chop parameters calculate the FT of the chop.
+      The dual beam chop is treated as two delta functions of
+      opposite sign separated by the chop throw and centred at the
+      middle of the data array. The Fourier transform of this function
+      is a sine wave in the direction of the chop (zero at the middle
+      beam) with wavelength related to the spatial frequency of the
+      array (pixel spacing).
+   }
+   \sstinvocation{
+       CALL SURFLIB\_2DFT\_CHOP (CHOP\_THROW, CHOP\_PA, PIXSIZE,
+            NX, NY, FT\_DATA, FT\_VARIANCE, WT\_DATA, WT\_VARIANCE, STATUS)
+   }
+   \sstarguments{
+      \sstsubsection{
+         CHOP\_THROW                  = REAL (Given)
+      }{
+         chop throw in arcsec
+      }
+      \sstsubsection{
+         CHOP\_PA                     = REAL (Given)
+      }{
+         position angle of chop. Positive is anti-clockwise
+         from North. This angle is in degrees.
+      }
+      \sstsubsection{
+         PIXSIZE                     = REAL (Given)
+      }{
+         pixel size in arcsec
+      }
+      \sstsubsection{
+         NX                          = INTEGER (Given)
+      }{
+         Number of pixels in X
+      }
+      \sstsubsection{
+         NY                          = INTEGER (Given)
+      }{
+         Number of pixels in Y
+      }
+      \sstsubsection{
+         FT\_DATA (IDIMS(1), IDIMS(2)) = REAL (Returned)
+      }{
+         data array containing F.T. of chop
+      }
+      \sstsubsection{
+         FT\_VARIANCE (IDIMS(1), IDIMS(2))       = REAL (Returned)
+      }{
+         variance on DATA; set to 0
+      }
+      \sstsubsection{
+         WT\_DATA (IDIMS(1), IDIMS(2)) = REAL (Returned)
+      }{
+         data array containing weight of chop
+      }
+      \sstsubsection{
+         WT\_VARIANCE (IDIMS(1), IDIMS(2))       = REAL (Returned)
+      }{
+         variance on DATA; set to 0
+      }
+      \sstsubsection{
+         STATUS                      = INTEGER (Given and returned)
+      }{
+         global status
+      }
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright \copyright 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+      Research Council. All Rights Reserved.
+   }
+}
+\sstroutine{
+   SURFLIB\_CALC\_DUAL\_BEAM
+}{
+   Calculates a chopped map from a single beam map
+}{
+   \sstdescription{
+      This routine can be used to added a chopped beam response
+      to a single beam image. When NBEAMS=2 this routine
+      calculates a middle-beam dual-beam map by
+      calculating the difference between the left and right
+      beams for each pixel in the map.
+
+      When NBEAMS=3 a triple beam map is constructed where the central
+      beam is the difference between the central beam and the average of
+      the positions a chop distance away on either side.
+
+      All pixels off the edge of the image are assumed to
+      have flux 0 and variance 0.
+
+      Bad pixels are assumed to be equivalent to flux of 0
+      and variance 0, although for the triple beam image a bad pixel
+      is retained if it coincide with the middle beam position.
+   }
+   \sstinvocation{
+       CALL SURFLIB\_CALC\_CHOPPED\_IMAGE( NBEAMS, CHOP\_THR, CHOP\_PA,
+            DIM1, DIM2, IN\_DATA, OUT\_DATA, USEVAR, IN\_VAR, OUT\_VAR,
+            STATUS)
+   }
+   \sstarguments{
+      \sstsubsection{
+         NBEAMS = INTEGER (Given)
+      }{
+         Number of beams to add. (2 or 3)
+      }
+      \sstsubsection{
+         CHOP\_THR = REAL (Given)
+      }{
+         Chop throw in pixels
+      }
+      \sstsubsection{
+         CHOP\_PA  = REAL (Given)
+      }{
+         Chop position angle (east of north) in degrees
+      }
+      \sstsubsection{
+         DIM1 = INTEGER (Given)
+      }{
+         First dimension of image
+      }
+      \sstsubsection{
+         DIM2 = INTEGER (Given)
+      }{
+         Second dimension of image [can not use DIMS as an array
+         since the linux fortran compiler doesnt like it]
+      }
+      \sstsubsection{
+         IN\_DATA = REAL (Given)
+      }{
+         Input single-beam image
+      }
+      \sstsubsection{
+         OUT\_DATA = REAL (Returned)
+      }{
+         Output dual-beam image
+      }
+      \sstsubsection{
+         USEVAR = LOGICAL (Given)
+      }{
+         Are we processing a variance array?
+      }
+      \sstsubsection{
+         IN\_VAR = REAL (Given)
+      }{
+         Input variance image (if USEVAR=TRUE)
+      }
+      \sstsubsection{
+         OUT\_VAR = REAL (Returned)
+      }{
+         Output variance image (if USEVAR=TRUE)
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         Global status
+      }
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright \copyright 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+      Research Council. All Rights Reserved.
+   }
+}
+\sstroutine{
+   SURFLIB\_CALC\_GRIDIJ
+}{
+   Calculate the position of a pixel number in an IJ grid
+}{
+   \sstdescription{
+      Calculates the I,J grid positions related to pixel numbers
+      1 to NX$*$NY.
+      Must calculate all positions in one go since it is very inefficient
+      to calculate the spiral positions on demand
+      Three modes types are currently available.
+   }
+   \sstinvocation{
+      CALL SURFLIB\_CALC\_GRIDIJ( TYPE, NX, NY, ICEN, JCEN, I, J, STATUS)
+   }
+   \sstarguments{
+      \sstsubsection{
+         TYPE = CHAR (Given)
+      }{
+         Type of unwrapping. Can be one of:
+         XLINEAR - unfold each X strip in turn for each Y
+         YLINEAR - unfold each Y strip in turn for each X
+         SPIRAL - unfold in a spiral from the reference pixels (ICEN,JCEN)
+         DIAG1  - Diagonal starting at 1,1
+         DIAG2  - Diagonal starting at NX,1
+      }
+      \sstsubsection{
+         NX = INTEGER (Given)
+      }{
+         Number of pixels in X
+      }
+      \sstsubsection{
+         NY = INTEGER (Given)
+      }{
+         Number of pixels in Y
+      }
+      \sstsubsection{
+         ICEN = INTEGER (Given)
+      }{
+         Location of reference pixel in X
+      }
+      \sstsubsection{
+         JCEN = INTEGER (Given)
+      }{
+         Location of reference pixel in Y
+      }
+      \sstsubsection{
+         I ( NX $*$ NY ) = INTEGER (Returned)
+      }{
+         X Positions in grid, indexed by pixel number
+      }
+      \sstsubsection{
+         J ( NX $*$ NY ) = INTEGER (Returned)
+      }{
+         Y Positions in grid, indexed by pixel number
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given \& Returned)
+      }{
+         Global Status
+      }
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright \copyright 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+      Research Council. All Rights Reserved.
+   }
+}
+\sstroutine{
+   SURFLIB\_CALC\_IJPOS
+}{
+   Calculate the position of data on an XY grid
+}{
+   \sstdescription{
+      Given an XY position, calculates the IJ position in the grid.
+      The I,J{\tt '}s are then placed into the output array (of dimension
+      2, N\_PTS)
+   }
+   \sstinvocation{
+       CALL SURFLIB\_CALC\_IJPOS (N\_PTS, PIXEL\_SZ,
+            I\_CENTRE, J\_CENTRE, X\_POS, Y\_POS, IJ,
+            STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         N\_PTS = INTEGER (Given)
+      }{
+         Number of X,Y pairs supplied
+      }
+      \sstsubsection{
+         PIXEL\_SZ = DOUBLE (Given)
+      }{
+         Size of each pixel (radians)
+      }
+      \sstsubsection{
+         I\_CENTRE = INTEGER (Given)
+      }{
+         Location of reference pixel in X
+      }
+      \sstsubsection{
+         J\_CENTRE = INTEGER (Given)
+      }{
+         Location of reference pixel in Y
+      }
+      \sstsubsection{
+         X\_POS = DOUBLE PRECISION (Given)
+      }{
+         X positions
+      }
+      \sstsubsection{
+         Y\_POS = DOUBLE PRECISION (Given)
+      }{
+         Y positions
+      }
+      \sstsubsection{
+         IJ ( 2, N\_PTS ) = INTEGER (Given)
+      }{
+         Positions of each point (I,J) in output grid
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given \& Returned)
+      }{
+         Global Status
+      }
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright \copyright 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+      Research Council. All Rights Reserved.
+   }
+}
+\sstroutine{
+   SURFLIB\_CALC\_OUTPUT\_GRID
+}{
+   Calculate the grid required to contain data given the X,Y positions
+}{
+   \sstdescription{
+      Finds the extent of the data (given X and Y) and then
+      reports back the size of the grid that is necessary to contain
+      the data. Also returns the reference pixel position.
+   }
+   \sstinvocation{
+       CALL SURFLIB\_CALC\_OUTPUT\_GRID (N\_FILES, N\_PTS, PIXEL\_SZ,
+            X\_PTR, Y\_PTR, NX, NY, I\_CENTRE, J\_CENTRE,
+            STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         N\_FILES = INTEGER (Given)
+      }{
+         Number of data sets (ie files)
+      }
+      \sstsubsection{
+         N\_PTS = INTEGER (Given)
+      }{
+         Number of X,Y pairs supplied
+      }
+      \sstsubsection{
+         PIXEL\_SZ = REAL (Given)
+      }{
+         Size of each pixel (radians)
+      }
+      \sstsubsection{
+         X\_PTR( N\_FILES ) = INTEGER (Given)
+      }{
+         Pointers to arrays containing DOUBLE PRECISION X positions
+      }
+      \sstsubsection{
+         Y\_PTR( N\_FILES ) = INTEGER (Given)
+      }{
+         Pointers to arrays containing DOUBLE PRECISION Y positions
+      }
+      \sstsubsection{
+         NX = INTEGER (Given)
+      }{
+         Required number of points in X in output grid
+      }
+      \sstsubsection{
+         NY = INTEGER (Given)
+      }{
+         Required number of points in Y in output grid
+      }
+      \sstsubsection{
+         I\_CENTRE = INTEGER (Given)
+      }{
+         Location of reference pixel in X
+      }
+      \sstsubsection{
+         J\_CENTRE = INTEGER (Given)
+      }{
+         Location of reference pixel in Y
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given \& Returned)
+      }{
+         Global Status
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         This routine requires double precision arguments for the X and
+           Y coordinates.
+      }
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright \copyright 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+      Research Council. All Rights Reserved.
+   }
+}
+\sstroutine{
+   SURFLIB\_CALC\_POLPACK\_ANGROT
+}{
+   Average rotations angles over integration
+}{
+   \sstdescription{
+      This routine calculates the mean rotation angle for each
+      integration. The input data contains one angle per sample
+      and this is averaged to calculate the rotation angle per
+      integration.
+      The input angle is the rotation angle (anti-clockwise)
+      between the RA frame and the nasmyth (waveplate) frame.
+      The output angle is the angle between the waveplate 0 and
+      the X PIXEL axis (not the RA axis)
+      Since the supplied angle is the angle from the Y-axis
+      (ie all angles are from Nasmyth Y axis) we need to add
+      90 degrees
+   }
+   \sstinvocation{
+      CALL SURFLIB\_CALC\_POLPACK\_ANGROT(N\_POS, N\_EXPOSURES,
+           N\_INTEGRATIONS, N\_MEASUREMENTS, DEM\_PNTR, ANGROT\_IN,
+           ANGROT\_OUT, STATUS)
+   }
+   \sstarguments{
+      \sstsubsection{
+         N\_POS = INTEGER (Given)
+      }{
+         Size of ANGROT\_IN array
+      }
+      \sstsubsection{
+         N\_EXPOSURES = INTEGER (Given)
+      }{
+         Number of exposures in DEM\_PNTR
+      }
+      \sstsubsection{
+         N\_INTEGRATIONS = INTEGER (Given)
+      }{
+         Number of integrations in DEM\_PNTR
+      }
+      \sstsubsection{
+         N\_MEASUREMENTS = INTEGER (Given)
+      }{
+         Number of measurements in DEM\_PNTR
+      }
+      \sstsubsection{
+         DEM\_PNTR(1,N\_EXPOSURES,N\_INTEGRATIONS,N\_MEASUREMENTS) = INTEGER (Given)
+      }{
+         Start position for each EXP, INT, MEAS
+      }
+      \sstsubsection{
+         ANGROT\_IN (N\_POS) = REAL (Given)
+      }{
+         Rotation for each sample (N\_POS)
+      }
+      \sstsubsection{
+         ANGROT\_OUT (N\_INTEGRATIONS, N\_MEASUREMENTS) = REAL (Returned)
+      }{
+         Rotation angle averaged over each integration
+      }
+      \sstsubsection{
+         ANGROT\_VAR (N\_INTEGRATIONS, N\_MEASUREMENTS) = REAL (Returned)
+      }{
+         Variance on averaged angle
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given \& Returned)
+      }{
+         Global status
+      }
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright \copyright 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+      Research Council. All Rights Reserved.
+   }
+}
+\sstroutine{
+   SURFLIB\_CLIP\_GRID
+}{
+   Remove spikes from grid
+}{
+   \sstdescription{
+      Given the binned data calculated by SURFLIB\_FILL\_GRID
+      and the limits calculated by SURFLIB\_STATS\_GRID,
+      clip all points that lie outside the statistical limits provided
+      by the stats array.
+   }
+   \sstinvocation{
+       CALL SURFLIB\_CLIP\_GRID(N\_FILES, N\_PTS, NX, NY, NMAX, NSIGMA,
+            N\_BOLS, BITNUM, QUALITY\_PTR, BINS, BIN\_POS, STATS, IPOS,
+            JPOS, NSPIKES, STATUS)
+   }
+   \sstarguments{
+      \sstsubsection{
+         N\_FILES = INTEGER (Given)
+      }{
+         Number of input data sets
+      }
+      \sstsubsection{
+         N\_PTS(N\_FILES) = INTEGER (Given)
+      }{
+         Number of points in each data set
+      }
+      \sstsubsection{
+         NX = INTEGER (Given)
+      }{
+         Size of X dimension
+      }
+      \sstsubsection{
+         NY = INTEGER (Given)
+      }{
+         Size of Y dimension
+      }
+      \sstsubsection{
+         NMAX = INTEGER (Given)
+      }{
+         Maximum value allowed for third dimension of BINS
+      }
+      \sstsubsection{
+         N\_BOLS ( N\_FILES ) = INTEGER (Given)
+      }{
+         Number of bolometers per file (used for constructing message for users)
+      }
+      \sstsubsection{
+         BITNUM = INTEGER (Given)
+      }{
+         Bit number that is modified when set bad
+      }
+      \sstsubsection{
+         DATA\_PTR( N\_FILES ) = INTEGER (Given \& Returned)
+      }{
+         The input data with each spike replaced with a median value
+      }
+      \sstsubsection{
+         QUALITY\_PTR(N\_FILES) = INTEGER (Given \& Returned)
+      }{
+         Pointers to quality arrays. Note that quality arrays are modified.
+         (The whole point of this routine) even though the pointers are not.
+      }
+      \sstsubsection{
+         BINS(NX, NY, NMAX) = REAL (Given)
+      }{
+         The data stored in relation to its position
+      }
+      \sstsubsection{
+         BIN\_POS (NX, NY, NMAX) = INTEGER (Given)
+      }{
+         Position of each data point in quality arrays
+      }
+      \sstsubsection{
+         STATS (NX, NY, 3) = REAL (Given)
+      }{
+         Statistics of each bin. 1=Median, 2=High, 3=Low
+      }
+      \sstsubsection{
+         PNTS(NMAX) = REAL (Given)
+      }{
+         Scratch space for copying in the data from each I,J
+      }
+      \sstsubsection{
+         IPOS(NX$*$NY) = INTEGER (Given)
+      }{
+         I position in array
+      }
+      \sstsubsection{
+         JPOS(NX$*$NY) = INTEGER (Given)
+      }{
+         J position in array
+      }
+      \sstsubsection{
+         NSPIKES = INTEGER (Returned)
+      }{
+         Number of spikes removed for a given file
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given \& Returned)
+      }{
+         Global Status
+      }
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright \copyright 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+      Research Council. All Rights Reserved.
+   }
+}
+\sstroutine{
+   SURFLIB\_DECODE\_REMSKY\_STRING
+}{
+   Calculate bolometer list from remsky input
+}{
+   \sstdescription{
+      Given an array of bolometer descriptions, return an array
+      of bolometer numbers.
+      Input array can contain a variety of forms for identifying bolometers
+      or lists of bolometers. This string is generated by, for example, the
+      REMSKY task.
+   }
+   \sstinvocation{
+       CALL SURFLIB\_DECODE\_REMSKY\_STRING( SUB\_INSTRUMENT,
+            N\_ELEMENTS, BOL\_DESC, N\_BOLS, BOL\_ADC, BOL\_CHAN,
+            BOL\_LIST, N\_BOLS\_OUT,
+            STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         SUB\_INSTRUMENT = CHARACTER (Given)
+      }{
+         Sub instrument name. This governs the bolometers that
+         are allowed to be returned.
+      }
+      \sstsubsection{
+         N\_ELEMENTS = INTEGER (Given)
+      }{
+         Number of elements in the input array
+      }
+      \sstsubsection{
+         BOL\_DESC( N\_ELEMENTS ) = CHARACTER$*$($*$) (Given)
+      }{
+         Array of bolometer descriptions
+         Can take the form of:
+
+\begin{tabular}{ll}
+     \texttt{n}     &   bolometer number\\
+     \texttt{id}    &   bolometer id (eg H7)\\
+     \texttt{all}   &   all bolometers\\
+     \texttt{rn}    &   Nth ring of bolometers\\
+\end{tabular}
+
+         Can be prefixed with a minus sign to indicate that a bolometer
+         should be removed from the final list. The calculation is sequential.
+      }
+      \sstsubsection{
+         N\_BOLS = INTEGER (Given)
+      }{
+         Maximum allowed size for return array containing bolometer numbers
+         An error is given if this number is exceeded. In effect this
+         is equivalent to the actual number of bolometers on the array.
+      }
+      \sstsubsection{
+         BOL\_ADC( N\_BOLS ) = INTEGER (Given)
+      }{
+         ADC numbers for identifying bolometers
+      }
+      \sstsubsection{
+         BOL\_CHAN( N\_BOLS ) = INTEGER (Given)
+      }{
+         Channel number for identifying bolometers
+      }
+      \sstsubsection{
+         BOL\_LIST( N\_BOLS ) = INTEGER (Returned)
+      }{
+         List of bolometer numbers corresponding to the supplied strings.
+      }
+      \sstsubsection{
+         N\_BOLS\_OUT = INTEGER (Returned)
+      }{
+         Actual number of bolometers returned in BOL\_LIST
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given \& Returned)
+      }{
+         Global status
+      }
+   }
+   \sstdiytopic{
+      Syntax
+   }{
+\begin{tabular}{ll}
+\texttt{[all]}              & Whole array\\
+\texttt{[r0]}               & Ring zero (central pixel)\\
+\texttt{[h7,r1]}            & inner ring and h7\\
+\texttt{[r1,-h8]}           & inner ring without h8\\
+\texttt{[r1,-18]}           & inner ring without bolometer 18\\
+\texttt{[all,-r1,-h7]}      & all pixels except the inner ring/h7\\
+\texttt{[all,-r3,g1]}       & all pixels except ring 3 but with
+                             g1 (g1 is in r3)\\
+\texttt{[all,-r1,-r2,-r3,-r4,-r5]} & Selects the central pixel!!\\
+\end{tabular}
+
+       Note that the sequence is evaluated in turn so that \texttt{[all,-all,h7]} will
+       still end up with pixel \texttt{h7}.
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright \copyright 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+      Research Council. All Rights Reserved.
+   }
+}
+\sstroutine{
+   SURFLIB\_DIFF\_DESPIKE
+}{
+   Despike data scan by detecting points
+   more than nsigma from running 2-point mean
+}{
+   \sstdescription{
+      This routine removes spikes from SCAN/MAP observations.
+      The scan map differential despiking algorithm uses 2 criteria
+      to decide which points are spikes.
+
+      First, for each bolometer used a pass is made through each
+      scan calculating for each point:-
+
+\begin{equation}
+        diff(i) = point(i) - \frac{(point(i-1) + point(i+1))}{2.0}
+\end{equation}
+
+      Values of {\tt '}diff{\tt '} for the first and last points in the scan are
+      calculated in a similar way but subtracting the mean of points
+      2 and 3 and points n-1 and n-2 respectively.
+
+      The mean and standard deviation of {\tt '}diff{\tt '} are calculated by
+      coadding the 10 points at each end of the scan where,
+      hopefully, there is no source emission. Spikes in these
+      regions are handled by removing points from the coadd that lie
+      further than 3 sigma from the mean, then redoing the
+      calculation recursively until no further points need be
+      removed.
+
+      The first criterion for a spike is that it{\tt '}s {\tt '}diff{\tt '} value
+      should be further from the mean of {\tt '}diff{\tt '} by NSIGMA times the
+      sigma derived from the endpoints.
+
+      The problem with this simple approach is that bright sources
+      in the scan themselves lead to excursions in {\tt '}diff{\tt '} that can
+      be wrongly identified as spikes. To prevent this happening a
+      second criterion is used. In this the scan values are
+      convolved with a 3 sample wide box so that each {\tt '}box{\tt '} point is
+      the average of the point itself and the points on either side of
+      it. {\tt '}Box{\tt '} is expected to increase faster for real sources than
+      for spikes because in them the increase will be spread over
+      all 3 averaged points rather than just 1.
+
+      The second criterion for a spike is met, therefore, if a
+      point{\tt '}s {\tt '}diff{\tt '} is further from the {\tt '}diff{\tt '} mean than the value
+      of {\tt '}box{\tt '} at that point.
+
+      Fixed-up values for points that have identified as spikes are
+      calculated by interpolating between the closest healthy points
+      on either side.
+
+      The second spike criterion also means unfortunately that the
+      technique is less sensitive to spikes on bright sources than
+      elsewhere. In addition, it is still possible to clip bright
+      sources if too low a value for NSIGMA is used. It is
+      recommended to run despike several times with different values
+      of NSIGMA. Begin with NSIGMA=5, look at the result to see how
+      effective despiking has been, then repeat the process with
+      NSIGMA=4.5, 4.0 etc. until you start to clip source
+      information.
+   }
+   \sstinvocation{
+       CALL SURFLIB\_DIFF\_DESPIKE (N\_EXPOSURES, N\_INTEGRATIONS,
+         N\_MEASUREMENTS, DEMOD\_POINTER, N\_BOL, N\_POS, IN\_DATA,
+         IN\_VARIANCE, IN\_QUALITY, BADBIT, NSIGMA, OUT\_DATA,
+         OUT\_VARIANCE, OUT\_QUALITY, NUM\_SPIKES, STATUS)
+   }
+   \sstarguments{
+      \sstsubsection{
+         N\_EXPOSURES                 = INTEGER (Given)
+      }{
+         maximum number of exposures per integration
+      }
+      \sstsubsection{
+         N\_INTEGRATIONS              = INTEGER (Given)
+      }{
+         number of integrations in the observation
+      }
+      \sstsubsection{
+         N\_MEASUREMENTS              = INTEGER (Given)
+      }{
+         number of measurements in the observation
+      }
+      \sstsubsection{
+         DEMOD\_POINTER (N\_EXPOSURES, N\_INTEGRATIONS, N\_MEASUREMENTS)
+      }{
+         array pointing to start and finish of scans in IN\_DATA
+      }
+      \sstsubsection{
+         N\_BOL                       = INTEGER (Given)
+      }{
+         the number of bolometers for which data was taken
+      }
+      \sstsubsection{
+         N\_POS                       = INTEGER (Given)
+      }{
+         the number of positions measured in the scan
+      }
+      \sstsubsection{
+         IN\_DATA (N\_BOL, N\_POS)      = REAL (Given)
+      }{
+         the measured data
+      }
+      \sstsubsection{
+         IN\_VARIANCE (N\_BOL, N\_POS)  = REAL (Given)
+      }{
+         the variance on IN\_DATA
+      }
+      \sstsubsection{
+         IN\_QUALITY (N\_BOL, N\_POS)   = BYTE (Given)
+      }{
+         the quality on IN\_DATA
+      }
+      \sstsubsection{
+         BADBIT                      = BYTE (Given)
+      }{
+         bad bit mask
+      }
+      \sstsubsection{
+         NSIGMA                      = REAL (Given)
+      }{
+         cut-off sigma for spikes
+      }
+      \sstsubsection{
+         OUT\_DATA (N\_BOL, N\_POS)     = REAL (Returned)
+      }{
+         the deconvolved data
+      }
+      \sstsubsection{
+         OUT\_VARIANCE (N\_BOL, N\_POS) = REAL (Returned)
+      }{
+         the variance on OUT\_DATA
+      }
+      \sstsubsection{
+         OUT\_QUALITY (N\_BOL, N\_POS)  = BYTE (Returned)
+      }{
+         the quality on OUT\_DATA
+      }
+      \sstsubsection{
+         NUM\_SPIKES                  = INTEGER (Returned)
+      }{
+         Total number of spikes detected
+      }
+      \sstsubsection{
+         STATUS                      = INTEGER (Given and returned)
+      }{
+         global status
+      }
+   }
+}
+\sstroutine{
+   SURFLIB\_FILL\_GRID
+}{
+   Populate grid with data points corresponding to position
+}{
+   \sstdescription{
+      Given an array of I,J coordinates associated with data values,
+      this routine places each data point onto the rectangular grid
+      and the position in the data array into a corresponding grid.
+      Grid is of size (NX,NY,NMAX) and each data point is placed into
+      a different layer (up to NMAX) for each I,J. We already know the
+      value of NMAX since the output array has been pre-allocated.
+   }
+   \sstinvocation{
+       CALL SURFLIB\_FILL\_GRID (N\_PTS, NX, NY, NMAX, OFFSET,
+            IN\_DATA, IN\_QUALITY, BADBIT, IJ, GRID, BINS, BIN\_POS,
+            STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         N\_PTS = INTEGER (Given)
+      }{
+         Number of I,J pairs supplied
+      }
+      \sstsubsection{
+         NX = INTEGER (Given)
+      }{
+         Size of X dimension
+      }
+      \sstsubsection{
+         NY = INTEGER (Given)
+      }{
+         Size of Y dimension
+      }
+      \sstsubsection{
+         NMAX = INTEGER (Given)
+      }{
+         Maximum value allowed for third dimension of BINS
+      }
+      \sstsubsection{
+         OFFSET = INTEGER (Given)
+      }{
+         This is the offset in the IJ data array. Not used for IJ itself
+         (Since this is added to the pointer of the input array if needed)
+         in this array but is added onto each of the values placed into
+         the BIN\_POS array so that we can keep track of the input data
+         without using a further two pieces of information.
+      }
+      \sstsubsection{
+         IN\_DATA(N\_PTS) = REAL (Given)
+      }{
+         Input data
+      }
+      \sstsubsection{
+         IN\_QUALITY(N\_PTS) = BYTE (Given)
+      }{
+         Input quality
+      }
+      \sstsubsection{
+         BADBIT = BYTE (Given)
+      }{
+         Bad bits mask for quality array
+      }
+      \sstsubsection{
+         IJ ( 2, N\_PTS ) = INTEGER (Given)
+      }{
+         Positions of each point (I,J) in output grid for each N\_PTS
+      }
+      \sstsubsection{
+         GRID (NX, NY) = INTEGER (Given \& Returned)
+      }{
+         Scratch space for keeping track of the number of points added
+         into each I,J
+      }
+      \sstsubsection{
+         BINS(NX, NY, NMAX) = REAL (Given \& Returned)
+      }{
+         The data stored in relation to its position
+      }
+      \sstsubsection{
+         BIN\_POS (NX, NY, NMAX) = INTEGER (Given \& Returned)
+      }{
+         The position in the input data arrays associated with each data point
+         in BINS
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given \& Returned)
+      }{
+         Global Status
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         GRID is not initialised by this routine since it is incremented
+           each time a point is placed in BINS
+
+         \sstitem
+         BINS and BIN\_POS are not initialised here but should be filled
+           with bad before this routine is first called.
+
+         \sstitem
+         a status of SAI\_\_WARN is returned if the indices lie outside
+           the model area. It is up to the calling routine to decide
+           whether to halt.
+      }
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright \copyright 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+      Research Council. All Rights Reserved.
+   }
+}
+\sstroutine{
+   SURFLIB\_FILL\_POLPACK\_ANGLES
+}{
+   Average
+}{
+   \sstdescription{
+      Copy the waveplate and rotation angles from WPLATE and ANGROT
+      (Which have dimensions (N\_INT,N\_MEAS) to a 2-dim array containing
+      the angles (waveplate and rotation) for each integration and
+      (in a separate array) the angles for each measurement.
+      Note that since the rotation angles are stored in the file
+      as one per integration, they need to be averaged over the
+      integration in order to calculate the correct value for the
+      measurement. ANG\_MEAS and ANG\_INT should be set to VAL\_\_BADR
+      before entry to this routine.
+   }
+   \sstinvocation{
+       CALL SURFLIB\_FILL\_POLPACK\_ANGLES( MAX\_FILE, MAX\_INT,
+            MAX\_MEAS, N\_FILE, N\_INT, N\_MEAS,
+            WPLATE, ANGROT, FAST\_AXIS, ANG\_INT, ANG\_MEAS, STATUS)
+   }
+   \sstarguments{
+      \sstsubsection{
+         MAX\_FILE = INTEGER (Given)
+      }{
+         First Dimension of ANG\_INT,ANG\_MEAS
+      }
+      \sstsubsection{
+         MAX\_INT = INTEGER (given)
+      }{
+         Second dimension of ANG\_INT
+      }
+      \sstsubsection{
+         MAX\_MEAS = INTEGER (given)
+      }{
+         Second dimension of ANG\_MEAS
+      }
+      \sstsubsection{
+         N\_FILE = INTEGER (Given)
+      }{
+         Current slice in ANG\_INT, ANG\_MEAS
+      }
+      \sstsubsection{
+         N\_INT = INTEGER (Given)
+      }{
+         Number of integrations per measurement
+      }
+      \sstsubsection{
+         N\_MEAS = INTEGER (Given)
+      }{
+         Number of measurements
+      }
+      \sstsubsection{
+         WPLATE(N\_INT, N\_MEAS) = REAL (Given)
+      }{
+         Waveplate angles for each integration
+      }
+      \sstsubsection{
+         ANGROT(N\_INT, N\_MEAS) = REAL (Given)
+      }{
+         Waveplate angles for each integration
+      }
+      \sstsubsection{
+         FAST\_AXIS = REAL (Given)
+      }{
+         Angle of the fast axis of the waveplate and the zero position
+         of the waveplate. Added to each waveplate angle to calculate
+         the true angle of the waveplate.
+      }
+      \sstsubsection{
+         ANG\_INT(MAX\_FILE, MAX\_INT, 2) = REAL (Returned)
+      }{
+         Waveplate and rotation angles for each integration
+         1=Waveplate, 2=Rotation. The waveplate angle is corrected for
+         fast axis.
+      }
+      \sstsubsection{
+         ANG\_MEAS(MAX\_FILE, MAX\_MEAS, 2) = REAL (Returned)
+      }{
+         Waveplate and rotation angles for each measurement.
+         1=Waveplate, 2=Rotation. The waveplate angle is corrected for
+         fast axis. The rotation angle is average over each integration
+         during the measurement. The waveplate angle is set to bad
+         if it is not constant for the given measurement.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         Global status
+      }
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright \copyright 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+      Research Council. All Rights Reserved.
+   }
+}
+\sstroutine{
+   SURFLIB\_FILL\_WPLATE
+}{
+   Populate the WavePlate array
+}{
+   \sstdescription{
+      Populate an array containing the waveplate angle for each
+      sample. This can be calculated in two ways. If the SCUCD\_WPLATE
+      array is present (N\_WPLATE$>$0), then this array contains the waveplate
+      position for each measurement. If this array is not present
+      the Waveplate angle is assumed to start at 0 degrees and increment
+      by 22.5 degrees for each integration. If the number of
+      measurements exceeds the number of positions in the SCUCD\_WPLATE
+      array the sequence wraps round to the first value.
+      The final output array will contain a single number (waveplate
+      position) per sample (up to N\_POS). The output value will be
+      in degrees.
+
+      Since integrations and measurements are stored sequentially
+      in a data file (in DEM\_PNTR) there is no need to use
+      SCULIB\_FIND\_SWITCH to determine the start and end points
+      in the data array - use SCULIB\_FIND\_INT.
+
+      The waveplate angles are also stored in a small
+      array containing a single wave plate angle for each integration
+      and each measurement. This is created to make it easier to
+      extract the individual waveplate positions later on when
+      storing them in output file
+   }
+   \sstinvocation{
+       CALL SURFLIB\_FILL\_WPLATE(USE\_WP, N\_WPLATE, SCUCD\_WPLATE, N\_POS, N\_EXP,
+            N\_INT, N\_MEAS, DEM\_PNTR, WPLATE\_OUT, WPLATE\_ANG, STATUS)
+   }
+   \sstarguments{
+      \sstsubsection{
+         N\_WPLATE = INTEGER (Given)
+      }{
+         Size of SCUCD\_WPLATE array. If the value is zero then
+         SCUCD\_WPLATE will not be used.
+      }
+      \sstsubsection{
+         SCUCD\_WPLATE(N\_WPLATE) = REAL (Given)
+      }{
+         Waveplate positions for each measurement (degrees)
+      }
+      \sstsubsection{
+         N\_POS = INTEGER (Given)
+      }{
+         Number of samples in WPLATE\_OUT
+      }
+      \sstsubsection{
+         N\_EXP = INTEGER (Given)
+      }{
+         Number of exposures in DEM\_PNTR array
+      }
+      \sstsubsection{
+         N\_INT = INTEGER (Given)
+      }{
+         Number of integrations in DEM\_PNTR array
+      }
+      \sstsubsection{
+         N\_MEAS= INTEGER (Given)
+      }{
+         Number of measurements in DEM\_PNTR array
+      }
+      \sstsubsection{
+         DEM\_PNTR ( 1, N\_EXP, N\_INT, N\_MEAS ) = INTEGER (Given)
+      }{
+         Start position for each EXP, INT, MEAS
+      }
+      \sstsubsection{
+         WPLATE\_OUT ( N\_POS ) = REAL (Returned)
+      }{
+         Waveplate position for each sample (degrees)
+      }
+      \sstsubsection{
+         WPLATE\_ANG( N\_INT, N\_MEAS ) = REAL (Given)
+      }{
+         Waveplate position for each integration/measurement
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given \& Returned)
+      }{
+         Global status
+      }
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright \copyright 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+      Research Council. All Rights Reserved.
+   }
+}
+\sstroutine{
+   SURFLIB\_HISTOGRAM\_GRID
+}{
+   Calculate a 2-D histogram of I,J coordinates on a grid
+}{
+   \sstdescription{
+      Given an array of I,J coordinates calculate the histogram
+      of all points onto this grid of size NX $*$ NY. Just tells you
+      how many data points there are per cell. Returns the histogram
+      and the highest value in the histogram
+   }
+   \sstinvocation{
+       CALL SURFLIB\_HISTOGRAM\_GRID (N\_PTS, NX, NY, USEDATA,
+            IN\_DATA, IN\_QUALITY, BADBIT, IJ, GRID, IMAX, JMAX, NMAX,
+            STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         N\_PTS = INTEGER (Given)
+      }{
+         Number of I,J pairs supplied
+      }
+      \sstsubsection{
+         NX = INTEGER (Given)
+      }{
+         Size of X dimension
+      }
+      \sstsubsection{
+         NY = INTEGER (Given)
+      }{
+         Size of Y dimension
+      }
+      \sstsubsection{
+         USEDATA = LOGICAL (Given)
+      }{
+         If TRUE the histogram takes bad data points into account by not
+         including them in the histogram. If false the straight histogram
+         of the I,J{\tt '}s is constructed.
+      }
+      \sstsubsection{
+         IN\_DATA(N\_PTS) = REAL (Given)
+      }{
+         Input data
+      }
+      \sstsubsection{
+         IN\_QUALITY(N\_PTS) = BYTE (Given)
+      }{
+         Input quality
+      }
+      \sstsubsection{
+         BADBIT = BYTE (Given)
+      }{
+         Bad bits mask for quality array
+      }
+      \sstsubsection{
+         IJ ( 2, N\_PTS ) = INTEGER (Given)
+      }{
+         Positions of each point (I,J) in output grid
+      }
+      \sstsubsection{
+         GRID (NX, NY) = INTEGER (Given \& Returned)
+      }{
+         Histogram. Note that array is not cleared by this routine leaving
+         the possibility that the routine can be called multiple times
+         to include more than one data set.
+      }
+      \sstsubsection{
+         IMAX = INTEGER (Returned)
+      }{
+         I position of maximum [first one encountered]
+      }
+      \sstsubsection{
+         JMAX = INTEGER (Returned)
+      }{
+         J position of maximum [first one encountered]
+      }
+      \sstsubsection{
+         NMAX = INTEGER (Returned)
+      }{
+         Maximum value in histogram
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given \& Returned)
+      }{
+         Global Status
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         If USEDATA is TRUE the data and quality array are used so that bad
+           pixels can be identified and not included into the histogram of
+           positions.
+
+         \sstitem
+         GRID is not initialised by this routine
+
+         \sstitem
+         A warning error is raised if the bounds of the histogram
+           are exceeded. It is up to the caller to decide whether this
+           is a fatal error.
+      }
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright \copyright 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+      Research Council. All Rights Reserved.
+   }
+}
+\sstroutine{
+   SURFLIB\_MEDIAN\_REGRID
+}{
+   Generate image with each pixel the median of all pixels in bin
+}{
+   \sstdescription{
+      This is done in two stages:
+
+      1) Find the size of the output grid from the maximum extent of
+         the input data.
+      2) Loop through data. Find I,J coordinate of each point in the
+         output grid.
+      3) Find out maximum number of points for an I,J position.
+      4) Put data onto grid in array (I,J,N) [REALS].
+         We also need to store positions of these data.
+         We can either do it by storing the file number, bolometer and
+         position (time) index OR we can just store some index in a merged
+         data array that goes from 1..TOT\_PTS.
+          First method is easy but memory hungry. Second method is
+          more efficient but does need some reconstruction to work
+          out where the point was in the original data.
+        Use the second method.
+
+      Once the data is gridded, it is first displayed and then
+      despiked. Currently despiking is done on a simple sigma clipping
+      basis for each bin.
+   }
+   \sstinvocation{
+       CALL SURFLIB\_MEDIAN\_REGRID( N\_FILES, N\_PTS, DIAMETER,
+            WAVELENGTH, OUT\_PIXEL, NX, NY, ICEN, JCEN, BOL\_RA\_PTR,
+            BOL\_DEC\_PTR, DATA\_PTR,  OUT\_DATA, OUT\_VAR, OUT\_QUAL,
+            STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         N\_FILES = INTEGER (Given)
+      }{
+         Number of data sets (ie files)
+      }
+      \sstsubsection{
+         N\_PTS ( N\_FILES ) = INTEGER (Given)
+      }{
+         Total number of points in each map
+      }
+      \sstsubsection{
+         N\_POS( N\_FILES ) = INTEGER (Given)
+      }{
+         Number of positions per set (Y positions)
+      }
+      \sstsubsection{
+         N\_BOLS( N\_FILES ) = INTEGER (Given)
+      }{
+         Number of bolometers per set (X positions)
+      }
+      \sstsubsection{
+         BOL\_RA\_PTR( N\_FILES ) = INTEGER (Given)
+      }{
+         Array of pointers to position information (X coords)
+         Note that each data set has positions for N\_POS $*$ N\_BOLS
+      }
+      \sstsubsection{
+         BOL\_RA\_PTR( N\_FILES ) = INTEGER (Given)
+      }{
+         Array of pointers to position information (Y coords)
+      }
+      \sstsubsection{
+         DATA\_PTR( N\_FILES ) = INTEGER (Given)
+      }{
+         Pointers to actual data arrays
+      }
+      \sstsubsection{
+         QUALITY\_PTR( N\_FILES ) = INTEGER (Given)
+      }{
+         Pointer to quality arrays
+      }
+      \sstsubsection{
+         NX = INTEGER (Returned)
+      }{
+         Number of points in grid (X)
+      }
+      \sstsubsection{
+         NY = INTEGER (Returned)
+      }{
+         Number of points in grid (Y)
+      }
+      \sstsubsection{
+         ICEN = INTEGER (Returned)
+      }{
+         Reference pixel (X)
+      }
+      \sstsubsection{
+         JCEN = INTEGER (Returned)
+      }{
+         Reference pixel (Y)
+      }
+      \sstsubsection{
+         NSPIKES ( N\_FILES ) = INTEGER (Returned)
+      }{
+         Number of spikes detected (and removed) in each file
+      }
+      \sstsubsection{
+         BADBIT ( N\_FILES ) = BYTE (Given)
+      }{
+         Bad bit mask for identifying bad pixels from quality
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given \& Returned)
+      }{
+         Global Status
+      }
+   }
+   \sstnotes{
+      For SMODE=NONE, DMODE is only requested if a plot is required.
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright \copyright 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+      Research Council. All Rights Reserved.
+   }
+}
+\sstroutine{
+   SURFLIB\_PLOT\_GRID
+}{
+   Plot unwrapped grid
+}{
+   \sstdescription{
+      Given the binned data calculated by SURFLIB\_FILL\_GRID
+      Plot the unwrapped data as {\tt '}data{\tt '} against {\tt '}bin{\tt '}
+      Use this as a first attempt at spike detection
+   }
+   \sstinvocation{
+       CALL SURFLIB\_PLOT\_GRID(UNIT, NX, NY, NMAX, NSIGMA, IPOS, JPOS
+           BINS, STATS, PNTS, POS, STATUS)
+   }
+   \sstarguments{
+      \sstsubsection{
+         UNIT = INTEGER (Given)
+      }{
+         Display number
+      }
+      \sstsubsection{
+         NX = INTEGER (Given)
+      }{
+         Size of X dimension
+      }
+      \sstsubsection{
+         NY = INTEGER (Given)
+      }{
+         Size of Y dimension
+      }
+      \sstsubsection{
+         NMAX = INTEGER (Given)
+      }{
+         Maximum value allowed for third dimension of BINS
+      }
+      \sstsubsection{
+         NSIGMA = REAL (Given)
+      }{
+         How many sigma away we plot the guide lines. If NSIGMA is negative
+         we dont plot the sigma ranges on the plot.
+      }
+      \sstsubsection{
+         IPOS(NX $*$ NY) = INTEGER (Given)
+      }{
+         I coordinate for each pixel
+      }
+      \sstsubsection{
+         JPOS(NX $*$ NY) = INTEGER (Given)
+      }{
+         J coordinate for each pixe
+      }
+      \sstsubsection{
+         STATS(NX, NY, 3) = REAL (Given)
+      }{
+         Statistics for each bin. 1=Median, 2=high, 3=low
+      }
+      \sstsubsection{
+         BINS(NX, NY, NMAX) = REAL (Given)
+      }{
+         The data stored in relation to its position
+      }
+      \sstsubsection{
+         PNTS(NMAX) = REAL (Given)
+      }{
+         Scratch space for copying in the data from each I,J
+      }
+      \sstsubsection{
+         POS(NMAX) = REAL (Given)
+      }{
+         Scratch space for storing the X positions for each marker on the plot
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given \& Returned)
+      }{
+         Global Status
+      }
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright \copyright 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+      Research Council. All Rights Reserved.
+   }
+}
+\sstroutine{
+   SURFLIB\_PROCESS\_BOLS
+}{
+   Calculate apparent RA/Dec of bolometers and some extra processing
+}{
+   \sstdescription{
+      This routine calculates the apparent RA and Dec of each bolometer
+      for all measurements, integrations and exposures. Both JIGGLE and
+      SCAN data are supported.
+      In addition, if this is called from EXTINCTION (ie EXTINCTION=.TRUE.)
+      the data is corrected for extinction using the calculated elevation
+      of the bolometers. If EXTINCTION is .FALSE. all the bolometers positions
+      are converted to apparent RA-Dec at the reference modified Julian
+      date (given by MJD\_STANDARD).
+
+      There is some complication for moving sources (use PL output coords):
+
+       For JIGGLE:
+      \sstitemlist{
+
+         \sstitem
+           [1] Calculate map RA/Dec at new MJD
+
+         \sstitem
+           [2] Convert to tangent plane offsets for this map centre
+
+      }
+       For SCAN:
+      \sstitemlist{
+
+         \sstitem
+           [1] Calculate array centre for reference MJD
+
+         \sstitem
+           [2] Calculate tangent offsets of array centre relative to map centre
+
+         \sstitem
+           [3] Calculate map centre at the interpolated MJD
+
+         \sstitem
+           [4] Work out array centre given new map centre
+
+      }
+       This is all because the file stores RA start and end relative
+       to the fixed centre at the start of the observation.
+   }
+   \sstinvocation{
+       CALL SURFLIB\_PROCESS\_BOLS(TSKNAME, N\_BEAMS,
+            N\_BOL, N\_POS, N\_POS\_BEAMS, N\_SWITCHES, N\_EXPOSURES, N\_INTEGRATIONS,
+            N\_MEASUREMENTS,START\_EXP, END\_EXP, START\_INT, END\_INT,
+            START\_MEAS, END\_MEAS,N\_MAP, N\_FITS, FITS, DEM\_PNTR, LST\_STRT,
+            IN\_ROTATION, SAMPLE\_MODE, SAMPLE\_COORDS, OUT\_COORDS,
+            JIGGLE\_REPEAT, JIGGLE\_COUNT, JIGGLE\_X, JIGGLE\_Y,
+            JIGGLE\_P\_SWITCH, RA\_CEN, DEC\_CEN,
+            RA1, RA2, DEC1, DEC2, MJD\_STANDARD, IN\_UT1,
+            MJD1, LONG1, LAT1, MJD2, LONG2, LAT2,
+            LOCAL\_COORDS, MAP\_X, MAP\_Y,
+            N\_POINT, POINT\_LST, POINT\_DAZ, POINT\_DEL,
+            NUM\_CHAN, NUM\_ADC, BOL\_ADC, BOL\_CHAN, BOL\_DU3, BOL\_DU4,
+            SCAN\_REVERSAL, FIRST\_LST, SECOND\_LST, FIRST\_TAU, SECOND\_TAU,
+            BOL\_DEC, BOL\_RA, NDATA, NVARIANCE, USE\_LST, LST\_DATA,
+            WAVEPLATE\_ANG, BOL\_IP\_DATA,
+            STATUS)
+   }
+   \sstarguments{
+      \sstsubsection{
+         TSKNAME    = \_CHAR (Given)
+      }{
+         Taskname that is used to determine whether certain parts
+         of the code are executed. Special values are:
+         SCUOVER - when using SCUOVER this prevents the EXP\_START
+                   loop from running properly. Only a single set
+                   of bolometer positions are returned.
+         EXTINCTION - corrects the input data for extinction
+         REMIP   - Corrects the input data for instrumental polarisation
+         All other values for this parameter assume that the bolometer
+         positions are to be calculated and returned (converted to
+         a standard MJD)
+      }
+      \sstsubsection{
+         N\_BEAMS = \_INTEGER (Given)
+      }{
+         Number of beams in the input data. Only used if EXTINCTION=.TRUE.
+      }
+      \sstsubsection{
+         N\_BOL = \_INTEGER (Given)
+      }{
+         Number of bolometers in the input data
+      }
+      \sstsubsection{
+         N\_POS = \_INTEGER (Given)
+      }{
+         Number of `samples{\tt '} taken
+      }
+      \sstsubsection{
+         N\_POS\_BEAMS = INTEGER (Given \& Returned)
+      }{
+         Number of beam positions to be returned per point. Can only be
+         reduced. If equals 3 then order is M,L,R
+      }
+      \sstsubsection{
+         N\_SWITCHES = \_INTEGER (Given)
+      }{
+         Number of switches
+      }
+      \sstsubsection{
+         N\_EXPOSURES = \_INTEGER (Given)
+      }{
+         Number of exposures
+      }
+      \sstsubsection{
+         N\_INTEGRATIONS = \_INTEGER (Given)
+      }{
+         Number of integrations
+      }
+      \sstsubsection{
+         N\_MEASUREMENTS = \_INTEGER (Given)
+      }{
+         Number of measurements
+      }
+      \sstsubsection{
+         START\_EXP  = INTEGER (Given)
+      }{
+         First exposure to process
+      }
+      \sstsubsection{
+         END\_EXP    = INTEGER (Given)
+      }{
+         Last exposure to process
+      }
+      \sstsubsection{
+         START\_INT  = INTEGER (Given)
+      }{
+         First integration to process
+      }
+      \sstsubsection{
+         END\_INT    = INTEGER (Given)
+      }{
+         End integration to process
+      }
+      \sstsubsection{
+         START\_MEAS = INTEGER (Given)
+      }{
+         First measurement to process
+      }
+      \sstsubsection{
+         END\_MEAS   = INTEGER (Given)
+      }{
+         End measurement to process
+      }
+      \sstsubsection{
+         N\_MAP = \_INTEGER (Given)
+      }{
+         Map number of input data (not used for EXTINCTION or REMIP)
+      }
+      \sstsubsection{
+         N\_FITS = \_INTEGER (Given)
+      }{
+         Number of FITS items
+      }
+      \sstsubsection{
+         FITS() = \_CHAR$*$80 (Given)
+      }{
+         FITS array
+      }
+      \sstsubsection{
+         DEM\_PNTR() = \_INTEGER (Given)
+      }{
+         DEM\_PNTR array - position in file of each exposure
+      }
+      \sstsubsection{
+         LST\_STRT() = \_DOUBLE (Given)
+      }{
+         LST of each exposure
+      }
+      \sstsubsection{
+         IN\_ROTATION = \_DOUBLE (Given)
+      }{
+         Angle between apparent N and N of input coord system (radians)
+      }
+      \sstsubsection{
+         SAMPLE\_MODE = \_CHAR (Given)
+      }{
+         Sample mode of input file
+      }
+      \sstsubsection{
+         SAMPLE\_COORDS = \_CHAR (Given)
+      }{
+         Coordinate system of sample offsets
+      }
+      \sstsubsection{
+         OUT\_COORDS = \_CHAR (Given)
+      }{
+         Output coordinate system
+      }
+      \sstsubsection{
+         JIGGLE\_REPEAT = \_INTEGER (Given)
+      }{
+         Number of times jiggle pattern is repeated in a switch
+      }
+      \sstsubsection{
+         JIGGLE\_COUNT = \_INTEGER (Given)
+      }{
+         Number of jiggle in pattern
+      }
+      \sstsubsection{
+         JIGGLE\_X(JIGGLE\_COUNT) = \_REAL (Given)
+      }{
+         X jiggle offsets (arcsec)
+      }
+      \sstsubsection{
+         JIGGLE\_Y(JIGGLE\_COUNT) = \_REAL (Given)
+      }{
+         Y jiggle offsets (arcsec)
+      }
+      \sstsubsection{
+         JIGGLE\_P\_SWITCH = \_INTEGER
+      }{
+         Number of jiggles per switch
+      }
+      \sstsubsection{
+         RA\_CEN = \_DOUBLE (Given)
+      }{
+         apparent RA of output map centre (radians). Used mainly for JIGGLE
+         but also for scan/map data pre Dec 1997
+      }
+      \sstsubsection{
+         DEC\_CEN = \_DOUBLE (Given)
+      }{
+         apparent Dec of output map centre (radians) Used mainly for JIGGLE
+         but also for scan/map data pre Dec 1997
+      }
+      \sstsubsection{
+         RA1 = \_REAL (Given)
+      }{
+         RA (in RD, RJ or AZ) at start of scan for each exposure (SCAN only)
+      }
+      \sstsubsection{
+         RA2 = \_REAL (Given)
+      }{
+         RA (in RD, RJ or AZ) at end of scan for each exposure (SCAN only)
+      }
+      \sstsubsection{
+         DEC1 = \_REAL (Given)
+      }{
+         DEC (in RJ, RD or AZ) at start of scan for each exposure (SCAN only)
+      }
+      \sstsubsection{
+         DEC2 = \_REAL (Given)
+      }{
+         DEC (in RD, RJ, AZ) at end of scan for each exposure (SCAN only)
+      }
+      \sstsubsection{
+         MJD\_STANDARD = \_DOUBLE (Given)
+      }{
+         Standard MJD to which each input map is referenced (EXTINCTION=FALSE)
+      }
+      \sstsubsection{
+         IN\_UT1 = \_DOUBLE (Given)
+      }{
+         MJD of input data.
+      }
+      \sstsubsection{
+         MJD1 = DOUBLE (Given)
+      }{
+         MJD of first planet position
+      }
+      \sstsubsection{
+         LONG1 = DOUBLE (Given)
+      }{
+         Longitude (apparent RA) at MJD1
+      }
+      \sstsubsection{
+         LAT1 = DOUBLE (Given)
+      }{
+         Latitude (apparent Dec) at MJD1
+      }
+      \sstsubsection{
+         MJD2 = DOUBLE (Given)
+      }{
+         MJD of second planet position
+      }
+      \sstsubsection{
+         LONG2 = DOUBLE (Given)
+      }{
+         Longitude (apparent RA) at MJD2
+      }
+      \sstsubsection{
+         LAT2 = DOUBLE (Given)
+      }{
+         Latitude (apparent Dec) at MJD2
+      }
+      \sstsubsection{
+         LOCAL\_COORDS = CHARACTER (Given)
+      }{
+         Coordinate system of offsets
+      }
+      \sstsubsection{
+         MAP\_X = DOUBLE (Given)
+      }{
+         X offset in LOCAL\_COORDS (radians)
+      }
+      \sstsubsection{
+         MAP\_Y = DOUBLE (Given)
+      }{
+         Y offset in LOCAL\_COORDS (radians)
+      }
+      \sstsubsection{
+         N\_POINT = \_INTEGER (Given)
+      }{
+         Number of pointing corrections (should be zero if EXTINCTION)
+      }
+      \sstsubsection{
+         POINT\_DEL = \_REAL (Given)
+      }{
+         Elevation pointing corrections (radians) [only if EXTINCTION=FALSE]
+      }
+      \sstsubsection{
+         POINT\_DAZ = \_REAL (Given)
+      }{
+         Azimuth pointing corrections (radians) [only if EXTINCTION=FALSE]
+      }
+      \sstsubsection{
+         POINT\_LST = \_DOUBLE (Given)
+      }{
+         LST of pointing corrections (radians) [only if EXTINCTION=FALSE]
+      }
+      \sstsubsection{
+         NUM\_CHAN = \_INTEGER (Given)
+      }{
+         Number of channels in DAQ
+      }
+      \sstsubsection{
+         NUM\_ADC = \_INTEGER (Given)
+      }{
+         Number of AtoD cards.
+      }
+      \sstsubsection{
+         BOL\_ADC = \_INTEGER (Given)
+      }{
+         A/D numbers of bolometers measured in input file
+      }
+      \sstsubsection{
+         BOL\_CHAN = \_INTEGER (Given)
+      }{
+         channel numbers of bolometers measured in input file
+      }
+      \sstsubsection{
+         BOL\_DU3 = \_REAL (Given)
+      }{
+         dU3 Nasmyth coordinates of bolometers
+      }
+      \sstsubsection{
+         BOL\_DU4 = \_REAL (Given)
+      }{
+         dU4 Nasmyth coordinates of bolometers
+      }
+      \sstsubsection{
+         SCAN\_REVERSAL = LOGICAL (Given)
+      }{
+         Multiply alternate exposures by -1 if SCANning
+      }
+      \sstsubsection{
+         FIRST\_LST = \_DOUBLE (Given)
+      }{
+         LST of first tau value (EXTINCTION only)
+      }
+      \sstsubsection{
+         SECOND\_LST = \_DOUBLE (Given)
+      }{
+         LST of second tau value (EXTINCTION only)
+      }
+      \sstsubsection{
+         FIRST\_TAU = \_REAL (Given)
+      }{
+         First tau value (EXTINCTION only)
+      }
+      \sstsubsection{
+         SECOND\_TAU = \_REAL (Given)
+      }{
+         Second tau value (EXTINCTION only)
+      }
+      \sstsubsection{
+         BOL\_DEC(N\_BOL, N\_POS, N\_POS\_BEAMS) = \_DOUBLE (Returned)
+      }{
+         Apparent DEC of bolometers for each measurement for MJD\_STANDARD
+         Depending on N\_POS\_BEAMS can contain M, L and R beam positions.
+      }
+      \sstsubsection{
+         BOL\_RA(N\_BOL, N\_POS, N\_POS\_BEAMS) = \_DOUBLE (Returned)
+      }{
+         Apparent RA of bolometers for each measurement for MJD\_STANDARD
+         Depending on N\_POS\_BEAMS can contain M, L and R beam positions.
+      }
+      \sstsubsection{
+         NDATA(N\_BOL, N\_POS, N\_BEAMS) = \_REAL (Given \& Returned)
+      }{
+         corrected data (EXTINCTION and REMIP only)
+      }
+      \sstsubsection{
+         NVARIANCE(N\_BOL, N\_POS, N\_BEAMS) = \_REAL (Given \& Returned)
+      }{
+         Extinction corrected variance (EXTINCTION only)
+      }
+      \sstsubsection{
+         USE\_LST = LOGICAL (Given)
+      }{
+         Do we return the LST positions? (TRUE  then we do)
+      }
+      \sstsubsection{
+         LST\_DATA(N\_POS) = DOUBLE (Returned)
+      }{
+         LST for each position.
+      }
+      \sstsubsection{
+         WAVEPLATE\_ANG = REAL (Given)
+      }{
+         waveplate position angle (Nasmyth degrees) (Given \& Returned)
+         The supplied value is the nasmyth angle in degrees and the
+         return value the sky rotation angle for each position.
+         (ie parallactic angle - elevation) in degrees (REMIP only)
+      }
+      \sstsubsection{
+         BOL\_IP\_DATA(8, NUM\_CHAN, NUM\_ADC) = REAL (Given)
+      }{
+         The IP data. This array contains the ip data for each
+         bolometer (specified by a combination of CHAN and ADC).
+         The 4 slices represent: P0, Pslope, Theta0 and ThetaSlope (REMIP only)
+         The next 4 slices are for the related variance (same order)
+      }
+      \sstsubsection{
+         STATUS = \_INTEGER (Given \& Returned)
+      }{
+         Global status
+      }
+   }
+   \sstnotes{
+      MAP\_X and MAP\_Y are only used for JIGGLE modes.
+      The SCAN/MAP offsets are wrapped into the RA1,DEC1,RA2,DEC2
+      numbers by the on-line system.
+      The offsets are added to the map centre every time round the
+      loop. This is because it is possible to have AZ offsets for
+      RA,Dec centres.
+
+      This routine tries to deal with  the different versions of
+      SCUCD (only affects SCAN/MAP data).
+      For version 0:
+
+        RA/Decs of the scan were incorrectly stored as RJ. They
+        are converted to RD before further processing.
+        The coordinate frame of RA1, RA2, DEC1 and DEC2 fro SCAN/MAP
+        depends on the CENTRE\_COORDS of the observation. For CENTRE=RD
+        the scan positions are in RD; for CENTRE=RB,RJ,GA the scans
+        are in RJ and for centre=AZ the scans are in AZ.
+        (SCULIB\_SCAN\_2\_RD)
+
+      For version 1.0:
+
+        A bug was introduced concerning the calculation of the
+        ends of the scans. The bug is recreated and inverted in order
+        to compensate. (SCULIB\_FIX\_SCAN\_V10)
+
+      Also, LO chopping for jiggle maps was broken until 19980730
+      such that the initial chop pa was calculated in Az but never
+      updated as the sky rotated. This fix is only important for SCUBA2MEM
+      where the positions of the off-beams are returned.
+   }
+   \sstbugs{
+      Currently the IN\_UT1 is assumed to be the MJD when the data taking
+      begins. As of 24-NOV-1997 IN\_UT1 is actually the MJD of the start
+      of the observation (ie when the telescope begins to slew). This is
+      a problem for data using a moving centre.
+   }
+}
+\sstroutine{
+   SURFLIB\_READ\_IPFILE
+}{
+   Reads IP data from text file
+}{
+   \sstdescription{
+      This routine reads IP data from a text file and stores
+      it in a multi-dimensional array.
+      The format of the file is:
+      Any line starting with the string {\tt '}FAST{\tt '} is assumed
+      to be specifying the angle between 0 degrees on the waveplate
+      and the angle to the fast axis. This is wavelength dependent.
+      The line should be of the format
+
+      \texttt{FAST filter angle}
+
+      eg   ``FAST 450 -3.0''
+
+      The list of valid filter names is passed in to the routine.
+      An error is raised if a fast axis angle has not been specified
+      for each filter.
+
+      For each bolometer the following information is required:
+
+
+\texttt{BolName P0 P0\_Err Pslope\_Err Theta0 Theta0\_Err ThetaSlope ThetaSlope\_Err}
+
+\begin{tabular}{ll}
+BolName   & Name of bolometer (eg H7,G12..)\\
+P0        & IP percentage polarization at the horizon\\
+P0Err     & Error in P0\\
+PSlope    & Gradient in P (ie P = P0 $+$ Pslope $*$ Elevation)\\
+PSlopeErr & Error in PSlope\\
+Theta0    & polarization angle of IP (degrees)\\
+Theta0Err & Error in polarisation angle\\
+ThetaSlope& Gradient in Theta (ie Theta = Theta0 $+$ ThetaSlope $*$ El)\\
+ThSlErr   & Error in ThetaSlope\\
+\end{tabular}
+
+      For example:
+      \texttt{H7  2.0 0.01 0.02 0.01 167 2 1.0 0.01}
+
+      \{ is the comment character. Blank lines are ignored.
+      The columns must be space separated.
+
+      All angles are converted to radians before further processing
+      (including Pslope which is in degrees$^{-1}$)
+   }
+   \sstinvocation{
+       CALL SURFLIB\_READ\_IPFILE( FD, NUM\_CHAN, NUM\_ADC,
+            N\_FILT, FILTERS, FAST\_ANG, BOL\_IP\_DATA, STATUS)
+   }
+   \sstarguments{
+      \sstsubsection{
+         FD = FILE (Given)
+      }{
+         Identifier to the open file (opened for read access)
+      }
+      \sstsubsection{
+         NUM\_CHAN = INTEGER (Given)
+      }{
+         Number of available bolometer channels
+      }
+      \sstsubsection{
+         NUM\_ADC  = INTEGER (Given)
+      }{
+         Number of available AtoD cards
+      }
+      \sstsubsection{
+         N\_FILT   = INTEGER (Given)
+      }{
+         Number of filters requested
+      }
+      \sstsubsection{
+         FILTERS( N\_FILT ) = CHARACTER (Given)
+      }{
+         Array of requested filter names
+      }
+      \sstsubsection{
+         FAST\_ANG( N\_FILT ) = REAL (Returned)
+      }{
+         Fast axis angle for each filter. Will contain bad values
+         if no angle was found
+      }
+      \sstsubsection{
+         BOL\_IP\_DATA(8, NUM\_CHAN, NUM\_ADC) = REAL (Returned)
+      }{
+         The IP data. This array contains the ip data for each
+         bolometer (specified by a combination of CHAN and ADC).
+         The 4 slices represent: P0, Pslope, Theta0 and ThetaSlope
+         The last 4 slices contain the corresponding variance
+         All angles are converted to radians (Pslope has to be converted
+         from /degree to /radian).
+      }
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright \copyright 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+      Research Council. All Rights Reserved.
+   }
+}
+\sstroutine{
+   SURFLIB\_REM\_GRID
+}{
+   Remove an image grid of data from demodulated data
+}{
+   \sstdescription{
+      Removes a gridded image from demodulated data using a
+      lookup table containing the (I,J) coordinates (in the grid)
+      of each input data point.
+      Can be used to remove the source from an input data set.
+   }
+   \sstinvocation{
+       CALL SURFLIB\_REM\_GRID( N\_POS, N\_BOLS, NX, NY,
+            IJ, GRID, IN\_DATA, STATUS)
+   }
+   \sstarguments{
+      \sstsubsection{
+         N\_PTS = INTEGER (Given)
+      }{
+         Number of data points in input data
+      }
+      \sstsubsection{
+         NX = INTEGER (Given)
+      }{
+         X dimension of input grid
+      }
+      \sstsubsection{
+         NY = INTEGER (Given)
+      }{
+         Y dimension of input grid
+      }
+      \sstsubsection{
+         IJ (2, N\_PTS)  INTEGER (Given)
+      }{
+         Positions of each point (I,J) in input grid
+      }
+      \sstsubsection{
+         GRID ( NX, NY) = REAL (Given)
+      }{
+         Image grid to be subtracted from data
+      }
+      \sstsubsection{
+         IN\_DATA( N\_PTS ) = REAL (Given \& Returned)
+      }{
+         Input data to be modified
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given \& Returned)
+      }{
+         Global Status
+      }
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright \copyright 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+      Research Council. All Rights Reserved.
+   }
+}
+\sstroutine{
+   SURFLIB\_REM\_TIMESERIES
+}{
+   Remove a time series  from a 2D array
+}{
+   \sstdescription{
+      Remove a time series (Y data) from a 2D array where the
+      second dimension corresponds to time. It is assumed that
+      both the time series and the 2D array have the same
+      number of points in time (N\_POS)
+   }
+   \sstinvocation{
+       CALL SURFLIB\_REM\_TIMESERIES ( N\_BOLS, N\_POS,
+            TIME\_SER, TIME\_VAR, IN\_DATA, IN\_VAR, STATUS)
+   }
+   \sstarguments{
+      \sstsubsection{
+         N\_BOLS = INTEGER (Given)
+      }{
+         Number of bolometers in data array (x dimension)
+      }
+      \sstsubsection{
+         N\_POS = INTEGER (Given)
+      }{
+         Number of time data values (y dim)
+      }
+      \sstsubsection{
+         TIME\_SER ( N\_POS ) = REAL (Given)
+      }{
+         Time series to be removed
+      }
+      \sstsubsection{
+         TIME\_VAR ( N\_POS ) = REAL (Given)
+      }{
+         Variance associated with each time value
+      }
+      \sstsubsection{
+         IN\_DATA (N\_BOLS, N\_POS ) = REAL (Given \& Returned)
+      }{
+         Input data to be modified
+      }
+      \sstsubsection{
+         IN\_VAR (N\_BOLS, N\_POS ) = REAL (Given \& Returned)
+      }{
+         Input variance
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given \& Returned)
+      }{
+         Global Status
+      }
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright \copyright 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+      Research Council. All Rights Reserved.
+   }
+}
+\sstroutine{
+   SURFLIB\_REMOVE\_DC\_FROM\_EXP
+}{
+   Remove linear baseline from each exposure
+}{
+   \sstdescription{
+      This routine takes a data array. It then removes a
+      DC offset (either the mean or the median derived from the scan)
+      from each scan.
+   }
+   \sstinvocation{
+       CALL SCULIB\_REMOVE\_DC\_FROM\_EXP(DORLB, N\_EXPOSURES,
+            N\_INTEGRATIONS, N\_MEASUREMENTS, METHOD, DEM\_PNTR, N\_BOL, N\_POS,
+            IN\_DATA, IN\_QUALITY, SAMPLE\_DX, CHOP\_THROW, OUT\_DATA,
+            OUT\_QUALITY, BADBIT, STATUS)
+   }
+   \sstarguments{
+      \sstsubsection{
+         DORLB                       = LOGICAL (Given)
+      }{
+         control whether we are subtracting the baseline (TRUE)
+         or storing the basline (FALSE)
+      }
+      \sstsubsection{
+         N\_EXPOSURES                 = INTEGER (Given)
+      }{
+         maximum number of exposures per integration
+      }
+      \sstsubsection{
+         N\_INTEGRATIONS              = INTEGER (Given)
+      }{
+         number of integrations in the observation
+      }
+      \sstsubsection{
+         N\_MEASUREMENTS              = INTEGER (Given)
+      }{
+         number of measurements in the observation
+      }
+      \sstsubsection{
+         METHOD                      = CHAR (Given)
+      }{
+         Removal method. MEDIAN or MEAN supported.
+      }
+      \sstsubsection{
+         DEMOD\_POINTER (N\_EXPOSURES, N\_INTEGRATIONS, N\_MEASUREMENTS)
+      }{
+                               = INTEGER (Given)
+         array pointing to start and finish of scans in IN\_DATA
+      }
+      \sstsubsection{
+         N\_BOL                       = INTEGER (Given)
+      }{
+         the number of bolometers for which data was taken
+      }
+      \sstsubsection{
+         N\_POS                       = INTEGER (Given)
+      }{
+         the number of positions measured in the scan
+      }
+      \sstsubsection{
+         IN\_DATA (N\_BOL, N\_POS)      = REAL (Given)
+      }{
+         the measured data
+      }
+      \sstsubsection{
+         IN\_VARIANCE (N\_BOL, N\_POS)      = REAL (Given)
+      }{
+         the measured variance
+      }
+      \sstsubsection{
+         IN\_QUALITY (N\_BOL, N\_POS)   = BYTE (Given)
+      }{
+         the quality on IN\_DATA
+      }
+      \sstsubsection{
+         OUT\_DATA (N\_BOL, N\_POS)     = REAL (Returned)
+      }{
+         the data with baseline removed
+      }
+      \sstsubsection{
+         OUT\_VARIANCE (N\_BOL, N\_POS)      = REAL (Given)
+      }{
+         the output variance
+      }
+      \sstsubsection{
+         OUT\_QUALITY (N\_BOL, N\_POS)  = BYTE (Returned)
+      }{
+         the quality on OUT\_DATA
+      }
+      \sstsubsection{
+         BADBIT                      = BYTE (Given)
+      }{
+         bad bit mask
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         Global Status value
+      }
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright \copyright 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+      Research Council. All Rights Reserved.
+   }
+}
+\sstroutine{
+   SURFLIB\_REMOVE\_DC\_VIA\_SECT
+}{
+   Remove median baseline from each exposure
+}{
+   \sstdescription{
+      This routine takes a data array and removes a
+      DC offset from each scan. The DC level is the median of the
+      data specified in the SCUBA section for that particular integration.
+      The same level is removed for each scan of an integration
+      with a different value for each bolometer.
+   }
+   \sstinvocation{
+       CALL SCULIB\_REMOVE\_DC\_FROM\_EXP(DORLB,N\_SPEC,SECTION,USE\_SECT,N\_EXPOSURES,
+            N\_INTEGRATIONS, N\_MEASUREMENTS, METHOD, DEM\_PNTR, N\_BOL, N\_POS,
+            IN\_DATA, IN\_QUALITY, SAMPLE\_DX, CHOP\_THROW, OUT\_DATA,
+            OUT\_QUALITY, BADBIT, STATUS)
+   }
+   \sstarguments{
+      \sstsubsection{
+         DORLB                       = LOGICAL (Given)
+      }{
+         control whether we are subtracting the baseline (TRUE)
+         or storing the basline (FALSE)
+      }
+      \sstsubsection{
+         N\_SPEC                      = INTEGER (Given)
+      }{
+         Number of sections specified
+      }
+      \sstsubsection{
+         SECTION ( N\_SPEC )          = CHAR (Given)
+      }{
+         Array of section specifications
+      }
+      \sstsubsection{
+         USE\_SECT                    = LOGICAL (Given)
+      }{
+         Is this an inverse section
+      }
+      \sstsubsection{
+         N\_EXPOSURES                 = INTEGER (Given)
+      }{
+         maximum number of exposures per integration
+      }
+      \sstsubsection{
+         N\_INTEGRATIONS              = INTEGER (Given)
+      }{
+         number of integrations in the observation
+      }
+      \sstsubsection{
+         N\_MEASUREMENTS              = INTEGER (Given)
+      }{
+         number of measurements in the observation
+      }
+      \sstsubsection{
+         DEMOD\_POINTER (N\_EXPOSURES, N\_INTEGRATIONS, N\_MEASUREMENTS)
+      }{
+                               = INTEGER (Given)
+         array pointing to start and finish of scans in IN\_DATA
+      }
+      \sstsubsection{
+         N\_BOL                       = INTEGER (Given)
+      }{
+         the number of bolometers for which data was taken
+      }
+      \sstsubsection{
+         N\_POS                       = INTEGER (Given)
+      }{
+         the number of positions measured in the scan
+      }
+      \sstsubsection{
+         IN\_DATA (N\_BOL, N\_POS)      = REAL (Given)
+      }{
+         the measured data
+      }
+      \sstsubsection{
+         IN\_VARIANCE (N\_BOL, N\_POS)      = REAL (Given)
+      }{
+         the measured variance
+      }
+      \sstsubsection{
+         IN\_QUALITY (N\_BOL, N\_POS)   = BYTE (Given)
+      }{
+         the quality on IN\_DATA
+      }
+      \sstsubsection{
+         OUT\_DATA (N\_BOL, N\_POS)     = REAL (Returned)
+      }{
+         the data with baseline removed
+      }
+      \sstsubsection{
+         OUT\_VARIANCE (N\_BOL, N\_POS)      = REAL (Given)
+      }{
+         the output variance
+      }
+      \sstsubsection{
+         OUT\_QUALITY (N\_BOL, N\_POS)  = BYTE (Returned)
+      }{
+         the quality on OUT\_DATA
+      }
+      \sstsubsection{
+         BADBIT                      = BYTE (Given)
+      }{
+         bad bit mask
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         Global Status value
+      }
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright \copyright 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+      Research Council. All Rights Reserved.
+   }
+}
+\sstroutine{
+   SURFLIB\_REMOVE\_IP
+}{
+   Remove instrumental polarisation
+}{
+   \sstdescription{
+      Remove the instrumental polarisation signal from the data
+      The following formula is used:
+
+      New flux = Measured flux / (1 $+$ \%age IP )
+
+      IP = \%age polarisation $*$ cos (4$*$waveplate - 2$*$ IP angle)
+
+      where \%age polarisation and IP angle vary linearly with
+      elevation.
+
+      This is an approximation of
+
+        Actual flux = measured flux - mean flux $*$ \%age IP
+
+      where IP = P $*$ (1 $+$ cos (4 WP - 2 THETA ) )
+      because the mean flux can not be calculated trivially since
+      the bolometers are jiggling on and off the source
+
+      This routine corrects the data point for each bolometer
+      by looking up the IP data in the supplied array. Only one
+      set of bolometers can be processed at any one time (since the
+      elevation of the array changes during the observation). The
+      routine should be called repeatedly for each time/elevation.
+   }
+   \sstinvocation{
+       CALL SURFLIB\_REMOVE\_IP( ELEVATION, NUM\_CHAN, NUM\_ADC,
+            N\_BOLS, WPLATE\_ANG, BOL\_CHAN, BOL\_ADC,
+            BOL\_IP\_DATA, BOL\_DATA, STATUS)
+   }
+   \sstarguments{
+      \sstsubsection{
+         ELEVATION = DOUBLE (Given)
+      }{
+         Elevation of the source (radians)
+      }
+      \sstsubsection{
+         NUM\_CHAN = INTEGER (Given)
+      }{
+         Number of channels per A/D card
+      }
+      \sstsubsection{
+         NUM\_ADC = INTEGER (Given)
+      }{
+         the number of A/D cards
+      }
+      \sstsubsection{
+         N\_BOLS = INTEGER (Given)
+      }{
+         the actual number of bolometers
+      }
+      \sstsubsection{
+         WPLATE\_ANG = REAL (Given)
+      }{
+         nasmyth angle of waveplate for these data (degrees)
+      }
+      \sstsubsection{
+         BOL\_CHAN (N\_BOLS) = INTEGER (Given)
+      }{
+         channel numbers of bolometers
+      }
+      \sstsubsection{
+         BOL\_ADC (N\_BOLS) = INTEGER (Given)
+      }{
+         ADC numbers of bolometers
+      }
+      \sstsubsection{
+         BOL\_IP\_DATA( 8, NUM\_CHAN, NUM\_ADC ) = REAL (Given)
+      }{
+         The IP data. This array contains the ip data for each
+         bolometer (specified by a combination of CHAN and ADC).
+         The 4 slices represent: P0, Pslope, Theta0 and ThetaSlope
+         The last 4 slices represent variance of each data point
+         All angles are in radians.
+      }
+      \sstsubsection{
+         BOL\_DATA (N\_BOLS) = REAL (Given and returned)
+      }{
+         bolometer data
+      }
+      \sstsubsection{
+         BOL\_VAR ( N\_BOLS ) = REAL (Given and returned)
+      }{
+         variance of bolometer data
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and returned)
+      }{
+         global status
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The elevation of each bolometer is assumed to be the elevation
+           of the central bolometer.
+
+         \sstitem
+         Output variance is calculated
+
+         \sstitem
+         degrees are used throughout since this simplifies the calculations
+           when the gradients and ThetaZero are specified in degrees
+           (or inverse degrees for the slope) from the input IP file.
+      }
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright \copyright 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+      Research Council. All Rights Reserved.
+   }
+}
+\sstroutine{
+   SURFLIB\_STATS\_GRID
+}{
+   Calculate statistics of binned data
+}{
+   \sstdescription{
+      Calculate the statistics of the binned data and return the
+      median and upper and lower limits of acceptable data.
+   }
+   \sstinvocation{
+       CALL SURFLIB\_STATS\_GRID(SMODE, NX, NY, NMAX, NSIGMA,
+            IPOS, JPOS, BINS, PNTS, STATS, STATUS)
+   }
+   \sstarguments{
+      \sstsubsection{
+         SMODE = CHARACTER (Given)
+      }{
+         Smoothing mode. The statistics can be smoothed by adjacent pixels
+         in order to remove spikes from the clipping envelope.
+         Options are:
+            NONE - No smoothing (ie the statistics of each bin)
+            HANN - Hanning smoothing. Triangular envolope across 3 points.
+         Note that smoothing depends on the way the grid was unwrapped.
+         since that determines which pixels are adjacent (except for
+         SMODE=NONE.
+      }
+      \sstsubsection{
+         NX = INTEGER (Given)
+      }{
+         Size of X dimension
+      }
+      \sstsubsection{
+         NY = INTEGER (Given)
+      }{
+         Size of Y dimension
+      }
+      \sstsubsection{
+         NMAX = INTEGER (Given)
+      }{
+         Maximum value allowed for third dimension of BINS
+      }
+      \sstsubsection{
+         NSIGMA = REAL (Given)
+      }{
+         Standard deviation limit.
+      }
+      \sstsubsection{
+         IPOS(NX $*$ NY) = INTEGER (Given)
+      }{
+         I coordinate for each pixel
+      }
+      \sstsubsection{
+         JPOS(NX $*$ NY) = INTEGER (Given)
+      }{
+         J coordinate for each pixel
+      }
+      \sstsubsection{
+         BINS(NX, NY, NMAX) = REAL (Given)
+      }{
+         The data stored in relation to its position
+      }
+      \sstsubsection{
+         PNTS(NMAX) = REAL (Given)
+      }{
+         Scratch space for copying in the data from each I,J
+      }
+      \sstsubsection{
+         STATS(NX, NY, 3) = REAL (Returned)
+      }{
+         Statistics of each bin. 3 components are: Median, Upper limit
+         lower limit.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given \& Returned)
+      }{
+         Global status.
+      }
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright \copyright 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+      Research Council. All Rights Reserved.
+   }
+}
+\sstroutine{
+   SURFLIB\_TRIM\_IMAGE
+}{
+   Sets quality bit for specified distance from exisiting bad data
+}{
+   \sstdescription{
+      Will take the quality array of a 2-D image and set the
+      quality bit of all pixels within the specified trimming
+      distance of a pixel that has bit 0 set. The output pixel
+      bit is only set explicitly if bit 0 is not already set.
+      This is so that the effect of the trim can be removed
+      simply by changing the bad bits mask.
+   }
+   \sstinvocation{
+      CALL SURFLIB\_TRIM\_IMAGE( TRIM, NX, NY, BITNUM,
+      IN\_QUAL, OUT\_QUAL, STATUS)
+   }
+   \sstarguments{
+      \sstsubsection{
+         TRIM = REAL (Given)
+      }{
+         The distance in pixels inside which quality bits will be
+         set.
+      }
+      \sstsubsection{
+         NX = INTEGER (Given)
+      }{
+         Number of X pixels in image
+      }
+      \sstsubsection{
+         NY = INTEGER (Given)
+      }{
+         Number of Y pixels in image
+      }
+      \sstsubsection{
+         BITNUM = INTEGER (Given)
+      }{
+         Bit number to set to bad if within TRIM distance of a
+         pixel that has bit 0 set. Start counting at 0.
+      }
+      \sstsubsection{
+         IN\_QUAL(NX,NY) = UBYTE (Given)
+      }{
+         Input image.
+      }
+      \sstsubsection{
+         OUT\_QUAL(NX,NY) = UBYTE (Returned)
+      }{
+         Output image quality.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         Global status
+      }
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright \copyright 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+      Research Council. All Rights Reserved.
+   }
+}

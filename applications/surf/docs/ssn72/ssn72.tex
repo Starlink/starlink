@@ -1,0 +1,3550 @@
+\documentclass[twoside,11pt]{article}
+
+% ? Specify used packages
+\usepackage{graphicx}        %  Use this one for final production.
+% \usepackage[draft]{graphicx} %  Use this one for drafting.
+% ? End of specify used packages
+
+\usepackage{lscape}
+\usepackage{amstex}
+
+\pagestyle{myheadings}
+
+% -----------------------------------------------------------------------------
+% ? Document identification
+% Fixed part
+\newcommand{\stardoccategory}  {Starlink System Note}
+\newcommand{\stardocinitials}  {SSN}
+\newcommand{\stardocsource}    {ssn\stardocnumber}
+
+% Variable part - replace [xxx] as appropriate.
+\newcommand{\stardocnumber}    {72.1}
+\newcommand{\stardocauthors}   {Tim Jenness, John F.\ Lightfoot\\
+                                Joint Astronomy Centre, Hilo, Hawaii}
+\newcommand{\stardocdate}      {09 August 1999}
+\newcommand{\stardoctitle}     {SURF Programming Interface}
+\newcommand{\stardocabstract}  {This document describes the SURF programming
+interface. Including the library API, instructions on how to build
+a SURF task, the SURF file format and instructions on how to write
+a SURF import task.}
+
+% Environment for indenting and using a small font.
+\newenvironment{myquote}{\begin{quote}\begin{small}}{\end{small}\end{quote}}
+
+\newcommand{\mytext}[1]{{\small \tt #1}}
+
+% set up some common package names
+\newcommand{\Kappa}{\xref{{\sc{Kappa}}}{sun95}{}}
+\newcommand{\Figaro}{\xref{{\sc{Figaro}}}{sun86}{}}
+\newcommand{\gaia}{\xref{{\sc{Gaia}}}{sun214}{}}
+\newcommand{\convert}{\xref{{\sc{Convert}}}{sun55}{}}
+\newcommand{\fluxes}{\xref{{\sc{Fluxes}}}{sun213}{}}
+\newcommand{\Iras}{\xref{{\sc{Iras90}}}{sun163}{}}
+\newcommand{\ndf}{\xref{NDF}{sun33}{}}
+\newcommand{\hds}{\xref{HDS}{sun92}{}}
+\newcommand{\agi}{\xref{AGI}{sun48}{}}
+\newcommand{\ESP}{\xref{ESP}{sun180}{}}
+\newcommand{\specx}{\xref{{\sc{Specx}}}{sc8}{}}
+\newcommand{\polpack}{\xref{{\sc{Polpack}}}{sun223}{}}
+\newcommand{\ccdpack}{\xref{CCDPACK}{sun139}{}}
+\newcommand{\cursa}{\xref{{\sc{Cursa}}}{sun190}{}}
+\newcommand{\surfref}{\xref{{\scusoft}}{sun190}{}}
+
+% Application tasks
+\newcommand{\task}[1]{{\sf #1}}
+
+% ADAM parameters
+\newcommand{\param}[1]{{\tt #1}}
+
+
+% Common tasks
+\newcommand{\renoise}{\xref{\task{reduce\_noise}}{sun216}{REDUCE_NOISE}}
+\newcommand{\rebin}{\xref{\task{rebin}}{sun216}{REBIN}}
+\newcommand{\bolrebin}{\xref{\task{bolrebin}}{sun216}{BOLREBIN}}
+\newcommand{\intrebin}{\xref{\task{intrebin}}{sun216}{INTREBIN}}
+\newcommand{\calcsky}{\xref{\task{calcsky}}{sun216}{CALCSKY}}
+\newcommand{\chgqual}{\xref{\task{change\_quality}}{sun216}{CHANGE_QUALITY}}
+\newcommand{\chgflat}{\xref{\task{change\_flat}}{sun216}{CHANGE_FLAT}}
+\newcommand{\chgpnt}{\xref{\task{change\_pointing}}{sun216}{CHANGE_POINTING}}
+\newcommand{\chgdata}{\xref{\task{change\_data}}{sun216}{CHANGE_DATA}}
+\newcommand{\resw}{\xref{\task{reduce\_switch}}{sun216}{REDUCE_SWITCH}}
+\newcommand{\flatf}{\xref{\task{flatfield}}{sun216}{FLATFIELD}}
+\newcommand{\skydip}{\xref{\task{skydip}}{sun216}{SKYDIP}}
+\newcommand{\scuphot}{\xref{\task{scuphot}}{sun216}{SCUPHOT}}
+\newcommand{\ext}{\xref{\task{extinction}}{sun216}{EXTINCTION}}
+\newcommand{\scuquick}{\xref{\task{scuquick}}{sun216}{SCUQUICK}}
+\newcommand{\scuhelp}{\xref{\task{scuhelp}}{sun216}{SCUHELP}}
+\newcommand{\remsky}{\xref{\task{remsky}}{sun216}{REMSKY}}
+\newcommand{\scuover}{\xref{\task{scuover}}{sun216}{SCUOVER}}
+\newcommand{\extdata}{\xref{\task{extract\_data}}{sun216}{EXTRACT_DATA}}
+\newcommand{\sculog}{\xref{\task{sculog}}{sun216}{SCULOG}}
+\newcommand{\scucat}{\xref{\task{scucat}}{sun216}{SCUCAT}}
+\newcommand{\photsum}{\xref{\task{photsum}}{sun216}{PHOTSUM}}
+\newcommand{\mapsum}{\xref{\task{mapsum}}{sun216}{MAPSUM}}
+\newcommand{\skysum}{\xref{\task{skysum}}{sun216}{SKYSUM}}
+\newcommand{\pointsum}{\xref{\task{pointsum}}{sun216}{POINTSUM}}
+\newcommand{\qdraw}{\xref{\task{qdraw}}{sun216}{QDRAW}}
+\newcommand{\sigclip}{\xref{\task{sigclip}}{sun216}{SIGCLIP}}
+\newcommand{\restore}{\xref{\task{restore}}{sun216}{RESTORE}}
+\newcommand{\sdip}{\xref{\task{sdip}}{sun216}{SDIP}}
+\newcommand{\scupa}{\xref{\task{scupa}}{sun216}{SCUPA}}
+\newcommand{\obssum}{\xref{\task{obssum}}{sun216}{OBSSUM}}
+\newcommand{\despike}{\xref{\task{despike}}{sun216}{DESPIKE}}
+\newcommand{\despikeb}{\xref{\task{despike2}}{sun216}{DESPIKE2}}
+\newcommand{\extflat}{\xref{\task{extract\_flat}}{sun216}{EXTRACT_FLAT}}
+\newcommand{\scushift}{\xref{\task{scushift}}{sun216}{SCUSHIFT}}
+\newcommand{\scuclip}{\xref{\task{scuclip}}{sun216}{SCUCLIP}}
+\newcommand{\scanrlb}{\xref{\task{scan\_rlb}}{sun216}{SCAN_RLB}}
+\newcommand{\dspbol}{\xref{\task{dspbol}}{sun216}{DSPBOL}}
+\newcommand{\pltbol}{\xref{\task{pltbol}}{sun216}{PLTBOL}}
+\newcommand{\rlinplot}{\xref{\task{rlinplot}}{sun216}{RLINPLOT}}
+\newcommand{\scuplot}{\xref{\task{scuplot}}{sun216}{SCUPLOT}}
+\newcommand{\remdbm}{\xref{\task{remdbm}}{sun216}{REMDBM}}
+\newcommand{\scumakewt}{\xref{\task{scumakewt}}{sun216}{SCUMAKEWT}}
+\newcommand{\chgnacent}{\xref{\task{change\_nacentre}}{sun216}{CHANGE_NACENTRE}}
+\newcommand{\scunoise}{\xref{\task{scunoise}}{sun216}{SCUNOISE}}
+\newcommand{\setbolwt}{\xref{\task{setbolwt}}{sun216}{SETBOLWT}}
+\newcommand{\adddbm}{\xref{\task{add\_dbm}}{sun216}{ADD_DBM}}
+\newcommand{\remip}{\xref{\task{remip}}{sun216}{REMIP}}
+\newcommand{\scusetenv}{\xref{\task{scusetenv}}{sun216}{SCUSETENV}}
+
+
+% Non surf tasks
+
+\newcommand{\fillbad}{\xref{\task{fillbad}}{sun95}{FILLBAD}}
+\newcommand{\ndftrace}{\xref{\task{ndftrace}}{sun95}{NDFTRACE}}
+\newcommand{\glitch}{\xref{\task{glitch}}{sun95}{GLITCH}}
+\newcommand{\display}{\xref{\task{display}}{sun95}{DISPLAY}}
+\newcommand{\linplot}{\xref{\task{linplot}}{sun95}{LINPLOT}}
+\newcommand{\mlinplot}{\xref{\task{mlinplot}}{sun95}{MLINPLOT}}
+\newcommand{\drawsig}{\xref{\task{drawsig}}{sun95}{DRAWSIG}}
+\newcommand{\centroid}{\xref{\task{centroid}}{sun95}{CENTROID}}
+\newcommand{\setaxis}{\xref{\task{setaxis}}{sun95}{SETAXIS}}
+\newcommand{\kstest}{\xref{\task{kstest}}{sun95}{KSTEST}}
+\newcommand{\stats}{\xref{\task{stats}}{sun95}{STATS}}
+\newcommand{\thresh}{\xref{\task{thresh}}{sun95}{THRESH}}
+\newcommand{\setbb}{\xref{\task{setbb}}{sun95}{SETBB}}
+\newcommand{\fitslist}{\xref{\task{fitslist}}{sun95}{FITSLIST}}
+\newcommand{\fourier}{\xref{\task{fourier}}{sun95}{FOURIER}}
+\newcommand{\hislist}{\xref{\task{hislist}}{sun95}{HISLIST}}
+\newcommand{\ndffits}{\xref{\task{ndf2fits}}{sun55}{NDF2FITS}}
+\newcommand{\cadd}{\xref{\task{cadd}}{sun95}{CADD}}
+\newcommand{\hdstrace}{\xref{\task{hdstrace}}{sun102}{}}
+\newcommand{\psmerge}{\xref{\task{psmerge}}{sun164}{}}
+\newcommand{\wdfits}{\xref{\task{wdfits}}{sun86}{WDFITS}}
+\newcommand{\delobj}{\xref{\task{delobj}}{sun86}{DELOBJ}}
+\newcommand{\sclean}{\xref{\task{sclean}}{sun86}{SCLEAN}}
+\newcommand{\setvar}{\xref{\task{setvar}}{sun95}{SETVAR}}
+\newcommand{\wcsalign}{\xref{\task{wcsalign}}{sun95}{WCSALIGN}}
+\newcommand{\ndfcopy}{\xref{\task{ndfcopy}}{sun95}{NDFCOPY}}
+\newcommand{\manic}{\xref{\task{manic}}{sun95}{MANIC}}
+\newcommand{\cdiv}{\xref{\task{cdiv}}{sun95}{CDIV}}
+\newcommand{\sub}{\xref{\task{sub}}{sun95}{SUB}}
+\newcommand{\cursor}{\xref{\task{cursor}}{sun95}{CURSOR}}
+\newcommand{\gdset}{\xref{\task{gdset}}{sun95}{GDSET}}
+\newcommand{\image}{\xref{\task{image}}{sun86}{IMAGE}}
+\newcommand{\gaufit}{\xref{\task{gaufit}}{sun180}{GAUFIT}}
+
+\newcommand{\makemos}{\xref{\task{makemos}}{sun139}{MAKEMOS}}
+
+\newcommand{\polimp}{\xref{\task{polimp}}{sun223}{POLIMP}}
+\newcommand{\polcal}{\xref{\task{polcal}}{sun223}{POLCAL}}
+\newcommand{\polbin}{\xref{\task{polbin}}{sun223}{POLBIN}}
+\newcommand{\polvec}{\xref{\task{polvec}}{sun223}{POLVEC}}
+\newcommand{\polplot}{\xref{\task{polplot}}{sun223}{POLPLOT}}
+
+\newcommand{\catselect}{\xref{\task{catselect}}{sun190}{}}
+
+% General commands
+\newcommand{\scusoft}          {{\sc Surf}}
+\newcommand{\micron}           {$\mu$m}  
+
+
+% ? End of document identification
+% -----------------------------------------------------------------------------
+
+% +
+%  Name:
+%     ssn72.tex
+%
+%  Purpose:
+%     SURF (see SUN/216) programming interface documentation
+%
+%  Authors:
+%     AJC: A.J.Chipperfield (Starlink, RAL)
+%     BLY: M.J.Bly (Starlink, RAL)
+%     PWD: Peter W. Draper (Starlink, Durham University)
+%     TIMJ: Tim Jenness (JAC, Hawaii)
+%
+%  History:
+%     17-JAN-1996 (AJC):
+%        Original with hypertext macros, based on MDL plain originals.
+%     16-JUN-1997 (BLY):
+%        Adapted for LaTeX2e.
+%     13-AUG-1998 (PWD):
+%        Converted for use with LaTeX2HTML version 98.2 and
+%        Star2HTML version 1.3.
+%     09-AUG-1999 (TIMJ):
+%        Convert template to SURF API document. Write complete document.
+%     {Add further history here}
+
+%  Copyright:
+%     Copyright (C) 1996-1998 Central Laboratory of the Research Councils
+%     Copyright (C) 1999 Particle Physics and Astronomy Research Council
+
+%
+% -
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markboth{\stardocname}{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+% -----------------------------------------------------------------------------
+%  Hypertext definitions.
+%  ======================
+%  These are used by the LaTeX2HTML translator in conjunction with star2html.
+
+%  Comment.sty: version 2.0, 19 June 1992
+%  Selectively in/exclude pieces of text.
+%
+%  Author
+%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
+%    Department of Computer Science
+%    University Tennessee at Knoxville
+%    104 Ayres Hall
+%    Knoxville, TN 37996
+%    USA
+
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  LaTeX2HTML to signify text it shouldn't process).
+%begin{latexonly}
+\makeatletter
+\def\makeinnocent#1{\catcode`#1=12 }
+\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
+
+\def\ThrowAwayComment#1{\begingroup
+    \def\CurrentComment{#1}%
+    \let\do\makeinnocent \dospecials
+    \makeinnocent\^^L% and whatever other special cases
+    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
+{\catcode`\^^M=12 \endlinechar=-1 %
+ \gdef\xComment#1^^M{\def\test{#1}
+      \csarg\ifx{PlainEnd\CurrentComment Test}\test
+          \let\html@next\endgroup
+      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
+            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
+      \else \let\html@next\xComment
+      \fi \fi \html@next}
+}
+\makeatother
+
+\def\includecomment
+ #1{\expandafter\def\csname#1\endcsname{}%
+    \expandafter\def\csname end#1\endcsname{}}
+\def\excludecomment
+ #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
+    {\escapechar=-1\relax
+     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
+     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
+    }}
+
+%  Define environments that ignore their contents.
+\excludecomment{comment}
+\excludecomment{rawhtml}
+\excludecomment{htmlonly}
+
+%  Hypertext commands etc. This is a condensed version of the html.sty
+%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
+%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
+%  should be consulted about all commands (and the environments defined above)
+%  except \xref and \xlabel which are Starlink specific.
+
+\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
+\newcommand{\htmladdnormallink}[2]{#1}
+\newcommand{\htmladdimg}[1]{}
+\newcommand{\hyperref}[4]{#2\ref{#4}#3}
+\newcommand{\htmlref}[2]{#1}
+\newcommand{\htmlimage}[1]{}
+\newcommand{\htmladdtonavigation}[1]{}
+
+\newenvironment{latexonly}{}{}
+\newcommand{\latex}[1]{#1}
+\newcommand{\html}[1]{}
+\newcommand{\latexhtml}[2]{#1}
+\newcommand{\HTMLcode}[2][]{}
+
+%  Starlink cross-references and labels.
+\newcommand{\xref}[3]{#1}
+\newcommand{\xlabel}[1]{}
+
+%  LaTeX2HTML symbol.
+\newcommand{\latextohtml}{\LaTeX2\texttt{HTML}}
+
+%  Define command to re-centre underscore for Latex and leave as normal
+%  for HTML (severe problems with \_ in tabbing environments and \_\_
+%  generally otherwise).
+\renewcommand{\_}{\texttt{\symbol{95}}}
+
+% -----------------------------------------------------------------------------
+%  Debugging.
+%  =========
+%  Remove % on the following to debug links in the HTML version using Latex.
+
+% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
+% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
+% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
+% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+%end{latexonly}
+% -----------------------------------------------------------------------------
+% ? Document specific \newcommand or \newenvironment commands.
+
+%+
+%  Name:
+%     SST.TEX
+
+%  Purpose:
+%     Define LaTeX commands for laying out Starlink routine descriptions.
+
+%  Language:
+%     LaTeX
+
+%  Type of Module:
+%     LaTeX data file.
+
+%  Description:
+%     This file defines LaTeX commands which allow routine documentation
+%     produced by the SST application PROLAT to be processed by LaTeX and
+%     by LaTeX2html. The contents of this file should be included in the
+%     source prior to any statements that make of the sst commnds.
+
+%  Notes:
+%     The style file html.sty provided with LaTeX2html needs to be used.
+%     This must be before this file.
+
+%  Authors:
+%     RFWS: R.F. Warren-Smith (STARLINK)
+%     PDRAPER: P.W. Draper (Starlink - Durham University)
+
+%  History:
+%     10-SEP-1990 (RFWS):
+%        Original version.
+%     10-SEP-1990 (RFWS):
+%        Added the implementation status section.
+%     12-SEP-1990 (RFWS):
+%        Added support for the usage section and adjusted various spacings.
+%     8-DEC-1994 (PDRAPER):
+%        Added support for simplified formatting using LaTeX2html.
+%     {enter_further_changes_here}
+
+%  Bugs:
+%     {note_any_bugs_here}
+
+%-
+
+%  Define length variables.
+\newlength{\sstbannerlength}
+\newlength{\sstcaptionlength}
+\newlength{\sstexampleslength}
+\newlength{\sstexampleswidth}
+
+%  Define a \tt font of the required size.
+\latex{\newfont{\ssttt}{cmtt10 scaled 1095}}
+\html{\newcommand{\ssttt}{\tt}}
+
+%  Define a command to produce a routine header, including its name,
+%  a purpose description and the rest of the routine's documentation.
+\newcommand{\sstroutine}[3]{
+   \goodbreak
+   \rule{\textwidth}{0.5mm}
+   \vspace{-7ex}
+   \newline
+   \settowidth{\sstbannerlength}{{\Large {\bf #1}}}
+   \setlength{\sstcaptionlength}{\textwidth}
+   \setlength{\sstexampleslength}{\textwidth}
+   \addtolength{\sstbannerlength}{0.5em}
+   \addtolength{\sstcaptionlength}{-1.0\sstbannerlength}
+   \addtolength{\sstcaptionlength}{-5.0pt}
+   \settowidth{\sstexampleswidth}{{\bf Examples:}}
+   \addtolength{\sstexampleslength}{-\sstexampleswidth}
+   \parbox[t]{\sstbannerlength}{\flushleft{\Large {\bf #1}}}
+   \parbox[t]{\sstcaptionlength}{\center{\Large #2}}
+   \begin{description}
+      #3
+   \end{description}
+}
+
+%  Format the description section.
+\newcommand{\sstdescription}[1]{\item[Description:] #1}
+
+%  Format the usage section.
+\newcommand{\sstusage}[1]{\item[Usage:] \mbox{}
+\\[1.3ex]{\raggedright \ssttt #1}}
+
+%  Format the invocation section.
+\newcommand{\sstinvocation}[1]{\item[Invocation:]\hspace{0.4em}{\tt #1}}
+
+%  Format the arguments section.
+\newcommand{\sstarguments}[1]{
+   \item[Arguments:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the returned value section (for a function).
+\newcommand{\sstreturnedvalue}[1]{
+   \item[Returned Value:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the parameters section (for an application).
+\newcommand{\sstparameters}[1]{
+   \item[Parameters:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the examples section.
+\newcommand{\sstexamples}[1]{
+   \item[Examples:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Define the format of a subsection in a normal section.
+\newcommand{\sstsubsection}[1]{ \item[{#1}] \mbox{} \\}
+
+%  Define the format of a subsection in the examples section.
+\newcommand{\sstexamplesubsection}[2]{\sloppy
+\item[\parbox{\sstexampleslength}{\ssttt #1}] \mbox{} \vspace{1.0ex}
+\\ #2 }
+
+%  Format the notes section.
+\newcommand{\sstnotes}[1]{\item[Notes:] \mbox{} \\[1.3ex] #1}
+
+%  Provide a general-purpose format for additional (DIY) sections.
+\newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}]
+\mbox{} \\[1.3ex] #2}
+
+%  Format the implementation status section.
+\newcommand{\sstimplementationstatus}[1]{
+   \item[{Implementation Status:}] \mbox{} \\[1.3ex] #1}
+
+%  Format the bugs section.
+\newcommand{\sstbugs}[1]{\item[Bugs:] #1}
+
+%  Format a list of items while in paragraph mode.
+\newcommand{\sstitemlist}[1]{
+  \mbox{} \\
+  \vspace{-3.5ex}
+  \begin{itemize}
+     #1
+  \end{itemize}
+}
+
+%  Define the format of an item.
+\newcommand{\sstitem}{\item}
+
+%% Now define html equivalents of those already set. These are used by
+%  latex2html and are defined in the html.sty files.
+\begin{htmlonly}
+
+%  sstroutine.
+   \newcommand{\sstroutine}[3]{
+      \subsection{#1\xlabel{#1}-\label{#1}#2}
+      \begin{description}
+         #3
+      \end{description}
+   }
+
+%  sstdescription
+   \newcommand{\sstdescription}[1]{\item[Description:]
+      \begin{description}
+         #1
+      \end{description}
+      \\
+   }
+
+%  sstusage
+   \newcommand{\sstusage}[1]{\item[Usage:]
+      \begin{description}
+         {\ssttt #1}
+      \end{description}
+      \\
+   }
+
+%  sstinvocation
+   \newcommand{\sstinvocation}[1]{\item[Invocation:]
+      \begin{description}
+         {\ssttt #1}
+      \end{description}
+      \\
+   }
+
+%  sstarguments
+   \newcommand{\sstarguments}[1]{
+      \item[Arguments:] \\
+      \begin{description}
+         #1
+      \end{description}
+      \\
+   }
+
+%  sstreturnedvalue
+   \newcommand{\sstreturnedvalue}[1]{
+      \item[Returned Value:] \\
+      \begin{description}
+         #1
+      \end{description}
+      \\
+   }
+
+%  sstparameters
+   \newcommand{\sstparameters}[1]{
+      \item[Parameters:] \\
+      \begin{description}
+         #1
+      \end{description}
+      \\
+   }
+
+%  sstexamples
+   \newcommand{\sstexamples}[1]{
+      \item[Examples:] \\
+      \begin{description}
+         #1
+      \end{description}
+      \\
+   }
+
+%  sstsubsection
+   \newcommand{\sstsubsection}[1]{\item[{#1}]}
+
+%  sstexamplesubsection
+   \newcommand{\sstexamplesubsection}[2]{\item[{\ssttt #1}] #2}
+
+%  sstnotes
+   \newcommand{\sstnotes}[1]{\item[Notes:] #1 }
+
+%  sstdiytopic
+   \newcommand{\sstdiytopic}[2]{\item[{#1}] #2 }
+
+%  sstimplementationstatus
+   \newcommand{\sstimplementationstatus}[1]{
+      \item[Implementation Status:] #1
+   }
+
+%  sstitemlist
+   \newcommand{\sstitemlist}[1]{
+      \begin{itemize}
+         #1
+      \end{itemize}
+      \\
+   }
+%  sstitem
+   \newcommand{\sstitem}{\item}
+
+\end{htmlonly}
+
+%  End of "sst.tex" layout definitions.
+%.
+
+
+
+
+
+% ? End of document specific commands
+% -----------------------------------------------------------------------------
+%  Title Page.
+%  ===========
+\renewcommand{\thepage}{\roman{page}}
+\begin{document}
+\thispagestyle{empty}
+
+%  Latex document header.
+%  ======================
+\begin{latexonly}
+   CCLRC / \textsc{Rutherford Appleton Laboratory} \hfill \textbf{\stardocname}\\
+   {\large Particle Physics \& Astronomy Research Council}\\
+   {\large Starlink Project\\}
+   {\large \stardoccategory\ \stardocnumber}
+   \begin{flushright}
+   \stardocauthors\\
+   \stardocdate
+   \end{flushright}
+   \vspace{-4mm}
+   \rule{\textwidth}{0.5mm}
+   \vspace{5mm}
+   \begin{center}
+   {\Large\textbf{\stardoctitle}}
+   \end{center}
+   \vspace{5mm}
+
+\begin{center}
+\includegraphics[width=2.0in]{ssn72_logo.eps}
+\end{center}
+
+% ? Heading for abstract if used.
+   \vspace{10mm}
+   \begin{center}
+      {\Large\textbf{Abstract}}
+   \end{center}
+% ? End of heading for abstract.
+\end{latexonly}
+
+%  HTML documentation header.
+%  ==========================
+\begin{htmlonly}
+   \xlabel{}
+   \begin{rawhtml} <H1 ALIGN=CENTER> \end{rawhtml}
+      \stardoctitle
+   \begin{rawhtml} </H1> <HR> \end{rawhtml}
+
+\includegraphics[width=2.0in]{ssn72_logo.eps}
+
+   \begin{rawhtml} <P> <I> \end{rawhtml}
+   \stardoccategory\ \stardocnumber \\
+   \stardocauthors \\
+   \stardocdate
+   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
+      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
+      \htmladdnormallink{Rutherford Appleton Laboratory}
+                        {http://www.cclrc.ac.uk/ral} \\
+      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
+                        {http://www.pparc.ac.uk} \\
+   \begin{rawhtml} </H3> <H2> \end{rawhtml}
+      \htmladdnormallink{Starlink Project}{http://www.starlink.rl.ac.uk/}
+   \begin{rawhtml} </H2> \end{rawhtml}
+   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
+      {http://www.starlink.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
+
+%  HTML document table of contents. 
+%  ================================
+%  Add table of contents header and a navigation button to return to this 
+%  point in the document (this should always go before the abstract \section). 
+  \label{stardoccontents}
+  \begin{rawhtml} 
+    <HR>
+    <H2>Contents</H2>
+  \end{rawhtml}
+  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
+        {stardoccontents}}
+
+% ? New section for abstract if used.
+  \section{\xlabel{abstract}Abstract}
+% ? End of new section for abstract
+
+\end{htmlonly}
+
+% -----------------------------------------------------------------------------
+% ? Document Abstract. (if used)
+%  ==================
+\stardocabstract
+% ? End of document abstract
+% -----------------------------------------------------------------------------
+% ? Latex document Table of Contents (if used).
+%  ===========================================
+  \newpage
+  \begin{latexonly}
+    \setlength{\parskip}{0mm}
+    \tableofcontents
+    \setlength{\parskip}{\medskipamount}
+    \markboth{\stardocname}{\stardocname}
+  \end{latexonly}
+% ? End of Latex document table of contents
+% -----------------------------------------------------------------------------
+\cleardoublepage
+\renewcommand{\thepage}{\arabic{page}}
+\setcounter{page}{1}
+
+%%%%%%%%%%%%%%%% S T A R T   H E R E %%%%%%%%%%%%%%%%%%%%%%%%%%
+% ? Main text
+
+\section{Introduction}
+
+The SCUBA User Reduction Facility (\surfref, SUN/33) provides data reduction 
+software for submillimetre bolometer cameras. It was specifically designed for 
+the Submillimetre Common-User Bolometer Array (SCUBA; Holland et al 1999,
+MNRAS, 303, 659) but could be ported to similar bolometer cameras. This
+document describes the programming interface used to write \scusoft\ tasks and 
+import foreign data formats into the system.
+
+
+\section{SURF File Format}
+
+\scusoft\ uses that standard Starlink \ndf\ (SUN/33) file format. This 
+is a hierarchical format based on \hds\ (SUN/92) and has native support for 
+variances, quality flags, non-linear axes and arbritrary extensions.
+
+\subsection{Raw data format\label{sec:raw}}
+
+SCUBA raw data (i.e.\ data in the format expected by the \scusoft\ task
+\resw) has the following general layout:
+
+\begin{myquote}
+\begin{verbatim}
+STRUCT  <NDF>
+
+   MORE           <EXT>           {structure}
+      FIGARO         <FIGARO_EXT>    {structure}
+
+      SCUCD          <SCUCD_ST>      {structure}
+         
+      SCUBA          <SCUBA_ST>      {structure}
+
+      FITS(171)      <_CHAR*80>      'ACCEPT  = 'not used'           / ac...'
+                                     ... 'WAVE_5  =                 ...','END'
+
+   DATA_ARRAY(5,130,900)  <_REAL>   0.0102353,1.9114159E-6,0.0184784,
+                                    ... 1.7097691E-5,0.01525085,1.841503E-5,0
+\end{verbatim}
+\end{myquote}
+It is a very simple NDF format with a single \texttt{DATA\_ARRAY} and
+four extensions. The extensions are described in section \ref{scu:ext}. 
+The \texttt{DATA\_ARRAY} is three dimensional with the following meanings:
+
+\begin{enumerate}
+\item The size of the first dimension depends on the observing mode. For
+jiggle and noise observations it has size 5 corresponding to the demodulated
+data, variance on demodulated data, internal calibrator signal, variance on
+calibrator signal and data quality. For SCAN/MAP observations it has size 4
+corresponding to the demodulated data, variance on demodulated data, internal
+calibrator signal and data quality (i.e.\ the calibrator variance is not
+stored for scan maps). The data quality is converted from a REAL number to a
+standard UBYTE quality (appendix \ref{sec:quality}): if the quality is odd,
+this indicates the flatfield was set to zero so bit 1 is turned on (this is
+also done using the \flatf\ task), if the quality is greater than the value
+specified via the \param{SPIKE\_LEVEL} parameter (i.e.\ there were more spikes
+in the individual sample than the specified threshold) bit 2 is turned on. For
+SKYDIP observations it has a size of SCUBA\_\_N\_TEMPS (see Appendix
+\ref{app:const}, usually 3) corresponding to the different temperatures
+measured (AMBIENT, SKY and COLD).
+
+\item The second dimension corresponds to the number of bolometers
+observed. This should match the size of the \texttt{BOL\_CHAN} and
+\texttt{BOL\_ADC} arrays in the \texttt{SCUBA} extension.
+
+\item The third dimension is the time axis and is equal to the total number of 
+samples (of length \texttt{EXP\_TIME}). This dimension must be greater than
+any value stored in the \texttt{DEM\_PNTR} array. For a JIGGLE observation
+the size can be calculated (assuming the observation was not aborted early)
+
+\end{enumerate}
+
+\subsection{SURF Format\label{sec:surfform}}
+
+The \resw\ task converts the raw SCUBA format into a more NDF-like format
+with proper variance and quality arrays (extracted by \resw\ from the SCUBA
+data array), axes, history reporting, a title and units.
+
+Here is an example of the \resw\ output for a Mars pointing observation:
+
+\begin{myquote}
+\begin{verbatim}
+O10  <NDF>
+
+   DATA_ARRAY(37,32)  <_REAL>     -0.003304771,0.0002364833,0.00320935,
+                                  ... 0.0003040197,0.001364953,-0.007496601
+   MORE           <EXT>           {structure}
+      FIGARO         <FIGARO_EXT>    {structure}
+         {structure is empty}
+
+      SCUCD          <SCUCD_ST>      {structure}
+         JIGL_X(16)     <_REAL>         5.3766,10.6914,10.6914,5.3766,0,
+                                        ... -10.6914,-5.3766,0,5.3766,-5.3766
+         JIGL_Y(16)     <_REAL>         -3.09,0,6.18,9.27,12.36,9.27,6.18,
+                                        ... 6.18,0,-3.09,-6.18,-9.27,-9.27
+         DEC1           <_REAL>         0
+         DEC2           <_REAL>         0
+         LST_STRT(2,1,2,1)  <_DOUBLE>   3.9425429572598,3.9440140603798,
+                                        3.9469952223685,3.9454089275179
+         RA1            <_REAL>         0
+         RA2            <_REAL>         0
+
+      SCUBA          <SCUBA_ST>      {structure}
+         BOL_CALB(16,9)  <_REAL>        1.286,0.9311,0.9499,1.002,0.9585,
+                                        ... 1.054,1.065,1.045,1,1,1,1,1,1,0
+         BOL_DU3(16,9)  <_REAL>         57.08,45.9,36.15,24.64,14.55,3.62,
+                                        ... -15.78,9.047,-54.65,0,0,0,0,0,0
+         BOL_DU4(16,9)  <_REAL>         -28.14,-35.91,-41.46,-49.62,
+                                        ... 63.89,77.76,71.16,0,0,0,0,0,0
+         BOL_QUAL(16,9)  <_INTEGER>     0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+                                        ... 0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,1,1
+         BOL_TYPE(16,9)  <_CHAR*20>     'SHORT','SHORT','SHORT','SHORT',
+                                        ... 'P...','P1350_DC','P1100_DC','BAD'
+         BOL_ADC(37)    <_INTEGER>      7,7,7,7,7,7,7,7,7,7,7,7,7,8,8,8,8,
+                                        ... 8,8,8,8,8,8,8,8,9,9,9,9,9,9,9,9,9
+         BOL_CHAN(37)   <_INTEGER>      1,2,3,4,7,8,9,10,11,13,14,15,16,1,
+                                        ... 12,13,14,15,16,1,2,3,4,5,6,7,8,9
+         FLAT_ADC       <_INTEGER>      0
+         FLAT_CHN       <_INTEGER>      0
+         FLAT_IND       <_INTEGER>      0
+         PHOT_BB        <_INTEGER>      0
+         ISTART         <_INTEGER>      0
+         NPIX           <_INTEGER>      0
+         POINTER        <_INTEGER>      0
+         DEM_PNTR(1,2,1)  <_INTEGER>    1,17
+
+      FITS(171)      <_CHAR*80>      'ACCEPT  = 'PROMPT  '           / ac...'
+                                     ... 'WAVE_5  =                 ...','END'
+      REDS           <SURF_EXTENSION>   {structure}
+         BEAM_WT(3)     <_REAL>         0,1,0
+
+   HISTORY        <HISTORY>       {structure}
+      CREATED        <_CHAR*24>      '1999-AUG-11 17:04:57.000'
+      CURRENT_RECORD  <_INTEGER>     1
+      RECORDS(10)    <HIST_REC>      {array of structures}
+
+      Contents of RECORDS(1)
+         DATE           <_CHAR*24>      '1999-AUG-11 17:04:57.000'
+         COMMAND        <_CHAR*29>      'REDUCE_SWITCH   (SURF V1.4-3)'
+         USER           <_CHAR*4>       'timj'
+         HOST           <_CHAR*6>       'lapaki'
+         DATASET        <_CHAR*33>      '/local/jcmt/scratch/timj/orac/o10'
+         TEXT(3)        <_CHAR*72>      'Parameters: IN=@10 MSG_FILTER='N...'
+                                        ... 'Software: /star/bin/surf/redu...'
+
+   QUALITY        <QUALITY>       {structure}
+      QUALITY(37,32)  <_UBYTE>       0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+                                     ... 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+      BADBITS        <_UBYTE>        7
+
+   VARIANCE(37,32)  <_REAL>       1.0950339E-6,7.1230471E-7,6.6492021E-7,
+                                  ... 4.2760187E-9,7.4043317E-5,4.8094225E-6
+   AXIS(2)        <AXIS>          {array of structures}
+
+   Contents of AXIS(1)
+      DATA_ARRAY(37)  <_REAL>        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,
+                                     ... 26,27,28,29,30,31,32,33,34,35,36,37
+      LABEL          <_CHAR*9>       'Bolometer'
+
+   LABEL          <_CHAR*8>       'Raw data'
+   TITLE          <_CHAR*30>      'mars'
+   UNITS          <_CHAR*5>       'Volts'
+
+End of Trace.
+\end{verbatim}
+\end{myquote}
+
+The data arrays are now 2 dimensional, corresponding to the bolometer number
+and time axis. The axis information is written so that the integration number
+is reflected on the Y axis. Additionally, a new extension, \texttt{REDS}, is
+created to hold the relative beam weights; for maps these are always set to 0,1,0.
+
+A photometry observation is slightly different from a map observation in that
+the output data array is now 3 dimensional rather than 2:
+
+\begin{myquote}
+\begin{verbatim}
+O107  <NDF>
+
+   MORE           <EXT>           {structure}
+      FIGARO         <FIGARO_EXT>    {structure}
+         {structure is empty}
+
+      SCUCD          <SCUCD_ST>      {structure}
+         JIGL_X(9)      <_REAL>         0,2,2,0,-2,-2,-2,0,2
+         JIGL_Y(9)      <_REAL>         0,0,2,2,2,0,-2,-2,-2
+         DEC1           <_REAL>         0
+         DEC2           <_REAL>         0
+         LST_STRT(2,1,8,1)  <_DOUBLE>   1.8834042737017,1.8844116777459,
+                                        ... 1.8981978240679,1.8971856029149
+         RA1            <_REAL>         0
+         RA2            <_REAL>         0
+
+      SCUBA          <SCUBA_ST>      {structure}
+         BOL_CALB(16,9)  <_REAL>        1.286,0.9311,0.9499,1.002,0.9585,
+                                        ... 1.054,1.065,1.045,1,1,1,1,1,1,0
+         BOL_DU3(16,9)  <_REAL>         57.08,45.9,36.15,24.64,14.55,3.62,
+                                        ... -15.78,9.047,-54.65,0,0,0,0,0,0
+         BOL_DU4(16,9)  <_REAL>         -28.14,-35.91,-41.46,-49.62,
+                                        ... 63.89,77.76,71.16,0,0,0,0,0,0
+         BOL_QUAL(16,9)  <_INTEGER>     0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+                                        ... 0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,1,1
+         BOL_TYPE(16,9)  <_CHAR*20>     'SHORT','SHORT','SHORT','SHORT',
+                                        ... 'P...','P1350_DC','P1100_DC','BAD'
+         BOL_ADC(130)   <_INTEGER>      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,
+                                        ... 8,8,8,8,8,8,8,8,9,9,9,9,9,9,9,9,9
+         BOL_CHAN(130)  <_INTEGER>      1,2,3,4,5,6,7,8,9,10,11,12,13,14,
+                                        ... 12,13,14,15,16,1,2,3,4,5,6,7,8,9
+         FLAT_ADC       <_INTEGER>      0
+         FLAT_CHN       <_INTEGER>      0
+         FLAT_IND       <_INTEGER>      0
+         PHOT_BB(3,2)   <_INTEGER>      0,112,0,0,46,0
+         ISTART         <_INTEGER>      0
+         NPIX           <_INTEGER>      0
+         POINTER        <_INTEGER>      0
+         DEM_PNTR(1,8,1)  <_INTEGER>    1,10,19,28,37,46,55,64
+
+      FITS(171)      <_CHAR*80>      'ACCEPT  = 'not used'           / ac...'
+                                     ... 'WAVE_5  =                 ...','END'
+      REDS           <SURF_EXTENSION>   {structure}
+         BEAM_WT(3)     <_REAL>         0.5,1,0.5
+
+   HISTORY        <HISTORY>       {structure}
+      CREATED        <_CHAR*24>      '1999-AUG-11 17:08:24.000'
+      CURRENT_RECORD  <_INTEGER>     1
+      RECORDS(10)    <HIST_REC>      {array of structures}
+
+      Contents of RECORDS(1)
+         DATE           <_CHAR*24>      '1999-AUG-11 17:08:24.000'
+         COMMAND        <_CHAR*29>      'REDUCE_SWITCH   (SURF V1.4-3)'
+         USER           <_CHAR*4>       'timj'
+         HOST           <_CHAR*6>       'lapaki'
+         DATASET        <_CHAR*34>      '/local/jcmt/scratch/timj/orac/o107'
+         TEXT(3)        <_CHAR*72>      'Parameters: IN=@107 MSG_FILTER='...'
+                                        ... 'Software: /star/bin/surf/redu...'
+
+   DATA_ARRAY(130,72,3)  <_REAL>   -0.0002527004,-0.0006291242,
+                                   ... 1.1537035E-5,0.001769435,0.001728294
+   QUALITY        <QUALITY>       {structure}
+      QUALITY(130,72,3)  <_UBYTE>    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+                                     ... 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+      BADBITS        <_UBYTE>        7
+
+   VARIANCE(130,72,3)  <_REAL>    3.6919182E-6,3.6207405E-6,4.2371025E-6,
+                                  ... 1.3244949E-8,0.0002660675,2.1535034E-5
+   AXIS(3)        <AXIS>          {array of structures}
+
+   Contents of AXIS(1)
+      DATA_ARRAY(130)  <_REAL>       1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,
+                                     ... 122,123,124,125,126,127,128,129,130
+      LABEL          <_CHAR*9>       'Bolometer'
+
+   LABEL          <_CHAR*8>       'Raw data'
+   TITLE          <_CHAR*30>      'hltau'
+   UNITS          <_CHAR*5>       'Volts'
+
+End of Trace.
+\end{verbatim}
+\end{myquote}
+
+The 3rd dimension corresponds to beam position. In most cases only beam 2 is
+used (the middle beam) but for two or three  bolometer chopping the 1st and
+3rd beams will be accessed. In general, the 1st and 3rd beams are simply
+scaled versions of the middle beam; the relative weighting of the beams is
+stored in the newly created \texttt{BEAM\_WT} array in the \texttt{REDS}
+extension. In the above example, the middle beam is -0.5 times the left or
+right beams.
+
+
+
+\subsection{Extensions\label{scu:ext}}
+
+The information describing the observation can be found in the NDF
+extensions. \scusoft\ expects to find the following extensions in
+data files:
+
+\subsubsection{FITS}
+
+The FITS extension is an array of 80 character strings stored in a format
+identical to a standard FITS header. This contains general information
+about the observation but no array information. Listings of full SCUBA
+FITS headers can be found in Appendix \ref{app:fits}. \scusoft\ only requires
+a subset of the full SCUBA headers. For a jiggle map these are listed
+in table \ref{tab:jigfits}.
+
+\begin{table}
+\begin{myquote}
+\begin{tabular}{ll}
+OBJECT & Name of object \\
+RUN    & Run number of observation \\
+MODE   & Type of observation (MAP, PHOTOM, SKYDIP etc) \\
+SAM\_MODE & Sampling method (JIGGLE or RASTER) \\
+SAM\_CRDS & Coordinate frame of jiggle or scan\\
+SAM\_PA & Scan PA (not required for jiggle)\\
+LAT    & Latitude of object (eg Declination)\\
+LONG   & Longitude of object (eg Right Ascension)\\
+CENT\_CRD & Coordinate frame of LONG/LAT (RB,RJ,GA etc)\\
+UTDATE & Date of observation in YYYY:MM:DD format\\
+UTSTART& UT time of start of observation (HH:MM:SS) \\
+STSTART& Local sidereal time of start of observation (HH:MM:SS)\\
+STEND  & LST of end of observation\\
+EXP\_TIME&Exposure time (seconds) of each individual sample\\
+MAP\_X  & Tangent plane X offset from tracking centre\\
+MAP\_Y &  Tangent plane Y offset from tracking centre\\
+N\_BOLS & Number of bolometers selected (should match data array)\\
+STATE & State at end of observation (ABORT indicates early abort)\\
+VERSION & Version of real-time software (see SURFLIB\_PROCESS\_BOLS)\\
+JIGL\_CNT & Number of offsets in jiggle pattern\\
+J\_PER\_S & Number of jiggles per switch\\
+J\_REPEAT & No. of jiggle pattern repeats in switch\\
+CNTR\_DU3 & Nasmyth  dU3 coord of instrument centre\\
+CNTR\_DU4 & Nasmyth dU4 coord of instrument centre\\
+LAT-OBS & Latitude of observatory (degrees)\\
+LONG-OBS & East longitude of observatory (degrees)\\
+TELESCOP & Telescope name\\
+INSTRUME & Instrument name\\
+CHOP\_THR & Chopper throw (arcsec)\\
+CHOP\_PA & Chopper PA 0=in lat, 90=in long\\
+CHOP\_FRQ & Chopper frequency (Hz)\\
+CHOP\_CRD & Coordinate frame of chop\\
+CHOP\_FUN & Chopper waveform (SQUARE, TRIPOS)\\
+N\_SUBS   & Number of sub-instruments \\
+SUB\_1    & Name of sub-instrument 1 (or 'not used')\\
+SUB\_2    & Name of sub-instrument 2 (or 'not used')\\
+SUB\_3    & Name of sub-instrument 3 (or 'not used')\\
+SUB\_4    & Name of sub-instrument 4 (or 'not used')\\
+SUB\_5    & Name of sub-instrument 5 (or 'not used')\\
+FILT\_1   & Filter name for sub-instrument 1 (or 'not used')\\
+FILT\_2   & Filter name for sub-instrument 2 (or 'not used')\\
+FILT\_3   & Filter name for sub-instrument 3 (or 'not used')\\
+FILT\_4   & Filter name for sub-instrument 4 (or 'not used')\\
+FILT\_5   & Filter name for sub-instrument 5 (or 'not used')\\
+WAVE\_1   & Wavelength of sub-instrument 1 (microns)\\
+WAVE\_2   & Wavelength of sub-instrument 2 (microns)\\
+WAVE\_3   & Wavelength of sub-instrument 3 (microns)\\
+WAVE\_4   & Wavelength of sub-instrument 4 (microns)\\
+WAVE\_5   & Wavelength of sub-instrument 5 (microns)\\
+\end{tabular}
+\end{myquote}
+\caption{FITS keywords required by \scusoft\ for Jiggle mapping}
+\label{tab:jigfits}
+\end{table}
+
+\subsubsection{SCUBA}
+
+The \texttt{SCUBA} extension contains information on the instrument and the
+structure of the data array. It has the following format (output of
+\hdstrace):
+
+\begin{myquote}
+\begin{verbatim}
+SCUBA          <SCUBA_ST>      {structure}
+   BOL_CALB(16,9)  <_REAL>        1.286,0.9311,0.9499,1.002,0.9585,
+                                  ... 1.054,1.065,1.045,1,1,1,1,1,1,0
+   BOL_DU3(16,9)  <_REAL>         57.08,45.9,36.15,24.64,14.55,3.62,
+                                  ... -15.78,9.047,-54.65,0,0,0,0,0,0
+   BOL_DU4(16,9)  <_REAL>         -28.14,-35.91,-41.46,-49.62,
+                                  ... 63.89,77.76,71.16,0,0,0,0,0,0
+   BOL_QUAL(16,9)  <_INTEGER>     0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+                                  ... 0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,1,1
+   BOL_TYPE(16,9)  <_CHAR*20>     'SHORT','SHORT','SHORT','SHORT',
+                                  ... 'P...','P1350_DC','P1100_DC','BAD'
+   BOL_ADC(128)   <_INTEGER>      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,
+                                  ... 8,8,8,8,8,8,8,8,9,9,9,9,9,9,9,9,9
+   BOL_CHAN(128)  <_INTEGER>      1,2,3,4,5,6,7,8,9,10,11,12,13,14,
+                                  ... 12,13,14,15,16,1,2,3,4,5,6,7,8,9
+   FLAT_ADC       <_INTEGER>      0
+   FLAT_CHN       <_INTEGER>      0
+   FLAT_IND       <_INTEGER>      0
+   PHOT_BB(3,2)   <_INTEGER>      0,112,0,0,46,0
+   DEM_PNTR(2,4,3,1)  <_INTEGER>   1,17,49,33,65,81,113,97,129,145,
+                                   ... 257,273,305,289,321,337,369,353
+   ISTART         <_INTEGER>      0
+   NPIX           <_INTEGER>      0
+   POINTER        <_INTEGER>      0
+\end{verbatim}
+\end{myquote}
+
+The first 5 entries are simply the flatfield information (see Appendix
+\ref{app:ff} for an example flatfield file). The shape of the arrays
+(in this case $16\times9$) corresponds to the number of channels on each A/D
+card and the number of A/D cards. These dimensions must match the values of
+the constants SCUBA\_\_NUM\_ADC and SCUBA\_\_NUM\_CHAN (Appendix
+\ref{app:const}).
+
+The full description of these entries follows:
+
+\begin{description}
+\item[BOL\_CALB]\mbox{} \\
+These are the actual flatfield values and contain the response of each pixel
+relative to a reference pixel (usually the centre pixel on each array, H7 and
+C14). This correction is applied to the data using the \flatf\ task
+(specifically the \texttt{sculib\_flatfield\_data} routine):
+\begin{equation}
+V_\mathrm{flatfielded}(B) = V_\mathrm{original}(B) \times \mathrm{BOL\_CALB}(B)
+\end{equation}
+where $B$ is the selected bolometer.
+
+\item[BOL\_DU3]\mbox{} \\
+These are the X coordinates of every bolometer. For SCUBA, these are arcsec X
+(U3) offsets (i.e.\ $\mathrm{d}U3$) from the left-hand Nasmyth centre.
+
+\item[BOL\_DU4]\mbox{} \\
+These are the Y coordinate of every bolometer. For SCUBA, these are arcsec Y
+(U4) offsets (i.e.\ $\mathrm{d}U4$) from the left-hand Nasmyth centre.
+
+\item[BOL\_QUAL]\mbox{} \\
+This is an array of quality flags. A 0 indicates that the bolometer is `good', 
+a 1 indicates that the bolometer is `bad'. This array is used during
+flatfielding (\texttt{sculib\_flatfield\_data})to set bit 1 in the NDF
+quality array.
+
+\item[BOL\_TYPE]\mbox{}\\
+This array contains a textual description of the sub-instrument to which each
+bolometer belongs. This information is used by the \ext\ task to select the
+bolometers from the specified sub-instrument.
+
+\item[BOL\_ADC]\mbox{}\\
+This array contains the A/D card numbers corresponding to each of the
+bolometers that were used for the observation. The order and size should match
+the size of the second dimension of the main data array for raw SCUBA data and 
+the first dimension for data that has been processed by \resw. The \ext\ task
+modifies this array to reflect the sub-instrument selection.
+
+\item[BOL\_CHAN]\mbox{}\\
+This array contains the A/D channel numbers corresponding to each of the
+bolometers that were used for the observation. The order and size should match
+the size of the second dimension of the main data array for raw SCUBA data and 
+the first dimension for data that has been processed by \resw. The \ext\ task
+modifies this array to reflect the sub-instrument selection.
+
+\item[FLAT\_ADC]\mbox{}\\
+Not used by \scusoft.
+
+\item[FLAT\_CHN]\mbox{}\\
+Not used by \scusoft.
+
+\item[FLAT\_IND]\mbox{}\\
+Not used by \scusoft.
+
+\item[PHOT\_BB]\mbox{}\\
+This is only used for PHOTOM (and POLPHOT) observations. The first dimension
+corresponds to the number of beam positions (3 for 2 position chopping with
+nodding) and the second dimension corresponds to the number of sub-instruments 
+used for the observation. The array contains the bolometer number (using the
+same indexing scheme as for the BOL\_CHAN and BOL\_ADC arrays) that is on
+source for each of the beam positions. For standard single bolometer
+photometry only the middle beam is on source and in the example shown only
+H7 and C14 are used for the photometry. The \scuphot\ task uses this array to
+decide which bolometers to extract from the full dataset. The \ext\ task
+modifies this array to reflect the sub-instrument selection.
+
+This information is also available in string form in the \texttt{PHOT\_BBF}
+FITS keyword. For non-PHOTOM based observations this structure is 0.
+
+
+\item[DEM\_PNTR]\mbox{}\\
+
+This array is used to convert from measurement, integration, exposure and
+switch number to sample number (i.e.\ the final dimension in the
+data array). The routines \texttt{SCULIB\_FIND\_SWITCH} and
+\texttt{SCULIB\_FIND\_INT} are provided to simplify this (they also
+return the position of the end of the switch or integration).
+It has dimensions of N\_SWITCHES, N\_EXPOSURES, N\_INTEGRATIONS,
+and N\_MEASUREMENTS.
+
+\item[ISTART]\mbox{}\\
+Not used by \scusoft.
+
+\item[NPIX]\mbox{}\\
+Not used by \scusoft.
+
+\item[POINTER]\mbox{}\\
+Not used by \scusoft.
+
+
+\end{description}
+
+\subsubsection{SCUCD}
+
+The \texttt{SCUCD} extension contains information on telescope movements.
+It is slightly different for JIGGLE (MAP and PHOTOM) and SCAN observations.
+For a JIGGLE observation it has the following format:
+
+\begin{myquote}
+\begin{verbatim}
+STRUCT.MORE.SCUCD  <SCUCD_ST>
+
+   JIGL_X(64)     <_REAL>         -2.6883,-5.3457,-8.033999,-13.3797,
+                                  ... 5.3457,2.6883,0,2.6883,0,2.6883,0,0
+   JIGL_Y(64)     <_REAL>         1.545,3.09,1.545,1.545,3.09,4.635,6.18,
+                                  ... -9.27,-7.725,-6.18,-4.635,-3.09,0
+   DEC1           <_REAL>         0
+   DEC2           <_REAL>         0
+   LST_STRT(2,4,3,1)  <_DOUBLE>   5.6288711444511,5.630383297715,
+                                  ... 5.6639924748021,5.6623806283313
+   RA1            <_REAL>         0
+   RA2            <_REAL>         0
+\end{verbatim}
+\end{myquote}
+
+and for a SCAN observation:
+
+\begin{myquote}
+\begin{verbatim}
+STRUCT.MORE.SCUCD  <SCUCD_ST>
+
+   JIGL_X         <_REAL>         0
+   JIGL_Y         <_REAL>         0
+   DEC1(1,5,1,1)  <_REAL>         -17.06608,-17.04154,-17.10884,-17.07168,
+                                  -17.11085
+   DEC2(1,5,1,1)  <_REAL>         -17.03781,-17.09083,-17.04711,-17.11225,
+                                  -17.09126
+   LST_STRT(1,5,1,1)  <_DOUBLE>   5.521871430823,5.5231108938446,
+                                  ... 5.5266851885263,5.5281428875176
+   RA1(1,5,1,1)   <_REAL>         21.16225,21.16618,21.16226,21.1673,
+                                  21.16577
+   RA2(1,5,1,1)   <_REAL>         21.16466,21.16197,21.16755,21.1638,
+                                  21.16747
+   WPLATE         <_REAL>         0
+\end{verbatim}
+\end{myquote}
+
+The full description of these entries follows:
+
+\begin{description}
+
+\item[JIGL\_X and JIGL\_Y]\mbox{} \\
+
+These are the X and Y coordinates of the jiggle pattern in arcsecond
+offsets. The coordinate frame is given in the \texttt{SAM\_CRDS} FITS keyword.
+They are only used for JIGGLE observations.
+
+\item[LST\_STRT]\mbox{} \\
+
+This is the local sidereal time of the start of every switch expressed as
+decimal radians. It has dimensions of N\_SWITCHES, N\_EXPOSURES,
+N\_INTEGRATIONS, and N\_MEASUREMENTS. The current epoch of observation
+(Modified Julian Date) is calculated from the UTSTART and UTDATE FITS
+keywords in \texttt{SCULIB\_GET\_MJD}.
+
+\item[RA1, DEC1, RA2 and DEC2]\mbox{} \\
+
+This is the apparent RA and Dec of the start (RA1, DEC1) and end (RA2, DEC2)
+of the scans in radians. The dimensions are N\_SWITCHES, N\_EXPOSURES,
+N\_INTEGRATIONS, and N\_MEASUREMENTS. The current epoch of observation
+(Modified Julian Date) is calculated from the UTSTART and UTDATE FITS
+keywords in \texttt{SCULIB\_GET\_MJD}.
+
+\item[WPLATE]\mbox{} \\
+
+For polarimetry observations (POLPHOT or POLPMAP) this array contains the 
+waveplate angle for each measurement (where a measurement is defined as a move 
+of the waveplate). It is used by the \texttt{SURFLIB\_FILL\_WPLATE} routine.
+
+\end{description}
+
+\subsubsection{REDS}
+
+The \texttt{REDS}\footnote{The name \texttt{REDS} is historical, at some time
+in the distant past the SCUBA data reduction software was called
+\textsc{Reds}, standing for `REDuction Scuba'} extension is created by SURF
+as a general purpose repository of information that should be passed between
+SURF tasks.
+
+It can contain the following entries:
+
+\begin{description}
+\item[BEAM\_WT]\mbox{} \\
+The relative weight of the beams. Only used for PHOTOM observations. This is 
+created by \resw.
+\item[SKY]\mbox{} \\
+An NDF containing the estimate of the sky fluctuations. This is usually
+created by \calcsky\ and is used by \remsky\ to remove the sky fluctuations.
+The size of the NDF should match the size of the time axis in the main data
+array.
+\item[BOLWT]\mbox{} \\
+Relative weight of each bolometer. Created by \setbolwt\ and used by \rebin.
+\end{description}
+
+
+\section{Aborted data files}
+
+When an observation completes normally (either because the specified number of
+measurements has been taken or a \texttt{TERMINATE} command has been issued)
+the size of the final dimension of the data array and the contents and shape
+of the \texttt{DEM\_PNTR} array agree.  In some cases an observation must be
+aborted suddenly using the \texttt{ABORT} command. 
+Aborted observation files do not always have the correct shape for 
+\texttt{DEM\_PNTR} (e.g.\ the number of integrations specified by the second
+dimension of the array does not agree with the number that were actually
+observed). \scusoft\ overcomes this problem by looking in the \texttt{STATE}
+FITS keyword; if it contains the string ``ABORTING'' the exposure, integration 
+and measurement values are read from the FITS keywords \texttt{LAST\_EXP}, 
+\texttt{LAST\_INT} and \texttt{LAST\_MEAS} respectively.
+
+
+
+\section{\xlabel{quality}Quality flags\label{sec:quality}}
+
+The \scusoft\ software conforms to the NDF standard concerning the processing
+of quality or bad-pixel masks. Each method of setting a pixel bad is
+associated with a bit in the quality masking flag (the NDF.QUALITY.BADBITS
+component). The bad bits and their meaning in \scusoft\ are described in table
+\ref{badbits}.
+
+\begin{table}
+\caption{Quality bits used by \scusoft}
+\label{badbits}
+\begin{center}
+\begin{tabular}{ccl}
+\hline\hline
+Bit\# & Value & Meaning \\ \hline
+0 & 1  &Infinity (eg division by zero) \\
+1 & 2  &Set by \flatf.\\
+2 & 4  &Set by \resw\ if the transputers detected more spikes\\
+  &    & than specified by the \param{SPIKE\_LEVEL} parameter.\\
+3 & 8  &Set by \chgqual.\\
+4 & 16 &Set by despiking (\scuclip\ and \despike)\\ \hline\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+In order to remove the effect of a particular bit (i.e.\ to ignore a
+despiking), the \Kappa\ task \setbb\ can be used to change the bad-bits
+mask in the NDF. Simply calculate the value related to the bits you are
+interested in keeping and use this value in \setbb. Note that care must
+be taken in deciding which bits are to be used for masking bad data. Bits zero
+and one must always be set whereas the other three bits are
+optional. \chgqual\ is the only task that acts on a file rather than producing
+a processed copy and it is probably better if \chgqual\ is used directly if
+you wish to manipulate the mask associated with bit three.
+
+Additionally, regridded images also use quality flags. Bit 0 is used
+to represent areas where no data were available and bit 1 is used to mask
+data at the edge of the regridded area via the TRIM parameter.
+
+\section{SURF Libraries}
+
+\scusoft\ consists of the top level task routines (i.e.\ routines that
+provide the structure of the task and do all disk I/O and most of the
+interaction with the parameter system) and lower level
+routines that do jobs that could be used by multiple tasks or other systems
+(such as the real-time observing system) or provide the data reduction
+algorithms. These lower level routines are stored in libraries and are
+discussed in the following sections.
+
+\subsection{SURFLIB}
+
+\texttt{SURFLIB} is a library of data reduction algorithms and routines that
+are directly relevant to \scusoft\ itself. All new subroutines required by
+\scusoft\ are added to this library unless there is an obvious reason to put
+it somewhere else. Contains routines for sky noise removal, instrumental
+polarisation removal, baseline removal from scan maps etc).
+
+
+\subsection{SCULIB}
+
+This library was designed to provide the fundamental building blocks for
+manipulating SCUBA data in the off-line and real-time system. Many of the
+routines in this library are not used in \scusoft\ itself. In general,
+new routines are added to \texttt{SURFLIB} rather than \texttt{SCULIB}
+although \texttt{SCULIB} does contain some routines that are used solely in 
+\scusoft.\footnote{\ldots for historical reasons.}
+
+
+\section{Anatomy of a SURF task}
+
+\scusoft\ tasks follow the same general format internally:
+
+\begin{enumerate}
+\item Request the messaging level from the parameter system
+(\param{MSG\_LEVEL}).
+\item Read in some information concerning the object name, observation mode
+and run number and write this to the screen (at normal messaging level) to
+keep the user informed.
+\item Check the history component to make sure that the correct tasks have
+been run prior to running the current task. This always contains a check to
+see that the \resw\ task has been run on the data.
+\item Check the dimensions of the data array, the \texttt{LST\_STRT} array and
+the \texttt{DEM\_PNTR} arrays.
+\item Retrieve information from NDF extensions (see e.g.\ 
+\texttt{SCULIB\_GET\_BOL\_DESC}, \texttt{SCULIB\_GET\_JIGGLE}). [as required]
+\item If required, construct an output name based on the input filename
+(\texttt{SCULIB\_CONSTRUCT\_OUT}). The output file is usually propogated from
+the input file using \texttt{NDF\_PROP}.
+\item Do whatever has to be done.
+\item Shut down NDF, free memory, free locators.
+
+\end{enumerate}
+
+\section{Writing an import task}
+
+In order to import data into \scusoft\ that has not been taken with the
+SCUBA VAX/VMS data acquisition system, it is necessary to convert the
+original file format to a form that \scusoft\ can understand.
+The file can be converted to the same format as written by the SCUBA
+acquisition system (\S\ref{sec:raw}) or the format written by the
+\resw\ task (\S\ref{sec:surfform}).
+
+It is expected that the conversion of the data structure to the correct format 
+will be fairly simple. The difficulty lies in generating the required FITS
+information (with the correct FITS keywords) and the NDF extensions.
+
+\subsection{Case Study: DREAM}
+
+DREAM is a SCUBA observing mode where the chopping is done as part of the
+jiggle pattern and the resulting signal is reconstructued by tiling the
+bolometer patterns (le Poole and Greve, 1998, SPIE 3357). In this case
+it is not necessary to subtract switches, despike or flatfield the data and
+\scusoft\ is required simply to perform the regridding and coadding.
+In this case, the \scusoft\ format was chosen to simulate the output of the
+\flatf\ task (the HISTORY component of the NDF was updated to reflect this).
+
+The required stages are:
+
+\begin{enumerate}
+\item Read in the import data file.
+\item Create output NDF.
+\item Convert data array to a 2-d array of dimensions (N\_BOLS $\times$
+N\_SAMPLES). Also create Variance and Quality arrays.
+\item Write AXIS information. This is simply bolometer number for the X axis
+and integration number for the Y axis.
+\item Create the \texttt{SCUCD}, \texttt{SCUBA} and \texttt{REDS} extensions.
+\item Construct the \texttt{DEM\_PNTR} array.
+\item Construct the \texttt{LST\_STRT} array.
+\item Store the jiggle patterns in \texttt{JIGL\_X} and \texttt{JIGL\_Y}.
+\item Construct \texttt{BOL\_CHAN} and \texttt{BOL\_ADC} arrays.
+\item Store the flatfield information (essentially for the X and Y offsets of
+each bolometer). This is done by reading in a flatfield file using
+\texttt{SCULIB\_READBOLS}.
+\item Create FITS header (see table \ref{tab:jigfits} for required keywords for
+jiggle map).
+\item Write fake history information to convince \scusoft\ that \resw\ and
+\flatf\ have been run on the file.
+\item Shut down.
+\end{enumerate}
+
+
+\appendix
+
+\clearpage
+
+\section*{\xlabel{glossary}Glossary\label{glossary}}
+\addcontentsline{toc}{section}{Glossary}
+
+\begin{description}
+
+\item{{\bf chopping}} The secondary mirror is continuously moved on and off
+source at approximately 7~Hz in order to remove the sky to zeroth order. This
+is done in addition to standard jiggling.
+
+\item{{\bf demodulation}} Removal of the chop signal by the transputers.
+At this time, the raw data can not be accessed, only the demodulated data are
+stored.
+
+\item{{\bf exposure}} An exposure is the result from a complete set of
+switches. For example, in a JIGGLE/MAP or PHOTOM observation where the
+telescope is nodding the source between left and right beams, the data from
+each nod position is a switch and the reduced result `left switch' - `right
+switch' say, is an exposure. In a SCAN/MAP observation there is no beam
+switching so, in this case, an exposure is the same as a switch.
+
+
+\item{{\bf integration}} An integration means different things for different
+observations.
+
+For one of the mapping modes it means the data from one fully-sampled coverage
+of the map area. In a JIGGLE/MAP, where full sampling is achieved by jiggling
+the secondary mirror, an integration is generally the results from one pass
+through the complete jiggle pattern. An integration is made up of one or more
+exposures. 
+
+Similarly, an integration for a SCAN/MAP observation is made up of data from
+the raster scans that cover the map area once.
+
+For PHOTOM observations an integration is usually the average of a 9 point
+mini-jiggle.
+
+For a SKYDIP observation, an integration is the data from a single revolution
+of the sector chopper in front of the cryostat window.
+
+
+\item{{\bf jiggle}} In order to sample an image fully the secondary mirror
+is moved once a second (whilst chopping) to move the position of the array on
+the sky; this is called `jiggling.'  There are a  complete set of jiggle
+positions for each integration. A PHOTOM observation can also jiggle in order
+to correct for seeing effects.
+
+\item{{\bf measurement}} A measurement is a group of integrations. Most MAP or
+PHOTOM observations will consist of only one measurement.
+
+A FOCUS or ALIGN observation consists of five measurements (one for each
+secondary mirror position). A SKYDIP observation consists of one measurement
+at each elevation.
+
+\item{{\bf nod}} In order to correct for atmospheric variation the telescope
+is moved off-source in each exposure so that sky can be measured.
+
+\item{{\bf ODF}} The observation definition file (ODF) is a file containing a
+list of instructions for an observation with SCUBA.
+
+\item{{\bf sub-instrument}} SCUBA contains bolometer arrays and photometric
+pixels that can operate at several wavelengths simultaneously. Each of these
+is called a sub-instrument. They are:
+
+\begin{itemize}
+\item SHORT - the short wave array containing 91 bolometers
+\item LONG - the long wave array containing 37 bolometers
+\item P1100 - the single bolometer optimised for 1100\micron.
+\item P1350 - the single bolometer optimised for 1350\micron.
+\item P2000 - the single bolometer optimised for 2000\micron.
+\end{itemize}
+
+
+\item{{\bf switch}} The switch is the fundamental unit of data-taking in an
+observation. For example in a JIGGLE/MAP or PHOTOM observation each chunk of
+jiggle positions measured with the object in the beam of a telescope is a
+switch. Each scan across the source in a SCAN/MAP observation is also a switch.
+ 
+\item{{\bf tau ($\tau$)}} Submillimetre extinction is measured using the
+zenith optical depth, tau or $\tau$, this is a measure of the amount of water
+vapour present in the atmosphere. For a tau, $\tau$ at a given airmass, $A$,
+the attenuation due to the atmosphere is given as e$^{-A \tau}$. Note that tau
+is wavelength dependent and that the value quoted by the 
+\htmladdnormallink{Caltech Submillimetre
+Observatory}{http://www.cco.caltech.edu/\~{}cso/} (CSO) is the $\tau$ at 225~GHz and will therefore be different at 
+the other wavelengths used by SCUBA
+
+\end{description}
+
+
+
+
+
+\section{SURF coordinate frames\label{app:frames}}
+
+\scusoft\ understands a number of different coordinate frames and uses
+two letter codes\footnote{with the exception of PLANET frame} 
+(as used by the JCMT) to describe them. The following
+are available:
+
+\begin{tabular}{ll}
+RB & FK4 B1950\\
+RJ & FK5 J2000\\
+RD & Apparent RA/Dec, current epoch\\
+GA & Galactic coordinates (J2000) \\
+NA & Left hand Nasmyth coordinates \\
+AZ & Az/El offsets \\
+PLANET & JCMT input coordinate frame for moving source \\
+PL & SURF output coordinate for offsets from tracking centre\\
+\end{tabular}
+
+These coordinate frames are used to specify the tracking centre
+(\texttt{CENT\_CRD}), the coordinate frame of the chop (\texttt{CHOP\_CRD}),
+the coordinate frame of any offsets (\texttt{LOCL\_CRD}) and the coordinate
+frame of the sampling (\texttt{SAM\_CRDS}) (eg jiggle coordinate frame or scan
+coordinate frame)
+
+SURF currently assumes that the instrument is on the left hand Nasmyth
+platform.
+
+\section{Building SURF}
+
+The \scusoft\ development tree is in CVS and has the layout shown in
+Fig.\ \ref{surf:devel}. The development version can be built 
+by using the default make target in the \texttt{surf} directory or
+by running the individual makefiles in the \texttt{sculib}, \texttt{surflib},
+\texttt{surf\_kap} and \texttt{src} directories. The \scusoft\ monolith is
+built in the \texttt{src} directory along with compilation of the IFC files
+(the monolith IFL file is created automatically from the task IFL files).
+
+The current development version number (i.e.\ the version number written to
+history components of the NDF files) is defined in \texttt{src/makefile}
+via the \texttt{PKG\_VERS} variable. (see \texttt{surf\_set\_app\_name.F} for
+more information on the setting of the version number in the monolith.
+
+\begin{figure}
+\begin{center}
+\begin{myquote}
+\begin{verbatim}
+surf ---- src                          Top level surf_* and IFL files
+      |
+      |-- surflib                      surflib source code
+      |
+      |-- sculib                       sculib source code
+      |
+      |-- surf_kap                     Useful routines from Kappa
+      |
+      |-- scripts                      Scripts (eg surf.csh, remdbm.pl)
+      |
+      |-- misc                         Miscellaneous (eg ipfile.dat)
+      |
+      |-- dream                        DREAM mode import routine
+      |
+      |-- starlink                     Starlink makefiles
+      |
+      |-- docs --------- hlp           On-line help system
+                     |
+                     |-- sun216        Main SURF documentation
+                     |
+                     |-- sc10          Photometry cookbook
+                     |
+                     |-- sc11          Mapping cookbook
+                     |
+                     |-- sc11_mini     mini mapping cookbook
+\end{verbatim}
+\end{myquote}
+\end{center}
+\caption{Directory layout of SURF development system. CVS directories are not
+shown.}
+\label{surf:devel}
+\end{figure}
+
+In order to generate a Starlink distribution the \texttt{export} target must
+be used from the root \texttt{makefile}. This generates tar files from each
+directory and copies them to the \texttt{starlink} directory.  If required, the
+version number must be updated manually in the Starlink \texttt{makefile}.
+The platform dependencies are stored in the \texttt{mk} script that is used
+to run \texttt{make} with the correct environment. The environment is selected
+with the \texttt{SYSTEM} environment variable and can be one of 
+\texttt{sun4\_Solaris}, \texttt{ix86\_Linux} or \texttt{alpha\_OSF1}.
+
+Once the \texttt{SYSTEM} environment variable has been set the \texttt{mk}
+script can be run to build and export \scusoft:
+
+\begin{description}
+
+\item[./mk export\_source] \mbox{} \\
+   Exports the source into a compressed tar file ready for distribution.
+\item[./mk build] \mbox{} \\
+   Builds the monolith, extracting source files from tar files as required.
+\item[./mk export] \mbox{} \\
+   Exports the built system into a compressed tar file ready for distribution.
+This will include the source code.
+\item[./mk export\_run] \mbox{} \\
+   Exports the run-only system into a compressed tar file ready for
+distribution. This will not include the source code.
+\item[./mk install] \mbox{} \\
+  Installs the built system into the directory structure specified by the
+\texttt{INSTALL} environment variable. Files are installed below this
+directory into \texttt{bin/surf}, \texttt{docs}, \texttt{help/surf}
+and \texttt{dates}. Soft links are made from the installed binary directory
+to the current directory so that the installed files can be seen.
+Usually, \texttt{INSTALL} is set to \texttt{/star}.
+\item[./mk deinstall] \mbox{} \\
+  Deinstall the package.
+\end{description}
+
+\section{SURF Constants\label{app:const}}
+
+The SURF\_PAR include file defines the global constants that are used
+in \scusoft\ for preallocating arrays and defining useful mathematical 
+constants and strings. Only top level \scusoft\ routines (ie names of
+\texttt{surf\_*} include this file; all other library routines 
+obtain the value from argument.
+
+\subsection{Constant strings}
+
+\begin{quote}
+\begin{description}
+  \item[PACKAGE = 'SURF'] \mbox{} \\
+    Name of the software package. Used in output messages. (CHAR*10)
+\end{description}
+\end{quote}
+
+\subsection{Convenient numeric definitions}
+
+\begin{quote}
+\begin{description}
+  \item[PI = 3.14159265359D0] \mbox{} \\
+    $\pi$ [DOUBLE]
+  \item[R2AS = 206264.806247D0] \mbox{} \\
+    Used to convert radians to arcseconds:
+    \begin{equation}
+     \mathrm{arcsec} = 3600\frac{180}{\pi}\theta
+    \end{equation}
+  [DOUBLE]
+\end{description}
+\end{quote}
+
+\subsection{Parameters controlling the observation limits}
+
+\begin{quote}
+\begin{description}
+  \item[SCUBA\_\_MAX\_BEAM = 3] \mbox{} \\
+     maximum number of bolometers in a single sub-instrument that actually
+observer the source in a PHOTOM observation. [INTEGER]
+  \item[SCUBA\_\_MAX\_MEAS = 200] \mbox{} \\
+      maximum number of measurements in an observation. [INTEGER]
+  \item[SCUBA\_\_MAX\_INT = 1000] \mbox{} \\
+      maximum number of integrations in a measurement. [INTEGER]
+  \item[SCUBA\_\_MAX\_EXP = 128] \mbox{} \\
+      maximum number of exposures per integration. [INTEGER]
+  \item[SCUBA\_\_MAX\_SWITCH = 3] \mbox{} \\
+      maximum number of switches per exposure. [INTEGER]
+  \item[SCUBA\_\_MAX\_JIGGLE = 512] \mbox{} \\
+      maximum number of offsets in a jiggle pattern. [INTEGER]
+\end{description} 
+\end{quote}
+
+\subsection{Parameters governing the instrument itself}
+
+\begin{quote}
+\begin{description}
+  \item[SCUBA\_\_MAX\_SUB = 5] \mbox{} \\
+    Maximum number of sub-instruments (i.e.\ for SCUBA there are LONG, SHORT,
+P2000, P1350 and P1100 sub-instruments). [INTEGER]
+  \item[SCUBA\_\_NUM\_ADC = 9] \mbox{} \\
+    Number of A/D cards (called A, B, C, D, E, F, G, H and I for SCUBA).
+  \item[SCUBA\_\_NUM\_CHAN = 16] \mbox{} \\
+    Number of channels on each A/D card.
+\end{description}
+\end{quote}
+
+\subsection{Parameters dealing with automatic output filename generation}
+
+\begin{quote}
+\begin{description}
+
+  \item[SUFFIX\_ENV = 'SCUBA\_SUFFIX'] \mbox{} \\
+    Name of the environment variable dealing with the format of the
+automatically generated output filename. [CHAR*15]
+
+  \item[SCUBA\_\_N\_SUFFIX = 3] \mbox{} \\
+    Number of suffix options [INTEGER]
+
+  \item[SUFFIX\_OPTIONS = 'LONG','SHORT','VERBOSE']\mbox{} \\
+    The allowed suffix options i.e.\ these are the values that are valid for
+the environment variable specified by SUFFIX\_ENV [CHAR*10 (SCUBA\_N\_SUFFIX)]
+
+\end{description}
+\end{quote}
+
+\subsection{General limits}
+
+\begin{quote}
+\begin{description}
+
+  \item[SCUBA\_\_MAX\_POINT = 20] \mbox{} \\
+   Maximum number of pointing corrections.
+  \item[SCUBA\_\_MAX\_FITS = 200] \mbox{} \\
+   Maximum number of FITS items in header.
+  \item[SCUBA\_\_MAX\_SECT = 10] \mbox{} \\
+   Maximum number of SCUBA sections that can be specified.
+  \item[SCUBA\_\_N\_TEMPS = 3] \mbox{} \\
+    Number of temperatures per reading for SKYDIP observations: AMBIENT, SKY,
+COLD. 
+
+\end{description}
+\end{quote}
+
+
+\section{SCUBA FITS headers\label{app:fits}}
+
+This section lists the FITS headers written by SCUBA. \scusoft\ uses a subset
+of these keywords. Multiple headers are listed since the values are slightly
+different for different observing modes.
+
+\subsection{Skydip}
+
+This is a typical SKYDIP FITS header:
+
+\begin{myquote}
+\begin{verbatim}
+ACCEPT  = 'NO      '           / accept update; PROMPT, YES or NO
+ALIGN_AX= 'not used'           / Alignment measurements in X or Y axis
+ALIGN_SH=                   -1 / Distance between successive alignment offsets (
+ALT-OBS =                 4092 / Height of observatory above sea level (metres)
+AMEND   =             3.863703 / Airmass at end of observation
+AMSTART =             1.015427 / Airmass at start of observation
+APEND   =              627.851 / Air pressure at end of observation (mbar)
+APSTART =              627.851 / Air pressure at start of observation (mbar)
+ATEND   =             5.604397 / Air temp. at end of observation (C)
+ATSTART =             5.677658 / Air temp. at start of observation (C)
+BOLOMS  = 'SHORT_DC,LONG_DC'   / Names of bolometers measured
+CALIBRTR=                    F / Internal calibrator is on or off
+CAL_FRQ =                   -1 / Calibrator frequency (Hz)
+CENT_CRD= 'AZ      '           / Centre coordinate system
+CHOP_CRD= 'not used'           / Chopper coordinate system
+CHOP_FRQ=                    2 / Chopper frequency (Hz)
+CHOP_FUN= 'not used'           / Chopper waveform
+CHOP_PA =                   -1 / Chopper P.A., 0 = in lat, 90 = in long
+CHOP_THR=                   -1 / Chopper throw (arcsec)
+DATA_DIR= '19990808'           / Sub-directory where datafile was stored
+DATA_KPT= 'DEMOD   '           / The type of data stored to disk
+END_AZD =              219.183 / Azimuth at end of observation (deg)
+END_EL  =                   80 / Elevation of last SKYDIP point (deg)
+END_ELD =              79.9896 / Elevation at end of observation
+EQUINOX =                 2000 / Equinox of mean coordinate system
+EXPOSED =                    5 / Exposure per pixel (seconds)
+EXP_NO  =                    1 / Exposure number at end of observation
+EXP_TIME=                  0.5 / Exposure time for each basic measurement (sec)
+E_PER_I =                    1 / Number of exposures per integration
+FILTER  = '450N:850N'          / Filters used
+FOCUS_SH=                   -1 / Shift between focus measurements (mm)
+GAIN    =                    1 / Programmable gain
+HSTEND  = '20:05:49.00131'     / HST at end of observation
+HSTSTART= '20:00:56.00281'     / HST at start of observation
+HUMEND  =                   15 / Humidity (%) at end of observation
+HUMSTART=                   15 / Humidity (%) at start of observation
+INSTRUME= 'SCUBA   '           / Name of instrument used
+INT_NO  =                    1 / Integration number at end of observation
+JIGL_CNT=                   -1 / Number of offsets in jiggle pattern
+JIGL_NAM= 'not used'           / File containing jiggle offsets
+J_PER_S =                   -1 / Number of jiggles per switch position
+J_REPEAT=                   -1 / No. jiggle pattern repeats in a switch
+LAT     = 'not used'           / Object latitude
+LAT-OBS =        19.8258323669 / Latitude of observatory (degrees)
+LAT2    = 'not used'           / Object latitude at MJD2
+LOCL_CRD= 'no      '           / Local offset coordinate system
+LONG    = '+219:11:26.64'      / Object longitude
+LONG-OBS=        204.520278931 / East longitude of observatory (degrees)
+LONG2   = 'not used'           / Object Longitude at MJD2
+MAP_HGHT=                   -1 / Height of rectangle to be mapped (arcsec)
+MAP_PA  =                   -1 / P.A. of map vertical, +ve towards +ve long
+MAP_WDTH=                   -1 / Width of rectangle to be mapped (arcsec)
+MAP_X   =                   -1 / Map X offset from telescope centre (arcsec)
+MAP_Y   =                   -1 / Map Y offset from telescope centre (arcsec)
+MAX_EL  =                   80 / Max elevation of sky-dip (deg)
+MEANDEC =            -17.93834 / -17:56:18.01437 = approx. mean Dec. (deg)
+MEANRA  =             222.1444 / 222:08:39.76318 = approx. mean R.A. (deg)
+MEAS_NO =                   10 / Measurement number at end of observation
+MIN_EL  =                   15 / Min elevation of sky-dip (deg)
+MJD1    =                   -1 / Modified Julian day planet at RA,DEC
+MJD2    =                   -1 / Modified Julian day planet at RA2,DEC2
+MODE    = 'SKYDIP  '           / The type of observation
+N_INT   =                   10 / No. integrations in the observation
+N_MEASUR=                   10 / No. measurements in the observation
+OBJECT  = 'not used'           / Name of object
+OBJ_TYPE= 'not used'           / Type of object
+OBSDEF  = 'ss:odfsxskydip_850.obs_193300' / The observation definition file
+OBSERVER= 'jmk     '           / The name of the observer
+PROJ_ID = 'SCUBA   '           / The project identification
+RUN     =                   26 / Run number of observation
+SAM_CRDS= 'no      '           / Coordinatesystem of sampling mesh
+SAM_DX  =                   -1 / Sample spacing along scan direction (arcsec)
+SAM_DY  =                   -1 / Sample spacing perp. to scan (arcsec)
+SAM_MODE= 'not used'           / Sampling method
+SAM_PA  =                   -1 / Scan P.A. rel. to lat. line; 0=lat, 90=long
+SCAN_REV=                    F / .TRUE. if alternate scans reverse direction
+SPK_NSIG=                   -1 / N sigmas from fit of spike threshold
+SPK_RMVL=                    F / Automatic spike removal
+SPK_WDTH=                   -1 / Assumed width of spike
+START_EL=                   15 / Elevation of first SKYDIP point (deg)
+STATE   = 'Terminating         :   RESET_DATA_SIZE' / SCUCD state
+STEND   = '16:49:09.149323'    / ST at end of observation
+STRT_AZD=              219.174 / Azimuth at observation start (deg)
+STRT_ELD=              14.9868 / Elevation at observation start (deg)
+STSTART = '16:44:15.34744'     / ST at start of observation
+SWTCH_MD= 'not     '           / Switch mode of observation
+SWTCH_NO=                    1 / Switch number at end of observation
+S_PER_E =                    1 / Number of switch positions per exposure
+TELESCOP= 'JCMT    '           / Name of telescope
+TEL_OPER= 'kkp     '           / Telescope operator
+UTDATE  = '1999:8:8'           / UT date of observation
+UTEND   = '6:05:48.9996'       / UT at end of observation
+UTSTART = '6:00:55.99937'      / UT at start of observation
+VERSION =                  1.1 / SCUCD version
+ALIGN_DX=             0.027268 / SMU tables X axis alignment offset
+ALIGN_DY=             0.482489 / SMU tables Y axis alignment offset
+ALIGN_X =             -0.96279 / SMU tables X axis
+ALIGN_Y =              3.79108 / SMU tables Y axis
+AZ_ERR  =                    0 / Error in the telescope azimuth
+CHOPPING=                    F / SMU Chopper chopping state
+EL_ERR  =             0.154495 / Error in the telescope elevation
+FOCUS_DZ=            -0.361142 / SMU tables Z axis focus offset
+FOCUS_Z =             -17.2453 / SMU tables Z axis
+SEEING  =                0.525 / SAO atmospheric seeing
+SEE_DATE= '9908061715'         / Date and time of SAO seeing
+TAU_225 =                0.066 / CSO tau
+TAU_DATE= '9908080555'         / Date and time of CSO tau
+TAU_RMS =              5.0E-03 / CSO tau rms
+UAZ     =            -0.528088 / User azimuth pointing offset
+UEL     =              4.83289 / User elevation pointing offset
+UT_DATE = ' 8 Aug 1999'        / UT date at start of observation
+BAD_LIM =                   32 / No. spikes before quality set bad
+CALIB_LG=                   -1 / Lag of internal calibrator in samples
+CALIB_PD=                   -1 / Period of internal calibrator in samples
+CHOP_LG =                    0 / Chop lag in samples
+CHOP_PD =             64.03689 / Chop period in samples
+CNTR_DU3=                    0 / Nasmyth dU3 coord of instrument centre
+CNTR_DU4=                    0 / Nasmyth dU4 coord of instrument centre
+ETATEL_1=                 0.75 / Transmission of telescope
+ETATEL_2=                  0.9 / Transmission of telescope
+ETATEL_3=                   -1 / Transmission of telescope
+ETATEL_4=                   -1 / Transmission of telescope
+ETATEL_5=                   -1 / Transmission of telescope
+FILT_1  = '450     '           / Filter name
+FILT_2  = '850     '           / Filter name
+FILT_3  = 'not used'           / Filter name
+FILT_4  = 'not used'           / Filter name
+FILT_5  = 'not used'           / Filter name
+FLAT    = 'jcmtdata_dir:lwswphot.dat' / Name of flat-field file
+JIG_DSCD=                   -1 / No. samples discarded after jiggle movement
+L_GD_BOL= 'not used'           / Bol. to whose value LW guard ring is set
+L_GUARD =                    F / Long wave guard ring on or off
+MEAS_BOL= 'not used'           / Bolometers  actually measured in observation
+N_BOLS  =                    2 / Number of bolometers selected
+N_SUBS  =                    2 / Number of sub-instruments used
+PHOT_BBF= 'not_used       LL,C14,NULL' / The bolometers on the source
+PRE_DSCD=                    0 / No. of samples discarded before chop movement
+PST_DSCD=                    0 / No. samples discarded after chop movement
+REBIN   = 'LINEAR  '           / Rebinning method used by SCUIP
+REF_ADC =                   -1 / A/D card of FLATFIELD reference bolometer
+REF_CHAN=                   -1 / Channel of FLATFIELD reference bolometer
+SAM_TIME=                  122 / A/D sample period in ticks (64musec)
+SIMULATE=                    F / True if data is simulated
+SKY     = 'jcmtdata_dir:skydip_startup.dat' / Name of sky opacities file
+SUB_1   = 'SHORT   '           / SCUBA instrument being used
+SUB_2   = 'LONG    '           / SCUBA instrument being used
+SUB_3   = 'not used'           / SCUBA instrument being used
+SUB_4   = 'not used'           / SCUBA instrument being used
+SUB_5   = 'not used'           / SCUBA instrument being used
+S_GD_BOL= 'not used'           / Bol. to whose value SW guard ring is set
+S_GUARD =                    F / Short wave guard ring on or off
+TAUZ_1  =                   -1 / Zenith sky optical depth
+TAUZ_2  =                   -1 / Zenith sky optical depth
+TAUZ_3  =                   -1 / Zenith sky optical depth
+TAUZ_4  =                   -1 / Zenith sky optical depth
+TAUZ_5  =                   -1 / Zenith sky optical depth
+T_AMB   =             278.6532 / The ambient air temperature (K)
+T_COLD_1=                  120 / Effective temperature of cold load (K)
+T_COLD_2=                  100 / Effective temperature of cold load (K)
+T_COLD_3=                   -1 / Effective temperature of cold load (K)
+T_COLD_4=                   -1 / Effective temperature of cold load (K)
+T_COLD_5=                   -1 / Effective temperature of cold load (K)
+T_HOT   =                282.6 / The temperature of the hot load (K)
+T_TEL   =             282.2908 / The temperature of the telescope
+USE_CAL =                    F / .TRUE. if dividing chop by cal before rebin
+WAVE_1  =                  442 / Wavelength of map (microns)
+WAVE_2  =                  862 / Wavelength of map (microns)
+WAVE_3  =                    0 / Wavelength of map (microns)
+WAVE_4  =                    0 / Wavelength of map (microns)
+WAVE_5  =                    0 / Wavelength of map (microns)
+END
+\end{verbatim}
+\end{myquote}
+
+\subsection{Jiggle map}
+
+Jiggle map of a planet (note that for a moving source SCUBA supplies that
+apparent RA and Dec of the source at two different times. These are specified
+as \texttt{LON}G and \texttt{LAT} for \texttt{MJD1} and \texttt{LONG2} and
+\texttt{LAT2} for \texttt{MJD2}):
+
+\begin{myquote}
+\begin{verbatim}
+ACCEPT  = 'not used'           / accept update; PROMPT, YES or NO
+ALIGN_AX= 'not used'           / Alignment measurements in X or Y axis
+ALIGN_SH=                   -1 / Distance between successive alignment offsets (
+ALT-OBS =                 4092 / Height of observatory above sea level (metres)
+AMEND   =             1.296355 / Airmass at end of observation
+AMSTART =             1.283144 / Airmass at start of observation
+APEND   =             627.4847 / Air pressure at end of observation (mbar)
+APSTART =             627.2405 / Air pressure at start of observation (mbar)
+ATEND   =             7.655678 / Air temp. at end of observation (C)
+ATSTART =             7.997562 / Air temp. at start of observation (C)
+BOLOMS  = 'LONG,SHORT'         / Names of bolometers measured
+CALIBRTR=                    F / Internal calibrator is on or off
+CAL_FRQ =             2.929688 / Calibrator frequency (Hz)
+CENT_CRD= 'PLANET  '           / Centre coordinate system
+CHOP_CRD= 'LO      '           / Chopper coordinate system
+CHOP_FRQ=               7.8125 / Chopper frequency (Hz)
+CHOP_FUN= 'SQUARE  '           / Chopper waveform
+CHOP_PA =                    0 / Chopper P.A., 0 = in lat, 90 = in long
+CHOP_THR=                   68 / Chopper throw (arcsec)
+DATA_DIR= '19990808'           / Sub-directory where datafile was stored
+DATA_KPT= 'DEMOD   '           / The type of data stored to disk
+END_AZD =              198.486 / Azimuth at end of observation (deg)
+END_EL  =                   -1 / Elevation of last SKYDIP point (deg)
+END_ELD =              50.3461 / Elevation at end of observation
+EQUINOX =                 2000 / Equinox of mean coordinate system
+EXPOSED =                0.128 / Exposure per pixel (seconds)
+EXP_NO  =                   13 / Exposure number at end of observation
+EXP_TIME=                0.128 / Exposure time for each basic measurement (sec)
+E_PER_I =                   -1 / Number of exposures per integration
+FILTER  = '450N:850N'          / Filters used
+FOCUS_SH=                   -1 / Shift between focus measurements (mm)
+GAIN    =                   10 / Programmable gain
+HSTEND  = '18:52:56.00327'     / HST at end of observation
+HSTSTART= '18:41:44.99954'     / HST at start of observation
+HUMEND  =                   14 / Humidity (%) at end of observation
+HUMSTART=                   14 / Humidity (%) at start of observation
+INSTRUME= 'SCUBA   '           / Name of instrument used
+INT_NO  =                    1 / Integration number at end of observation
+JIGL_CNT=                   -1 / Number of offsets in jiggle pattern
+JIGL_NAM= 'not used'           / File containing jiggle offsets
+J_PER_S =                   -1 / Number of jiggles per switch position
+J_REPEAT=                   -1 / No. jiggle pattern repeats in a switch
+LAT     = '-017:55:40.89'      / Object latitude
+LAT-OBS =        19.8258323669 / Latitude of observatory (degrees)
+LAT2    = '-017:55:47.08'      / Object latitude at MJD2
+LOCL_CRD= 'RD      '           / Local offset coordinate system
+LONG    = '+014:48:26.75'      / Object longitude
+LONG-OBS=        204.520278931 / East longitude of observatory (degrees)
+LONG2   = '+014:48:28.04'      / Object Longitude at MJD2
+MAP_HGHT=                  600 / Height of rectangle to be mapped (arcsec)
+MAP_PA  =                    0 / P.A. of map vertical, +ve towards +ve long
+MAP_WDTH=                  600 / Width of rectangle to be mapped (arcsec)
+MAP_X   =                    0 / Map X offset from telescope centre (arcsec)
+MAP_Y   =                    0 / Map Y offset from telescope centre (arcsec)
+MAX_EL  =                   -1 / Max elevation of sky-dip (deg)
+MEANDEC =            -17.92968 / -17:55:46.84753 = approx. mean Dec. (deg)
+MEANRA  =             222.1171 / 222:07:01.490479 = approx. mean R.A. (deg)
+MEAS_NO =                    1 / Measurement number at end of observation
+MIN_EL  =                   -1 / Min elevation of sky-dip (deg)
+MJD1    =    51398.19570601852 / Modified Julian day planet at RA,DEC
+MJD2    =    51398.20612268519 / Modified Julian day planet at RA2,DEC2
+MODE    = 'MAP     '           / The type of observation
+N_INT   =                    1 / No. integrations in the observation
+N_MEASUR=                    1 / No. measurements in the observation
+OBJECT  = 'mars    '           / Name of object
+OBJ_TYPE= 'UNKNOWN '           / Type of object
+OBSDEF  = 'ss:scan_68dec.obs_mars_184023' / The observation definition file
+OBSERVER= 'jmk     '           / The name of the observer
+PROJ_ID = 'm99au34 '           / The project identification
+RUN     =                   18 / Run number of observation
+SAM_CRDS= 'NA      '           / Coordinatesystem of sampling mesh
+SAM_DX  =                    3 / Sample spacing along scan direction (arcsec)
+SAM_DY  =                   60 / Sample spacing perp. to scan (arcsec)
+SAM_MODE= 'RASTER  '           / Sampling method
+SAM_PA  =                 15.5 / Scan P.A. rel. to lat. line; 0=lat, 90=long
+SCAN_REV=                    T / .TRUE. if alternate scans reverse direction
+SPK_NSIG=                   -1 / N sigmas from fit of spike threshold
+SPK_RMVL=                    F / Automatic spike removal
+SPK_WDTH=                   -1 / Assumed width of spike
+START_EL=                   -1 / Elevation of first SKYDIP point (deg)
+STATE   = 'Terminating         :   STEP' / SCUCD state
+STEND   = '15:36:04.176178'    / ST at end of observation
+STRT_AZD=              194.923 / Azimuth at observation start (deg)
+STRT_ELD=              51.0202 / Elevation at observation start (deg)
+STSTART = '15:24:51.33911'     / ST at start of observation
+SWTCH_MD= 'NOSW    '           / Switch mode of observation
+SWTCH_NO=                    1 / Switch number at end of observation
+S_PER_E =                    1 / Number of switch positions per exposure
+TELESCOP= 'JCMT    '           / Name of telescope
+TEL_OPER= 'kkp     '           / Telescope operator
+UTDATE  = '1999:8:8'           / UT date of observation
+UTEND   = '4:52:55.99983'      / UT at end of observation
+UTSTART = '4:41:44.99954'      / UT at start of observation
+VERSION =                  1.1 / SCUCD version
+ALIGN_DX=             0.027268 / SMU tables X axis alignment offset
+ALIGN_DY=             0.482489 / SMU tables Y axis alignment offset
+ALIGN_X =             -2.32166 / SMU tables X axis
+ALIGN_Y =              3.78719 / SMU tables Y axis
+AZ_ERR  =                    0 / Error in the telescope azimuth
+CHOPPING=                    T / SMU Chopper chopping state
+EL_ERR  =                    0 / Error in the telescope elevation
+FOCUS_DZ=            -0.361142 / SMU tables Z axis focus offset
+FOCUS_Z =             -16.5076 / SMU tables Z axis
+SEEING  =                0.525 / SAO atmospheric seeing
+SEE_DATE= '9908061715'         / Date and time of SAO seeing
+TAU_225 =                0.097 / CSO tau
+TAU_DATE= '9908080435'         / Date and time of CSO tau
+TAU_RMS =              8.0E-03 / CSO tau rms
+UAZ     =            -0.528088 / User azimuth pointing offset
+UEL     =              4.83289 / User elevation pointing offset
+UT_DATE = ' 8 Aug 1999'        / UT date at start of observation
+BAD_LIM =                   32 / No. spikes before quality set bad
+CALIB_LG=                    6 / Lag of internal calibrator in samples
+CALIB_PD=             42.66667 / Period of internal calibrator in samples
+CHOP_LG =                    4 / Chop lag in samples
+CHOP_PD =                   16 / Chop period in samples
+CNTR_DU3=                    0 / Nasmyth dU3 coord of instrument centre
+CNTR_DU4=                    0 / Nasmyth dU4 coord of instrument centre
+ETATEL_1=                   -1 / Transmission of telescope
+ETATEL_2=                   -1 / Transmission of telescope
+ETATEL_3=                   -1 / Transmission of telescope
+ETATEL_4=                   -1 / Transmission of telescope
+ETATEL_5=                   -1 / Transmission of telescope
+FILT_1  = '450     '           / Filter name
+FILT_2  = '850     '           / Filter name
+FILT_3  = 'not used'           / Filter name
+FILT_4  = 'not used'           / Filter name
+FILT_5  = 'not used'           / Filter name
+FLAT    = 'jcmtdata_dir:lwswphot.dat' / Name of flat-field file
+JIG_DSCD=                   -1 / No. samples discarded after jiggle movement
+L_GD_BOL= 'not used'           / Bol. to whose value LW guard ring is set
+L_GUARD =                    F / Long wave guard ring on or off
+MEAS_BOL= 'not used'           / Bolometers  actually measured in observation
+N_BOLS  =                  128 / Number of bolometers selected
+N_SUBS  =                    2 / Number of sub-instruments used
+PHOT_BBF= 'not_used       LL,C14,NULL' / The bolometers on the source
+PRE_DSCD=                    0 / No. of samples discarded before chop movement
+PST_DSCD=                    0 / No. samples discarded after chop movement
+REBIN   = 'LINEAR  '           / Rebinning method used by SCUIP
+REF_ADC =                   -1 / A/D card of FLATFIELD reference bolometer
+REF_CHAN=                   -1 / Channel of FLATFIELD reference bolometer
+SAM_TIME=                  125 / A/D sample period in ticks (64musec)
+SIMULATE=                    F / True if data is simulated
+SKY     = 'jcmtdata_dir:skydip_startup.dat' / Name of sky opacities file
+SUB_1   = 'SHORT   '           / SCUBA instrument being used
+SUB_2   = 'LONG    '           / SCUBA instrument being used
+SUB_3   = 'not used'           / SCUBA instrument being used
+SUB_4   = 'not used'           / SCUBA instrument being used
+SUB_5   = 'not used'           / SCUBA instrument being used
+S_GD_BOL= 'not used'           / Bol. to whose value SW guard ring is set
+S_GUARD =                    F / Short wave guard ring on or off
+TAUZ_1  =                    0 / Zenith sky optical depth
+TAUZ_2  =                    0 / Zenith sky optical depth
+TAUZ_3  =                    0 / Zenith sky optical depth
+TAUZ_4  =                    0 / Zenith sky optical depth
+TAUZ_5  =                    0 / Zenith sky optical depth
+T_AMB   =                   -1 / The ambient air temperature (K)
+T_COLD_1=                   -1 / Effective temperature of cold load (K)
+T_COLD_2=                   -1 / Effective temperature of cold load (K)
+T_COLD_3=                   -1 / Effective temperature of cold load (K)
+T_COLD_4=                   -1 / Effective temperature of cold load (K)
+T_COLD_5=                   -1 / Effective temperature of cold load (K)
+T_HOT   =                   -1 / The temperature of the hot load (K)
+T_TEL   =                   -1 / The temperature of the telescope
+USE_CAL =                    F / .TRUE. if dividing chop by cal before rebin
+WAVE_1  =                  442 / Wavelength of map (microns)
+WAVE_2  =                  862 / Wavelength of map (microns)
+WAVE_3  =                    0 / Wavelength of map (microns)
+WAVE_4  =                    0 / Wavelength of map (microns)
+WAVE_5  =                    0 / Wavelength of map (microns)
+END
+\end{verbatim}
+\end{myquote}
+
+\subsection{Photometry}
+
+This is a photometry header:
+
+\begin{myquote}
+\begin{verbatim}
+ACCEPT  = 'not used'           / accept update; PROMPT, YES or NO
+ALIGN_AX= 'not used'           / Alignment measurements in X or Y axis
+ALIGN_SH=                   -1 / Distance between successive alignment offsets (
+ALT-OBS =                 4092 / Height of observatory above sea level (metres)
+AMEND   =             1.279808 / Airmass at end of observation
+AMSTART =             1.263818 / Airmass at start of observation
+APEND   =             628.7057 / Air pressure at end of observation (mbar)
+APSTART =             628.7057 / Air pressure at start of observation (mbar)
+ATEND   =             6.678879 / Air temp. at end of observation (C)
+ATSTART =             6.776558 / Air temp. at start of observation (C)
+BOLOMS  = 'H7      '           / Names of bolometers measured
+CALIBRTR=                    T / Internal calibrator is on or off
+CAL_FRQ =             2.929688 / Calibrator frequency (Hz)
+CENT_CRD= 'RB      '           / Centre coordinate system
+CHOP_CRD= 'AZ      '           / Chopper coordinate system
+CHOP_FRQ=               7.8125 / Chopper frequency (Hz)
+CHOP_FUN= 'SCUBAWAVE'          / Chopper waveform
+CHOP_PA =                   90 / Chopper P.A., 0 = in lat, 90 = in long
+CHOP_THR=                   45 / Chopper throw (arcsec)
+DATA_DIR= '19990808'           / Sub-directory where datafile was stored
+DATA_KPT= 'DEMOD   '           / The type of data stored to disk
+END_AZD =              274.745 / Azimuth at end of observation (deg)
+END_EL  =                   -1 / Elevation of last SKYDIP point (deg)
+END_ELD =              51.0018 / Elevation at end of observation
+EQUINOX =                 2000 / Equinox of mean coordinate system
+EXPOSED =                    0 / Exposure per pixel (seconds)
+EXP_NO  =                    1 / Exposure number at end of observation
+EXP_TIME=                1.024 / Exposure time for each basic measurement (sec)
+E_PER_I =                    1 / Number of exposures per integration
+FILTER  = '450N:850N'          / Filters used
+FOCUS_SH=                   -1 / Shift between focus measurements (mm)
+GAIN    =                   10 / Programmable gain
+HSTEND  = '10:29:31.9986'      / HST at end of observation
+HSTSTART= '10:25:34.0004'      / HST at start of observation
+HUMEND  =                   36 / Humidity (%) at end of observation
+HUMSTART=                   37 / Humidity (%) at start of observation
+INSTRUME= 'SCUBA   '           / Name of instrument used
+INT_NO  =                    8 / Integration number at end of observation
+JIGL_CNT=                    9 / Number of offsets in jiggle pattern
+JIGL_NAM= 'JCMTDATA_DIR:SQUEASY_9_2P0.JIG' / File containing jiggle offsets
+J_PER_S =                    9 / Number of jiggles per switch position
+J_REPEAT=                    1 / No. jiggle pattern repeats in a switch
+LAT     = '+018:07:36.20'      / Object latitude
+LAT-OBS =        19.8258323669 / Latitude of observatory (degrees)
+LAT2    = 'not used'           / Object latitude at MJD2
+LOCL_CRD= 'RB      '           / Local offset coordinate system
+LONG    = '+004:28:44.42'      / Object longitude
+LONG-OBS=        204.520278931 / East longitude of observatory (degrees)
+LONG2   = 'not used'           / Object Longitude at MJD2
+MAP_HGHT=                  180 / Height of rectangle to be mapped (arcsec)
+MAP_PA  =                    0 / P.A. of map vertical, +ve towards +ve long
+MAP_WDTH=                  180 / Width of rectangle to be mapped (arcsec)
+MAP_X   =                    0 / Map X offset from telescope centre (arcsec)
+MAP_Y   =                    0 / Map Y offset from telescope centre (arcsec)
+MAX_EL  =                   -1 / Max elevation of sky-dip (deg)
+MEANDEC =             18.23093 / 18:13:51.36292 = approx. mean Dec. (deg)
+MEANRA  =             67.90475 / 67:54:17.08923 = approx. mean R.A. (deg)
+MEAS_NO =                    1 / Measurement number at end of observation
+MIN_EL  =                   -1 / Min elevation of sky-dip (deg)
+MJD1    =                   -1 / Modified Julian day planet at RA,DEC
+MJD2    =                   -1 / Modified Julian day planet at RA2,DEC2
+MODE    = 'PHOTOM  '           / The type of observation
+N_INT   =                    8 / No. integrations in the observation
+N_MEASUR=                    1 / No. measurements in the observation
+OBJECT  = 'hltau   '           / Name of object
+OBJ_TYPE= 'UNKNOWN '           / Type of object
+OBSDEF  = 'ss:odfsxphotom.t_hltau_100525' / The observation definition file
+OBSERVER= 'jmk     '           / The name of the observer
+PROJ_ID = 'scuba   '           / The project identification
+RUN     =                  107 / Run number of observation
+SAM_CRDS= 'AZ      '           / Coordinatesystem of sampling mesh
+SAM_DX  =                   -1 / Sample spacing along scan direction (arcsec)
+SAM_DY  =                   -1 / Sample spacing perp. to scan (arcsec)
+SAM_MODE= 'JIGGLE  '           / Sampling method
+SAM_PA  =                   -1 / Scan P.A. rel. to lat. line; 0=lat, 90=long
+SCAN_REV=                    F / .TRUE. if alternate scans reverse direction
+SPK_NSIG=                    0 / N sigmas from fit of spike threshold
+SPK_RMVL=                    T / Automatic spike removal
+SPK_WDTH=                    0 / Assumed width of spike
+START_EL=                   -1 / Elevation of first SKYDIP point (deg)
+STATE   = 'Terminating         :' / SCUCD state
+STEND   = '7:15:14.03503'      / ST at end of observation
+STRT_AZD=              274.523 / Azimuth at observation start (deg)
+STRT_ELD=              51.8553 / Elevation at observation start (deg)
+STSTART = '7:11:15.3828'       / ST at start of observation
+SWTCH_MD= 'BMSW    '           / Switch mode of observation
+SWTCH_NO=                    1 / Switch number at end of observation
+S_PER_E =                    2 / Number of switch positions per exposure
+TELESCOP= 'JCMT    '           / Name of telescope
+TEL_OPER= 'kkp     '           / Telescope operator
+UTDATE  = '1999:8:8'           / UT date of observation
+UTEND   = '20:29:31.9986'      / UT at end of observation
+UTSTART = '20:25:34.0004'      / UT at start of observation
+VERSION =                  1.1 / SCUCD version
+ALIGN_DX=             0.027268 / SMU tables X axis alignment offset
+ALIGN_DY=             0.482489 / SMU tables Y axis alignment offset
+ALIGN_X =             -2.98649 / SMU tables X axis
+ALIGN_Y =              3.79108 / SMU tables Y axis
+AZ_ERR  =                    0 / Error in the telescope azimuth
+CHOPPING=                    T / SMU Chopper chopping state
+EL_ERR  =                    0 / Error in the telescope elevation
+FOCUS_DZ=            -0.504222 / SMU tables Z axis focus offset
+FOCUS_Z =             -16.7523 / SMU tables Z axis
+SEEING  =                0.525 / SAO atmospheric seeing
+SEE_DATE= '9908061715'         / Date and time of SAO seeing
+TAU_225 =                0.101 / CSO tau
+TAU_DATE= '9908082019'         / Date and time of CSO tau
+TAU_RMS =              3.0E-03 / CSO tau rms
+UAZ     =             -5.09089 / User azimuth pointing offset
+UEL     =              3.83056 / User elevation pointing offset
+UT_DATE = ' 8 Aug 1999'        / UT date at start of observation
+BAD_LIM =                   32 / No. spikes before quality set bad
+CALIB_LG=                    6 / Lag of internal calibrator in samples
+CALIB_PD=             42.66667 / Period of internal calibrator in samples
+CHOP_LG =                    4 / Chop lag in samples
+CHOP_PD =                   16 / Chop period in samples
+CNTR_DU3=                    0 / Nasmyth dU3 coord of instrument centre
+CNTR_DU4=                    0 / Nasmyth dU4 coord of instrument centre
+ETATEL_1=                   -1 / Transmission of telescope
+ETATEL_2=                   -1 / Transmission of telescope
+ETATEL_3=                   -1 / Transmission of telescope
+ETATEL_4=                   -1 / Transmission of telescope
+ETATEL_5=                   -1 / Transmission of telescope
+FILT_1  = '850     '           / Filter name
+FILT_2  = '450     '           / Filter name
+FILT_3  = 'not used'           / Filter name
+FILT_4  = 'not used'           / Filter name
+FILT_5  = 'not used'           / Filter name
+FLAT    = 'jcmtdata_dir:lwswphot.dat' / Name of flat-field file
+JIG_DSCD=                   -1 / No. samples discarded after jiggle movement
+L_GD_BOL= 'not used'           / Bol. to whose value LW guard ring is set
+L_GUARD =                    F / Long wave guard ring on or off
+MEAS_BOL= 'LONG,SHORT,F12,F13' / Bolometers  actually measured in observation
+N_BOLS  =                  130 / Number of bolometers selected
+N_SUBS  =                    2 / Number of sub-instruments used
+PHOT_BBF= 'NULL,H7,NULL,NULL,C14,NULL' / The bolometers on the source
+PRE_DSCD=                    0 / No. of samples discarded before chop movement
+PST_DSCD=                    0 / No. samples discarded after chop movement
+REBIN   = 'LINEAR  '           / Rebinning method used by SCUIP
+REF_ADC =                   -1 / A/D card of FLATFIELD reference bolometer
+REF_CHAN=                   -1 / Channel of FLATFIELD reference bolometer
+SAM_TIME=                  125 / A/D sample period in ticks (64musec)
+SIMULATE=                    F / True if data is simulated
+SKY     = 'jcmtdata_dir:skydip_startup.dat' / Name of sky opacities file
+SUB_1   = 'LONG    '           / SCUBA instrument being used
+SUB_2   = 'SHORT   '           / SCUBA instrument being used
+SUB_3   = 'not used'           / SCUBA instrument being used
+SUB_4   = 'not used'           / SCUBA instrument being used
+SUB_5   = 'not used'           / SCUBA instrument being used
+S_GD_BOL= 'not used'           / Bol. to whose value SW guard ring is set
+S_GUARD =                    F / Short wave guard ring on or off
+TAUZ_1  =                    0 / Zenith sky optical depth
+TAUZ_2  =                    0 / Zenith sky optical depth
+TAUZ_3  =                    0 / Zenith sky optical depth
+TAUZ_4  =                    0 / Zenith sky optical depth
+TAUZ_5  =                    0 / Zenith sky optical depth
+T_AMB   =                   -1 / The ambient air temperature (K)
+T_COLD_1=                   -1 / Effective temperature of cold load (K)
+T_COLD_2=                   -1 / Effective temperature of cold load (K)
+T_COLD_3=                   -1 / Effective temperature of cold load (K)
+T_COLD_4=                   -1 / Effective temperature of cold load (K)
+T_COLD_5=                   -1 / Effective temperature of cold load (K)
+T_HOT   =                   -1 / The temperature of the hot load (K)
+T_TEL   =                   -1 / The temperature of the telescope
+USE_CAL =                    F / .TRUE. if dividing chop by cal before rebin
+WAVE_1  =                  862 / Wavelength of map (microns)
+WAVE_2  =                  442 / Wavelength of map (microns)
+WAVE_3  =                   -1 / Wavelength of map (microns)
+WAVE_4  =                   -1 / Wavelength of map (microns)
+WAVE_5  =                   -1 / Wavelength of map (microns)
+END
+\end{verbatim}
+\end{myquote}
+
+\subsection{Scan Map}
+
+This is a scan map FITS header. Note the presence of \texttt{MAP\_HGHT},
+\texttt{MAP\_WDTH} and \texttt{MAP\_PA} to specify the map size (although
+\scusoft\ does not use these since all map parameters are encoded into the
+\texttt{RA1}, \texttt{RA2}, \texttt{DEC1} and \texttt{DEC2} arrays in the
+\texttt{SCUCD} extension.
+
+\begin{myquote}
+\begin{verbatim}
+ACCEPT  = 'not used'           / accept update; PROMPT, YES or NO
+ALIGN_AX= 'not used'           / Alignment measurements in X or Y axis
+ALIGN_SH=                   -1 / Distance between successive alignment offsets (
+ALT-OBS =                 4092 / Height of observatory above sea level (metres)
+AMEND   =             1.645293 / Airmass at end of observation
+AMSTART =             1.602218 / Airmass at start of observation
+APEND   =             628.3394 / Air pressure at end of observation (mbar)
+APSTART =             628.3394 / Air pressure at start of observation (mbar)
+ATEND   =             4.798538 / Air temp. at end of observation (C)
+ATSTART =             4.847378 / Air temp. at start of observation (C)
+BOLOMS  = 'LONG,SHORT'         / Names of bolometers measured
+CALIBRTR=                    F / Internal calibrator is on or off
+CAL_FRQ =             2.929688 / Calibrator frequency (Hz)
+CENT_CRD= 'RB      '           / Centre coordinate system
+CHOP_CRD= 'LO      '           / Chopper coordinate system
+CHOP_FRQ=               7.8125 / Chopper frequency (Hz)
+CHOP_FUN= 'SQUARE  '           / Chopper waveform
+CHOP_PA =                   90 / Chopper P.A., 0 = in lat, 90 = in long
+CHOP_THR=                   44 / Chopper throw (arcsec)
+DATA_DIR= '19990808'           / Sub-directory where datafile was stored
+DATA_KPT= 'DEMOD   '           / The type of data stored to disk
+END_AZD =              214.199 / Azimuth at end of observation (deg)
+END_EL  =                   -1 / Elevation of last SKYDIP point (deg)
+END_ELD =               37.223 / Elevation at end of observation
+EQUINOX =                 2000 / Equinox of mean coordinate system
+EXPOSED =                0.128 / Exposure per pixel (seconds)
+EXP_NO  =                   12 / Exposure number at end of observation
+EXP_TIME=                0.128 / Exposure time for each basic measurement (sec)
+E_PER_I =                   -1 / Number of exposures per integration
+FILTER  = '450N:850N'          / Filters used
+FOCUS_SH=                   -1 / Shift between focus measurements (mm)
+GAIN    =                   10 / Programmable gain
+HSTEND  = '21:46:43.99933'     / HST at end of observation
+HSTSTART= '21:37:22.00058'     / HST at start of observation
+HUMEND  =                   17 / Humidity (%) at end of observation
+HUMSTART=                   16 / Humidity (%) at start of observation
+INSTRUME= 'SCUBA   '           / Name of instrument used
+INT_NO  =                    1 / Integration number at end of observation
+JIGL_CNT=                   -1 / Number of offsets in jiggle pattern
+JIGL_NAM= 'not used'           / File containing jiggle offsets
+J_PER_S =                   -1 / Number of jiggles per switch position
+J_REPEAT=                   -1 / No. jiggle pattern repeats in a switch
+LAT     = '-024:22:00.00'      / Object latitude
+LAT-OBS =        19.8258323669 / Latitude of observatory (degrees)
+LAT2    = 'not used'           / Object latitude at MJD2
+LOCL_CRD= 'RB      '           / Local offset coordinate system
+LONG    = '+016:31:00.00'      / Object longitude
+LONG-OBS=        204.520278931 / East longitude of observatory (degrees)
+LONG2   = 'not used'           / Object Longitude at MJD2
+MAP_HGHT=                  600 / Height of rectangle to be mapped (arcsec)
+MAP_PA  =                    0 / P.A. of map vertical, +ve towards +ve long
+MAP_WDTH=                  600 / Width of rectangle to be mapped (arcsec)
+MAP_X   =                    0 / Map X offset from telescope centre (arcsec)
+MAP_Y   =                    0 / Map Y offset from telescope centre (arcsec)
+MAX_EL  =                   -1 / Max elevation of sky-dip (deg)
+MEANDEC =            -24.46885 / -24:28:07.850189 = approx. mean Dec. (deg)
+MEANRA  =             248.5074 / 248:30:26.53198 = approx. mean R.A. (deg)
+MEAS_NO =                    1 / Measurement number at end of observation
+MIN_EL  =                   -1 / Min elevation of sky-dip (deg)
+MJD1    =                   -1 / Modified Julian day planet at RA,DEC
+MJD2    =                   -1 / Modified Julian day planet at RA2,DEC2
+MODE    = 'MAP     '           / The type of observation
+N_INT   =                    1 / No. integrations in the observation
+N_MEASUR=                    1 / No. measurements in the observation
+OBJECT  = 'b31-22  '           / Name of object
+OBJ_TYPE= 'UNKNOWN '           / Type of object
+OBSDEF  = 'ss:scan_44ra.obs_b31x22_204433' / The observation definition file
+OBSERVER= 'jmk     '           / The name of the observer
+PROJ_ID = 'm99au34 '           / The project identification
+RUN     =                   38 / Run number of observation
+SAM_CRDS= 'NA      '           / Coordinatesystem of sampling mesh
+SAM_DX  =                    3 / Sample spacing along scan direction (arcsec)
+SAM_DY  =                   60 / Sample spacing perp. to scan (arcsec)
+SAM_MODE= 'RASTER  '           / Sampling method
+SAM_PA  =                 15.5 / Scan P.A. rel. to lat. line; 0=lat, 90=long
+SCAN_REV=                    T / .TRUE. if alternate scans reverse direction
+SPK_NSIG=                   -1 / N sigmas from fit of spike threshold
+SPK_RMVL=                    F / Automatic spike removal
+SPK_WDTH=                   -1 / Assumed width of spike
+START_EL=                   -1 / Elevation of first SKYDIP point (deg)
+STATE   = 'Terminating         :   STEP RECORD_DATA' / SCUCD state
+STEND   = '18:30:20.72296'     / ST at end of observation
+STRT_AZD=              212.051 / Azimuth at observation start (deg)
+STRT_ELD=              38.3846 / Elevation at observation start (deg)
+STSTART = '18:20:57.18613'     / ST at start of observation
+SWTCH_MD= 'NOSW    '           / Switch mode of observation
+SWTCH_NO=                    1 / Switch number at end of observation
+S_PER_E =                    1 / Number of switch positions per exposure
+TELESCOP= 'JCMT    '           / Name of telescope
+TEL_OPER= 'kkp     '           / Telescope operator
+UTDATE  = '1999:8:8'           / UT date of observation
+UTEND   = '7:46:43.99933'      / UT at end of observation
+UTSTART = '7:37:22.00058'      / UT at start of observation
+VERSION =                  1.1 / SCUCD version
+ALIGN_DX=             0.027268 / SMU tables X axis alignment offset
+ALIGN_DY=             0.482489 / SMU tables Y axis alignment offset
+ALIGN_X =             -2.02578 / SMU tables X axis
+ALIGN_Y =              3.79108 / SMU tables Y axis
+AZ_ERR  =                    0 / Error in the telescope azimuth
+CHOPPING=                    T / SMU Chopper chopping state
+EL_ERR  =                    0 / Error in the telescope elevation
+FOCUS_DZ=            -0.361142 / SMU tables Z axis focus offset
+FOCUS_Z =              -16.756 / SMU tables Z axis
+SEEING  =                0.525 / SAO atmospheric seeing
+SEE_DATE= '9908061715'         / Date and time of SAO seeing
+TAU_225 =                0.063 / CSO tau
+TAU_DATE= '9908080735'         / Date and time of CSO tau
+TAU_RMS =              2.0E-03 / CSO tau rms
+UAZ     =              1.42235 / User azimuth pointing offset
+UEL     =              4.05503 / User elevation pointing offset
+UT_DATE = ' 8 Aug 1999'        / UT date at start of observation
+BAD_LIM =                   32 / No. spikes before quality set bad
+CALIB_LG=                    6 / Lag of internal calibrator in samples
+CALIB_PD=             42.66667 / Period of internal calibrator in samples
+CHOP_LG =                    4 / Chop lag in samples
+CHOP_PD =                   16 / Chop period in samples
+CNTR_DU3=                    0 / Nasmyth dU3 coord of instrument centre
+CNTR_DU4=                    0 / Nasmyth dU4 coord of instrument centre
+ETATEL_1=                   -1 / Transmission of telescope
+ETATEL_2=                   -1 / Transmission of telescope
+ETATEL_3=                   -1 / Transmission of telescope
+ETATEL_4=                   -1 / Transmission of telescope
+ETATEL_5=                   -1 / Transmission of telescope
+FILT_1  = '450     '           / Filter name
+FILT_2  = '850     '           / Filter name
+FILT_3  = 'not used'           / Filter name
+FILT_4  = 'not used'           / Filter name
+FILT_5  = 'not used'           / Filter name
+FLAT    = 'jcmtdata_dir:lwswphot.dat' / Name of flat-field file
+JIG_DSCD=                   -1 / No. samples discarded after jiggle movement
+L_GD_BOL= 'not used'           / Bol. to whose value LW guard ring is set
+L_GUARD =                    F / Long wave guard ring on or off
+MEAS_BOL= 'not used'           / Bolometers  actually measured in observation
+N_BOLS  =                  128 / Number of bolometers selected
+N_SUBS  =                    2 / Number of sub-instruments used
+PHOT_BBF= 'not_used       LL,C14,NULL' / The bolometers on the source
+PRE_DSCD=                    0 / No. of samples discarded before chop movement
+PST_DSCD=                    0 / No. samples discarded after chop movement
+REBIN   = 'LINEAR  '           / Rebinning method used by SCUIP
+REF_ADC =                   -1 / A/D card of FLATFIELD reference bolometer
+REF_CHAN=                   -1 / Channel of FLATFIELD reference bolometer
+SAM_TIME=                  125 / A/D sample period in ticks (64musec)
+SIMULATE=                    F / True if data is simulated
+SKY     = 'jcmtdata_dir:skydip_startup.dat' / Name of sky opacities file
+SUB_1   = 'SHORT   '           / SCUBA instrument being used
+SUB_2   = 'LONG    '           / SCUBA instrument being used
+SUB_3   = 'not used'           / SCUBA instrument being used
+SUB_4   = 'not used'           / SCUBA instrument being used
+SUB_5   = 'not used'           / SCUBA instrument being used
+S_GD_BOL= 'not used'           / Bol. to whose value SW guard ring is set
+S_GUARD =                    F / Short wave guard ring on or off
+TAUZ_1  =                    0 / Zenith sky optical depth
+TAUZ_2  =                    0 / Zenith sky optical depth
+TAUZ_3  =                    0 / Zenith sky optical depth
+TAUZ_4  =                    0 / Zenith sky optical depth
+TAUZ_5  =                    0 / Zenith sky optical depth
+T_AMB   =                   -1 / The ambient air temperature (K)
+T_COLD_1=                   -1 / Effective temperature of cold load (K)
+T_COLD_2=                   -1 / Effective temperature of cold load (K)
+T_COLD_3=                   -1 / Effective temperature of cold load (K)
+T_COLD_4=                   -1 / Effective temperature of cold load (K)
+T_COLD_5=                   -1 / Effective temperature of cold load (K)
+T_HOT   =                   -1 / The temperature of the hot load (K)
+T_TEL   =                   -1 / The temperature of the telescope
+USE_CAL =                    F / .TRUE. if dividing chop by cal before rebin
+WAVE_1  =                  442 / Wavelength of map (microns)
+WAVE_2  =                  862 / Wavelength of map (microns)
+WAVE_3  =                    0 / Wavelength of map (microns)
+WAVE_4  =                    0 / Wavelength of map (microns)
+WAVE_5  =                    0 / Wavelength of map (microns)
+END
+\end{verbatim}
+\end{myquote}
+
+
+\begin{landscape}
+\section{Flatfield file format\label{app:ff}}
+
+This is the flatfield file used for SCUBA at the time of writing:
+
+
+\begin{myquote}
+\begin{verbatim}
+proc SET_BOLS
+{ flat field data file written by SCUDR
+{ Mon Jun 16 17:20:00 1997
+{ observation run number 01
+{      Name Type      dU3         dU4         Calib       Theta       A           B         Qual
+ SETBOL G1  LONG      0.7830E+01 -0.7610E+02  0.1290E+01  0.4280E+01  0.7106E+01  0.7117E+01  0  66.0359490741  12 H8         
+ SETBOL G2  LONG      0.2679E+02 -0.6138E+02  0.1086E+01  0.2370E+00  0.7387E+01  0.6795E+01  0  66.0482523148  12 H8         
+ SETBOL G3  LONG      0.4785E+02 -0.4588E+02  0.1160E+01  0.1088E+00  0.7340E+01  0.6600E+01  0  66.0606250000  12 H8         
+ SETBOL G4  LONG      0.7119E+02 -0.3377E+02  0.1080E+01  0.2125E-01  0.7499E+01  0.6642E+01  0  66.0729050926  12 H8         
+ SETBOL G7  LONG     -0.1777E+02 -0.6524E+02  0.1089E+01  0.1843E+01  0.6980E+01  0.7279E+01  0  66.0852893519  12 H8         
+ SETBOL G8  LONG      0.2193E+01 -0.4958E+02  0.1032E+01 -0.1701E+02 -0.4981E+01 -0.9338E+00  0  66.0979166667  12 H8         
+ SETBOL G9  LONG      0.2291E+02 -0.3673E+02  0.1194E+01  0.9538E+01  0.7368E+01  0.6878E+01  0  66.1170254630  13 H8         
+ SETBOL G10 LONG      0.4500E+02 -0.2298E+02  0.1187E+01  0.1407E+02  0.6766E+01  0.7412E+01  0  66.1295138889  13 H8         
+ SETBOL G11 LONG      0.6850E+02 -0.1106E+02  0.1159E+01 -0.1926E+00  0.7540E+01  0.6623E+01  0  66.1417013889  13 H8         
+ SETBOL G13 LONG     -0.3950E+02 -0.5281E+02  0.1039E+01 -0.3004E+01  0.7097E+01  0.6988E+01  0  66.1540625000  13 H8         
+ SETBOL G14 LONG     -0.2157E+02 -0.3796E+02  0.1072E+01 -0.1470E+01  0.6906E+01  0.7204E+01  0  66.1663194444  13 H8         
+ SETBOL G15 LONG      0.0510E+00 -0.2533E+02  0.1150E+01 -0.7553E-01  0.7276E+01  0.6851E+01  0  66.1786805556  13 H8         
+ SETBOL G16 LONG      0.2174E+02 -0.1171E+02  0.9190E+00  0.6017E+03  0.7038E+01  0.7038E+01  0  66.1910532407  13 H8         
+ SETBOL H1  LONG      0.4506E+02  0.1172E+01  0.1014E+01 -0.2208E+00  0.7407E+01  0.6631E+01  0  66.2103472222  14 H8         
+ SETBOL H2  LONG      0.6772E+02  0.1328E+02  0.9490E+00 -0.1933E+00  0.7481E+01  0.6458E+01  0  66.2226736111  14 H8         
+ SETBOL I12 LONG_DC   0.0000E+00  0.0000E+00  0.1000E+01  0.0000E+00  0.0000E+00  0.0000E+00  0   0.0000000000   0 NUL        
+ SETBOL H4  LONG     -0.6336E+02 -0.3956E+02  0.1003E+01  0.5146E+02  0.7361E+01  0.6270E+01  0  66.2350000000  14 H8         
+ SETBOL H5  LONG     -0.4256E+02 -0.2631E+02  0.9240E+00 -0.2044E+02  0.7017E+01  0.7017E+01  0  66.2473611111  14 H8         
+ SETBOL H6  LONG     -0.2200E+02 -0.1264E+02  0.9870E+00 -0.3340E+01  0.7200E+01  0.6928E+01  0  66.2596296296  14 H8         
+ SETBOL H7  LONG     -0.0000E+00  0.0000E+00  0.1000E+01  0.4839E+01  0.7151E+01  0.6991E+01  0  66.2720138889  14 H8         
+ SETBOL H8  LONG      0.2262E+02  0.1231E+02  0.9270E+00 -0.3250E+00  0.7358E+01  0.6627E+01  0  66.5038773148  16 H8         
+ SETBOL H9  LONG      0.4633E+02  0.2465E+02  0.1039E+01  0.1223E+02  0.7425E+01  0.6624E+01  0  66.2913541667  15 H8         
+ SETBOL H10 LONG      0.7049E+02  0.3728E+02  0.1134E+01 -0.3192E+00  0.7535E+01  0.6472E+01  0  66.3037037037  15 H8         
+ SETBOL H11 LONG     -0.6490E+02 -0.1333E+02  0.9580E+00  0.7245E+01  0.6991E+01  0.7178E+01  0  66.3161921296  15 H8         
+ SETBOL H12 LONG     -0.4228E+02 -0.4700E+00  0.9160E+00  0.1142E+01  0.6943E+01  0.7179E+01  0  66.3286921296  15 H8         
+ SETBOL H13 LONG     -0.2029E+02  0.1298E+02  0.1068E+01 -0.4099E+00  0.7245E+01  0.6759E+01  0  66.3409490741  15 H8         
+ SETBOL H14 LONG      0.1250E+01  0.2529E+02  0.9650E+00  0.3552E+01  0.7087E+01  0.7087E+01  0  66.3532407407  15 H8         
+ SETBOL H15 LONG      0.2519E+02  0.3783E+02  0.9380E+00 -0.2608E+05  0.7130E+01  0.7130E+01  0  66.3657407407  15 H8         
+ SETBOL H16 LONG      0.4965E+02  0.4959E+02  0.9280E+00 -0.3867E+00  0.7513E+01  0.6436E+01  0  66.3780902778  15 H8         
+ SETBOL I1  LONG     -0.6385E+02  0.1301E+02  0.9940E+00 -0.2134E+01  0.6749E+01  0.7152E+01  0  66.3975578704  16 H8         
+ SETBOL I2  LONG     -0.4057E+02  0.2669E+02  0.1051E+01  0.4635E+03  0.7093E+01  0.7094E+01  0  66.4102546296  16 H8         
+ SETBOL I3  LONG     -0.1803E+02  0.3894E+02  0.1135E+01  0.8583E+02  0.6732E+01  0.7409E+01  0  66.4227893519  16 H8         
+ SETBOL I4  LONG      0.5930E+01  0.5154E+02  0.9620E+00 -0.5106E+01  0.6806E+01  0.7535E+01  0 192.7277662037   6 H7         
+ SETBOL I5  LONG      0.2938E+02  0.6318E+02  0.9410E+00 -0.4519E+00  0.7451E+01  0.6512E+01  0  66.4477083333  16 H8         
+ SETBOL I6  LONG     -0.6020E+02  0.4057E+02  0.9970E+00  0.3169E+01  0.7024E+01  0.7024E+01  0  66.4604976852  16 H8         
+ SETBOL I7  LONG     -0.3669E+02  0.5404E+02  0.1054E+01 -0.6765E+02  0.7037E+01  0.7043E+01  0  66.4728125000  16 H8         
+ SETBOL I8  LONG     -0.1578E+02  0.6389E+02  0.1065E+01 -0.2099E+02  0.6717E+01  0.7520E+01  0  66.4855787037  16 H8         
+ SETBOL I9  LONG      0.9047E+01  0.7776E+02  0.1045E+01 -0.7307E-02  0.7092E+01  0.7032E+01  0  66.4977546296  16 H8         
+												
+{ short-wave array										
+ SETBOL A1  SHORT     0.5708E+02 -0.2814E+02  0.1286E+01 -0.7433E-01  0.4129E+01  0.3690E+01  0  64.9820833333  43 C14        
+ SETBOL A2  SHORT     0.4590E+02 -0.3591E+02  0.9311E+00 -0.3590E-01  0.4002E+01  0.3673E+01  0  64.9895138889  43 C14
+ SETBOL A3  SHORT     0.3615E+02 -0.4146E+02  0.9499E+00  0.1720E+00  0.3987E+01  0.3677E+01  0  64.9969675926  43 C14
+ SETBOL A4  SHORT     0.2464E+02 -0.4962E+02  0.1002E+01  0.2098E+00  0.3995E+01  0.3715E+01  0  65.0044212963  43 C14
+ SETBOL A5  SHORT     0.1455E+02 -0.5628E+02  0.9585E+00 -0.4524E+00  0.3849E+01  0.3849E+01  0  65.0118055556  43 C14
+ SETBOL A6  SHORT     0.3620E+01 -0.6315E+02  0.1115E+01 -0.1306E+01  0.3761E+01  0.3982E+01  0  65.0192824074  43 C14
+ SETBOL A7  SHORT     0.5638E+02 -0.1661E+02  0.1000E+01 -0.2444E+00  0.4263E+01  0.3668E+01  0  65.0266898148  43 C14
+ SETBOL A8  SHORT     0.4508E+02 -0.2315E+02  0.1126E+01 -0.1680E+00  0.3962E+01  0.3597E+01  0  65.0341319444  43 C14
+ SETBOL A9  SHORT     0.3495E+02 -0.3012E+02  0.1089E+01 -0.2392E-01  0.3919E+01  0.3687E+01  0  65.5473379630   4 C14
+ SETBOL A10 SHORT     0.2240E+02 -0.3762E+02  0.1107E+01 -0.8797E-02  0.3912E+01  0.3632E+01  0  65.5551041667   4 C14
+ SETBOL A11 SHORT     0.1314E+02 -0.4396E+02  0.1203E+01 -0.2799E-02  0.3922E+01  0.3644E+01  0  65.5626851852   4 C14
+ SETBOL A12 SHORT     0.2812E+01 -0.5070E+02  0.1067E+01 -0.6335E+00  0.3796E+01  0.3796E+01  0  65.5701967593   4 C14
+ SETBOL A13 SHORT    -0.7590E+01 -0.5808E+02  0.9114E+00  0.3143E+02  0.3849E+01  0.3851E+01  0  65.5777777778   4 C14
+ SETBOL A14 SHORT     0.5559E+02 -0.4683E+01  0.9639E+00 -0.1907E+00  0.4101E+01  0.3452E+01  0  65.5855555556   4 C14
+ SETBOL A15 SHORT     0.4502E+02 -0.1081E+02  0.1068E+01 -0.2673E+00  0.3985E+01  0.3569E+01  0  65.5932754630   4 C14
+ SETBOL A16 SHORT     0.3296E+02 -0.1807E+02  0.1170E+01 -0.1050E+00  0.3974E+01  0.3628E+01  0  65.6006944444   4 C14
+ SETBOL B1  SHORT     0.2224E+02 -0.2456E+02  0.1102E+01 -0.9115E-01  0.3948E+01  0.3680E+01  0  65.6129629630   5 C14
+ SETBOL B2  SHORT     0.1165E+02 -0.3120E+02  0.1157E+01 -0.6530E-02  0.3921E+01  0.3681E+01  0  65.6204513889   5 C14
+ SETBOL B3  SHORT     0.2000E+01 -0.3855E+02  0.9660E+00  0.2064E-01  0.3904E+01  0.3688E+01  0  65.6279282407   5 C14
+ SETBOL B4  SHORT    -0.9089E+01 -0.4490E+02  0.1076E+01  0.2914E-01  0.3910E+01  0.3702E+01  0  65.6354513889   5 C14
+ SETBOL B5  SHORT    -0.1951E+02 -0.5160E+02  0.9298E+00  0.7764E+01  0.3756E+01  0.3901E+01  0  65.6433101852   5 C14
+ SETBOL B6  SHORT     0.5585E+02  0.7780E+01  0.1088E+01 -0.2603E+00  0.4125E+01  0.3553E+01  0  72.3519444444  58 C14
+ SETBOL B7  SHORT     0.4489E+02  0.9322E+00  0.1020E+01 -0.3361E+05  0.3717E+01  0.3717E+01  0  65.6584606481   5 C14
+ SETBOL B8  SHORT     0.3283E+02 -0.5420E+01  0.1112E+01  0.5543E+00  0.3792E+01  0.3789E+01  0  65.6659953704   5 C14
+ SETBOL B9  SHORT     0.2169E+02 -0.1181E+02  0.1019E+01  0.1420E+01  0.3657E+01  0.3946E+01  0  65.3514120370   1 C14
+ SETBOL B10 SHORT     0.1166E+02 -0.1921E+02  0.1063E+01  0.1457E+01  0.3861E+01  0.3776E+01  0  65.3589467593   1 C14
+ SETBOL B11 SHORT     0.7480E+00 -0.2610E+02  0.1017E+01  0.6716E+00  0.3820E+01  0.3829E+01  0  65.3664004630   1 C14
+ SETBOL B12 SHORT    -0.1013E+02 -0.3228E+02  0.1085E+01 -0.1378E+00  0.3904E+01  0.3757E+01  0  65.3738888889   1 C14
+ SETBOL B13 SHORT    -0.2043E+02 -0.3952E+02  0.1112E+01 -0.2830E+00  0.3875E+01  0.3700E+01  0  65.3814351852   1 C14
+ SETBOL B14 SHORT    -0.2907E+02 -0.4586E+02  0.9829E+00 -0.2085E+00  0.3860E+01  0.3679E+01  0  65.3888657407   1 C14
+ SETBOL B15 SHORT     0.5681E+02  0.2020E+02  0.9500E+00 -0.2601E+00  0.4107E+01  0.3470E+01  0  72.3643634259  58 C14
+ SETBOL B16 SHORT     0.4512E+02  0.1323E+02  0.1090E+01 -0.3063E+00  0.3952E+01  0.3450E+01  0  72.3767245370  58 C14
+ SETBOL C1  SHORT     0.3315E+02  0.7096E+01  0.1004E+01 -0.2430E+00  0.3927E+01  0.3510E+01  0  65.4163888889   2 C14
+ SETBOL C2  SHORT     0.2194E+02  0.7400E+00  0.1066E+01 -0.2254E+00  0.3982E+01  0.3568E+01  0  65.4239004630   2 C14
+ SETBOL C3  SHORT     0.1091E+02 -0.6110E+01  0.1044E+01  0.2300E+00  0.3858E+01  0.3727E+01  0  65.4313425926   2 C14
+ SETBOL C4  SHORT     0.2756E+00 -0.1215E+02  0.1254E+01 -0.1419E+01  0.3763E+01  0.3830E+01  0  65.4390509259   2 C14
+ SETBOL C5  SHORT    -0.1075E+02 -0.1977E+02  0.1111E+01  0.5111E+00  0.3827E+01  0.3827E+01  0  65.4468634259   2 C14
+ SETBOL C6  SHORT    -0.2075E+02 -0.2666E+02  0.1075E+01 -0.2159E+00  0.3901E+01  0.3764E+01  0  65.4543634259   2 C14
+ SETBOL C7  SHORT    -0.3146E+02 -0.3298E+02  0.1287E+01  0.7394E+01  0.3743E+01  0.3888E+01  0  65.4617824074   2 C14
+ SETBOL C8  SHORT    -0.4124E+02 -0.4042E+02  0.9000E+00  0.4200E+01  0.3704E+01  0.3741E+01  0  65.4693287037   2 C14
+ SETBOL C9  SHORT     0.5849E+02  0.3141E+02  0.1326E+01  0.3450E+00  0.3868E+01  0.3868E+01  0  72.3890740741  58 C14
+ SETBOL C10 SHORT     0.4631E+02  0.2581E+02  0.1066E+01  0.1101E+01  0.3526E+01  0.4008E+01  0  65.4891782407   3 C14
+ SETBOL C11 SHORT     0.3388E+02  0.2000E+02  0.1229E+01  0.4242E+00  0.3780E+01  0.3780E+01  0  65.4966782407   3 C14
+ SETBOL C12 SHORT     0.2248E+02  0.1267E+02  0.1131E+01  0.1323E+01  0.3537E+01  0.3973E+01  0  65.5042824074   3 C14
+ SETBOL C13 SHORT     0.1116E+02  0.6479E+01  0.1062E+01  0.5274E+00  0.3760E+01  0.3760E+01  0  65.5119328704   3 C14
+ SETBOL C14 SHORT     0.0000E+00 -0.0000E+00  0.1000E+01 -0.2339E+00  0.3860E+01  0.3595E+01  0  72.4200810185  58 C14
+ SETBOL C15 SHORT    -0.1116E+02 -0.6479E+01  0.1130E+01  0.1179E+01  0.3666E+01  0.3898E+01  0  65.5270949074   3 C14
+ SETBOL C16 SHORT    -0.2215E+02 -0.1332E+02  0.1101E+01 -0.3823E+00  0.3928E+01  0.3760E+01  0  65.5345717593   3 C14
+ SETBOL D1  SHORT    -0.3139E+02 -0.2045E+02  0.1157E+01  0.4295E+01  0.3729E+01  0.3857E+01  0  65.6783796296   6 C14
+ SETBOL D2  SHORT    -0.4220E+02 -0.2734E+02  0.1175E+01  0.2061E+01  0.3803E+01  0.3755E+01  0  65.6859375000   6 C14
+ SETBOL D3  SHORT    -0.5298E+02 -0.3271E+02  0.1142E+01 -0.2841E+00  0.3731E+01  0.3861E+01  0  65.6934606481   6 C14
+ SETBOL D4  SHORT     0.4815E+02  0.3794E+02  0.9828E+00 -0.2879E+01  0.3816E+01  0.3816E+01  0  65.7009027778   6 C14
+ SETBOL D5  SHORT     0.3558E+02  0.3207E+02  0.1027E+01 -0.2057E+01  0.3540E+01  0.3993E+01  0  65.7086342593   6 C14
+ SETBOL D6  SHORT     0.2340E+02  0.2565E+02  0.1080E+01  0.2692E+01  0.3989E+01  0.3572E+01  0  65.7160416667   6 C14
+ SETBOL D7  SHORT     0.1184E+02  0.1956E+02  0.1258E+01 -0.1224E+01  0.3779E+01  0.3779E+01  0  65.7237500000   6 C14
+ SETBOL D8  SHORT     0.1100E+01  0.1301E+02  0.1052E+01  0.1119E+01  0.3643E+01  0.3878E+01  0  65.7313888889   6 C14
+ SETBOL D9  SHORT    -0.1030E+02  0.6303E+01  0.1011E+01  0.1506E+02  0.3734E+01  0.3770E+01  0  65.7436805556   7 C14
+ SETBOL D10 SHORT    -0.2141E+02 -0.4385E+00  0.1088E+01 -0.2669E+00  0.3951E+01  0.3611E+01  0  65.7512615741   7 C14
+ SETBOL D11 SHORT    -0.3244E+02 -0.6844E+01  0.1173E+01  0.1050E+01  0.3711E+01  0.3913E+01  0  65.7587268519   7 C14
+ SETBOL D12 SHORT    -0.4299E+02 -0.1380E+02  0.1172E+01 -0.8284E+00  0.3793E+01  0.3728E+01  0  65.7662037037   7 C14
+ SETBOL D13 SHORT    -0.5295E+02 -0.2078E+02  0.9500E+00  0.5212E+01  0.3815E+01  0.3733E+01  0  65.7740393519   7 C14
+ SETBOL D14 SHORT     0.3682E+02  0.4498E+02  0.9517E+00 -0.6182E+00  0.4028E+01  0.3525E+01  0  65.7814583333   7 C14
+ SETBOL D15 SHORT     0.2543E+02  0.3744E+02  0.1036E+01 -0.6247E+01  0.3738E+01  0.3775E+01  0  65.7891203704   7 C14
+ SETBOL D16 SHORT     0.1301E+02  0.3179E+02  0.1248E+01  0.2862E+01  0.3836E+01  0.3636E+01  0  65.7968518519   7 C14
+ SETBOL E1  SHORT     0.1499E+01  0.2630E+02  0.1153E+01 -0.5981E+01  0.3772E+01  0.3773E+01  0  65.8090972222   8 C14
+ SETBOL E2  SHORT    -0.9694E+01  0.1926E+02  0.1098E+01  0.6842E+01  0.3768E+01  0.3768E+01  0  72.4015509259  58 C14
+ SETBOL E3  SHORT    -0.2096E+02  0.1302E+02  0.1142E+01 -0.3893E+00  0.3940E+01  0.3670E+01  0  65.8240972222   8 C14
+ SETBOL E4  SHORT    -0.3153E+02  0.6590E+01  0.1126E+01  0.3139E+00  0.3796E+01  0.3796E+01  0  65.8315740741   8 C14
+ SETBOL E5  SHORT    -0.4362E+02 -0.8783E+00  0.1026E+01  0.6693E+02  0.3609E+01  0.3792E+01  0  65.8392939815   8 C14
+ SETBOL E6  SHORT    -0.5395E+02 -0.7067E+01  0.1020E+01  0.9356E+00  0.3635E+01  0.3792E+01  0  65.8469444444   8 C14
+ SETBOL E7  SHORT     0.2731E+02  0.5184E+02  0.9742E+00  0.7678E+02  0.3756E+01  0.3897E+01  0  65.8546759259   8 C14
+ SETBOL E8  SHORT     0.1511E+02  0.4443E+02  0.1204E+01 -0.5818E+00  0.4007E+01  0.3567E+01  0  65.8621875000   8 C14
+ SETBOL E9  SHORT     0.3500E+01  0.3973E+02  0.1020E+01 -0.2097E+01  0.3605E+01  0.3976E+01  0  65.8745717593   9 C14
+ SETBOL E10 SHORT    -0.8784E+01  0.3302E+02  0.1197E+01 -0.4411E+01  0.3800E+01  0.3767E+01  0  72.4138888889  58 C14
+ SETBOL E11 SHORT    -0.1987E+02  0.2656E+02  0.1005E+01  0.4240E+01  0.3643E+01  0.3936E+01  0  65.8894791667   9 C14
+ SETBOL E12 SHORT    -0.3045E+02  0.2024E+02  0.1067E+01  0.1210E+02  0.3940E+01  0.3664E+01  0  65.8971643519   9 C14
+ SETBOL E13 SHORT    -0.4249E+02  0.1245E+02  0.9850E+00  0.8132E+00  0.3809E+01  0.3739E+01  0  65.9045254630   9 C14
+ SETBOL E14 SHORT    -0.5245E+02  0.6274E+01  0.1177E+01 -0.1508E+01  0.3760E+01  0.3760E+01  0  65.9120717593   9 C14
+ SETBOL E15 SHORT     0.1652E+02  0.5893E+02  0.9800E+00  0.3954E+01  0.3587E+01  0.4123E+01  0  65.9196643519   9 C14
+ SETBOL E16 SHORT     0.3524E+01  0.5163E+02  0.1174E+01  0.9079E+00  0.3618E+01  0.4055E+01  0  65.9270949074   9 C14
+ SETBOL F1  SHORT    -0.7665E+01  0.4592E+02  0.1168E+01  0.3404E+01  0.3775E+01  0.3842E+01  0  65.9394328704  10 C14
+ SETBOL F2  SHORT    -0.1817E+02  0.3963E+02  0.1020E+01 -0.5761E+00  0.3991E+01  0.3608E+01  0  65.9469560185  10 C14
+ SETBOL F3  SHORT    -0.3008E+02  0.3403E+02  0.1295E+01 -0.5724E+00  0.3977E+01  0.3659E+01  0  65.9544675926  10 C14
+ SETBOL F4  SHORT    -0.4123E+02  0.2619E+02  0.1244E+01  0.8881E+00  0.3627E+01  0.3909E+01  0  65.9621064815  10 C14
+ SETBOL F5  SHORT    -0.5155E+02  0.2029E+02  0.1069E+01  0.1093E+00  0.3760E+01  0.3760E+01  0  65.9695601852  10 C14
+ SETBOL F6  SHORT     0.6895E+01  0.6560E+02  0.1245E+01  0.4535E-01  0.3981E+01  0.3981E+01  0  65.9770949074  10 C14
+ SETBOL F7  SHORT    -0.4842E+01  0.6013E+02  0.9947E+00 -0.7757E+00  0.4069E+01  0.3691E+01  0  65.9846527778  10 C14
+ SETBOL F8  SHORT    -0.1690E+02  0.5287E+02  0.1017E+01  0.8808E+00  0.3724E+01  0.4061E+01  0  65.9920138889  10 C14
+ SETBOL F9  SHORT    -0.2931E+02  0.4752E+02  0.9485E+00 -0.5179E+01  0.3703E+01  0.3979E+01  0  66.0041087963  11 C14
+ SETBOL F10 SHORT    -0.4009E+02  0.3977E+02  0.9474E+00  0.8256E+00  0.3667E+01  0.3968E+01  0  66.0116203704  11 C14
+ SETBOL F11 SHORT    -0.5045E+02  0.3338E+02  0.1169E+01  0.7934E+00  0.3701E+01  0.3940E+01  0  66.0190625000  11 C14
+ SETBOL I11 SHORT_DC  0.0000E+00  0.0000E+00  0.1000E+01  0.0000E+00  0.0000E+00  0.0000E+00  1   0.0000000000   0 NUL
+{ P1100 bolometer										     		    
+ SETBOL I10 P1100    -0.5465E+02  0.7116E+02  0.1000E+01 -0.1453E+03  0.1002E+02  0.9003E+01  1  69.6688541667  65 NUL
+ SETBOL I15 P1100_DC  0.0000E+00  0.0000E+00  0.1000E+01  0.0000E+00  0.0000E+00  0.0000E+00  1   0.0000000000   0 NUL
+{ P1350 bolometer										     		    
+ SETBOL G12 P1350    -0.5827E+02 -0.7068E+02  0.1000E+01 -0.8953E+00  0.9681E+01  0.1101E+02  0  69.7100231481  66 NUL
+ SETBOL I14 P1350_DC  0.0000E+00  0.0000E+00  0.1000E+01  0.0000E+00  0.0000E+00  0.0000E+00  0   0.0000000000   0 NUL
+{ P2000 bolometer										     		    
+ SETBOL G6  P2000     0.1000E+03  0.2375E+01  0.1000E+01 -0.1447E+00  0.1735E+02  0.1374E+02  0  69.7901157407  71 NUL
+ SETBOL I13 P2000_DC  0.0000E+00  0.0000E+00  0.1000E+01  0.0000E+00  0.0000E+00  0.0000E+00  0   0.0000000000   0 NUL
+end proc
+\end{verbatim}
+\end{myquote}
+\end{landscape}
+
+\section{The DREAM2SURF import task}
+
+This section lists the complete source code for the \texttt{dream2surf} import 
+task. This is an example of an import task for JIGGLE map type observations.
+
+\begin{myquote}
+\begin{verbatim}
+      SUBROUTINE DREAM2SURF ( STATUS )
+*+
+*  Name:
+*     DREAM2SURF
+
+*  Purpose:
+*     Convert DREAM output data into SURF data format
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     ADAM A-task
+
+*  Invocation:
+*     CALL DREAM2SURF ( STATUS )
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status
+ 
+*  Description:
+*     This routine reads in a DREAM format file and converts it
+*     into a file format that can be processed by SURF.
+*     This new file will have been 'REDUCE_SWITCH'ed and 
+*     'FLATFIELD'ed.
+
+*  Usage:
+*     dream2surf in out
+
+*  ADAM Parameters:
+*     FLATFILE = CHAR (Read)
+*        File containing the flatfield description
+*     FSCYCLE = INTEGER (Read)
+*        First cycle number to read from file
+*     IN = FILE (Read)
+*        The name of the DREAM input file to open.
+*     MSG_FILTER = CHAR (Read)
+*         Message filter level. Default is NORM.
+*     NRCYCLE = INTEGER (Read)
+*         Number of cycles to read from file
+*     OUT = NDF (Write)
+*        The NDF output file.
+
+*  Authors:
+*     TIMJ: T. Jenness (timj@jach.hawaii.edu)
+*     GREVE: H.W. van Someren Greve (greve@nfra.nl)
+
+*  Copyright:
+*     Copyright (C) 1998 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+
+*  History:
+*     $Log$
+*     Revision 1.1  1999/08/19 03:52:10  timj
+*     First draft.
+*
+*     Revision 1.4  1999/08/03 19:32:28  timj
+*     Add copyright message to header.
+*
+*     Revision 1.3  1998/06/24 19:26:03  timj
+*     Finally get jiggle pattern to work for new format sol files.
+*
+*     Revision 1.2  1998/06/19 19:28:26  timj
+*     First released version
+*
+*     Revision 1.1  1998/05/14 20:41:03  timj
+*     Initial revision
+*
+
+*  Bugs:
+*     {note_any_bugs_here}
+ 
+*-
+ 
+*  Type Definitions:
+      IMPLICIT NONE
+ 
+*  Global constants:
+      INCLUDE 'SAE_PAR'       ! Starlink status
+      INCLUDE 'DAT_PAR'       ! DAT__ constants
+      INCLUDE 'PRM_PAR'       ! For VAL__
+      INCLUDE 'MSG_PAR'       ! For MSG_
+
+      INCLUDE 'SCU_SOL'       ! Description of DREAM header file
+      INCLUDE 'SURF_PAR'      ! Standard SCUBA include
+
+*  COMMON data
+      COMMON SOLPA            ! DREAM common block
+
+*  Status:
+      INTEGER STATUS
+
+*  External references
+      INTEGER CHR_LEN
+      EXTERNAL CHR_LEN
+
+*  Local Constants:
+      INTEGER       DREAM__NBYTES
+      PARAMETER     (DREAM__NBYTES = 4)  ! Number of bytes per DREAM record
+      INTEGER       SRECSIZE                 
+      PARAMETER     (SRECSIZE = 4096)          ! Small record size in bytes
+      INTEGER       HEADER
+      PARAMETER     (HEADER   = 5120)          ! Nr of I4 in Header records
+      CHARACTER*(10) TSKNAME                   ! Task name
+      PARAMETER (TSKNAME = 'DREAM2SURF')
+
+      DOUBLE PRECISION LAT_OBS           ! Latitude of JCMT (degrees)
+      PARAMETER (LAT_OBS = 19.8258323669)
+      DOUBLE PRECISION LONG_OBS          ! Longitude of JCMT (degrees)
+      PARAMETER (LONG_OBS = 204.520278931)
+       
+
+
+*  Local variables:
+      INTEGER ADC             ! A to D number
+      REAL             BOL_CALB (SCUBA__NUM_CHAN, SCUBA__NUM_ADC)
+                                                 ! bolometer flatfield factors
+      DOUBLE PRECISION BOL_DAY (SCUBA__NUM_CHAN, SCUBA__NUM_ADC)
+                                                 ! time and day number on which
+                                                 ! the bolometer flatfield was
+                                                 ! measured
+      REAL             BOL_DU3 (SCUBA__NUM_CHAN, SCUBA__NUM_ADC)
+                                                 ! Nasmyth dU3 coords of 
+                                                 ! bolometers
+      REAL             BOL_DU4 (SCUBA__NUM_CHAN, SCUBA__NUM_ADC)
+                                                 ! Nasmyth dU4 coords of 
+                                                 ! bolometers
+      INTEGER          BOL_QUAL (SCUBA__NUM_CHAN, SCUBA__NUM_ADC)
+                                                 ! bolometer flatfield quality
+      CHARACTER*20     BOL_REF (SCUBA__NUM_CHAN, SCUBA__NUM_ADC)
+                                                 ! flatfield reference
+                                                 ! bolometers
+      REAL             BOL_RTEMP (SCUBA__NUM_CHAN, SCUBA__NUM_ADC)
+                                                 ! scratch real bolometer data
+      INTEGER          BOL_RUN (SCUBA__NUM_CHAN, SCUBA__NUM_ADC)
+                                                 ! run number on which the
+                                                 ! bolometer flatfield was
+                                                 ! measured
+      CHARACTER*20     BOL_TYPE (SCUBA__NUM_CHAN, SCUBA__NUM_ADC)
+                                                 ! bolometer types
+      INTEGER BOL_ADC ( SCUBA__NUM_ADC * SCUBA__NUM_CHAN ) ! ADC numbers
+      INTEGER BOL_CHAN ( SCUBA__NUM_ADC * SCUBA__NUM_CHAN ) ! Channel numbers
+      CHARACTER *10 CENT_CRD  ! Centre coordinate system
+      INTEGER CHAN            ! Channel number
+      CHARACTER * 80 CTEMP    ! Scratch string
+      DOUBLE PRECISION DEC    ! Declination
+      INTEGER DEMBNDS ( 4 )   ! Dimensions of DEM_PNTR
+      INTEGER DEM_PNTR        ! Pointer to DEM_PNTR extension
+      INTEGER DIM ( 4 )       ! Dimensions of an array
+      DOUBLE PRECISION DLST   ! Time per cycle
+      INTEGER DREAM_PTR       ! Pointer to DREAM input data
+      DOUBLE PRECISION DTEMP  ! Scratch double
+      CHARACTER * (80) FITS (SCUBA__MAX_FITS)  ! FITS extension
+      INTEGER LBND ( 2 )      ! Lower bounds of output NDF
+      INTEGER LUN             ! Logical unit number of input file
+      INTEGER ERR             ! Error from DREAM system
+      INTEGER FD              ! File descriptor of input
+      CHARACTER*80 FLATFILE   ! Flatfield file name
+      INTEGER FSCYCLE         ! First cycle to read from input file
+      INTEGER I               ! Loop integer
+      INTEGER IERR            ! For VEC_
+      INTEGER IPOSN           ! Position in string
+      INTEGER ITEMP           ! Scratch integer
+      REAL    JIGL_X ( SCUBA__MAX_JIGGLE ) ! X jiggle positions
+      REAL    JIGL_Y ( SCUBA__MAX_JIGGLE ) ! Y jiggle positions
+      DOUBLE PRECISION LONGITUDE ! Longitude degrees west
+      DOUBLE PRECISION LST    ! LST of observation
+      DOUBLE PRECISION LST_STRT ! Start LST of observation (decimal hours)
+      INTEGER MAXCYC          ! Maximum number of cycles that can be read
+      DOUBLE PRECISION MJD    ! MJD of observation
+      INTEGER NBYTES          ! Number of bytes per data record
+      INTEGER NDIM            ! Number of dimensions in an array
+      INTEGER NERR            ! For VEC_
+      INTEGER NRCYCLE         ! Number of cycles to read
+      INTEGER NREC            ! Number of records per cycle
+      INTEGER NSVAL           ! Number of solved values per cycle
+      INTEGER N_FITS          ! Number of FITS components
+      INTEGER OFFSET          ! Y offset in output array
+      INTEGER OUT_A_PTR       ! Pointer to axis
+      INTEGER OUT_NDF         ! Output NDF identifier
+      INTEGER OUT_PTR         ! Pointer to output data (NDF)
+      INTEGER OUT_QUAL_PTR    ! Pointer to quality array
+      INTEGER OUT_VAR_PTR     ! Pointer to variance array
+      CHARACTER*(DAT__SZLOC) OUT_SCUCD_LOC ! Locator to SCUCD extension
+      CHARACTER*(DAT__SZLOC) OUT_SCUBA_LOC ! Locator to SCUBA extension
+      CHARACTER*(DAT__SZLOC) OUT_REDS_LOC ! Locator to REDS extension
+      CHARACTER*(DAT__SZLOC) OUT_FIG_LOC ! Locator to FIGARO extension
+      CHARACTER*(DAT__SZLOC) OUT_FITS_LOC ! Locator to FITS extension
+      DOUBLE PRECISION RA     ! Right ascension of source
+      INTEGER RECIN           ! Current input record
+      INTEGER RECORD          ! Record number in input file
+      INTEGER RECSS           ! Record size in words
+      CHARACTER *20 RUNNO     ! Run number in 0 padded form (eg 0015) 
+      CHARACTER * 80 STEMP    ! Scratch string
+      INTEGER UBND ( 2 )      ! Upper bounds of output NDF
+
+*-
+
+      IF (STATUS .NE. SAI__OK) RETURN
+
+*     Set the MSG output level (for use with MSG_OUTIF)
+ 
+      CALL MSG_IFGET('MSG_FILTER', STATUS)
+
+
+*     Read in the DREAM file (currently assume that 
+*     user will supply full path or use DREAM_OUT env var.
+
+      CALL RIO_ASSOC('IN', 'READ', 'UNFORMATTED', SRECSIZE, FD,
+     :     STATUS)
+
+*     Since we are using the DREAM I/O routines we need to get
+*     the file unit number
+      CALL FIO_UNIT(FD, LUN, STATUS)
+
+*     Read header into common block
+
+      IF (STATUS .EQ. SAI__OK) THEN
+         RECORD = 1             ! Record number 1
+         RECSS = SRECSIZE / DREAM__NBYTES ! Output record size in words
+
+         CALL DISK_IO (2, LUN, RECSS, RECORD, SOLPA, HEADER, ERR)
+
+         IF (ERR .NE. 0) THEN
+            STATUS = SAI__ERROR
+            CALL MSG_SETC('TSK', TSKNAME)
+            CALL MSG_SETI('ERR', ERR)
+            CALL MSG_SETI('REC', RECORD)
+            CALL ERR_REP(' ','^TSK: Error ^ERR in reading record'//
+     :           ' ^REC', STATUS)
+         END IF
+      END IF
+
+*     Ask for the first cycle to select
+      CALL PAR_GDR0I('FSCYCLE', 1, 1, r_Ncycle, .FALSE., FSCYCLE,
+     :     STATUS)
+
+*     Ask for the number of cycles to be selected
+      MAXCYC = r_Ncycle - FSCYCLE + 1
+      CALL PAR_GDR0I('NRCYCLE', MAXCYC, 1, MAXCYC, .FALSE., 
+     :     NRCYCLE, STATUS)
+
+*     Now we can start doing things.
+*     Calculate total number of pixel values per cycle
+
+      NSVAL = r_Nbol * MAX_PIX
+
+      IF (NSVAL .LE. 0) THEN
+
+         IF (STATUS .EQ. SAI__OK) THEN
+            STATUS = SAI__ERROR
+            CALL MSG_SETC('TSK', TSKNAME)
+            CALL MSG_SETI('NPT', NSVAL)
+            CALL ERR_REP(' ','^TSK: Number of observed points'//
+     :           'is too small (^NPT)', STATUS)
+         END IF
+      END IF
+
+*     Start NDF
+      CALL NDF_BEGIN
+
+*     Open an NDF file
+*     Default file name constructed from the UT date
+
+*     Year
+      CALL CHR_ITOC(GR_YY, STEMP, ITEMP)
+      IPOSN = CHR_LEN(STEMP)
+
+*     Month (pad with leading zero)
+      IF (GR_MN .LT. 10) CALL CHR_APPND('0', STEMP, IPOSN)
+      CALL CHR_ITOC(GR_MN, CTEMP, ITEMP)
+      CALL CHR_APPND(CTEMP, STEMP, IPOSN)
+
+*     Day
+      IF (GR_DD .LT. 10) CALL CHR_APPND('0', STEMP, IPOSN)
+      CALL CHR_ITOC(GR_DD, CTEMP, ITEMP)
+      CALL CHR_APPND(CTEMP,STEMP,IPOSN)
+
+*     Find observation number from filename
+*     Assumes string of form xxx_NNNN
+
+      ITEMP = CHR_LEN ( SOLVE_DATA )
+      RUNNO = SOLVE_DATA(ITEMP-3:)
+
+*     Append an _
+      CALL CHR_APPND('_', STEMP, IPOSN)
+
+*     Append run number to out
+      CALL CHR_APPND(RUNNO, STEMP, IPOSN)
+
+*     Append DREAM signature
+      CALL CHR_APPND('_drm', STEMP, IPOSN)
+
+
+*     Set default
+      CALL PAR_DEF0C('OUT', STEMP, STATUS)
+
+*     Bounds of NDF
+      LBND(1) = 1
+      LBND(2) = 1
+      UBND(1) = R_NBOL
+      UBND(2) = NPIX * NRCYCLE
+
+      CALL NDF_CREAT('OUT', '_REAL', 2, LBND, UBND, OUT_NDF, STATUS)
+
+*     Map the output data array (plus the other arrays for SURF
+*     compatibility)
+      CALL NDF_MAP(OUT_NDF, 'QUALITY','_UBYTE', 'WRITE/ZERO',
+     :     OUT_QUAL_PTR, ITEMP, STATUS)
+      CALL NDF_MAP(OUT_NDF, 'DATA', '_REAL', 'WRITE', OUT_PTR,
+     :     ITEMP, STATUS)
+      CALL NDF_MAP(OUT_NDF, 'VARIANCE', '_REAL', 'WRITE/ZERO',
+     :     OUT_VAR_PTR, ITEMP, STATUS)
+
+
+*     Get some memory to store the data from each cycle
+*     We are using 4 byte words but define in parameter
+
+      NBYTES = MAX(DREAM__NBYTES * NSVAL, SRECSIZE)
+      CALL PSX_MALLOC(NBYTES, DREAM_PTR, STATUS)
+
+*     Loop over cycles
+
+*     Calculate number of records per cycle
+      NREC = (NSVAL + RECSS - 1 ) / RECSS
+
+*     Loop
+      DO I = FSCYCLE, NRCYCLE
+
+         IF (STATUS .EQ. SAI__OK) THEN
+
+*     Determine inpur record number
+            RECIN = HEAD_S / RECSS + (I * NREC)
+
+*     Read pixel intensities into memory
+            CALL DISK_IO (2, LUN, RECSS, RECIN, %VAL(DREAM_PTR),
+     :           NSVAL, ERR)
+
+            IF (ERR .NE. 0) THEN
+               print *,'in if ',ERR, STATUS
+               STATUS = SAI__ERROR
+               CALL MSG_SETC('TSK', TSKNAME)
+               CALL MSG_SETI('ERR', ERR)
+               CALL MSG_SETI('REC', RECIN)
+               CALL ERR_REP(' ','^TSK: Error ^ERR in reading record'//
+     :              ' ^REC', STATUS)
+            END IF
+
+*     Calculate current offset position in output array (time axis)
+            OFFSET = (I - FSCYCLE) * NPIX + 1
+
+*     Now we need to write this data to the NDF file
+            CALL DREAM_DATA_TO_SURF_DATA(R_NBOL, MAX_PIX,
+     :           NPIX * NRCYCLE,
+     :           OFFSET, INT_POS, %VAL(DREAM_PTR), %VAL(OUT_PTR),
+     :           STATUS)
+
+         END IF
+
+      END DO
+
+*     Free the memory assoicated with each cycle
+      CALL PSX_FREE(DREAM_PTR, STATUS)
+
+*     Close the input file
+      CALL RIO_CLOSE(FD, STATUS)
+
+*     Unmap the data arrays
+      CALL NDF_UNMAP(OUT_NDF, '*', STATUS)
+
+*     Axis information is simply integration number.
+*     Steal this from REDUCE_SWITCH
+*
+*     Axis 1: bolometers   2: Data
+
+*     Deal with BOLOMETER axis
+ 
+      CALL NDF_AMAP(OUT_NDF, 'CENTRE', 1, '_INTEGER', 'WRITE',
+     :     OUT_A_PTR, ITEMP, STATUS)
+      IF (STATUS .EQ. SAI__OK) THEN
+         CALL SCULIB_NFILLI (R_NBOL, %val(OUT_A_PTR))
+      END IF
+      CALL NDF_ACPUT ('Bolometer', OUT_NDF, 'LABEL', 1, STATUS)
+      CALL NDF_AUNMP (OUT_NDF, 'CENTRE', 1, STATUS)
+
+*     Integrations
+      CALL NDF_AMAP (OUT_NDF, 'CENTRE', 2, '_REAL', 'WRITE',
+     :     OUT_A_PTR, ITEMP, STATUS)
+ 
+      IF (STATUS .EQ. SAI__OK) THEN
+         CALL SCULIB_NFILLR (ITEMP, %val(OUT_A_PTR))
+         CALL SCULIB_MULCAR(ITEMP, %VAL(OUT_A_PTR), 1.0/REAL(NPIX),
+     :        %VAL(OUT_A_PTR))
+      END IF
+
+      CALL NDF_ACPUT ('Integration', OUT_NDF, 'LABEL', 2, STATUS)
+      CALL NDF_AUNMP (OUT_NDF, 'CENTRE', 2, STATUS)
+
+
+*     Now we can start writing header information to the file
+
+*     SCUCD extension
+      CALL NDF_XNEW(OUT_NDF, 'SCUCD', 'SCUCD_ST', 0, 0,
+     :     OUT_SCUCD_LOC, STATUS)
+
+*     SCUBA extension
+      CALL NDF_XNEW(OUT_NDF, 'SCUBA', 'SCUBA_ST', 0, 0,
+     :     OUT_SCUBA_LOC, STATUS)
+
+*     REDS extension
+      CALL NDF_XNEW(OUT_NDF, 'REDS', 'SURF_EXTENSION', 0, 0,
+     :     OUT_REDS_LOC, STATUS)
+
+*     FIGARO extension (for completeness)
+      CALL NDF_XNEW(OUT_NDF, 'FIGARO', 'FIGARO_EXT', 0, 0,
+     :     OUT_FIG_LOC, STATUS)
+      CALL DAT_ANNUL(OUT_FIG_LOC, STATUS)
+
+*     First write DEM_PNTR array
+*     Create the component
+*     Note that DEM_PNTR is always 1 dimensional in this
+*     since there are no switches, exposures or measurements.
+*     Only has 3 dimensions since there are no switches
+
+      DEMBNDS ( 1 ) = 1
+      DEMBNDS ( 2 ) = NRCYCLE
+      DEMBNDS ( 3 ) = 1
+      CALL CMP_MOD(OUT_SCUBA_LOC, 'DEM_PNTR', '_INTEGER', 3,
+     :     DEMBNDS, STATUS)
+
+*     Map it (rather do this as otherwise I need to create
+*     the array on the fly
+      CALL CMP_MAPV(OUT_SCUBA_LOC, 'DEM_PNTR', '_INTEGER',
+     :     'WRITE', DEM_PNTR, ITEMP, STATUS)
+
+*     Loop over cycles again
+      DO I = 1, NRCYCLE
+         OFFSET = (I-1) * NPIX + 1
+         CALL VEC_ITOI(.FALSE., 1, OFFSET,
+     :        %VAL(DEM_PNTR + ((I-1) * VAL__NBI)), IERR, NERR,
+     :        STATUS)
+      END DO
+
+*     Unmap DEM_PNTR
+      CALL CMP_UNMAP(OUT_SCUBA_LOC, 'DEM_PNTR', STATUS)
+
+*     Write LST information (Same dimensions as DEM_PNTR)
+      DEMBNDS ( 1 ) = 1
+      DEMBNDS ( 2 ) = 1
+      DEMBNDS ( 3 ) = NRCYCLE
+      DEMBNDS ( 4 ) = 1
+      CALL CMP_MOD(OUT_SCUCD_LOC, 'LST_STRT', '_DOUBLE', 4,
+     :     DEMBNDS, STATUS)
+
+*     Map it (rather do this as otherwise I need to create
+*     the array on the fly (re-use DEM_PNTR variable)
+      CALL CMP_MAPV(OUT_SCUCD_LOC, 'LST_STRT', '_DOUBLE',
+     :     'WRITE', DEM_PNTR, ITEMP, STATUS)
+
+*     This is based on STIME
+*     Returns LST in radians and the MJD
+*     Dont know why John chose degrees east of meridian
+*     convert back to degrees west.
+      LONGITUDE =  LONG_OBS - 360.0D0
+
+      CALL LST_FROM_UT(GR_YY, GR_MN, GR_DD, UT_HH, UT_MN, UT_SS,
+     :     LONGITUDE, LST_STRT, MJD, STATUS)
+
+*     increment in LST per cycle
+*     I think this is stored in cycle_t and is in millisec in the header
+*     Convert to radians
+      DLST = (CYCLE_T / (1000.0D0 * 3600.0D0)) * 15.0D0 * PI / 180.0D0
+
+*     Loop over cycles
+      DO I = FSCYCLE, NRCYCLE
+         LST = LST_STRT + (DBLE(I-1) * DLST)
+         
+         CALL VEC_DTOD(.FALSE., 1, LST,
+     :        %VAL(DEM_PNTR + (I-FSCYCLE) * VAL__NBD), IERR, NERR,
+     :        STATUS)
+
+      END DO
+
+*     Unmap LST_STRT
+      CALL CMP_UNMAP(OUT_SCUCD_LOC, 'LST_STRT', STATUS)
+
+*     Now deal with jiggle patterns
+*     Create the JIGL_X and JIGL_Y components
+      CALL CMP_MOD(OUT_SCUCD_LOC, 'JIGL_X', '_REAL', 1,
+     :     NPIX, STATUS)
+      CALL CMP_MOD(OUT_SCUCD_LOC, 'JIGL_Y', '_REAL', 1,
+     :     NPIX, STATUS)
+
+*     Now loop over jiggle positions and store the relevant
+*     ones (> -1)
+
+*     SURF requires that bolometer coordinates are derived by
+*          Xpos = Bol_Xpos - Jigl_X
+*          Ypos = Bol_Ypos - Jigl_Y
+*
+*     DREAM currently assumes
+*          Xpos = -Bol_Xpos + Jigl_X
+*          Ypos =  Bol_Ypos - Jigl_Y
+
+*     I end up doing this
+*          Invert x positions in flatfield (nasty)
+*          Negate jiggle position for X and Y
+
+      ITEMP = 0
+      DO I = 0, MAX_PIX  - 1
+         IF (INT_POS(I) .NE. - 1) THEN 
+            ITEMP = ITEMP + 1
+            JIGL_X(ITEMP) = JIG_X(I)
+            JIGL_Y(ITEMP) = JIG_Y(I)
+         END IF
+      END DO
+
+
+*     Write the jiggle pattern to the extensions
+      CALL CMP_PUT1R(OUT_SCUCD_LOC, 'JIGL_X', NPIX, JIGL_X, STATUS)
+      CALL CMP_PUT1R(OUT_SCUCD_LOC, 'JIGL_Y', NPIX, JIGL_Y, STATUS)
+
+
+*     Now work out the order in which the bolometers are stored.
+
+*     Create the BOL_CHAN and BOL_ADC extensions
+      CALL CMP_MOD(OUT_SCUBA_LOC, 'BOL_CHAN', '_INTEGER', 1,
+     :     R_NBOL, STATUS)
+      CALL CMP_MOD(OUT_SCUBA_LOC, 'BOL_ADC', '_INTEGER', 1,
+     :     R_NBOL, STATUS)
+
+
+*     Need to loop over input bolometers and decode the name
+*     DREAM stores the storage order in BOL_ORDER and the
+*     name in BOL_NAME
+
+      DO I = 0, R_NBOL - 1
+
+*     Determine the ADC and Channel number from the name
+         CALL SCULIB_BOLDECODE ( BOL_NAME(I), ADC, CHAN, STATUS)
+
+*     Now put these values into the correct slot of BOL_CHAN and BOL_ADC
+*     (Am I supposed to use BOL_ORDER?)
+         BOL_CHAN ( I + 1) = CHAN
+         BOL_ADC ( I + 1) = ADC
+*         BOL_CHAN ( BOL_ORDER(I) + 1) = CHAN
+*         BOL_ADC ( BOL_ORDER(I) + 1) = ADC
+
+      END DO
+
+*     Write the bolometer order to the extensions
+      CALL CMP_PUT1I(OUT_SCUBA_LOC, 'BOL_ADC', R_NBOL, BOL_ADC, STATUS)
+      CALL CMP_PUT1I(OUT_SCUBA_LOC, 'BOL_CHAN', R_NBOL, BOL_CHAN,STATUS)
+
+*     Read flatfield from a text file
+      CALL PAR_GET0C ('FLATFILE', FLATFILE, STATUS)
+
+      CALL SCULIB_READBOLS (FLATFILE, SCUBA__NUM_CHAN,
+     :     SCUBA__NUM_ADC, BOL_TYPE, BOL_DU3, BOL_DU4, BOL_CALB,
+     :     BOL_RTEMP, BOL_RTEMP, BOL_RTEMP, BOL_QUAL, BOL_DAY,
+     :     BOL_RUN, BOL_REF, STATUS)
+
+*     Now write the flatfield information to the extensions
+      NDIM = 2
+      DIM (1) = SCUBA__NUM_CHAN
+      DIM (2) = SCUBA__NUM_ADC
+
+*     Create the extensions
+      CALL CMP_MODC(OUT_SCUBA_LOC, 'BOL_TYPE', 20, NDIM, DIM, STATUS)
+      CALL CMP_MOD(OUT_SCUBA_LOC, 'BOL_DU3', '_REAL', NDIM, DIM,
+     :     STATUS)
+      CALL CMP_MOD(OUT_SCUBA_LOC, 'BOL_DU4', '_REAL', NDIM, DIM,
+     :     STATUS)
+
+*     Only really interested in the BOL_TYPE and DU3, DU4 arrays
+*     Write the data
+      CALL CMP_PUTNC (OUT_SCUBA_LOC, 'BOL_TYPE', NDIM, DIM, BOL_TYPE,
+     :     DIM, STATUS)
+      CALL CMP_PUTNR (OUT_SCUBA_LOC, 'BOL_DU3', NDIM, DIM, BOL_DU3,
+     :     DIM, STATUS)
+      CALL CMP_PUTNR (OUT_SCUBA_LOC, 'BOL_DU4', NDIM, DIM, BOL_DU4,
+     :     DIM, STATUS)
+
+
+
+*     FITS EXTENSION -------------------
+      N_FITS = 0  ! No FITS components to start with
+
+*     Object name (default to something if nothing in header)
+      CALL SCULIB_PUT_FITS_C(SCUBA__MAX_FITS, N_FITS, FITS,
+     :     'OBJECT', 'DREAM', 'Name of object', STATUS)
+
+*     RUN number
+      CALL CHR_CTOI(RUNNO, ITEMP, STATUS)
+      CALL SCULIB_PUT_FITS_I(SCUBA__MAX_FITS, N_FITS, FITS,
+     :     'RUN', ITEMP, 'Run number of observation', STATUS)
+
+*     Observation, Sample mode (Always MAP/JIGGLE) and sample coords
+      CALL SCULIB_PUT_FITS_C(SCUBA__MAX_FITS, N_FITS, FITS,
+     :     'MODE', 'MAP', 'The type of observation', STATUS)
+      CALL SCULIB_PUT_FITS_C(SCUBA__MAX_FITS, N_FITS, FITS,
+     :     'SAM_MODE', 'JIGGLE', 'Sampling method', STATUS)
+      CALL SCULIB_PUT_FITS_C(SCUBA__MAX_FITS, N_FITS, FITS,
+     :     'SAM_CRDS', 'NA', 'Coordinate system of sampling mesh', 
+     :     STATUS)
+      CALL SCULIB_PUT_FITS_I(SCUBA__MAX_FITS, N_FITS, FITS,
+     :     'SAM_PA', -1, 'Scan P.A. rel. to lat. line; 0=lat, 90=long', 
+     :     STATUS)
+
+*     Coordinates of observation
+
+*     Declination
+*     Convert to string D:M:S
+      IF (DECSN .GE. 0.0D0) THEN
+         STEMP = '+'
+      ELSE
+         STEMP = '-'
+      END IF
+      IPOSN = 1
+
+      DEC = DBLE(DECDD) + (DBLE(DECMN)/60.0D0) + (DBLE(DECSS)/3600.0D0)
+      CALL CHR_RTOAN(REAL(DEC), 'DEGREES', STEMP, IPOSN)
+
+*     Store in LAT
+      CALL SCULIB_PUT_FITS_C(SCUBA__MAX_FITS, N_FITS, FITS,
+     :     'LAT', STEMP, 'Object Latitude', STATUS)
+
+*     Store in token
+      CALL MSG_SETC('DEC', STEMP)
+
+*     Determine Right ascension 
+      RA = DBLE(RAHH) + (DBLE(RAMN)/60.0D0) + (DBLE(RASS)/3600.0D0)
+      IPOSN = 0
+      CALL CHR_RTOAN(REAL(RA), 'HOURS', STEMP, IPOSN)
+
+*     Store in LONG
+      CALL SCULIB_PUT_FITS_C(SCUBA__MAX_FITS, N_FITS, FITS,
+     :     'LONG', STEMP, 'Object longitude', STATUS)
+
+*     Store in message token
+      CALL MSG_SETC('RA', STEMP)
+
+*     Write coordinates to display
+      CALL MSG_SETC('TSK',TSKNAME)
+      CALL MSG_OUTIF(MSG__NORM, ' ', '^TSK: Coordinates: '//
+     :     '^RA, ^DEC', STATUS)
+
+
+*     Need to ask for coordinate frame of the tracking centre
+      CALL PAR_CHOIC('COORDS', 'RB', 'AZ,RD,RB,GA,RJ', .TRUE.,
+     :     CENT_CRD, STATUS)
+
+      CALL SCULIB_PUT_FITS_C(SCUBA__MAX_FITS, N_FITS, FITS,
+     :     'CENT_CRD',CENT_CRD,'Centre coordinate system', STATUS)
+
+
+
+*     UT Date.
+*     Convert Year
+      CALL CHR_ITOC(GR_YY, STEMP, ITEMP)
+      IPOSN = CHR_LEN(STEMP)
+      CALL CHR_APPND(':',STEMP, IPOSN)
+
+*     Convert month
+      CALL CHR_ITOC(GR_MN, CTEMP, ITEMP)
+      CALL CHR_APPND(CTEMP, STEMP, IPOSN)
+      CALL CHR_APPND(':',STEMP, IPOSN)
+
+*     Convert day
+      CALL CHR_ITOC(GR_DD, CTEMP, ITEMP)
+      CALL CHR_APPND(CTEMP, STEMP, IPOSN)
+
+*     Write the MJD
+      CALL SCULIB_PUT_FITS_D(SCUBA__MAX_FITS, N_FITS, FITS,
+     :     'MJD-OBS', MJD, 'Modified Julian Date of obsstart',
+     :     STATUS)
+
+*     Write the date
+*      STEMP = '1998:1:1'
+      CALL SCULIB_PUT_FITS_C(SCUBA__MAX_FITS, N_FITS, FITS,
+     :     'UTDATE', STEMP, 'UT Date of observation', STATUS)     
+
+
+
+*     Write the UT time
+*     Convert hour
+      CALL CHR_ITOC(UT_HH, STEMP, ITEMP)
+      IPOSN = CHR_LEN(STEMP)
+      CALL CHR_APPND(':',STEMP, IPOSN)
+
+*     Convert minute
+      CALL CHR_ITOC(UT_MN, CTEMP, ITEMP)
+      CALL CHR_APPND(CTEMP, STEMP, IPOSN)
+      CALL CHR_APPND(':',STEMP, IPOSN)
+
+*     Convert second
+      CALL CHR_ITOC(UT_SS, CTEMP, ITEMP)
+      CALL CHR_APPND(CTEMP, STEMP, IPOSN)
+
+      CALL SCULIB_PUT_FITS_C(SCUBA__MAX_FITS, N_FITS, FITS,
+     :     'UTSTART', STEMP, 'UT at start of observation', STATUS)
+
+*     Convert LST (Hours minutes seconds) into a time
+*     First convert LST_STRT to hours (should be radians to this point)
+      LST_STRT = LST_STRT * 180.0D0 / (PI * 15.0D0)
+
+      IPOSN = 0
+      CALL CHR_DTOAN(LST_STRT, 'HOURS', STEMP, IPOSN)
+
+*     and write it out
+      CALL SCULIB_PUT_FITS_C(SCUBA__MAX_FITS, N_FITS, FITS,
+     :     'STSTART', STEMP, 'ST at start of observation', STATUS)
+
+
+*     Also store STEND
+      IPOSN = 0
+
+      DTEMP = LST_STRT + (DLST * DBLE(FSCYCLE + NRCYCLE - 1) 
+     :     * 180.0D0 / (PI * 15.0D0))
+      CALL CHR_DTOAN(DTEMP,
+     :     'HOURS',STEMP, IPOSN)
+      CALL SCULIB_PUT_FITS_C(SCUBA__MAX_FITS, N_FITS, FITS,
+     :     'STEND', STEMP, 'ST at start of observation', STATUS)
+
+*     exposure time per sample
+      CALL SCULIB_PUT_FITS_D(SCUBA__MAX_FITS, N_FITS, FITS,
+     :     'EXP_TIME', DBLE(CYCLE_T / (1000.0 * REAL(NPIX))),
+     :     'Exposure time for each basic measurement (sec)',
+     :     STATUS)
+
+
+*     Set up MAP_X and MAP_Y offsets
+      CALL SCULIB_PUT_FITS_I(SCUBA__MAX_FITS, N_FITS, FITS,
+     :      'MAP_X', 0.0, 
+     :      'Map X offset from telescope centre (arcsec)',
+     :      STATUS)
+      CALL SCULIB_PUT_FITS_I(SCUBA__MAX_FITS, N_FITS, FITS,
+     :      'MAP_Y', 0.0, 
+     :      'Map Y offset from telescope centre (arcsec)',
+     :      STATUS)
+
+*     Number of bolometers
+      CALL SCULIB_PUT_FITS_I(SCUBA__MAX_FITS, N_FITS, FITS,
+     :      'N_BOLS', R_NBOL, 
+     :      'Number of bolometers selected', STATUS)
+
+*     State of the observation (anything except ABORT)
+      CALL SCULIB_PUT_FITS_C(SCUBA__MAX_FITS, N_FITS, FITS,
+     :     'STATE','Terminating', 'SCUCD state', STATUS)
+
+*     Version of SCUCD (set to 0 for now)
+      CALL SCULIB_PUT_FITS_I(SCUBA__MAX_FITS, N_FITS, FITS,
+     :     'VERSION', 0, 'SCUCD version (DREAM data)',STATUS)
+
+*     Jiggle info
+      CALL SCULIB_PUT_FITS_I(SCUBA__MAX_FITS, N_FITS, FITS,
+     :     'JIGL_CNT', NPIX, 'Number of offsets in a jiggle pattern',
+     :     STATUS)
+      CALL SCULIB_PUT_FITS_I(SCUBA__MAX_FITS, N_FITS, FITS,
+     :     'J_PER_S', NPIX, 'Number of jiggles per switch',
+     :     STATUS)
+      CALL SCULIB_PUT_FITS_I(SCUBA__MAX_FITS, N_FITS, FITS,
+     :     'J_REPEAT', NPIX, 'No. of jiggle pattern repeats in switch',
+     :     STATUS)
+
+*     Center of array
+      CALL SCULIB_PUT_FITS_D(SCUBA__MAX_FITS, N_FITS, FITS,
+     :     'CNTR_DU3', 0.0D0, 'Nasmyth dU3 coord of instrument centre',
+     :     STATUS)
+      CALL SCULIB_PUT_FITS_D(SCUBA__MAX_FITS, N_FITS, FITS,
+     :     'CNTR_DU4', 0.0D0, 'Nasmyth dU4 coord of instrument centre',
+     :     STATUS)
+
+*     Position of the telescope
+      CALL SCULIB_PUT_FITS_D(SCUBA__MAX_FITS, N_FITS, FITS,
+     :     'LAT-OBS', LAT_OBS, 'Latitude of observatory (degrees)',
+     :     STATUS)
+      CALL SCULIB_PUT_FITS_D(SCUBA__MAX_FITS, N_FITS, FITS,
+     :     'LONG-OBS', LONG_OBS, 
+     :     'East Longitude of observatory (degrees)',
+     :     STATUS)
+
+*     Need to supply some chop information (meaningless)
+      CALL SCULIB_PUT_FITS_D(SCUBA__MAX_FITS, N_FITS, FITS,
+     :     'CHOP_THR', 0.0D0, 'Chopper throw (arcsec)',
+     :     STATUS)
+      CALL SCULIB_PUT_FITS_D(SCUBA__MAX_FITS, N_FITS, FITS,
+     :     'CHOP_PA', 0.0D0, 'Chopper P.A., 0 = in lat, 90 = in long',
+     :     STATUS)
+      CALL SCULIB_PUT_FITS_D(SCUBA__MAX_FITS, N_FITS, FITS,
+     :     'CHOP_FRQ', SMU_F, 'Chopper frequency (Hz)',
+     :     STATUS)
+      CALL SCULIB_PUT_FITS_C(SCUBA__MAX_FITS, N_FITS, FITS,
+     :     'CHOP_CRD', 'NA', 'Chopper coordinate system',
+     :     STATUS)
+      CALL SCULIB_PUT_FITS_C(SCUBA__MAX_FITS, N_FITS, FITS,
+     :     'CHOP_FUN', 'DREAM', 'Chopper waveform',
+     :     STATUS)
+
+
+
+*     Sub instrument information
+*     Assume that we have one sub-instrument and that it is LONG
+      CALL SCULIB_PUT_FITS_I(SCUBA__MAX_FITS, N_FITS, FITS,
+     :     'N_SUBS', 1, 'Number of sub-instruments used',
+     :     STATUS)
+
+      CALL SCULIB_PUT_FITS_C(SCUBA__MAX_FITS, N_FITS, FITS,
+     :     'SUB_1','LONG', 'SCUBA sub-instrument being used', STATUS)
+      CALL SCULIB_PUT_FITS_C(SCUBA__MAX_FITS, N_FITS, FITS,
+     :     'SUB_2','not used', 'SCUBA sub-instrument being used',STATUS)
+      CALL SCULIB_PUT_FITS_C(SCUBA__MAX_FITS, N_FITS, FITS,
+     :     'SUB_3','not used', 'SCUBA sub-instrument being used',STATUS)
+      CALL SCULIB_PUT_FITS_C(SCUBA__MAX_FITS, N_FITS, FITS,
+     :     'SUB_4','not used', 'SCUBA sub-instrument being used',STATUS)
+      CALL SCULIB_PUT_FITS_C(SCUBA__MAX_FITS, N_FITS, FITS,
+     :     'SUB_5','not used', 'SCUBA sub-instrument being used',STATUS)
+
+      CALL SCULIB_PUT_FITS_D(SCUBA__MAX_FITS, N_FITS, FITS,
+     :     'TAUZ_1',0.0D0, 'Zenith sky optical depth',STATUS)
+
+*     FILTERS and wavelength
+
+      CALL SCULIB_PUT_FITS_C(SCUBA__MAX_FITS, N_FITS, FITS,
+     :     'FILT_1','850', 'Filter name', STATUS)
+      CALL SCULIB_PUT_FITS_D(SCUBA__MAX_FITS, N_FITS, FITS,
+     :     'WAVE_1',862.0D0, 'Wavelength of map (microns)', STATUS)
+
+
+
+*     Write FITS component
+      CALL NDF_XNEW (OUT_NDF, 'FITS', '_CHAR*80', 1, N_FITS, 
+     :     OUT_FITS_LOC, STATUS)
+      CALL DAT_PUT1C (OUT_FITS_LOC, N_FITS, FITS, STATUS)
+
+*     Annul extension locators
+      CALL DAT_ANNUL(OUT_SCUCD_LOC, STATUS)
+      CALL DAT_ANNUL(OUT_SCUBA_LOC, STATUS)
+      CALL DAT_ANNUL(OUT_REDS_LOC, STATUS)
+      CALL DAT_ANNUL(OUT_FITS_LOC, STATUS)
+
+*     Write the HISTORY information. (DREAM info will be written
+*     automatically when NDF is closed
+      CALL NDF_HCRE(OUT_NDF, STATUS)
+
+*     Close the NDF and shut down the NDF system (write DREAM history)
+      CALL NDF_ANNUL(OUT_NDF, STATUS)
+ 
+*     It seems that the only way to write multiple history
+*     entries is to open and close the NDF multiple times!
+
+*     REDUCE_SWITCH
+*     Re-open the file
+      CALL NDF_ASSOC('OUT', 'UPDATE', OUT_NDF, STATUS)
+
+*     Need to write REDUCE_SWITCH and FLATFIELD tags to fool SURF
+*     into thinking that the data have been processed by these tasks
+      CALL NDF_HPUT(' ', 'REDUCE_SWITCH', .TRUE., 1, 
+     :     'This is a dummy history component to fool SURF',
+     :     .FALSE., .TRUE., .FALSE., OUT_NDF, STATUS)
+
+*     Close the NDF
+      CALL NDF_ANNUL(OUT_NDF, STATUS)
+
+*     FLATFIELD
+*     Re-open the file
+      CALL NDF_ASSOC('OUT', 'UPDATE', OUT_NDF, STATUS)
+
+
+      CALL NDF_HPUT(' ', 'FLATFIELD', .TRUE., 1, 
+     :     'This is a dummy history component to fool SURF',
+     :     .FALSE., .TRUE., .FALSE., OUT_NDF, STATUS)
+
+*     Close the NDF
+      CALL NDF_ANNUL(OUT_NDF, STATUS)
+
+
+*     Shut down NDF system
+      CALL NDF_END(STATUS)
+
+      END
+\end{verbatim}
+\end{myquote}
+
+\section{Library APIs}
+
+This section lists the full API documentation for the \scusoft\ 
+libraries.
+
+\subsection{SURF}
+
+These are the top-level \scusoft\ routines that are not simply task files.
+These are routines for disk I/O, the top level A-task interface routine
+and specialised code for \calcsky\ and \despike\ (since they are children
+of the general purpose \rebin\ task interface).
+
+\include{ssn72_libsurf}
+
+\subsection{SURFLIB}
+
+This section describes the subroutines that are available in the
+\texttt{surflib} distribution (\texttt{libsurflib.a}).
+
+\include{ssn72_libsurflib}
+
+
+\subsection{SCULIB}
+
+This section describes the subroutines that are available in the
+\texttt{scuflib} distribution (\texttt{libsculib.a}). \copyright
+
+\include{ssn72_libsculib}
+
+
+
+% ? End of main text
+\end{document}
