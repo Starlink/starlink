@@ -1,7 +1,7 @@
       SUBROUTINE POL1_CLCAT( IWCS, CI, STATUS )
 *+
 *  Name:
-*     POL1_MKCAT
+*     POL1_CLCAT
 
 *  Purpose:
 *     Write coordinate information to a catalogue and close it.
