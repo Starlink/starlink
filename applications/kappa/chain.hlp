@@ -1,0 +1,82 @@
+.help chain Starlink kappa
+.nf
+Concatenates a series of vectorized NDFs.
+
+Usage:
+
+   chain in c1 [c2] [c3] ... [c25] out=?
+
+Description:
+
+   This application concatenates a series of NDFs, in the order
+   supplied and treated as vectors, to form a 1-dimensional output
+   NDF.  The dimensions of the NDFs may be different, and indeed so
+   may their dimensionalities.
+
+Parameters
+
+For information on individual parameters, select from the list below:
+
+IN
+
+IN = NDF (Read)
+   The base NDF after which the other input NDFs will be
+   concatenated.
+
+OUT
+
+OUT = NDF (Write)
+   The one-dimensional NDF resulting from concatenating the input
+   NDFs.
+
+C1-C25
+
+C1-C25 = NDF (Read)
+   The NDFs to be concatenated to the base NDF.  The NDFs are
+   joined in the order C1, C2, ... C25.  There can be no missing
+   NDFs, e.g. in order for C3 to be processed there must be a C2
+   given as well.   A null value (!) indicates that there is no
+   NDF.  NDFs C2 to C25 are defaulted to !.  At least one NDF
+   must be pasted, therefore C1 may not be null.
+
+TITLE
+
+TITLE = LITERAL (Read)
+   Title for the output NDF structure.  A null value (!)
+   propagates the title from the base NDF to the output NDF. [!]
+
+Examples
+
+chain obs1 obs2 out=stream
+   This concatenates the NDF called obs2 on to the arrays in the
+   NDF called obs1 to produce the 1-dimensional NDF stream.
+
+chain c1=obs2 c2=obs1 in=obs3 out=stream
+   This concatenates the NDF called obs2 on to the arrays in the
+   NDF called obs3, and then concatenates the arrays from obs1
+   to them to produce the 1-dimensional NDF stream.
+
+Related_Applications
+
+   KAPPA: PASTE, RESHAPE.
+
+Authors
+
+MJC: Malcolm J. Currie (STARLINK)
+
+History
+
+ 1997 June 14 (MJC):
+    Original version.
+
+Implementation_Status
+
+   -  This routine correctly processes the DATA, QUALITY,
+   VARIANCE, LABEL, TITLE, UNITS, and HISTORY, components of an NDF
+   data structure and propagates all extensions.  Propagation is from
+   the base NDF.  WCS and AXIS information is lost.
+
+   -  All non-complex numeric data types can be handled.
+
+   -  Any number of NDF dimensions is supported.
+.endhelp
