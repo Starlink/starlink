@@ -40,6 +40,8 @@
 #        Add SIZE, WEIGHTS and TIMES
 #     1998 Jun 9 (TIMJ)
 #        Add WTFNRAD, SCALE. Position 1 for REF
+#     1998 Dec 6 (TIMJ)
+#        Add USEGRD
 #     {enter_further_changes_here}
 
 #-
@@ -123,6 +125,14 @@
 	 HELPKEY  '*'
       ENDPARAMETER  
 
+
+      PARAMETER USEGRD
+         TYPE '_LOGICAL'
+         VPATH 'DYNAMIC,PROMPT'
+         PPATH 'DYNAMIC'
+         PROMPT 'Use a guard ring?'
+	 HELPKEY  '*'
+      ENDPARAMETER  
 
       PARAMETER SHIFT_DX
          TYPE    '_REAL'
