@@ -420,24 +420,24 @@ numerical types. The \emph{actual} routines names will not include the trailing
 \begin{htmlonly}
   \begin{rawhtml} 
     <SCRIPT LANGUAGE=JavaScript>
-       self.name="MAIN";
-       var w = open( "./search.html", "SEARCH", "status,width=700,height=500" );
-       w.oldurl = self.location;
-       w.loaded = false;
-       w.onload = function(){ w.loaded = true; }
-       w.onunload = function(){ 
-          if( w.loaded && w.opener.location == w.oldurl ) {
-             w.opener.back();
-          }};
+       function popup() {
+          self.name="MAIN";
+          var w = open( "", "SEARCH", "status,width=700,height=500" );
+          if( w.document.URL == "" ) w.location = "./search.html";
+          w.focus();
+       }
+       popup();
     </SCRIPT>
   \end{rawhtml}
 
    Accessing this page should cause your browser to pop up a window with
-   title "Search for KAPLIBS routines". Use this pop-up window to search
-   for KAPLIBS routines which match your requirements. Type a phrase into
-   the ``Search for:'' box, and press return, or press the ``Go'' button.
-   When you have finished, close the pop-up window by clicking on the
-   cross at the right hand end of the window's title bar.
+   title "Search for KAPLIBS routines".  To create the pop-up window
+   yourself, click \htmladdnormallink{here}{javascript:void popup();}.
+   Use this pop-up window to search for KAPLIBS routines which match your
+   requirements. Type a phrase into the ``Search for:'' box, and press
+   return, or press the ``Go'' button. When you have finished, close the
+   pop-up window by clicking on the cross at the right hand end of the
+   window's title bar.
 
    You can search for a given string within various fields of the 
    documentation of all KAPLIBS routines. You can select to search
