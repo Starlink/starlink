@@ -12,29 +12,31 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS_$TRDRx( FD, DIM1, DIM2, POSCOD, COUNT, DATA, LBND, UBND,
-*    :                 CMPLET, STATUS )
+*     CALL KPS_$TRDRx( FD, DIM1, DIM2, POSCOD, COUNT, CODATA, VADATA, 
+*    :                 LBND, UBND, CMPLET, STATUS )
 
 *  Description:
 *     This routine reads co-ordinate information and data value from
-*     an ASCII free-format file. The file is like a relational catalogue
-*     with one record per related set of co-ordinate and data values.
-*     The input data are copied to two arrays, the first uses a new line
-*     for each record of the file, its columns stores the given positional
-*     data in the order x,y,z etc. The second stores the data value. If
-*     the end of file is not reached a flag is returned.
+*     an ASCII free-format file.  The file is like a relational
+*     catalogue with one record per related set of co-ordinate and data
+*     values, however, exact column alignment is not necessary.  The
+*     input data are copied to two arrays, the first uses a new line
+*     for each record of the file, its columns stores the given
+*     positional data in the order x,y,z etc. The second stores the
+*     data value. If the end of file is not reached a flag is returned.
 
 *  Arguments:
 *     FD = INTEGER (Given)
 *        Fortran file identifier.
 *     DIM1 = INTEGER (Given)
 *        The first dimension of the output array, equal to the
-*        dimensionality of the output IMAGE file.
+*        dimensionality of the output NDF.
 *     DIM2 = INTEGER (Given)
 *        The second dimension of the output array.
 *     POSCOD( DIM1+1 ) = INTEGER (Given)
 *        The column numbers of the co-ordinate information in order
 *        x,y,z, etc. followed by the column number of the data value.
+*        They must be positive.
 *     COUNT = INTEGER (Given and Returned)
 *        The number of the line in the output array to be written first.
 *        If the file has been completely read this becomes the number
@@ -84,8 +86,6 @@
 *        them in the output file, and computing the bounds of the array.
 *        Report the context of an error should one occur.
 *     -  If the file was completely read, set a flag to indicate this.
-*        Report the number of points read, and the upper and lower
-*        bounds.
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
@@ -355,7 +355,7 @@
 
             IF ( NCOM .NE. -1 ) COUNT = COUNT + 1
 
-*          Something may have gone wrong interpeting the file, either
+*          Something may have gone wrong interpreting the file, either
 *          a typographical error, or it is not arranged in columns, e.g.
 *          perhaps with no co-ordinate data.
 
@@ -400,22 +400,6 @@
 
          CALL ERR_ANNUL( STATUS )
 
-*       Tell the user the number of data points found, and the maximum
-*       and minimum co-ordinate values for each dimension.
-
-         CALL MSG_OUT( 'BLANK', ' ', STATUS )
-         CALL MSG_SETI( 'COUNT', COUNT )
-         CALL MSG_OUT( 'HOW_MANY', 'Number of data points input was '/
-     :                 /'^COUNT.', STATUS )
-
-         DO  J = 1, DIM1
-            CALL MSG_SETR( 'POSMIN', LBND( J ) )
-            CALL MSG_SETR( 'POSMAX', UBND( J ) )
-            CALL MSG_SETI( 'N', J )
-            CALL MSG_OUT( 'POS_LIMITS', 'Dimension ^N: co-ordinate '/
-     :        /'minimum was ^POSMIN, maximum was ^POSMAX.', STATUS )
-
-         END DO
       END IF
 
  980  CONTINUE
