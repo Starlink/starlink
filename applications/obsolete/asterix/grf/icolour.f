@@ -202,7 +202,7 @@
 *    Local constants :
 *    Local variables :
       CHARACTER*80 REC
-      CHARACTER*16 TABS(6)/'default.act','greyscale.act',green.act',
+      CHARACTER*16 TABS(6)/'default.act','greyscale.act','green.act',
      :                     'bluegreen.act','red.act',rainbow.act'/
       CHARACTER FILE*132
       REAL COLTAB(3,16)
@@ -283,7 +283,8 @@
           CALL USI_GET0C('FILE',FILE,STATUS)
           CALL FIO_OPEN(FILE,'WRITE','NONE',0,IFD,STATUS)
           DO I=1,16
-            WRITE(REC,'(3(F4.2,1X))') COLTAB(1,I),COLTAB(2,I),COLTAB(3,I)
+            WRITE(REC,'(3(F4.2,1X))')
+     :                       COLTAB(1,I),COLTAB(2,I),COLTAB(3,I)
             CALL FIO_WRITEF(IFD,REC,STATUS)
           ENDDO
           CALL FIO_CLOSE(IFD,STATUS)
