@@ -27,6 +27,6 @@ else
     AC_MSG_RESULT(no)
 fi
 
-AC_CONFIG_FILES(Makefile component.xml)
+AC_CONFIG_FILES(Makefile)
 AC_CONFIG_HEADERS(config.h)
 AC_OUTPUT
