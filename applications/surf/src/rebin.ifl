@@ -20,7 +20,7 @@
 #     1996 October 29 (TIMJ)
 #        Use GLOBAL defaults
 #     1996 November 13 (TIMJ)
-#        Add NA output coords
+#        Add NA,AZ output coords
 
 #-
 
@@ -106,8 +106,8 @@
 
       PARAMETER OUT_COORDS
          TYPE    '_CHAR'
-         PROMPT  'Coordinate system of output map; NA, RB, RJ, RD or GA'
-#	 IN      'RB','RJ','RD','GA', 'NA'
+         PROMPT  'Coordinate system of output map; AZ,NA,RB,RJ,RD or GA'
+#	 IN      'RB','RJ','RD','GA', 'NA','AZ'
 	 HELPKEY  '*'
       ENDPARAMETER
 
