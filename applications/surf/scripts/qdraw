@@ -1,16 +1,24 @@
-#!/bin/perl -s
+#!/star/bin/ndfperl -s
+#
+#  This program requires the NDF module and ndfperl.
+#  This program will run as long as ndfperl exists in /star/bin
+#  Note that this ndfperl can be a soft link to your normal
+#  perl so long as the NDF module is installed as a shareable module.
 
 # QDRAW - Draws a data set with +/- 5 sigma range
 
-# Load NDF module
+# Load the NDF module
 use NDF;
 
 my ($par, $pkg);
 
-
-# The location of stats and linplot
-$root = '/star/bin/kappa';
-$lroot = '/jcmt_sw/sun4_Solaris/bin';
+# Get the location of KAPPA
+ 
+if (defined $ENV{"KAPPA_DIR"}) {
+  $kappa = $ENV{"KAPPA_DIR"};
+} else {
+  die "Can not start - The KAPPA_DIR environment variable is not set\n";
+}
 
 
 # Global status
@@ -48,14 +56,12 @@ if ($#ndfs > -1) {
     # Get root name (allow sections)
     ($roothds, $junk) = split(/\.|\(/,$ndf);
  
-    if ($root =~ /./) {
-      (-e "$roothds.sdf" || -e $ENV{'DATADIR'}."/$roothds.sdf") &&
-        do {      
-          print "NDF is $ndf\n";
-          $usethis = $ndf;
-          last;
-        };
-    }
+    (-e "$roothds.sdf" | -e $ENV{'DATADIR'}."/$roothds.sdf") &&
+      do {      
+	print "NDF is $ndf\n";
+	$usethis = $ndf;
+	last;
+      };
   }
  
   undef $ndf;
@@ -86,7 +92,7 @@ foreach $par (@parlist) {
   if ($params{$par} =~ /./);
 }
 
-$exstat = system("$root/stats '$ndf' $modpars > /dev/null");
+$exstat = system("$kappa/stats '$ndf' $modpars > /dev/null");
 die "STATS finished abnormally...stopping (status = $exstat)\n"
   if ($exstat != 0);
 
@@ -115,7 +121,7 @@ foreach $par (@parlist) {
 
 
 $exstat =
-  system("$root/linplot '$ndf' axlim=true ordlim='[$min,$max]' abslim=! $modpars");
+  system("$kappa/linplot '$ndf' axlim=true ordlim='[$min,$max]' abslim=! $modpars");
 die "LINPLOT finished abnormally...stopping (status = $exstat)\n"
   if ($exstat != 0);
 
@@ -133,7 +139,7 @@ foreach $par (@parlist) {
 }
 
 $exstat = 
-  system("$lroot/drawsig linestyle=2 sigcol=red nsigma='[0,3]' device=$device")
+  system("$kappa/drawsig linestyle=2 sigcol=red nsigma='[0,3]' device=$device")
   unless ($noline);
 die "DRAWSIG finished abnormally...stopping (status = $exstat)\n"
   if ($exstat != 0 && $noline);
@@ -153,7 +159,8 @@ __END__
 *  Description:
 *    This program uses kappa routines to calculate mean and standard 
 *    deviation of an NDF. It then uses linplot to display the data with
-*    a range of plus or minus 5 sigma.
+*    a range of plus or minus 5 sigma. Optionally, DRAWSIG can be used
+*    to overlay 3 sigma lines.
 
 *  Usage:
 *     qdraw [-noline] NDF [Linplot/Stats/Drawsig parameters]
@@ -164,9 +171,9 @@ __END__
 *      displayed or not.
 *    NDF (Given)
 *      The required dataset
-*    Any
-*      Any parameters recognised by LINPLOT, STATS or DRAWSIG
-
+*    ADAM parameters = Any
+*      Any parameters accepted by the individual routines as long as they
+*      use PARAM=VALUE format.
 
 *  Examples:
 *     qdraw test
@@ -179,10 +186,17 @@ __END__
 *     qdraw mode=2 sigcol=red test
 *        Plot with `+' symbols and use red lines to show the +/- 3 sigma lines.
 
+*  Related Applications:
+*    SURF: SCUCAT, SCUPHOT;
+*    KAPPA: STATS, LINPLOT, DRAWSIG
+
 *  Implementation Status:
 *    The output of STATS is not displayed therefore no error message is
 *    reported if STATS can not access the NDF (usually because the NDF has
-*    been specified incorrectly).
+*    been specified incorrectly). If qdraw freezes without printing any
+*    output this is usually because STATS is waiting for input. You can
+*    check if the NDF has been specified correctly  by running it through 
+*    STATS outside of qdraw and examining the output.
 *-
 
 
