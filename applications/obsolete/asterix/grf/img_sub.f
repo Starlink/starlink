@@ -5012,6 +5012,7 @@ c        REAL XX,XP,YP
       CHARACTER*1 CH
       INTEGER FLAG
       LOGICAL LEFT,RIGHT
+      LOGICAL FOK
 *    Global Variables :
       INCLUDE 'IMG_CMN'
 *-
@@ -5042,10 +5043,13 @@ c        REAL XX,XP,YP
 
 *  form input
           IF (I_FORM) THEN
-            CALL IMG_NBGET0R('PAR_R1',XC,STATUS)
-            CALL IMG_NBGET0R('PAR_R2',YC,STATUS)
-            CALL IMG_NBGET0R('PAR_R3',DX,STATUS)
-            CALL IMG_NBGET0R('PAR_R4',DY,STATUS)
+            CALL IMG_FORMOK(FOK,STATUS)
+            IF (FOK) THEN
+              CALL IMG_NBGET0R('PAR_R1',XC,STATUS)
+              CALL IMG_NBGET0R('PAR_R2',YC,STATUS)
+              CALL IMG_NBGET0R('PAR_R3',DX,STATUS)
+              CALL IMG_NBGET0R('PAR_R4',DY,STATUS)
+            ENDIF
           ENDIF
 
 
@@ -5141,6 +5145,7 @@ c        REAL XX,XP,YP
       INTEGER LS
       INTEGER FLAG
       LOGICAL LEFT,RIGHT
+      LOGICAL FOK
 *-
 
       IF (STATUS.EQ.SAI__OK) THEN
@@ -5213,6 +5218,18 @@ c        REAL XX,XP,YP
             ENDIF
           ELSEIF (FLAG.EQ.3) THEN
             I_FORM=.TRUE.
+          ENDIF
+
+*  get input from form
+          IF (I_FORM) THEN
+            CALL IMG_FORMOK(FOK,STATUS)
+            IF (FOK) THEN
+              CALL IMG_NBGET0R('PAR_R1',XCENT,STATUS)
+              CALL IMG_NBGET0R('PAR_R2',YCENT,STATUS)
+              CALL IMG_NBGET0R('PAR_R3',ANGLE,STATUS)
+              CALL IMG_NBGET0R('PAR_R4',LENGTH,STATUS)
+              CALL IMG_NBGET0R('PAR_R5',WIDTH,STATUS)
+            ENDIF
           ENDIF
 
 *  command mode cursor input
@@ -5551,11 +5568,45 @@ c        REAL XX,XP,YP
       REAL XR,YR
       INTEGER FLAG
       LOGICAL LEFT,RIGHT
+      LOGICAL FOK
 *-
       IF (STATUS.EQ.SAI__OK) THEN
 
-*  cursor mode
-        IF (I_MODE.EQ.1) THEN
+        IF (I_GUI) THEN
+
+*  try for cursor input
+          I_FORM=.FALSE.
+          XC=I_X
+          YC=I_Y
+          CALL MSG_PRNT('Select centre...')
+          CALL IMG_GUICURS(XC,YC,FLAG,STATUS)
+          IF (FLAG.EQ.1) THEN
+            CALL PGPOINT(1,XC,YC,2)
+            XR=XC
+            YR=YC
+            CALL MSG_PRNT('Select radius...')
+            CALL IMG_GUICURS(XR,YR,FLAG,STATUS)
+            IF (FLAG.EQ.1) THEN
+              RAD=SQRT((XR-XC)**2 + (YR-YC)**2)
+            ELSEIF (FLAG.EQ.3) THEN
+              I_FORM=.TRUE.
+            ENDIF
+          ELSEIF (FLAG.EQ.3) THEN
+            I_FORM=.TRUE.
+          ENDIF
+
+*  form input
+          IF (I_FORM) THEN
+            CALL IMG_FORMOK(FOK,STATUS)
+            IF (FOK) THEN
+              CALL IMG_NBGET0R('PAR_R1',XC,STATUS)
+              CALL IMG_NBGET0R('PAR_R2',YC,STATUS)
+              CALL IMG_NBGET0R('PAR_R3',RAD,STATUS)
+            ENDIF
+          ENDIF
+
+*  command mode cursor input
+        ELSEIF (I_MODE.EQ.1) THEN
 *  get centre
           XC=I_X
           YC=I_Y
@@ -5644,66 +5695,91 @@ c        REAL XX,XP,YP
       REAL XR,YR
       INTEGER FLAG
       LOGICAL LEFT,RIGHT
+      LOGICAL FOK
 *-
       IF (STATUS.EQ.SAI__OK) THEN
 
-*  cursor mode
-        IF (I_MODE.EQ.1) THEN
+*  GUI mode
+        IF (I_GUI) THEN
+
+*  try getting input from cursor
+          I_FORM=.TRUE.
+          XC=I_X
+          YC=I_Y
+          CALL MSG_PRNT('Select centre...')
+          CALL IMG_GUICURS(XC,YC,FLAG,STATUS)
+          IF (FLAG.EQ.1) THEN
+            CALL PGPOINT(1,XC,YC,2)
+            CALL MSG_PRNT('Select inner radius...')
+            CALL IMG_GUICURS(XR,YR,FLAG,STATUS)
+            IF (FLAG.EQ.1) THEN
+              IRAD=SQRT((XR-XC)**2 + (YR-YC)**2)
+              CALL IMG_CIRCLE(XC,YC,IRAD,STATUS)
+              CALL MSG_PRNT('Select outer radius...')
+              CALL IMG_GUICURS(XR,YR,FLAG,STATUS)
+              IF (FLAG.EQ.1) THEN
+                ORAD=SQRT((XR-XC)**2 + (YR-YC)**2)
+                CALL IMG_CIRCLE(XC,YC,ORAD,STATUS)
+              ELSEIF (FLAG.EQ.3) THEN
+                I_FORM=.TRUE.
+              ENDIF
+            ELSEIF (FLAG.EQ.3) THEN
+              I_FORM=.TRUE.
+            ENDIF
+          ELSEIF (FLAG.EQ.3) THEN
+            I_FORM=.TRUE.
+          ENDIF
+
+*  form input
+          IF (I_FORM) THEN
+            CALL IMG_FORMOK(FOK,STATUS)
+              CALL IMG_NBGET0R('PAR_R1',XC,STATUS)
+              CALL IMG_NBGET0R('PAR_R2',YC,STATUS)
+              CALL IMG_NBGET0R('PAR_R3',IRAD,STATUS)
+              CALL IMG_NBGET0R('PAR_R4',ORAD,STATUS)
+            ENDIF
+          ENDIF
+
+*  command mode cursor input
+        ELSEIF (I_MODE.EQ.1) THEN
 *  get centre
           XC=I_X
           YC=I_Y
-          IF (I_GUI) THEN
-            CALL MSG_PRNT('Select centre...')
-            CALL IMG_GUICURS(XC,YC,FLAG,STATUS)
-          ELSE
-            CALL MSG_PRNT(' ')
-            CALL MSG_SETR('XC',XC)
-            CALL MSG_SETR('YC',YC)
-            CALL MSG_PRNT('Select centre/^XC,^YC/...')
-            CALL GFX_CURS(XC,YC,LEFT,RIGHT,CH,STATUS)
-            IF (CH.EQ.CHAR(13)) THEN
-              XC=I_X
-              YC=I_Y
-            ENDIF
+          CALL MSG_PRNT(' ')
+          CALL MSG_SETR('XC',XC)
+          CALL MSG_SETR('YC',YC)
+          CALL MSG_PRNT('Select centre/^XC,^YC/...')
+          CALL GFX_CURS(XC,YC,LEFT,RIGHT,CH,STATUS)
+          IF (CH.EQ.CHAR(13)) THEN
+            XC=I_X
+            YC=I_Y
           ENDIF
 
           CALL PGPOINT(1,XC,YC,2)
 
 *  get radii
-          IF (I_GUI) THEN
-            CALL MSG_PRNT('Select inner radius...')
-            CALL IMG_GUICURS(XR,YR,FLAG,STATUS)
-            IRAD=SQRT((XR-XC)**2 + (YR-YC)**2)
+          CALL MSG_SETR('RAD',I_R)
+          CALL MSG_PRNT('Select inner radius/^RAD/...')
+          XR=XC
+          YR=YC
+          CALL GFX_CURS(XR,YR,LEFT,RIGHT,CH,STATUS)
+          IF (CH.EQ.CHAR(13)) THEN
+            IRAD=I_R
           ELSE
-            CALL MSG_SETR('RAD',I_R)
-            CALL MSG_PRNT('Select inner radius/^RAD/...')
-            XR=XC
-            YR=YC
-            CALL GFX_CURS(XR,YR,LEFT,RIGHT,CH,STATUS)
-            IF (CH.EQ.CHAR(13)) THEN
-              IRAD=I_R
-            ELSE
-              IRAD=SQRT((XR-XC)**2 + (YR-YC)**2)
-            ENDIF
+            IRAD=SQRT((XR-XC)**2 + (YR-YC)**2)
           ENDIF
 
           CALL IMG_CIRCLE(XC,YC,IRAD,STATUS)
 
-          IF (I_GUI) THEN
-            CALL MSG_PRNT('Select outer radius...')
-            CALL IMG_GUICURS(XR,YR,FLAG,STATUS)
-            ORAD=SQRT((XR-XC)**2 + (YR-YC)**2)
+          CALL MSG_SETR('RAD',I_R)
+          CALL MSG_PRNT('Select outer radius/^RAD/...')
+          XR=XC
+          YR=YC
+          CALL GFX_CURS(XR,YR,LEFT,RIGHT,CH,STATUS)
+          IF (CH.EQ.CHAR(13)) THEN
+            ORAD=I_R
           ELSE
-            CALL MSG_SETR('RAD',I_R)
-            CALL MSG_PRNT('Select outer radius/^RAD/...')
-            XR=XC
-            YR=YC
-            CALL GFX_CURS(XR,YR,LEFT,RIGHT,CH,STATUS)
-            IF (CH.EQ.CHAR(13)) THEN
-              ORAD=I_R
-            ELSE
-              ORAD=SQRT((XR-XC)**2 + (YR-YC)**2)
-            ENDIF
+            ORAD=SQRT((XR-XC)**2 + (YR-YC)**2)
           ENDIF
 
           CALL IMG_CIRCLE(XC,YC,ORAD,STATUS)
@@ -6103,7 +6179,7 @@ c        REAL XX,XP,YP
 *  Import :
       CHARACTER*(*) NAME
 *  Export :
-      REAL VAL
+      INTEGER VAL
 *  Status :
       INTEGER STATUS
 *  Local constants :
@@ -6115,6 +6191,41 @@ c        REAL XX,XP,YP
         CALL NBS_FIND_ITEM(I_NBID,NAME,ID,STATUS)
         CALL NBS_GET_VALUE(ID,0,VAL__NBI,VAL,NB,STATUS)
 
+
+      ENDIF
+
+      END
+
+
+*+ IMG_FORMOK
+      SUBROUTINE IMG_FORMOK(OK,STATUS)
+
+      IMPLICIT NONE
+
+*  Global constants :
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'PRM_PAR'
+*    Global variables :
+      INCLUDE 'IMG_CMN'
+*  Import :
+*  Export :
+      LOGICAL OK
+*  Status :
+      INTEGER STATUS
+*  Local constants :
+*  Local variables :
+      INTEGER ID,NB,FLAG
+*-
+      OK=.FALSE.
+      IF (STATUS.EQ.SAI__OK) THEN
+
+        CALL NBS_FIND_ITEM(I_NBID,'FLAG',ID,STATUS)
+        FLAG=0
+        CALL NBS_PUT_VALUE(ID,0,VAL__NBI,FLAG,STATUS)
+        DO WHILE (FLAG.EQ.0)
+          CALL NBS_GET_VALUE(FID,0,VAL__NBI,FLAG,NB,STATUS)
+        ENDDO
+        OK=(FLAG.EQ.1)
 
       ENDIF
 
