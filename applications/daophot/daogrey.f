@@ -69,6 +69,7 @@
       include 'PRM_PAR'
       include 'SAE_PAR'
       include 'DAT_PAR'
+      include 'CNF_PAR'
 
 *    Import :
       integer xstart, xend, ystart, yend
@@ -152,7 +153,8 @@
 
 * Find the maximum and minimum data values in the subarray
 * Use the KAPGEN routine MAXMIN
-      call MAXMIN( idims( 1 ), idims( 2 ), %val( datpin ), xstart,
+      call MAXMIN( idims( 1 ), idims( 2 ), %val( cnf_pval( datpin ) ), 
+     :             xstart,
      :             ystart, xend, yend, npix, ninval, vmax, vmin,
      :             maxpos, minpos, status )
 
@@ -189,8 +191,9 @@
 
 * Scale the data array into the workspace array
       call MSG_OUT( ' ', 'Scaling image', status )
-      call GREY( idims( 1 ), idims( 2 ), %val( datpin ), xstart, xend,
-     :           ystart, yend, dx, dy, %val( worpin ),
+      call GREY( idims( 1 ), idims( 2 ), %val( cnf_pval( datpin ) ), 
+     :           xstart, xend,
+     :           ystart, yend, dx, dy, %val( cnf_pval( worpin ) ),
      :           npens, vmax, vmin )
 
 * Create an SGS zone of the correct shape, best filling the display
@@ -205,7 +208,8 @@
 
 * Plot out the image
       call MSG_OUT( ' ', 'Plotting image', status )
-      call GCA( x1, y2, x2, y1, dx, dy, 1, 1, dx, dy, %val( worpin ) )
+      call GCA( x1, y2, x2, y1, dx, dy, 1, 1, dx, dy, 
+     :          %val( cnf_pval( worpin ) ) )
 
 * Make a database entry
       call AGS_SZONE( 'DAOGREY', 'Grey image', picid2, status )

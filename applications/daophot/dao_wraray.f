@@ -107,6 +107,7 @@
       COMMON /SIZE  / NCOL , NROW
  
       INCLUDE 'ndf_cmn'         ! Common block for NDF information
+      INCLUDE 'CNF_PAR'         ! For CNF_PVAL function
  
 *  Arguments Given :
       CHARACTER*(*) ENVIRO      ! Environment whose data is to be written
@@ -192,8 +193,8 @@
      :                STATUS)
  
 *   Write the data into the mapped array
-         CALL VEC_RTOR(.FALSE.,MX,FUNC(1,J),%VAL(IPNTR),IERR,NERR,
-     :                 STATUS)
+         CALL VEC_RTOR(.FALSE.,MX,FUNC(1,J),%VAL(CNF_PVAL(IPNTR)),
+     :                 IERR,NERR,STATUS)
  
 *   Unmap the data and annul the identifier
          CALL NDF_UNMAP(NDF_ISECT,'DATA',STATUS)

@@ -87,6 +87,7 @@ C-----------------------------------------------------------------------
  
 *  Global Constants:
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
+      INCLUDE 'CNF_PAR'               ! For CNF_PVAL function
 
 C
 C DIMENSIONS
@@ -307,8 +308,9 @@ C
       CALL DAO_ALLOC( '_REAL', MAXSKY, IP2 )
       CALL DAO_ALLOC( '_INTEGER', MAXSKY, IP3 )
 
-      CALL SKY (%VAL(IP1), %VAL(IP2), %VAL(IP3), MAXSKY, HIBAD, READNS,
-     .     PHPADU, SKYMOD, IX)
+      CALL SKY (%VAL(CNF_PVAL(IP1)), %VAL(CNF_PVAL(IP2)), 
+     .          %VAL(CNF_PVAL(IP3)), MAXSKY, HIBAD, READNS,
+     .          PHPADU, SKYMOD, IX)
 
       CALL DAO_DEALL( IP3 )
       CALL DAO_DEALL( IP2 )

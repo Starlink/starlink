@@ -33,6 +33,7 @@ C
 
 *  Global Constants:
       INCLUDE 'DAT_PAR'               ! HDS/DAT parameters
+      INCLUDE 'CNF_PAR'               ! For CNF_PVAL function
 
       INTEGER NOPT, NCMD, MAXPSF, MAXEXP, MAXBOX, MAXSKY,
      .     MAXPAR
@@ -285,8 +286,9 @@ C
          CALL DAO_ALLOC( '_INTEGER', MAXSTR, IP3 )
          CALL DAO_ALLOC( '_INTEGER', MAXSTR, IP4 )
          CALL DAO_ALLOC( '_INTEGER', MAXSTR, IP5 )
-         CALL SORTER(%VAL(IP1), MAXSTR*80, %VAL(IP2), %VAL(IP3), 
-     .        %VAL(IP4), %VAL(IP5), MAXSTR, OPT(11))
+         CALL SORTER(%VAL(CNF_PVAL(IP1)), MAXSTR*80, 
+     :               %VAL(CNF_PVAL(IP2)), %VAL(CNF_PVAL(IP3)),
+     .        %VAL(CNF_PVAL(IP4)), %VAL(CNF_PVAL(IP5)), MAXSTR, OPT(11))
          CALL DAO_DEALL( IP5 )
          CALL DAO_DEALL( IP4 )
          CALL DAO_DEALL( IP3 )
@@ -302,8 +304,9 @@ C
          CALL DAO_ALLOC( '_REAL', MAXSTR, IP3 )
          CALL DAO_ALLOC( '_REAL', MAXSTR, IP4 )
          CALL DAO_ALLOC( '_REAL', MAXSTR, IP5 )
-         CALL DAOSLT (%VAL(IP1), %VAL(IP2), %VAL(IP3), %VAL(IP4), 
-     .        %VAL(IP5), MAXSTR )
+         CALL DAOSLT (%VAL(CNF_PVAL(IP1)), %VAL(CNF_PVAL(IP2)), 
+     :                %VAL(CNF_PVAL(IP3)), %VAL(CNF_PVAL(IP4)),
+     .        %VAL(CNF_PVAL(IP5)), MAXSTR )
          CALL DAO_DEALL( IP5 )
          CALL DAO_DEALL( IP4 )
          CALL DAO_DEALL( IP3 )
@@ -320,8 +323,10 @@ C
          CALL DAO_ALLOC( '_REAL', MAXSTR, IP4 )
          CALL DAO_ALLOC( '_REAL', MAXSTR, IP5 )
          CALL DAO_ALLOC( '_INTEGER', MAXSTR, IP6 )
-         CALL PCKPSF (%VAL(IP1), %VAL(IP2), %VAL(IP3), %VAL(IP4),
-     .        %VAL(IP5), %VAL(IP6), MAXSTR, OPT(12), OPT(13))
+         CALL PCKPSF (%VAL(CNF_PVAL(IP1)), %VAL(CNF_PVAL(IP2)), 
+     :                %VAL(CNF_PVAL(IP3)), %VAL(CNF_PVAL(IP4)),
+     .        %VAL(CNF_PVAL(IP5)), %VAL(CNF_PVAL(IP6)), 
+     :        MAXSTR, OPT(12), OPT(13))
          CALL DAO_DEALL( IP6 )
          CALL DAO_DEALL( IP5 )
          CALL DAO_DEALL( IP4 )
@@ -376,7 +381,8 @@ C
             CALL DAO_ALLOC( '_REAL', MAXSKY, IP1 )
             CALL DAO_ALLOC( '_REAL', MAXSKY, IP2 )
             CALL DAO_ALLOC( '_INTEGER', MAXSKY, IP3 )
-            CALL SKY (%VAL(IP1), %VAL(IP2), %VAL(IP3), MAXSKY, OPT(4), 
+            CALL SKY (%VAL(CNF_PVAL(IP1)), %VAL(CNF_PVAL(IP2)), 
+     :                %VAL(CNF_PVAL(IP3)), MAXSKY, OPT(4),
      .           SKYMN, SKYMED, SKYMOD, K)
             CALL DAO_DEALL( IP3 )
             CALL DAO_DEALL( IP2 )
@@ -394,8 +400,10 @@ C
             CALL DAO_ALLOC( '_REAL', MAXBOX*NCOL, IP2 )
             CALL DAO_ALLOC( '_REAL', MAXBOX*MAXBOX, IP3 )
             CALL DAO_ALLOC( '_LOGICAL', MAXBOX*MAXBOX, IP4 )
-            CALL FIND(%VAL(IP1), %VAL(IP2), %VAL(IPWK), %VAL(IP3), 
-     .                %VAL(IP4), NCOL*NROW, MAXBOX, NCOL, MAXSKY, OPT,
+            CALL FIND(%VAL(CNF_PVAL(IP1)), %VAL(CNF_PVAL(IP2)), 
+     :                %VAL(CNF_PVAL(IPWK)), %VAL(CNF_PVAL(IP3)),
+     .                %VAL(CNF_PVAL(IP4)), 
+     :                NCOL*NROW, MAXBOX, NCOL, MAXSKY, OPT,
      .                NOPT)
             CALL DAO_DEALL( IP4 )
             CALL DAO_DEALL( IP3 )
@@ -410,7 +418,8 @@ C
             K = MAXEXP/2
             MAX = MAXPSF*MAXPSF*K
             K = K+1
-            CALL PHOTSB (%VAL(IPWK), PSF, PSF(1,1,K), MAX, NCOL, NROW,
+            CALL PHOTSB (%VAL(CNF_PVAL(IPWK)), 
+     :                   PSF, PSF(1,1,K), MAX, NCOL, NROW,
      .           OPT(11))
          ELSE
             CALL STUPID ('   No picture file has been ATTACHed.')
@@ -423,8 +432,10 @@ C
             CALL DAO_ALLOC( '_REAL', MAXSTR, IP3 )
             CALL DAO_ALLOC( '_REAL', MAXSTR, IP4 )
             CALL DAO_ALLOC( '_INTEGER', MAXSTR, IP5 )
-            CALL GETPSF (%VAL(IPWK), NCOL, NROW, PAR, PSF, 
-     .           %VAL(IP1), %VAL(IP2), %VAL(IP3), %VAL(IP4), %VAL(IP5),
+            CALL GETPSF (%VAL(CNF_PVAL(IPWK)), NCOL, NROW, PAR, PSF,
+     .           %VAL(CNF_PVAL(IP1)), %VAL(CNF_PVAL(IP2)), 
+     :           %VAL(CNF_PVAL(IP3)), %VAL(CNF_PVAL(IP4)), 
+     :           %VAL(CNF_PVAL(IP5)),
      .           MAXSTR, OPT, NOPT)
             CALL DAO_DEALL( IP5 )
             CALL DAO_DEALL( IP4 )
@@ -445,9 +456,12 @@ C
             CALL DAO_ALLOC( '_INTEGER', MAXSTR, IP6 )
             CALL DAO_ALLOC( '_INTEGER', MAXSTR, IP7 )
             CALL DAO_ALLOC( '_INTEGER', MAXSTR, IP8 )
-            CALL GROUP (PAR, MAXPAR, PSF, MAXPSF, MAXEXP, %VAL(IP1),
-     .           %VAL(IP2), %VAL(IP3), %VAL(IP4), %VAL(IP5),
-     .           %VAL(IP6), %VAL(IP7), %VAL(IP8), MAXSTR, OPT(12),
+            CALL GROUP (PAR, MAXPAR, PSF, MAXPSF, MAXEXP, 
+     :                  %VAL(CNF_PVAL(IP1)),
+     .           %VAL(CNF_PVAL(IP2)), %VAL(CNF_PVAL(IP3)), 
+     :           %VAL(CNF_PVAL(IP4)), %VAL(CNF_PVAL(IP5)),
+     .           %VAL(CNF_PVAL(IP6)), %VAL(CNF_PVAL(IP7)), 
+     :           %VAL(CNF_PVAL(IP8)), MAXSTR, OPT(12),
      .           OPT(13))
             CALL DAO_DEALL( IP8 )
             CALL DAO_DEALL( IP7 )
@@ -465,7 +479,8 @@ C
          IF (OPEN) THEN
             MAXB = (MAXPSF-7)/2
             CALL DAO_ALLOC( '_REAL', MAXB*MAXB, IP1 )
-            CALL DAOPK (PAR, MAXPAR, PSF, MAXPSF, MAXEXP, %VAL(IP1), 
+            CALL DAOPK (PAR, MAXPAR, PSF, MAXPSF, MAXEXP, 
+     :                  %VAL(CNF_PVAL(IP1)),
      .           MAXB, OPT(11), OPT(12), OPT(19), OPT(20))
             CALL DAO_DEALL( IP1 )
          ELSE
@@ -474,7 +489,8 @@ C
 C
       ELSE IF (KEY .EQ. ICNVRT('NS')) THEN
          IF (OPEN) THEN
-            CALL NSTAR (PAR, MAXPAR, PSF, MAXPSF, MAXEXP, %VAL(IPWK),
+            CALL NSTAR (PAR, MAXPAR, PSF, MAXPSF, MAXEXP, 
+     :                  %VAL(CNF_PVAL(IPWK)),
      .           NCOL, NROW, OPT(11), OPT(12), OPT(19), OPT(20))
          ELSE
             CALL STUPID ('   No picture file has been ATTACHed.')
@@ -483,7 +499,7 @@ C
       ELSE IF (KEY .EQ. ICNVRT('SU')) THEN
          IF (OPEN) THEN
             CALL SUBSTR (PAR, MAXPAR, PSF, MAXPSF, MAXEXP, 
-     .           %VAL(IPWK), NCOL, NROW, OPT(11))
+     .           %VAL(CNF_PVAL(IPWK)), NCOL, NROW, OPT(11))
          ELSE
             CALL STUPID ('   No picture file has been ATTACHed.')
          END IF
@@ -491,21 +507,21 @@ C
       ELSE IF (KEY .EQ. ICNVRT('AD')) THEN
          IF (OPEN) THEN
             CALL ADDSTR (PAR, MAXPAR, PSF, MAXPSF, MAXEXP,
-     .           %VAL(IPWK), NCOL, NROW, OPT(11))
+     .           %VAL(CNF_PVAL(IPWK)), NCOL, NROW, OPT(11))
          ELSE
             CALL STUPID ('   No picture file has been ATTACHed.')
          END IF
 C
       ELSE IF (KEY .EQ. ICNVRT('DU')) THEN
          IF (OPEN) THEN
-            CALL DUMP (%VAL(IPWK), NCOL, NROW)
+            CALL DUMP (%VAL(CNF_PVAL(IPWK)), NCOL, NROW)
          ELSE
             CALL STUPID ('   No picture file has been ATTACHed.')
          END IF
 C
       ELSE IF (KEY .EQ. ICNVRT('FU')) THEN
          IF (OPEN) THEN
-            CALL FUDGE (FILE, %VAL(IPWK), NCOL)
+            CALL FUDGE (FILE, %VAL(CNF_PVAL(IPWK)), NCOL)
          ELSE
             CALL STUPID ('   No picture file has been ATTACHed.')
          END IF

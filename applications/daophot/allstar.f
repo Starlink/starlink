@@ -12,6 +12,7 @@
  
 *  Global Constants:
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
+      INCLUDE 'CNF_PAR'               ! For CNF_PVAL function
 
       INTEGER PSFMAX, NOPT
 
@@ -101,12 +102,17 @@ C
 C
 C Call the routine to do the work.
 C
-      CALL ALLSTR (%VAL(IPDAT), NCOL, NROW, %VAL(IPSUB), %VAL(IPSIG), 
-     .     %VAL(IPR(1)), %VAL(IPR(2)), %VAL(IPR(3)), %VAL(IPR(4)),
-     .     %VAL(IPR(5)), %VAL(IPR(6)), %VAL(IPR(7)), %VAL(IPR(8)),
-     .     %VAL(IPR(9)), %VAL(IPR(10)), %VAL(IPR(11)), %VAL(IPR(12)),
-     .     %VAL(IPR(13)), %VAL(IPR(14)), 
-     .     %VAL(IPID), %VAL(IPNP), %VAL(IPSK), %VAL(IPLA), MAXSTR,
+      CALL ALLSTR (%VAL(CNF_PVAL(IPDAT)), NCOL, NROW, 
+     :             %VAL(CNF_PVAL(IPSUB)), %VAL(CNF_PVAL(IPSIG)),
+     .     %VAL(CNF_PVAL(IPR(1))), %VAL(CNF_PVAL(IPR(2))), 
+     :     %VAL(CNF_PVAL(IPR(3))), %VAL(CNF_PVAL(IPR(4))),
+     .     %VAL(CNF_PVAL(IPR(5))), %VAL(CNF_PVAL(IPR(6))), 
+     :     %VAL(CNF_PVAL(IPR(7))), %VAL(CNF_PVAL(IPR(8))),
+     .     %VAL(CNF_PVAL(IPR(9))), %VAL(CNF_PVAL(IPR(10))), 
+     :     %VAL(CNF_PVAL(IPR(11))), %VAL(CNF_PVAL(IPR(12))),
+     .     %VAL(CNF_PVAL(IPR(13))), %VAL(CNF_PVAL(IPR(14))),
+     .     %VAL(CNF_PVAL(IPID)), %VAL(CNF_PVAL(IPNP)), 
+     :     %VAL(CNF_PVAL(IPSK)), %VAL(CNF_PVAL(IPLA)), MAXSTR,
      .     OPT(1), OPT(5), OPT(4), NINT(OPT(2)), CENTER, 
      .     NINT(OPT(6)), PERERR, PROERR, OPT(9), OPT(10))
 C

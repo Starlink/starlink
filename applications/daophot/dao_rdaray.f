@@ -100,6 +100,7 @@
       COMMON /SIZE  / NCOL , NROW
  
       INCLUDE 'ndf_cmn'         ! Common block for NDF information
+      INCLUDE 'CNF_PAR'         ! For CNF_PVAL function
  
 *  Arguments Given :
       CHARACTER*(*) ENVIRO      ! Environment whose data is to be read
@@ -184,8 +185,8 @@
          CALL NDF_MAP(NDF_ISECT,'DATA','_REAL','READ',IPNTR,NELE,STATUS)
  
 *   Read the data into the given array
-         CALL VEC_RTOR(.FALSE.,MX,%VAL(IPNTR),FUNC(1,J),IERR,NERR,
-     :                 STATUS)
+         CALL VEC_RTOR(.FALSE.,MX,%VAL(CNF_PVAL(IPNTR)),
+     :                 FUNC(1,J),IERR,NERR,STATUS)
  
 *   Unmap the data and annul the identifier
          CALL NDF_UNMAP(NDF_ISECT,'DATA',STATUS)

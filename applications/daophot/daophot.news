@@ -1,7 +1,12 @@
 1 DAOPHOT - DAO photometry package
                                                             Expires: **.**.**
 
- This is DAOPHOT v1.3-2.
+ This is DAOPHOT v1.3-3.
+
+ Changes at v1.3-3:
+
+   o Made changes for compatibility with 64-bit environment
+     (wrapped %VAL invocation arguments in CNF_PVAL).
 
  Changes at v1.3-2:
 
