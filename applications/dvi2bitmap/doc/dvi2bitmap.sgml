@@ -174,7 +174,8 @@ DVI file as
 cat myfile.dvi | dvi2bitmap -
 </verbatim>
 is an alternative way of reading the file (rather pointless in this
-case, but it shows the principle).
+case, but it shows the principle; see <ref id="usagenotes.pipe"></ref>
+for further discussion).
 For more arcane purposes, the DVI file may also be specified as 
 <code>&lt;osfile&gt;dvi-file</code>
 (which is entirely equivalent), or 
@@ -765,7 +766,12 @@ but it will return with a zero (success) status.
 <p>Exception: If the <code/-n> option (see <ref id=usage.options/>) is
 present, then the program returns success only if <em/all> fonts are present.
 
-<subsect id=usage.examples export>Examples
+<subsect id=usage.examples export>
+<subhead>
+<title>Examples</title>
+</subhead>
+
+<p>Basic usage examples.</p>
 
 <p><verbatim>
 % dvi2bitmap --resolution=110 --magnification=2 --scale=2 \
@@ -774,7 +780,7 @@ present, then the program returns success only if <em/all> fonts are present.
 This converts the file <code/hello.dvi> to a GIF bitmap.  It first sets the
 magnification factor to 2, so that the program uses a double-size font
 (eg, <code>.../cmr10.220pk</code>), then scales the bitmap down by a
-factor of 2 to obtain a bitmap of the correct size.
+factor of 2 to obtain a bitmap of the correct size.</p>
 
 <p><verbatim>
 % dvi2bitmap -n -Qf --resolution=110 --magnification=1.5 \
@@ -784,9 +790,10 @@ Qf cmr10 165 110 1.5 localfont
 This reads the DVI file to find out what fonts are required, but does
 not process it further.  It then tries to find the fonts, fails, and
 produces a list of parameters which could be used to generate the
-font files.  
+font files.  </p>
 
-<p>See also <ref id=usage.fonts/>.
+<p>See also <ref id=usage.fonts/>, and see <ref id=usagenotes/>
+for more elaborate examples of use.</p>
 
 <subsect id=usage.fonts export>Finding and generating fonts
 <update versionid="upd2">Renamed this section from vague
@@ -883,8 +890,8 @@ display commands to generate missing fonts (<code/-Qg>).  Run one of
 these font-generation commands, then ask <code/kpsewhich> where the
 result is.
 
-<p>It is a good idea to run the <code/dvi2bitmap> tests, by giving the
-command <kbd/make test> in the build directory.  If you do, then you
+<p>It is a good idea to run the <code>dvi2bitmap</code> tests, by giving the
+command <kbd>(cd test;make)</kbd> in the build directory.  If you do, then you
 will end up with at least <code/cmr10> built using the Metafont mode
 and point size which <code/dvi2bitmap> uses by default (you can change
 the default Metafont mode: see <span media=screen><ref
@@ -1090,8 +1097,234 @@ Thus, using these values as an example, if one of the entries in
 if we had given the font-finder script as 
 <code>/usr/local/teTeX/bin/kpsewhich pk %f.%dpk</code>, the
 <code/dvi2bitmap> would have executed the command <code>.../kpsewhich
-pk cmr10.330pk</code>, which would have returned with a suitable font path.
+pk cmr10.330pk</code>, which would have returned with a suitable font
+path.</p>
 
+</subsubsect>
+</subsect>
+</sect>
+
+
+
+<sect id="usagenotes" export="export">
+<subhead>
+<title>Usage notes</title>
+</subhead>
+
+
+
+<subsect id="usagenotes.fonts" export="export">
+<subhead>
+<title>Good choices of fonts and scaling</title>
+</subhead>
+
+<p>There is a certain amount of subtlety in choosing fonts and
+resolutions for maximum readability.</p>
+
+<p>The fonts that <code>dvi2bitmap</code> (currently) uses by default
+are from the <code>cmr</code> family, and generated using Metafont
+mode <code>ibmvga</code>, chosen because its design resolution, of 110
+pixels to the inch, is approximately right for bitmaps viewed on the
+screen.  This is not, however, necessarily the optimal choice in all
+circumstances.</p>
+
+<p>You can produce some simple antialiasing by magnifying the output
+bitmaps then scaling them down, so that:
+<verbatim>
+% dvi2bitmap --magnification=2 --scale=2 myfile.dvi
+</verbatim>
+doubles the size of the bitmaps, then halfs it, effectively blurring
+it in the latter stage.  This works quite
+well.  You don't <em>necessarily</em> get better results with larger
+factors (though it does, of course, depend on the situation), because
+Metafont already does some work to make the characters easier to read,
+and I suspect that excessive antialiasing merely frustrates this.</p>
+
+<p>If you choose a different Metafont mode, it can make a difference.
+In your TeX distribution, there should be a file called
+<code>modes.mf</code>, containing a large collection of Metafont
+font-generation modes (look for it using <code>kpsewhich
+modes.mf</code> if you have that command), and there are several modes
+in this set which have resolutions in the 70 to 200 range, which are therefore
+about the right size to be useful in this context.  You're probably
+aiming for a resolution of around 100 pixels per inch, if you want the
+text in the output bitmap to be around the same size as the other text
+on your monitor.  For example, try the <code>ncd</code> and
+<code>nec</code> modes:
+<verbatim>
+% dvi2bitmap --magnification=2 --scale=2 --font-mode=ncd --resolution=95 try.dvi
+% dvi2bitmap --scale=2 --font-mode=nec --resolution=180 try.dvi
+% dvi2bitmap --magnification=2 --scale=4 --font-mode=nec --resolution=180 try.dvi
+</verbatim>
+Note that the declared resolution must match the font mode -- the
+default resolution of 110 is designed to match the default mode of
+<code>ibmvga</code>.  Also the <code>nec</code> mode, because its base
+resolution is large anyway, only needs to be scaled down to get
+adequate antialiasing.</p>
+
+<p>It should be possible to create a Metafont mode specifically for
+<code>dvi2bitmap</code> applications.  That might be a useful project
+for someone!</p>
+
+<p>Another thing to look at is whether changing the font family can
+help.  The Computer Modern family is, of course, designed for paper.
+The <webref
+url="http://www.tex.ac.uk/cgi-bin/texfaq2html?label=concrete"
+>Concrete Math family</webref>, though also designed primarily for
+paper, has features which make it particularly suitable for this
+application.  The <webref
+url="http://www.tex.ac.uk/cgi-bin/texfaq2html?label=psfchoice" >FAQ
+article which discusses maths font choices</webref> remarks that
+<blockquote>
+<px>Since Concrete is considerably darker than Computer Modern, this
+variant may be of particular interest for use in low-resolution
+printing or in display-oriented applications such as posters,
+transparencies, or online documents.</px>
+</blockquote>
+As well as this, these fonts have rather simpler outlines than
+Computer Modern <em>and</em> they are rather more upright, both of
+which make them more robust to being rendered at rather small
+resolutions.</p>
+
+<p>You can use the concrete maths fonts simply by adding the
+declaration
+<verbatim>
+\usepackage{concmath}
+</verbatim>
+to the preamble of your &latex; document.  In tests, the best
+configuration for clarity in a bitmap appeared to be a document using
+the concrete maths fonts, plus the <code>dvi2bitmap</code> invocation
+<verbatim>
+% dvi2bitmap --magnification=2 --scale=4 --font-mode=nec --resolution=180 try-cc.dvi
+</verbatim></p>
+
+<p>Any observations on this topic would be warmly appreciated.</p>
+
+<p>Many thanks to Doug du Boulay at <code>titech.ac.jp</code> for
+raising this issue, for thus prompting me to discuss the various options, and
+for then doing the critical testing work.</p>
+
+</subsect>
+
+<subsect id="usagenotes.pipe" export="export">
+<subhead>
+<title>Using dvi2bitmap in a pipe</title>
+</subhead>
+<p><code>dvi2bitmap</code> is perfectly happy reading DVI files from a
+pipe, so that
+<verbatim>
+cat myfile.dvi | dvi2bitmap --pipe -
+</verbatim>
+will work perfectly well.  Since the program knows that the standard
+input -- indicated by the <code>-</code> argument to
+<code>dvi2bitmap</code> -- is not seekable, the option
+<code>&ddash;pipe</code> is actually redundant.  This is not by itself
+particularly useful, since &tex; is not written to send its DVI output
+into a pipe.</p> 
+
+<p>If, however, you make a `named pipe' beforehand, using the Unix
+<code>mkfifo</code> command (a FIFO, or first-in-first-out, is the
+other name for such an object), then &tex; can be persuaded to send its
+output there.
+<verbatim>
+% mkfifo myfile.dvi
+% ls -l myfile.dvi
+prw-r--r--  1 norman  admin  0 Aug 12 00:18 myfile.dvi
+% latex myfile >myfile.stdout &
+% dvi2bitmap --pipe mkfile.dvi
+</verbatim>
+Here, we create the FIFO using the <code>mkfifo</code> command;
+looking at it, we see that the first character on the <code>ls</code>
+line is a <code>p</code>, indicating the type of object it is.  We
+start (La)&tex; going in the background (achieved by the
+<code>&amp;</code>), putting its chatty output into a file, and it
+merrily writes into the `file' <code>myfile.dvi</code>.  Immediately
+afterwards (we've shown this on two lines, but the two commands could
+be run together with only the <code>&amp;</code> separating them) we
+start <code>dvi2bitmap</code>, telling it to read from the named pipe.
+The pipe effectively synchronises the two processes, so that if there
+is nothing to read, <code>dvi2bitmap</code> is briefly suspended, and
+if the pipe is full, &latex; is suspended.  After this performance, the
+DVI file, <code>myfile.dvi</code> ends up zero size again, and the
+process can be repeated.</p>
+
+<p>You can go further than this, and use a FIFO for &latex;'s input,
+too:
+<verbatim>
+% mkfifo myfile.tex myfile.dvi
+% cat foo.tex >myfile.tex & \
+  latex '\input myfile.tex' >myfile.stderr & \
+  dvi2bitmap --pipe myfile.dvi
+</verbatim>
+(the trailing backslashes indicate that this second set of commands is
+all on one line).  The rather odd form of &latex; invocation (note the
+quotes) stops &tex; from peeking at the file, looking for the magic
+<code>%&amp;</code> line which can tell it which format to use; since
+the input is a pipe, it's unseekable, so we must use this form, or else
+&latex; fails.</p>
+</subsect>
+
+<subsect id="usagenotes.multieqs" export="export">
+<subhead>
+<title>Processing many bitmaps</title>
+</subhead>
+
+<p>If you have a large number of fragments of &tex; to process, it is
+best not to invoke <code>dvi2bitmap</code> for each one individually.
+Also, the program does not (yet) allow you to specify more than one
+DVI file as input.  In this situation, it is best to generate an input
+&tex; or &latex; file which contains <em>all</em> of the text you wish
+to process, with one fragment per page.</p>
+
+<p>For example, the following can help:
+<verbatim>
+\documentclass{article}
+\pagestyle{empty}
+\special{dvi2bitmap default imageformat png}
+\newcommand{\neweq}[1]{\vfil\break\special{dvi2bitmap outputfile #1.png}}
+\begin{document}
+
+\neweq{index-html-alpha}
+$\alpha$
+
+\neweq{index-html-aprime}
+$A'=(0,\alpha,0,0)$
+
+[...]
+
+\end{document}
+</verbatim>
+That includes a special to make PNG the default output format, and
+defines a command sequence, <code>\neweq</code> which simultaneously
+forces a new page and inserts a special to name the output file.  A
+script which generates a file like this and then looks for the
+resulting bitmaps, with known names of course, can run very
+efficiently.  Combining that with the techniques in <ref
+id="usagenotes.pipe"/> can work wonders.</p>
+</subsect>
+
+</sect>
+
+
+<sect id="libdvi2bitmap" export="export">
+<subhead>
+<title>The <code>libdvi2bitmap</code> library</title>
+</subhead>
+
+<p>The main bulk of the code which implements <code>dvi2bitmap</code>
+is in a library, and the program itself is a rather thin wrapper on
+top of this.  This library is intended to be usable for other
+applications.</p>
+
+<p>The library is written in C++, and provides an abstraction of DVI
+files, PK font files, Bitmaps, and various other objects used to build
+these ones.  By default, the build procedure creates both static and
+dynamic libraries.</p>
+
+<p>The library API is extensively documented in the
+<code>doc_libdvi2bitmap/</code> directory of the distribution.</p>
+
+</sect>
 
 <sect id=install export>Building and installing dvi2bitmap
 
@@ -1138,14 +1371,12 @@ Building should therefore be simple:
 </verbatim>
 but see the configuration options below.</p>
 
-<p>By default, both a static and a dynamic library are built.
-Building the dynamic library fails on OSX when linking against
-kpathsea versions up to at least 7.4.6.  I've submitted a kpathsea
-patch to address that, but if this fails for you on OSX, configure
-using <code>&ddash;disable-shared</code> and you'll build a static
-library only.</p>
+<p>By default, both a static and a dynamic library are built.  If
+there is some reason why building the dynamic library fails on your
+platform, configure using <code>&ddash;disable-shared</code> and
+you'll build a static library only.</p>
 
-<p>It's a good idea to run `<code/make test>' as well.  See <ref
+<p>It's a good idea to run <code>(cd test;make)</code> as well.  See <ref
 id=usage.fonts.finding/>.
 
 <p>To install, just copy the executable <code/dvi2bitmap> wherever you want it
@@ -1352,59 +1583,55 @@ successfully on (at least):
 <thead>
 <row><entry>Platform<entry>Version<entry>Compiler
 <tbody>
+
 <row>
 <entry>powerpc-apple-darwin6.6 (MacOS X, 10.2.6)</entry>
 <entry>0.11b1</entry>
 <entry>g++ 3.1 20020420 (prerelease)</entry>
 </row>
+
 <row>
 <entry>sun-sparc-solaris2.9</entry>
 <entry>0.11b1</entry>
 <entry>CC: Sun WorkShop 6 update 2 C++ 5.3 2001/05/15</entry>
 </row>
+
 <row>
 <entry>alphaev67-dec-osf5.1</entry>
 <entry>0.11b1</entry>
 <entry>Compaq C++ V6.5-014</entry>
 </row>
+
 <row>
 <entry>
 i686-pc-linux-gnu (RedHat 7.3)</entry>
 <entry>0.11b1</entry>
 <entry>g++ 2.96</entry>
 </row>
+
 <row>
   <entry>i686-pc-linux-gnu (RedHat 7.3)</entry>
   <entry>0.10</entry>
   <entry>gcc 2.96</entry>
 </row>
+
 <row>
 <entry>i686-pc-linux-gnu (RedHat 6.2)</entry>
 <entry>0.10b1</entry>
 <entry>egcs-2.91.66</entry>
 </row>
+
                     <row>
                       <entry>powerpc-apple-darwin6.4 (MacOSX 10.2)</entry>
                       <entry>0.10</entry>
                       <entry>g++ 3.1 20020420 (prerelease)</entry>
 		      <!-- g++ -version -->
                     </row>
-<row>
-<entry>sparc-sun-solaris2.8</entry>
-<entry>0.10</entry>
-<entry>Sun WorkShop 6 update 2 C++ 5.3</entry>
-<!-- CC -V -->
-</row>
+
 <row>
 <entry>sparc-sun-solaris2.8</entry>
 <entry>0.10b1</entry>
 <entry>egcs-2.91.66</entry>
-</row>
-<row>
-<entry>alphaev56-dec-osf5.0</entry>
-<entry>0.10</entry>
-<entry>Compaq C++ V6.5-014 for Compaq Tru64 UNIX V5.0A</entry>
-<!-- cxx -V -->
 </row>
 <row>
 <entry>alphaev56-dec-osf5.0</entry>
@@ -1502,7 +1729,7 @@ project machines).
 <p>There are some issues involved in creating, and hence in
 installing, an <code/export_run> distribution.  Part of the
 configuration of <code/dvi2bitmap> involves establishing the location,
-on the build system, of font-building scripts and TeX configuration
+on the build system, of font-building scripts and &tex; configuration
 files.  However, the point of the <code/export_run> distributions is
 that it should run on systems <em/other> than the build system.  We
 deal with this by (a) configuring <code/dvi2bitmap> to use a custom
@@ -1518,15 +1745,17 @@ the environment variable <code/TEXMFCNF> is defined (see
 <kbd/kpsewhich cnf texmf.cnf>).  You can see what features are enabled
 with the command <kbd/dvi2bitmap -V>.
 
-<sect id=developments export>Bugs, extras, and further developments
+</subsect>
+</sect>
+
+
+
+
+<sect id=developments export>
+<subhead>
+<title>Bugs, extras, and further developments</title>
 <update versionid=v0-7-1>Added bugreport address</update>
-
-<p>Bugs:
-<ul>
-<li>There are way too many options.  I'd better switch to using 
-<code/getopts> as soon as I get the chance.
-
-</ul>
+</subhead>
 
 <p>To report bugs, please send to <code/norman@astro.gla.ac.uk> a
 brief description of the problem; 
@@ -1543,8 +1772,10 @@ received.
 
 <p>In the <code type=fspath>.../extras</code> directory of the
 distribution is a script <code>img-eqlist.pl</code>, which transforms a
-file of LaTeX fragments into a LaTeX file, keeping track of
-filenames, and avoiding generating duplicate bitmaps for duplicated maths.
+file of &latex; fragments into a &latex; file, keeping track of
+filenames, and avoiding generating duplicate bitmaps for duplicated
+maths.</p>
+</sect>
 
 <sect id=refs export>References and acknowledgements
 
@@ -1640,14 +1871,14 @@ works, but it's <em/terribly> slow, which was the motivation for this program.
 <p><webref url="http://www.cis.ohio-state.edu/~gurari/TeX4ht/mn.html"
 	>TeX4ht</webref> (&tex; for Hypertext) uses &tex;'s own
 parser, but still produces equations as gifs.
-TeX4ht can also emit MathML from LaTeX.  The TeX4ht documentation has
+TeX4ht can also emit MathML from &latex;.  The TeX4ht documentation has
 a useful collection of resources.
 There's an alternative location for TeX4ht
 <webref url='http://www.tug.org/applications/tex4ht/mn.html'
 	>at TUG</webref>.
 
 <p><webref url="http://hutchinson.belmont.ma.us/tth/"
-	>tth: TeX to HTML translator</webref> 
+	>tth: &tex; to HTML translator</webref> 
 (<webref url="http://hutchinson.belmont.ma.us/tth/manual.cgi"
 >manual</webref>).  <code/tth> translates &latex; maths directly to HTML,
 with remarkable success and astonishing speed, and with good failure
@@ -1732,7 +1963,7 @@ conversion factors wrong (I hate these!), please correct me.
 
 <table id=tsizes>
 <caption>
-Sizes in TeX
+Sizes in &tex;
 </caption>
 <tabular frame="all">
 <tgroup cols="3">
