@@ -884,15 +884,27 @@
 *     Inquire the current colour index of this pen (it will be restored
 *     after all plotting is complete).
          CALL GQPLR( IWKID, MPEN, GSET, IERR, LNTYPI, LWIDTH, COLI )
+
+*     Calculate the distance between bolometers. If we only have one
+*     bolometer just assume a distance of 24 arcsec (a random number)
+
+         IF (N_BOL .LE. 1) THEN
+
+            BOL_DIST = 15.0
+
+         ELSE
          
 *     Need to find half distance between bolometers
-         CALL VEC_DTOR(.FALSE., 2, %val(BOL_RA_PTR),
-     :        XTEMP, IERR, NERR, STATUS)
-         CALL VEC_DTOR(.FALSE., 2, %val(BOL_DEC_PTR),
-     :        YTEMP, IERR, NERR, STATUS)
+            CALL VEC_DTOR(.FALSE., 2, %val(BOL_RA_PTR),
+     :           XTEMP, IERR, NERR, STATUS)
+            CALL VEC_DTOR(.FALSE., 2, %val(BOL_DEC_PTR),
+     :           YTEMP, IERR, NERR, STATUS)
          
-         BOL_DIST = SQRT((XTEMP(2)-XTEMP(1))**2 +(YTEMP(2)-YTEMP(1))**2)
-         BOL_DIST = BOL_DIST * REAL(R2AS) * 0.5
+            BOL_DIST = SQRT((XTEMP(2)-XTEMP(1))**2 +
+     :           (YTEMP(2)-YTEMP(1))**2)
+            BOL_DIST = BOL_DIST * REAL(R2AS) * 0.5
+
+         END IF
 
 *     Now calculate (half) this distance in World coordinates
 *     (I am assuming dx=dy for simplicity)
