@@ -6,10 +6,14 @@
 *	Part of:	SExtractor
 *
 *	Author:		E.BERTIN (IAP, Leiden observatory & ESO)
+*                       P.W.DRAPER (Starlink, Durham University)
 *
 *	Contents:	Functions to handle the configuration file.
 *
 *	Last modify:	29/06/98
+*                       25/11/98 (PWD)
+*                          Modified to accept an environment variable
+*                          as part of configuration file name.
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -35,7 +39,7 @@ void    readprefs(char *filename, char **argkey, char **argval, int narg)
 
   {
    FILE          *infile;
-   char          *cp, str[MAXCHAR], *keyword, *value, **dp;
+   char          *cp, str[MAXCHAR], *keyword, *value, **dp, *name;
    int           i, ival, nkey, warn, argi, flagc, flagd, flagz;
    double        dval;
 #ifndef	NO_ENVVAR
@@ -44,8 +48,53 @@ void    readprefs(char *filename, char **argkey, char **argval, int narg)
 #endif
 
 
-  if ((infile = fopen(filename,"r")) == NULL)
-    error(EXIT_FAILURE,"*ERROR*: can't read ", filename);
+/* PWD: open the configuration file. Check for environment variables
+   in name, code copied from below */
+#ifndef	NO_ENVVAR
+   if ( dolpos = strchr( filename, '$' ) ) {
+     int        nc;
+     char       *valuet,*value2t, *envval;
+   
+     value2t = str;
+     valuet = filename;
+     while ( dolpos ) {
+       while ( valuet < dolpos ) {
+         *(value2t++) = *(valuet++);      /* verbatim copy upto '$' */
+       }
+       if (*(++valuet) == (char)'{') {
+         valuet++;
+       }
+       strncpy( envname, valuet, nc=strcspn(valuet,"}/:\"\'\\") );
+       *(envname+nc) = (char)'\0';
+       if (*(valuet+=nc) == (char)'}')
+         valuet++;
+       if ( ! ( envval = getenv( envname ) ) ) {
+         error(EXIT_FAILURE, "Environment variable not found: ",
+               envname);
+       }
+       while(*envval) {                   /* Copy the ENV content */
+         *(value2t++) = *(envval++);
+       }
+       while(*valuet && *valuet!=(char)'$') { /* Continue verbatim copy */
+         *(value2t++) = *(valuet++);
+       }
+       if (*valuet) {
+         dolpos = valuet;
+       } else {
+         dolpos = NULL;
+         *value2t = (char)'\0';
+       }
+     }
+     name = str;
+   }
+#else 
+   name = filename;
+#endif
+
+/*  Now open file. */
+   if ( ( infile = fopen( name, "r" ) ) == NULL ) {
+     error(EXIT_FAILURE,"*ERROR*: can't read ", name);
+   }
 
 /*Build the keyword-list from pkeystruct-array */
 
