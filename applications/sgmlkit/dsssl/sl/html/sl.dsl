@@ -49,7 +49,7 @@ Walsh's stylesheet, other parts from me
 Code to support the generation of HTML filenames, and the
 links which navigate between documents
 
-<codereference doc="maths.dsl" docid="code.maths" id="code.maths">
+<codereference doc="maths.dsl" docid="code.maths.img" id="code.maths">
 <title>Maths processing
 <description>
 Code to process the various maths elements.
