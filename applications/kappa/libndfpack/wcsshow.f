@@ -107,6 +107,7 @@
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -116,6 +117,8 @@
 *        Added parameter NDF.
 *     22-JUN-1999 (DSB):
 *        Added parameter CAT.
+*     1-OCT-2004 (TIMJ):
+*        Access to KPG_AST restricted to libkpg. Use setter functions.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -135,13 +138,6 @@
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
 
 *  Global Variables:
-      INCLUDE 'KPG_AST'          ! KPG AST common blocks.
-*        ASTGRP = INTEGER (Write)
-*           GRP identifier for the group.
-*        ASTGSP = CHARACTER * 1 (Write)
-*           The character to be prepended to the text. Ignored if blank.
-*        ASTLN = INTEGER (Write)
-*           Index of previous GRP element to be read.
 
 *  Status:
       INTEGER STATUS
@@ -253,8 +249,8 @@
 *  Store the identifier for the group containing the dump in common so
 *  that it can be used by the source function KPG1_ASGFR. Also initialise
 *  the index of the last group element to have been read.
-            ASTGRP = IGRP
-            ASTLN = 0
+            CALL KPG1_SETASTGRP( IGRP )
+            CALL KPG1_SETASTLN( 0 )
 
 *  Attempt to read an Object from the group.
             IAST = AST_READ( CHAN, STATUS )
@@ -338,8 +334,8 @@
 *  to the group.
          CHAN = AST_CHANNEL( AST_NULL, KPG1_ASGFW, ' ', STATUS )
          CALL AST_SETI( CHAN, 'FULL', FULL, STATUS )
-         ASTGRP = IGRP
-         ASTGSP = ' '
+         CALL KPG1_SETASTGRP( IGRP )
+         CALL KPG1_SETASTGSP( ' ' )
 
 *  Write the OBJECT to the group. Report an error if nothing is
 *  written.
