@@ -108,6 +108,7 @@
       CHARACTER*30              CDATE                   ! Creation date
       CHARACTER*(DAT__SZLOC)    CRLOC                   ! Current RECORDS cell
       CHARACTER*(DAT__SZLOC)    HLOC                    ! HISTORY object
+      CHARACTER*30		HOST			! History host
       CHARACTER*(DAT__SZLOC)    LOC                     ! Dataset locator
       CHARACTER*(DAT__SZLOC)    RLOC                    ! RECORDS object
       CHARACTER*132		TEXT			! History text
@@ -152,10 +153,25 @@
 
 *    Construct return data
         CALL ADI_NEW0( 'HistoryRecord', OARG, STATUS )
+
+*    Write date
         CALL CMP_GET0C( CRLOC, 'DATE', CDATE, STATUS )
-        CALL CMP_GET0C( CRLOC, 'COMMAND', TEXT, STATUS )
         CALL ADI_CPUT0C( OARG, 'Date', CDATE, STATUS )
+
+*    Write command
+        CALL CMP_GET0C( CRLOC, 'COMMAND', TEXT, STATUS )
         CALL ADI_CPUT0C( OARG, 'Creator', TEXT(:CHR_LEN(TEXT)), STATUS )
+
+*    Write host
+        CALL DAT_THERE( CRLOC, 'HOST', THERE, STATUS )
+        IF ( THERE ) THEN
+          CALL CMP_GET0C( CRLOC, 'HOST', HOST, STATUS )
+        ELSE
+          HOST = 'unknown'
+        END IF
+        CALL ADI_CPUT0C( OARG, 'Host', HOST, STATUS )
+
+*    Write text
         CALL DAT_THERE( CRLOC, 'TEXT', THERE, STATUS )
         IF ( THERE ) THEN
           CALL DAT_FIND( CRLOC, 'TEXT', TXLOC, STATUS )
