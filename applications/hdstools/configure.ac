@@ -37,6 +37,9 @@ STAR_CHECK_PROGS(ifd2star)
 dnl    Need prohlp to create help.
 STAR_CHECK_PROGS(prohlp, sst)
 
+dnl Latex/htx documentation
+STAR_LATEX_DOCUMENTATION(sun245)
+
 dnl    Configure files.
 AC_CONFIG_FILES([Makefile component.xml hdstools.ifd])
 

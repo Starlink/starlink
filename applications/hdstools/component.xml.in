@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>applications/hdstools</path>
+  <description>HDSTOOLS - Tools To Display and Edit HDS Objects</description>
+  <abstract><p>
+The HDSTOOLS package contains a number of tools
+to edit and display HDS objects. The tools originated in the ASTERIX
+package but have now been modified to run as normal Starlink tasks.
+  </p></abstract>
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <developers>
+    <person>
+      <uname>ajc</uname>
+      <name>A. J. Chipperfield</name>
+      <email>ussc@star.rl.ac.uk</email>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
