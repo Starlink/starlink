@@ -878,12 +878,22 @@ do_test: $(EXTERNAL_INCLUDES)
 #
 #  Note the test has not yet succeeded.
 	@- if test -f .TESTED_$(SYSTEM); then $(RMF) .TESTED_$(SYSTEM); else :; fi
-	@ echo "Testing moggy"
-	cd moggy && make test
-	@ echo "There is not yet an installed AUTOASTROM test."
+	@ echo "There is not yet any installation test of autoastrom."
+	@ echo "Type ./mk pretest to run the pre-installation regression tests"
 #
 #  Note the test has been run.
 	@ touch .TESTED_$(SYSTEM)
+
+#  Run regression tests (all these test harnesses are basically the
+#  same, but are invoked in different ways because of the different
+#  ways the different directories do platform-specific configuration.
+pretest:
+	@ echo "Testing moggy"
+	cd moggy && make test
+	@ echo "Testing astrom"
+	cd astrom/t && ../mk
+	@ echo "Testing autoastrom"
+	cd t && ./runtests
 
 
 #  export: Export the installed system.
@@ -1041,7 +1051,7 @@ unbuild: clean
 	cd astrom && ./mk unbuild
 	cd moggy && if test -f Makefile; then make distclean; else make -f Makefile.in distclean; fi
 	cd catlib && if test -f Makefile; then make distclean; fi
-	test ! -d catlib-install || rm -Rf catlib-install
+	test ! -d $(CATLIBINSTALLDIR) || rm -Rf (CATLIBINSTALLDIR)
 	cd doc && make unbuild
 	@- $(RMF) $(BUILT_FILES) $(DATE_STAMP) .BUILT 1>/dev/null 2>/dev/null
 	@ echo '*** Built files removed'
@@ -1076,30 +1086,30 @@ sun242.xml: doc/sun242.xml
 moggy/moggy: moggy/Makefile $(CATLIBINSTALLDIR)/lib/libcat.a
 	cd moggy && unset INSTALL; make
 
-moggy/Makefile: moggy/Makefile.in
-	test -d $(CATLIBINSTALLDIR) || mkdir $(CATLIBINSTALLDIR)
+moggy/Makefile: moggy/Makefile.in $(CATLIBINSTALLDIR)/stamp
 	INST=`cd $(CATLIBINSTALLDIR);pwd`; cd moggy && unset INSTALL; CXX=$(CXX) CC=$(CC) ./configure --with-catlib=$$INST
 
 #  Build and install the SkyCat cat library.  We install it into the
 #  directory $(CATLIBINSTALLDIR), which moggy knows about.
-$(CATLIBINSTALLDIR)/lib/libcat.a: $(CATLIBINSTALLDIR) catlib/Makefile
+$(CATLIBINSTALLDIR)/lib/libcat.a: $(CATLIBINSTALLDIR)/stamp catlib/Makefile
 	cd catlib && unset INSTALL; CXX=$(CXX) CC=$(CC) make
 	cd catlib && unset INSTALL; CXX=$(CXX) CC=$(CC) make install
 
 #  Target to configure catlib
-catlib/Makefile: $(CATLIBINSTALLDIR)
+catlib/Makefile: $(CATLIBINSTALLDIR)/stamp
 	INST=`cd $(CATLIBINSTALLDIR);pwd`; cd catlib && unset INSTALL; CXX=$(CXX) CC=$(CC) ./configure --prefix=$$INST --with-notcl
 
 #  We have to create the installation directories `by hand', since the catlib
 #  installation script is a bit stupid.
-#  $(CATLIBINSTALLDIR) directory is proxy for all directories under it
-$(CATLIBINSTALLDIR):
+#  $(CATLIBINSTALLDIR)/stamp file is proxy for all directories under it
+$(CATLIBINSTALLDIR)/stamp:
 	test -d $(CATLIBINSTALLDIR) || mkdir $(CATLIBINSTALLDIR)
 	for dir in include lib man man/man3; \
 	do \
 		test -d $(CATLIBINSTALLDIR)/$$dir || \
 			mkdir $(CATLIBINSTALLDIR)/$$dir; \
 	done
+	touch $(CATLIBINSTALLDIR)/stamp
 
 astrom/astrom.x: astrom/astrom.f
 	cd astrom && ./mk build
