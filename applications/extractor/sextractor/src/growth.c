@@ -9,7 +9,7 @@
 *
 *	Contents:	Make growth curves.
 *
-*	Last modify:	28/11/98
+*	Last modify:	05/04/99
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -77,7 +77,7 @@ void	makeavergrowth(picstruct *field, picstruct *wfield, objstruct *obj)
     wthresh = wfield->weight_thresh;
 
 /* Clear the growth-curve buffer */
-  memset(growth, 0, GROWTH_NSTEP*sizeof(double));
+  memset(growth, 0, (size_t)(GROWTH_NSTEP*sizeof(double)));
 
   mx = obj->mx;
   my = obj->my;

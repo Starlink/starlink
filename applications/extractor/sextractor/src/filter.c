@@ -10,7 +10,7 @@
 *	Contents:	functions dealing with on-line filtering of the image
 *			(for detection).
 *
-*	Last modify:	28/08/98
+*	Last modify:	15/12/99
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -316,4 +316,72 @@ void	neurfilter(picstruct *field, PIXTYPE *mscan)
 
   return;
   }
+
+
+/******************************* convolve_image ******************************/
+/*
+Convolve a vignet with an array.
+*/
+void	convolve_image(picstruct *field, double *vig1,
+		double *vig2, int width, int height)
+
+  {
+   int		mw,mw2,m0,me,m,mx,dmx, y, y0,dy;
+   float	*mask;
+   double	*mscane, *s,*s0, *vig3, *d,*de, mval, val;
+
+/* If no filtering, just return a copy of the input data */
+  if (!thefilter || thefilter->bpann)
+    {
+    memcpy(vig2, vig1, width*height*sizeof(double));
+    return;
+    }    
+  mw = thefilter->convw;
+  mw2 = mw/2;
+  memset(vig2, 0, width*height*sizeof(double));
+  vig3 = vig2;
+  for (y=0; y<height; y++, vig3+=width)
+    {
+    mscane = vig3+width;
+    y0 = y - (thefilter->convh/2);
+    if (y0 < 0)
+      {
+      m0 = -mw*y0;
+      y0 = 0;
+      }
+    else
+      m0 = 0;
+    if ((dy = height - y0) < thefilter->convh)
+      me = mw*dy;
+    else
+      me = mw*thefilter->convh;
+    mask = thefilter->conv+m0;
+    for (m = m0, mx = 0; m<me; m++, mx++)
+      {
+      if (mx==mw)
+        mx = 0;
+      if (!mx)
+        s0 = vig1+width*(y0++);
+      if ((dmx = mx-mw2)>=0)
+        {
+        s = s0 + dmx;
+        d = vig3;
+        de = mscane - dmx;
+        }
+      else
+        {
+        s = s0;
+        d = vig3 - dmx;
+        de = mscane;
+        }
+
+      mval = *(mask++);
+      while (d<de)
+        *(d++) += ((val = *(s++))>-BIG? mval*val:0.0);
+      }
+    }
+
+  return;
+  }
+
 

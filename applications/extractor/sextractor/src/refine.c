@@ -9,7 +9,7 @@
 *
 *	Contents:	functions to refine extraction of objects.
 *
-*	Last modify:	28/11/98
+*	Last modify:	11/05/99
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -81,7 +81,7 @@ int	parcelout(objliststruct *objlistin, objliststruct *objlistout)
   debobjlist.nobj = debobjlist2.nobj = 0;
   debobjlist.npix = debobjlist2.npix = 0;
   objlistout->thresh = debobjlist2.thresh = objlistin->thresh;
-  memset(objlist, 0, xn*sizeof(objliststruct));
+  memset(objlist, 0, (size_t)xn*sizeof(objliststruct));
 
   for (l=0; l<objlistin->nobj && out==RETURN_OK; l++)
       {
@@ -293,7 +293,7 @@ int	gatherup(objliststruct *objlistin, objliststruct *objlistout)
     if (!bmp[(x-xs) + (y-ys)*bmwidth])
       {
       pixt2 = pixelout + (l=(k++*plistsize));
-      memcpy(pixt2, pixt, plistsize);
+      memcpy(pixt2, pixt, (size_t)plistsize);
       PLIST(pixt2, nextpix) = -1;
       distmin = 1e+31;
       for (objt = objin+(i=1); i<nobj; i++, objt++)

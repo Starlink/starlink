@@ -10,7 +10,7 @@
 *	Contents:	functions that remove spurious detections from the
 *			catalog
 *
-*	Last modify:	29/03/98
+*	Last modify:	21/04/99
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -77,9 +77,10 @@ INPUT   Object number,
 OUTPUT  0 if the object was CLEANed, 1 otherwise.
 NOTES   -.
 AUTHOR  E. Bertin (IAP, Leiden & ESO)
-VERSION 12/02/98
+VERSION 06/04/99
  ***/
-int	clean(int objnb, objliststruct *objlistin)
+int	clean(picstruct *field, picstruct *dfield, int objnb,
+		objliststruct *objlistin)
   {
    objstruct		*objin, *obj;
    int			i,j,k;
@@ -122,6 +123,22 @@ int	clean(int objnb, objliststruct *objlistin)
           {
 /*------- the newcomer is eaten!! */
           mergeobject(objin, obj);
+          if (prefs.blank_flag)
+            {
+/*---------- Paste back ``CLEANed'' object pixels before forgetting them */
+            if (objin->blank)
+              {
+              pasteimage(field, objin->blank, objin->subw, objin->subh,
+			objin->subx, objin->suby);
+              free(objin->blank);
+              }
+            if (objin->dblank)
+              {
+              pasteimage(dfield, objin->dblank, objin->subw, objin->subh,
+			objin->subx, objin->suby);
+              free(objin->dblank);
+              }
+            }
 
           return 0;
           }
@@ -135,6 +152,22 @@ int	clean(int objnb, objliststruct *objlistin)
     k = cleanvictim[i];
     obj = cleanobjlist->obj + k;
     mergeobject(obj, objin);
+    if (prefs.blank_flag)
+      {
+/*---- Paste back ``CLEANed'' object pixels before forgetting them */
+      if (obj->blank)
+        {
+        pasteimage(field, obj->blank, obj->subw, obj->subh,
+		obj->subx, obj->suby);
+        free(obj->blank);
+        }
+      if (obj->dblank)
+        {
+        pasteimage(dfield, obj->dblank, obj->subw, obj->subh,
+		obj->subx, obj->suby);
+        free(obj->dblank);
+        }
+      }
     subcleanobj(k);
     }
 
@@ -212,12 +245,22 @@ void	mergeobject(objstruct *objslave,objstruct *objmaster)
           *pix = colormaster;
     }
 
+  if (FLAG(obj.flux_prof))
+    {
+    objmaster->flux_prof = (objmaster->flux_prof*objmaster->fdflux
+			+ objslave->flux_prof*objslave->fdflux)
+			/ (objmaster->fdflux + objslave->fdflux);
+    objmaster->fluxerr_prof = (objmaster->fluxerr_prof*objmaster->fdflux
+			+ objslave->fluxerr_prof*objslave->fdflux)
+			/ (objmaster->fdflux + objslave->fdflux);
+    }
   objmaster->fdnpix += objslave->fdnpix;
   objmaster->dnpix += objslave->dnpix;
   objmaster->fdflux += objslave->fdflux;
   objmaster->dflux += objslave->dflux;
   objmaster->flux += objslave->flux;
   objmaster->fluxerr += objslave->fluxerr;
+
   if (objslave->fdpeak>objmaster->fdpeak)
     {
     objmaster->fdpeak = objslave->fdpeak;
@@ -245,6 +288,7 @@ void	mergeobject(objstruct *objslave,objstruct *objmaster)
   return;
   }
 
+
 /******************************* subcleanobj ********************************/
 /*
 remove an object from a "cleanobjlist".
@@ -252,8 +296,7 @@ remove an object from a "cleanobjlist".
 void	subcleanobj(int objnb)
 
   {
-
-/*Update the object list */
+/* Update the object list */
   if (objnb>=cleanobjlist->nobj)
     error(EXIT_FAILURE, "*Internal Error*: no CLEAN object to remove ",
 	"in subcleanobj()");

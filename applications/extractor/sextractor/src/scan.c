@@ -1,4 +1,4 @@
-  /*
+   /*
  				scan.c
 
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -10,7 +10,7 @@
 *	Contents:	functions for extraction of connected pixels from
 *			a pixmap.
 *
-*	Last modify:	28/11/98
+*	Last modify:	07/10/99
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -59,7 +59,8 @@ void	scanimage(picstruct *field, picstruct *dfield, picstruct **pffield,
 
    char			*marker, newmarker, *blankpad, *bpt,*bpt0;
    int			co, i,j, flag, luflag,pstop, xl,xl2,yl, cn,
-			nposize, stacksize, w, h, blankh, maxpixnb;
+			nposize, stacksize, w, h, blankh, maxpixnb,
+			varthreshflag;
    short	       	trunflag;
    PIXTYPE		thresh, relthresh, cdnewsymbol, cdvar,
 			*scan,*dscan,*cdscan,*dwscan,*cdwscan,*scant,*wscan;
@@ -76,8 +77,10 @@ void	scanimage(picstruct *field, picstruct *dfield, picstruct **pffield,
 /* cdwfield is the detection weight-field if available */
   cdwfield = dwfield? dwfield:(prefs.dweight_flag?wfield:NULL);
 
-/* Depending on WEIGHTing or not, activate threshold scaling */
-  if (cdwfield)
+/* If WEIGHTing and no absolute thresholding, activate threshold scaling */
+  varthreshflag = (cdwfield && prefs.thresh_type[0]!=THRESH_ABSOLUTE);
+
+  if (varthreshflag)
     relthresh = prefs.dthresh[0];
 
   w = cfield->width;
@@ -187,7 +190,7 @@ void	scanimage(picstruct *field, picstruct *dfield, picstruct **pffield,
       if (prefs.filter_flag)
         {
         free(cdscan);
-        if (dwfield)
+        if (cdwfield)
           free(cdwscan);
         }
       cdwscan = cdscan = dumscan;
@@ -206,6 +209,8 @@ void	scanimage(picstruct *field, picstruct *dfield, picstruct **pffield,
         wscan = (wfield->stripy==wfield->stripysclim)?
 		  (PIXTYPE *)loadstrip(wfield, (picstruct *)NULL)
 		: &wfield->strip[wfield->stripy*wfield->width];
+      else
+        wscan = NULL;
       scan = (field->stripy==field->stripysclim)?
 		  (PIXTYPE *)loadstrip(field, wfield)
 		: &field->strip[field->stripy*field->width];
@@ -252,8 +257,8 @@ void	scanimage(picstruct *field, picstruct *dfield, picstruct **pffield,
       marker[xl] = 0;
 
       curpixinfo.flag = trunflag;
-      if (cdwfield)
-        thresh = relthresh*sqrt(cdvar=cdwscan[xl]);
+      if (varthreshflag)
+        thresh = relthresh*sqrt(cdvar = ((xl==w || yl==h)? 0.0:cdwscan[xl]));
       luflag = cdnewsymbol > thresh?1:0;
 
       if (luflag)
@@ -450,6 +455,14 @@ void	scanimage(picstruct *field, picstruct *dfield, picstruct **pffield,
           for (i=w; i--; scant++)
             if (*(bpt++))
               *scant = -BIG;
+          if (dfield)
+            {
+            bpt = bpt0;
+            scant = &PIX(field, 0, cfield->yblank);
+            for (i=w; i--; scant++)
+              if (*(bpt++))
+                *scant = -BIG;
+            }
           bpt = bpt0;
           }
         }
@@ -515,14 +528,22 @@ void	scanimage(picstruct *field, picstruct *dfield, picstruct **pffield,
   if (prefs.blank_flag && prefs.filter_flag && (cfield->yblank >= 0))
     for (j=blankh-1; j--; yl++)
       {
-      bpt = blankpad + w*(yl%blankh);
+      bpt = bpt0 = blankpad + w*(yl%blankh);
       scant = &PIX(cfield, 0, cfield->yblank);
-      cfield->yblank++;
-      if (dfield)
-        field->yblank = cfield->yblank;
       for (i=w; i--; scant++)
         if (*(bpt++))
           *scant = -BIG;
+      if (dfield)
+        {
+        bpt = bpt0;
+        scant = &PIX(field, 0, cfield->yblank);
+        for (i=w; i--; scant++)
+          if (*(bpt++))
+            *scant = -BIG;
+        }
+      cfield->yblank++;
+      if (dfield)
+        field->yblank = cfield->yblank;
       }
 
 /* Now that all "detected" pixels have been removed, analyse detections */
@@ -603,7 +624,7 @@ void  sortit(picstruct *field, picstruct *dfield, picstruct *wfield,
   objlist->obj = &obj;
   objlist->nobj = 1;
 
-  memset(&obj, 0, sizeof(objstruct));
+  memset(&obj, 0, (size_t)sizeof(objstruct));
   objlist->npix = info->pixnb;
   obj.firstpix = info->firstpix;
   obj.lastpix = info->lastpix;
@@ -690,24 +711,8 @@ void  sortit(picstruct *field, picstruct *dfield, picstruct *wfield,
       }
 
 /* Only add the object if it is not swallowed by cleaning */
-    if (!prefs.clean_flag || clean(i, objlist2))
+    if (!prefs.clean_flag || clean(field, dfield, i, objlist2))
       addcleanobj(cobj);
-    else if (prefs.blank_flag)
-      {
-/*---- Paste back ``CLEANed'' object pixels before forgetting them */
-      if (cobj->blank)
-        {
-        pasteimage(field, cobj->blank, cobj->subw, cobj->subh,
-		cobj->subx, cobj->suby);
-        free(cobj->blank);
-        }
-      if (cobj->dblank)
-        {
-        pasteimage(dfield, cobj->dblank, cobj->subw, cobj->subh,
-		cobj->subx, cobj->suby);
-        free(cobj->dblank);
-        }
-      }
     }
 
   free(objlistout.plist);

@@ -121,10 +121,10 @@ void	getflags(objstruct *obj, pliststruct *pixel)
               nflag += FLAG_BUFSIZE;
               QREALLOC(flagstack, FLAGTYPE, nflag)
               fs = flagstack + nflag0;
-              memset(fs, 0, FLAG_BUFSIZE*sizeof(FLAGTYPE));
+              memset(fs, 0, (size_t)FLAG_BUFSIZE*sizeof(FLAGTYPE));
               QREALLOC(nflagstack, int, nflag)
               nfs = nflagstack + nflag0;
-              memset(nfs, 0, FLAG_BUFSIZE*sizeof(int));
+              memset(nfs, 0, (size_t)FLAG_BUFSIZE*sizeof(int));
               }
             if (!*nfs)
               {

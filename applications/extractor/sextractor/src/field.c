@@ -9,7 +9,7 @@
 *
 *	Contents:	Handling of field structures.
 *
-*	Last modify:	28/11/98
+*	Last modify:	12/08/99
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -51,8 +51,7 @@ picstruct	*newfield(char *filename, int flags)
   NFPRINTF(OUTPUT, gstr);
 /* Check the image exists and read important info (image size, etc...) */
   readimagehead(field);
-  if (prefs.verbose_type != QUIET)
-    fprintf(OUTPUT, "%s \"%.20s\" / %d x %d / %d bits %s data\n",
+  QPRINTF(OUTPUT, "%s \"%.20s\" / %d x %d / %d bits %s data\n",
 	flags&FLAG_FIELD?   "Flagging  from:" :
        (flags&(RMS_FIELD|VAR_FIELD|WEIGHT_FIELD)?
 			     "Weighting from:" :
@@ -95,14 +94,9 @@ picstruct	*newfield(char *filename, int flags)
     if (((flags & DETECT_FIELD) && prefs.back_type[0]==BACK_ABSOLUTE)
 	|| ((flags & MEASURE_FIELD) && prefs.back_type[1]==BACK_ABSOLUTE))
       field->back_type = BACK_ABSOLUTE;
-/*-- Now make the background map */
-    makeback(field);
-/*-- If asked for, force the backmean parameter to the supplied value */
-    if (field->back_type == BACK_ABSOLUTE)
-      field->backmean = (float)prefs.back_val[(flags&DETECT_FIELD)?0:1];
     }
 
-/* Prepare the image buffer */
+/* Compute the image buffer size */
 /* Basically, only one margin line is sufficient... */
   field->stripmargin = 1;
 /* ...but : */
@@ -119,80 +113,6 @@ picstruct	*newfield(char *filename, int flags)
     if (field->stripmargin < (margin = (thefilter->convh-1)/2))
       field->stripmargin = margin;
     }
-
-/* Allocate space for the frame-buffer */
-  if (flags ^ FLAG_FIELD)
-    {
-    if (!(field->strip=(PIXTYPE *)malloc(field->stripheight*field->width
-        *sizeof(PIXTYPE))))
-      error(EXIT_FAILURE,"Not enough memory for the image buffer of ",
-	field->rfilename);
-    }
-  else
-    {
-    if (!(field->fstrip=(FLAGTYPE *)malloc(field->stripheight*field->width
-        *sizeof(FLAGTYPE))))
-      error(EXIT_FAILURE,"Not enough memory for the flag buffer of ",
-	field->rfilename);
-    }
-
-  if ((flags & DETECT_FIELD) || (flags & MEASURE_FIELD))
-    {
-    if (prefs.ndthresh > 1)
-      {
-       double	dval;
-
-      if (fabs(dval=prefs.dthresh[0] - prefs.dthresh[1])> 70.0)
-        error(EXIT_FAILURE,
-	"*Error*: I cannot deal with such extreme thresholds!", "");
-
-      field->dthresh = field->pixscale*field->pixscale
-		*pow(10.0, -0.4*dval);
-      }
-    else if (prefs.thresh_type[0]==THRESH_ABSOLUTE)
-        field->dthresh = prefs.dthresh[0];
-    else
-        field->dthresh = prefs.dthresh[0]*field->backsig;
-    if (prefs.nthresh > 1)
-      {
-       double	dval;
-
-      if (fabs(dval=prefs.thresh[0] - prefs.thresh[1]) > 70.0)
-        error(EXIT_FAILURE,
-	"*Error*: I cannot deal with such extreme thresholds!", "");
-
-      field->thresh = field->pixscale*field->pixscale
-	*pow(10.0, -0.4*dval);
-      }
-    else if (prefs.thresh_type[1]==THRESH_ABSOLUTE)
-        field->thresh = prefs.thresh[0];
-    else
-      field->thresh = prefs.thresh[0]*field->backsig;
-
-    if (prefs.verbose_type != QUIET)
-      fprintf(OUTPUT, "    Background: %-10g RMS: %-10g / Threshold: %-10g \n",
-	field->backmean, field->backsig, (flags & DETECT_FIELD)?
-	field->dthresh: field->thresh);
-
-#ifdef	QUALITY_CHECK
-    printf("%-10g %-10g %-10g\n", field->backmean, field->backsig,
-	(flags & DETECT_FIELD)? field->dthresh : field->thresh);
-#endif
-
-    if (field->dthresh<=0.0 || field->thresh<=0.0)
-      error(EXIT_FAILURE,
-	"*Error*: I cannot deal with zero or negative thresholds!", "");
-
-    if (prefs.detect_type == PHOTO
-	&& field->backmean+3*field->backsig > 50*field->ngamma)
-      error(EXIT_FAILURE,
-	"*Error*: The density range of this image is too large for ",
-	"PHOTO mode");
-    }
-
-/* Prepare learn and/or associations */
-  if (flags & MEASURE_FIELD && prefs.assoc_flag)
-    init_assoc(field);			/* initialize assoc tasks */
 
   return field;
   }
@@ -213,32 +133,16 @@ picstruct	*inheritfield(picstruct *infield, int flags)
 /* Copy what is important and reset the remaining */
   *field = *infield;
   field->flags = flags;
-  copyback(infield, field);
   copyastrom(infield, field);
   QMEMCPY(infield->fitshead, field->fitshead, char, infield->fitsheadsize);
+  field->interp_flag = 0;
   field->assoc = NULL;
   field->strip = NULL;
   field->fstrip = NULL;
-  field->copystrip = infield->strip;
+  field->reffield = infield;
   field->compress_buf = NULL;
   field->compress_type = COMPRESS_NONE;
   field->file = NULL;
-
-/* Allocate space for the frame-buffer */
-  if (flags ^ FLAG_FIELD)
-    {
-    if (!(field->strip=(PIXTYPE *)malloc(field->stripheight*field->width
-        *sizeof(PIXTYPE))))
-      error(EXIT_FAILURE,"Not enough memory for the image buffer of ",
-	field->rfilename);
-    }
-  else
-    {
-    if (!(field->fstrip=(FLAGTYPE *)malloc(field->stripheight*field->width
-        *sizeof(FLAGTYPE))))
-      error(EXIT_FAILURE,"Not enough memory for the flag buffer of ",
-	field->rfilename);
-    }
 
   return field;
   }
@@ -262,7 +166,6 @@ void	endfield(picstruct *field)
     endastrom(field);
   if (field->interp_flag)
     end_interpolate(field);
-  end_assoc(field);			/* close learning routines */
   endback(field);
   free(field);
 

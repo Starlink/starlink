@@ -10,7 +10,7 @@
 *	Contents:	functions for extraction of connected pixels from
 *			a bitmap.
 *
-*	Last modify:	28/11/98
+*	Last modify:	05/04/99
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -175,7 +175,7 @@ int	lutz(objliststruct *objlistroot, int nroot, objstruct *objparent,
         {
         if (xl==0 || xl==xmax)
           curpixinfo.flag |= OBJ_TRUNC;
-        memcpy(pixel, plistint, plistsize);
+        memcpy(pixel, plistint, (size_t)plistsize);
         PLIST(pixel, nextpix) = -1;
         curpixinfo.lastpix = curpixinfo.firstpix = cn;
         cn += plistsize;
@@ -333,7 +333,7 @@ void  lutzsort(infostruct *info, objliststruct *objlist)
   {
   objstruct  *obj = objlist->obj+objlist->nobj;
 
-  memset(obj, 0, sizeof(objstruct));
+  memset(obj, 0, (size_t)sizeof(objstruct));
   obj->firstpix = info->firstpix;
   obj->lastpix = info->lastpix;
   obj->flag = info->flag;

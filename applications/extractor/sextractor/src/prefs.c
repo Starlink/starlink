@@ -9,7 +9,7 @@
 *
 *	Contents:	Functions to handle the configuration file.
 *
-*	Last modify:	19/11/98
+*	Last modify:	25/05/99
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -305,6 +305,12 @@ void	useprefs()
    int		i, margin, naper;
    char		*str;
 
+/*-------------------------------- Images ----------------------------------*/
+  prefs.dimage_flag = (prefs.nimage_name>1);
+
+/*--------------------------------- ASSOC ----------------------------------*/
+  prefs.assoc_flag = FLAG(obj2.assoc) || FLAG(obj2.assoc_number);
+
 /*-------------------------------- Extracting ------------------------------*/
   if (prefs.nthresh_type<2)
     prefs.thresh_type[1] = prefs.thresh_type[0];
@@ -367,9 +373,7 @@ void	useprefs()
 /*------------------------------- MASKing ----------------------------------*/
   prefs.blank_flag = (prefs.mask_type!=MASK_NONE);
 
-/*-------------------------------- Flags -----------------------------------*/
-  prefs.dimage_flag = (prefs.nimage_name>1);
-  prefs.assoc_flag = FLAG(obj2.assoc) || FLAG(obj2.assoc_number);
+/*--------------------------- SOM-fitting ----------------------------------*/
   prefs.somfit_flag = FLAG(obj2.flux_somfit);
 
 /*------------------------------ Background --------------------------------*/
@@ -398,45 +402,66 @@ void	useprefs()
     error(EXIT_FAILURE, "*Error*: CHECKIMAGE_NAME(s) and CHECKIMAGE_TYPE(s)",
 		" are not in equal number");
 
-/*----------------------------- WEIGHT-images ------------------------------*/
-  prefs.weight_flag = prefs.dweight_flag = 0;
-  for (i=0; i<prefs.nweight_type; i++)
-    if (prefs.weight_type[i] != WEIGHT_NONE)	/* at least 1 is not NONE */
-      prefs.weight_flag = 1;
+/*---------------------------- PSF-fitting ---------------------------------*/
+  if (FLAG(obj2.flux_psf))
+    prefs.psf_flag = 1;
+  if (prefs.check_flag)
+    for (i=0; i<prefs.ncheck_type; i++)
+      if (prefs.check_type[i] == CHECK_SUBPSFPROTOS
+		|| prefs.check_type[i] == CHECK_PSFPROTOS)
+        prefs.psf_flag = 1;
 
-
-  if (prefs.weight_flag)
+/*---------------------------- PC-fitting ----------------------------------*/
+/* PC-fitting is possible only if a PSF file is loaded */
+  if (prefs.psf_flag)
     {
-    if (prefs.weight_type[0]!= WEIGHT_NONE)
-      prefs.dweight_flag = 1;
+    prefs.pc_flag = FLAG(obj2.mx2_pc);
+    if (prefs.check_flag)
+      for (i=0; i<prefs.ncheck_type; i++)
+        if (prefs.check_type[i] == CHECK_SUBPCPROTOS
+		|| prefs.check_type[i] == CHECK_PCPROTOS
+		|| prefs.check_type[i] == CHECK_PCOPROTOS)
+          prefs.pc_flag = 1;
+    }
 
+/*----------------------------- WEIGHT-images ------------------------------*/
+  if (prefs.nweight_type<2)
+    prefs.weight_type[1] = prefs.weight_type[0];
+
+  prefs.dweight_flag = (prefs.weight_type[0]!= WEIGHT_NONE);
+  prefs.weight_flag = (prefs.weight_type[1]!= WEIGHT_NONE);
+
+  if (prefs.dweight_flag || prefs.weight_flag)
+    {
 /*-- Handle the default weight-threshold values */
-    if (prefs.nweight_thresh<prefs.nweight_type)
-      for (i=prefs.nweight_type; i-- >= prefs.nweight_thresh;)
+    if (prefs.nweight_thresh<2)
+      for (i=2; --i >= prefs.nweight_thresh;)
         prefs.weight_thresh[i] = (prefs.weight_type[i]==WEIGHT_FROMWEIGHTMAP)?
 					0.0 : BIG;
 /*-- Check WEIGHT_IMAGE parameter(s) */
     if ((!prefs.nwimage_name
 	&& ((prefs.weight_type[0]!=WEIGHT_FROMBACK
 		&& prefs.weight_type[0]!=WEIGHT_NONE)
-	|| (prefs.nweight_type>1
-		&& prefs.weight_type[1]!=WEIGHT_FROMBACK
+	|| (prefs.weight_type[1]!=WEIGHT_FROMBACK
 		&& prefs.weight_type[1]!=WEIGHT_NONE)))
 	|| (prefs.nwimage_name<2
-	&& prefs.nweight_type>1
 	&& prefs.weight_type[0]!=WEIGHT_FROMBACK
 	&& prefs.weight_type[0]!=WEIGHT_NONE
 	&& prefs.weight_type[1]!=WEIGHT_FROMBACK
 	&& prefs.weight_type[1]!=WEIGHT_NONE
 	&& prefs.weight_type[0]!=prefs.weight_type[1]))
       error(EXIT_FAILURE, "*Error*: WEIGHT_IMAGE missing","");
-    if (prefs.nwimage_name && prefs.nwimage_name<prefs.nweight_type)
+
+    if (prefs.nwimage_name && prefs.nwimage_name<2)
       prefs.wimage_name[1] = prefs.wimage_name[0];
+    if (prefs.nwimage_name==2 && prefs.nweight_type==1)
+      prefs.nweight_type = 2;
 
 /*-- If detection-only interpolation is needed with 1 Weight image... */
 /*-- ...pretend we're using 2, with only one being interpolated */
     if (prefs.nweight_type==1
-	&& prefs.interp_type[0]==INTERP_VARONLY)
+	&& prefs.nwimage_name && prefs.wimage_name[1]==prefs.wimage_name[0]
+	&& prefs.interp_type[0]==INTERP_VARONLY )
       {
       prefs.nweight_type = 2;
       prefs.weight_type[1] = prefs.weight_type[0];

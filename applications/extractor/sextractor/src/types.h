@@ -5,11 +5,11 @@
 *
 *	Part of:	SExtractor
 *
-*	Author:		E.BERTIN (IAP, Leiden observatory & ESO)
+*	Author:		E.BERTIN (IAP)
 *
 *	Contents:	global type definitions.
 *
-*	Last modify:	20/11/98
+*	Last modify:	11/11/99
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -78,6 +78,8 @@ typedef struct
   float		dflux;				/* integrated det. flux */
   float		flux;				/* integrated mes. flux */
   float		fluxerr;			/* integrated variance */
+  float		flux_prof;			/* PROFILE flux*/
+  float		fluxerr_prof;			/* PROFILE flux variance */
   PIXTYPE	fdpeak;				/* peak intensity (ADU) */
   PIXTYPE	dpeak;				/* peak intensity (ADU) */
   PIXTYPE	peak;				/* peak intensity (ADU) */
@@ -133,6 +135,10 @@ typedef struct
   float		*fluxerr_aper;			/* APER flux error vector  */
   float		*mag_aper;			/* APER magnitude vector */
   float		*magerr_aper;			/* APER mag error vector */
+  float		flux_prof;			/* PROFILE flux*/
+  float		fluxerr_prof;			/* PROFILE flux error */
+  float		mag_prof;			/* PROFILE magnitude */
+  float		magerr_prof;			/* PROFILE magnitude error */
 /* ---- astrometric data */
   double	posx,posy;			/* "FITS" pos. in pixels */
   double	mamaposx,mamaposy;		/* "MAMA" pos. in pixels */
@@ -190,12 +196,13 @@ typedef struct
   float		mag_growthstep;			/* Growth-curve step */
   float		*flux_radius;			/* f-light-radii */
 /* ---- PSF-fitting */
-  float		flux_psf;			/* Flux from PSF-fitting */
-  float		fluxerr_psf;			/* RMS error on PSF flux */
-  float		mag_psf;			/* Mag from PSF-fitting */
-  float		magerr_psf;			/* RMS mag from PSF-fitting */
-  float		x_psf,y_psf;			/* Coords from PSF-fitting */
+  float		*flux_psf;			/* Flux from PSF-fitting */
+  float		*fluxerr_psf;			/* RMS error on PSF flux */
+  float		*mag_psf;			/* Mag from PSF-fitting */
+  float		*magerr_psf;			/* RMS mag from PSF-fitting */
+  float		*x_psf, *y_psf;			/* Coords from PSF-fitting */
   short		niter_psf;			/* # of PSF-fitting iterat. */
+  short		npsf;				/* # of fitted PSFs */
   float		chi2_psf;			/* Red. chi2 of PSF-fitting */
   double	xw_psf, yw_psf;			/* WORLD coords */
   double	alphas_psf, deltas_psf;		/* native alpha, delta */
@@ -219,6 +226,20 @@ typedef struct
 /* ---- PC-fitting */
   double	mx2_pc,my2_pc,mxy_pc;		/* PC 2nd-order parameters */
   float		a_pc,b_pc,theta_pc;		/* PC shape parameters */
+  float		*vector_pc;			/* Principal components */
+  float		gdposang;			/* Gal. disk position angle */
+  float		gdscale;			/* Gal. disk scalelength */
+  float		gdaspect;			/* Gal. disk aspect-ratio */
+  float		gde1,gde2;			/* Gal. disk ellipticities */
+  float		gbratio;			/* Galaxy B/T */
+  float		gbposang;			/* Gal. bulge position angle */
+  float		gbscale;			/* Gal. bulge scalelength */
+  float		gbaspect;			/* Gal. bulge aspect-ratio */
+  float		gbe1,gbe2;			/* Gal. bulge ellipticities */
+  float		flux_galfit;			/* Galaxy tot. flux from fit */
+  float		fluxerr_galfit;			/* RMS error on galfit flux */
+  float		mag_galfit;			/* Galaxy tot. mag from fit */
+  float		magerr_galfit;			/* RMS error on galfit mag */
   }	obj2struct;
 
 /*----------------------------- lists of objects ----------------------------*/
@@ -234,7 +255,7 @@ typedef struct
 
 
 /*----------------------------- image parameters ----------------------------*/
-typedef struct
+typedef struct pic
   {
   char		filename[MAXCHAR];	/* pointer to the image filename */
   char		*rfilename;		/* pointer to the reduced image name */
@@ -257,7 +278,6 @@ typedef struct
   int		ymax;			/* y limit (highest accessible+1) */
   int		yblank;			/* y blanking limit (highest+1) */
   PIXTYPE	*strip;			/* pointer to the image buffer */
-  PIXTYPE	*copystrip;	       	/* pointer to another image buffer */
   FLAGTYPE	*fstrip;		/* pointer to the FLAG buffer */
   int		stripheight;		/* height  of a strip (in lines) */
   int		stripmargin;		/* number of lines in margin */
@@ -304,6 +324,7 @@ typedef struct
   int		*interp_ytimeoutbuf;	/* interpolation timeout line buffer */
   int		interp_xtimeout;	/* interpolation timeout value in x */
   int		interp_ytimeout;	/* interpolation timeout value in y */
+  struct pic	*reffield;	       	/* pointer to a reference field */
   }	picstruct;
 
 
@@ -353,7 +374,7 @@ typedef struct
   int		nweight_type;				/* nb of params */
   int		weight_flag;				/* do we weight ? */
   int		dweight_flag;				/* detection weight? */
-
+  int		weightgain_flag;			/* weight gain? */
 /*----- photometry */
   enum	{CAT_NONE, ASCII, ASCII_HEAD, ASCII_SKYCAT,
 	FITS_LDAC, FITS_BINIMHEAD, FITS_NOIMHEAD, FITS_10}
@@ -379,7 +400,7 @@ typedef struct
   char		back_name[MAXCHAR];			/* bkgnd filename */
   backenum	back_type[2];				/* bkgnd type */
   int		nback_type;				/* nb of params */
-  double        back_val[2];				/* user-def. bkg PWD: modification here*/
+  double	back_val[2];				/* user-def. bkg */
   int		nback_val;				/* nb of params */
   int		backsize[2];				/* bkgnd mesh size */
   int		nbacksize;				/* nb of params */
@@ -450,7 +471,22 @@ typedef struct
   double	flux_frac[MAXNAPER];			/* for FLUX_RADIUS */
   int		nflux_frac;       			/* number of elem. */
 /*----- PSF-fitting */
+  int		psf_flag;				/* PSF-fit needed */
   char		psf_name[MAXCHAR];			/* PSF filename */
+  int		psf_npsfmax;				/* Max # of PSFs */
+  enum	{PSFDISPLAY_SPLIT, PSFDISPLAY_VECTOR}
+		psfdisplay_type;			/* PSF display type */
+  int		psf_xsize,psf_ysize;			/* nb of params */
+  int		psf_xwsize,psf_ywsize;			/* nb of params */
+  int		psf_alphassize,psf_deltassize;		/* nb of params */
+  int		psf_alpha2000size,psf_delta2000size;	/* nb of params */
+  int		psf_alpha1950size,psf_delta1950size;	/* nb of params */
+  int		psf_fluxsize;				/* nb of params */
+  int		psf_fluxerrsize;			/* nb of params */
+  int		psf_magsize;				/* nb of params */
+  int		psf_magerrsize;				/* nb of params */
+  int		pc_flag;				/* PC-fit needed */
+  int		pc_vectorsize;				/* nb of params */
 /*----- customize */
   double	mama_corflex;
   int		fitsunsigned_flag;			/* Force unsign FITS */
