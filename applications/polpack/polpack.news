@@ -25,3 +25,9 @@
       changed. The widths of the margins used to be specified as
       fractions of the height or width of the DATA plot. They are now
       given as fractions of the height or width of the current picture.
+
+   o  A bug has been fixed in POLKA which caused the output NDFs to have 
+      the wrong names if an image was supplied for parameter REFIN. The
+      output images corresponding to the first input image were stored in
+      files appropriate for the second input image, etc., and the output
+      images for the final input image were not produced at all.
