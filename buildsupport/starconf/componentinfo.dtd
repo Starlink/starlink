@@ -146,8 +146,9 @@
 <!-- The installation manifest for one component.  The component ID
      must be the ID attribute of a <component> element.  However it is
      not declared as an IDREF below, as the <manifest> element is
-     sometimes used as a top-level document type. -->
-<!ELEMENT manifest      (version, files)>
+     sometimes used as a top-level document type.  The <files> element
+     may be missing _or_ empty, if for some reason no files were installed. -->
+<!ELEMENT manifest      (version, notes*, files?)>
 <!ATTLIST manifest
         component       CDATA   #REQUIRED
         >
