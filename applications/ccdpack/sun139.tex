@@ -3449,6 +3449,86 @@ change to an empty directory and issue the command ``\text{wcsexercise}''.
 You should delete any files produced by this script.
 
 
+
+\subsubsection{Example AST file}
+
+Finally, we give an example of an AST file which 
+has been constructed for a real 
+instrument.  The instrument is the Wide Field Camera on
+the Isaac Newton Telescope at La Palma,
+and consists of four CCDs each 2048$\times$4096 pixels.
+Because the area occupied by detectors is large, 
+optical distortion effects become quite important near the edges.
+After registering four images {\tt sb1,sb2,sb3,sb4},
+including taking account of a pincushion distortion,
+the file was constructed by the following command:
+\begin{myquote}
+\begin{verbatim}
+% astexp astfile=INT-WFC.ast in='"sb[1234]"' outdomain=INT-WFC
+         outtitle='"INT wide field camera undistorted"'
+         idtype=fitsid fitsid=CHIPNAME fitsrot=ROTSKYPA accept
+\end{verbatim}
+\end{myquote}
+The OUTDOMAIN and OUTTITLE parameters write labels indicating 
+the source of the coordinate information.
+The IDTYPE=FITSID and FITSID=CHIPNAME parameters 
+indicate that the chip which each
+one comes from is to be distinguished by the value of its
+``CHIPNAME'' FITS header card, and the FITSROT=ROTSKYPA
+parameter indicates that the ``ROTSKYPA'' FITS header card
+contains an angle in degrees through which the telescope has
+been rotated.
+Applying this to a set of files from the same instrument has
+the following effect:
+\begin{myquote}
+\begin{verbatim}
+% astimp 'o1059??' astfile=INT-WFC.ast reset accept
+
+    ASTIMP
+    ======
+  Framesets read from file INT-WFC.ast:
+    FITS header "ROTSKYPA" used for rotation
+
+     N    Base domain         Current domain      Frameset ID
+     --   -----------         --------------      -----------
+     1    PIXEL               INT-WFC             FITSID CHIPNAME 'A5506-4'
+     2    PIXEL               INT-WFC             FITSID CHIPNAME 'A5383-17-7'
+     3    PIXEL               INT-WFC             FITSID CHIPNAME 'A5530-3'
+     4    PIXEL               INT-WFC             FITSID CHIPNAME 'A5382-1-7'
+  4 NDFs accessed using parameter IN
+
+  Processing NDF /local2/data/register/intastgen/o105952
+    Matched with frameset ID "FITSID CHIPNAME 'A5506-4'"
+    Rotating additional 180 degrees
+    New frame in domain "INT-WFC" added
+
+  Processing NDF /local2/data/register/intastgen/o105953
+    Matched with frameset ID "FITSID CHIPNAME 'A5383-17-7'"
+    Rotating additional 180 degrees
+    New frame in domain "INT-WFC" added
+
+  Processing NDF /local2/data/register/intastgen/o105954
+    Matched with frameset ID "FITSID CHIPNAME 'A5530-3'"
+    Rotating additional 180 degrees
+    New frame in domain "INT-WFC" added
+
+  Processing NDF /local2/data/register/intastgen/o105955
+    Matched with frameset ID "FITSID CHIPNAME 'A5382-1-7'"
+    Rotating additional 180 degrees
+    New frame in domain "INT-WFC" added
+\end{verbatim}
+\end{myquote}
+Since they now share a coordinate system they can now be, for instance,
+aligned with other images from the same instrument or resampled directly.
+
+The AST file can be found at {\tt \$CCDPACK\_DIR/INT-WFC.ast}.
+It's not perfect; there are still optical distortions at two
+corners and alignment of CCD 2 is poor.  
+If you have data from the WFC then consider
+improving it as an exercise for the reader!
+
+
+
 \subsection{Schematic registration sequences}
 
 One outline for using the various applications is shown in 
