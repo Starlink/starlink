@@ -153,13 +153,6 @@ AC_SUBST(STAR_MESSGEN_SOURCES)
 STAR_DOCUMENTATION=
 AC_SUBST([STAR_DOCUMENTATION])
 
-# Extra files to be distributed.  This is for files added to the
-# distribution list by starconf; files which the user wishes to add
-# should be specified in the usual way, through the automake
-# EXTRA_DIST variable.
-STAR_EXTRA_DIST=
-AC_SUBST(STAR_EXTRA_DIST)
-
 # Create a PACKAGE_VERSION_INTEGER variable, which contains the
 # package's version number as an integer major*1e6+minor*1e3+release.
 eval [`echo $VERSION | sed -e 's/\([0-9]*\)[^0-9]*\([0-9]*\)[^0-9]*\([0-9]*\)/PACKAGE_VERSION_MAJOR=\1; PACKAGE_VERSION_MINOR=\2; PACKAGE_VERSION_RELEASE=\3;/'`]
@@ -193,6 +186,11 @@ AC_SUBST(STAR_MANIFEST_DIR)
 # added as a Makefile variable by default.  We need it below, however,
 # so add it now.
 AC_SUBST(PACKAGE_VERSION)
+
+# Initialise state of predist/postdist flags (see STAR_PREDIST_SOURCES)
+_star_predist_status=unknown
+PREDIST='#'
+AC_SUBST(PREDIST)
 ])# STAR_DEFAULTS
 
 
@@ -219,36 +217,94 @@ AC_SUBST(PACKAGE_VERSION)
 # package also implicitly declares a `sourceset' dependency on the
 # messgen package.
 #
-# This macro leaves the discovered facility name and code in the shell
-# variables star_facilityname and star_facilitycode respectively
-# (these correspond to the last message file, if there is more than
-# one), from where they may be scavenged by the calling configure script.
+# This macro also declares that the .msg files are pre-distribution
+# files (it calls STAR_PREDIST_SOURECS) on them, and so the resulting
+# configure script should expect not to find them in an unpacked
+# distribution.
+#
+# This macro leaves the discovered facility code in the shell variable
+# star_facilitycode (this corresponds to the last message file, if there
+# is more than one), from where it may be scavenged by the calling
+# configure script.  No component should _need_ to use this number -- it
+# is present for historical reasons, and is potentially useful if a
+# component needs an integer which is guaranteed unique to that component.
+#
+# Note that this macro determines the facility code when configure is
+# being generated (as opposed to when it is being run on the build
+# machine), since the .msg file will typically not be distributed, and
+# thus not available when ./configure is run)
 AC_DEFUN([STAR_MESSGEN],
          [#
           m4_ifval([$1], [], [AC_FATAL([$0: called with no message file])])dnl
-          for infile in $1
-          do
-              expr "x$infile" : 'x.*\.msg$' >/dev/null || \
-                { echo "ERROR: facility file $infile does not end in .msg";
-                  exit 1; }
-              if test -r $infile; then
-                  : OK
-              else
-                  echo "Facility file $infile missing or not readable"
-                  exit 1
-              fi
-              # Extract the facility name and code from the .msg file
-              # Format is `.FACILITY name,code/PREFIX=xxx'
-              AC_MSG_CHECKING([facility and code in $infile])
-              eval [`sed -n '/\.FACILITY/{s/.*\.FACILITY[ 	]*\([a-zA-Z]*\) *, *\([0-9]*\).*/star_facilityname=\1; star_facilitycode=\2;/p;q;}' $infile`]
-              star_facilityname=[`echo $star_facilityname | tr '[A-Z]' '[a-z]'`]
-              AC_MSG_RESULT([$star_facilityname/$star_facilitycode])
-              STAR_HELP_FILES(fac_${star_facilitycode}_err)
-              _STAR_EXTRA_DIST(fac_${star_facilitycode}_err)
-          done
+          AC_FOREACH([MsgFileName], [$1],
+                     [m4_define([MsgFacCode],
+                                m4_normalize(esyscmd([sed -n '/\.FACILITY/{s/.*, *\([0-9]*\).*/\1/p;q;}' ]MsgFileName)))dnl
+                      STAR_HELP_FILES([fac_]MsgFacCode[_err])dnl
+                      _STAR_EXTRA_DIST([fac_]MsgFacCode[_err])dnl
+                      star_facilitycode=MsgFacCode
+                     ])
           STAR_DECLARE_DEPENDENCIES([sourceset], [messgen])
+          STAR_PREDIST_SOURCES($1)
           STAR_CHECK_PROGS(messgen)
 ])# STAR_MESSGEN
+
+
+# STAR_PREDIST_SOURCES(source-files)
+# ----------------------------------
+#
+# Give a (space-separated) list of files which should exist only in
+# the pre-distribution (ie, repository checkout) state.  If one of
+# these is found, then the substitution variable PREDIST is set to a
+# blank.  We should find either all of the marker files or none of
+# them; if only some of the marker files are found, this is probably
+# an error of some type, so warn about it.  This means, by the way,
+# that it is the presence or absence of the first marker file which
+# determines whether we are in the predist or postdist state, with the
+# rest providing consistency checks.
+#
+# The macro may be called more than once.  Multiple calls are
+# equivalent to a single call with all the marker files in the list.
+# Automake checks that the files listed here are not in the list of
+# distributed files, and issues a warning if they are.
+AC_DEFUN([STAR_PREDIST_SOURCES],
+[m4_ifval([$1], [], [AC_FATAL([$0: called with no stamp file])])dnl
+for marker in $1
+do
+    if test -e $marker; then
+        _star_predist_marker_present=true
+        AC_MSG_NOTICE([found predist marker file $marker])
+    else
+        _star_predist_marker_present=false
+    fi
+    case $_star_predist_status in
+        unknown)
+            if $_star_predist_marker_present; then
+                # we do want to build sourceset files
+                _star_predist_status=predist
+                PREDIST=
+            else
+                # leave default PREDIST='#'
+                _star_predist_status=postdist
+            fi
+            ;;
+        predist)
+            if $_star_predist_marker_present; then
+                : OK
+            else
+                AC_MSG_WARN([Building predist, but marker file $marker is not present])
+            fi
+            ;;
+        postdist)
+            if $_star_predist_marker_present; then
+                AC_MSG_WARN([Not building predist, but marker file $marker is present])
+            fi
+            ;;
+        *)
+            AC_MSG_ERROR([impossible predist status $_star_predist_status])
+            ;;
+    esac
+done
+])# STAR_PREDIST_SOURCES
 
 
 # STAR_HAVE_FC_OPEN_READONLY
@@ -256,22 +312,9 @@ AC_DEFUN([STAR_MESSGEN],
 #
 # Tests if the Fortran compiler supports the READONLY option on the
 # OPEN command.  If it does, it defines HAVE_FC_OPEN_READONLY to 1.
-AC_DEFUN([STAR_HAVE_FC_OPEN_READONLY],
-         [AC_REQUIRE([AC_PROG_FC])dnl
-          AC_CACHE_CHECK([whether OPEN has the READONLY specifier],
-                         [star_cv_have_fc_open_readonly],
-                         [AC_LANG_PUSH([Fortran])dnl
-                          AC_COMPILE_IFELSE(
-                              AC_LANG_PROGRAM([],
-                                              [      OPEN(UNIT=99,READONLY)]),
-                              [star_cv_have_fc_open_readonly=yes],
-                              [star_cv_have_fc_open_readonly=no])
-                          AC_LANG_POP(Fortran)])
-          if test $star_cv_have_fc_open_readonly = yes; then
-              AC_DEFINE([HAVE_FC_OPEN_READONLY], 1,
-                        [Define to 1 if f77 OPEN has the READONLY specifier])
-          fi
-])
+AU_DEFUN([STAR_HAVE_FC_OPEN_READONLY],
+         [AC_FC_OPEN_SPECIFIERS(READONLY)],
+         [STAR_HAVE_FC_OPEN_READONLY obsolete -- use AC_FC_OPEN_SPECIFIERS instead])
 
 
 # STAR_CNF_COMPATIBLE_SYMBOLS
@@ -624,7 +667,7 @@ AC_DEFUN([STAR_DECLARE_DEPENDENCIES],
           m4_ifval([$2], [], [AC_FATAL([$0: no deplist given])])dnl
           for _star_tmp in $2
           do
-              STAR_DEPENDENCIES_CHILDREN="$STAR_DEPENDENCIES_CHILDREN<[$1]m4_ifval([$3], [ option='$3'], [])>$_star_tmp</$1>"
+              STAR_DEPENDENCIES_CHILDREN="$STAR_DEPENDENCIES_CHILDREN <[$1]m4_ifval([$3], [ option='$3'], [])>$_star_tmp</$1>"
           done
 ])# STAR_DECLARE_DEPENDENCIES
 
@@ -751,15 +794,13 @@ AC_DEFUN([_STAR_EXTRADIR_COMMON],
 
 # _STAR_EXTRA_DIST(filelist)
 # --------------------------
-#
 # Declare a space-separated list of files which should be included in
 # the distribution.  This has the same function as automake's
-# EXTRA_DIST rule.
-AC_DEFUN([_STAR_EXTRA_DIST],
-	 [m4_ifval([$1], [], 
-                         [AC_FATAL([$0: called with empty filelist])])dnl
-          STAR_EXTRA_DIST="$STAR_EXTRA_DIST $1"
-])# _STAR_EXTRA_DIST
+# EXTRA_DIST rule.  This macro expands to nothing -- it is here so
+# that it can be traced by automake, and the arguments placed in the
+# generated Makefile.in as the value of the Makefile variable
+# STAR_EXTRA_DIST.
+AC_DEFUN([_STAR_EXTRA_DIST], [])
 
 
 # end of starconf macros
