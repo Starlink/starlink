@@ -121,6 +121,9 @@
 *      9-JUL-1996: modified to handle v200 data with 5 data per demodulated
 *                  point (JFL).
 *     $Log$
+*     Revision 1.22  1997/07/03 20:20:11  timj
+*     Forgot to remove a print statement.
+*
 *     Revision 1.21  1997/07/03 20:18:10  timj
 *     Output file size is now much smaller (use NDF_SECT before propogation
 *     and copy output data to file after reducing the siwtches).
@@ -1081,8 +1084,6 @@ c
 
          CALL NDF_AMAP (OUT_NDF, 'CENTRE', 2, '_REAL', 'WRITE',
      :        OUT_A_PTR, ITEMP, STATUS)
-
-         print *,'Size of axis is :',ITEMP, N_POS, EXP_POINTER-1
 
          IF (STATUS .EQ. SAI__OK) THEN
             ITEMP = 0
