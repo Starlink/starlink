@@ -6,7 +6,7 @@
 *     yacc grammar
 * 
 *  Purpose:
-*     Specify minimal grammar of C source.
+*     Specify minimal grammar of C source for tagging.
 * 
 *  Description:
 *     This grammar specification provides enough understanding of C source
@@ -256,6 +256,7 @@ identifier
 
 %%
 
+/* Include the lexical analyser source code directly into this file. */
 #include "ctag-l.c"
 
 #include <stdio.h>
