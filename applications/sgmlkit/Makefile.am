@@ -11,6 +11,19 @@ nobase_pkglib_DATA = \
 	$(SL_HTML) \
 	$(SL_TEXML)
 
+texmldir = $(pkglibdir)/lib/texml
+dist_texml_SCRIPTS = \
+	lib/texml/bin/texml.py
+texml_DATA = \
+	lib/texml/bin/handler.py \
+	lib/texml/bin/handler.pyc \
+	lib/texml/bin/specmap.py \
+	lib/texml/bin/specmap.pyc \
+	lib/texml/bin/texmlwr.py \
+	lib/texml/bin/texmlwr.pyc \
+	lib/texml/bin/unimap.py \
+	lib/texml/bin/unimap.pyc
+
 stardocs_DATA = doc/ssn70/ssn70.htx_tar
 
 # The list of DTDs to install is maintained within the dtd/ directory,
@@ -81,5 +94,5 @@ bin/sgml2hlp: bin/sgml2hlp.x
 	chmod +x $@.tmp
 	mv $@.tmp $@
 
-dtd/manifest:
+dtd/manifest: dtd/CATALOG dtd/manifest-omit
 	cd dtd; make manifest
