@@ -1,0 +1,95 @@
+## NDF2FITS - Converts NDFs into FITS files.
+
+#+
+#  Name:
+#     NDF2FITS.IFL
+
+#  Type of module:
+#     ADAM A-task parameter interface.
+
+#  Author:
+#     MJC: Malcolm J. Currie (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     1994 June 26 (MJC):
+#	 Original version.
+#     {enter_changes_here}
+
+#-
+
+interface NDF2FITS
+
+   helplib        'CONVERT_HELP:'
+
+   parameter      BITPIX         # No. of bits per pixel
+      position    4
+      type        'GROUP'
+      vpath       'DEFAULT'
+      ppath       'CURRENT,DYNAMIC'
+      prompt      'Number of bits per pixel'
+      helpkey     '*'
+#     in          '0', '8', '16', '32', '-32', '-64'
+      default     '0'
+   endparameter
+
+   parameter      COMP           # Data, quality or variance?
+      position    3
+      type        'GROUP'
+      vpath       'DEFAULT'
+      ppath       'DEFAULT,CURRENT,DYNAMIC'
+      prompt      'Array components to copy to the FITS file(s)'
+      helpkey     '*'
+#     in          'A', 'D', 'V', 'Q', 'DV', 'VD', 'DQ', 'QD', 'VQ', 'QV'
+      default     'A'
+   endparameter
+
+   parameter      IN             # Input NDF(s)
+      position    1
+      type        'LITERAL'
+      access      'READ'
+      vpath       'PROMPT'
+      ppath       'GLOBAL,CURRENT'
+# Omit output association until wildcards are commonly accepted.
+      association '<->GLOBAL.DATA_ARRAY'
+      prompt      'Input NDF data structure(s)'
+      helpkey     '*'
+   endparameter
+
+   parameter      OUT            # Output FITS file(s)
+      position    2
+      type        'LITERAL'
+      access      'WRITE'
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'Output FITS file(s)'
+      helpkey     '*'
+   endparameter
+
+   parameter      ORIGIN         # Origin of the FITS files
+      position    5
+      type        'LITERAL'
+      vpath       'DEFAULT'
+      ppath       'CURRENT'
+      prompt      'Origin of the FITS files (for the FITS header)'
+      helpkey     '*'
+      default     !
+   endparameter
+
+   parameter      PROEXTS        # Propagate the NDF's extensions
+      type        '_LOGICAL'
+      prompt      'Propagate the NDF extensions?'
+      vpath       'DEFAULT'
+      default     FALSE
+      helpkey     '*'
+   endparameter
+
+   parameter      PROFITS        # Propagate the NDF's FITS extension
+      type        '_LOGICAL'
+      prompt      'Merge the FITS extension of the NDF in the FITS header?'
+      vpath       'DEFAULT'
+      default     TRUE
+      helpkey     '*'
+   endparameter
+
+endinterface
