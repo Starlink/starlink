@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="astrom">
+  <version>3.8</version>
+  <path>applications/astrom</path>
+  <description>Basic astrometry package</description>
+  <abstract><p>ASTROM performs ``plate reductions''.  You supply star
+  positions from a catalogue and the (x,y) ccoordinates of the
+  corresponding star images.  ASTROM uses this information to
+  establish the relationship between (x,y) and (ra,dec) enabling the
+  coordinates of ``unknown stars'' to be determined.</p></abstract>
+  <dependencies >
+    <build>sla</build><build>cfitsio</build><sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>P T Wallace</name>
+      <uname>ptw</uname>
+      <email>P.T.Wallace@rl.ac.uk</email>
+    </person>
+    <person>
+      <name>Norman Gray</name>
+      <uname>nxg</uname>
+      <email>norman@astro.gla.ac.uk</email>
+    </person>
+  </developers>
+  <documentation> sun5</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
