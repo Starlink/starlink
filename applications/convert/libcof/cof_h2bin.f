@@ -70,10 +70,10 @@
 *        Corrected string length arguments used in calls which pass a
 *        character array using %VAL. 
 *     12-MAR-2002 (AJC):
-*        Correct CRDNM for TDIMn card error message.
-*        Add string length to dimensions in TDIMn cards for _CHAR arrays
+*        Correct CRDNM for TDIMn card error message.  Add string length 
+*        to dimensions in TDIMn cards for _CHAR arrays.
 *     2004 September 9 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
 *     {enter_further_changes_here}
 
 *  Bugs:
