@@ -83,6 +83,7 @@
 *     PMA: Peter Allan (Starlink, RAL)
 *     RFWS: R.F. Warren-Smith (Starlink, RAL)
 *     AJC: A.J. Chipperfield (Starlink, RAL)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -103,6 +104,8 @@
 *     23-JUN-2000 (AJC):
 *        Improve documentation re pointers
 *        Tidy refs to CNF routines
+*     6-DEC-2004 (TIMJ):
+*        Report allocation failure as requesting unsigned int bytes
 *     {enter_further_changes_here}
 
 *  Bugs:
