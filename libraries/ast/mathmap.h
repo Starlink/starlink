@@ -19,9 +19,9 @@
 *     provides the type definitions, function prototypes and macros,
 *     etc.  needed to use this class.
 *
-*     The MathMap class implements Mappings that are specified symbolically
-*     by a series of arithmetic expressions that relate output variables
-*     to input variables (and vice versa).
+*     The MathMap class implements Mappings that are specified by a series
+*     of arithmetic expressions that relate output variables to input
+*     variables (and vice versa).
 
 *  Inheritance:
 *     The MathMap class inherits from the Mapping class.
@@ -197,7 +197,7 @@ typedef struct AstMathMap {
    int **invcode;                /* Array of opcodes for inverse functions */
    int fwdstack;                 /* Stack size required by forward functions */
    int invstack;                 /* Stack size required by inverse functions */
-   int nfwd;                     /* Number of forward functiins */
+   int nfwd;                     /* Number of forward functions */
    int ninv;                     /* Number of inverse functions */
    int simp_fi;                  /* Forward-inverse MathMap pairs simplify? */
    int simp_if;                  /* Inverse-forward MathMap pairs simplify? */

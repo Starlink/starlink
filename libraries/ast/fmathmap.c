@@ -80,9 +80,9 @@ F77_INTEGER_FUNCTION(ast_mathmap)( INTEGER(NIN),
 
    astAt( "AST_MATHMAP", NULL, 0 );
    astWatchSTATUS(
-      options = astString( OPTIONS, OPTIONS_length );
       fwd = astStringArray( FWD, *NFWD, FWD_length );
       inv = astStringArray( INV, *NINV, INV_length );
+      options = astString( OPTIONS, OPTIONS_length );
 
 /* Change ',' to '\n' (see AST_SET in fobject.c for why). */
       if ( astOK ) {
@@ -90,11 +90,13 @@ F77_INTEGER_FUNCTION(ast_mathmap)( INTEGER(NIN),
             if ( options[ i ] == ',' ) options[ i ] = '\n';
          }
       }
-      RESULT = astP2I( astMathMap( *NIN, *NOUT, *NFWD, fwd, *NINV, inv,
+      RESULT = astP2I( astMathMap( *NIN, *NOUT,
+                                   *NFWD, (const char **) fwd,
+                                   *NINV, (const char **) inv,
                                    "%s", options ) );
+      astFree( options );
       astFree( inv );
       astFree( fwd );
-      astFree( options );
    )
    return RESULT;
 }
