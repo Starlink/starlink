@@ -40,6 +40,8 @@
 *        The sampling mode
 *     RBIN = REAL (read)
 *        Radial bin size in annular sampling
+*     OUT = CHAR (read)
+*        Output file name for model
 
 *  Examples:
 *     {routine_example_text}
@@ -104,6 +106,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'ADI_PAR'
 
 *  Global Variables:
       INCLUDE 'IMG_CMN'
@@ -122,6 +125,7 @@
       REAL			XPOS, YPOS, R		! Source position
 
       INTEGER			ISRC			! Source number
+      INTEGER			OFID			! Output file id
 *.
 
 *  Check inherited global status.
@@ -241,6 +245,11 @@
 *      Display model residuals
           ELSE IF ( CMD .EQ. 'RDISP' ) THEN
             CALL IBGND_DISP_SURF( .TRUE., STATUS )
+
+*      Save model to file
+          ELSE IF ( CMD .EQ. 'SAVE' ) THEN
+            CALL USI_CREAT( 'OUT', ADI__NULLID, OFID, STATUS )
+            CALL IBGND_SAVE( OFID, STATUS )
 
           END IF
 
@@ -1126,6 +1135,286 @@
 *  Flag current plotting status
       I_DISP = .TRUE.
       I_DISP_1D = .FALSE.
+
+      END
+
+
+
+      SUBROUTINE IBGND_SAVE( FID, STATUS )
+*+
+*  Name:
+*     IBGND_SAVE
+
+*  Purpose:
+*     Save current model to file
+
+*  Language:
+*     Starlink Fortran
+
+*  Type of Module:
+*     Task subroutine
+
+*  Invocation:
+*     CALL IBGND_SAVE( FID, STATUS )
+
+*  Description:
+*     {routine_description}
+
+*  Arguments:
+*     FID = INTEGER (given and returned)
+*        Output file id of of saved model
+*     STATUS = INTEGER (given)
+*        The global status.
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
+*     {algorithm_description}...
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  Implementation Status:
+*     {routine_implementation_status}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
+*     {routine_deficiencies}...
+
+*  References:
+*     {task_references}...
+
+*  Keywords:
+*     ibgnd, usage:private
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1995
+
+*  Authors:
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*     23 Jan 1996 (DJA):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'QUAL_PAR'
+
+*  Global Variables:
+      INCLUDE 'IMG_CMN'
+
+*  Arguments Given and Returned:
+      INTEGER			FID
+
+*  Status:
+      INTEGER			STATUS             	! Global status
+
+*  External References:
+      EXTERNAL			BIT_ANDUB
+        BYTE			BIT_ANDUB
+      EXTERNAL			BIT_NOTUB
+        BYTE			BIT_NOTUB
+
+*  Local Variables:
+      INTEGER			DIMS(2)			! Output dimensions
+      INTEGER			DPTR			! Output data array
+      INTEGER			IAX			! Loop over axes
+      INTEGER			QPTR			! Output quality array
+
+      BYTE			MASK			! Output quality mask
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Link output image
+      DIMS(1) = I_NX
+      DIMS(2) = I_NY
+      CALL BDI_LINK( 'XYimage', 2, DIMS, 'REAL', FID, STATUS )
+
+*  Top level text
+      CALL BDI_PUT0C( FID, 'Title', 'Background model image', STATUS )
+      CALL BDI_PUT0C( FID, 'Label', I_LABEL, STATUS )
+      CALL BDI_PUT0C( FID, 'Units', I_UNITS, STATUS )
+
+*  Write out data
+      CALL BDI_MAPR( FID, 'Data', 'WRITE', DPTR, STATUS )
+      CALL ARR_COP1R( I_NX*I_NY, %VAL(I_BGM_DPTR), %VAL(DPTR), STATUS )
+      CALL BDI_UNMAP( FID, 'Data', DPTR, STATUS )
+
+*  Write quality
+      MASK = BIT_ANDUB( QUAL__MASK, BIT_NOTUB(QUAL__PATCHED) )
+      CALL BDI_PUT0UB( FID, 'QualityMask', MASK, STATUS )
+      CALL BDI_MAPUB( FID, 'Quality', 'WRITE', QPTR, STATUS )
+      CALL IBGND_IDX2Q( I_NX*I_NY, %VAL(I_BGM_SAMIDX), %VAL(QPTR),
+     :                  STATUS )
+      CALL BDI_UNMAP( FID, 'Quality', QPTR, STATUS )
+
+*  Copy axes
+      DO IAX = 1, 2
+        CALL BDI_AXCOPY( I_FID, IAX, ' ', FID, IAX, STATUS )
+      END DO
+
+*  Copy ancilliary stuff from input
+      CALL UDI_COPANC( I_FID, ' ', FID, STATUS )
+
+      END
+
+
+
+      SUBROUTINE IBGND_IDX2Q( N, IDX, QUAL, STATUS )
+*+
+*  Name:
+*     IBGND_IDX2Q
+
+*  Purpose:
+*     Convert sampling index value to quality
+
+*  Language:
+*     Starlink Fortran
+
+*  Type of Module:
+*     Task subroutine
+
+*  Invocation:
+*     CALL IBGND_IDX2Q( N, IDX, QUAL, STATUS )
+
+*  Description:
+*     {routine_description}
+
+*  Arguments:
+*     N = INTEGER (given)
+*        Number of pixels in image
+*     IDX[N] = INTEGER (given)
+*        Sampling index per pixel, -1 for outside region, 0 for bad quality,
+*        <sample> otherwise
+*     QUAL[N] = BYTE (returned)
+*        Quality value per pixel
+*     STATUS = INTEGER (given and returned)
+*        The global status.
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
+*     {algorithm_description}...
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  Implementation Status:
+*     {routine_implementation_status}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
+*     {routine_deficiencies}...
+
+*  References:
+*     {task_references}...
+
+*  Keywords:
+*     ibgnd, usage:private
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1995
+
+*  Authors:
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*     23 Jan 1996 (DJA):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'QUAL_PAR'
+
+*  Arguments Given:
+      INTEGER			N, IDX(*)
+
+*  Arguments Returned:
+      BYTE			QUAL(*)
+
+*  Status:
+      INTEGER			STATUS             	! Global status
+
+*  Local Variables:
+      INTEGER			I			! Loop over arrays
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Loop over input index
+      DO I = 1, N
+        IF ( IDX(I) .LT. 0 ) THEN
+          QUAL(I) = QUAL__MISSING
+        ELSE IF ( IDX(I) .EQ. 0 ) THEN
+          QUAL(I) = QUAL__PATCHED
+        ELSE
+          QUAL(I) = QUAL__GOOD
+        END IF
+      END DO
 
       END
 
@@ -2910,7 +3199,7 @@
 *    Function declarations :
 *    Local constants :
       INTEGER MLINE
-      PARAMETER (MLINE=15)
+      PARAMETER (MLINE=16)
 *    Local variables :
       CHARACTER*79 MTEXT(MLINE)
      :/' Source commands:',' ',
@@ -2920,6 +3209,7 @@
      : ' ', ' Sampling commands:',' ',
      : '  SETSAMP - Set sampling mode (WHOLE, ANNULUS or BOX)',
      : '  SETFIT  - Method of sample interpolation',
+     : '  SAVE    - Save current model to a file',
      : ' ', ' Plotting commands:',' ',
      : '  DISP    - Display background model image',
      : '  RDISP   - Display data - background model residuals'/
