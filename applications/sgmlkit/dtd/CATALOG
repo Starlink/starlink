@@ -28,8 +28,11 @@ public "-//Starlink//DTD Fortran Source Code 0.1//EN"	"fortrancode-0.1.dtd"
 public "-//Starlink//DTD Fortran Source Code 0.2//EN"	"fortrancode-0.2.dtd"
 public "-//Starlink//DTD DSSSL Source Code 0.2//EN"	"dssslcode-0.2.dtd"
 
+--
 public "-//Starlink//DTD tth equation list//EN"		"tth-equations.dtd"
-
+--
+system "tth-equation-list"				"tth-equations.dtd"
+system "img-eqlist"					"img-eqlist.dtd"
 
 	--
 	   OASIS exchange table model.
