@@ -1,11 +1,13 @@
 import org.w3c.dom.*;
 import java.io.PrintStream;
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
+import java.util.TreeSet;
 import java.util.regex.Pattern;
 
 
@@ -498,27 +500,35 @@ public class GenerateDependencies {
         for (Iterator ci = Component.allComponents(); ci.hasNext(); ) {
             Component c = (Component)ci.next();
 
-            Set ssdeps = c.getCompleteDependencies(Dependency.SOURCESET);
-            if (ssdeps == null) {
+            Set ssdeps = new TreeSet(Dependency.simpleComparator());
+            Set s = c.getCompleteDependencies(Dependency.SOURCESET);
+            if (s == null) {
                 System.err.println
                         ("Circularity detected in sourceset dependencies of "
                          + c.getName());
                 globalStatus++;
                 continue;
             }
+            ssdeps.addAll(s);
 
-            Set builddeps = c.getCompleteDependencies(Dependency.BUILD);
-            if (builddeps == null) {
+            s = c.getCompleteDependencies(Dependency.BUILD);
+            if (s == null) {
                 System.err.println
                         ("Circularity detected in build dependencies of "
                          + c.getName());
                 globalStatus++;
                 continue;
             }
+            Set builddeps = new TreeSet(Dependency.simpleComparator());
+            
+            builddeps.addAll(s);
             builddeps.addAll(ssdeps);
 
+            Set confdeps = new TreeSet(Dependency.simpleComparator());
+            confdeps.addAll(c.getCompleteDependencies(Dependency.CONFIGURE));
+
             if (builddeps.isEmpty()) {
-                // implies ssdeps is empty, too
+                // implies ssdeps and confdeps are empty, too
                 flatdeps.println("<!-- no dependencies for " + c + " -->");
             } else {
                 flatdeps.println("<component id='" + c + "'");
@@ -543,6 +553,11 @@ public class GenerateDependencies {
                                  + "'");
                 flatdeps.println("\t>");
                 flatdeps.println("<dependencies>");
+                if (! confdeps.isEmpty())
+                    for (Iterator i=confdeps.iterator(); i.hasNext(); ) {
+                        flatdeps.println
+                                ("<configure>" + i.next() + "</configure>");
+                    }
                 if (! ssdeps.isEmpty())
                     for (Iterator i=ssdeps.iterator(); i.hasNext(); ) {
                         flatdeps.println
@@ -1041,6 +1056,8 @@ public class GenerateDependencies {
         private static Set configureDependencyObjectSet
                 = new java.util.HashSet();
 
+        private static Comparator simpleComparatorImpl = null;
+
 
         private Dependency(String type,
                            Component component,
@@ -1153,6 +1170,32 @@ public class GenerateDependencies {
             return dependsOnComponent.hashCode()
                     ^ mytype.hashCode()
                     ^ (option == null ? "" : option).hashCode();
+        }
+
+        /**
+         * Returns a Comparator object, which compares based only on
+         * names, rather than types and options, as this class as a
+         * whole does.  Thus:
+         *
+         * <p><strong>Note</strong> This comparator imposes orderings
+         * that are inconsistent with equals, since it regards
+         * objects as equal when the <code>equals()</code> method on
+         * <code>Dependency</code> distinguishes them.
+         */
+        public static Comparator simpleComparator() {
+            if (simpleComparatorImpl == null) {
+                simpleComparatorImpl = new Comparator() {
+                        public boolean equals(Object o) {
+                            return o == simpleComparatorImpl;
+                        }
+                        public int compare(Object o1, Object o2) 
+                                throws ClassCastException {
+                            return ((Dependency)o1).component()
+                                    .compareTo(((Dependency)o2).component());
+                        }
+                    };
+            }
+            return simpleComparatorImpl;
         }
 
         /**
