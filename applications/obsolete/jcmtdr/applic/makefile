@@ -93,7 +93,7 @@
 #     is used if the environment variable STARLINK is not defined).
 #        dat_par
 #        sae_par
-#        dtacodes.inc
+#        dtacodes
 #        dynamic_memory.inc
 #        ../subs/astro_par.inc
 #
@@ -447,9 +447,9 @@ export_source:
 
 ASTRO_PAR:  ../subs/astro_par.inc;         $(LINK) $? $@
 DAT_PAR:    $(STAR_INC)/dat_par;           $(LINK) $? $@
-DTA_CODES:  $(FIG_INC)/dtacodes.inc;       $(LINK) $? $@
-DYN_MEMORY: $(FIG_INC)/dynamic_memory.inc; $(LINK) $? $@
-GSD_PARS:   ../gsd/gsd_pars.inc;           $(LINK) $? $@
+DTA_CODES:  $(FIG_INC)/dtacodes;           $(LINK) $? $@
+DYN_MEMORY: $(FIG_INC)/dynamic_memory_inc; $(LINK) $? $@
+GSD_PARS:   $(STAR_INC)/gsd_par;           $(LINK) $? $@
 PRM_PAR:    $(STAR_INC)/prm_par;           $(LINK) $? $@
 SAE_PAR:    $(STAR_INC)/sae_par;           $(LINK) $? $@
 
