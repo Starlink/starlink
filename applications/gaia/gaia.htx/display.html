@@ -87,5 +87,18 @@ Finally you can put the control panel in a window of its own:
 </pre>
 This option is designed for very restricted size monitors.
 </p>
+ 
+<h3>Displaying data cubes</h3>
+    If your data are really three dimensional cubes then you can still display
+    them. There are two basic ways that this will be done. The default method
+    is to provide a toolbox that allows you to step through the image planes
+    of the cube (you can also go to this directly using the "Open cube.." item
+    in the File menu), or you can display the cube as a stretched out series of
+    images running from the bottom to the top of the image display. To get
+    this latter behaviour you will need to start GAIA with the
+    <tt>-check_for_cubes</tt> option set to <tt>0</tt>, and have a NDF
+    format cube. See the tool
+    <a href="ndfcube.html">help</a> for more.
+
   </body>
 </html>

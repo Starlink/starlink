@@ -146,11 +146,27 @@ itcl::class gaia::GaiaNDFCube {
       add_short_help $itk_component(index) \
          {Index of the image plane to display (along current axis)}
 
+      #  Index coordinate.
+      itk_component add indexlabel {
+         LabelValue $w_.indexlabel \
+            -text {Coordinate of plane:} \
+            -labelwidth $lwidth
+      }
+      pack $itk_component(indexlabel) -side top -fill x
+
+      #  Index coordinate type.
+      itk_component add indextype {
+         LabelValue $w_.indextype \
+            -text {Coordinate type:} \
+            -labelwidth $lwidth
+      }
+      pack $itk_component(indextype) -side top -fill x
+
       #  Add tab window for choosing either the animation or collapse
       #  controls. 
       itk_component add tabnotebook {
          iwidgets::tabnotebook $w_.tab \
-            -angle 0 -tabpos n -width 350 -height 200
+            -angle 0 -tabpos n -width 350 -height 250
       }
       pack $itk_component(tabnotebook) -fill both -expand 1
 
@@ -186,6 +202,14 @@ itcl::class gaia::GaiaNDFCube {
       add_short_help $itk_component(lower) \
          {Lower index used during animation}
 
+      #  Coordinate.
+      itk_component add lowerlabel {
+         LabelValue $animationTab.lowerlabel \
+            -text {Coordinate:} \
+            -labelwidth $lwidth
+      }
+      pack $itk_component(lowerlabel) -side top -fill x
+
       itk_component add upper {
          LabelEntryScale $animationTab.upper \
             -text {Upper index:} \
@@ -204,6 +228,34 @@ itcl::class gaia::GaiaNDFCube {
       pack $itk_component(upper) -side top -fill x -ipadx 1m -ipady 2m
       add_short_help $itk_component(upper) \
          {Upper index used during animation}
+
+      #  Coordinate.
+      itk_component add upperlabel {
+         LabelValue $animationTab.upperlabel \
+            -text {Coordinate:} \
+            -labelwidth $lwidth
+      }
+      pack $itk_component(upperlabel) -side top -fill x
+
+      #  Delay used in animation.
+      itk_component add delay {
+         LabelEntryScale $animationTab.delay \
+            -text {Delay (milli):} \
+            -value $itk_option(-delay) \
+            -labelwidth $lwidth \
+            -valuewidth 20 \
+            -from 0 \
+            -to 5000 \
+            -increment 100 \
+            -resolution 10 \
+            -show_arrows 1 \
+            -anchor w \
+            -delay 25 \
+            -command [code $this set_delay_]
+      }
+      pack $itk_component(delay) -side top -fill x -ipadx 1m -ipady 2m
+      add_short_help $itk_component(delay) \
+         {Delay used during animation in milliseconds}
 
       itk_component add animation {
          frame $animationTab.animation
@@ -252,6 +304,15 @@ itcl::class gaia::GaiaNDFCube {
       add_short_help $itk_component(collower) \
          {Lower index used for creating collapsed image}
 
+      #  Coordinate.
+      itk_component add collowerlabel {
+         LabelValue $collapseTab.collowerlabel \
+            -text {Coordinate:} \
+            -labelwidth $lwidth
+      }
+      pack $itk_component(collowerlabel) -side top -fill x
+
+
       itk_component add colupper {
          LabelEntryScale $collapseTab.colupper \
             -text {Upper index:} \
@@ -270,6 +331,14 @@ itcl::class gaia::GaiaNDFCube {
       pack $itk_component(colupper) -side top -fill x -ipadx 1m -ipady 2m
       add_short_help $itk_component(colupper) \
          {Upper index used for creating collapsed image}
+
+      #  Coordinate.
+      itk_component add colupperlabel {
+         LabelValue $collapseTab.colupperlabel \
+            -text {Coordinate:} \
+            -labelwidth $lwidth
+      }
+      pack $itk_component(colupperlabel) -side top -fill x
 
       #  Method used for collapse.
       itk_component add combination {
@@ -376,18 +445,27 @@ itcl::class gaia::GaiaNDFCube {
          $itk_component(collower) configure -from $plane_min_ -to $plane_max_
          $itk_component(colupper) configure -from $plane_min_ -to $plane_max_
 
+         $itk_component(lower) configure -value $plane_min_
          set_lower_bound_ $plane_min_
+         $itk_component(upper) configure -value $plane_max_
          set_upper_bound_ $plane_max_
 
+         $itk_component(collower) configure -value $plane_min_
          set_collapse_lower_bound_ $plane_min_
+         $itk_component(colupper) configure -value $plane_max_
          set_collapse_upper_bound_ $plane_max_
+
+         #  Label and units.
+         set vlu [get_coord_ $plane_ 1]
+         set trail [lassign $vlu value]
+         $itk_component(indextype) configure -value $trail
          
          set plane_ $plane_min_
          set_display_plane_ [expr (${plane_max_}- ${plane_min_})/2]
       }
    }
    
-   #  Set the plane to display.
+   #  Set the plane to display and display it.
    protected method set_display_plane_ { newvalue } {
       if { $newvalue != $plane_ && $ndfname_ != {} } {
          if { $newvalue >= $plane_max_ } {
@@ -406,6 +484,7 @@ itcl::class gaia::GaiaNDFCube {
             set section "(,,$plane_)"
          }
          display_ ${ndfname_}$section
+         $itk_component(indexlabel) configure -value [get_coord_ $plane_]
       }
    }
    
@@ -418,11 +497,29 @@ itcl::class gaia::GaiaNDFCube {
    #  Set the animation lower bound.
    protected method set_lower_bound_ {bound} {
       set lower_bound_ $bound
+      $itk_component(lowerlabel) configure -value [get_coord_ $bound]
    }
 
    #  Set the animation upper bound.
    protected method set_upper_bound_ {bound} {
       set upper_bound_ $bound
+      $itk_component(upperlabel) configure -value [get_coord_ $bound]
+   }
+
+   #  Get the coordinate of an index along the current axis.
+   protected method get_coord_ {index {trail 0}} {
+      if { $axis_ == 1 } {
+         set section [list $index 1 1]
+      } elseif { $axis_ == 2 } {
+         set section [list 1 $index 1]
+      } else {
+         set section [list 1 1 $index]
+      }
+      set coord {}
+      catch {
+         set coord [$rtdimage_ ndf query $id_ coord $axis_ $section $trail]
+      }
+      return $coord
    }
 
    #  Start the animation.
@@ -446,6 +543,11 @@ itcl::class gaia::GaiaNDFCube {
       }
    }
 
+   #  Set the animation delay.
+   protected method set_delay_ {delay} {
+      configure -delay $delay
+   }
+
    #  Increment the displayed section by one.
    protected method increment_ {} {
       if { $plane_ >= $lower_bound_ && $plane_ < $upper_bound_ } {
@@ -461,11 +563,13 @@ itcl::class gaia::GaiaNDFCube {
    #  Set the collapse lower bound.
    protected method set_collapse_lower_bound_ {bound} {
       set lower_collapse_bound_ $bound
+      $itk_component(collowerlabel) configure -value [get_coord_ $bound]
    }
 
    #  Set the collapse upper bound.
    protected method set_collapse_upper_bound_ {bound} {
       set upper_collapse_bound_ $bound
+      $itk_component(colupperlabel) configure -value [get_coord_ $bound]
    }
 
    # Set the combination type

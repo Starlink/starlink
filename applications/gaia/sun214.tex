@@ -18,10 +18,10 @@
 % Variable part - replace [xxx] as appropriate.
 \newcommand{\stardocnumber}    {214.15}
 \newcommand{\stardocauthors}   {Peter W. Draper, Norman Gray \& David S. Berry}
-\newcommand{\stardocdate}      {28th April 2004}
+\newcommand{\stardocdate}      {29th October 2004}
 \newcommand{\stardoctitle}     {GAIA -- Graphical Astronomy and
                                 Image Analysis Tool}
-\newcommand{\stardocversion}   {2.11}
+\newcommand{\stardocversion}   {2.12}
 \newcommand{\stardocmanual}    {User's Manual}
 
 \newcommand{\stardocabstract} {GAIA is an image display and analysis
@@ -357,26 +357,27 @@ A list of images can be displayed in GAIA using the command:
 \end{quote}
 These will be displayed in separate clones.
 
-\subsection{\xlabel{using_gaia_from_irafcl}Using GAIA from IRAF/CL}
+% No longer available
+%\subsection{\xlabel{using_gaia_from_irafcl}Using GAIA from IRAF/CL}
 
-GAIA can be used from the IRAF/CL command-line (providing it has been
-installed on your system). Before you can actually run the main program
-you first need to initialize the \mytt{gaia} package:
-\begin{quote}
-\mytt{cl> gaia}
-\end{quote}
-(you could do this once and for all in your \mytt{login.cl}
-file). Next you need to use the \mytt{gaiadisp} command. This command
-has two arguments, the name of the image to display and the plane
-(\textit{i.e.} GAIA clone) that you want to display into. So for instance
-if you wanted to display the default IRAF test image you'd use a
-command like:
-\begin{quote}
-\mytt{cl> gaiadisp dev\$pix.imh 1}
-\end{quote}
-This will either display into an existing GAIA or start up a new
-instance. Note that GAIA is not an IRAF image display and will
-consequently not support any IRAF cursor commands.
+%GAIA can be used from the IRAF/CL command-line (providing it has been
+%installed on your system). Before you can actually run the main program
+%you first need to initialize the \mytt{gaia} package:
+%\begin{quote}
+%\mytt{cl> gaia}
+%\end{quote}
+%(you could do this once and for all in your \mytt{login.cl}
+%file). Next you need to use the \mytt{gaiadisp} command. This command
+%has two arguments, the name of the image to display and the plane
+%(\textit{i.e.} GAIA clone) that you want to display into. So for instance
+%if you wanted to display the default IRAF test image you'd use a
+%command like:
+%\begin{quote}
+%\mytt{cl> gaiadisp dev\$pix.imh 1}
+%\end{quote}
+%This will either display into an existing GAIA or start up a new
+%instance. Note that GAIA is not an IRAF image display and will
+%consequently not support any IRAF cursor commands.
 
 \section{\xlabel{what_does_it_actually_do}What does it actually do?}
 
@@ -424,6 +425,13 @@ GAIA provides the following normal ``image display tool'' features:
 \item Real time pixel value table. A table displaying the data
   values and simple statistics of a region about the cursor can be
   displayed.
+
+\item Display of image planes from data cubes. Using this you can step
+  through on the axes and display the image formed by the other two axes. 
+  You can also combine a range of image planes or do the stepping
+  using a timed animation. The displayed images created by this tool can be 
+  analysed just like any other image, but the data format should be 
+  NDF for efficiency.
 
 \end{itemize}
 

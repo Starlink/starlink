@@ -478,6 +478,7 @@ itcl::class gaia::GaiaAstGrid {
          lappend options \
             "labelat(2)=[radec_to_radian_ 2 $position_($this,labelat2)]"
       }
+
       lappend options "labelup(1)=$position_($this,labelup1)"
       lappend options "labelup(2)=$position_($this,labelup2)"
       lappend options "labelling=$position_($this,labelling)"

@@ -85,6 +85,11 @@ extern "C" {
     int gaiaSimpleQueryBounds( int ndfid, int ndimx, int lbnd[], int ubnd[], 
                                int *ndim, char **error_mess );
 
+    /* Query the coordinate of a position along the given axis. */
+    int gaiaSimpleQueryCoord( int ndfid, int axis, double *coords, 
+                              int ncoords, int trailed, char **coord,
+                              char **error_mess );
+
 #ifdef __cplusplus
 }
 #endif
