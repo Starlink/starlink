@@ -192,7 +192,7 @@
         END IF
 
 *      Load graphics control from file
-        CALL GCB_FLOAD( GFID, STATUS )
+        CALL GCB_FLOAD( GID, STATUS )
 
 *      Any notes there?
         CALL GCB_GETI( 'MARKER_N', OK, NMARK, STATUS )
