@@ -24,6 +24,8 @@
 #     1997 Nov 21 (TimJ)
 #        Fix prompt string for 'IN' so that it no longer asks for an
 #	 extinction correction.
+#     1998 Jan 6 (TimJ)
+#        Add the CVAR variable.
 #-
 
    INTERFACE SKYDIP
@@ -37,6 +39,14 @@
 	DEFAULT  -1.0
         RANGE    -1000000, 1.0
 	HELPKEY '*'
+      ENDPARAMETER
+
+      PARAMETER CVAR
+        PROMPT 'Use the same variance for each point'
+        TYPE '_LOGICAL'
+        DEFAULT 'TRUE'
+        HELPKEY '*'
+        PPATH   'CURRENT,DEFAULT'
       ENDPARAMETER
  
       PARAMETER   ETA_TEL
