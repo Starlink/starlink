@@ -77,7 +77,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! Starlink data constants
-      INCLUDE '/star/include/msg_par'          ! MSG constants
+      INCLUDE 'MSG_PAR'          ! MSG constants
       INCLUDE 'DAT_PAR'          ! DAT constants.
       INCLUDE 'IRA_PAR'          ! IRA constants.
       INCLUDE 'I90_DAT'          ! IRAS90 data.
