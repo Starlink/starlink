@@ -82,6 +82,7 @@
       LOGICAL                   P_EOK(PSF_NMAX)   	! Psf energy dependent?
       INTEGER		        P_INST(PSF_NMAX)	! Internal instance data
       LOGICAL			P_GOTAX(PSF_NMAX)	! Got axis stuff yet?
+      CHARACTER*(DAT__SZLOC)	P_LOC(PSF_NMAX)
 
 *    Time and energy bands
       LOGICAL                   TE_INIT           	! Initialised yet?
@@ -89,7 +90,7 @@
       DOUBLE   PRECISION        TE_TLO, TE_THI    	! Time bands
 
 *    Character common block
-      COMMON /PSF_CMN_C/	L_NAME, L_MODN 		! Library stuff
+      COMMON /PSF_CMN_C/	P_LOC,L_NAME, L_MODN 		! Library stuff
 
 *    Non-character common block
       COMMON /PSF_CMN/
