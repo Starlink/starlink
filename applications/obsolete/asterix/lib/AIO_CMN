@@ -1,0 +1,21 @@
+*+  AIO_CMN - Common blocks for AIO sub-package
+*-
+
+      CHARACTER*80		AIO_FILE			! Output file
+      CHARACTER*7   		AIO_TYPE			! Channel type
+      CHARACTER*(PAR__SZNAM) 	AIO_PARNAM			! ADAM par name
+
+      INTEGER       		AIO_ITYPE			! Code of _TYPE
+      INTEGER 			AIO_FID				! FIO descriptor
+      INTEGER			AIO_WIDTH			! Channel width
+      INTEGER			AIO_MODE			! Output mode
+
+      LOGICAL       		AIO_DEF				! Channel defined?
+      LOGICAL			AIO_WRAP			! Wrap on?
+
+*    Non-character common block
+      COMMON /AIO_CMN/ AIO_ITYPE,AIO_FID,AIO_WIDTH,AIO_MODE,AIO_DEF,
+     :                 AIO_WRAP
+
+*    Character common block
+      COMMON /AIO_CMN_C/ AIO_FILE,AIO_TYPE,AIO_PARNAM

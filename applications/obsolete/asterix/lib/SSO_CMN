@@ -1,0 +1,41 @@
+*+  SSO_CMN - SSO system
+*-
+
+*    Max active datasets
+      INTEGER      SSO__MXDS
+        PARAMETER  ( SSO__MXDS = 12 )
+
+*    Max mapped items
+      INTEGER      SSO__MXMI
+        PARAMETER  ( SSO__MXMI = SSO__MXDS*4 )
+
+*    The two types of mapped item
+      INTEGER      SSO__MI_DATA, SSO__MI_ERROR
+        PARAMETER  ( SSO__MI_DATA=1, SSO__MI_ERROR=2 )
+
+*    Dataset description
+      STRUCTURE    /SSO_DS_REC/
+        CHARACTER*(DAT__SZLOC)      LOC              ! Dataset locator
+        LOGICAL                     USED             ! Slot in use?
+      END STRUCTURE
+
+*    SSO mapped item
+      STRUCTURE    /SSO_MI_REC/
+        INTEGER                     DS               ! Dataset number
+        CHARACTER*(DAT__SZNAM)      FLD              ! Field name
+        CHARACTER*(DAT__SZLOC)      FLOC             ! Field locator
+        INTEGER                     TYPE             ! Type of mapped item
+        INTEGER                     PTR              ! Pointer to object
+        LOGICAL                     MAPPED           ! Object mapped?
+        LOGICAL                     USED             ! Slot in use?
+      END STRUCTURE
+
+*    SSO system block
+      STRUCTURE    /SSO_SYS/
+        RECORD /SSO_DS_REC/         DS(SSO__MXDS)
+        RECORD /SSO_MI_REC/         MI(SSO__MXMI)
+      END STRUCTURE
+
+*    Declare common block
+      RECORD /SSO_SYS/ SSO
+      COMMON /SSO_CMN/ SSO

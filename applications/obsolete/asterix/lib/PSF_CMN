@@ -1,0 +1,109 @@
+*+  PSF_CMN - PSF system common block definition
+*
+*     History :
+*
+*      24 Oct 89 : Original (BHVAD::DJA)
+*      23 Feb 90 : Added module name list for PSF_DISPLAY (DJA)
+*       8 Mar 90 : Removed TE block from psf data record (DJA)
+*      25 Oct 92 : Added energy options (DJA)
+*      21 Apr 93 : Added EVDS and EOK logicals and some spare slots (DJA)
+*      14 Dec 93 : Added fields for spatial response handling (DJA)
+*      29 Jan 94 : Added PSFINIT flag (DJA)
+*      10 Mar 94 : Last structures removed (DJA)
+*-
+
+      INTEGER                   PSF_E_NONE        	! Energy modes
+        PARAMETER               ( PSF_E_NONE = 0 )
+      INTEGER                   PSF_E_CHANNEL
+        PARAMETER               ( PSF_E_CHANNEL = 1 )
+      INTEGER                   PSF_E_MODEL
+        PARAMETER               ( PSF_E_MODEL = 2 )
+
+      INTEGER                   PGRID_MAXR		! Max bins in polar model
+        PARAMETER               ( PGRID_MAXR = 30 )
+
+*    Psf system initialised
+      LOGICAL                 	PSFINIT			! System initialised?
+
+*    Spatial model
+      LOGICAL		        SM_SIZEDEF(PSF_NMAX) 	! Model extent defined?
+      INTEGER                   SM_NX(PSF_NMAX)   	! Model extent
+      INTEGER                   SM_NY(PSF_NMAX)   	! Model extent
+      INTEGER                   SM_NELM(PSF_NMAX) 	! Product of NX and NY
+      LOGICAL		        SM_GOTDATA(PSF_NMAX) 	! DATA allocated yet?
+      INTEGER                   SM_DATA(PSF_NMAX) 	! The model psf ptr
+      INTEGER                   SM_FLAG(PSF_NMAX) 	! The model psf flag array
+      INTEGER                   SM_TYPE(PSF_NMAX) 	! The model type
+      INTEGER                   SM_NMOD(PSF_NMAX) 	! # model psfs in DATA
+      INTEGER                   SM_P_NA(PSF_NMAX)	! Polar pars
+      INTEGER                   SM_P_NR(PSF_NMAX)	!   "    "
+      LOGICAL		        SM_P_REG(PSF_NMAX)	!   "    "
+      REAL		        SM_P_DR(PSF_NMAX)	!   "    "
+      REAL		        SM_P_RUP(PGRID_MAXR,    !   "    "
+     :                                 PSF_NMAX)
+      INTEGER                   SM_R_NX(PSF_NMAX)	! Rectangular pars
+      INTEGER                   SM_R_NY(PSF_NMAX)	!      "       "
+      REAL		        SM_R_DX(PSF_NMAX)	!      "       "
+      REAL		        SM_R_DY(PSF_NMAX)	!      "       "
+
+*    Energy model
+      INTEGER                   EM_MODE(PSF_NMAX)
+      INTEGER                   EM_NBIN(PSF_NMAX)
+      INTEGER                   EM_CBPTR(PSF_NMAX)
+      INTEGER                   EM_OK(PSF_NMAX)
+
+*    Library data
+      CHARACTER*80              L_NAME(PSF_LMAX)  	! Library names
+      CHARACTER*15              L_MODN(PSF_NMAX,  	! Module names
+     :                               PSF_LMAX)
+      INTEGER                   L_MOD_I(PSF_NMAX, 	! Psf init routines
+     :                                PSF_LMAX)
+      INTEGER                   L_MOD_D(PSF_NMAX, 	! Psf data routines
+     :                                PSF_LMAX)
+      INTEGER                   L_MOD_H(PSF_NMAX, 	! Psf hint routines
+     :                                PSF_LMAX)
+      INTEGER                   L_MOD_DEF(PSF_NMAX, 	! Psf def routines
+     :                                PSF_LMAX)
+      INTEGER                   L_MOD_PFL(PSF_NMAX, 	! Psf profile routines
+     :                                PSF_LMAX)
+      INTEGER                   L_MOD_C(PSF_NMAX, 	! Psf closure routines
+     :                                PSF_LMAX)
+      INTEGER                   L_NLEN(PSF_LMAX)  	! Library name lengths
+      INTEGER                   L_NMOD(PSF_LMAX)  	! No of modules in library
+      INTEGER                   L_HAN(PSF_LMAX)   	! Library handle
+      INTEGER                   L_NLIB			! Number of active libraries
+
+*    Psf instance data
+      LOGICAL                   P_USED(PSF_NMAX)  	! Slot in use
+      INTEGER                   P_LIBID(PSF_NMAX) 	! Psf library id
+      INTEGER                   P_MODID(PSF_NMAX) 	! Psf module id
+      LOGICAL                   P_EVDS(PSF_NMAX)  	! File is an event dataset
+      LOGICAL                   P_MODEL(PSF_NMAX) 	! Psf is a model
+      LOGICAL                   P_EOK(PSF_NMAX)   	! Psf energy dependent?
+      INTEGER		        P_INST(PSF_NMAX)	! Internal instance data
+
+*    Time and energy bands
+      LOGICAL                   TE_INIT           	! Initialised yet?
+      INTEGER                   TE_ELO, TE_EHI    	! Energy bands
+      DOUBLE   PRECISION        TE_TLO, TE_THI    	! Time bands
+
+*    Character common block
+      COMMON /PSF_CMN_C/	L_NAME, L_MODN 		! Library stuff
+
+*    Non-character common block
+      COMMON /PSF_CMN/
+     :          SM_SIZEDEF, SM_NX, SM_NY,  		! Spatial model
+     :            SM_NELM, SM_GOTDATA, SM_DATA,
+     :            SM_FLAG, SM_TYPE, SM_NMOD,
+     :            SM_P_NA, SM_P_NR, SM_P_REG,
+     :            SM_P_DR, SM_P_RUP, SM_R_NX,
+     :            SM_R_NY, SM_R_DX, SM_R_DY,
+     :          TE_TLO, TE_THI, TE_ELO, TE_EHI,		! Time/energy bands
+     :            TE_INIT,
+     :          L_NLIB, L_NLEN, L_NMOD,	L_HAN,  	! Library stuff
+     :            L_MOD_I, L_MOD_D, L_MOD_DEF,
+     :            L_MOD_PFL, L_MOD_C, L_MOD_H,
+     :          P_USED, P_LIBID, P_MODID, P_EOK, 	! Psf instances
+     :            P_EVDS, P_MODEL, P_INST,
+     :          EM_MODE,EM_NBIN,EM_CBPTR,EM_OK, 	! Energy model specs
+     :          PSFINIT					! System initialised flag

@@ -1,0 +1,15 @@
+*+  USI_CMN - Internal common for USI routines
+      INTEGER USI_NMAX
+      PARAMETER (USI_NMAX=20)
+
+      STRUCTURE /DATASET/
+        CHARACTER*(DAT__SZLOC) LOC	! locator to dataset
+        LOGICAL USED			! whether this slot being used
+        CHARACTER*1 IO			! input or output dataset
+      ENDSTRUCTURE
+
+      RECORD /DATASET/ DS(USI_NMAX)	! datasets
+
+
+      COMMON /USI_CMN/ DS
+*-

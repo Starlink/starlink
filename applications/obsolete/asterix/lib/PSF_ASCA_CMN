@@ -1,0 +1,14 @@
+*+  PSF_ASCA_CMN - Common block definition for ASCA
+*-
+
+      LOGICAL                 AS_INIT 			! System initialised
+      REAL                    AS_ENERGY(PSF_NMAX)	!
+      INTEGER                 AS_PHALO(PSF_NMAX)        !
+      INTEGER                 AS_PHAHI(PSF_NMAX)        ! Channel bounds
+      LOGICAL                 AS_PHA_DEF(PSF_NMAX)      ! Channel bounds defined
+
+      CHARACTER*3	      AS_INSTR(PSF_NMAX)	! ASCA detector
+
+      COMMON /PSF_ASCA_CMN/    AS_INIT, AS_ENERGY,
+     :                        AS_PHALO, AS_PHAHI, AS_PHA_DEF
+      COMMON /PSF_ASCA_CMNC/   AS_INSTR

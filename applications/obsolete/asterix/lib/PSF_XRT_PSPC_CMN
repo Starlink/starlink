@@ -1,0 +1,37 @@
+*+  PSF_XRT_PSPC_CMN - Common block definition for XRT PSF
+*-
+
+      INTEGER        PSF_PSPC__VARG			! XRT PSPC psf forms
+        PARAMETER    ( PSF_PSPC__VARG = 1 )
+      INTEGER        PSF_PSPC__ONAX3
+        PARAMETER    ( PSF_PSPC__ONAX3 = 2 )
+      INTEGER        PSF_PSPC__ONAX2
+        PARAMETER    ( PSF_PSPC__ONAX2 = 3 )
+      INTEGER        PSF_PSPC__VARP
+        PARAMETER    ( PSF_PSPC__VARP = 4 )
+
+      LOGICAL                 RX_INIT 			! System initialised
+      CHARACTER*(DAT__SZLOC)  RX_LOC(PSF_NMAX)  	! Dataset locators
+      INTEGER                 RX_OPTION(PSF_NMAX)	!
+      REAL                    RX_ENERGY(PSF_NMAX)	!
+      INTEGER                 RX_PHALO(PSF_NMAX)        !
+      INTEGER                 RX_PHAHI(PSF_NMAX)        ! Channel bounds
+      LOGICAL                 RX_PHA_DEF(PSF_NMAX)      ! Channel bounds defined
+
+      LOGICAL                 RX_CB_OPEN
+      CHARACTER*(DAT__SZLOC)  RX_CB_LOC  		! Dataset locators
+      INTEGER                 RX_CB_PPTR, RX_CB_RPTR    ! Ptr to cube fields
+      INTEGER                 RX_CB_NRBIN, RX_CB_NEBIN, ! Cube dimensions
+     :                        RX_CB_NOBIN
+      INTEGER                 RX_CB_EAPTR, RX_CB_EWPTR  ! Energy axis data
+      REAL                    RX_CB_OBASE, RX_CB_OSCALE ! Off-axis axis pars
+      REAL                    RX_CB_RPMIN               ! Minimum radius > 0
+
+      COMMON /PSF_XRT_CMN/    RX_INIT, RX_CB_OPEN,
+     :                        RX_OPTION, RX_ENERGY, RX_PHALO,
+     :                        RX_PHAHI, RX_PHA_DEF,
+     :                        RX_CB_PPTR, RX_CB_RPTR, RX_CB_NRBIN,
+     :                        RX_CB_NEBIN, RX_CB_NOBIN, RX_CB_EAPTR,
+     :                        RX_CB_EWPTR, RX_CB_OBASE, RX_CB_OSCALE,
+     :                        RX_CB_RPMIN
+      COMMON /PSF_XRT_CMNC/   RX_LOC, RX_CB_LOC

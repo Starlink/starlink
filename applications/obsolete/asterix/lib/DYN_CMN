@@ -1,0 +1,17 @@
+*+  DYN_CMN - internal common blocks for DYN_ system
+
+      INTEGER DYN_NMAX
+      PARAMETER (DYN_NMAX=500)
+
+      STRUCTURE /DYN_LIST/
+        INTEGER PTR			! pointer to start of dynamic memory
+        INTEGER NITEM                   ! number of items
+        INTEGER NPAGE			! number of pages allocated
+        INTEGER NBYTE			! number of bytes actually used
+        LOGICAL SECTION			! whether disk-file section used
+        CHARACTER*(DAT__SZLOC) LOC	! locator to disk-file
+      ENDSTRUCTURE
+
+      RECORD /DYN_LIST/ LIST(DYN_NMAX)
+      INTEGER NPTR
+      COMMON /DYN_CMN/ NPTR,LIST
