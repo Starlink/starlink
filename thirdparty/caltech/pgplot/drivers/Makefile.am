@@ -1,5 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 
+SUBDIRS = xmotif xathena xtk
+
 # To change driver list edit configure.ac
 BUILT_DRIVER_ROUTINES = @BUILT_DRIVERS@
 STAR_BUILT_DRIVER_ROUTINES = @STAR_BUILT_DRIVERS@

@@ -77,11 +77,11 @@ dnl    have done something as wierd as Apple.
 LIBS="$LIBS -L/usr/X11R6/lib"
 CPPFLAGS="$CPPFLAGS -I/usr/X11R6/include"
 
-AC_CHECK_HEADER([X11/Xaw3d/Simple.h], set have_xa3dheader = "yes" ) 
-AC_CHECK_HEADER([X11/Xaw/Simple.h], set have_xaheader = "yes" ) 
+AC_CHECK_HEADER([X11/Xaw3d/Simple.h], have_xa3dheader=yes ) 
+AC_CHECK_HEADER([X11/Xaw/Simple.h], have_xaheader=yes ) 
 
-AC_CHECK_LIB(Xaw3d, XawInitializeWidgetSet, set have_xa3dlib = "yes" )
-AC_CHECK_LIB(Xaw, XawInitializeWidgetSet, set have_xalib = "yes" )
+AC_CHECK_LIB(Xaw3d, XawInitializeWidgetSet, have_xa3dlib=yes )
+AC_CHECK_LIB(Xaw, XawInitializeWidgetSet, have_xalib=yes )
 
 
 AM_CONDITIONAL( HAVE_XATHENA, \
@@ -105,8 +105,8 @@ AC_ARG_WITH([tk],
     CPPFLAGS="$CPPFLAGS -I$TKINCDIR"
   fi])
 
-AC_CHECK_HEADER([tk.h], set have_tkheader = "yes" ) 
-AC_CHECK_LIB(tk, Tk_DisplayName, set have_tklib = "yes" )
+AC_CHECK_HEADER([tk.h], have_tkheader=yes ) 
+AC_CHECK_LIB(tk, Tk_DisplayName, have_tklib=yes )
 AM_CONDITIONAL( HAVE_TK, \
     [test "$have_tkheader" = "yes" && test "$have_tklib" = "yes"] )
 
@@ -127,8 +127,8 @@ AC_ARG_WITH([motif],
     CPPFLAGS="$CPPFLAGS -I$XMINCDIR"
   fi])
 
-AC_CHECK_HEADER([Xm/XmP.h], set have_xmheader = "yes" ) 
-AC_CHECK_LIB(Xm, XmScrolledWindowSetAreas, set have_xmlib = "yes" )
+AC_CHECK_HEADER([Xm/XmP.h], have_xmheader=yes ) 
+AC_CHECK_LIB(Xm, XmScrolledWindowSetAreas, have_xmlib=yes )
 
 AM_CONDITIONAL( HAVE_XMOTIF, \
    [test "$have_xmheader" = "yes" && test "$have_xmlib" = "yes"] )
