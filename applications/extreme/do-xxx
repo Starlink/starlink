@@ -1,0 +1,215 @@
+#!/bin/sh
+
+#+
+#  Name:
+#     do_filter
+#
+#  Purpose:
+#     Apply source code filter to a set of files
+#
+#  Usage:
+#     do_filter files
+#
+#  Description:
+#     This is a driver script to run one of the filter programs in
+#     the EXTREME package which modifies source code.  If it is invoked
+#     under the name 'do_xxx' it will try to invoke the filter 'xxx'.
+#     For each of its command line arguments (files) it:
+#        - Invokes the filter xxx
+#        - Writes a line to the file ./xxx.log saying how many lines were
+#          changed
+#        - If and only if changes were made, it writes the modified file
+#          under the same name into the directory ./xxx.changed
+#        - If the filter or this script thinks there might be something 
+#          which needs human attention, it prints a line to standard output.
+#
+#     It then writes a short summary of the run.
+#
+#     As part of its checking, it invokes a script called cmp_xxx.pl
+#     on each pair of (original, changed) files; these scripts are 
+#     crude checks that the changes made have not done anything to the
+#     source code to change its intention other than what should have 
+#     been done.  They have been written in a fairly quick and dirty 
+#     way however, and may well turn up false positives or false negatives.
+#
+#  Authors:
+#     MBT: Mark Taylor (STARLINK)
+#
+#  History:
+#     17-JAN-2000 (MBT):
+#        Initial version.
+#-
+
+#  Get name of driver script and filter.
+      driver=`echo $0 | sed 's%.*/%%'`
+      filter=`echo $driver | sed 's%^do_%%'`
+
+#  Set up destination directory, logfile and comparison script.
+      destdir="./$filter.changed"
+      logfile="./$filter.log"
+      cmp_scr="cmp_$filter.pl"
+
+#  Check command line arguments.
+      if [ ! "$*" ] 
+      then
+         echo "Usage: $driver files"
+         exit 1
+      else
+         :
+      fi
+
+#  Add EXTREME_DIR to path if it is defined.
+      if [ "$EXTREME_DIR" ]
+      then
+         PATH=${PATH}:$EXTREME_DIR
+         export PATH
+      else
+         :
+      fi
+
+#  Set up location of commands.
+      compare="perl `which $cmp_scr`"
+      if [ `which $filter | wc -w` = "1" -a `which $cmp_scr | wc -w` = "1" ]
+      then
+         :
+      else
+         echo "$driver: The $filter and $cmp_scr commands must be in the path."
+         exit 1
+      fi
+ 
+#  Initialise files.
+      mkdir -p $destdir
+      rm -f $logfile
+
+#  Initialise counters.
+      nf="0"
+      nc="0"
+
+#  Process each file.
+      for f in $@
+      do
+
+#  Get names of input and output files.
+         infile="$f"
+         outfile="$destdir/$f"
+
+#  Do the processing
+         $filter $infile $outfile 2>&1 | \
+         while read errtext
+         do
+            printf "%-3s  %-20s %-40s  %-3s\n" "***" "$f:" "$errtext" "***"
+         done
+
+#  See if the processing made any changes.  Remove the output file if not.
+         changed=`diff $infile $outfile | grep -c "^<"`
+         if [ "$changed" = "0" ]
+         then
+            rm $destdir/$f
+         else
+            nc=`echo $nc 1 + p | dc`
+         fi
+
+#  Specific tests for the inscnf filter.
+         if [ "$filter" = "inscnf" ]
+         then
+
+#  See if the input file apparently contains %VAL and CNF_PVAL.  This 
+#  is just a crude check to see whether it looks like modifications 
+#  have got done on the right files.
+            if grep -i '^ .*%VAL' $infile >/dev/null
+            then
+               isval=1
+            else
+               isval=0
+            fi
+            if grep -i '^ .*CNF_PVAL' $infile >/dev/null
+            then
+               iscnf=1
+            else
+               iscnf=0
+            fi
+            if [ "$isval" = "1" -a "$iscnf" = "0" ]
+            then
+               should=1
+            else
+               should=0
+            fi
+
+#  Write a warning if it looks like the wrong modifications have been made.
+#  Such warnings probably indicate that %VAL crops up in a comment, or
+#  something like that, but should perhaps be checked out (by a manual
+#  diff) to check whether there is anything to worry about.
+            if [ "$changed" = "0" -a "$should" != "0" ]
+            then
+               warn="%VAL without CNF_PVAL present, but no changes"
+            elif [ "$changed" != "0" -a "$should" = "0" ]
+            then
+               if [ "$isval" = "0" ]
+               then
+                  warn="No %VAL, but changes were made"
+               else
+                  warn="CNF_PVAL present, but changes made"
+               fi
+            else
+               warn=""
+            fi
+            if [ "$warn" ]
+            then
+               printf "%-3s  %-20s %-40s  %-3s\n" "***" "$f:" "$warn" "***"
+            else
+               :
+            fi
+
+         fi
+
+#  Check that no mistakes have been made while breaking lines etc.
+#  This uses a quick and dirty Perl script - again, an error here 
+#  does not necessarily mean that something has gone wrong, but could
+#  use a check.
+         if [ "$changed" != "0" ]
+         then
+            if $compare $infile $outfile >/dev/null
+            then
+               :
+            else
+               warn="Possible error in modifications?"
+               printf "%-3s  %-20s %-40s  %-3s\n" "***" "$f:" "$warn" "***"
+            fi
+         else
+            :
+         fi
+
+#  Check that no new lines exceed 73 characters for the fortran filters.
+         if [ "$filter" = "inscnf" -o "$filter" = "frepint" ]
+         then
+            if [ "$changed" != "0" ]
+            then
+               if [ "`diff $infile $outfile | grep '^> ' \
+                                            | sed 's/ *$//; s/^> //' \
+                                            | awk 'length(\$0)>72'`" ]
+               then
+                  warn="Line extended past column 72?"
+                  printf "%-3s  %-20s %-40s  %-3s\n" "***" "$f:" "$warn" "***"
+               else
+                  :
+               fi
+            else
+               :
+            fi
+         else
+            :
+         fi
+
+#  Write to log file.
+         printf >>$logfile "%-30s  %4d lines changed\n" "$infile" "$changed"
+         nf=`echo $nf 1 + p | dc`
+      done
+
+#  Summarise to standard output.
+      echo " "
+      echo "$nc/$nf modified files written in $destdir"
+      echo "Logfile is $logfile"
+      
+
+
+# $Id$
