@@ -1,9 +1,8 @@
 INTERFACE SFLUX
 
-   PARAMETER FIT_MOD
+   PARAMETER MODEL
       POSITION 1
       TYPE 'UNIV'
-      KEYWORD 'MODEL'
       VPATH 'GLOBAL,DEFAULT'
       PPATH 'GLOBAL'
       ASSOCIATION '<->GLOBAL.FIT_MODEL'
@@ -11,9 +10,8 @@ INTERFACE SFLUX
       HELP 'Dataset containing spectrum model specification'
    ENDPARAMETER
 
-   PARAMETER REDSHIFT
+   PARAMETER Z
       TYPE '_REAL'
-      KEYWORD 'Z'
       VPATH 'GLOBAL,DEFAULT'
       PPATH 'GLOBAL'
       ASSOCIATION '<->GLOBAL.REDSHIFT'
@@ -22,27 +20,24 @@ INTERFACE SFLUX
       HELP 'Redshift to be applied to source spectrum'
    ENDPARAMETER
 
-   PARAMETER NO_OF_CHANNELS
+   PARAMETER NCH
       TYPE '_INTEGER'
-      KEYWORD 'NCH'
       VPATH 'DEFAULT'
       DEFAULT 1000
       PROMPT 'Number of energy channels'
       HELP 'Channels are used for discrete evaluation of integral (max.5000)'
    ENDPARAMETER
 
-   PARAMETER LOWER_ENERGY
+   PARAMETER LEN
       POSITION 2
       TYPE 'REAL'
-      KEYWORD 'LEN'
       PROMPT 'Lower energy limit'
       HELP 'Flux integral starts at this energy (in keV)'
    ENDPARAMETER
 
-   PARAMETER UPPER_ENERGY
+   PARAMETER UEN
       POSITION 3
       TYPE 'REAL'
-      KEYWORD 'UEN'
       PROMPT 'Upper energy limit'
       HELP 'Flux integral ends at this energy (in keV)'
    ENDPARAMETER
