@@ -228,11 +228,11 @@
      :         0.0D0, 2000.0D0, MJD, RA_N_APP, DEC_N_APP)
 
          ELSE IF (COORD_TYPE .EQ. 'EQ') THEN
-            CALL SLA_ECLEQ (LONG, LAT, RA_2000, DEC_2000)
+            CALL SLA_ECLEQ (LONG, LAT, MJD, RA_2000, DEC_2000)
             CALL SLA_MAP (RA_2000, DEC_2000, 0.0D0, 0.0D0, 0.0D0, 0.0D0,
      :         2000.0D0, MJD, RA_APP, DEC_APP)
 
-            CALL SLA_ECLEQ (0.0D0, DPI2, RA_N_2000, DEC_N_2000)
+            CALL SLA_ECLEQ (0.0D0, DPI2, MJD, RA_N_2000, DEC_N_2000)
             CALL SLA_MAP (RA_N_2000, DEC_N_2000, 0.0D0, 0.0D0, 0.0D0, 
      :         0.0D0, 2000.0D0, MJD, RA_N_APP, DEC_N_APP)
          END IF
