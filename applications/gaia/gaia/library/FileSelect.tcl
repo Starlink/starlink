@@ -73,8 +73,9 @@
 # --------------  ---------  ----------------------------------------
 # Allan Brighton  20 May 96  added quick hack to get this to work in itk2.0. 
 #                            (New version in iwidgets2.0.1 was too slow)
+#
 # Peter W. Draper 27 Jan 97  added -filter_types option to allow caller
-#                            to see a list of "known" file extensions
+#                            to see a list of "known" file extensions. 
 
 itk::usual FileSelect {}
 
@@ -84,16 +85,11 @@ itk::usual FileSelect {}
 # that is still used because of poor performance in the iwidgets2.x version.
 # This should probably be replaced when we move to tcl8.x.
  
-class FileSelect {
+itcl::class util::FileSelect {
     inherit util::TopLevelWidget
 
     #  create new scrolled text
     constructor {args} {
-	#
-	# Explicitly handle configs that may have been ignored earlier.
-	# Also, check to see if the user has specified, width, or height.  
-	# If not, use the default and config.
-	#
 	eval itk_initialize $args
 
 	#
@@ -120,14 +116,13 @@ class FileSelect {
 	#
 	label $fs(filterf).label -text "$itk_option(-filterlabel)"
 	set fs(filter) [entry $fs(filterf).entry -relief sunken]
-	#bind $fs(filter) <ButtonRelease-2> [code $this get_selection $fs(filter)]
-	#entry_key_bindings $fs(filter)
 
 	#$fs(filter) configure -selectbackground \
 	#	[lindex [$fs(filter) configure -background] 4] -selectborderwidth 0
 
 	pack $fs(filterf).label -side top -anchor w
-	pack $fs(filterf).entry -side top -fill x -expand yes -ipady 1m
+        # PWD: modification here, pack to top not bottom.
+        pack $fs(filterf).entry -side top -fill x -expand yes -ipady 1m
 		
 	#
 	# Create directory list, scrollbar, and label for the directory 
@@ -184,10 +179,6 @@ class FileSelect {
 	#
 	label $fs(self).label -text "$itk_option(-selectlabel)"
 	set fs(select) [entry $fs(self).entry -relief sunken]
-	#bind $fs(select) <ButtonRelease-2> [code $this get_selection $fs(select)]
-	#entry_key_bindings $fs(select)
-	#$fs(select) configure -selectbackground \
-	#	[lindex [$fs(select) configure -background] 4] -selectborderwidth 0
 	set _selection "$itk_option(-dir)/"
 
 	pack $fs(self).label -side top -anchor w
@@ -254,7 +245,11 @@ class FileSelect {
 	bind $fs(filter) <Return> "$fs(filterbtn) invoke"
 	bind $fs(select) <Return> "$fs(okbtn) invoke"
 
-        #  Interface is now going.
+	#
+	# Explicitly handle configs that may have been ignored earlier.
+	# Also, check to see if the user has specified, width, or height.  
+	# If not, use the default and config.
+	#
 	set _initialized 1
 	eval itk_initialize $args
 
@@ -282,7 +277,7 @@ class FileSelect {
     # to reset the working directory back to the
     # original before returning the result.
 
-    method activate {} {
+    public method activate {} {
 	global ::result
 
 	set curwd "[pwd]"
@@ -312,13 +307,13 @@ class FileSelect {
 
     #  Return the selection.
 
-    method get {} {
+    public method get {} {
 	return $_selection
     }
 
     #  called for double click on a filename 
 
-    method _dclickfile {y} {
+    protected method _dclickfile {y} {
 	_selectfile $y
 	update idletasks
 	$fs(okbtn) invoke
@@ -326,7 +321,7 @@ class FileSelect {
 
     #  called for double click on a dir name 
 
-    method _dclickdir {y} {
+    protected method _dclickdir {y} {
 	_selectdir $y
 	update idletasks
 	$fs(filterbtn) invoke
@@ -339,7 +334,7 @@ class FileSelect {
     # displayed.  Mark the filter button as the 
     # default.
 
-    method _selectdir {y} {
+    protected method _selectdir {y} {
 	$fs(dirs) selection clear 0 end
 	$fs(dirs) selection set [$fs(dirs) nearest $y]
 
@@ -368,7 +363,7 @@ class FileSelect {
     # Select the file, set the selection to
     # the new file.  Mark the ok button as the
     # default.
-    method _selectfile {y} {
+    protected method _selectfile {y} {
 	$fs(files) selection clear 0 end
 	$fs(files) selection set [$fs(files) nearest $y]
 
@@ -388,7 +383,7 @@ class FileSelect {
     # parameter is null use the tail of the filter
     # entry text.
 
-    method _setfilter {{d ""} {f ""}} {
+    protected method _setfilter {{d ""} {f ""}} {
 	if {$d == ""} {set d [file dirname [$fs(filter) get]]}
 	if {$f == ""} {set f [file tail [$fs(filter) get]]}
 
@@ -400,7 +395,7 @@ class FileSelect {
     # parameter.  If the file 'f' parameter is
     # null, use the 'selection' attribute.
 
-    method _setselection {{f ""}} {
+    protected method _setselection {{f ""}} {
 	if {$f == ""} {set f $_selection}
 
 	$fs(select) delete 0 end
@@ -414,7 +409,7 @@ class FileSelect {
     # the grab and set the global ::result, which frees
     # the wait.
 
-    method _okcmd {} {
+    protected method _okcmd {} {
 	global ::result
 
 	set _selection [$fs(select) get]
@@ -441,7 +436,7 @@ class FileSelect {
     # selection text along with the list contents.
     # Mark the default button as filter.
 
-    method _filtercmd {} {
+    protected method _filtercmd {} {
 	set seldir [file dirname [$fs(filter) get]]
 
 	if {![file exists $seldir]} {
@@ -468,7 +463,7 @@ class FileSelect {
     #                        release the grab and wait via the global
     #                        result variable.
     # ------------------------------------------------------------------
-    method _cancelcmd {} {
+    protected method _cancelcmd {} {
 	global ::result
 	_defaultbtn cancel
 
@@ -486,7 +481,7 @@ class FileSelect {
     # to determine full file name insertion.
     # Select the first element if it exists.
 
-    method _filldirlist {} {
+    protected method _filldirlist {} {
 	$fs(dirs) delete 0 end
 
 	foreach i [exec /bin/ls -a $itk_option(-dir)] {
@@ -511,7 +506,7 @@ class FileSelect {
     # insertion.  Select the first element if 
     # it exists.
 
-    method _fillfilelist {} {
+    protected method _fillfilelist {} {
 	$fs(files) delete 0 end
 
 	set file_temp [glob -nocomplain $itk_option(-dir)/$itk_option(-filter)]
@@ -530,7 +525,7 @@ class FileSelect {
     # Sets the default button, either ok, filter
     # or cancel.  The focus is also adjusted.
 
-    method _defaultbtn {btn} {
+    protected method _defaultbtn {btn} {
 	if {$btn == "ok"} {
 	    $fs(btnf).okf configure -relief sunken
 	    $fs(btnf).ff configure -relief flat
@@ -558,7 +553,7 @@ class FileSelect {
     # exist.  If it doesn't exist, this will still insert it
     # into the entry widget.  I don't know of a workaround
 
-    method get_selection {entry_widget} {
+    protected method get_selection {entry_widget} {
 	set cmd "selection get"
 	catch $cmd string
 	$entry_widget insert insert $string
@@ -566,24 +561,9 @@ class FileSelect {
     }
 
 
-    # Method:  Provide key bindings to the entry widgets
-    # (not needed in Tk4.0 ...?)
-
-    method entry_key_bindings {entry_widget} {
-	bind $entry_widget <Left> [code $this entry_adjust_pos $entry_widget -1]
-	bind $entry_widget <Control-b> [code $this entry_adjust_pos $entry_widget -1]
-	bind $entry_widget <Right> [code $this entry_adjust_pos $entry_widget 1]
-	bind $entry_widget <Control-f> [code $this entry_adjust_pos $entry_widget 1]
-	bind $entry_widget <Control-e> "$entry_widget icursor end"
-	bind $entry_widget <Control-a> "$entry_widget icursor 0"
-	bind $entry_widget <Control-k> "$entry_widget delete insert end"
-	bind $entry_widget <Control-d> "$entry_widget delete insert"
-    }
-
-    
     # Method:  Get the position of the cursor and move it one way or another
 
-    method entry_adjust_pos {entry_widget offset} {
+    protected method entry_adjust_pos {entry_widget offset} {
 	set pos [$entry_widget index insert]
 	incr pos $offset
 	if {$pos < 0} {
@@ -592,8 +572,9 @@ class FileSelect {
 	$entry_widget icursor $pos
     }
 
+    #
     # Method: Set the filter type to a known value.
-
+    #
     method set_filter_type {type} {
        if { $type == "" } {
           set type "*"
@@ -605,25 +586,6 @@ class FileSelect {
        _filtercmd
     }
 
-    #  Preset file filters
-    itk_option define -filter_types filter_types Filter_Types {} {
-       if {$_initialized} {
-          if { [info exists fs(filter_types)] } { 
-             catch {destroy $fs(filter_types)}
-          }
-          if { $itk_option(-filter_types) != {} } { 
-             set fs(filter_types) [LabelMenu $fs(filterf).types \
-                                      -text {File Type:}]
-             foreach pair "$itk_option(-filter_types)" {
-                set name [lindex $pair 0]
-                set type [lindex $pair 1]
-                $fs(filter_types) add -label $name \
-                   -command [code $this set_filter_type $type]
-             }
-             pack $fs(filter_types) -side bottom -ipady 1m -anchor w
-          }
-       }
-    }
 
     # Set the window title.
     itk_option define -title title Title "Select File" {
@@ -713,6 +675,26 @@ class FileSelect {
 
     #  The button label for button 3
     itk_option define -button_3 button_3 Button_3 "Cancel" {}
+
+    #  Add an optional menu of file suffixes (preset file filters).
+    itk_option define -filter_types filter_types Filter_Types {} {
+       if {$_initialized} {
+          if { [info exists fs(filter_types)] } { 
+             catch {destroy $fs(filter_types)}
+          }
+          if { $itk_option(-filter_types) != {} } { 
+             set fs(filter_types) [LabelMenu $fs(filterf).types \
+                                      -text {File Type:}]
+             foreach pair "$itk_option(-filter_types)" {
+                set name [lindex $pair 0]
+                set type [lindex $pair 1]
+                $fs(filter_types) add -label $name \
+                   -command [code $this set_filter_type $type]
+             }
+             pack $fs(filterf).types -side bottom -ipady 1m -anchor w
+          }
+       }
+    }
 
     #  flag: if true, grab the screen
     itk_option define -modal modal Modal 0
