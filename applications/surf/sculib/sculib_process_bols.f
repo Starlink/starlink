@@ -512,6 +512,13 @@
          CHOP_CRD = LOCAL_COORDS
       END IF
 
+*     Divide chop throw by two if we are doing a SCAN/MAP
+*     (since the middle beam is not a real beam)
+
+      IF (SAMPLE_MODE .EQ. 'RASTER') THEN
+         CHOP_THROW = CHOP_THROW / 2.0
+      END IF
+
 
 
 *     Determine the offset coordinate system
