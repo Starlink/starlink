@@ -100,6 +100,7 @@
       CHARACTER*(DAT__SZLOC)	LOC			! Output HDS object
 
       LOGICAL			OK, OK1, OK2, OK3	! Structures present
+      LOGICAL			STRUC			! Object is a struct
 *.
 
 *  Check inherited global status.
@@ -111,8 +112,16 @@
 *  Extract locator
       CALL ADI1_GETLOC( ARGS(1), LOC, STATUS )
 
+*  Object is a structure?
+      CALL DAT_STRUC( LOC, STRUC, STATUS )
+
 *  History exists?
-      CALL DAT_THERE( LOC, 'HISTORY', OK, STATUS )
+      IF ( STRUC .AND. (STATUS.EQ.SAI__OK) ) THEN
+        CALL DAT_THERE( LOC, 'HISTORY', OK, STATUS )
+      ELSE
+        OK = .FALSE.
+      END IF
+
       IF ( OK ) THEN
 
 *    Locate top-level structure
