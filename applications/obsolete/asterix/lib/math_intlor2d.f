@@ -149,8 +149,8 @@
 *        For each sub-pixel row
           DO JJ = 0, YSUB-1
 
-*          Y centre of sub-pixel in sigma^2
-            YPS2 = (YPS/YWID)**2
+*          Y centre of sub-pixel
+            YPS2 = YPS**2
 
 *          X position of first sub-pixel centre
             XPS = XP0 + DX*(I-1) + 0.5*SDX
@@ -159,7 +159,7 @@
             DO II = 0, XSUB-1
 
 *            Value of Lorentzian
-              R2 = (XPS/XWID)**2 + YPS2
+              R2 = XPS**2 + YPS2
               IF ( R2 .LE. RLIM2*WID2 ) THEN
                 SUM = SUM + 1.0 / (R2 + WID2)
               END IF
