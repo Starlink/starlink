@@ -476,7 +476,7 @@ I_SUB2 =
 #  the files.
 
 EXTERNAL_INCLUDES = SAE_PAR NDF_PAR NDF_ERR GRP_PAR PRM_PAR PAR_ERR \
-PAR_PAR AGI_ERR FIO_ERR MSG_PAR SUBPAR_PAR DAT_PAR
+PAR_PAR AGI_ERR FIO_ERR MSG_PAR SUBPAR_PAR DAT_PAR PSX_ERR
 
 #  List of Fortran routines required for building the package.  This is
 #  just a list of all the Fortran source files (excluding BLOCK DATA
@@ -604,6 +604,7 @@ SUBPAR_PAR:   $(STAR_INC)/subpar_par;   $(LINK) $? $@
 NDF_ERR:      $(STAR_INC)/ndf_err;   $(LINK) $? $@
 NDF_PAR:      $(STAR_INC)/ndf_par;   $(LINK) $? $@
 SAE_PAR:   $(STAR_INC)/sae_par;   $(LINK) $? $@
+PSX_ERR:      $(STAR_INC)/psx_err;   $(LINK) $? $@
 
 #  Rules for extracting source files from the source archive.
 
@@ -1394,7 +1395,7 @@ esp_mon.o:  PAR_PAR SAE_PAR
 esphelp.o:  DAT_PAR PAR_ERR PAR_PAR SAE_PAR hlpcmd.inc
 fastmed.o:  NDF_PAR PRM_PAR SAE_PAR fas_par
 gaufit.o:   NDF_PAR FIO_ERR AGI_ERR SAE_PAR DAT_PAR MSG_PAR SUBPAR_PAR gau_par
-gaufit2.o:  SAE_PAR gau_par
+gaufit2.o:  SAE_PAR PSX_ERR gau_par
 graphs.o:   PAR_ERR SAE_PAR AGI_ERR FIO_ERR MSG_PAR PAR_ERR PRM_PAR \
             SAE_PAR SUBPAR_PAR gra_par
 histpeak.o: NDF_PAR PAR_ERR PRM_PAR SAE_PAR his_par

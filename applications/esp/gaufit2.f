@@ -760,7 +760,7 @@ c$$$      endif
 *   types and includes
       implicit none
       include 'gau_par'
-      include '/star/include/psx_err'
+      include 'PSX_ERR'
       include 'SAE_PAR'
 
 *   arguments
