@@ -38,7 +38,7 @@ POST_UNINSTALL = :
 subdir = .
 DIST_COMMON = $(am__configure_deps) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(srcdir)/Makefile.starconf.in \
-	$(srcdir)/bootstrap.installed.in \
+	$(srcdir)/bootstrap.installed.in $(srcdir)/starconf-finder.in \
 	$(srcdir)/starconf-validate.in $(srcdir)/starconf.m4.in \
 	$(top_srcdir)/configure $(top_srcdir)/java/Makefile.in \
 	install-sh missing
@@ -49,8 +49,8 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno configure.status.lineno
 mkinstalldirs = $(mkdir_p)
-CONFIG_CLEAN_FILES = starconf.m4 Makefile.starconf bootstrap.installed \
-	java/Makefile starconf-validate
+CONFIG_CLEAN_FILES = Makefile.starconf starconf.m4 bootstrap.installed \
+	java/Makefile starconf-finder starconf-validate
 am__installdirs = $(DESTDIR)$(bindir) $(DESTDIR)$(datadir)
 binSCRIPT_INSTALL = $(INSTALL_SCRIPT)
 SCRIPTS = $(bin_SCRIPTS)
@@ -130,7 +130,7 @@ sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
-bin_SCRIPTS = starconf starconf-validate
+bin_SCRIPTS = starconf starconf-validate starconf-finder
 data_DATA = \
 	componentinfo.dtd \
 	template-Makefile.am \
@@ -202,13 +202,15 @@ $(top_srcdir)/configure:  $(am__configure_deps)
 	cd $(srcdir) && $(AUTOCONF)
 $(ACLOCAL_M4):  $(am__aclocal_m4_deps)
 	cd $(srcdir) && $(ACLOCAL) $(ACLOCAL_AMFLAGS)
-starconf.m4: $(top_builddir)/config.status $(srcdir)/starconf.m4.in
-	cd $(top_builddir) && $(SHELL) ./config.status $@
 Makefile.starconf: $(top_builddir)/config.status $(srcdir)/Makefile.starconf.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+starconf.m4: $(top_builddir)/config.status $(srcdir)/starconf.m4.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 bootstrap.installed: $(top_builddir)/config.status $(srcdir)/bootstrap.installed.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 java/Makefile: $(top_builddir)/config.status $(top_srcdir)/java/Makefile.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+starconf-finder: $(top_builddir)/config.status $(srcdir)/starconf-finder.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 starconf-validate: $(top_builddir)/config.status $(srcdir)/starconf-validate.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@

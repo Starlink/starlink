@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-bin_SCRIPTS = starconf starconf-validate
+bin_SCRIPTS = starconf starconf-validate starconf-finder
 data_DATA = \
 	componentinfo.dtd \
 	template-Makefile.am \

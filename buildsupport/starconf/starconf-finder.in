@@ -1,0 +1,71 @@
+#! /bin/sh -
+# Find and exec a program in the Starlink tree; or find other files
+#
+# Possible extensions:
+#   * could look through installed manifest files for applications
+#     and libraries;
+#   * could have a --component option which restricts the search to
+#     one particular component (would require looking through the manifest
+#     files.
+
+myname=$0
+Usage () {
+    echo "Usage: $myname application [arguments...]" >&2
+    echo "       $myname --path application" >&2
+    echo "       $myname --help | --version" >&2
+    exit 1
+}
+
+echo_only=false
+progname=
+while test $# != 0 -a -z "$progname"
+do
+    case $1 in
+    --path)
+        echo_only=true
+        ;;
+    --help)
+        Usage
+        ;;
+    --version)
+        echo "`basename $myname`: part of starconf version @VERSION@"
+        exit 0
+        ;;
+    -*)
+        Usage
+        ;;
+    *)
+        progname=$1
+        ;;
+    esac
+    shift
+done
+
+test -n "$progname" || Usage
+
+instdir=@STARCONF_DEFAULT_PREFIX@
+extrastarlinkdir=@STARCONF_DEFAULT_STARLINK@
+
+apppath=`find $instdir -name $progname`
+if test -z "$apppath" -a $extrastarlinkdir != "$instdir"; then
+    apppath=`find $extrastarlinkdir -name $progname`
+fi
+if test -z "$apppath" -a -n "$STARLINK" -a "$STARLINK" != $extrastarlinkdir; then
+    apppath=`find $STARLINK -name $progname`
+fi
+
+if test -z "$apppath"; then
+    echo "$myname: Can't find application $progname in install=$instdir, extra=$extrastarlinkdir, STARLINK=$STARLINK" >&2
+    exit 1
+fi
+
+if $echo_only; then
+    echo "$apppath"
+else
+    case $# in
+    0) exec $apppath ;;
+    *) exec $apppath "$@" ;;
+    esac
+fi
+
+exit 0
