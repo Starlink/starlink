@@ -58,8 +58,6 @@
           CALL ERR_REP( ' ', 'Cannot retype primitive object', STATUS )
         ENDIF
 
-        CALL DAT_ANNUL(LOC,STATUS)
-
       ENDIF
 
       CALL AST_CLOSE()
