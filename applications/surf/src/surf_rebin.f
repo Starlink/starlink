@@ -249,6 +249,9 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
+*     Revision 1.82  2005/03/23 19:45:44  timj
+*     initialise ABOL_*_PTR first time through for intrebin
+*
 *     Revision 1.81  2005/03/23 09:20:11  timj
 *     Register the INTREBIN offsetting pointers with CNF before attempting to use them with CNF_PVAL
 *
@@ -2180,6 +2183,11 @@ c
                            END IF
 
                         ELSE
+*     first time through. Make sure the pointer is correct (it should be)
+                           ABOL_DATA_PTR(1) = IN_DATA_PTR(CURR_FILE) 
+                           ABOL_VAR_PTR(1) = IN_VARIANCE_PTR(CURR_FILE)
+                           ABOL_RA_PTR(1) = BOL_RA_PTR(CURR_FILE)
+                           ABOL_DEC_PTR(1) = BOL_DEC_PTR(CURR_FILE)
 
                            ISNEWPD = .FALSE.
                            ISNEWPV = .FALSE.
