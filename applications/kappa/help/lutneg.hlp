@@ -1,0 +1,31 @@
+1 LUTNEG
+Loads the standard negative greyscale lookup table.
+
+Usage:
+
+   lutneg
+
+Description:
+
+   Procedure for loading the standard greyscale lookup table into
+   the current image-display device with negative linear scaling.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 DEVICE
+DEVICE = DEVICE (Read)
+   Name of the image display whose colour table is to be changed.
+   [Current image-display device]
+2 Notes
+This is a procedure that calls LUTABLE.  Therefore, the parameter
+cannot be specified on the command line.  You will only be
+prompted for the DEVICE parameter if the current image display
+is not suitable or not available.
+2 Authors
+MJC: Malcolm J. Currie (STARLINK)
+2 History
+ 1990 Mar 2 (MJC):
+    Original version.
+
+ 1991 April 24 (MJC):
+    NDF version of LUTABLE and extended the prologue.
+

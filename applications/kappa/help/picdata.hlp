@@ -1,0 +1,35 @@
+1 PICDATA
+Selects the last DATA picture from the graphics database.
+
+Usage:
+
+   picdata
+
+Description:
+
+   This command selects the last-created DATA picture.  Subsequent
+   plotting for the chosen device will be in this new current
+   picture.  By default the chosen device is the current one.
+
+   This command is a synonym for "piclist name=data picnum=last".
+
+2 Parameters
+For information on individual parameters, select from the list below:
+3 DEVICE
+DEVICE = DEVICE (Read)
+   The graphics workstation. [The current graphics device]
+2 Examples
+picdata
+   This selects the last DATA picture for the current graphics
+   device.
+
+picdata device=xw
+   This selects the last DATA picture for the xw device.
+2 Related_Applications
+   KAPPA: PICCUR, PICBASE, PICFRAME, PICLAST, PICLIST, PICSEL.
+2 Authors
+MJC: Malcolm J. Currie (STARLINK)
+2 History
+ 1995 August 23 (MJC):
+    Original version.
+
