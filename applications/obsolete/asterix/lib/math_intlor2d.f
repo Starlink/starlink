@@ -141,7 +141,7 @@
 
 *        X contribution to normalisation - hence total normalisation
           XNOR = SDX / XWID
-          NORM = ABS( XNOR*YNOR/MATH__PI )
+          NORM = ABS( WID2*XNOR*YNOR/MATH__PI )
 
 *        Y position of first sub-pixel centre
           YPS = YP0 + DY*(J-1) + 0.5*SDY
