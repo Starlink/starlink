@@ -32,7 +32,7 @@
 #define INTEGER_CONSTANT 283
 #define STRING_CONSTANT 284
 #define ILLEGAL_CHAR 285
-#define TOKEN 286
+#define IDENTIFIER 286
 #define VAL 287
 #define END 288
 #define CNF_PVAL 289

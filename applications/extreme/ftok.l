@@ -140,7 +140,7 @@ SPACE			[ \t]*
 {DIGIT}+				{ count(); return( INTEGER_CONSTANT ); }
 \'(''|[^'\n]|{CONT})*\'			{ count(); return( STRING_CONSTANT ); }
 
-{LETTER}({LETTER}|{DIGIT})*		{ count(); return( TOKEN ); }
+{LETTER}({LETTER}|{DIGIT})*		{ count(); return( IDENTIFIER ); }
 
 "%"					{ count(); return( '%' ); }
 ":"					{ count(); return( ':' ); }
@@ -224,7 +224,7 @@ SPACE			[ \t]*
 /* Append preval and the matched text. */
       yyleng = preleng + strlen( yytext );
       yylval = (char *) memok( malloc( yyleng + 1 ) );
-      ymatchst = preleng;
+      ymatst = yylval + preleng;
       if ( preleng > 0 ) {
          strcpy( yylval, preval );
          strcat( yylval, yytext );
