@@ -1,6 +1,0 @@
-
-To create an old classic release just do:
-
-  ./mk check_source
-
-this creates the necessary tarballs.
