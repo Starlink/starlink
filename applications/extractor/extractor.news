@@ -6,7 +6,7 @@
  and support for MEFs. The MEF support differs to that previously available
  in that it now scans a complete MEF file in a single pass.
 
- A error previously limited EXTRACTOR input file names to 20 characters,
+ An error previously limited EXTRACTOR input file names to 20 characters,
  this has now been corrected.
 
  The EXTRACTOR major version number has been changed to reflect that of the
