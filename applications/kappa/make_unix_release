@@ -89,8 +89,67 @@
       mv kappa.star-hlp kappa.hlp
       ifd_irafhlpgen kappa
 
-#  Remove entries from kappa.men which do not relate to actions.
+#  Remove entries from kappa.men and kappa.hd which do not relate to actions.
       $KAPPA_DEV/bin/mencheck.tcl
+      $KAPPA_DEV/bin/hdcheck.tcl
+
+
+#  Create a CL script which will create the help database on /homemips
+      cat > temp.cl << FOO
+set kappa = /home/mips/dsb/iraf/kappa/
+so
+mkhelpdb kappa\$root.hd helpdb.mip
+lo
+FOO
+
+#  Create a tcsh script to set things up on axp0 and activate the CL script.
+      cat > kapiraf << FOO2
+#!/usr/local/bin/tcsh
+cd iraf
+rm -rf kappa
+mkdir kappa
+cd kappa
+ftp -v starprog << FOO3
+dsb
+ascii
+cd ${REL_DIR}
+get root.hd
+get _kappa.hd
+get kappa.hd
+get temp.cl
+bye
+FOO3
+mv temp.cl ..
+cd ..
+cl < temp.cl
+FOO2
+      chmod u+x kapiraf
+
+#  FTP this file to axp0.
+      ftp -v axp0 << FOO4
+dsb
+ascii
+put kapiraf
+bye
+FOO4
+      rm kapiraf
+
+#  Ask the user to execute the script on axp0. Why wont rsh do this?
+      echo " "
+      echo " "
+      echo "  Now log into axp0 and do 'source kapiraf'"
+      echo " "
+      echo -n "Press RETURN to continue ..."
+      set ans = $<
+
+#  Now FTP the helpdb.mip file back from axp0.
+      ftp -v axp0 << FOO5
+dsb
+binary
+cd iraf
+get helpdb.mip
+bye
+FOO5
 
 #  Create each of the tar files. First do the system-independant ones
 #  listed in group TAR_FILES_A...
