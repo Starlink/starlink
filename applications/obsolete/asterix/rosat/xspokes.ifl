@@ -23,6 +23,14 @@
                VPATH   'PROMPT'
             ENDPARAMETER
 
+     PARAMETER RAWDIR
+               TYPE    '_CHAR'
+               PROMPT  'Raw data directory'
+               PPATH   'DYNAMIC'
+               VPATH   'PROMPT'
+               HELP    'Directory containing raw data files'
+     ENDPARAMETER
+
      PARAMETER ATTFIL
                TYPE    '_CHAR'
                PROMPT  'Name of attitude file'
