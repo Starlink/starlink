@@ -1,0 +1,6 @@
+1 Release_Version
+
+  DATACUBE is described in SUN/237, with further information
+  being found in SC/16. These can be viewed with the commands
+  "showme sun237" and "showme sc16" respectively. Online help
+  can be accessed by using the command "cubehelp".
