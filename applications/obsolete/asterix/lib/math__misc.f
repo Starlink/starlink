@@ -269,12 +269,9 @@
 
       LOGICAL                  SYMMETRIC               ! Symmetric about centre?
 *
-*    Inline function :
+*    Local functions :
 *
-      REAL                     DEL,PIX
-      INTEGER                  SPIX
-       SPIX(DEL,PIX) = MAX(1,NINT(abs(10.0*PIX)/RC/MAX(1.0,
-     :                                SQRT(ABS(DEL/RC)))))
+      INTEGER			SPIX
 *-
 
 *    Check status
@@ -462,4 +459,16 @@
 *
       ENDDO
 *
+      END
+
+
+
+      INTEGER FUNCTION SPIX( DEL, PIX )
+
+      REAL                     DEL,PIX
+
+      SPIX = MAX( 1,
+     :            NINT( ABS( 10.0 * PIX ) /
+     :                  RC / MAX( 1.0, SQRT( ABS( DEL / RC ) ) ) ) )
+
       END
