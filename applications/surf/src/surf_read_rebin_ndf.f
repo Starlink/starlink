@@ -156,6 +156,9 @@
 *     1997 May 12 (TIMJ)
 *       Initial version removed from reds_wtfn_rebin.f
 *     $Log$
+*     Revision 1.21  2000/06/16 01:25:15  timj
+*     Use new-format SCULIB_GET_MJD
+*
 *     Revision 1.20  1999/08/19 03:37:43  timj
 *     Header tweaks to ease production of SSN72 documentation.
 *
@@ -718,10 +721,6 @@
      :     'LAT-OBS', LAT_OBS, STATUS)
       LAT_OBS = LAT_OBS * PI / 180.0D0
 
-*     the UT of the observation expressed as modified Julian day
-
-      CALL SCULIB_GET_MJD(N_FITS, FITS, IN_UT1, RTEMP, STATUS)
-
 *     the time of the first file read in will be the one for which the
 *     apparent RA,Decs of all the input data will be calculated
 *     This routine returns this information for all files and relies on
@@ -886,6 +885,11 @@
       CALL SCULIB_GET_LST_STRT(IN_SCUCDX_LOC, IN_LST_STRT_PTR,
      :     N_SWITCHES, N_EXPOSURES, N_INTEGRATIONS,
      :     N_MEASUREMENTS, STATUS)
+
+*  UT at which observation was made expressed as modified Julian day
+
+      CALL SCULIB_GET_MJD(N_FITS, FITS, %VAL(IN_LST_STRT_PTR), IN_UT1, 
+     :     RTEMP, RTEMP, STATUS)
 
 *     find if the observation was aborted
 

@@ -151,6 +151,9 @@
 *  History:
 *     $Id$
 *     $Log$
+*     Revision 1.34  2000/06/16 01:25:16  timj
+*     Use new-format SCULIB_GET_MJD
+*
 *     Revision 1.33  2000/06/03 03:14:28  timj
 *     Default ETA_TEL correctly
 *
@@ -1268,9 +1271,10 @@ c
 *     of the filter profile). In that case, we suggest a default that
 *     is different from the value stored in the header.
 *     Need to get MJD of observation (April 26 2000 is MJD 51660.0) 
-            CALL SCULIB_GET_MJD(N_FITS, FITS, MJD, EPOCH, STATUS)
+            CALL SCULIB_GET_MJD(N_FITS, FITS, -1.0D0, MJD, EPOCH, 
+     :           RTEMP, STATUS)
 
-            IF (MJD < 51660.0D0) THEN
+            IF (MJD .LT. 51660.0D0) THEN
 
                MODIFIED = .FALSE.
                IF (FILT .EQ. '850' .AND.
