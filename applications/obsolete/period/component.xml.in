@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>applications/obosolete/period</path>
+  <description>PERIOD - A Time-series analysis package</description>
+  <abstract><p>
+A software package designed to search for periodicities in data.
+  </p></abstract>
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <developers>
+    <person>
+      <name>V S Dhillon</name>
+      <uname>vsd</uname>
+    </person>
+    <person>
+      <name>Grant J Privett</name>
+      <uname>gjp</uname>
+    </person>
+    <person>
+      <name>K P Duffey</name>
+      <uname>kpd</uname>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
