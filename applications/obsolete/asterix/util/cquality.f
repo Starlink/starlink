@@ -213,7 +213,7 @@
         CALL MSG_PRNT( 'Axes are not recognisable as X and Y, '/
      :                 /'using axes 1 and 2' )
         AORDER(1) = 1
-        AORDER(1) = 2
+        AORDER(2) = 2
         MOVE_AXES = .FALSE.
         DO I = 1, NDIM
           TDIMS(I) = DIMS(I)
