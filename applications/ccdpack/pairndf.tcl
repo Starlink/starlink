@@ -392,10 +392,20 @@
 #  calling routine.
                   if { $iA < $iB } {
                      set key "$iA,$iB"
+                     set xo $xoff
+                     set yo $yoff
+                     set mp $matchpts
                   } else {
                      set key "$iB,$iA"
+                     set xo [ expr 0 - $xoff ]
+                     set yo [ expr 0 - $yoff ]
+                     set mp {}
+                     foreach $pt $matchpts {
+                        lappend mp [ list [ lindex $pt 2 ] [ lindex $pt 3 ] \
+                                          [ lindex $pt 0 ] [ lindex $pt 1 ] ]
+                     }
                   }
-                  set pairs($key) [ list $nmatch $xoff $yoff $matchpts ]
+                  set pairs($key) [ list $nmatch $xo $yo $mp ]
 
 #  Record the fact that these images have been connected.
                   set Done($iA) 1
