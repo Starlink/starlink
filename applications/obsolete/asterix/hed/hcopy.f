@@ -304,9 +304,6 @@
 
       END IF
 
-*    Release input
-      CALL USI_ANNUL( ILOC, STATUS )
-
 *    Tidy up
  99   CALL AST_CLOSE()
       CALL AST_ERR( STATUS )

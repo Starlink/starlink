@@ -132,7 +132,8 @@
 *    Free input objects. Do this inside new error context
       CALL ERR_MARK( STATUS )
       DO IOBJ = 1, NOBJ
-        CALL USI_ANNUL( LOC(IOBJ), STATUS )
+        WRITE( INP, '(A3,I1)' ) 'INP', IOBJ
+        CALL USI_ANNUL( INP, STATUS )
       END DO
       CALL ERR_RLSE( STATUS )
 
