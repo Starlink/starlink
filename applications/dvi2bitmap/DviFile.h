@@ -23,7 +23,7 @@ public:
     ~DviFile();
     bool eof();
     DviFileEvent *getEvent();
-    static void debug (int level) { debug_ = level; }
+    static void verbosity (int level) { verbosity_ = level; }
     // currH and currY are current horiz and vert positions in pixel
     // units, including possible drift corrections
     int currH() const { return hh_; }	// device units
@@ -110,7 +110,8 @@ private:
     */
     map<int,PkFont*> fontMap_;
     map<int,PkFont*>::const_iterator fontIter_;
-    static int debug_;
+    // verbosity_ > 1 is debugging, verbosiity_=0 silent
+    static int verbosity_;
 };
 
 

@@ -28,9 +28,13 @@ class DviBug : public DviError {
 
 
 // For some reason which I don't understand (am I not including a
-// required library?), streambuf.h and iostream.h complain about NULL
+// required library?), GCC streambuf.h and iostream.h complain about NULL
 // being defined wrongly (as void*), unless I define it to be zero here.
-// This is only true of some variants.
+//
+// Hmm no, this isn't quite the problem.  If I include, for example, <string>, 
+// before I include <iostream>, the problem goes away...
+//
+// I think this must just be a small GCC STL buglet.
 // Define DEFINE_NULL 1 if this needs to be done
 #define DEFINE_NULL 0
 

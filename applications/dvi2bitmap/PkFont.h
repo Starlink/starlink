@@ -22,7 +22,7 @@ class PkRasterdata {
 		 unsigned int w, unsigned int h);
     const Byte *bitmap()
 	{ if (bitmap_ == 0) construct_bitmap(); return bitmap_; }
-    static void debug (int level) { debug_ = level; }
+    static void verbosity (int level) { verbosity_ = level; }
  private:
     Byte *rasterdata_, *eob_;
     const unsigned int len_, w_, h_;
@@ -34,7 +34,7 @@ class PkRasterdata {
     unsigned int unpackpk();
     Byte nybble();
     void construct_bitmap ();
-    static int debug_;
+    static int verbosity_;
 };
 
 class PkGlyph {
@@ -70,7 +70,7 @@ class PkGlyph {
     // escapements in pixels
     int hEscapement() const { return dx_; }
     int vEscapement() const { return dy_; }
-    static void debug (int level) { debug_ = level; }
+    static void verbosity (int level) { verbosity_ = level; }
 
  private:
     unsigned int cc_, dx_, dy_, w_, h_;
@@ -80,7 +80,7 @@ class PkGlyph {
     PkRasterdata *rasterdata_;
     bool longform_;
     const Byte *bitmap_;
-    static int debug_;
+    static int verbosity_;
     static const int two20_ = 1048576;	// 2^20
     static const int two16_ = 65536; // 2^16
 };
@@ -103,11 +103,12 @@ class PkFont {
 	else
 	    return glyphs_[0];	// dummy glyph
     }
-    static void debug (int level) { debug_ = level; }
+    static void verbosity (int level) { verbosity_ = level; }
     static void setFontPath(string fp) { fontpath_ = fp; }
     static void setFontPath(char  *fp) { fontpath_ = fp; }
     static void setResolution(int res) { resolution_ = res; }
     string name() const { return name_; }
+    string fontFilename() const { return path_; }
     int magnification() const { return dvimag_; }
     int dpi() const { return resolution_; }
     int dpiScaled() const {
@@ -163,7 +164,7 @@ class PkFont {
     bool seen_in_doc_;		// true once the font_def command has been
     				// seen in the document, as well as the
     				// postamble
-    static int debug_;
+    static int verbosity_;
     static string fontpath_;	// single string with %F in it
     static int resolution_;
 };

@@ -18,7 +18,7 @@ class Bitmap {
     void setTransparent(const bool sw) { transparent_ = sw; }
     void scaleDown (const int factor);
     bool empty () const { return (bbL >= bbR || bbT >= bbB); }
-    static void debug (const int level) { debug_ = level; }
+    static void verbosity (const int level) { verbosity_ = level; }
 
  private:
     // pointer to bitmap.  Pixel (x,y) is at B[y*W + x];
@@ -35,7 +35,7 @@ class Bitmap {
     bool transparent_;		// make bg transparent if poss.
     int bpp_;			// bits-per-pixel
     int max_colour_;		// ==> max colour index
-    static int debug_;
+    static int verbosity_;
 
     //void write_debugbitmap (string filename);
     //void write_gif (string filename);
