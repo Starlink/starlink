@@ -22,6 +22,7 @@
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
+      INCLUDE 'AST_PKG'
 *
 *    Global variables :
 *
@@ -40,9 +41,10 @@
 *
       INTEGER                    N                  ! The dataset slot
 *
-*    To ensure inclusion:
+*    External References:
 *
-      EXTERNAL			SSO0_BLK
+      EXTERNAL			AST_QPKGI
+        LOGICAL			AST_QPKGI
 *
 *    Local variables :
 *
@@ -52,9 +54,7 @@
       IF ( STATUS .EQ. SAI__OK ) THEN
 
 *      Initialise yet?
-        IF ( .NOT. SSO_INIT_Q ) THEN
-          CALL SSO_INIT( STATUS )
-        END IF
+        IF ( .NOT. AST_QPKGI( SSO_PKG ) ) CALL SSO_INIT( STATUS )
 
 *      Search for locator in table
         N = 0

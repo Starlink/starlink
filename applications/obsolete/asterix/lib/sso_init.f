@@ -22,6 +22,7 @@
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
+      INCLUDE 'AST_PKG'
 *
 *    Global variables :
 *
@@ -44,6 +45,7 @@
         SSO_MI_USED(I) = .FALSE.
       END DO
 
-      SSO_INIT_Q = .TRUE.
+*  Mark initialised
+      CALL AST_SPKGI( SSO_PKG )
 
       END
