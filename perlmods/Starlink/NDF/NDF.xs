@@ -29,7 +29,8 @@ extern "C" {
 #include "arrays/arrays.c"
 
 
-/* Starlink parameters */
+/* Starlink parameters - the only necessary include files are sae_par.h
+   and dat_par.h. The remaining include files are optional. */
 
 #include "dat_par.h"
 #include "sae_par.h"
@@ -251,7 +252,7 @@ locator *
 DAT__ROOT()
  PROTOTYPE:
  CODE:
- RETVAL = DAT__ROOT;
+ RETVAL = strdup(DAT__ROOT);
  stringCtof77(RETVAL, DAT__SZLOC);
  OUTPUT:
   RETVAL
@@ -260,7 +261,7 @@ locator *
 DAT__NOLOC()
  PROTOTYPE:
  CODE:
- RETVAL = DAT__NOLOC;
+ RETVAL = strdup(DAT__NOLOC);
  stringCtof77(RETVAL, DAT__SZLOC);
  OUTPUT:
   RETVAL
