@@ -7,7 +7,7 @@
 *     Convert position in axis units to standard system
 
 *  Language:
-*     Starlink Fortran 77
+*     Starlink Fortran
 
 *  Invocation:
 *     CALL WCI_CNA2S( APOS, PIXID, PRJID, SPOS, STATUS )
@@ -60,22 +60,17 @@
 *     ADI:
 *        ADI_GET/MAP	Various ADI data access routines
 *     SLA:
-*
+*        SLA_DCS2C      Spherical to Cartesian conversion
+*        SLA_DCC2S      Cartesian to spherical conversion
 
 *  Implementation Deficiencies:
 *     {routine_deficiencies}...
 
-*  {machine}-specific features used:
-*     {routine_machine_specifics}...
-
-*  {DIY_prologue_heading}:
-*     {DIY_prologue_text}
-
 *  References:
-*     {routine_references}...
+*     WCI Subroutine Guide : http://www.star.sr.star.ac.uk:8080/asterix-docs/Programmer/Guides/wci.html
 
 *  Keywords:
-*     package:wci, usage:public
+*     package:wci, usage:public, coordinate conversion
 
 *  Copyright:
 *     {routine_copyright}
