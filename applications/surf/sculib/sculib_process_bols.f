@@ -125,9 +125,11 @@
 *     JIGGLE_P_SWITCH = _INTEGER
 *        Number of jiggles per switch
 *     RA_CEN = _DOUBLE (Given)
-*        apparent RA of output map centre (radians) Only used for JIGGLE data.
+*        apparent RA of output map centre (radians). Used mainly for JIGGLE
+*        but also for scan/map data pre Dec 1997
 *     DEC_CEN = _DOUBLE (Given)
-*        apparent Dec of output map centre (radians) Only used for JIGGLE data.
+*        apparent Dec of output map centre (radians) Used mainly for JIGGLE
+*        but also for scan/map data pre Dec 1997
 *     CENTRE_DU3 = _REAL (Given)
 *        dU3 Nasmyth coordinate of point on focal plane that defines 
 *        telescope axis.
@@ -135,13 +137,13 @@
 *        dU4 Nasmyth coordinate of point on focal plane that defines 
 *        telescope axis.
 *     RA1 = _REAL (Given)
-*        RA at start of scan for each exposure (SCAN only)
+*        RA (in RD, RJ or AZ) at start of scan for each exposure (SCAN only)
 *     RA2 = _REAL (Given)
-*        RA at end of scan for each exposure (SCAN only)
+*        RA (in RD, RJ or AZ) at end of scan for each exposure (SCAN only)
 *     DEC1 = _REAL (Given)
-*        DEC at start of scan for each exposure (SCAN only)
+*        DEC (in RJ, RD or AZ) at start of scan for each exposure (SCAN only)
 *     DEC2 = _REAL (Given)
-*        DEC at end of scan for each exposure (SCAN only)
+*        DEC (in RD, RJ, AZ) at end of scan for each exposure (SCAN only)
 *     MJD_STANDARD = _DOUBLE (Given)
 *        Standard MJD to which each input map is referenced (EXTINCTION=FALSE)
 *     IN_UT1 = _DOUBLE (Given)
@@ -218,6 +220,11 @@
 *     The offsets are added to the map centre every time round the
 *     loop. This is because it is possible to have AZ offsets for
 *     RA,Dec centres.
+*
+*     The coordinate frame of RA1, RA2, DEC1 and DEC2 fro SCAN/MAP depends
+*     on the CENTRE_COORDS of the observation. For CENTRE=RD the scan positions
+*     are in RD; for CENTRE=RB,RJ,GA the scans are in RJ and for centre=AZ
+*     the scans are in AZ.
 
 *  Authors:
 *     TIMJ: Tim Jenness (JACH)
@@ -228,6 +235,10 @@
 *        Extract from main tasks
 
 *  Bugs:
+*     Currently the IN_UT1 is assumed to be the MJD when the data taking
+*     begins. As of 24-NOV-1997 IN_UT1 is actually the MJD of the start
+*     of the observation (ie when the telescope begins to slew). This is
+*     a problem for data using a moving centre.
 *     {note_any_bugs_here}
  
 *-
@@ -330,6 +341,7 @@
       DOUBLE PRECISION ARRAY_RA_CENTRE  ! apparent RA of array centre (rads)
       INTEGER          BEAM             ! Loop counter for N_BEAMS
       INTEGER          BOL_COORDS_OFFSET! Offset used in CALC_BOL_COORDS
+      CHARACTER*(10)   CENTRE_COORDS    ! Centre coords of observation centre
       REAL             CENTRE_DU3       ! dU3 Nasmyth coordinate of point on 
                                         ! focal plane that defines tel axis
       REAL             CENTRE_DU4       ! dU3 Nasmyth coordinate of point on 
@@ -367,6 +379,7 @@
       REAL             RA_END           ! RA at end of SCAN
       REAL             RA_START         ! RA at start of SCAN
       REAL             RTEMP            ! Temp real
+      INTEGER          SCUCD_VERSION    ! Version of SCUCD file
       LOGICAL          SET_STATUS       ! True is status has been set by sub
       LOGICAL          SOME_DATA        ! True if data was found
       INTEGER          STORED_OFFSET    ! Data offset at start of exposure
@@ -430,6 +443,17 @@
      :     'CNTR_DU3', CENTRE_DU3, STATUS)
       CALL SCULIB_GET_FITS_R (N_FITS, N_FITS, FITS,
      :     'CNTR_DU4', CENTRE_DU4, STATUS)
+
+*     Cheat a little bit here and read CENTRE_COORDS from the 
+*     FITS header rather than passing it in as an argument.
+
+      CALL SCULIB_GET_FITS_C (N_FITS, N_FITS, FITS,
+     :     'CENT_CRD', CENTRE_COORDS, STATUS)
+
+*     Get the file version number
+      CALL SCULIB_GET_FITS_I(N_FITS, N_FITS, FITS,
+     :     'VERSION', SCUCD_VERSION, STATUS)
+
 
 *     Determine the offset coordinate system
 
@@ -687,6 +711,25 @@
      :                          DBLE (EXP_END - EXP_START)
                         END IF
 
+*     This array centre now has to be converted to apparent RA/DEC
+*     The on-line system uses different coordinate systems for the
+*     start and end of the scans depending on the CENTRE_COORDS
+*     so we need to convert the map centres to Apparent RA/Dec
+*     before proceeding.
+*     If CENTRE_COORDS is 'PLANET' then we do nothing since it is 
+*     already in apparent RA/Dec.
+*     In fact the modification is really small.
+*     After December 1997 the on-line system really does store apparent
+*     RA/Dec correctly so this is not required (version 1.0 of the
+*     SCUCD file).
+
+                        CALL SCULIB_SCAN_2_RD(SCUCD_VERSION, 
+     :                       CENTRE_COORDS, MAP_RA_CEN, MAP_DEC_CEN,
+     :                       ARRAY_RA_CENTRE, ARRAY_DEC_CENTRE,
+     :                       LST, IN_UT1,
+     :                       ARRAY_RA_CENTRE, ARRAY_DEC_CENTRE,
+     :                       STATUS)
+                        
                         OFFSET_X = 0.0
                         OFFSET_Y = 0.0
 
@@ -841,7 +884,7 @@
 *     Check that some data was processed
       IF (STATUS .EQ. SAI__OK .AND. .NOT. SOME_DATA) THEN
          STATUS = SAI__WARN
-         CALL ERR_REP (' ', 'SCULIB_PROCESS_BOLS: No data was '//
+         CALL ERR_REP (' ', 'SCULIB_PROCESS_BOLS: No data were '//
      :        'processed', STATUS)
          SET_STATUS = .TRUE.
       END IF
