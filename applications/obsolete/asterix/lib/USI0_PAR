@@ -1,0 +1,112 @@
+* Logging modes
+      INTEGER			USI__L_ICL
+        PARAMETER		( USI__L_ICL = 1 )
+      INTEGER			USI__L_CSH
+        PARAMETER		( USI__L_CSH = 2 )
+      INTEGER			USI__L_CALL
+        PARAMETER		( USI__L_CALL = 3 )
+
+      INTEGER                   USI__F_L
+        PARAMETER               ( USI__F_L = 0 )
+      INTEGER                   USI__F_I
+        PARAMETER               ( USI__F_I = 1 )
+      INTEGER                   USI__F_R
+        PARAMETER               ( USI__F_R = 2 )
+      INTEGER                   USI__F_D
+        PARAMETER               ( USI__F_D = 3 )
+      INTEGER                   USI__F_C
+        PARAMETER               ( USI__F_C = 4 )
+
+      INTEGER                   USI__F_DEF0
+        PARAMETER               ( USI__F_DEF0 = 1 )
+      INTEGER                   USI__F_DEF1
+        PARAMETER               ( USI__F_DEF1 = 5 )
+      INTEGER                   USI__F_GET0
+        PARAMETER               ( USI__F_GET0 = 10 )
+      INTEGER                   USI__F_GET1
+        PARAMETER               ( USI__F_GET1 = 15 )
+      INTEGER                   USI__F_PUT0
+        PARAMETER               ( USI__F_PUT0 = 20 )
+      INTEGER                   USI__F_PUT1
+        PARAMETER               ( USI__F_PUT1 = 25 )
+      INTEGER                   USI__F_REST
+        PARAMETER               ( USI__F_REST = 40 )
+
+      INTEGER			USI__F_DEF0L
+        PARAMETER               ( USI__F_DEF0L = USI__F_DEF0+USI__F_L )
+      INTEGER			USI__F_DEF0I
+        PARAMETER               ( USI__F_DEF0I = USI__F_DEF0+USI__F_I )
+      INTEGER			USI__F_DEF0R
+        PARAMETER               ( USI__F_DEF0R = USI__F_DEF0+USI__F_R )
+      INTEGER			USI__F_DEF0D
+        PARAMETER               ( USI__F_DEF0D = USI__F_DEF0+USI__F_D )
+      INTEGER			USI__F_DEF0C
+        PARAMETER               ( USI__F_DEF0C = USI__F_DEF0+USI__F_C )
+
+      INTEGER			USI__F_DEF1L
+        PARAMETER               ( USI__F_DEF1L = USI__F_DEF1+USI__F_L )
+      INTEGER			USI__F_DEF1I
+        PARAMETER               ( USI__F_DEF1I = USI__F_DEF1+USI__F_I )
+      INTEGER			USI__F_DEF1R
+        PARAMETER               ( USI__F_DEF1R = USI__F_DEF1+USI__F_R )
+      INTEGER			USI__F_DEF1D
+        PARAMETER               ( USI__F_DEF1D = USI__F_DEF1+USI__F_D )
+      INTEGER			USI__F_DEF1C
+        PARAMETER               ( USI__F_DEF1C = USI__F_DEF1+USI__F_C )
+
+      INTEGER			USI__F_GET0L
+        PARAMETER               ( USI__F_GET0L = USI__F_GET0+USI__F_L )
+      INTEGER			USI__F_GET0I
+        PARAMETER               ( USI__F_GET0I = USI__F_GET0+USI__F_I )
+      INTEGER			USI__F_GET0R
+        PARAMETER               ( USI__F_GET0R = USI__F_GET0+USI__F_R )
+      INTEGER			USI__F_GET0D
+        PARAMETER               ( USI__F_GET0D = USI__F_GET0+USI__F_D )
+      INTEGER			USI__F_GET0C
+        PARAMETER               ( USI__F_GET0C = USI__F_GET0+USI__F_C )
+
+      INTEGER			USI__F_GET1L
+        PARAMETER               ( USI__F_GET1L = USI__F_GET1+USI__F_L )
+      INTEGER			USI__F_GET1I
+        PARAMETER               ( USI__F_GET1I = USI__F_GET1+USI__F_I )
+      INTEGER			USI__F_GET1R
+        PARAMETER               ( USI__F_GET1R = USI__F_GET1+USI__F_R )
+      INTEGER			USI__F_GET1D
+        PARAMETER               ( USI__F_GET1D = USI__F_GET1+USI__F_D )
+      INTEGER			USI__F_GET1C
+        PARAMETER               ( USI__F_GET1C = USI__F_GET1+USI__F_C )
+
+      INTEGER			USI__F_PUT0L
+        PARAMETER               ( USI__F_PUT0L = USI__F_PUT0+USI__F_L )
+      INTEGER			USI__F_PUT0I
+        PARAMETER               ( USI__F_PUT0I = USI__F_PUT0+USI__F_I )
+      INTEGER			USI__F_PUT0R
+        PARAMETER               ( USI__F_PUT0R = USI__F_PUT0+USI__F_R )
+      INTEGER			USI__F_PUT0D
+        PARAMETER               ( USI__F_PUT0D = USI__F_PUT0+USI__F_D )
+      INTEGER			USI__F_PUT0C
+        PARAMETER               ( USI__F_PUT0C = USI__F_PUT0+USI__F_C )
+
+      INTEGER			USI__F_PUT1L
+        PARAMETER               ( USI__F_PUT1L = USI__F_PUT1+USI__F_L )
+      INTEGER			USI__F_PUT1I
+        PARAMETER               ( USI__F_PUT1I = USI__F_PUT1+USI__F_I )
+      INTEGER			USI__F_PUT1R
+        PARAMETER               ( USI__F_PUT1R = USI__F_PUT1+USI__F_R )
+      INTEGER			USI__F_PUT1D
+        PARAMETER               ( USI__F_PUT1D = USI__F_PUT1+USI__F_D )
+      INTEGER			USI__F_PUT1C
+        PARAMETER               ( USI__F_PUT1C = USI__F_PUT1+USI__F_C )
+
+      INTEGER			USI__F_CANCL
+        PARAMETER               ( USI__F_CANCL = USI__F_REST+1 )
+      INTEGER			USI__F_PROMT
+        PARAMETER               ( USI__F_PROMT = USI__F_REST+2 )
+      INTEGER			USI__F_STATE
+        PARAMETER               ( USI__F_STATE = USI__F_REST+3 )
+      INTEGER			USI__F_DASSOC
+        PARAMETER               ( USI__F_DASSOC = USI__F_REST+4 )
+      INTEGER			USI__F_DCREAT
+        PARAMETER               ( USI__F_DCREAT = USI__F_REST+5 )
+      INTEGER			USI__F_PARSE
+        PARAMETER               ( USI__F_PARSE = USI__F_REST+6 )
