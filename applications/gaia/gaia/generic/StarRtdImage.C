@@ -454,67 +454,70 @@ int StarRtdImage::call ( const char *name, int len, int argc, char *argv[] )
 // The image will use the StarWCS class to manage WCS coordinates, instead
 // of the default implementation (SAOWCS).
 //
-// The arguments are the filename and an optional slice and HDS path
-// name string for NDFIO.  (17.03.98, ALLAN), note all images with
-// slices, must be processed by the NDF library.
+// The arguments are the filename, an optional slice, fits extension
+// number and HDS path name string for NDFIO.  (17.03.98, ALLAN), note
+// all images with slices, must be processed by the NDF library.
 //-
 ImageData* StarRtdImage::getStarImage(const char* filename,
+                                      const char* fitsext,
                                       const char* slice,
                                       const char* path)
 {
-   // Check if the file extension is one known to the NDF library
-   // (excluding FITS). If not then pass the image to be read using
-   // the StarFitsIO or NDFIO classes as appropriate. These are then passed
-   // to ImageData via which any further control is made.
-   const char* type = fileSuffix( filename );
-   ImageIO imio;
-
-   //  ALLAN: fileSuffix(filename) might return "fits.Z" or "fits.gz"
-   //  for a compressed FITS file.
-   char* p = (char *) strchr( filename, '.' );
-   int isfits = 1;
-   if ( p && ! strstr( p, ".fit" ) ) {
-      isfits = 0;
-   }
-
-   if ( ( !isfits && isNDFtype( type ) ) || slice || path ) {
-      if ( slice || path ) {
-
-         //  Construct a complete name, including the slice and or path
-         //  name. Note if a HDS path is given then we must avoid
-         //  including the file extension.
-         int len = strlen( filename ) + 1;
-         if ( slice ) len += strlen( slice );
-         if ( path ) len += strlen( path );
-         char *fullname = new char[len];
-         strcpy( fullname, filename );
-         if ( path ) {
-            p = strstr( fullname, type ) - 1;
-            strcpy( p, path );
-         }
-         if ( slice ) strcat( fullname, slice );
-
-         //  Open image.
-         imio = NDFIO::read( fullname, component() );
-         delete fullname;
-
-      } else {
-
-         //  Plain name so just open image.
-         imio = NDFIO::read( filename, component() );
-      }
-   }  else {
-
-      //  Note: Use special FITS class so that we can use AST for
-      //  dealing with astrometry.
-      imio = StarFitsIO::read( filename, Mem::FILE_PRIVATE | Mem::FILE_RDWR );
-   }
-   if ( imio.status() != 0 ) {
-      return (ImageData *) NULL;
-   }
-
-   //  Return the new image.
-   return makeImage( imio );
+    // Check if the file extension is one known to the NDF library
+    // (excluding FITS). If not then pass the image to be read using
+    // the StarFitsIO or NDFIO classes as appropriate. These are then
+    // passed to ImageData via which any further control is made.
+    const char* type = fileSuffix( filename );
+    ImageIO imio;
+    
+    //  ALLAN: fileSuffix(filename) might return "fits.Z" or "fits.gz"
+    //  for a compressed FITS file.
+    char* p = (char *) strchr( filename, '.' );
+    int isfits = 1;
+    if ( p && ! strstr( p, ".fit" ) ) {
+        isfits = 0;
+    }
+    
+    if ( ( !isfits && isNDFtype( type ) ) || slice || path ) {
+        if ( slice || path || fitsext ) {
+            
+            //  Construct a complete name, including the slice, FITS
+            //  extension and or path name. Note if a HDS path is
+            //  given then we must avoid including the file extension.
+            int len = strlen( filename ) + 1;
+            if ( fitsext ) len += strlen( fitsext );
+            if ( slice ) len += strlen( slice );
+            if ( path ) len += strlen( path );
+            char *fullname = new char[len];
+            strcpy( fullname, filename );
+            if ( path ) {
+                p = strstr( fullname, type ) - 1;
+                strcpy( p, path );
+            }
+            if ( fitsext ) strcat( fullname, fitsext );
+            if ( slice ) strcat( fullname, slice );
+            
+            //  Open image.
+            imio = NDFIO::read( fullname, component() );
+            delete fullname;
+            
+        } else {
+            
+            //  Plain name so just open image.
+            imio = NDFIO::read( filename, component() );
+        }
+    }  else {
+        
+        //  Note: Use special FITS class so that we can use AST for
+        //  dealing with astrometry.
+        imio = StarFitsIO::read( filename, Mem::FILE_PRIVATE | Mem::FILE_RDWR );
+    }
+    if ( imio.status() != 0 ) {
+        return (ImageData *) NULL;
+    }
+    
+    //  Return the new image.
+    return makeImage( imio );
 }
 
 //+
@@ -533,8 +536,8 @@ ImageData* StarRtdImage::getStarImage(const char* filename,
 //  correct classes are initialized, in particular, the StarWCS class.
 //
 //  (XXX what about byte swapping for shared memory images (rtdimage
-//  mmap and shm commands, real-time interface) ? Do we want to do
-//  that here?).
+//  mmap and shm commands, real-time interface)? Do we want to do that
+//  here?).
 //-
 ImageData *StarRtdImage::makeImage( ImageIO imio )
 {
@@ -593,21 +596,24 @@ int StarRtdImage::loadFile()
 
    //  Check that the image exists and parse it.
    char *name;
+   char *fitsext;
    char *slice;
    char *path;
-   if ( parseName( file(), &name, &slice, &path ) != TCL_OK ) {
+   if ( parseName( file(), &name, &fitsext, &slice, &path ) != TCL_OK ) {
       if ( name ) delete name;
+      if ( fitsext ) delete fitsext;
       if ( slice ) delete slice;
       if ( path ) delete path;
       return error( file(), " is not an image" );
    }
 
    //  Create the image.
-   ImageData* image = getStarImage( name, slice, path );
+   ImageData* image = getStarImage( name, fitsext, slice, path );
 
    //  Release resources and return an error if image couldn't be
    //  created for some reason.
    delete name;
+   if ( fitsext ) delete fitsext;
    if ( slice ) delete slice;
    if ( path ) delete path;
    if (! image ) {
@@ -2131,10 +2137,12 @@ int StarRtdImage::astcopyCmd( int argc, char *argv[] )
 
   //  Parse the input image name.
   char *name;
+  char *fitsext;
   char *slice;
   char *path;
-  if ( parseName( argv[0], &name, &slice, &path ) != TCL_OK ) {
+  if ( parseName( argv[0], &name, &fitsext, &slice, &path ) != TCL_OK ) {
     if ( name ) delete name;
+    if ( fitsext ) delete fitsext;
     if ( slice ) delete slice;
     if ( path ) delete path;
     return error( argv[0], " is not an image" );
@@ -2143,8 +2151,9 @@ int StarRtdImage::astcopyCmd( int argc, char *argv[] )
   // Open the image to get at the WCS information.
   // XXX this is a very inefficient way to get at WCS information, but
   // at least it's general.
-  ImageData* newimage = getStarImage( name, slice, path );
+  ImageData* newimage = getStarImage( name, fitsext, slice, path );
   delete name;
+  if ( fitsext ) delete fitsext;
   if ( slice ) delete slice;
   if ( path ) delete path;
   if ( ! newimage ) {
@@ -4363,7 +4372,7 @@ int StarRtdImage::gbandCmd( int argc, char *argv[] )
     }
   }
 
-  //  XXX code from mband.
+  //  Code from mband.
   //  Calculate canvas coords for lines and labels and
   //  try to keep the labels out of the way so they don't block anything
   double mx = (x0 + x1)/2;
@@ -4508,122 +4517,151 @@ int StarRtdImage::gbandCmd( int argc, char *argv[] )
 //   StarRtdImage::parseName
 //
 //   Purpose:
-//     Parses an image name into a filename, plus the NDF slice and a
-//     possible HDS component path.
+//      Parses an image name into a filename, plus optional components
+//      of a FITS extension, NDF slice and HDS component path.
 //
 //   Notes:
-//     The given name is checked to see if it corresponds to a known
-//     NDF name, or the name of a file that the NDF library can
-//     process (such as a foreign format). If this is the case then
-//     the existence of the file is checked. If it doesn't exist then
-//     an NDF with the basename is check instead, if this exists then
-//     it is assumed that the file "extension" corresponds to an NDF
-//     within that container file.
+//      The given name is checked to see if it corresponds to a known
+//      NDF name, or the name of a file that the NDF library can
+//      process (such as a foreign format). If this is the case then
+//      the existence of the file is checked. If it doesn't exist then
+//      an NDF with the basename is check instead, if this exists then
+//      it is assumed that the file "extension" corresponds to an NDF
+//      within that container file.
 //
-//     FITS files are checked for existence, if these are not found
-//     then no further action is taken.
+//      FITS files are checked for existence, if these are not found
+//      then no further action is taken, but note that the extension
+//      specifier ([number]) and slice can also be valid.
 //
-//     The fullname, slice and path strings are set to a copy of the
-//     appropriate parts of imagename. These should be deleted when no
-//     longer needed.
+//      The fullname, slice and path strings are set to a copy of the
+//      appropriate parts of imagename. These should be deleted when no
+//      longer needed.
 //
 //   Return:
 //      TCL_OK if file exists, TCL_ERROR otherwise.
 //
 //-
 int StarRtdImage::parseName( const char *imagename, char **fullname,
-                             char **slice, char **path )
+                             char **fitsext, char **slice, char **path )
 {
 
-   //  Create the output strings.
-   int namelen = strlen( imagename ) + 1;
-   *fullname = new char[namelen];
-   *slice = new char[namelen];
-   *path = new char[namelen];
-   strcpy( *fullname, imagename );
+    //  Create the output strings.
+    int namelen = strlen( imagename ) + 1;
+    *fullname = new char[namelen];
+    *slice = new char[namelen];
+    *path = new char[namelen];
+    *fitsext = new char[namelen];
+    strcpy( *fullname, imagename );
+    
+    //  Look for a slice at the end of the file name. This needs to be
+    //  removed while we do other tests.
+    char *left = strrchr( *fullname, '(');
+    char *right = strrchr( *fullname, ')');
+    int haveslice = 0;
+    if ( left && right ) {
+        strcpy( *slice, left );
+        *left = '\0';
+        haveslice = 1;
+    }
+    
+    //  Look for a FITS extension, this should be before the slice,
+    //  but after the file type (probably .fits).
+    left = strrchr( *fullname, '[');
+    right = strrchr( *fullname, ']');
+    int havefitsext = 0;
+    if ( left && right ) {
+        strcpy( *fitsext, left );
+        *left = '\0';
+        havefitsext = 1;
+    }
 
-   //  Look for a slice at the end of the file name. This needs to be
-   //  removed while we do other tests.
-   char *left = strrchr( *fullname, '(');
-   char *right = strrchr( *fullname, ')');
-   if ( left && right ) {
-      strcpy( *slice, left );
-      *left = '\0';
-   } else {
-      delete *slice;
-      *slice = NULL;
-   }
-
-   //  See if fullname is now just an existing file known to NDF.
-   const char* type = fileSuffix( *fullname );
-   if ( isNDFtype( type ) ) {
-
-      //  Check that name is a file, if so nothing to do except to check
-      //  that it is a regular file.
-      if ( ! fileExists( *fullname ) ) {
-         delete *fullname;
-         *fullname = NULL;
-         if ( slice ) {
+    //  See if fullname is now just an existing file known to NDF.
+    const char* type = fileSuffix( *fullname );
+    if ( isNDFtype( type ) ) {
+        
+        //  Check that name is a file, if so nothing to do except to check
+        //  that it is a regular file.
+        if ( ! fileExists( *fullname ) ) {
+            delete *fullname;
+            *fullname = NULL;
             delete *slice;
             *slice = NULL;
-         }
-         delete *path;
-         *path = NULL;
-         return error( imagename, " cannot be accessed" );
-      } else {
-         delete *path;
-         *path = (char *) NULL;
-         return TCL_OK;
-      }
-   } else {
-
-      //  Could be FITS file. No funny possibilities for these names.
-      char* p = strchr( *fullname, '.' );
-      if ( p && strstr( p, ".fit" ) != (char *) NULL ) {
-
-         //  Is a FITS name, does file exist? If not assume might be NDF
-         //  component and pass on.
-         if ( fileExists( *fullname ) ) {
-            if ( slice ) {
-               delete *slice;
-               *slice = NULL;
-            }
             delete *path;
             *path = NULL;
+            return error( imagename, " cannot be accessed" );
+        } else {
+            if ( ! haveslice ) {
+                delete *slice;
+                *slice = NULL;
+            }
+            if ( ! havefitsext ) {
+                delete *fitsext;
+                *fitsext = NULL;
+            }
+            delete *path;
+            *path = (char *) NULL;
             return TCL_OK;
-         }
-      }
-   }
-
-   //  OK. File as given doesn't correspond to a disk file. Either the
-   //  name is wrong, or we may have a path to a HDS component. Look
-   //  for a component name which should be after the ".sdf" string,
-   //  but before the slice.
-   int found = 0;
-   char *sdf = strstr( *fullname, ".sdf" );
-   if ( sdf ) {
-      sdf += 4;
-      if ( *sdf == '.' ) {
-         strcpy( *path, sdf );
-         *sdf = '\0';
-
-         //  OK fullname should be a filename.
-         found = fileExists( *fullname );
-      }
-   }
-   if ( found ) {
-      return TCL_OK;
-   } else {
-      delete *fullname;
-      *fullname = NULL;
-      if ( *slice ) {
-         delete *slice;
-         *slice = NULL;
-      }
-      delete *path;
-      *path = NULL;
-      return error( imagename, " cannot be accessed" );
-   }
+        }
+    } else {
+        
+        //  Could be FITS file. No funny possibilities for these names.
+        char* p = strchr( *fullname, '.' );
+        if ( p && strstr( p, ".fit" ) != (char *) NULL ) {
+            
+            //  Is a FITS name, does file exist? If not assume might
+            //  be NDF component and pass on. Note a slice is valid,
+            //  but ultimately means this will be accessed as an NDF.
+            if ( fileExists( *fullname ) ) {
+                if ( ! haveslice ) {
+                    delete *slice;
+                    *slice = NULL;
+                }
+                if ( ! havefitsext ) {
+                    delete *fitsext;
+                    *fitsext = NULL;
+                }
+                delete *path;
+                *path = NULL;
+                return TCL_OK;
+            }
+        }
+    }
+    
+    //  OK. File as given doesn't correspond to a disk file. Either the
+    //  name is wrong, or we may have a path to a HDS component. Look
+    //  for a component name which should be after the ".sdf" string,
+    //  but before the slice.
+    int found = 0;
+    char *sdf = strstr( *fullname, ".sdf" );
+    if ( sdf ) {
+        sdf += 4;
+        if ( *sdf == '.' ) {
+            strcpy( *path, sdf );
+            *sdf = '\0';
+            
+            //  OK fullname should be a filename.
+            found = fileExists( *fullname );
+        }
+    }
+    if ( found ) {
+        delete *fitsext;
+        *fitsext = NULL;
+        if ( ! haveslice ) {
+            delete *slice;
+            *slice = NULL;
+        }
+        return TCL_OK;
+    } else {
+        delete *fullname;
+        *fullname = NULL;
+        delete *fitsext;
+        *fitsext = NULL;
+        delete *slice;
+        *slice = NULL;
+        delete *path;
+        *path = NULL;
+        return error( imagename, " cannot be accessed" );
+    }
 }
 
 //+
@@ -4714,10 +4752,12 @@ int StarRtdImage::fullNameCmd( int argc, char *argv[] )
    if ( isndf ) {
       //  Parse the filename into bits
       char *name;
+      char *fitsext;
       char *slice;
       char *path;
-      if ( parseName( file(), &name, &slice, &path ) != TCL_OK ) {
+      if ( parseName( file(), &name, &fitsext, &slice, &path ) != TCL_OK ) {
          if ( name ) delete name;
+         if ( fitsext ) delete fitsext;
          if ( slice ) delete slice;
          if ( path ) delete path;
          return error( file(), " is not a known NDF (internal error)" );
@@ -4888,12 +4928,12 @@ int StarRtdImage::readonlyCmd( int argc, char *argv[] )
 //-
 int StarRtdImage::remoteTclCmd( int argc, char* argv[] )
 {
-   if ( Tcl_Eval( interp_, argv[0] ) == TCL_OK ) {
-      return set_result( interp_->result );
-   } else {
-      set_result( interp_->result );
-      return TCL_ERROR;
-   }
+    if ( Tcl_Eval( interp_, argv[0] ) == TCL_OK ) {
+        return set_result( interp_->result );
+    } else {
+        set_result( interp_->result );
+        return TCL_ERROR;
+    }
 }
 
 //+

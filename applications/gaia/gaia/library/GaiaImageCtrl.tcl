@@ -446,13 +446,10 @@ itcl::class gaia::GaiaImageCtrl {
             delete_temporary_
          }
 
-	 #  Parse name to deal with slices etc. and make this current.
+	 #  Parse name as we may need to also configure the HDU number.
 	 $namer_ configure -imagename $file
-	 if { [$namer_ exists] } {
-            configure -file [$namer_ fullname]
-         } else {
-            error_dialog "There is no file named '$file'" $w_
-         }
+         configure -hdu [$namer_ fitshdunum]
+         configure -file [$namer_ fullname 0]
       }
    }
 
@@ -560,7 +557,7 @@ itcl::class gaia::GaiaImageCtrl {
 
    #  Load an image (internal version: use -file option/public
    #  variable), modified to deal with NDF image names.
-   public method load_fits_ {} {
+   protected method load_fits_ {} {
 
       #  See if the image should be saved (image server types).
       check_save
@@ -572,12 +569,12 @@ itcl::class gaia::GaiaImageCtrl {
          set old_height [$image_ height]
          busy {
             set center_ok_ 0
-            if {[catch {$image_ config -file [$namer_ fullname] \
+            if {[catch {$image_ config -file [$namer_ fullname 0] \
                            -component $itk_option(-component)} msg]} {
 
                #  If component isn't "data" then try that.
                if { $itk_option(-component) != "data" } {
-                  if {[catch {$image_ config -file [$namer_ fullname] \
+                  if {[catch {$image_ config -file [$namer_ fullname 0] \
                                  -component "data"} msg]} {
                      error_dialog $msg $w_
                      clear
@@ -599,6 +596,12 @@ itcl::class gaia::GaiaImageCtrl {
          set w [$image_ dispwidth]
          set h [$image_ dispheight]
          set_scrollregion 0 0 $w $h
+
+         #  Set the initial FITS HDU.
+         if { $itk_option(-hdu) != 0 } {
+            $image_ hdu $itk_option(-hdu)
+         }
+
       } else {
          error_dialog "'$itk_option(-file)' does not exist" $w_
          set file ""
@@ -836,7 +839,7 @@ itcl::class gaia::GaiaImageCtrl {
             load_fits_
          }
          if { $itk_option(-file_change_cmd) != "" } {
-            eval $itk_option(-file_change_cmd) $itk_option(-file)
+            #eval $itk_option(-file_change_cmd) $itk_option(-file)
          }
       }
       set $itk_option(-temporary) 0
@@ -884,6 +887,9 @@ itcl::class gaia::GaiaImageCtrl {
 
    #  Component of the NDF that is displayed.
    itk_option define -component component Component data
+
+   #  Define the HDU initially displayed from each FITS file that is loaded.
+   itk_option define -hdu hdu Hdu 0
 
    #  Protected variables:
    #  ====================

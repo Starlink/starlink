@@ -55,7 +55,15 @@ if { $argc >= 1 } {
    #  otherwise no image has been given and we just get on with it.
    if { ! [string match {-*} $image] } {
       gaia::GaiaImageName .namer -imagename $image
-      set argv [lreplace $argv 0 0 [.namer fullname]]
+
+      #  Set the HDU, this will be removed from the name, if needed.
+      set hdu [.namer fitshdunum]
+      lappend argv "-hdu" 
+      lappend argv "$hdu"
+      incr argc 2
+
+      #  Replace the given name by one that GAIA can display.
+      set argv [lreplace $argv 0 0 [.namer fullname 0]]
       delete object .namer
    }
 }
@@ -63,7 +71,6 @@ if { $argc >= 1 } {
 #  Extract the known file types and set these up as defaults. These
 #  are entered as if command-line arguments so that they propagate
 #  to clone windows.
-
 set file_types {{any *} {NDF(.sdf) *.sdf} {FIT(.fit) *.fit} {FITS(fits) *.fits}}
 if { [info exists env(NDF_FORMATS_IN)] } {
    set new_types [split $env(NDF_FORMATS_IN) ","]

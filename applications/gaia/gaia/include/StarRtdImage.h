@@ -246,6 +246,7 @@ class StarRtdImage : public Skycat {
 
    //  Load an image file and return a pointer to the ImageData object for it.
    virtual ImageData *getStarImage( const char *filename,
+                                    const char *fitsext,
                                     const char *slice,
                                     const char *path );
 
@@ -266,7 +267,7 @@ class StarRtdImage : public Skycat {
 
    //  Parse and test image name.
    int parseName( const char *imagename, char **fullname,
-                  char **slice, char **path );
+                  char **fitsext, char **slice, char **path );
 
    //  Check if the named file exists.
    int fileExists( const char *filename );

@@ -64,7 +64,7 @@
 #     05-MAY-2000 (PWD):
 #        Changed so that CATLIB_CONFIG is used in preference to
 #        all other configuration files when set (otherwise need
-#        to delete ~/.skycat/skycat.cfg before can use another 
+#        to delete ~/.skycat/skycat.cfg before can use another
 #        configuration file).
 #     12-MAY-2000 (PWD):
 #        Added positions toolbox.
@@ -180,13 +180,13 @@ itcl::class gaia::Gaia {
    #  Quit the application. Really.... Rtd doesn't have the exit.
    #  If being paranoid then ask for confirmation.
    public method quit {} {
-      if { ! $itk_option(-quiet_exit) } { 
+      if { ! $itk_option(-quiet_exit) } {
          if { ! [confirm_dialog \
                     "Are you sure you want to exit the application?" $w_]} {
             return
          }
       }
-      
+
       #  Permission supplied so continue with exit.
       delete object $w_
       after idle exit
@@ -351,14 +351,15 @@ itcl::class gaia::Gaia {
             -component $itk_option(-component) \
             -min_scale $itk_option(-min_scale) \
             -max_scale $itk_option(-max_scale) \
-            -pickobjectorient $itk_option(-pickobjectorient)
+            -pickobjectorient $itk_option(-pickobjectorient) \
+            -hdu $itk_option(-hdu)
       }
 
       #  Keep a list of SkyCat/GAIA instances.
       global ::skycat_images
       lappend skycat_images $itk_component(image)
    }
-   
+
    #  Delete a this object.
    public method delete_window {} {
       delete object $w_
@@ -377,7 +378,7 @@ itcl::class gaia::Gaia {
       bind $w_  <Control-v> [code $image_ reopen]
       bind $w_  <Control-s> [code $image_ save_as]
       catch {$m delete "Save region as..."}
-      
+
       #  Close also needs the command changing to delete the object.
       $m entryconfigure "Close" \
 	 -label "Close Window" \
@@ -569,7 +570,7 @@ itcl::class gaia::Gaia {
 	       {See a demonstration of GAIA (needs an empty directory)} \
 	       -command [code $this make_toolbox demo]
       }
-      if { $itk_option(-ramp_print) && $itk_option(-with_colorramp) } { 
+      if { $itk_option(-ramp_print) && $itk_option(-with_colorramp) } {
 	 add_menuitem $m command "Print color ramp..." \
 	    {Print a labelled copy of color ramp to postscript} \
 	    -command [code $this print_ramp_]
@@ -940,17 +941,21 @@ itcl::class gaia::Gaia {
    }
 
    #  Open a new file without a filebrowser, or return the name of the
-   #  displayed file. Always use an absolute name (for matching etc.)
+   #  displayed file. Always use an absolute name (for matching etc.).
+   #  FITS extensions are enabled if needed by using the "fullname 0"
+   #  switch.
    public method open {args} {
       if { "$args" != "" } {
          set imagename [lindex $args 0]
 	 set namer [GaiaImageName \#auto -imagename $imagename]
-	 if { [$namer exists] } { 
+	 if { [$namer exists] } {
 	    $namer absolute
-	    configure -file [$namer fullname]
-
-            #  Make sure image exists before using it.
-            $image_ configure -file [$namer fullname]
+            set fullname [$namer fullname 0]
+            set hdunum [$namer fitshdunum]
+            configure -hdu $hdunum
+            configure -file $fullname
+            $image_ configure -hdu $hdunum
+            $image_ configure -file $fullname
 
             #  Lower the image on the canvas so that any existing
             #  graphics are revealed.
@@ -985,7 +990,7 @@ itcl::class gaia::Gaia {
       }
 
       #  If a clone number was given construct the related name.
-      if { $number != "" } { 
+      if { $number != "" } {
 	 set name ".gaia$number"
       } else {
 	 set name ""
@@ -1011,7 +1016,7 @@ itcl::class gaia::Gaia {
       }
 
       #  Start a new clone, block the tkwait if asked.
-      if { ! $block } { 
+      if { ! $block } {
 	 rename ::tkwait ::real_tkwait
 	 rename ::false_tkwait ::tkwait
       }
@@ -1019,11 +1024,11 @@ itcl::class gaia::Gaia {
 
       #  Actually we only arrive here if not blocking, except when
       #  application is exiting, so clone number is wrong.
-      if { ! $block } { 
+      if { ! $block } {
 	 rename ::tkwait ::false_tkwait
 	 rename ::real_tkwait ::tkwait
 	 tkwait visibility $name
-	 if { $number != {} } { 
+	 if { $number != {} } {
 
 	    #  Number given, so update the title and make sure next
 	    #  clone doesn't try to have same name.
@@ -1086,7 +1091,7 @@ itcl::class gaia::Gaia {
 	    }
 	    lappend newargv $opt $arg
 	 }
-	 if { ! $seenfile } { 
+	 if { ! $seenfile } {
 
 	    #  No -file and no unpaired options.
 	    lappend newargv "-file" "$filename"
@@ -1157,7 +1162,7 @@ itcl::class gaia::Gaia {
       #    use CATLIB_CONFIG, if set (assume this is deliberate)
       #    next use ~/.skycat/skycat.cfg if it exists (this contains
       #    the user's preferences), finally use $SKYCAT_CONFIG if set
-      #    (note native implimentation ignores SKYCAT_CONFIG as this 
+      #    (note native implimentation ignores SKYCAT_CONFIG as this
       #    may be set by CURSA, which is bad).
       if { ! [info exists env(CATLIB_CONFIG)] } {
 
@@ -1371,7 +1376,7 @@ itcl::class gaia::Gaia {
 
    #  Show the print colorramp code.
    itk_option define -ramp_print ramp_print Ramp_Print 0
-   
+
    #  Set focus following policy (can only set once, then stuck with it).
    itk_option define -focus_follows_mouse focus_follows_mouse \
       Focus_Follows_Mouse 0 {
@@ -1383,6 +1388,9 @@ itcl::class gaia::Gaia {
    #  Option to inhibit the display of the exit application dialog.
    #  UKIRT requested this for 14,000 ft anoxia cases!
    itk_option define -quiet_exit quiet_exit Quiet_Exit 1
+
+   #  Set the HDU that is displayed initially.
+   itk_option define -hdu hdu Hdu 0
 
    # -- Protected variables --
 

@@ -107,9 +107,15 @@ itcl::class gaia::GaiaImageName {
    #  Methods:
    #  --------
 
-   #  Get the GAIA compliant fully expanded name.
-   public method fullname {} {
-      return $fullname_
+   #  Get the GAIA compliant fully expanded name. Do not add the FITS
+   #  extension, unless it is needed (i.e. we have a slice) when
+   #  requested. 
+   public method fullname { {fitsext 1} } {
+      if { $fitsext || $fitsext_ == {} || $slice_ != {} } {
+         return $fullname_
+      } else {
+         return "$diskfile_$path_$slice_"
+      }
    }
 
    #  Get the diskfile name.
@@ -127,9 +133,14 @@ itcl::class gaia::GaiaImageName {
       return $fitsext_
    }
 
-   #  Get the FITS extension number.
+   #  Get the FITS extension number. Note this is 0, if an NDF slice
+   #  is available.
    public method fitshdunum {} {
-      return $fitshdu_
+      if { $slice_ == {} } {
+         return $fitshdu_
+      } else {
+         return 0
+      }
    }
 
    #  Get the HDS path.
@@ -160,9 +171,9 @@ itcl::class gaia::GaiaImageName {
       #  Foreign format. If this is FITS with extension then need to
       #  decrement the extension number (from Skycat HDU count). Always
       #  return these in single quotes to protect special characters.
-      if { $fitshdu_ != 0 } { 
+      if { $fitshdu_ != 0 } {
          set extnum [expr $fitshdu_ -1]
-         return "'$diskfile_$slice_\[$extnum\]'"
+         return "'$diskfile_\[$extnum\]$slice_'"
       }
       return "'$fullname_'"
    }
@@ -187,6 +198,19 @@ itcl::class gaia::GaiaImageName {
 	    set imagename "$here/$imagename"
 	    parse_name_
 	 }
+      }
+   }
+
+   #  If requested then protect the FITS extension specifier from
+   #  expansion as a command. Note the ndfname method may fail after
+   #  using this.
+   public method protect {} {
+      if { $fitsext_ != {} } {
+         regsub {\[} $fitsext_ {\[} quoted
+         regsub {\]} $quoted {\]} fitsext_
+
+         #  Reconstruct related variables.
+         get_fullname_
       }
    }
 
@@ -216,7 +240,7 @@ itcl::class gaia::GaiaImageName {
    }
 
    #  Get any FITS extension information from the image name. Extract
-   #  the extension number as we need to decrement this for FITS files 
+   #  the extension number as we need to decrement this for FITS files
    #  that are to be processed by CONVERT & NDF (these use 1 for the
    #  first extension, not 2 as in Skycat).
    protected method get_fitsext_ {} {
@@ -230,15 +254,18 @@ itcl::class gaia::GaiaImageName {
       }
    }
 
-   #  Get the file type. This is the string (minus any FITS extension)
-   #  after the first "."  in the string after the last directory
-   #  separator. If no type is given then it defaults to ".sdf".
+   #  Get the file type. This is the string (minus any FITS extension
+   #  or NDF slice) after the first "."  in the string after the last
+   #  directory separator. If no type is given then it defaults to ".sdf".
    protected method get_type_ {} {
       set tail [file tail $imagename]
       set i1 [string first {.} $tail]
       if { $i1 > -1 } {
-         if { $fitsext_ != {} } { 
+         if { $fitsext_ != {} } {
             set i2 [expr [string first $fitsext_ $tail] -1]
+            set type_ [string range $tail $i1 $i2]
+         } elseif { $slice_ != {} } {
+            set i2 [expr [string first $slice_ $tail] -1]
             set type_ [string range $tail $i1 $i2]
          } else {
             set type_ [string range $tail $i1 end]
@@ -274,7 +301,6 @@ itcl::class gaia::GaiaImageName {
 	 incr i1 -1
 	 set diskfile_ "[string range $imagename 0 $i1]$type_"
       } else {
-
 	 #  Type not in imagename, so fallback to path_.
 	 set i1 [string first $path_ $imagename]
 	 if { $i1 > -1 } {
@@ -294,9 +320,9 @@ itcl::class gaia::GaiaImageName {
       }
    }
 
-   #  Construct the full name from the various parts. 
+   #  Construct the full name from the various parts.
    protected method get_fullname_ {} {
-      set fullname_ "$diskfile_$path_$slice_$fitsext_"
+      set fullname_ "$diskfile_$path_$fitsext_$slice_"
    }
 
    #  Get the path component from the name. Assumes a check_type_ has
@@ -312,13 +338,14 @@ itcl::class gaia::GaiaImageName {
 	    set i2 end
 	 }
 	 set path_ [string range $type_ $i1 $i2]
-
       } else {
-
 	 #  No ".sdf", so assume what looks like a file extension is a
 	 #  path.
 	 if { $slice_ != {} } {
 	    set i2 [expr [string first $slice_ $type_]-1]
+            if { $i2 < 0 } {
+               set i2 end
+            }
 	 } else {
 	    set i2 end
 	 }
