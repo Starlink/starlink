@@ -149,7 +149,7 @@
         CALL ADI1_CCA2HC( ARGS(3), ' ', ALOC, ROBJ, STATUS )
 
 *  Object is an HDS file?
-      ELSE IF ( TYPE(1:4) .EQ. 'HDSfile' ) THEN
+      ELSE IF ( TYPE(1:7) .EQ. 'HDSfile' ) THEN
 
 *    Extract referenced object locator
         CALL ADI1_GETLOC( ARGS(3), RLOC, STATUS )

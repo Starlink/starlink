@@ -1,98 +1,150 @@
-*+  SBG - Writes reference to background dataset into source dataset
-      SUBROUTINE SBG(STATUS)
-*
-*    Description :
-*
-*     HDS reference to background dataset is written into .MORE.ASTERIX.BGREF
-*     component of dataset.
-*     If null (!) background is specified then any existing reference is
-*     deleted.
-*
-*    Environment parameters :
-*     INP=UNIV(U)
-*            source dataset
-*     BGFILE=UNIV(R)
-*            background dataset
-*    Method :
-*     Uses the Starlink REFERENCE system.
-*    Deficiencies :
-*    Bugs :
-*    Authors :
-*
-*     Trevor Ponman (BHVAD::TJP)
-*
-*    History :
-*
-*      1 Jul 92 : V1.6-1 Original (BHVAD::TJP)
-*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
-*
-*    Type definitions :
-*
-	IMPLICIT NONE
-*
-*    Global constants :
-*
-	INCLUDE 'SAE_PAR'
-	INCLUDE 'DAT_PAR'
-	INCLUDE 'PAR_ERR'
-	INCLUDE 'FIT_PAR'
-*    Global variables :
-*    Structure definitions :
-*    Status :
-	INTEGER STATUS
-*    Local constants :
-*    Local variables :
-	CHARACTER*(DAT__SZLOC) ILOC	! Locator to source dataset
-	CHARACTER*(DAT__SZLOC) ALOC	! Locator to ASTERIX box in source data
-	CHARACTER*(DAT__SZLOC) BLOC	! Locator to b/g dataset
-	LOGICAL PRIM			! Input data primitive?
-	LOGICAL THERE			! Component present?
-	LOGICAL NULL			! No background
-*    Local data :
-*    Version :
-	CHARACTER*30 VERSION
-	PARAMETER		(VERSION='SBG Version 1.8-0')
+      SUBROUTINE SBG( STATUS )
+*+
+*  Name:
+*     SBG
+
+*  Purpose:
+*     Writes reference to background dataset into source dataset
+
+*  Language:
+*     Starlink Fortran
+
+*  Type of Module:
+*     ASTERIX task
+
+*  Invocation:
+*     CALL SBG( STATUS )
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Description:
+*     Writes the logical BGND file link to the specified source dataset.
+*     This link can be used subsequently by ASTERIX to load the background
+*     dataset automatically. Supplying a null value for the background
+*     dataset results in the file link being deleted.
+
+*  Usage:
+*     sbg {parameter_usage}
+
+*  Environment Parameters:
+*     INP = UNIV (update)
+*        Source dataset
+*     BGFILE = UNIV (read)
+*        Background dataset
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
+*     {algorithm_description}...
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  Implementation Status:
+*     {routine_implementation_status}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
+*     {routine_deficiencies}...
+
+*  References:
+*     {task_references}...
+
+*  Keywords:
+*     sbg, usage:public
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1995
+
+*  Authors:
+*     TJP: Trevor Ponman (University of Birmingham)
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*      1 Jul 1992 V1.6-1 (TJP):
+*        Original version.
+*     24 Nov 1994 V1.8-0 (DJA):
+*        Now use USI for user interface
+*     28 Jul 1995 V2.0-0 (DJA):
+*        Use new FRI routine
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
 *-
 
-* Version
-	CALL MSG_PRNT(VERSION)
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
 
-* Initialise BDA_*
-	CALL AST_INIT
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'ADI_PAR'
+      INCLUDE 'PAR_ERR'
 
-* Get names of source and background datasets
-	CALL USI_ASSOCI('INP','UPDATE',ILOC,PRIM,STATUS)
-	IF(STATUS.NE.SAI__OK) GO TO 9000
-	CALL USI_DASSOC('BGFILE','READ',BLOC,STATUS)
-	IF(STATUS.EQ.PAR__NULL)THEN
-	  CALL ERR_ANNUL(STATUS)
-	  NULL=.TRUE.
-	ELSE
-	  NULL=.FALSE.
-	ENDIF
+*  Status:
+      INTEGER			STATUS             	! Global status
 
-* Find ASTERIX box
-	CALL BDA_LOCAST(ILOC,ALOC,STATUS)
-	IF(STATUS.NE.SAI__OK) GO TO 9000
+*  Local Constants:
+      CHARACTER*30		VERSION
+        PARAMETER		( VERSION = 'SBG Version 2.0-0' )
 
-* If BGREF already exists then delete it
-	CALL DAT_THERE(ALOC,'BGREF',THERE,STATUS)
-	IF(THERE)THEN
-	  IF(NULL)THEN
-	    CALL MSG_PRNT('Deleting existing background reference')
-	  ELSE
-	    CALL MSG_PRNT('Replacing existing background reference')
-	  ENDIF
-	  CALL DAT_ERASE(ALOC,'BGREF',STATUS)
-	ENDIF
+*  Local Variables:
+      INTEGER			IFID			! Source dataset
+      INTEGER			BFID			! Background dataset
+*.
 
-* Write new reference if necessary
-	IF(.NOT.NULL)THEN
-	  CALL REF_CRPUT(ALOC,'BGREF',BLOC,.FALSE.,STATUS)
-	ENDIF
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
 
-* Exit
- 9000  	CALL AST_CLOSE()
-        CALL AST_ERR( STATUS )
+*  Version id
+      CALL MSG_PRNT( VERSION )
 
-	END
+*  Initialise ASTERIX
+      CALL AST_INIT()
+
+*  Get names of source and background datasets
+      CALL USI_TASSOCI( 'INP', '*', 'UPDATE', IFID, STATUS )
+      IF ( STATUS .NE. SAI__OK ) GOTO 99
+      CALL USI_TASSOCI( 'BGFILE', '*', 'READ', BFID, STATUS )
+      IF ( STATUS .EQ. PAR__NULL ) THEN
+        CALL ERR_ANNUL( STATUS )
+        BFID = ADI__NULLID
+
+*  Abort on other bad status values
+      ELSE IF ( STATUS .NE. SAI__OK ) THEN
+        GOTO 99
+
+      END IF
+
+*  Make the link
+      CALL FRI_PUTI( IFID, 'BGND', BFID, STATUS )
+
+*  Tidy up
+ 99   CALL AST_CLOSE()
+      CALL AST_ERR( STATUS )
+
+      END
