@@ -415,6 +415,15 @@ f     - Title: The Plot title drawn using AST_GRID
 *        - DrawTicks modified to correctly reset graphical attributes and
 *        pass on to the next axis if an axis has zero length major and minor 
 *        tick marks.
+*     9-JAN-2004 (DSB):
+*        DrawGrid: Report error if no grid curves can be drawn.
+*        AxPlot: Initialise returned CDATA structure before checking argument
+*        validity.
+*        GetTicks: Calculate the reference value on the other axis using
+*        function "Typical" rather than simply using the man of the supplied 
+*        values (the supplied values may be clustered around 0 and 2*PI if the
+*        field is centred on the origin, resulting in the mean being at about 
+*        1.PI and therefore inappropriate).
 *class--
 */
 
@@ -1520,6 +1529,7 @@ static double GetTicks( AstPlot *, int, double *, double, double **, int *, int 
 static double GoodGrid( AstPlot *, int *, AstPointSet **, AstPointSet **, const char *, const char * );
 static double GetUseSize( AstPlot *, int );
 static double GetUseWidth( AstPlot *, int );
+static double Typical( int, double *, double, double );
 static int Border( AstPlot * );
 static int Boundary( AstPlot *, const char *, const char * );
 static int BoxCheck( float *, float *, float *, float * );
@@ -3506,6 +3516,13 @@ static void AxPlot( AstPlot *this, int axis, const double *start, double length,
 
 /* Check the global error status. */
    if ( !astOK ) return;
+
+/* Initialise any supplied cdata structure to hold safe values. */
+   if( cdata ){
+      cdata->length = 0.0;
+      cdata->out = 1;
+      cdata->nbrk = 0;
+   }
 
 /* Get the number of axes in the current Frame. */
    naxes = astGetNout( this );
@@ -7845,6 +7862,7 @@ static CurveData **DrawGrid( AstPlot *this, TickInfo **grid, int drawgrid,
    CurveData tcdt;          /* Pointer to break info. for current curve section */
    TickInfo *info;          /* Tick mark information for a single axis */
    double start[ 2 ];       /* Strting position for current curve section */
+   double total_length;     /* Total curve length for all axis ticks */
    int i;                   /* Axis index */
    int j;                   /* Tick mark index */
    int k;                   /* Curve section index */
@@ -7882,6 +7900,7 @@ static CurveData **DrawGrid( AstPlot *this, TickInfo **grid, int drawgrid,
 
 /* Initialise a pointer to the first CurveData structure for this axis. */
             cdt = cdata[ i ];
+            total_length = 0.0;
 
 /* Do each tick mark. */
             for( j = 0; j < info->nmajor; j++ ){
@@ -7915,9 +7934,21 @@ static CurveData **DrawGrid( AstPlot *this, TickInfo **grid, int drawgrid,
 
                }
 
+/* Increment the total length of curves drawn for all ticks on this axis. */
+               total_length += cdt->length;
+
 /* Point to the CurveData structure for the next tick mark. */
                cdt++;
 
+            }
+
+/* Report an error if the total length of all curves on this axis is zero. 
+   This can be caused for instance by bugs in the algorithm for finding
+   major tick values (which may cause AST__BAD tick mark values). */
+            if( total_length == 0.0 && astOK ) {
+               astError( AST__INTER, "%s(%s): No grid curves can be drawn for "
+                         "axis %d (internal AST programming error).", method, 
+                         class, i + 1 );
             }
 
          }
@@ -12105,11 +12136,8 @@ static double GetTicks( AstPlot *this, int axis, double *cen, double gap,
 
 /* Local Variables: */
    int i;                    /* Axis index */
-   int j;                    /* Position index */
-   double *p;                /* Pointer to next axis value */
    double cen0;              /* Supplied value of cen */
    double frac;              /* Fraction of plot area holding good coords */
-   double sum;               /* Sum of axis values */
    double test_gap;          /* Trial gap size */
    double used_gap;          /* The used gap size */
 
@@ -12118,7 +12146,7 @@ static double GetTicks( AstPlot *this, int axis, double *cen, double gap,
    static AstPointSet *pset=NULL;   /* Pointer to a PointSet holding physical coords */
    static double **ptr;             /* Pointer to physical coordinate values */
    static double defgaps[ 2 ];      /* Initial test gaps for each axis */
-   static double mean[ 2 ];         /* Mean value on each axis */
+   static double typval[ 2 ];       /* Typical value on each axis */
    static int maxticks;             /* Max. number of ticks on each axis */
    static int mintick;              /* Min. number of ticks on each axis */
    static int ngood[ 2 ];           /* No. of good physical values on each axis */
@@ -12167,29 +12195,18 @@ static double GetTicks( AstPlot *this, int axis, double *cen, double gap,
 /* Get a pointer to the data in the PointSet. */
       ptr = astGetPoints( pset );
 
-/* Find the mean value on each axis. */
+/* Find a typical value on each axis. */
       for( i = 0; i < 2 && astOK; i++ ){
-
-         if( ngood[ i ] > 0 ){
-            sum = 0.0;
-            p = ptr[ i ];
-            for( j = 0; j < ngood[ i ]; j++ ) sum += *(p++);
-            mean[ i ] = sum/(double) ngood[ i ];
-
-         } else {
-            mean[ i ] = AST__BAD;
-         }
-
+         typval[ i ] = Typical( ngood[ i ], ptr[ i ], -DBL_MAX, DBL_MAX );
       }
-
    }
 
 /* Return the flag indicating if any regions of invalid physical coordinates 
    were found. */
    *inval = bad;
 
-/* Return the mean value on the other axis. */
-   *refval = mean[ 1 - axis ];
+/* Return the typical value on the other axis. */
+   *refval = typval[ 1 - axis ];
 
 /* Store the supplied valeu of cen. */
    cen0 = ( cen ) ? *cen : AST__BAD;
@@ -21467,6 +21484,158 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 
 }
 
+static double Typical( int n, double *value, double lolim, double hilim ) {
+/*
+*  Name:
+*     Typical
+
+*  Purpose:
+*     Return a typical value within the supplied array of values.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "plot.h"
+*     double Typical( int n, double *value, double lolim, double hilim  )
+
+*  Class Membership:
+*     Plot member function.
+
+*  Description:
+*     This function locates the approximate mode of the supplied values,
+*     and returns one of the supplied values which is close to the modal
+*     value. Values outside an indicated range are ignored.
+
+*  Parameters:
+*     n
+*        The number of data values.
+*     value
+*        A pointer to an array of "n" values.
+*     lolim
+*        Values less than lolim are ignored. Supply as -DBL_MAX if there
+*        is no lower limit.
+*     hilim
+*        Values greater than hilim are ignored. Supply as DBL_MAX if there
+*        is no upper limit.
+
+*  Returned Value:
+*     A typical value from the supplied array. AST__BAD is returned only
+*     if an error has occurred, or if all the supplied values are AST__BAD
+*     or outside the specified range.
+
+*/
+
+/* Local Variables: */
+   double *a;             /* Pointer to next value */
+   double delta;          /* Bin size */
+   double maxval;         /* Maximum supplied value */
+   double mean;           /* Mean supplied value */
+   double minval;         /* Minimum supplied value */
+   double result;         /* The returned value. */
+   int *hist;             /* Pointer to first cell of histogram array */
+   int i;                 /* Loop count */
+   int ibin;              /* Bin index */
+   int maxcnt;            /* Maximum no. of values in any bin */
+   int nbin;              /* No. of bins in histogram */
+   int ngood;             /* No. of good values supplied */
+ 
+/* Initialise. */
+   result = AST__BAD;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Find the minimum and maximum value in the supplied array, which are
+   also within the supplied limits. Also store the first good value 
+   encountered in "result". */
+   minval = DBL_MAX;
+   maxval = -DBL_MAX;
+   a = value;
+   ngood = 0;
+   for( i = 0; i < n; i++, a++ ) {
+      if( *a != AST__BAD ) {
+         if( *a >= lolim && *a <= hilim ) {
+            if( *a < minval ) minval = *a;
+            if( *a > maxval ) maxval = *a;
+            if( ngood == 0 ) result = *a;
+            ngood++;
+         }
+      }
+   }
+
+/* If less than 3 points were found, we will return the first. Otherwise, if 
+   3 or more good values were found, find a typical value. */
+   if( ngood > 2 ) {
+
+/* We will form a histogram of the supplied values in order to find the
+   mode. The number of bins in this histogram is chosen so that there
+   is an average of 2 points per bin. Find the number of bins. */
+      nbin = ( ngood + 1 )/2;
+
+/* Find the bin size. If zero (i.e. if all values are equal), return the 
+   first good value established above. */
+      delta = ( maxval - minval )/ nbin;
+      if( delta > 0.0 ) {
+
+/* Allocat ememory for the histogram. */
+         hist = astMalloc( sizeof(int)*(size_t)nbin );
+         if( hist ) {
+
+/* Initialise the histogram. */
+            for( i = 0; i < nbin; i++ ) hist[ i ] = 0;
+
+/* Form the histogram. Form the mean data value at the same time. */
+            mean = 0.0;
+            a = value;
+            for( i = 0; i < n; i++, a++ ){
+               if( *a != AST__BAD ) {
+                  if( *a >= lolim && *a <= hilim ) {
+                     mean += *a;
+                     ibin = (int) ( ( *a - minval )/ delta );
+                     if( ibin == nbin ) ibin--;
+                     hist[ ibin ]++;
+                  }
+               }
+            }
+
+            mean /= ngood;
+
+/* Find the bin with the highest count. If there is more than one bin
+   with the same highest count, choose the one which is closest to the
+   mean data value found above. */
+            maxcnt = 0;
+            for( i = 0; i < nbin; i++ ) {
+               if( hist[ i ] > maxcnt ) {
+                  maxcnt = hist[ i ];
+                  ibin = i;
+
+               } else if( hist[ i ] == maxcnt ) {
+                  if( fabs( minval + ( i - 0.5 )*delta - mean ) <
+                      fabs( minval + ( ibin - 0.5 )*delta - mean ) ) {
+                     maxcnt = hist[ i ];
+                     ibin = i;
+                  }            
+               }
+            }
+
+/* Free the histogram memory. */
+            hist = astFree( hist );
+
+/* Call this function recursively to refine the value, restricting
+   attention to those data values which are within the range of the bin
+   found above. */
+            minval += ibin*delta;
+            maxval = minval + delta;
+            result = Typical( n, value, minval, maxval );
+         }
+      }
+   }
+
+/* Return the result. */
+   return result;
+}
+
 static int GetUseColour( AstPlot *this, int id ) {
 /*
 *  Name:
@@ -24139,6 +24308,3 @@ f     function is invoked with STATUS set to an error value, or if it
    return astMakeId( new );
 
 }
-
-
-
