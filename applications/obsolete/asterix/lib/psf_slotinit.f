@@ -66,9 +66,6 @@
 *  Check inherited global status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Allocate internal storage
-      CALL PSF1_ALLOC( P_INST(SLOT), STATUS )
-
 *  Get axis data from dataset
       CALL PSF_CHKAXES( SLOT, STATUS )
 

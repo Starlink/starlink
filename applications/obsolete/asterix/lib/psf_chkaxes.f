@@ -34,7 +34,6 @@
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'ADI_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PSF_PAR'
 *
 *    Global variables :
@@ -78,6 +77,8 @@
 *  Allocate internal storage if not already done
       IF ( P_INST(SLOT) .EQ. 0 ) THEN
         CALL PSF1_ALLOC( P_INST(SLOT), STATUS )
+        CALL ADI_CPUT0I( P_PSID(SLOT), 'Instance', P_INST(SLOT),
+     :                   STATUS )
       END IF
 
 *  Already done this?
@@ -140,7 +141,7 @@
       ELSE
 
 *    Check data
-        CALL BDI_GETSHP( P_FID(SLOT), DAT__MXDIM, DIMS, NDIM, STATUS )
+        CALL BDI_GETSHP( P_FID(SLOT), ADI__MXDIM, DIMS, NDIM, STATUS )
 
 *    Locate axes by quantity code
         DO IAX = 1, 4
