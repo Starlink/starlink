@@ -15,7 +15,9 @@
 #include <string.h>
 #include <signal.h>
 #include <stdlib.h>
+#if ! ( defined(__APPLE__) && defined(__MACH__) )
 #include <malloc.h>
+#endif
 
 #include "tcl.h"
 #include "tk.h"

@@ -133,7 +133,7 @@ case "${UNAME_MACHINE}:${UNAME_SYSTEM}:${UNAME_RELEASE}:${UNAME_VERSION}" in
 	echo powerpc-apple-machten${UNAME_RELEASE}
 	exit 0 ;;
     *:Darwin:*:*)
-	echo m68k-apple-openbsd${UNAME_RELEASE}
+        echo unknown-pc-bsdi
         exit 0 ;;
     RISC*:Mach:*:*)
 	echo mips-dec-mach_bsd4.3

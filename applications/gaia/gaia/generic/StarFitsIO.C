@@ -32,7 +32,10 @@
  */
 static const char* const rcsId="@(#) $Id$";
 
+#if ! ( defined(__APPLE__) && defined(__MACH__) )
 #include <netinet/in.h>
+#endif
+
 #include <string.h>
 #include <stdio.h>
 #include <ctype.h>

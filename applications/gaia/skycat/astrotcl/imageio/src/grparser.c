@@ -55,7 +55,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#ifndef macintosh
+#if ! ( defined(__APPLE__) && defined(__MACH__) )
 #include <malloc.h>
 #include <memory.h>
 #endif

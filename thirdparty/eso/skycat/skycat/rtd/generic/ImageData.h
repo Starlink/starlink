@@ -39,6 +39,10 @@
 #include "ImageIO.h"
 #include "ImageDisplay.h"
 
+#ifndef isnan
+#define isnan(x) ((x) != (x))
+#endif
+
 typedef unsigned char byte;	// type of XImage data (no longer ...)
 struct ImageDataParams;		// forward ref
 struct ImageDataHistogram;      // forward ref

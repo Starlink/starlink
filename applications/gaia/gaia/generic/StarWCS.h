@@ -37,8 +37,8 @@
 extern "C" {
 #include "ast.h"
 }
-#include "WorldCoords.h"
-#include "WCS.h"
+#include "WorldCoords.hxx"
+#include "WCS.hxx"
 #include "tcl.h"
 
 //

@@ -250,7 +250,8 @@ RtdRemote::~RtdRemote()
  */
 int RtdRemote::makeStatusFile(sockaddr_in& addr)
 {
-#ifdef __alpha
+#if defined( __alpha ) || ( defined(__APPLE__) && defined(__MACH__) )
+
     int addrSize = sizeof(sockaddr_in);
 #else
     size_t addrSize = sizeof(sockaddr_in);

@@ -27,6 +27,7 @@
 #ifndef NO_SELECT
 
 #ifndef NO_SYS_SELECT_H
+#define panic panicDummy
 #   include <sys/select.h>
 #endif
 

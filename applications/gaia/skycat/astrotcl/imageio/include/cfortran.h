@@ -100,6 +100,9 @@ only C calling FORTRAN subroutines will work using K&R style.*/
                            Support f2c or f77 with gcc, vcc with f2c. 
                            f77 with vcc works, missing link magic for f77 I/O.*/
 #endif
+#if defined(__APPLE__)     /* 11/2002 */
+#define f2cFortran
+#endif
 #if defined(__hpux)             /* 921107: Use __hpux instead of __hp9000s300 */
 #define       hpuxFortran       /*         Should also allow hp9000s7/800 use.*/
 #endif

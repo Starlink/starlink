@@ -24,12 +24,12 @@ BUILD_INCLUDES  = @TCLUTIL_BUILD_INCLUDES@ \
 		  @ASTROTCL_BUILD_INCLUDES@
 # ------------------------------------------------------------------------
 
-SRCS 		=  AstroCatalog.C AstroImageCPP.C AstroQuery.C LocalCatalog.C\
+SRCS 		=  AstroCatalogCPP.C AstroImageCPP.C AstroQuery.C LocalCatalog.C\
 		   CatalogInfo.C TabTable.C QueryResult.C  \
 		   TcsCatalog.C TcsQueryResult.C TcsCatalogObject.C \
 		   TcsLocalCatalog.C
 
-OBJS 		=  AstroCatalog.o AstroImageCP.o AstroQuery.o LocalCatalog.o \
+OBJS 		=  AstroCatalogCPP.o AstroImageCPP.o AstroQuery.o LocalCatalog.o \
 		   CatalogInfo.o TabTable.o QueryResult.o \
 		   TcsCatalog.o TcsQueryResult.o TcsCatalogObject.o \
 		   TcsLocalCatalog.o

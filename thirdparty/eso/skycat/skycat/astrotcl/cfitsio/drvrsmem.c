@@ -11,6 +11,8 @@
 02-Feb-00 : now deletes global table shared memory (P.W.Draper@durham.ac.uk)
 */
 
+
+#ifdef HAVE_SHMEM_SERVICES
 #include "fitsio2.h"				/* drvrsmem.h is included by it */
 
 #include <stdio.h>
@@ -870,3 +872,8 @@ int	smem_write(int driverhandle, void *buffer, long nbytes)
    shared_lt[driverhandle].seekpos += nbytes;
    return(0);
  }
+#else
+static void dummy() {
+  /* Do nothing */
+}
+#endif

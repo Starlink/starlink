@@ -23,7 +23,7 @@
  *                 16/02/04  Added alwaysMerge_ member.
  */
 
-#include "FitsIO.h"
+#include "FitsIO.hxx"
 
 
 /*

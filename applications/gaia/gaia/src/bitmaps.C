@@ -35,6 +35,9 @@ void defineGaiaBitmaps(Tcl_Interp *interp) {
     #include "ellipse.xbm"
     Tk_DefineBitmap(interp, Tk_GetUid("ellipse"), (char*)ellipse_bits, ellipse_width, ellipse_height);
 
+    #include "finger.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("finger"), (char*)finger_bits, finger_width, finger_height);
+
     #include "gaiaplus.xbm"
     Tk_DefineBitmap(interp, Tk_GetUid("gaiaplus"), (char*)gaiaplus_bits, gaiaplus_width, gaiaplus_height);
 
@@ -59,14 +62,11 @@ void defineGaiaBitmaps(Tcl_Interp *interp) {
     #include "row.xbm"
     Tk_DefineBitmap(interp, Tk_GetUid("row"), (char*)row_bits, row_width, row_height);
 
-    #include "triangle.xbm"
-    Tk_DefineBitmap(interp, Tk_GetUid("triangle"), (char*)triangle_bits, triangle_width, triangle_height);
-
-    #include "finger.xbm"
-    Tk_DefineBitmap(interp, Tk_GetUid("finger"), (char*)finger_bits, finger_width, finger_height);
-
     #include "symb_rotbox.xbm"
     Tk_DefineBitmap(interp, Tk_GetUid("symb_rotbox"), (char*)symb_rotbox_bits, symb_rotbox_width, symb_rotbox_height);
+
+    #include "triangle.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("triangle"), (char*)triangle_bits, triangle_width, triangle_height);
 
     #include "gaia_logo.xpm"
     Tix_DefinePixmap(interp, Tk_GetUid("gaia_logo"), gaia_logo_xpm);

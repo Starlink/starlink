@@ -46,12 +46,9 @@
 #include <stdio.h>
 #include "fitshead.h"	/* FITS header extraction subroutines */
 #include <stdlib.h>
-#ifndef VMS
-#include <values.h>
-#else
-#define MAXINT  2147483647 /* Biggest number that can fit in long */
-#define MAXSHORT 32767
-#endif
+#include <limits.h>
+#define MAXINT  INT_MAX /* Biggest number that can fit in long */
+#define MAXSHORT SHRT_MAX
 
 #ifdef USE_SAOLIB
 static int use_saolib=0;

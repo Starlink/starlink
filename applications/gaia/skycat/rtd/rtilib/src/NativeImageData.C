@@ -63,3 +63,8 @@
 #undef ISNAN
 
 #endif /* defined(i386) ... */
+
+// Dummy routine to keep some linkers happy.
+static void dummy() {
+  // Do nothing.
+}

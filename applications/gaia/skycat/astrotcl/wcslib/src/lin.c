@@ -164,7 +164,7 @@ const char *linrev_errmsg[] = {
 
 
 #ifndef __convexc__
-#ifndef VMS
+#if ! ( defined(__APPLE__) && defined(__MACH__) )
 #include <malloc.h>
 #else
 #include <stdlib.h>
