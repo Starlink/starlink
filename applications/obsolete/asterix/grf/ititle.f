@@ -65,6 +65,11 @@
         CALL GCB_SETI('TITLE_N',1,STATUS)
         CALL GFX_TITLE(' ',STATUS)
 
+        IF (I_DISP) THEN
+          CALL GCB_CACHE(I_CACHE,STATUS)
+        ELSEIF (I_DISP_1D) THEN
+          CALL GCB_CACHE(I_CACHE_1D,STATUS)
+        ENDIF
 
       ENDIF
 

@@ -98,6 +98,8 @@
 
           ENDIF
 
+          CALL GCB_CACHE(I_CACHE,STATUS)
+
         ENDIF
 
       ENDIF

@@ -73,6 +73,11 @@
         CALL MSG_PRNT('AST_ERR: no image being displayed')
       ELSE
 
+*  ensure transformations correct
+        CALL GTR_RESTORE(STATUS)
+        CALL GCB_ATTACH('IMAGE',STATUS)
+        CALL IMG_2DGCB(STATUS)
+
 *  see if OFF-mode
         CALL USI_GET0L('OFF',OFF,STATUS)
 
@@ -110,10 +115,6 @@
           ENDIF
           CALL GCB_SETL('MARKER_NUMBER',NUMBER,STATUS)
 
-*  ensure transformations correct
-          CALL GTR_RESTORE(STATUS)
-          CALL GCB_ATTACH('IMAGE',STATUS)
-          CALL IMG_2DGCB(STATUS)
 
           IF (CURR) THEN
 
@@ -256,6 +257,8 @@
           CALL GFX_MARKS(STATUS)
 
         ENDIF
+
+        CALL GCB_CACHE(I_CACHE,STATUS)
 
       ENDIF
 
