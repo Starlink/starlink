@@ -1,7 +1,7 @@
 #!perl
 
 use strict;
-use Test::More tests => 15;
+use Test::More tests => 18;
 
 require_ok("PGPLOT");
 require_ok("Starlink::AST");
@@ -50,6 +50,14 @@ my $old_value;
   Starlink::AST::PGPLOT::_GAttr( Starlink::AST::Grf::GRF__COLOUR(), 3, undef );
 
 is( $status, 1, "Calling _GAttr()" );
+is( $old_value, 1, "Checking old GRF__COLOUR value" );
+
+( $status, $old_value ) = 
+  Starlink::AST::PGPLOT::_GAttr( Starlink::AST::Grf::GRF__WIDTH(), 5, undef );
+
+is( $status, 1, "Calling _GAttr()" );
+is( $old_value, 0.71376748335625, "Checking old GRF__WIDTH value" );
+
 
 $x[0] = 5; $y[0] = 5;
 $x[1] = 6; $y[1] = 6;
