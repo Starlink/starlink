@@ -52,7 +52,6 @@ if test "$NOUNDERSCORES" != "no"; then
   fi
 fi
 
-echo "PROFILINGOPTION=$PROFILINGOPTION  NOUNDERSCORES=$NOUNDERSCORES"
 dnl  If we haven't set both of PROFILINGOPTION and NOUNDERSCORES by
 dnl  now, then try to guess appropriate values based on the host
 dnl  platform.  This isn't ideal, since it can't tell if you're using
@@ -60,7 +59,6 @@ dnl  a non-default compiler, but we'll try to use the options at the
 dnl  end, and try to give a helpful error message if it doesn't work.
 if test -z "$PROFILINGOPTION" -o -z "$NOUNDERSCORES"; then
     AC_CANONICAL_HOST
-    echo "build=$build  host=$host  target=$target"
     echo "Target system $host"
     case "$host" in
       sparc-*-*) 
@@ -71,6 +69,14 @@ if test -z "$PROFILINGOPTION" -o -z "$NOUNDERSCORES"; then
             NOUNDERSCORES=-ext_names=plain
         fi
         ;;
+      alpha*)
+        if test -z "$PROFILINGOPTION" -o "$PROFILINGOPTION" != "no"; then 
+            PROFILINGOPTION=-pg
+        fi
+        if test -z "$NOUNDERSCORES" -o "$NOUNDERSCORES" != "no"; then
+            NOUNDERSCORES='-assume nounderscore'
+        fi
+        ;;
       *)
         AC_MSG_WARN([
   I can't work out how to specify the profiling and
@@ -79,7 +85,7 @@ if test -z "$PROFILINGOPTION" -o -z "$NOUNDERSCORES"; then
   and --enable-nounderscore=<option> configure commands.
   If you know, can you mail norman@astro.gla.ac.uk
   with the appropriate options, quoting the compiler type
-      $target.
+      $host.
   Thanks.])
          ;;
     esac
@@ -88,8 +94,6 @@ fi
 dnl  Now test the options we have set up, by compiling a simple
 dnl  Fortran program
 AC_LANG_FORTRAN77
-echo "CC=$CC  F77=$F77"
-echo "FFLAGS=$FFLAGS"
 dnl   Following triggers a bug in autoconf 2.13 (reported to
 dnl  http://sources.redhat.com/autoconf/).
 dnl
@@ -113,18 +117,21 @@ cat >conftest.f <<EOF
       I=1
       END
 EOF
-$F77 $FFLAGS $PROFILINGOPTION $NOUNDERSCORES conftest.f
+$F77 $FFLAGS $PROFILINGOPTION $NOUNDERSCORES -o conftest.o conftest.f
 if test $? = 0; then
-    echo "Fortran flags $FFLAGS work"
+    echo "Fortran flags $FFLAGS $PROFILINGOPTION $NOUNDERSCORES work"
 else
     AC_MSG_WARN([
-    Oooh-err.  Based on your platform, $host, I thought that the Fortran
-    compiler options $FFLAGS would work, but they don't appear to.
-    Perhaps the Fortran compiler you've selected, $F77, isn't the default
-    one for this platform.  You can force the profiling options and
-    no-underscores options by using the configure flags
-    --enable-profiling=<option> and --enable-nounderscore=<option>])
+    Oooh-err.  Based on your platform, 
+        $host
+    I thought that the Fortran compiler options 
+        $FFLAGS $PROFILINGOPTION $NOUNDERSCORES
+    would work, but they don't appear to.  Perhaps the Fortran
+    compiler you've selected, $F77, isn't the default one for this
+    platform.  You can force the profiling options and no-underscores
+    options by using the configure flags --enable-profiling=<option>
+    and --enable-nounderscore=<option>])
 fi
-
+rm -f conftest.*
 
 AC_OUTPUT(Makefile)
