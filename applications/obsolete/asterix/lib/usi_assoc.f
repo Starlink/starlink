@@ -174,11 +174,13 @@
         ELSE
 
 *      Try reading as a number
-          READ( FNAME, *, IOSTAT=FSTAT ) DVAL
-          IF ( FSTAT .EQ. 0 ) THEN
+          CALL CHR_CTOD( FNAME, DVAL, STATUS )
+          IF ( STATUS .EQ. SAI__OK ) THEN
             CALL DAT_TEMP( '_DOUBLE', 0, 0, TLOC, STATUS )
             CALL DAT_PUT0D( TLOC, DVAL, STATUS )
             SCALAR = (STATUS.EQ.SAI__OK)
+          ELSE
+            CALL ERR_ANNUL( STATUS )
           END IF
 
         END IF
