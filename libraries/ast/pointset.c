@@ -26,6 +26,11 @@
 *     8-JAN-2003 (DSB):
 *        Changed private InitVtab method to protected astInitPointSetVtab
 *        method.
+*     9-SEP-2004 (DSB):
+*        Added astPermPoints.
+*     5-OCT-2004 (DSB):
+*        Bug fix in astLoadPointSet - npoint was used as size for new array
+*        of pointers (changed to ncoord).
 */
 
 /* Module Macros. */
@@ -88,12 +93,128 @@ static void ClearAttrib( AstObject *, const char * );
 static void Copy( const AstObject *, AstObject * );
 static void Delete( AstObject * );
 static void Dump( AstObject *, AstChannel * );
+static void PermPoints( AstPointSet *, int, const int[] );
 static void SetAttrib( AstObject *, const char * );
 static void SetPoints( AstPointSet *, double ** );
 static void SetSubPoints( AstPointSet *, int, int, AstPointSet * );
 
 /* Member functions. */
 /* ================= */
+static void CheckPerm( AstPointSet *this, const int *perm, const char *method ) {
+/*
+*+
+*  Name:
+*     astCheckPerm
+
+*  Purpose:
+*     Check that an array contains a valid permutation.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "frame.h"
+*     void astCheckPerm( AstPointSet *this, const int *perm, const char *method )
+
+*  Class Membership:
+*     PointSet method.
+
+*  Description:
+*     This function checks the validity of a permutation array that
+*     will be used to permute the order of a PointSet's axes. If the
+*     permutation specified by the array is not valid, an error is
+*     reported and the global error status is set. Otherwise, the
+*     function returns without further action.
+
+*  Parameters:
+*     this
+*        Pointer to the PointSet.
+*     perm
+*        Pointer to an array of integers with the same number of
+*        elements as there are axes in the PointSet. For each axis, the
+*        corresponding integer gives the (zero based) axis index to be
+*        used to identify the axis values for that axis (using the
+*        un-permuted axis numbering). To be valid, the integers in
+*        this array should therefore all lie in the range zero to
+*        (ncoord-1) inclusive, where "ncoord" is the number of PointSet
+*        axes, and each value should occur exactly once.
+*     method
+*        Pointer to a constant null-terminated character string
+*        containing the name of the method that invoked this function
+*        to validate a permutation array. This method name is used
+*        solely for constructing error messages.
+
+*  Notes:
+*     - Error messages issued by this function refer to the external
+*     (public) numbering system used for axes (which is one-based),
+*     whereas zero-based axis indices are used internally.
+*-
+*/
+
+/* Local Variables: */
+   int *there;                   /* Pointer to temporary array */
+   int coord;                     /* Loop counter for axes */
+   int ncoord;                   /* Number of PointSet axes */
+   int valid;                    /* Permutation array is valid? */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Initialise. */
+   valid = 1;
+
+/* Obtain the number of PointSet axes and allocate a temporary array of 
+   integers with the same number of elements. */
+   ncoord = astGetNcoord( this );
+   there = astMalloc( sizeof( int ) * (size_t) ncoord );
+   if ( astOK ) {
+
+/* Initialise the temporary array to zero. */
+      for ( coord = 0; coord < ncoord; coord++ ) there[ coord ] = 0;
+
+/* Scan the permutation array, checking that each permuted axis index it
+   contains is within the correct range. Note an error and quit checking
+   if an invalid value is found. */
+      for ( coord = 0; coord < ncoord; coord++ ) {
+         if ( ( perm[ coord ] < 0 ) || ( perm[ coord ] >= ncoord ) ) {
+            valid = 0;
+            break;
+
+/* Use the temporary array to count how many times each valid axis index
+   occurs. */
+	 } else {
+            there[ perm[ coord ] ]++;
+	 }
+      }
+
+/* If all the axis indices were within range, check to ensure that each value
+   occurred only once. */
+      if ( valid ) {
+         for ( coord = 0; coord < ncoord; coord++ ) {
+
+/* Note an error and quit checking if any value did not occur exactly once. */
+            if ( there[ coord ] != 1 ) {
+               valid = 0;
+               break;
+	    }
+	 }
+      }
+   }
+
+/* Free the temporary array. */
+   there = astFree( there );
+
+/* If an invalid permutation was detected and no other error has
+   occurred, then report an error (note we convert to one-based axis
+   numbering in the error message). */
+   if ( !valid && astOK ) {
+      astError( AST__PRMIN, "%s(%s): Invalid coordinate permutation array.",
+                method, astGetClass( this ) );
+      astError( AST__PRMIN, "Each coordinate index should lie in the range 1 to %d "
+                "and should occur only once.", ncoord );
+   }
+}
+
 static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /*
 *  Name:
@@ -494,6 +615,7 @@ void astInitPointSetVtab_(  AstPointSetVtab *vtab, const char *name ) {
    vtab->GetNcoord = GetNcoord;
    vtab->GetNpoint = GetNpoint;
    vtab->GetPoints = GetPoints;
+   vtab->PermPoints = PermPoints;
    vtab->SetPoints = SetPoints;
    vtab->SetSubPoints = SetSubPoints;
 
@@ -514,6 +636,93 @@ void astInitPointSetVtab_(  AstPointSetVtab *vtab, const char *name ) {
    astSetCopy( vtab, Copy );
    astSetDelete( vtab, Delete );
    astSetDump( vtab, Dump, "PointSet", "Container for a set of points" );
+}
+
+static void PermPoints( AstPointSet *this, int forward, const int perm[] ) {
+/*
+*+
+*  Name:
+*     astPermPoints
+
+*  Purpose:
+*     Permute the order of a PointSet's axes.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "pointset.h"
+*     void astPermPoints( AstPointSet *this, int forward, const int perm[] ) 
+
+*  Class Membership:
+*     PointSet method.
+
+*  Description:
+*     This function permutes the order in which a PointSet's axes occur.
+
+*  Parameters:
+*     this
+*        Pointer to the PointSet.
+*     forward
+*        The direction in which the permutation is to be applied. This
+*        controls the use of the "perm" arrays. If a non-zero value is
+*        given, then the indices into the "perm" array correspond to the 
+*        indices of the coordinates in the returned PointSet, and the
+*        values stored in the "perm" array correspond to the indices of 
+*        the coordinates in the supplied PointSet. If a zero value is
+*        given, then the indices into the "perm" array correspond to the 
+*        indices of the coordinates in the supplied PointSet, and the
+*        values stored in the "perm" array correspond to the indices of 
+*        the coordinates in the returnedPointSet.
+*     perm
+*        An array of int (with one element for each axis of the PointSet)
+*        which lists the axes in their new order. How this array is use
+*        depends on the value supplied for "forward".
+
+*  Notes:
+*     - Only genuine permutations of the axis order are permitted, so
+*     each axis must be referenced exactly once in the "perm" array.
+*     - If more than one axis permutation is applied to a PointSet, the
+*     effects are cumulative.
+*-
+*/
+
+/* Local Variables: */
+   double **old;                 /* Pointer to copy of old pointer array */
+   int coord;                    /* Loop counter for axes */
+   int ncoord;                   /* Number of axes */
+
+/* Check the global error status. Return without action if no data is
+   associated with the PointSet. */
+   if ( !astOK || !this->ptr ) return;
+
+/* Validate the permutation array, to check that it describes a genuine
+   permutation. */
+   CheckPerm( this, perm, "astPermPoints" );
+
+/* Obtain the number of PointSet axes. */
+   ncoord = astGetNcoord( this );
+
+/* Allocate memory and use it to store a copy of the old pointers array for
+   the PointSet. */
+   old = astStore( NULL, this->ptr, sizeof( double * ) * (size_t) ncoord );
+
+/* Apply the new axis permutation cumulatively to the old one and store the
+   result in the PointSet. */
+   if ( astOK ) {
+      if( forward ) {
+         for ( coord = 0; coord < ncoord; coord++ ) {
+            this->ptr[ coord ] = old[ perm[ coord ] ];
+         }
+      } else {
+         for ( coord = 0; coord < ncoord; coord++ ) {
+            this->ptr[ perm[ coord ] ] = old[ coord ];
+         }
+      }
+   }
+
+/* Free the temporary copy of the old array. */
+   old = astFree( old );
 }
 
 static void SetAttrib( AstObject *this_object, const char *setting ) {
@@ -1579,7 +1788,7 @@ AstPointSet *astLoadPointSet_( void *mem, size_t size,
 /* If it does, allocate memory to hold the coordinate data and
    pointers. */
       if ( astOK && !empty ) {
-         new->ptr = astMalloc( sizeof( double * ) * (size_t) new->npoint );
+         new->ptr = astMalloc( sizeof( double * ) * (size_t) new->ncoord );
          new->values = astMalloc( sizeof( double ) *
                                   (size_t) ( new->npoint * new->ncoord ) );
          if ( astOK ) {
@@ -1644,6 +1853,10 @@ int astGetNcoord_( const AstPointSet *this ) {
 double **astGetPoints_( AstPointSet *this ) {
    if ( !astOK ) return NULL;
    return (**astMEMBER(this,PointSet,GetPoints))( this );
+}
+void astPermPoints_( AstPointSet *this, int forward, const int perm[] ) {
+   if ( !astOK ) return;
+   (**astMEMBER(this,PointSet,PermPoints))( this, forward, perm );
 }
 void astSetPoints_( AstPointSet *this, double **ptr ) {
    if ( !astOK ) return;
