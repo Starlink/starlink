@@ -361,7 +361,7 @@ f     - AST_PUTCARDS: Stores a set of FITS header card in a FitsChan
 *        encodings to be non-contiguous.
 *        - Corrected ComBlock to correctly remove AST comment blocks in
 *        native encoded fitschans.
-*     14-AUG-2001 (DSB:
+*     14-AUG-2001 (DSB):
 *        - Modified FixUsed so that it it does not set the current card
 *        back to the start of file if the last card in the FitsChan is 
 *        deleted.
@@ -596,6 +596,9 @@ f     - AST_PUTCARDS: Stores a set of FITS header card in a FitsChan
 *     13-SEP-2004 (DSB):
 *        Check the "text" pointer can be used safely before using it in
 *        DSSToStore.
+*     27-SEP-2004 (DSB):
+*        In SpecTrans, before creating new PCi_j values,  check that no 
+*        PCi_j values have been created via an earlier translation.
 *class--
 */
 
@@ -22307,6 +22310,7 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
    int *mp;                       /* Pointer to next projection parameter index */
    int axlat;                     /* Index of latitude axis */
    int axlon;                     /* Index of longitude axis */
+   int gotpcij;                   /* Does FitsChan contain any PCi_j keywords? */
    int i,j;                       /* Indices */
    int jlo;                       /* Lowest axis index */
    int jhi;                       /* Highest axis index */
@@ -22519,7 +22523,8 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
       } else {
          strcpy( template, "PC%d_%d" );
       }
-      if( astKeyFields( this, template, 0, NULL, NULL ) == 0 ){
+      gotpcij = astKeyFields( this, template, 0, NULL, NULL );
+      if( !gotpcij ){
 
 /* CDjjjiii 
    -------- */
@@ -22544,6 +22549,7 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
                         dval = 1.0;
                         SetValue( ret, FormatKey( "CDELT", j + 1, -1, s ),
                                   (void *) &dval, AST__FLOAT, NULL );
+                        gotpcij = 1;
                      }
                   }
                }
@@ -22557,7 +22563,7 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
          } else {
             strcpy( template, "CD%d_%d" );
          }
-         if( astKeyFields( this, template, 0, NULL, NULL ) ){
+         if( !gotpcij && astKeyFields( this, template, 0, NULL, NULL ) ){
 
 /* Do each row in the matrix. */
             for( j = 0; j < naxis; j++ ){
@@ -22580,6 +22586,7 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
                   dval = 1.0;
                   SetValue( ret, FormatKey( "CDELT", j + 1, -1, s ),
                             (void *) &dval, AST__FLOAT, NULL );
+                  gotpcij = 1;
                }
             }
          }
@@ -22593,7 +22600,7 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
          } else {
             strcpy( template, "CDELT%d" );
          }
-         if( astKeyFields( this, template, 0, NULL, NULL ) ){
+         if( !gotpcij && astKeyFields( this, template, 0, NULL, NULL ) ){
 
 /* See if there is a CROTA keyword. Try to read values for both axes
    since they are sometimes both included. This ensures they will not be
@@ -22628,6 +22635,7 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
 /* Store it as PCi_j */
                      SetValue( ret, FormatKey( "PC", j + 1, i + 1, ' ' ),
                                (void *) &dval, AST__FLOAT, NULL );
+                     gotpcij = 1;
                   }
                }
 
@@ -22664,6 +22672,7 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
    
                      SetValue( ret, FormatKey( "PC", i + 1, i + 1, ' ' ),
                                (void *) &dval, AST__FLOAT, NULL );
+                     gotpcij = 1;
                   }
 
 /* Now do the non-zero off-diagonal terms. */
