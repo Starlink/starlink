@@ -128,25 +128,25 @@
       CALL ADI_THERE( DETID, 'Mission', MOK, STATUS )
       IF ( MOK ) THEN
         CALL ADI_CGET0C( DETID, 'Mission', MISSION, STATUS )
-        CALL ADI2_PKEY0C( FID, 'TELESCOP', MISSION,
+        CALL ADI2_PKEY0C( FID, ' ', 'TELESCOP', MISSION,
      :                    'Telescope (mission) name', STATUS )
       END IF
       CALL ADI_THERE( DETID, 'Instrument', IOK, STATUS )
       IF ( IOK ) THEN
         CALL ADI_CGET0C( DETID, 'Instrument', INSTRUM, STATUS )
-        CALL ADI2_PKEY0C( FID, 'INSTRUME', INSTRUM,
+        CALL ADI2_PKEY0C( FID, ' ', 'INSTRUME', INSTRUM,
      :                    'Instrument name', STATUS )
       END IF
       CALL ADI_THERE( DETID, 'Detector', DOK, STATUS )
       IF ( DOK ) THEN
         CALL ADI_CGET0C( DETID, 'Detector', DET, STATUS )
-        CALL ADI2_PKEY0C( FID, 'DETNAM', DET,
+        CALL ADI2_PKEY0C( FID, ' ', 'DETNAM', DET,
      :                    'Detector name', STATUS )
       END IF
       CALL ADI_THERE( DETID, 'Filter', FOK, STATUS )
       IF ( FOK ) THEN
         CALL ADI_CGET0C( DETID, 'Filter', FILT, STATUS )
-        CALL ADI2_PKEY0C( FID, 'FILTER', FILT,
+        CALL ADI2_PKEY0C( FID, ' ', 'FILTER', FILT,
      :                    'Instrument filter name', STATUS )
       END IF
 
