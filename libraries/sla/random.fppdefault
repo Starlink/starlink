@@ -53,7 +53,7 @@
 #elif defined(HAVE_RANDOM)
       REAL RANDOM
 #else
-#error "Can't find random-number function"
+ error "Can't find random-number function"
 #endif
 
       REAL AS
