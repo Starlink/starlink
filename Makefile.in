@@ -56,6 +56,7 @@ ALL_TARGETS = \
 	$(MANIFEST)/hdstools \
 	$(MANIFEST)/hdstrace \
 	$(MANIFEST)/hlp \
+	$(MANIFEST)/htx \
 	$(MANIFEST)/icl \
 	$(MANIFEST)/idi \
 	$(MANIFEST)/img \

@@ -145,14 +145,15 @@ $(MANIFEST)/atools: \
 		$(MANIFEST)/ary \
 		$(MANIFEST)/ast \
 		$(MANIFEST)/cat \
+		$(MANIFEST)/cfitsio \
 		$(MANIFEST)/chr \
 		$(MANIFEST)/cnf \
 		$(MANIFEST)/dtask \
 		$(MANIFEST)/ems \
 		$(MANIFEST)/fio \
-		$(MANIFEST)/generic \
 		$(MANIFEST)/gks \
 		$(MANIFEST)/gns \
+		$(MANIFEST)/graphpar \
 		$(MANIFEST)/grp \
 		$(MANIFEST)/gwm \
 		$(MANIFEST)/hds \
@@ -161,6 +162,7 @@ $(MANIFEST)/atools: \
 		$(MANIFEST)/ifd \
 		$(MANIFEST)/kaplibs \
 		$(MANIFEST)/lex \
+		$(MANIFEST)/mag \
 		$(MANIFEST)/mers \
 		$(MANIFEST)/messys \
 		$(MANIFEST)/misc \
@@ -170,8 +172,12 @@ $(MANIFEST)/atools: \
 		$(MANIFEST)/one \
 		$(MANIFEST)/par \
 		$(MANIFEST)/parsecon \
+		$(MANIFEST)/pda \
+		$(MANIFEST)/pgp \
+		$(MANIFEST)/pgplot \
 		$(MANIFEST)/prm \
 		$(MANIFEST)/psx \
+		$(MANIFEST)/ref \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/sgs \
 		$(MANIFEST)/shl \
@@ -181,7 +187,8 @@ $(MANIFEST)/atools: \
 		$(MANIFEST)/star2html \
 		$(MANIFEST)/starx \
 		$(MANIFEST)/string \
-		$(MANIFEST)/subpar
+		$(MANIFEST)/subpar \
+		$(MANIFEST)/trn
 	cd applications/atools \
 	    && make>make.log && make install>>make.log
 
@@ -403,12 +410,14 @@ $(MANIFEST)/cursa: \
 		$(MANIFEST)/ary \
 		$(MANIFEST)/ast \
 		$(MANIFEST)/cat \
+		$(MANIFEST)/cfitsio \
 		$(MANIFEST)/chr \
 		$(MANIFEST)/cnf \
 		$(MANIFEST)/dtask \
 		$(MANIFEST)/ems \
 		$(MANIFEST)/fio \
 		$(MANIFEST)/gks \
+		$(MANIFEST)/gns \
 		$(MANIFEST)/gwm \
 		$(MANIFEST)/hds \
 		$(MANIFEST)/hlp \
@@ -426,6 +435,7 @@ $(MANIFEST)/cursa: \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/sla \
 		$(MANIFEST)/star2html \
+		$(MANIFEST)/starx \
 		$(MANIFEST)/string \
 		$(MANIFEST)/subpar
 	cd applications/cursa \
@@ -473,6 +483,7 @@ $(MANIFEST)/datacube: \
 		$(MANIFEST)/ary \
 		$(MANIFEST)/ast \
 		$(MANIFEST)/cat \
+		$(MANIFEST)/cfitsio \
 		$(MANIFEST)/chr \
 		$(MANIFEST)/cnf \
 		$(MANIFEST)/convert \
@@ -483,6 +494,7 @@ $(MANIFEST)/datacube: \
 		$(MANIFEST)/generic \
 		$(MANIFEST)/gks \
 		$(MANIFEST)/gns \
+		$(MANIFEST)/graphpar \
 		$(MANIFEST)/grp \
 		$(MANIFEST)/gwm \
 		$(MANIFEST)/hds \
@@ -502,9 +514,11 @@ $(MANIFEST)/datacube: \
 		$(MANIFEST)/par \
 		$(MANIFEST)/parsecon \
 		$(MANIFEST)/pda \
+		$(MANIFEST)/pgp \
 		$(MANIFEST)/pgplot \
 		$(MANIFEST)/prm \
 		$(MANIFEST)/psx \
+		$(MANIFEST)/ref \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/sgs \
 		$(MANIFEST)/shl \
@@ -514,25 +528,25 @@ $(MANIFEST)/datacube: \
 		$(MANIFEST)/string \
 		$(MANIFEST)/subpar \
 		$(MANIFEST)/tcl \
-		$(MANIFEST)/tk
+		$(MANIFEST)/tk \
+		$(MANIFEST)/trn
 	cd applications/datacube \
 	    && make>make.log && make install>>make.log
 
 $(MANIFEST)/dipso: \
-		$(MANIFEST)/adam \
 		$(MANIFEST)/agi \
 		$(MANIFEST)/ams \
 		$(MANIFEST)/ary \
 		$(MANIFEST)/ast \
 		$(MANIFEST)/cat \
+		$(MANIFEST)/cfitsio \
 		$(MANIFEST)/chr \
 		$(MANIFEST)/cnf \
-		$(MANIFEST)/dtask \
 		$(MANIFEST)/ems \
 		$(MANIFEST)/fio \
-		$(MANIFEST)/generic \
 		$(MANIFEST)/gks \
 		$(MANIFEST)/gns \
+		$(MANIFEST)/graphpar \
 		$(MANIFEST)/grp \
 		$(MANIFEST)/gwm \
 		$(MANIFEST)/hds \
@@ -540,8 +554,8 @@ $(MANIFEST)/dipso: \
 		$(MANIFEST)/idi \
 		$(MANIFEST)/kaplibs \
 		$(MANIFEST)/lex \
+		$(MANIFEST)/mag \
 		$(MANIFEST)/mers \
-		$(MANIFEST)/messys \
 		$(MANIFEST)/misc \
 		$(MANIFEST)/ncar \
 		$(MANIFEST)/ndf \
@@ -549,8 +563,11 @@ $(MANIFEST)/dipso: \
 		$(MANIFEST)/par \
 		$(MANIFEST)/parsecon \
 		$(MANIFEST)/pda \
+		$(MANIFEST)/pgp \
+		$(MANIFEST)/pgplot \
 		$(MANIFEST)/prm \
 		$(MANIFEST)/psx \
+		$(MANIFEST)/ref \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/sgs \
 		$(MANIFEST)/sla \
@@ -558,7 +575,8 @@ $(MANIFEST)/dipso: \
 		$(MANIFEST)/star2html \
 		$(MANIFEST)/starx \
 		$(MANIFEST)/string \
-		$(MANIFEST)/subpar
+		$(MANIFEST)/subpar \
+		$(MANIFEST)/trn
 	cd applications/dipso \
 	    && make>make.log && make install>>make.log
 
@@ -727,7 +745,6 @@ $(MANIFEST)/extractor: \
 		$(MANIFEST)/prm \
 		$(MANIFEST)/psx \
 		$(MANIFEST)/sae \
-		$(MANIFEST)/sla \
 		$(MANIFEST)/star2html \
 		$(MANIFEST)/string \
 		$(MANIFEST)/subpar
@@ -805,6 +822,7 @@ $(MANIFEST)/findcoords: \
 		$(MANIFEST)/ary \
 		$(MANIFEST)/ast \
 		$(MANIFEST)/cat \
+		$(MANIFEST)/cfitsio \
 		$(MANIFEST)/chr \
 		$(MANIFEST)/cnf \
 		$(MANIFEST)/cursa \
@@ -812,6 +830,7 @@ $(MANIFEST)/findcoords: \
 		$(MANIFEST)/ems \
 		$(MANIFEST)/fio \
 		$(MANIFEST)/gks \
+		$(MANIFEST)/gns \
 		$(MANIFEST)/gwm \
 		$(MANIFEST)/hds \
 		$(MANIFEST)/hlp \
@@ -829,6 +848,7 @@ $(MANIFEST)/findcoords: \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/sla \
 		$(MANIFEST)/star2html \
+		$(MANIFEST)/starx \
 		$(MANIFEST)/string \
 		$(MANIFEST)/subpar
 	cd applications/findcoords \
@@ -861,13 +881,17 @@ $(MANIFEST)/fio: \
 $(MANIFEST)/gaia: \
 		$(MANIFEST)/adam \
 		$(MANIFEST)/ams \
+		$(MANIFEST)/ard \
 		$(MANIFEST)/ary \
 		$(MANIFEST)/ast \
 		$(MANIFEST)/cat \
+		$(MANIFEST)/cfitsio \
 		$(MANIFEST)/chr \
 		$(MANIFEST)/cnf \
 		$(MANIFEST)/dtask \
 		$(MANIFEST)/ems \
+		$(MANIFEST)/fio \
+		$(MANIFEST)/gwm \
 		$(MANIFEST)/hds \
 		$(MANIFEST)/hlp \
 		$(MANIFEST)/lex \
@@ -877,11 +901,14 @@ $(MANIFEST)/gaia: \
 		$(MANIFEST)/ndf \
 		$(MANIFEST)/par \
 		$(MANIFEST)/parsecon \
+		$(MANIFEST)/pda \
+		$(MANIFEST)/pgplot \
 		$(MANIFEST)/prm \
 		$(MANIFEST)/psx \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/sla \
 		$(MANIFEST)/star2html \
+		$(MANIFEST)/starx \
 		$(MANIFEST)/string \
 		$(MANIFEST)/subpar
 	cd applications/gaia \
@@ -1248,6 +1275,7 @@ $(MANIFEST)/kaplibs: \
 		$(MANIFEST)/hlp \
 		$(MANIFEST)/idi \
 		$(MANIFEST)/lex \
+		$(MANIFEST)/mag \
 		$(MANIFEST)/mers \
 		$(MANIFEST)/messys \
 		$(MANIFEST)/misc \
@@ -1277,6 +1305,7 @@ $(MANIFEST)/kappa: \
 		$(MANIFEST)/ary \
 		$(MANIFEST)/ast \
 		$(MANIFEST)/cat \
+		$(MANIFEST)/cfitsio \
 		$(MANIFEST)/chr \
 		$(MANIFEST)/cnf \
 		$(MANIFEST)/dtask \
@@ -1285,6 +1314,7 @@ $(MANIFEST)/kappa: \
 		$(MANIFEST)/generic \
 		$(MANIFEST)/gks \
 		$(MANIFEST)/gns \
+		$(MANIFEST)/graphpar \
 		$(MANIFEST)/grp \
 		$(MANIFEST)/gwm \
 		$(MANIFEST)/hds \
@@ -1302,9 +1332,12 @@ $(MANIFEST)/kappa: \
 		$(MANIFEST)/one \
 		$(MANIFEST)/par \
 		$(MANIFEST)/parsecon \
+		$(MANIFEST)/pda \
+		$(MANIFEST)/pgp \
 		$(MANIFEST)/pgplot \
 		$(MANIFEST)/prm \
 		$(MANIFEST)/psx \
+		$(MANIFEST)/ref \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/sgs \
 		$(MANIFEST)/shl \
@@ -1315,7 +1348,8 @@ $(MANIFEST)/kappa: \
 		$(MANIFEST)/string \
 		$(MANIFEST)/subpar \
 		$(MANIFEST)/tcl \
-		$(MANIFEST)/tk
+		$(MANIFEST)/tk \
+		$(MANIFEST)/trn
 	cd applications/kappa \
 	    && make>make.log && make install>>make.log
 
@@ -1323,9 +1357,11 @@ $(MANIFEST)/kaprh: \
 		$(MANIFEST)/adam \
 		$(MANIFEST)/agi \
 		$(MANIFEST)/ams \
+		$(MANIFEST)/ard \
 		$(MANIFEST)/ary \
 		$(MANIFEST)/ast \
 		$(MANIFEST)/cat \
+		$(MANIFEST)/cfitsio \
 		$(MANIFEST)/chr \
 		$(MANIFEST)/cnf \
 		$(MANIFEST)/dtask \
@@ -1334,6 +1370,7 @@ $(MANIFEST)/kaprh: \
 		$(MANIFEST)/generic \
 		$(MANIFEST)/gks \
 		$(MANIFEST)/gns \
+		$(MANIFEST)/graphpar \
 		$(MANIFEST)/grp \
 		$(MANIFEST)/gwm \
 		$(MANIFEST)/hds \
@@ -1341,6 +1378,7 @@ $(MANIFEST)/kaprh: \
 		$(MANIFEST)/idi \
 		$(MANIFEST)/kaplibs \
 		$(MANIFEST)/lex \
+		$(MANIFEST)/mag \
 		$(MANIFEST)/mers \
 		$(MANIFEST)/messys \
 		$(MANIFEST)/misc \
@@ -1350,8 +1388,12 @@ $(MANIFEST)/kaprh: \
 		$(MANIFEST)/one \
 		$(MANIFEST)/par \
 		$(MANIFEST)/parsecon \
+		$(MANIFEST)/pda \
+		$(MANIFEST)/pgp \
+		$(MANIFEST)/pgplot \
 		$(MANIFEST)/prm \
 		$(MANIFEST)/psx \
+		$(MANIFEST)/ref \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/sgs \
 		$(MANIFEST)/shl \
@@ -1657,6 +1699,7 @@ $(MANIFEST)/pisa: \
 		$(MANIFEST)/ary \
 		$(MANIFEST)/ast \
 		$(MANIFEST)/cat \
+		$(MANIFEST)/cfitsio \
 		$(MANIFEST)/chr \
 		$(MANIFEST)/cnf \
 		$(MANIFEST)/dtask \
@@ -1664,6 +1707,7 @@ $(MANIFEST)/pisa: \
 		$(MANIFEST)/fio \
 		$(MANIFEST)/gks \
 		$(MANIFEST)/gns \
+		$(MANIFEST)/graphpar \
 		$(MANIFEST)/gwm \
 		$(MANIFEST)/hds \
 		$(MANIFEST)/hlp \
@@ -1677,15 +1721,19 @@ $(MANIFEST)/pisa: \
 		$(MANIFEST)/par \
 		$(MANIFEST)/parsecon \
 		$(MANIFEST)/pda \
+		$(MANIFEST)/pgp \
 		$(MANIFEST)/prm \
 		$(MANIFEST)/psx \
+		$(MANIFEST)/ref \
 		$(MANIFEST)/sae \
+		$(MANIFEST)/sgs \
 		$(MANIFEST)/shl \
 		$(MANIFEST)/sla \
 		$(MANIFEST)/star2html \
 		$(MANIFEST)/starx \
 		$(MANIFEST)/string \
-		$(MANIFEST)/subpar
+		$(MANIFEST)/subpar \
+		$(MANIFEST)/trn
 	cd applications/pisa \
 	    && make>make.log && make install>>make.log
 
@@ -1693,18 +1741,18 @@ $(MANIFEST)/polpack: \
 		$(MANIFEST)/adam \
 		$(MANIFEST)/agi \
 		$(MANIFEST)/ams \
-		$(MANIFEST)/ard \
 		$(MANIFEST)/ary \
 		$(MANIFEST)/ast \
 		$(MANIFEST)/cat \
+		$(MANIFEST)/cfitsio \
 		$(MANIFEST)/chr \
 		$(MANIFEST)/cnf \
 		$(MANIFEST)/dtask \
 		$(MANIFEST)/ems \
 		$(MANIFEST)/fio \
-		$(MANIFEST)/generic \
 		$(MANIFEST)/gks \
 		$(MANIFEST)/gns \
+		$(MANIFEST)/graphpar \
 		$(MANIFEST)/grp \
 		$(MANIFEST)/gwm \
 		$(MANIFEST)/hds \
@@ -1712,18 +1760,23 @@ $(MANIFEST)/polpack: \
 		$(MANIFEST)/idi \
 		$(MANIFEST)/kaplibs \
 		$(MANIFEST)/lex \
+		$(MANIFEST)/mag \
 		$(MANIFEST)/mers \
 		$(MANIFEST)/messys \
 		$(MANIFEST)/misc \
+		$(MANIFEST)/nbs \
 		$(MANIFEST)/ncar \
 		$(MANIFEST)/ndf \
 		$(MANIFEST)/ndg \
 		$(MANIFEST)/one \
 		$(MANIFEST)/par \
 		$(MANIFEST)/parsecon \
+		$(MANIFEST)/pda \
+		$(MANIFEST)/pgp \
 		$(MANIFEST)/pgplot \
 		$(MANIFEST)/prm \
 		$(MANIFEST)/psx \
+		$(MANIFEST)/ref \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/sgs \
 		$(MANIFEST)/shl \
@@ -1732,7 +1785,8 @@ $(MANIFEST)/polpack: \
 		$(MANIFEST)/star2html \
 		$(MANIFEST)/starx \
 		$(MANIFEST)/string \
-		$(MANIFEST)/subpar
+		$(MANIFEST)/subpar \
+		$(MANIFEST)/trn
 	cd applications/polpack \
 	    && make>make.log && make install>>make.log
 

@@ -44,7 +44,7 @@ to one of the functions within the AST library. ATOOLS thus provides a
 high-level interface to the AST library. 
   </p></abstract>
   <dependencies >
-    <build>parsecon</build><build>dtask</build><build>ast</build><build>grp</build><build>ndf</build><build>par</build><build>fio</build><build>kaplibs</build><build>sae</build><build>shl</build><sourceset>sst</sourceset>
+    <build>parsecon</build><build>dtask</build><build>ast</build><build>cnf</build><build>hds</build><build>fio</build><build>grp</build><build>ifd</build><build>ndf</build><build>par</build><build>sae</build><build option='link'>kaplibs</build><build option='link'>ast</build><build option='link'>shl</build><sourceset>sst</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -185,7 +185,7 @@ text files.  CURSA also includes some facilities for accessing remote
 on-line catalogues via the Internet.
   </p></abstract>
   <dependencies >
-    <build>parsecon</build><build>dtask</build><build>sae</build><build>cat</build><build>fio</build><build>par</build><build>pda</build><build>ndf</build><build>pgp</build><sourceset>star2html</sourceset>
+    <build>parsecon</build><build>dtask</build><build option='link'>sae</build><build option='link'>cat</build><build option='link'>fio</build><build option='link'>par</build><build option='link'>pda</build><build option='link'>ndf</build><build option='link'>pgp</build><sourceset>star2html</sourceset><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -264,7 +264,7 @@ cube manipulation. </p></abstract>
       
   </p></abstract>
   <dependencies >
-    <build>ast</build><build>cat</build><build>kaplibs</build><build>snx</build><build>pda</build><build>ndf</build><build>sae</build><sourceset>star2html</sourceset>
+    <build option='link'>ast</build><build option='link'>cat</build><build option='link'>kaplibs</build><build option='link'>snx</build><build option='link'>pda</build><build option='link'>ndf</build><build option='link'>sae</build><sourceset>star2html</sourceset><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -441,7 +441,7 @@ flexible configuration facilities and can handle images and catalogues in a
 variety of formats.
 </p></abstract>
   <dependencies >
-    <build>parsecon</build><build>dtask</build><build>ast</build><build>ndf</build><build>sae</build><link>ndf</link><sourceset>star2html</sourceset>
+    <build>parsecon</build><build>dtask</build><build option='link'>ast</build><build option='link'>ndf</build><build option='link'>sae</build><sourceset>star2html</sourceset><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -593,7 +593,7 @@ calibration and modification, grid overlays, blink comparison, defect patching
 and the ability to query on-line (WWW) catalogues.
 </p></abstract>
   <dependencies >
-    <build>parsecon</build><build>dtask</build><build>ast</build><build>ndf</build><build>sae</build><build>cat</build><sourceset>star2html</sourceset>
+    <build>parsecon</build><build>dtask</build><build option='link'>ard</build><build option='link'>ams</build><build option='link'>ast</build><build option='link'>cat</build><build option='link'>fio</build><build option='link'>ndf</build><build option='link'>pda</build><build option='link'>sae</build><build option='link'>subpar</build><sourceset>star2html</sourceset><use>convert</use><use>esp</use><use>extractor</use><use>kappa</use><use>photom</use><use>polpack</use><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -786,7 +786,7 @@ intended to work in conjunction with Starlink's various specialised
 packages.
   </p></abstract>
   <dependencies >
-    <build>parsecon</build><build>dtask</build><build>fio</build><build>prm</build><build>par</build><build>sae</build><build>shl</build><build>hds</build><build>kaplibs</build><build>ard</build><build>mag</build><build>pgplot</build><build>tcl</build><build>tk</build><sourceset>star2html</sourceset>
+    <build>parsecon</build><build>dtask</build><build>agi</build><build>ast</build><build>chr</build><build>cnf</build><build>kaplibs</build><build>hds</build><build>fio</build><build>grp</build><build>mag</build><build>mers</build><build>ndf</build><build>one</build><build>par</build><build>prm</build><build>psx</build><build>sae</build><build>shl</build><build>subpar</build><build>tcl</build><build>tk</build><build>trn</build><build option='link'>ard</build><build option='link'>kaplibs</build><build option='link'>shl</build><build option='link'>one</build><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -815,7 +815,7 @@ are retained within KAPRH to satisfy any occasional need there may be for
 them. 
   </p></abstract>
   <dependencies >
-    <build>parsecon</build><build>dtask</build><build>ast</build><build>kaplibs</build><build>hds</build><build>fio</build><build>gks</build><build>gns</build><build>idi</build><build>mers</build><build>ndf</build><build>prm</build><build>par</build><build>sae</build><build>trn</build><build>subpar</build><build>shl</build><sourceset>star2html</sourceset>
+    <build>parsecon</build><build>dtask</build><build>ast</build><build>kaplibs</build><build>hds</build><build>fio</build><build>gks</build><build>gns</build><build>idi</build><build>mers</build><build>ndf</build><build>par</build><build>prm</build><build>sae</build><build>subpar</build><build>trn</build><build option='link'>kaplibs</build><build option='link'>cat</build><build option='link'>snx</build><build option='link'>ncar</build><build option='link'>idi</build><build option='link'>sgs</build><build option='link'>ndg</build><build option='link'>gks</build><build option='link'>gwm</build><build option='link'>gns</build><build option='link'>ndf</build><build option='link'>agi</build><build option='link'>fio</build><build option='link'>ref</build><build option='link'>ard</build><build option='link'>grp</build><build option='link'>trn</build><build option='link'>prm</build><build option='link'>shl</build><build option='link'>mag</build><build option='link'>sla</build><build option='link'>psx</build><build option='link'>pda</build><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -1066,7 +1066,7 @@ file extension stored in the standard Starlink NDF data format.
       
   </p></abstract>
   <dependencies >
-    <build>parsecon</build><build>dtask</build><build>agi</build><build>cat</build><build>chr</build><build>fio</build><build>ndf</build><build>par</build><build>pda</build><build>prm</build><build>sae</build><build>shl</build><sourceset>star2html</sourceset>
+    <build>parsecon</build><build>dtask</build><build option='link'>agi</build><build option='link'>cat</build><build option='link'>chr</build><build option='link'>fio</build><build option='link'>ndf</build><build option='link'>par</build><build option='link'>pda</build><build option='link'>prm</build><build option='link'>sae</build><build option='link'>shl</build><sourceset>star2html</sourceset><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -1092,7 +1092,7 @@ registration, sky subtraction, calculation of Stokes parameters, and
 display of vector maps.  
 </p></abstract>
   <dependencies >
-    <build>parsecon</build><build>dtask</build><build>fio</build><build>prm</build><build>par</build><build>sae</build><build>hds</build><build>kaplibs</build><build>ard</build><build>pgplot</build><build>shl</build><sourceset>star2html</sourceset>
+    <build>parsecon</build><build>dtask</build><build>ast</build><build>cat</build><build>chr</build><build>cnf</build><build>hds</build><build>fio</build><build>grp</build><build>mers</build><build>ndf</build><build>ndg</build><build>par</build><build>prm</build><build>sae</build><build>trn</build><build option='link'>sla</build><build option='link'>nbs</build><build option='link'>kaplibs</build><build option='link'>shl</build><use>kappa</use><use>ccdpack</use><use>tcl</use><use>tk</use><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -2134,7 +2134,7 @@ KAPLIBS provides software developers with access to many of the internal
 KAPPA routines, so that KAPPA-like applications can be written and built
 independently of KAPPA.</p></abstract>
   <dependencies >
-    <build>parsecon</build><build>dtask</build><build>cnf</build><build>sae</build><build>mers</build><build>subpar</build><build>gks</build><build>gns</build><build>idi</build><build>agi</build><build>ast</build><build>cat</build><build>ndg</build><build>hds</build><build>chr</build><build>fio</build><build>grp</build><build>ndf</build><build>prm</build><build>par</build><build>psx</build><build>snx</build><build>generic</build><link>cat</link><link>mers</link><link>subpar</link><link>psx</link><link>ndg</link><link>ndf</link><link>ast</link><link>agi</link><link>fio</link><link>grp</link><link>trn</link><link>prm</link><link>mag</link><link>psx</link><link>pda</link><link>pgplot</link><link>snx</link><sourceset>star2html</sourceset>
+    <build>parsecon</build><build>dtask</build><build>cnf</build><build>sae</build><build>mers</build><build>mag</build><build>subpar</build><build>gks</build><build>gns</build><build>idi</build><build>agi</build><build>ast</build><build>cat</build><build>ndg</build><build>hds</build><build>chr</build><build>fio</build><build>grp</build><build>ndf</build><build>prm</build><build>par</build><build>psx</build><build>snx</build><build>generic</build><link>cat</link><link>mers</link><link>subpar</link><link>psx</link><link>ndg</link><link>ndf</link><link>ast</link><link>agi</link><link>fio</link><link>grp</link><link>trn</link><link>prm</link><link>mag</link><link>psx</link><link>pda</link><link>pgplot</link><link>snx</link><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
