@@ -23,25 +23,25 @@
   in the documentation against taking advantage of this to get up to
   mucky hacks (you'll grow hairs on the backs of your hands, you know).
 -->
-<!notation texmaths   public 
+<!NOTATION texmaths   PUBLIC
   "+//ISBN 0-201-13447//NOTATION The TeXBook//EN">
-<!notation latexmaths public 
+<!NOTATION latexmaths PUBLIC
   "+//ISBN 0-201-52983//NOTATION LaTeX: A document preparation system//EN">
-<!notation latexgraphics public
+<!NOTATION latexgraphics PUBLIC
   "+//ISBN 0-201-54199//NOTATION The LaTeX Companion, ch. 10//EN">
-<!notation metapost public
+<!NOTATION metapost PUBLIC
   "+//IDN cm.bell-labs.com/who/hobby/MetaPost.html//NOTATION MetaPost//EN">
-<!NOTATION JPEG     PUBLIC 
+<!NOTATION jpeg     PUBLIC 
   "ISO/IEC 10918:1993//NOTATION Digital Compression and Coding of
     Continuous-tone Still Images (JPEG)//EN">
-<!NOTATION EPS      PUBLIC
+<!NOTATION eps      PUBLIC
   "+//ISBN 0-201-18127::Adobe//NOTATION PostScript Language Ref. Manual//EN">
-<!NOTATION GIF89a   PUBLIC
+<!NOTATION gif89a   PUBLIC
   "-//CompuServe//NOTATION Graphics Interchange Format 89a//EN">
-<!notation linespecific system
+<!NOTATION linespecific SYSTEM
   "line ends and leading white space must be preserved in output">
 
-<!entity % text.figure.notations 'linespecific | latexgraphics | metapost'
+<!ENTITY % text.figure.notations 'linespecific | latexgraphics | metapost'
 	-- Figure notations which use only SGML characters (terminology? see
 	   8879, 9.2), which can therefore be included directly within
 	   figurecontent element -->
@@ -51,13 +51,13 @@
      then it can be used as follows.  In the DTD subset, declare an
      entity as follows:
 
-       <!doctype ... [
+       <!DOCTYPE ... [
        ...
-       <!entity % notations-subset 
+       <!ENTITY % notations-subset 
           PUBLIC "-//Starlink//DTD Notation Declarations//EN">
        %notations-subset;
-       <!entity ltx-file system "things.tex" 
-          ndata latexgraphics [ package=stuff ]>
+       <!ENTITY ltx-file SYSTEM "things.tex" 
+          NDATA latexgraphics [ package=stuff ]>
        ...
        ]>
 
@@ -66,12 +66,12 @@
      there's no way to refer to data attributes in an element
      attribute.
      -->
-<!attlist #notation latexgraphics
+<!ATTLIST #NOTATION latexgraphics
 	package		-- LaTeX packages required for this to be processed --
-		cdata
-		#implied
+		CDATA
+		#IMPLIED
 	>
 
 <!-- Define this parameter entity so we can avoid reading this entity a 
      second time -->
-<!entity % notations-read "IGNORE">
+<!ENTITY % notations-read "IGNORE">
