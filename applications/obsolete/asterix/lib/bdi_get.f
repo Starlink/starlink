@@ -312,8 +312,6 @@
       INTEGER			AXPTR			! Ptr to axis data
       INTEGER			NDIM, DIMS(ADI__MXDIM)	! Dataset shape
       INTEGER			LITL			! Used length of LITEM
-
-      LOGICAL			REG			! Regular spaced data?
 *.
 
 *  Check inherited global status.
@@ -393,15 +391,8 @@
 *      Unmap the axis
           CALL BDI_AXUNMAP( ID, AXNO, 'Data', AXPTR, STATUS )
 
-*      Regularly spaced?
-          IF ( REG .AND. (STATUS.EQ.SAI__OK) ) THEN
-            CALL ADI_NEWV1R( 2, SPARR, DID, STATUS )
-
-          ELSE
-            STATUS = SAI__ERROR
-            CALL ERR_REP( ' ', 'Axis values are not regularly spaced',
-     :                    STATUS )
-          END IF
+*      Create the data
+          CALL ADI_NEWV1R( 2, SPARR, DID, STATUS )
 
 *    Otherwise report error
         ELSE

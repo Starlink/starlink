@@ -3018,7 +3018,6 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
      :               SID, STATUS )
       RF_DIMS(1,SLOT) = DX
       RF_DIMS(2,SLOT) = DY
-	call adi_print( sid,status)
 
 *  Map the index
       CALL CMP_MAPV( SLOC, 'INDEX', '_INTEGER', 'READ',
