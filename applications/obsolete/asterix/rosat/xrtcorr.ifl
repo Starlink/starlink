@@ -20,6 +20,14 @@
                HELP 'Enter dataset name without an extension'
             ENDPARAMETER
 
+     PARAMETER RAWDIR
+               TYPE    '_CHAR'
+               PROMPT  'Raw data directory'
+               PPATH   'DYNAMIC'
+               VPATH   'PROMPT'
+               HELP    'Directory containing raw data files'
+     ENDPARAMETER
+
      PARAMETER RTNAME
                TYPE    '_CHAR'
                PROMPT  'Rootname for the other calibration files'
