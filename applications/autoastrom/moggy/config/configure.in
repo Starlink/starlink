@@ -194,6 +194,8 @@ dnl     AC_MSG_ERROR([--without-wcslib specified but need wcslib])
 dnl   else
 dnl     AC_DEFINE(WCSLIB,-L$wcs_libdir -lwcs)
 dnl   fi)
+AC_CHECK_LIB(ast_wcslib, glsfwd, , 
+  AC_DEFINE(NEEDGLSFUNCS))
 
 
 dnl   Check whether the version of AST which we'll be linking against
