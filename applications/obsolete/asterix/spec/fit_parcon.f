@@ -167,7 +167,6 @@
       INTEGER             FITERR		! Fitting error encountered
       INTEGER             EJ,J,K		! Parameter indices
       INTEGER             LEPAR(NPAMAX)         ! Parameter to have errors done
-      INTEGER             NIT			! Iteration number (for FIT_MIN)
       INTEGER             NUNFROZEN		! No of unfrozen parameters
 
       LOGICAL             FPEGGED(NPAMAX)	! Parameters pegged in fitting

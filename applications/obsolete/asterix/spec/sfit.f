@@ -47,7 +47,7 @@
 *        Max number of iterations to be performed
 *     MINS = REAL (read)
 *        Minimum `reduced statistic' slope forcing continued iteration
-*     NUPE = INTEGER (read)
+*     NUP = INTEGER (read)
 *        Number of iterations between updates of model parameter file
 *     ERR = LOGICAL (read)
 *        Evaluate approximate parameter errors and write to model file?
@@ -181,6 +181,8 @@
 *        Removed explicit use of HDS
 *     30 Nov 1995 V2.0-0 (DJA):
 *        ADI port
+*     17 Apr 1996 V2.0-1 (DJA):
+*        New minimisation control
 *     {enter_changes_here}
 
 *  Bugs:
@@ -210,7 +212,7 @@
 	PARAMETER 		( OPCHAN = 6 )		! messages ( <1 for no messages)
 
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'SFIT Version V2.0-0' )
+        PARAMETER		( VERSION = 'SFIT Version V2.0-1' )
 
 *  Local Variables:
       RECORD /DATASET/    	OBDAT(NDSMAX)		! Observed datasets
@@ -218,51 +220,40 @@
       RECORD /PREDICTION/ 	PREDDAT(NDSMAX) 	! Data predicted by model
       RECORD /MODEL_SPEC/ 	MODEL			! Model specification
 
-      CHARACTER*2		SPAR			! String version of int
-
       DOUBLE PRECISION 		STAT			! Fit statistic
       DOUBLE PRECISION 		FPROB			! Fit probability
 
       REAL 			PARAM(NPAMAX)		! Model parameters
-      REAL MINSLO			! Reduced stat threshold for FIT_MIN
-      REAL LB(NPAMAX)			! Parameter lower bounds
-      REAL UB(NPAMAX)			! Parameter upper bounds
-      REAL LE(NPAMAX)			! Lower error estimate
-      REAL UE(NPAMAX)			! Upper error estimate
-      REAL DPAR(NPAMAX)			! Differential parameter increments
-      REAL PARSIG(NPAMAX)		! Parameter 1 sigma errors (approx)
-      REAL Z				! Redshift [ Eobs/Esource=1/(1+z) ]
+      REAL 			LB(NPAMAX)		! Parameter lower bounds
+      REAL 			UB(NPAMAX)		! Parameter upper bounds
+      REAL 			LE(NPAMAX)		! Lower error estimate
+      REAL 			UE(NPAMAX)		! Upper error estimate
+      REAL 			DPAR(NPAMAX)		! Differential parameter increments
+      REAL 			PARSIG(NPAMAX)	        ! Parameter 1 sigma errors (approx)
+      REAL 			Z			! Redshift [ Eobs/Esource=1/(1+z) ]
 
       INTEGER			IFID			! Input dataset id
+      INTEGER			MCTRL			! Minimisation control
       INTEGER			MFID			! Model spec id
       INTEGER 			NDS			! No of datasets
       INTEGER 			NGOOD			! No. good data elements
       INTEGER 			SSCALE			! Factor for scaling fitstat
-      INTEGER			NC			! No. chars used in SPAR
       INTEGER NDOF			! No of degrees of freedom - should be
 					!  no of data - no of unfrozen params
-      INTEGER NITMAX			! Return when NIT reaches NITMAX
-      INTEGER NITUP			! Period for updating model spec (&
-					! typing progress diagnostics)
+      INTEGER 			NITMAX			! Max # iterations
       INTEGER 			NPAR			! No of parameters
-      INTEGER 			NIT			! Iteration number
-      INTEGER FITERR			! Fitting error encountered
-      INTEGER 			J			! Parameter index
-      INTEGER NRET			! Itern no for return from FIT_MIN
-      INTEGER OCI			! Logical unit number for o/p file
-      INTEGER FSTAT			! Fit statistic flag (1=chisq, 2=l'hood)
+      INTEGER 			FITERR			! Fitting error encountered
+      INTEGER 			OCI			! Output channel
+      INTEGER 			FSTAT			! See FIT_PAR for info
 
-	LOGICAL CHISTAT			! Fitstat is chi-squared?
-	LOGICAL LIKSTAT			! Fitstat is Cash likelihood statistic?
-	LOGICAL WORKSPACE		! Set up workspace for STAT gradients?
-	LOGICAL FROZEN(NPAMAX)		! Frozen parameter flag
-	LOGICAL INITIALISE		! Should be set true on first call only
-					! - always returned false
-	LOGICAL PEGGED(NPAMAX)		! Parameter pegged on bound
-	LOGICAL FINISHED		! Minimum found
-	LOGICAL NOFREE			! No parameters free
-	LOGICAL ER			! Parameter error calculation required?
-	LOGICAL OP			! Printout required?
+      LOGICAL 			LIKSTAT			! Fitstat is Cash likelihood statistic?
+      LOGICAL 			WORKSPACE		! Set up workspace for STAT gradients?
+      LOGICAL 			FROZEN(NPAMAX)		! Frozen parameter flag
+      LOGICAL 			PEGGED(NPAMAX)	     	! Parameter pegged on bound
+      LOGICAL 			FINISHED		! Minimum found
+      LOGICAL 			NOFREE			! No parameters free
+      LOGICAL 			ER			! Parameter error calculation required?
+      LOGICAL 			OP			! Printout required?
 *.
 
 *  Check inherited global status.
@@ -280,7 +271,6 @@
 
 *  Chi-squared or likelihood fitting?
       CALL USI_GET0L( 'LIK', LIKSTAT, STATUS )
-      CHISTAT=.NOT.LIKSTAT
       IF ( LIKSTAT ) THEN
         FSTAT=FIT__LOGL
       ELSE
@@ -291,7 +281,7 @@
       CALL USI_ASSOC( 'INP', 'FileSet|BinDS', 'READ', IFID, STATUS )
       WORKSPACE = .TRUE.
       CALL FIT_GETDAT( ADI__NULLID, IFID, 'SPEC', FSTAT, WORKSPACE,
-     :                 CHISTAT, NDS,
+     :                 (.NOT. LIKSTAT), NDS,
      :                 OBDAT, NGOOD, SSCALE, PREDDAT, INSTR, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
@@ -308,7 +298,7 @@
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *  Number of degrees of freedom for chi-squared
-      IF ( CHISTAT ) THEN
+      IF ( .NOT. LIKSTAT ) THEN
 
 *    Finds NDOF from frozen array and constraints
         CALL FIT1_NDOF( NGOOD, MODEL, FROZEN, NDOF, STATUS )
@@ -318,17 +308,15 @@
 
       END IF
 
-*  Set iteration limits
-      CALL USI_GET0I('MAX',NITMAX,STATUS)
-      CALL USI_GET0R('MINS',MINSLO,STATUS)
-      CALL USI_GET0I('NUP',NITUP,STATUS)
-      IF ( STATUS .NE. SAI__OK ) GOTO 99
+*  Get minimisation control
+      CALL FCI_GETMC( MCTRL, STATUS )
 
 *  Set up workspace for model stack
       CALL SFIT_MAPMODSTK( NDS, PREDDAT, MODEL.STACKPTR, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *  Zero iterations means just print the statistic
+      CALL ADI_CGET0I( MCTRL, 'MaxIt', NITMAX, STATUS )
       IF ( NITMAX .EQ. 0 ) THEN
 
 *    Evaluate the statistic
@@ -348,85 +336,26 @@
 
       END IF
 
-*  Main loop
-      NIT=0
-      INITIALISE=.TRUE.
-      FINISHED=.FALSE.
-      NOFREE=.FALSE.
-      DO WHILE(NIT.LT.NITMAX.AND..NOT.FINISHED)
+*  Perform fit iteration
+      CALL FIT_MIN( NDS, OBDAT, INSTR, MODEL, MCTRL, OPCHAN, .TRUE.,
+     :              NPAR, LB, UB, FROZEN, SSCALE, FSTAT,
+     :              FIT_PREDDAT, PREDDAT, PARAM, DPAR, PEGGED,
+     :              STAT, FINISHED, FITERR, STATUS )
+      IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-	NRET = NIT + NITUP
-	IF(NRET.GT.NITMAX) NRET=NITMAX
+*  Fitting error?
+      IF (FITERR.EQ.2.OR.FITERR.EQ.3)THEN
 
-*    Perform fit iteration
-	CALL FIT_MIN(NDS,OBDAT,INSTR,MODEL,OPCHAN,NRET,NPAR,LB,UB,
-     :    FROZEN,SSCALE,INITIALISE,MINSLO,FSTAT,FIT_PREDDAT,PREDDAT,
-     :    PARAM,DPAR,PEGGED,STAT,NIT,FINISHED,FITERR,STATUS)
-	IF(STATUS.NE.SAI__OK) GOTO 99
+*    No free parameters?
+	NOFREE=.TRUE.
+        FINISHED=.TRUE.
 
-*    Fitting error
-	IF(FITERR.EQ.2.OR.FITERR.EQ.3)THEN
+*  Fatal fitting error?
+      ELSE IF ( FITERR .NE. 0 )THEN
+        CALL FIT_REPFERR( FITERR, STATUS )
+	GOTO 99
 
-*        No free parameters - terminate
-	  NOFREE=.TRUE.
-	  FINISHED=.TRUE.
-
-	ELSE IF(FITERR.NE.0)THEN
-
-*      Fatal fitting error
-          CALL FIT_REPFERR( FITERR, STATUS )
-	  GOTO 99
-
-	END IF
-
-*    Report progress
-	CALL MSG_BLNK()
-        CALL MSG_SETI( 'NIT', NIT )
-        CALL MSG_PRNT( '* Iteration ^NIT *' )
-	DO J=1,NPAR
-	  IF(FROZEN(J))THEN
-            CALL MSG_SETC( 'STATE', 'frozen' )
-	  ELSE IF(PEGGED(J))THEN
-            CALL MSG_SETC( 'STATE', 'pegged' )
-	  ELSE
-            IF ( (MODEL.NTIE.GT.0) .AND. (MODEL.TGROUP(J).GT.0) ) THEN
-              IF ( J .NE. MODEL.TSTART(MODEL.TGROUP(J)) ) THEN
-                CALL CHR_ITOC( MODEL.TSTART(MODEL.TGROUP(J)), SPAR, NC )
-                CALL MSG_SETC( 'STATE', 'free (tied to '/
-     :                                     /SPAR(:NC)//')' )
-              ELSE
-                CALL MSG_SETC( 'STATE', 'free' )
-              END IF
-            ELSE
-              CALL MSG_SETC( 'STATE', 'free' )
-            END IF
-	  ENDIF
-          CALL MSG_FMTR( 'PVAL', '1PG14.6', PARAM(J) )
-          CALL MSG_PRNT( MODEL.PARNAME(J)//' ^PVAL   ^STATE' )
-	END DO
-	IF ( FINISHED ) THEN
-	  CALL MSG_BLNK()
-	  IF ( NOFREE ) THEN
-	    CALL MSG_PRNT( '+++ No parameters free +++' )
-	  ELSE
-	    CALL MSG_PRNT( '+++ Minimum found +++' )
-	  END IF
-	  CALL MSG_BLNK()
-	END IF
-
-*    Update model_spec object
-	CALL MSG_BLNK()
-	CALL MSG_PRNT( '** Updating model spec - do not exit '/
-     :                                  /'until completed **' )
-	CALL FIT_MODUP( MFID,MODEL.NCOMP,NPAR,PARAM,LE,UE,-99.0,STATUS)
-	IF ( STATUS .NE. SAI__OK ) THEN
-	  CALL ERR_FLUSH(STATUS)
-	ELSE
-	  CALL MSG_PRNT( '** Model updated **' )
-	  CALL MSG_BLNK()
-	END IF
-
-      END DO
+      END IF
 
 *  Calculate approximate parameter errors and display
       IF ( NOFREE ) THEN
@@ -492,9 +421,6 @@
 
 *    Status of minimisation
         CALL AIO_BLNK( OCI, STATUS )
-        CALL MSG_SETI( 'NIT', NIT )
-        CALL AIO_WRITE( OCI, 'Terminated after ^NIT iterations',
-     :                  STATUS )
 	IF ( FINISHED ) THEN
           CALL AIO_WRITE( OCI, 'Minimum found', STATUS )
 	ELSE
