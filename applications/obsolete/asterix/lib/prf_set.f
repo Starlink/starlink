@@ -58,7 +58,7 @@
 *     {routine_deficiencies}...
 
 *  References:
-*     PRF Subroutine Guide : http://www.sr.bham.ac.uk:8080/asterix-docs/Programmer/Guides/prf.html
+*     PRF Subroutine Guide : http://www.sr.bham.ac.uk/asterix-docs/Programmer/Guides/prf.html
 
 *  Keywords:
 *     package:prf, usage:public

@@ -55,7 +55,7 @@
 *     {routine_deficiencies}...
 
 *  References:
-*     GCB Subroutine Guide : http://www.sr.bham.ac.uk:8080/asterix-docs/Programmer/Guides/gcb.html
+*     GCB Subroutine Guide : http://www.sr.bham.ac.uk/asterix-docs/Programmer/Guides/gcb.html
 
 *  Keywords:
 *     package:gcb, usage:public

@@ -56,7 +56,7 @@
 *     {routine_deficiencies}...
 
 *  References:
-*     GMI Subroutine Guide : http://www.sr.bham.ac.uk:8080/asterix-docs/Programmer/Guides/gmi.html
+*     GMI Subroutine Guide : http://www.sr.bham.ac.uk/asterix-docs/Programmer/Guides/gmi.html
 
 *  Keywords:
 *     package:gmi, usage:public
