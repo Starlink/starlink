@@ -29,6 +29,7 @@ use Cwd;
 
 #  Directory locations.
 
+# $srcdir = "/local/star/src/from-ussc";  # head of source tree
 $srcdir = "/local/star/sources";        # head of source tree
 $bindir = "/star/bin";                  # Starlink binaries directory
 $incdir = "/star/include";              # Starlink include directory
@@ -124,7 +125,7 @@ sub starpack {
 
    local $_ = shift;
    /^(\w+)#/;
-   return $1;
+   return $1 || '';
 }
 
 ########################################################################
