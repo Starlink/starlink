@@ -77,8 +77,28 @@
 
         ENDIF
 
+*  clear display
+        IF (I_SPLIT_DISP) THEN
+          CALL IMG_CLEAR(1,STATUS)
+        ELSE
+          CALL GDV_CLEAR(STATUS)
+        ENDIF
 
+*  reset transformation database
+        CALL GTR_ZERO(STATUS)
+
+        CALL GCB_ATTACH('IMAGE',STATUS)
+        CALL IMG_2DGCB(STATUS)
+
+*  display image
+        CALL IMG_WINDOW(STATUS)
         CALL IMG_DISP(STATUS)
+        CALL IMG_AXES(STATUS)
+
+*  flag current plotting status
+        CALL GCB_SETL('SURF_FLAG',.FALSE.,STATUS)
+        I_DISP=.TRUE.
+         I_DISP_1D=.FALSE.
 
       ENDIF
 
