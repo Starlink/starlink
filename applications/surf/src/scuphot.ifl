@@ -29,6 +29,8 @@
 #     1997 June 10 (TimJ)
 #        Change FILE to _CHAR instead of type FILENAME
 #        Fixes problems with uninitialised parameter.
+#     1998 June 16 (TimJ)
+#        Add POSITION for OUT
 #     {enter_further_changes_here}
  
 #-
@@ -66,6 +68,7 @@
       ENDPARAMETER
 
       PARAMETER OUT
+         POSITION 3
          TYPE    '_CHAR'
 	 ACCESS   'WRITE'
 	 VPATH    'PROMPT'
@@ -75,6 +78,7 @@
       ENDPARAMETER
 
       PARAMETER FILE
+         POSITION 4
          TYPE    '_CHAR'
          VPATH   'PROMPT'
          PROMPT  'Name of ASCII file to contain results summary'
