@@ -258,12 +258,8 @@
               CALL CONV_SPLIT(TEXT(:L),RAS,DECS,STATUS)
 *  parse
               CALL CONV_RADEC(RAS,DECS,RA,DEC,STATUS)
-*  then convert back to a uniform format
-              CALL CONV_DEGHMS(REAL(RA),RAS)
-              CALL CONV_DEGDMS(REAL(DEC),DECS)
 *  and store
-              CALL GRP_PUT(I_POS_ID,1,RAS(:11)//DECS(:11),0,STATUS)
-              I_NPOS=I_NPOS+1
+              CALL IMG_PUTPOS( RA, DEC, STATUS )
 
 *  if first one then make current position
               IF (I_NPOS.EQ.1) THEN
@@ -298,13 +294,9 @@
                     CALL CONV_SPLIT(REC,RAS,DECS,STATUS)
 *  parse
                     CALL CONV_RADEC(RAS,DECS,RA,DEC,STATUS)
-*  then convert back to a uniform format
-                    CALL CONV_DEGHMS(REAL(RA),RAS)
-                    CALL CONV_DEGDMS(REAL(DEC),DECS)
+
 *  and store
-                    CALL GRP_PUT(I_POS_ID,1,RAS(:11)//DECS(:11),0,
-     :                                                      STATUS)
-                    I_NPOS=I_NPOS+1
+                   CALL IMG_PUTPOS( RA, DEC, STATUS )
 
 *  make the first one the current position
                     IF (I_NPOS.EQ.1) THEN
@@ -341,14 +333,8 @@
                     CALL ARR_ELEM1D(RAPTR,NSRC,ISRC,RA,STATUS)
                     CALL ARR_ELEM1D(DECPTR,NSRC,ISRC,DEC,STATUS)
 
-*  convert to a uniform format
-                    CALL CONV_DEGHMS(REAL(RA),RAS)
-                    CALL CONV_DEGDMS(REAL(DEC),DECS)
-
 *  and store
-                    CALL GRP_PUT(I_POS_ID,1,RAS(:11)//DECS(:11),0,
-     :                                                      STATUS)
-                    I_NPOS=I_NPOS+1
+                    CALL IMG_PUTPOS( RA, DEC, STATUS )
 
 *  make the first one the current position
                     IF (I_NPOS.EQ.1) THEN
