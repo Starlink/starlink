@@ -450,7 +450,7 @@ static void RemoveTask( volatile task_data *task ) {
    (void) sigprocmask( SIG_SETMASK, &oset, NULL );
 
 /* Free the memory used. */
-   free( (void *) task );
+   free( task );
 }
 
 /* Kill a task and return immediately (without waiting). */
