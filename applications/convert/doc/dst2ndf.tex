@@ -19,14 +19,14 @@
          IN = Figaro file (Read)
       }{
          The file name of the version 2 file.  A file extension must
-         not be given after the name, since {\tt ".DST"} is appended by the
+         not be given after the name, since {\tt ".dst"} is appended by the
          application.  The file name is limited to 80 characters.
       }
       \sstsubsection{
          OUT = NDF (Write)
       }{
          The file name of the output NDF file.  A file extension must
-         not be given after the name, since {\tt ".SDF"} is appended by the
+         not be given after the name, since {\tt ".sdf"} is appended by the
          application.  Since the NDF\_ library is not used, a section
          definition may not be given following the name.  The file
          name is limited to 80 characters.
@@ -34,16 +34,16 @@
    }
    \sstexamples{
       \sstexamplesubsection{
-         DST2NDF OLD NEW
+         dst2ndf old new
       }{
-         This converts the Figaro file OLD.DST file to the NDF file
-         NEW.SDF.
+         This converts the Figaro file old.dst to the NDF called new
+         (in file new.sdf).
       }
       \sstexamplesubsection{
-         DST2NDF HORSE HORSE
+         dst2ndf horse horse
       }{
-         This converts the Figaro file HORSE.DST to the NDF called
-         HORSE in file HORSE.SDF.
+         This converts the Figaro file horse.dst to the NDF called
+         horse (in file horse.sdf).
       }
    }
    \sstnotes{

@@ -11,7 +11,7 @@
       are listed in the Notes.
    }
    \sstusage{
-      NDF2DIPSO IN OUT
+      ndf2dipso in out
    }
    \sstparameters{
       \sstsubsection{
@@ -24,21 +24,23 @@
       \sstsubsection{
          OUT = FILENAME (Write)
       }{
-         Output DIPSO file.  File extension {\tt ".DAT"} is assumed.
+         Output DIPSO file.  On VMS platforms a default file extension
+         of {\tt ".DAT"} is appended when parameter OUT contains no file
+         extension.
       }
    }
    \sstexamples{
       \sstexamplesubsection{
-         NDF2DIPSO OLD NEW
+         ndf2dipso old new
       }{
-         This converts the NDF file NEW.SDF to the DIPSO file OLD.DAT
-         file.
+         This converts the NDF called old (in file old.sdf) to the
+         DIPSO file called new.
       }
       \sstexamplesubsection{
-         NDF2DIPSO SPECTRE SPECTRE
+         ndf2dipso spectre spectre.dat
       }{
-         This converts the NDF called SPECTRE in file SPECTRE.SDF to
-         the DIPSO file SPECTRE.DAT.
+         This converts the NDF called spectre (in file spectre.sdf) to
+         the DIPSO file spectre.dat.
       }
    }
    \sstnotes{

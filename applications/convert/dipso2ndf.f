@@ -25,22 +25,24 @@
 *     for the conversion are listed in the Notes.
 
 *  Usage:
-*      DIPSO2NDF IN OUT
+*     dipso2ndf in out
 
 *  ADAM Parameters:
 *     IN = FILENAME (Read)
-*        Input DIPSO file.  File extension ".DAT" is assumed.
+*        Input DIPSO file.  On VMS platforms a default file extension
+*        of ".DAT" is appended when parameter IN contains no file
+*        extension.
 *     OUT = NDF (Write)
 *        Output NDF data structure.  A file extension must not be given
 *        after the name.  It becomes the new current NDF.
 
 *  Examples:
-*     DIPSO2NDF OLD NEW
-*        This converts the DIPSO file OLD.DAT file to the NDF file
-*        NEW.SDF.
-*     DIPSO2NDF SPECTRE SPECTRE
-*        This converts the DIPSO file SPECTRE.DAT to the NDF called
-*        SPECTRE in file SPECTRE.SDF.
+*     dipso2ndf old new
+*        This converts the DIPSO file called old to the NDF called new
+*        (in file new.sdf).
+*     dipso2ndf spectre.dat spectre
+*        This converts the DIPSO file spectre.dat to the NDF called
+*        spectre (in file spectre.sdf).
 
 *  Notes:
 *     -  The DIPSO title is written to the NDF TITLE.

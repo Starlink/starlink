@@ -3,7 +3,7 @@ Converts an NDF to a DIPSO-format file.
 
 Usage:
 
-   NDF2DIPSO IN OUT
+   ndf2dipso in out
 
 Description:
 
@@ -20,15 +20,17 @@ IN = NDF (Read)
    one exists, otherwise it is the current value.
 3 OUT
 OUT = FILENAME (Write)
-   Output DIPSO file.  File extension ".DAT" is assumed.
+   Output DIPSO file.  On VMS platforms a default file extension
+   of ".DAT" is appended when parameter OUT contains no file
+   extension.
 2 Examples
-NDF2DIPSO OLD NEW
-   This converts the NDF file NEW.SDF to the DIPSO file OLD.DAT
-   file.
+ndf2dipso old new
+   This converts the NDF called old (in file old.sdf) to the
+   DIPSO file called new.
 
-NDF2DIPSO SPECTRE SPECTRE
-   This converts the NDF called SPECTRE in file SPECTRE.SDF to
-   the DIPSO file SPECTRE.DAT.
+ndf2dipso spectre spectre.dat
+   This converts the NDF called spectre (in file spectre.sdf) to
+   the DIPSO file spectre.dat.
 2 Notes
 -  The NDF TITLE object is to the DIPSO file.
 

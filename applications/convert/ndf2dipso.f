@@ -13,14 +13,14 @@
 *     ADAM A-task
 
 *  Invocation:
-*     CALL NDF2DIPSO (STATUS)
+*     CALL NDF2DIPSO( STATUS )
 
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
-*  Usage
-*     NDF2DIPSO IN OUT
+*  Usage:
+*     ndf2dipso in out
 
 *  Description:
 *     The routine converts a 1-dimensional NDF data file into a
@@ -34,15 +34,17 @@
 *        after the name.  The suggested default is the current NDF if
 *        one exists, otherwise it is the current value.
 *     OUT = FILENAME (Write)
-*        Output DIPSO file.  File extension ".DAT" is assumed.
+*        Output DIPSO file.  On VMS platforms a default file extension
+*        of ".DAT" is appended when parameter OUT contains no file
+*        extension.
 
 *  Examples:
-*     NDF2DIPSO OLD NEW
-*        This converts the NDF file NEW.SDF to the DIPSO file OLD.DAT
-*        file.
-*     NDF2DIPSO SPECTRE SPECTRE
-*        This converts the NDF called SPECTRE in file SPECTRE.SDF to
-*        the DIPSO file SPECTRE.DAT.
+*     ndf2dipso old new
+*        This converts the NDF called old (in file old.sdf) to the
+*        DIPSO file called new.
+*     ndf2dipso spectre spectre.dat
+*        This converts the NDF called spectre (in file spectre.sdf) to
+*        the DIPSO file spectre.dat.
 
 *  Notes:
 *     -  The NDF TITLE object is to the DIPSO file.

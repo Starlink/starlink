@@ -27,27 +27,27 @@
 *      little or no information lost.
 
 *   Usage:
-*      DST2NDF IN OUT
+*      dst2ndf in out
 
 *   ADAM Parameters:       
 *      IN = Figaro file (Read)
 *         The file name of the version 2 file.  A file extension must
-*         not be given after the name, since ".DST" is appended by the
+*         not be given after the name, since ".dst" is appended by the
 *         application.  The file name is limited to 80 characters.
 *      OUT = NDF (Write)     
 *         The file name of the output NDF file.  A file extension must
-*         not be given after the name, since ".SDF" is appended by the
+*         not be given after the name, since ".sdf" is appended by the
 *         application.  Since the NDF_ library is not used, a section
 *         definition may not be given following the name.  The file
 *         name is limited to 80 characters.
 
 *  Examples:
-*     DST2NDF OLD NEW
-*        This converts the Figaro file OLD.DST file to the NDF file
-*        NEW.SDF.
-*     DST2NDF HORSE HORSE
-*        This converts the Figaro file HORSE.DST to the NDF called
-*        HORSE in file HORSE.SDF.
+*     dst2ndf old new
+*        This converts the Figaro file old.dst to the NDF called new
+*        (in file new.sdf).
+*     dst2ndf horse horse
+*        This converts the Figaro file horse.dst to the NDF called
+*        horse (in file HORSE.SDF).
 
 *  Notes:
 *     The rules for the conversion of the various components are as
