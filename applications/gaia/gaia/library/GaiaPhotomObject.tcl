@@ -276,7 +276,6 @@ itcl::class gaia::GaiaPhotomObject {
          } else {
             create_sky_ellipse $x $y
          }
-         set interactive_ 1
          set newpositions regions
       } else {
          set positions annulus
@@ -286,6 +285,15 @@ itcl::class gaia::GaiaPhotomObject {
       configure -positions $newpositions
    }
 
+   #  Set details of a sky region that will be used when creating 
+   #  without allowing resizing.
+   public method setskydefaults {major ecc angle shape} {
+       set sky_defaults_(angle) [canvas_angle $angle]
+       set sky_defaults_(major) $major
+       set sky_defaults_(minor) [expr $major*sqrt(1.0-$ecc*$ecc)]
+       set sky_defaults_(shape) $shape
+   }
+   
    #  Return the values of all options. If mode is "all" then for
    #  apertures the extended form is used, otherwise only basic PHOTOM
    #  values are returned. If object isn't measured then this will
@@ -419,7 +427,6 @@ itcl::class gaia::GaiaPhotomObject {
             return [getoptdets_]
          }
       }
-
    }
    
    #  Return aperture details.
@@ -515,6 +522,17 @@ itcl::class gaia::GaiaPhotomObject {
       }
    }
 
+   #  Do the actual creation of a circular aperture at the given position.
+   protected method placed_circle_ {x y} {
+
+      #  Reset the bindings and cursor.
+      bind $canvas <1> [code $default_binding_]
+      $canvas configure -cursor $default_cursor_
+      set xpos $x
+      set ypos $y
+      create_circle
+   }
+
    #  Draw a circular aperture with the current values.
    public method create_circle {} {
       if { "$canvasdraw" != {} } {
@@ -540,16 +558,6 @@ itcl::class gaia::GaiaPhotomObject {
       }
    }
 
-   #  Do the actual creation of a circular aperture at the given position.
-   protected method placed_circle_ {x y} {
-
-      #  Reset the bindings and cursor.
-      bind $canvas <1> [code $default_binding_]
-      $canvas configure -cursor $default_cursor_
-      set xpos $x
-      set ypos $y
-      create_circle
-   }
 
    #  Finally created the new aperture, record details and add call
    #  backs for interactive updates etc. Execute the requested
@@ -632,23 +640,42 @@ itcl::class gaia::GaiaPhotomObject {
 
    #  Create a circular sky region without resizing.
    public method create_no_resize_sky_circle {} {
-      if { "$canvasdraw" != {} } {
-         set default_binding_ [bind $canvas <1>]
-         set default_cursor_ [$canvas cget -cursor]
-         $canvas configure -cursor circle
-
-         #  Get the position of the circle and create it.
-         bind $canvas <1> [code eval $this placed_sky_circle_ $canvasX_ $canvasY_]
-      }
+       if { "$canvasdraw" != {} } {
+	   set default_binding_ [bind $canvas <1>]
+	   set default_cursor_ [$canvas cget -cursor]
+	   $canvas configure -cursor circle
+	   
+	   #  Get the position of the circle and create it.
+	   set interactive_ 0
+	   bind $canvas <1> [code eval $this placed_sky_circle_ $canvasX_ $canvasY_]
+       }
    }
 
    #  Respond to request to create a circular aperture at the given position.
    protected method placed_sky_circle_ {x y} {
 
-      #  Reset the bindings and cursor.
-      bind $canvas <1> [code $default_binding_]
-      $canvas configure -cursor $default_cursor_
-      create_sky_circle $x $y
+       #  Reset the bindings and cursor.
+       bind $canvas <1> [code $default_binding_]
+       $canvas configure -cursor $default_cursor_
+       incr sky_regions
+
+       #  Set the apertiure detail defaults.
+       set sky_details_($sky_regions,x) $x
+       set sky_details_($sky_regions,y) $y
+       if { [info exists sky_defaults_] } {
+	   set sky_details_($sky_regions,major) \
+		   [canvas_dist $sky_defaults_(major)]
+	   set sky_details_($sky_regions,minor) \
+		   [canvas_dist $sky_defaults_(minor)]
+	   set sky_details_($sky_regions,angle) $sky_defaults_(angle)
+	   set sky_details_($sky_regions,shape) $sky_defaults_(shape)
+       } else {
+	   set sky_details_($sky_regions,major) $major
+	   set sky_details_($sky_regions,minor) $minor
+	   set sky_details_($sky_regions,angle) $angle
+	   set sky_details_($sky_regions,angle) $shape
+       }
+       create_sky_circle $x $y
    }
 
    #  Draw a circular sky region at the given position.
@@ -664,38 +691,39 @@ itcl::class gaia::GaiaPhotomObject {
    #  done, otherwise set them) and add call backs for interactive
    #  updates etc.
    public method created_sky_circle {id args} {
-      if { $interactive_ } {
-         incr sky_regions
-         lassign [$canvas coords $id] x y
-         set maj [$canvas itemcget $id -semimajor]
-         set min [$canvas itemcget $id -semiminor]
-         set ang [$canvas itemcget $id -angle]
-         set sky_details_($sky_regions,x) $x
-         set sky_details_($sky_regions,y) $y
-         set sky_details_($sky_regions,shape) circle
-         set sky_details_($sky_regions,major) $maj
-         set sky_details_($sky_regions,minor) $min
-         set sky_details_($sky_regions,angle) $ang
-      } else {
-         #  Non-interactive create, assume sky_details are set.
-         $canvas coords $id \
-            $sky_details_($sky_regions,x) \
-            $sky_details_($sky_regions,y)
-         $canvas itemconfigure $id \
-            -semimajor $sky_details_($sky_regions,major) \
-            -semiminor $sky_details_($sky_regions,minor) \
-            -angle $sky_details_($sky_regions,angle)
-      }
-      set sky_details_($id,index) $sky_regions
-      set sky_details_($sky_regions,id) $id
-      $canvasdraw add_notify_cmd $id [code $this update_sky_circle $id] 0
-      add_bindings_ $id
-
-      #  Inform sub-classes that a new aperture has been created.
-      if { $create_cmd_ != {} } {
-         eval $create_cmd_ $id
-         set create_cmd_ {}
-      }
+       if { $interactive_ } {
+	   incr sky_regions
+	   lassign [$canvas coords $id] x y
+	   set maj [$canvas itemcget $id -semimajor]
+	   set min [$canvas itemcget $id -semiminor]
+	   set ang [$canvas itemcget $id -angle]
+	   set sky_details_($sky_regions,x) $x
+	   set sky_details_($sky_regions,y) $y
+	   set sky_details_($sky_regions,shape) circle
+	   set sky_details_($sky_regions,major) $maj
+	   set sky_details_($sky_regions,minor) $min
+	   set sky_details_($sky_regions,angle) $ang
+       } else {
+	   #  Non-interactive create, assume sky_details are set.
+	   $canvas coords $id \
+		   $sky_details_($sky_regions,x) \
+		   $sky_details_($sky_regions,y)
+	   $canvas itemconfigure $id \
+		   -semimajor $sky_details_($sky_regions,major) \
+		   -semiminor $sky_details_($sky_regions,minor) \
+		   -angle $sky_details_($sky_regions,angle)
+	   set interactive_ 1
+       }
+       set sky_details_($id,index) $sky_regions
+       set sky_details_($sky_regions,id) $id
+       $canvasdraw add_notify_cmd $id [code $this update_sky_circle $id] 0
+       add_bindings_ $id
+       
+       #  Inform sub-classes that a new aperture has been created.
+       if { $create_cmd_ != {} } {
+	   eval $create_cmd_ $id
+	   set create_cmd_ {}
+       }
    }
 
    #  Update sky aperture on movement, resize or delete.
@@ -909,14 +937,14 @@ itcl::class gaia::GaiaPhotomObject {
          set sky_details_($sky_regions,minor) $min
          set sky_details_($sky_regions,angle) $ang
       } else {
-         #  Non-interactive create, assume sky_details are set.
-         $canvas coords $id \
-            $sky_details_($sky_regions,x) \
-            $sky_details_($sky_regions,y)
-         $canvas itemconfigure $id \
-            -semimajor $sky_details_($sky_regions,major) \
-            -semiminor $sky_details_($sky_regions,minor) \
-            -angle $sky_details_($sky_regions,angle)
+	  #  Non-interactive create, assume sky_details are set .
+	  $canvas coords $id \
+		  $sky_details_($sky_regions,x) \
+		  $sky_details_($sky_regions,y)
+	  $canvas itemconfigure $id \
+		  -semimajor $sky_details_($sky_regions,major) \
+		  -semiminor $sky_details_($sky_regions,minor) \
+		  -angle $sky_details_($sky_regions,angle)
       }
       set sky_details_($id,index) $sky_regions
       set sky_details_($sky_regions,id) $id
@@ -1333,8 +1361,7 @@ itcl::class gaia::GaiaPhotomObject {
    }
    public variable shape {circle} {
       if { $state_ != "new" } {
-         #  puts stderr \
-         #  {It's not possible to change the aperture shape after creation.}
+         # It's not possible to change the aperture shape after creation.
          set shape $first_shape_
          notify_change
       } else {
@@ -1411,6 +1438,9 @@ itcl::class gaia::GaiaPhotomObject {
 
    #  Sky region details.
    protected variable sky_details_
+   
+   #  Defaults for sky regions created non-interactively
+   protected variable sky_defaults_
 
    #  Shape of object on first config.
    protected variable first_shape_

@@ -255,7 +255,7 @@ itcl::class gaia::GaiaPhotomList {
          }
       }
 
-      #  Reset allow interactive resize
+      #  Reset to allow interactive resize
       $canvasdraw configure -show_selection_grips 1
    }
 
