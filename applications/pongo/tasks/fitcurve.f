@@ -108,6 +108,7 @@
 *     JBVAD::PAH: Paul Harrison (STARLINK)
 *     PCTR: P.C.T. Rees (STARLINK)
 *     PDRAPER: P.W. Draper (STARLINK - Durham University)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -139,6 +140,8 @@
 *        Added POLYFILE parameter to allow permanent storage of the 
 *        polynomial coefficients and so that string truncation 
 *        problems for complex fits can be avoided (mainly in IRAF).
+*     1-OCT-2004 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *-
@@ -149,6 +152,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PONGO_PAR'        ! PONGO global constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL
 
 *  Global Variables:
       INCLUDE 'PONGO_CMN'        ! PONGO global variables
@@ -324,7 +328,8 @@
          IFAIL2 = 0
          CALL ERR_MARK
          CALL PDA_DPOLFT( NDATFIT, XD, YD, WD, NPOLY, NDEG,
-     :                    EPS, THEFIT, IFAIL1, %VAL( IPWRK ), IFAIL2 )
+     :                    EPS, THEFIT, IFAIL1, %VAL( CNF_PVAL( IPWRK )),
+     :                    IFAIL2 )
 
 *     Check if the fit has been done.
          IF ( NDEG .NE. NPOLY .OR. IFAIL1 .NE. 1 )THEN
@@ -342,7 +347,8 @@
             
 *     Print the fit results (extract the coefficients for polynomial
 *     first).
-         CALL PDA_DPCOEF( NPOLY, 0.0D0, COEFF, %VAL( IPWRK ), STATUS )
+         CALL PDA_DPCOEF( NPOLY, 0.0D0, COEFF,
+     :                  %VAL( CNF_PVAL( IPWRK ) ), STATUS )
          CALL PON_SPOL( XMINP, XMAXP, NDATFIT, USEWEI, NPOLY, COEFF, 
      :                  EPS, STATUS )
          CALL PSX_FREE( IPWRK, STATUS )
@@ -437,8 +443,8 @@
 
          CALL PDA_CURFIT( IOPT, NDATFIT, XR, YR, WR, XMINP, XMAXP, 
      :                    NPOLY, SFACT, NEST, IKNOTS, KNOTS, 
-     :                    SPLINE, EPSR, %VAL( IPWRK3 ), LWRK, 
-     :                    %VAL( IPWRK2 ), IFAIL1 )
+     :                    SPLINE, EPSR, %VAL( CNF_PVAL ( IPWRK3 ) ),
+     :                    LWRK, %VAL( CNF_PVAL( IPWRK2 ) ), IFAIL1 )
 
          CALL PSX_FREE( IPWRK2, STATUS )
          CALL PSX_FREE( IPWRK3, STATUS )
