@@ -41,10 +41,6 @@ using std::memcpy;
 #define PATH_SEP ':'
 #endif
 
-#ifndef DEFAULT_MFMODE
-#define DEFAULT_MFMODE "ibmvga"
-#endif
-
 #include "InputByteStream.h"
 #include "PkFont.h"
 
@@ -56,8 +52,22 @@ verbosities PkRasterdata::verbosity_ = normal;
 verbosities PkFont::verbosity_ = normal;
 verbosities PkGlyph::verbosity_ = normal;
 string PkFont::fontpath_ = "";
-int PkFont::resolution_ = 72;
+
+#ifndef DEFAULT_MFMODE
+#define DEFAULT_MFMODE "ibmvga"
+#endif
+#ifndef DEFAULT_RESOLUTION
+#define DEFAULT_RESOLUTION 110
+#endif
+
+string PkFont::missingFontMode_ = DEFAULT_MFMODE;
+int PkFont::resolution_ = DEFAULT_RESOLUTION;
+
+#if ENABLE_FONT_GEN
 bool PkFont::makeMissingFonts_ = true;
+#else
+bool PkFont::makeMissingFonts_ = false;
+#endif
 
 PkFont::PkFont(unsigned int dvimag,
 	       unsigned int c,
@@ -88,7 +98,7 @@ PkFont::PkFont(unsigned int dvimag,
 		    << " --dpi " << dpi()
 		    << " --bdpi " << dpiBase()
 		    << " --mag " << dvimag_/1000.0
-		    << " --mfmode " << DEFAULT_MFMODE
+		    << " --mfmode " << missingFontMode_
 		    << ' ' << name
 		    << '\0';
 #else
@@ -97,7 +107,7 @@ PkFont::PkFont(unsigned int dvimag,
 		    << dpi()		<< ' '
 		    << dpiBase()	<< ' '
 		    << dvimag_/1000.0	<< ' '
-		    << DEFAULT_MFMODE
+		    << missingFontMode_
 		    << '\0';
 #endif
 		if (verbosity_ >= normal)
@@ -270,7 +280,9 @@ bool PkFont::search_pkpath (string path,
 
     bool found = false;
 
-    for (int pathnum = 0; pathnum<pathlist.size() && !found; pathnum++)
+    for (unsigned int pathnum = 0;
+	 pathnum<pathlist.size() && !found;
+	 pathnum++)
     {
 	string prefix = pathlist[pathnum];
 	prefix += '/';
@@ -757,7 +769,7 @@ string_list break_path (string path)
 {
     string_list l;
     string tmp = "";
-    for (int i=0; i<path.length(); i++)
+    for (unsigned int i=0; i<path.length(); i++)
 	if (path[i] == PATH_SEP)
 	{
 	    l.push_back(tmp);
