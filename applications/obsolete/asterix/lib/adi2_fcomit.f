@@ -257,8 +257,8 @@
             CALL FTPKYS( LUN, KEY, CVALUE, CMT, FSTAT )
           END IF
           IF ( FSTAT .NE. 0 ) THEN
-            CALL ADI2_FITERP( FSTAT, STATUS )
             CALL MSG_SETC( 'KEY', KEY )
+            CALL ADI2_FITERP( FSTAT, STATUS )
             CALL ERR_REP( ' ', 'Error comitting keyword ^KEY to disk',
      :                    STATUS )
             GOTO 99
