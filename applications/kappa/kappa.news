@@ -1,12 +1,26 @@
 1 KAPPA_Version_0.19
 
-   A new release of KAPPA (V0.19) has been made. The changes are
-   described fully in sun95. The following is a summary of the main
-   changes since the last Starlink CD (V0.18-6):
+   A new release of KAPPA (V0.19) has been made. The changes
+   are described fully in sun95. An important change is that
+   all graphics are now produced using "native" PGPLOT instead
+   of the GKS-based version of PGPLOT. One consequence of this
+   is that postscript output now goes to the single file
+   "pgplot.ps" instead of to mutiple files "gks74.ps",
+   "gks74.ps.1", "gks74.ps.2", etc.
+
+
+   >>>>> NOTE, each graphics application will overwrite any
+      existing version of the "pgplot.ps" file, so it is
+      important to rename this file, if you want to keep its
+      contents, before running further graphics applications.
+
+
+  The following is a summary of the other main changes since
+  the last Starlink CD (V0.18-6):
 
    - The following new commands have been added:
-      o LUTEDIT: Creates or edits image display colour tables via a
-      graphical-user-interface.
+      o LUTEDIT: Creates or edits image display colour tables
+      via a graphical-user-interface.
 
    - The following commands have been modified to use the PGPLOT
    graphics library: LUTABLE, LUTSAVE, OVSET.
