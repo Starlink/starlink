@@ -184,9 +184,6 @@
 *  Check the inherited status. 
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Begin an AST context.
-      CALL AST_BEGIN( STATUS )
-
 *  First deal with cases where the new DATA picture is to be aligned with
 *  an existing DATA picture.
       IF( IPICD .NE. -1 ) THEN
