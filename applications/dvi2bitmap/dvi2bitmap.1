@@ -121,9 +121,15 @@ corresponding option -- thus
 has the same effect as
 .I --font-search=none
 .TP
-.I "-G, --font-gen=[boolean]"
+.I "-G, --font-gen=[[boolean]|command[=script]]"
 Switch automatic generation of fonts off and on.
-The default is set at compile time.
+If 
+.I --fontgen=command
+is given, then the command specified at compile time is used to
+generate fonts.  If, further, a font-generation script is specified, then it
+will be used instead of the default.  The specified script is a
+font-string template, as described below.
+The default for automatic font generation is set at compile time.
 .TP
 .I "-g, --debug=[spec]"
 Switch on debugging.  The
