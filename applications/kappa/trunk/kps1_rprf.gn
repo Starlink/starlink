@@ -1,9 +1,9 @@
-      SUBROUTINE KPS1_RPRF<T>( ARRAY, DIM1, DIM2, SIG0, AXISR, THETA,
-     :                         RANGE, POS, NXY, WT, RSCALE, RSCL2,
-     :                         NBIN1, NBIN2, BINPTS, DMODE, R, LSTART,
-     :                         NPTS, DATA, IADR, NXTADR, PROFIL,
-     :                         PROFR, PROFWT, FWHM, AMP, BACK, SIGMA,
-     :                         GAMMA, STATUS )
+      SUBROUTINE KPS1_RPRF<T>( DIM1, DIM2, ARRAY, LBND, SIG0, AXISR,
+     :                        THETA, RANGE, POS, NXY, WT, RSCALE, RSCL2,
+     :                        NBIN1, NBIN2, BINPTS, DMODE, R, LSTART,
+     :                        NPTS, DATA, IADR, NXTADR, PROFIL,
+     :                        PROFR, PROFWT, FWHM, AMP, BACK, SIGMA,
+     :                        GAMMA, STATUS )
 *+
 *  Name:
 *     KPS1_RPRFx
@@ -15,8 +15,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_RPRFx( ARRAY, DIM1, DIM2, SIG0, AXISR, THETA, RANGE,
-*                      POS, NXY, WT, RSCALE, RSCL2, NBIN1, NBIN2,
+*     CALL KPS1_RPRFx( DIM1, DIM2, ARRAY, LBND, SIG0, AXISR, THETA,
+*                      RANGE, POS, NXY, WT, RSCALE, RSCL2, NBIN1, NBIN2,
 *                      BINPTS, DMODE, R, LSTART, NPTS, DATA, IADR,
 *                      NXTADR, PROFIL, PROFR, PROFWT, FWHM, AMP, BACK,
 *                      SIGMA, GAMMA, STATUS )
@@ -28,12 +28,14 @@
 *     parameters that define a Gaussian fit to the set of star images.
 
 *  Arguments:
-*     ARRAY( DIM1, DIM2 ) = ? (Given)
-*        The input array in which the star images lie.
 *     DIM1 = INTEGER (Given)
 *        The number of pixels per line of the array.
 *     DIM2 = INTEGER (Given)
 *        The number of lines in the array.
+*     ARRAY( DIM1, DIM2 ) = ? (Given)
+*        The input array in which the star images lie.
+*     LBND( 2 ) = ? (Given)
+*        The lower bounds of the input array.
 *     SIG0 = REAL (Given)
 *        The star 'sigma' across the minor axis.
 *     AXISR = REAL (Given)
@@ -136,6 +138,10 @@
 *        but returned extra parameters: the mean-profile values,
 *        weights, and radii; the amplitude; Gaussian width; and the
 *        background.
+*     1992 April 2 (MJC):
+*        Reordered the ARRAY argument to its normal location after the
+*        dimensions.  Added LBND argument and corrected the x-y
+*        positions as if the lower bounds were both one.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -153,6 +159,7 @@
 *  Arguments Given:
       INTEGER
      :  DIM1, DIM2,
+     :  LBND( 2 ),
      :  NXY,
      :  NBIN1,
      :  NBIN2,
@@ -240,7 +247,11 @@
      :  RDASH,                   ! Effective radius
      :  RLIMIT,                  ! Radius limit in the minor axis
      :  RSIG,                    ! Reciprocal sigma
-     :  S                        ! Sine of the orientation
+     :  S,                       ! Sine of the orientation 
+     :  XC,                      ! X centre of the current star
+                                 ! corrected for origin
+     :  YC                       ! Y centre of the current star
+                                 ! corrected for origin
 
       INTEGER
      :  BIN,                     ! Bin counter for a star
@@ -310,10 +321,20 @@
 
          IF ( WT( STAR ) .GT. 1.0E-10 ) THEN
 
+*          Find the centre of the search square.  The star positions
+*          are supplied in world co-ordinates.  In this routine the
+*          array has lower bounds which are both one, but the positions
+*          may not.  Therefore correct the positions to what they would
+*          be given lower bounds of one.
+
+            XC = POS( 1,  STAR ) - REAL( LBND( 1 ) - 1 )
+            YC = POS( 2,  STAR ) - REAL( LBND( 2 ) - 1 )
+        
+            I0 = NINT( MIN( MAX( -1.0E8, XC ), 1.0E8 ) )
+            J0 = NINT( MIN( MAX( -1.0E8, YC ), 1.0E8 ) )
+
 *          Find the edges of the search square centred on the star.
 
-            I0 = NINT( MIN( MAX( -1.0E8, POS( 1, STAR ) ), 1.0E8 ) )
-            J0 = NINT( MIN( MAX( -1.0E8, POS( 2, STAR ) ), 1.0E8 ) )
             IMIN = MAX( 1, I0 - ISHIFT )
             IMAX = MIN( DIM1, I0 + ISHIFT )
             JMIN = MAX( 1, J0 - ISHIFT )
@@ -334,8 +355,8 @@
 *          index.
 
             INDEX = 0
-            DY = JMIN - POS( 2, STAR ) - 1.0
-            DX0 = IMIN - POS( 1, STAR ) - 1.0
+            DY = JMIN - YC - 1.0
+            DX0 = IMIN - XC - 1.0
 
             DO J = JMIN, JMAX
                IMLOCN = ( J - 1 ) * DIM1 + IMIN - 1
