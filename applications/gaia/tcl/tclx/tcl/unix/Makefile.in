@@ -124,7 +124,7 @@ TEST_SAOBJS = tclTest.o tclTestObj.o tclUnixTest.o tclXtest.o tclXunixTestSA.o
 # If a link fails, purge the executable, as some systems leave invalid
 # executables around.
 #
-all: RUNTIME tclXtest
+all: tcl RUNTIME tclXtest
 
 static:	tcl.static tclXtest.static
 
