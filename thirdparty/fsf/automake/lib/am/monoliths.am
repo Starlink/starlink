@@ -88,9 +88,11 @@ install-%DIR%MONOLITHS: $(%DIR%_MONOLITHS) $(%DIR%_MONOLITH_IFCS)
 	done
 ## Finally, make links for each of the task:monolith pairs in variable
 ## TASK_MONOLITH_PAIRS
-	list='$(TASK_MONOLITH_PAIRS)'; cd $(DESTDIR)$(%NDIR%dir); \
+	@list='$(TASK_MONOLITH_PAIRS)'; cd $(DESTDIR)$(%NDIR%dir); \
 	  for p in $$list; do \
 	    eval `echo $$p | sed 's,\(.*\):\(.*\),task=\1; monolith=\2,'`; \
+	    rm -f $$task; \
+	    echo $(LN_S) $$monolith $$task; \
 	    $(LN_S) $$monolith $$task; \
 	    if test -n "$$MANIFEST_FILE"; then \
 	      echo "$(DESTDIR)$(%NDIR%dir)/$$task" >>$$MANIFEST_FILE; \
