@@ -67,9 +67,11 @@
 #include    <string.h>
 #include    <math.h>
 #include    <ctype.h>
-#ifdef VAXC
+#if HAVE_UNIXLIB_H
 #include    <unixlib.h>
 #endif
+
+#include    "gwm.h"
 
 /* Package definitions */
 

@@ -60,6 +60,8 @@
 #include    <stdlib.h>
 #include    <stdio.h>
 
+#include    "gwm.h"
+
 /* Package definitions */
 
 #include    "device.dep"
