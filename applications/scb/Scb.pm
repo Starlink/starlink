@@ -782,7 +782,7 @@ sub pushd {
 
 #  Change to new directory.
 
-   chdir $dir or error "Failed to change directory to $dir\n";
+   chdir $dir or error "chdir $dir: $!\n";
 }
 
 ########################################################################
@@ -834,7 +834,7 @@ sub popd {
 
 #  Change to directory.
 
-   chdir $dir or error "Failed to change directory to $dir\n";
+   chdir $dir or error "chdir $dir: $!\n";
 }
 
 
