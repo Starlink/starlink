@@ -428,7 +428,7 @@ void PNGBitmap::png_warning_fn (png_structp png_ptr,
 	cerr << "PNG warning: " << warning_msg;
 }
 
-#if GREYSCAPE_BITMAP
+#if GREYSCALE_BITMAP
 // A row-transform function which inverts the greyscale.  Bitmaps are
 // sent to this class with zero being white and all-bits-on being
 // black, which is opposite to what PNG wants.  png_set_invert_mono
