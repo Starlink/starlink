@@ -33,6 +33,12 @@ interface IBGND
     prompt 'Source number'
     help 'Source number to which operation will be applied'
   endparameter
+  parameter SAMPLING
+    type '_CHAR'
+    default 'WHOLE'
+    prompt 'Sampling mode'
+    help 'WHOLE, ANNULAR or BOXES'
+  endparameter
   parameter XCENT
     type '_REAL'
     vpath 'INTERNAL,NOPROMPT'
