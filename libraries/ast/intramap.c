@@ -40,8 +40,10 @@ f     used using AST_INTRAREG before creating an IntraMap.
 *     The IntraMap class inherits from the Mapping class.
 
 *  Attributes:
-*     The IntraMap class does not define any new attributes beyond
-*     those which are applicable to all Mappings.
+*     In addition to those attributes common to all Mappings, every
+*     IntraMap also has the following attributes:
+*
+*     - IntraID: IntraMap identification string
 
 *  Functions:
 c     The IntraMap class does not define any new functions beyond those
@@ -57,6 +59,9 @@ f     The IntraMap class does not define any new routines beyond those
 *  History:
 *     16-MAR-1998 (RFWS):
 *        Original version.
+*     15-SEP-1999 (RFWS):
+*        Added a "this" pointer to the external transformation function
+*        used by an IntraMap.
 *class--
 */
 
@@ -89,15 +94,16 @@ f     The IntraMap class does not define any new routines beyond those
 #include <ctype.h>
 #include <stdarg.h>
 #include <stddef.h>
+#include <stdio.h>
 #include <string.h>
 
 /* Module Type Definitions. */
 /* ======================== */
 /* Structure to hold data for transformation functions. */
 typedef struct TranData {
-   void (* tran)( int, int, const double *[], int, int, double *[] );
+   void (* tran)( AstMapping *, int, int, const double *[], int, int, double *[] );
                                  /* Pointer to transformation function */
-   void (* tran_wrap)( void (*)( int, int, const double *[], int, int, double *[] ), int, int, const double *[], int, int, double *[] );
+   void (* tran_wrap)( void (*)( AstMapping *, int, int, const double *[], int, int, double *[] ), AstMapping *, int, int, const double *[], int, int, double *[] );
                                  /* Pointer to wrapper function */
    char *author;                 /* Author's name */
    char *contact;                /* Contact details (e.g. e-mail address) */
@@ -124,8 +130,12 @@ static int class_init = 0;       /* Virtual function table initialised? */
 /* Pointers to parent class methods which are used or extended by this
    class. */
 static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet * );
+static const char *(* parent_getattrib)( AstObject *, const char * );
 static int (* parent_getnin)( AstMapping * );
 static int (* parent_getnout)( AstMapping * );
+static int (* parent_testattrib)( AstObject *, const char * );
+static void (* parent_clearattrib)( AstObject *, const char * );
+static void (* parent_setattrib)( AstObject *, const char * );
 
 /* External Interface Function Prototypes. */
 /* ======================================= */
@@ -133,17 +143,27 @@ static int (* parent_getnout)( AstMapping * );
    protected prototypes), so we must provide local prototypes for use
    within this module. */
 AstIntraMap *astIntraMapId_( const char *, int, int, const char *, ... );
-void astIntraRegFor_( const char *, int, int, void (* tran)( int, int, const double *[], int, int, double *[] ), void (* tran_wrap)( void (*)( int, int, const double *[], int, int, double *[] ), int, int, const double *[], int, int, double *[] ), unsigned int, const char *, const char *, const char * );
+void astIntraRegFor_( const char *, int, int, void (* tran)( AstMapping *, int, int, const double *[], int, int, double *[] ), void (* tran_wrap)( void (*)( AstMapping *, int, int, const double *[], int, int, double *[] ), AstMapping *, int, int, const double *[], int, int, double *[] ), unsigned int, const char *, const char *, const char * );
 
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
 static char *CleanName( const char *, const char * );
+static const char *GetAttrib( AstObject *, const char * );
+static const char *GetIntraID( AstIntraMap * );
 static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int ** );
+static int TestAttrib( AstObject *, const char * );
+static int TestIntraID( AstIntraMap * );
+static void ClearAttrib( AstObject *, const char * );
+static void ClearIntraID( AstIntraMap * );
+static void Copy( const AstObject *, AstObject * );
+static void Delete( AstObject * );
 static void Dump( AstObject *, AstChannel * );
 static void InitVtab( AstIntraMapVtab * );
-static void IntraReg( const char *, int, int, void (*)( int, int, const double *[], int, int, double *[] ), void (*)( void (*)( int, int, const double *[], int, int, double *[] ), int, int, const double *[], int, int, double *[] ), unsigned int, const char *, const char *, const char * );
-static void TranWrap( void (*)( int, int, const double *[], int, int, double *[] ), int, int, const double *[], int, int, double *[] );
+static void IntraReg( const char *, int, int, void (*)( AstMapping *, int, int, const double *[], int, int, double *[] ), void (*)( void (*)( AstMapping *, int, int, const double *[], int, int, double *[] ), AstMapping *, int, int, const double *[], int, int, double *[] ), unsigned int, const char *, const char *, const char * );
+static void SetAttrib( AstObject *, const char * );
+static void SetIntraID( AstIntraMap *, const char * );
+static void TranWrap( void (*)( AstMapping *, int, int, const double *[], int, int, double *[] ), AstMapping *, int, int, const double *[], int, int, double *[] );
 
 /* Member functions. */
 /* ================= */
@@ -233,6 +253,145 @@ static char *CleanName( const char *name, const char *caller ) {
    return result;
 }
 
+static void ClearAttrib( AstObject *this_object, const char *attrib ) {
+/*
+*  Name:
+*     ClearAttrib
+
+*  Purpose:
+*     Clear an attribute value for an IntraMap.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "intramap.h"
+*     void ClearAttrib( AstObject *this, const char *attrib )
+
+*  Class Membership:
+*     IntraMap member function (over-rides the astClearAttrib protected
+*     method inherited from the Mapping class).
+
+*  Description:
+*     This function clears the value of a specified attribute for an
+*     IntraMap, so that the default value will subsequently be used.
+
+*  Parameters:
+*     this
+*        Pointer to the IntraMap.
+*     attrib
+*        Pointer to a null terminated string specifying the attribute
+*        name.  This should be in lower case with no surrounding white
+*        space.
+*/
+
+/* Local Variables: */
+   AstIntraMap *this;            /* Pointer to the IntraMap structure */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Obtain a pointer to the IntraMap structure. */
+   this = (AstIntraMap *) this_object;
+
+/* Check the attribute name and clear the appropriate attribute. */
+
+/* IntraID. */
+/* -------- */
+   if ( !strcmp( attrib, "intraid" ) ) {
+      astClearIntraID( this );
+
+/* Not recognised. */
+/* --------------- */
+/* If the attribute is not recognised, pass it on to the parent method
+   for further interpretation. */
+   } else {
+      (*parent_clearattrib)( this_object, attrib );
+   }
+}
+
+static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
+/*
+*  Name:
+*     GetAttrib
+
+*  Purpose:
+*     Get the value of a specified attribute for an IntraMap.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "intramap.h"
+*     const char *GetAttrib( AstObject *this, const char *attrib )
+
+*  Class Membership:
+*     IntraMap member function (over-rides the protected astGetAttrib
+*     method inherited from the Mapping class).
+
+*  Description:
+*     This function returns a pointer to the value of a specified
+*     attribute for a IntraMap, formatted as a character string.
+
+*  Parameters:
+*     this
+*        Pointer to the IntraMap.
+*     attrib
+*        Pointer to a null-terminated string containing the name of
+*        the attribute whose value is required. This name should be in
+*        lower case, with all white space removed.
+
+*  Returned Value:
+*     - Pointer to a null-terminated string containing the attribute
+*     value.
+
+*  Notes:
+*     - The returned string pointer may point at memory allocated
+*     within the IntraMap, or at static memory. The contents of the
+*     string may be over-written or the pointer may become invalid
+*     following a further invocation of the same function or any
+*     modification of the IntraMap. A copy of the string should
+*     therefore be made if necessary.
+*     - A NULL pointer will be returned if this function is invoked
+*     with the global error status set, or if it should fail for any
+*     reason.
+*/
+
+/* Local Variables: */
+   AstIntraMap *this;            /* Pointer to the IntraMap structure */
+   const char *result;           /* Pointer value to return */
+
+/* Initialise. */
+   result = NULL;
+
+/* Check the global error status. */   
+   if ( !astOK ) return result;
+
+/* Obtain a pointer to the IntraMap structure. */
+   this = (AstIntraMap *) this_object;
+
+/* Compare "attrib" with each recognised attribute name in turn,
+   obtaining the value of the required attribute. If necessary, write
+   the value into "buff" as a null-terminated string in an appropriate
+   format.  Set "result" to point at the result string. */
+
+/* IntraID. */
+/* -------- */
+   if ( !strcmp( attrib, "intraid" ) ) {
+      result = astGetIntraID( this );
+
+/* Not recognised. */
+/* --------------- */
+/* If the attribute name was not recognised, pass it on to the parent
+   method for further interpretation. */
+   } else {
+      result = (*parent_getattrib)( this_object, attrib );
+   }
+
+/* Return the result. */
+   return result;
+}
+
 static void InitVtab( AstIntraMapVtab *vtab ) {
 /*
 *  Name:
@@ -262,6 +421,7 @@ static void InitVtab( AstIntraMapVtab *vtab ) {
 */
 
 /* Local Variables: */
+   AstObjectVtab *object;        /* Pointer to Object component of Vtab */
    AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
 
 /* Check the global error status. */
@@ -275,9 +435,26 @@ static void InitVtab( AstIntraMapVtab *vtab ) {
 
 /* Initialise member function pointers. */
 /* ------------------------------------ */
+/* Store pointers to the member functions (implemented here) that provide
+   virtual methods for this class. */
+   vtab->ClearIntraID = ClearIntraID;
+   vtab->GetIntraID = GetIntraID;
+   vtab->SetIntraID = SetIntraID;
+   vtab->TestIntraID = TestIntraID;
+
 /* Save the inherited pointers to methods that will be extended, and
    replace them with pointers to the new member functions. */
+   object = (AstObjectVtab *) vtab;
    mapping = (AstMappingVtab *) vtab;
+
+   parent_clearattrib = object->ClearAttrib;
+   object->ClearAttrib = ClearAttrib;
+   parent_getattrib = object->GetAttrib;
+   object->GetAttrib = GetAttrib;
+   parent_setattrib = object->SetAttrib;
+   object->SetAttrib = SetAttrib;
+   parent_testattrib = object->TestAttrib;
+   object->TestAttrib = TestAttrib;
 
    parent_transform = mapping->Transform;
    mapping->Transform = Transform;
@@ -291,18 +468,22 @@ static void InitVtab( AstIntraMapVtab *vtab ) {
    parent_getnin = mapping->GetNin;
    parent_getnout = mapping->GetNout;
 
-/* Declare the class dump function. There is no copy constructor or
-   destructor. */
+/* Declare the copy constructor, destructor and class dump
+   function. */
+   astSetCopy( vtab, Copy );
+   astSetDelete( vtab, Delete );
    astSetDump( vtab, Dump, "IntraMap",
                "Map points using a private transformation function" );
 }
 
 static void IntraReg( const char *name, int nin, int nout,
-                      void (* tran)( int, int, const double *[], int, int,
-                                    double *[] ),
-                      void (* tran_wrap)( void (*)( int, int, const double *[],
-                                                    int, int, double *[] ),
-                                          int, int, const double *[], int, int,
+                      void (* tran)( AstMapping *, int, int, const double *[],
+                                     int, int, double *[] ),
+                      void (* tran_wrap)( void (*)( AstMapping *, int, int,
+                                                    const double *[], int, int,
+                                                    double *[] ),
+                                          AstMapping *, int, int,
+                                          const double *[], int, int,
                                           double *[] ),
                       unsigned int flags,
                       const char *purpose, const char *author,
@@ -320,11 +501,13 @@ static void IntraReg( const char *name, int nin, int nout,
 *  Synopsis:
 *     #include "intramap.h"
 *     void IntraReg( const char *name, int nin, int nout,
-*                    void (* tran)( int, int, const double *[], int, int,
-*                                   double *[] ),
-*                    void (* tran_wrap)( void (*)( int, int, const double *[],
-*                                                  int, int, double *[] ),
-*                                        int, int, const double *[], int, int,
+*                    void (* tran)( AstMapping *, int, int, const double *[],
+*                                   int, int, double *[] ),
+*                    void (* tran_wrap)( void (*)( AstMapping *, int, int,
+*                                                  const double *[], int, int,
+*                                                  double *[] ),
+*                                        AstMapping *, int, int,
+*                                        const double *[], int, int,
 *                                        double *[] ),
 *                    unsigned int flags,
 *                    const char *purpose, const char *author,
@@ -357,15 +540,14 @@ static void IntraReg( const char *name, int nin, int nout,
 *        method of invoking the transformation function should be
 *        encapsulated in the "tran_wrap" function (below).
 *     tran_wrap
-*        Pointer to a wrapper function appropriate to the
-*        transformation function (above). This wrapper function should
-*        have the same interface as astTranP (from the Mapping class),
-*        except that it takes a pointer to a function like "tran" as
-*        its first argument instead of a Mapping pointer. The purpose
-*        of this wrapper is to invoke the transformation function via
-*        the pointer supplied, to pass it the necessary information
-*        derived from the remainder of its arguments, and then to
-*        return the results.
+*        Pointer to a wrapper function appropriate to the transformation
+*        function (above). This wrapper function should have the same
+*        interface as astTranP (from the Mapping class), except that it takes
+*        a pointer to a function like "tran" as an additional first argument.
+*        The purpose of this wrapper is to invoke the transformation function
+*        via the pointer supplied, to pass it the necessary information
+*        derived from the remainder of its arguments, and then to return the
+*        results.
 *     flags
 *        This argument may be used to supply a set of flags which
 *        control the behaviour of any IntraMap which uses the
@@ -482,9 +664,9 @@ static void IntraReg( const char *name, int nin, int nout,
 }
 
 void astIntraReg_( const char *name, int nin, int nout,
-                   void (* tran)( int, int, const double *[], int, int,
-                                  double *[] ), unsigned int flags,
-                   const char *purpose, const char *author,
+                   void (* tran)( AstMapping *, int, int, const double *[],
+                                  int, int, double *[] ),
+                   unsigned int flags, const char *purpose, const char *author,
                    const char *contact ) {
 /*
 *++
@@ -502,9 +684,9 @@ f     Register a transformation routine for use by an IntraMap.
 *  Synopsis:
 c     #include "intramap.h"
 c     astIntraReg( const char *name, int nin, int nout,
-c                  void (* tran)( int, int, const double *[], int, int,
-c                                 double *[] ), unsigned int flags,
-c                  const char *purpose, const char *author,
+c                  void (* tran)( AstMapping *, int, int, const double *[],
+c                                 int, int, double *[] ),
+c                  unsigned int flags, const char *purpose, const char *author,
 c                  const char *contact )
 f     CALL AST_INTRAREG( NAME, NIN, NOUT, TRAN, FLAGS, PURPOSE, AUTHOR,
 f                        CONTACT, STATUS )
@@ -575,13 +757,10 @@ f     TRAN = SUBROUTINE (Given)
 c        Pointer to the transformation function to be registered.
 c        This function should perform whatever coordinate
 c        transformations are required and should have an interface
-c        like astTranP, except that the first parameter (the Mapping
-c        pointer) is not required and should be omitted.
+c        like astTranP (q.v.).
 f        The transformation routine to be registered.  This routine
 f        should perform whatever coordinate transformations are
-f        required and should have an interface like AST_TRANN, except
-f        that the first argument (the Mapping pointer) is not required
-f        and should be omitted.
+f        required and should have an interface like AST_TRANN (q.v.).
 f
 f        This transformation routine must also appear in an EXTERNAL
 f        statement in the routine which calls AST_INTRAREG.
@@ -633,14 +812,14 @@ f        The global status.
 
 *  Notes:
 c     - Beware that an external representation of an IntraMap (created
+c     by writing it to a Channel) will not include the coordinate
+c     transformation function which it uses, so will only refer to the
+c     function by its name (as assigned using astIntraReg).
 c     Consequently, the external representation cannot be utilised by
 c     another program unless that program has also registered the same
-c     by writing it to a Channel) will not include the coordinate
-c     function by its name (as assigned using astIntraReg).
+c     transformation function with the same name using an identical
 c     invocation of astIntraReg. If no such registration has been
 c     performed, then attempting to read the external representation
-c     transformation function which it uses, so will only refer to the
-c     transformation function with the same name using an identical
 c     will result in an error.
 f     - Beware that an external representation of an IntraMap (created
 f     by writing it to a Channel) will not include the coordinate
@@ -773,11 +952,13 @@ f     implemented.
 }
 
 void astIntraRegFor_( const char *name, int nin, int nout,
-                      void (* tran)( int, int, const double *[], int, int,
-                                     double *[] ),
-                      void (* tran_wrap)( void (*)( int, int, const double *[],
-                                                    int, int, double *[] ),
-                                          int, int, const double *[], int, int,
+                      void (* tran)( AstMapping *, int, int, const double *[],
+                                     int, int, double *[] ),
+                      void (* tran_wrap)( void (*)( AstMapping *, int, int,
+                                                    const double *[], int, int,
+                                                    double *[] ),
+                                          AstMapping *, int, int,
+                                          const double *[], int, int,
                                           double *[] ),
                       unsigned int flags, const char *purpose,
                       const char *author, const char *contact ) {
@@ -795,13 +976,16 @@ void astIntraRegFor_( const char *name, int nin, int nout,
 *  Synopsis:
 *     #include "intramap.h"
 *     void astIntraRegFor( const char *name, int nin, int nout,
-*                          void (* tran)( int, int, const double *[], int, int,
+*                          void (* tran)( AstMapping *, int, int,
+*                                         const double *[], int, int,
 *                                         double *[] ),
-*                          void (* tran_wrap)( void (*)( int, int,
-*                                                        const double *[], int,
-*                                                        int, double *[] ),
-*                                              int, int, const double *[], int,
-*                                              int, double *[] ),
+*                          void (* tran_wrap)( void (*)( AstMapping *, int,
+*                                                        int, const double *[],
+*                                                        int, int,
+*                                                        double *[] ),
+*                                              AstMapping *, int, int,
+*                                              const double *[], int, int,
+*                                              double *[] ),
 *                          unsigned int flags, const char *purpose,
 *                          const char *author, const char *contact )
 
@@ -836,12 +1020,11 @@ void astIntraRegFor_( const char *name, int nin, int nout,
 *        Pointer to a wrapper function appropriate to the foreign
 *        language interface. This wrapper function should have the
 *        same interface as astTranP (from the Mapping class), except
-*        that it takes a pointer to a function like "tran" as its
-*        first argument instead of a Mapping pointer. The purpose of
-*        this wrapper is to invoke the transformation function via the
-*        pointer supplied, to pass it the necessary information
-*        derived from the remainder of its arguments, and then to
-*        return the results.
+*        that it takes a pointer to a function like "tran" as an additional
+*        first argument. The purpose of this wrapper is to invoke the
+*        transformation function via the pointer supplied, to pass it the
+*        necessary information derived from the remainder of its arguments,
+*        and then to return the results.
 *     flags
 *        This argument may be used to supply a set of flags which
 *        control the behaviour of any IntraMap which uses the
@@ -1055,9 +1238,11 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* Obtain a pointer to the second IntraMap. */
          intramap2 = (AstIntraMap *) ( *map_list )[ imap2 ];
 
-/* Check that the two IntraMaps use the same transformation
-   function. */
-         if ( intramap1->ifun == intramap2->ifun ) {
+/* Check that the two IntraMaps use the same transformation function
+   and have the same IntraID string (if set). */
+         if ( ( intramap1->ifun == intramap2->ifun ) &&
+              !strcmp( intramap1->intra_id ? intramap1->intra_id : "",
+                       intramap2->intra_id ? intramap2->intra_id : "" ) ) {
 
 /* Determine the number of input coordinates that the first IntraMap
    would have if its Invert attribute were set to the value of the
@@ -1144,6 +1329,155 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    return result;
 }
 
+static void SetAttrib( AstObject *this_object, const char *setting ) {
+/*
+*  Name:
+*     SetAttrib
+
+*  Purpose:
+*     Set an attribute value for an IntraMap.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "intramap.h"
+*     void SetAttrib( AstObject *this, const char *setting )
+
+*  Class Membership:
+*     IntraMap member function (over-rides the astSetAttrib method inherited
+*     from the Mapping class).
+
+*  Description:
+*     This function assigns an attribute value for a IntraMap, the
+*     attribute and its value being specified by means of a string of
+*     the form:
+*
+*        "attribute= value "
+*
+*     Here, "attribute" specifies the attribute name and should be in
+*     lower case with no white space present. The value to the right
+*     of the "=" should be a suitable textual representation of the
+*     value to be assigned and this will be interpreted according to
+*     the attribute's data type.  White space surrounding the value is
+*     only significant for string attributes.
+
+*  Parameters:
+*     this
+*        Pointer to the IntraMap.
+*     setting
+*        Pointer to a null terminated string specifying the new attribute
+*        value.
+*/
+
+/* Local Vaiables: */
+   AstIntraMap *this;            /* Pointer to the IntraMap structure */
+   int intra_id;                 /* Offset of IntraID value in string */
+   int len;                      /* Length of setting string */
+   int nc;                       /* Number of characters read by sscanf */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Obtain a pointer to the IntraMap structure. */
+   this = (AstIntraMap *) this_object;
+
+/* Obtain the length of the setting string. */
+   len = strlen( setting );
+
+/* Test for each recognised attribute in turn, using "sscanf" to parse the
+   setting string and extract the attribute value (or an offset to it in the
+   case of string values). In each case, use the value set in "nc" to check
+   that the entire string was matched. Once a value has been obtained, use the
+   appropriate method to set it. */
+
+/* IntraID. */
+/* -------- */
+   if ( nc = 0,
+        ( 0 == sscanf( setting, "intraid=%n%*[^\n]%n", &intra_id, &nc ) )
+        && ( nc >= len ) ) {
+      astSetIntraID( this, setting + intra_id );
+
+/* Not recognised. */
+/* --------------- */
+/* If the attribute is not recognised, pass it on to the parent method
+   for further interpretation. */
+   } else {
+      (*parent_setattrib)( this_object, setting );
+   }
+}
+
+static int TestAttrib( AstObject *this_object, const char *attrib ) {
+/*
+*  Name:
+*     TestAttrib
+
+*  Purpose:
+*     Test if a specified attribute value is set for an IntraMap.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "intramap.h"
+*     int TestAttrib( AstObject *this, const char *attrib )
+
+*  Class Membership:
+*     IntraMap member function (over-rides the astTestAttrib protected
+*     method inherited from the Mapping class).
+
+*  Description:
+*     This function returns a boolean result (0 or 1) to indicate whether
+*     a value has been set for one of a IntraMap's attributes.
+
+*  Parameters:
+*     this
+*        Pointer to the IntraMap.
+*     attrib
+*        Pointer to a null terminated string specifying the attribute
+*        name.  This should be in lower case with no surrounding white
+*        space.
+
+*  Returned Value:
+*     One if a value has been set, otherwise zero.
+
+*  Notes:
+*     - A value of zero will be returned if this function is invoked
+*     with the global status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstIntraMap *this;            /* Pointer to the IntraMap structure */
+   int result;                   /* Result value to return */
+
+/* Initialise. */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain a pointer to the IntraMap structure. */
+   this = (AstIntraMap *) this_object;
+
+/* Check the attribute name and test the appropriate attribute. */
+
+/* IntraID. */
+/* -------- */
+   if ( !strcmp( attrib, "intraid" ) ) {
+      result = astTestIntraID( this );
+
+/* Not recognised. */
+/* --------------- */
+/* If the attribute is not recognised, pass it on to the parent method
+   for further interpretation. */
+   } else {
+      result = (*parent_testattrib)( this_object, attrib );
+   }
+
+/* Return the result, */
+   return result;
+}
+
 static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
                                int forward, AstPointSet *out ) {
 /*
@@ -1202,12 +1536,15 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
 
 /* Local Variables: */
    AstIntraMap *this;            /* Pointer to IntraMap structure */
+   AstMapping *id;               /* Public ID for the IntraMap supplied */
    AstPointSet *result;          /* Pointer to output PointSet */
    const double **ptr_in;        /* Pointer to input coordinate data */
    double **ptr_out;             /* Pointer to output coordinate data */
    int ncoord_in;                /* Number of coordinates per input point */
    int ncoord_out;               /* Number of coordinates per output point */
    int npoint;                   /* Number of points */
+   int ok;                       /* AST status OK? */
+   int status;                   /* AST status value */
 
 /* Check the global error status. */
    if ( !astOK ) return NULL;
@@ -1239,40 +1576,62 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
    been inverted. */
    if ( astGetInvert( this ) ) forward = !forward;
 
+/* Obtain a public (external) ID for the IntraMap. This will be
+   required (instead of a true C pointer) by the transformation function,
+   since it is user-written. */
+   id = (AstMapping *) astMakeId( this );
+
 /* Locate the transformation function data associated with the
    IntraMap and use the wrapper function to invoke the transformation
    function itself. */
-   if ( astOK ) {
+   if ( ( ok = astOK ) ) {
       ( *tran_data[ this->ifun ].tran_wrap )( tran_data[ this->ifun ].tran,
-                                              npoint, ncoord_in, ptr_in,
+                                              id, npoint, ncoord_in, ptr_in,
                                               forward, ncoord_out, ptr_out );
 
-/* If an error occurred, report a contextual error message. */
-      if ( !astOK ) {
-         astError( astStatus, "astTransform(%s): Error signalled by "
-                   "\"%s\" transformation function.", astGetClass( this ),
-                   tran_data[ this->ifun ].name );
+/* If an error occurred, report a contextual error message. To ensure
+   that the location of the error appears in the message, we first clear
+   the global status (which makes the error system think this is the
+   first report). */
+      if ( !( ok = astOK ) ) {
+         status = astStatus;
+         astClearStatus;
+         astError( status,
+                   "astTransform(%s): Error signalled by \"%s\" "
+                   "transformation function.",
+                   astGetClass( this ), tran_data[ this->ifun ].name );
       }
+   }
+
+/* Annul the external identifier. */
+   id = astMakeId( astAnnulId( id ) );
+
+/* If an error occurred here, but earlier steps were successful, then
+   something has happened to the external ID, so report a contextual
+   error message. */
+   if ( !astOK && ok ) {
+      astError( astStatus,
+                "astTransform(%s): %s pointer corrupted by \"%s\" "
+                "transformation function.",
+                astGetClass( this ), astGetClass( this ),
+                tran_data[ this->ifun ].name );
    }
 
 /* If an error occurred, clear the returned pointer. If a new output
    PointSet has been created, then delete it. */
    if ( !astOK ) {
-      if ( out ) {
-         result = NULL;
-      } else {
-         result = astDelete( result );
-      }
+      result = ( result == out ) ? NULL : astDelete( result );
    }
 
 /* Return a pointer to the output PointSet. */
    return result;
 }
 
-static void TranWrap( void (* tran)( int, int, const double *[], int, int,
-                                     double *[] ),
-                      int npoint, int ncoord_in, const double *ptr_in[],
-                      int forward, int ncoord_out, double *ptr_out[] ) {
+static void TranWrap( void (* tran)( AstMapping *, int, int, const double *[],
+                                     int, int, double *[] ),
+                      AstMapping *this, int npoint, int ncoord_in,
+                      const double *ptr_in[], int forward, int ncoord_out,
+                      double *ptr_out[] ) {
 /*
 *  Name:
 *     TranWrap
@@ -1284,10 +1643,11 @@ static void TranWrap( void (* tran)( int, int, const double *[], int, int,
 *     Private function.
 
 *  Synopsis:
-*     void TranWrap( void (* tran)( int, int, const double *[], int, int,
-*                                   double *[] ),
-*                    int npoint, int ncoord_in, const double *ptr_in[],
-*                    int forward, int ncoord_out, double *ptr_out[] )
+*     void TranWrap( void (* tran)( AstMapping *, int, int, const double *[],
+*                                   int, int, double *[] ),
+*                    AstMapping *this, int npoint, int ncoord_in,
+*                    const double *ptr_in[], int forward, int ncoord_out,
+*                    double *ptr_out[] )
 
 *  Class Membership:
 *     IntraMap member function.
@@ -1308,6 +1668,9 @@ static void TranWrap( void (* tran)( int, int, const double *[], int, int,
 *        Pointer to the transformation function to be invoked. This
 *        should resemble astTranP (but with the first argument
 *        omitted).
+*     this
+*        An external Mapping ID associated with the internal (true C) pointer
+*        for the IntraMap whose transformation is being evaluated.
 *     npoint
 *        The number of points to be transformed.
 *     ncoord_in
@@ -1345,7 +1708,7 @@ static void TranWrap( void (* tran)( int, int, const double *[], int, int,
    if ( !astOK ) return;
 
 /* Invoke the transformation function. */
-   ( *tran )( npoint, ncoord_in, ptr_in, forward, ncoord_out, ptr_out );
+   ( *tran )( this, npoint, ncoord_in, ptr_in, forward, ncoord_out, ptr_out );
 }
 
 /* Functions which access class attributes. */
@@ -1355,13 +1718,141 @@ static void TranWrap( void (* tran)( int, int, const double *[], int, int,
    "object.h" file. For a description of each attribute, see the class
    interface (in the associated .h file). */
 
+/*
+*att++
+*  Name:
+*     IntraID
+
+*  Purpose:
+*     IntraMap identification string.
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     String.
+
+*  Description:
+*     This attribute allows an IntraMap to be tagged so that it is
+*     distinguishable from other IntraMaps.
+
+*  Applicability:
+*     IntraMap
+*        All IntraMaps have this attribute.
+
+*  Notes:
+*     - A pair of IntraMaps cannot be simplified (e.g. using astSimplify)
+*     unless they have identical IntraID values.
+*att--
+*/
+/* Clear the IntraID value by freeing the allocated memory and
+   assigning a NULL pointer. */
+astMAKE_CLEAR(IntraMap,IntraID,intra_id,astFree( this->intra_id ))
+
+/* Return a pointer to the IntraID value. */
+astMAKE_GET(IntraMap,IntraID,const char *,NULL,this->intra_id)
+
+/* Set a IntraID value by freeing any previously allocated memory, allocating
+   new memory, storing the string and saving the pointer to the copy. */
+astMAKE_SET(IntraMap,IntraID,const char *,intra_id,astStore( this->intra_id,
+                                                             value,
+                                                strlen( value ) + (size_t) 1 ))
+
+/* The IntraID value is set if the pointer to it is not NULL. */
+astMAKE_TEST(IntraMap,IntraID,( this->intra_id != NULL ))
+
 /* Copy constructor. */
 /* ----------------- */
-/* No copy constructor is needed, as a byte-by-byte copy suffices. */
+static void Copy( const AstObject *objin, AstObject *objout ) {
+/*
+*  Name:
+*     Copy
+
+*  Purpose:
+*     Copy constructor for IntraMap objects.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     void Copy( const AstObject *objin, AstObject *objout )
+
+*  Description:
+*     This function implements the copy constructor for IntraMap objects.
+
+*  Parameters:
+*     objin
+*        Pointer to the object to be copied.
+*     objout
+*        Pointer to the object being constructed.
+
+*  Notes:
+*     -  This constructor makes a deep copy.
+*/
+
+/* Local Variables: */
+   AstIntraMap *in;              /* Pointer to input IntraMap */
+   AstIntraMap *out;             /* Pointer to output IntraMap */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Obtain pointers to the input and output IntraMaps. */
+   in = (AstIntraMap *) objin;
+   out = (AstIntraMap *) objout;
+
+/* For safety, first clear any references to the input memory from
+   the output IntraMap. */
+   out->intra_id = NULL;
+
+/* If necessary, allocate memory in the output IntraMap and store a
+   copy of the input IntraID string. */
+   if ( in->intra_id ) out->intra_id = astStore( NULL, in->intra_id,
+                                         strlen( in->intra_id ) + (size_t) 1 );
+
+/* If an error occurred, free any allocated memory. */
+   if ( !astOK ) {
+      out->intra_id = astFree( out->intra_id );
+   }
+}
 
 /* Destructor. */
 /* ----------- */
-/* No destructor is needed as no memory, etc. needs freeing. */
+static void Delete( AstObject *obj ) {
+/*
+*  Name:
+*     Delete
+
+*  Purpose:
+*     Destructor for IntraMap objects.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     void Delete( AstObject *obj )
+
+*  Description:
+*     This function implements the destructor for IntraMap objects.
+
+*  Parameters:
+*     obj
+*        Pointer to the object to be deleted.
+
+*  Notes:
+*     This function attempts to execute even if the global error status is
+*     set.
+*/
+
+/* Local Variables: */
+   AstIntraMap *this;            /* Pointer to IntraMap */
+
+/* Obtain a pointer to the IntraMap structure. */
+   this = (AstIntraMap *) obj;
+
+/* Free the memory used for the IntraID string if necessary. */
+   this->intra_id = astFree( this->intra_id );
+}
 
 /* Dump function. */
 /* -------------- */
@@ -1392,6 +1883,8 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 
 /* Local Variables: */
    AstIntraMap *this;             /* Pointer to the IntraMap structure */
+   const char *sval;              /* Pointer to string value */
+   int set;                       /* Attribute value set? */
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -1407,6 +1900,13 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 /* ----------------------------- */
    astWriteString( channel, "Fname", 1, 1, tran_data[ this->ifun ].name,
                    "Name of transformation function" );
+
+/* IntraID string. */
+/* --------------- */
+   set = TestIntraID( this );
+   sval = set ? GetIntraID( this ) : astGetIntraID( this );
+   astWriteString( channel, "ID", set, 0, sval,
+                   "IntraMap identification string" );
 
 /* Purpose string. */
 /* --------------- */
@@ -1802,6 +2302,9 @@ AstIntraMap *astInitIntraMap_( void *mem, size_t size, int init,
 
 /* Initialise the IntraMap data. */
 /* ---------------------------- */
+/* Initialise the IntraID string pointer. */
+               new->intra_id = NULL;
+
 /* Store the index used to access the transformation function data. */
                new->ifun = ifun;
 
@@ -1954,6 +2457,10 @@ AstIntraMap *astLoadIntraMap_( void *mem, size_t size, int init,
 /* Transformation function name. */
 /* ----------------------------- */
       fname = astReadString( channel, "fname", "" );
+
+/* IntraID string. */
+/* --------------- */
+      new->intra_id = astReadString( channel, "id", NULL );
 
 /* Purpose string. */
 /* --------------- */

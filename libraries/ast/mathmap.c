@@ -4673,10 +4673,10 @@ static AstPointSet *Transform( AstMapping *map, AstPointSet *in,
    if ( nfun > ncoord_out ) work = astFree( work );
 
 /* If an error occurred, then return a NULL pointer. If no output
-   PointSet was supplied, also annul any new one that may have been
+   PointSet was supplied, also delete any new one that may have been
    created. */
    if ( !astOK ) {
-      result = ( result == out ) ? NULL : astAnnul( result );
+      result = ( result == out ) ? NULL : astDelete( result );
    }
 
 /* Return a pointer to the output PointSet. */
