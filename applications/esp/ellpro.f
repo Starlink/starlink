@@ -6413,6 +6413,7 @@ c     :              '^DEV   ^POI  ^STAT'
       if (status .ne. sai__ok) then
          elp1_median = 0.0
          goto 9999
+      endif
       
 *   First, copy the good elements of the array to the workspace
       l = 0
