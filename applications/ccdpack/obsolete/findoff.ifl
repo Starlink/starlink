@@ -7,6 +7,7 @@
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK)
+#     MBT: Mark Taylor (STARLINK)
 #     {enter_new_authors_here}
 
 #  History:
@@ -14,6 +15,8 @@
 #     	 Original version.
 #     29-SEP-1992 (PDRAPER):
 #     	 Now FINDOFF.
+#     09-FEB-1998 (MBT):
+#        Added USEWCS.
 #     {enter_further_changes_here}
 
 #-
@@ -135,6 +138,16 @@ interface FINDOFF
       default true
       prompt  'Use completeness as weight'
       helpkey  '*'
+   endparameter
+
+   parameter USEWCS
+      type    _LOGICAL
+      access  READ
+      vpath   'CURRENT,DEFAULT'
+      ppath   'CURRENT,DEFAULT'
+      default true
+      prompt  'Use NDF World Coordinate System extension if it exists'
+      helpkey '*'
    endparameter
 
    parameter MINSEP
