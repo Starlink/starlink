@@ -24,13 +24,21 @@
 
 #  Public Variables (Configuration Options):
 #
-#     text = string
-#        Text to appear in the message box.
+#     animate = boolean
+#        If the value of this option is non-zero, a little animation will
+#        appear to indeicate that work is being done for as long as the
+#        window is posted.  This works on timeout callbacks, so if
+#        commands are taking place which take a long time to execute
+#        without calling the Tk event loop, the animation is not going
+#        to look very good.  If zero, no animated display is shown.
 #
 #     busycursor = string
 #        The name in usual Tk format of a cursor which will be used for
 #        all the windows made inactive by the grab as long as this
 #        window exists.
+#
+#     text = string
+#        Text to appear in the message box.
 
 #  Authors:
 #     MBT: Mark Taylor (Starlink)
@@ -60,7 +68,7 @@
             frame $itk_interior.messframe
          }
          pack $itk_component(messframe) -side left -fill both \
-                                        -expand 1 -ipadx 15
+                                        -expand 1 -ipadx 15 -ipady 5
          itk_component add animframe {
             frame $itk_interior.animframe
          }
@@ -75,7 +83,6 @@
          itk_component add animation {
             label $itk_component(animframe).animation -bitmap @$Tickerbitmap(1)
          }
-         pack $itk_component(animation) -fill both -expand 1
 
 #  Configure requested options.
          eval itk_initialize $args
@@ -89,9 +96,6 @@
                        + [ winfo height $master ] / 2 \
                        - [ winfo reqheight $waitwin ] / 2 ]
          wm geometry $waitwin +$xpos+$ypos
-
-#  Begin the animation.
-         CCDAnimateBitmap $itk_component(animation) [ scope Tickerbitmap ] 8
 
 #  Save the current cursors for all application windows.
          savecursors $master
@@ -118,7 +122,9 @@
       destructor {
 
 #  Stop the animation.
-         CCDAnimateBitmap $itk_component(animation) stop
+         if { $animate } {
+            CCDAnimateBitmap $itk_component(animation) stop
+         }
 
 #  Restore the cursors of the affected windows.
          restorecursors
@@ -134,7 +140,23 @@
 ########################################################################
 #  Public variables (configuration options).
 ########################################################################
+
+#-----------------------------------------------------------------------
       public variable busycursor { watch } {
+#-----------------------------------------------------------------------
+      }
+
+
+#-----------------------------------------------------------------------
+      public variable animate {0} {
+#-----------------------------------------------------------------------
+         if { $animate } {
+            pack $itk_component(animation) -fill both -expand 1
+            CCDAnimateBitmap $itk_component(animation) [ scope Tickerbitmap ] 8
+         } else {
+            pack forget $itk_component(animation)
+            CCDAnimateBitmap $itk_component(animation) stop
+         }
       }
 
 
