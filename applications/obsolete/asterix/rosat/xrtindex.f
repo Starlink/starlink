@@ -17,11 +17,62 @@
 *    Authors :
 *     Jeremy Ashley
 *    History :
-*     20-Sep-1993   -   original
-*     24-Apr-1994   - (v1.7-0) for new release of asterix
-*     09-Jun-1994   - (v1.7-1) string length for file names increased (132)
-*     16-Jun-1994   - (v1.7-2) Now handles new RDF files (2.3)
-*      4 Sep 1995 V1.7-3 - Use HSI rather than HIST (DJA)
+*     20 Sep 1993 V1.5-0 (RDS):
+*        Original version
+*     24 Apr 1994 V1.7-0 (JKA):
+*        For new release of asterix
+*      9 Jun 1994 V1.7-1 (JKA):
+*        String length for file names increased
+*     16 Jun 1994 V1.7-2 (JKA):
+*        Now handles new RDF files (2.3)
+*      4 Sep 1995 V1.7-3 (DJA):
+*        Use HSI rather than HIST
+*     18 Dec 1995 V2.0-0 (DJA):
+*        ADI port. Split in two for cleaner XRTCONV interface
+*    Type definitions :
+      IMPLICIT NONE
+*    Global constants :
+      INCLUDE 'SAE_PAR'
+*    Status :
+      INTEGER STATUS
+*    Local variables :
+      CHARACTER*132		FNAME			! Input FITS file
+      CHARACTER*132		HNAME			! Output root
+      CHARACTER*5		ORIGIN			! File origin
+*-
+
+*  Check inherited global status
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Initialise
+      CALL AST_INIT()
+
+*  Get user input stuff
+      CALL USI_GET0C( 'INPUT', FNAME, STATUS )
+      CALL USI_GET0C( 'ORIGIN', ORIGIN, STATUS )
+      CALL USI_GET0C( 'OUTPUT', HNAME, STATUS )
+      CALL CHR_UCASE( ORIGIN )
+
+*  Invoke internal routine
+      CALL XRTINDEX_INT( FNAME, ORIGIN, HNAME, STATUS )
+
+*  Tidy up
+ 99   CALL AST_CLOSE()
+      CALL AST_ERR( STATUS )
+
+      END
+
+
+
+*+  XRTINDEX_INT - Creates header & index file for US or Rationalised FITS
+	SUBROUTINE XRTINDEX_INT( INP, ORIGIN, HNAME, STATUS )
+*    Description :
+*    Environment parameters :
+*    Method :
+*    Deficiencies :
+*    Bugs :
+*    Authors :
+*     Jeremy Ashley
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -30,6 +81,8 @@
       INCLUDE 'DAT_PAR'
 *    Structure definitions :
       INCLUDE 'INC_XRTHEAD'
+*    Import:
+      CHARACTER*(*)	INP,ORIGIN,HNAME
 *    Status :
       INTEGER STATUS
 *    Function declarations :
@@ -38,70 +91,54 @@
 *    Local variables :
       RECORD /XRT_HEAD/ HEAD 		! Structure to hold header information
       CHARACTER*(DAT__SZLOC) LOC                  ! Locator to HDS file
-      CHARACTER*132 HNAME                         ! Name of HDS file
-      CHARACTER*132 PATH,FNAME                         ! Name of FITS file
-      CHARACTER*5 ORIGIN                          ! Type of FITS file
-      INTEGER IUNIT,OFID,IFID,NLEV
+      INTEGER IUNIT,OFID,IFID
       INTEGER ISTAT
       INTEGER INDEX  ! structure to hold index
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'XRTINDEX Version 1.7-3')
+      PARAMETER (VERSION = 'XRTINDEX Version 2.0-0')
 *-
-C     IF (STATUS.NE.SAI__OK) RETURN
 
-*  Initialise
-      CALL AST_INIT()
-*
-      CALL MSG_PRNT(VERSION)
+*  Check inherited global status
+      IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Get free IO unit
-      CALL FIO_GUNIT(IUNIT,STATUS)
+*  Version
+      CALL MSG_PRNT( VERSION )
 
-*  Get input file name
-      CALL USI_ASSOC( 'INPUT', 'FITSfile', 'READ', IFID, STATUS )
-      IF (STATUS .NE. SAI__OK) GOTO 99
-
-*  Get the FITS file type (US/RAT)
-      CALL USI_GET0C( 'ORIGIN', ORIGIN, STATUS )
-      IF (STATUS .NE. SAI__OK) GOTO 99
-      CALL CHR_UCASE( ORIGIN )
+*  Open input file
+      CALL ADI_FOPEN( INP, 'FITSfile', 'READ', IFID, STATUS )
+      IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *  Get header information from file
-      CALL ADI_FTRACE( IFID, NLEV, PATH, FNAME, STATUS )
       CALL ADI2_GETLUN( IFID, IUNIT, STATUS )
       CALL RAT_RDHEAD( IUNIT, ORIGIN, HEAD, ISTAT )
       IF ( ISTAT .NE. 0 ) THEN
-        CALL MSG_SETC( 'FNAM', FNAME )
+        CALL MSG_SETC( 'FNAM', INP )
         CALL MSG_PRNT( '** Error reading header info from ^FNAM **' )
         GOTO 99
       END IF
 
-*  Get output file name
-      CALL USI_GET0C( 'OUTPUT', HNAME, STATUS )
-      IF (STATUS .NE. SAI__OK) GOTO 99
-
-*  Create the Index file
+*  Create the index file
       CALL ADI_FCREAT( HNAME(:CHR_LEN(HNAME))//'_hdr%hds',
      :                                  ADI__NULLID, OFID, STATUS )
       IF (STATUS .NE. SAI__OK) GOTO 99
 
 *  Write Rationalised fits version
       CALL ADI1_GETLOC( OFID, LOC, STATUS )
-      CALL HDX_PUTC(LOC,'VERSION',1,version,STATUS)
+      CALL HDX_PUTC( LOC, 'VERSION', 1, VERSION, STATUS )
 
 *  Write the file type
-      CALL HDX_PUTC(LOC,'ORIGIN',1,origin(1:CHR_LEN(origin)),STATUS)
+      CALL HDX_PUTC( LOC, 'ORIGIN', 1, ORIGIN(1:CHR_LEN(ORIGIN)),
+     :               STATUS )
 
 *  Write the filename
-*     CALL STRNAME(fname,fname,STATUS)
-      CALL HDX_PUTC(LOC,'SRCFILE',1,fname(1:CHR_LEN(fname)),STATUS)
+      CALL HDX_PUTC( LOC, 'SRCFILE', 1, INP(1:CHR_LEN(INP)), STATUS )
 
 *  Create and map the HEAD structure
-      CALL RAT_PUTHEAD(LOC,'HEAD',HEAD,STATUS)
+      CALL RAT_PUTHEAD( OFID, 'HEAD', HEAD, STATUS )
 
 *  Create and map the index structure
-      CALL RAT_PUTINDEX(LOC,'INDEX',INDEX,STATUS)
+      CALL RAT_PUTINDEX( OFID, 'INDEX', INDEX, STATUS )
 
 *  Produce a history record
       CALL HSI_ADD( OFID, VERSION, STATUS )
@@ -111,11 +148,13 @@ C     IF (STATUS.NE.SAI__OK) RETURN
         CALL MSG_PRNT('Error writing to output file')
       END IF
 
-*  Close the HDS file
+*  Close the FITS and HDS files
+      CALL ADI_FCLOSE( IFID, STATUS )
       CALL ADI_FCLOSE( OFID, STATUS )
 
 *  Finish with asterix
- 99   CALL AST_CLOSE()
-      CALL AST_ERR( STATUS )
+ 99   IF ( STATUS .NE. SAI__OK ) THEN
+        CALL AST_REXIT( 'XRTINDEX_INT', STATUS )
+      END IF
 
       END

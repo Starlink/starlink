@@ -357,7 +357,6 @@
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Include files
       INCLUDE 'INC_XRTHEAD'
 *    Parameters :
@@ -508,7 +507,6 @@
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Include files
       INCLUDE 'INC_XRTHEAD'
 *    Parameters :
@@ -593,7 +591,7 @@
       END
 
 *+  RAT-PUTHEAD - Create Index structure
-      SUBROUTINE RAT_PUTINDEX(LOC,OBJECT,INDEX,STATUS)
+      SUBROUTINE RAT_PUTINDEX(FID,OBJECT,INDEX,STATUS)
 *
 * Description :
 *   Data structure indexing event data.  (not yet implemented)
@@ -610,18 +608,19 @@
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Include files
 *    Parameters :
-      CHARACTER*(DAT__SZLOC)   LOC                   ! Start locator
+      INTEGER			FID
       CHARACTER*(*)            OBJECT                ! Structured name
       INTEGER                  INDEX                 ! Index structure
 *    Status :
       INTEGER STATUS
 *    Local constants :
 *    Local variables :
+      CHARACTER*(DAT__SZLOC)   LOC                   ! Start locator
       CHARACTER*(DAT__SZLOC)   ALOC                   ! locator
 *
+      CALL ADI1_GETLOC( FID, LOC, STATUS )
 ***** Create INDEX structure
       CALL HDX_CREATE(LOC,OBJECT,0,0,OBJECT,ALOC,STATUS)
       CALL HDX_FIND(LOC,OBJECT,ALOC,STATUS)
@@ -975,12 +974,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'PAR_ERR'
-*     <any INCLUDE files containing global constant definitions>
-*    Global variables :
-*     <global variables held in named COMMON>
-*    Structure definitions :
-*     <specification of FORTRAN structures>
 *    Import :
 *     <declarations and descriptions for imported arguments>
       INTEGER IUNIT              ! Logical unit number of FITS file
@@ -1055,12 +1048,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'PAR_ERR'
-*     <any INCLUDE files containing global constant definitions>
-*    Global variables :
-*     <global variables held in named COMMON>
-*    Structure definitions :
-*     <specification of FORTRAN structures>
 *    Import :
       CHARACTER*(*) FITSDIR     ! Raw directory of fits files
 *     <declarations and descriptions for imported arguments>
@@ -1198,8 +1185,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'PAR_ERR'
-*     <any INCLUDE files containing global constant definitions>
 *    Global variables :
       INCLUDE 'INC_XRTHEAD'
 *    Global parameters
@@ -1244,8 +1229,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'PAR_ERR'
-*     <any INCLUDE files containing global constant definitions>
 *    Global variables :
       INCLUDE 'INC_XRTHEAD'
 *    Global parameters
@@ -1398,8 +1381,6 @@ C - CHECK NUMBER OF TIME RANGES DOESN'T EXCEED MAXIMUM
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'PAR_ERR'
-*     <any INCLUDE files containing global constant definitions>
 *    Global variables :
       INCLUDE 'INC_XRTHEAD'
 *    Global parameters
@@ -1834,8 +1815,6 @@ C -   CHECK STATUS
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'PAR_ERR'
-*     <any INCLUDE files containing global constant definitions>
 *    Global variables :
       INCLUDE 'INC_XRTHEAD'
 *    Global parameters
@@ -1878,8 +1857,6 @@ C -   CHECK STATUS
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'PAR_ERR'
-*     <any INCLUDE files containing global constant definitions>
 *    Global variables :
       INCLUDE 'INC_XRTHEAD'
 *    Global parameters
@@ -1978,8 +1955,6 @@ C - CONVERT TIME FORMATS
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'PAR_ERR'
-*     <any INCLUDE files containing global constant definitions>
 *    Global variables :
       INCLUDE 'INC_XRTHEAD'
 *    Global parameters
@@ -2289,7 +2264,6 @@ C - CONVERT TIME FORMATS
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
       INCLUDE 'QUAL_PAR'
 *    Global parameters
 *     ROOTNAME  - hds events filename
@@ -2909,7 +2883,6 @@ C      ENDIF
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Status :
       INTEGER STATUS
 *    Structure definitions :
