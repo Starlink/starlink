@@ -146,12 +146,12 @@
         CALL ADI2_CFIND( ARGS(2), ' ', '.CRPIX'//CAX, ' ', .TRUE.,
      :                   .FALSE., TYPE, 0, 0, DIDCRE, ITID, STATUS )
         CALL ADI_CNEWV0R( ITID, 'Value', TANG, STATUS )
-        CALL ADI_CNEWV0C( ITID, 'Comment', ' pixel of tangent point',
-     :                    STATUS )
+        CALL ADI_CNEWV0C( ITID, 'Comment', AXIS//
+     :                    ' pixel of tangent point', STATUS )
         CALL ADI2_CFIND( ARGS(2), ' ', '.CDELT'//CAX, ' ', .TRUE.,
      :                   .FALSE., TYPE, 0, 0, DIDCRE, ITID, STATUS )
         CALL ADI_CNEWV0R( ITID, 'Value', DELTA, STATUS )
-        CALL ADI_CNEWV0C( ITID, 'Comment', ' degrees per pixel',
+        CALL ADI_CNEWV0C( ITID, 'Comment', AXIS//' degrees per pixel',
      :                    STATUS )
       ELSE
 
