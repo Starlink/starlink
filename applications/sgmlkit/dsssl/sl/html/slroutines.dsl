@@ -18,11 +18,11 @@ $Id$
 <codebody>
 (mode section-reference
   (element routinelist
-    (make-section-reference 1 (literal "Routine list")))
+    (make-section-reference title: (literal "Routine list")))
   (element codecollection
-    (make-section-reference 2
-     (with-mode routine-ref-get-reference
-       (process-codecollection (attribute-string (normalize "doc")))))))
+    (make-section-reference 
+     title: (with-mode routine-ref-get-reference
+	      (process-codecollection (attribute-string (normalize "doc")))))))
 
 
 ;; Routinelist is simple
