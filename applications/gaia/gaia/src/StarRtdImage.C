@@ -91,8 +91,10 @@
 //        configuration option to control this.
 //     13-NOV-1998 (PWD):
 //        Added rotbox to plotting symbols.
-//     13-JAN-1998 (PWD):
+//     13-JAN-1999 (PWD):
 //        Merged Allan Brighton's GAIA plugins changes (see history above).
+//     06-APR-1999 (PWD):
+//        Added contour command. 
 //-
 
 #include <string.h>
@@ -117,6 +119,14 @@
 #include "grf_tkcan.h"
 #include "tcl_err.h"
 #include "rtdDtrn.h"
+
+extern "C" {
+int gaiaContour( const float *image, int nx, int ny,
+                 const double *cont, int ncont,
+                 AstPlot *plot, const char *props[], int nprops,
+                 int xll, int yll, int xsize, int ysize,
+                 int fast );
+}
 
 // Include any foreign commands. These are processed by the "foreign"
 // member function when requested.
@@ -160,6 +170,7 @@ public:
   { "astwrite",      &StarRtdImage::astwriteCmd,     1, 2 },
   { "blankcolor",    &StarRtdImage::blankcolorCmd,   1, 1 },
   { "clone",         &StarRtdImage::cloneCmd,        1, 2 },
+  { "contour",       &StarRtdImage::contourCmd,      0, 2 },
   { "dump",          &StarRtdImage::dumpCmd,         1, 2 },
   { "foreign",       &StarRtdImage::foreignCmd,      2, 2 },
   { "origin",        &StarRtdImage::originCmd,       2, 2 },
@@ -3207,3 +3218,205 @@ int StarRtdImage::get_compass(double x, double y, const char* xy_units,
   return TCL_OK;
 }
 
+//////////////////////////////////////////////////////////////////////////////
+
+
+//+
+//   StarRtdImage::contourCmd
+//
+//   Purpose:
+//      Contour an image
+//
+//    Return:
+//       TCL status and result. Plots contours.
+//
+//    Notes:
+//       The first parameter to this routine is a list that contains
+//       all of the line attributes (see the AST documentation) in a
+//       pre-formatted manner (such as can be used by as astSet
+//       routine). This allows maximum flexibility in the options
+//       that can be set, but imposes an obligation on the user of
+//       this member function to format and control the attributes
+//       correctly.
+//
+//       The second parameter passed to this member should be a list of
+//       the bounds, in canvas coordinates, of the region to be
+//       drawn. If NULL then the whole canvas is used.
+//
+//-
+int StarRtdImage::contourCmd( int argc, char *argv[] )
+{
+#ifdef _DEBUG_
+  cout << "Called StarRtdImage::contourCmd" << endl;
+#endif
+
+  int inerror = 0;
+  if ( !image_ ) {
+    return error("no image loaded");
+  }
+
+  // Do the initial split of the input list.
+  char **listArgv;
+  int listArgc = 0;
+  char **coordArgv;
+  int coordArgc = 0;
+  double pbox[4];
+  if ( argc != 0 ) {
+    if ( argc > 2 ) {
+      error( "wrong # args: contour options_list canvas_area" );
+      inerror = 1;
+    } else {
+      if ( Tcl_SplitList( interp_, argv[0], &listArgc, &listArgv ) != TCL_OK ) {
+        error( "failed to interpret options as a list" );
+        inerror = 1;
+      }
+    }
+
+    //  Get the canvas coordinate display range if given.
+    if ( argc == 2 ) {
+      if ( Tcl_SplitList( interp_, argv[1], &coordArgc, &coordArgv ) != TCL_OK ) {
+	error( "failed to interpret canvas coordinates as a list" );
+	coordArgc = 0;
+	inerror = 1;
+      } else {
+	if ( coordArgc != 4 ) {
+	  error( "wrong # of args, should be 4 canvas coordinates" );
+	  inerror = 1;
+	} else {
+	  for ( int index = 0; index < coordArgc; index++ ) {
+	    if ( Tcl_GetDouble(interp_, coordArgv[index],
+			       &pbox[index] ) != TCL_OK ) {
+	      error( coordArgv[index], "is not a valid number");
+	      inerror = 1;
+	      break;
+	    }
+	  }
+
+	  // Reorganise these coordinates to the expected order
+	  // (bottom-left, top-right of screen, not canvas).
+	  swap( pbox[1], pbox[3] );
+	}
+      }
+    }
+  }
+  
+  // Define the limits of the canvas plotting "area" in canvas
+  // coordinates and sky coordinates (the same positions). Use the
+  // image position on the canvas for this. Note that this also
+  // reorients the image to the canvas (so any scales, flips, offset
+  // etc. are corrected for here, but not any axes interchange).
+  // XXX double pbox[4];
+  float gbox[4];
+  if ( coordArgc == 0 ) {
+    double rw = reqWidth_, rh = reqHeight_;
+    if ( rw == 0 ) rw = (double) image_->width();  // Zero when whole image is
+    if ( rh == 0 ) rh = (double) image_->height(); // displayed.
+    doTrans(rw, rh, 1);
+    gbox[0] = pbox[0] = 0.0;
+    gbox[1] = pbox[1] = rh;
+    gbox[2] = pbox[2] = rw;
+    gbox[3] = pbox[3] = 0.0;
+  } else {
+    gbox[0] = pbox[0];
+    gbox[1] = pbox[1];
+    gbox[2] = pbox[2];
+    gbox[3] = pbox[3];
+  }
+  int rotated = image_->rotate();             // Record if rotated
+  if ( rotated ) {                            // and switch off while
+    image_->rotate(0);                        // getting graphics mapping
+  }
+  canvasToImageCoords( pbox[0], pbox[1], 0 );
+  canvasToImageCoords( pbox[2], pbox[3], 0 );
+  if ( rotated ) {
+    image_->rotate(1);                           // Restore rotation.
+  }
+
+  //  Now see if a copy of the current WCS frameset is available (we
+  //  use a copy so we can  modify without changing any other elements).
+  StarWCS* wcsp = getStarWCSPtr();
+  if (!wcsp)
+    return TCL_ERROR;
+  AstFrameSet *wcs = wcsp->astWCSCopy();
+  if ( ! inerror ) {
+
+    //  Initialise the interpreter and canvas name for the Tk plotting
+    //  routines.
+    astTk_Init( interp_, canvasName_ );
+    
+    //  Define a tag for all items created in the plot.
+    astTk_Tag( grid_tag() );
+
+    //  Current frame is the GRID coordinates of the image to be
+    //  contoured (when plotting ... XXX this could be another
+    //  image...). So set the Current frame to be the base frame.
+    astSetI( wcs, "Current", AST__BASE );
+    
+    //  Create the plot frameset.
+    AstPlot *plot = astPlot( wcs, gbox, pbox, "" );
+    if ( astOK ) {
+      
+      //  If the X and Y axes are interchanged then we need to
+      //  correct the mapping between the pixel frame (image
+      //  coordinates) and the graphics frame.
+      if ( image_->rotate() ) {
+	int inperm[] = {2,1};
+	int outperm[] = {2,1};
+	AstPermMap *perm = astPermMap( 2, inperm, 2, outperm,
+				       (double *) NULL, "" );
+	astRemapFrame( plot, AST__BASE, perm );
+	perm = (AstPermMap *) astAnnul( perm );
+      }
+      
+      // Set all plot attributes to control the plot appearance.
+      if ( listArgc > 0 ) {
+	char *string = NULL;
+	for ( int index = 0; index < listArgc; index++ ) {
+	  string = listArgv[index];
+	  astSet( plot, string );
+	  if ( !astOK ) {
+	    (void) error( string, " is not a valid attribute" );
+	    inerror = 1;
+	    break;
+	  }
+	}
+      }
+
+      //  Draw the contour.
+      if ( astOK && ! inerror ) {
+	double levels[3] = {6000.0, 8000.0, 10000.0};
+	char *props[] = { "colour(curve)=red", 
+			  "colour(curve)=blue",
+			  "colour(curve)=green" };
+	ImageIO imageIO = image_->image();
+	float *image = (float *)imageIO.dataPtr();
+	gaiaContour( image, image_->width(), image_->height(), 
+                     levels, 3, plot, props, 3, 1, 1, image_->width(),
+                     image_->height(), 0 );
+      }
+    }
+
+    //  Free the plot.
+    plot = (AstPlot *) astAnnul( plot );
+
+    //  Reset the tag associated with AST grid items.
+    astTk_Tag( NULL );
+  }
+
+  // Free the list.
+  if ( listArgc > 0 ) {
+    Tcl_Free( (char *) listArgv );
+  }
+  
+  // Free the WCS copy.
+  wcs = (AstFrameSet *) astAnnul( wcs );
+
+  // Tidy up.
+  if ( inerror || ! astOK ) {
+    if ( !astOK ) {
+      astClearStatus;
+    }
+    return TCL_ERROR;
+  }
+  return TCL_OK;
+}

@@ -190,6 +190,9 @@ public:
   //  Slice command (X and Y coordinates).
   int sliceCmd( int argc, char *argv[] );
 
+  //  Contour command.
+  int contourCmd( int argc, char *argv[] );
+
 protected:
 
   // Pointer to structure that holds the image configuration options.
