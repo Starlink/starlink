@@ -15,10 +15,10 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {226.1}
+\newcommand{\stardocnumber}    {226.2}
 \newcommand{\stardocauthors}   {A.J. Chipperfield\\
                                 P.W. Draper}
-\newcommand{\stardocdate}      {6 January 1999}
+\newcommand{\stardocdate}      {14 January 1999}
 \newcommand{\stardoctitle}     {EXTRACTOR\\
                                 An Astronomical Source Detection Program}
 \newcommand{\stardocversion}   {1.0}
@@ -568,7 +568,7 @@ by using the \xref{\CONVERT}{sun55}{abstract} package \latex{(see
 SUN/55)} -- these include \htmladdnormallink{FITS}{\FITSURL} and
 \htmladdnormallink{IRAF}{\IRAFURL} OIF.
 
-An unmodified version of \SExtractor\ (2.0.15) is also included in the
+An unmodified version of \SExtractor\ (2.0.19) is also included in the
 distribution of \EXTRACTOR.  You can find details of \SExtractor's
 operation, and how to configure it, in the
 \htmladdnormallink{\SExtractor\ User's Guide}{\MUD} (which is issued
@@ -793,6 +793,26 @@ not supported.
 If you come across any problems with \EXTRACTOR\ please notify
 Starlink Software Support
 (\htmladdnormallink{ussc@star.rl.ac.uk}{mailto:ussc@star.rl.ac.uk}).
+
+\section{Changes}
+\subsection{Version 1.0-1}
+
+ The \EXTRACTOR\ and \SExtractor\ programs have been updated to \SExtractor\
+ version $2.0.19$ (the previous version was $2.0.15$). The changes
+ introduced by this are (from the SExtractor change log):
+ \begin{itemize}
+ \item SEGMENTATION numbering problem fixed.
+ \item new ASSOC\_TYPE NEAREST option.
+ \item MAP\_RMS measurement mode and FLAG\_TYPE MAX bugs fixed.
+ \item New BACK\_TYPE, BACK\_VALUE and THRESH\_TYPE parameters.
+ \item FLUX\_RADIUS no longer requires FLUX\_AUTO.
+ \item documentation (mud165) slightly improved.
+ \end{itemize}
+ The BACK\_TYPE/BACK\_VALUE parameters now allow the background used to
+ be defined as a single constant for the whole image (BACK\_TYPE takes
+ the values ``INTERNAL'' and ``MANUAL'') and the THRESH\_TYPE controls
+ whether the detection and analysis thresholds are a multiple of the 
+ background RMS, or just in absolute data units.
 
 \section{\xlabel{references}References}
 Bailey J.A. : \xref{SG/5}{sg5}{} : ICL \dash\ The Interactive Command Language for ADAM.\\

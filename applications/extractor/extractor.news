@@ -1,29 +1,22 @@
-1 EXTRACTOR
+1 Update to EXTRACTOR
 
- EXTRACTOR is a new program for automatically detecting objects on an
- astronomical image and building a catalogue of their measured
- properties. It is particularly suited for the reduction of large
- scale galaxy-survey data, but also performs well on other
- astronomical images.
+ The EXTRACTOR and SExtractor programs have been updated to SExtractor
+ version 2.0.19 (the previous version was 2.0.15). The changes
+ introduced by this are (from the SExtractor change log):
 
- EXTRACTOR is really Emmanuel Bertin's SExtractor program modified
- to use the NDF data format and the Starlink astrometry library
- (AST). This allows it to read foreign data formats (e.g. IRAF ".imh" )
- and use non-FITS astrometric calibrations, such as native AST and
- DSS. The native version of SExtractor (v2.0.15) is also provided as
- part of this release.
+    - SEGMENTATION numbering problem fixed.
+    - new ASSOC_TYPE NEAREST option.
+    - MAP_RMS measurement mode and FLAG_TYPE MAX bugs fixed.
+    - new BACK_TYPE, BACK_VALUE and THRESH_TYPE parameters.
+    - FLUX_RADIUS no longer requires FLUX_AUTO.
+    - documentation (mud165) slightly improved.
 
- GAIA, the Graphical Astronomy and Image Analysis Tool, has been
- upgraded to make use of EXTRACTOR (and SExtractor) and now provides
- an interactive environment to visually inspect how the extraction
- process has proceeded and to specify the detection and catalogue
- parameters. It also displays the catalogue of results and provides
- interaction between the catalogue and detected objects (i.e. you
- can select a detected object and view its related measurements, or
- select a row of measurements and see the related object).
+ The BACK_TYPE/BACK_VALUE parameters now allow the background used to
+ be defined as a single constant for the whole image (BACK_TYPE takes
+ the values "INTERNAL" and "MANUAL") and the THRESH_TYPE controls
+ whether the detection and analysis thresholds are a multiple of the 
+ background RMS, or just in absolute data units.
 
- It is expected that EXTRACTOR will eventually replace the PISA
- package, so existing users of PISA are encouraged to use EXTRACTOR.
 
  EXTRACTOR is described in SUN/226, which can be viewed on-line by the
  command:
@@ -31,4 +24,4 @@
     % showme sun226
 
 
- Peter W. Draper & Alan Chipperfield      6th January 1999.
+ Peter W. Draper 14th January 1999.
