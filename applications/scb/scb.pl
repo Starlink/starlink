@@ -560,6 +560,21 @@ sub package_list {
 
       print "<h2>$package</h2>\n";
 
+#     Assemble a list of files in the package for each file extension.
+#     The code can be easily changed as commented to group them by
+#     which tar file they are included in if that is preferred.
+
+      my (%files, $file, $tarfile, $suffix);
+      while (($file, $loc) = $file_index->each($package)) {
+         $suffix = $tarfile = '';
+         $suffix = $1 if ($file =~ m%(\.[^/>#]+)$%);
+         push @{$files{$suffix}}, $file;  
+
+         # Could do this to group them by tarfile instaed if you wanted.
+         # $tarfile = $1 if ($loc =~ m%([^/>#]+.tar)(?:\.[^/>#]*)?>[^/>#]+$%);
+         # push @{$files{$tarfile}}, $file;
+      }
+
 #     Print links to package-specific lists which will not be given here.
 
       my %printlist;
@@ -574,31 +589,46 @@ sub package_list {
          unless ($printlist{'func'});
 
 
-      if (1) {
-#        Get list of tasks within selected package.
 
-         my @tasks = @{$tasks{$package}};
+#     Print list of Starlink documents from selected package.
 
-         if (@tasks) {
+      my (@docs);
+      foreach $texfile (@{$files{'.tex'}}) {
+         push @docs, "$1$2"
+            if ($texfile =~ /^(sc|sg|sun|sgp|ssn)([0-9]+)\.tex$/);
+      }
 
-#           Print list of tasks for selected package.
-
-            hprint "
-               <hr>
-               <h3>Tasks in package <b>$package</b>:</h3>
-               The following appear to be tasks within package <b>$package</b>:
-               <br>
-               <dl> <dt> <br> <dd>
-            ";
-            my $module;
-            foreach $module (sort @tasks) {
-               $task = $module;
-               $task =~ s/_$//;
-               print 
-                  "$sep<a href='$scb?$module&amp;$package#$module'>$task</a>\n";
-            }
-            print "</dl>\n\n";
+      if (@docs) {
+         hprint "
+            <hr>
+            <h3>Starlink documents in package <b>$package</b>:</h3>
+            <dl>
+         ";
+         foreach $doc (sort @docs) {
+            print "<dt><a href='", docurl ($doc), "'>", uc ($doc), "</a><dd>\n";
          }
+         print "</dl>\n";
+      }
+
+#     Print list of tasks in selected package.
+
+      if (@tasks = @{$tasks{$package}}) {
+
+         hprint "
+            <hr>
+            <h3>Tasks in package <b>$package</b>:</h3>
+            The following appear to be tasks within package <b>$package</b>:
+            <br>
+            <dl> <dt> <br> <dd>
+         ";
+         my $module;
+         foreach $module (sort @tasks) {
+            $task = $module;
+            $task =~ s/_$//;
+            print 
+               "$sep<a href='$scb?$module&amp;$package#$module'>$task</a>\n";
+         }
+         print "</dl>\n\n";
       }
 
       if ($printlist{'func'}) {
@@ -664,19 +694,6 @@ sub package_list {
             <h3>Files in package <b>$package</b>:</h3>
          ";
 
-#        Assemble a list of files in the package for each file extension.
-#        The code can be easily changed as commented to group them by
-#        which tar file they are included in if that is preferred.
-
-         my (%files, $file, $tarfile, $suffix);
-         while (($file, $loc) = $file_index->each($package)) {
-            $suffix = $tarfile = '';
-            $tarfile = $1 if ($loc =~ m%([^/>#]+.tar)(?:\.[^/>#]*)?>[^/>#]+$%);
-            $suffix = $1 if ($file =~ m%(\.[^/>#]+)$%);
-            push @{$files{$suffix}}, $file;     #  Group by suffix.
-            # push @{$files{$tarfile}}, $file;  #  Group by containing tar file.
-         }
-   
          if (%files) {
 
 #           For each extension, print group of files in the package.
@@ -781,7 +798,7 @@ sub search_keys {
 
    foreach $index (qw/file func/) {
       while (($name, $loc) = ${$index . '_index'}->each($package)) {
-         if ($name =~ /$regex/o) {
+         if ($name =~ /$regex/io) {
             $pack = starpack $loc;
             $match{$index}{$pack}{$name} = $loc;
          }
@@ -791,7 +808,7 @@ sub search_keys {
 #  Print heading.
 
    my $htregex = demeta $regex;
-   print "\n<h2>Search results: $htregex</h2>\n";
+   print "\n<h2>Search results: $htregex</h2>\n" if ($html);
 
    if (%match) {
 
@@ -834,9 +851,15 @@ sub search_keys {
 
 #     No matching entries found.
 
-      print "No matches were found for the regular expression '$htregex'";
-      print " in package <b>$package</b>" if $package;
-      print ".<p>\n";
+      if ($html) {
+         print "No matches were found for the regular expression '$htregex'";
+         print " in package <b>$package</b>" if ($package);
+         print ".<p>\n";
+      }
+      else {
+         print STDERR "No matches found for the regular expression '$regex'\n";
+         print STDERR "in package $package\n" if ($package);
+      }
    }
       
 }
@@ -1200,6 +1223,7 @@ sub output {
 #     a language-specific tagging routine if one is defined for this
 #     file type.
 
+      my $pre;
       $ext = '';
       $ext = $1 if ($file =~ /\.([^.]+)$/);
       if ($rtagger = $tagger{$ext}) {
@@ -1278,6 +1302,7 @@ sub output {
 
          header $locname;
          print "<pre>\n";
+         $intag = 'pre';
          print $tagged;
       }
       else {
@@ -1290,18 +1315,21 @@ sub output {
 #        their proper MIME types, since as source files, it's probably
 #        the source that we want to see rather than, say executing an
 #        application/x-tcl type script.  There are exceptions to this
-#        rule of thumb, e.g. postscript.
+#        rule of thumb as defined in the variable $mimeuse.
+
+         my $mimeuse = join '|', qw/postscript html x-xbitmap x-xpixmap/;
 
 #        Get MIME type.
 
          $mime = mimetype $ext;
 
-         if (-T $file && $mime !~ /postscript|html/) {
+         if (-T $file && $mime !~ /$mimeuse/o) {
 
-#           Text file - output as preformatted HTML.
+#           Text file to output as preformatted HTML.
 
             header $locname, 'text/html';
-            print "<pre>\n";
+            print "<xmp>\n";
+            $intag = 'xmp';
          }
          else {
 
@@ -1309,7 +1337,6 @@ sub output {
 
             $mime ||= 'application/unknown';
             header $locname, $mime;
-            $raw = 1;
          }
 
 #        Output text of file.
@@ -1322,8 +1349,8 @@ sub output {
 
 #     Output appropriate footer text.
 
-      unless ($raw) {
-         print "</pre>\n";
+      if ($intag) {
+         print "</$intag>\n";
          my $year = 1900 + (localtime)[5];
          hprint "
             <hr><i>
@@ -1347,6 +1374,66 @@ sub output {
    close FILE;
 
 }
+
+
+########################################################################
+sub docurl {
+
+#+
+#  Name:
+#     docurl
+
+#  Purpose:
+#     Generate a URL for a Starlink document.
+
+#  Language:
+#     Perl 5
+
+#  Invocation:
+#     $url = docurl ($doc);
+
+#  Description:
+#     Generates a URL for a Starlink document.
+
+#  Arguments:
+#     $doc = string.
+#        Name of Starlink document, e.g. 'sun188'.
+
+#  Return value:
+#     $url = string.
+#        Uniform Resource Locator pointing to the document in question.
+
+#  Notes:
+#     To avoid having to know too much about how the HTTP server is set
+#     up this simply returns a reference to the document at HTX server
+#     at RAL.  Since a local copy probably exists, this is rather wasteful.
+
+#  Authors:
+#     MBT: Mark Taylor (IoA, Starlink)
+#     {enter_new_authors_here}
+
+#  History:
+#     05-OCT-1998 (MBT):
+#       Initial revision.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#  Get argument.
+
+   $doc = shift;
+
+#  Return URL.
+
+   return "$htxserver/$doc.htx/$doc.html";
+}
+
+
+
+
 
 
 ########################################################################
