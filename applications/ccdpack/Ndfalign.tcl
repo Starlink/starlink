@@ -246,6 +246,46 @@
             }
             configure -zoom $zoom
 
+#  Work out the size of the scrolledcanvas widget.
+            set canvwin [ $canvas component canvas ]
+            update idletasks
+            wm deiconify $itk_interior
+            set xcanv [ winfo width $canvwin ]
+            set ycanv [ winfo height $canvwin ]
+
+#  If the displayed size is smaller than the size of the scrolledcanvas
+#  widget (but not necessarily than the canvas itself), enlarge it 
+#  until it takes up the available space.
+            set enlarge 0
+            while { 1 } {
+               set z [ zoominc $zoom [ expr $enlarge + 1 ] ]
+
+#  Set the initial offset.  The images should be adjacent to each other
+#  with a little gap in between.
+               set xoff(A) [ expr 0 - $xlo(A) ]
+               set yoff(A) [ expr 0 - $ylo(A) ]
+               set xoff(B) [ expr $xhi(A) - $xlo(A) \
+                                + $pixgap * $pixelsize * $z - $xlo(B) ]
+               set yoff(B) [ expr 0 - $ylo(B) ]
+
+#  Work out how big the GWM will need to be to display the pair of images.
+               set xsize [ expr $z / $pixelsize * \
+                                ( $xhi(B) + $xoff(B) - $xlo(A) - $xoff(A) ) ]
+               set ysize [ expr $z / $pixelsize * \
+                                [ max [ expr $yhi(A) - $ylo(A) ] \
+                                      [ expr $yhi(B) - $yhi(B) ] ] ]
+
+#  Increase the zoom level (if it will go any larger) and try again if
+#  necessary.
+               if { $xsize <= $xcanv && $ysize <= $ycanv } {
+                  incr enlarge 1
+                  if { [ zoominc $zoom [ expr $enlarge + 1 ] ] <= $z } { break }
+               } else {
+                  break
+               }
+            }
+            set zoom [ zoominc $zoom $enlarge ]
+
 #  We may have to iterate the following steps, shrinking the zoom each 
 #  time, if they result in requiring a GWM canvas which exceeds the 
 #  requested maximum dimensions.
@@ -255,9 +295,6 @@
 
 #  Set the initial offset.  The images should be adjacent to each other 
 #  with a little gap in between.
-#  This setting could be modified so that in the case of two short fat 
-#  NDFs they got put one above the other.  That lack of consistency 
-#  might be more confusing though?
                set xoff(A) [ expr 0 - $xlo(A) ]
                set yoff(A) [ expr 0 - $ylo(A) ]
                set xoff(B) [ expr $xhi(A) - $xlo(A) \
@@ -275,9 +312,7 @@
 #  necessary.
                if { $maxcanv > 0 && [ max $xsize $ysize ] > $maxcanv } {
                   incr shrink -1
-                  if { [ zoominc $zoom $shrink ] >= $z } {
-                     break 
-                  }
+                  if { [ zoominc $zoom $shrink ] >= $z } { break }
                } else {
                   break
                }
