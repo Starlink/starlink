@@ -380,8 +380,8 @@ c     - Border: The plot boundary drawn using astBorder or astGrid
 f     - Border: The plot boundary drawn using AST_BORDER or AST_GRID
 c     - Grid: Curves drawn using astGridLine or astGrid
 f     - Grid: Curves drawn using AST_GRIDLINE or AST_GRID
-c     - Curves: Curves drawn using astCurve
-f     - Curves: Curves drawn using AST_CURVE
+c     - Curves: Curves drawn using astCurve or astPolyCurve
+f     - Curves: Curves drawn using AST_CURVE or AST_POLYCURVE
 c     - NumLab: Numerical axis labels drawn using astGrid
 f     - NumLab: Numerical axis labels drawn using AST_GRID
 c     - TextLab: Textual axis labels drawn using astGrid
@@ -428,13 +428,15 @@ f     - Strings: Text strings drawn using AST_TEXT
 *           Draw a geodesic curve between two points.
 *        astMark
 *           Draw a set of graphical markers at given physical coordinates.
+*        astPolyCurve
+*           Draw a set of connected geodesic curves.
 *        astText
 *           Draw a text string at given physical coordinates.
 
 *     Protected:
 *        astCvBrk
 *           Return information about the most recent curve drawn by
-*           astGridLine or astCurve.
+*           astGridLine or astCurve (NOT astPolyCurve).
 
 *        Protected methods are supplied to set, test, clear and test each
 *        of the attributes described in the above section entitled "New
@@ -504,6 +506,8 @@ f     - Strings: Text strings drawn using AST_TEXT
 *  History:
 *     18-SEP-1996 (DSB):
 *        Original version.
+*     28-OCT-1998 (DSB):
+*        Added method astPolyCurve. 
 *-
 */
 
@@ -610,6 +614,7 @@ typedef struct AstPlotVtab {
    int (* CvBrk)( AstPlot *, int, double *, double *, double * );
    void (* GridLine)( AstPlot *, int, const double [], double );
    void (* Curve)( AstPlot *, const double [], const double [] );
+   void (* PolyCurve)( AstPlot *, int, int, int, const double (*)[] );
    void (* Grid)( AstPlot * ); 
    void (* Mark)( AstPlot *, int, int, int, const double (*)[], int  ); 
    void (* Text)( AstPlot *, const char *, const double [], const float [2], const char * );
@@ -765,6 +770,7 @@ AstPlot *astLoadPlot_( void *, size_t, int, AstPlotVtab *,
    void astCurve_( AstPlot *, const double [], const double [] );
    void astGrid_( AstPlot * );
    void astMark_( AstPlot *, int, int, int, const double (*)[], int  ); 
+   void astPolyCurve_( AstPlot *, int, int, int, const double (*)[] );
    void astText_( AstPlot *, const char *, const double [], const float [2], const char * );
 
 #if defined(astCLASS)            /* Protected */
@@ -978,6 +984,10 @@ astINVOKE(V,astGridLine_(astCheckPlot(this),axis,start,length))
 
 #define astCurve(this,start,finish) \
 astINVOKE(V,astCurve_(astCheckPlot(this),start,finish))
+
+#define astPolyCurve(this,npoint,ncoord,dim,in) \
+astINVOKE(V,astPolyCurve_(astCheckPlot(this),npoint,ncoord,dim,in))
+
 
 #if defined(astCLASS)            /* Protected */
 

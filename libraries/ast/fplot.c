@@ -22,6 +22,7 @@
 *     AST_ISAPLOT
 *     AST_MARK
 *     AST_PLOT
+*     AST_POLYCURVE
 *     AST_TEXT   
 
 *  Copyright:
@@ -40,6 +41,8 @@
 *     18-DEC-1996 (DSB):
 *        Argument UP changed to single precision and NCOORD removed 
 *        in AST_TEXT.
+*     11-AUG-1998 (DSB):
+*        Added AST_POLYCURVE.
 */
 
 /* Define the astFORTRAN77 macro which prevents error messages from
@@ -210,5 +213,24 @@ F77_SUBROUTINE(ast_text)( INTEGER(THIS),
       astText( astI2P( *THIS ), text, POS, UP, just );
       (void) astFree( (void *) text );
       (void) astFree( (void *) just );
+   )
+}
+
+F77_SUBROUTINE(ast_polycurve)( INTEGER(THIS),
+                           INTEGER(NPOINT),
+                           INTEGER(NCOORD),
+                           INTEGER(DIM),
+                           DOUBLE_ARRAY(IN),
+                           INTEGER(STATUS) ) {
+   GENPTR_INTEGER(THIS)
+   GENPTR_INTEGER(NPOINT)
+   GENPTR_INTEGER(NCOORD)
+   GENPTR_INTEGER(DIM)
+   GENPTR_DOUBLE_ARRAY(IN)
+
+   astAt( "AST_POLYCURVE", NULL, 0 );
+   astWatchSTATUS(
+      astPolyCurve( astI2P( *THIS ), *NPOINT, *NCOORD, *DIM,
+                (const double (*)[])IN );
    )
 }
