@@ -178,18 +178,18 @@ OBJS = itcl_bicmds.o itcl_class.o itcl_cmds.o itcl_ensemble.o \
 	itcl_linkage.o itcl_methods.o itcl_migrate.o itcl_objects.o \
 	itcl_obsolete.o itcl_parse.o itcl_util.o
 
-all: $(ITCL_LIB_FILE) itclsh
+all: $(ITCL_LIB_FILE) itclsh$(EXEEXT)
 
 @ITCL_LIB_FILE@:  $(OBJS)
 	rm -f $(ITCL_LIB_FILE)
 	@MAKE_LIB@
 	$(RANLIB) $(ITCL_LIB_FILE)
 
-itclsh: tclAppInit.o $(ITCL_LIB_FILE)
+itclsh$(EXEEXT): tclAppInit.o $(ITCL_LIB_FILE)
 	$(CC) @LD_FLAGS@ tclAppInit.o @ITCL_BUILD_LIB_SPEC@ \
 		$(LIBS) $(LD_SEARCH_FLAGS) -o itclsh
 
-test: itclsh
+test: itclsh$(EXEEXT)
 	LD_LIBRARY_PATH="$(TCL_LIB_DIR):`pwd`:$(LD_LIBRARY_PATH)"; \
 	export LD_LIBRARY_PATH; \
 	TCL_LIBRARY="$(TCL_SRC_DIR)/library"; export TCL_LIBRARY; \
@@ -199,14 +199,14 @@ test: itclsh
 
 install: install-binaries install-libraries install-man
 
-install-binaries: $(ITCL_LIB_FILE) itclsh
+install-binaries: $(ITCL_LIB_FILE) itclsh$(EXEEXT)
 	@$(MKINSTALLDIRS) $(LIB_INSTALL_DIR) $(BIN_INSTALL_DIR)
 	@echo "Installing $(ITCL_LIB_FILE)"
 	@$(INSTALL_DATA) $(ITCL_LIB_FILE) $(LIB_INSTALL_DIR)/$(ITCL_LIB_FILE)
 	@(cd $(LIB_INSTALL_DIR); $(RANLIB) $(ITCL_LIB_FILE))
 	chmod 555 $(LIB_INSTALL_DIR)/$(ITCL_LIB_FILE)
 	@echo "Installing itclsh"
-	$(INSTALL_PROGRAM) itclsh $(BIN_INSTALL_DIR)/itclsh$(VERSION)
+	$(INSTALL_PROGRAM) itclsh$(EXEEXT) $(BIN_INSTALL_DIR)/itclsh$(VERSION)$(EXEEXT)
 	@echo "Installing itclConfig.sh"
 	@$(INSTALL_DATA) itclConfig.sh $(LIB_INSTALL_DIR)/itclConfig.sh
 

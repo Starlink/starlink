@@ -209,7 +209,7 @@ OBJS = itk_cmds.o itk_option.o itk_archetype.o itk_util.o
 SRCS = $(GENERIC_DIR)/itk_cmds.c $(GENERIC_DIR)/itk_option.c \
 	$(GENERIC_DIR)/itk_archetype.c $(GENERIC_DIR)/itk_util.c
 
-all: itkwish
+all: itkwish$(EXEEXT)
 
 # The following target is configured by autoconf to generate either
 # a shared library or non-shared library for [incr Tk].
@@ -219,7 +219,7 @@ all: itkwish
 	@MAKE_LIB@
 	$(RANLIB) $(ITK_LIB_FILE)
 
-itkwish: tkAppInit.o $(ITK_LIB_FILE)
+itkwish$(EXEEXT): tkAppInit.o $(ITK_LIB_FILE)
 	$(CC) @LD_FLAGS@ tkAppInit.o @ITK_BUILD_LIB_SPEC@ \
 		$(LIBS) $(LD_SEARCH_FLAGS) -o itkwish
 
@@ -227,7 +227,7 @@ itkwish: tkAppInit.o $(ITK_LIB_FILE)
 # "make test" won't work in the case where the compilation directory
 # isn't the same as the source directory.
 
-test: itkwish
+test: itkwish$(EXEEXT)
 	TCLLIBPATH="`pwd` $(TK_LIB_DIR) $(ITCL_LIB_DIR) $(TCL_LIB_DIR)"; export TCLLIBPATH; \
 	LD_LIBRARY_PATH=`pwd`:$(ITCL_LIB_DIR):$(TK_LIB_DIR):$(TCL_LIB_DIR):$(LD_LIBRARY_PATH); export LD_LIBRARY_PATH; \
 	TCL_LIBRARY=$(TCL_SRC_DIR)/library; export TCL_LIBRARY; \
@@ -239,14 +239,14 @@ test: itkwish
 
 install: install-binaries install-libraries install-man
 
-install-binaries: $(ITK_LIB_FILE) itkwish
+install-binaries: $(ITK_LIB_FILE) itkwish$(EXEEXT)
 	@$(MKINSTALLDIRS) $(LIB_INSTALL_DIR) $(BIN_INSTALL_DIR)
 	@echo "Installing $(ITK_LIB_FILE)"
 	@$(INSTALL_DATA) $(ITK_LIB_FILE) $(LIB_INSTALL_DIR)
 	@(cd $(LIB_INSTALL_DIR); $(RANLIB) $(ITK_LIB_FILE))
 	@chmod 555 $(LIB_INSTALL_DIR)/$(ITK_LIB_FILE)
 	@echo "Installing itkwish"
-	$(INSTALL_PROGRAM) itkwish $(BIN_INSTALL_DIR)/itkwish$(VERSION)
+	$(INSTALL_PROGRAM) itkwish$(EXEEXT) $(BIN_INSTALL_DIR)/itkwish$(VERSION)$(EXEEXT)
 	@echo "Installing itkConfig.sh"
 	@$(INSTALL_DATA) itkConfig.sh $(LIB_INSTALL_DIR)/itkConfig.sh
 

@@ -124,7 +124,7 @@ TEST_SAOBJS = tclTest.o tclTestObj.o tclUnixTest.o tclXtest.o tclXunixTestSA.o
 # If a link fails, purge the executable, as some systems leave invalid
 # executables around.
 #
-all: checkup RUNTIME tclXtest
+all: RUNTIME tclXtest
 
 static:	tcl.static tclXtest.static
 
@@ -173,7 +173,7 @@ checkup.done: tcl tcl.tlib tcl.tndx tclx.tcl buildidx.tcl autoload.tcl
 # unless we don't have them.
 #
 RUNTIME: tcl.tlib tcl.tndx tclx.tcl buildidx.tcl autoload.tcl help.tmp \
-         dltest.tmp checkup
+         dltest.tmp
 
 tcl.tlib: ${TLIB_SRCS} autoload.tcl
 	-rm -f tcl.tlib tcl.tndx
