@@ -42,6 +42,7 @@ EXTERN int		Tktest_Init _ANSI_ARGS_((Tcl_Interp *interp));
  *----------------------------------------------------------------------
  */
 
+Tcl_ObjCmdProc tclbgcmd;
 Tcl_ObjCmdProc NdfDrawpair;
 Tcl_ObjCmdProc NdfCentroffset;
 Tcl_ObjCmdProc CcdputsCmd;
@@ -159,10 +160,14 @@ Tcl_AppInit(interp)
     /*
      * Call Tcl_CreateCommand for application-specific commands, if
      * they weren't already created by the init procedures called above.
+     *
+     * Note that commands which could block for a significant amount of
+     * time are declared via the tclbgcmd mechanism.
      */
 
-    Tcl_CreateObjCommand( interp, "ndfdrawpair", NdfDrawpair, 
-                          (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL );
+    Tcl_CreateObjCommand( interp, "ndfdrawpair", tclbgcmd,
+                          (ClientData) NdfDrawpair, 
+                          (Tcl_CmdDeleteProc *) NULL );
     Tcl_CreateObjCommand( interp, "ndfcentroffset", NdfCentroffset,
                           (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL );
     Tcl_CreateObjCommand( interp, "ccdputs", CcdputsCmd,
