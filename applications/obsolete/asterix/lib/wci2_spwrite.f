@@ -108,9 +108,7 @@
 *  Result is null
       OARG = ADI__NULLID
 
-*  Report any errors
-      IF ( STATUS .NE. SAI__OK ) THEN
-        CALL AST_REXIT( 'WCI2_SPWRITE', STATUS )
-      END IF
+*  Invoke base method
+      CALL ADI_CALNXT( STATUS )
 
       END

@@ -99,8 +99,10 @@
 *  External References:
       EXTERNAL			ADI_REQPKG
       EXTERNAL                  WCI1_READ
+      EXTERNAL                  WCI2_READ
       EXTERNAL                  WCI1_WRITE
       EXTERNAL			WCI2_WRITFIT
+      EXTERNAL			WCI2_SPWRITE
 
 *  Local variables:
       INTEGER			DID			! Ignored identifier
@@ -116,11 +118,17 @@
         CALL ADI_REQPKG( 'wcs', STATUS )
 
 *    Define the methods
-        CALL ADI_DEFMTH( 'ReadWCS(_HDSfile)', WCI1_READ, DID, STATUS )
-        CALL ADI_DEFMTH( 'WriteWCS(_HDSfile,_,_Projection,'/
+        CALL ADI_DEFMTH( 'ReadWCS(_BinDS,_HDSfile)', WCI1_READ, DID,
+     :                   STATUS )
+        CALL ADI_DEFMTH( 'ReadWCS(_BinDS,_FITSfile)', WCI2_READ, DID,
+     :                   STATUS )
+        CALL ADI_DEFMTH( 'WriteWCS(_BinDS,_HDSfile,_,_Projection,'/
      :                   /'_CoordSystem)', WCI1_WRITE, DID, STATUS )
-        CALL ADI_DEFMTH( 'WriteWCS(_FITSfile,_,_Projection,'/
+        CALL ADI_DEFMTH( 'WriteWCS(_BinDS,_FITSfile,_,_Projection,'/
      :                   /'_CoordSystem)', WCI2_WRITFIT, DID, STATUS )
+
+        CALL ADI_DEFMTH( 'WriteWCS(_Spectrum,_FITSfile,_,_Projection,'/
+     :                   /'_CoordSystem)', WCI2_SPWRITE, DID, STATUS )
 
 *    Now initialised
 	WCI_INIT = .TRUE.
