@@ -2,7 +2,7 @@
 
 SUBDIRS = @subdirs@
 
-dist_bin_SCRIPTS = kaplibs_link kaplibs_link_adam
+dist_bin_SCRIPTS = kaplibs_link_adam
 dist_noinst_SCRIPTS = kaplibs_test_link 
 
 #  Define test programs
