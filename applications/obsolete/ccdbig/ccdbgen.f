@@ -220,7 +220,7 @@
       FOPEN = .FALSE.
 
 *  Start up CCDPACK.
-      CALL CCD1_START( 'CCDGENERATE', STATUS )
+      CALL CCD1_START( 'CCDBGEN', STATUS )
 
 *  Start an NDF context.
       CALL NDF_BEGIN
@@ -471,7 +471,7 @@ C            CALL NDF_HCRE( IDF, STATUS )
 *  If an error occurred, then report a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN
          CALL ERR_REP( 'CCDGEN_ERR',
-     :   'CCDGENERATE: Error creating CCDPACK test frames - tough',
+     :   'CCDBGEN: Error creating CCDPACK test frames - tough',
      :   STATUS )
       END IF
 
@@ -479,4 +479,4 @@ C            CALL NDF_HCRE( IDF, STATUS )
       CALL CCD1_END( STATUS )
 
       END
-* $Id: ccdbgen.f,v 1.4 1998/06/16 09:41:43 mbt Exp $
+* $Id: ccdbgen.f,v 1.5 1998/06/17 10:56:21 mbt Exp mbt $
