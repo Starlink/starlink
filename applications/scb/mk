@@ -119,7 +119,7 @@
 #     the host system.  These may freely be changed.  In each case 
 #     the default is shown in parentheses.
 #
-#        PERL_MOD_DIR ($INSTALL/lib/perl5)
+#        PERL_MOD_DIR ($INSTALL/Perl/lib/perl5/site_perl)
 #           Directory for installation of Perl modules.
 #
 #        SCB_SOURCES ($STARLINK/sources)
@@ -168,7 +168,7 @@
 #     particular machine (e.g. RANLIB on Sparc Solaris 2) should not be
 #     overridden.  In each case the default is shown in parentheses.
 #
-#        PERL5 (/usr/local/bin/perl)
+#        PERL5 ($STARLINK/Perl/bin/perl)
 #           Location of the Perl 5 binary.
 #
 #        AR_IN (ar -r)
