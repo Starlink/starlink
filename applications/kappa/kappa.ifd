@@ -2711,6 +2711,53 @@ package kappa {
 
    executable kapview_mon {
 
+      action ardplot {
+         alias {ardp(lot)}
+
+         helplib {$KAPPA_HELP}
+
+         parameter ardfile {
+            position 1
+            type FILENAME
+            access READ
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            prompt {ARD file}
+            default ardfile.dat
+            helpkey *
+         }
+
+         parameter device {
+            position 2
+            ptype DEVICE
+            vpath GLOBAL PROMPT
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.GRAPHICS_DEVICE
+            prompt {Name of graphics device}
+            helpkey *
+         }
+
+         parameter regval {
+            position 3
+            type _INTEGER
+            prompt {Index of the region to plot (0 = all)}
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default 0
+            helpkey *
+         }
+
+         parameter style {
+            type LITERAL
+            ppath CURRENT DEFAULT
+            vpath CURRENT DEFAULT
+            prompt {Plotting style}
+            helpkey *
+            default !
+         }
+
+      }
+
       action colcomp {
 
          alias {colcomp}
@@ -8444,6 +8491,40 @@ package kappa {
 
       action creframe {
          alias {cref(rame)}
+
+         parameter like {
+            type NDF
+            access READ
+            vpath DEFAULT
+            ppath GLOBAL DEFAULT
+            association <-GLOBAL.DATA_ARRAY
+            prompt {Template NDF (null for none)}
+            helpkey *
+            default !
+         }
+
+         parameter logfile {
+            type FILENAME
+            vpath DEFAULT
+            ppath DEFAULT
+            prompt {Log file for results}
+            default !
+            helpkey *
+         }
+
+         parameter out {
+            position 1
+            type NDF
+            access WRITE
+            vpath PROMPT
+            association ->GLOBAL.DATA_ARRAY
+            prompt {NDF to contain surface}
+            helpkey *
+         }
+
+
+
+
 
          parameter xdim {
             position 1
