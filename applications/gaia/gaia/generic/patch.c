@@ -497,9 +497,9 @@ void *copyImagetoWork( enum ImageDataType type,
                        void *imagePtr, int swap,
                        int nx, int x1, int y1, int x2, int y2)
 {
-  signed char *scPtr, *scArr;
-  short *sPtr, *sArr;
-  int *iPtr, *iArr;
+  unsigned char *scPtr, *scArr;
+  unsigned short *sPtr, *sArr;
+  unsigned int *iPtr, *iArr;
   void *sectPtr;
   int i, j;
   int size;

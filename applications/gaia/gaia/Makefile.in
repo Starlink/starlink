@@ -172,7 +172,7 @@ $(GAIAMON): normallib gaiaMon.c gaiaMon.ifc
 	echo "linking \"$(GAIAMON)\"..."
 	$(ALINK) gaiaMon.c -o $(GAIAMON) $(LOCAL_LIBRARY) $(ADDLIBS) \
 	   -L$(STAR_LIB) $(LD_SEARCH_FLAGS) \
-	   `fio_link` `ard_link_adam` `ndf_link_adam` `cat_link`
+	   `fio_link` `ard_link_adam` `ndf_link_adam` `cat_link_adam`
 	for f in gaiaMon $(IFC_FILES) ""; do \
 	   if test -f "$${f}.ifl"; then \
 	      $(COMPIFL) $$f; \
@@ -208,11 +208,9 @@ install-bin:
 	$(INSTALL) $(DEMO_TCL) $(BINDIR)
 	$(INSTALL) $(GAIAMON) $(BINDIR)
 	for f in gaiaMon $(GAIA_TASKS) ""; do \
-	   (cd bin; \
-	   if test -f "$${f}.ifc"; then \
-	      $(INSTALL_DATA) $${f}.ifc $(BINDIR)/; \
+	   if test -f bin/"$${f}.ifc"; then \
+	      $(INSTALL_DATA) bin/"$${f}.ifc" $(BINDIR)/; \
 	   else :; fi;\
-	   );\
 	done
 	for f in $(GAIA_TASKS); do \
 	    (cd $(BINDIR); \

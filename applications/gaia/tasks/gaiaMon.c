@@ -64,12 +64,12 @@
 /*  ====================================== */
 /*  Generate Fortran stubs for any actions */
 /*  ====================================== */
-GENERATE_FORTRANCMD( ardstatCmd,  ardstat );
-GENERATE_FORTRANCMD( asc2tabCmd,  asc2tab );
-GENERATE_FORTRANCMD( autocropCmd, autocrop );
-GENERATE_FORTRANCMD( cat2tabCmd,  cat2tab );
-GENERATE_FORTRANCMD( tab2ascCmd,  tab2asc );
-GENERATE_FORTRANCMD( tab2catCmd,  tab2cat );
+GENERATE_FORTRANCMD( ardstatCmd,  ardstat )
+GENERATE_FORTRANCMD( asc2tabCmd,  asc2tab )
+GENERATE_FORTRANCMD( autocropCmd, autocrop )
+GENERATE_FORTRANCMD( cat2tabCmd,  cat2tab )
+GENERATE_FORTRANCMD( tab2ascCmd,  tab2asc )
+GENERATE_FORTRANCMD( tab2catCmd,  tab2cat )
 
 /*  Define TASK subroutine that returns name */
 extern void F77_EXTERNAL_NAME( task_get_name )(
@@ -96,8 +96,8 @@ static void taskGetName( char *name, int name_length, int *status )
 /*  Define the list of actions that we can invoke. */
 /*  ==============================================  */
 static struct actionStruct {
-    char const *name;              // Name of action
-    void (*fptr)( int *status );   // Ptr to invoking function
+    char const *name;              /* Name of action */
+    void (*fptr)( int *status );   /* Ptr to invoking function */
 } actions_[] = {
     { "ardstat",  ardstatCmd  },
     { "asc2tab",  asc2tabCmd  },
