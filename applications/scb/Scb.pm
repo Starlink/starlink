@@ -50,7 +50,7 @@ require Exporter;
 #  Names of routines and variables defined here to be exported.
 
 @EXPORT = qw/tarxf popd pushd starpack rmrf parsetag
-             $incdir $srcdir $bindir 
+             $incdir $srcdir $bindir $scb_tmpdir $scbindex_tmpdir
              $mimetypes_file
              $htxserver
              $func_indexfile $file_indexfile $taskfile
@@ -76,18 +76,26 @@ use Cwd;
 #
 #  Note that the script is written in such a way as to work even before 
 #  such replacements have taken place.
+#
+#  Some of the variables take the values of corresponding environment
+#  variable, if they exist.
 
 #  Starlink source tree directory locations.
 
 my $STARLINK = "/star"; 
-my $SOURCES_DIR = "$STARLINK/sources"; 
+my $SCB_SOURCES = "$STARLINK/sources"; 
 
 $star = "$STARLINK";
-$srcdir = "$SOURCES_DIR";
+$srcdir = $ENV{'SCB_SOURCES'} || "$SCB_SOURCES";
 $bindir = "$star/bin";
 $incdir = "$star/include";
-$srcdir = "/local/star/src/from-ussc";
-$srcdir = "/local/star/sources";
+
+#  Temporary directory locations.
+
+my $SCB_BROWSER_TMP = "/usr/tmp/scb";
+my $SCB_INDEXER_TMP = "/usr/tmp/scbindex";
+$scb_tmpdir      = $ENV{'SCB_BROWSER_TMP'} || "$SCB_BROWSER_TMP";
+$scbindex_tmpdir = $ENV{'SCB_INDEXER_TMP'} || "$SCB_INDEXER_TMP";
 
 #  System file locations.
 
@@ -101,8 +109,8 @@ $htxserver = "$HTXSERVER_URL";
 
 #  Index file locations.
 
-my $INDEX_DIR = "";
-$indexdir = "$INDEX_DIR" || cwd;
+my $SCB_INDEX = cwd;
+$indexdir = $ENV{'SCB_INDEX'} || "$SCB_INDEX" || cwd;
 $func_indexfile = "$indexdir/func";
 $file_indexfile = "$indexdir/file";
 $taskfile       = "$indexdir/tasks";
@@ -127,6 +135,7 @@ use FortranTag;
             c   => \&CTag::tag,
             h   => \&CTag::tag,
             C   => \&CTag::tag,
+            cc  => \&CTag::tag,
             cpp => \&CTag::tag,
             cxx => \&CTag::tag,
 
@@ -195,6 +204,10 @@ sub tarxf {
 #        List of files successfully extracted.
 
 #  Notes:
+#     To accomodate differences which exist between the output of tar 
+#     on different platforms with the 'xv' flags, the list of extracted
+#     files is generated in a separate step from doing the extraction
+#     itself.  This may be somewhat wasteful.
 
 #  Authors:
 #     MBT: Mark Taylor (IoA, Starlink)
@@ -226,30 +239,26 @@ sub tarxf {
 
 #  Unpack the tar file, reading the list of file names into a list.
 
-   my $command = "$filter{$ext} $tarfile | $tar xvf - " . join ' ', @files;
-   my @extracted;
-   open TAR, "$command|" or error "$command failed\n";
-   while (<TAR>) {
-      chomp;
-      push @extracted, $_;
+   my $command = "$filter{$ext} $tarfile | $tar xf - " . join ' ', @files;
+   system $command and error "$command failed: $!\n";
+
+#  In list context, generate and return list of regular files extracted.
+#  Otherwise, return the null value.
+
+   if (wantarray) {
+      my @extracted;
+      $command = "$filter{$ext} $tarfile | $tar tf - " . join ' ', @files;
+      open TAR, "$command|" or error "$command failed: $!\n";
+      while (<TAR>) {
+         chomp;
+         push @extracted, $_ if (-f $_);
+      }
+      close TAR             or error "$command failed: $!\n";
+      return @extracted;
    }
-   close TAR             or error "Error executing tar\n";
-
-#  Check we got as many files as were requested (unless none were requested).
-
-   error "Failed to extract all requested files\n"
-      if (@files && @files != @extracted);
-
-#  Eliminate any directories from the list.
-
-   my ($file, @fextracted);
-   while ($file = shift @extracted) {
-      push @fextracted, $file unless (-d $file);
+   else {
+      return undef;
    }
-
-#  Return list.
-
-   return @fextracted;
 }
 
 
@@ -380,7 +389,7 @@ sub rmrf {
 #  the arguments).
 
    my @cmd = ("/bin/rm", "-rf", "$dir");
-   my $cmd = join '', @cmd;
+   my $cmd = join ' ', @cmd;
 
 #  Form a very cautious opinion of whether it is safe to proceed.
 
@@ -393,7 +402,7 @@ sub rmrf {
 #  Execute the command or exit with error message.
 
    if ($ok) {
-      system (@cmd) and die "Error in $cmd: $?\n";
+      system (@cmd) and die "Error in $cmd: $!\n";
    }
    else {
       die "Internal: command $cmd may be dangerous - see Scb::rmrf\n";
