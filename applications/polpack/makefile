@@ -455,9 +455,9 @@ PLATFORM_C =
 
 ADDOBJS = tclAdam.o tkGwm.o tkGwmPrint.o tkGwmCanv.o tclNbs.o $(SYSOBJS)
 
-#  List of additional object libraries.
+#  List of TK/TCL object libraries.
 
-ADDLIBS = -ltk$(TK_VERS) -ltcl$(TCL_VERS) 
+TCLLIBS = -ltk$(TK_VERS) -ltcl$(TCL_VERS) 
 
 #  List of applications/tasks in monolith.
 
@@ -644,7 +644,7 @@ libpolpack.a: $(O_SUB2)
 
 $(MONOLITH): $(MONO_OBJECT) $(OBJECT_LIBRARIES) $(LINK_SCRIPT)
 	$(ALINK) $(MONO_OBJECT) -o $(MONOLITH) $(OBJECT_LIBRARIES) \
-            -L/star-test/lib -L$(KAPPA_SOURCE) $(ADDLIBS) `./$(LINK_SCRIPT)` \
+            -L/star-test/lib -L$(KAPPA_SOURCE) $(TCLLIBS) `./$(LINK_SCRIPT)` \
             $(LDFLAGS)
 
 
