@@ -673,14 +673,14 @@ GENSRC = ccg1_add.gen ccg1_bext.gen ccg1_bl.gen ccg1_bmd1.gen \
  ccg1_wtm4.gen ccg1_smr1.gen ccg1_smd2.gen ccg1_smr2.gen \
  ccg1_smd3.gen ccg1_smr3.gen ccg1_fmr1.gen ccg1_fmr2.gen \
  ccg1_fmr3.gen ccg1_fmd1.gen ccg1_fmd2.gen ccg1_fmd3.gen \
- ccg1_kthx.gen
+ ccg1_kthx.gen kpg1_asli.gen
 
 #  Routines which may be real or double precision
 GENRDSRC = ccg1_ffrj.grd kpg1_bloc.grd ccg1_axin.grd \
  kpg1_mdet.grd kpg1_litn.grd kpg1_trbo.grd kpg1_trpi.grd \
  ccg1_irhg.grd ccg1_irhl.grd ccg1_cmpr.grd ccg1_crdt.grd \
  ccg1_mvdt.grd ccg1_ptbd.grd ccg1_qntl.grd ccg1_skys.grd \
- kpg1_ludc.grd ccg1_evar.grd
+ kpg1_ludc.grd ccg1_evar.grd kpg1_asbo.grd kpg1_aspi.grd
 
 #  Routines which may be logical,real,double,integer or character (storage)
 GENLRDICSRC = ccg1_fch0.glrdic ccg1_sto0.glrdic ccg1_fch1.glrdic \
@@ -836,7 +836,8 @@ INCLUDE_LINKS = $(EXTERNAL_INCLUDES) CCD1_FDCM CCD1_FITCM CCD1_MEMCM \
 
 #  Rules to set up links to locate each of the above include files.
 
-AST_PAR:	$(STAR_INC)/ast_par;      $(LINK) $? $@
+# AST_PAR:	$(STAR_INC)/ast_par;      $(LINK) $? $@
+AST_PAR:	$(STARLINK)/local/include/ast_par;      $(LINK) $? $@
 CCD1_FDCM:	ccd1_fdcm;	          $(LINK) $? $@
 CCD1_FITCM:	ccd1_fitcm;	          $(LINK) $? $@
 CCD1_MEMCM:	ccd1_memcm;	          $(LINK) $? $@
