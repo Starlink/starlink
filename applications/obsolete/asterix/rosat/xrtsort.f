@@ -142,6 +142,10 @@
 
       IF ( STATUS .NE. SAI__OK ) GOTO 999
 
+*   Create spatial masks
+      CALL XRTSORT_CRE_MASK(HEAD,SRT,BSRT,SDIM,NRBIN,
+     :                      MDIM,MRES,SMPTR,BMPTR,STATUS)
+
 *  Sorting to a binned data set ?
       IF ( SRT.DTYPE .EQ. 'BinDS') THEN
 
@@ -178,9 +182,6 @@
             GOTO 999
          ENDIF
 *
-*   Create spatial masks
-         CALL XRTSORT_CRE_MASK(HEAD,SRT,BSRT,SDIM,NRBIN,
-     :                      MDIM,MRES,SMPTR,BMPTR,STATUS)
 
 *
          CALL XRTSORT_SORT_BIN(HEAD, SRT, BSRT, SDIM(1), SDIM(2),
@@ -1065,7 +1066,8 @@ C     CALL BDA_ANNUL(LIV, STATUS)
 
             CALL MSG_PRNT('The following header files are present:')
             DO LP=1,NFILES
-              CALL MSG_SETC('FILE', FILE(LP))
+              CALL STR_ROOT(FILE(LP),RTNAME)
+              CALL MSG_SETC('FILE', RTNAME)
               CALL MSG_PRNT(' ^FILE')
             ENDDO
             CALL MSG_BLNK()
@@ -1322,7 +1324,8 @@ C     CALL BDA_ANNUL(LIV, STATUS)
       IF (STATUS .NE. SAI__OK) RETURN
 *
 *  if output contains an image - create mask of same dimensions
-      IF (SDIM(1).GT.1.AND.SDIM(2).GT.1.AND.NRBIN.EQ.1) THEN
+      IF (SRT.DTYPE.EQ.'BinDS'.AND.
+     :         SDIM(1).GT.1.AND.SDIM(2).GT.1.AND.NRBIN.EQ.1) THEN
         MDIM(1)=SDIM(1)
         MDIM(2)=SDIM(2)
         PTOD = HEAD.PIXEL/3600.
