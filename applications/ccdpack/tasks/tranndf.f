@@ -346,7 +346,6 @@
       INTEGER IUBND( NDF__MXDIM ) ! Upper bounds of the input NDF
       INTEGER IWCS               ! Pointer to the WCS extension of the input NDF
       INTEGER JREG              ! Index of the CCD_REG frame in the input NDF
-      INTEGER JGEN              ! Index of the CCD_GEN frame in the input NDF
       INTEGER JPIX              ! Index of the PIXEL frame in the output NDF
       INTEGER MAP                ! Mapping to use
       INTEGER NBAD               ! Number of bad elements in output array
@@ -450,7 +449,7 @@
 
       IF( .NOT. USEWCS ) THEN
         
-*  The user wants to read data with the old TRN structures, shame on them!
+*  The user wants to read data with the old TRN structures.
 
 *  Does the user want transformation structures to be located in the NDF
 *  extensions or do they want to supply a single structure to transform
@@ -559,7 +558,7 @@
 *  stored in the WCS extention of the NDF.
 
 *  First check that there is an existing WCS FrameSet
-            CALL NDF_STATE(IDIN, 'WCS', SWCS, STATUS)
+            CALL NDF_STATE( IDIN, 'WCS', SWCS, STATUS )
             IF( .NOT. SWCS ) THEN
                STATUS = SAI__ERROR
                CALL NDF_MSG( 'NDFNAME', IDIN )
@@ -570,18 +569,17 @@
             ENDIF  
             
 *  It appears we have a WCS component, get a pointer to the current FrameSet
-            CALL CCD1_GTWCS(IDIN, IWCS, STATUS)
+            CALL CCD1_GTWCS( IDIN, IWCS, STATUS )
             MAP = AST_GETMAPPING( IWCS, 2, AST__CURRENT, STATUS )
             MAP = AST_SIMPLIFY( MAP, STATUS )
             FRCUR = AST_GETFRAME( IWCS, AST__CURRENT, STATUS )
 
 *  Get the index of the current frame for future use 
-            CFRAME = AST_GETI(IWCS, 'Current', STATUS)
+            CFRAME = AST_GETI( IWCS, 'Current', STATUS )
                                      
          ELSE
 
-*  The user is back in the dark ages and insists that they want
-*  to use TRN structures, lets humour them.
+*  The user wishes to use TRANSFORM structures.
             IF ( INEXT ) THEN
             
 *  Get the transformation associated with this NDF. This should be
@@ -649,7 +647,6 @@
                               
 *  Make sure the user has actually run REGISTER, if not warn them
                CALL CCD1_FRDM( IWCS, 'CCD_REG', JREG, STATUS )
-               CALL CCD1_FRDM( IWCS, 'CCD_GEN', JGEN, STATUS )
               
                IF( JREG .EQ. 0 ) THEN
                
@@ -665,7 +662,7 @@
 
 *  Tell the user which co-ordinate domain we'll be transforming too
                CALL MSG_SETC('CURRENT', 
-     :                       AST_GETC(FRCUR, 'Domain', STATUS))
+     :                       AST_GETC( FRCUR, 'Domain', STATUS ) )
                CALL CCD1_MSG(' ','  The current AST Frame has '//
      :'domain ^CURRENT', STATUS )               
            ENDIF
@@ -766,19 +763,9 @@
             ASTART( IAXIS ) = DBLE( ILBND( IAXIS ) )
             AEND( IAXIS ) = DBLE( IUBND( IAXIS ) )
          END DO
-
-*  Use test points at the extremes and midpoints of each axis to obtain
-*  an estimate of the extent of the output NDF's coordinates.  This
-*  assumes that the transformation does not move the innards of the
-*  input array to the outside of the output array.
          IF ( USEWCS ) THEN
-         
-*  We're using AST FrameSets
-*
-*            CALL CCG1_ASBOD( NVIN, ASTART, AEND, MAP, NVOUT, DDLBND,
-*     :                       DDUBND, STATUS ) 
-*            
-*  Replaced CCG1_ASBOx with AST_MAPBOX, does the same job
+
+*  We're using AST framesets.
             DO IAXIS = 1, NVIN
                CALL AST_MAPBOX( MAP, ASTART, AEND, .TRUE., IAXIS,
      :                          DDLBND(IAXIS), DDUBND(IAXIS), DDXL, 
@@ -1523,45 +1510,38 @@
 *  A reminder of the various pointers and indices we have to play with
 *       CFRAME  Index of the alignment frame
 *       JREG    Index of CCD_REG frame
-*       JGEN    Index of CCD_GEN frame
 *       JPIX    Index of PIXEL frame
 *       FRCUR   Pointer to alignment frame
 *       IWCS    Pointer to input AST FrameSet
 *       OWCS    Pointer to output AST FrameSet
 
 *  Get default WCS component (just GRID, PIXEL, AXIS) for the output NDF.
-                CALL CCD1_GTWCS( IDOUT, OWCS, STATUS )
-                CALL AST_SETI( IWCS, 'Current', CFRAME, STATUS )
+            CALL CCD1_GTWCS( IDOUT, OWCS, STATUS )
+            CALL AST_SETI( IWCS, 'Current', CFRAME, STATUS )
     
 *  Remove GRID, PIXEL, AXIS frames from original frameset since they're
-*  out of date now...
-                CALL CCD1_DMPRG( IWCS, 'PIXEL', .FALSE., 0, STATUS )
-                CALL CCD1_DMPRG( IWCS, 'AXIS', .FALSE., 0, STATUS )
-                CALL CCD1_DMPRG( IWCS, 'GRID', .FALSE., 0, STATUS )
+*  out of date now.  This just leaves the non-automatic frames of the 
+*  input WCS component.
+            CALL CCD1_DMPRG( IWCS, 'PIXEL', .FALSE., 0, STATUS )
+            CALL CCD1_DMPRG( IWCS, 'AXIS', .FALSE., 0, STATUS )
+            CALL CCD1_DMPRG( IWCS, 'GRID', .FALSE., 0, STATUS )
     
-*  We now just have the non-automatic frames of the input WCS component.
-*  This will contain the Current frame (which may or may not be CCD_REG)
-*  and an indeterminate number of other ones which we know nothing about,
-*  perhaps including CCD_GEN.  Now attach these to the default frameset
-*  generated by CCD1_GTWCS, using the fact that the PIXEL domain of that
-*  should be Unit mapped to the Current frame of the old one.
-
 *  Lets find out which frame contains the PIXEL domain (its going to be
 *  frame 2, but we may as well do it properly) in the output WCS frameset.
-                NFRM = AST_GETI( OWCS, 'Nframe', STATUS )
-                DO K = 1, NFRM
-                   FRM = AST_GETFRAME( OWCS, K, STATUS )
-                   IF( AST_GETC( FRM, 'Domain', STATUS ) 
-     :                 .EQ. 'PIXEL' ) PFRAME = K
-                END DO
+            NFRM = AST_GETI( OWCS, 'Nframe', STATUS )
+            DO K = 1, NFRM
+               FRM = AST_GETFRAME( OWCS, K, STATUS )
+               IF( AST_GETC( FRM, 'Domain', STATUS ) 
+     :             .EQ. 'PIXEL' ) PFRAME = K
+            END DO
                 
 *  And add the remaining bits of IWCS to OWCS
-                CALL AST_ADDFRAME( OWCS, PFRAME, 
-     :                             AST_UNITMAP( NDIMI, ' ', STATUS ),
-     :                             IWCS, STATUS )
+            CALL AST_ADDFRAME( OWCS, PFRAME, 
+     :                         AST_UNITMAP( NDIMI, ' ', STATUS ),
+     :                         IWCS, STATUS )
     
 *  Write it out.
-                CALL NDF_PTWCS( OWCS, IDOUT, STATUS )
+            CALL NDF_PTWCS( OWCS, IDOUT, STATUS )
             
          END IF
 
