@@ -232,9 +232,6 @@
 
 #-
 
-source_icon();
-exit;
-
 #  Print introductory message.
 $announce = "Star2HTML V@PACKAGE_VERSION@";
 $underline = $announce;
