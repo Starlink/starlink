@@ -476,7 +476,7 @@ itcl::class gaia::GaiaPositions {
 
          #  Get "id ra dec x y" positions from new file and read into
          #  table.
-         if { $outfile != {} } {
+         if { $outfile != {} && $outfile != -1 } {
             $itk_component(table) read_positions $outfile
 
             #  If X and Y or RA/Dec where missing then project them

@@ -12,7 +12,7 @@
 #  Description:
 #     This class opens a text file and interprets its contents
 #     according to a series of configurable rules. The configuration
-#     covers what columns names to use, what delimeters are used and
+#     covers what columns names to use, what delimiters are used and
 #     which columns are coordinates.
 #
 #     The result is a new file which has either the format of a TAB
@@ -98,6 +98,12 @@ itcl::class gaia::GaiaTextImport {
          -command [code $this accept] \
          -accelerator {Control-x}
       bind $w_ <Control-x> [code $this accept]
+
+      #  Add window help.
+      global gaia_dir
+      add_help_button $gaia_dir/GaiaTextImport.hlp "On Window..."
+      add_short_help $itk_component(menubar).help \
+         {Help menu: get some help about this window}
 
       #  Name of input file.
       if { $itk_option(-show_infile) } {
@@ -214,7 +220,7 @@ itcl::class gaia::GaiaTextImport {
    #  Set defaults for widget states.
    protected method set_defaults_ {} {
       set values_($this,separated) 1
-      set values_($this,delimeter) ","
+      set values_($this,delimiter) ","
       set values_($this,comment) "\#"
       set values_($this,fixwidths) {10 20}
       set values_($this,skip) 0
@@ -239,7 +245,7 @@ itcl::class gaia::GaiaTextImport {
    public method activate {} {
       wm deiconify $w_
       tkwait variable [scope itk_option(-outfile)]
-      return "$itk_option(-outfile) $raout_ $decout_ $xout_ $yout_"
+      return [list $itk_option(-outfile) $raout_ $decout_ $xout_ $yout_]
    }
 
    #  Reset window to defaults.
@@ -253,10 +259,10 @@ itcl::class gaia::GaiaTextImport {
    protected method add_struct_controls_ {parent} {
       set lwidth 12
 
-      #  Delimetered or fixed format.
+      #  Delimitered or fixed format.
       itk_component add separated {
          StarLabelCheck $parent.separated \
-            -text "Use delimeter (otherwise fixed width):" \
+            -text "Use delimiter (otherwise fixed width):" \
             -onvalue 1 \
             -offvalue 0 \
             -variable [scope values_($this,separated)] \
@@ -264,27 +270,27 @@ itcl::class gaia::GaiaTextImport {
       }
       pack $itk_component(separated) -side top -fill x -pady 3 -padx 3
       add_short_help $itk_component(separated) \
-         {Use a delimeter between fields, fixed width otherwise}
+         {Use a delimiter between fields, fixed width otherwise}
 
-      #  Set the delimeter.
-      itk_component add delimeter {
-         LabelMenu $parent.delimeter \
+      #  Set the delimiter.
+      itk_component add delimiter {
+         LabelMenu $parent.delimiter \
             -labelwidth $lwidth \
-            -text "Delimeter:" \
-            -variable [scope values_($this,delimeter)]
+            -text "Delimiter:" \
+            -variable [scope values_($this,delimiter)]
       }
-      pack $itk_component(delimeter) -side top -fill x -ipadx 1m -ipady 1m
-      add_short_help $itk_component(delimeter) \
-         {The field delimeter character(s)}
+      pack $itk_component(delimiter) -side top -fill x -ipadx 1m -ipady 1m
+      add_short_help $itk_component(delimiter) \
+         {The field delimiter character(s)}
       foreach {sname value} {space " " comma "," tab "\t" semicolon ";"} {
-         $itk_component(delimeter) add \
+         $itk_component(delimiter) add \
             -label $sname \
             -value $value \
-            -command [code $this set_delimeter_ $value]
+            -command [code $this set_delimiter_ $value]
       }
-      set_delimeter_ { }
+      set_delimiter_ { }
 
-      #  Comment delimeter.
+      #  Comment delimiter.
       itk_component add comment {
          LabelEntry $parent.comment \
             -labelwidth $lwidth \
@@ -320,7 +326,7 @@ itcl::class gaia::GaiaTextImport {
       }
       pack $itk_component(fixwidths) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(fixwidths) \
-         {Postions of field separation: position1 position2 ... }
+         {Positions of field separation: position1 position2 ... }
 
       #  Interactive tab positioning widget.
       itk_component add tabstop {
@@ -335,16 +341,16 @@ itcl::class gaia::GaiaTextImport {
    }
 
 
-   #  Toggle the state of the delimeter fields.
+   #  Toggle the state of the delimiter fields.
    protected method set_separated_ {} {
       if { $values_($this,separated) } {
-         #  Using delimeter
-         $itk_component(delimeter) configure -state normal
+         #  Using delimiter
+         $itk_component(delimiter) configure -state normal
          $itk_component(fixwidths) configure -state disabled
          $itk_component(tabstop) configure -state disabled
       } else {
          #  Using fixed format
-         $itk_component(delimeter) configure -state disabled
+         $itk_component(delimiter) configure -state disabled
          $itk_component(fixwidths) configure -state normal
          $itk_component(tabstop) configure -state normal
       }
@@ -360,9 +366,9 @@ itcl::class gaia::GaiaTextImport {
       }
    }
 
-   #  Set the delimeter symbol.
-   protected method set_delimeter_ {value} {
-      set values_($this,delimeter) $value
+   #  Set the delimiter symbol.
+   protected method set_delimiter_ {value} {
+      set values_($this,delimiter) $value
    }
 
    #  Heading names and types controls.
@@ -531,14 +537,14 @@ itcl::class gaia::GaiaTextImport {
    }
 
    #  Run the decode cycle. Opens input file, reads first line and
-   #  decodes it (to count words), if using a delimeter. Otherwise
+   #  decodes it (to count words), if using a delimiter. Otherwise
    #  just counts the fixed width words.
    protected method process_ {args} {
 
       #  Remove old controls.
       clear_headings_
 
-      #  If using a delimeter.
+      #  If using a delimiter.
       if { $values_($this,separated) } {
 
          #  Open the file.
@@ -580,7 +586,7 @@ itcl::class gaia::GaiaTextImport {
       if { $line != {} } {
          set ncol 0
          while { 1 } {
-            set word [ctoken line $values_($this,delimeter)]
+            set word [ctoken line $values_($this,delimiter)]
             if { $word != {} } {
                incr ncol
                lappend wordlist_ $word
@@ -610,7 +616,7 @@ itcl::class gaia::GaiaTextImport {
 
    #  Save the converted contents to a TAB catalogue.
    protected method save_file_ {args} {
-      if { $itk_option(-outfile) != {} } {
+      if { $itk_option(-outfile) != {} && $itk_option(-infile) != {} } {
          set outid [::open $itk_option(-outfile) w]
          set inid [::open $itk_option(-infile) r]
          set raout_ -1
@@ -793,7 +799,11 @@ itcl::class gaia::GaiaTextImport {
          ::close $inid
          ::close $outid
       } else {
-         error_dialog "You must supply an output file name"
+         if { $itk_option(-infile) == {} } {
+            error_dialog "You must supply an input file name"
+         } else {
+            error_dialog "You must supply an output file name"
+         }
          return 0
       }
       return 1
