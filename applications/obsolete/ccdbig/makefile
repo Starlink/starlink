@@ -6,14 +6,14 @@
 #     Application makefile Mk V
 #
 #  Purpose:
-#     Build and install the CCDPACK package.
+#     Build and install the CCDBIG package.
 #
 #  Type of Module:
 #     Description file for the make utility.
 #
 #  Description:
 #     This description file is used by the make utility to build the
-#     CCDPACK package from the distributed source files, to install
+#     CCDBIG package from the distributed source files, to install
 #     the resulting system for use, and to perform other housekeeping
 #     tasks.
 #
@@ -107,14 +107,18 @@
 #           to significant reduction in the sizes of binaries.
 #
 #  External Dependencies:
-#     The CCDPACK package depends on the following other Starlink
+#     The CCDBIG package depends on the following other Starlink
 #     packages which must previously have been installed into the
 #     appropriate sub-directories of the $STARLINK directory (/star is
 #     used if the environment variable STARLINK is not defined).
 #
-#        The following ADAM UNIX software libraries and their
-#        dependencies.
-#           AGI ARD CHR FIO GRP IDI NDF PGPLOT PRM PSX TRN PDA
+#        The following Starlink packages.
+#           CCDPACK KAPPA
+#        The following ADAM UNIX software libraries and their dependencies.
+#           CHR FIO NDF PRM PDA
+# #        The following ADAM UNIX software libraries and their
+# #        dependencies.
+# #           AGI ARD CHR FIO GRP IDI NDF PGPLOT PRM PSX TRN PDA
 #        HTX
 #           The hypertext linker.
 #        GENERIC
@@ -137,6 +141,7 @@
 #     BLY: M.J.Bly (Starlink, RAL)
 #     AJC: A.J.Chipperfield (Starlink, RAL)
 #     PDRAPER: P.W. Draper (Starlink, Durham University)
+#     MBT: M.B.Taylor (Starlink, Cambridge University)
 #     {enter_new_authors_here}
 #
 #  History:
@@ -225,6 +230,8 @@
 #        for supporting foreign data access.
 #     04-JUL-1997 (PDRAPER):
 #        Added targets and other changes for IRAF interoperability.
+#     16-JUN-1998 (MBT):
+#        Modified for use with CCDBIG.
 #     {enter_further_changes_here}
 #
 #  Bugs:
@@ -327,7 +334,6 @@ STAR_HELP = $(STARLINK)/help
 STAR_INC = $(STARLINK)/include
 STAR_LIB = $(STARLINK)/lib
 STAR_SHARE = $(STARLINK)/share
-STAR_IRAF = $(STARLINK)/iraf
 
 #  Pathname of the root directory beneath which the built files for
 #  this package should be installed for use.  This defaults to the
@@ -391,10 +397,10 @@ CP = cp -p
 
 #  Name of the package as specified in documentation
 #  The value is used in messages from make to the user.
-PACK_NAME = CCDPACK
+PACK_NAME = CCDBIG
 
 #  Prefix for the package in lowercase as used in filenames etc.
-PKG_NAME = ccdpack
+PKG_NAME = ccdbig
 
 #  Prefix for the package in uppercase as used in include file links.
 PKG_LINK = CCD1
