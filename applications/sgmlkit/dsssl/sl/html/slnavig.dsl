@@ -619,9 +619,9 @@ generated HTML documents.
                                                    "#"
                                                    (if sect-id
                                                        (string-append
-                                                           "xref__IDINDEX_"
-                                                           sect-id)
-                                                       (idindex-frag-id)))))
+                                                           idindex-frag-id
+							   "_" sect-id)
+                                                       idindex-frag-id))))
             (literal "[ID index]"))))
 
 ;; Generates a standard navigation bar.
