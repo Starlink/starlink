@@ -142,7 +142,7 @@
 *        filename; the original name has the "swp" removed and "silo"
 *        is prefixed.  So for example, swp25000.silo would become
 *        an NDF called silo25000.  No FITS extension is created.
-*     fits2ndf "abc.fit,def.fts" "fgh,ijk" fmtcnv="F,T" noproexs
+*     fits2ndf "abc.fit,def.fts" "fgh,ijk" fmtcnv="F,T" noproexts
 *        This converts the FITS files abc.fit and def.fts to the NDFs
 *        called fgh and ijk respectively.  Format conversion is applied
 *        to abc.fit but not to def.fts.  FITS extensions are created
