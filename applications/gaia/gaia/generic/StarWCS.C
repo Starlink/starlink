@@ -507,24 +507,44 @@ double StarWCS::epoch() const
 //  Convert the given x,y image coordinates to world coordinates, if
 //  possible, and write the result to the given buffer as a list of
 //  the form "RA DEC EQUINOX".
-//  If no conversion can be done, buf will contain an empty list.
+//  If no conversion can be done, buf will contain an empty list. 
+//  This (compatibility) version requires that the x,y position is on
+//  the image. 
 //
 //  If hms_flag is 1, the result is always in H:M:S D:M:S, otherwise
 //  the result is returned in decimal degrees.
 //
-//  XXX The behaviour with hms_flag may not be the same after moving to AST.
+char* StarWCS::pix2wcs( double x, double y, char* buf, int bufsz, 
+                        int hms_flag ) const
+{
+    pix2wcs( x, y, 0, buf, bufsz, hms_flag );
+    return buf;
+}
+
 //
-char* StarWCS::pix2wcs(double x, double y, char* buf, int bufsz, int hms_flag) const
+//  Convert the given x,y image coordinates to world coordinates, if
+//  possible, and write the result to the given buffer as a list of
+//  the form "RA DEC EQUINOX".
+//  If no conversion can be done, buf will contain an empty list.
+//  This version allows a return if the result doesn't lie on the image.
+//
+//  If hms_flag is 1, the result is always in H:M:S D:M:S, otherwise
+//  the result is returned in decimal degrees.
+//
+//  The behaviour with hms_flag may not be the same after moving to AST.
+//
+char* StarWCS::pix2wcs( double x, double y, int notbound, char* buf, 
+                        int bufsz, int hms_flag ) const 
 {
     buf[0] = '\0';
-    if ( isWcs() && x > 0 && y > 0 && x < nxpix_ && y < nypix_ ) {
-
+    int onimage = x > 0 && y > 0 && x < nxpix_ && y < nypix_;
+    if ( isWcs() && ( onimage || notbound ) ) {
         double newx[1], newy[1], oldx[1], oldy[1];
         double point[2];
         oldx[0] = x;
         oldy[0] = y;
         astTran2( wcs_, 1, oldx, oldy, 1, newx, newy );
-
+        
         //  Normalize the result into the correct range.
         point[0] = newx[0];
         point[1] = newy[0];
@@ -547,9 +567,9 @@ char* StarWCS::pix2wcs(double x, double y, char* buf, int bufsz, int hms_flag) c
                 }
             } 
             else {
-
+                
                 // If hms_flag is not set then return the result in degrees.
-                sprintf (buf, "%g %g %s", ra * r2d_, dec * r2d_, equinoxStr_);
+                sprintf (buf, "%.12g %.12g %s", ra * r2d_, dec * r2d_, equinoxStr_);
             }
         }
         if ( !astOK ) astClearStatus;

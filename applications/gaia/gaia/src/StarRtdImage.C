@@ -234,7 +234,7 @@ public:
     { "astfix",        &StarRtdImage::astfixCmd,       0, 0 },
     { "astget",        &StarRtdImage::astgetCmd,       1, 1 },
     { "astpix2cur",    &StarRtdImage::astpix2curCmd,   2, 2 },
-    { "astpix2wcs",    &StarRtdImage::astpix2wcsCmd,   2, 2 },
+    { "astpix2wcs",    &StarRtdImage::astpix2wcsCmd,   2, 3 },
     { "astread",       &StarRtdImage::astreadCmd,      1, 1 },
     { "astrefine",     &StarRtdImage::astrefineCmd,    4, 4 },
     { "astreplace",    &StarRtdImage::astreplaceCmd,   0, 0 },
@@ -631,7 +631,7 @@ int StarRtdImage::loadFile()
         image_->saveParams(p);
         delete image_;
         image_ = (ImageData *) NULL;
-        updateViews(); 
+        updateViews();
     }
 
     //  Check that the image exists and parse it.
@@ -713,7 +713,7 @@ int StarRtdImage::astcelestialCmd( int argc, char *argv[] )
 //
 //   Return if coordinate system is celestial.
 //-
-int StarRtdImage::isCelestial() 
+int StarRtdImage::isCelestial()
 {
     StarWCS* wcsp = getStarWCSPtr();
     if ( wcsp ) {
@@ -743,7 +743,7 @@ int StarRtdImage::isCelestial()
 //   be FITS-WCS or DSS) and a successful FITS- WCS has not already
 //   been written.
 //
-//   The return from this function is either TCL_OK for success 
+//   The return from this function is either TCL_OK for success
 //   or TCL_ERROR for failure. Either way the return may have
 //   diagnostic messages that should be shown to the user.
 //
@@ -764,13 +764,12 @@ int StarRtdImage::dumpCmd( int argc, char *argv[] )
         ostrstream message;
         if ( origset_ ) {
 
-            //  WCS has been played with. Attempt to write the current
-            //  WCS out to the FITS headers. We do this by reading the
-            //  existing FITS headers into a channel, attempting to
-            //  repeat the process of reading an object (thus removing
-            //  the associated FITS headers) and then attempt to write
-            //  the new WCS object, plus a native object (as a backup
-            //  in case other system cannot be written).
+            //  WCS has been modified so we need to store this in the
+            //  headers, before saving the file. The stratedy is to
+            //  clear the headers of any existing WCS content and then
+            //  write the new WCS. This supercedes the old method
+            //  which was to read a single WCS and then try to write
+            //  the new WCS using that encoding.
             AstFitsChan *chan = (AstFitsChan *)astFitsChan( NULL, NULL, "" );
 
             //  Now add all the current FITS headers to this channel.
@@ -800,17 +799,34 @@ int StarRtdImage::dumpCmd( int argc, char *argv[] )
                 }
             }
 
-            //  Read a WCS system from the channel to simulate the initial
-            //  read (which removed an object).
-            astClear( chan, "Card" );
-            const char *default_encoding = astGetC( chan, "Encoding" );
-            AstFrameSet *tmpset = (AstFrameSet *) astRead( chan );
-            if ( !astOK ) {
-                astClearStatus;
-            }
-            if ( tmpset != AST__NULL && astIsAFrameSet( tmpset ) ) {
-                tmpset = (AstFrameSet *) astAnnul( tmpset );
+            //  Read the headers until no more WCS's can be
+            //  extracted. The default encoding is what AST's returns
+            //  as the first valid read.
+            const char *default_encoding = NULL;
+            const char *test_encoding = NULL;
+            astSet( chan, "Clean=1" );
+            int failed = 0;
 
+            while ( failed < 2 ) {
+                astClear( chan, "Card" );
+                if ( default_encoding == NULL ) {
+                    test_encoding = astGetC( chan, "Encoding" );
+                }
+                AstFrameSet *tmpset = (AstFrameSet *) astRead( chan );
+                if ( !astOK ) {
+                    astClearStatus;
+                }
+                if ( tmpset != AST__NULL && astIsAFrameSet( tmpset ) ) {
+                    if ( default_encoding == NULL ) {
+                        default_encoding = test_encoding;
+                    }
+                    tmpset = (AstFrameSet *) astAnnul( tmpset );
+                } else {
+                    failed++;
+                }
+            }
+
+            if ( default_encoding != NULL ) {
                 // A successful initial default encoding is the
                 // permanent default for writing back.
                 astSet( chan, "Encoding=%s", default_encoding );
@@ -843,9 +859,10 @@ int StarRtdImage::dumpCmd( int argc, char *argv[] )
             //  type of the channel is set to the type of the WCS
             //  object just read (or Native and FITS-WCS for NDFs and
             //  FITS). The first attempt to update will use whatever
-            //  this is set to. If this fails then an attempt to write
-            //  a native encoding will be made, if the default type
-            //  wasn't native already.
+            //  this is set to. If this fails (shouldn't now we clear
+            //  the FITS headers of all WCS information) then an
+            //  attempt to write a native encoding will be made, if
+            //  the default type wasn't native already.
             StarWCS* wcsp = getStarWCSPtr();
             if ( !wcsp ) {
                 return TCL_ERROR;
@@ -880,7 +897,7 @@ int StarRtdImage::dumpCmd( int argc, char *argv[] )
             } else {
 
                 //  Write succeeded using default encoding.
-                message << "WCS: saved WCS using default encoding: " 
+                message << "WCS: saved WCS using default encoding: "
                         << default_encoding << endl;
                 saved = 1;
                 if ( strcmp( "NATIVE", default_encoding ) == 0 ) {
@@ -892,23 +909,24 @@ int StarRtdImage::dumpCmd( int argc, char *argv[] )
 
             //  Now try with the given encoding (which shouldn't be
             //  native), if this is the same as that just written, or
-            //  is just another FITS-* encoding then do nothing. To
+            //  is just another FITS-* encoding then do nothing. Too
             //  many FITS encodings are a bad things (mixes CD, PC
             //  etc. keywords which is difficult to maintain). Note
             //  DSS gets through.
             if ( argc == 2 ) {
                 if ( strcmp( argv[1], default_encoding ) != 0 &&
                      ( strncmp( argv[1], "FITS-", 5 ) == 0 &&
-                       strncmp( default_encoding, "FITS-", 5 ) != 0 )
+                       ( strncmp( default_encoding, "FITS-", 5 ) != 0 ) || 
+                       native )
                     ) {
                     astSet( chan, "Encoding=%s", argv[1] );
                     nextra = astWrite( chan, newwcs );
 
                     if ( astOK && nextra != 0 ) {
                         saved = 1;
-                        message << "WCS: saved WCS using additional encoding: " 
+                        message << "WCS: saved WCS using additional encoding: "
                                 << argv[1] << endl;
-                    } 
+                    }
                     else {
                         message << "WCS: failed to save WCS using "
                                 << "additional encoding: " << argv[1] << endl;
@@ -946,7 +964,7 @@ int StarRtdImage::dumpCmd( int argc, char *argv[] )
                                 << "could only be saved as an AST native "
                                 << "encoding, this will limit its "
                                 << "usefulness to AST compatible programs "
-                                << "(GAIA, KAPPA, EXTRACTOR etc.)" 
+                                << "(GAIA, KAPPA, EXTRACTOR etc.)"
                                 << endl;
                         result = TCL_ERROR;
                     }
@@ -959,7 +977,7 @@ int StarRtdImage::dumpCmd( int argc, char *argv[] )
                     message << "WCS: error, failed to save your modified WCS "
                             << endl;
                     result = TCL_ERROR;
-                } 
+                }
                 else {
                     message << "WCS: your modified WCS was "
                             << "successfully saved" << endl;
@@ -2496,7 +2514,8 @@ int StarRtdImage::astwcs2pixCmd( int argc, char *argv[] )
 //     the image WCS system.
 //
 //  Input:
-//     X and Y position
+//     X and Y position, optional third parameter indicating if the
+//     result should be reported even if outside the image bounds.
 //
 //  Result:
 //     RA and Dec in degrees (plus trailing equinox).
@@ -2520,10 +2539,18 @@ int StarRtdImage::astpix2wcsCmd( int argc, char *argv[] )
         return TCL_ERROR;
     }
 
+    int notbound = 0;
+    if ( argc == 3 ) {
+        if ( *argv[2] != '0' ) {
+            notbound = 1;
+        }
+    }
+
     //  Convert to a RA/Dec in degrees (plus an unwanted equinox, which
     //  is left in place for convenience).
     char buffer[80];
-    image_->wcs().pix2wcs( x, y, buffer, 80, 0);
+    StarWCS* wcsp = getStarWCSPtr();
+    wcsp->pix2wcs( x, y, notbound, buffer, 80, 0 );
 
     //  Set the result and return.
     set_result( buffer );
@@ -2534,7 +2561,7 @@ int StarRtdImage::astpix2wcsCmd( int argc, char *argv[] )
 //  StarRtdImage::astpix2curCmd
 //
 //  Purpose:
-//     Given an image X and Y position return them as formatted 
+//     Given an image X and Y position return them as formatted
 //     coordinates in the current frame.
 //
 //  Input:
@@ -2569,14 +2596,14 @@ int StarRtdImage::astpix2curCmd( int argc, char *argv[] )
     if ( image_->wcs().pix2wcs( x, y, ra, dec ) == 0 ) {
         ra /= r2d_;
         dec /= r2d_;
-        
+
         //  Format the values according to the current frame.
         StarWCS* wcsp = getStarWCSPtr();
         AstFrameSet *wcs = wcsp->astWCSClone();
         const char *ra_buf = astFormat( wcs, 1, ra );
         const char *dec_buf = astFormat( wcs, 2, dec );
-        append_result( ra_buf );
-        append_result( dec_buf );
+        set_result( ra_buf );
+        append_element( dec_buf );
         astAnnul( wcs );
         return TCL_OK;
     }
@@ -5132,7 +5159,7 @@ int StarRtdImage::isfitsCmd( int argc, char *argv[] )
 //
 //   Purpose:
 //      Returns whether the displayed image is a FITS file or not.
-//- 
+//-
 int StarRtdImage::isfits()
 {
     //  See what kind of image type we have.
@@ -5510,8 +5537,8 @@ int StarRtdImage::asttran2Cmd( int argc, char *argv[] )
         astNorm( wcs, point );
         const char *ra_buf = astFormat( wcs, 1, point[0] );
         const char *dec_buf = astFormat( wcs, 2, point[1] );
-        append_result( ra_buf );
-        append_result( dec_buf );
+        set_result( ra_buf );
+        append_element( dec_buf );
     }
     astSetI( wcs, "Current", current );
     astSetI( wcs, "Base", base );
@@ -5851,10 +5878,10 @@ int StarRtdImage::astmilliCmd( int argc, char *argv[] )
 //   StarRtdImage::slalibCmd
 //
 //   Purpose:
-//      Offers access to a limited set of SLALIB routines.
+//      Offers access to a limited set of SLALIB and related routines.
 //
 //   Arguments:
-//      Name of the SLALIB method to invoke, followed by any necessary
+//      Name of the method to invoke, followed by any necessary
 //      arguments.
 //
 //   Result:
@@ -5888,11 +5915,28 @@ int StarRtdImage::slalibCmd( int argc, char *argv[] )
             c[0] = '\0';
         }
         slaObs( n, c, name, &w, &p, &h );
-        
+
         // Construct a list return of all the parameters.
         char result[ 60 + TCL_DOUBLE_SPACE * 3 ];
         sprintf( result, "{%s} {%s} {%f} {%f} {%f}", c, name, w, p, h );
         set_result( result );
+    }
+    else if ( strcmp( argv[0], "dateobs2je" ) == 0 ) {
+
+        //  Convert a DATE-OBS FITS date string to a Julian Epoch. Two
+        //  arguments are needed, the name of the keyword (so that
+        //  old-style DATE is allowed) and the complete FITS card.
+        if ( argc != 3 ) {
+            return error( "wrong number of arguments, should "
+                          "be FITS-keyword FITS-card" );
+        }
+        double value;
+        if ( hgetdate( argv[2], argv[1], &value ) ) {
+            set_result( value );
+        }
+        else {
+            return error( argv[2], ": doesn't contain a date" );
+        }
     }
     else {
         return error( argv[0], " : unknown slalib subcommand" );

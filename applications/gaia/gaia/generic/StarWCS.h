@@ -118,8 +118,14 @@ public:
   //  Return 1 if WCS is a celestial coordinate system.
   int isCelestial() {return issky_;}
 
-  //  Return the world coordinates string for the given ximage coords
-  char* pix2wcs(double x, double y, char* buf, int bufsz, int hms_flag = 1) const;
+  //  Return the world coordinates string for the given image coords
+  char* pix2wcs( double x, double y, char* buf, int bufsz, 
+                 int hms_flag = 1 ) const;
+
+  //  Return the world coordinates string for the given image
+  //  coords. Choose if offimage coordinates should be converted.
+  char* pix2wcs( double x, double y, int notbound, char* buf, int bufsz, 
+                int hms_flag = 1 ) const;
 
   //  Return the world coords (in degrees, as 2 doubles) for the ximage coords
   int pix2wcs(double x, double y, double& ra, double& dec) const;

@@ -125,11 +125,15 @@ itcl::class gaia::GaiaBlink {
       add_short_help $itk_component(menubar).actions \
          {Choose an action}
 
+      add_menuitem $Actions command "Apply WCS shifts" \
+         {Attempt to position images using WCS projected shifts} \
+         -command [code $this set_wcs_origins_]
+
       add_menuitem $Actions command "Apply NDF origins" \
          {Attempt to position images using any NDF origin information} \
          -command [code $this set_ndf_origins_]
 
-      add_menuitem $Actions command "Apply FITS origins" \
+      add_menuitem $Actions command "Apply FITS CRPIX origins" \
          {Attempt to position images using FITS CRPIX1 and CRPIX2 values} \
          -command [code $this set_fits_origins_]
 
@@ -759,6 +763,7 @@ itcl::class gaia::GaiaBlink {
          set_ndf_origins_
       }
    }
+
    protected method set_ndf_origins_ {} {
       if { [info exists clones_(0)] } {
 
@@ -792,40 +797,35 @@ itcl::class gaia::GaiaBlink {
       }
    }
 
-   protected method set_fits_origins_ {} {
+   protected method set_wcs_origins_ {} {
       if { [info exists clones_(0)] } {
 
-         #  Place mobile image at 0 0 and get image coordinates of
-         #  upper left.
+         #  Place mobile image at 0 0.
          $canvas_ coords $image_($mobile_) 0 0
-
-         set bxo [$image_($mobile_) fits get CRPIX1]
-         if { $bxo == {} } {
-            set bxo 1
-         }
-         set byo [$image_($mobile_) fits get CRPIX2]
-         if { $byo == {} } {
-            set byo 1
-         }
-         set byo [expr $byo+[$image_($mobile_) height]-1]
-
          set_scroll_region_
+
+         #  Loop over other images asking for the grid coordinates of
+         #  the mobile image that correspond to the WCS coordinates of
+         #  the upper left corner.
          for { set i 0 } { $i < $n_ } { incr i } {
 
-            #  Origin of upper left of this image (image coordinates).
-            set xo [$image_($i) fits get CRPIX1]
-            if { $xo == {} } {
-               set xo 1
-            }
-            set yo [$image_($i) fits get CRPIX2]
-            if { $yo == {} } {
-               set yo 1
-            }
-            set yo [expr $yo+[$image_($i) height]-1]
+            #  Origin of upper left of this image (grid coordinates).
+            set xo 0.0
+            set yo [expr [$image_($i) height]-1.0]
+
+            #  Convert to WCS.
+            puts "xo = $xo, yo = $yo"
+            lassign [$image_($i) astpix2wcs $xo $yo 1] wcs1 wcs2
+            puts "wcs1 = $wcs1, wcs2 = $wcs2"
+            
+            #  Back to pixels, but of mobile image.
+            lassign [$image_($mobile_) astwcs2pix $wcs1 $wcs2] xo yo
+            puts "xo = $xo, yo = $yo"
 
             # Pixel shift from mobile image upper left to this one.
-            set dx [expr $xo-$bxo]
-            set dy [expr $byo-$yo]
+            set dx $xo
+            set dy [expr [$image_($mobile_) height]-1.0-$yo]
+            puts "dx = $dx, dy = $dy"
 
             # Equivalent canvas shift.
             $image_($mobile_) convert dist $dx $dy image dx dy canvas
@@ -837,6 +837,60 @@ itcl::class gaia::GaiaBlink {
 
          #  Final scrollregion encompasses positions of all images.
          set_scroll_region_
+      }
+   }
+
+   #  Set the origins for FITS using CRPIX values.
+   protected method set_fits_origins_ { {crpix 1} } {
+      catch {
+         if { [info exists clones_(0)] } {
+
+            #  Place mobile image at 0 0 and get image coordinates of
+            #  upper left.
+            $canvas_ coords $image_($mobile_) 0 0
+            
+            set bxo [$image_($mobile_) fits get $CRPIX1]
+            if { $bxo == {} } {
+               set bxo 1
+            }
+            set byo [$image_($mobile_) fits get $CRPIX2]
+            if { $byo == {} } {
+               set byo 1
+            }
+            set byo [expr $byo+[$image_($mobile_) height]-1]
+            
+            set_scroll_region_
+            for { set i 0 } { $i < $n_ } { incr i } {
+               
+               #  Origin of upper left of this image (image coordinates).
+               set xo [$image_($i) fits get $CRPIX1]
+               if { $xo == {} } {
+                  set xo 1
+               }
+               set yo [$image_($i) fits get $CRPIX2]
+               if { $yo == {} } {
+                  set yo 1
+               }
+               set yo [expr $yo+[$image_($i) height]-1]
+               
+               # Pixel shift from mobile image upper left to this one.
+               set dx [expr $xo-$bxo]
+               set dy [expr $byo-$yo]
+               
+               # Equivalent canvas shift.
+               $image_($mobile_) convert dist $dx $dy image dx dy canvas
+               
+               #  Apply shift
+               $canvas_ coords $image_($i) 0 0
+               $canvas_ move $image_($i) $dx $dy
+            }
+            
+            #  Final scrollregion encompasses positions of all images.
+            set_scroll_region_
+         }
+      } msg
+      if { $msg != "" } { 
+         info_dialog $msg
       }
    }
 
