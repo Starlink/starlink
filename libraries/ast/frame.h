@@ -332,6 +332,8 @@
 *           Overlay the attributes of a template Frame on to another Frame.
 *        astPrimaryFrame
 *           Uniquely identify a primary Frame and one of its axes.
+*        astResolvePoints
+*           Resolve many vectors into two orthogonal components.
 *        astSetAxis
 *           Set a new Axis for a Frame.
 *        astSetDigits
@@ -585,6 +587,7 @@ typedef struct AstFrameVtab {
 /* Properties (e.g. methods) specific to this class. */
    AstAxis *(* GetAxis)( AstFrame *, int );
    AstFrame *(* PickAxes)( AstFrame *, int, const int[], AstMapping ** );
+   AstPointSet *(* ResolvePoints)( AstFrame *, const double [], const double [], AstPointSet *, AstPointSet * );
    const char *(* Abbrev)( AstFrame *, int, const char *, const char *, const char * );
    const char *(* Format)( AstFrame *, int, double );
    const char *(* GetDomain)( AstFrame * );
@@ -772,6 +775,7 @@ void astPermAxesId_( AstFrame *, const int[] );
 #if defined(astCLASS)            /* Protected */
 AstAxis * astGetAxis_( AstFrame *, int );
 AstFrameSet *astConvertX_( AstFrame *, AstFrame *, const char * );
+AstPointSet *astResolvePoints_( AstFrame *, const double [], const double [], AstPointSet *, AstPointSet * );
 const char *astAbbrev_( AstFrame *, int, const char *, const char *, const char * );
 const char *astGetDomain_( AstFrame * );
 const char *astGetFormat_( AstFrame *, int );
@@ -968,6 +972,8 @@ astINVOKE(V,astAbbrev_(astCheckFrame(this),axis,fmt,str1,str2))
 astINVOKE(V,astFields_(astCheckFrame(this),axis,fmt,str,maxfld,fields,nc,val))
 #define astCheckPerm(this,perm,method) \
 astINVOKE(V,astCheckPerm_(astCheckFrame(this),perm,method))
+#define astResolvePoints(this,p1,p2,in,out) \
+astINVOKE(O,astResolvePoints_(astCheckFrame(this),p1,p2,astCheckPointSet(in),((out)?astCheckPointSet(out):NULL)))
 #define astClearDigits(this) \
 astINVOKE(V,astClearDigits_(astCheckFrame(this)))
 #define astClearDirection(this,axis) \

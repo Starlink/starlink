@@ -591,6 +591,8 @@ f     - AST_PUTCARDS: Stores a set of FITS header card in a FitsChan
 *        (e.g. "2E-4").
 *     27-AUG-2004 (DSB):
 *        Completed initial attempt at a FITS-CLASS encoding.
+*     9-SEP-2004 (DSB):
+*        Fixed usage of uninitialised values within ReadCrval.
 *class--
 */
 
@@ -14508,11 +14510,13 @@ static int IsMapLinear( AstMapping *map, const double lbnd_in[],
    double sv;
    double tol;
    double ubnd_out;
+   int boxok; 
    int i;
    int j;
    int nin;
    int nout;
-   int ret;              /* Linear fit successful? */
+   int oldrep;
+   int ret;              
 
 /* Initialise */
    ret = 0;
@@ -14532,31 +14536,57 @@ static int IsMapLinear( AstMapping *map, const double lbnd_in[],
       pset2 = astPointSet( NP, nout, "" );
       ptr2 = astGetPoints( pset2 );
 
+/* Call astMapBox in a new error reporting context. */
+      boxok = 0;
+      if( astOK ) {
+
+/* Temporarily switch off error reporting so that no report is made if
+   astMapBox cannot find a bounding box (which can legitimately happen with
+   some non-linear Mappings). */
+         oldrep = astReporting( 0 );
+
 /* Find the upper and lower bounds on the specified Mapping output. This also
    returns the input coords of a point at which the required output has its
    lowest value. */
-      astMapBox( map, lbnd_in, ubnd_in, 1, coord_out, &lbnd_out, &ubnd_out,
-                 xl, NULL );
+         astMapBox( map, lbnd_in, ubnd_in, 1, coord_out, &lbnd_out, &ubnd_out,
+                    xl, NULL );
 
-/* If the bounds are equal, we cannot use them. In this case create new 
-   bounds. */
-      if( EQUAL( lbnd_out, ubnd_out ) ) {
-         m = 0.5*( lbnd_out + ubnd_out );             
-         if( fabs( m ) > 1.0E-15 ) {
-            lbnd_out = 0.9*m;
-            ubnd_out = 1.1*m;
+/* If the box could not be found, clear the error status and pass on. */
+         if( !astOK ) {
+            astClearStatus;
+            
+/* If the box was found OK, flag this and check if the bounds are equal.
+   If so we cannot use them. In this case create new bounds. */
          } else {
-            lbnd_out = -1.0;
-            ubnd_out = 1.0;
-         }
-      }
+            boxok = 1;
 
-/* Check pointers can be used safely. */
-      if( astOK ) {
+            if( EQUAL( lbnd_out, ubnd_out ) ) {
+               m = 0.5*( lbnd_out + ubnd_out );             
+               if( fabs( m ) > 1.0E-15 ) {
+                  lbnd_out = 0.9*m;
+                  ubnd_out = 1.1*m;
+               } else {
+                  lbnd_out = -1.0;
+                  ubnd_out = 1.0;
+               }
+            }
+         }
+
+/* Re-instate error reporting. */
+         astReporting( oldrep );
+      }
+     
+/* Check pointers can be used safely and a box was obtained. */
+      if( astOK && boxok ) {
 
 /* Transform the input position returned by astMapBox using the supplied
-   Mapping to get the corresponding output position. */
-         for( i = 0; i < nin; i++ ) ptr1[ i ][ 0 ] = xl[ i ];
+   Mapping to get the corresponding output position. Fill all unused
+   elements of the PointSet with AST__BAD. */
+         for( i = 0; i < nin; i++ ){
+            p = ptr1[ i ];
+            *(p++) = xl[ i ];
+            for( j = 1; j < NP; j++ ) *(p++) = AST__BAD;
+         }
          astTransform( map, pset1, 1, pset2 );
 
 /* Now create a set of NP points evenly spaced in output coordinates. The
@@ -19303,13 +19333,17 @@ static double *ReadCrval( AstFitsChan *this, AstFrame *wcsfrm, char s,
    } else {
       sprintf( buf, "CRVAL%%d%c", s );
    }
-   astKeyFields( fc, buf, 1, &hii, &loi );
-   crval = astMalloc( sizeof( double )*(size_t) hii );
-   ok = 1;
-   for( iax = 0; iax < hii; iax++ ){
-      ok = ok && GetValue( fc, FormatKey( "CRVAL", iax + 1, -1, s ), 
-                           AST__FLOAT, (void *) (crval + iax), 0, 0, method, 
-                           class );
+   if( astKeyFields( fc, buf, 1, &hii, &loi ) > 0 ) {
+      crval = astMalloc( sizeof( double )*(size_t) hii );
+      ok = 1;
+      for( iax = 0; iax < hii; iax++ ){
+         ok = ok && GetValue( fc, FormatKey( "CRVAL", iax + 1, -1, s ), 
+                              AST__FLOAT, (void *) (crval + iax), 0, 0, method, 
+                              class );
+      }
+   } else {
+      crval = NULL;
+      ok = 0;
    }
 
 /* If the CRVAL values were obtained succesfully, attempt to read a FrameSet 
@@ -19360,7 +19394,7 @@ static double *ReadCrval( AstFitsChan *this, AstFrame *wcsfrm, char s,
    }
 
 /* Free resources. */
-   crval = astFree( crval );
+   if( crval ) crval = astFree( crval );
    fc = astAnnul( fc );
 
 /* If an error occurred, free the returned array. */
@@ -33014,6 +33048,8 @@ int astGetCDMatrix_( AstFitsChan *this ){
 
 /*
 static void ListFC( AstFitsChan *, const char * );
+
+
 static void ListFC( AstFitsChan *this, const char *ttl ) {
    FitsCard *cardo;
    char card[ 81 ];
@@ -33030,7 +33066,7 @@ static void ListFC( AstFitsChan *this, const char *ttl ) {
       MoveCard( this, 1, "List", "FitsChan" );
    }
    this->card = cardo;
-}*/
+} */
 
 
 

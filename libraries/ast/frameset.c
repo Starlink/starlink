@@ -179,6 +179,8 @@ f     - AST_REMOVEFRAME: Remove a Frame from a FrameSet
 *	astResolve, astSystemCode, astSystemString, astValidateSystem,
 *	astValidateAxisSelection). These should have been overridden a
 *       long time ago!
+*     8-SEP-2004 (DSB):
+*       Override astResolvePoints.
 *class--
 */
 
@@ -721,6 +723,7 @@ static AstFrameSet *FindFrame( AstFrame *, AstFrame *, const char * );
 static AstMapping *CombineMaps( AstMapping *, int, AstMapping *, int, int );
 static AstMapping *GetMapping( AstFrameSet *, int, int );
 static AstMapping *Simplify( AstMapping * );
+static AstPointSet *ResolvePoints( AstFrame *, const double [], const double [], AstPointSet *, AstPointSet * );
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
 static const char *Abbrev( AstFrame *, int, const char *, const char *, const char * );
 static const char *Format( AstFrame *, int, double );
@@ -4490,6 +4493,7 @@ void astInitFrameSetVtab_(  AstFrameSetVtab *vtab, const char *name ) {
    frame->PickAxes = PickAxes;
    frame->PrimaryFrame = PrimaryFrame;
    frame->Resolve = Resolve;
+   frame->ResolvePoints = ResolvePoints;
    frame->SetAxis = SetAxis;
    frame->SetDigits = SetDigits;
    frame->SetDirection = SetDirection;
@@ -5832,6 +5836,100 @@ static void Resolve( AstFrame *this_frame, const double point1[],
    fr = astGetFrame( this, AST__CURRENT );
    astResolve( fr, point1, point2, point3, point4, d1, d2 );
    fr = astAnnul( fr );
+
+}
+
+static AstPointSet *ResolvePoints( AstFrame *this_frame, const double point1[],
+                                   const double point2[], AstPointSet *in,
+                                   AstPointSet *out ) {
+/*
+*  Name:
+*     astResolvePoints
+
+*  Purpose:
+*     Resolve a set of vectors into orthogonal components
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "frame.h"
+*     AstPointSet *astResolvePoints( AstFrame *this, const double point1[], 
+*                                    const double point2[], AstPointSet *in,
+*                                    AstPointSet *out )
+
+*  Class Membership:
+*     FrameSet member function (over-rides the astResolvePoints method
+*     inherited from the Frame class).
+
+*  Description:
+*     This function takes a Frame and a set of vectors encapsulated
+*     in a PointSet, and resolves each one into two orthogonal components,
+*     returning these two components in another PointSet.
+*
+*     This is exactly the same as the public astResolve method, except
+*     that this method allows many vectors to be processed in a single call,
+*     thus reducing the computational cost of overheads of many
+*     individual calls to astResolve.
+
+*  Parameters:
+*     this
+*        Pointer to the Frame.
+*     point1
+*        An array of double, with one element for each Frame axis
+*        (Naxes attribute). This marks the start of the basis vector,
+*        and of the vectors to be resolved.
+*     point2
+*        An array of double, with one element for each Frame axis
+*        (Naxes attribute). This marks the end of the basis vector.
+*     in
+*        Pointer to the PointSet holding the ends of the vectors to be
+*        resolved.
+*     out
+*        Pointer to a PointSet which will hold the length of the two
+*        resolved components. A NULL value may also be given, in which 
+*        case a new PointSet will be created by this function.
+
+*  Returned Value:
+*     Pointer to the output (possibly new) PointSet. The first axis will 
+*     hold the lengths of the vector components parallel to the basis vector. 
+*     These values will be signed (positive values are in the same sense as 
+*     movement from point 1 to point 2. The second axis will hold the lengths 
+*     of the vector components perpendicular to the basis vector. These
+*     values will always be positive.
+
+*  Notes:
+*     - The number of coordinate values per point in the input
+*     PointSet must match the number of axes in the supplied Frame.
+*     - If an output PointSet is supplied, it must have space for
+*     sufficient number of points and 2 coordinate values per point.
+*     - A null pointer will be returned if this function is invoked
+*     with the global error status set, or if it should fail for any
+*     reason.
+*/
+
+/* Local Variables: */
+   AstPointSet *result;          /* Pointer to output PointSet */
+   AstFrameSet *this;            /* Pointer to FrameSet structure */
+   AstFrame *fr;                 /* Pointer to current Frame */
+
+/* Initialise. */
+   result = NULL;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain a pointer to the FrameSet structure. */
+   this = (AstFrameSet *) this_frame;
+
+/* Obtain a pointer to the FrameSet's current Frame and invoke this
+   Frame's astResolvePoints method. Annul the Frame pointer afterwards. */
+   fr = astGetFrame( this, AST__CURRENT );
+   result = astResolvePoints( this, point1, point2, in, out );
+   fr = astAnnul( fr );
+
+/* Return a pointer to the output PointSet. */
+   return result;
 
 }
 
