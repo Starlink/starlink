@@ -333,8 +333,8 @@ itcl::class gaia::GaiaImageCtrl {
            -show_footer 1 \
            -whole_canvas 0 \
            -transient 1 \
-           -pagewidth 8.1i \
-           -top_left  "${itk_option(-appname)}\n$object" \
+           -pagewidth 7.5i \
+           -top_left  "$itk_option(-appname)\n$object" \
            -top_right "$file\n$center" \
            -bot_left  "$user" \
            -bot_right "$date"
