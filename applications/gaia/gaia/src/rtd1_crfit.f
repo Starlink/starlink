@@ -346,6 +346,6 @@
      :               AVAIL, STATUS )
       END IF
 
-  999 CONTINUE
+ 999  CONTINUE
 
       END

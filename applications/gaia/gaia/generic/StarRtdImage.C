@@ -666,11 +666,16 @@ StarWCS* StarRtdImage::getStarWCSPtr( ImageData* image )
         image = image_;
     }
     WCSRep *p = image->wcs().rep();
-    if ( p && strcmp(p->classname(), "StarWCS" ) == 0 ) {
+    if ( p && strcmp( p->classname(), "StarWCS" ) == 0 ) {
         return (StarWCS *) p;
     }
-    error( "internal error: expected class StarWCS, not ",
-           p->classname() );
+    if ( p ) {
+        error( "internal error: expected class StarWCS, not ",
+               p->classname() );
+    }
+    else {
+        error( "internal error: null StarWCS object" );
+    }
     return NULL;
 }
 
@@ -698,7 +703,12 @@ int StarRtdImage::astcelestialCmd( int argc, char *argv[] )
 int StarRtdImage::isCelestial() 
 {
     StarWCS* wcsp = getStarWCSPtr();
-    return wcsp->isCelestial();
+    if ( wcsp ) {
+        return wcsp->isCelestial();
+    }
+    else {
+        return 0;
+    }
 }
 
 //+
@@ -5525,11 +5535,13 @@ int StarRtdImage::astwarningsCmd( int argc, char *argv[] )
 #endif
     if ( image_ ) {
         StarWCS *wcs = getStarWCSPtr( image_ );
-        const char *warnings = wcs->getWarning();
-        if ( warnings ) {
-            set_result( warnings );
+        if ( wcs ) {
+            const char *warnings = wcs->getWarning();
+            if ( warnings ) {
+                set_result( warnings );
+                }
+            }
         }
-    }
     return TCL_OK;
 }
 
