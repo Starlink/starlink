@@ -122,8 +122,11 @@ interface with the `style file' defined there.
     (make element gi: "group"
           (with-mode in-docinfo (process-node-list authorlist)))
     (if abstract
-	(make-latex-command name: "setAbstract"
-	      (with-mode in-docinfo (process-node-list abstract)))
+        ;; as for setAuthorlist, so with setAbstract
+	(make sequence
+          (make-latex-empty-command name: "setAbstract")
+          (make element gi: "group"
+                (with-mode in-docinfo (process-node-list abstract))))
 	(empty-sosofo))
     (if docref
 	(make sequence
