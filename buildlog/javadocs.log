@@ -2560,13 +2560,13 @@ javadocs:
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "The range of coordinates spanned (i.e. min/max values in xPos and
   [javadoc]  yPos)."
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/TimeSeries.java:367: warning - The first sentence is interpreted to be:
   [javadoc] "Whether this series should be used when auto-ranging (certain classes
   [javadoc]  of series, i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Whether this series should be used when auto-ranging (certain classes
   [javadoc]  of series, i.e. generated ones, could be expected to have artificial
   [javadoc]  ranges)."
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/TimeSeries.java:367: warning - The first sentence is interpreted to be:
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/TimeSeries.java:1631: warning - The first sentence is interpreted to be:
   [javadoc] "Return interpolated physical values (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
@@ -2782,4 +2782,4 @@ javadocs:
   [javadoc] 206 warnings
 
 BUILD SUCCESSFUL
-Total time: 4 minutes 12 seconds
+Total time: 3 minutes 55 seconds
