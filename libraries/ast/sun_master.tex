@@ -7597,12 +7597,12 @@ coordinate systems. Because these are represented in AST by SkyFrames
 Domain value for a SkyFrame is SKY. Since there is only one sky, you
 probably won't need to change this very often.
 
-\item[SPECTRAL]\mbox{}\\
+\item[SPECTRUM]\mbox{}\\
 Identifies the domain used to describe positions within an
 electro-magnetic spectrum. The AST SpecFrame (\secref{ss:specframes})
 class describes positions within this domain, allowing a wide range of
 different coordinate systems to be used (frequency, wavelength,
-{\em{etc}}). The default Domain value for a SpecFrame is SPECTRAL.
+{\em{etc}}). The default Domain value for a SpecFrame is SPECTRUM.
 
 \end{description}
 \end{quote}
@@ -8790,11 +8790,11 @@ The output from this might look like the following:
 #   Title = "Optical velocity, rest frequency = 250 GHz"       # Title
 of coordinate system
     Naxes = 1   # Number of coordinate axes
-#   Domain = "SPECTRAL"         # Coordinate system domain
+#   Domain = "SPECTRUM"         # Coordinate system domain
 #   Epoch = 2000        # Julian epoch of observation
 #   Lbl1 = "Optical velocity"  # Label for axis 1
     System = "VOPT"     # Coordinate system type
-#   Uni1 = "m/s"        # Units for axis 1
+#   Uni1 = "km/s"       # Units for axis 1
     Ax1 =       # Axis number 1
        Begin Axis       # Coordinate axis
        End Axis
@@ -8812,13 +8812,13 @@ for the particular velocity system that the SpecFrame represents.
 
 These choices would be appropriate for a System value of ``Vopt'',
 but if a different System value were set, the defaults would be
-correspondingly different. For example, frequency is measured in 
-units of Hertz, not $m/s$, so setting ``System=freq''
+correspondingly different. For example, by default frequency is measured in 
+units of GHz, not $km/s$, so setting ``System=freq''
 would change the appropriate line above from:
 
 \begin{quote}
 \begin{verbatim}
-#   Uni1 = "m/s"        # Units for axis 1
+#   Uni1 = "km/s"       # Units for axis 1
 \end{verbatim}
 \end{quote}
 
@@ -8826,20 +8826,20 @@ to
 
 \begin{quote}
 \begin{verbatim}
-#   Uni1 = "Hz"         # Units for axis 1
+#   Uni1 = "GHz"        # Units for axis 1
 \end{verbatim}
 \end{quote}
 
 Of course, if you do not like any of these defaults, you may always
 over-ride them by setting explicit attribute values yourself. For
-instance, you may choose to have your frequency axis expressed in ``GHz''
-rather than ``Hz''. To do this simply set the attribute value as follows:
+instance, you may choose to have your frequency axis expressed in ``kHz''
+rather than ``GHz''. To do this simply set the attribute value as follows:
 
 c+
 \begin{quote}
 \small
 \begin{verbatim}
-astSetC( specframe, "Unit", "GHz" );
+astSetC( specframe, "Unit", "kHz" );
 \end{verbatim}
 \normalsize
 \end{quote}
@@ -8847,7 +8847,7 @@ c-
 f+
 \small
 \begin{verbatim}
-      CALL AST_SETC( SPECFRAME, 'Unit', 'GHz', STATUS )
+      CALL AST_SETC( SPECFRAME, 'Unit', 'kHz', STATUS )
 \end{verbatim}
 \normalsize
 f-
@@ -8897,7 +8897,7 @@ AstSpecFrame *specframe;
 AstCmpFrame *cmpframe;
 ...
 skyframe = astSkyFrame( "Epoch=J2002" );
-specframe = astSpecFrame( "System=Freq,Unit=GHz,StdOfRest=LSRK" );
+specframe = astSpecFrame( "System=Freq,StdOfRest=LSRK" );
 cmpframe = astCmpFrame( skyframe, specframe, "" );
 \end{verbatim}
 \normalsize
@@ -8911,7 +8911,7 @@ f+
       INTEGER CMPFRAME
       ...
       SKYFRAME = AST_SKYFRAME( 'Epoch=J2002', STATUS )
-      SPECFRAME = AST_SPECFRAME( 'System=Freq,Unit=GHz,StdOfRest=LSRK',
+      SPECFRAME = AST_SPECFRAME( 'System=Freq,StdOfRest=LSRK',
      :                           STATUS )
       CMPFRAME = AST_CMPFRAME( SKYFRAME, SPECFRAME, ' ', STATUS )
 \end{verbatim}
@@ -9047,9 +9047,15 @@ f+
 f-
 
 \subsection{The Attributes of a CmpFrame}
-The default value for its Domain attribute is ``CMP'' and the
-(fixed) value for its System attribute is ``Compound''. A CmpFrame has no 
-extra attributes over and above those common to all Frames. However,
+
+A CmpFrame \emph{is a} Frame and so has all the attributes of a Frame.
+The default value for the Domain attribute for a CmpFrame is formed by
+concatenating the Domains of the two component Frames, separated by a
+minus sign (``-'').\footnote{If both component Frames have blank Domains, 
+then the default Domain for the CmpFrame is the string ``CMP''.} The (fixed) 
+value for its System attribute is ``Compound''.\footnote{Any attempt to 
+change the System value of a CmpFrame is ignored.} A CmpFrame has no 
+further attributes over and above those common to all Frames. However,
 attributes of the two component Frames can be accessed as if they were
 attributes of the CmpFrame, as described below.
 
@@ -18951,6 +18957,12 @@ occurred in the AST library between versions V1.8-13 and V2.0 (the
 current version):
 
 \begin{enumerate}
+
+\item The default value for the Domain attribute provided by the CmpFrame 
+class has been changed from ``CMP'' to a string formed by concatenating
+the Domain attributes of the two component Frames, separated by a minus
+sign. If both component Domains are blank, then the old default of
+``CMP'' is retained for the CmpFrame Domain.
 
 \item The implementation of the 
 c+
