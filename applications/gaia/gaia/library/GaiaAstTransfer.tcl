@@ -97,7 +97,7 @@ itcl::class gaia::GaiaAstTransfer {
 
       #  Add window help.
       global gaia_dir
-      add_help_button $gaia_dir/StarAst.hlp "Astrometry Overview..."
+      add_help_button $gaia_dir/GaiaAst.hlp "Astrometry Overview..."
       add_help_button $gaia_dir/GaiaAstTransfer.hlp "On Window..."
       add_short_help $itk_component(menubar).help \
          {Help menu: get some help about this window}

@@ -1,6 +1,6 @@
 #+
 #  Name:
-#     StarAstCopy
+#     GaiaAstCopy
 
 #  Type of Module:
 #     [incr Tk] class
@@ -17,9 +17,9 @@
 
 #  Invocations:
 #
-#        StarAstCopy object_name [configuration options]
+#        GaiaAstCopy object_name [configuration options]
 #
-#     This creates an instance of a StarAstCopy object. The return is
+#     This creates an instance of a GaiaAstCopy object. The return is
 #     the name of the object.
 #
 #        object_name configure -configuration_options value
@@ -44,21 +44,23 @@
 #     Copyright (C) 1997 Central Laboratory of the Research Councils
 
 #  Authors:
-#     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     PWD: Peter Draper (STARLINK - Durham University)
 #     {enter_new_authors_here}
 
 #  History:
-#     10-DEC-1997 (PDRAPER):
+#     10-DEC-1997 (PWD):
 #        Original version.
+#     23-MAY-2000 (PWD):
+#        Chanaged name to GaiaAstCopy
 #     {enter_further_changes_here}
 
 #-
 
 #.
 
-itk::usual StarAstCopy {}
+itk::usual GaiaAstCopy {}
 
-itcl::class gaia::StarAstCopy {
+itcl::class gaia::GaiaAstCopy {
 
    #  Inheritances:
    #  -------------
@@ -115,10 +117,10 @@ itcl::class gaia::StarAstCopy {
 
       #  Add window help.
       global env gaia_dir
-      add_help_button $gaia_dir/StarAst.hlp "Astrometry Overview..."
+      add_help_button $gaia_dir/GaiaAst.hlp "Astrometry Overview..."
       add_short_help $itk_component(menubar).help \
          {Help menu: get some help about this window}
-      add_help_button $gaia_dir/StarAstCopy.hlp "On Window..."
+      add_help_button $gaia_dir/GaiaAstCopy.hlp "On Window..."
 
       #  Create the button bar
       itk_component add actionframe {frame $w_.action}
