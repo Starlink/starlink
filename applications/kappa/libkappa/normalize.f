@@ -85,8 +85,9 @@
 *        Four values may be given, in the order - bottom, right, top, left. 
 *        If less than four values are given, extra values are used equal to 
 *        the first supplied value. If these margins are too narrow any axis 
-*        annotation may be clipped. The dynamic default is 0.18 (for all 
-*        edges) if annotated axes are produced, and zero otherwise. []
+*        annotation may be clipped. If a null (!) value is supplied, the
+*        value used is 0.18 (for all edges) if annotated axes are produced, 
+*        and zero otherwise. [!]
 *     MARKER = _INTEGER (Read)
 *        Specifies the symbol with which each position should be marked in
 *        the plot. It should be given as an integer PGPLOT marker type. For 
