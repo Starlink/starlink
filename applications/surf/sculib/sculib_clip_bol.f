@@ -23,7 +23,10 @@
 *     SCUQUAL(N_POS) = BYTE (Given & Returned)
 *        The data quality
 *     N_SIGMA = DOUBLE (Given)
-*        Number of sigma to clip at
+*        Number of sigma to clip at. If this number is positive
+*        then a clipped mean and standard deviation are calculated.
+*        If it is negative the statistics are calculated without
+*        iterative clipping.
 *     BADBIT = BYTE (Given & Returned)
 *        Bad bit mask
 *     NSPIKES = INTEGER (Returned)
@@ -41,6 +44,9 @@
 *     1996 November 17 (TIMJ):
 *       Original version
 *     $Log$
+*     Revision 1.7  1998/05/21 00:35:32  timj
+*     Sigma clipping is now used unless N_SIGMA is negative.
+*
 *     Revision 1.6  1998/03/04 05:45:39  timj
 *     Initialise pointers
 *
@@ -91,7 +97,6 @@
       PARAMETER (SKYBIT = 4)  
 
 *  Local Variables:
-      REAL    CLIP                 ! Number of sigma to clip at
       DOUBLE PRECISION CLIPMAX     ! Max clipping level
       DOUBLE PRECISION CLIPMIN     ! Min clipping level
       INTEGER I                    ! Loop counter
@@ -118,10 +123,8 @@
 
 *  Find the statistics (Mean and standard deviation
 
-      CLIP = -1.0
-
-      CALL SCULIB_STATR(N_POS, CLIP, SCUDATA, SCUQUAL, BADBIT, NGOOD,
-     :     MEAN, MEDIAN, SUM, SUMSQ, STDEV, %val(SPNTR), STATUS)
+      CALL SCULIB_STATR(N_POS, REAL(N_SIGMA), SCUDATA, SCUQUAL, BADBIT, 
+     :     NGOOD, MEAN, MEDIAN, SUM, SUMSQ, STDEV, %val(SPNTR), STATUS)
 
 *     Free memory
 
@@ -134,8 +137,8 @@
 
       IF (MEAN .NE. VAL__BADD .AND. STDEV.NE.VAL__BADD) THEN
 
-         CLIPMAX = MEAN + (N_SIGMA * STDEV)
-         CLIPMIN = MEAN - (N_SIGMA * STDEV)
+         CLIPMAX = MEAN + (ABS(N_SIGMA) * STDEV)
+         CLIPMIN = MEAN - (ABS(N_SIGMA) * STDEV)
 
          DO I = 1, N_POS
 
