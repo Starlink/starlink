@@ -329,8 +329,7 @@
 *  reading in all the headers because the size of the work space may
 *  have been changed, and we don't want to mix mapping with direct
 *  access to the work structure.
-         CALL DAT_MAP( TLOC, '_CHAR*80', 'UPDATE', 1, NCARD, HPNTR,
-     :                 STATUS )
+         CALL DAT_MAPC( TLOC, 'UPDATE', 1, NCARD, HPNTR, STATUS )
 
 *  Check we have a valid pointer before accessing it.
          IF ( STATUS .NE. SAI__OK ) GOTO 980
