@@ -1,7 +1,7 @@
-#!/bin/csh
+#!/bin/csh -xv
 #+
 #  Name:
-#     TEST
+#     dgeneric
 
 #  Purpose:
 #     Generates doubly generic code for CCDPACK
@@ -37,11 +37,13 @@
 #     28-JUN-1993 (PDRAPER):
 #        Added split option to cope with DECstation inability to 
 #        compile large doubly generic files.
+#     30-JAN-1998 (PDRAPER):
+#        Added check for generic script location.
 #     {enter_changes_here}
 
 #-
 #
-#  Check for input file
+#  Check for input file.
      if ( $1 == "" ) then
         echo "Usage: dgeneric filename"
         exit
@@ -58,7 +60,19 @@
         echo "Processing $file"
      endif
 
-#  Replace the T1's etc. with the normal flags
+#  Locate a copy of the generic script, or just guess.
+     if ( -e /star/bin/generic ) then
+        set GENERIC=/star/bin/generic
+     else if ( $?STARLINK ) then 
+        if ( -e ${STARLINK}/bin/generic ) then
+           set GENERIC=${STARLINK}/bin/generic
+        else 
+           set GENERIC generic 
+        endif
+     endif
+
+
+#  Replace the T1's etc. with the normal flags.
      onintr EXIT
      if ( -e dgeneric.gen ) then
         'rm' dgeneric.gen
@@ -71,12 +85,11 @@
         -e s/HTYPE1/HTYPE/g  \
         -e s/COMM1/COMM/g
 
-#  Generic this
-
+#  Generic this.
      if ( $2 == "" ) then 
-        generic -t n dgeneric.gen
+        $GENERIC -t n dgeneric.gen
      else
-        generic -t $2 dgeneric.gen
+        $GENERIC -t $2 dgeneric.gen
      endif
 
 #  Second tokens. 
@@ -95,9 +108,9 @@
 #  -s flag
      if ( $3 == "" ) then
         if ( $2 == "" ) then 
-           generic -t n dgeneric2.gen
+           $GENERIC -t n dgeneric2.gen
         else
-           generic -t $2 dgeneric2.gen
+           $GENERIC -t $2 dgeneric2.gen
         endif
 
 #  Set the output file name.
@@ -114,9 +127,9 @@
            endif
         end
         if ( $2 == "" ) then 
-           generic -t n  -s dgeneric2.gen
+           $GENERIC -t n  -s dgeneric2.gen
         else
-           generic -t $2 -s dgeneric2.gen
+           $GENERIC -t $2 -s dgeneric2.gen
         endif
 
 #  Now look for all dgeneric2* files. Get the * value and rename.
