@@ -29,6 +29,7 @@ fintramap.c \
 fitschan.c \
 flutmap.c \
 fmapping.c \
+fmathmap.c \
 fmatrixmap.c \
 fobject.c \
 fpcdmap.c \

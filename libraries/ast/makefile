@@ -419,14 +419,14 @@ MAIN_C_ROUTINES = \
 axis.c c2f77.c channel.c cmpframe.c cmpmap.c \
 dssmap.c error.c fchannel.c fcmpframe.c fcmpmap.c \
 fdssmap.c ferror.c ffitschan.c fframe.c fframeset.c \
-fintramap.c fitschan.c flutmap.c fmapping.c fmatrixmap.c \
-fobject.c fpcdmap.c fpermmap.c fplot.c frame.c \
-frameset.c fskyframe.c fslamap.c fsphmap.c funitmap.c \
-fwcsmap.c fwinmap.c fzoommap.c intramap.c loader.c \
-lutmap.c mapping.c mathmap.c matrixmap.c memory.c \
-object.c pcdmap.c permmap.c plot.c pointset.c \
-skyaxis.c skyframe.c slamap.c sphmap.c unitmap.c \
-wcsmap.c winmap.c zoommap.c
+fintramap.c fitschan.c flutmap.c fmapping.c fmathmap.c \
+fmatrixmap.c fobject.c fpcdmap.c fpermmap.c fplot.c \
+frame.c frameset.c fskyframe.c fslamap.c fsphmap.c \
+funitmap.c fwcsmap.c fwinmap.c fzoommap.c intramap.c \
+loader.c lutmap.c mapping.c mathmap.c matrixmap.c \
+memory.c object.c pcdmap.c permmap.c plot.c \
+pointset.c skyaxis.c skyframe.c slamap.c sphmap.c \
+unitmap.c wcsmap.c winmap.c zoommap.c
 
 #  The default error reporting module.
 ERR_C_ROUTINES = err_null.c
@@ -1339,6 +1339,8 @@ flutmap.o: flutmap.c f77.h c2f77.h error.h memory.h lutmap.h mapping.h \
  object.h channel.h pointset.h
 fmapping.o: fmapping.c f77.h c2f77.h error.h mapping.h object.h \
  channel.h pointset.h
+fmathmap.o: fmathmap.c f77.h c2f77.h error.h memory.h mathmap.h \
+ mapping.h object.h channel.h pointset.h
 fmatrixmap.o: fmatrixmap.c f77.h c2f77.h error.h memory.h matrixmap.h \
  mapping.h object.h channel.h pointset.h
 fobject.o: fobject.c f77.h c2f77.h error.h memory.h object.h channel.h
@@ -1382,8 +1384,8 @@ lutmap.o: lutmap.c error.h memory.h object.h channel.h pointset.h \
  mapping.h winmap.h lutmap.h ast_err.h
 mapping.o: mapping.c error.h memory.h object.h channel.h pointset.h \
  mapping.h ast_err.h
-mathmap.o: mathmap.c error.h memory.h object.h channel.h mapping.h \
- pointset.h unitmap.h mathmap.h ast_err.h
+mathmap.o: mathmap.c channel.h object.h error.h mapping.h pointset.h \
+ mathmap.h memory.h unitmap.h ast_err.h
 matrixmap.o: matrixmap.c error.h memory.h object.h channel.h \
  pointset.h mapping.h matrixmap.h slalib.h permmap.h zoommap.h \
  unitmap.h winmap.h ast_err.h
