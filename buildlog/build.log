@@ -390,7 +390,7 @@ build_demo:
       [tar] Building tar: /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat/demo/demo.tar.bz2
 
 build:
-    [javac] Compiling 106 source files to /apps/cvsbuild/java/source/topcat/build/classes
+    [javac] Compiling 107 source files to /apps/cvsbuild/java/source/topcat/build/classes
      [copy] Copying 64 files to /apps/cvsbuild/java/source/topcat/build/classes
      [copy] Copied 2 empty directories to /apps/cvsbuild/java/source/topcat/build/classes
      [copy] Copying 28 files to /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat

@@ -9166,6 +9166,7 @@ U java/source/topcat/src/main/uk/ac/starlink/topcat/func/Conversions.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/func/Coords.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/func/Image.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/func/Maths.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/func/Mgc.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/func/Output.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/func/Sdss.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/func/Sog.java
