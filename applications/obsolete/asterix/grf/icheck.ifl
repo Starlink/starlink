@@ -1,0 +1,8 @@
+interface ICHECK
+  parameter INP
+    position 1
+    type 'LITERAL'
+    prompt 'Image'
+    help 'Name of image file'
+  endparameter
+endinterface
