@@ -342,7 +342,8 @@ proc adamtask.kill {task arglist} {
 #-
     upvar #0 adamtask_priv priv
     if { "$priv(PID,$task)" != ""} {
-	set result [adamtask.send [list exec kill -TERM $priv(PID,$task)]]
+	#set result [adamtask.send [list exec kill -TERM $priv(PID,$task)]]
+	set result [adamtask.send [list exec kill $priv(PID,$task)]]
     } else {
 	error "attached tasks cannot be killed"
     }
