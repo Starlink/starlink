@@ -4111,7 +4111,7 @@ c     :                           S2 = 4.0419,
       NORM = 10.6971 * MATH__PI +
      :       6.96186E-6 * MATH__PI * N1*N1 -
      :       6.96186E-6 * MATH__PI * N1*N1 *
-     :       MATH_EXPD(-5000.0/(S2*S2))
+     :       MATH_EXPD(DBLE(-5000.0/(S2*S2)))
 
 *    A few variables to speed things up
       S1_2 = -0.5 / S1**2
