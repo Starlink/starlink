@@ -5703,7 +5703,7 @@ c        REAL XX,XP,YP
         IF (I_GUI) THEN
 
 *  try getting input from cursor
-          I_FORM=.TRUE.
+          I_FORM=.FALSE.
           XC=I_X
           YC=I_Y
           CALL MSG_PRNT('Select centre...')
