@@ -1,0 +1,176 @@
+	-- Catalog SGML Open style entity catalog for Starlink DTDs
+
+	   $Id$
+
+	   This catalog entry file consists of entries delegated from
+	   the main catalog.  These are separated off here partly out
+	   of neatness, but mostly so that the effect of the SGMLDECL
+	   declaration can be contained within here.
+
+	   Keep the entries in this file normalised so that each entry
+	   is on a single line, the PUBLIC keyword at the beginning is
+	   in upper case, and the system id on those lines doesn't have
+	   quotes.  This is so that tools such as perlSGML, which have
+	   relatively simple catalogue parsers, don't get confused.
+	   The SYSTEM entry is an SP extension, and the SP
+	   documentation recommends that its sysid2 is quoted to avoid
+	   confusing tools which don't recognise it.
+
+	   For details of the catalog format, see James Clark's notes
+	   at <http://www.jclark.com/sp/catalog.htm>, or OASIS
+	   Technical Resolution 9401:1997, at
+	   <http://www.oasis-open.org/html/a401.htm>.
+	   --
+
+	-- The Starlink DTDs use the SGML declaration contained in the
+	   s.o.i. starlink.decl.  This declaration now
+	   includes NAMECASE GENERAL NO.  Declare the use of
+	   this declaration here using an SGMLDECL declaration.  This
+	   _requires_ these entries to be in a separate catalog from
+	   the other entries which refer to, for example, the DSSSL
+	   stylesheet DTDs.  If this is not the case, and this
+	   declaration is found when extracting an architecture (for
+	   example, when Jade extracts the DSSSL architecture from a
+	   stylesheet), then all hell breaks loose.
+
+	   My understanding of the OASIS TR above suggests that the
+	   first SGMLDECL entry in the whole catalog (possibly
+	   composed of several catalog entry files) governs all the
+	   DTDs mentioned.  However, the DELEGATE declaration, unlike
+	   the CATALOG declaration, creates a completely _new_
+	   catalog.
+	   -- 
+SGMLDECL starlink.decl
+
+	-- And include a public-id for this, so it can be referred to
+	   from within the stylesheets.
+
+	   I _think_ that a public text class of `SYNTAX' is correct here,
+	   as described in 8879 clause 10.2.2.1, and clause 13, but I'm not
+	   convinced.
+	   --
+PUBLIC "-//Starlink//SYNTAX Starlink Declaration//EN"	starlink.decl
+
+
+	-- listed most general to most specific --
+
+	-- Starlink General is to be used _only_ by reference
+	   from within one of the other DTDs.
+	   --
+-- require a version number
+PUBLIC "-//Starlink//DTD Starlink General//EN"		starlink-0.6.dtd
+--
+PUBLIC "-//Starlink//DTD Starlink General 0.6//EN"	starlink-0.6.dtd
+PUBLIC "-//Starlink//DTD Starlink General 0.5//EN"	starlink-0.5.dtd
+PUBLIC "-//Starlink//DTD Starlink General 0.4//EN"	starlink-0.4.dtd
+PUBLIC "-//Starlink//DTD Starlink General 0.3//EN"	starlink-0.3.dtd
+PUBLIC "-//Starlink//DTD Starlink General 0.2//EN"	starlink-0.2.dtd
+PUBLIC "-//Starlink//DTD Starlink General 0.1//EN"	starlink-0.1.dtd
+
+PUBLIC "-//Starlink//DTD Starlink SUG//EN"		sug-0.6.dtd
+PUBLIC "-//Starlink//DTD Starlink SUG 0.6//EN"		sug-0.6.dtd
+PUBLIC "-//Starlink//DTD Starlink SUG 0.5//EN"		sug-0.5.dtd
+PUBLIC "-//Starlink//DTD Starlink SUG 0.4//EN"		sug-0.4.dtd
+PUBLIC "-//Starlink//DTD Starlink SUG 0.3//EN"		sug-0.3.dtd
+PUBLIC "-//Starlink//DTD Starlink SUG 0.2//EN"		sug-0.2.dtd
+
+PUBLIC "-//Starlink//DTD Starlink SUN//EN"		sun-0.6.dtd
+PUBLIC "-//Starlink//DTD Starlink SUN 0.6//EN"		sun-0.6.dtd
+PUBLIC "-//Starlink//DTD Starlink SUN 0.5//EN"		sun-0.5.dtd
+PUBLIC "-//Starlink//DTD Starlink SUN 0.4//EN"		sun-0.4.dtd
+PUBLIC "-//Starlink//DTD Starlink SUN 0.3//EN"		sun-0.3.dtd
+PUBLIC "-//Starlink//DTD Starlink SUN 0.2//EN"		sun-0.2.dtd
+PUBLIC "-//Starlink//DTD Starlink SUN 0.1//EN"		sun-0.1.dtd
+
+PUBLIC "-//Starlink//DTD Starlink SSN//EN"		ssn-0.6.dtd
+PUBLIC "-//Starlink//DTD Starlink SSN 0.6//EN"		ssn-0.6.dtd
+PUBLIC "-//Starlink//DTD Starlink SSN 0.5//EN"		ssn-0.5.dtd
+PUBLIC "-//Starlink//DTD Starlink SSN 0.4//EN"		ssn-0.4.dtd
+PUBLIC "-//Starlink//DTD Starlink SSN 0.3//EN"		ssn-0.3.dtd
+PUBLIC "-//Starlink//DTD Starlink SSN 0.2//EN"		ssn-0.2.dtd
+PUBLIC "-//Starlink//DTD Starlink SSN 0.1//EN"		ssn-0.1.dtd
+
+PUBLIC "-//Starlink//DTD Starlink SGP//EN"		sgp-0.6.dtd
+PUBLIC "-//Starlink//DTD Starlink SGP 0.6//EN"		sgp-0.6.dtd
+PUBLIC "-//Starlink//DTD Starlink SGP 0.5//EN"		sgp-0.5.dtd
+PUBLIC "-//Starlink//DTD Starlink SGP 0.4//EN"		sgp-0.4.dtd
+PUBLIC "-//Starlink//DTD Starlink SGP 0.3//EN"		sgp-0.3.dtd
+PUBLIC "-//Starlink//DTD Starlink SGP 0.2//EN"		sgp-0.2.dtd
+
+PUBLIC "-//Starlink//DTD Starlink SC//EN"		sc-0.6.dtd
+PUBLIC "-//Starlink//DTD Starlink SC 0.6//EN"		sc-0.6.dtd
+PUBLIC "-//Starlink//DTD Starlink SC 0.5//EN"		sc-0.5.dtd
+PUBLIC "-//Starlink//DTD Starlink SC 0.4//EN"		sc-0.4.dtd
+PUBLIC "-//Starlink//DTD Starlink SC 0.3//EN"		sc-0.3.dtd
+PUBLIC "-//Starlink//DTD Starlink SC 0.2//EN"		sc-0.2.dtd
+
+PUBLIC "-//Starlink//DTD Starlink SG//EN"		sg-0.6.dtd
+PUBLIC "-//Starlink//DTD Starlink SG 0.6//EN"		sg-0.6.dtd
+PUBLIC "-//Starlink//DTD Starlink SG 0.5//EN"		sg-0.5.dtd
+PUBLIC "-//Starlink//DTD Starlink SG 0.4//EN"		sg-0.4.dtd
+PUBLIC "-//Starlink//DTD Starlink SG 0.3//EN"		sg-0.3.dtd
+PUBLIC "-//Starlink//DTD Starlink SG 0.2//EN"		sg-0.2.dtd
+
+PUBLIC "-//Starlink//DTD Starlink MUD//EN"		mud-0.6.dtd
+PUBLIC "-//Starlink//DTD Starlink MUD 0.6//EN"		mud-0.6.dtd
+PUBLIC "-//Starlink//DTD Starlink MUD 0.5//EN"		mud-0.5.dtd
+PUBLIC "-//Starlink//DTD Starlink MUD 0.4//EN"		mud-0.4.dtd
+PUBLIC "-//Starlink//DTD Starlink MUD 0.3//EN"		mud-0.3.dtd
+PUBLIC "-//Starlink//DTD Starlink MUD 0.2//EN"		mud-0.2.dtd
+PUBLIC "-//Starlink//DTD Starlink MUD 0.1//EN"		mud-0.1.dtd
+
+PUBLIC "-//Starlink//DTD Document Summary 0.6//EN"	summary-0.6.dtd
+PUBLIC "-//Starlink//DTD Document Summary 0.5//EN"	summary-0.5.dtd
+PUBLIC "-//Starlink//DTD Document Summary 0.2//EN"	summary-0.2.dtd
+PUBLIC "-//Starlink//DTD Document Summary 0.1//EN"	summary-0.1.dtd
+
+PUBLIC "-//Starlink//ELEMENTS Starlink Paragraph Elements 0.6//EN"	paracontent-0.6.dtd
+PUBLIC "-//Starlink//ELEMENTS Starlink Paragraph Elements 0.5//EN"	paracontent-0.5.dtd
+
+	-- The part of the DTD dealing with the notation declarations
+	   is broken off into a separate entity.  See the main DTD
+	   for discussion.
+	   --
+PUBLIC "-//Starlink//ELEMENTS Starlink Notation Declarations//EN"	notations.text
+
+	-- Program source code DTDs --
+
+-- require a version number
+PUBLIC "-//Starlink//DTD Program Source Code//EN"	programcode-0.6.dtd
+--
+PUBLIC "-//Starlink//DTD Program Source Code 0.6//EN"	programcode-0.6.dtd
+PUBLIC "-//Starlink//DTD Program Source Code 0.5//EN"	programcode-0.5.dtd
+PUBLIC "-//Starlink//DTD Program Source Code 0.3//EN"	programcode-0.3.dtd
+PUBLIC "-//Starlink//DTD Program Source Code 0.2//EN"	programcode-0.2.dtd
+PUBLIC "-//Starlink//DTD Program Source Code 0.1//EN"	programcode-0.1.dtd
+
+PUBLIC "-//Starlink//DTD Fortran Source Code//EN"	fortrancode-0.6.dtd
+PUBLIC "-//Starlink//DTD Fortran Source Code 0.6//EN"	fortrancode-0.6.dtd
+PUBLIC "-//Starlink//DTD Fortran Source Code 0.5//EN"	fortrancode-0.5.dtd
+PUBLIC "-//Starlink//DTD Fortran Source Code 0.3//EN"	fortrancode-0.3.dtd
+PUBLIC "-//Starlink//DTD Fortran Source Code 0.2//EN"	fortrancode-0.2.dtd
+PUBLIC "-//Starlink//DTD Fortran Source Code 0.1//EN"	fortrancode-0.1.dtd
+
+PUBLIC "-//Starlink//DTD DSSSL Source Code//EN"		dssslcode-0.6.dtd
+PUBLIC "-//Starlink//DTD DSSSL Source Code 0.6//EN"	dssslcode-0.6.dtd
+PUBLIC "-//Starlink//DTD DSSSL Source Code 0.5//EN"	dssslcode-0.5.dtd
+PUBLIC "-//Starlink//DTD DSSSL Source Code 0.3//EN"	dssslcode-0.3.dtd
+PUBLIC "-//Starlink//DTD DSSSL Source Code 0.2//EN"	dssslcode-0.2.dtd
+
+	-- The following DTDs are used only internally to the SGML
+	   application, so they shouldn't have public identifiers.
+	   --
+--
+PUBLIC "-//Starlink//DTD tth equation list//EN"		tth-equations.dtd
+--
+SYSTEM "tth-equation-list"				"tth-equations.dtd"
+SYSTEM "img-eqlist"					"img-eqlist.dtd"
+
+	-- Map the parameterisation entities to the default locations
+	   of the DSSSL files.  If a user wants to override these,
+	   they can do so, and put a catalogue earlier in the path which
+	   replaces this definition.
+	   --
+PUBLIC "-//Starlink//TEXT DSSSL Common Parameterisation//EN"	../dsssl/sl/common/slparams.dsl
+PUBLIC "-//Starlink//TEXT DSSSL HTML Parameterisation//EN"	../dsssl/sl/html/slparams.dsl
+PUBLIC "-//Starlink//TEXT DSSSL LaTeX Parameterisation//EN"	../dsssl/sl/latex/slparams.dsl
