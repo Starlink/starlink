@@ -59,7 +59,7 @@
       chmod 777 *
 
 #  Create the on-line help file.
-
+      foreach file (`grp user_tasks`)
          prohlp in=$file out=$file.help
       end
       cat polpack.hlp *.help > new.hlp
