@@ -70,6 +70,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          			! Standard SAE constants
+      INCLUDE 'DAT_PAR'					! HDS constants
       INCLUDE 'FIT_PAR'		 			! ASTERIX fit constants
 
 *  Structure definitions:
@@ -86,11 +87,7 @@
 *  Status:
       INTEGER 			STATUS             	! Global status
 
-*  External References:
-      [external_declaration]
-      {data_type} {external_name} ! [external_description]
-
-*    Local Variables:
+*  Local Variables:
       INTEGER			J			! Loop over parameters
       INTEGER			ITIE			! Loop over ties
 *.
@@ -102,7 +99,7 @@
       NDOF = NGOOD
 
 *    Less the frozen parameters
-      DO J = 1, NPAR
+      DO J = 1, MODEL.NPAR
 	IF ( .NOT. FROZEN(J) ) NDOF = NDOF - 1
       END DO
 
@@ -110,7 +107,7 @@
       IF ( MODEL.NTIE .GT. 0 ) THEN
 
 *      Loop over parameters
-        DO J = 1, NPAR
+        DO J = 1, MODEL.NPAR
 
 *        Parameter not already frozen
 	  IF ( .NOT. FROZEN(J) ) THEN
@@ -119,11 +116,20 @@
             IF ( MODEL.TGROUP(J) .GT. 0 ) THEN
 
 *            Not the base parameter of the group
-              IF ( MODEL.TSTART(MODEL.TGROUP(J)) .NE. J ) NDOF = NDOF - 1
+              IF ( MODEL.TSTART(MODEL.TGROUP(J)) .NE. J ) THEN
+                NDOF = NDOF - 1
+              END IF
 
+*          End of tie group test
             END IF
+
+*        End of frozen test
           END IF
+
+*      End of parameter loop
         END DO
+
+*    End of any ties present test
       END IF
 
 *    Check ok

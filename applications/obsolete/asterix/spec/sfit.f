@@ -272,19 +272,13 @@
 
 *    Number of degrees of freedom for chi-squared
       IF ( CHISTAT ) THEN
-	NDOF=NGOOD
-	DO J=1,NPAR
-	  IF(.NOT.FROZEN(J)) NDOF=NDOF-1
-	ENDDO
-	IF(NDOF.EQ.0)THEN
-	  CALL MSG_PRNT('Number of degrees of freedom is zero')
-	ELSE IF(NDOF.LT.0)THEN
-	  STATUS = SAI__ERROR
-	  CALL ERR_REP('BADNDOF','More free parameters than data values!',
-     :      STATUS)
-	  GOTO 9000
-	ENDIF
-	SSCALE = NDOF		! NDOF to be used for scaling chisq statistic
+
+*      Finds NDOF from frozen array and constraints
+        CALL FIT1_NDOF( NGOOD, MODEL, FROZEN, NDOF, STATUS )
+
+*      NDOF to be used for scaling chisq statistic
+	SSCALE = NDOF
+
       END IF
 
 *    Set iteration limits
@@ -395,26 +389,26 @@
 
       END DO
 
-* Calculate approximate parameter errors and display
-	IF(NOFREE)THEN
-	  ER=.FALSE.
-	ELSE
-	  CALL USI_GET0L('ERRORS',ER,STATUS)
-	ENDIF
-	IF(ER)THEN
-	  CALL MSG_BLNK()
-	  CALL MSG_PRNT( 'Calculating approximate parameter errors' )
-	  CALL FIT_PARERR(NDS,OBDAT,INSTR,MODEL,NPAR,PARAM,LB,UB,DPAR,
+*    Calculate approximate parameter errors and display
+      IF ( NOFREE ) THEN
+	ER = .FALSE.
+      ELSE
+	CALL USI_GET0L('ERRORS',ER,STATUS)
+      END IF
+      IF ( ER ) THEN
+	CALL MSG_BLNK()
+	CALL MSG_PRNT( 'Calculating approximate parameter errors' )
+	CALL FIT_PARERR(NDS,OBDAT,INSTR,MODEL,NPAR,PARAM,LB,UB,DPAR,
      :    FROZEN,PEGGED,SSCALE,FSTAT,FIT_PREDDAT,PREDDAT,PARSIG,STATUS)
-          CALL ARR_COP1R( NPAR, PARSIG, LE, STATUS )
-          CALL ARR_COP1R( NPAR, PARSIG, UE, STATUS )
+        CALL ARR_COP1R( NPAR, PARSIG, LE, STATUS )
+        CALL ARR_COP1R( NPAR, PARSIG, UE, STATUS )
 
-	ELSE
+      ELSE
 
-*        Reset array to ensure tidy print out
-          CALL ARR_INIT1R( 0.0, NPAR, PARSIG, STATUS )
+*      Reset array to ensure tidy print out
+        CALL ARR_INIT1R( 0.0, NPAR, PARSIG, STATUS )
 
-	ENDIF
+      END IF
 
 *    Report parameter values
       CALL SFIT_OPTABLE( NPAR, PARAM, FROZEN, PEGGED, PARSIG, MODEL,
@@ -483,6 +477,7 @@
 *    Tidy up & exit
  9000 CALL USI_ANNUL(MLOC,STATUS)
       CALL USI_ANNUL(ILOC,STATUS)
-      CALL AST_CLOSE(STATUS)
+      CALL AST_CLOSE()
+      CALL AST_ERR( STATUS )
 
       END

@@ -258,11 +258,8 @@
 
 *    Number of degrees of freedom for chi-squared
       IF ( CHISTAT ) THEN
-	NDOF = NGOOD
-	DO J = 1, NPAR
-	  IF ( .NOT. FROZEN(J) ) NDOF = NDOF - 1
-	END DO
-	SSCALE = NDOF		! NDOF to be used for scaling chisq statistic
+        CALL FIT1_NDOF( NGOOD, MODEL, FROZEN, NDOF, STATUS )
+	SSCALE = NDOF
       END IF
 
 *    Allocate space for model stack
