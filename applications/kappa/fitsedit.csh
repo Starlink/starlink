@@ -53,6 +53,12 @@
 #     5-JUN-1998 (DSB):
 #        Added facility to create a new FITS extension if there is no 
 #        existing FITS extension in the NDF.
+#     2-FEB-2000 (DSB):
+#        Guard against GLOBAL.sdf not existing by checking $status after
+#        running parget. Interpret a single exclamation mark as an abort 
+#        request. Do not include an escaped new line before awk since this
+#        produces a "null command" error. Explicitly remove any shell
+#        metacharacters (such as "$") from the NDF name.
 #     {enter_further_changes_here}
 #
 #  Bugs:
@@ -81,14 +87,28 @@ if ( $#argv == 0 ) then
    set ok = 0
    while ( $ok == 0 )
 #
-#   Obtain the current DATA_ARRAY.
+#   Ensure that the following invocation of parget will return a non-zero
+#   status value if anything goes wrong.
 #
-      set defndf = `parget data_array GLOBAL`
-      if ( $defndf == "" ) then
+      set adam_exit_set = $?ADAM_EXIT 
+      setenv ADAM_EXIT 1
+#
+#   Obtain the current DATA_ARRAY. Check that parget worked ok by testing
+#   status. Also remove angle brackets introduced by parget (eg. replace 
+#   "$<KAPPA_DIR>/m31" by "$KAPPA_DIR/m31" ).
+#
+      set defndf = `parget data_array GLOBAL | sed -e 's/^\$<\(.*\)>\(.*\)/\$\1\2/'`
+      if ( $status || "$defndf" == "" ) then
          set prstring = "NDF - Name of the NDF > "
       else
          set prstring = "NDF - Name of the NDF /@"$defndf"/ > "
          set ndf = $defndf
+      endif
+#
+#   Clear ADAM_EXIT unless it was already set.
+#
+      if ( ! $adam_exit_set ) then
+         unset ADAM_EXIT
       endif
 #
 #   Assume that the value will be fine unless we discover otherwise
@@ -103,7 +123,7 @@ if ( $#argv == 0 ) then
 #
 #   Write some help information, but continue in the loop.
 #
-      if ( $ndf == '?' ) then
+      if ( "$ndf" == '?' ) then
          sh -c "echo '  ' 1>&2"
          sh -c "echo '   NDF  = NDF (Read)' 1>&2"
          sh -c "echo '      The name of the NDF whose FITS extension is to be edited.' 1>&2"
@@ -112,12 +132,12 @@ if ( $#argv == 0 ) then
 #
 #   Abort when requested.
 #
-      else if ( "$ndf" == \!\! ) then
+      else if ( "$ndf" == \!\! || "$ndf" == \! ) then
          exit
 #
 #   Reprompt when no value is given.
 #
-      else if ( $defndf == "" && $ndf == "" ) then
+      else if ( "$defndf" == "" && "$ndf" == "" ) then
          sh -c "echo 'No NDF specified.  Enter "\!\!" to abort.' 1>&2"
          set ok = 0
 
@@ -125,10 +145,14 @@ if ( $#argv == 0 ) then
 #
 #   Accept the default.
 #
-         if ( $ndf == "" && $defndf != "" ) then
+         if ( "$ndf" == "" && "$defndf" != "" ) then
             set ndf = $defndf
          endif
          unset noglob
+#  
+#   Remove any shell meta-characters
+#
+         eval set ndf = $ndf
 #
 #   Check that the supplied NDF exists.  If there is a specific
 #   extension, test that the file exists.
@@ -152,8 +176,7 @@ if ( $#argv == 0 ) then
 #   The first value gives the number of formats, so if this is 0,
 #   NDF_FORMATS_IN is undefined.
 #
-               set formats = `printenv | grep NDF_FORMATS_IN | \
-                             awk -f $KAPPA_DIR/nfi.awk`
+               set formats = `printenv | grep NDF_FORMATS_IN | awk -f $KAPPA_DIR/nfi.awk`
                if ( $formats[1] == 0 ) then
                   sh -c "echo 'NDF "$ndf" does not exist.' 1>&2"
                   set ok = 0
