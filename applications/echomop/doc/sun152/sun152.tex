@@ -457,7 +457,8 @@ and 2-D distortion fitting and extraction.
 %%S2HPOST# Hyperlink so that links in the document should work.
 %%S2HPOST    echo '! Hyperlinking document against Master Document Set at RAL.'
 %%S2HPOST    cd ..
-%%S2HPOST    HTX_PATH=. hlink .
+%%S2HPOST    HTX_PATH=.; export HTX_PATH
+%%S2HPOST    hlink .
 %%S2HPOST    echo '! Hyperlink done.'
 %%S2HPOST    echo '! star2html post-processing complete.'
 %%S2HPOST
@@ -494,6 +495,7 @@ and 2-D distortion fitting and extraction.
 
 % ? Add picture here if required for the LaTeX version.
 %   e.g. \includegraphics[scale=0.3]{filename.ps}
+\includegraphics[height=120mm]{sun152_cover.eps}
 % ? End of picture
 
 % ? Heading for abstract if used.
