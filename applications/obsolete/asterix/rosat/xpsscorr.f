@@ -127,7 +127,7 @@
       CALL AST_INIT()
 
 *    Associate input dataset
-      CALL USI_TASSOCI( 'INP', '*', 'UPDATE', IFID, STATUS )
+      CALL USI_ASSOC( 'INP', '*', 'UPDATE', IFID, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 999
 
 *    Check input ok
@@ -243,7 +243,7 @@
       CALL SSI_FINDDS( IFID, 1, SFID, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
         CALL ERR_ANNUL( STATUS )
-        CALL USI_TASSOCI( 'AUX', '*', 'READ', SFID, STATUS )
+        CALL USI_ASSOC( 'AUX', 'BinDS|EventDS', 'READ', SFID, STATUS )
       END IF
 
 *  Get detector details
