@@ -367,9 +367,9 @@
 
 *  Current sideband
                IF( AST_GETC( FRM, 'SIDEBAND', STATUS ) .EQ. 'USB') THEN
-                  CALL MSG_SETC( 'SB',  'Upper' );
+                  CALL MSG_SETC( 'SB',  'Upper' )
                ELSE
-                  CALL MSG_SETC( 'SB',  'Lower' );
+                  CALL MSG_SETC( 'SB',  'Lower' )
                END IF
 
                CALL MSG_OUT( 'WCS_SBND', 
