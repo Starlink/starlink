@@ -1,4 +1,5 @@
-      SUBROUTINE COF_WHEAD( NDF, COMP, FUNIT, BITPIX, PROPEX, STATUS )
+      SUBROUTINE COF_WHEAD( NDF, COMP, FUNIT, BITPIX, PROPEX, ORIGIN,
+     :                      STATUS )
 *+
 *  Name:
 *     COF_WHEAD
@@ -10,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL COF_WHEAD( NDF, COMP, FUNIT, BITPIX, PROPEX, STATUS )
+*     CALL COF_WHEAD( NDF, COMP, FUNIT, BITPIX, PROPEX, ORIGIN, STATUS )
 
 *  Description:
 *     This routine creates the header section of the primary array or
@@ -39,6 +40,8 @@
 *        The NDF FITS extension, if present, is folded into the output
 *        FITS header when PROPEX is .TRUE..  When PROPEX is .FALSE.,
 *        the FITS extension is ignored.
+*     ORIGIN = CHARACTER * ( * ) (Given)
+*        The value of the ORIGIN card.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -64,9 +67,11 @@
 *        OBJECT, LABEL, BUNIT --- the values held in NDF TITLE, LABEL,
 *          and UNITS respectively are used if present, otherwise any
 *          s found in the FITS extension are used.
-*        ORIGIN and DATE --- are created automatically.  However the
-*          former may be overriden by an ORIGIN card in the NDF
-*          extension.
+*        DATE --- is created automatically.
+*        ORIGIN --- inherits any existing ORIGIN card in the NDF FITS
+*          extension, unless you supply a value through argument
+*          ORIGIN other than the default "Starlink Project, U.K." or
+*          a blank string.
 *        EXTNAME --- is the component name of the object from the COMP
 *          argument.
 *        HDUCLAS1, HDUCLASn --- "NDF" and the value of COMP
@@ -104,6 +109,10 @@
 *        for axis units.
 *     1997 November 14 (MJC):
 *        Filtered LBOUNDn keywords.
+*     1998 January 5 (MJC):
+*        Added ORIGIN argument.  Inherits airlock ORIGIN card if
+*        present unless ORIGIN argument is neither the default nor
+*        blank.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -126,6 +135,7 @@
       INTEGER   FUNIT            ! Logical-unit number of FITS file
       INTEGER   BITPIX           ! Bits per pixel
       LOGICAL   PROPEX           ! Propagate FITS extension, when true
+      CHARACTER * ( * ) ORIGIN   ! The ORIGIN card value
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -175,11 +185,14 @@
       INTEGER   J                ! Loop variable
       CHARACTER KEYWRD * ( SZKEY ) ! Accommodates keyword name
       LOGICAL   LABFND           ! True if NDF LABEL found
+      CHARACTER LORIGN * ( SZVAL ) ! Local value of the ORIGIN argument
       LOGICAL   MANDAT           ! Not a mandatory header?
       INTEGER   NCHAR            ! Length of a character string
       INTEGER   NCOMP            ! No. of components
       INTEGER   NDIM             ! Number of dimensions
-      LOGICAL   ORIGIN           ! Starlink origin header present?
+      LOGICAL   ORIPRE           ! Starlink origin header present?
+      LOGICAL   PRORIG           ! True if to use supplied ORIGIN
+                                 ! argument
       LOGICAL   ROTAX( DAT__MXDIM ) ! True if an axis is rotated in the
                                  ! FITS extension
       LOGICAL   TITFND           ! True if NDF TITLE found
@@ -194,6 +207,17 @@
 *  Initialise the FITSIO status.  It's not the same as the Starlink
 *  status, which is reset by the fixed part.
       FSTAT = FITSOK
+
+*  Prepare the ORIGIN.
+*  ===================
+
+*  Use local variable for the origin to deal with a null value.
+      LORIGN = ORIGIN
+      IF ( ORIGIN . EQ. ' ' ) LORIGN = 'Starlink Project, U.K.'
+
+*  Record whether or not an existing ORIGIN card in the FITS airlock
+*  is inherited.
+      PRORIG = LORIGN .EQ. 'Starlink Project, U.K.'
 
 *  Write special header cards.
 *  ===========================
@@ -213,11 +237,15 @@
 *    OBJECT, LABEL, BUNIT --- the values held in NDF TITLE, LABEL,
 *      and UNITS respectively are used if present, otherwise any values
 *      found in the FITS extension are used.
-*    ORIGIN and DATE --- are created automatically.  However the former
-*      may be overriden by the entry in the NDF extension.
+*    DATE --- is created automatically.
+*    ORIGIN --- inherits any existing ORIGIN card in the NDF FITS
+*      extension, unless you supply a value through argument ORIGIN
+*      other than the default "Starlink Project, U.K." or a blank
+*      string.
 *    BLANK --- is created for integer data types from the bad value.
 *
-      CALL COF_WNDFH( NDF, COMP, FUNIT, NFLAGS, BITPIX, CMPFND, STATUS )
+      CALL COF_WNDFH( NDF, COMP, FUNIT, NFLAGS, BITPIX, LORIGN, CMPFND,
+     :                STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 999
 
 *  Write classification and naming headers.
@@ -327,14 +355,14 @@
      :                 /'#100 and other' ) )
 
 *  Use an intermediate variable to reduce the number of continuation
-*  lines in the test.  This tests for the Starlink ORIGIN card.
-            ORIGIN = KEYWRD .EQ. 'ORIGIN'
-*            ORIGIN = ( KEYWRD .EQ. 'ORIGIN' ) .AND. 
+*  lines in the test.  This tests for the ORIGIN card.
+            ORIPRE = KEYWRD .EQ. 'ORIGIN' .AND. PRORIG
+*            ORIPRE = ( KEYWRD .EQ. 'ORIGIN' ) .AND. 
 *     :               ( VALUE( 2:23 ) .EQ. 'Starlink Project, U.K.' )
 
 *  Do the test whether to copy the FITS extension header into the output
 *  FITS file's header.
-            IF ( MANDAT .AND. .NOT. BANNER .AND. .NOT. ORIGIN .AND.
+            IF ( MANDAT .AND. .NOT. BANNER .AND. ORIPRE .AND.
      :        ( KEYWRD .NE. 'DATE' ) .AND.
      :        ( KEYWRD .NE. 'BLANK' ) .AND.
      :        ( KEYWRD .NE. 'BSCALE' ) .AND.
@@ -365,6 +393,12 @@
                   CALL CHR_CTOI( KEYWRD( 6: ), ADIM, STATUS )
                   CALL CHR_CTOR( VALUE( :SZNVAL ), AXROT, STATUS )
                   ROTAX( ADIM ) = ABS( AXROT ) .GT. VAL__EPSR
+
+*  Overwrite the ORIGIN card written by COF_WNDFH rather than making a
+*  second card.
+               ELSE IF ( KEYWRD .EQ. 'ORIGIN' ) THEN
+                  CALL FTMCRD( FUNIT, 'ORIGIN', FITSTR, FSTAT )
+
                ELSE
 
 *  Write the header card.
