@@ -170,7 +170,7 @@
      :                                                   SID,STATUS)
         CALL NBS_DEFINE_PRIMITIVE(ID,'DEC1950','_DOUBLE',0,VAL__NBD,
      :                                                    SID,STATUS)
-*  data min/max/mean
+*  data min/max/mean/sum
         CALL NBS_DEFINE_PRIMITIVE(ID,'MIN','_REAL',0,VAL__NBR,SID,
      :                                                       STATUS)
         CALL NBS_DEFINE_PRIMITIVE(ID,'MAX','_REAL',0,VAL__NBR,SID,
@@ -178,6 +178,8 @@
         CALL NBS_DEFINE_PRIMITIVE(ID,'MEAN','_REAL',0,VAL__NBR,SID,
      :                                                       STATUS)
         CALL NBS_DEFINE_PRIMITIVE(ID,'MERR','_REAL',0,VAL__NBR,SID,
+     :                                                       STATUS)
+        CALL NBS_DEFINE_PRIMITIVE(ID,'SUM','_REAL',0,VAL__NBR,SID,
      :                                                       STATUS)
 
 *  data quality
@@ -317,6 +319,8 @@
         CALL NBS_FIND_ITEM(I_NBID,'MEAN',ITEMID,STATUS)
         CALL NBS_PUT_VALUE(ITEMID,0,VAL__NBR,0.0,STATUS)
         CALL NBS_FIND_ITEM(I_NBID,'MERR',ITEMID,STATUS)
+        CALL NBS_PUT_VALUE(ITEMID,0,VAL__NBR,0.0,STATUS)
+        CALL NBS_FIND_ITEM(I_NBID,'SUM',ITEMID,STATUS)
         CALL NBS_PUT_VALUE(ITEMID,0,VAL__NBR,0.0,STATUS)
         CALL NBS_FIND_ITEM(I_NBID,'NGOOD',ITEMID,STATUS)
         CALL NBS_PUT_VALUE(ITEMID,0,VAL__NBI,0,STATUS)
