@@ -61,12 +61,15 @@
 *     Copyright (C) University of Birmingham, 1995
 
 *  Authors:
-*     DJA: David J. Allan (JET-X,University of Birmingham)
+*     DJA: David J. Allan (JET-X, University of Birmingham)
+*     RB: Richard Beard (ROSAT, University of Birmingham)
 *     {enter_new_authors_here}
 
 *  History:
 *     15 Jul 1994 (DJA):
 *        Original version.
+*     24 Feb 1997 (RB):
+*        Add MODE and REP values.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -101,6 +104,7 @@
       INTEGER			IMODE			! FITSIO mode
       INTEGER			LFILEC			! Last char in filename
       INTEGER			LUN			! Logical unit number
+      INTEGER			REPID			! File representaion ID
 *.
 
 *  Check inherited global status.
@@ -147,6 +151,15 @@
 *      Write extra info into the file handle object
           CALL ADI_CPUT0I( ID, 'Lun', LUN, STATUS )
           CALL ADI_CPUT0I( ID, 'BlockSize', BSIZE, STATUS )
+
+*      Put in the correct access mode
+          IF ( IMODE .EQ. 0 ) THEN
+            CALL ADI_CPUT0C( ID, 'MODE', 'READ', STATUS )
+          ELSE
+            CALL ADI_CPUT0C( ID, 'MODE', 'WRITE', STATUS )
+          END IF
+          CALL ADI_LOCREP( 'FITS', REPID, STATUS )
+          CALL ADI_CPUT0I( ID, 'REP', REPID, STATUS )
 
 *      Initialise
           CALL ADI_CPUT0I( ID, '.CurHdu', -1, STATUS )
