@@ -55,7 +55,7 @@ $(DIPSO_SUB1)
 
 #  The contents of kappa.tar.
 UNIX_TOTAL = makefile mk sun50.tex sun50.htx_tar dipso.news \
-dipso_sub1.tar dipso_specdat.tar
+dipso_sub1.tar dipso_specdat.tar dipso_source.tar
 
 #  Target for use by the grp command.
 $(action)
