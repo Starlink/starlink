@@ -12,7 +12,7 @@
 %     Horst Meyerdierks (ROE)
 %     John F. Lightfoot (ROE)
 %     Tim Jenness (JAC, Hawaii)
-%     Remo Tilanus (JAC, HAwaii)
+%     Remo Tilanus (JAC, Hawaii)
 
 %  History:
 %     13 Jan 1995 (RMP):
@@ -241,7 +241,7 @@ SPECX.}
 %  ==========================
 \begin{htmlonly}
    \xlabel{}
-   \begin{rawhtml} <H1 ALIGN=CENTER> \end{rawhtml}
+   \begin{rawhtml} <H1> \end{rawhtml}
       \stardoctitle\\
       \stardocversion\\
       \stardocmanual
@@ -328,7 +328,7 @@ instruments, Starlink users will find it particularly useful for the reduction
 of data obtained with the James Clerk Maxwell Telescope.  SPECX has it's own
 command line interpreter, and manipulates spectra on a pop-down stack.  The
 package is designed to work on a variety of graphics terminals but is mainly
-used from within an X windows environement. Hardcopy may be output on a number
+used from within an X windows environment. Hardcopy may be output on a number
 of printers for which \xref{GKS}{sun83}{} drivers are provided by Starlink. In
 the Unix version these are mainly different PostScript printers.
 
@@ -337,7 +337,7 @@ Some of the major features of SPECX are:
 \item
 The ability to process up to eight spectra (quadrants) simultaneously:
 these may have the same or different centre frequencies, resolutions, 
-{\em etc.} This allows users to operate on different filter-banks, or
+\emph{etc.} This allows users to operate on different filter-banks, or
 dual polarisation data for example, in parallel. 
 \item
 The ability to automatically save the current status of the system 
@@ -348,17 +348,17 @@ stopped (unintentionally or otherwise), when restarted it will
 Commands for the listing and display of spectra on a graphics
 terminal, with hardcopy on a variety of printers.
 \item
-Single and multiple scan arithmetic, scan averaging, {\em etc.}
+Single and multiple scan arithmetic, scan averaging, \emph{etc.}
 \item
 Commands to store and retrieve intermediate spectra in storage registers.
 \item
 Commands to perform the fitting and removal of polynomial, 
-harmonic and gaussian baselines.
+harmonic and Gaussian baselines.
 \item
 Commands for filtering and editing spectra.
 \item
 Commands to determine important line parameters (peak intensity, width, 
-{\em etc.}).
+\emph{etc.}).
 \item
 The ability to perform Fourier transform and power spectrum calculations.
 \item
@@ -493,7 +493,7 @@ commented at all. User are advised to compare it with {\tt demo.spx},
 which is a copy from the VMS version and will probably not work, but has
 comments as to the meaning of the commands.
 {\tt vms\_demo.spx} demonstrates the reading of JCMT data,
-the fitting of baselines and gaussians to spectra, and shows how to make
+the fitting of baselines and Gaussian to spectra, and shows how to make
 and display a data cube.
 
 
@@ -511,7 +511,7 @@ proceed as follows
 
 \begin{myquote}
 \begin{verbatim}
-% cd /star/specx                               # 1
+% cd /star/sources/specx                       # 1
 % setenv INSTALL /star
 % ./mk deinstall
 
@@ -703,14 +703,14 @@ Starlink-PGPLOT.  There is no change to functionality.
 \subsection{V6.7-4}
 
 At this update the graphics devices not available to GKS/PGPLOT have been
-removed from the graphics devices file (various termianl types and gif files).
+removed from the graphics devices file (various terminal types and gif files).
 There is also a fix to prevent an error when using colour PostScript devices.
 
 \subsection{V6.7-3}
 
 This is a minor update to correct the graphics device names to use the
 GKS/PGPLOT device names, and to fix a bug in the plotting system that caused
-problenms for PostScript devices.
+problems for PostScript devices.
 
 \subsection{V6.7-2}
 
@@ -935,7 +935,7 @@ velocity). By a simple application of the binomial theorem, we can see that
 these are all equivalent for $v << c$. A problem arises because these
 equations are used in reverse to \emph{define} a velocity, and this definition
 is often used where the approximations in (\ref{eqn:radio}) or
-(\ref{eqn:optical}) are inadmissable. Even the (special) relativistic formula
+(\ref{eqn:optical}) are inadmissible. Even the (special) relativistic formula
 applies only in \emph{local} frames, which are not the same thing at all as
 distant cosmological frames. So none of these formula are ``right''.
 
@@ -969,7 +969,7 @@ receiver we do this by adjusting the local oscillator frequency by an amount
 equal to the \emph{total} doppler frequency shift expected for the
 line. Second, we then need to \emph{display} the spectrum. Unfortunately, the
 spectrometer is back on Earth, at the telescope, so we need to map the
-I.F. frequencies of individual spectrometerchannels onto velocity (or
+I.F. frequencies of individual spectrometer channels onto velocity (or
 frequency) space in some other chosen frame. This `display' frame need not
 necessarily be the same as the `observation' frame.  For example, whatever the
 observation frame, we may wish to display the output in one of several
@@ -1064,9 +1064,9 @@ Receiver # 1  Line rest frequency? (GHz) [  0.000000] 345.795989
 \end{verbatim}
 \end{myquote}
 
-If we have done all this correctly we now get the absolute frequency plot
+\sloppypar{If we have done all this correctly we now get the absolute frequency plot
 shown below (Fig 2). A macro has been provided to do all this -- just type
-IMAGE-FREQ (this calls \texttt{specx\_command:image.spx}).
+IMAGE-FREQ (this calls \texttt{specx\_command:image.spx}).}
 
 \subsubsection{COMPLICATIONS. 2: AOSC}
 
@@ -1163,7 +1163,7 @@ as the map header.
 \subsubsection{References}
 
 M.A. Gordon. Chap 6.1 in "Methods of Experimental Physics", vol 12-C,
-    (Astrophyics -- Radio Observations). Academic Press, NY, 1976
+    (Astrophysics -- Radio Observations). Academic Press, NY, 1976
 
 
 \subsection{More on SPECX velocity scales -- January 1993}
@@ -1211,7 +1211,7 @@ out what was actually going on here.
 
 \begin{enumerate}
 \item J.D.Kraus, 1966. "Radio Astronomy" p47 McGraw-Hill, NY (first edition).
-\item D.A.MacRae and G.Westerhout: "Table for the reduction of velocites to the
+\item D.A.MacRae and G.Westerhout: "Table for the reduction of velocities to the
     Local Standard of Rest", The Observatory, Lund, Sweden 1956. (`The Lund
     Tables'). Uses 20km/s toward 18h,+30d(B1900)
 \item M.A.Gordon, 1976, in "Methods of Experimental Physics", vol 12-C, Chap 6.1
@@ -1280,7 +1280,7 @@ Meanwhile, for those who do have access to a VAX still, and while
 you are at the telescope, the improvements in V6.3 should make life
 easier. In fact the release of this version has been prompted mainly
 by the successful commissioning of the DAS, which in turn has required
-major changes in the internals of SPECX to accomodate extra header
+major changes in the internals of SPECX to accommodate extra header
 information required to define the frequency scales accurately.
 Several new commands have been added for dealing with DAS data, while
 others have been modified slightly.
@@ -1296,7 +1296,7 @@ any more, but it is a simple matter to open a new file and then copy the
 spectra across one by one or in a DO loop.
 
 
-The reason these file formats have had to change is to accomodate the
+The reason these file formats have had to change is to accommodate the
 LO and IF frequencies in the header, along with the velocity of the
 source in various frames. These were not previously available in the
 GSD file, but were derived within SPECX from the specified source-frame
