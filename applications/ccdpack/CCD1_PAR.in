@@ -42,6 +42,8 @@
 *        Added symbolic constant CCD1__BADSI.
 *     3-JUL-2001 (MBT):
 *        Added symbolic constant CCD1__MXSI.
+*     17-AUG-2004 (MBT):
+*        Increased some of the limits (CCD1__MXNDF, CCD1__MXLIS)
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -53,7 +55,7 @@
 
 *  Maximum number of NDFs that can be accessed.
       INTEGER CCD1__MXNDF
-      PARAMETER ( CCD1__MXNDF = 100 )
+      PARAMETER ( CCD1__MXNDF = 1000 )
 
 *  Maximum length of normal input string.
       INTEGER CCD1__SZSTR
@@ -78,18 +80,18 @@
 *  Maximum number of input coordinate lists and sum of
 *  (ccd1__mxlis-1) + (ccd1__mxlis-2)... (maximum intercomparisons)
       INTEGER CCD1__MXLIS
-      PARAMETER ( CCD1__MXLIS = 100 )
+      PARAMETER ( CCD1__MXLIS = 400 )
       INTEGER CCD1__MXLIC
-      PARAMETER ( CCD1__MXLIC = 4950 )
+      PARAMETER ( CCD1__MXLIC = CCD1__MXLIS * ( CCD1__MXLIS - 1 ) / 2 )
 
 *  Maximum number of pointers that common block can hold.
       INTEGER CCD1__MXPNT
-      PARAMETER ( CCD1__MXPNT = 5120 )
+      PARAMETER ( CCD1__MXPNT = 10240 )
 
 *  Maximum number of NDFs that can be accessed (all groups in automated
 *  reduction).
       INTEGER CCD1__MXINS
-      PARAMETER ( CCD1__MXINS = 512 )
+      PARAMETER ( CCD1__MXINS = 2048 )
 
 *  Maximum length of NAME field (FRAME_TYPE or FILTER)
       INTEGER CCD1__NMLEN
