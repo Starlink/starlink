@@ -1280,6 +1280,313 @@ C      HEAD.PSCALE = (HEAD.PMAX - HEAD.PMIN + 1) / NBIN
 *
       END
 
+
+*+XRT_GETSEL  - Gets event selection parameters from a file
+      SUBROUTINE XRT_GETSEL(ID, HEAD, STATUS)
+*    Description :
+*    Method :
+*    Authors :
+*    Type definitions :
+      IMPLICIT NONE
+*    Global constants :
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'DAT_PAR'
+*    Global variables :
+*    Structure definitions :
+      INCLUDE 'INC_CORR'
+*    Import :
+      INTEGER ID				 ! ID of input file
+*    Import-Export :
+      RECORD /CORR/ HEAD
+*    Status :
+      INTEGER STATUS
+*    Function declarations :
+*    Local constants :
+*    Local variables :
+      CHARACTER*(DAT__SZLOC) LOCIN               ! Locator to input file
+      CHARACTER*(DAT__SZLOC) ILOC,HLOC
+      LOGICAL NEW
+      INTEGER NTIM                        	 ! Number of sets of time windows
+      INTEGER LP
+      INTEGER MDATE                       	 ! MJD of the observation
+      INTEGER MSWITCH                    	 ! MJD of 26th Jan 1991
+
+*-
+      IF (STATUS .NE. SAI__OK) RETURN
+*
+      CALL ADI1_GETLOC(ID,LOCIN,STATUS)
+
+* Get locator to the instrument box
+      CALL BDA_LOCINSTR(LOCIN, ILOC, STATUS)
+*
+* Get detector type i.e. PSPC or HRI
+      CALL CMP_GET0C(ILOC, 'DETECTOR', HEAD.DET, STATUS)
+*
+      IF (STATUS .NE. SAI__OK) THEN
+         CALL MSG_PRNT('*Error reading instrument type*')
+         GOTO 999
+      ENDIF
+*
+* Sometimes it doesn't say if it is PSPC-B or C, but just says PSPC. In
+* this case the only way to tell is from the observation date.
+* Before Jan 26th 1991 is 'C' and after is 'B'.
+*   Test if the detector string is ok.
+      IF ( (INDEX(HEAD.DET, 'HRI') .EQ. 0) .AND.
+     &       (INDEX(HEAD.DET, 'PSPCB') .EQ. 0) .AND.
+     &           (INDEX(HEAD.DET, 'PSPCC') .EQ. 0) ) THEN
+*
+*      Get the observation date as an MJD (use MJDs to compare dates)
+         CALL BDA_LOCHEAD(LOCIN, HLOC, STATUS)
+*
+         CALL CMP_GET0I(HLOC, 'BASE_MJD', MDATE, STATUS)
+*
+         IF (STATUS .NE. SAI__OK) THEN
+            CALL MSG_PRNT('** Error reading BASE_MJD **')
+            CALL MSG_PRNT('** Can not determine detector type **')
+            GOTO 999
+         ENDIF
+*
+*      Convert 26th Jan 1991 to an MJD
+         CALL CONV_YMDMJD(1991, 1, 26, MSWITCH)
+*
+*      Compare the MJD of the observation to the switch over point
+         IF (MDATE .LE. MSWITCH) THEN
+            HEAD.DET = 'PSPCC'
+         ELSE
+            HEAD.DET = 'PSPCB'
+         ENDIF
+*
+      ENDIF
+*
+*
+      IF (STATUS .NE. SAI__OK) GOTO 999
+
+
+*  Get number of selection records
+      CALL SLN_NREC( ID, NREC, STATUS )
+
+      IF (NREC.EQ.0) THEN
+        CALL MSG_PRNT('AST_ERR: no sort selection data present')
+        STATUS=SAI__ERROR
+        GOTO 999
+      ENDIF
+
+*  Get this records
+      CALL SLN_GETREC(ID, '*', 0, SELID, STATUS )
+
+*  Locate Selectors
+      CALL ADI_FIND( SELID, 'Selectors', SID, STATUS )
+
+*  Get number of components
+      CALL ADI_NCMP( SID, NCMP, STATUS )
+      DO ICMP = 1, NCMP
+
+*  Index the selector
+        CALL ADI_INDCMP( SID, ICMP, SIID, STATUS )
+
+*  Get name
+        CALL ADI_NAME( SIID, SNAME, STATUS )
+
+        IF (SNAME.EQ.'SPACE') THEN
+
+          CALL XRT_GETSEL_ARD(SIID,HEAD,STATUS)
+
+        ELSEIF (SNAME.EQ.'TIME') THEN
+
+          CALL XRT_GETSEL_RANGE(SIID,HEAD.NTRANGE,HEAD.TMIN,HEAD.TMAX,
+     :                                                         STATUS)
+          IF (STATUS .NE. SAI__OK) THEN
+            CALL MSG_PRNT('Error accessing time range'/
+     :                     /' information from file')
+            GOTO 999
+          ENDIF
+
+        ELSEIF (SNAME.EQ.'ENERGY') THEN
+
+          CALL XRT_GETSEL_RANGE(SIID,HEAD.NPRANGE,HEAD.PMIN,HEAD.PMAX,
+     :                                                         STATUS)
+
+          IF (STATUS .NE. SAI__OK) THEN
+            CALL MSG_PRNT('Error accessing corrected PH range'/
+     :                     /' information from file')
+            GOTO 999
+          ENDIF
+
+
+        ELSEIF (SNAME.EQ.'PH_CHANNEL') THEN
+
+          CALL XRT_GETSEL_RANGE(SIID,
+     :                  HEAD.NUPRANGE,HEAD.UPMIN,HEAD.UPMAX,STATUS)
+
+          IF (STATUS .NE. SAI__OK) THEN
+            CALL MSG_PRNT('Error accessing raw PH range'/
+     :                     /' information from file')
+            GOTO 999
+          ENDIF
+
+
+        ENDIF
+
+
+*        Release selector
+        CALL ADI_ERASE( SIID, STATUS )
+
+      ENDDO
+
+*      Destroy it
+      CALL ADI_ERASE( SID, STATUS )
+      CALL ADI_ERASE( SELID, STATUS )
+
+
+
+*
+*   Calculate the off axis angle of the collection box
+      CALL XRT_OFFAX(1, 1, HEAD)
+*
+*
+999   CONTINUE
+*
+
+*
+      END
+
+
+
+*+
+      SUBROUTINE XRT_GETSEL_RANGE(SIID,NRANGE,START,STOP,STATUS)
+
+      IMPLICIT NONE
+
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'DAT_PAR'
+
+      INTEGER SIID
+      INTEGER NRANGE
+      REAL START(*)
+      REAL STOP(*)
+
+      INTEGER STATUS
+
+      INTEGER BPTR,EPTR
+*-
+
+      IF (STATUS.NE.SAI__OK) RETURN
+
+* How many pairs?
+      CALL ADI_CSIZE( SIID, 'START', NRANGE, STATUS )
+
+* Map the data
+      CALL ADI_CMAPR( SIID, 'START', 'READ', BPTR, STATUS )
+      CALL ADI_CMAPR( SIID, 'STOP', 'READ', EPTR, STATUS )
+
+* Loop over pairs
+      DO I = 1, NRANGE
+
+* Get these values
+        CALL ARR_ELEM1R( BPTR, NRANGE, I, START(I), STATUS )
+        CALL ARR_ELEM1R( EPTR, NRANGE, I, STOP(I), STATUS )
+
+      ENDDO
+
+* Release range pairs data
+      CALL ADI_CUNMAP( SIID, 'START', BPTR, STATUS )
+      CALL ADI_CUNMAP( SIID, 'STOP', EPTR, STATUS )
+
+
+      END
+
+
+*+
+      SUBROUTINE XRT_GETSEL_ARD(SIID,HEAD,STATUS)
+
+      IMPLICIT NONE
+
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'DAT_PAR'
+      INCLUDE 'INC_CORR'
+
+      INTEGER SIID
+      RECORD /CORR/ HEAD
+
+      INTEGER STATUS
+
+      CHARACTER*20 SHAPE
+      REAL PAR(7)
+
+*-
+
+      IF (STATUS.NE.SAI__OK) RETURN
+
+      CALL ADI_CGET0I( SIID, 'GRPID', HEAD.ARDID, STATUS )
+
+      CALL ARX_QSHAPE(HEAD.ARDID,SHAPE,PAR,STATUS)
+
+      IF (SHAPE.EQ.'CIRCLE') THEN
+        HEAD.SHAPE='C'
+        HEAD.XCENT=PAR(1)
+        HEAD.YCENT=PAR(2)
+        HEAD.PHI=0.0
+        HEAD.XINNER=0.0
+        HEAD.YINNER=0.0
+        HEAD.XOUTER=PAR(3)
+        HEAD.YOUTER=PAR(3)
+      ELSEIF (SHAPE.EQ.'BOX') THEN
+        HEAD.SHAPE='R'
+        HEAD.XCENT=PAR(1)
+        HEAD.YCENT=PAR(2)
+        HEAD.PHI=0.0
+        HEAD.XINNER=0.0
+        HEAD.YINNER=0.0
+        HEAD.XOUTER=PAR(3)/2.0
+        HEAD.YOUTER=PAR(4)/2.0
+      ELSEIF (SHAPE.EQ.'ELLIPSE') THEN
+        HEAD.SHAPE='E'
+        HEAD.XCENT=PAR(1)
+        HEAD.YCENT=PAR(2)
+        HEAD.PHI=PAR(3)
+        HEAD.XINNER=0.0
+        HEAD.YINNER=0.0
+        HEAD.XOUTER=PAR(4)
+        HEAD.YOUTER=PAR(5)
+      ELSEIF (SHAPE.EQ.'ANNULUS') THEN
+        HEAD.SHAPE='A'
+        HEAD.XCENT=PAR(1)
+        HEAD.YCENT=PAR(2)
+        HEAD.PHI=0.0
+        HEAD.XINNER=PAR(3)
+        HEAD.YINNER=PAR(3)
+        HEAD.XOUTER=PAR(4)
+        HEAD.YOUTER=PAR(4)
+      ELSEIF (SHAPE.EQ.'ANNULARBOX') THEN
+        HEAD.SHAPE='R'
+        HEAD.XCENT=PAR(1)
+        HEAD.YCENT=PAR(2)
+        HEAD.PHI=0.0
+        HEAD.XINNER=PAR(3)/2.0
+        HEAD.YINNER=PAR(4)/2.0
+        HEAD.XOUTER=PAR(5)/2.0
+        HEAD.YOUTER=PAR(6)/2.0
+      ELSEIF (SHAPE.EQ.'ANNULARELLIPSE') THEN
+        HEAD.SHAPE='E'
+        HEAD.XCENT=PAR(1)
+        HEAD.YCENT=PAR(2)
+        HEAD.PHI=PAR(3)
+        HEAD.XINNER=PAR(4)
+        HEAD.YINNER=PAR(5)
+        HEAD.XOUTER=PAR(6)
+        HEAD.YOUTER=PAR(7)
+
+      ELSE
+        HEAD.SHAPE='D'
+
+      ENDIF
+
+      END
+
+
+
+
+
 *+XRT_GETTYPE	Works out the type of file produced from the axes.
 	SUBROUTINE XRT_GETTYPE (NAXES,AXES,TYPE)
 * Description :
