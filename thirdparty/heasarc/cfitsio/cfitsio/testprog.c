@@ -18,7 +18,7 @@ int main()
     int status, simple, bitpix, naxis, extend, hdutype, hdunum, tfields;
     long ii, jj, extvers;
     int nkeys, nfound, colnum, typecode, signval,nmsg;
-    char cval;
+    char cval, cvalstr[2];
     long repeat, offset, width, jnulval;
     int anynull;
     float vers;
@@ -1145,10 +1145,10 @@ int main()
     {
       ffgtcl(fptr, ii + 1, &typecode, &repeat, &width, &status);
       printf("%4s %3d %2ld %2ld", tform[ii], typecode, repeat, width);
-      ffgbcl(fptr, ii + 1, ttype[0], tunit[0], &cval, &repeat, &scale,
+      ffgbcl(fptr, ii + 1, ttype[0], tunit[0], cvalstr, &repeat, &scale,
            &zero, &jnulval, tdisp, &status);
       printf(" %s, %s, %c, %ld, %f, %f, %ld, %s.\n",
-         ttype[0], tunit[0], cval, repeat, scale, zero, jnulval, tdisp);
+         ttype[0], tunit[0], cvalstr[0], repeat, scale, zero, jnulval, tdisp);
     }
 
     printf("\n");

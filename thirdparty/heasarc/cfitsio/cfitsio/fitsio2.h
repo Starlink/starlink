@@ -240,14 +240,36 @@
 #ifndef LONGLONG_MAX
 
 #ifdef LLONG_MAX
+/* Linux and Solaris definition */
 #define LONGLONG_MAX LLONG_MAX
 #define LONGLONG_MIN LLONG_MIN
 
+#elif defined(LONG_LONG_MAX)
+#define LONGLONG_MAX LONG_LONG_MAX
+#define LONGLONG_MIN LONG_LONG_MIN
+
+#elif defined(__LONG_LONG_MAX__)
+/* Mac OS X & CYGWIN defintion */
+#define LONGLONG_MAX __LONG_LONG_MAX__
+#define LONGLONG_MIN (-LONGLONG_MAX -1LL)
+
 #elif defined(INT64_MAX)
+/* windows definition */
 #define LONGLONG_MAX INT64_MAX
 #define LONGLONG_MIN INT64_MIN
 
-#elif (LONGSIZE == 64) || defined(HAVE_LONGLONG)
+#elif defined(_I64_MAX)
+/* windows definition */
+#define LONGLONG_MAX _I64_MAX
+#define LONGLONG_MIN _I64_MIN
+
+#elif defined(HAVE_LONGLONG)
+/* compiler has a 'long long' or equivalent type */
+#define LONGLONG_MAX  9223372036854775807LL /* max 64-bit integer */
+#define LONGLONG_MIN (-LONGLONG_MAX -1LL)   /* min 64-bit integer */
+
+#elif (LONGSIZE == 64)
+/* Compiler may not have a 'long long' type, but sizeof(long) = 64 */
 #define LONGLONG_MAX  9223372036854775807L /* max 64-bit integer */
 #define LONGLONG_MIN (-LONGLONG_MAX -1L)   /* min 64-bit integer */
 
@@ -363,6 +385,9 @@ int ffwrite(FITSfile *fptr, long nbytes, void *buffer,
             int *status);
 int fftrun(fitsfile *fptr, OFF_T filesize, int *status);
 
+int ffpcluc(fitsfile *fptr, int colnum, long firstrow, long firstelem, long
+           nelem, int *status);
+	   
 int ffgcll(fitsfile *fptr, int colnum, long firstrow, OFF_T firstelem, long
            nelem, int nultyp, char nulval, char *array, char *nularray,
            int *anynul, int *status);
@@ -1005,6 +1030,7 @@ int stdin2file(int hd);
 int stdout_close(int handle);
 int mem_compress_openrw(char *filename, int rwmode, int *hdl);
 int mem_compress_open(char *filename, int rwmode, int *hdl);
+int mem_compress_stdin_open(char *filename, int rwmode, int *hdl);
 int mem_iraf_open(char *filename, int rwmode, int *hdl);
 int mem_rawfile_open(char *filename, int rwmode, int *hdl);
 int mem_size(int handle, OFF_T *filesize);

@@ -157,6 +157,7 @@ int	shared_set_debug(int debug_msgs);	/* set/reset debug mode */
 int	shared_set_createmode(int mode);	/* set/reset debug mode */
 int	shared_list(int id);			/* list segment(s) */
 int	shared_uncond_delete(int id);		/* uncondintionally delete (NOWAIT operation) segment(s) */
+int	shared_getaddr(int id, char **address);	/* get starting address of FITS file in segment */
 
 int	smem_init(void);
 int	smem_shutdown(void);

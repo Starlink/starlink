@@ -1,7 +1,133 @@
-
                    Log of Changes Made to CFITSIO
 
-Version 2.490 -  11 February 2004
+
+Version 2.501 - 2 December 2004
+
+  New Routines:
+  
+   - added fits_open_diskfile and fits_create_diskfile routines that simply
+     open or create a FITS file with a specified name.  CFITSIO does not
+     try to parse the name using the extended filename syntax.
+     
+   - 2 new C functions, CFITS2Unit and CUnit2FITS, were added to convert
+     between the C fitsfile pointer value and the Fortran unit number.
+     These functions may be useful in mixed language C and Fortran programs.   
+   
+  Enhancements:
+  
+   - added the ability to recognize and open a compressed FITS file
+     (compressed with gzip or unix compress) on the stdin standard input
+     stream.
+  
+   - Craig Markwardt (GSFC) provided 2 more lexical parser functions:
+     accum(x) and seqdiff(x) that compute the cummulative sum and the
+     sequential difference of the values of x.
+  
+   - modified putcole.c and putcold.c so that when writing arrays of
+     pixels to the FITS image or column that contain null values, and
+     there are also numerical overflows when converting some of the
+     non-null values to the FITS values, CFITSIO will now ignore the
+     overflow error until after all the data have been written. Previously,
+     in some circumstances CFITSIO would have simply stopped writing any
+     data after the first overflow error.     
+      
+   - modified fitsio2.h to try to eliminate compiler warning messages
+     on some platforms about the use of 'long long' constants when 
+     defining the value of LONGLONG_MAX (whether to use L or LL
+     suffix).
+
+   - modified region.c to support 'physical' regions in addition to
+     'image', 'fk4', etc.
+
+   - modified ffiurl (input filename parsing routine) to increase the 
+     maximum allowed extension number that can be specified from 9999 
+     to 99999 (e.g. 'myfile.fits+99999')
+
+  Bug Fixes:
+  
+   - added check to fits_create_template to force it to start with
+     the primary array in the template file, in case an extension
+     number was specified as part of the template FITS file name.
+      
+Version 2.500 - 28 & 30 July 2004
+
+  New Routine:  
+  
+   - fits_file_exists tests whether the specified input file, or a 
+     compressed version of the file, exists on disk.
+
+  Enhancements:
+
+   - modified the way CFITSIO reads and writes data in COMPLEX ('C') and
+     DBLCOMPLEX 'M' columns.  Now, in all cases, when referring to the
+     number of elements in the vector, or the value of the offset to a 
+     particular element within the vector, CFITSIO considers each pair of
+     numbers (the imaginary and real parts) as a single element instead of
+     treating each single number as an element. In particular, this changes
+     the behavior of fits_write_col_null when writing to complex columns.  
+     It also changes the length of the 'nullarray' vector in the
+     fits_read_colnull routine;  it is now only 1/2 as long as before.
+     Each element of the nullarray is set = 1 if either the real or 
+     imaginary parts of the corresponding complex value have a null
+     value.(this change was added to version 2.500 on 30 July).
+
+   - Craig Markwardt, at GSFC, provided a number of significant enhancements
+     to the CFITSIO lexical parser that is used to evaluate expressions:
+     
+       - the parser now can operate on bit columns ('X') in a similar
+         way as for other numeric columns (e.g., 'B' or 'I' columns)
+	 
+       - range checking has been implemented, so that the following 
+         conditions return a Null value, rather than returning an error:
+	 divide by zero, sqrt(negative),  arccos(>1), arcsin(>1),
+	 log(negative), log10(negative)
+	 
+       - new vector functions:  MEDIAN, AVERAGE, STDDEV, and 
+         NVALID (returns the number of non-null values in the vector)
+
+       - all the new functions (and SUM, MIN and MAX) ignore null values
+       
+   - modified the iterator to support variable-length array columns
+
+   - modified configure to support AIX systems that have flock in a non-
+     standard location.
+     
+   - modified configure to remove the -D_FILE_OFFSET_BITS flag when running
+     on Mac Darwin systems.  This caused conflicts with the Fortran
+     wrappers, and should only be needed in any case when using CFITSIO
+     to read/write FITS files greater than 2.1 GB in size.
+
+   - modified fitsio2.h to support compilers that define LONG_LONG_MAX.
+
+   - modified ffrsim (resize an existing image) so that it supports changing
+     the datatype to an unsigned integer image using the USHORT_IMG and
+     ULONG_IMG definitions.
+
+   - modified the disk file driver (drvrfile.c) so that if an output
+     file is specified when opening an ordinary file (e.g. with the syntax
+     'myfile.fits(outputfile.fits)' then it will make a copy of the file,
+     close the original file and open the copy.  Previously, the
+     specified output file would be ignored unless the file was compressed.
+
+   - modified f77_wrap.h and f77_wrap3.c to support the Fortran wrappers
+     on 64-bit AMD Opteron machines
+
+  Bug fixes:
+
+   - made small change to ffsrow in eval_f.c to avoid potential array 
+     bounds overflow.
+     
+   - made small change to group.c to fix problem where an 'int' was
+     incorrectly being cast to a 'long'.
+
+   - corrected a memory allocation error in the new fits_hdr2str routine
+     that was added in version 2.48
+
+   - The on-the-fly row-selection filtering would fail with a segfault
+     if the length of a table row (NAXIS1 value) was greater than
+     500000 bytes.  A small change to eval_f.c was required to fix this.
+
+Version 2.490 - 11 February 2004
 
   Bug fixes:
 
@@ -132,7 +258,7 @@ Version 2.470 - 18 August 2003
 
   Bug fixes:
 
-  - In the special case of writing 0 elements to a vector table colum
+  - In the special case of writing 0 elements to a vector table column
     that contains 0 rows, ffgcpr no longer adds a blank row to the table.
     
   - added error checking code for cases where a ASCII string column
@@ -195,7 +321,7 @@ Version 2.450 - 30 April 2003
     modify a keyword, instead of a column.  Previously it was only possible
     to modify keywords in a table extension (not an image), and the 
     keyword filtering could cause some of the table columns to not
-    get propogated into the virtual file.  Also, spaces are now
+    get propagated into the virtual file.  Also, spaces are now
     allowed within the specified keyword comment field.
 
   - ffdtyp was incorrectly returning the data type of FITS keyword
@@ -405,7 +531,7 @@ Version 2.410 - 22 April 2002 (used in the FTOOLS 5.2 release)
 
   - included an alternate source file that can be used to replace
     compress.c, which is distributed under the GNU General Public
-    Licence.  The alternate file contains non-functional stubs for
+    License.  The alternate file contains non-functional stubs for
     the compression routines, which can be used to make a version of
     CFITSIO that does not have the GPL restrictions (and is also less
     functional since it cannot read or write compressed FITS files).
@@ -426,9 +552,9 @@ Version 2.410 - 22 April 2002 (used in the FTOOLS 5.2 release)
     of memory available on typical machines today compared with
     a few years ago.  The number of buffers can be set by the user
     with the NIOBUF parameter in fitsio2.h.  (Setting this too large
-    can actually hurt performace).
+    can actually hurt performance).
 
-  - modified the #if statments in fitsio2.h, f77_wrap.h and f77_wrap1.c
+  - modified the #if statements in fitsio2.h, f77_wrap.h and f77_wrap1.c
     to support the new Itanium 64-bit Intel PC.
 
   - a couple minor modifications to fitsio.h needed to support the off_t
@@ -516,7 +642,7 @@ Version 2.400 - 18 Jan 2002
   - major enhancement was made to support writing to tile-compressed
     images.  In this format, the image is divided up into a rectangular
     grid of tiles, and each tile of pixels is compressed individually
-    and stored in a row of a variable-length array columm in a binary
+    and stored in a row of a variable-length array column in a binary
     table.  CFITSIO has been able to transparently read this compressed
     image format ever since version 2.1.  Now all the CFITSIO image
     writing routines also transparently support this format.  There are

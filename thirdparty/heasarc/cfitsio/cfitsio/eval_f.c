@@ -238,7 +238,7 @@ int ffsrow( fitsfile *infptr,   /* I - Input FITS file                      */
    /*  Fill out Info data for parser  */
    /***********************************/
 
-   Info.dataPtr = (char *)malloc( inExt.numRows * sizeof(char) );
+   Info.dataPtr = (char *)malloc( (inExt.numRows + 1) * sizeof(char) );
    Info.nullPtr = NULL;
    Info.maxRows = inExt.numRows;
    if( !Info.dataPtr ) {
@@ -247,6 +247,9 @@ int ffsrow( fitsfile *infptr,   /* I - Input FITS file                      */
       return( *status = MEMORY_ALLOCATION );
    }
    
+   /* make sure array is zero terminated */
+   ((char*)Info.dataPtr)[inExt.numRows] = 0;
+
    if( constant ) { /*  Set all rows to the same value from constant result  */
 
       result = gParse.Nodes[gParse.resultNode].value.data.log;
@@ -273,7 +276,7 @@ int ffsrow( fitsfile *infptr,   /* I - Input FITS file                      */
          ffcprs();
          return( *status=MEMORY_ALLOCATION );
       }
-      maxrows = 500000L/rdlen;
+      maxrows = maxvalue( (500000L/rdlen), 1);
       nbuff = 0;
       inloc = 1;
       if( infptr==outfptr ) { /* Skip initial good rows if input==output file */
@@ -809,9 +812,9 @@ int ffiprs( fitsfile *fptr,      /* I - Input FITS file                     */
    /*  which columns are neded and what data type is returned  */
 
    ffrestart(NULL);
-   if( ffparse() )
+   if( ffparse() ) {
       return( *status = PARSE_SYNTAX_ERR );
-
+   }
    /*  Check results  */
 
    *status = gParse.status;

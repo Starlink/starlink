@@ -712,6 +712,16 @@ int file_checkfile (char *urltype, char *infile, char *outfile)
         *file_outfile = '\0';  /* no output file was specified */
       }
     }
+    else  /* an ordinary, uncompressed FITS file on disk */
+    {
+        /* save the output file name for later use when opening the file. */
+        /* In this case, the file to be opened will be opened READONLY,   */
+        /* and copied to this newly created output file.  The original file */
+        /* will be closed, and the copy will be opened by CFITSIO for     */
+        /* subsequent processing (possibly with READWRITE access).        */
+        if (strlen(outfile))
+            strcpy(file_outfile,outfile);
+    }
 
     return 0;
 }

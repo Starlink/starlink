@@ -1,4 +1,4 @@
-/*  Version Info: This file is distributed with version 2.490 of CFITSIO   */
+/*  Version Info: This file is distributed with version 2.510 of CFITSIO   */
 
 /*  The FITSIO software was written by William Pence at the High Energy    */
 /*  Astrophysic Science Archive Research Center (HEASARC) at the NASA      */
@@ -314,6 +314,8 @@ typedef struct  /* structure for the iterator function column information */
 
 /* error status codes */
 
+#define CREATE_DISK_FILE -106 /* create disk file, without extended filename syntax */
+#define OPEN_DISK_FILE   -105 /* open disk file, without extended filename syntax */
 #define SKIP_TABLE       -104 /* move to 1st image when opening file */
 #define SKIP_IMAGE       -103 /* move to 1st table when opening file */
 #define SKIP_NULL_PRIMARY -102 /* skip null primary array when opening file */
@@ -487,6 +489,9 @@ extern "C" {
 #endif
 #endif
 
+int CFITS2Unit( fitsfile *fptr );
+fitsfile* CUnit2FITS(int unit);
+
 /*----------------  FITS file URL parsing routines -------------*/
 int fits_get_token(char **ptr, char *delimiter, char *token, int *isanumber);
 char *fits_split_names(char *list);
@@ -494,6 +499,7 @@ int ffiurl(char *url,  char *urltype, char *infile,
                     char *outfile, char *extspec, char *rowfilter,
                     char *binspec, char *colspec, int *status);
 int ffrtnm(char *url, char *rootname, int *status);
+int ffexist(const char *infile, int *exists, int *status);
 int ffexts(char *extspec, int *extnum,  char *extname, int *extvers,
           int *hdutype, char *colname, char *rowexpress, int *status);
 int ffextn(char *url, int *extension_num, int *status);
@@ -520,8 +526,10 @@ int ffopen(fitsfile **fptr, const char *filename, int iomode, int *status);
 int ffdopn(fitsfile **fptr, const char *filename, int iomode, int *status);
 int fftopn(fitsfile **fptr, const char *filename, int iomode, int *status);
 int ffiopn(fitsfile **fptr, const char *filename, int iomode, int *status);
+int ffdkopn(fitsfile **fptr, const char *filename, int iomode, int *status);
 int ffreopen(fitsfile *openfptr, fitsfile **newfptr, int *status); 
-int ffinit(fitsfile **fptr, const char *filename, int *status);
+int ffinit(  fitsfile **fptr, const char *filename, int *status);
+int ffdkinit(fitsfile **fptr, const char *filename, int *status);
 int ffimem(fitsfile **fptr,  void **buffptr,
            size_t *buffsize, size_t deltasize,
            void *(*mem_realloc)(void *p, size_t newsize),

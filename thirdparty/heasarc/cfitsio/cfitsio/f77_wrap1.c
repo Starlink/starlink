@@ -81,8 +81,7 @@ void Cfffiou( int unit, int *status )
 FCALLSCSUB2(Cfffiou,FTFIOU,ftfiou,INT,PINT)
 
 
-int CFits2Unit( fitsfile *fptr );
-int CFits2Unit( fitsfile *fptr )
+int CFITS2Unit( fitsfile *fptr )
      /* Utility routine to convert a fitspointer to a Fortran unit number */
      /* for use when a C program is calling a Fortran routine which could */
      /* in turn call CFITSIO... Modelled after code by Ning Gan.          */
@@ -115,6 +114,15 @@ int CFits2Unit( fitsfile *fptr )
    return( last_unit );
 }
 
+
+fitsfile* CUnit2FITS(int unit)
+{
+    if( unit<1 || unit>=MAXFITSFILES )
+        return(0);
+	
+    return(gFitsFiles[unit]);
+}
+
      /**************************************************/
      /*   Start of wrappers for routines in fitsio.h   */
      /**************************************************/
@@ -123,6 +131,7 @@ int CFits2Unit( fitsfile *fptr )
 
 FCALLSCSUB9(ffiurl,FTIURL,ftiurl,STRING,PSTRING,PSTRING,PSTRING,PSTRING,PSTRING,PSTRING,PSTRING,PINT)
 FCALLSCSUB3(ffrtnm,FTRTNM,ftrtnm,STRING,PSTRING,PINT)
+FCALLSCSUB3(ffexist,FTEXIST,ftexest,STRING,PINT,PINT)
 FCALLSCSUB3(ffextn,FTEXTN,ftextn,STRING,PINT,PINT)
 FCALLSCSUB7(ffrwrg,FTRWRG,ftrwrg,STRING,LONG,INT,PINT,PLONG,PLONG,PINT)
 
@@ -143,6 +152,23 @@ void Cffopen( fitsfile **fptr, const char *filename, int iomode, int *blocksize,
    }
 }
 FCALLSCSUB5(Cffopen,FTOPEN,ftopen,PFITSUNIT,STRING,INT,PINT,PINT)
+
+void Cffdkopn( fitsfile **fptr, const char *filename, int iomode, int *blocksize, int *status );
+void Cffdkopn( fitsfile **fptr, const char *filename, int iomode, int *blocksize, int *status )
+{
+   int hdutype;
+
+   if( *fptr==NULL || *fptr==(fitsfile*)1 ) {
+      ffdkopn( fptr, filename, iomode, status );
+      ffmahd( *fptr, 1, &hdutype, status );
+      *blocksize = 1;
+   } else {
+      *status = FILE_NOT_OPENED;
+      ffpmsg("Cffdkopn tried to use an already opened unit.");
+   }
+}
+FCALLSCSUB5(Cffdkopn,FTDKOPN,ftdkopn,PFITSUNIT,STRING,INT,PINT,PINT)
+
 
 void Cffnopn( fitsfile **fptr, const char *filename, int iomode, int *status );
 void Cffnopn( fitsfile **fptr, const char *filename, int iomode, int *status )
@@ -215,6 +241,18 @@ void Cffinit( fitsfile **fptr, const char *filename, int blocksize, int *status 
    }
 }
 FCALLSCSUB4(Cffinit,FTINIT,ftinit,PFITSUNIT,STRING,INT,PINT)
+
+void Cffdkinit( fitsfile **fptr, const char *filename, int blocksize, int *status );
+void Cffdkinit( fitsfile **fptr, const char *filename, int blocksize, int *status )
+{
+   if( *fptr==NULL || *fptr==(fitsfile*)1 ) {
+      ffdkinit( fptr, filename, status );
+   } else {
+      *status = FILE_NOT_CREATED;
+      ffpmsg("Cffdkinit tried to use an already opened unit.");
+   }
+}
+FCALLSCSUB4(Cffdkinit,FTDKINIT,ftdkinit,PFITSUNIT,STRING,INT,PINT)
 
 void Cfftplt( fitsfile **fptr, const char *filename, const char *tempname,
 	      int *status );

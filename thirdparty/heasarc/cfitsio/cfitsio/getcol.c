@@ -892,13 +892,13 @@ int ffgcf(  fitsfile *fptr,   /* I - FITS file pointer                       */
     }
     else if (datatype == TCOMPLEX)
     {
-        ffgcle(fptr, colnum, firstrow, (firstelem - 1) * 2 + 1, nelem * 2,
-           1, 2, *(float *) nulval, (float *) array, nullarray, anynul, status);
+        ffgcfc(fptr, colnum, firstrow, firstelem, nelem,
+           (float *) array, nullarray, anynul, status);
     }
     else if (datatype == TDBLCOMPLEX)
     {
-        ffgcld(fptr, colnum, firstrow, (firstelem - 1) * 2 + 1, nelem * 2, 
-         1, 2, *(double *) nulval, (double *) array, nullarray, anynul, status);
+        ffgcfm(fptr, colnum, firstrow, firstelem, nelem, 
+           (double *) array, nullarray, anynul, status);
     }
 
     else if (datatype == TLOGICAL)

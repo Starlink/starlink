@@ -1,4 +1,4 @@
- FITSIO TESTPROG, v  2.490
+ FITSIO TESTPROG, v  2.510
   
  Try opening then closing a nonexistent file: 
    ftopen iunit, status (expect an error) =  15 104
@@ -303,9 +303,9 @@
  NOT DEFINED      F   0   0 -16 -16 -16. -16.   0.   0.   0.   0.
  NOT DEFINED      T   0   0  98  98  98.  98.   0.   0.   0.   0.
  NOT DEFINED      T   0   0 -18 -18 -18. -18.   0.   0.   0.   0.
- NOT DEFINED      T   0   0  98  98  98.  98.   0.   0.   0.   0.
+ NOT DEFINED      T   0  98  98  98  98.  98.   0.   0.   0.   0.
  NOT DEFINED      T   0   0 -20 -20 -20. -20.   0.   0.   0.   0.
- NOT DEFINED      F   0   0  98  98  98.  98.   0.   0.   0.   0.
+ NOT DEFINED      F   0  98  98  98  98.  98.   0.   0.   0.   0.
   
   Read columns with ftgcf_: 
  first string     F  76   1   1   1   1.   1.   1.  -2.   1.  -2.
@@ -326,9 +326,9 @@
                   F   0   0 -16
                   T   0   0  99
                   T   0   0 -18
-                  T   0   0  99
+                  T   0  99  99
                   T   0   0 -20
-                  F   0   0  99
+                  F   0  99  99
   
  Data values after inserting 3 rows after row 2:
  first string     1   1   1   1.   1.

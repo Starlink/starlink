@@ -1665,8 +1665,8 @@ int ffgtam(fitsfile *gfptr,   /* FITS file pointer to grouping table HDU     */
 			   status);
 
       if(positionCol != 0)
-	fits_write_col_lng(gfptr,positionCol,nmembers,1,1,
-			   (long *)&memberPosition,status);
+	fits_write_col_int(gfptr,positionCol,nmembers,1,1,
+			   &memberPosition,status);
 
       *tmpPtr = memberFileName; 
 
@@ -3988,8 +3988,8 @@ int ffgmf(fitsfile *gfptr, /* pointer to grouping table HDU to search       */
       if(positionCol != 0 && 
 	            (grptype == GT_ID_POS || grptype == GT_ID_POS_URI))
 	{
-	  fits_read_col_lng(gfptr,positionCol,i,1,1,0,
-			    (long*)&mposition,&dummy,status);
+	  fits_read_col_int(gfptr,positionCol,i,1,1,0,
+			    &mposition,&dummy,status);
 	  if(position != mposition) continue;
 	}
       

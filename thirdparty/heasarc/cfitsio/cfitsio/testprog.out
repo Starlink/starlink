@@ -1,4 +1,4 @@
-CFITSIO TESTPROG, v2.490
+CFITSIO TESTPROG, v2.510
 
 Try opening then closing a nonexistent file:
   ffopen fptr, status  = 0 104 (expect an error)
@@ -333,9 +333,9 @@ Read columns with ffgcv_:
     NOT DEFINED 0   0  0 -16 -16 -16.0 -16.0 (  0.0,  0.0) (  0.0,  0.0) 
     NOT DEFINED 1   0  0  98  98  98.0  98.0 (  0.0,  0.0) (  0.0,  0.0) 
     NOT DEFINED 1   0  0 -18 -18 -18.0 -18.0 (  0.0,  0.0) (  0.0,  0.0) 
-    NOT DEFINED 1   0  0  98  98  98.0  98.0 (  0.0,  0.0) (  0.0,  0.0) 
+    NOT DEFINED 1   0 98  98  98  98.0  98.0 (  0.0,  0.0) (  0.0,  0.0) 
     NOT DEFINED 1   0  0 -20 -20 -20.0 -20.0 (  0.0,  0.0) (  0.0,  0.0) 
-    NOT DEFINED 0   0  0  98  98  98.0  98.0 (  0.0,  0.0) (  0.0,  0.0) 
+    NOT DEFINED 0   0 98  98  98  98.0  98.0 (  0.0,  0.0) (  0.0,  0.0) 
 
 Read columns with ffgcf_:
    first string 0  76  1   1   1   1.0   1.0 (  1.0, -2.0) (  1.0, -2.0)
@@ -356,9 +356,9 @@ Read columns with ffgcf_:
                 0   0  0 -16 
                 1   0  0  99 
                 1   0  0 -18 
-                1   0  0  99 
+                1   0 99  99 
                 1   0  0 -20 
-                0   0  0  99 
+                0   0 99  99 
 
 Data values after inserting 3 rows after row 2:
    first string  1   1   1   1.0   1.0

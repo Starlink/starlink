@@ -1,7 +1,7 @@
          CFITSIO - An Interface to FITS Format Files for C Programmers
  
                     William D Pence, HEASARC, NASA/GSFC
-                               Version 2.2 
+                               Version 2.4 
  
  
 [Note: This file contains various formatting command symbols ('*', '-')
@@ -64,22 +64,12 @@ package should be sent to the primary author:
 -
 This User's Guide assumes that readers already have a general
 understanding of the definition and structure of FITS format files.
-Further information about FITS formats is available in the `FITS User's
-Guide' and the `NOST FITS Standard', which are available from the NASA
-Science Office of Standards and Technology at the address given below.
-Both of these documents are available electronically from their Web
-site and via anonymous ftp at nssdc.gsfc.nasa.gov in the /pub/fits
-directory. Any questions about FITS formats should be directed to the
-NOST, at:
--
-        NASA, Science Office of Standards and Technology
-        Code 633.2,
-        Goddard Space Flight Center
-        Greenbelt MD 20771, USA
-        WWW: http://fits.gsfc.nasa.gov/
-        E-mail: fits@fits.gsfc.nasa.gov
-        (301) 286-2899
--
+Further information about FITS formats is available from the FITS Support
+Office at {\tt http://fits.gsfc.nasa.gov}.  In particular, the
+'NOST FITS Standard' gives the authoritative definition of the FITS data
+format, and the  `FITS User's Guide' provides additional historical background
+and practical advice on using FITS files.
+
 The HEASARC also provides a very sophisticated FITS file analysis
 program called `Fv' which can be used to display and edit the contents
 of any FITS file as well as construct new FITS files from scratch. The
@@ -128,7 +118,9 @@ then wrote the parsing routines used by CFITSIO based on Lammers'
 design, combined with other techniques such as the CFITSIO iterator
 routine to further enhance the data processing throughput.  This effort
 also benefited from a much earlier lexical parsing routine that was
-developed by Kent Blackburn (NASA/GSFC).
+developed by Kent Blackburn (NASA/GSFC). More recently, Craig Markwardt
+(NASA/GSFC) implemented additional functions (median, average, stddev)
+and other enhancements to the lexical parser.
 
 The CFITSIO iterator function is loosely based on similar ideas
 developed for the XMM Data Access Layer.
@@ -320,16 +312,18 @@ then they may be omitted from the build by typing 'make all-nofitsio'
 instead of simply typing 'make'.  This will reduce the size
 of the CFITSIO library slightly.
 
-Most 32-bit operating systems have only supported disk files up to
-2.1GB (2**31 bytes) in size.  Starting with version 2.1 of CFITSIO,
-FITS files larger than this limit (up to 6 terabytes) can be read and
-written on platforms which support large files (e.g., Solaris).  To
-enable this feature, CFITSIO must be compiled with the
-`-D\_FILE\_OFFSET\_BITS=64' compiler flag.  All programs which link to
-the CFITSIO library must also be compiled with this flag or must
-include this preprocessor definition at the start of the source code
-file. See the `CFITSIO Size Limitations' section in Chapter 4 for
-further details.
+Most 32-bit operating systems have only supported disk files up to 2.1GB
+(2**31 bytes) in size.  Starting with version 2.1 of CFITSIO, FITS files
+larger than this limit (up to 6 terabytes) can be read and written on
+platforms that support large files (e.g., at least some LINUX platforms 
+and Solaris).  To enable this
+feature, CFITSIO must be compiled with the '-D\_LARGEFILE\_SOURCE' and
+`-D\_FILE\_OFFSET\_BITS=64'
+compiler flags.  Some platforms may also require the `-D\_LARGE\_FILES'
+compiler flag.   It appears that in most cases it is not necessary to
+also include these compiler flags when compiling programs that link to
+the CFITSIO library. See the `CFITSIO Size Limitations'
+section in Chapter 4 for further details.
 
 It may not be possible to staticly link programs that use CFITSIO on
 some platforms (namely, on Solaris 2.6) due to the network drivers
@@ -651,8 +645,9 @@ TFORMn -- the data type of the column
 TUNITn -- the physical units of the column (optional)
 \end{itemize}
 
-Users should refer to the NOST documentation for more details about the
-required keywords and their allowed values.
+Users should refer to the FITS Support Office at {\tt http://fits.gsfc.nasa.gov}
+for futher information about the FITS format and related software 
+packages.
 
 
 *IV.  Programming Guidelines
@@ -856,7 +851,7 @@ equivalent to '\_\_int64'.  If the compiler does not support a 8-byte
 integer data type then LONGLONG is defined to be equivalent to 'long'.
 Note that the C format specifier to print out these long integer values
 is "\%lld" on most unix machines, except on OSF platforms where "\%ld"
-must be used.  On Windows platform which have the \_\_int64 data type,
+must be used.  On Windows platform that have the \_\_int64 data type,
 the format specifier is "\%INT64d".
 
 When dealing with the FITS byte data type it is important to remember
@@ -1169,7 +1164,7 @@ CFITSIO will automatically scan the table when it is closed to
 determine the maximum length of the vector and will append this value
 to the TFORMn value.
 
-The same routines which read and write data in an ordinary fixed length
+The same routines that read and write data in an ordinary fixed length
 binary table extension are also used for variable length fields,
 however, the routine parameters take on a slightly different
 interpretation as described below.
@@ -1301,7 +1296,7 @@ actual smaller value just before closing the table.
 **M.  CFITSIO Size Limitations
 
 CFITSIO places very few restrictions on the size of FITS files that it
-reads or writes.  There are a few limits, however, which may affect
+reads or writes.  There are a few limits, however, that may affect
 some extreme cases:
 
 1.  The maximum number of FITS files that may be simultaneously opened
@@ -1322,23 +1317,24 @@ records that have been read or written in the FITS files.  If the number
 of opened files is greater than NIOBUF, then CFITSIO may waste more time
 flushing and re-reading or re-writing the same records in the FITS files.
 
-2.  By default, CFITSIO can handle FITS files up to 2.1 GB in size
-(2**31 bytes).  This file size limit is often imposed by 32-bit
-operating systems.  More recently, as 64-bit operating systems become
-more common, an industry-wide standard (at least on Unix systems) has
-been developed to support larger sized files (see
-http://ftp.sas.com/standards/large.file/).  Starting with version 2.1
-of CFITSIO, larger FITS files up to 6 terabytes in size may be read and
-written on certain supported platforms.  In order to support these
-larger files, CFITSIO must be compiled with the
-`-D\_FILE\_OFFSET\_BITS=64' compiler flag.  All programs which link to
-the CFITSIO library must also be compiled with this flag or must
-include this preprocessor definition at the start of the source code
-file.  This causes the compiler to allocate 8-bytes instead of 4-bytes
-for the `off\_t' data type which is used to store file offset
-positions.
+2.  By default, CFITSIO can handle FITS files up to 2.1 GB in size (2**31
+bytes).  This file size limit is often imposed by 32-bit operating
+systems.  More recently, as 64-bit operating systems become more common, an
+industry-wide standard (at least on Unix systems) has been developed to
+support larger sized files (see http://ftp.sas.com/standards/large.file/).
+Starting with version 2.1 of CFITSIO, larger FITS files up to 6 terabytes
+in size may be read and written on supported platforms.  In order
+to support these larger files, CFITSIO must be compiled with the
+'-D\_LARGEFILE\_SOURCE' and  `-D\_FILE\_OFFSET\_BITS=64' compiler flags. 
+Some platforms may also require the `-D\_LARGE\_FILES' compiler flag.  
+ This causes the compiler to allocate 8-bytes instead of
+4-bytes for the `off\_t' data type that is used to store file offset
+positions.  It appears that in most cases it is not necessary to
+also include these compiler flags when compiling programs that link to
+the CFITSIO library.
 
-If CFITSIO is compiled with the -D\_FILE\_OFFSET\_BITS=64 flag on a
+If CFITSIO is compiled with the -D\_LARGEFILE\_SOURCE 
+and -D\_FILE\_OFFSET\_BITS=64 flags on a
 platform that supports large files, then it can read and write FITS
 files that contain up to 2**31 2880-byte FITS records, or approximately
 6 terabytes in size.  It is still required that the value of the NAXISn
@@ -1349,9 +1345,8 @@ image (given by the NAXISn keywords), the total width of a table
 the total size of the variable-length array heap in binary tables
 (PCOUNT keyword) must be less than this limit.
 
-Currently, support for large files within CFITSIO has only been tested
-on the Solaris 2.6 operating system using the Sun cc compiler or gcc
-2.95.2.
+Currently, support for large files within CFITSIO has been tested
+on the Linux, Solaris, and IBM AIX operating systems.
 
 *V.  Basic CFITSIO Interface Routines
  
@@ -1435,6 +1430,9 @@ status value is also returned as the value of the function itself.
 int fits_open_file / ffopen
     (fitsfile **fptr, char *filename, int iomode, > int *status)
 
+int fits_open_diskfile / ffdkopen
+    (fitsfile **fptr, char *filename, int iomode, > int *status)
+
 int fits_open_data / ffdopn
     (fitsfile **fptr, char *filename, int iomode, > int *status)
 
@@ -1453,6 +1451,13 @@ within the FITS file that should be moved to and opened (e.g.,
 \verb-myfile.fits+3- or \verb-myfile.fits[3]- moves to the 3rd extension within
 the file, and \verb-myfile.fits[events]- moves to the extension with the
 keyword EXTNAME = 'EVENTS').
+
+The fits\_open\_diskfile routine is similar to the fits\_open\_file routine
+except that it does not support the extended filename syntax in the input
+file name.  This routine simply tries to open the specified input file
+on magnetic disk.  This routine is mainly for use in cases where the
+filename (or directory path) contains square or curly bracket characters
+that would confuse the extended filename parser.
 
 The fits\_open\_data routine is similar to the fits\_open\_file routine
 except that it will move to the first HDU containing significant data,
@@ -1476,7 +1481,7 @@ and dimensions of the array must be specified in square brackets
 following the name of the file (e.g.  'rawfile.dat[i512,512]' opens a
 512 x 512 short integer image).  See the `Extended File Name Syntax'
 chapter for more details on how to specify the raw file name.  The raw
-file is converted on the fly into a virtual FITS image in memory which
+file is converted on the fly into a virtual FITS image in memory that
 is then opened by the application program with READONLY access.
 
 Programs can read the input file from the 'stdin' file stream if a dash
@@ -1500,7 +1505,7 @@ myimage.fits[101:200,301:400]
 -
 will create and open a 100x100 pixel virtual image of that section of
 the physical image, and \verb+myimage.fits[*,-*]+ opens a virtual image
-which is the same size as the physical image but has been flipped in
+that is the same size as the physical image but has been flipped in
 the vertical direction.
 
 When opening a table, the filtering syntax can be used to add or delete
@@ -1535,6 +1540,9 @@ file twice, move to 2 different extensions within the file, and then
 -
 int fits_create_file / ffinit
     (fitsfile **fptr, char *filename, > int *status)
+    
+int fits_create_diskfile / ffdkinit
+    (fitsfile **fptr, char *filename, > int *status)
 -
 
 An error will be returned if the specified file already exists, unless
@@ -1549,7 +1557,7 @@ character ('-') or the string 'stdout' is given as the filename. Similarly,
 '-.gz' or 'stdout.gz' will cause the file to be gzip compressed before
 it is written out to the stdout stream.
 
-Optionally, the name of a template file which is used to define the
+Optionally, the name of a template file that is used to define the
 structure of the new file may be specified in parentheses following the
 output file name. The template file may be another FITS file, in which
 case the new file, at the time it is opened, will be an exact copy of
@@ -1557,7 +1565,15 @@ the template file except that the data structures (images and tables)
 will be filled with zeros. Alternatively, the template file may be an
 ASCII format text file containing directives that define the keywords to be
 created in each HDU of the file. See the 'Extended File Name Syntax'
-> section for a complete description of the template file syntax. 
+ section for a complete description of the template file syntax. 
+ 
+The fits\_create\_diskfile routine is similar to the fits\_create\_file routine
+except that it does not support the extended filename syntax in the input
+file name.  This routine simply tries to create the specified file
+on magnetic disk.  This routine is mainly for use in cases where the
+filename (or directory path) contains square or curly bracket characters
+> that would confuse the extended filename parser.
+
 
 >3  Close a previously opened FITS file.  The first routine simply
 closes the file, whereas the second one also DELETES THE FILE, which
@@ -1786,7 +1802,7 @@ header.
 -
 >6  Concatenate the header keywords in the CHDU into a single long
     string of characters.  This provides a convenient way of passing
-    all the header information in a FITS HDU to other subroutines.
+    all or part of the header information in a FITS HDU to other subroutines.
     Each 80-character fixed-length keyword record is appended to the
     output character string, in order, with no intervening separator or
     terminating characters. The last header record is terminated with
@@ -3399,6 +3415,8 @@ iotype -- defines whether the data array is to be input to the
           work function (i.e, read from the FITS file), or output
           from the work function (i.e., written to the FITS file) or
           both.  Allowed values are InputCol, OutputCol, or InputOutputCol.
+	  Variable-length array columns are supported as InputCol or 
+	  InputOutputCol types, but may not be used for an OutputCol type.
 \end{itemize}
 
 After the driver routine has initialized all these parameters, it
@@ -3432,7 +3450,10 @@ can then call the CFITSIO iterator function:
                     for greatest efficiency.
                     If nPerLoop is negative, then all the rows
                     or pixels will be passed at one time, and the work
-                    function will only be called once.
+                    function will only be called once.  If any variable
+		    length arrays are being processed, then the nPerLoop
+		    value is ignored, and the iterator will always process
+		    one row of the table at a time.
 
 \item
    *workFn     - the name (actually the address) of the work function
@@ -3485,6 +3506,11 @@ initialization step or during the clean up step after the last set of
 data has been processed.  Extra FITS file I/O during the main
 processing loop of the work function can seriously degrade the speed of
 the program.
+
+If variable-length array columns are being processed, then the iterator
+will operate on one row of the table at a time.  In this case the
+the repeat element in the interatorCol structure will be set equal to
+the number of elements in the current row that is being processed.
 
 One important feature of the iterator is that the first element in each
 array that is passed to the work function gives the value that is used
@@ -3592,20 +3618,14 @@ do not have a corresponding short function name.
 
 *IX.  Celestial Coordinate System Routines
 
-The FITS community has adopted a set of keyword conventions that are
-used to  specify the transformation that is needed to convert between
-pixel locations in an image and the corresponding celestial coordinates
-on the sky.  or more generally, to specify world coordinates that
-are to be associated with any pixel location in an n-dimensional FITS
-array. CFITSIO is distributed with a simple set of World Coordinate
-System routines that support a limited set of celestial projections.
-These routines were derived from functions in the Classic AIPS software
-package developed in the 1980s.  These routines DO NOT support all the
-new conventions in the WCS papers that have recently been approved as
-part of the official FITS standard.
-
-Rather than using the WCS routines distributed with CFITSIO, it is
-STRONGLY RECOMMENDED that software developers use a more sophisticated
+The FITS community has adopted a set of keyword conventions that define
+the transformations needed to convert between pixel locations in an
+image and the corresponding celestial coordinates on the sky, or more
+generally, that define world coordinates that are to be associated with
+any pixel location in an n-dimensional FITS array. CFITSIO is distributed
+with a couple of self-contained World Coordinate System (WCS) routines,
+however, these routines DO NOT support all the latest WCS conventions,
+so it is STRONGLY RECOMMENDED that software developers use a more robust
 external WCS library.  Several recommended libraries are:
 
 -
@@ -3614,15 +3634,18 @@ external WCS library.  Several recommended libraries are:
   AST library - developed by the U.K. Starlink project
 -
 
-More information about the WCS keyword conventions and links
-to all of these libraries can be found on the FITS Support Office
-web site at http://fits.gsfc.nasa.gov under the WCS link.
+More information about the WCS keyword conventions and links to all of
+these WCS libraries can be found on the FITS Support Office web site at
+http://fits.gsfc.nasa.gov under the WCS link.
 
-Each of these libraries has a routine that will ingest a list of header
-keywords from which the transformations between pixel coordinates and
-world coordinates can be derived.  The following CFITSIO routine may
-be used to copy the keywords in any FITS header into a long character
-string that can then be passed to the WCS library routine:
+The functions provided in these external WCS libraries will need
+access to the  WCS information contained in the FITS file headers.
+One convenient way to pass this information to the extermal library is
+to use the fits\_hdr2str routine in CFITSIO (defined below) to copy the
+header keywords into one long string, and then pass this string to an
+interface routine in the external library that will extract
+the necessary WCS information (e.g., see the astFitsChan and astPutCards
+routines in the Starlink AST library).
   
 >1  Concatenate the header keywords in the CHDU into a single long
     string of characters. Each 80-character fixed-length keyword
@@ -3656,7 +3679,7 @@ the following routines ARE NOW DEPRECATED.  It is STRONGLY RECOMMENDED
 that software developers not use these routines, and instead use an
 external WCS library, as described in the previous section.
 
-These routines are included only for backward compatibility with
+These routines are included mainly for backward compatibility with
 existing software.  They support the following standard map 
 projections: -SIN, -TAN, -ARC, -NCP, -GLS, -MER, and -AIT (these are the
 legal values for the coordtype parameter).  These routines are based
@@ -4122,7 +4145,23 @@ specifications.
    int fits_parse_rootname / ffrtnm
        (char *filename, > char *rootname, int *status);
 -
->8 Flush any internal buffers of data to the output FITS file. These 
+>8 Test if the input file or a compressed version of the file (with
+a .gz, .Z, .z, or .zip extension) exists on disk.  The returned value of 
+the 'exists' parameter will have 1 of the 4 following values:
+-
+   2:  the file does not exist, but a compressed version does exist
+   1:  the disk file does exist
+   0:  neither the file nor a compressed version of the file exist
+  -1:  the input file name is not a disk file (could be a ftp, http,
+       smem, or mem file, or a file piped in on the STDIN stream)
+-
+
+> \label{ffexist}
+-
+   int fits_file_exists / ffexist
+       (char *filename, > int *exists, int *status);
+-
+>9 Flush any internal buffers of data to the output FITS file. These 
    routines rarely need to be called, but can be useful in cases where
    other processes need to access the same FITS file in real time,
    either on disk or in memory.  These routines also help to ensure
@@ -4729,7 +4768,7 @@ parameters used in these routines.
     or 32.  This does not create or change the value of the BLANK keyword in
 >   the header. \label{ffpnul}
 -
-  int fits_set_imgnul / ffpnul
+  int fits_set_imgnull / ffpnul
       (fitsfile *fptr, long nulval, > int *status)
 -
 >4  Define the string to be used to signify undefined pixels in
@@ -6151,53 +6190,62 @@ by a backslash to force the UNIX shell to ignore it.
     The expression may  also include arithmetic operators and functions.
     Trigonometric  functions use  radians,  not degrees.  The  following
     arithmetic  operators and  functions  can be  used in the expression
-    (function names are case insensitive):
+    (function names are case insensitive). A null value will be returned
+    in case of illegal operations such as divide by zero, sqrt(negative)
+    log(negative), log10(negative), arccos(.gt. 1), arcsin(.gt. 1).
 
 -
-    "addition"           +          "subtraction"          -
-    "multiplication"     *          "division"             /
-    "negation"           -          "exponentiation"       **   ^
-    "absolute value"     abs(x)     "cosine"               cos(x)
-    "sine"               sin(x)     "tangent"              tan(x)
-    "arc cosine"         arccos(x)  "arc sine"             arcsin(x)
-    "arc tangent"        arctan(x)  "arc tangent"          arctan2(x,y)
-    "exponential"        exp(x)     "square root"          sqrt(x)
-    "natural log"        log(x)     "common log"           log10(x)
-    "modulus"            i % j      "random # [0.0,1.0)"   random()
-    "minimum"            min(x,y)   "maximum"              max(x,y)
-    "if-then-else"       b?x:y
+    "addition"          +          "subtraction"          -
+    "multiplication"    *          "division"             /
+    "negation"          -          "exponentiation"       **   ^
+    "absolute value"    abs(x)     "cosine"                cos(x)
+    "sine"              sin(x)     "tangent"               tan(x)
+    "arc cosine"        arccos(x)  "arc sine"              arcsin(x)
+    "arc tangent"       arctan(x)  "arc tangent"           arctan2(x,y)
+    "hyperbolic cos"    cosh(x)    "hyperbolic sin"        sinh(x)
+    "hyperbolic tan"    tanh(x)    "round to nearest int"  round(x)
+    "round down to int" floor(x)   "round up to int"       ceil(x)
+    "exponential"       exp(x)     "square root"           sqrt(x)
+    "natural log"       log(x)     "common log"            log10(x)
+    "modulus"           i % j      "random # [0.0,1.0)"    random()
+    "minimum"           min(x,y)   "maximum"               max(x,y)
+    "cumulative sum"    accum(x)   "sequential difference" seqdiff(x)
+    "if-then-else"      b?x:y
 -
 
     An alternate syntax for the min and max functions  has only a single
     argument which  should be  a  vector value (see  below).  The result
     will be the minimum/maximum element contained within the vector.
+    
+    The accum(x) function forms the cumulative sum of x, element by element.
+    Vector columns are supported simply by performing the summation process
+    through all the values.  Null values are treated as 0.  The seqdiff(x) 
+    function forms the sequential difference of x, element by element.  
+    The first value of seqdiff is the first value of x.  A single null 
+    value in x causes a pair of nulls in the output.  The seqdiff and 
+    accum functions are functional inverses, i.e., seqdiff(accum(x)) == x
+    as long as no null values are present.
+    
+    The  following  type  casting  operators  are  available,  where the
+    inclosing parentheses are required and taken  from  the  C  language
+    usage. Also, the integer to real casts values to double precision:
+-
+                "real to integer"    (int) x     (INT) x
+                "integer to real"    (float) i   (FLOAT) i
+-
 
-    There are three functions that are primarily for use with SAO region
-    files and the  FSAOI  task, but they  can  be  used  directly.  They
-    return  a  boolean true   or  false  depending   on  whether a   two
-    dimensional point is in the region or not:
+    In addition, several constants are built in  for  use  in  numerical
+    expressions:
+
 -
-    "point in a circular region"
-          circle(xcntr,ycntr,radius,Xcolumn,Ycolumn)
-    
-    "point in an elliptical region"
-         ellipse(xcntr,ycntr,xhlf_wdth,yhlf_wdth,rotation,Xcolumn,Ycolumn)
-    
-    "point in a rectangular region"
-             box(xcntr,ycntr,xfll_wdth,yfll_wdth,rotation,Xcolumn,Ycolumn)
-    
-    where 
-       (xcntr,ycntr) are the (x,y) position of the center of the region
-       (xhlf_wdth,yhlf_wdth) are the (x,y) half widths of the region
-       (xfll_wdth,yfll_wdth) are the (x,y) full widths of the region
-       (radius) is half the diameter of the circle
-       (rotation) is the angle(degrees) that the region is rotated with
-             respect to (xcntr,ycntr)
-       (Xcoord,Ycoord) are the (x,y) coordinates to test, usually column
-             names
-       NOTE: each parameter can itself be an expression, not merely a
-             column name or constant.
+        #pi              3.1415...      #e             2.7182...
+        #deg             #pi/180        #row           current row number
+        #null         undefined value   #snull         undefined string
 -
+
+    A  string constant must  be enclosed  in quotes  as in  'Crab'.  The
+    "null" constants  are useful for conditionally  setting table values
+    to a NULL, or undefined, value (eg., "col1==-99 ? \#NULL : col1").
 
     There is also a function for testing if  two  values  are  close  to
     each  other,  i.e.,  if  they are "near" each other to within a user
@@ -6212,19 +6260,20 @@ by a backslash to force the UNIX shell to ignore it.
     the expression will evaluate to NULL unless the undefined  value  is
     not   actually   required  for  evaluation,  e.g. "TRUE  .or.  NULL" 
     evaluates to TRUE. The  following  two  functions  allow  some  NULL
-    detection  and  handling:  ISNULL(x)  and  DEFNULL(x,y).  The former
+    detection  and  handling:
+-
+         "a null value?"              ISNULL(x)
+         "define a value for null"    DEFNULL(x,y)
+-
+    The former
     returns a boolean value of TRUE if the  argument  x  is  NULL.   The
     later  "defines"  a  value  to  be  substituted  for NULL values; it
     returns the value of x if x is not NULL, otherwise  it  returns  the
     value of y.
     
-    The  following  type  casting  operators  are  available,  where the
-    inclosing parentheses are required and taken  from  the  C  language
-    usage. Also, the integer to real casts values to double precision:
--
-                "real to integer"    (int) x     (INT) x
-                "integer to real"    (float) i   (FLOAT) i
--
+    
+    
+***2.  Bit Masks
 
     Bit  masks can be used to select out rows from bit columns (TFORMn =
     \#X) in FITS files. To represent the mask,  binary,  octal,  and  hex
@@ -6281,21 +6330,8 @@ by a backslash to force the UNIX shell to ignore it.
 
     Bit  fields can be appended as well using the '+' operator.  Strings
     can be concatenated this way, too.
-    
-    In addition, several constants are built in  for  use  in  numerical
-    expressions:
 
--
-        #pi              3.1415...      #e             2.7182...
-        #deg             #pi/180        #row           current row number
-        #null         undefined value   #snull         undefined string
--
-
-    A  string constant must  be enclosed  in quotes  as in  'Crab'.  The
-    "null" constants  are useful for conditionally  setting table values
-    to a NULL, or undefined, value (eg., "col1==-99 ? \#NULL : col1").
-
-***2.  Vector Columns
+***3.  Vector Columns
 
     Vector columns can also be used  in  building  the  expression.   No
     special  syntax  is required if one wants to operate on all elements
@@ -6311,16 +6347,29 @@ by a backslash to force the UNIX shell to ignore it.
     Arithmetic and logical operations are all performed on an element by
     element basis.  Comparing two vector columns,  eg  "COL1  ==  COL2",
     thus  results  in  another vector of boolean values indicating which
-    elements of the two vectors are equal.  Two functions are  available
-    which   operate   on  vectors:  SUM(x)  and  NELEM(x).   The  former 
-    literally sums all the elements in x, returning a scalar value.   If
-    x  is  a  boolean  vector,  SUM returns the number of TRUE elements.
-    The latter, NELEM, returns the  number  of  elements  in  vector  x.
-    (NELEM  also  operates  on  bit  and string columns, returning their
-    column widths.)  As an example, to test whether all elements of  two
-    vectors  satisfy  a  given  logical  comparison,  one  can  use  the 
-    expression
+    elements of the two vectors are equal.
 
+    Eight functions are available that operate on a vector and return a
+    scalar result:
+-
+    "minimum"      MIN(V)          "maximum"               MAX(V)
+    "average"      AVERAGE(V)      "median"                MEDIAN(V)
+    "sumation"     SUM(V)          "standard deviation"    STDDEV(V)
+    "# of values"  NELEM(V)        "# of non-null values"  NVALID(V)
+-
+    where V represents the name of a vector column or a manually 
+    constructed vector using curly brackets as described below.  The
+    first 6 of these functions ignore any null values in the vector when
+    computing the result.
+    
+    The SUM function literally sums all  the elements in x,  returning a 
+    scalar value.   If V  is  a  boolean  vector, SUM returns the number
+    of TRUE elements. The NELEM function  returns the number of elements
+    in vector V whereas NVALID return the number of non-null elements in
+    the  vector.   (NELEM  also  operates  on  bit  and string  columns, 
+    returning their column widths.)  As an example, to  test whether all 
+    elements of two vectors satisfy a  given logical comparison, one can
+    use the expression
 -
               SUM( COL1 > COL2 ) == NELEM( COL1 )
 -
@@ -6365,7 +6414,7 @@ by a backslash to force the UNIX shell to ignore it.
     vectors, will be expanded out with  each of its elements becoming an
     element in the constructed vector.
 
-***3.  Good Time Interval Filtering
+***4.  Good Time Interval Filtering
 
     A common filtering method involves selecting rows which have a time
     value which lies within what is called a Good Time Interval or GTI.
@@ -6380,10 +6429,17 @@ by a backslash to force the UNIX shell to ignore it.
     syntax is
 -
       gtifilter( [ "gtifile" [, expr [, "STARTCOL", "STOPCOL" ] ] ] )
+    or
+      gtifilter( [ 'gtifile' [, expr [, 'STARTCOL', 'STOPCOL' ] ] ] )
 -
     where  each "[]" demarks optional parameters.  Note that  the quotes
     around the gtifile and START/STOP column are required.  Either single
-    or double quotes may be used. The gtifile,
+    or double quotes may be used.  In cases where this expression is 
+    entered on the Unix command line, enclose the entire expression in
+    double quotes, and then use single quotes within the expression to
+    enclose the 'gtifile' and other terms.  It is also usually possible
+    to do the reverse, and enclose the whole expression in single quotes
+    and then use double quotes within the expression.  The gtifile,
     if specified,  can be blank  ("") which will  mean to use  the first
     extension  with   the name "*GTI*"  in   the current  file,  a plain
     extension  specifier (eg, "+2",  "[2]", or "[STDGTI]") which will be
@@ -6411,7 +6467,7 @@ by a backslash to force the UNIX shell to ignore it.
     searches   for   TIMEZERO/I/F   keywords  in  the  current  and  GTI 
     extensions, applying a relative time offset, if necessary.
 
-***4.  Spatial Region Filtering
+***5.  Spatial Region Filtering
 
     Another common  filtering method selects rows based on whether the
     spatial position associated with each row is located within a given 
@@ -6520,6 +6576,32 @@ by a backslash to force the UNIX shell to ignore it.
     at examples of region file produced by fv/POW or ds9 for further
     details of the region file format.
 
+    There are three functions that are primarily for use with SAO region
+    files and the  FSAOI  task, but they  can  be  used  directly.  They
+    return  a  boolean true   or  false  depending   on  whether a   two
+    dimensional point is in the region or not:
+-
+    "point in a circular region"
+          circle(xcntr,ycntr,radius,Xcolumn,Ycolumn)
+    
+    "point in an elliptical region"
+         ellipse(xcntr,ycntr,xhlf_wdth,yhlf_wdth,rotation,Xcolumn,Ycolumn)
+    
+    "point in a rectangular region"
+             box(xcntr,ycntr,xfll_wdth,yfll_wdth,rotation,Xcolumn,Ycolumn)
+    
+    where 
+       (xcntr,ycntr) are the (x,y) position of the center of the region
+       (xhlf_wdth,yhlf_wdth) are the (x,y) half widths of the region
+       (xfll_wdth,yfll_wdth) are the (x,y) full widths of the region
+       (radius) is half the diameter of the circle
+       (rotation) is the angle(degrees) that the region is rotated with
+             respect to (xcntr,ycntr)
+       (Xcoord,Ycoord) are the (x,y) coordinates to test, usually column
+             names
+       NOTE: each parameter can itself be an expression, not merely a
+             column name or constant.
+-
 
 ***5.  Example Row Filters
 -
@@ -6609,7 +6691,9 @@ number may be given instead of the name, preceded by a pound sign
 CFITSIO will first try to use the 'preferred column' as specified by
 the CPREF keyword if it exists (e.g., 'CPREF = 'DETX,DETY'), otherwise
 column names 'X', 'Y', 'Z', and 'T' will be assumed for each of the 4
-axes, respectively.
+axes, respectively.  In cases where the column name could be confused
+with an arithmetic expression, enclose the column name in parentheses to
+force the name to be interpreted literally.
 
 Each column name may be followed by an equals sign and then the lower
 and upper range of the histogram, and the size of the histogram bins,
@@ -7417,6 +7501,7 @@ fits\_copy\_hdu       & \pageref{ffcopy} \\
 fits\_copy\_header    & \pageref{ffcphd} \\
 fits\_copy\_key           & \pageref{ffcpky} \\
 fits\_copy\_member    & \pageref{ffgmcp} \\
+fits\_create\_diskfile    & \pageref{ffinit} \\
 fits\_create\_file    & \pageref{ffinit} \\
 fits\_create\_group  & \pageref{ffgtcr} \\
 fits\_create\_hdu     & \pageref{ffcrhd} \\
@@ -7427,9 +7512,10 @@ fits\_create\_template & \pageref{fftplt} \\
 fits\_date2str  & \pageref{ffdt2s} \\
 fits\_decode\_chksum  & \pageref{ffdsum} \\
 fits\_decode\_tdim    & \pageref{ffdtdm} \\
-fits\_delete\_col   & \pageref{ffdcol} \\
+
 \end{tabular}
 \begin{tabular}{lr}
+fits\_delete\_col   & \pageref{ffdcol} \\
 fits\_delete\_file    & \pageref{ffdelt} \\
 fits\_delete\_hdu     & \pageref{ffdhdu} \\
 fits\_delete\_key     & \pageref{ffdkey} \\
@@ -7438,6 +7524,7 @@ fits\_delete\_rowlist & \pageref{ffdrws} \\
 fits\_delete\_rowrange & \pageref{ffdrrg} \\
 fits\_delete\_rows  & \pageref{ffdrow} \\
 fits\_encode\_chksum  & \pageref{ffesum} \\
+fits\_file\_exists    & \pageref{ffexist} \\
 fits\_file\_mode      & \pageref{ffflmd} \\
 fits\_file\_name      & \pageref{ffflnm} \\
 fits\_find\_first\_row    & \pageref{ffffrw} \\
@@ -7460,10 +7547,10 @@ fits\_get\_hdrspace      & \pageref{ffghsp} \\
 fits\_get\_hdu\_num    & \pageref{ffghdn} \\
 fits\_get\_hdu\_type   & \pageref{ffghdt} \\
 fits\_get\_hduaddr    & \pageref{ffghad} \\
-fits\_get\_hduoff    & \pageref{ffghad} \\
-fits\_get\_img\_dim & \pageref{ffgidm} \\
 \end{tabular}
 \begin{tabular}{lr}
+fits\_get\_hduoff    & \pageref{ffghad} \\
+fits\_get\_img\_dim & \pageref{ffgidm} \\
 fits\_get\_img\_equivtype & \pageref{ffgidt} \\
 fits\_get\_img\_param & \pageref{ffgipr} \\
 fits\_get\_img\_size & \pageref{ffgisz} \\
@@ -7494,11 +7581,11 @@ fits\_insert\_key\_TYP    & \pageref{ffikyx} \\
 fits\_insert\_record     & \pageref{ffirec} \\
 fits\_insert\_rows  & \pageref{ffirow} \\
 fits\_iterate\_data   & \pageref{ffiter} \\
-fits\_make\_keyn      & \pageref{ffkeyn} \\
-fits\_make\_nkey      & \pageref{ffnkey} \\
 \end{tabular}
 \newpage
 \begin{tabular}{lr}
+fits\_make\_keyn      & \pageref{ffkeyn} \\
+fits\_make\_nkey      & \pageref{ffnkey} \\
 fits\_merge\_groups  & \pageref{ffgtmg} \\
 fits\_modify\_card       & \pageref{ffmcrd} \\
 fits\_modify\_comment    & \pageref{ffmcom} \\
@@ -7512,6 +7599,7 @@ fits\_movnam\_hdu     & \pageref{ffmnhd} \\
 fits\_movrel\_hdu     & \pageref{ffmrhd} \\
 fits\_null\_check     & \pageref{ffnchk} \\
 fits\_open\_data      & \pageref{ffopen} \\
+fits\_open\_diskfile    & \pageref{ffopen} \\
 fits\_open\_file      & \pageref{ffopen} \\
 fits\_open\_image      & \pageref{ffopen} \\
 fits\_open\_table      & \pageref{ffopen} \\
@@ -7543,11 +7631,12 @@ fits\_read\_img         & \pageref{ffgpv} \\
 fits\_read\_img\_coord & \pageref{ffgics} \\
 fits\_read\_img\_TYP     & \pageref{ffgpvx} \\
 fits\_read\_imghdr       & \pageref{ffghpr} \\
+
+\end{tabular}
+\begin{tabular}{lr}
 fits\_read\_imgnull & \pageref{ffgpf} \\
 fits\_read\_imgnull\_TYP & \pageref{ffgpfx} \\
 fits\_read\_key          & \pageref{ffgky} \\
-\end{tabular}
-\begin{tabular}{lr}
 fits\_read\_key\_longstr  & \pageref{ffgkls} \\
 fits\_read\_key\_triple   & \pageref{ffgkyt} \\
 fits\_read\_key\_unit     & \pageref{ffgunt} \\
@@ -7593,10 +7682,11 @@ fits\_update\_chksum  & \pageref{ffupck} \\
 fits\_update\_key        & \pageref{ffuky} \\
 fits\_update\_key\_null   & \pageref{ffukyu} \\
 fits\_update\_key\_TYP    & \pageref{ffukyx} \\
-fits\_uppercase      & \pageref{ffupch} \\
-fits\_url\_type      & \pageref{ffurlt} \\
 \end{tabular}
 \begin{tabular}{lr}
+
+fits\_uppercase      & \pageref{ffupch} \\
+fits\_url\_type      & \pageref{ffurlt} \\
 fits\_verify\_chksum  & \pageref{ffvcks} \\
 fits\_verify\_group  & \pageref{ffgtvf} \\
 fits\_world\_to\_pix & \pageref{ffxypx} \\
@@ -7670,6 +7760,8 @@ ffdcol   & \pageref{ffdcol} \\
 ffdelt    & \pageref{ffdelt} \\
 ffdhdu     & \pageref{ffdhdu} \\
 ffdkey     & \pageref{ffdkey} \\
+ffdkinit  & \pageref{ffinit} \\
+ffdkopen      & \pageref{ffopen} \\
 ffdopn      & \pageref{ffopen} \\
 ffdrec  & \pageref{ffdrec} \\
 ffdrow  & \pageref{ffdrow} \\
@@ -7681,6 +7773,7 @@ ffdtdm   & \pageref{ffdtdm} \\
 ffdtyp    & \pageref{ffdtyp} \\
 ffeqty    & \pageref{ffgtcl} \\
 ffesum  & \pageref{ffesum} \\
+ffexest  & \pageref{ffexist} \\
 ffextn   & \pageref{ffextn} \\
 ffffrw    & \pageref{ffffrw} \\
 ffflmd      & \pageref{ffflmd} \\
@@ -7691,11 +7784,11 @@ fffrow    & \pageref{fffrow} \\
 ffg2d\_      & \pageref{ffg2dx} \\
 ffg3d\_      & \pageref{ffg3dx} \\
 ffgabc      & \pageref{ffgabc} \\
+\end{tabular}
+\begin{tabular}{lr}
 ffgacl  & \pageref{ffgacl} \\
 ffgbcl  & \pageref{ffgbcl} \\
 ffgcdw  & \pageref{ffgcdw} \\
-\end{tabular}
-\begin{tabular}{lr}
 ffgcf    & \pageref{ffgcf} \\
 ffgcf\_    & \pageref{ffgcfx} \\
 ffgcks     & \pageref{ffgcks} \\
@@ -7740,11 +7833,12 @@ ffgmrm   & \pageref{ffgmrm} \\
 ffgmsg    & \pageref{ffgmsg} \\
 ffgmtf  & \pageref{ffgmtf} \\
 ffgncl     & \pageref{ffgnrw} \\
+
+\end{tabular}
+\begin{tabular}{lr}
 ffgnrw     & \pageref{ffgnrw} \\
 ffgnxk      & \pageref{ffgnxk} \\
 ffgpf & \pageref{ffgpf} \\
-\end{tabular}
-\begin{tabular}{lr}
 ffgpf\_ & \pageref{ffgpfx} \\
 ffgpv         & \pageref{ffgpv} \\
 ffgpv\_     & \pageref{ffgpvx} \\
@@ -7789,11 +7883,12 @@ ffirow  & \pageref{ffirow} \\
 ffitab    & \pageref{ffitab} \\
 ffiter   & \pageref{ffiter} \\
 ffiurl & \pageref{ffiurl} \\
+
+\end{tabular}
+\begin{tabular}{lr}
 ffkeyn      & \pageref{ffkeyn} \\
 ffmahd     & \pageref{ffmahd} \\
 ffmcom    & \pageref{ffmcom} \\
-\end{tabular}
-\begin{tabular}{lr}
 ffmcrd       & \pageref{ffmcrd} \\
 ffmkls    & \pageref{ffmkyx} \\
 ffmkyu   & \pageref{ffmkyu} \\
@@ -7838,11 +7933,12 @@ ffpmsg   & \pageref{ffpmsg} \\
 ffpnul    & \pageref{ffpnul} \\
 ffppn     & \pageref{ffppn} \\
 ffppn\_ & \pageref{ffppnx} \\
+
+\end{tabular}
+\begin{tabular}{lr}
 ffppr        & \pageref{ffppr} \\
 ffpprn & \pageref{ffpprn} \\
 ffppru & \pageref{ffppru} \\
-\end{tabular}
-\begin{tabular}{lr}
 ffppr\_    & \pageref{ffpprx} \\
 ffppx & \pageref{ffppx} \\
 ffppxn & \pageref{ffppxn} \\
@@ -7957,6 +8053,7 @@ err_text - error message string corresponding to error number (30 chars max)
 exact    - TRUE (=1) if the strings match exactly; 
            FALSE (=0) if wildcards are used
 exclist  - array of pointers to keyword names to be excluded from search
+exists   - flag indicating whether the file or compressed file exists on disk
 expr     - boolean or arithmetic expression
 extend   - TRUE (=1) if FITS file may have extensions, else FALSE (=0)
 extname  - value of the EXTNAME keyword (null-terminated)

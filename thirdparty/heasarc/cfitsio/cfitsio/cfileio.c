@@ -125,7 +125,7 @@ int ffomem(fitsfile **fptr,      /* O - FITS file pointer                   */
     if (!(*fptr))
     {
         (*driverTable[driver].close)(handle);  /* close the file */
-        ffpmsg("failed to allocate structure for following file: (ffopen)");
+        ffpmsg("failed to allocate structure for following file: (ffomem)");
         ffpmsg(url);
         return(*status = MEMORY_ALLOCATION);
     }
@@ -267,6 +267,27 @@ int ffomem(fitsfile **fptr,      /* O - FITS file pointer                   */
     return(*status);
 }
 /*--------------------------------------------------------------------------*/
+int ffdkopn(fitsfile **fptr,      /* O - FITS file pointer                   */ 
+           const char *name,     /* I - full name of file to open           */
+           int mode,             /* I - 0 = open readonly; 1 = read/write   */
+           int *status)          /* IO - error status                       */
+/*
+  Open an existing FITS file on magnetic disk with either readonly or 
+  read/write access.  The routine does not support CFITSIO's extended
+  filename syntax and simply uses the entire input 'name' string as
+  the name of the file.
+*/
+{
+    if (*status > 0)
+        return(*status);
+
+    *status = OPEN_DISK_FILE;
+
+    ffopen(fptr, name, mode, status);
+
+    return(*status);
+}
+/*--------------------------------------------------------------------------*/
 int ffdopn(fitsfile **fptr,      /* O - FITS file pointer                   */ 
            const char *name,     /* I - full name of file to open           */
            int mode,             /* I - 0 = open readonly; 1 = read/write   */
@@ -366,7 +387,7 @@ int ffopen(fitsfile **fptr,      /* O - FITS file pointer                   */
     char *url;
     double minin[4], maxin[4], binsizein[4], weight;
     int imagetype, naxis = 1, haxis, recip;
-    int skip_null = 0, skip_image = 0, skip_table = 0;
+    int skip_null = 0, skip_image = 0, skip_table = 0, open_disk_file = 0;
     char colname[4][FLEN_VALUE];
     char errmsg[FLEN_ERRMSG];
     char *hdtype[3] = {"IMAGE", "TABLE", "BINTABLE"};
@@ -393,13 +414,22 @@ int ffopen(fitsfile **fptr,      /* O - FITS file pointer                   */
     }
     else if (*status == SKIP_TABLE)
     {
-      /* this special status value is used as a flag by fftopn to tell */
+      /* this special status value is used as a flag by ffiopn to tell */
       /* ffopen to move to 1st significant image when opening the file. */
 
        skip_table = 1;
        *status = 0;
     }
+    else if (*status == OPEN_DISK_FILE)
+    {
+      /* this special status value is used as a flag by ffdkopn to tell */
+      /* ffopen to not interpret the input filename using CFITSIO's    */
+      /* extended filename syntax, and simply open the specified disk file */
 
+       open_disk_file = 1;
+       *status = 0;
+    }
+    
     *fptr = 0;              /* initialize null file pointer */
     writecopy = 0;  /* have we made a write-able copy of the input file? */
 
@@ -419,10 +449,26 @@ int ffopen(fitsfile **fptr,      /* O - FITS file pointer                   */
         return(*status = FILE_NOT_OPENED);
     }
 
+    if (open_disk_file)
+    {
+      /* treat the input URL literally as the name of the file to open */
+      /* and don't try to parse the URL using the extended filename syntax */
+      
+        strcpy(infile,url);
+        strcpy(urltype, "file://");
+        outfile[0] = '\0';
+        extspec[0] = '\0';
+        binspec[0] = '\0';
+        colspec[0] = '\0';
+        rowfilter[0] = '\0';
+    }
+    else
+    {
         /* parse the input file specification */
-    ffiurl(url, urltype, infile, outfile, extspec,
+        ffiurl(url, urltype, infile, outfile, extspec,
               rowfilter, binspec, colspec, status);
-
+    }
+    
     if (*status > 0)
     {
         ffpmsg("could not parse the input filename: (ffopen)");
@@ -1589,7 +1635,6 @@ int ffedit_columns(
                 /*   oldname = name of the column or keyword */
                 /*   colformat = column format, or keyword comment string */
 
-
                 fits_calculator(*fptr, cptr2, *fptr, oldname, colformat,
        	                        status);
 
@@ -2598,6 +2643,26 @@ when writing FITS images.
     return(*status);
 }
 /*--------------------------------------------------------------------------*/
+int ffdkinit(fitsfile **fptr,      /* O - FITS file pointer                   */
+           const char *name,     /* I - name of file to create              */
+           int *status)          /* IO - error status                       */
+/*
+  Create and initialize a new FITS file on disk.  This routine differs
+  from ffinit in that the input 'name' is literally taken as the name
+  of the disk file to be created, and it does not support CFITSIO's 
+  extended filename syntax.
+*/
+{
+    if (*status > 0)
+        return(*status);
+
+    *status = CREATE_DISK_FILE;
+
+    ffinit(fptr, name,status);
+
+    return(*status);
+}
+/*--------------------------------------------------------------------------*/
 int ffinit(fitsfile **fptr,      /* O - FITS file pointer                   */
            const char *name,     /* I - name of file to create              */
            int *status)          /* IO - error status                       */
@@ -2605,14 +2670,20 @@ int ffinit(fitsfile **fptr,      /* O - FITS file pointer                   */
   Create and initialize a new FITS file.
 */
 {
-    int driver, slen, clobber;
+    int driver, slen, clobber = 0;
     char *url;
     char urltype[MAX_PREFIX_LEN], outfile[FLEN_FILENAME];
     char tmplfile[FLEN_FILENAME], compspec[80];
-    int handle;
+    int handle, create_disk_file = 0;
 
     if (*status > 0)
         return(*status);
+
+    if (*status == CREATE_DISK_FILE)
+    {
+       create_disk_file = 1;
+       *status = 0;
+    }
 
     *fptr = 0;              /* initialize null file pointer */
 
@@ -2632,25 +2703,36 @@ int ffinit(fitsfile **fptr,      /* O - FITS file pointer                   */
         return(*status = FILE_NOT_CREATED);
     }
 
-    /* check for clobber symbol, i.e,  overwrite existing file */
-    if (*url == '!')
+    if (create_disk_file)
     {
-        clobber = TRUE;
-        url++;
+       strcpy(outfile, url);
+       strcpy(urltype, "file://");
+       tmplfile[0] = '\0';
+       compspec[0] = '\0';
     }
     else
-        clobber = FALSE;
+    {
+       
+      /* check for clobber symbol, i.e,  overwrite existing file */
+      if (*url == '!')
+      {
+          clobber = TRUE;
+          url++;
+      }
+      else
+          clobber = FALSE;
 
         /* parse the output file specification */
-    ffourl(url, urltype, outfile, tmplfile, compspec, status);
+      ffourl(url, urltype, outfile, tmplfile, compspec, status);
 
-    if (*status > 0)
-    {
+      if (*status > 0)
+      {
         ffpmsg("could not parse the output filename: (ffinit)");
         ffpmsg(url);
         return(*status);
+      }
     }
-
+    
         /* find which driver corresponds to the urltype */
     *status = urltype2driver(urltype, &driver);
 
@@ -3841,7 +3923,7 @@ int ffiurl(char *url,               /* input filename */
             break;
     }
 
-    if (ii > 0 && (jj - ii) < 6)  /* limit extension numbers to 4 digits */
+    if (ii > 0 && (jj - ii) < 7)  /* limit extension numbers to 5 digits */
     {
         infilelen = ii;
         ii++;
@@ -4327,6 +4409,63 @@ int ffiurl(char *url,               /* input filename */
     }
 
     free(infile);
+    return(*status);
+}
+/*--------------------------------------------------------------------------*/
+int ffexist(const char *infile, /* I - input filename or URL */
+            int *exists,        /* O -  2 = a compressed version of file exists */
+	                        /*      1 = yes, disk file exists               */
+	                        /*      0 = no, disk file could not be found    */
+				/*     -1 = infile is not a disk file (could    */
+				/*       be a http, ftp, smem, or stdin file)   */
+            int *status)        /* I/O  status  */
+
+/*
+   test if the input file specifier is an existing file on disk
+   If the specified file can't be found, it then searches for a 
+   compressed version of the file.
+*/
+{
+    FILE *diskfile;
+    char rootname[FLEN_FILENAME];
+    char *ptr1;
+    
+    if (*status > 0)
+        return(*status);
+
+    /* strip off any extname or filters from the name */
+    ffrtnm( (char *)infile, rootname, status);
+
+    ptr1 = strstr(rootname, "://");
+    
+    if (ptr1 || *rootname == '-') {
+        if (!strncmp(rootname, "file", 4) ) {
+	    ptr1 = ptr1 + 3;   /* pointer to start of the disk file name */
+	} else {
+	    *exists = -1;   /* this is not a disk file */
+	    return (*status);
+	}
+    } else {
+        ptr1 = rootname;
+    }
+    
+    /* see if the disk file exists */
+    if (file_openfile(ptr1, 0, &diskfile)) {
+    
+        /* no, couldn't open file, so see if there is a compressed version */
+        if (file_is_compressed(ptr1) ) {
+           *exists = 2;  /* a compressed version of the file exists */
+        } else {
+	   *exists = 0;  /* neither file nor compressed version exist */
+	}
+	
+    } else {
+    
+        /* yes, file exists */
+        *exists = 1; 
+	fclose(diskfile);
+    }
+    	   
     return(*status);
 }
 /*--------------------------------------------------------------------------*/
@@ -5386,6 +5525,7 @@ int ffoptplt(fitsfile *fptr,      /* O - FITS file pointer                   */
     }
     else  /* template is a valid FITS file */
     {
+        ffmahd(tptr, 1, NULL, status); /* make sure we are at the beginning */
         while (*status <= 0)
         {
            ffghsp(tptr, &nkeys, &nadd, status); /* get no. of keywords */

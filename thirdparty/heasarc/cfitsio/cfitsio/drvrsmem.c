@@ -735,6 +735,23 @@ int     shared_list(int id)
    return(r);                                           /* table full */
  }
 
+int     shared_getaddr(int id, char **address)
+ { int i, r;
+   char segname[10];
+
+   if (NULL == shared_gt) return(SHARED_NOTINIT);       /* not initialized */
+   if (NULL == shared_lt) return(SHARED_NOTINIT);       /* not initialized */
+ 
+   strcpy(segname,"h");
+   sprintf(segname+1,"%d", id);
+ 
+   if (smem_open(segname,0,&i)) return(SHARED_BADARG);
+ 
+   *address = ((char *)(((DAL_SHM_SEGHEAD *)(shared_lt[i].p + 1)) + 1));
+ /*  smem_close(i); */
+   return(SHARED_OK);
+ }
+
 
 int     shared_uncond_delete(int id)
  { int i, r;

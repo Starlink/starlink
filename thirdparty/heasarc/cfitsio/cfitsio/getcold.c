@@ -668,13 +668,28 @@ int ffgcfm(fitsfile *fptr,   /* I - FITS file pointer                       */
   TSCAL and ZERO should not be used with complex values. 
 */
 {
-    double dummy = 0;
+    long ii, jj;
+    float dummy = 0;
+    char *carray;
 
     /* a complex double value is interpreted as a pair of double values,   */
     /* thus need to multiply the first element and number of elements by 2 */
 
+    /* allocate temporary array */
+    carray = (char *) calloc(nelem * 2, 1); 
+
     ffgcld(fptr, colnum, firstrow, (firstelem - 1) * 2 + 1, nelem * 2,
-     1, 2, dummy, array, nularray, anynul, status);
+     1, 2, dummy, array, carray, anynul, status);
+
+    for (ii = 0, jj = 0; jj < nelem; ii += 2, jj++)
+    {
+       if (carray[ii] || carray[ii + 1])
+          nularray[jj] = 1;
+       else
+          nularray[jj] = 0;
+    }
+
+    free(carray);    
     return(*status);
 }
 /*--------------------------------------------------------------------------*/

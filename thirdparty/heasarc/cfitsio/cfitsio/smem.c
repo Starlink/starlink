@@ -11,6 +11,8 @@
 
 int	main(int argc, char **argv)
 { int cmdok, listmode, longlistmode, recovermode, deletemode, id;
+int status;
+char *address;
 
 listmode = longlistmode = recovermode = deletemode = 0;
 id = -1;
@@ -67,5 +69,9 @@ if (listmode) shared_list(id);
 else if (recovermode) shared_recover(id);
 else if (deletemode) shared_uncond_delete(id);
 
+for (id = 0; id <16; id++) {
+  status = shared_getaddr(id, &address);
+  if (!status)printf("id, status, address %d %d %ld %.30s\n", id, status, address, address);
+}
 return(0);
 }

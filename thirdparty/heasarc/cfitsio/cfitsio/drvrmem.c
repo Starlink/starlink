@@ -288,6 +288,7 @@ int stdin_open(char *filename, int rwmode, int *handle)
 */
 {
     int status = 0;
+    char cbuff;
 
     if (*stdin_outfile)
     {
@@ -319,29 +320,44 @@ int stdin_open(char *filename, int rwmode, int *handle)
     }
     else
     {
-      /* copy the stdin stream into memory then open file in memory */
-
-      if (rwmode != READONLY)
+   
+      /* get the first character, then put it back */
+      cbuff = fgetc(stdin);
+      ungetc(cbuff, stdin);
+    
+      /* compressed files begin with 037 or 'P' */
+      if (cbuff == 31 || cbuff == 75)
       {
-        ffpmsg("cannot open stdin with WRITE access");
-        return(READONLY_FILE);
+         /* looks like the input stream is compressed */
+         status = mem_compress_stdin_open(filename, rwmode, handle);
+	 
       }
-
-      status = mem_createmem(2880L, handle);
-
-      if (status)
+      else
       {
-        ffpmsg("failed to create empty memory file (stdin_open)");
-        return(status);
-      }
+        /* copy the stdin stream into memory then open file in memory */
+
+        if (rwmode != READONLY)
+        {
+          ffpmsg("cannot open stdin with WRITE access");
+          return(READONLY_FILE);
+        }
+
+        status = mem_createmem(2880L, handle);
+
+        if (status)
+        {
+          ffpmsg("failed to create empty memory file (stdin_open)");
+          return(status);
+        }
  
-      /* copy the whole stdin stream into memory */
-      status = stdin2mem(*handle);
+        /* copy the whole stdin stream into memory */
+        status = stdin2mem(*handle);
 
-      if (status)
-      {
-        ffpmsg("failed to copy stdin into memory (stdin_open)");
-        free(memTable[*handle].memaddr);
+        if (status)
+        {
+          ffpmsg("failed to copy stdin into memory (stdin_open)");
+          free(memTable[*handle].memaddr);
+        }
       }
     }
 
@@ -389,7 +405,8 @@ int stdin2mem(int hd)  /* handle number */
 
    if (filesize == 0)
    {
-       ffpmsg("Couldn't find the string 'SIMPLE' in the stdin stream");
+       ffpmsg("Couldn't find the string 'SIMPLE' in the stdin stream.");
+       ffpmsg("This does not look like a FITS file.");
        return(FILE_NOT_OPENED);
    }
 
@@ -646,6 +663,60 @@ int mem_compress_open(char *filename, int rwmode, int *hdl)
         if (!ptr)
         {
             ffpmsg("Failed to reduce size of allocated memory (compress_open)");
+            return(MEMORY_ALLOCATION);
+        }
+
+        *(memTable[*hdl].memaddrptr) = ptr;
+        *(memTable[*hdl].memsizeptr) = memTable[*hdl].fitsfilesize;
+    }
+
+    return(0);
+}
+/*--------------------------------------------------------------------------*/
+int mem_compress_stdin_open(char *filename, int rwmode, int *hdl)
+/*
+  This routine reads the compressed input stream and creates an empty memory
+  buffer, then calls mem_uncompress2mem.
+*/
+{
+    int status;
+    char *ptr;
+
+    if (rwmode != READONLY)
+    {
+        ffpmsg(
+  "cannot open compressed input stream with WRITE access (mem_compress_stdin_open)");
+        return(READONLY_FILE);
+    }
+ 
+    /* create a memory file for the uncompressed file */
+    status = mem_createmem(28800, hdl);
+
+    if (status)
+    {
+        ffpmsg("failed to create empty memory file (compress_stdin_open)");
+        return(status);
+    }
+
+    /* uncompress file into memory */
+    status = mem_uncompress2mem(filename, stdin, *hdl);
+
+    if (status)
+    {
+        mem_close_free(*hdl);   /* free up the memory */
+        ffpmsg("failed to uncompress stdin into memory (compress_stdin_open)");
+        return(status);
+    }
+
+    /* if we allocated too much memory initially, then free it */
+    if (*(memTable[*hdl].memsizeptr) > 
+       (( (size_t) memTable[*hdl].fitsfilesize) + 256L) ) 
+    {
+        ptr = realloc(*(memTable[*hdl].memaddrptr), 
+                       memTable[*hdl].fitsfilesize);
+        if (!ptr)
+        {
+            ffpmsg("Failed to reduce size of allocated memory (compress_stdin_open)");
             return(MEMORY_ALLOCATION);
         }
 

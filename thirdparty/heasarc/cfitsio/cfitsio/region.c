@@ -191,6 +191,9 @@ int ffrrgn( const char *filename,
             if( !strncasecmp( namePtr, "image;", 6 ) ) {
 				namePtr += 6;
 				cFmt = pixel_fmt;
+            } else if( !strncasecmp( namePtr, "physical;", 9 ) ) {
+                                namePtr += 9;
+                                cFmt = pixel_fmt;
             } else if( !strncasecmp( namePtr, "fk4;", 4 ) ) {
 				namePtr += 4;
 				cFmt = degree_fmt;

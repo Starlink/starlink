@@ -21,8 +21,9 @@ int ffrsim(fitsfile *fptr,      /* I - FITS file pointer           */
 {
     int ii, simple, obitpix, onaxis, extend, nmodify;
     long onaxes[99], pcount, gcount, nblocks, longval;
+    long longbitpix;
     OFF_T newsize, oldsize;
-    char comment[25], keyname[FLEN_KEYWORD], message[FLEN_ERRMSG];
+    char comment[FLEN_COMMENT], keyname[FLEN_KEYWORD], message[FLEN_ERRMSG];
 
     if (*status > 0)
         return(*status);
@@ -42,11 +43,19 @@ int ffrsim(fitsfile *fptr,      /* I - FITS file pointer           */
                &gcount, &extend, status) > 0)
         return(*status);
 
+    longbitpix = bitpix;
+
+    /* test for the 2 special cases that represent unsigned integers */
+    if (longbitpix == USHORT_IMG)
+        longbitpix = SHORT_IMG;
+    else if (longbitpix == ULONG_IMG)
+        longbitpix = LONG_IMG;
+
     /* test that the new values are legal */
 
-    if (bitpix != BYTE_IMG && bitpix != SHORT_IMG && 
-        bitpix != LONG_IMG &&
-        bitpix != FLOAT_IMG && bitpix != DOUBLE_IMG)
+    if (longbitpix != BYTE_IMG && longbitpix != SHORT_IMG && 
+        longbitpix != LONG_IMG && longbitpix != LONGLONG_IMG &&
+        longbitpix != FLOAT_IMG && longbitpix != DOUBLE_IMG)
     {
         sprintf(message,
         "Illegal value for BITPIX keyword: %d", bitpix);
@@ -94,7 +103,7 @@ int ffrsim(fitsfile *fptr,      /* I - FITS file pointer           */
 
     oldsize = (oldsize + 2879) / 2880; /* old size, in blocks */
 
-    newsize = (newsize + pcount) * gcount * (abs(bitpix) / 8);
+    newsize = (newsize + pcount) * gcount * (abs(longbitpix) / 8);
     newsize = (newsize + 2879) / 2880; /* new size, in blocks */
 
     if (newsize > oldsize)   /* have to insert new blocks for image */
@@ -114,10 +123,9 @@ int ffrsim(fitsfile *fptr,      /* I - FITS file pointer           */
 
     strcpy(comment,"&");  /* special value to leave comments unchanged */
 
-    if (bitpix != obitpix)
+    if (longbitpix != obitpix)
     {                         /* update BITPIX value */
-        longval = bitpix;
-        ffmkyj(fptr, "BITPIX", longval, comment, status);
+        ffmkyj(fptr, "BITPIX", longbitpix, comment, status);
     }
 
     if (naxis != onaxis)
@@ -150,6 +158,22 @@ int ffrsim(fitsfile *fptr,      /* I - FITS file pointer           */
             ffkeyn("NAXIS", ii+1, keyname, status);
             ffdkey(fptr, keyname, status);
         }
+    }
+
+    /* Update the BSCALE and BZERO keywords, if an unsigned integer image */
+    if (bitpix == USHORT_IMG)
+    {
+        strcpy(comment, "offset data range to that of unsigned short");
+        ffukyg(fptr, "BZERO", 32768., 0, comment, status);
+        strcpy(comment, "default scaling factor");
+        ffukyg(fptr, "BSCALE", 1.0, 0, comment, status);
+    }
+    else if (bitpix == ULONG_IMG)
+    {
+        strcpy(comment, "offset data range to that of unsigned long");
+        ffukyg(fptr, "BZERO", 2147483648., 0, comment, status);
+        strcpy(comment, "default scaling factor");
+        ffukyg(fptr, "BSCALE", 1.0, 0, comment, status);
     }
 
     /* re-read the header, to make sure structures are updated */
