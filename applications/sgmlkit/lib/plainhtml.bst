@@ -83,8 +83,7 @@ ENTRY
   {}
   { label }
 
-INTEGERS { output.state before.all mid.sentence after.sentence after.block 
-	close.link }
+INTEGERS { output.state before.all mid.sentence after.sentence after.block }
 
 STRINGS { s t xxxmirror }
 
@@ -94,7 +93,6 @@ FUNCTION {init.state.consts}
   #1 'mid.sentence :=
   #2 'after.sentence :=
   #3 'after.block :=
-  #0 'close.link :=
 
   "xxx.soton.ac.uk" 'xxxmirror :=
 }
@@ -105,13 +103,6 @@ FUNCTION {output.nonnull}
     { ", " * write$ }
     { output.state after.block =
 	{ add.period$ write$
-          % close the <dt> after the end of the first block
-          % and set closelink false
-	  close.link
-	    { "</dt> <dd>" write$
-	      #0 'close.link := }
-	    'skip$
-	  if$
 	  newline$
 	  "  " write$
 	}
@@ -142,14 +133,15 @@ FUNCTION {output.check}
   if$
 }
 
+% Output a bibitem, included in the DT element.  I've tried to do fancy stuff
+% putting more than just the cite$ in the DT, by using the state mechanism
+% and new.block, and all, but this was frustrated by the asynchronous output
+% mechanism (I think).
 FUNCTION {output.bibitem}
 { newline$
   "<dt><a name=" quote$ * write$
   cite$ write$
-  quote$ ">[" * cite$ * "] " * write$
-  % the <dt> is closed within output.nonnull, as long as close.link is true
-  #1 'close.link :=
-%  newline$
+  quote$ ">[" * cite$ * "]</a></dt>" * write$ newline$ "<dd>" write$
   ""
   before.all 'output.state :=
 }
@@ -164,7 +156,7 @@ FUNCTION {fin.entry}
 
 FUNCTION {new.block}
 { output.state before.all =
-    'skip$
+    'skip$ 
     { after.block 'output.state := }
   if$
 }
@@ -847,8 +839,7 @@ FUNCTION {manual}
 { output.bibitem
   author empty$
     { organization empty$
-%	'skip$
-	{ "" output.nonnull }	% must call output.nonnull, to close </a>
+	'skip$
 	{ organization output.nonnull
 	  address output
 	}
