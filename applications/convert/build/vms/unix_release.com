@@ -177,6 +177,15 @@ $!  Assembly and compile the portable help library.
 $!
 $    @[]HLP_UNIX_RELEASE 'P1'
 $!
+$!  C-shell scripts.
+$!  ================
+$!
+$!  Fetch the C-shell scripts for running tasks or defining commands.
+$!  prefixes.
+$!
+$    CMS FETCH'CF' C_SHELL_SCRIPTS
+$    RENAME *.CSH *.
+$!
 $!  Build files.
 $!  ============
 $!
