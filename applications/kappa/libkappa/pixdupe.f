@@ -75,6 +75,7 @@
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David S. Berry (STARLINK)
+*     TDCA: Tim Ash (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -82,6 +83,9 @@
 *        Original NDF version.
 *     11-JUN-1998 (DSB):
 *        Added propagation of the NDF WCS component.
+*     16-JUL-1999 (TDCA):
+*        Expansion now takes place around point (0,0) in pixel
+*        co-ordinates in order, so origin information is not lost.
 *     {enter_any_changes_here}
 
 *  Bugs:
@@ -119,6 +123,7 @@
       INTEGER IAXIS              ! Loop counter for the axis-array
                                  ! components
       INTEGER IDIMS( NDF__MXDIM )! Dimensions of input NDF
+      INTEGER ISHIFT( NDF__MXDIM )! Shift required to align pixel coords
       CHARACTER ITYPE * ( NDF__SZTYP ) ! Numeric type for processing
       INTEGER LBNDI( NDF__MXDIM ) ! Lower bounds of input NDF
       INTEGER LBNDO( NDF__MXDIM ) ! Lower bounds of output NDF
@@ -583,6 +588,14 @@
 
 *  Propagate the WCS component.
       CALL KPG1_ASPRP( NDIM, NDFI, NDFO, MATRIX, OFFSET, STATUS )
+
+*  Calculate required shift to ensure expansion is around point
+*  (0,0) in pixel co-ordinates, and apply it to the output NDF.
+      DO I = 1, NDIM
+         ISHIFT( I ) = LBNDI( I ) * EXPAND( I )
+      ENDDO
+
+      CALL NDF_SHIFT( NDIM, ISHIFT, NDFO, STATUS )
 
 *  Come here if something has gone wrong.
   999 CONTINUE
