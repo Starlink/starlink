@@ -1,3 +1,34 @@
+2000-06-02  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* surf_kap/makefile: Include new Kappa routines from V0.14-5
+
+	* src/surf_scuover.f (SURF_SCUOVER): AST-ify. Remove SGS.
+
+	* src/surf_link_adam: Remove SGS dependency.
+
+2000-05-23  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* scripts/remdbm.pl: Remove CHOP related keywords from FITS header.
+
+2000-05-22  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* src/surf_extinction.f (SURF_EXTINCTION): Correct for the case
+	where SECOND_LST is less than FIRST_LST
+
+	* surflib/surflib_decode_remsky_string.f
+	(SURFLIB_DECODE_REMSKY_STRING): Supprt negative ring numbers
+
+	* sculib/sculib_put_fits_c.f (SCULIB_PUT_FITS_C): Correctly move
+	END entry
+
+	* sculib/sculib_put_fits_i.f (SCULIB_PUT_FITS_I): Correctly move
+	END entry
+
+	* sculib/sculib_put_fits_d.f (SCULIB_PUT_FITS_D): Correctly move
+	END entry
+
+	* src/surf_skydip.f (SURF_SKYDIP): Default ETA_TEL
+
 2000-05-11  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* docs/hlp/surf.hlp (SFACTOR): Add SFACTOR to docs
