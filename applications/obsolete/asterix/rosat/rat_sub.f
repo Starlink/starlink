@@ -521,6 +521,9 @@
 *
       IF (STATUS.NE.SAI__OK) RETURN
 
+        call hds_show('FILES',status)
+        call hds_show('LOCATORS',status)
+
         call dat_valid(loc,valid,status)
         print *,valid
 
