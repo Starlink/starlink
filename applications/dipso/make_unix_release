@@ -1,0 +1,78 @@
+#!/bin/tcsh
+# Name:
+#    make_unix_release
+#
+# Purpose:
+#    Do unix specific bits required to make a release of dipso.
+#
+# Type of Module:
+#    Shell script
+#
+# Description:
+#    This command creates a compressed tar file containing a release of the 
+#    dipso package. It is called from within the make_release script. 
+#    
+# Invocation:
+#    make_unix_release
+#
+# Authors:
+#    DSB: David S. Berry (STARLINK)
+#    {enter_new_authors_here}
+#
+# History:
+#    20-SEP-2000 (DSB):
+#       Original version, based on KAPPA equivalent.
+#    {enter_changes_here}
+#
+# Bugs:
+#    {note_any_bugs_here}
+#-
+
+#  Ensure the sdt grp command is available.
+      source $SDT_DIR/startup.csh
+
+#  Store the name of the release directory, and go there.
+      set REL_DIR = ${TEMPDIR}/dipso_${SYSTEM}
+      cd ${REL_DIR}
+      echo "Moved to $PWD"
+
+#  See if the hypertext documents are to be re-created.
+#      echo -n "Re-create sun50.htx? (y/n): "
+#      set ans = $<
+#      if( $ans == "y" ) then
+#         star2html sun50.tex
+#         tar -cvhf ./sun50.htx_tar sun50.htx/*
+#         rm -rf sun50.htx
+#         mv ./sun50.htx_tar ${DIPSO_DEV}/..
+#      endif
+
+#  Copy the hypertext docs to the release directory.
+      echo "Copying the hypertext docs to the release directory."
+      cp ${DIPSO_DEV}/../sun50.htx_tar ${REL_DIR}
+
+#  Ensure all files are accessable.
+      echo "Setting protection for all files"
+      chmod 777 *
+
+#  Create each of the tar files listed in group TAR_FILES.
+      foreach file (`grp tar_files`)
+         echo "Creating ${file}.tar"
+         tar -cvh -f ${TEMPDIR}/${file}.tar `grp ${file}`
+         rm -f `grp ${file}`
+         mv ${TEMPDIR}/${file}.tar ${REL_DIR}
+      end
+
+#  Tar up all the release files and then remove them.
+      echo "Creating dipso.tar"
+      tar -cvh -f ${TEMPDIR}/dipso.tar `grp unix_total` 
+      rm `grp unix_total` 
+      mv ${TEMPDIR}/dipso.tar ${REL_DIR}
+
+#  Compress it.
+      echo "Compressing dipso.tar"
+      compress dipso.tar
+
+# Remove grp.make.
+      rm -f grp.make
+
+      exit
