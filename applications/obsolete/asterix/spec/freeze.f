@@ -44,7 +44,6 @@
 	CHARACTER*(DAT__SZLOC) MIPJLOC		! Locator to one param of pmod I
 	CHARACTER*(DAT__SZTYP) TYP		! Object type
 	CHARACTER*25 PARNAME			! Parameter name
-	LOGICAL INPRIM				! Primitive input data?
 	LOGICAL FROZEN				! Parameter frozen?
 	LOGICAL PVALS				! Frozen param values entered
 	LOGICAL GETPAR				! Parameter component accessed?
