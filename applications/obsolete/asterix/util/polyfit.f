@@ -1,79 +1,153 @@
-*+  POLYFIT - Fits 1D polynomials to nD data. Can subtract fit from data too.
       SUBROUTINE POLYFIT( STATUS )
-*
-*    Description :
-*
+*+
+*  Name:
+*     POLYFIT
+
+*  Purpose:
+*     Fits 1D polynomials to nD data. Can subtract fit from data too.
+
+*  Language:
+*     Starlink Fortran
+
+*  Type of Module:
+*     ASTERIX task
+
+*  Invocation:
+*     CALL POLYFIT( STATUS )
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Description:
+*     {routine_description}
+
+*  Usage:
+*     polyfit {parameter_usage}
+
+*  Environment Parameters:
+*     INP = CHAR (read)
+*        Dataset to be fitted
+*     OVER = LOGICAL (read)
+*        Overwrite input with fit (Y), or create new output file
+*     OUT = CHAR (read)
+*        Output dataset
+*     FIT = LOGICAL (read)
+*        Write the fit, or the input data minus the fit?
+*     SUPER = LOGICAL (read)
+*        Write the fit coefficients to the GCB of the output?
+*     DEGREE = INTEGER (read)
+*        Preferred degree of polynomial fit
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
 *     Calculates a 1 dimensional polynomial fit to the data.
 *     If the data is greater than 1D, then a series of 1D fits are performed.
 *     The output dataset can either consist of:
 *         input data - fit; or
 *         fit, depending upon the value of the parameter POLY.
 *     The input dataset may be over written
-*
-*    Parameters :
-*
-*     POLY        = '_LOGICAL' (read)  POLYFIT or DTREND mode?
-*     IN          = 'UNIV'     (read)  Input object
-*     POLY_DEGREE = '_INTEGER' (read)  Degree of polynomial
-*     OUT         = 'UNIV'     (write) Output object
-*
-*    Method :
-*
-*     Adapted originally by APW from SAO POLYFIT program. Degree of
-*     polynomial is the highest power of x.
-*
-*    Deficiencies :
-*
-*     Does not work if primitive output object specified.
-*
-*    Bugs :
-*    Authors :
-*
-*     Trevor Ponman  (BHVAD::TJP)
-*     Phillip Andrews (BHVAD::PLA)
-*
-*    History :
-*
-*     29 Jun 84 : Original (BHVAD::TJP)
-*     12 Dec 84 : Mapped for UPDATE instead of WRITE (TJP)
-*     30 Mar 87 : Code tidied up, and brought to STARLINK standard. (PLA)
-*      2 Sep 87 : V1.0-2 Operates on primative input object. (PLA)
-*     16 Sep 88 : V1.0-3 OVERWRITE option, & now uses MATH_POLY subroutine (PLA)
-*      6 Oct 88 : V1.0-4 Displays correct values of the coefficients (PLA)
-*     14 Nov 88 : V1.0-5 Handles nD datasets by performing repeated 1D fits.
-*                        MATH_POLY code improved and included within this file
-*                        because normalization of AXIS values done out side of
-*                        altered MATH_POLY (here POLYFIT_DOIT). (PLA)
-*      8 Oct 92 : V1.7-0 Changes for alterations in compiler 3 years ago. This
-*                        program is either bug free or never used (DJA)
-*     30 Jun 93 : V1.7-1 Fixed by in above update (DJA)
-*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
-*      5 Apr 95 : V1.8-1 Now uses new data interface (DJA)
-*     29 Nov 95 : V2.0-0 Writes fit data into GCB (RJV)
-*
-*    Type Definitions :
-*
-      IMPLICIT NONE
-*
-*    Global constants :
-*
-      INCLUDE 'SAE_PAR'
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  Implementation Status:
+*     {routine_implementation_status}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
+*     {routine_deficiencies}...
+
+*  References:
+*     {task_references}...
+
+*  Keywords:
+*     polyfit, usage:public
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1995
+
+*  Authors:
+*     TJP: Trevor Ponman (University of Birmingham)
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*     29 Jun 1984 V0.6-0 (TJP):
+*        Original version.
+*     12 Dec 1984 V0.6-1 (TJP):
+*        Mapped for UPDATE instead of WRITE
+*     30 Mar 1987 V0.6-2 (PLA):
+*        Code tidied up, and brought to STARLINK standard
+*      2 Sep 1987 V1.0-2 (PLA):
+*        Operates on primitive input object
+*     16 Sep 1988 V1.0-3 (PLA):
+*        OVERWRITE option, & now uses MATH_POLY subroutine
+*      6 Oct 1988 V1.0-4 (PLA):
+*        Displays correct values of the coefficients
+*     14 Nov 1988 V1.0-5 (PLA):
+*        Handles nD datasets by performing repeated 1D fits. MATH_POLY code
+*        improved and included within this file because normalization of AXIS
+*        values done out side of altered MATH_POLY (here POLYFIT_DOIT).
+*      8 Oct 1992 V1.7-0 (DJA):
+*        Changes for alterations in compiler 3 years ago. This
+*        program is either bug free or never used
+*     24 Nov 1994 V1.8-0 (DJA):
+*        Now use USI for user interface
+*     29 Nov 1995 V2.0-0 (RJV):
+*        Writes fit data into GCB
+*     11 Dec 1995 V2.0-1 (DJA):
+*        ADI port
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'ADI_PAR'
-*
-*    Status :
-*
-      INTEGER STATUS
-*
-*    Local Constants :
-*
-      CHARACTER*19           Fmt             ! Format for output of coefficients
-         PARAMETER          (Fmt = '(1X,G15.6,A,I2,A)')
-*
-*    Local variables :
-*
-      CHARACTER*80           TEXT (5)        ! History file message
-      CHARACTER*12           NAME
-      REAL                   PARAM(12)
+
+*  Status:
+      INTEGER			STATUS             	! Global status
+
+*  Local Constants:
+      CHARACTER*19              Fmt             ! Format for output of coefficients
+        PARAMETER               ( Fmt = '(1X,G15.6,A,I2,A)' )
+
+      CHARACTER*30		VERSION
+        PARAMETER		( VERSION = 'POLYFIT Version V2.0-1' )
+
+*  Local Variables:
+      CHARACTER*80              TEXT(5)                 ! History file message
+      CHARACTER*12              NAME
+
+      REAL                      PARAM(12)
 
       INTEGER                AXPTR           ! Pointers to mapped axis values
       INTEGER                BLEN            ! No. of fits to be performed
@@ -89,15 +163,9 @@
       INTEGER                NVAL            ! Number of values mapped
       INTEGER			OFID			! Input dataset id
       INTEGER                QPTR            ! Pointer to data quality
-      INTEGER                TLDIMS(ADI__MXDIM) ! Dummy size of each dimension
-      INTEGER                TNDIM           ! Dummy dimensionality of component
-      INTEGER                VPTR            ! Pointer to data variances
+      INTEGER                   VPTR                    ! Pointer to data variances
       INTEGER                WTPTR           ! Data weights (=1/variance**2)
 
-      LOGICAL                AXREG           ! Is the AXIS data regularly spaced?
-      LOGICAL                BAD             ! Are there any bad quality values?
-      LOGICAL                DATOK           ! Is the DATA OK?
-      LOGICAL                INPRIM          ! Input primitive object ?
       LOGICAL                OK              ! Are various components OK to be used
       LOGICAL                OVERWRITE       ! Over write input object?
       LOGICAL                POLY            ! Selects DTREND or POLYFIT function.
@@ -105,24 +173,18 @@
       LOGICAL                VAROK           ! Is VARIANCE present & ok ?
       LOGICAL                WFIT            ! Perform weighted fit?
       LOGICAL                SUPER           ! Superimpose fit
-*
-*    Version id :
-*
-      CHARACTER*22           VERSION
-        PARAMETER            ( VERSION = 'POLYFIT Version 2.0-0' )
-*-
+*.
 
-*    Check status.
+*  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Version id
+*  Version id
       CALL MSG_PRNT( VERSION )
 
-*    Initialize
-      CALL AST_INIT
-      CALL ARR_INIT1I( 1, ADI__MXDIM, LDIMS, STATUS )
+*  Initialise ASTERIX
+      CALL AST_INIT()
 
-*    Ask if detrending or polynomial fitting required:
+*  Ask if detrending or polynomial fitting required:
       CALL USI_GET0L( 'FIT', POLY, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
       IF ( POLY ) THEN
@@ -130,118 +192,90 @@
         POLY = .NOT. POLY
       END IF
 
-*    Find out if are overwritting input file
+*  Find out if are overwritting input file
       CALL USI_GET0L( 'OVER', OVERWRITE, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    See if fit data to be written to GCB for superimposing fit
-      CALL USI_GET0L('SUPER',SUPER,STATUS)
+*  See if fit data to be written to GCB for superimposing fit
+      CALL USI_GET0L( 'SUPER', SUPER, STATUS )
 
-*    Open input
+*  Open input
       IF ( OVERWRITE ) THEN
         CALL MSG_PRNT( 'WARNING: Overwriting input object' )
-        CALL USI_TASSOCI( 'INP', 'UPDATE', IFID, STATUS )
+        CALL USI_ASSOC( 'INP', 'BinDS|Array', 'UPDATE', IFID, STATUS )
         OFID = IFID
       ELSE
-        IF (SUPER) THEN
-          CALL USI_TASSOC2( 'INP', 'OUT', 'UPDATE', IFID, OFID, STATUS )
+        IF ( SUPER ) THEN
+          CALL USI_ASSOC( 'INP', 'BinDS|Array', 'UPDATE', IFID,
+     :                    STATUS )
         ELSE
-          CALL USI_TASSOC2( 'INP', 'OUT', 'READ', IFID, OFID, STATUS )
+          CALL USI_ASSOC( 'INP', 'BinDS|Array', 'READ', IFID,
+     :                    STATUS )
         ENDIF
+        CALL USI_CLONE( 'INP', 'OUT', 'BinDS|Array', OFID, STATUS )
       END IF
-
-*    Check status
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Check data
-      CALL  BDI_CHKDATA (IFID, DATOK, NDIM, LDIMS, STATUS)
-      IF ( .NOT. DATOK ) THEN
+*  Check data
+      CALL BDI_CHK( IFID, 'Data', OK, STATUS )
+      CALL BDI_GETSHP( IFID, ADI__MXDIM, LDIMS, NDIM, STATUS )
+      IF ( .NOT. OK ) THEN
         STATUS = SAI__ERROR
         CALL ERR_REP( ' ', '! Invalid data', STATUS )
       END IF
-
-*    Check status
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Look for independent variable - if present & correct then map it
-      CALL BDI_CHKAXVAL( IFID, 1, OK, AXREG, NVAL, STATUS )
+*  Pad dimensions to 7-D
+      CALL AR7_PAD( NDIM, LDIMS, STATUS )
 
-      IF ( OK ) THEN
-        CALL BDI_MAPAXVAL (IFID, 'READ', 1, AXPTR, STATUS)
-
-      ELSE
+*  Look for independent variable - if present & correct then map it
+      CALL BDI_AXCHK( IFID, 1, 'Data', OK, STATUS )
+      IF ( .NOT. OK ) THEN
 
 *      Set up temporary data object containing equally spaced values
         CALL MSG_PRNT ('WARNING: Axis(1) data is invalid'/
      :                        /' - proceeding assuming regular spacing')
 
-        CALL BDI_CREAXES (OFID, NDIM, STATUS)
-
+        SPARR(1) = 0.0
+        SPARR(1) = 1.0
         DO I = 1, NDIM
-          CALL BDI_CREAXVAL( OFID, I, .TRUE., LDIMS(I), STATUS )
-          CALL BDI_PUTAXVAL( OFID, I, 0.0, 1.0, LDIMS(I), STATUS )
+          CALL BDI_AXPUT1R( OFID, I, 'SpacedData', 2, SPARR, STATUS )
         END DO
 
-        CALL BDI_MAPAXVAL (OFID, 'READ', 1, AXPTR, STATUS)
-
       END IF
-
-*    Check status
+      CALL BDI_AXMAPR( IFID, 1, 'Data', 'READ', AXPTR, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Map in data array
-      CALL BDI_PRIM( IFID, INPRIM, STATUS )
-      IF ( .NOT. INPRIM ) THEN
-        CALL ADI_FCOPY( IFID, OFID, STATUS )
-        CALL BDI_MAPDATA( OFID, 'UPDATE', DPTR, STATUS )
+*  Map in data array
+      CALL BDI_MAPR( OFID, 'Data', 'UPDATE', DPTR, STATUS )
 
-      ELSE
-        IF ( OVERWRITE ) THEN
-          CALL BDI_MAPDATA( IFID, 'UPDATE', DPTR, STATUS )
-
-        ELSE
-          CALL HSI_COPY( IFID, OFID, STATUS )
-          CALL BDI_COPDATA( IFID, OFID, STATUS )
-          CALL BDI_MAPDATA( OFID, 'UPDATE', DPTR, STATUS )
-
-        END IF
-      END IF
-
-*    Map data variance if present & correct
-      CALL BDI_CHKVAR( IFID, VAROK, TNDIM, TLDIMS, STATUS )
+*  Map data variance if present & correct
+      CALL BDI_CHK( IFID, 'Variance', VAROK, STATUS )
       IF ( VAROK ) THEN
-        CALL BDI_MAPVAR( IFID, 'READ', VPTR, STATUS )
+        CALL BDI_MAPR( IFID, 'Variance', 'READ', VPTR, STATUS )
       END IF
 
-*    Check data quality - exclude any bad points from fit.
-      CALL BDI_CHKQUAL( IFID, QUALOK, TNDIM, TLDIMS, STATUS )
+*  Check data quality - exclude any bad points from fit.
+      CALL BDI_CHK( IFID, 'Quality', QUALOK, STATUS )
       IF ( QUALOK ) THEN
-        CALL BDI_MAPLQUAL( IFID, 'READ', BAD, QPTR, STATUS )
-        IF ( .NOT. BAD ) THEN
-          CALL BDI_UNMAPLQUAL( IFID, STATUS )
-          QUALOK = .FALSE.
-        END IF
+        CALL BDI_MAPL( IFID, 'LogicalQuality', 'READ', QPTR, STATUS )
       END IF
-
-*    Check status
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Inform user about number of data points
+*  Inform user about number of data points
       CALL ARR_SUMDIM( NDIM, LDIMS, NDAT )
-
       CALL MSG_SETI( 'NDAT', NDAT )
       CALL MSG_PRNT( '^NDAT points entered' )
-
       IF ( NDIM .GT. 1 ) THEN
         CALL MSG_SETI( 'NDAT', LDIMS(1) )
         CALL MSG_PRNT( '^NDAT points in each 1 dimensional fit' )
       END IF
 
-*    User input.
+*  User input.
       CALL USI_GET0I( 'DEGREE', NDEG, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    NDEG must lie between 0 and 10
+*  NDEG must lie between 0 and 10
       IF ( NDEG .GT. 10 ) THEN
         NDEG = 10
         CALL MSG_PRNT( 'WARNING: Will only calculate up to '//
@@ -259,17 +293,15 @@
       IF ( VAROK .OR. QUALOK ) THEN
         WFIT = .TRUE.
 
-*      Create dynamic array to hold weights
+*    Create dynamic array to hold weights
         CALL DYN_MAPR( 1, NDAT, WTPTR, STATUS )
 
-*      Create dynamic array to hold number of bad points
+*    Create dynamic array to hold number of bad points
         CALL DYN_MAPI( 1, BLEN, NBPTR, STATUS )
-
-*      Check status
         IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*      Set up array of weights.
-        CALL POLYFIT_WEIGHTS (VAROK, QUALOK, LDIMS(1), BLEN, %VAL(VPTR),
+*    Set up array of weights.
+        CALL POLYFIT_WEIGHTS( VAROK, QUALOK, LDIMS(1), BLEN, %VAL(VPTR),
      :              %VAL(QPTR), %VAL(WTPTR), %VAL(NBPTR), NBAD, STATUS )
 
         IF (NBAD .GT. 0 ) THEN
@@ -285,7 +317,7 @@
 
         END IF
 
-*      Loop over NDIM-1 dimensions, performing 1 d fits
+*    Loop over NDIM-1 dimensions, performing 1 d fits
         CALL POLYFIT_LOOPWT (POLY, NDEG, NDIM, LDIMS(1), BLEN,
      :        %VAL(AXPTR), %VAL(NBPTR), %VAL(WTPTR), %VAL(DPTR),
      :                                           PARAM,  STATUS)
@@ -297,35 +329,32 @@
      :                         %VAL(AXPTR), %VAL(DPTR),PARAM,STATUS)
 
       END IF
-
-*    Check status
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Write fit data into GCB
-      IF (SUPER) THEN
-        CALL GCB_LCONNECT(STATUS)
-        CALL GCB_FLOAD(IFID,STATUS)
-        CALL GCB_SETL('FUNC_FLAG',.TRUE.,STATUS)
-        CALL GCB_SETC('FUNC_TYPE','POLY',STATUS)
-        NAME='FUNC_PAR'
-        DO I=1,MIN(6,NDEG+1)
+*  Write fit data into GCB
+      IF ( SUPER ) THEN
+        CALL GCB_LCONNECT( STATUS )
+        CALL GCB_FLOAD( IFID, STATUS )
+        CALL GCB_SETL( 'FUNC_FLAG', .TRUE., STATUS )
+        CALL GCB_SETC( 'FUNC_TYPE', 'POLY', STATUS )
+        NAME = 'FUNC_PAR'
+        DO I = 1, MIN(6,NDEG+1)
           WRITE(NAME(9:9),'(I1)') I
           CALL GCB_SETR(NAME,PARAM(I),STATUS)
         ENDDO
-        DO I=MIN(6,NDEG+1)+1,6
+        DO I = MIN(6,NDEG+1)+1,6
           WRITE(NAME(9:9),'(I1)') I
-          CALL GCB_CANR(NAME,STATUS)
-        ENDDO
-        CALL GCB_FSAVE(IFID,STATUS)
-        CALL GCB_DETACH(STATUS)
-      ENDIF
+          CALL GCB_CAN( NAME, STATUS )
+        END DO
+        CALL GCB_FSAVE( IFID, STATUS )
+        CALL GCB_DETACH( STATUS )
+      END IF
 
-*    History file entry
+*  History file entry
       CALL HSI_ADD( OFID, VERSION, STATUS )
       CALL USI_NAMEI( I, TEXT, STATUS )
       CALL MSG_SETI( 'NDEG', NDEG )
       I = I + 1
-
       IF ( POLY ) THEN
         CALL MSG_MAKE( 'Polynomial fit of degree ^NDEG produced.',
      :                                                TEXT(I), N )
@@ -335,7 +364,7 @@
       END IF
       CALL HSI_PTXT( OFID, I, TEXT, STATUS )
 
-*    Tidy up
+*  Tidy up
  99   CALL AST_CLOSE()
       CALL AST_ERR( STATUS )
 
@@ -424,7 +453,6 @@
         DO J = 1, BLEN
           DO I = 1, NDAT
             WT(I,J) = 1.0 / VAR(I,J)
-
           END DO
         END DO
       END IF
@@ -487,10 +515,10 @@
       REAL COEFF(12)
 *-
 
-*    Check status
+*  Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Set up array for normalized axis
+*  Set up array for normalized axis
       SIZE(1) = NDAT
       SIZE(2) = (2 * NDEG) + 1
 
@@ -562,7 +590,7 @@
       END IF
 
  99   IF ( STATUS .NE. SAI__OK ) THEN
-        CALL ERR_REP( ' ', '...from POLYFIT_LOOPWT', STATUS )
+        CALL AST_REXIT( 'POLYFIT_LOOPWT', STATUS )
       END IF
 
       END
@@ -636,11 +664,11 @@
 *    Check status
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Write normalized axis
+*  Write normalized axis
       CALL POLYFIT_NORM( SIZE(1), SIZE(2), AXIS, %VAL(XNPTR), AXMAX,
      :                                                       AXMIN )
 
-*    Loop over fits
+*  Loop over fits
       DO I = 1, BLEN
 *      Perform either polynomial fit or detrending:
         CALL POLYFIT_DOIT (POLY, SIZE(1), SIZE(2), NDEG, .FALSE., C1,
@@ -694,7 +722,7 @@
       END IF
 
  99   IF (STATUS .NE. SAI__OK) THEN
-        CALL ERR_REP( ' ', '...from POLYFIT_LOOP', STATUS )
+        CALL AST_REXIT( 'POLYFIT_LOOP', STATUS )
       END IF
 
       END
@@ -1066,8 +1094,8 @@
 
  99   IF (VALUE .EQ. 0) THEN
         STATUS = SAI__ERROR
-
       END IF
+
       END
 
 
@@ -1101,6 +1129,7 @@
 
       REAL       SUM          ! Used in calculation.
 *-
+
 *    Check status
       IF (STATUS .NE. SAI__OK) RETURN
 
@@ -1113,14 +1142,12 @@
 
         DO I = MMK + 1, M
           SUM = SUM + A(MMK, I) * X(I)
-
         END DO
-        X(MMK) = A(MMK, MP1) - SUM
+        X(MMK) = A(MMK,MP1) - SUM
 
       END DO
+
       END
-
-
 
 
 *+  POLYFIT_CNM - Returns n! / (m! (n-m)!)
