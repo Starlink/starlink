@@ -1,15 +1,13 @@
 # Configure template for GNU m4.
-# Copyright (C) 1991, 1993, 1994 Free Software Foundation, Inc.
+# Copyright (C) 1991, 1993, 1994, 2004 Free Software Foundation, Inc.
 # Process this file with autoconf to produce a configure script.
-
-## undefine([changeword])
 
 AC_INIT(src/m4.c)
 AC_CONFIG_HEADER(config.h)
 AC_ARG_PROGRAM
 
 PRODUCT=m4
-VERSION=1.4
+VERSION=1.4.1
 AC_DEFINE_UNQUOTED(PRODUCT, "$PRODUCT")
 AC_DEFINE_UNQUOTED(VERSION, "$VERSION")
 AC_SUBST(PRODUCT)
