@@ -44,6 +44,8 @@ must be a subset of the return value of <funcname/section-element-list/.
   (list (normalize "abstract")
         (normalize "sect")
 	(normalize "subsect")
+	(normalize "subsubsect")
+	(normalize "subsubsubsect")
 	(normalize "appendices")
 	(normalize "routinelist")
 	(normalize "codecollection")
@@ -401,6 +403,25 @@ return an empty sosofo, and #t otherwise.
       (not (or (node-list-empty? subsects) (<= depth 0)))))
 
 <routine>
+<routinename>has-chunk-contents?
+<description>Finds out whether the given node contains elements 
+which would be chunks.
+<returnvalue type=boolean>#t if the given node has children which
+are chunks, and #t otherwise.
+<argumentlist>
+<parameter optional default='(current-node)'>start-element
+  <type>singleton-node-list
+  <description>Node we want the contents of.
+<codebody>
+(define (has-chunk-contents? #!optional
+                       (start-element (current-node)))
+   (let ((subsects (node-list-filter-by-gi (select-by-class
+                                           (children start-element)
+                                           'element)
+                                          (chunk-element-list))))
+      (not (node-list-empty? subsects))))
+
+<routine>
 <routinename>navlink
 <description>Generates a navigation hyperlink (i.e. HTML A element).
 <argumentlist>
@@ -548,7 +569,7 @@ generated HTML documents.
 
 (define (nav-footer elemnode)
    (make sequence 
-      (if (has-contents?)
+      (if (has-chunk-contents?)
           (sosofo-append (make empty-element gi: "hr") (make-contents))
           (empty-sosofo))
       (navbar elemnode)
