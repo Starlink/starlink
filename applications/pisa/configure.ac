@@ -31,10 +31,10 @@ dnl    Need "hlib" command to build the help library.
 STAR_CHECK_PROGS(hlib)
 
 dnl    Documentation.
-STAR_LATEX_DOCUMENTATION(sun109, [sun109.tex sun109.htx_tar sun109.ps])
+STAR_LATEX_DOCUMENTATION(sun109)
 
 dnl    Extra files to go with documents.
-STAR_DOC_FILES(sun109fig.ps)
+STAR_DOCS_FILES(sun109fig.ps)
 
 dnl    Configure files.
 AC_CONFIG_FILES([Makefile component.xml start pisa.icl])
