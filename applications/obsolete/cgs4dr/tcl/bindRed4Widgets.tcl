@@ -79,7 +79,7 @@ proc red4DoSomething {taskname dowhat inputs} {
        if {$dowhat=="action"} {
          red4ArrayTests $taskname
        } elseif {$dowhat=="help"} {
-         cgs4drHelpDialog .helpDialog $cgs4drHtml/red4ArrayTests.html
+         cgs4drHelpDialog .helpDialog $cgs4drHtml/red4ArrayTestsBox1.html
        }
       }
     calculate_observation_efficiency
