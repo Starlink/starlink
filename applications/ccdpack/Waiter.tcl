@@ -31,6 +31,13 @@
 #        The name in usual Tk format of a cursor which will be used for
 #        all the windows made inactive by the grab as long as this
 #        window exists.
+
+#  Authors:
+#     MBT: Mark Taylor (Starlink)
+
+#  History:
+#     2-NOV-2000 (MBT):
+#        Original version.
  
 #-
 
