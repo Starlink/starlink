@@ -165,7 +165,7 @@ Building Programs and Libraries
 * Yacc and Lex::                Yacc and Lex support
 * C++ Support::                 Compiling C++ sources
 * Assembly Support::            Compiling assembly sources
-* Fortran 77 Support::          Compiling Fortran 77 sources
+* Fortran Support::             Compiling Fortran sources
 * Java Support::                Compiling Java sources
 * Support for Other Languages::  Compiling other languages
 * ANSI::                        Automatic de-ANSI-fication
@@ -191,13 +191,13 @@ Building a Shared Library
 * LTLIBOBJ::                    Using $(LTLIBOBJ)
 * Libtool Issues::              Common Issues Related to Libtool's Use
 
-Fortran 77 Support
+Fortran Support
 
-* Preprocessing Fortran 77::    Preprocessing Fortran 77 sources
-* Compiling Fortran 77 Files::  Compiling Fortran 77 sources
-* Mixing Fortran 77 With C and C++::  Mixing Fortran 77 With C and C++
+* Preprocessing Fortran::       Preprocessing Fortran sources
+* Compiling Fortran Files::     Compiling Fortran sources
+* Mixing Fortran With C and C++::  Mixing Fortran With C and C++
 
-Mixing Fortran 77 With C and C++
+Mixing Fortran With C and C++
 
 * How the Linker is Chosen::    Automatic linker selection
 
@@ -1380,9 +1380,17 @@ distributed with Autoconf version 2.13 and later.  @xref{Particular
 Programs, , Particular Program Checks, autoconf, The Autoconf Manual}.
 @cvindex AC_PROG_F77
 
+@item AC_PROG_FC
+This is the newer interface to Fortran source, replacing the older F77
+interfaces.  This macro is distributed with Autoconf version 2.50 and
+later.  @xref{Particular
+Programs, , Particular Program Checks, autoconf, The Autoconf Manual}.
+@cvindex AC_PROG_FC
+XXX Correct version?
+
 @item AC_F77_LIBRARY_LDFLAGS
 This is required for programs and shared libraries that are a mixture of
-languages that include Fortran 77 (@pxref{Mixing Fortran 77 With C and
+languages that include Fortran 77 (@pxref{Mixing Fortran With C and
 C++}).  @xref{Macros, , Autoconf macros supplied with Automake}.
 @cvindex AC_F77_LIBRARY_LDFLAGS
 
@@ -2355,7 +2363,7 @@ to build programs and libraries.
 * Yacc and Lex::                Yacc and Lex support
 * C++ Support::                 Compiling C++ sources
 * Assembly Support::            Compiling assembly sources
-* Fortran 77 Support::          Compiling Fortran 77 sources
+* Fortran Support::             Compiling Fortran sources
 * Java Support::                Compiling Java sources
 * Support for Other Languages::  Compiling other languages
 * ANSI::                        Automatic de-ANSI-fication
@@ -3656,33 +3664,33 @@ Only the suffixes @samp{.s} and @samp{.S} are recognized by
 @code{automake} as being files containing assembly code.
 
 
-@node Fortran 77 Support
+@node Fortran Support
 @comment  node-name,  next,  previous,  up
-@section Fortran 77 Support
+@section Fortran Support
 
-@cindex Fortran 77 support
-@cindex Support for Fortran 77
+@cindex Fortran support
+@cindex Support for Fortran
 
-Automake includes full support for Fortran 77.
+Automake includes full support for Fortran.
 
-Any package including Fortran 77 code must define the output variable
-@samp{F77} in @file{configure.ac}; the simplest way to do this is to use
-the @code{AC_PROG_F77} macro (@pxref{Particular Programs, , Particular
+Any package including Fortran code must define the output variable
+@samp{FC} in @file{configure.ac}; the simples way to do this is to use
+the @code{AC_PROG_FC} macro (@pxref{Particular Programs, , Particular
 Program Checks, autoconf, The Autoconf Manual}).
 
-A few additional variables are defined when a Fortran 77 source file is
+A few additional variables are defined when a Fortran source file is
 seen:
 
 @vtable @code
 
-@item F77
-The name of the Fortran 77 compiler.
+@item FC
+The name of the Fortran compiler.
 
-@item FFLAGS
-Any flags to pass to the Fortran 77 compiler.
+@item FCFLAGS
+Any flags to pass to the Fortran compiler.
 
-@item AM_FFLAGS
-The maintainer's variant of @code{FFLAGS}.
+@item AM_FCFLAGS
+The maintainer's variant of @code{FCFLAGS}.
 
 @item RFLAGS
 Any flags to pass to the Ratfor compiler.
@@ -3690,51 +3698,72 @@ Any flags to pass to the Ratfor compiler.
 @item AM_RFLAGS
 The maintainer's variant of @code{RFLAGS}.
 
-@item F77COMPILE
-The command used to actually compile a Fortran 77 source file.  The file
+@item FCCOMPILE
+The command used to actually compile a Fortran source file.  The file
 name is appended to form the complete command line.
 
-@item FLINK
-The command used to actually link a pure Fortran 77 program or shared
+@item FCLINK
+The command used to actually link a pure Fortran program or shared
 library.
 
 @end vtable
 
-Automake can handle preprocessing Fortran 77 and Ratfor source files in
-addition to compiling them@footnote{Much, if not most, of the
-information in the following sections pertaining to preprocessing
-Fortran 77 programs was taken almost verbatim from @ref{Catalogue of
-Rules, , Catalogue of Rules, make, The GNU Make Manual}.}.  Automake
-also contains some support for creating programs and shared libraries
-that are a mixture of Fortran 77 and other languages (@pxref{Mixing
-Fortran 77 With C and C++}).
+Automake still provides the older Fortran 77 support, using the
+variables @samp{F77}, @samp{FFLAGS}, @samp{AM_FFLAGS}, @samp{F77COMPILE}
+and @samp{FLINK}, instead of the analogous variables described above.
+
+Automake can handle preprocessing Fortran and Ratfor source files in
+addition to compiling them@footnote{See also the information on rules in
+@ref{Catalogue of Rules, , Catalogue of Rules, make, The GNU Make
+Manual}.}.  Automake also contains some support for creating programs
+and shared libraries that are a mixture of Fortran and other languages
+(@pxref{Mixing Fortran With C and C++}).
 
 These issues are covered in the following sections.
 
 @menu
-* Preprocessing Fortran 77::    Preprocessing Fortran 77 sources
-* Compiling Fortran 77 Files::  Compiling Fortran 77 sources
-* Mixing Fortran 77 With C and C++::  Mixing Fortran 77 With C and C++
+* Preprocessing Fortran::       Preprocessing Fortran sources
+* Compiling Fortran Files::     Compiling Fortran sources
+* Mixing Fortran With C and C++::  Mixing Fortran With C and C++
 @end menu
 
 
-@node Preprocessing Fortran 77
+@node Preprocessing Fortran
 @comment  node-name,  next,  previous,  up
-@subsection Preprocessing Fortran 77
+@subsection Preprocessing Fortran
 
-@cindex Preprocessing Fortran 77
-@cindex Fortran 77, Preprocessing
+@cindex Preprocessing Fortran
+@cindex Fortran, Preprocessing
 @cindex Ratfor programs
 
-@file{N.f} is made automatically from @file{N.F} or @file{N.r}.  This
-rule runs just the preprocessor to convert a preprocessable Fortran 77
-or Ratfor source file into a strict Fortran 77 source file.  The precise
-command used is as follows:
+It is possible to use Fortran which has cpp-style directives within it.
+Some Fortran compilers, such as @code{g77}, can process
+these directives internally, and so need no separate preprocessing
+stage; in other cases, the code must be compiled indirectly, with a
+preprocessor producing pure Fortran code which is only then passed to
+the compiler.
+
+Because of the syntactical differences in the underlying languages,
+however, it is not always possible to do this using the @code{cpp}
+program, and you may need help from a separate Fortran-specific
+preprocessor.
+
+@comment XXX Add Autoconf version number where AC_PROG_FPP was introduced
+
+Automake's support for preprocessed Fortran is tightly bound to the
+Autoconf @code{AC_PROG_FPP} macro (introduced in version XXX), which
+determines if the Fortran compiler can cope with preprocessor
+directives, and if not finds a preprocessor which can.  It looks for
+files with a @file{.fpp} or @file{.F} extension (the former is the
+default, but this can be changed in the call of the @code{AC_PROG_FPP}
+macro).
+
+Preprocessing Ratfor is straightforward.  The file @file{N.f} is made
+automatically from @file{N.r} by a rule which
+runs just the preprocessor to convert a Ratfor source file into a strict
+Fortran 77 source file.  The precise command used is as follows:
 
 @table @file
-
-@item .F
-@code{$(F77) -F $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_FFLAGS) $(FFLAGS)}
 
 @item .r
 @code{$(F77) -F $(AM_FFLAGS) $(FFLAGS) $(AM_RFLAGS) $(RFLAGS)}
@@ -3742,11 +3771,11 @@ command used is as follows:
 @end table
 
 
-@node Compiling Fortran 77 Files
+@node Compiling Fortran Files
 @comment  node-name,  next,  previous,  up
-@subsection Compiling Fortran 77 Files
+@subsection Compiling Fortran Files
 
-@file{N.o} is made automatically from @file{N.f}, @file{N.F} or
+@file{N.o} is made automatically from @file{N.f} or
 @file{N.r} by running the Fortran 77 compiler.  The precise command used
 is as follows:
 
@@ -3755,24 +3784,21 @@ is as follows:
 @item .f
 @code{$(F77) -c $(AM_FFLAGS) $(FFLAGS)}
 
-@item .F
-@code{$(F77) -c $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_FFLAGS) $(FFLAGS)}
-
 @item .r
 @code{$(F77) -c $(AM_FFLAGS) $(FFLAGS) $(AM_RFLAGS) $(RFLAGS)}
 
 @end table
 
 
-@node Mixing Fortran 77 With C and C++
+@node Mixing Fortran With C and C++
 @comment  node-name,  next,  previous,  up
-@subsection Mixing Fortran 77 With C and C++
+@subsection Mixing Fortran With C and C++
 
-@cindex Fortran 77, mixing with C and C++
-@cindex Mixing Fortran 77 with C and C++
-@cindex Linking Fortran 77 with C and C++
+@cindex Fortran, mixing with C and C++
+@cindex Mixing Fortran with C and C++
+@cindex Linking Fortran with C and C++
 @cindex cfortran
-@cindex Mixing Fortran 77 with C and/or C++
+@cindex Mixing Fortran with C and/or C++
 
 Automake currently provides @emph{limited} support for creating programs
 and shared libraries that are a mixture of Fortran 77 and C and/or C++.
@@ -3939,7 +3965,7 @@ the @code{_LDFLAGS} variable for the program.
 @section Support for Other Languages
 
 Automake currently only includes full support for C, C++ (@pxref{C++
-Support}), Fortran 77 (@pxref{Fortran 77 Support}), and Java
+Support}), Fortran (@pxref{Fortran Support}), and Java
 (@pxref{Java Support}).  There is only rudimentary support for other
 languages, support for which will be improved based on user demand.
 

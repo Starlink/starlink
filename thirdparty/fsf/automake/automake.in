@@ -832,6 +832,31 @@ register_language ('name' => 'fc',
 # some cases becoming no-ops).  See the macros in Autoconf's
 # fortran.m4 for details of these.
 #
+# We specify a list of extensions consisting of '.@FPP_COMPILE_EXT@'
+# ALONE.  We do _not_ want to list the real extensions here, since we
+# don't yet know what they are!  They could be `.fpp' or `.F'
+# (depending on the user's preference), but if we have to resort to
+# indirect compilation, then this FPP_COMPILE_EXT will be set to a
+# dummy value by Autoconf.  Thus the rule we emit
+# and the label we pass around in extension_seen, for example, uses
+# this autoconf variable.
+#
+# That is, overall we want to recognise both .fpp and .F, but in both
+# cases act _as_if_ the extension seen were '.@FPP_COMPILE_EXT@'.
+#
+# We do, however, need to recognise .fpp and .F sources for what they
+# are, and trigger FPP behaviour.  So immediately after registering
+# the language, (a) tell automake that '.fpp' and '.F' are real
+# extensions that it knows about, and (b), add notional suffix rules,
+# so that &derive_suffix maps each of these to `.@FPP_COMPILE_EXT@' at
+# the appropriate point (is this a hack, or is it clever use of
+# available facilities?).  This is therefore doing by hand some of the
+# work of register_language.  NB, `output_extensions' does a different
+# job.
+#
+# A separate .fpp.f or .F.f rule will be emitted by the PPFC block of
+# lang-compile.am.
+#
 register_language ('name' => 'ppfc',
                    'Name' => 'Preprocessed Fortran',
                    # autoconf support for fortran defines FC,
@@ -850,24 +875,10 @@ register_language ('name' => 'ppfc',
 
                    'pure' => 1,
 
-                   # We do _not_ want to list the real extensions
-                   # here, since we don't yet know what they are!
-                   # They could be `.fpp' or `.F' (depending on the
-                   # user's preference), but if we have to resort to
-                   # indirect compilation, then this FPP_COMPILE_EXT
-                   # will be set to a dummy value by Autoconf, and a
-                   # separate .fpp.f or .F.f rule will be emitted by
-                   # lang-compile.am.  Thus the rule we emit and the
-                   # label we pass around in extension_seen, for
-                   # example, uses this autoconf variable.
                    'extensions' => ['.@FPP_COMPILE_EXT@'],
 		   '_finish' => \&lang_ppfc_finish,
                   );
-# We do, however, need to recognise .fpp and .F sources for what they
-# are, and trigger FPP behaviour.  So add notional suffix rules here,
-# so that &derive_suffix maps these to `.@FPP_COMPILE_EXT@' at the
-# appropriate point (is this a hack, or is it clever use of available
-# facilities?).
+accept_extensions ('.fpp', '.F');
 register_suffix_rule (INTERNAL, '.fpp', '.@FPP_COMPILE_EXT@');
 register_suffix_rule (INTERNAL, '.F',   '.@FPP_COMPILE_EXT@');
 
