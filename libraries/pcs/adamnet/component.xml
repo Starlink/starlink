@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="adamnet">
+<component id="adamnet" status="obsolete">
   <version>1.0</version>
   <path>libraries/pcs/adamnet</path>
   <description>Implements the ADAM networking process. It interfaces
