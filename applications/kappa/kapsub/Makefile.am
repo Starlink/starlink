@@ -66,7 +66,7 @@ medwts.f medwv.f shifts.f shiftx.f shifty.f statv.f thrsr.f	   \
 kps1_dnrth.f
 
 
-C_ROUTINES = kps1_luted.c
+C_ROUTINES = kps1_luted.c kps1_tkast.c
 
 MEM_ROUTINES = kps1_mem20.f kps1_memco.f kps1_memcp.f kps1_memcs.f \
 kps1_memfp.f kps1_memfx.f kps1_memga.f kps1_memin.f kps1_memnm.f   \
@@ -107,3 +107,6 @@ SUFFIXES = .gen .gdr .gr .gbdirw .f
 	cp $< $(<:.gbdirw=.gen)
 	$(GENERIC)  -t bdirw $(<:.gbdirw=.gen)
 	rm $(<:.gbdirw=.gen)
+
+AM_FCFLAGS = @TCL_CFLAGS@ @TK_CFLAGS@
+

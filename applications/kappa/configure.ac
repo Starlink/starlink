@@ -25,20 +25,24 @@ STAR_CNF_COMPATIBLE_SYMBOLS
 STAR_CHECK_PROGS([ifd2star awish atclsh hlib generic])
 STAR_CHECK_PROGS(prohlp,sst)
 
+dnl    Look for tcl/tk system
+STAR_PATH_TCLTK(8.2, [tk])
+AC_CHECK_HEADERS([tcl.h tk.h])
 
 dnl    Build dependencies for this package.
 dnl    Includes: fio, par, sae; 
 dnl    links to: chr, mers, fio, psx, task.
-STAR_DECLARE_DEPENDENCIES([build], [fio prm par sae shl hds kaplibs ard mag pgplot])
+STAR_DECLARE_DEPENDENCIES([build], [fio prm par sae shl hds kaplibs ard mag pgplot tcl tk])
 dnl    No use dependencies
 
 STAR_LATEX_DOCUMENTATION(sun95 sun221)
 
 
-AC_CONFIG_FILES([Makefile component.xml
+AC_CONFIG_FILES([Makefile component.xml 
     kappa_mon.f ndfpack_mon.f kapview_mon.f kappa.ifd
     atools/Makefile   kapsub/Makefile    libkapview/Makefile
     ccdpack/Makefile  libkappa/Makefile  libndfpack/Makefile])
+AC_CONFIG_FILES(kappa_link_adam,  [chmod +x kappa_link_adam])
 AC_CONFIG_FILES(lutedit.tcl,      [chmod +x lutedit.tcl])
 AC_CONFIG_FILES(adamMessageRelay, [chmod +x adamMessageRelay])
 AC_CONFIG_FILES(stardemo.tcl,     [chmod +x stardemo.tcl])

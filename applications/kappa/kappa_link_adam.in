@@ -58,6 +58,9 @@
 #        Add SHL
 #     2-SEP-2004 (TIMJ):
 #        Add ONE
+#     4-OCT-2004 (DSB):
+#        Added Tk/Tcl libraries (now needed since kpg1_tkast has been
+#        moved to kps1_tkast).
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -89,7 +92,7 @@
       done
 
 #  Echo the link list.
-      echo `ard_link_adam` `kaplibs_link_adam ${kaplibs_opts}` \
+      echo @TCL_LIBS@ @TK_LIBS@ `ard_link_adam` `kaplibs_link_adam ${kaplibs_opts}` \
            `shl_link_adam` `one_link_adam` \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}

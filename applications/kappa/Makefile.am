@@ -2,6 +2,7 @@
 
 SUBDIRS = kapsub ccdpack atools libndfpack libkapview libkappa
 
+
 bin_SCRIPTS = $(PUBLICSCRIPTS) $(DYNSCRIPTS) $(STYLE_FILES)
 
 bindatadir = $(bindir)

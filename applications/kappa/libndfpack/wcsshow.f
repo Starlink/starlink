@@ -119,6 +119,8 @@
 *        Added parameter CAT.
 *     1-OCT-2004 (TIMJ):
 *        Access to KPG_AST restricted to libkpg. Use setter functions.
+*     4-OCT-2004 (TIMJ):
+*        Use kps1_tkast instead of kpg1_tkast.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -372,7 +374,7 @@
 *  Display the AST Object in a TK window.
          CALL MSG_SETC( 'OBJ', AST_GETC( IAST, 'CLASS', STATUS ) )
          CALL MSG_LOAD( ' ', '^OBJ', TITLE, TLEN, STATUS )       
-         CALL KPG1_TKAST( IAST, TITLE( : TLEN ), FULL, STATUS )
+         CALL KPS1_TKAST( IAST, TITLE( : TLEN ), FULL, STATUS )
 
       END IF
 
