@@ -229,7 +229,8 @@ S-INT Y
 ! the title of the map and the spatial sampling that will be used. An error 
 ! will be reported if the file already exists.
 !
-OPEN-MAP-FILE L483CORE\L483core\starlink\\10 10\0.0\17 9\65
+$ rm l483core_map.sdf
+OPEN-MAP-FILE l483core\L483core\starlink\\10 10\0.0\17 9\65
 !
 ! We happen to know that the line occurs in quadrant ("receiver") 2
 ! of the data from the correlator, so select this and put the data into
