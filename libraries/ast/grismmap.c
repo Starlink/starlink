@@ -237,6 +237,8 @@ void astSet##attribute##_( Ast##class *this, type value ) { \
 #include "mapping.h"             /* Coordinate mappings (parent class) */
 #include "unitmap.h"             /* Unit Mappings */
 #include "channel.h"             /* I/O channels */
+#include "zoommap.h"             /* ZoomMap interface */
+#include "winmap.h"              /* WinMap interface */
 #include "grismmap.h"            /* Interface definition for this class */
 
 /* Error code definitions. */
@@ -289,7 +291,7 @@ AstGrismMap *astGrismMapId_( const char *, ... );
 /* ======================================== */
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
 static const char *GetAttrib( AstObject *, const char * );
-static int CanMerge( AstMapping *, int, AstMapping *, int );
+static AstMapping *CanMerge( AstMapping *, int, AstMapping *, int );
 static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int ** );
 static int TestAttrib( AstObject *, const char * );
 static void ClearAttrib( AstObject *, const char * );
@@ -339,7 +341,8 @@ static void SetGrismTheta( AstGrismMap *, double );
 
 /* Member functions. */
 /* ================= */
-static int CanMerge( AstMapping *map1, int inv1, AstMapping *map2, int inv2 ){
+static AstMapping *CanMerge( AstMapping *map1, int inv1, AstMapping *map2, 
+                             int inv2 ){
 /*
 *
 *  Name:
@@ -353,15 +356,17 @@ static int CanMerge( AstMapping *map1, int inv1, AstMapping *map2, int inv2 ){
 
 *  Synopsis:
 *     #include "grismmap.h"
-*     int CanMerge( AstMapping *map1, int inv1, AstMapping *map2, int inv2 )
+*     AstMapping *CanMerge( AstMapping *map1, int inv1, AstMapping *map2, 
+*                           int inv2 )
 
 *  Class Membership:
 *     GrismMap internal utility function.
 
 *  Description:
-*     This function checks the two supplied Mappings to see if they are
-*     two GrismMaps which can be merged. This is only possible if they
-*     form an inverse pair.
+*     This function checks the two supplied Mappings to see if they can
+*     be merged into a single Mapping. One of the two Mappings should be
+*     a GrismMap. If they can be merged, the Merged Mapping is returned
+*     as the function value. Otherwise NULL is returned.
 
 *  Parameters:
 *     map1
@@ -374,43 +379,137 @@ static int CanMerge( AstMapping *map1, int inv1, AstMapping *map2, int inv2 ){
 *        The invert flag to use with the second mapping.
 
 *  Returned Value:
-*     1 if the GrismMaps can be merged, zero otherwise.
+*     A pointer to the merged Mapping if the supplied Mappings can be merged, 
+*     NULL otherwise.
 
 */
 
 /* Local Variables: */
-   AstGrismMap *gmap1;            /* Pointer to first GrismMap */
-   AstGrismMap *gmap2;            /* Pointer to second GrismMap */
-   int ret;                       /* Can the Mappings be merged? */
+   AstGrismMap *gmap2;        /* Pointer to second GrismMap */
+   AstGrismMap *gmap;         /* Pointer to first GrismMap */
+   AstMapping *ret;           /* Returned merged Mapping */
+   double g;                  /* The value of the GrismG attribute */
+   double nrp;                /* The value of the GrismNRP attribute */
+   double waver;              /* The value of the GrismWaveR attribute */
+   double z;                  /* Wavelength scaling */
+   int invert_result;         /* Is "ret" the inverse of the required Mapping? */
 
 /* Initialise the returned value. */
-   ret = 0;
+   ret = NULL;
 
 /* Check the global error status. */
    if ( !astOK ) return ret;
 
-/* Both Mappings must be GrismMaps to merge. */
-   if( !strcmp( "GrismMap", astGetClass( map1 ) ) &&
-       !strcmp( "GrismMap", astGetClass( map2 ) ) ) {
+/* Initialise the zoom factor of the adjacent ZoomMap to indicate
+   that we have not yet found an adjacent ZoomMap. */
+   z = AST__BAD;
 
-/* Get pointers to the GrismMaps. */
-      gmap1 = (AstGrismMap *) map1;
-      gmap2 = (AstGrismMap *) map2;
+/* If the first Mapping is a GrismMap... */
+   if( !strcmp( "GrismMap", astGetClass( map1 ) ) ) {
+      gmap = (AstGrismMap *) map1;
+
+/* If the second Mapping is also a GrismMap, they can be merged into a
+   UnitMap if one GrismMap is the inverse of the other. */
+      if( !strcmp( "GrismMap", astGetClass( map2 ) ) ) {
+         gmap2 = (AstGrismMap *) map2;
 
 /* Check that the two GrismMaps have the same attribute values. */
-      if( EQUAL( astGetGrismNR( gmap1 ), astGetGrismNR( gmap2 )) &&
-          EQUAL( astGetGrismNRP( gmap1 ), astGetGrismNRP( gmap2 )) &&
-          EQUAL( astGetGrismWaveR( gmap1 ), astGetGrismWaveR( gmap2 )) &&
-          EQUAL( astGetGrismAlpha( gmap1 ), astGetGrismAlpha( gmap2 )) &&
-          EQUAL( astGetGrismG( gmap1 ), astGetGrismG( gmap2 )) &&
-          EQUAL( astGetGrismM( gmap1 ), astGetGrismM( gmap2 )) &&
-          EQUAL( astGetGrismEps( gmap1 ), astGetGrismEps( gmap2 )) &&
-          EQUAL( astGetGrismTheta( gmap1 ), astGetGrismTheta( gmap2 )) ){
+         if( EQUAL( astGetGrismNR( gmap ), astGetGrismNR( gmap2 )) &&
+             EQUAL( astGetGrismNRP( gmap ), astGetGrismNRP( gmap2 )) &&
+             EQUAL( astGetGrismWaveR( gmap ), astGetGrismWaveR( gmap2 )) &&
+             EQUAL( astGetGrismAlpha( gmap ), astGetGrismAlpha( gmap2 )) &&
+             EQUAL( astGetGrismG( gmap ), astGetGrismG( gmap2 )) &&
+             EQUAL( astGetGrismM( gmap ), astGetGrismM( gmap2 )) &&
+             EQUAL( astGetGrismEps( gmap ), astGetGrismEps( gmap2 )) &&
+             EQUAL( astGetGrismTheta( gmap ), astGetGrismTheta( gmap2 )) ){
 
-/* Check that the Mappings are applied in opposite senses. If so we can 
-   cancel the two GrismMaps. */
-         if( inv1 != inv2 ) ret = 1; 
+/* If so, check that the GrismMaps are applied in opposite senses. If so 
+   we can cancel the two GrismMaps, so return a UnitMap. */
+            if( inv1 != inv2 ) ret = (AstMapping *) astUnitMap( 1, "" );
+         }
+
+/* If the first Mapping is a GrismMap but the second one is not... */
+      } else {
+
+/* We can merge the GrismMap with the second Mapping if the GrismMap has
+   not been inverted (i.e. if the wavelength output produced by the
+   GrismMap is fed as input to the second Mapping), and if the second
+   Mapping is a ZoomMap. */
+         if( !inv1 ) {
+
+/* Indicate that any merged Mapping to be created later will not need to 
+   be inverted. */
+            invert_result = 0;
+
+/* See if the second Mapping is a ZoomMap, and if so, get the zoom
+   factor. If the Invert attribute in the ZoomMap is not set to the 
+   required value, invert the zoom factor. This gives us the required 
+   *forward* transformation. */
+            if( !strcmp( "ZoomMap", astGetClass( map2 ) ) ) {
+               z = astGetZoom( (AstZoomMap *) map2 );
+               if( astGetInvert( map2 ) != inv2 && z != 0.0 ) z = 1.0/z;
+            }                   
+         }
       }
+
+/* If the first Mapping is not a GrismMap, but the second one is... */
+   } else if( !strcmp( "GrismMap", astGetClass( map2 ) ) ) {
+      gmap = (AstGrismMap *) map2;
+
+/* We can merge the GrismMap with the first Mapping if the GrismMap has
+   been inverted (i.e. if the wavelength output produced by the first 
+   Mapping is fed as input to the inverted GrismMap), and if the first
+   Mapping is a ZoomMap. */
+      if( inv2 ) {
+
+/* It is easier to consider pairs of Mappings in which an un-inverted
+   GrismMap is followed by a ZoomMap (as in the above case). For this 
+   reason, we invert the Mappings here, so that the merged Mapping created 
+   later will be in the inverse of the required Mapping. Indicate that the 
+   merged Mapping will therefore need to be inverted before being returned. */
+         invert_result = 1;
+
+/* See if the first Mapping is a ZoomMap. If so, get the zoom factor. If the 
+   Invert attribute in the ZoomMap is not set to the opposite of the required 
+   value, invert the zoom factor. This gives us the required *inverse* 
+   transformation. */
+         if( !strcmp( "ZoomMap", astGetClass( map1 ) ) ) {
+            z = astGetZoom( (AstZoomMap *) map1 );
+            if( astGetInvert( map1 ) == inv1 && z != 0.0 ) z = 1.0/z;
+         }                   
+      }
+   }
+
+/* If required, produce the merged Mapping by merging the forward
+   GrismMap with the following ZoomMap (and then invert the
+   resulting Mapping if it is in the wrong direction). */
+   if( !ret && z != AST__BAD && z != 0.0 ) {
+
+/* Ensure we have a forward GrismMap. */
+      ret = astCopy( gmap );
+      astSetInvert( ret, 0 );
+
+/* Get the required GrismMap attribute values. */
+      g = astGetGrismG( ret );
+      nrp = astGetGrismNRP( ret );
+      waver = astGetGrismWaveR( ret );
+
+/* The above code ensures that z is the zoom factor from the wavelength 
+   produced by the forward GrismMap to the final (modified) wavelength units. 
+   Set the new GrismMap attribute values. GrismG, GrismNRP and GrismWaveR have 
+   units of length and are scaled to represent new length units using the 
+   zoom factor found above. */
+      g /= z;
+      nrp /= z;
+      waver *= z;
+
+      astSetGrismG( ret, g );
+      astSetGrismNRP( ret, nrp );
+      astSetGrismWaveR( ret, waver );
+
+/* If required invert this GrismMap. */
+      if( invert_result ) astInvert( ret );
+
    }
 
 /* Return the answer. */
@@ -884,14 +983,14 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 */
 
 /* Local Variables: */
-   AstMapping *neighbour; /* Pointer to neighbouring Mapping */
-   const char *class1;   /* Pointer to first Mapping class string */
-   const char *class2;   /* Pointer to second Mapping class string */
-   int i1;               /* Lower index of the two GrismMaps being merged */
-   int i2;               /* Upper index of the two GrismMaps being merged */
-   int i;                /* Mapping index */
-   int merge;            /* Can GrismMap merge with a neighbour? */
-   int result;           /* Result value to return */
+   AstMapping *merged_map; /* Merger of two Mappings */
+   AstMapping *neighbour;  /* Pointer to neighbouring Mapping */
+   const char *class1;     /* Pointer to first Mapping class string */
+   const char *class2;     /* Pointer to second Mapping class string */
+   int i1;                 /* Lower index of the two GrismMaps being merged */
+   int i2;                 /* Upper index of the two GrismMaps being merged */
+   int i;                  /* Mapping index */
+   int result;             /* Result value to return */
 
 /* Initialise. */
    result = -1;
@@ -908,46 +1007,45 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
       class1 = ( where > 0 ) ? astGetClass( ( *map_list )[ where - 1 ] ) : NULL;
       class2 = ( where < *nmap - 1 ) ? astGetClass( ( *map_list )[ where + 1 ] ) : NULL;
 
-/* A GrismMap can only combine with its own inverse. Set a flag indicating
-   that we have not yet found a neighbour with which the GrismMap can be
-   merged. */
-      merge = 0;
+/* Set a flag indicating that we have not yet found a neighbour with which 
+   the GrismMap can be merged. */
+      merged_map = NULL;
 
 /* First check the lower neighbour (if any). */
       if( where > 0 ) {
          i1 = where - 1;
          i2 = where;
          neighbour = ( *map_list )[ i1 ];
-         merge = CanMerge( ( *map_list )[ i1 ], (* invert_list)[ i1 ],
-                           ( *map_list )[ i2 ], (* invert_list)[ i2 ] );
+         merged_map = CanMerge( ( *map_list )[ i1 ], (* invert_list)[ i1 ],
+                                ( *map_list )[ i2 ], (* invert_list)[ i2 ] );
       }
 
 /* If the GrismMap can not be merged with its lower neighbour, check its
    upper neighbour (if any) in the same way. */
-      if( !merge && where < *nmap - 1 ) {
+      if( !merged_map && where < *nmap - 1 ) {
          i1 = where;
          i2 = where + 1;
          neighbour = ( *map_list )[ i2 ];
-         merge = CanMerge( ( *map_list )[ i1 ], (* invert_list)[ i1 ],
-                           ( *map_list )[ i2 ], (* invert_list)[ i2 ] );
+         merged_map = CanMerge( ( *map_list )[ i1 ], (* invert_list)[ i1 ],
+                                ( *map_list )[ i2 ], (* invert_list)[ i2 ] );
       }
 
-/* If either neighbour has passed these checks, it is the inverse of the 
-   GrismMap being checked. The pair of GrismMaps can be replaced by a single
-   UnitMap. */
-      if( merge ) {
+/* If either neighbour has passed these checks, replace the pair of
+   Mappings which have been merged with the single merged Mapping returned 
+   above. */
+      if( merged_map ) {
 
-/* Annul the two GrismMaps. */
+/* Annul the two Mappings. */
          (void) astAnnul( ( *map_list )[ i1 ] );
          (void) astAnnul( ( *map_list )[ i2 ] );
 
-/* Create a UnitMap, and store a pointer for it in place of the first 
-   GrismMap. */
-         ( *map_list )[ i1 ] = (AstMapping *) astUnitMap( 1, "" );
-         ( *invert_list )[ i1 ] = 0;
+/* Store a pointer for the merged Mapping in place of the first of the
+   two replaced Mappings. */
+         ( *map_list )[ i1 ] = merged_map;
+         ( *invert_list )[ i1 ] = astGetInvert( merged_map );
 
 /* Shuffle down the remaining Mappings to fill the hole left by the
-   second GrismMap. */
+   second of the replaced Mappings. */
          for ( i = i2 + 1; i < *nmap; i++ ) {
             ( *map_list )[ i - 1 ] = ( *map_list )[ i ];
             ( *invert_list )[ i - 1 ] = ( *invert_list )[ i ];
