@@ -1,45 +1,42 @@
 %!PS-Adobe-1.0
-%%DocumentFonts: Times-Italic Courier
+%%DocumentFonts: Palatino-Italic Courier
 %%BoundingBox: @BB@
 %%EndComments
 /Module @MODULE@ def
 /LineGap Module 1.2 mul def
 /ScriptFont /Courier findfont Module scalefont def
-/CommentFont /Times-Italic findfont Module 0.9 mul scalefont def
+/CommentFont /Palatino-Italic findfont Module 0.9 mul scalefont def
 %%EndProlog
 
-ScriptFont setfont
-@COLOUR@
-% @GREY@ setgray
-
-/Nlines 6 def
+/Nlines 7 def
 
 /Vpos LineGap Nlines mul def
-/NL {
+
+/LongLineLength 0 def
+% Expects a string on the stack, to be printed.
+% Maintains longest line so far in LongLineLength
+/Line {
     /Vpos Vpos LineGap sub def
     0 Vpos moveto
+    dup stringwidth pop dup LongLineLength gt
+        { /LongLineLength exch def }
+        { pop }
+    ifelse
+    show
 } def
 
-% LongLine is the longest line printed
-/LongLine (% cvs -d <starlink> co .) def
+ScriptFont setfont
+@COLOUR@  % eg, 0.9 setgray
 
-NL
-LongLine show
-/LongLineLength LongLine stringwidth pop def
-% NL
-% (% more README) show
-NL
-(% ./bootstrap) show
-NL
-(% make configure-deps) show
-NL
-(% ./configure -C) show
-NL
-(% make world) show
-NL
+(% cvs checkout .) Line
+(% more README) Line
+(% ./bootstrap) Line
+(% make configure-deps) Line
+(% ./configure -C) Line
+(% make world) Line
 
 CommentFont setfont
-(.....2300 kLOC) show
+(.....2300 kSLOC!!!) Line
 
 % Print out a tight bounding box, for reference
 (%%BoundingBox: 0 0 ) print
