@@ -61,7 +61,8 @@
 *  cursor?
           CALL PGQINF('CURSOR',YN,L)
           G_CURSOR=(YN(:L).EQ.'YES')
-
+*  pixel size of display?
+          CALL PGQVP(3,G_PX1,G_PX2,G_PY1,G_PY2)
 
         ELSE
           STATUS=SAI__ERROR
