@@ -9,20 +9,7 @@
 #include <iostream>		// for debugging code, written to cerr
 
 #ifdef ENABLE_KPATHSEA
-// kpathsea headers typedef a `string' type, which conflicts with C++ string
-// egcs doesn't support namespace, so hack it by defining `string' to 
-// something innocuous.  Must also define HAVE_PROTOTYPES.
-#define string kpse_string
-#define HAVE_PROTOTYPES
-#define STDC_HEADERS
-extern "C" {
-#include <kpathsea/debug.h>
-#include <kpathsea/proginit.h>
-#include <kpathsea/tex-glyph.h>
-}
-#undef STDC_HEADERS
-#undef HAVE_PROTOTYPES
-#undef string
+#include "kpathsea.h"
 #endif
 
 #if NO_CSTD_INCLUDE
@@ -44,7 +31,7 @@ using std::memcpy;
 int PkRasterdata::verbosity_ = 1;
 int PkFont::verbosity_ = 1;
 int PkGlyph::verbosity_ = 1;
-//string PkFont::fontpath_;
+string PkFont::fontpath_ = "";
 int PkFont::resolution_ = 72;
 
 PkFont::PkFont(unsigned int dvimag,
@@ -133,7 +120,6 @@ PkFont::~PkFont()
 // least generating a name).
 bool PkFont::find_font (string& path)
 {
-#if 0
     int scaled_res
 	= static_cast<int>(resolution_
 			   * ((double)font_header_.s * (double)dvimag_)
@@ -144,46 +130,55 @@ bool PkFont::find_font (string& path)
 	     << ", scaled " << font_header_.s << '/' << font_header_.d 
 	     << " (mag " << dvimag_ << ") = " << scaled_res
 	     << '\n';
-#endif
-int scaled_res = resolution_;
+
+    string pkpath = "";
+    if (fontpath_.length() > 0)
+    {
+	pkpath = fontpath_;
+	if (verbosity_ > 1)
+	    cerr << "find_font: using fontpath=" << fontpath_ << '\n';
+    }
+    else
+    {
+	const char *pkpath_p = getenv ("DVI2BITMAP_PK_PATH");
+	if (pkpath_p != 0)
+	{
+	    pkpath = pkpath_p;
+	    if (verbosity_ > 1)
+		cerr << "find_font: using DVI2BITMAP_PK_PATH="
+		     << pkpath << '\n';
+	}
+    }
+
+    if (pkpath.length() != 0)
+    {
+	// Fontpath stuff rudimentary -- but allow it to override kpathsea
+	pkpath += '/';
+	pkpath += name_;
+	
+	char numbers[10];
+	sprintf (numbers, "%dpk", scaled_res);
+	pkpath += numbers;
+
+	path = pkpath;
+	return true;
+    }
+
 #ifdef ENABLE_KPATHSEA
-#if 0
-    if (verbosity_ > 1)
-	kpathsea_debug = ~0;	// all debugging
-#endif
-    kpse_init_prog("TEX", scaled_res, "localfont", "cmr10");
+    const char *kpse_file;
 
-    kpse_glyph_file_type glyph_info;
-    char *fname;
-    fname = kpse_find_pk (name_.c_str(), scaled_res, &glyph_info);
-#if 0
-    if (fname)
-	cerr << "KPSE found file " << fname << '\n';
-    else
-	cerr << "KPSE can't find file " << name_
-	     << " res=" << scaled_res << '\n';
-#endif
-    cerr << "KPSE " << (fname ? "OK" : "bad") << '\n';
-    //path = fname;
-    return (fname != 0);
-#else
-    char *pkpath = getenv ("DVI2BITMAP_PK_PATH");
-    //name_ = "/var/lib/texmf/pk/ljfour/public/cm/cmr6.600pk"; // temp
-    //name_ = "/var/lib/texmf/fonts/pk/ljfour/public/cm/cmr10.600pk";
-    //name_ = fontpath_;
-    //int strpos = name_.find("%F");
-    //name_.replace(strpos, 2, name);
-    // Fontpath stuff rudimentary -- eventually replace with KPSE
-    char fnbuf[200];
-    if (pkpath)
-	sprintf (fnbuf, "%s/%s.%dpk",
-`		 pkpath, name_.c_str(), scaled_res);
-    else
-	sprintf (fnbuf, "%s.%dpk", name_.c_str(), scaled_res);
-    path = fnbuf;
+    kpse_file = kpathsea::find (name_.c_str(), scaled_res);
 
-    return true;
+    if (kpse_file != 0)
+    {
+	if (verbosity_ > 0)
+	    cerr << "KPSE found " << kpse_file << '\n';
+	path = kpse_file;
+	return true;
+    }
 #endif
+
+    return false;
 }
 
 void PkFont::read_font (InputByteStream& pkf)

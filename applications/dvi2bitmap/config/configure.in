@@ -51,9 +51,10 @@ AC_ARG_ENABLE(gif,
 [  --enable-gif            Enable output of GIF files],
    AC_DEFINE(ENABLE_GIF) GIFOBJ="GIFBitmap.o")
 
+AC_SUBST(KPATHSEAOBJ)
 dnl   Specify support for Kpathsea library
 AC_ARG_WITH(kpathsea,
-[  --with-kpathsea         Enable use of Kpathsea library],
-   AC_DEFINE(ENABLE_KPATHSEA) LIBS="$LIBS -lkpathsea")
+[  --with-kpathsea         Use Kpathsea library],
+   AC_DEFINE(ENABLE_KPATHSEA) KPATHSEAOBJ="kpathsea.o" LIBS="$LIBS -lkpathsea")
 
 AC_OUTPUT(Makefile)

@@ -28,16 +28,7 @@ using std::exit;
 #include "version.h"
 
 #ifdef ENABLE_KPATHSEA
-// kpathsea headers typedef a `string' type, which conflicts with C++ string
-// egcs doesn't support namespace, so hack it by defining `string' to 
-// something innocuous.  Must also define HAVE_PROTOTYPES.
-#define string kpse_string
-#define HAVE_PROTOTYPES
-extern "C" {
-#include <kpathsea/progname.h>
-}
-#undef HAVE_PROTOTYPES
-#undef string
+#include "kpathsea.h"
 #endif
 
 typedef vector<string> string_list;
@@ -80,21 +71,19 @@ main (int argc, char **argv)
 
     progname = argv[0];
 #ifdef ENABLE_KPATHSEA
-    kpse_set_program_name (argv[0], "dvi2bitmap");
+    kpathsea::init (argv[0], "dvi2bitmap");
 #endif
 
     for (argc--, argv++; argc>0; argc--, argv++)
 	if (**argv == '-')
 	    switch (*++*argv)
 	    {
-#if 0
 	      case 'f':		// set PK font path
 		argc--, argv++;
 		if (argc <= 0)
 		    Usage();
 		PkFont::setFontPath(*argv);
 		break;
-#endif
 	      case 'r':		// set resolution
 		argc--, argv++;
 		if (argc <= 0)
@@ -128,6 +117,11 @@ main (int argc, char **argv)
 			  case 'm': // debug main program
 			    verbosity = debuglevel;
 			    break;
+#ifdef ENABLE_KPATHSEA
+			  case 'k':
+			    kpathsea::verbosity(debuglevel);
+			    break;
+#endif
 			  case 'g':
 			    debuglevel++;
 			    break;
@@ -141,6 +135,7 @@ main (int argc, char **argv)
 		PkFont::verbosity(0);
 		PkRasterdata::verbosity(0);
 		Bitmap::verbosity(0);
+		kpathsea::verbosity(0);
 		verbosity = 0;
 		break;
 	      case 'l':		// show missing fonts
