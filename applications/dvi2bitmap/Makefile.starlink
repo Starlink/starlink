@@ -370,6 +370,7 @@ PKG_NAME = dvi2bitmap
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
+# %%VERSION%%
 PKG_VERS = 0.9-3
 
 #  List of public script files.  These are scripts which form part of
