@@ -17,7 +17,9 @@
 %     1997-1998 (TIMJ)
 %        Original versions
 %     1998 November 15th (TIMJ)
-%        Modify for release 1.3 of SURF   
+%        Modify for release 1.3 of SURF
+%     1998 December 7th (TIMJ)
+%        Add GUARD parameter to REBIN derivatives 
 %     {Add further history here}
 %
 % -
@@ -2145,7 +2147,7 @@ SHIFT_DY - Y shift to be applied to input dataset on output map (arcsec) /0/ >
 SURF Input data: (name, weight, dx, dy)
    -- 1: n59_sky_lon (1, 0, 0)
  
-LONG_OUT - Longitude of of output map centre in hh (or dd) mm ss.ss format /'+12
+LONG_OUT - Longitude of output map centre in hh (or dd) mm ss.ss format /'+12
  56 11.17'/ > 
 LAT_OUT - Latitude of output map centre in dd mm ss.ss format /'- 05 47 22.1'/ > 
 OUT_OBJECT - Object name for output map /'3c279'/ > 
@@ -2329,11 +2331,19 @@ With \Figaro\ we would do:
 Note that \wdfits\ always writes integer FITS whereas \ndffits\
 would by default write REAL FITS (bitpix=$-32$). \ndffits\ also writes
 the Variance and Quality arrays to FITS tables in the output file (this can be
-turned off by specifying just the data component with \param{COMP=D}).  Also
-note that if the coordinate system of the NDF is changed in some way (e.g.\ by
-making a section with \Kappa\ \cadd) then the WCS information stored in
-the FITS array {\bf WILL BE WRONG}. The WCS information is only correct for
-the image produced by \rebin.
+turned off by specifying just the data component with \param{COMP=D}).  
+
+From \Kappa\ V0.13 the WCS information stored in the header is used when
+manipulating the NDF. This means that the IRAS90 or FITS extensions are
+ignored when calculating astrometry transformations. It also means that if the
+WCS information is lost (eg after a RESHAPE or FOURIER) that the remaining
+astrometry information (eg from FITS-WCS) will be incorrect and should be
+removed.\footnote{The FITS-WCS and IRAS90 astrometry information are only
+correct for the image produced by \rebin\ and should not be believed if the
+output image is manipulated in some way (e.g.\ by making an NDF section).}
+It is likely that the FITS-WCS and IRAS90 astrometry information will
+be removed in the next release of SURF once AST-WCS has become the
+standard for all Starlink applications.
 
 
 \subsection{Photometry}
@@ -2720,7 +2730,7 @@ Upgrades currently on the work list are:
       author if you are interested in testing the SCUBA pipeline.
 
 \item A task to fit Gaussians to dual-beam images. [This task is almost
-complete in version 0.9-5 of of \ESP\ \cite{esp} in the 
+complete in version 0.9-5 of \ESP\ \cite{esp} in the 
 \gaufit\ task]
 
 \end{itemize}
@@ -2733,7 +2743,8 @@ wish-list}{http://www.jach.hawaii.edu/jcmt\_sw/bin/scuba\_wish.pl}.
 
 \subsection{Changes in Version 1.3}
 
-This is only a minor upgrade.
+This is only a minor upgrade. All scripts have been updated so that
+they are compatible with \Kappa\ V0.13.
 
 \begin{description}
 
@@ -2750,8 +2761,9 @@ This is only a minor upgrade.
 \item Images produced by \rebin\ now include world-coordinate information via
 the AST library (WCS extension).
 \item The guard ring has been turned on for LINEAR and GAUSSIAN regridding.
-    (It had been turned off in v1.2). A new parameter (USEGRD) can be used
+    (It had been turned off in v1.2). A new parameter (GUARD) can be used
     to turn the bolometer guard ring on or off.
+\item Axis information is now written to the output files from REMDBM.
 
 \end{itemize}
 
@@ -3205,7 +3217,7 @@ Jenness~T., Bly~M.~J., 1998,
 \quickdes{FLATFIELD}{Multiply the data array by the flatfield volumes.}{surf:flatfield}
 \quickdes{INTREBIN}{Generate a separate regridded image for each integration.}{surf:intrebin}
 \quickdes{MAPSUM}{Generate a summary of map observations}{surf:mapsum}
-\quickdes{OBSSUM}{Summarize all observations}{surf:sculog}
+\quickdes{OBSSUM}{Summarize all observations}{surf:obssum}
 \quickdes{PHOTSUM}{Generate a summary of photometry observations}{surf:photsum}
 \quickdes{PLTBOL}{Interactive data inspection (Requires \Kappa)}{surf:pltbol}
 \quickdes{POINTSUM}{Generate a summary of pointing observations}{surf:pointsum}
@@ -3476,6 +3488,15 @@ The \scusoft\ routines are described in the following pages:
    }
    \sstparameters{
       \sstsubsection{
+         GUARD = LOGICAL (Read)
+      }{
+            Controls whether the bolometer guard ring should be used during
+   the regridding process. The guard ring enforces zero flux at the
+   edge of the regridded image. Should be turned off if flux is present
+   at the edge. Default is to use the guard ring for LINEAR, BESSEL
+   and GAUSSIAN rebin modes.
+      }
+      \sstsubsection{
          IN = CHAR (Read)
       }{
          The name of the input file to be rebinned. This parameter is requested
@@ -3637,15 +3658,6 @@ The \scusoft\ routines are described in the following pages:
          Note that, in general, the number of pixels in the output grid
          exceeds the number of independent beams in the image.
          The data can be accessed as OUT.more.reds.times. Default is FALSE. 
-      }
-      \sstsubsection{
-         USEGRD = LOGICAL (Read)
-      }{
-            Controls whether the bolometer guard ring should be used during
-   the regridding process. The guard ring enforces zero flux at the
-   edge of the regridded image. Should be turned off if flux is present
-   at the edge. Default is to use the guard ring for LINEAR, BESSEL
-   and GAUSSIAN rebin modes.
       }
       \sstsubsection{
          WEIGHT = REAL (Read)
@@ -5360,6 +5372,15 @@ proceeding.
    }
    \sstparameters{
       \sstsubsection{
+         GUARD = LOGICAL (Read)
+      }{
+            Controls whether the bolometer guard ring should be used during
+   the regridding process. The guard ring enforces zero flux at the
+   edge of the regridded image. Should be turned off if flux is present
+   at the edge. Default is to use the guard ring for LINEAR, BESSEL
+   and GAUSSIAN rebin modes.
+      }
+      \sstsubsection{
          IN = CHAR (Read)
       }{
          The name of the input file to be rebinned. This parameter is requested
@@ -5521,15 +5542,6 @@ proceeding.
          Note that, in general, the number of pixels in the output grid
          exceeds the number of independent beams in the image.
          The data can be accessed as OUT.more.reds.times. Default is FALSE.
-      }
-      \sstsubsection{
-         USEGRD = LOGICAL (Read)
-      }{
-            Controls whether the bolometer guard ring should be used during
-   the regridding process. The guard ring enforces zero flux at the
-   edge of the regridded image. Should be turned off if flux is present
-   at the edge. Default is to use the guard ring for LINEAR, BESSEL
-   and GAUSSIAN rebin modes.
       }
       \sstsubsection{
          WEIGHT = REAL (Read)
@@ -6437,6 +6449,15 @@ menu.
    }
    \sstparameters{
       \sstsubsection{
+         GUARD = LOGICAL (Read)
+      }{
+            Controls whether the bolometer guard ring should be used during
+   the regridding process. The guard ring enforces zero flux at the
+   edge of the regridded image. Should be turned off if flux is present
+   at the edge. Default is to use the guard ring for LINEAR, BESSEL
+   and GAUSSIAN rebin modes.
+      }
+      \sstsubsection{
          IN = CHAR (Read)
       }{
          The name of the input file to be rebinned. This parameter is requested
@@ -6595,15 +6616,6 @@ menu.
          Note that, in general, the number of pixels in the output grid
          exceeds the number of independent beams in the image.
          The data can be accessed as OUT.more.reds.times. Default is FALSE.
-      }
-      \sstsubsection{
-         USEGRD = LOGICAL (Read)
-      }{
-            Controls whether the bolometer guard ring should be used during
-   the regridding process. The guard ring enforces zero flux at the
-   edge of the regridded image. Should be turned off if flux is present
-   at the edge. Default is to use the guard ring for LINEAR, BESSEL
-   and GAUSSIAN rebin modes.
       }
       \sstsubsection{
          WEIGHT = REAL (Read)
