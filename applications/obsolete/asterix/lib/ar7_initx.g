@@ -7,7 +7,7 @@
 *     Initialise 7-D array with <TYPE> value
 
 *  Language:
-*     Starlink Fortran 77
+*     Starlink Fortran
 
 *  Invocation:
 *     CALL AR7_INIT<T>( VALUE, DIMS, ARRAY, STATUS )
@@ -45,11 +45,14 @@
 *  Algorithm:
 *     {algorithm_description}...
 
+*  References:
+*     AR Subroutine Guide : http://www.sr.bham.ac.uk:8080/asterix-docs/Programmer/Guides/ar.html
+
 *  Keywords:
 *     package:ar7, usage:public, initialisation, 7-D
 
 *  Copyright:
-*     {routine_copyright}
+*     Copyright (C) University of Birmingham, 1995
 
 *  Authors:
 *     DJA: David J. Allan (JET-X, University of Birmingham)
