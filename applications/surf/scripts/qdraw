@@ -1,0 +1,190 @@
+#!/bin/perl -s
+
+# QDRAW - Draws a data set with +/- 5 sigma range
+
+# Load NDF module
+use NDF;
+
+my ($par, $pkg);
+
+
+# The location of stats and linplot
+$root = '/star/bin/kappa';
+$lroot = '/jcmt_sw/sun4_Solaris/bin';
+
+
+# Global status
+$status = &NDF::SAI__OK;
+
+########################################################################
+# Read the command line parameters
+ 
+@ndfs = ();
+%params = ();
+ 
+foreach $arg (@ARGV) {
+ 
+  $arg =~ /=/ && do {
+    ($param, $value) = split(/=/, $arg);
+    $param = uc($param);
+    $params{$param} = $value;
+  } || push(@ndfs, $arg);
+ 
+}
+
+########################################################################
+# Check for file
+
+if ($#ndfs > -1) {
+ 
+# If there are more than one possible files given, loop through and
+# take the first one that exists.
+ 
+  undef $usethis;
+  foreach $ndf (@ndfs) {
+    # Remove trailing sdf
+    $ndf =~ s/\.sdf$//;
+
+    # Get root name (allow sections)
+    ($roothds, $junk) = split(/\.|\(/,$ndf);
+ 
+    if ($root =~ /./) {
+      (-e "$roothds.sdf" || -e $ENV{'DATADIR'}."/$roothds.sdf") &&
+        do {      
+          print "NDF is $ndf\n";
+          $usethis = $ndf;
+          last;
+        };
+    }
+  }
+ 
+  undef $ndf;
+  if (defined $usethis) {
+    $ndf = $usethis;
+  } else {
+    print "No files were found named ",join(" ",@ndfs),"\n";
+    exit;
+  }
+} else {
+  print "\tUsage: qdraw [par=] file\n";
+  exit;
+}
+
+
+
+
+##########################################################################
+
+# Run stats (this should be done in perl)
+
+undef $modpars;
+
+@parlist = ('CLIP');
+
+foreach $par (@parlist) {
+  $modpars = $modpars." $par=".$params{$par} 
+  if ($params{$par} =~ /./);
+}
+
+$exstat = system("$root/stats '$ndf' $modpars > /dev/null");
+die "STATS finished abnormally...stopping (status = $exstat)\n"
+  if ($exstat != 0);
+
+($mean) =  par_get("mean", "stats", \$status);
+($sigma) = par_get("sigma", "stats", \$status);
+
+# Range (in sigma) of plot
+$nsig = 5.0; # Default
+$nsig = $params{NSIGMA} if (defined $params{NSIGMA});
+
+
+
+$max = $mean + ($nsig * $sigma);
+$min = $mean - ($nsig * $sigma);
+
+# Run linplot
+
+@parlist = ('DEVICE','MODE','ERRBAR','PLTTITL','COMP','LINCOL','SYMCOL',
+	   'COSYS','THICK','FONT','ABSLAB','ORDLAB');
+
+undef $modpars;
+foreach $par (@parlist) {
+  $modpars = $modpars." $par=".$params{$par} 
+  if ($params{$par} =~ /./);
+}
+
+
+$exstat =
+  system("$root/linplot '$ndf' ordlim=true ordlow=$min ordupp=$max $modpars");
+die "LINPLOT finished abnormally...stopping (status = $exstat)\n"
+  if ($exstat != 0);
+
+# Find out the device name (in case GDSET has not been run)
+($device) = par_get("device", "linplot", \$status);
+
+# Run drawsig and draw line at 3 sigma
+
+@parlist = ('SIGCOL','LINESTYLE','AXIS','COMP');
+
+undef $modpars;
+foreach $par (@parlist) {
+  $modpars = $modpars." $par=".$params{$par} 
+  if ($params{$par} =~ /./);
+}
+
+$exstat = 
+  system("$lroot/drawsig linestyle=2 sigcol=red nsigma='[0,3]' device=$device")
+  unless ($noline);
+die "DRAWSIG finished abnormally...stopping (status = $exstat)\n"
+  if ($exstat != 0 && $noline);
+
+
+__END__
+*+
+*  Name:
+*    qdraw
+
+*  Purpose:
+*    Draw a data set with plus or minus 5 sigma range
+
+*  Type of module:
+*    Perl 5 script
+
+*  Description:
+*    This program uses kappa routines to calculate mean and standard 
+*    deviation of an NDF. It then uses linplot to display the data with
+*    a range of plus or minus 5 sigma.
+
+*  Usage:
+*     qdraw [-noline] NDF [Linplot/Stats/Drawsig parameters]
+
+*  ADAM Parameters:
+*    -noline
+*      A Unix-type switch which controls whether the 3 sigma lines are 
+*      displayed or not.
+*    NDF (Given)
+*      The required dataset
+*    Any
+*      Any parameters recognised by LINPLOT, STATS or DRAWSIG
+
+
+*  Examples:
+*     qdraw test
+*        Draws test.sdf  with a scale of +/- 5 sigma and draws lines at +/- 3 
+*        sigma.
+*     qdraw -noline test 
+*        Same as above but without the 3 sigma lines
+*     qdraw mode=2 test
+*        Plot the data using `+' symbols (LINPLOT mode 2)
+*     qdraw mode=2 sigcol=red test
+*        Plot with `+' symbols and use red lines to show the +/- 3 sigma lines.
+
+*  Implementation Status:
+*    The output of STATS is not displayed therefore no error message is
+*    reported if STATS can not access the NDF (usually because the NDF has
+*    been specified incorrectly).
+*-
+
+
+
+
