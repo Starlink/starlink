@@ -16060,6 +16060,49 @@ MJC: Malcolm J. Currie (STARLINK)
  1991 April 24 (MJC):
     NDF version of LUTABLE and extended the prologue.
 
+1 LUTEDIT
+Create or edit an image-display colour lookup table.
+
+Usage:
+
+   lutedit lut image
+
+Description:
+
+   This application allows a lookup table to be created or edited
+   interactively. The process is controlled through a graphical user
+   interface which presents curves of intensity against pen number, and
+   allows the user to change them in various ways. A specified image
+   is displayed as part of the interface in order to see the effects of
+   the changes. A histogram of pen values is also included. The colour
+   of each pen can be displayed either as red, green and blue intensity,
+   or as hue, saturation and value. More information on the use of the
+   GUI is available through the Help menu within the GUI.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 LUT
+LUT = NDF (Read)
+   Name of an exiting colour table to be edited. This should be an
+   NDF containing an array of red, green and blue intensities. The
+   NDF must be 2-dimensional, the first dimension being 3, and the
+   second being arbitrary.  The method used to compress or expand the
+   colour table if the second dimension is different from the number
+   of unreserved colour indices is controlled by the "Interpolation"
+   option in the GUI. If LUT is null (!) the current KAPPA colour
+   table for the xwindows graphics display is used. [!]
+3 IMAGE
+IMAGE = NDF (Read)
+   Input NDF data structure containing the image to be displayed
+   to show the effect of the created colour table. If a null value
+   is supplied a default image is used.
+2 Related_Applications
+   KAPPA: LUTABLE, LUTFLIP, LUTREAD, LUTSAVE, LUTVIEW, PALREAD, PALSAVE;
+   Figaro: COLOUR.
+2 Authors
+DSB David S. Berry (STARLINK)
+2 History
+ 19-NOV-2001 (DSB):
+    Original version.
 1 LUTFC
 Loads the standard false-colour lookup table.
 

@@ -3798,13 +3798,13 @@ pen 3, which can be set using \htmlref{PALENTRY}{PALENTRY}.
 
 \item A triple of floating point red, green and blue intensity values in
 the range zero to one, separated by spaces, \emph{e.g.} 
-{tt Colour(border)=1.0 0.0 0.0}.
+{\tt Colour(border)=1.0 0.0 0.0}.
 
 \item An HTML colour code. This is a hash followed by 3 pairs of hexadecimal 
 digits giving red, green and blue intensity in the range 0 to 255,
-\emph{e.g.} {tt Colour(border)=#ffa700}. Within style files, the ``#''
+\emph{e.g.} {\tt Colour(border)=\#ffa700}. Within style files, the ``\#''
 character is used to introduce a comment, and so the colour code would be
-ignored. To avoid this, the ``@'' character can be used in place of ``#''.
+ignored. To avoid this, the ``@'' character can be used in place of ``\#''.
 
 \end{itemize}
 
@@ -3943,7 +3943,7 @@ additional attributes are described \hyperref{here}{in section }{}{se:frmatt}.
       element so that, for instance, the setting ``{\tt Colour(title)=2}''
       causes the title to be drawn using colour index 2. Standard X colour 
       names, space separated floating point RGB triples, or HTML colour codes 
-      (optionally using a ``@'' inplace of a ``#'' to avoid the code
+      (optionally using a ``@'' inplace of a ``\#'' to avoid the code
       being interpreted as a comment within a style file) can also be 
       specified, and the nearest available colour will be used if 
       the requested colour is not currently in the palette. 
@@ -11395,6 +11395,8 @@ picture.}
  Loads the standard colour lookup table.}
 \menuitem{LUTCONT}{
  Loads a lookup table to give the display the appearance of a contour plot.}
+\menuitem{LUTEDIT}{
+ Create or edit an image-display colour table.}
 \menuitem{LUTFC}{
  Loads the standard false-colour lookup table.}
 \menuitem{LUTFLIP}{
@@ -11773,6 +11775,8 @@ functions as follows.
  Loads the standard colour lookup table.
 \classitem{LUTCONT}
  Loads a lookup table to give the display the appearance of a contour plot.
+\classitem{LUTEDIT}
+ Creates or edits an image-display colour table.
 \classitem{LUTFC}
  Loads the standard false-colour lookup table.
 \classitem{LUTFLIP}
@@ -17121,7 +17125,7 @@ default value.
    \sstdiytopic{
       Related Applications
    }{
-      KAPPA: LUTABLE, LUTFLIP, LUTREAD, LUTROT, LUTSAVE, LUTTWEAK, \linebreak
+      KAPPA: LUTABLE, LUTEDIT, LUTFLIP, LUTREAD, LUTROT, LUTSAVE, LUTTWEAK, \linebreak
       LUTVIEW, PALREAD, PALSAVE; Figaro: COLOUR.
    }
    \sstimplementationstatus{
@@ -23599,7 +23603,7 @@ plot (101k).
    \sstdiytopic{
       Related Applications
    }{
-      KAPPA: LAPLACE, LUTABLE, SHADOW, THRESH; Figaro: HOPT.
+      KAPPA: LAPLACE, LUTABLE, LUTEDIT, SHADOW, THRESH; Figaro: HOPT.
    }
    \sstimplementationstatus{
       \sstitemlist{
@@ -27080,7 +27084,7 @@ plot (10k).
    \sstdiytopic{
       Related Applications
    }{
-      KAPPA: CRELUT, LUTFLIP, LUTHILITE, LUTREAD, LUTROT, LUTSAVE,
+      KAPPA: LUTEDIT, CRELUT, LUTFLIP, LUTHILITE, LUTREAD, LUTROT, LUTSAVE,
       LUTTWEAK, LUTVIEW; Figaro: COLOUR.
    }
    \sstimplementationstatus{
@@ -27181,6 +27185,53 @@ plot (10k).
       cannot be specified on the command line.  You will only be
       prompted for the DEVICE parameter if the current image display
       is not suitable or not available.
+   }
+}
+\sstroutine{
+   LUTEDIT
+}{
+   Create or edit an image-display colour lookup table
+}{
+   \sstdescription{
+      This application allows a lookup table to be created or edited
+      interactively. The process is controlled through a graphical user
+      interface which presents curves of intensity against pen number, and
+      allows the user to change them in various ways. A specified image
+      is displayed as part of the interface in order to see the effects of
+      the changes. A histogram of pen values is also included. The colour
+      of each pen can be displayed either as red, green and blue intensity,
+      or as hue, saturation and value. More information on the use of the
+      GUI is available through the Help menu within the GUI.
+   }
+   \sstusage{
+      lutedit lut image
+   }
+   \sstparameters{
+      \sstsubsection{
+         LUT = NDF (Read)
+      }{
+         Name of an exiting colour table to be edited. This should be an
+         NDF containing an array of red, green and blue intensities. The
+         NDF must be 2-dimensional, the first dimension being 3, and the
+         second being arbitrary.  The method used to compress or expand the
+         colour table if the second dimension is different from the number
+         of unreserved colour indices is controlled by the {\tt "}Interpolation{\tt "}
+         option in the GUI. If LUT is null (!) the current KAPPA colour
+         table for the xwindows graphics display is used. {\tt [!]}
+      }
+      \sstsubsection{
+         IMAGE = NDF (Read)
+      }{
+         Input NDF data structure containing the image to be displayed
+         to show the effect of the created colour table. If a null value
+         is supplied a default image is used.
+      }
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+      KAPPA: LUTABLE, LUTFLIP, LUTREAD, LUTSAVE, LUTVIEW, PALREAD, PALSAVE;
+      Figaro: COLOUR.
    }
 }
 \sstroutine{
@@ -28238,7 +28289,7 @@ plot (10k).
    \sstdiytopic{
       Related Applications
    }{
-      KAPPA: DISPLAY, LUTABLE; Figaro: COLOUR.
+      KAPPA: DISPLAY, LUTABLE, LUTEDIT ; Figaro: COLOUR.
    }
 }
 \sstroutine{
@@ -31980,7 +32031,7 @@ plot (9k).
            commas or spaces.  Each value must lie in the range 0.0--1.0.
            For example, {\tt "1.0,1.0,0.5"} would give a pale yellow.
 
-           o  An HTML colour code such as #ff002d. The leading #
+           o  An HTML colour code such as \#ff002d. The leading \#
            character can be replaced if required by a ``@'' character.
 
       }
@@ -45024,6 +45075,16 @@ linking command.
 The following applications have been modified:
 
 \begin{description}
+   \item [\htmlref{LUTEDIT}{LUTEDIT}] \mbox{}
+      Creates or edits an image-display colour table. It uses a graphical
+      user interface to allow interactive manipulation of the colour
+      table in many ways.
+\end{description}
+
+\subsection{Modified Commands}
+The following applications have been modified:
+
+\begin{description}
 
    \item [\htmlref{LUTABLE}{LUTABLE}] \mbox{}
       \begin{itemize}
@@ -45209,6 +45270,8 @@ functions as follows.
  Loads the standard colour lookup table.
 \classitem{LUTCONT}
  Loads a lookup table to give the display the appearance of a contour plot.
+\classitem{LUTEDIT}
+ Creates or edits an image-display colour table.
 \classitem{LUTFC}
  Loads the standard false-colour lookup table.
 \classitem{LUTFLIP}
