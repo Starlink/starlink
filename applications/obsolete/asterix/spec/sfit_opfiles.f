@@ -12,12 +12,13 @@
 *    Bugs :
 *    Authors :
 *
-*     David J. Allan(JET-X,University of Birmingham)
+*     David J. Allan (JET-X,University of Birmingham)
 *
 *    History :
 *
 *     21 Jul 94 : Original (DJA)
 *     25 Jul 94 : Converted to use AIO system (DJA)
+*      1 Aug 95 : Added vignetting file report (DJA)
 *
 *    Type definitions :
 *
@@ -55,14 +56,16 @@
       INTEGER			NLEV			! Trace info
 *-
 
-*    Check status
+*  Check inherited global status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Write list of files
+*  Write list of files
       CALL AIO_WRITE( OCI, 'Fitting to datasets:', STATUS )
       DO I = 1, NDS
         CALL MSG_SETC( 'DFILE', OBDAT(I).DATNAME )
         CALL AIO_IWRITE( OCI, 21, '^DFILE', STATUS )
+
+*    Likelihood mode?
         IF ( FSTAT .EQ. FIT__LOGL ) THEN
           IF ( OBDAT(I).B_ID .NE. ADI__NULLID ) THEN
             CALL ADI_FTRACE( OBDAT(I).B_ID, NLEV, PATH, FILE, STATUS )
@@ -72,6 +75,14 @@
           CALL MSG_SETC( 'BFILE', FILE )
           CALL AIO_IWRITE( OCI, 14, 'bgnd : ^BFILE', STATUS )
         END IF
+
+*    Vignetting file present?
+        IF ( OBDAT(I).V_ID .NE. ADI__NULLID ) THEN
+          CALL ADI_FTRACE( OBDAT(I).V_ID, NLEV, PATH, FILE, STATUS )
+          CALL MSG_SETC( 'VFILE', FILE )
+          CALL AIO_IWRITE( OCI, 14, 'vign : ^VFILE', STATUS )
+        END IF
+
         CALL AIO_BLNK( OCI, STATUS )
       END DO
 
