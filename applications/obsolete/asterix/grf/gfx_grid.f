@@ -5,8 +5,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Import :
       EXTERNAL XYTOSKY,SKYTOXY	! routines for coord conversion
 *    Global variables :
