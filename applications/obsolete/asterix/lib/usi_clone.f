@@ -154,7 +154,7 @@
 
 *  Now close and re-open for update!
       CALL ADI_FCLOSE( ID, STATUS )
-      CALL USI_ASSOC( 'OUT', LCLASS, 'UPDATE', ID, stATUS )
+      CALL ADI_FOPEN( FNAME, LCLASS, 'UPDATE', ID, stATUS )
 
 *    Store in common
         CALL USI0_STOREI( OUT(:EP), ID, 'O', .FALSE., STATUS )
