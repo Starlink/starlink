@@ -115,7 +115,10 @@
       END IF
 
 *  Switch on member class
-      IF ( CLASS(1:7) .EQ. 'INTEGER' ) THEN
+      IF ( CLASS(1:7) .EQ. 'HDSfile' ) THEN
+        CALL ADI1_CCA2HZ( ID, MEMBER, LOC, CMP, STATUS )
+
+      ELSE IF ( CLASS(1:7) .EQ. 'INTEGER' ) THEN
         CALL ADI1_CCA2HI( ID, MEMBER, LOC, CMP, STATUS )
 
       ELSE IF ( CLASS(1:7) .EQ. 'LOGICAL' ) THEN

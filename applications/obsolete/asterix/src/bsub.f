@@ -20,6 +20,7 @@
 *
 *     03 Mar 90 : V1.2-0  Original (DJA)
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
+*      5 Apr 95 : V1.8-1 Use new data interfaces (DJA)
 *
 *    Type definitions :
 *
@@ -28,7 +29,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
       INCLUDE 'PAR_ERR'
       INCLUDE 'MATH_PAR'
       INCLUDE 'QUAL_PAR'
@@ -44,10 +45,6 @@
 *
 *    Local variables :
 *
-      CHARACTER*(DAT__SZLOC)    BLOC             ! Background model
-      CHARACTER*(DAT__SZLOC)	ILOC             ! Input dataset
-      CHARACTER*(DAT__SZLOC)    OLOC             ! Output dataset
-
 	REAL			SIZE		 ! pixel size in arc secs
 	REAL			BASE, SCALE	 ! axis attributes
 
@@ -55,11 +52,16 @@
 
 	INTEGER 		DIM		 ! axis attribute
 
-	INTEGER                 DIMS(DAT__MXDIM) ! Input dimensions
-	INTEGER                 TDIMS(DAT__MXDIM)!
-	INTEGER                 PSFDIMS(DAT__MXDIM)!
-	INTEGER                 PSF_FDIMS(DAT__MXDIM)!
-	INTEGER                 PSF_WDIMS(DAT__MXDIM)!
+	INTEGER                 DIMS(ADI__MXDIM) ! Input dimensions
+	INTEGER                 TDIMS(ADI__MXDIM)!
+	INTEGER                 PSFDIMS(ADI__MXDIM)!
+	INTEGER                 PSF_FDIMS(ADI__MXDIM)!
+	INTEGER                 PSF_WDIMS(ADI__MXDIM)!
+
+      INTEGER			BFID			! Background model
+      INTEGER			IFID			! Input dataset
+      INTEGER			OFID			! Output dataset
+      INTEGER			PSFHAN			! Psf handle
 
 	INTEGER			NDIM             ! Input dimensionality
 	INTEGER                 NELM             ! Total number of data items
@@ -76,7 +78,6 @@
 
         LOGICAL                 CREBACK          ! Create background model
         LOGICAL                 CREBSUB          ! Create background sub'd img
-	LOGICAL			IN_PRIM          ! Input primitive?
 	LOGICAL                 DATA_OK          ! Input data ok?
 	LOGICAL                 QUAL_OK, VAR_OK
 	LOGICAL                 ANYBAD
@@ -99,8 +100,7 @@
 	INTEGER  		  I		!counter
 
 	CHARACTER*132		  TEXT			!text string
-	CHARACTER*132		  OUT_HISTORY(100)	!history string
-	CHARACTER*132		  EXPAND_TEXT(5)	!for UIS_TEXT
+	CHARACTER*132		  EXPAND_TEXT(5)	!for USI_TEXT
 
 	REAL                      SCF		!conv factor to arc secs
 
@@ -113,28 +113,26 @@
 	INTEGER   COMPX_PTR, COMPY_PTR
 *-
 
-*    Check status
+*  Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Initialise
+*  Initialise
       CALL AST_INIT()
 
-	ISTATUS=.TRUE.
+      ISTATUS = .TRUE.
+      MAX_HIST = 100
 
-	MAX_HIST=100
-
-*    Version announcement
+*  Version announcement
       CALL MSG_PRNT( VERSION )
 
-*    Get Output write parameter
+*  Get Output write parameter
       CALL USI_GET0L('OUT_MESSAGES',LOUD,STATUS)
-      IF(STATUS.NE.SAI__OK)RETURN
 
-*    Associate the input and output objects (files)
-      CALL USI_ASSOCI( 'INP', 'READ', ILOC, IN_PRIM, STATUS )
+*  Associate the input and output objects (files)
+      CALL USI_TASSOCI( 'INP', '*', 'READ', IFID, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-      CALL USI_ASSOCO( 'OUT', 'DATASET', OLOC, STATUS )
+      CALL USI_TASSOCO( 'OUT', 'BINDS', OFID, STATUS )
       IF ( STATUS .EQ. PAR__NULL ) THEN
         CREBSUB = .FALSE.
         CALL ERR_ANNUL( STATUS )
@@ -144,7 +142,7 @@
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Background model
-      CALL USI_ASSOCO( 'BGND', 'BACKGROUND', BLOC, STATUS )
+      CALL USI_TASSOCO( 'BGND', 'BACKGROUND', BFID, STATUS )
       IF ( STATUS .EQ. PAR__NULL ) THEN
         CREBACK = .FALSE.
         CALL ERR_ANNUL( STATUS )
@@ -163,51 +161,51 @@
 
 *    Copy file info from one to other and get the PSF handle
       IF ( CREBSUB ) THEN
-        CALL HDX_COPY( ILOC, OLOC, STATUS )
-        CALL DAT_ERASE( OLOC, 'DATA_ARRAY', STATUS )
-	CALL HIST_ADD( OLOC, VERSION, STATUS )
+        CALL ADI_FCOPY( IFID, OFID, STATUS )
+        CALL BDI_DELETE( OFID, 'Data', STATUS )
+	CALL HSI_ADD( OFID, VERSION, STATUS )
       END IF
       IF ( CREBACK ) THEN
-        CALL HDX_COPY( ILOC, BLOC, STATUS )
-        CALL DAT_ERASE( BLOC, 'DATA_ARRAY', STATUS )
-	CALL HIST_ADD( BLOC, VERSION, STATUS )
+        CALL ADI_FCOPY( IFID, BFID, STATUS )
+        CALL BDI_DELETE( BFID, 'Data', STATUS )
+	CALL HSI_ADD( BFID, VERSION, STATUS )
       END IF
 
 *    Associate psf
-      CALL PSF_ASSOCI( ILOC, PSFHAN, STATUS )
+      CALL PSF_TASSOCI( IFID, PSFHAN, STATUS )
 
 *    Map input image
-      CALL BDA_MAPDATA( ILOC, 'READ', DATA_PTR, STATUS )
+      CALL BDI_MAPDATA( IFID, 'READ', DATA_PTR, STATUS )
 
 *    Check data
-      CALL BDA_CHKDATA( ILOC, DATA_OK, NDIM, DIMS, STATUS )
+      CALL BDI_CHKDATA( IFID, DATA_OK, NDIM, DIMS, STATUS )
 
       IF ( DATA_OK ) THEN
 
 *       Create output data in case input was not floating point
          IF ( CREBSUB ) THEN
 
-           CALL BDA_CREDATA( OLOC, NDIM, DIMS, STATUS )
-	   CALL BDA_MAPDATA(OLOC, 'WRITE', ODATA_PTR, STATUS)
+           CALL BDI_CREDATA( OFID, NDIM, DIMS, STATUS )
+	   CALL BDI_MAPDATA(OFID, 'WRITE', ODATA_PTR, STATUS)
 
 *         Get variance if present
-	   CALL BDA_CHKVAR( OLOC, VAR_OK, TNDIM, TDIMS, STATUS )
+	   CALL BDI_CHKVAR( OFID, VAR_OK, TNDIM, TDIMS, STATUS )
 C	   IF ( VAR_OK ) THEN
-C	     CALL BDA_MAPVAR( OLOC, 'UPDATE', VAR_PTR, STATUS )
+C	     CALL BDI_MAPVAR( OFID, 'UPDATE', VAR_PTR, STATUS )
 C	   ELSE
-C	     CALL BDA_CREVAR( OLOC, NDIM, DIMS, STATUS )
-C	     CALL BDA_MAPVAR( OLOC, 'WRITE', VAR_PTR, STATUS )
+C	     CALL BDI_CREVAR( OFID, NDIM, DIMS, STATUS )
+C	     CALL BDI_MAPVAR( OFID, 'WRITE', VAR_PTR, STATUS )
 C	   END IF
            IF ( STATUS .NE. SAI__OK ) GOTO 99
          END IF
 
 *       Create background model
          IF ( CREBACK ) THEN
-           CALL BDA_CREDATA( BLOC, NDIM, DIMS, STATUS )
-	   CALL BDA_MAPDATA( BLOC, 'WRITE', BDATA_PTR, STATUS)
+           CALL BDI_CREDATA( BFID, NDIM, DIMS, STATUS )
+	   CALL BDI_MAPDATA( BFID, 'WRITE', BDATA_PTR, STATUS)
            IF ( .NOT. CREBSUB ) THEN
              ODATA_PTR = BDATA_PTR
-             OLOC = BLOC
+             OFID = BFID
            END IF
          END IF
          CALL DYN_MAPR( NDIM, DIMS, VAR_PTR, STATUS )
@@ -220,7 +218,7 @@ C	   END IF
 
 	  IF(STATUS.NE.SAI__OK)THEN
 
-	    CALL ERR_REP(' ','Error in BDA_MAPDATA',STATUS)
+	    CALL ERR_REP(' ','Error in BDI_MAPDATA',STATUS)
 	    GOTO 99
 
 	  END IF
@@ -236,12 +234,12 @@ C	   END IF
         CALL ARR_SUMDIM( NDIM, DIMS, NELM )
 
 *      Map quality from input
-	CALL BDA_CHKQUAL( ILOC, QUAL_OK, TNDIM, TDIMS, STATUS )
+	CALL BDI_CHKQUAL( IFID, QUAL_OK, TNDIM, TDIMS, STATUS )
 	IF ( QUAL_OK ) THEN
-	  CALL BDA_MAPLQUAL( ILOC, 'READ', ANYBAD, QUAL_PTR, STATUS )
+	  CALL BDI_MAPLQUAL( IFID, 'READ', ANYBAD, QUAL_PTR, STATUS )
 	  IF ( .NOT. ANYBAD ) THEN
 	    QUAL_OK = .FALSE.
-	    CALL BDA_UNMAPLQUAL( ILOC, STATUS )
+	    CALL BDI_UNMAPLQUAL( IFID, STATUS )
 	  END IF
 	END IF
 
@@ -265,7 +263,7 @@ C	   END IF
 
 *  Find out if image scale is in degrees or arc mins and then get axis scale
 *  in arc secs
-	CALL BDA_GETAXUNITS(ILOC, 1, UNITS, STATUS)
+	CALL BDI_GETAXUNITS( IFID, 1, UNITS, STATUS)
         CALL CONV_UNIT2R( UNITS, SCF, STATUS )
 
         IF ( STATUS .NE. SAI__OK ) THEN
@@ -276,7 +274,7 @@ C	   END IF
         END IF
 
 *    Get axis 1 stuff
-	CALL BDA_GETAXVAL( ILOC, 1, BASE, SCALE, DIM, STATUS )
+	CALL BDI_GETAXVAL( IFID, 1, BASE, SCALE, DIM, STATUS )
 
 *    Get min and max values of the axes (for spatial filter)
 	AXIS1(1)=BASE
@@ -292,15 +290,12 @@ C	   END IF
 	END IF
 
 *    Get axis 2 stuff
-	CALL BDA_GETAXVAL( ILOC, 2, BASE, SCALE, DIM, STATUS )
+	CALL BDI_GETAXVAL( IFID, 2, BASE, SCALE, DIM, STATUS )
 
 *    Get min and max values of the axes (for spatial filter)
 	AXIS2(1)=BASE
 	AXIS2(2)=BASE+(DIMS(2)-1)*SCALE
 	AXIS2(3)=SCALE
-*
-*  grab a locator to the MORE box
-	CALL DAT_FIND(ILOC, 'MORE', LOCMORE, STATUS)
 
 *    Get 68,95,99% limits on PSF
 *    Get pixel size in radians
@@ -385,9 +380,9 @@ C	   END IF
 *
 * create quality array
 *
-	CALL BDA_CREQUAL(OLOC,2,DIMS,STATUS)
-	CALL BDA_PUTMASK(OLOC,QUAL__MASK,STATUS)
-	CALL BDA_MAPQUAL(OLOC,'WRITE',QUAL_PTR,STATUS)
+	CALL BDI_CREQUAL( OFID,2,DIMS,STATUS)
+	CALL BDI_PUTMASK( OFID,QUAL__MASK,STATUS)
+	CALL BDI_MAPQUAL( OFID,'WRITE',QUAL_PTR,STATUS)
 *
 * calculate the background
 *
@@ -398,8 +393,8 @@ C	   END IF
      &  PSFDIMS(2),%VAL(PSF_STORE),%VAL(PSF_SHIFT),CREBSUB,CREBACK,
      &  %VAL(ODATA_PTR),%VAL(BDATA_PTR),
      &  %VAL(VAR_PTR),SDIM,%VAL(X_S_PTR),%VAL(Y_S_PTR),
-     &	%VAL(R_S_PTR),%VAL(SRCMAP_PTR),N_REMOVED,OLOC,%VAL(QUAL_PTR),
-     &  STATUS)
+     &	%VAL(R_S_PTR),%VAL(SRCMAP_PTR),N_REMOVED,OFID,PSFHAN,
+     &  %VAL(QUAL_PTR),STATUS)
 
 	IF(ISTATUS)THEN
 
@@ -441,33 +436,28 @@ C	   END IF
 	    HISTORY(NHISTORY) = EXPAND_TEXT(I)
 	  END DO
 
-	  DO I=1,NHISTORY
-	    OUT_HISTORY(I)=HISTORY(I)
-	  END DO
-
 *    Write this into history structure
           IF ( CREBSUB ) THEN
-	    CALL HIST_PTXT( OLOC, NHISTORY, OUT_HISTORY, STATUS )
+	    CALL HSI_PTXT( OFID, NHISTORY, HISTORY, STATUS )
           END IF
           IF ( CREBACK ) THEN
-	    CALL HIST_PTXT( BLOC, NHISTORY, OUT_HISTORY, STATUS )
+	    CALL HSI_PTXT( BFID, NHISTORY, HISTORY, STATUS )
           END IF
 
 *    Release datasets
           CALL PSF_RELEASE( PSFHAN, STATUS )
-	  CALL BDA_RELEASE( ILOC, STATUS )
-          CALL DAT_ANNUL(LOCMORE,STATUS)
+	  CALL BDI_RELEASE( IFID, STATUS )
 
           IF ( CREBSUB ) THEN
 
 *           Set BACKGROUND SUBTRACT flag to true
-             CALL PRO_SET( OLOC, 'BGND_SUBTRACTED', .TRUE., STATUS )
+             CALL PRF_SET( OFID, 'BGND_SUBTRACTED', .TRUE., STATUS )
 
-	     CALL BDA_RELEASE( OLOC, STATUS )
+	     CALL BDI_RELEASE( OFID, STATUS )
 
           END IF
           IF ( CREBACK ) THEN
-	     CALL BDA_RELEASE( BLOC, STATUS )
+	     CALL BDI_RELEASE( BFID, STATUS )
           END IF
 
 	END IF		!if status OK after call to BSUB_SUBTRACT_BACKGROUND
@@ -530,11 +520,10 @@ C	   END IF
      &  PSF_FUNC,N1,N2,N3,WORK,N_AZIMP2,N_ELEVP2,PSF_STORE,PSF_SHIFT,
      &  CREBSUB,CREBACK,
      &  IMAGE,BMODEL,VARRAY,SDIM,X_SOURCE,Y_SOURCE,R_SOURCE,SRCMAP,
-     &  N_REMOVED,OLOC,QUALITY,STATUS)
+     &  N_REMOVED,OFID,PSFHAN,QUALITY,STATUS)
 
 	INCLUDE 'SAE_PAR'
 	INCLUDE 'QUAL_PAR'
-	INCLUDE 'DAT_PAR'
 *
 	INTEGER   IMAGE_X, IMAGE_Y	!dimensions of the full image
 
@@ -585,7 +574,7 @@ C	   END IF
 
 	INTEGER   N_REMOVED		!No. of sources removed
 
-	CHARACTER*(DAT__SZLOC) OLOC	!output locator
+      INTEGER			OFID			! Output dataset id
 
 	BYTE QUALITY(IMAGE_X,IMAGE_Y)	!quality array
 
@@ -675,12 +664,11 @@ C	   END IF
 *
 *  find out if its a SURVEY image etc.
 *
-	CALL BSUB_GET_HEADER_INFO(OLOC,IMAGE_X,IMAGE_Y,IMAGE,VARRAY,
+	CALL BSUB_GET_HEADER_INFO(OFID,IMAGE_X,IMAGE_Y,IMAGE,VARRAY,
      &  SIZE,POINTED,MIN_XPOS,MAX_XPOS,MIN_YPOS,MAX_YPOS,STATUS)
-*
+
 *  The minimum box size is subsequently defined to be N*IR_80 where
 *  (currently) N=2
-*
 	IR_80=NINT(R_80)
 
 	MIN_BOXSIZE=1.5*IR_80		!get minimum box size
@@ -748,7 +736,6 @@ C	   END IF
 
 *
 *  store factorials into array for later use
-*
 	CALL BSUB_COMPUTE_FACTORIALS(IMAX,STATUS)
 
 *  Number of boxes needed (over estimate)
@@ -824,8 +811,8 @@ C	   END IF
 	      OFF_X=-OFF_X*SIZE			!direction consistency
 	      OFF_Y=-OFF_Y*SIZE			!with DJA's definition
 
-	      CALL BSUB_GET_PSF_GRID(SIZE,CEN_X,CEN_Y,OFF_X,OFF_Y,
-     &        N_AZIM,N_ELEV,PSF_FUNC,STATUS)	!extract PSF
+	      CALL BSUB_GET_PSF_GRID(PSFHAN,SIZE,CEN_X,CEN_Y,OFF_X,
+     &        OFF_Y,N_AZIM,N_ELEV,PSF_FUNC,STATUS)	!extract PSF
 
 	    ELSE		!resample
 *
@@ -838,8 +825,8 @@ C	   END IF
 	      OFF_X=0.
 	      OFF_Y=0.
 
-	      CALL BSUB_GET_PSF_GRID(SIZE,CEN_X,CEN_Y,OFF_X,OFF_Y,
-     &        N_AZIMP2,N_ELEVP2,PSF_STORE,STATUS)
+	      CALL BSUB_GET_PSF_GRID(PSFHAN,SIZE,CEN_X,CEN_Y,OFF_X,
+     &        OFF_Y,N_AZIMP2,N_ELEVP2,PSF_STORE,STATUS)
 
 	      IF(STATUS.NE.SAI__OK)THEN
 	        CALL ERR_REP(' ','Error in BSUB_GET_PSF_GRID - returning
@@ -955,7 +942,6 @@ C	   END IF
      &  QUALITY,STATUS)
 *
 	INCLUDE 'SAE_PAR'
-	INCLUDE 'DAT_PAR'
 	INCLUDE 'QUAL_PAR'
 *
 	INTEGER   BOXSIZE		!box size
@@ -1221,7 +1207,7 @@ C	   END IF
 *
 *  bins histogram
 *
-	    CALL GET_HISTOGRAM(DIMX,DIMY,IMAGE,SRCMAP,I,BOX_LIMS,
+	    CALL BSUB_GET_HISTOGRAM(DIMX,DIMY,IMAGE,SRCMAP,I,BOX_LIMS,
      +      HISTOGRAM,NHIST,NHIST_LAST,CT_SUM,NPIX_USED,
      +      MEAN_VALUE,ALL_INT,ROUTINE_ID,QUALITY,STATUS)
 
@@ -1258,8 +1244,8 @@ C	   END IF
 		  Y(M+1)=1.D0*HISTOGRAM(M)
 d		  E(M+1)=1.D0
 
-		  CALL BINOMIAL_ERROR(NPIX_USED,MEAN_VALUE,M,E(M+1),P_PROB,
-     +		  Q_PROB,STATUS)
+		  CALL BSUB_BINOMIAL_ERROR(NPIX_USED,MEAN_VALUE,
+     :            M,E(M+1),P_PROB,Q_PROB,STATUS)
 
 		END DO
 *
@@ -1309,7 +1295,7 @@ d		  E(M+1)=1.D0
 *  intermediate array), storing the same mean value to all pixels in the box
 *  This routine also gets the weighting factor in each box
 *
-	    CALL WRITE_BACK(DIMX,DIMY,I,BOX_LIMS,A(2),INT_IMAGE,
+	    CALL BSUB_WRITE_BACK(DIMX,DIMY,I,BOX_LIMS,A(2),INT_IMAGE,
      +      NPIX_USED,CT_SUM,VARRAY,ENOUGH_PIXELS,ROUTINE_ID,STATUS)
 
 	    MAX_CTS=MAX(MAX_CTS,A(2))
@@ -1455,7 +1441,7 @@ d		  E(M+1)=1.D0
 *
 		    DO M=0,MAXCT(K)
 
-			CALL BINOMIAL_ERROR(1,SMOOTHED_IMAGE(J,I),M,
+			CALL BSUB_BINOMIAL_ERROR(1,SMOOTHED_IMAGE(J,I),M,
      +		 	E(M+1),P_PROB,Q_PROB,STATUS)
 
 			SUM_P(M+1)=SUM_P(M+1) + P_PROB
@@ -1595,7 +1581,7 @@ d		  E(M+1)=1.D0
 	SUBROUTINE BSUB_COMPUTE_FACTORIALS(IMAX,STATUS)
 *
 	INCLUDE 'SAE_PAR'
-	INCLUDE 'DAT_PAR'
+        INCLUDE 'MATH_PAR'
 
 	REAL   LOG_FACTORIALS(0:100)		!factorial array
 
@@ -1603,15 +1589,11 @@ d		  E(M+1)=1.D0
 
 	REAL   FACTORIAL, LN_FAC		!N! and log(N!) variables
 
-	REAL   PI				!pi
-
 	INTEGER   J				!integer factorial variable
 
 	INTEGER   IMAX 				!max factorial to evaluate
 *
 	INTEGER   STATUS
-
-	INCLUDE 'BSUB_CMN'
 
 	COMMON/FACTORIALS/LOG_FACTORIALS
 *
@@ -1651,8 +1633,7 @@ d		  E(M+1)=1.D0
 	      RETURN
 	    ELSE
 
-	      PI=4.0*ATAN(1.0)
-	      LN_FAC=(RJ+0.50)*LOG(RJ) - RJ + 0.50*LOG(2.0*PI)
+	      LN_FAC=(RJ+0.50)*LOG(RJ) - RJ + 0.50*LOG(2.0*MATH__PI)
 
 	    END IF
 
@@ -1678,7 +1659,6 @@ d		  E(M+1)=1.D0
      &  BOX_LIMS,NBOXES,ROUTINE_ID,STATUS)
 *
 	INCLUDE 'SAE_PAR'
-	INCLUDE 'DAT_PAR'
 
 	INTEGER   DIMX, DIMY		!image dimensions
 
@@ -1772,12 +1752,12 @@ d		  E(M+1)=1.D0
 *
 *  subroutine to bin up histogram
 *
-	SUBROUTINE GET_HISTOGRAM(DIMX,DIMY,IMAGE,SRCMAP,IBOX,BOX_LIMS,
+	SUBROUTINE BSUB_GET_HISTOGRAM(DIMX,DIMY,IMAGE,SRCMAP,IBOX,
+     :          BOX_LIMS,
      +  HISTOGRAM,NHIST,NHL,CT_SUM,NPIX_USED,MEAN,ALL_INT,ROUTINE_ID,
      +  QUALITY,STATUS)
 
 	INCLUDE 'SAE_PAR'
-	INCLUDE 'DAT_PAR'
 	INCLUDE 'QUAL_PAR'
 
 	INTEGER   DIMX, DIMY		!image dimensions
@@ -1856,7 +1836,7 @@ d		  E(M+1)=1.D0
 	NHIST=NMAX
 
         IF ( STATUS .NE. SAI__OK ) THEN
-          CALL AST_REXIT( 'GET_HISTOGRAM', STATUS )
+          CALL AST_REXIT( 'BSUB_GET_HISTOGRAM', STATUS )
         END IF
 
 	END
@@ -1870,12 +1850,11 @@ d		  E(M+1)=1.D0
 *
 
 
-	SUBROUTINE WRITE_BACK(DIMX,DIMY,IBOX,BOX_LIMS,MEAN,
+	SUBROUTINE BSUB_WRITE_BACK(DIMX,DIMY,IBOX,BOX_LIMS,MEAN,
      +  INT_IMAGE,NPIX_USED,CT_SUM,WEIGHT,ENOUGH_PIXELS,ROUTINE_ID,
      +  STATUS)
 *
 	INCLUDE 'SAE_PAR'
-	INCLUDE 'DAT_PAR'
 
 	INTEGER   DIMX, DIMY		!image dimensions
 
@@ -1899,11 +1878,10 @@ d		  E(M+1)=1.D0
 *
 *-
 
-*    Check status
+*  Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  not same element order as for get_histogram
-*
+*  Not same element order as for get_histogram
 	DO I=BOX_LIMS(1,IBOX),BOX_LIMS(2,IBOX)		!X loop
 
 	  DO J=BOX_LIMS(3,IBOX),BOX_LIMS(4,IBOX)	!Y loop
@@ -1923,7 +1901,7 @@ d		  E(M+1)=1.D0
 	END DO
 
         IF ( STATUS .NE. SAI__OK ) THEN
-          CALL AST_REXIT( 'WRITE_BACK', STATUS )
+          CALL AST_REXIT( 'BSUB_WRITE_BACK', STATUS )
         END IF
 
 	END
@@ -1937,7 +1915,6 @@ d		  E(M+1)=1.D0
      &  MIN_CTS,MAX_CTS,SM_BORDER,ROUTINE_ID,STATUS)
 *
 	INCLUDE 'SAE_PAR'
-	INCLUDE 'DAT_PAR'
 
 	INTEGER   DIMX, DIMY			!image dimensions
 
@@ -2217,7 +2194,6 @@ d		  E(M+1)=1.D0
      +  STRIP1,STRIP2,ROUTINE_ID,STATUS)
 *
 	INCLUDE 'SAE_PAR'
-	INCLUDE 'DAT_PAR'
 
 	INTEGER   DIMX, DIMY			!image dimensions
 
@@ -2267,10 +2243,11 @@ d		  E(M+1)=1.D0
 *
 *  routine to evaluate binomial error value
 *
-	SUBROUTINE BINOMIAL_ERROR(DIM,MEAN,IBIN,E,P_PROB,Q_PROB,STATUS)
+	SUBROUTINE BSUB_BINOMIAL_ERROR(DIM,MEAN,IBIN,E,P_PROB,
+     :                    Q_PROB,STATUS)
 *
 	INCLUDE 'SAE_PAR'
-	INCLUDE 'DAT_PAR'
+        INCLUDE 'MATH_PAR'
 
 	INTEGER   DIM			!no of pixels used in this calc
 
@@ -2285,8 +2262,6 @@ d		  E(M+1)=1.D0
 	REAL   YV			!expected Poisson value
 
 	INTEGER   J			!local variables
-
-	REAL   PI			!pi
 
 	REAL   LN_FAC, LN_YV		!ln(factorial),   ln(yv)
 
@@ -2325,8 +2300,7 @@ d		  E(M+1)=1.D0
 	      RETURN
 	    ELSE
 
-	      PI=4.0*ATAN(1.0)
-	      LN_FAC=(RJ+0.50)*LOG(RJ) - RJ + 0.50*LOG(2.0*PI)
+	      LN_FAC=(RJ+0.50)*LOG(RJ) - RJ + 0.50*LOG(2.0*MATH__PI)
 
 	    END IF
 
@@ -2364,7 +2338,7 @@ d		  E(M+1)=1.D0
 	END IF
 *
         IF ( STATUS .NE. SAI__OK ) THEN
-          CALL AST_REXIT( 'BINOMIAL_ERROR', STATUS )
+          CALL AST_REXIT( 'BSUB_BINOMIAL_ERROR', STATUS )
         END IF
 
 	END
@@ -2375,7 +2349,6 @@ d		  E(M+1)=1.D0
 	SUBROUTINE BSUB_FILL_FUNC(N_AZIM,N_ELEV,PSF_FUNC,ARR_2D,STATUS)
 
 	INCLUDE 'SAE_PAR'
-	INCLUDE 'DAT_PAR'
 
 	INTEGER   N_ELEV, N_AZIM		!dimenions of PSF grid
 
@@ -2436,7 +2409,6 @@ d		  E(M+1)=1.D0
 *	Type definitions :
 
 	INCLUDE 'SAE_PAR'
-	INCLUDE 'DAT_PAR'
 
 	INTEGER N			!array dimensions
 
@@ -2584,7 +2556,6 @@ d		  E(M+1)=1.D0
 	INTEGER FUNCTION BSUB_GAUSS_ELIM(A,N,NP,B,M,MP,STATUS)
 
 	INCLUDE 'SAE_PAR'
-	INCLUDE 'DAT_PAR'
 
 	INTEGER   NMAX			!max array size
 
@@ -2724,25 +2695,22 @@ d		  E(M+1)=1.D0
 *
 *+  BSUB_GET_HEADER_INFO - Gets useful info + circular mask
 *
-	SUBROUTINE BSUB_GET_HEADER_INFO(OLOC,NX,NY,IMAGE,VARRAY,SIZE,
+	SUBROUTINE BSUB_GET_HEADER_INFO(OFID,NX,NY,IMAGE,VARRAY,SIZE,
      &POINTED,MIN_X,MAX_X,MIN_Y,MAX_Y,STATUS)
 
+*
+*    Type definitions :
+*
+      IMPLICIT NONE
+*
 *  A routine to get useful info from header and act upon it
 
 	INCLUDE 'SAE_PAR'
-	INCLUDE 'DAT_PAR'
-
-	INCLUDE 'BSUB_CMN'
-
-	CHARACTER*(DAT__SZLOC)	OLOC		!output image locator
+        INCLUDE 'MATH_PAR'
 
 	INTEGER NX,NY				!image dimensions
 
 	REAL   IMAGE(NX,NY),VARRAY(NX,NY)	!image, variance array
-
-	REAL   SIZE				!pixel size in arcsec
-
-	LOGICAL POINTED				!pointed phase
 
 	INTEGER MIN_X,MAX_X			!X limits of non-zero image
 
@@ -2750,141 +2718,112 @@ d		  E(M+1)=1.D0
 
 	INTEGER STATUS
 
-	CHARACTER*(DAT__SZLOC)	LOCHEAD		! HEADER object
-
 	CHARACTER*132 UNITS			!units string
 	CHARACTER*132 STRING			!SURVEY string
 	CHARACTER*132 INSTRUMENT 		!which instrument
 
 	INTEGER I,J				!local counters
 
-	INTEGER EXPOS,SURVEY			!index positions
+	INTEGER SURVEY			!index positions
 
 	INTEGER SURVEY1,SURVEY2			!index positions
 
-	INTEGER INSTR				!   "
-
 	REAL   EXPOSURE_TIME			!exposure time
 
-	REAL   RADIUS, OK_RADIUS		!radii
+	REAL   PIX_X,PIX_Y			!posn from centre
 
-	REAL   PIX_X,PIX_Y			!posn from center
+*  Arguments Given:
+      INTEGER			OFID			! Output dataset id
+      REAL			SIZE			! Pixel size (arcsec)
 
-	DOUBLE PRECISION AXIS_RA,AXIS_DEC	!positions
+*  Arguments Returned:
+      LOGICAL			POINTED			! Pointed mode?
 
-	DOUBLE PRECISION FIELD_RA,FIELD_DEC	!
+*  Local Constants:
+      REAL			RFOV			! Radius of FOV (deg)
+        PARAMETER		( RFOV = 2.45 )
 
-	DOUBLE PRECISION PI			! pi!
+*  Local Variables:
+      DOUBLE PRECISION		NPOINT(2)		! Nominal pointing dir
+      DOUBLE PRECISION		SPOINT(2)		! Axis cel position
 
-	DOUBLE PRECISION CEL(2),ROLL		!for routines
+      REAL			DX, DY			! Offset nom->point
+      REAL			NPPIX(2)		! NPOINT in pixels
+      REAL			OK_RAD2			! Limit of FOV^2
+      REAL			RAD2			! Radius of point^2
+      REAL			SPPIX(2)		! SPOINT in pixels
 
-	DOUBLE PRECISION AZ_SUBIM,EL_SUBIM	!positions of center SUBIM
+      INTEGER			DETID			! Detector configuration
+      INTEGER			IDUM			! Dummy argument
+      INTEGER			PIXID, PRJID, SYSID	! World coordinates
+      INTEGER			TIMID			! Timing
 
-	DOUBLE PRECISION CTOS(3,3)
-
-	LOGICAL FLAG				!removed any?
-	LOGICAL HEAD_THERE
-	LOGICAL TARGET_THERE
-	LOGICAL RA_THERE
-	LOGICAL DEC_THERE
-	LOGICAL FRA_THERE
-	LOGICAL FDEC_THERE
-	LOGICAL EXPOS_THERE
-	LOGICAL INST_THERE
+      LOGICAL			FLAG			! Flag warning message?
+      LOGICAL			PNT_OK			! Got pointing data?
+      LOGICAL			THERE			! Object exists?
 *-
 
-*    Check status
+*  Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-* set up constants
-*
-	PI=4.0D0*ATAN(1.0D0)
+*  Try to read world coordinates and timing info
+      CALL DCI_GETID( OFID, DETID, STATUS )
+      CALL WCI_GETIDS( OFID, PIXID, PRJID, SYSID, STATUS )
+      CALL TCI_GETID( OFID, TIMID, STATUS )
 
-*      Default is they don't exist
-        HEAD_THERE = .FALSE.
-	TARGET_THERE=.FALSE.
-        RA_THERE=.FALSE.
-	DEC_THERE=.FALSE.
-	FRA_THERE=.FALSE.
-	FDEC_THERE=.FALSE.
-	EXPOS_THERE=.FALSE.
-	INST_THERE=.FALSE.
+*  Get units - if /C in string then exposure corrected
+      CALL BDI_GETUNITS( OFID, UNITS, STATUS )
+      IF(STATUS.NE.SAI__OK)THEN
+	CALL MSG_PRNT('ERROR: No UNIT information in header')
+        CALL ERR_ANNUL( STATUS )
 
-*      Does HEADER exist?
-        CALL HDX_FIND( LOCMORE, 'ASTERIX.HEADER', LOCHEAD, STATUS )
-        IF ( STATUS .EQ. SAI__OK ) THEN
-	  HEAD_THERE=.TRUE.
+      ELSE
+	CALL CHR_UCASE( UNITS )
 
-*        Do components exist?
-          CALL DAT_THERE( LOCHEAD, 'TARGET', TARGET_THERE, STATUS )
-          CALL DAT_THERE( LOCHEAD, 'AXIS_RA', RA_THERE, STATUS )
-          CALL DAT_THERE( LOCHEAD, 'AXIS_DEC', DEC_THERE, STATUS )
-          CALL DAT_THERE( LOCHEAD, 'FIELD_RA', FRA_THERE, STATUS )
-          CALL DAT_THERE( LOCHEAD, 'FIELD_DEC', FDEC_THERE, STATUS )
-          CALL DAT_THERE( LOCHEAD, 'EXPOSURE_TIME', EXPOS_THERE,
-     :                                                  STATUS )
-          CALL DAT_THERE( LOCHEAD, 'INSTRUMENT', INST_THERE, STATUS )
+	IF ( INDEX(UNITS,'/C') ) THEN
 
-        END IF
+*        Exposure correct
+          CALL ADI_CGET0R( TIMID, 'Exposure', EXPOSURE_TIME, STATUS )
 
-*      Annul status looking for components
-        IF ( STATUS .NE. SAI__OK ) CALL ERR_ANNUL(STATUS)
+	  CALL MSG_PRNT('Image was exposure corrected - for correct '//
+     :                  'background use UN-corrected image')
+	  CALL MSG_SETR('EXP',EXPOSURE_TIME)
+	  CALL MSG_PRNT('Exposure time was ^EXP seconds')
 
-*
-*  get units - if /C in string then exposure corrected
-*
-        CALL CMP_GET0C(OLOC,'UNITS',UNITS,STATUS)
-	IF(STATUS.NE.SAI__OK)THEN
-	  CALL MSG_PRNT('ERROR: No UNIT information in header')
-          CALL ERR_ANNUL( STATUS )
-
-	ELSE
-	  CALL CHR_UCASE( UNITS )
-	  EXPOS=INDEX(UNITS,'/C')
-
-	  IF(EXPOS.NE.0)THEN
-
-*          Exposure correct
-            CALL CMP_GET0R( LOCHEAD, 'EXPOSURE_TIME', EXPOSURE_TIME,
-     :                                                      STATUS )
-
-	    CALL MSG_PRNT('Image was exposure corrected - for correct
-     &background use UN-corrected image')
-	    CALL MSG_SETR('EXP',EXPOSURE_TIME)
-	    CALL MSG_PRNT('Exposure time was ^EXP seconds')
-
-	    DO I=1,NY
-	      DO J=1,NX
-	        IMAGE(J,I)=FLOAT(NINT(IMAGE(J,I)*EXPOSURE_TIME))
-	      END DO
+	  DO I=1,NY
+	    DO J=1,NX
+	      IMAGE(J,I) = FLOAT(NINT(IMAGE(J,I)*EXPOSURE_TIME))
 	    END DO
+	  END DO
 
-	  ENDIF
-	ENDIF
+	END IF
 
-*      Get target instrument
-        IF ( INST_THERE ) THEN
-	  CALL CMP_GET0C( LOCHEAD, 'INSTRUMENT', INSTRUMENT, STATUS )
-	  CALL CHR_UCASE( INSTRUMENT )
-        ELSE
-	  CALL MSG_PRNT( 'No instrument information, defaulting to WFC')
-          INSTRUMENT = 'WFC'
-        END IF
-	INSTR = INDEX(INSTRUMENT,'WFC')
+      END IF
 
-	IF(INSTR.GT.0)THEN
+*  Get target instrument
+      CALL ADI_THERE( DETID, 'Instrument', THERE, STATUS )
+      IF ( THERE ) THEN
+        CALL ADI_CGET0C( DETID, 'Instrument', INSTRUMENT, STATUS )
+	CALL CHR_UCASE( INSTRUMENT )
+      ELSE
+	CALL MSG_PRNT( 'No instrument information, defaulting to WFC')
+        INSTRUMENT = 'WFC'
+      END IF
 
-*  now find out if survey or pointed mode
+*   WFC data?
+      IF ( INDEX(INSTRUMENT,'WFC') .GT. 0 ) THEN
 
-	IF ( TARGET_THERE ) THEN
-	  CALL CMP_GET0C(LOCHEAD,'TARGET',STRING,STATUS)
+*    Now find out if survey or pointed mode
+        CALL ADI_THERE( DETID, 'Target', THERE, STATUS )
+	IF ( THERE ) THEN
+          CALL ADI_CGET0C( DETID, 'Target', STRING, STATUS )
+	  CALL CHR_UCASE( STRING )
 	ELSE
-	  CALL MSG_PRNT('ERROR: No target information - assuming
-     &WFC SURVEY' )
-	  STRING='SURVEY'
-	ENDIF
+	  CALL MSG_PRNT('ERROR: No target information - assuming '//
+     :                  'WFC SURVEY' )
+	  STRING = 'SURVEY'
+	END IF
 
-	CALL CHR_UCASE( STRING )
 	SURVEY1=0
 	SURVEY2=0
 	SURVEY1=INDEX(STRING,'SURVEY')	!will be non-zero if SURVEY image
@@ -2903,126 +2842,106 @@ d		  E(M+1)=1.D0
 	  CALL MSG_SETC('TARG',STRING)
 	  CALL MSG_PRNT('POINTED Phase image, Target ^TARG')
 
-	  IF(RA_THERE)THEN
-	    CALL CMP_GET0D(LOCHEAD,'AXIS_RA',AXIS_RA,STATUS)
-	  ELSE
-	    CALL MSG_PRNT('ERROR: no AXIS_RA information')
-	    CALL MSG_PRNT('       No circular mask applied')
-	  ENDIF
-	  IF(DEC_THERE)THEN
-	    CALL CMP_GET0D(LOCHEAD,'AXIS_DEC',AXIS_DEC,STATUS)
-	  ELSE
-	    CALL MSG_PRNT('ERROR: no AXIS_DEC information')
-	    CALL MSG_PRNT('       No circular mask applied')
-	  ENDIF
-	  IF(FRA_THERE)THEN
-	    CALL CMP_GET0D(LOCHEAD,'FIELD_RA',FIELD_RA,STATUS)
-	  ELSE
-	    CALL MSG_PRNT('ERROR: no FIELD_RA information')
-	    CALL MSG_PRNT('       No circular mask applied')
-	  ENDIF
-	  IF(FDEC_THERE)THEN
-	    CALL CMP_GET0D(LOCHEAD,'FIELD_DEC',FIELD_DEC,STATUS)
-	  ELSE
-	    CALL MSG_PRNT('ERROR: no FIELD_DEC information')
-	    CALL MSG_PRNT('       No circular mask applied')
-	  ENDIF
-
-	  IF(STATUS.NE.SAI__OK)THEN
-	    CALL MSG_PRNT('ERROR: some error in BSUB_GET_HEADER_INFO')
+*      Look for pointing direction
+          PNT_OK = .FALSE.
+          CALL ADI_CGET1D( PRJID, 'SPOINT', 2, SPOINT, IDUM, STATUS )
+          IF ( STATUS .NE. SAI__OK ) THEN
             CALL ERR_ANNUL( STATUS )
-            GOTO 99
-	  ENDIF
+	    CALL MSG_PRNT('ERROR: no pointing direction information')
+	    CALL MSG_PRNT('       No circular mask applied')
 
-*	 Convert to radians
-	  AXIS_RA=AXIS_RA*PI/180.D0
-	  AXIS_DEC=AXIS_DEC*PI/180.D0
-	  FIELD_RA=FIELD_RA*PI/180.D0
-	  FIELD_DEC=FIELD_DEC*PI/180.D0
+          ELSE
+            CALL ADI_CGET1D( PRJID, 'NPOINT', 2, NPOINT, IDUM, STATUS )
+            IF ( STATUS .NE. SAI__OK ) THEN
+              CALL ERR_ANNUL( STATUS )
+            ELSE
+              PNT_OK = .TRUE.
+            END IF
 
-	  CEL(1)=AXIS_RA
-	  CEL(2)=AXIS_DEC
-	  ROLL=0.D0
+          END IF
 
-*        get difference in radians
-	  CALL CONV_GENDMAT(CEL(1),CEL(2),ROLL,CTOS )
-	  CALL CONV_DSPCVRT(FIELD_RA,FIELD_DEC,CTOS,AZ_SUBIM,EL_SUBIM)
+*      Got pointing?
+          IF ( PNT_OK ) THEN
 
-	  IF(AZ_SUBIM.GT.PI)AZ_SUBIM=AZ_SUBIM-2.D0*PI
+*        Find position of SPOINT AND NPOINT in the SPOINT frame in pixels.
+*        Convert SPOINT,NPOINT to radians first.
+            DO I = 1, 2
+              SPOINT(I) = SPOINT(I) * MATH__DDTOR
+              NPOINT(I) = NPOINT(I) * MATH__DDTOR
+            END DO
+            CALL WCI_CNS2P( SPOINT, PIXID, PRJID, SPPIX, STATUS )
+            CALL WCI_CNS2P( NPOINT, PIXID, PRJID, NPPIX, STATUS )
 
-*        get shift in pixels
-	  AZ_SUBIM=AZ_SUBIM*(180.D0/PI)*3600.D0/DBLE(SIZE)
-	  EL_SUBIM=EL_SUBIM*(180.D0/PI)*3600.D0/DBLE(SIZE)
+*        Find offsets
+            DX = NPPIX(1) - SPPIX(1)
+            DY = NPPIX(2) - SPPIX(2)
 
-*  now have shift in terms of pixels of this image from image center
-*
-*  now put on circular mask - 2.45 degrees
+*        Now put on circular mask - RFOV degrees
 
-*  get number of pixels for radius
+*        Get number of pixels for radius, squared
+	    OK_RAD2 = (RFOV*3600./SIZE)**2
 
-	  OK_RADIUS=2.45*3600./SIZE
+	    FLAG=.FALSE.
+	    DO I=MIN_Y,MAX_Y
 
-	  FLAG=.FALSE.
-	  DO I=MIN_Y,MAX_Y
-	    DO J=MIN_X,MAX_X
-
-*  get radius from real center
-*  put mask on if necessary
-
-	      PIX_X=J*1.-(NX*1.0)/2.
 	      PIX_Y=I*1.-(NY*1.0)/2.
-	      RADIUS=SQRT((PIX_X+SNGL(AZ_SUBIM))**2+
-     &			(PIX_Y+SNGL(EL_SUBIM))**2)
-	      IF(RADIUS.GT.OK_RADIUS)THEN
-	        FLAG=.TRUE.
-	        VARRAY(J,I)=-100
-	        IF(IMAGE(J,I).EQ.0)THEN
-	          IMAGE(J,I)=-100000
-	        ELSE
-		  IMAGE(J,I)=-IMAGE(J,I)
+
+	      DO J=MIN_X,MAX_X
+
+*            Get radius from real centre put mask on if necessary
+	        PIX_X=J*1.-(NX*1.0)/2.
+	        RAD2 = (PIX_X+DX)**2 + (PIX_Y+DY)**2
+	        IF ( RAD2 .GT. OK_RAD2 ) THEN
+	          FLAG = .TRUE.
+	          VARRAY(J,I) = -100
+	          IF ( IMAGE(J,I) .EQ. 0 ) THEN
+	            IMAGE(J,I) = -100000
+	          ELSE
+		    IMAGE(J,I) = -IMAGE(J,I)
+	          ENDIF
 	        ENDIF
-	      ENDIF
 
+	      END DO
 	    END DO
-	  END DO
 
-	  IF(FLAG)THEN
-	    CALL MSG_PRNT('Circlular mask placed on image')
-	  ENDIF
+	    IF ( FLAG ) THEN
+	      CALL MSG_PRNT('Circlular mask placed on image')
+	    END IF
 
-	ENDIF
+          ELSE
+	    CALL MSG_PRNT('ERROR: insufficient pointing direction '/
+     :                      /'information')
+	    CALL MSG_PRNT('       No circular mask applied')
+          END IF
 
-        ELSE              ! Not WFC
-          POINTED = .FALSE.
-          CALL MSG_SETC( 'INS', INSTRUMENT )
-          CALL MSG_PRNT( 'Instrument is ^INS' )
-	ENDIF
+	END IF
 
-        IF ( STATUS .NE. SAI__OK ) THEN
-          CALL AST_REXIT( 'BSUB_GET_HEADER_INFO', STATUS )
-        END IF
+*  Not WFC
+      ELSE
+        POINTED = .FALSE.
+        CALL MSG_SETC( 'INS', INSTRUMENT )
+        CALL MSG_PRNT( 'Instrument is ^INS' )
 
-*      Annul locators even if bad status by declaring new error context
- 99     CALL ERR_BEGIN( STATUS )
+      END IF
 
-        IF ( HEAD_THERE ) CALL DAT_ANNUL( LOCHEAD, STATUS )
+ 99   IF ( STATUS .NE. SAI__OK ) THEN
+        CALL AST_REXIT( 'BSUB_GET_HEADER_INFO', STATUS )
+      END IF
 
-        CALL ERR_END( STATUS )
-
-	END
+      END
 
 
 *+
 *
 *  Subroutine BSUB_GET_PSF_GRID reads in the PSF data.
 *
-	SUBROUTINE BSUB_GET_PSF_GRID(SIZE,XCEN,YCEN,xoff,yoff,
+	SUBROUTINE BSUB_GET_PSF_GRID(PSFHAN,SIZE,XCEN,YCEN,xoff,yoff,
      *  N_AZIM,N_ELEV,PSF_FUNC,STATUS)
 *
 	INCLUDE 'SAE_PAR'
-	INCLUDE 'DAT_PAR'
 
-	real*4 XCEN, YCEN		!image coords at which to get PSF
+        INTEGER PSFHAN
+	real XCEN, YCEN		!image coords at which to get PSF
 
 	REAL   XOFF, YOFF		!offsets from pixel centre
 
@@ -3071,9 +2990,8 @@ d		  E(M+1)=1.D0
 
 	OFF_AZIM=XOFF
 	OFF_ELEV=YOFF
-*
+
 *  access master calibration file to derive PSF.
-*
 	CALL PSF_2D_DATA( PSFHAN, AZIM, ELEV, OFF_AZIM, OFF_ELEV,
      &    D_AZIM, D_ELEV, .TRUE.,N_AZIM,N_ELEV,%VAL(PTR),STATUS)
 
@@ -3121,7 +3039,6 @@ d		  E(M+1)=1.D0
 
 
 *+  BSUB_MARQ_COEF
-*
 	SUBROUTINE BSUB_MARQ_COEF(X,Y,EY,NDATA,A,MA,LISTA,MFIT,ALPHA,
      &  BETA,NALP,CHISQ,STATUS)
 
@@ -3138,7 +3055,6 @@ d		  E(M+1)=1.D0
 *	Type definitions :
 
 	INCLUDE 'SAE_PAR'
-	INCLUDE 'DAT_PAR'
 
 	INTEGER MMAX				!max dim of arrays
 	PARAMETER (MMAX=2)
@@ -3174,15 +3090,12 @@ d		  E(M+1)=1.D0
 	REAL   SIG2I				!weight
 
 	REAL   DY, WT				!internal variables
-
-	INCLUDE 'BSUB_CMN'
-*
 *-
 
-*    Check status
+*  Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*	zero everything
+*    Zero everything
 	DO J=1,MFIT
 	  DO K=1,J
 	    ALPHA(J,K)=0.0
@@ -3192,12 +3105,10 @@ d		  E(M+1)=1.D0
 
 	CHISQ=0.0
 
-*	get values and derivatives
-
+*    Get values and derivatives
 	DO I=1,NDATA
 
-*  	work out poisson distribution
-
+*      Work out poisson distribution
 	  CALL BSUB_POISSON(X(I),A,YMOD,DYDA,MA,STATUS)
 	  IF(STATUS.EQ.-100)THEN
 	    CALL ERR_REP(' ','Error in BSUB_POISSON - returning '/
@@ -3229,7 +3140,8 @@ d		  E(M+1)=1.D0
         END IF
 
 	END
-*
+
+
 *+  BSUB_MIN_FUNC  		This Routines is taken from Numerical Recipes
 *
 	SUBROUTINE BSUB_MIN_FUNC(X,Y,EY,NDATA,NCA,COVAR,ALPHA,
@@ -3264,7 +3176,6 @@ d		  E(M+1)=1.D0
 *	Type definitions :
 
 	INCLUDE 'SAE_PAR'
-	INCLUDE 'DAT_PAR'
 
 	INTEGER MMAX				!max array dimension
 	PARAMETER(MMAX=2)
@@ -3349,7 +3260,7 @@ d		  E(M+1)=1.D0
 *	get old chisq and alpha/beta etc
 
 	  CALL BSUB_MARQ_COEF(X,Y,EY,NDATA,A,MA,LISTA,MFIT,ALPHA,BETA,NCA,
-     &CHISQ,STATUS)
+     &         CHISQ,STATUS)
 	  IF(STATUS.NE.SAI__OK.AND.STATUS.NE.-300)THEN
 	    CALL ERR_REP(' ','Error in BSUB_MARQ_COEF - returning '/
      :                                      /'to top level', STATUS)
@@ -3451,7 +3362,7 @@ d		  E(M+1)=1.D0
 	SUBROUTINE BSUB_POISSON(XI,A,YV,DYDA,NA,STATUS)
 *
 	INCLUDE 'SAE_PAR'
-	INCLUDE 'DAT_PAR'
+        INCLUDE 'MATH_PAR'
 
 	REAL   XI		!input X value
 
@@ -3467,8 +3378,6 @@ d		  E(M+1)=1.D0
 
 	INTEGER   J		!integer x value
 
-	REAL   PI		!pi
-
 	REAL   LN_FAC, LN_YV	!ln(factorial),   ln(yv)
 
 	REAL   RJ		!real variable = x
@@ -3476,19 +3385,15 @@ d		  E(M+1)=1.D0
 	REAL   LOG_FACTORIALS(0:100)	!log(N!) array
 
 	COMMON/FACTORIALS/LOG_FACTORIALS
-*
-	INCLUDE 'BSUB_CMN'
-*
 *-
 
-*    Check status
+*  Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  If J is <= 50, read log(J!) from array, else, compute directly
 *  using Stirlings approx. Note the setup computation for the array
 *  only goes up to 50, using simple J! and Stirlings approx where
 *  appropriate. See BSUB_COMPUTE_FACTORIALS
-*
 	RJ=0.D0
 	J=NINT(XI)
 	RJ=J
@@ -3505,8 +3410,7 @@ d		  E(M+1)=1.D0
 	    RETURN
 	  ELSE
 
-	    PI=4.0*ATAN(1.0)
-	    LN_FAC=(RJ+0.50)*LOG(RJ) - RJ + 0.50*LOG(2.0*PI)
+	    LN_FAC=(RJ+0.50)*LOG(RJ) - RJ + 0.50*LOG(2.0*MATH__PI)
 
 	  END IF
 
@@ -3558,7 +3462,6 @@ d		  E(M+1)=1.D0
 	SUBROUTINE BSUB_SORT_COVAR(COVAR,NCVM,MA,LISTA,MFIT,STATUS)
 
 	INCLUDE 'SAE_PAR'
-	INCLUDE 'DAT_PAR'
 
 	INTEGER MMAX			!max array dimension
 	PARAMETER (MMAX=2)
@@ -3634,7 +3537,6 @@ d		  E(M+1)=1.D0
      &  RBIN,NP,STATUS)
 *
 	INCLUDE 'SAE_PAR'
-	INCLUDE 'DAT_PAR'
 D	IMPLICIT NONE
 
 	INTEGER   IMAGE_X, IMAGE_Y		!image dimensions
@@ -3932,7 +3834,6 @@ C     &  (bcoef(ii),ii=1,4)
      +  XPOS,YPOS,PSF_COEFS,RMAX,R_4SIG,STATUS)
 
 	INCLUDE 'SAE_PAR'
-	INCLUDE 'DAT_PAR'
 
 	INTEGER   IMAGE_X, IMAGE_Y		!image dimensions
 
@@ -4038,7 +3939,6 @@ dd	        SCALED_PSF=PSF_COEFS(4)*PSF_FUNC(II-IX_ST+1,JJ-IY_ST+1) !func
      +  BOX_LIMS,STATUS)
 
 	INCLUDE 'SAE_PAR'
-	INCLUDE 'DAT_PAR'
 
 	INTEGER   IMAGE_X, IMAGE_Y		!image dimensions
 
@@ -4082,7 +3982,6 @@ dd	        SCALED_PSF=PSF_COEFS(4)*PSF_FUNC(II-IX_ST+1,JJ-IY_ST+1) !func
      &  SRCMAP,IMAX,IMIN,MIN_XPOS,MAX_XPOS,MIN_YPOS,MAX_YPOS,STATUS)
 *
 	INCLUDE 'SAE_PAR'
-	INCLUDE 'DAT_PAR'
 
 	INTEGER   IMAGE_X, IMAGE_Y		!image dimensions
 
@@ -4191,7 +4090,7 @@ dd	        SCALED_PSF=PSF_COEFS(4)*PSF_FUNC(II-IX_ST+1,JJ-IY_ST+1) !func
      &  MIN_CTS,MAX_CTS,SM_BORDER,WORK1,WORK2,WORK3,ROUTINE_ID,STATUS)
 *
 	INCLUDE 'SAE_PAR'
-	INCLUDE 'DAT_PAR'
+        INCLUDE 'MATH_PAR'
 
 	INTEGER   DIMX, DIMY			!image dimensions
 
@@ -4245,7 +4144,7 @@ dd	        SCALED_PSF=PSF_COEFS(4)*PSF_FUNC(II-IX_ST+1,JJ-IY_ST+1) !func
 	SIG=FWHM/2.354
 	GLIM=NINT(3*SIG)
 	DO I=-GLIM,GLIM
-	  GFUNC(I)=1./SQRT(2.*3.141592654*SIG*SIG)
+	  GFUNC(I)=1./SQRT(2.*MATH__PI*SIG*SIG)
 	  GFUNC(I)=GFUNC(I)*EXP( - I*I/(2.*SIG*SIG) )
 	END DO
 *
@@ -4403,12 +4302,12 @@ dd	        SCALED_PSF=PSF_COEFS(4)*PSF_FUNC(II-IX_ST+1,JJ-IY_ST+1) !func
 *
 *  determine the best linear fit through these data for near xside
 *
-	CALL GET_SLOPE(MAX_DIM1,MAX_DIM2,EDGES,MIN_YPOS,MAX_YPOS,
+	CALL BSUB_GET_SLOPE(MAX_DIM1,MAX_DIM2,EDGES,MIN_YPOS,MAX_YPOS,
      &  A,B,SIGMA,1,OK(1),STATUS)
 *
 *  and for far xside
 *
-	CALL GET_SLOPE(MAX_DIM1,MAX_DIM2,EDGES,MIN_YPOS,MAX_YPOS,
+	CALL BSUB_GET_SLOPE(MAX_DIM1,MAX_DIM2,EDGES,MIN_YPOS,MAX_YPOS,
      &  A,B,SIGMA,2,OK(2),STATUS)
 *
 *  now fill quality array such that points outside the limits of the sloping
@@ -4444,8 +4343,8 @@ dd	        SCALED_PSF=PSF_COEFS(4)*PSF_FUNC(II-IX_ST+1,JJ-IY_ST+1) !func
 *+
 *  routine to compute slope parameters for fit to edge of image
 *
-	SUBROUTINE GET_SLOPE(MAX_DIM1,MAX_DIM2,EDGES,L1,L2,A,B,SIGMA,
-     &  IEDGE,OK,STATUS)
+	SUBROUTINE BSUB_GET_SLOPE(MAX_DIM1,MAX_DIM2,EDGES,L1,L2,A,B,
+     &        SIGMA,IEDGE,OK,STATUS)
 
 	IMPLICIT NONE
 
@@ -4474,53 +4373,42 @@ dd	        SCALED_PSF=PSF_COEFS(4)*PSF_FUNC(II-IX_ST+1,JJ-IY_ST+1) !func
 	REAL SUMXY
 
 	INTEGER I
-*
 *-
-*
-*  initialise summation variables
-*
-	OK=.FALSE.
 
-	YBAR2=0.
-	SUMX=0.
-	SUMX2=0.
-	SUMY=0.
-	SUMY2=0.
-	SUMXY=0.
-	N=0
-*
-* perform necessary summations
-*
-	DO I=L1,L2
+*  Initialise summation variables
+      OK=.FALSE.
+      YBAR2=0.
+      SUMX=0.
+      SUMX2=0.
+      SUMY=0.
+      SUMY2=0.
+      SUMXY=0.
 
-	  N=N+1
+*  Perform necessary summations
+      DO I = L1, L2
+	SUMX=SUMX + I
+	SUMX2=SUMX2 + I*I
+	SUMY=SUMY + EDGES(I,IEDGE)
+	SUMY2=SUMY2 + EDGES(I,IEDGE)*EDGES(I,IEDGE)
+	SUMXY=SUMXY + I*EDGES(I,IEDGE)
+      END DO
+      N = L2 - L1 + 1
 
-	  SUMX=SUMX + I
-	  SUMX2=SUMX2 + I*I
+*  Compute resulting slope parameters
+      A(IEDGE)=0.0
+      B(IEDGE)=0.0
+      SIGMA(IEDGE)=0.0
 
-	  SUMY=SUMY + EDGES(I,IEDGE)
-	  SUMY2=SUMY2 + EDGES(I,IEDGE)*EDGES(I,IEDGE)
+      IF(N*SUMX2-SUMX*SUMX.NE.0.0)THEN
 
-	  SUMXY=SUMXY + I*EDGES(I,IEDGE)
+	OK=.TRUE.
 
-	END DO
-*
-*  and compute resulting slope parameters
-*
-	A(IEDGE)=0.0
-	B(IEDGE)=0.0
-	SIGMA(IEDGE)=0.0
+	A(IEDGE)=(N*SUMXY-SUMX*SUMY)/(N*SUMX2-SUMX*SUMX)
+	B(IEDGE)=(SUMX2*SUMY-SUMX*SUMXY)/(N*SUMX2-SUMX*SUMX)
 
-	IF(N*SUMX2-SUMX*SUMX.NE.0.0)THEN
+	YBAR2=(SUMY/N)*(SUMY/N)
+	SIGMA(IEDGE)=SQRT((SUMY2/N)-YBAR2)
 
-	  OK=.TRUE.
+      END IF
 
-	  A(IEDGE)=(N*SUMXY-SUMX*SUMY)/(N*SUMX2-SUMX*SUMX)
-	  B(IEDGE)=(SUMX2*SUMY-SUMX*SUMXY)/(N*SUMX2-SUMX*SUMX)
-
-	  YBAR2=(SUMY/N)*(SUMY/N)
-	  SIGMA(IEDGE)=SQRT((SUMY2/N)-YBAR2)
-
-	END IF
-
-	END
+      END
