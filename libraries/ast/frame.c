@@ -6768,7 +6768,7 @@ f     If the ActiveUnit flag is .TRUE., setting a new Unit value for an
 *     is assigned to the Unit attribute.
 *
 c     Note, if a non-zero value is set for the ActiveUnit flag, then changing a
-*     Note, if a .TRUE. value is set for the ActiveUnit flag, then changing a
+f     Note, if a .TRUE. value is set for the ActiveUnit flag, then changing a
 *     Unit value for the current Frame within a FrameSet will result in the
 *     Frame being re-mapped (that is, the Mappings which define the
 *     relationships between Frames within the FrameSet will be modified to
