@@ -78,6 +78,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.4  1999/03/08 20:57:31  timj
+*     Change arguments to call to CALC_DUAL_BEAM
+*
 *     Revision 1.3  1999/01/26 19:35:07  timj
 *     Add a 'related applications' line in the header
 *
@@ -238,8 +241,8 @@
       END IF
 
 *     Call the dual beam subroutine
-      CALL SURFLIB_CALC_DUAL_BEAM(CHOP_THROW, CHOP_PA, DIM, 
-     :     %VAL(IN_DATA_PTR), %VAL(OUT_DATA_PTR), 
+      CALL SURFLIB_CALC_DUAL_BEAM(CHOP_THROW, CHOP_PA, DIM(1), 
+     :     DIM(2), %VAL(IN_DATA_PTR), %VAL(OUT_DATA_PTR), 
      :     STATE, %VAL(IN_DATA_PTR), %VAL(OUT_VARIANCE_PTR), 
      :     STATUS)
 
