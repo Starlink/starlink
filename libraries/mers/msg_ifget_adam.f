@@ -56,6 +56,10 @@
 *        re-format CHARACTER declarations
 *     17-SEP-1999 (AJC):
 *        Avoid calling MSG_IFSET - linking problem
+*     1-JUL-2004 (DSB):
+*        Use MSG1_GT... functions to get the values from the MSG_CMN 
+*        common blocks rather than directly accessing the common blocks
+*        (which are initialised in a different shared library).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -71,9 +75,6 @@
       INCLUDE 'MSG_PAR'          ! MSG_ public constants
       INCLUDE 'MSG_ERR'          ! MSG_ error codes
 
-*  Global Variables:
-      INCLUDE 'MSG_CMN'          ! MSG_ output filter level
-
 *  Arguments Given:
       CHARACTER * ( * ) PNAME
 
@@ -82,7 +83,6 @@
 
 *  External References:
       LOGICAL CHR_SIMLR          ! Caseless string equality
-
       INTEGER CHR_LEN            ! String length
 
 *  Local Constants:
@@ -175,7 +175,7 @@
 
 *     Set the message filtering level.
          IF ( MATCH ) THEN
-            MSGINF = FILTER
+            CALL MSG1_PTINF( FILTER )
          ELSE
 
 *        An invalid filter name has been used, so report an error.

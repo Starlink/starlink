@@ -75,6 +75,10 @@
 *        Add tuning parameters MSGWSZ and MSGSTM
 *     26-FEB-2001 (AJC):
 *        Use MSG1_RFORM nor EMS1_RFORM
+*     1-JUL-2004 (DSB):
+*        Use MSG1_GT... functions to get the values from the MSG_CMN 
+*        common blocks rather than directly accessing the common blocks
+*        (which are initialised in a different shared library).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -91,9 +95,6 @@
       INCLUDE 'MSG_PAR'                 ! MSG_ public constants
       INCLUDE 'MSG_SYS'                 ! MSG_ private constants
 
-*  Global Variables:
-      INCLUDE 'MSG_CMN'                 ! Line length parameters
-
 *  Arguments Given:
       CHARACTER * ( * ) TEXT
 
@@ -102,6 +103,8 @@
 
 *  External References:
       INTEGER CHR_LEN                   ! String length
+      INTEGER MSG1_GTWSZ
+      LOGICAL MSG1_GTSTM
 
 *  Local Variables:
       INTEGER IPOSN                     ! Character pointer
@@ -127,7 +130,7 @@
       IF ( LENG .GT. 0 ) THEN
          LENG = MIN( LENG, MSG__SZMSG )
 
-         IF ( MSGSTM ) THEN
+         IF ( MSG1_GTSTM() ) THEN
 *     Output with no messing
             CALL SUBPAR_WRMSG( TEXT, ISTAT )
 
@@ -139,7 +142,8 @@
 *     DO WHILE loop.
  10         CONTINUE
             IF ( IPOSN .NE. 0 .AND. ISTAT .EQ. SAI__OK ) THEN
-               CALL MSG1_RFORM( TEXT, IPOSN, LINE( : MSGWSZ), OPLEN )
+               CALL MSG1_RFORM( TEXT, IPOSN, LINE( : MSG1_GTWSZ()), 
+     :                          OPLEN )
                CALL SUBPAR_WRMSG( LINE( : OPLEN ), ISTAT )
             GO TO 10
             END IF
