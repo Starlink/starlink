@@ -291,13 +291,10 @@
       if ( "$device" != "NONE" ) then
 
 #  Display the objects located.
-#  For NDFs without associated position lists (ones with no matched objects)
-#  PLOTLIST would fail verbosely but harmlessly.  This is avoided
-#  by omitting numbers 3 and 6 from the position list below.
          echo " "
          echo "  Displaying the labels of objects which have been matched."
          echo " "
-         foreach num ( 1 2 4 5 )
+         foreach num ( 1 2 3 4 5 6 )
             picsel label=a$num accept
             plotlist \
                inlist=$ndfs[$num] \
@@ -362,7 +359,8 @@
          echo " "
          echo "  Registration is complete: display the alignment of the"
          echo "  images on the graphics device prior to generating the"
-         echo "  mosaic."
+         echo "  mosaic.  Also plot the points whose matching caused the"
+         echo "  alignment."
          echo " "
          gdclear \\
          outline \
@@ -370,6 +368,18 @@
             clear \
             reset accept
 #        end outline
+         plotlist \
+            inlist='data-1?' \
+            mtype=2 \
+            palnum=2 \
+            reset accept
+#        end plotlist
+         plotlist \
+            inlist='data-2?' \
+            mtype=4 \
+            palnum=3 \
+            reset accept
+#        end plotlist
       endif
       echo " "
 
