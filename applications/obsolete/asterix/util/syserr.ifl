@@ -1,4 +1,5 @@
 INTERFACE SYSERR
+
    PARAMETER INP
       POSITION    1
       TYPE        'UNIV'
@@ -8,10 +9,9 @@ INTERFACE SYSERR
       HELP        'Must be a binned dataset'
    ENDPARAMETER
 
-   PARAMETER ERR
+   PARAMETER ERROR
       POSITION    2
       TYPE        '_REAL'
-      KEYWORD     'ERROR'
       PPATH       'GLOBAL'
       PROMPT      'Percentage error to be added'
       HELP        'The % error to be added in quadrature to the existing errors of dataset'
@@ -28,10 +28,10 @@ INTERFACE SYSERR
 
    PARAMETER OVER
       TYPE        '_LOGICAL'
-      KEYWORD     'OVER'
       DEFAULT     N
       VPATH       'DEFAULT'
       PROMPT      'Overwrite the input dataset? '
       HELP        'If NO then a new dataset will be created for the output.'
    ENDPARAMETER
+
 ENDINTERFACE
