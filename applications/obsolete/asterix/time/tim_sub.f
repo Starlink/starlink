@@ -770,7 +770,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Create interface object
-      CALL BDI_LINK( 'TimeSeries', 1, T_NVAL, 'REAL', FID, STATUS )
+      CALL BDI_LINK( 'BinDS', 1, T_NVAL, 'REAL', FID, STATUS )
 
 *  text
       CALL BDI_PUT0C( FID, 'Title', T_TITLE,STATUS)
@@ -814,7 +814,7 @@
       CALL BDI_AXPUT0C(FID,1,'Units',T_AUNITS,STATUS)
 
 *  Copy ancilliary stuff from input
-c      CALL UDI_COPANC(T_FID,'grf',FID,STATUS)
+      CALL UDI_COPANC(T_FID,'grf',FID,STATUS)
 
       IF (STATUS.NE.SAI__OK) THEN
         CALL AST_REXIT('TIM_SAVEALL',STATUS)
@@ -853,7 +853,7 @@ c      CALL UDI_COPANC(T_FID,'grf',FID,STATUS)
       NVAL = I2-I1+1
 
 *  Create interface object
-      CALL BDI_LINK( 'TimeSeries', 1, NVAL, 'REAL', FID, STATUS )
+      CALL BDI_LINK( 'BinDS', 1, NVAL, 'REAL', FID, STATUS )
 
 *  Text
       CALL BDI_PUT0C( FID, 'Title', T_TITLE,STATUS)
