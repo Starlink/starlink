@@ -23,14 +23,10 @@
 	system "../../dsssl/sl/common/slcommon.dsl" subdoc>
   <!entity dsssl.params
 	system "../../dsssl/sl/common/slparams.sgml" subdoc>
-  <!entity release.notes-0.5
-	system "../../ReleaseNotes">
-  <!entity release.notes-0.4
-	system "ReleaseNotes-0.4">
-  <!entity release.notes-0.3
-	system "ReleaseNotes-0.3">
-  <!entity release.notes-0.2
-	system "ReleaseNotes-0.2">
+  <!entity release.notes
+	system "ReleaseNotes">
+  <!entity release.notes.old
+	system "ReleaseNotes.old">
 ]>
 <!-- $Id$ -->
 
@@ -78,6 +74,10 @@ Time for few documentation updates.
 </distribution>
 
 <change date="23-SEP-1999" versionid="post-v0-5">Misc. clarifications.</change>
+
+<distribution string="DR-0.6" date="30-SEP-1999" author="ng" versionid="v0.6">
+Added sgml2docs command.
+</distribution>
 
 </history>
 
@@ -806,9 +806,8 @@ online.  The Starlink general DTD defines two parameter entities
 <code/&percent;Only.paper/ and <code/&percent;Only.web/, which you can
 use to include or ignore text in a marked section.  By default, both
 of these are set to the string 
-`ignore', but the common Makefile (in
-<code>$STARLINK_SGML_DIR/lib/Makefile.common</code>, see <ref
-id=proc.makefile>) sets one or other of these to `include', as
+`ignore', but when you use the <code/sgml2docs/ script (see <ref
+id=proc.sgml2docs>), one or the other of these will be set to `include', as
 appropriate for the type of file being generated.
 
 <p>You would use this facility as follows:
@@ -846,6 +845,17 @@ document conforms to its DTD.
 <kbd>sgmlnorm sun1234.sgml</kbd>.  This transforms your document into
 an equivalent one with all omitted elements reinserted.
 
+<p>Finally, and most importantly, try converting your document to
+HTML.  This uses the script <code/sgml2docs/.  Give the command
+<kbd/sgml2docs sun1234.sgml/, which will transform your document into
+a collection of HTML files, and package them up into a tar-file by the
+name of <code/sun1234.tar-htx/.  Alternatively, give the command
+<kbd/sgml2docs --latex sun1234.sgml/, which will transform your
+document into a &latex; file, and place it, and any figures required
+for processing into a file <code/sun1234.tar-latex/.
+See <ref id=proc.sgml2docs> for further details.  
+
+<!--
 <p>Finally, try converting your document to HTML.  This uses the
 program Jade, which is an implementation of the DSSSL formatting
 language.  Give the command 
@@ -862,13 +872,10 @@ than directly from the command line.
 <p>You can also convert your document to &latex;, with the command 
 <kbd>jade -t latex -d $STARLINK_SGML_DIR/dsssl/sl/latex/sl.dsl#latex
 sun1234.sgml</kbd>.
+-->
 
 <p>Try making parts of your document invalid, and comparing the error
 with the error message <code/nsgmls/ produces.
-
-<!-- FIXME : check that this is consistent with whatever I do to set up
-     the paths and environment variables.  Refer to id=proc.setup as
-     appropriate. -->
 
 
 <sect id=structure export>The structure of the document
@@ -1228,15 +1235,15 @@ element.  The DTD is quite generic, but in this application, the
 bibliography is implemented as a Bib&tex database, so that the
 backmatter element's `bibliography' attribute names a Bib&tex
 <code>.bib</code> file (without the <code/.bib/ extension), and the
-citation element's content is a Bib&tex entry key.  If you use the
-template Makefile (see <ref id=proc.makefile>), the name of the
-Bib&tex database is passed directly to Bib&tex, so you might need to
-have Bib&tex;'s <code/BIB_INPUTS/ environment variable suitably
-defined.  There is no way (at present) to specify the bibliography
-formatting style -- the SGML set uses a customised bibliography style
-which, incidentally, supports a URL field in bibliography entries.
-See the Bib&tex documentation in, for example, <citation/lamport/ for
-further details.
+citation element's content is a Bib&tex entry key.  Note that the
+Bib&tex; processing of your document is done within the context of a
+temporary work directory (see <ref id=proc.sgml2docs>), so you might have
+to specify Bib&tex;'s <code/BIBINPUTS/ environment variable if
+Bib&tex; is to find your bibliography database.  There is no way (at
+present) to specify the bibliography formatting style -- the SGML set
+uses a customised bibliography style which, incidentally, supports a
+URL field in bibliography entries.  See the Bib&tex documentation in,
+for example, <citation/lamport/ for further details.
 
 <p>You can include notes in your document with the note element.
 At present, the notes are presented as footnotes in
@@ -2264,40 +2271,60 @@ or
 % source /star/bin/sgml/sgml_set.csh
 </verbatim>
 depending on whether you are using a Bourne-like shell (<code/sh/,
-<code/bash/ or <code/ksh/) or a C-shell (<code/csh/, <code/tcsh/ or
+<code/bash/) or a C-shell (<code/csh/, <code/tcsh/ or
 other variants).  This will set up a couple of environment variables,
-and define simple <code/sgml2html/ and <code/sgml2latex/ commands.
+and add a binaries directory to your path.
 
-<p>To use the SGML set, you need to have the program
-<code/dvi2bitmap/ installed.  This is a separate Starlink application,
-which converts &tex; DVI files to GIFs, and is used when you have
-maths in your document.
 
-<!--
-You also need to have a suitably patched copy
-of Jade installed, as this is not currently packaged with the rest of
-the SGML set.
--->
-<!--
-<p>Note for developers: there will be a setup script, once I've sorted
-out where the various bits of the set will be placed, and whether
-or not I'm going to distribute a built version of Jade.  At present,
-you need to have jade and co. (nsgmls, sgmlnorm,...) in your path; the
-environment variable <code/STARLINK_SGML_DIR/ pointing to the root
-of the SGML distribution (ie, the directory which has doc, dsssl, dtd
-and lib subdirectories; and <code/SGML_CATALOG_FILES/ including 
-<code>/home/norman/s/src/sgml/documents/CATALOG</code> (the location
-of the document summary files) and
-<code>/home/norman/s/src/sgml/w/sgml/dtd/CATALOG</code> (the main
-distributed SGML catalogue).
+<subsect id=proc.sgml2docs export>sgml2docs
+<update versionid="v0-4" >Added section on sgml2stuff commands, and
+discussion of very simple processing.</update>
+<update versionid="v0.6">Significant change to sgml2docs commands</update>
 
-<p>To test the setup, go to <code>$STARLINK_SGML_DIR/doc/ssn70</code>
-and type <kbd/make ssn70.html.stamp/: this should build the HTML
-version of the documentation.  If you type <kbd/make
-ssn70.latex.stamp/ you should get the &latex version.
--->
+<p>You should use the command <code/sgml2docs/ to process your SGML
+documents.
+
+<p>Given a single argument, specifying an SGML source file, the script
+uses the Starlink DSSSL stylesheets to process this into a
+collection of HTML files and GIFs, or &latex; and EPS files
+places them in a subdirectory named after the source file, and
+then creates a tarball in the source directory holding the
+generated files.
+
+<p>It requires that the environment variable <code/STARLINK_SGML_DIR/ is
+properly set, pointing to the root of the Starlink SGML kit.  It
+also requires that dvi2bitmap is in the <code/PATH/.
+The script creates a work directory and does its processing
+there.  If it is necessary to run Bib&tex;, it will be done with
+that temporary directory as the current directory, so that it
+might be necessary to set <code/BIBINPUTS/ (for example) to let the
+system find the bibliography database.
+
+<p>The program takes a single argument, the SGML file to be processed.
+
+There are several script options:
+<dl compact>
+<dt><code/--html/
+<dd>Generate HTML (the default).
+<dt><code/--latex/
+<dd>Generate &latex;.
+<dt><code/--package-dir my-dir/
+<dd>Package up the generated files into a directory called `my-dir'.
+<dt><code/--tarball my.tar/
+<dd>Bundle the package-dir into a tarball named `my.tar'.
+<dt><code/--jadeflags flags/
+<dd>Pass the given flags to Jade.
+</dl>
+
+<p>The final option, <code/--jadeflags/, allows you to do some limited
+customisation of the output.  See <ref id=appx.system.paramdsssl>.
 
 <subsect id=proc.makefile export>Processing documents -- using the Makefile
+<update versionid="v0.6">Makefile approach no longer supported</update>
+
+<p>At one time, the processing of documents was driven by a Makefile.
+This is still distributed with the rest of the package, but is no
+longer supported.
 
 <p>Processing documents is potentially a bit of a headache.
 
@@ -2309,7 +2336,7 @@ some circumstances the names of output files are significant to the
 system.  It is for all these reasons that the system is designed to be
 used primarily <em/via/ makefiles.  See however, the description of
 the <code/sgml2html/ and <code/sgml2latex/ commands in <ref
-id=proc.sgml2stuff>.
+id=proc.sgml2docs>.
 
 <p>The distribution contains a Makefile,
 <code>$STARLINK_SGML_DIR/lib/Makefile.common</code>, which contains
@@ -2337,7 +2364,7 @@ include $(STARLINK_SGML_DIR)/lib/Makefile.common
 command), and you could build the documentation using the command
 <kbd/make mydoc.html.stamp/.  If your document is simple enough to
 need no more than this, then you will be able to use the
-<code/sgml2html/ command described in <ref id=proc.sgml2stuff>.
+<code/sgml2html/ command described in <ref id=proc.sgml2docs>.
 
 <p>If your document includes backmatter (bibliography or notes) or
 maths, then they will need 
@@ -2452,21 +2479,6 @@ convenience.
 a manifest of the files which make a complete set.  The names of the
 manifest files can be configured as parameters (see <ref
 id=appx.system.paramdsssl>).
-
-<subsect id=proc.sgml2stuff export>sgml2html and sgml2latex
-<update versionid="v0-4" >Added section on sgml2stuff commands, and
-discussion of very simple processing.</update>
-
-<p>The setup scripts described in <ref id=proc.setup> define two
-commands, <code/sgml2html/ and <code/sgml2latex/.  These are designed
-to do simple processing of documents, in the absence of a makefile, as
-described in <ref id=proc.makefile>.
-If you have a simple document called <code/mydoc.sgml/, then the
-command <kbd/sgml2html mydoc/ will transparently make the
-<code/mydoc.html.stamp/ target, and then create a symbolic link called
-<code/mydoc.html/ to the root HTML file.  The command
-<code/sgml2latex/ works in a similar way.  These commands assume that
-there is no need to do preprocessing of backmatter or maths.
 
 <subsect id=editors export>Editors
 
@@ -3323,10 +3335,10 @@ parameters file.
 argument; this variable is then given the value <code/#t/ (true),
 overriding any other definition in a stylesheet.  Several of the
 stylesheets' parameters are designed to be settable this way.  You can
-either give this option explicitly on a Jade command line, or set the
-variable <code/JADEFLAGS/ in a Makefile:
+either give this option explicitly on a Jade command line, or pass it
+to Jade via the <code/sgml2docs/ command line (see <ref id=proc.sgml2docs>):
 <verbatim>
-JADEFLAGS=-V show-element-ids
+sgml2docs --jadeflags '-V show-element-ids' ...
 </verbatim>
 
 <p>If this type of customising is insufficient, then you may take a
@@ -3367,11 +3379,6 @@ with the package itself.  This is located in <code
 fspath>$STARLINK_SGML_DIR/lib</code>.
 
 <dl>
-<dt><code/Makefile.common/
-<dd>A common makefile, intended to be included by the makefiles
-associated with individual documents.  It is described in more detail
-in <ref id=proc.makefile>.
-
 <dt><code/abstract-star2html.pl/
 <dd>A Perl script which does a simple but robust parse of &latex;
 files suitable for the Star2HTML system, generating DocumentSummary
@@ -3397,11 +3404,6 @@ common makefile.
 <dd>This postprocesses the bibliography file produced by
 <code/plainhtml.bst/, rejoining the long lines which Bib&tex;
 erroneously splits.
-
-<dt><code/pstopnm-s/
-<dd>Used by the common makefile, to translate a postscript file to one
-or more Portable Anymap files.  It is generally available, but this
-version was modified by me to include an extra resolution option.
 
 </dl>
 
@@ -3431,6 +3433,7 @@ used for the main document.  There is more flexibility in the Document
 Summary DTD than is used at present.  The DTD is well-commented, and
 you should refer to it for further details.
 
+<![ ignore [
 <p>The installation procedure generates document summaries for all the
 Starlink documents it can find, using the script
 <code fspath>$STARLINK_SGML_DIR/lib/abstract-star2html.pl</code> to scan
@@ -3441,6 +3444,7 @@ robust enough to be used in an unattended installation procedure, so its
 id=appx.system.htx>, the installation makefile invokes this script in
 a precise way, to make generated HTML output conform to the
 requirements of HTX.
+]]>
 
 <p>Since the Starlink General DTD declares itself as a client of the
 Document Summary DTD (see <ref id=appx.system.hytime> for a discussion
@@ -3609,16 +3613,20 @@ environment variables as usual, and type
 % ./mk install
 </verbatim>
 This will install the DTD, DSSSL scripts and documentation in the
-correct places, and generate document summaries for all the Starlink
+correct places.
+<!--
+, and generate document summaries for all the Starlink
 documents it can find in <code fspath>/star/docs</code> (these
 summaries are not necessarily perfect, as they do not attempt to do
 anything clever with &latex; markup in the documents they are
 abstracting; however the script which generates them should not
 collapse during the installation).
+-->
 As noted in <ref id=proc.setup>, you prepare the set for use by
 sourcing one of two scripts.
 
-<p>This will also install a patched version of Jade.
+<p>This will also install a patched version of <code/Jade/, and an
+appropriate copy of the <code/dvi2bitmap/ package.
 
 <!-- Keep old Jade build instructions for the moment -->
 <![ ignore [
@@ -3662,11 +3670,13 @@ for the SGML set assumes it has complete control over that
 subdirectory, and will squash anything else it finds there.
 ]]>
 
+<![ ignore [
 <p>The application <code/dvi2bitmap/ is also required.  This is
 distributed separately.  Until it finds its way onto the Starlink CD,
 however, you can obtain a copy on <webref
 url="http://www.astro.gla.ac.uk/users/norman/star/dvi2bitmap/" >my
 dvi2bitmap page</webref>.
+]]>
 
 <sect id=appx.general.dtd export>The Starlink General DTD
 
@@ -3708,12 +3718,7 @@ See <ref id=doccode.languages> for details.
 
 <sect id=appx.releasenotes export>Release Notes
 
-&release.notes-0.5;
-
-&release.notes-0.4;
-
-&release.notes-0.3;
-
-&release.notes-0.2;
+&release.notes;
+&release.notes.old;
 
 <backmatter bibliography=ssn70>
