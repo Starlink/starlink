@@ -87,7 +87,7 @@
           ENDIF
           T_STEP=.FALSE.
           T_SYMBOL=0
-          CALL USI_CLOSE()
+c          CALL USI_CLOSE()
 
         ELSE
           CALL GDV_CLOSE(STATUS)
