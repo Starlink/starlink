@@ -1,0 +1,9 @@
+make t2.run >/dev/null 2>&1
+test $? = 0 || exit 1
+
+run=./t2.run
+
+$run "f=%f m=%m b=%b d=%d M=%M %%" cmr10 3 110 330 ibmvga
+$run "%f%m%b%d%M" cmr10 3 110 330 ibmvga
+
+exit 0
