@@ -132,6 +132,7 @@
       INTEGER IPICD              ! AGI identifier for the DATA picture
       INTEGER IPICF              ! AGI identifier for the frame picture
       INTEGER IPICK              ! AGI identifier for the KEY picture
+      INTEGER IPIX               ! Index of PIXEL Frame
       INTEGER IPLOT              ! Pointer to AST Plot for DATA picture
       INTEGER NFRM               ! Frame index increment between IWCS and IPLOT
       INTEGER REGVAL             ! Requested region value
