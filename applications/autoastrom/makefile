@@ -992,7 +992,7 @@ $(EXPORT)/$(PKG_NAME).tar.Z: $(SOURCE_FILES)
 #  already clean).  Also ensure that the moggy configure script is present.
 $(PKG_NAME)_source.tar:
 	cd astrom && ./mk unbuild
-	cd moggy && test -f Makefile &&	make distclean
+	cd moggy && test ! -f Makefile || make distclean
 	cd moggy && make -f Makefile.in configure
 	test ! -f $(PKG_NAME)_source.tar || rm -f $(PKG_NAME)_source.tar
 	$(TAR_IN) $(PKG_NAME)_source.tar $(PUBLIC_SCRIPTS) astrom moggy misc
