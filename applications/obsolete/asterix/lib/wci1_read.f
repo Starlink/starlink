@@ -194,7 +194,9 @@
         CALL ADI1_CGET0D( HLOC, 'FIELD_RA', FRAOK, NPOINT(1), STATUS )
         CALL ADI1_CGET0D( HLOC, 'FIELD_DEC', FDECOK, NPOINT(2), STATUS )
         CALL ADI1_CGET0D( HLOC, 'POSITION_ANGLE', PAOK, PA, STATUS )
-        IF ( .NOT. PAOK ) THEN
+        IF ( PAOK ) THEN
+          PA = - PA
+        ELSE
           PA = 0D0
         END IF
 

@@ -104,12 +104,15 @@
 *  Local Variables:
       CHARACTER*(DAT__SZLOC)	HLOC			! Object header
 
+      DOUBLE PRECISION		PA			! Position angle
       DOUBLE PRECISION		SPOINT(2)		! RA, DEC
 
       INTEGER			NACT			! Actual # values read
       INTEGER			PIXID			! Pixellation object
       INTEGER			PRJID			! Projection object
       INTEGER			SYSID			! CoordSystem object
+
+      LOGICAL			THERE			! Object exists?
 *.
 
 *  Check inherited global status.
@@ -128,8 +131,11 @@
         IF ( PIXID .NE. ADI__NULLID ) THEN
 
 *      Position angle
-          CALL ADI1_CCA2HD( PIXID, 'ROTATION', HLOC, 'POSITION_ANGLE',
-     :                      STATUS )
+          CALL ADI_THERE( PIXID, 'ROTATION', THERE, STATUS )
+          IF ( THERE ) THEN
+            CALL ADI_CGET0D( PIXID, 'ROTATION', PA, STATUS )
+            CALL HDX_PUTD( HLOC, 'POSITION_ANGLE', 1, -PA, STATUS )
+          END IF
 
         END IF
 
