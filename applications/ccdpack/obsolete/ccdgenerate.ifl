@@ -41,11 +41,28 @@ interface CCDGENERATE
       helpkey  '*'
    endparameter
 
-   parameter UBNDS
+   parameter ANGLES
+      type     _DOUBLE
+      vpath    'PROMPT,CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      prompt   'Angle of each output sequence (degrees anticlockwise)'
+      helpkey  '*'
+      default  (0D0)
+   endparameter
+
+   parameter ORIGINS
+      type     _DOUBLE
+      vpath    'PROMPT,CURRENT'
+      ppath    'CURRENT'
+      prompt   'Origin of each output sequence (X,Y,...)'
+      helpkey  '*'
+   endparameter
+
+   parameter PIXELS
       type     _INTEGER
       vpath    'PROMPT,CURRENT'
       ppath    'CURRENT'
-      prompt   'Upper bounds'
+      prompt   'Size in pixels for the output NDFs (X,Y)'
       helpkey  '*'
    endparameter
 
@@ -55,14 +72,6 @@ interface CCDGENERATE
       ppath    'CURRENT,DEFAULT'
       default  '.sdf'
       prompt   'Output data type'
-      helpkey  '*'
-   endparameter
-
-   parameter LBNDS
-      type     _INTEGER
-      vpath    'PROMPT,CURRENT'
-      ppath    'CURRENT'
-      prompt   'Lower bounds'
       helpkey  '*'
    endparameter
 
