@@ -78,6 +78,7 @@
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK - Durham University)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -89,6 +90,8 @@
 *        Added changes to support quality.
 *     19-NOV-1997 (PDRAPER):
 *        Increases workspace for noise array to 2047 from 511.
+*     15-JUL-2004 (TIMJ):
+*        Use PDA_DRANN rather than private PDA_DRNOR
 *     {enter_changes_here}
 
 *  Bugs:
@@ -126,10 +129,10 @@
       INTEGER STATUS            ! Global status
 
 *  External references:
-      EXTERNAL PDA_DSTART
-      DOUBLE PRECISION PDA_DSTART
-      EXTERNAL PDA_DRNOR        ! Random number generator
-      DOUBLE PRECISION PDA_DRNOR
+      EXTERNAL PDA_DRANS
+      DOUBLE PRECISION PDA_DRANS
+      EXTERNAL PDA_DRANN        ! Random number generator
+      DOUBLE PRECISION PDA_DRANN
 
 *  Local constants:
       INTEGER NERROR            ! Number of errors to sample
@@ -205,10 +208,10 @@
 
 *  Fill up an array with a sample of gaussian noise. Scale these
 *  using the noise scaling factor and the sigma from the fit.
-      DSIGMA = PDA_DSTART( 32767 )
+      DSIGMA = PDA_DRANS( 32767 )
       DSIGMA = DBLE( SIGMA * SCALE )
       DO 2 I = 1, NERROR
-         ER( I ) = REAL( PDA_DRNOR() * DSIGMA )
+         ER( I ) = REAL( PDA_DRANN() * DSIGMA )
  2    CONTINUE
 
 *  And fill image part with surface plus noise.
