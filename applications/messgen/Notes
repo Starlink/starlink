@@ -1,0 +1,8 @@
+messgen autoconfed and added to CVS repository by Norman Gray, on
+2003 December 8
+
+Actions: Created simple bootstrap, configure.ac and Makefile.am;
+filled in component.xml.  Added cremsg.c, messgen.c and sun185.tex to
+repository.  Added generated Makefile.in and configure as usual.
+Added test file sai_err.msg, and news file messgen.news to repository,
+though neither is (at present) used.

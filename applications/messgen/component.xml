@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentlist.dtd">
+
+<component id="messgen">
+<description>Starlink Facility Error Message Generation</description>
+<path>/applications/messgen</path>
+<dependencies>
+<build>starconf star2html</build>
+</dependencies>
+<developers>
+<person>
+<name>A J Chipperfield</name>
+<email>A.J.Chipperfield@rl.ac.uk</email>
+</person>
+<person>
+<name>B K McIlwrath</name>
+<email>B.K.McIlwrath@rl.ac.uk</email>
+</person>
+</developers>
+</component>
