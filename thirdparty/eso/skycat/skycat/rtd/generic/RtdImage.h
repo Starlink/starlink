@@ -4,7 +4,7 @@
 
 /*
  * E.S.O. - VLT project / ESO Archive
- * "@(#) $Id: RtdImage.h,v 1.25 1998/10/28 17:41:29 abrighto Exp $"
+ * "@(#) $Id: RtdImage.h,v 1.26 1998/12/24 00:37:46 abrighto Exp $"
  *
  * RtdImage.h - class definitions for class RtdImage, a real-time image 
  * display extension for Tk.
@@ -26,6 +26,7 @@
 
 #include "TkImage.h"
 #include "ImageData.h"
+#include "rtdImageEvent.h"
 
 // we use pointers to classes of these types below
 class ImageColor;
@@ -36,7 +37,6 @@ class RtdCamera;
 class RtdRemote;
 class Mem;
 class RtdImage;
-struct rtdIMAGE_INFO;
 
 /* 
  * image options (used for image configuration)
