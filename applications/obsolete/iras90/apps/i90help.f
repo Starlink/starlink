@@ -50,9 +50,6 @@
 *     I90HELP [TOPIC] [SUBTOPIC] [SUBSUBTOPIC] [SUBSUBSUBTOPIC]
 
 *  ADAM Parameters:
-*     LIBRARY = LITERAL (Read)
-*        The Starlink help library from which help text is to be 
-*        obtained.                              [IRAS90_DIR:IRAS90_HELP]
 *     SUBSUBSUBTOPIC = LITERAL (Read)
 *        Subsubsubtopic for which help is to be given.             [" "]
 *     SUBSUBTOPIC = LITERAL (Read)
@@ -93,21 +90,18 @@
 *  External References:
 
 *  Local Constants:
+      CHARACTER*10 LIBNAM      ! Name of the IRAS90 help library
+      PARAMETER ( LIBNAM = 'IRAS90_HELP' )
 
 *  Local Variables:
-      CHARACTER*32 LIBRAY
 
 *.
 
 *  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Get the name of the help library to use.
-      CALL PAR_GET0C( 'LIBRARY', LIBRAY, STATUS )
-      IF ( STATUS .EQ. SAI__OK ) THEN
-
 *  Open the help library application layer
-      CALL SHL_ADAM( LIBRAY, .TRUE., STATUS)
+      CALL SHL_ADAM( LIBNAM, .TRUE., STATUS)
 
       END IF
       
