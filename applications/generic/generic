@@ -166,6 +166,8 @@
 #        temporary file not being removed after each type was
 #        instantiated.  Add some warning and information messages.
 #        Augment examples.
+#     2004 October 5 (TIMJ):
+#        File suffices were overriding an explicit -t
 #     {enter_further_changes_here}
 
 #-
@@ -189,6 +191,7 @@ set sepchar =
 set sepflag = 0
 set uflag = 0
 set xflag = 0
+set settypes = 0
 
 # Check that there are some arguments present.
 
@@ -204,6 +207,7 @@ while ( $#args > 0 )
    case -t:        #  Type of data flag.
       shift args
       set types = $args[1]
+      set settypes = 1
       shift args
       breaksw
    case -a:        #  Convert Asterix tokens.
@@ -253,7 +257,6 @@ endif
 
 # Check the value of the variable types.
 
-set settypes = 0
 if ( $?types == 0 ) then
    if ( $?GENERIC_TYPES ) then
       set types = $GENERIC_TYPES
