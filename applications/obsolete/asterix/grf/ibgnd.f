@@ -28,6 +28,12 @@
 *  Environment Parameters:
 *     CMD = CHARACTER (read)
 *        Command name. One of RESET
+*     X = REAL (read)
+*        X coordinate of source position
+*     Y = REAL (read)
+*        Y coordinate of source position
+*     R = REAL (read)
+*        Radius of source to knock out
 
 *  Examples:
 *     {routine_example_text}
@@ -105,6 +111,8 @@
 
 *  Local Variables:
       CHARACTER*16		CMD			! Major mode
+
+      REAL			XPOS, YPOS, R		! Source position
 *.
 
 *  Check inherited global status.
@@ -154,6 +162,18 @@
 *      Start a new model
           ELSE IF ( CMD .EQ. 'NEW' ) THEN
             CALL IBGND_NEW( STATUS )
+
+*      Add a source to the database
+          ELSE IF ( CMD .EQ. 'ADDSRC' ) THEN
+
+*        Get circle from user
+            CALL IMG_GETCIRC( 'X','Y', 'RAD', XPOS, YPOS, R, STATUS )
+
+*        Plot initial circle
+            CALL IMG_CIRCLE( XPOS, YPOS, R, STATUS )
+
+*        Add to list
+            CALL IBGND_ADDSRC( XPOS, YPOS, R, STATUS )
 
 *      Display internal state
           ELSE IF ( CMD .EQ. 'SHOW' ) THEN
@@ -267,6 +287,9 @@
       INTEGER			STATUS             	! Global status
 
 *  Local Variables:
+      REAL			X, Y, R			! Source attrs
+
+      INTEGER			I			! Loop over sources
 *.
 
 *  Check inherited global status.
@@ -275,6 +298,26 @@
 *  Modelling started?
       CALL MSG_BLNK()
       IF ( I_BGM_ON ) THEN
+
+*    Sources
+        IF ( I_BGM_NSRC .GT. 0 ) THEN
+          DO I = 1, I_BGM_NSRC
+            CALL ARR_ELEM1R( I_BGM_SRCPTR(1), I__MXBGSRC, I, X,
+     :                       STATUS )
+            CALL ARR_ELEM1R( I_BGM_SRCPTR(2), I__MXBGSRC, I, Y,
+     :                       STATUS )
+            CALL ARR_ELEM1R( I_BGM_SRCPTR(3), I__MXBGSRC, I, R,
+     :                       STATUS )
+            PRINT *,X,Y,R
+          END DO
+        ELSE
+          CALL MSG_PRNT( '  No source candidates defined' )
+        END IF
+
+*    Sampling
+
+*    Surface
+
       ELSE
         CALL MSG_PRNT( '  No source candidates defined' )
         CALL MSG_PRNT( '  No image sampling defined' )
@@ -283,6 +326,149 @@
       CALL MSG_BLNK()
 
       END
+
+
+      SUBROUTINE IBGND_ADDSRC( X, Y, R, STATUS )
+*+
+*  Name:
+*     IBGND_ADDSRC
+
+*  Purpose:
+*     Add a source to the background modeller database
+
+*  Language:
+*     Starlink Fortran
+
+*  Type of Module:
+*     Task subroutine
+
+*  Invocation:
+*     CALL IBGND_ADDSRC( X, Y, R, STATUS )
+
+*  Description:
+*     {routine_description}
+
+*  Arguments:
+*     X = REAL (given)
+*        X position of source
+*     Y = REAL (given)
+*        Y position of source
+*     R = REAL (given)
+*        Radius of source to exclude from background estimation
+*     STATUS = INTEGER (given)
+*        The global status.
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
+*     {algorithm_description}...
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  Implementation Status:
+*     {routine_implementation_status}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
+*     {routine_deficiencies}...
+
+*  References:
+*     {task_references}...
+
+*  Keywords:
+*     ibgnd, usage:private
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1995
+
+*  Authors:
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*     23 Jan 1996 (DJA):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'QUAL_PAR'
+
+*  Global Variables:
+      INCLUDE 'IMG_CMN'
+
+*  Arguments Given:
+      REAL			X, Y, R
+
+*  Status:
+      INTEGER			STATUS             	! Global status
+
+*  Local Variables:
+      LOGICAL			ALLOC			! Allocate bg memory?
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Maximum number of sources already?
+      IF ( I_BGM_NSRC .EQ. I__MXBGSRC ) THEN
+        STATUS = SAI__ERROR
+        CALL ERR_REP( ' ', 'Maximum number of sources exceeded',
+     :                STATUS )
+      ELSE
+
+*    Increment source counter
+        I_BGM_NSRC = I_BGM_NSRC + 1
+
+*    Add source attributes
+        CALL ARR_SELEM1R( I_BGM_SRCPTR(1), I__MXBGSRC, I_BGM_NSRC,
+     :                    X, STATUS )
+        CALL ARR_SELEM1R( I_BGM_SRCPTR(2), I__MXBGSRC, I_BGM_NSRC,
+     :                    Y, STATUS )
+        CALL ARR_SELEM1R( I_BGM_SRCPTR(3), I__MXBGSRC, I_BGM_NSRC,
+     :                    R, STATUS )
+
+*    Initialise the the background model quality array. This is ok for points
+*    inside the current region, and bad outside and for bad input pixels
+        CALL IBGND_SETQ( I_NX, I_NY, %VAL(I_QPTR),
+     :                   %VAL(I_BGM_QPTR), STATUS )
+
+*    Recompute the samples and surface
+        CALL IBGND_RECALC( .TRUE., .TRUE., STATUS )
+
+      END IF
+
+      END
+
 
 
       SUBROUTINE IBGND_NEW( STATUS )
@@ -537,8 +723,13 @@
       EXTERNAL			IMG_INREG
         LOGICAL			IMG_INREG
 
+      EXTERNAL			IMG_INCIRC
+        LOGICAL			IMG_INCIRC
+
 *  Local Variables:
       INTEGER			I, J			! Loop over image
+      INTEGER			I1, I2, J1, J2		! Circle bounding box
+      INTEGER			S			! Loop over sources
 
       LOGICAL			GOOD			! Good input pixel?
       LOGICAL			REGEX			! Region exists?
@@ -551,7 +742,7 @@
       REGEX = (I_REG_TYPE .NE. 'NONE')
 
 *  If no region defined, and no data quality present
-      IF ( (I_REG_TYPE .EQ. 'NONE') .AND. .NOT. I_BAD ) THEN
+      IF ( (I_REG_TYPE .EQ. 'NONE') .AND. .NOT. (I_QOK.AND.I_BAD) ) THEN
         CALL ARR_INIT1B( QUAL__GOOD, NX*NY, BQ, STATUS )
 
 *  Otherwise must test each pixel
@@ -560,7 +751,7 @@
 *    Loop over whole image
         DO J = 1, NY
           DO I = 1, NX
-            IF ( I_BAD ) THEN
+            IF ( I_QOK .AND. I_BAD ) THEN
               GOOD = (BIT_ANDUB(QUAL(I,J),I_MASK).EQ.QUAL__GOOD)
             ELSE
               GOOD = .TRUE.
@@ -580,6 +771,34 @@
         END DO
 
       END IF
+
+*  Force pixels inside source circles to bad
+      DO S = 1, I_BGM_NSRC
+
+*    Get position
+        CALL ARR_ELEM1R( I_BGM_SRCPTR(1), I__MXBGSRC, I, X, STATUS )
+        CALL ARR_ELEM1R( I_BGM_SRCPTR(2), I__MXBGSRC, I, Y, STATUS )
+        CALL ARR_ELEM1R( I_BGM_SRCPTR(3), I__MXBGSRC, I, R, STATUS )
+
+*    Convert position and radius to bounding rectangle
+        CALL IMG_CIRCTOBOX(XC,YC,R,I1,I2,J1,J2,STATUS)
+        DO J = J1, J2
+          DO I = I1, I2
+
+*        If model pixel is potentially good
+            IF ( BQ(I,J) .EQ. QUAL__GOOD ) THEN
+
+*          If pixel is in circle then ignore this point for sampling purposes
+              IF ( IMG_INCIRC(I,J,X,Y,R) ) THEN
+                BQ(I,J) = QUAL__BAD
+              END IF
+
+            END IF
+
+          END DO
+        END DO
+
+      END DO
 
       END
 
@@ -715,21 +934,137 @@
       CALL ARR_INIT1R( 0.0, I_BGM_NSAMP, %VAL(I_BGM_SAMPTR(2)), STATUS )
       CALL ARR_INIT1I( 0, I_BGM_NSAMP, %VAL(I_BGM_SAMPTR(3)), STATUS )
 
+*  Recompute the samples and surface
+      CALL IBGND_RECALC( .TRUE., .TRUE., STATUS )
+
+      END
+
+
+      SUBROUTINE IBGND_RECALC( SAMP, SURF, STATUS )
+*+
+*  Name:
+*     IBGND_RECALC
+
+*  Purpose:
+*     Recalculate samples and surface
+
+*  Language:
+*     Starlink Fortran
+
+*  Type of Module:
+*     Task subroutine
+
+*  Invocation:
+*     CALL IBGND_SETSAMP( SAMP, SURF, STATUS )
+
+*  Description:
+*     {routine_description}
+
+*  Arguments:
+*     SAMP = LOGICAL (given)
+*        Recompute samples?
+*     SURF = LOGICAL (given)
+*        Recompute surface?
+*     STATUS = INTEGER (given and returned)
+*        The global status.
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
+*     {algorithm_description}...
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  Implementation Status:
+*     {routine_implementation_status}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
+*     {routine_deficiencies}...
+
+*  References:
+*     {task_references}...
+
+*  Keywords:
+*     ibgnd, usage:private
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1995
+
+*  Authors:
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*     23 Jan 1996 (DJA):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'QUAL_PAR'
+
+*  Global Variables:
+      INCLUDE 'IMG_CMN'
+
+*  Arguments Given:
+      LOGICAL			SAMP, SURF
+
+*  Status:
+      INTEGER			STATUS             	! Global status
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
 *  Compute the samples
-      CALL IBGND_SAMP_COMP( I_NX, I_NY, %VAL(I_DPTR),
+      IF ( SAMP ) THEN
+        CALL IBGND_SAMP_COMP( I_NX, I_NY, %VAL(I_DPTR),
      :                      %VAL(I_BGM_QPTR),
      :                      I_BGM_NSAMP, %VAL(I_BGM_SAMPTR(1)),
      :                      %VAL(I_BGM_SAMPTR(2)),
      :                      %VAL(I_BGM_SAMPTR(3)),
      :                      STATUS )
+      END IF
 
 *  Compute the background surface
-      CALL IBGND_SURF_COMP( I_BGM_NSAMP, I_NX, I_NY, %VAL(I_DPTR),
+      IF ( SURF ) THEN
+        CALL IBGND_SURF_COMP( I_BGM_NSAMP, I_NX, I_NY, %VAL(I_DPTR),
      :                      %VAL(I_BGM_QPTR), %VAL(I_BGM_SAMPTR(1)),
      :                      %VAL(I_BGM_SAMPTR(2)),
      :                      %VAL(I_BGM_SAMPTR(3)),
      :                      %VAL(I_BGM_DPTR),
      :                      STATUS )
+      END IF
 
       END
 
