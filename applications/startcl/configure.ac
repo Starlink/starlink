@@ -23,8 +23,8 @@ STAR_DECLARE_DEPENDENCIES(build, [starx pcs ems gwm mers tcl tk nbs sae])
 STAR_LATEX_DOCUMENTATION(sun186)
 STAR_LATEX_DOCUMENTATION(sun219)
 
-dnl    Locate the tclsh and wish binaries 
-STAR_PATH_TCLTK
+dnl    Locate the tclsh and wish binaries and associated libraries
+STAR_PATH_TCLTK(8.2,[tk])
 
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.
