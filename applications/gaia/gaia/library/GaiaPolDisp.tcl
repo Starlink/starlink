@@ -1241,7 +1241,7 @@ itcl::class gaia::GaiaPolDisp {
       set oy_ [expr $yo - 1.5]
 
 #  If both the catalogue and the image have WCS, align in ra/dec.
-      if { [$cat gotWcs] && [$rtdimage_ wcsradius] != "" } {
+      if { [$cat gotWcs] && [$rtdimage_ astcelestial] == "1" } {
 
 #  Get the indices of the Ra and Dec columns, and the equinox.
          set col1 [$cat getRaCol]
