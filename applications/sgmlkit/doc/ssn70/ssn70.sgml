@@ -28,9 +28,9 @@
 			-- dsssl common code -->
   <!ENTITY dsssl.params	SYSTEM "../../dsssl/sl/common/slparams.sgml" SUBDOC
 			-- Parameterisation -->
-  <!ENTITY supportbinaries SYSTEM "../../bin/sgmlbin.sgml" SUBDOC
+  <!ENTITY supportbinaries SYSTEM "../../bin/bindocs.sgml" SUBDOC
 			-- Generated documentation for sgml2... -->
-  <!ENTITY supportlib SYSTEM "../../lib/sgmllib.sgml" SUBDOC
+  <!ENTITY supportlib SYSTEM "../../lib/libdocs.sgml" SUBDOC
 			-- Generated documentation for library utils... -->
   <!ENTITY release.notes	
 			SYSTEM "ReleaseNotes">
