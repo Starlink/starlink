@@ -125,6 +125,7 @@
       REAL			TOR			! Radian conversion
 
       INTEGER			DIMS(2)			! Axis dimensions
+      INTEGER			FARG			! File argument
       INTEGER			IMJD			! Value of BASE_MJD
       INTEGER			IPSF			! Psf system handle
       INTEGER			NDIM			! Dimensionality
@@ -157,7 +158,7 @@
 
 *  Introduce the dataset to the PSF system
       FARG = ARGS(1)
-      IF ( FARGS .EQ. ADI__NULLID ) FARG = ARGS(2)
+      IF ( FARG .EQ. ADI__NULLID ) FARG = ARGS(2)
       CALL PSF_INTRO( FARG, IPSF, STATUS )
       IF ( STATUS .EQ. SAI__OK ) THEN
         HASPIX = .TRUE.
@@ -177,8 +178,6 @@
             REG(2) = .TRUE.
             UNITS(1) = 'arcmin'
             UNITS(2) = 'arcmin'
-            LABEL(1) = 'X offset'
-            LABEL(1) = 'Y offset'
             TOR = MATH__DTOR/60.0
             BASE(1) = REAL(DIMS(1)-1)/2.0
             SCALE(1) = -1.0
