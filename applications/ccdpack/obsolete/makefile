@@ -114,7 +114,7 @@
 #
 #        The following ADAM UNIX software libraries and their
 #        dependencies.
-#           AGI ARD CHR FIO GRP IDI NDF PGPLOT PRM PSX TRN PDA
+#           AGI ARD AST CHR FIO GRP IDI NDF PGPLOT PRM PSX TRN PDA
 #        HTX
 #           The hypertext linker.
 #        GENERIC
@@ -137,6 +137,7 @@
 #     BLY: M.J.Bly (Starlink, RAL)
 #     AJC: A.J.Chipperfield (Starlink, RAL)
 #     PDRAPER: P.W. Draper (Starlink, Durham University)
+#     MBT: M.B.Taylor (Starlink, IoA)
 #     {enter_new_authors_here}
 #
 #  History:
@@ -225,6 +226,10 @@
 #        for supporting foreign data access.
 #     04-JUL-1997 (PDRAPER):
 #        Added targets and other changes for IRAF interoperability.
+#     08-FEB-1999 (MBT):
+#        Modified for changes required to use AST/WCS information in NDFs.
+#     15-MAR-1999 (MBT):
+#        Changed order of .SUFFIXES list so failed .gen files don't mess up.
 #     {enter_further_changes_here}
 #
 #  Bugs:
@@ -521,7 +526,7 @@ ICL_SCRIPT = $(PKG_NAME).icl
 #  which form part of the package and are required in order to build
 #  it, but which are not required by users of it.
 
-PRIVATE_INCLUDES = ccd1_fitcm ccd1_memcm ccd1_moscm \
+PRIVATE_INCLUDES = ccd1_fdcm ccd1_fitcm ccd1_memcm ccd1_moscm \
  ccd1_mospr ccd1_par ccd1_tmpcm fio1_clog hlpcmd.inc \
  irg_com irg_err irg_fac irg_par irh_com irh_err irh_par ndf_const \
  user_err irg_err.h slv.h
@@ -532,8 +537,8 @@ PRIVATE_INCLUDES = ccd1_fitcm ccd1_memcm ccd1_moscm \
 #  reference the files within the source code, not the actual names of
 #  the files.
 
-EXTERNAL_INCLUDES = CHR_ERR DAT_PAR DAT_ERR TRN_PAR TRN_ERR FIO_ERR FIO_PAR \
- IDI_ERR IDI_PAR MSG_PAR NDF_ERR NDF_PAR NUM_CMN NUM_DEC_B \
+EXTERNAL_INCLUDES = AST_PAR CHR_ERR DAT_PAR DAT_ERR TRN_PAR TRN_ERR \
+ FIO_ERR FIO_PAR IDI_ERR IDI_PAR MSG_PAR NDF_ERR NDF_PAR NUM_CMN NUM_DEC_B \
  NUM_DEC_CVT NUM_DEC_D NUM_DEC_I NUM_DEC_R NUM_DEC_UB NUM_DEC_UW \
  NUM_DEC_W NUM_DEF_B NUM_DEF_CVT NUM_DEF_D NUM_DEF_I NUM_DEF_R \
  NUM_DEF_UB NUM_DEF_UW NUM_DEF_W PAR_ERR PAR_PAR PRM_PAR SAE_PAR \
@@ -554,8 +559,9 @@ F_ROUTINES = $(TASKSRC) $(SUBSRC) $(HELPSRC) $(IRHSRC) $(IRGSRC) \
 TASKSRC = $(REDTASKS:=.f) $(REGTASKS:=.f) $(RESTASKS:=.f) \
           $(NAGTASKS:=.f) $(SCRTASKS:=.f)
 
-SUBSRC = ccd1_acmsk.f ccd1_adds.f ccd1_adkey.f ccd1_aldif.f \
- ccd1_anoi.f ccd1_appnd.f ccd1_asfio.f ccd1_auto.f ccd1_cen2.f \
+SUBSRC = ccd1_achan.f ccd1_acmsk.f ccd1_adds.f ccd1_adkey.f ccd1_aldif.f \
+ ccd1_anoi.f ccd1_appnd.f ccd1_asfio.f ccd1_asnk.f ccd1_asrc.f \
+ ccd1_auto.f ccd1_cen2.f \
  ccd1_cent.f ccd1_cext.f ccd1_cff.f ccd1_ckcdb.f \
  ccd1_ckcon.f ccd1_ckfla.f ccd1_ckfty.f ccd1_cktyp.f \
  ccd1_clcor.f ccd1_cmul.f ccd1_cmult.f ccd1_copy.f \
@@ -565,14 +571,14 @@ SUBSRC = ccd1_acmsk.f ccd1_adds.f ccd1_adkey.f ccd1_aldif.f \
  ccd1_domos.f ccd1_drawi.f ccd1_drawp.f ccd1_dtrn.f \
  ccd1_duesc.f ccd1_end.f ccd1_estm.f ccd1_ffcl.f \
  ccd1_ffcor.f ccd1_filas.f ccd1_fiohd.f ccd1_fitg.f \
- ccd1_fitlm.f ccd1_flnms.f ccd1_frtmp.f ccd1_ftypi.f \
+ ccd1_fitlm.f ccd1_flnms.f ccd1_frdm.f ccd1_frtmp.f ccd1_ftval.f ccd1_ftypi.f \
  ccd1_ftypl.f ccd1_gafit.f ccd1_gastc.f ccd1_gastd.f \
  ccd1_gefp.f ccd1_giseq.f ccd1_gmdcp.f ccd1_gmid.f \
  ccd1_gmmp.f ccd1_grapc.f ccd1_groff.f ccd1_gtbds.f \
  ccd1_gtcmp.f ccd1_gtcpb.f ccd1_gtcpc.f ccd1_gtdir.f \
  ccd1_gtlig.f ccd1_gtlis.f ccd1_gtmlg.f ccd1_gtmli.f \
- ccd1_gtmsk.f ccd1_gtsec.f ccd1_hisp.f ccd1_hvcon.f \
- ccd1_hvusr.f ccd1_inser.f ccd1_iscom.f ccd1_itra.f \
+ ccd1_gtmsk.f ccd1_gtsec.f ccd1_gtwcs.f ccd1_hisp.f ccd1_hvcon.f \
+ ccd1_hvusr.f ccd1_inply.f ccd1_inser.f ccd1_iscom.f ccd1_itra.f \
  ccd1_lasto.f ccd1_lastw.f ccd1_lcc.f ccd1_lext.f \
  ccd1_linv.f ccd1_lmap.f ccd1_lnam.f ccd1_lnamm.f ccd1_locs2.f \
  ccd1_locs3.f ccd1_ltest.f ccd1_ltrcm.f ccd1_lxyt.f \
@@ -583,9 +589,9 @@ SUBSRC = ccd1_acmsk.f ccd1_adds.f ccd1_adkey.f ccd1_aldif.f \
  ccd1_mxyo.f ccd1_mxyo2.f ccd1_nabv.f ccd1_ndfab.f \
  ccd1_ndfac.f ccd1_ndfck.f ccd1_ndfgb.f \
  ccd1_ndfgl.f ccd1_ndfgr.f ccd1_ndfgu.f ccd1_ndfin.f \
- ccd1_ndfpg.f ccd1_ndfpr.f ccd1_nlmap.f ccd1_nrmed.f \
+ ccd1_ndfpg.f ccd1_ndfpr.f ccd1_nlmap.f ccd1_nmid.f ccd1_nrmed.f \
  ccd1_nxwrd.f ccd1_objs.f ccd1_opfio.f ccd1_orvar.f \
- ccd1_ovcom.f ccd1_ovlap.f ccd1_plof.f ccd1_prmin.f \
+ ccd1_ovcom.f ccd1_ovlap.f ccd1_plof.f ccd1_pnply.f ccd1_prmin.f \
  ccd1_prndf.f ccd1_prsel.f ccd1_prune.f ccd1_ptbad.f \
  ccd1_ptins.f ccd1_putr.f ccd1_rbia.f ccd1_rcal.f \
  ccd1_rccr.f ccd1_rdbi.f ccd1_rdlin.f ccd1_redtr.f \
@@ -596,7 +602,7 @@ SUBSRC = ccd1_acmsk.f ccd1_adds.f ccd1_adkey.f ccd1_aldif.f \
  ccd1_sched.f ccd1_scrch.f ccd1_soff.f ccd1_spair.f \
  ccd1_stao.f ccd1_start.f ccd1_strgr.f \
  ccd1_stsat.f ccd1_stvb.f ccd1_subcs.f ccd1_szlsf.f \
- ccd1_szlsm.f ccd1_szprd.f ccd1_szslv.f ccd1_tfun.f \
+ ccd1_szlsm.f ccd1_szprd.f ccd1_szslv.f ccd1_tcout.f ccd1_tfun.f \
  ccd1_tmpnm.f ccd1_tstb.f ccd1_untmp.f ccd1_vlin.f \
  ccd1_wdpc.f ccd1_wedge.f ccd1_wffc.f \
  ccd1_wgtrn.f ccd1_winad.f ccd1_windr.f ccd1_wlis.f \
@@ -700,7 +706,7 @@ CIRGSRC = irg1_wild.c
 
 REDTASKS = makebias debias makecal calcor makeflat flatcor
 REGTASKS = findcent idicurs findobj register tranlist plotlist findoff \
- pairndf ccdedit makemos tranndf
+ pairndf ccdedit makemos tranndf astimp astexp
 RESTASKS = ccdsetup ccdclear ccdnote ccdshow ccdndfac ccdgenerate \
  picinfo import present schedule ccdimp ccdexp
 NAGTASKS = nagmakemos
@@ -747,7 +753,7 @@ IRAF_HELP = calcor.hlp makebias.hlp ccdalign.hlp makecal.hlp \
    ccdshow.hlp reduce.hlp command_descriptions.hlp register.hlp \
    debias.hlp schedule.hlp findcent.hlp tranlist.hlp findobj.hlp \
    tranndf.hlp findoff.hlp typical_initial_reduction.hlp flatcor.hlp \
-   use_globals.hlp idicurs.hlp xreduce.hlp import.hlp
+   use_globals.hlp idicurs.hlp xreduce.hlp import.hlp astimp.hlp astexp.hlp
 
 #  Name of the help task.
 
@@ -792,7 +798,7 @@ HAVE_NAG = 0
 #  Add suffixes for the generic files too.
 
 .SUFFIXES:
-.SUFFIXES: .o .c .f .ifc .ifl .shl .hlp .h .gen .grd .glrdi .glrdic .dgen
+.SUFFIXES: .o .c .gen .grd .glrdi .glrdic .dgen .f .ifc .ifl .shl .hlp .h 
 
 #  List of files which must be built from the source files before the
 #  package can be installed for use.  This should comprise all the files
@@ -810,13 +816,15 @@ BUILT_FILES = $(LINK_SCRIPT1) $(LINK_SCRIPT2) \
 #  files whose names do not exactly match the names used in the source
 #  code.
 
-INCLUDE_LINKS = $(EXTERNAL_INCLUDES) CCD1_FITCM CCD1_MEMCM CCD1_MOSCM \
-                CCD1_MOSPR CCD1_PAR CCD1_TMPCM FIO1_CLOG \
+INCLUDE_LINKS = $(EXTERNAL_INCLUDES) CCD1_FDCM CCD1_FITCM CCD1_MEMCM \
+                CCD1_MOSCM CCD1_MOSPR CCD1_PAR CCD1_TMPCM FIO1_CLOG \
                 HLPCMD.INC IRG_COM IRG_ERR IRG_FAC IRG_PAR IRH_COM \
                 IRH_ERR IRH_PAR NDF_CONST USER_ERR
 
 #  Rules to set up links to locate each of the above include files.
 
+AST_PAR:	$(STAR_INC)/ast_par;      $(LINK) $? $@
+CCD1_FDCM:	ccd1_fdcm;	          $(LINK) $? $@
 CCD1_FITCM:	ccd1_fitcm;	          $(LINK) $? $@
 CCD1_MEMCM:	ccd1_memcm;	          $(LINK) $? $@
 CCD1_MOSCM:	ccd1_moscm;	          $(LINK) $? $@
@@ -1153,9 +1161,6 @@ MONO_OBJECT = $(MONO_SOURCE:.f=.o)
 
 .f.o:
 	$(FC) $(FFLAGS) -c $<
-
-#  List of object library files to be built and rules for building
-#  them.
 
 #  List of object library files to be built and rules for building
 #  them.
@@ -2115,7 +2120,10 @@ irg_fac: IRG_ERR IRG_PAR IRH_ERR IRH_PAR
 aif_antmp.o: DAT_PAR SAE_PAR
 aif_asfio.o: PAR_ERR SAE_PAR
 aif_temp.o: DAT_PAR SAE_PAR
+astimp.o: AST_PAR FIO_PAR PAR_ERR SAE_PAR
+astexp.o: AST_PAR CCD1_PAR FIO_PAR PAR_ERR SAE_PAR
 calcor.o: CCD1_PAR DAT_PAR IRG_FAC NDF_PAR SAE_PAR
+ccd1_achan.o: AST_PAR CCD1_FDCM SAE_PAR
 ccd1_acmsk.o: DAT_PAR GRP_PAR MSG_PAR NDF_PAR PAR_ERR SAE_PAR
 ccd1_adds.o: SAE_PAR
 ccd1_adkey.o: SAE_PAR
@@ -2123,6 +2131,8 @@ ccd1_aldif.o: PRM_PAR SAE_PAR
 ccd1_anoi.o: PRM_PAR SAE_PAR
 ccd1_appnd.o: SAE_PAR
 ccd1_asfio.o: FIO_PAR PAR_ERR SAE_PAR
+ccd1_asnk.o: CCD1_PAR CCD1_FDCM SAE_PAR
+ccd1_asrc.o: CCD1_PAR CCD1_FDCM FIO_ERR SAE_PAR
 ccd1_auto.o: CCD1_PAR IRG_FAC MSG_PAR SAE_PAR
 ccd1_calcj.o: CCD1_MOSCM CCD1_MOSPR CCD1_PAR
 ccd1_cat.o: FIO_ERR MSG_PAR SAE_PAR
@@ -2173,8 +2183,10 @@ ccd1_fiohd.o: MSG_PAR SAE_PAR
 ccd1_fitg.o: CCD1_FITCM DAT_PAR NUM_CMN SAE_PAR
 ccd1_fitlm.o: MSG_PAR NUM_CMN PRM_PAR SAE_PAR
 ccd1_flnms.o: CCD1_PAR SAE_PAR
+ccd1_frdm.o: AST_PAR SAE_PAR
 ccd1_frtmp.o: CCD1_PAR CCD1_TMPCM DAT_PAR
 ccd1_ftgrp.o: GRP_PAR SAE_PAR TRN_ERR
+ccd1_ftval.o: DAT_PAR SAE_PAR
 ccd1_ftypi.o: CCD1_PAR DAT_PAR SAE_PAR
 ccd1_ftypl.o: CCD1_PAR DAT_PAR SAE_PAR
 ccd1_gafit.o: SAE_PAR
@@ -2199,11 +2211,13 @@ ccd1_gtmlg.o: IRG_FAC SAE_PAR
 ccd1_gtmli.o: IRG_FAC SAE_PAR
 ccd1_gtmsk.o: CCD1_PAR DAT_PAR MSG_PAR PRM_PAR SAE_PAR
 ccd1_gtsec.o: MSG_PAR SAE_PAR
+ccd1_gtwcs.o: AST_PAR SAE_PAR
 ccd1_hdrrn.o: SAE_PAR
 ccd1_hisp.o: SAE_PAR
 ccd1_hvcon.o: SAE_PAR
 ccd1_hvusr.o: SAE_PAR
 ccd1_imfit.o: DAT_PAR GRP_PAR MSG_PAR SAE_PAR
+ccd1_inply.o: SAE_PAR
 ccd1_inser.o: SAE_PAR
 ccd1_iscom.o: SAE_PAR
 ccd1_itra.o: SAE_PAR
@@ -2253,6 +2267,7 @@ ccd1_ndfin.o: FIO_ERR IRG_FAC PAR_ERR SAE_PAR
 ccd1_ndfpg.o: FIO_ERR IRG_FAC PAR_ERR SAE_PAR
 ccd1_ndfpr.o: CCD1_PAR FIO_ERR IRG_FAC PAR_ERR SAE_PAR
 ccd1_nlmap.o: SAE_PAR
+ccd1_nmid.o: SAE_PAR
 ccd1_nrmed.o: SAE_PAR
 ccd1_nxwrd.o: CHR_ERR SAE_PAR
 ccd1_objs.o: SAE_PAR
@@ -2261,6 +2276,7 @@ ccd1_orvar.o: CCD1_PAR SAE_PAR
 ccd1_ovcom.o: PRM_PAR SAE_PAR
 ccd1_ovlap.o: NDF_PAR SAE_PAR
 ccd1_plof.o: SAE_PAR
+ccd1_pnply.o: SAE_PAR
 ccd1_prin.o: CCD1_PAR FIO_ERR IRG_FAC PAR_ERR SAE_PAR
 ccd1_prmin.o: PRM_PAR SAE_PAR
 ccd1_prndf.o: SAE_PAR
@@ -2305,6 +2321,7 @@ ccd1_subcs.o: SAE_PAR
 ccd1_szlsf.o: CCD1_MOSCM CCD1_MOSPR CCD1_PAR
 ccd1_szprd.o: CCD1_MOSCM CCD1_MOSPR CCD1_PAR
 ccd1_szslv.o: CCD1_MOSCM CCD1_MOSPR CCD1_PAR PRM_PAR SAE_PAR USER_ERR
+ccd1_tcout.o: AST_PAR MSG_PAR PRM_PAR SAE_PAR
 ccd1_tmpnm.o: PRM_PAR SAE_PAR
 ccd1_touch.o: SAE_PAR
 ccd1_tstb.o: SAE_PAR
@@ -2328,7 +2345,7 @@ ccdalign.o: FIO_ERR MSG_PAR PSX_ERR SAE_PAR
 ccdclear.o: DAT_ERR DAT_PAR IRH_PAR SAE_PAR
 ccdedit.o: CCD1_PAR DAT_PAR FIO_PAR PAR_ERR SAE_PAR TRN_PAR
 ccdexp.o: CCD1_PAR FIO_ERR PRM_PAR SAE_PAR
-ccdgenerate.o: CCD1_PAR DAT_PAR SAE_PAR
+ccdgenerate.o: AST_PAR CCD1_PAR DAT_PAR SAE_PAR
 ccdhelp.o: DAT_PAR PAR_ERR PAR_PAR SAE_PAR
 ccdimp.o: CCD1_PAR DAT_PAR FIO_ERR NDF_PAR SAE_PAR TRN_PAR
 ccdndfac.o: CCD1_PAR MSG_PAR PAR_ERR SAE_PAR
@@ -2351,7 +2368,7 @@ ccg1_bmr1.o: NUM_CMN NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR
 ccg1_bmr2.o: NUM_CMN NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR
 ccg1_bmr3.o: NUM_CMN NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR
 ccg1_cen.o: NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR
-ccg1_clip.o: PRM_PAR SAE_PAR
+ccg1_clip.o: NUM_DEC_B NUM_DEC_CVT NUM_DEC_D NUM_DEC_I NUM_DEC_R NUM_DEC_UB NUM_DEC_UW NUM_DEC_W NUM_DEF_B NUM_DEF_CVT NUM_DEF_D NUM_DEF_I NUM_DEF_R NUM_DEF_UB NUM_DEF_UW NUM_DEF_W PRM_PAR SAE_PAR
 ccg1_cm1d.o: SAE_PAR
 ccg1_cm1r.o: SAE_PAR
 ccg1_cm2d.o: SAE_PAR
@@ -2401,7 +2418,7 @@ ccg1_mmd3.o: NUM_CMN NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR
 ccg1_mmr1.o: NUM_CMN NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR
 ccg1_mmr2.o: NUM_CMN NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR
 ccg1_mmr3.o: NUM_CMN NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR
-ccg1_mnmx.o: PRM_PAR SAE_PAR
+ccg1_mnmx.o: NUM_DEC_B NUM_DEC_CVT NUM_DEC_D NUM_DEC_I NUM_DEC_R NUM_DEC_UB NUM_DEC_UW NUM_DEC_W NUM_DEF_B NUM_DEF_CVT NUM_DEF_D NUM_DEF_I NUM_DEF_R NUM_DEF_UB NUM_DEF_UW NUM_DEF_W PRM_PAR SAE_PAR
 ccg1_mod1.o: NUM_CMN NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR
 ccg1_mod2.o: NUM_CMN NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR
 ccg1_mod3.o: NUM_CMN NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR
@@ -2455,7 +2472,7 @@ ccg1_wtm3.o: NUM_DEC_CVT NUM_DEF_CVT SAE_PAR
 debias.o: CCD1_PAR DAT_PAR NDF_PAR PAR_ERR PRM_PAR SAE_PAR
 findcent.o: CCD1_PAR DAT_PAR FIO_PAR NDF_PAR PAR_ERR SAE_PAR
 findobj.o: CCD1_PAR DAT_PAR FIO_PAR NDF_PAR PAR_ERR SAE_PAR
-findoff.o: CCD1_PAR DAT_PAR FIO_PAR SAE_PAR
+findoff.o: AST_PAR CCD1_PAR DAT_PAR FIO_PAR SAE_PAR
 fio1_cllog.o: FIO1_CLOG SAE_PAR
 fio1_errep.o: FIO1_CLOG SAE_PAR
 fio1_msg.o: FIO1_CLOG SAE_PAR
@@ -2557,7 +2574,7 @@ plotlist.o: CCD1_PAR FIO_PAR SAE_PAR
 present.o: CCD1_PAR IRG_FAC PAR_ERR SAE_PAR
 pthlpo.o: DAT_PAR HLPCMD.INC PAR_PAR SAE_PAR
 reduce.o: MSG_PAR PRM_PAR PSX_ERR SAE_PAR
-register.o: CCD1_PAR DAT_PAR FIO_PAR PAR_ERR SAE_PAR TRN_PAR
+register.o: AST_PAR CCD1_PAR DAT_PAR FIO_PAR PAR_ERR SAE_PAR TRN_PAR
 runxreduce.o: SAE_PAR
 schedule.o: CCD1_PAR FIO_PAR SAE_PAR
 tranlist.o: CCD1_PAR DAT_PAR FIO_PAR SAE_PAR
