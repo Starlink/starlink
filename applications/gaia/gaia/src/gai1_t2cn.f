@@ -223,30 +223,41 @@
  6                CONTINUE
                ELSE
 
+*  See if this is a positional parameter which we should skip.
+                  IF ( NAME .NE. 'id_col' .AND. NAME .NE. 'ra_col' .AND. 
+     :                 NAME .NE. 'dec_col' ) THEN
+
 *  Now see if the parameter exists (as stored ones should).
-                  CALL ERR_MARK
-                  QI = CAT__NOID
-                  CALL CAT_TIDNT( CI, NAME, QI, STATUS )
-                  IF ( STATUS .NE. SAI__OK ) THEN
-                     CALL ERR_ANNUL( STATUS )
+                     CALL ERR_MARK
+                     QI = CAT__NOID
+                     CALL CAT_TIDNT( CI, NAME, QI, STATUS )
+                     IF ( STATUS .NE. SAI__OK ) THEN
+                        CALL ERR_ANNUL( STATUS )
 
 *  Create the parameter anyway. This will just have character format.
-                     CALL CAT_PPTSC( CI, NAME, VALUE, ' ', QI, STATUS )
-                  ELSE
+                        CALL CAT_PPTSC( CI, NAME, VALUE, ' ', QI, 
+     :                                  STATUS )
+                     ELSE
 
 *  Parameter exists, just set the value (rely on internal conversion).
-                     CALL CAT_TATTC( QI, 'VALUE', VALUE, STATUS )
-                  END IF
+                        CALL ERR_MARK
+                        CALL CAT_TATTC( QI, 'VALUE', VALUE, STATUS )
+                        IF ( STATUS .NE. SAI__OK ) 
+     :                       CALL ERR_ANNUL( STATUS )
+                        CALL ERR_RLSE
+                     END IF
+                     CALL ERR_RLSE
+                  ELSE
 
-*  See if this is ra_col or dec_col.
-                  IF ( NAME .EQ. 'ra_col' ) THEN 
-                     CALL CHR_CTOI( VALUE, RACOL, STATUS )
-                     RACOL = RACOL + 1
-                  ELSE IF ( NAME .EQ. 'dec_col' ) THEN
-                     CALL CHR_CTOI( VALUE, DECCOL, STATUS )
-                     DECCOL = DECCOL + 1
+*  If this ra_col or dec_col then record for format conversion.
+                     IF ( NAME .EQ. 'ra_col' ) THEN 
+                        CALL CHR_CTOI( VALUE, RACOL, STATUS )
+                        RACOL = RACOL + 1
+                     ELSE IF ( NAME .EQ. 'dec_col' ) THEN
+                        CALL CHR_CTOI( VALUE, DECCOL, STATUS )
+                        DECCOL = DECCOL + 1
+                     END IF
                   END IF
-                  CALL ERR_RLSE
                END IF
             ELSE
 

@@ -149,6 +149,7 @@
       LOGICAL NULFLG            ! Value is NULL
       LOGICAL PRFDSP            ! Preferential display flag
       LOGICAL ADDIND            ! Whether to add a pseudo index
+      LOGICAL SKIP              ! Whether to skip parameter
 
 *.
 
@@ -215,11 +216,10 @@
             SYMBOL( N ) = VALUE
          ELSE
 
-*  Write the parameter.
-            WRITE( FI, 101 ) NAME, DTYPE, CSIZE, UNITS, EXTFMT, PRFDSP
-
 *  Check for known parameters, which can be case folded and truncated by
-*  conversion into CAT (esp CAT/FITS).
+*  conversion into CAT (esp CAT/FITS). SKIP positional parameters that 
+*  cannot be correct (CAT has no strict column order).
+            SKIP = .FALSE.
             IF ( NAME .EQ. 'SHORT_NA' ) THEN
                NAME = 'short_name'
             ELSE IF ( NAME .EQ. 'SERV_TYP' ) THEN
@@ -238,11 +238,22 @@
                NAME = 'show_cols'
             ELSE IF ( NAME .EQ. 'COPYRIGH' ) THEN
                NAME = 'copyright'
+            ELSE IF ( NAME .EQ. 'ID_COL' ) THEN
+               SKIP = .TRUE. 
+            ELSE IF ( NAME .EQ. 'RA_COL' ) THEN
+               SKIP = .TRUE.
+            ELSE IF ( NAME .EQ. 'DEC_COL' ) THEN
+               SKIP = .TRUE.
             END IF
 
+*  Write the parameter description line.
+            IF ( .NOT. SKIP ) THEN
+               WRITE( FI, 101 ) NAME, DTYPE, CSIZE, UNITS, EXTFMT,PRFDSP
+
 *  Add the "parameter : value" line.
-            WRITE( FI, '(A)') NAME( :CHR_LEN( NAME ) )//': '//
-     :                        VALUE( :CHR_LEN( VALUE ) )
+               WRITE( FI, '(A)') NAME( :CHR_LEN( NAME ) )//': '//
+     :                           VALUE( :CHR_LEN( VALUE ) )
+            END IF
          END IF
  2    CONTINUE
 

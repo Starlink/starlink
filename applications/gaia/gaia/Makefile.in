@@ -162,7 +162,7 @@ $(demo_wish): normallib tkAppInit.o FORCE
 $(demo_tcl): normallib tclAppInit.o FORCE
 	@echo "linking \"$(demo_tcl)\"..."
 	$(CXX) $(CC_SWITCHES)  tclAppInit.o -o $(demo_tcl) \
-	       $(LD_SEARCH_FLAGS) $(LOCAL_LIBRARY) $(ADDLIBS) $(gADAM_LIBS) \
+	       $(LD_SEARCH_FLAGS) $(LOCAL_LIBRARY) $(ADDLIBS) $(ADAM_LIBS) \
 	       $(TCLTKLIBS) $(EXTRA_LIBS)
 
 $(ardstat): normallib ardstat.o
