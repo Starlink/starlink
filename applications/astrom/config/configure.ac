@@ -3,6 +3,10 @@ dnl  $Id$
 
 AC_INIT(astrom, 3.7-1, ussc@starlink.ac.uk)
 
+dnl  Everything depends on where /star is.  Declare STARLINK as a
+dnl  `precious variable'
+AC_ARG_VAR(STARLINK, [Where all the Starlink software lives])
+
 dnl  By default, we want to be installed into /star (this option has
 dnl  no effect at present, since this is not how we currently
 dnl  configure the installation directory in Starlink makefiles, but
@@ -31,25 +35,32 @@ AC_F77_DUMMY_MAIN
 dnl  Does ln -s behave?
 AC_PROG_LN_S
 
-dnl  Platform-specific stuff
-AC_CANONICAL_BUILD
-echo build=$build  build_cpu=$build_cpu  build_vendor=$build_vendor  build_os=$build_os
-case $build_vendor in
-    sun) LDFLAGS="$LDFLAGS -lnsl -lsocket"
-        ;;
-esac
+dnl   Check whether we need to include `-lnsl -lsocket' to use the
+dnl   socket() call and friends (the t/makefile needs this, and the
+dnl  moggy configuration will use this also)
+AC_CHECK_FUNC(gethostbyname,,
+  AC_CHECK_LIB(nsl, gethostbyname))
+AC_CHECK_FUNC(socket,,
+  AC_CHECK_LIB(socket, socket,,,-lnsl))
 
+dnl  This is a rather unsatisfactory way of helping Fortran programs
+dnl  link to C ones.  Better is the AC_F77_WRAPPERS macro, but that
+dnl  requires cooperation on the part of the C library in question
+dnl  (actually slalib, here)
+if test "$F77" = g77; then
+  FFLAGS="-fno-second-underscore $FFLAGS"
+fi
 
 dnl  Set the default WCS style.  This can be overridden by setting the
-dnl  environment variable DEFWCSSTYLE to one of the legal ASTROM
-dnl  header styles (see the documentation).  This is, at present,
-dnl  intended only to be used by other programs configuring this one,
-dnl  so it shouldn't be regarded as a public interface (that is, it
-dnl  might change without warning).
-if test -z "$DEFWCSSTYLE"; then
-    DEFWCSSTYLE=qtan
+dnl  environment variable ASTROMWCSSTYLE to one of the legal ASTROM
+dnl  header styles, or by setting that variable in the ./configure argument
+dnl  list (see the documentation).  This is, at present, primarily
+dnl  intended to be used by other programs configuring this one.
+AC_ARG_VAR(ASTROMWCSSTYLE,
+           [Default style ASTROM uses for output FITS WCS info])
+if test -z "$ASTROMWCSSTYLE"; then
+    ASTROMWCSSTYLE=qtan
 fi
-AC_SUBST(DEFWCSSTYLE)
 
 dnl  Check for tar.  Set TAR_IN and TAR_OUT depending on whether we do
 dnl  find tar, or whether we're stuck with POSIX pax.
