@@ -26,7 +26,7 @@ STAR_MONOLITHS
 # Find program to compile help libraries, and star2html, for doc/Makefile
 STAR_CHECK_PROGS(hlib star2html hlink)
 
-STAR_DECLARE_DEPENDENCIES(build, [cnf fio hds hlp mers ndf par pda pgp prm sae sla mers])
+STAR_DECLARE_DEPENDENCIES(build, [cnf fio hds hlp mers ndf par pda pgp prm sae sla shl mers])
 STAR_DECLARE_DEPENDENCIES(build, kaplibs, link)
 
 # Documented in SUN/152.  The source is in doc/, and the listed products
