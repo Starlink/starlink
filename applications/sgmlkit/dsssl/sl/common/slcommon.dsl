@@ -354,7 +354,7 @@ is in effect.
 	(normalize "appendices")
 	(normalize "routinelist")
 	(normalize "codecollection")
-	(normalize "backmatter")
+	;(normalize "backmatter")
 	;(normalize "notecontents")
 	;(normalize "bibliography")
 	))
