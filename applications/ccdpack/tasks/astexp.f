@@ -240,7 +240,7 @@
 *           <frameset 1>
 *           <frameset 1 modifiers>
 *           (blank line)
-*           <frameset 1>
+*           <frameset 2>
 *           <frameset 2 modifiers>
 *           (blank line)
 *             ...
