@@ -23,7 +23,7 @@
                                 A Library for Handling\\
                                 World Coordinate Systems\\
                                 in Astronomy}
-\newcommand{\stardoccopyright} {Copyright (C) 2000 Central Laboratory of the Research Councils}
+\newcommand{\stardoccopyright} {Copyright (C) 2001 Central Laboratory of the Research Councils}
 \newcommand{\stardoctitlehtml} {AST - A Library for Handling World Coordinate
                                       Systems in Astronomy}
 \newcommand{\stardocversion}   {V1.6}
@@ -13614,7 +13614,7 @@ Object            - Base class for all AST Objects
    }
    \sstsynopsis{
       void astMark( AstPlot $*$this, int nmark, int ncoord, int indim,
-                    const double ($*$in)[], int type )
+                    const double $*$in, int type )
    }
    \sstparameters{
       \sstsubsection{
@@ -13647,7 +13647,8 @@ Object            - Base class for all AST Objects
       \sstsubsection{
          in
       }{
-         A 2-dimensional array of shape {\tt{"}}[ncoord][indim]{\tt{"}} giving the
+         The address of the first element of a 2-dimensional array of
+         shape {\tt{"}}[ncoord][indim]{\tt{"}} giving the
          physical coordinates of the points where markers are to be
          drawn. These should be stored such that the value of
          coordinate number {\tt{"}}coord{\tt{"}} for input mark number {\tt{"}}mark{\tt{"}} is
@@ -15240,7 +15241,7 @@ Object            - Base class for all AST Objects
    }
    \sstsynopsis{
       void astPolyCurve( AstPlot $*$this, int npoint, int ncoord, int indim,
-                         const double ($*$in)[] )
+                         const double $*$in )
    }
    \sstparameters{
       \sstsubsection{
@@ -15272,7 +15273,8 @@ Object            - Base class for all AST Objects
       \sstsubsection{
          in
       }{
-         A 2-dimensional array, of shape {\tt{"}}[ncoord][indim]{\tt{"}} giving the
+         The address of the first element in a 2-dimensional array of shape
+         {\tt{"}}[ncoord][indim]{\tt{"}} giving the
          physical coordinates of the points which are to be joined in
          sequence by geodesic curves. These should be stored such that
          the value of coordinate number {\tt{"}}coord{\tt{"}} for point number
@@ -17305,9 +17307,9 @@ Object            - Base class for all AST Objects
    }
    \sstsynopsis{
       void astTranN( AstMapping $*$this, int npoint,
-                     int ncoord\_in, int indim, const double ($*$in)[],
+                     int ncoord\_in, int indim, const double $*$in,
                      int forward,
-                     int ncoord\_out, int outdim, double ($*$out)[] )
+                     int ncoord\_out, int outdim, double $*$out )
    }
    \sstparameters{
       \sstsubsection{
@@ -17339,7 +17341,8 @@ Object            - Base class for all AST Objects
       \sstsubsection{
          in
       }{
-         A 2-dimensional array, of shape {\tt{"}}[ncoord\_in][indim]{\tt{"}},
+         The address of the first element in a 2-dimensional array of
+         shape {\tt{"}}[ncoord\_in][indim]{\tt{"}},
          containing the coordinates of the input (untransformed)
          points. These should be stored such that the value of
          coordinate number {\tt{"}}coord{\tt{"}} for input point number {\tt{"}}point{\tt{"}} is
@@ -17373,7 +17376,8 @@ Object            - Base class for all AST Objects
       \sstsubsection{
          out
       }{
-         A 2-dimensional array, of shape {\tt{"}}[ncoord\_out][outdim]{\tt{"}}, into
+         The address of the first element in a 2-dimensional array of
+         shape {\tt{"}}[ncoord\_out][outdim]{\tt{"}}, into
          which the coordinates of the output (transformed) points will
          be written. These will be stored such that the value of
          coordinate number {\tt{"}}coord{\tt{"}} for output point number {\tt{"}}point{\tt{"}}
