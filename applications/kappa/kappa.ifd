@@ -16848,8 +16848,8 @@ iraf! {
       }
    }
 
-   command fitshead {
-      obey {$STARHELP_DIR/starthelp.csh}      
+   command newhelp {
+      obey {$KAPPA_DIR/kaphelp.csh}      
    }
 
    command picxy {
