@@ -58,6 +58,10 @@
 #        Added TIFF and GIF.
 #     1996 August 22 (MJC):
 #        Switched the FMTCNV flag in FITSDIN to TRUE, as documented.
+#     1997 July 15 (MJC):
+#        Replaced FITSDIN with FITS2NDF.  Added bitpix=-1 to NDF2FITS
+#        command.  Added STREAM (direct-access) and GZIP (gzip'ed NDFs)
+#        cases.
 #     {enter_further_changes_here}
 #
 #  Bugs:
@@ -79,15 +83,15 @@ FITS)
 #  ----------------
    case $1 in
    from)
-      appl=FITSDIN
-      $KAPPA_DIR/fitsdin files=$3$4$5 out=$6 FMTCNV=T $NDF_FROM_FITS_PARS \
+      appl=FITS2NDF
+      $CONVERT_DIR/fits2ndf in=$3$4$5 out=$6 FMTCNV=T $NDF_FROM_FITS_PARS \
       </dev/null 2>&1 | \
       sed 's/^\!\!/\! /' | \
       awk -f $CONVERT_DIR/convertawk fmt="from $2 to NDF using $appl"
       ;;
    to)
       appl=NDF2FITS
-      $CONVERT_DIR/ndf2fits in=$6 out=$3$4$5 $NDF_TO_FITS_PARS \
+      $CONVERT_DIR/ndf2fits in=$6 out=$3$4$5 bitpix=-1 $NDF_TO_FITS_PARS \
       </dev/null 2>&1 | \
       sed 's/^\!\!/\! /' | \
       awk -f $CONVERT_DIR/convertawk fmt="from NDF to $2 using $appl."
@@ -286,6 +290,39 @@ GIF)
       ;; 
    esac
    ;;
+
+STREAM)
+#  STREAM (direct-access) conversions. 
+#  ----------------------------------- 
+   case $1 in
+   from)
+      appl=DA2NDF
+      echo "$NDF_FROM_UNF0_PARS" | grep -i 'shape *=' >/dev/null || \
+       (echo ""
+        echo "!! ** Error converting NDF from $2 format using $appl"
+        D=`echo $1 | tr '[a-z]' '[A-Z]'`
+        echo "!  You must set the SHAPE parameter for $appl"
+        echo "!  in environment variable NDF_FROM_$2_PARS"
+        echo "!  ** Returning to main application"
+        echo ""
+        exit 1
+       ) || exit 1
+      $CONVERT_DIR/da2ndf fits=f in=$3$4$5 out=$6 noperec=! \
+      $NDF_FROM_UNF0_PARS \
+      </dev/null 2>&1 | \
+      sed 's/^\!\!/\! /' | \
+      awk -f $CONVERT_DIR/convertawk fmt="from $2 to NDF using $appl"
+      ;;
+   to)
+      appl=NDF2DA
+      $CONVERT_DIR/ndf2da in=$6 out=$3$4$5 $NDF_TO_UNF0_PARS \
+      </dev/null 2>&1 | \
+      sed 's/^\!\!/\! /' | \
+      awk -f $CONVERT_DIR/convertawk fmt="from NDF to $2 using $appl."
+      ;; 
+   esac
+   ;;
+
       
 TIFF)
 #  TIFF conversions.
@@ -330,6 +367,40 @@ COMPRESSED)
    to)
       appl=compress
       compress -c -f $6.sdf >$3$4$5 || \
+       (echo ""
+        echo "!! ** Error converting NDF from $2 format using $appl"
+        sed 's/^/!  /' Z_err_$4.lis
+        echo "!  ** Returning to main application"
+        echo ""
+        rm -f Z_err_reports.lis $6.sdf
+        exit 1
+       )
+      rm -f Z_err_reports.lis
+
+      ;;
+   esac
+   ;;
+
+GZIP) 
+#  GZIP'ed conversions. 
+#  -------------------- 
+   case $1 in
+   from)
+      appl=gunzip
+      gunzip -c -f $3$4$5 >$6.sdf 2>Z_err_$4.lis || \
+       (echo ""
+        echo "!! ** Error converting NDF from $2 format using $appl"
+        sed 's/^/!  /' Z_err_$4.lis
+        echo "!  ** Returning to main application"
+        echo ""
+        rm -f Z_err_$4.lis $6.sdf
+        exit 1
+       )
+      rm -f Z_err_$4.lis
+      ;;
+   to)
+      appl=gzip
+      gzip -c -f $6.sdf >$3$4$5 || \
        (echo ""
         echo "!! ** Error converting NDF from $2 format using $appl"
         sed 's/^/!  /' Z_err_$4.lis
