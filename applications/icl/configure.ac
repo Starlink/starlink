@@ -45,6 +45,7 @@ AC_CHECK_HEADERS([term.h ncurses/term.h])
 
 # unix.c should be tweaked to not use environ
 AC_CHECK_FUNCS([setenv putenv])
+AC_CHECK_FUNCS([unsetenv])
 
 # adam.c
 AC_CHECK_FUNCS([strsignal psignal sys_siglist])
