@@ -19,11 +19,18 @@
 *     the environment variable NDF_FORMATS_IN are included. 
 *
 *     The ambiguity between HDS component paths and file types is solved
-*     here by including all matching files in the returned group. For
+*     here by returning only the HDS file in the returned group. For
 *     instance, the template "datafile.fit" will match either a FITS file 
 *     called "datafile.fit" or an HDS file called "datafile.sdf" containing 
 *     a ".fit" component. If the current directory contains both of these
-*     files, then they will both be added to the returned group. 
+*     files, then only "datafile.sdf" will be added to the returned group. 
+*
+*     Each combination of directory and basename is included only once in
+*     the returned group. If the supplied template matches files with the
+*     same directory/basename but with different file types, then only
+*     the file with the highest priority file type is returned (i.e. 
+*     the .sdf file if available, or the file type which is closest to 
+*     the start of NDF_FORMATS_OUT otherwise).
 
 *  Arguments:
 *     TEMPLT = CHARACTER * ( * ) (Given)
@@ -127,6 +134,7 @@
       INTEGER NC                 ! No. of characters in string
       INTEGER NMATCH             ! No. of matching file types
       INTEGER PAR                ! Index of next "("
+      INTEGER SIZE0              ! Size of original group
       INTEGER SLEN               ! Length of total search string
 *.
 
@@ -136,6 +144,9 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Save the original size of the supplied group.
+      CALL GRP_GRPSZ( IGRP, SIZE0, STATUS )
 
 *  Ensure that supplemental groups are associated with the returned group
 *  holding extra information. These groups are deleted automatically when
@@ -416,6 +427,11 @@
 
 *  End the error context started before the loop.
       CALL ERR_END( STATUS )         
+
+*  Purge the returned groups of matching files (i.e. file with the same
+*  directory and basename but differing file types).
+      CALL NDG1_SORT( IGRP, IGRPD, IGRPB, IGRPT, IGRPH, IGRPS, 
+     :                SIZE0 + 1, NFMT, FMT, STATUS )
 
 *  Delete the temporary groups.
  999  CONTINUE
