@@ -226,7 +226,6 @@
                                       ! left bolometer, intersection of lines
                                       ! and right bolometer
       REAL L_R                        ! distance from left to right bolometer
-      REAL RTEMP                      ! 
       CHARACTER*15 TYPE               ! type of bolometer
       CHARACTER*15 PRIME_TYPE         ! prime type of bolometer; SHORT, LONG,
                                       ! P1100, P1300, P2000
