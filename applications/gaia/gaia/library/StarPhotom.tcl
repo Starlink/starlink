@@ -602,6 +602,7 @@ itcl::class gaia::StarPhotom {
                outfile=StarPhotomOut.Dat \
                skymag=$skymag_ \
                usemags=$ok \
+               optima=f \
                $more
          } else {
             error_dialog "No image is displayed"

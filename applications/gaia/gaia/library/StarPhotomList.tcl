@@ -609,7 +609,7 @@ itcl::class gaia::StarPhotomList {
       # These values now become the default (for creation of
       # new objects without resize).
       if { [info exists objects_($index)] } {
-	 lassign [$objects_($index) aperture_details] \
+	 lassign [$objects_($index) object_details] \
 		 index x y mag magerr sky signal code semimajor \
 		 eccentricity angle positions innerscale outerscale
       }

@@ -85,7 +85,7 @@ itcl::class gaia::StarPhotomDetails {
       #  Create and pack all the widgets that are necessary for
       #  displaying the values of the current StarPhotomObject.
       itk_component add MainLabel {
-         LabelRule $w_.label -text "Object details"
+         LabelRule $w_.label -text "Current Object details"
       }
       itk_component add Index {
          LabelValue $w_.index -text {Aperture index:} \
@@ -258,7 +258,7 @@ itcl::class gaia::StarPhotomDetails {
       #  update, ending in a positive feedback loop!
       set propagate_ 0
 
-      lassign [$object aperture_details] index x y mag magerr sky \
+      lassign [$object object_details] index x y mag magerr sky \
          signal code itk_option(-semimajor) itk_option(-eccentricity)\
          itk_option(-angle) positions itk_option(-innerscale) \
 	 itk_option(-outerscale)
