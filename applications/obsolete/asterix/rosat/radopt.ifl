@@ -1,0 +1,90 @@
+        INTERFACE RADOPT
+
+           PARAMETER INSTR
+               POSITION   1
+               TYPE  '_CHAR'
+               PPATH    'CURRENT,DEFAULT'
+               VPATH    'PROMPT'
+               PROMPT   'Instrument name e.g. XRT, WFC'
+               DEFAULT  'XRT'
+               HELP     'Enter the name of the instrument either XRT or WFC'
+           ENDPARAMETER
+
+           PARAMETER SCOUNT
+               POSITION   2
+               TYPE  '_REAL'
+               PPATH    'CURRENT'
+               VPATH    'PROMPT'
+               PROMPT   'Total number of source counts'
+               HELP     'Total no. of counts from the source box - not the countrate'
+           ENDPARAMETER
+
+           PARAMETER BCOUNT
+               POSITION   3
+               TYPE  '_REAL'
+               PPATH    'CURRENT'
+               VPATH    'PROMPT'
+               PROMPT   'Number of background counts per square arcmin'
+               HELP     'Total no. of counts - not the countrate'
+           ENDPARAMETER
+
+           PARAMETER AZIMUTH
+               POSITION   4
+               TYPE  '_REAL'
+               PPATH    'CURRENT'
+               VPATH    'PROMPT'
+               PROMPT   'X offset from axis centre (arcmin)'
+           ENDPARAMETER
+
+           PARAMETER ELEV
+               POSITION   5
+               TYPE  '_REAL'
+               PPATH    'CURRENT'
+               VPATH    'PROMPT'
+               PROMPT   'Y offset from axis centre (arcmin)'
+           ENDPARAMETER
+
+           PARAMETER ENERGY
+               TYPE  '_REAL'
+               PPATH    'CURRENT'
+               VPATH    'DYNAMIC,DEFAULT'
+               PROMPT   'Mean photon energy (keV)'
+               DEFAULT    0.2
+           ENDPARAMETER
+
+           PARAMETER DMJD
+               TYPE  '_DOUBLE'
+               PPATH    'CURRENT'
+               VPATH    'PROMPT'
+               PROMPT   'MJD of observation'
+           ENDPARAMETER
+
+           PARAMETER FILTER
+               TYPE  '_INTEGER'
+               PPATH    'CURRENT'
+               VPATH    'DEFAULT'
+               PROMPT   'Filter number'
+               HELP     'S1A=8, S2A=6, S1B=4, S2B=2, P1=3, P2=7, UV=1'
+           ENDPARAMETER
+
+           PARAMETER DISP
+               TYPE  '_LOGICAL'
+               PPATH    'CURRENT'
+               VPATH    'DEFAULT'
+               PROMPT   'Display result on terminal'
+               DEFAULT    Y
+           ENDPARAMETER
+
+           PARAMETER RADIUS
+               TYPE  '_REAL'
+               VPATH 'INTERNAL,NOPROMPT'
+               DEFAULT  0.0
+           ENDPARAMETER
+
+           PARAMETER MAXFRAC
+               TYPE  '_REAL'
+               VPATH 'INTERNAL,NOPROMPT'
+               DEFAULT  0.0
+           ENDPARAMETER
+
+        ENDINTERFACE
