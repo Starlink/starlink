@@ -62,10 +62,8 @@
 *  Initialise
       FOUND = .FALSE.
 
-*  Handle slice!
-
 *  Locate the response data
-      CALL ERI_GETIDS( ID, INSTR.R_ID, INSTR.A_ID, STATUS )
+      CALL ERI_GETIDS( ID, INDEX, INSTR.R_ID, INSTR.A_ID, STATUS )
 
 *  Fill in dummy field
       INSTR.ELOC = DAT__NOLOC
