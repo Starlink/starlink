@@ -14761,7 +14761,7 @@ default value.
 
       For each output pixel, all corresponding input pixel values between
       the specified bounds of the the nominated axis to be collapsed are
-      combined together using either a mean or median estimator to
+      combined together using either a mean, mode or median estimator to
       produce the output pixel value.
 
       Possible uses include such things as collapsing a range of
@@ -14790,7 +14790,8 @@ default value.
          ESTIMATOR = LITERAL (Read)
       }{
          The method to use for estimating the output pixel values.  It
-         can be either {\tt "}Mean{\tt "} or {\tt "}Median{\tt "}. {\tt [{\tt "}Mean{\tt "}]}
+         can be either {\tt "}Mean{\tt "}, {\tt "}Mode{\tt "}  or 
+         {\tt "}Median{\tt "}. {\tt [{\tt "}Mean{\tt "}]}
       }
       \sstsubsection{
          HIGH = LITERAL (Read)

@@ -392,12 +392,13 @@ KAPSUB_SOURCES = $(KAPSUB_NONGEN) $(KAPSUB_GEN)
 
 # The contents of the kapsub_sub.tar file (including expanded generic
 # files and the generic source files):
-KAPSUB_SUB = $(KAPSUB_SOURCES) kps1_sparb.f kps1_spard.f kps1_spari.f kps1_sparr.f \
-kps1_sparub.f kps1_sparuw.f kps1_sparw.f kps1_pgftb.f kps1_pgftd.f kps1_pgfti.f \
-kps1_pgftr.f kps1_pgftub.f kps1_pgftuw.f kps1_pgftw.f 
+KAPSUB_SUB = $(KAPSUB_SOURCES) kps1_sparb.f kps1_spard.f kps1_spari.f \
+kps1_sparr.f kps1_sparub.f kps1_sparuw.f kps1_sparw.f kps1_pgftb.f \
+kps1_pgftd.f kps1_pgfti.f kps1_pgftr.f kps1_pgftub.f kps1_pgftuw.f \
+kps1_pgftw.f kps1_clpsr.f kps1_clpsd.f
 
 # Generic source files needed for kapsub_sub.tar:
-KAPSUB_GEN = kps1_spar.gen kps1_pgft.gen
+KAPSUB_GEN = kps1_spar.gen kps1_pgft.gen kps1_clps.gen
 
 # Non-generic source files needed for kapsub_sub.tar:
 KAPSUB_NONGEN = apadsb.f cnthlt.f cntkey.f cntsbp.f crfrsb.f curre.f \
@@ -477,7 +478,7 @@ kps1_mlpng.f kps1_mlpcv.f kps1_mlpml.f kps1_mlppn.f kps1_mlpfs.f \
 kps1_mlpmp.f kps1_mlpky.f kps1_mlpnd.f kps1_elmap.f kps1_pswcs.f \
 kps1_vect.f kps1_ccmpp.f kps1_ccmqn.f kps1_zpdec.f kps1_glidd.f \
 kps1_gliwd.f kpg1_orvar.f kps1_glibr.f kps1_glibd.f kps1_glidr.f \
-kps1_gliwr.f kps1_gligt.f kps1_saxlk.f kps1_clpsr.f kps1_clpsd.f
+kps1_gliwr.f kps1_gligt.f kps1_saxlk.f 
 
 # The contents of the kapview_sub.tar file:
 KAPVIEW_SUB = contour.f contover.f crelut.f cursor.f drawsig.f display.f \

@@ -3649,7 +3649,7 @@ Description:
 
    For each output pixel, all corresponding input pixel values between
    the specified bounds of the the nominated axis to be collapsed are
-   combined together using either a mean or median estimator to
+   combined together using either a mean, mode or median estimator to
    produce the output pixel value.
 
    Possible uses include such things as collapsing a range of
@@ -3672,7 +3672,7 @@ AXIS = LITERAL (Read)
 3 ESTIMATOR
 ESTIMATOR = LITERAL (Read)
    The method to use for estimating the output pixel values.  It
-   can be either "Mean" or "Median". ["Mean"]
+   can be either "Mean", "Mode" or "Median". ["Mean"]
 3 HIGH
 HIGH = LITERAL (Read)
    A value for the axis specified by parameter AXIS. For example,

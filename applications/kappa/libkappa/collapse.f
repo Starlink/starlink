@@ -28,7 +28,7 @@
 *
 *     For each output pixel, all corresponding input pixel values between
 *     the specified bounds of the the nominated axis to be collapsed are
-*     combined together using either a mean or median estimator to
+*     combined together using either a mean, mode or median estimator to
 *     produce the output pixel value.
 *
 *     Possible uses include such things as collapsing a range of
@@ -52,7 +52,7 @@
 *        be used.
 *     ESTIMATOR = LITERAL (Read)
 *        The method to use for estimating the output pixel values.  It
-*        can be either "Mean" or "Median". ["Mean"]
+*        can be either "Mean", "Mode" or "Median". ["Mean"]
 *     HIGH = LITERAL (Read)
 *        A value for the axis specified by parameter AXIS. For example,
 *        if AXIS is 3 and the current Frame of the input NDF has axes
@@ -651,7 +651,7 @@
       CALL NDF_PTWCS( IWCS, INDF2, STATUS )      
 
 *  Get the ESTIMATOR and WLIM parameters.
-      CALL PAR_CHOIC( 'ESTIMATOR', 'Mean', 'Mean,Median', .FALSE.,
+      CALL PAR_CHOIC( 'ESTIMATOR', 'Mean', 'Mean,Mode,Median', .FALSE.,
      :                ESTIM, STATUS )
       CALL PAR_GDR0R( 'WLIM', 0.3, 0.0, 1.0, .FALSE., WLIM, STATUS )
 
