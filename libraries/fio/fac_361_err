@@ -1,0 +1,110 @@
+FACILITY FIO
+100,TOOFD,No more available file descriptors
+101,ILLFD,Illegal file descriptor
+102,TOMNY,Too many open files
+103,ILLAC,Illegal access mode
+104,ILLOP,Illegal open request
+105,ILLCL,Illegal close request
+106,NTOPN,File not open
+107,NOTFD,File not found
+108,OPNER,File open error
+109,NAMER,File name error
+110,CLSER,File close error
+111,DUPFL,Duplicate file
+112,CRTER,File create error
+113,DLTER,File delete error
+114,RDER,File read error
+115,WRTER,File write error
+116,IVACM,Invalid access mode
+117,EOF,End of file
+118,REDON,File is readonly
+119,RECTL,Record too long
+120,ALOPN,File already open
+121,NOUNT,No more unit numbers available
+122,IVUNT,Invalid unit number
+123,OLORG,Illegal origin
+124,OUTFL,Outside file
+125,ERROR,Error
+126,NTSUP,Option not supported yet
+127,SYNAM,Syntax error in NAMELIST input
+128,TOOMV,Too many values for NAMELIST variable
+129,INVRV,Invalid reference to variable
+130,REWER,REWIND error
+131,BACER,BACKSPACE error
+132,OPREQ,OPEN or DEFINE FILE required
+133,TOORC,Too many records in I/O statement
+134,FILNF,File not found
+135,MIXFL,Mixed file access modes
+136,ENDFL,ENDFILE error
+137,SEGRC,Segmented record format error
+138,INCRC,Inconsistent record length
+139,RECIO,Recursive I/O operation
+140,INSVR,Insufficient virtual memory
+141,NODEV,No such device
+142,INCRT,Inconsistent record type
+143,KEYVL,Keyword value error in OPEN statement
+144,INCOC,Inconsistent OPEN/CLOSE parameters
+145,INVRG,Invalid argument to FORTRAN Run-Time Library
+146,INVKY,Invalid key specification
+147,INCKC,Inconsistent key change or duplicate key
+148,INCRG,Inconsistent file organization
+149,SPLOC,Specified record locked
+150,NOCRC,No current record
+151,REWRT,REWRITE error
+152,UNLER,UNLOCK error
+153,FINER,FIND error
+154,LISYN,List-directed I/O syntax error
+155,INFOR,Infinite format loop
+156,FORVR,Format/variable-type mismatch
+157,SYNER,Syntax error in format
+158,OUTCN,Output conversion error
+159,INPCN,Input conversion error
+160,OUTOV,Output statement overflows record
+161,INREQ,Input statement requires too much data
+162,VFVAL,Variable format expression value error
+163,UNKPA,Parameter is not a file parameter
+164,TOOFP,File parameter table full
+165,ISACT,File parameter is active
+166,EREXH,Error establishing exit handler for FIO
+167,INVMK,Invalid key match specifier
+168,PTAFD,Permission to access file denied
+169,COEXI,Cannot overwrite existing file
+170,IVFMT,Invalid FORMAT option
+171,FDNFP,File descriptor does not have an associated file parameter descriptor
+172,INVRL,Invalid record length
+173,OSERR,General operating system error code
+176,ERFMT,Error in format
+177,ILLUN,Illegal unit number
+178,FIONA,Formatted I/O not allowed
+179,UIONA,Unformatted I/O not allowed
+180,DIONA,Direct I/O not allowed
+181,SIONA,Sequential I/O not allowed
+182,CNTBF,Cannot backspace file
+183,OFBOR,Off beginning of record
+184,CNTSF,Can't stat file
+185,NAARC,No * after repeat count
+186,OFEOR,Off end of record
+187,TRUNF,Truncation failed
+188,ILSTI,Incomprehensible list input
+189,OOFSP,Out of free space
+190,UNTNC,Unit not connected
+191,RUNCH,Read unexpected character
+192,BLINP,Blank logical input field
+193,NFEXI,'NEW' file exists
+194,CFOLF,Cannot find 'OLD' file
+195,UNKNO,Unknown system error
+196,REQSA,Requires seek ability
+197,ILARG,Illegal argument
+198,NEGRC,Negative repeat count
+199,ILOPU,Illegal operaton for unit
+200,TOOMF,Too many file open - no free descriptors
+201,UNTNO,Attempted operation on unit that is not open
+202,IINAM,Illegal input for namelist
+203,FILEO,Error in FILEOPT parameter
+204,PERMD,Permission denied
+205,FTOOL,File too large
+206,NSLOD,No space left on device
+207,FNTL,File name too long
+208,DQEXC,Disk quota exceeded
+209,ILINP,Illegal logical input field
+210,INSPE,Incompatible specifiers in open
