@@ -81,7 +81,7 @@
 
 *    Match?
         IF ( STR_ABBREV( TAG, ROUT ) ) THEN
-          FOUND = .FALSE.
+          FOUND = .TRUE.
         ELSE
           ICMP = ICMP + 1
         END IF

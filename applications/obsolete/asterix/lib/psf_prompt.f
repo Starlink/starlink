@@ -661,6 +661,7 @@
 *    Local variables :
 *
       CHARACTER*40             RSN
+      CHARACTER*15		TAG
 
       INTEGER                  BEG, IC                 ! Character pointer
       INTEGER                  IR                      ! Loop over r bins

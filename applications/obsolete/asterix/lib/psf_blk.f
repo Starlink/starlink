@@ -38,12 +38,9 @@
 *           Psf subsystem initialised?
 *        PSFAUTO = LOGICAL (Returned)
 *           Psf load automatic?
-*        PSFLIBINIT = LOGICAL (Returned)
-*           Psf library subsystem initialised?
 
 *  Global data:
       DATA PSFINIT/.FALSE./
-      DATA PSFLIBINIT/.FALSE./
       DATA PSFAUTO/.FALSE./
 *.
 

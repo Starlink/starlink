@@ -156,65 +156,6 @@
 
 
 
-*+  PSF_FINDRTN - Call initialisation routine for a given slot
-      SUBROUTINE PSF_FINDRTN( LIBRARY, ROUTINE, PTR, STATUS )
-*
-*    Authors :
-*
-*     David J. Allan (ROSAT,University of Birmingham)
-*
-*    History :
-*
-*     01 Nov 89 : Original
-*
-*    Type definitions :
-*
-      IMPLICIT NONE
-*
-*    Status :
-*
-      INTEGER STATUS
-*
-*    Global constants :
-*
-      INCLUDE 'SAE_PAR'
-*
-*    Import :
-*
-      INTEGER                     LIBRARY           ! Library to look up
-      CHARACTER*(*)               ROUTINE           ! Routine to find
-*
-*    Import / Export :
-*
-      INTEGER                     PTR               ! Ptr to routine
-*
-*    Functions :
-*
-      INTEGER                     PSF_FINDR
-*-
-
-*    Check status
-      IF ( STATUS .NE. SAI__OK ) RETURN
-
-*    Already found?
-      IF ( PTR .EQ. 0 ) THEN
-
-*      Look it up
-        STATUS = PSF_FINDR( ROUTINE, LIBRARY, PTR )
-
-*      If not found, set ptr bad - note that PSF_FINDR doesn't do any error
-*      reporting
-        IF ( STATUS .NE. SAI__OK ) THEN
-          PTR = 0
-          STATUS = SAI__OK
-        END IF
-
-      END IF
-
-      END
-
-
-
 *+  PSF_INIT_EXEC - Call initialisation routine for a given slot
       SUBROUTINE PSF_INIT_EXEC( ROUTINE, PSID, FID, INST, STATUS )
 *
