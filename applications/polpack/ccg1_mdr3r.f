@@ -61,6 +61,10 @@
 *  History:
 *     19-MAY-1992 (PDRAPER):
 *        Original version.
+*     13-NOV-2001 (DSB):
+*        Fixed bug; variance values were not sorted corresponding to
+*        order of data values being stacked (spotted by MT).
+
 *     {enter_changes_here}
 
 *  Bugs:
@@ -156,7 +160,7 @@
          IF ( NGOOD .GT. 0 ) THEN
 
 *  Sort these values into increasing order.
-            CALL CCG1_IS2R( WRK1, POINT, NGOOD, STATUS )
+            CALL CCG1_IS3R( WRK1, WRK2, POINT, NGOOD, STATUS )
 
 *  Find the weighted median.
             CALL CCG1_WTM2R( WRK1, WRK2, NGOOD, USED, VAL, STATUS )
