@@ -1323,6 +1323,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
+      INCLUDE 'ADI_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'FIT_PAR'
       INCLUDE 'PSS_PAR'
@@ -1459,7 +1460,7 @@
 *    Open file
       WRITE( NSTR, '(I4.4)' ) GE_EXEC_NSRC
       FNAME = PREFIX(:CHR_LEN(PREFIX))//'_'//GVARS//'_'//NSTR//'%hds'
-      CALL ADI_FCREAT( FNAME, 'BinDS', GID, STATUS )
+      CALL ADI_FCREAT( FNAME, ADI__NULLID, GID, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Find RA and DEC for title
