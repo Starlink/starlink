@@ -9,7 +9,7 @@
 *    Parameters :
 *
 *     INP    = UNIV  -  name of data object to be modified
-*     VALUES = UNIV  -  values to be assigned to object
+*     VAL    = UNIV  -  values to be assigned to object
 *
 *    Method :
 *    Deficiencies :
@@ -79,7 +79,7 @@
           CALL DAT_TYPE(OBJLOC,TYPE,STATUS)
 
 *        get values from terminal or other data object
-          CALL USI_DASSOC('VALUES','READ',VALOC,STATUS)
+          CALL USI_DASSOC('VAL','READ',VALOC,STATUS)
 
           IF (STATUS.EQ.SAI__OK) THEN
 

@@ -47,7 +47,7 @@
       CALL USI_DASSOC('INP','READ',LOC,STATUS)
 
 *    Obtain filename
-      CALL USI_GET0C('FILNAM', FILNAM, status)
+      CALL USI_GET0C('FILE', FILNAM, status)
 
 *    See if formatted or unformatted
       CALL USI_GET0L('BINARY',BINARY,STATUS)
@@ -106,11 +106,9 @@
           CALL DAT_UNMAP(LOC,STATUS)
 
         ELSEIF (STATUS.EQ.SAI__OK) THEN
-          CALL MSG_PRNT('! Not a primitive or primitive array')
           STATUS=SAI__ERROR
+          CALL ERR_REP(' ','Not a primitive or primitive array',STATUS)
         ENDIF
-
-
 
 *	  Close the data file
         CLOSE (UNIT=LUN)
