@@ -344,14 +344,14 @@
 *           the new information supplants the old, and no error is
 *           reported.
 *
-*           The TIME record can either specify the UT date and time
-*           or, optionally, the local sidereal time, for mid-exposure.
-*           If the ST option is used, the epoch on the plate data
-*           record must be specified (and should be accurate to a day
-*           or two if the annual aberration and solar deflection are
-*           to be correctly computed).  If the time record specifies
-*           a UT, and an epoch is specified on the plate data record,
-*           the latter is ignored, without any error being reported.
+*           The TIME record can either specify the UT date and time, the
+*           epoch, or the local sidereal time, for mid-exposure.  If the
+*           ST option is used, the epoch on the plate data record must
+*           be specified (and should be accurate to a day or two if the
+*           annual aberration and solar deflection are to be correctly
+*           computed).  If the time record specifies a UT or an epoch,
+*           and an epoch is specified on the plate data record, the
+*           latter is ignored, without any error being reported.
 *
 *           The OBSERVATORY record can either specify one of the
 *           observatory identifiers recognised by the sla_OBS routine,
@@ -965,12 +965,12 @@
          IF (NFLD.EQ.1) THEN
             
 *         Julian epoch, double
-            UTMJD=WORK(1)
-            GOTUT=.TRUE.
-
 *         Replace any plate epoch
-            EPPCG=sla_EPJ(UTMJD)
-            KPPCG='J'
+            EPPCG=WORK(1)
+            CALL EQEP(EPPCG,J)
+            IF (J.NE.0) GO TO 990
+            CALL sla_KBJ(J2(1),EPPCG,KPPCG,J)
+            IF (J.NE.0) GO TO 990
             GOTPEP=.TRUE.
 
          ELSE IF (NFLD.EQ.2) THEN
@@ -2430,7 +2430,7 @@
                      IUTM=MOD(I,60)
                      WRITE (FTWS, '("Obs. start ",A,F8.3,
      :                    " (",I4,"-",I2.2,"-",I2.2,
-     :                    "T",I2.2,":",I2.2,")")')
+     :                    "T",I2.2,":",I2.2,":00)")')
      :                    KPPCG, EPPCG,
      :                    IUTY, IUTMO, IUTD, IUTH, IUTM
                      CALL FTPKYG (FTUNIT, 'MJD-OBS', UTMJD, 7,
