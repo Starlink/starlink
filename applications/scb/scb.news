@@ -4,6 +4,21 @@ SCB -- Source Code Browser
 Indexer and extractor/HTML browser for source code comprising Starlink
 packages.
 
-Initial release December 1998 - Version 1.0-0
-Bugfixes and minor modifications Janauary 1999 - Version 1.0-1
+v1.0-0 (December 1998):
+   Initial release.
+
+v1.0-1 (January 1999):
+   Bugfixes and minor modifications.
+
+v1.1-0 (December 1999):
+   The package has been restructured in terms of where it installs itself.
+
+   The source code parsing/tagging has been entirely rewritten using lex
+   and yacc instead of the Perl/regular expression-based approach used in
+   previous versions.  This is significantly more efficient in execution 
+   time and memory for small and moderate-sized files and MUCH more 
+   efficient for large ones and certain pathological cases which the 
+   previous routines had trouble with.  It seems to be about as accurate - 
+   that is certain things which the previous parser got right the new one
+   doesn't, and vice versa.
 
