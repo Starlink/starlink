@@ -3,7 +3,8 @@
 SUBDIRS = @subdirs@
 
 ## In automake terminology, this is the `bin' prefix to the `SCRIPTS' primary.
-bin_SCRIPTS = drivers/pgplot_link drivers/pgplot_link_adam rgb.txt
+bin_SCRIPTS = drivers/pgplot_link drivers/pgplot_link_adam
+dist_bin_SCRIPTS = rgb.txt
 
 # Made up from sublibs
 lib_LTLIBRARIES = libpgplot.la libpgplot_star.la

@@ -9,8 +9,7 @@ if HAVE_TK
 
   C_ROUTINES = tkpgplot.c
 
-  PUBLIC_INCLUDES = tkpgplot.h
-  PRIVATE_INCLUDES =
+  PUBLIC_INCLUDES = tkpgplot.h rvpgplot.h
 
   AM_CFLAGS = -DPG_PPU -I../
 

@@ -5,6 +5,7 @@ if HAVE_XMOTIF
   libXmPgplot_la_SOURCES = $(C_ROUTINES)
 
   include_HEADERS = $(PUBLIC_INCLUDES)
+  dist_noinst_HEADERS = $(PRIVATE_INCLUDES)
 
   C_ROUTINES = XmPgplot.c
  
