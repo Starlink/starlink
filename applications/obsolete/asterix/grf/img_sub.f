@@ -5564,7 +5564,7 @@ c        REAL XX,XP,YP
 *    Function declarations :
 *    Local constants :
 *    Local variables :
-      CHARACTER*1 CH
+      CHARACTER CH*1,OPT*8
       REAL XR,YR
       INTEGER FLAG
       LOGICAL LEFT,RIGHT
@@ -5574,25 +5574,31 @@ c        REAL XX,XP,YP
 
         IF (I_GUI) THEN
 
+*  form input?
+          CALL IMG_NBGET0C('OPTIONS',OPT,STATUS)
+          IF (OPT(:4).EQ.'FORM') THEN
+            I_FORM=.TRUE.
+          ELSE
 *  try for cursor input
-          I_FORM=.FALSE.
-          XC=I_X
-          YC=I_Y
-          CALL MSG_PRNT('Select centre...')
-          CALL IMG_GUICURS(XC,YC,FLAG,STATUS)
-          IF (FLAG.EQ.1) THEN
-            CALL PGPOINT(1,XC,YC,2)
-            XR=XC
-            YR=YC
-            CALL MSG_PRNT('Select radius...')
-            CALL IMG_GUICURS(XR,YR,FLAG,STATUS)
+            I_FORM=.FALSE.
+            XC=I_X
+            YC=I_Y
+            CALL MSG_PRNT('Select centre...')
+            CALL IMG_GUICURS(XC,YC,FLAG,STATUS)
             IF (FLAG.EQ.1) THEN
-              RAD=SQRT((XR-XC)**2 + (YR-YC)**2)
+              CALL PGPOINT(1,XC,YC,2)
+              XR=XC
+              YR=YC
+              CALL MSG_PRNT('Select radius...')
+              CALL IMG_GUICURS(XR,YR,FLAG,STATUS)
+              IF (FLAG.EQ.1) THEN
+                RAD=SQRT((XR-XC)**2 + (YR-YC)**2)
+              ELSEIF (FLAG.EQ.3) THEN
+                I_FORM=.TRUE.
+              ENDIF
             ELSEIF (FLAG.EQ.3) THEN
               I_FORM=.TRUE.
             ENDIF
-          ELSEIF (FLAG.EQ.3) THEN
-            I_FORM=.TRUE.
           ENDIF
 
 *  form input
@@ -6191,6 +6197,37 @@ c        REAL XX,XP,YP
 
         CALL NBS_FIND_ITEM(I_NBID,NAME,ID,STATUS)
         CALL NBS_GET_VALUE(ID,0,VAL__NBI,VAL,NB,STATUS)
+
+
+      ENDIF
+
+      END
+
+
+*+ IMG_NBGET0C
+      SUBROUTINE IMG_NBGET0C(NAME,CVAL,STATUS)
+
+      IMPLICIT NONE
+
+*  Global constants :
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'PRM_PAR'
+*    Global variables :
+      INCLUDE 'IMG_CMN'
+*  Import :
+      CHARACTER*(*) NAME
+*  Export :
+      CHARACTER*(*) CVAL
+*  Status :
+      INTEGER STATUS
+*  Local constants :
+*  Local variables :
+      INTEGER ID,NB
+*-
+      IF (STATUS.EQ.SAI__OK) THEN
+
+        CALL NBS_FIND_ITEM(I_NBID,NAME,ID,STATUS)
+        CALL NBS_GET_CVALUE(ID,0,CVAL,NB,STATUS)
 
 
       ENDIF
