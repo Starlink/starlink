@@ -288,71 +288,82 @@
                            END DO
                         END DO
 
-                        IF (COUNT .GT. NSCRATCH) THEN
-                           print *,'COUNT is too high!!',COUNT
-                        END IF
-
 *     We now have some data with COUNT pixels in it and an array
 *     containing pixel distance (X pixel values relative to start of scan)
 *     Simply need to fit this with a least squares polynomial fit.
 *     Use first order polynomial.
+*     If we have no data then skip this bolometer
+*     Cant have more than NSCRATCH points - if we do then we will have been
+*     in trouble anyway as the VEC_ITOD lines (above) would cause a segmentation
+*     fault.
+*     Probably should make sure we have at least 2 points over which to calculate the
+*     baseline.
 
-                        EPS = 0.0D0
-                        IFAIL = 0
+                        IF (COUNT .GT. 1 .AND. COUNT .LE. NSCRATCH) THEN 
 
-                        CALL PDA_DPOLFT (COUNT, %VAL(X_PTR), 
-     :                       %VAL(FITDATA_PTR), %VAL(WEIGHT_PTR), 
-     :                       MAXDEG, NDEG, EPS, 
-     :                       %VAL(R_PTR), IFAIL, %VAL(A_PTR), STATUS)
+                           EPS = 0.0D0
+                           IFAIL = 0
 
-                        IF (IFAIL .EQ. 1) THEN
+                           CALL PDA_DPOLFT (COUNT, %VAL(X_PTR), 
+     :                          %VAL(FITDATA_PTR), %VAL(WEIGHT_PTR), 
+     :                          MAXDEG, NDEG, EPS, 
+     :                          %VAL(R_PTR), IFAIL, %VAL(A_PTR), STATUS)
+                           
+                           IF (IFAIL .EQ. 1) THEN
 
 *     Now use the coefficients to remove the baseline from the data
 
-                           IF (STATUS .EQ. SAI__OK) THEN
-                              DO POS = SCAN_START, SCAN_END
-
-                                 XPOS = DBLE(POS - SCAN_START + 1)
+                              IF (STATUS .EQ. SAI__OK) THEN
+                                 DO POS = SCAN_START, SCAN_END
+                                    
+                                    XPOS = DBLE(POS - SCAN_START + 1)
                                  
-                                 CALL PDA_DP1VLU(NDEG, NDER, XPOS, YFIT, 
-     :                                YP, %VAL(A_PTR), STATUS)
+                                    CALL PDA_DP1VLU(NDEG, NDER, XPOS,
+     :                                   YFIT, YP, %VAL(A_PTR), STATUS)
 
 *     Simply remove this value (write out even if quality is bad)
-                                 IF (IN_DATA(BOL,POS) .NE. VAL__BADR) 
-     :                                THEN
+                                    IF (IN_DATA(BOL,POS) .NE. VAL__BADR) 
+     :                                   THEN
+                                       
+                                       OUT_DATA(BOL,POS) = 
+     :                                      IN_DATA(BOL,POS) - 
+     :                                      REAL(YFIT)
+                                       
+                                    ELSE
+                                       OUT_DATA(BOL,POS) = 
+     :                                      IN_DATA(BOL,POS)
+                                    END IF
+                                    
+                                    OUT_QUALITY(BOL, POS) = 
+     :                                   IN_QUALITY(BOL, POS)
+                                    OUT_VARIANCE(BOL, POS) = 
+     :                                   IN_VARIANCE(BOL,POS)
+                                    
+                                 END DO
+                              END IF
+                           
+                           ELSE IF (STATUS .NE. SAI__OK) THEN
 
-                                    OUT_DATA(BOL,POS) = IN_DATA(BOL,POS)
-     :                                   - REAL(YFIT)
-
-                                 ELSE
-                                    OUT_DATA(BOL,POS) = IN_DATA(BOL,POS)
-                                 END IF
+                              CALL MSG_SETI('IFAIL', IFAIL)
+                              CALL MSG_SETI('BOL', BOL)
+                              CALL ERR_REP(' ','REMOVE_LINEAR_BASEL'//
+     :                             'INE: Error whilst removing '//
+     :                             'baseline (Bol=^BOL, IFAIL=^IFAIL)',
+     :                             STATUS)
                               
-                                 OUT_QUALITY(BOL, POS) = 
-     :                                IN_QUALITY(BOL, POS)
-                                 OUT_VARIANCE(BOL, POS) = 
-     :                                IN_VARIANCE(BOL,POS)
-                                 
-                              END DO
+                           ELSE
+
+                              CALL MSG_SETI('IFAIL', IFAIL)
+                              CALL MSG_SETI('BOL', BOL)
+                              CALL MSG_OUTIF(MSG__QUIET,' ',
+     :                             'REMOVE_LINEAR_BASELINE: Warning '//
+     :                             'IFAIL = ^IFAIL in PDA_DPOLFT for '//
+     :                             'Bolometer ^BOL',
+     :                             STATUS)
+
                            END IF
-
-                        ELSE IF (STATUS .NE. SAI__OK) THEN
-
-                           CALL MSG_SETI('IFAIL', IFAIL)
-                           CALL ERR_REP(' ','REMOVE_LINEAR_BASELINE:'//
-     :                          ' Error whilst removing basline'//
-     :                          ' (IFAIL=^IFAIL)', STATUS)
-
-                        ELSE
-
-                           CALL MSG_SETI('IFAIL', IFAIL)
-                           CALL MSG_OUTIF(MSG__QUIET,' ',
-     :                          'REMOVE_LINEAR_BASELINE: Warning '//
-     :                          'IFAIL = ^IFAIL in PDA_DPOLFT',
-     :                          STATUS)
-
+                           
                         END IF
-
 
 
                      END IF
