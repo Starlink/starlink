@@ -87,6 +87,7 @@
 *     21 Dec 94 : V1.8-5  Changed to new ARD (RJV)
 *     15 Feb 95 : V1.8-6  Removed old stuff as well so that it links! (DJA)
 *     24 Apr 95 : V1.8-7  Updated data interface (DJA)
+*     13 Dec 1995 : V2.0-0 ADI port (DJA)
 *
 *    Type Definitions :
 *
@@ -167,7 +168,6 @@
       LOGICAL                	GOTAUX                 	! Got auxilliary file ?
       LOGICAL 		     	MAGIC		    	! Select on magic values?
       LOGICAL                	MODESET                	! Mode selected
-      LOGICAL                	INPRIM                 	! Is input primitive?
       LOGICAL                	OK                     	! OK?
       LOGICAL                	OVERWRITE              	! Overwrite input dataset
       LOGICAL        	     	Q_IGNORE		! Mode switches
@@ -184,37 +184,32 @@
 *    Version id :
 *
       CHARACTER*80           	VERSION
-        PARAMETER            	( VERSION = 'QUALITY Version 1.8-7' )
+        PARAMETER            	( VERSION = 'QUALITY Version 2.0-0' )
 *-
 
-*    Version id
+*  Version id
       CALL MSG_PRNT( VERSION )
 
-*    Initialize
+*  Initialize
       CALL AST_INIT()
 
-*    Overwrite?
+*  Overwrite?
       CALL USI_GET0L( 'OVER', OVERWRITE, STATUS )
 
-*    Get input
+*  Get input
       IF ( OVERWRITE ) THEN
-        CALL USI_TASSOCI( 'INP', '*', 'UPDATE', IFID, STATUS )
+        CALL USI_ASSOC( 'INP', 'BinDS', 'UPDATE', IFID, STATUS )
         OFID = IFID
       ELSE
-        CALL USI_TASSOC2( 'INP', 'OUT', 'READ', IFID, OFID, STATUS )
-        CALL ADI_FCOPY( IFID, OFID, STATUS )
-      END IF
-      CALL BDI_PRIM( IFID, INPRIM, STATUS )
-
-*    Check DATA
-      CALL BDI_CHKDATA( OFID, OK, NDIM, DIMS, STATUS )
-      IF (.NOT. OK) THEN
-        STATUS = SAI__ERROR
-        CALL ERR_REP( ' ', 'Invalid dataset', STATUS )
-        GOTO 99
+        CALL USI_ASSOC( 'INP', 'BinDS', 'READ', IFID, STATUS )
+        CALL USI_CLONE( 'INP', 'OUT', 'BinDS', OFID, STATUS )
       END IF
 
-*    Obtain mode from user
+*  Check dataset shape
+      CALL BDI_GETSHP( OFID, ADI__MXDIM, DIMS, NDIM, STATUS )
+      IF ( STATUS .NE. SAI__OK ) GOTO 99
+
+*  Obtain mode from user
       MODESET=.FALSE.
       CALL USI_GET0L( 'SET', Q_SET, STATUS )
       MODESET = Q_SET
@@ -242,8 +237,6 @@
         CALL USI_GET0L( 'NOT', Q_NOT, STATUS )
         MODESET = Q_NOT
       END IF
-
-*    Check status
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Check that a mode has been selected
@@ -282,29 +275,18 @@
         QSEL = .FALSE.
 
       END IF
-
-*    Check status
       IF ( STATUS .NE. SAI__OK ) GOTO 99
-
-*    Check inprim
-      IF ( INPRIM ) THEN
-        STATUS = SAI__ERROR
-        CALL ERR_REP( ' ', 'Input not a dataset!', STATUS )
-        GOTO 99
-      END IF
 
 *    Find length of array
       CALL ARR_SUMDIM( NDIM, DIMS, NELM )
 
-*    Check QUALITY
-      CALL BDI_CHKQUAL( OFID, OK, QNDIM, QDIMS, STATUS )
-
+*  Check QUALITY
+      CALL BDI_CHK( OFID, 'Quality', OK, STATUS )
       IF ( .NOT. OK ) THEN
         IF ( Q_SET .OR. Q_IGNORE ) THEN
-          CALL BDI_CREQUAL( OFID, NDIM, DIMS, STATUS )
-          CALL BDI_MAPQUAL( OFID, 'WRITE', QPTR, STATUS )
+          CALL BDI_MAPUB( OFID, 'Quality', 'WRITE', QPTR, STATUS )
           CALL ARR_INIT1B( QUAL__GOOD, NELM, %VAL(QPTR), STATUS )
-          CALL BDI_PUTMASK( OFID, QUAL__MASK, STATUS )
+          CALL BDI_PUT0UB( OFID, 'QualityMask', QUAL__MASK, STATUS )
 
         ELSE
           STATUS = SAI__ERROR
@@ -313,47 +295,43 @@
 
         END IF
       ELSE
-        CALL BDI_MAPQUAL( OFID, 'UPDATE', QPTR, STATUS )
+        CALL BDI_MAPUB( OFID, 'Quality', 'UPDATE', QPTR, STATUS )
       END IF
-
-*    Check status
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Adjust size of array to 7 D
-      DO I = NDIM + 1, ADI__MXDIM
-        DIMS(I) = 1
-      END DO
+*  Adjust size of array to 7 D
+      CALL AR7_PAD( NDIM, DIMS, STATUS )
 
-*    Set up temporary array for flagging selections
+*  Set up temporary array for flagging selections
       CALL DYN_MAPL( 1, NELM, CPTR, STATUS )
       CALL DYN_MAPL( 1, NELM, TCPTR, STATUS )
 
-*    Auxilliary data object?
+*  Auxilliary data object?
       IF ( DATSEL .OR. MAGIC ) THEN
-        CALL USI_TASSOCI( 'AUXIN', '*', 'READ', AFID, STATUS )
+        CALL USI_ASSOC( 'AUXIN', 'BinDS|Array', 'READ', AFID, STATUS )
         IF ( STATUS .EQ. PAR__NULL ) THEN
           CALL ERR_ANNUL( STATUS )
           GOTAUX = .FALSE.
-	  CALL ADI_CLONE( IFID, DFID, STATUS )
+          DFID = IFID
         ELSE IF ( STATUS .NE. SAI__OK ) THEN
           GOTO 99
         ELSE
           GOTAUX = .TRUE.
-	  CALL ADI_CLONE( AFID, DFID, STATUS )
+          DFID = AFID
         END IF
       END IF
 
-*    We start out with all values selected
+*  We start out with all values selected
       CALL ARR_INIT1L( .TRUE., NELM, %VAL(CPTR), STATUS )
 
-*    Select on axis values?
+*  Select on axis values?
       IF ( AXSEL ) THEN
 
-*      Display axes
+*    Display axes
         CALL QUALITY_DISPAX( OFID, NDIM, DIMS, AXLABEL, AXLO, AXHI,
      :                                                DIR, STATUS )
 
-*      Construct allowed ranges
+*    Construct allowed ranges
         DO I = 1, ADI__MXDIM
           NAXRANGES(I) = 1
           AXRANGES(1,1,I) = AXLO(I)
@@ -363,12 +341,10 @@
           SEL(I) = .FALSE.
         END DO
 
-*      Get axes to select on
+*    Get axes to select on
         IF ( NDIM .GT. 1 ) THEN
           CALL MSG_PRNT( ' ' )
           CALL PRS_GETLIST( 'AXES', NDIM, AXES, NAXES, STATUS )
-
-*        Check status
           IF ( STATUS .NE. SAI__OK ) GOTO 99
 
         ELSE
@@ -376,7 +352,7 @@
           AXES(1) = 1
         END IF
 
-*  get ranges for each selected axis
+*    Get ranges for each selected axis
         DO I = 1, NAXES
           J=AXES(I)
           SEL(J) = .TRUE.
@@ -396,10 +372,10 @@
      :                   AXRANGES(1,1,J), NAXRANGES(J), STATUS )
 
 *      Convert axis value ranges to pixel ranges
-          CALL BDI_MAPAXVAL (OFID, 'R', J, AXPTR(J), STATUS)
+          CALL BDI_AXMAPR( OFID, J, 'Data', 'READ', AXPTR(J), STATUS )
           CALL QUALITY_AXRAN (DIMS(J),NAXRANGES(J),AXRANGES(1,1,J),
      :                     %VAL(AXPTR(J)),DIR(J),PIXRNG(1,1,J),STATUS)
-          CALL BDI_UNMAPAXVAL( OFID, J, STATUS )
+          CALL BDI_UNAXMAP( OFID, J, 'Data', AXPTR(J), STATUS )
 
         END DO
 
@@ -434,7 +410,7 @@
       IF ( DATSEL ) THEN
 
 *      Map data and get its range (ignoring quality)
-        CALL BDI_MAPDATA( DFID, 'READ', DPTR, STATUS )
+        CALL BDI_MAPR( DFID, 'Data', 'READ', DPTR, STATUS )
         CALL ARR_RANG1R( NELM, %VAL(DPTR), DMIN, DMAX, STATUS )
 
         CALL MSG_PRNT( ' ' )
@@ -473,7 +449,7 @@
       IF ( MAGIC ) THEN
 
 *      Set up selection array
-        CALL BDI_MAPDATA( DFID, 'READ', DPTR, STATUS )
+        CALL BDI_MAPR( DFID, 'Data', 'READ', DPTR, STATUS )
         CALL QUALITY_SETMSEL( NELM, %VAL(DPTR), %VAL(TCPTR), STATUS )
 
 *      AND it with our existing array
@@ -556,10 +532,10 @@
 
       END IF
 
-*    Write output quality
-      CALL BDI_UNMAPQUAL( OFID, STATUS )
+*  Write output quality
+      CALL BDI_UNMAP( OFID, 'Quality', QPTR, STATUS )
 
-*    Inform user of altered points
+*  Inform user of altered points
       IF ( AXSEL .AND. DATSEL ) THEN
         CALL MSG_SETC( 'FROM', 'axis/data range' )
       ELSE IF ( AXSEL .AND. FSEL ) THEN
@@ -576,22 +552,16 @@
       CALL MSG_PRNT( '^NCH points had quality altered out of'/
      :                            /' ^NFROM points in ^FROM' )
 
-*    Write history
+*  Write history
       CALL HSI_ADD( OFID, VERSION, STATUS )
       NLINES = 1
       IF ( QSEL ) THEN
         TEXT(2) = 'Only points having QUALITY = '//MODQUAL//' altered'
         NLINES  = 2
       END IF
-
       CALL HSI_PTXT( OFID, NLINES, TEXT, STATUS )
 
-*    Auxilliary array used?
-      IF ( GOTAUX ) THEN
-        CALL BDI_RELEASE( DFID, STATUS )
-      END IF
-
-*    Exit
+*  Exit
  99   CALL AST_CLOSE()
       CALL AST_ERR( STATUS )
 
@@ -646,12 +616,8 @@
 *
       INTEGER			APTR			! Axis values ptr
       INTEGER                I                  ! loop variable
-      INTEGER                SIZ                ! dummy
 
-      LOGICAL                REG                ! Is axis regularly spaced?
       LOGICAL                OK
-
-      REAL                   BASE, SCALE
 *-
 
 *    Status check
@@ -661,29 +627,21 @@
 
       DO I = 1, NDIM
 *  get label
-        CALL BDI_GETAXLABEL( FID, I, AXLABEL(I), STATUS )
+        CALL BDI_AXGET0C( FID, I, 'Label', AXLABEL(I), STATUS )
         CALL MSG_SETI ('I', I)
         CALL MSG_SETC ('NAME', AXLABEL(I))
         CALL MSG_PRNT (' ^I ^NAME')
 
 *  check values
-        CALL BDI_CHKAXVAL( FID, I, OK, REG, SIZ, STATUS )
+        CALL BDI_AXCHK( FID, I, 'Data', OK, STATUS )
 
-* find lo and hi values
-        IF ( REG ) THEN
-          CALL BDI_GETAXVAL( FID, I, BASE, SCALE, SIZ, STATUS )
-          AXLO(I) = BASE
-          AXHI(I) = BASE + (SIZ - 1) * SCALE
+*     Find lo and hi values
+        CALL BDI_AXMAPR( FID, I, 'Data', 'READ', APTR, STATUS )
+        CALL ARR_ELEM1R( APTR, DIMS(I), 1, AXLO(I), STATUS )
+        CALL ARR_ELEM1R( APTR, DIMS(I), DIMS(I), AXHI(I), STATUS )
+        CALL BDI_AXUNMAP( FID, I, 'Data', APTR, STATUS )
 
-         ELSE
-           CALL BDI_MAPAXVAL( FID, 'READ', I, APTR, STATUS )
-           CALL ARR_ELEM1R( APTR, SIZ, 1, AXLO(I), STATUS )
-           CALL ARR_ELEM1R( APTR, SIZ, SIZ, AXHI(I), STATUS )
-           CALL BDI_UNMAPAXVAL( FID, I, STATUS )
-
-         END IF
-
-*  set direction indicator
+*     Set direction indicator
          DIR(I) = SIGN(1.0,AXHI(I)-AXLO(I))
 
        END DO
@@ -1332,55 +1290,59 @@
       INTEGER ARDID
 *-
 
-*    Initialise
+*  Initialise
       CALL ARR_SUMDIM( ADI__MXDIM, DIM, NELM )
       CALL ARR_INIT1L( .FALSE., NELM, SELECT, STATUS )
 
-*    Open the ARD file
+*  Open the ARD file
       CALL ARX_OPEN('READ',ARDID,STATUS)
       CALL ARX_READ('ARDFILE',ARDID,STATUS)
 
-*    Find the X and Y axis dimensions
-      CALL AXIS_TGET( FID, 'X pos', 'XDIM', NDIM, IMAX(1), STATUS )
-      IF (STATUS .NE. SAI__OK) GOTO 999
-      CALL AXIS_TGET( FID, 'Y pos', 'YDIM', NDIM, IMAX(2), STATUS )
-      IF (STATUS .NE. SAI__OK) GOTO 999
+*  Find the X and Y axis dimensions
+      CALL BDI0_FNDAXC( FID, 'X', IMAX(1), STATUS )
+      CALL BDI0_FNDAXC( FID, 'Y', IMAX(2), STATUS )
+      IF ( STATUS .NE. SAI__OK ) THEN
+        CALL ERR_ANNUL( STATUS )
+        CALL MSG_PRNT( 'Cannot identify X and Y axes, will use '/
+     :                 /'dimensions 1 and 2' )
+        IMAX(1) = 1
+        IMAX(1) = 2
+      END IF
 
-*    Create a dynamic array to hold the mask for the image region
+*  Create a dynamic array to hold the mask for the image region
       MDIM(1) = DIM(IMAX(1))
       MDIM(2) = DIM(IMAX(2))
       CALL DYN_MAPI(2,MDIM,MPNTR,STATUS)
-*
       IF (STATUS .NE. SAI__OK) THEN
-         CALL MSG_PRNT('Insufficient dynamic memory')
-         GOTO 999
+        CALL MSG_PRNT('Insufficient dynamic memory')
+        GOTO 999
       ENDIF
 
 *  Read the image axis units from the datafile
-      CALL BDI_GETAXUNITS( FID, IMAX(1), UNITS(1), STATUS)
-      CALL BDI_GETAXUNITS( FID, IMAX(2), UNITS(2), STATUS)
+      CALL BDI_AXGET0C( FID, IMAX(1), 'Units', UNITS(1), STATUS)
+      CALL BDI_AXGET0C( FID, IMAX(2), 'Units', UNITS(2), STATUS)
 
 *  Calculate the scale values of each axis
       DO LP=1,2
         BASE(LP) = AXLO(IMAX(LP))
         SCALE(LP) = (AXHI(IMAX(LP)) - AXLO(IMAX(LP))) /
      :                 REAL(DIM(IMAX(LP))-1)
-      ENDDO
+      END DO
 
-*    Use ARD to create image mask
+*  Use ARD to create image mask
       CALL ARX_MASK(ARDID,MDIM,BASE,SCALE,UNITS,%val(MPNTR),STATUS)
       IF (STATUS .NE. SAI__OK) GOTO 999
 
-*    Modify the full quality mask with the 2-d one just produced
+*  Modify the full quality mask with the 2-d one just produced
       CALL QUALITY_SETFSEL_ADDMASK( MDIM(1), MDIM(2), %val(MPNTR),
      :                              IMAX(1), IMAX(2), DIM(1), DIM(2),
      :                              DIM(3), DIM(4), DIM(5), DIM(6),
      :                              DIM(7), SELECT )
 
-*    Close the ARD file
+*  Close the ARD file
       CALL ARX_CLOSE(ARDID,STATUS)
 
-*    Abort point
+*  Abort point
  999  CONTINUE
 
       END
