@@ -1,0 +1,8 @@
+ndf,f,a,,,,"The NDF to be modified"
+posin,s,a,,,,"Position to be transformed"
+framein,s,a,"PIXEL",,,"Input co-ordinate Frame"
+frameout,s,h,INDEF,,,"Output co-ordinate Frame"
+epochin,r,a,,,,"Epoch of input position"
+epochout,r,a,,,,"Epoch of output position"
+posout,s,h," ",,,""
+quiet,b,h,n,,,"Suppress screen output?"
