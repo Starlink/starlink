@@ -5,10 +5,11 @@ Note not many of these are likely as time and funding are short...
 
   o CCD Mosaics
 
-     - Display CCD Mosaics as a single exposure
+     - Display CCD Mosaics as a single exposure, partially done, 
+       the blink compare toolbox will display side-by-side.
 
      - Display CCD Mosaics with correct orientations (using a tiling
-       scheme of some kind)
+       scheme of some kind), again partially done.
 
   o FITS images
 
@@ -28,11 +29,11 @@ Note not many of these are likely as time and funding are short...
   o Astrometry solutions
 
       - Add facilities for doing plate solutions (i.e. distorted
-        ones), probably using the new AUTOASTROM
+        ones), probably using the new AUTOASTROM. Done.
 
       - Display displacement vectors to display fit quality
 
-      - Support latest FITS-WCS projections
+      - Support latest FITS-WCS projections, on-going.
  
       - Read TAB tables directly
 
@@ -118,7 +119,7 @@ Note not many of these are likely as time and funding are short...
 
   o Blinking:
 
-      - pre-align images.
+      - pre-align images. Done.
 
   o Photom toolbox
      
@@ -138,11 +139,13 @@ Note not many of these are likely as time and funding are short...
         than the save graphics facilities) and to work with RA/DEC 
         coordinates. Idea is to have proper diagramming facilities.
 
-  o Image display:
-
-      - deal with small images better (5x5 size cannot see zoom)
-
   o On-help line:
   
       - get external links following to work and then add some.
 
+  o Command-line options.
+
+      - make it possible to load more than one catalogue.
+
+      - make it possible to load more than one image. Done see
+        "gaiadispmany" command.

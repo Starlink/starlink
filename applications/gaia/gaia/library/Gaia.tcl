@@ -129,7 +129,7 @@ Usage: gaia ?NDF/fitsFile? ?-option value ...?
 
 Options:
  -cat <bool>              - Include ESO/Archive catalog extensions (default).
- -catalog <name>          - Open a window for the given catalog on startup.
+ -catalog  "<c1> <c2> .." - Open windows for the given catalogs on startup.
  -colorramp_height <n>    - height of colorramp window (default: 12).
  -component <component>   - NDF component to display (one of: data, variance)
  -debug <bool>            - debug flag: run bg processes in fg.

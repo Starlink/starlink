@@ -91,3 +91,12 @@
   Experimental tabbed interface.
 
   Long (2 pixels) thin or tall images now display readout of positions.
+
+  The pix2wcs and wcs2pix scripts should be working again.
+
+  The displaycat command now creates fully functional catalogue windows
+  of the same kind as normal (this includes GAIA extensions to the Skycat
+  defaults).
+
+  The -catalog command-line option now accepts a list of catalogues to 
+  display immediately.

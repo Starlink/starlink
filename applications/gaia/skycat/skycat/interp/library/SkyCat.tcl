@@ -14,13 +14,14 @@
 # A.Brighton 11 Oct 95   created
 # P.W.Draper 19 Jan 00   added concat to bindtags, itk ones were
 #                        being lost. Removed extra ] from ]] in title string.
+#            18 Nov 03   Now accepts a list of catalogues to display.
 
 set skycat_usage {
 Usage: skycat ?fitsFile? ?-option value ...?
 
 Options:
  -cat <bool>              - Include ESO/Archive catalog extensions (default).
- -catalog <name>          - Open a window for the given catalog on startup.
+ -catalog \"<cat1> <cat2>\" - Open windows for the given catalogs on startup.
  -colorramp_height <n>    - height of colorramp window (default: 12).
  -float_panel <bool>      - put info panel in a popup window (default: 0).
  -panel_layout <layout>   - panel layout, one of: "saoimage", "reverse" or "default" .
@@ -121,16 +122,17 @@ itcl::class skycat::SkyCat {
 	    wm deiconify $w_
 	}
 	
-	if {"$itk_option(-catalog)" != ""} {
-	    # make sure we use full path name for local catalogs
-	    set f $itk_option(-catalog)
-	    if {[file exists $f] && "[string index $f 0]" != "/"} {
-		set itk_option(-catalog) [pwd]/$f
-	    }
-	    # open a window for the given catalog
-	    cat::AstroCat::open_catalog_window $itk_option(-catalog) \
-		[code $image_] ::skycat::SkySearch $itk_option(-debug) $w_
-	}
+        if {"$itk_option(-catalog)" != ""} {
+            # make sure we use full path name for local catalogs
+            # and process option as a list
+            foreach f "$itk_option(-catalog)" {
+               if {[file exists $f] && "[string index $f 0]" != "/"} {
+                   set $f [pwd]/$f
+               }
+               cat::AstroCat::open_catalog_window $f \
+                   [code $image_] ::skycat::SkySearch $itk_option(-debug) $w_
+            }
+        }
 	
 	# check the main window size to make sure it is not too large
 	bind SkyCat::resize <Configure> [code $this resize %w %h]
