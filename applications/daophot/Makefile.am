@@ -59,14 +59,14 @@ daophot_LDADD = $(LDADD) $(OBJECT_LIBS) `$(srcdir)/daophot_link`
 
 daocurs_SOURCES = daocurs.f
 daocurs_LDADD = $(LDADD) $(OBJECT_LIBS) `$(srcdir)/daophot_link_adam`
-daocurs_TASKS = daocurs
+daocurs_TASKS =
 
 daogrey_SOURCES = daogrey.f
 daogrey_LDADD = $(LDADD) $(OBJECT_LIBS) `$(srcdir)/daophot_link_adam`
-daogrey_TASKS = daogrey
+daogrey_TASKS =
 
 daoplot_SOURCES = daoplot.f
 daoplot_LDADD = $(LDADD) $(OBJECT_LIBS) `$(srcdir)/daophot_link_adam`
-daoplot_TASKS = daoplot
+daoplot_TASKS =
 
 
