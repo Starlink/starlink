@@ -6772,7 +6772,7 @@ package kappa {
             default !
          }
 
-         parametet undo {
+         parameter undo {
             type _LOGICAL
             ppath DEFAULT
             default FALSE
