@@ -251,7 +251,7 @@
          IF( NGOOD .EQ. 0 ) THEN
             TEXT = '    No good data found in aperture'
             CALL MSG_OUTIF( MSG__NORM, ' ', TEXT, STATUS )
-            CALL FIO_WRITE( MSG__NORM, ' ', TEXT, STATUS )
+            IF ( LOGING ) CALL FIO_WRITE( FD, TEXT, STATUS )
 
 *  Otherwise, calculate the total flux density in the aperture, in Jy.
          ELSE
@@ -299,7 +299,7 @@
       ELSE
          TEXT = '    Aperture has zero size'
          CALL MSG_OUTIF( MSG__NORM, ' ', TEXT, STATUS )
-         CALL FIO_WRITE( MSG__NORM, ' ', TEXT, STATUS )
+         IF ( LOGING ) CALL FIO_WRITE( FD, TEXT, STATUS )
 
       END IF
 
