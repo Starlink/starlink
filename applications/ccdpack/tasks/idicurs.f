@@ -46,6 +46,25 @@
 *     idicurs in
 
 *  ADAM Parameters:
+*     CENTROID = _LOGICAL (Read and Write)
+*        This parameter controls whether points marked on the image are
+*        to be centroided.  If true, then when you click on the image to
+*        add a new point IDICURS will attempt to find a centroidable
+*        object near to where the click was made and add the point
+*        there.  If no centroidable feature can be found nearby, you will 
+*        not be allowed to add a point.  Note that the centroiding
+*        routine is capable of identifying spurious objects in noise,
+*        but where a genuine feature is nearby this should find its
+*        centre.
+*
+*        Having centroiding turned on does not guarantee that all points
+*        on the image have been centroided, it only affects points
+*        added by clicking on the image.  In particular any points read
+*        from the INLIST file will not be automatically centroided.
+*
+*        This parameter only gives the initial centroiding state - 
+*        centroiding can be turned on and off interactively while the
+*        program is running.
 *     IN = LITERAL (Read)
 *        Gives the name of the NDFs to display and get coordinates from.
 *        If multiple NDFs are specified using wildcards or separating 
@@ -310,12 +329,13 @@
 *     and reset using the CCDSETUP and CCDCLEAR commands.
 *
 *     Some of the parameters (MAXCANV, PERCENTILES, WINX, WINY, ZOOM,
-*     MARKSTYLE) give initial values for quantities which can be modified 
-*     while the program is running.  Although these may be specified on
-*     the command line, it is normally easier to start the program up and
-*     modify them using the graphical user interface.  If the program
-*     exits normally, their values at the end of the run will be used
-*     as defaults next time the program starts up.
+*     MARKSTYLE, CENTROID) give initial values for quantities which 
+*     can be modified while the program is running.  Although these 
+*     may be specified on the command line, it is normally easier to 
+*     start the program up and modify them using the graphical user 
+*     interface.  If the program exits normally, their values at the 
+*     end of the run will be used as defaults next time the program 
+*     starts up.
       
 *  Authors:
 *     MBT: Mark Taylor (STARLINK)
@@ -330,6 +350,8 @@
 *     22-MAY-2001 (MBT):
 *        Changed so that an empty position list file is written when 
 *        there are no points rather than no file at all.
+*     19-JUL-2001 (MBT):
+*        Added CENTROID parameter.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -401,6 +423,7 @@
       INTEGER OLSTGR             ! GRP identifier for output position list files
       INTEGER UBND( 2 )          ! Upper NDF bounds
       INTEGER WINDIM( 2 )        ! Dimensions of display window
+      LOGICAL CENTRD             ! Centroid points marked on image?
       LOGICAL INEXT              ! True if input position list is in extension
       LOGICAL RDLIST             ! True if using initial position lists
       LOGICAL OVERWR             ! Overwrite input list file?
@@ -493,6 +516,7 @@
       CALL PAR_GET0I( 'WINX', WINDIM( 1 ), STATUS )
       CALL PAR_GET0I( 'WINY', WINDIM( 2 ), STATUS )
       CALL PAR_GET0C( 'MARKSTYLE', MSTYLE, STATUS )
+      CALL PAR_GET0L( 'CENTROID', CENTRD, STATUS )
 
 *  See if we are verbose.
       CALL PAR_GET0L( 'VERBOSE', VERBOS, STATUS )
@@ -683,8 +707,8 @@
          
 *  Invoke the Tcl code to do the work.
          CALL CCD1_TCURS( NDFNMS, NMEM, SNAME, DOMAIN, %VAL( IPII ),
-     :                    %VAL( IPXI ), %VAL( IPYI ), NPOSI, PERCNT,
-     :                    ZOOM, MAXCNV, WINDIM, MSTYLE, VERBOS, 
+     :                    %VAL( IPXI ), %VAL( IPYI ), NPOSI, VERBOS, 
+     :                    PERCNT, ZOOM, MAXCNV, WINDIM, MSTYLE, CENTRD,
      :                    IPIO, IPXO, IPYO, NPOSO, STATUS )
 
 *  If requested to do so, write the returned positions to an output 
@@ -817,6 +841,7 @@
       CALL PAR_PUT0I( 'WINX', WINDIM( 1 ), STATUS )
       CALL PAR_PUT0I( 'WINY', WINDIM( 2 ), STATUS )
       CALL PAR_PUT0C( 'MARKSTYLE', MSTYLE, STATUS )
+      CALL PAR_PUT0L( 'CENTROID', CENTRD, STATUS )
       CALL PAR_PUT1D( 'PERCENTILES', 2, PERCNT, STATUS )
 
 *  Exit on error label.

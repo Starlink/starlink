@@ -23,6 +23,8 @@
 #        Rewrote to accommodate change from IDI to Tcl GUI.
 #     9-APR-2001 (MBT):
 #        Upgraded for use with Sets.
+#     19-JUL-2001 (MBT):
+#        Added CENTROID parameter.
 #     {enter_changes_here}
 #-
 
@@ -189,6 +191,17 @@
             ppath CURRENT DEFAULT
             default {showindex=1}
             prompt {String giving style of markers to plot}
+            helpkey *
+         }
+
+         parameter centroid {
+                             # Do centroiding of added positions?
+            type _LOGICAL
+            access UPDATE
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default TRUE
+            prompt {Centroid each position added to image?}
             helpkey *
          }
             
