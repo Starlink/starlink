@@ -517,7 +517,6 @@
                   label $itk_component(plot$index:display).instruct$index \
                      -justify $side -text $msg
                }
-               global CCDdir
                itk_component add plot$index:arrow {
                   label $itk_component(plot$index:display).arrow$index \
                      -bitmap @$CCDdir/arrow_$side.xbm
@@ -942,6 +941,8 @@
       private variable plotted         ;# Array containing plot characteristics
       private variable showfits {}     ;# FITS headers to display for each NDF 
       private variable wcsframecontrol ;# Frame control widgets for each NDF
+
+      private common CCDdir $env(CCDPACK_DIR)
 
    }
 

@@ -74,9 +74,6 @@
          }
       }
 
-#  Perform miscellaneous initialisation.
-      tasksetup
-
 #  Initialise screen.
       wm withdraw .
 
