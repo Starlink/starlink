@@ -12,5 +12,5 @@ STAR_DEFAULTS(docs-only)
 
 STAR_LATEX_DOCUMENTATION([ssn29 ssn77 sun115 sun134 sun144 sun224 sun241])
 
-AC_CONFIG_FILES([Makefile component.xml])
+AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
