@@ -40,6 +40,7 @@ interface IRAF2NDF
       type        'NDF'
       access      'WRITE'
       vpath       'PROMPT'
+      ppath       'CURRENT'
       association '->GLOBAL.DATA_ARRAY'
       prompt      'Output NDF data structure'
       helpkey     '*'
