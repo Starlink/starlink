@@ -1,4 +1,4 @@
-\documentstyle{article} 
+\documentclass{article} 
 \pagestyle{myheadings}
 
 %------------------------------------------------------------------------------
@@ -58,6 +58,73 @@ RUTHERFORD APPLETON LABORATORY\\
 \begin{center}
 {\Large\bf Version 3.3}
 \end{center}
+
+\section{Notes on Unix version}
+
+This document describes the VAX/VMS version of CHART, rather than the
+version currently available on Starlink Unix systems. The following
+notes, which were originally due to Malcolm Currie, summarise the
+usage of CHART on Unix. There is little difference between the Unix
+and VAX/VMS versions of CHART, apart from the commands being in lower
+case, and the absence of the STOP command (on Unix there is no CHART
+environment so the STOP command is not needed).
+
+  The main stages are listed below.
+
+\begin{enumerate}
+
+\item From the Unix shell prompt type \texttt{chart} and a welcome message should appear and you are returned to the unix shell.
+
+\item Define the search parameters with \texttt{sset}
+and answer the prompts. If you do not know the meaning, enter \texttt{?} to
+get help for that parameter.
+
+\item Search the catalogues for the selected field centres: \texttt{search}
+
+\item Define the plot parameters: \texttt{oset}
+
+\item Plot the charts with \texttt{ploto}
+
+If it is a hardcopy device, there will be files called
+\texttt{gks74.ps}, \texttt{gks74.ps.1}, \texttt{gks74.ps.2} etc. that
+you will have to spool yourself.
+
+\item  Optionally list the stars found during the search. Use
+ \texttt{listo} to write to file \texttt{output.lis}, or
+ \texttt{typeo} to list the stars on the screen.
+
+\end{enumerate}
+
+After running CHART you will find a couple of files in the current
+directory: \texttt{chartint.dat} and \texttt{chartpar.dat} equivalent
+to \texttt{CHARTINT.DAT} and \texttt{CHARTPAR.DAT} as described in
+this document.
+
+There is another difference. In the VAX/VMS version of CHART you could
+change a single setting like
+
+\begin{verbatim}
+     OSET DEVICE PS_L
+\end{verbatim}
+
+to select a different graphics device, but now you would need to enter
+
+\begin{verbatim}
+     oset device=ps_l \\
+\end{verbatim}
+
+The  escaped  backslash  means accept the current values for the other
+parameters. To see the current parameter settings type
+
+\begin{verbatim}
+     display
+\end{verbatim}
+
+Note that this display alias clashes with \textsc{kappa}'s command of
+the same name.  If you need both, you can select CHART's
+display with \texttt{cht\_display}, and \textsc{kappa}'s with
+\texttt{kap\_display}.
+
 
 \section{Introduction}
 
@@ -1015,4 +1082,5 @@ environment') and Joe Vickerstaff (graphical output).
 
 Tim Wilkins (Manchester) did most of the work to convert CHART to use GKS~7.2. 
 \end{document}
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  
+
+
