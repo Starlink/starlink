@@ -49,6 +49,17 @@ following steps are required:
    and also make sure that an old-style Starlink system is not in your
    path (since tools like messgen will get very confused).
 
+ - Review any other environment variables that might affect the build.
+   For example, the variables F77, FC and CC will force the build
+   system to use the specified compilers.  In particular, the default
+   IRAF installation sets the F77 variable to be a script which works
+   happily in most cases, but which will _not_ work with libtool, and
+   will cause the build to fail with opaque error messages about being
+   `unable to infer tagged configuration'.  Unless you do wish to
+   force certain compilers to be used, it is probably better to unset
+   these variables before building the software.  See './configure
+   --help' for a list of `some influential environment variables'.
+
  - First build the buildsupport system (the tools in the buildsupport
    directory, plus third-party applications autoconf, automake and
    libtool).  Some of these applications have been patched
