@@ -499,9 +499,6 @@ static int EncodeFloat( char *, int, int, int, double );
 static int EncodeValue( AstFitsChan *, char *, int, int, const char * );
 static int KeyFields( AstFitsChan *, const char *, int, int *, int * );
 static int FindKeyCard( AstFitsChan *, const char *, const char *, const char * );
-#if FUNNY
-static int FindSkyAxes( AstFrame *, AstSkyFrame **, int *, int *);
-#endif
 static int FitsEof( AstFitsChan * );
 static int FitsGetCF( AstFitsChan *, const char *, double * );
 static int FitsGetCI( AstFitsChan *, const char *, int * );
@@ -537,17 +534,11 @@ static int WcsPrimary( AstFitsChan *, FitsStore * );
 static int WcsSecondary( AstFitsChan *, FitsStore * );
 static int WcsValues( AstFitsChan *, AstFrameSet *, int, int, int, int, FitsStore * );
 static int WcsWithWcs( AstFitsChan *, AstMapping *, AstMapping *, AstMapping *, AstFrame *, int, int, FitsStore * );
-#if FUNNY
-static int WrdSplit( const char *, int, const char *, int, const char *[], int [] );
-#endif
 static int Write( AstChannel *, AstObject * );
 static int WriteDSS( AstChannel *, AstObject * );
 static int WriteWcs( AstChannel *, AstObject * );
 static int astSplit_( const char *, char **, char **, char **, const char *, const char * );
 static void *CardData( AstFitsChan *, size_t * );
-#if FUNNY
-static void CheckFitsCard( int, const char *, const char *, const char * );
-#endif
 static void CheckZero( char *, double );
 static void CleanFits( FitsStore * );
 static void ClearAttrib( AstObject *, const char * );
@@ -875,216 +866,6 @@ static int CardType( AstFitsChan *this ){
    return ret;
 
 }
-
-#if FUNNY
-static void CheckFitsCard( int nc, const char *card, const char *method, 
-                           const char *class ){
-/*
-*  Name:
-*     CheckFitsCard
-
-*  Purpose:
-*     Check the syntax of a FITS header card.
-
-*  Type:
-*     Private function.
-
-*  Synopsis:
-*     #include "fitschan.h"
-*     void CheckFitsCard( int nc, const char *card, const char *method, 
-*                         const char *class )
-
-*  Class Membership:
-*     FitsChan member function.
-
-*  Description:
-*     Checks the syntax of the supplied FITS header card. Note, the 
-*     syntax of the value string is NOT checked.
-
-*  Parameters:
-*     nc
-*        Number of characters to be used from "card".
-*     card
-*        Pointer to a string holding the FITS header card.
-*     method
-*        Pointer to a string holding the name of the calling method.
-*        This is only for use in constructing error messages.
-*     class 
-*        Pointer to a string holding the name of the supplied object class.
-*        This is only for use in constructing error messages.
-
-*  Notes:
-*     -  An error is reported if the supplied string does not conform to
-*     the requirements of a FITS header card.
-*/
-
-/* Local Variables: */
-   char name[ FITSNAMLEN + 1 ]; /* Null-terminated keyword name */
-   const char *words[4];      /* Pointers to first 4 words */
-   int i;                     /* Word index */
-   int ncw[4];                /* Lengths of first 4 words */
-   int nwrd;                  /* Number of words found */
-
-/* Check the global status. */
-   if( !astOK ) return;
-
-/* Get pointers to the start of the first four words in the supplied card, 
-   and the corresponding word lengths. */
-   nwrd = WrdSplit( card, nc, " =/", 4, words, ncw );
-
-/* Discount any words following a "/" character. */
-   for( i = 0; i < nwrd; i++ ){
-      if( *( words[ i ] ) == '/' ){
-         nwrd = i;
-         break;
-      }
-   }
-
-/* If the first 8 columns of the card are empty it is a legal comment card. */
-   if( nwrd > 0 && words[ 0 ] - card < FITSNAMLEN ) {
-
-/* Otherwise, the number of leading spaces should be zero. */
-      if( words[ 0 ] - card > 0 ){
-         astError( AST__BDFTS, "%s(%s): Illegal leading spaces found.",
-                   method, class );
-
-/* The first word should not be longer than FITSNAMLEN characters. */
-      } else if( ncw[ 0 ] > FITSNAMLEN ){
-         astError( AST__BDFTS, "%s(%s): The first word (the keyword name) "
-                   "is longer than %d characters.", method, class, 
-                   FITSNAMLEN );
-
-/* Otherwise, if at least two words were found... */
-      } else if( nwrd > 1 ){
-
-/* If the second word starts too soon, report an error. */
-         if( words[ 1 ] - card < FITSNAMLEN ){
-
-            if( *words[ 1 ] == '=' ){
-               astError( AST__BDFTS, "%s(%s): Equals sign ('=') "
-                         "found earlier than column %d.", method, 
-                         class, FITSNAMLEN + 1 );
-            } else {
-               astError( AST__BDFTS, "%s(%s): The second word starts "
-                         "earlier than column %d.", method, class, 
-                         FITSNAMLEN + 1 );
-            }
-         
-         } else { 
-
-/* The Syntax of HISTORY, COMMENT and blank keyword cards is free, so don't
-   do any further checks on these cards. */
-            if( Ustrncmp( "HISTORY", words[ 0 ], 7 ) &&
-                Ustrncmp( "COMMENT", words[ 0 ], 7 ) &&
-               words[ 0 ] - card < FITSNAMLEN ){
-
-/* If there is an equals sign in column 9, the keyword should have a value,
-   otherwise the remainder of the card is considered a comment. */
-               if( card[ FITSNAMLEN ] == '=' ){
-
-/* If there is no value (i.e. third word), report an error. */
-                  if( nwrd < 3 ){
-                     astError( AST__BDFTS, "%s(%s): No keyword value "
-                               "supplied.", method, class );
-
-/* Otherwise, report an error if the value starts too early. */
-                  } else if( words[ 2 ] - card < FITSNAMLEN + 2 ){
-                     astError( AST__BDFTS, "%s(%s): Keyword value starts "
-                               "ealier than column %d.", method, class, 
-                               FITSNAMLEN + 3 );
-
-/* If the value consists of a single letter belonging to the
-   set "tfTFynYN", it is a logical value. Report an error if it is in the
-   wrong column. */
-                  } else if( ncw[ 2 ] == 1 && strchr( "tfTFynYN", 
-                                                      *(words[ 2 ]) ) ){
-                     if( words[ 2 ] - card != FITSRLCOL - 1 ){
-                        astError( AST__BDFTS, "%s(%s): Logical value "
-                                  "'%c' not in column %d.", method, class,
-                                  *( words[ 2 ] ), FITSRLCOL );
-                     }
-
-/* If the value starts with a single quote it is a string value. Otherwise it
-   should be a numerical value. */
-                  } else if( *(words[ 2 ]) != '\'' ){
-
-/* Report an error if the first character is not legal within a numerical
-   value. */
-                     if( !strchr( "0123456789.-+", *(words[ 2 ]) ) ){
-                        astError( AST__BDFTS, "%s(%s): String keyword value "
-                                  "does not start with a quote mark.",
-                                  method, class );
-
-/* Otherwise, report an error if the 3rd word ends earlier than column 30. */
-                     } else if( words[ 2 ] - card + ncw[ 2 ] < FITSRLCOL ){
-                        if( nwrd > 3 ){
-                           astError( AST__BDFTS, "%s(%s): Real part of "
-                                     "complex keyword value ends earlier "
-                                     "than column %d.", method, class,
-                                     FITSRLCOL );
-                        } else {
-                           astError( AST__BDFTS, "%s(%s): Numerical keyword "
-                                     "value ends earlier than column %d.", 
-                                     method, class, FITSRLCOL );
-                        }
-
-/* Otherwise, report an error if the 3rd word ends later than column 30. */
-                     } else if( words[ 2 ] - card + ncw[ 2 ] > FITSRLCOL ){
-                        if( nwrd > 3 ){
-                           astError( AST__BDFTS, "%s(%s): Real part of "
-                                     "complex keyword value extends beyond "
-                                     "column %d.", method, class,
-                                     FITSRLCOL );
-                        } else {
-                           astError( AST__BDFTS, "%s(%s): Numerical keyword "
-                                     "value extends beyond column %d.", 
-                                     method, class, FITSRLCOL );
-                        }
-
-                     }
-
-/* If the value is complex, report an error if the 4th word ends earlier than 
-   column 50. */
-                     if( astOK && nwrd > 3 ){                  
-                        if( words[ 3 ] - card + ncw[ 3 ] < FITSIMCOL ){
-                           astError( AST__BDFTS, "%s(%s): Imaginary part of "
-                                     "complex keyword value ends earlier "
-                                     "than column %d.", method, class,
-                                     FITSIMCOL );
-
-/* Otherwise, report an error if the 3rd word ends later than column 50. */
-                        } else if( words[ 3 ] - card + ncw[ 3 ] > FITSIMCOL ){
-                           astError( AST__BDFTS, "%s(%s): Imaginary part of "
-                                     "complex keyword value extends beyond "
-                                     "column %d.", method, class,
-                                     FITSIMCOL );
-                        }
-
-                     }
-
-                  }
-
-               }
-
-/* Check that there are no illegal characters in the keyword name. */
-               strncpy( name, words[ 0 ], FITSNAMLEN );
-               name[ ncw[ 0 ] ] = 0;
-               (void) CheckFitsName( name, method, class );
-
-            }
-               
-         }
-          
-      }
-
-   }
-
-   if( !astOK ){
-      astError( astStatus, "%s(%s): Unable to store the following FITS "
-                "header card:\n%s\n", method, class, card );
-   }
-}
-#endif
 
 static int CheckFitsName( const char *name, const char *method, 
                           const char *class ){
@@ -4286,154 +4067,6 @@ static int FindKeyCard( AstFitsChan *this, const char *name,
    return ret;
 
 }
-
-#if FUNNY
-static int FindSkyAxes( AstFrame *frame, AstSkyFrame **sframe,
-                        int *axlon, int *axlat ){
-/*
-*  Name:
-*     FindSkyAxes
-
-*  Purpose:
-*     Search a Frame for a pair of longitude/latitude axes.
-
-*  Type:
-*     Private function.
-
-*  Synopsis:
-*     #include "fitschan.h"
-
-*  Class Membership:
-*     FitsChan member function.
-*     int FindSkyAxes( AstFrame *frame, AstSkyFrame **sframe, 
-*                      int *axlon, int *axlat )
-
-*  Description:
-*     This function searches the supplied Frame (which may be a
-*     CmpFrame) for a pair of matching longitude and latitude 
-*     axes. If such a pair is found, the axis indices within the
-*     supplied Frame are returned, together with a pointer to the
-*     SkyFrame containing the longitude and latitude axes.
-
-*  Parameters:
-*     frame
-*        Pointer to the Frame to be searched.
-*     sframe
-*        Address of a location at which to return a pointer to the
-*        SkyFrame containing the latitude and longitude axies. A 
-*        NULL pointer is returned if no suitable sky axes are found,
-*        or an error occurs.
-*     axlon
-*        Address of a location at which to return the index of the 
-*        longitude axis within the supplied frame. This is returned 
-*        as zero if no suitable sky axes are found or an error occurs.
-*     axlat
-*        Address of a location at which to return the index of the 
-*        latitude axis within the supplied frame. This is returned 
-*        as zero if no suitable sky axes are found or an error occurs.
-
-*  Returned Value:
-*     Zero if no suitable sky axes are found, one otherwise.
-
-*  Notes:
-*     -  The returned SkyFrame pointer should be annulled when no longer
-*     needed.
-*     -  A value of zero is returned if an error has occurred, or if this
-*     function should fail for any reason. 
-*/
-
-/* Local Variables: */
-   AstFrame *prmfrm;          /* Pointer to primary frame */
-   AstFrame *skyfrm;          /* Pointer to first primary SkyFrame found */
-   int axis;                  /* Axis index within supplied frame */
-   int latax;                 /* Index of latitude axis within supplied frame */
-   int lonax;                 /* Index of longitude axis within supplied frame */
-   int naxis;                 /* Number of axes within supplied frame */
-   int pax;                   /* Axis index within primary frame */
-   int ret;                   /* Returned function value */
-
-/* Initialise the retruend values. */
-   if( sframe ) *sframe = NULL;
-   if( axlon ) *axlon = 0;
-   if( axlat ) *axlat = 0;
-
-/* Check the inherited status, and the supplied frame. */
-   if( !astOK || !frame ) return 0;
-
-/* Initialise the returned flag to indicate that no suitable
-   sky axes have been found in the supplied Frame. */
-   ret = 0;
-
-/* Get the number of axes in the supplied Frame. */
-   naxis = astGetNin( frame );
-
-/* Loop round each axis... */
-   skyfrm = NULL;    
-   latax = -1;
-   lonax = -1;
-   for( axis = 0; axis < naxis; axis++ ){
-
-/* Get the primary frame from which the current axis was derived,
-   and its index within that frame . */
-      astPrimaryFrame( frame, axis, &prmfrm, &pax );
-
-/* If the primary frame is a SkyFrame, then we have a longitude or
-   latitude axis. */
-      if( astIsASkyFrame( prmfrm ) ){
-
-/* If this is the first SkyFrame to be found, take a clone of the 
-   SkyFrame pointer. */
-         if( !skyfrm ) skyfrm = astClone( prmfrm );
-
-/* Ignore the current axis if it is not derived from the first 
-   SkyFrame found. */
-         if( prmfrm == skyfrm ){
-
-/* Axis zero in the original SkyFrame is the longitude axis, and
-   axis one is the latitude axis. */
-            if( pax == 0 ) {
-               lonax = axis;
-            } else {
-               latax = axis;
-            }
-
-         }
-
-      }
-
-/* Annul the primary Frame pointer. */
-      prmfrm = astAnnul( prmfrm );
-
-   }
-
-/* If both axes were found, return the required information. */
-   if( skyfrm ){
-
-      if( latax != -1 && lonax != -1 ){
-         if( sframe ) *sframe = astClone( skyfrm );
-         if( axlon ) *axlon = lonax;
-         if( axlat ) *axlat = latax;
-         ret = 1;
-      }
-
-/* Annul the primary sky frame */
-      skyfrm = astAnnul( skyfrm );
-   }
-
-/* If an error has occurred, annull the returned Frame pointer, and 
-   return zero for the two axes, and a function value of zero. */
-   if( !astOK ){
-      if( sframe ) *sframe = astAnnul( *sframe );
-      if( axlon ) *axlon = 0;
-      if( axlat ) *axlat = 0;
-      ret = 0;
-   }
-
-/* Return the answer. */
-   return ret;
-
-}
-#endif
 
 static const char *FindWcs( AstFitsChan *this ){
 /*
@@ -13604,12 +13237,7 @@ static int WcsPrimary( AstFitsChan *this, FitsStore *store ){
 
 /* Format the keyword name and comment. */
             sprintf( keyname, fmt, i + 1, j + 1 );
-#ifdef FUNNY
-           sprintf( comment, "Axis rotation and scaling matrix",
-                     i + 1, j + 1 );
-#else
-           sprintf( comment, "Axis rotation and scaling matrix" );
-#endif
+            sprintf( comment, "Axis rotation and scaling matrix" );
 
 /* Get the CD element value, replacing missing PC values with their 
    defaults (1.0 for diagonal elements, 0.0 for others). */
@@ -13635,11 +13263,7 @@ static int WcsPrimary( AstFitsChan *this, FitsStore *store ){
          for( i = 0; i < store->naxis; i++ ){
             for( j = 0; j < store->naxis; j++ ){
                sprintf( keyname, "PC%.3d%.3d", i + 1, j + 1 );
-#ifdef FUNNY
-               sprintf( comment, "Axis rotation matrix", i + 1, j + 1 );
-#else
                sprintf( comment, "Axis rotation matrix" );
-#endif
                SetValue( this, keyname, (void *) (pc++), AST__FLOAT, comment );
             }
          }
@@ -14626,130 +14250,6 @@ static int WcsWithWcs( AstFitsChan *this, AstMapping *map1, AstMapping *map2,
    return ret;
 
 }
-
-#if FUNNY
-static int WrdSplit( const char *text, int n, const char *delim, int maxwrd, 
-                     const char *pnt[], int nc[] ){
-/*
-*  Name:
-*     WrdSplit
-
-*  Purpose:
-*     Split a string into words.
-
-*  Type:
-*     Private function.
-
-*  Synopsis:
-*     #include "fitschan.h"
-*     int WrdSplit( const char *text, int n, const char *delim, int maxwrd, 
-*                   char *pnt[], int nc[] )
-
-*  Class Membership:
-*     FitsChan member function.
-
-*  Description:
-*     Pointers to the starts of the first "maxwrd" words within "text"
-*     are returned, together with the corresponding word lengths. The
-*     word delimiters may be specified. Word delimiters other than spaces
-*     are treated as whole word in themselves. Thus if the delimiter was
-*     "=", the string "CRVAL1=1.0" would be split into three words:
-*     "CRVAL1", "=", "1.0".
-
-*  Parameters:
-*     text
-*        Text string to be split.
-*     n
-*        The maximum number of characters to read from "text".
-*     delim
-*        String holding word delimiters. 
-*     maxwrd
-*        The maximum number of words to find.
-*     pnt
-*        A pointer to an array of character string pointers containing at 
-*        least "maxwrd" elements. This array is returned holding pointers
-*        to the start of up to "maxwrd" words within "text".
-*     nc
-*        A pointer to an array of integer containing at least "maxwrd" 
-*        elements. This array is returned holding the number of characters
-*        in up to "maxwrd" words within "text".
-
-*  Returned Value:
-*     The number of words found. This will never be larger than "maxwrd".
-
-*  Notes:
-*     -  Zero will be returned if an error has already occurred.
-
-*/
-
-/* Local Variables: */
-   const char *c;          /* Pointer to next character */
-   const char *last;       /* Pointer to last usable character */
-   const char *start;      /* Pointer to start of word */
-   int i;                  /* Word index */
-   int nwrd;               /* Word count */
-
-/* Initialise the returned values. */
-   for( i = 1; i < maxwrd; i++ ){
-      pnt[ i ] = NULL;
-      nc[ i ] = 0;
-   }
-   nwrd = 0;
-
-/* Check the global status. */
-   if( !astOK ) return nwrd;
-
-/* Store a pointer to the last character to be used. */
-   last = text + n - 1;
-
-/* Initialise a pointer to the start of the next word in the string. */
-   c = text;
-
-/* Loop round reading words. */
-   for( i = 0; i < maxwrd; i++ ){   
-
-/* Get a pointer to the next non-space character. */
-      start = c + (int) strspn( c, " " );
-
-/* If we have gone beyond the end of the part of the string to be used, 
-   break out of the loop. */
-      if( start > last ) {
-         break;
-
-/* Otherwise, store the pointer to the start of the word in the returned 
-   array. */
-      } else {
-         pnt[ i ] = start;
-
-/* If the first non-space character is a delimiter, use the single delimiter 
-   character as the whole word. */
-         if( strchr( delim, *start ) ){
-            nc[ i ] = 1;
-
-/* If the first non-space character is not a delimiter, the word ends
-   at the next delimiter. */
-         } else {
-            nc[ i ] = (int) strcspn( start, delim );
-         }
-
-/* Restrict the word length so that it does not extend beyond the
-   end of the usable string. */
-         if( nc[ i ] - 1 > last - start ) nc[ i ] = (int)( last - start ) + 1;         
-
-/* Increment the number of words stored. */
-         nwrd++;
-
-/* Move the pointer to the first character following the current word. */
-         c = start + nc[ i ];         
-         
-      }
-      
-   }
-   
-   return nwrd;
-
-}
-#endif
 
 static int Write( AstChannel *this_channel, AstObject *object ) {
 /*

@@ -2377,7 +2377,6 @@ static int Match( AstFrame *template_frame, AstFrame *target,
    AstFrame *frame0;             /* Pointer to Frame underlying axis 0 */
    AstFrame *frame1;             /* Pointer to Frame underlying axis 1 */
    AstSkyFrame *template;        /* Pointer to template SkyFrame structure */
-   int flags;                    /* Template matching flags */
    int iaxis0;                   /* Axis index underlying axis 0 */
    int iaxis1;                   /* Axis index underlying axis 1 */
    int match;                    /* Coordinate conversion possible? */
@@ -3263,7 +3262,7 @@ static double ReadDateTime( const char *value ) {
 
 /* Look the month up in the table of months and generate the required month
    number. */
-            if ( ptr = strstr( table, lcmonth ) ) {
+            if ( ( ptr = strstr( table, lcmonth ) ) ) {
                month = 1 + ( ptr - table ) / 4;
 
 /* If the lookup failed, report an error. */
@@ -3468,7 +3467,6 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* Local Vaiables: */
    AstSkyFrame *this;            /* Pointer to the SkyFrame structure */
    AstSkySystemType system_code; /* System type code */
-   char jb[ 2 ];                 /* "J" or "B" string */
    double mjd;                   /* Modified Julian Date */
    int astime;                   /* Value of AsTime attribute */
    int axis;                     /* Axis index */
@@ -3765,10 +3763,8 @@ static int SubFrame( AstFrame *target_frame, AstFrame *template,
    AstSkyFrame *temp;            /* Pointer to copy of target SkyFrame */
    int match;                    /* Coordinate conversion is possible? */
    int perm[ 2 ];                /* Permutation array for axis swap */
-   int result_axis;              /* Result Frame axis index */
    int result_swap;              /* Swap result SkyFrame coordinates? */
    int target_axis;              /* Target SkyFrame axis index */
-   int target_naxes;             /* Number of target SkyFrame axes */
    int target_swap;              /* Swap target SkyFrame coordinates? */
 
 /* Initialise the returned values. */
@@ -4898,7 +4894,6 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
    double dval;                  /* Double value */
    int bessyr;                   /* Format as Besselian years (else Julian) */
    int helpful;                  /* Helpful to display un-set value? */
-   int ival;                     /* Integer value */
    int set;                      /* Attribute value set? */
 
 /* Check the global error status. */
