@@ -41,7 +41,7 @@ lutedit.help lutedit.tcl cpoint.bit dpoint.bit minus.bit plus.bit \
 unzoom.bit uparrow.bit cpoint.bit dpoint.bit
 
 # The contents of the kappa_iraf.tar file:
-KAPPA_IRAF = doc log10.cl loge.cl exp10.cl expe.cl \
+KAPPA_IRAF = doc log10.cl loge.cl exp10.cl expe.cl lutcold.cl \
 fitsexist.cl fitsval.cl fitswrite.cl kappa.cl lutbgyrw.cl lutwarm.cl \
 lutcol.cl lutcont.cl lutfc.cl lutgrey.cl lutheat.cl lutikon.cl lutneg.cl \
 lutramps.cl lutread.cl lutspec.cl lutzebra.cl picbase.cl picdata.cl \
@@ -78,7 +78,7 @@ _kappa.hd kappa.men helpdb.mip profile.par listshow.par listmake.par \
 wcsadd.par wcsalign.par wcsattrib.par wcscopy.par wcsframe.par \
 wcsremove.par wcsshow.par chain.par reshape.par copybad.par wcstran.par \
 scatter.par lutcont.par lutheat.par lutramps.par picbase.par piclast.par \
-lutbgyrw.par lutwarm.par lutfc.par lutikon.par lutspec.par picdata.par lutcol.par \
+lutbgyrw.par lutwarm.par lutcold.par lutfc.par lutikon.par lutspec.par picdata.par lutcol.par \
 lutgrey.par lutneg.par lutzebra.par picframe.par kapversion.par
 
 #  Contents of the doc/ directory in kappa_iraf.tar
@@ -99,7 +99,7 @@ hiscom.hlp hislist.hlp hisset.hlp histat.hlp histeq.hlp histogram.hlp \
 ardplot.hlp \
 interaction_mode.hlp kaphelp.hlp kappa.hlp kstest.hlp laplace.hlp \
 linplot.hlp log10.hlp logar.hlp loge.hlp look.hlp lucy.hlp lutable.hlp \
-lutbgyrw.hlp lutwarm.hlp lutcol.hlp lutcont.hlp lutfc.hlp lutgrey.hlp \
+lutbgyrw.hlp lutwarm.hlp lutcold.hlp lutcol.hlp lutcont.hlp lutfc.hlp lutgrey.hlp \
 lutheat.hlp lutikon.hlp lutneg.hlp lutramps.hlp lutread.hlp \
 lutsave.hlp lutspec.hlp lutview.hlp lutzebra.hlp \
 makesurface.hlp manic.hlp maths.hlp median.hlp mem2d.hlp mlinplot.hlp \
@@ -129,7 +129,7 @@ KAPPA_DATA = bgyrw_lut.sdf cont_lut.sdf fc_lut.sdf heat_lut.sdf ikon_lut.sdf \
 ramps_lut.sdf spectrum_lut.sdf zebra_lut.sdf ccdframec.sdf comwest.sdf \
 spectrum.sdf m31.sdf iras.sdf grey_lut.sdf m31_issa_100.sdf \
 m31_issa_12.sdf m31_issa_25.sdf m31_issa_60.sdf m57.sdf logo.sdf \
-logo_lut.sdf warm_lut.sdf m31_arm.FIT scupol_i.sdf scupol_p.sdf \
+logo_lut.sdf warm_lut.sdf cold_lut.sdf m31_arm.FIT scupol_i.sdf scupol_p.sdf \
 scupol_ang.sdf m31_issa_12a.sdf cobe.sdf ccdframec.FIT scumos.sdf
 
 # The contents of the kappa_ifls.tar file:
@@ -191,19 +191,23 @@ kps1_dscli.f kps1_dsclr.f kps1_dsclw.f kps1_stpab.f kps1_stpad.f \
 kps1_stpai.f kps1_stpar.f kps1_stpaub.f kps1_stpauw.f kps1_stpaw.f \
 kps1_thgtb.f kps1_thgtd.f kps1_thgti.f kps1_thgtr.f kps1_thgtub.f \
 kps1_thgtuw.f kps1_thgtw.f kps1_prmxb.f kps1_prmxub.f kps1_prmxd.f \
-kps1_prmxuw.f kps1_prmxi.f kps1_prmxw.f kps1_prmxr.f
+kps1_prmxuw.f kps1_prmxi.f kps1_prmxw.f kps1_prmxr.f kps1_apadb.f \
+kps1_apadub.f kps1_apadd.f kps1_apaduw.f kps1_apadi.f kps1_apadw.f \
+kps1_apadr.f kps1_ardmb.f kps1_ardmd.f kps1_ardmi.f kps1_ardmr.f \
+kps1_ardmub.f kps1_ardmuw.f kps1_ardmw.f kps1_laplb.f kps1_lapld.f \
+kps1_lapli.f kps1_laplr.f kps1_laplub.f kps1_lapluw.f kps1_laplw.f 
 
 # Generic source files needed for kapsub_sub.tar:
 KAPSUB_GEN = kps1_spar.gen kps1_pgft.gen kps1_clps.gen kps1_dscl.gen \
-kps1_stpa.gen kps1_thgt.gen kps1_prmx.gen
+kps1_stpa.gen kps1_thgt.gen kps1_prmx.gen kps1_apad.gen kps1_ardm.gen \
+kps1_lapl.gen
 
 # Non-generic source files needed for kapsub_sub.tar :
 KAPSUB_NONGEN = apadsb.f cnthlt.f cntkey.f cntsbp.f crfrsb.f curre.f \
 ftsize.f ftsizt.f gethlp.f getv2.f gltbsb.f gltclt.f gltcsb.f hstdsp.f \
 hstlo.f hstrep.f imlst.f inhi.f inpe.f inpol.f inre.f insl.f inva.f \
 inxy.f kps1_agncm.f kps1_agncp.f kps1_agncv.f kps1_agndl.f kps1_agndr.f \
-kps1_agnls.f kps1_agnms.f kps1_agnst.f kps1_ardmb.f kps1_ardmd.f \
-kps1_ardmi.f kps1_ardmr.f kps1_ardmub.f kps1_ardmuw.f kps1_ardmw.f \
+kps1_agnls.f kps1_agnms.f kps1_agnst.f \
 kps1_bafid.f kps1_bafir.f kps1_cff2d.f kps1_cff2r.f kps1_clnsd.f \
 kps1_clnsi.f kps1_clnsr.f kps1_clpal.f kps1_cnsed.f kps1_cnser.f \
 kps1_cntdr.f kps1_cntgd.f kps1_cntur.f kps1_cnvfp.f kps1_cnvlv.f kps1_cnvrp.f \

@@ -1,338 +1,315 @@
-*+  OUTSET - Sets pixels outside a specified circle in a 2-d data array
-*            to a specified value
+      SUBROUTINE OUTSET( STATUS )
+*+
+*  Name:
+*     OUTSET
 
-      SUBROUTINE OUTSET ( STATUS )
-*
-*    Description :
-*
-*     A circle of a given centre and diameter within the 2-d data array
-*     of the input IMAGE structure is specified.  The data array written
-*     to the output IMAGE structure, is a copy of the input data array
-*     except pixels outside the circle are set to a specified value.
-*
-*    Invocation :
-*
+*  Purpose:
+*     Mask pixels inside or outside a specified circle in a 2-d NDF.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
 *     CALL OUTSET( STATUS )
-*
-*    Parameters :
-*
-*     INPIC  =  IMAGE( READ )
-*         IMAGE structure containing the array to be modified
-*     OUTPIC  =  IMAGE( WRITE )
-*         Output IMAGE structure containing the modified array
-*     OTITLE  =  CHARACTER( READ )
-*         Title for the output IMAGE structure
-*     XCENTRE  =  REAL( READ )
-*         x co-ordinate of the centre of the circle to be used
-*     YCENTRE  =  REAL( READ )
-*         y co-ordinate of the centre of the circle to be used
-*     DIAMETER  =  REAL( READ )
-*         Diameter of the circle to be used
-*     NEWVAL  =  LITERAL( READ )
-*         Value to replace old values in the pixels outside the circle.
-*         If this is set to 'Bad' the magic-value is used.
-*
-*    Arguments:
-*
-*     STATUS  = INTEGER( READ, WRITE )
-*         Global status value
-*
-*    Method :
-*
-*     Check status on entry - return if not o.k.
-*     Get input IMAGE structure
-*     If no error then
-*        Try to map a data-array component
-*        If no error then
-*           Output dimensions of input array
-*           Get x,y centre and diameter of circle to be taken, and
-*            value to be substituted for pixels outside the circle
-*           If no error then
-*              Create an output structure to hold processed image
-*              Propagate NDF QUALITY and MORE from the input data file
-*              If no error then 
-*                 Map a data-array component in the output structure
-*                 If no error then
-*                    Call working subroutine to copy input data array
-*                      into output one, except outside defined circle
-*                      where input new value is substituted
-*                    Unmap output data array
-*                 Else
-*                    Report error
-*                 Endif
-*                 Annul output IMAGE structure
-*              Else
-*                 Report error
-*              Endif
-*           Else
-*              Report error
-*           Endif
-*           Unmap input data array
-*        Else
-*           Report error
-*        Endif
-*        Tidy up input structure
-*     Else
-*        Report error
-*     Endif
-*     End
-*
-*    Bugs :
-*
-*     None known.
-*
-*    Authors :
-*
-*     Mark McCaughrean UoE (REVA::MJM)
-*     Malcolm Currie  STARLINK (RAL::CUR)
-*
-*    History :
-*
-*     17-09-1985 : First implementation (REVA::MJM)
-*     03-07-1986 : Tidied and more error checking (REVA::MJM)
-*     1986 Aug 7 : Renamed algorithmic routine to OTSTSB, reordered
-*                  arguments (2nd to 7th). (RAL::CUR).
-*     1986 Aug 29: Added arguments section to the prologue, nearly
-*                  conformed to Starlink standards (RAL::CUR).
-*     1988 Mar 17: Referred to `array' rather than `image'
-*                  (RAL::CUR)
-*     1988 May 31: More reporting of error context (RAL::CUR)
-*     1989 Jun 13: Allow for processing primitive NDFs (RAL::CUR)
-*     1989 Aug  8: Passed array dimensions as separate variables
-*                  to OTSTSB (RAL::CUR).
-*     1990 Oct  9: x-y centre is co-ordinates rather than pixel
-*                  indices; added bad-value option for the replacement
-*                  value (RAL::CUR).
-*     1991 Oct 25: Propagates AXIS, UNITS, LABEL, and HISTORY
-*                  (RAL::CUR).
-*     1992 Feb 25: Limited processing of simple NDFs (RAL::CUR).
-*     1992 Mar  3: Replaced AIF parameter-system calls by the extended
-*                  PAR library (RAL::CUR).
-*
-*    Type Definitions :
 
-      IMPLICIT NONE            ! no default typing allowed
+*  Arguments:   
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
 
-*    Global constants :
+*  Description:
+*     This routine assigns a specified value (which may be "bad") to
+*     either the outside or inside of a specified circle within a
+*     specified component of a given 2-dimensional NDF.
 
-      INCLUDE 'SAE_PAR'        ! SSE global definitions
-      INCLUDE 'DAT_PAR'        ! Data-system constants
-      INCLUDE 'PAR_ERR'        ! parameter-system errors
-      INCLUDE 'PRM_PAR'        ! Bad-pixel and extreme value constants
+*  Usage:
+*     outset in out centre diam 
 
-*    Status :
+*  ADAM Parameters:
+*     CENTRE = LITERAL (Read)
+*        The co-ordinates of the centre of the circle. The position must
+*        be given in the current co-ordinate Frame of the NDF (supplying 
+*        a colon ":" will display details of the current co-ordinate
+*        Frame). The position should be supplied as a list of formatted 
+*        axis values separated by spaces or commas. See also parameter 
+*        USEAXIS. The current co-ordinate Frame can be changed using
+*        KAPPA:WCSFRAME.
+*     COMP = LITERAL (Read)
+*        The NDF array component to be masked.  It may be "Data", or
+*        "Variance", or "Error" (where "Error" is equivalent to 
+*        "Variance"). ["Data"]
+*     CONST = LITERAL (Given)
+*        The constant numerical value to assign to the masked pixels, or 
+*         the string "bad". ["bad"]
+*     DIAM = LITERAL (Read)
+*        The diameter of the circle. If the current co-ordinate Frame of 
+*        the NDF is a SKY Frame (e.g. RA and DEC), then the value should be
+*        supplied as an increment of celestial latitude (e.g. DEC). Thus,
+*        "10.2" means 10.2 arc-seconds, "30:0" would mean 30 arc-minutes,
+*        and "1:0:0" would mean 1 degree. If the current co-ordinate
+*        Frame is not a SKY Frame, then the diameter should be specified 
+*        as an increment along axis 1 of the current co-ordinate Frame.
+*        Thus, if the current Frame is PIXEL, the value should be given
+*        simply as a number of pixels.
+*     IN = NDF (Read)
+*        The name of the source NDF.
+*     INSIDE = _LOGICAL (Read)
+*        If a TRUE value is supplied, the constant value is assigned to the 
+*        inside of the circle. Otherwise, it is assigned to the outside. [FALSE]
+*     OUT = NDF (Write)
+*        The name of the masked NDF.
+*     TITLE = LITERAL (Read)
+*        Title for the output NDF structure.  A null value (!)
+*        propagates the title from the input NDF to the output NDF. [!]
 
-      INTEGER STATUS
+*  Examples:
+*     outset neb1 nebm "13.5,201.3" 20 const=0
+*        This copies NDF "neb1" to "nebm", setting pixels to zero in the
+*        DATA array if they fall outside the specified circle. Assuming the 
+*        current co-ordinate Frame of neb1 is PIXEL, the circle is centred 
+*        at pixel co-ordinates (13.5, 201.3) and has a diameter of 20 pixels. 
+*     outset neb1 nebm "15:23:43.2 -22:23:34.2" "10:0" inside comp=var
+*        This copies NDF "neb1" to "nebm", setting pixels bad in the
+*        VARIANCE array if they fall inside the specified circle. Assuming 
+*        the current co-ordinate Frame of neb1 is a SKY Frame describing RA 
+*        and DEC, the aperture is centred at RA 15:23:43.2 and 
+*        DEC -22:23:34.2, and has a diameter of 10 arc-minutes.
 
-*    Local Constants :
+*  Implementation Status:
+*     -  This routine correctly processes the WCS, AXIS, DATA, QUALITY,
+*     LABEL, TITLE, UNITS, HISTORY, and VARIANCE components of an NDF
+*     data structure and propagates all extensions.
+*     -  Processing of bad pixels and automatic quality masking are
+*     supported.
+*     -  Bad pixels and automatic quality masking are supported.
+*     -  All non-complex numeric data types can be handled.
 
-      INTEGER 
-     :  NDIMS                  ! array dimensionality
-      PARAMETER ( NDIMS  =  2 )! 2-d arrays only
+*  Related Applications:
+*     KAPPA: ARDMASK.
 
-*    Local variables :
+*  Authors:
+*     DSB: David S. Berry (STARLINK)
+*     {enter_new_authors_here}
 
-      INTEGER 
-     :  IDIMS( NDIMS ),        ! dimensions of input DATA_ARRAY
-     :  ORIGIN( DAT__MXDIM ),  ! Origin of the data array
-     :  PNTRI,                 ! pointer to input DATA_ARRAY component
-     :  PNTRO                  ! pointer to output DATA_ARRAY component
+*  History:
+*     30-NOV-2001 (DSB):
+*        Original NDF version.
+*     {enter_further_changes_here}
 
-      REAL 
-     :  DIAMTR,                ! diameter of circle to be used
-     :  NEWVAL,                ! new value for points outside circle
-     :  XCENTR,                ! x co-ordinate of circle centre
-     :  YCENTR                 ! y     "      "    "      "
-
-      CHARACTER*20
-     :  CNWVAL                 ! new value for pixels outside the circle
-
-      CHARACTER*(DAT__SZLOC)   ! locators for :
-     :  LOCDI,                 ! structure containing the input data
-                               ! array
-     :  LOCDO,                 ! structure containing the output data
-                               ! array
-     :  LOCI,                  ! input data structure
-     :  LOCO                   ! output data structure
-
-      CHARACTER * ( DAT__SZNAM )
-     :  DNAMEI,                ! Name of the input data-array component
-     :  DNAMEO                 ! Name of the output data-array component
-
+*  Bugs:
+*     {note_any_bugs_here}
 
 *-
-*    check status on entry - return if not o.k.
 
-      IF ( STATUS .NE. SAI__OK ) RETURN
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
 
-*    get a locator to input IMAGE type data structure
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'NDF_PAR'          ! NDF_ public constant
+      INCLUDE 'GRP_PAR'          ! GRP_ data constants
+      INCLUDE 'PRM_PAR'          ! VAL_ data constants
+      INCLUDE 'AST_PAR'          ! AST_ data constants and functions
+               
+*  Status:     
+      INTEGER STATUS             ! Global status
 
-      CALL KPG1_GETIM( 'INPIC', LOCI, LOCDI, DNAMEI, ORIGIN, STATUS )
- 
-*    check status before continuing
+*  Local Variables:      
+      CHARACTER COMP*8           ! Name of array component to mask
+      CHARACTER CONTXT*40        ! Text version of constant value
+      CHARACTER TEXT*(GRP__SZNAM)! General text bufferName of ARD file
+      CHARACTER TYPE*( NDF__SZTYP )  ! Numeric type for processing
+      DOUBLE PRECISION BC( 2 )   ! CENTRE base Frame axis value
+      DOUBLE PRECISION CC( 2 )   ! CENTRE current Frame axis value
+      DOUBLE PRECISION CONST     ! The constant to assign
+      DOUBLE PRECISION DIAM      ! The diameter of circular aperture
+      INTEGER CURFRM             ! AST pointer to current WCS Frame
+      INTEGER DAX                ! Index of axis for measuring diameter
+      INTEGER EL                 ! Total number of pixels in the image
+      INTEGER IAT                ! Used length of a string
+      INTEGER IGRP               ! Group identifier
+      INTEGER INDF1              ! Identifier for the source NDF  
+      INTEGER INDF2              ! Identifier for the output NDF
+      INTEGER IPMASK             ! Pointer to the ARD logical mask
+      INTEGER IPOUT              ! Pointer to the data component of for the output NDF
+      INTEGER IWCS               ! NDF WCS FrameSet
+      INTEGER LBNDE( NDF__MXDIM )! Lower bounds of a box encompassing all external array elements
+      INTEGER LBNDI( NDF__MXDIM )! Lower bounds of a box encompassing all internal array elements
+      INTEGER NVAL               ! Number of supplied values
+      INTEGER REGVAL             ! Value assignied to the first ARD region
+      INTEGER SDIM( NDF__MXDIM ) ! Indices of significant axes
+      INTEGER SLBND( NDF__MXDIM )! Lower limit for input NDF
+      INTEGER SUBND( NDF__MXDIM )! Upper limit for input NDF
+      INTEGER UBNDE( NDF__MXDIM )! Upper bounds of a box encompassing all external array elements
+      INTEGER UBNDI( NDF__MXDIM )! Upper bounds of a box encompassing all internal array elements
+      LOGICAL BAD                ! Assign bad values to the region?
+      LOGICAL INSIDE             ! Assign value to inside of region?
+      LOGICAL THERE              ! Does the requested NDF component exist?
+      REAL TRCOEF( ( NDF__MXDIM + 1 ) * NDF__MXDIM ) ! Data to world co-ordinate conversions
+*.
 
-      IF ( STATUS .EQ. SAI__OK ) THEN
+*  Check the inherited global status.
+      IF( STATUS .NE. SAI__OK ) RETURN
 
-*       try to map a data-array component of the input data structure
+*  Begin an AST context.
+      CALL AST_BEGIN( STATUS )
 
-         CALL CMP_MAPN( LOCDI, DNAMEI, '_REAL', 'READ', NDIMS,
-     :                  PNTRI, IDIMS, STATUS )
+*  Begin an NDF context.
+      CALL NDF_BEGIN
+
+*  Obtain an identifier for the NDF structure to be examined.       
+      CALL LPG_ASSOC( 'IN', 'READ', INDF1, STATUS )
+
+*  Determine which array component is to be masked, converting 'ERROR' into 
+*  'VARIANCE'.
+      CALL PAR_CHOIC( 'COMP', 'Data', 'Data,Error,Variance', .FALSE., 
+     :                COMP, STATUS )
+      IF ( COMP .EQ. 'ERROR' ) COMP = 'VARIANCE'
+
+*  Check that the required component exists and report an error if it
+*  does not.
+      CALL NDF_STATE( INDF1, COMP, THERE, STATUS )
+      IF ( ( STATUS .EQ. SAI__OK ) .AND. ( .NOT. THERE ) ) THEN
+         STATUS = SAI__ERROR
+         CALL MSG_SETC( 'COMP', COMP )
+         CALL NDF_MSG( 'NDF', INDF1 )
+         CALL ERR_REP( 'OUTSET_ERR1', 'The ^COMP component is '//
+     :                 'undefined in the NDF structure ^NDF', STATUS )
+      END IF
       
-*       check status before continuing
+*  Obtain the numeric type of the NDF array component to be masked.
+      CALL NDF_TYPE( INDF1, COMP, TYPE, STATUS )
 
-         IF ( STATUS .EQ. SAI__OK ) THEN
+*  Get the WCS FrameSet and the bounds of the significant axes.
+      CALL KPG1_ASGET( INDF1, 2, .FALSE., .TRUE., .TRUE., SDIM, 
+     :                 SLBND, SUBND, IWCS, STATUS )
 
-*          tell user dimensions of input array
+*  Get a pointer to the current Frame.
+      CURFRM = AST_GETFRAME( IWCS, AST__CURRENT, STATUS )
 
-            CALL MSG_SETI( 'XDIM', IDIMS( 1 ) )
-            CALL MSG_SETI( 'YDIM', IDIMS( 2 ) )
-            CALL MSG_OUT( 'INPUT_DIMS', ' Array is ^XDIM by ^YDIM '/
-     :                    /'pixels', STATUS )
-            CALL MSG_OUT( 'BLANK', ' ', STATUS )
+*  Get the CENTRE parameter value.
+      CC( 1 ) = AST__BAD
+      CALL KPG1_GTPOS( 'CENTRE', IWCS, .FALSE., CC, BC, STATUS )
 
-
-*          get x and y co-ordinates of centre of circle to be used
-
-            CALL PAR_GDR0R( 'XCENTRE', 0.5 * REAL( IDIMS( 1 ) ), 0.0,
-     :                      REAL( IDIMS( 1 ) ), .FALSE., XCENTR,
-     :                      STATUS )
-            CALL PAR_GDR0R( 'YCENTRE', 0.5 * REAL( IDIMS( 2 ) ), 0.0,
-     :                      REAL( IDIMS( 2 ) ), .FALSE., YCENTR,
-     :                      STATUS )
-
-*          get the diameter of the circle setting the maximum to be
-*          just big enough to encompass the whole array
-
-            CALL PAR_GDR0R( 'DIAMETER', 10.0, 0.0,
-     :                      SQRT(2.0)*MAX( IDIMS( 1 ), IDIMS( 2 ) ),
-     :                      .FALSE., DIAMTR, STATUS )
-
-*          get replacement value for pixels outside defined circle
-
-            CALL PAR_MIX0R( 'NEWVAL', '0.0', VAL__MINR, VAL__MAXR,
-     :                      'Bad', .FALSE., CNWVAL, STATUS )
-
-*          It may be the bad-pixel value.
-
-            IF ( CNWVAL .EQ. 'BAD' ) THEN
-               NEWVAL = VAL__BADR
-            ELSE
-
-*             Convert the output numeric string to its numeric value.
-
-               CALL CHR_CTOR( CNWVAL, NEWVAL, STATUS )
-            END IF
-
-*          check for error before continuing
-
-            IF ( STATUS .EQ. SAI__OK ) THEN
-
-*             now get an output array to contain modified data
-
-               CALL KPG1_CROUT( 'OUTPIC', 'OTITLE', NDIMS, IDIMS,
-     :                          ORIGIN, LOCO, LOCDO, DNAMEO, STATUS )
-
-*             propagate AXIS, QUALITY, UNITS, LABEL, HISTORY and
-*             extensions from the input data file
-
-               CALL KPG1_IMPRG( LOCI, 'AXIS,QUALITY,UNITS', LOCO,
-     :                          STATUS )
-
-*             check error before continuing
-
-               IF ( STATUS .EQ. SAI__OK ) THEN
-
-*                map an output data-array component
-
-                  CALL CMP_MAPN( LOCDO, DNAMEO, '_REAL', 
-     :                           'WRITE', NDIMS, PNTRO, IDIMS, STATUS )
-
-*                check status before accessing pointers
-
-                  IF ( STATUS .EQ. SAI__OK ) THEN
-
-*                   now call the subroutine that does the actual work
-
-                     CALL OTSTSB( %VAL( PNTRI ), IDIMS( 1 ), IDIMS( 2 ),
-     :                            XCENTR, YCENTR, DIAMTR, NEWVAL,
-     :                            %VAL( PNTRO ), STATUS )
-
-*                   unmap output data array
-
-                     CALL CMP_UNMAP( LOCDO, DNAMEO, STATUS )
-
-                  ELSE
-
-                     CALL ERR_REP( 'ERR_REPSET_NOMPO',
-     :                 'OUTSET : Error occurred whilst trying to map '/
-     :                 /'output frame', STATUS )
-
-                  END IF
-
-*                Tidy up the output structures
-
-                  CALL DAT_ANNUL( LOCDO, STATUS )
-                  CALL DAT_ANNUL( LOCO, STATUS )
-
-               ELSE
-
-                  IF ( STATUS .NE. PAR__ABORT ) THEN
-                     CALL ERR_REP( 'ERR_REPSET_NOFRO',
-     :                 'OUTSET : Error occurred whilst trying to '/
-     :                 /'access output frame', STATUS )
-                  END IF
-
-*             end of if-error-after-getting-output-structure check
-
-               END IF
-
-            ELSE
-
-               IF ( STATUS .NE. PAR__ABORT .AND.
-     :              STATUS .NE. PAR__NULL ) THEN
-
-*                announce the error
-
-                  CALL ERR_REP( 'ERR_REPSET_PAR',
-     :              'OUTSET : Error obtaining parameters - aborting',
-     :              STATUS )
-               END IF
-
-*          end of if-no-error-after-getting-parameters check
-
-            END IF
-
-*          unmap input data array
-
-            CALL CMP_UNMAP( LOCDI, DNAMEI, STATUS )
-
-         ELSE
-
-            CALL ERR_REP( 'ERR_REPSET_NOMPI',
-     :        'OUTSET : Error occurred whilst trying to map input '/
-     :        /'frame', STATUS )
-
-*       end of if-no-error-after-mapping-input-array check
-
-         END IF
-
-*       tidy up the input structures
-
-         CALL DAT_ANNUL( LOCDI, STATUS )
-         CALL DAT_ANNUL( LOCI, STATUS )
-
+*  Choose the axis to use, and then get the DIAM parameter value.
+      IF( AST_ISASKYFRAME( CURFRM, STATUS ) ) THEN
+         DAX = AST_GETI( CURFRM, 'LATAXIS', STATUS )
       ELSE
+         DAX = 1
+      END IF
+      DIAM= AST__BAD
+      CALL KPG1_GTAXV( 'DIAM', 1, .TRUE., CURFRM, DAX, DIAM, NVAL, 
+     :                 STATUS )
 
-         IF ( STATUS .NE. PAR__ABORT ) THEN
-            CALL ERR_REP( 'ERR_REPSET_NOFRI',
-     :        'OUTSET : Error occurred whilst trying to access input '/
-     :        /'frame', STATUS )
-         END IF
+*  Create the ARD description.
+      TEXT = 'CIRCLE('
+      IAT = 8
+      CALL CHR_APPND( AST_FORMAT( CURFRM, 1, CC( 1 ), STATUS ), TEXT,
+     :                IAT )
+      CALL CHR_APPND( ',', TEXT, IAT )
+      IAT = IAT + 1
+      CALL CHR_APPND( AST_FORMAT( CURFRM, 2, CC( 2 ), STATUS ), TEXT,
+     :                IAT )
+      CALL CHR_APPND( ',', TEXT, IAT )
+      IAT = IAT + 1
+      CALL CHR_APPND( AST_FORMAT( CURFRM, DAX, DIAM, STATUS ), TEXT,
+     :                IAT )
+      CALL CHR_APPND( ' )', TEXT, IAT )
 
-*    end of if-error-after-getting-input-structure check
+*  Put this text into a GRP group.
+      CALL GRP_NEW( ' ', IGRP, STATUS )
+      CALL GRP_PUT( IGRP, 1, TEXT( : IAT ), 0, STATUS ) 
+          
+*  Store the WCS FrameSet. Since no COFRAME or WCS statements were included 
+*  in the ARD description above, positions will be interpreted as being in 
+*  the current Frame of the WCS FrameSet.
+      CALL ARD_WCS( IWCS, 'PIXEL', STATUS )
+          
+*  Allocate the memory needed for the logical mask array.
+      CALL NDF_SIZE( INDF1, EL, STATUS )
+      CALL PSX_CALLOC( EL, '_INTEGER', IPMASK, STATUS )
+      
+*  Create the mask.  Value 2 should be used to represent pixels
+*  specified by the first keyword in the ARD description. TRCOEF is
+*  ignored because we have previously called ARD_WCS.
+      REGVAL = 2
+      CALL ARD_WORK( IGRP, 2, SLBND, SUBND, TRCOEF, .FALSE., REGVAL,
+     :               %VAL( IPMASK ), LBNDI, UBNDI, LBNDE, UBNDE,
+     :               STATUS )
+       
+*  Propagate the bits of the source NDF required.
+      CALL LPG_PROP( INDF1, 'Data,Variance,Quality,Axis,Units,WCS', 
+     :               'OUT', INDF2, STATUS )
+
+*  Get the title for the output NDF.
+      CALL NDF_CINP( 'TITLE', INDF2, 'Title', STATUS )
+
+*  Map the output NDF array for updating.
+      CALL NDF_MAP( INDF2, COMP, TYPE, 'UPDATE', IPOUT, EL,
+     :              STATUS )
+
+*  Get the string representing the constant value to assign.
+      CALL PAR_MIX0D( 'CONST', 'Bad', VAL__MIND, VAL__MAXD, 'Bad',
+     :                 .FALSE., CONTXT, STATUS )
+
+*  Get the appropriate numerical value from the string.
+      BAD = ( CONTXT .EQ. 'BAD' )
+      IF( .NOT. BAD ) CALL CHR_CTOD( CONTXT, CONST, STATUS )
+
+*  See if the value is to be assigned to the inside or the outside of the 
+*  region.
+      CALL PAR_GET0L( 'INSIDE', INSIDE, STATUS )
+
+*  Correct the output image to have bad pixels where indicated on the
+*  mask.  Call the appropriate routine for the data type.
+      IF( TYPE .EQ. '_REAL' ) THEN
+         CALL KPS1_ARDMR( BAD, CONST, INSIDE, EL, %VAL( IPMASK ), 
+     :                    %VAL( IPOUT ), STATUS )
+
+      ELSE IF( TYPE .EQ. '_BYTE' ) THEN
+         CALL KPS1_ARDMB( BAD, CONST, INSIDE, EL, %VAL( IPMASK ), 
+     :                    %VAL( IPOUT ), STATUS )
+
+      ELSE IF( TYPE .EQ. '_DOUBLE' ) THEN
+         CALL KPS1_ARDMD( BAD, CONST, INSIDE, EL, %VAL( IPMASK ), 
+     :                    %VAL( IPOUT ), STATUS )
+
+      ELSE IF( TYPE .EQ. '_INTEGER' ) THEN
+         CALL KPS1_ARDMI( BAD, CONST, INSIDE, EL, %VAL( IPMASK ), 
+     :                    %VAL( IPOUT ), STATUS )
+
+      ELSE IF( TYPE .EQ. '_UBYTE' ) THEN
+         CALL KPS1_ARDMUB( BAD, CONST, INSIDE, EL, %VAL( IPMASK ), 
+     :                    %VAL( IPOUT ), STATUS )
+
+      ELSE IF( TYPE .EQ. '_UWORD' ) THEN
+         CALL KPS1_ARDMUW( BAD, CONST, INSIDE, EL, %VAL( IPMASK ), 
+     :                    %VAL( IPOUT ), STATUS )
+
+      ELSE IF( TYPE .EQ. '_WORD' ) THEN
+         CALL KPS1_ARDMW( BAD, CONST, INSIDE, EL, %VAL( IPMASK ), 
+     :                    %VAL( IPOUT ), STATUS )
 
       END IF
 
-*    end
+*  Set the bad-pixel flag.
+      IF( BAD ) CALL NDF_SBAD( .TRUE., INDF2, COMP, STATUS )
+
+*  Free the dynamic array space of the logical mask.
+      CALL PSX_FREE( IPMASK, STATUS )
+
+*  Close down the group used to hold the pixel mask.
+      CALL GRP_DELET( IGRP, STATUS )
+
+*  End the NDF context.
+      CALL NDF_END( STATUS )                              
+
+*  End the AST context.
+      CALL AST_END( STATUS )
+
+*  Add a context report if anything went wrong.
+      IF( STATUS .NE. SAI__OK ) THEN
+         CALL ERR_REP( 'OUTSET_ERR', 'OUTSET: Failed to apply a '//
+     :                 'circular mask to a 2-dimensional NDF.', STATUS )
+      END IF
 
       END

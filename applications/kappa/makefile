@@ -659,7 +659,9 @@ kps1_glibd.f kps1_glidr.f kps1_gliwr.f kps1_saxlk.f kps1_clpsr.f \
 kps1_clpsd.f kps1_prmxb.f kps1_prmxub.f kps1_prmxd.f kps1_prmxuw.f \
 kps1_prmxi.f kps1_prmxw.f kps1_prmxr.f kps1_cremg.f kps1_crets.f \
 kps1_agnch.f kps1_agndw.f kps1_agnwc.f kps1_look.f kps1_look1.f kps1_look2.f \
-kps1_ltaba.f 
+kps1_ltaba.f kps1_apadb.f kps1_apadub.f kps1_apadd.f kps1_apaduw.f \
+kps1_apadi.f kps1_apadw.f kps1_apadr.f kps1_laplb.f kps1_lapld.f \
+kps1_lapli.f kps1_laplub.f kps1_lapluw.f kps1_laplr.f kps1_laplw.f 
 
 MEM_F_ROUTINES = mem2d.f
 
@@ -736,7 +738,8 @@ NDFS = $(LUTS) $(TEST_FILES)
 
 LUTS = \
 bgyrw_lut.sdf cont_lut.sdf fc_lut.sdf heat_lut.sdf ikon_lut.sdf warm_lut.sdf \
-ramps_lut.sdf spectrum_lut.sdf zebra_lut.sdf grey_lut.sdf logo_lut.sdf
+ramps_lut.sdf spectrum_lut.sdf zebra_lut.sdf grey_lut.sdf logo_lut.sdf \
+cold_lut.sdf
 
 #  Define the package test data (NDFs only!).
 
@@ -817,7 +820,7 @@ IRAF_HELP_FILES = _$(PKG_NAME).hd $(PKG_NAME).hd $(PKG_NAME).men \
 IRAF_AUX_SCRIPTS = fitsexist.cl fitsval.cl fitswrite.cl \
                    lutbgyrw.cl lutcol.cl lutcont.cl lutfc.cl lutgrey.cl \
                    lutheat.cl lutikon.cl lutneg.cl lutramps.cl lutread.cl \
-                   lutspec.cl lutwarm.cl lutzebra.cl \
+                   lutspec.cl lutwarm.cl lutcold.cl lutzebra.cl \
                    picbase.cl picdata.cl picframe.cl picgrid.cl piclast.cl \
                    picxy.cl
 

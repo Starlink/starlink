@@ -1777,105 +1777,90 @@ package kappa {
       }
 
       action setsky {
-         alias {setsk(y)}
-
          helplib {$KAPPA_HELP}
-
          parameter coords {
             position 3
             type LITERAL
             vpath PROMPT
-            ppath CURRENT
             prompt {Sky co-ordinate system}
+            ppath CURRENT
             helpkey *
           }
-
          parameter epoch {
             position 4
             type _DOUBLE
             access READ
             vpath PROMPT
+            prompt {Epoch of the data}
             ppath CURRENT DEFAULT
             default 1994.0D0
-            prompt {Epoch of the data}
             helpkey *
           }
-
          parameter lat {
             position 7
             type LITERAL
             vpath DEFAULT PROMPT
+            prompt {Latitude of the reference point}
             ppath CURRENT
             default !
-            prompt {Latitude of the reference point}
             helpkey *
           }
-
          parameter logfile {
             position 12
             type LITERAL
             vpath DEFAULT PROMPT
+            prompt {The name of a log file}
             ppath CURRENT
             default !
-            prompt {The name of a log file}
             helpkey *
           }
-
          parameter lon {
             position 6
             type LITERAL
             vpath DEFAULT PROMPT
+            prompt {Longitude of the reference point}
             ppath CURRENT
             default !
-            prompt {Longitude of the reference point}
             helpkey *
           }
-
          parameter ndf {
             position 1
             type NDF
             access UPDATE
             vpath PROMPT
+            prompt {NDF to have astrometry information appended}
             ppath GLOBAL
             association <->GLOBAL.DATA_ARRAY
-            prompt {NDF to have astrometry information appended}
             helpkey *
           }
-
          parameter orient {
             position 10
             type LITERAL
             vpath DEFAULT PROMPT
+            prompt {Orientation of the image y-axis from north measured via east}
             ppath CURRENT
             default !
-            prompt {Orientation of the image y-axis from north measured via east}
             helpkey *
           }
-
          parameter pixelref {
-            size *
-				 # position
             type LITERAL
             access READ
             vpath DEFAULT PROMPT
+            prompt {Pixel co-ordinates of the reference position}
             ppath CURRENT
             default !
-            prompt {Pixel co-ordinates of the reference position}
             helpkey *
           }
-
          parameter pixelsize {
-            size *
             position 9
             type LITERAL
             access READ
             vpath DEFAULT PROMPT
+            prompt {Size of the pixels at the reference point}
             ppath CURRENT
             default !
-            prompt {Size of the pixels at the reference point}
             helpkey *
           }
-
          parameter positions {
             position 2
             type LITERAL
@@ -1883,37 +1868,33 @@ package kappa {
             prompt {A group of corresponding sky and image co-ordinates }
             helpkey *
           }
-
          parameter projtype {
             position 5
             type LITERAL
             vpath DEFAULT PROMPT
+            prompt {Projection type}
             ppath CURRENT
             default !
-            prompt {Projection type}
             helpkey *
           }
-
          parameter refcode {
             position 8
             type LITERAL
             vpath DEFAULT PROMPT
+            prompt {Location of the reference point}
             ppath CURRENT
             default !
-            prompt {Location of the reference point}
             helpkey *
           }
-
          parameter tilt {
             position 11
             type LITERAL
             vpath DEFAULT
-            ppath CURRENT
             prompt {Tilt of the celestial sphere prior to projection}
-            helpkey *
+            ppath CURRENT
             default 0.0
+            helpkey *
           }
-
       }
 
       action settitle {
@@ -5946,109 +5927,123 @@ package kappa {
       }
 
       action aperadd {
-         alias {aper(add)}
-
-         parameter inpic {
-            position 1
-            type IMAGE
-            access READ
-            vpath PROMPT
-            ppath GLOBAL
-            association <->GLOBAL.DATA_ARRAY
-            prompt {Image to be binned}
-            help "Name of the IMAGE structure containing the 2-d data array to be examined"
-          }
-
-         parameter xcen {
-            position 2
-            type _REAL
-            vpath PROMPT
-            ppath CURRENT DYNAMIC
-            prompt {x co-ordinate of circle centre}
-            help "Give the x co-ordinate of the centre of the circle to be binned up"
-          }
-
-         parameter ycen {
-            position 3
-            type _REAL
-            ppath CURRENT DYNAMIC
-            vpath PROMPT
-            prompt {y co-ordinate of circle centre}
-            help "Give the y co-ordinate of the centre of the circle to be binned up"
-          }
-
-         parameter diam {
-            position 4
-            type _REAL
-            ppath CURRENT DYNAMIC DEFAULT
-            vpath PROMPT
-            prompt {Diameter of circle}
-            help "Give diameter (in pixels) of the circle to be binned"
-            default 10.0
-          }
-
-         parameter logfile {
-            position 5
+         helplib {$KAPPA_HELP}
+         parameter ardfile {
             type FILENAME
             access READ
             vpath DEFAULT
-            ppath CURRENT DEFAULT
-            prompt {File to log the results}
+            prompt {ARD file defining the aperture}
+            ppath GLOBAL CURRENT DEFAULT
             default !
-            help "Name of the text file to be used to record the statistics."
+            association <->GLOBAL.ARDFILE
+            helpkey *
           }
-
-         parameter again {
-            position 6
-            type _LOGICAL
-            ppath DEFAULT
-            vpath PROMPT
-            prompt {Do you another aperture in the same 2-d array?}
-            help "Option to select another aperture in same input data array. Type N to exit"
-            default FALSE
+         parameter centre {
+            position 2
+            type LITERAL
+            prompt {Centre of circular aperture}
+            ppath CURRENT
+            helpkey *
           }
-
-         parameter numpix {
-            access WRITE
-            type _INTEGER
+         parameter diam {
+            position 3
+            type LITERAL
+            prompt {Diameter of circular aperture}
+            ppath CURRENT
+            helpkey *
+          }
+         parameter logfile {
+            type FILENAME
+            access READ
             vpath DEFAULT
-            prompt {Object to contain the number of pixels}
-            default 0
+            prompt {File for logging results}
+            ppath CURRENT DEFAULT
+            default !
+            helpkey *
           }
-
-         parameter total {
-            access WRITE
-            type _REAL
-            vpath DEFAULT
-            prompt {Object to contain the total value}
-            default 0.0
-          }
-
          parameter mean {
+            type _DOUBLE
             access WRITE
-            type _REAL
             vpath DEFAULT
-            prompt {Object to contain the mean value}
-            default 0.0
+            default 0.0D0
+            helpkey *
           }
-
+         parameter ndf {
+            position 1
+            type NDF
+            access READ
+            vpath {PROMPT }
+            prompt {Data structure to analyse}
+            ppath GLOBAL CURRENT
+            association <->GLOBAL.DATA_ARRAY
+            helpkey *
+          }
+         parameter ngood {
+            type _INTEGER
+            access WRITE
+            vpath DEFAULT
+            default 0
+            helpkey *
+          }
+         parameter numpix {
+            type _INTEGER
+            access WRITE
+            vpath DEFAULT
+            default 0
+            helpkey *
+          }
+         parameter quiet {
+            type _LOGICAL
+            vpath DEFAULT
+            prompt {Is screen output to be suppressed?}
+            ppath CURRENT DEFAULT
+            default FALSE
+            helpkey *
+          }
          parameter sigma {
+            type _DOUBLE
             access WRITE
-            type _REAL
             vpath DEFAULT
-            prompt {Object to contain the standard deviation}
-            default 0.0
+            default 0.0D0
+            helpkey *
           }
-
-         parameter noise {
-           keyword sigma
+         parameter sigmean {
+            type _DOUBLE
             access WRITE
-            type _REAL
             vpath DEFAULT
-            prompt {Object to contain the standard deviation after binning}
-            default 0.0
+            default 0.0D0
+            helpkey *
           }
-
+         parameter sigtotal {
+            type _DOUBLE
+            access WRITE
+            vpath DEFAULT
+            default 0.0D0
+            helpkey *
+          }
+         parameter total {
+            type _DOUBLE
+            access WRITE
+            vpath DEFAULT
+            default 0.0D0
+            helpkey *
+          }
+         parameter useaxis {
+            type LITERAL
+            vpath DEFAULT
+            prompt {The current Frame axes to be used}
+            ppath DYNAMIC DEFAULT
+            default !
+            helpkey *
+          }
+         parameter weight {
+            type _LOGICAL
+            vpath DEFAULT
+            prompt {Weight pixel data using inverse variances?}
+            ppath CURRENT DEFAULT
+            default FALSE
+            helpkey *
+          }
       }
 
       action ardgen {
@@ -6154,52 +6149,70 @@ package kappa {
       }
 
       action ardmask {
-         alias {ardm(ask)}
-
          helplib {$KAPPA_HELP}
-
          parameter ardfile {
             position 2
             type FILENAME
             access READ
             vpath PROMPT
-            ppath GLOBAL CURRENT DEFAULT
             prompt {Masking ARD file}
-            association <->GLOBAL.ARDFILE
+            ppath GLOBAL CURRENT DEFAULT
             default ardfile.dat
+            association <->GLOBAL.ARDFILE
             helpkey *
           }
-
+         parameter comp {
+            type LITERAL
+            access UPDATE
+            vpath DEFAULT
+            prompt {NDF array component to mask}
+            ppath CURRENT DEFAULT
+            default DATA
+            helpkey *
+          }
+         parameter const {
+            type LITERAL
+            vpath DEFAULT
+            prompt {New value for masked pixels}
+            ppath CURRENT DEFAULT
+            default BAD
+            helpkey *
+          }
          parameter in {
             position 1
             type NDF
             access READ
             vpath PROMPT
+            prompt {NDF to be masked}
             ppath GLOBAL
             association <-GLOBAL.DATA_ARRAY
-            prompt {NDF to be masked}
             help "*"
           }
-
+         parameter inside {
+            type _LOGICAL
+            vpath DEFAULT
+            prompt {Mask the inside of the ARD region?}
+            ppath CURRENT DEFAULT
+            default TRUE
+            helpkey *
+          }
          parameter out {
             position 3
             type NDF
             access WRITE
             vpath PROMPT
-            association ->GLOBAL.DATA_ARRAY
             prompt {Masked NDF}
+            association ->GLOBAL.DATA_ARRAY
             helpkey *
           }
-
          parameter title {
             type LITERAL
             vpath DEFAULT
-            ppath CURRENT DEFAULT
             prompt {Title for output NDF}
+            ppath CURRENT DEFAULT
             default !
             helpkey *
           }
-
       }
 
       action block {
@@ -9385,47 +9398,41 @@ iraf! {
 }
 
       action laplace {
-         alias {lapl(ace)}
-
-         parameter inpic {
+         helplib {$KAPPA_HELP}
+         parameter in {
             position 1
-            type IMAGE
+            type NDF
             access READ
             vpath PROMPT
-            ppath GLOBAL
+            prompt {Input NDF}
+            ppath GLOBAL CURRENT
             association <-GLOBAL.DATA_ARRAY
-            prompt {Image to be convolved}
-            help "Name of the IMAGE structure containing the 2-d data array on which the Laplacian convolution is performed"
+            helpkey *
           }
-
          parameter number {
-            position 2
             type _INTEGER
             vpath DEFAULT
+            prompt {Number of Laplacians to remove}
+            ppath CURRENT DEFAULT
             default 1
-            prompt {Number of Laplacians removed}
-            help "Give the integer number of Laplacians to be removed from the input data array"
+            helpkey *
           }
-
-         parameter outpic {
-            position 3
-            type IMAGE
+         parameter out {
+            position 2
+            type NDF
             access WRITE
             vpath PROMPT
+            prompt {Output NDF}
             association ->GLOBAL.DATA_ARRAY
-            prompt {Image after convolution}
-            help "Name given to the IMAGE structure to hold the convolved data array"
+            helpkey *
           }
-
-         parameter otitle {
-            position 4
-            type _CHAR
+         parameter title {
+            type LITERAL
             vpath DEFAULT
-            prompt {Title for output image}
-            default {KAPPA - Laplace}
-            help "Character string to be used as a title for the output IMAGE data structure"
+            prompt {Output title}
+            default !
+            helpkey *
           }
-
       }
 
       action kstest {
@@ -11866,75 +11873,73 @@ iraf! {
       }
 
       action outset {
-         alias {outs(et)}
-
-         parameter inpic {
+         helplib {$KAPPA_HELP}
+         parameter centre {
+            position 3
+            type LITERAL
+            prompt {Centre of circular aperture}
+            ppath CURRENT
+            helpkey *
+          }
+         parameter comp {
+            type LITERAL
+            access UPDATE
+            vpath DEFAULT
+            prompt {NDF array component to mask}
+            ppath CURRENT DEFAULT
+            default DATA
+            helpkey *
+          }
+         parameter const {
+            type LITERAL
+            vpath DEFAULT
+            prompt {New value for masked pixels}
+            ppath CURRENT DEFAULT
+            default BAD
+            helpkey *
+          }
+         parameter diam {
+            position 4
+            type LITERAL
+            prompt {Diameter of circular aperture}
+            ppath CURRENT
+            helpkey *
+          }
+         parameter in {
             position 1
-            type IMAGE
+            type NDF
             access READ
             vpath PROMPT
+            prompt {NDF to be masked}
             ppath GLOBAL
             association <-GLOBAL.DATA_ARRAY
-            prompt {Image to be modified}
-            help "Name of IMAGE structure containing the 2-d data array to be modified"
+            help "*"
           }
-
-         parameter outpic {
+         parameter inside {
+            type _LOGICAL
+            vpath DEFAULT
+            prompt {Mask the inside of the ARD region?}
+            ppath CURRENT DEFAULT
+            default FALSE
+            helpkey *
+          }
+         parameter out {
             position 2
-            type IMAGE
+            type NDF
             access WRITE
             vpath PROMPT
+            prompt {Masked NDF}
             association ->GLOBAL.DATA_ARRAY
-            prompt {Image after being modified}
-            help "Name given to the IMAGE structure to hold the data array after being modified"
+            helpkey *
           }
-
-         parameter otitle {
-            position 3
-            type _CHAR
-            vpath DEFAULT
-            prompt {Title for output image}
-            default {KAPPA - Outset}
-            help "Character string used as a title for the output IMAGE structure."
-          }
-
-         parameter xcentre {
-            position 4
-            type _REAL
-            vpath PROMPT
-            ppath DYNAMIC
-            prompt {x co-ordinate of circle centre}
-            help "Give the x co-ordinate of the centre of the circle to be used"
-          }
-
-         parameter ycentre {
-            position 5
-            type _REAL
-            vpath PROMPT
-            ppath DYNAMIC
-            prompt {y co-ordinate of circle centre}
-            help "Give the y co-ordinate of the centre of the circle to be used"
-          }
-
-         parameter diameter {
-            position 6
-            type _REAL
-            vpath PROMPT
-            ppath DYNAMIC
-            prompt {Diameter of circle}
-            help "Give the diameter in pixels of the circle to be used"
-          }
-
-         parameter newval {
-            position 7
+         parameter title {
             type LITERAL
-            vpath PROMPT
-            ppath DEFAULT
-            prompt {New value for pixels outside circle}
-            default 0.0
-            help "This will become the new value for all pixels outside the circle. BAD gives the bad-pixel value."
+            vpath DEFAULT
+            prompt {Title for output NDF}
+            ppath CURRENT DEFAULT
+            default !
+            helpkey *
           }
-
       }
 
       action parget {
@@ -12352,47 +12357,42 @@ iraf! {
       }
 
       action pow {
-
-         parameter inpic {
+         helplib {$KAPPA_HELP}
+         parameter in {
             position 1
-            type IMAGE
+            type NDF
             access READ
             vpath PROMPT
-            ppath GLOBAL
+            prompt {Input NDF data structure}
+            ppath GLOBAL CURRENT
             association <-GLOBAL.DATA_ARRAY
-            prompt {Input image}
-            help "Name of the IMAGE structure containing the input data array"
+            helpkey *
           }
-
-         parameter power {
-            position 2
-            type _REAL
-            access READ
-            vpath PROMPT
-            ppath CURRENT DYNAMIC
-            prompt {Power}
-            help "Power to be taken of each input data-array pixel"
-          }
-
-         parameter outpic {
+         parameter out {
             position 3
-            type IMAGE
+            type NDF
             access WRITE
             vpath PROMPT
+            prompt {Output NDF}
             association ->GLOBAL.DATA_ARRAY
-            prompt {Output image}
-            help "Name given to the IMAGE structure holding the data array resulting from taking power"
+            helpkey *
           }
-
-         parameter otitle {
-            position 4
+         parameter power {
+            position 2
+            type _DOUBLE
+            access READ
+            vpath PROMPT
+            prompt {Power to be used}
+            ppath CURRENT
+            helpkey *
+          }
+         parameter title {
             type LITERAL
             vpath DEFAULT
-            prompt {Title for output image}
-            default {KAPPA - Pow}
-            help "Character string used as a title for the output IMAGE structure."
+            prompt {Title for output NDF}
+            default !
+            helpkey *
           }
-
       }
 
       action psf {
@@ -15076,46 +15076,43 @@ iraf! {
       }
 
       action trig {
-
-         parameter inpic {
+         helplib {$KAPPA_HELP}
+         parameter in {
             position 1
-            type UNIV
+            type NDF
             access READ
             vpath PROMPT
-            ppath GLOBAL
+            prompt {Input NDF data structure}
+            ppath GLOBAL CURRENT
             association <-GLOBAL.DATA_ARRAY
-            prompt {Input to be operated on}
-            help "Give the IMAGE structure containing the data array, or the scalar on which the trig function is to operate."
+            helpkey *
           }
-
+         parameter out {
+            position 3
+            type NDF
+            access WRITE
+            vpath PROMPT
+            prompt {Output NDF}
+            association ->GLOBAL.DATA_ARRAY
+            helpkey *
+          }
          parameter trigfunc {
             position 2
             type LITERAL
+            access READ
             vpath PROMPT
-            ppath CURRENT DYNAMIC
-            prompt {Trig function to be used}
-            help "One of SIN,COS,TAN,SIND,COSD,TAND,ASIN,ACOS,ATAN,ASIND,ACOSD,ATAND."
+            prompt {Trig function}
+            ppath CURRENT
+            helpkey *
           }
-
-         parameter outpic {
-            position 3
-            type IMAGE
-            access WRITE
-            vpath PROMPT
-            association ->GLOBAL.DATA_ARRAY
-            prompt {Image for output data}
-            help "Name given to the IMAGE structure to hold the generated data array."
-          }
-
-         parameter otitle {
+         parameter title {
             position 4
-            type _CHAR
+            type LITERAL
             vpath DEFAULT
-            prompt {Title for output image}
-            default {KAPPA - Trig}
-            help "Character string used as a title for the output IMAGE structure."
+            prompt {Title for output NDF}
+            default !
+            helpkey *
           }
-
       }
 
       action kapversion {
@@ -16065,6 +16062,16 @@ iraf! {
          taskinherit device
          taskparam mapping=linear
          taskparam coltab=colour
+      }
+   }
+
+   command lutcold {
+      alias {lutcold}
+      task lutable {
+         taskinherit device
+         taskparam mapping=linear
+         taskparam coltab=external
+         taskparam {lut=$KAPPA_DIR/cold_lut}
       }
    }
 

@@ -4,7 +4,7 @@
 *     SETSKY
 
 *  Purpose:
-*     Makes an IRAS astrometry extension.
+*     Stores new  WCS information within an NDF.
 
 *  Language:
 *     Starlink Fortran 77
@@ -20,15 +20,11 @@
 *        The global status.
 
 *  Description:
-*     This application makes an IRAS astrometry extension within a
-*     two-dimensional NDF, therefore allowing sky co-ordinate
-*     information to be stored with an arbitrary image.  This
-*     information is used by certain IRAS90 applications (those with
-*     the SKY prefix) to perform various astrometric operations.  These
-*     include annotation of a displayed image with a grid of celestial
-*     co-ordinates, marking the location of a given celestial position
-*     given a pixel position, and aligning a group of images.  See
-*     SUN/163 for details.
+*     This application adds WCS information describing a celestial sky
+*     co-ordinate system to a two-dimensional NDF. This information can
+*     be stored either in the form of a standard NDF WCS component, or 
+*     in the form of an "IRAS90 astrometry structure" (see parameter
+*     IRAS90).
 *
 *     The astrometry is determined either by you supplying explicit
 *     values for certain projection parameters, or by you providing the
@@ -64,6 +60,21 @@
 *     EPOCH = DOUBLE PRECISION (Read)
 *        The Julian epoch at which the observation was made (e.g.
 *        "1994.0").
+*     IRAS90 = _LOGICAL (Read)
+*        If a TRUE value is supplied, then the WCS information will be
+*        stored in the form of an IRAS90 astrometry structure. This is the
+*        form used by the IRAS90 package (see SUN/163). In this case, any
+*        existing IRAS90 astrometry structure will be over-written. See
+*        the "Notes:" section below for warnings about using this form.
+*
+*        If a FALSE value is supplied, then the WCS information will be
+*        stored in the form of a standard NDF WCS component which will be
+*        recognized, used and updated correctly by most other Starlink
+*        software.
+*
+*        If a null value (!) is supplied, then a TRUE value will be used
+*        if the supplied NDF already has an IRAS90 extension. Otherwise a
+*        FALSE value will be used. [!]
 *     LAT = LITERAL (Read)
 *        The latitude of the reference point, in the co-ordinate system
 *        specified by parameter COORDS.  For example, if COORDS is
@@ -94,7 +105,7 @@
 *        estimated automatically from the data supplied for parameter
 *        POSITIONS. [!]
 *     NDF = NDF (Read and Write)
-*        The NDF that is to have an IRAS astrometry extension.
+*        The NDF in which to store the WCS information.
 *     ORIENT = LITERAL (Read)
 *        The position angle of the NDF's y axis on the celestial
 *        sphere, measured from north through east.  North is defined as
@@ -141,7 +152,7 @@
 *     PROJTYPE = LITERAL (Read)
 *        The type of projection to use.  The options are:
 *           "Aitoff"         - Aitoff equal-area,
-*           "Gnomonic"       - Gnomonic or tangent plane,
+*           "Gnomonic"       - Gnomonic (i.e. tangent plane),
 *           "Lambert"        - Lambert normal equivalent cylindrical,
 *           "Orthographic"   - Orthographic.
 *
@@ -183,9 +194,9 @@
 
 *  Examples:
 *     setsky m51 ^stars.lis ecl(j1994.0) 1994.0 logfile=m51.log 
-*        This creates an astrometry extension within the two-dimensional
-*        NDF called m51.  The values for parameters PROJTYPE, LON, LAT,
-*        PIXELREF, PIXELSIZE and ORIENT are determined automatically so
+*        This creates a WCS component to a two-dimensional NDF called 
+*        m51.  The values for parameters PROJTYPE, LON, LAT, PIXELREF, 
+*        PIXELSIZE and ORIENT are determined automatically so
 *        that they minimised the sum of the squared residuals (in
 *        pixels) at each of the positions specified in the file
 *        stars.lis.  This file contains a line for each position, each
@@ -197,16 +208,15 @@
 *        values together with the residual at each position are logged
 *        to file m51.log.
 *     setsky m51 ^stars.lis ecl(j1994.0) 1994.0 orient=0 projtype=orth
-*        This creates an astrometry extension within the
-*        two-dimensional NDF called m51.  The values for parameters
-*        PROJTYPE, LON, LAT, PIXELREF and PIXELSIZE are determined
-*        automatically as in the previous example.  In this example
-*        however, an Orthographic projection is forced, and the value
-*        zero is assigned to parameter ORIENT, resulting in north being
-*        `upwards' in the image.
+*        This creates a WCS component within the two-dimensional NDF 
+*        called m51.  The values for parameters PROJTYPE, LON, LAT, 
+*        PIXELREF and PIXELSIZE are determined automatically as in 
+*        the previous example.  In this example however, an Orthographic 
+*        projection is forced, and the value zero is assigned to 
+*        parameter ORIENT, resulting in north being `upwards' in the image.
 *     setsky virgo "!" eq(j2000.0) 1989.3 gn "12 29" "+12 30" bl 1.1s
 *            0.0d
-*        This creates an astrometry extension within the two-dimensional
+*        This creates a WCS component within the two-dimensional
 *        NDF called virgo.  It is a gnomonic projection in the
 *        equatorial system at Julian epoch 2000.0.  The bottom-left
 *        pixel of the image is located at Right Ascension 12 hours 29
@@ -217,7 +227,7 @@
 *        image.
 *     setsky map "!" galactic(1950.0) 1993.8 aitoff 90 0 cc
 *       [0.5d,0.007r] 180.0d
-*        This creates an astrometry extension within the two-dimensional
+*        This creates a WCS component within the two-dimensional
 *        NDF called map.  It is an Aitoff projection in the galactic
 *        system at Besselian epoch 1950.0.  The centre of the image is
 *        located at galactic longitude 90 degrees, latitude 0 degrees.
@@ -226,8 +236,8 @@
 *        1993.8.  At the image centre, south is at the top and is
 *        parallel to the y-axis of the image.
 *     setsky zodiac "!" ec 1983.4 or 10.3 -5.6 Pixel 20m 0.3d
-*       pixelref=[9.5,-11.2]
-*        This creates an astrometry extension within the
+*       pixelref=[9.5,-11.2] IRAS90=YES
+*        This creates an IRAS90 astrometry extension within the
 *        two-dimensional NDF called zodiac.  It is an orthographic
 *        projection in the Ecliptic system at Besselian epoch 1950.0.
 *        The reference point at pixel co-ordinates (9.5,-11.2)
@@ -242,17 +252,21 @@
 *     SKYPOS, SKYWRITE. 
 
 *  Notes:
-*     -  SETSKY overwrites an existing astrometry extension within
-*     the NDF.
-*     -  WARNING: As is standard for NDF extensions, the transformation
-*     stored in the NDF will be propagated to new NDFs derived from it.
-*     However, certain operations will invalidate the transformation.
-*     These include configuration change, a shift of origin, and
-*     resampling.  Once there is a standard astrometry extension, KAPPA
-*     applications will be made to process that extension correctly, by
-*     modifying it where that's possible otherwise not copying it.
+*     - The GAIA image display tool (SUN/214) provides various interactive 
+*     tools for storing new WCS information within an NDF.
+*     - This application was written to supply the limited range of WCS 
+*     functions required by the IRAS90 package. For instance, it does not
+*     support the complete range or projections or sky co-ordinate systems
+*     which may be represented by the more general NDF WCS component.
+*     - If WCS information is stored in the form of an IRAS90 astrometry
+*     structure (see parameter IRAS90), it will in general be invalidated
+*     by any subsequent KAPPA commands which modify the transformation
+*     between sky and pixel coordinates. For instance, if the image is
+*     moved using SLIDE (for example), then the IRAS90 astrometry
+*     structure will no longer correctly describe the sky co-ordinates
+*     associated with each pixel. For this reason (amongst others) it is
+*     better to set parameter IRAS90 to a false value.
 
-*  [optional_A_task_items]...
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David S. Berry (STARLINK)
@@ -263,12 +277,14 @@
 *        Original version.
 *     28-OCT-1994 (DSB):
 *        Added parameters POSITIONS and LOGFILE.  Modified to determine
-*        projection parameters automatically from the data suplied for
+*        projection parameters automatically from the data supplied for
 *        POSITIONS.
 *     1995 February 13 (MJC):
 *        Corrected typo's, errors in the examples, output the fitted
 *        pixel size in arcseconds if appropriate.  Validated the
 *        extension locator before annulling it.
+*     26-NOV-2001 (DSB):
+*        Added parameter IRAS90.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -287,6 +303,7 @@
       INCLUDE 'MSG_PAR'          ! Message-system constants
       INCLUDE 'PRM_PAR'          ! PRIMDAT public constants
       INCLUDE 'GRP_PAR'          ! GRP public constants
+      INCLUDE 'AST_PAR'          ! AST constants
       INCLUDE 'PAR_ERR'          ! PAR error constants
 
 *  Status:
@@ -299,64 +316,68 @@
       PARAMETER ( NP = 8 )
 
 *  Local Variables:
-      INTEGER ADDED              ! No. of elements added to a GRP group
-      CHARACTER * ( DAT__SZNAM ) ASNAME ! Name of astrometry structure
-      CHARACTER * ( IRA__SZFSC ) ATEXT ! Best ref longitude
-      CHARACTER * ( IRA__SZFSC ) BTEXT ! Best ref latitude
-      CHARACTER * ( IRA__SZFSC ) CPIXEL( 2 ) ! Pixel sizes as sky
-                                 ! co-ordinate strings
-      CHARACTER * ( VAL__SZR ) CXREF ! X-position of reference pixel
-      CHARACTER * ( VAL__SZR ) CYREF ! Y-position of reference pixel
+      CHARACTER ASNAME*( DAT__SZNAM ) ! Name of astrometry structure
+      CHARACTER ATEXT*( IRA__SZFSC ) ! Best ref longitude
+      CHARACTER BTEXT*( IRA__SZFSC ) ! Best ref latitude
+      CHARACTER CPIXEL( 2 )*( IRA__SZFSC ) ! Pixel sizes as sky co-ordinate strings
+      CHARACTER CXREF*( VAL__SZR ) ! X-position of reference pixel
+      CHARACTER CYREF*( VAL__SZR ) ! Y-position of reference pixel
+      CHARACTER LOC*( DAT__SZLOC ) ! Locator to the IRAS extension
+      CHARACTER PATEXT*( IRA__SZFSC ) ! Best image orientation
+      CHARACTER PRMSUF*( 26 + 2 * VAL__SZR ) ! String to complete the prompt string for LON and LAT
+      CHARACTER PROJEC*( IRA__SZPRJ ) ! Chosen projection type
+      CHARACTER PROTYP*( IRA__SZPLS ) ! List of supported projection types
+      CHARACTER REFPOS*( 5 ) ! Reference-position code
+      CHARACTER SCS*( IRA__SZSCS ) ! Chosen sky co-ordinate system
+      CHARACTER TTEXT*( IRA__SZFSC ) ! Best celestial sphere tilt
+      CHARACTER XNAME*( DAT__SZNAM ) ! Name of extn. holding astrometry data
       DOUBLE PRECISION EPOCH     ! Julian epoch
-      LOGICAL FLAG               ! Was group expression flagged?
+      DOUBLE PRECISION P( NP )   ! Parameters defining the projection
+      INTEGER ADDED              ! No. of elements added to a GRP group
       INTEGER IDA                ! Astrometry identifier
       INTEGER IGRP               ! ID for GRP group holding co-ord data
       INTEGER IGRP0              ! ID for GRP group holding co-ord data
+      INTEGER IPIX               ! Index of PIXEL Frame in IWCS
+      INTEGER IRAFRM             ! AST Frame describing IRA sky co-ords
+      INTEGER IRAMAP             ! AST Mapping from IRA "image" to sky co-ords
+      INTEGER IWCS               ! WCS FrameSet
       INTEGER LBND( NDIM )       ! Lower bounds of the NDF
-      CHARACTER * ( DAT__SZLOC ) LOC ! Locator to the IRAS extension
-      LOGICAL LOG                ! Log search results to a file?
       INTEGER LOGFD              ! FIO log file descriptor
       INTEGER MDIM               ! Actual no. of dimensions of the NDF
       INTEGER NCX                ! No. of signif. characters in CXREF
       INTEGER NCY                ! No. of signif. characters in CYREF
       INTEGER NDF                ! NDF identifier
       INTEGER NPOS               ! No. of supplied sky positions
+      INTEGER SDIM( NDF__MXDIM ) ! Significant NDF dimensions
+      INTEGER SIZE               ! Current size of GRP group.
+      INTEGER UBND( NDIM )       ! Upper bounds of the NDF
+      LOGICAL FLAG               ! Was group expression flagged?
+      LOGICAL IRAS90             ! Store WCS info as an IRA structure?
+      LOGICAL LOG                ! Log search results to a file?
+      LOGICAL NEWIRA             ! Has the IRA structure been created by this app?
       LOGICAL ORIENT             ! Has value been supplied for ORIENT?
-      CHARACTER * ( IRA__SZFSC ) PATEXT ! Best image orientation
-      DOUBLE PRECISION P( NP )   ! Parameters defining the projection
-      CHARACTER * ( 26 + 2 * VAL__SZR ) PRMSUF ! String to complete the
-                                 ! prompt string for LON and LAT
-      CHARACTER * ( IRA__SZPRJ ) PROJEC ! Chosen projection type
-      CHARACTER * ( IRA__SZPLS ) PROTYP ! List of supported projection
-                                 ! types
-      REAL PIXREF( 2 )           ! Reference pixel co-ordinates 
-      REAL PIXSIZ( 2 )           ! Pixel sizes
       LOGICAL PROJ               ! Was a value supplied for PROJTYPE?
       LOGICAL PSIZE              ! Has value been supplied for PIXSIZE?
       LOGICAL REFIMG             ! Were ref. pos. image co-ords given?
-      CHARACTER * ( 5 ) REFPOS   ! Reference-position code
       LOGICAL REFSKY             ! Were ref. pos. sky co-ords given?
-      REAL    RMS                ! Smallest RMS positional error found
-      CHARACTER * ( IRA__SZSCS ) SCS ! Chosen sky co-ordinate system
-      INTEGER SDIM( NDF__MXDIM ) ! Significant NDF dimensions
       LOGICAL SEARCH             ! Search in parameter space?
-      INTEGER SIZE               ! Current size of GRP group.
+      LOGICAL THERE              ! If true there is already an IRAS extension in the NDF
       LOGICAL TILT               ! Has value been supplied for TILT?
-      LOGICAL THERE              ! If true there is already an IRAS
-                                 ! extension in the NDF
-      CHARACTER * ( IRA__SZFSC ) TTEXT ! Best celestial sphere tilt
-      INTEGER UBND( NDIM )       ! Upper bounds of the NDF
       LOGICAL VALID              ! Locator is valid or not
-      CHARACTER * ( DAT__SZNAM ) XNAME ! Name of extn. holding
-                                 ! astrometry data
+      REAL RMS                   ! Smallest RMS positional error found
+      REAL PIXREF( 2 )           ! Reference pixel co-ordinates 
+      REAL PIXSIZ( 2 )           ! Pixel sizes
 
 *.
 
 *  Check inherited global status.
-      IF ( STATUS .NE. SAI__OK ) RETURN
+      IF( STATUS .NE. SAI__OK ) RETURN
 
 *  Access the NDF and find its shape.
 *  ==================================
+
+*  Start an AST context.
+      CALL AST_BEGIN( STATUS )
 
 *  Start an NDF context.
       CALL NDF_BEGIN
@@ -383,7 +404,7 @@
 *  Abort if an error has occurred.  This will ensure that the status
 *  check following the next subroutine call only picks up errors
 *  generated in that subroutine.
-      IF ( STATUS .NE. SAI__OK ) GO TO 999
+      IF( STATUS .NE. SAI__OK ) GO TO 999
       
 *  Get the input co-ordinate data and store it in the GRP group.  Loop
 *  round until a group expression is supplied which does not end with a
@@ -400,11 +421,11 @@
 *  will not be done (in which case the user must supply all the values
 *  required to define the mapping), annul the error, and delete the
 *  group.
-      IF ( STATUS .EQ. SAI__OK ) THEN      
+      IF( STATUS .EQ. SAI__OK ) THEN      
          SEARCH = .TRUE.
 
 *  Report an error if no values were supplied
-         IF ( SIZE .EQ. 0 ) THEN
+         IF( SIZE .EQ. 0 ) THEN
             STATUS = SAI__ERROR
             CALL ERR_REP( 'SETSKY_ERR1', 'No values were supplied '/
      :                    /'for parameter ''%POSITIONS''.', STATUS )
@@ -421,7 +442,7 @@
 *  multiple of 4, report an error.
          CALL GRP_GRPSZ( IGRP, SIZE, STATUS )
          NPOS = SIZE/4
-         IF ( 4*NPOS .NE. SIZE ) THEN
+         IF( 4*NPOS .NE. SIZE ) THEN
             CALL MSG_SETI( 'N', SIZE )
             STATUS = SAI__ERROR
             CALL ERR_REP( 'SETSKY_ERR2', 'An incomplete list of '/
@@ -431,7 +452,7 @@
          END IF
 
             
-      ELSE IF ( STATUS .EQ. PAR__NULL ) THEN
+      ELSE IF( STATUS .EQ. PAR__NULL ) THEN
          SEARCH = .FALSE.
          CALL ERR_ANNUL( STATUS )
          CALL GRP_DELET( IGRP0, STATUS )
@@ -447,28 +468,44 @@
 
 *  If an IRA astrometry structure already exists in the NDF, use the
 *  same location for the new one.
+      THERE = .FALSE.
+      NEWIRA = .FALSE.
       CALL IRA_FIND( NDF, THERE, XNAME, ASNAME, LOC, STATUS )
-      IF ( THERE ) THEN
+      IF( THERE ) THEN
          CALL IRA_LOCAT( XNAME, ASNAME, STATUS )
 
 *  Otherwise, use extension IRAS and component ASTROMETRY.
       ELSE
-         CALL IRA_LOCAT( 'IRAS', 'ASTROMETRY', STATUS )
+         XNAME = 'IRAS'
+         ASNAME = 'ASTROMETRY'
+         CALL IRA_LOCAT( XNAME, ASNAME, STATUS )
 
 *  Check whether the extension already exists.
-         CALL NDF_XSTAT( NDF, 'IRAS', THERE, STATUS )
+         CALL NDF_XSTAT( NDF, XNAME, THERE, STATUS )
 
 *  Create it if it is not present.
-         IF ( .NOT. THERE ) CALL NDF_XNEW( NDF, 'IRAS',
-     :                                     'IRAS_EXTENSION',
-     :                                     0, 0, LOC, STATUS )
+         IF( .NOT. THERE ) THEN
+            NEWIRA = .TRUE.
+            CALL NDF_XNEW( NDF, XNAME, 'IRAS_EXTENSION', 0, 0, LOC, 
+     :                     STATUS )
+         END IF
 
       END IF
 
 *  Exit if an error occurred.  This is needed because the significant
-*  dimensions are used as array indices.
-      IF ( STATUS .NE. SAI__OK ) GOTO 999
+*  dimensions are used as array indices (and also because of the 
+*  following check for a null parameter value).
+      IF( STATUS .NE. SAI__OK ) GOTO 999
 
+*  See if the IRAS90 extension is to be deleted at the end.
+      CALL PAR_GET0L( 'IRAS90', IRAS90, STATUS )
+
+*  A null value means "Keep it only if the input NDF has an IRAS90 
+*  extension."
+      IF( STATUS .NE. SAI__OK ) THEN
+         IRAS90 = THERE
+         IF( STATUS .EQ. PAR__NULL ) CALL ERR_ANNUL( STATUS )
+      END IF
 
 *  Obtain details of the transformation.
 *  =====================================
@@ -477,7 +514,7 @@
       CALL IRA_IPROJ( PROTYP, STATUS )
 
 *  Abort if an error has already occurred.
-      IF ( STATUS .NE. SAI__OK ) GO TO 999
+      IF( STATUS .NE. SAI__OK ) GO TO 999
       
 *  Obtain the projection type. 
       CALL PAR_CHOIC( 'PROJTYPE', 'GNOMONIC', PROTYP, .FALSE., PROJEC,
@@ -486,7 +523,7 @@
 *  A null value is OK if the mapping is to be based on supplied
 *  co-ordinate data.  In this case, the best projection will be found
 *  and used.
-      IF ( SEARCH .AND. STATUS .EQ. PAR__NULL ) THEN
+      IF( SEARCH .AND. STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
          PROJ = .FALSE.
       ELSE
@@ -499,7 +536,7 @@
       CALL IRA_GTSCS( 'COORDS', .TRUE., SCS, STATUS )
 
 *  Abort if an error has occurred.
-      IF ( STATUS .NE. SAI__OK ) GO TO 999      
+      IF( STATUS .NE. SAI__OK ) GO TO 999      
       
 *  Get the reference co-ordinates. 
       CALL PAR_CHOIC( 'REFCODE', 'CC', 'Pixel,TL,BL,CL,TR,BR,CR,TC,'/
@@ -509,7 +546,7 @@
 *  some arbitrary co-ordinates for the reference pixel.  Get the value
 *  and create the prompt suffix for obtaining the longitude and
 *  latitude.
-      IF ( REFPOS .EQ. 'PIXEL' ) THEN
+      IF( REFPOS .EQ. 'PIXEL' ) THEN
          CALL PAR_EXACR( 'PIXELREF', 2, PIXREF, STATUS )
          CALL CHR_RTOC( PIXREF( 1 ), CXREF, NCX )
          CALL CHR_RTOC( PIXREF( 2 ), CYREF, NCY )
@@ -520,55 +557,55 @@
 *  each of the other position codes.
 *
 *  The centre
-      ELSE IF ( REFPOS .EQ. 'CC' ) THEN
+      ELSE IF( REFPOS .EQ. 'CC' ) THEN
          PIXREF( 1 ) = 0.5 * REAL( UBND( 1 ) + LBND( 1 ) )
          PIXREF( 2 ) = 0.5 * REAL( UBND( 2 ) + LBND( 2 ) )
          PRMSUF = ' of the centre.'
            
 *  The top-left corner
-      ELSE IF ( REFPOS .EQ. 'TL' ) THEN
+      ELSE IF( REFPOS .EQ. 'TL' ) THEN
          PIXREF( 1 ) = REAL( LBND( 1 ) )
          PIXREF( 2 ) = REAL( UBND( 2 ) )
          PRMSUF = ' of the top-left corner.'
             
 *  The bottom-left corner
-      ELSE IF ( REFPOS .EQ. 'BL' ) THEN
+      ELSE IF( REFPOS .EQ. 'BL' ) THEN
          PIXREF( 1 ) = REAL( LBND( 1 ) )
          PIXREF( 2 ) = REAL( LBND( 2 ) )
          PRMSUF = ' of the bottom-left corner.'
             
 *  Centre-left
-      ELSE IF ( REFPOS .EQ. 'CL' ) THEN
+      ELSE IF( REFPOS .EQ. 'CL' ) THEN
          PIXREF( 1 ) = REAL( LBND( 1 ) )
          PIXREF( 2 ) = 0.5 * REAL( UBND( 2 ) + LBND( 2 ) )
          PRMSUF = ' of midway along the left side.'
             
 *  The top-right corner
-      ELSE IF ( REFPOS .EQ. 'TR' ) THEN
+      ELSE IF( REFPOS .EQ. 'TR' ) THEN
          PIXREF( 1 ) = REAL( UBND( 1 ) )
          PIXREF( 2 ) = REAL( UBND( 2 ) )
          PRMSUF = ' of the top-right corner.'
             
 *  The bottom-right corner
-      ELSE IF ( REFPOS .EQ. 'BR' ) THEN
+      ELSE IF( REFPOS .EQ. 'BR' ) THEN
          PIXREF( 1 ) = REAL( UBND( 1 ) )
          PIXREF( 2 ) = REAL( LBND( 2 ) )
          PRMSUF = ' of the bottom-right corner.'
             
 *  The centre-right
-      ELSE IF ( REFPOS .EQ. 'CR' ) THEN
+      ELSE IF( REFPOS .EQ. 'CR' ) THEN
          PIXREF( 1 ) = REAL( UBND( 1 ) )
          PIXREF( 2 ) = 0.5 * REAL( UBND( 2 ) + LBND( 2 ) )
          PRMSUF = ' of midway along the right side.'
             
 *  The top-centre
-      ELSE IF ( REFPOS .EQ. 'TC' ) THEN
+      ELSE IF( REFPOS .EQ. 'TC' ) THEN
          PIXREF( 1 ) = 0.5 * REAL( UBND( 1 ) + LBND( 1 ) )
          PIXREF( 2 ) = REAL( UBND( 2 ) )
          PRMSUF = ' of midway along the top side.'
             
 *  The bottom-centre
-      ELSE IF ( REFPOS .EQ. 'BC' ) THEN
+      ELSE IF( REFPOS .EQ. 'BC' ) THEN
          PIXREF( 1 ) = 0.5 * REAL( UBND( 1 ) + LBND( 1 ) )
          PIXREF( 2 ) = REAL( LBND( 2 ) )
          PRMSUF = ' of midway along the bottomside.'
@@ -578,7 +615,7 @@
 *  A null value is OK for REFCODE or PIXELREF if the mapping is to be
 *  based on supplied co-ordinate data.  In this case, the best image
 *  co-ordinates for the reference position will be found and used.
-      IF ( SEARCH .AND. STATUS .EQ. PAR__NULL ) THEN
+      IF( SEARCH .AND. STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
          REFIMG = .FALSE.
          PRMSUF = ' of the reference point.'
@@ -600,7 +637,7 @@
 *  A null value is OK for LON or LAT if the mapping is to be based on
 *  supplied co-ordinate data.  In this case, the best sky co-ordinates
 *  for the reference position will be found and used.
-      IF ( SEARCH .AND. STATUS .EQ. PAR__NULL ) THEN
+      IF( SEARCH .AND. STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
          REFSKY = .FALSE.
       ELSE
@@ -608,13 +645,13 @@
       END IF
          
 *  Abort if an error has already occurred.
-      IF ( STATUS .NE. SAI__OK ) GO TO 999      
+      IF( STATUS .NE. SAI__OK ) GO TO 999      
       
 *  Obtain the x and y pixel sizes as strings.  If just one value is
 *  supplied assume that the x and y sizes are the same.
       CALL PAR_GETVC( 'PIXELSIZE', NDIM, CPIXEL, MDIM, STATUS )
-      IF ( MDIM .EQ. 1 ) CPIXEL( 2 ) = CPIXEL( 1 )
-      IF ( CPIXEL( 1 ) .EQ. ' ' ) THEN
+      IF( MDIM .EQ. 1 ) CPIXEL( 2 ) = CPIXEL( 1 )
+      IF( CPIXEL( 1 ) .EQ. ' ' ) THEN
          STATUS = SAI__ERROR
          CALL ERR_REP( 'INVPIXSIZE',
      :     'SETSKY: The pixelsize is undefined.', STATUS )
@@ -623,13 +660,13 @@
 *  A null value for the pixel size is OK if the mapping is to be based
 *  on supplied co-ordinate data.  Annul the error and set a flag to
 *  indicate that pixel size has not yet been determined.
-      IF ( SEARCH .AND. STATUS .EQ. PAR__NULL ) THEN      
+      IF( SEARCH .AND. STATUS .EQ. PAR__NULL ) THEN      
          CALL ERR_ANNUL( STATUS )               
          PSIZE = .FALSE.
 
 *  If a pixel size was supplied, flag that pixel size has been
 *  determined.
-      ELSE IF ( STATUS .EQ. SAI__OK ) THEN
+      ELSE IF( STATUS .EQ. SAI__OK ) THEN
          PSIZE = .TRUE.
 
 *  Convert the formatted sky co-ordinate specifying the pixelsize
@@ -640,7 +677,7 @@
       END IF
 
 *  Abort if an error has occurred.
-      IF ( STATUS .NE. SAI__OK ) GO TO 999      
+      IF( STATUS .NE. SAI__OK ) GO TO 999      
       
 *  Obtain the position angle of the NDF's Y axis on the celestial
 *  sphere, measured from north through east.  Since this is a pure
@@ -656,7 +693,7 @@
 *  supplied co-ordinate data.  In this case, annul the error and set a
 *  flag to indicate that the orientation of the map is still to be
 *  determined.
-      IF ( SEARCH .AND. STATUS .EQ. PAR__NULL ) THEN
+      IF( SEARCH .AND. STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
          ORIENT = .FALSE.
 
@@ -666,7 +703,7 @@
       END IF
 
 *  Abort if an error has occurred.
-      IF ( STATUS .NE. SAI__OK ) GO TO 999
+      IF( STATUS .NE. SAI__OK ) GO TO 999
       
 *  Obtain the tilt of the celestial sphere prior to projection.  Set
 *  the default to be 0.0, i.e. there is no tilt.  Since this is a pure
@@ -682,7 +719,7 @@
 *  supplied co-ordinate data.  In this case, annul the error and set a
 *  flag to indicate that the TILT of the celestial sphere is still to be
 *  determined.
-      IF ( SEARCH .AND. STATUS .EQ. PAR__NULL ) THEN
+      IF( SEARCH .AND. STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
          TILT = .FALSE.
 
@@ -696,16 +733,16 @@
       CALL PAR_GET0D( 'EPOCH', EPOCH, STATUS )
 
 *  Abort if an error has occurred.
-      IF ( STATUS .NE. SAI__OK ) GO TO 999
+      IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  If a search is to be done, get the name of a log file in which to 
 *  store the parameter values best fit residuals.  Annul the error if 
 *  a null value is supplied.
-      IF ( SEARCH ) THEN
+      IF( SEARCH ) THEN
 
          CALL FIO_ASSOC( 'LOGFILE', 'WRITE', 'LIST', 0, LOGFD, STATUS )
 
-         IF ( STATUS .EQ. PAR__NULL ) THEN
+         IF( STATUS .EQ. PAR__NULL ) THEN
             CALL ERR_ANNUL( STATUS )
             LOG = .FALSE.
          ELSE
@@ -723,7 +760,7 @@
 *  If the mapping is to be based on supplied co-ordinate data, determine
 *  the best projection parameters.  Otherwise the supplied parameter
 *  values will be used.
-      IF ( SEARCH ) THEN
+      IF( SEARCH ) THEN
          CALL KPS1_SKYFT( LOG, LOGFD, IGRP, NPOS, SCS, EPOCH, PROJ, 
      :                    TILT, ORIENT, PSIZE, REFIMG, REFSKY, NP, 
      :                    PROJEC, P, RMS, STATUS )
@@ -761,7 +798,7 @@
 * Use arcminutes or arcseconds as appropriate.
       PIXSIZ( 1 ) = REAL( IRA__R2AM * P( 5 ) )
       PIXSIZ( 2 ) = REAL( IRA__R2AM * P( 6 ) )
-      IF ( PIXSIZ( 1 ) .LT. 1.0 .AND. PIXSIZ( 2 ) .LT. 1.0 ) THEN
+      IF( PIXSIZ( 1 ) .LT. 1.0 .AND. PIXSIZ( 2 ) .LT. 1.0 ) THEN
          CALL MSG_SETR( 'DX', PIXSIZ( 1 ) * 60.0 )
          CALL MSG_SETR( 'DY', PIXSIZ( 2 ) * 60.0 )
          CALL MSG_OUTIF( MSG__NORM, 'SETSKY_MSG6',
@@ -790,6 +827,42 @@
 *  Create the astrometry information.
       CALL IRA_CREAT( PROJEC, NP, P, SCS, EPOCH, NDF, IDA, STATUS )
 
+*  If requested, we now convert the IRA structure into an equivalent 
+*  NDF WCS component.
+      IF( .NOT. IRAS90 ) THEN
+
+*  Create an AST Frame describing the sky co-ordinates in the IRA
+*  structure, and a Mapping from IRA "image" co-ordinates to sky
+*  co-ordinates.
+         CALL KPG1_ASIRA( IDA, IRAFRM, IRAMAP, STATUS )
+
+*  Only proceed if both Mapping and Frame were produced.
+         IF( IRAFRM .NE. AST__NULL .AND. IRAMAP .NE. AST__NULL ) THEN
+
+*  Get the current WCS FrameSet from the NDF.
+            CALL NDF_GTWCS( NDF, IWCS, STATUS )
+ 
+*  Find the index of the PIXEL Frame.
+            CALL KPG1_ASFFR( IWCS, 'PIXEL', IPIX, STATUS )
+
+*  Add the IRA Frame into the FrameSet, using the IRA Mapping to join the 
+*  existing PIXEL Frame to the IRA Frame. This makes PIXEL co-ords and IRA 
+*  "image" co-ords identical.
+            CALL AST_ADDFRAME( IWCS, IPIX, IRAMAP, IRAFRM, STATUS )
+
+*  Save the new WCS FrameSet.
+            CALL NDF_PTWCS( IWCS, NDF, STATUS )
+
+*  Report an error if the WCS component could not be created.
+         ELSE IF( STATUS .EQ. SAI__OK ) THEN
+            STATUS = SAI__ERROR
+            CALL ERR_REP( 'SETSKY_ERR', 'Could not convert the IRAS90'//
+     :                    ' astrometry information into a standard '//
+     :                    'NDF WCS component.', STATUS )
+         END IF
+
+      END IF
+
 *  Annul the IRA identifier.
       CALL IRA_ANNUL( IDA, STATUS )      
       
@@ -799,25 +872,34 @@
 *  Jump to here if an error occurs.
   999 CONTINUE
 
+*  If required, delete the IRAS90 extension.
+      IF( .NOT. IRAS90 .OR. ( STATUS .NE. SAI__OK .AND. NEWIRA ) ) THEN
+         CALL ERR_BEGIN( STATUS )
+         CALL NDF_XDEL( NDF, XNAME, STATUS ) 
+         CALL ERR_END( STATUS )
+      END IF
+
 *  If required, annul the log file descriptor.
-      IF ( LOG ) CALL FIO_ANNUL( LOGFD, STATUS )
+      IF( LOG ) CALL FIO_ANNUL( LOGFD, STATUS )
 
 *  Annul locator to the NDF extension holding the astrometry structure,
 *  if the locator exists.
       CALL DAT_VALID( LOC, VALID, STATUS )
-      IF ( VALID ) CALL DAT_ANNUL( LOC, STATUS )
+      IF( VALID ) CALL DAT_ANNUL( LOC, STATUS )
 
 *  If a GRP group was used to hold co-ordinate data, delete the group.
-      IF ( IGRP .NE. GRP__NOID ) CALL GRP_DELET( IGRP, STATUS )
+      IF( IGRP .NE. GRP__NOID ) CALL GRP_DELET( IGRP, STATUS )
 
 *  Close the NDF system.
       CALL NDF_END( STATUS )
 
+*  Close the AST context.
+      CALL AST_END( STATUS )
+
 *  If an error occurred, then report a contextual message.
-      IF ( STATUS .NE. SAI__OK ) THEN
-         CALL ERR_REP( 'SETSKY_ERR',
-     :     'SETSKY: Unable to add astrometry structure to IRAS '/
-     :     /'extension.', STATUS )
+      IF( STATUS .NE. SAI__OK ) THEN
+         CALL ERR_REP( 'SETSKY_ERR', 'SETSKY: Unable to add '//
+     :                 'astrometry information to an NDF.', STATUS )
       END IF
 
       END

@@ -447,13 +447,15 @@ Usage:
 
 Description:
 
-   This task allows regions of a NDF's data array to be masked, so
-   that they can be excluded from subsequent data processing.  ARD
-   (ASCII Region Definition) descriptions stored in a text
-   file define which pixels of the data array are masked.  An
+   This task allows regions of an NDF's to be masked, so
+   that they can (for instance) be excluded from subsequent data
+   processing.  ARD (ASCII Region Definition) descriptions stored in
+   a text file define which pixels of the data array are masked.  An
    output NDF is created which is the same as the input file except
-   that all pixels specified by the ARD file have been assigned the
-   bad value.
+   that all pixels specified by the ARD file have been assigned either
+   the bad value or a specified constant value. This value can be
+   assigned to either the inside or the outside of the specified
+   ARD region.
 2 Parameters
 For information on individual parameters, select from the list below:
 3 ARDFILE
@@ -468,9 +470,23 @@ ARDFILE = FILENAME (Read)
    indicate that positions are specified in RA/DEC (FK5,J2000). The
    statement "COFRAME(PIXEL)" indicates explicitly that positions are
    specified in pixel co-ordinates.
+3 COMP
+COMP = LITERAL (Read)
+   The NDF array component to be masked.  It may be "Data", or
+   "Variance", or "Error" (where "Error" is equivalent to
+   "Variance"). ["Data"]
+3 CONST
+CONST = LITERAL (Given)
+   The constant numerical value to assign to the region, or the string
+   "bad". ["bad"]
 3 IN
 IN = NDF (Read)
    The name of the source NDF.
+3 INSIDE
+INSIDE = _LOGICAL (Read)
+   If a TRUE value is supplied, the constant value is assigned to the
+   inside of the region specified by the ARD file. Otherwise, it is
+   assigned to the outside. [TRUE]
 3 OUT
 OUT = NDF (Write)
    The name of the masked NDF.
@@ -536,6 +552,9 @@ DSB: David S. Berry (STARLINK)
  25-OCT-2001 (DSB):
     Modified to make pixel coords the default coord system for ard
     files.
+
+ 30-NOV-2001 (DSB):
+    Added parameters COMP, CONST and INSIDE.
 2 Implementation_Status
    -  This routine correctly processes the WCS, AXIS, DATA, QUALITY,
    LABEL, TITLE, UNITS, HISTORY, and VARIANCE components of an NDF
@@ -10252,100 +10271,64 @@ MJC: Malcolm J. Currie (STARLINK)
    the _REAL data type, and the output dataset has this type.
 
 1 LAPLACE
-    Performs a Laplacian convolution as an edge detector in a 2-d
-    data array
- 
-   This routine works out the Laplacian of the 2-d data array, in the
-   input IMAGE structure, and subtracts it from the original array to
-   create a new data array in the output IMAGE structure. The
+Performs a Laplacian convolution as an edge detector in a 2-d NDF
+
+Usage:
+
+   laplace in number out title
+
+Description:
+
+   This routine calculates the Laplacian of the supplied 2-d NDF, and
+   subtracts it from the original array to create the output NDF. The
    subtractions can be done a specified integer number of times.
-   This operation can be approximated with a convolution by
- 
+   This operation can be approximated by a convolution with the kernel:
+
                          -N   -N   -N
+
                          -N   +8N  -N
+
                          -N   -N   -N
- 
+
    where N is the integer number of times the Laplacian is
    subtracted.  This convolution is used as a uni-directional edge
    detector.  Areas where the input data array is flat become zero
    in the output data array.
- 
-   The magic-value method is used for processing bad data.
-2 AUTHORS
-   Mark McCaughrean UoE ( REVA::MJM )
-   Malcolm Currie  STARLINK (RAL::CUR)
-2 BUGS
-   None known.
-2 HISTORY
-   10-12-1985 : First implementation (UKTH::MARK)
-   17-04-1986 : Tidied and more error checking (REVA::MJM)
-   1986 Aug 7 : Renamed algorithmic subroutine to LAPLSB.
-   1986 Aug 29: Added argument section to prologue, and nearly
-                conformed to Starlink standards (RAL::CUR).
-   1987 Oct 15: Reordered tidying and extra status checks
-                (RAL::CUR)
-   1988 Mar 17: Referred to `array' rather than `image'
-                (RAL::CUR)
-   1988 May 31: More reporting of error context (RAL::CUR)
-   1989 Jun 13: Allow for processing primitive NDFs (RAL::CUR)
-   1989 Aug  8: Passed array dimensions as separate variables
-                to LAPLSB (RAL::CUR).
-   1991 Oct 25: Propagates AXIS, LABEL, and HISTORY (RAL::CUR).
-   1992 Feb 25: Limited processing of simple NDFs (RAL::CUR).
-   1992 Mar  3: Replaced AIF parameter-system calls by the extended
-                PAR library (RAL::CUR).
-   1992 Mar  3: Replaced AIF parameter-system calls by the extended
-                PAR library (RAL::CUR).
-2 PARAMETERS
-   INPIC = IMAGE( READ )
-       Input IMAGE structure containing the 2-d data array to be
-         processed
-   NUMBER = INTEGER( READ )
-       Number of times the Laplacian is to be subtracted
-   OUTPIC = IMAGE( WRITE )
-       Output IMAGE structure containing the processed data array
-   OTITLE = CHAR( READ )
-       Title string for output IMAGE structure
-3 INPIC
-  position    1
-  keyword     'INPIC'
-  type        'IMAGE'
-  access      'READ'
-  vpath       'PROMPT'
-  ppath       'GLOBAL'
-  association '<-GLOBAL.DATA_ARRAY'
-  prompt      'Image to be convolved'
-  help        'Name of the IMAGE structure containing the 2-d data 
-              array on which the Laplacian convolution is performed'
+2 Parameters
+For information on individual parameters, select from the list below:
+3 IN
+IN = NDF (Read)
+   Input NDF.
 3 NUMBER
-  position    2
-  keyword     'NUMBER'
-  type        '_INTEGER'
-  vpath       'DEFAULT'
-  default     1
-  prompt      'Number of Laplacians removed'
-  help        'Give the integer number of Laplacians to be removed 
-              from the input data array'
-3 OUTPIC
-  position    3
-  keyword     'OUTPIC'
-  type        'IMAGE'
-  access      'WRITE'
-  vpath       'PROMPT'
-  association '->GLOBAL.DATA_ARRAY'
-  prompt      'Image after convolution'
-  help        'Name given to the IMAGE structure to hold the 
-              convolved data array'
-3 OTITLE
-  position    4
-  keyword     'OTITLE'
-  type        '_CHAR'
-  vpath       'DEFAULT'
-  prompt      'Title for output image'
-  default     'KAPPA - Laplace'
-  help        'Character string to be used as a title for the output 
-              IMAGE data structure'
+NUMBER = _INTEGER (Read)
+   Number of Laplacians to remove. [1]
+3 OUT
+OUT = NDF (Write)
+   Output NDF.
+3 TITLE
+TITLE = LITERAL (Read)
+   Value for the title of the output NDF.  A null value will cause
+   the title of the NDF supplied for parameter IN to be used
+   instead. [!]
+2 Examples
+laplace a 10 b
+   This subtracts 10 Laplacians from the NDF called a, to make the
+   NDF called b. NDF b inherits its title from a.
+2 Related_Applications
+   KAPPA: SHADOW, MEDIAN; Figaro: ICONV3.
+2 Authors
+DSB: David S. Berry (STARLINK)
+2 History
+ 26-NOV-2001 (DSB):
+    Original NDF version.
+2 Implementation_Status
+   -  This routine correctly processes the WCS, AXIS, DATA, and VARIANCE
+   components of an NDF data structure. QUALITY is propagated.
 
+   -  Processing of bad pixels and automatic quality masking are
+   supported.
+
+   -  All non-complex numeric data types can be handled.
 1 LINPLOT
 Draws a line plot of the data values in a 1-dimensional NDF.
 
@@ -12259,6 +12242,36 @@ MJC: Malcolm J. Currie (STARLINK)
 
  1991 April 24 (MJC):
     NDF version of LUTABLE and extended the prologue.
+
+1 LUTCOLD
+Loads the cold lookup table.
+
+Usage:
+
+   lutcold
+
+Description:
+
+   This procedure loads the "cold" lookup table with linear scaling
+   into the current image-display device.  It is a continuous LUT
+   going from black to white, passing through cold shades of pale blue
+   and grey.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 DEVICE
+DEVICE = DEVICE (Read)
+   Name of the image display whose colour table is to be changed.
+   [Current image-display device]
+2 Notes
+This is a procedure that calls LUTABLE.  Therefore, the 
+parameter cannot be specified on the command line.  You will 
+only be prompted for the DEVICE parameter if the current
+image display is not suitable or not available.
+2 Authors
+DSB: David S. Berry (STARLINK)
+2 History
+ 2000 Oct 31 (MJC):
+    Original version.
 
 1 LUTCONT
 Loads a lookup table to give the display the appearance of a
@@ -16431,122 +16444,93 @@ DSB: David S. Berry (STARLINK)
     Original version.
 
 1 OUTSET
-    Sets pixels outside a specified circle in a 2-d data array to a
-    specified value
- 
-   A circle of a given centre and diameter within the 2-d data array
-   of the input IMAGE structure is specified.  The data array written
-   to the output IMAGE structure, is a copy of the input data array
-   except pixels outside the circle are set to a specified value.
-2 AUTHORS
-   Mark McCaughrean UoE (REVA::MJM)
-   Malcolm Currie  STARLINK (RAL::CUR)
-2 BUGS
-   None known.
-2 HISTORY
-   17-09-1985 : First implementation (REVA::MJM)
-   03-07-1986 : Tidied and more error checking (REVA::MJM)
-   1986 Aug 7 : Renamed algorithmic routine to OTSTSB, reordered
-                arguments (2nd to 7th). (RAL::CUR).
-   1986 Aug 29: Added arguments section to the prologue, nearly
-                conformed to Starlink standards (RAL::CUR).
-   1988 Mar 17: Referred to `array' rather than `image'
-                (RAL::CUR)
-   1988 May 31: More reporting of error context (RAL::CUR)
-   1989 Jun 13: Allow for processing primitive NDFs (RAL::CUR)
-   1989 Aug  8: Passed array dimensions as separate variables
-                to OTSTSB (RAL::CUR).
-   1990 Oct  9: x-y centre is co-ordinates rather than pixel
-                indices; added bad-value option for the replacement
-                value (RAL::CUR).
-   1991 Oct 25: Propagates AXIS, UNITS, LABEL, and HISTORY
-                (RAL::CUR).
-   1992 Feb 25: Limited processing of simple NDFs (RAL::CUR).
-   1992 Mar  3: Replaced AIF parameter-system calls by the extended
-                PAR library (RAL::CUR).
-2 PARAMETERS
-   INPIC  =  IMAGE( READ )
-       IMAGE structure containing the array to be modified
-   OUTPIC  =  IMAGE( WRITE )
-       Output IMAGE structure containing the modified array
-   OTITLE  =  CHARACTER( READ )
-       Title for the output IMAGE structure
-   XCENTRE  =  REAL( READ )
-       x co-ordinate of the centre of the circle to be used
-   YCENTRE  =  REAL( READ )
-       y co-ordinate of the centre of the circle to be used
-   DIAMETER  =  REAL( READ )
-       Diameter of the circle to be used
-   NEWVAL  =  REAL( READ )
-       Value to replace old values in the pixels outside the circle
-       If this is set to 'Bad' the magic-value is used.
-3 INPIC
-  position    1
-  keyword     'INPIC'
-  type        'IMAGE'
-  access      'READ'
-  vpath       'PROMPT'
-  ppath       'GLOBAL'
-  association '<-GLOBAL.DATA_ARRAY'
-  prompt      'Image to be modified'
-  help        'Name of IMAGE structure containing the 2-d data array 
-              to be modified'
-3 OUTPIC
-  position    2
-  keyword     'OUTPIC'
-  type        'IMAGE'
-  access      'WRITE'
-  vpath       'PROMPT'
-  association '->GLOBAL.DATA_ARRAY'
-  prompt      'Image after being modified'
-  help        'Name given to the IMAGE structure to hold the data 
-              array after being modified'
-3 OTITLE
-  position    3
-  keyword     'OTITLE'
-  type        '_CHAR'
-  vpath       'DEFAULT'
-  prompt      'Title for output image'
-  default     'KAPPA - Outset'
-  help        'Character string used as a title for the output IMAGE 
-              structure.'
-3 XCENTRE
-  position    4
-  keyword     'XCENTRE'
-  type        '_REAL'
-  vpath       'PROMPT'
-  ppath       'DYNAMIC'
-  prompt      'x co-ordinate of circle centre'
-  help        'Give the x co-ordinate of the centre of the circle to 
-              be used'
-3 YCENTRE
-  position    5
-  keyword     'YCENTRE'
-  type        '_REAL'
-  vpath       'PROMPT'
-  ppath       'DYNAMIC'
-  prompt      'y co-ordinate of circle centre'
-  help        'Give the y co-ordinate of the centre of the circle to 
-              be used'
-3 DIAMETER
-  position    6
-  keyword     'DIAMETER'
-  type        '_REAL'
-  vpath       'PROMPT'
-  ppath       'DYNAMIC'
-  prompt      'Diameter of circle'
-  help        'Give the diameter in pixels of the circle to be used'
-3 NEWVAL
-  position    7
-  keyword     'NEWVAL'
-  type        '_LITERAL'
-  vpath       'PROMPT'
-  ppath       'DEFAULT'
-  prompt      'New value for pixels outside circle'
-  default     0.0
-  help        'This will become the new value for all pixels outside 
-              the circle.  BAD gives the bad-pixel value.'
+Mask pixels inside or outside a specified circle in a 2-d NDF.
 
+Usage:
+
+   outset in out centre diam
+
+Description:
+
+   This routine assigns a specified value (which may be "bad") to
+   either the outside or inside of a specified circle within a
+   specified component of a given 2-dimensional NDF.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 CENTRE
+CENTRE = LITERAL (Read)
+   The co-ordinates of the centre of the circle. The position must
+   be given in the current co-ordinate Frame of the NDF (supplying
+   a colon ":" will display details of the current co-ordinate
+   Frame). The position should be supplied as a list of formatted
+   axis values separated by spaces or commas. See also parameter
+   USEAXIS. The current co-ordinate Frame can be changed using
+   KAPPA:WCSFRAME.
+3 COMP
+COMP = LITERAL (Read)
+   The NDF array component to be masked.  It may be "Data", or
+   "Variance", or "Error" (where "Error" is equivalent to
+   "Variance"). ["Data"]
+3 CONST
+CONST = LITERAL (Given)
+   The constant numerical value to assign to the masked pixels, or
+    the string "bad". ["bad"]
+3 DIAM
+DIAM = LITERAL (Read)
+   The diameter of the circle. If the current co-ordinate Frame of
+   the NDF is a SKY Frame (e.g. RA and DEC), then the value should be
+   supplied as an increment of celestial latitude (e.g. DEC). Thus,
+   "10.2" means 10.2 arc-seconds, "30:0" would mean 30 arc-minutes,
+   and "1:0:0" would mean 1 degree. If the current co-ordinate
+   Frame is not a SKY Frame, then the diameter should be specified
+   as an increment along axis 1 of the current co-ordinate Frame.
+   Thus, if the current Frame is PIXEL, the value should be given
+   simply as a number of pixels.
+3 IN
+IN = NDF (Read)
+   The name of the source NDF.
+3 INSIDE
+INSIDE = _LOGICAL (Read)
+   If a TRUE value is supplied, the constant value is assigned to the
+   inside of the circle. Otherwise, it is assigned to the outside. [FALSE]
+3 OUT
+OUT = NDF (Write)
+   The name of the masked NDF.
+3 TITLE
+TITLE = LITERAL (Read)
+   Title for the output NDF structure.  A null value (!)
+   propagates the title from the input NDF to the output NDF. [!]
+2 Examples
+outset neb1 nebm "13.5,201.3" 20 const=0
+   This copies NDF "neb1" to "nebm", setting pixels to zero in the
+   DATA array if they fall outside the specified circle. Assuming the
+   current co-ordinate Frame of neb1 is PIXEL, the circle is centred
+   at pixel co-ordinates (13.5, 201.3) and has a diameter of 20 pixels.
+
+outset neb1 nebm "15:23:43.2 -22:23:34.2" "10:0" inside comp=var
+   This copies NDF "neb1" to "nebm", setting pixels bad in the
+   VARIANCE array if they fall inside the specified circle. Assuming
+   the current co-ordinate Frame of neb1 is a SKY Frame describing RA
+   and DEC, the aperture is centred at RA 15:23:43.2 and
+   DEC -22:23:34.2, and has a diameter of 10 arc-minutes.
+2 Related_Applications
+   KAPPA: ARDMASK.
+2 Authors
+DSB: David S. Berry (STARLINK)
+2 History
+ 30-NOV-2001 (DSB):
+    Original NDF version.
+2 Implementation_Status
+   -  This routine correctly processes the WCS, AXIS, DATA, QUALITY,
+   LABEL, TITLE, UNITS, HISTORY, and VARIANCE components of an NDF
+   data structure and propagates all extensions.
+
+   -  Processing of bad pixels and automatic quality masking are
+   supported.
+
+   -  Bad pixels and automatic quality masking are supported.
+
+   -  All non-complex numeric data types can be handled.
 1 PALDEF
 Loads the default palette to a colour table.
 
@@ -18350,87 +18334,57 @@ DSB: David S. Berry (STARLINK)
    -  Any number of NDF dimensions is supported.
 
 1 POW
-    Takes the specified power of each pixel of a data array
- 
-   This routine takes the specified power of each pixel of the
-   data array in the input IMAGE structure. The result goes into a
-   new output array, also in an IMAGE structure.
- 
-   The magic-value method is used for processing bad data.  Output
-   pixels become bad if the result raising to the specified power is
-   undefined or out of range.  Negative pixel values will only
-   generate good output pixels when the power is an even integer.
-2 AUTHORS
-   Mark McCaughrean UoE ( REVA::MJM )
-   Malcolm Currie  STARLINK (RAL::CUR)
-2 BUGS
-   None known.
-2 HISTORY
-   03-07-1986 : First implementation (REVA::MJM)
-   1986 Aug 7 : Renamed algorithm subroutine (POWARR), changed new
-                2nd argument to total number of pixels (RAL::CUR).
-   1986 Aug 29: Add argument section, generalised to vector and
-                tidied (RAL::CUR).
-   1987 Oct 16: Reordered tidying and used CMP_SHAPE (RAL::CUR)
-   1988 Mar 17: Referred to `array' rather than `image'
-                (RAL::CUR)
-   1988 May 31: More reporting of error context (RAL::CUR)
-   1989 Jun 13: Allow for processing primitive NDFs (RAL::CUR)
-   1991 Oct 25: Propagates AXIS, LABEL, and HISTORY (RAL::CUR).
-   1992 Feb 25: Limited processing of simple NDFs (RAL::CUR).
-   1992 Mar  3: Replaced AIF parameter-system calls by the extended
-                PAR library (RAL::CUR).
-2 PARAMETERS
-   INPIC  =  IMAGE( READ )
-       Input IMAGE structure containing the data array to be
-         processed
-   POWER  =  REAL( READ )
-       Power to be taken of each input data-array pixel
-   OUTPIC  =  IMAGE( WRITE )
-       Output IMAGE structure holding result of the processed data
-         array
-   OTITLE  =  CHAR( READ )
-       Title string for the output IMAGE structure
-3 INPIC
-  position    1
-  keyword     'INPIC'
-  type        'IMAGE'
-  access      'READ'
-  vpath       'PROMPT'
-  ppath       'GLOBAL'
-  association '<-GLOBAL.DATA_ARRAY'
-  prompt      'Input image'
-  help        'Name of the IMAGE structure containing the input data 
-              array'
-3 POWER
-  position    2
-  keyword     'POWER'
-  type        '_REAL'
-  access      'READ'
-  vpath       'PROMPT'
-  ppath       'CURRENT,DYNAMIC'
-  prompt      'Power'
-  help        'Power to be taken of each input data-array pixel'
-3 OUTPIC
-  position    3
-  keyword     'OUTPIC'
-  type        'IMAGE'
-  access      'WRITE'
-  vpath       'PROMPT'
-  association '->GLOBAL.DATA_ARRAY'
-  prompt      'Output image'
-  help        'Name given to the IMAGE structure holding the data 
-              array resulting from taking power'
-3 OTITLE
-  position    4
-  keyword     'OTITLE'
-  type        'LITERAL'
-  vpath       'DEFAULT'
-  prompt      'Title for output image'
-  default     'KAPPA - Pow'
-  help        'Character string used as a title for the output IMAGE 
-              structure.'
+Takes the specified power of each pixel of an NDF.
 
+Usage:
+
+   pow in power out
+
+Description:
+
+   This routine copies the supplied input NDF, raising each value in
+   the DATA array to the specified power. The VARIANCE component, if
+   present, is modified appropriately. Negative data values will only
+   generate good output pixels when the power is an integer.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 IN
+IN = NDF (Read)
+   The input NDF structure.
+3 OUT
+OUT = NDF (Write)
+   The output NDF structure.
+3 POWER
+POWER = _DOUBLE (Read)
+   The power.
+3 TITLE
+TITLE = LITERAL (Read)
+   A title for the output NDF.  A null value will cause the title
+   of the NDF supplied for parameter IN to be used instead.
+   [!]
+2 Examples
+pow m51 2 m51sq
+   Square all values in the NDF called m51, and store the results in the
+   NDF called m51sq.
+2 Related_Applications
+   KAPPA: ADD, CADD, CMULT, CDIV, CSUB, DIV, MATHS, MULT, SUB.
+2 Authors
+DSB: David S. Berry (STARLINK)
+2 History
+ 30-NOV-2001 (DSB):
+    Original NDF version.
+2 Implementation_Status
+   -  This routine correctly processes the AXIS, DATA, QUALITY,
+   LABEL, TITLE, UNITS, HISTORY, WCS and VARIANCE components of an NDF
+   data structure and propagates all extensions.
+
+   -  Processing of bad pixels and automatic quality masking are
+   supported.
+
+   -  All non-complex numeric data types can be handled.  Arithmetic
+   is performed using single-precision floating point, or double
+   precision, if appropriate, but the numeric type of the input pixels
+   is preserved in the output NDF.
 1 PROFILE
 Creates a 1-dimensional profile through an N-dimensional NDF.
 
@@ -20876,7 +20830,7 @@ MJC: Malcolm J. Currie (STARLINK)
  1995 April 24 (MJC):
     Made usage and examples lowercase.  Added Related Applications.
 1 SETSKY
-Makes an IRAS astrometry extension.
+Stores new  WCS information within an NDF.
 
 Usage:
 
@@ -20885,15 +20839,11 @@ Usage:
 
 Description:
 
-   This application makes an IRAS astrometry extension within a
-   two-dimensional NDF, therefore allowing sky co-ordinate
-   information to be stored with an arbitrary image.  This
-   information is used by certain IRAS90 applications (those with
-   the SKY prefix) to perform various astrometric operations.  These
-   include annotation of a displayed image with a grid of celestial
-   co-ordinates, marking the location of a given celestial position
-   given a pixel position, and aligning a group of images.  See
-   SUN/163 for details.
+   This application adds WCS information describing a celestial sky
+   co-ordinate system to a two-dimensional NDF. This information can
+   be stored either in the form of a standard NDF WCS component, or
+   in the form of an "IRAS90 astrometry structure" (see parameter
+   IRAS90).
 
    The astrometry is determined either by you supplying explicit
    values for certain projection parameters, or by you providing the
@@ -20921,144 +20871,20 @@ COORDS = LITERAL (Read)
    parentheses, for example, "Equatorial(1994.5)".  The epoch may
    be preceded by a single character, "B" or "J", indicating that
    the epoch is Besselian or Julian respectively.  If this letter
-   is missing, a Besselian epoch is assumed if the epoch is less than
-   1984.0, and a Julian epoch is assumed otherwise.
+   is missing, a Besselian epoch is assumed if the epoch is less
+   than 1984.0, and a Julian epoch is assumed otherwise.
 3 EPOCH
 EPOCH = DOUBLE PRECISION (Read)
    The Julian epoch at which the observation was made (e.g.
    "1994.0").
-3 LAT
-LAT = LITERAL (Read)
-   The latitude of the reference point, in the co-ordinate system
-   specified by parameter COORDS.  For example, if COORDS is
-   "Equatorial", LAT is the Declination.  See SUN/163, Section
-   4.7.2 for full details of the allowed syntax for specifying
-   this position.  For convenience here are some examples how you
-   may specify the Declination -45 degrees, 12 arcminutes: "-45 12
-   00", "-45 12", "-45d 12m", "-45.2d", "-451200", "-0.78888r".
-   The last of these is a radians value.  A null value causes the
-   latitude of the reference point to be estimated automatically
-   from the data supplied for parameter POSITIONS. [!]
-3 LOGFILE
-LOGFILE = FILENAME (Read)
-   Name of the text file to log the final projection parameter
-   values and the residual at each supplied position.  If null,
-   there will be no logging.  This parameter is ignored if a null
-   value is given to parameter POSITIONS. [!]
-3 LON
-LON= LITERAL (Read)
-   The longitude of the reference point, in the co-ordinate
-   system specified by parameter COORDS.  For example, if COORDS
-   is "Equatorial", LON is the Right Ascension.  See SUN/163,
-   Section 4.7.2 for full details of the allowed syntax for
-   specifying this position.  For convenience here are some
-   examples how you may specify the Right Ascension 11 hours, 34
-   minutes, and 56.2 seconds: "11 34 56.2", "11h 34m 56.2s", "11
-   34.9366", "11.58228", "113456.2".  See parameter LAT for
-   examples of specifying a non-equatorial longitude.  A null
-   value causes the longitude of the reference point to be
-   estimated automatically from the data supplied for parameter
-   POSITIONS. [!]
-3 NDF
-NDF = NDF (Read and Write)
-   The NDF that is to have an IRAS astrometry extension.
-3 ORIENT
-ORIENT = LITERAL (Read)
-   The position angle of the NDF's y axis on the celestial
-   sphere, measured from north through east.  North is defined as
-   the direction of increasing sky latitude, and east is the
-   direction of increasing sky longitude.  Values are constrained
-   to the range 0 to two-pi radians.  A null value causes the
-   position angle to be estimated automatically from the data
-   supplied for parameter POSITIONS. [!]
-3 PIXELREF
-PIXELREF( 2 ) = REAL (Read)
-   The pixel co-ordinates of the reference pixel (x then y).
-   This parameter is ignored unless REFCODE = "Pixel".  Remember
-   that the centre of a pixel at indices i,j is (i-0.5,j-0.5).  A
-   null value causes the pixel co-ordinates of the reference
-   point to be estimated automatically from the data supplied for
-   parameter POSITIONS. [!]
-3 PIXELSIZE
-PIXELSIZE( 2 ) = _REAL (Read)
-   The x and y pixel sizes at the reference position.  If only
-   one value is given, the pixel is deemed to be square.  Values
-   may be given in a variety of units (see parameter LAT).  For
-   example, 0.54 arcseconds could be specified as "0.54s" or
-   "0.009m" or "2.618E-6r".  A null value causes the pixel
-   dimensions to be estimated automatically from the data
-   supplied for parameter POSITIONS. [!]
-3 POSITIONS
-POSITIONS = LITERAL (Read)
-   A list of sky co-ordinates and corresponding image
-   co-ordinates for the set of positions which are to be used to
-   determine the astrometry.  If a null value is given then the
-   astrometry is determined by the explicit values you supply for
-   each of the other parameters.  Each position is defined by
-   four values, the sky longitude (in the same format as for
-   parameter LON), the sky latitude (in the same format as for
-   parameter LAT), the image pixel x co-ordinate and the image
-   pixel y co-ordinate (both decimal values).  These should be
-   supplied (in the order stated) for each position.  These
-   values are given in the form of a `group expression' (see
-   SUN/150).  This means that values can be either typed in
-   directly or supplied in a text file.  If typed in directly,
-   the items in the list should be separated by commas, and you
-   are re-prompted for further values if the last supplied value
-   ends in a minus sign.  If conveyed in a text file, they should
-   again be separated by commas, but can be split across lines.
-   The name of the text file is given in response to the prompt,
-   preceded by an `up arrow' symbol (^).
-3 PROJTYPE
-PROJTYPE = LITERAL (Read)
-   The type of projection to use.  The options are:
-      "Aitoff"         - Aitoff equal-area,
-      "Gnomonic"       - Gnomonic or tangent plane,
-      "Lambert"        - Lambert normal equivalent cylindrical,
-      "Orthographic"   - Orthographic.
-
-   The following synonyms are also recognised:
-       "All_sky"       - Aitoff,
-       "Cylindrical"   - Lambert,
-       "Tangent_plane" - Gnomonic.
-
-   See SUN/163 for descriptions of these projections.  A null
-   value causes the projection to be determined automatically
-   from the data supplied for parameter POSITIONS. [!]
-3 REFCODE
-REFCODE = LITERAL (Read)
-   The code for the reference pixel.  If it has value "Pixel"
-   this requests that pixel co-ordinates for the reference point
-   be obtained through parameter PIXELREF.  The other options are
-   locations specified by two characters, the first corresponding
-   to the vertical position and the second the horizontal.  For
-   the vertical, valid positions are T(op), B(ottom), or
-   C(entre); and for the horizontal the options are L(eft),
-   R(ight), or C(entre).  Thus REFCODE = "CC" means the reference
-   position is at the centre of the NDF image, and "BL" specifies
-   that the reference position is at the centre of the
-   bottom-left pixel in the image.  A null value causes the pixel
-   co-ordinates of the reference point to be estimated
-   automatically from the data supplied for parameter POSITIONS.
-   [!]
-3 TILT
-TILT = LITERAL (Read)
-   The angle through which the celestial sphere is to be rotated
-   prior to doing the projection.  The axis of rotation is a
-   radius passing through the reference point.  The rotation is
-   in an anti-clockwise sense when looking from the reference
-   point towards the centre of the celestial sphere.  In common
-   circumstances this can be set to zero.  Values may be given in
-   a variety of units (see parameter LAT).  Values are
-   constrained to the range 0 to two-pi radians.  A null value
-   causes the latitude of the reference point to be estimated
-   automatically from the data supplied for parameter POSITIONS.
-   ["0.0"]
+3 IRAS90
+IRAS90 = _LOGICAL (Read)
+   If a TRUE value is supplied, then the WCS information will be
 2 Examples
 setsky m51 ^stars.lis ecl(j1994.0) 1994.0 logfile=m51.log
-   This creates an astrometry extension within the two-dimensional
-   NDF called m51.  The values for parameters PROJTYPE, LON, LAT,
-   PIXELREF, PIXELSIZE and ORIENT are determined automatically so
+   This creates a WCS component to a two-dimensional NDF called
+   m51.  The values for parameters PROJTYPE, LON, LAT, PIXELREF,
+   PIXELSIZE and ORIENT are determined automatically so
    that they minimised the sum of the squared residuals (in
    pixels) at each of the positions specified in the file
    stars.lis.  This file contains a line for each position, each
@@ -21071,17 +20897,16 @@ setsky m51 ^stars.lis ecl(j1994.0) 1994.0 logfile=m51.log
    to file m51.log.
 
 setsky m51 ^stars.lis ecl(j1994.0) 1994.0 orient=0 projtype=orth
-   This creates an astrometry extension within the
-   two-dimensional NDF called m51.  The values for parameters
-   PROJTYPE, LON, LAT, PIXELREF and PIXELSIZE are determined
-   automatically as in the previous example.  In this example
-   however, an Orthographic projection is forced, and the value
-   zero is assigned to parameter ORIENT, resulting in north being
-   `upwards' in the image.
+   This creates a WCS component within the two-dimensional NDF
+   called m51.  The values for parameters PROJTYPE, LON, LAT,
+   PIXELREF and PIXELSIZE are determined automatically as in
+   the previous example.  In this example however, an Orthographic
+   projection is forced, and the value zero is assigned to
+   parameter ORIENT, resulting in north being `upwards' in the image.
 
 setsky virgo "!" eq(j2000.0) 1989.3 gn "12 29" "+12 30" bl 1.1s
        0.0d
-   This creates an astrometry extension within the two-dimensional
+   This creates a WCS component within the two-dimensional
    NDF called virgo.  It is a gnomonic projection in the
    equatorial system at Julian epoch 2000.0.  The bottom-left
    pixel of the image is located at Right Ascension 12 hours 29
@@ -21093,7 +20918,7 @@ setsky virgo "!" eq(j2000.0) 1989.3 gn "12 29" "+12 30" bl 1.1s
 
 setsky map "!" galactic(1950.0) 1993.8 aitoff 90 0 cc
    [0.5d,0.007r] 180.0d
-    This creates an astrometry extension within the two-dimensional
+    This creates a WCS component within the two-dimensional
     NDF called map.  It is an Aitoff projection in the galactic
     system at Besselian epoch 1950.0.  The centre of the image is
     located at galactic longitude 90 degrees, latitude 0 degrees.
@@ -21103,8 +20928,8 @@ setsky map "!" galactic(1950.0) 1993.8 aitoff 90 0 cc
     parallel to the y-axis of the image.
 
 setsky zodiac "!" ec 1983.4 or 10.3 -5.6 Pixel 20m 0.3d
-   pixelref=[9.5,-11.2]
-    This creates an astrometry extension within the
+   pixelref=[9.5,-11.2] IRAS90=YES
+    This creates an IRAS90 astrometry extension within the
     two-dimensional NDF called zodiac.  It is an orthographic
     projection in the Ecliptic system at Besselian epoch 1950.0.
     The reference point at pixel co-ordinates (9.5,-11.2)
@@ -21115,19 +20940,22 @@ setsky zodiac "!" ec 1983.4 or 10.3 -5.6 Pixel 20m 0.3d
     epoch 1983.4.  At the reference point the y-axis of the image
     points to 0.3 degrees east of north.
 2 Notes
--  SETSKY overwrites an existing astrometry extension within
-the NDF.
+- The GAIA image display tool (SUN/214) provides various interactive
+tools for storing new WCS information within an NDF.
 
--  WARNING: As is standard for NDF extensions, the transformation
-stored in the NDF will be propagated to new NDFs derived from it.
-However, certain operations will invalidate the transformation.
-These include configuration change, a shift of origin, and
-resampling.  Once there is a standard astrometry extension, KAPPA
-applications will be made to process that extension correctly, by
-modifying it where that's possible otherwise not copying it.
-2 Related_Applications
-   ASTROM; IRAS90: SKYALIGN, SKYBOX, SKYGRID, SKYLINE, SKYMARK,
-   SKYPOS, SKYWRITE.
+- This application was written to supply the limited range of WCS
+functions required by the IRAS90 package. For instance, it does not
+support the complete range or projections or sky co-ordinate systems
+which may be represented by the more general NDF WCS component.
+
+- If WCS information is stored in the form of an IRAS90 astrometry
+structure (see parameter IRAS90), it will in general be invalidated
+by any subsequent KAPPA commands which modify the transformation
+between sky and pixel coordinates. For instance, if the image is
+moved using SLIDE (for example), then the IRAS90 astrometry
+structure will no longer correctly describe the sky co-ordinates
+associated with each pixel. For this reason (amongst others) it is
+better to set parameter IRAS90 to a false value.
 2 Authors
 MJC: Malcolm J. Currie (STARLINK)
 
@@ -21138,13 +20966,16 @@ DSB: David S. Berry (STARLINK)
 
  28-OCT-1994 (DSB):
     Added parameters POSITIONS and LOGFILE.  Modified to determine
-    projection parameters automatically from the data suplied for
+    projection parameters automatically from the data supplied for
     POSITIONS.
 
  1995 February 13 (MJC):
     Corrected typo's, errors in the examples, output the fitted
     pixel size in arcseconds if appropriate.  Validated the
     extension locator before annulling it.
+
+ 26-NOV-2001 (DSB):
+    Added parameter IRAS90.
 1 SETTITLE
 Sets a new title for an NDF data structure.
 
@@ -23478,94 +23309,86 @@ MJC: Malcolm J. Currie (STARLINK)
  1993 June 18 (MJC):
     Original version.
 1 TRIG
-    Performs a trigonometric transformation on a data array
- 
-   This routine allows the user to select one of a set of several
-   basic trigonometrical functions (sine, cosine, tangent, arcsine,
-   etc.) and operate on each pixel of the data array, in the input
-   IMAGE structure, with this function, and then to output a
-   transformed version of the array. The trigonometric functions can
-   be selected to act as if the input data are to be treated as
-   radians or degrees. If a scalar value rather than a data array is
-   input, the application acts purely on that scalar value.
- 
-   The magic-value method is used for processing bad data.  Undefined
-   results are set to the magic value.
-2 AUTHORS
-   Mark McCaughrean UoE ( REVA::MJM )
-   Malcolm Currie  STARLINK (RAL)
-2 BUGS
-   None known.
-2 HISTORY
-   10-12-1985 : First implementation (UKTH::MARK)
-   08-01-1986 : Allowed option of scalar processing (REVA::MJM)
-   1986 Aug 8 : Renamed routines TRIGSCAL and TRIGSUB to TRGSCL and
-                TRIGSB respectively. 2nd argument of TRIGSB changed
-                to the number of pixels in the input array. Status
-                checking of mapping of output array added
-                (RAL::CUR).
-   1986 Sep 1 : Added argument section to prologue, generalised to
-                vector and nearly conformed to Starlink standards
-                (RAL::CUR).
-   1987 Oct 16: Reordered tidying (particularly in VALID loop), extra
-                status checks and used CMP_SHAPE, rewrote method
-                section (RAL::CUR)
-   1988 Mar 17: Referred to `array' rather than `image'
-                (RAL::CUR)
-   1988 Jun 1 : More reporting of error context (RAL::CUR)
-   1989 Jun 13: Allow for processing primitive NDFs (RAL::CUR)
-   1991 Oct 25: Propagates AXIS, LABEL, and HISTORY (RAL::CUR).
-   1992 Feb 25: Limited processing of simple NDFs (RAL::CUR).
-2 PARAMETERS
-   INPIC = IMAGE( READ )
-       Input IMAGE structure containing the data array to be
-         transformed.
-   TRIGFUNC = CHAR( READ )
-       Trigonometrical function to be applied.
-   OUTPIC = IMAGE( WRITE )
-       Output IMAGE structure containing the transformed data array.
-   OTITLE = CHAR( READ )
-       Title string for the output IMAGE structure.
-3 INPUT
-  position    1
-  keyword     'INPUT'
-  type        'UNIV'
-  access      'READ'
-  vpath       'PROMPT'
-  ppath       'GLOBAL'
-  association '<-GLOBAL.DATA_ARRAY'
-  prompt      'Input to be operated on'
-  help        'Give the IMAGE structure containing the data array, or 
-              the scalar on which the trig function is to operate.'
+Performs a trigonometric transformation on a NDF.
+
+Usage:
+
+   trig in trigfunc out title
+
+Description:
+
+   This routine copies the supplied input NDF, performing a specified
+   trigonometric operation ( sine, tangent, etc.) on each value in the
+   DATA array. The VARIANCE component, if present, is modified
+   appropriately. Pixels for which the required value is undefined, or
+   outside the numerical range of the NDFs data type, are set bad in
+   the output.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 IN
+IN = NDF (Read)
+   The input NDF structure.
+3 OUT
+OUT = NDF (Write)
+   The output NDF structure.
 3 TRIGFUNC
-  position    2
-  keyword     'TRIGFUNC'
-  type        'LITERAL'
-  vpath       'PROMPT'
-  prompt      'Trig function to be used'
-  help        'One of 
-              SIN,COS,TAN,SIND,COSD,TAND,ASIN,ACOS,ATAN,ASIND,ACOSD,ATAND.'
- #in          'SIN', 'COS', 'TAN', 'SIND', 'COSD', 'TAND', 'ASIN', 
-              'ACOS', 'ATAN', 'ASIND', 'ACOSD', 'ATAND'
-3 OUTPIC
-  position    3
-  keyword     'OUTPIC'
-  type        'IMAGE'
-  access      'WRITE'
-  vpath       'PROMPT'
-  association '->GLOBAL.DATA_ARRAY'
-  prompt      'Image for output data'
-  help        'Name given to the IMAGE structure to hold the 
-              generated data array.'
-3 OTITLE
-  position    4
-  keyword     'OTITLE'
-  type        '_CHAR'
-  vpath       'DEFAULT'
-  prompt      'Title for output image'
-  default     'KAPPA - Trig'
-  help        'Character string used as a title for the output IMAGE 
-              structure.'
+TRIGFUNC = LITERAL (Read)
+     Trigonometrical function to be applied.  The options are:
+
+   - ACOS:   arc-cosine (radians)
+
+   - ACOSD:   arc-cosine (degrees)
+
+   - ASIN:   arc-sine (radians)
+
+   - ASIND:   arc-sine (degrees)
+
+   - ATAN:   arc-tangent (radians)
+
+   - ATAND:   arc-tangent (degrees)
+
+   - COS:   cosine (radians)
+
+   - COSD:   cosine (degrees)
+
+   - SIN:   sine (radians)
+
+   - SIND:   sine (degrees)
+
+   - TAN:   tangent (radians)
+
+   - TAND:   tangent (degrees)
+3 TITLE
+TITLE = LITERAL (Read)
+   A title for the output NDF.  A null value will cause the title
+   of the NDF supplied for parameter IN to be used instead.
+   [!]
+2 Examples
+trig sindata asind data
+   Take the arc-sine of the data values in the NDF called sindata, and
+   store the results (in degrees) in the NDF called data.
+
+trig sindata asin data
+   As above, but the output values are stored in radians.
+2 Related_Applications
+   KAPPA: ADD, CADD, CMULT, CDIV, CSUB, DIV, MATHS, MULT, SUB.
+2 Authors
+DSB: David S. Berry (STARLINK)
+2 History
+ 3-DEC-2001 (DSB):
+    Original NDF version.
+2 Implementation_Status
+   -  This routine correctly processes the AXIS, DATA, QUALITY,
+   LABEL, TITLE, UNITS, HISTORY, WCS and VARIANCE components of an NDF
+   data structure and propagates all extensions.
+
+   -  Processing of bad pixels and automatic quality masking are
+   supported.
+
+   -  All non-complex numeric data types can be handled.  Arithmetic
+   is performed using single-precision floating point, or double
+   precision, if appropriate, but the numeric type of the input pixels
+   is preserved in the output NDF.
 
 1 VECPLOT
 Plots a 2-dimensional vector map.
