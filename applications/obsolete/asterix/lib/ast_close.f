@@ -82,9 +82,6 @@
 *  Dynamic memory management
       CALL DYN_CLOSE()
 
-*  History (should go soon)
-      CALL HIST_CLOSE()
-
 *  User interface
       CALL USI_CLOSE()
 
