@@ -145,6 +145,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER NPIX
@@ -189,7 +190,8 @@
 *  median variances.
       IF( IMETH .NE. 1 .AND. IMETH .NE. 2 .AND. IMETH .NE. 300 ) THEN
           CALL PSX_CALLOC( NLINES*NLINES, '_DOUBLE', IPW1, STATUS )
-          CALL CCD1_ORVAR( NLINES, NMAT, PP, COVEC, %VAL( IPW1 ), 
+          CALL CCD1_ORVAR( NLINES, NMAT, PP, COVEC, 
+     :                     %VAL( CNF_PVAL( IPW1 ) ),
      :                     STATUS )
           CALL PSX_FREE( IPW1, STATUS )
       END IF
