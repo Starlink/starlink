@@ -574,6 +574,7 @@
       LOGICAL LOGAX
       LOGICAL SCALE,SETSCALE
       LOGICAL RADEC,SETRADEC
+      LOGICAL SUPPRESS
 *-
 
       SETW=.TRUE.
@@ -591,77 +592,102 @@
 
       IF (STATUS.EQ.SAI__OK) THEN
 
-*  get individual control parameters - NULL means no change
-        CALL PAR_GET0I('WIDTH',WIDTH,STATUS)
-        IF (STATUS.EQ.PAR__NULL) THEN
-          CALL ERR_ANNUL(STATUS)
+*  are default axes to be suppressed
+        CALL PAR_PROMT('SUPPRESS','Are axes to be suppressed',
+     :                                                 STATUS)
+        CALL PAR_GET0L('SUPPRESS',SUPPRESS,STATUS)
+
+        IF (SUPPRESS) THEN
+
           SETW=.FALSE.
-        ENDIF
-
-        CALL PAR_GET0I('FONT',FONT,STATUS)
-        IF (STATUS.EQ.PAR__NULL) THEN
-          CALL ERR_ANNUL(STATUS)
-          SETF=.FALSE.
-        ENDIF
-
-        CALL PAR_GET0R('SIZE',SIZE,STATUS)
-        IF (STATUS.EQ.PAR__NULL) THEN
-          CALL ERR_ANNUL(STATUS)
-          SETS=.FALSE.
-        ENDIF
-
-        CALL PAR_GET0I('BOLD',BOLD,STATUS)
-        IF (STATUS.EQ.PAR__NULL) THEN
-          CALL ERR_ANNUL(STATUS)
-          SETB=.FALSE.
-        ENDIF
-
-        CALL PAR_GET0R('TICK',TICK,STATUS)
-        IF (STATUS.EQ.PAR__NULL) THEN
-          CALL ERR_ANNUL(STATUS)
           SETT=.FALSE.
-        ENDIF
-
-        CALL PAR_GET0I('DIV',DIV,STATUS)
-        IF (STATUS.EQ.PAR__NULL) THEN
-          CALL ERR_ANNUL(STATUS)
           SETD=.FALSE.
-        ENDIF
-
-        CALL PAR_GET0C('OPT',OPT,STATUS)
-        IF (STATUS.EQ.PAR__NULL) THEN
-          CALL ERR_ANNUL(STATUS)
-          SETO=.FALSE.
-        ENDIF
-
-        CALL PAR_GET0R('LO',LO,STATUS)
-        IF (STATUS.EQ.PAR__NULL) THEN
-          CALL ERR_ANNUL(STATUS)
-          SETLO=.FALSE.
-        ENDIF
-
-        CALL PAR_GET0R('HI',HI,STATUS)
-        IF (STATUS.EQ.PAR__NULL) THEN
-          CALL ERR_ANNUL(STATUS)
-          SETHI=.FALSE.
-        ENDIF
-
-        CALL PAR_GET0L('LOG',LOGAX,STATUS)
-        IF (STATUS.EQ.PAR__NULL) THEN
-          CALL ERR_ANNUL(STATUS)
+          SETF=.FALSE.
+          SETS=.FALSE.
+          SETB=.FALSE.
           SETL=.FALSE.
-        ENDIF
-
-        CALL PAR_GET0L('RADEC',RADEC,STATUS)
-        IF (STATUS.EQ.PAR__NULL) THEN
-          CALL ERR_ANNUL(STATUS)
-          SETRADEC=.FALSE.
-        ENDIF
-
-        CALL PAR_GET0L('SCALE',SCALE,STATUS)
-        IF (STATUS.EQ.PAR__NULL) THEN
-          CALL ERR_ANNUL(STATUS)
+          SETHI=.FALSE.
+          SETLO=.FALSE.
           SETSCALE=.FALSE.
+          SETRADEC=.FALSE.
+
+          OPT=' '
+
+        ELSE
+
+*  get individual control parameters - NULL means no change
+          CALL PAR_GET0I('WIDTH',WIDTH,STATUS)
+          IF (STATUS.EQ.PAR__NULL) THEN
+            CALL ERR_ANNUL(STATUS)
+            SETW=.FALSE.
+          ENDIF
+
+          CALL PAR_GET0I('FONT',FONT,STATUS)
+          IF (STATUS.EQ.PAR__NULL) THEN
+            CALL ERR_ANNUL(STATUS)
+            SETF=.FALSE.
+          ENDIF
+
+          CALL PAR_GET0R('SIZE',SIZE,STATUS)
+          IF (STATUS.EQ.PAR__NULL) THEN
+            CALL ERR_ANNUL(STATUS)
+            SETS=.FALSE.
+          ENDIF
+
+          CALL PAR_GET0I('BOLD',BOLD,STATUS)
+          IF (STATUS.EQ.PAR__NULL) THEN
+            CALL ERR_ANNUL(STATUS)
+            SETB=.FALSE.
+          ENDIF
+
+          CALL PAR_GET0R('TICK',TICK,STATUS)
+          IF (STATUS.EQ.PAR__NULL) THEN
+            CALL ERR_ANNUL(STATUS)
+            SETT=.FALSE.
+          ENDIF
+
+          CALL PAR_GET0I('DIV',DIV,STATUS)
+          IF (STATUS.EQ.PAR__NULL) THEN
+            CALL ERR_ANNUL(STATUS)
+            SETD=.FALSE.
+          ENDIF
+
+          CALL PAR_GET0C('OPT',OPT,STATUS)
+          IF (STATUS.EQ.PAR__NULL) THEN
+            CALL ERR_ANNUL(STATUS)
+            SETO=.FALSE.
+          ENDIF
+
+          CALL PAR_GET0R('LO',LO,STATUS)
+          IF (STATUS.EQ.PAR__NULL) THEN
+            CALL ERR_ANNUL(STATUS)
+            SETLO=.FALSE.
+          ENDIF
+
+          CALL PAR_GET0R('HI',HI,STATUS)
+          IF (STATUS.EQ.PAR__NULL) THEN
+            CALL ERR_ANNUL(STATUS)
+            SETHI=.FALSE.
+          ENDIF
+
+          CALL PAR_GET0L('LOG',LOGAX,STATUS)
+          IF (STATUS.EQ.PAR__NULL) THEN
+            CALL ERR_ANNUL(STATUS)
+            SETL=.FALSE.
+          ENDIF
+
+          CALL PAR_GET0L('RADEC',RADEC,STATUS)
+          IF (STATUS.EQ.PAR__NULL) THEN
+            CALL ERR_ANNUL(STATUS)
+            SETRADEC=.FALSE.
+          ENDIF
+
+          CALL PAR_GET0L('SCALE',SCALE,STATUS)
+          IF (STATUS.EQ.PAR__NULL) THEN
+            CALL ERR_ANNUL(STATUS)
+            SETSCALE=.FALSE.
+          ENDIF
+
         ENDIF
 
 *  NSEL is set to 1 for LIVE mode or single dataset
@@ -917,7 +943,7 @@
         CALL PAR_GET0L('SUPPRESS',SUPPRESS,STATUS)
 
         IF (SUPPRESS) THEN
-          TEXT="     "
+          TEXT=' '
           SETF=.FALSE.
           SETS=.FALSE.
           SETB=.FALSE.
@@ -3275,6 +3301,7 @@
       REAL SIZE
       LOGICAL OK
       LOGICAL RPT
+      LOGICAL SUPPRESS
 *-
 
       IF (STATUS.EQ.SAI__OK) THEN
@@ -3295,82 +3322,96 @@
           ENDIF
         ENDIF
 
+*  are titles to be suppressed altogether
+        CALL PAR_PROMT('SUPPRESS','Are all titles to be suppressed',
+     :                                                       STATUS)
+        CALL PAR_GET0L('SUPPRESS',SUPPRESS,STATUS)
+
+        IF (SUPPRESS) THEN
+
+          CALL GCB_SETI('TITLE_N',1,STATUS)
+          CALL GCB_SET1C('TITLE_TEXT',1,1,' ',STATUS)
+          CALL GCB_SET1R('TITLE_SIZE',1,1,0.1,STATUS)
+
+        ELSE
+
 *  get existing and new number
-        CALL GCB_GETI('TITLE_N',OK,N1,STATUS)
-        IF (.NOT.OK) THEN
-          N1=0
-        ENDIF
-        N2=N1+1
-        CALL PAR_DEF0I('NUM',N2,STATUS)
-        CALL PAR_GET0I('NUM',N2,STATUS)
-        IF (N2.GT.N1) THEN
+          CALL GCB_GETI('TITLE_N',OK,N1,STATUS)
+          IF (.NOT.OK) THEN
+            N1=0
+          ENDIF
           N2=N1+1
-        ENDIF
+          CALL PAR_DEF0I('NUM',N2,STATUS)
+          CALL PAR_GET0I('NUM',N2,STATUS)
+          IF (N2.GT.N1) THEN
+            N2=N1+1
+          ENDIF
 
 
 *  get individual control parameters - NULL means no change
-        RPT=.TRUE.
-        N3=N2
-        DO WHILE (RPT)
-          CALL PAR_GET0C('TEXT',TEXT,STATUS)
+          RPT=.TRUE.
+          N3=N2
+          DO WHILE (RPT)
+            CALL PAR_GET0C('TEXT',TEXT,STATUS)
+            IF (STATUS.EQ.PAR__NULL) THEN
+              CALL ERR_ANNUL(STATUS)
+              RPT=.FALSE.
+            ELSE
+              L=CHR_LEN(TEXT)
+              RPT=(TEXT(L:L).EQ.'~')
+              IF (RPT) THEN
+                TEXT=TEXT(:L-1)
+              ENDIF
+              CALL GCB_SET1C('TITLE_TEXT',N3,1,TEXT,STATUS)
+            ENDIF
+            IF (RPT) THEN
+              N3=N3+1
+              CALL PAR_CANCL('TEXT',STATUS)
+            ENDIF
+          ENDDO
+
+          IF (N3.GT.N1) THEN
+            CALL GCB_SETI('TITLE_N',N3,STATUS)
+          ENDIF
+
+          CALL PAR_GET0I('FONT',FONT,STATUS)
           IF (STATUS.EQ.PAR__NULL) THEN
             CALL ERR_ANNUL(STATUS)
-            RPT=.FALSE.
           ELSE
-            L=CHR_LEN(TEXT)
-            RPT=(TEXT(L:L).EQ.'~')
-            IF (RPT) THEN
-              TEXT=TEXT(:L-1)
-            ENDIF
-            CALL GCB_SET1C('TITLE_TEXT',N3,1,TEXT,STATUS)
+            DO N=N2,N3
+              CALL GCB_SET1I('TITLE_FONT',N,1,FONT,STATUS)
+            ENDDO
           ENDIF
-          IF (RPT) THEN
-            N3=N3+1
-            CALL PAR_CANCL('TEXT',STATUS)
+
+          CALL PAR_GET0I('BOLD',BOLD,STATUS)
+          IF (STATUS.EQ.PAR__NULL) THEN
+            CALL ERR_ANNUL(STATUS)
+          ELSE
+            DO N=N2,N3
+              CALL GCB_SET1I('TITLE_BOLD',N,1,BOLD,STATUS)
+            ENDDO
           ENDIF
-        ENDDO
 
-        IF (N3.GT.N1) THEN
-          CALL GCB_SETI('TITLE_N',N3,STATUS)
+          CALL PAR_GET0R('SIZE',SIZE,STATUS)
+          IF (STATUS.EQ.PAR__NULL) THEN
+            CALL ERR_ANNUL(STATUS)
+          ELSE
+            DO N=N2,N3
+              CALL GCB_SET1R('TITLE_SIZE',N,1,SIZE,STATUS)
+            ENDDO
+          ENDIF
+
+          CALL PAR_GET0C('JUST',JUST,STATUS)
+          IF (STATUS.EQ.PAR__NULL) THEN
+            CALL ERR_ANNUL(STATUS)
+          ELSE
+            CALL CHR_UCASE(JUST)
+            DO N=N2,N3
+              CALL GCB_SET1C('TITLE_JUST',N,1,JUST,STATUS)
+            ENDDO
+          ENDIF
+
         ENDIF
-
-        CALL PAR_GET0I('FONT',FONT,STATUS)
-        IF (STATUS.EQ.PAR__NULL) THEN
-          CALL ERR_ANNUL(STATUS)
-        ELSE
-          DO N=N2,N3
-            CALL GCB_SET1I('TITLE_FONT',N,1,FONT,STATUS)
-          ENDDO
-        ENDIF
-
-        CALL PAR_GET0I('BOLD',BOLD,STATUS)
-        IF (STATUS.EQ.PAR__NULL) THEN
-          CALL ERR_ANNUL(STATUS)
-        ELSE
-          DO N=N2,N3
-            CALL GCB_SET1I('TITLE_BOLD',N,1,BOLD,STATUS)
-          ENDDO
-        ENDIF
-
-        CALL PAR_GET0R('SIZE',SIZE,STATUS)
-        IF (STATUS.EQ.PAR__NULL) THEN
-          CALL ERR_ANNUL(STATUS)
-        ELSE
-          DO N=N2,N3
-            CALL GCB_SET1R('TITLE_SIZE',N,1,SIZE,STATUS)
-          ENDDO
-        ENDIF
-
-        CALL PAR_GET0C('JUST',JUST,STATUS)
-        IF (STATUS.EQ.PAR__NULL) THEN
-          CALL ERR_ANNUL(STATUS)
-        ELSE
-          CALL CHR_UCASE(JUST)
-          DO N=N2,N3
-            CALL GCB_SET1C('TITLE_JUST',N,1,JUST,STATUS)
-          ENDDO
-        ENDIF
-
 
 *  resave if necessary
         IF (.NOT.LIVE) THEN
