@@ -670,6 +670,9 @@ c        CALL PGSCLP( 0 )
          CALL AST_GRID( PLOT, STATUS )
       END IF
 
+*  Initialise pen number.
+      IPEN = AST_GETI( PLOT, 'Colour(curves)', STATUS )
+
 *  If we are rotating pens between plots, generate a group of pen style
 *  attributes to cycle through.  Doing it like this is slightly more 
 *  involved than just calculating it within the plotting loop, but 
@@ -690,16 +693,13 @@ c        CALL PGSCLP( 0 )
 
 *  Write a group entry for each of the available colours, or one for each
 *  NDF, whichever is the fewer.
-         NPEN = MIN( HICOL - LOCOL + 1, NNDF )
+         NPEN = MIN( HICOL - LOCOL + 1, NNDF + IPEN )
          DO I = 1, NPEN
             CALL MSG_SETI( 'IPEN', I )
             CALL MSG_LOAD( ' ', 'Colour=^IPEN', STYEL, STYLEN, STATUS )
             CALL GRP_PUT( PENGID, 1, STYEL( 1 : STYLEN ), I, STATUS )
          END DO
       END IF
-
-*  Initialise pen number.
-      IPEN = AST_GETI( PLOT, 'Colour(curves)', STATUS )
 
 *  Initialise constant vertex positions.
       XLO = 0.5D0
