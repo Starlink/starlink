@@ -4491,6 +4491,11 @@ M Makefile.dependencies
           <title>General FAQs</title>
         </subhead>
 
+        <p>For FAQs specifically about installation, see <ref
+            id="install-faqs">the next section</ref>, and for quite
+            detailed FAQs about the various ways that state is held in
+          the starconf system, see <ref id="state-faqs"/>.</p>
+
         <p>In the examples below, the installation location
           (that is, <code>STARCONF_DEFAULT_PREFIX</code>) is written as
           <code>/local-star</code>, and the example component is usually
@@ -4638,14 +4643,6 @@ M Makefile.dependencies
                   id="importing-thirdparty"/> for several examples.</p>
             </dd>
 
-            <dt>I want to make distribution tarballs install into
-              <code>/star</code>.  How?<index>distribution!setting
-              prefix</index></dt>
-            <dd>
-              <p>See the description of <code>./bootstrap</code> in
-                <ref id="rolldistribution"/>.</p>
-            </dd>
-
             <dt>How do I write portable Makefiles and shell scripts?</dt>
             <dd>
               <p>The autoconf manual has a very useful collection of
@@ -4739,16 +4736,26 @@ M Makefile.dependencies
             </dd>
 
             <dt>How do I install things in
-              <code>/star/{docs,etc,examples,help}</code>?</dt>
+              <code>/local-star/{docs,etc,examples,help}</code>?</dt>
             <dd>
               <p>In the <code>Makefile.am</code> use the
                 <code>DATA</code> prefixes <code>stardocs</code>,
-                <code>staretc</code>, and so on.  In
-                <code>configure.ac</code>, use the macros
-                <code>STAR_DOCS_FILES</code>,
-                <code>STAR_ETC_FILES</code> and so on.  See <ref
-                  id="macro-special-dirs"/> for details, and
+                <code>staretc</code>, and so on.  See 
                 <ref id="automakeoverview"/> for an example.</p>
+
+              <p>Note that by <code>/local-star</code>, here, we refer to
+                the directory indicated by
+                <code>STARCONF_DEFAULT_STARLINK</code> -- if you are
+                interested in changing this when making distribution
+                tarballs, see the next question.</p>
+            </dd>
+
+            <dt>I want to make distribution tarballs install into
+              <code>/star</code>.  How?<index>distribution!setting
+              prefix</index></dt>
+            <dd>
+              <p>See the description of <code>./bootstrap</code> in
+                <ref id="rolldistribution"/>.</p>
             </dd>
 
             <dt id="nobase-faq">Automake flattens paths when it
@@ -4874,7 +4881,7 @@ cd $(DESTDIR)/link; rm -f LINK; $(LN_S) $(DESTDIR)/target/TARGET LINK
             </dd>
 
           </dl>
-</p>
+        </p>
       </subsect>
 
       <subsect id="state-faqs" export="export" indexkey="state">
