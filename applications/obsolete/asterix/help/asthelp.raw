@@ -1908,7 +1908,7 @@
  NLEV      -    INTEGER     Number of levels for OPT=1,2. 
    Default = 5
  BIAS      -    REAL        See sub-topic "Biasing"
-   Default = <math>|dmin| + 1% * dmax</math>
+   Default = <math>|dmin| + 1% * dmax</math
  LEVS           REAL        Array of data levels at which smoothing is
                             performed. Only used if OPT=3.
  WSTART    -    INTEGER     Initial guess for mask width. 
@@ -4698,12 +4698,12 @@
  define a mode!<p>
 
 3 Spatial_files
- It   is possible to   use a spatial  file (as  produced by REGIONS or WELLARD (now XRTARD))
- to define a 2-d region on an n-d datafile. This file may be used to
- set the QUALITY of the pixels in the region by setting FSEL=YES on
- the QUALITY command line. A shortform command, ARDQUAL, is available 
- which basically performs an IGNORE operation on the pixels within
- the region specified.<p>
+ It is possible to use a spatial file (as produced by REGIONS or
+ WELLARD - now XRTARD) to define a 2-d region on an n-d datafile. This
+ file may be used to set the QUALITY of the pixels in the region by
+ setting FSEL=YES on the QUALITY command line. A shortform command,
+ ARDQUAL, is available which basically performs an IGNORE operation
+ on the pixels within the region specified.<p>
 
 2 ARDQUAL+
  ARDQUAL is a -<shortform>- variant of QUALITY, used to set the
