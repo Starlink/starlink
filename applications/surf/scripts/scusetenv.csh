@@ -128,7 +128,7 @@ exit
 *  Examples:
 *    scusetenv
 *      Set DATADIR and SCUBA_PREFIX for the current UT date
-*    scubasetenv 19980201
+*    scusetenv 19980201
 *      Set DATADIR and SCUBA_PREFIX for the data observed on date
 *      19980201
 
@@ -151,6 +151,9 @@ exit
 
 *  History:
 *    $Log$
+*    Revision 1.3  1999/06/19 03:01:25  timj
+*    Correct name in example
+*
 *    Revision 1.2  1999/06/18 03:19:50  timj
 *    Documentation patch
 *
