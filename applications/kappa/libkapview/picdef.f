@@ -35,17 +35,18 @@
 *           is available on the chosen graphics workstation;
 *       2.  obtaining the bounds from the environment (in world
 *           co-ordinates of the reference picture);
-*       3.  or by giving a position code for the new picture, and
-*           specifying its linear fractional size along each axis in
-*           terms of the reference picture, and/or its aspect ratio.
-*           The position code comprises two characters.  The first
+*       3.  or by giving a position and size for the new picture. The 
+*           position is specified by a two-character code. The first
 *           controls the vertical location, and may be "T", "B", or "C"
 *           to create the new picture at the top, bottom, or in the
 *           centre respectively.  The second defines the horizontal
 *           situation, and may be "L", "R", or "C" to define a new
 *           picture to the left, right, or in the centre respectively.
 *           Thus a code of "BR" will make a new picture in the
-*           bottom-right corner.
+*           bottom-right corner. The size of the new picture along each
+*           axis may be specified either in centimetres, or as a fraction
+*           of the corresponding axis of the reference picture. The picture
+*           may also be forced to have a specified aspect ratio.
 
 *     The picture created becomes the current picture on exit.
 
@@ -110,7 +111,8 @@
 *        the shape of the reference picture.  So a value of 0.5 would
 *        create a picture 0.25 the area of the current or BASE picture.
 *        The default is 0.5, unless parameter ASPECT is not null, when
-*        the default is 1.0. []
+*        the default is 1.0. This parameter is not used if the picture
+*        size is specified in centimetres using parameter SIZE. []
 *     LABELNO = _INTEGER (Read)
 *        The number used to form the label for the first (bottom-left)
 *        picture in Array mode.  It cannot be negative. [1]
@@ -126,8 +128,7 @@
 *        by two characters, the first corresponding to the vertical
 *        position and the second the horizontal.  For the vertical,
 *        valid positions are T(op), B(ottom), or C(entre); and for the
-*        horizontal the options are L(eft), R(ight), or C(entre). (It
-*        is the same as the disposition code in SGS). ["Cursor"]
+*        horizontal the options are L(eft), R(ight), or C(entre). ["Cursor"]
 *     OUTLINE = _LOGICAL (Read)
 *        If TRUE, a box that delimits the new picture is drawn. [TRUE]
 *     PREFIX = LITERAL (Read)
@@ -139,6 +140,12 @@
 *        increases the chance of losing existing labels.  A ! response
 *        means no labelling is required.  The suggested default is the
 *        last-used prefix.
+*     SIZE( 2 ) = _REAL (Read)
+*        The size of the new picture along both axes, in centimetres,
+*        applicable for modes other than Array, Cursor, and XY. If a 
+*        single value is given, it is used for both axes. If a null 
+*        value (!) is given, then the size of the picture is determined 
+*        by parameter FRACTION. [!]
 *     UBOUND( 2 ) = _REAL (Read)
 *        Co-ordinates of the upper bound that defines the new picture.
 *        The suggested default is the top-right of the current picture.
@@ -164,6 +171,12 @@
 *        Creates a new FRAME picture within the full display area on
 *        the current graphics device, and an outline is drawn around
 *        the new picture.  This picture is the largest square possible,
+*        and it is justified to the bottom-left corner.  It becomes the
+*        current picture.
+*     picdef bl size=[15,10]
+*        Creates a new FRAME picture within the full display area on
+*        the current graphics device, and an outline is drawn around
+*        the new picture.  This picture is 15 by 10 centimetres in size
 *        and it is justified to the bottom-left corner.  It becomes the
 *        current picture.
 *     picdef cc 0.7 current nooutline
@@ -194,7 +207,7 @@
 *     -  Open graphics device and start database activity.
 *     -  Determine the mode required (including cursor), and whether or
 *     not the current picture is to enclose the new picture. If not
-*     get the BASE picture and zone, otherwise get the zone associated
+*     get the BASE picture and viewport, otherwise get the viewport associated
 *     with the current picture.
 *     -  If mode is cursor prepare the cursor.  If a cursor and one
 *     choice could not be obtained report what has happened and
@@ -213,9 +226,9 @@
 *        and array size.  Get the label start number.
 *        o  Inquire the bounds of the existing picture.  For each
 *        picture in the array:
-*           -  Select the original picture identifier and zone. Compute
-*           its bounds, create the new zone. Draw a box around the zone
-*           if requested. Save the new zone in the database.  If
+*           -  Select the original picture identifier and viewport. Compute
+*           its bounds, create the new viewport. Draw a box around the viewport
+*           if requested. Save the new viewport in the database.  If
 *           labelling required form the label from the prefix and
 *           current label number, and then store in the database.
 *        o  If an error occurred, report that the current picture has
@@ -223,13 +236,13 @@
 *        o  Make the bottom-left picture in the array the current
 *        picture.
 *     -  If the mode is a position code get linear fractions of the
-*     current zone, and the picture aspect ratio.  Obtain x-y limits
+*     current viewport, and the picture aspect ratio.  Obtain x-y limits
 *     given the justification, fractions, and aspect ratio.
-*     -  For non-array modes create the new zone, draw a box around it
-*     if requested, and save the new zone in the database.
+*     -  For non-array modes create the new viewport, draw a box around it
+*     if requested, and save the new viewport in the database.
 *     -  If an error occurred, report that the current picture has not
 *     been switched.
-*     -  Deactivate SGS and cancel AGI device
+*     -  Deactivate plotting package and cancel AGI device
 
 *  Related Applications:
 *     KAPPA: PICBASE, PICCUR, PICDATA, PICFRAME, PICGRID, PICLABEL,
@@ -237,6 +250,7 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie  (STARLINK)
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -285,6 +299,8 @@
 *        Removed CURRENT as a positional parameter, and made LBOUND and
 *        UBOUND positional; this is to enable PICXY to operate and to
 *        allow both PICGRID and PICXY to inherit the CURRENT option.
+*     21-AUG-1998 (DSB):
+*        Converted to use PGPLOT. Re-formatted code. Added parameter SIZE.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -310,8 +326,7 @@
 *  Local Constants:
       INTEGER NPTS             ! Number of x-y points to be measured
       PARAMETER ( NPTS = 2 )   ! by cursor for defining the picture
-      INTEGER MXCHO            ! Maximum number of choices
-      PARAMETER ( MXCHO = 3 )  !
+
       INTEGER MAXPIC           ! Maximum number of pictures in each
                                ! direction of an array, so the
                                ! maximum total number of pictures is
@@ -320,6 +335,7 @@
 
 *  Local Variables:
       INTEGER
+     :  ACT( NPTS ),           ! Cursor choices
      :  I, J,                  ! Loop counters
      :  LABNUM,                ! Label number
      :  MAXNO,                 ! Maximum starting number for the labels
@@ -329,6 +345,7 @@
      :  NIMGMS,                ! Number of lines of image-display
                                ! messages
      :  NP,                    ! Number of points obtained by the cursor
+     :  NSIZE,                 ! Number of SIZE values obtained
      :  NTERMS                 ! Number of lines of terminal messages
 
       INTEGER
@@ -339,13 +356,11 @@
      :  PICIDP,                ! Picture identifier for new picture
      :  START,                 ! Label number of the bottom-left picture
                                ! in an array
+     :  UP,                    ! Highest available colour index
      :  XPIC,                  ! Number of pictures in the horizontal
                                ! direction
-     :  YPIC,                  ! Number of pictures in the vertical
+     :  YPIC                   ! Number of pictures in the vertical
                                ! direction
-     :  ZONE,                  ! SGS current zone identifier
-     :  ZONEB,                 ! SGS zone identifier --- BASE picture
-     :  ZONEN                  ! SGS zone identifier --- new picture
 
       LOGICAL                  ! True if :
      :  BOX,                   ! A box is to be drawn around the new
@@ -362,19 +377,14 @@
 
       CHARACTER
      :  CLBNUM*9,              ! Label number
-     :  IMGMES( 2 )*80,        ! Informational messages if device is
-                               ! an image display
+     :  AMES( 2 )*80,          ! Informational messages about use of cursor
      :  LABEL*(DAT__SZNAM),    ! AGI picture label
      :  MODE*6,                ! Mode of determining the position and
                                ! size of the new picture
-     :  PREFIX*(DAT__SZNAM-3), ! Label prefix
-     :  TERMES( 2 )*80         ! Informational messages if device is
-                               ! a terminal
+     :  PREFIX*(DAT__SZNAM-3)  ! Label prefix
 
       REAL
      :  ASPECT,                ! Aspect ratio
-     :  DELTA,                 ! Width of the point markers in cursor
-                               ! mode
      :  FILL,                  ! Linear filling factor for the array of
                                ! pictures
      :  FRACT( 2 ),            ! Linear fraction of the current or base
@@ -384,6 +394,8 @@
      :  OFFS( 2 ),             ! Offsets of the array of pictures with
                                ! respect to the origin of abutted set
      :  SIZE( 2 ),             ! Sizes of each picture array element
+     :  SZMAX( 2 ),            ! Max size of picture in cm
+     :  SZMIN( 2 ),            ! Min size of picture in cm
      :  UBND( 2 )              ! Upper bounds of the new picture
 
       REAL
@@ -403,179 +415,142 @@
 
 *.
 
-*    Check the inherited status.
-
-      IF ( STATUS .NE. SAI__OK ) RETURN
+*  Check the inherited status.
+      IF( STATUS .NE. SAI__OK ) RETURN
 
       CURPIC = .FALSE.
       CURSOR = .FALSE.
       DEVCAN = .FALSE.
 
-*    Start an AGI scope.
-
+*  Start an AGI scope.
       CALL AGI_BEGIN
 
-*    Open GKS workstation to reset device
-
+*  Open AGI database.
       CALL AGI_ASSOC( 'DEVICE', 'UPDATE', PICID, STATUS )
 
-*    Activate SGS
+*  Activate PGPLOT 
+      CALL AGP_ACTIV( STATUS )
 
-      CALL AGS_ACTIV( STATUS )
+*  If the graphics device was not available, report the error and
+*  leave the programme.
+      IF( STATUS .NE. SAI__OK ) THEN
 
-*    If the graphics device was not available, report the error and
-*    leave the programme.
-
-      IF ( STATUS .NE. SAI__OK ) THEN
-
-         IF ( STATUS .NE. PAR__ABORT ) THEN
+         IF( STATUS .NE. PAR__ABORT ) THEN
             CALL ERR_REP( 'ERR_PICDEF_NID',
      :        'PICDEF: Graphics device not available or not '/
      :        /'recognised.', STATUS )
          END IF
          DEVCAN = .TRUE.
-         GOTO 999
+         GO TO 999
       END IF
 
-*    Get the mode of operation
-
+*  Get the mode of operation
       CALL PAR_CHOIC( 'MODE', 'Cursor', 'Cursor,XY,Array,TL,BL,CL,TR,'/
      :                /'BR,CR,TC,BC,CC', .FALSE., MODE, STATUS )
 
       CALL PAR_GTD0L( 'CURRENT', .FALSE., .TRUE., CURPIC, STATUS )
-      IF ( STATUS .NE. SAI__OK ) GOTO 999
+      IF( STATUS .NE. SAI__OK ) GO TO 999
 
-      IF ( .NOT. CURPIC ) THEN
+      IF( .NOT. CURPIC ) THEN
 
-*       Get the BASE picture
-
+*  Get the BASE picture
          CALL AGI_IBASE( PICIDB, STATUS )
          CALL AGI_SELP( PICIDB, STATUS )
 
-*       Get associated zone
+*  Get associated viewport
+         CALL AGP_NVIEW( .FALSE., STATUS )
 
-         CALL AGS_NZONE( ZONEB, STATUS )
-
-         IF ( STATUS .NE. SAI__OK ) THEN
+         IF( STATUS .NE. SAI__OK ) THEN
             CALL ERR_REP( 'PICDEF__NOBAS',
-     :        'PICDEF: Unable to get the BASE picture/zone from the '/
+     :        'PICDEF: Unable to get the BASE picture from the '/
      :        /'database.', STATUS )
 
             DEVCAN = .TRUE.
-            GOTO 999
+            GO TO 999
          END IF
       ELSE
 
-*       Get zone corresponding to the current picture
+*  Get viewport corresponding to the current picture
+         CALL AGP_NVIEW( .FALSE., STATUS )
 
-         CALL AGS_NZONE( ZONE, STATUS )
-
-         IF ( STATUS .NE. SAI__OK ) THEN
+         IF( STATUS .NE. SAI__OK ) THEN
             CALL ERR_REP( 'PICDEF__NCURP',
-     :        'PICDEF: Unable to get the current zone from the '/
+     :        'PICDEF: Unable to get the current picture from the '/
      :        /'database.', STATUS )
 
             DEVCAN = .TRUE.
-            GOTO 999
+            GO TO 999
          END IF
 
-*    End of current-picture-to-be-used check
-
+*  End of current-picture-to-be-used check
       END IF
 
-      IF ( MODE .EQ. 'CURSOR' ) THEN
+*  Has cursor mode been requested, but there is no cursor?
+      IF( MODE .EQ. 'CURSOR' .AND. STATUS .EQ. SAI__OK ) THEN
 
-*       Create informational messages.
+         CALL KPG1_PQVID( 'DEVICE', ' ', 'CURSOR', 0, UP, STATUS )
 
-         TERMES( 1 ) = 'Type the spacebar to select a point.'
-         TERMES( 2 ) = 'Type . to exit.'
-         NTERMS = 2
-
-         IMGMES( 1 ) = 'To select a point press the left '/
-     :     /'button on the mouse or trackerball.'
-         IMGMES( 2 ) = 'To exit press the right button.'
-         NIMGMS = 2
-
-*       Prepare the cursor. Specifically, does it exist and have the
-*       correct attributes?
-
-         CALL KPG1_PRCUR( 1, TERMES, NTERMS, IMGMES, NIMGMS, '12 .',
-     :                    CURSOR, IMGDIS, STATUS )
-         IF ( STATUS .NE. SAI__OK ) GOTO 999
-
-*       Has cursor mode been requested, but there is no cursor or it
-*       does not have any choices?
-
-         IF ( .NOT. CURSOR ) THEN
-            STATUS = SAI__ERROR
-            CALL ERR_REP( 'PICDEF_NOCURSOR',
-     :        'The workstation does not have a suitable cursor. '/
-     :        /'Continuing in no-cursor mode.', STATUS )
+         IF( STATUS .EQ. SAI__ERROR ) THEN
+            CALL ERR_REP( 'PICDEF_NOCURSOR', 'Continuing in no-cursor'//
+     :                    ' mode.', STATUS )
             CALL ERR_FLUSH( STATUS )
 
-*          Give the user a second chance to select a mode other than
-*          with the cursor
-
+*  Give the user a second chance to select a mode other than
+*  with the cursor
             CALL PAR_CANCL( 'MODE', STATUS )
             CALL PAR_CHOIC( 'MODE', 'XY', 'XY,Array,TL,BL,CL,TR,BR,CR,'/
      :                      /'TC,BC,CC', .FALSE., MODE, STATUS )
-            IF ( STATUS .NE. SAI__OK ) GOTO 999
+            IF( STATUS .NE. SAI__OK ) GO TO 999
          END IF
 
-*    End of cursor-required check
-
+*  End of cursor-required check
       END IF
 
-*    Is a rectangular box to be drawn about the new picture?
-
+*  Is a rectangular box to be drawn about the new picture?
       CALL PAR_GTD0L( 'OUTLINE', .FALSE., .TRUE., BOX, STATUS )
-      IF ( STATUS .EQ. PAR__ABORT ) GOTO 999
+      IF( STATUS .NE. SAI__OK ) GO TO 999
 
-      IF ( MODE .EQ. 'CURSOR' ) THEN
+      IF( MODE .EQ. 'CURSOR' ) THEN
 
-*       Get the picture limits.
+*  Get the bounds of the picture in millimetres, and convert to metres.
+         CALL PGQVP( 2, X1E, X2E, Y1E, Y2E )
+         XM = ( X2E - X1E )/1000.0
+         YM = ( Y2E - Y1E )/1000.0
 
-         CALL SGS_IZONE( X1E, X2E, Y1E, Y2E, XM, YM )
+*  Get its bounds in world coordinates.
+         CALL PGQWIN( X1E, X2E, Y1E, Y2E )
 
-*       The cursor will appear at the centre of the picture.
-
+*  The cursor will appear at the centre of the picture.
          XIN = 0.5 * ( X1E + X2E )
          YIN = 0.5 * ( Y1E + Y2E )
 
-*       Get the marker height.
+*  Obtain the bounds of the new picture via the cursor. A pair
+*  of points is required, the points will be marked.
+         AMES( 1 ) = 'select a point'
+         AMES( 2 ) = 'quit'
+         CALL KPG1_PGCUR( .TRUE., 'select 2 distinct points', 2, AMES, 
+     :                    ' .', X1E, X2E, Y1E, Y2E, 2, XIN, YIN, NPTS, 
+     :                    2, 0, 0, 1, XP, YP, ACT, NP, STATUS )
 
-         DELTA = 0.005 * MIN( X2E - X1E, Y2E - Y1E )
-
-*       Obtain the bounds of the new picture via the cursor. A pair
-*       of points is required, the points will be marked then erased.
-*       The points should be unconnected, and distinct.
-
-         CALL CURPTS( NPTS, .TRUE., MXCHO, .TRUE., .TRUE., DELTA,
-     :                .FALSE., .TRUE., X1E, X2E, Y1E, Y2E, XIN, YIN,
-     :                NP, XP, YP, STATUS )
-
-*       Look out for an abort, i.e. the number of points is not NPTS.
-*       Copy from the arrays into the standard (to the rest of the
-*       application) variables.
-
-         IF ( NP .GE. NPTS ) THEN
+*  Look out for an abort, i.e. the number of points is not 2.
+*  Copy from the arrays into the standard (to the rest of the
+*  application) variables.
+         IF( NP .GE. NPTS ) THEN
             X1 = MIN( XP( 1 ), XP( 2 ) )
             X2 = MAX( XP( 1 ), XP( 2 ) )
             Y1 = MIN( YP( 1 ), YP( 2 ) )
             Y2 = MAX( YP( 1 ), YP( 2 ) )
 
-*          There is now a change from the graphics cursor operation
-*          to report values on the text screen (assuming the device is
-*          a terminal).  In order for the message to appear in the
-*          correct plane, there must be a delay, so that the graphics
-*          system can complete its work before the (faster and
-*          independent) message system reports the cursor position.
-*          The following calls achieves this synchronisation.
-
+*  There is now a change from the graphics cursor operation
+*  to report values on the text screen (assuming the device is
+*  a terminal).  In order for the message to appear in the
+*  correct plane, there must be a delay, so that the graphics
+*  system can complete its work before the (faster and
+*  independent) message system reports the cursor position.
+*  The following calls achieves this synchronisation.
             CALL MSG_SYNC( STATUS )
 
-*          Report the co-ordinates of the new frame.
-
+*  Report the co-ordinates of the new frame.
             CALL MSG_SETR( 'CUR_X1', X1 )
             CALL MSG_SETR( 'CUR_Y1', Y1 )
             CALL MSG_SETR( 'CUR_X2', X2 )
@@ -590,164 +565,130 @@
      :        STATUS )
          END IF
 
-      ELSE IF ( MODE .EQ. 'XY' ) THEN
+      ELSE IF( MODE .EQ. 'XY' ) THEN
 
-*       Get limits from the environment.
+*  Get limits from the environment.
+         CALL KPG1_GDBND( 'LBOUND', 'UBOUND', LBND, UBND, STATUS )
 
-         CALL CURRE( .FALSE., 'LBOUND', 'UBOUND', LBND, UBND, STATUS )
-
-*       Use the same variables as for other modes.
-
+*  Use the same variables as for other modes.
          X1 = MIN( LBND( 1 ), UBND( 1 ) )
          X2 = MAX( LBND( 1 ), UBND( 1 ) )
          Y1 = MIN( LBND( 2 ), UBND( 2 ) )
          Y2 = MAX( LBND( 2 ), UBND( 2 ) )
 
-*    ARray mode has been selected.
+*  Array mode has been selected.
+      ELSE IF( MODE .EQ. 'ARRAY' ) THEN
 
-      ELSE IF ( MODE .EQ. 'ARRAY' ) THEN
-
-*       Get the dimensions of the grid of pictures.
-
+*  Get the dimensions of the grid of pictures.
          CALL PAR_GDR0I( 'XPIC', 2, 1, MAXPIC, .FALSE., XPIC, STATUS )
          CALL PAR_GDR0I( 'YPIC', XPIC, 1, MAXPIC, .FALSE., YPIC,
      :                   STATUS )
 
-*       Get the filling factor.
-
+*  Get the filling factor.
          CALL PAR_GDR0R( 'FILL', 1.0, 0.1, 1.0, .TRUE., FILL, STATUS )
 
-         IF ( STATUS .NE. SAI__OK ) GOTO 999
+         IF( STATUS .NE. SAI__OK ) GO TO 999
 
-*       Get the labelling prefix.
-
+*  Get the labelling prefix.
          LABELS = .TRUE.
          CALL PAR_GET0C( 'PREFIX', PREFIX, STATUS )
 
-*       A null label means labelling is not required.
-
-         IF ( STATUS .EQ. PAR__NULL ) THEN
+*  A null label means labelling is not required.
+         IF( STATUS .EQ. PAR__NULL ) THEN
             CALL ERR_ANNUL( STATUS )
             LABELS = .FALSE.
 
-         ELSE IF ( STATUS .NE. SAI__OK ) THEN
-            GOTO 999
+         ELSE IF( STATUS .NE. SAI__OK ) THEN
+            GO TO 999
 
-*       Get the start label number.
-
+*  Get the start label number.
          ELSE
 
-*          Find the length of the prefix.  The AGI label is restricted
-*          the length of an HDS object name, so the maximum starting
-*          number in a label has to be derived.
-
+*  Find the length of the prefix.  The AGI label is restricted
+*  the length of an HDS object name, so the maximum starting
+*  number in a label has to be derived.
             NCPRFX = CHR_LEN( PREFIX )
             MAXNO = INT( MIN( DBLE( VAL__MAXI ),
      :              1.D1**( DAT__SZNAM - NCPRFX - 1 ) ) )
      :               - XPIC * YPIC + 1
             CALL PAR_GDR0I( 'LABELNO', 1, 0, MAXNO, .TRUE., START,
      :                      STATUS )
-            IF ( STATUS .EQ. PAR__ABORT ) GOTO 999
+            IF( STATUS .EQ. PAR__ABORT ) GO TO 999
          END IF
 
-*       Get the bounds of the zone to be broken into the array.
-*       Note SGS_ZPART could have been used for much of the array
-*       creation but for the small number of zones permitted and the
-*       filling factor.
+*  Get the bounds of the picture in millimetres, and convert to metres.
+         CALL PGQVP( 2, X1E, X2E, Y1E, Y2E )
+         XM = ( X2E - X1E )/1000.0
+         YM = ( Y2E - Y1E )/1000.0
 
-         CALL SGS_IZONE( X1E, X2E, Y1E, Y2E, XM, YM )
+*  Get its bounds in world coordinates.
+         CALL PGQWIN( X1E, X2E, Y1E, Y2E )
 
-*       Derive the dimension of the current picture in world
-*       co-ordinates.
-
+*  Derive the dimension of the current picture in world
+*  co-ordinates.
          XR = X2E - X1E
          YR = Y2E - Y1E
 
-*       Obtain the offsets of each picture.
-
+*  Obtain the offsets of each picture.
          OFFS( 1 ) = ( 1.0 - FILL ) * 0.5 * XR / REAL( XPIC )
          OFFS( 2 ) = ( 1.0 - FILL ) * 0.5 * YR / REAL( YPIC )
 
-*       Calculate the dimensions of each new picture.
-
+*  Calculate the dimensions of each new picture.
          SIZE( 1 ) = FILL * XR / REAL( XPIC )
          SIZE( 2 ) = FILL * YR / REAL( YPIC )
 
-*       Find the horizontal bounds of the new zones.
-
+*  Find the horizontal bounds of the new pictures.
          DO  I = 1, XPIC
             XLIM( 2 * I - 1 ) = X1E + OFFS( 1 ) + XR * 
      :                          REAL( I - 1 ) / REAL( XPIC )
             XLIM( 2 * I ) = XLIM( 2 * I - 1 ) + SIZE( 1 )
          END DO
 
-*       Ensure that rounding errors have not made any of the new
-*       pictures exceed the bounds of the current picture.
-
+*  Ensure that rounding errors have not made any of the new
+*  pictures exceed the bounds of the current picture.
          XLIM( 1 ) = MAX( X1E, XLIM( 1 ) )
          XLIM( 2 * XPIC ) = MIN( X2E, XLIM( 2 * XPIC ) )
 
-*       Initialise the label numbering.
+*  Initialise the label numbering.
+         IF( LABELS ) LABNUM = START - 1
 
-         IF ( LABELS ) LABNUM = START - 1
+*  Pictures must lie within the current picture, so the
+*  original picture identifier and viewport must be selected.
+*  These are either the BASE picture or the current picture
+*  on input.
+         IF( CURPIC ) THEN
+            CALL AGI_SELP( PICID, STATUS )
+            CALL AGP_NVIEW( .FALSE., STATUS )
+         ELSE
+            CALL AGI_SELP( PICIDB, STATUS )
+            CALL AGP_NVIEW( .FALSE., STATUS )
+         END IF
 
-*       Loop for all the pictures in the y direction.
+         CALL PGQWIN( X1, X2, Y1, Y2 )
 
+*  Loop for all the pictures in the y direction.
          DO  J = 1, YPIC
 
-*          Define the vertical bounds of the new zones, ensuring that
-*          the created picture does not lie outside the bounds of the
-*          current picture.
-
+*  Define the vertical bounds of the new pictures, ensuring that
+*  the created picture does not lie outside the bounds of the
+*  current picture.
             Y1 = MAX( Y1E, Y1E + OFFS( 2 ) + YR *
      :           REAL( J - 1 ) / REAL( YPIC ) )
             Y2 = MIN( Y2E, Y1 + SIZE( 2 ) )
 
-*          Loop for each picture along the x direction, whose bounds
-*          have already been computed.
-
+*  Loop for each picture along the x direction, whose bounds
+*  have already been computed.
             DO  I = 1, XPIC
                X1 = XLIM( 2 * I - 1 )
                X2 = XLIM( 2 * I )
 
-*             Pictures must lie within the current picture, so the
-*             original picture identifier and zone must be selected.
-*             These are either the BASE picture or the current picture
-*             on input.
+*  Create the new viewport
+               CALL KPG1_PGCUT( X1, X2, Y1, Y2, STATUS )
 
-               IF ( CURPIC ) THEN
-                  CALL AGI_SELP( PICID, STATUS )
-                  CALL SGS_SELZ( ZONE, STATUS )
-               ELSE
-                  CALL AGI_SELP( PICIDB, STATUS )
-                  CALL SGS_SELZ( ZONEB, STATUS )
-               END IF
+*  Store the new viewport as a database picture.
+               CALL AGP_SVIEW( 'FRAME', 'KAPPA_PICDEF', PICIDP, STATUS )
 
-*             Free up the last picture unless it was the first.  Also
-*             free its SGS zone to prevent exhausting the available
-*             zones.  These operations must be done once there is
-*             a new current picture and zone, as you cannot delete
-*             the current zone.
-
-               IF ( I .GT. 2 .OR. J .GT. 1 ) THEN
-                  CALL AGI_ANNUL( PICIDP, STATUS )
-                  CALL SGS_RELZ( ZONEN )
-               END IF
-
-*             Create the new zone.
-
-               CALL SGS_ZONE( X1, X2, Y1, Y2, ZONEN, STATUS )
-               CALL SGS_SW( X1, X2, Y1, Y2, STATUS )
-
-*             Optionally, draw a box around it.
-
-               IF ( BOX ) CALL SGS_BOX( X1, X2, Y1, Y2 )
-
-*             Store the new zone as a database picture.
-
-               CALL AGS_SZONE( 'FRAME', 'KAPPA_PICDEF', PICIDP, STATUS )
-
-               IF ( STATUS .NE. SAI__OK ) THEN
+               IF( STATUS .NE. SAI__OK ) THEN
                   CALL MSG_SETI( 'X', I )
                   CALL MSG_SETI( 'Y', J )
                   CALL ERR_REP( 'ERR_PICDEF_DBSP',
@@ -756,118 +697,165 @@
                   CALL AGI_SELP( PICID, STATUS )
                END IF
 
-*             Store the first picture's identifier.
+*  Store the first picture's identifier. Otherwise, annul the identifier.
+               IF( I .EQ. 1 .AND. J .EQ. 1 ) THEN
+                  PICIDO = PICIDP
+               ELSE
+                  CALL AGI_ANNUL( PICIDP, STATUS )
+               END IF
 
-               IF ( I .EQ. 1 .AND. J .EQ. 1 ) PICIDO = PICIDP
+*  Label the picture if required.
+               IF( LABELS ) THEN
 
-*             Label the picture if required.
-
-               IF ( LABELS ) THEN
-
-*                Derive the label from the prefix and element number.
-
+*  Derive the label from the prefix and element number.
                   LABNUM = LABNUM + 1
                   CALL CHR_ITOC( LABNUM, CLBNUM, NCLBNO )
                   LABEL = PREFIX( :NCPRFX )//CLBNUM( :NCLBNO )
                   CALL AGI_SLAB( -1, LABEL, STATUS )
                END IF
 
-*          End of the loops used to form the array of pictures.
+*  Re-instate the reference picture and viewport.
+               IF( CURPIC ) THEN
+                  CALL AGI_SELP( PICID, STATUS )
+                  CALL AGP_NVIEW( .FALSE., STATUS )
+               ELSE
+                  CALL AGI_SELP( PICIDB, STATUS )
+                  CALL AGP_NVIEW( .FALSE., STATUS )
+               END IF
 
+*  Optionally, draw a box around the new viewport. Do this once the 
+*  reference picture has been made current to avoid PGPLOT clipping.
+               IF( BOX ) THEN
+                  CALL PGSFS( 2 )
+                  CALL PGRECT( X1, X2, Y1, Y2 )
+               END IF                  
+
+*  End of the loops used to form the array of pictures.
             END DO
          END DO
 
-*       Make the bottom-left picture the current picture.
-
+*  Make the bottom-left picture the current picture.
          CALL AGI_SELP( PICIDO, STATUS )
-      ELSE
 
-*       Start a new error context.
+      ELSE IF( STATUS .EQ. SAI__OK ) THEN
 
+*  Get the bounds of the picture in millimetres, and convert to centimetres.
+         CALL PGQVP( 2, X1E, X2E, Y1E, Y2E )
+         SZMAX( 1 ) = ( X2E - X1E )/10.0
+         SZMAX( 2 ) = ( Y2E - Y1E )/10.0
+         SZMIN( 1 ) = 0.5
+         SZMIN( 2 ) = 0.5
+
+*  Start a new error context.
          CALL ERR_MARK
 
-*       Obtain the aspect ratio, ensuring that it is positive, and no
-*       dynamic default.
+*  Get the dimensions of the picture in centimetres.
+         CALL PAR_GRMVR( 'SIZE', 2, SZMIN, SZMAX, SIZE, NSIZE, STATUS )
 
-         CALL PAR_GDR0R( 'ASPECT', VAL__BADR, VAL__SMLR, VAL__MAXR,
-     :                   .FALSE., ASPECT, STATUS )
+*  If values were obtained succesfully...
+         IF( STATUS .EQ. SAI__OK ) THEN
 
-*       Handle null transparently.  A negative value tells the
-*       subroutine not to apply an aspect-ratio constraint.
+*  Ensure we have 2 values.     
+            IF( NSIZE .EQ. 1 ) SIZE( 2 ) = SIZE( 1 )
 
-         IF ( STATUS .EQ. PAR__NULL ) THEN
+*  Convert these sizes to fractions of the reference picture.
+            FRACT( 1 ) = SIZE( 1 ) / SZMAX( 1 )            
+            FRACT( 2 ) = SIZE( 2 ) / SZMAX( 2 )            
+
+*  Indicate that the aspect ratio is not to be changed.
             ASPECT = -1.0
+
+*  If a null value (!) was given, annull the error.
+         ELSE IF( STATUS .EQ. PAR__NULL ) THEN
             CALL ERR_ANNUL( STATUS )
 
-*       Set dynamic defaults for the fraction.
+*  Obtain the aspect ratio, ensuring that it is positive, and no
+*  dynamic default.
+            CALL PAR_GDR0R( 'ASPECT', VAL__BADR, VAL__SMLR, VAL__MAXR,
+     :                      .FALSE., ASPECT, STATUS )
 
-            FRADEF = 0.5
-         ELSE
-            FRADEF = 1.0
+*  Handle null transparently.  A negative value tells the
+*  subroutine not to apply an aspect-ratio constraint.
+            IF( STATUS .EQ. PAR__NULL ) THEN
+               ASPECT = -1.0
+               CALL ERR_ANNUL( STATUS )
+
+*  Set dynamic defaults for the fraction.
+               FRADEF = 0.5
+            ELSE
+               FRADEF = 1.0
+            END IF
+
+*  Obtain the fractional sizes within limits.
+            CALL PAR_DEF0R( 'FRACTION', FRADEF, STATUS )
+            CALL PAR_GDRVR( 'FRACTION', 2, 0.10, 1.0, FRACT, NFRAC,
+     :                      STATUS )
+
+*  Handle null transparently.
+            IF( STATUS .EQ. PAR__NULL ) THEN
+               FRACT( 1 ) = 1.0
+               FRACT( 2 ) = 1.0
+               CALL ERR_ANNUL( STATUS )
+            END IF
+
+*  Duplicate fractional size if only one value is given.
+            IF( NFRAC .EQ. 1 ) FRACT( 2 ) = FRACT( 1 )
+
          END IF
 
-*       Obtain the fractional sizes within limits.
-
-         CALL PAR_DEF0R( 'FRACTION', FRADEF, STATUS )
-         CALL PAR_GDRVR( 'FRACTION', 2, 0.10, 1.0, FRACT, NFRAC,
-     :                   STATUS )
-
-*       Handle null transparently.
-
-         IF ( STATUS .EQ. PAR__NULL ) THEN
-            FRACT( 1 ) = 1.0
-            FRACT( 2 ) = 1.0
-            CALL ERR_ANNUL( STATUS )
-         END IF
-
-*       Release the new error context.
-
+*  Release the new error context.
          CALL ERR_RLSE
 
-         IF ( STATUS .NE. SAI__OK ) GOTO 999
+         IF( STATUS .NE. SAI__OK ) GO TO 999
 
-*       Duplicate fractional size if only one value is given.
+*  Get the limits of the viewport using the fraction and position code.
+         CALL KPG1_GDARE( MODE, FRACT, ASPECT, X1, X2, Y1, Y2, STATUS )
 
-         IF ( NFRAC .EQ. 1 ) FRACT( 2 ) = FRACT( 1 )
-
-*       Get the limits of the zone using the fraction and position code.
-
-         CALL KPS1_FRARE( MODE, FRACT, ASPECT, X1, X2, Y1, Y2, STATUS )
       END IF
 
-      IF ( STATUS .EQ. SAI__OK .AND. MODE .NE. 'ARRAY' ) THEN
+*  Create the viewport. This will already have been done for ARRAY mode.
+      IF( STATUS .EQ. SAI__OK .AND. MODE .NE. 'ARRAY' ) THEN
 
-*       Create the new zone.
+*  Optionally, draw a box around it. Do this before the new viewport is
+*  created to avoid PGPLOT clipping.
+         IF( BOX ) THEN
+            CALL PGSFS( 2 )
+            CALL PGRECT( X1, X2, Y1, Y2 )
+         END IF                  
 
-         CALL SGS_ZONE( X1, X2, Y1, Y2, ZONEN, STATUS )
-         CALL SGS_SW( X1, X2, Y1, Y2, STATUS )
-         IF ( BOX ) CALL SGS_BOX( X1, X2, Y1, Y2 )
+*  Create the new viewport.
+         CALL KPG1_PGCUT( X1, X2, Y1, Y2, STATUS )
 
-*       Store the new zone as a database picture.
+*  Store the new viewport as a database picture.
+         CALL AGP_SVIEW( 'FRAME', 'KAPPA_PICDEF', PICIDP, STATUS )
 
-         CALL AGS_SZONE( 'FRAME', 'KAPPA_PICDEF', PICIDP, STATUS )
-
-         IF ( STATUS .NE. SAI__OK ) THEN
+         IF( STATUS .NE. SAI__OK ) THEN
             CALL ERR_REP( 'ERR_PICDEF_DBSP',
      :        'PICDEF: Error while storing the new picture in the '/
      :        /'graphics database.', STATUS )
             CALL AGI_SELP( PICID, STATUS )
          END IF
+
       END IF
+
 
  999  CONTINUE
 
-*    Deactivate SGS and close AGI workstation.
-
-      CALL AGS_DEACT( STATUS )
-      IF ( DEVCAN ) THEN
+*  Deactivate PGPLOT and close AGI workstation.
+      CALL AGP_DEACT( STATUS )
+      IF( DEVCAN ) THEN
          CALL AGI_CANCL( 'DEVICE', STATUS )
       ELSE
          CALL AGI_ANNUL( PICID, STATUS )
       END IF
 
-*    End the AGI scope.
-
+*  End the AGI scope.
       CALL AGI_END( -1, STATUS )
+
+*  Add a context report if anything went wrong.
+      IF( STATUS .NE. SAI__OK ) THEN
+         CALL ERR_REP( 'PICDEF_ERR', 'PICDEF: Failed to define one or'//
+     :                 ' more new graphics pictures.', STATUS )
+      END IF
 
       END

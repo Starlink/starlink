@@ -86,6 +86,7 @@
       DOUBLE PRECISION OUTB( NDF__MXDIM )! Corner "B" of window in output Frame
       INTEGER G12MAP             ! Mapping from i/p GRID to o/p GRID
       INTEGER GP1MAP             ! Mapping from i/p GRID to i/p PIXEL
+      INTEGER FRM                ! Frame pointer
       INTEGER I                  ! Loop count
       INTEGER IBASE              ! Index of original Base Frame
       INTEGER ICURR              ! Index of original Current Frame
@@ -152,17 +153,23 @@
 *  coords in INDF1 to pixel coords in INDF2.
       P12MAP = AST_CMPMAP( MTRMAP, WINMAP, .TRUE., ' ', STATUS )
 
-*  Get the WCS FrameSet from the input NDF.
-      CALL NDF_GTWCS( INDF1, IWCS1, STATUS )
+*  Get the WCS FrameSet from the input NDF. If no WCS component is
+*  present in the NDF, an attempt is made to create a WCS FrameSet from
+*  any IRAS90 astrometry structure, or FITS extension in the NDF.
+      CALL KPG1_GTWCS( INDF1, IWCS1, STATUS )
 
-*  Loop round Frames in the FrameSet, until the PIXEL Frame is found.
+*  Loop round Frames in the FrameSet, until the PIXEL Frame is found
+*  with the specified number of axes.
       IPIX1 = AST__NOFRAME
       DO I = 1, AST_GETI( IWCS1, 'Nframe', STATUS )
 
-         IF( AST_GETC( AST_GETFRAME( IWCS1, I, STATUS ), 'DOMAIN', 
-     :                 STATUS ) .EQ. 'PIXEL' ) THEN
-            IPIX1 = I
-            GO TO 10
+         FRM = AST_GETFRAME( IWCS1, I, STATUS )
+
+         IF( AST_GETC( FRM, 'DOMAIN', STATUS ) .EQ. 'PIXEL' ) THEN
+            IF( AST_GETI( FRM, 'NAXES', STATUS ) .EQ. NDIM ) THEN
+               IPIX1 = I
+               GO TO 10
+            END IF
          END IF
 
       END DO
@@ -173,24 +180,33 @@
       IF( STATUS .EQ. SAI__OK .AND. IPIX1 .EQ. AST__NOFRAME ) THEN
          STATUS = SAI__ERROR
          CALL NDF_MSG( 'NDF', INDF1 )
-         CALL ERR_REP( 'KPG1_ASPRP_3', 'No PIXEL Frame found in '//
-     :                 'the WCS component of ''^NDF''.', STATUS )
+         CALL NDF_MSG( 'NDIM', NDIM )
+         CALL ERR_REP( 'KPG1_ASPRP_3', 'No PIXEL Frame with ^NDIM '//
+     :                 'axes found in the WCS component of ''^NDF''.', 
+     :                 STATUS )
       END IF
 
 *  Get the mapping from the GRID to the PIXEL Frame.
       GP1MAP = AST_GETMAPPING( IWCS1, AST__BASE, IPIX1, STATUS )
 
-*  Get the WCS FrameSet from the output NDF.
+*  Get the WCS FrameSet from the output NDF. We only need the PIXEL and
+*  GRID Frames which are available even if the NDF has no WCS component.
+*  For this reason we do not use KPG1_GTWCS which attempts to create a
+*  FRAMESET from IRAS90 or FITS extensions if no WCS component is available.
       CALL NDF_GTWCS( INDF2, IWCS2, STATUS )
 
-*  Loop round Frames in the FrameSet, until the PIXEL Frame is found.
+*  Loop round Frames in the FrameSet, until the PIXEL Frame is found with
+*  NDIM axes.
       IPIX2 = AST__NOFRAME
       DO I = 1, AST_GETI( IWCS2, 'Nframe', STATUS )
 
-         IF( AST_GETC( AST_GETFRAME( IWCS2, I, STATUS ), 'DOMAIN', 
-     :                 STATUS ) .EQ. 'PIXEL' ) THEN
-            IPIX2 = I
-            GO TO 20
+         FRM = AST_GETFRAME( IWCS2, I, STATUS )
+
+         IF( AST_GETC( FRM, 'DOMAIN', STATUS ) .EQ. 'PIXEL' ) THEN
+            IF( AST_GETI( FRM, 'NAXES', STATUS ) .EQ. NDIM ) THEN
+               IPIX2 = I
+               GO TO 20
+            END IF
          END IF
 
       END DO
@@ -201,8 +217,10 @@
       IF( STATUS .EQ. SAI__OK .AND. IPIX2 .EQ. AST__NOFRAME ) THEN
          STATUS = SAI__ERROR
          CALL NDF_MSG( 'NDF', INDF2 )
-         CALL ERR_REP( 'KPG1_ASPRP_4', 'No PIXEL Frame found in '//
-     :                 'the WCS component of ''^NDF''.', STATUS )
+         CALL NDF_MSG( 'NDIM', NDIM )
+         CALL ERR_REP( 'KPG1_ASPRP_4', 'No PIXEL Frame with ^NDIM '//
+     :                 'axes found in the WCS component of ''^NDF''.', 
+     :                 STATUS )
       END IF
 
 *  Get the mapping from the PIXEL to the GRID Frame.

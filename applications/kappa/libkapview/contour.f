@@ -16,18 +16,30 @@
 *     CALL CONTOUR( STATUS )
 
 *  Description:
-*     This application contours an image of a 2-dimensional NDF on the
-*     current graphics device.  The image may be part or whole of the
-*     data array, but also the variance or quality can be shown.  The
-*     plot is situated within the current graphics-database picture.
-
-*     The contour plot resides within optional, annotated and enumerated
-*     axes.  An optional, but recommended, key may be drawn to the
-*     right of the contour plot.  It reports the NDF's units if there
-*     are any, and only contour heights actually plotted are included.
-*     There are seven methods for selecting contours.
-
-*     The contouring algorithm has single-pixel resolution.
+*     This application produces a contour map of a 2-dimensional NDF on 
+*     the current graphics device, with single-pixel resolution. Contour
+*     levels can be chosen automatically in various ways, or specified 
+*     explicitly (see parameter MODE). 
+*
+*     The plot is produced within the current graphics database picture,
+*     and may be aligned with an existing DATA picture if the existing
+*     picture contains suitable co-ordinate Frame information (see 
+*     parameter CLEAR). 
+*
+*     The appearance of each contour can be controlled in several ways. The 
+*     pens used can be rotated automatically (see parameter PENROT). Contours
+*     below a given threshold value can be drawn dashed (see parameter DASHED).
+*     Alternatively, the appearance of each contour can be set explicitly
+*     (see parameter PENS).
+*
+*     Annotated axes can be produced (see parameter AXES), and the appearance 
+*     of the axes can be controlled in detail (see parameter STYLE). The 
+*     axes show co-ordinates in the current co-ordinate Frame of the supplied 
+*     NDF.
+*
+*     A list of the contour levels can be displayed to the right of the 
+*     contour map (see parameter KEY). The appearance and position of this 
+*     key may be controlled using parameters KEYSTYLE and KEYPOS.
 
 *  Usage:
 *     contour ndf [comp] mode ncont [key] [device]
@@ -37,310 +49,320 @@
 *       mode
 
 *  ADAM Parameters:
-*     ABSLAB = LITERAL (Read)
-*        Label for the plot abscissa, in which NCAR fancy founts may be
-*        embedded when FONT = "NCAR".  If axis information is present
-*        the suggested default is the NDF's axis label followed by the
-*        units, in parentheses.  If an error occurs obtaining the label
-*        the suggested default is "X". []
 *     AXES = _LOGICAL (Read)
 *        TRUE if labelled and annotated axes are to be drawn around the
-*        contour plot.  The annotations are either the data
-*        co-ordinates from the NDF axis components, provided these are
-*        present and linear and COSYS = "Data"; otherwise pixel
-*        co-ordinates are used.  [TRUE]
-*     BORDER = _LOGICAL (Read)
-*        BORDER is TRUE if a box is to be drawn about the contour plot.
-*        This is only accessed when there are no axes required. [TRUE]
+*        contour map, showing the current co-ordinate Frame of the
+*        supplied NDF. The appearance of the axes can be controlled using
+*        the STYLE parameter. [TRUE]
 *     CLEAR = _LOGICAL (Read)
-*        TRUE if the graphics device is to be cleared before display
-*        of the array. [TRUE]
+*        TRUE if the graphics device is to be cleared before displaying
+*        the contour map. If you want the contour map to be drawn over
+*        the top of an existing DATA picture, then set CLEAR to FALSE. The
+*        contour map will then be drawn in alignment with the displayed 
+*        data. If possible, alignment occurs within the current co-ordinate 
+*        Frame of the NDF. If this is not possible, (for instance if 
+*        suitable WCS information was not stored with the existing DATA 
+*        picture), then alignment is attempted in PIXEL 
+*        co-ordinates. If this is not possible, then alignment is
+*        attempted in GRID co-ordinates. If this is not possible, then
+*        alignment is attempted in the first suitable Frame found in the NDF
+*        irrespective of its domain. A message is displayed indicating the 
+*        domain in which alignment occurred. If there are no suitable Frames 
+*        in the NDF then an error is reported. [TRUE]
 *     COMP = LITERAL (Read)
 *        The NDF component to be contoured.  It may be "Data",
-*        "Quality", "Variance", or "Error" (where "Error" is the
+*        "Quality", "Variance", or "Error" (where "Error" is an
 *        alternative to "Variance" and causes the square root of the
-*        variance values to be taken before plotting contours).  If
+*        variance values to be displayed).  If
 *        "Quality" is specified, then the quality values are treated as
 *        numerical values (in the range 0 to 255). ["Data"]
-*     CONCOL = LITERAL (Read)
-*        The colour of the contour lines on devices that support colour.
-*        The options are described below.
-*
-*          "MAX"          - The maximum colour index in the image 
-*                           display colour lookup table.
-*          "MIN"          - The minimum (non-reserved) colour index in 
-*                           the image-display colour lookup table.
-*          An integer     - The actual colour index.  It is constrained
-*                           between 0 and the maximum colour index
-*                           available on the device. 
-*          A named colour - Uses the named colour from the palette, and
-*                           if it is not present, the nearest colour
-*                           from the palette is selected.
-*
-*        If the colour is to remain unaltered as the lookup table is
-*        manipulated choose an integer between 0 and 15, or a named
-*        colour.  This parameter will be ignored if PENROT = TRUE.
-*        [The current value, but equals "1" (the foreground colour) if
-*        there is no current value.] 
-*     COSYS = LITERAL (Read)
-*        The co-ordinate system to be used.  This can be either "World"
-*        or "Data".  "World" makes pixel co-ordinates to appear on axes.
-*        If COSYS = "Data" the NDF's axis information is used to
-*        annotate axes.  [Current co-ordinate system]
 *     DASHED = _REAL (Read)
 *        The height below which the contours will be drawn with dashed
-*        lines.  A null value (!) means all contours are drawn with
-*        solid lines.  [!]
+*        lines (if possible).  A null value (!) results in contours being 
+*        drawn with the styles specified by parameters PENS, PENROT and 
+*        STYLE. [!]
 *     DEVICE = DEVICE (Read)
-*        The plotting device. [Current image-display device]
-*     FIRSTCNT = _REAL (Read)
-*        Height of the first contour (Linear and Magnitude modes).
-*        The suggested value is the current value.
+*        The plotting device. [current image-display device]
+*     FAST = _LOGICAL (Given)
+*        If TRUE, then a faster, but in certain cases less accurate, method 
+*        is used to draw the contours. In fast mode, contours may be
+*        incorrectly placed on the display if the mapping between graphics 
+*        co-ordinates and the current co-ordinate Frame of the supplied NDF 
+*        has any discontinuities, or is strongly non-linear. This may be
+*        the case, for instance, when displaying all-sky maps on top of
+*        each other. [TRUE]
 *     FILL = _LOGICAL (Read)
 *        The contour plot normally has square pixels, in other words
-*        a length along each axis corresponds to the same number of
-*        pixels.  However, for images with markedly different
+*        a specified length along each axis corresponds to the same number 
+*        of pixels.  However, for images with markedly different
 *        dimensions this default behaviour may not be suitable or give
 *        the clearest plot.  When FILL is TRUE, the square-pixel
 *        constraint is relaxed and the contour plot is the largest
 *        possible within the current picture.  When FILL is FALSE, the
-*        pixels are square.  The suggested default is the current
-*        value.  [FALSE]
+*        pixels are square.  [FALSE]
 *     FIRSTCNT = _REAL (Read)
 *        Height of the first contour (Linear and Magnitude modes).
-*        The suggested value is the current value.
-*     FONT = LITERAL (Read)
-*        The fount to be used for the line graphics.  It can be either
-*        "NCAR" for the NCAR fancy characters and "GKS" for the standard
-*        GKS san-serif fount.  The former is intended for hardcopy
-*        publication-quality plots, since it is relatively slow; the
-*        latter is intended for normal interactive graphics requiring
-*        rapid plotting, and it is clearer on small plots.  The
-*        suggested default is the current value. ["GKS"]
 *     HEIGHTS() = _REAL (Read)
-*        Contour levels (Free mode).  The suggested default is the
-*        current value.
+*        The required contour levels (Free mode).  
 *     KEY = _LOGICAL (Read)
-*        A key of the contour level versus pixel value is to be
-*        produced. [TRUE]
+*        TRUE if a key of the contour level versus pixel value is to be
+*        produced. The appearance of this key can be controlled using
+*        parameter KEYSTYLE, and its position can be controlled using 
+*        parameter KEYPOS. [TRUE]
+*     KEYPOS() = _REAL (Read)
+*        Two values giving the position of the key. The first value gives 
+*        the gap between the right hand edge of the contour map and the left 
+*        hand edge of the key (0.0 for no gap, 1.0 for the largest gap). The 
+*        second value gives the vertical position of the top of the key (1.0 
+*        for the highest position, 0.0 for the lowest). If the second value 
+*        is not given, the top of the key is placed level with the top of the 
+*        contour map. Both values should be in the range 0.0 to 1.0. If a
+*        key is produced, then the right hand margin specified by parameter 
+*        MARGIN is ignored. [current value]
+*     KEYSTYLE = GROUP (Read)
+*        A group of attribute settings describing the plotting style to use 
+*        for the key (see parameter KEY). 
+*
+*        A comma-separated list of strings should be given in which each
+*        string is either an attribute setting, or the name of a text file
+*        preceded by an up-arrow character "^". Such text files should
+*        contain further comma-separated lists which will be read and 
+*        interpreted in the same manner. Attribute settings are applied in 
+*        the order in which they occur within the list, with later settings
+*        over-riding any earlier settings given for the same attribute.
+*
+*        Each individual attribute setting should be of the form:
+*
+*           <name>=<value>
+*        
+*        where <name> is the name of a plotting attribute, and <value> is
+*        the value to assign to the attribute. Default values will be
+*        used for any unspecified attributes. All attributes will be
+*        defaulted if a null value (!) is supplied. See section "Plotting
+*        Attributes" in SUN/95 for a description of the available
+*        attributes. Any unrecognised attributes are ignored (no error is
+*        reported). 
+*
+*        The heading in the key can be changed by setting a value for the 
+*        Title attribute (the supplied heading is split into lines of no more 
+*        than 17 characters). The appearance of the heading is controlled 
+*        by attributes Colour(Title), Font(Title), etc. The appearance of 
+*        the contour indices is controlled by attributes Colour(TextLab), 
+*        Font(TextLab), etc (the synonym Index can be used in place of 
+*        TextLab). The appearance of the contour values is controlled by 
+*        attributes Colour(NumLab), Font(NumLab), etc (the synonym Value 
+*        can be used in place of NumLab). Contour indices are formatted 
+*        using attributes Format(1), Digits(1), etc (the synonym Index can 
+*        be used in place of value 1). Contour values are formatted 
+*        using attributes Format(2), etc (the synonym Value can be used in 
+*        place of the value 2). [current value] 
 *     LENGTH() = _REAL (Write)
-*        The total length in pixels of the contours at each selected
-*        height.  These values are only computed when STATS = TRUE.
-*     MAJTIC( 2 ) = _REAL (Read)
-*        The parameter controlling the numbers of major tick marks
-*        for the x and y axes.  (Number used is between MAJTIC+2 and
-*        5*MAJTIC/2+4.) [3.,3.]
-*     MINTIC( 2 ) = _REAL (Read)
-*        The number of minor tick marks between each major tick mark
-*        for the x and y axes.  A negative value forces the graphics
-*        package to compute appropriate values. [-1.,-1.]
+*        On exit this holds the total length in pixels of the contours at each 
+*        selected height.  These values are only computed when parameter STATS 
+*        is TRUE.
+*     MARGIN( 4 ) = _REAL (Write)
+*        The widths of the margins to leave around the contour map for axis 
+*        annotation. The widths should be given as fractions of the 
+*        corresponding dimension of the DATA picture. 
+*        The actual margins used may be increased to preserve the aspect 
+*        ratio of the DATA picture. Four values may be given, in the order;
+*        bottom, right, top, left. If fewer than four values are given, 
+*        extra values are used equal to the first supplied value. If these 
+*        margins are too narrow any axis annotation may be clipped. The
+*        dynamic default is 0.18 (for all edges) if annotated axes are being 
+*        produced, and zero otherwise. See also parameter KEYPOS. []
 *     MODE = LITERAL (Read)
-*        The method used to select the contour levels.  The options are
-*        described below.
+*        The method used to select the contour levels. The options are:
+*          - "Area" -- The contours enclose areas of the array for which 
+*          the equivalent radius increases by equal increments.  You 
+*          specify the number of levels.
 *
-*          "Area"        - The contours enclose areas of the array for
-*                          which the equivalent radius increases by
-*                          equal increments.  You specify the number of
-*                          levels.
-*          "Automatic"   - The contour levels are equally spaced between
-*                          the maximum and minimum pixel values in the
-*                          array.  You supply the number of contour
-*                          levels.
-*          "Equalised"   - You define the number of equally spaced
-*                          percentiles.
-*          "Free"        - You specify a series of contour values
-*                          explicitly.
-*          "Linear"      - You define the number of contours, the start
-*                          contour level and linear step between
-*                          contours.
-*          "Magnitude"   - You define the number of contours, the start
-*                          contour level and step between contours.  The
-*                          step size is in magnitudes so the nth contour
-*                          is dex(-0.4*(n-1)*step) times the start
-*                          contour level.
-*          "Percentiles" - You specify a series of percentiles.
+*          - "Automatic" -- The contour levels are equally spaced between
+*          the maximum and minimum pixel values in the array.  You supply 
+*          the number of contour levels.
 *
-*        The suggested default is the current value, which is initially
-*        "Free".
+*          - "Equalised" -- You define the number of equally spaced 
+*          percentiles.
+*
+*          - "Free" -- You specify a series of contour values explicitly.
+*
+*          - "Linear" -- You define the number of contours, the start
+*          contour level and linear step between contours.
+*
+*          - "Magnitude" -- You define the number of contours, the start
+*          contour level and step between contours.  The step size is in 
+*          magnitudes so the nth contour is dex(-0.4*(n-1)*step) times the 
+*          start contour level.
+*
+*          - "Percentiles" -- You specify a series of percentiles.
+*
+*        If the contour map is aligned with an existing DATA picture (see
+*        parameter CLEAR), then only part of the supplied NDF may be
+*        displayed. In this case, the choice of contour levels is based 
+*        on the data within a rectangular section of the input NDF
+*        enclosing the existing DATA picture. Data values outside this 
+*        section are ignored.
 *     NCONT = _INTEGER (Read)
-*        The number of contours required (all modes except Free and
+*        The number of contours required (in all modes except Free and
 *        Percentiles).  It must be between 1 and 50.  If the number is
 *        large, the plot may be cluttered and take longer to produce.
-*        6, the initial suggested default, gives reasonable results.
-*        The current value becomes the suggested default.
+*        The initial suggested default of 6 gives reasonable results.
 *     NDF = NDF (Read)
 *        NDF structure containing the 2-dimensional image to be
 *        contoured.
 *     NUMBER() = _INTEGER (Write)
-*        The number of closed contours at each selected height.
-*        Contours are not closed if they intersect a bad pixel or the
+*        On exit this holds the number of closed contours at each selected 
+*        height. Contours are not closed if they intersect a bad pixel or the
 *        edge of the image.  These values are only computed when
-*        STATS = TRUE.
-*     ORDLAB = LITERAL (Read)
-*        Label for the plot ordinate, in which NCAR fancy founts may be
-*        embedded when FONT = "NCAR".  If axis information is present
-*        the suggested default is the NDF's axis label followed by the
-*        units, in parentheses.  If an error occurs obtaining the label
-*        the suggested default is "Y". []
-*     OUTTIC = _LOGICAL (Read)
-*        TRUE if the axis tick marks are to appear on the outside of
-*        the axes instead of inside. By default, the tick marks are
-*        drawn outside the contouring region to eliminate
-*        intersections of ticks with the contours. [TRUE]
+*        parameter STATS is TRUE.
 *     PENROT = _LOGICAL (Read)
 *        If TRUE, the plotting pens are cycled through the contours to
-*        aid identification of the contour heights.  [FALSE]
+*        aid identification of the contour heights.  Only accessed if 
+*        pen definitions are not supplied using parameter PENS. [FALSE]
+*     PENS = GROUP (Given)
+*        A group of strings, separated by semi-colons, each of which specifies
+*        the appearance of a pen to be used to draw a contour. The first 
+*        string in the group describes the pen to use for the first contour, 
+*        the second string describes the pen for the second contour, etc. If 
+*        there are fewer strings than contours, then the supplied pens are 
+*        cycled through again, starting at the beginning. Each string should
+*        be a comma-separated list of plotting attributes to be used when drawing 
+*        the contour. For instance, the string "width=0.02,colour=red,style=2"
+*        produces a thick, red, dashed contour. Attributes which are
+*        unspecified in a string default to the values implied by parameter 
+*        STYLE. If a null value (!) is given for PENS, then the pens 
+*        implied by parameters PENROT, DASHED and STYLE are used. [!]
 *     PERCENTILES() = _REAL (Read)
 *        Contour levels given as percentiles.  The values must lie
-*        between 0.0 and 100.0. (Percentiles mode).  The suggested
-*        default is the current value.
-*     PLTITL = LITERAL (Read)
-*        The title of the plot.  Up to about 40 characters can be
-*        accommodated, and NCAR fancy founts may be embedded when FONT =
-*        "NCAR". If an error occurs obtaining the title, it is
-*        defaulted to "Contour plot".  [The NDF title]
-*     PXSIZE = _REAL (Read)
-*        The length (x axis) of the plot in metres. [Maximum that can
-*        fit in the current picture whilst preserving square pixels]
-*     PYSIZE = _REAL (Read)
-*        The length (y axis) of the plot in metres. [Maximum that can
-*        fit in the current picture whilst preserving square pixels]
+*        between 0.0 and 100.0. (Percentiles mode).  
 *     STATS = _LOGICAL (Read)
-*        If TRUE, the LENGTH and NUMBER statistics are computed.
-*        [FALSE].
+*        If TRUE, the LENGTH and NUMBER statistics are computed. [FALSE].
 *     STEPCNT = _REAL (Read)
 *        Separation between contour levels, linear for Linear mode
-*        and in magnitudes for Magnitude mode.  The suggested value is
-*        the current value.
-*     THICK = _REAL (Read)
-*        The thickness of the lines and NCAR-fount characters in the
-*        plot, where 1.0 is the normal thickness.  Currently, this is
-*        only available on a few devices.  It must take a value in the
-*        range 0.5--10.0.  [1.0]
+*        and in magnitudes for Magnitude mode. 
+*     STYLE = GROUP (Read)
+*        A group of attribute settings describing the plotting style to use 
+*        for the contours and annotated axes. 
+*
+*        A comma-separated list of strings should be given in which each
+*        string is either an attribute setting, or the name of a text file
+*        preceded by an up-arrow character "^". Such text files should
+*        contain further comma-separated lists which will be read and 
+*        interpreted in the same manner. Attribute settings are applied in 
+*        the order in which they occur within the list, with later settings
+*        over-riding any earlier settings given for the same attribute.
+*
+*        Each individual attribute setting should be of the form:
+*
+*           <name>=<value>
+*        
+*        where <name> is the name of a plotting attribute, and <value> is
+*        the value to assign to the attribute. Default values will be
+*        used for any unspecified attributes. All attributes will be
+*        defaulted if a null value (!) is supplied. See section "Plotting
+*        Attributes" in SUN/95 for a description of the available
+*        attributes. Any unrecognised attributes are ignored (no error is
+*        reported). 
+*
+*        The appearance of the contours is controlled by the attributes
+*        Colour(Curves), Width(Curves), etc (the synonym Contours may be
+*        used in place of Curves). The contour appearance established in
+*        this way may be modified using parameters PENS, PENROT and DASHED. 
+*        [current value]
+*     USEAXIS = GROUP (Read)
+*        USEAXIS is only accessed if the current co-ordinate Frame of the 
+*        NDF has more than 2 axes. A group of two strings should be
+*        supplied specifying the 2 axes which are to be used when annotating 
+*        and aligning the contour map. Each axis can be specified either by 
+*        its integer index within the current Frame (in the range 1 to the 
+*        number of axes in the current Frame), or by its Symbol attribute. A
+*        list of acceptable values is displayed if an illegal value is 
+*        supplied. The dynamic default selects the axes with the same indices 
+*        as the 2 significant NDF pixel axes. []
 
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Examples:
-*     contour myfile d \
+*     contour myfile 
 *        Contours the data array in the NDF called myfile on the current
 *        graphics device.  All other settings are defaulted, so for
 *        example the current mode for determining heights is used, and
 *        a key is plotted.
-*     contour taurus1(100:199,150:269,4) \
-*        Contours a 2-dimensional portion of current array component in
-*        the NDF cube called taurus1 on the current graphics device.
-*        The portion extends from pixel (100,150,4) to pixel
-*        (199,269,4).  All other settings are defaulted, so for
-*        example, the NDF's title adorns the plot, and a key is
-*        plotted.
-*     contour ngc6872 mode=au ncont=5 device=ps_l concol=white
+*     contour taurus1(100:199,150:269,4)
+*        Contours a 2-dimensional section of the 3-dimensional NDF called 
+*        taurus1 on the current graphics device. The section extends from 
+*        pixel (100,150,4) to pixel (199,269,4).  
+*     contour ngc6872 mode=au ncont=5 device=ps_l pens="style=1;style=2"
 *        Contours the data array in the NDF called ngc6872 on the ps_l
 *        graphics device.  Five equally spaced contours between the
-*        maximum and minimum data values are drawn in white.  A key is
-*        plotted.
-*     contour ndf=ngc6872 mode=au ncont=5 penrot cosys=w device=ps_l
-*        As above except that the pens are cycled (which will normally
-*        give rise to various dashed patterns on this device).  The
-*        axes have pixel co-ordinates.
-*     contour ngc6872 mode=li firstcnt=10 stepcnt=2 ncont=4 noaxes
-*        Contours the data array in the NDF called ngc6872 on the
+*        maximum and minimum data values are drawn, alternating between 
+*        line styles 1 and 2 (solid and dashed).  
+*     contour ndf=ngc6872 mode=au ncont=5 penrot style="^mysty,grid=1"
+*        As above except that the current graphics device is used, pens 
+*        are cycled automatically, and the appearance of the axes is read 
+*        from text file mysty. The plotting attribute Grid is set
+*        explicitly to 1 to ensure that a co-ordinate grid is drawn over
+*        the plot. The text file mysty could, for instance, contain the 
+*        two lines "Title=NGC6872 at 25 microns" and "grid=0". The Title 
+*        setting gives the title to display at the top of the axes. The
+*        Grid setting would normally prevent a co-ordinate grid being 
+*        drawn, but is over-ridden in this example by the explicit setting 
+*        for Grid which follows the file name.
+*     contour m51 mode=li firstcnt=10 stepcnt=2 ncont=4 keystyle=^keysty
+*        Contours the data array in the NDF called m51 on the
 *        current graphics device.  Four contours at heights 10, 12, 14,
-*        and 16 are drawn.  A key is plotted, but no axes surround the
-*        contour plot.
-*     contour ss443 mode=pe percentiles=[80,90,95,98,99,99.9] stats
+*        and 16 are drawn.  A key is plotted using the style specified
+*        in the text file keysty. This file could, for instance, contain 
+*        the two lines "font=3" and "digits(2)=4" to cause all text in
+*        the key to be drawn using PGPLOT font 3 (an italic font), and
+*        4 digits to be used when formatting the contour values.
+*     contour ss443 mode=pe percentiles=[80,90,95] stats keypos=0.05
 *        Contours the data array in the NDF called ss443 on the current
 *        graphics device.  Contours at heights corresponding to the 80,
-*        90, 95, 98, 99, and 99.9 percentiles are drawn in the current
-*        colour.  A key is plotted.  Contour statistics are computed.
-*     contour mode=eq ncont=5 dashed=0 concol=red ndf=skyflux
-*        Contours the data array in the NDF called skyflux on the
-*        current graphics device.  Contours at heights corresponding to
-*        the 10, 30, 50, 70 and 90 percentiles are drawn in red.  Those
-*        contours whose values are negative will appear as dashed
-*        lines.  A key is plotted.
-*     contour comp=d nokey penrot \
-*        Contours the portion of the data array in the current NDF on
+*        90 and 95 percentiles are drawn.  The key is placed closer
+*        to the contour map than usual.  Contour statistics are computed.
+*     contour skyflux mode=eq ncont=5 dashed=0 pens='colour=red' noclear 
+*        Contours the data array in the NDF called skyflux on the current 
+*        graphics device.  The contour map is automatically aligned with
+*        any existing DATA picture, if possible. Contours at heights 
+*        corresponding to the 10, 30, 50, 70 and 90 percentiles (of the 
+*        data within the picture) are drawn in red.  Those contours whose 
+*        values are negative will appear as dashed lines.  
+*     contour comp=d nokey penrot style="grid=1,title=My data" \
+*        Contours the data array in the current NDF on
 *        the current graphics device using the current method for
-*        height selection.  The NDF's title is the plot's title.  No
-*        key is drawn.  The appearance of the contours cycles every
-*        third contour.
-*     contour comp=v mode=fr heights=[10,20,40,80] title=Variance
+*        height selection.  No key is drawn.  The appearance of the 
+*        contours cycles every third contour. A co-ordinate grid is 
+*        drawn over the plot, and a title of "My data" is displayed at
+*        the top.
+*     contour comp=v mode=fr heights=[10,20,40,80] \
 *        Contours the variance array in the current NDF on the
 *        current graphics device.  Contours at 10, 20, 40 and 80 are
-*        drawn.  "Variance" is the title of the plot.
+*        drawn.  
 
 *  Notes:
+*     -  The Title component in the NDF is used as the default title for 
+*     the annotated axes. If the NDF does not have a Title component, then
+*     the default title is taken from current co-ordinate Frame stored in the
+*     WCS component of the NDF. This
+*     default may be over-ridden by specifying a value for the Title
+*     attribute using the STYLE parameter. 
 *     -  The application stores a number of pictures in the graphics
-*     database in the following order: a FRAME of the specified size
-*     containing the title, annotated axes, contours and key; a DATA
-*     picture which is stored with world co-ordinates in units of data
-*     pixels; and a KEY picture to store the key if present.  The DATA
-*     picture also may have double-precision data co-ordinates derived
-*     from the NDF axis components provided these are linear and
-*     different from pixel co-ordinates; the data co-ordinates are
-*     stored via a linear transformation.  The NDF associated with the
-*     plot is stored by reference with the DATA picture.  On exit the
-*     current database picture for the chosen device reverts to the
+*     database in the following order: a FRAME picture containing the 
+*     annotated axes, contours, and key; a KEY picture to store 
+*     the key if present; and a DATA picture containing just the contours.
+*     Note, the FRAME picture is only created if annotated axes or a key
+*     has been drawn, or if non-zero margins were specified using parameter 
+*     MARGIN. The world co-ordinates in the DATA picture will be pixel 
+*     co-ordinates. A reference to the supplied NDF, together with a copy 
+*     of the WCS information in the NDF are stored in the DATA picture. On 
+*     exit the current database picture for the chosen device reverts to the 
 *     input picture.
-*     -  There are some options for setting the characteristics of the
-*     contour lines.  By default, solid lines are drawn with the same
-*     colour as the axes and key, namely the foreground colour.  The
-*     colour will depend on the graphics device chosen, but it is often
-*     black for printers or white for terminals.  The alternatives to
-*     override this default behaviour are listed below.
-*
-*        1. Set a colour for all contours using parameter CONCOL.
-*        2. Request dashed contours below some threshold given by
-*           parameter DASHED and solid lines for other heights.  All
-*           contours have either the foreground colour or that
-*           prescribed by parameter CONCOL.
-*        3. Cycle the pens modulo 3 for each contour height actually
-*           plotted by setting PENROT = TRUE.  The characteristics of
-*           the second and third line styles will depend on the chosen
-*           graphics device.  An image display or pen plotter will draw
-*           coloured lines using palette entries 1 to 3; whereas a
-*           window overlay, or monochrome laser printer or terminal
-*           will draw a variety of dashed or thicker lines.
-*        4. Combine options 2 and 3.  However, palette colours 1 to 3
-*           will always be used and CONCOL ignored.  The contours below
-*           the threshold continue the cycle through the three colours.
-*           There may be some confusion on devices that already use
-*           dashed lines, so this is only suitable for devices
-*           supporting at least three colours simultaneously.
-*
-*     Pen rotation takes precedence over colour control through CONCOL. 
-
-*  Algorithm:
-*     -  Find which component to display, obtain an identifier to the
-*     NDF and check that the component is present.  Find the data type
-*     for processing.  Get the NDF bounds and inquire the bad-pixel
-*     flag.  Get the units.  Obtain the sub-image bounds.  Create the
-*     the section.  Determine which co-ordinate system to use.
-*     -  Get the display device and open the database for it with the
-*     appropriate device status. Get the current SGS zone.
-*     -  Save the frame picture in the database.
-*     -  Obtain the plotting style, title, axis labels and plot size.
-*     -  Create a new zone of the requested size.
-*     -  Define frame, image and key zones.
-*     -  Get the contour-style parameters.
-*     -  Obtain the data co-ordinate transformation and axis bounds.
-*     -  Draw axes in a smaller than default NCAR zone or a box in the
-*     full image zone.
-*     -  Find the position of the top of the key.
-*     -  Map the section.
-*     -  Select the contour heights and sort them in ascending order.
-*     -  Obtain lots of work arrays, redefine the co-ordinates to that
-*     of the image and plot the contours in the NCAR grid region.  Clear
-*     workspace. Store the image picture in the database, plus the data
-*     reference, and the transformation for data co-ordinates.
-*     -  Draw the key, recording it in the database and report the
-*     heights.
-*     -  Tidy graphics and NDF.
 
 *  Related Applications:
-*     KAPPA: CONTOVER, TURBOCONT; Figaro: ICONT; SPECDRE: SPECCONT.
+*     KAPPA: WCSFRAME, TURBOCONT, PICDEF; Figaro: ICONT; SPECDRE: SPECCONT.
 
 *  Implementation Status:
 *     -  Only real data can be processed directly.  Other non-complex
@@ -349,13 +371,11 @@
 *     -  Bad pixels and automatic quality masking are supported.
 
 *  Implementation Deficiencies:
-*     Some missing options to tailor the plot.  NCAR does strange
-*     things if the picture is too small.  A method to circumvent the
-*     problem is being investigated.  Smooth-contour function is no
-*     longer available.
+*     Smooth-contour function is no longer available.
 
 *  Authors:
-*     MJC: Malcolm J. Currie  STARLINK
+*     MJC: Malcolm J. Currie  (STARLINK)
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -449,6 +469,9 @@
 *        NOISY, RESOLUTION, and SMOOTHING withdrawn. 
 *     1997 May 31 (MJC):
 *     	 Added STATS, LENGTH, and NUMBER.
+*     12-AUG-1998 (DSB):
+*        Major changes to base graphics on PGPLOT and handling of co-ordinate
+*        systems on the AST library.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -457,1088 +480,423 @@
 *-
 
 *  Type Definitions:
-      IMPLICIT NONE            ! no default typing allowed
+      IMPLICIT NONE            
 
 *  Global Constants:
-      INCLUDE 'SAE_PAR'        ! Global SSE definitions
-      INCLUDE 'DAT_PAR'        ! Data-system constants
-      INCLUDE 'PRM_PAR'        ! Magic-value definitions
-      INCLUDE 'NDF_PAR'        ! NDF_ public constants
-      INCLUDE 'NDF_ERR'        ! NDF_ error definitions
-      INCLUDE 'PAR_ERR'        ! Parameter-system error definitions
-      INCLUDE 'GKS_PAR'        ! GKS constants (e.g. GSET)
+      INCLUDE 'SAE_PAR'        ! Standard SAE constants
+      INCLUDE 'PRM_PAR'        ! VAL constants
+      INCLUDE 'NDF_PAR'        ! NDF constants
+      INCLUDE 'NDF_ERR'        ! NDF error constants
+      INCLUDE 'PAR_ERR'        ! PAR error constants
+      INCLUDE 'AST_PAR'        ! AST constants
+      INCLUDE 'GRP_PAR'        ! GRP constants
 
 *  Status:
       INTEGER STATUS
 
-*  Local Constants:
-      REAL
-     :  ANCLP1, ANCLP2,        ! Fraction of the frame zone in which the
-     :  ANCLP3, ANCLP4         ! image will appear when there are axes.
-                               ! Note aspect ratio is preserved.
-      PARAMETER ( ANCLP1 = 0.19, ANCLP2 = 0.95,
-     :            ANCLP3 = 0.15, ANCLP4 = 0.91 )
+*  External References:
+      INTEGER CHR_LEN          ! Used length of a string
 
-      INTEGER
-     :  CUNITS,                ! Maximum number of characters in units
-                               ! that will be visible in the plot
-     :  NDIM,                  ! Dimensionality of input array
-     :  MXCONT                 ! Maximum number of contour heights
+*  Local Constants:
+      INTEGER CUNITS           ! Max. no. of visible characters in units
       PARAMETER( CUNITS = 14 )
-      PARAMETER( NDIM = 2 )    ! default to 2-d
+
+      INTEGER NDIM             ! Dimensionality of input array
+      PARAMETER( NDIM = 2 )    
+
+      INTEGER MXCONT           ! Maximum number of contour heights
       PARAMETER( MXCONT = 50 )
 
-      REAL
-     :  ASPKEY                 ! Fractional aspect ratio (of that of
-                               ! the input array) for the key
-      PARAMETER ( ASPKEY = 0.2 )
-
-      INTEGER CONPEN             ! SGS pen number used to plot unrotated
-      PARAMETER ( CONPEN = 2 )   ! contour
-
-      INTEGER MXWORK             ! Maximum number of work arrays
-      PARAMETER ( MXWORK = 1 )
-
 *  Local Variables:
-      LOGICAL                  ! True if :
-     :  AXES,                  ! Annotated axes are to be drawn
-     :  BAD,                   ! Bad pixels are present in the image
-     :  BORDER,                ! A border about the plot is to be drawn
-     :  CLEAR,                 ! The graphics device is to be cleared
-                               ! before display of the array
-     :  COLOUR,                ! Workstation supports colour
-     :  CNTUSD( MXCONT ),      ! A contour has been plotted at the
-                               ! corresponding height in CNTLEV
-     :  DACOOR,                ! Data co-ordinates are to be stored
-                               ! in the database
-     :  DATACO,                ! Axes are given in data co-ordinates
-     :  DATEMP,                ! Either of the axes is non-monotonic
-     :  DEVCAN,                ! Graphics-device parameter is to be
-                               ! cancelled
-     :  DPAXIS,                ! Axis centres are double precision
-     :  FILL                   ! Plotting area is filled
-
-      LOGICAL
-     :  KEY,                   ! A key of the contour heights
-                               ! is to be produced
-     :  MONOTO,                ! Axis is monotonic
-     :  OUTTIC,                ! Axis tick marks are to be placed
-                               ! outside the box instead of inside
-     :  PENROT,                ! The graphics pens are to be cycled
-     :  SCLINE,                ! Non-standard thickness lines needed
-     :  STATS,                 ! Contour statistics required?
-     :  THERE,                 ! NDF array component is present
-     :  WKUSED( MXWORK )       ! Workspace is allocated/mapped?
-
-      REAL
-     :  ANCLIP( 4 ),           ! Fraction of the frame zone in which the
-                               ! image will appear when there are axes.
-                               ! Can't give array directly as parameter
-     :  AREA( MXCONT ),        ! Work array for storing areas in CNTSEL
-     :  ASP,                   ! Aspect ratio of the input array
-     :  AXLBND( NDIM ),        ! Axis lower bounds
-     :  AXUBND( NDIM ),        ! Axis upper bounds
-     :  CLWIDT,                ! Width of lines of current SGS pen
-     :  CNTLEN( MXCONT ),      ! Length of contours at each height
-     :  CNTLEV( MXCONT ),      ! Contour heights
-     :  GRID( 4 ),             ! Current AUTOGRAPH grid offsets
-     :  KEYOFF,                ! Fractional y position of the top of the
-                               ! key,
-     :  MINTIC( 2 ),           ! Numbers of minor tick marks along x and
-                               ! y axes respectively
-     :  MAJTIC( 2 )            ! Parameters controlling the numbers of
-                               ! major tick marks along x and y axes
-                               ! respectively
-
-      REAL
-     :  OFFSET( NDIM ),        ! Offsets in the world-to-data
-                               ! co-ordinate transformations
-     :  PERCNT( MXCONT ),      ! Contour heights as percentiles
-                               ! (actually fractions)
-     :  SCALE( NDIM ),         ! Scale factors in the world-to-data
-                               ! co-ordinate transformations
-     :  THICK,                 ! The line thickness (standard is 1.0)
-     :  THRESH,                ! Threshold for dashed contours
-     :  TICDEF( 2 ),           ! Suggested default axis-tick values
-     :  X1, X2, Y1, Y2,        ! Zone size in world co-ordinates
-     :  XK,                    ! Dummy x position of key
-     :  XM, YM                 ! Zone size in metres
-
-      DOUBLE PRECISION
-     :  DXLBND( NDIM ),        ! Axis lower bounds
-     :  DXUBND( NDIM ),        ! Axis upper bounds
-     :  DOFSET( NDIM ),        ! Offsets in the world-to-data
-                               ! co-ordinate transformations
-     :  DSCALE( NDIM )         ! Scale factors in the world-to-data
-                               ! co-ordinate transformations
-
-
-      CHARACTER*72
-     :  ABSLAB,                ! Label for the abscissa of the plot
-     :  ATYPE * ( NDF__SZTYP ),! Processing type of the axis centres
-     :  COMP * 8,              ! Component to be displayed
-     :  COSYS * 5,             ! Co-ordinate system
-     :  DTYPE * ( NDF__SZFTP ),! Type of the image after processing (not
-                               ! used)
-     :  FOUNT * 4,             ! Fount type
-     :  ITYPE * ( NDF__SZTYP ),! Processing type of the image
-     :  MCOMP * 8,             ! Component to be mapped
-     :  ORDLAB,                ! Label for the ordinate of the plot
-     :  PLTITL,                ! Title of the plot
-     :  UNITS * ( CUNITS+5 )   ! Units of the data
-
-      INTEGER
-     :  AEL,                   ! Number of elements in a mapped axis
-     :  AXPNTR( 1 ),           ! Pointer to a mapped axis
-     :  CCOLI,                 ! Original colour index of pen used for
-                               ! plotting the lines
-     :  CLNTYP,                ! Line type for current lines SGS pen
-     :  CNTCLS( MXCONT ),      ! Number of closed contours at each
-                               ! height
-     :  CONCI,                 ! Colour index required for contours
-     :  DIMS( NDIM ),          ! Dimensions of input array
-     :  EL,                    ! Number of elements in the input array
-     :  GSTAT,                 ! GKS status
-     :  I,                     ! General variable
-     :  IERR,                  ! Returned by GSPLR --- not used
-     :  IWKID,                 ! GKS workstation identifier
-     :  LASF( 13 ),            ! GKS list of aspect source flags
-     :  LBND( NDF__MXDIM )     ! Lower bounds of the image
-
-      INTEGER
-     :  MAXPEN,                ! Maximum pen number for undashed pens
-     :  NCU,                   ! Number of characters in the units
-     :  NCONT,                 ! Number of contour heights
-     :  NDF,                   ! NDF identifier
-     :  NDFC,                  ! Identifier for input section
-     :  NDFS,                  ! NDF identifier of the section
-     :  NDIMS,                 ! Total number of NDF dimensions
-     :  NWORK                  ! Number of workspaces created
-
-      INTEGER
-     :  PICID1,                ! Graphics' database identifier on input
-     :  PICID2,                ! Graphics' database identifier for
-                               ! the frame (contour + key) picture
-     :  PICID3,                ! Graphics' database identifier for
-                               ! the displayed contour picture
-     :  PICID4,                ! Graphics' database identifier for
-                               ! the picture of the key
-     :  PNTRI( 1 ),            ! Pointer to array data
-     :  SCRPNT,                ! Pointer to the work array
-     :  SDIM( NDF__MXDIM ),    ! Significant dimensions of the NDF
-     :  SLBND( NDIM ),         ! Significant lower bounds of the image
-     :  SUBND( NDIM ),         ! Significant upper bounds of the image
-     :  UBND( NDF__MXDIM ),    ! Upper bounds of the image
-     :  WKPNTR( MXWORK ),      ! Pointers to workspace
-     :  ZONE1,                 ! Initial SGS zone identifier
-     :  ZONE2,                 ! SGS zone identifier
-     :  ZONEK,                 ! SGS zone identifier for the key
-     :  ZONEIF,                ! SGS zone identifier for the image area
-     :  ZONEI                  ! SGS zone identifier for the image area
+      CHARACTER COMP*8            ! Component to be displayed
+      CHARACTER DTYPE*(NDF__SZFTP)! Type of the image after processing
+      CHARACTER ITYPE*(NDF__SZTYP)! Processing type of the image
+      CHARACTER MCOMP*8           ! Component to be mapped
+      CHARACTER NDFNAM*255        ! Full NDF specification 
+      CHARACTER TITLE*255         ! Default title for the plot
+      CHARACTER UNITS*(CUNITS + 5)! Units of the data
+      DOUBLE PRECISION BOX( 4 )! Bounds of image in pixel co-ordinates
+      INTEGER CNTCLS( MXCONT ) ! Number of closed contours at each height
+      INTEGER DIMS( NDIM )     ! Dimensions of input array
+      INTEGER EL               ! Number of elements in the input array
+      INTEGER I                ! General variable
+      INTEGER ICURR            ! Index of Current Frame
+      INTEGER IGRID            ! Index of GRID Frame in NDF's WCS FrameSet
+      INTEGER IGRP             ! GRP identifier for group holding pen definitions
+      INTEGER INDF             ! NDF identifier for input NDF
+      INTEGER INDFS            ! NDF identifier for visible NDF section 
+      INTEGER IPICD            ! AGI id. for DATA picture
+      INTEGER IPICF            ! AGI id. for new FRAME picture
+      INTEGER IPICK            ! AGI id. for the KEY picture
+      INTEGER IPLOT            ! Pointer to AST Plot for DATA picture
+      INTEGER IPLOTK           ! Pointer to AST Plot for KEY picture
+      INTEGER IWCS             ! Pointer to the WCS FrameSet from the NDF
+      INTEGER NCONT            ! Number of contour heights
+      INTEGER NC               ! Number of characters in NDFNAM
+      INTEGER NCU              ! Number of characters in the units
+      INTEGER NFRM             ! Frame index increment between IWCS and IPLOT
+      INTEGER NMARG            ! No. of margin values given
+      INTEGER NKP              ! No. of values supplied for parameter KEYPOS
+      INTEGER PNTR             ! Pointer to array data
+      INTEGER SDIM( NDIM )     ! The significant NDF axes
+      INTEGER SLBND( NDIM )    ! Significant lower bounds of the image
+      INTEGER SUBND( NDIM )    ! Significant upper bounds of the image
+      INTEGER WKPNTR           ! Pointer to workspace
+      LOGICAL ALIGN            ! DATA picture aligned with a previous picture?
+      LOGICAL AXES             ! Annotated axes are to be drawn?
+      LOGICAL BAD              ! Bad pixels are present in the image?
+      LOGICAL CNTUSD( MXCONT ) ! Contour plotted at height in CNTLEV?
+      LOGICAL FAST             ! Draw contours quickly?
+      LOGICAL KEY              ! Key of the contour heights to be produced?
+      LOGICAL STATS            ! Contour statistics required?
+      REAL AREA( MXCONT )      ! Work array for storing areas in CNTSEL
+      REAL ASPECT              ! Aspect ratio of the input array
+      REAL CNTLEN( MXCONT )    ! Length of contours at each height
+      REAL CNTLEV( MXCONT )    ! Contour heights
+      REAL DUMMY               ! Un-required argument value
+      REAL KEYOFF              ! Offset to top of key 
+      REAL KEYPOS( 2 )         ! Key position
+      REAL MARGIN( 4 )         ! Width of margins round DATA picture
+      REAL PERCNT( MXCONT )    ! Contour heights as percentiles (=fractions)
+      REAL Y1,Y2               ! Vertical bounds of PGPLOT viewport
 *.
 
-*    Check the inherited global status.
+*  Check the inherited global status.
+      IF( STATUS .NE. SAI__OK ) RETURN
 
-      IF ( STATUS .NE. SAI__OK ) GOTO 999
+*  Obtain the NDF to be contoured and get its WCS information.
+*  ===========================================================
 
-      DEVCAN = .FALSE.
-
-*    Obtain and map the array to be contoured.
-*    =========================================
-
-*    Find which component to contour, converting 'ERROR' into
-*    'VARIANCE'.
-
-      CALL PAR_CHOIC( 'COMP', 'Data', 'Data,Quality,Error,Variance',
-     :                .FALSE., COMP, STATUS )
-      MCOMP = COMP
-      IF ( COMP .EQ. 'ERROR' ) COMP = 'VARIANCE'
-
-*    Begin an NDF context.
-
+*  Begin an NDF context.
       CALL NDF_BEGIN
 
-*    Obtain the identifier of the NDF to be contoured.
+*  Obtain the identifier of the NDF to be contoured.
+      CALL NDF_ASSOC( 'NDF', 'READ', INDF, STATUS )
 
-      CALL NDF_ASSOC( 'NDF', 'READ', NDF, STATUS )
+*  Find which component to contour.
+      CALL KPG1_ARCOG( 'COMP', INDF, MCOMP, COMP, STATUS )
 
-*    There must be a data array, but for other components check that
-*    requested component is present.
+*  Abort if an error has occurred.
+      IF( STATUS .NE. SAI__OK ) GO TO 999
 
-      IF ( COMP .NE. 'DATA' ) THEN
-         CALL NDF_STATE( NDF, COMP, THERE, STATUS )
-
-*       The component is not present or not defined.
-
-         IF ( .NOT. THERE ) THEN
-            STATUS = SAI__ERROR
-            CALL MSG_SETC( 'COMP', COMP )
-            CALL ERR_REP( 'CONTOUR_NOCOMP',
-     :        'CONTOUR: ^COMP component is not defined.', STATUS )
-            GO TO 980
-         END IF
-      END IF
-
-*    This application can only process real components directly.
-*    Therefore for the given type of the image find in which type
-*    it should be processed.  Currently, it is obvious since only
-*    one type is supported, but this acts as a placeholder when this
-*    is no longer true.  It may still be possible to handle d.p.
-*    data provided the dynamic range is not too small.
-
-      CALL ERR_MARK
-      CALL NDF_MTYPE( '_REAL', NDF, NDF, COMP, ITYPE, DTYPE, STATUS )
-      IF ( STATUS .EQ. NDF__TYPNI ) THEN
+*  This application can only process real components directly.
+*  Therefore for the given type of the image find in which type
+*  it should be processed.  Currently, it is obvious since only
+*  one type is supported, but this acts as a placeholder when this
+*  is no longer true.  It may still be possible to handle d.p.
+*  data provided the dynamic range is not too small.
+      CALL NDF_MTYPE( '_REAL', INDF, INDF, COMP, ITYPE, DTYPE, STATUS )
+      IF( STATUS .EQ. NDF__TYPNI ) THEN
          CALL ERR_FLUSH( STATUS )
-         CALL MSG_OUT( 'PRECLOSS', 'The loss of precision may not be '/
-     :     /'serious so continuing to process in _REAL.', STATUS )
+         CALL MSG_OUT( 'PRECLOSS', 'The loss of precision may not be '//
+     :                 'serious so continuing to process in _REAL.', 
+     :                 STATUS )
          ITYPE = '_REAL'
       END IF
-      CALL ERR_RLSE
 
-*    Find whether or not there are but two significant dimensions and
-*    which ones they are.
+*  Get an AST pointer to a FrameSet describing the co-ordinate Frames
+*  present in the NDF's WCS component. Modify it to ensure that the Base,
+*  PIXEL and Current frames all have 2 dimensions. The NDF must have exactly
+*  2 significant dimensions (i.e. axes spanning more than 1 pixel)
+      CALL KPG1_ASGET( INDF, NDIM, .TRUE., .TRUE., .TRUE., SDIM, SLBND, 
+     :                 SUBND, IWCS, STATUS )
 
-      CALL KPG1_SGDIM( NDF, NDIM, SDIM, STATUS )
+*  Store the index of the GRID Frame (i.e. the Base Frame). We need this
+*  so that we can easily find the GRID Frame in the AST Plot used to do the
+*  graphics.
+      IGRID = AST_GETI( IWCS, 'BASE', STATUS )
 
-*    Obtain the bounds of the image.  These will be stored in the
-*    graphics database once the image is contoured.
+*  Obtain the units if present.  A null units field does not
+*  cause a blank line to appear in the key.  Quality has no units.
+      CALL KPG1_DAUNI( INDF, MCOMP, UNITS, NCU, STATUS )
 
-      CALL NDF_BOUND( NDF, NDF__MXDIM, LBND, UBND, NDIMS, STATUS )
+*  Get some other parameter values.
+*  =================================
+      CALL PAR_GET0L( 'STATS', STATS, STATUS )
+      CALL PAR_GET0L( 'KEY', KEY, STATUS )
+      CALL PAR_GET0L( 'AXES', AXES, STATUS )
+      CALL PAR_GET0L( 'FAST', FAST, STATUS )
 
-*    Set upper insignificant bounds to one.  We have to make a section
-*    so that trailing insignificant bounds may be shifted when the
-*    user has specified the whole NDF.  This cannot be done for the base
-*    NDF.
+*  Start the graphics system.
+*  ==========================
 
-      CALL NDF_SECT( NDF, NDIMS, LBND, UBND, NDFC, STATUS )
-      CALL KPG1_SECSH( NDFC, SDIM( NDIM ), STATUS )
-
-*    Must have a 2-d.  A bad status will be generated by NDF_BOUND
-*    if there are greater than 2 significant dimensions.
-
-      IF ( STATUS .EQ. NDF__XSDIM ) THEN
-         CALL ERR_REP( 'CONTOUR_IVDIM',
-     :     'CONTOUR: Input NDF must be two-dimensional.', STATUS )
-         GOTO 980
+*  Set the dynamic defaults for MARGIN.
+      IF( AXES ) THEN
+         CALL PAR_DEF1R( 'MARGIN', 1, 0.18, STATUS )
+      ELSE
+         CALL PAR_DEF1R( 'MARGIN', 1, 0.0, STATUS )
       END IF
 
-*    Compute the dimensions and the significant bounds.
+      CALL PAR_GDRVR( 'MARGIN', 4, -0.49, 10.0, MARGIN, NMARG, STATUS )
+      NMARG = MIN( 4, NMARG )
 
-      SLBND( 1 ) = LBND( SDIM( 1 ) )
-      SLBND( 2 ) = LBND( SDIM( 2 ) )
-      SUBND( 1 ) = UBND( SDIM( 1 ) )
-      SUBND( 2 ) = UBND( SDIM( 2 ) )
+*  Abort if an error has occurred.
+      IF( STATUS .NE. SAI__OK ) GO TO 999
+
+*  Use the first value for any unspecified edges.
+      DO I = NMARG + 1, 4      
+         MARGIN( I ) = MARGIN( 1 )
+      END DO
+
+*  Store the pixel co-ordinates bounds for the new DATA picture. These
+*  are only used if the new DATA picture is not based on an existing DATA
+*  picture. Note, the corresponding PGPLOT window created by KPG1_PLOT will
+*  have world co-ordinates of millimetres from the bottom left corner of
+*  the view surface, NOT pixels. This box is only used to define the bounds 
+*  of the picture within the AGI database for the benefit of non-AST 
+*  applications.
+      BOX( 1 ) = DBLE( SLBND( 1 ) ) - 1.0D0
+      BOX( 2 ) = DBLE( SLBND( 2 ) ) - 1.0D0
+      BOX( 3 ) = DBLE( SUBND( 1 ) ) 
+      BOX( 4 ) = DBLE( SUBND( 2 ) ) 
+
+*  Store the aspect ratio of the data array, assuming square pixels.
+      ASPECT = ( BOX( 4 ) - BOX( 2 ) )/( BOX( 3 ) - BOX( 1 ) )
+
+*  Generate a reference for the NDF to be stored in the graphics
+*  database.
+      CALL NDF_MSG( 'NDF', INDF )
+      CALL MSG_LOAD( ' ', '^NDF', NDFNAM, NC, STATUS )
+
+*  Establish synonyms for AST graphical element names to be recognised
+*  during the following call to KPG1_PLOT.
+      CALL KPG1_ASPSY( '(CON*TOURS)', '(CURVES)', STATUS )
+
+*  Start up the graphics system. This stores a new DATA picture in the AGI 
+*  database with the given pixel co-ordinate bounds (a KEY picture is also
+*  created if necessary, together with an enclosing FRAME picture ). The 
+*  PGPLOT viewport is set so that it matches the area of the DATA picture. 
+*  World co-ordinates within the PGPLOT window are set to millimetres
+*  from the bottom left corner of the view surface. An AST Plot is returned 
+*  for drawing in the DATA picture. The Base (GRAPHICS) Frame in the Plot 
+*  corresponds to millimetres from the bottom left corner of the view
+*  port, and the Current Frame is inherited from the NDF's WCS FrameSet.
+
+*  First deal with cases where a key is required...
+      IF( KEY ) THEN
+
+*  Get the position required for the key. The margin between DATA and KEY 
+*  Frames is determined by the horizontal position requested for the key.
+         CALL PAR_GDRVR( 'KEYPOS', 2, 0.0, 1.0, KEYPOS, NKP, STATUS )
+         MARGIN( 2 ) = KEYPOS( 1 )
+  
+*  Start up the graphics system, creating a KEY picture.
+         CALL KPG1_PLOT( IWCS, 'UNKNOWN', 'CONTOUR', NDFNAM( : NC ), 
+     :                   MARGIN, 1, 'KEY', 'R', 0.5, ASPECT, 
+     :                   'PIXEL', BOX, IPICD, IPICF, IPICK, IPLOT, 
+     :                   NFRM, ALIGN, STATUS )
+
+*  Otherwise, start up the graphics system, creating no KEY picture.
+      ELSE
+         CALL KPG1_PLOT( IWCS, 'UNKNOWN', 'CONTOUR', NDFNAM( : NC ), 
+     :                   MARGIN, 0, ' ', ' ', 0.0, ASPECT, 'PIXEL', BOX,
+     :                   IPICD, IPICF, IPICK, IPLOT, NFRM, ALIGN, 
+     :                   STATUS )
+      END IF
+
+*  If the user did not specify a Plot title (as indicated by the Plot title
+*  being the same as the WCS title), make the NDF Title the default Title for 
+*  the Plot. We have to be careful about the timing of this change to the
+*  Title. If we did it before KPG1_PLOT (i.e. if we set the Title in IWCS)
+*  it may prevent alignment ocurring within KPG1_PLOT since alignment fails 
+*  if the Title of two Frames differ.
+      IF( AST_GETC( IWCS, 'TITLE', STATUS ) .EQ. 
+     :    AST_GETC( IPLOT, 'TITLE', STATUS ) ) THEN
+
+         TITLE = ' '
+         CALL NDF_CGET( INDF, 'TITLE', TITLE, STATUS ) 
+
+         IF( TITLE .NE. ' ' ) THEN
+            CALL AST_SETC( IPLOT, 'TITLE', TITLE( : CHR_LEN( TITLE ) ), 
+     :                     STATUS )
+         END IF
+
+      END IF
+
+*  Obtain sorted contour heights.
+*  ==============================
+*  If the new DATA picture has been aligned with an existing DATA picture
+*  it is possible that only a small part of the supplied NDF will be
+*  visible. We want to base the selection of contour levels on the visible 
+*  data, rather than the entire NDF. We therefore obtain an NDF section
+*  spanning just the visible data. The GRID Frame in the Plot is re-mapped so
+*  that it refers to GRID coordinates in the NDF section.
+      CALL KPS1_CNTSC( INDF, IPLOT, IGRID + NFRM, SDIM, SLBND, SUBND, 
+     :                 INDFS, STATUS )
+
+*  Map the section.
+      CALL NDF_MAP( INDFS, MCOMP, ITYPE, 'READ', PNTR, EL, STATUS )
+
+*  Check whether or not bad pixels are present.
+      CALL NDF_BAD( INDFS, COMP, .FALSE., BAD, STATUS )
+
+*  Select the method of defining contour heights and evaluate them.
+      CALL KPS1_CNSER( 'MODE', 'NCONT', 'FIRSTCNT', 'STEPCNT',
+     :                 'HEIGHTS', 'PERCENTILES', BAD, EL,
+     :                 %VAL( PNTR ), MXCONT, CNTLEV, PERCNT,
+     :                 AREA, NCONT, STATUS )
+
+*  Abort if an error has occurred.
+      IF( STATUS .NE. SAI__OK ) GO TO 999
+
+*  Sort the contour heights into increasing order.
+      CALL KPG1_QSRTR( NCONT, 1, NCONT, CNTLEV, STATUS )
+
+*  Add a context message if anything went wrong while sorting.
+      IF( STATUS .NE. SAI__OK ) THEN
+         CALL ERR_REP( 'CONTOUR_GTLEV', 'CONTOUR: Error sorting the '//
+     :                 'contour levels', STATUS )
+         GO TO 999
+      END IF
+
+*  Get the drawing attributes to use for each contour.
+      CALL KPS1_CNTPN( 'PENS', 'PENROT', 'DASHED', IPLOT, NCONT, CNTLEV, 
+     :                  IGRP, STATUS )
+
+*  Produce the plot.
+*  =================
+
+*  Store the size of each significant dimension in the displayed NDF section.
       DIMS( 1 ) = SUBND( 1 ) - SLBND( 1 ) + 1
       DIMS( 2 ) = SUBND( 2 ) - SLBND( 2 ) + 1
 
-*    Obtain the units if present.  A null units field does not
-*    cause a blank line to appear in the key.  Quality has no units.
-
-      CALL KPG1_DAUNI( NDF, MCOMP, UNITS, NCU, STATUS )
-
-      IF ( STATUS .NE. SAI__OK ) GOTO 980
-
-*    Create a section from the input (full-sized) NDF section that
-*    has any insignificant bounds shifted; otherwise it is possible
-*    for the array to be filled with bad values, simply because the
-*    chosen section lies outside the bounds of the original section.
-
-      CALL NDF_SECT( NDFC, SDIM( NDIM ), LBND, UBND, NDFS, STATUS )
-
-*    Map the slice as real because not all processing routines are 
-*    generic. Later this should be changed to double precision, and
-*    one work array can be dispensed.
- 
-      CALL KPG1_MAP( NDFS, MCOMP, ITYPE, 'READ', PNTRI, EL, STATUS )
-
-*    Check whether or not bad pixels are present.
-
-      CALL NDF_BAD( NDFS, COMP, .FALSE., BAD, STATUS )
-
-*    Get the type of co-ordinates to place on axes.
-*    ==============================================
-
-*    Is there an axis system?
-
-      CALL NDF_STATE( NDF, 'Axis', DACOOR, STATUS )
-
-*    Obtain the desired co-ordinate system.
-
-      CALL PAR_CHOIC( 'COSYS', 'Data', 'Data,World', .FALSE., COSYS,
-     :                STATUS )
-
-*    Find the effective co-ordinate system.
-
-      DATACO = DACOOR .AND. COSYS .EQ. 'DATA'
-
-*    Find the implementation type of the axis structure.
-*    ===================================================
-
-*    Integer needs d.p. because it potentially has ten significant
-*    digits.  Record the fact for compactness and efficiency.
-
-      IF ( DATACO ) THEN
-         CALL KPG1_AXTYP( NDF, 'Centre', ATYPE, STATUS )
-         DPAXIS = ATYPE .EQ. '_DOUBLE'
-      END IF
-
-*    Test axes to determine monotonicity.
-*    ====================================
-
-      DATEMP = .TRUE.
-      IF ( DACOOR ) THEN
-
-*       Obtain the axes calling the appropriate routine depending on the
-*       axis implementation type.
-
-         IF ( DPAXIS ) THEN
-            DO  I = 1, NDIM
-
-*             Map the axis.
-
-               CALL NDF_AMAP( NDF, 'Centre', SDIM( I ), '_DOUBLE',
-     :                        'READ', AXPNTR, AEL, STATUS )
-
-*             Are all the axes monotonic?  Start a new error context so
-*             that the error reports concerning a non-monotonic axis
-*             may be annulled.  Instead we issue a warning message
-*             so that the application can continue by using world
-*             co-ordinates.
-
-               MONOTO = .TRUE.
-               IF ( STATUS .EQ. SAI__OK ) THEN
-                  CALL ERR_MARK
-                  CALL KPG1_MONOD( .TRUE., AEL, %VAL( AXPNTR( 1 ) ),
-     :                             MONOTO, STATUS )
-                  IF ( STATUS .NE. SAI__OK ) THEN
-                     CALL ERR_ANNUL( STATUS )
-                     MONOTO = .FALSE.
-                  END IF
-                  CALL ERR_RLSE
-               END IF
-
-*             Issue the warning.  Change the emphasis depending on
-*             whether the co-ordinate system is DATA.
-
-               IF ( .NOT. MONOTO ) THEN
-                  CALL MSG_SETI( 'IAXIS', SDIM( I ) )
-                  IF ( DATACO ) THEN
-                     CALL MSG_OUT( 'CONTOUR_NOTMONO1',
-     :                'CONTOUR: Axis ^IAXIS is not monotonic.  Will '/
-     :                /'use world co-ordinates instead.', STATUS )
-                  ELSE
-                     CALL MSG_OUT( 'CONTOUR_NOTMONO2',
-     :                'CONTOUR: Axis ^IAXIS is not monotonic.  Will '/
-     :                /'not record axis bounds in the graphics '/
-     :                /'database.', STATUS )
-                  END IF
-
-*                Record the fact.
-                  DATEMP = .FALSE.
-               END IF
-
-*             Unmap the axis since we have finished with it.
-
-               CALL NDF_AUNMP( NDF, 'Centre', SDIM( I ), STATUS )
-            END DO
-         ELSE
-            DO  I = 1, NDIM
-
-*             Map the axis centres.
-
-               CALL NDF_AMAP( NDF, 'Centre', SDIM( I ), '_REAL',
-     :                        'READ', AXPNTR, AEL, STATUS )
-
-*             Are all the axes monotonic?  Start a new error context so
-*             that the error reports concerning a non-monotonic axis
-*             may be annulled.  Instead we issue a warning message
-*             so that the application can continue by using world
-*             co-ordinates.
-
-               MONOTO = .TRUE.
-               IF ( STATUS .EQ. SAI__OK ) THEN
-                  CALL ERR_MARK
-                  CALL KPG1_MONOR( .TRUE., AEL, %VAL( AXPNTR( 1 ) ),
-     :                             MONOTO, STATUS )
-                  IF ( STATUS .NE. SAI__OK ) THEN
-                     CALL ERR_ANNUL( STATUS )
-                     MONOTO = .FALSE.
-                  END IF
-                  CALL ERR_RLSE
-               END IF
-
-*             Issue the warning.  Change the emphasis depending on
-*             whether the co-ordinate system is DATA.
-
-               IF ( .NOT. MONOTO ) THEN
-                  CALL MSG_SETI( 'IAXIS', SDIM( I ) )
-                  IF ( DATACO ) THEN
-                     CALL MSG_OUT( 'CONTOUR_NOTMONO1',
-     :                'CONTOUR: Axis ^IAXIS is not monotonic.  Will '/
-     :                /'use world co-ordinates instead.', STATUS )
-                  ELSE
-                     CALL MSG_OUT( 'CONTOUR_NOTMONO2',
-     :                'CONTOUR: Axis ^IAXIS is not monotonic.  Will '/
-     :                /'not record axis bounds in the graphics '/
-     :                /'database.', STATUS )
-                  END IF
-
-*                Record the fact.
-                  DATEMP = .FALSE.
-
-               END IF
-
-*             Unmap the axis since we have finished with it.
-
-               CALL NDF_AUNMP( NDF, 'Centre', SDIM( I ), STATUS )
-            END DO
-         END IF
-      END IF
-
-*    Reset the co-ordinate system and axis flags when either of the axes
-*    is non-monotonic.
-
-      IF ( .NOT. DATEMP ) THEN
-         DATACO = .FALSE.
-         DACOOR = .FALSE.
-      END IF
-
-*    Inquire whether or not statistics of the contours are required.
-*    ===============================================================
-      CALL PAR_GET0L( 'STATS', STATS, STATUS )
-
-*    Start the graphics system.
-*    ==========================
-
-*    See whether picture is to be refreshed.
-
-      CALL PAR_GTD0L( 'CLEAR', .TRUE., .TRUE., CLEAR, STATUS )
-      IF ( STATUS .EQ. PAR__ABORT ) GOTO 980
-
-*    Open graphics database for required device.
-
-      IF ( CLEAR ) THEN
-         CALL AGS_ASSOC( 'DEVICE', 'WRITE', ' ', PICID1, ZONE1, STATUS )
-      ELSE
-         CALL AGS_ASSOC( 'DEVICE', 'UPDATE', ' ', PICID1, ZONE1,
-     :                   STATUS )
-      END IF
-
-*    Set up the workstation polyline representations.
-*    ================================================
-
-*    If the device supports colour we want solid lines to be drawn.
-
-      CALL KPG1_QCOL( COLOUR, STATUS )
-      IF ( STATUS .NE. SAI__OK ) THEN
-         DEVCAN = .TRUE.
-         GOTO 960
-      END IF
-
-*    Find whether a key is required.
-*    ===============================
-
-      CALL PAR_GTD0L( 'KEY', .TRUE., .TRUE., KEY, STATUS )
-
-*    Are annotated axes required?
-*    ============================
-
-      CALL PAR_GTD0L( 'AXES', .TRUE., .TRUE., AXES, STATUS )
-
-*    Is a border required?
-*    =====================
-
-      IF ( AXES ) THEN
-         BORDER = .TRUE.
-      ELSE
-         CALL PAR_GTD0L( 'BORDER', .TRUE., .TRUE., BORDER, STATUS )
-      END IF
-
-*    Create and store the frame picture.
-*    ===================================
-
-      CALL KPG1_FRPIC( 'PXSIZE', 'PYSIZE', 'KAPPA_CONTOUR', .FALSE.,
-     :                 ZONE2, PICID2, STATUS )
-
-*    Reset input picture as current in case of an accident.
-
-      CALL AGI_SELP( PICID1, STATUS )
-
-*    Obtain a title for the plot.
-*    ============================
-
-      CALL KPG1_GNTIT( NDF, 'PLTITL', 'Contour Plot', PLTITL,
-     :                 STATUS )
-
-      IF ( AXES ) THEN
-
-*       Obtain axis labels.
-*       ===================
-*
-         IF ( DATACO ) THEN
-
-*          A null value causes the default to be chosen, namely, 'X' for
-*          the abscissa...
-
-*          Get the abscissa and ordinate labels suggesting the value in
-*          the NDF axis structure, if present, as the default.
-
-            CALL KPG1_GAXLB( NDF, SDIM( 1 ), 'ABSLAB', 'X', ABSLAB,
-     :                       STATUS )
-            CALL KPG1_GAXLB( NDF, SDIM( 2 ), 'ORDLAB', 'Y', ORDLAB,
-     :                       STATUS )
-
-         ELSE
-
-*          Get the abscissa and ordinate labels without consulting the
-*          NDF's axis structure to preevent the wrong label being
-*          associated with the world co-ordinates.  The suggested
-*          defaults are 'X' and 'Y'.
-
-            CALL PAR_DEF0C( 'ABSLAB', 'X', STATUS )
-            CALL PAR_GET0C( 'ABSLAB', ABSLAB, STATUS )
-            CALL PAR_DEF0C( 'ORDLAB', 'Y', STATUS )
-            CALL PAR_GET0C( 'ORDLAB', ORDLAB, STATUS )
-         END IF
-
-*       ^^^^^^^^^^^^^^^^^^^
-
-         ANCLIP( 1 ) = ANCLP1
-         ANCLIP( 2 ) = ANCLP2
-         ANCLIP( 3 ) = ANCLP3
-         ANCLIP( 4 ) = ANCLP4
-
-*       Obtain the plotting style.
-*       ==========================
-
-*       Get the number of minor ticks, assigning the dynamic defaults.
-
-         TICDEF( 1 ) = -1.
-         TICDEF( 2 ) = -1.
-         CALL PAR_GDR1R( 'MINTIC', 2, TICDEF, -1., VAL__MAXR, .FALSE.,
-     :                   MINTIC, STATUS )
-
-*       Get the parameter controlling the number of major ticks per
-*       axis, assigning the dynamic defaults.
-
-         TICDEF( 1 ) = 3.
-         TICDEF( 2 ) = 3.
-         CALL PAR_GDR1R( 'MAJTIC', 2, TICDEF, -1., VAL__MAXR, .FALSE.,
-     :                   MAJTIC, STATUS )
-
-*       Are the tick marks on the outside of the axes?
-
-         CALL PAR_GTD0L( 'OUTTIC', .TRUE., .TRUE., OUTTIC, STATUS )
-      END IF
-
-*    Get the line thickness.
-      CALL PAR_GDR0R( 'THICK', 1.0, 0.5, 10.0, .TRUE., THICK, STATUS )
-      SCLINE = THICK .LT. 0.99999 .OR. THICK .GT. 1.00001
-
-*    Set the fount.  This is only needed if there is some annotation.
-*    Inline annotation is only available if there is a key.
-      IF ( AXES .OR. KEY ) THEN
-
-*    Get the fount.  Although NCAR is the default, either must be
-*    selected to prevent persistence from earlier invocations.
-         CALL PAR_CHOIC( 'FONT', 'GKS', 'GKS,NCAR', .TRUE., FOUNT,
-     :                   STATUS )
-
-*    Use the fast and clean san-serif fount.
-         IF ( FOUNT .EQ. 'GKS ' ) THEN
-            CALL AGPWRT( 0.0, 0.0, ' ', 0, 0, 0, -100 )
-
-*    Crude attempt to make GKS text thicker by using the bold fount.
-            IF ( THICK .GT. 1.5 ) CALL SGS_SFONT( 102 )
-
-         ELSE IF ( FOUNT .EQ. 'NCAR' ) THEN
-            CALL AGPWRT( 0.0, 0.0, ' ', 0, 0, 0, 100 )
-         END IF
-      END IF
-
-*    Determine if square pixels are required.
-*    ========================================
-      CALL PAR_GTD0L( 'FILL', .FALSE., .TRUE., FILL, STATUS )
-      IF ( STATUS .NE. SAI__OK ) GOTO 960
-
-*    Create zones.
-*    =============
-
-*    Define the aspect ratio of the plot.  For the filled area just
-*    find the aspect ratio of the frame. (This assumes symmetric
-*    trimming of each axis for the annotated axes.)  Create a frame
-*    zone for the plot and a key zone (when required).  The subroutine
-*    recognises the negative ASP value, and will calculate an effective
-*    aspect ratio and return this value.
-
-      IF ( FILL ) THEN
-         ASP = -1.0
-      ELSE
-         ASP = REAL( DIMS( 1 ) ) / REAL( DIMS( 2 ) )
-      END IF
-      CALL KPG1_KEYZO( KEY, ASPKEY, ASP, ZONEIF, ZONEK, STATUS )
-      
-*    Obtain sorted contour heights.
-*    ==============================
-
-*    Select the method of defining contour heights and evaluate them.
-
-      CALL KPS1_CNSER( 'MODE', 'NCONT', 'FIRSTCNT', 'STEPCNT',
-     :                 'HEIGHTS', 'PERCENTILES', BAD, EL,
-     :                 %VAL( PNTRI( 1 ) ), MXCONT, CNTLEV, PERCNT,
-     :                 AREA, NCONT, STATUS )
-
-*    Report the error context and tidy up the work array.
-
-      IF ( STATUS .NE. SAI__OK ) GOTO 960
-
-*    Sort the contour heights into increasing order.
-
-      IF ( STATUS .EQ. SAI__OK .AND. NCONT .GT. 0 )
-     :  CALL KPG1_QSRTR( NCONT, 1, NCONT, CNTLEV, STATUS )
-
-      IF ( STATUS .NE. SAI__OK ) THEN
-         IF ( STATUS .NE. PAR__ABORT ) THEN
-            CALL ERR_REP( 'CONTOUR_GTLEV',
-     :        'CONTOUR: Error obtaining or sorting the contour levels',
-     :        STATUS )
-            GOTO 960
-         END IF
-      END IF
-
-*    Obtain the level below which the contours will be dashed.  A null
-*    value means no contours are dashed.
-      CALL ERR_MARK
-      CALL PAR_GET0R( 'DASHED', THRESH, STATUS )
-      IF ( STATUS .EQ. PAR__NULL ) THEN
-         CALL ERR_ANNUL( STATUS )
-         THRESH = VAL__BADR
-      END IF
-      CALL ERR_RLSE
-
-*    Obtain the line characteristics.
-*    ================================
-
-*    Determine whether or not pens are to be cycled through the
-*    contour levels.
-
-      CALL PAR_GTD0L( 'PENROT', .FALSE., .TRUE., PENROT, STATUS )
-
-*    Abort for an error status.
-
-      IF ( STATUS .NE. SAI__OK ) GOTO 960
-
-*  Set the pen colours and line styles.
-*  ====================================
-
-*  Note that this must be done before plotting to avoid plot
-*  regeneration (i.e. clear the plot when the device is closed).
-
-      IF ( .NOT. PENROT ) THEN
-
-*  Obtain the colour index for the desired colour of the contours.
-*  Don't restrict the colours to the palette to give the user more
-*  control.  There are instructions in the documentation on the benefits
-*  of choosing a palette colour.
-         CALL KPG1_IVCI( 'DEVICE', 'CONCOL', .FALSE., CONCI, STATUS )
-
-      END IF
-
-*  In order to preserve pen 1 for the axes and key, contouring uses pen
-*  2.  So we shift the properties but default the properties of pen 1
-*  to pen 2.  If there is a threshold, we need to transfer pens 2 and 3
-*  to 3 and 4 respectively.  Therefore we start at the highest pen and
-*  work backwards.
-
-*  Inquire the workstation identifier for GKS inquiries.
-      CALL SGS_ICURW( IWKID )
-
-*  When there is pen rotation we want dashed lines for pens 5 to 7 in
-*  the same colours as pens 2 to 4.  Otherwise only pen 5 need be
-*  dashed.
-      MAXPEN = CONPEN
-      IF ( PENROT ) MAXPEN = CONPEN + 2
-      DO I = MAXPEN, CONPEN, -1
-
-*  Inquire the current colour index of this pen (it will be restored
-*  after all plotting is complete).
-         CALL GQPLR( IWKID, I - 1, GSET, IERR, CLNTYP, CLWIDT, CCOLI )
-
-*  Decide whether to use the CONCOL index or the existing colour.
-         IF ( .NOT. PENROT ) CCOLI = CONCI
-
-*  Decide whether to use the existing line type or the existing type.
-*  It is solid when there is no pen rotation.  This is because in the
-*  case of pen rotation, we need to preserve the line style in case the
-*  device only supports a variety of dashed-line patterns.
-         IF ( .NOT. PENROT ) CLNTYP = 1
-
-*  Store the new colour index, line style, and line thickness for this
-*  pen and its complementary dashed form.  However, the line thickness
-*  appears not to change (probably due to NCAR resetting something, as
-*  it works when NCAR calls are absent).
-         IF ( THRESH .NE. VAL__BADR ) THEN
-            CALL GSPLR( IWKID, I, CLNTYP, THICK, CCOLI )
-            CALL GSPLR( IWKID, I + 3, 2, THICK, CCOLI )
-
-*  Just shift the pen to have the attributes of the next higher pen,
-*  except perhaps the colour when there is no pen rotation.
-         ELSE
-            CALL GSPLR( IWKID, I, CLNTYP, THICK, CCOLI )
-
-         END IF
-      END DO
-
-*    Obtain the axis co-ordinates.
-*    =============================
-
-      IF ( DACOOR ) THEN
-
-*       To plot axes and to be able to store their data co-ordinates
-*       the application requires a linear axis.  Determine whether or
-*       not the data co-ordinates derived from the NDF axes are linear
-*       and not identical to world (pixel) co-ordinates, and if so find
-*       the linear transformation from world to data co-ordinates and
-*       the axis bounds.
-
-         IF ( DPAXIS ) THEN
-            CALL KPG1_DCLID( NDIM, NDFS, DXLBND, DXUBND, DSCALE, DOFSET,
-     :                       DACOOR, STATUS )
-            DO I = 1, NDIM
-               AXLBND( I ) = REAL( DXLBND( I ) )
-               AXUBND( I ) = REAL( DXUBND( I ) )
-            END DO
-         ELSE
-            CALL KPG1_DCLIR( NDIM, NDFS, AXLBND, AXUBND, SCALE, OFFSET,
-     :                       DACOOR, STATUS )
-         END IF
-      END IF
-
-      IF ( AXES .AND. .NOT. DATACO ) THEN
-
-*       Just use the pixel bounds to define the annotated-axis limits
-*       as there is no axis information or the user want pixel indices
-*       on the axes.
-
-          DO I = 1, NDIM
-            AXLBND( I ) = REAL( SLBND( I ) - 1 )
-            AXUBND( I ) = REAL( SUBND( I ) )
-         END DO
-      END IF
-
-*    Define the location of the axes and draw them.
-*    ==============================================
-
-*    Plot in the image area, which includes the border (graph window)
-*    if axes are required.
-
-      CALL SGS_SELZ( ZONEIF, STATUS )
-
-      IF ( AXES ) THEN
-
-*       Get AUTOGRAPH to use the SGS zone.
-
-         CALL SNX_AGWV
-
-*       Store the current NCAR grid values.
-
-         CALL AGGETF( 'GRID/LEFT.', GRID( 1 ) )
-         CALL AGGETF( 'GRID/RIGHT.', GRID( 2 ) )
-         CALL AGGETF( 'GRID/BOTTOM.', GRID( 3 ) )
-         CALL AGGETF( 'GRID/TOP.', GRID( 4 ) )
-
-*       Store the current NCAR grid values. 
-
-         CALL AGSETF( 'GRID/LEFT.', ANCLIP( 1 ) )
-         CALL AGSETF( 'GRID/RIGHT.', ANCLIP( 2 ) )
-         CALL AGSETF( 'GRID/BOTTOM.', ANCLIP( 3 ) )
-         CALL AGSETF( 'GRID/TOP.', ANCLIP( 4 ) )
-
-*       Draw annotated axes in graph window with the grid positioned as
-*       defined above.  Note the NDF-axis bounds are used to define the
-*       bounds of the annotated axes.  In other words a regularly
-*       spaced array is assumed.  Note there may be problems for d.p.
-*       data co-ordinates due to GKS's use of single precision.
-
-         CALL NCRAXS( AXLBND( 1 ), AXLBND( 2 ), AXUBND( 1 ),
-     :                AXUBND( 2 ), PLTITL, ABSLAB, ORDLAB, MINTIC,
-     :                MAJTIC, OUTTIC, THICK, .FALSE., STATUS )
-
-*       The plot of contours will in be in the NCAR grid window.  When
-*       NCAR is not required to draw with annotation the equivalent SGS
-*       zone has to be defined.  If annotation is required the new zone 
-*       is not used for plotting, but it is created merely to define
-*       the location of the top of the key.  The NCAR grid window is
-*       defined to lie between world co-ordinates 0--1 along each axis.
-
-         CALL SNX_AGCS
-         CALL SGS_ZONE( 0.0, 1.0, 0.0, 1.0, ZONEI, STATUS )
-
-*       Restore the input NCAR grid values. 
-
-         CALL AGSETF( 'GRID/LEFT.', GRID( 1 ) )
-         CALL AGSETF( 'GRID/RIGHT.', GRID( 2 ) )
-         CALL AGSETF( 'GRID/BOTTOM.', GRID( 3 ) )
-         CALL AGSETF( 'GRID/TOP.', GRID( 4 ) )
-
-*    No axes.
-*    ========
-
-      ELSE
-
-*       Make the image/frame zone the image zone as there need not be
-*       space for axes.  So clone the image zone from the frame zone.
-
-         CALL SGS_IZONE( X1, X2, Y1, Y2, XM, YM )
-         CALL SGS_ZONE( X1, X2, Y1, Y2, ZONEI, STATUS )
-
-*       Define an world co-ordinate system for the image zone.  The unit
-*       square may be needed to compute the position of the top of the 
-*       key.
-
-         CALL SGS_SW( 0.0, 1.0, 0.0, 1.0, STATUS )
-
-      END IF
-
-*    Set the line width.
-*    ===================
-
-      IF ( SCLINE ) THEN
-
-*       Inquire the GKS aspect source flags.
-         CALL GQASF( GSTAT, LASF )
-
-*       Set the line width scale factor source flags to individual.
-         LASF( 2 ) = 1
-         CALL GSASF( LASF )
-
-*       Now actually set the line width scale factor.
-         CALL GSLWSC( THICK )
-
-*       Watch out for any error.
-         CALL GKS_GSTAT( STATUS )
-         IF ( STATUS .NE. SAI__OK ) GOTO 960
-      END IF
-
-*    Draw a box around the plot when required.
-
-      IF ( BORDER .AND. .NOT. AXES ) CALL SGS_BOX( 0.0, 1.0, 0.0, 1.0 )
-
-*    Find the fractional position of the top axis, to be used later
-*    for positioning the key.
-*    ==============================================================
-
-      IF ( KEY ) THEN
-
-*       Again there are two cases.  If the aspect ratio of the data
-*       array region to be contoured is less than one, the frame zone
-*       of the contour plot spans the full height of the current
-*       picture.  Therefore just use the fractional position of the top
-*       of the grid from NCAR.  If there are no axes, it is top of the
-*       second dimension of the image zone.  (Note at this point the
-*       co-ordinates are normalised for the frame, whereas the top of
-*       the plot will be the inverse aspect ratio in this system.) The
-*       key-drawing routine will calculate an offset from the height of
-*       the text if necessary.
-
-         IF ( ASP .LT. 1.0 .AND. AXES ) THEN
-            KEYOFF = ANCLIP( 4 )
-         ELSE
-
-*          The top of the grid is a line y=1.0 in ZONEI. Transform
-*          this to the key zone.
-
-            IF ( AXES .OR. FILL ) THEN
-               CALL SGS_TPZ( ZONEI, 0.0, 1.0, ZONEK, XK, KEYOFF,
-     :                       STATUS )
-
-*          The top of the grid is a line at the ratio of the zone and
-*          image aspect ratios in ZONEI. (Since these are in normalised
-*          co-ordinates).  Transform this to the key zone.
-
-            ELSE
-               CALL SGS_TPZ( ZONEI, 0.0, XM / YM / ASP, ZONEK, XK,
-     :                       KEYOFF, STATUS )
-            END IF
-         END IF
-      END IF
-
-*    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-*  Initialise workspace pointers.
-      DO I = 1, MXWORK
-         WKUSED( I ) = .FALSE.
-      END DO
-      
-*    Create a scratch area in which to log pixels contoured.
-
-      CALL PSX_CALLOC( DIMS( 1 ) * DIMS( 2 ), '_LOGICAL', WKPNTR( 1 ),
-     :                 STATUS )
-
-*    Record the number of work arrays obtained and assign an alias.
-
-      NWORK = 1
-      SCRPNT = WKPNTR( 1 )
-      WKUSED( 1 ) = .TRUE.
-      IF ( STATUS .NE. SAI__OK ) GOTO 950
-
-*    Contour the array.
-*    ==================
-
-*    Define world co-ordinates.  A +0.5 shift is due to KPS1_CNTDR
-*    using a different co-ordinate system.
-
-      CALL SGS_SW( 0.5, REAL( DIMS( 1 ) ) + 0.5, 0.5,
-     :             REAL( DIMS( 2 ) ) + 0.5, STATUS )
-
-*    Draw the contour plot possibly with pen rotation.
-
-      CALL KPS1_CNTDR( DIMS( 1 ), DIMS( 2 ), %VAL( PNTRI( 1 ) ),
+*  Create a scratch area in which to log pixels contoured.
+      CALL PSX_CALLOC( DIMS( 1 )*DIMS( 2 ), '_LOGICAL', WKPNTR, STATUS )
+
+*  Contours are drawn by KPS1_CNTDR in GRID co-ordinates. Therefore, make 
+*  the GRID Frame from the supplied NDF the Current Frame in the Plot.
+*  Note the index of the Current Frame first.
+      ICURR = AST_GETI( IPLOT, 'CURRENT', STATUS )
+      CALL AST_SETI( IPLOT, 'CURRENT', IGRID + NFRM, STATUS )
+
+*  Abort if an error has occurred.
+      IF( STATUS .NE. SAI__OK ) GO TO 999
+
+*  Draw the contour plot.
+      CALL KPS1_CNTDR( IPLOT, IGRP, DIMS( 1 ), DIMS( 2 ), %VAL( PNTR ),
      :                 1, 1, DIMS( 1 ), DIMS( 2 ), NCONT, CNTLEV,
-     :                 PENROT, THRESH, STATS, %VAL( SCRPNT ),
-     :                 CNTUSD, CNTLEN, CNTCLS, STATUS )
+     :                 STATS, FAST, %VAL( WKPNTR ), CNTUSD, CNTLEN, 
+     :                 CNTCLS, STATUS )
 
-      CALL SGS_FLUSH
-
-      IF ( STATUS .NE. SAI__OK ) THEN
-         CALL ERR_REP( 'CONTOUR_SCA',
-     :     'CONTOUR: Error contouring the array.', STATUS )
+*  Add a context message if anything went wrong.
+      IF( STATUS .NE. SAI__OK ) THEN
+         CALL ERR_REP( 'CONTOUR_SCA', 'CONTOUR: Error contouring the '//
+     :                 'array.', STATUS )
       END IF
 
-*    Write the statistics to output parameters.
-      IF ( STATS ) THEN
+*  Write the statistics to output parameters.
+      IF( STATS ) THEN
          CALL PAR_PUT1I( 'NUMBER', NCONT, CNTCLS, STATUS )
          CALL PAR_PUT1R( 'LENGTH', NCONT, CNTLEN, STATUS )
       END IF
 
-*    Unmap and annul workspace.
+*  Re-instate the original Current Frame and draw the axes if required.
+      CALL AST_SETI( IPLOT, 'CURRENT', ICURR, STATUS )
+      IF( AXES ) CALL KPG1_ASGRD( IPLOT, IPICF, .TRUE., STATUS )
 
-      IF ( WKUSED( 1 ) ) THEN
-         CALL PSX_FREE( WKPNTR( 1 ), STATUS )
-         WKUSED( 1 ) = .FALSE.
-      END IF
+*  Plot the key if necessary.
+      IF( KEY ) THEN
 
-      IF ( STATUS .NE. SAI__OK ) GOTO 950
+*  If no value was supplied for the vertical position of the KEY using 
+*  parameter KEYPOS, find the value which puts the top of the key level 
+*  with the top of the DATA picture.
+         IF( NKP .LT. 2 ) THEN
 
-*    Reset image zone's world co-ordinates to the standard system.
-
-      CALL SGS_SW( REAL( SLBND( 1 ) ) - 1.0, REAL( SUBND( 1 ) ),
-     :             REAL( SLBND( 2 ) ) - 1.0, REAL( SUBND( 2 ) ),
-     :             STATUS )
-
-*    Reset the line width.
-*    =====================
-
-      IF ( SCLINE ) THEN
-
-*       Set the line width scale factor source flags to bundled.
-
-         LASF( 2 ) = 0
-         CALL GSASF( LASF )
-
-*       Watch out for any error.
-
-         CALL GKS_GSTAT( STATUS )
-         IF ( STATUS .NE. SAI__OK ) GOTO 950
-      END IF
-
-*    Record the data picture in the database.
-*    ========================================
-*    
-*    Switch back to the frame picture.
-
-      CALL AGI_SELP( PICID2, STATUS )
-
-*    Record the picture and a reference to the NDF in the database.
-
-      CALL KPG1_SDTRN( 'KAPPA_CONTOUR', NDF, PICID3, STATUS )
-
-*    Store a transformation from data co-ordinates to world co-ordinates
-*    where they are different and the data co-ordinates are linear.
-
-      IF ( DACOOR ) THEN
-         IF ( DPAXIS ) THEN
-            CALL KPG1_LITRD( DSCALE, DOFSET, STATUS )
-         ELSE
-            CALL KPG1_LITRR( SCALE, OFFSET, STATUS )
-         END IF
-      END IF
-
-*    Plot the key.
-*    =============
-
-*    Reset the input picture as current in case of an accident.
-
-      CALL AGI_SELP( PICID1, STATUS )
-
-*    If a key of contours are to be plotted...
-
-      IF ( KEY .AND. STATUS .EQ. SAI__OK ) THEN
-
-*       Return to the key zone and frame picture.
-
-         CALL AGI_SELP( PICID2, STATUS )
-         CALL SGS_SELZ( ZONEK, STATUS )
-
-*       Get AUTOGRAPH to use SGS zones.
-
-         CALL SNX_AGWV
-
-*       Draw the key to the right of the contour plot and aligned with
-*       the top axis.
-
-         CALL CNTKEY( NCONT, CNTLEV, CNTUSD, KEYOFF, UNITS, THICK,
-     :                STATUS )
-
-         IF ( STATUS .NE. SAI__OK ) THEN
-            CALL ERR_REP( 'CONTOUR_NOKEY',
-     :        'CONTOUR: Error while plotting the key.', STATUS )
-         ELSE
-
-*          Record the key in the database.
-
-            CALL AGS_SZONE( 'KEY', 'KAPPA_CONTOUR', PICID4, STATUS )
-
-            IF ( STATUS .NE. SAI__OK ) THEN
-               CALL ERR_REP( 'CONTOUR_DBSK',
-     :           'CONTOUR: Error while storing the key picture in the '/
-     :           /'graphics database.', STATUS )
+*  Report an error if there is insufficient room within the current
+*  picture for the key.
+            IF( IPICK .EQ. -1 .AND. STATUS .EQ. SAI__OK ) THEN
+               STATUS = SAI__ERROR
+               CALL ERR_REP( 'CONTOUR_KEY', 'There is insufficient '//
+     :                       'room in the current picture for a key.', 
+     :                       STATUS )
+               GO TO 999
             END IF
+
+*  We need to know the position of the top of the DATA picture so that
+*  the top of the key can be put at the same height on the screen. Get
+*  the bounds of the current PGPLOT viewport, in mm. Only the vertical
+*  position at the top is needed.
+            CALL PGQVP( 2, DUMMY, DUMMY, DUMMY, KEYOFF )
+
+*  Activate the KEY picture. This returns a pointer to an AST Plot which
+*  can be used to draw in the KEY picture, and sets the current PGPLOT
+*  viewport so that it corresponds to the KEY picture.
+            CALL KPG1_GDGET( IPICK, AST__NULL, .FALSE., IPLOTK, STATUS )
+            IF( STATUS .NE. SAI__OK ) GO TO 999
+
+*  Find the vertical position in the key picture which corresponds to
+*  the top of the DATA picture, as a fraction of the height of the key
+*  picture.
+            CALL PGQVP( 2, DUMMY, DUMMY, Y1, Y2 )
+            KEYOFF = ( KEYOFF - Y1 )/( Y2 - Y1 )
+
+*  If the horizontal positions was given using parameter KEYPOS, just 
+*  activate the KEY picture. 
+         ELSE
+            KEYOFF = KEYPOS( 2 )
+            CALL KPG1_GDGET( IPICK, AST__NULL, .FALSE., IPLOTK, STATUS )
+            IF( STATUS .NE. SAI__OK ) GO TO 999
          END IF
 
-*    End of plot-key check
+*  Cancel the Title set for the Current Frame in the key Plot. This will
+*  be "Graphical co-ordinates" and is not useful. Clearing the Title will
+*  allow KPS1_CNTKY to use its own more appropriate title.
+         CALL AST_CLEAR( IPLOTK, 'TITLE', STATUS )
+
+*  Ensure that any previous synonyms for AST attributes are cleared.
+         CALL KPG1_ASPSY( ' ', ' ', STATUS )
+
+*  Establish some synonyms for AST attribute names to be used when setting
+*  the plotting style for the key. Note, the order is important - see
+*  KPG1_ASPSY.
+         CALL KPG1_ASPSY( 'FORMAT(IND*EX)', 'FORMAT(1)', STATUS )
+         CALL KPG1_ASPSY( '(IND*EX)', '(TEXTLAB)', STATUS )
+         CALL KPG1_ASPSY( 'FORMAT(VAL*UE)', 'FORMAT(2)', STATUS )
+         CALL KPG1_ASPSY( '(VAL*UE)', '(NUMLAB)', STATUS )
+         CALL KPG1_ASPSY( '(TEXT)', '(TITLE)', STATUS )
+
+*  Set the style for plotting in the key picture. 
+         CALL KPG1_ASSET( 'CONTOUR', 'KEYSTYLE', IPLOTK, STATUS )
+
+*  Draw the key to the right of the contour plot and aligned with
+*  the top axis.
+         CALL KPS1_CNTKY( IPLOTK, NCONT, CNTLEV, CNTUSD, KEYOFF, UNITS,
+     :                    STATUS )
+
+*  Report a context message if anything went wrong.
+         IF( STATUS .NE. SAI__OK ) THEN
+            CALL ERR_REP( 'CONTOUR_NOKEY', 'CONTOUR: Error while '//
+     :                    'plotting the key.', STATUS )
+         END IF
 
       END IF
 
-*    Report the heights to the user as they are not always clearly
-*    visible on small plots and/or on low-resolution workstations.
-
+*  Report the heights actually used as they are not always clearly
+*  visible on small plots and/or on low-resolution workstations.
       CALL CNTHLT( NCONT, CNTLEV, CNTUSD, STATUS )
 
-*    Tidy workspace.
-*    ===============
+*  Tidy up.
+*  ========
+ 999  CONTINUE
 
- 950  CONTINUE
-      DO I = 1, NWORK
-         IF ( WKUSED( I ) ) THEN
-            CALL PSX_FREE( WKPNTR( I ), STATUS )
-            WKUSED( I ) = .FALSE.
-         END IF
-      END DO      
+*  Delete any group holding pen definitions.
+      IF( IGRP .NE. GRP__NOID ) CALL GRP_DELET( IGRP, STATUS )
 
-*    AGI closedown sequence.
-*    =======================
+*  Free workspace.
+      CALL PSX_FREE( WKPNTR, STATUS )
 
- 960  CONTINUE
-      CALL AGS_DEASS( 'DEVICE', DEVCAN, STATUS )
+*  Shutdown PGPLOT and the graphics database.
+      CALL ERR_BEGIN( STATUS )
+      CALL AGP_DEASS( 'DEVICE', .FALSE., STATUS )
+      CALL ERR_END( STATUS )
 
-*    Unmap and annul NDF data.
-*    =========================
-
- 980  CONTINUE
+*  End the NDF context.
       CALL NDF_END( STATUS )
 
- 999  CONTINUE
+*  Add a context report if anything went wrong.
+      IF( STATUS .NE. SAI__OK ) THEN
+         CALL ERR_REP( 'CONTOUR_ERR', 'CONTOUR: Failed to contour a '//
+     :                 '2-dimensional data set.', STATUS )
+      END IF
 
       END

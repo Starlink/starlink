@@ -1,6 +1,6 @@
-      SUBROUTINE KPS1_CNTDR( DIM1, DIM2, ARRAY, XLL, YLL, XSIZE, YSIZE,
-     :                       NCONT, CONT, PENROT, THRESH, STATS, DONE,
-     :                       CNTUSD, CNTLEN, CNTCLS, STATUS )
+      SUBROUTINE KPS1_CNTDR( IPLOT, IGRP, DIM1, DIM2, ARRAY, XLL, YLL, 
+     :                       XSIZE, YSIZE, NCONT, CONT, STATS, FAST, 
+     :                       DONE, CNTUSD, CNTLEN, CNTCLS, STATUS )
 *+
 *  Name:
 *     KPS1_CNTDR
@@ -12,8 +12,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_CNTDR( DIM1, DIM2, ARRAY, XLL, YLL, XSIZE, YSIZE, NCONT,
-*                      CONT, PENROT, THRESH, STATS, DONE, CNTUSD,
+*     CALL KPS1_CNTDR( IPLOT, IGRP, DIM1, DIM2, ARRAY, XLL, YLL, XSIZE, 
+*                      YSIZE, NCONT, CONT, STATS, FAST, DONE, CNTUSD, 
 *                      CNTLEN, CNTCLS, STATUS )
 
 *  Description:
@@ -23,16 +23,31 @@
 *     that level, and then traces the contour until it closes or ends
 *     outside the image.
 
-*     A log of contour heights actually plotted is made.  The SGS pens
+*     A log of contour heights actually plotted is made.  The pens
 *     which draw the contours may be cycled modulo 3 for each height
 *     used, and so assist in identification.
 
 *     There is an option to compute the number of closed contours, and
 *     the total contour length at each level used.
 
-*     This application uses SGS and GKS graphics.
-
 *  Arguments:
+*     IPLOT = INTEGER (Given)
+*        An AST pointer to the Plot through which the graphics will be
+*        produced. The Current Frame should describe the GRID coordinates
+*        of the array to be contoured.
+*     IGRP = INTEGER (Given)
+*        A GRP identifier for a group containing descriptions of the pens
+*        to be used to draw each contour. If this is supplied as GRP__NOID
+*        then all contours are drawn using the "Curves" attributes (eg
+*        Colour(Curves), Width(Curves), etc ) in the supplied Plot. If a
+*        group is supplied, then each element in the group should be a
+*        comma separated list of AST attribute settings to be established
+*        prior to drawing a contour. Element 1 in the group is used for
+*        the first contour, element 2 for the second, etc. If the end of
+*        the group is reached before all contours have been drawn, then 
+*        another pass is made through the group starting at element 1
+*        again. Any attributes not specified default to their values in
+*        the Plot.
 *     DIM1 = INTEGER (Given)
 *        The first dimension of the two-dimensional array.
 *     DIM2 = INTEGER (Given)
@@ -53,12 +68,15 @@
 *        The number of contour levels.
 *     CONT( NCONT ) = REAL (Given)
 *        The contour levels.
-*     PENROT = LOGICAL (Given)
-*        If .TRUE., the three pens drawing the contours will be cycled.
-*     THRESH = REAL (Given)
-*        The threshold below which pen 5 will be used for plotting, or
-*        pens 5 to 7 if PENROT = .TRUE..  A bad value means that pen 2,
-*        or pens 2 to 4 respectively are used.
+*     STATS = LOGICAL (Given)
+*        Are contour statistics required?
+*     FAST = LOGICAL (Given)
+*        If .TRUE., then contours are drawn using straight lines as the 
+*        basic drawing element. Otherwise, the basic drawing element are
+*        geodesic curves in the Current coordinate system of the supplied
+*        Plot. This is much slower to draw, but may be useful when a
+*        severly non-linear or discontinuous mapping exists between grid 
+*        coordinates in the array, and graphics coordinates.
 *     DONE( XSIZE, YSIZE ) = LOGICAL (Returned)
 *        Workspace to store log of pixels which have already been
 *        contoured.
@@ -115,21 +133,8 @@
 *     contour-following.  Cells which are already flagged as "done" do
 *     not subsequently trigger further contour-following on this pass.
 
-*     Finally the graphics pen is reset if pen cycling was requested.
-*     End
-
 *  Notes:
 *     -  Magic-value bad pixels are correctly processed.
-*     -  Uses pen 2 for plotting.  5 also is used when there is a
-*     threshold set.  For pen rotation these become pens 2 to 4 without
-*     a threshold, and 5 to 7 with a threshold.
-
-*  Prior Requirements:
-*     -  This routine uses SGS and GKS graphics.  The GKS device must
-*     already be open.
-*     -  If the threshold is set, pen 5 should be a dashed form of pen
-*     2.  When pen rotation is also requested pens 6 and 7 are dashed
-*     forms of pens 3 and 4.
 
 *  Implementation Deficiencies:
 *     The contours are not smooth and the scanning algorithm can be made
@@ -138,6 +143,7 @@
 *  Authors:
 *     RFWS: Rodney Warren-Smith (STARLINK, Durham)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -159,6 +165,8 @@
 *        commenting.  Added THRESH argument (for dashed lines).
 *        Increased co-ordinate buffers to 10000 points.  Added
 *        statistics via new arguments STATS, CNTLEN, and CNTCLS.
+*     17-MAR-1998 (DSB):
+*        Modified to use AST for drawing the contours.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -167,13 +175,17 @@
 *-
 
 *  Type Definitions:
-      IMPLICIT NONE              ! No implicit typing
+      IMPLICIT NONE            
 
 *  Global Constants:
-      INCLUDE 'SAE_PAR'          ! SSE global definitions
-      INCLUDE 'PRM_PAR'          ! VAL__ public constants
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'AST_PAR'          ! AST constants 
+      INCLUDE 'PRM_PAR'          ! VAL constants
+      INCLUDE 'GRP_PAR'          ! GRP constants
 
 *  Arguments Given:
+      INTEGER IPLOT
+      INTEGER IGRP
       INTEGER DIM1
       INTEGER DIM2
       REAL ARRAY( DIM1, DIM2 )
@@ -183,9 +195,8 @@
       INTEGER YSIZE
       INTEGER NCONT
       REAL CONT( NCONT )
-      LOGICAL PENROT
-      REAL THRESH
       LOGICAL STATS
+      LOGICAL FAST
 
 *  Arguments Returned:
       LOGICAL DONE( XSIZE, YSIZE )
@@ -196,66 +207,74 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
+*  External References:
+      CHARACTER CHR_NTH*2
+
 *  Local Constants:
       INTEGER MAXPTS             ! Maximum number of positions in each
-                                 ! axis that define the locus of a
-                                 ! contour
-      PARAMETER ( MAXPTS = 10000 )
+      PARAMETER ( MAXPTS = 10000 ) ! axis that define the locus of a contour
 
       INTEGER NCELL              ! Number of pixels in a cell
       PARAMETER ( NCELL = 4 )
 
-
 *  Local Variables:
-      LOGICAL ABOVE              ! Next cell pixel's value is greater
-                                 ! than contour level?
-      LOGICAL ANOTE              ! Reference cell pixel's value is
-                                 ! greater than contour level?
-      REAL B( NCELL + 1 )        ! Storage of the pixel values
-      LOGICAL BADPIX             ! Cell contains one or more invalid
-                                 ! pixels?
-      REAL BMAX                  ! Maximum pixel value in the cell
-      REAL BMIN                  ! Minimum pixel value in the cell
-      LOGICAL CONFUS             ! Cell is confused?
-      REAL CX( NCELL )           ! X co-ordinates of the cell corners
-      REAL CY( NCELL )           ! Y co-ordinates of the cell corners
-      REAL CVAL                  ! Current contour value
+      CHARACTER DOMAIN*40        ! Domain of Current Frame in supplied Plot
+      CHARACTER PENDEF*(GRP__SZNAM)! AST attribute settings for current pen
+      DOUBLE PRECISION ATTRS( 20 )! PGPLOT graphics attributes on entry
       INTEGER DIST               ! Distance between two x,y positions
-      LOGICAL DSHTHR             ! Is there a threshold?
-      REAL DX( NCELL )           ! Differential x co-ordinates of cell
-                                 ! corners
-      REAL DY( NCELL )           ! Differential y co-ordinates of cell
-                                 ! corners
-      REAL FRACT                 ! Fractional position of contour from
-                                 ! Linear interpolation
       INTEGER I                  ! Loop counter through columns
       INTEGER ICONT              ! Counter to index contour levels
+      INTEGER ICURR              ! Index of original Current Frame
       INTEGER II                 ! X element numbers of current pixel in
                                  ! sub-array
       INTEGER IMOVE( NCELL )     ! X directions to move from the cell
                                  ! side where a contour leaves
-      INTEGER INPEN              ! Input SGS pen number
+      INTEGER IPEN               ! Current pen number
+      INTEGER IPLOTT             ! AST pointer to Plot with current pen set
       INTEGER IX                 ! X element numbers of current pixel in
                                  ! full-size array
       INTEGER IY                 ! Y element numbers of current pixel in
                                  ! full-size array
       INTEGER J                  ! Loop counter through lines
+      INTEGER J1                 ! Index at start of attribute setting
+      INTEGER J2                 ! Index of comma at end of attribute setting
       INTEGER JJ                 ! Y element numbers of current pixel in
                                  ! sub-array
       INTEGER JMOVE( NCELL )     ! Y directions to move from the cell
                                  ! side where a contour leaves
       INTEGER L                  ! General variable
       INTEGER LIN                ! Current entrance side of new cell
-      LOGICAL LINEND             ! At end of a line?
       INTEGER LSIDE              ! Current exit side of cell
-      INTEGER NEXIT              ! Number of cell exits for current cell
       INTEGER NEWSID( NCELL )    ! Side of entry in the new cell from
                                  ! the side of exit from the old cell
+      INTEGER NEXIT              ! Number of cell exits for current cell
+      INTEGER NPEN               ! No. of pens supplied by IGRP
       INTEGER NPTS               ! Number of points in contour's locus
+      LOGICAL ABOVE              ! Next cell pixel's value is greater
+                                 ! than contour level?
+      LOGICAL ANOTE              ! Reference cell pixel's value is
+                                 ! greater than contour level?
+      LOGICAL BADAT              ! Was attribute setting string invalid?
+      LOGICAL BADPIX             ! Cell contains one or more invalid
+                                 ! pixels?
+      LOGICAL CONFUS             ! Cell is confused?
+      LOGICAL DSHTHR             ! Is there a threshold?
+      LOGICAL LINEND             ! At end of a line?
       LOGICAL OFFIMG             ! Outside the sub-array?
-      REAL RDIST                 ! Distance between two x,y positions
-      INTEGER PENNO              ! SGS pen number
       LOGICAL SAME               ! Two x-y positions are the same?
+      REAL B( NCELL + 1 )        ! Storage of the pixel values
+      REAL BMAX                  ! Maximum pixel value in the cell
+      REAL BMIN                  ! Minimum pixel value in the cell
+      REAL CVAL                  ! Current contour value
+      REAL CX( NCELL )           ! X co-ordinates of the cell corners
+      REAL CY( NCELL )           ! Y co-ordinates of the cell corners
+      REAL DX( NCELL )           ! Differential x co-ordinates of cell
+                                 ! corners
+      REAL DY( NCELL )           ! Differential y co-ordinates of cell
+                                 ! corners
+      REAL FRACT                 ! Fractional position of contour from
+                                 ! Linear interpolation
+      REAL RDIST                 ! Distance between two x,y positions
       REAL X( MAXPTS )           ! X positions of the contour
       REAL XTEMP                 ! Dummy for swapping x position of
                                  ! contour
@@ -291,25 +310,107 @@
       DATA IMOVE /0, 1, 0, -1/
       DATA JMOVE /-1, 0, 1, 0/
       DATA NEWSID /3, 4, 1, 2/
-
 *.
 
 *  Check the global inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Inquire the current pen number.
-      CALL SGS_IPEN( INPEN )
+*  Report an error if the Current Frame in the supplied Plot does not
+*  have a Domain value of GRID.
+      DOMAIN = AST_GETC( IPLOT, 'DOMAIN', STATUS )
+      IF( DOMAIN .NE. 'GRID' )THEN
 
-*  See if a threshold is required.
-      DSHTHR = THRESH .NE. VAL__BADR
+         IF( STATUS .EQ. SAI__OK ) THEN
+            CALL MSG_SETC( 'DOM', DOMAIN )
+            STATUS = SAI__ERROR
+            CALL ERR_REP( 'KPS1_CNTDR_1', 'KPS1_CNTDR: Current Frame '//
+     :                    'in supplied Plot has Domain ^DOM but '//
+     :                    'should have Domain GRID (programming '//
+     :                    'error).', STATUS )
+         END IF
 
-*  Initialise the pen colour for the first contour level.
-      CALL SGS_SPEN( 2 )
-      IF ( DSHTHR .AND. CONT( 1 ) .LT. THRESH ) CALL SGS_SPEN( 5 )
+         GO TO 999
+
+      END IF
+
+*  Simplify the Plot. This adds a new Current Frame into the Plot, so note 
+*  the index of the original Current Frame so that it can be re-instated later.
+*  This can help to speed up the drawing, and also avoids the possibility
+*  of the Mapping going via a Frame in which the positions are undefined.
+      ICURR = AST_GETI( IPLOT, 'CURRENT', STATUS )
+      CALL KPG1_ASSIM( IPLOT, STATUS )
+
+*  Store the number of pens supplied in the GRP group.
+      IF( IGRP .NE. GRP__NOID ) THEN
+         CALL GRP_GRPSZ( IGRP, NPEN, STATUS )
+      ELSE
+         NPEN = 0
+      END IF
+
+*  Initialise the pen number.
+      IPEN = 1
 
 *  Scan through each contour level.
       DO ICONT = 1, NCONT
          CVAL = CONT( ICONT )
+
+*  If different pens are being used, produce a modified Plot which draws 
+*  curves with the pen style supplied for this contour. 
+         IF( NPEN .GT. 0 ) THEN
+
+*  Take a deep copy of the supplied Plot. This Plot will be modify using the
+*  supplied attribute settings. A copy is used so that the original plotting
+*  attributes can be re-instated later.
+            IPLOTT = AST_COPY( IPLOT, STATUS )
+
+*  Get the next list of AST Attribute settings from the group. 
+            CALL GRP_GET( IGRP, IPEN, 1, PENDEF, STATUS )
+
+*  Abort if an error has occurred.
+            IF( STATUS .NE. SAI__OK ) GO TO 999
+
+*  Loop round each comma-delimited attribute in the definitions, translating 
+*  colour names and any defined synonyms, and storing it in the Plot.
+            IF( PENDEF .NE. ' ' ) THEN
+               J1 = 1
+               DO WHILE( J1 .LE. GRP__SZNAM )
+                  J2 = J1
+                  CALL CHR_FIND( PENDEF, ',', .TRUE., J2 )
+                  CALL KPG1_ASSTS( PENDEF( J1 : J2 - 1 ), .TRUE., 
+     :                             .TRUE., IPLOTT, BADAT, STATUS )
+                  J1 = J2 + 1
+               END DO
+
+*  Issue a context message if anything went wrong setting the pen.
+               IF( STATUS .NE. SAI__OK ) THEN
+                  CALL MSG_SETI( 'I', ICONT )
+                  CALL MSG_SETC( 'I', CHR_NTH( ICONT ) )               
+                  CALL ERR_REP( 'KPS1_CNTDR_1', 'Unable to set the '//
+     :                         'pen for the ^I contour level.', STATUS )
+                  GO TO 999
+               END IF
+
+            END IF
+
+*  Increment the index of the next pen to use, cycling back to the start
+*  when the end is reached.
+            IPEN = IPEN + 1
+            IF( IPEN .GT. NPEN ) IPEN = 1
+
+*  If the same pen is being used for all contours, just clone the
+*  supplied Plot pointer.
+         ELSE
+            IPLOTT = AST_CLONE( IPLOT, STATUS )
+         END IF
+
+*  Buffer all PGPLOT output produced while drawing this contour.
+         CALL PGBBUF 
+
+*  If using FAST drawing mode, establish the new PGPLOT attributes,
+*  saving the old in ATTRS. If not using fast drawing mode, AST will 
+*  establish them when AST_CURVE is called to draw the contour.
+         IF( FAST ) CALL KPG1_PGSTY( IPLOTT, 'CURVES', .TRUE., ATTRS,
+     :                               STATUS )
 
 *  Initialise record of contour levels actually used.
          CNTUSD( ICONT ) = .FALSE.
@@ -502,19 +603,23 @@
      :                                          RDIST( NPTS, NPTS + 1 )
                            END IF
 
-*  Count the number of closed contours by seeing tif the first and last
+*  Count the number of closed contours by seeing if the first and last
 *  points are the same.
                            IF ( SAME( 1, NPTS ) ) THEN
                               CNTCLS( ICONT ) = CNTCLS( ICONT ) + 1
                            END IF
                         END IF
 
-*  Plot the stored contour and reset the number of co-ordinates.
-                        CALL GPL( NPTS, X, Y )
+*  Plot the stored contour. 
+                        CALL KPG1_ASCRV( IPLOTT, FAST, NPTS, X, Y, 
+     :                                   STATUS )
 
 *  Plot the segment of the other contour found in the confused cell.
-                        IF ( CONFUS )
-     :                     CALL GPL( 2, X( NPTS+1 ), Y( NPTS+1 ) )
+                        IF ( CONFUS ) THEN
+                           CALL KPG1_ASCRV( IPLOTT, FAST, 2, 
+     :                                     X( NPTS + 1 ), Y( NPTS + 1 ),
+     :                                     STATUS )
+                        END IF
 
 *  Reset the number of points to plot.
                         NPTS = 0
@@ -534,33 +639,28 @@
 *  End of the loop through the lines.
          END DO
 
-*  Set the pen if required.
-         IF ( PENROT .AND. CNTUSD( ICONT ) ) THEN
-            PENNO = MOD( ICONT, 3 ) + 2
+*  Flush the buffers used by KPG1_ASCRV.
+         CALL KPG1_ASCRV( IPLOTT, FAST, 0, 0.0, 0.0, STATUS )
 
-*  Check whether next contour is below the threshold.  If so use the
-*  higher pens.
-            IF ( DSHTHR .AND.
-     :           CONT( MIN( NCONT, ICONT+1 ) ) .LT. THRESH ) THEN
-               PENNO = PENNO + 3
-            END IF
-            CALL SGS_SPEN( PENNO )
+*  If using FAST drawing mode, re-establish the old PGPLOT plotting attributes.
+         IF( FAST ) CALL KPG1_PGSTY( IPLOTT, 'CURVES', .FALSE., ATTRS, 
+     :                               STATUS )
 
-*  No cycling but have to decide which of two pens to use depending on
-*  the next contour level.
-         ELSE IF ( DSHTHR .AND.
-     :             CONT( MIN( NCONT, ICONT+1 ) ) .LT. THRESH ) THEN
-            CALL SGS_SPEN( 5 )
+*  Flush the buffer holding PGPLOT output produced while drawing this contour.
+         CALL PGEBUF 
 
-         ELSE IF ( DSHTHR ) THEN
-            CALL SGS_SPEN( 2 )
-
-         END IF
+*  Annul the temporary copy of the supplied Plot which was used to do the
+*  drawing.
+         CALL AST_ANNUL( IPLOTT, STATUS )
 
 *  End of the contour-level loop.
       END DO
 
-*  Reset the pen to the input value.
-      CALL SGS_SPEN( INPEN )
+ 999  CONTINUE
+
+*  Remove the Current Frame added by KPG1_ASSIM and re-instate the original 
+*  Current Frame.
+      CALL AST_REMOVEFRAME( IPLOT, AST__CURRENT, STATUS )
+      CALL AST_SETI( IPLOT, 'CURRENT', ICURR, STATUS )
 
       END

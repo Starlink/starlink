@@ -47,6 +47,7 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -54,6 +55,10 @@
 *        Original version.
 *     1992 April 14 (MJC):
 *        Allow for blank units and for ERROR component.
+*     22-SEP-1998 (DSB):
+*        Bug fixed which caused UNITS to be addressed out of bounds if
+*        the the UNITS NDF component is longer than the declared length of 
+*        the UNITS argument.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -82,8 +87,12 @@
       INTEGER CHR_LEN            ! Length of a character string less
                                  ! trailing blanks
 
+*  Local Constants:
+      INTEGER LBUF               ! Declared length of BUFFER
+      PARAMETER( LBUF = 132 )
+
 *  Local Variables:
-      CHARACTER * ( 132 ) BUFFER ! Buffer for forming the concatenation
+      CHARACTER * ( LBUF ) BUFFER ! Buffer for forming the concatenation
                                  ! of the parts of the output string
       CHARACTER * ( 8 ) CMPNAM   ! Uppercase copy of the component
       INTEGER CPOS               ! Character position of the last
@@ -127,20 +136,24 @@
       ELSE
 
 *  Initialise the units.
+         BUFFER = ' '
          UNITS = ' '
          NCU = 0
 
 *  Obtain the units if present.
          CALL NDF_STATE( NDF, 'UNITS', UNITSP, STATUS )
          IF ( UNITSP ) THEN
-            CALL NDF_CGET( NDF, 'UNITS', UNITS, STATUS )
+            CALL NDF_CGET( NDF, 'UNITS', BUFFER, STATUS )
 
 *  Get the number of characters in the units.
             CALL NDF_CLEN( NDF, 'UNITS', NCU, STATUS )
-            NCU = CHR_LEN( UNITS( :NCU ) )
+            NCU = CHR_LEN( BUFFER( : MIN( NCU, LBUF ) ) )
 
 *  Ignore units if it is a blank string.
             IF ( NCU .GT. 0 ) THEN
+
+*  Copy the units string.
+               UNITS = BUFFER( : MIN( LBUF, CUNITS ) )
 
 *  Watch out for the cases where the units string cannot be fitted into
 *  the key.  Insert an ellipsis if the text overflows.
