@@ -109,6 +109,9 @@ typedef void AstKeyMap;
 typedef void AstFluxFrame;
 typedef void AstSpecFluxFrame;
 typedef void AstRegion;
+typedef void AstBox;
+typedef void AstCircle;
+typedef void AstEllipse;
 #endif
 
 /* between v3.0 and v3.4 astRate returned the second derivative */
@@ -395,7 +398,7 @@ void myAstRate ( AstMapping * this, double * cat, int ax1, int ax2,
 
 #if RATE_HAS_SECOND_DERIVATIVE
   ASTCALL(
-    RETVAL = astRate( this, cat, ax1, ax2, &d2 );
+    RETVAL = astRate( this, cat, ax1, ax2, d2 );
   )
 #else
   ASTCALL(
@@ -405,7 +408,7 @@ void myAstRate ( AstMapping * this, double * cat, int ax1, int ax2,
   if ( RETVAL != AST__BAD ) {
      XPUSHs(sv_2mortal(newSVnv(RETVAL)));
 #ifdef RATE_HAS_SECOND_DERIVATIVE
-     XPUSHs(sv_2mortal(newSVnv(d2)));
+     XPUSHs(sv_2mortal(newSVnv(*d2)));
 #endif
   } else {
      XSRETURN_EMPTY;
@@ -420,7 +423,7 @@ PROTOTYPES: DISABLE
 BOOT:
           MUTEX_INIT(&AST_mutex);
           ErrBuff = newAV();
-          
+
 double
 AST__BAD()
  CODE:
@@ -431,7 +434,7 @@ AST__BAD()
 #endif
  OUTPUT:
   RETVAL
-          
+
 MODULE = Starlink::AST     PACKAGE = Starlink::AST PREFIX = ast
 
 
@@ -2295,7 +2298,7 @@ astResolve( this, point1, point2, point3 )
   cpoint2 = pack1D( newRV_noinc((SV*)point2), 'd');
   cpoint3 = pack1D( newRV_noinc((SV*)point3), 'd');
   cpoint4 = get_mortalspace( naxes, 'd' );
-  
+
   ASTCALL(
     astResolve(this, cpoint1, cpoint2, cpoint3, cpoint4, &d1, &d2);
   )
