@@ -136,14 +136,15 @@ c	RECORD /MODEL_SPEC/ MODEL	! Model specification
       CALL SPEC_INIT( STATUS )
 
 *  Model GENUS
-      MODEL.GENUS = 'SPEC'
+      IMOD = 1
+      MODEL_SPEC_GENUS(IMOD) = 'SPEC'
 
 *  Get instrument response
       FOUND = .FALSE.
 
 *  Read input file
       CALL USI_ASSOC( 'INP', 'BinDS|*', 'READ', IFID, STATUS )
-      CALL FIT_GETINS( IFID, 0, 1, FOUND, INSTR, STATUS )
+      CALL FIT_GETINS( IFID, 0, 1, FOUND, 1, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
       IF(.NOT.FOUND)THEN
 	CALL MSG_PRNT( 'No instrument response component found' )
@@ -152,7 +153,7 @@ c	RECORD /MODEL_SPEC/ MODEL	! Model specification
 
 * Get model specification
       CALL USI_ASSOC( 'MODEL', '*', 'READ', MFID, STATUS )
-      CALL FIT_MODGET( MFID, MODEL, NPAR, PARAM, LB, UB, LE, UE,
+      CALL FIT_MODGET( MFID, IMOD, NPAR, PARAM, LB, UB, LE, UE,
      :                 FROZEN, STATUS )
       IF(STATUS.NE.SAI__OK) GOTO 99
 
@@ -188,7 +189,7 @@ c	RECORD /MODEL_SPEC/ MODEL	! Model specification
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *  Set up PREDDAT (no workspace required)
-      PREDDAT.CONVOLVE = .TRUE.
+      PREDICTION_CONVOLVE(1) = .TRUE.
       CALL FIT_PREDSET( IFID, 1, .FALSE., 1, 1, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
@@ -294,7 +295,7 @@ c	RECORD /MODEL_SPEC/ MODEL	! Model specification
       ELSE
 	LEGEND(2) = 'No statistical noise'
       END IF
-      CALL MSG_SETC( 'SPEC', MODEL.SPEC )
+      CALL MSG_SETC( 'SPEC', MODEL_SPEC_SPEC(IMOD) )
       CALL MSG_MAKE( 'Spectral model : ^SPEC', LEGEND(3), NCH )
 
 *  Attach GCB and write attributes

@@ -157,7 +157,8 @@ D	    print *,'j: ',j
 	        CALL CMP_PUT0L(MIPJLOC,'FROZEN',.TRUE.,STATUS)
 	        IF(STATUS.NE.SAI__OK) GO TO 9000
 	        WRITE(6,500)PARNAME
- 500	        FORMAT(16X,'* ',A<CHR_LEN(PARNAME)>,1X,'frozen')
+ 500	        FORMAT(16X,'* ',A30,1X,'frozen')
+c500	        FORMAT(16X,'* ',A<CHR_LEN(PARNAME)>,1X,'frozen')
 	      ENDIF
 	      CALL DAT_ANNUL(MIPJLOC,STATUS)
 	    ENDIF
