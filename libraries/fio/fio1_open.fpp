@@ -48,9 +48,8 @@
 *     -  CARRIAGECONTROL option is tested and avoided if not supported
 *     -  If ACCESS='APPEND' is attempted but not supported an error
 *        will be triggered.
-*     -  The RECL option is assumed to be allowed with sequential files
-*        even though it is tested for. This requires a bit more work
-*        from configure.
+*     -  If RECL with SEQUENTIAL files is not supported, the RECLEN
+*        LOGICAL is ignored and assumed to be false.
 
 *  Copyright:
 *     Copyright (C) 1992 Science & Engineering Research Council
@@ -105,6 +104,7 @@
 
 *  Local Variables:
       INTEGER SYSERR             ! The Fortran I/O status value
+      LOGICAL LREC               ! Internal copy of RECLEN
 
 *.
 
@@ -122,6 +122,14 @@
       END IF
 #endif
 
+#ifdef HAVE_FC_OPEN_ACCESSSEQUENTIALRECL1
+*  RECLEN with sequential files is supported so allow the option
+      LREC = RECLEN
+#else
+*  RECLEN with sequential files is not supported so bypass code path
+      LREC = .FALSE.      
+#endif
+
 *  Check that the carriage control option is valid.
       IF ( CC .NE. 'FORTRAN' .AND.
      :     CC .NE. 'LIST' .AND.
@@ -132,7 +140,7 @@
       ELSE
 
 *  Open the file.
-         IF ( RECLEN ) THEN
+         IF ( LREC ) THEN
             IF ( CCNTL ) THEN
                IF ( RDONLY ) THEN
                   OPEN( UNIT=UNIT, FILE=FILE, STATUS=FSTAT, FORM=FORMAT,
