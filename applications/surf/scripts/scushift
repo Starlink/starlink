@@ -1,6 +1,24 @@
 #!/star/bin/ndfperl -s
 
 # Script to shift ADC cards along by a specified amount. A big kludge.
+# Since all channels are read from a particular ADC card but only some
+# of them are actually stored in the demodulated data file, the shift
+# may result in fewer bolometers being stored for a given sub-instrument.
+#
+# Here is an example:
+#
+#     The system stores channels 1,2,3,6,7,8,10 but we know that we
+#  have a shift of -1 in the system (ie an extra byte is present).
+#  This implies that we have actually stored channels 16,1,2,5,6,7,9
+#  but only bolometers 1,2,6,7 are from the required sub-instrument.
+#  In this example we have to throw away data from channels 15,5 and 9.
+#
+#  Algorithm:
+#    0. Make sure that extinction has not been run (otherwise we are 
+#       in trouble since extinction selects the relevant bolometers)
+#    1. Add on the shift to each channel (taking care of wrap-around).
+#    2. BOL_TYPES will take care of everything else automatically when
+#       extinction is run.
 
 
 # NDF access
@@ -20,7 +38,7 @@ use Term::ReadLine;
     card\t The letter identifying the A to D card (A..I)
     shift\t Size of shift
 
-  A positive shift moves d2->d1 and a negative shift moves d16->d1.
+  A negative shift moves d2->d1 and a positive shift moves d16->d1.
 
 /;
   exit;
@@ -84,15 +102,31 @@ if ($status == $good) {
   die "Error reading $ndf\n";
 }
 
+# Now read the HISTORY and make sure that EXTINCTION is not present
+ndf_hnrec($indf,$nrec,$status);
+ 
+# if there is history...
+if ($status == &NDF::SAI__OK) {
+  
+  # Loop through the history components and find last "APPLICATION"
+  for ($i=$nrec; $i > 0; $i--) {
+    ndf_hinfo($indf, 'APPLICATION', $i, $value, $status);
+    die "Sorry - scushift must be run before EXTINCTION\n" 
+      if $value =~ /extinction/i;
+  }
+}
+
+
+
 # Now find the SCUBA extension
 
 $xloc = &NDF::DAT__NOLOC;
 ndf_xloc($indf, 'SCUBA', 'UPDATE', $xloc, $status);
 
 
-# We now have to read in the BOL_CHAN and BOL_TYPE arrays.
+# We now have to read in the BOL_CHAN and BOL_ADC arrays.
 # We shift BOL_CHAN at the location of the A to D card
-# and put the data at the end of the card
+# by adding the shift (taking care of 16 and negatives)
 
 # Read in BOL_CHAN
 
@@ -101,8 +135,6 @@ cmp_getvi($xloc, 'BOL_CHAN', 150, @bolchan, $el, $status);
 # Read in BOL_ADC
 cmp_getvi($xloc, 'BOL_ADC', 150, @boladc, $el, $status);
 
-# To fix BOL_CHAN I simply have to splice in a new array at the
-# correct location
 # First find the position of the card in these arrays
 
 # No point if status is bad
@@ -146,38 +178,20 @@ if ($status == $good) {
 
   
   # Now we need to implement the fix
-  
-  # Firstly I need to remove the requisite number of points from the array
-  # Then I need to add in those numbers at the end of the card
-  
+  # Do this by adding $shift to each channel on the given ADC card.  
+ 
   print "Before: @bolchan\n";
-  
-  # If the shift is negative we start at the end
-  
-  # Only changing bol_chan for now
-  
-  $start = ($shift > 0 ? $startpos : $endpos - abs($shift) + 1);
-  $end   = ($shift > 0 ? $endpos - $shift + 1 : $startpos);
   
   # Simply have to add the shift to each bolometer between 
   # startpos and endpos making sure that they do not go negative 
   # or greater than 16
   
-  @bolchan[$startpos..$endpos] = map {&roll($_,$shift)} @bolchan[$startpos..$endpos];
+  @bolchan[$startpos..$endpos] = map {&roll($_,$shift)} 
+                                      @bolchan[$startpos..$endpos];
 
-
-  #@removed = splice(@bolchan, $start, abs($shift));
-  
-  #print "Removed: @removed\n";
-  # Now insert these bolometers at the end of the card
-  #splice(@bolchan, $end, 0, @removed);
-  
   print "Bolchan: @bolchan\n";
 
 }
-
-die "Finish early\n";
-
 
 # Now we have to write the data out again
 
@@ -235,3 +249,72 @@ sub roll {
   return $mod;
 
 }
+
+# Put the Starlink documentation here
+__END__
+
+*+
+*  Name:
+*    SCUSHIFT
+ 
+*  Purpose:
+*    Correct for data shift error in demodulated data files
+ 
+*  Type of module:
+*    Perl 5
+
+*  Description:
+*    This script corrects for the ADC communications error and shifts
+*    the data from ADC cards along by a specified amount.
+*    Since all channels are read from a particular ADC card but only some
+*    of them are actually stored in the demodulated data file, the shift
+*    may result in fewer bolometers being stored for a given sub-instrument.
+
+*  Usage:
+*     scushift [-h] NDF card shift
+ 
+*  ADAM Parameters:
+*     -h
+*        Help information
+*     NDF (Given)
+*        The input files to be modified.
+*     card
+*        The letter identifying the A-to-D card (allowed values are A to I)
+*     shift
+*        The number of bolometers to shift by. A negative shift moves
+*        D1 to D16 (for example) and a positive shift D1 to D2. In most
+*        cases a negative shift is required (usually -1).
+*
+*  Examples:
+*     scushift test i -2
+*       Move the I card data of test.sdf by minus 2 bolometers
+*     scushift test2 h 1
+*       Move the H-card data by plus 1 bolometer.
+*
+*  Algorithm:
+*     - Make sure EXTINCTION has not been run on the data.
+*     - Use the BOL_ADC array to determine which entries in the BOL_CHAN
+*       array need to be modified.
+*     - Add on the shift to each channel for the specified card
+*       taking care of wrap-around and negatives.
+*     - Write the new BOL_CHAN array back to the file.
+*
+*
+*  Author:
+*     Tim Jenness (JACH)
+*
+*  History:
+*     $Log$
+*     Revision 1.2  1997/08/25 20:23:09  timj
+*     Fix to use the correct shift algorithm (so now works on Long wave array
+*     and F card)
+*
+*
+*  Notes:
+*     - EXTINCTION must not have been run on the input NDF.
+*     - Arguments are requested if they are missing from the command line
+*     - If the system stores channels 1,2,3,6,7,8,10 but we know that we
+*       have a shift of -1 in the system (ie an extra byte is present).
+*       This implies that we have actually stored channels 16,1,2,5,6,7,9
+*       but only bolometers 1,2,6,7 are from the required sub-instrument.
+*       In this example we have to throw away data from channels 15,5 and 9.
