@@ -1,5 +1,5 @@
 1 NDF2UNF
-Writes an NDF to an unformatted file.
+Converts an NDF to a sequential unformatted file.
 
 Usage:
 

@@ -4,7 +4,7 @@
 *     DIPSO2NDF
 
 *  Purpose:
-*     Converts a DIPSO file to an NDF.
+*     Converts a DIPSO-format file to an NDF.
 
 *  Language:
 *     Starlink Fortran 77

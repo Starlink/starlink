@@ -4,7 +4,7 @@
 *     NDF2UNF
 
 *  Purpose:
-*     Writes an NDF to an unformatted file.
+*     Converts an NDF to a sequential unformatted file.
 
 *  Language:
 *     Starlink Fortran 77

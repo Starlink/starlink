@@ -1,5 +1,5 @@
 1 NDF2ASCII
-Writes an NDF to an ASCII file.
+Converts an NDF to an ASCII file.
 
 Usage:
 

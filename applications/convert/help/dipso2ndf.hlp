@@ -1,5 +1,5 @@
 1 DIPSO2NDF
-Converts a DIPSO file to an NDF.
+Converts a DIPSO-format file to an NDF.
 
 Usage:
 

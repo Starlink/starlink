@@ -4,7 +4,7 @@
 *     NDF2ASCII
 
 *  Purpose:
-*     Writes an NDF to an ASCII file.
+*     Converts an NDF to an ASCII file.
 
 *  Language:
 *     Starlink Fortran 77
