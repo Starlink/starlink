@@ -297,8 +297,7 @@
 
 *      Map for read and write
           CALL BDI_MAP( IFID, OBJ(J) , TYPE, 'READ', IPTR, STATUS )
-          CALL BDI_MAP( IFID, OBJ(J) , TYPE, 'WRITE', OPTR,
-     :                  STATUS )
+          CALL BDI_MAP( OFID, OBJ(J) , TYPE, 'WRITE', OPTR, STATUS )
 
 *      Perform n-D flip
           IF ( TYPE .EQ. 'UBYTE' ) THEN
