@@ -1010,23 +1010,35 @@ with a non-existent file.
 <parameter>ent-name
   <type>string
   <description>String containing entity declared in current context
-<parameter keyword default='#t'>prepend-decl
-  <type>boolean
-  <description>If true (default), prepend the proper SGML declaration
+<parameter keyword default='%starlink-decl-entity%'>prepend-decl
+  <type>string
+  <description>If true, prepend the given SGML declaration
 <codebody>
-(define (document-element-from-entity str #!key (prepend-decl #t))
+(define (document-element-from-entity str #!key (prepend-decl %starlink-decl-entity%))
   (let* (;(pubid (entity-public-id str))
 	 (fsi (if prepend-decl
-		  (string-append (entity-generated-system-id %starlink-decl-entity%)
-				 (entity-generated-system-id str))
+		  (string-append (entity-generated-system-id prepend-decl)
+				 (debug (entity-generated-system-id str)))
 		  (entity-generated-system-id str))))
     (if fsi
 	(document-element (sgml-parse fsi))
 	(error (string-append "Can't generate file from entity " str)))))
-;(define (document-element-from-entity str)
-;  (let ((sysid (debug (entity-generated-system-id str))))
-;    (and sysid
-;	 (document-element (sgml-parse sysid)))))
+
+<routine>
+<routinename>document-element-from-sysid
+<purpose>Parse the given system-id, returning document-element.
+<description>As for <funcname>document-element-from-entity</>.
+<codebody>
+(define (document-element-from-sysid str
+				     #!key
+				     (prepend-decl %starlink-decl-entity%))
+  (let* ((fsi (if prepend-decl
+		  (string-append (entity-generated-system-id prepend-decl)
+				 (string-append "<" "OSFILE>" str))
+		  (entity-generated-system-id str))))
+    (if fsi
+	(document-element (sgml-parse fsi))
+	(error (string-append "Can't generate file from system-id " str)))))
 
 <routine>
 <routinename>isspace?
@@ -1714,6 +1726,20 @@ the node subtree.  Starts with a letter.
 		  a)
 	       c)
 	    m)))
+
+
+<routine>
+<routinename>list-true
+<description>Given a list, return the list with all <code>#f</> elements deleted.
+<codebody>
+(define (list-true l)
+  (if (null? l)
+      l
+      (if (car l)
+	  (append (list (car l)) (list-true (cdr l)))
+	  (list-true (cdr l)))))
+
+
 
 <!-- now scoop up the remaining common functions, from sl-gentext.dsl -->
 <routine>
