@@ -124,6 +124,7 @@
 #
 #  Authors:
 #     RFWS: R.F.Warren-Smith (Starlink)
+#     DSB: David S. Berry (Starlink)
 #
 #  History
 #     15-NOV-1996 (RFWS):
@@ -138,6 +139,9 @@
 #        current standards.
 #     18-AUG-1999 (RFWS):
 #        Added files for the MathMap class.
+#     4-SEP-2001 (DSB):
+#        Added "PATH=$(PATH):$(STAR_BIN); export PATH;\" line to do_test 
+#        target.
 #------------------------------------------------------------------------------
 
 #  Help target.
@@ -1142,6 +1146,7 @@ do_test:
 #  library - only the Fortran version has one. An appropriate options string
 #  is then produced for use during linking.)
 	opts='';\
+        PATH=$(PATH):$(STAR_BIN); export PATH;\
         for d in $(INSTALL) $(STARLINK); do \
            if test -r $$d/lib/libsla.a; then \
               if test ! -x $$d/bin/sla_link; then opts="-csla"; else :; fi;\
