@@ -95,7 +95,7 @@
 <!ENTITY % references	"">
 
 <!ENTITY % simplephrase	"| em | strong | quote | code | kbd | cite | m
-			 | angle | foreign
+			 | angle | foreign | span
 			%additional.simplephrase;">
 <!ENTITY % structuring	"| blockquote | dl | ul | ol | verbatim | linespecific 
 			%update.or;
@@ -136,6 +136,32 @@
 <!ELEMENT strong	%MXX; (%phrase;)*>
 <!ELEMENT cite		%MXX; (%phrase;)*>
 <!ELEMENT foreign	%MXX; (%phrase;)*>
+
+<!-- The Span element is intended to delimit properly nested regions
+     in the flow of text.  At present, the only attribute it has is
+     the media attribute, but I expect that it will be extended with a
+     more general `class' attribute at some point.
+
+     The media.types are patterned after those in the W3C HTML4 spec.  See
+     <http://www.w3.org/TR/REC-html40/types.html#h-6.13> for media
+     types, and
+     <http://www.w3.org/TR/REC-html40/sgml/dtd.html#MediaDesc> for the
+     declaration of the mediadesc entity there.  The parsing of this
+     attribute should be as described in that HTML spec, but at
+     present, users should expect only `screen', `print', `tty' and `all' to
+     be recognised.
+     -->
+<!ENTITY % media.types "CDATA">
+<!ELEMENT span		%MXX (%phrase;)*>
+<!ATTLIST span
+	media	%media.types	#IMPLIED
+	>
+	<!-- attributes:
+		media		If present, this indicates that the
+				enclosed text is to be used only when
+				generating output for the specified
+				medium
+		-->
 
 <!-- CODE is part of %phrase markup, and is for inline text such as
      pathnames which needs to be shown in a distinctive font.  KBD is
