@@ -7,8 +7,8 @@ lib_LTLIBRARIES = libsnx.la libsnx_agchnlz.la libsnx_agpwritx.la
 # Have SNX routines and AG replacements
 libsnx_la_SOURCES = $(F_ROUTINES) agpwritx.f agchnlz.f
 
-libsnx_agchnlz_la_SOURCES = agchnlz.la
-libsnx_agpwritx_la_SOURCES = agpwritx.la
+libsnx_agchnlz_la_SOURCES = agchnlz.f
+libsnx_agpwritx_la_SOURCES = agpwritx.f
 
 F_ROUTINES = snx_aggux.f snx_agop.f snx_agugx.f snx_chset.f \
 snx_agguy.f snx_agres.f snx_agugy.f snx_curs.f snx_to.f snx_agcs.f     \
