@@ -16,6 +16,11 @@ environment-independent.
 Main Changes in this Version
 ----------------------------
 
+   o The FitsChan class has a new attribute called DefB1950 which can be 
+   used to select the default reference frame and equinox to be used if
+   a FitsChan with foreign encoding contains no indication of the
+   reference frame or equinox.
+
    o A new method (astDecompose) has been added which enables pointers to
    be obtained to the component parts of CmpMap and CmpFrame objects.
 

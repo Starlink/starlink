@@ -54,6 +54,9 @@
 *        to 1 (this is like performing a "rewind" on the FitsChan). Testing the
 *        attribute returns 1 if the current card is at the "start-of-file"
 *        and zero otherwise.
+*     DefB1950
+*        Use FK4 B1950 in the abscence of any other indication within a
+*        foreign FITS header? Otherwise, FK5 J2000 is used.
 *     Encoding
 *        This attribute specifies the system to use when encoding AST
 *        objects into FITS headers. A value of "Native" causes AST objects 
@@ -263,6 +266,7 @@ typedef struct AstFitsChan {
 
 /* Attributes specific to objects in this class. */
    int encoding;    /* System for encoding AST objects ito FITS headers */
+   int defb1950;    /* Use FK4 B1950 as defaults? */
    int fitsdigits;  /* No. of decmial places in formatted floating point keyword values */
    char *warnings;  /* Pointer to a string containing warning conditions */
    void *card;      /* Pointer to next FitsCard to be read */
@@ -321,6 +325,10 @@ typedef struct AstFitsChanVtab {
    int (* TestFitsDigits)( AstFitsChan * );
    void (* SetFitsDigits)( AstFitsChan *, int );
    void (* ClearFitsDigits)( AstFitsChan * );
+   int (* GetDefB1950)( AstFitsChan * );
+   int (* TestDefB1950)( AstFitsChan * );
+   void (* SetDefB1950)( AstFitsChan *, int );
+   void (* ClearDefB1950)( AstFitsChan * );
    int (* GetNcard)( AstFitsChan * );
    int (* GetEncoding)( AstFitsChan * );
    int (* TestEncoding)( AstFitsChan * );
@@ -407,6 +415,11 @@ AstFitsChan *astLoadFitsChan_( void *, size_t, int, AstFitsChanVtab *,
    int astTestCard_( AstFitsChan * );
    void astSetCard_( AstFitsChan *, int );
    void astClearCard_( AstFitsChan * );
+
+   int astGetDefB1950_( AstFitsChan * );
+   int astTestDefB1950_( AstFitsChan * );
+   void astSetDefB1950_( AstFitsChan *, int );
+   void astClearDefB1950_( AstFitsChan * );
 
    int astGetFitsDigits_( AstFitsChan * );
    int astTestFitsDigits_( AstFitsChan * );
@@ -552,6 +565,15 @@ astINVOKE(V,astGetCard_(astCheckFitsChan(this)))
 astINVOKE(V,astSetCard_(astCheckFitsChan(this),card))
 #define astTestCard(this) \
 astINVOKE(V,astTestCard_(astCheckFitsChan(this)))
+
+#define astClearDefB1950(this) \
+astINVOKE(V,astClearDefB1950_(astCheckFitsChan(this)))
+#define astGetDefB1950(this) \
+astINVOKE(V,astGetDefB1950_(astCheckFitsChan(this)))
+#define astSetDefB1950(this,defb950) \
+astINVOKE(V,astSetDefB1950_(astCheckFitsChan(this),defb950))
+#define astTestDefB1950(this) \
+astINVOKE(V,astTestDefB1950_(astCheckFitsChan(this)))
 
 #define astClearFitsDigits(this) \
 astINVOKE(V,astClearFitsDigits_(astCheckFitsChan(this)))

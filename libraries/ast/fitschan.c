@@ -97,6 +97,7 @@ f     encodings), then write operations using AST_WRITE will
 *     FitsChan also has the following attributes:
 *
 *     - AllWarnings: A list of the available conditions
+*     - DefB1950: Use FK4 B1950 as default equatorial coordinates?
 *     - Card: Index of current FITS card in a FitsChan
 *     - Encoding: System for encoding Objects as FITS headers
 *     - FitsDigits: Digits of precision for floating-point FITS values
@@ -370,6 +371,8 @@ f     - AST_PUTFITS: Store a FITS header card in a FitsChan
 *     28-SEP-2001 (DSB):
 *        GoodWarns changed so that no error is reported if a blank list
 *        of conditions is supplied.
+*     12-SEP-2001 (DSB):
+*        Added DefB1950 attribute.
 *class--
 */
 
@@ -683,6 +686,11 @@ static void ClearFitsDigits( AstFitsChan * );
 static int GetFitsDigits( AstFitsChan * );
 static int TestFitsDigits( AstFitsChan * );
 static void SetFitsDigits( AstFitsChan *, int );
+
+static void ClearDefB1950( AstFitsChan * );
+static int GetDefB1950( AstFitsChan * );
+static int TestDefB1950( AstFitsChan * );
+static void SetDefB1950( AstFitsChan *, int );
 
 static void ClearWarnings( AstFitsChan * );
 static const char *GetWarnings( AstFitsChan * );
@@ -2061,6 +2069,11 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /* ----------- */
    } else if ( !strcmp( attrib, "fitsdigits" ) ) {
       astClearFitsDigits( this );
+
+/* DefB1950 */
+/* -------- */
+   } else if ( !strcmp( attrib, "defb1950" ) ) {
+      astClearDefB1950( this );
 
 /* Warnings. */
 /* -------- */
@@ -8348,6 +8361,15 @@ const char *GetAttrib( AstObject *this_object, const char *attrib ) {
          }
       }
 
+/* DefB1950 */
+/* -------- */
+   } else if ( !strcmp( attrib, "defb1950" ) ) {
+      ival = astGetDefB1950( this );
+      if ( astOK ) {
+         (void) sprintf( buff, "%d", ival );
+         result = buff;
+      }
+
 /* FitsDigits. */
 /* ----------- */
    } else if ( !strcmp( attrib, "fitsdigits" ) ) {
@@ -9313,6 +9335,10 @@ static void InitVtab( AstFitsChanVtab *vtab ) {
    vtab->TestFitsDigits = TestFitsDigits;
    vtab->SetFitsDigits = SetFitsDigits;
    vtab->GetFitsDigits = GetFitsDigits;
+   vtab->ClearDefB1950 = ClearDefB1950;
+   vtab->TestDefB1950 = TestDefB1950;
+   vtab->SetDefB1950 = SetDefB1950;
+   vtab->GetDefB1950 = GetDefB1950;
    vtab->ClearWarnings = ClearWarnings;
    vtab->TestWarnings = TestWarnings;
    vtab->SetWarnings = SetWarnings;
@@ -12317,6 +12343,13 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
         && ( nc >= len ) ) {
       astSetFitsDigits( this, ival );
 
+/* DefB1950 */
+/* -------- */
+   } else if ( nc = 0,
+        ( 1 == sscanf( setting, "defb1950= %d %n", &ival, &nc ) )
+        && ( nc >= len ) ) {
+      astSetDefB1950( this, ival );
+
 /* Warnings. */
 /* -------- */
    } else if ( nc = 0,
@@ -15060,6 +15093,11 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "fitsdigits" ) ) {
       result = astTestFitsDigits( this );
 
+/* DefB1950. */
+/* --------- */
+   } else if ( !strcmp( attrib, "defb1950" ) ) {
+      result = astTestDefB1950( this );
+
 /* Warnings. */
 /* -------- */
    } else if ( !strcmp( attrib, "warnings" ) ) {
@@ -16496,8 +16534,8 @@ static AstFrame *WcsFrame( AstFitsChan *this, FitsStore *store, char s, int prj,
                bj = 'J';
             }
 
-/* If an equatorial system is being used, give a warning that a default RADESYS value is 
-   being used. */
+/* If an equatorial system is being used, give a warning that a default RADESYS 
+   value is being used. */
             if( !strcmp( sys, "EQU" ) ){
                sprintf( buf, "The original FITS header did not specify the "
                         "RA/DEC reference frame. A default value of %s was "
@@ -16518,16 +16556,23 @@ static AstFrame *WcsFrame( AstFitsChan *this, FitsStore *store, char s, int prj,
             equinox = 2000.0;
             bj = 'J';
 
-/* If no RADESYS or EQUINOX was supplied, assume FK4 B1950 since the G&C
-   conventions are obviously not being used (GAPPT does not use EQUINOX). */
+/* If no RADESYS or EQUINOX was supplied, assume either FK4 B1950 or FK5
+   J2000 (decided by attribute DefB1950) (GAPPT does not use EQUINOX). */
          } else if( radesys == NORADEC ) {
-            equinox = 1950.0;
-            bj = 'B';
-            radesys = FK4;
+            if( astGetDefB1950( this ) ) {
+               equinox = 1950.0;
+               bj = 'B';
+               radesys = FK4;
+            } else {
+               equinox = 2000.0;
+               bj = 'J';
+               radesys = FK5;
+            }
             if( !strcmp( sys, "EQU" ) ){
-               Warn( this, "noradesys", "The original FITS header did not "
-                     "specify the RA/DEC reference frame. A default value of "
-                     "FK4 was assumed.", method, class );
+               sprintf( buf, "The original FITS header did not specify the "
+                        "RA/DEC reference frame. A default value of %s was "
+                        "assumed.", ( radesys == FK4 ) ? "FK4" : "FK5" );
+               Warn( this, "noradesys", buf, method, class );
             }
          }
 
@@ -20310,6 +20355,40 @@ astMAKE_SET(FitsChan,Encoding,int,encoding,(
               "supplied.", value ), UNKNOWN_ENCODING )))
 astMAKE_TEST(FitsChan,Encoding,( this->encoding != UNKNOWN_ENCODING ))
 
+/* DefB1950 */
+/* ======== */
+/*
+*att++
+*  Name:
+*     DefB1950
+
+*  Purpose:
+*     Use FK4 B1950 as defaults?
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     Integer (boolean).
+
+*  Description:
+*     This attribute is a boolean value which specifies a default equinox
+*     and reference frame to use when reading a FrameSet from a FitsChan
+*     with a foreign (i.e. non-native) encoding. It is only used if the FITS 
+*     header contains no information about the reference frame or equinox. If
+*     this is the case, then values of FK4 and B1950 are assumed if the DefB1950 
+*     attribute has a non-zero value, and FK5 J2000 is assumed if DefB1950 is zero.
+
+*  Applicability:
+*     FitsChan
+*        All FitsChans have this attribute.
+*att--
+*/
+astMAKE_CLEAR(FitsChan,DefB1950,defb1950,-1)
+astMAKE_GET(FitsChan,DefB1950,int,1,(this->defb1950 == -1 ? 1 : this->defb1950))
+astMAKE_SET(FitsChan,DefB1950,int,defb1950,( value ? 1 : 0 ))
+astMAKE_TEST(FitsChan,DefB1950,( this->defb1950 != -1 ))
+
 /* FitsDigits. */
 /* =========== */
 /*
@@ -20787,6 +20866,12 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
    set = TestFitsDigits( this );
    ival = set ? GetFitsDigits( this ) : astGetFitsDigits( this );
    astWriteInt( channel, "FitsDg", set, 1, ival, "No. of digits for floating point values" );
+
+/* DefB1950 */
+/* -------- */
+   set = TestDefB1950( this );
+   ival = set ? GetDefB1950( this ) : astGetDefB1950( this );
+   astWriteInt( channel, "DfB1950", set, 1, ival, (ival ? "Default to FK4 B1950": "Default to FK5 J2000") );
 
 /* Warnings. */
 /* --------- */
@@ -21543,6 +21628,7 @@ AstFitsChan *astInitFitsChan_( void *mem, size_t size, int init,
       new->head = NULL;
       new->card = NULL;
       new->keyseq = NULL;
+      new->defb1950 = 1;
       new->fitsdigits = DBL_DIG;
       new->encoding = UNKNOWN_ENCODING;
       new->warnings = NULL;
@@ -21736,6 +21822,11 @@ AstFitsChan *astLoadFitsChan_( void *mem, size_t size, int init,
 /* ----------- */
       new->fitsdigits = astReadInt( channel, "fitsdg", DBL_DIG );
       if ( TestFitsDigits( new ) ) SetFitsDigits( new, new->fitsdigits );
+
+/* DefB1950 */
+/* -------- */
+      new->defb1950 = astReadInt( channel, "dfb1950", DBL_DIG );
+      if ( TestDefB1950( new ) ) SetDefB1950( new, new->defb1950 );
 
 /* Warnings. */
 /* --------- */
