@@ -10,5 +10,5 @@ DOC = FM-3
 all: $(DOC).dvi
 
 clean:
-	rm -f $(DOC).dvi $(DOC).aux $(DOC).toc $(DOC).log
+	rm -f $(DOC).dvi $(DOC).aux $(DOC).log $(DOC).ps
 
