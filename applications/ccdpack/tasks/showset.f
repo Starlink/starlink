@@ -102,10 +102,14 @@
 *        matching that of one of the template images will be selected.
 *     NAMELIST = LITERAL (Read)
 *        The name of an output file in which to write the names of
-*        the images selected for output.  Only the image names and not 
-*        the Set attributes will be written to this file, so it 
-*        can be used as an indirection file for input to other 
-*        CCDPACK commands.
+*        the images selected for output.  The (non-comment) lines of 
+*        this file are of the form:
+*
+*           ndf-name # set-index set-name
+*
+*        since the set-index and set-name values appear to the right
+*        of a comment character, the file can thus be used as an
+*        indirection file for input to other CCDPACK commands.
 *        [showset.lis]
 *     PICKINDEX = LITERAL (Read)
 *        Indicates how NDFs are to be filtered by Set Index attribute for
@@ -229,6 +233,7 @@
       INTEGER J                  ! Loop variable
       INTEGER JSET               ! Frame index of CCD_SET frame
       INTEGER KEYGRP             ! GRP identifier for keys
+      INTEGER LENG               ! Line length
       INTEGER NAMGRP             ! GRP identifier for allowed Set Name atts
       INTEGER NCHAR              ! Number of characters in conversion
       INTEGER NEWGRP             ! Temporary GRP identifier
@@ -241,6 +246,7 @@
       INTEGER NSEL               ! Number selected so far this subgroup
       INTEGER NSPLIT             ! Number of subgroups
       INTEGER OKGRP              ! GRP identifier for selected NDFs
+      INTEGER OKCGRP             ! GRP identifier for selected NDF comment
       INTEGER SPLGRP( CCD1__MXNDF ) ! NDG identifiers for subgroups of INGRP
       LOGICAL NOSET              ! Does NDF have no Set headers?
       LOGICAL OK                 ! Can current NDF be selected?
@@ -432,9 +438,13 @@
          CALL CCD1_MSG( ' ', LINE, STATUS )
       END IF
 
-*  Initialise the group for the selected NDFs.
+*  Initialise the groups for the selected NDFs.  A group each for the NDF
+*  name, the Set Index and the Set Name is established in the same
+*  owner/slave chain, so that deleting one will delete the others.
       NOK = 0
       CALL GRP_NEW( 'CCD:SELECTED', OKGRP, STATUS )
+      CALL GRP_NEW( 'CCD:SEL_COMMENT', OKCGRP, STATUS )
+      CALL GRP_SOWN( OKGRP, OKCGRP, STATUS )
 
 *  Cycle through the subgroups into which the input NDFs have been split.
       DO I = 1, NSPLIT
@@ -483,15 +493,22 @@
 *  Get the name of the NDF.
                CALL GRP_GET( IGRP, J, 1, NDFNAM, STATUS )
 
-*  Copy it to the group containing selected NDFs (for later namelist
-*  output).
-               CALL GRP_PUT( OKGRP, 1, NDFNAM, 0, STATUS )
-
 *  If this NDF had no Set headers, make this explicit.
                IF ( NOSET ) THEN
                   SINDEX = '<NO_SET>'
                   NAME = '<NO_SET>'
                END IF
+
+*  Copy it to the group containing selected NDFs (for later namelist
+*  output).
+               CALL GRP_PUT( OKGRP, 1, NDFNAM, 0, STATUS )
+
+*  Construct a comment to be appended to the namelist lines.
+               CALL MSG_SETC( 'SINDEX', SINDEX )
+               CALL MSG_SETC( 'SNAME', NAME )
+               CALL MSG_LOAD( ' ', '^SINDEX ^SNAME', LINE, LENG,
+     :                        STATUS )
+               CALL GRP_PUT( OKCGRP, 1, LINE( 1:LENG ), 0, STATUS )
 
 *  If this is the first line to be output for this subgroup, write a
 *  header line through the log system.
@@ -545,9 +562,9 @@
 
 *  Write selected NDF names to the output list.
       CALL CCD1_MSG( ' ', ' ', STATUS )
-      CALL CCD1_LNAM( 'NAMELIST', 1, NOK, 
+      CALL CCD1_LNAM( 'NAMELIST', 1, NOK,
      :                '# SHOWSET - selected NDF name list', OKGRP,
-     :                .TRUE., STATUS )
+     :                OKCGRP, .TRUE., STATUS )
 
 *  Error exit label.
  99   CONTINUE
