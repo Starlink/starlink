@@ -248,7 +248,7 @@
       CALL ARR_SUMDIM( NDIM, DIMS, NELS )
 
 *  Create an output file
-      CALL USI_CLONE( 'INP', 'OUT', 'BinDS', OFID, STATUS )
+      CALL USI_CLONE( 'INP1', 'OUT', 'BinDS', OFID, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *  Map the data array in the output file and zero it.
