@@ -42,10 +42,14 @@ dnl AUTOHEADER="echo autoheader ignored"
 
 
 dnl   Checks for programs.
-dnl   Check for system compilers first -- CC and cxx are the C++ compilers on 
-dnl   Solaris and DUX respectively
-AC_PROG_CXX(CC cxx c++ g++)
-AC_PROG_CC(cc gcc egcs)
+dnl   By giving arguments (CC cxx c++ g++) and (cc gcc egcs), here, we
+dnl   can attempt to check for system compilers first (CC and cxx are
+dnl   the C++ compilers on Solaris and DUX respectively).  However
+dnl   this isn't useful (the README states clearly enough that the
+dnl   CXX environment variable can be used to control this), and it
+dnl   possibly/potentially causes problems.
+AC_PROG_CXX
+AC_PROG_CC
 AC_PROG_LIBTOOL
 
 dnl  Use C to compile the AC_CHECK_FUNCS tests (using C++ can cause
@@ -64,25 +68,7 @@ AC_HEADER_STAT
 
 dnl   Checks for library functions
 AC_CHECK_FUNCS(pipe snprintf setenv putenv alarm setitimer)
-dnl   getopt_long.c uses (and provides a replacement for)
-dnl   this glibc utility function
-AC_CHECK_FUNCS(__strchrnul)
 
-dnl   We ought not to have to worry about getopt.h, getopt{,1}.c,
-dnl   since they can always be unconditionally compiled and linked.  See
-dnl   http://mail.gnu.org/archive/html/autoconf/2000-12/msg00049.html
-dnl   and surrounding thread for discussion.  However that doesn't
-dnl   appear to work in fact, and the function in getopt_long.c has
-dnl   different magic to avoid getting horribly tangled up.
-dnl
-dnl   Note that the getopt checks must appear _after_ the checks for
-dnl   kpathsea.  This is because the kpathsea library provides an
-dnl   implementation for getopt so that, if kpathsea is included, we
-dnl   must make sure that we pick up that one.  If this test is
-dnl   placed before kpathsea, we can end up defining getopt twice.
-AC_CHECK_FUNCS(getopt)
-AC_CHECK_DECLS([getopt,getsubopt,getopt_long,setenv,putenv])
-AC_REPLACE_FUNCS(getopt_long getsubopt)
 
 
 dnl   Now switch to doing header checks with C++, for those headers
@@ -439,6 +425,33 @@ AC_ARG_ENABLE(gif,
 	     [Define as 1 if you want to enable generation of GIFs])]
   EXTRALO="$EXTRALO GIFBitmap.lo"
   )
+
+
+dnl   Now check whether getopt and co. are defined.  Do this last,
+dnl   since some libraries, such as libkpathsea, can provide this, so
+dnl   we can get linker errors if we don't notice that.  We need to
+dnl   use C for these tests.
+AC_LANG([C])
+
+dnl   We ought not to have to worry about getopt.h, getopt{,1}.c,
+dnl   since they can always be unconditionally compiled and linked.  See
+dnl   http://mail.gnu.org/archive/html/autoconf/2000-12/msg00049.html
+dnl   and surrounding thread for discussion.  However that doesn't
+dnl   appear to work in fact, and the function in getopt_long.c has
+dnl   different magic to avoid getting horribly tangled up.
+dnl
+dnl   Note that the getopt checks must appear _after_ the checks for
+dnl   kpathsea.  This is because the kpathsea library provides an
+dnl   implementation for getopt so that, if kpathsea is included, we
+dnl   must make sure that we pick up that one.  If this test is
+dnl   placed before kpathsea, we can end up defining getopt twice.
+AC_CHECK_FUNCS(getopt)
+AC_CHECK_DECLS([getopt,getsubopt,getopt_long,setenv,putenv])
+AC_REPLACE_FUNCS(getopt_long getsubopt)
+
+dnl   getopt_long.c uses (and provides a replacement for)
+dnl   this glibc utility function
+AC_CHECK_FUNCS(__strchrnul)
 
 
 dnl   Select path separator characters.  Specify as a pair of
