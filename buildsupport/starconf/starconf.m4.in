@@ -667,7 +667,7 @@ AC_DEFUN([STAR_DECLARE_DEPENDENCIES],
           m4_ifval([$2], [], [AC_FATAL([$0: no deplist given])])dnl
           for _star_tmp in $2
           do
-              STAR_DEPENDENCIES_CHILDREN="$STAR_DEPENDENCIES_CHILDREN <[$1]m4_ifval([$3], [ option='$3'], [])>$_star_tmp</$1>"
+              STAR_DEPENDENCIES_CHILDREN="$STAR_DEPENDENCIES_CHILDREN<[$1]m4_ifval([$3], [ option='$3'], [])>$_star_tmp</$1>"
           done
 ])# STAR_DECLARE_DEPENDENCIES
 
