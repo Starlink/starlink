@@ -251,11 +251,12 @@ C
             IF (WRITE) THEN
                OPEN (UNIT=LU,FILE=FULL_NAME(:FLEN),STATUS='OLD',
      :                                               IOSTAT=STATUS)
-#if HAVE_FC_OPEN_READONLY             
             ELSE
                OPEN (UNIT=LU,FILE=FULL_NAME(:FLEN),STATUS='OLD',
-     :                                      READONLY,IOSTAT=STATUS)
+#if HAVE_FC_OPEN_READONLY             
+     :                                      READONLY,
 #endif
+     :              IOSTAT=STATUS)
             END IF
             IF (STATUS.NE.0) THEN
                CALL GEN_FORTERR(STATUS,.FALSE.,ERROR)
