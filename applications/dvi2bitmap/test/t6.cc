@@ -10,11 +10,13 @@
 #include <iostream>
 
 #if HAVE_CSTD_INCLUDE
-#include <cstdio>
-#include <cstdlib>
+#  include <cstdio>
+#  include <cstdlib>
+#  include <cerrno>
 #else
-#include <stdio.h>
-#include <stdlib.h>
+#  include <stdio.h>
+#  include <stdlib.h>
+#  include <errno.h>
 #endif
 #include <unistd.h>
 #include <fcntl.h>
@@ -22,19 +24,13 @@
 #include <sys/stat.h>		// for mkfifo
 
 #if HAVE_SYS_ERRNO_H
-/* If it's available, use sys/errno.h rather than <cerrno> or <errno.h>.
- * If we're compiling in a strict-ansi mode, these will _not_ have errors
- * which are specific to Unix/POSIX, which are, of course, precisely the
- * ones we're hoping to use.
+/* If it's available, explicitly include sys/errno.h as well as
+ * <cerrno> or <errno.h> above.  If we're compiling in a strict-ansi
+ * mode, the compiler may well have carefully avoided defining errors
+ * which are specific to Unix/POSIX, which are, of course, precisely
+ * the ones we're hoping to use.
  */
 #  include <sys/errno.h>
-#else
-/* what else can we do? */
-#  if HAVE_CSTD_INCLUDE
-#    include <cerrno>
-#  else
-#    include <errno.h>
-#  endif
 #endif
 
 
@@ -562,7 +558,7 @@ int do_pipe_tests()
 #if HAVE_SETENV
             setenv("TT", "test", 1);
 #elif HAVE_PUTENV	    
-            putenv((const char*)"TT=test");
+            putenv((char*)"TT=test");
 #else
 #  error "Can't set environment variables"
 #endif
