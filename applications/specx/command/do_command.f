@@ -81,6 +81,8 @@
 *        Add SET-DATA-DIRECTORY
 *     18 Mar 2003 (rpt)
 *        Add SWITCH-DATE
+*     12 Apr 2004 (timj)
+*        Must use different dummy arguments for DASMERGE else things break
 C-----------------------------------------------------------------------
 
       LOGICAL FUNCTION DO_COMMAND (PROCEDURE, COMMAND, IFAIL)
@@ -123,6 +125,7 @@ C-----------------------------------------------------------------------
 * Used by DAS-MERGE
       INTEGER   NDROP   ! dummy
       LOGICAL   LOGDUM  ! dummy
+      LOGICAL   LOGDUM2 ! 2nd dummy arg
 *------------
       LOGICAL   DUMP_OK
       LOGICAL   SXGGREYOK
@@ -1290,7 +1293,9 @@ C-----------------------
  
       ELSE IF(COMMAND.EQ.'DAS-MERGE')  THEN
         IF((ICHECK(1,IFAIL).NE.1).OR.NQUAD.LT.2) RETURN
-        CALL DASMERGE(NDROP, LOGDUM, LOGDUM, IFAIL)
+C     Logical arguments must be different variables else the routine
+C     gets really upset [since they become aliases to each other]
+        CALL DASMERGE(NDROP, LOGDUM, LOGDUM2, IFAIL)
         DUMP_OK = .TRUE.
 
 
