@@ -112,9 +112,6 @@ void userradii( picstruct *field, picstruct *dfield, objstruct *obj,
                threshs[i] = field->thresh * pow( 2, i + 2 );
             }
 
-            /* RAD0 is total isophotal area */
-            obj->rad[0] = obj->npix;
-
          } else if ( prefs.nrad == 1 ) {
 
             /*  Given interval in mags, starting point is analysis
@@ -123,9 +120,6 @@ void userradii( picstruct *field, picstruct *dfield, objstruct *obj,
                threshs[i] = field->thresh *
                             pow( 10, -0.4 * prefs.rad[0] * (double)i );
             }
-
-            /* RAD0 is total isophotal area */
-            obj->rad[0] = obj->npix;
 
          } else {
 
@@ -173,9 +167,6 @@ void userradii( picstruct *field, picstruct *dfield, objstruct *obj,
             zero = prefs.mag_zeropoint / area;
             start += zero;
 
-            /* RAD0 is total isophotal area */
-            obj->rad[0] = obj->npix;
-
          } else if ( prefs.nrad == 1 ) {
 
             /*  Start is analysis threshold and zero point is
@@ -214,7 +205,7 @@ void userradii( picstruct *field, picstruct *dfield, objstruct *obj,
                /*  Thresholds need to be equal to at least the analysis
                    threshold to have any significance */
                if ( threshs[i] < field->thresh ) {
-               threshs[i] = BIG;
+                  threshs[i] = BIG;
                }
                dval += step; /*  Increment to next threshold */
             }
