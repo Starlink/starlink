@@ -177,10 +177,8 @@
      :                       STATUS )
             END IF
 
-            CALL BDI_CHK( IFID, 'Axis_1_Data', OK, STATUS )
-            IF ( OK ) THEN
-              CALL BDI_AXMAPR(IFID, 1, 'Data', 'READ', XPTR, STATUS )
-            ELSE
+            CALL BDI_AXMAPR(IFID, 1, 'Data', 'READ', XPTR, STATUS )
+            IF ( STATUS .NE. SAI__OK ) THEN
               CALL MSG_PRNT ('FATAL ERROR: No axis information')
             END IF
 
