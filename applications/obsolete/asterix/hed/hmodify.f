@@ -1,5 +1,5 @@
 *+  HMODIFY - modifies the value of HDS data object
-      SUBROUTINE HMODIFY(STATUS)
+      SUBROUTINE HMODIFY( STATUS )
 *
 *    Description :
 *
@@ -24,6 +24,7 @@
 *                         after all (DJA)
 *     14 Jan 94 : V1.7-2  Use COP1B for character strings as ARR_COP1C
 *                         doesn't work this way on UNIX (DJA)
+*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *
 *    Type Definitions :
 *
@@ -50,14 +51,17 @@
 *    Version :
 *
       CHARACTER*30 VERSION
-        PARAMETER (VERSION='HMODIFY Version 1.7-2')
+        PARAMETER (VERSION='HMODIFY Version 1.8-0')
 *-
 
 *    write out version number to terminal
       CALL MSG_PRNT( VERSION )
 
+*    Start ASTERIX
+      CALL AST_INIT()
+
 *    get locator to object if it exists
-      CALL DAT_ASSOC('INP','UPDATE',OBJLOC,STATUS)
+      CALL USI_DASSOC('INP','UPDATE',OBJLOC,STATUS)
       IF (STATUS.EQ.SAI__OK) THEN
 
 *      check that object is primitive
@@ -75,7 +79,7 @@
           CALL DAT_TYPE(OBJLOC,TYPE,STATUS)
 
 *        get values from terminal or other data object
-          CALL DAT_ASSOC('VALUES','READ',VALOC,STATUS)
+          CALL USI_DASSOC('VALUES','READ',VALOC,STATUS)
 
           IF (STATUS.EQ.SAI__OK) THEN
 
@@ -146,5 +150,9 @@
 
         CALL DAT_ANNUL(OBJLOC,STATUS)
       ENDIF
+
+*    Close ASTERIX
+      CALL AST_CLOSE()
+      CALL AST_ERR( STATUS )
 
       END

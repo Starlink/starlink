@@ -27,6 +27,7 @@
 *     14 Apr 93 : V1.7-0 Incorrect DAT_ANNUL replaced with HDS_CLOSE (DJA)
 *     11 Jun 93 : V1.7-1 Fixed bug in copy to container file with length > 15
 *                        characters (DJA)
+*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *
 *    Type Definitions :
 *
@@ -73,16 +74,19 @@
 *      Version id :
 *
       CHARACTER*(20) VERSION
-	PARAMETER(VERSION= 'HCOPY Version 1.7-1')
+	PARAMETER(VERSION= 'HCOPY Version 1.8-0')
 *-
 
 	CALL MSG_PRNT( VERSION )
 
+*      Start asterix
+        CALL AST_INIT()
+
 * Associate the input object file
-        CALL DAT_ASSOC('INP','READ',ILOC,STATUS)
+        CALL USI_DASSOC('INP','READ',ILOC,STATUS)
 
 * Get specification of output object
-        CALL PAR_GET0C('OUT',OUT,STATUS)
+        CALL USI_GET0C('OUT',OUT,STATUS)
 
         IF (STATUS.EQ.SAI__OK) THEN
 
@@ -167,9 +171,10 @@
 
 
                 ELSE
-                  CALL MSG_PRNT(
-     :            '! Level to contain copied object is not a structure')
                   STATUS=SAI__ERROR
+                  CALL ERR_REP( ' ',
+     :            'Level to contain copied object is not a structure',
+     :            STATUS )
                 ENDIF
                 CALL DAT_ANNUL(CLOC,STATUS)
               ENDIF
@@ -179,6 +184,8 @@
           CALL DAT_ANNUL(ILOC,STATUS)
 	ENDIF
 
+*      Tidy up
+        CALL AST_CLOSE()
         CALL AST_ERR( STATUS )
 
 	END

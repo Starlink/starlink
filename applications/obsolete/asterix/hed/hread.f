@@ -13,6 +13,7 @@
 *    History :
 *     02 Jun 87: original (BHVAD::RCF)
 *     12 Apr 89: modified for ASTERIX88 (BHVAD::RJV)
+*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *    type Definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -23,7 +24,7 @@
       INTEGER status
 *    local Constants :
 	CHARACTER*30 VERSION		! Version number
-        PARAMETER ( VERSION='HREAD Version 1.0-1')
+        PARAMETER ( VERSION='HREAD Version 1.8-0')
 *    local variables :
 	CHARACTER*80 FILNAM		! name of FORTRAN file
 	CHARACTER*(DAT__SZTYP) type	! type descriptor
@@ -42,12 +43,15 @@
 *   Write out the version number
       CALL MSG_PRNT(VERSION)
 
+*    Start ASTERIX
+      CALL AST_INIT()
+
 * Obtain filename and whether binary or ASCII
-      CALL PAR_GET0C('FILE', FILNAM,STATUS)
-      CALL PAR_GET0L('BINARY',BINARY,STATUS)
+      CALL USI_GET0C('FILE', FILNAM,STATUS)
+      CALL USI_GET0L('BINARY',BINARY,STATUS)
 
 * Obtain object name
-      CALL DAT_ASSOC('OUT','UPDATE',LOC,STATUS)
+      CALL USI_DASSOC('OUT','UPDATE',LOC,STATUS)
 
 * Open file
       CALL FIO_GUNIT(LUN,STATUS)
@@ -96,14 +100,19 @@
           CALL DAT_UNMAP(LOC,STATUS)
 
         ELSE
-            CALL MSG_PRNT('! Not a primitive or primitive array')
             STATUS=SAI__ERROR
+            CALL ERR_REP( ' ', 'Not a primitive or primitive array',
+     :       STATUS)
         ENDIF
 
 *	  Close the data file
 	CLOSE (UNIT=LUN)
         CALL FIO_PUNIT(LUN,STATUS)
       ENDIF
+
+*    Close ASTERIX
+      CALL AST_CLOSE()
+      CALL AST_ERR( STATUS )
 
       END
 
@@ -114,7 +123,6 @@
         IMPLICIT NONE
 *    Global constants :
         INCLUDE 'SAE_PAR'
-        INCLUDE 'PAR_ERR'
 
 	INTEGER        status            ! Error code
 
@@ -164,7 +172,6 @@
         IMPLICIT NONE
 *    Global constants :
         INCLUDE 'SAE_PAR'
-        INCLUDE 'PAR_ERR'
 
 	INTEGER        status            ! Error code
 
@@ -214,7 +221,6 @@
         IMPLICIT NONE
 *    Global constants :
         INCLUDE 'SAE_PAR'
-        INCLUDE 'PAR_ERR'
 
 	INTEGER        status            ! Error code
 
@@ -264,7 +270,6 @@
         IMPLICIT NONE
 *    Global constants :
         INCLUDE 'SAE_PAR'
-        INCLUDE 'PAR_ERR'
 
 	INTEGER        status            ! Error code
 
@@ -314,7 +319,6 @@
         IMPLICIT NONE
 *    Global constants :
         INCLUDE 'SAE_PAR'
-        INCLUDE 'PAR_ERR'
 
 	INTEGER        status            ! Error code
 

@@ -14,10 +14,14 @@
 *     15 Apr 91 : V1.4-0 6 digit array index rather than 5 (DJA)
 *     22 May 92 : V1.6-0 ERR_ANNULs inserted. Uses PRS_GETSLICE for slice
 *                        parsing. Use USI for object association (DJA)
+*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *
 *    Type Definitions :
+*
       IMPLICIT NONE
+*
 *    Global constants :
+*
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'PAR_ERR'
@@ -25,7 +29,9 @@
 *    Status :
 *
       INTEGER STATUS
+*
 *    Local variables :
+*
       CHARACTER*(DAT__SZLOC) LOC(7)      ! locators to objects in table
       CHARACTER*4 INP		         ! parameter name
       CHARACTER*20 SLICE
@@ -47,7 +53,7 @@
 *    Version id :
 *
       CHARACTER*30       VERSION
-        PARAMETER        ( VERSION = 'HTAB Version 1.7-0' )
+        PARAMETER        ( VERSION = 'HTAB Version 1.8-0' )
 *-
 
 *    Version id
@@ -58,7 +64,7 @@
 
 *    Set up output channel
       CALL AIO_ASSOCO( 'DEV', 'LIST', OCH, DEFWIDTH, STATUS )
-      CALL PAR_GET0I('WIDTH',WIDTH,STATUS)
+      CALL USI_GET0I('WIDTH',WIDTH,STATUS)
       IF (STATUS.EQ.PAR__NULL) THEN
         WIDTH=DEFWIDTH
         CALL ERR_ANNUL( STATUS )
@@ -115,7 +121,7 @@
 
 *    Get slice if required
       IF ( (NOBJ.GT.0) .AND. (STATUS.EQ.SAI__OK) ) THEN
-        CALL PAR_GET0C( 'SLICE', SLICE, STATUS )
+        CALL USI_GET0C( 'SLICE', SLICE, STATUS )
         CALL PRS_GETSLICE( 1, LEN, SLICE, RANGES, STATUS )
         CALL HTAB_OUT( LOC, NOBJ, RANGES, OCH, WIDTH, STATUS )
       END IF

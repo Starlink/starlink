@@ -19,6 +19,7 @@
 *
 *      ? ??? ?? : V1.0-0  Original (RJV)
 *      6 Jan 93 : V1.7-0  Use ARR_ routines to fill arrays (DJA)
+*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *
 *    Type Definitions :
       IMPLICIT NONE
@@ -47,7 +48,7 @@
 *    Version :
 *
       CHARACTER*30 VERSION
-        PARAMETER (VERSION='HFILL Version 1.7-0')
+        PARAMETER (VERSION='HFILL Version 1.8-0')
 *-
 
       CALL MSG_PRNT(VERSION)
@@ -62,7 +63,7 @@
         CALL DAT_TYPE(OBJLOC,TYPE,STATUS)
 
 *        get value from console or other data object
-        CALL DAT_ASSOC('VALUE','READ',VALOC,STATUS)
+        CALL USI_DASSOC('VALUE','READ',VALOC,STATUS)
 *        check value is simple scalar
         CALL DAT_SHAPE(VALOC,DAT__MXDIM,DIMS,NDIM,STATUS)
         SCALAR=(NDIM.EQ.0)
@@ -104,13 +105,15 @@
           CALL DAT_UNMAP(OBJLOC,STATUS)
 
         ELSE
-          CALL MSG_PRNT('! Value incompatible with object')
+          STATUS = SAI__ERROR
+          CALL ERR_REP(' ', 'Value incompatible with object', STATUS )
         ENDIF
 
         CALL DAT_ANNUL(VALOC,STATUS)
 
       ELSE
-        CALL MSG_PRNT('! Object is not primitive')
+        STATUS = SAI__ERROR
+        CALL ERR_REP(' ','Object is not primitive', STATUS )
       ENDIF
 
       CALL AST_CLOSE()

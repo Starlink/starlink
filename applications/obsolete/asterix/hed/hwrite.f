@@ -9,6 +9,7 @@
 *    History :
 *
 *      3 Jun 92 : Use ERR_ANNUL (BHVAD::DJA)
+*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *
 *    type Definitions :
       IMPLICIT NONE
@@ -20,7 +21,7 @@
       INTEGER status
 *    local Constants :
 	CHARACTER*30 VERSION		! Version number
-        PARAMETER ( VERSION='HWRITE Version 1.0-2')
+        PARAMETER ( VERSION='HWRITE Version 1.8-0')
 *    local variables :
 	CHARACTER*80 FILNAM		! name of FORTRAN file
 	CHARACTER*(DAT__SZTYP) type	! type descriptor
@@ -38,18 +39,22 @@
 
 *   Write out the version number
       CALL MSG_PRNT(VERSION)
-* Obtain object name
-      CALL DAT_ASSOC('INP','READ',LOC,STATUS)
 
-* Obtain filename
-      CALL PAR_GET0C('FILNAM', FILNAM, status)
+*    Start ASTERIX
+      CALL AST_INIT()
 
-* See if formatted or unformatted
-      CALL PAR_GET0L('BINARY',BINARY,STATUS)
+*    Obtain object name
+      CALL USI_DASSOC('INP','READ',LOC,STATUS)
+
+*    Obtain filename
+      CALL USI_GET0C('FILNAM', FILNAM, status)
+
+*    See if formatted or unformatted
+      CALL USI_GET0L('BINARY',BINARY,STATUS)
 
 *  If formatted see if format specified
       IF (.NOT.BINARY) THEN
-        CALL PAR_GET0C('FMT',FMT,STATUS)
+        CALL USI_GET0C('FMT',FMT,STATUS)
         IF (STATUS.EQ.PAR__NULL) THEN
           FMT=' '
           CALL ERR_ANNUL(STATUS)
@@ -113,6 +118,8 @@
 
       ENDIF
 
+*    Shutdown ASTERIX
+      CALL AST_CLOSE()
       CALL AST_ERR(STATUS)
 
       END
@@ -125,7 +132,6 @@
         IMPLICIT NONE
 *    Global constants :
         INCLUDE 'SAE_PAR'
-        INCLUDE 'PAR_ERR'
 
 	INTEGER        status            ! Error code
 
@@ -183,7 +189,6 @@
         IMPLICIT NONE
 *    Global constants :
         INCLUDE 'SAE_PAR'
-        INCLUDE 'PAR_ERR'
 
 	INTEGER        status           ! Error code
 
@@ -243,7 +248,6 @@
         IMPLICIT NONE
 *    Global constants :
         INCLUDE 'SAE_PAR'
-        INCLUDE 'PAR_ERR'
 
 	INTEGER  	 status         ! Error code
 
@@ -301,7 +305,6 @@
         IMPLICIT NONE
 *    Global constants :
         INCLUDE 'SAE_PAR'
-        INCLUDE 'PAR_ERR'
 
 	INTEGER  	 status         ! Error code
 
@@ -359,7 +362,6 @@
         IMPLICIT NONE
 *    Global constants :
         INCLUDE 'SAE_PAR'
-        INCLUDE 'PAR_ERR'
 
 	INTEGER  	 status         ! Error code
 

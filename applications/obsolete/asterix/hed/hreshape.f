@@ -13,6 +13,7 @@
 *    Authors :
 *             (BHVAD::RJV)
 *    History :
+*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *    Type Definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -25,7 +26,7 @@
       INTEGER STATUS
 *    Local Constants :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION='HRESHAPE Version 1.0-0')
+      PARAMETER (VERSION='HRESHAPE Version 1.8-0')
 *    Local variables :
       CHARACTER*(DAT__SZLOC) LOC	! locator to object
       INTEGER NDIM,DIMSO(DAT__MXDIM)	! old dimensions
@@ -35,7 +36,9 @@
 *-
       CALL MSG_PRNT(VERSION)
 
-      CALL DAT_ASSOC('INP','UPDATE',LOC,STATUS)
+      CALL AST_INIT()
+
+      CALL USI_DASSOC('INP','UPDATE',LOC,STATUS)
 
 *  get existing shape of object
       CALL DAT_SHAPE(LOC,DAT__MXDIM,DIMSO,NDIM,STATUS)
@@ -63,6 +66,7 @@
 
       CALL DAT_ANNUL(LOC,STATUS)
 
+      CALL AST_CLOSE()
       CALL AST_ERR(STATUS)
 
       END

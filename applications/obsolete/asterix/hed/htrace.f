@@ -39,6 +39,7 @@
 *     15 Nov 93 : V1.7-0  Original (DJA)
 *     11 Jan 94 : V1.7-1  Corrected use of DAT_VALID instead of DAT_STATE (DJA)
 *     27 Apr 94 : V1.7-2  Recoded to use AIO_ routines for i/o (DJA)
+*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *
 *    Type Definitions :
 *
@@ -70,29 +71,32 @@
 *    Version id :
 *
       CHARACTER*30 		VERSION
-        PARAMETER    ( VERSION = 'HTRACE Version 1.7-2' )
+        PARAMETER    ( VERSION = 'HTRACE Version 1.8-0' )
 *-
 
 *    Version number
       CALL MSG_PRNT( VERSION )
 
+*    Start ASTERIX
+      CALL AST_INIT()
+
 *    Get parameter values
-      CALL DAT_ASSOC('INP','READ',OBJLOC,STATUS)
+      CALL USI_DASSOC('INP','READ',OBJLOC,STATUS)
 
 *    Get output channel
       CALL AIO_ASSOCO( 'DEV', 'LIST', OCH, OUTWIDTH, STATUS )
 
 *    Full output of structure arrays?
-      CALL PAR_GET0L( 'FULL', FULL, STATUS )
+      CALL USI_GET0L( 'FULL', FULL, STATUS )
 
 *    Get indentation control
-      CALL PAR_GET0I( 'TYPIND', TYPIND, STATUS )
-      CALL PAR_GET0I( 'VALIND', VALIND, STATUS )
+      CALL USI_GET0I( 'TYPIND', TYPIND, STATUS )
+      CALL USI_GET0I( 'VALIND', VALIND, STATUS )
 
 *    Value placement control
-      CALL PAR_GET0L( 'NEWLINE', NEWLINE, STATUS )
-      CALL PAR_GET0I( 'NLINES', NLINES, STATUS )
-      CALL PAR_GET0L( 'EACHLINE', EACHLINE, STATUS )
+      CALL USI_GET0L( 'NEWLINE', NEWLINE, STATUS )
+      CALL USI_GET0I( 'NLINES', NLINES, STATUS )
+      CALL USI_GET0L( 'EACHLINE', EACHLINE, STATUS )
 
 *    Perform the trace
       CALL HTRACE_INT( OBJLOC, FULL, HTRACE_ITERATOR, STATUS )
@@ -101,6 +105,7 @@
       CALL AIO_CANCL( 'DEV', STATUS )
 
 *    Tidy up
+      CALL AST_CLOSE()
       CALL AST_ERR( STATUS )
 
       END

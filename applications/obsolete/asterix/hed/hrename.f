@@ -13,6 +13,7 @@
 *    Authors :
 *             (BHVAD::RJV)
 *    History :
+*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *    Type Definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -25,21 +26,24 @@
       INTEGER STATUS
 *    Local Constants :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION='HRENAME Version 1.0-0')
+      PARAMETER (VERSION='HRENAME Version 1.8-0')
 *    Local variables :
       CHARACTER*(DAT__SZLOC) LOC
       CHARACTER*(DAT__SZNAM) NEW
 *-
       CALL MSG_PRNT(VERSION)
 
-      CALL DAT_ASSOC('INP','UPDATE',LOC,STATUS)
+      CALL AST_INIT()
 
-      CALL PAR_GET0C('TO',NEW,STATUS)
+      CALL USI_DASSOC('INP','UPDATE',LOC,STATUS)
+
+      CALL USI_GET0C('TO',NEW,STATUS)
 
       CALL DAT_RENAM(LOC,NEW,STATUS)
 
       CALL DAT_ANNUL(LOC,STATUS)
 
+      CALL AST_CLOSE()
       CALL AST_ERR(STATUS)
 
       END

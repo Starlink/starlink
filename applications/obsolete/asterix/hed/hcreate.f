@@ -1,25 +1,27 @@
 *+  HCREATE - creates HDS data object
-
-      SUBROUTINE HCREATE(STATUS)
-
+      SUBROUTINE HCREATE( STATUS )
+*
 *    Description :
-
+*
 *     Creates an HDS data object of specified type and dimensions.  It
 *     will either create a completely new object and container file or
 *     a new object within an existing structure
-
+*
 *    Parameters :
-
+*
 *     INP  = UNIV    - name of object
 *     TYPE = CHAR    -  type of object to be created
 *     DIMS = INTEGER - dimensions of object
-
+*
 *    Method :
 *    Deficiencies :
 *    Bugs :
 *    Authors :
 *             (BHVAD::RJV)
 *    History :
+*
+*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
+*
 *    Type Definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -40,24 +42,30 @@
 *    Version :
 *
       CHARACTER*30 VERSION
-      PARAMETER (VERSION='HCREATE Version 1.0-0')
+        PARAMETER (VERSION='HCREATE Version 1.8-0')
 *-
 
-*    write out version number to console
+*    Version number
       CALL MSG_PRNT( VERSION )
 
-*    get type of object to be created
-      CALL PAR_GET0C('TYPE',TYPE,STATUS)
+*    Start ASTERIX
+      CALL AST_INIT()
 
-*    get dimensionality
-      CALL PAR_GET1I('DIMS',DAT__MXDIM,DIMS,NVAL,STATUS)
-      IF (DIMS(1).EQ.0) THEN
-        NDIMS=0
+*    Get type of object to be created
+      CALL USI_GET0C('TYPE',TYPE,STATUS)
+
+*    Get dimensionality
+      CALL USI_GET1I( 'DIMS', DAT__MXDIM, DIMS, NVAL, STATUS )
+      IF ( DIMS(1) .EQ. 0 ) THEN
+        NDIMS = 0
       ELSE
-        NDIMS=NVAL
+        NDIMS = NVAL
       ENDIF
 
-*    now create
-      CALL DAT_CREAT('INP',TYPE,NDIMS,DIMS,STATUS)
+*    Now create
+      CALL USI_DCREAT( 'INP', TYPE, NDIMS, DIMS, STATUS )
+
+*    Close ASTERIX
+      CALL AST_CLOSE()
 
       END

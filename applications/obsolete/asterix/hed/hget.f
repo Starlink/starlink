@@ -49,6 +49,7 @@
 *     21 Apr 91 : V1.4-0  Original (DJA)
 *     14 Oct 92 : V1.4-1  Outputs index of min or max value (RDS)
 *      6 Jul 93 : V1.7-0  Added ECHO keyword (DJA)
+*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *
 *    Type Definitions :
 *
@@ -119,15 +120,18 @@
 *    Version id
 c     CALL MSG_PRNT( VERSION )
 
+*    Start ASTERIX
+      CALL AST_INIT()
+
 *    Get locator to data object and validate it
-      CALL DAT_ASSOC( 'INP', 'READ', LOC, STATUS )
+      CALL USI_DASSOC( 'INP', 'READ', LOC, STATUS )
       CALL DAT_VALID( LOC, OK, STATUS )
 
 *    If OK so far carry on
       IF ( OK .AND. ( STATUS .EQ. SAI__OK ) ) THEN
 
 *      Get item code
-        CALL PAR_GET0C( 'ITEM', ITEM, STATUS )
+        CALL USI_GET0C( 'ITEM', ITEM, STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 99
         CALL CHR_UCASE( ITEM )
 
@@ -206,7 +210,7 @@ c     CALL MSG_PRNT( VERSION )
         ELSE
           CALL MSG_SETC( 'ITEM', ITEM )
           STATUS = SAI__ERROR
-          CALL ERR_REP( ' ', '! Illegal item code /^ITEM/', STATUS )
+          CALL ERR_REP( ' ', 'Illegal item code /^ITEM/', STATUS )
           GOTO 99
         END IF
 
@@ -218,24 +222,24 @@ c     CALL MSG_PRNT( VERSION )
       END IF
 
 *    Echo to output?
-      CALL PAR_GET0L( 'ECHO', ECHO, STATUS )
+      CALL USI_GET0L( 'ECHO', ECHO, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Write attribute
       TSTAT = SAI__OK
       IF ( ATYPE .EQ. TYP_INT ) THEN
-        CALL PAR_PUT0I( 'ATTR', IVALUE, TSTAT )
+        CALL USI_PUT0I( 'ATTR', IVALUE, TSTAT )
         IF ( ECHO ) CALL MSG_SETI( 'VAL', IVALUE )
       ELSE IF ( ATYPE .EQ. TYP_LOG ) THEN
         CVALUE = TRUTH(LVALUE)
-        CALL PAR_PUT0C( 'ATTR', CVALUE(:5), TSTAT )
+        CALL USI_PUT0C( 'ATTR', CVALUE(:5), TSTAT )
         IF ( ECHO ) CALL MSG_SETC( 'VAL', CVALUE(1:5) )
       ELSE IF ( ATYPE .EQ. TYP_REAL ) THEN
-        CALL PAR_PUT0R( 'ATTR', RVALUE, TSTAT )
+        CALL USI_PUT0R( 'ATTR', RVALUE, TSTAT )
         IF ( ECHO ) CALL MSG_SETR( 'VAL', RVALUE )
       ELSE IF ( ATYPE .EQ. TYP_CHAR ) THEN
         CLEN = CHR_LEN( CVALUE )
-        CALL PAR_PUT0C( 'ATTR', CVALUE(:CLEN), TSTAT )
+        CALL USI_PUT0C( 'ATTR', CVALUE(:CLEN), TSTAT )
         IF ( ECHO ) CALL MSG_SETC( 'VAL', CVALUE(1:CLEN) )
       END IF
 
@@ -243,8 +247,7 @@ c     CALL MSG_PRNT( VERSION )
       IF ( ECHO ) CALL MSG_PRNT( '^VAL' )
 
 *    Tidy up
- 99   IF ( STATUS .NE. SAI__OK ) THEN
-        CALL ERR_REP( ' ', '...from HGET', STATUS )
-      END IF
+ 99   CALL AST_CLOSE()
+      CALL AST_ERR( STATUS )
 
       END

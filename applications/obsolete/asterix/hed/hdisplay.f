@@ -34,6 +34,7 @@
 *     22 May 92 : V1.6-1 Fixed probelm with display of _CHAR*81 objects (DJA)
 *      1 Jun 92 : V1.6-2 And cured problem with wid=132 caused by above (DJA)
 *      4 May 94 : V1.7-0 Fixed UNIX character problems by using AIO (DJA)
+*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *
 *    Type Definitions :
 *
@@ -68,14 +69,17 @@
 *    Version :
 *
       CHARACTER*40             VERSION
-        PARAMETER              ( VERSION = 'HDISPLAY Version 1.7-0' )
+        PARAMETER              ( VERSION = 'HDISPLAY Version 1.8-0' )
 *-
 
 *    Version id
       CALL MSG_PRNT( VERSION )
 
+*    Start ASTERIX
+      CALL AST_INIT()
+
 *    Get locator to data object and validate it
-      CALL DAT_ASSOC( 'INP', 'READ', OBJLOC, STATUS )
+      CALL USI_DASSOC( 'INP', 'READ', OBJLOC, STATUS )
       CALL HDISPLAY_VALIDOBJ( OBJLOC, OBJOK, STATUS )
 
 *    If OK so far carry on
@@ -85,7 +89,7 @@
         CALL AIO_ASSOCO( 'DEVICE', 'LIST', OCH, DEFWIDTH, STATUS )
 
 *      Override device width?
-        CALL PAR_GET0I( 'WIDTH', WIDTH, STATUS )
+        CALL USI_GET0I( 'WIDTH', WIDTH, STATUS )
         IF ( STATUS .EQ. PAR__NULL ) THEN
           WIDTH = DEFWIDTH
           CALL ERR_ANNUL( STATUS )
@@ -94,7 +98,7 @@
 *      If non-scalar get range to be output
         CALL DAT_SHAPE( OBJLOC, DAT__MXDIM, DIMS, NDIM, STATUS )
         IF ( NDIM .GT. 0 ) THEN
-          CALL PAR_GET0C( 'SLICE', RANGESTR, STATUS )
+          CALL USI_GET0C( 'SLICE', RANGESTR, STATUS )
           CALL PRS_GETSLICE( NDIM, DIMS, RANGESTR, RANGES, STATUS )
 
         ELSE
@@ -110,7 +114,7 @@
         END DO
 
 *      See if format specified
-        CALL PAR_GET0C( 'FORMAT', FMT, STATUS )
+        CALL USI_GET0C( 'FORMAT', FMT, STATUS )
         IF ( STATUS .EQ. PAR__NULL ) THEN
           FMT = ' '
           CALL ERR_ANNUL( STATUS )
@@ -124,6 +128,10 @@
         CALL AIO_CANCL( 'DEVICE', STATUS )
 
       END IF
+
+*    Shutdown ASTERIX
+      CALL AST_CLOSE()
+      CALL AST_ERR( STATUS )
 
       END
 

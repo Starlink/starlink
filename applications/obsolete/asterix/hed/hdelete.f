@@ -1,6 +1,5 @@
 *+  HDELETE - deletes HDS data object
-
-      SUBROUTINE HDELETE(STATUS)
+      SUBROUTINE HDELETE( STATUS )
 
 *    Description :
 *     Deletes a named HDS data object.  Everything below the level
@@ -14,25 +13,22 @@
 *    Authors :
 *             (BHVAD::RJV)
 *    History :
+*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *    Type Definitions :
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-*    Import :
-*    Import-export :
-*    Export :
 *    Status :
       INTEGER STATUS
 *    Local Constants :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION='HDELETE Version 1.0-0')
-*    Local variables :
+      PARAMETER (VERSION='HDELETE Version 1.8-0')
 *-
 
       CALL MSG_OUT('VERSION',VERSION,STATUS)
 
-*    simple wrap-up of HDS routine
-      CALL DAT_DELET('INP',STATUS)
+*    Delete environment object
+      CALL USI_DELET( 'INP', STATUS )
 
       END

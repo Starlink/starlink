@@ -1,4 +1,4 @@
-*+  HDIR - gives list (directory) of HDS data object
+*+  HDIR - Gives list (directory) of HDS data object
       SUBROUTINE HDIR( STATUS )
 *
 *    Description :
@@ -28,6 +28,7 @@
 *     ?? ??? ?? : V1.0-0  Original (BHVAD::RJV)
 *      8 May 92 : V1.6-1  Tidied up. Device name lengthed. (BHVAD::DJA)
 *      4 May 94 : V1.7-0  Use AIO for proper UNIX output (DJA)
+*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *
 *    Type Definitions :
 *
@@ -51,14 +52,17 @@
 *    Version id :
 *
       CHARACTER*30 		VERSION
-        PARAMETER 		( VERSION = 'HDIR Version 1.7-0' )
+        PARAMETER 		( VERSION = 'HDIR Version 1.8-0' )
 *-
 
 *    Version number
       CALL MSG_PRNT( VERSION )
 
+*    Start ASTERIX
+      CALL AST_INIT()
+
 *    Get parameter values
-      CALL DAT_ASSOC( 'INP', 'READ', OBJLOC, STATUS )
+      CALL USI_DASSOC( 'INP', 'READ', OBJLOC, STATUS )
 
 *    Connect output device
       CALL AIO_ASSOCO( 'DEVICE', 'LIST', OCH, OUTWIDTH, STATUS )
@@ -70,7 +74,8 @@
       CALL AIO_CANCL( 'DEVICE', STATUS )
 
 *    Tidy up
- 99   CALL AST_ERR( STATUS )
+      CALL AST_CLOSE()
+      CALL AST_ERR( STATUS )
 
       END
 
