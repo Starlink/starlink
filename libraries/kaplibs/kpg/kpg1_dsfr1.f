@@ -38,6 +38,8 @@
 *  History:
 *     25-FEB-2003 (DSB):
 *        Original version.
+*     11-AUG-2004 (DSB):
+*        Report details of DSBSpecFrame class.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -81,6 +83,7 @@
       DOUBLE PRECISION EP        ! Epoch of observation
       DOUBLE PRECISION EQ        ! Epoch of reference equinox
       DOUBLE PRECISION FD        ! Fraction of day (+ve)
+      DOUBLE PRECISION IFF       ! Intermediate frequency
       DOUBLE PRECISION MJD       ! Modified Julian Date corresponding to Epoch
       INTEGER IAT                ! Current length of a string
       INTEGER ID                 ! Day of month
@@ -357,6 +360,45 @@
             CALL MSG_OUT( 'WCS_REF', 
      :                    IND( : NIND )//'Observer (Lon,Lat)  : ^OBS', 
      :                    STATUS )
+
+
+*  Now display stuff specific to the DSBSpecFrame sub-class of SpecFrame.
+            IF( AST_ISADSBSPECFRAME( FRM, STATUS ) ) THEN
+
+*  Current sideband
+               IF( AST_GETC( FRM, 'SIDEBAND', STATUS ) .EQ. 'USB') THEN
+                  CALL MSG_SETC( 'SB',  'Upper' );
+               ELSE
+                  CALL MSG_SETC( 'SB',  'Lower' );
+               END IF
+
+               CALL MSG_OUT( 'WCS_SBND', 
+     :                IND( : NIND )//'Sideband            : ^SB', 
+     :                STATUS )
+
+*  Intermediate Frequency...
+               IFF = AST_GETD( FRM, 'IF', STATUS )
+               CALL MSG_SETD( 'IF', IFF )
+               CALL MSG_SETC( 'IF', ' GHz' )
+               CALL MSG_OUT( 'WCS_IF', 
+     :                IND( : NIND )//'Intermediate frequency : ^IF', 
+     :                STATUS )
+
+*  Observation centre...
+               CALL MSG_SETD( 'CV', AST_GETD( FRM, 'DSBCentre', 
+     :                                        STATUS ) )
+               CALL MSG_SETC( 'CU', AST_GETC( FRM, 'Unit(1)', STATUS ) )
+               IF( IFF .LT. 0.0 ) THEN
+                  CALL MSG_SETC( 'CU', ' (USB)' )
+               ELSE 
+                  CALL MSG_SETC( 'CU', ' (LSB)' )
+               END IF
+
+               CALL MSG_OUT( 'WCS_CEN', 
+     :                IND( : NIND )//'Observation centre  : ^CV ^CU', 
+     :                STATUS )
+
+            END IF
 
          END IF
 
