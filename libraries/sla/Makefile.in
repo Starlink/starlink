@@ -39,16 +39,13 @@ NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
 host_triplet = @host@
-DIST_COMMON = $(am__configure_deps) $(srcdir)/../../config.guess \
-	$(srcdir)/../../config.sub $(srcdir)/../../depcomp \
-	$(srcdir)/../../install-sh $(srcdir)/../../ltmain.sh \
-	$(srcdir)/../../missing $(srcdir)/../../mkinstalldirs \
-	$(srcdir)/Makefile.am $(srcdir)/Makefile.in \
-	$(srcdir)/component.xml.in $(srcdir)/config.h.in \
-	$(top_srcdir)/configure gresid.fpp__vms gresid.fpp__win \
-	gresid.fppdefault random.fpp__vms random.fpp__win \
-	random.fppdefault rtl_random.c wait.f__vms wait.f__win \
-	wait.fdefault
+DIST_COMMON = $(am__configure_deps) $(srcdir)/Makefile.am \
+	$(srcdir)/Makefile.in $(srcdir)/component.xml.in \
+	$(srcdir)/config.h.in $(top_srcdir)/configure config.guess \
+	config.sub depcomp gresid.fpp__vms gresid.fpp__win \
+	gresid.fppdefault install-sh ltmain.sh missing random.fpp__vms \
+	random.fpp__win random.fppdefault rtl_random.c wait.f__vms \
+	wait.f__win wait.fdefault
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/acinclude.m4 \
@@ -57,7 +54,7 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno configure.status.lineno
-mkinstalldirs = $(SHELL) $(top_srcdir)/../../mkinstalldirs
+mkinstalldirs = $(mkdir_p)
 CONFIG_HEADER = config.h
 CONFIG_CLEAN_FILES = component.xml
 am__installdirs = $(DESTDIR)$(libdir) $(DESTDIR)$(bindir) $(DESTDIR)$(stardocsdir)
@@ -99,7 +96,7 @@ libsla_la_OBJECTS = $(am_libsla_la_OBJECTS)
 binSCRIPT_INSTALL = $(INSTALL_SCRIPT)
 SCRIPTS = $(bin_SCRIPTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I.
-depcomp = $(SHELL) $(top_srcdir)/../../depcomp
+depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 @AMDEP_TRUE@DEP_FILES = $(DEPDIR)/gresid.fpp__vms \
 @AMDEP_TRUE@	$(DEPDIR)/gresid.fpp__win \
@@ -526,19 +523,20 @@ install-libLTLIBRARIES: $(lib_LTLIBRARIES)
 	    echo " $(LIBTOOL) --mode=install $(libLTLIBRARIES_INSTALL) $(INSTALL_STRIP_FLAG) $$p $(DESTDIR)$(libdir)/$$f"; \
 	    $(LIBTOOL) --mode=install $(libLTLIBRARIES_INSTALL) $(INSTALL_STRIP_FLAG) $$p $(DESTDIR)$(libdir)/$$f; \
 	    if test -n "$$MANIFEST_FILE"; then \
-		    echo "$(DESTDIR)$(libdir)/$$f" >>$$MANIFEST_FILE; \
+	      echo "$(DESTDIR)$(libdir)/$$f" >>$$MANIFEST_FILE; \
+	      expr $$p : '.*\.la$$' >/dev/null || \
+		{ echo "Installing non-la file $$p!"; exit 1; }; \
+	      (. $$p; \
+		if test -n "$$library_names"; then \
+		  for l in $$library_names; do \
+		    echo "$$libdir/$$l" >>$$MANIFEST_FILE; \
+		  done; \
+		fi; \
+		if test -n "$$old_library"; then \
+		  echo "$$libdir/$$old_library" >>$$MANIFEST_FILE; \
+		else :; fi; \
+              ); \
 	    else :; fi; \
-	    expr $$p : '.*\.la$$' >/dev/null || \
-		{ echo "Installing non-la file!"; exit 1; }; \
-	    (. $$p; \
-		  if test -n "$$library_names"; then \
-		      for l in $$library_names; do \
-		          echo "$$libdir/$$l" >>$$MANIFEST_FILE; \
-		      done; \
-		  else :; fi; \
-		  if test -n "$$old_library"; then \
-		      echo "$$libdir/$$old_library" >>$$MANIFEST_FILE; \
-		  else :; fi; ); \
 	  else :; fi; \
 	done
 
@@ -757,7 +755,7 @@ uninstall-stardocsSTARDATA:
 distdir: $(DISTFILES)
 	$(am__remove_distdir)
 	mkdir $(distdir)
-	$(mkdir_p) $(distdir)/. $(distdir)/../..
+	$(mkdir_p) $(distdir)/.
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \

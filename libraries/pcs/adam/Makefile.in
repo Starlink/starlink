@@ -272,19 +272,20 @@ install-libLTLIBRARIES: $(lib_LTLIBRARIES)
 	    echo " $(LIBTOOL) --mode=install $(libLTLIBRARIES_INSTALL) $(INSTALL_STRIP_FLAG) $$p $(DESTDIR)$(libdir)/$$f"; \
 	    $(LIBTOOL) --mode=install $(libLTLIBRARIES_INSTALL) $(INSTALL_STRIP_FLAG) $$p $(DESTDIR)$(libdir)/$$f; \
 	    if test -n "$$MANIFEST_FILE"; then \
-		    echo "$(DESTDIR)$(libdir)/$$f" >>$$MANIFEST_FILE; \
+	      echo "$(DESTDIR)$(libdir)/$$f" >>$$MANIFEST_FILE; \
+	      expr $$p : '.*\.la$$' >/dev/null || \
+		{ echo "Installing non-la file $$p!"; exit 1; }; \
+	      (. $$p; \
+		if test -n "$$library_names"; then \
+		  for l in $$library_names; do \
+		    echo "$$libdir/$$l" >>$$MANIFEST_FILE; \
+		  done; \
+		fi; \
+		if test -n "$$old_library"; then \
+		  echo "$$libdir/$$old_library" >>$$MANIFEST_FILE; \
+		else :; fi; \
+              ); \
 	    else :; fi; \
-	    expr $$p : '.*\.la$$' >/dev/null || \
-		{ echo "Installing non-la file!"; exit 1; }; \
-	    (. $$p; \
-		  if test -n "$$library_names"; then \
-		      for l in $$library_names; do \
-		          echo "$$libdir/$$l" >>$$MANIFEST_FILE; \
-		      done; \
-		  else :; fi; \
-		  if test -n "$$old_library"; then \
-		      echo "$$libdir/$$old_library" >>$$MANIFEST_FILE; \
-		  else :; fi; ); \
 	  else :; fi; \
 	done
 
