@@ -27,6 +27,7 @@ In this example the sky background is estimated using the region
 between the outer and inner annuli. If this region contains any
 contamination then you will need to create sky apertures.
 
+
    --- Measure several stars:
 
 You can create as many apertures as you like by repeating the stages
