@@ -5,6 +5,18 @@ java_DATA = starconf.jar
 # `starconf --show buildsupportjar`
 javadir = $(pkgdatadir)
 
+# Default target.  We must be able to cope with Java not being
+# present.  Test the value of the JAVAC variable, and if it is
+# NOJAVAC, do nothing (successfully).  The rest of the buildsupport
+# system is (well, should be) written to cope with this absence.  If
+# JAVAC is available, we assume JAR is, too.
+all:
+	if test $(JAVAC) = NOJAVAC; then \
+	  echo "Warning: No Java available -- not building starconf.jar"; \
+	else \
+	  $(MAKE) starconf.jar; \
+	fi
+
 starconf.jar: GenerateDependencies.class Transformer.class
 	$(JAR) cf $@ *.class
 
