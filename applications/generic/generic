@@ -120,7 +120,7 @@
 #  Set up the environment variable GENERIC_DIR.
 
 if ( $?GENERIC_DIR == 0 ) then
-   setenv GENERIC_DIR .
+   setenv GENERIC_DIR `dirname $0`/../etc
 endif
 
 #  Set up default values of parameters.
