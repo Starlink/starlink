@@ -50,6 +50,10 @@
 #        Added SExtractor toolbox.
 #     10-MAR-1999 (PDRAPER):
 #        Attempt merge of Allan's GAIA plugin differences...
+#     01-MAY-1999 (PDRAPER):
+#        Added contouring photometry toolbox.
+#     28-MAY-1999 (PDRAPER):
+#        Added optimal photometry toolbox.
 #     {enter_changes_here}
 
 #-
@@ -411,6 +415,18 @@ itcl::class gaia::Gaia {
          -accelerator {Control-g}
       bind $w_ <Control-g> [code $this make_toolbox countphotom]
 
+      add_menuitem $m cascade "Optimal photometry" \
+         {Perform optimal photometry on image} \
+         -menu [menu $m.optphotom]
+
+      add_menuitem $m.optphotom command "Results in magnitudes..." \
+         {Display optimal photometry toolbox (results in magnitudes)} \
+         -command [code $this make_toolbox magoptphotom]
+
+      add_menuitem $m.optphotom command "Results in data counts..." \
+         {Display optimal photometry toolbox (results in image data units)} \
+         -command [code $this make_toolbox countoptphotom]
+
       add_menuitem $m command "Image regions..." \
          {Perform operations on regions of image} \
          -command [code $this make_toolbox ard] \
@@ -512,7 +528,7 @@ itcl::class gaia::Gaia {
       }
    }
 
-   #  Make a magnitude photometry toolbox.
+   #  Make a magnitude aperture photometry toolbox.
    public method make_magphotom_toolbox {name {cloned 0}} {
       itk_component add $name {
          StarPhotom .\#auto 1 \
@@ -525,7 +541,7 @@ itcl::class gaia::Gaia {
       }
    }
 
-   #  Make a counts photometry toolbox.
+   #  Make a counts aperture photometry toolbox.
    public method make_countphotom_toolbox {name {cloned 0}} {
       itk_component add $name {
          StarPhotom .\#auto 0 \
@@ -535,6 +551,32 @@ itcl::class gaia::Gaia {
             -transient $itk_option(-transient_tools) \
             -number $clone_ \
             -clone_cmd [code $this make_toolbox countphotom 1]
+      }
+   }
+
+   #  Make a magnitude optimal photometry toolbox.
+   public method make_magoptphotom_toolbox {name {cloned 0}} {
+      itk_component add $name {
+         GaiaOptPhotom .\#auto 1 \
+            -canvasdraw [$image_ component draw] \
+            -canvas [$image_ get_canvas] \
+            -rtdimage [$image_ get_image] \
+            -transient $itk_option(-transient_tools) \
+            -number $clone_ \
+            -clone_cmd [code $this make_toolbox magoptphotom 1]
+      }
+   }
+
+   #  Make a counts optimal photometry toolbox.
+   public method make_countoptphotom_toolbox {name {cloned 0}} {
+      itk_component add $name {
+         GaiaOptPhotom .\#auto 0 \
+            -canvasdraw [$image_ component draw] \
+            -canvas [$image_ get_canvas] \
+            -rtdimage [$image_ get_image] \
+            -transient $itk_option(-transient_tools) \
+            -number $clone_ \
+            -clone_cmd [code $this make_toolbox countoptphotom 1]
       }
    }
 
