@@ -666,22 +666,6 @@
 
       IF ( STATUS .NE. SAI__OK ) GOTO 999
 
-
-
-      call msg_blank( status )   
-      call msg_blank( status )   
-      call msg_out( ' ', '  WARNING:  The TURBOCONT application will '//
-     :              'be withdrawn at the next release of KAPPA. Use '//
-     :              'CONTOUR instead.', STATUS )
-      call msg_blank( status )   
-      call msg_blank( status )   
-
-
-
-
-
-
-
       DEVCAN = .FALSE.
 
 *    Obtain and map the array to be contoured.
