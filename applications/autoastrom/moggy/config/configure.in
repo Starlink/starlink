@@ -23,6 +23,9 @@ AC_PROG_CXX
 dnl   use C++ to compile test programs
 AC_LANG_CPLUSPLUS
 
+dnl   Check for a Perl binary, looking in the likely Starlink area first
+AC_PATH_PROG(PERL, perl, perl, /star/bin:$PATH)
+
 dnl   Checks for header files.  I don't actually use these defines within
 dnl   the program, so there doesn't seem much point in testing for them. 
 dnl   I think everything I use is in invoked in the place it's supposed to
