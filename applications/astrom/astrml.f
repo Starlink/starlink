@@ -579,8 +579,6 @@
 
 *  Distortion coefficient and saved value before any fitting
       DOUBLE PRECISION DISTOR,DISTO
-*   Distortion coefficient in units of deg^{-2} (DISTOR has units rad^{-2})
-      DOUBLE PRECISION DISTORD2
 
 *  Approximately flag (applies to telescope type and plate centre only)
       LOGICAL APPROX
