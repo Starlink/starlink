@@ -1,0 +1,163 @@
+*+
+*  Name:
+*     ARY_CONST
+
+*  Purpose:
+*     Define private (internal) constants for the ARY_ system.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     Global constants include file.
+
+*  Description:
+*     This file contains definitions of global constants used internally
+*     by routines in the ARY_ system, which are not needed by external
+*     users of this system.
+
+*  Prior Requirements:
+*     The SAE_PAR include file should be included prior to this file, in
+*     order to define constants which are needed here.
+
+*  Authors:
+*     RFWS: R.F. Warren-Smith (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     22-SEP-1989 (RFWS):
+*        Original version.
+*     12-DEC-1990 (RFWS):
+*        Added the ARY__FACNO constant.
+*     24-MAR-1999 (RFWS):
+*        Increased array sizes to allow more array identifiers.
+*     {enter_further_changes_here}
+
+*-
+
+*  Global Constants:
+
+*  Common block sizes.
+*  ==================
+
+*  Maximum number of entries in the Access Control Block.
+      INTEGER ARY__MXACB
+      PARAMETER ( ARY__MXACB = 1024 )
+
+*  Maximum number of entries in the Data Control Block.
+      INTEGER ARY__MXDCB
+      PARAMETER ( ARY__MXDCB = 512 )
+
+*  Maximum number of entries in the Mapping Control Block.
+      INTEGER ARY__MXMCB
+      PARAMETER ( ARY__MXMCB = 256 )
+
+*  Maximum number of entries in the Placeholder Control Block.
+      INTEGER ARY__MXPCB
+      PARAMETER ( ARY__MXPCB = 20 )
+
+*  Common block identifiers.
+*  ========================
+
+*  Identifier for the Access Control Block.
+      INTEGER ARY__ACB
+      PARAMETER ( ARY__ACB = 1 )
+
+*  Identifier for the Data Control Block.
+      INTEGER ARY__DCB
+      PARAMETER ( ARY__DCB = 2 )
+
+*  Identifier for the Mapping Control Block.
+      INTEGER ARY__MCB
+      PARAMETER ( ARY__MCB = 3 )
+
+*  Identifier for the Placeholder Control Block.
+      INTEGER ARY__PCB
+      PARAMETER ( ARY__PCB = 4 )
+
+*  String lengths.
+*  ==============
+
+*  Maximum length of a string describing an active mapping mode entry
+*  in the MCB, e.g. 'UPDATE'.
+      INTEGER ARY__SZAMM
+      PARAMETER ( ARY__SZAMM = 6 )
+
+*  Maximum length of a string describing a data object disposal mode,
+*  entry in the DCB, e.g. 'DELETE'.
+      INTEGER ARY__SZDSP
+      PARAMETER ( ARY__SZDSP = 6 )
+
+*  Maximum length of a string containing the name of an HDS container
+*  file (this value is somewhat arbitrary, since the maximum length of
+*  a file name appears to be a rather ill-defined quantity on most
+*  systems).
+      INTEGER ARY__SZFIL
+      PARAMETER ( ARY__SZFIL = 255 )
+
+*  Maximum length of a string describing an initialisation option
+*  appended to an array mapping mode specification, e.g. 'ZERO'.
+      INTEGER ARY__SZIOP
+      PARAMETER ( ARY__SZIOP = 4 )
+
+*  Maximum length of a string describing a data object access mode
+*  entry in the DCB, e.g. 'UPDATE'.
+      INTEGER ARY__SZMOD
+      PARAMETER ( ARY__SZMOD = 6 )
+
+*  Maximum size of a string containing the path name of an HDS data
+*  object (this value is somewhat arbitrary, since the maximum depth of
+*  nesting of HDS objects does not appear to be defined).
+      INTEGER ARY__SZPTH
+      PARAMETER ( ARY__SZPTH = 255 )
+
+*  Access control.
+*  ==============
+
+*  Number of access control flags maintained in the ACB, which
+*  determines the number of types of array access over which control
+*  can be exercised.
+      INTEGER ARY__MXACC
+      PARAMETER ( ARY__MXACC = 5 )
+
+*  Identifier for the BOUNDS access control flag.
+      INTEGER ARY__BOUND
+      PARAMETER ( ARY__BOUND = 1 )
+
+*  Identifier for the DELETE access control flag.
+      INTEGER ARY__DELET
+      PARAMETER ( ARY__DELET = 2 )
+
+*  Identifier for the SHIFT access control flag.
+      INTEGER ARY__SHIFT
+      PARAMETER ( ARY__SHIFT = 3 )
+
+*  Identifier for the TYPE access control flag.
+      INTEGER ARY__TYPE
+      PARAMETER ( ARY__TYPE = 4 )
+
+*  Identifier for the WRITE access control flag.
+      INTEGER ARY__WRITE
+      PARAMETER ( ARY__WRITE = 5 )
+
+*  Data system description.
+*  =======================
+
+*  Maximum number of dimensions for which the data system (HDS) is
+*  capable of "slicing" a primitive object.
+      INTEGER ARY__MXHSL
+      PARAMETER ( ARY__MXHSL = 3 )
+
+*  Value which cannot be a valid HDS locator, to which invalid locators
+*  may be set.
+      CHARACTER * ( DAT__SZLOC ) ARY__NOLOC
+      PARAMETER ( ARY__NOLOC = '<NOT A LOCATOR>' )
+
+*  Miscellaneous.
+*  =============
+
+*  Unique ARY_ system facility number.
+      INTEGER ARY__FACNO
+      PARAMETER ( ARY__FACNO = 1503 )
+
+*.

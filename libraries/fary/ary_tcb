@@ -1,0 +1,48 @@
+*+
+*  Name:
+*     ARY_TCB
+
+*  Purpose:
+*     Define ARY_ system Error Tracing Control Block (TCB).
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     Global variables include file.
+
+*  Description:
+*     This file defines global variables which control the reporting of
+*     error tracing messages via the ARY1_TRACE routine which is called
+*     by most other routines in the ARY_ system.
+
+*  Authors:
+*     RFWS: R.F. Warren-Smith (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     22-NOV-1989 (RFWS):
+*        Original version.
+*     {enter_changes_here}
+
+*-
+
+*  Global Variables:
+
+*  Error tracing flag:
+*  ==================
+*  This logical flag controls whether the ARY1_TRACE routine actually
+*  reports a message. This routine is called whenever another ARY_
+*  system routine exits as a result of an error occurring within itself
+*  or a lower level routine which it calls. This results in a series of
+*  messages showing the sequence of routines which have exited
+*  prematurely as a result of the error. The TCB_ETFLG flag controls
+*  whether this internal diagnostic information is actually produced.
+*  Its initial value is established by the ARY1_INIT block data
+*  routine; its subsequent value is controlled by calls to ARY_TRACE.
+      LOGICAL TCB_ETFLG
+
+*  Non-character data.
+      COMMON /ARY1_TCB1/ TCB_ETFLG
+
+*.

@@ -1,0 +1,66 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     ary_dev
+
+#  Purpose:
+#     Create links to ARY include files.
+
+#  Type of Module:
+#     Shell script.
+
+#  Description:
+#     This script sets up (or removes) symbolic links in the current
+#     working directory which refer to ARY public include files. It
+#     exists to allow source code which contains references to the
+#     standard public ARY include files to be compiled without having
+#     to know where these files actually reside.
+
+#  Invocation:
+#     ary_dev
+#        Sets up links for all ths ARY public include files.
+#     ary_dev remove
+#        Removes the links previously set up.
+
+#  Notes:
+#     The pathname of the installation include directory (INSTALL_INC)
+#     must be edited into this script when it is installed.
+
+#  Copyright:
+#     Copyright (C) 1992 Science & Engineering Research Council
+
+#  Authors:
+#     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     6-APR-1993 (RFWS):
+#     	 Original version.
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#.
+
+#  If no parameters were given, then create the required links.
+      if test "$*" = ""; then
+         ln -s INSTALL_INC/ary_err ARY_ERR
+         ln -s INSTALL_INC/ary_par ARY_PAR
+
+#  If "remove" was the only parameter, then remove the links.
+      elif test "$*" = "remove"; then
+         rm ARY_ERR
+         rm ARY_PAR
+
+#  If the parameters were not recognised, then report an error.
+      else
+         echo "ary_dev: invalid option \"$*\"" >&2
+         exit 1
+      fi
+
+#  End of script.
+      exit 0

@@ -1,0 +1,54 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     ary_link
+
+#  Purpose:
+#     Generate linker (ld) arguments for linking against standalone ARY.
+
+#  Type of Module:
+#     Shell script.
+
+#  Description:
+#     This script should be invoked by those building standalone
+#     applications which use ARY in order to generate the correct
+#     arguments for the compiler (or ld) command. The arguments
+#     generated are written to the standard output.
+
+#  Invocation:
+#     The script is normally invoked as part of a compiler command line,
+#     such as:
+#
+#        f77 -o program -L/star/lib `ary_link` program.f
+
+#  Copyright:
+#     Copyright (C) 1995 Rutherford Appleton Laboratory
+
+#  Authors:
+#     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+#     BLY:  M.J. Bly (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     7-JUL-1993 (RFWS):
+#        Original version.
+#     21-JUN-1995 (RFWS):
+#        Added new awk script to permit larger numbers of libraries.
+#     22-JUN-1995 (BLY):
+#        Generic version.
+#     28-MAR-1996 (BLY):
+#        Version for ARY.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+      echo -lary `prm_link` `err_link` `hds_link` `chr_link` \
+           | awk 'BEGIN{RS=" ";FS="\n"}
+                  {f[i++]=$1}
+                  END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
+
+#  End of script.
