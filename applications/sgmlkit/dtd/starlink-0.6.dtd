@@ -244,6 +244,22 @@
 <!ENTITY % Feature.EnforceLinkPolicy 'INCLUDE'>
 
 
+<!--========== Special entity ==========-->
+<!-- I need to be able to refer to the SGML declaration which is
+     appropriate for this DTD, from within the stylesheets.  Since
+     DSSSL doesn't have access to the entity manager (I don't think),
+     and since I can't work out how to declare entities in the catalog
+     (the ENTITY declaration seems not to work as I'd expect it to),
+     the only way round seems to be to declare an entity here which
+     points to the declaration's public-id.  This is available to the
+     stylesheets, and the catalog can resolve it ok.  I think....
+
+     I don't believe this is the best way to go about this, but I
+     _cannot_ work out a better one.
+     -->
+<!ENTITY starlink.decl PUBLIC "-//Starlink//SYNTAX Starlink Declaration//EN">
+
+
 <!--========== Entities for special symbols ==========-->
 <!-- There's a feature here I don't understand.  I had thought that the
      appropriate way to switch between entity sets (for LaTeX or HTML

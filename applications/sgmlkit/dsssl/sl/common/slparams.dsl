@@ -56,7 +56,7 @@ Jade command line).
 (define suppress-manifest #f)
 
 <routine>
-<routinename>%starlink-decl%
+<routinename>%starlink-decl-entity%
 <description>
 <p>Public-id of the Starlink declaration.
 <p>I <em/think/ that a public text class of `SYNTAX' is correct here,
@@ -65,6 +65,6 @@ Jade command line).
 <returnvalue type=string>public-id, which will be resolved to a
      system-id elsewhere.
 <codebody>
-(define %starlink-decl%
-  "-//Starlink//SYNTAX Starlink Declaration//EN")
+(define %starlink-decl-entity% "starlink.decl")
+;; defined in DTD to point to "-//Starlink//SYNTAX Starlink Declaration//EN"
 

@@ -42,15 +42,9 @@
 	   -- 
 SGMLDECL starlink.decl
 
-	-- And include a public-id for this, so it can be referred to
-	   from within the stylesheets.
-
-	   I _think_ that a public text class of `SYNTAX' is correct here,
-	   as described in 8879 clause 10.2.2.1, and clause 13, but I'm not
-	   convinced.
-	   --
+--  This has to go in the catalog which delegates to this one.  Dunno why!
 PUBLIC "-//Starlink//SYNTAX Starlink Declaration//EN"	starlink.decl
-
+--
 
 	-- listed most general to most specific --
 

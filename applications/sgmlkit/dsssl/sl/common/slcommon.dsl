@@ -907,9 +907,25 @@ with a non-existent file.
 <routine>
 <routinename>document-element-from-entity
 <description>
-Return the document element of the document referred to by the
-entity string passed as argument.  
-Uses <funcname/sgml-parse/: see 10179, 10.1.7.
+  <p>Return the document element of the document referred to by the
+  entity string passed as argument.  
+  Uses <funcname/sgml-parse/: see 10179, 10.1.7.
+  <p>This is <em/complicated/!  When <funcname/sgml-parse/ is called, it
+  is a completely different parse from the main one.  That means that
+  it has the default SGML declaration, which has <code/NAMECASE
+  GENERAL NO/.  Unless we prepend the correct declaration, this isn't
+  parsed properly.  The variable <funcname/%starlink-decl-entity%/ is
+  defined in the General DTD to point to the declaration, so if the
+  string entity name that we're asked to call <funcname/sgml-parse/ on
+  doesn't have a public id, it must have a system-id, so we must
+  prepend the correct SGML declaration.  Do this by calling
+  <funcname/entity-generated-system-id/ on the entity.
+  <p>The crucial thing here is to realise that a `system identifier'
+  (the argument of <funcname/sgml-parse/) is <em/not/ necessarily a
+  single file.  As described in clause A.6 (?) of the HyTime spec, and
+  also on the <webref url='http://www.jclark.com/' >SP pages</webref>,
+  it can consist of several <em/storage object identifiers/, which are
+  concatenated.
 <returnvalue type="node-list">Document element, or <code/#f/ on error.
 <argumentlist>
 <parameter>ent-name
@@ -918,11 +934,10 @@ Uses <funcname/sgml-parse/: see 10179, 10.1.7.
 <codebody>
 (define (document-element-from-entity str)
   (let* ((pubid (entity-public-id str))
-	 (fsi (debug (if pubid
+	 (fsi (if pubid
 		  (entity-generated-system-id str)
-		  (string-append ;(entity-generated-system-id %starlink-decl%)
-		   "<" "OSFILE>/home/norman/s/src/sgml/w/sgml/dtd/starlink.decl"
-				 (entity-generated-system-id str))))))
+		  (string-append (entity-generated-system-id %starlink-decl-entity%)
+				 (entity-generated-system-id str)))))
     (if fsi
 	(document-element (sgml-parse fsi))
 	(error (string-append "Can't generate file from entity " str)))))

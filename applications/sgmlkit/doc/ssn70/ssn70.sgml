@@ -628,7 +628,7 @@ identifiers/.  You can refer to these external entities as follows:
   <!ENTITY fig1.eps SYSTEM 'figure1.eps' NDATA eps>
   <!ENTITY fig1.gif SYSTEM 'figure1.gif' NDATA gif89a>
   <!ENTITY sun199 
-        PUBLIC "-//Starlink//DOCUMENT Summary SUN/199//EN" subdoc>
+        PUBLIC "-//Starlink//DOCUMENT Summary SUN/199//EN" SUBDOC>
 ]>
 ]]></verbatim>
 

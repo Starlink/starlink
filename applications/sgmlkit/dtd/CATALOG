@@ -23,6 +23,17 @@
 	   --
 DELEGATE "-//Starlink" CATALOG.starlink
 
+	-- However, include here a public-id for the Starlink
+	   declaration, so it can be referred to from within the
+	   stylesheets.  For some reason, if this is located in the
+	   delegated catalog, it produces a _completely_ different
+	   generated-system-id.  I have not a clue why!
+
+	   I _think_ that a public text class of `SYNTAX' is correct here,
+	   as described in 8879 clause 10.2.2.1, and clause 13, but I'm not
+	   convinced.
+	   --
+PUBLIC "-//Starlink//SYNTAX Starlink Declaration//EN"	starlink.decl
 
 
 

@@ -1,8 +1,9 @@
-<!DOCTYPE programcode PUBLIC "-//Starlink//DTD DSSSL Source Code 0.2//EN" [
+<!DOCTYPE programcode PUBLIC "-//Starlink//DTD DSSSL Source Code 0.6//EN" [
   <!ENTITY commonparams.dsl	PUBLIC "-//Starlink//TEXT DSSSL Common Parameterisation//EN">
   <!ENTITY htmlparams.dsl	PUBLIC "-//Starlink//TEXT DSSSL HTML Parameterisation//EN">
   <!ENTITY latexparams.dsl	PUBLIC "-//Starlink//TEXT DSSSL LaTeX Parameterisation//EN">
 ]>
+<!-- $Id$ -->
 
 <docblock>
 <title>Parameterisation of the DSSSL stylesheets

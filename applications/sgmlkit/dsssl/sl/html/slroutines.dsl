@@ -46,7 +46,10 @@ $Id$
 (define (process-codecollection docent)
   (if docent
       (let ((de (document-element-from-entity docent)))
-      (and (debug (gi de)) (process-node-list de)))
+	(if (node-list-empty? de)
+	    (error (string-append "Couldn't get document element from doc "
+				  docent))
+	    (process-node-list de)))
       (empty-sosofo)))
 
 (mode routine-ref-test
