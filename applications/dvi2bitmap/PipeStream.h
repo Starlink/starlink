@@ -61,18 +61,4 @@ class PipeStream : public InputByteStream {
     const string orig_command_;
 };
 
-namespace PipeStreamSignalHandling {
-    /* Handle SIGCHLDs by maintaining a set of pid/caught-status pairs. */
-    struct process_status {
-	pid_t pid;
-	int status;
-    };
-    struct process_status *procs;
-    int nprocs;
-    bool got_status(pid_t pid, int* status);
-    bool init();
-    extern "C" void childcatcher(int);
-};
-
-
 #endif /* PIPE_STREAM_HEADER_READ */

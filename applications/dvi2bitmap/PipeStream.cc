@@ -71,6 +71,18 @@ using std::cerr;
 #include <stringstream.h>
 
 	
+namespace PipeStreamSignalHandling {
+    /* Handle SIGCHLDs by maintaining a set of pid/caught-status pairs. */
+    struct process_status {
+	pid_t pid;
+	int status;
+    };
+    struct process_status* procs = 0; // initial value triggers initialisation
+    int nprocs = 8;		// max no of children we can wait for
+    bool got_status(pid_t pid, int* status);
+    bool init();
+    extern "C" void childcatcher(int);
+};
 
 
 /**
@@ -116,7 +128,8 @@ PipeStream::PipeStream (string cmd, string envs)
      * Implementation here follows useful example in
      * <http://www.erack.de/download/pipe-fork.c> 
      */
-    PipeStreamSignalHandling::init();
+    if (PipeStreamSignalHandling::procs == 0)
+	PipeStreamSignalHandling::init();
 
     int fd[2];
 
@@ -378,12 +391,6 @@ int PipeStream::getTerminationStatus(void)
  * All this is a rather simple-minded version of the pattern described in 
  * <http://www.cs.wustl.edu/~schmidt/signal-patterns.html>
  */
-
-
-struct PipeStreamSignalHandling::process_status*
-	PipeStreamSignalHandling::procs = 0;
-int PipeStreamSignalHandling::nprocs
-	= 8; // max no of children we can wait for
 
 bool PipeStreamSignalHandling::init()
 {
