@@ -216,35 +216,17 @@
      and to see how they are aligned with each other, for instance prior
      to resampling and generating a mosaic.
 
-  Other items
-  -----------
+  Changes since v4.0-10
+  ---------------------
 
-     The following minor changes have also been made since v3.1-1:
+   - A bug which caused problems with OVERRIDE=TRUE in FINDOFF has been
+     fixed.  This is only likely to have caused problems to ORAC-DR users.
 
-      - Some bugs in FINDOFF, including one which caused failure when 
-        NDFNAMES=false, have been fixed.
+  Changes since v4.0-11
+  ---------------------
 
-      - FINDOFF will now propagate values in trailing columns from the
-        input to output position lists.
-
-      - PLOTLIST has been modified to interact with the AGI database
-        in a more KAPPA-compatible way, so that alignment with KAPPA 
-        graphical output should be improved.
-
-      - There have been some improvements and bug fixes to the percentile
-        location routine used by FINDOBJ.
-
-      - The MODIFIED parameter of WCSEDIT has been withdrawn and replaced 
-        by the NAMELIST parameter.
-
-      - TRANNDF will now (sensibly) refuse to resample into a SkyFrame.
-
-      - There is improved crossreferencing in SUN/139 from "See also"
-        sections in the task descriptions Appendix back to the main text.
-
-      - Programs which deal with attached position lists will now normally
-        use a position list file with no entries rather than not using
-        an attached position list at all.
+   - A long-standing bug which prevented REGISTER from working with FITTYPE=6
+     has been fixed.
 
 1 ASTEXP
 Exports coordinate system information from images

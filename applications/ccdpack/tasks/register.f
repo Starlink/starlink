@@ -488,6 +488,8 @@
 *     22-MAY-2001 (MBT):
 *        Changed to use empty position list files instead of no file at
 *        all when there are no positions.
+*     8-MAY-2002 (MBT):
+*        Fixed coredumping bug for FITTYPE=6.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -1002,6 +1004,11 @@
      :      STATUS )
          END IF
       ELSE
+
+*  Get some workspace for the lists.
+         NTOT = NRECS( 1 ) + NRECS( 2 )
+         CALL CCD1_MALL( NTOT, '_DOUBLE', IPWX, STATUS )
+         CALL CCD1_MALL( NTOT, '_DOUBLE', IPWY, STATUS )
 
 *  If FITTYPE is 6 then the user wants to supply their own
 *  transformations. If this is the case we should ideally like to get
