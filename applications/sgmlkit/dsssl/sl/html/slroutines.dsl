@@ -53,9 +53,134 @@ $Id$
 	    (process-node-list de)))
       (empty-sosofo)))
 
+;; Process a list consisting of all the "author" elements in the
+;; programcode document.  Split the author list into those with the
+;; same ID as the first author, and those with a different ID: call
+;; process-one-author on the first set, and call process-authorlist
+;; again on the second.
+(define (process-authorlist nl)
+  (if (node-list-empty? nl)
+      (empty-sosofo)
+      (let* ((first-author (attribute-string (normalize "id")
+					     (node-list-first nl)))
+	     (alists (let loop ((anl nl)
+				(thisaut (empty-node-list))
+				(otherauts (empty-node-list)))
+		       (if (node-list-empty? anl)
+			   (cons thisaut otherauts)
+			   (if (string=?
+				first-author
+				(attribute-string (normalize "id")
+						  (node-list-first anl)))
+			       (loop (node-list-rest anl)
+				     (node-list thisaut
+						(node-list-first anl))
+				     otherauts)
+			       (loop (node-list-rest anl)
+				     thisaut
+				     (node-list otherauts
+						(node-list-first anl))))))))
+	(make sequence
+	  (process-one-author first-author (car alists))
+	  (process-authorlist (cdr alists))))))
+
+;; Process a single-author node-list.  Collect the relevant
+;; information from the nodes in the list.  Use the first attribute
+;; present, and don't check or warn if the information is
+;; inconsistent.
+;;
+;; The processing here is less sophisticated than it could be, as
+;; there's no real cross-referencing between individual author
+;; elements and the aggregate information.
+(define (process-one-author aut-id nl)
+  (let ((autprops (let loop ((auts nl)
+			     (name #f)
+			     (aff #f)
+			     (email #f)
+			     (web #f))
+		    (if (or (node-list-empty? auts)
+			    (and name aff email web))
+			(list name aff email web)
+			(let ((aut (node-list-first auts)))
+			  (loop (node-list-rest auts)
+				(or name
+				    (data aut))
+				(or aff
+				    (attribute-string (normalize "affiliation")
+						      aut))
+				(or email
+				    (attribute-string (normalize "email")
+						      aut))
+				(or web
+				    (attribute-string (normalize "webpage")
+						      aut))))))))
+    (make sequence
+      (make element gi: "dt"
+	    (make element gi: "a"
+		  attributes: `(("name" , (string-append "AUTHOR_" aut-id)))
+		  (literal (or (car autprops)
+			       "Mystery programmer"))))
+      (make element gi: "dd"
+	    (make element gi: "dl"	;Assume we have at least one of these
+		  (if (cadr autprops)
+		      (make sequence
+			(make element gi: "dt"
+			      (literal "Affiliation"))
+			(make element gi: "dd"
+			      (literal (cadr autprops) ")")))
+		      (empty-sosofo))
+		  (if (caddr autprops)
+		      (make sequence
+			(make element gi: "dt"
+			      (literal "Email"))
+			(make element gi: "dd"
+			      (make element gi: "code"
+				    (literal (caddr autprops)))))
+		      (empty-sosofo))
+		  (if (cadddr autprops)
+		      (make sequence
+			(make element gi: "dt"
+			      (literal "URL"))
+			(make element gi: "dl"
+			      (make element gi: "code"
+				    (make element gi: "a"
+					  attributes: `(("href" ,(cadddr autprops)))
+					  (literal (string-append "<" (cadddr autprops) ">"))))))
+		      (empty-sosofo)))))))
+
 (mode routine-ref
   (element programcode
     (process-children))
+  (element docblock
+    ;; Only prepare an authorlist for the top-level docblock, and not
+    ;; for the docblock elements in codegroups, for example.
+    (if (string=? (gi (parent (current-node)))
+		  (normalize "programcode"))
+	(let ((allauthors (select-elements
+			   (descendants (parent (current-node)))
+			   (normalize "author"))))
+	  ;; docblock always has a title element, but this is suppressed in
+	  ;; this mode.  If there's _more_ than one element, then other
+	  ;; docblock elements are present, so should be put into a
+	  ;; description list.
+	  (make sequence
+	    (if (or (> (node-list-length (children (current-node))) 1)
+		    (not (node-list-empty? allauthors)))
+		(make element gi: "dl"
+		      (make sequence
+			(with-mode docblock
+			  (process-children))
+			;; process authors
+			(if (node-list-empty? allauthors)
+			    (empty-sosofo)
+			    (make sequence
+			      (make element gi: "dt"
+				    (literal "Authors"))
+			      (make element gi: "dd"
+				    (make element gi: "dl"
+					  (process-authorlist allauthors)))))))
+		(empty-sosofo))))
+	(empty-sosofo)))
   (element codegroup
     (make sequence
       (make empty-element gi: "hr")
@@ -79,8 +204,6 @@ $Id$
 		      (with-mode routine-ref-get-reference
 			(process-node-list ref-docelem)))))
 	(process-children))))
-  (element docblock
-    (process-children))
   (element title
     (make element gi: "h1"
 	  (process-children)))
@@ -95,48 +218,57 @@ $Id$
       (make element gi: "ul"
 	    (process-children))))
   (element author
-    (let ((affil (attribute-string (normalize "affiliation")))
-	  (id (attribute-string (normalize "id")))
-	  (kids (children (current-node)))
-	  (link (or (attribute-string (normalize "webpage"))
-		    (and (attribute-string (normalize "email"))
-			 (string-append "mailto:"
-					(attribute-string (normalize
-							   "email")))))))
+    (let ((id (attribute-string (normalize "id"))))
       (make element gi: "li"
-	    (let ((attlist
-		   (if link
-		       (list (list "name" (string-append "AUTHOR_" id))
-			     (list "href" link))
-		       (list (list "name" (string-append "AUTHOR_" id))))))
-	      (make element gi: "a"
-		    attributes: attlist
-		    (process-node-list (node-list-first kids))))
-	    (process-node-list (node-list-rest kids))
-	    (if affil
-		(literal (string-append " (" affil ")"))
-		(empty-sosofo)))))
-  (element authorref
-    (let* ((aut-id (attribute-string (normalize "id")))
-	   (aut-el (and aut-id
-			(element-with-id aut-id)))
-	   (note (attribute-string (normalize "note"))))
-      (if (and (not (node-list-empty? aut-el))
-	       (string=? (gi aut-el) (normalize "author")))
-	  (make element gi: "li"
-		(make element gi: "a"
-		      attributes: (list (list "href"
-					      (string-append "#AUTHOR_"
-							     aut-id)))
-		      (make sequence
-			(with-mode routine-ref-get-reference
-			  (process-node-list aut-el))
-			(if note
-			    (literal (string-append " (" note ")"))
-			    (empty-sosofo)))))
-	  (error (string-append "ID " aut-id " is not an AUTHOR element")))))
+	    (make element gi: "a"
+		  attributes: `(("href" , (string-append "#AUTHOR_" id)))
+		  (process-children)))))
+;   (element author
+;     (let ((affil (attribute-string (normalize "affiliation")))
+; 	  (id (attribute-string (normalize "id")))
+; 	  (kids (children (current-node)))
+; 	  (link (or (attribute-string (normalize "webpage"))
+; 		    (and (attribute-string (normalize "email"))
+; 			 (string-append "mailto:"
+; 					(attribute-string (normalize
+; 							   "email")))))))
+;       (make element gi: "li"
+; 	    (let ((attlist
+; 		   (if link
+; 		       (list (list "name" (string-append "AUTHOR_" id))
+; 			     (list "href" link))
+; 		       (list (list "name" (string-append "AUTHOR_" id))))))
+; 	      (make element gi: "a"
+; 		    attributes: attlist
+; 		    (process-node-list (node-list-first kids))))
+; 	    (process-node-list (node-list-rest kids))
+; 	    (if affil
+; 		(literal (string-append " (" affil ")"))
+; 		(empty-sosofo)))))
+;   (element authorref
+;     (let* ((aut-id (attribute-string (normalize "id")))
+; 	   (aut-el (and aut-id
+; 			(element-with-id aut-id)))
+; 	   (note (attribute-string (normalize "note"))))
+;       (if (and (not (node-list-empty? aut-el))
+; 	       (string=? (gi aut-el) (normalize "author")))
+; 	  (make element gi: "li"
+; 		(make element gi: "a"
+; 		      attributes: (list (list "href"
+; 					      (string-append "#AUTHOR_"
+; 							     aut-id)))
+; 		      (make sequence
+; 			(with-mode routine-ref-get-reference
+; 			  (process-node-list aut-el))
+; 			(if note
+; 			    (literal (string-append " (" note ")"))
+; 			    (empty-sosofo)))))
+; 	  (error (string-append "ID " aut-id " is not an AUTHOR element")))))
   (element authornote
-    (process-children))
+    (make sequence
+      (literal "[ ")
+      (process-children)
+      (literal " ]")))
   (element otherauthors
     (make element gi: "li"
 	  (make element gi: "p"
@@ -374,6 +506,57 @@ $Id$
     (process-children))
   (element routinename
     (process-children)))
+
+(mode docblock
+  (element title			; ignore in this mode -- title
+					; is taken care of by
+					; $latex-section$ in element
+					; codecollection
+    (empty-sosofo))
+  (element description
+    (make sequence
+      (make element gi: "dt"
+	    (literal "Description"))
+      (make element gi: "dd"
+	    (process-children))))
+  (element userkeywords
+    (make sequence
+      (make element gi: "dt"
+	    (literal "User keywords"))
+      (make element gi: "dd"
+	    (process-children))))
+  (element softwarekeywords
+    (make sequence
+      (make element gi: "dt"
+	    (literal "Software category"))
+      (make element gi: "dd"
+	    (process-children))))
+  (element copyright
+    (make sequence
+      (make element gi: "dt"
+	    (literal "Copyright"))
+      (make element gi: "dd"
+	    (process-children))))
+  (element history
+    (empty-sosofo))
+  ;; Following works, it's just that I don't want to produce this output.
+;   (element history
+;     (make sequence
+;       (make empty-command name: "item"
+; 	    parameters: '("?History"))
+;       (make environment name: "description"
+; 	    (process-children))))
+;   (element change
+;     (let ((heading (string-append (attribute-string (normalize "date")
+; 						    (current-node))
+; 				  " by "
+; 				  (attribute-string (normalize "author")
+; 						    (current-node)))))
+;       (make sequence
+; 	(make empty-command name: "item"
+; 	      parameters: `(,(string-append "?" heading)))
+; 	(process-children))))
+  )
 
 ;(define (href-to-fragid-routine)
 ;  (let ((id (or (attribute-string (normalize "id"))
