@@ -23,6 +23,11 @@ interface IBGND
     prompt 'Radius'
     help 'Radius of circle in axis units'
   endparameter
+  parameter ISRC
+    type '_INTEGER'
+    prompt 'Source number'
+    help 'Source number to which operation will be applied'
+  endparameter
   parameter XCENT
     type '_REAL'
     vpath 'INTERNAL,NOPROMPT'
