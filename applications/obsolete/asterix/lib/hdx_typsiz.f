@@ -66,7 +66,8 @@
 
         ELSE
           STATUS = SAI__ERROR
-          CALL MSG_PRNT( '! Unrecognized type '//TYPE )
+          CALL MSG_SETC( 'T', TYPE )
+          CALL ERR_REP( ' ', 'Unrecognized type ^T', STATUS )
 
         END IF
 
