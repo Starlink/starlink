@@ -17,6 +17,7 @@
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *     18 Jan 1996 V2.0-0 (DJA):
 *        Updated USI routines
+*     22 Mar 99 : V2.2-1 Get rid of ADI
 *
 *    Type Definitions :
 *
@@ -40,7 +41,6 @@
 
       INTEGER 			DEFWIDTH                ! width of output
       INTEGER 			DIMS(DAT__MXDIM)        ! dimensions of object
-      INTEGER			FID(7)			! Input object ids
       INTEGER 			IOBJ                    ! index to object
       INTEGER LEN
       INTEGER			OCH			! Output channel id
@@ -56,7 +56,7 @@
 *    Version id :
 *
       CHARACTER*30       VERSION
-        PARAMETER        ( VERSION = 'HTAB Version 2.2-0' )
+        PARAMETER        ( VERSION = 'HTAB Version 2.2-1' )
 *-
 
 *    Version id
@@ -85,8 +85,7 @@
 
 *      Construct parameter and associate with object
         WRITE(INP,'(A3,I1)') 'INP', NOBJ+1
-        CALL USI_ASSOC( INP, '*', 'READ', FID(NOBJ+1), STATUS )
-        CALL ADI1_GETLOC( FID(NOBJ+1), LOC(NOBJ+1), STATUS )
+        CALL USI_DASSOC( INP, 'READ', LOC(NOBJ+1), STATUS )
         CALL DAT_PRIM( LOC(NOBJ+1), PRIM, STATUS )
 
 *      No more objects?

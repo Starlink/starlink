@@ -43,6 +43,7 @@
 *     24 Nov 94 : V1.8-0  Now use USI for user interface (DJA)
 *     18 Jan 1996 V2.0-0  (DJA): Use new USI routine
 *     15 May 1997 V2.1-0  Convert DOUBLE valus correctly (RB)
+*     22 Mar 99 : V2.2-1  Get rid of ADI (rjv)
 *
 *    Type Definitions :
 *
@@ -65,7 +66,6 @@
 *
       CHARACTER*(DAT__SZLOC) 	OBJLOC          ! Object to trace
 
-      INTEGER			OBJID		   	! Object identifier
 
       LOGICAL			FULL		! Full o/p of structure arrays?
 *
@@ -76,7 +76,7 @@
 *    Version id :
 *
       CHARACTER*30 		VERSION
-        PARAMETER    ( VERSION = 'HTRACE Version 2.2-0' )
+        PARAMETER    ( VERSION = 'HTRACE Version 2.2-1' )
 *-
 
 *    Version number
@@ -86,8 +86,7 @@
       CALL AST_INIT()
 
 *    Get parameter values
-      CALL USI_ASSOC( 'INP', '*', 'READ', OBJID, STATUS )
-      CALL ADI1_GETLOC( OBJID, OBJLOC, STATUS )
+      CALL USI_DASSOC( 'INP', 'READ', OBJLOC, STATUS )
 
 *    Get output channel
       CALL AIO_ASSOCO( 'DEV', 'LIST', OCH, OUTWIDTH, STATUS )

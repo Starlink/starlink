@@ -10,6 +10,7 @@
 *
 *      3 Jun 92 : Use ERR_ANNUL (BHVAD::DJA)
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
+*     22 Mar 99 : V2.2-1 Get rid of ADI (rjv)
 *
 *    type Definitions :
       IMPLICIT NONE
@@ -32,7 +33,6 @@
 	INTEGER IERR			! I/O error code
         INTEGER PTR
         INTEGER NVAL
-        INTEGER ID
 
         LOGICAL BINARY
         LOGICAL PRIM
@@ -45,8 +45,7 @@
       CALL AST_INIT()
 
 *    Obtain object name
-      CALL USI_ASSOC('INP','*','READ',ID,STATUS)
-      CALL ADI1_GETLOC(ID,LOC,STATUS)
+      CALL USI_DASSOC('INP','READ',LOC,STATUS)
 
 *    Obtain filename
       CALL USI_GET0C('FILE', FILNAM, status)

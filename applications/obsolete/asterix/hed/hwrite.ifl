@@ -2,7 +2,7 @@ INTERFACE HWRITE
 
    parameter INP
       position 1
-      type 'LITERAL'
+      type 'UNIV'
       ppath 'GLOBAL'
       association '<->GLOBAL.HDSOBJ'
       prompt 'Object name'
