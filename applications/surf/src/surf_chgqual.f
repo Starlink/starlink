@@ -123,6 +123,8 @@
       PARAMETER (MAX__DIM = 4)            ! array
       CHARACTER * 14   TSKNAME            ! Name of task
       PARAMETER (TSKNAME = 'CHANGE_QUALITY')
+      INTEGER          BITNUM             ! Bit affected by this task
+      PARAMETER (BITNUM = 3)
 
 *    Local variables :
       BYTE             BADBIT             ! NDF badbit mask
@@ -132,8 +134,7 @@
       INTEGER          BOL_S (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
                                           ! array containing 1 for bolometers
                                           ! selected in data-spec, 0 otherwise
-      INTEGER          CURLY              ! index of { in IN
-      CHARACTER*80     DATA_SPEC          ! data-spec part of IN
+      CHARACTER*80     DATA_SPEC(SCUBA__MAX_SECT) ! data-spec part of IN
       INTEGER          DIM (MAX__DIM)     ! dimensions of array
       INTEGER          EXP_S (SCUBA__MAX_EXP)   ! array containing 1 for
                                           ! exposures selected in
@@ -177,6 +178,7 @@
                                           ! observation
       INTEGER          N_POS              ! number of positions measured
                                           ! in observation
+      INTEGER          N_SPEC             ! Number of specifications
       CHARACTER*40     OBJECT             ! name of observed object
       CHARACTER*40     OBSERVING_MODE     ! observing mode of file
       LOGICAL          PHOTOM             ! .TRUE. if the PHOTOM
@@ -200,6 +202,7 @@
                                           ! array that has 1 for
                                           ! switches selected by
                                           ! data-spec, 0 otherwise
+      LOGICAL          USE_SECT           ! Am I using the section or not?
 *     Internal References :
 *     Local data :
 *     .
@@ -222,23 +225,9 @@
 
       CALL PAR_GET0C ('IN', IN, STATUS)
 
-      CURLY = INDEX (IN,'{')
-      IF (STATUS .EQ. SAI__OK) THEN
-         IF (CURLY .EQ. 0) THEN
-            STATUS = SAI__ERROR
-            CALL MSG_SETC ('TASK', TSKNAME)
-            CALL ERR_REP (' ', '^TASK: no data section specified',
-     :        STATUS)
-         ELSE IF (CURLY .EQ. 1) THEN
-            STATUS = SAI__ERROR
-            CALL MSG_SETC ('TASK', TSKNAME)
-            CALL ERR_REP (' ', '^TASK: no filename specified',
-     :        STATUS)
-         ELSE
-            FILE = IN (:CURLY-1)
-            DATA_SPEC = IN (CURLY:)
-         END IF
-      END IF
+*     Split up into filename and data spec
+      CALL SCULIB_SPLIT_FILE_SPEC(IN, SCUBA__MAX_SECT, FILE, N_SPEC,
+     :     DATA_SPEC, STATUS)
 
 *     open the data NDF
 
@@ -434,16 +423,9 @@
       CALL SCULIB_MALLOC (N_POS * VAL__NBI, POS_S_PTR, POS_S_END,
      :  STATUS)
 
-*     decode the data specification
+*     Do I want to change the section or the non-sections?
 
-      IF (STATUS .EQ. SAI__OK) THEN
-         SWITCH_EXPECTED = .FALSE.
-
-         CALL SCULIB_DECODE_SPEC (DATA_SPEC, %val(IN_DEM_PNTR_PTR),
-     :     1, N_EXPOSURES, N_INTEGRATIONS, N_MEASUREMENTS, N_POS,
-     :     N_BOLS, SWITCH_EXPECTED, POS_SELECTED, %val(POS_S_PTR),
-     :     SWITCH_S, EXP_S, INT_S, MEAS_S, BOL_S, STATUS)
-      END IF
+      CALL PAR_GET0L ('USE_SECTION', USE_SECT, STATUS)
 
 *     do we want to set quality bad or good
 
@@ -460,14 +442,30 @@
 *     modify the quality array
 
       CALL NDF_BB (IN_NDF, BADBIT, STATUS)
-      BADBIT = SCULIB_BITON (BADBIT, 3)
+      BADBIT = SCULIB_BITON (BADBIT, BITNUM)
       CALL NDF_SBB (BADBIT, IN_NDF, STATUS)
 
 *     and set quality for the selected bolometers and positions
 
       IF (STATUS .EQ. SAI__OK) THEN
-         CALL SCULIB_SET_QUAL (%val(IN_QUALITY_PTR), N_BOLS, N_POS,
-     :     N_BEAM, BOL_S, %val(POS_S_PTR), 3, BIT_VALUE, STATUS)
+
+*     decode each data specification
+
+         SWITCH_EXPECTED = .FALSE.
+
+         DO I = 1, N_SPEC
+
+            CALL SCULIB_DECODE_SPEC (DATA_SPEC(I), 
+     :           %val(IN_DEM_PNTR_PTR),
+     :           1, N_EXPOSURES, N_INTEGRATIONS, N_MEASUREMENTS, N_POS,
+     :           N_BOLS, SWITCH_EXPECTED, POS_SELECTED, %val(POS_S_PTR),
+     :           SWITCH_S, EXP_S, INT_S, MEAS_S, BOL_S, STATUS)
+            
+            CALL SCULIB_SET_QUAL (USE_SECT,%val(IN_QUALITY_PTR), N_BOLS,
+     :           N_POS, N_BEAM, BOL_S, %val(POS_S_PTR), BITNUM, 
+     :           BIT_VALUE, STATUS)
+
+         END DO
       END IF
 
 *     close file and tidy up
