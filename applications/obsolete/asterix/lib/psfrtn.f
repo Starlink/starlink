@@ -2437,7 +2437,6 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 
 *    Release from BDA
       IF ( ( STATUS .EQ. SAI__OK ) .AND. VALID ) THEN
-        CALL BDI_RELEASE( TFID, STATUS )
         CALL ADI_FCLOSE( TFID, STATUS )
       END IF
 

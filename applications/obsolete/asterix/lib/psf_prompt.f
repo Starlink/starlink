@@ -412,34 +412,31 @@
 *
 *    Local variables :
 *
-      CHARACTER*40              TEXT                    ! Axis label/text
-
       INTEGER                   APTR                    ! Axis pointer
-      INTEGER                   DIMS(ADI__MXDIM)        ! Spectrum dimensions
+      INTEGER                   NDIM, DIMS(1)        	! Spectrum dimensions
       INTEGER                   DPTR                    ! Data pointer
-      INTEGER                   NDIM                    ! Spectrum dimensionality
       INTEGER                   NSBIN                   ! # spectral bins
       INTEGER                   QPTR                    ! Quality pointer
       INTEGER			SFID			! Spectrum identifier
       INTEGER                  	WPTR                    ! Axis widths ptr
 
-      LOGICAL                   ANYBAD                  ! Bad quality points?
       LOGICAL                   OK                      ! Spectrum ok?
       LOGICAL                   QOK                     ! Spectrum quality ok?
 *-
 
-*    Check status
+*  Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Try to open file
-      CALL ADI_FOPEN( SPEC, '*', 'READ', SFID, STATUS )
+*  Try to open file
+      CALL ADI_FOPEN( SPEC, 'BinDS', 'READ', SFID, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
         CALL ERR_REP( ' ', 'Unable to open spectrum '//SPEC, STATUS )
         GOTO 99
       END IF
 
-*    Check dimensions and data
-      CALL BDI_CHKDATA( SFID, OK, NDIM, DIMS, STATUS )
+*  Check dimensions and data
+      CALL BDI_CHK( SFID, 'Data', OK, STATUS )
+      CALL BDI_GETSHP( SFID, 1, DIMS, NDIM, STATUS )
       IF ( .NOT. OK ) THEN
         STATUS = SAI__ERROR
         CALL MSG_SETC( 'SPEC', SPEC )
@@ -454,47 +451,30 @@
       END IF
       NSBIN = DIMS(1)
 
-*    Check axis is channels
-      CALL BDI_GETAXUNITS( SFID, 1, TEXT, STATUS )
-      IF ( INDEX(TEXT,'channel') .EQ. 0 ) THEN
-        CALL BDI_GETAXLABEL( SFID, 1, TEXT, STATUS )
-        CALL MSG_SETC( 'UN', TEXT )
-        IF ( INDEX(TEXT,'channel') .EQ. 0 ) THEN
-          CALL MSG_SETC( 'LAB', TEXT )
-          CALL MSG_PRNT( '! Unrecognised axis ^LAB with units ^UN,'/
-     :                               /' assuming channel spectrum' )
-        END IF
-      END IF
+*  Quality present?
+      CALL BDI_CHK( SFID, 'Quality', QOK, STATUS )
 
-*    Quality present?
-      CALL BDI_CHKQUAL( SFID, QOK, NDIM, DIMS, STATUS )
-
-*    Map input arrays
-      CALL BDI_MAPAXVAL( SFID, 'READ', 1, APTR, STATUS )
-      CALL BDI_MAPAXWID( SFID, 'READ', 1, WPTR, STATUS )
-      CALL BDI_MAPDATA( SFID, 'READ', DPTR, STATUS )
+*  Map input arrays
+      CALL BDI_AXMAPR( SFID, 1, 'Data', 'READ', APTR, STATUS )
+      CALL BDI_AXMAPR( SFID, 1, 'Width', 'READ', WPTR, STATUS )
+      CALL BDI_MAPR( SFID, 'Data', 'READ', DPTR, STATUS )
       IF ( QOK ) THEN
-        CALL BDI_MAPLQUAL( SFID, 'READ', ANYBAD, QPTR, STATUS )
-        IF ( .NOT. ANYBAD ) THEN
-          CALL BDI_UNMAPLQUAL( SFID, STATUS )
-          QOK = .FALSE.
-        END IF
+        CALL BDI_MAPL( SFID, 'LogicalQuality', 'READ', QPTR, STATUS )
       END IF
 
-*    Map space for channel bounds
+*  Map space for channel bounds
       EM_NBIN(SLOT) = NBIN
       CALL DYN_MAPI( 1, NBIN, EM_CBPTR(SLOT), STATUS )
 
-*    Determine model bin centres
+*  Determine model bin centres
       CALL PSF_PAR_ANSPEC_INT( NSBIN, %VAL(APTR), %VAL(WPTR),
      :                         %VAL(DPTR), QOK, %VAL(QPTR), NBIN,
      :                         %VAL(EM_CBPTR(SLOT)), STATUS )
 
-*    Close spectrum
-      CALL BDI_RELEASE( SFID, STATUS )
+*  Close spectrum
       CALL ADI_FCLOSE( SFID, STATUS )
 
-*    Tidy up
+*  Tidy up
  99   CONTINUE
 
       END
