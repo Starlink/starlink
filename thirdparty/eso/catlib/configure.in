@@ -12,8 +12,21 @@
 # Allan Brighton  27 Jul 98  Created
 # P. Biereichel   12/06/99   Adapted for VLT OCT99 release
 # -----------------------------------------------------------------------
+# Norman Gray     2004 March 26   brought into the Starlink build system
 
 AC_INIT(README)
+
+
+# Starlink additions
+PACKAGE=catlib
+PACKAGE_VERSION=3.7.4
+: ${STAR_MANIFEST_DIR='$(prefix)/manifests'}
+
+AC_SUBST(PACKAGE)
+AC_SUBST(PACKAGE_VERSION)
+AC_SUBST(STAR_MANIFEST_DIR)
+
+
 
 #--------------------------------------------------------------------
 #	run configure scripts in these subdirectories, if available
