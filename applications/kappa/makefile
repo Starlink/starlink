@@ -2251,7 +2251,9 @@ do_test:
 #
 	@ echo
 	KAPPA_DIR='$(INSTALL_BIN)';export KAPPA_DIR; \
-           $(INSTALL_BIN)/stardemo.tcl v$(PKG_VERS)
+           mkdir kappa-test; cd kappa-test; \
+           $(INSTALL_BIN)/stardemo.tcl v$(PKG_VERS); \
+           cd ..; rm -rf kappa-test 
 	@ echo
 #
 #  Note the test has been run.
