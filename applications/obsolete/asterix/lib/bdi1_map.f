@@ -333,7 +333,7 @@
 
 *  Check for single axis value
       IF ( NVAL .EQ. 1 ) THEN
-        WIDTH = 0.0
+        WIDTH(1) = 0.0
 
       ELSE
         DO I = 2, NVAL - 1
