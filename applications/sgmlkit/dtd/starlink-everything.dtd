@@ -6,9 +6,13 @@
   the General DTD.  Note that this is _not_ to be used for documents,
   as some of the features in the General DTD may be mutually
   exclusive.
+
+  Note also that this pub-id without version number is NOT present in
+  the default CATALOG (at least at present).  To use this DTD, you
+  might, therefore, need to provide a custom CATALOG file.
 -->
 <!entity % Feature.Everything 'include'>
 
 <!entity % Starlink.general
-	public "-//Starlink//DTD Starlink General 0.4//EN">
+	public "-//Starlink//DTD Starlink General//EN">
 %Starlink.general;
