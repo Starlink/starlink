@@ -202,6 +202,7 @@ if [ $TARGETFORMAT -eq 0 ]; then
     # Generate backmatter.  Don't fail if no .aux file was generated
     if [ -r "$ROOT.htmlbib.aux" ]; then
 	echo "Backmatter..."
+	# BSTINPUTS set here; require the user to do any setting of BIBINPUTS
 	BSTINPUTS=$LIBDIR $BIBTEX $ROOT.htmlbib
 	sed -f $LIBDIR/postprocess-bbl.sed $ROOT.htmlbib.bbl > t.bbl
 	mv t.bbl $ROOT.htmlbib.bbl
@@ -255,9 +256,8 @@ fi
 # generated material, which will have no path, and the second is the sysid as
 # declared in the entity, which may have a path.
 #
-# hlink gets confused by Jade's way of generating elements.  To help
-# it out, find lines in HTML files which end in `<a', and stitch the
-# start-tag into a single line.
+# hlink and showme/findme get confused by Jade's way of generating elements.
+# To help out, run the files through sgmlnorm.
 if [ -r MANIFEST ]; then
     #mv `awk 'NF==1 {print $1}' MANIFEST` $PACKAGEDIR
     for f in `awk 'NF==1 {print $1}' MANIFEST`; do
