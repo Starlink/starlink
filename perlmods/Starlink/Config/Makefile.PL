@@ -108,6 +108,12 @@ of perl modules based on Starlink libraries and allows
 for this information to be placed in a single place
 rather than in every single Starlink module.
 
+The locations of the relevant directories are set during build time.
+The location of the Starlink directory is determined using 
+environment variables: $STARLINK is used if present, else $INSTALL
+is used, else C</star> is tried. If none of these directories
+exists the build fails.
+
 When used, a hash is imported into the current namespace called
 C<%StarConfig>. This hash contains the following keys:
 
@@ -170,7 +176,6 @@ my (%localConfig);
 sub TIEHASH { bless \%localConfig; }
 
 sub FETCH {
-  print $_[0];
   $_[0]->{$_[1]};
 }
 
@@ -188,6 +193,7 @@ sub DESTROY { }
 foreach (<DATA>) {
   my ($key, $value) = split('\s*=>\s*');
   $value =~ s/\'//g;
+  chomp($value);
   $localConfig{$key} = $value if defined $key;
 }
 
