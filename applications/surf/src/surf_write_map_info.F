@@ -1,7 +1,6 @@
       SUBROUTINE REDS_WRITE_MAP_INFO( OUT_NDF, OUT_COORDS, OUT_TITLE,
      :     MJD_STANDARD, NFILE, FILENAME, OUT_LONG, OUT_LAT,
-     :     OUT_PIXEL, I_CENTRE, J_CENTRE, NX_OUT, NY_OUT, N_FITS,
-     :     FITS, STATUS )
+     :     OUT_PIXEL, I_CENTRE, J_CENTRE, NX_OUT, NY_OUT, STATUS)
 *+
 *  Name:
 *     REDS_WRITE_MAP_INFO
@@ -10,7 +9,10 @@
 *     Starlink Fortran 77
  
 *  Invocation:
-*     CALL REDS_WRITE_MAP_INFO( STATUS )
+*     CALL REDS_WRITE_MAP_INFO( OUT_NDF, OUT_COORDS, OUT_TITLE,
+*    :     MJD_STANDARD, NFILE, FILENAME, OUT_LONG, OUT_LAT,
+*    :     OUT_PIXEL, I_CENTRE, J_CENTRE, NX_OUT, NY_OUT,
+*    :     STATUS )
 
 *  Description:
 *     This routine writes Axis and FITS information to a rebinned
@@ -44,10 +46,6 @@
 *        Size of output map in X direction
 *     NY_OUT = INTEGER (Given)
 *        Size of output map in Y direction
-*     N_FITS = INTEGER (Given & Returned)
-*        Size of FITS array
-*     FITS  = CHAR*80 (N_FITS) (Given & Returned)
-*        FITS keywords
 *     STATUS = INTEGER (Given and Returned)
 *        The global status
 
@@ -59,6 +57,8 @@
 *  History:
 *     1997 April 08 (TIMJ)
 *        Extract from reds_wtfn_rebin.f
+*     1997 May 12 (TIMJ)
+*        Remove FITS from input arguments
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -89,10 +89,6 @@
       REAL             OUT_PIXEL
       CHARACTER * (*)  OUT_TITLE
 
-*  Arguments Given & Returned
-      CHARACTER * 80   FITS(N_FITS)
-      INTEGER          N_FITS
-
 *  Status
       INTEGER STATUS
 
@@ -106,6 +102,7 @@
       CHARACTER*12     DATEOBS  ! Date of map obs
       DOUBLE PRECISION DTEMP    ! Scratch double
       REAL             FITS_OUT_PIXEL  ! size of pixels in output map (degrees)
+      CHARACTER * 80   FITS(SCUBA__MAX_FITS) ! Output FITS array
       INTEGER          I        ! Counter
       INTEGER          ID       ! day of an input observation
       INTEGER          IM       ! month in which observation started
@@ -114,6 +111,7 @@
       INTEGER          IY       ! year in which input observation started
       INTEGER          NDIM     ! Number of dimensions in FITS array
       INTEGER          NP       ! size of P array in call to IRA_CREAT
+      INTEGER          N_FITS   ! Number of FITS entries
       DOUBLE PRECISION OBSRA    ! RA of output map (degrees)
       DOUBLE PRECISION OBSDEC   ! Dec of output map (degrees)
       INTEGER          OUT_A_PTR ! Pointer to output axis
@@ -181,7 +179,8 @@
 
 *     create the IRAS astrometry structure
 
-            IF (OUT_COORDS .NE. 'NA'.AND.OUT_COORDS.NE.'AZ') THEN
+            IF (OUT_COORDS .NE. 'NA'.AND.OUT_COORDS.NE.'AZ' .AND.
+     :           OUT_COORDS .NE. 'PL') THEN
 
                CALL IRA_INIT (STATUS)
 
@@ -242,12 +241,17 @@
 
             END IF
 
-*     Get telescope and instrument from FITS
+*     PLanet is special
 
-            CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
-     :           'INSTRUME', INSTRUMENT, STATUS)
-            CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
-     :           'TELESCOP', TELESCOPE, STATUS)
+            IF (OUT_COORDS  .EQ. 'PL') THEN
+                  CTYPE1 = 'RA---TAN'
+                  CTYPE2 = 'DEC--TAN'
+            END IF
+
+*     This is the SCUBA software so I know the instrument and telescope
+
+            INSTRUMENT = 'SCUBA'
+            TELESCOPE = 'JCMT-Hawaii'
 
 *     and write out the same information to a .MORE.FITS section
 
@@ -264,12 +268,13 @@
             END DO
 
             IF (OUT_COORDS.NE.'GA' .AND. OUT_COORDS.NE.'NA'
-     :           .AND.OUT_COORDS.NE.'AZ') THEN
+     :           .AND.OUT_COORDS.NE.'AZ' .AND. OUT_COORDS .NE.'PL') THEN
                CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
      :              'RADECSYS', RADECSYS, 'Frame of reference', STATUS)
             END IF
 
-            IF (OUT_COORDS.NE.'NA'.AND.OUT_COORDS.NE.'AZ') THEN
+            IF (OUT_COORDS.NE.'NA'.AND.OUT_COORDS.NE.'AZ' .AND.
+     :           OUT_COORDS .NE. 'PL') THEN
                CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
      :              'SYSTEM', SCS, 'sky coordinate system', STATUS)
                CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS, 
