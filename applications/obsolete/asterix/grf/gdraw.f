@@ -412,7 +412,7 @@
 
 *  if step-line need axis widths
         IF (STEP) THEN
-          CALL BDA_CHKAXWID_INT(ID,WOK,UNIF,NWID,STATUS)
+          CALL BDA_CHKAXWID_INT(ID,1,WOK,UNIF,NWID,STATUS)
           IF (WOK) THEN
             CALL BDA_MAPAXWID_INT(ID,'R',1,WPTR,STATUS)
             AWID=.FALSE.
