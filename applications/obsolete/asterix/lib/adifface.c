@@ -35,10 +35,10 @@
 *
 *      Structure handling :
 *
-*	adic_delcmp	- delete named structure component
-*	adic_loccmp	- locate named structure component
-*	adic_ncmp	- number of components in structure
-*	adic_indcmp	- locate structure component by number
+*	adi_delcmp	- delete named structure component
+*	adi_loccmp	- locate named structure component
+*	adi_ncmp	- number of components in structure
+*	adi_indcmp	- locate structure component by number
 *
 *      Reference count :
 *
@@ -342,6 +342,76 @@ F77_SUBROUTINE(adifn(indprp))( INTEGER(id), INTEGER(index), INTEGER(pid),
   _ERR_IN("ADI_INDPRP");
 
   adix_indprp( (ADIobj) *id, *index, (ADIobj *) pid, status );
+
+  _ERR_OUT;
+  }
+
+
+/* -------------------------------------------------------------------------
+ * Component handling
+ * -------------------------------------------------------------------------
+ */
+F77_SUBROUTINE(adifn(delcmp))( INTEGER(id), CHARACTER(cname), INTEGER(status)
+			       TRAIL(cname) )
+  {
+  GENPTR_INTEGER(id)
+  GENPTR_CHARACTER(cname)
+  GENPTR_INTEGER(status)
+
+  _chk_init_err; _chk_stat;
+
+  _ERR_IN("ADI_DELCMP");
+
+  adix_delcmp( (ADIobj) *id, cname, cname_length, status );
+
+  _ERR_OUT;
+  }
+
+F77_SUBROUTINE(adifn(loccmp))( INTEGER(id), CHARACTER(cname), INTEGER(cid),
+			       INTEGER(status) TRAIL(cname) )
+  {
+  GENPTR_INTEGER(id)
+  GENPTR_CHARACTER(cname)
+  GENPTR_INTEGER(cid)
+  GENPTR_INTEGER(status)
+
+  _chk_init_err; _chk_stat;
+
+  _ERR_IN("ADI_LOCCMP");
+
+  adix_loccmp( (ADIobj) *id, cname, cname_length, (ADIobj *) cid, status );
+
+  _ERR_OUT;
+  }
+
+F77_SUBROUTINE(adifn(ncmp))( INTEGER(id), INTEGER(ncmp), INTEGER(status) )
+  {
+  GENPTR_INTEGER(id)
+  GENPTR_INTEGER(ncmp)
+  GENPTR_INTEGER(status)
+
+  _chk_init_err; _chk_stat;
+
+  _ERR_IN("ADI_NCMP");
+
+  adix_ncmp( (ADIobj) *id, ncmp, status );
+
+  _ERR_OUT;
+  }
+
+F77_SUBROUTINE(adifn(indcmp))( INTEGER(id), INTEGER(index), INTEGER(cid),
+			       INTEGER(status) )
+  {
+  GENPTR_INTEGER(id)
+  GENPTR_INTEGER(index)
+  GENPTR_INTEGER(cid)
+  GENPTR_INTEGER(status)
+
+  _chk_init_err; _chk_stat;
+
+  _ERR_IN("ADI_INDCMP");
+
+  adix_indcmp( (ADIobj) *id, *index, (ADIobj *) cid, status );
 
   _ERR_OUT;
   }

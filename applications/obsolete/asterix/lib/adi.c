@@ -72,10 +72,10 @@
  *
  *    Bugs :
  *
- *     identifying_fea truncation of adidb
- *
  *    To be done :
  *
+ *     string slicing
+ *     string allocation using byte type?
  *     separate DOS/UNIX/Windows stream initialisation & error system
  *     buffer locdat info to speed up _there+_find pairs
  *     locrcb should report errors?
@@ -1594,12 +1594,7 @@ void adix_prnt_l( ADIobj stream, ADIobj id, ADIstatus status )
 
 void adix_prnt_c( ADIobj stream, ADIobj id, ADIstatus status )
   {
-  int   len = _str_len(id);
-  char *dat = _str_dat(id);
-
-/*  ADIstrmPutCh( stream, '"', status ); */
   ADIstrmPrintf( stream, "%S", status, id );
-/*  ADIstrmPutCh( stream, '"', status ); */
   }
 
 void adix_prnt_p( ADIobj stream, ADIobj id, ADIstatus status )
@@ -1622,14 +1617,10 @@ void adix_prnt_struc( ADIobj stream, ADIobj id, ADIstatus status )
   while ( _valid_q(sid) ) {
     ADIobj	scar = _CAR(sid);
 
-    ADIstrmPrintf( stream, "%S =", status, _CAR(scar) );
-    adix_print( stream, _CDR(scar), 1, ADI__true, status );
     sid = _CDR(sid);
-    if ( _valid_q(sid) )
-      ADIstrmPutStr( stream, ", ", 2, status );
+    ADIstrmPrintf( stream, "%S = %O%s", status, _CAR(scar),
+		   _CDR(scar), _valid_q(sid) ? ", " : "}" );
     }
-
-  ADIstrmPutCh( stream, '}', status );
   }
 
 
@@ -4058,10 +4049,10 @@ void adix_print( ADIobj stream, ADIobj id, int level, ADIlogical value_only,
       ADIobj curp = _han_pl(id);
       ADIstrmPutStr( stream, ", props = {", _CSM, status );
       do {
-        ADIobj	car = _CAR(curp);
+	ADIobj	car = _CAR(curp);
 	curp = _CDR(curp);
 	ADIstrmPrintf( stream, "%S = %O%c", status, _CAR(car), _CDR(car),
-                       _null_q(curp) ? '}' : ',' );
+		       _null_q(curp) ? '}' : ',' );
 	}
       while ( _valid_q(curp) && _ok(status) );
       }
@@ -4087,11 +4078,9 @@ void adix_print( ADIobj stream, ADIobj id, int level, ADIlogical value_only,
       else {
 	ADIstrmPutStr( stream, ", superclasses {", _CSM, status );
 	for( ; _valid_q(cpar); cpar = _pdef_next(cpar) ) {
-	  adix_print( stream, _pdef_name(cpar), level+1, ADI__true, status );
-	  if ( _valid_q(cpar) )
-	    ADIstrmPutCh( stream, ' ', status );
+	  ADIstrmPrintf( stream, "%S%c", status, _pdef_name(cpar),
+			 _valid_q(cpar) ? ' ' : '}' );
 	  }
-	ADIstrmPutCh( stream, '}', status );
 	}
       ADIstrmPrintf( stream, ",\n", status );
 
@@ -4103,10 +4092,8 @@ void adix_print( ADIobj stream, ADIobj id, int level, ADIlogical value_only,
 	ADIstrmPutStrI( stream, _mdef_aname(cmem), status );
 	if ( imem == tdef->defmem )
 	  ADIstrmPutCh( stream, '*', status );
-	if ( _valid_q(_mdef_cdata(cmem) )) {
-	  ADIstrmPutStr( stream, " = ", _CSM, status );
-	  adix_print( stream, _mdef_cdata(cmem), level+1, ADI__true, status );
-	  }
+	if ( _valid_q(_mdef_cdata(cmem) ))
+	  ADIstrmPrintf( stream, " = %O", status, _mdef_cdata(cmem) );
 	ADIstrmPrintf( stream, "\n", status );
 	}
       }
@@ -4134,17 +4121,17 @@ void adix_print( ADIobj stream, ADIobj id, int level, ADIlogical value_only,
       ADIstrmPrintf( stream, "<%s %d:%d", status, tdef->name,
 	    _ID_IBLK(id), _ID_SLOT(id) );
       if ( _eprc_q(id) ) {
-        ADIstrmPrintf( stream, ", lang=%c, addr=%p>", status,
-                       _eprc_c(id) ? 'C' : 'F', _eprc_prc(id) );
-        }
+	ADIstrmPrintf( stream, ", lang=%s, addr=%p>", status,
+		       _eprc_c(id) ? "C" : "Fortran", _eprc_prc(id) );
+	}
       else if ( _mthd_q(id) ) {
-        ADIstrmPrintf( stream, "\n   name = %O\n", status, _mthd_name(id) );
-        ADIstrmPrintf( stream, "   args = %O\n", status, _mthd_args(id) );
-        ADIstrmPrintf( stream, "   form = %O\n", status, _mthd_form(id) );
-        ADIstrmPrintf( stream, "   exec = %O\n   >", status, _mthd_exec(id) );
-        }
+	ADIstrmPrintf( stream,
+		"\n   name = %O\n   args = %O\n   form = %O\n   exec = %O\n   >",
+		status, _mthd_name(id), _mthd_args(id), _mthd_form(id),
+		_mthd_exec(id) );
+	}
       else
-        ADIstrmPutCh( stream, '>', status );
+	ADIstrmPutCh( stream, '>', status );
       }
     value_only = ADI__true;
     }
