@@ -142,6 +142,9 @@
 *  Status:
       INTEGER STATUS
 
+*  External References:
+      INTEGER VAL_<T>TOI
+
 *  Local Constants:
       DOUBLE PRECISION FILLIM  ! Minimum fraction of fill histogram
       PARAMETER( FILLIM = 0.04D0 ) ! bins to avoid iteration
