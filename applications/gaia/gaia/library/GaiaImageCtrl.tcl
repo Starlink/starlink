@@ -426,6 +426,9 @@ itcl::class gaia::GaiaImageCtrl {
 
       #  Set the default for CAR projections.
       set_linear_cartesian_
+
+      #  Set the default for merging headers.
+      set_always_merge_
    }
 
    #  Set the precision used to display RA/Dec coordinates. By default
@@ -445,6 +448,15 @@ itcl::class gaia::GaiaImageCtrl {
       if { $image_ != {} } {
          catch {
             $image_ astcarlin $itk_option(-linear_cartesian)
+         }
+      }
+   }
+
+   #  Set the default for merging headers.
+   protected method set_always_merge_ {} {
+      if { $image_ != {} } {
+         catch {
+            $image_ astalwaysmerge $itk_option(-always_merge)
          }
       }
    }
@@ -663,10 +675,10 @@ itcl::class gaia::GaiaImageCtrl {
       }
    }
 
-   # Check if the given filename is in the history catalog, and if so, 
+   # Check if the given filename is in the history catalog, and if so,
    # apply the cut levels and color settings for the file. Overriden
    # so that we can apply a default cut by usingh GaiaSearch instead of
-   # SkySearch. 
+   # SkySearch.
    public method apply_history {filename} {
       gaia::GaiaSearch::apply_history $this $filename $itk_option(-default_cut)
    }
@@ -1006,10 +1018,14 @@ itcl::class gaia::GaiaImageCtrl {
       }
 
    #  Whether CAR projections should be interpreted as a linear mapping.
-   itk_option define -linear_cartesian linear_cartesian \
-      Linear_Cartesian 1 {
-         set_linear_cartesian_
-      }
+   itk_option define -linear_cartesian linear_cartesian Linear_Cartesian 1 {
+      set_linear_cartesian_
+   }
+
+   #  How to merge FITS headers from primary and extension images.
+   itk_option define -always_merge always_merge Always_Merge 0 {
+      set_always_merge_
+   }
 
    #  Default percentage cut applied when displaying images for the
    #  first time (or when not in history).

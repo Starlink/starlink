@@ -20,6 +20,7 @@
  *                 14/08/00  Added getReadonly member so that assumed
  *                           access mode can be determined.
  *                 16/08/00  Added write and mergeHeader members.
+ *                 16/02/04  Added alwaysMerge_ member.
  */
 
 #include "FitsIO.h"
@@ -64,14 +65,27 @@ public:
     // header and data.
     static StarFitsIO* initialize(Mem& header, Mem& data);
     
-    //  Return if the data and header are mapped with readonly access.
+    // Return if the data and header are mapped with readonly access.
     int getReadonly();
 
-    //  Merge the primary and extension FITS headers.
+    // Merge the primary and extension FITS headers.
     void mergeHeader();
 
-    //  Write a FITS image to disk.
+    // Write a FITS image to disk.
     int write( const char *filename );
+
+    // Set whether to always merge headers or not.
+    static void setAlwaysMerge( int value ) { alwaysMerge_ = value; }
+
+    // Get whether to always merge headers or not.
+    static int getAlwaysMerge() { return alwaysMerge_; }
+
+protected:
+    // Whether to merge headers or not.
+    static int alwaysMerge_;
+
+    // Whether a header merge is needed, given the current settings.
+    int mergeNeeded();
 };
 
 #endif _StarFitsIO_h_

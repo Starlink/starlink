@@ -196,6 +196,7 @@ itcl::class gaia::GaiaStartup {
       set values_($this,default_cmap) real
       set values_($this,default_itt) ramp
       set values_($this,linear_cartesian) 1
+      set values_($this,always_merge) 0
    }
 
    #  Update the properties object to the local values and cause a
@@ -206,7 +207,7 @@ itcl::class gaia::GaiaStartup {
                    focus_follows_mouse scrollbars transient_tools \
                    quiet_exit min_scale max_scale zoom_factor \
                    default_cut default_cmap default_itt \
-                   linear_cartesian" {
+                   linear_cartesian always_merge" {
          $props_ set_named_property Gaia $key $values_($this,$key)
       }
       $props_ save_properties
@@ -224,6 +225,8 @@ itcl::class gaia::GaiaStartup {
             $values_($this,default_cut)
          $itk_option(-image) configure -linear_cartesian \
             $values_($this,linear_cartesian)
+         $itk_option(-image) configure -always_merge \
+            $values_($this,always_merge)
       }
       if { $itk_option(-gaia) != {} } {
          $itk_option(-gaia) configure -transient_tools \
@@ -374,6 +377,18 @@ itcl::class gaia::GaiaStartup {
       add_short_help $itk_component(hduchooser) \
          {Show the HDU chooser, by default, when loading multiextension images}
       pack $itk_component(hduchooser) -side top -fill x
+
+      #  How to merge MEF headers.
+      itk_component add alwaysmerge {
+         StarLabelCheck $w_.alwaysmerge \
+            -text "Always merge MEF headers:" \
+            -onvalue 1 -offvalue 0 \
+            -labelwidth $lwidth \
+            -variable [scope values_($this,always_merge)]
+      }
+      add_short_help $itk_component(alwaysmerge) \
+         {Always merge primary into extension headers for full WCS}
+      pack $itk_component(alwaysmerge) -side top -fill x
 
       #  Minimum zoom scale.
       itk_component add minscale {

@@ -26,6 +26,9 @@
  *                 16/08/00  Changed extension header merging to be more
  *                           correct. Added write member to added a
  *                           merged set of headers to any new files.
+ *                 16/02/04  Changed merging of headers to be optional and
+ *                           also to only be done if the primary HDU contains
+ *                           a dummy image.
  */
 static const char* const rcsId="@(#) $Id$";
 
@@ -42,6 +45,9 @@ static const char* const rcsId="@(#) $Id$";
 #include "Mem.h"
 #include "StarWCS.h"
 #include "StarFitsIO.h"
+
+// Initialize static members.
+int StarFitsIO::alwaysMerge_ = 0;
 
 enum {FITSBLOCK=2880};
 
@@ -219,19 +225,55 @@ int StarFitsIO::getReadonly() {
  */
 int StarFitsIO::wcsinit()
 {
-   //   If there are multiple HDUs, merge the primary header with
-   //   the extension header to get all of the WCS info.
-   if ( getNumHDUs() > 1 && getHDUNum() != 1 ) {
-      mergeHeader();
-      wcs_ = WCS( new StarWCS( (const char *)mergedHeader_.ptr(),
-                               mergedHeader_.size() ) );
-      return wcs_.status();
-   }
-   wcs_ = WCS( new StarWCS( (const char *)header_.ptr(), header_.size() ) );
-   return wcs_.status();
+    //   If there are multiple HDUs, merge the primary header with
+    //   the extension header to get all of the WCS info.
+    if ( mergeNeeded() ) {
+        mergeHeader();
+        wcs_ = WCS( new StarWCS( (const char *)mergedHeader_.ptr(),
+                                 mergedHeader_.size() ) );
+        return wcs_.status();
+    }
+    wcs_ = WCS( new StarWCS( (const char *)header_.ptr(), header_.size() ) );
+    return wcs_.status();
 }
 
-/*  
+/**
+ * Determine if we need to merge the header with those from the primary HDU or
+ * not. If the alwaysMerge_ member is set true, then we always merge,
+ * otherwise we only merge if the primary HDU contains a dummy image.
+ */
+int StarFitsIO::mergeNeeded()
+{
+    // Don't need to do anything for the primary HDU
+    if ( getNumHDUs() == 1 || getHDUNum() == 1 ) {
+        return 0;
+    }
+
+    int result = alwaysMerge_;
+    if ( !result ) {
+        //  Need to check the primary image size... Don't want to modify the
+        //  current HDU so need to do this the hard way?
+        int ncards = primaryHeader_.length() / 80;
+        char *ptr = (char *) primaryHeader_.ptr();
+        char *subptr = NULL;
+        int naxis = 0;
+        for ( int i = 0 ; i < ncards; i++, ptr += 80 ) {
+            if ( strncmp( ptr, "NAXIS ", 6 ) == 0 ) {
+                subptr = strstr( ptr, "=" );
+                if ( subptr != NULL ) {
+                    sscanf( ++subptr, "%d", &naxis );
+                }
+                break;
+            }
+        }
+        if ( naxis == 0 ) {
+            result = 1;
+        }
+    }
+    return result;
+}
+
+/*
  *  Merge the current primary and extension header into a single
  *  header. The merge is done by taking the extension header and
  *  adding the any primary items that are not already present.
@@ -249,7 +291,7 @@ void StarFitsIO::mergeHeader()
 
     //  Copy the extension header into place. Replacing the first card
     //  which should be XTENSION='IMAGE', with SIMPLE = T.
-    sprintf( newheader, "%-80s", 
+    sprintf( newheader, "%-80s",
              "SIMPLE  =                    T / Fits standard" );
     strncpy( newheader + 80, (char *)header_.ptr() + 80, elength - 80 );
 
@@ -277,17 +319,19 @@ void StarFitsIO::mergeHeader()
 
         //  Special cards are always added to the end. Note END card
         //  is always copied from primary headers.
-        if ( strncmp( extraPtr, "END     ", 8 ) == 0 ) { 
+        if ( strncmp( extraPtr, "END     ", 8 ) == 0 ) {
             skip = 0;
             i = extracards;  // Time to stop
-        } else if ( strncmp( extraPtr, "COMMENT ", 8 ) == 0 ||
+        }
+        else if ( strncmp( extraPtr, "COMMENT ", 8 ) == 0 ||
                     strncmp( extraPtr, "HISTORY ", 8 ) == 0 ||
                     strncmp( extraPtr, "        ", 8 ) == 0 ) {
             skip = 0;
-        } else {
+        }
+        else {
 
             //  Need to check for an existing keyword and skip
-            //  position if found. 
+            //  position if found.
             skip = 0;
             char *mainPtr = (char *) newheader;
             for ( int j = 0; j < fixedcards; j++, mainPtr += 80 ) {
@@ -298,7 +342,7 @@ void StarFitsIO::mergeHeader()
             }
         }
         if ( ! skip ) {
-            
+
             //  Keyword not seen or special, so append this.
             strncpy( endPtr, extraPtr, 80 );
             endPtr += 80;
@@ -350,10 +394,10 @@ int StarFitsIO::write( const char *filename )
     int header_length = header_.length();
     if ( header_length > 0 ) {
        char *nextrec = (char *)header_.ptr();
-       if ( getNumHDUs() > 1 && getHDUNum() != 1 ) {
+       if ( mergeNeeded() ) {
 
-           //  Need to save the merged version of the headers.
-           //  Always re-merge at this point so that changes to the primary header
+           //  Need to save the merged version of the headers.  Always
+           //  re-merge at this point so that changes to the primary header
            //  are seen on output (this may contain a new WCS).
            mergeHeader();
            header_length = mergedHeader_.length();

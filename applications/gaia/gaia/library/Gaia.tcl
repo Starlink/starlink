@@ -128,8 +128,9 @@ set gaia_usage {
 Usage: gaia ?NDF/fitsFile? ?-option value ...?
 
 Options:
- -cat <bool>              - Include ESO/Archive catalog extensions (default).
- -catalog  "<c1> <c2> .." - Open windows for the given catalogs on startup.
+ -always_merge <bool>     - always merge primary & extension headers (MEFs).
+ -cat <bool>              - include ESO/Archive catalog extensions (default).
+ -catalog  "<c1> <c2> .." - open windows for the given catalogs on startup.
  -colorramp_height <n>    - height of colorramp window (default: 12).
  -component <component>   - NDF component to display (one of: data, variance)
  -debug <bool>            - debug flag: run bg processes in fg.
@@ -138,27 +139,27 @@ Options:
  -extended_precision      - show extra readout precision (default: 0).
  -file <file>             - image file to load.
  -float_panel <bool>      - put info panel in a popup window (default: 0).
- -focus_follows_mouse <bool> - entry focus follows mouse (default: 0)
- -linear_cartesian <bool> - assuming CAR projections are a linear mapping (default: 1)
+ -focus_follows_mouse <bool> - entry focus follows mouse (default: 0).
+ -linear_cartesian <bool> - assuming CAR projections are a linear mapping (default: 1).
  -max_scale <n>           - maximum scale for magnification menu (default: 20).
  -min_scale <n>           - minimum scale for magnification menu (default: -10).
  -panel_layout <layout>   - panel layout, one of: "saoimage", "reverse" or "default" .
  -pickobjectorient <v>    - orientation for pick object win: "horizontal", "vertical"
- -port <port>             - Listen for remote cmds on port (default: 0 = choose port).
- -remote <bool>           - Use existing skycat process, if available, with Tk send.
- -rtd <bool>              - Include ESO/VLT Real-Time Features.
- -scrollbars <bool>       - Display scrollbars (not displayed by default).
- -shm_data <bool>         - Put image data in sysV shared memory.
- -shm_header <bool>       - Put image header in sysV shared memory.
- -use_zoom_view <bool>    - Use a "view" of the image for the zoom window (default).
- -usexshm <bool>          - Use X shared mem, if available (default).
- -verbose <bool>          - Print diagnostic messages.
- -with_colorramp <bool>   - Display the color bar (default).
- -with_pan_window <bool>  - Display the pan window (default).
- -with_warp <bool>        - add bindings to move mouse ptr with arrow keys (default: 1).
- -with_zoom_window <bool> - Display the zoom window (default).
- -ukirt_ql <bool>         - Show UKIRT Quick Look Facilities (default: 0).
+ -port <port>             - listen for remote cmds on port (default: 0 = choose port).
+ -remote <bool>           - use existing skycat process, if available, with Tk send.
+ -rtd <bool>              - include ESO/VLT Real-Time Features.
+ -scrollbars <bool>       - display scrollbars (not displayed by default).
+ -shm_data <bool>         - put image data in sysV shared memory.
+ -shm_header <bool>       - put image header in sysV shared memory.
+ -ukirt_ql <bool>         - show UKIRT Quick Look Facilities (default: 0).
+ -use_zoom_view <bool>    - use a "view" of the image for the zoom window (default).
+ -usexshm <bool>          - use X shared mem, if available (default).
+ -verbose <bool>          - print diagnostic messages.
  -visual <visual_id>      - X visual to use (pseudocolor, truecolor, visual id...)
+ -with_colorramp <bool>   - display the color bar (default).
+ -with_pan_window <bool>  - display the pan window (default).
+ -with_warp <bool>        - add bindings to move mouse ptr with arrow keys (default: 1).
+ -with_zoom_window <bool> - display the zoom window (default).
  -zoom_factor <n>         - zooming factor (default: 4).
 }
 
@@ -419,6 +420,7 @@ itcl::class gaia::Gaia {
             -appname $appname_ \
             -extended_precision $itk_option(-extended_precision) \
             -linear_cartesian $itk_option(-linear_cartesian) \
+            -always_merge $itk_option(-always_merge) \
             -show_hdu_chooser $itk_option(-show_hdu_chooser) \
             -default_cut $itk_option(-default_cut)
       }
@@ -1765,6 +1767,9 @@ window gives you access to this."
 
    #  Whether CAR projections should be interpreted as a linear mapping.
    itk_option define -linear_cartesian linear_cartesian Linear_Cartesian 1
+
+   #  Whether primary headers should always be merged with extension.
+   itk_option define -always_merge always_merge Always_Merge 0
 
    #  Whether to attempt to show and control the HDU chooser. If 0
    #  then control is only attempted when the HDU already exists.

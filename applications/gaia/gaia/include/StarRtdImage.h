@@ -45,6 +45,8 @@
 //       The quick look is off by default.
 //    22-JAN-2003 (PWD):
 //       Added astmilliCmd to switch on milli-arcsec resolution.
+//    16-FEB-2004 (PWD):
+//       Added astalwaysmergeCmd.
 //
 //-
 
@@ -270,6 +272,9 @@ class StarRtdImage : public Skycat {
    
    //  Set the CarLin attribute of FITS channels.
    int astcarlinCmd( int argc, char *argv[] );
+
+   //  Set the always merge attribute.
+   int astalwaysmergeCmd( int argc, char *argv[] );
 
  protected:
 

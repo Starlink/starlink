@@ -163,6 +163,9 @@
 //     19-DEC-2003 (PWD):
 //        Added astcarlin command. Controls the CarLin attribute
 //        used when reading a FITS channel.
+//     16-FEB-2004 (PWD):
+//        Added astalwaysmerge command. Controls whether primary headers are
+//        merged with extension before looking for a WCS.
 //-
 
 #include <string.h>
@@ -226,55 +229,56 @@ public:
     int min_args;                                      // Min number of args
     int max_args;                                      // Max number of args
 } subcmds_[] = {
-    { "astassign",     &StarRtdImage::astassignCmd,    7, 7 },
-    { "astaddcolour",  &StarRtdImage::astaddcolourCmd, 2, 2 },
-    { "astbootstats",  &StarRtdImage::astbootstatsCmd, 4, 4 },
-    { "astcarlin",     &StarRtdImage::astcarlinCmd,    1, 1 },
-    { "astcelestial",  &StarRtdImage::astcelestialCmd, 0, 0 },
-    { "astcopy",       &StarRtdImage::astcopyCmd,      1, 1 },
-    { "astcreate",     &StarRtdImage::astcreateCmd,    0, 0 },
-    { "astcur2pix",    &StarRtdImage::astcur2pixCmd,   2, 3 },
-    { "astdelete",     &StarRtdImage::astdeleteCmd,    1, 1 },
-    { "astdomains",    &StarRtdImage::astdomainsCmd,   0, 0 },
-    { "astfix",        &StarRtdImage::astfixCmd,       0, 0 },
-    { "astget",        &StarRtdImage::astgetCmd,       1, 1 },
-    { "astpix2cur",    &StarRtdImage::astpix2curCmd,   2, 2 },
-    { "astpix2wcs",    &StarRtdImage::astpix2wcsCmd,   2, 3 },
-    { "astread",       &StarRtdImage::astreadCmd,      1, 1 },
-    { "astrefine",     &StarRtdImage::astrefineCmd,    4, 4 },
-    { "astreplace",    &StarRtdImage::astreplaceCmd,   0, 0 },
-    { "astreset",      &StarRtdImage::astresetCmd,     1, 1 },
-    { "astfontresize", &StarRtdImage::astfontresizeCmd,1, 1 },
-    { "astrestore",    &StarRtdImage::astrestoreCmd,   0, 1 },
-    { "astset",        &StarRtdImage::astsetCmd,       2, 2 },
-    { "aststore",      &StarRtdImage::aststoreCmd,     2, 4 },
-    { "astsystem",     &StarRtdImage::astsystemCmd,    2, 3 },
-    { "asttran2",      &StarRtdImage::asttran2Cmd,     2, 2 },
-    { "astwarnings",   &StarRtdImage::astwarningsCmd,  0, 0 },
-    { "astwcs2pix",    &StarRtdImage::astwcs2pixCmd,   2, 2 },
-    { "astwrite",      &StarRtdImage::astwriteCmd,     1, 3 },
-    { "astmilli",      &StarRtdImage::astmilliCmd,     1, 1 },
-    { "blankcolor",    &StarRtdImage::blankcolorCmd,   1, 1 },
-    { "colorramp",     &StarRtdImage::colorrampCmd,    0, 2 },
-    { "contour",       &StarRtdImage::contourCmd,      1, 6 },
-    { "dump",          &StarRtdImage::dumpCmd,         1, 2 },
-    { "foreign",       &StarRtdImage::foreignCmd,      2, 2 },
-    { "fullname",      &StarRtdImage::fullNameCmd,     0, 0 },
-    { "gband",         &StarRtdImage::gbandCmd,        6, 6 },
-    { "globalstats",   &StarRtdImage::globalstatsCmd,  2, 2 },
-    { "hdu",           &StarRtdImage::hduCmd,          0, 6 },
-    { "isfits",        &StarRtdImage::isfitsCmd,       0, 0 },
-    { "origin",        &StarRtdImage::originCmd,       2, 2 },
-    { "percentiles",   &StarRtdImage::percentCmd,      1, 1 },
-    { "plotgrid",      &StarRtdImage::plotgridCmd,     0, 2 },
-    { "readonly",      &StarRtdImage::readonlyCmd,     0, 1 },
-    { "remote",        &StarRtdImage::remoteCmd,       0, 1 },
-    { "remotetcl",     &StarRtdImage::remoteTclCmd,    1,  1},
-    { "slice",         &StarRtdImage::sliceCmd,       11, 11},
-    { "slalib",        &StarRtdImage::slalibCmd,       1, 10},
-    { "urlget",        &StarRtdImage::urlgetCmd,       1, 1 },
-    { "usingxshm",     &StarRtdImage::usingxshmCmd,    0, 0 },
-    { "xyprofile",     &StarRtdImage::xyProfileCmd,   14, 14}
+    { "astaddcolour",  &StarRtdImage::astaddcolourCmd,  2, 2 },
+    { "astalwaysmerge",&StarRtdImage::astalwaysmergeCmd,1, 1 },
+    { "astassign",     &StarRtdImage::astassignCmd,     7, 7 },
+    { "astbootstats",  &StarRtdImage::astbootstatsCmd,  4, 4 },
+    { "astcarlin",     &StarRtdImage::astcarlinCmd,     1, 1 },
+    { "astcelestial",  &StarRtdImage::astcelestialCmd,  0, 0 },
+    { "astcopy",       &StarRtdImage::astcopyCmd,       1, 1 },
+    { "astcreate",     &StarRtdImage::astcreateCmd,     0, 0 },
+    { "astcur2pix",    &StarRtdImage::astcur2pixCmd,    2, 3 },
+    { "astdelete",     &StarRtdImage::astdeleteCmd,     1, 1 },
+    { "astdomains",    &StarRtdImage::astdomainsCmd,    0, 0 },
+    { "astfix",        &StarRtdImage::astfixCmd,        0, 0 },
+    { "astfontresize", &StarRtdImage::astfontresizeCmd, 1, 1 },
+    { "astget",        &StarRtdImage::astgetCmd,        1, 1 },
+    { "astmilli",      &StarRtdImage::astmilliCmd,      1, 1 },
+    { "astpix2cur",    &StarRtdImage::astpix2curCmd,    2, 2 },
+    { "astpix2wcs",    &StarRtdImage::astpix2wcsCmd,    2, 3 },
+    { "astread",       &StarRtdImage::astreadCmd,       1, 1 },
+    { "astrefine",     &StarRtdImage::astrefineCmd,     4, 4 },
+    { "astreplace",    &StarRtdImage::astreplaceCmd,    0, 0 },
+    { "astreset",      &StarRtdImage::astresetCmd,      1, 1 },
+    { "astrestore",    &StarRtdImage::astrestoreCmd,    0, 1 },
+    { "astset",        &StarRtdImage::astsetCmd,        2, 2 },
+    { "aststore",      &StarRtdImage::aststoreCmd,      2, 4 },
+    { "astsystem",     &StarRtdImage::astsystemCmd,     2, 3 },
+    { "asttran2",      &StarRtdImage::asttran2Cmd,      2, 2 },
+    { "astwarnings",   &StarRtdImage::astwarningsCmd,   0, 0 },
+    { "astwcs2pix",    &StarRtdImage::astwcs2pixCmd,    2, 2 },
+    { "astwrite",      &StarRtdImage::astwriteCmd,      1, 3 },
+    { "blankcolor",    &StarRtdImage::blankcolorCmd,    1, 1 },
+    { "colorramp",     &StarRtdImage::colorrampCmd,     0, 2 },
+    { "contour",       &StarRtdImage::contourCmd,       1, 6 },
+    { "dump",          &StarRtdImage::dumpCmd,          1, 2 },
+    { "foreign",       &StarRtdImage::foreignCmd,       2, 2 },
+    { "fullname",      &StarRtdImage::fullNameCmd,      0, 0 },
+    { "gband",         &StarRtdImage::gbandCmd,         6, 6 },
+    { "globalstats",   &StarRtdImage::globalstatsCmd,   2, 2 },
+    { "hdu",           &StarRtdImage::hduCmd,           0, 6 },
+    { "isfits",        &StarRtdImage::isfitsCmd,        0, 0 },
+    { "origin",        &StarRtdImage::originCmd,        2, 2 },
+    { "percentiles",   &StarRtdImage::percentCmd,       1, 1 },
+    { "plotgrid",      &StarRtdImage::plotgridCmd,      0, 2 },
+    { "readonly",      &StarRtdImage::readonlyCmd,      0, 1 },
+    { "remote",        &StarRtdImage::remoteCmd,        0, 1 },
+    { "remotetcl",     &StarRtdImage::remoteTclCmd,     1,  1},
+    { "slalib",        &StarRtdImage::slalibCmd,        1, 10},
+    { "slice",         &StarRtdImage::sliceCmd,        11, 11},
+    { "urlget",        &StarRtdImage::urlgetCmd,        1, 1 },
+    { "usingxshm",     &StarRtdImage::usingxshmCmd,     0, 0 },
+    { "xyprofile",     &StarRtdImage::xyProfileCmd,    14, 14}
 };
 
 //+
@@ -5978,6 +5982,28 @@ int StarRtdImage::astcarlinCmd( int argc, char *argv[] )
     }
     else {
         StarWCS::setCarLin( 1 );
+    }
+    return TCL_OK;
+}
+
+//+
+//   StarRtdImage::astalwaysmergeCmd
+//
+//   Purpose:
+//      Set whether extension headers cards should be merge with 
+//      the ones from the primary HDU. True always merges the headers, 
+//      but false is just a suggestion.
+//-
+int StarRtdImage::astalwaysmergeCmd( int argc, char *argv[] )
+{
+#ifdef _DEBUG_
+    cout << "Called StarRtdImage::astalwaysmergeCmd" << endl;
+#endif
+    if ( *argv[0] == '0' ) {
+        StarFitsIO::setAlwaysMerge( 0 );
+    }
+    else {
+        StarFitsIO::setAlwaysMerge( 1 );
     }
     return TCL_OK;
 }
