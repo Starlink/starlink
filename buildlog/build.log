@@ -186,7 +186,7 @@ check_packages:
 
 build:
     [mkdir] Created dir: /apps/cvsbuild/java/source/table/build/classes
-    [javac] Compiling 112 source files to /apps/cvsbuild/java/source/table/build/classes
+    [javac] Compiling 115 source files to /apps/cvsbuild/java/source/table/build/classes
      [copy] Copying 2 files to /apps/cvsbuild/java/source/table/build/classes
     [mkdir] Created dir: /apps/cvsbuild/java/source/table/lib/table
      [copy] Copying 1 file to /apps/cvsbuild/java/source/table/lib/table
@@ -474,4 +474,4 @@ execute_mk_script:
      [exec] g77: temp/*.o: No such file or directory
 
 BUILD SUCCESSFUL
-Total time: 1 minute 9 seconds
+Total time: 1 minute 10 seconds

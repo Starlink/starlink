@@ -34,25 +34,25 @@ run-tests:
     [junit] Testsuite: uk.ac.starlink.util.DOMUtilsTest
     [junit] Tests run: 4, Failures: 0, Errors: 0, Time elapsed: 0.353 sec
 
-    [junit] Testcase: testGetChildElementByName took 0.128 sec
-    [junit] Testcase: testGetTextContent took 0.021 sec
+    [junit] Testcase: testGetChildElementByName took 0.129 sec
+    [junit] Testcase: testGetTextContent took 0.022 sec
     [junit] Testcase: testNewDocument took 0.019 sec
-    [junit] Testcase: testRelativizeDOM took 0.179 sec
+    [junit] Testcase: testRelativizeDOM took 0.18 sec
     [junit] Testsuite: uk.ac.starlink.util.DataSourceTest
-    [junit] Tests run: 6, Failures: 0, Errors: 1, Time elapsed: 3.285 sec
+    [junit] Tests run: 6, Failures: 0, Errors: 1, Time elapsed: 4.345 sec
 
-    [junit] Testcase: testData took 0.682 sec
-    [junit] Testcase: testIntro took 0.891 sec
-    [junit] Testcase: testStream took 0.753 sec
-    [junit] Testcase: testHybridStream took 0.456 sec
-    [junit] Testcase: testCombo1 took 0.284 sec
+    [junit] Testcase: testData took 1.103 sec
+    [junit] Testcase: testIntro took 1.508 sec
+    [junit] Testcase: testStream took 0.76 sec
+    [junit] Testcase: testHybridStream took 0.461 sec
+    [junit] Testcase: testCombo1 took 0.291 sec
     [junit] 	Caused an ERROR
     [junit] null
     [junit] java.lang.OutOfMemoryError
 
-    [junit] Testcase: testCombo1Testcase: testResourceStream took 0.213 sec
+    [junit] Testcase: testCombo1Testcase: testResourceStream took 0.212 sec
 
 BUILD FAILED
 file:/apps/cvsbuild/java/source/util/build.xml:913: Test uk.ac.starlink.util.DataSourceTest failed
 
-Total time: 12 seconds
+Total time: 13 seconds

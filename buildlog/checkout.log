@@ -9258,9 +9258,11 @@ U java/source/table/src/main/uk/ac/starlink/table/formats/WDCStarTable.java
 U java/source/table/src/main/uk/ac/starlink/table/formats/WDCTableBuilder.java
 U java/source/table/src/main/uk/ac/starlink/table/formats/package.html
 cvs checkout: Updating java/source/table/src/main/uk/ac/starlink/table/gui
+U java/source/table/src/main/uk/ac/starlink/table/gui/FileChooserLoader.java
 U java/source/table/src/main/uk/ac/starlink/table/gui/LabelledComponentStack.java
 U java/source/table/src/main/uk/ac/starlink/table/gui/MapGroupTableModel.java
 U java/source/table/src/main/uk/ac/starlink/table/gui/MultilineJTable.java
+U java/source/table/src/main/uk/ac/starlink/table/gui/NodeLoader.java
 U java/source/table/src/main/uk/ac/starlink/table/gui/NumericCellRenderer.java
 U java/source/table/src/main/uk/ac/starlink/table/gui/ProgressBarStarTable.java
 U java/source/table/src/main/uk/ac/starlink/table/gui/SQLDialog.java
@@ -9272,6 +9274,7 @@ U java/source/table/src/main/uk/ac/starlink/table/gui/StarTableColumn.java
 U java/source/table/src/main/uk/ac/starlink/table/gui/StarTableModel.java
 U java/source/table/src/main/uk/ac/starlink/table/gui/StarTableNodeChooser.java
 U java/source/table/src/main/uk/ac/starlink/table/gui/StarTableSaver.java
+U java/source/table/src/main/uk/ac/starlink/table/gui/TableLoadDialog.java
 U java/source/table/src/main/uk/ac/starlink/table/gui/TableRowHeader.java
 U java/source/table/src/main/uk/ac/starlink/table/gui/UCDSelector.java
 U java/source/table/src/main/uk/ac/starlink/table/gui/ValueInfoCellEditor.java
