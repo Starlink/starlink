@@ -1,8 +1,8 @@
       SUBROUTINE KPS1_SPARW( CFRM, MAP,  DIM1, DIM2, ARRAY, LBND, 
      :                       ISIZE, RANGE, GAUSS, NXY, POS, LOGF, FD,
      :                       PNMIN, PAXISR, PORIEN, PFWHM, PGAMMA, PAMP,
-     :                       IDS, GOTIDS, NM, AXISR, THETA, FWHM, GAMMA, 
-     :                       WIDTH, SIG, PX, PY, AMP, STATUS )
+     :                       IDS, GOTIDS, NM, UNITS, AXISR, THETA, FWHM, 
+     :                       GAMMA, WIDTH, SIG, PX, PY, AMP, STATUS )
 *+
 *  Name:
 *     KPS1_SPARW
@@ -17,8 +17,8 @@
 *  Invocation:
 *     CALL KPS1_SPARW( CFRM, MAP, DIM1, DIM2, ARRAY, LBND, ISIZE, RANGE,
 *                      GAUSS, NXY, POS, LOGF, FD, PNMIN, PAXISR, PORIEN, 
-*                      PFWHM, PGAMMA, PAMP, IDS, GOTIDS, NM, AXISR, THETA,
-*                      FWHM, GAMMA, WIDTH, SIG, PX, PY, AMP, STATUS )
+*                      PFWHM, PGAMMA, PAMP, IDS, GOTIDS, NM, UNITS, AXISR, 
+*                      THETA, FWHM, GAMMA, WIDTH, SIG, PX, PY, AMP, STATUS )
 
 *  Description:
 *     This routine calls a number of subroutines to find a set of 
@@ -92,6 +92,8 @@
 *     NM = LOGICAL (Given)
 *        Should the PSF be normalized to unity? Otherise it is normalized
 *        to the fitted peak value of the first usable star.
+*     UNITS = CHARACTER * ( * ) (Given)
+*        The data units from the input NDF.
 *     AXISR = REAL (Returned)
 *        The axis ratio of the star images.
 *     THETA = REAL (Returned)
@@ -161,6 +163,8 @@
 *        Big changes for AST version.
 *     2-MAY-2000 (DSB):
 *        Added arguments PAMP, NM and AMP.
+*     17-MAY-2000 (DSB):
+*        Added argument UNITS.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -199,6 +203,7 @@
       INTEGER IDS( NXY )
       LOGICAL GOTIDS
       LOGICAL NM
+      CHARACTER * ( * ) UNITS
 
 *  Arguments Returned:
       REAL AXISR
@@ -240,6 +245,7 @@
       CHARACTER FWHMUN*20        ! Units of FWHM
       CHARACTER UNIT*20          ! Value of Unit attribute
       CHARACTER XVAL*13          ! Formatted axis 1 value
+      CHARACTER YUNITS*80        ! Y axis units
       CHARACTER YVAL*13          ! Formatted axis 2 value
       DOUBLE PRECISION SIGOUT    ! Sigma in Current Frame 
       DOUBLE PRECISION XOUT      ! Current Frame axis 1 centre
@@ -688,17 +694,19 @@
 *  Optionally plot the mean radial profile. 
 *  ========================================
 
-*  Set the scale factor for the Y axis to give either a peak value of 1.o
+*  Set the scale factor for the Y axis to give either a peak value of 1.0
 *  or a peak value equal to the first usable star.
          IF( NM ) THEN
             YSCALE = 1.0/AMP
+            YUNITS = ' '
          ELSE
             YSCALE = AMP1/AMP
+            YUNITS = UNITS
          END IF
 
 *  Plot the profile.
          CALL KPS1_PSPLT( NBIN2, SIGMA, AXISR, AMP, GAMMA, BACK, SCALE,
-     :                    YSCALE, FWHMUN, PNMIN, %VAL( PVPTR ), 
+     :                    YSCALE, FWHMUN, YUNITS, PNMIN, %VAL( PVPTR ), 
      :                    %VAL( PRPTR ), %VAL( PWPTR ), %VAL( PDW ), 
      :                    STATUS )
 
