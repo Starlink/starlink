@@ -313,7 +313,7 @@
             (process-children)))
 
 
-      (element programcode
+      (element routine
          (make sequence
             (with-mode active 
                 (process-first-descendant 'routinename))
