@@ -79,7 +79,7 @@
       REAL TOT_WEIGHT_IN (NI, NJ)
       REAL WAVELENGTH
       INTEGER WEIGHTSIZE
-      REAL WTFN(RES * RES * WEIGHTSIZE * WEIGHTSIZE)
+      REAL WTFN(RES * RES * WEIGHTSIZE * WEIGHTSIZE + 1)
 
 *  Arguments Returned:
       REAL CONV_DATA_SUM (NI, NJ)
@@ -134,7 +134,7 @@
 
 * Set up small to prevent comparing REAL to 0.0
 
-      SMALL = VAL__SMLR * 10.0
+      SMALL = VAL__SMLR
       SMALLRT = SQRT(SMALL)
 
 
