@@ -56,7 +56,7 @@
          exit
       endif
 
-      foreach file (kappa.ifd)
+      foreach file (atools.ifd)
          sed -e "s#PKG_VERS#$vers[3]#g" $file > temp
          mv -f temp $file
       end
@@ -86,13 +86,13 @@
       /bin/rm -rf $airaf
       mkdir $airaf
       cp root.hd $airaf
-      cp _kappa.hd $airaf
-      cp kappa.hd $airaf
+      cp _atools.hd $airaf
+      cp atools.hd $airaf
       cd $airaf/..
 
 #  Create a CL script which will create the help database.
       cat > temp.cl << FOO
-set kappa = /home/dsb/iraf/atools/
+set atools = /home/dsb/iraf/atools/
 so
 mkhelpdb $airaf/root.hd helpdb.mip
 lo
