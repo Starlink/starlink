@@ -1,7 +1,7 @@
 /*
 *+
 *  Name:
-*     ccdtcl.h
+*     tcltalk.h
 
 *  Type of Module:
 *     C header file.
@@ -23,6 +23,9 @@
 *        Original version.
 *-
 */
+
+#ifndef CCD_TCLTALK_DEFINED
+#define CCD_TCLTALK_DEFINED
 
 /* The following constants must be distinct from legitimate TCL return codes,
    TCL_OK, TCL_ERROR, TCL_RETURN, TCL_BREAK and TCL_CONTINUE. */
@@ -55,5 +58,7 @@
    char *ccdTclGetC( ccdTcl_Interp *cinterp, char *script, int *status );
 #define ccdTclDo(cinterp,script,status) \
    (void) ccdTclGetC( cinterp, script, status )
+
+#endif  /* CCD_TCLTALK_DEFINED */
 
 /* $Id$ */
