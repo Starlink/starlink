@@ -3,6 +3,8 @@
       INTEGER DYN_NMAX
       PARAMETER (DYN_NMAX=500)
 
+      LOGICAL			DYN_ISINIT		! Sub-system initialised?
+
       STRUCTURE /DYN_LIST/
         INTEGER PTR			! pointer to start of dynamic memory
         INTEGER NITEM                   ! number of items
@@ -14,4 +16,4 @@
 
       RECORD /DYN_LIST/ LIST(DYN_NMAX)
       INTEGER NPTR
-      COMMON /DYN_CMN/ NPTR,LIST
+      COMMON /DYN_CMN/ NPTR,DYN_ISINIT,LIST
