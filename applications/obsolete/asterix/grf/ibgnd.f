@@ -213,6 +213,7 @@
           ELSE IF ( CMD .EQ. 'SETSAMP' ) THEN
 
             CALL USI_GET0C( 'SAMPLING', MODE, STATUS )
+            CALL CHR_UCASE( MODE )
             CALL IBGND_SETSAMP( MODE, 'MEAN', STATUS )
 
             CALL IBGND_RECALC( .TRUE., .TRUE., STATUS )
@@ -1195,6 +1196,9 @@
 *  Set the sample mode to the whole image, simple mean and compute the samples
       CALL IBGND_SETSAMP( 'WHOLE', 'MEAN', STATUS )
 
+*  Calculate everything
+      CALL IBGND_RECALC( .TRUE., .TRUE., STATUS )
+
 *  Switch modelling on
       I_BGM_ON = (STATUS.EQ.SAI__OK)
 
@@ -1675,9 +1679,6 @@
       CALL ARR_INIT1R( 0.0, I_BGM_NSAMP, %VAL(I_BGM_SAMPTR(2)), STATUS )
       CALL ARR_INIT1I( 0, I_BGM_NSAMP, %VAL(I_BGM_SAMPTR(3)), STATUS )
 
-*  Recompute the samples and surface
-      CALL IBGND_RECALC( .TRUE., .TRUE., STATUS )
-
       END
 
 
@@ -2072,11 +2073,13 @@
       INTEGER			STATUS             	! Global status
 
 *  Local Variables:
-      REAL			MEAN, SUM, STDDEV	!
+      REAL			MEAN			!
       REAL			D, DMEAN, WTSUM, WTSUM2	!
 
       INTEGER			I, J			! Loop over sample data
       INTEGER			S			! Loop over samples
+
+      BYTE			SQ			! Sample quality
 *.
 
 *  Check inherited global status.
@@ -2140,9 +2143,9 @@
       END IF
 
 
-*  Decide how many samples
+*  Export details of means to environment
       S = 1
-      IF ( I_BGM_AREA .EQ. 'WHOLE' ) THEN
+      IF ( I_BGM_AREA(1:3) .EQ. 'WHO' ) THEN
 
 *    Simply report mean
         CALL MSG_SETR( 'MEAN', SAMM(1) )
@@ -2151,8 +2154,61 @@
         CALL MSG_PRNT( '  Mean value in image is ^MEAN +- '/
      :                               /'^EMEAN (^N points)' )
 
-      ELSE IF ( I_BGM_AREA .EQ. 'ANNULUS' ) THEN
+*  Annulus mode?
+      ELSE IF ( I_BGM_AREA(1:3) .EQ. 'ANN' ) THEN
+
+*    Construct radial plot
+        I_N_1D = I_BGM_NSAMP
+        CALL IMG_GET1D( I_BGM_NSAMP, STATUS )
+
+*    Set labels
+        I_XLABEL_1D = 'Radius'
+        I_XUNITS_1D = I_XYUNITS
+        I_LABEL_1D = 'Surface brightness'
+        I_TITLE_1D = 'Radial distribution'
+
+*    Set data units to be per pixel
+        I_UNITS_1D = I_UNITS(1:CHR_LEN(I_UNITS)) // ' / pixel'
+
+*    Set axis values
+        I_XBASE_1D = I_BGM_RBIN / 2.0
+        I_XSCALE_1D = I_BGM_RBIN
+        I_XWID_1D = I_BGM_RBIN
+
+*    Copy sample data to 1-D data, errors to variance
+        CALL ARR_COP1R( I_BGM_NSAMP, SAMM, %VAL(I_DPTR_1D), STATUS )
+        CALL ARR_COP1R( I_BGM_NSAMP, SAMEM, %VAL(I_VPTR_1D), STATUS )
+
+*    Convert error to variance
+        CALL ARR_SQR1R( %VAL(I_VPTR_1D), I_BGM_NSAMP, STATUS )
+
+*    1-D quality is good if more than 1 point per sample, bad otherwise
+        DO S = 1, I_BGM_NSAMP
+          IF ( SAMNP(S) .GT. 1 ) THEN
+            SQ = QUAL__GOOD
+          ELSE
+            SQ = QUAL__BAD
+          END IF
+          CALL ARR_SELEM1B( I_QPTR_1D, I_BGM_NSAMP, S, SQ, STATUS )
+
+        END DO
+
+*    Set default axis ranges
+C        I_X1_1D=0.0
+C        I_X2_1D=ABS(I_XSCALE)*REAL(I_N_1D)/REAL(I_OSAMPLE)
+C        CALL ARR_RANG1R(I_N_1D,%VAL(I_DPTR_1D),I_Y1_1D,I_Y2_1D,STATUS)
+C        I_Y2_1D=I_Y2_1D+0.1*(I_Y2_1D-I_Y1_1D)
+
+*    Set default plotting style
+        CALL IMG_1DGCB(STATUS)
+        CALL GCB_SETL('ERR_FLAG',.TRUE.,STATUS)
+        CALL GCB_SETL('STEP_FLAG',.FALSE.,STATUS)
+        CALL GCB_SETL('POLY_FLAG',.FALSE.,STATUS)
+        CALL GCB_SETL('POINT_FLAG',.FALSE.,STATUS)
+
+
       ELSE IF ( I_BGM_AREA .EQ. 'BOX' ) THEN
+
       END IF
 
       END
@@ -2313,6 +2369,22 @@
           END DO
         END DO
 
+      ELSE IF ( I_BGM_AREA(1:3) .EQ. 'WHO' ) THEN
+
+*    Loop over image
+        DO J = 1, NY
+          DO I = 1, NX
+
+*      Outside area?
+            IF ( IDX(I,J) .LT. 0 ) THEN
+              BGMOD(I,J) = 0.0
+            ELSE
+              BGMOD(I,J) = SAMM(IDX(I,J))
+            END IF
+
+          END DO
+        END DO
+
       END IF
 
 *  Accumulate max and RMS fractional residual
@@ -2323,11 +2395,11 @@
       DO J = 1, NY
         DO I = 1, NX
 
-*      Outside area?
-          IF ( IDX(I,J) .LT. 0 ) THEN
+*      Inside area?
+          IF ( IDX(I,J) .GT. 0 ) THEN
 
             FR = DATA(I,J) - BGMOD(I,J)
-            IF ( (BGMOD(I,J) .NE. 0.0) .AND. (IDX(I,J) .GT. 0) ) THEN
+            IF ( BGMOD(I,J) .NE. 0.0 ) THEN
               NFR = NFR + 1
               FR = FR / ABS(BGMOD(I,J))
               RMSFR = RMSFR + FR**2
