@@ -775,6 +775,7 @@
           QUANT = 0.0
         ELSE
           QUANT = 1.0
+          QOK = .TRUE.
         END IF
         CALL MSG_SETC( 'LIST', NAME )
         CALL MSG_SETR( 'VAL', QUANT )
