@@ -109,8 +109,10 @@
         PARAMETER ( IC_WCS = 1 )
       INTEGER			IC_MIS
         PARAMETER ( IC_MIS = 2 )
+      INTEGER			IC_TIM
+        PARAMETER ( IC_TIM = 4 )
       INTEGER			IC_ALL
-        PARAMETER ( IC_ALL = IC_WCS+IC_MIS )
+        PARAMETER ( IC_ALL = IC_WCS+IC_MIS+IC_TIM )
 
       CHARACTER*30		VERSION
         PARAMETER		( VERSION = 'ASHOW Version 1.8-0' )
@@ -178,14 +180,19 @@
 *    Write details of file
         CALL ADI_FTRACE( IFID, NLEV, PATH, FILE, STATUS )
 
-*    World coordinates?
-        IF ( IAND( ITEMC, IC_WCS ) .NE. 0 ) THEN
-          CALL ASHOW_WCS( IFID, OCH, STATUS )
-        END IF
-
 *    Mission strings?
         IF ( IAND( ITEMC, IC_MIS ) .NE. 0 ) THEN
           CALL ASHOW_MIS( IFID, OCH, STATUS )
+        END IF
+
+*    Timing
+        IF ( IAND( ITEMC, IC_TIM ) .NE. 0 ) THEN
+          CALL ASHOW_TIM( IFID, OCH, STATUS )
+        END IF
+
+*    World coordinates?
+        IF ( IAND( ITEMC, IC_WCS ) .NE. 0 ) THEN
+          CALL ASHOW_WCS( IFID, OCH, STATUS )
         END IF
 
       END IF
@@ -213,15 +220,17 @@
 *     Starlink Fortran
 
 *  Invocation:
-*     CALL ASHOW_WCS( [p]... )
+*     CALL ASHOW_WCS( IFID, OCH, STATUS )
 
 *  Description:
 *     {routine_description}
 
 *  Arguments:
-*     {argument_name}[dimensions] = {data_type} ({argument_access_mode})
-*        {argument_description}
-*     STATUS = INTEGER ({status_access_mode})
+*     IFID = INTEGER (given)
+*        Input dataset identifier
+*     OCH = INTEGER (given)
+*        Output channel identifier
+*     STATUS = INTEGER (given and returned)
 *        The global status.
 
 *  Examples:
@@ -410,15 +419,17 @@
 *     Starlink Fortran
 
 *  Invocation:
-*     CALL ASHOW_WCS( [p]... )
+*     CALL ASHOW_MIS( IFID, OCH, STATUS )
 
 *  Description:
 *     {routine_description}
 
 *  Arguments:
-*     {argument_name}[dimensions] = {data_type} ({argument_access_mode})
-*        {argument_description}
-*     STATUS = INTEGER ({status_access_mode})
+*     IFID = INTEGER (given)
+*        Input dataset identifier
+*     OCH = INTEGER (given)
+*        Output channel identifier
+*     STATUS = INTEGER (given and returned)
 *        The global status.
 
 *  Examples:
@@ -537,5 +548,140 @@
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'ASHOW_MIS', STATUS )
+
+      END
+
+
+
+      SUBROUTINE ASHOW_TIM( IFID, OCH, STATUS )
+*+
+*  Name:
+*     ASHOW_TIM
+
+*  Purpose:
+*     Display timing info
+
+*  Language:
+*     Starlink Fortran
+
+*  Invocation:
+*     CALL ASHOW_TIM( IFID, OCH, STATUS )
+
+*  Description:
+*     {routine_description}
+
+*  Arguments:
+*     IFID = INTEGER (given)
+*        Input dataset identifier
+*     OCH = INTEGER (given)
+*        Output channel identifier
+*     STATUS = INTEGER (given and returned)
+*        The global status.
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
+*     {algorithm_description}...
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
+*     {routine_deficiencies}...
+
+*  References:
+*     {task_references}...
+
+*  Keywords:
+*     ashow, usage:private
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1995
+
+*  Authors:
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*     13 Apr 1995 (DJA):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'ADI_PAR'
+
+*  Arguments Given:
+      INTEGER			IFID			! Input dataset id
+      INTEGER			OCH			! Output channel
+
+*  Status:
+      INTEGER 			STATUS             	! Global status
+
+*  Local Variables:
+      CHARACTER*50		STR
+
+      REAL			RVAL			!
+
+      INTEGER			TIMID			! TCI info
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Load timing info
+      CALL TCI_GETID( IFID, TIMID, STATUS )
+      IF ( STATUS .NE. SAI__OK ) THEN
+        CALL ERR_ANNUL( STATUS )
+      END IF
+
+*  Write heading
+      CALL AIO_BLNK( OCH, STATUS )
+      CALL AIO_IWRITE( OCH, 2, 'Timing Information :', STATUS )
+      CALL AIO_BLNK( OCH, STATUS )
+
+*  The observation details
+      CALL AIO_IWRITE( OCH, 4, 'Observation Dates & Exposure Times :',
+     :                  STATUS )
+      CALL AIO_BLNK( OCH, STATUS )
+      CALL ADI_CGET0C( TIMID, 'DateObs', STR, STATUS )
+      CALL MSG_SETC( 'DATE', STR )
+      CALL AIO_IWRITE( OCH, 6, 'Date at start   : ^DATE', STATUS )
+      CALL ADI_CGET0R( TIMID, 'ObsLength', STR, STATUS )
+      CALL MSG_SETR( 'OBSL', RVAL )
+      CALL AIO_IWRITE( OCH, 6, 'Obs. length     : ^OBSL seconds',
+     :           STATUS )
+
+*  Report any errors
+      IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'ASHOW_TIM', STATUS )
 
       END
