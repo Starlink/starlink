@@ -14,9 +14,9 @@
 \newcommand{\stardocsource}    {sun95.14}
 \newcommand{\stardocnumber}    {95.14}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {9 June 1999}
+\newcommand{\stardocdate}      {18 August 1999}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
-\newcommand{\stardocversion}   {0.13-6}
+\newcommand{\stardocversion}   {0.14}
 \newcommand{\stardocmanual}    {User's Guide}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -13163,7 +13163,6 @@ default value.
       }
    }
 }
- 
 \sstroutine{
    CENTROID
 }{
@@ -13174,108 +13173,117 @@ default value.
       centroids of features in its data array given approximate initial
       co-ordinates.  A feature is a set of connected pixels which are
       above or below the surrounding background region.  For example, a
-      feature could be a star or galaxy on the sky.  The centroid is
-      obtained iteratively from computing marginal profiles in a
-      search region about the initial position, and subtracting the
-      background.  The loop is repeated up to a maximum number of
-      iterations, though it normally terminates when a desired accuracy
-      has been achieved.  Typically, for stars better than 0.1 pixel
-      is readily attainable, but the accuracy is affected by noise,
-      non-Gaussian and overlapping features.  The error in the centroid
-      position may be estimated by a Monte-Carlo method using the
-      data variance to generate realisations of the data about the
-      feature.  Each realisation is processed identically to the actual
-      data, and statistics are formed to derive the standard deviations.
+      feature could be a star or galaxy on the sky, although the
+      applications is not restricted to 2-dimensional NDFs.
 
-      Positions may be expressed in either pixel or data co-ordinates.
-      Three methods are available for obtaining the initial positions.
+      Four methods are available for obtaining the initial positions,
+      selected using parameter MODE:
 
-      \begin{enumerate}
-      \item From the parameter system, usually in response to prompting.
-      \item By a placing a graphics cursor of a nominated device on the
-         feature.  To do this the data array must already be
-         displayed as an image, or a contour or line plot, and the
-         picture stored in the graphics database.
-      \item By reading a text file containing a list of co-ordinates
-         in free format, one object per record.  There may be
-         commentary lines in the file beginning with '{\tt \#}' or
-         '{\tt !}'.
-      \end{enumerate}
+      \sstitemlist{
 
-      In the first two modes the application loops asking for new
-      feature co-ordinates until told to quit or encounters an error.
-      Features within NDFs of dimension 1 to 7 may be located, except
-      in the second method, where the graphics interface limits
-      constrain the NDF to be one- or two-dimensional---the most common
-      cases.
+         \sstitem
+         From the parameter system (see parameter INIT).
 
-      The results may optionally be written to a log file that includes
-      details of the input parameters.  This is intended for the human
-      reader.  If the centroid positions are to be fed into another
-      application requiring a list of co-ordinates, {\it e.g.}\ for photometry,
-      a co-ordinate list file may also be written.
+         \sstitem
+         Using a graphics cursor to indicate the feature in a previously
+         displayed data array (see parameter DEVICE).
+
+         \sstitem
+         From a specified positions list (see parameter INCAT).
+
+         \sstitem
+         From a simple text file containing a list of co-ordinates (see
+         parameter COIN).
+
+      }
+      In the first two modes the application loops, asking for new
+      feature co-ordinates until it is told to quit or encounters an error.
+
+      The results may optionally be written to an output positions list
+      which can be used to pass the positions on to another application
+      (see parameter OUTCAT), or to a log file geared more towards human
+      readers, including details of the input parameters (see parameter
+      LOGFILE).
+
+      The uncertainty in the centroid positions may be estimated if
+      variance values are available within the supplied NDF (see
+      parameter CERROR).
    }
    \sstusage{
       centroid ndf [mode] init [search] [maxiter] [maxshift] [toler]
    }
    \sstparameters{
       \sstsubsection{
+         CENTRE  = LITERAL (Write)
+      }{
+         The formatted co-ordinates of the last centroid position, in
+         the current Frame of the NDF.
+      }
+      \sstsubsection{
          CERROR = \_LOGICAL (Read)
       }{
-         If {\tt TRUE}, errors in the centroid position will be calculated.
-         The input NDF must contain the data's variance in order
-         to compute errors. {\tt [FALSE]}
+         If TRUE, errors in the centroided position will be calculated.
+         The input NDF must contain a Variance component in order to
+         compute errors. {\tt [FALSE]}
       }
       \sstsubsection{
          COIN =  FILENAME (Read)
       }{
-         Name of the text file containing the initial co-ordinates
-         of star-like images.   The co-ordinates should be arranged
-         in free-format columns $x$ then $y$ then $z$ {\it etc.}, one record per
-         image.  The file may contain comment lines with the first
-         character \# or !.  (XYlist mode)
+         Name of a text file containing the initial guesses at the
+         co-ordinates of features to be centroided. Only accessed if
+         parameter MODE is given the value {\tt "}File{\tt "}. Each line should
+         contain the formatted axis values for a single position, in the
+         current Frame of the NDF. Axis values can be separated by
+         spaces, tabs or commas. The file may contain comment lines
+         with the first character \# or !.
       }
       \sstsubsection{
-         COOUT =  FILENAME (Read)
+         DESCRIBE = LOGICAL (Read)
       }{
-         Name of the text file to contain the centroid co-ordinates
-         of the star-like images.  It is a co-ordinate file which can
-         be used by other applications, and contains the position of
-         one object per record.  If COOUT is null, {\tt !}, no output
-         co-ordinate file will be created. {\tt [!]}
-      }
-      \sstsubsection{
-         COSYS = LITERAL (Read)
-      }{
-         The co-ordinate system to be used.  This can be either
-         {\tt "World"} or {\tt "Data"}.  If COSYS = {\tt "Data"} the
-         input co-ordinates and the
-         centroids are to be expressed in data co-ordinates, otherwise
-         pixel (world) co-ordinates are used.  The data co-ordinates are
-         converted to and from pixel indices via the NDF's axis values;
-         if there is no axis information within the NDF, world
-         co-ordinates are then used, except in Cursor mode where the
-         transformation, if present, is taken from the last DATA
-         picture in the graphics database.  If COSYS = {\tt "World"} pixel
-         co-ordinates are used throughout.  {\tt [}Current co-ordinate
-         system{\tt ]}
+         If TRUE, a detailed description of the co-ordinate Frame in which
+         the centroided positions will be reported is displayed before the
+         positions themselves. {\tt [current value]}
       }
       \sstsubsection{
          DEVICE = DEVICE (Read)
       }{
-         The graphics device whose the cursor is used to select the
-         images for which centroids are to be calculated. (Cursor
-         mode) {\tt [}Current graphics device{\tt ]}
+         The graphics device which is to be used to give the initial
+         guesses at the centroid positions. Only accessed if parameter
+         MODE is given the value {\tt "}Cursor{\tt "}. {\tt [Current graphics device]}
       }
       \sstsubsection{
-         INIT()  = \_DOUBLE (Read)
+         ERROR  =  LITERAL (Write)
       }{
-         Guess co-ordinates of the feature to be centroided.  The
-         co-ordinates must lie within the bounds of the NDF.  If
-         the initial co-ordinates are supplied on the command line
-         only one centroid will be found; otherwise the application
-         will ask for further guesses, which may be terminated by
-         supplying the null value ({\tt !}). (Interface mode)
+         The errors associated with the position written to parameter
+         CENTRE.
+      }
+      \sstsubsection{
+         GUESS = \_LOGICAL (Read)
+      }{
+         If TRUE, then the supplied guesses for the centroid positions
+         will be included in the screen and log file output, together
+         with the accurate positions. {\tt [current value]}
+      }
+      \sstsubsection{
+         INCAT = FILENAME (Read)
+      }{
+         A catalogue containing a positions list giving the initial
+         guesses at the centroid positions, such as produced by
+         applications CURSOR, LISTMAKE, \emph{etc}. Only accessed if parameter
+         MODE is given the value {\tt "}Catalogue{\tt "}.
+      }
+      \sstsubsection{
+         INIT  = LITERAL (Read)
+      }{
+         An initial guess at the co-ordinates of the next feature to be
+         centroided, in the current co-ordinate Frame of the NDF (supplying
+         a colon {\tt "}:{\tt "} will display details of the current co-ordinate Frame).
+         The position should be supplied as a list of formatted axis values
+         separated by spaces or commas. INIT is only accessed if parameter
+         MODE is given the value {\tt "}Interface{\tt "}. If the initial co-ordinates
+         are supplied on the command line only one centroid will be found;
+         otherwise the application will ask for further guesses, which may
+         be terminated by supplying the null value (!).
       }
       \sstsubsection{
          LOGFILE  =  FILENAME (Read)
@@ -13285,10 +13293,37 @@ default value.
          and is not intended for passing to other applications. {\tt [!]}
       }
       \sstsubsection{
-         MARK = \_LOGICAL (Read)
+         MARK = LITERAL (Read)
       }{
-         If {\tt TRUE}, the point selected by the cursor will be marked by a
-         cross. (Cursor mode) {\tt [FALSE]}
+         Only accessed if parameter MODE is given the value {\tt "}Cursor{\tt "}. It
+         indicates which positions are to be marked on the screen using the
+         marker type given by parameter MARKER. It can take any of the
+         following values:
+
+         \sstitemlist{
+
+            \sstitem
+            {\tt "}Initial{\tt "}: The position of the cursor when the mouse button is
+            pressed is marked.
+
+            \sstitem
+            {\tt "}Centroid{\tt "}: The corresponding centroid position is marked.
+
+            \sstitem
+            {\tt "}None{\tt "}: No positions are marked.
+
+         }
+         {\tt [current value]}
+      }
+      \sstsubsection{
+         MARKER = INTEGER (Read)
+      }{
+         This parameter is only accessed if parameter MARK is set TRUE.
+         It specifies the type of marker with which each cursor position
+         should be marked, and should be given as an integer PGPLOT marker
+         type. For instance, 0 gives a box, 1 gives a dot, 2 gives a cross,
+         3 gives an asterisk, 7 gives a triangle. The value must be larger
+         than or equal to -31. {\tt [current value]}
       }
       \sstsubsection{
          MAXITER  =  \_INTEGER (Read)
@@ -13308,15 +13343,35 @@ default value.
       \sstsubsection{
          MODE  =  LITERAL (Read)
       }{
-         The mode in which the initial co-ordinates are to be obtained.
-         {\tt "Interface"} means from the parameter system, {\tt "Cursor"}
-         enables selection by graphics cursor, and {\tt "File"} reads
-         them from a text file. {\tt [}Current interaction mode{\tt ]}
+         The mode in which the initial co-ordinates are to be obtained. The
+         supplied string can be one of the following:
+
+         \sstitemlist{
+
+            \sstitem
+            {\tt "}Interface{\tt "}: positions are obtained using parameter INIT.
+
+            \sstitem
+            {\tt "}Cursor{\tt "}: positions are obtained using the graphics cursor of
+               the device specified by parameter DEVICE.
+
+            \sstitem
+            {\tt "}Catalogue{\tt "}: positions are obtained from a positions list
+               using parameter INCAT.
+
+            \sstitem
+            {\tt "}File{\tt "}: positions are obtained from a text file using parameter
+               COIN. {\tt [current value]}
+         }
       }
       \sstsubsection{
          NDF = NDF (Read)
       }{
-         The NDF structure containing the data array to be analysed.
+         The NDF structure containing the data array to be analysed. In
+         cursor mode (see parameter MODE), the run-time default is the
+         displayed data, as recorded in the graphics database. In other
+         modes, there is no run-time default and the user must supply a
+         value. {\tt []}
       }
       \sstsubsection{
          NSIM =  \_INTEGER (Read)
@@ -13328,10 +13383,48 @@ default value.
          values is 3--10000. {\tt [100]}
       }
       \sstsubsection{
+         OUTCAT = FILENAME (Write)
+      }{
+         The output catalogue in which to store the centroided positions.
+         If a null value (!) is supplied, no output catalogue is produced.
+         {\tt [!]}
+      }
+      \sstsubsection{
+         PLOTSTYLE = LITERAL (Read)
+      }{
+         A group of attribute settings describing the style to use when
+         drawing the graphics markers specified by parameter MARK.
+
+         A comma-separated list of strings should be given in which each
+         string is either an attribute setting, or the name of a text file
+         preceded by an up-arrow character {\tt "}$\wedge${\tt "}. Such text files should
+         contain further comma-separated lists which will be read and
+         interpreted in the same manner. Attribute settings are applied in
+         the order in which they occur within the list, with later settings
+         over-riding any earlier settings given for the same attribute.
+
+         Each individual attribute setting should be of the form:
+
+            $<$name$>$=$<$value$>$
+
+         where $<$name$>$ is the name of a plotting attribute, and $<$value$>$ is
+         the value to assign to the attribute. Default values will be
+         used for any unspecified attributes. All attributes will be
+         defaulted if a null value (!) is supplied. See section {\tt "}Plotting
+         Attributes{\tt "} in SUN/95 for a description of the available
+         attributes. Any unrecognised attributes are ignored (no error is
+         reported). {\tt [current value]}
+      }
+      \sstsubsection{
          POSITIVE  =  \_LOGICAL (Read)
       }{
-         {\tt TRUE} if array features are positive above the background.
-         {\tt [TRUE]}
+         TRUE, if array features are positive above the background. {\tt [TRUE]}
+      }
+      \sstsubsection{
+         QUIET = LOGICAL (Read)
+      }{
+         If TRUE then the centroid positions are not displayed on the
+         screen. Output parameters and files are still created. {\tt [FALSE]}
       }
       \sstsubsection{
          SEARCH()  =  \_INTEGER (Read)
@@ -13342,6 +13435,15 @@ default value.
          Each value must be odd and lie in the range 3--51.  {\tt [9]}
       }
       \sstsubsection{
+         TITLE =  LITERAL (Read)
+      }{
+         A title to store with the output catalogue specified by
+         parameter OUTCAT, and to display before the centroid positions
+         are listed. The run-time default is taken from any input
+         catalogue specified by parameter INCAT, or is a fixed string
+         including the name of the NDF. {\tt []}
+      }
+      \sstsubsection{
          TOLER  =  \_REAL (Read)
       }{
          Accuracy in pixels required in centroiding.  Iterations will
@@ -13349,29 +13451,27 @@ default value.
          is less than the accuracy.  The accuracy must lie in the range
          0.0--2.0. {\tt [0.05]}
       }
-   }
-   \sstresparameters{
       \sstsubsection{
-         CENTRE()  = \_DOUBLE (Write)
+         XCEN  =  LITERAL (Write)
       }{
-         Co-ordinates of the centroid of the feature.  Note
-         that only the last centroid is recorded in this parameter.
+         The formatted X co-ordinate of the last centroid position, in the
+         current co-ordinate Frame of the NDF.
       }
       \sstsubsection{
-         XCEN  =  \_DOUBLE (Write)
+         XERR =  LITERAL (Write)
       }{
-         $x$ co-ordinate of the centroid of the star-like feature.  Note
-         that only the last centroid is recorded in this parameter.
-         This provided in addition to CENTRE for convenience until
-         {\footnotesize ICL} permits arrays.
+         The error associated with the value written to parameter XCEN.
       }
       \sstsubsection{
-         YCEN  =  \_DOUBLE (Write)
+         YCEN  =  LITERAL (Write)
       }{
-         $y$ co-ordinate of the centroid of the star-like feature.  Note
-         that only the last centroid is recorded in this parameter.
-         This provided in addition to CENTRE for convenience until
-         {\footnotesize ICL} permits arrays.
+         The formatted Y co-ordinate of the last centroid position, in the
+         current co-ordinate Frame of the NDF.
+      }
+      \sstsubsection{
+         YERR =  LITERAL (Write)
+      }{
+         The error associated with the value written to parameter YCEN.
       }
    }
    \sstexamples{
@@ -13382,61 +13482,100 @@ default value.
          graphics cursor on the current graphics device.
       }
       \sstexamplesubsection{
-         centroid cluster cu search=21
+         centroid cluster cu search=21 mark=ce plotstyle={\tt '}colour=red{\tt '}
       }{
          This finds the centroids in the NDF called cluster via the
          graphics cursor on the current graphics device.  The search
-         box for the centroid is 21 pixels in each dimension.
+         box for the centroid is 21 pixels in each dimension. The centroid
+         positions are marked using a red symbol.
       }
       \sstexamplesubsection{
-         centroid cluster i [21.7,5007.1] cosys=d
+         centroid cluster i {\tt '}{\tt "}21.7,5007.1{\tt "}{\tt '}
       }{
-         This finds the centroid of the object in the 2-dimensional NDF called
-         cluster around the data co-ordinate (21.7,5007.1).
+         This finds the centroid of the object in the 2-dimensional NDF
+         called cluster around the current Frame co-ordinate (21.7,5007.1).
       }
       \sstexamplesubsection{
-         centroid arp244(6,,) i [40,30] cosys=w toler=0.01
+         centroid arp244(6,,) i {\tt '}{\tt "}40,30{\tt "}{\tt '} toler=0.01
       }{
-         This finds the 2-dimensional centroid of the feature near pixel
-         (6,40,30) in the 3-dimensional NDF called arp244 via the
-         graphics cursor on the current graphics device.  The centroid
+         This finds the 2-dimensional centroid of the feature near
+         pixel (6,40,30) in the 3-dimensional NDF called arp244 (assuming
+         the current co-ordinate Frame of the NDF is PIXEL). The centroid
          must be found to 0.01 pixels.
       }
       \sstexamplesubsection{
-         centroid cluster i [40,30] cosys=w xcen=(xp) ycen=(yp)
+         centroid cluster cu xcen=(xp) ycen=(yp)
       }{
-         This finds the centroid of the object in the 2-dimensional NDF
-         called cluster around the pixel co-ordinate (40.0,30.0).  The
-         centroid co-ordinates are written to {\footnotesize ICL}
-         variables XP and YP for use in other applications.
+         This finds the centroid of an object in the 2-dimensional NDF
+         called cluster using a graphics cursor, and writes the centroid
+         co-ordinates to ICL variables XP and YP for use in other applications.
       }
       \sstexamplesubsection{
-         centroid cluster mode=xy coin=objects.dat logfile=centroids.log
+         centroid cluster mode=file coin=objects.dat logfile=centroids.log
       }{
          This finds the centroids in the NDF called cluster.  The
-         initial positions are given in the text file {\tt objects.dat} in
-         the current co-ordinate system.  A log of the input parameter
+         initial positions are given in the text file objects.dat in
+         the current co-ordinate Frame.  A log of the input parameter
          values, initial and centroid positions is written to the text
-         file {\tt centroids.log}.
+         file centroids.log.
       }
       \sstexamplesubsection{
-         centroid cluster mode=xy coin=objects.dat coout=centres.dat
+         centroid cluster mode=cat incat=a outcat=b
       }{
-         As above, except there is no logfile; instead a co-ordinate
-         file called centres.dat is generated.
+         This example reads the initial guess positions from the
+         positions list in file a.FIT, and writes the accurate centroid
+         positions to positions list file b.FIT. The input file may, for
+         instance, have been created using the application CURSOR.
       }
-      \sstexamplesubsection{
-         centroid cluster i [40,30] cosys=w nopositive
-      }{
-         This finds the centroid of the object in the 2-dimensional NDF called
-         cluster around the pixel co-ordinate (40.0,30.0).  The feature
-         must have values below that of the surrounding background.
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         All positions are supplied and reported in the current co-ordinate
+         Frame of the NDF. A description of the co-ordinate Frame being used
+         is given if parameter DESCRIBE is set to a TRUE value. Application
+         WCSFRAME can be used to change the current co-ordinate Frame of the
+         NDF before running this application if required.
+
+         \sstitem
+         In Cursor or Interface mode, only the first 200 supplied positions
+         will be stored in the output catalogue. Any further positions will be
+         displayed on the screen but not stored in the output catalogue.
       }
+   }
+   \sstdiytopic{
+      Estimation of Centroid Positions
+   }{
+      Each centroid position is obtained by projecting the data values
+      within a search box centred on the supplied position, on to each
+      axis in turn. This forms a set of profiles for the feature, one for
+      each axis. An estimate of the background at each point in these
+      profiles is made and subtracted from the profile. This flattens the
+      profile backgrounds, removing any slope in the data. Once the
+      profiles have been flattened in this way, and estimate of the
+      background noise in each is made. The centroid of the feature is
+      then found using only the data above the noise level.
+
+      Successive estimates of the centroid position are made by using the
+      previous estimate of the centroid as the initial position for
+      another estimation. This loop is repeated up to a maximum number of
+      iterations, though it normally terminates when a desired accuracy
+      has been achieved.
+
+      The achieved accuracy is affected by noise, and the presence of
+      non-Gaussian or overlapping features, but typically an accuracy
+      better than 0.1 pixel is readily attainable for stars. The error in
+      the centroid position may be estimated by a Monte-Carlo method
+      using the data variance to generate realisations of the data about
+      the feature (see parameter CERROR).  Each realisation is processed
+      identically to the actual data, and statistics are formed to derive
+      the standard deviations.
    }
    \sstdiytopic{
       Related Applications
    }{
-      KAPPA: PSF.
+      KAPPA: PSF, CURSOR, LISTSHOW, LISTMAKE.
    }
    \sstimplementationstatus{
       \sstitemlist{
@@ -13444,24 +13583,9 @@ default value.
          \sstitem
          The processing of bad pixels and all non-complex numeric types
          is supported.
-
-         \sstitem
-         Data co-ordinates are processed in double precision.  When data
-         co-ordinates are being used, and the cursor mode is selected or
-         the NDF contains axis information, the results appear in double
-         precision.  Double precision arithmetic is needed to prevent
-         a loss of precision for certain co-ordinate transformations stored
-         within the graphics database or for double-precision axis centres.
-
-         \sstitem
-         The format of the logfile is different for 2-dimensional from other
-         dimensions for historical reasons.  The 2-dimensional has a tabular layout
-         with headings.  Logging awaits a proper table system to make this
-         consistent.
       }
    }
 }
-
 \sstroutine{
    CHAIN
 }{
@@ -29499,20 +29623,20 @@ plot (9k).
 }{
    \sstdescription{
       This application compares the data values in one NDF against the
-      corresponding values in the other NDF. A least-squares
+      corresponding values in the other NDF.  A least-squares
       straight-line is then fitted to the relationship between the two
       sets of data values in order to determine the relative scale
       factor and any zero-level offset between the NDFs.  To reduce
       computation time, the data points are binned according to the
-      data value in the first NDF. The mean data value within each bin
+      data value in the first NDF.  The mean data value within each bin
       is used to find the fit and weights are applied according to the
       number of pixels which contribute to each bin.
 
       To guard against erroneous data values, which can corrupt the fit
-      obtained, the application then performs a number of iterations. It
-      calculates a noise estimate for each bin according to the rms
+      obtained, the application then performs a number of iterations.
+      It calculates a noise estimate for each bin according to the rms
       deviation of data values in the bin from the straight-line fit
-      obtained previously. It then re-bins the data, omitting values
+      obtained previously.  It then re-bins the data, omitting values
       which lie more than a specified number of standard deviations
       from the expected value in each bin.  The straight-line fit is
       then re-calculated.  You can specify the number of standard
@@ -29520,8 +29644,7 @@ plot (9k).
 
       A plot is produced after the final iteration showing the bin
       centres, with error bars representing the spread of values in each
-      bin. This plot is produced within the current AGI picture and is
-      of a size you specify.
+      bin.  The best fitting straight line is overlayed on this plot.
 
       Optionally, an output NDF can be created containing a normalised
       version of the data array from the first input NDF.
@@ -29531,27 +29654,43 @@ plot (9k).
    }
    \sstparameters{
       \sstsubsection{
+         AXES = \_LOGICAL (Read)
+      }{
+         TRUE if labelled and annotated axes are to be drawn around the
+         plot. The width of the margins left for the annotation may be
+         controlled using parameter MARGIN. The appearance of the axes
+         (colours, fonts, \emph{etc.}) can be controlled using the parameter
+         STYLE. {\tt [TRUE]}
+      }
+      \sstsubsection{
          CLEAR = \_LOGICAL (Read)
       }{
-         Determines if the graphics workstation is to be cleared before
-         producing the plot. {\tt [TRUE]}
+         If TRUE the current picture is cleared before the plot is
+         drawn. If CLEAR is FALSE not only is the existing plot retained,
+         but also an attempt is made to align the new picture with the
+         existing picture. Thus you can generate a composite plot within
+         a single set of axes, say using different colours or modes to
+         distinguish data from different datasets. {\tt [TRUE]}
       }
       \sstsubsection{
          DATARANGE( 2 ) = \_REAL (Read)
       }{
-         This parameter may be used to override the plot auto-scaling
+         This parameter may be used to override the auto-scaling
          feature.  If given, two real numbers should be supplied
          specifying the lower and upper data values in IN2, between
          which data will be used.  If not given, the default is to use
          the auto-scaled values, calculated according to the value of
-         PCRANGE. {\tt [,]}
+         PCRANGE. Note, this parameter controls the range of data used in
+         the fitting algorithm. The range of data displayed in the plot can
+         be specified separately using parameters XLEFT, XRIGHT, YBOT and
+         YTOP. {\tt [,]}
       }
       \sstsubsection{
          DEVICE = DEVICE (Read)
       }{
-         The graphics workstation on which to produce the plot.  If it
-         is null, {\tt !}, there will be no plot made.
-         {\tt [}Current graphics device{\tt ]}
+         The graphics workstation on which to produce the plot.  If a
+         null value (!) is supplied no plot will be made. {\tt [Current graphics
+         device]}
       }
       \sstsubsection{
          IN1 = NDF (Read)
@@ -29562,6 +29701,26 @@ plot (9k).
          IN2 = NDF (Read)
       }{
          The NDF to which IN1 will be normalised.
+      }
+      \sstsubsection{
+         MARGIN( 4 ) = \_REAL (Read)
+      }{
+         The widths of the margins to leave for axis annotation, given
+         as fractions of the corresponding dimension of the DATA picture.
+         Four values may be given, in the order - bottom, right, top, left.
+         If less than four values are given, extra values are used equal to
+         the first supplied value. If these margins are too narrow any axis
+         annotation may be clipped. The dynamic default is 0.18 (for all
+         edges) if annotated axes are produced, and zero otherwise. {\tt []}
+      }
+      \sstsubsection{
+         MARKER = \_INTEGER (Read)
+      }{
+         Specifies the symbol with which each position should be marked in
+         the plot. It should be given as an integer PGPLOT marker type. For
+         instance, 0 gives a box, 1 gives a dot, 2 gives a cross, 3 gives
+         an asterisk, 7 gives a triangle. The value must be larger than or
+         equal to -31. {\tt [current value]}
       }
       \sstsubsection{
          MINPIX = \_INTEGER (Read)
@@ -29589,10 +29748,16 @@ plot (9k).
          rejected.  It must lie in the range 0.1 to 1.0E6. {\tt [3.0]}
       }
       \sstsubsection{
+         OFFSET = \_REAL (Write)
+      }{
+         An output parameter giving the offset in the linear
+         normalisation expression: IN1 = SLOPE $*$ IN2 $+$ OFFSET.
+      }
+      \sstsubsection{
          OUT = NDF (Write)
       }{
          An optional output NDF to hold a version of IN1 which is
-         normalised to IN2.  A null ({\tt !}) value indicates that an output
+         normalised to IN2.  A null (!) value indicates that an output
          NDF is not required.
       }
       \sstsubsection{
@@ -29600,102 +29765,102 @@ plot (9k).
       }{
          This parameter takes two real values in the range 0 to 100 and
          is used to modify the action of the auto-scaling algorithm
-         which scales the plots. The two values correspond to the
-         percentage points in the histogram of IN2 at which the lower
-         and upper cuts on data value are placed. With the default
-         value, the plots will omit those pixels which lie in the lower
-         and upper 2 percent intensity range of IN2. {\tt [2,98]}
-      }
-      \sstsubsection{
-         PXSIZE = \_REAL (Read)
-      }{
-         The horizontal size of the plot in metres. If a value less
-         than the default is requested, then the plot will appear at
-         the bottom left of the current picture. {\tt [}The size of the
-         current picture{\tt ]}
-      }
-      \sstsubsection{
-         PYSIZE = \_REAL (Read)
-      }{
-         The vertical size of the plot in metres. If a value less than
-         the default is requested, then the plot will appear at the
-         bottom left of the current picture. {\tt [}The size of the current
-         picture{\tt ]}
-      }
-      \sstsubsection{
-         TITLE = LITERAL (Read)
-      }{
-         Value for the title of the output NDF.  A null value will cause
-         the title of the NDF supplied for parameter IN1 to be used
-         instead.  {\tt [!]}
-      }
-   }
-   \sstgraphparameters{
-      \sstsubsection{
-         ABSLAB = LITERAL (Read)
-      }{
-         A title for the plot's $x$ axis. Only the first 50 characters
-         are used. The default is {\tt "Data value in $\wedge$NDF"} where $\wedge$NDF is
-         replaced by the name of the NDF associated with IN2. {\tt []}
-      }
-      \sstsubsection{
-         FONT = LITERAL (Read)
-      }{
-         The fount to be used for the line graphics.  It can be either
-         {\tt "NCAR"} for the NCAR fancy characters and {\tt "GKS"} for the standard
-         GKS san-serif fount.   The former is intended for hardcopy
-         publication-quality plots, since it is relatively slow; the
-         latter is intended for normal interactive graphics requiring
-         rapid plotting, and it is clearer on small plots. The
-         suggested default is the current value. {\tt ["GKS"]}
-      }
-      \sstsubsection{
-         MAJTIC( 2 ) = \_REAL (Read)
-      }{
-         The parameter controlling the numbers of major tick marks
-         for the $x$ and $y$ axes.  (Number used is between MAJTIC$+$2 and
-         5$*$MAJTIC/2$+$4.) {\tt [3.,3.]}
-      }
-      \sstsubsection{
-         MINTIC( 2 ) = \_REAL (Read)
-      }{
-         The number of minor tick marks between each major tick mark
-         for the $x$ and $y$ axes.  A negative value forces the graphics
-         package to compute appropriate values. {\tt [-1.,-1.]}
-      }
-      \sstsubsection{
-         ORDLAB = LITERAL (Read)
-      }{
-         A title for the plots $y$ axis. Only the first 50 characters
-         are used. The default is {\tt "Data value in $\wedge$NDF"} where
-         $\wedge$NDF is replaced by the name of the NDF associated with IN1.
-         {\tt []}
-      }
-      \sstsubsection{
-         OUTTIC = \_LOGICAL (Read)
-      }{
-         {\tt TRUE} if the axis tick marks are to appear on the outside of
-         the axes instead of inside. {\tt [FALSE]}
-      }
-      \sstsubsection{
-         PTITLE = LITERAL (Read)
-      }{
-         A title for the top of the plot. Only the first 50 characters
-         are used. {\tt ["Normalization plot"]}
-      }
-   }
-   \sstresparameters{
-      \sstsubsection{
-         OFFSET = \_REAL (Write)
-      }{
-         An output parameter giving the offset in the linear
-         normalisation expression: IN1 = SLOPE $*$ IN2 $+$ OFFSET.
+         which selects the data to use in the fitting algorithm. The two
+         values correspond to the percentage points in the histogram of
+         IN2 at which the lower and upper cuts on data value are placed.
+         With the default value, the plots will omit those pixels which
+         lie in the lower and upper 2 percent intensity range of IN2.
+         Note, this parameter controls the range of data used in the
+         fitting algorithm. The range of data displayed in the plot can
+         be specified separately using parameters XLEFT, XRIGHT, YBOT and
+         YTOP. {\tt [2,98]}
       }
       \sstsubsection{
          SLOPE = \_REAL (Write)
       }{
          An output parameter giving the slope of the linear
          normalisation expression: IN1 = SLOPE $*$ IN2 $+$ OFFSET.
+      }
+      \sstsubsection{
+         STYLE = LITERAL (Read)
+      }{
+         A group of attribute settings describing the plotting style to use
+         when drawing the annotated axes, data values, error bars, and
+         best fitting line.
+
+         A comma-separated list of strings should be given in which each
+         string is either an attribute setting, or the name of a text file
+         preceded by an up-arrow character {\tt "}$\wedge${\tt "}. Such text files should
+         contain further comma-separated lists which will be read and
+         interpreted in the same manner. Attribute settings are applied in
+         the order in which they occur within the list, with later settings
+         over-riding any earlier settings given for the same attribute.
+
+         Each individual attribute setting should be of the form:
+
+            $<$name$>$=$<$value$>$
+
+         where $<$name$>$ is the name of a plotting attribute, and $<$value$>$ is
+         the value to assign to the attribute. Default values will be
+         used for any unspecified attributes. All attributes will be
+         defaulted if a null value (!) is supplied. See section {\tt "}Plotting
+         Attributes{\tt "} in SUN/95 for a description of the available
+         attributes. Any unrecognised attributes are ignored (no error is
+         reported).
+
+         The appearance of the best fitting straight line is controlled by
+         the attributes Colour(Curves), Width(Curves), \emph{etc.} (the synonym Line
+         may be used in place of Curves). The appearance of markers is
+         controlled by Colour(Markers), Width(Markers), \emph{etc.} (the synonym
+         Symbols may be used in place of Markers). The appearance of the
+         error bars is controlled using Colour(ErrBars), Width(ErrBars),
+         \emph{etc}. Note, Size(ErrBars) controls the length of the serifs
+         (\emph{i.e.}
+         the cross pieces at each end of the error bar), and defaults to
+         1.0. {\tt [current value]}
+      }
+      \sstsubsection{
+         TITLE = LITERAL (Read)
+      }{
+         Value for the title of the output NDF.  A null value will cause
+         the title of the NDF supplied for parameter IN1 to be used
+         instead. {\tt [!]}
+      }
+      \sstsubsection{
+         XLEFT = \_REAL (Read)
+      }{
+         The axis value to place at the left hand end of the horizontal
+         axis of the plot. The dynamic default is the minimum data value
+         used by the fitting algorithm from IN2 (with a small margin).
+         The value supplied may be greater than or less than the value
+         supplied for XRIGHT. {\tt []}
+      }
+      \sstsubsection{
+         XRIGHT = \_REAL (Read)
+      }{
+         The axis value to place at the right hand end of the horizontal
+         axis of the plot. The dynamic default is the maximum data value
+         used by the fitting algorithm from IN2 (with a small margin).
+         The value supplied may be greater than or less than the value
+         supplied for XLEFT. {\tt []}
+      }
+      \sstsubsection{
+         YBOT = \_REAL (Read)
+      }{
+         The axis value to place at the bottom end of the vertical axis of
+         the plot. The dynamic default is the minimum data value used by
+         the fitting algorithm from IN1 (with a small margin). The value
+         supplied may be greater than or less than the value supplied for
+         YTOP. {\tt []}
+      }
+      \sstsubsection{
+         YTOP = \_REAL (Read)
+      }{
+         The axis value to place at the top end of the vertical axis of
+         the plot. The dynamic default is the maximum data value used by
+         the fitting algorithm from IN1 (with a small margin). The value
+         supplied may be greater than or less than the value supplied for
+         YBOT. {\tt []}
       }
    }
    \sstexamples{
@@ -29705,33 +29870,33 @@ plot (9k).
          This normalises NDF cl123a to the NDF cl123b.  A plot of the
          fit is made on the current graphics device, and the resulting
          normalisation scale and offset are written only to the
-         {\tt normalize.sdf} parameter file (as in the all the examples
-         below except where noted).  The NDF cl123c is the normalised
-         version of the input cl123a.
+         normalize.sdf parameter file (as in the all the examples below
+         except where noted).  The NDF cl123c is the normalised version
+         of the input cl123a.
       }
       \sstexamplesubsection{
-         normalize cl123a cl123b cl123c TITLE="Gain calibration"
+         normalize cl123a cl123b style={\tt "}{\tt '}size(errba)=0,title=Gain calibration{\tt '}{\tt "}
       }{
          This normalises NDF cl123a to the NDF cl123b.  A plot of the
          fit is made on the current graphics device with the title
-         {\tt "Gain calibration"}.  The NDF cl123c is the normalised
-         version of the input cl123a. 
+         {\tt "}Gain calibration{\tt "}.  The error bars are drawn with no serifs.
       }
       \sstexamplesubsection{
          normalize cl123a cl123b cl123c offset=(shift) slope=(scale)
       }{
          This normalises NDF cl123a to the NDF cl123b.  A plot of the
          fit is made on the current graphics device.  The resulting
-         normalisation scale and offset are written to the {\footnotesize ICL}
+         normalisation scale and offset are written to the ICL
          variables SCALE and SHIFT respectively, where they could be
-         passed to another application via an {\footnotesize ICL} procedure.
-         The NDF cl123c is the normalised version of the input cl123a.
+         passed to another application via an ICL procedure.  The NDF
+         cl123c is the normalised version of the input cl123a.
       }
       \sstexamplesubsection{
-         normalize in2=old in1=new out=! device=xwindows
+         normalize in2=old in1=new out=! device=xwindows style=$\wedge$normstyle
       }{
          This normalises NDF new to the NDF old.  A plot of the fit is
-         made on the xwindows device.  No output NDF is produced.
+         made on the xwindows device, using the plotting style defined in
+         text file normstyle.  No output NDF is produced.
       }
       \sstexamplesubsection{
          normalize in1=new in2=old out=young niter=5 pcrange=[3,98.5]
@@ -29749,12 +29914,13 @@ plot (9k).
       \sstitemlist{
 
          \sstitem
-         Provided the application does not fail two pictures are stored
-         in the graphics database: a FRAME of the specified size containing
-         the title, annotated axes and the plot; and a DATA picture with
-         each world co-ordinate being the pixel value of each NDF.  Both
-         pictures have comment {\tt "}KAPPA - Normalize{\tt "}.  The associated NDFs
-         are not stored in the database.
+         The application stores two pictures in the graphics database in
+         the following order: a FRAME picture containing the annotated axes
+         and data plot, and a DATA picture containing just the data plot.
+         Note, the FRAME picture is only created if annotated axes have been
+         drawn, or if non-zero margins were specified using parameter
+         MARGIN. The world co-ordinates in the DATA picture will correspond
+         to data value in the two NDFs.
       }
    }
    \sstdiytopic{
@@ -29774,7 +29940,7 @@ plot (9k).
          \sstitem
          At the moment, variance values are not used in the fitting
          algorithm but are modified in the output NDF to take account of
-         the scaling introduced by the normalisation. (A later version may
+         the scaling introduced by the normalisation.  (A later version may
          take account of variances in the fitting algorithm.)
 
          \sstitem
@@ -29783,13 +29949,14 @@ plot (9k).
 
          \sstitem
          Only \_REAL data can be processed directly.  Other non-complex
-         numeric data types will undergo a type conversion before processing
-         occurs. \_DOUBLE data cannot be processed due to a loss of precision.
+         numeric data types will undergo a type conversion before
+         processing occurs.  \_DOUBLE data cannot be processed due to a
+         loss of precision.
 
          \sstitem
          The pixel bounds of the two input NDFs are matched by trimming
          before calculating the normalisation constants, and are mapped as
-         vectors to allow processing of NDFs of any dimensionality. An
+         vectors to allow processing of NDFs of any dimensionality.  An
          output NDF may optionally be produced which is based on the
          first input NDF (IN1) by applying the calculated normalisation
          constants to IN1.
@@ -42138,7 +42305,6 @@ section \ref{se:style} the use of graphical style parameters.
          WCS co-ordinate Frame to another.
 
 \end{description}
-\end{htmlonly}
 
 \section{Release Notes---V0.13-6}
  No new applications or facilities have been introduced or changed, but 
@@ -42189,6 +42355,116 @@ section \ref{se:style} the use of graphical style parameters.
     parameter PERCENTILES.
  
 \end{itemize}
+\end{htmlonly}
+
+\section{Release Notes---V0.14}
+
+More applications have been changed to enable them to make use
+of the NDF WCS component, which stores descriptions of world
+co-ordinate systems within NDF data structures. More graphics 
+applications have also been changed to use the STYLE parameter 
+system introduced in V0.13 to control the detailed appearance of
+the plot. In some cases, these have involved major changes, 
+including the removal of existing parameters and the addition of 
+new parameters.
+
+\begin{quote}
+\emph{ Scripts which make use of any of the removed or modified parameters
+will fail when run with KAPPA V0.14. Such scripts will need to be changed
+to take account of the new features introduced in this release. Check the
+lists below for details.}
+\end{quote}
+
+\subsection{Modified applications}
+The following applications have been modified:
+   \begin{description}
+
+      \item [\htmlref{NORMALIZE}{NORMALIZE}] \mbox{}
+         \begin{itemize}
+            \item There is now much greater control over the appearance
+                  of the normalization plot. This is provided through the 
+                  STYLE parameter which allow plotting attributes to
+                  be set.
+
+            \item The following parameters have been removed (alternatives to 
+                  using these old parameters are indicated): 
+
+               \begin{description}
+                  \item[ABSLAB] -- Use the STYLE parameter to specify a
+                                   value for the plotting attribute {\tt 
+                                   Label(1)}.
+                  \item[FONT] -- Use the {\tt Font} plotting attributes.
+                  \item[MAJTIC] -- Use the {\tt Gap} plotting attributes.
+                  \item[MINTIC] -- Use the {\tt MinTick} plotting attribute.
+                  \item[ORDLAB] -- Use {\tt Label(2)} plotting attribute.
+                  \item[OUTTIC] -- Use {\tt MajTickLen} and {\tt MinTickLen} 
+                                   plotting attributes.
+                  \item[PTITLE] -- Use the {\tt Title} plotting attribute.
+               \end{description}
+
+            \item The following new parameters have been added: AXES, MARGIN, 
+                  MARKER, XLEFT, XRIGHT, YBOT, YTOP.
+         
+         \end{itemize}
+
+      \item [\htmlref{CENTROID}{CENTROID}] \mbox{}
+         \begin{itemize}
+
+            \item Positions can now be read from and written to position
+	    list catalogues such as created by CURSOR, LISTMAKE, etc.
+
+            \item All positions, both given by the user and returned by
+	    the program, now refer to the Current Frame of the NDF.
+
+            \item Either the initial or final positions may now be marked
+	    on the screen (see parameter MARK).
+
+            \item There is now much greater control over the appearance
+	    of any annotation draw over the screen. This is provided
+	    through the PLOTSTYLE parameter which allow plotting
+	    attributes to be set.
+
+            \item The error on the final position is now returned in
+	    parameters XERR and YERR.
+
+            \item The following parameters have been removed
+	    (alternatives to using these old parameters are indicated):
+
+               \begin{description}
+                  \item[COSYS] -- Use application WCSFRAME to set the required
+                                  co-ordinate Frame first.
+               \end{description}
+
+            \item The following new parameters have been added: DESCRIBE,
+	    ERROR, GUESS, INCAT, MARKER, OUTCAT, PLOTSTYLE, QUIET, TITLE,
+	    XERR, YERR.
+
+            \item The following parameters have been modified:
+               \begin{description}
+
+                  \item[CENTRE] -- This is now a string parameter in
+		  which is returned the formatted co-ordinates of the
+		  last centroid position, in the current Frame of the
+		  NDF.
+
+                  \item[INIT] -- This is now a string parameter which
+		  should be given the co-ordinates of the initial guess
+		  in the Current Frame of the NDF.
+
+                  \item[MARK] -- Now indicates whether the initial or
+		  final positions should be marked on the screen.
+
+                  \item[MODE] -- Now accepts the extra value "Catalogue".
+
+                  \item[XCEN,YCEN] -- These are now string parameters
+		  which return the formatted X and Y co-ordinates of the
+		  last centroid position, in the current Frame of the
+		  NDF.
+
+               \end{description}
+         \end{itemize}
+
+   \end{description}
 
 \begin{latexonly}
 \newpage
