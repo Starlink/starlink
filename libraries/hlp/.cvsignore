@@ -1,3 +1,11 @@
+config.h
+config.h.in
+crehlp
+lsthlp
+starconf.status
+sun124.ps
+sun124.dvi
+tsthlp
 *.lo
 *.la
 Makefile

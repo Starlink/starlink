@@ -1,3 +1,13 @@
+CMP_ERR
+DAT_ERR
+config.h
+dat_err.h
+dat_par.h
+dat_par_h
+fac_200_err
+fac_230_err
+sun92.ps
+sun92.dvi
 *.lo
 *.la
 Makefile

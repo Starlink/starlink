@@ -1,3 +1,13 @@
+IDI_ERR
+core.*
+dctprep
+fac_275_err
+gnsrun_idi
+idi_err.h
+starconf.status
+sun65.ps
+sun65.dvi
+xworks.dat
 *.lo
 *.la
 Makefile
