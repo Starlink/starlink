@@ -153,6 +153,10 @@ MJC: Malcolm J. Currie (STARLINK)
     Allowed for non-zero axis rotation so that axis information is
     not lost when converting a BDF to an NDF and then back to a
     BDF.
+
+ 1993 January 4 (MJC):
+    Fixed a bug that made it was possible not to write mandatory
+    descriptors to the BDF.  Allowed lowercase Interim types.
 2 Implementation_Status
    -  Primitive NDFs are created.
 

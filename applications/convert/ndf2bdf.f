@@ -156,7 +156,7 @@
 *     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
-*  hISTORY:
+*  History:
 *     1991 March 5th (JM):
 *        Adapted from STAROUT.
 *     1991 October 30 (MJC):
@@ -179,6 +179,9 @@
 *        Allowed for non-zero axis rotation so that axis information is
 *        not lost when converting a BDF to an NDF and then back to a
 *        BDF.
+*     1993 January 4 (MJC):
+*        Fixed a bug that made it was possible not to write mandatory
+*        descriptors to the BDF.  Allowed lowercase Interim types.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -234,12 +237,13 @@
       CHARACTER CRVAL*(SZDESC)      ! Descriptor name of CRVALn
       CHARACTER CVALUE*(SZVAL)      ! Accommodates descriptor value
       CHARACTER DESCR*(SZDESC)      ! Accommodates descriptor name
+      CHARACTER DEFFMT*(2)          ! Default Interim data format
       LOGICAL   DESCRP              ! True if descriptors output to user
       INTEGER   DIMS(DAT__MXDIM)    ! IMAGE dimensions (axis length)
       INTEGER   FD                  ! File descriptor 
       LOGICAL   FITSPR              ! True if FITS extension is present
       CHARACTER FITSTR*(SZFITS)     ! FITS string
-      CHARACTER FORMAT*(DAT__SZTYP) ! data format required
+      CHARACTER FORMAT*(2)          ! Interim data format required
       CHARACTER FTLOC*(DAT__SZLOC)  ! Locator to NDF FITS extension
       CHARACTER FTLOCI*(DAT__SZLOC) ! Locator to NDF FITS extension
       CHARACTER HDSTYP*(DAT__SZTYP) ! HDS type data type 
@@ -263,6 +267,8 @@
       LOGICAL   ROTAX( DAT__MXDIM ) ! True if an axis is rotated in the
                                     ! FITS extension
       REAL      START               ! Start value for an axis structure
+      LOGICAL   STDDSR              ! True if BDF has had its mandatory
+                                    ! descriptors written
       LOGICAL   THERE               ! True if NDF has FITS extension
       LOGICAL   TITFND              ! True if NDF TITLE found
       LOGICAL   UNTFND              ! True if NDF UNITS found
@@ -294,18 +300,18 @@
 
 *   Convert the HDS type to an Interim type to be used as the
 *   dynamic default.
-      CALL CON_H2ITY( NDFTYP, FORMAT, STATUS )
+      CALL CON_H2ITY( NDFTYP, DEFFMT, STATUS )
 
-*   Get Format of data required, using NDF's type as the default.
-      CALL PAR_DEF0C( 'TYPE', FORMAT, STATUS )
-      CALL PAR_GET0C( 'TYPE', FORMAT, STATUS )
-
-      IF ( STATUS .NE. SAI__OK ) GO TO 999
+*   Get Interim format of data required, using NDF's data type as the
+*   default.  Note this is in uppercase as this is all Interim will
+*   recognise.
+      CALL PAR_CHOIC( 'TYPE', DEFFMT, 'R,DP,SB,SW,SL,UB,UW', .FALSE.,
+     :                FORMAT, STATUS )
 
 *   Convert format to old-style value and get its HDS equivalent.
       CALL CON_INTCL( FORMAT, BDFORM, NBPI, STATUS )
       CALL CON_I2HTY( FORMAT, HDSTYP, STATUS )
-      IF ( STATUS .NE. SAI__OK ) GOTO 999
+      IF ( STATUS .NE. SAI__OK ) GOTO 996
 
 *   Map the NDF data array.
 *   =======================
@@ -487,6 +493,10 @@
          LABFND = .FALSE.
          UNTFND = .FALSE.
 
+*      Initialise the flag to indicate that the mandatory NAXIS, NAXISn
+*      descriptors have not been written to the BDF.
+         STDDSR = .FALSE.
+
 *      Initialise the flags that indicate a rotated axis.
          DO I = 1, NDIM
             ROTAX( I ) = .FALSE.
@@ -556,6 +566,9 @@
                   CALL CON_SPDES( NDF, 'IMAGE', DESCRP, NFLAGS, CMPFND,
      :                            STATUS )
 
+*               The mandatory headers have just been written.
+                  STDDSR = .TRUE.
+
 *               Use more obvious flags to indicate the certain items
 *               have been written to the descriptors already.
                   AXIFND = CMPFND( 1 )
@@ -577,6 +590,13 @@
 
             END IF
          END DO
+
+*      Check that the mandatory headers have been written.  They might
+*      not have been created because the FITS extension only includes
+*      standard FITS keywords, such as the mandatory descriptors.
+         IF ( .NOT. STDDSR ) 
+     :     CALL CON_SPDES( NDF, 'IMAGE', DESCRP, NFLAGS, CMPFND,
+     :     STATUS )
 
 *      Deal with rotated axes.
 *      =======================
