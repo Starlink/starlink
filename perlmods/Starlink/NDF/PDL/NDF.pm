@@ -74,8 +74,8 @@ $EXTNAME = 'NDF_EXT';
 
   Reads a piddle from a NDF format data file.
 
-     $pdl = rgsd('file.sdf');
-     $pdl = rgsd('file.sdf',1);
+     $pdl = rndf('file.sdf');
+     $pdl = rndf('file.sdf',1);
 
   The '.sdf' suffix is optional. The optional second argument turns off 
   automatic quality masking and returns a quality array as well.
@@ -91,7 +91,7 @@ $EXTNAME = 'NDF_EXT';
   then:
       %{$hdr}        contains all the FITS headers plus:
       $$hdr{Error}   contains the Error/Variance PDL
-      $$hdr{Quality} The quality byte array
+      $$hdr{Quality} The quality byte array (if reqeusted)
       @{$$hdr{Axis}} Is an array of piddles containing the information
                      for axis 0, 1, etc.
       $$hdr{NDF_EXT} Contains all the NDF extensions
@@ -857,7 +857,7 @@ sub wdata {
  
   my ($outndf, $pdl, $status) = @_;
   my (@bounds, $ndims, @lower, @comps, $dcomp, $temppdl, $type);
-  my ($pntr, $el, $nbytes, $axis, $axcomp, $axpntr);
+  my ($pntr, $el, $nbytes, $axis, $axcomp, $axpntr, %hdr, %axhdr);
   my ($entry, $value, $i, $axndims, $axtype, $tcomp, @acomps);
  
  
@@ -881,9 +881,13 @@ sub wdata {
   # Map data, variance, quality...
   @comps = ('Data','Errors','Quality');
  
-  # Retrieve header
+  # Retrieve header and check that the header is a hash ref
   my $hdr = $pdl->gethdr;
-  my %hdr = %$hdr;
+  if (ref($hdr) eq 'HASH') {
+    %hdr = %$hdr;
+  } else {
+    %hdr = ();
+  }
 
   for $dcomp (@comps) {
 
@@ -1004,8 +1008,12 @@ sub wdata {
             ndf_aunmp($outndf, '*', $i+1, $status);
 
             # Errors
-            my $axhdr = $axis->gethdr;
-            my %axhdr = %$axhdr;
+            my $axhdr = $axis->gethdr; # Retrieve and check header
+            if (ref($axhdr) eq 'HASH') {
+              %axhdr = %$hdr;
+            } else {
+              %axhdr = ();
+            }
 
             if (exists $axhdr{Errors}) {
                my $axis = $axhdr{Errors};
@@ -1078,7 +1086,7 @@ sub whdr {
   my ($outndf, $pdl, $status) = @_;
 
   my ($key, %header, @fitsdim, $fitsloc, $value);
-  my (%unused, @fits, $hashref);
+  my (%unused, @fits, $hashref, %header);
  
   # Return if bad status
   return 0 if $status != &NDF::SAI__OK;
@@ -1087,7 +1095,14 @@ sub whdr {
  
   # Write FITS header from {Hdr}
  
-  %header = %{$pdl->gethdr};
+  # Retrieve and check header from PDL
+  my $hdr = $pdl->gethdr;
+  if (ref($header) eq 'HASH') {
+    %header = %$hdr;
+  } else {
+    %header = ();
+  }
+
   %unused = ();
   @fits = ();
  
