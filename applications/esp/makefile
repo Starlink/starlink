@@ -249,6 +249,10 @@
 #        Altered make rule .hlp.shl to include PKG_VERS in help library.
 #     15-NOV-1999 (NG, MBT):
 #        Various minor fixes to build procedure.
+#     13-NOV-2001 (NG):
+#        Fixed mutual dependencies esp_source.tar and the actual
+#        source files (introducing file source-unpacked); added
+#        VERSION file.
 #     {enter_further_changes_here}
 #
 #  RCS:
@@ -425,7 +429,8 @@ PKG_LINK = ESP
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
-PKG_VERS = 0.10-7
+# %%VERSION%%
+PKG_VERS = 0.10-8
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the
@@ -434,7 +439,7 @@ PKG_VERS = 0.10-7
 #  smaller source archives in place of one large one to speed up build
 #  times.
 
-SOURCE_FILES = $(PKG_NAME)_source.tar makefile mk $(DOCUMENTATION)
+SOURCE_FILES = $(PKG_NAME)_source.tar makefile mk $(DOCUMENTATION) VERSION
 
 
 #  List of public script files.  These are scripts which form part of
@@ -467,13 +472,11 @@ ICL_SCRIPT = $(PKG_NAME).icl
 #  which form part of the package and are required in order to build
 #  it, but which are not required by users of it.
 
-PRIVATE_INCLUDES = $(I_SUB1) $(I_SUB2)
+PRIVATE_INCLUDES = $(I_SUB1)
 
 I_SUB1 = cor_par elf_par elp_par fas_par gra_par \
 	his_par hsb_par lob_par sec_par sel_par ske_par top_par gau_par \
 	hlpcmd.inc
-
-I_SUB2 =
 
 #  List of external include files.  These are files which are required
 #  in order to build the package but form part of other, externally
@@ -491,7 +494,7 @@ EXTERNAL_INCLUDES = SAE_PAR NDF_PAR NDF_ERR GRP_PAR PRM_PAR PAR_ERR \
 #
 #  Include the platform-specific variants as source files.
 
-F_ROUTINES = $(F_SUB1) $(F_SUB2) $(MONO_SOURCE)
+F_ROUTINES = $(F_SUB1) $(MONO_SOURCE)
 
 F_SUB1 = corr.f ellfou.f ellpro.f esphelp.f fastmed.f gaufit.f \
 	gaufit2.f dnsg.f d1mach.f_bigieee d1mach.f_littleieee \
@@ -500,37 +503,33 @@ F_SUB1 = corr.f ellfou.f ellpro.f esphelp.f fastmed.f gaufit.f \
         esp1_asffr.f esp1_crpt.f esp1_dsfrm.f esp1_gtpos.f esp1_gtpsz.f \
         esp1_inpos.f esp1_pr2s.f esp1_s2pr.f esp1_xyfmt.f esp1_farr.f \
 	elp1_filer.f elp1_texto.f elp1_cato.f \
-        kpg1_pgesc.f
+        kpg1_pgesc.f esp1_vers.f
 
-F_SUB2 =
 
 #  List of Fortran BLOCK DATA routines.
 
-BLOCK_DATA = $(B_SUB1) $(B_SUB2)
+BLOCK_DATA = $(B_SUB1)
 
 B_SUB1 =
  
-B_SUB2 =
 
 #  List of platform specific Fortran routines.  The source tar file will
 #  contain a version of these files for each set of platforms.  The names
 #  given here are the general version of the file, e.g. pkg_open.f.  The
 #  names in the tar file will be pkg_open.f_sun4, pkg_open.f_mips, etc.
 
-PLATFORM_F = $(PF_SUB1) $(PF_SUB2)
+PLATFORM_F = $(PF_SUB1)
 
 PF_SUB1 = d1mach.f
 
-PF_SUB2 =
 
 #  C routines required for building the package.  This is just a list of
 #  all the C source files.
 
-C_ROUTINES = $(C_SUB1) $(C_SUB2)
+C_ROUTINES = $(C_SUB1)
 
 C_SUB1 =
 
-C_SUB2 =
 
 #  List of applications/tasks in monolith.
 
@@ -594,7 +593,8 @@ DOCUMENTATION = $(LATEX_DOCS) $(HYPERTEXT_DOCS:.htx=.htx_tar) \
 #  file).
 
 BUILT_FILES = $(PUBLIC_SCRIPTS) $(OBJECT_LIBRARIES) $(MONOLITH) \
-$(IFC_FILES) $(HELP_FILES) $(ICL_SCRIPT) $(DATA_FILES) $(STARTUP_SCRIPTS)
+	$(IFC_FILES) $(HELP_FILES) $(ICL_SCRIPT) $(DATA_FILES) \
+	$(STARTUP_SCRIPTS)
 
 #  List of links used to access include files during compilation.  This
 #  should comprise all the external include files and any other include
@@ -622,15 +622,35 @@ AST_ERR:      $(STAR_INC)/ast_err;   $(LINK) $? $@
 AST_PAR:      $(STAR_INC)/ast_par;   $(LINK) $? $@
 CAT_PAR:      $(STAR_INC)/cat_par;   $(LINK) $? $@
 
-#  Rules for extracting source files from the source archive.
+#  Rule for extracting source files from the source archive.
 
-# Generate MONO_IFL from the other IFL files, rather than extracting it
-# from the tar archive.
-$(PUBLIC_SCRIPTS) $(DATA_FILES) $(LINK_SCRIPT) $(MONO_SOURCE) \
-$(HELP_SOURCES) $(STARTUP_SCRIPTS) $(IFL_FILES) $(ICL_SCRIPT):
-	$(TAR_OUT) $(PKG_NAME)_source.tar $@
-	@ if test -f $@; then :;\
-           else echo $@ is not in the tar file; exit 1; fi
+#  Express this as a rule to create the file source-unpacked.
+#
+#  This is somewhat twisted, and is caused by the requirement that
+#  since this makefile must function both at packaging time and at
+#  post-distribution build time.  Thus esp_source.tar has to depend on
+#  all the source files so that we can create it from them when we are
+#  creating the export_source target.  However, after distribution,
+#  the source files might also be said to depend on the esp_source.tar
+#  file in the sense that it is that file they are unpacked from.  We
+#  can't express both these dependencies directly here, so we declare
+#  that esp_source.tar depends on all the source files, and
+#  source-unpacked depends on esp_source.tar.  Then, if the build
+#  target depends on source-unpacked (which is rational), we ensure
+#  that the sources will be unpacked before anything else is built.
+#
+#  The requirement here is that the file source-unpacked _exists_.  We 
+#  mustn't express a makefile dependency of source-unpacked on
+#  esp_source.tar, since (a) that dependency would fail in the
+#  development directory, and (b) it would cause esp_source.tar to be
+#  unpacked shortly after it was created in the development
+#  directory.  Thus, since source-unpacked is in the CVS repository,
+#  the following dependency will _always_ be satisfied in the
+#  development directory, but will require the unpacking of the source 
+#  tarball in the distributed directory.
+source-unpacked:
+	test -f $(PKG_NAME)_source.tar && $(TAR_OUT) $(PKG_NAME)_source.tar
+
 
 # Generate the monolith IFL file by concatenating the individual task 
 # IFL files.
@@ -648,55 +668,37 @@ $(MONO_IFL): $(IFL_FILES)
 	done
 	echo "endmonolith"				>>$(MONO_IFL)
 
-$(F_SUB1) $(I_SUB1) $(B_SUB1) $(C_SUB1):
-	$(TAR_OUT) $(PKG_NAME)_source.tar $@
-	@ if test -f $@; then :;\
-           else echo $@ is not in the tar file; exit 1; fi
 
-# target to create a new_$(PKG_NAME)_source.tar, from the current versions
-# of the sources in this directory.  In order that the $? works reliably, 
-# the file must not exist already
-new_$(PKG_NAME)_source.tar: $(PUBLIC_SCRIPTS) $(DATA_FILES) \
+#  Target to create a $(PKG_NAME)_source.tar, from the current versions
+#  of the sources in this directory.  Include the (empty) file
+#  source-unpacked in the tarball, since it serves as a marker in the
+#  distributed directory (see discussion above).
+$(PKG_NAME)_source.tar: $(PUBLIC_SCRIPTS) $(DATA_FILES) \
 		$(LINK_SCRIPT) $(MONO_SOURCE) $(HELP_SOURCES) $(MONO_IFL) \
 		$(STARTUP_SCRIPTS) $(IFL_FILES) $(ICL_SCRIPT) \
 		$(F_SUB1) $(I_SUB1) $(B_SUB1) $(C_SUB1)
-	$(TAR_IN) new_$(PKG_NAME)_source.tar $?
+	$(TAR_IN) $@ \
+		$(PUBLIC_SCRIPTS) $(DATA_FILES) \
+		$(LINK_SCRIPT) $(MONO_SOURCE) $(HELP_SOURCES) $(MONO_IFL) \
+		$(STARTUP_SCRIPTS) $(IFL_FILES) $(ICL_SCRIPT) \
+		$(F_SUB1) $(I_SUB1) $(B_SUB1) $(C_SUB1) \
+		source-unpacked
 
-$(F_SUB2) $(I_SUB2) $(B_SUB2) $(C_SUB2):
-	$(TAR_OUT) $(PKG_NAME)_sub2.tar $@
-	@ if test -f $@; then :;\
-           else echo $@ is not in the tar file; exit 1; fi
 
 #  Rules for extracting platform specific source files from the source
 #  archives.
 
-#  It is quite likely that there are no platform-specific source files
-#  and that the macro PF_SUBn is empty. To prevent a syntax error in
-#  make, a dummy target is present.
-
-#$(PF_SUB1) dummy_target1:
-#	$(TAR_OUT) $(PKG_NAME)_source.tar $@_$(SOURCE_VARIANT)
-#	@ if test -f $@_$(SOURCE_VARIANT); then :;\
-#           else echo $@_$(SOURCE_VARIANT) is not in the tar file; exit 1; fi
-#	mv $@_$(SOURCE_VARIANT) $@
-
 d1mach.f: d1mach.f_$(SOURCE_VARIANT)
 	$(LINK) $? $@
 
-$(PF_SUB2) dummy_target2:
-	$(TAR_OUT) $(PKG_NAME)_sub2.tar $@_$(SOURCE_VARIANT)
-	@ if test -f $@_$(SOURCE_VARIANT); then :;\
-           else echo $@_$(SOURCE_VARIANT) is not in the tar file; exit 1; fi
-	mv $@_$(SOURCE_VARIANT) $@
 
 #  List of object files produced by compiling the source code and rules
 #  for performing the compilations.
 
-OBJECT_FILES = $(O_SUB1) $(O_SUB2) $(MONO_OBJECT)
+OBJECT_FILES = $(O_SUB1) $(MONO_OBJECT)
 
 O_SUB1 = $(B_SUB1:.f=.o) $(F_SUB1:.f=.o) $(PF_SUB1:.f=.o) $(C_SUB1:.c=.o)
 
-O_SUB2 = $(B_SUB2:.f=.o) $(F_SUB2:.f=.o) $(PF_SUB2:.f=.o) $(C_SUB2:.c=.o)
 
 MONO_OBJECT = $(MONO_SOURCE:.f=.o)
 
@@ -714,9 +716,6 @@ libesp.a: $(O_SUB1)
 	$(AR_IN) $@ $?
 	$(RANLIB) $@
 
-libsub2.a: $(O_SUB2)
-	$(AR_IN) $@ $?
-	$(RANLIB) $@
 
 #  Rule and dependencies for building the monolith.
 
@@ -834,7 +833,7 @@ check:
 #  not, it then causes the .BUILT target to be made which ensures that
 #  the package has been built.
 
-build:
+build: source-unpacked
 	@ if test -f .INSTALLED_$(SYSTEM); then \
            echo;\
            echo \
@@ -1409,10 +1408,39 @@ export_source: $(EXPORT)/$(PKG_NAME).tar.Z
 $(EXPORT)/$(PKG_NAME).tar.Z: $(SOURCE_FILES)
 #
 #  Remove any pre-existing tar files before creating new ones.
-	if test -f $(EXPORT)/$(PKG_NAME).tar.Z; then \
-           rm -f $(EXPORT)/$(PKG_NAME).tar.Z; else :; fi
+	test ! -f $(EXPORT)/$(PKG_NAME)-$(PKG_VERS).tar.Z || \
+		rm -f $(EXPORT)/$(PKG_NAME)-$(PKG_VERS).tar.Z
 	$(TAR_IN) - $(SOURCE_FILES) \
-           | compress -v > $(EXPORT)/$(PKG_NAME).tar.Z
+           | compress -v > $(EXPORT)/$(PKG_NAME)-$(PKG_VERS).tar.Z
+	test ! -f $(EXPORT)/$(PKG_NAME).tar.Z || \
+		rm -f $(EXPORT)/$(PKG_NAME).tar.Z
+	$(LINK) $(EXPORT)/$(PKG_NAME)-$(PKG_VERS).tar.Z \
+		$(EXPORT)/$(PKG_NAME).tar.Z
+
+#  Documentation targets
+#
+#  We don't distribute sun180.dvi, but building the HTX documentation
+#  requires the sun180.aux file
+sun180.aux: sun180.tex
+	latex sun180
+
+sun180.htx_tar: sun180.tex sun180.aux
+	star2html -aux sun180
+	tar cf sun180.htx_tar sun180.htx
+
+#  Propagate version number from file VERSION
+makefile sun180.tex: VERSION
+	./propagate-version makefile sun180.tex
+
+#  Generate the file esp1_vers.f from the VERSION file.  Matches
+#  major.minor and major.minor-release; tolerant of text after the
+#  version string.
+esp1_vers.f: VERSION
+	echo '      real function esp1_vers ()' > $@
+	sed 's/^ *\(.*\)/c     Library version: \1/' $? >> $@
+	echo 'c     This file is auto-generated -- see makefile' >> $@
+	sed -e 's/^ *\([0-9][0-9]*\)[^0-9][^0-9]*\([0-9][0-9]*\)\([^0-9][^0-9]*\([0-9][0-9]*\)\)\?.*/      esp1_vers=\1+\2\/1e2+(\4+0)\/1e4/' $? >> $@
+	echo '      end' >> $@
 
 #  clean: Clean up the source directory.
 #  ------------------------------------
