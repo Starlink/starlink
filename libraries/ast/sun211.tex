@@ -1,6 +1,7 @@
 \documentclass[twoside,11pt]{article}
 
 % ? Specify used packages
+\usepackage[english]{babel}  %  For correct hyphenation rules
 \usepackage{graphicx}        %  Use this one for final production.
 % \usepackage[draft]{graphicx} %  Use this one for drafting.
 % ? End of specify used packages
@@ -13657,6 +13658,710 @@ Object            - Base class for all AST Objects
    }
 }
 \sstroutine{
+   astMathMap\sstlabel{astMathMap}
+}{
+   Create a MathMap
+}{
+   \sstdescription{
+      This function creates a new \htmlref{MathMap}{MathMap} and optionally initialises its
+      attributes.
+
+      A MathMap is a \htmlref{Mapping}{Mapping} which allows you to specify a set of forward
+      and/or inverse transformation functions using arithmetic operations
+      and mathematical functions similar to those available in C. The
+      MathMap interprets these functions at run-time, whenever its forward
+      or inverse transformation is required. Because the functions are not
+      compiled in the normal sense (unlike an \htmlref{IntraMap}{IntraMap}), they may be used to
+      describe coordinate transformations in a transportable manner. A
+      MathMap therefore provides a flexible way of defining new types of
+      Mapping whose descriptions may be stored as part of a dataset and
+      interpreted by other programs.
+   }
+   \sstsynopsis{
+      AstMathMap $*$astMathMap( int nin, int nout,
+                              int nfwd, const char $*$fwd[],
+                              int ninv, const char $*$inv[],
+                              const char $*$options, ... )
+   }
+   \sstparameters{
+      \sstsubsection{
+         nin
+      }{
+         Number of input variables for the MathMap. This determines the
+         value of its \htmlref{Nin}{Nin} attribute.
+      }
+      \sstsubsection{
+         nout
+      }{
+         Number of output variables for the MathMap. This determines the
+         value of its \htmlref{Nout}{Nout} attribute.
+      }
+      \sstsubsection{
+         nfwd
+      }{
+         The number of forward transformation functions being supplied.
+         This must be at least equal to {\tt{"}}nout{\tt{"}}, but may be increased to
+         accommodate any additional expressions which define intermediate
+         variables for the forward transformation (see the {\tt{"}}Calculating
+         Intermediate Values{\tt{"}} section below).
+      }
+      \sstsubsection{
+         fwd
+      }{
+         An array (with {\tt{"}}nfwd{\tt{"}} elements) of pointers to null terminated strings
+         which contain the expressions defining the forward transformation.
+         The syntax of these expressions is described below.
+      }
+      \sstsubsection{
+         ninv
+      }{
+         The number of inverse transformation functions being supplied.
+         This must be at least equal to {\tt{"}}nin{\tt{"}}, but may be increased to
+         accommodate any additional expressions which define intermediate
+         variables for the inverse transformation (see the {\tt{"}}Calculating
+         Intermediate Values{\tt{"}} section below).
+      }
+      \sstsubsection{
+         inv
+      }{
+         An array (with {\tt{"}}ninv{\tt{"}} elements) of pointers to null terminated strings
+         which contain the expressions defining the inverse transformation.
+         The syntax of these expressions is described below.
+      }
+      \sstsubsection{
+         options
+      }{
+         Pointer to a null-terminated string containing an optional
+         comma-separated list of attribute assignments to be used for
+         initialising the new MathMap. The syntax used is identical to
+         that for the \htmlref{astSet}{astSet} function and may include {\tt{"}}printf{\tt{"}} format
+         specifiers identified by {\tt{"}}\%{\tt{"}} symbols in the normal way.
+         If no initialisation is required, a zero-length string may be
+         supplied.
+      }
+      \sstsubsection{
+         ...
+      }{
+         If the {\tt{"}}options{\tt{"}} string contains {\tt{"}}\%{\tt{"}} format specifiers, then
+         an optional list of additional arguments may follow it in
+         order to supply values to be substituted for these
+         specifiers. The rules for supplying these are identical to
+         those for the astSet function (and for the C {\tt{"}}printf{\tt{"}}
+         function).
+      }
+   }
+   \sstreturnedvalue{
+      \sstsubsection{
+         astMathMap()
+      }{
+         A pointer to the new MathMap.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The sequence of numbers produced by the random number functions
+         available within a MathMap is normally unpredictable and different for
+         each MathMap. However, this behaviour may be controlled by means of
+         the MathMap's \htmlref{Seed}{Seed} attribute.
+
+         \sstitem
+         Normally, compound Mappings (CmpMaps) which involve MathMaps will
+         not be subject to simplification (e.g. using \htmlref{astSimplify}{astSimplify}) because AST
+         cannot know how different MathMaps will interact. However, in the
+         special case where a MathMap occurs in series with its own inverse,
+         then simplification may be possible. Whether simplification does, in
+         fact, occur under these circumstances is controlled by the MathMap's
+         \htmlref{SimpFI}{SimpFI} and \htmlref{SimpIF}{SimpIF} attributes.
+
+         \sstitem
+         A null \htmlref{Object}{Object} pointer (AST\_\_NULL) will be returned if this
+         function is invoked with the AST error status set, or if it
+         should fail for any reason.
+      }
+   }
+   \sstdiytopic{
+      Defining Transformation Functions
+   }{
+      A MathMap's transformation functions are supplied as a set of
+      expressions in an array of character strings. Normally you would
+      supply the same number of expressions for the forward transformation,
+      via the {\tt{"}}fwd{\tt{"}} parameter, as there are output variables (given by the
+      MathMap's Nout attribute). For instance, if Nout is 2 you might use:
+      \sstitemlist{
+
+         \sstitem
+         {\tt{"}}r = sqrt( x $*$ x $+$ y $*$ y ){\tt{"}}
+
+         \sstitem
+         {\tt{"}}theta = atan2( y, x ){\tt{"}}
+
+      }
+      which defines a transformation from Cartesian to polar
+      coordinates. Here, the variables that appear on the left of each
+      expression ({\tt{"}}r{\tt{"}} and {\tt{"}}theta{\tt{"}}) provide names for the output variables
+      and those that appear on the right ({\tt{"}}x{\tt{"}} and {\tt{"}}y{\tt{"}}) are references to
+      input variables.
+
+      To complement this, you must also supply expressions for the inverse
+      transformation via the {\tt{"}}inv{\tt{"}} parameter.  In this case, the number of
+      expressions given would normally match the number of MathMap input
+      coordinates (given by the Nin attribute).  If Nin is 2, you might use:
+      \sstitemlist{
+
+         \sstitem
+         {\tt{"}}x = r $*$ cos( theta ){\tt{"}}
+
+         \sstitem
+         {\tt{"}}y = r $*$ sin( theta ){\tt{"}}
+
+      }
+      which expresses the transformation from polar to Cartesian
+      coordinates. Note that here the input variables ({\tt{"}}x{\tt{"}} and {\tt{"}}y{\tt{"}}) are
+      named on the left of each expression, and the output variables ({\tt{"}}r{\tt{"}}
+      and {\tt{"}}theta{\tt{"}}) are referenced on the right.
+
+      Normally, you cannot refer to a variable on the right of an expression
+      unless it is named on the left of an expression in the complementary
+      set of functions. Therefore both sets of functions (forward and
+      inverse) must be formulated using the same consistent set of variable
+      names. This means that if you wish to leave one of the transformations
+      undefined, you must supply dummy expressions which simply name each of
+      the output (or input) variables.  For example, you might use:
+      \sstitemlist{
+
+         \sstitem
+         {\tt{"}}x{\tt{"}}
+
+         \sstitem
+         {\tt{"}}y{\tt{"}}
+
+      }
+      for the inverse transformation above, which serves to name the input
+      variables but without defining an inverse transformation.
+   }
+   \sstdiytopic{
+      Calculating Intermediate Values
+   }{
+      It is sometimes useful to calculate intermediate values and then to
+      use these in the final expressions for the output (or input)
+      variables. This may be done by supplying additional expressions for
+      the forward (or inverse) transformation functions. For instance, the
+      following array of five expressions describes 2-dimensional pin-cushion
+      distortion:
+      \sstitemlist{
+
+         \sstitem
+         {\tt{"}}r = sqrt( xin $*$ xin $+$ yin $*$ yin ){\tt{"}}
+
+         \sstitem
+         {\tt{"}}rout = r $*$ ( 1 $+$ 0.1 $*$ r $*$ r ){\tt{"}}
+
+         \sstitem
+         {\tt{"}}theta = atan2( yin, xin ){\tt{"}}
+
+         \sstitem
+         {\tt{"}}xout = rout $*$ cos( theta ){\tt{"}}
+
+         \sstitem
+         {\tt{"}}yout = rout $*$ sin( theta ){\tt{"}}
+
+      }
+      Here, we first calculate three intermediate results ({\tt{"}}r{\tt{"}}, {\tt{"}}rout{\tt{"}}
+      and {\tt{"}}theta{\tt{"}}) and then use these to calculate the final results ({\tt{"}}xout{\tt{"}}
+      and {\tt{"}}yout{\tt{"}}). The MathMap knows that only the final two results
+      constitute values for the output variables because its Nout attribute
+      is set to 2. You may define as many intermediate variables in this
+      way as you choose. Having defined a variable, you may then refer to it
+      on the right of any subsequent expressions.
+
+      Note that when defining the inverse transformation you may only refer
+      to the output variables {\tt{"}}xout{\tt{"}} and {\tt{"}}yout{\tt{"}}.  The intermediate variables
+      {\tt{"}}r{\tt{"}}, {\tt{"}}rout{\tt{"}} and {\tt{"}}theta{\tt{"}} (above) are private to the forward
+      transformation and may not be referenced by the inverse
+      transformation. The inverse transformation may, however, define its
+      own private intermediate variables.
+   }
+   \sstdiytopic{
+      Expression Syntax
+   }{
+      The expressions given for the forward and inverse transformations
+      closely follow the syntax of the C programming language (with some
+      extensions for compatibility with Fortran). They may contain
+      references to variables and literal constants, together with
+      arithmetic, boolean, relational and bitwise operators, and function
+      invocations. A set of symbolic constants is also available. Each of
+      these is described in detail below. Parentheses may be used to
+      over-ride the normal order of evaluation. There is no built-in limit
+      to the length of expressions and they are insensitive to case or the
+      presence of additional white space.
+   }
+   \sstdiytopic{
+      Variables
+   }{
+      Variable names must begin with an alphabetic character and may contain
+      only alphabetic characters, digits, and the underscore character
+      {\tt{"}}\_{\tt{"}}. There is no built-in limit to the length of variable names.
+   }
+   \sstdiytopic{
+      Literal Constants
+   }{
+      Literal constants, such as {\tt{"}}0{\tt{"}}, {\tt{"}}1{\tt{"}}, {\tt{"}}0.007{\tt{"}} or {\tt{"}}2.505e-16{\tt{"}} may appear
+      in expressions, with the decimal point and exponent being optional (a
+      {\tt{"}}D{\tt{"}} may also be used as an exponent character for compatibility with
+      Fortran). A unary minus {\tt{"}}-{\tt{"}} may be used as a prefix.
+   }
+   \sstdiytopic{
+      Arithmetic Precision
+   }{
+      All arithmetic is floating point, performed in double precision.
+   }
+   \sstdiytopic{
+      Propagation of Missing Data
+   }{
+      Unless indicated otherwise, if any argument of a function or operator
+      has the value AST\_\_BAD (indicating missing data), then the result of
+      that function or operation is also AST\_\_BAD, so that such values are
+      propagated automatically through all operations performed by MathMap
+      transformations.  The special value AST\_\_BAD can be represented in
+      expressions by the symbolic constant {\tt{"}}$<$bad$>${\tt{"}}.
+
+      A $<$bad$>$ result (i.e. equal to AST\_\_BAD) is also produced in response
+      to any numerical error (such as division by zero or numerical
+      overflow), or if an invalid argument value is provided to a function
+      or operator.
+   }
+   \sstdiytopic{
+      Arithmetic Operators
+   }{
+      The following arithmetic operators are available:
+      \sstitemlist{
+
+         \sstitem
+         x1 $+$ x2: Sum of {\tt{"}}x1{\tt{"}} and {\tt{"}}x2{\tt{"}}.
+
+         \sstitem
+         x1 - x2: Difference of {\tt{"}}x1{\tt{"}} and {\tt{"}}x2{\tt{"}}.
+
+         \sstitem
+         x1 $*$ x2: Product of {\tt{"}}x1{\tt{"}} and {\tt{"}}x1{\tt{"}}.
+
+         \sstitem
+         x1 / x2: Ratio of {\tt{"}}x1{\tt{"}} and {\tt{"}}x2{\tt{"}}.
+
+         \sstitem
+         x1 $*$$*$ x2: {\tt{"}}x1{\tt{"}} raised to the power of {\tt{"}}x2{\tt{"}}.
+
+         \sstitem
+         $+$ x: Unary plus, has no effect on its argument.
+
+         \sstitem
+         - x: Unary minus, negates its argument.
+      }
+   }
+   \sstdiytopic{
+      Boolean Operators
+   }{
+      Boolean values are represented using zero to indicate false and
+      non-zero to indicate true. In addition, the value AST\_\_BAD is taken to
+      mean {\tt{"}}unknown{\tt{"}}. The values returned by boolean operators may therefore
+      be 0, 1 or AST\_\_BAD. Where appropriate, {\tt{"}}tri-state{\tt{"}} logic is
+      implemented. For example, {\tt{"}}a$|$$|$b{\tt{"}} may evaluate to 1 if {\tt{"}}a{\tt{"}} is non-zero,
+      even if {\tt{"}}b{\tt{"}} has the value AST\_\_BAD. This is because the result of the
+      operation would not be affected by the value of {\tt{"}}b{\tt{"}}, so long as {\tt{"}}a{\tt{"}} is
+      non-zero.
+
+      The following boolean operators are available:
+      \sstitemlist{
+
+         \sstitem
+         x1 \&\& x2: Boolean AND between {\tt{"}}x1{\tt{"}} and {\tt{"}}x2{\tt{"}}, returning 1 if both {\tt{"}}x1{\tt{"}}
+         and {\tt{"}}x2{\tt{"}} are non-zero, and 0 otherwise. This operator implements
+         tri-state logic. (The synonym {\tt{"}}.and.{\tt{"}} is also provided for compatibility
+         with Fortran.)
+
+         \sstitem
+         x1 $|$$|$ x2: Boolean OR between {\tt{"}}x1{\tt{"}} and {\tt{"}}x2{\tt{"}}, returning 1 if either {\tt{"}}x1{\tt{"}}
+         or {\tt{"}}x2{\tt{"}} are non-zero, and 0 otherwise. This operator implements
+         tri-state logic. (The synonym {\tt{"}}.or.{\tt{"}} is also provided for compatibility
+         with Fortran.)
+
+         \sstitem
+         x1 $\wedge$$\wedge$ x2: Boolean exclusive OR (XOR) between {\tt{"}}x1{\tt{"}} and {\tt{"}}x2{\tt{"}}, returning
+         1 if exactly one of {\tt{"}}x1{\tt{"}} and {\tt{"}}x2{\tt{"}} is non-zero, and 0 otherwise. Tri-state
+         logic is not used with this operator. (The synonyms {\tt{"}}.neqv.{\tt{"}} and {\tt{"}}.xor.{\tt{"}}
+         are also provided for compatibility with Fortran, although the second
+         of these is not standard.)
+
+         \sstitem
+         x1 .eqv. x2: This is provided only for compatibility with Fortran
+         and tests whether the boolean states of {\tt{"}}x1{\tt{"}} and {\tt{"}}x2{\tt{"}} (i.e. true/false)
+         are equal. It is the negative of the exclusive OR (XOR) function.
+         Tri-state logic is not used with this operator.
+
+         \sstitem
+         ! x: Boolean unary NOT operation, returning 1 if {\tt{"}}x{\tt{"}} is zero, and
+         0 otherwise. (The synonym {\tt{"}}.not.{\tt{"}} is also provided for compatibility
+         with Fortran.)
+      }
+   }
+   \sstdiytopic{
+      Relational Operators
+   }{
+      Relational operators return the boolean result (0 or 1) of comparing
+      the values of two floating point values for equality or inequality. The
+      value AST\_\_BAD may also be returned if either argument is $<$bad$>$.
+
+      The following relational operators are available:
+      \sstitemlist{
+
+         \sstitem
+         x1 == x2: Tests whether {\tt{"}}x1{\tt{"}} equals {\tt{"}}x1{\tt{"}}. (The synonym {\tt{"}}.eq.{\tt{"}} is
+         also provided for compatibility with Fortran.)
+
+         \sstitem
+         x1 != x2: Tests whether {\tt{"}}x1{\tt{"}} is unequal to {\tt{"}}x2{\tt{"}}. (The synonym {\tt{"}}.ne.{\tt{"}}
+         is also provided for compatibility with Fortran.)
+
+         \sstitem
+         x1 $>$ x2: Tests whether {\tt{"}}x1{\tt{"}} is greater than {\tt{"}}x2{\tt{"}}. (The synonym
+         {\tt{"}}.gt.{\tt{"}} is also provided for compatibility with Fortran.)
+
+         \sstitem
+         x1 $>$= x2: Tests whether {\tt{"}}x1{\tt{"}} is greater than or equal to {\tt{"}}x2{\tt{"}}. (The
+         synonym {\tt{"}}.ge.{\tt{"}}  is also provided for compatibility with Fortran.)
+
+         \sstitem
+         x1 $<$ x2: Tests whether {\tt{"}}x1{\tt{"}} is less than {\tt{"}}x2{\tt{"}}. (The synonym {\tt{"}}.lt.{\tt{"}}
+         is also provided for compatibility with Fortran.)
+
+         \sstitem
+         x1 $<$= x2: Tests whether {\tt{"}}x1{\tt{"}} is less than or equal to {\tt{"}}x2{\tt{"}}. (The
+         synonym {\tt{"}}.le.{\tt{"}} is also provided for compatibility with Fortran.)
+
+      }
+      Note that relational operators cannot usefully be used to compare
+      values with the $<$bad$>$ value (representing missing data), because the
+      result is always $<$bad$>$. The isbad() function should be used instead.
+   }
+   \sstdiytopic{
+      Bitwise Operators
+   }{
+      The bitwise operators provided by C are often useful when operating on
+      raw data (e.g. from instruments), so they are also provided for use in
+      MathMap expressions. In this case, however, the values on which they
+      operate are floating point values rather than pure integers. In order
+      to produce results which match the pure integer case, the operands are
+      regarded as fixed point binary numbers (i.e. with the binary
+      equivalent of a decimal point) with negative numbers represented using
+      twos-complement notation. For integer values, the resulting bit
+      pattern corresponds to that of the equivalent signed integer (digits
+      to the right of the point being zero). Operations on the bits
+      representing the fractional part are also possible, however.
+
+      The following bitwise operators are available:
+      \sstitemlist{
+
+         \sstitem
+         x1 $>$$>$ x2: Rightward bit shift. The integer value of {\tt{"}}x2{\tt{"}} is taken
+         (rounding towards zero) and the bits representing {\tt{"}}x1{\tt{"}} are then
+         shifted this number of places to the right (or to the left if the
+         number of places is negative). This is equivalent to dividing {\tt{"}}x1{\tt{"}} by
+         the corresponding power of 2.
+
+         \sstitem
+         x1 $<$$<$ x2: Leftward bit shift. The integer value of {\tt{"}}x2{\tt{"}} is taken
+         (rounding towards zero), and the bits representing {\tt{"}}x1{\tt{"}} are then
+         shifted this number of places to the left (or to the right if the
+         number of places is negative). This is equivalent to multiplying {\tt{"}}x1{\tt{"}}
+         by the corresponding power of 2.
+
+         \sstitem
+         x1 \& x2: Bitwise AND between the bits of {\tt{"}}x1{\tt{"}} and those of {\tt{"}}x2{\tt{"}}
+         (equivalent to a boolean AND applied at each bit position in turn).
+
+         \sstitem
+         x1 $|$ x2: Bitwise OR between the bits of {\tt{"}}x1{\tt{"}} and those of {\tt{"}}x2{\tt{"}}
+         (equivalent to a boolean OR applied at each bit position in turn).
+
+         \sstitem
+         x1 $\wedge$ x2: Bitwise exclusive OR (XOR) between the bits of {\tt{"}}x1{\tt{"}} and
+         those of {\tt{"}}x2{\tt{"}} (equivalent to a boolean XOR applied at each bit
+         position in turn).
+
+      }
+      Note that no bit inversion operator ({\tt{"}}$\sim${\tt{"}} in C) is provided. This is
+      because inverting the bits of a twos-complement fixed point binary
+      number is equivalent to simply negating it. This differs from the
+      pure integer case because bits to the right of the binary point are
+      also inverted. To invert only those bits to the left of the binary
+      point, use a bitwise exclusive OR with the value -1 (i.e. {\tt{"}}x$\wedge$-1{\tt{"}}).
+   }
+   \sstdiytopic{
+      Functions
+   }{
+      The following functions are available:
+      \sstitemlist{
+
+         \sstitem
+         abs(x): Absolute value of {\tt{"}}x{\tt{"}} (sign removal), same as fabs(x).
+
+         \sstitem
+         acos(x): Inverse cosine of {\tt{"}}x{\tt{"}}, in radians.
+
+         \sstitem
+         acosd(x): Inverse cosine of {\tt{"}}x{\tt{"}}, in degrees.
+
+         \sstitem
+         aint(x): Integer part of {\tt{"}}x{\tt{"}} (round towards zero), same as int(x).
+
+         \sstitem
+         asin(x): Inverse sine of {\tt{"}}x{\tt{"}}, in radians.
+
+         \sstitem
+         asind(x): Inverse sine of {\tt{"}}x{\tt{"}}, in degrees.
+
+         \sstitem
+         atan(x): Inverse tangent of {\tt{"}}x{\tt{"}}, in radians.
+
+         \sstitem
+         atand(x): Inverse tangent of {\tt{"}}x{\tt{"}}, in degrees.
+
+         \sstitem
+         atan2(x1, x2): Inverse tangent of {\tt{"}}x1/x2{\tt{"}}, in radians.
+
+         \sstitem
+         atan2d(x1, x2): Inverse tangent of {\tt{"}}x1/x2{\tt{"}}, in degrees.
+
+         \sstitem
+         ceil(x): Smallest integer value not less then {\tt{"}}x{\tt{"}} (round towards
+           plus infinity).
+
+         \sstitem
+         cos(x): Cosine of {\tt{"}}x{\tt{"}} in radians.
+
+         \sstitem
+         cosd(x): Cosine of {\tt{"}}x{\tt{"}} in degrees.
+
+         \sstitem
+         cosh(x): Hyperbolic cosine of {\tt{"}}x{\tt{"}}.
+
+         \sstitem
+         dim(x1, x2): Returns {\tt{"}}x1-x2{\tt{"}} if {\tt{"}}x1{\tt{"}} is greater than {\tt{"}}x2{\tt{"}}, otherwise 0.
+
+         \sstitem
+         exp(x): Exponential function of {\tt{"}}x{\tt{"}}.
+
+         \sstitem
+         fabs(x): Absolute value of {\tt{"}}x{\tt{"}} (sign removal), same as abs(x).
+
+         \sstitem
+         floor(x): Largest integer not greater than {\tt{"}}x{\tt{"}} (round towards
+           minus infinity).
+
+         \sstitem
+         fmod(x1, x2): Remainder when {\tt{"}}x1{\tt{"}} is divided by {\tt{"}}x2{\tt{"}}, same as
+           mod(x1, x2).
+
+         \sstitem
+         gauss(x1, x2): Random sample from a Gaussian distribution with mean
+           {\tt{"}}x1{\tt{"}} and standard deviation {\tt{"}}x2{\tt{"}}.
+
+         \sstitem
+         int(x): Integer part of {\tt{"}}x{\tt{"}} (round towards zero), same as aint(x).
+
+         \sstitem
+         isbad(x): Returns 1 if {\tt{"}}x{\tt{"}} has the $<$bad$>$ value (AST\_\_BAD), otherwise 0.
+
+         \sstitem
+         log(x): Natural logarithm of {\tt{"}}x{\tt{"}}.
+
+         \sstitem
+         log10(x): Logarithm of {\tt{"}}x{\tt{"}} to base 10.
+
+         \sstitem
+         max(x1, x2, ...): Maximum of two or more values.
+
+         \sstitem
+         min(x1, x2, ...): Minimum of two or more values.
+
+         \sstitem
+         mod(x1, x2): Remainder when {\tt{"}}x1{\tt{"}} is divided by {\tt{"}}x2{\tt{"}}, same as
+           fmod(x1, x2).
+
+         \sstitem
+         nint(x): Nearest integer to {\tt{"}}x{\tt{"}} (round to nearest).
+
+         \sstitem
+         poisson(x): Random integer-valued sample from a Poisson
+           distribution with mean {\tt{"}}x{\tt{"}}.
+
+         \sstitem
+         pow(x1, x2): {\tt{"}}x1{\tt{"}} raised to the power of {\tt{"}}x2{\tt{"}}.
+
+         \sstitem
+         rand(x1, x2): Random sample from a uniform distribution in the
+           range {\tt{"}}x1{\tt{"}} to {\tt{"}}x2{\tt{"}} inclusive.
+
+         \sstitem
+         sign(x1, x2): Absolute value of {\tt{"}}x1{\tt{"}} with the sign of {\tt{"}}x2{\tt{"}}
+           (transfer of sign).
+
+         \sstitem
+         sin(x): Sine of {\tt{"}}x{\tt{"}} in radians.
+
+         \sstitem
+         sind(x): Sine of {\tt{"}}x{\tt{"}} in degrees.
+
+         \sstitem
+         sinh(x): Hyperbolic sine of {\tt{"}}x{\tt{"}}.
+
+         \sstitem
+         sqr(x): Square of {\tt{"}}x{\tt{"}} (= {\tt{"}}x$*$x{\tt{"}}).
+
+         \sstitem
+         sqrt(x): Square root of {\tt{"}}x{\tt{"}}.
+
+         \sstitem
+         tan(x): Tangent of {\tt{"}}x{\tt{"}} in radians.
+
+         \sstitem
+         tand(x): Tangent of {\tt{"}}x{\tt{"}} in degrees.
+
+         \sstitem
+         tanh(x): Hyperbolic tangent of {\tt{"}}x{\tt{"}}.
+      }
+   }
+   \sstdiytopic{
+      Symbolic Constants
+   }{
+      The following symbolic constants are available (the enclosing {\tt{"}}$<$$>${\tt{"}}
+      brackets must be included):
+      \sstitemlist{
+
+         \sstitem
+         $<$bad$>$: The {\tt{"}}bad{\tt{"}} value (AST\_\_BAD) used to flag missing data. Note
+         that you cannot usefully compare values with this constant because the
+         result is always $<$bad$>$. The isbad() function should be used instead.
+
+         \sstitem
+         $<$dig$>$: Number of decimal digits of precision available in a
+         floating point (double) value.
+
+         \sstitem
+         $<$e$>$: \htmlref{Base}{Base} of natural logarithms.
+
+         \sstitem
+         $<$epsilon$>$: Smallest positive number such that 1.0$+$$<$epsilon$>$ is
+         distinguishable from unity.
+
+         \sstitem
+         $<$mant\_dig$>$: The number of base $<$radix$>$ digits stored in the
+         mantissa of a floating point (double) value.
+
+         \sstitem
+         $<$max$>$: Maximum representable floating point (double) value.
+
+         \sstitem
+         $<$max\_10\_exp$>$: Maximum integer such that 10 raised to that power
+         can be represented as a floating point (double) value.
+
+         \sstitem
+         $<$max\_exp$>$: Maximum integer such that $<$radix$>$ raised to that
+         power minus 1 can be represented as a floating point (double) value.
+
+         \sstitem
+         $<$min$>$: Smallest positive number which can be represented as a
+         normalised floating point (double) value.
+
+         \sstitem
+         $<$min\_10\_exp$>$: Minimum negative integer such that 10 raised to that
+         power can be represented as a normalised floating point (double) value.
+
+         \sstitem
+         $<$min\_exp$>$: Minimum negative integer such that $<$radix$>$ raised to
+         that power minus 1 can be represented as a normalised floating point
+         (double) value.
+
+         \sstitem
+         $<$pi$>$: Ratio of the circumference of a circle to its diameter.
+
+         \sstitem
+         $<$radix$>$: The radix (number base) used to represent the mantissa of
+         floating point (double) values.
+
+         \sstitem
+         $<$rounds$>$: The mode used for rounding floating point results after
+         addition. Possible values include: -1 (indeterminate), 0 (toward
+         zero), 1 (to nearest), 2 (toward plus infinity) and 3 (toward minus
+         infinity). Other values indicate machine-dependent behaviour.
+      }
+   }
+   \sstdiytopic{
+      Evaluation Precedence and Associativity
+   }{
+      Items appearing in expressions are evaluated in the following order
+      (highest precedence first):
+      \sstitemlist{
+
+         \sstitem
+         Constants and variables
+
+         \sstitem
+         Function arguments and parenthesised expressions
+
+         \sstitem
+         Function invocations
+
+         \sstitem
+         Unary $+$ - ! .not.
+
+         \sstitem
+         $*$$*$
+
+         \sstitem
+         $*$ /
+
+         \sstitem
+         $+$ -
+
+         \sstitem
+         $<$$<$ $>$$>$
+
+         \sstitem
+         $<$ .lt. $<$= .le. $>$ .gt. $>$= .ge.
+
+         \sstitem
+         == .eq. != .ne.
+
+         \sstitem
+         \&
+
+         \sstitem
+         $\wedge$
+
+         \sstitem
+         $|$
+
+         \sstitem
+         \&\& .and.
+
+         \sstitem
+         $\wedge$$\wedge$
+
+         \sstitem
+         $|$$|$ .or
+
+         \sstitem
+         .eqv. .neqv. .xor.
+
+      }
+      All operators associate from left-to-right, except for unary $+$,
+      unary -, !, .not. and $*$$*$ which associate from right-to-left.
+   }
+}
+\sstroutine{
    astMatrixMap\sstlabel{astMatrixMap}
 }{
    Create a MatrixMap
@@ -20577,6 +21282,151 @@ Object            - Base class for all AST Objects
    }
 }
 \sstroutine{
+   Seed\sstlabel{Seed}
+}{
+   Random number seed for a MathMap
+}{
+   \sstdescription{
+      This attribute, which may take any integer value, determines the
+      sequence of random numbers produced by the random number functions in
+      \htmlref{MathMap}{MathMap} expressions. It is set to an unpredictable default value when
+      a MathMap is created, so that by default each MathMap uses a different
+      set of random numbers.
+
+      If required, you may set this Seed attribute to a value of your
+      choosing in order to produce repeatable behaviour from the random
+      number functions. You may also enquire the Seed value (e.g. if an
+      initially unpredictable value has been used) and then use it to
+      reproduce the resulting sequence of random numbers, either from the
+      same MathMap or from another one.
+
+      Clearing the Seed attribute gives it a new unpredictable default
+      value.
+   }
+   \sstattributetype{
+      Integer.
+   }
+   \sstapplicability{
+      \sstsubsection{
+         MathMap
+      }{
+         All MathMaps have this attribute.
+      }
+   }
+}
+\sstroutine{
+   SimpFI\sstlabel{SimpFI}
+}{
+   Forward-inverse MathMap pairs simplify?
+}{
+   \sstdescription{
+      This attribute should be set to a non-zero value if applying a
+      \htmlref{MathMap}{MathMap}'s forward transformation, followed immediately by the matching
+      inverse transformation will always restore the original set of
+      coordinates. It indicates that AST may replace such a sequence of
+      operations by an identity \htmlref{Mapping}{Mapping} (a \htmlref{UnitMap}{UnitMap}) if it is encountered
+      while simplifying a compound Mapping (e.g. using \htmlref{astSimplify}{astSimplify}).
+
+      By default, the SimpFI attribute is zero, so that AST will not perform
+      this simplification unless you have set SimpFI to indicate that it is
+      safe to do so.
+   }
+   \sstattributetype{
+      Integer (boolean).
+   }
+   \sstapplicability{
+      \sstsubsection{
+         MathMap
+      }{
+         All MathMaps have this attribute.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         For simplification to occur, the two MathMaps must be in series and
+         be identical (with textually identical transformation
+         functions). Functional equivalence is not sufficient.
+
+         \sstitem
+         The consent of both MathMaps is required before simplification can
+         take place. If either has a SimpFI value of zero, then simplification
+         will not occur.
+
+         \sstitem
+         The SimpFI attribute controls simplification only in the case where
+         a MathMap's forward transformation is followed by the matching inverse
+         transformation. It does not apply if an inverse transformation is
+         followed by a forward transformation. This latter case is controlled
+         by the \htmlref{SimpIF}{SimpIF} attribute.
+
+         \sstitem
+         The {\tt{"}}forward{\tt{"}} and {\tt{"}}inverse{\tt{"}} transformations referred to are those
+         defined when the MathMap is created (corresponding to the {\tt{"}}fwd{\tt{"}} and
+         {\tt{"}}inv{\tt{"}} parameters of its constructor function). If the MathMap is
+         inverted (i.e. its \htmlref{Invert}{Invert} attribute is non-zero), then the role of the
+         SimpFI and SimpIF attributes will be interchanged.
+      }
+   }
+}
+\sstroutine{
+   SimpIF\sstlabel{SimpIF}
+}{
+   Inverse-forward MathMap pairs simplify?
+}{
+   \sstdescription{
+      This attribute should be set to a non-zero value if applying a
+      \htmlref{MathMap}{MathMap}'s inverse transformation, followed immediately by the matching
+      forward transformation will always restore the original set of
+      coordinates. It indicates that AST may replace such a sequence of
+      operations by an identity \htmlref{Mapping}{Mapping} (a \htmlref{UnitMap}{UnitMap}) if it is encountered
+      while simplifying a compound Mapping (e.g. using \htmlref{astSimplify}{astSimplify}).
+
+      By default, the SimpIF attribute is zero, so that AST will not perform
+      this simplification unless you have set SimpIF to indicate that it is
+      safe to do so.
+   }
+   \sstattributetype{
+      Integer (boolean).
+   }
+   \sstapplicability{
+      \sstsubsection{
+         MathMap
+      }{
+         All MathMaps have this attribute.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         For simplification to occur, the two MathMaps must be in series and
+         be identical (with textually identical transformation
+         functions). Functional equivalence is not sufficient.
+
+         \sstitem
+         The consent of both MathMaps is required before simplification can
+         take place. If either has a SimpIF value of zero, then simplification
+         will not occur.
+
+         \sstitem
+         The SimpIF attribute controls simplification only in the case where
+         a MathMap's inverse transformation is followed by the matching forward
+         transformation. It does not apply if a forward transformation is
+         followed by an inverse transformation. This latter case is controlled
+         by the \htmlref{SimpFI}{SimpFI} attribute.
+
+         \sstitem
+         The {\tt{"}}forward{\tt{"}} and {\tt{"}}inverse{\tt{"}} transformations referred to are those
+         defined when the MathMap is created (corresponding to the {\tt{"}}fwd{\tt{"}} and
+         {\tt{"}}inv{\tt{"}} parameters of its constructor function). If the MathMap is
+         inverted (i.e. its \htmlref{Invert}{Invert} attribute is non-zero), then the role of the
+         SimpFI and SimpIF attributes will be interchanged.
+      }
+   }
+}
+\sstroutine{
    Size(element)\sstlabel{Sizeelement}
 }{
    Character size for a Plot element
@@ -22199,6 +23049,55 @@ Object            - Base class for all AST Objects
          \sstitem
          \htmlref{astTranP}{astTranP}: Transform N-dimensional coordinates held in separate arrays
       }
+   }
+}
+\sstroutine{
+   MathMap\sstlabel{MathMap}
+}{
+   Transform coordinates using mathematical expressions
+}{
+   \sstdescription{
+      A MathMap is a \htmlref{Mapping}{Mapping} which allows you to specify a set of forward
+      and/or inverse transformation functions using arithmetic operations
+      and mathematical functions similar to those available in C. The
+      MathMap interprets these functions at run-time, whenever its forward
+      or inverse transformation is required. Because the functions are not
+      compiled in the normal sense (unlike an \htmlref{IntraMap}{IntraMap}), they may be used to
+      describe coordinate transformations in a transportable manner. A
+      MathMap therefore provides a flexible way of defining new types of
+      Mapping whose descriptions may be stored as part of a dataset and
+      interpreted by other programs.
+   }
+   \sstconstructor{
+      \htmlref{astMathMap}{astMathMap}
+   }
+   \sstdiytopic{
+      Inheritance
+   }{
+      The MathMap class inherits from the Mapping class.
+   }
+   \sstdiytopic{
+      Attributes
+   }{
+      In addition to those attributes common to all Mappings, every
+      MathMap also has the following attributes:
+      \sstitemlist{
+
+         \sstitem
+         \htmlref{Seed}{Seed}: Random number seed
+
+         \sstitem
+         \htmlref{SimpFI}{SimpFI}: Forward-inverse MathMap pairs simplify?
+
+         \sstitem
+         \htmlref{SimpIF}{SimpIF}: Inverse-forward MathMap pairs simplify?
+      }
+   }
+   \sstdiytopic{
+      Functions
+   }{
+      The MathMap class does not define any new functions beyond those
+      which are applicable to all Mappings.
    }
 }
 \sstroutine{
