@@ -67,3 +67,7 @@ Files also added from the machine specific system directories:
                alpha versions except that Solaris uses UNIT=(A+B) syntax
                Note that CSSFN is disabled on Linux.
 	       Presumably because SCRATCH files do not need a filename.
+
+  gklor.fpp
+  gkland.fpp - simple configure tests. Could use these functions in
+               gkiofo.fpp to simplify that ifdef forest
