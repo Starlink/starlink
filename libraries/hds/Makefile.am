@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-bin_SCRIPTS = hds_link hds_link_adam
+dist_bin_SCRIPTS = hds_link hds_link_adam
 noinst_PROGRAMS = hds_machine dat_par_h
 starhelp_DATA = hds_machine.txt
 
@@ -11,6 +11,7 @@ check_PROGRAMS = hds_test hds_test_prm
 
 libhds_la_SOURCES = \
 	$(PUBLIC_INCLUDES) \
+        $(PRIVATE_INCLUDES) \
 	$(C_ROUTINES) \
 	$(F_ROUTINES) \
 	$(BLOCK_DATA_FILES)
