@@ -14,13 +14,13 @@
 *     CALL ADI2_OPEN( FSPEC, MODE, ID, STATUS )
 
 *  Description:
-*     Attempts to open the named file object as an HDS file. If successful
+*     Attempts to open the named file object as an FITS file. If successful
 *     the routine stores the logical unit and HDU number on the property
 *     list of the ID object.
 
 *  Arguments:
 *     FSPEC = CHAR (Given)
-*        Name of the object on which HDS access to be attempted
+*        Name of the object on which FITS access to be attempted
 *     MODE = CHAR (Given)
 *        File access mode
 *     ID = INTEGER (Given)

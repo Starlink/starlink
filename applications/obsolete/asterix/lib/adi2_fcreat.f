@@ -146,7 +146,9 @@
 *    Write extra info into the file handle object
         CALL ADI_CPUT0I( FID, '.LUN', LUN, STATUS )
         CALL ADI_CPUT0I( FID, '.BLOCK_SIZE', BSIZE, STATUS )
-        CALL ADI_CPUT0I( FID, '.NHDU', 0, STATUS )
+
+*    Initialise object
+        CALL ADI2_FOINIT( FID, STATUS )
 
       ELSE
 

@@ -119,15 +119,6 @@
 *    Set the HDU number
         CALL ADI_CGET0I( FID, '.NHDU', NHDU, STATUS )
 
-*    Trap case of NHDU = 0
-        IF ( NHDU .EQ. 0 ) THEN
-          CALL ADI2_LOCHDU1( FID, ' ', .FALSE., PID, 0, STATUS )
-          CALL ADI_CPUT0L( PID, '.CREATED', .FALSE., STATUS )
-          CALL ADI_CPUT0L( PID, '.DEF_START', .FALSE., STATUS )
-          CALL ADI_CPUT0L( PID, '.DEF_END', .FALSE., STATUS )
-          CALL ADI_ERASE( PID, STATUS )
-        END IF
-
         NHDU = NHDU + 1
         CALL ADI_CPUT0I( FID, '.NHDU', NHDU, STATUS )
         CALL ADI_CPUT0I( ID, '.IHDU', NHDU, STATUS )
@@ -266,10 +257,6 @@
 *  primary HDU
       IF ( HDU(1:1) .EQ. ' ' ) THEN
         CALL ADI_FIND( FID, 'PRIMARY', ID, STATUS )
-        IF ( CANCRE ) THEN
-          CALL ADI_CGET0I( FID, '.NHDU', NHDU, STATUS )
-          CREATED = (NHDU.EQ.0)
-        END IF
 
 *  Otherwise named HDU in the EXTENSIONS structure
       ELSE
