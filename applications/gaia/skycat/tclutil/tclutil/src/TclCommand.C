@@ -184,9 +184,15 @@ int TclCommand::set_result(int i, int j)
  */
 int TclCommand::set_result(double i, double j) 
 {
-    char buf[64];
-    sprintf(buf, "%g %g", i, j);
-    Tcl_SetResult(interp_, buf, TCL_VOLATILE);
+    // PWD: use Tcl_PrintDouble to get tcl_precision encoded doubles.
+    char buf[TCL_DOUBLE_SPACE + 1];
+
+    Tcl_ResetResult(interp_);
+    Tcl_PrintDouble(interp_, i, buf );
+    Tcl_AppendResult(interp_, buf, (char *)NULL);
+    buf[0] = ' ';
+    Tcl_PrintDouble(interp_, j, buf + 1 );
+    Tcl_AppendResult(interp_, buf, (char *)NULL);
     return TCL_OK;
 }
 
@@ -196,8 +202,9 @@ int TclCommand::set_result(double i, double j)
  */
 int TclCommand::set_result(double d) 
 {
-    char buf[80];
-    sprintf(buf, "%g", d);
+    // PWD: use Tcl_PrintDouble to get tcl_precision encoded doubles.
+    char buf[TCL_DOUBLE_SPACE];
+    Tcl_PrintDouble(interp_, d, buf );
     Tcl_SetResult(interp_, buf, TCL_VOLATILE);
     return TCL_OK;
 }
@@ -262,8 +269,12 @@ int TclCommand::append_element(int i, int j)
  */
 int TclCommand::append_element(double i, double j) 
 {
-    char buf[64];
-    sprintf(buf, "%g %g", i, j);
+    // PWD: use Tcl_PrintDouble to get tcl_precision encoded doubles.
+    char buf[TCL_DOUBLE_SPACE + 1];
+    Tcl_PrintDouble(interp_, i, buf );
+    Tcl_AppendElement(interp_, buf);
+    buf[0] = ' ';
+    Tcl_PrintDouble(interp_, j, buf + 1 );
     Tcl_AppendElement(interp_, buf);
     return TCL_OK;
 }
@@ -274,8 +285,9 @@ int TclCommand::append_element(double i, double j)
  */
 int TclCommand::append_element(double d) 
 {
-    char buf[80];
-    sprintf(buf, "%g", d);
+    // PWD: use Tcl_PrintDouble to get tcl_precision encoded doubles.
+    char buf[TCL_DOUBLE_SPACE + 1];
+    Tcl_PrintDouble(interp_, d, buf );
     Tcl_AppendElement(interp_, buf);
     return TCL_OK;
 }
