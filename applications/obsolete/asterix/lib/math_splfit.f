@@ -16,7 +16,8 @@
 *     Richard Beard (Birmingham)
 *    History :
 *     4 May 1988 Original (LTVAD::RDS)
-*     9 Jun 1997 COnvert to PDA (RB)
+*     9 Jun 1997 Convert to PDA (RB)
+*    27 Jun 1997 Correct knot placement (RB)
 *    Type Definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -25,7 +26,11 @@
       INTEGER STATUS                 !i/o: Status return from the NAG routine
 *    Local Constants :
       INTEGER MAXKNOT                ! Max no of knots used
-        PARAMETER(MAXKNOT=500)
+        PARAMETER (MAXKNOT=500)
+      INTEGER MAXDATA		     ! Max no of data points allowed
+        PARAMETER (MAXDATA=1024)
+      INTEGER ORDER		     ! Order of spline (= degree + 1)
+        PARAMETER (ORDER=4)	     ! (ie. bi-cubic)
 *    Import :
       INTEGER NPTS                   ! Number of points in X and Y arrays
       REAL XIN(NPTS)                 ! Array of X values
@@ -39,16 +44,15 @@
       INTEGER N7                     ! Number of intervals of the spline +7
       DOUBLE PRECISION KNOT(MAXKNOT) ! Array of knot positions (fn of X)
       DOUBLE PRECISION COEFF(MAXKNOT)! Array of spline coefficients
-      DOUBLE PRECISION SD(1024)      ! Reciprocal of weights
+      DOUBLE PRECISION SD(MAXDATA)   ! Reciprocal of weights
       INTEGER SS                     ! Sum of the residues (ie error)
 *    Global variables :
 *    Local variables :
       INTEGER L
-      PARAMETER (L = (500+6)*5 + (500+8)*5 + 2*(1024+500) + 500+7 + 16)
+        PARAMETER (L=(MAXKNOT-ORDER+3)*(ORDER+1)+(MAXKNOT+1)*(ORDER+1)+
+     :                2*(MAXDATA)+MAXKNOT+ORDER*ORDER)
       DOUBLE PRECISION WORK2(L)  	   ! Work space for PDA_DEFC
-      INTEGER NSECT                        ! Number of sections of the spline
       REAL DRANGE                          ! Range of X
-      INTEGER N3                           ! Number of sections + 3
       INTEGER J,K                          ! Loop variable
       INTEGER LP
       REAL KINC                            ! Increment between knots
@@ -60,47 +64,44 @@
          STATUS = SAI__ERROR
          CALL ERR_REP('NPTS > 1024, SORRY...','from MATH_SPLFIT',STATUS)
          RETURN
-      ENDIF
+      END IF
 *
 * Convert input real arrays to double precision
 *
-      DO LP=1,NPTS
-         XWORK(LP)=DBLE( XIN(LP) )
-         YWORK(LP)=DBLE( YIN(LP) )
-      ENDDO
+      DO LP = 1, NPTS
+         XWORK(LP) = DBLE( XIN(LP) )
+         YWORK(LP) = DBLE( YIN(LP) )
+      END DO
 *
 * Calculate the number of knots and sections in the spline
 *
-      DRANGE=REAL(XWORK(NPTS)-XWORK(1))
+      DRANGE = REAL(XWORK(NPTS) - XWORK(1))
       NKNOT = NINT( DRANGE / RWIDTH )
-      NSECT=NKNOT+1
-*
-      N7 = NSECT + 7
-      N3 = NSECT + 3
+      N7 = NKNOT + (2*ORDER) - 1
 *
 * Set up knots
 * Knots must be inside the data points
 *
 *   Set up the end point knots for PDA
-      DO J=1,4
+      DO J = 1, ORDER-1
          KNOT(J) = XWORK(1)
-         KNOT(N3+J) = XWORK(NPTS)
+         KNOT(N7-ORDER+1+J) = XWORK(NPTS)
       END DO
 
 *   Set extreme knots just inside the data set.
-      KNOT(5)=XWORK(2)
-      KNOT(N3)=XWORK(NPTS-1)
+      KNOT(ORDER) = XWORK(2)
+      KNOT(N7-ORDER+1) = XWORK(NPTS-1)
 *
 *   Space interior knots equidistantly
-      KINC= (XWORK(NPTS-1)-XWORK(2)) / REAL(NKNOT-1)
+      KINC = (XWORK(NPTS-1)-XWORK(2)) / REAL(NKNOT)
 *
-      DO J=6,N3-1
-         K = J-5
+      DO J = ORDER+1, N7-ORDER
+         K = J-ORDER
 	 KNOT(J) = XWORK(2) + DBLE(K*KINC)
-      ENDDO
+      END DO
 
-      DO J=1,NPTS
-         IF (WEIGHT(J) .NE. 0.0D0) THEN
+      DO J = 1, NPTS
+         IF ( WEIGHT(J) .NE. 0.0D0 ) THEN
             SD(J) = 1.0D0 / WEIGHT(J)
          ELSE
             SD(J) = 9.99D99
@@ -110,13 +111,19 @@
 * Do spline fit. Status should be set to zero anyway, but just make sure.
 *
       STATUS = 0
-      CALL PDA_DEFC(NPTS,XWORK,YWORK,SD,4,N7,KNOT,1,J,COEFF,L,WORK2,
-     &                                                        STATUS)
+      CALL PDA_DEFC( NPTS, XWORK, YWORK, SD, ORDER, N7, KNOT, 1, J,
+     :               COEFF, L, WORK2, STATUS )
       SS = 0
 *
+      IF ( J .EQ. -1 ) THEN
+         CALL MSG_PRNT( 'Usage error from PDA_DEFC.' )
+      ELSE IF ( J .EQ. 2 ) THEN
+         CALL MSG_PRNT(' Not enough data processed for spline.' )
+      END IF
+
       IF (STATUS .NE. SAI__OK .OR. J .NE. 1) THEN
-           STATUS = SAI__ERROR
-           CALL ERR_REP(' ','from MATH_SPLFIT',STATUS)
+          STATUS = SAI__ERROR
+          CALL ERR_REP('No spline fitted','from MATH_SPLFIT',STATUS)
       ENDIF
 *
       END
