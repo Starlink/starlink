@@ -1,11 +1,16 @@
 
 DIPSODIR=@bindir@
+export DIPSODIR
 DIPSOLIB=@bindir@
+export DIPSOLIB
 DIPSOSTARBIN=@prefix@/bin
+export DIPSOSTARBIN
 SPECDAT=@staretcdir@
+export SPECDAT
 OWNERDIR=${HOME}
+export OWNERDIR
 
-dipso << EOF
+$DIPSODIR/dipso << EOF
 ECHO 3
 DEV xwindows
 ATLIST
