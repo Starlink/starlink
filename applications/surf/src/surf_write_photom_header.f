@@ -2,9 +2,7 @@
      :     ANALYSIS, RUN_NUMBER, OBJECT, SUB_INSTRUMENT, FILTER, 
      :     CENTRE_COORDS, LAT, LONG, LAT2, LONG2, MJD1, MJD2, 
      :     OFFSET_COORDS, MAP_X, MAP_Y, SAMPLE_COORDS, SAMPLE_PA, 
-     :     SKY_SUBTRACTION, MAX_BEAM, 
-     :     PHOT_BB, MAX_INT, N_INTEGRATIONS, FD, 
-     :     STATUS)
+     :     SKY_SUBTRACTION, FD, STATUS)
 *+
 *  Name:
 *     SURF_WRITE_PHOTOM_HEADER
@@ -20,9 +18,7 @@
 *     :     ANALYSIS, RUN_NUMBER, OBJECT, SUB_INSTRUMENT, FILTER, 
 *     :     CENTRE_COORDS, LAT, LONG, LAT2, LONG2, MJD1, MJD2, 
 *     :     OFFSET_COORDS, MAP_X, MAP_Y, SAMPLE_COORDS, SAMPLE_PA, 
-*     :     SKY_SUBTRACTION, MAX_BEAM, 
-*     :     PHOT_BB, MAX_INT, N_INTEGRATIONS, FD, 
-*     :     STATUS)
+*     :     SKY_SUBTRACTION, FD, STATUS)
 
 *  Description:
 *     This routine writes out the header for 1 sub-instrument of a PHOTOM
@@ -113,10 +109,6 @@
 *     PHOT_BB (MAX_BEAM)     = INTEGER (Given)
 *           the indices of the bolometers used to observe the source in 
 *           each beam in the BOL_CHAN and BOL_ADC arrays
-*     MAX_INT                = INTEGER (Given)
-*           the maximum number of integrations in an observation
-*     N_INTEGRATIONS         = INTEGER (Given)
-*           the number of integrations in the observation
 *     FD                     = INTEGER (Returned)
 *           File descriptor of output file
 *     STATUS                 = INTEGER (Given and returned)
@@ -163,10 +155,7 @@
       CHARACTER*(*) SAMPLE_COORDS
       REAL          SAMPLE_PA
       LOGICAL       SKY_SUBTRACTION
-      INTEGER       MAX_BEAM
-      INTEGER       PHOT_BB (MAX_BEAM)
-      INTEGER       MAX_INT
-      INTEGER       N_INTEGRATIONS
+
 *    Import-Export :
 *    Export :
       INTEGER            FD              ! FIO file identifier
