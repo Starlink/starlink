@@ -49,7 +49,7 @@
 #        modify RtdImageCtrl. All code relating to float_panel is
 #        removed as are changes for with_warp.
 #     24-NOV-1999 (PDRAPER):
-#        Added zoom to selected region changes (bound to Shift-1 and 
+#        Added zoom to selected region changes (bound to Shift-1 and
 #        Shift-2).
 #     {enter_changes_here}
 
@@ -614,7 +614,7 @@ itcl::class gaia::GaiaImageCtrl {
    }
 
    #  Select a region of the image and zoom to show as much of it as
-   #  possible. 
+   #  possible.
    public method zoomin {} {
 
       #  Record current zoom.
@@ -632,27 +632,28 @@ itcl::class gaia::GaiaImageCtrl {
       set ch [winfo height $canvas_]
       if {$cw != 1 && $dw && $dh} {
 
-         #  Zoom image to fit the marked region. Keep in range and
-         #  make sure it is never zero.
+         #  Zoom image to fit the marked region.
          set rw [expr abs($x1-$x0)]
          set rh [expr abs($y1-$y0)]
-         set xs [expr int(0.75*$dw/$rw)]
-         set ys [expr int(0.75*$dh/$rh)]
+         set tw [max $dw $cw]
+         set th [max $dh $ch]
+         set xinc [expr int(double($tw)/double($rw)) -1]
+         set yinc [expr int(double($th)/double($rh)) -1]
+         lassign [$image_ scale] xs ys
+         incr xs $xinc
+         incr ys $yinc
          set scale [max $itk_option(-min_scale) [min $xs $ys $itk_option(-max_scale)]]
-         if { $scale == 0 } { 
-            set scale 1
-         }
          scale $scale $scale
 
          #  Now scroll to new position. Re-get bbox of item.
          lassign [$canvas_ bbox $canvas_id] x0 y0 x1 y1
-         set x [expr ($x1+$x0)/2.0] 
+         set x [expr ($x1+$x0)/2.0]
          set y [expr ($y1+$y0)/2.0]
          set dw [$image_ dispwidth]
          set dh [$image_ dispheight]
          $canvas_ xview moveto [expr (($x-$cw/2.0)/$dw)]
          $canvas_ yview moveto [expr (($y-$ch/2.0)/$dh)]
-      } 
+      }
 
       #  Remove region item.
       $itk_component(draw) delete_object $canvas_id
@@ -664,8 +665,8 @@ itcl::class gaia::GaiaImageCtrl {
          incr nlastzoom_ -1
          set nlastzoom_ [max 0 $nlastzoom_]
          scale $lastzoom_($nlastzoom_,Z) $lastzoom_($nlastzoom_,Z)
-         $canvas_ xview moveto $lastzoom_($nlastzoom_,XS) 
-         $canvas_ yview moveto $lastzoom_($nlastzoom_,YS) 
+         $canvas_ xview moveto $lastzoom_($nlastzoom_,XS)
+         $canvas_ yview moveto $lastzoom_($nlastzoom_,YS)
          maybe_center
          if { $nlastzoom_ != 0 } {
             unset lastzoom_($nlastzoom_,Z)
