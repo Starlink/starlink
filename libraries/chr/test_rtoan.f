@@ -1,0 +1,80 @@
+      SUBROUTINE TEST_RTOAN(STATUS)
+*+
+*  Name:
+*     TEST_RTOAN
+
+*  Purpose:
+*     Test CHR_RTOAN.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL TEST_RTOAN(STATUS)
+
+*  Description:
+*     Test CHR_RTOAN.
+*     If any failure occurs, return STATUS = SAI__ERROR.
+*     Otherwise, STATUS is unchanged.
+
+*  Arguments:
+*     STATUS = INTEGER (Returned)
+*        The status of the tests. 
+
+*  Authors:
+*     RLVAD::AJC: A J Chipperfield (STARLINK)
+*     RLVAD::ACC: A C Charles (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     17-AUG-1989 (RLVAD::AJC):
+*        Original version.
+*     14-SEP-1993 (ACC)
+*        Modularised version: broken into one routine for each of 5 main 
+*        categories of tests.
+*     01-MAR-1994 (ACC)
+*        Second modularised version: broken further into one routine for 
+*        each of subroutine tested.  This subroutine created.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  Subprograms called:   
+*     CHR_RTOAN
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Arguments Given:
+*     None
+
+*  Arguments Returned:
+      INTEGER STATUS
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'CHR_ERR'
+
+*  Local Variables:
+      INTEGER PTR1               ! String indexes
+      CHARACTER*120 STRING
+
+*.
+
+*    Test CHR_RTOAN -- Real to character angle
+
+      STRING = ' '
+      PTR1 = 0
+      CALL CHR_RTOAN (24.5, 'HOURS', STRING, PTR1)
+      CALL CHR_RTOAN (24.5, 'DEGREES', STRING, PTR1)
+      IF (STRING(1:PTR1) .EQ. '24.5 ???24:30:00') THEN
+         PRINT *, 'CHR_RTOAN OK'
+      ELSE
+         PRINT *, 'CHR_RTOAN FAILS - STRING is:', STRING
+         STATUS = SAI__ERROR
+      ENDIF
+
+      END

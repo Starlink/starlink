@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="cnf">
+  <version>4.0-2</version>
+  <path>libraries/cnf</path>
+  <description>Mixed Language Programming -- FORTRAN and C</description>
+  <abstract><p>The CNF package comprises two sets of software which
+      ease the task of writing portable programs in a mixture of
+      FORTRAN and C.  F77 is a set of C macros for handling the
+      FORTRAN/C subroutine linkage in a portable way, and CNF is a set
+      of functions to handle the difference between FORTRAN and C
+      character strings, logical values and pointers to dynamically
+      allocated memory.</p></abstract>
+  <dependencies>
+    <build>starconf star2html</build>
+    <use></use>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Rodney F Warren-Smith</name>
+      <uname>rfws</uname>
+    </person>
+    <person>
+      <name>Peter M Allan</name>
+      <uname>pma</uname>
+    </person>
+    <person>
+      <name>Alan J Chipperfield</name>
+      <uname>ajc</uname>
+      <email>A.J.Chipperfield@rl.ac.uk</email>
+    </person>
+  </developers>
+  <documentation> sun209</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>

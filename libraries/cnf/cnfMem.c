@@ -1,0 +1,751 @@
+/*
+*  Name:
+*     cnfMem.c
+
+*  Purpose:
+*     Manage the passing of pointers between C and Fortran.
+
+*  Description:
+*     This module implements functions which manage the passing of
+*     dynamically allocated memory pointers between C and Fortran.
+*
+*     It operates by maintaining a list of "registered" C pointers
+*     which may be converted into Fortran pointers (stored as
+*     INTEGERs) by applying a bit-mask if necessary (i.e. if the
+*     Fortran INTEGER type is shorter than a C pointer). The reverse
+*     conversion (Fortran to C) is performed by ensuring that all
+*     registered pointers are unique in the lower bits which are
+*     passed to Fortran. Conversion may then be performed by matching
+*     the Fortran pointer to the lower bits of the registered C
+*     pointer.
+*
+*     This requirement for uniqueness in the lower bits means that not
+*     all C pointers can be registered. Therefore, memory allocation
+*     functions are also implemented here which ensure that all
+*     allocated memory intended for use from both C and Fortran is
+*     referenced only by pointers which have the required property.
+
+*  Copyright:
+*     Copyright (C) 1999 Central Laboratory of the Research Councils.
+
+*  Authors:
+*     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+*     <{enter_new_authors_here}>
+
+*  History:
+*      5-FEB-1999 (RFWS):
+*        Original version.
+*      1-MAR-1999 (AJC):
+*        Fix for warning on too large a shift
+*     <{enter_changes_here}>
+*/
+
+/* Header files. */
+/* ============= */
+/* C run-time library header files. */
+#include <limits.h>              /* Implementation-defined limits */
+#include <stdlib.h>              /* Utility functions */
+
+/* User header files. */
+#include "f77.h"                 /* F77 <--> C interface macros */
+
+/* Static variables for this module. */
+/* ================================= */
+/* Mask for extracting the lower bits from C pointers so that they fit
+   into the Fortran POINTER type. 
+   The shift is split into two to avoid a compiler warning if the shift is
+   = the number of bits in unsigned long. */
+static const unsigned long int mask =
+   ~( ~0UL << ( sizeof( F77_POINTER_TYPE ) * CHAR_BIT - 1) << 1 );
+
+/* Number of entries for which space is allocated in pointer list. */
+static int pointer_max = 0;
+
+/* Number of entries so far used in pointer list. */
+static int pointer_count = 0;
+
+/* Number of registered pointers. */
+static int registered_pointers = 0;
+   
+/* Pointer to list of C pointers. */
+static void **pointer_list = NULL;
+
+/* Pointer to list of associated offsets. */
+static size_t *offset_list = NULL;
+
+/* Function prototypes. */
+/* ==================== */
+static int Register( void * );
+static size_t Unregister( void * );
+static void *Malloc( size_t, int );
+void *F77_EXTERNAL_NAME(cnfPval)( POINTER(FPTR) );
+
+/* Function definitions. */
+/* ===================== */
+void *cnfCalloc( size_t nobj, size_t size ) {
+/*
+*+
+*  Name:
+*     cnfCalloc
+
+*  Purpose:
+*     Allocate space that may be accessed from C and Fortran.
+
+*  Invocation:
+*     cpointer = cnfCalloc( nobj, size );
+
+*  Description:
+*     This function allocates space in the same way as the standard C
+*     calloc() function, except that the pointer to the space
+*     allocated is automatically registered (using cnfRegp) for use
+*     from both C and Fortran. This means that the returned pointer
+*     may subsequently be converted into a Fortran pointer of type
+*     F77_POINTER_TYPE (using cnfFptr) and back into a C pointer
+*     (using cnfCptr). The contents of the space may therefore be
+*     accessed from both languages.
+
+*  Arguments:
+*     size_t nobj (Given)
+*        The number of objects for which space is required.
+*     size_t size (Given)
+*        The size of each object.
+
+*  Returned Value:
+*     void *cnfCalloc
+*        A registered pointer to the allocated space, or NULL if the
+*        space could not be allocated.
+
+*  Notes:
+*     - As with calloc(), the allocated space is initialised to zero
+*     bytes.
+*     - The space should be freed using cnfFree when no longer
+*     required.
+*-
+*/
+
+/* Allocate the required memory with initialisation to zero. */
+   return Malloc( nobj * size, 1 );
+}
+
+void *cnfCptr( F77_POINTER_TYPE fpointer ) {
+/*
+*+
+*  Name:
+*     cnfCptr
+
+*  Purpose:
+*     Convert a Fortran pointer to a C pointer.
+
+*  Invocation:
+*     cpointer = cnfCptr( fpointer )
+
+*  Description:
+*     Given a Fortran pointer, stored in a variable of type
+*     F77_POINTER_TYPE, this function returns the equivalent C
+*     pointer. Note that this conversion is only performed if the C
+*     pointer has originally been registered (using cnfRegp) for use
+*     from both C and Fortran. All pointers to space allocated by
+*     cnfCalloc and cnfMalloc are automatically registered in this
+*     way.
+
+*  Arguments:
+*     F77_POINTER_TYPE fpointer (Given)
+*        The Fortran pointer value.
+
+*  Returned Value:
+*     void *cnfCptr
+*        The equivalent C pointer.
+
+*  Notes:
+*     - A NULL value will be returned if the C pointer has not
+*     previously been registered for use from both C and Fortran, or
+*     if the Fortran pointer value supplied is zero.
+*-
+*/
+
+/* Local Variables: */
+   int i;                        /* Loop counter for searching pointer list */
+   void *result = NULL;          /* Result value to return */
+
+/* Search the pointer list for an entry whose Fortran pointer matches
+   the one supplied. */
+   for ( i = 0; i < pointer_count; i++ ) {
+      if ( pointer_list[ i ] &&
+           ( fpointer == (F77_POINTER_TYPE)
+                         ( mask & (unsigned long int) pointer_list[ i ] ) ) ) {
+
+/* If found, return the C version of the pointer. */
+         result = pointer_list[ i ];
+         break;
+      }
+   }
+
+/* Return the result. */
+   return result;
+}
+
+F77_POINTER_TYPE cnfFptr( void *cpointer ) {
+/*
+*+
+*  Name:
+*     cnfFptr
+
+*  Purpose:
+*     Convert a C pointer to a Fortran pointer.
+
+*  Invocation:
+*     fpointer = cnfFptr( cpointer )
+
+*  Description:
+*     Given a C pointer, this function returns the equivalent Fortran
+*     pointer of type F77_POINTER_TYPE. Note that this conversion is
+*     only performed if the C pointer has originally been registered
+*     (using cnfRegp) for use from both C and Fortran. All pointers
+*     to space allocated by cnfCalloc and cnfMalloc are
+*     automatically registered in this way.
+
+*  Arguments:
+*     void *cpointer (Given)
+*        The C pointer.
+
+*  Returned Value:
+*     F77_POINTER_TYPE cnfCptr
+*        The equivalent Fortran pointer value.
+
+*  Notes:
+*     - A value of zero will be returned if the C pointer has not
+*     previously been registered for use from both C and Fortran, or
+*     if a NULL pointer is supplied.
+*-
+*/
+
+/* Local Variables: */
+   int i;                        /* Loop counter for searching pointer list */
+   F77_POINTER_TYPE result = (F77_POINTER_TYPE) 0; /* Result to return */
+
+/* Search the pointer list for an entry whose C pointer matches the
+   one supplied. */
+   for ( i = 0; i < pointer_count; i++ ) {
+      if ( pointer_list[ i ] && ( cpointer == pointer_list[ i ] ) ) {
+
+/* If found, return the Fortran version of the pointer. */
+         result = (F77_POINTER_TYPE)
+                  ( mask & (unsigned long int) pointer_list[ i ] );
+         break;
+      }
+   }
+
+/* Return the result. */
+   return result;
+}
+
+void cnfFree( void *pointer ) {
+/*
+*+
+*  Name:
+*     cnfFree
+
+*  Purpose:
+*     Free allocated space.
+
+*  Invocation:
+*     cnfFree( pointer )
+
+*  Description:
+*     Free space that was previously allocated by a call to
+*     cnfCalloc, cnfCreat, cnfCreib, cnfCreim or cnfMalloc.
+
+*  Arguments:
+*     void *pointer (Given)
+*        A pointer to the space to be freed.
+
+*  Notes:
+*     - This function is not simply equivalent to the C free()
+*     function, since if the pointer has been registered (using
+*     cnfRegp) for use by both C and Fortran, then it will be
+*     unregistered before the space is freed. All pointers to space
+*     allocated by cnfCalloc and cnfMalloc are automatically
+*     registered in this way, so cnfFree should always be used to
+*     free them.
+*     - It is also safe to free unregistered pointers with this
+*     function.
+*-
+*/
+
+/* Unregister the pointer and decrement it by the offset applied when
+   it was issued (this will be zero if the pointer was not
+   registered). */
+   pointer = (void *) ( (char *) pointer - Unregister( pointer ) );
+
+/* Free the allocated memory. */
+   free( pointer );
+}
+
+static void *Malloc( size_t size, int zero ) {
+/*
+*  Name:
+*     Malloc
+
+*  Purpose:
+*     Allocate memory that may be accessed from C and Fortran.
+
+*  Invocation:
+*     ptr = Malloc( size, zero );
+
+*  Description:
+*     This function allocates memory in the same way as the standard C
+*     calloc() and malloc() functions, except that the pointer to the
+*     allocated memory is automatically registered (using cnfRegp)
+*     for use from both C and Fortran. This means that the returned
+*     pointer may subsequently be converted into a Fortran pointer of
+*     type F77_POINTER_TYPE (using cnfFptr) and back into a C pointer
+*     (using cnfCptr). The contents of the memory may therefore be
+*     accessed from both languages.
+
+*  Arguments:
+*     size_t size (Given)
+*        The size of the required memory region.
+*     int zero (Given)
+*        If this is zero, the memory is not initialised (like
+*        malloc()). If it is non-zero, the memory is initialised to
+*        zero (like calloc()).
+
+*  Returned Value:
+*     void *Malloc
+*        A registered pointer to the allocated memory, or NULL if the
+*        memory could not be allocated.
+
+*  Notes:
+*     - The allocated memory should be freed using cnfFree when no
+*     longer required.
+*/
+
+/* Local Constants: */
+   const size_t offset_step = sizeof( long int ); /* Offset for OK alignment */
+
+/* Local Variables: */
+   int slot;                     /* Location of pointer in pointer list */
+   size_t offset = (size_t) 0;   /* Offset from start of allocated memory */
+   void *mem;                    /* Pointer to allocated memory */
+   void *result;                 /* Pointer value to return */
+
+/* Loop until an acceptable memory pointer has been found or an error
+   occurs. */
+   while ( 1 ) {
+
+/* Attempt to allocate the required amount of memory, plus an extra
+   amount to permit the returned pointer to be offset from the start
+   of the allocated memory if necessary. */
+      mem = zero ? calloc( (size_t) 1, size + offset ) :
+                   malloc( size + offset );
+
+/* Quit if the memory could not be allocated. */
+      if ( !mem ) {
+         result = NULL;
+         break;
+
+/* Otherwise, calculate the returned pointer value by offsetting from
+   the start of the allocated memory. */
+      } else {
+         result = (void *) ( (char *) mem + offset );
+
+/* See if this pointer can be registered (i.e. is unique when
+   converted into a Fortran pointer). */
+         if ( !( slot = Register( result ) ) ) {
+
+/* If it cannot, then free the allocated memory and increment the
+   offset, so that a new pointer value will be produced next time. */
+            free( mem );
+            offset += offset_step;
+
+/* If the pointer was successfully registered, then store the offset
+   value associated with it. */
+         } else if ( slot > 0 ) {
+            offset_list[ slot - 1 ] = offset;
+            break;
+
+/* If an error occurred during registration, then free the allocated
+   memory and quit. */
+         } else {
+            free( mem );
+            result = NULL;
+            break;
+         }
+      }
+   }
+
+/* Return the result. */
+   return result;
+}
+
+void *cnfMalloc( size_t size ) {
+/*
+*+
+*  Name:
+*     cnfMalloc
+
+*  Purpose:
+*     Allocate space that may be accessed from C and Fortran.
+
+*  Invocation:
+*     cpointer = cnfMalloc( size );
+
+*  Description:
+*     This function allocates space in the same way as the standard C
+*     malloc() function, except that the pointer to the space
+*     allocated is automatically registered (using cnfRegp) for use
+*     from both C and Fortran. This means that the returned pointer
+*     may subsequently be converted into a Fortran pointer of type
+*     F77_POINTER_TYPE (using cnfFptr), and back into a C pointer
+*     (using cnfCptr). The contents of the space may therefore be
+*     accessed from both languages.
+
+*  Arguments:
+*     size_t size (Given)
+*        The size of the required space.
+
+*  Returned Value:
+*     void *cnfMalloc
+*        A registered pointer to the allocated space, or NULL if the
+*        space could not be allocated.
+
+*  Notes:
+*     - The allocated space should be freed using cnfFree when no
+*     longer required.
+*-
+*/
+
+/* Allocate the required memory without initialisation. */
+   return Malloc( size, 0 );
+}
+
+void *F77_EXTERNAL_NAME(cnf_pval)( POINTER(FPTR) ) {
+/*
+*+
+*  Name:
+*     CNF_PVAL
+
+*  Purpose:
+*     Expand a Fortran pointer to its full value.
+
+*  Invocation:
+*     CALL DOIT( ..., %VAL( CNF_PVAL( FPTR ) ), ... )
+
+*  Description:
+*     Given a Fortran pointer, stored in an INTEGER variable, this
+*     function returns the full value of the pointer (on some
+*     platforms, this may be longer than an INTEGER). Typically, this
+*     is only required when the pointer is used to pass dynamically
+*     allocated memory to another routine using the "%VAL" facility.
+
+*  Arguments:
+*     FPTR = INTEGER (Given)
+*        The Fortran pointer value.
+
+*  Returned Value:
+*     CNF_PVAL
+*        The full pointer value.
+
+*  Notes:
+*     - The data type of this function will depend on the platform in
+*     use and is declared in the include file CNF_PAR.
+*-
+
+*  Implementation Notes:
+*     - This routine is designed to be called from Fortran.
+*/
+
+/* Local Variables: */
+   GENPTR_POINTER(FPTR)
+
+/* Obtain the C pointer value and return it. */
+   return cnfCptr( *FPTR );
+}
+
+static int Register( void *ptr ) {
+/*
+*  Name:
+*     Register
+
+*  Purpose:
+*     Register a pointer for use from both C and Fortran.
+
+*  Invocation:
+*     result = Register( ptr )
+
+*  Description:
+*     This function attempts to register a C pointer so that it may be
+*     used from both C and Fortran. If successful, registration
+*     subsequently allows the pointer to be converted into a Fortran
+*     pointer of type F77_POINTER_TYPE, and then back into a C
+*     pointer, even if the Fortran pointer is stored in a smaller data
+*     type than the C pointer.
+*
+*     Not all C pointers may be registered, and registration may fail
+*     if the Fortran version of the pointer is indistinguishable from
+*     that of a pointer which has already been registered. In such a
+*     case, a new C pointer must be obtained (e.g. by allocating a
+*     different region of memory).
+
+*  Arguments:
+*     void *ptr (Given)
+*        The pointer to be registered.
+
+*  Returned Value:
+*     int Register
+*        If registration was successful, the function returns one more
+*        than the index in the "pointer_list" array where the
+*        registered pointer information has been stored. If
+*        registration was unsuccessful, zero is returned.
+*
+*  Notes:
+*     - If an internal error occurs, the function returns -1.
+*/
+
+/* Local Constants: */
+   const size_t init_size = (size_t) 64; /* Initial pointer list size */
+
+/* Local Variables: */
+   int i;                        /* Loop counter for searching list */
+   int result = 0;               /* Result value to return */
+   int unique = 1;               /* Fortran pointer is unique? */
+   int vacant = 0;               /* Location of first vacant list element */
+   unsigned long int f77_ptr;    /* Fortran version of pointer */
+   void *tmp;                    /* Temprary pointer to re-allocated memory */
+/* Extract the lower bits from the C pointer to form the equivalent
+   Fortran pointer. We can only register the pointer if the Fortran
+   version is not zero, since it will otherwise conflict with the NULL
+   pointer. */
+   if ( ( f77_ptr = mask & (unsigned long int) ptr ) ) {
+
+/* Search the list of registerd pointers to see if the new Fortran one
+   is unique. */
+      for ( i = 0; i < pointer_count; i++ ) {
+         if ( pointer_list[ i ] ) {
+            unique = f77_ptr !=
+                     ( mask & (unsigned long int) pointer_list[ i ] );
+            if ( !unique ) break;
+
+/* On the same pass, also search for the first list element (if any)
+   which does not have a pointer entry. */
+         } else {
+            if ( !vacant ) vacant = i + 1;
+         }
+      }
+
+/* If the new Fortran pointer is unique, we can register it. */
+      if ( unique ) {
+
+/* If a vacant list element was found, then re-use it to store the C
+   version of the pointer, and initialise its offset. Note which
+   element was used. */
+         if ( vacant ) {
+            pointer_list[ vacant - 1 ] = ptr;
+            offset_list[ vacant - 1 ] = (size_t) 0;
+            result = vacant;
+
+/* Otherwise, check if the space allocated for the list is sufficient
+   to allow a new element at the end. */
+         } else {
+            if ( pointer_count == pointer_max ) {
+
+/* If not, then calculate a new list size, doubling it each time an
+   extension becomes necessary. */
+               pointer_max = pointer_max ? 2 * pointer_max : init_size;
+
+/* Re-allocate the space for the pointer list, checking for memory
+   allocation errors. */
+               if ( ( tmp = realloc( pointer_list, sizeof( void * ) *
+                                                   (size_t) pointer_max ) ) ) {
+                  pointer_list = tmp;
+               } else {
+                  result = -1;
+               }
+
+/* Similarly, re-allocate memory for the list of pointer offsets. */
+               if ( ( tmp = realloc( offset_list, sizeof( size_t ) *
+                                                  (size_t) pointer_max ) ) ) {
+                  offset_list = tmp;
+               } else {
+                  result = -1;
+               }
+            }
+
+/* If OK, store the C pointer and initialise its offset. Increment the
+   list length, noting which element was used. */
+            if ( !result ) {
+               pointer_list[ pointer_count ] = ptr;
+               offset_list[ pointer_count ] = (size_t) 0;
+               result = ++pointer_count;
+            }
+         }
+      }
+   }
+
+/* If registration was successful, increment the count of registered
+   pointers. */
+   if ( result > 0 ) registered_pointers++;
+
+/* Return the result. */
+   return result;
+}
+
+int cnfRegp( void *cpointer ) {
+/*
+*+
+*  Name:
+*     cnfRegp
+
+*  Purpose:
+*     Register a pointer for use from both C and Fortran.
+
+*  Invocation:
+*     result = cnfRegp( cpointer )
+
+*  Description:
+*     This is a low-level function which will normally only be
+*     required if you are implementing your own memory allocation
+*     facilities (all memory allocated by cnfCalloc and cnfMalloc is
+*     automatically registered using this function).
+*
+*     The function attempts to register a C pointer so that it may be
+*     used from both C and Fortran. If successful, registration
+*     subsequently allows the pointer to be converted into a Fortran
+*     pointer of type F77_POINTER_TYPE (using cnfFptr), and then back
+*     into a C pointer (using cnfCptr).  These conversions are
+*     possible even if the Fortran pointer is stored in a shorter data
+*     type than the C pointer.
+*
+*     Not all C pointers may be registered, and registration may fail
+*     if the Fortran version of the pointer is indistinguishable from
+*     that of a pointer which has already been registered. In such a
+*     case, a new C pointer must be obtained (e.g. by allocating a
+*     different region of memory).
+
+*  Arguments:
+*     void *cpointer (Given)
+*        The C pointer to be registered.
+
+*  Returned Value:
+*     int cnfRegp
+*        If registration was successful, the function returns 1. If
+*        registration was unsuccessful, it returns zero.
+
+*  Notes:
+*     - If an internal error occurs (e.g. if insufficient memory is
+*     available), the function returns -1.
+*-
+*/
+
+/* Local Variables: */
+   int result;                   /* Result value to return. */
+/* Attempt to register the pointer. */
+   result = Register( cpointer );
+/* If successful, return 1. */
+   if ( result > 0 ) result = 1;
+
+/* Return the result. */
+   return result;
+}
+
+static size_t Unregister( void *ptr ) {
+/*
+*  Name:
+*     Unregister
+
+*  Purpose:
+*     Unregister a pointer previously registered using Register.
+
+*  Invocation:
+*     offset = Unregister( ptr )
+
+*  Description:
+*     This function accepts a C pointer which has previously been
+*     registered for use from both C and Fortran (using Register) and
+*     removes its registration. Subsequently, conversion between the C
+*     pointer and its Fortran equivalent (and vice versa) will no
+*     longer be supported.
+
+*  Arguments:
+*     void *ptr (Given)
+*        The C pointer to be unregistered.
+
+*  Returned Value:
+*     size_t offset
+*        The offset between the pointer and the start of the allocated
+*        region of memory, as applied when the pointer was first
+*        issued (this only applies to pointers issued from within this
+*        module, otherwise the offset is always zero).
+
+*  Notes:
+*     - No action occurs (and no error results) if the C pointer has
+*     not previously been registered for use from both C and Fortran.
+*/
+
+/* Local Variables: */
+   int i;                        /* Loop counter for searching pointer list */
+   size_t result = (size_t) 0;   /* Result value to return */
+
+/* Search the pointer list for an entry whose C pointer matches the
+   one supplied. */
+   for ( i = 0; i < pointer_count; i++ ) {
+      if ( pointer_list[ i ] && ( ptr == pointer_list[ i ] ) ) {
+
+/* If found, extract the pointer offset and clear the list entry. */
+         result = offset_list[ i ];
+         pointer_list[ i ] = NULL;
+         offset_list[ i ] = (size_t) 0;
+
+/* Decrement the count of registered pointers. If this reaches zero,
+   then reset the pointer list counts and free the associated
+   memory. */
+         if ( !--registered_pointers ) {
+            pointer_max = 0;
+            pointer_count = 0;
+            free( pointer_list ); pointer_list = NULL;
+            free( offset_list ); offset_list = NULL;
+         }
+         break;
+      }
+   }
+
+/* Return the result. */
+   return result;
+}
+
+void cnfUregp( void *cpointer ) {
+/*
+*+
+*  Name:
+*     cnfUregp
+
+*  Purpose:
+*     Unregister a pointer previously registered using cnfRegp.
+
+*  Invocation:
+*     cnfUregp( cpointer )
+
+*  Description:
+*     This is a low-level function which will normally only be
+*     required if you are implementing your own memory allocation
+*     facilities.
+*
+*     The function accepts a C pointer which has previously been
+*     registered for use from both C and Fortran (using cnfRegp) and
+*     removes its registration. Subsequently, conversion between the C
+*     pointer and its Fortran equivalent (and vice versa) will no
+*     longer be performed by cnfFptr and cnfCptr.
+
+*  Arguments:
+*     void *cpointer (Given)
+*        The C pointer to be unregistered.
+
+*  Notes:
+*     - No action occurs (and no error results) if the C pointer has
+*     not previously been registered for use from both C and Fortran.
+*-
+*/
+
+/* Unregister the pointer. */
+   (void) Unregister( cpointer );
+}

@@ -1,0 +1,41 @@
+*+
+*  Name:
+*     CHR_SYS
+
+*  Purpose:
+*     Define the CHR_ private constants.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of module:
+*     Global constants include file.
+
+*  Description:
+*     This file contains the definitions of the global constants used 
+*     internally by the CHR_ system.  Note that the definition of ESCAPE
+*     is different on UNIX from that on VMS.
+
+*  Authors:
+*     ACC: A.C. Charles (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     28-SEP-1993 (ACC):
+*        Original version adapted from EMS_SYS.
+*     {enter_further_changes_here}
+
+*-
+
+*  Global Constants:
+      CHARACTER ESCAPE           ! Escape character
+*     PARAMETER ( ESCAPE = '\' ) ! VAX
+      PARAMETER ( ESCAPE = '\\' ) ! UNIX
+
+      CHARACTER WILDA            ! Single character wild-card
+      PARAMETER ( WILDA = '%' )
+
+      CHARACTER WILDN            ! Arbitrary length string wild-card
+      PARAMETER ( WILDN = '*' )
+
+*.

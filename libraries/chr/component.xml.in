@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>libraries/chr</path>
+  <description>Character Handling Routines</description>
+  <abstract><p>The CHR library augments the limited character handling
+      facilities provided by the Fortran 77 standard.  It offers a
+      range of character handling facilities: from formatting Fortran
+      data types into text strings and the reverse, to higher level
+      functions such as wild card matching, string sorting, paragraph
+      reformatting and justification.  The library may be used simply
+      for building text strings for interactive applications or as a
+      basis for more complex text processing applications.
+    </p></abstract>
+  <dependencies>
+    <build>@STAR_BUILD_DEPENDENCIES@</build>
+    <use>@STAR_USE_DEPENDENCIES@</use>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Anne C Charles</name>
+      <uname>acc</uname>
+    </person>
+    <person>
+      <name>P C T Rees</name>
+      <uname>pctr</uname>
+    </person>
+    <person>
+      <name>Alan J Chipperfield</name>
+      <uname>ajc</uname>
+      <email>A.J.Chipperfield@rl.ac.uk</email>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>

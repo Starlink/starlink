@@ -1,0 +1,80 @@
+      SUBROUTINE CHR_LCASE( STRING )
+*+
+*  Name:
+*     CHR_LCASE
+
+*  Purpose:
+*     Convert a string to lowercase.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL CHR_LCASE( STRING )
+
+*  Description:
+*     The characters in the string are all converted to lowercase
+*     in situ.
+
+*  Arguments:
+*     STRING = CHARACTER * ( * ) (Given and Returned)
+*        The string to be converted to lowercase.
+
+*  Algorithm:
+*     Use CHR_LEN to find the string length, and then CHR_LOWER to
+*     convert each character.
+
+*  Implementation Deficiencies:
+*     This implementation does not use VAX utilities and hence
+*     is slower than it could be. However, it retains the advantage 
+*     of being standard Fortran 77.
+
+*  Authors:
+*     JRG: Jack Giddings (UCL)
+*     ACD: A.C. Davenhall (ROE)
+*     AJC: A.J. Chipperfield (STARLINK)
+*     ACC:  A.C. Charles (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     3-JAN-1983 (JRG):
+*        Original version.
+*     16-NOV-1984 (ACD):
+*        Documentation improved.
+*     3-OCT-1988 (AJC):
+*        Documentation improved.
+*     10-MAR-1994 (ACC):
+*        Modifications to prologue.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Arguments Given and Returned:
+      CHARACTER STRING * ( * )
+
+*  External References:
+      CHARACTER * 1 CHR_LOWER    ! Convert character to lowercase
+
+      INTEGER CHR_LEN            ! String length (ignoring trailing blanks)
+
+*  Local Variables:
+      INTEGER IPOSN              ! Current position in the string
+      INTEGER SIZE               ! Length of the string
+
+*.
+
+*  Get the length of the given string, ignoring trailing blanks.
+      SIZE = CHR_LEN( STRING )
+
+*  Loop to convert the string to lowercase.
+      DO 10 IPOSN = 1, SIZE
+         STRING( IPOSN : IPOSN ) = CHR_LOWER( STRING( IPOSN : IPOSN ) )
+ 10   CONTINUE
+
+      END

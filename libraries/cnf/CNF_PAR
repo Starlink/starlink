@@ -1,0 +1,41 @@
+*+
+*  Name:
+*     CNF_PAR
+
+*  Purpose:
+*     Define public global constants for the CNF_ system.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     Platform-specific global constants include file.
+*     Although this is in principle platform-specific, it appears that
+*     all the platform-specific code is identical.  That variation
+*     was therefore discarded on import to CVS/autoconfing -- it is
+*     better done through configuration switches in any case
+*     (NG, 12-Dec-2003)
+
+*  Description:
+*     This file contains definitions of global constants which are used
+*     by the CNF_ system and which may also be needed by software which
+*     calls routines from this system.
+
+*  Copyright:
+*     Copyright (C) 1999 Central Laboratory of the Research Councils
+
+*  Authors:
+*     AJC: Alan J. Chipperfield (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*      8-FEB-1999 (AJC):
+*        Original version.
+*     {enter_further_changes_here}
+
+*-
+
+*   The Fortran INTEGER to C pointer conversion function
+      INTEGER CNF_PVAL
+
+*.

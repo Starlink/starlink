@@ -1,0 +1,13 @@
+CHR Version 2.2-5 is released
+   This version has CHR_ETOM and CHR_MTOE converted to C to overcome problems
+   introduced by Redhat Linux 7.0
+
+CHR Version 2.2-4 is released
+   This version adds a shared library on Linux
+
+CHR Version 2.2-3 is released
+   This release of CHR removes inefficiencies in CHR_APPND and the
+   'type to C' conversion routines.  The effect of this will depend upon
+   the size of the buffers specified.
+
+   The mk script is brought up to date for Linux.
