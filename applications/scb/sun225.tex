@@ -520,7 +520,8 @@ in the SCB\_SOURCES directory
 
 
 
-\subsection{\xlabel{sec:indexing}\label{sec:indexing}Generating the index}
+\section{\xlabel{sec:indexing}\label{sec:indexing}Generating the index
+         ({\tt scbindex.pl})}
 
 In order for the browser to work, indices of the source files must be
 generated.  This is done by the script {\tt scbindex.pl}, installed
@@ -531,7 +532,7 @@ collection will be required, but people modifying or developing
 their own copies of packages may wish to generate a personalised index.
 
 
-\subsubsection{\xlabel{sec:indexing-all}\label{sec:indexing-all}Indexing the whole Starlink collection}
+\subsection{\xlabel{sec:indexing-all}\label{sec:indexing-all}Indexing the whole Starlink collection}
 
 To index the whole of the source collection, simply invoke the 
 indexer program as follows:
@@ -598,11 +599,13 @@ original when it is complete, like this:
 \begin{verbatim}
 % setenv SCB_INDEX /usr/tmp/tmp_index
 % mkdir $SCB_INDEX
-% cp /star/etc/scb/* $SCB_INDEX
+% scbcp.pl /star/etc/scb $SCB_INDEX
 % scbindex.pl pack1 pack2
-% cp $SCB_INDEX/* /star/etc/scb
+% scbcp.pl $SCB_INDEX /star/etc/scb
 \end{verbatim}
 \end{quote}
+Use of the {\tt scbcp.pl} utility is explained in 
+section \ref{sec:scbcp}.
 
 Occasionally some non-fatal error messages will be generated in the 
 course of the indexing, for instance:
@@ -617,8 +620,19 @@ If the program stops with an error however, it should be investigated.
 The error message in this case should give an indication of what has
 gone wrong and how to fix it.
 
+The index files created in the SCB\_INDEX directory should 
+total four or five Mb for the whole USSC.  
+On some operating systems the index files may be 
+sparse, and {\em appear} much bigger than they are,
+so that {\tt ls~-l} makes them look very large, 
+while {\tt du} or {\tt ls~-s} gives their true size.
+Copying the indices should be done using the supplied utility
+{\tt scbcp.pl} (see section \ref{sec:scbcp}), 
+not the Unix {\tt cp} command; the latter would
+work, but may result in inefficient use of disk space.
 
-\subsubsection{\xlabel{sec:personalise}\label{sec:personalise}Creating a personalised index}
+
+\subsection{\xlabel{sec:personalise}\label{sec:personalise}Creating a personalised index}
 
 As well as examining all the source files from their natural home
 in the main Starlink source tree (the SCB\_SOURCES directory),
@@ -626,24 +640,26 @@ it is also possible to index source code from elsewhere,
 by giving the pathname of the directory
 or tarfile containing the source.
 In this way a personalised index can be created: 
-suppose you have a personal source copy (under development say) of 
-Figaro, you can execute the following sequence:
+suppose that {\tt scbindex.pl} has already been run 
+on all the source code in {\tt /star/sources}, 
+writing index files in {\tt /star/etc/scb}, as described in 
+the previous section, 
+and that you have a personal source copy (under development say) of 
+Figaro in \verb|~/star/sources/figaro|.
+To create your own index in \verb|~/star/etc/scb|, 
+which will for the most part match the global index 
+but contain your version of Figaro,
+you can do the following:
 \begin{quote}
 \begin{verbatim}
-% setenv SCB_SOURCES /star/sources
 % setenv SCB_INDEX ~/star/etc/scb
-% scbindex.pl
+% scbcp.pl /star/etc/scb $SCB_INDEX
 % scbindex.pl ~/star/sources/figaro
 \end{verbatim}
 \end{quote}
---- the first invocation of {\tt scbindex.pl} 
-creates an index of the main body
-of Starlink source code, and the second one
-replaces the entries relating to the Figaro package 
-with those in your personal copy.
-If a full index already existed in {\tt /star/etc/scb}, 
-then the first invocation of {\tt scbindex.pl} could be replaced
-by {\tt cp~/star/etc/scb/*~\$SCB\_INDEX}.
+--- first a private copy is made of the global indexes using 
+the supplied {\tt scbcp.pl} utility (see section \ref{sec:scbcp}),
+and then the Figaro parts are overwritten using {\tt scbindex.pl}.
 If the modified sources were 
 in a compressed tar file in the current directory, 
 rather than in \verb|~/star/sources|,
@@ -653,7 +669,10 @@ then the last line above could be replaced by
 % scbindex.pl ./figaro.tar.Z
 \end{verbatim}
 \end{quote}
-The personalised index files will be written in the SCB\_INDEX directory.
+It would be possible to make personal index of Figaro only,
+in which case the {\tt scbcp.pl} step could be avoided, 
+but then hyperlinks to routines in other Starlink packages 
+would not work.
 
 To make use of the personalised index, rather than the one set as
 the default at install time, the following must be done:
@@ -685,7 +704,8 @@ http://host.domain/cgi-bin/star/scb.pl?indexdir=/home/user/star/etc/scb
 \end{description}
 
 
-\section{\xlabel{sec:extract}\label{sec:extract}Viewing the source code}
+\section{\xlabel{sec:extract}\label{sec:extract}Viewing the source code
+         ({\tt scb.pl})}
 
 This section explains how to use the extractor program, {\tt scb.pl},
 to view source code from the Starlink source tree,
@@ -1074,6 +1094,9 @@ The Tasks index is stored in a plain text file called {\tt tasks};
 being line formatted it has, in general, 
 to be read in its entirety to find any
 required piece of information.
+Since it is plain text 
+it can be examined using a normal text editor 
+(although some of the lines may be rather long).
 
 The File and Routine indices
 each resemble a table which
@@ -1105,6 +1128,10 @@ any given entry can be accessed by key very quickly.
 The design of these objects was dictated chiefly by the requirements
 of the browser program, as explained in 
 section \ref{sec:internals-extractor}).
+
+It is possible to examine the File and Routines indices 
+directly from the command line by using the supplied {\tt dbmcat.pl}
+utility (see section \ref{sec:dbmcat}).
 
 
 
@@ -1297,8 +1324,152 @@ may in any case avoid) of having to reload the same file when all
 that is required is to move around in it.
 
 
+\section{\xlabel{sec:utilities}\label{sec:utilities}Additional utilities}
+
+As well as the principle programs in the package 
+{\tt scb.pl} (section \ref{sec:extract})
+and 
+{\tt scbindex.pl} (section \ref{sec:indexing})
+a couple of additional utilities are supplied with the package.
+These are not necessary for normal operation 
+of the package but may prove useful to those making more 
+involved use of it.
 
 
+
+
+\subsection{\xlabel{sec:dbmcat}\label{sec:dbmcat}{\tt dbmcat.pl}}
+
+The {\tt dbmcat.pl} utility directly examines the DBM files 
+in which the File and Routine indices are kept 
+(see section \ref{sec:internals-indices}.
+
+Source documentation is as follows:
+\begin{verbatim}
+#  Name:
+#     dbmcat.pl
+
+#  Purpose:
+#     Examine StarIndex files.
+
+#  Language:
+#     Perl 5
+
+#  Invocation:
+#     dbmcat.pl filename
+#     dbmcat.pl filename key ...
+
+#  Description:
+#     This utility is for examining the DBM files representing StarIndex
+#     objects used to store the indices used by the SCB package for
+#     indexing files and routines.
+#
+#     It is not required for any part of the package operation, but is
+#     provided for manual examination of these files.  It will mainly
+#     be useful for debugging, but may also be useful (in combination
+#     with, for instance, grep(1)) for making more flexible queries
+#     of the index files than are permitted by the 'type=regex'
+#     argument of the scb.pl extractor program.
+#
+#     It can be used in two modes: if the name of the index only is
+#     specified, then every record in the index is printed (in an
+#     unpredictable order); the format is
+#
+#        key    => value value value ...
+#
+#     where the values are file locations using the logical pathnames
+#     as used in the rest of the SCB package.  There may be one or more
+#     values, and they are separated by spaces.
+
+#  Arguments:
+#     filename
+#        Name of the index file.  This is the name of the index as
+#        submitted to the StarIndex::new() routine, i.e. without
+#        whatever file extensions (.db, .dir, ...) may appear when
+#        the file is actually written.  The full path must be given.
+#     key
+#        One or more keys of the index may be specified.  They must be
+#        exact.
+\end{verbatim}
+Thus to examine the whole index (note that records are printed in
+no particular order):
+\begin{quote}
+\begin{verbatim}
+% dbmcat.pl $SCB_INDEX/file
+ary1_gt1d.f          =>  ary#ary_source.tar>ary1_gt1d.f
+test_abbrv.f         =>  chr#chr_source.tar>test_abbrv.f
+ech_read_type.f      =>  echomop#echomop_source.tar>ech_read_type.f
+optextract.hlp       =>  figaro#figaro_iraf.tar>doc/optextract.hlp
+    . . .
+\end{verbatim}
+\end{quote}
+and to examine named entries:
+\begin{quote}
+\begin{verbatim}
+% dbmcat.pl /star/etc/scb/func add_ rec_unlock
+add_                 => img#img_source.tar>add.f kappa#kappa_sub.tar>add.f
+rec_unlock           => hds#hds_source.tar>rec_unlock.c
+\end{verbatim}
+\end{quote}
+
+
+
+\subsection{\xlabel{sec:scbcp}\label{sec:scbcp}{\tt scbcp.pl}}
+
+The {\tt scbcp.pl} utility copies all the indexes which have
+been written by {\tt scbindex.pl} (see section \ref{sec:internals-indices})
+from one directory to another.
+
+Source documentation is as follows:
+\begin{verbatim}
+#  Name:
+#     scbcp.pl
+
+#  Purpose:
+#     Copy SCB indexes from one directory to another.
+
+#  Language:
+#     Perl 5
+
+#  Invocation:
+#     scbcp.pl $dir1 $dir2
+
+#  Description:
+#     This utility copies all the index files used by the SCB package
+#     from one directory to another.  It is an improvement on copying
+#     the files using cp in two ways:
+#
+#        1) It knows which files to copy.
+#        2) It will copy sparse files in a sparse way.
+#
+#     The second may be important depending on the implementation of 
+#     DBM being used.  Some DBMs can create sparse files, that is ones
+#     with large 'holes' in them, which occupy few disk blocks but 
+#     when copied in any of the usual ways (for instance with cp(1))
+#     produce files which occupy many more blocks.  Whether a file is
+#     sparse can be determined by comparing the output of 'ls -l' and 
+#     'ls -s'.
+#
+#     This utility is not required for normal operation of the package,
+#     it is provided for optional use.
+
+#  Arguments:
+#     $dir1
+#        Source directory containing SCB indices.
+#     $dir2
+#        Target directory into which SCB indices are to be copied.
+\end{verbatim}
+Thus to create a private copy of the SCB indices, for instance
+in order to create a modified personal index, a command like the
+following would be used:
+\begin{quote}
+\begin{verbatim}
+% scbcp.pl /star/etc/scb ~/star/etc/scb
+/star/etc/scb/tasks -> /home/user/star/etc/scb/tasks
+/star/etc/scb/func -> /home/user/star/etc/scb/func
+/star/etc/scb/file -> /home/user/star/etc/scb/file
+\end{verbatim}
+\end{quote}
 
 
 % ? End of main text
