@@ -59,8 +59,10 @@
 *       last
 *   D.L.Terrett  Starlink Jan 1992
 *       Plot cell arrays the correct way up
-*   D.L.Terrett  Starlink Fen 1995
+*   D.L.Terrett  Starlink Feb 1995
 *       Change transformation to match pgplot 5.0
+*   T. Jenness   JACH     Aug 2004
+*       Use CNF_PVAL for %val
 *+
       IMPLICIT NONE
 
@@ -77,6 +79,8 @@
       INCLUDE 'GKS_PAR'
 
       INCLUDE 'SAE_PAR'
+
+      INCLUDE 'CNF_PAR'     ! For CNF_PVAL
 
       REAL X1, X2, Y1, Y2
       INTEGER NSEG, IERR, NL, IWK
@@ -163,7 +167,7 @@
 *         Copy the data from the input data array to the workspace
 *         converting the real numbers to GKS colour indices
             CALL GRCOCI(A, IDIM, JDIM, I1, I2, J1, J2, BACKGR,
-     :                FOREGR, MINCI, MAXCI, MODE, %val(PNTR))
+     :                FOREGR, MINCI, MAXCI, MODE, %VAL(CNF_PVAL(PNTR)))
 
 *         Calculate corners of this cell array fragment
             IF (ROTATE) THEN
@@ -182,7 +186,7 @@
 
 *         Plot the cell array
             CALL GCA(X1, Y1, X2, Y2, I2-I1+1, J2-J1+1, 1, 1,
-     :               I2-I1+1, J2-J1+1, %val(PNTR))
+     :               I2-I1+1, J2-J1+1, %VAL(CNF_PVAL(PNTR)))
 
 *         Release the dynamic memory
             CALL PSX_FREE( PNTR, ISTAT)
