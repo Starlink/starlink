@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="startcl">
+<component id="startcl" support="S">
   <version>1.5-5</version>
   <path>applications/startcl</path>
   <description>Starlink extensions to Tcl &amp; Tk</description>

@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- @configure_input@ -->
 
-<component id="@PACKAGE@">
+<component id="@PACKAGE@" support="S">
   <version>@PACKAGE_VERSION@</version>
   <path>applications/dvi2bitmap</path>
   <description>Converts TeX DVI files to bitmaps</description>
@@ -23,6 +23,11 @@
     </person>
   </developers>
   <documentation>@STAR_DOCUMENTATION@</documentation>
+  <tests status="yes"/>
   <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <copyright>
+    <year>1992-2004</year>
+    <name>Council for the Central Laboratory of the Research Councils</name>
+  </copyright>
   <!-- <notes><p></p></notes> -->
 </component>

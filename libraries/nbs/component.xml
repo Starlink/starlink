@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="nbs">
+<component id="nbs" support="S">
   <version>2.5-9</version>
   <path>libraries/nbs</path>
   <description>NBS Noticeboard System</description>

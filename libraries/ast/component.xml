@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 
-<component id="ast">
+<component id="ast" support="S">
   <version>3.5-6</version>
   <path>libraries/ast</path>
   <description>WCS library</description>
@@ -37,4 +37,8 @@
   </developers>
   <documentation> sun210 sun211</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year></year>
+    <name>Council for the Central Laboratory of the Research Councils</name>
+  </copyright>
 </component>

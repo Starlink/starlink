@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 
-<component id="autoconf" buildsupport="yes">
+<component id="autoconf" buildsupport="yes" support="U">
   <version>2.59</version>
   <path>thirdparty/fsf/autoconf</path>
   <description>Starlink autoconf</description>
@@ -17,6 +17,18 @@
     </person>
   </developers>
   <bugreports>@PACKAGE_BUGREPORT</bugreports>
+  <copyright>
+    <year>1994-2004</year>
+    <name>Free Software Foundation</name>
+  </copyright>
+  <copyright>
+    <year>2004-5</year>
+    <name>Council for the Central Laboratory of the Research
+    Councils</name>
+    <notes>
+      <p>Modifications</p>
+    </notes>
+  </copyright>
   <notes><p>This version of autoconf has been patched to include
       Fortran preprocessor support.  Those patches were submitted
       to autoconf-patches@gnu.org in January 2004, and were being

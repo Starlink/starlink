@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="idi">
+<component id="idi" support="U">
   <version>1.4-5</version>
   <path>libraries/idi</path>
   <description>IDI -- Image Display Interface</description>

@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="gks">
+<component id="gks" support="U">
   <version>1.37-1</version>
   <path>libraries/gks</path>
   <description>The tarlink RAL/ICL GKS graphics package.</description>

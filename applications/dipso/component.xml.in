@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- @configure_input@ -->
 
-<component id="@PACKAGE@">
+<component id="@PACKAGE@" support="S">
   <version>@PACKAGE_VERSION@</version>
   <path>applications/dipso</path>
   <description>DIPSO -- A friendly spectrum analysis program</description>

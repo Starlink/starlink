@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="chr">
+<component id="chr" support="S">
   <version>2.2-5</version>
   <path>libraries/chr</path>
   <description>Character Handling Routines</description>
@@ -40,5 +40,9 @@
     </person>  </developers>
   <documentation> sun40</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year></year>
+    <name>Council for the Central Laboratory of the Research Councils</name>
+  </copyright>
   <!-- <notes><p></p></notes> -->
 </component>

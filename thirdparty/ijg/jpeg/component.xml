@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="jpeg">
+<component id="jpeg" support="U">
   <version>6b</version>
   <path>thirdparty/ijg/jpeg</path>
   <description>Independent JPEG Group library</description>

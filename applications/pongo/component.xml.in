@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- @configure_input@ -->
 
-<component id="@PACKAGE@">
+<component id="@PACKAGE@" support="U">
   <version>@PACKAGE_VERSION@</version>
   <path>applications/pongo</path>
   <description>PONGO - a suite of commands for interactively plotting data stored in text files</description>

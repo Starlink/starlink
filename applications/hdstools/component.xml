@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="hdstools">
+<component id="hdstools" support="S">
   <version>1.0</version>
   <path>applications/hdstools</path>
   <description>HDSTOOLS - Tools To Display and Edit HDS Objects</description>
@@ -28,5 +28,13 @@ package but have now been modified to run as normal Starlink tasks.
     </person>  </developers>
   <documentation> sun245</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year></year>
+    <name>Council for the Central Laboratory of the Research Councils</name>
+  </copyright>
+  <copyright>
+    <year></year>
+    <name>University of Birmingham</name>
+  </copyright>
   <!-- <notes><p></p></notes> -->
 </component>

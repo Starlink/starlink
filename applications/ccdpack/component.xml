@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="ccdpack">
+<component id="ccdpack" support="S">
   <version>4.0-18</version>
   <path>applications/ccdpack</path>
   <description>CCD data reduction package</description>
@@ -44,5 +44,12 @@
   </developers>
   <!-- <documentation> sun139</documentation> -->
   <bugreports>ccdpack@starlink.ac.uk</bugreports>
+  <copyright>
+    <year></year>
+    <name>Council for the Central Laboratory of the Research Councils</name>
+    <notes>
+      <p>Except for contents of obsolete dir</p>
+    </notes>
+  </copyright>
   <!-- <notes><p></p></notes> -->
 </component>

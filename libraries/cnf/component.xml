@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="cnf">
+<component id="cnf" support="S">
   <version>4.1-1</version>
   <path>libraries/cnf</path>
   <description>Mixed Language Programming -- FORTRAN and C</description>
@@ -38,5 +38,9 @@
     </person>  </developers>
   <documentation> sun209</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year></year>
+    <name>Council for the Central Laboratory of the Research Councils</name>
+  </copyright>
   <!-- <notes><p></p></notes> -->
 </component>

@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="extractor">
+<component id="extractor" support="S">
   <version>2.3-1</version>
   <path>applications/extractor</path>
   <description>EXTRACTOR - An Astronomical Source Detection Program</description>
@@ -25,5 +25,9 @@ variety of formats.
   </developers>
   <documentation> sun226</documentation>
   <bugreports>extractor@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year></year>
+    <name>Council for the Central Laboratory of the Research Councils</name>
+  </copyright>
   <!-- <notes><p></p></notes> -->
 </component>

@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="ifd">
+<component id="ifd" support="S">
   <version>1.2-8</version>
   <path>applications/ifd</path>
   <description>Interface Definition Files</description>

@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="hlp">
+<component id="hlp" support="S">
   <version>3.3-2</version>
   <path>libraries/hlp</path>
   <description>HLP -- interactive help system</description>

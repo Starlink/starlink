@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- @configure_input@ -->
 
-<component id="@PACKAGE@">
+<component id="@PACKAGE@" support="S">
   <version>@PACKAGE_VERSION@</version>
   <path>libraries/pcs</path>
   <description>PCS -- Parameter and Communication Subsystems</description>
@@ -182,5 +182,9 @@
   </developers>
   <!-- <documentation>@STAR_DOCUMENTATION@</documentation> -->
   <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <copyright>
+    <year>1999-2004</year>
+    <name>Council for the Central Laboratory of the Research Councils</name>
+  </copyright>
   <notes><p>Documentation is in the pcs-docs subdirectory.</p></notes>
 </component>

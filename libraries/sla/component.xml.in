@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- @configure_input@ -->
 
-<component id="@PACKAGE@">
+<component id="@PACKAGE@" support="S">
   <version>@PACKAGE_VERSION@</version>
   <path>libraries/sla</path>
   <description>SLALIB --- Positional Astronomy Library</description>
@@ -24,4 +24,8 @@
   </developers>
   <documentation>@STAR_DOCUMENTATION@</documentation>
   <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <copyright>
+    <year>1989-2003</year>
+    <name>Council for the Central Laboratory of the Research Councils</name>
+  </copyright>
 </component>

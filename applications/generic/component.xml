@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="generic">
+<component id="generic" support="S">
   <version>1.1-2</version>
   <path>applications/generic</path>
   <description>A Utility for Compiling Generic Fortran Subroutines</description>

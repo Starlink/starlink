@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- @configure_input@ -->
 
-<component id="@PACKAGE@">
+<component id="@PACKAGE@" support="S">
   <version>@PACKAGE_VERSION@</version>
   <path>applications/hdstools</path>
   <description>HDSTOOLS - Tools To Display and Edit HDS Objects</description>
@@ -28,5 +28,13 @@ package but have now been modified to run as normal Starlink tasks.
     </person>  </developers>
   <documentation>@STAR_DOCUMENTATION@</documentation>
   <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <copyright>
+    <year></year>
+    <name>Council for the Central Laboratory of the Research Councils</name>
+  </copyright>
+  <copyright>
+    <year></year>
+    <name>University of Birmingham</name>
+  </copyright>
   <!-- <notes><p></p></notes> -->
 </component>

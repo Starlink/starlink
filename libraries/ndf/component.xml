@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="ndf">
+<component id="ndf" support="S">
   <version>1.5-10</version>
   <path>libraries/ndf</path>
   <description>NDF - Routines for Accessing the Extensible N-Dimensional Data Format</description>
@@ -32,5 +32,9 @@
   </developers>
   <documentation> ssn20 sun33</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year></year>
+    <name>Council for the Central Laboratory of the Research Councils</name>
+  </copyright>
   <!-- <notes><p></p></notes> -->
 </component>

@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="dipso">
+<component id="dipso" support="S">
   <version>3.6-4</version>
   <path>applications/dipso</path>
   <description>DIPSO -- A friendly spectrum analysis program</description>

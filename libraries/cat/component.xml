@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="cat">
+<component id="cat" support="S">
   <version>8.1</version>
   <path>libraries/cat</path>
   <description>CAT -- Catalogue and Table Manipulation Library</description>
@@ -23,6 +23,10 @@ astronomical catalogues and similar tabular datasets.
   </developers>
   <documentation> sun181</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year></year>
+    <name>Council for the Central Laboratory of the Research Councils</name>
+  </copyright>
   <notes><p>
 No longer under active control.
 </p></notes>

@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- @configure_input@ -->
 
-<component id="@PACKAGE@">
+<component id="@PACKAGE@" support="U">
   <version>@PACKAGE_VERSION@</version>
   <path>libraries/gsd</path>
   <description>Global Section Datafile (GSD) access library</description>

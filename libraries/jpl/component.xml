@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 
-<component id="jpl">
+<component id="jpl" support="S">
   <version>2.0-2</version>
   <path>libraries/jpl</path>
   <description>JPL Ephemeris access routines</description>

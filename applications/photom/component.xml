@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="photom">
+<component id="photom" support="S">
   <version>1.9-0</version>
   <path>applications/photom</path>
   <description>PHOTOM - A Photometry Package</description>

@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="cfitsio">
+<component id="cfitsio" support="U">
   <version>2.4-90</version>
   <path>thirdparty/heasarc/cfitsio</path>
   <description>CFITSIO -- C and Fortran libraries for access to FITS files

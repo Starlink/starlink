@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="tk">
+<component id="tk" support="U">
   <version>8.2.3</version>
   <path>thirdparty/tclsys/tk</path>
   <description>The Tk system</description>

@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="sst">
+<component id="sst" support="S">
   <version>1.1</version>
   <path>applications/sst</path>
   <description>SST - A Simple Software Tools Package</description>
@@ -39,5 +39,9 @@
   </developers>
   <documentation> sun110</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year></year>
+    <name>Council for the Central Laboratory of the Research Councils</name>
+  </copyright>
   <!-- <notes><p></p></notes> -->
 </component>

@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="gns">
+<component id="gns" support="U">
   <version>1.1-4</version>
   <path>libraries/gns</path>
   <description>Graphics Workstation Name Service</description>

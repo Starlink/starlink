@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="ndg">
+<component id="ndg" support="S">
   <version>5.2-2</version>
   <path>libraries/ndg</path>
   <description>NDG - Routines for Accessing Groups of NDFs</description>
@@ -25,5 +25,9 @@
   </developers>
   <documentation> sun2</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year></year>
+    <name>Council for the Central Laboratory of the Research Councils</name>
+  </copyright>
   <!-- <notes><p></p></notes> -->
 </component>

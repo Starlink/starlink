@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 
-<component id="@PACKAGE@">
+<component id="@PACKAGE@" support="S">
   <version>@PACKAGE_VERSION@</version>
   <path>libraries/ast</path>
   <description>WCS library</description>
@@ -37,4 +37,8 @@
   </developers>
   <documentation>@STAR_DOCUMENTATION@</documentation>
   <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <copyright>
+    <year></year>
+    <name>Council for the Central Laboratory of the Research Councils</name>
+  </copyright>
 </component>

@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="astrom">
+<component id="astrom" support="S">
   <version>3.8</version>
   <path>applications/astrom</path>
   <description>Basic astrometry package</description>
@@ -29,5 +29,9 @@
   </developers>
   <documentation> sun5</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year></year>
+    <name>Council for the Central Laboratory of the Research Councils</name>
+  </copyright>
   <!-- <notes><p></p></notes> -->
 </component>

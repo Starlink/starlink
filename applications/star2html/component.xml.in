@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- @configure_input@ -->
 
-<component id="@PACKAGE@">
+<component id="@PACKAGE@" support="S">
   <version>@PACKAGE_VERSION@</version>
   <path>applications/star2html</path>
   <description>Convert Starlink documents to hypertext</description>
@@ -30,5 +30,9 @@
   </developers>
   <documentation>@STAR_DOCUMENTATION@</documentation>
   <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <copyright>
+    <year></year>
+    <name>Council for the Central Laboratory of the Research Councils</name>
+  </copyright>
   <notes><p>Starlink customised wrapper around latex2html</p></notes>
 </component>

@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="convert">
+<component id="convert" support="S">
   <version>1.5-5</version>
   <path>applications/convert</path>
   <description>CONVERT -- format-conversion package</description>

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 
-<component id="starconf" buildsupport="yes">
+<component id="starconf" buildsupport="yes" support="U">
   <version>1.2</version>
   <path>buildsupport/starconf</path>
   <description>Starlink autoconf support</description>

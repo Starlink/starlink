@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- @configure_input@ -->
 
-<component id="@PACKAGE@">
+<component id="@PACKAGE@" support="U">
   <version>@PACKAGE_VERSION@</version>
   <path>applications/spt</path>
   <description>Software Porting Tools</description>

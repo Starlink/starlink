@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 
-<component id="fio">
+<component id="fio" support="S">
   <version>1.5-3</version>
   <path>libraries/fio</path>
   <description>FORTRAN file I/O routines</description>

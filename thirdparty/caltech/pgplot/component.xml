@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="pgplot">
+<component id="pgplot" support="S">
   <version>5.2.2-2</version>
   <path>thirdparty/caltech/pgplot</path>
   <description>Native PGPLOT</description>

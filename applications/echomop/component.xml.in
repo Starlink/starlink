@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- @configure_input@ -->
 
-<component id="@PACKAGE@">
+<component id="@PACKAGE@" support="S">
   <version>@PACKAGE_VERSION@</version>
   <path>applications/echomop</path>
   <description>Echelle Data Reduction Package</description>
@@ -39,5 +39,16 @@
   </developers>
   <documentation>@STAR_DOCUMENTATION@</documentation>
   <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <copyright>
+    <year></year>
+    <name>Council for the Central Laboratory of the Research Councils</name>
+  </copyright>
+  <copyright>
+    <year></year>
+    <name>Others...</name>
+    <notes>
+      <p>Various small contributions, mostly from UCL</p>
+    </notes>
+  </copyright>
   <!-- <notes><p></p></notes> -->
 </component>

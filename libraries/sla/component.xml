@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="sla">
+<component id="sla" support="S">
   <version>2.4-12</version>
   <path>libraries/sla</path>
   <description>SLALIB --- Positional Astronomy Library</description>
@@ -24,4 +24,8 @@
   </developers>
   <documentation> sun67</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1989-2003</year>
+    <name>Council for the Central Laboratory of the Research Councils</name>
+  </copyright>
 </component>

@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="img">
+<component id="img" support="S">
   <version>1.3-1</version>
   <path>libraries/img</path>
   <description>IMG - Simple Image Data Access</description>
@@ -24,5 +24,9 @@ understand.
   </developers>
   <documentation> sun160</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year></year>
+    <name>Council for the Central Laboratory of the Research Councils</name>
+  </copyright>
   <!-- <notes><p></p></notes> -->
 </component>

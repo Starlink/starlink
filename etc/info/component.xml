@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="info">
+<component id="info" support="S">
   <version>2004.1-1</version>
   <path>etc/info</path>
   <description>General admin files and doc index</description>

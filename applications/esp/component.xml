@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="esp">
+<component id="esp" support="S">
   <version>0.11</version>
   <path>applications/esp</path>
   <description>Extended Surface Photometry</description>
@@ -35,5 +35,12 @@
   </developers>
   <documentation> sun180</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1996-1999, 2004</year>
+    <name>Council for the Central Laboratory of the Research Councils</name>
+    <notes>
+      <p>Includes some public domain code</p>
+    </notes>
+  </copyright>
   <!-- <notes><p></p></notes> -->
 </component>

@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="htx">
+<component id="htx" support="S">
   <version>1.2-10</version>
   <path>applications/htx</path>
   <description>Hypertext Cross-reference Utilities</description>
@@ -41,5 +41,9 @@
   </developers>
   <!-- <documentation> sun188</documentation> -->
   <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year></year>
+    <name>Council for the Central Laboratory of the Research Councils</name>
+  </copyright>
   <!-- <notes><p></p></notes> -->
 </component>

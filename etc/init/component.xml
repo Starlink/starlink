@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="init">
+<component id="init" support="S">
   <version>1.1-26</version>
   <path>etc/init</path>
   <description>Starlink initialisation files</description>

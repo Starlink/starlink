@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="spt">
+<component id="spt" support="U">
   <version>1.3-1</version>
   <path>applications/spt</path>
   <description>Software Porting Tools</description>

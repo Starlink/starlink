@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="echomop">
+<component id="echomop" support="S">
   <version>3.3-7</version>
   <path>applications/echomop</path>
   <description>Echelle Data Reduction Package</description>
@@ -39,5 +39,16 @@
   </developers>
   <documentation> sun152</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year></year>
+    <name>Council for the Central Laboratory of the Research Councils</name>
+  </copyright>
+  <copyright>
+    <year></year>
+    <name>Others...</name>
+    <notes>
+      <p>Various small contributions, mostly from UCL</p>
+    </notes>
+  </copyright>
   <!-- <notes><p></p></notes> -->
 </component>

@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="polpack">
+<component id="polpack" support="S">
   <version>3.1-3</version>
   <path>applications/polpack</path>
   <description>POLPACK - An Imaging Polarimetry Reduction Package</description>
@@ -29,5 +29,9 @@ display of vector maps.
   </developers>
   <documentation> sun223</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year></year>
+    <name>Council for the Central Laboratory of the Research Councils</name>
+  </copyright>
   <!-- <notes><p></p></notes> -->
 </component>

@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="psmerge">
+<component id="psmerge" support="U">
   <version>1.0-6</version>
   <path>applications/psmerge</path>
   <description>Merge EPS files</description>

@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="prm">
+<component id="prm" support="S">
   <version>1.4-1</version>
   <path>libraries/prm</path>
   <description>PRIMDAT --- Processing of Primitive Numerical Data</description>
@@ -33,5 +33,9 @@
   </developers>
   <documentation> sun39</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1987, 1988, 1991, 1992, 1995, 2004</year>
+    <name>Council for the Central Laboratory of the Research Councils</name>
+  </copyright>
   <!-- <notes><p></p></notes> -->
 </component>

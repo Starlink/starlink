@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="mers">
+<component id="mers" support="U">
   <version>1.8</version>
   <path>libraries/mers</path>
   <description>Message and Error Reporting Systems</description>

@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- @configure_input@ -->
 
-<component id="@PACKAGE@" status="obsolete">
+<component id="@PACKAGE@" status="obsolete" support="U">
   <version>@PACKAGE_VERSION@</version>
   <path>applications/obsolete/email</path>
   <description>Astronomy email address searching</description>

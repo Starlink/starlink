@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="pgp">
+<component id="pgp" support="S">
   <version>5.1.1-9</version>
   <path>libraries/pgp</path>
   <description>PGPLOT Graphics Subroutine Library (GKS version)q</description>

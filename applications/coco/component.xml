@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="coco">
+<component id="coco" support="S">
   <version>2.2-8</version>
   <path>applications/coco</path>
   <description>Conversion of Celestial Coordinates</description>

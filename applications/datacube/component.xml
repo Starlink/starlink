@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="datacube">
+<component id="datacube" support="S">
   <version>1.0-4</version>
   <path>applications/datacube</path>
   <description>DATACUBE - An IFS datacube manipulation package</description>

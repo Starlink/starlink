@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="gwm">
+<component id="gwm" support="U">
   <version>1.5-1</version>
   <path>libraries/gwm</path>
   <description>GWM - X Graphics Window Manager</description>

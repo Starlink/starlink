@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="shl">
+<component id="shl" support="S">
   <version>1.0-1</version>
   <path>libraries/shl</path>
   <description>SHL -- Support for HLP Library access</description>

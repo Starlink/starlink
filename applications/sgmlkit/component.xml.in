@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- @configure_input@ -->
 
-<component id="@PACKAGE@">
+<component id="@PACKAGE@" support="S">
   <version>@PACKAGE_VERSION@</version>
   <path>applications/sgmlkit</path>
   <description>Starlink documentation SGML kit</description>
@@ -30,4 +30,8 @@
   </developers>
   <documentation>@STAR_DOCUMENTATION@</documentation>
   <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <copyright>
+    <year>1999-2004</year>
+    <name>Council for the Central Laboratory of the Research Councils</name>
+  </copyright>
 </component>

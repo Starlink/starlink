@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 
-<component id="messgen">
+<component id="messgen" support="S">
   <version>1.2</version>
   <path>applications/messgen</path>
   <description>Starlink Facility Error Message Generation</description>

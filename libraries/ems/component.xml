@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="ems">
+<component id="ems" support="S">
   <version>2.0-7</version>
   <path>libraries/ems</path>
   <description>EMS -- Error Message Service</description>
@@ -33,5 +33,9 @@
     </person>  </developers>
   <documentation> ssn4</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year></year>
+    <name>Council for the Central Laboratory of the Research Councils</name>
+  </copyright>
   <!-- <notes><p></p></notes> -->
 </component>

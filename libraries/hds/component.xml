@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="hds">
+<component id="hds" support="S">
   <version>4.3-4</version>
   <path>libraries/hds</path>
   <description>Hierarchical Data System</description>

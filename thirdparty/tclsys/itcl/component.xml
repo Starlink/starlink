@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="itcl">
+<component id="itcl" support="U">
   <version>3.1.0</version>
   <path>thirdparty/tclsys/itcl</path>
   <description>[incr Tcl]</description>

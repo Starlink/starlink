@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="ref">
+<component id="ref" support="U">
   <version>1.1-4</version>
   <path>libraries/ref</path>
   <description>Routines for Handling References to HDS Objects</description>

@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="kaprh">
+<component id="kaprh" support="U">
   <version>2.0</version>
   <path>applications/kaprh</path>
   <description>KAPRH - A home for retired KAPPA applications</description>

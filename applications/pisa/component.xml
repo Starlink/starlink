@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="pisa">
+<component id="pisa" support="U">
   <version>2.4-7</version>
   <path>applications/pisa</path>
   <description>PISA - Position Intensity and Shape Analysis</description>

@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="hdstrace">
+<component id="hdstrace" support="S">
   <version>1.2-2</version>
   <path>applications/hdstrace</path>
   <description>HDSTRACE - Trace an HDS file</description>

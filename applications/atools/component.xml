@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="atools">
+<component id="atools" support="S">
   <version>1.8-1</version>
   <path>applications/atools</path>
   <description>ATOOLS - AST applications</description>
@@ -26,5 +26,9 @@ high-level interface to the AST library.
   </developers>
   <documentation></documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year></year>
+    <name>Council for the Central Laboratory of the Research Councils</name>
+  </copyright>
   <!-- <notes><p></p></notes> -->
 </component>
