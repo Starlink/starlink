@@ -14,7 +14,7 @@ require AutoLoader;
  
 @ISA = qw(Exporter DynaLoader); 
 
-$VERSION = '1.00';
+'$Revision$ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = "$1");
 
 # Add the following to the 'ndf'=> associative array if you want to
 # use ADAM PARAMETERS. Remove the comment field from the entries in the XS
@@ -99,7 +99,8 @@ $VERSION = '1.00';
 
 		'misc'=>[qw/mem2string string2mem array2mem mem2array
 			 par_get
-			 fits_get_nth_item fits_get_item fits_extract_key_val/]
+			 fits_get_nth_item fits_get_item fits_extract_key_val
+			 fits_construct_string/]
 	       );
 
 Exporter::export_tags('ndf','ary','msg','err','hds','dat','cmp','misc');
@@ -381,15 +382,15 @@ sub par_get ($$$) {
 
 sub fits_get_nth_item (\@$) {
 
-  my ($keyword, $value);
+  my ($keyword, $value, $comment);
   my ($fitsref, $n) = @_;
 
   # Split up keyword and value
 
-  ($keyword, $value) = fits_extract_key_val($$fitsref[$n]);
+  ($keyword, $value, $comment) = fits_extract_key_val($$fitsref[$n]);
 
   # Now return keyword and value
-  return ($keyword, $value);
+  return ($keyword, $value, $comment);
 
 }
 
@@ -403,7 +404,7 @@ sub fits_get_nth_item (\@$) {
 sub fits_get_item (\@$) {
 
   my ($fitsref, $keyword) = @_;
-  my ($name, $value, $nfits);
+  my ($name, $value, $nfits, $comment);
   my (@results) = ();
 
   # Look at each member of the FITS array
@@ -411,7 +412,7 @@ sub fits_get_item (\@$) {
 
   ($#results > -1) && do {
 
-    ($name, $value) = fits_extract_key_val($results[0]);
+    ($name, $value, $comment) = fits_extract_key_val($results[0]);
 
   } || ($value = "NOT FOUND");
 
@@ -423,11 +424,11 @@ sub fits_get_item (\@$) {
 sub fits_extract_key_val ($) {
 
   my $fits_entry = shift;
-  my ($keyword, $value);
+  my ($keyword, $value, $comment);
 
-  $keyword = $value = undef;
+  $keyword = $value = $comment = undef;
   # Extract the value
-  ($keyword, $value) = split(/=|\s\//,$fits_entry);
+  ($keyword, $value, $comment) = split(/=|\s\//,$fits_entry);
 
   # Tidy up the keyword
   $keyword =~ s/\s//g;    # Remove white space
@@ -440,9 +441,42 @@ sub fits_extract_key_val ($) {
   $value = "NOT FOUND" unless ($value =~ /./);
   $keyword = "NONE" unless ($keyword =~ /./);
 
-  return($keyword, $value);
+  return($keyword, $value, $comment);
 }
 
+# Routine to construct a FITS-like string from a keyword, value and comment
+# Packed string is returned
+
+sub fits_construct_string ($$$) {
+  my ($keyword, $value, $comment) = @_;
+
+  my ($fitsent);
+
+  $fitsent = substr($keyword,0,8); # Key must be <= 8 characters
+  $fitsent .= (' 'x(8-length($fitsent)))."= ";
+
+  # Check whether we have a number or character string
+  if ($value =~ /^(-?)(\d*)(\.?)(\d*)([Ee][-\+]?\d+)?$/) {
+    # Number (chop to 67 characters)
+    $value = substr($value,0,67);
+    $value = (' 'x(20-length($value))).$value;
+
+  } else {
+    # Character (chop to 65 characters)
+    $value = substr($value,0, 65);
+    $value = "'$value'";
+    $value = $value.(' 'x(20-length($value)));
+  }
+
+  # Add comment
+  $fitsent .= $value.' / '.$comment;
+
+  # Fix at 80 characters
+  $fitsent = substr($fitsent,0,80);
+  $fitsent .= ' 'x(80-length($fitsent));
+
+  return $fitsent;
+}
  
  
 1;
@@ -621,14 +655,14 @@ For example, to list all the values and keywords:
 
 
    for ($i=0; $i <= $#fits; $i++) {
-    ($keyword, $value) = fits_get_nth_item(@fits, $i);
+    ($keyword, $value, $comment) = fits_get_nth_item(@fits, $i);
     print "$i: $keyword\t $value\n";
    }
 
 You can also use fits_extract_key_val to access the nth entry via
 
 C<
-  ($keyword, $value) = fits_extract_key_val($fits[$n]);
+  ($keyword, $value, $comment) = fits_extract_key_val($fits[$n]);
 >
 
 To find out the value that goes with a keyword:
@@ -643,7 +677,7 @@ Remember that perl has associative arrays, such that
 
   %fitsitem = ();
   for ($i=0; $i <= $#fits; $i++) {
-    ($keyword, $value) = fits_get_nth_item(@fits, $i);
+    ($keyword, $value, $comment) = fits_get_nth_item(@fits, $i);
     $fitsitem{$keyword} = $value;
   }
 
@@ -781,7 +815,7 @@ cmp_type cmp_unmap
 =item :misc
 
 mem2string string2mem array2mem mem2array fits_get_nth_item
-fits_get_item fits_extract_key_val par_get
+fits_get_item fits_extract_key_val fits_construct_string par_get
 
 
 =back
