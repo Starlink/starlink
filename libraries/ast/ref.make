@@ -89,17 +89,15 @@ release: addcopyright addversion getnewversion
 do_unix_release:
 #
 #  Fetch all the source files required.
-	fetch `grp c_routines f_routines c_include_files f_include_files \
-                   unix_startup_files unix_link_files message_system_files \
-                   utility_programs test_programs` COPYING.LIB
-	echo `grp c_routines f_routines c_include_files f_include_files \
-                   unix_startup_files unix_link_files message_system_files \
-                   utility_programs test_programs` COPYING.LIB
+	fetch $(C_ROUTINES) $(F_ROUTINES) $(C_INCLUDE_FILES) \
+              $(F_INCLUDE_FILES) $(UNIX_STARTUP_FILES) \
+              $(UNIX_LINK_FILES) $(MESSAGE_SYSTEM_FILES) \
+              $(UTILITY_PROGRAMS) $(TEST_PROGRAMS) COPYING.LIB; rm RCS
 #
 #  Create files generated from other source files, and delete the
 #  original source where necessary.
-	$(MAKE) -e -f $(MAKEFILE) `grp derived_files`
-	rm -f `grp message_system_files`
+	$(MAKE) -e -f $(MAKEFILE) $(DERIVED_FILES)
+	rm -f $(MESSAGE_SYSTEM_FILES)
 #
 #  Make the remaining files accessible to others.
 	for f in *; do \
@@ -113,11 +111,12 @@ do_unix_release:
 #  Pack the files into the source archive, omitting any which must be kept
 #  separate for licensing reasons. Then remove the original copies of the
 #  files that were packed.
-	tar_files=`{  grp wcslib_files;\
+	tar_files=`{  echo $(WCSLIB_FILES);\
                       awk 'BEGIN{printf(" > ")}' </dev/null;\
-                      grp c_routines f_routines c_include_files derived_files \
-                      f_include_files unix_startup_files unix_link_files \
-                      utility_programs test_programs;\
+                      echo $(C_ROUTINES) $(F_ROUTINES) $(C_INCLUDE_FILES) \
+                           $(DERIVED_FILES) $(F_INCLUDE_FILES) \
+                           $(UNIX_STARTUP_FILES) $(UNIX_LINK_FILES) \
+                           $(UTILITY_PROGRAMS) $(TEST_PROGRAMS);\
                     } | awk 'BEGIN{RS=" \n"}{ \
                        if ( $$1 == ">" ) { \
                           x++ \
@@ -130,7 +129,7 @@ do_unix_release:
         rm -f $${tar_files}
 #
 #  Pack the wcslib files into their own library and then remove the originals.
-	tar_files=`grp wcslib_files`;\
+	tar_files=$(WCSLIB_FILES);\
         $(TAR_IN) wcslib.tar $${tar_files};\
         rm -f $${tar_files}
 #
@@ -144,16 +143,16 @@ do_unix_release:
 #
 #  Get the postscript figures and store in suitable directories.
 	mkdir sun210_figures sun211_figures
-	(cd sun210_figures; fetch `grp postscript_figures`)
-	(cd sun211_figures; fetch `grp postscript_figures`)
+	(cd sun210_figures; fetch $(POSTSCRIPT_FIGURES); rm RCS)
+	(cd sun211_figures; fetch $(POSTSCRIPT_FIGURES); rm RCS)
 	chmod 755 sun210_figures sun211_figures
 	chmod 644 sun210_figures/* sun211_figures/*
 #
 #  Fetch the news file and licence conditions and any additional files
 #  required in the release. Make all files accessible.
 	files="$(PKG).news LICENCE makefile mk \
-               `grp latex_documentation_files`";\
-        fetch $${files};\
+               $(LATEX_DOCUMENTATION_FILES)";\
+        fetch $${files}; rm RCS; \
         for f in $${files}; do \
            cat "$${f}" | ${AST_REF}/addcopyright \
                        | ${AST_REF}/addversion >tmp.tmp;\
