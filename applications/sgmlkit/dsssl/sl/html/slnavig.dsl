@@ -46,6 +46,18 @@ must be a subset of the return value of (section-element-list).
 	))
 
 <func>
+<routinename>chunking?
+<description>
+Returns true if chunking is enabled.
+<p>Currently, this simply returns <code/ (not (or nochunks stream-output))/,
+but could be more general in future.
+<returnvalue type=boolean>True if chunking is enabled.
+<argumentlist none>
+<codebody>
+(define (chunking?)
+  (not (or nochunks stream-output)))
+
+<func>
 <routinename>chunk?
 <description>
 Return <code/#t/ if the given node is a chunk, taking account of whether
@@ -59,11 +71,8 @@ to have a GI which is in (chunk-element-list)).
   <description>The node to test
 <codebody>
 (define (chunk? #!optional (nd (current-node)))
-  (if (or nochunks stream-output)
-      #f ;; (node-list=? nd (document-element))
-      (if (member (gi nd) (chunk-element-list))
-	  #t ;; (if (combined-chunk? nd) #f #t)
-	  #f)))
+  (and (chunking?)
+       (member (gi nd) (chunk-element-list))))
 
 <func>
 <routinename>chunk-path
@@ -338,11 +347,12 @@ generated HTML documents.
 ;; the section-footer-navigation functions will be invoked only if
 ;; we're chunking.
 (define (root-footer-navigation elemnode)
-  (if (or nochunks stream-output)
-      (empty-sosofo)
-      (let ((subsects (chunk-children (select-elements (children elemnode)
-						       (normalize "docbody")))))
-	(make-subcontents subsects))))
+  (if (chunking?)
+      (let ((subsects (chunk-children (select-elements
+				       (children elemnode)
+				       (normalize "docbody")))))
+	(make-subcontents subsects))
+      (empty-sosofo)))
 
 ;(define (section-footer-navigation elemnode)
 ;  (let ((subsects (chunk-children elemnode)))
@@ -359,9 +369,9 @@ generated HTML documents.
 	 ; Otherwise, return an empty-node-list
 	 ; (this is because (chunk-children) doesn't find sections from within
 	 ; the root element, and so needs a special case).
-	 (root-subsects (if (and (node-list=? elemnode
-					      (document-element))
-				 (not (or nochunks stream-output)))
+	 (root-subsects (if (and (chunking?)
+				 (node-list=? elemnode
+					      (document-element)))
 			    (chunk-children (select-elements
 					     (children elemnode)
 					     (normalize "docbody")))

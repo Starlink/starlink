@@ -21,6 +21,8 @@ fragments which can be read in and inserted into the generated HTML.
 
 <codegroup id="code.maths">
 <title>Process maths elements
+<description>The code here is designed to be used within another stylesheet,
+such as the stylesheet which does the main processing of the document.
 
 <misccode>
 <description>Declare the <code/all-element-number/ Jade extension
@@ -87,9 +89,9 @@ appropriate bracketing expressions.
   (element m
     (tth-equation "\\(" "\\)"))
   (element mequation
-    (tth-equation "\\begin{equation}" "\\end{equation}"))
+    (tth-equation "\\begin{equation*}" "\\end{equation*}"))
   (element meqnarray
-    (tth-equation "\\begin{eqnarray}" "\\end{eqnarray}")))
+    (tth-equation "\\begin{eqnarray*}" "\\end{eqnarray*}")))
 </codebody>
 </misccode>
 
@@ -257,7 +259,7 @@ links which navigate between documents
 
 <codegroup use="code.maths code.lib code.common code.navig" id=maths.main>
 <title>Extract document maths
-<description>This codegroup is usable as a standalone stylesheet, to extract
+<description>This codegroup is used as a standalone stylesheet, to extract
 the maths from a document without doing any further processing.
 
 <misccode>

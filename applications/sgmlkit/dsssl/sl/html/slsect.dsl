@@ -7,7 +7,7 @@
 
 
 (define ($section-separator$) 
-  (if (or (not (or nochunks stream-output))
+  (if (or (chunking?)
 	  (node-list=? (current-node) (document-element)))
       (empty-sosofo)
       (make empty-element gi: "HR")))

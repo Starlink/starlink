@@ -19,7 +19,9 @@ then generates an HTML file
 </codeprologue>
 (define (process-document)
   (make sequence
-    (literal (string-append (root-file-name) ":"))
+    (if stream-output			; no info if output to stdout
+	(empty-sosofo)
+	(literal (string-append (root-file-name) ":")))
     (html-document
      (process-node-list (getdocinfo 'title))
      (process-matching-children 'docbody))))

@@ -71,7 +71,8 @@ into a separate entity
 	    name: "HTML"
 	    public-id: %html-pubid%)
 	  doc-sosofo)
-	(if (or (chunk?) (node-list=? (current-node) (document-element)))
+	(if (or (chunk?)
+		(node-list=? (current-node) (document-element)))
 	    (make entity
 	      system-id: (html-file)
 	      (make document-type

@@ -1,11 +1,11 @@
 <!DOCTYPE programcode public "-//Starlink//DTD DSSSL Source Code 0.2//EN" [
-<!entity slparams.dsl		system "slparams.dsl">
 <!entity sldocs.dsl		system "sldocs.dsl">
 <!entity slall.dsl		system "slall.dsl">
 <!entity slsect.dsl		system "slsect.dsl">
 <!entity version.dsl		system "version.dsl">
 <!entity slroutines.dsl		system "slroutines.dsl">
 
+<!entity slparams.dsl		system "slparams.dsl" subdoc>
 <!entity slhtml.dsl		system "slhtml.dsl" subdoc>
 <!entity lib.dsl		system "../lib/sllib.dsl" subdoc>
 <!entity common.dsl		system "../common/slcommon.dsl" subdoc>
@@ -58,8 +58,15 @@ Code to process the various maths elements.
 <description>
 Code to support HTML generation
 
+<codereference doc="slparams.dsl" id=code.params>
+<title>Parameters
+<description>
+Miscellaneous parameters, which control detailed behaviour of the stylesheet.
 
-<codegroup use="code.lib code.common code.maths code.html code.navig" id=html>
+
+<codegroup 
+  use="code.lib code.common code.maths code.html code.navig code.params" 
+  id=html>
 <title>HTML-specific stylesheet code
 <description>
 This is the DSSSL stylesheet for converting the Starlink DTD to HTML.
@@ -88,8 +95,6 @@ transformation extensions of Jade.</description>
 </misccode>
 
 <!-- include the other parts by reference -->
-
-&slparams.dsl
 
 &slroutines.dsl
 
