@@ -36,25 +36,32 @@
       cd ${REL_DIR}
 
 #  See if the hypertext documents are to be re-created.
-#      echo -n "Re-create polreg.htx? (y/n): "
+#      echo -n "Re-create kappa.htx? (y/n): "
 #      set ans = $<
 #      if( $ans == "y" ) then
-#         star2html polreg.tex
-#         tar -cvhf ./polreg.htx_tar polreg.htx/*
-#         rm -rf polreg.htx
-#         mv ./polreg.htx_tar ${kappa_DEV}/..
+#         star2html sun95.tex
+#         tar -cvhf ./sun95.htx_tar sun95.htx/*
+#         rm -rf sun95.htx
+#         mv ./sun95.htx_tar ${KAPPA_DEV}/..
 #      endif
+
+#  Copy the hypertext docs to the release directory.
+      cp ${KAPPA_DEV}/../sun95.htx_tar ${REL_DIR}
 
 #  Ensure all files are accessable.
       chmod 777 *
 
-#  Create each of the tar files.
+#  Create each of the tar files. First do the system-independant ones
+#  listed in group TAR_FILES_A...
       foreach file (`grp tar_files_a`)
          tar -cvh -f ${TEMPDIR}/${file}.tar `grp ${file}`
          rm -f `grp ${file}`
          mv ${TEMPDIR}/${file}.tar ${REL_DIR}
       end
 
+#  Now do the system-dependant ones listed in group TAR_FILES_B. The contents
+#  of these tar files have the SYSTEM value appended to the end of each file 
+#  name.
       foreach file (`grp tar_files_b`)
          setenv news " "
          foreach item (`grp ${file}`)
@@ -68,8 +75,7 @@
          mv ${TEMPDIR}/${file}.tar ${REL_DIR}
       end
 
-#  Tar up all the release files (source and non-source), and then remove
-#  them.
+#  Tar up all the release files and then remove them.
       tar -cvh -f ${TEMPDIR}/kappa.tar `grp unix_total` 
       rm `grp unix_total` 
       mv ${TEMPDIR}/kappa.tar ${REL_DIR}
