@@ -1,3 +1,8 @@
+1 SPECX - v6.8-2
+
+ Fixes a problem introduced in v6.8-1 that prevents specx from creating
+ new maps.
+
 1 SPECX - v6.8-1
  Fixes a bug in the DATE-OBS parser on Linux.
  
