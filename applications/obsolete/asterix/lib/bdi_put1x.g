@@ -104,7 +104,4 @@
 *  Invoke basic routine
       CALL BDI_PUT<T>( ID, ITEMS, 1, DIM, DATA, STATUS )
 
-*  Report any errors
-      IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'BDI_PUT1<T>', STATUS )
-
       END

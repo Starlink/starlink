@@ -114,7 +114,4 @@
       CALL BDI_GET( ID, ITEMS, '<HTYPE>', NDIM, DIMX, DATA, DIMS,
      :              STATUS )
 
-*  Report any errors
-      IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'BDI_GET<T>', STATUS )
-
       END

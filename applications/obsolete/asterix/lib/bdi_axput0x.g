@@ -127,7 +127,4 @@
 
       END DO
 
-*  Report any errors
-      IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'BDI_AXPUT0<T>', STATUS )
-
       END

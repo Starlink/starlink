@@ -110,7 +110,4 @@
 *  Simply invoke generic routine
       CALL BDI_GET<T>( ID, ITEMS, 1, DIMX, DATA, DIM, STATUS )
 
-*  Report any errors
-      IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'BDI_GET1<T>', STATUS )
-
       END

@@ -108,7 +108,4 @@
 *  Invoke
       CALL BDI_MAP( ID, ITEMS, '<HTYPE>', MODE, PTRS, STATUS )
 
-*  Report any errors
-      IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'BDI_MAP<T>', STATUS )
-
       END
