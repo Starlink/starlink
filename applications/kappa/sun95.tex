@@ -42784,6 +42784,63 @@ lists below for details.}
 The following applications have been modified:
    \begin{description}
 
+      \item [\htmlref{CENTROID}{CENTROID}] \mbox{}
+         \begin{itemize}
+
+            \item Positions can now be read from and written to position
+	    list catalogues such as created by CURSOR, LISTMAKE, etc.
+
+            \item All positions, both given by the user and returned by
+	    the program, now refer to the Current Frame of the NDF.
+
+            \item Either the initial or final positions may now be marked
+	    on the screen (see parameter MARK).
+
+            \item There is now much greater control over the appearance
+	    of any annotation draw over the screen. This is provided
+	    through the PLOTSTYLE parameter which allow plotting
+	    attributes to be set.
+
+            \item The error on the final position is now returned in
+	    parameters XERR and YERR.
+
+            \item The following parameters have been removed
+	    (alternatives to using these old parameters are indicated):
+
+               \begin{description}
+                  \item[COSYS] -- Use application WCSFRAME to set the required
+                                  co-ordinate Frame first.
+               \end{description}
+
+            \item The following new parameters have been added: DESCRIBE,
+	    ERROR, GUESS, INCAT, MARKER, OUTCAT, PLOTSTYLE, QUIET, TITLE,
+	    XERR, YERR.
+
+            \item The following parameters have been modified:
+               \begin{description}
+
+                  \item[CENTRE] -- This is now a string parameter in
+		  which is returned the formatted co-ordinates of the
+		  last centroid position, in the current Frame of the
+		  NDF.
+
+                  \item[INIT] -- This is now a string parameter which
+		  should be given the co-ordinates of the initial guess
+		  in the Current Frame of the NDF.
+
+                  \item[MARK] -- Now indicates whether the initial or
+		  final positions should be marked on the screen.
+
+                  \item[MODE] -- Now accepts the extra value "Catalogue".
+
+                  \item[XCEN,YCEN] -- These are now string parameters
+		  which return the formatted X and Y co-ordinates of the
+		  last centroid position, in the current Frame of the
+		  NDF.
+
+               \end{description}
+         \end{itemize}
+
       \item [\htmlref{MLINPLOT}{MLINPLOT}] \mbox{}
          \begin{itemize}
 
@@ -42912,61 +42969,27 @@ The following applications have been modified:
          
          \end{itemize}
 
-      \item [\htmlref{CENTROID}{CENTROID}] \mbox{}
+      \item [\htmlref{PIXDUPE}{PIXDUPE] \mbox{}
          \begin{itemize}
+            \item Modified so that pixel origin information is not lost. 
+            For instance, if you expand two aligned images by the same 
+            factor, they will still be aligned after the expansion.
+         \end{itemize}
 
-            \item Positions can now be read from and written to position
-	    list catalogues such as created by CURSOR, LISTMAKE, etc.
+      \item [\htmlref{ROTATE}{ROTATE}] \mbox{}
+         \begin{itemize}
+            \item Modified so that rotation occurs around the origin of
+            pixel co-ordinates. This means that origin information is not 
+            lost. For instance, if you rotate two aligned images by the
+            same angle, they will still be aligned after the rotation.
+            Negative rotation angles are now accepted.
+         \end{itemize}
 
-            \item All positions, both given by the user and returned by
-	    the program, now refer to the Current Frame of the NDF.
-
-            \item Either the initial or final positions may now be marked
-	    on the screen (see parameter MARK).
-
-            \item There is now much greater control over the appearance
-	    of any annotation draw over the screen. This is provided
-	    through the PLOTSTYLE parameter which allow plotting
-	    attributes to be set.
-
-            \item The error on the final position is now returned in
-	    parameters XERR and YERR.
-
-            \item The following parameters have been removed
-	    (alternatives to using these old parameters are indicated):
-
-               \begin{description}
-                  \item[COSYS] -- Use application WCSFRAME to set the required
-                                  co-ordinate Frame first.
-               \end{description}
-
-            \item The following new parameters have been added: DESCRIBE,
-	    ERROR, GUESS, INCAT, MARKER, OUTCAT, PLOTSTYLE, QUIET, TITLE,
-	    XERR, YERR.
-
-            \item The following parameters have been modified:
-               \begin{description}
-
-                  \item[CENTRE] -- This is now a string parameter in
-		  which is returned the formatted co-ordinates of the
-		  last centroid position, in the current Frame of the
-		  NDF.
-
-                  \item[INIT] -- This is now a string parameter which
-		  should be given the co-ordinates of the initial guess
-		  in the Current Frame of the NDF.
-
-                  \item[MARK] -- Now indicates whether the initial or
-		  final positions should be marked on the screen.
-
-                  \item[MODE] -- Now accepts the extra value "Catalogue".
-
-                  \item[XCEN,YCEN] -- These are now string parameters
-		  which return the formatted X and Y co-ordinates of the
-		  last centroid position, in the current Frame of the
-		  NDF.
-
-               \end{description}
+      \item [\htmlref{WCSALIGN}{WCSALIGN}] \mbox{}
+         \begin{itemize}
+            \item Several new interpolation methods have been added, and an
+            improved algorithm is now used which should be more efficient in 
+            some cases.
          \end{itemize}
 
    \end{description}
@@ -42976,6 +42999,26 @@ The following applications have been modified:
    \item [\htmlref{SCATTER}{SCATTER}] -- Displays a scatter plot between
     data in two n-dimension NDFs.
 \end{description}
+
+\subsection{Other Changes}
+\begin{itemize}
+\item A bug has been fixed in the random number generators which could
+cause the same set of random numbers to be used on succesive invocations
+of an application, if the invocations occurred within one second of each
+other. For instance, if \htmlref{CREFRAME}{CREFRAME} were used twice to
+create two small frames of Gaussian noise with no delay inbetween, then the
+resulting images could previously have been identical. Another affected
+application is CENTROID -- estimates of the variance of the centroid positions
+will now be rather different because previous estimates were based on 
+correlated random shifts.
+
+\item Several significant memory leaks have been fixed.
+
+\item The following applications have been converted to use the GKS version of 
+PGPLOT instead of SGS/NCAR (there are no changes in functionality): 
+\htmlref{GDNAMES}{GDNAMES}.
+
+\end{itemize}
 
 \begin{latexonly}
 \newpage
