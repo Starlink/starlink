@@ -173,16 +173,11 @@
 *        This parameter controls whether to continue and create an
 *        incomplete solution. Such solutions will result when only a
 *        subset of the input position lists have been matched.
-*
-*        In this case, if the associating position lists with NDFs option
-*        has been chosen, then any NDFs for which matching was not 
-*        achieved will have their associated position lists removed
-*        from their .MORE.CCDPACK extensions.  Thus after running 
-*        FINDOFF with OVERRIDE set to TRUE, any position list associated
-*        with an NDF is guaranteed to be one which has been matched, and 
-*        not just one left over from the previously associated unmatched 
-*        list.
-*
+*        If the associating position lists with NDFs option has
+*        been chosen, an position list will still be written for 
+*        each input NDF, but for NDFs which were not matched the
+*        output list will be empty (will consist only of comment lines).
+*        
 *        Incomplete matching would ideally indicate that one, or more, 
 *        of the input lists are from positions not coincident with the 
 *        others, in which case it is perfectly legimate to proceed. 
@@ -1436,7 +1431,7 @@
                CALL CCD1_MSG( ' ', '  Continuing with those that have.',
      :                        STATUS ) 
                CALL CCD1_MSG( ' ', '  (associated position lists will'//
-     :                        ' be removed for the others).', STATUS )
+     :                        ' be empty for the others).', STATUS )
                CALL CCD1_MSG( ' ', ' ', STATUS )
             ELSE
                STATUS = SAI__ERROR

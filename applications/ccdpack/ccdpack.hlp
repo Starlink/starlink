@@ -4972,14 +4972,10 @@ OVERRIDE = _LOGICAL (Read)
    incomplete solution. Such solutions will result when only a
    subset of the input position lists have been matched.
 
-   In this case, if the associating position lists with images option
-   has been chosen, then any images for which matching was not
-   achieved will have their associated position lists removed
-   from their .MORE.CCDPACK extensions.  Thus after running
-   FINDOFF with OVERRIDE set to TRUE, any position list associated
-   with an image is guaranteed to be one which has been matched, and
-   not just one left over from the previously associated unmatched
-   list.
+   If the associating position lists with NDFs option has
+   been chosen, an position list will still be written for 
+   each input NDF, but for NDFs which were not matched the
+   output list will be empty (will consist only of comment lines).
 
    Incomplete matching would ideally indicate that one, or more,
    of the input lists are from positions not coincident with the
