@@ -207,23 +207,8 @@
 *        Add to list
             CALL IBGND_ADDSRC( XPOS, YPOS, R, STATUS )
 
-*        Bgnd derived image is displayed?
-            IF ( I_BGM_DISIM .NE. 0 ) THEN
-
-*          Update it
-              CALL IBGND_DISP_SURF( I_BGM_DISIM, STATUS )
-
-*          Mark sources
-              DO ISRC = 1, I_BGM_NSRC
-                CALL IBGND_MARK( ISRC, STATUS )
-              END DO
-
-            ELSE
-
-*          Mark the new soruce
-              CALL IBGND_MARK( I_BGM_NSRC, STATUS )
-
-            END IF
+*        Mark the new soruce
+            CALL IBGND_MARK( I_BGM_NSRC, STATUS )
 
 *      Mark sources
           ELSE IF ( CMD .EQ. 'MARKSRC' ) THEN
@@ -256,22 +241,13 @@
             CALL USI_GET0I( 'ISRC', ISRC, STATUS )
             CALL IBGND_DELSRC( ISRC, STATUS )
 
-*        Bgnd derived image is displayed?
-            IF ( I_BGM_DISIM .NE. 0 ) THEN
-
-*          Update it
-              CALL IBGND_DISP_SURF( I_BGM_DISIM, STATUS )
-
-*          Mark sources
-              DO ISRC = 1, I_BGM_NSRC
-                CALL IBGND_MARK( ISRC, STATUS )
-              END DO
-
-            END IF
-
 *      Display model
-          ELSE IF ( CMD .EQ. 'DISP' ) THEN
+          ELSE IF ( CMD .EQ. 'MDISP' ) THEN
             CALL IBGND_DISP_SURF( 1, STATUS )
+
+*      Display data
+          ELSE IF ( CMD .EQ. 'DDISP' ) THEN
+            CALL IBGND_DISP_SURF( 0, STATUS )
 
 *      Display model residuals
           ELSE IF ( CMD .EQ. 'RDISP' ) THEN
@@ -1087,6 +1063,7 @@
       INTEGER			STATUS             	! Global status
 
 *  Local Variables:
+      INTEGER			DPTR			! Data to plot
       REAL			PMIN, PMAX		! Pixel bounds
 
       LOGICAL			FRESH			! Device freshly opened
@@ -1124,31 +1101,36 @@
 
 *    Convert to residuals?
         IF ( PCODE .EQ. -1 ) THEN
-
           CALL IBGND_SURF_RESID( I_NX*I_NY, %VAL(I_BGM_SAMIDX),
      :                           %VAL(I_DPTR), %VAL(I_BGM_DPTR),
      :                           .TRUE., STATUS )
-
+          DPTR = I_BGM_DPTR
+        ELSE IF ( PCODE .EQ. 1 ) THEN
+          DPTR = I_BGM_DPTR
+        ELSE IF ( PCODE .EQ. 2 ) THEN
+          DPTR = I_DPTR
         END IF
 
 *    Plot bounds
-        CALL ARR_RANG1R( I_NX*I_NY, %VAL(I_BGM_DPTR), PMIN, PMAX,
-     :                   STATUS )
+        CALL ARR_RANG1R( I_NX*I_NY, %VAL(DPTR), PMIN, PMAX, STATUS )
         IF ( PMIN .EQ. PMAX ) THEN
           PMIN = 0.95*PMIN
           PMAX = 1.05*PMAX
         END IF
+	print *,'pix range ',pmin,pmax
+        I_PMIN = PMIN
+        I_PMAX = PMAX
 
 *    Plot the pixels
-        IF ( (PCODE.EQ.-1) .AND. I_QOK .AND. I_BAD ) THEN
+        IF ( (PCODE.NE.1) .AND. I_QOK .AND. I_BAD ) THEN
           CALL GFX_PIXEL(I_WKPTR,I_NX,I_NY,I_IX1,I_IX2,I_IY1,I_IY2,
      :                .TRUE.,%VAL(I_XPTR),%VAL(I_YPTR),0,0,
-     :                     %VAL(I_BGM_DPTR), PMIN,PMAX,%VAL(I_QPTR),
+     :                     %VAL(I_DPTR), PMIN,PMAX,%VAL(I_QPTR),
      :                    I_MASK,STATUS)
         ELSE
           CALL GFX_PIXEL(I_WKPTR,I_NX,I_NY,I_IX1,I_IX2,I_IY1,I_IY2,
      :                .TRUE.,%VAL(I_XPTR),%VAL(I_YPTR),0,0,
-     :                     %VAL(I_BGM_DPTR), PMIN,PMAX,STATUS)
+     :                     %VAL(I_DPTR), PMIN,PMAX,STATUS)
         END IF
 
 *    Convert back from residuals?
@@ -2463,6 +2445,15 @@
      :                      %VAL(I_BGM_SAMPTR(3)),
      :                      %VAL(I_BGM_DPTR),
      :                      STATUS )
+
+*    Bgnd derived image is displayed?
+        IF ( I_BGM_DISIM .NE. 2 ) THEN
+
+*      Update it
+          CALL IBGND_DISP_SURF( I_BGM_DISIM, STATUS )
+
+        END IF
+
       END IF
 
       END
@@ -3307,7 +3298,7 @@
 *    Function declarations :
 *    Local constants :
       INTEGER MLINE
-      PARAMETER (MLINE=16)
+      PARAMETER (MLINE=17)
 *    Local variables :
       CHARACTER*79 MTEXT(MLINE)
      :/' Source commands:',' ',
@@ -3319,7 +3310,8 @@
      : '  SETFIT  - Method of sample interpolation',
      : '  SAVE    - Save current model to a file',
      : ' ', ' Plotting commands:',' ',
-     : '  DISP    - Display background model image',
+     : '  DDISP   - Display source data',
+     : '  MDISP   - Display background model image',
      : '  RDISP   - Display data - background model residuals'/
       INTEGER ILINE
 *-
