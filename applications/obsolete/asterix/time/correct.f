@@ -240,7 +240,9 @@
         IF ( OK ) THEN
           CALL ADI_CGET0R( TIMID, 'EffExposure', TEXP, STATUS )
           IF ( STATUS .EQ. SAI__OK ) THEN
-            CALL MSG_SETC( 'WHERE', 'effective exposure time' )
+            IF ( .NOT. LIVE_OK ) THEN
+              CALL MSG_SETC( 'WHERE', 'effective exposure time' )
+            END IF
             GOT_TEXP = .TRUE.
           END IF
         END IF
@@ -251,7 +253,9 @@
           IF ( OK ) THEN
             CALL ADI_CGET0R( TIMID, 'Exposure', TEXP, STATUS )
             IF ( STATUS .EQ. SAI__OK ) THEN
-              CALL MSG_SETC( 'WHERE', 'exposure time in header' )
+              IF ( .NOT. LIVE_OK ) THEN
+                CALL MSG_SETC( 'WHERE', 'exposure time in header' )
+              END IF
               GOT_TEXP = .TRUE.
             END IF
           END IF
@@ -364,17 +368,20 @@
 *  Time resolved and dataset has time axis
       IF ( LIVE_OK ) THEN
 
-*    Apply the dead time correction
-        CALL CORRECT_DEADCOR( DIMS(T_AX), NELM/DIMS(T_AX), %VAL(DCPTR),
+        IF ( T_RESOLVED ) THEN
+
+          CALL MSG_PRNT( 'Performing time resolved dead time '/
+     :                                          /'correction' )
+
+*      Apply the dead time correction to each time slice
+          CALL CORRECT_DEADCOR( DIMS(T_AX), NELM/DIMS(T_AX), %VAL(DCPTR),
      :                        %VAL(DPTR), VOK, %VAL(VPTR), QOK,
      :                        %VAL(QPTR), STATUS )
 
-        IF ( T_RESOLVED ) THEN
-          CALL MSG_PRNT( 'Performing time resolved dead time '/
-     :                                          /'correction' )
         ELSE IF ( DEADC .NE. 1.0 ) THEN
           CALL MSG_SETR( 'DEAD', DEADC )
           CALL MSG_PRNT( 'Applied a total dead time correction of ^D' )
+
         END IF
 
 *    Release live times
