@@ -25,9 +25,10 @@
 #
 #
 # Dependency: the starconf.m4.in file defines a macro
-# STAR_MAKE_MANIFEST: that macro relies on us including
-# install-with-manifest.in here, and when we scan configure.ac, we
-# rely on that macro name to know when to include it.
+# STAR_DEFAULTS: that macro relies on us including
+# install-with-manifest.in here.
+
+
 
 # Check we have at least one argument
 if test $# -eq 0; then
@@ -45,7 +46,14 @@ cat >&3 <<\_STARCONF_EOD
 #
 # This is starconf, version @PACKAGE_VERSION@
 
-defaultchunks="acinclude.m4"
+# Configuration
+datadir=@datadir@
+ln_s="@LN_S@"
+
+# Always include acinclude.m4 to add Starlink autoconf macros.
+# Always include install-with-manifest.in, since the STAR_DEFAULTS macro
+# depends on it.
+defaultchunks="acinclude.m4 install-with-manifest.in"
 extrachunks=""
 
 # Make sure we have a configure.ac in the current directory
@@ -59,15 +67,16 @@ fi
 # Scan configure.ac, getting all the used macros into a string
 starmacros=`sed -n 's/^\(STAR[_A-Z]*\).*/\1/p' configure.ac | sed '{:a;N;s/\n/ /;t a;}'`
 
+# Certain macros depend on certain additional files.  Scan the list of used
+# macros, and add the required files to $extrachunks.  There are no such
+# interdependencies at present, but if they are added, the dependencies
+# should be documented here.
 found_star_defaults=false
 for foundmacro in $starmacros dummy
 do
     case $foundmacro in
         STAR_DEFAULTS)
             found_star_defaults=true
-            ;;
-        STAR_MAKE_MANIFEST)
-            extrachunks="$extrachunks install-with-manifest.in"
             ;;
         *) ;;
     esac
@@ -91,12 +100,15 @@ if test ! -e component.xml; then
     echo "$0: no file component.xml found.  Stub file created"
     cat >>component.xml <<\_EOF
 <?xml version="1.0"?>
-<!DOCTYPE component SYSTEM "componentlist.dtd">
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
 
-<component id="">
+<component id="???">
 </component>
 _EOF
 fi
+
+# Make sure there's a link to the installed componentinfo.dtd
+test -e componentinfo.dtd || $ln_s $datadir/componentinfo.dtd componentinfo.dtd
 
 # Start writing the starconf.status file; send output to FD 4
 exec 4>starconf.status
