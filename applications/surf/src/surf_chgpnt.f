@@ -83,16 +83,8 @@
 
 *    Global variables :
 *    Local Constants :
-      INTEGER          MAX__BOL                  ! max number of bolometers
-      PARAMETER (MAX__BOL = 20)                  ! that can be specified
       INTEGER          MAX__DIM                  ! max number of dimensions in
       PARAMETER (MAX__DIM = 4)                   ! array
-      INTEGER          MAX__INT                  ! max number of integrations 
-      PARAMETER (MAX__INT = 20)                  ! that can be specified
-      INTEGER          MAX__INTS                 ! max number of integrations 
-      PARAMETER (MAX__INTS = 200)                 ! in a file
-      INTEGER          MAX__MEAS                 ! max number of measurements
-      PARAMETER (MAX__MEAS = 20)                 ! that can be specified
       CHARACTER * 15   TSKNAME                   ! Name of task
       PARAMETER (TSKNAME = 'CHANGE_POINTING')  
 *    Local variables :
@@ -101,8 +93,6 @@
                                                  ! correction array
       DOUBLE PRECISION DTEMP                     ! scratch double
       CHARACTER*80     FITS (SCUBA__MAX_FITS)    ! array of FITS keywords
-      LOGICAL          FITS_CHANGED              ! .TRUE. if any FITS item is
-                                                 ! changed
       INTEGER          I                         ! DO loop index
       INTEGER          IHMSF (4)                 ! hours, minutes, seconds
                                                  ! and fractional seconds
@@ -154,8 +144,6 @@
       IF (STATUS .NE. SAI__OK) RETURN
 
 * initialise some flags and locators
-
-      FITS_CHANGED = .FALSE.
 
       LST_THERE = .FALSE.
       IN_FITSX_LOC = DAT__NOLOC
@@ -242,7 +230,6 @@
 
       CALL DAT_GET1C (IN_FITSX_LOC, SCUBA__MAX_FITS, FITS, N_FITS,
      :     STATUS)
-      FITS_CHANGED = .FALSE.
 
       CALL SCULIB_GET_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS, 'RUN',
      :     RUN_NUMBER, STATUS)
@@ -443,9 +430,6 @@
 *     close file and tidy up
 
       IF (IN_FITSX_LOC .NE. DAT__NOLOC) THEN
-         IF (FITS_CHANGED) THEN
-            CALL DAT_PUT1C (IN_FITSX_LOC, N_FITS, FITS, STATUS)
-         END IF
          CALL DAT_ANNUL (IN_FITSX_LOC, STATUS)
       END IF
 
