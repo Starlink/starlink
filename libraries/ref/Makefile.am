@@ -6,19 +6,20 @@ lib_LTLIBRARIES = libref.la
 
 libref_la_SOURCES = \
 	$(PUBLIC_INCLUDES) \
+	$(include_MESSAGES) \
 	$(F_ROUTINES)
 
 include_HEADERS = $(PUBLIC_INCLUDES)
-
-
-PUBLIC_INCLUDES = \
-	REF_PAR REF_ERR
+include_MESSAGES = REF_ERR
+PUBLIC_INCLUDES = REF_PAR
 
 F_ROUTINES = \
 	ref1_split.f  ref_annul.f  ref_crput.f  ref_find.f  ref_get.f \
 	ref_new.f  ref_put.f
 
-BUILT_SOURCES = REF_ERR
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
+
+BUILT_SOURCES = $(include_MESSAGES)
 
 
 # Testing

@@ -30,7 +30,7 @@ INCLUDE_FILES = IRM_COM
 
 TESTS = irm_test
 check_MONOLITHS = irm_test
-irm_test_TASKS = 
+# no variable irm_test_TASKS -- irm_test is an ATASK
 irm_test_SOURCES = irm_test.f
 irm_test_LDADD = libirm.la ../i90/libi90.la ../irq/libirq.la \
 	`err_link_adam` `ndf_link_adam` `one_link`

@@ -44,6 +44,8 @@ BLOCK_DATA_FILES = aio_blk.f
 HELP_SOURCES = hdstools.hlp
 starhelp_DATA = $(HELP_SOURCES:.hlp=.shl)
 
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
+
 prohlp=	@PROHLP@
 
 hdstools.hlp: $(hdstools_mon_TASKS:=.f) hdstools_master.hlp

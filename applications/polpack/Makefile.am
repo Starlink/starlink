@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-SUBDIRS = @subdirs@
+SUBDIRS = polsub ccdpack
 
 bin_SCRIPTS = $(MISC_FILES) $(DATA_FILES) $(PUBLICSCRIPTS) $(DYNSCRIPTS) version.dat
 
@@ -21,6 +21,8 @@ version.dat:
 
 # Help source file
 starhelp_DATA = polpack.shl
+
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
 .hlp.shl:
 	@HLIB@ $<

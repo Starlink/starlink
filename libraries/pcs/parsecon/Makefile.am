@@ -58,6 +58,7 @@ F_ROUTINES = \
 # For some reason, the error file that is included and installed is
 # not the PARSE_ERR file that is generated, but PARSECON_ERR.  So
 # create the latter from the former:
+noinst_MESSAGES = PARSE_ERR
 PARSECON_ERR: PARSE_ERR
 	cp PARSE_ERR PARSECON_ERR
 

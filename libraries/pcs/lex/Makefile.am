@@ -5,12 +5,12 @@ bin_SCRIPTS = lex_link_adam
 lib_LTLIBRARIES = liblex_adam.la
 
 liblex_adam_la_SOURCES = \
-	$(PUBLIC_INCLUDES) \
+	$(include_HEADERS) \
+	$(include_MESSAGES) \
 	$(F_ROUTINES)
 
-include_HEADERS = $(PUBLIC_INCLUDES)
-
-PUBLIC_INCLUDES = LEX_ERR LEX_PAR
+include_HEADERS = LEX_PAR
+include_MESSAGES = LEX_ERR
 
 F_ROUTINES = \
 	lex_cmdline.f \
@@ -19,4 +19,4 @@ F_ROUTINES = \
 	lex_parse.f \
 	lex_set.f
 
-BUILT_SOURCES = LEX_ERR
+BUILT_SOURCES = $(include_MESSAGES)

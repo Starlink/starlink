@@ -3,14 +3,19 @@
 dist_bin_SCRIPTS = psx_link psx_link_adam
 
 lib_LTLIBRARIES = libpsx.la
-## libpsx_la_CFLAGS = -Wall   # -Wall is gcc
 
 libpsx_la_SOURCES = \
 	$(C_ROUTINES) \
-	$(PUBLIC_INCLUDES) \
-	$(PRIVATE_INCLUDES)
+	$(PRIVATE_INCLUDES) \
+	$(include_MESSAGES) \
+	$(noinst_MESSAGES)
 
-include_HEADERS = $(PUBLIC_INCLUDES)
+include_MESSAGES = PSX_ERR
+noinst_MESSAGES = psx_err.h
+
+PRIVATE_INCLUDES = psx1.h
+
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
 C_ROUTINES = \
 	psx1_init_rtl.c \
@@ -39,11 +44,7 @@ C_ROUTINES = \
 	psx_ttyname.c \
 	psx_uname.c
 
-PUBLIC_INCLUDES = PSX_ERR
-
-PRIVATE_INCLUDES = psx1.h psx_err.h
-
-BUILT_SOURCES = psx_err.h
+BUILT_SOURCES = $(noinst_MESSAGES) $(include_MESSAGES)
 
 # Tests
 

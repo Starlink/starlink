@@ -7,6 +7,8 @@ bin_PROGRAMS = $(FILTERS)
 
 include_HEADERS = EXT_DEC EXT_DEF EXT_PAR extreme.h
 
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
+
 TESTS = extreme_test.sh
 
 #  List of source code filter programs.

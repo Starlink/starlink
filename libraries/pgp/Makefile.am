@@ -7,13 +7,11 @@ bin_SCRIPTS = pgp_link grfont.dat rgb.txt
 
 lib_LTLIBRARIES = libpgp.la
 
-libpgp_la_SOURCES = $(F_ROUTINES) \
-	$(PUBLIC_INCLUDES) \
-        $(PRIVATE_INCLUDES)
+libpgp_la_SOURCES = $(F_ROUTINES) $(include_MESSAGES)
 
-include_HEADERS = $(PUBLIC_INCLUDES)
+include_MESSAGES = PGP_ERR
 
-PUBLIC_INCLUDES = PGP_ERR
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
 #  List of Fortran routines required for building the package.  This is
 #  just a list of all the Fortran source files (excluding BLOCK DATA

@@ -27,7 +27,7 @@ check_PROGRAMS = gkspar_test
 check_MONOLITHS = gks_test
 
 # Not sure why pthread is needed on linux. Need to investigate
-gks_test_TASKS =
+# no variable gks_test_TASKS -- gks_test is an ATASK
 gks_test_SOURCES = gks_test.f
 gks_test_LDADD = $(LDADD) `$(srcdir)/gks_link_adam` `par_link_adam` -lpthread
 

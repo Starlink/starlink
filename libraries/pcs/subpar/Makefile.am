@@ -18,6 +18,7 @@ bin_SCRIPTS = subpar_link_adam
 # significant added complication to deal with a problem that's
 # unlikely to be severe anyway.
 include_HEADERS = $(PUBLIC_INCLUDES) $(PRIVATE_INCLUDES)
+include_MESSAGES = SUBPAR_ERR subpar_err.h
 
 lib_LTLIBRARIES = libsubpar_adam.la
 libsubpar_adam_la_SOURCES =	\
@@ -25,6 +26,7 @@ libsubpar_adam_la_SOURCES =	\
 	$(FPP_ROUTINES)		\
 	$(C_ROUTINES)		\
 	$(PUBLIC_INCLUDES)	\
+	$(include_MESSAGES)	\
 	$(PRIVATE_INCLUDES)
 
 FPP_ROUTINES = sup_openifc.fpp
@@ -212,8 +214,7 @@ C_ROUTINES = sup_admus.c \
              sup_mkdir.c \
              sup_trmsz.c
 
-PUBLIC_INCLUDES = SUBPAR_PAR SUBPAR_ERR subpar_err.h
-
+PUBLIC_INCLUDES = SUBPAR_PAR
 PRIVATE_INCLUDES = SUBPAR_CMN SUBPAR_SYS SUBPAR_PARERR
 
-BUILT_SOURCES = SUBPAR_ERR subpar_err.h
+BUILT_SOURCES = $(include_MESSAGES)

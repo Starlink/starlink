@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-SUBDIRS = @subdirs@
+SUBDIRS = kapsub ccdpack atools libndfpack libkapview libkappa
 
 bin_SCRIPTS = $(PUBLICSCRIPTS) $(DYNSCRIPTS) $(STYLE_FILES)
 
@@ -177,6 +177,8 @@ $(IFL_FILES) $(DYNSCRIPTS): kappa.ifd
 
 # Help source file
 starhelp_DATA = kappa.shl
+
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
 .hlp.shl:
 	@HLIB@ $<

@@ -5,13 +5,18 @@ bin_SCRIPTS = grp_link grp_link_adam
 
 libgrp_la_SOURCES = \
         $(PUBLIC_INCLUDES) \
+	$(include_MESSAGES) \
         $(BASIC_F_ROUTINES) $(STANDALONE_F_ROUTINES) $(BLOCKDATA)
 
 libgrp_adam_la_SOURCES = \
         $(PUBLIC_INCLUDES) \
+	$(include_MESSAGES) \
         $(BASIC_F_ROUTINES) $(ADAM_F_ROUTINES) $(BLOCKDATA)
 
 include_HEADERS = $(PUBLIC_INCLUDES)
+include_MESSAGES = GRP_ERR
+
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
 BUILT_SOURCES = GRP_ERR
 
@@ -21,11 +26,8 @@ check_PROGRAMS = test1
 test1_SOURCES = grp_test.f
 test1_LDADD = libgrp.la `$(srcdir)/grp_link`
 
-PUBLIC_INCLUDES = GRP_PAR GRP_ERR
-
+PUBLIC_INCLUDES = GRP_PAR
 PRIVATE_INCLUDES = GRP_CONST GRP_COM
-
-EXTERNAL_INCLUDES = SAE_PAR PAR_ERR PRM_PAR
 
 #  List of Fortran routines required by both ADAM and standalone libraries.
 BASIC_F_ROUTINES = grp1_cdesc.f grp1_conc.f grp1_cpoin.f grp1_eledt.f \

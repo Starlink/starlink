@@ -1,6 +1,4 @@
 
-SUBDIRS = @subdirs@
-
 #  Things to build.
 
 ccdsupportdir = $(bindir)
@@ -11,6 +9,10 @@ ccdsupport_DATA = $(DATA_FILES) ccdpack.shl \
 bin_SCRIPTS = $(PUBLIC_SCR) $(TCL_SUPPORT_MSGRLY) $(TCL_SUPPORT_EXE)
 
 bin_PROGRAMS = ccdwish
+
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@ \
+    sun139geo.eps sun139reg.eps sun139red.eps sun139mos.eps sun139driz.eps \
+    sun139outsky.eps sun139outclear.eps sun139outim.eps
 
 noinst_LTLIBRARIES = libgrf_ccdpack.la
 libgrf_ccdpack_la_SOURCES = grf_ccdpack.c grf.h
@@ -31,6 +33,9 @@ bin_MONOLITHS = ccdpack_red ccdpack_reg ccdpack_res ccdpack_scr \
 
 starhelp_DATA = ccdpack.shl
 
+## This is installed -- is that correct?
+include_MESSAGES = USER_ERR
+
 dist_pkgdata_DATA = ccdpack.news
 
 ccdpack_red_SOURCES = ccdpack_red.f
@@ -43,7 +48,7 @@ ccdpack_red_TASKS = $(REDTASKS)
 ccdpack_reg_TASKS = $(REGTASKS)
 ccdpack_res_TASKS = $(RESTASKS)
 ccdpack_scr_TASKS = $(SCRTASKS)
-ccdhelp_TASKS =
+# No variable ccdhelp_TASKS -- ccdhelp is an ATASK
 
 #  Link flags.  This is untidy; you'd think there would be a better way
 #  to cope with interdependencies between noinst_LTLIBRARIES libraries
@@ -263,4 +268,6 @@ $(TCL_SUPPORT_MSGRLY): Makefile
 	mv $(TCL_SUPPORT_MSGRLY).tmp $(TCL_SUPPORT_MSGRLY)
 
 BUILT_SOURCES = ccdhelp.ifl USER_ERR
+
+SUBDIRS = tasks gen help main
 

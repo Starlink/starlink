@@ -74,5 +74,5 @@ asttest_SOURCES = asttest.f \
 	$(CSRC) \
 	$(PRIVATE_INCLUDES)
 
-asttest_TASKS =
+# no variable asttest_TASKS -- asttest is an ATASK
 asttest_LDADD = $(LDADD) `$(srcdir)/atools_link_adam`

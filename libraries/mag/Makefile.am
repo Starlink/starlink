@@ -8,8 +8,7 @@ tapecreate_SOURCES = \
 	tapecreate.f
 
 # There is only one task and that is the same as the monolith name
-
-tapecreate_TASKS =
+# no variable tapecreate_TASKS -- tapecreate is an ATASK
 
 # Alink needs to know about libtool so that we can use libmag.la etc
 tapecreate_LDADD = $(LDADD) .libs/libmag_adam.a .libs/libmag.a
@@ -17,17 +16,19 @@ tapecreate_LDADD = $(LDADD) .libs/libmag_adam.a .libs/libmag.a
 lib_LTLIBRARIES = libmag.la libmag_adam.la
 
 libmag_la_SOURCES = $(F_ROUTINES) $(C_ROUTINES) \
-	$(PUBLIC_INCLUDES) $(PRIVATE_INCLUDES) $(BLOCKDATA)
+	$(include_MESSAGES) $(PRIVATE_INCLUDES) $(BLOCKDATA)
 
 libmag_adam_la_SOURCES = $(F_ROUTINES_ADAM) \
-	$(PUBLIC_INCLUDES) $(PRIVATE_INCLUDES) $(BLOCKDATA_ADAM)
+	$(include_MESSAGES) $(PRIVATE_INCLUDES) $(BLOCKDATA_ADAM)
 
-include_HEADERS = $(PUBLIC_INCLUDES)
-
-PUBLIC_INCLUDES = MAG_ERR
+include_MESSAGES = MAG_ERR
+noinst_MESSAGES = MIO_ERR mio_err.h
 
 PRIVATE_INCLUDES = MAGGO_SCL MAGIO_CMN MAGPA_SCL MAGSCL_PAR MAG_SYS \
-                   MIOBUF_CMN MIOFIL_CMN MIO_ERR MIO_SYS ioc_incl.h mio_err.h
+                   MIOBUF_CMN MIOFIL_CMN MIO_SYS ioc_incl.h \
+		   $(noinst_MESSAGES)
+
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
 
 F_ROUTINES = mag1_code.f mag1_dev.f mag1_end.f mag1_ernam.f mag1_err.f \
@@ -53,7 +54,7 @@ BLOCKDATA_ADAM = mag_blk.f
 C_ROUTINES = ioc.c
 
 
-BUILT_SOURCES = MAG_ERR MIO_ERR mio_err.h
+BUILT_SOURCES = $(include_MESSAGES)
 
 
 # magtest is ADAM monolith
@@ -69,6 +70,6 @@ ioctest_LDADD = libmag.la `err_link` `psx_link`
 mag_test_SOURCES = mag_test.f
 mag_test_LDADD = `$(srcdir)/mag_link_adam`
 
-magtest_TASKS =
+# no variable magtest_TASKS -- magtest is an ATASK
 magtest_SOURCES = magtest.f
 magtest_LDADD = `$(srcdir)/mag_link_adam` `prm_link`

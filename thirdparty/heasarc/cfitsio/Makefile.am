@@ -22,7 +22,7 @@ dist_pkgdata_DATA = $(EXAMPLE_SOURCES) cfitsio_changes.txt CFITSIO_CONDITIONS\
  Licence.txt cfitsio.news
 
 # Extra documentation for stardocs (not converted to hypertext).
-stardocs_DATA = mud162.tex mud167.tex mud166.tex
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@ mud162.tex mud167.tex mud166.tex
 
 # Headers and example sources are made within cfitsio
 $(include_HEADERS) $(EXAMPLE_SOURCES):

@@ -1,3 +1,5 @@
 ## Process this file with automake to produce Makefile.in
 
-SUBDIRS = @subdirs@
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
+
+SUBDIRS = gkspar pgppar sgspar

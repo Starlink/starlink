@@ -90,6 +90,8 @@ libsys_DATA = $(LIBRARY_FILES) tclIndex
 libsys_SCRIPTS = adamMessageRelay
 TESTS = tester.sh
 
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
+
 #  Rules.
 
 # In principal it would be more efficient to use a static awish

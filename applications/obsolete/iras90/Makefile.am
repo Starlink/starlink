@@ -1,7 +1,5 @@
 ## Process this file with automake to produce Makefile.in
 
-SUBDIRS = @subdirs@
-
 bin_SCRIPTS = $(DYNSCRIPTS) misc/pscont
 bin_PROGRAMS = ffield
 ffield_SOURCES = misc/ffield.f
@@ -78,6 +76,10 @@ specresp60.sdf: makeresp makeresp.ifc
 specresp100.sdf: makeresp makeresp.ifc
 	./makeresp specresp100 100
 
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@ \
+    sun161_a_1_1.ps sun161_a_3_1_canon.dat sun161_a_4_3.ps sun161_a_1_2.ps \
+    sun161_a_4_1.ps sun161_a_4_4.ps sun161_a_2_1.ps sun161_a_4_2.ps \
+    sun161_a_4_5.ps
 
 # Define the help source file.
 starhelp_DATA = iras90_help.shl
@@ -98,3 +100,5 @@ echwind.csh: echwind.csh.in
 	$(edit) \
 	    $(srcdir)/echwind.csh.in > echwind.csh.tmp
 	mv echwind.csh.tmp echwind.csh
+
+SUBDIRS = i90 ira irc iri irq irm apps

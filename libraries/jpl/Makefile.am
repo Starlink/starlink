@@ -8,6 +8,10 @@ bin_SCRIPTS = jpl_link jpl_link_adam
 # JPL helper programs
 bin_PROGRAMS = jplpleph jplstate jplconst jplstate shorteph
 
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
+
+staretc_DATA = jpleph.dat
+
 # Build tools
 noinst_PROGRAMS = ephdsk
 

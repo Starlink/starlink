@@ -6,12 +6,14 @@ lib_LTLIBRARIES = libsock.la
 
 libsock_la_SOURCES = \
 	$(C_ROUTINES) \
-	$(PUBLIC_INCLUDES)
+	$(PUBLIC_INCLUDES) \
+	$(include_MESSAGES)
 
 include_HEADERS = $(PUBLIC_INCLUDES)
+include_MESSAGES = sock_err.h
 
 C_ROUTINES = sock.c
 
-PUBLIC_INCLUDES = sock.h sock_err.h
+PUBLIC_INCLUDES = sock.h
 
-BUILT_SOURCES = sock_err.h
+BUILT_SOURCES = $(include_MESSAGES)

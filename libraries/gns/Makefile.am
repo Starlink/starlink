@@ -4,15 +4,25 @@ bin_SCRIPTS = gns_link gns_link_adam
 
 lib_LTLIBRARIES = libgns.la
 
-libgns_la_SOURCES = $(F_ROUTINES) $(FPP_ROUTINES) $(PUBLIC_INCLUDES) \
-	$(PRIVATE_INCLUDES)
+libgns_la_SOURCES = \
+  $(F_ROUTINES) \
+  $(FPP_ROUTINES) \
+  $(PUBLIC_INCLUDES) \
+  $(include_MESSAGES) \
+  $(PRIVATE_INCLUDES)
 
 include_HEADERS = $(PUBLIC_INCLUDES)
+include_MESSAGES = GNS_ERR
+
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
+
+# These etc files are binary, so should not go into share
+staretc_DATA = gns_gksdevices gns_gksnames gns_ididevices gns_idinames
 
 #  List of public include files.  These are include files which form
 #  part of the package and may be required by users of it.
 
-PUBLIC_INCLUDES = GNS_ERR GNS_PAR
+PUBLIC_INCLUDES = GNS_PAR
 
 #  List of private include files.  These are additional include files
 #  which form part of the package and are required in order to build
@@ -41,12 +51,12 @@ gksbuild_SOURCES = gksbuild.fpp
 idibuild_SOURCES = idibuild.fpp
 
 gns_gksdevices : gksbuild gksdevices.txt
-	-rm gns_gksdevices
+	-rm -f gns_gksdevices
 	echo gksdevices.txt | ./gksbuild
 	chmod o+r gns_gksdevices
 
 gns_ididevices : idibuild ididevices.txt
-	-rm gns_ididevices
+	-rm -f gns_ididevices
 	echo ididevices.txt | ./idibuild
 	chmod o+r gns_ididevices
 

@@ -6,13 +6,17 @@ lib_LTLIBRARIES = libdtask_adam.la
 
 libdtask_adam_la_SOURCES = \
 	$(PUBLIC_INCLUDES) \
+	$(include_MESSAGES) \
 	$(F_ROUTINES) \
 	$(FPP_ROUTINES) \
 	$(C_ROUTINES)
 
 include_HEADERS = $(PUBLIC_INCLUDES)
+include_MESSAGES = DTASK_ERR dtask_err.h ACT_ERR act_err.h
 
-PUBLIC_INCLUDES = DTASK_ERR DTASK_PAR dtask_err.h ACT_ERR act_err.h
+staretc_DATA = dtask_main.txt
+
+PUBLIC_INCLUDES = DTASK_PAR
 
 PRIVATE_INCLUDES = DTASK_CMN DTASK_SYS
 

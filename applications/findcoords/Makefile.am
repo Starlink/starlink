@@ -1,5 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
+
 dist_bin_SCRIPTS = findcoords
 dist_pkgdata_DATA = findcoords.news
 

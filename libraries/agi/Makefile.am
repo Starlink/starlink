@@ -1,11 +1,12 @@
 ## Process this file with automake to produce Makefile.in
 
-SUBDIRS = @subdirs@
+SUBDIRS = agp
 
 ## In automake terminology, this is the `bin' prefix to the `SCRIPTS' primary.
 bin_SCRIPTS = agi_link agi_link_adam
 
-include_HEADERS = AGI_ERR AGI_PAR
+include_HEADERS = AGI_PAR
+include_MESSAGES = AGI_ERR
 
 noinst_HEADERS = agi_cache agi_cref agi_idips agi_locs agi_nam \
 agi_nest agi_pfree ags_wkids
@@ -18,6 +19,8 @@ agi_nest agi_pfree ags_wkids
 ## and static libraries.
 
 lib_LTLIBRARIES = libagi.la libagi_adam.la libagp.la libagp_adam.la
+
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
 # AGI libraries
 libagi_la_SOURCES = $(COMMON_F_ROUTINES) $(AGI_F_ROUTINES) $(BLOCK_DATA_ROUTINES)
@@ -70,7 +73,6 @@ AGP_ADAM_F_ROUTINES = agi_assoc.f agi_cancl.f agp_assoc.f agp_deass.f
 #  List of Fortran BLOCK DATA routines.
 
 BLOCK_DATA_ROUTINES = agi_block.f
-
 
 BUILT_SOURCES = AGI_ERR
 

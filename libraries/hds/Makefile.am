@@ -11,6 +11,7 @@ check_PROGRAMS = hds_test hds_test_prm
 
 libhds_la_SOURCES = \
 	$(PUBLIC_INCLUDES) \
+	$(include_MESSAGES) \
         $(PRIVATE_INCLUDES) \
 	$(C_ROUTINES) \
 	$(F_ROUTINES) \
@@ -29,13 +30,18 @@ hds_test_prm_SOURCES = hds_test_prm.c
 hds_test_prm_LDADD = libhds.la `ems_link` `chr_link` `cnf_link`
 
 include_HEADERS = $(PUBLIC_INCLUDES)
+include_MESSAGES = CMP_ERR DAT_ERR
+noinst_MESSAGES = dat_err.h
 
-PUBLIC_INCLUDES = CMP_ERR DAT_ERR DAT_PAR dat_par.h
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
+
+PUBLIC_INCLUDES = DAT_PAR dat_par.h
 PRIVATE_INCLUDES = \
 	CMP_CCT CMP_CONST DAT1_SYS \
-	dat1.h dat_err.h hds1.h \
+	dat1.h hds1.h \
 	hds1_feature.h rec.h rec1.h str.h \
-        win_fixups.h
+        win_fixups.h \
+	$(noinst_MESSAGES)
 
 F_ROUTINES = \
 	cmp_activ.f cmp_deact.f cmp_erdsn.f cmp_get0x.f cmp_get1x.f \
@@ -111,4 +117,4 @@ hds_machine.txt: hds_machine
 	echo "" >>$@
 	./hds_machine >>$@
 
-BUILT_SOURCES = DAT_ERR dat_err.h dat_par.h DAT_PAR CMP_ERR
+BUILT_SOURCES = $(include_MESSAGES) $(noinst_MESSAGES) DAT_PAR dat_par.h

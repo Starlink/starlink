@@ -1,8 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 
-SUBDIRS = @subdirs@
+SUBDIRS = include base data call drivers
 
-## In automake terminology, this is the `bin' prefix to the `SCRIPTS' primary.
 bin_SCRIPTS = gks_link gks1_link_adam
 
 ## List libraries which are to be built, and installed in `lib'.  Note
@@ -17,13 +16,11 @@ lib_LTLIBRARIES = libgks.la
 
 libgks_la_SOURCES = 
 libgks_la_LIBADD = base/libgks_base.la call/libgks_call.la \
-drivers/libgks_drivers.la
+    drivers/libgks_drivers.la
 
-include_HEADERS = $(PUBLIC_INCLUDES)
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@ \
+    sun83-c1.eps sun83-c2.eps sun83-c3.eps sun83-c4.eps sun83-c5.eps
 
-#  List of public include files.  These are include files which form
-#  part of the package and may be required by users of it
-
-PUBLIC_INCLUDES = GKS_ERR
+include_MESSAGES = GKS_ERR
 
 BUILT_SOURCES = GKS_ERR

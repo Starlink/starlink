@@ -28,6 +28,8 @@ libncar_conpms_la_SOURCES = conpms.f
 # Install the data files
 staretc_DATA = ezmap.dat pwritx.dat
 
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
+
 # Source files
 
 F_ROUTINES = agaxis.f agback.f agbnch.f agchax.f agchcu.f agchil.f \

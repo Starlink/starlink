@@ -24,7 +24,7 @@ check_PROGRAMS = pgppar_test
 check_MONOLITHS = pgp_test
 
 # Not sure why pthread is needed on linux. Need to investigate
-pgp_test_TASKS =
+# no variable pgp_test_TASKS -- pgp_test is an ATASK
 pgp_test_SOURCES = pgp_test.f
 pgp_test_LDADD = $(LDADD) `$(srcdir)/pgp_link_adam` `par_link_adam` -lpthread
 

@@ -11,7 +11,7 @@
 #  from both FONTS and NFONTS.
 
 FONTS = font101 font102 font103 font104 font105 font106 font107 \
-font110 font115
+    font110 font115
 NFONTS = 9
 
 # Need simple version number
@@ -23,6 +23,8 @@ noinst_SCRIPTS = create_dbs
 
 gksdbs_SOURCES = gksdbs.f
 gksdbs_LDADD = ../../base/libgks_base.la
+
+staretc_DATA = gks.dbs-$(RLSE)
 
 # In order to create the font file we need to create a wrapper
 # script that runs the db creation program with the correct arguments
@@ -49,8 +51,6 @@ create_dbs:  $(FONTS)
 # Create the font database from the ascii font files
 
 gks.dbs-$(RLSE): gksdbs create_dbs hershey.dat
-	if test -f gks.dbs-$(RLSE); then \
-	   rm gks.dbs-$(RLSE) ; \
-	else :; fi; \
+	rm -f gks.dbs $@
 	./create_dbs
-	mv gks.dbs gks.dbs-$(RLSE)
+	mv gks.dbs $@

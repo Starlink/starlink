@@ -16,6 +16,8 @@ LDADD = libhlp.la
 
 lib_LTLIBRARIES = libhlp.la
 
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
+
 libhlp_la_SOURCES = \
 	$(F_ROUTINES) \
 	$(FPP_ROUTINES) \

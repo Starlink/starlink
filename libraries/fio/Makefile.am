@@ -14,6 +14,9 @@ libfio_adam_la_SOURCES = \
 	$(F_ROUTINES_ADAM)
 
 include_HEADERS = $(PUBLIC_INCLUDES)
+include_MESSAGES = FIO_ERR
+
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
 make_errno_err_SOURCES = make-errno-err.c
 
@@ -74,7 +77,7 @@ BLOCK_DATA_ADAM = fiopa_blk.f
 
 #  List of public include files.  These are include files which form
 #  part of the package and may be required by users of it.
-PUBLIC_INCLUDES = FIO_ERR FIO_PAR
+PUBLIC_INCLUDES = FIO_PAR
 
 #  List of private include files.  These are additional include files
 #  which form part of the package and are required in order to build
@@ -104,7 +107,7 @@ fio1_serr.lo: ERRNO_ERR
 TESTS = fiotest
 check_MONOLITHS = fiotest
 
-fiotest_TASKS =
+# no variable fiotest_TASKS -- fiotest is an ATASK
 fiotest_SOURCES = fiotest.f
 fiotest_LDADD = `$(srcdir)/fio_link_adam`
 

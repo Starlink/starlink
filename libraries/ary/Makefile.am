@@ -11,15 +11,18 @@ lib_LTLIBRARIES = libary.la
 
 libary_la_SOURCES = \
 	$(PUBLIC_INCLUDES) \
+	$(include_MESSAGES) \
 	$(F_ROUTINES) \
 	$(PRIVATE_INCLUDES)
 
 include_HEADERS = $(PUBLIC_INCLUDES)
 
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
+
 PRIVATE_INCLUDES = ARY_ACB ARY_CONST ARY_DCB ARY_MCB ARY_PCB ARY_TCB
 
-PUBLIC_INCLUDES = \
-	ARY_PAR ARY_ERR
+PUBLIC_INCLUDES = ARY_PAR
+include_MESSAGES = ARY_ERR
 
 F_ROUTINES = ary1_init.f ary1_accok.f ary1_adiag.f ary1_anl.f	       \
 ary1_annpl.f ary1_antmp.f ary1_bad.f ary1_badb.f ary1_badd.f	       \

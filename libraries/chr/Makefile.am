@@ -7,8 +7,13 @@ lib_LTLIBRARIES = libchr.la
 libchr_la_SOURCES = \
 	$(F_ROUTINES) \
 	$(C_ROUTINES) \
-	$(PRIVATE_INCLUDES) \
-	$(PUBLIC_INCLUDES)
+	$(include_MESSAGES) \
+	$(PRIVATE_INCLUDES)
+
+include_MESSAGES = CHR_ERR
+PRIVATE_INCLUDES = CHR_SYS
+
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
 F_ROUTINES = chr_abbrv.f chr_achr.f chr_appnd.f chr_atok.f \
         chr_atom.f  chr_btoi.f  chr_clean.f chr_copy.f  chr_ctoc.f \
@@ -29,11 +34,7 @@ F_ROUTINES = chr_abbrv.f chr_achr.f chr_appnd.f chr_atok.f \
 
 C_ROUTINES = chr_etom.c chr_mtoe.c
 
-PRIVATE_INCLUDES = CHR_SYS
-
-PUBLIC_INCLUDES = CHR_ERR
-
-BUILT_SOURCES = CHR_ERR
+BUILT_SOURCES = $(include_MESSAGES)
 
 TEST_ROUTINES = case.f compare.f decode.f edit.f \
         encode.f enquire.f port.f search.f \

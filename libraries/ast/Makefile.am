@@ -144,9 +144,10 @@ GRP_F_INCLUDE_FILES = \
     GRF_PAR \
     AST_ERR
 
-LATEX_DOCUMENTATION_FILES = \
-    sun210.tex \
-    sun211.tex
+## Following declaration isn't used
+## LATEX_DOCUMENTATION_FILES = \
+##     sun210.tex \
+##     sun211.tex
 
 DOCUMENTATION_PRODUCTS = $(PAPER_DOCUMENTATION) $(HYPER_DOCUMENTATION)
 PAPER_DOCUMENTATION = sun210.tex sun211.tex sun210.ps sun211.ps
@@ -225,9 +226,10 @@ dist_noinst_SCRIPTS = makeh
 
 # Headers required by library users.  Both of the following lines
 # indicate headers which are installed.
-include_HEADERS = AST_ERR GRF_PAR
+include_HEADERS = GRF_PAR
 # Following are generated, so should not be distributed.
 nodist_include_HEADERS = ast.h AST_PAR
+include_MESSAGES = AST_ERR ast_err.h
 
 lib_LTLIBRARIES = \
     libast.la \
@@ -238,6 +240,8 @@ lib_LTLIBRARIES = \
     libast_pgplot.la \
     libast_slalib.la \
     libast_wcslib.la
+
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
 
 libast_la_SOURCES = \

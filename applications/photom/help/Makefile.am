@@ -3,11 +3,10 @@
 bin_MONOLITHS = photomhelp
 
 photomhelp_SOURCES = $(F_ROUTINES)
-photomhelp_TASKS =
 photomhelp_LDADD = `shl_link_adam`
+# no variable photomhelp_TASKS -- photomhelp is an ATASK
 
-F_ROUTINES = \
-  photomhelp.f
+F_ROUTINES = photomhelp.f
 
 ##  The on-line help.
 HELP_SOURCES = photomhelp.hlp

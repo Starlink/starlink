@@ -2,6 +2,8 @@
 
 bin_SCRIPTS = star2html xlabel latex2html
 
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
+
 # Template data files.
 # And we do want to distribute them (not done for data files by default).
 dist_data_DATA = sun.tex ssn.tex sgp.tex sg.tex sc.tex sst.tex

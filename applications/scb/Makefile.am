@@ -6,6 +6,8 @@ bin_PROGRAMS = ctag ftag
 ctag_SOURCES = ctag-y.y tag.c tag.h
 ftag_SOURCES = ftag-y.y tag.c tag.h
 
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
+
 supportdir = $(bindir)
 support_DATA = mime.types
 

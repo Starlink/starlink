@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-SUBDIRS = @subdirs@
+SUBDIRS = kapsub
 
 bin_SCRIPTS = $(DYNSCRIPTS) version.dat
 
@@ -62,6 +62,8 @@ $(IFL_FILES) $(DYNSCRIPTS): kaprh.ifd
 
 # Help source file
 starhelp_DATA = kaprh.shl
+
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
 .hlp.shl:
 	@HLIB@ $<

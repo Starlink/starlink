@@ -7,9 +7,14 @@ lib_LTLIBRARIES = libtask_adam.la
 libtask_adam_la_SOURCES = \
 	$(F_ROUTINES) \
 	$(PUBLIC_INCLUDES) \
+	$(include_MESSAGES) \
 	$(PRIVATE_INCLUDES)
 
 include_HEADERS = $(PUBLIC_INCLUDES)
+include_MESSAGES = TASK_ERR
+
+PUBLIC_INCLUDES = TASK_PAR
+PRIVATE_INCLUDES = TASK_CMN
 
 F_ROUTINES = tsk_add_msinf.f \
              tsk_askparam.f \
@@ -91,8 +96,4 @@ F_ROUTINES = tsk_add_msinf.f \
              tsk_valnl.f \
              tsk_valnr.f
 
-PUBLIC_INCLUDES = TASK_PAR TASK_ERR
-
-PRIVATE_INCLUDES = TASK_CMN
-
-BUILT_SOURCES = TASK_ERR
+BUILT_SOURCES = $(include_MESSAGES)

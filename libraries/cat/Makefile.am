@@ -10,6 +10,7 @@ libcat_la_SOURCES = \
 
 libcat_la_DEPENDENCIES = \
 	$(PUBLIC_INCLUDES) \
+	$(include_MESSAGES) \
 	$(PRIVATE_INCLUDES)
 
 libcat_adam_la_SOURCES = \
@@ -17,6 +18,7 @@ libcat_adam_la_SOURCES = \
 
 libcat_adam_la_DEPENDENCIES = \
 	$(PUBLIC_INCLUDES) \
+	$(include_MESSAGES) \
 	$(PRIVATE_INCLUDES)
 
 
@@ -27,8 +29,11 @@ $(libcat_adam_la_SOURCES): $(PUBLIC_INCLUDES)
 ## List headers which are to be installed -- these are built first if
 ## necessary, XXX oh no they are not! Hence above.
 include_HEADERS = $(PUBLIC_INCLUDES)
+include_MESSAGES = CAT_ERR
 
-PUBLIC_INCLUDES = CAT_ERR CAT_PAR
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
+
+PUBLIC_INCLUDES = CAT_PAR
 
 PRIVATE_INCLUDES = CAT1_NUL CAT1_PAR CAT1_AST_CMN CAT1_ATTRB_CMN \
     CAT1_CATS_CMN   CAT1_CTRL_CMN   CAT1_DSDIR_CMN  CAT1_IDS_CMN \
@@ -83,6 +88,8 @@ F_ROUTINES =   cat1_dceqp.f  cat1_tidnt.f  cat5_wrpar.f               \
 ADAM_F_ROUTINES = cat_assoc.f cat_creat.f cat_exist.f
 
 BLOCK_DATA_FILES = ant_block.f attrbb.f catsb.f ctrlb.f idsb.f
+
+BUILT_SOURCES = $(include_MESSAGES)
 
 ## Standalone local test, requires that other components are installed.
 ## Note this doesn't test the ADAM libraries.

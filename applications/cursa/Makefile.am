@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-SUBDIRS = @subdirs@
+SUBDIRS = libcap
 
 bin_SCRIPTS = xcatview cursa_test.csh cursa.csh xcatview catcdsin \
  catremote UrlReader.class UrlReader.java 
@@ -13,7 +13,7 @@ bin_MONOLITHS = catview cursa
 
 catview_SOURCES = catview.f
 catview_LDADD = $(LOCAL_LINK)
-catview_TASKS =
+# no variable catview_TASKS -- catview is an ATASK
 
 cursa_SOURCES = cursa.f
 cursa_LDADD = $(LOCAL_LINK)
@@ -22,6 +22,8 @@ cursa_TASKS = catchart catchartrn catcoord catcopy catgrid  \
  catselect catsort
 
 bin_PROGRAMS = geturl
+
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
 geturl_SOURCES = geturl.c
 

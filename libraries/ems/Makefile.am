@@ -6,21 +6,23 @@ lib_LTLIBRARIES = libems.la libemsf.la
 
 libems_la_SOURCES = \
 	$(PUBLIC_INCLUDES) \
+	$(include_MESSAGES) \
 	$(PRIVATE_INCLUDES) \
 	$(C_ROUTINES)
 
 libemsf_la_SOURCES = \
 	$(PUBLIC_INCLUDES) \
+	$(include_MESSAGES) \
 	$(PRIVATE_INCLUDES) \
 	$(CF_ROUTINES) \
 	$(PLATFORM_CF)
 
 include_HEADERS = $(PUBLIC_INCLUDES)
+include_MESSAGES = ems_err.h EMS_ERR
 
-PUBLIC_INCLUDES = \
-	ems.h ems_err.h ems_par.h \
-	EMS_ERR EMS_PAR
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
+PUBLIC_INCLUDES = ems.h ems_par.h EMS_PAR
 PRIVATE_INCLUDES = ems_sys.h ems1.h ems_msgtb.h ems_toktb.h
 
 C_ROUTINES = emsAnnul.c emsBegin.c emsEload.c emsEnd.c emsErrno.c emsExpnd.c \

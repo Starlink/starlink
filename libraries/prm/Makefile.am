@@ -9,6 +9,8 @@ noinst_PROGRAMS = make-prm-par
 libprm_la_SOURCES = \
 	$(F_ROUTINES)
 	$(PUBLIC_INCLUDES) \
+	$(include_MESSAGES) \
+	$(noinst_MESSAGES) \
 	$(PRIVATE_INCLUDES) \
 	PRM_PAR
 
@@ -18,9 +20,11 @@ libprm_a_la_SOURCES = \
 make_prm_par_SOURCES = make-prm-par.c
 make_prm_par_LDADD = -lm
 
-include_HEADERS = \
-	$(NORMAL_INCLUDES) \
-	$(PLATFORM_INCLUDES)
+include_HEADERS = $(NORMAL_INCLUDES) $(PLATFORM_INCLUDES)
+include_MESSAGES = PRM_ERR
+noinst_MESSAGES = prm_err.h
+
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
 
 
@@ -113,7 +117,6 @@ num_han.cmips num_han.c_sun_solaris
 
 #  List of non platform-specific include files.
 NORMAL_INCLUDES = \
-	PRM_ERR prm_err.h \
 	NUM_DEC_B NUM_DEC_D NUM_DEC_I \
 	NUM_DEC_R NUM_DEC_UB NUM_DEC_UW NUM_DEC_W \
 	NUM_DEC_CVT \
@@ -161,7 +164,7 @@ SUFFIXES = .fpp
 
 
 
-PRIVATE_INCLUDES = PRM_CONST prm_err.h
+PRIVATE_INCLUDES = PRM_CONST
 
 
 
@@ -169,7 +172,8 @@ PRIVATE_INCLUDES = PRM_CONST prm_err.h
 PRM_PAR prm_par.h: make-prm-par$(EXEEXT)
 	./make-prm-par -fPRM_PAR -cprm_par.h
 
-BUILT_SOURCES = PRM_ERR prm_err.h PRM_PAR prm_par.h $(PLATFORM_INCLUDES)
+BUILT_SOURCES = $(include_MESSAGES) $(noinst_MESSAGES) PRM_PAR prm_par.h \
+	$(PLATFORM_INCLUDES)
 
 
 # Tests

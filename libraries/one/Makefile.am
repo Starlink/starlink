@@ -6,17 +6,16 @@ pkgdata_DATA = one.news
 lib_LTLIBRARIES = libone.la
 
 libone_la_SOURCES = \
-        $(PUBLIC_INCLUDES) \
+	$(include_MESSAGES) \
         $(C_ROUTINES)
 
-include_HEADERS = $(PUBLIC_INCLUDES)
+include_MESSAGES = ONE_ERR one_err.h
 
-PUBLIC_INCLUDES = \
-        ONE_ERR one_err.h
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
 C_ROUTINES = one_exec.c  one_find_file.c  one_scrsz.c
 
-BUILT_SOURCES = ONE_ERR one_err.h
+BUILT_SOURCES = $(include_MESSAGES)
 
 
 # Testing

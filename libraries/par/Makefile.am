@@ -3,9 +3,14 @@
 bin_SCRIPTS = par_link_adam
 
 lib_LTLIBRARIES = libpar_adam.la
-libpar_adam_la_SOURCES = $(F_ROUTINES) $(C_ROUTINES)
+libpar_adam_la_SOURCES = \
+	$(F_ROUTINES) $(C_ROUTINES) \
+	$(include_HEADERS) $(include_MESSAGES)
 
 include_HEADERS = $(PUBLIC_INCLUDES)
+include_MESSAGES = par_err.h PAR_ERR
+
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
 F_ROUTINES = \
          par1_menu.f \
@@ -43,19 +48,17 @@ F_ROUTINES = \
 C_ROUTINES = par.c
 
 PUBLIC_INCLUDES = \
-	PAR_ERR \
 	PAR_PAR \
 	par.h \
 	parwrap.h \
-	par_err.h \
 	par_par.h
 
-BUILT_SOURCES = PAR_ERR par_err.h
+BUILT_SOURCES = $(include_MESSAGES)
 
 
 TESTS = par_test
 
 check_MONOLITHS = par_test
 par_test_SOURCES = par_test.f
-par_test_TASKS =
+# no variable par_test_TASKS -- par_test is an ATASK
 par_test_LDADD = libpar_adam.la `err_link_adam` `subpar_link_adam` `chr_link_adam`

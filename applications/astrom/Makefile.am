@@ -2,6 +2,8 @@
 
 bin_PROGRAMS = astrom
 
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
+
 astrom_SOURCES = \
 	$(F_ROUTINES) \
 	$(BLOCK_DATA_FILES) \

@@ -5,6 +5,8 @@
 bin_SCRIPTS = ifd2iraf ifd2star ifd2irafifl ifl2ifd ifd_irafhlpgen \
               ifd_front.tcl
 
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
+
 ## Test script.
 
 TESTS = tester.sh

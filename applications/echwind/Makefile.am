@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-SUBDIRS = @subdirs@
+SUBDIRS = libmodel libplot libetc
 
 bin_SCRIPTS = echwind.csh
 
@@ -9,6 +9,8 @@ echwind_SOURCES = echwind.f
 echwind_LDADD = libmodel/libmodel.la libplot/libplot.la libetc/libetc.la \
 	`$(srcdir)/echwind_link`
 echwind_FCFLAGS = -Ilibmodel
+
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
 # Need to install the associated data files into per-package bindir
 mydatadir = $(bindir)

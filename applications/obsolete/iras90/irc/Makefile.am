@@ -22,7 +22,7 @@ INCLUDE_FILES = IRC_PAR IRC_ERR IRC_COM
 
 TESTS = irc_test
 check_MONOLITHS = irc_test
-irc_test_TASKS = 
+# no variable irc_test_TASKS -- irc_test is an ATASK
 irc_test_SOURCES = irc_test.f
 irc_test_LDADD = libirc.la ../i90/libi90.la ../ira/libira.la \
 	`err_link_adam` `sla_link_adam` `ndf_link_adam` `hds_link_adam`

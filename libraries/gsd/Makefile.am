@@ -16,6 +16,8 @@ libgsd_la_SOURCES = \
 	GSD_PAR \
 	gsd.h gsd1.h gsd2.h
 
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
+
 C_ROUTINES = \
 gsd1_getval.c    gsd1_rdhead.c  gsdClose.c  gsdGet0x.c    gsdItem.c \
 gsd1_rddata.c    gsd2_copya.c   gsd_f77.c   gsdGet1x.c    gsdOpenRead.c \

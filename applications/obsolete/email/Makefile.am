@@ -1,6 +1,8 @@
 bin_SCRIPTS = email
 pkgdata_DATA = email.news
 
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
+
 # Fixup scripts with bin location
 # The scripts needs to have installation locations edited into them
 edit = sed \

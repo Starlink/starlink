@@ -2,6 +2,8 @@
 
 bin_PROGRAMS = icl icl_io
 
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
+
 icl_SOURCES = parse.y lex.l $(F_ROUTINES) $(C_ROUTINES)
 icl_LDADD = `ams_link_adam` `hds_link_adam` `hlp_link_adam` `cnf_link_adam` `nbs_link_adam` @FCLIBS@
 
@@ -21,7 +23,7 @@ AM_LFLAGS = -l
 icl_io_SOURCES = icl_io.c
 icl_io_LDADD = `ams_link_adam` -lncurses
 
-BUILT_SOURCES = UFACE_ERR
+noinst_MESSAGES = UFACE_ERR
 
 #  List of Fortran routines required for building the package.  This is
 #  just a list of all the Fortran source files (excluding BLOCK DATA
@@ -74,8 +76,10 @@ PRIVATE_INCLUDES = $(ICL_INCLUDES) \
                    adam.h \
                    adam_functions.h \
                    uface_functions.h \
-                   uface_err \
-                   uface_cmn
+                   $(noinst_MESSAGES) \
+                   UFACE_CMN
+
+BUILT_SOURCES = $(noinst_MESSAGES)
 
 #  List yacc source
 YACC_SOURCE = parse.y

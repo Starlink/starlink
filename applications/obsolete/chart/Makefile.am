@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-SUBDIRS = @subdirs@
+SUBDIRS = applic libchart
 
 bin_PROGRAMS = ast2a ast2b csi2a csi2b nso2a nso2b
 bin_SCRIPTS = $(DYNSCRIPTS) chart_params
@@ -44,6 +44,8 @@ crepar_LDADD = libchart/libchart.la `err_link`
 #  Install data files into etc
 staretc_DATA = chartpar.dat nsoref.txt starnames.lis \
 	astrom84.cat nso.cat csi79.cat
+
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
 
 

@@ -26,7 +26,7 @@ gkmc.par:	gkmc.par.fpp
 SUFFIXES = .fpp
 .fpp:
 	rm -f $@
-	$(FPP) $(FPPFLAGS) $(DEFAULT_INCLUDES) $(CPPFLAGS) $(DEFS) $< $(FPP_OUTPUT)
+	$(FPP) -I.. $(FPPFLAGS) $(DEFAULT_INCLUDES) $(CPPFLAGS) $(DEFS) $< $(FPP_OUTPUT)
 
 # Need to generate the fpp include files
 BUILT_SOURCES = $(FPP_INC_OUT)

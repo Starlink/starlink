@@ -61,6 +61,9 @@ bin_MONOLITHS = gaiaMon
 gaiaMon_SOURCES =
 gaiaMon_TASKS = $(GAIA_TASKS)
 
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@ sun214fig.ps
+
+
 ## Local rules for _configuring_ and building the sub-directories and
 ## extracting the required products. When developing you need to use the
 ## makefiles in the sub-directories and return to this level to complete the

@@ -10,12 +10,18 @@ bin_SCRIPTS = extractor.csh extractor.icl extractor.ifc
 
 bin_MONOLITHS = extractor
 extractor_SOURCES = extract/src/extractor.c
-extractor_TASKS =
+# no variable extractor_TASKS -- extractor is an ATASK
 extractor_LDADD = $(LDADD) libextractor.a libfits.a `ndf_link_adam`
 
 bin_PROGRAMS = sex
 
 noinst_LIBRARIES = libextractor.a libfits.a
+
+# Files for the docs, directory. Some of these may present in the .htx
+# subdirectory as they are needed by the hypertext document, this just
+# copies the files out of there and into "star/docs" when necessary.
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@ sun226.htx/mud165.ps sun226fig.ps
+
 
 ##  There are no local sources for these libraries and programs.
 libextractor_a_SOURCES =

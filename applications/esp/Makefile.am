@@ -7,6 +7,8 @@ esp_mon_TASKS = corr ellfou ellpro esphelp fastmed \
     gaufit graphs histpeak hsub loback mask \
     mixup sector selfc selfcw skew topped
 
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
+
 esp_mon_SOURCES = \
     esp_mon.f \
     $(esp_mon_TASKS:=.f) \

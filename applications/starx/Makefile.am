@@ -2,6 +2,8 @@
  
 bin_SCRIPTS = starX_link
 
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
+
 # Testing. Just build a simple X11 application
 # and make sure it runs
 

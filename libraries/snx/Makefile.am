@@ -4,6 +4,10 @@ bin_SCRIPTS = snx_link snx_link_adam
 
 lib_LTLIBRARIES = libsnx.la libsnx_agchnlz.la libsnx_agpwritx.la
 
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@ \
+    sun90-fig-1.eps sun90-fig-2.eps sun90-fig-3.eps \
+    sun90-fig-4.eps sun90-fig-5.eps sun90-fig-6.eps
+
 # Have SNX routines and AG replacements
 libsnx_la_SOURCES = $(F_ROUTINES) agpwritx.f agchnlz.f
 

@@ -9,7 +9,8 @@ lib_LTLIBRARIES = libimg_adam.la
 
 ## Declare the sources for the library.
 libimg_adam_la_SOURCES = \
- $(PUBLIC_INCLUDES) \
+ $(include_HEADERS) \
+ $(include_MESSAGES) \
  $(PRIVATE_INCLUDES) \
  $(BLOCK_DATA_FILES) \
  $(C_ROUTINES) \
@@ -23,9 +24,10 @@ libimg_adam_la_SOURCES = \
 EXTRA_DIST = $(G_ROUTINES) $(GNP_ROUTINES) $(GCP_ROUTINES)
 
 ## List headers which are to be installed -- these are built first if necessary
-include_HEADERS = $(PUBLIC_INCLUDES)
+include_HEADERS = img.h
+include_MESSAGES = IMG_ERR img_err.h
 
-PUBLIC_INCLUDES = IMG_ERR img_err.h img.h
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
 PRIVATE_INCLUDES = IMG_CONST IMG_PCB IMG_ECB img1.h \
  imgIn1Gen.h imgIn2Gen.h imgIn3Gen.h imgInGen.h imgMod1Gen.h \
@@ -120,5 +122,5 @@ MAINTAINERCLEANFILES = $(G_ROUTINES:.gen=.f) $(GNP_ROUTINES:.gnp=.f) \
 TESTS = img_test
 check_MONOLITHS = img_test
 img_test_SOURCES = img_test.f libimg_adam.la
-img_test_TASKS =
+# no variable img_test_TASKS -- img_test is an ATASK
 img_test_LDADD = $(LDADD) `$(srcdir)/img_link_adam`

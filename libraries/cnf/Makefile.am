@@ -7,6 +7,8 @@ lib_LTLIBRARIES = libcnf.la
 libcnf_la_SOURCES = \
 	$(C_ROUTINES)
 
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
+
 C_ROUTINES = cnfCopyf.c cnfCreat.c cnfCref.c cnfCrefa.c cnfCreib.c \
     cnfCreim.c cnfCrela.c \
     cnfExpch.c cnfExpla.c cnfExpn.c cnfExprt.c cnfExprta.c cnfExprtap.c \

@@ -5,16 +5,17 @@ bin_SCRIPTS = trn_link trn_link_adam
 lib_LTLIBRARIES = libtrn.la
 
 libtrn_la_SOURCES = \
-	$(PUBLIC_INCLUDES) \
+	$(include_headers) \
+	$(include_MESSAGES) \
 	$(F_ROUTINES) \
 	$(PRIVATE_INCLUDES)
 
-include_HEADERS = $(PUBLIC_INCLUDES)
+include_HEADERS = TRN_PAR
+include_MESSAGES = TRN_ERR
 
 PRIVATE_INCLUDES = TRN_CMN TRN_CMN_SYM TRN_CONST TRN_CONST_STM
 
-PUBLIC_INCLUDES = \
-	TRN_PAR TRN_ERR
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
 F_ROUTINES = trn1_symdt.f trn1_alwrk.f trn1_anlst.f trn1_antmp.f    \
 trn1_cbcli.f trn1_cbcls.f trn1_clexp.f trn1_clvar.f trn1_cmpex.f    \
@@ -35,9 +36,7 @@ trn_join.f trn_new.f trn_prfx.f trn_ptcl.f trn_stok.f trn_stokd.f   \
 trn_stoki.f trn_stokr.f trn_tr1d.f trn_tr1i.f trn_tr1r.f trn_tr2d.f \
 trn_tr2i.f trn_tr2r.f trn_trnd.f trn_trni.f trn_trnr.f
 
-
-
-BUILT_SOURCES = TRN_ERR
+BUILT_SOURCES = $(include_MESSAGES)
 
 
 # Testing

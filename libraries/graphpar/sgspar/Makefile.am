@@ -30,7 +30,7 @@ check_PROGRAMS = sgspar_test
 check_MONOLITHS = sgs_test
 
 # Not sure why pthread is needed on linux. Need to investigate
-sgs_test_TASKS =
+# no variable sgs_test_TASKS -- sgs_test is an ATASK
 sgs_test_SOURCES = sgs_test.f
 sgs_test_LDADD = $(LDADD) `$(srcdir)/sgs_link_adam` `par_link_adam` -lpthread
 

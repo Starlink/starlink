@@ -2,19 +2,23 @@
 
 dist_bin_SCRIPTS = err_link err_link_adam
 include_HEADERS = \
-	ERR_ERR ERR_PAR \
-	MSG_ERR MSG_PAR \
-        err_err.h err_par.h msg_err.h msg_par.h \
+	ERR_PAR MSG_PAR \
+        err_par.h msg_par.h \
         merswrap.h mers.h
+include_MESSAGES = ERR_ERR err_err.h MSG_ERR msg_err.h
 
 lib_LTLIBRARIES = liberr_standalone.la liberr_adam.la
 noinst_LTLIBRARIES = liberr.la
+
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
 liberr_la_SOURCES = \
 	$(F_ROUTINES) \
 	$(F_BLOCK_DATA_FILES) \
 	$(C_ROUTINES) \
 	$(C_INTERFACE_ROUTINES) \
+	$(include_HEADERS) \
+	$(include_MESSAGES) \
 	$(PRIVATE_INCLUDES)
 
 liberr_standalone_la_SOURCES = \
@@ -31,6 +35,8 @@ liberr_adam_la_SOURCES = \
 	$(F_ROUTINES_UT) \
 	$(PRIVATE_INCLUDES)
 liberr_adam_la_LIBADD = liberr.la
+
+PRIVATE_INCLUDES = ERR_CMN ERR_SYS MSG_CMN MSG_SYS
 
 F_ROUTINES = err1_bell.f err1_print.f err_annul.f err_begin.f err_end.f \
              err_facer.f err_fioer.f err_flbel.f err_flush.f err_level.f \
@@ -66,15 +72,7 @@ C_INTERFACE_STAND = err_stand.c
 #  The installation test source
 TEST_SOURCE = err_test.f err_test.c err_test.ifl
 
-# The following files are also source files for the libraries (as well as 
-# the _ERR and _PAR files being include_HEADERS
-PRIVATE_INCLUDES = \
-	ERR_ERR ERR_PAR \
-        ERR_CMN ERR_SYS \
-        MSG_ERR MSG_PAR \
-	MSG_CMN MSG_SYS
-
-BUILT_SOURCES = ERR_ERR err_err.h MSG_ERR msg_err.h
+BUILT_SOURCES = $(include_MESSAGES)
 
 
 # Testing

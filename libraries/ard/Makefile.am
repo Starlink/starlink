@@ -8,10 +8,12 @@ libard_la_SOURCES = \
         $(BASIC_F_ROUTINES) $(STANDALONE_F_ROUTINES) $(BLOCKDATA)
 
 libard_adam_la_SOURCES = \
-        $(PUBLIC_INCLUDES) $(PRIVATE_INCLUDES) \
+        $(include_MESSAGES) $(PRIVATE_INCLUDES) \
         $(BASIC_F_ROUTINES) $(ADAM_F_ROUTINES) $(BLOCKDATA)
 
-include_HEADERS = $(PUBLIC_INCLUDES)
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
+
+include_MESSAGES = ARD_ERR
 
 BUILT_SOURCES = ARD_ERR
 
@@ -22,7 +24,6 @@ test1_SOURCES = ard_test.f
 test1_LDADD = libard.la `ast_link` `sla_link` `grp_link` `chr_link` \
 	`err_link`  `psx_link`
 
-PUBLIC_INCLUDES = ARD_ERR
 
 PRIVATE_INCLUDES = ARD_COM ARD_CONST
 

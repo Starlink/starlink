@@ -7,15 +7,16 @@ lib_LTLIBRARIES = libmsp.la
 libmsp_la_SOURCES = \
 	$(C_ROUTINES) \
 	$(PUBLIC_INCLUDES) \
+	$(include_MESSAGES) \
 	$(PRIVATE_INCLUDES)
 
 ## List headers which are to be installed -- these are built first if necessary
 include_HEADERS = $(PUBLIC_INCLUDES)
+include_MESSAGES = msp_err.h
 
 C_ROUTINES = msp.c
 
-PUBLIC_INCLUDES = msp.h msp_par.h msp_err.h
-
+PUBLIC_INCLUDES = msp.h msp_par.h
 PRIVATE_INCLUDES = msp_static.h 
 
-BUILT_SOURCES = msp_err.h
+BUILT_SOURCES = $(include_MESSAGES)

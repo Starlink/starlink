@@ -4,6 +4,8 @@ bin_SCRIPTS = pda_link pda_link_adam
 
 lib_LTLIBRARIES = libpda.la
 
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@ sun194_1.eps
+
 libpda_la_SOURCES = \
 	$(F_ROUTINES)
 

@@ -11,6 +11,8 @@ sst_mon_SOURCES = \
 sst_mon_TASKS = forstats procvt prohlp prolat propak prohtml
 sst_mon_LDADD = $(LDADD) `fio_link_adam` `one_link_adam`
 
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
+
 
 SUBSRC = sst_clean.f sst_fwild.f sst_latex.f sst_puts.f  sst_trcvt.f \
          sst_cntac.f sst_get.f sst_latp.f sst_rdad1.f sst_trhlp.f \

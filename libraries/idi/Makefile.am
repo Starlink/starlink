@@ -6,6 +6,7 @@ lib_LTLIBRARIES = libidi.la libidi_adam.la
 
 libidi_la_SOURCES = \
 	$(PUBLIC_INCLUDES) \
+	$(include_MESSAGES) \
 	$(PRIVATE_INCLUDES) \
 	$(F_ROUTINES) \
 	$(C_ROUTINES)
@@ -15,10 +16,14 @@ libidi_adam_la_SOURCES = $(ADAM_F_ROUTINES) \
 
 
 include_HEADERS = $(PUBLIC_INCLUDES)
+include_MESSAGES = IDI_ERR idi_err.h
 
+# This etc file is a binary file, so should not go into share
+staretc_DATA = xworks.dat xworks.dct
 
-PUBLIC_INCLUDES = \
-	IDI_ERR IDI_PAR idi_err.h idi.h
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
+
+PUBLIC_INCLUDES = IDI_PAR idi.h
 
 PRIVATE_INCLUDES = idistruct_e.h kwm.h vdm.h idi_did \
 idi_compar device.dep iii.h x11defs.h idifuncs.h
@@ -59,7 +64,7 @@ gnsrun_idi_LDADD = libidi.la `gwm_link` `gns_link` `cnf_link` $(X_LIBS) $(X_EXTR
 
 # idi_test requires ndf and lpthread?
 
-idi_test_TASKS =
+# no variable idi_test_TASKS -- idi_test is an ATASK
 idi_test_SOURCES = idi_test.f
 idi_test_LDADD = libidi_adam.la libidi.la `ndf_link_adam` `gwm_link_adam` \
 `gns_link_adam` `cnf_link_adam` $(X_LIBS) $(X_EXTRA_LIBS) $(X_PRE_LIBS) -lX11

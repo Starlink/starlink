@@ -10,10 +10,11 @@ LDADD = -lsock -lmsp
 
 C_ROUTINES = ant.c adamnet.c
 
-PRIVATE_INCLUDES = ant_par.h ant_err.h ant_sys.h ant_cmn.h \
-                   ant.h ant_static.h
+noinst_MESSAGES = ant_err.h
+PRIVATE_INCLUDES = ant_par.h ant_sys.h ant_cmn.h \
+                   ant.h ant_static.h $(noinst_MESSAGES)
 
-BUILT_SOURCES = ant_err.h
+BUILT_SOURCES = $(noinst_MESSAGES)
 
 # have no idea whether these programs are useful
 noinst_PROGRAMS = traceit antmaster antslave

@@ -48,6 +48,8 @@ bin_PROGRAMS = allstar daophot
 bin_MONOLITHS = daocurs daogrey daoplot
 noinst_LIBRARIES = $(OBJECT_LIBS)
 
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
+
 libdaophot_a_SOURCES = $(F_SUB1)
 libdaosubs_a_SOURCES = $(F_SUB2)
 
@@ -59,14 +61,14 @@ daophot_LDADD = $(LDADD) $(OBJECT_LIBS) `$(srcdir)/daophot_link`
 
 daocurs_SOURCES = daocurs.f
 daocurs_LDADD = $(LDADD) $(OBJECT_LIBS) `$(srcdir)/daophot_link_adam`
-daocurs_TASKS =
+# no variable daocurs_TASKS -- daocurs is an ATASK
 
 daogrey_SOURCES = daogrey.f
 daogrey_LDADD = $(LDADD) $(OBJECT_LIBS) `$(srcdir)/daophot_link_adam`
-daogrey_TASKS =
+# no variable daogrey_TASKS -- daogrey is an ATASK
 
 daoplot_SOURCES = daoplot.f
 daoplot_LDADD = $(LDADD) $(OBJECT_LIBS) `$(srcdir)/daophot_link_adam`
-daoplot_TASKS =
+# no variable daoplot_TASKS -- daoplot is an ATASK
 
 

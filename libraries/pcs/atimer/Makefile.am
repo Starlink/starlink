@@ -7,15 +7,16 @@ lib_LTLIBRARIES = libatimer.la
 libatimer_la_SOURCES = \
 	$(C_ROUTINES) \
 	$(PUBLIC_INCLUDES) \
+	$(include_MESSAGES) \
 	$(PRIVATE_INCLUDES)
 
 ## List headers which are to be installed -- these are built first if necessary
 include_HEADERS = $(PUBLIC_INCLUDES)
+include_MESSAGES = atimer_err.h
 
 C_ROUTINES = atimer.c fatimer.c
 
-PUBLIC_INCLUDES = atimer.h atimer_par.h atimer_err.h
-
+PUBLIC_INCLUDES = atimer.h atimer_par.h
 PRIVATE_INCLUDES = atimer_static.h 
 
-BUILT_SOURCES = atimer_err.h
+BUILT_SOURCES = $(include_MESSAGES)

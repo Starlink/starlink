@@ -45,30 +45,30 @@ fig3d_LDADD = `sgs_link` `sla_link` `chr_link`
 
 check_MONOLITHS = ira_demo1 ira_demo2 drexam1 drexam2 drexam3 drexam4 drexam5
 
-ira_demo1_TASKS = 
+# no variable ira_demo1_TASKS -- ira_demo1 is an ATASK
 ira_demo1_SOURCES = ira_demo1.f
 ira_demo1_LDADD = libira.la `ndf_link_adam` 
-ira_demo2_TASKS = 
+# no variable ira_demo2_TASKS -- ira_demo2 is an ATASK
 ira_demo2_SOURCES = ira_demo2.f
 ira_demo2_LDADD = libira.la `ndf_link_adam` 
 
-drexam1_TASKS =
+# no variable drexam1_TASKS -- drexam1 is an ATASK
 drexam1_SOURCES = drexam1.f
 drexam1_LDADD = libira.la `sgs_link_adam` `sla_link`
 
-drexam2_TASKS =
+# no variable drexam2_TASKS -- drexam2 is an ATASK
 drexam2_SOURCES = drexam2.f
 drexam2_LDADD = libira.la `sgs_link_adam` `sla_link`
 
-drexam3_TASKS =
+# no variable drexam3_TASKS -- drexam3 is an ATASK
 drexam3_SOURCES = drexam3.f
 drexam3_LDADD = libira.la `sgs_link_adam` `sla_link`
 
-drexam4_TASKS =
+# no variable drexam4_TASKS -- drexam4 is an ATASK
 drexam4_SOURCES = drexam4.f
 drexam4_LDADD = libira.la `sgs_link_adam` `sla_link`
 
-drexam5_TASKS =
+# no variable drexam5_TASKS -- drexam5 is an ATASK
 drexam5_SOURCES = drexam5.f
 drexam5_LDADD = libira.la `sgs_link_adam` `sla_link`
 

@@ -20,12 +20,16 @@ lib_LTLIBRARIES = libgwm.la
 
 libgwm_la_SOURCES = \
 	$(PUBLIC_INCLUDES) \
+	$(include_MESSAGES) \
 	$(C_ROUTINES) \
 	$(PRIVATE_INCLUDES)
 
+include_MESSAGES = gwm_err.h GWM_ERR
 include_HEADERS = $(PUBLIC_INCLUDES)
 
 BUILT_SOURCES = GWM_ERR gwm_err.h
+
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
 C_ROUTINES =							  \
 	findwindow.c getwininfo.c processevent.c error.c	  \
@@ -38,7 +42,8 @@ C_ROUTINES =							  \
 	wseti.c wsetl.c xtrap.c gwm_globals.c
 
 
-PUBLIC_INCLUDES = gwm.h gwm_err.h GWM_ERR
+PUBLIC_INCLUDES = gwm.h
+## PUBLIC_INCLUDES = gwm.h gwm_err.h GWM_ERR
 
 PRIVATE_INCLUDES = gwm_for.h  gwm_global.h  gwm_sys.h cshead.icon starlink.icon
 

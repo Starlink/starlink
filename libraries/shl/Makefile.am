@@ -43,7 +43,7 @@ TESTS = testhelp ctesthelp
 
 check_PROGRAMS = ctesthelp
 check_MONOLITHS = testhelp
-testhelp_TASKS = 
+# no variable testhelp_TASKS -- testhelp is an ATASK
 testhelp_SOURCES = testhelp.f
 testhelp_LDADD = libshl_adam.la libshl.la \
 	`hlp_link_adam` `one_link` `fio_link_adam`

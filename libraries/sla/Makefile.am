@@ -4,6 +4,8 @@ dist_bin_SCRIPTS = sla_link sla_link_adam
 
 lib_LTLIBRARIES = libsla.la
 
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
+
 libsla_la_SOURCES = \
 	$(F_ROUTINES) \
 	$(FPP_ROUTINES)

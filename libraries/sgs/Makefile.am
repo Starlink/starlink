@@ -4,15 +4,14 @@ bin_SCRIPTS = sgs_link
 
 lib_LTLIBRARIES = libsgs.la
 
-libsgs_la_SOURCES = $(F_ROUTINES) $(PUBLIC_INCLUDES) \
+libsgs_la_SOURCES = $(F_ROUTINES) $(include_MESSAGES) \
 	$(PRIVATE_INCLUDES)
 
-include_HEADERS = $(PUBLIC_INCLUDES)
+include_MESSAGES = SGS_ERR
 
-#  List of public include files.  These are include files which form
-#  part of the package and may be required by users of it
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@ sun85_diag1.eps
 
-PUBLIC_INCLUDES = SGS_ERR
+#  There are no other public include files.
 
 #  List of private include files.  These are additional include files
 #  which form part of the package and are required in order to build

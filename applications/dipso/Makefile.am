@@ -92,6 +92,8 @@ dipsosupport_DATA = ATLIST.DAT demo2.cmd LWPLO.ABS run_dipso.o user.f \
 ## Data files for etc/dipso.
 staretc_DATA = specdat/*
 
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
+
 EXTRA_DIST = specdat $(PRIVATE_INCLUDES) dipsosetup.in my_dipso.in
 
 ## Simple installation test.

@@ -181,6 +181,8 @@ echtest_DATA = echtests.icl echtests.csh test1.icl test10.icl \
     test9e.ref test9f.ref test9g.ref test9h.ref test9i.ref
 starhelp_DATA = echomop.shl
 
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
+
 
 # Documentation lives in the doc directory, which has its own Makefile
 sun152.htx_tar sun152.latex_tar echomop_hyper.tar:

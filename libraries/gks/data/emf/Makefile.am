@@ -11,10 +11,13 @@ noinst_PROGRAMS = gksemf
 gksemf_SOURCES = gksemf.f
 gksemf_LDADD = ../../base/libgks_base.la
 
+staretc_DATA = gks.emf-$(RLSE)
+
 # Create the font database from the ascii font files
 
 gks.emf-$(RLSE): gksemf gksemf.dat
+	rm -f gks.emf $@
 	./gksemf
-	mv gks.emf gks.emf-$(RLSE)
+	mv gks.emf $@
 
 

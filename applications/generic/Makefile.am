@@ -10,6 +10,8 @@ nodist_include_HEADERS = DCV_FUN
 
 staretc_DATA = $(AUX_FILES)
 
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
+
 #  List of package auxiliary files.  These are text files uesd by GENERIC.
 AUX_FILES = byte byte_asterix \
 	character character_asterix \

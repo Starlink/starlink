@@ -7,6 +7,8 @@ dist_noinst_SCRIPTS = pisa_link_adam
 
 bin_MONOLITHS = pisa_mon pisa_mon4 pisahelp
 
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@ @STAR_LATEX_DOCUMENATATION@ sun109fig.ps
+
 pisa_mon_SOURCES = \
         pisa_mon.f \
 	$(pisa_mon_TASKS:=.f) \
@@ -32,7 +34,7 @@ pisa_mon4_TASKS = pisafind4 pisafit4
 ##  Link the pisahelp program as an atask. 
 pisahelp_SOURCES = pisahelp.f
 pisahelp_LDADD = `shl_link_adam`
-pisahelp_TASKS = 
+# no variable pisahelp_TASKS -- pisahelp is an ATASK
 
 
 SUBSRC = addmod.f func.f analys.f anoise.f checkp.f dchole.f \

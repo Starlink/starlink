@@ -6,6 +6,7 @@ lib_LTLIBRARIES = libndf.la libndf_adam.la
 
 libndf_la_SOURCES = \
 	$(PUBLIC_INCLUDES) \
+	$(include_MESSAGES) \
 	$(BASIC_F_ROUTINES) \
 	$(STANDALONE_F_ROUTINES) \
 	$(BASIC_C_ROUTINES) \
@@ -14,6 +15,7 @@ libndf_la_SOURCES = \
 
 libndf_adam_la_SOURCES = \
 	$(PUBLIC_INCLUDES) \
+	$(include_MESSAGES) \
 	$(BASIC_F_ROUTINES) \
 	$(ADAM_F_ROUTINES) \
 	$(BASIC_C_ROUTINES) \
@@ -21,16 +23,16 @@ libndf_adam_la_SOURCES = \
 	$(PRIVATE_INCLUDES)
 
 include_HEADERS = $(PUBLIC_INCLUDES)
+include_MESSAGES = ndf_err.h NDF_ERR
 
 # Include files that should be installed
-
-PUBLIC_INCLUDES = ndf.h NDF_PAR NDF_ERR ndf_err.h NDF_FUNC_DEC \
-NDF_FUNC_DEF NDF_FUNC
+PUBLIC_INCLUDES = ndf.h NDF_PAR NDF_FUNC_DEC NDF_FUNC_DEF NDF_FUNC
 
 # Include files that are only needed for the build
-
 PRIVATE_INCLUDES = NDF_ACB NDF_CONST NDF_DCB NDF_ELB NDF_FCB NDF_PCB \
-NDF_TCB ndf1.h
+	NDF_TCB ndf1.h
+
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
 #  Fortran routines required for both the standalone and ADAM libraries.
 #  Include the BLOCK data file
@@ -125,7 +127,7 @@ STANDALONE_C_ROUTINES = ndf1_getap.c
 ADAM_C_ROUTINES = ndf_adam.c
 
 
-BUILT_SOURCES = NDF_ERR ndf_err.h
+BUILT_SOURCES = $(include_MESSAGES)
 
 # Testing
 

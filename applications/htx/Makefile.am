@@ -26,6 +26,8 @@ SUFFIXES = .sed.in .sed
 
 bin_SCRIPTS = $(PUBLIC_SCR)
 
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
+
 htxsupportdir = $(bindir)/htx-scripts
 htxsupport_SCRIPTS = $(PRIVATE_SCR)
 htxsupport_DATA = $(PRIVATE_SED_SCR)

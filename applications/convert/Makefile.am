@@ -36,6 +36,8 @@ EXAMPLE_FILES = test_data/*
 HELP_SOURCES = convert.hlp
 starhelp_DATA = $(HELP_SOURCES:.hlp=.shl)
 
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
+
 #  Rule for building the help library from the help source.
 .hlp.shl:
 	@HLIB@ $<

@@ -1,7 +1,8 @@
 noinst_LTLIBRARIES = libccdpack.la
 libccdpack_la_SOURCES = $(SUBSRC) $(CSUBSRC)
 
-AM_FCFLAGS = -I../
+AM_FCFLAGS = -I..
+AM_CFLAGS = -I..
 
 #  List of applications/tasks in monoliths.
 
