@@ -45,9 +45,6 @@ must be a subset of the return value of <funcname/section-element-list/.
 	(normalize "appendices")
 	(normalize "routinelist")
 	(normalize "codecollection")
-	;(normalize "backmatter")
-	;(normalize "notecontents")
-	;(normalize "bibliography")
 	))
 
 <routine>
@@ -149,7 +146,7 @@ which will hold this node
 <routinename>html-file
 <description>
 Returns the filename of the html file that contains the given node.
-<returnvalue type=string>Complete filename
+<returnvalue type=string>Complete filename.  Will not return an empty string.
 <argumentlist>
 <parameter keyword default='(current-node)'>
   target_nd<type>node-list<description>Node whose file we want
@@ -182,7 +179,11 @@ Returns the filename of the html file that contains the given node.
 		     ;; Following gives the same behaviour.  More rational?
 		     ;((node-list=? input_nd (document-element))
 		     ; (root-file-name))
-		     (else "xxx1"))))
+		     ;; Catch-all.  It's probably better to return
+		     ;; _something_ here, even if it's nonsense,
+		     ;; rather than a confusing empty-string
+		     (else "xxx1")
+		     )))
     (string-append base %html-ext%)))
 
 <routine>
@@ -433,38 +434,62 @@ generated HTML documents.
 	 (rel (document-release-info))
 	 (subsects (chunk-children elemnode))
 	 (nextchunk (onwards)))
-    (make element gi: "div" attributes: '(("class" "navbar"))
-      (make element gi: "TABLE" attributes: %nav-footer-table-attr%
+    (make element gi: "div" attributes: '(("class" "navbar")
+					  ("align" "right"))
+      (make element gi: "table" attributes: %nav-footer-table-attr%
 	    (make sequence
 	      (if (node-list-empty? subsects)
 		  (empty-sosofo)
-		  (make element gi: "TR"
-			(make element gi: "TD"
+		  (make element gi: "tr"
+			(make element gi: "td"
 			      (make sequence
 				(make element gi: "h4"
 				      (literal "Contents"))
 				(make-contents))
 			      )))
-	      (make element gi: "TR"
-		    (make element gi: "TD" attributes: '(("ALIGN"
-							  "RIGHT"))
+	      (make element gi: "tr"
+		    (make element gi: "td" attributes: '(("align" "right"))
 			;(whereami "nav-footer")
 			;(literal (car nextchunk))
 			(if (node-list-empty? (cdr nextchunk))
 			    (literal "END")
 			    (make sequence
-			      (make element gi: "EM"
+			      (make element gi: "em"
 				    (literal (string-append (car nextchunk)
 							    ": ")))
-			      (make element gi: "A"
+			      (make element gi: "a"
 				    attributes: (list
-						 (list "HREF"
+						 (list "href"
 						       (href-to (cdr nextchunk))))
 				    (with-mode section-reference
 				      (process-node-list (cdr nextchunk))))))
-			))))
-      (make element gi: "address" ;"P" attributes: '(("ALIGN" "RIGHT"))
-	    (make element gi: "EM"
+			))
+	      (if (hasidindex?)
+		  (make element gi: "tr"
+			(make element gi: "td" attributes: '(("align" "right"))
+			      (let* ((in-sect (ancestor-member
+					       (current-node)
+					       (list (normalize "sect"))))
+				     (sect-id (and in-sect
+						   (attribute-string
+						    (normalize "id")
+						    in-sect))))
+				(make element gi: "a"
+				      attributes:
+				      (list
+				       (list
+					"href" (string-append
+						(idindex-sys-id)
+						"#"
+						(if sect-id
+						    (string-append
+						     "xref__IDINDEX_" sect-id)
+						    (idindex-frag-id)))))
+				      (make element gi: "small"
+					    (literal "ID index"))))))
+		  (empty-sosofo))))
+      (make element gi: "address"
+	    (make element gi: "em"
 		  (make sequence
 		    (node-list-reduce authors
 				      (lambda (result a)
@@ -472,7 +497,7 @@ generated HTML documents.
 					 result
 					 (make sequence
 					   (process-node-list a)
-					   (make empty-element gi: "BR"))))
+					   (make empty-element gi: "br"))))
 				      (empty-sosofo))
 		    (literal (format-date (car rel)))
 		    )))
