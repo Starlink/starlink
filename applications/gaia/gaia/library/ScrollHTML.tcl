@@ -66,7 +66,7 @@ itcl::class gaia::ScrollHTML {
 
       #  Create the label.
       itk_component add label {
-         label $w_.label -text "$itk_option(-label)"
+         label $w_.label
       }
 
       #  Create the scrollbars.
@@ -78,7 +78,7 @@ itcl::class gaia::ScrollHTML {
       itk_component add hframe {
          frame $w_.hframe -borderwidth 0
       }
-      set rwidth [winfo reqwidth $itk_component(hscroll)]
+      set rwidth [winfo reqwidth $itk_component(vscroll)]
 
       itk_component add corner {
          frame $itk_component(hframe).corner -width $rwidth
@@ -99,8 +99,10 @@ itcl::class gaia::ScrollHTML {
             -scriptcommand [code $this scriptcommand_] \
             -appletcommand [code $this appletcommand_] \
             -hyperlinkcommand [code $this hyperlinkcommand_] \
-            -underlinehyperlinks 1 \
-            -tablerelief raised
+            -underlinehyperlinks 0 \
+            -tablerelief raised \
+            -unvisitedcolor blue \
+            -takefocus 1
       } {
          keep \
             -width -height -exportselection -foreground -background \
@@ -108,6 +110,30 @@ itcl::class gaia::ScrollHTML {
       }
       $itk_component(hscroll) configure -command "$itk_component(html) xview"
       $itk_component(vscroll) configure -command "$itk_component(html) yview"
+
+      #  This widget also needs a couple of bindings to work. One to
+      #  pick up hyperlink events (XXX I thought -hyperlinkcommand
+      #  should do this) and one to change the cursor as hyperlinks
+      #  are passed over.
+      bind HtmlClip <1> [code $this hyperlinkcommand_ %x %y]
+      catch {focus $itk_component(html).x}
+      bind HtmlClip <Motion> {
+         set parent [winfo parent %W]
+         set url [$parent href %x %y] 
+         if {[string length $url] > 0} {
+            $parent configure -cursor hand2
+         } else {
+            $parent configure -cursor {}
+         }
+      }
+
+      #  Add bindings for keyboard movements.
+      bind HtmlClip <Key-Next> [code $this pageforward_]
+      bind HtmlClip <Key-BackSpace> [code $this pageback_]
+      bind HtmlClip <Key-Prior> [code $this pageback_]
+      bind HtmlClip <Key-Delete> [code $this pageback_]
+      bind HtmlClip <Key-Down> [code $this lineforward_]
+      bind HtmlClip <Key-Up> [code $this lineback_]
 
       #  Now pack everything into place.
       pack $itk_component(label) -side top -fill x
@@ -171,9 +197,18 @@ itcl::class gaia::ScrollHTML {
 
    #  This method is called when the user clicks on a hyperlink. There
    #  are really two cases to deal with here, when a new page is to be
-   #  loaded and when we need to move to an anchor in the current page.
-   protected method hyperlinkcommand_ { url } {
-      
+   #  loaded and when we need to move to an anchor in the current
+   #  page. The args are either the name of the hyperlink, or the X
+   #  and Y coordinates of a potential hyperlink.
+   protected method hyperlinkcommand_ { args } {
+      catch {focus $itk_component(html).x}
+      if { [llength $args] > 1 } {
+         set url [$itk_component(html) href [lindex $args 0] [lindex $args 1]]
+         if { $url == {} } return
+      } else {
+         set url [lindex $args 0]
+      }
+
       #  If the file is same as last time look for an anchor.
       set pattern "$current_\#"
       set len [string length $pattern]
@@ -182,10 +217,130 @@ itcl::class gaia::ScrollHTML {
          incr len
          $itk_component(html) yview [string range $new $len end]
       } else {
-         loadfile_ $url
+         loadfile $url
       }
    }
+
+   #  Clear the widget. Clear all images that have been created.
+   public method clear {} {
+      $itk_component(html) clear
+      if { [info exists images_] } {
+         foreach imgsrc [array names images_] {
+            image delete $images_($imgsrc)
+         }
+         catch {unset images_}
+      }
+   }
+
+   #  Read a file, returning the contents as the results.
+   protected method readfile_ {url} {
+      if { ![regexp {(.*)\#(.*)} $url dummy filename anchor] } {
+         set filename $url
+         set anchor {}
+      }
+      if {[catch {open $filename r} fp]} {
+         error $fp
+         return {}
+      } else {
+         fconfigure $fp -translation binary
+         set r [read $fp [file size $filename]]
+         close $fp
+         return $r
+      }
+   }
+
+   #  Load a file into the HTML widget.
+   public method loadfile {url} {
+      set html [readfile_ $url]
+      if { $html == "" } return
+      clear
+      happend_ $url
+      set current_ $url
+      $itk_component(html) configure -base $url
+      $itk_component(html) parse $html
+   }
+
+   #  Just show some HTML in the widget.
+   public method parse {text {clear 1}} {
+      if { $clear } clear
+      $itk_component(html) parse $text
+   }
+
+   #  Refresh the current file.
+   public method refresh {.} {
+      if { $current == {} } return
+      loadfile $current_
+   }
+
+   #  Append a file to the history record. Do not append if this is
+   #  the same as the current file.
+   protected method happend_ {name} {
+      if { $name == $current_ } return
+      set history_($nhist_) $name
+      incr nhist_
+      if { $nhist_ > 20 } {
+         set nhist_ 0
+      }
+   }
+
+   #  Return the file associated with a history position.
+   public method history {n} {
+      if { [info exists history_($n)] } {
+         return history_($n)
+      }
+   }
+
+   #  Display the "previous" file.
+   public method previous {} {
+      incr nhist_ -1
+      if { $nhist_ < 0 && [info exists history_(20)] } {
+         set nhist_ 20
+      } else {
+         set nhist_ 0
+      }
+      puts "loading $nhist_"
+      if { [info exists history_($nhist_)] } {
+         loadfile $history_($nhist_)
+      }
+   }
+
+   #  Display the "next" file.
+   public method next {} {
+      incr nhist_
+      if { $nhist_ > 20 } {
+         set nhist_ 0
+      }
+      puts "loading $nhist_"
+      if { [info exists history_($nhist_)] } {
+         loadfile $history_($nhist_)
+      } else {
+         incr nhist_ -1
+         if { $nhist_ < 0 } {
+            set nhist_ 0 
+         }
+         puts "failed ($nhist_)"
+      }
+   }
+
+   #  Callback for page forward shortcut key.
+   protected method pageforward_ {} {
+      $itk_component(html) yview scroll 1 pages
+   }
    
+   #  Callback for page back shortcut key.
+   protected method pageback_ {} {
+      $itk_component(html) yview scroll -1 pages
+   }
+   
+   #  Callback for line forward shortcut key
+   protected method lineforward_ {} { 
+      $itk_component(html) yview scroll 1 units 
+   }
+
+   #  Callback for line back shortcut key
+   protected method lineback_ {} { 
+      $itk_component(html) yview scroll -1 units 
+   }
 
    #  Protected variables:
    #  --------------------
@@ -195,14 +350,22 @@ itcl::class gaia::ScrollHTML {
 
    #  Name of the file that we're looking at.
    protected variable current_ {}
+   
+   #  The names of last 20 URLs that we've visited.
+   protected variable history_
+
+   #  The current insertion position in the history.
+   protected variable nhist_ 0
 
    #  Configuration options:
    #  ----------------------
 
    #  Set text of label.
    itk_option define -label scrolltextlabel ScrolltextLabel {} {
-      if { [info exists itk_component(label)] } {
+      if { [info exists itk_component(label)] && $itk_option(-label) != {}} {
          $itk_component(label) configure -text "$itk_option(-label)"
+      } else {
+         pack unpack $itk_component(label)
       }
    }
 
@@ -210,34 +373,17 @@ itcl::class gaia::ScrollHTML {
    #  Shared images
    #  -------------
    #  These images are used in place of GIFs or of form elements
-   common biggray {
-      image create photo biggray -data {
-         R0lGODdhPAA+APAAALi4uAAAACwAAAAAPAA+AAACQISPqcvt
-         D6OctNqLs968+w+G4kiW5omm6sq27gvH8kzX9o3n+s73/g8M
-         CofEovGITCqXzKbzCY1Kp9Sq9YrNFgsAO///
-      }
+
+   common smgray {}
+   image create photo smgray -data {
+      R0lGODdhOAAYAPAAALi4uAAAACwAAAAAOAAYAAACI4SPqcvtD
+      6OctNqLs968+w+G4kiW5omm6sq27gvH8kzX9m0VADv/
    }
-   common smgray {
-      image create photo smgray -data {
-         R0lGODdhOAAYAPAAALi4uAAAACwAAAAAOAAYAAACI4SPqcvtD
-         6OctNqLs968+w+G4kiW5omm6sq27gvH8kzX9m0VADv/
-      }
-   }
-   common nogifbig {
-      image create photo nogifbig -data {
-         R0lGODdhJAAkAPEAAACQkADQ0PgAAAAAACwAAAAAJAAkAAACm
-         ISPqcsQD6OcdJqKM71PeK15AsSJH0iZY1CqqKSurfsGsex08X
-         uTuU7L9HywHWZILAaVJssvgoREk5PolFo1XrHZ29IZ8oo0HKE
-         YVDYbyc/jFhz2otvdcyZdF68qeKh2DZd3AtS0QWcDSDgWKJXY
-         +MXS9qY4+JA2+Vho+YPpFzSjiTIEWslDQ1rDhPOY2sXVOgeb2
-         kBbu1AAADv/
-      }
-   }
-   common nogifsm {
-      image create photo nogifsm -data {
-         R0lGODdhEAAQAPEAAACQkADQ0PgAAAAAACwAAAAAEAAQAAACN
-         ISPacHtD4IQz80QJ60as25d3idKZdR0IIOm2ta0Lhw/Lz2S1J
-         qvK8ozbTKlEIVYceWSjwIAO///
-      }
+
+   common nogifsm {}
+   image create photo nogifsm -data {
+      R0lGODdhEAAQAPEAAACQkADQ0PgAAAAAACwAAAAAEAAQAAACN
+      ISPacHtD4IQz80QJ60as25d3idKZdR0IIOm2ta0Lhw/Lz2S1J
+      qvK8ozbTKlEIVYceWSjwIAO///
    }
 }

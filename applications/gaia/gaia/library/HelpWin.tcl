@@ -20,7 +20,6 @@
 itcl::class util::HelpWin {
 
    # Constructor: Note that all HelpWin objects share a single toplevel window.
-
    constructor {args} {
 
       #  Evaluate any options.
@@ -52,8 +51,9 @@ itcl::class util::HelpWin {
       if { ![winfo exists $hyperhelp_] } {
          create_
       }
-      $hyperhelp_ showtopic $file ;#$topic
-      $hyperhelp_ activate
+      $hyperhelp_ showtopic $file
+      wm deiconify $hyperhelp_
+      raise $hyperhelp_
    }
 
    # Remove the help window.
@@ -63,19 +63,17 @@ itcl::class util::HelpWin {
       }
    }
 
+   # Destroy the window.
+   public method destroy_help {} {
+      delete object $this
+   }
+
    # Create the help window.
    private method create_ {} {
       if { ![winfo exists $hyperhelp_] } {
-         set hyperhelp_ [gaia::GaiaHyperHelp .\#auto \
-                            -title "GAIA On-line Help" \
-                            -modality none \
-                            -topics {index} \
-                            -helpdir $helpdir \
-                            -wrap word \
-                            -setgrid 1 \
-                            -width 500 \
-                            -height 700 \
-                            -fontname helvetica]
+         set hyperhelp_ [::gaia::GaiaHyperHelp .\#auto \
+                            -topics {{Home index}} \
+                            -helpdir $helpdir]
       }
    }
 
@@ -91,26 +89,15 @@ itcl::class util::HelpWin {
    #  Protected variables: (available to instance)
    #  --------------------
 
-   # Names of available fonts.
-   protected variable fonts_ {
-      -*-courier-medium-r-*-*-*-120-*-*-*-*-*-*
-      -*-courier-medium-r-*-*-*-140-*-*-*-*-*-*
-      -*-courier-medium-r-*-*-*-180-*-*-*-*-*-*
-   }
-
    #  Common variables: (shared by all instances)
    #  -----------------
 
    # Name of the widget used to display the help.
-   private common hyperhelp_ {}
-
-   # Name of the top-level widget the contains the help and control
-   # buttons .
-   private common Top_ {}
+   common hyperhelp_ {}
 
    # Reference count of help objects that have an interest in the
    # help widget.
-   private common reference_ 0
+   common reference_ 0
 
 #  End of class definition.
 }
