@@ -22,7 +22,7 @@
 
 #  Arguments:
 #     Textwindow = window (write)
-#        Name of a text-like widget for writing the task output to.
+#        Command name of a text-like widget for writing the task output to.
 #     watch = boolean (read)
 #        If watch is set true then the task output is monitored for
 #        progress statements. These are used to reflect the relative
@@ -59,6 +59,10 @@
 #        type widget.
 #     16-MAY-2000 (MBT):
 #        Upgraded for Tcl8.
+#     3-JUL-2001 (MBT):
+#        Improved error reporting - now reports all lines of error message
+#        to stdout, which is helpful if a bit messy.  Also removed an
+#        error reporting bug I introduced in the last change.
 #     {enter_further_changes_here}
 
 #-
@@ -70,15 +74,18 @@
 #.
 
 #  Check for an error.
-      if { [string range $output 0 0 ] == "!!" } {
-         CCDTaskError $task $output
+      if { [string range $output 0 0 ] == "!" } {
+         ccdputs $output
+         if { [string range $output 0 1 ] == "!!" } {
+            CCDTaskError $task $output
+         }
       }
 
 #  Write output from task into window if required.
       set textwindow [CCDPathOf $Textwindow]
       if { $CCDseetasks } {
-         if [winfo exists $textwindow] {
-            $textwindow insert end "$output\n"
+         if { [winfo exists $textwindow] } {
+            $Textwindow insert end "$output\n"
          }
       }
 
