@@ -98,7 +98,7 @@
 
 *  Local Constants:
       INTEGER MXCOL              ! Max number of column definitions
-      PARAMETER ( MXCOL = 17 )
+      PARAMETER ( MXCOL = 18 )
 
 *  Local Variables:
       CHARACTER BUF*255          ! Buffer for line read from config file
@@ -121,7 +121,8 @@
 *  Local Data:
       DATA INIT /.FALSE./,
      :     NAMES / 'X', 'Y', 'RA', 'DEC', 'I', 'Q', 'U', 'V', 'DI', 
-     :             'DQ', 'DV', 'P', 'PI', 'ANG', 'DP', 'DPI', 'DANG' /
+     :             'DQ', 'DU', 'DV', 'P', 'PI', 'ANG', 'DP', 'DPI', 
+     :             'DANG' /
 
 
 *  Ensure the necessary variale values are retained between invocations
@@ -252,7 +253,7 @@
 
 *  Arrive here if the internal name is not known.
       STATUS = SAI__ERROR
-      CALL MSG_SETC( 'Q', NAME )
+      CALL MSG_SETC( 'Q', INAME )
       CALL ERR_REP( 'POL1_COLNM_ERR1', 'POL1_COLNM: Unknown quantity '//
      :              '''^Q'' supplied (programming error).', STATUS )
 
