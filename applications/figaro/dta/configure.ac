@@ -16,6 +16,9 @@ AC_PROG_FC
 AC_PROG_FPP
 AC_PROG_LIBTOOL
 
+dnl Do not want binaries to be shared against this deprecated library.
+AC_DISABLE_SHARED
+
 dnl    Other options here, such as
 STAR_CNF_COMPATIBLE_SYMBOLS
 

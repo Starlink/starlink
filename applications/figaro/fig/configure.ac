@@ -19,6 +19,9 @@ AC_PROG_LIBTOOL
 dnl    Look for unit of RECL
 AC_FC_RECL_UNIT
 
+dnl Do not want binaries to be shared against this deprecated library.
+AC_DISABLE_SHARED
+
 dnl    Other options here, such as
 STAR_CNF_COMPATIBLE_SYMBOLS
 

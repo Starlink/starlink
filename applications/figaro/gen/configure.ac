@@ -19,6 +19,10 @@ AC_PROG_LIBTOOL
 dnl    Look for endian-ness (SPARC, Motorola and PowerPC's are all big-endian)
 AC_C_BIGENDIAN
 
+dnl Do not want binaries to be shared against this deprecated library.
+AC_DISABLE_SHARED
+
+dnl    If you wish to configure extra files, you can add them to this
 dnl    Other options here, such as
 STAR_CNF_COMPATIBLE_SYMBOLS
 
