@@ -258,6 +258,7 @@
                                         ! (radians)
       DOUBLE PRECISION LONG2_RAD        ! apparent RA of telescope centre at
                                         ! MJD2 (radians)
+      CHARACTER*(15)   LOCAL_COORDS     ! Coordinate system of MAP_X and MAP_Y
       REAL             MAP_X            ! x offset of map centre from telescope
                                         ! centre (arcsec)
       REAL             MAP_Y            ! y offset of map centre from telescope
@@ -491,6 +492,20 @@
      :  MAP_Y, STATUS)
       MAP_Y = MAP_Y / REAL (R2AS)
 
+*     and the coordinate frame of these offsets
+*     not sure whether old files have this parameter so test for status
+*     If it is not available then assume it is CENTRE_COORDS
+
+      IF (STATUS .EQ. SAI__OK) THEN
+         CALL SCULIB_GET_FITS_C(SCUBA__MAX_FITS, N_FITS, FITS,
+     :        'LOCL_CRD', LOCAL_COORDS, STATUS)
+
+         IF (STATUS .NE. SAI__OK) THEN
+            CALL ERR_ANNUL(STATUS)
+            LOCAL_COORDS = CENTRE_COORDS
+         END IF
+      END IF
+
 *  the number of bolometers measured
 
       CALL SCULIB_GET_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS, 'N_BOLS',
@@ -613,7 +628,7 @@
 *  observation
 
       CALL SCULIB_CALC_APPARENT (LONG_RAD, LAT_RAD, LONG2_RAD,
-     :     LAT2_RAD, DBLE(MAP_X), DBLE(MAP_Y), CENTRE_COORDS, 
+     :     LAT2_RAD, 0.0D0, 0.0D0, CENTRE_COORDS, 
      :     %VAL(IN_LST_STRT_PTR), UT1, 
      :     MJD1, MJD2, RA_CENTRE, DEC_CENTRE, ROTATION, STATUS)
 
@@ -897,8 +912,9 @@
      :        JIGGLE_COUNT, JIGGLE_X, JIGGLE_Y, JIGGLE_P_SWITCH,
      :        RA_CENTRE, DEC_CENTRE,
      :        %VAL(IN_RA1_PTR), %VAL(IN_RA2_PTR), 
-     :        %VAL(IN_DEC1_PTR), %VAL(IN_DEC2_PTR), 0.0, 0.0,
+     :        %VAL(IN_DEC1_PTR), %VAL(IN_DEC2_PTR), UT1, UT1,
      :        0.0D0, 0.0D0, 0.0D0, 0.0D0, 0.0D0, 0.0D0,
+     :        LOCAL_COORDS, DBLE(MAP_X), DBLE(MAP_Y),
      :        0, POINT_LST, POINT_DAZ, POINT_DEL,
      :        SCUBA__NUM_CHAN, SCUBA__NUM_ADC,OUT_BOL_ADC,OUT_BOL_CHAN,
      :        BOL_DU3, BOL_DU4, .FALSE., FIRST_LST_RAD, SECOND_LST_RAD,
