@@ -50,8 +50,6 @@ S			[ \t\v\n\f]*
 IDENT			{L}({L}|{D})*
 
 %{
-#include <stdio.h>
-#include "y.tab.h"
 
 void count();
 void comment();

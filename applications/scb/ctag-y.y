@@ -58,6 +58,9 @@
 
 %{
 #define YYSTYPE char *
+
+char *snew( char * );
+char *scat( int, ... );
 %}
 
 %%
@@ -75,16 +78,16 @@ external_definition
 unit
 	: f77_define_macro '(' identifier ')' '(' nonexecutable_code ')' 
 	  function_body
-		{ $$ = scat( 8, $1, $2, anchor( "name", $3, 1 ), 
+		{ $$ = scat( 8, $1, $2, canchor( "name", $3, 1 ), 
 		             $4, $5, $6, $7, $8 ); }
 	| f77_define_macro '(' identifier ')' '(' nonexecutable_code ')' ';'
 		{ $$ = scat( 8, $1, $2, $3, $4, $5, $6, $7, $8 ); }
 	| FUNC_NAME '(' nonexecutable_code ')' function_body
-		{ $$ = scat( 5, anchor( "name", $1, 0 ), $2, $3, $4, $5 ); }
+		{ $$ = scat( 5, canchor( "name", $1, 0 ), $2, $3, $4, $5 ); }
 	| FUNC_NAME '(' nonexecutable_code ')' ';'
 		{ $$ = scat( 5, $1, $2, $3, $4, $5 ); }
 	| FUNC_NAME '(' ')' function_body
-		{ $$ = scat( 4, anchor( "name", $1, 0 ), $2, $3, $4 ); }
+		{ $$ = scat( 4, canchor( "name", $1, 0 ), $2, $3, $4 ); }
 	| FUNC_NAME '(' ')' ';'
 		{ $$ = scat( 4, $1, $2, $3, $4 ); }
 	| declaration_word
@@ -144,7 +147,7 @@ nonexecutable_item
 	: declaration_word
 		{ $$ = $1; }
 	| FUNC_NAME '(' nonexecutable_code ')'
-		{ $$ = scat( 4, anchor( "href", $1, 0 ), $2, $3, $4 ); }
+		{ $$ = scat( 4, canchor( "href", $1, 0 ), $2, $3, $4 ); }
 	| ';'
 	;
 
@@ -157,11 +160,11 @@ executable_code
 
 executable_item
 	: F77_CALL '(' identifier ')' 
-		{ $$ = scat( 4, $1, $2, anchor( "href", $3, 1 ), $4 ); }
+		{ $$ = scat( 4, $1, $2, canchor( "href", $3, 1 ), $4 ); }
 	| FUNC_NAME '(' executable_code ')'
-		{ $$ = scat( 4, anchor( "href", $1, 0 ), $2, $3, $4 ); }
+		{ $$ = scat( 4, canchor( "href", $1, 0 ), $2, $3, $4 ); }
 	| FUNC_NAME '(' ')'
-		{ $$ = scat( 3, anchor( "href", $1, 0 ), $2, $3 ); }
+		{ $$ = scat( 3, canchor( "href", $1, 0 ), $2, $3 ); }
 	| reserved
 		{ $$ = $1; }
 	| identifier
@@ -252,10 +255,12 @@ identifier
 	;
 
 %%
+
+#include "ctag-l.c"
+
 #include <stdio.h>
 
-extern char yytext[];
-extern int column;
+   extern char *yytext;
 
    yyerror(char *s) { 
       fflush(stdout);
@@ -263,121 +268,18 @@ extern int column;
    }
 
 
-#include <stdarg.h>
+#include <ctype.h>
 #include <string.h>
 #include <stdlib.h>
-#include <ctype.h>
-
-   char *snew( char *str ) {
-/*+
-*  Name:
-*     snew
-* 
-*  Invocation:
-*     string = snew( str );
-* 
-*  Purpose:
-*     Copy a string into malloc'd space.
-* 
-*  Arguments:
-*     str = char *
-*        The string to be copied (must end with '\0').
-* 
-*  Return Value:
-*     string = char *
-*        A string with the same contents as str, but in a newly malloc'd
-*        location.
-* 
-*  Description:
-*     This routine just mallocs some space and copies the given string
-*     into it.  The purpose of this is so that the resulting pointer 
-*     can be passed to routines which assume their arguments have been
-*     malloc'd and may be free'd.
-*-
-*/
-      char *string;
-
-      string = malloc( strlen( str ) + 1 );
-      strcpy( string, str );
-      return( string );
-   }
  
  
-   char *scat( int n, ... ) {
+   char *canchor( char *attrib, char *fname, int f77flag ) {
 /*+
 *  Name:
-*     scat
+*     canchor
 * 
 *  Invocation:
-*     string = scat( n, ... )
-* 
-*  Purpose:
-*     Concatenate a list of strings.
-* 
-*  Arguments:
-*     n = int
-*        The number of strings to be concatenated.
-*     sp1, sp2, ... = char *
-*        The other arguments are all strings, and there are n of them.
-*        free() is called on each of them, so they must have been malloc'd
-*        at some time in the past, and must not be used subsequent to
-*        passing to this function.
-* 
-*  Return value:
-*     string = char *
-*        The return value is a string containing the concatenation of
-*        all the strings supplied.  It is obtained using malloc, so
-*        should be free'd at some time in the future.
-* 
-*  Description:
-*     This routine returns a newly malloc'd string which is the concatenation
-*     of all the strings supplied to it as arguments.  Each of those arguments
-*     gets free'd by this routine, so they must have been malloc'd (probably
-*     by this routine) in the past, and must not be referred to again after
-*     calling this routine.
-*-
-*/
-
-/* Local variables. */
-      va_list ap;
-      int len, i;
-      char *string, *sp;
-
-/* Work out the length of the final string. */
-      len = 1;
-      va_start( ap, n );
-      for ( i = 0; i < n; i++ ) {
-         sp = va_arg( ap, char * );
-         len += strlen( sp );
-      }
-      va_end( ap );
-
-/* Allocate the memory we will need, and initialise it. */
-      string = malloc( len + 1 );
-      *string = '\0';
-
-/* Copy the arguments into the allocated space, calling free() on each 
- * one as we go along. */
-      va_start( ap, n );
-      for ( i = 0; i < n; i++ ) {
-         sp = va_arg( ap, char * );
-         strcat( string, sp );
-         free( sp );
-      }
-      va_end( ap );
-
-/* Return. */
-      return( string );
-   }
-   
-
-   char *anchor( char *attrib, char *fname, int f77flag ) {
-/*+
-*  Name:
-*     anchor
-* 
-*  Invocation:
-*     string = anchor( attrib, fname, f77flag )
+*     string = canchor( attrib, fname, f77flag )
 * 
 *  Purpose:
 *     Generates an HTML-like anchor tag around a string.
@@ -448,7 +350,6 @@ extern int column;
       return( string );
    }
       
-
 
    
 /* $Id$ */
