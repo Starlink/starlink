@@ -1,13 +1,56 @@
+This is V2.1.5 (February 8 2000). New features include:
+- Small inaccuracy in crowding-flag positioning fixed.
+- Fixed division by zero in local background in MASK_TYPE
+  CORRECT mode.
+- Risk of segmentation fault with huge weight maps fixed.
+
+/*- Previous notes for V2.1.4 (November 13 1999) */
+- Quote (') symbol now properly handled in FITS headers.
+- Removed display of debug information inadvertently left
+  in the previous release.
+
+/*- Previous notes for V2.1.3 (September 14 1999) */
+- Bug in ASSOC on Linux systems fixed.
+- Background bug in WEIGHT_TYPE NONE,MAP_WEIGHT mode fixed.
+- THRESH_TYPE ABSOLUTE now works on weighted images.
+
+/*- Previous notes for V2.1.0 (May 24 1999) */
+- Better formatting of output flags.
+- New display.
+- Total robust handling of weight-maps during background-
+  determination.
+- (tiny) differences between single and double-image results
+  suppressed.
+- New (experimental) _PROFILE photometric parameters.
+- New WEIGHT_GAIN parameter (see doc).
+
+/*- Previous notes for V2.0.22 (April 9 1999) */
+- Many memory leaks fixed.
+- CLEANing bug with very faint sources fixed.
+- BACKGROUND_RMS check-images are now operational in
+  single-image mode.
+- Documentation improved.
+
+/*- Previous notes for V2.0.21 (March 2 1999) */
+This is V2.0.21 (March 2 1999). New features include:
+- BACK_VALUE bug fixed.
+- XPEAK and YPEAK offset bugs fixed.
+
+/*- Previous notes for V2.0.20 (February 19 1999) */
+- ASSOC bug in 2 ASSOC_PARAMS mode fixed.
+- Variable thresholding is now taken into account when
+  computing FWHM and CLASS_STAR if WEIGHT_TYPE != NONE
+
 This version slightly modified by Peter W. Draper 24 November 1998. 
 - Fixed missing include files  (lint specified)
 - Changed ASCII_SKYCAT to output correct column names (fixed id, ra,
   dec and mag no longer needed).
 
-This is V2.0.19 (January 13 1999). New features include:
+/*- Previous notes for V2.0.19 (January 13 1999) */
 - SEGMENTATION numbering problem fixed.
 - New Makefile macro-definitions.
 
-This is V2.0.18 (December 28 1998). New features include:
+/*- Previous notes for V2.0.18 (December 28 1998) */
 - lint warnings fixed.
 - new ASSOC_TYPE NEAREST option.
 - MAP_RMS measurement mode and FLAG_TYPE MAX bugs fixed.
