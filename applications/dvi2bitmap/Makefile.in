@@ -39,6 +39,7 @@ XBMBitmap.o: XBMBitmap.cc XBMBitmap.h Bitmap.h
 # Distribution
 configure: config/configure.in
 	autoconf config/configure.in >configure
+	chmod 755 configure
 
 dvi2bitmap.mantext: dvi2bitmap.1
 	nroff -man dvi2bitmap.1 >dvi2bitmap.mantext
