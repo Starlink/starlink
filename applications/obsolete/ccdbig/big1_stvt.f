@@ -52,6 +52,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
 *  Arguments Given:
+      CHARACTER * ( * ) DTYPE
       REAL VAL
       INTEGER SIZE
 
@@ -72,19 +73,19 @@
 
 *  Call appropriate routine according to data type.
       IF      ( DTYPE .EQ. '_WORD'    ) THEN
-         CALL BIG1_STVW( VAL, SIZE, ARR, STATUS )
+         CALL BGG1_STVW( VAL, SIZE, ARR, STATUS )
       ELSE IF ( DTYPE .EQ. '_INTEGER' ) THEN
-         CALL BIG1_STVI( VAL, SIZE, ARR, STATUS )
+         CALL BGG1_STVI( VAL, SIZE, ARR, STATUS )
       ELSE IF ( DTYPE .EQ. '_REAL'    ) THEN
-         CALL BIG1_STVR( VAL, SIZE, ARR, STATUS )
+         CALL BGG1_STVR( VAL, SIZE, ARR, STATUS )
       ELSE IF ( DTYPE .EQ. '_DOUBLE'  ) THEN
-         CALL BIG1_STVD( VAL, SIZE, ARR, STATUS )
+         CALL BGG1_STVD( VAL, SIZE, ARR, STATUS )
       ELSE
          STATUS = SAI__ERROR
          CALL MSG_SETC( 'DTYPE', DTYPE )
          CALL ERR_REP( 'CCDBGEN_TYPE',
-        :              'CCDBGEN: Invalid data type (^DTYPE)', STATUS )
+     :                 'CCDBGEN: Invalid data type (^DTYPE)', STATUS )
       END IF
 
       END
-* $Id: bgg1_stv.gen,v 1.2 1998/07/03 13:28:28 mbt Exp $
+* $Id: big1_stvt.f,v 1.1 1998/07/03 13:34:52 mbt Exp $

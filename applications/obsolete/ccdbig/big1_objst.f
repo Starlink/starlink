@@ -117,8 +117,6 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
 *  Global Variables:
-      COMMON /PM    / PARM1, PARM2, PARMN, PARSQ, CHANGE, PARRAD
-      COMMON /PMN   / PARMN1, PARMN2, PARMNN, CMIX
 
 *  Arguments Given:
       CHARACTER * ( * ) DTYPE
@@ -153,22 +151,22 @@
 
 *  Call appropriate routine according to data type.
       IF      ( DTYPE .EQ. '_WORD'    ) THEN
-         CALL BIG1_OBJSW( DTYPE, FRAME, XDIM, YDIM, XORIG, YORIG,
+         CALL BGG1_OBJSW( DTYPE, FRAME, XDIM, YDIM, XORIG, YORIG,
      :                    XPOS, YPOS, INTENS, NOBJ, GSIGM, CROSS,
      :                    COMIX, ELLIP, ANGLE, BACK, SAT, NSIGMA,
      :                    EXPAND, SCALE, STATUS )
       ELSE IF ( DTYPE .EQ. '_INTEGER' ) THEN
-         CALL BIG1_OBJSI( DTYPE, FRAME, XDIM, YDIM, XORIG, YORIG,
+         CALL BGG1_OBJSI( DTYPE, FRAME, XDIM, YDIM, XORIG, YORIG,
      :                    XPOS, YPOS, INTENS, NOBJ, GSIGM, CROSS,
      :                    COMIX, ELLIP, ANGLE, BACK, SAT, NSIGMA,
      :                    EXPAND, SCALE, STATUS )
       ELSE IF ( DTYPE .EQ. '_REAL'    ) THEN
-         CALL BIG1_OBJSR( DTYPE, FRAME, XDIM, YDIM, XORIG, YORIG,
+         CALL BGG1_OBJSR( DTYPE, FRAME, XDIM, YDIM, XORIG, YORIG,
      :                    XPOS, YPOS, INTENS, NOBJ, GSIGM, CROSS,
      :                    COMIX, ELLIP, ANGLE, BACK, SAT, NSIGMA,
      :                    EXPAND, SCALE, STATUS )
       ELSE IF ( DTYPE .EQ. '_DOUBLE'  ) THEN
-         CALL BIG1_OBJSD( DTYPE, FRAME, XDIM, YDIM, XORIG, YORIG,
+         CALL BGG1_OBJSD( DTYPE, FRAME, XDIM, YDIM, XORIG, YORIG,
      :                    XPOS, YPOS, INTENS, NOBJ, GSIGM, CROSS,
      :                    COMIX, ELLIP, ANGLE, BACK, SAT, NSIGMA,
      :                    EXPAND, SCALE, STATUS )
@@ -176,9 +174,9 @@
          STATUS = SAI__ERROR
          CALL MSG_SETC( 'DTYPE', DTYPE )
          CALL ERR_REP( 'CCDBGEN_TYPE',
-        :              'CCDBGEN: Invalid data type (^DTYPE)', STATUS )
+     :                 'CCDBGEN: Invalid data type (^DTYPE)', STATUS )
       END IF
 
 *  All done
       END
-* $Id: ccd1_objs.f,v 1.1 1997/06/27 09:01:41 pwd Exp $
+* $Id: big1_objst.f,v 1.1 1998/07/03 14:05:16 mbt Exp $
