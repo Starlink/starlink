@@ -79,14 +79,15 @@ static int ast_resample_interp##X( int ndim, \
                                    const int lbnd[], const int ubnd[], \
                                    const Xtype in[], const Xtype in_var[], \
                                    int npoint, const int offset[], \
-                                   const double *const coord[], int flags, \
-                                   Xtype badval, const double params[], \
+                                   const double *const coords[], \
+                                   const double params[], int flags, \
+                                   Xtype badval, \
                                    Xtype *out, Xtype *out_var ) { \
    DECLARE_INTEGER(STATUS); \
    int result; \
 \
 /* Obtain the C status and then invoke the FORTRAN 77 interpolation \
-   function via the stored pointer. Note that the "coord" array we \
+   function via the stored pointer. Note that the "coords" array we \
    pass to FORTRAN has to be a contiguous 2-d array, so we must \
    de-reference one level of pointer compared to the C case. */ \
    STATUS = astStatus; \
@@ -97,10 +98,10 @@ static int ast_resample_interp##X( int ndim, \
                                        Ftype##_ARRAY_ARG(in_var), \
                                        INTEGER_ARG(&npoint), \
                                        INTEGER_ARRAY_ARG(offset), \
-                                       DOUBLE_ARRAY_ARG(coord[ 0 ]), \
+                                       DOUBLE_ARRAY_ARG(coords[ 0 ]), \
+                                       DOUBLE_ARRAY_ARG(params), \
                                        INTEGER_ARG(flags), \
                                        Ftype##_ARG(&badval), \
-                                       DOUBLE_ARRAY_ARG(params), \
                                        Ftype##_ARRAY_ARG(out), \
                                        Ftype##_ARRAY_ARG(out_var), \
                                        INTEGER_ARG(&STATUS) ); \
@@ -191,11 +192,11 @@ F77_INTEGER_FUNCTION(ast_resample##f)( INTEGER(THIS), \
                                        Ftype##_ARRAY(IN_VAR), \
                                        INTEGER(INTERP), \
                                        F77_INTEGER_TYPE (* UINTERP)(), \
+                                       DOUBLE_ARRAY(PARAMS), \
                                        DOUBLE(TOL), \
                                        INTEGER(MAXPIX), \
                                        INTEGER(FLAGS), \
                                        Ftype(BADVAL), \
-                                       DOUBLE_ARRAY(PARAMS), \
                                        INTEGER(NDIM_OUT), \
                                        INTEGER_ARRAY(LBND_OUT), \
                                        INTEGER_ARRAY(UBND_OUT), \
@@ -211,11 +212,11 @@ F77_INTEGER_FUNCTION(ast_resample##f)( INTEGER(THIS), \
    GENPTR_##Ftype##_ARRAY(IN) \
    GENPTR_##Ftype##_ARRAY(IN_VAR) \
    GENPTR_INTEGER(INTERP) \
+   GENPTR_DOUBLE_ARRAY(PARAMS) \
    GENPTR_DOUBLE(TOL) \
    GENPTR_INTEGER(MAXPIX) \
    GENPTR_INTEGER(FLAGS) \
    GENPTR_##Ftype(BADVAL) \
-   GENPTR_DOUBLE_ARRAY(PARAMS) \
    GENPTR_INTEGER(NDIM_OUT) \
    GENPTR_INTEGER_ARRAY(LBND_OUT) \
    GENPTR_INTEGER_ARRAY(UBND_OUT) \
@@ -255,8 +256,8 @@ F77_INTEGER_FUNCTION(ast_resample##f)( INTEGER(THIS), \
       } \
       RESULT = astResample##X( astI2P( *THIS ), *NDIM_IN, \
                                LBND_IN, UBND_IN, IN, in_var, \
-                               interp, *TOL, *MAXPIX, \
-                               *FLAGS, *BADVAL, PARAMS, \
+                               interp, PARAMS, *TOL, *MAXPIX, \
+                               *FLAGS, *BADVAL, \
                                *NDIM_OUT, LBND_OUT, UBND_OUT, \
                                LBND, UBND, OUT, out_var ); \
    ) \
