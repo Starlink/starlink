@@ -106,7 +106,7 @@
       NOUTP = 0
 
 *  Go through list of input points.
-      DO I = 1, NINP
+      DO 1 I = 1, NINP
 
 *  Determine whether this point is inside the polygon.
          CALL CCD1_PNPLY( INPX( I ), INPY( I ), VERTX, VERTY, NVERT,
@@ -119,8 +119,7 @@
             OUTPY( NOUTP ) = INPY( I )
             IND( NOUTP ) = I
          END IF
-
-      END DO
+ 1    CONTINUE
 
       END
 * $Id$

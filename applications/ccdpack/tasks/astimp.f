@@ -296,7 +296,7 @@
       DUPID = .FALSE.
 
 *  Read frameset objects one by one from file.
-      DO I = 1, MXFSET
+      DO 11 I = 1, MXFSET
 
 *  Read next object or exit loop
          FSET( I ) = AST_READ( FCHAN, STATUS )
@@ -339,8 +339,7 @@
          BUF( 31: ) = DMCUR( 1:18 )
          BUF( 51: ) = ID
          CALL CCD1_MSG( ' ', BUF, STATUS )
-
-      END DO
+ 11   CONTINUE
 
 *  Abort if the maximum number of framesets in the AST file is exceeded.
       STATUS = SAI__ERROR
@@ -405,7 +404,7 @@
       IF ( STATUS .NE. SAI__OK ) GO TO 99
 
 *  Loop over NDFs
-      DO I = 1, NNDF
+      DO 12 I = 1, NNDF
          CALL IRG_NDFEX( INGRP, I, INDF, STATUS )
 
 *  Output name of NDF.
@@ -415,14 +414,14 @@
          
 *  Go through list of IDs to see if any match this NDF.
          MATCH = .FALSE.
-         DO J = 1, NFSET
+         DO 13 J = 1, NFSET
             CALL GRP_GET( IFGRP, J, 1, ID, STATUS )
             CALL CCD1_NMID( INDF, ID, INDXS( I ), MATCH, STATUS )
             IF ( MATCH ) THEN
                FSMAT = FSET( J )
                GO TO 2
             END IF
-         END DO
+ 13      CONTINUE
  2       CONTINUE
 
 *  No matching frameset in file; inform user.
@@ -518,8 +517,7 @@
             END IF
 
          END IF
-
-      END DO
+ 12   CONTINUE
 
 *  Exit with error label.  Tidy up after this.
  99   CONTINUE

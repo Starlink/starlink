@@ -461,7 +461,7 @@
       DUPID = .FALSE.
 
 *  Loop over NDFs
-      DO I = 1, NNDF
+      DO 1 I = 1, NNDF
          CALL IRG_NDFEX( INGRP, I, INDF, STATUS )
 
 *  Output name of NDF.
@@ -583,8 +583,7 @@
 
 *  End AST context.
          CALL AST_END( STATUS )
-
-      END DO
+ 1    CONTINUE 
 
 *  Warn if there were non-matching domain names or duplicate frameset
 *  ID values.
