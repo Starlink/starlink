@@ -22,6 +22,7 @@ dnl   things in GIFBitmap.cc), so if anything goes wrong here, it's the
 dnl   compiler's fault, not mine.
 dnl AC_HEADER_STDC
 dnl AC_CHECK_HEADERS(fcntl.h unistd.h)
+AC_CHECK_HEADERS(assert.h)
 
 dnl   Checks for library functions (...nor these)
 dnl AC_FUNC_VPRINTF
@@ -50,5 +51,9 @@ AC_ARG_ENABLE(gif,
 [  --enable-gif            Enable output of GIF files],
    AC_DEFINE(ENABLE_GIF) GIFOBJ="GIFBitmap.o")
 
+dnl   Specify support for Kpathsea library
+AC_ARG_WITH(kpathsea,
+[  --with-kpathsea         Enable use of Kpathsea library],
+   AC_DEFINE(ENABLE_KPATHSEA) LIBS="$LIBS -lkpathsea")
 
 AC_OUTPUT(Makefile)
