@@ -1,0 +1,49 @@
+## NDF2DIPSO - Writes an NDF to a DIPSO-format file, which can be read by the DIPSO READ command.
+   
+#+
+#  Name:
+#     NDF2DIPSO.IFL
+
+#  Type of module:
+#     ADAM A-task parameter interface.
+
+#  Author:
+#     JM: Jo Murray (STARLINK)
+#     MJC: Malcolm J. Currie (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     1990 August 21st (JM):
+#	 Original version.
+#     1992 February 4 (MJC):
+#     	 Renamed the file parameters to IN and OUT.  Added help from
+#	 a library. Corrected caption and parameter help.
+#     1992 August 27 (MJC):
+#     	 Make the current NDF the suggested default for IN.
+#     {enter_further_changes_here}
+
+#-
+
+interface NDF2DIPSO
+
+   helplib        'CONVERT_DIR:CONVERT'
+
+   parameter      IN                # Input NDF
+      position    1
+      type        'NDF'
+      access      'READ'
+      ppath       'GLOBAL,CURRENT'
+      prompt      'NDF to be converted'
+      association '<-GLOBAL.DATA_ARRAY'
+      helpkey     '*'
+   endparameter
+
+   parameter      OUT               # Output DIPSO file
+      position    2
+      access      'WRITE'
+      ppath       'CURRENT'
+      prompt      'Filename for DIPSO file'
+      helpkey     '*'
+   endparameter
+
+endinterface
