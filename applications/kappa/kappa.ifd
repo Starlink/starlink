@@ -10207,99 +10207,128 @@ iraf! {
 
       action look {
 
-         parameter inpic {
-            position 1
-            type IMAGE
-            access READ
-            vpath PROMPT
-            ppath GLOBAL
-            association <->GLOBAL.DATA_ARRAY
-            prompt {Image to be inspected}
-            help "Give name of the IMAGE structure holding the 2-d data array to be inspected."
-          }
-
-         parameter choice {
+         parameter centre {
             position 2
             type LITERAL
-            vpath PROMPT
-            ppath CURRENT DYNAMIC DEFAULT
-            default Peep
-            prompt {Peep, Examine or List}
-            help "Peep lists a 7x7 neighbourhood to screen, Examine reports an NxM box to screen, List gives a listing to a file."
-          }
-
-         parameter xcen {
-            type _INTEGER
-            access READ
-            vpath PROMPT
-            ppath CURRENT DYNAMIC
-            prompt {x centre pixel index of 7x7 box}
-            help "Give the x centre pixel index of the sub-array to be peeped."
-          }
-
-         parameter ycen {
-            type _INTEGER
-            vpath PROMPT
-            access READ
-            ppath CURRENT DYNAMIC
-            prompt {y centre pixel index of 7x7 box}
-            help "Give the y centre pixel index of the sub-array to be peeped."
-          }
-
-         parameter xlow {
-            type _INTEGER
-            vpath PROMPT
-            access READ
-            ppath CURRENT DYNAMIC
-            prompt {x start pixel index of sub-array}
-            help "Give the x start pixel index of the sub-array to be inspected."
-          }
-
-         parameter ylow {
-            type _INTEGER
-            vpath PROMPT
-            access READ
-            ppath CURRENT DYNAMIC
-            prompt {y start pixel index of sub-array}
-            help "Give the y start pixel index of the sub-array to be inspected."
-          }
-
-         parameter xsize {
-            type _INTEGER
-            vpath PROMPT
-            access READ
+            prompt {Position at the centre of the listing}
             ppath DYNAMIC
-            prompt {x size of sub-array}
-            help "Give the x size of the sub-array to be inspected."
+            helpkey *
           }
 
-         parameter ysize {
-            type _INTEGER
-            access READ
-            vpath PROMPT
-            ppath DYNAMIC
-            prompt {y size of sub-array}
-            help "Give the y size of the sub-array to be inspected."
+         parameter comp {
+            position 8
+            type LITERAL
+            vpath DEFAULT
+            prompt {Component to list}
+            ppath CURRENT DEFAULT
+            default Data
+            helpkey *
           }
 
-         parameter filename {
+         parameter format {
+            position 7
+            type LITERAL
+            vpath DEFAULT
+            prompt {Format for listing}
+            ppath CURRENT DEFAULT
+            default Strips
+            helpkey *
+          }
+
+         parameter lbound {
+            position 4
+            type LITERAL
+            prompt {Position at the bottom left corner of the listing}
+            ppath CURRENT DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter logfile {
+            position 6
             type FILENAME
             access READ
-            vpath PROMPT
-            ppath DEFAULT
-            default lookout.lis
-            prompt {Name of listing file}
-            help "Give name of the text file to contain the sub-array listing."
+            vpath DEFAULT
+            prompt {File to store listing in}
+            ppath CURRENT DEFAULT
+            default !
+            helpkey *
           }
 
-         parameter another {
-            type _LOGICAL
+         parameter maxlen {
+            type _INTEGER
+            access READ
+            vpath DEFAULT
+            prompt {The line length for the listing}
+            ppath CURRENT DEFAULT
+            default 80
+            helpkey *
+          }
+
+         parameter ndf {
+            position 1
+            type NDF
             access READ
             vpath PROMPT
-            ppath DEFAULT
-            default TRUE
-            prompt {Another inspection ?}
-            help "Answer YES if another sub-array is to be peeped or listed."
+            prompt {NDF to examine}
+            ppath GLOBAL
+            association <->GLOBAL.DATA_ARRAY
+            helpkey *
+          }
+
+         parameter quiet {
+            type _LOGICAL
+            vpath DEFAULT
+            prompt {Is screen output to be suppressed?}
+            ppath CURRENT DEFAULT
+            default FALSE
+            helpkey *
+          }
+
+         parameter size {
+            position 3
+            type _INTEGER
+            access READ
+            vpath DEFAULT
+            prompt {The dimensions (in pixels) of the area to be listed}
+            ppath CURRENT DEFAULT
+            default 7
+            helpkey *
+          }
+
+         parameter style {
+            type LITERAL
+            vpath CURRENT DEFAULT
+            prompt {Formatting style for data values}
+            ppath CURRENT DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter ubound {
+            position 5
+            type LITERAL
+            prompt {Position at the top right corner of the listing}
+            ppath CURRENT DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter useaxis {
+            type LITERAL
+            vpath DEFAULT
+            prompt {The axes to be annotated}
+            ppath DYNAMIC DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter value {
+            type _DOUBLE
+            access WRITE
+            vpath DEFAULT
+            default 0.0D0
+            helpkey *
           }
 
       }
