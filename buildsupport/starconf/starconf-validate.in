@@ -22,6 +22,7 @@
 #
 
 ($progname = $0) =~ s+.*/++;
+$version = '@PACKAGE_VERSION@';
 $force = 0;
 $srcdir = undef;
 
@@ -30,6 +31,28 @@ while ($#ARGV >= 0) {
     $arg eq '--force' && do {
         $force = 1;
         next;
+    };
+
+    $arg eq '--help' && do {
+        print <<EOD;
+Usage: $progname [option] [srcdir]
+
+  Check that the [srcdir] conforms to the conventions of a Starlink
+  source directory.  [srcdir] defaults to '.'.  The exit status of the program
+  is the number of errors and warnings found.
+
+  Options:
+    --force    If present, the exit status represents only the number of
+               outright errors.
+    --help     Prints this message and exits
+    --version  Prints version number and exits
+EOD
+        exit(0);
+    };
+
+    $arg eq '--version' && do {
+        print "$progname $version\n";
+        exit(0);
     };
 
     $arg =~ /^-/ && do {
@@ -62,7 +85,7 @@ defined($srcdir) || do { $srcdir = '.'; };
                           };
 @extra_checkins =       qw{ Makefile.in
                             component.xml
-                            configure 
+                            configure
                             starconf.status
                           };
 # The first three below are extracted from starconf.status;
@@ -78,6 +101,7 @@ defined($srcdir) || do { $srcdir = '.'; };
                             ltmain.sh
                             missing
                             mkinstalldirs
+                            starconf.status.local
                           };
 $nwarnings = 0;
 $nerrors = 0;
