@@ -3,6 +3,11 @@ interface IARITH
     position 1
     type '_CHAR'
   endparameter
+  parameter CACHE
+    type '_LOGICAL'
+    vpath 'DEFAULT'
+    default N
+  endparameter
   parameter INP
     position 2
     type 'LITERAL'
