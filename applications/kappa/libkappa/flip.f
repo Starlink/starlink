@@ -146,12 +146,12 @@
       CALL NDF_BEGIN
 
 *  Obtain the input NDF and determine its dimension sizes.
-      CALL NDG_ASSOCL( 'IN', 'READ', NDF1, STATUS )
+      CALL LPG_ASSOC( 'IN', 'READ', NDF1, STATUS )
       CALL NDF_DIM( NDF1, NDF__MXDIM, DIM, NDIM, STATUS )
 
 *  Create the output NDF, propagating the axis and units values (some of
 *  the propagated axis values and WCS component may later be over-written).
-      CALL NDG_PROPL( NDF1, 'Axis,Units,Wcs', 'OUT', NDF2, STATUS )
+      CALL LPG_PROP( NDF1, 'Axis,Units,Wcs', 'OUT', NDF2, STATUS )
 
 *  Determine which NDF dimension the pixels are to be reversed along.
 *  Only do this if there is a choice.

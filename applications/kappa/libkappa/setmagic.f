@@ -190,7 +190,7 @@
       CALL NDF_BEGIN
 
 *  Obtain the identifier of the NDF to be displayed.
-      CALL NDG_ASSOCL( 'IN', 'READ', NDFI, STATUS )
+      CALL LPG_ASSOC( 'IN', 'READ', NDFI, STATUS )
 
 *  Find which component(s) to alter.
 *  =================================
@@ -248,7 +248,7 @@
 *  Propagate the QUALITY, UNITS, WCS and AXIS components from the input
 *  NDF to the output, and the arrays not to be processed.
       IF ( LCOMP( 1 ) .AND. LCOMP( 2 ) ) THEN
-         CALL NDG_PROPL( NDFI, 'Quality,Units,Axis,WCS', 'OUT', NDFO,
+         CALL LPG_PROP( NDFI, 'Quality,Units,Axis,WCS', 'OUT', NDFO,
      :                  STATUS )
 
 *  This application supports all the non-complex numeric types
@@ -263,7 +263,7 @@
          CALL NDF_STYPE( DTYPE, NDFO, 'Data,Variance', STATUS )
 
       ELSE IF ( LCOMP( 1 ) ) THEN
-         CALL NDG_PROPL( NDFI, 'Variance,Quality,Units,Axis,WCS', 'OUT',
+         CALL LPG_PROP( NDFI, 'Variance,Quality,Units,Axis,WCS', 'OUT',
      :                  NDFO, STATUS )
 
          CALL NDF_MTYPE( '_BYTE,_UBYTE,_WORD,_UWORD,_INTEGER,_REAL,'/
@@ -271,7 +271,7 @@
      :                   DTYPE, STATUS )
 
       ELSE IF ( LCOMP( 2 ) ) THEN
-         CALL NDG_PROPL( NDFI, 'Data,Quality,Units,Axis,WCS', 'OUT', 
+         CALL LPG_PROP( NDFI, 'Data,Quality,Units,Axis,WCS', 'OUT', 
      :                  NDFO, STATUS )
 
 *  For this purpose Error and Variance structures are synonymous.

@@ -1,4 +1,4 @@
-      SUBROUTINE KPG1_GTPOS( PARAM, IWCS, CC, BC, STATUS )
+      SUBROUTINE KPG1_GTPOS( PARAM, IWCS, NULL, CC, BC, STATUS )
 *+
 *  Name:
 *     KPG1_GTPOS
@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG1_GTPOS( PARAM, IWCS, CC, BC, STATUS )
+*     CALL KPG1_GTPOS( PARAM, IWCS, NULL, CC, BC, STATUS )
 
 *  Description:
 *     This routine obtains a spatial position from the environment, using
@@ -40,6 +40,11 @@
 *        The name of the parameter to use.
 *     IWCS = INTEGER (Given)
 *        A pointer to an AST Frame or FrameSet.
+*     NULL = LOGICAL (Given)
+*        If TRUE, a null (!) parameter value will result in the dynamic
+*        default value being used. If FALSE (or if there is no dynamic
+*        default), a null parameter value will result in a PAR__NULL error
+*        status.
 *     CC( * ) = DOUBLE PRECISION (Given and Returned)
 *        On entry, holds the position to use as the dynamic default for the
 *        parameter, in the Current Frame of the supplied FrameSet (or
@@ -71,6 +76,8 @@
 *        the supplied default position. 
 *     30-AUG-1999 (DSB):
 *        If a null parameter is given use the dynamic default value.
+*     3-SEP-1999 (DSB):
+*        Added NULL argument.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -92,6 +99,7 @@
 *  Arguments Given:
       CHARACTER PARAM*(*)
       INTEGER IWCS
+      LOGICAL NULL
 
 *  Arguments Given and Returned:
       DOUBLE PRECISION CC( * )
@@ -278,7 +286,7 @@
 *  Construct a string holding the default position (a comma separated
 *  list of formatted axis values) using the Digits value set above.
          DPOS = AST_FORMAT( CURFRM, 1, CC( 1 ), STATUS )
-         IAT = CHR_LEN( DPOS )
+         IAT = CHR_LEN( POS )
          DO I = 2, NCAXES
             IAT = IAT + 1
             CALL CHR_APPND( AST_FORMAT( CURFRM, I, CC( I ), STATUS ),
@@ -326,8 +334,8 @@
          CALL PAR_GET0C( PARAM, POS, STATUS )
 
 *  If a null parameter value has been given, annul the error and return
-*  the dynamic default if there is a dynamic default.
-         IF( STATUS .EQ. PAR__NULL .AND. GOOD ) THEN
+*  the dynamic default if there is a dynamic default, and if NULL is TRUE.
+         IF( STATUS .EQ. PAR__NULL .AND. GOOD .AND. NULL ) THEN
             CALL ERR_ANNUL( STATUS )
             POS = DPOS
          END IF            

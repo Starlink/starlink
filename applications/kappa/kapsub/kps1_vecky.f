@@ -253,7 +253,7 @@
 
 *  Get a new value, limiting it to 95% of the width of the key zone.
 *  The value just calculated is used as the dynamic default.
-      CALL PAR_GDR0R( PARKEY, KEYDAT, 0.0, 95.0 * XM * VSCALE, .FALSE.,
+      CALL PAR_GDR0R( PARKEY, KEYDAT, 0.0, 95.0 * XM * VSCALE, .TRUE.,
      :                KEYDAT, STATUS )
 
 *  Format the data value into a character string.

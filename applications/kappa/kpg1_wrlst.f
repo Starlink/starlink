@@ -101,6 +101,7 @@
 
 *  Local Variables:
       CHARACTER CVAL*80          ! Character value obtained for the parameter
+      INTEGER CI                 ! CAT identifier
       INTEGER IPW                ! Pointer to work space
       INTEGER MAP                ! AST Pointer to Mapping
       INTEGER NBAX               ! No. of axes in BASE FRAME
@@ -112,11 +113,15 @@
 *  Start an AST context.
       CALL AST_BEGIN( STATUS )
 
-*  Get a character value for the parameter. This is done to see if a null
-*  parameter value is supplied. There is no need to create the positions
-*  list is a null parameter value is supplied.
-      CALL PAR_GET0C( PARAM, CVAL, STATUS )
-      IF( STATUS .NE. SAI__OK ) GO TO 999
+*  Access the catalogue. There is no need to create the positions
+*  list is a catalogue cannot be obtained.
+      CALL LPG_CATCREAT( PARAM, CI, STATUS )
+      IF( STATUS .NE. SAI__OK ) THEN
+         CALL ERR_BEGIN( STATUS )
+         CALL CAT_TRLSE( CI, STATUS )
+         CALL ERR_END( STATUS )
+         GO TO 999
+      END IF
 
 *  Get the simplified Mapping from the supplied Frame to the Base Frame.
       MAP = AST_SIMPLIFY( AST_GETMAPPING( IWCS, IFRM, AST__BASE, 

@@ -70,19 +70,19 @@
 *        the bounds of the existing plot (on both axes), and parameters 
 *        XLEFT, XRIGHT, YBOT and YTOP are ignored. This parameter is only
 *        accessed if parameter CLEAR is FALSE, and if there is another line 
-*        plot within the current picture. The dynamic default is to align
-*        the plots if the labels on the horizontal axes are the same, and
-*        not to align the plots if the labels are different. []
+*        plot within the current picture. If a null (!) value is supplied, 
+*        the plots are aligned if the labels on the horizontal axes are the 
+*        same, but they are not aligned if the labels are different. [!]
 *     AXES = _LOGICAL (Read)
 *        TRUE if labelled and annotated axes are to be drawn around the
-*        plot. The dynamic default is FALSE if the plot is being
-*        aligned with an existing plot (see parameter ALIGN), and
-*        TRUE otherwise. Parameters USEAXIS and YLOG determine the
-*        quantities used to annotated the horizontal and vertical axes
+*        plot. If a null (!) value is supplied, the value used is FALSE if 
+*        the plot is being aligned with an existing plot (see parameter 
+*        ALIGN), and TRUE otherwise. Parameters USEAXIS and YLOG determine 
+*        the quantities used to annotated the horizontal and vertical axes
 *        respectively. The width of the margins left for the annotation 
 *        may be controlled using parameter MARGIN. The appearance of the 
 *        axes (colours, fonts, etc) can be controlled using the parameter
-*        STYLE. []
+*        STYLE. [!]
 *     CLEAR = _LOGICAL (Read)
 *        If TRUE the current picture is cleared before the plot is 
 *        drawn. If CLEAR is FALSE not only is the existing plot retained, 
@@ -117,17 +117,18 @@
 *        TRUE if a key is to be plotted below the horizontal axis giving
 *        the positions at the start and end of the plot, within the
 *        current co-ordinate Frame of the NDF. If parameter USEAXIS is
-*        null (i.e. if the horizontal axis is annotated with offset from 
+*        zero (i.e. if the horizontal axis is annotated with offset from 
 *        the first array element), then the positions refer to the centres
 *        of the first and last elements in the supplied NDF, whether or not
 *        these elements are actually visible in the plot. If USEAXIS is not 
-*        null (i.e. if the horizontal axis is annotated with the value on 
+*        zero (i.e. if the horizontal axis is annotated with the value on 
 *        one of the axes of the NDFs current co-ordinate Frame), then the
 *        displayed positions correspond to the two ends of the visible
 *        section of the horizontal axis. The appearance of the key can be
-*        controlled using parameter KEYSTYLE. The dynamic default is to 
-*        produce a key if the current co-ordinate Frame of the supplied NDF 
-*        has 2 or more axes, and not to if it only has 1 axis. []
+*        controlled using parameter KEYSTYLE. If a null (!) value is 
+*        supplied, a key is produced if the current co-ordinate Frame of 
+*        the supplied NDF has 2 or more axes, but no key is produced if it 
+*        only has 1 axis. [!]
 *     KEYSTYLE = LITERAL (Read)
 *        A group of attribute settings describing the plotting style to use 
 *        for the key (see parameter KEY).
@@ -157,9 +158,9 @@
 *        Four values may be given, in the order - bottom, right, top, left. 
 *        If less than four values are given, extra values are used equal to 
 *        the first supplied value. If these margins are too narrow any axis 
-*        annotation may be clipped. The dynamic default is 0.18 (for all 
-*        edges) if either annotated axes or a key are produced, and zero 
-*        otherwise. []
+*        annotation may be clipped. If a null (!) value is supplied, the 
+*        value used is 0.18 (for all edges) if either annotated axes or a 
+*        key are produced, and zero otherwise. [!]
 *     MARKER = _INTEGER (Read)
 *        This parameter is only accessed if parameter MODE is set to
 *        "Chain" or "Mark". It specifies the symbol with which each
@@ -247,13 +248,12 @@
 *        parameter SHAPE). [current value]
 *     USEAXIS = LITERAL (Read)
 *        Specifies the quantity to be used to annotate the horizontal axis 
-*        of the plot. If USEAXIS is given a null (!) value, then the 
-*        distance along the profile from the centre of the first element in 
-*        the supplied NDF will be used. This will be measured in the current 
-*        co-ordinate Frame of the NDF. If USEAXIS is not null, then it
-*        gives the index of the axis which is to be used, and must be less 
-*        than or equal to the number of axes in the current co-ordinate 
-*        Frame of the NDF. 
+*        of the plot. The index or label of an axis within the current 
+*        co-ordinate Frame of the NDF should be supplied. Alternatively,
+*        if USEAXIS is given the value zero, then the distance along the 
+*        profile from the centre of the first element in the supplied NDF 
+*        will be used to annotate the axis. This will be measured in the 
+*        current co-ordinate Frame of the NDF. 
 *
 *        The quantity used to annotate the horizontal axis must have a
 *        defined value at all points in the array, and must increase or 
@@ -261,34 +261,37 @@
 *        used to annotate the horizontal axis, then an error will be
 *        reported if the profile passes through RA=0 because it will 
 *        introduce a non-monotonic jump in axis value (from 0h to 24h, or 
-*        24h to 0h). The dynamic default is 1 if the current co-ordinate 
-*        Frame in the NDF is 1-dimensional an null (!) otherwise. []
+*        24h to 0h). If a null (!) value is supplied, the value used is
+*        1 if the current co-ordinate Frame in the NDF is 1-dimensional 
+*        and zero otherwise. [!]
 *     XLEFT = LITERAL (Read)
 *        The axis value to place at the left hand end of the horizontal
-*        axis. The dynamic default is the value for the first element in the 
-*        supplied NDF (with a margin to include any horizontal error bar).
-*        The value supplied may be greater than or less than the value
-*        supplied for XRIGHT. A formatted value for the quantity specified 
-*        by parameter USEAXIS should be supplied. See also parameter ALIGN. []
+*        axis. If a null (!) value is supplied, the value used is the value 
+*        for the first element in the supplied NDF (with a margin to include 
+*        any horizontal error bar). The value supplied may be greater than or 
+*        less than the value supplied for XRIGHT. A formatted value for the 
+*        quantity specified by parameter USEAXIS should be supplied. See also 
+*        parameter ALIGN. [!]
 *     XRIGHT = LITERAL (Read)
 *        The axis value to place at the right hand end of the horizontal
-*        axis. The dynamic default is the value for the last element in the 
-*        supplied NDF (with a margin to include any horizontal error bar).
-*        The value supplied may be greater than or less than the value
-*        supplied for XLEFT. A formatted value for the quantity specified 
-*        by parameter USEAXIS should be supplied. See also parameter ALIGN. []
+*        axis. If a null (!) value is supplied, the value used is the value 
+*        for the last element in the supplied NDF (with a margin to include 
+*        any horizontal error bar). The value supplied may be greater than 
+*        or less than the value supplied for XLEFT. A formatted value for 
+*        the quantity specified by parameter USEAXIS should be supplied. 
+*        See also parameter ALIGN. [!]
 *     XSIGMA = LITERAL (Read)
 *        If horizontal error bars are produced (see parameter ERRBAR), then
 *        XSIGMA gives the number of standard deviations which the error
 *        bars are to represent. [current value]
 *     YBOT = LITERAL (Read)
 *        The axis value to place at the bottom end of the vertical
-*        axis. The dynamic default is the lowest value within the supplied
-*        array (with a margin to include any vertical error bars).
-*        The value supplied may be greater than or less than the value
-*        supplied for YTOP. The value should be supplied as a floating
-*        point value for the quantity specified by parameter YLOG. See also
-*        parameter ALIGN. []
+*        axis. If a null (!) value is supplied, the value used is
+*        the lowest value within the supplied array (with a margin to 
+*        include any vertical error bars). The value supplied may be 
+*        greater than or less than the value supplied for YTOP. The value 
+*        should be supplied as a floating point value for the quantity
+*        specified by parameter YLOG. See also parameter ALIGN. [!]
 *     YLOG = _LOGICAL (Read)
 *        TRUE if the value displayed on the vertical axis is to be the
 *        logarithm of the supplied data values. If TRUE, then the values
@@ -300,12 +303,12 @@
 *        bars are to represent. [current value]
 *     YTOP = LITERAL (Read)
 *        The axis value to place at the top end of the vertical
-*        axis. The dynamic default is the highest value within the supplied
-*        array (with a margin to include any vertical error bars).
-*        The value supplied may be greater than or less than the value
-*        supplied for YBOT. The value should be supplied as a floating
-*        point value for the quantity specified by parameter YLOG. See also
-*        parameter ALIGN. []
+*        axis. If a null (!) value is supplied, the value used is the
+*        highest value within the supplied array (with a margin to include 
+*        any vertical error bars). The value supplied may be greater than 
+*        or less than the value supplied for YBOT. The value should be 
+*        supplied as a floating point value for the quantity specified by 
+*        parameter YLOG. See also parameter ALIGN. [!]
 
 *  Examples:
 *     linplot spectrum 
@@ -400,6 +403,9 @@
 *     8-DEC-1998 (DSB):
 *        Use the 1st *significant* axis when accessing AXIS structures using
 *        NDF_A routines.
+*     6-SEP-1999 (DSB):
+*        USEAXIS changed so that "use offset" is indicated by supplying
+*        zero rather than a null value.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -552,7 +558,7 @@
 *  =============================================
 
 *  Obtain the identifier of the NDF to be ploted.
-      CALL NDG_ASSOCL( 'NDF', 'READ', INDF, STATUS )
+      CALL LPG_ASSOC( 'NDF', 'READ', INDF, STATUS )
 
 *  Find which component to plot.
       CALL KPG1_ARCOG( 'COMP', INDF, MCOMP, COMP, STATUS )
@@ -588,7 +594,7 @@
 *  Allow null to be used to indicate that the horizontal axis should be
 *  annotated with geodesic distance form the first point (measured along
 *  the profile). The dynamic default is axis 1 if the input NDF is one
-*  dimensional, and null otherwise. An axis index is returned.
+*  dimensional, and zero otherwise. An axis index is returned.
       IF( NAX .EQ. 1 ) THEN
          IAXIS = 1
       ELSE
@@ -596,16 +602,18 @@
       END IF
       CALL KPG1_GTAXI( 'USEAXIS', IWCS, 1, IAXIS, STATUS )
 
-*  If we got an axis, indicate that the horizontal axis will not be
-*  annotated with distance frm the starting point.
-      IF( STATUS .EQ. SAI__OK ) THEN
+*  If a null value was supplied, annull the error and use the returned 
+*  dynamic default.
+      IF( STATUS .EQ. PAR__NULL ) CALL ERR_ANNUL( STATUS )
+
+*  If we got a value greater than zero, indicate that the horizontal axis 
+*  will not be annotated with distance from the starting point.
+      IF( IAXIS .GT. 0 ) THEN
          DIST = .FALSE.
 
-*  If a null (!) value was supplied for USEAXIS, annull the error and 
-*  indicate that the horizontal axis should be annotated with distance
-*  from the starting point.
-      ELSE IF( STATUS .EQ. PAR__NULL ) THEN
-         CALL ERR_ANNUL( STATUS )
+*  If zero was supplied for USEAXIS, indicate that the horizontal axis should 
+*  be annotated with distance from the starting point.
+      ELSE 
          DIST = .TRUE.
 
 *  In general there is no way of knowing which axis to use to format
@@ -906,6 +914,9 @@
      :                       'the existing plot (^OLDLAB).', STATUS )
             END IF
 
+*  Abort if an error has occurred.
+            IF( STATUS .NE. SAI__OK ) GO TO 999
+
 *  We now decide whether to shift the X axis of the new DATAPLOT so that
 *  it aligns with the existing DATAPLOT. First of all, choose a default
 *  value on the basis of the axis labels. If the X axis labels are equal,
@@ -914,6 +925,12 @@
 
 *  Allow the user to change this value.
             CALL PAR_GET0L( 'ALIGN', ALIGN, STATUS )
+
+*  Use the dynamic default if a null value was supplied.
+            IF( STATUS .EQ. PAR__NULL ) THEN
+               CALL ERR_ANNUL( STATUS )
+               ALIGN = XLABEQ
+            END IF
 
 *  If they are to be aligned...
             IF( ALIGN ) THEN
@@ -935,14 +952,29 @@
                WWGOT = WWGOT + NFRM
                WWWANT = WWWANT + NFRM
 
+*  Abort if an error has occurred.
+               IF( STATUS .NE. SAI__OK ) GO TO 999
+
 *  See if a key giving the start and end positions of the profile is
 *  required. Default is no.
                CALL PAR_DEF0L( 'KEY', .FALSE., STATUS )
                CALL PAR_GET0L( 'KEY', KEY, STATUS )
 
+*  Use the dynamic default if a null value was supplied.
+               IF( STATUS .EQ. PAR__NULL ) THEN
+                  CALL ERR_ANNUL( STATUS )
+                  KEY = .FALSE.
+               END IF
+
 *  See if annotated axes are required. The default is no.
                CALL PAR_DEF0L( 'AXES', .FALSE., STATUS )
                CALL PAR_GET0L( 'AXES', AXES, STATUS )
+
+*  Use the dynamic default if a null value was supplied.
+               IF( STATUS .EQ. PAR__NULL ) THEN
+                  CALL ERR_ANNUL( STATUS )
+                  AXES = .FALSE.
+               END IF
 
 *  Get the margin values, using a dynamic default of zero if no key or
 *  axes are being created (to avoid the unnecessary creation of FRAME 
@@ -955,6 +987,19 @@
 
                CALL PAR_GDRVR( 'MARGIN', 4, -0.49, 10.0, MARGIN, NMARG,
      :                         STATUS )
+
+*  Use the dynamic default if a null value was supplied.
+               IF( STATUS .EQ. PAR__NULL ) THEN
+                  CALL ERR_ANNUL( STATUS )
+                  IF( .NOT. KEY .AND. .NOT. AXES ) THEN
+                     MARGIN( 1 ) = 0.0
+                  ELSE
+                     MARGIN( 1 ) = 0.18
+                  END IF
+                  NMARG = 1
+               END IF
+
+*  Use the first 4 values supplied.
                NMARG = MIN( 4, NMARG )
 
 *  Abort if an error has occurred.
@@ -1169,14 +1214,29 @@
          CALL AST_TRANN( FSET, 1, 2, 1, BL, .FALSE., 2, 1, BLG, STATUS ) 
          CALL AST_TRANN( FSET, 1, 2, 1, TR, .FALSE., 2, 1, TRG, STATUS ) 
 
+*  Abort if an error has occurred.
+         IF( STATUS .NE. SAI__OK ) GO TO 999
+
 *  See if a key giving the start and end positions of the profile is
 *  required. Default is yes if the NDF has more than 1 Curretn Frame axis.
          CALL PAR_DEF0L( 'KEY', ( NAX .GT. 1 ), STATUS )
          CALL PAR_GET0L( 'KEY', KEY, STATUS )
 
+*  Use the dynamic default if a null value was supplied.
+         IF( STATUS .EQ. PAR__NULL ) THEN
+            CALL ERR_ANNUL( STATUS )
+            KEY = ( NAX .GT. 1 )
+         END IF
+
 *  See if annotated axes are required. The default is yes.
          CALL PAR_DEF0L( 'AXES', .TRUE., STATUS )
          CALL PAR_GET0L( 'AXES', AXES, STATUS )
+
+*  Use the dynamic default if a null value was supplied.
+         IF( STATUS .EQ. PAR__NULL ) THEN
+            CALL ERR_ANNUL( STATUS )
+            AXES = .TRUE.
+         END IF
 
 *  Get the margin values, using a dynamic default of zero if no key or
 *  axes are being created (to avoid the unnecessary creation of FRAME 
@@ -1189,6 +1249,18 @@
 
          CALL PAR_GDRVR( 'MARGIN', 4, -0.49, 10.0, MARGIN, NMARG,
      :                    STATUS )
+*  Use the dynamic default if a null value was supplied.
+         IF( STATUS .EQ. PAR__NULL ) THEN
+            CALL ERR_ANNUL( STATUS )
+            IF( .NOT. KEY .AND. .NOT. AXES ) THEN
+               MARGIN( 1 ) = 0.0
+            ELSE
+               MARGIN( 1 ) = 0.18
+            END IF
+            NMARG = 1
+         END IF
+
+*  Use the first 4 values supplied.
          NMARG = MIN( 4, NMARG )
 
 *  Abort if an error has occurred.
@@ -1261,10 +1333,19 @@
 
       END IF
 
+*  Abort if an error has occurred.
+      IF( STATUS .NE. SAI__OK ) GO TO 999
+
 *  See if annotated axes are required. The default is YES unles we are 
 *  drawing over an existing DATA picture.
       CALL PAR_DEF0L( 'AXES', .NOT. NEWPIC, STATUS )
       CALL PAR_GET0L( 'AXES', AXES, STATUS )
+
+*  Use the dynamic default if a null value was supplied.
+      IF( STATUS .EQ. PAR__NULL ) THEN
+         CALL ERR_ANNUL( STATUS )
+         AXES = .NOT. NEWPIC
+      END IF
 
 *  Produce the plot.
 *  =================

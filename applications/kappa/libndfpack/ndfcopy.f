@@ -141,13 +141,13 @@
       CALL NDF_BEGIN
 
 *  Obtain the input NDF.
-      CALL NDG_ASSOCL( 'IN', 'READ', NDF1, STATUS )
+      CALL LPG_ASSOC( 'IN', 'READ', NDF1, STATUS )
       IF ( STATUS .EQ. SAI__OK ) THEN
 
 *  Defer error reporting and attempt to obtain a second NDF to act as a
 *  shape template.
          CALL ERR_MARK
-         CALL NDG_ASSOCL( 'LIKE', 'READ', NDF2, STATUS )
+         CALL LPG_ASSOC( 'LIKE', 'READ', NDF2, STATUS )
 
 *  Interpret a null value as indicating that a template should not be
 *  used.
@@ -167,7 +167,7 @@
       END IF
 
 *  Copy the input NDF (or section) to create the output NDF.
-      CALL NDG_PROPL( NDF1,
+      CALL LPG_PROP( NDF1,
      :               'Title,Label,Units,Data,Variance,Quality,Axis,' //
      :               'History,WCS', 'OUT', NDF3, STATUS )
 

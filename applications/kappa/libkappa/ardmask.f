@@ -184,7 +184,7 @@
       CALL NDF_BEGIN
 
 *  Obtain an identifier for the NDF structure to be examined.       
-      CALL NDG_ASSOCL( 'IN', 'READ', NDFI, STATUS )
+      CALL LPG_ASSOC( 'IN', 'READ', NDFI, STATUS )
 
 *  Obtain the numeric type of the NDF array component to be analysed.
       CALL NDF_TYPE( NDFI, 'Data', TYPE, STATUS )
@@ -299,7 +299,7 @@
       END IF
 
 *  Propagate the bits of the source NDF required.
-      CALL NDG_PROPL( NDFI, 'Data,Variance,Quality,Axis,Units,WCS', 
+      CALL LPG_PROP( NDFI, 'Data,Variance,Quality,Axis,Units,WCS', 
      :               'OUT', NDFO, STATUS )
 
 *  Get the title for the output NDF.

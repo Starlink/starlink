@@ -80,8 +80,8 @@
 *        data, but this mechanism can be overridden by specifying XMAX
 *        on the command line.  The parameter is provided to allow the
 *        fit limits to be fine tuned for special purposes.  It should
-*        not normally be altered. [Maximum x co-ordinate of the fitted
-*        data]
+*        not normally be altered. If a null (!) value is supplied, the
+*        value used is the maximum x co-ordinate of the fitted data. [!]
 *     XMIN = _DOUBLE (Read)
 *        The minimum x value to be used in the fit.  This must be
 *        smaller than or equal to the x co-ordinate of the left-hand
@@ -90,8 +90,8 @@
 *        data, but this mechanism can be overridden by specifying XMIN
 *        on the command line.  The parameter is provided to allow the
 *        fit limits to be fine tuned for special purposes.  It should
-*        not normally be altered.  [Minimum x co-ordinate of the fitted
-*        data]
+*        not normally be altered.  If a null (!) value is supplied, the
+*        value used is the minimum x co-ordinate of the fitted data. [!]
 *     YMAX = _DOUBLE (Read)
 *        The maximum y value to be used in the fit.  This must be
 *        greater than or equal to the y co-ordinate of the top pixel in
@@ -100,7 +100,8 @@
 *        mechanism can be overridden by specifying YMAX on the command
 *        line.  The parameter is provided to allow the fit limits to be
 *        fine tuned for special purposes.  It should not normally be
-*        altered. [Maximum y co-ordinate of the fitted data]
+*        altered. If a null (!) value is supplied, the value used is the 
+*        maximum y co-ordinate of the fitted data. [!]
 *     YMIN = _DOUBLE (Read)
 *        The minimum y value to be used in the fit.  This must be
 *        smaller than or equal to the y co-ordinate of the bottom pixel
@@ -109,7 +110,8 @@
 *        mechanism can be overridden by specifying YMIN on the command
 *        line.  The parameter is provided to allow the fit limits to be
 *        fine tuned for special purposes.  It should not normally be
-*        altered. [Minimum y co-ordinate of the fitted data]
+*        altered. If a null (!) value is supplied, the value used is the 
+*        minimum y co-ordinate of the fitted data. [!]
 
 *  Examples:
 *     fitsurface virgo nxpar=4 nypar=4 novariance
@@ -206,6 +208,7 @@
       INCLUDE 'MSG_PAR'          ! MSG__ constants
       INCLUDE 'NDF_PAR'          ! NDF__ constants
       INCLUDE 'PRM_PAR'          ! Magic-value definitions (VAL__BADx)
+      INCLUDE 'PAR_ERR'          ! PAR error constants
 
 *  Status:
       INTEGER STATUS             ! Global Status
@@ -503,17 +506,32 @@
             END IF
 
 *  Allow the x and y extrema returned by KPG1_XYZWx to be overridden by
-*  parameters. (These parameters will normally have a VPATH of DYNAMIC,
-*  so the calculated value will be used unless otherwise specified).
-            CALL PAR_DEF0D( 'XMIN', XMIN, STATUS )
-            CALL PAR_DEF0D( 'XMAX', XMAX, STATUS )
-            CALL PAR_DEF0D( 'YMIN', YMIN, STATUS )
-            CALL PAR_DEF0D( 'YMAX', YMAX, STATUS )
+*  parameters. (These parameters will normally have a VPATH of DEFAULT,
+*  and DEFAULT = !, so the calculated value will be used unless otherwise 
+*  specified).
+            IF( STATUS .EQ. SAI__OK ) THEN
+               CALL PAR_DEF0D( 'XMIN', XMIN, STATUS )
+               CALL PAR_GET0D( 'XMIN', XMIN, STATUS )
+               IF( STATUS .EQ. PAR__NULL ) CALL ERR_ANNUL( STATUS )
+            END IF
 
-            CALL PAR_GET0D( 'XMIN', XMIN, STATUS )
-            CALL PAR_GET0D( 'XMAX', XMAX, STATUS )
-            CALL PAR_GET0D( 'YMIN', YMIN, STATUS )
-            CALL PAR_GET0D( 'YMAX', YMAX, STATUS )
+            IF( STATUS .EQ. SAI__OK ) THEN
+               CALL PAR_DEF0D( 'XMAX', XMAX, STATUS )
+               CALL PAR_GET0D( 'XMAX', XMAX, STATUS )
+               IF( STATUS .EQ. PAR__NULL ) CALL ERR_ANNUL( STATUS )
+            END IF
+   
+            IF( STATUS .EQ. SAI__OK ) THEN
+               CALL PAR_DEF0D( 'YMIN', YMIN, STATUS )
+               CALL PAR_GET0D( 'YMIN', YMIN, STATUS )
+               IF( STATUS .EQ. PAR__NULL ) CALL ERR_ANNUL( STATUS )
+            END IF
+   
+            IF( STATUS .EQ. SAI__OK ) THEN
+               CALL PAR_DEF0D( 'YMAX', YMAX, STATUS )
+               CALL PAR_GET0D( 'YMAX', YMAX, STATUS )
+               IF( STATUS .EQ. PAR__NULL ) CALL ERR_ANNUL( STATUS )
+            END IF
 
 *  Report if something has gone wrong while obtaining the parameters.
             IF ( STATUS .NE. SAI__OK ) THEN

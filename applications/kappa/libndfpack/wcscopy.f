@@ -249,14 +249,14 @@
       CALL NDF_BEGIN
 
 *  Obtain an identifier for the NDF to be modified.
-      CALL NDG_ASSOCL( 'NDF', 'UPDATE', INDF1, STATUS )
+      CALL LPG_ASSOC( 'NDF', 'UPDATE', INDF1, STATUS )
 
 *  Get the number of pixel axes in the NDF.
       CALL NDF_DIM( INDF1, NDF__MXDIM, DIM, NDIM1, STATUS )
 
 *  Obtain an identifier for the NDF containing the WCS component to be
 *  copied.
-      CALL NDG_ASSOCL( 'LIKE', 'READ', INDF2, STATUS )
+      CALL LPG_ASSOC( 'LIKE', 'READ', INDF2, STATUS )
 
 *  Get the number of pixel axes in the NDF.
       CALL NDF_DIM( INDF2, NDF__MXDIM, DIM, NDIM2, STATUS )

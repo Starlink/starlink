@@ -60,9 +60,9 @@
 *        WRAP=TRUE requests that the paragraphs of comments are wrapped
 *        to make as much text fit on to each line of the history record
 *        as possible.  WRAP=FALSE means that the commentary text beyond
-*        the width of the history records (72 characters) is lost.  The
-*        default is TRUE when MODE="Interface" and FALSE if
-*        MODE="File".  The suggested default is the current value. []
+*        the width of the history records (72 characters) is lost. If a 
+*        null (!) value is supplied, the value used is TRUE when 
+*        MODE="Interface" and FALSE if MODE="File".  [!]
 
 *  Examples:
 *     hiscom frame256 comment="This image has a non-uniform background"
@@ -162,7 +162,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Obtain the NDF.
-      CALL NDG_ASSOCL( 'NDF', 'UPDATE', INDF, STATUS )
+      CALL LPG_ASSOC( 'NDF', 'UPDATE', INDF, STATUS )
 
 *  Determine the mode to be used.
       CALL PAR_CHOIC( 'MODE', 'Interface', 'File,Interface', .FALSE.,
@@ -171,9 +171,9 @@
 *  Obtain the wrapping flag.  Use appropriate dynamic defaults depending
 *  on the mode.
       IF ( MODE .EQ. 'FILE' ) THEN
-         CALL PAR_GTD0L( 'WRAP', .FALSE., .FALSE., WRAP, STATUS )
+         CALL PAR_GTD0L( 'WRAP', .FALSE., .TRUE., WRAP, STATUS )
       ELSE
-         CALL PAR_GTD0L( 'WRAP', .TRUE., .FALSE., WRAP, STATUS )
+         CALL PAR_GTD0L( 'WRAP', .TRUE., .TRUE., WRAP, STATUS )
       END IF
 
       IF ( STATUS .EQ. SAI__OK ) THEN
@@ -268,7 +268,7 @@
          ELSE IF ( MODE .EQ. 'INTERFACE' ) THEN
 
 *  Find if the comment was given on the command line.
-            CALL NDG_STATE( 'COMMENT', CONSTA, STATUS )
+            CALL LPG_STATE( 'COMMENT', CONSTA, STATUS )
 
 *  Read the comments a line at a time.
             LOOP = .TRUE.
@@ -283,11 +283,8 @@
                   LOOP = .FALSE.
                END IF
 
-*  Cancel the parameter if looping.
+*  Increment the number of lines in the paragraph, if looping.
                IF ( LOOP .AND. STATUS .EQ. SAI__OK ) THEN
-                  CALL PAR_CANCL( 'COMMENT', STATUS )
-
-*  Increment the number of lines in the paragraph.
                   PLINES = PLINES + 1
 
 *  Find the number of characters in the comment.
@@ -311,6 +308,11 @@
 
 *  End the loop if the value was on the command line.
                LOOP = .NOT. ( CONSTA .EQ. PAR__ACTIVE ) .AND. LOOP
+
+*  Cancel the parameter if looping.
+               IF( LOOP .AND. STATUS .EQ. SAI__OK ) THEN
+                  CALL PAR_CANCL( 'COMMENT', STATUS )
+               END IF
 
 *  Look for a paragraph or the end of the file or an exhausted buffer.
                IF ( PARBUF .EQ. ' ' .OR. .NOT. LOOP .OR.

@@ -133,6 +133,8 @@
 *  History:
 *     30-JUN-1999 (DSB):
 *        Original version.
+*     3-SEP-1999 (DSB):
+*        Added NULL argument to KPG1_GTPOS call.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -332,7 +334,7 @@
 *  co-ordinates are supplied on the command line.  If so, we set a 
 *  flag to indicate that only one centroid is to be determined.
       ELSE
-         CALL NDG_STATE( PARAM, STATE, STATUS )
+         CALL LPG_STATE( PARAM, STATE, STATUS )
          IF ( STATE .EQ. SUBPAR__ACTIVE ) THEN
             SINGLE = .TRUE.
          ELSE
@@ -390,7 +392,8 @@
 *  In interactive mode, just get a position using the specified parameter.
          ELSE
             IF( .NOT. ( SINGLE .OR. QUIET ) ) CALL MSG_BLANK( STATUS )
-            CALL KPG1_GTPOS( PARAM, RFRM, INPOS, 0.0D0, STATUS )
+            CALL KPG1_GTPOS( PARAM, RFRM, .FALSE., INPOS, 0.0D0, 
+     :                       STATUS )
             IF( .NOT. ( SINGLE .OR. QUIET ) ) CALL MSG_BLANK( STATUS )
 
 *  If a null value was supplied, annul the error and indicate that 

@@ -243,7 +243,7 @@
       LOGFIL = .FALSE.
 
 *  Obtain the NDF to be analysed.
-      CALL NDG_ASSOCL( 'NDF', 'READ', NDF, STATUS )
+      CALL LPG_ASSOC( 'NDF', 'READ', NDF, STATUS )
 
 *  Determine which array component is to be analysed, converting
 *  'ERROR' into 'VARIANCE'.

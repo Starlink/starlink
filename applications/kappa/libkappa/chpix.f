@@ -173,7 +173,7 @@
       CALL NDF_BEGIN
 
 *  Obtain the input NDF.
-      CALL NDG_ASSOCL( 'IN', 'Read', NDFI, STATUS )
+      CALL LPG_ASSOC( 'IN', 'Read', NDFI, STATUS )
 
 *  Determine which array component is to be modified.
       CALL PAR_CHOIC( 'COMP', 'Data', 'Data,Error,Quality,Variance',
@@ -206,7 +206,7 @@
 *  Create the output NDF.
 *  ======================
 *  Obtain an output NDF and propagate the whole of the input NDF to it.
-      CALL NDG_PROPL( NDFI, 'WCS,Data,Variance,Quality,Axis,Units', 
+      CALL LPG_PROP( NDFI, 'WCS,Data,Variance,Quality,Axis,Units', 
      :               'OUT', NDFO, STATUS )
 
 *  Get the title for the output NDF.
@@ -232,7 +232,7 @@
 *  Determine whether or not to loop.  Looping does not occur if the
 *  NEWVAL is given on the command line, i.e. it is already in the active
 *  state.
-      CALL NDG_STATE( 'NEWVAL', ACTVAL, STATUS )
+      CALL LPG_STATE( 'NEWVAL', ACTVAL, STATUS )
 
       LOOP = .TRUE.
       DO WHILE ( STATUS .EQ. SAI__OK .AND. LOOP )

@@ -529,8 +529,8 @@
 *  Determine whether or not the scaling parameters have been
 *  found, to avoid finding the maximum and minimum values when
 *  they are not required.
-         CALL NDG_STATE( 'LOW', ACTLOW, STATUS )
-         CALL NDG_STATE( 'HIGH', ACTHIG, STATUS )
+         CALL LPG_STATE( 'LOW', ACTLOW, STATUS )
+         CALL LPG_STATE( 'HIGH', ACTHIG, STATUS )
          FNDRNG = ACTLOW .EQ. SUBPAR__ACTIVE .AND.
      :            ACTHIG .EQ. SUBPAR__ACTIVE
 

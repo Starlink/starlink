@@ -232,7 +232,7 @@
 #        Corrected TCL linking, and updated libraries to TCL_VERS = 7.6
 #        and TK_VERS = 4.2.
 #     31-AUG-1999 (DSB):
-#        Updated NDG library.
+#        Updated NDG library. Added CTG an LPG libraries.
 #     {note_further_changes_here}
 #
 #  Bugs:
@@ -437,6 +437,7 @@ SOURCE_FILES = $(PKG_NAME)_source.tar makefile mk $(DOCUMENTATION) \
                aif_sub.tar fts_sub.tar ira_sub.tar kapgen_sub.tar \
                ndg_source.tar kappa_sub.tar kapsub_sub.tar kapview_sub.tar \
                ndfpack_sub.tar $(PKG_NAME)_ifls.tar $(PKG_NAME)_iraf.tar \
+               ctg_source.tar lpg_source.tar \
                $(PKG_NAME)_data_alpha_OSF1.tar \
                $(PKG_NAME)_data_ix86_Linux.tar \
                $(PKG_NAME)_data_sun4_Solaris.tar
@@ -474,14 +475,15 @@ ICL_SCRIPT = $(PKG_NAME).icl
 #  which form part of the package and are required in order to build
 #  it, but which are not required by users of it.
 
-PRIVATE_INCLUDES = $(I_KAPPA) $(I_NDG)
+PRIVATE_INCLUDES = $(I_KAPPA) $(I_NDG) $(I_CTG) $(I_LPG)
 
 I_KAPPA = c1_com me_com ira_par ira_com ira_err ctm_com \
           ctm_par fts_par hlpcmd sft_com kpg_ast kpg_par \
           grf.h grecom.inc grerr 
 
-I_NDG = ndg_com ndg_const ndg_err
-
+I_NDG = ndg_const ndg_err
+I_CTG = ctg_const ctg_err
+I_LPG = lpg_com lpg_const 
 
 #  List of external include files. These are files which are required
 #  in order to build the package but form part of other, externally
@@ -503,7 +505,7 @@ EXTERNAL_INCLUDES = SAE_PAR AGI_ERR CHR_ERR DAT_ERR DAT_PAR FIO_ERR \
 #  just a list of all the Fortran source files (excluding BLOCK DATA
 #  routines and the main routine, which are treated separately).
 
-F_ROUTINES = $(AIF_F_ROUTINES) $(FITS_F_ROUTINES) $(F_NDG) \
+F_ROUTINES = $(AIF_F_ROUTINES) $(FITS_F_ROUTINES) $(F_NDG) $(F_CTG) $(F_LPG) \
              $(IRA_F_ROUTINES) $(KAPGEN_F_ROUTINES) \
              $(KAPPA_F_ROUTINES) $(KAPSUB_F_ROUTINES) \
              $(KAPVIEW_F_ROUTINES) $(MEM_F_ROUTINES) \
@@ -540,14 +542,23 @@ ira_find.f ira_getco.f ira_geteq.f ira_gtco1.f ira_gtscs.f ira_init.f \
 ira_iproj.f ira_iscs.f ira_locat.f ira_norm.f ira_seteq.f ira_trans.f \
 ira_write.f ira_read.f
 
-F_NDG = ndg1_appen.f ndg1_hfind.f ndg1_pshdb.f ndg_asexp.f \
-ndg_ndfas.f ndg1_chscn.f ndg1_hsplt.f ndg1_pshde.f ndg_ndfcr.f \
-ndg1_expan.f ndg1_lasto.f ndg1_pshdf.f ndg_ndfpr.f ndg1_fparx.f \
-ndg1_ndfch.f ndg1_sdfex.f ndg_crexp.f ndg1_hcut.f ndg1_ndfdl.f \
-ndg_ndfcp.f ndg_setsz.f ndg1_match.f ndg1_subst.f \
-ndg_assoc.f ndg_creat.f ndg_again.f ndg_assoc1.f \
-ndg_creat1.f ndg_crep1.f ndg_prop1.f ndg_assocl.f ndg_creatl.f \
-ndg_crepl.f ndg_propl.f ndg_start.f ndg_state.f ndg_tidy.f
+F_NDG = ndg1_appen.f ndg1_asexp.f ndg1_chscn.f ndg1_crexp.f \
+ndg1_expan.f ndg1_fpars.f ndg1_fparx.f ndg1_gtyps.f ndg1_hcut.f \
+ndg1_hfind.f ndg1_hsplt.f ndg1_lasto.f ndg1_match.f ndg1_ndfch.f \
+ndg1_ndfdl.f ndg1_pshdb.f ndg1_pshde.f ndg1_pshdf.f ndg1_sdfex.f \
+ndg1_subst.f ndg_gtsup.f ndg_ndfas.f ndg_ndfcp.f ndg_ndfcr.f ndg_ndfpr.f \
+ndg_ptsup.f ndg_setsz.f ndg_asso1.f ndg_assoc.f ndg_crea1.f ndg_creat.f \
+ndg_crep1.f ndg_prop1.f
+
+F_CTG = ctg1_appen.f ctg1_expan.f ctg1_match.f ctg_catcr.f \
+ctg_ptsup.f ctg1_asexp.f ctg1_fpars.f ctg_setsz.f ctg1_catch.f \
+ctg1_gtyps.f ctg1_crexp.f ctg1_lasto.f ctg_catas.f ctg_gtsup.f ctg1_subst.f \
+ctg_asso1.f ctg_assoc.f ctg_crea1.f ctg_creat.f 
+
+F_LPG = lpg_again.f lpg_catcreat.f lpg_prop.f lpg_test.f lpg1_ptpar.f \
+lpg_assoc.f lpg_creat.f lpg_start.f lpg1_tidy.f lpg_catassoc.f lpg_crep.f \
+lpg_state.f
+
 
 
 KAPGEN_F_ROUTINES = \
@@ -647,11 +658,11 @@ kpg1_wrlst.f kpg1_wwrt.f kpg1_xyd2w.f kpg1_xyzwd.f kpg1_xyzwr.f \
 kpg1_zones.f kpg1_zopic.f ld2ar.f logarr.f ncraxs.f ncrbck.f ncropn.f \
 normal.f nxtnam.f powarr.f pthlpo.f sread.f zero1d.f zero2d.f \
 kpg1_cshft.f kpg1_ctcpd.f kpg1_ctcpi.f kpg1_rcatw.f kpg1_snkta.f \
-kpg1_wcatw.f kpg1_srcta.f kpg1_ctass.f kpg1_ctcre.f kpg1_fit1d.f \
+kpg1_wcatw.f kpg1_srcta.f kpg1_fit1d.f \
 kpg1_pllod.f kpg1_plsav.f kpg1_plget.f kpg1_plput.f kpg1_mkpos.f \
 kpg1_pseed.f kpg1_ndfnm.f kpg1_graph.f kpg1_grphw.f kpg1_assig.f kpg1_cpndb.f \
 kpg1_cpndd.f kpg1_cpndi.f kpg1_cpndr.f kpg1_cpndub.f kpg1_cpnduw.f \
-kpg1_cpndw.f kpg1_rglmt.f
+kpg1_cpndw.f kpg1_rglmt.f kpg1_envdf.f kpg1_env0r.f
 
 KAPVIEW_F_ROUTINES = \
 contour.f contover.f \
@@ -666,7 +677,7 @@ mlinplot.f ovclear.f ovset.f paldef.f palentry.f \
 palread.f palsave.f piccur.f picdef.f \
 picempty.f picentire.f picin.f piclabel.f \
 piclist.f picsel.f pictrans.f picvis.f \
-snapshot.f turbocont.f vecplot.f 
+scatter.f snapshot.f turbocont.f vecplot.f 
 
 KAPPA_F_ROUTINES = \
 add.f aperadd.f ardgen.f ardmask.f \
@@ -688,7 +699,7 @@ rotate.f segment.f setmagic.f shadow.f slide.f \
 sqorst.f stats.f sub.f substitute.f surfit.f thresh.f \
 trandat.f traninvert.f tranjoin.f tranmake.f \
 transformer.f trantrace.f trig.f wiener.f zaplin.f \
-listmake.f listshow.f profile.f wcsalign.f wcstran.f scatter.f
+listmake.f listshow.f profile.f wcsalign.f wcstran.f 
 
 KAPSUB_F_ROUTINES = \
 apadsb.f cnthlt.f cntkey.f cntsbp.f crfrsb.f curre.f ftsize.f ftsizt.f \
@@ -764,7 +775,7 @@ kps1_cenaw.f kps1_cenbt.f kps1_cenhd.f kps1_censg.f kps1_censh.f \
 kps1_mlpcp.f kps1_mlpcv.f kps1_mlpfs.f kps1_mlpky.f kps1_mlplb.f \
 kps1_mlpml.f kps1_mlpmp.f kps1_mlpnd.f kps1_mlpng.f kps1_mlppn.f
 
-MEM_F_ROUTINES = mem2d.f
+MEM_F_ROUTINES = 
 
 NDFPACK_F_ROUTINES = \
 axconv.f axlabel.f axunits.f erase.f \
@@ -795,24 +806,26 @@ PLATFORM_F =
 
 #  Block data routines.
 
-BLOCK_DATA = $(KAPGEN_BLOCK_DATA) $(IRA_BLOCK_DATA) $(NDG_BLOCK_DATA)
+BLOCK_DATA = $(KAPGEN_BLOCK_DATA) $(IRA_BLOCK_DATA) $(LPG_BLOCK_DATA)
 
 KAPGEN_BLOCK_DATA = ctm_xcols.f
 IRA_BLOCK_DATA = ira1_init.f
-NDG_BLOCK_DATA = ndg1_init.f
+LPG_BLOCK_DATA = lpg1_init.f
 
 #  C routines required for building the libraries.  This is just a
 #  list of all the C source files.
 
 C_ROUTINES = $(FITS_C_ROUTINES) $(KAPGEN_C_ROUTINES) $(C_NDG) \
-             $(GRF_C_ROUTINES)
+             $(C_CTG) $(C_LPG) $(GRF_C_ROUTINES)
 
 FITS_C_ROUTINES = fts1_findf.c fts1_rnand.c fts1_rnanr.c
 
 KAPGEN_C_ROUTINES = kpg1_trmsz.c kpg1_ieeer.c kpg1_ieeed.c \
-                    kpg1_tkast.c
+                    kpg1_tkast.c 
 
+C_CTG = ctg1_wild.c ctg1_rm.c 
 C_NDG = ndg1_wild.c 
+C_LPG = lpg1_rm.c lpg1_sleep.c
 
 GRF_C_ROUTINES = grf_kappa.c
 
@@ -978,7 +991,8 @@ BUILT_FILES = $(PUBLIC_SCRIPTS) $(OBJECT_LIBRARIES) $(MEMTASKS) \
 
 INCLUDE_LINKS = $(EXTERNAL_INCLUDES) C1_COM ME_COM CTM_COM CTM_PAR \
                 FTS_PAR HLPCMD SFT_COM IRA_COM IRA_PAR \
-                IRA_ERR NDG_ERR NDG_CONST NDG_COM KPG_PAR KPG_AST
+                IRA_ERR NDG_ERR NDG_CONST CTG_ERR CTG_CONST \
+                LPG_CONST LPG_COM KPG_PAR KPG_AST
 
 #
 #  Rules to set up links to locate each of the above include files.
@@ -1017,7 +1031,10 @@ NDF_ERR:     $(STAR_INC)/ndf_err;     $(LINK) $? $@
 NDF_PAR:     $(STAR_INC)/ndf_par;     $(LINK) $? $@
 NDG_CONST:   ndg_const;               $(LINK) $? $@
 NDG_ERR:     ndg_err;                 $(LINK) $? $@
-NDG_COM:     ndg_com;                 $(LINK) $? $@
+CTG_CONST:   ctg_const;               $(LINK) $? $@
+CTG_ERR:     ctg_err;                 $(LINK) $? $@
+LPG_CONST:   lpg_const;               $(LINK) $? $@
+LPG_COM:     lpg_com;                 $(LINK) $? $@
 NUM_CMN:     $(STAR_INC)/num_cmn;     $(LINK) $? $@
 NUM_DEC:     $(STAR_INC)/num_dec;     $(LINK) $? $@
 NUM_DEC_B:   $(STAR_INC)/num_dec_B;   $(LINK) $? $@
@@ -1076,8 +1093,18 @@ $(IRA_F_ROUTINES) $(IRA_BLOCK_DATA) :
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
 
-$(F_NDG) $(I_NDG) $(C_NDG) $(NDG_BLOCK_DATA):
+$(F_NDG) $(I_NDG) $(C_NDG):
 	$(TAR_OUT) ndg_source.tar $@
+	@ if test -f $@; then :;\
+           else echo $@ is not in the tar file; exit 1; fi
+
+$(F_CTG) $(I_CTG) $(C_CTG):
+	$(TAR_OUT) ctg_source.tar $@
+	@ if test -f $@; then :;\
+           else echo $@ is not in the tar file; exit 1; fi
+
+$(F_LPG) $(I_LPG) $(C_LPG) $(LPG_BLOCK_DATA):
+	$(TAR_OUT) lpg_source.tar $@
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
 
@@ -1142,8 +1169,8 @@ $(IRAF_DEMO) :
 #  way as the kappa libraries).
 
 
-OBJECT_FILES = $(AIF_OBJECT_FILES) $(FITS_OBJECT_FILES) $(O_NDG) \
-               $(IRA_OBJECT_FILES) $(KAPGEN_OBJECT_FILES) \
+OBJECT_FILES = $(AIF_OBJECT_FILES) $(FITS_OBJECT_FILES) $(O_NDG) $(O_CTG) \
+               $(O_LPG) $(IRA_OBJECT_FILES) $(KAPGEN_OBJECT_FILES) \
                $(KAPPA_OBJECT_FILES) $(KAPSUB_OBJECT_FILES) \
                $(KAPVIEW_OBJECT_FILES) $(NDFPACK_OBJECT_FILES)
 
@@ -1153,7 +1180,9 @@ FITS_OBJECT_FILES = $(FITS_F_ROUTINES:.f=.o) $(FITS_C_ROUTINES:.c=.o)
 
 IRA_OBJECT_FILES = $(IRA_F_ROUTINES:.f=.o) $(IRA_BLOCK_DATA:.f=.o) 
 
-O_NDG = $(F_NDG:.f=.o) $(C_NDG:.c=.o) $(NDG_BLOCK_DATA:.f=.o)
+O_NDG = $(F_NDG:.f=.o) $(C_NDG:.c=.o) 
+O_CTG = $(F_CTG:.f=.o) $(C_CTG:.c=.o) 
+O_LPG = $(F_LPG:.f=.o) $(C_LPG:.c=.o) $(LPG_BLOCK_DATA:.f=.o)
 
 KAPGEN_OBJECT_FILES = $(KAPGEN_F_ROUTINES:.f=.o) $(KAPGEN_BLOCK_DATA:.f=.o) \
                       $(KAPGEN_C_ROUTINES:.c=.o)
@@ -1179,7 +1208,7 @@ NDFPACK_OBJECT_FILES = $(NDFPACK_F_ROUTINES:.f=.o)
 
 OBJECT_LIBRARIES = \
 libkappa.a libkapview.a libndfpack.a libkapsub.a libkapgen.a libfits.a \
-libaif.a libira.a libndg.a
+libaif.a libira.a liblpg.a libndg.a libctg.a 
 
 #
 libaif.a: $(AIF_OBJECT_FILES)
@@ -1195,6 +1224,14 @@ libira.a: $(IRA_OBJECT_FILES)
 	$(RANLIB) $@
 #
 libndg.a: $(O_NDG)
+	$(AR_IN) $@ $?
+	$(RANLIB) $@
+#
+libctg.a: $(O_CTG)
+	$(AR_IN) $@ $?
+	$(RANLIB) $@
+#
+liblpg.a: $(O_LPG)
 	$(AR_IN) $@ $?
 	$(RANLIB) $@
 #
@@ -1229,6 +1266,8 @@ NDFPACK_MON = ndfpack_mon
 MONOLITH = $(MONO_SOURCE:.f=)
 MEMTASKS = $(MEM_F_ROUTINES:.f=)
 TASKS = $(KAPPA_TASKS) $(KAPVIEW_TASKS) $(NDFPACK_TASKS)
+
+monoliths:	$(MONOLITH)
 
 #  Define the tasks for each monolith.
 
@@ -1351,7 +1390,8 @@ $(INSTALL_DIRS):
 archive: $(PKG_NAME)_source.tar aif_sub.tar fts_sub.tar \
          kapgen_sub.tar kappa_sub.tar kapsub_sub.tar kapview_sub.tar \
          ndfpack_sub.tar $(PKG_NAME)_ifls.tar ira_sub.tar ndg_source.tar \
-         $(PKG_NAME)_data_alpha_OSF1.tar $(PKG_NAME)_data_sun4_Solaris.tar
+         ctg_source.tar lpg_source.tar $(PKG_NAME)_data_alpha_OSF1.tar \
+         $(PKG_NAME)_data_sun4_Solaris.tar
 #
 	@ echo "   Build of the $(PACK_NAME) tar files is complete."
 
@@ -2361,7 +2401,13 @@ fts_sub.tar:
 	$(TAR_IN) fts_sub.tar $(FITS_F_ROUTINES) $(FITS_C_ROUTINES)
 
 ndg_source.tar:
-	$(TAR_IN) ndg_sub.tar $(F_NDG) $(C_NDG) $(I_NDG) $(NDG_BLOCK_DATA)
+	$(TAR_IN) ndg_source.tar $(F_NDG) $(C_NDG) $(I_NDG) $(NDG_BLOCK_DATA)
+
+ctg_source.tar:
+	$(TAR_IN) ctg_source.tar $(F_CTG) $(C_CTG) $(I_CTG) 
+
+lpg_source.tar:
+	$(TAR_IN) lpg_source.tar $(F_LPG) $(C_LPG) $(I_LPG) $(LPG_BLOCK_DATA)
 
 ira_sub.tar:
 	$(TAR_IN) ira_sub.tar $(IRA_F_ROUTINES) $(IRA_BLOCK_DATA)
@@ -2454,6 +2500,25 @@ crelut.o:	 SAE_PAR DAT_PAR PAR_ERR SUBPAR_PAR CTM_PAR NDF_PAR PRM_PAR NUM_DEC_CV
 creout.o:	 SAE_PAR PAR_ERR
 crfrsb.o:	 SAE_PAR
 csub.o:	         SAE_PAR NDF_PAR
+ctg1_appen.o:	 SAE_PAR GRP_PAR CTG_CONST CTG_ERR
+ctg1_asexp.o:	 SAE_PAR CTG_CONST CTG_ERR GRP_PAR
+ctg1_catch.o:	 SAE_PAR GRP_PAR CTG_CONST CTG_ERR
+ctg1_crexp.o:	 SAE_PAR GRP_PAR CTG_CONST PSX_ERR
+ctg1_expan.o:	 SAE_PAR GRP_PAR CTG_CONST
+ctg1_fpars.o:	 SAE_PAR
+ctg1_gtyps.o:	 SAE_PAR
+ctg1_lasto.o:	 SAE_PAR
+ctg1_match.o:	 SAE_PAR GRP_PAR CTG_CONST
+ctg1_subst.o:	 SAE_PAR
+ctg_asso1.o:	 SAE_PAR GRP_PAR CAT_PAR
+ctg_assoc.o:	 SAE_PAR GRP_PAR GRP_ERR PAR_ERR CTG_ERR
+ctg_catas.o:	 SAE_PAR CAT_PAR GRP_PAR CTG_CONST
+ctg_catcr.o:	 SAE_PAR CAT_PAR GRP_PAR CTG_CONST
+ctg_crea1.o:	 SAE_PAR GRP_PAR CAT_PAR
+ctg_creat.o:	 SAE_PAR GRP_PAR PAR_ERR
+ctg_gtsup.o:	 SAE_PAR GRP_PAR
+ctg_ptsup.o:	 SAE_PAR GRP_PAR
+ctg_setsz.o:	 SAE_PAR GRP_PAR
 ctm_xcols.o:	 CTM_PAR
 curpts.o:	 SAE_PAR
 curre.o:	 SAE_PAR PAR_ERR
@@ -2759,10 +2824,8 @@ kpg1_csubr.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEC_R NUM_DEF_CVT NUM_DEF
 kpg1_csubub.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEC_UB NUM_DEF_CVT NUM_DEF_UB
 kpg1_csubuw.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEC_UW NUM_DEF_CVT NUM_DEF_UW
 kpg1_csubw.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEC_W NUM_DEF_CVT NUM_DEF_W
-kpg1_ctass.o:	 SAE_PAR CAT_PAR PAR_ERR
 kpg1_ctcpd.o:    SAE_PAR PRM_PAR CAT_PAR
 kpg1_ctcpi.o:    SAE_PAR PRM_PAR CAT_PAR
-kpg1_ctcre.o:	 SAE_PAR CAT_PAR PAR_ERR
 kpg1_d2w2r.o:	 SAE_PAR PRM_PAR
 kpg1_danot.o:	 SAE_PAR
 kpg1_dauni.o:	 SAE_PAR
@@ -2776,6 +2839,7 @@ kpg1_dwsor.o:	 SAE_PAR NUM_DEC_CVT NUM_DEF_CVT
 kpg1_elnmb.o:	 SAE_PAR NUM_DEC_CVT NUM_DEF_CVT
 kpg1_elnmd.o:	 SAE_PAR NUM_DEC_CVT NUM_DEF_CVT
 kpg1_elnmr.o:	 SAE_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_envdf.o:	 SAE_PAR PSX_ERR
 kpg1_ffrd.o:	 SAE_PAR
 kpg1_ffrr.o:	 SAE_PAR
 kpg1_fftbd.o:	 SAE_PAR
@@ -3447,6 +3511,18 @@ logar.o:	 SAE_PAR DAT_PAR PAR_ERR
 logarr.o:	 SAE_PAR PRM_PAR
 loge.o:	         SAE_PAR DAT_PAR PAR_ERR
 look.o:	         SAE_PAR DAT_PAR PAR_ERR
+lpg1_init.o:	 DAT_PAR LPG_CONST GRP_PAR LPG_COM
+lpg1_ptpar.o:	 SAE_PAR GRP_PAR DAT_PAR
+lpg1_tidy.o:	 SAE_PAR DAT_PAR GRP_PAR SUBPAR_PAR LPG_CONST LPG_COM
+lpg_again.o:	 SAE_PAR DAT_PAR PAR_ERR LPG_CONST LPG_COM
+lpg_assoc.o:	 SAE_PAR DAT_PAR NDF_PAR GRP_PAR SUBPAR_PAR LPG_CONST PAR_ERR LPG_COM
+lpg_catassoc.o:	 SAE_PAR DAT_PAR CAT_PAR GRP_PAR SUBPAR_PAR LPG_CONST PAR_ERR LPG_COM
+lpg_catcreat.o:	 SAE_PAR DAT_PAR GRP_PAR CAT_PAR PAR_ERR SUBPAR_PAR LPG_CONST LPG_COM
+lpg_creat.o:	 SAE_PAR DAT_PAR GRP_PAR NDF_PAR PAR_ERR SUBPAR_PAR LPG_CONST LPG_COM
+lpg_crep.o:	 SAE_PAR DAT_PAR GRP_PAR NDF_PAR PAR_ERR SUBPAR_PAR LPG_CONST LPG_COM
+lpg_prop.o:	 SAE_PAR DAT_PAR GRP_PAR NDF_PAR SUBPAR_PAR LPG_CONST PAR_ERR LPG_COM
+lpg_start.o:	 SAE_PAR DAT_PAR GRP_PAR SUBPAR_PAR LPG_CONST LPG_COM
+lpg_state.o:	 SAE_PAR DAT_PAR LPG_CONST LPG_COM
 lsfun1.o:	 IRA_PAR SFT_COM
 lucy.o:	         SAE_PAR PRM_PAR NDF_PAR MSG_PAR PAR_ERR
 lutable.o:	 SAE_PAR DAT_PAR PAR_ERR PAR_PAR CTM_PAR PRM_PAR NDF_PAR NDF_ERR
@@ -3493,43 +3569,38 @@ ncropn.o:	 SAE_PAR PAR_ERR
 ndfcopy.o:	 SAE_PAR PAR_ERR NDF_PAR
 ndfpack_mon.o:	 SAE_PAR
 ndftrace.o:	 SAE_PAR DAT_PAR NDF_PAR PRM_PAR AST_PAR NUM_DEC_CVT NUM_DEF_CVT
-ndg1_appen.o:    SAE_PAR GRP_PAR NDG_CONST NDG_ERR
-ndg1_chscn.o:    SAE_PAR DAT_PAR NDF_ERR
-ndg1_expan.o:    SAE_PAR GRP_PAR DAT_PAR
-ndg1_hcut.o:     SAE_PAR DAT_PAR NDF_ERR
-ndg1_hfind.o:    SAE_PAR DAT_PAR NDF_ERR
-ndg1_hsplt.o:    SAE_PAR DAT_PAR NDF_ERR
-ndg1_init.o:	 DAT_PAR NDG_CONST GRP_PAR NDG_COM
-ndg1_lasto.o:    SAE_PAR
+ndg1_appen.o:	 SAE_PAR GRP_PAR NDG_CONST NDG_ERR
+ndg1_asexp.o:	 SAE_PAR NDG_CONST NDG_ERR GRP_PAR
+ndg1_chscn.o:	 SAE_PAR DAT_PAR NDF_ERR
+ndg1_crexp.o:	 SAE_PAR DAT_PAR GRP_PAR NDG_CONST PSX_ERR
+ndg1_expan.o:	 SAE_PAR GRP_PAR DAT_PAR
+ndg1_fpars.o:	 SAE_PAR
+ndg1_gtyps.o:	 SAE_PAR
+ndg1_hcut.o:	 SAE_PAR DAT_PAR NDF_ERR
+ndg1_hfind.o:	 SAE_PAR DAT_PAR NDF_ERR
+ndg1_hsplt.o:	 SAE_PAR DAT_PAR NDF_ERR
+ndg1_lasto.o:	 SAE_PAR
 ndg1_match.o:	 SAE_PAR GRP_PAR NDG_CONST
-ndg1_ndfch.o:    SAE_PAR GRP_PAR NDG_CONST NDG_ERR PSX_ERR
-ndg1_ndfdl.o:    SAE_PAR GRP_PAR DAT_PAR
-ndg1_pshdb.o:    SAE_PAR DAT_PAR NDF_ERR
-ndg1_pshde.o:    SAE_PAR DAT_PAR NDF_ERR
-ndg1_pshdf.o:    SAE_PAR DAT_PAR NDF_ERR
-ndg1_sdfex.o:    SAE_PAR GRP_PAR DAT_PAR
+ndg1_ndfch.o:	 SAE_PAR GRP_PAR NDG_CONST NDG_ERR PSX_ERR
+ndg1_ndfdl.o:	 SAE_PAR GRP_PAR DAT_PAR
+ndg1_pshdb.o:	 SAE_PAR DAT_PAR NDF_ERR
+ndg1_pshde.o:	 SAE_PAR DAT_PAR NDF_ERR
+ndg1_pshdf.o:	 SAE_PAR DAT_PAR NDF_ERR
+ndg1_sdfex.o:	 SAE_PAR GRP_PAR DAT_PAR
 ndg1_subst.o:	 SAE_PAR
-ndg_again.o:	 SAE_PAR DAT_PAR NDG_CONST NDG_COM
-ndg_asexp.o:     SAE_PAR NDG_CONST NDG_ERR GRP_PAR
-ndg_assoc.o:     SAE_PAR GRP_PAR GRP_ERR PAR_ERR NDG_ERR
-ndg_assoc1.o:	 SAE_PAR GRP_PAR NDF_PAR
-ndg_assocl.o:	 SAE_PAR DAT_PAR NDF_PAR GRP_PAR SUBPAR_PAR NDG_CONST PAR_ERR NDG_COM
-ndg_creat.o:     SAE_PAR GRP_PAR PAR_ERR
-ndg_creat1.o:	 SAE_PAR GRP_PAR NDF_PAR
-ndg_creatl.o:	 SAE_PAR DAT_PAR GRP_PAR NDF_PAR PAR_ERR SUBPAR_PAR NDG_CONST NDG_COM
+ndg_asso1.o:	 SAE_PAR GRP_PAR NDF_PAR
+ndg_assoc.o:	 SAE_PAR GRP_PAR GRP_ERR PAR_ERR NDG_ERR
+ndg_crea1.o:	 SAE_PAR GRP_PAR NDF_PAR
+ndg_creat.o:	 SAE_PAR GRP_PAR PAR_ERR
 ndg_crep1.o:	 SAE_PAR GRP_PAR NDF_PAR
-ndg_crepl.o:	 SAE_PAR DAT_PAR GRP_PAR NDF_PAR PAR_ERR SUBPAR_PAR NDG_CONST NDG_COM
-ndg_crexp.o:     SAE_PAR DAT_PAR GRP_PAR NDG_CONST PSX_ERR
-ndg_ndfas.o:     SAE_PAR DAT_PAR NDF_PAR GRP_PAR NDG_CONST
+ndg_gtsup.o:	 SAE_PAR GRP_PAR
+ndg_ndfas.o:	 SAE_PAR DAT_PAR NDF_PAR GRP_PAR NDG_CONST
 ndg_ndfcp.o:	 SAE_PAR DAT_PAR NDF_PAR GRP_PAR NDG_CONST
-ndg_ndfcr.o:     SAE_PAR DAT_PAR NDF_PAR GRP_PAR NDG_CONST
-ndg_ndfpr.o:     SAE_PAR DAT_PAR NDF_PAR GRP_PAR NDG_CONST
+ndg_ndfcr.o:	 SAE_PAR DAT_PAR NDF_PAR GRP_PAR NDG_CONST
+ndg_ndfpr.o:	 SAE_PAR DAT_PAR NDF_PAR GRP_PAR NDG_CONST
 ndg_prop1.o:	 SAE_PAR GRP_PAR NDF_PAR
-ndg_propl.o:	 SAE_PAR DAT_PAR GRP_PAR NDF_PAR SUBPAR_PAR NDG_CONST PAR_ERR NDG_COM
+ndg_ptsup.o:	 SAE_PAR GRP_PAR
 ndg_setsz.o:	 SAE_PAR GRP_PAR
-ndg_start.o:	 SAE_PAR DAT_PAR GRP_PAR SUBPAR_PAR NDG_CONST NDG_COM
-ndg_state.o:	 SAE_PAR DAT_PAR NDG_CONST NDG_COM
-ndg_tidy.o:	 SAE_PAR DAT_PAR GRP_PAR SUBPAR_PAR NDG_CONST NDG_COM
 noglobals.o:	 SAE_PAR DAT_PAR DAT_ERR
 nomagic.o:	 SAE_PAR NDF_PAR PAR_ERR MSG_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
 normal.o:	 SAE_PAR
@@ -3633,6 +3704,6 @@ wcstran.o:	 SAE_PAR NDF_PAR AST_PAR
 wiener.o:	 SAE_PAR DAT_PAR PRM_PAR MSG_PAR NDF_PAR PAR_ERR
 zaplin.o:	 SAE_PAR DAT_PAR NDF_PAR NDF_ERR SUBPAR_PAR PAR_ERR FIO_ERR
 zero1d.o:	 SAE_PAR
-zero2d.o:	 SAE_PAR
+zero2d.o:	 SAE_PAR                 
 
 #  End of makefile.

@@ -178,10 +178,11 @@
 *        preserve the aspect ratio of the data. Four values may be given, in
 *        the order - bottom, right, top, left. If less than four values are 
 *        given, extra values are used equal to the first supplied value. If 
-*        these margins are too narrow any axis annotation may be clipped. The 
-*        dynamic default (for all edges) is; 0.2 if annotated axes are 
-*        being produced; 0.06, if a simple border is being produced; and 
-*        0.0 if neither border nor axes are being produced. []
+*        these margins are too narrow any axis annotation may be clipped. 
+*        If a null (!) value is supplied, the value used is (for all edges);
+*        0.2 if annotated axes are being produced; 0.06, if a simple border 
+*        is being produced; and 0.0 if neither border nor axes are being 
+*        produced. []
 *     MODE = LITERAL (Read)
 *        The method by which the maximum and minimum data values to be 
 *        displayed are chosen. The options are:
@@ -288,8 +289,9 @@
 *        axis can be specified either by its integer index within the current 
 *        Frame (in the range 1 to the number of axes in the current Frame), or
 *        by its symbol string. A list of acceptable values is displayed if an 
-*        illegal value is supplied. The dynamic default selects the axes with 
-*        the same indices as the 2 used pixel axes within the NDF. []
+*        illegal value is supplied. If a null (!) value is supplied, the axes 
+*        with the same indices as the 2 used pixel axes within the NDF
+*        are used. [!]
 *     XMAGN = _REAL (Read)
 *        The horizontal magnification for the image.  The default
 *        value of 1.0 corresponds to 'normal' magnification in which the
@@ -305,8 +307,8 @@
 *        A value larger than 1.0 makes each data pixel taller. If this
 *        results in the image being taller than the available space then
 *        the image will be clipped to display fewer pixels. See also
-*        parameters XMAGN, CENTRE and FILL. The dynamic default is the
-*        value supplied for XMAGN. [%XMAGN]
+*        parameters XMAGN, CENTRE and FILL. If a null (!) value is supplied, 
+*        the value used is the value supplied for XMAGN. [!]
 
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
@@ -462,6 +464,8 @@
 *        Use '_DOUBLE' instead of 'DOUBLE' in call to NDF_MTYPE.
 *     26-AUG-1998 (DSB)
 *        Radical changes to use AST and PGPLOT.
+*     3-SEP-1999 (DSB):
+*        Added NULL argument to KPG1_GTPOS call.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -563,6 +567,7 @@
       REAL ASP0                ! Aspect ratio of the available space
       REAL ASPD                ! Aspect ratio of the data array
       REAL ASPECT              ! Aspect ratio of the DATA picture
+      REAL DEFMAR              ! Default MARGIN value
       REAL GLBND( NDIM )       ! Low grid co-ord bounds of PGPLOT window
       REAL GUBND( NDIM )       ! High grid co-ord bounds of PGPLOT window
       REAL LUT( NPRICL, 0:MXLUTE ) ! Lookup table
@@ -597,7 +602,7 @@
 *  Get the main parameters of the data to be displayed.
 *  =====================================================
 *  Obtain the identifier of the NDF to be displayed.
-      CALL NDG_ASSOCL( 'IN', 'READ', INDF1, STATUS )
+      CALL LPG_ASSOC( 'IN', 'READ', INDF1, STATUS )
 
 *  Find which component to display. MCOMP is for use with NDF_MAP and may
 *  be set to 'Error'. COMP is for use with all other NDF routines (which
@@ -636,14 +641,25 @@
 *  two margins in one any dimension must be greater than -1.0. Therefore
 *  limit each margin to be greater than -0.49.
       IF( AXES ) THEN
-         CALL PAR_DEF1R( 'MARGIN', 1, 0.2, STATUS )
+         DEFMAR = 0.2
       ELSE IF( BORDER ) THEN
-         CALL PAR_DEF1R( 'MARGIN', 1, 0.06, STATUS )
+         DEFMAR = 0.06
       ELSE
-         CALL PAR_DEF1R( 'MARGIN', 1, 0.0, STATUS )
+         DEFMAR = 0.0
       END IF
 
+      CALL PAR_DEF1R( 'MARGIN', 1, DEFMAR, STATUS )
+
+*  Abort if an error has occurred.
+      IF( STATUS .NE. SAI__OK ) GO TO 999
+
       CALL PAR_GDRVR( 'MARGIN', 4, -0.49, 10.0, MARGIN, NMARG, STATUS )
+      IF( STATUS .EQ. PAR__NULL ) THEN
+         CALL ERR_ANNUL( STATUS )
+         NMARG = 1
+         MARGIN( 1 ) = DEFMAR         
+      ENDIF
+
       NMARG = MIN( 4, NMARG )
 
 *  Abort if an error has occurred.
@@ -731,7 +747,7 @@
 *  picture so that it fills the available space in at least one dimension.
       CALL PAR_GDR0R( 'XMAGN', 0.0, 1.0E-6, 1.0E6, .FALSE., XMAGN, 
      :                STATUS )
-      CALL PAR_GDR0R( 'YMAGN', XMAGN, 1.0E-6, 1.0E6, .FALSE., YMAGN, 
+      CALL PAR_GDR0R( 'YMAGN', XMAGN, 1.0E-6, 1.0E6, .TRUE., YMAGN, 
      :                STATUS )
 
 *  Abort if an error has occurred.
@@ -779,7 +795,7 @@
 *  only access the CENTRE parameter if a value was supplied on the command 
 *  line. Otherwise, just use the centre of the GRID frame as the centre for 
 *  the displayed image.
-      CALL NDG_STATE( 'CENTRE', STATE, STATUS )
+      CALL LPG_STATE( 'CENTRE', STATE, STATUS )
       IF( ( CC( 1 ) .NE. AST__BAD .AND. CC( 2 ) .NE. AST__BAD ) .OR.
      :    STATE .EQ. PAR__ACTIVE ) THEN
 
@@ -789,7 +805,7 @@
 *  will be ignored if they are bad). KPG1_GTPOS loops until co-ordinates 
 *  are obtains which are valid in the Base Frame (i.e. GRID Frame in our 
 *  case) of the supplied FrameSet. These GRID co-ordinates are returned in GC.
-         CALL KPG1_GTPOS( 'CENTRE', IWCS, CC, GC, STATUS )
+         CALL KPG1_GTPOS( 'CENTRE', IWCS, .TRUE., CC, GC, STATUS )
 
       END IF
 
@@ -864,6 +880,8 @@
 *  TRUE for parameter FILL.
       IF( WDIM( 1 ) .EQ. 1 .OR. WDIM( 2 ) .EQ. 1 ) THEN
          CALL PAR_DEF0L( 'FILL', .TRUE., STATUS )
+      ELSE
+         CALL PAR_DEF0L( 'FILL', .FALSE., STATUS )
       END IF
 
 *  Store the pixel co-ordinate bounds to be stored with the new DATA picture
@@ -1020,7 +1038,7 @@
 
 *  Create the output NDF structure based on the displayed section of the
 *  input NDF.
-         CALL NDG_PROPL( INDF2, 'AXIS,NOQUALITY,NOHISTORY,NOVARIANCE,'//
+         CALL LPG_PROP( INDF2, 'AXIS,NOQUALITY,NOHISTORY,NOVARIANCE,'//
      :                  'NOEXTENSION(),WCS', 'OUT', INDF3, STATUS )
 
          IF ( STATUS .EQ. PAR__NULL ) THEN

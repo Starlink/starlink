@@ -139,7 +139,7 @@
       CALL AST_BEGIN( STATUS )
 
 *  Open the input catalogue.
-      CALL KPG1_CTASS( PARAM, 'READ', CI, STATUS )
+      CALL LPG_CATASSOC( PARAM, 'READ', CI, STATUS )
 
 *  Get the catalogue name for use in error messages.
       CALL CAT_TIQAC( CI, 'NAME', CNAME, STATUS )

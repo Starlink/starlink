@@ -1122,7 +1122,7 @@
 *    If the inspection option is specified on the command line then
 *    there will be no looping.
 
-      CALL NDG_STATE( 'OPTION', ACTOPT, STATUS )
+      CALL LPG_STATE( 'OPTION', ACTOPT, STATUS )
       CMLOPT = ACTOPT .EQ. SUBPAR__ACTIVE
 
 *    The main loop.
@@ -1406,7 +1406,7 @@
 *       Create a new NDF of the section, propagating all other
 *       components.
 
-         CALL NDG_PROPL( NDFR, 'Data,Quality,Variance,Axis,Units,WCS',
+         CALL LPG_PROP( NDFR, 'Data,Quality,Variance,Axis,Units,WCS',
      :                  'OUT', NDFO, STATUS )
 
 *       Get the title for the NDF.

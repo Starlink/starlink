@@ -583,7 +583,7 @@
          CALL ERR_MARK
          LBND( 1 ) = 1
          UBND( 1 ) = NKEPT
-         CALL NDG_PROPL( NDFR, 'NOAXIS,UNITS', 'OUT', NDFO, STATUS )
+         CALL LPG_PROP( NDFR, 'NOAXIS,UNITS', 'OUT', NDFO, STATUS )
 
 *  Change the bounds and type.
          CALL NDF_SBND( 1, LBND, UBND, NDFO, STATUS )

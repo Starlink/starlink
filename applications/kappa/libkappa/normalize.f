@@ -65,12 +65,12 @@
 *        This parameter may be used to override the auto-scaling
 *        feature.  If given, two real numbers should be supplied
 *        specifying the lower and upper data values in IN2, between
-*        which data will be used.  If not given, the default is to use
-*        the auto-scaled values, calculated according to the value of
-*        PCRANGE. Note, this parameter controls the range of data used in
-*        the fitting algorithm. The range of data displayed in the plot can
-*        be specified separately using parameters XLEFT, XRIGHT, YBOT and
-*        YTOP. [,]
+*        which data will be used.  If a null (!) value is supplied, the 
+*        values used are the auto-scaled values, calculated according to 
+*        the value of PCRANGE. Note, this parameter controls the range of 
+*        data used in the fitting algorithm. The range of data displayed 
+*        in the plot can be specified separately using parameters XLEFT, 
+*        XRIGHT, YBOT and YTOP. [!]
 *     DEVICE = DEVICE (Read)
 *        The graphics workstation on which to produce the plot.  If a
 *        null value (!) is supplied no plot will be made. [Current graphics 
@@ -96,7 +96,8 @@
 *     MINPIX = _INTEGER (Read)
 *        The minimum number of good pixels required in a bin before it
 *        contributes to the fitted line.  It must be in the range 1 to
-*        the number of pixels per bin. [2]
+*        the number of pixels per bin. If a null (!) value is supplied, 
+*        the value used is the number of pixels per bin. [!]
 *     NBIN = _INTEGER (Read)
 *        The number of bins to use when binning the scatter plot prior
 *        to fitting a straight line, in the range 2 to 10000. [50]
@@ -168,28 +169,28 @@
 *        instead. [!]
 *     XLEFT = _REAL (Read)
 *        The axis value to place at the left hand end of the horizontal
-*        axis of the plot. The dynamic default is the minimum data value 
-*        used by the fitting algorithm from IN2 (with a small margin). 
-*        The value supplied may be greater than or less than the value 
-*        supplied for XRIGHT. []
+*        axis of the plot. If a null (!) value is supplied, the value used 
+*        is the minimum data value used by the fitting algorithm from IN2 
+*        (with a small margin). The value supplied may be greater than or 
+*        less than the value supplied for XRIGHT. [!]
 *     XRIGHT = _REAL (Read)
 *        The axis value to place at the right hand end of the horizontal
-*        axis of the plot. The dynamic default is the maximum data value 
-*        used by the fitting algorithm from IN2 (with a small margin). 
-*        The value supplied may be greater than or less than the value 
-*        supplied for XLEFT. []
+*        axis of the plot. If a null (!) value is supplied, the value used 
+*        is the maximum data value used by the fitting algorithm from IN2 
+*        (with a small margin). The value supplied may be greater than or 
+*        less than the value supplied for XLEFT. [!]
 *     YBOT = _REAL (Read)
 *        The axis value to place at the bottom end of the vertical axis of 
-*        the plot. The dynamic default is the minimum data value used by 
-*        the fitting algorithm from IN1 (with a small margin). The value 
-*        supplied may be greater than or less than the value supplied for 
-*        YTOP. []
+*        the plot. If a null (!) value is supplied, the value used is
+*        the minimum data value used by the fitting algorithm from IN1 (with 
+*        a small margin). The value supplied may be greater than or less than 
+*        the value supplied for YTOP. []
 *     YTOP = _REAL (Read)
 *        The axis value to place at the top end of the vertical axis of 
-*        the plot. The dynamic default is the maximum data value used by 
-*        the fitting algorithm from IN1 (with a small margin). The value 
-*        supplied may be greater than or less than the value supplied for 
-*        YBOT. []
+*        the plot. If a null (!) value is supplied, the value used is
+*        the maximum data value used by the fitting algorithm from IN1 
+*        (with a small margin). The value supplied may be greater than or 
+*        less than the value supplied for YBOT. [!]
 
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
@@ -367,8 +368,8 @@
       CALL NDF_BEGIN
 
 *  Get NDF identifiers for the two input NDFs.
-      CALL NDG_ASSOCL( 'IN1', 'READ', NDF1S, STATUS )
-      CALL NDG_ASSOCL( 'IN2', 'READ', NDF2S, STATUS )
+      CALL LPG_ASSOC( 'IN1', 'READ', NDF1S, STATUS )
+      CALL LPG_ASSOC( 'IN2', 'READ', NDF2S, STATUS )
 
 *  If an error occurred, abort.
       IF ( STATUS .NE. SAI__OK ) GOTO 999
@@ -376,7 +377,7 @@
 *  Get an NDF identifier for the output NDF. The output is based on IN1
 *  and inherits all the components of IN1 except the data and variance
 *  arrays.
-      CALL NDG_PROPL( NDF1S, 'WCS,Axis,Quality,Units', 'OUT', NDFOUT,
+      CALL LPG_PROP( NDF1S, 'WCS,Axis,Quality,Units', 'OUT', NDFOUT,
      :               STATUS )
 
 *  If an output NDF was obtained successfully...
@@ -467,7 +468,7 @@
 *  which the IN2 data value is inside the given range are used. The
 *  auto-scaled range calculated above is used as the dynamic default.
       CALL PAR_GDR1R( 'DATARANGE', 2, DRDEF, VAL__MINR, VAL__MAXR,
-     :                .FALSE., DRANGE, STATUS )
+     :                .TRUE., DRANGE, STATUS )
 
 *  Get required scalar parameters.
       CALL PAR_GDR0I( 'NBIN', 50, 2, 100000, .TRUE., NBIN, STATUS )
@@ -476,7 +477,7 @@
      :                STATUS )
       DEFMIN = MAX( 1, NELS / NBIN )
       CALL PAR_GDR0I( 'MINPIX', DEFMIN, 1, MIN( DEFMIN, NELS / NBIN ),
-     :                .FALSE., MINPIX, STATUS )
+     :                .TRUE., MINPIX, STATUS )
 
 *  Get temporary workspace for use in KPS1_NMPLT, and map it.
       CALL PSX_CALLOC( NBIN, '_INTEGER', PNTW1, STATUS )

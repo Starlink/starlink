@@ -206,7 +206,7 @@
       CALL NDF_BEGIN
 
 *  Obtain the identifier of the NDF to be displayed.
-      CALL NDG_ASSOCL( 'IN', 'READ', NDFI, STATUS )
+      CALL LPG_ASSOC( 'IN', 'READ', NDFI, STATUS )
 
 *  Find which component(s) to alter.
 *  =================================
@@ -242,15 +242,15 @@
 *  Propagate the LABEL, WCS, HISTORY, UNITS and AXIS components from the
 *  input NDF to the output, and the arrays not to be processed.
       IF ( COMP( 1:4 ) .EQ. 'DATA' ) THEN
-         CALL NDG_PROPL( NDFI, 'WCS,Variance,Quality,Units,Axis', 'OUT',
+         CALL LPG_PROP( NDFI, 'WCS,Variance,Quality,Units,Axis', 'OUT',
      :                  NDFO, STATUS )
 
       ELSE IF ( COMP .EQ. 'VARIANCE' ) THEN
-         CALL NDG_PROPL( NDFI, 'WCS,Data,Quality,Units,Axis', 'OUT',
+         CALL LPG_PROP( NDFI, 'WCS,Data,Quality,Units,Axis', 'OUT',
      :                  NDFO, STATUS )
 
       ELSE IF ( COMP( 1:7 ) .EQ. 'QUALITY' ) THEN
-         CALL NDG_PROPL( NDFI, 'WCS,Data,Variance,Units,Axis', 'OUT', 
+         CALL LPG_PROP( NDFI, 'WCS,Data,Variance,Units,Axis', 'OUT', 
      :                  NDFO, STATUS )
 
       END IF

@@ -112,14 +112,14 @@
       CALL NDF_BEGIN
 
 *  Obtain an identifier for the input NDF.
-      CALL NDG_ASSOCL( 'IN', 'READ', NDF1, STATUS )
+      CALL LPG_ASSOC( 'IN', 'READ', NDF1, STATUS )
 
 *  Obtain the scalar value to be subtracted.
       CALL PAR_GET0D( 'SCALAR', CONST, STATUS )
 
 *  Create a new output NDF based on the input NDF. Propagate the WCS, axis,
 *  quality, units and variance components.
-      CALL NDG_PROPL( NDF1, 'WCS,Axis,Quality,Units,Variance', 'OUT', 
+      CALL LPG_PROP( NDF1, 'WCS,Axis,Quality,Units,Variance', 'OUT', 
      :               NDF2, STATUS )
 
 *  Determine which data type to use to process the input data array.

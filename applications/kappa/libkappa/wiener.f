@@ -105,14 +105,14 @@
 *        is only accessed if a null value is supplied for parameter
 *        MODEL.  If a value is obtained for PMODEL then the model image
 *        is assumed to have the specified constant power at all spatial
-*        frequencies.  The run-time default is the mean power per pixel
-*        in the input image. []
+*        frequencies.  If a null (!) value is supplied, the value used is
+*        the mean power per pixel in the input image. [!]
 *     PNOISE = _REAL (Read)
 *        The mean noise power per pixel in the observed data.  For
-*        Gaussian noise this is equal to the variance.  The run-time
-*        default is an estimate of the noise variance based on the
-*        difference between adjacent pixel values in the observed
-*        data. []
+*        Gaussian noise this is equal to the variance.  If a null (!) 
+*        value is supplied, the value used is an estimate of the noise 
+*        variance based on the difference between adjacent pixel values in 
+*        the observed data. [!]
 *     PSF = NDF (Read)
 *        An NDF holding an estimate of the Point-Spread Function (PSF)
 *        of the input array.  This could, for instance, be produced
@@ -127,12 +127,12 @@
 *        MODEL (or the value given for parameter PMODEL), includes
 *        noise.  If the model does not include any noise then a TRUE
 *        value should be supplied for QUIET.  If there is any noise in
-*        the model then QUIET should be supplied FALSE.  The run-time
-*        default is FALSE, unless the image given for parameter MODEL
-*        was created by a previous run of WIENER (as indicated by the
-*        presence of a WIENER extension in the NDF), in which case the
-*        run time default is TRUE (i.e. the previous run of WIENER is
-*        assumed to have removed the noise). []
+*        the model then QUIET should be supplied FALSE.  If a null (!) 
+*        value is supplied, the value used is FALSE, unless the image 
+*        given for parameter MODEL was created by a previous run of WIENER 
+*        (as indicated by the presence of a WIENER extension in the NDF), 
+*        in which case the run time default is TRUE (i.e. the previous 
+*        run of WIENER is assumed to have removed the noise). [!]
 *     THRESH = _REAL (Read)
 *        The fraction of the PSF peak amplitude at which the extents of
 *        the PSF are determined.  These extents are used to derive the
@@ -489,7 +489,7 @@
 *  noise.  Get the constant noise power to use, using the squared of
 *  the rough estimate of the noise standard deviation obtained earlier
 *  as the dynamic default.
-      CALL PAR_GDR0R( 'PNOISE', STDEV**2, 0.0, VAL__MAXR, .FALSE., PN,
+      CALL PAR_GDR0R( 'PNOISE', STDEV**2, 0.0, VAL__MAXR, .TRUE., PN,
      :                STATUS )
 
 *  Warn the user.
@@ -518,7 +518,7 @@
 *  Get the model power to use.  Use the mean power in the input image
 *  as a default.  Constrain it to be larger than zero.
          CALL PAR_GDR0R( 'PMODEL', MEANO2, 10.0 * VAL__SMLR, VAL__MAXR, 
-     :                   .FALSE., PG, STATUS )
+     :                   .TRUE., PG, STATUS )
 
 *  Warn the user.
          CALL MSG_SETR( 'PG', PG )
@@ -591,7 +591,11 @@
 *  established above.
       CALL MSG_BLANK( STATUS )
       CALL PAR_DEF0L( 'QUIET', QUIET, STATUS )
+
+      IF( STATUS .NE. SAI__OK ) GO TO 999
+
       CALL PAR_GET0L( 'QUIET', QUIET, STATUS )
+      IF( STATUS .EQ. PAR__NULL ) CALL ERR_ANNUL( STATUS )
       
 *  Get the minimum fractional weight of good pixels required to produce
 *  a good output pixel.  Ensure it is not too small.
@@ -615,7 +619,7 @@
 
 *  Create the output NDF, based upon the input NDF, and map its DATA
 *  array.
-      CALL NDG_PROPL( INDF1, 'WCS,Axis,Quality,Units', 'OUT', INDF4,
+      CALL LPG_PROP( INDF1, 'WCS,Axis,Quality,Units', 'OUT', INDF4,
      :               STATUS )
       CALL KPG1_MAP( INDF4, 'Data', '_REAL', 'WRITE', IPN4, NEL4,
      :              STATUS )

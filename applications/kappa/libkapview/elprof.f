@@ -24,31 +24,29 @@
 *     or into a `fan' of adjacent sectors, centred on a specified
 *     position.  The mean data values in each bin are found, and stored 
 *     in a 1-dimensional NDF which can be examined using LINPLOT,
-*     INSPECT, etc.  Options exist to restrict the area binned to a
-*     given range of radial distance and/or azimuthal angle.  A
-*     2-dimensional mask image can optionally be produced indicating
-*     which bin each input pixel was placed in.
+*     INSPECT, etc.  A 2-dimensional mask image can optionally be 
+*     produced indicating which bin each input pixel was placed in.
 *
-*     If radial binning is selected (the default), then each bin is an
-*     elliptical annulus of shape and size determined by parameters
-*     RMIN, RMAX, ANGMAJ, RATIO, XC, YC, and WIDTH.  The bins can be
-*     restricted to a specified sector of these annuli using parameter
-*     ANGLIM.
+*     The area of the input image which is to be binned is the annulus 
+*     enclosed between the two concentric ellipses defined by parameter 
+*     RATIO, ANGMAJ, RMIN and RMAX. The binned area can be restricted to 
+*     an azimuthal section of this annulus using parameter ANGLIM. Input 
+*     data outside the area selected by these parameters is ignored. The 
+*     selected area can be binned in two ways, specified by parameter 
+*     RADIAL:
 *
-*     If azimuthal binning is selected, then each bin is a sector
+*     - If radial binning is selected (the default), then each bin is 
+*     an elliptical annulus concentric with the ellipses bounding the 
+*     binned area. The number of bins is specified by parameter NBIN 
+*     and the radial thickness of each bin is specified by WIDTH. 
+*
+*     - If azimuthal binning is selected, then each bin is a sector
 *     (i.e. a wedge-shape), with its vertex given by parameters XC and
-*     YC, and its opening angle given by parameters WIDTH.  The range of
-*     azimuthal angles to be binned can be specified by parameter
-*     ANGLIM.  The bins can be restricted to the intersection of these
-*     sectors with an elliptical annulus by specified values for
-*     parameters RMIN, RMAX, ANGMAJ and RATIO. 
+*     YC, and its opening angle given by parameters WIDTH.  The number of
+*     bins is specified by NBIN.
 
 *  Usage:
-*     elprof in out nbin xc yc { angmaj=?
-*                              { ratio=?
-*                              { rmin=?
-*                              { rmax=?
-*                              radial
+*     elprof in out nbin xc yc
 
 *  ADAM Parameters:
 *     ANGLIM( 2 ) = _REAL (Read)
@@ -59,13 +57,11 @@
 *        are measured in degrees from the x-axis, and rotation from the
 *        x-axis to the y-axis is positive.  If only a single value is
 *        supplied, or if both values are equal, the sector starts at
-*        the given angle and extends for 360 degrees. [0]
+*        the given angle and extends for 360 degrees. [0.0]
 *     ANGMAJ = _REAL (Read)
 *        The angle between the x-axis and the major axis of the
 *        ellipse, in degrees.  Rotation from the x-axis to the y-axis is
-*        positive.  If an azimuthal profile (see parameter RADIAL) is
-*        being produced a run-time default of zero is used, otherwise
-*        you will be prompted for a value. []
+*        positive.  [0.0]
 *     IN = NDF (Read)
 *        The input NDF containing the 2-dimensional image from which a
 *        profile is to be generated.
@@ -104,20 +100,17 @@
 *     RATIO = _REAL (Read)
 *        The ratio of the length of the minor axis of the ellipse to
 *        the length of the major axis.  It must be in the range 0.0 to
-*        1.0.  If an azimuthal profile (see parameter RADIAL) is being
-*        produced a run-time default of 1.0 is used, otherwise you are
-*        prompted for a value. []
+*        1.0. [1.0]
 *     RMAX = _REAL (Read)
 *        The radius in pixels, measured on the major axis, at the outer edge
-*        of the elliptical region to be binned.  If an azimuthal profile
-*        (see parameter RADIAL) is being produced, a large run-time
-*        default is used which results in the entire image being
-*        binned, otherwise you are prompted for a value. []
+*        of the elliptical annulus to be binned.  If a null value (!) is
+*        supplied the value used is the distance from the ellipse centre
+*        (specified by XC and YC) to the furthest corner of the image. This
+*        will cause the entire image to fall within the outer edge of the
+*        binning area. [!]
 *     RMIN = _REAL (Read)
 *        The radius in pixels, measured on the major axis, at the inner edge
-*        of the elliptical region to be binned.  If an azimuthal profile
-*        (see parameter RADIAL) is being produced a run-time default of
-*        0.0 is used, otherwise you are prompted a value. []
+*        of the elliptical region to be binned. [0.0]
 *     TITLE = LITERAL (Read)
 *        A title for the output profile NDF.  If a null value is
 *        supplied the title is propagated from the input NDF. ["KAPPA -
@@ -127,10 +120,11 @@
 *        (see parameter RADIAL) this is the width of each annulus in
 *        pixels (measured on the major axis).  If an azimuthal profile
 *        is being created, it is the opening angle of each sector, in
-*        degrees.  The run-time default is chosen so that there are no
-*        gaps between adjacent bins.  Smaller values will result in gaps
-*        appearing between adjacent bins.  The supplied value must be
-*        small enough to ensure that adjacent bins do not overlap. []
+*        degrees.  If a null (!) value is supplied, the value used is chosen 
+*        so that there are no gaps between adjacent bins.  Smaller values 
+*        will result in gaps appearing between adjacent bins.  The supplied 
+*        value must be small enough to ensure that adjacent bins do not 
+*        overlap. [!]
 *     XC = _REAL (Read)
 *        The x pixel co-ordinate of the centre of the ellipse, and the
 *        vertex of the sectors.
@@ -171,6 +165,7 @@
 *  Implementation Status:
 *     -  This routine correctly processes the DATA, VARIANCE, TITLE,
 *     UNITS, and HISTORY components of the input NDF.
+*     -  WCS information is currently lost by this application. 
 *     -  Processing of bad pixels and automatic quality masking are
 *     supported.
 *     -  All non-complex numeric data types can be handled.  Arithmetic
@@ -189,6 +184,9 @@
 *        modern variable-declaration style and other stylish changes,
 *        removed long lines, mapped the input arrays together for
 *        efficiency.
+*     6-SEP-1999 (DSB):
+*        Changed the defaulting for ANGMAJ, RATIO, RMAX, RMIN and WIDTH
+*        to avoid vpath=dynamic parameters.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -219,8 +217,6 @@
       
 *  Local Variables:
       INTEGER ACTVAL             ! Actual no. of values obtained
-      REAL ANGLIM( 2 )           ! Angular bounds of the binning sector
-      REAL ANGMAJ                ! Position angle of ellipse major axis
       INTEGER EL                 ! No. of elements in mapped array
       INTEGER I                  ! Loop count
       INTEGER IGRP               ! GRP ID. for group holding ARD desc.
@@ -229,35 +225,35 @@
       INTEGER INDF3              ! NDF ID. for output mask
       INTEGER IPAX( 2 )          ! Pointers to mapped output AXIS arrays
       INTEGER IPDO               ! Pointer to mapped output DATA array
+      INTEGER IPI( 2 )           ! Pointer to mapped input DATA and VARIANCE arrays
       INTEGER IPMASK             ! Pointer to ARD mask array
       INTEGER IPMOUT             ! Pointer to mapped output mask 
-      INTEGER IPI( 2 )           ! Pointer to mapped input DATA and
-                                 ! VARIANCE arrays
-      INTEGER IPVO               ! Pointer to mapped output VARIANCE
-                                 ! array
+      INTEGER IPVO               ! Pointer to mapped output VARIANCE array
       INTEGER IPW1               ! Pointer to mapped work array
       INTEGER IPW2               ! Pointer to mapped work array
-      REAL MAXWID                ! Maximum bin width
       INTEGER NBIN               ! No. of bins
       INTEGER NX                 ! Size of first dimension
       INTEGER NY                 ! Size of second dimension
-      REAL PASTEP                ! Step between adjacent sector bins
-      LOGICAL RADIAL             ! Perform radial binning?
-      REAL RATIO                 ! Ratio of ellipse axes
       INTEGER REGVAL             ! Index for first ARD region
-      REAL RMAX                  ! Outer radius to be binned
-      REAL RMIN                  ! Inner radius to be binned
-      REAL RSTEP                 ! Step between adjacent annular bins
       INTEGER SDIM( 2 )          ! Indices of significant axes
       INTEGER SLBND( 2 )         ! Lower bounds of significant axes
       INTEGER SUBND( 2 )         ! Upper bounds of significant axes
-      LOGICAL USEANN             ! Restrict binning to an annulus?
+      LOGICAL RADIAL             ! Perform radial binning?
+      LOGICAL USEANN             ! Is only part of input image to be binned?
       LOGICAL USESEC             ! Restrict binning to a sector?
       LOGICAL VAR                ! Does input NDF have a VARIANCE array?
+      REAL ANGLIM( 2 )           ! Angular bounds of the binning sector
+      REAL ANGMAJ                ! Position angle of ellipse major axis
+      REAL MAXWID                ! Maximum bin width
+      REAL PASTEP                ! Step between adjacent sector bins
+      REAL RATIO                 ! Ratio of ellipse axes
+      REAL RLIM                  ! Radius to furthest corner
+      REAL RMAX                  ! Outer radius to be binned
+      REAL RMIN                  ! Inner radius to be binned
+      REAL RSTEP                 ! Step between adjacent annular bins
       REAL WIDTH                 ! Bin width
       REAL XC                    ! X centre of ellipse
       REAL YC                    ! Y centre of ellipse
-
 *.
 
 *  Check the inherited global status.
@@ -272,7 +268,7 @@
 
 *  Create the output NDF to hold the mean data values.  It will be
 *  changed later to a suitable 1-dimensional shape.
-      CALL NDG_PROPL( INDF1, 'UNITS', 'OUT', INDF2, STATUS )
+      CALL LPG_PROP( INDF1, 'UNITS', 'OUT', INDF2, STATUS )
 
 *  Find the dimensions of the input image.
       NX = SUBND( 1 ) - SLBND( 1 ) + 1
@@ -319,6 +315,12 @@
       CALL PAR_DEF0R( 'YC', 0.5 * REAL( SUBND( 2 ) + SLBND( 2 ) ), 
      :                STATUS )
       CALL PAR_GET0R( 'YC', YC, STATUS )
+
+*  Find the distance from the ellipse centre to the furthest corner.
+      RLIM = SQRT( MAX( XC - REAL ( SLBND( 1 ) - 1 ), 
+     :                  REAL( SUBND( 1 ) ) - XC )**2 + 
+     :             MAX( YC - REAL ( SLBND( 2 ) - 1 ), 
+     :                  REAL( SUBND( 2 ) ) - YC )**2 )
 
 *  Store the value which will be used to represent the first region
 *  specified in the ARD description describing the bins to be used.
@@ -367,11 +369,20 @@
 
          RMIN = MAX( 0.1, RMIN )
       
+*  Abort if an error has occurred.
+         IF( STATUS .NE. SAI__OK ) GO TO 999
+
 *  Get the major-axis radius of the outer edge of the outer-most
-*  elliptical annulus.  Constrain the used value to be at least RMIN +
-*  NBIN.
+*  elliptical annulus.  
          CALL PAR_GET0R( 'RMAX', RMAX, STATUS )
 
+*  Use the distance to the furthest corner if a null value was supplied.
+         IF( STATUS .EQ. PAR__NULL ) THEN
+            CALL ERR_ANNUL( STATUS )
+            RMAX = RLIM
+         END IF
+
+*  Constrain the used value to be at least RMIN + NBIN.
          IF ( RMAX .LT. RMIN + REAL( NBIN ) ) THEN
             RMAX = RMIN + REAL( NBIN ) 
             CALL MSG_SETR( 'R', RMAX )
@@ -406,6 +417,9 @@
             USESEC = .TRUE.
          END IF
 
+*  Abort if an error has occurred.
+         IF( STATUS .NE. SAI__OK ) GO TO 999
+
 *  Get the width of each annulus, constraining it to be at least 1
 *  pixel.  The default value is such that there are no gaps between the
 *  annuli.  The supplied value is not allowed to be larger than this
@@ -413,6 +427,12 @@
          MAXWID = ( RMAX - RMIN ) / REAL( NBIN )
          CALL PAR_GDR0R( 'WIDTH', MAXWID, 1.0, MAXWID, .FALSE., WIDTH, 
      :                   STATUS )
+
+*  If a null value was supplied, use the dynamic default.
+         IF( STATUS .EQ. PAR__NULL ) THEN
+            CALL ERR_ANNUL( STATUS )
+            WIDTH = MAXWID
+         END IF
 
 *  Store the radial step between each pair of adjacent annuli.
          IF ( NBIN .GT. 1 ) THEN
@@ -463,9 +483,8 @@
 
 *  Get the ratio of the minor- to major-axis lengths.  This must be in
 *  the range 0.0 to 1.0.
-         CALL PAR_GDR0R( 'RATIO', 1.0, 0.0, 1.0, .FALSE., RATIO, 
-     :                   STATUS )
-      
+         CALL PAR_GET0R( 'RATIO', RATIO, STATUS )
+
 *  Get the major-axis radius of the inner edge of the elliptical
 *  annulus.  Limit it to be positive (greater than 0.0) so that ARD
 *  will not try to create an ellipse of zero area.
@@ -473,19 +492,18 @@
      :                   STATUS )
          RMIN = MAX( 0.1, RMIN )
       
+*  Abort if an error has occurred.
+         IF( STATUS .NE. SAI__OK ) GO TO 999
+
 *  Get the major-axis radius of the outer edge of the elliptical
 *  annulus.  Limit it to be greater than RMIN+1.
          CALL PAR_GDR0R( 'RMAX', REAL( MAX( NX, NY ) ), RMIN + 1.0,
      :                    VAL__MAXR, .FALSE., RMAX, STATUS )
 
-*  If a null value was supplied for ANGMAJ, RATIO, RMIN or RMAX, do not
-*  use an annulus (i.e. assume the annulus extends from the centre to
-*  infinity).  Set a flag and annul the error.
-         IF ( STATUS .EQ. PAR__NULL ) THEN
-            USEANN = .FALSE.
+*  Use the distance to the furthest corner if a null value was supplied.
+         IF( STATUS .EQ. PAR__NULL ) THEN
             CALL ERR_ANNUL( STATUS )
-         ELSE
-            USEANN = .TRUE.
+            RMAX = RLIM
          END IF
 
 *  Get the orientations of the two radii defining the sector to be
@@ -503,11 +521,20 @@
          IF ( MAXWID .LE. 0.0 ) MAXWID = MAXWID + 2 * PI
          MAXWID = RTOD * MAXWID / REAL( NBIN )
 
+*  Abort if an error has occurred.
+         IF( STATUS .NE. SAI__OK ) GO TO 999
+
 *  Get the width of each annulus, constraining it to be at least 0.1
 *  degree. 
          CALL PAR_GDR0R( 'WIDTH', MAXWID, 0.1, MAXWID, .FALSE., WIDTH, 
      :                   STATUS )
          WIDTH = DTOR * WIDTH
+
+*  If a null value was supplied, use the dynamic default.
+         IF( STATUS .EQ. PAR__NULL ) THEN
+            CALL ERR_ANNUL( STATUS )
+            WIDTH = DTOR*MAXWID
+         END IF
 
 *  Calculate the step size between the centre of adjacent sectors.
          IF ( ANGLIM( 2 ) .LE. ANGLIM( 1 ) ) THEN
@@ -530,6 +557,12 @@
 *  Get some temporary workspace.
          CALL PSX_CALLOC( 3 + NBIN, '_INTEGER', IPW1, STATUS )         
 
+*  See if the binning area covers the entire image. We can speed up the
+*  binning process if it does.
+         USEANN = ( RMIN .GT. 0.0 .OR. 
+     :              RMAX .LT. MAX( NX, NY ) .OR. 
+     :              MAXWID .LT. 2*PI )
+   
 *  Create the ARD description, storing the axis value for each bin in
 *  the AXIS component of the output NDF.
          CALL KPS1_ELPR2( NX, NY, USEANN, ANGMAJ, RATIO, RMIN, RMAX, XC,
@@ -556,7 +589,7 @@
       IF ( STATUS .NE. SAI__OK ) GO TO 999
       
 *  Get an NDF in which to store the mask.
-      CALL NDG_PROPL( INDF1, ' ', 'MASK', INDF3, STATUS )
+      CALL LPG_PROP( INDF1, ' ', 'MASK', INDF3, STATUS )
 
 *  If a null value was given, annul the error and continue.
       IF ( STATUS .EQ. PAR__NULL ) THEN

@@ -114,8 +114,8 @@
 *     LBOUND( ) = _INTEGER (Read)
 *        The lower bounds of the NDF to be created.  The number of
 *        values must match the number supplied to parameter SHAPE.  It
-*        is only accessed in automatic mode.  It defaults to 1 along
-*        each axis. []
+*        is only accessed in automatic mode.  If a null (!) value is 
+*        supplied, the value used is 1 along each axis. [!]
 *     POSCOLS() = _INTEGER (Read)
 *        Column positions of the co-ordinates in an input record
 *        of the text file, starting from x to higher dimensions.  It
@@ -128,7 +128,8 @@
 *        Pixel-to-pixel distance in co-ordinate units for each
 *        dimension.  It is only used in co-ordinate mode.  Its purpose
 *        is to permit linear scaling from some arbitrary units to
-*        pixels. [1.0 in each co-ordinate dimension] 
+*        pixels. If a null (!) value is supplied, the value used is
+*        1.0 for each co-ordinate dimension. [!] 
 *     QUANTUM = _INTEGER (Read)
 *        You can safely ignore this parameter.  It is used for fine-
 *        tuning performance in the co-ordinate mode.
@@ -475,7 +476,7 @@
             PSDEF( I ) = 1.0
          END DO
          CALL PAR_GDR1R( 'PSCALE', NDIMS, PSDEF, VAL__SMLR, VAL__MAXR,
-     :                   .FALSE., PSCALE, STATUS )
+     :                   .TRUE., PSCALE, STATUS )
 
 *  Now get the work-array packet size.  Tuned for 512-byte blocks.
          CALL PAR_GDR0I( 'QUANTUM', 2048, 32, 2097152, .TRUE., PACKET,
@@ -645,7 +646,7 @@
       CALL NDF_BEGIN
 
 *  Create the output NDF structure.
-      CALL NDG_CREATL( 'NDF', DTYPE, NDIMS, OLBND, OUBND, NDFOUT,
+      CALL LPG_CREAT( 'NDF', DTYPE, NDIMS, OLBND, OUBND, NDFOUT,
      :                STATUS )
 
 *  Set the initialisation control string.  Set the (NDF) bad-pixel

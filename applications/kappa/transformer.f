@@ -79,25 +79,31 @@
 *     SHAPE = LITERAL (Read)
 *        The method by which to define the bounds and co-ordinate limits
 *        of the output NDF.  See Section "Co-ordinate Limits and
-*        Bounds".  The options for SHAPE are described below.
-*           "Bounds" - Specify the output bounds with LBOUND and UBOUND.
-*                      Use the default co-ordinate limits derived from
-*                      the transformation of test points in the input
-*                      NDF.
-*           "Full"   - Specify the output co-ordinate limits and bounds
-*                      with LCOORD, UCOORD, LBOUND and UBOUND.
-*           "Limits" - Use the bounds of the input NDF and specify the
-*                      output co-ordinate limits with LCOORD and UCOORD.
-*           "Match"  - Use the co-ordinate limits from transformed test
-*                      points of the input NDF, and make a co-ordinate
-*                      unit equivalent to one pixel.  The bounds are the
-*                      integer-rounded co-ordinate limits.  This option
-*                      results in an output NDF that is not clipped and
-*                      unlike the other options guarantees no further
-*                      linear compression or expansion.
-*           "Same"   - Use the bounds of the input NDF and take the
-*                      co-ordinate limits from transformed test points
-*                      of the input NDF.
+*        Bounds".  The options for SHAPE are:
+*
+*        -  "Bounds" -- Specify the output bounds with LBOUND and UBOUND.
+*                       Use the default co-ordinate limits derived from
+*                       the transformation of test points in the input
+*                       NDF.
+*
+*        -  "Full"   -- Specify the output co-ordinate limits and bounds
+*                       with LCOORD, UCOORD, LBOUND and UBOUND.
+*
+*        -  "Limits" -- Use the bounds of the input NDF and specify the
+*                       output co-ordinate limits with LCOORD and UCOORD.
+*
+*        -  "Match"  -- Use the co-ordinate limits from transformed test
+*                       points of the input NDF, and make a co-ordinate
+*                       unit equivalent to one pixel.  The bounds are the
+*                       integer-rounded co-ordinate limits.  This option
+*                       results in an output NDF that is not clipped and
+*                       unlike the other options guarantees no further
+*                       linear compression or expansion.
+*
+*        -  "Same"   -- Use the bounds of the input NDF and take the
+*                       co-ordinate limits from transformed test points
+*                       of the input NDF.
+*
 *        The first three also cause the co-ordinate limits to be
 *        reported before obtaining the limits and/or bounds.
 
@@ -111,10 +117,9 @@
 *        the number of input variables, and that in turn equals the
 *        number of dimensions in the input NDF.
 *
-*        SHAPE defaults to the dynamic default.  When COSYS = "Data"
-*        this is "Bounds", and when COSYS = "World" the default is
-*        "Match".  The suggested default is current value, or the
-*        dynamic default if there is not one.  []
+*        If a null (!) value is supplied, a default value is used. When 
+*        COSYS = "Data" this is "Bounds", and when COSYS = "World" the 
+*        default is "Match".  [!]
 *     TITLE = LITERAL (Read)
 *        Title for the output NDF structure.  A null value (!)
 *        propagates the title from the input NDF to the output NDF. [!]
@@ -484,7 +489,7 @@
       ELSE
          IF ( COSYS .EQ. 'DATA' ) THEN
             CALL PAR_CHOIC( 'SHAPE', 'Bounds', 'Bounds,Full,Limits',
-     :                      .FALSE., SHAPE, STATUS )
+     :                      .TRUE., SHAPE, STATUS )
 
 *  When the number of dimensions increases but the NDF has more
 *  dimensions than the input NDF it is hard to know what to do.
@@ -494,7 +499,7 @@
 
          ELSE
             CALL PAR_CHOIC( 'SHAPE', 'Match', 'Bounds,Match',
-     :                      .FALSE., SHAPE, STATUS )
+     :                      .TRUE., SHAPE, STATUS )
          END IF
          SAME = .FALSE.
       END IF
@@ -526,7 +531,7 @@
       CALL NDF_BEGIN
 
 *  Open the input NDF.
-      CALL NDG_ASSOCL( 'IN', 'READ', NDFI, STATUS )
+      CALL LPG_ASSOC( 'IN', 'READ', NDFI, STATUS )
 
 *  Obtain the dimensions of the NDF.
       CALL NDF_DIM( NDFI, NDF__MXDIM, IDIMS, NDIMI, STATUS )
@@ -988,7 +993,7 @@
 
 *  Create the output NDF.
 *  ======================
-      CALL NDG_PROPL( NDFI, 'Units', 'OUT', NDFO, STATUS )
+      CALL LPG_PROP( NDFI, 'Units', 'OUT', NDFO, STATUS )
 
 *  Change its shape where required.
       IF ( .NOT. SAME ) THEN

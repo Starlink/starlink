@@ -142,11 +142,11 @@
 *        be altered.)
 *
 *        If FULL = FALSE, only non-reserved intensities will form the
-*        greyscale.  The default is TRUE when the non-reserved pens
-*        is less than 32, and FALSE otherwise.  (This figure was chosen 
-*        because it is roughly the number of grey levels at which the
-*        eye will clearly detect the quantisation in a complex scene.)
-*        []
+*        greyscale.  If a null (!) value is supplied, the value used is
+*        TRUE when the non-reserved pens is less than 32, and FALSE 
+*        otherwise.  (This figure was chosen because it is roughly the 
+*        number of grey levels at which the eye will clearly detect the 
+*        quantisation in a complex scene.) [!]
 *     IN = NDF (Read)
 *        Input NDF data structure containing the image to be displayed.
 *     KEY = _LOGICAL (Read)
@@ -708,7 +708,7 @@
 
 *    Obtain the identifier of the NDF to be displayed.
 
-      CALL NDG_ASSOCL( 'IN', 'READ', NDF, STATUS )
+      CALL LPG_ASSOC( 'IN', 'READ', NDF, STATUS )
 
 *    There must be a data array, but for other components check that
 *    requested component is present.
@@ -1549,8 +1549,8 @@
 *       found, to avoid finding the maximum and minimum values when
 *       they are not required.
 
-         CALL NDG_STATE( 'BLACK', ACTBLA, STATUS )
-         CALL NDG_STATE( 'WHITE', ACTWHI, STATUS )
+         CALL LPG_STATE( 'BLACK', ACTBLA, STATUS )
+         CALL LPG_STATE( 'WHITE', ACTWHI, STATUS )
          FNDRNG = ACTBLA .EQ. SUBPAR__ACTIVE .AND.
      :            ACTWHI .EQ. SUBPAR__ACTIVE
 
@@ -2300,7 +2300,7 @@
 
 *       Create the output NDF structure based on the input NDF.
 
-         CALL NDG_PROPL( NDF, 'AXIS,NOHISTORY,NOQUALITY,NOVARIANCE,'/
+         CALL LPG_PROP( NDF, 'AXIS,NOHISTORY,NOQUALITY,NOVARIANCE,'/
      :                  /'NOEXTENSION(),WCS', 'OUT', NDFO, STATUS )
 
          IF ( STATUS .EQ. PAR__NULL ) THEN

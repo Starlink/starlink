@@ -56,21 +56,22 @@
 *        background.  If you supply only one value, it is used for
 *        both dimensions.  The minimum value is 2.  The maximum may be
 *        constrained by the number of polynomial terms, such that in
-*        each direction there are at least as many bins as terms.  The
-*        default is dynamic such that 32 bins are created along each
-*        axis. []
+*        each direction there are at least as many bins as terms.  If a 
+*        null (!) value is supplied, the value used is such that 32 bins 
+*        are created along each axis. [!]
 *     CLIP() = _REAL (Read)
 *        Array of limits for progressive clipping of pixel values
 *        during the binning process in units of standard deviation.  A
 *        null value means only unclipped statistics are computed and
 *        presented.  Between 1 and 5 values may be supplied. [2,3]
 *     ESTIMATOR = LITERAL (Read)
-*        The estimator for the bin.  It must one of the following
+*        The estimator for the bin.  It must be one of the following
 *        values: "Mean" for the mean value, "Ksigma" for the mean with
 *        kappa-sigma clipping; "Mode" for the mode, and "Median" for
 *        the median.  "Mode" is only available when there are at least
-*        twelve pixels in a bin.  It is also the default when this
-*        criterion is met, other the default is "Median". []
+*        twelve pixels in a bin.  If a null (!) value is supplied, "Median"
+*        is used if there are less than 6 values in a bin, and "Mode" is 
+*        used otherwise. [!]
 *     EVALUATE = LITERAL (Read)
 *        The method by which the resulting data array is to be
 *        evaluated from the surface-fit.  It must be either
@@ -426,7 +427,7 @@
 
 *  Create the surface-fit NDF, propagating the WCS, AXIS, UNITS, LABEL,
 *  TITLE, HISTORY and extensions from the input NDF.
-      CALL NDG_PROPL( NDFI, 'WCS,Axis,Units', 'OUT', NDFO, STATUS )
+      CALL LPG_PROP( NDFI, 'WCS,Axis,Units', 'OUT', NDFO, STATUS )
 
 *  Obtain a new title for the output NDF.
       CALL NDF_CINP( 'TITLE', NDFO, 'Title', STATUS )
@@ -533,8 +534,18 @@
 *  binned.  A single value supplied applies to both axes.
       BINMIN( 1 ) = MINBIN
       BINMIN( 2 ) = MINBIN
+
+      IF( STATUS .NE. SAI__OK ) GO TO 999
+
       CALL PAR_GRMVI( 'BINDIM', NDIM, BINMIN, BINMAX, IBIN, ACTVAL,
      :                STATUS )
+      IF( STATUS .EQ. PAR__NULL ) THEN
+         CALL ERR_ANNUL( STATUS )
+         IBIN( 1 ) = DBD( 1 )
+         IBIN( 2 ) = DBD( 2 )
+         ACTVAL = 2
+      END IF
+
       IF ( ACTVAL .EQ. 1 ) IBIN( 2 ) = IBIN( 1 )
       IX = IBIN( 1 )
       IY = IBIN( 2 )

@@ -145,7 +145,7 @@
 
 *  Obtain an identifier for the NDF to be modified and obtain its
 *  bounds (normally a section will be supplied).
-      CALL NDG_ASSOCL( 'NDF', 'UPDATE', NDF1, STATUS )
+      CALL LPG_ASSOC( 'NDF', 'UPDATE', NDF1, STATUS )
       CALL NDF_BOUND( NDF1, NDF__MXDIM, LBND, UBND, NDIM, STATUS )
 
 *  Obtain an identifier for the base NDF associated with the section.
@@ -156,7 +156,7 @@
       LIKE = .FALSE.
       IF ( STATUS .EQ. SAI__OK ) THEN
          CALL ERR_MARK
-         CALL NDG_ASSOCL( 'LIKE', 'READ', NDF2, STATUS )
+         CALL LPG_ASSOC( 'LIKE', 'READ', NDF2, STATUS )
 
 *  If a null template was given, then simply annul the error.
          IF ( STATUS .EQ. PAR__NULL ) THEN

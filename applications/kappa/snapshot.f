@@ -950,7 +950,7 @@
 
 *   Create the output NDF structure.
 
-      CALL NDG_CREPL( 'OUT', TYPE, NDIM, IDIMS, NDF, STATUS )
+      CALL LPG_CREP( 'OUT', TYPE, NDIM, IDIMS, NDF, STATUS )
 
       IF ( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )

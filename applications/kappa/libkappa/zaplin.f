@@ -552,7 +552,7 @@
       ZBAD = ZAP .EQ. 'BAD'
 
       IF ( ENVIRO ) THEN
-         CALL NDG_STATE( 'LINCOL', LCSTA, STATUS )
+         CALL LPG_STATE( 'LINCOL', LCSTA, STATUS )
          LCDEF = LCSTA .EQ. SUBPAR__ACTIVE
       END IF
 
@@ -671,8 +671,8 @@
 *    This is initially a copy of the input NDF, which will then be
 *    altered.
 
-      CALL NDG_PROPL( NDF, 'WCS,Data,Variance,Quality,Axis,Units', 
-     :               'OUT', NDFO, STATUS )
+      CALL LPG_PROP( NDF, 'WCS,Data,Variance,Quality,Axis,Units',
+     :                'OUT', NDFO, STATUS )
 
 *    The input NDF is no longer required so annul its identifier.
 

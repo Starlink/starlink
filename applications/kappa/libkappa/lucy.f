@@ -135,9 +135,9 @@
 *     SIGMA = _REAL (Read)
 *        The standard deviation of the noise in the observed data.
 *        This is only used if parameter VARIANCE is given the value
-*        FALSE.  The run-time default is an estimate of the noise
-*        based on the difference between adjacent pixel values in the
-*        observed data. []
+*        FALSE. If a null (!) value is supplied, the value used is
+*        an estimate of the noise based on the difference between 
+*        adjacent pixel values in the observed data. [!]
 *     START = NDF (Read)
 *        An NDF containing an initial guess at the restored array.
 *        This could, for instance, be the output from a previous run of
@@ -167,8 +167,9 @@
 *        error is reported if this option is selected and the NDF has
 *        no VARIANCE component.  If FALSE, then a constant variance
 *        equal to the square of the value given for parameter SIGMA is
-*        used for all data samples.  The run-time default is TRUE if the
-*        input NDF has a VARIANCE component, and FALSE otherwise. []
+*        used for all data samples.  If a null (!) value is supplied, 
+*        the value used is TRUE if the input NDF has a VARIANCE 
+*        component, and FALSE otherwise. [!]
 *     WLIM = _REAL (Read)
 *        If the input array contains bad pixels, then this parameter
 *        may be used to determine the number of good data values which
@@ -202,12 +203,14 @@
 *        happens. [0.001]
 *     XCENTRE = _INTEGER (Read)
 *        The x pixel index of the centre of the PSF within the supplied
-*        PSF array.  The run-time default is the middle pixel (rounded
-*        down if there are an even number of pixels per line). []
+*        PSF array.  If a null (!) value is supplied, the value used is
+*        the middle pixel (rounded down if there are an even number of 
+*        pixels per line). [!]
 *     YCENTRE = _INTEGER (Read)
 *        The y pixel index of the centre of the PSF within the supplied
-*        PSF array. The run-time default is the middle line (rounded
-*        down if there are an even number of lines). []
+*        PSF array. If a null (!) value is supplied, the value used is
+*        the middle line (rounded down if there are an even number of 
+*        lines). [!]
 
 *  Examples:
 *     lucy m51 star m51_hires
@@ -410,9 +413,9 @@
 *  Get the pixel indices of the centre of the PSF within the array.  The
 *  default is the centre of the PSF array.
       CALL PAR_GDR0I( 'XCENTRE', SLBND2( 1 ) + DIMS2( 1 ) / 2,
-     :                SLBND2( 1 ), SUBND2( 1 ), .FALSE., XCEN, STATUS )
+     :                SLBND2( 1 ), SUBND2( 1 ), .TRUE., XCEN, STATUS )
       CALL PAR_GDR0I( 'YCENTRE', SLBND2( 2 ) + DIMS2( 2 ) / 2,
-     :                SLBND2( 2 ), SUBND2( 2 ), .FALSE., YCEN, STATUS )
+     :                SLBND2( 2 ), SUBND2( 2 ), .TRUE., YCEN, STATUS )
 
 *  Get the truncation threshold as fraction of the peak amplitude of
 *  the PSF.
@@ -524,8 +527,14 @@
 
 *  See from where the observed data variances are to be obtained.  If
 *  the input NDF has a VARIANCE component, use it by default.
-      CALL PAR_DEF0L( 'VARIANCE', VAR1, STATUS )
-      CALL PAR_GET0L( 'VARIANCE', VARN, STATUS )
+      IF( STATUS .EQ. SAI__OK ) THEN 
+         CALL PAR_DEF0L( 'VARIANCE', VAR1, STATUS )
+         CALL PAR_GET0L( 'VARIANCE', VARN, STATUS )
+         IF( STATUS .EQ. PAR__NULL ) THEN
+            CALL ERR_ANNUL( STATUS )
+            VARN = VAR1
+         END IF
+      END IF
 
 *  If variances are to be obtained from the NDF...
       IF ( VARN ) THEN 
@@ -572,7 +581,7 @@
 *  obtained earlier as the dynamic default.  Constrain it to be larger
 *  than zero.
          CALL PAR_GDR0R( 'SIGMA', STDEV, 10.0 * VAL__SMLR, VAL__MAXR, 
-     :                   .FALSE., STDEV, STATUS )
+     :                   .TRUE., STDEV, STATUS )
 
 *  Warn the user.
          CALL MSG_SETR( 'SIGMA', STDEV )
@@ -724,7 +733,7 @@
      :                %VAL( IP2 ), %VAL( IP5 ), %VAL( IP7 ), STATUS )
 
 *  Create the output NDF, and map the DATA array.
-      CALL NDG_PROPL( INDF1, 'WCS,AXIS,QUALITY,UNITS', 'OUT', INDF5,
+      CALL LPG_PROP( INDF1, 'WCS,AXIS,QUALITY,UNITS', 'OUT', INDF5,
      :               STATUS )
       CALL KPG1_MAP( INDF5, 'DATA', '_REAL', 'WRITE', IPN5, NEL5,
      :              STATUS )

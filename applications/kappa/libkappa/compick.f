@@ -48,8 +48,8 @@
 *        COMPRESS() pixels.  The origin must lie within the first
 *        selection intervals, therefore the ith origin must be in the
 *        range LBND(i) to LBND(i)+COMPRESS(i)-1, where LBND(i) is the
-*        lower bound of the ith dimension.  The suggested default is
-*        the first array element.
+*        lower bound of the ith dimension.  If a null (!) value is
+*        supplied, the first array element is used. [!]
 *     OUT = NDF (Write)
 *        NDF structure to contain compressed version of the input NDF.
 *     TITLE = LITERAL (Read)
@@ -204,7 +204,7 @@
       CALL NDF_BEGIN
 
 *  Obtain the input NDF.
-      CALL NDG_ASSOCL( 'IN', 'READ', NDFI, STATUS )
+      CALL LPG_ASSOC( 'IN', 'READ', NDFI, STATUS )
 
 *  Inquire the bounds and dimensions of the NDF.
       CALL NDF_BOUND( NDFI, NDF__MXDIM, LBND, UBND, NDIM, STATUS )
@@ -265,7 +265,7 @@
       END DO
 
 *  Get the origin indices.  All must be given.
-      CALL PAR_GRM1I( 'ORIGIN', NDIM, ORGDEF, LBND, ORGMAX, .FALSE.,
+      CALL PAR_GRM1I( 'ORIGIN', NDIM, ORGDEF, LBND, ORGMAX, .TRUE.,
      :                ORIGIN, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 999
 
@@ -319,7 +319,7 @@
 *  and axes will be processed individually, but this enables the LABEL,
 *  UNITS, HISTORY, AXIS character components, and extensions to be
 *  propagated.
-      CALL NDG_PROPL( NDFS, 'Axis,Units', 'OUT', NDFO, STATUS )
+      CALL LPG_PROP( NDFS, 'Axis,Units', 'OUT', NDFO, STATUS )
 
 *  Obtain a title and assign it to the output NDF.
 *  ===============================================

@@ -330,7 +330,7 @@
       LOGFIL = .FALSE.
 
 *  Obtain the NDF to be analysed.
-      CALL NDG_ASSOCL( 'IN', 'READ', NDF, STATUS )
+      CALL LPG_ASSOC( 'IN', 'READ', NDF, STATUS )
 
 *  Determine which array component is to be analysed.
       CALL PAR_CHOIC( 'COMP', 'Data', 'Data,Error,Quality,Variance',
@@ -379,7 +379,7 @@
 *  Obtain the range of values first; later get the number of bins.
 *  Only compute the extreme values and report them when parameter RANGE
 *  is not specified on the command line.
-      CALL NDG_STATE( 'RANGE', ACTRNG, STATUS )
+      CALL LPG_STATE( 'RANGE', ACTRNG, STATUS )
       COMEXT = ACTRNG .NE. PAR__ACTIVE
 
 *  We need to find the minimum and maximum to assist the user.  This
@@ -1081,7 +1081,7 @@
       CALL NDF_BEGIN
 
 *  Create a new NDF.
-      CALL NDG_CREATL( 'OUT', '_INTEGER', 1, 1, NUMBIN, NDFO, STATUS )
+      CALL LPG_CREAT( 'OUT', '_INTEGER', 1, 1, NUMBIN, NDFO, STATUS )
 
 *  Map the data array.
       CALL KPG1_MAP( NDFO, 'Data', '_INTEGER', 'WRITE', OUTPTR,

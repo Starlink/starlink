@@ -82,18 +82,26 @@
 *        parameter is ignored when LOOP=FALSE.
 *     OPTION = LITERAL (Read)
 *        The operation to perform on the extension or a component
-*        therein.  The recognised options are listed below.
-*           "Delete"   - Delete an existing NDF extension.
-*           "Erase"    - Erase a component within an NDF extension
-*           "Exit"     - Exit from the task (when LOOP=TRUE)
-*           "Get"      - Display the value of a component within an NDF
-*                        extension.  The component must exist.
-*           "Put"      - Change the value of a component within an NDF
-*                        extension or create a new component.
-*           "Rename"   - Renames a component.  The component must exist.
-*           "Select"   - Selects another extension.  If the extension
-*                        does not exist a new one is created.  This
-*                        option is not allowed when LOOP=FALSE.
+*        therein.  The recognised options are:
+*
+*        - "Delete"  -- Delete an existing NDF extension, and exit the
+*                       task (when LOOP=TRUE).
+*
+*        - "Erase"   -- Erase a component within an NDF extension
+*
+*        - "Exit"    -- Exit from the task (when LOOP=TRUE)
+*
+*        - "Get"     -- Display the value of a component within an NDF
+*                       extension.  The component must exist.
+*
+*        - "Put"     -- Change the value of a component within an NDF
+*                       extension or create a new component.
+*
+*        - "Rename"  -- Renames a component.  The component must exist.
+*
+*        - "Select"  -- Selects another extension.  If the extension
+*                       does not exist a new one is created.  This
+*                       option is not allowed when LOOP=FALSE.
 *
 *        The suggested default is the current value, except for the
 *        first option where there is no default.
@@ -167,6 +175,9 @@
 *        Usage.  Allowed access to arrays and all integer data types.
 *        Added rename option.  Allowed more than one extension to be
 *        processed.
+*     3-SEP-1999 (DSB):
+*        Corrected description of DELETE option. Do not cancel parameters 
+*        when not looping.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -257,7 +268,7 @@
 *  Open the NDF context and open the NDF for UPDATE access.  (The NDF
 *  must already exist or an error will result).
       CALL NDF_BEGIN
-      CALL NDG_ASSOCL( 'NDF', 'UPDATE', INDF, STATUS )
+      CALL LPG_ASSOC( 'NDF', 'UPDATE', INDF, STATUS )
 
 *  Find whether or not to loop.
       CALL PAR_GET0L( 'LOOP', LOOP, STATUS )
@@ -272,6 +283,10 @@
 *  (3) DELETE command obtained, but only if verified.
 *  (4) Task is not in LOOP mode.
 *  Conditions (2), (3) and (4) are controlled via the RUNING flag.
+*
+*  If LOOP=.FALSE., two passes are made through this loop, not one.
+*  The initial pass always performs a "SELECT" action. The second pass
+*  then performs the action requested by the user.
       RUNING = .TRUE.
 
       DO WHILE ( STATUS .EQ. SAI__OK .AND. RUNING ) 
@@ -979,23 +994,24 @@
 
          END IF
 
-*  The RUNING flag can only be TRUE if LOOP is TRUE as well.  RUNING is
-*  always true for the first loop.
+*  Do another pass through the main loop if LOOP is TRUE or if this
+*  was the first pass through.
          IF ( FIRST ) THEN
             RUNING = .TRUE.
          ELSE
             RUNING = RUNING .AND. LOOP
          END IF
 
-*  Flush any error messages and reset the status.
-         IF ( RUNING ) THEN
+*  If another loop will be performed, and we are looping, flush any error 
+*  messages, reset the status, and cancel any parameters which may need 
+*  to be reprompted for on the next pass.
+         IF ( RUNING .AND. LOOP ) THEN
+
             IF ( STATUS .NE. PAR__ABORT ) THEN
                IF ( STATUS .NE. SAI__OK ) CALL ERR_FLUSH( STATUS ) 
             END IF
 
-*  Cancel any parameters which may need to be reprompted for.
             IF ( FIRST ) THEN
-               FIRST = .FALSE.
                CALL PAR_CANCL( 'XNAME', STATUS )
                CALL PAR_CANCL( 'XTYPE', STATUS )
             ELSE
@@ -1012,6 +1028,9 @@
             END IF
 
          END IF
+
+*  The next pass will not be the first pass.
+         FIRST = .FALSE.
 
       END DO
 

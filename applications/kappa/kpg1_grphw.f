@@ -303,15 +303,29 @@
       IF( YT .NE. VAL__BADR ) YTOP = YT
 
 *  Get new bounds for the plot, using these as dynamic defaults.
-      CALL PAR_DEF0R( 'XLEFT', XLEFT, STATUS )
-      CALL PAR_DEF0R( 'XRIGHT', XRIGHT, STATUS )
-      CALL PAR_DEF0R( 'YBOT', YBOT, STATUS )
-      CALL PAR_DEF0R( 'YTOP', YTOP, STATUS )
+      IF( STATUS .EQ. SAI__OK ) THEN
+         CALL PAR_DEF0R( 'XLEFT', XLEFT, STATUS )
+         CALL PAR_GET0R( 'XLEFT', XLEFT, STATUS )
+         IF( STATUS .EQ. PAR__NULL ) CALL ERR_ANNUL( STATUS )
+      END IF            
 
-      CALL PAR_GET0R( 'XLEFT', XLEFT, STATUS )
-      CALL PAR_GET0R( 'XRIGHT', XRIGHT, STATUS )
-      CALL PAR_GET0R( 'YBOT', YBOT, STATUS )
-      CALL PAR_GET0R( 'YTOP', YTOP, STATUS )
+      IF( STATUS .EQ. SAI__OK ) THEN
+         CALL PAR_DEF0R( 'XRIGHT', XRIGHT, STATUS )
+         CALL PAR_GET0R( 'XRIGHT', XRIGHT, STATUS )
+         IF( STATUS .EQ. PAR__NULL ) CALL ERR_ANNUL( STATUS )
+      END IF            
+
+      IF( STATUS .EQ. SAI__OK ) THEN
+         CALL PAR_DEF0R( 'YBOT', YBOT, STATUS )
+         CALL PAR_GET0R( 'YBOT', YBOT, STATUS )
+         IF( STATUS .EQ. PAR__NULL ) CALL ERR_ANNUL( STATUS )
+      END IF            
+
+      IF( STATUS .EQ. SAI__OK ) THEN
+         CALL PAR_DEF0R( 'YTOP', YTOP, STATUS )
+         CALL PAR_GET0R( 'YTOP', YTOP, STATUS )
+         IF( STATUS .EQ. PAR__NULL ) CALL ERR_ANNUL( STATUS )
+      END IF            
 
 *  Store these as the bounds of the plotting box.
       BOX( 1 ) = DBLE( XLEFT )

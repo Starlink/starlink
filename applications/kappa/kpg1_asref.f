@@ -122,7 +122,7 @@
 *  a) command line, b) graphics database, c) prompting.
 
 *  See if the NDF is pre-supplied on the command line.
-      CALL NDG_STATE( PNNDF, STATE, STATUS )
+      CALL LPG_STATE( PNNDF, STATE, STATUS )
 
 *  Get an identifier to the input NDF if it has not already been
 *  obtained on the command line, using a supplied reference.  See if the
@@ -150,12 +150,12 @@
             CALL MSG_OUT( 'KPG1_ASREF_REFOBJ', 'The displayed NDF '//
      :                    'cannot be accessed. Please supply an '//
      :                    'alternative NDF.', STATUS )
-            CALL NDG_ASSOCL( PNNDF, MODE, NDF, STATUS )
+            CALL LPG_ASSOC( PNNDF, MODE, NDF, STATUS )
          END IF
 
 *  Obtain the identifier of the NDF by association.
       ELSE
-         CALL NDG_ASSOCL( PNNDF, MODE, NDF, STATUS )
+         CALL LPG_ASSOC( PNNDF, MODE, NDF, STATUS )
       END IF
 
   999 CONTINUE

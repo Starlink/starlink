@@ -600,7 +600,7 @@
 *  expression.
          NVAR = 0
          DO 50 I = 1, NIN
-            CALL NDG_ASSOCL( NDFNAM( I ), 'READ', NDF( I ), STATUS )
+            CALL LPG_ASSOC( NDFNAM( I ), 'READ', NDF( I ), STATUS )
 
 *  Check to see if each NDF has a variance component present and count
 *  the number which have.
@@ -705,10 +705,10 @@
 *  propagating the WCS, axis and quality information (and the units
 *  information if required).
          IF ( UNITS ) THEN
-            CALL NDG_PROPL( NDF( 1 ), 'WCS,Axis,Quality,Units', 'OUT',
+            CALL LPG_PROP( NDF( 1 ), 'WCS,Axis,Quality,Units', 'OUT',
      :                     NDFOUT, STATUS )
          ELSE
-            CALL NDG_PROPL( NDF( 1 ), 'WCS,Axis,Quality', 'OUT', NDFOUT,
+            CALL LPG_PROP( NDF( 1 ), 'WCS,Axis,Quality', 'OUT', NDFOUT,
      :                     STATUS )
          END IF
 
@@ -731,7 +731,7 @@
 *  from parameters.  Defer error reporting and attempt to obtain a
 *  second NDF to act as a shape template.
          CALL ERR_MARK
-         CALL NDG_ASSOCL( 'LIKE', 'READ', LIKEID, STATUS )
+         CALL LPG_ASSOC( 'LIKE', 'READ', LIKEID, STATUS )
 
 *  See whether or not a valid template NDF has been given.
          IF ( STATUS .EQ. SAI__OK ) THEN
@@ -749,10 +749,10 @@
 *  Create an output NDF using the supplied template, propagating the
 *  data and axis arrays, the title, label, WCS and history.
             IF ( UNITS ) THEN
-               CALL NDG_PROPL( LIKEID, 'Data,Units,Axis,WCS', 'OUT', 
+               CALL LPG_PROP( LIKEID, 'Data,Units,Axis,WCS', 'OUT', 
      :                        NDFOUT, STATUS )
             ELSE
-               CALL NDG_PROPL( LIKEID, 'Data,Axis,WCS', 'OUT', NDFOUT,
+               CALL LPG_PROP( LIKEID, 'Data,Axis,WCS', 'OUT', NDFOUT,
      :                        STATUS )
             END IF
 
@@ -782,7 +782,7 @@
             CALL PAR_GET1I( 'UBOUND', NPC, UBND, NDIM, STATUS )
 
 *  Create a new NDF of the right type and size from scratch.
-            CALL NDG_CREATL( 'OUT', ITYPE, NPC, LBND, UBND, NDFOUT,
+            CALL LPG_CREAT( 'OUT', ITYPE, NPC, LBND, UBND, NDFOUT,
      :                      STATUS )
 
 *  Initialise the axis system.

@@ -128,11 +128,10 @@
 *        value is entered. Only accessed if parameter MODE is given the 
 *        value "Interface".
 *     TITLE = LITERAL (Read)
-*        A title for the output positions list. The dynamic default
-*        is obtained from the input positions list if one is supplied.
-*        Otherwise, the dynamic default is obtained from the NDF if one
-*        is supplied. Otherwise, the dynamic default is "Output from
-*        LISTMAKE". []
+*        A title for the output positions list. If a null (!) value is 
+*        supplied, the value used is obtained from the input positions list 
+*        if one is supplied. Otherwise, it is obtained from the NDF if one
+*        is supplied. Otherwise, it is "Output from LISTMAKE". [!]
 
 *  Examples:
 *     listmake newlist frame=pixel dim=2 
@@ -208,6 +207,8 @@
 *  History:
 *     16-SEP-1998 (DSB):
 *        Original version.
+*     3-SEP-1999 (DSB):
+*        Added NULL argument to KPG1_GTPOS call.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -290,7 +291,7 @@
 *  ===================================================================
 
 *  Get the NDF which defines the available co-ordinate Frames.
-      CALL NDG_ASSOCL( 'NDF', 'READ', INDF, STATUS )
+      CALL LPG_ASSOC( 'NDF', 'READ', INDF, STATUS )
 
 *  If an NDF was supplied, get its WCS FrameSet.
       IF( STATUS .EQ. SAI__OK ) THEN
@@ -427,7 +428,7 @@
          DO WHILE( NP .LT. MXPOS .AND. STATUS .EQ. SAI__OK ) 
 
             CC( 1 ) = AST__BAD
-            CALL KPG1_GTPOS( 'POSITION', FRM, CC, BC, STATUS )
+            CALL KPG1_GTPOS( 'POSITION', FRM, .FALSE., CC, BC, STATUS )
 
             IF( STATUS .EQ. SAI__OK ) THEN
                NP = NP + 1
@@ -443,6 +444,9 @@
 
 *  Annul the error if a null parameter value was supplied.
          IF( STATUS .EQ. PAR__NULL ) CALL ERR_ANNUL( STATUS )
+
+*  Indicate that we should use the POS array.
+         USEFIL = .FALSE.
 
       END IF
 
@@ -491,13 +495,17 @@
       END IF
 
 *  Get the title to store in the output positions list.
-      IF( TITLE .EQ. ' ' ) THEN
-         IF( INDF .NE. NDF__NOID ) CALL NDF_CGET( INDF, 'TITLE', TITLE,
-     :                                            STATUS )
+      IF( TITLE .EQ. ' ' .AND. INDF .NE. NDF__NOID ) THEN
+         CALL NDF_CGET( INDF, 'TITLE', TITLE, STATUS )
       END IF
+      IF( TITLE .EQ. ' ' ) TITLE = 'Output from LISTMAKE'
+      CALL PAR_DEF0C( 'TITLE', TITLE, STATUS )
 
-      IF( TITLE .NE. ' ' ) CALL PAR_DEF0C( 'TITLE', TITLE, STATUS )
+      IF( STATUS .NE. SAI__OK ) GO TO 999
+
       CALL PAR_GET0C( 'TITLE', TITLE, STATUS )
+      IF( STATUS .EQ. PAR__NULL ) CALL ERR_ANNUL( STATUS )
+
 
 *  Get the index of the Frame within IWCS in which we have positions.
       IFRM = AST_GETI( IWCS, 'CURRENT', STATUS )

@@ -124,6 +124,8 @@
 *        Original version.
 *     25-AUG-1999 (DSB):
 *        Add TOKEN arg in call to KPG1_ASFRM
+*     3-SEP-1999 (DSB):
+*        Added NULL argument to KPG1_GTPOS call.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -165,7 +167,7 @@
       CALL AST_BEGIN( STATUS )
 
 *  Obtain an identifier for the NDF.
-      CALL NDG_ASSOCL( 'NDF', 'READ', INDF, STATUS )
+      CALL LPG_ASSOC( 'NDF', 'READ', INDF, STATUS )
 
 *  Create an AST FrameSet from the WCS component of the NDF.
       CALL KPG1_GTWCS( INDF, IWCS, STATUS )
@@ -191,7 +193,7 @@
 
 *  Get the input position. Do not supply a dynamic default.
       POSIN( 1 ) = AST__BAD
-      CALL KPG1_GTPOS( 'POSIN', FRMIN, POSIN, 0.0D0, STATUS )
+      CALL KPG1_GTPOS( 'POSIN', FRMIN, .FALSE., POSIN, 0.0D0, STATUS )
 
 *  Transform the position into GRID co-ordinates.
       CALL AST_TRANN( IWCS, 1, NIN, 1, POSIN, .FALSE., NGRID, 1, GRID, 

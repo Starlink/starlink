@@ -68,7 +68,7 @@
 *        .TRUE. and the original Current Frame in the supplied NDF has
 *        too many axes. The dynamic default selects the axes with the same
 *        indices as the selected NDF axes. The value should be given as a
-*        GRP group expression, with default control characters. []
+*        GRP group expression, with default control characters. 
 
 *  Arguments:
 *     INDF = INTEGER (Given)

@@ -132,14 +132,14 @@
       CALL AST_BEGIN( STATUS )
 
 *  Obtain an identifier for the NDF.
-      CALL NDG_ASSOCL( 'NDF', 'UPDATE', INDF, STATUS )
+      CALL LPG_ASSOC( 'NDF', 'UPDATE', INDF, STATUS )
 
 *  Create an AST FrameSet from the WCS component of the NDF.
       CALL KPG1_GTWCS( INDF, IWCS, STATUS )
 
 *  If no value was supplied for parameter FRAME on the command line, 
 *  display the current co-ordinate Frame.
-      CALL NDG_STATE( 'FRAME', STATE, STATUS )
+      CALL LPG_STATE( 'FRAME', STATE, STATUS )
       IF( STATE .NE. PAR__ACTIVE ) THEN
          CALL MSG_BLANK( STATUS )
          CALL NDF_MSG( 'NDF', INDF )

@@ -382,7 +382,7 @@
       LBND( 2 ) = 1
       DIMS( 1 ) = 3
       DIMS( 2 ) = NLUTE
-      CALL NDG_CREATL( 'LUT', '_REAL', NDIMS, LBND, DIMS, NDF, STATUS )
+      CALL LPG_CREAT( 'LUT', '_REAL', NDIMS, LBND, DIMS, NDF, STATUS )
 
 *    Map the NDF's data component for WRITE access.
 

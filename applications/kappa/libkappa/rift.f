@@ -149,14 +149,14 @@
       CALL NDF_BEGIN
 
 *  Obtain an identifier for the input NDF.
-      CALL NDG_ASSOCL( 'IN', 'READ', NDFI, STATUS )
+      CALL LPG_ASSOC( 'IN', 'READ', NDFI, STATUS )
 
 *  Obtain the scalar value to be added.
       CALL PAR_GET0D( 'SCALAR', CONST, STATUS )
 
 *  Create a new output NDF based on the input NDF. Propagate the data,
 *  axis, quality, units, WCS and variance components.
-      CALL NDG_PROPL( NDFI, 'Data,Axis,Quality,Units,Variance,WCS', 
+      CALL LPG_PROP( NDFI, 'Data,Axis,Quality,Units,Variance,WCS', 
      :               'OUT', NDFO, STATUS )
 
 *  Determine which data type to use to process the input data array.

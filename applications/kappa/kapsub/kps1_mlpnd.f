@@ -64,12 +64,12 @@
 *        The data value to place at the bottom end of the vertical axis. 
 *        The dynamic default is the lowest data value to be displayed,
 *        after addition of the vertical offsets. The value supplied may be 
-*        greater than or less than the value supplied for YTOP. []
+*        greater than or less than the value supplied for YTOP.
 *     YTOP = _DOUBLE (Read)
 *        The data value to place at the top end of the vertical axis. 
 *        The dynamic default is the highest data value to be displayed,
 *        after addition of the vertical offsets. The value supplied may be 
-*        greater than or less than the value supplied for YBOT. []
+*        greater than or less than the value supplied for YBOT.
 
 *  Arguments:
 *     NX = INTEGER (Given)
@@ -151,6 +151,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! VAL__ constants 
+      INCLUDE 'PAR_ERR'          ! PAR error constants 
 
 *  Arguments Given:
       INTEGER NX
@@ -394,10 +395,17 @@
 
       CALL PAR_DEF0D( 'YBOT', YB, STATUS )
       CALL PAR_DEF0D( 'YTOP', YT, STATUS )
+         
+*  Abort if an error has occurred.
+      IF( STATUS .NE. SAI__OK ) GO TO 999
 
-*  Get alternative values from the environment.
+*  Get alternative values from the environment. Use default if null 
+*  parameter value was supplied.
       CALL PAR_GET0D( 'YBOT', YB, STATUS )
+      IF( STATUS .EQ. PAR__NULL ) CALL ERR_ANNUL( STATUS )
+
       CALL PAR_GET0D( 'YTOP', YT, STATUS )
+      IF( STATUS .EQ. PAR__NULL ) CALL ERR_ANNUL( STATUS )
 
 *  Find the minimum and maximum nominal data values to display.
       IF( YB .GT. YT ) THEN

@@ -403,10 +403,10 @@
 
 *  Obtain an identifier for the first NDF, which defines the data to go
 *  inside the polygonal segments.
-      CALL NDG_ASSOCL( 'IN1', 'READ', INDF1, STATUS )
+      CALL LPG_ASSOC( 'IN1', 'READ', INDF1, STATUS )
 
 *  If a null value was supplied, annul the error (a null NDF identifier
-*  will have been returned by NDG_ASSOCL in this case).
+*  will have been returned by LPG_ASSOC in this case).
       IF ( STATUS .EQ. PAR__NULL ) CALL ERR_ANNUL( STATUS )
 
 *  Set a flag indicating if an NDF was obtained.
@@ -424,10 +424,10 @@
 
 *  Obtain an identifier for the second NDF, which defines the data to go
 *  outside the polygonal segments.
-      CALL NDG_ASSOCL( 'IN2', 'READ', INDF2, STATUS )
+      CALL LPG_ASSOC( 'IN2', 'READ', INDF2, STATUS )
 
 *  If a null value was supplied, annul the error (a null NDF identifier
-*  will have been returned by NDG_ASSOCL in this case).
+*  will have been returned by LPG_ASSOC in this case).
       IF ( STATUS .EQ. PAR__NULL ) CALL ERR_ANNUL( STATUS )
 
 *  Set a flag indicating if an NDF was obtained.
@@ -465,11 +465,11 @@
 *  If the first input NDF was supplied, propagate the output NDF from
 *  the first input NDF.
       IF ( GOT1 ) THEN
-         CALL NDG_PROPL( INDF1, 'UNITS,AXIS,WCS', 'OUT', INDF3, STATUS )
+         CALL LPG_PROP( INDF1, 'UNITS,AXIS,WCS', 'OUT', INDF3, STATUS )
 
 *  Otherwise, propagate the output NDF from the second input NDF.
       ELSE
-         CALL NDG_PROPL( INDF2, 'UNITS,AXIS,WCS', 'OUT', INDF3, STATUS )
+         CALL LPG_PROP( INDF2, 'UNITS,AXIS,WCS', 'OUT', INDF3, STATUS )
       END IF
 
 *  Decide in which plane to specify polygonal segments.
@@ -830,7 +830,7 @@
 *  been supplied for the first polygon co-ordinate file.  If so, set a
 *  flag to suppress looping.
       IF ( MODE .EQ. 'FILE' ) THEN
-         CALL NDG_STATE( 'POLY1', PSTATE, STATUS )
+         CALL LPG_STATE( 'POLY1', PSTATE, STATUS )
          LOOP = PSTATE .NE. PAR__ACTIVE
 
       ELSE
@@ -951,7 +951,7 @@
 *  In no-prompt mode (i.e. when POLY1 is supplied on the command line)
 *  check when the next polygon is supplied there too.
          IF ( NPOLY .GT. 0 .AND. .NOT. LOOP ) THEN
-            CALL NDG_STATE( PNAME( :LPNAME ), PSTATE, STATUS )
+            CALL LPG_STATE( PNAME( :LPNAME ), PSTATE, STATUS )
             USE = PSTATE .EQ. PAR__ACTIVE
          END IF
 

@@ -157,7 +157,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Obtain the NDF to be modified.
-      CALL NDG_ASSOCL( 'NDF', 'UPDATE', NDF, STATUS )
+      CALL LPG_ASSOC( 'NDF', 'UPDATE', NDF, STATUS )
 
 *  Obtain the current bad-bits value.
       CALL NDF_BB( NDF, BB, STATUS )

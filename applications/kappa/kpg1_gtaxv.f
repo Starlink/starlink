@@ -36,6 +36,9 @@
 *        The global status.
 
 *  Notes:
+*     -  If a null (!) parameter value is supplied, the supplied value of
+*     AXVAL is returned, and the error is annulled if the AXVAL value is 
+*     not equal to AST__BAD.
 *     -  AXVAL is left unchanged if an error has already occurred.
 *     -  AST__BAD is returned in AXVAL if an error occurs during this routine.
 
@@ -78,6 +81,7 @@
       CHARACTER FMT*30           ! Axis format
       CHARACTER LAB*30           ! Axis label
       CHARACTER TEXT*255         ! Text string
+      DOUBLE PRECISION AXVAL0    ! Supplied AXVAL value
       INTEGER F                  ! Index of first non-blank character
       INTEGER I                  ! Axis index
       INTEGER IAT                ! No. of characters in a string
@@ -88,6 +92,9 @@
 
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Store the supplied AXVAL value.
+      AXVAL0 = AXVAL
 
 *  If a good position has been supplied in AXVAL, format it and
 *  use it as the dynamic default for the parameter. Otherwise, use
@@ -121,6 +128,14 @@
 
 *  Get a value for the parameter.
          CALL PAR_GET0C( PARAM, TEXT, STATUS )
+
+*  If a parameter null value was supplied, Return the original AXVAL
+*  value, and annul the error if this is not AST__BAD.
+         IF( STATUS .EQ. PAR__NULL ) THEN
+            AXVAL = AXVAL0
+            IF( AXVAL .NE. AST__BAD ) CALL ERR_ANNUL( STATUS )
+            GO TO 999
+         END IF
 
 *  Get the indices of the first and last non-blank characters.
          CALL CHR_FANDL( TEXT, F, L )
@@ -205,6 +220,9 @@
          END IF
 
       END DO
+
+*  Tidy up.
+ 999  CONTINUE
 
 *  If an error has occurred, return AST__BAD values.
       IF( STATUS .NE. SAI__OK ) AXVAL = AST__BAD

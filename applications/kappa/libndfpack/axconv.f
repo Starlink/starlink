@@ -111,7 +111,7 @@
       CALL NDF_BEGIN
 
 *  Associate the NDF.
-      CALL NDG_ASSOCL( 'NDF', 'UPDATE', NDF, STATUS )
+      CALL LPG_ASSOC( 'NDF', 'UPDATE', NDF, STATUS )
 
 *  See if the axis coordinate system is defined.  If not, abort.
 *  header for it.

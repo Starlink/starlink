@@ -216,8 +216,10 @@
 *        declarations and other tidying.
 *     1995 June 18 (MJC):
 *        Added QUIET option and the output parameters.
-*     1997 November 27 (DSB):
+*     27-NOV-1997 (DSB):
 *        Added support for WCS component.
+*     7-SEP-1999 (DSB):
+*        Replaced ERR_MARK/RLSE by ERR_BEGIN/END.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -334,7 +336,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Obtain an identifier for the NDF structure to be examined.
-      CALL NDG_ASSOCL( 'NDF', 'READ', INDF, STATUS )
+      CALL LPG_ASSOC( 'NDF', 'READ', INDF, STATUS )
 
 *  See if full axis information is to be obtained.
       CALL PAR_GET0L( 'FULLAXIS', FULLAX, STATUS )
@@ -544,14 +546,14 @@
 *  error reports concerning a non-monotonic axis may be annulled.
 *  Instead we issue a warning message so that the application can
 *  continue by using world co-ordinates.
-            CALL ERR_MARK
+            CALL ERR_BEGIN( STATUS )
             CALL KPG1_MONOD( .TRUE., EL, %VAL( AXPNTR( 1 ) ),
      :                       MONOTO( IAXIS ), STATUS )
             IF ( STATUS .NE. SAI__OK ) THEN
                CALL ERR_ANNUL( STATUS )
                MONOTO( IAXIS ) = .FALSE.
             END IF
-            CALL ERR_RLSE
+            CALL ERR_END( STATUS )
 
 *  Unmap the axis.
             CALL NDF_AUNMP( INDF, 'Centre', IAXIS, STATUS )

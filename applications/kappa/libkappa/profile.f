@@ -185,6 +185,8 @@
 *  History:
 *     10-SEP-1998 (DSB):
 *        Original version.
+*     3-SEP-1999 (DSB):
+*        Added NULL argument to KPG1_GTPOS call.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -271,7 +273,7 @@
 *  Access the data to be displayed, and get its main parameters.
 *  =============================================================
 *  Obtain the identifier of the NDF to be displayed.
-      CALL NDG_ASSOCL( 'IN', 'READ', INDF1, STATUS )
+      CALL LPG_ASSOC( 'IN', 'READ', INDF1, STATUS )
 
 *  Get an AST pointer to a FrameSet describing the co-ordinate Frames
 *  present in the NDF's WCS component. 
@@ -343,7 +345,7 @@
 
 *  See if a value has been assigned to the parameter INCAT on the command 
 *  line.
-      CALL NDG_STATE( 'INCAT', STATE, STATUS )
+      CALL LPG_STATE( 'INCAT', STATE, STATUS )
              
 *  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999
@@ -410,7 +412,7 @@
 
 *  Get a position for the profile start from the environment, using the
 *  above current Frame co-ordinates as the dynamic default.
-         CALL KPG1_GTPOS( 'START', IWCS, CC1, GC1, STATUS )
+         CALL KPG1_GTPOS( 'START', IWCS, .TRUE., CC1, GC1, STATUS )
 
 *  The suggested default for the end of the profile is the last pixel. 
 *  Store the GRID co-ordinates at the centre of the last pixel.
@@ -424,7 +426,7 @@
 
 *  Get a position for the profile end from the environment, using the
 *  above current Frame co-ordinates as the dynamic default.
-         CALL KPG1_GTPOS( 'FINISH', IWCS, CC2, GC2, STATUS )
+         CALL KPG1_GTPOS( 'FINISH', IWCS, .TRUE., CC2, GC2, STATUS )
 
 *  Store the positions.
          NPOS = 2
@@ -522,7 +524,7 @@
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Create the NDF.
-      CALL NDG_CREATL( 'OUT', TYPE, 1, 1, NP, INDF2, STATUS )
+      CALL LPG_CREAT( 'OUT', TYPE, 1, 1, NP, INDF2, STATUS )
 
 *  Map the DATA and (if required) variance components.
       CALL NDF_MAP( INDF2, 'DATA', '_DOUBLE', 'WRITE', IPDOUT, EL, 

@@ -110,7 +110,7 @@
  
 *    Create a new NDF.
  
-      CALL NDG_CREPL( PNNDF, '_REAL', NDIM, DIMS, NDFO, STATUS )
+      CALL LPG_CREP( PNNDF, '_REAL', NDIM, DIMS, NDFO, STATUS )
  
 *    Map the data array.  Wrap to prevent line overflow when the token
 *    is expanded.

@@ -119,9 +119,9 @@
 *     TYPE = LITERAL (Read)
 *        The data type of the modified axis array.  TYPE can be either
 *        "_REAL" or "_DOUBLE".  It is only accessed for MODE="File",
-*        "Expression", or "Pixel".  The default is the current data
-*        type of the array component if it exists, otherwise it is
-*        "_REAL". []
+*        "Expression", or "Pixel".  If a null (!) value is supplied, the 
+*        value used is the current data type of the array component if 
+*        it exists, otherwise it is "_REAL". [!]
 
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
@@ -284,7 +284,7 @@
       CALL NDF_BEGIN
 
 *  Obtain an identifier for the NDF to be modified.
-      CALL NDG_ASSOCL( 'NDF', 'UPDATE', NDF, STATUS )
+      CALL LPG_ASSOC( 'NDF', 'UPDATE', NDF, STATUS )
 
 *  Find the number of dimensions, and bounds in the NDF.
       CALL NDF_BOUND( NDF, NDF__MXDIM, LBND, UBND, NDIM, STATUS )
@@ -375,7 +375,7 @@
 *  Determine whether or not to loop.  Looping does not occur if the
 *  NEWVAL is given on the command line, i.e. it is already in the active
 *  state.
-         CALL NDG_STATE( 'NEWVAL', ACTVAL, STATUS )
+         CALL LPG_STATE( 'NEWVAL', ACTVAL, STATUS )
 
 *  Map the array component of the axis in update mode.
          TYPE = DEFTYP
@@ -464,7 +464,7 @@
       ELSE IF ( MODE .EQ. 'EXPRESSION' ) THEN
 
 *  Obtain the type of the output array.
-         CALL PAR_CHOIC( 'TYPE', DEFTYP, '_REAL,_DOUBLE', .FALSE., TYPE,
+         CALL PAR_CHOIC( 'TYPE', DEFTYP, '_REAL,_DOUBLE', .TRUE., TYPE,
      :                   STATUS ) 
 
 *  Obtain the expression relating variance values to data values.
@@ -635,7 +635,7 @@
       ELSE IF ( MODE .EQ. 'FILE' ) THEN
 
 *  Obtain the type of the output array.
-         CALL PAR_CHOIC( 'TYPE', DEFTYP, '_REAL,_DOUBLE', .FALSE.,
+         CALL PAR_CHOIC( 'TYPE', DEFTYP, '_REAL,_DOUBLE', .TRUE.,
      :                   TYPE, STATUS ) 
 
 *  Attempt to obtain and open a free-format data file.
@@ -673,7 +673,7 @@
       ELSE IF ( MODE .EQ. 'PIXEL' ) THEN
 
 *  Obtain the type of the output array.
-         CALL PAR_CHOIC( 'TYPE', DEFTYP, '_REAL,_DOUBLE', .FALSE.,
+         CALL PAR_CHOIC( 'TYPE', DEFTYP, '_REAL,_DOUBLE', .TRUE.,
      :                   TYPE, STATUS ) 
 
 *  Specify the number of elements along the axis.

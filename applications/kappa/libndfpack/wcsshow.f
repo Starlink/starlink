@@ -86,9 +86,10 @@
 *        component with name DATA and type _CHAR.
 *     QUIET = _LOGICAL (Read)
 *        If TRUE, then the structure of the AST Object is not displayed
-*        (using the Tk GUI). Other functions are unaffected. The dynamic
-*        default is TRUE if a non-null value is supplied for parameter 
-*        LOGFILE or parameter NEWWCS, and FALSE otherwise. []
+*        (using the Tk GUI). Other functions are unaffected. If a null (!) 
+*        value is supplied, the value used is TRUE if a non-null value is 
+*        supplied for parameter LOGFILE or parameter NEWWCS, and FALSE 
+*        otherwise. [!]
 
 *  Examples:
 *     wcsshow m51
@@ -201,7 +202,7 @@
 
 *  Attempt to open an input catalogue. Annull the error if a null value
 *  is suplied.
-      CALL KPG1_CTASS( 'CAT', 'READ', CI, STATUS )
+      CALL LPG_CATASSOC( 'CAT', 'READ', CI, STATUS )
       IF( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
 
@@ -231,7 +232,7 @@
 
 *  If no catalogue was supplied, get an NDF identifier.
       IF( IAST .EQ. AST__NULL ) THEN
-         CALL NDG_ASSOCL( 'NDF', ACCESS, INDF, STATUS )
+         CALL LPG_ASSOC( 'NDF', ACCESS, INDF, STATUS )
       ELSE
          INDF = NDF__NOID
       END IF
@@ -361,9 +362,13 @@
          CALL ERR_ANNUL( STATUS )
       END IF
 
+*  Abort if an error has occurred.
+      IF( STATUS .NE. SAI__OK ) GO TO 999
+
 *  See if the Object is to be displayed in the GUI.
       CALL PAR_DEF0L( 'QUIET', QUIET, STATUS )
       CALL PAR_GET0L( 'QUIET', QUIET, STATUS )
+      IF( STATUS .EQ. PAR__NULL ) CALL ERR_ANNUL( STATUS )
 
 *  If so (and we have an Object), display it.
       IF( .NOT. QUIET .AND. IAST .NE. AST__NULL ) THEN

@@ -200,7 +200,7 @@
 *  ======================
 
 *  First the principal NDF.
-      CALL NDG_ASSOCL( 'IN', 'READ', NDFI( 1 ), STATUS )
+      CALL LPG_ASSOC( 'IN', 'READ', NDFI( 1 ), STATUS )
 
 *  Make a loop to input the NDFs, via parameters IN1, IN2,...  Start an
 *  error context because a null is used to end the list of NDFs.  Since
@@ -212,7 +212,7 @@
          I = I + 1
          CALL CHR_ITOC( I, CIN, NC )
          PNIN = 'P'//CIN( :NC )
-         CALL NDG_ASSOCL( PNIN, 'READ', NDFI( I + 1 ), STATUS )
+         CALL LPG_ASSOC( PNIN, 'READ', NDFI( I + 1 ), STATUS )
       END DO
 
 *  Look for the expected null.  Note the first pasted NDF may not be
@@ -342,10 +342,10 @@
 *  have the bounds of the output pasted NDF.  Want to propagate from
 *  the principal array.
       IF ( CONFIN ) THEN
-         CALL NDG_PROPL( NDFI( 1 ), 'WCS,AXIS,UNITS', 'OUT', NDFO, 
+         CALL LPG_PROP( NDFI( 1 ), 'WCS,AXIS,UNITS', 'OUT', NDFO, 
      :                  STATUS )
       ELSE
-         CALL NDG_PROPL( NDFIC( 1 ), 'WCS,AXIS,UNITS', 'OUT', NDFO, 
+         CALL LPG_PROP( NDFIC( 1 ), 'WCS,AXIS,UNITS', 'OUT', NDFO, 
      :                  STATUS )
       END IF
 

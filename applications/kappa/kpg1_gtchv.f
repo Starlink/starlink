@@ -196,6 +196,7 @@
                VALS( I ) = IDEF( I )
             END DO
 
+            NGOT = NVAL
             PROMPT = .FALSE.
 
 *  If no error has occurred, check each choice is OK.
@@ -345,7 +346,6 @@
          ENDIF
 
       END DO
-
 
  999  CONTINUE
 

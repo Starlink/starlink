@@ -203,9 +203,9 @@
 *     TITLE =  LITERAL (Read)
 *        A title to store with the output catalogue specified by
 *        parameter OUTCAT, and to display before the centroid positions 
-*        are listed. The run-time default is taken from any input
-*        catalogue specified by parameter INCAT, or is a fixed string
-*        including the name of the NDF. []
+*        are listed. If a null (!) value is supplied, the title is taken 
+*        from any input catalogue specified by parameter INCAT, or is a 
+*        fixed string including the name of the NDF. [!]
 *     TOLER  =  _REAL (Read)
 *        Accuracy in pixels required in centroiding.  Iterations will
 *        stop when the shift between successive centroid positions
@@ -456,7 +456,7 @@
 *  application, but is no longer documented. It is expected that people
 *  will now use parameter OUTCAT instead of COOUT. Only use the parameter
 *  if it was given on the command line.
-      CALL NDG_STATE( 'COOUT', STATE, STATUS )
+      CALL LPG_STATE( 'COOUT', STATE, STATUS )
       IF( STATE .EQ. SUBPAR__ACTIVE ) THEN
 
 *  Abort if an error occured.
@@ -718,7 +718,7 @@ c     :                                 STATUS ), STATUS )
          CALL NDF_MSG( 'NDF', INDF )
          CALL MSG_LOAD( 'DUMMY', '^NDF', NDFNAM, NCI, STATUS )
 
-*  Find teh last "/" marking the end of the directory path.
+*  Find the last "/" marking the end of the directory path.
          CALL NDG1_LASTO( NDFNAM, '/', DIREND, STATUS )
          DIREND = DIREND + 1
 
@@ -733,8 +733,11 @@ c     :                                 STATUS ), STATUS )
 
       END IF
 
-      CALL PAR_DEF0C( 'TITLE', TITLE, STATUS )
-      CALL PAR_GET0C( 'TITLE', TITLE, STATUS )
+      IF( STATUS .EQ. SAI__OK ) THEN
+         CALL PAR_DEF0C( 'TITLE', TITLE, STATUS )
+         CALL PAR_GET0C( 'TITLE', TITLE, STATUS )
+         IF( STATUS .EQ. PAR__NULL ) CALL ERR_ANNUL( STATUS )
+      END IF      
 
 *  Obtain the search region sizes, duplicating the value if only a single 
 *  value is given. Each size must be a positive odd number.
@@ -955,7 +958,7 @@ c     :                                 STATUS ), STATUS )
      :                                           .FALSE., ATTR, STATUS )
 
 *  Close the graphics database and device.
-         CALL AGS_DEASS( 'DEVICE', .FALSE., STATUS )
+         CALL AGP_DEASS( 'DEVICE', .FALSE., STATUS )
 
       END IF
 

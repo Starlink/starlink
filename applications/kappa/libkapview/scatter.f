@@ -135,24 +135,24 @@
 *        of Markers). [current value]
 *     XLEFT = _REAL (Read)
 *        The axis value to place at the left hand end of the horizontal
-*        axis. The dynamic default is determined by parameter PERC1. The 
-*        value supplied may be greater than or less than the value supplied 
-*        for XRIGHT. []
+*        axis. If a null (!) value is suplied, the value used is determined 
+*        by parameter PERC1. The value supplied may be greater than or less 
+*        than the value supplied for XRIGHT. [!]
 *     XRIGHT = _REAL (Read)
 *        The axis value to place at the right hand end of the horizontal
-*        axis. The dynamic default is determined by parameter PERC1. The 
-*        value supplied may be greater than or less than the value supplied 
-*        for XLEFT. []
+*        axis. If a null (!) value is suplied, the value used is determined 
+*        by parameter PERC1. The value supplied may be greater than or less 
+*        than the value supplied for XLEFT. [!]
 *     YBOT = _REAL (Read)
 *        The axis value to place at the bottom end of the vertical axis. 
-*        The dynamic default is determined by parameter PERC2. The value 
-*        supplied may be greater than or less than the value supplied 
-*        for YTOP. []
+*        If a null (!) value is suplied, the value used is determined 
+*        by parameter PERC2. The value supplied may be greater than or less 
+*        than the value supplied for YTOP. [!]
 *     YTOP = _REAL (Read)
 *        The axis value to place at the top end of the vertical axis. 
-*        The dynamic default is determined by parameter PERC2. The value 
-*        supplied may be greater than or less than the value supplied 
-*        for YBOT. []
+*        If a null (!) value is suplied, the value used is determined 
+*        by parameter PERC2. The value supplied may be greater than or less 
+*        than the value supplied for YBOT. [!]
 
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
@@ -287,8 +287,8 @@
       CALL NDF_BEGIN
 
 *  Get NDF identifiers for the two input NDFs.
-      CALL NDG_ASSOCL( 'IN1', 'READ', INDF1, STATUS )
-      CALL NDG_ASSOCL( 'IN2', 'READ', INDF2, STATUS )
+      CALL LPG_ASSOC( 'IN1', 'READ', INDF1, STATUS )
+      CALL LPG_ASSOC( 'IN2', 'READ', INDF2, STATUS )
 
 *  Find which components to plot.
       CALL KPG1_ARCOG( 'COMP1', INDF1, MCOMP1, COMP1, STATUS )

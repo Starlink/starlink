@@ -254,8 +254,6 @@
 *        Modified to use AST_RESAMPLE
 *     5-AUG-1999 (DSB):
 *        Tidied up.
-*     30-AUG-1999 (DSB):
-*        Changed call to NDG_ANNUL/DELET to NDF_ANNUL/DELET.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -318,7 +316,7 @@
       IF ( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Get the reference image.
-      CALL NDG_ASSOCL( 'REF', 'READ', INDFR, STATUS )
+      CALL LPG_ASSOC( 'REF', 'READ', INDFR, STATUS )
 
 *  If a null value was supplied, annul the error and use the first NDF
 *  supplied for IN.

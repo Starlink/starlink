@@ -50,7 +50,7 @@
 *     23-AUG-1999 (DSB):
 *        V0.14 - Added SCATTER.
 *     30-AUG-1999 (DSB):
-*        Added multiple invocation of applications using NDG looping.
+*        Added multiple invocation of applications using LPG looping.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -68,11 +68,13 @@
       INTEGER  STATUS
 
 *  External References:
-      LOGICAL NDG_AGAIN           ! Invoke the application again?
+      LOGICAL LPG_AGAIN           ! Invoke the application again?
 
 *  Local Variables:
       CHARACTER NAME * ( 15 )     ! Task name from the command
+      LOGICAL DISAB               ! Disable looping?
       LOGICAL VERB                ! Run in verbose mode?
+      REAL DELAY                  ! Delay between loops in seconds
 
 *.
 
@@ -89,17 +91,24 @@
 *  Define the current application name for history. The package version
 *  number gets substituted in here when the KAPPA release source tar file 
 *  is contructed.
-      CALL NDF_HAPPN( NAME // ' (KAPPA PKG_VERS)', STATUS )
+      CALL NDF_HAPPN( NAME // ' (KAPPA 0.14)', STATUS )
 
-*  See if we are running in verbose mode.
-      CALL KPG1_VERB( VERB, STATUS )
+*  See if NDF names should be reported when looping.
+      CALL KPG1_ENVDF( 'KAPPA_REPORT_NAMES', VERB, STATUS )
+
+*  See if looping should be disabled.
+      CALL KPG1_ENVDF( 'KAPPA_LOOP_DISABLE', DISAB, STATUS )
+
+*  See if a delay should be included between invocations.
+      DELAY = 0.0
+      CALL KPG1_ENV0R( 'KAPPA_LOOP_DELAY', DELAY, STATUS )
 
 *  Initialise the common blocks used to control multiple invokation of
 *  applications to process lists of NDFs.
-      CALL NDG_START( VERB, STATUS )
+      CALL LPG_START( VERB, DELAY, DISAB, STATUS )
 
 *  Loop round invoking the task for each set of NDFs specified by the user.
-      DO WHILE( NDG_AGAIN( STATUS ) )
+      DO WHILE( LPG_AGAIN( STATUS ) )
 
 *  Check the string against valid A-task names---if matched then call
 *  the relevant A-task

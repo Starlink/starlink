@@ -41,13 +41,13 @@
 *        FWHM).
 *
 *        The values given will be rounded up to positive odd integers
-*        if necessary.  A dynamic default value is calculated which is
-*        just sufficient to accommodate the Gaussian PSF out to a
+*        if necessary.  If a null (!) value is supplied, the value used
+*        is just sufficient to accommodate the Gaussian PSF out to a
 *        radius of 3 standard deviations.  Note that the time taken to
 *        perform the smoothing increases in approximate proportion to
 *        the value of this parameter for a circular Gaussian, and in
 *        proportion to the product of the two box sizes for an
-*        elliptical Gaussian. []
+*        elliptical Gaussian. [!]
 *     FWHM() = _REAL (Read)
 *        This specifies whether a circular or elliptical Gaussian
 *        point-spread function is used in smoothing a 2-dimensional
@@ -277,7 +277,7 @@
       CALL NDF_BEGIN
 
 *  Obtain the input NDF.
-      CALL NDG_ASSOCL( 'IN', 'READ', NDF1, STATUS )
+      CALL LPG_ASSOC( 'IN', 'READ', NDF1, STATUS )
 
 *  Find whether or not there are no more than two significant
 *  dimensions and which ones they are.
@@ -333,8 +333,20 @@
 *  rounded up if necessary.  Ignore any second value.
          BOXDEF( 1 ) = 2 * NINT( 3.0 * SIGMA( 1 ) ) + 1
          CALL PAR_DEF1I( 'BOX', 1, BOXDEF, STATUS )
+
+         IF( STATUS .NE. SAI__OK ) GO TO 99
          CALL PAR_GDRVI( 'BOX', NDIM, 1, VAL__MAXI, BOX, NVAL, STATUS )
-         IF ( STATUS .NE. SAI__OK ) GO TO 99
+
+         IF( STATUS .EQ. PAR__NULL ) THEN
+            CALL ERR_ANNUL( STATUS )
+            BOX( 1 ) = BOXDEF( 1 )
+            NVAL = 1
+
+         ELSE IF ( STATUS .NE. SAI__OK ) THEN
+            GO TO 99
+
+         END IF
+
          IBOX = MAX( BOX( 1 ), 1 ) / 2
       ELSE
 
@@ -371,8 +383,19 @@
          BOXDEF( 1 ) = 2 * NINT( ABS( XMAX ) ) + 1
          BOXDEF( 2 ) = 2 * NINT( ABS( YMAX ) ) + 1
          CALL PAR_DEF1I( 'BOX', NDIM, BOXDEF, STATUS )
+
+         IF( STATUS .NE. SAI__OK ) GO TO 99
          CALL PAR_GDRVI( 'BOX', NDIM, 1, VAL__MAXI, BOX, NVAL, STATUS )
-         IF ( STATUS .NE. SAI__OK ) GO TO 99
+
+         IF( STATUS .EQ. PAR__NULL ) THEN
+            CALL ERR_ANNUL( STATUS )
+            BOX( 1 ) = BOXDEF( 1 )
+            BOX( 2 ) = BOXDEF( 2 )
+            NVAL = 2
+         ELSE IF ( STATUS .NE. SAI__OK ) THEN
+            GO TO 99
+         END IF
+
          IBOX = MAX( BOX( 1 ), 1 ) / 2
 
 *  If only one value was given, a square is used.
@@ -414,7 +437,7 @@
 
 *  Create an output NDF based on the input one.  Set an appropriate
 *  numeric type for the output arrays.
-      CALL NDG_PROPL( NDF1, 'WCS,Axis,Quality,Units', 'OUT', NDF2, 
+      CALL LPG_PROP( NDF1, 'WCS,Axis,Quality,Units', 'OUT', NDF2, 
      :               STATUS )
       CALL NDF_STYPE( DTYPE, NDF2, COMP, STATUS )
 
@@ -554,7 +577,7 @@
       END IF
 
 *  Obtain a new title for the output NDF.  The input NDF's title was
-*  already propagated by the NDG_PROPL call and so a null value will
+*  already propagated by the LPG_PROP call and so a null value will
 *  leave it unaltered.
       CALL NDF_CINP( 'TITLE', NDF2, 'Title', STATUS )
 

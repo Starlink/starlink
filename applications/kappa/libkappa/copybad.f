@@ -127,8 +127,8 @@
       CALL NDF_BEGIN
 
 *  Obtain identifiers for the two input NDFs.
-      CALL NDG_ASSOCL( 'IN', 'READ', IN, STATUS )
-      CALL NDG_ASSOCL( 'REF', 'READ', REF, STATUS )
+      CALL LPG_ASSOC( 'IN', 'READ', IN, STATUS )
+      CALL LPG_ASSOC( 'REF', 'READ', REF, STATUS )
 
 *  Trim the input pixel-index bounds to match.
       CALL NDF_MBND( 'TRIM', IN, REF, STATUS )
@@ -136,7 +136,7 @@
 *  Create a new output NDF based on the first input NDF. Propagate the
 *  data, WCS, and axis components. (Use if neither variance or quality 
 *  arrays are present.)
-      CALL NDG_PROPL( IN, 'Data,WCS,Axis,Variance,Quality', 'OUT', OUT, 
+      CALL LPG_PROP( IN, 'Data,WCS,Axis,Variance,Quality', 'OUT', OUT, 
      :               STATUS )
 
 *  Determine which data type to use to process the input data/variance

@@ -166,7 +166,7 @@
       CALL NDF_BEGIN
 
 *  Obtain an identifier for the NDF to be modified.
-      CALL NDG_ASSOCL( 'NDF', 'UPDATE', INDF, STATUS )
+      CALL LPG_ASSOC( 'NDF', 'UPDATE', INDF, STATUS )
 
 *  Get the WCS FrameSet associated with the NDF.
       CALL KPG1_GTWCS( INDF, IWCS, STATUS )

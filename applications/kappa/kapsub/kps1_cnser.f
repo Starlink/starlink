@@ -250,7 +250,6 @@
       CALL PAR_CHOIC( PNMODE, 'Free', 'Free,Automatic,Area,Linear,'/
      :                /'Magnitude,Percentiles,Equalised', .TRUE., MODE,
      :                STATUS )
-      CALL PAR_CANCL( PNMODE, STATUS )
  
       IF ( STATUS .EQ. SAI__OK ) THEN
  

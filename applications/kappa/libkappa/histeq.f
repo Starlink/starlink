@@ -150,7 +150,7 @@
       CALL NDF_BEGIN
 
 *  Obtain the identifier of the NDF to be displayed.
-      CALL NDG_ASSOCL( 'IN', 'READ', NDFI, STATUS )
+      CALL LPG_ASSOC( 'IN', 'READ', NDFI, STATUS )
 
 *  Inquire whether or not the NDF may have bad values.
       CALL NDF_BAD( NDFI, 'Data', .FALSE., BAD, STATUS )
@@ -161,7 +161,7 @@
 *  Propagate the QUALITY, LABEL, HISTORY, WCS and AXIS components from the
 *  input NDF to the output.  Note that UNITS and VARIANCE become
 *  undefined following the transformation and so are not propagated.
-      CALL NDG_PROPL( NDFI, 'WCS,Quality,Axis', 'OUT', NDFO, STATUS )
+      CALL LPG_PROP( NDFI, 'WCS,Quality,Axis', 'OUT', NDFO, STATUS )
 
 *  This application supports all the non-complex numeric types
 *  directly.  Therefore for the given type of the image find in which

@@ -515,7 +515,7 @@
 
 *    Create a new NDF.
 
-      CALL NDG_CREPL( PNHINA, '_REAL', 1, NUMBIN, NDFO, STATUS )
+      CALL LPG_CREP( PNHINA, '_REAL', 1, NUMBIN, NDFO, STATUS )
 
 *    Map the data array.
 

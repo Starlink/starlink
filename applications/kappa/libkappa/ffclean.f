@@ -250,7 +250,7 @@
       CALL NDF_BEGIN
 
 *  Get identifier for the NDF containing the input image.
-      CALL NDG_ASSOCL( 'IN', 'READ', NDFI, STATUS )
+      CALL LPG_ASSOC( 'IN', 'READ', NDFI, STATUS )
 
 *  Find whether or not there are no more than two significant
 *  dimensions and which ones they are.
@@ -294,7 +294,7 @@
 *  Create a new output NDF to contain the cleaned image, which
 *  inheriting all the attributes of the input NDF.  Set an appropriate
 *  numeric type for the output arrays.
-      CALL NDG_PROPL( NDFI, 'WCS,Axis,Units,Quality', 'OUT', NDFO, 
+      CALL LPG_PROP( NDFI, 'WCS,Axis,Units,Quality', 'OUT', NDFO, 
      :               STATUS )
       CALL NDF_STYPE( DTYPE, NDFO, COMP, STATUS )
 
@@ -465,7 +465,7 @@
       CALL PAR_PUT0D( 'SIGMA', SIGMA, STATUS )   
 
 *  Get the new title for the output image and insert it into the output
-*  NDF.  The input NDF's title was already propagated by the NDG_PROPL
+*  NDF.  The input NDF's title was already propagated by the LPG_PROP
 *  call and so a null value will leave it unaltered.
       CALL NDF_CINP( 'TITLE', NDFO, 'Title', STATUS )
 

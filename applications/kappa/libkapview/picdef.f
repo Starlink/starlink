@@ -405,7 +405,7 @@
 
 *  Get the mode of operation
       CALL PAR_CHOIC( 'MODE', 'Cursor', 'Cursor,XY,Array,TL,BL,CL,TR,'/
-     :                /'BR,CR,TC,BC,CC', .FALSE., MODE, STATUS )
+     :                /'BR,CR,TC,BC,CC', .TRUE., MODE, STATUS )
 
       CALL PAR_GTD0L( 'CURRENT', .FALSE., .TRUE., CURPIC, STATUS )
       IF( STATUS .NE. SAI__OK ) GO TO 999

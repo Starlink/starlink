@@ -168,9 +168,10 @@
 *        ratio of the DATA picture. Four values may be given, in the order;
 *        bottom, right, top, left. If fewer than four values are given, 
 *        extra values are used equal to the first supplied value. If these 
-*        margins are too narrow any axis annotation may be clipped. The
-*        dynamic default is 0.18 (for all edges) if annotated axes are being 
-*        produced, and zero otherwise. See also parameter KEYPOS. []
+*        margins are too narrow any axis annotation may be clipped. If a 
+*        null (!) value is supplied, the value used is 0.18 (for all edges) 
+*        if annotated axes are being produced, and zero otherwise. See also 
+*        parameter KEYPOS. [!]
 *     MODE = LITERAL (Read)
 *        The method used to select the contour levels. The options are:
 *
@@ -278,8 +279,8 @@
 *        its integer index within the current Frame (in the range 1 to the 
 *        number of axes in the current Frame), or by its Symbol attribute. A
 *        list of acceptable values is displayed if an illegal value is 
-*        supplied. The dynamic default selects the axes with the same indices 
-*        as the 2 significant NDF pixel axes. []
+*        supplied. If a null (!) value is supplied, the axes with the same 
+*        indices as the 2 significant NDF pixel axes are used. [!]
 
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
@@ -572,7 +573,7 @@
       CALL NDF_BEGIN
 
 *  Obtain the identifier of the NDF to be contoured.
-      CALL NDG_ASSOCL( 'NDF', 'READ', INDF, STATUS )
+      CALL LPG_ASSOC( 'NDF', 'READ', INDF, STATUS )
 
 *  Find which component to contour.
       CALL KPG1_ARCOG( 'COMP', INDF, MCOMP, COMP, STATUS )
@@ -621,14 +622,28 @@
 *  Start the graphics system.
 *  ==========================
 
-*  Set the dynamic defaults for MARGIN.
+*  Abort if an error has occurred.
+      IF( STATUS .NE. SAI__OK ) GO TO 999
+
+*  Set the dynamic default for MARGIN.
       IF( AXES ) THEN
-         CALL PAR_DEF1R( 'MARGIN', 1, 0.18, STATUS )
+         MARGIN( 1 ) = 0.18 
       ELSE
-         CALL PAR_DEF1R( 'MARGIN', 1, 0.0, STATUS )
+         MARGIN( 1 ) = 0.0
       END IF
 
+      CALL PAR_DEF1R( 'MARGIN', 1, MARGIN( 1 ), STATUS )
+
+*  Get new values.
       CALL PAR_GDRVR( 'MARGIN', 4, -0.49, 10.0, MARGIN, NMARG, STATUS )
+
+*  Use the default if a null value was supplied.
+      IF( STATUS .EQ. PAR__NULL ) THEN
+         CALL ERR_ANNUL( STATUS )
+         NMARG = 1
+      END IF
+
+*  Ignore any suplus values.
       NMARG = MIN( 4, NMARG )
 
 *  Abort if an error has occurred.

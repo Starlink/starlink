@@ -100,7 +100,7 @@
 
 *    Obtain the NDF identifier of the input lookup table.
 
-      CALL NDG_ASSOCL( PNLUT, 'READ', NDFL, STATUS )
+      CALL LPG_ASSOC( PNLUT, 'READ', NDFL, STATUS )
 
 *    Obtain the array dimensions.
 

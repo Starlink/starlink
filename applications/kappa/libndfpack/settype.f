@@ -37,9 +37,9 @@
 *        values, an imaginary part containing zeros being created if
 *        necessary.  If a FALSE value is given, then the components will
 *        be altered so that they hold non-complex values, any imaginary
-*        part being deleted if necessary.  The dynamic default for this
-*        parameter is chosen so that no change is made to the current
-*        state. []
+*        part being deleted if necessary.  If a null (!) value is supplied, 
+*        the value used is chosen so that no change is made to the current
+*        state. [!]
 *     DATA = _LOGICAL (Read)
 *        If a TRUE value is given for this parameter, then the numeric
 *        type of the NDF's data array will be changed.  Otherwise, this
@@ -110,6 +110,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'NDF_PAR'          ! NDF_ public constants
+      INCLUDE 'PAR_ERR'          ! PAR error constants
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -144,7 +145,7 @@
       CALL NDF_BEGIN
 
 *  Obtain an NDF identifier.
-      CALL NDG_ASSOCL( 'NDF', 'UPDATE', NDF, STATUS )
+      CALL LPG_ASSOC( 'NDF', 'UPDATE', NDF, STATUS )
 
 *  Obtain the NDF's current numeric array type as the default.
       CALL NDF_TYPE( NDF, 'Data,Variance', TYPE, STATUS )
@@ -167,9 +168,11 @@
       IF ( STATUS .NE. SAI__OK ) GO TO 99
 
 *  See if the NDF is to hold complex values.  Suggest the current
-*  complex value flag as the default.
+*  complex value flag as the default, and use this value if a null value
+*  is supplied.
       CALL PAR_DEF0L( 'COMPLEX', CMPLX, STATUS )
       CALL PAR_GET0L( 'COMPLEX', CMPLX, STATUS )
+      IF( STATUS .EQ. PAR__NULL ) CALL ERR_ANNUL( STATUS )
 
 *  Determine if the data component's type is to be set.
       CALL PAR_GET0L( 'DATA', DATA, STATUS )

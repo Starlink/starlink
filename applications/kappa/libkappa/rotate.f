@@ -60,10 +60,10 @@
 *        the pixel values in bi-linear interpolation, and also causes 
 *        output variances to be created. This parameter is ignored if 
 *        ANGLE is a multiple of 90 degrees or NNMETH=TRUE; in these cases 
-*        the variance array is merely propagated.  The run-time default 
-*        is TRUE if the input NDF has a VARIANCE component, and FALSE 
-*        otherwise.  Note that following this operation the errors are 
-*        no longer independent. []
+*        the variance array is merely propagated.  If a null (!) value is 
+*        supplied, the value used is TRUE if the input NDF has a VARIANCE 
+*        component, and FALSE otherwise.  Note that following this operation 
+*        the errors are no longer independent. [!]
 
 *  Notes:
 *     -  Bad pixels are ignored in the bi-linear interpolation.  If all
@@ -354,8 +354,11 @@
             CALL NDF_STATE( NDFI, 'Variance', VAR, STATUS )
 
 *  Decide whether or not to process the VARIANCE array.
-            CALL PAR_DEF0L( 'VARIANCE', VAR, STATUS )
-            CALL PAR_GET0L( 'VARIANCE', VAR, STATUS )
+            IF( STATUS .EQ. SAI__OK ) THEN
+               CALL PAR_DEF0L( 'VARIANCE', VAR, STATUS )
+               CALL PAR_GET0L( 'VARIANCE', VAR, STATUS )
+               IF( STATUS .EQ. PAR__NULL ) CALL ERR_ANNUL( STATUS )
+            END IF
          
 *  Decide whether or not to process the QUALITY array.
             CALL PAR_GET0L( 'QUALITY', QUAL, STATUS )
@@ -378,14 +381,14 @@
 *  rotation) needs the array components to be copied.  Axes will be
 *  overwritten later for right-angle multiples.
       IF ( NUMRA .EQ. 2 ) THEN
-         CALL NDG_PROPL( NDFS, 'AXIS,DATA,VARIANCE,QUALITY,UNITS',
+         CALL LPG_PROP( NDFS, 'AXIS,DATA,VARIANCE,QUALITY,UNITS',
      :                   'OUT', NDFO, STATUS )
 
       ELSE IF ( NUMRA .EQ. 1 .OR. NUMRA .EQ. 3 ) THEN
-         CALL NDG_PROPL( NDFS, 'AXIS,UNITS', 'OUT', NDFO, STATUS )
+         CALL LPG_PROP( NDFS, 'AXIS,UNITS', 'OUT', NDFO, STATUS )
 
       ELSE
-         CALL NDG_PROPL( NDFS, 'UNITS', 'OUT', NDFO, STATUS )
+         CALL LPG_PROP( NDFS, 'UNITS', 'OUT', NDFO, STATUS )
       END IF
 
 *  Obtain a new title for the output NDF.

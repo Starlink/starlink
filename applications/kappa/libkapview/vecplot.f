@@ -107,8 +107,8 @@
 *        TRUE if a key is to be produced. [TRUE]
 *     KEYVEC = _REAL (Read)
 *        Length of the vector to be displayed in the key, in data units.
-*        A default value is generated based on the spread of vector
-*        lengths in the plot. []
+*        If a null (!) value is supplied, the value used is generated 
+*        on the basis of the spread of vector lengths in the plot. [!]
 *     MAJTIC( 2 ) = _REAL (Read)
 *        The parameter controlling the numbers of major tick marks
 *        for the x and y axes.  (Number used is between MAJTIC+2 and
@@ -153,8 +153,8 @@
 *     STEP = _INTEGER (Read)
 *        The number of pixels between adjacent displayed vectors (along
 *        both axes).  Increasing this value reduces the number of
-*        displayed vectors.  The default value gives about 30 vectors 
-*        along the longest axis of the plot. []
+*        displayed vectors.  If a null (!) value is supplied, the value 
+*        used gives about 30 vectors along the longest axis of the plot. [!]
 *     THICK = _REAL (Read)
 *        The thickness of the axes and annotations in the plot, where
 *        1.0 is the normal thickness.  Currently, this is only available
@@ -180,8 +180,9 @@
 *     VSCALE = _REAL (Read)
 *        The scale to be used for the vectors.  The supplied value
 *        should give the data value corresponding to a vector length of
-*        one centimetre.  The default makes 5% of all displayed vectors
-*        larger than the interval between adjacent vectors. []
+*        one centimetre.  If a null (!) value is supplied, a value is used
+*        which makes 5% of all displayed vectors larger than the interval 
+*        between adjacent vectors. [!]
 *     VTYPE = LITERAL (Read)
 *        The type of vector to be plotted; it can take the value "Arrow"
 *        or "Line".  Vectors are drawn as arrows or lines accordingly.
@@ -281,6 +282,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! VAL_ constants
       INCLUDE 'NDF_PAR'          ! NDF_ constants
+      INCLUDE 'PAR_ERR'          ! PAR_ error constants
       INCLUDE 'CTM_PAR'          ! CTM_ Colour-Table Management
                                  ! constants
       INCLUDE 'GKS_PAR'          ! GKS constants (GSET)
@@ -797,12 +799,16 @@
      :                STATUS )
       ANGROT = ANGROT * DTOR
 
+*  Abort if an error has occurred.
+      IF( STATUS .NE. SAI__OK ) GO TO 999
+
 *  Find the increment between plotted vectors, in pixels, ensuring that
 *  it is not zero or negative.  A default value which gives a reasonable
 *  number of vectors along the shortest axis is used.
       STEP = MAX( 1, NINT( MAX( SXHI - SXLO, SYHI - SYLO ) / NVEC0 ) )
       CALL PAR_DEF0I( 'STEP', STEP, STATUS )
       CALL PAR_GET0I( 'STEP', STEP, STATUS )
+      IF( STATUS .EQ. PAR__NULL ) CALL ERR_ANNUL( STATUS )
       STEP = MAX( 1, STEP )
 
 *  Establish the default value for the vector scaling factor such that
@@ -814,6 +820,10 @@
      :              ( 100.0 * XM * REAL( STEP ) ) )
       CALL PAR_DEF0R( 'VSCALE', DEFSCA, STATUS )
       CALL PAR_GET0R( 'VSCALE', VSCALE, STATUS )
+      IF( STATUS .EQ. PAR__NULL ) THEN
+         CALL ERR_ANNUL( STATUS )
+         VSCALE = DEFSCA
+      END IF
       VSCALE = ABS( VSCALE )
       IF ( VSCALE .LE. VAL__SMLR ) VSCALE = DEFSCA
 

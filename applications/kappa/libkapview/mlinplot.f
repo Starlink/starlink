@@ -72,14 +72,14 @@
 *        the NDF. [1]
 *     AXES = _LOGICAL (Read)
 *        TRUE if labelled and annotated axes are to be drawn around the
-*        plot. The dynamic default is FALSE if the plot is being
-*        aligned with an existing plot (see parameter CLEAR), and
-*        TRUE otherwise. Parameters USEAXIS and YLOG determine the
+*        plot. If a null (!) value is supplied, FALSE is used if the plot 
+*        is being aligned with an existing plot (see parameter CLEAR), and
+*        TRUE is used otherwise. Parameters USEAXIS and YLOG determine the
 *        quantities used to annotated the horizontal and vertical axes
 *        respectively. The width of the margins left for the annotation 
 *        may be controlled using parameter MARGIN. The appearance of the 
 *        axes (colours, fonts, etc) can be controlled using the parameter
-*        STYLE. []
+*        STYLE. [!]
 *     CLEAR = _LOGICAL (Read)
 *        If TRUE the current picture is cleared before the plot is 
 *        drawn. If CLEAR is FALSE not only is the existing plot retained, 
@@ -321,9 +321,9 @@
 *        the left edge of the plotting area, and 1.0 the right edge. Values
 *        outside the range 0 to 1 may be used. [current value]
 *     USEAXIS = LITERAL (Read)
-*        The index of the axis which is to be used to annotate the 
-*        horizontal axis of the plot. It must be less than or equal to 
-*        the number of axes in the current co-ordinate Frame of the NDF. 
+*        The index or label of the axis within the current co-ordinate Frame 
+*        of the NDF which is to be used to annotate the horizontal axis of 
+*        the plot. 
 *
 *        The quantity used to annotate the horizontal axis must have a
 *        defined value at all points in the array, and must increase or 
@@ -331,24 +331,28 @@
 *        used to annotate the horizontal axis, then an error will be
 *        reported if the profile passes through RA=0 because it will 
 *        introduce a non-monotonic jump in axis value (from 0h to 24h, or 
-*        24h to 0h). [1]
+*        24h to 0h). If a null (!) value is supplied, the value of parameter 
+*        ABSAXS is used. [!]
 *     XLEFT = LITERAL (Read)
 *        The axis value to place at the left hand end of the horizontal
-*        axis. The dynamic default is the value for the first element in the 
-*        data being displayed. The value supplied may be greater than or 
-*        less than the value supplied for XRIGHT. A formatted value for the 
-*        quantity specified by parameter USEAXIS should be supplied. []
+*        axis. If a null (!) value is supplied, the value used is the first 
+*        element in the data being displayed. The value supplied may be 
+*        greater than or less than the value supplied for XRIGHT. A formatted 
+*        value for the quantity specified by parameter USEAXIS should be 
+*        supplied. [!]
 *     XRIGHT = LITERAL (Read)
 *        The axis value to place at the right hand end of the horizontal
-*        axis. The dynamic default is the value for the last element in the 
-*        data being displayed. The value supplied may be greater than or 
-*        less than the value supplied for XLEFT. A formatted value for the 
-*        quantity specified by parameter USEAXIS should be supplied. []
+*        axis. If a null (!) value is supplied, the value used is the last
+*        element in the data being displayed. The value supplied may be 
+*        greater than or less than the value supplied for XLEFT. A formatted 
+*        value for the quantity specified by parameter USEAXIS should be 
+*        supplied. [!]
 *     YBOT = _DOUBLE (Read)
 *        The data value to place at the bottom end of the vertical axis. 
-*        The dynamic default is the lowest data value to be displayed,
-*        after addition of the vertical offsets. The value supplied may be 
-*        greater than or less than the value supplied for YTOP. []
+*        If a null (!) value is supplied, the value used is the lowest data 
+*        value to be displayed, after addition of the vertical offsets. The 
+*        value supplied may be greater than or less than the value supplied 
+*        for YTOP. [!]
 *     YLOG = _LOGICAL (Read)
 *        TRUE if the value displayed on the vertical axis is to be the
 *        logarithm of the supplied data values. If TRUE, then the values
@@ -356,9 +360,10 @@
 *        logarithm of the data value, not the data value itself. [FALSE]
 *     YTOP = _DOUBLE (Read)
 *        The data value to place at the top end of the vertical axis. 
-*        The dynamic default is the highest data value to be displayed,
-*        after addition of the vertical offsets. The value supplied may be 
-*        greater than or less than the value supplied for YBOT. []
+*        If a null (!) value is supplied, the value used is the highest data 
+*        value to be displayed, after addition of the vertical offsets. The 
+*        value supplied may be greater than or less than the value supplied 
+*        for YBOT. [!]
 *     ZMARK = _LOGICAL (Read)
 *        If TRUE, then a pair of short horizontal lines are drawn at the left 
 *        and right edges of the main plot for each curve. The vertical
@@ -450,6 +455,7 @@
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
       INCLUDE 'NDF_PAR'          ! NDF__ constants 
       INCLUDE 'PRM_PAR'          ! VAL__ constants 
+      INCLUDE 'PAR_ERR'          ! PAR error constants 
 
 *  Status:
       INTEGER STATUS
@@ -562,7 +568,7 @@
 *  =============================================
 
 *  Obtain the identifier of the NDF to be ploted.
-      CALL NDG_ASSOCL( 'NDF', 'READ', INDF, STATUS )
+      CALL LPG_ASSOC( 'NDF', 'READ', INDF, STATUS )
 
 *  Find which component to plot.
       CALL KPG1_ARCOG( 'COMP', INDF, MCOMP, COMP, STATUS )
@@ -856,10 +862,17 @@ c         IMODE = 4
 
 *  Produce the plot.
 *  =================
+*  Abort if an error has occurred.
+      IF( STATUS .NE. SAI__OK ) GO TO 999
+
 *  See if axes are required. Default is YES unless the plot was drawn
 *  over an existing plot.
       CALL PAR_DEF0L( 'AXES', .NOT. ALIGN, STATUS )
       CALL PAR_GET0L( 'AXES', AXES, STATUS )
+      IF( STATUS .EQ. PAR__NULL ) THEN
+         CALL ERR_ANNUL( STATUS )
+         AXES = .NOT. ALIGN 
+      END IF
 
 *  Draw the grid if required.
       IF( AXES ) CALL KPG1_ASGRD( IPLOT, IPICF, .TRUE., STATUS )

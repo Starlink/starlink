@@ -74,8 +74,8 @@
 *     FIRST = INTEGER (Read)
 *        The identifier for the first position to be displayed. Positions
 *        are only displayed which have identifiers in the range given by
-*        parameters FIRST and LAST. The dynamic default is the lowest
-*        identifier value in the positions list. []
+*        parameters FIRST and LAST. If a null (!) value is supplied, the 
+*        value used is the lowest identifier value in the positions list. [!]
 *     FRAME = LITERAL (Read)
 *        A string determining the co-ordinate Frame in which positions are 
 *        to be reported. This application can report positions in
@@ -130,8 +130,9 @@
 *     LAST = INTEGER (Read)
 *        The identifier for the last position to be displayed. Positions
 *        are only displayed which have identifiers in the range given by
-*        parameters FIRST and LAST. parameters FIRST and LAST. The dynamic 
-*        default is the highest identifier value in the positions list. []
+*        parameters FIRST and LAST. parameters FIRST and LAST. If a null (!) 
+*        value is supplied, the value used is the highest identifier value 
+*        in the positions list. [!]
 *     LOGFILE = FILENAME (Write)
 *        The name of the text file in which the formatted co-ordinates of 
 *        the selected positions may be stored. This is intended primarily 
@@ -220,8 +221,9 @@
 *     QUIET = LOGICAL (Read)
 *        If TRUE then the positions are not displayed on the screen while 
 *        The application is running. Output parameters and files are still 
-*        created. The dynamic default is to run quietly if any graphics or 
-*        labels are being plotted (see parameters PLOT and LABEL). []
+*        created. If a null (!) value is supplied, the value used is TRUE
+*        if any graphics or labels are being plotted (see parameters PLOT 
+*        and LABEL), and FALSE otherwise. [!]
 *     STRINGS = LITERAL (Read)
 *        A group of text strings which are used to mark the supplied positions 
 *        if parameter PLOT is set to "TEXT". The first string in the group 
@@ -441,14 +443,15 @@
       CALL PAR_GET0L( 'LABEL', LABEL, STATUS )
 
 *  Set the dynamic default for QUIET.
-      IF( ( PLOT .NE. 'NONE' .AND. PLOT .NE. 'BLANK' ) .OR. LABEL ) THEN
-         CALL PAR_DEF0L( 'QUIET', .TRUE., STATUS )
-      ELSE
-         CALL PAR_DEF0L( 'QUIET', .FALSE., STATUS )
-      END IF
+      QUIET = ( PLOT .NE. 'NONE' .AND. PLOT .NE. 'BLANK' ) .OR. LABEL
+      CALL PAR_DEF0L( 'QUIET', QUIET, STATUS )
+	
+*  Abort if an error has occurred.
+      IF( STATUS .NE. SAI__OK ) GO TO 999
 
-*  See if we are to supress display all information on the screen.
+*  See if we are to suppress all information on the screen.
       CALL PAR_GET0L( 'QUIET', QUIET, STATUS )
+      IF( STATUS .EQ. PAR__NULL ) CALL ERR_ANNUL( STATUS )
 
 *  Get the input positions list. A pointer to a FrameSet is returned,
 *  together with pointers to positions and identifiers, and a title.
@@ -595,12 +598,12 @@
 
 *  Get the first position identifier to be displayed. Use a dynamic
 *  default equal to the lowest identifier in the positions list.
-      CALL PAR_GDR0I( 'FIRST', FIRST, FIRST, LAST, .FALSE., FIRST, 
+      CALL PAR_GDR0I( 'FIRST', FIRST, FIRST, LAST, .TRUE., FIRST, 
      :                STATUS )
 
 *  Get the last position identifier to be displayed. Use a dynamic
 *  default equal to the highest identifier in the positions list.
-      CALL PAR_GDR0I( 'LAST', LAST, FIRST, LAST, .FALSE., LAST, 
+      CALL PAR_GDR0I( 'LAST', LAST, FIRST, LAST, .TRUE., LAST, 
      :                STATUS )
 
 *  Count the number of positions within the supplied range of position

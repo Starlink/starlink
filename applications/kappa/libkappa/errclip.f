@@ -138,7 +138,7 @@
       CALL NDF_BEGIN
 
 *  Get the input NDF
-      CALL NDG_ASSOCL( 'IN', 'READ', INDF1, STATUS )
+      CALL LPG_ASSOC( 'IN', 'READ', INDF1, STATUS )
 
 *  Check that it has a defined VARIANCE component.  Report an error if
 *  not.
@@ -155,7 +155,7 @@
 
 *  Get the output NDF, propagating all components and extensions except
 *  DATA and VARIANCE.
-      CALL NDG_PROPL( INDF1, 'WCS,UNITS,AXIS,QUALITY', 'OUT', INDF2, 
+      CALL LPG_PROP( INDF1, 'WCS,UNITS,AXIS,QUALITY', 'OUT', INDF2, 
      :               STATUS )
 
 *  See what type of limit is to be used.

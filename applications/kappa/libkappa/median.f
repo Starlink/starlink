@@ -294,7 +294,7 @@
 *     5-JUN-1998 (DSB):
 *        Added propagation of the WCS component.
 *     16-SEP-1998 (DSB):
-*        Correction to component list passed to NDG_PROPL; ">WCS" replaced 
+*        Correction to component list passed to LPG_PROP; ">WCS" replaced 
 *        by ",WCS".
 *     {enter_further_changes_here}
 
@@ -498,7 +498,7 @@
 
 *  Create output NDF structure, propagating the DATA, AXIS, UNITS, WCS,
 *  LABEL, TITLE, HISTORY and extensions from the input NDF.
-      CALL NDG_PROPL( NDFI, 'Data,Axis,Units,WCS', 'OUT', NDFO, STATUS )
+      CALL LPG_PROP( NDFI, 'Data,Axis,Units,WCS', 'OUT', NDFO, STATUS )
 
 *  Obtain a new title for the output NDF.
       CALL NDF_CINP( 'TITLE', NDFO, 'Title', STATUS )
