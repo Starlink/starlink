@@ -233,6 +233,7 @@ ADIobj DnameAfter       = ADI__nullid;
 ADIobj DnameAround      = ADI__nullid;
 ADIobj DnameBefore      = ADI__nullid;
 ADIobj DnamePrimary     = ADI__nullid;
+ADIobj DnameNewLink     = ADI__nullid;
 ADIobj DnameSetLink     = ADI__nullid;
 ADIobj DnameUnLink      = ADI__nullid;
 
@@ -4361,6 +4362,11 @@ ADIobj adix_fdsp_vo( ADICB *rtn, int *narg, ADIobj args[], ADIstatus status )
   return ADI__nullid;
   }
 
+void adix_base_NewLink( ADIobj id, ADIobj lid, ADIstatus status )
+  {
+  adic_cput0i( id, "ADIlink", (UT_CTYPE_i) lid, status );
+  }
+
 void adix_base_SetLink( ADIobj id, ADIobj lid, ADIstatus status )
   {
   adic_cput0i( id, "ADIlink", (UT_CTYPE_i) lid, status );
@@ -4371,6 +4377,14 @@ void adix_base_UnLink( ADIobj id, ADIstatus status )
   adic_cput0i( id, "ADIlink", 0, status );
   }
 
+void adix_newlnk( ADIobj id, ADIobj lid, ADIstatus status )
+  {
+  ADIobj        args[2];
+
+  args[0] = id; args[1] = lid;
+
+  adix_execi( DnameNewLink, 2, args, status );
+  }
 
 void adix_setlnk( ADIobj id, ADIobj lid, ADIstatus status )
   {
@@ -4450,6 +4464,7 @@ void adix_dinit( ADIstatus status )
     {"After",         &DnameAfter},
     {"Before",        &DnameBefore},
     {"Primary",       &DnamePrimary},
+    {"NewLink",       &DnameNewLink},
     {"SetLink",       &DnameSetLink},
     {"UnLink",        &DnameUnLink},
     {NULL,NULL}};
@@ -4462,6 +4477,7 @@ void adix_dinit( ADIstatus status )
     }
   gtable[] =
     {
+    {"NewLink(lhs,rhs)",       adix_cdsp_voo,	adix_fdsp_voo},
     {"SetLink(lhs,rhs)",       adix_cdsp_voo,	adix_fdsp_voo},
     {"UnLink(lhs,rhs)",        adix_cdsp_vo,	adix_fdsp_vo},
     {NULL,NULL,NULL}};
@@ -4473,6 +4489,7 @@ void adix_dinit( ADIstatus status )
     }
   mtable[] =
     {
+    {"NewLink(ADIbase,ADIbase)",       (ADIcMethodCB) adix_base_NewLink},
     {"SetLink(ADIbase,ADIbase)",       (ADIcMethodCB) adix_base_SetLink},
     {"UnLink(ADIbase,ADIbase)",        (ADIcMethodCB) adix_base_UnLink},
     {NULL,NULL}};
@@ -5310,7 +5327,7 @@ void adix_fcreat( char *fspec, int flen, ADIobj id, ADIobj *fileid,
     ocls = _DTDEF(id)->aname;		/* Class name of created object */
 
 /* Link user object to file object if required */
-    adix_setlnk( *fileid, id, status );
+    adix_newlnk( *fileid, id, status );
     }
 
   }
