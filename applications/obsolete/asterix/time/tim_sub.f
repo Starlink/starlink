@@ -814,8 +814,7 @@
       CALL BDI_AXPUT0C(FID,1,'Units',T_AUNITS,STATUS)
 
 *  Copy ancilliary stuff from input
-      CALL BDI_COPY(T_FID,'More',FID,' ',STATUS)
-      CALL UDI_COPANC(T_FID,'grf',FID,STATUS)
+c      CALL UDI_COPANC(T_FID,'grf',FID,STATUS)
 
       IF (STATUS.NE.SAI__OK) THEN
         CALL AST_REXIT('TIM_SAVEALL',STATUS)
