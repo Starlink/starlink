@@ -368,6 +368,7 @@
       INCLUDE 'GRP_PAR'          ! GRP system constants
       INCLUDE 'AST_PAR'          ! AST system declarations
       INCLUDE 'CCD1_PAR'         ! Private CCDPACK constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:           
       INTEGER STATUS             ! Global status
@@ -614,7 +615,8 @@
                         CALL CCD1_MALL( NP( I ), '_INTEGER', IPIND( I ),
      :                                  STATUS )
                         CALL CCD1_GISEQ( NPOSI + 1, 1, NP( I ),
-     :                                   %VAL( IPIND( I ) ), STATUS )
+     :                                   %VAL( CNF_PVAL( IPIND( I ) ) ), 
+     :                                   STATUS )
 
 *  Standard file format map these in.
                      ELSE
@@ -665,20 +667,30 @@
                   CALL CCD1_MALL( NP( I ), '_DOUBLE', IPX2, STATUS )
                   CALL CCD1_MALL( NP( I ), '_DOUBLE', IPY2, STATUS )
                   IF ( DOMAIN .EQ. 'PIXEL' ) THEN
-                     CALL CCD1_LEXT( %VAL( IPDAT( I ) ), NP( I ),
-     :                               NF( I ), 1, %VAL( IPX2 ), STATUS )
-                     CALL CCD1_LEXT( %VAL( IPDAT( I ) ), NP( I ),
-     :                               NF( I ), 2, %VAL( IPY2 ), STATUS )
+                     CALL CCD1_LEXT( %VAL( CNF_PVAL( IPDAT( I ) ) ), 
+     :                               NP( I ),
+     :                               NF( I ), 1, 
+     :                               %VAL( CNF_PVAL( IPX2 ) ), STATUS )
+                     CALL CCD1_LEXT( %VAL( CNF_PVAL( IPDAT( I ) ) ), 
+     :                               NP( I ),
+     :                               NF( I ), 2, 
+     :                               %VAL( CNF_PVAL( IPY2 ) ), STATUS )
                   ELSE
                      CALL CCD1_MALL( NP( I ), '_DOUBLE', IPX1, STATUS )
                      CALL CCD1_MALL( NP( I ), '_DOUBLE', IPY1, STATUS )
-                     CALL CCD1_LEXT( %VAL( IPDAT( I ) ), NP( I ),
-     :                               NF( I ), 1, %VAL( IPX1 ), STATUS )
-                     CALL CCD1_LEXT( %VAL( IPDAT( I ) ), NP( I ),
-     :                               NF( I ), 2, %VAL( IPY1 ), STATUS )
-                     CALL AST_TRAN2( MAP( I ), NP( I ), %VAL( IPX1 ),
-     :                               %VAL( IPY1 ), .TRUE., 
-     :                               %VAL( IPX2 ), %VAL( IPY2 ),
+                     CALL CCD1_LEXT( %VAL( CNF_PVAL( IPDAT( I ) ) ), 
+     :                               NP( I ),
+     :                               NF( I ), 1, 
+     :                               %VAL( CNF_PVAL( IPX1 ) ), STATUS )
+                     CALL CCD1_LEXT( %VAL( CNF_PVAL( IPDAT( I ) ) ), 
+     :                               NP( I ),
+     :                               NF( I ), 2, 
+     :                               %VAL( CNF_PVAL( IPY1 ) ), STATUS )
+                     CALL AST_TRAN2( MAP( I ), NP( I ), 
+     :                               %VAL( CNF_PVAL( IPX1 ) ),
+     :                               %VAL( CNF_PVAL( IPY1 ) ), .TRUE.,
+     :                               %VAL( CNF_PVAL( IPX2 ) ), 
+     :                               %VAL( CNF_PVAL( IPY2 ) ),
      :                               STATUS )
                      CALL CCD1_MFREE( IPX1, STATUS )
                      CALL CCD1_MFREE( IPY1, STATUS )
@@ -686,12 +698,16 @@
 
 *  Copy the points from their current arrays into the right part of 
 *  the Set array.
-                  CALL CCG1_COPSI( 1, %VAL( IPIND( I ) ), NP( I ),
-     :                             NPA, %VAL( IPII ), STATUS )
-                  CALL CCG1_COPSD( 1, %VAL( IPX2 ), NP( I ), NPA,
-     :                             %VAL( IPXI ), STATUS )
-                  CALL CCG1_COPSD( 1, %VAL( IPY2 ), NP( I ), NPA,
-     :                             %VAL( IPYI ), STATUS )
+                  CALL CCG1_COPSI( 1, %VAL( CNF_PVAL( IPIND( I ) ) ), 
+     :                             NP( I ),
+     :                             NPA, %VAL( CNF_PVAL( IPII ) ), 
+     :                             STATUS )
+                  CALL CCG1_COPSD( 1, %VAL( CNF_PVAL( IPX2 ) ), 
+     :                             NP( I ), NPA,
+     :                             %VAL( CNF_PVAL( IPXI ) ), STATUS )
+                  CALL CCG1_COPSD( 1, %VAL( CNF_PVAL( IPY2 ) ), 
+     :                             NP( I ), NPA,
+     :                             %VAL( CNF_PVAL( IPYI ) ), STATUS )
 
 *  Increment the position in the Set array.
                   NPA = NPA + NP( I )
@@ -706,8 +722,10 @@
          END IF
          
 *  Invoke the Tcl code to do the work.
-         CALL CCD1_TCURS( NDFNMS, NMEM, SNAME, DOMAIN, %VAL( IPII ),
-     :                    %VAL( IPXI ), %VAL( IPYI ), NPOSI, VERBOS, 
+         CALL CCD1_TCURS( NDFNMS, NMEM, SNAME, DOMAIN, 
+     :                    %VAL( CNF_PVAL( IPII ) ),
+     :                    %VAL( CNF_PVAL( IPXI ) ), 
+     :                    %VAL( CNF_PVAL( IPYI ) ), NPOSI, VERBOS,
      :                    PERCNT, ZOOM, MAXCNV, WINDIM, MSTYLE, CENTRD,
      :                    IPIO, IPXO, IPYO, NPOSO, STATUS )
 
@@ -725,8 +743,9 @@
                CALL CCD1_FIOHD( FD, 'Output from IDICURS', STATUS )
 
 *  Write the positions to the output file.
-               CALL CCD1_WRIXY( FD, %VAL( IPIO ), %VAL( IPXO ),
-     :                          %VAL( IPYO ), NPOSO, LINE,
+               CALL CCD1_WRIXY( FD, %VAL( CNF_PVAL( IPIO ) ), 
+     :                          %VAL( CNF_PVAL( IPXO ) ),
+     :                          %VAL( CNF_PVAL( IPYO ) ), NPOSO, LINE,
      :                          CCD1__BLEN, STATUS )
 
 *  Close the output file.
@@ -771,9 +790,11 @@
                      CALL CCD1_MALL( NPOSO, '_INTEGER', IPI2, STATUS )
 
 *  Transform the positions into pixel coordinates.
-                     CALL AST_TRAN2( MAP( I ), NPOSO, %VAL( IPXO ),
-     :                               %VAL( IPYO ), .FALSE.,
-     :                               %VAL( IPX1 ), %VAL( IPY1 ),
+                     CALL AST_TRAN2( MAP( I ), NPOSO, 
+     :                               %VAL( CNF_PVAL( IPXO ) ),
+     :                               %VAL( CNF_PVAL( IPYO ) ), .FALSE.,
+     :                               %VAL( CNF_PVAL( IPX1 ) ), 
+     :                               %VAL( CNF_PVAL( IPY1 ) ),
      :                               STATUS )
 
 *  Get the NDF's bounds.
@@ -786,15 +807,20 @@
 
 *  Select only the points in this position list which fall within the
 *  bounds of this NDF.
-                     CALL CCD1_CHUSB( %VAL( IPIO ), %VAL( IPX1 ),
-     :                                %VAL( IPY1 ),
+                     CALL CCD1_CHUSB( %VAL( CNF_PVAL( IPIO ) ), 
+     :                                %VAL( CNF_PVAL( IPX1 ) ),
+     :                                %VAL( CNF_PVAL( IPY1 ) ),
      :                                NPOSO, XLO, XHI, YLO, YHI, 
-     :                                %VAL( IPI2 ), %VAL( IPX2 ), 
-     :                                %VAL( IPY2 ), NPO, STATUS )
+     :                                %VAL( CNF_PVAL( IPI2 ) ), 
+     :                                %VAL( CNF_PVAL( IPX2 ) ),
+     :                                %VAL( CNF_PVAL( IPY2 ) ), 
+     :                                NPO, STATUS )
 
 *  Write the positions out.
-                     CALL CCD1_WRIXY( FD, %VAL( IPI2 ), %VAL( IPX2 ),
-     :                                %VAL( IPY2 ), NPO, LINE,
+                     CALL CCD1_WRIXY( FD, %VAL( CNF_PVAL( IPI2 ) ), 
+     :                                %VAL( CNF_PVAL( IPX2 ) ),
+     :                                %VAL( CNF_PVAL( IPY2 ) ), 
+     :                                NPO, LINE,
      :                                CCD1__BLEN, STATUS )
 
 *  Free memory.

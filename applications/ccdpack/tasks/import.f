@@ -274,6 +274,7 @@
       INCLUDE 'DAT_PAR'          ! HDS/DAT parameters
       INCLUDE 'FIO_PAR'          ! FIO parameters
       INCLUDE 'GRP_PAR'          ! GRP system constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -335,8 +336,8 @@
 *  to be stored at this location.
          CALL GRP_GRPSZ( LINGRP, NLINES, STATUS )
          CALL CCD1_MALL( NLINES, '_LOGICAL', IPLOG, STATUS )
-         CALL CCD1_FTGRP( WRDGRP, LINGRP, %VAL( IPLOG ), FITGRP,
-     :                    DESGRP, STATUS )
+         CALL CCD1_FTGRP( WRDGRP, LINGRP, %VAL( CNF_PVAL( IPLOG ) ), 
+     :                    FITGRP, DESGRP, STATUS )
          CALL CCD1_MFREE( IPLOG, STATUS )
 
 *  Free table groups.
@@ -411,10 +412,14 @@
 *  systems (normally implemented by the compiler), on VMS this makes
 *  no difference.
             IF ( STATUS .EQ. SAI__OK ) THEN
-               CALL CCD1_IMFIT( FITGRP, DESGRP, IDIN, %VAL( IPFIT ),
-     :                          FITLEN, %VAL( IPINT ), %VAL( IPREAL ),
-     :                          %VAL( IPDBLE ), %VAL( IPLOG ),
-     :                          %VAL( IPCHR), STATUS, %VAL( 80 ) )
+               CALL CCD1_IMFIT( FITGRP, DESGRP, IDIN, 
+     :                          %VAL( CNF_PVAL( IPFIT ) ),
+     :                          FITLEN, %VAL( CNF_PVAL( IPINT ) ), 
+     :                          %VAL( CNF_PVAL( IPREAL ) ),
+     :                          %VAL( CNF_PVAL( IPDBLE ) ), 
+     :                          %VAL( CNF_PVAL( IPLOG ) ),
+     :                          %VAL( CNF_PVAL( IPCHR )), STATUS, 
+     :                          %VAL( 80 ) )
             END IF
 
 *  Unmap FITS block.

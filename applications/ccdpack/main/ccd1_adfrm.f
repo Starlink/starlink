@@ -80,6 +80,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! Standard AST constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
       
 *  Arguments Given:
       INTEGER FSET
@@ -151,7 +152,8 @@
       IF ( FITROT .NE. ' ' ) THEN
          IF ( NCARD .GT. 0 ) THEN
             FROT = 0D0
-            CALL FTS1_GKEYD( NCARD, %VAL( IPFITS ), 1, FITROT, THERE,
+            CALL FTS1_GKEYD( NCARD, %VAL( CNF_PVAL( IPFITS ) ), 
+     :                       1, FITROT, THERE,
      :                       FROT, ICARD, STATUS, %VAL( 80 ) )
             IF ( THERE ) THEN
                ROTATE = ROTATE + FROT

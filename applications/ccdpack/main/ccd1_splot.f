@@ -60,6 +60,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! Standard AST constants
       INCLUDE 'DAT_PAR'          ! Standard HDS constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Local Constants:
       INTEGER CLEN               ! Length of strings in character array
@@ -136,7 +137,8 @@
       NEL = NEL + 1
  1    CONTINUE
       NEL = NEL - 1
-      CALL CCD1_CA2C( %VAL( IPWCS ), NEL, LINE, STATUS, %VAL( CLEN ) )
+      CALL CCD1_CA2C( %VAL( CNF_PVAL( IPWCS ) ), NEL, LINE, STATUS, 
+     :                %VAL( CLEN ) )
       IF ( LINE .EQ. ' ' .AND. NEL .GT. 1 ) GO TO 1
 
 *  Unmap the data and resize the array to the number of non-empty lines.

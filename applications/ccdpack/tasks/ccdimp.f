@@ -99,6 +99,7 @@
       INCLUDE 'FIO_ERR'         ! FIO_ error codes
       INCLUDE 'TRN_PAR'         ! TRANSFORM constants
       INCLUDE 'CCD1_PAR'        ! CCDPACK constants
+      INCLUDE 'CNF_PAR'         ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -261,7 +262,8 @@
                         ITMP = INSERT - 1
                         CALL CHR_PUTI( I, KEYWRD, ITMP )
                      END IF
-                     CALL FTS1_GKEYC( EL, %VAL( PNTR( 1 ) ), 1,
+                     CALL FTS1_GKEYC( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                                1,
      :                                KEYWRD, FOUND, CVAL, CARD,
      :                                STATUS, %VAL( LENGTH ) )
                      IF ( STATUS .EQ. SAI__OK ) THEN
@@ -285,8 +287,8 @@
 *  Obtain a value for the keyword from the FITS header. Note
 *  extra %VAL(LENGTH) used to pass length of mapped character array.
                   IF ( LINE( I1( 2 ):I2( 2 ) ) .EQ. '_CHAR' ) THEN
-                     CALL FTS1_GKEYC( EL, %VAL( PNTR( 1 ) ), 1,
-     :                                LINE( I1( 3 ):I2( 3 ) ), FOUND,
+                     CALL FTS1_GKEYC( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                                1, LINE( I1( 3 ):I2( 3 ) ), FOUND,
      :                                CVAL, CARD, STATUS,
      :                                %VAL( LENGTH ) )
                      IF ( STATUS .EQ. SAI__OK ) THEN
@@ -306,8 +308,8 @@
 *  Obtain a value for the keyword from the FITS header.
                   ELSE IF ( LINE( I1( 2 ):I2( 2 ) ) .EQ. '_DOUBLE' )
      :                    THEN
-                     CALL FTS1_GKEYD( EL, %VAL( PNTR( 1 ) ), 1,
-     :                                LINE( I1( 3 ):I2( 3 ) ), FOUND,
+                     CALL FTS1_GKEYD( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                                1, LINE( I1( 3 ):I2( 3 ) ), FOUND,
      :                                DVAL, CARD, STATUS,
      :                                %VAL( LENGTH ) )
                      IF ( STATUS .EQ. SAI__OK ) THEN
@@ -325,8 +327,8 @@
 *  Obtain a value for the keyword from the FITS header.
                   ELSE IF ( LINE( I1( 2 ):I2( 2 ) ) .EQ. '_INTEGER' )
      :                    THEN
-                     CALL FTS1_GKEYI( EL, %VAL( PNTR( 1 ) ), 1,
-     :                                LINE( I1( 3 ):I2( 3 ) ), FOUND,
+                     CALL FTS1_GKEYI( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                                1, LINE( I1( 3 ):I2( 3 ) ), FOUND,
      :                                IVAL, CARD, STATUS,
      :                                %VAL( LENGTH ) )
                      IF ( STATUS .EQ. SAI__OK ) THEN
@@ -344,8 +346,8 @@
 *  Obtain a value for the keyword from the FITS header.
                   ELSE IF ( LINE( I1( 2 ):I2( 2 ) ) .EQ. '_LOGICAL' )
      :                    THEN
-                     CALL FTS1_GKEYL( EL, %VAL( PNTR( 1 ) ), 1,
-     :                                LINE( I1( 3 ):I2( 3 ) ), FOUND,
+                     CALL FTS1_GKEYL( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                                1, LINE( I1( 3 ):I2( 3 ) ), FOUND,
      :                                LVAL, CARD, STATUS,
      :                                %VAL( LENGTH ) )
                      IF ( STATUS .EQ. SAI__OK ) THEN
@@ -362,8 +364,8 @@
 *  ====
 *  Obtain a value for the keyword from the FITS header.
                   ELSE IF ( LINE( I1( 2 ):I2( 2 ) ) .EQ. '_REAL' ) THEN
-                     CALL FTS1_GKEYR( EL, %VAL( PNTR( 1 ) ), 1,
-     :                                LINE( I1( 3 ):I2( 3 ) ), FOUND,
+                     CALL FTS1_GKEYR( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                                1, LINE( I1( 3 ):I2( 3 ) ), FOUND,
      :                                RVAL, CARD, STATUS,
      :                                %VAL( LENGTH ) )
                      IF ( STATUS .EQ. SAI__OK ) THEN
@@ -427,7 +429,7 @@
          KEYWRD = ' '
          CALL CHR_ITOC( I, C, NC )
          KEYWRD = 'LBOUND'//C( 1 : NC )
-         CALL FTS1_GKEYI( EL, %VAL( PNTR( 1 ) ), 1,
+         CALL FTS1_GKEYI( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 1,
      :                    KEYWRD, FOUND, IVAL, CARD, STATUS,
      :                    %VAL( LENGTH ) )
          IF ( STATUS .NE. SAI__OK ) THEN

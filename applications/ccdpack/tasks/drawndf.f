@@ -420,6 +420,7 @@
       INCLUDE 'PAR_PAR'          ! Standard PAR constants
       INCLUDE 'PAR_ERR'          ! PAR system error codes
       INCLUDE 'CCD1_PAR'         ! CCDPACK parameterisations
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Local Constants:
       INTEGER MAXLAB             ! Maximum number of labelling options
@@ -1048,7 +1049,8 @@
          JPGP = AST_GETI( PLOT, 'Current', STATUS )
 
 *  Initialise the array with empty-coloured pixels.
-         CALL CCG1_STVI( BADCOL, XIM * YIM, %VAL( IPIM ), STATUS )
+         CALL CCG1_STVI( BADCOL, XIM * YIM, %VAL( CNF_PVAL( IPIM ) ), 
+     :                   STATUS )
          DO I = 1, NNDF
 
 *  Get a mapping from the GRID coordinates of the NDF to the coordinates
@@ -1081,12 +1083,13 @@
             CALL CCD1_MKIMG( IPDAT, TYPE, DIMS( 1, I ), DIMS( 2, I ),
      :                       MAP, XIM, YIM, LIMITS( 1 ), LIMITS( 2 ),
      :                       LOCOL, HICOL, BADCOL, SCHEME, INTPAR, 
-     :                       %VAL( IPIM ), STATUS )
+     :                       %VAL( CNF_PVAL( IPIM ) ), STATUS )
          END DO
 
 *  Plot the array which now contains all the resampled images.
          CALL PGQWIN( X1, X2, Y1, Y2 )
-         CALL PGPIXL( %VAL( IPIM ), XIM, YIM, 1, XIM, 1, YIM,
+         CALL PGPIXL( %VAL( CNF_PVAL( IPIM ) ), 
+     :                XIM, YIM, 1, XIM, 1, YIM,
      :                X1, X2, Y1, Y2 )
 
 *  Free the memory used for the plot.

@@ -124,6 +124,7 @@
       INCLUDE 'DAT_PAR'          ! HDS/DAT constants
       INCLUDE 'NDF_PAR'          ! NDF public constants
       INCLUDE 'USER_ERR'         ! General purpose "user" error codes
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       LOGICAL GETS
@@ -375,24 +376,32 @@
             CALL ERR_MARK
             IF ( ITYPE .EQ. '_REAL' ) THEN
                CALL CCD1_CMPRR( BAD, VARC, EL,
-     :                          %VAL( PNTRJ( 1 ) ), %VAL( PNTRJ( 2 ) ),
-     :                          %VAL( PNTRI( 1 ) ), %VAL( PNTRI( 2 ) ),
+     :                          %VAL( CNF_PVAL( PNTRJ( 1 ) ) ), 
+     :                          %VAL( CNF_PVAL( PNTRJ( 2 ) ) ),
+     :                          %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                          %VAL( CNF_PVAL( PNTRI( 2 ) ) ),
      :                          GETS, GETZ, TOLS, TOLZ, MAXIT, SKYSUP,
      :                          DIFS( NCMP1 ), DDIFS( NCMP1 ),
      :                          DIFZ( NCMP1 ), DDIFZ( NCMP1 ),
      :                          ORIGIN( NCMP1 ), NGOOD, ITER, DS, DZ,
-     :                          %VAL( WRK1 ), %VAL( WRK2 ),
-     :                          %VAL( WRK3 ), %VAL( WRK4 ), STATUS )
+     :                          %VAL( CNF_PVAL( WRK1 ) ), 
+     :                          %VAL( CNF_PVAL( WRK2 ) ),
+     :                          %VAL( CNF_PVAL( WRK3 ) ), 
+     :                          %VAL( CNF_PVAL( WRK4 ) ), STATUS )
             ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
                CALL CCD1_CMPRD( BAD, VARC, EL,
-     :                          %VAL( PNTRJ( 1 ) ), %VAL( PNTRJ( 2 ) ),
-     :                          %VAL( PNTRI( 1 ) ), %VAL( PNTRI( 2 ) ),
+     :                          %VAL( CNF_PVAL( PNTRJ( 1 ) ) ), 
+     :                          %VAL( CNF_PVAL( PNTRJ( 2 ) ) ),
+     :                          %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                          %VAL( CNF_PVAL( PNTRI( 2 ) ) ),
      :                          GETS, GETZ, TOLS, TOLZ, MAXIT, SKYSUP,
      :                          DIFS( NCMP1 ), DDIFS( NCMP1 ),
      :                          DIFZ( NCMP1 ), DDIFZ( NCMP1 ),
      :                          ORIGIN( NCMP1 ), NGOOD, ITER, DS, DZ,
-     :                          %VAL( WRK1 ), %VAL( WRK2 ),
-     :                          %VAL( WRK3 ), %VAL( WRK4 ), STATUS )
+     :                          %VAL( CNF_PVAL( WRK1 ) ), 
+     :                          %VAL( CNF_PVAL( WRK2 ) ),
+     :                          %VAL( CNF_PVAL( WRK3 ) ), 
+     :                          %VAL( CNF_PVAL( WRK4 ) ), STATUS )
             END IF
 
 *  If there were insufficient good data values, or an iterative fit

@@ -115,6 +115,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       CHARACTER * ( * ) TYPE
@@ -158,48 +159,62 @@
       IF ( GENVAR ) THEN
 *  Process at real versions.
          IF ( TYPE .EQ. '_BYTE' ) THEN
-            CALL CCG1_CM2RB(%VAL( IPSTK ), NPIX, NLINES, VARS, IMETH,
+            CALL CCG1_CM2RB(%VAL( CNF_PVAL( IPSTK ) ), 
+     :                      NPIX, NLINES, VARS, IMETH,
      :                       MINPIX, NITER, NSIGMA, ALPHA, RMIN, RMAX,
-     :                       %VAL( IPRES ), %VAL( IPVAR ), WRK1, WRK2,
+     :                       %VAL( CNF_PVAL( IPRES ) ), 
+     :                      %VAL( CNF_PVAL( IPVAR ) ), WRK1, WRK2,
      :                       PP, COVEC, NMAT, NCON, POINT, USED,
      :                       STATUS )
 
           ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
-            CALL CCG1_CM2RUB( %VAL( IPSTK ), NPIX, NLINES, VARS, IMETH,
+            CALL CCG1_CM2RUB( %VAL( CNF_PVAL( IPSTK ) ), 
+     :                        NPIX, NLINES, VARS, IMETH,
      :                        MINPIX, NITER, NSIGMA, ALPHA, RMIN, RMAX,
-     :                        %VAL( IPRES ), %VAL( IPVAR ), WRK1, WRK2,
+     :                        %VAL( CNF_PVAL( IPRES ) ), 
+     :                        %VAL( CNF_PVAL( IPVAR ) ), WRK1, WRK2,
      :                        PP, COVEC, NMAT, NCON, POINT, USED,
      :                        STATUS )
          ELSE IF ( TYPE .EQ. '_WORD' ) THEN
-            CALL CCG1_CM2RW( %VAL( IPSTK ), NPIX, NLINES, VARS, IMETH,
+            CALL CCG1_CM2RW( %VAL( CNF_PVAL( IPSTK ) ), 
+     :                       NPIX, NLINES, VARS, IMETH,
      :                       MINPIX, NITER, NSIGMA, ALPHA, RMIN, RMAX,
-     :                       %VAL( IPRES ), %VAL( IPVAR ), WRK1, WRK2,
+     :                       %VAL( CNF_PVAL( IPRES ) ), 
+     :                       %VAL( CNF_PVAL( IPVAR ) ), WRK1, WRK2,
      :                       PP, COVEC, NMAT, NCON, POINT, USED,
      :                       STATUS )
          ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
-            CALL CCG1_CM2RUW( %VAL( IPSTK ), NPIX, NLINES, VARS, IMETH,
+            CALL CCG1_CM2RUW( %VAL( CNF_PVAL( IPSTK ) ), 
+     :                        NPIX, NLINES, VARS, IMETH,
      :                        MINPIX, NITER, NSIGMA, ALPHA, RMIN, RMAX,
-     :                        %VAL( IPRES ), %VAL( IPVAR ), WRK1, WRK2,
+     :                        %VAL( CNF_PVAL( IPRES ) ), 
+     :                        %VAL( CNF_PVAL( IPVAR ) ), WRK1, WRK2,
      :                        PP, COVEC, NMAT, NCON, POINT,
      :                        USED, STATUS )
          ELSE IF ( TYPE .EQ. '_REAL' ) THEN
-            CALL CCG1_CM2RR( %VAL( IPSTK ), NPIX, NLINES, VARS, IMETH,
+            CALL CCG1_CM2RR( %VAL( CNF_PVAL( IPSTK ) ), 
+     :                       NPIX, NLINES, VARS, IMETH,
      :                       MINPIX, NITER, NSIGMA, ALPHA, RMIN, RMAX,
-     :                       %VAL( IPRES ), %VAL( IPVAR ), WRK1, WRK2,
+     :                       %VAL( CNF_PVAL( IPRES ) ), 
+     :                       %VAL( CNF_PVAL( IPVAR ) ), WRK1, WRK2,
      :                       PP, COVEC, NMAT, NCON, POINT, USED,
      :                       STATUS )
 
 *  All double precision version.
          ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
-            CALL CCG1_CM2DI( %VAL( IPSTK ), NPIX, NLINES, VARS, IMETH,
+            CALL CCG1_CM2DI( %VAL( CNF_PVAL( IPSTK ) ), 
+     :                       NPIX, NLINES, VARS, IMETH,
      :                       MINPIX, NITER, NSIGMA, ALPHA, RMIN, RMAX,
-     :                       %VAL( IPRES ), %VAL( IPVAR ), WRK1, WRK2,
+     :                       %VAL( CNF_PVAL( IPRES ) ), 
+     :                       %VAL( CNF_PVAL( IPVAR ) ), WRK1, WRK2,
      :                       PP, COVEC, NMAT, NCON, POINT, USED,
      :                       STATUS )
          ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
-            CALL CCG1_CM2DD( %VAL( IPSTK ), NPIX, NLINES, VARS, IMETH,
+            CALL CCG1_CM2DD( %VAL( CNF_PVAL( IPSTK ) ), 
+     :                       NPIX, NLINES, VARS, IMETH,
      :                       MINPIX, NITER, NSIGMA, ALPHA, RMIN, RMAX,
-     :                       %VAL( IPRES ), %VAL( IPVAR ), WRK1, WRK2,
+     :                       %VAL( CNF_PVAL( IPRES ) ), 
+     :                       %VAL( CNF_PVAL( IPVAR ) ), WRK1, WRK2,
      :                       PP, COVEC, NMAT, NCON, POINT, USED,
      :                       STATUS )
          END IF
@@ -208,42 +223,56 @@
 *  Else do not generate variances... save effort.
 *  Process at real versions.
          IF ( TYPE .EQ. '_BYTE' ) THEN
-            CALL CCG1_CM3RB(%VAL( IPSTK ), NPIX, NLINES, VARS, IMETH,
+            CALL CCG1_CM3RB(%VAL( CNF_PVAL( IPSTK ) ), 
+     :                      NPIX, NLINES, VARS, IMETH,
      :                       MINPIX, NITER, NSIGMA, ALPHA, RMIN, RMAX,
-     :                       %VAL( IPRES ), WRK1, WRK2, NCON, POINT,
+     :                       %VAL( CNF_PVAL( IPRES ) ), 
+     :                      WRK1, WRK2, NCON, POINT,
      :                       USED, STATUS )
 
           ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
-            CALL CCG1_CM3RUB( %VAL( IPSTK ), NPIX, NLINES, VARS, IMETH,
+            CALL CCG1_CM3RUB( %VAL( CNF_PVAL( IPSTK ) ), 
+     :                        NPIX, NLINES, VARS, IMETH,
      :                        MINPIX, NITER, NSIGMA, ALPHA, RMIN, RMAX,
-     :                        %VAL( IPRES ), WRK1, WRK2, NCON, POINT,
+     :                        %VAL( CNF_PVAL( IPRES ) ), 
+     :                        WRK1, WRK2, NCON, POINT,
      :                        USED, STATUS )
          ELSE IF ( TYPE .EQ. '_WORD' ) THEN
-            CALL CCG1_CM3RW( %VAL( IPSTK ), NPIX, NLINES, VARS, IMETH,
+            CALL CCG1_CM3RW( %VAL( CNF_PVAL( IPSTK ) ), 
+     :                       NPIX, NLINES, VARS, IMETH,
      :                       MINPIX, NITER, NSIGMA, ALPHA, RMIN, RMAX,
-     :                       %VAL( IPRES ), WRK1, WRK2, NCON, POINT,
+     :                       %VAL( CNF_PVAL( IPRES ) ), 
+     :                       WRK1, WRK2, NCON, POINT,
      :                       USED, STATUS )
          ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
-            CALL CCG1_CM3RUW( %VAL( IPSTK ), NPIX, NLINES, VARS, IMETH,
+            CALL CCG1_CM3RUW( %VAL( CNF_PVAL( IPSTK ) ), 
+     :                        NPIX, NLINES, VARS, IMETH,
      :                        MINPIX, NITER, NSIGMA, ALPHA, RMIN, RMAX,
-     :                        %VAL( IPRES ), WRK1, WRK2, NCON, POINT,
+     :                        %VAL( CNF_PVAL( IPRES ) ), 
+     :                        WRK1, WRK2, NCON, POINT,
      :                        USED, STATUS )
          ELSE IF ( TYPE .EQ. '_REAL' ) THEN
-            CALL CCG1_CM3RR( %VAL( IPSTK ), NPIX, NLINES, VARS, IMETH,
+            CALL CCG1_CM3RR( %VAL( CNF_PVAL( IPSTK ) ), 
+     :                       NPIX, NLINES, VARS, IMETH,
      :                       MINPIX, NITER, NSIGMA, ALPHA, RMIN, RMAX,
-     :                       %VAL( IPRES ), WRK1, WRK2, NCON, POINT,
+     :                       %VAL( CNF_PVAL( IPRES ) ), 
+     :                       WRK1, WRK2, NCON, POINT,
      :                       USED, STATUS )
 
 *  All double precision version.
          ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
-            CALL CCG1_CM3DI( %VAL( IPSTK ), NPIX, NLINES, VARS, IMETH,
+            CALL CCG1_CM3DI( %VAL( CNF_PVAL( IPSTK ) ), 
+     :                       NPIX, NLINES, VARS, IMETH,
      :                       MINPIX, NITER, NSIGMA, ALPHA, RMIN, RMAX,
-     :                       %VAL( IPRES ), WRK1, WRK2, NCON, POINT,
+     :                       %VAL( CNF_PVAL( IPRES ) ), 
+     :                       WRK1, WRK2, NCON, POINT,
      :                       USED, STATUS )
          ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
-            CALL CCG1_CM3DD( %VAL( IPSTK ), NPIX, NLINES, VARS, IMETH,
+            CALL CCG1_CM3DD( %VAL( CNF_PVAL( IPSTK ) ), 
+     :                       NPIX, NLINES, VARS, IMETH,
      :                       MINPIX, NITER, NSIGMA, ALPHA, RMIN, RMAX,
-     :                       %VAL( IPRES ), WRK1, WRK2, NCON, POINT,
+     :                       %VAL( CNF_PVAL( IPRES ) ), 
+     :                       WRK1, WRK2, NCON, POINT,
      :                       USED, STATUS )
          END IF
       END IF

@@ -115,6 +115,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       DOUBLE PRECISION ERROR
@@ -181,7 +182,8 @@
       CALL CCD1_MALL( XBIN, '_INTEGER', IPHIST, STATUS )
       NBIN = XBIN
       CALL CCG1_MKHID( DIST, NREC1 * NREC2, .FALSE., 1, NBIN,
-     :                 %VAL( IPHIST ), MODE, XBIN, ZERO, WIDTH, STATUS )
+     :                 %VAL( CNF_PVAL( IPHIST ) ), 
+     :                 MODE, XBIN, ZERO, WIDTH, STATUS )
       IF ( STATUS .NE. SAI__OK ) GO TO 99
 
 *  Change the mode into an offset.
@@ -200,7 +202,8 @@
 
 *  Produce histogram
       CALL CCG1_MKHID( DIST, NREC1 * NREC2, .FALSE., 1, NBIN,
-     :                 %VAL( IPHIST ), MODE, YBIN, ZERO, WIDTH, STATUS )
+     :                 %VAL( CNF_PVAL( IPHIST ) ), 
+     :                 MODE, YBIN, ZERO, WIDTH, STATUS )
       IF ( STATUS .NE. SAI__OK ) GO TO 99
 
 *  Change the mode into an offset.

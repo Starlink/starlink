@@ -330,6 +330,7 @@
       INCLUDE 'NDF_PAR'          ! NDF parameterisations
       INCLUDE 'CCD1_PAR'         ! CCDPACK parameterisations
       INCLUDE 'FIO_PAR'          ! FIO system parameterisations
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -515,7 +516,8 @@
 *  the mode (bin number which contains the peak count). Note the BAD
 *  flag is updated by this routine.
             CALL CCD1_MKHIS( ITYPE, IPIN, EL, BAD, MINBIN, NEED,
-     :                       %VAL( IPHIST ), MODE, PEAK, NBIN, ZERO,
+     :                       %VAL( CNF_PVAL( IPHIST ) ), 
+     :                       MODE, PEAK, NBIN, ZERO,
      :                       WIDTH, STATUS )
             IF ( STATUS .NE. SAI__OK ) GO TO 98
 
@@ -531,7 +533,8 @@
             CALL CCD1_MSG( ' ', '  Bin width     : ^WIDTH', STATUS )
 
 *  Fit the background using a gaussian.
-            CALL CCD1_GAFIT( %VAL( IPHIST ), NBIN, MODE, SD, STATUS )
+            CALL CCD1_GAFIT( %VAL( CNF_PVAL( IPHIST ) ), 
+     :                       NBIN, MODE, SD, STATUS )
 
 *  Release histogram workspace.
             CALL CCD1_MFREE( IPHIST, STATUS )
@@ -627,8 +630,10 @@
 
 *  Determine the connectivity of images above the threshold.
             CALL CCD1_DCON( ITYPE, IPIN, XDIM, YDIM, BAD, THRESH, TOUCH,
-     :                      %VAL( IPX ), %VAL( IPY ), %VAL( IPINT ),
-     :                      %VAL( IPGRP ), NPIXEL, NABOVE, 
+     :                      %VAL( CNF_PVAL( IPX ) ), 
+     :                      %VAL( CNF_PVAL( IPY ) ), 
+     :                      %VAL( CNF_PVAL( IPINT ) ),
+     :                      %VAL( CNF_PVAL( IPGRP ) ), NPIXEL, NABOVE,
      :                      STATUS )
 
 *  Get workspace for the centroiding results
@@ -645,12 +650,17 @@
                IF ( STATUS .NE. SAI__OK ) GO TO 98
                
 *  Now form the centroids.
-               CALL CCD1_DCEN( NABOVE, %VAL( IPX ), %VAL( IPY ),
-     :                         %VAL( IPINT ), %VAL( IPGRP ), 
-     :                         NPIXEL, MINPIX, %VAL( IPSUM1 ), 
-     :                         %VAL( IPSUM2 ), %VAL( IPCON ), 
-     :                         %VAL( IPXC ), %VAL( IPYC ),
-     :                         %VAL( IPMIN), NOUT, STATUS )
+               CALL CCD1_DCEN( NABOVE, %VAL( CNF_PVAL( IPX ) ), 
+     :                         %VAL( CNF_PVAL( IPY ) ),
+     :                         %VAL( CNF_PVAL( IPINT ) ), 
+     :                         %VAL( CNF_PVAL( IPGRP ) ),
+     :                         NPIXEL, MINPIX, 
+     :                         %VAL( CNF_PVAL( IPSUM1 ) ),
+     :                         %VAL( CNF_PVAL( IPSUM2 ) ), 
+     :                         %VAL( CNF_PVAL( IPCON ) ),
+     :                         %VAL( CNF_PVAL( IPXC ) ), 
+     :                         %VAL( CNF_PVAL( IPYC ) ),
+     :                         %VAL( CNF_PVAL( IPMIN )), NOUT, STATUS )
                IF ( STATUS .NE. SAI__OK ) GO TO 98
 
 *  Inform the user about the number of features located.
@@ -672,7 +682,8 @@
                TR( 4 ) = DBLE( LBND( 2 ) ) - 1.5D0
                TR( 5 ) = 0.0D0
                TR( 6 ) = 1.0D0 
-               CALL CCD1_LXYT3( %VAL( IPXC ), %VAL( IPYC ), NOUT, TR,
+               CALL CCD1_LXYT3( %VAL( CNF_PVAL( IPXC ) ), 
+     :                          %VAL( CNF_PVAL( IPYC ) ), NOUT, TR,
      :                          STATUS )
 
 *  Get the output file which is to contain the results. The name of this
@@ -692,8 +703,10 @@
                IF ( STATUS .EQ. SAI__OK ) THEN
                   CALL CCD1_FIOHD( FDOUT, 'Output from FINDOBJ', 
      :                             STATUS )
-                  CALL CCD1_WRXYP( FDOUT, %VAL( IPXC ), %VAL( IPYC ),
-     :                             %VAL( IPMIN ), NOUT, LINE, 
+                  CALL CCD1_WRXYP( FDOUT, %VAL( CNF_PVAL( IPXC ) ), 
+     :                             %VAL( CNF_PVAL( IPYC ) ),
+     :                             %VAL( CNF_PVAL( IPMIN ) ), 
+     :                             NOUT, LINE,
      :                             CCD1__BLEN, STATUS )
 
 *  Close the positions list file.

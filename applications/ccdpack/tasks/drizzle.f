@@ -536,6 +536,7 @@
 *  Internal references:
       INCLUDE 'NUM_DEC_CVT'      ! Conversion declarations
       INCLUDE 'NUM_DEF_CVT'      ! Conversion definitions
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 *.
 
 *  Check inherited global status.
@@ -759,37 +760,44 @@
           
 * Calculate the mean variance for the image
             IF ( ITYPE .EQ. '_BYTE' ) THEN
-               CALL CCG1_MEANB( .TRUE., %VAL( IVAR ), NPXIN( I ), 
+               CALL CCG1_MEANB( .TRUE., %VAL( CNF_PVAL( IVAR ) ), 
+     :                          NPXIN( I ),
      :                          MEANV, VALPIX, STATUS )
 
 *  Get the mean variance from a double-precision array.
             ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-               CALL CCG1_MEAND( .TRUE., %VAL( IVAR ), NPXIN( I ), 
+               CALL CCG1_MEAND( .TRUE., %VAL( CNF_PVAL( IVAR ) ), 
+     :                          NPXIN( I ),
      :                          MEANV, VALPIX, STATUS )
                   
 *  Get the mean variance from an integer array.
             ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
-               CALL CCG1_MEANI( .TRUE., %VAL( IVAR ), NPXIN( I ), 
+               CALL CCG1_MEANI( .TRUE., %VAL( CNF_PVAL( IVAR ) ), 
+     :                          NPXIN( I ),
      :                          MEANV, VALPIX, STATUS )
 
 *  Get the mean variance from a single-precision array.
             ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
-               CALL CCG1_MEANR( .TRUE., %VAL( IVAR ), NPXIN( I ), 
+               CALL CCG1_MEANR( .TRUE., %VAL( CNF_PVAL( IVAR ) ), 
+     :                          NPXIN( I ),
      :                          MEANV, VALPIX, STATUS )
 
 *  Get the mean variance from an unsigned-byte array.
             ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
-               CALL CCG1_MEANUB( .TRUE., %VAL( IVAR ), NPXIN( I ), 
+               CALL CCG1_MEANUB( .TRUE., %VAL( CNF_PVAL( IVAR ) ), 
+     :                           NPXIN( I ),
      :                           MEANV, VALPIX, STATUS )
 
 *  Get the mean variance from an unsigned-word array.
             ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
-               CALL CCG1_MEANUW( .TRUE., %VAL( IVAR ), NPXIN( I ), 
+               CALL CCG1_MEANUW( .TRUE., %VAL( CNF_PVAL( IVAR ) ), 
+     :                           NPXIN( I ),
      :                           MEANV, VALPIX, STATUS )
 
 *  Get the mean variance from a word array.
             ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
-               CALL CCG1_MEANW( .TRUE., %VAL( IVAR ), NPXIN( I ), 
+               CALL CCG1_MEANW( .TRUE., %VAL( CNF_PVAL( IVAR ) ), 
+     :                          NPXIN( I ),
      :                          MEANV, VALPIX, STATUS )
             END IF     
 
@@ -880,37 +888,44 @@
 
 *  Get the mean variance from a byte array.
                   IF ( ITYPE .EQ. '_BYTE' ) THEN
-                     CALL CCG1_MEANB( .TRUE., %VAL( IVAR ), NPXIN( I ), 
+                     CALL CCG1_MEANB( .TRUE., %VAL( CNF_PVAL( IVAR ) ), 
+     :                                NPXIN( I ),
      :                                MEANV, VALPIX, STATUS )
 
 *  Get the mean variance from a double-precision array.
                   ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-                     CALL CCG1_MEANB( .TRUE., %VAL( IVAR ), NPXIN( I ), 
+                     CALL CCG1_MEANB( .TRUE., %VAL( CNF_PVAL( IVAR ) ), 
+     :                                NPXIN( I ),
      :                                MEANV, VALPIX, STATUS )
                   
 *  Get the mean variance from an integer array.
                   ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
-                     CALL CCG1_MEANI( .TRUE., %VAL( IVAR ), NPXIN( I ), 
+                     CALL CCG1_MEANI( .TRUE., %VAL( CNF_PVAL( IVAR ) ), 
+     :                                NPXIN( I ),
      :                                MEANV, VALPIX, STATUS )
 
 *  Get the mean variance from a single-precision array.
                   ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
-                     CALL CCG1_MEANR( .TRUE., %VAL( IVAR ), NPXIN( I ), 
+                     CALL CCG1_MEANR( .TRUE., %VAL( CNF_PVAL( IVAR ) ), 
+     :                                NPXIN( I ),
      :                                MEANV, VALPIX, STATUS )
 
 *  Get the mean variance from an unsigned-byte array.
                   ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
-                     CALL CCG1_MEANUB( .TRUE., %VAL( IVAR ), NPXIN( I ), 
+                     CALL CCG1_MEANUB( .TRUE., %VAL( CNF_PVAL( IVAR ) ), 
+     :                                 NPXIN( I ),
      :                                 MEANV, VALPIX, STATUS )
 
 *  Get the mean variance from an unsigned-word array.
                   ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
-                     CALL CCG1_MEANUW( .TRUE., %VAL( IVAR ), NPXIN( I ), 
+                     CALL CCG1_MEANUW( .TRUE., %VAL( CNF_PVAL( IVAR ) ), 
+     :                                 NPXIN( I ),
      :                                 MEANV, VALPIX, STATUS )
 
 *  Get the mean variance from a word array.
                   ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
-                     CALL CCG1_MEANW( .TRUE., %VAL( IVAR ), NPXIN( I ), 
+                     CALL CCG1_MEANW( .TRUE., %VAL( CNF_PVAL( IVAR ) ), 
+     :                                NPXIN( I ),
      :                                MEANV, VALPIX, STATUS )
  
                   END IF
@@ -1247,80 +1262,94 @@
 *  Byte array
          IF ( OTYPE .EQ. '_BYTE' ) THEN
             CALL CCG1_DODIZB( NDF(I), WEIGHT(I), NPXIN(I), 
-     :                        ITYPE, %VAL(ODAT), %VAL(OWHT), 
-     :                        %VAL(OCNT), %VAL(OVAR),
+     :                        ITYPE, %VAL(CNF_PVAL(ODAT)), 
+     :                        %VAL(CNF_PVAL(OWHT)),
+     :                        %VAL(CNF_PVAL(OCNT)), 
+     :                        %VAL(CNF_PVAL(OVAR)),
      :                        MAPN(I),  IDIMS(1), IDIMS(2), NDIMI, 
      :                        ODIM(1), ODIM(2), NVOUT, ILBND, LBNDX,
      :                        PIXFRAC, GETV, GETS, GETZ, GETM, 
      :                        SCALE(I), ZERO(I), VARFAC, VAR,
-     :                        %VAL(VWHT), STATUS ) 
+     :                        %VAL(CNF_PVAL(VWHT)), STATUS )
           
 *  Double-precision array
          ELSE IF ( OTYPE .EQ. '_DOUBLE' ) THEN
             CALL CCG1_DODIZD( NDF(I), WEIGHT(I), NPXIN(I), 
-     :                        ITYPE, %VAL(ODAT), %VAL(OWHT), 
-     :                        %VAL(OCNT), %VAL(OVAR),
+     :                        ITYPE, %VAL(CNF_PVAL(ODAT)), 
+     :                        %VAL(CNF_PVAL(OWHT)),
+     :                        %VAL(CNF_PVAL(OCNT)), 
+     :                        %VAL(CNF_PVAL(OVAR)),
      :                        MAPN(I),  IDIMS(1), IDIMS(2), NDIMI, 
      :                        ODIM(1), ODIM(2), NVOUT, ILBND, LBNDX,
      :                        PIXFRAC, GETV, GETS, GETZ, GETM, 
      :                        SCALE(I), ZERO(I), VARFAC, VAR,
-     :                        %VAL(VWHT), STATUS )      
+     :                        %VAL(CNF_PVAL(VWHT)), STATUS )
      
 *  Integer array
          ELSE IF ( OTYPE .EQ. '_INTEGER' ) THEN
             CALL CCG1_DODIZI( NDF(I), WEIGHT(I), NPXIN(I), 
-     :                        ITYPE, %VAL(ODAT), %VAL(OWHT), 
-     :                        %VAL(OCNT), %VAL(OVAR),
+     :                        ITYPE, %VAL(CNF_PVAL(ODAT)), 
+     :                        %VAL(CNF_PVAL(OWHT)),
+     :                        %VAL(CNF_PVAL(OCNT)), 
+     :                        %VAL(CNF_PVAL(OVAR)),
      :                        MAPN(I),  IDIMS(1), IDIMS(2), NDIMI, 
      :                        ODIM(1), ODIM(2), NVOUT, ILBND, LBNDX,
      :                        PIXFRAC, GETV, GETS, GETZ, GETM, 
      :                        SCALE(I), ZERO(I), VARFAC, VAR,
-     :                        %VAL(VWHT), STATUS ) 
+     :                        %VAL(CNF_PVAL(VWHT)), STATUS )
      
 *  Single-precision array
          ELSE IF ( OTYPE .EQ. '_REAL' ) THEN
             CALL CCG1_DODIZR( NDF(I), WEIGHT(I), NPXIN(I), 
-     :                        ITYPE, %VAL(ODAT), %VAL(OWHT), 
-     :                        %VAL(OCNT), %VAL(OVAR),
+     :                        ITYPE, %VAL(CNF_PVAL(ODAT)), 
+     :                        %VAL(CNF_PVAL(OWHT)),
+     :                        %VAL(CNF_PVAL(OCNT)), 
+     :                        %VAL(CNF_PVAL(OVAR)),
      :                        MAPN(I),  IDIMS(1), IDIMS(2), NDIMI, 
      :                        ODIM(1), ODIM(2), NVOUT, ILBND, LBNDX,
      :                        PIXFRAC, GETV, GETS, GETZ, GETM, 
      :                        SCALE(I), ZERO(I), VARFAC, VAR,
-     :                        %VAL(VWHT), STATUS )
+     :                        %VAL(CNF_PVAL(VWHT)), STATUS )
      
 *  Unsigned-byte array
          ELSE IF ( OTYPE .EQ. '_UBYTE' ) THEN
             CALL CCG1_DODIZUB( NDF(I), WEIGHT(I), NPXIN(I), 
-     :                        ITYPE, %VAL(ODAT), %VAL(OWHT), 
-     :                        %VAL(OCNT), %VAL(OVAR),
+     :                        ITYPE, %VAL(CNF_PVAL(ODAT)), 
+     :                        %VAL(CNF_PVAL(OWHT)),
+     :                        %VAL(CNF_PVAL(OCNT)), 
+     :                        %VAL(CNF_PVAL(OVAR)),
      :                        MAPN(I),  IDIMS(1), IDIMS(2), NDIMI, 
      :                        ODIM(1), ODIM(2), NVOUT, ILBND, LBNDX,
      :                        PIXFRAC, GETV, GETS, GETZ, GETM, 
      :                        SCALE(I), ZERO(I), VARFAC, VAR,
-     :                        %VAL(VWHT), STATUS ) 
+     :                        %VAL(CNF_PVAL(VWHT)), STATUS )
      
      
 *  Unsigned-word array
          ELSE IF ( OTYPE .EQ. '_UWORD' ) THEN
             CALL CCG1_DODIZUW( NDF(I), WEIGHT(I), NPXIN(I), 
-     :                        ITYPE, %VAL(ODAT), %VAL(OWHT), 
-     :                        %VAL(OCNT), %VAL(OVAR),
+     :                        ITYPE, %VAL(CNF_PVAL(ODAT)), 
+     :                        %VAL(CNF_PVAL(OWHT)),
+     :                        %VAL(CNF_PVAL(OCNT)), 
+     :                        %VAL(CNF_PVAL(OVAR)),
      :                        MAPN(I),  IDIMS(1), IDIMS(2), NDIMI, 
      :                        ODIM(1), ODIM(2), NVOUT, ILBND, LBNDX,
      :                        PIXFRAC, GETV, GETS, GETZ, GETM, 
      :                        SCALE(I), ZERO(I), VARFAC, VAR,
-     :                        %VAL(VWHT), STATUS )
+     :                        %VAL(CNF_PVAL(VWHT)), STATUS )
       
 *  Word array
          ELSE IF ( OTYPE .EQ. '_WORD' ) THEN
             CALL CCG1_DODIZW( NDF(I), WEIGHT(I), NPXIN(I), 
-     :                        ITYPE, %VAL(ODAT), %VAL(OWHT), 
-     :                        %VAL(OCNT), %VAL(OVAR),
+     :                        ITYPE, %VAL(CNF_PVAL(ODAT)), 
+     :                        %VAL(CNF_PVAL(OWHT)),
+     :                        %VAL(CNF_PVAL(OCNT)), 
+     :                        %VAL(CNF_PVAL(OVAR)),
      :                        MAPN(I),  IDIMS(1), IDIMS(2), NDIMI, 
      :                        ODIM(1), ODIM(2), NVOUT, ILBND, LBNDX,
      :                        PIXFRAC, GETV, GETS, GETZ, GETM, 
      :                        SCALE(I), ZERO(I), VARFAC, VAR,
-     :                        %VAL(VWHT), STATUS )
+     :                        %VAL(CNF_PVAL(VWHT)), STATUS )
          END IF                        
      
          IF ( STATUS .NE. SAI__OK ) GOTO 940

@@ -496,6 +496,7 @@
       INCLUDE 'AST_PAR'          ! AST constants
       INCLUDE 'PAR_ERR'          ! PAR error codes
       INCLUDE 'GRP_PAR'          ! Standard GRP system constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -927,23 +928,28 @@
 *  Prepare a list of unique indices identifying each point.  This will
 *  enable us later on to keep track of the file in which each point 
 *  originated.
-            CALL CCD1_GISEQ( IPOS, 1, NREC( I ), %VAL( IPSEQ( I ) ),
+            CALL CCD1_GISEQ( IPOS, 1, NREC( I ), 
+     :                       %VAL( CNF_PVAL( IPSEQ( I ) ) ),
      :                       STATUS )
             IPOS = IPOS + NREC( I )
 
 *  Extract the X and Y values from the mapped data array.
-            CALL CCD1_LEXT( %VAL( IPDAT ), NREC( I ), NVAL, 1,
-     :                      %VAL( IPXP ), STATUS )
-            CALL CCD1_LEXT( %VAL( IPDAT ), NREC( I ), NVAL, 2,
-     :                      %VAL( IPYP ), STATUS )
+            CALL CCD1_LEXT( %VAL( CNF_PVAL( IPDAT ) ), 
+     :                      NREC( I ), NVAL, 1,
+     :                      %VAL( CNF_PVAL( IPXP ) ), STATUS )
+            CALL CCD1_LEXT( %VAL( CNF_PVAL( IPDAT ) ), 
+     :                      NREC( I ), NVAL, 2,
+     :                      %VAL( CNF_PVAL( IPYP ) ), STATUS )
 
 *  Transform the X and Y values into the correct coordinate system.
             IF ( USEWCS ) THEN
                CALL CCD1_MALL( NREC( I ), '_DOUBLE', IPXQ( I ), STATUS )
                CALL CCD1_MALL( NREC( I ), '_DOUBLE', IPYQ( I ), STATUS )
-               CALL AST_TRAN2( MAPS( I ), NREC( I ), %VAL( IPXP ),
-     :                         %VAL( IPYP ), .TRUE., %VAL( IPXQ( I ) ),
-     :                         %VAL( IPYQ( I ) ), STATUS )
+               CALL AST_TRAN2( MAPS( I ), NREC( I ), 
+     :                         %VAL( CNF_PVAL( IPXP ) ),
+     :                         %VAL( CNF_PVAL( IPYP ) ), .TRUE., 
+     :                         %VAL( CNF_PVAL( IPXQ( I ) ) ),
+     :                         %VAL( CNF_PVAL( IPYQ( I ) ) ), STATUS )
                CALL CCD1_MFREE( IPXP, STATUS )
                CALL CCD1_MFREE( IPYP, STATUS )
             ELSE
@@ -955,8 +961,9 @@
             IF ( NXVAL( I ) .GT. 0 ) THEN
                CALL CCD1_MALL( NREC( I ) * NXVAL( I ), '_DOUBLE',
      :                         IPXDAT( I ), STATUS )
-               CALL CCD1_XDAT( %VAL( IPDAT ), NREC( I ), NVAL, 
-     :                         %VAL( IPXDAT( I ) ), STATUS )
+               CALL CCD1_XDAT( %VAL( CNF_PVAL( IPDAT ) ), 
+     :                         NREC( I ), NVAL,
+     :                         %VAL( CNF_PVAL( IPXDAT( I ) ) ), STATUS )
             END IF
 
 *  Release workspace.
@@ -987,12 +994,18 @@
                DO J = ILISOF( I ), ILISOF( I + 1 ) - 1
                   L = ILIS( J )
                   IF ( NREC( L ) .GT. 0 ) THEN
-                     CALL CCG1_COPSI( 1, %VAL( IPSEQ( L ) ), NREC( L ),
-     :                                IOFF, %VAL( IPRDN ), STATUS )
-                     CALL CCG1_COPSD( 1, %VAL( IPXQ( L ) ), NREC( L ),
-     :                                IOFF, %VAL( IPXN ), STATUS )
-                     CALL CCG1_COPSD( 1, %VAL( IPYQ( L ) ), NREC( L ),
-     :                                IOFF, %VAL( IPYN ), STATUS )
+                     CALL CCG1_COPSI( 1, %VAL( CNF_PVAL( IPSEQ( L ) ) ), 
+     :                                NREC( L ),
+     :                                IOFF, %VAL( CNF_PVAL( IPRDN ) ), 
+     :                                STATUS )
+                     CALL CCG1_COPSD( 1, %VAL( CNF_PVAL( IPXQ( L ) ) ), 
+     :                                NREC( L ),
+     :                                IOFF, %VAL( CNF_PVAL( IPXN ) ), 
+     :                                STATUS )
+                     CALL CCG1_COPSD( 1, %VAL( CNF_PVAL( IPYQ( L ) ) ), 
+     :                                NREC( L ),
+     :                                IOFF, %VAL( CNF_PVAL( IPYN ) ), 
+     :                                STATUS )
                      IOFF = IOFF + NREC( L )
                      CALL CCD1_MFREE( IPSEQ( L ), STATUS )
                      CALL CCD1_MFREE( IPXQ( L ), STATUS )
@@ -1011,11 +1024,15 @@
             CALL CCD1_MALL( NRECS( I ), '_INTEGER', IPRAN( I ), STATUS )
             CALL CCD1_MALL( NRECS( I ), '_DOUBLE', IPX( I ), STATUS )
             CALL CCD1_MALL( NRECS( I ), '_DOUBLE', IPY( I ), STATUS )
-            CALL CCD1_PRMIN( %VAL( IPXN ), %VAL( IPYN ), %VAL( IPRDN ),
+            CALL CCD1_PRMIN( %VAL( CNF_PVAL( IPXN ) ), 
+     :                       %VAL( CNF_PVAL( IPYN ) ), 
+     :                       %VAL( CNF_PVAL( IPRDN ) ),
      :                       NRECS( I ), 
      :                       MINSEP * PSIZE( ILIS( ILISOF( I ) ) ),
-     :                       %VAL( IPX( I ) ), %VAL( IPY( I ) ),
-     :                       %VAL( IPRAN( I ) ), NRECN( I ), STATUS )
+     :                       %VAL( CNF_PVAL( IPX( I ) ) ), 
+     :                       %VAL( CNF_PVAL( IPY( I ) ) ),
+     :                       %VAL( CNF_PVAL( IPRAN( I ) ) ), 
+     :                       NRECN( I ), STATUS )
             CALL CCD1_MFREE( IPRDN, STATUS )
             CALL CCD1_MFREE( IPXN, STATUS )
             CALL CCD1_MFREE( IPYN, STATUS )
@@ -1139,35 +1156,49 @@
 *  Select only points in list I which fall inside bounding boxes
 *  associated with list J.
                CALL CCD1_MALL( NRECN( I ), '_LOGICAL', IPGOOD, STATUS )
-               CALL CCG1_STVL( .FALSE., NRECN( I ), %VAL( IPGOOD ),
+               CALL CCG1_STVL( .FALSE., NRECN( I ), 
+     :                         %VAL( CNF_PVAL( IPGOOD ) ),
      :                         STATUS )
                DO K = ILISOF( J ), ILISOF( J + 1 ) - 1
                   L = ILIS( K )
                   CALL CCD1_INPLY( BNDX( 1, L ), BNDY( 1, L ), 4,
-     :                             %VAL( IPX( I ) ), %VAL( IPY( I ) ),
-     :                             NRECN( I ), %VAL( IPGOOD ), STATUS )
+     :                             %VAL( CNF_PVAL( IPX( I ) ) ), 
+     :                             %VAL( CNF_PVAL( IPY( I ) ) ),
+     :                             NRECN( I ), 
+     :                             %VAL( CNF_PVAL( IPGOOD ) ), STATUS )
                END DO
-               CALL CCD1_CHUSP( %VAL( IPGOOD ), %VAL( IPX( I ) ), 
-     :                          %VAL( IPY( I ) ), NRECN( I ),
-     :                          %VAL( IPXI1 ), %VAL( IPYI1 ),
-     :                          %VAL( IPRBN1 ), NUMI1, STATUS )
+               CALL CCD1_CHUSP( %VAL( CNF_PVAL( IPGOOD ) ), 
+     :                          %VAL( CNF_PVAL( IPX( I ) ) ),
+     :                          %VAL( CNF_PVAL( IPY( I ) ) ), 
+     :                          NRECN( I ),
+     :                          %VAL( CNF_PVAL( IPXI1 ) ), 
+     :                          %VAL( CNF_PVAL( IPYI1 ) ),
+     :                          %VAL( CNF_PVAL( IPRBN1 ) ), 
+     :                          NUMI1, STATUS )
                CALL CCD1_MFREE( IPGOOD, STATUS )
 
 *  Select only points in list J which fall inside bounding boxes
 *  associated with list I.
                CALL CCD1_MALL( NRECN( J ), '_LOGICAL', IPGOOD, STATUS )
-               CALL CCG1_STVL( .FALSE., NRECN( J ), %VAL( IPGOOD ),
+               CALL CCG1_STVL( .FALSE., NRECN( J ), 
+     :                         %VAL( CNF_PVAL( IPGOOD ) ),
      :                         STATUS )
                DO K = ILISOF( I ), ILISOF( I + 1 ) - 1
                   L = ILIS( K )
                   CALL CCD1_INPLY( BNDX( 1, L ), BNDY( 1, L ), 4,
-     :                             %VAL( IPX( J ) ), %VAL( IPY( J ) ),
-     :                             NRECN( J ), %VAL( IPGOOD ), STATUS )
+     :                             %VAL( CNF_PVAL( IPX( J ) ) ), 
+     :                             %VAL( CNF_PVAL( IPY( J ) ) ),
+     :                             NRECN( J ), 
+     :                             %VAL( CNF_PVAL( IPGOOD ) ), STATUS )
                END DO
-               CALL CCD1_CHUSP( %VAL( IPGOOD ), %VAL( IPX( J ) ),
-     :                          %VAL( IPY( J ) ), NRECN( J ),
-     :                          %VAL( IPXI2 ), %VAL( IPYI2 ),
-     :                          %VAL( IPRBN2 ), NUMI2, STATUS )
+               CALL CCD1_CHUSP( %VAL( CNF_PVAL( IPGOOD ) ), 
+     :                          %VAL( CNF_PVAL( IPX( J ) ) ),
+     :                          %VAL( CNF_PVAL( IPY( J ) ) ), 
+     :                          NRECN( J ),
+     :                          %VAL( CNF_PVAL( IPXI2 ) ), 
+     :                          %VAL( CNF_PVAL( IPYI2 ) ),
+     :                          %VAL( CNF_PVAL( IPRBN2 ) ), 
+     :                          NUMI2, STATUS )
                CALL CCD1_MFREE( IPGOOD, STATUS )
             ELSE
 
@@ -1179,8 +1210,10 @@
                IPYI2 = IPY( J )
                NUMI1 = NRECN( I )
                NUMI2 = NRECN( J )
-               CALL CCD1_GISEQ( 1, 1, NUMI1, %VAL( IPRBN1 ), STATUS )
-               CALL CCD1_GISEQ( 1, 1, NUMI2, %VAL( IPRBN2 ), STATUS )
+               CALL CCD1_GISEQ( 1, 1, NUMI1, %VAL( CNF_PVAL( IPRBN1 ) ), 
+     :                          STATUS )
+               CALL CCD1_GISEQ( 1, 1, NUMI2, %VAL( CNF_PVAL( IPRBN2 ) ), 
+     :                          STATUS )
             END IF
 
 *  Check if we have enough points in each list to satisfy the matching
@@ -1195,16 +1228,20 @@
 *  One or both lists have only one object.  Treat as a special case.
                METHOD = 'SNGL'
                CALL CCD1_SNGL( MAXDIS * PIXSIZ,
-     :                         %VAL( IPXI1 ), %VAL( IPYI1 ),
-     :                         %VAL( IPRBN1 ), NUMI1,
-     :                         %VAL( IPXI2 ), %VAL( IPYI2 ),
-     :                         %VAL( IPRBN2 ), NUMI2,
-     :                         %VAL( IPXO1( COUNT ) ),
-     :                         %VAL( IPYO1( COUNT ) ),
-     :                         %VAL( IPXO2( COUNT ) ),
-     :                         %VAL( IPYO2( COUNT ) ), NMAT( COUNT ),
+     :                         %VAL( CNF_PVAL( IPXI1 ) ), 
+     :                         %VAL( CNF_PVAL( IPYI1 ) ),
+     :                         %VAL( CNF_PVAL( IPRBN1 ) ), NUMI1,
+     :                         %VAL( CNF_PVAL( IPXI2 ) ), 
+     :                         %VAL( CNF_PVAL( IPYI2 ) ),
+     :                         %VAL( CNF_PVAL( IPRBN2 ) ), NUMI2,
+     :                         %VAL( CNF_PVAL( IPXO1( COUNT ) ) ),
+     :                         %VAL( CNF_PVAL( IPYO1( COUNT ) ) ),
+     :                         %VAL( CNF_PVAL( IPXO2( COUNT ) ) ),
+     :                         %VAL( CNF_PVAL( IPYO2( COUNT ) ) ), 
+     :                         NMAT( COUNT ),
      :                         XOFF( COUNT ), YOFF( COUNT ),
-     :                         %VAL( IPRAN1 ), %VAL( IPRAN2 ), STATUS )
+     :                         %VAL( CNF_PVAL( IPRAN1 ) ), 
+     :                         %VAL( CNF_PVAL( IPRAN2 ) ), STATUS )
 
 *  If the match was successful, completeness must be unity.
                IF ( STATUS .EQ. SAI__OK ) THEN
@@ -1219,17 +1256,21 @@
 *  iteration.
                METHOD = 'FAST'
                CALL CCD1_STAO( ERROR * PIXSIZ, MAXDIS * PIXSIZ, 
-     :                         %VAL( IPXI1 ), %VAL( IPYI1 ), 
-     :                         %VAL( IPRBN1 ), NUMI1,
-     :                         %VAL( IPXI2 ), %VAL( IPYI2 ),
-     :                         %VAL( IPRBN2 ), NUMI2,
-     :                         %VAL( IPWRK1 ),
-     :                         %VAL( IPXO1( COUNT ) ),
-     :                         %VAL( IPYO1( COUNT ) ),
-     :                         %VAL( IPXO2( COUNT ) ),
-     :                         %VAL( IPYO2( COUNT ) ), NMAT( COUNT ),
+     :                         %VAL( CNF_PVAL( IPXI1 ) ), 
+     :                         %VAL( CNF_PVAL( IPYI1 ) ),
+     :                         %VAL( CNF_PVAL( IPRBN1 ) ), NUMI1,
+     :                         %VAL( CNF_PVAL( IPXI2 ) ), 
+     :                         %VAL( CNF_PVAL( IPYI2 ) ),
+     :                         %VAL( CNF_PVAL( IPRBN2 ) ), NUMI2,
+     :                         %VAL( CNF_PVAL( IPWRK1 ) ),
+     :                         %VAL( CNF_PVAL( IPXO1( COUNT ) ) ),
+     :                         %VAL( CNF_PVAL( IPYO1( COUNT ) ) ),
+     :                         %VAL( CNF_PVAL( IPXO2( COUNT ) ) ),
+     :                         %VAL( CNF_PVAL( IPYO2( COUNT ) ) ), 
+     :                         NMAT( COUNT ),
      :                         XOFF( COUNT ), YOFF( COUNT ),
-     :                         %VAL( IPRAN1 ), %VAL( IPRAN2 ), STATUS )
+     :                         %VAL( CNF_PVAL( IPRAN1 ) ), 
+     :                         %VAL( CNF_PVAL( IPRAN2 ) ), STATUS )
                IF ( STATUS .NE. SAI__OK ) THEN
                
 *  This mode has failed. If failsafe is set set FAILED to TRUE. Annul
@@ -1250,10 +1291,12 @@
                   IF ( FSAFE ) THEN 
 
 *  Now do the test.
-                     CALL CCD1_OVCOM( %VAL( IPX( I ) ),
-     :                                %VAL( IPY( I ) ), NRECN( I ),
-     :                                %VAL( IPX( J ) ),
-     :                                %VAL( IPY( J ) ), NRECN( J ),
+                     CALL CCD1_OVCOM( %VAL( CNF_PVAL( IPX( I ) ) ),
+     :                                %VAL( CNF_PVAL( IPY( I ) ) ), 
+     :                                NRECN( I ),
+     :                                %VAL( CNF_PVAL( IPX( J ) ) ),
+     :                                %VAL( CNF_PVAL( IPY( J ) ) ), 
+     :                                NRECN( J ),
      :                                NMAT( COUNT ), XOFF( COUNT ),
      :                                YOFF( COUNT ), ERROR * PIXSIZ, 
      :                                COMFAC, STATUS )
@@ -1282,19 +1325,25 @@
                CALL CCD1_MALL( NUMI2 + 2, '_INTEGER', IPWRK5, 
      :                         STATUS )
                CALL CCD1_SOFF( ERROR * PIXSIZ, MAXDIS * PIXSIZ, 
-     :                         %VAL( IPXI1 ), %VAL( IPYI1 ),
-     :                         %VAL( IPRBN1 ), NUMI1,
-     :                         %VAL( IPXI2 ), %VAL( IPYI2 ),
-     :                         %VAL( IPRBN2 ), NUMI2,
-     :                         %VAL( IPWRK1 ), %VAL( IPWRK2 ),
-     :                         %VAL( IPWRK3 ), %VAL( IPWRK4 ),
-     :                         %VAL( IPWRK5 ),
-     :                         %VAL( IPXO1( COUNT ) ),
-     :                         %VAL( IPYO1( COUNT ) ),
-     :                         %VAL( IPXO2( COUNT ) ),
-     :                         %VAL( IPYO2( COUNT ) ), NMAT( COUNT ),
+     :                         %VAL( CNF_PVAL( IPXI1 ) ), 
+     :                         %VAL( CNF_PVAL( IPYI1 ) ),
+     :                         %VAL( CNF_PVAL( IPRBN1 ) ), NUMI1,
+     :                         %VAL( CNF_PVAL( IPXI2 ) ), 
+     :                         %VAL( CNF_PVAL( IPYI2 ) ),
+     :                         %VAL( CNF_PVAL( IPRBN2 ) ), NUMI2,
+     :                         %VAL( CNF_PVAL( IPWRK1 ) ), 
+     :                         %VAL( CNF_PVAL( IPWRK2 ) ),
+     :                         %VAL( CNF_PVAL( IPWRK3 ) ), 
+     :                         %VAL( CNF_PVAL( IPWRK4 ) ),
+     :                         %VAL( CNF_PVAL( IPWRK5 ) ),
+     :                         %VAL( CNF_PVAL( IPXO1( COUNT ) ) ),
+     :                         %VAL( CNF_PVAL( IPYO1( COUNT ) ) ),
+     :                         %VAL( CNF_PVAL( IPXO2( COUNT ) ) ),
+     :                         %VAL( CNF_PVAL( IPYO2( COUNT ) ) ), 
+     :                         NMAT( COUNT ),
      :                         XOFF( COUNT ), YOFF( COUNT ),
-     :                         %VAL( IPRAN1 ), %VAL( IPRAN2 ), STATUS )
+     :                         %VAL( CNF_PVAL( IPRAN1 ) ), 
+     :                         %VAL( CNF_PVAL( IPRAN2 ) ), STATUS )
                CALL CCD1_MFREE( IPWRK2, STATUS )
                CALL CCD1_MFREE( IPWRK3, STATUS )
                CALL CCD1_MFREE( IPWRK4, STATUS )
@@ -1314,9 +1363,12 @@
             ELSE
 
 *  Now do the test.
-               CALL CCD1_OVCOM( %VAL( IPX( I ) ), %VAL( IPY( I ) ), 
-     :                          NRECN( I ), %VAL( IPX( J ) ), 
-     :                          %VAL( IPY( J ) ), NRECN( J ), 
+               CALL CCD1_OVCOM( %VAL( CNF_PVAL( IPX( I ) ) ), 
+     :                          %VAL( CNF_PVAL( IPY( I ) ) ),
+     :                          NRECN( I ), 
+     :                          %VAL( CNF_PVAL( IPX( J ) ) ),
+     :                          %VAL( CNF_PVAL( IPY( J ) ) ), 
+     :                          NRECN( J ),
      :                          NMAT( COUNT ), XOFF( COUNT ), 
      :                          YOFF( COUNT ), ERROR * PIXSIZ, 
      :                          COMFAC, STATUS )
@@ -1362,12 +1414,16 @@
      :                         IPRCN1( COUNT ), STATUS )
                CALL CCD1_MALL( NMAT( COUNT ), '_INTEGER',
      :                         IPRCN2( COUNT ), STATUS )
-               CALL CCG1_PRMTI( %VAL( IPRAN( I ) ), %VAL( IPRAN1 ),
+               CALL CCG1_PRMTI( %VAL( CNF_PVAL( IPRAN( I ) ) ), 
+     :                          %VAL( CNF_PVAL( IPRAN1 ) ),
      :                          1, NMAT( COUNT ),
-     :                          %VAL( IPRCN1( COUNT ) ), STATUS )
-               CALL CCG1_PRMTI( %VAL( IPRAN( J ) ), %VAL( IPRAN2 ),
+     :                          %VAL( CNF_PVAL( IPRCN1( COUNT ) ) ), 
+     :                          STATUS )
+               CALL CCG1_PRMTI( %VAL( CNF_PVAL( IPRAN( J ) ) ), 
+     :                          %VAL( CNF_PVAL( IPRAN2 ) ),
      :                          1, NMAT( COUNT ),
-     :                          %VAL( IPRCN2( COUNT ) ), STATUS )
+     :                          %VAL( CNF_PVAL( IPRCN2( COUNT ) ) ), 
+     :                          STATUS )
 
 *  Generate the weight; it is the number of matches, perhaps multiplied
 *  by the completeness.
@@ -1467,35 +1523,44 @@
 *  position is treated as a node, the node-node transformations are
 *  the edges with weights the number of positions matched).
 *  First create the graph. 
-      CALL CCD1_CRGR( NMAT, COUNT, NSUP, %VAL( IPGRA ), NEDGES,
+      CALL CCD1_CRGR( NMAT, COUNT, NSUP, %VAL( CNF_PVAL( IPGRA ) ), 
+     :                NEDGES,
      :                STATUS )
                            
 *  Call routine to determine if the graph is complete.
-      CALL CCD1_GRAPC( %VAL( IPGRA ), NEDGES, 1, %VAL( IPQUE ),
-     :                 %VAL( IPBEEN ), COMPL, CYCLIC, %VAL( IPSUB ),
+      CALL CCD1_GRAPC( %VAL( CNF_PVAL( IPGRA ) ), NEDGES, 1, 
+     :                 %VAL( CNF_PVAL( IPQUE ) ),
+     :                 %VAL( CNF_PVAL( IPBEEN ) ), COMPL, CYCLIC, 
+     :                 %VAL( CNF_PVAL( IPSUB ) ),
      :                 NEWED, TOTNOD, STATUS )
       IF ( COMPL ) THEN    
                            
 *  Graph is complete -- all nodes connected. Determine the most likely
 *  spanning sub-graph. The most likely one is the graph which is most
 *  strongly connected (largest count of matched pairs).
-         CALL CCD1_MLSPG( %VAL( IPGRA ), WEIGHT, NEDGES, TOTNOD, 
-     :                    %VAL( IPQUE ), %VAL( IPBEEN ), %VAL( IPSPAN ),
-     :                    %VAL( IPSUB ), NEWED, NNODE, STATUS )
+         CALL CCD1_MLSPG( %VAL( CNF_PVAL( IPGRA ) ), 
+     :                    WEIGHT, NEDGES, TOTNOD,
+     :                    %VAL( CNF_PVAL( IPQUE ) ), 
+     :                    %VAL( CNF_PVAL( IPBEEN ) ), 
+     :                    %VAL( CNF_PVAL( IPSPAN ) ),
+     :                    %VAL( CNF_PVAL( IPSUB ) ), 
+     :                    NEWED, NNODE, STATUS )
 
 *  Determine the "complete" solution.
 *  Find the offsets of all positions to the `reference' set (first
 *  node of first edge of spanning graph is assumed to be the reference
 *  set).
-         CALL CCD1_GROFF( %VAL( IPSUB ), NEWED, XOFF, YOFF,
-     :                    NSUP, %VAL( IPBEEN ), %VAL( IPQUE ),
+         CALL CCD1_GROFF( %VAL( CNF_PVAL( IPSUB ) ), NEWED, XOFF, YOFF,
+     :                    NSUP, %VAL( CNF_PVAL( IPBEEN ) ), 
+     :                    %VAL( CNF_PVAL( IPQUE ) ),
      :                    XOFFN, YOFFN, STATUS )
 
 *  Output the offsets to the user.
          DO I = 1, NSUP
             FRM( I ) = FRMS( ILIS( ILISOF( I ) ) )
          END DO
-         CALL CCD1_PROFF( NSUP, %VAL( IPBEEN ), XOFFN, YOFFN, FRM,
+         CALL CCD1_PROFF( NSUP, %VAL( CNF_PVAL( IPBEEN ) ), 
+     :                    XOFFN, YOFFN, FRM,
      :                    USEWCS, STATUS )
 
 *  Generate the ID's for the output lists. Matching positions between
@@ -1503,7 +1568,8 @@
          DO I = 1, NSUP
             TOLS( I ) = 0D0
          END DO
-         CALL CCD1_GMMP( %VAL( IPSUB ), NEWED, NSUP, IPXO1, IPYO1,
+         CALL CCD1_GMMP( %VAL( CNF_PVAL( IPSUB ) ), 
+     :                   NEWED, NSUP, IPXO1, IPYO1,
      :                   IPRCN1, IPXO2, IPYO2, IPRCN2, NMAT, TOLS,
      :                   OFFS, IPX, IPY, IPRAN, IPID, NOUT, STATUS )
       ELSE
@@ -1587,11 +1653,15 @@
                CALL CCD1_MALL( NREC( L ), '_DOUBLE', IPLY, STATUS )
 
 *  Extract the positions belonging to this list from the owning superlist.
-               CALL CCD1_EXLIS( %VAL( IPRAN( IS ) ), %VAL( IPID( IS ) ), 
-     :                          %VAL( IPX( IS ) ), %VAL( IPY( IS ) ),
+               CALL CCD1_EXLIS( %VAL( CNF_PVAL( IPRAN( IS ) ) ), 
+     :                          %VAL( CNF_PVAL( IPID( IS ) ) ),
+     :                          %VAL( CNF_PVAL( IPX( IS ) ) ), 
+     :                          %VAL( CNF_PVAL( IPY( IS ) ) ),
      :                          NOUT( IS ), IPOS, IPOS + NREC( L ) - 1,
-     :                          %VAL( IPLRAN ), %VAL( IPLID ),
-     :                          %VAL( IPLX ), %VAL( IPLY ), NLOUT,
+     :                          %VAL( CNF_PVAL( IPLRAN ) ), 
+     :                          %VAL( CNF_PVAL( IPLID ) ),
+     :                          %VAL( CNF_PVAL( IPLX ) ), 
+     :                          %VAL( CNF_PVAL( IPLY ) ), NLOUT,
      :                          STATUS )
             ELSE
                IPLRAN = IPRAN( IS )
@@ -1609,9 +1679,11 @@
                IF ( USEWCS ) THEN
                   CALL CCD1_MALL( NLOUT, '_DOUBLE', IPXT, STATUS )
                   CALL CCD1_MALL( NLOUT, '_DOUBLE', IPYT, STATUS )
-                  CALL AST_TRAN2( MAPS( L ), NLOUT, %VAL( IPLX ),
-     :                            %VAL( IPLY ), .FALSE., %VAL( IPXT ),
-     :                            %VAL( IPYT ), STATUS )
+                  CALL AST_TRAN2( MAPS( L ), NLOUT, 
+     :                            %VAL( CNF_PVAL( IPLX ) ),
+     :                            %VAL( CNF_PVAL( IPLY ) ), .FALSE., 
+     :                            %VAL( CNF_PVAL( IPXT ) ),
+     :                            %VAL( CNF_PVAL( IPYT ) ), STATUS )
                   CALL CCD1_MFREE( IPLX, STATUS )
                   CALL CCD1_MFREE( IPLY, STATUS )
                   IPLX = IPXT
@@ -1623,20 +1695,25 @@
 
 *  First doctor the point index values so they refer to position within
 *  this file not position within all encountered files.
-                  CALL CCG1_CADDI( %VAL( IPLRAN ), NLOUT, 1 - IPOS,
+                  CALL CCG1_CADDI( %VAL( CNF_PVAL( IPLRAN ) ), 
+     :                             NLOUT, 1 - IPOS,
      :                             STATUS )
 
 *  Permute the data values into the right order using the doctored 
 *  point index values.
                   CALL CCD1_MALL( NXVAL( L ) * NLOUT, '_DOUBLE', IPXDP,
      :                            STATUS )
-                  CALL CCG1_PRMTD( %VAL( IPXDAT( L ) ), %VAL( IPLRAN ),
-     :                             NXVAL( L ), NLOUT, %VAL( IPXDP ),
+                  CALL CCG1_PRMTD( %VAL( CNF_PVAL( IPXDAT( L ) ) ), 
+     :                             %VAL( CNF_PVAL( IPLRAN ) ),
+     :                             NXVAL( L ), NLOUT, 
+     :                             %VAL( CNF_PVAL( IPXDP ) ),
      :                             STATUS )
 
 *  And write them out.
-                  CALL CCD1_WRIDI( FDOUT, %VAL( IPLID ), %VAL( IPLX ),
-     :                             %VAL( IPLY ), %VAL( IPXDP ),
+                  CALL CCD1_WRIDI( FDOUT, %VAL( CNF_PVAL( IPLID ) ), 
+     :                             %VAL( CNF_PVAL( IPLX ) ),
+     :                             %VAL( CNF_PVAL( IPLY ) ), 
+     :                             %VAL( CNF_PVAL( IPXDP ) ),
      :                             NXVAL( L ), NLOUT, LINE, CCD1__BLEN,
      :                             STATUS )
                   CALL CCD1_MFREE( IPXDP, STATUS )
@@ -1645,8 +1722,10 @@
 *  If no extra data columns, just output ID, X and Y; no permutations
 *  are necessary.
                ELSE
-                  CALL CCD1_WRIXY( FDOUT, %VAL( IPLID ), %VAL( IPLX ),
-     :                             %VAL( IPLY ), NLOUT, LINE,
+                  CALL CCD1_WRIXY( FDOUT, %VAL( CNF_PVAL( IPLID ) ), 
+     :                             %VAL( CNF_PVAL( IPLX ) ),
+     :                             %VAL( CNF_PVAL( IPLY ) ), 
+     :                             NLOUT, LINE,
      :                             CCD1__BLEN, STATUS )
                END IF
 

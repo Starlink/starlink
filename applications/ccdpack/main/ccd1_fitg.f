@@ -138,6 +138,7 @@
                                  ! defines NUM_ERROR
       INCLUDE 'CCD1_FITCM'       ! Common block for passing fit
                                  ! information to LSFUN1 subroutine
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 *        CCD1_IPPIN = INTEGER (Write)
 *           Pointer to array to hold all the parameter values as
 *           variables on input to the transformation.
@@ -208,8 +209,12 @@
       NUM_ERROR = SAI__OK
 
 *  Match the identifiers of the lists and remove unmatched positions.
-      CALL CCD1_MTCHL( %VAL( IPID1 ), %VAL( IPX1 ), %VAL( IPY1 ), NREC1,
-     :                 %VAL( IPID2 ), %VAL( IPX2 ), %VAL( IPY2 ), NREC2,
+      CALL CCD1_MTCHL( %VAL( CNF_PVAL( IPID1 ) ), 
+     :                 %VAL( CNF_PVAL( IPX1 ) ), 
+     :                 %VAL( CNF_PVAL( IPY1 ) ), NREC1,
+     :                 %VAL( CNF_PVAL( IPID2 ) ), 
+     :                 %VAL( CNF_PVAL( IPX2 ) ), 
+     :                 %VAL( CNF_PVAL( IPY2 ) ), NREC2,
      :                 CCD1_NREC, STATUS )
 
 *  Only proceed if NMATCH is greater than zero, otherwise issue an
@@ -262,9 +267,10 @@
          CALL CCD1_MALL( CCD1_NREC * 2, '_DOUBLE', CCD1_IPPO, STATUS )
 
 *  Transfer these to the input transformation array.
-         CALL CCD1_ITRA( PARVAL, %VAL( IPX1 ), %VAL( IPY1 ), NREC1,
+         CALL CCD1_ITRA( PARVAL, %VAL( CNF_PVAL( IPX1 ) ), 
+     :                   %VAL( CNF_PVAL( IPY1 ) ), NREC1,
      :                   CCD1_NREC, CCD1_NPAR + 2, .TRUE.,
-     :                   %VAL( CCD1_IPPIN ), STATUS )
+     :                   %VAL( CNF_PVAL( CCD1_IPPIN ) ), STATUS )
 
 *  Set pointer to access reference XY positions from LSFUN1.
          CCD1_IPX = IPX2
@@ -283,8 +289,9 @@
 
 *  Now try to determine the fit parameters.
          CALL PDA_LMDIF1( CCD1_LSFUN1, NRES, CCD1_NPAR, PARVAL,
-     :                    %VAL( IPFVEC ), TOLER, IFAIL, %VAL( IPWRK1 ),
-     :                    %VAL( IPWRK2 ), NWORK )
+     :                    %VAL( CNF_PVAL( IPFVEC ) ), TOLER, IFAIL, 
+     :                    %VAL( CNF_PVAL( IPWRK1 ) ),
+     :                    %VAL( CNF_PVAL( IPWRK2 ) ), NWORK )
 
 *  Trap numeric errors.
          IF ( NUM_ERROR .NE. SAI__OK ) THEN

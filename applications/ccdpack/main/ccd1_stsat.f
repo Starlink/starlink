@@ -64,6 +64,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       CHARACTER * ( * ) ITYPE
@@ -88,25 +89,32 @@
 
 *  Call the appropriate CCG1_STSAT routine.
       IF ( ITYPE .EQ. '_BYTE' ) THEN
-         CALL CCG1_SSATB( BAD, %VAL( IPOINT ), EL, SETSAT, SATVAL, NSAT,
+         CALL CCG1_SSATB( BAD, %VAL( CNF_PVAL( IPOINT ) ), 
+     :                    EL, SETSAT, SATVAL, NSAT,
      :                    STATUS )
       ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
-         CALL CCG1_SSATUB( BAD, %VAL( IPOINT ), EL, SETSAT, SATVAL,
+         CALL CCG1_SSATUB( BAD, %VAL( CNF_PVAL( IPOINT ) ), 
+     :                     EL, SETSAT, SATVAL,
      :                     NSAT, STATUS )
       ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
-         CALL CCG1_SSATW( BAD, %VAL( IPOINT ), EL, SETSAT, SATVAL, NSAT,
+         CALL CCG1_SSATW( BAD, %VAL( CNF_PVAL( IPOINT ) ), 
+     :                    EL, SETSAT, SATVAL, NSAT,
      :                    STATUS )
       ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
-         CALL CCG1_SSATUW( BAD, %VAL( IPOINT ), EL, SETSAT, SATVAL,
+         CALL CCG1_SSATUW( BAD, %VAL( CNF_PVAL( IPOINT ) ), 
+     :                     EL, SETSAT, SATVAL,
      :                     NSAT, STATUS )
       ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
-         CALL CCG1_SSATI( BAD, %VAL( IPOINT ), EL, SETSAT, SATVAL, NSAT,
+         CALL CCG1_SSATI( BAD, %VAL( CNF_PVAL( IPOINT ) ), 
+     :                    EL, SETSAT, SATVAL, NSAT,
      :                    STATUS )
       ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
-         CALL CCG1_SSATR( BAD, %VAL( IPOINT ), EL, SETSAT, SATVAL, NSAT,
+         CALL CCG1_SSATR( BAD, %VAL( CNF_PVAL( IPOINT ) ), 
+     :                    EL, SETSAT, SATVAL, NSAT,
      :                    STATUS )
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-         CALL CCG1_SSATD( BAD, %VAL( IPOINT ), EL, SETSAT, SATVAL, NSAT,
+         CALL CCG1_SSATD( BAD, %VAL( CNF_PVAL( IPOINT ) ), 
+     :                    EL, SETSAT, SATVAL, NSAT,
      :                    STATUS )
       END IF
 

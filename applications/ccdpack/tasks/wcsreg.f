@@ -270,6 +270,7 @@
       INCLUDE 'GRP_PAR'          ! Standard GRP constants
       INCLUDE 'PAR_ERR'          ! PAR system error constants
       INCLUDE 'CCD1_PAR'         ! Private CCDPACK constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -470,7 +471,7 @@
 
 *  Create a graph of all possible conversions between the WCS framesets.
          CALL CCD1_CNVGR( IWCS, NNDF, DMNS, NDMN, USESET, SNAME,
-     :                    %VAL( IPGRA ), NEDGE, STATUS )
+     :                    %VAL( CNF_PVAL( IPGRA ) ), NEDGE, STATUS )
 
 *  Allocate some temporary workspace.
          CALL CCD1_MALL( 4 * NEDGE, '_INTEGER', IPWK1, STATUS )
@@ -479,9 +480,12 @@
          CALL CCD1_MALL( NNDF, '_LOGICAL', IPWK4, STATUS )
 
 *  Check the graph for completeness and report accordingly.
-         CALL CCD1_GRREP( %VAL( IPGRA ), NEDGE, NNDF, REFPOS, 
-     :                    %VAL( IPWK1 ), %VAL( IPWK2 ), %VAL( IPWK3 ),
-     :                    %VAL( IPWK4 ), COMPL, STATUS )
+         CALL CCD1_GRREP( %VAL( CNF_PVAL( IPGRA ) ), 
+     :                    NEDGE, NNDF, REFPOS,
+     :                    %VAL( CNF_PVAL( IPWK1 ) ), 
+     :                    %VAL( CNF_PVAL( IPWK2 ) ), 
+     :                    %VAL( CNF_PVAL( IPWK3 ) ),
+     :                    %VAL( CNF_PVAL( IPWK4 ) ), COMPL, STATUS )
 
 *  Free temporary workspace.
          CALL CCD1_MFREE( IPWK1, STATUS )
@@ -519,7 +523,8 @@
 
 *  Find the best path through the graph from the Current frame of this
 *  frameset to the reference frame in the reference frameset.
-         CALL CCD1_GRPTH( %VAL( IPGRA ), NEDGE, I, REFPOS, WORK, WORK2,
+         CALL CCD1_GRPTH( %VAL( CNF_PVAL( IPGRA ) ), 
+     :                    NEDGE, I, REFPOS, WORK, WORK2,
      :                    PATH, NSTEP( I ), STATUS )
 
 *  Check whether a successful path was found.

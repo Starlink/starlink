@@ -394,6 +394,7 @@
 *  Internal references:
       INCLUDE 'NUM_DEC_CVT'      ! Conversion declarations
       INCLUDE 'NUM_DEF_CVT'      ! Conversion definitions
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 *.
 
 *  Check inherited global status.
@@ -686,32 +687,42 @@
 *  Combine all the NDFs in the stack using the method given.
             IF ( HAVVAR ) THEN
                IF ( PTYPE .EQ. '_REAL' ) THEN
-                  CALL CCG1_CM1RR( %VAL( IPDWRK ), EL, NNDF,
-     :                             %VAL( IPVWRK ), IMETH, MINPIX, NITER,
+                  CALL CCG1_CM1RR( %VAL( CNF_PVAL( IPDWRK ) ), EL, NNDF,
+     :                             %VAL( CNF_PVAL( IPVWRK ) ), 
+     :                             IMETH, MINPIX, NITER,
      :                             NSIGMA, ALPHA, RMIN, RMAX,
-     :                             %VAL( IPDOUT ), %VAL( IPVOUT ), WRK1,
-     :                             WRK2, WRK3, %VAL( IPWRK4 ), NWRK4,
+     :                             %VAL( CNF_PVAL( IPDOUT ) ), 
+     :                             %VAL( CNF_PVAL( IPVOUT ) ), WRK1,
+     :                             WRK2, WRK3, 
+     :                             %VAL( CNF_PVAL( IPWRK4 ) ), NWRK4,
      :                             NCON, POINT, USED, STATUS )
                ELSE IF ( PTYPE .EQ. '_DOUBLE ' ) THEN
-                  CALL CCG1_CM1DD( %VAL( IPDWRK ), EL, NNDF,
-     :                             %VAL( IPVWRK ), IMETH, MINPIX, NITER,
+                  CALL CCG1_CM1DD( %VAL( CNF_PVAL( IPDWRK ) ), EL, NNDF,
+     :                             %VAL( CNF_PVAL( IPVWRK ) ), 
+     :                             IMETH, MINPIX, NITER,
      :                             NSIGMA, ALPHA, RMIN, RMAX,
-     :                             %VAL( IPDOUT ), %VAL( IPVOUT ), WRK1,
-     :                             WRK2, WRK3, %VAL( IPWRK4 ), NWRK4,
+     :                             %VAL( CNF_PVAL( IPDOUT ) ), 
+     :                             %VAL( CNF_PVAL( IPVOUT ) ), WRK1,
+     :                             WRK2, WRK3, 
+     :                             %VAL( CNF_PVAL( IPWRK4 ) ), NWRK4,
      :                             NCON, POINT, USED, STATUS )
                END IF
             ELSE
 
 *  No variances just use inverse weights.
                IF ( PTYPE .EQ. '_REAL' ) THEN
-                  CALL CCG1_CM3RR( %VAL( IPDWRK ), EL, NNDF, INFACT,
+                  CALL CCG1_CM3RR( %VAL( CNF_PVAL( IPDWRK ) ), 
+     :                             EL, NNDF, INFACT,
      :                             IMETH, MINPIX, NITER, NSIGMA, ALPHA,
-     :                             RMIN, RMAX, %VAL( IPDOUT ), WRK1,
+     :                             RMIN, RMAX, 
+     :                             %VAL( CNF_PVAL( IPDOUT ) ), WRK1,
      :                             WRK2, NCON, POINT, USED, STATUS )
                ELSE IF ( PTYPE .EQ. '_DOUBLE ' ) THEN
-                  CALL CCG1_CM3DD( %VAL( IPDWRK ), EL, NNDF, INFACT,
+                  CALL CCG1_CM3DD( %VAL( CNF_PVAL( IPDWRK ) ), 
+     :                             EL, NNDF, INFACT,
      :                             IMETH, MINPIX, NITER, NSIGMA, ALPHA,
-     :                             RMIN, RMAX, %VAL( IPDOUT ), WRK1,
+     :                             RMIN, RMAX, 
+     :                             %VAL( CNF_PVAL( IPDOUT ) ), WRK1,
      :                             WRK2, NCON, POINT, USED, STATUS )
                END IF
             END IF

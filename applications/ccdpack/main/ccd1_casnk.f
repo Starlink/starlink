@@ -62,6 +62,7 @@
                                  !    Pointer to character array
                                  ! CCD1_CALOC = CHARACTER * ( DAT__SZLOC )
                                  !    Locator for HDS component storing array
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  External References:
       INTEGER CHR_LEN            ! Significant length of a string
@@ -123,8 +124,8 @@
                CALL DAT_MAPV( CCD1_CALOC, '_CHAR', 'UPDATE', CCD1_CAPTR,
      :                        CCD1_CANUM, STATUS )
                DO K = CCD1_CAPOS, CCD1_CANUM
-                  CALL CCD1_C2CA( %VAL( CCD1_CAPTR ), K, ' ', STATUS,
-     :                            %VAL( CCD1_CALEN ) )
+                  CALL CCD1_C2CA( %VAL( CNF_PVAL( CCD1_CAPTR ) ), 
+     :                            K, ' ', STATUS, %VAL( CCD1_CALEN ) )
                END DO
             END IF
 
@@ -133,7 +134,8 @@
                J = MIN( I + CCD1_CALEN - 1, NCHAR )
 
 *  Write the line, prefixed by the flag_character.
-               CALL CCD1_C2CA( %VAL( CCD1_CAPTR ), CCD1_CAPOS, 
+               CALL CCD1_C2CA( %VAL( CNF_PVAL( CCD1_CAPTR ) ), 
+     :                         CCD1_CAPOS,
      :                         FLAG // LINE( I : J ), STATUS,
      :                         %VAL( CCD1_CALEN ) )
 

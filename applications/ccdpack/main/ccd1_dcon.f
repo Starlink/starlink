@@ -95,6 +95,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       CHARACTER * ( * ) ITYPE
@@ -123,31 +124,38 @@
 
 *  Call the appropriate version of CCG1_DCN to count the values.
       IF ( ITYPE .EQ. '_BYTE' ) THEN 
-         CALL CCG1_DCNB( %VAL( ARRAY ), NCOL, NLINE, BAD, THRES, TOUCH,
+         CALL CCG1_DCNB( %VAL( CNF_PVAL( ARRAY ) ), 
+     :                   NCOL, NLINE, BAD, THRES, TOUCH,
      :                   XLIST, YLIST, ILIST, LABEL, NGROUP, NTHRES,
      :                   STATUS )
       ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN 
-         CALL CCG1_DCNUB( %VAL( ARRAY ), NCOL, NLINE, BAD, THRES, TOUCH,
+         CALL CCG1_DCNUB( %VAL( CNF_PVAL( ARRAY ) ), 
+     :                    NCOL, NLINE, BAD, THRES, TOUCH,
      :                   XLIST, YLIST, ILIST, LABEL, NGROUP, NTHRES,
      :                   STATUS )
       ELSE IF ( ITYPE .EQ. '_WORD' ) THEN 
-         CALL CCG1_DCNW( %VAL( ARRAY ), NCOL, NLINE, BAD, THRES, TOUCH,
+         CALL CCG1_DCNW( %VAL( CNF_PVAL( ARRAY ) ), 
+     :                   NCOL, NLINE, BAD, THRES, TOUCH,
      :                   XLIST, YLIST, ILIST, LABEL, NGROUP, NTHRES,
      :                   STATUS )
       ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN 
-         CALL CCG1_DCNUW( %VAL( ARRAY ), NCOL, NLINE, BAD, THRES, TOUCH,
+         CALL CCG1_DCNUW( %VAL( CNF_PVAL( ARRAY ) ), 
+     :                    NCOL, NLINE, BAD, THRES, TOUCH,
      :                   XLIST, YLIST, ILIST, LABEL, NGROUP, NTHRES,
      :                   STATUS )
       ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN 
-         CALL CCG1_DCNI( %VAL( ARRAY ), NCOL, NLINE, BAD, THRES, TOUCH,
+         CALL CCG1_DCNI( %VAL( CNF_PVAL( ARRAY ) ), 
+     :                   NCOL, NLINE, BAD, THRES, TOUCH,
      :                   XLIST, YLIST, ILIST, LABEL, NGROUP, NTHRES,
      :                   STATUS )
       ELSE IF ( ITYPE .EQ. '_REAL' ) THEN 
-         CALL CCG1_DCNR( %VAL( ARRAY ), NCOL, NLINE, BAD, THRES, TOUCH,
+         CALL CCG1_DCNR( %VAL( CNF_PVAL( ARRAY ) ), 
+     :                   NCOL, NLINE, BAD, THRES, TOUCH,
      :                   XLIST, YLIST, ILIST, LABEL, NGROUP, NTHRES,
      :                   STATUS )
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN 
-         CALL CCG1_DCND( %VAL( ARRAY ), NCOL, NLINE, BAD, THRES, TOUCH,
+         CALL CCG1_DCND( %VAL( CNF_PVAL( ARRAY ) ), 
+     :                   NCOL, NLINE, BAD, THRES, TOUCH,
      :                   XLIST, YLIST, ILIST, LABEL, NGROUP, NTHRES,
      :                   STATUS )
       ELSE

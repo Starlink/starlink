@@ -132,6 +132,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       CHARACTER * ( * ) TYPE1
@@ -225,62 +226,72 @@
 
 *  Centroid this pair of positions.
          IF ( TYPE1 .EQ. '_UBYTE' ) THEN
-            CALL CCG1_CENUB( XPOS1, YPOS1, %VAL( IPDAT1 ),
+            CALL CCG1_CENUB( XPOS1, YPOS1, %VAL( CNF_PVAL( IPDAT1 ) ),
      :                       NCOL1, NLINE1, ISIZE, SIGN, MAXSHF,
      :                       MAXIT, TOLER, XACC1, YACC1, STATUS )
          ELSE IF ( TYPE1 .EQ. '_BYTE' ) THEN 
-            CALL CCG1_CENB( XPOS1, YPOS1, %VAL( IPDAT1 ), NCOL1, NLINE1,
+            CALL CCG1_CENB( XPOS1, YPOS1, %VAL( CNF_PVAL( IPDAT1 ) ), 
+     :                      NCOL1, NLINE1,
      :                       ISIZE, SIGN, MAXSHF, MAXIT, TOLER,
      :                       XACC1, YACC1, STATUS )
          ELSE IF ( TYPE1 .EQ. '_UWORD' ) THEN 
-            CALL CCG1_CENUW( XPOS1, YPOS1, %VAL( IPDAT1 ),
+            CALL CCG1_CENUW( XPOS1, YPOS1, %VAL( CNF_PVAL( IPDAT1 ) ),
      :                       NCOL1, NLINE1, ISIZE, SIGN, MAXSHF,
      :                       MAXIT, TOLER, XACC1, YACC1, STATUS )
          ELSE IF ( TYPE1 .EQ. '_WORD' ) THEN 
-            CALL CCG1_CENW( XPOS1, YPOS1, %VAL( IPDAT1 ), NCOL1, NLINE1,
+            CALL CCG1_CENW( XPOS1, YPOS1, %VAL( CNF_PVAL( IPDAT1 ) ), 
+     :                      NCOL1, NLINE1,
      :                       ISIZE, SIGN, MAXSHF, MAXIT, TOLER,
      :                       XACC1, YACC1, STATUS )
          ELSE IF ( TYPE1 .EQ. '_INTEGER' ) THEN 
-            CALL CCG1_CENI( XPOS1, YPOS1, %VAL( IPDAT1 ), NCOL1, NLINE1,
+            CALL CCG1_CENI( XPOS1, YPOS1, %VAL( CNF_PVAL( IPDAT1 ) ), 
+     :                      NCOL1, NLINE1,
      :                       ISIZE, SIGN, MAXSHF, MAXIT, TOLER,
      :                       XACC1, YACC1, STATUS )
          ELSE IF ( TYPE1 .EQ. '_REAL' ) THEN 
-            CALL CCG1_CENR( XPOS1, YPOS1, %VAL( IPDAT1 ), NCOL1, NLINE1,
+            CALL CCG1_CENR( XPOS1, YPOS1, %VAL( CNF_PVAL( IPDAT1 ) ), 
+     :                      NCOL1, NLINE1,
      :                       ISIZE, SIGN, MAXSHF, MAXIT, TOLER,
      :                       XACC1, YACC1, STATUS )
          ELSE 
-            CALL CCG1_CEND( XPOS1, YPOS1, %VAL( IPDAT1 ), NCOL1, NLINE1,
+            CALL CCG1_CEND( XPOS1, YPOS1, %VAL( CNF_PVAL( IPDAT1 ) ), 
+     :                      NCOL1, NLINE1,
      :                       ISIZE, SIGN, MAXSHF, MAXIT, TOLER,
      :                       XACC1, YACC1, STATUS )
          END IF
 
 *  Now for second set.
          IF ( TYPE2 .EQ. '_UBYTE' ) THEN
-            CALL CCG1_CENUB( XPOS2, YPOS2, %VAL( IPDAT2 ),
+            CALL CCG1_CENUB( XPOS2, YPOS2, %VAL( CNF_PVAL( IPDAT2 ) ),
      :                       NCOL2, NLINE2, ISIZE, SIGN, MAXSHF,
      :                       MAXIT, TOLER, XACC2, YACC2, STATUS )
          ELSE IF ( TYPE2 .EQ. '_BYTE' ) THEN 
-            CALL CCG1_CENB( XPOS2, YPOS2, %VAL( IPDAT2 ), NCOL2, NLINE2,
+            CALL CCG1_CENB( XPOS2, YPOS2, %VAL( CNF_PVAL( IPDAT2 ) ), 
+     :                      NCOL2, NLINE2,
      :                       ISIZE, SIGN, MAXSHF, MAXIT, TOLER,
      :                       XACC2, YACC2, STATUS )
          ELSE IF ( TYPE2 .EQ. '_UWORD' ) THEN 
-            CALL CCG1_CENUW( XPOS2, YPOS2, %VAL( IPDAT2 ),
+            CALL CCG1_CENUW( XPOS2, YPOS2, %VAL( CNF_PVAL( IPDAT2 ) ),
      :                       NCOL2, NLINE2, ISIZE, SIGN, MAXSHF,
      :                       MAXIT, TOLER, XACC2, YACC2, STATUS )
          ELSE IF ( TYPE2 .EQ. '_WORD' ) THEN 
-            CALL CCG1_CENW( XPOS2, YPOS2, %VAL( IPDAT2 ), NCOL2, NLINE2,
+            CALL CCG1_CENW( XPOS2, YPOS2, %VAL( CNF_PVAL( IPDAT2 ) ), 
+     :                      NCOL2, NLINE2,
      :                       ISIZE, SIGN, MAXSHF, MAXIT, TOLER,
      :                       XACC2, YACC2, STATUS )
          ELSE IF ( TYPE2 .EQ. '_INTEGER' ) THEN 
-            CALL CCG1_CENI( XPOS2, YPOS2, %VAL( IPDAT2 ), NCOL2, NLINE2,
+            CALL CCG1_CENI( XPOS2, YPOS2, %VAL( CNF_PVAL( IPDAT2 ) ), 
+     :                      NCOL2, NLINE2,
      :                       ISIZE, SIGN, MAXSHF, MAXIT, TOLER,
      :                       XACC2, YACC2, STATUS )
          ELSE IF ( TYPE2 .EQ. '_REAL' ) THEN 
-            CALL CCG1_CENR( XPOS2, YPOS2, %VAL( IPDAT2 ), NCOL2, NLINE2,
+            CALL CCG1_CENR( XPOS2, YPOS2, %VAL( CNF_PVAL( IPDAT2 ) ), 
+     :                      NCOL2, NLINE2,
      :                       ISIZE, SIGN, MAXSHF, MAXIT, TOLER,
      :                       XACC2, YACC2, STATUS )
          ELSE 
-            CALL CCG1_CEND( XPOS2, YPOS2, %VAL( IPDAT2 ), NCOL2, NLINE2,
+            CALL CCG1_CEND( XPOS2, YPOS2, %VAL( CNF_PVAL( IPDAT2 ) ), 
+     :                      NCOL2, NLINE2,
      :                       ISIZE, SIGN, MAXSHF, MAXIT, TOLER,
      :                       XACC2, YACC2, STATUS )
          END IF

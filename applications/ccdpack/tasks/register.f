@@ -513,6 +513,7 @@
       INCLUDE 'FIO_PAR'          ! FIO parameters
       INCLUDE 'AST_PAR'          ! AST parameters
       INCLUDE 'NDF_PAR'          ! NDF parameters
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -797,7 +798,7 @@
                CALL CCD1_MALL( NREC( L ), '_INTEGER', IPIND( L ),
      :                         STATUS )
                CALL CCD1_GISEQ( NRECS( I ) + 1, 1, NREC( L ),
-     :                          %VAL( IPIND( L ) ), STATUS )
+     :                          %VAL( CNF_PVAL( IPIND( L ) ) ), STATUS )
             ELSE
 
 *  Standard file format...
@@ -930,40 +931,54 @@
          DO I = 1, NSUP
             DO J = ILISOF( I ), ILISOF( I + 1 ) - 1
                L = ILIS( J )
-               CALL CCD1_LEXT( %VAL( IPDAT( L ) ), NREC( L ), NVAL( L ),
-     :                         1, %VAL( IPWX ), STATUS )
-               CALL CCD1_LEXT( %VAL( IPDAT( L ) ), NREC( L ), NVAL( L ),
-     :                         2, %VAL( IPWY ), STATUS )
+               CALL CCD1_LEXT( %VAL( CNF_PVAL( IPDAT( L ) ) ), 
+     :                         NREC( L ), NVAL( L ),
+     :                         1, %VAL( CNF_PVAL( IPWX ) ), STATUS )
+               CALL CCD1_LEXT( %VAL( CNF_PVAL( IPDAT( L ) ) ), 
+     :                         NREC( L ), NVAL( L ),
+     :                         2, %VAL( CNF_PVAL( IPWY ) ), STATUS )
 
 *  Either just copy the coordinates or transform them using the WCS
 *  component of the associated NDF.
                IF ( USEWCS ) THEN
-                  CALL AST_TRAN2( MAPS( L ), NREC( L ), %VAL( IPWX ),
-     :                            %VAL( IPWY ), .TRUE., %VAL( IPXT ),
-     :                            %VAL( IPYT ), STATUS )
-                  CALL CCG1_LAPND( %VAL( IPXT ), NREC( L ), IP,
-     :                             %VAL( IPX ), STATUS )
-                  CALL CCG1_LAPND( %VAL( IPYT ), NREC( L ), IP, 
-     :                             %VAL( IPY ), STATUS )
+                  CALL AST_TRAN2( MAPS( L ), NREC( L ), 
+     :                            %VAL( CNF_PVAL( IPWX ) ),
+     :                            %VAL( CNF_PVAL( IPWY ) ), .TRUE., 
+     :                            %VAL( CNF_PVAL( IPXT ) ),
+     :                            %VAL( CNF_PVAL( IPYT ) ), STATUS )
+                  CALL CCG1_LAPND( %VAL( CNF_PVAL( IPXT ) ), 
+     :                             NREC( L ), IP,
+     :                             %VAL( CNF_PVAL( IPX ) ), STATUS )
+                  CALL CCG1_LAPND( %VAL( CNF_PVAL( IPYT ) ), 
+     :                             NREC( L ), IP,
+     :                             %VAL( CNF_PVAL( IPY ) ), STATUS )
                ELSE
-                  CALL CCG1_LAPND( %VAL( IPWX ), NREC( L ), IP, 
-     :                             %VAL( IPX ), STATUS )
-                  CALL CCG1_LAPND( %VAL( IPWY ), NREC( L ), IP, 
-     :                             %VAL( IPY ), STATUS )
+                  CALL CCG1_LAPND( %VAL( CNF_PVAL( IPWX ) ), 
+     :                             NREC( L ), IP,
+     :                             %VAL( CNF_PVAL( IPX ) ), STATUS )
+                  CALL CCG1_LAPND( %VAL( CNF_PVAL( IPWY ) ), 
+     :                             NREC( L ), IP,
+     :                             %VAL( CNF_PVAL( IPY ) ), STATUS )
                END IF
-               CALL CCG1_LAPNI( %VAL( IPIND( L ) ), NREC( L ), IP,
-     :                          %VAL( IPID ), STATUS )
+               CALL CCG1_LAPNI( %VAL( CNF_PVAL( IPIND( L ) ) ), 
+     :                          NREC( L ), IP,
+     :                          %VAL( CNF_PVAL( IPID ) ), STATUS )
                IP = IP + NREC( L )
             END DO
          END DO
 
 *  Do the first global transformation using the first positions
 *  as the reference set.
-         CALL CCD1_FITLM( %VAL( IPX ), %VAL( IPY ), %VAL( IPID ),
-     :                    %VAL( IPOK ), NRECS, NSUP, IPREFS,
-     :                    IFIT, TOLER, TR, %VAL( IPXR ), %VAL( IPYR ),
-     :                    %VAL( IPIDR ), %VAL( IPWX ), %VAL( IPWY ),
-     :                    %VAL( IPWID ), NOUT, RMS, STATUS )
+         CALL CCD1_FITLM( %VAL( CNF_PVAL( IPX ) ), 
+     :                    %VAL( CNF_PVAL( IPY ) ), 
+     :                    %VAL( CNF_PVAL( IPID ) ),
+     :                    %VAL( CNF_PVAL( IPOK ) ), NRECS, NSUP, IPREFS,
+     :                    IFIT, TOLER, TR, %VAL( CNF_PVAL( IPXR ) ), 
+     :                    %VAL( CNF_PVAL( IPYR ) ),
+     :                    %VAL( CNF_PVAL( IPIDR ) ), 
+     :                    %VAL( CNF_PVAL( IPWX ) ), 
+     :                    %VAL( CNF_PVAL( IPWY ) ),
+     :                    %VAL( CNF_PVAL( IPWID ) ), NOUT, RMS, STATUS )
 
 *  Explain the units of the linear transformation to the user.
          CALL CCD1_MSG( ' ', ' ', STATUS )
@@ -1012,15 +1027,19 @@
             IF ( USEWCS ) THEN
                CALL CCD1_MALL( NOUT, '_DOUBLE', IPXT, STATUS )
                CALL CCD1_MALL( NOUT, '_DOUBLE', IPYT, STATUS )
-               CALL AST_TRAN2( MAPS( IPREF ), NOUT, %VAL( IPXR ),
-     :                         %VAL( IPYR ), .FALSE., %VAL( IPXT ),
-     :                         %VAL( IPYT ), STATUS )
+               CALL AST_TRAN2( MAPS( IPREF ), NOUT, 
+     :                         %VAL( CNF_PVAL( IPXR ) ),
+     :                         %VAL( CNF_PVAL( IPYR ) ), .FALSE., 
+     :                         %VAL( CNF_PVAL( IPXT ) ),
+     :                         %VAL( CNF_PVAL( IPYT ) ), STATUS )
             ELSE
                IPXT = IPXR
                IPYT = IPYR
             END IF
-            CALL CCD1_WRIXY( FDREFO, %VAL( IPIDR ), %VAL( IPXT ),
-     :                       %VAL( IPYT ), NOUT, LINE, CCD1__BLEN,
+            CALL CCD1_WRIXY( FDREFO, %VAL( CNF_PVAL( IPIDR ) ), 
+     :                       %VAL( CNF_PVAL( IPXT ) ),
+     :                       %VAL( CNF_PVAL( IPYT ) ), 
+     :                       NOUT, LINE, CCD1__BLEN,
      :                       STATUS )
 
 *  Tell user we have done so.
@@ -1199,7 +1218,8 @@
 *  allowed when determining the best fit.
          CALL CCD1_MALL( NRECS( 1 ) + NRECS( 2 ), '_LOGICAL', IPOK,
      :                   STATUS )
-         CALL CCD1_RMULO( XPARNM, NXPAR, YPARNM, NYPAR, %VAL( IPOK ),
+         CALL CCD1_RMULO( XPARNM, NXPAR, YPARNM, NYPAR, 
+     :                    %VAL( CNF_PVAL( IPOK ) ),
      :                    UNIPAR, NUMUNI, STATUS )
          CALL CCD1_MFREE( IPOK, STATUS )
 
@@ -1217,30 +1237,35 @@
             NRECS( I ) = 0
             DO J = ILISOF( I ), ILISOF( I + 1 ) - 1
                L = ILIS( J )
-               CALL CCD1_LEXT( %VAL( IPDAT( L ) ), NREC( L ), NVAL( L ),
-     :                         1, %VAL( IPWX ), STATUS )
-               CALL CCD1_LEXT( %VAL( IPDAT( L ) ), NREC( L ), NVAL( L ),
-     :                         2, %VAL( IPWY ), STATUS )
+               CALL CCD1_LEXT( %VAL( CNF_PVAL( IPDAT( L ) ) ), 
+     :                         NREC( L ), NVAL( L ),
+     :                         1, %VAL( CNF_PVAL( IPWX ) ), STATUS )
+               CALL CCD1_LEXT( %VAL( CNF_PVAL( IPDAT( L ) ) ), 
+     :                         NREC( L ), NVAL( L ),
+     :                         2, %VAL( CNF_PVAL( IPWY ) ), STATUS )
 
 *  Transform them into the correct coordinates if necessary.
                IF ( USEWCS ) THEN
                   CALL CCD1_MALL( NREC( L ), '_DOUBLE', IPXT, STATUS )
                   CALL CCD1_MALL( NREC( L ), '_DOUBLE', IPYT, STATUS )
-                  CALL AST_TRAN2( MAPS( L ), NREC( L ), %VAL( IPWX ),
-     :                            %VAL( IPWY ), .TRUE., %VAL( IPXT ),
-     :                            %VAL( IPYT ), STATUS )
+                  CALL AST_TRAN2( MAPS( L ), NREC( L ), 
+     :                            %VAL( CNF_PVAL( IPWX ) ),
+     :                            %VAL( CNF_PVAL( IPWY ) ), .TRUE., 
+     :                            %VAL( CNF_PVAL( IPXT ) ),
+     :                            %VAL( CNF_PVAL( IPYT ) ), STATUS )
                   IPWX = IPXT
                   IPWY = IPYT
                END IF
 
 *  Copy them into the superlist.
                IP = NRECS( I ) + 1
-               CALL CCG1_LAPND( %VAL( IPWX ), NREC( L ), IP,
-     :                          %VAL( IPXG( I ) ), STATUS )
-               CALL CCG1_LAPND( %VAL( IPWY ), NREC( L ), IP,
-     :                          %VAL( IPYG( I ) ), STATUS )
-               CALL CCG1_LAPNI( %VAL( IPIND( I ) ), NREC( L ), IP,
-     :                          %VAL( IPIG( I ) ), STATUS )
+               CALL CCG1_LAPND( %VAL( CNF_PVAL( IPWX ) ), NREC( L ), IP,
+     :                          %VAL( CNF_PVAL( IPXG( I ) ) ), STATUS )
+               CALL CCG1_LAPND( %VAL( CNF_PVAL( IPWY ) ), NREC( L ), IP,
+     :                          %VAL( CNF_PVAL( IPYG( I ) ) ), STATUS )
+               CALL CCG1_LAPNI( %VAL( CNF_PVAL( IPIND( I ) ) ), 
+     :                          NREC( L ), IP,
+     :                          %VAL( CNF_PVAL( IPIG( I ) ) ), STATUS )
                NRECS( I ) = NRECS( I ) + NREC( L )
             END DO
          END DO

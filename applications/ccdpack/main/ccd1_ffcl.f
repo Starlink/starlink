@@ -86,6 +86,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       CHARACTER * ( * ) PTYPE
@@ -124,15 +125,23 @@
 
 *  Call the appropriate version of CCG1_FFREJ
       IF ( PTYPE .EQ. '_REAL' ) THEN
-         CALL CCG1_FFRJR( BAD, %VAL( IPIN ), NX, NY, NITER, GAMMA,
-     :                    IX, IY, SIGMA, %VAL( IPOUT ), NGOOD,
-     :                    %VAL( IPWRK), %VAL( IPILIN ),%VAL( IPNLIN ),
+         CALL CCG1_FFRJR( BAD, %VAL( CNF_PVAL( IPIN ) ), 
+     :                    NX, NY, NITER, GAMMA,
+     :                    IX, IY, SIGMA, %VAL( CNF_PVAL( IPOUT ) ), 
+     :                    NGOOD,
+     :                    %VAL( CNF_PVAL( IPWRK )), 
+     :                    %VAL( CNF_PVAL( IPILIN ) ),
+     :                    %VAL( CNF_PVAL( IPNLIN ) ),
      :                    STATUS )
 
       ELSE IF( PTYPE .EQ. '_DOUBLE' ) THEN
-         CALL CCG1_FFRJD( BAD, %VAL( IPIN ), NX, NY, NITER, GAMMA,
-     :                    IX, IY, SIGMA, %VAL( IPOUT ), NGOOD,
-     :                    %VAL( IPWRK), %VAL( IPILIN ),%VAL( IPNLIN ),
+         CALL CCG1_FFRJD( BAD, %VAL( CNF_PVAL( IPIN ) ), 
+     :                    NX, NY, NITER, GAMMA,
+     :                    IX, IY, SIGMA, %VAL( CNF_PVAL( IPOUT ) ), 
+     :                    NGOOD,
+     :                    %VAL( CNF_PVAL( IPWRK )), 
+     :                    %VAL( CNF_PVAL( IPILIN ) ),
+     :                    %VAL( CNF_PVAL( IPNLIN ) ),
      :                    STATUS )
       END IF
       END

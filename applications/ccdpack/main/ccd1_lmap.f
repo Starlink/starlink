@@ -72,6 +72,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER FD
@@ -203,7 +204,8 @@
 *  Increment the record count.
             NLINES = NLINES + 1
             CALL CCD1_DECL3( LINE, LINNUM, NREC, NVAL, NLINES,
-     :                       %VAL( IPIND ), %VAL( IPDAT ), STATUS )
+     :                       %VAL( CNF_PVAL( IPIND ) ), 
+     :                       %VAL( CNF_PVAL( IPDAT ) ), STATUS )
 
 *  If status is BAD issue filename with error message
             IF ( STATUS .NE. SAI__OK ) THEN

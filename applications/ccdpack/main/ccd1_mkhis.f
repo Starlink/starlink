@@ -86,6 +86,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       CHARACTER * ( * ) ITYPE
@@ -114,25 +115,32 @@
 *  Branch calling version of CCD1_MKHI appropriate to the input data
 *  type.
       IF ( ITYPE .EQ. '_BYTE' ) THEN 
-        CALL CCG1_MKHIB( %VAL( ARRAY ), NPIX, BAD, MINBIN, NHIST, HIST,
+        CALL CCG1_MKHIB( %VAL( CNF_PVAL( ARRAY ) ), 
+     :                   NPIX, BAD, MINBIN, NHIST, HIST,
      :                   MODE, NBIN, ZERO, WIDTH, STATUS )
       ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN 
-        CALL CCG1_MKHIUB( %VAL( ARRAY ), NPIX, BAD, MINBIN, NHIST, HIST,
+        CALL CCG1_MKHIUB( %VAL( CNF_PVAL( ARRAY ) ), 
+     :                    NPIX, BAD, MINBIN, NHIST, HIST,
      :                   MODE, NBIN, ZERO, WIDTH, STATUS )
       ELSE IF ( ITYPE .EQ. '_WORD' ) THEN 
-        CALL CCG1_MKHIW( %VAL( ARRAY ), NPIX, BAD, MINBIN, NHIST, HIST,
+        CALL CCG1_MKHIW( %VAL( CNF_PVAL( ARRAY ) ), 
+     :                   NPIX, BAD, MINBIN, NHIST, HIST,
      :                   MODE, NBIN, ZERO, WIDTH, STATUS )
       ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN 
-        CALL CCG1_MKHIUW( %VAL( ARRAY ), NPIX, BAD, MINBIN, NHIST, HIST,
+        CALL CCG1_MKHIUW( %VAL( CNF_PVAL( ARRAY ) ), 
+     :                    NPIX, BAD, MINBIN, NHIST, HIST,
      :                   MODE, NBIN, ZERO, WIDTH, STATUS )
       ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN 
-        CALL CCG1_MKHII( %VAL( ARRAY ), NPIX, BAD, MINBIN, NHIST, HIST,
+        CALL CCG1_MKHII( %VAL( CNF_PVAL( ARRAY ) ), 
+     :                   NPIX, BAD, MINBIN, NHIST, HIST,
      :                   MODE, NBIN, ZERO, WIDTH, STATUS )
       ELSE IF ( ITYPE .EQ. '_REAL' ) THEN 
-        CALL CCG1_MKHIR( %VAL( ARRAY ), NPIX, BAD, MINBIN, NHIST, HIST,
+        CALL CCG1_MKHIR( %VAL( CNF_PVAL( ARRAY ) ), 
+     :                   NPIX, BAD, MINBIN, NHIST, HIST,
      :                   MODE, NBIN, ZERO, WIDTH, STATUS )
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN 
-        CALL CCG1_MKHID( %VAL( ARRAY ), NPIX, BAD, MINBIN, NHIST, HIST,
+        CALL CCG1_MKHID( %VAL( CNF_PVAL( ARRAY ) ), 
+     :                   NPIX, BAD, MINBIN, NHIST, HIST,
      :                   MODE, NBIN, ZERO, WIDTH, STATUS )
       ELSE
 

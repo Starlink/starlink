@@ -59,6 +59,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'        ! Global SAE definitions
+      INCLUDE 'CNF_PAR'        ! For CNF_PVAL function
 
 *  Arguments Given:
       CHARACTER * ( * ) TYPE
@@ -84,31 +85,38 @@
 
 *  Branch calling the correct version of CCG1_FRACx appropriate to the data.
       IF ( TYPE .EQ. '_BYTE' ) THEN
-         CALL CCG1_FRACB( EL, %VAL( IPARR ), NFRAC, FRAC, BAD, CLFRAC,
+         CALL CCG1_FRACB( EL, %VAL( CNF_PVAL( IPARR ) ), 
+     :                    NFRAC, FRAC, BAD, CLFRAC,
      :                    VALUES, STATUS )
 
       ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
-         CALL CCG1_FRACUB( EL, %VAL( IPARR ), NFRAC, FRAC, BAD, CLFRAC,
+         CALL CCG1_FRACUB( EL, %VAL( CNF_PVAL( IPARR ) ), 
+     :                     NFRAC, FRAC, BAD, CLFRAC,
      :                     VALUES, STATUS )
 
       ELSE IF ( TYPE .EQ. '_WORD' ) THEN
-         CALL CCG1_FRACW( EL, %VAL( IPARR ), NFRAC, FRAC, BAD, CLFRAC,
+         CALL CCG1_FRACW( EL, %VAL( CNF_PVAL( IPARR ) ), 
+     :                    NFRAC, FRAC, BAD, CLFRAC,
      :                    VALUES, STATUS )
 
       ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
-         CALL CCG1_FRACUW( EL, %VAL( IPARR ), NFRAC, FRAC, BAD, CLFRAC,
+         CALL CCG1_FRACUW( EL, %VAL( CNF_PVAL( IPARR ) ), 
+     :                     NFRAC, FRAC, BAD, CLFRAC,
      :                     VALUES, STATUS )
 
       ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
-         CALL CCG1_FRACI( EL, %VAL( IPARR ), NFRAC, FRAC, BAD, CLFRAC,
+         CALL CCG1_FRACI( EL, %VAL( CNF_PVAL( IPARR ) ), 
+     :                    NFRAC, FRAC, BAD, CLFRAC,
      :                    VALUES, STATUS )
 
       ELSE IF ( TYPE .EQ. '_REAL' ) THEN
-         CALL CCG1_FRACR( EL, %VAL( IPARR ), NFRAC, FRAC, BAD, CLFRAC,
+         CALL CCG1_FRACR( EL, %VAL( CNF_PVAL( IPARR ) ), 
+     :                    NFRAC, FRAC, BAD, CLFRAC,
      :                    VALUES, STATUS )
 
       ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
-         CALL CCG1_FRACD( EL, %VAL( IPARR ), NFRAC, FRAC, BAD, CLFRAC,
+         CALL CCG1_FRACD( EL, %VAL( CNF_PVAL( IPARR ) ), 
+     :                    NFRAC, FRAC, BAD, CLFRAC,
      :                    VALUES, STATUS )
 
 

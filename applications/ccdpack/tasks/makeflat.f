@@ -322,6 +322,7 @@
       INCLUDE 'GRP_PAR'          ! GRP system constants
       INCLUDE 'AST_PAR'          ! AST system constants
       INCLUDE 'CCD1_PAR'         ! CCDPACK internal constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -786,22 +787,28 @@
 
 *  Process at real versions.
                IF ( PTYPE .EQ. '_REAL' ) THEN
-                  CALL CCG1_CM1RR( %VAL( IPSTK ), EL, NNDF, 
-     :                             %VAL( IPVSTK),
+                  CALL CCG1_CM1RR( %VAL( CNF_PVAL( IPSTK ) ), EL, NNDF,
+     :                             %VAL( CNF_PVAL( IPVSTK )),
      :                             IMETH, MINPIX, NITER, NSIGMA, ALPHA,
-     :                             RMIN, RMAX, %VAL( IPOINT ),
-     :                             %VAL( IPVAR ), WRK1, WRK2, WRK3,
-     :                             %VAL( IPWRK4 ), NWRK4, NCON,
+     :                             RMIN, RMAX, 
+     :                             %VAL( CNF_PVAL( IPOINT ) ),
+     :                             %VAL( CNF_PVAL( IPVAR ) ), 
+     :                             WRK1, WRK2, WRK3,
+     :                             %VAL( CNF_PVAL( IPWRK4 ) ), 
+     :                             NWRK4, NCON,
      :                             POINT, USED, STATUS )
 
 *  Double precision version.
                ELSE IF ( PTYPE .EQ. '_DOUBLE' ) THEN
-                  CALL CCG1_CM1DD( %VAL( IPSTK ), EL, NNDF, 
-     :                             %VAL( IPVSTK ),
+                  CALL CCG1_CM1DD( %VAL( CNF_PVAL( IPSTK ) ), EL, NNDF,
+     :                             %VAL( CNF_PVAL( IPVSTK ) ),
      :                             IMETH, MINPIX, NITER, NSIGMA, ALPHA,
-     :                             RMIN, RMAX, %VAL( IPOINT ),
-     :                             %VAL( IPVAR ), WRK1, WRK2, WRK3,
-     :                             %VAL( IPWRK4 ), NWRK4, NCON,
+     :                             RMIN, RMAX, 
+     :                             %VAL( CNF_PVAL( IPOINT ) ),
+     :                             %VAL( CNF_PVAL( IPVAR ) ), 
+     :                             WRK1, WRK2, WRK3,
+     :                             %VAL( CNF_PVAL( IPWRK4 ) ), 
+     :                             NWRK4, NCON,
      :                             POINT, USED, STATUS )
                END IF
             ELSE
@@ -809,17 +816,21 @@
 *  No variance to propagate, use inverse exposure factors.
 *  Process at real versions.
                IF ( PTYPE .EQ. '_REAL' ) THEN
-                  CALL CCG1_CM3RR( %VAL( IPSTK ), EL, NNDF, INVAVE,
+                  CALL CCG1_CM3RR( %VAL( CNF_PVAL( IPSTK ) ), 
+     :                             EL, NNDF, INVAVE,
      :                             IMETH, MINPIX, NITER, NSIGMA, ALPHA,
-     :                             RMIN, RMAX, %VAL( IPOINT ),
+     :                             RMIN, RMAX, 
+     :                             %VAL( CNF_PVAL( IPOINT ) ),
      :                             WRK1, WRK2, NCON, POINT, USED,
      :                             STATUS )
 
 *  Double precision version.
                ELSE IF ( PTYPE .EQ. '_DOUBLE' ) THEN
-                  CALL CCG1_CM3DD( %VAL( IPSTK ), EL, NNDF, INVAVE,
+                  CALL CCG1_CM3DD( %VAL( CNF_PVAL( IPSTK ) ), 
+     :                             EL, NNDF, INVAVE,
      :                             IMETH, MINPIX, NITER, NSIGMA, ALPHA,
-     :                             RMIN, RMAX, %VAL( IPOINT ),
+     :                             RMIN, RMAX, 
+     :                             %VAL( CNF_PVAL( IPOINT ) ),
      :                             WRK1, WRK2, NCON, POINT, USED,
      :                             STATUS )
                END IF
@@ -827,11 +838,17 @@
 *  Generate estimated variances, if required.
                IF ( GENVAR ) THEN
                   IF ( PTYPE .EQ. '_REAL' ) THEN
-                     CALL CCG1_EVARR( %VAL( IPOINT ),%VAL( IPSTK ),
-     :                                EL, NNDF, %VAL( IPVAR ), STATUS )
+                     CALL CCG1_EVARR( %VAL( CNF_PVAL( IPOINT ) ),
+     :                                %VAL( CNF_PVAL( IPSTK ) ),
+     :                                EL, NNDF, 
+     :                                %VAL( CNF_PVAL( IPVAR ) ), 
+     :                                STATUS )
                   ELSE IF ( PTYPE .EQ. '_DOUBLE' ) THEN
-                     CALL CCG1_EVARD( %VAL( IPOINT ),%VAL( IPSTK ),
-     :                                EL, NNDF, %VAL( IPVAR ), STATUS )
+                     CALL CCG1_EVARD( %VAL( CNF_PVAL( IPOINT ) ),
+     :                                %VAL( CNF_PVAL( IPSTK ) ),
+     :                                EL, NNDF, 
+     :                                %VAL( CNF_PVAL( IPVAR ) ), 
+     :                                STATUS )
                   END IF
                END IF
             END IF

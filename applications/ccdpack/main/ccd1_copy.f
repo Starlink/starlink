@@ -56,6 +56,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       CHARACTER * ( * ) PTYPE
@@ -75,19 +76,26 @@
 
 *  Call the appropriate routine, and copy the data.
       IF (  PTYPE .EQ. '_BYTE' ) THEN
-         CALL CCG1_COPAB( DIM, %VAL( IPIN ) , %VAL( IPOUT ), STATUS )
+         CALL CCG1_COPAB( DIM, %VAL( CNF_PVAL( IPIN ) ) , 
+     :                    %VAL( CNF_PVAL( IPOUT ) ), STATUS )
       ELSE IF (  PTYPE .EQ. '_UBYTE' ) THEN
-         CALL CCG1_COPAUB( DIM, %VAL( IPIN ) , %VAL( IPOUT ), STATUS )
+         CALL CCG1_COPAUB( DIM, %VAL( CNF_PVAL( IPIN ) ) , 
+     :                     %VAL( CNF_PVAL( IPOUT ) ), STATUS )
       ELSE IF (  PTYPE .EQ. '_WORD' ) THEN
-         CALL CCG1_COPAW( DIM, %VAL( IPIN ) , %VAL( IPOUT ), STATUS )
+         CALL CCG1_COPAW( DIM, %VAL( CNF_PVAL( IPIN ) ) , 
+     :                    %VAL( CNF_PVAL( IPOUT ) ), STATUS )
       ELSE IF (  PTYPE .EQ. '_UWORD' ) THEN
-         CALL CCG1_COPAUW( DIM, %VAL( IPIN ) , %VAL( IPOUT ), STATUS )
+         CALL CCG1_COPAUW( DIM, %VAL( CNF_PVAL( IPIN ) ) , 
+     :                     %VAL( CNF_PVAL( IPOUT ) ), STATUS )
       ELSE IF (  PTYPE .EQ. '_INTEGER' ) THEN
-         CALL CCG1_COPAI( DIM, %VAL( IPIN ) , %VAL( IPOUT ), STATUS )
+         CALL CCG1_COPAI( DIM, %VAL( CNF_PVAL( IPIN ) ) , 
+     :                    %VAL( CNF_PVAL( IPOUT ) ), STATUS )
       ELSE IF (  PTYPE .EQ. '_REAL' ) THEN
-         CALL CCG1_COPAR( DIM, %VAL( IPIN ) , %VAL( IPOUT ), STATUS )
+         CALL CCG1_COPAR( DIM, %VAL( CNF_PVAL( IPIN ) ) , 
+     :                    %VAL( CNF_PVAL( IPOUT ) ), STATUS )
       ELSE IF (  PTYPE .EQ. '_DOUBLE' ) THEN
-         CALL CCG1_COPAD( DIM, %VAL( IPIN ) , %VAL( IPOUT ), STATUS )
+         CALL CCG1_COPAD( DIM, %VAL( CNF_PVAL( IPIN ) ) , 
+     :                    %VAL( CNF_PVAL( IPOUT ) ), STATUS )
       ELSE
 
 *  Bad PTYPE.

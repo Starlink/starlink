@@ -335,6 +335,7 @@
       INCLUDE 'PSX_ERR'         ! PSX error codes
       INCLUDE 'PAR_ERR'         ! PAR system error codes
       INCLUDE 'CCD1_PAR'        ! CCDPACK private constants
+      INCLUDE 'CNF_PAR'         ! For CNF_PVAL function
 
 *  Arguments Given
       CHARACTER * ( * ) PID     ! Parent process id as string
@@ -759,8 +760,9 @@
             CALL CCD1_FIOHD( FD, 'Output from CCDALIGN', STATUS )
 
 *  Write all the points in the position list to the file.
-            CALL CCD1_WRIXY( FD, %VAL( IPIND( I ) ),
-     :                       %VAL( IPXPOS( I ) ), %VAL( IPYPOS( I ) ),
+            CALL CCD1_WRIXY( FD, %VAL( CNF_PVAL( IPIND( I ) ) ),
+     :                       %VAL( CNF_PVAL( IPXPOS( I ) ) ), 
+     :                       %VAL( CNF_PVAL( IPYPOS( I ) ) ),
      :                       NPOINT( I ), LINE, 1024, STATUS )
 
 *  Close the position list file.
@@ -803,9 +805,11 @@
                MAP = AST_GETMAPPING( IWCS, JSET, JPIX, STATUS )
 
 *  Transform the positions into pixel coordinates.
-               CALL AST_TRAN2( MAP, NPOINT( I ), %VAL( IPXPOS( I ) ),
-     :                         %VAL( IPYPOS( I ) ), .TRUE.,
-     :                         %VAL( IPX1 ), %VAL( IPY1 ), STATUS )
+               CALL AST_TRAN2( MAP, NPOINT( I ), 
+     :                         %VAL( CNF_PVAL( IPXPOS( I ) ) ),
+     :                         %VAL( CNF_PVAL( IPYPOS( I ) ) ), .TRUE.,
+     :                         %VAL( CNF_PVAL( IPX1 ) ), 
+     :                         %VAL( CNF_PVAL( IPY1 ) ), STATUS )
 
 *  Get its bounds.
                CALL NDF_BOUND( INDF, 2, LBND, UBND, NDIM, STATUS )
@@ -816,10 +820,13 @@
 
 *  Select only those points in this Set's position list which fall
 *  within the bounds of this NDF.
-               CALL CCD1_CHUSB( %VAL( IPIND( I ) ), %VAL( IPX1 ),
-     :                          %VAL( IPY1 ), NPOINT( I ),
-     :                          XLO, XHI, YLO, YHI, %VAL( IPI2 ), 
-     :                          %VAL( IPX2 ), %VAL( IPY2 ), N2, STATUS )
+               CALL CCD1_CHUSB( %VAL( CNF_PVAL( IPIND( I ) ) ), 
+     :                          %VAL( CNF_PVAL( IPX1 ) ),
+     :                          %VAL( CNF_PVAL( IPY1 ) ), NPOINT( I ),
+     :                          XLO, XHI, YLO, YHI, 
+     :                          %VAL( CNF_PVAL( IPI2 ) ),
+     :                          %VAL( CNF_PVAL( IPX2 ) ), 
+     :                          %VAL( CNF_PVAL( IPY2 ) ), N2, STATUS )
 
 *  Now write a list and associate it with this NDF.  First construct
 *  a name for the list file.
@@ -833,8 +840,10 @@
                CALL CCD1_FIOHD( FD, 'Output from CCDALIGN', STATUS )
 
 *  Write the chosen points into it.
-               CALL CCD1_WRIXY( FD, %VAL( IPI2 ), %VAL( IPX2 ),
-     :                          %VAL( IPY2 ), N2, LINE, 1024, STATUS )
+               CALL CCD1_WRIXY( FD, %VAL( CNF_PVAL( IPI2 ) ), 
+     :                          %VAL( CNF_PVAL( IPX2 ) ),
+     :                          %VAL( CNF_PVAL( IPY2 ) ), 
+     :                          N2, LINE, 1024, STATUS )
 
 *  Close the list file.
                CALL FIO_CLOSE( FD, STATUS )

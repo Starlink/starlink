@@ -3,7 +3,7 @@
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="ccdpack">
-  <version>4.0-17</version>
+  <version>4.0-18</version>
   <path>applications/ccdpack</path>
   <description>CCD data reduction package</description>
   <abstract>

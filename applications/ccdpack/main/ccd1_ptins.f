@@ -60,6 +60,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       CHARACTER * ( * ) ITYPE
@@ -81,26 +82,33 @@
 
 *  Call the appropriate routine to insert the line of data.
       IF ( ITYPE .EQ. '_BYTE' ) THEN
-         CALL CCG1_PTISB( %VAL( IPSTAK ), NPIX, NLINES, ILINE,
-     :                    %VAL( IPLINE ), STATUS )
+         CALL CCG1_PTISB( %VAL( CNF_PVAL( IPSTAK ) ), 
+     :                    NPIX, NLINES, ILINE,
+     :                    %VAL( CNF_PVAL( IPLINE ) ), STATUS )
       ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
-         CALL CCG1_PTISUB( %VAL( IPSTAK ), NPIX, NLINES, ILINE,
-     :                     %VAL( IPLINE ), STATUS )
+         CALL CCG1_PTISUB( %VAL( CNF_PVAL( IPSTAK ) ), 
+     :                     NPIX, NLINES, ILINE,
+     :                     %VAL( CNF_PVAL( IPLINE ) ), STATUS )
       ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
-         CALL CCG1_PTISW( %VAL( IPSTAK ), NPIX, NLINES, ILINE,
-     :                    %VAL( IPLINE ), STATUS )
+         CALL CCG1_PTISW( %VAL( CNF_PVAL( IPSTAK ) ), 
+     :                    NPIX, NLINES, ILINE,
+     :                    %VAL( CNF_PVAL( IPLINE ) ), STATUS )
       ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
-         CALL CCG1_PTISUW( %VAL( IPSTAK ), NPIX, NLINES, ILINE,
-     :                     %VAL( IPLINE ), STATUS )
+         CALL CCG1_PTISUW( %VAL( CNF_PVAL( IPSTAK ) ), 
+     :                     NPIX, NLINES, ILINE,
+     :                     %VAL( CNF_PVAL( IPLINE ) ), STATUS )
       ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
-         CALL CCG1_PTISI( %VAL( IPSTAK ), NPIX, NLINES, ILINE,
-     :                    %VAL( IPLINE ), STATUS )
+         CALL CCG1_PTISI( %VAL( CNF_PVAL( IPSTAK ) ), 
+     :                    NPIX, NLINES, ILINE,
+     :                    %VAL( CNF_PVAL( IPLINE ) ), STATUS )
       ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
-         CALL CCG1_PTISR( %VAL( IPSTAK ), NPIX, NLINES, ILINE,
-     :                    %VAL( IPLINE ), STATUS )
+         CALL CCG1_PTISR( %VAL( CNF_PVAL( IPSTAK ) ), 
+     :                    NPIX, NLINES, ILINE,
+     :                    %VAL( CNF_PVAL( IPLINE ) ), STATUS )
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-         CALL CCG1_PTISD( %VAL( IPSTAK ), NPIX, NLINES, ILINE,
-     :                    %VAL( IPLINE ), STATUS )
+         CALL CCG1_PTISD( %VAL( CNF_PVAL( IPSTAK ) ), 
+     :                    NPIX, NLINES, ILINE,
+     :                    %VAL( CNF_PVAL( IPLINE ) ), STATUS )
       END IF
 
       END

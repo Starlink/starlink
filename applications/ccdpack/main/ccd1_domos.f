@@ -331,6 +331,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'NDF_PAR'          ! NDF global constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER NIN
@@ -899,64 +900,92 @@
 *  _REAL processing, no variances.
                         IF ( ITYPE1 .EQ. '_REAL' ) THEN
                            IF ( .NOT. UVAR ) THEN
-                              CALL CCG1_CM3RR( %VAL( DATSTK ), EL, NII,
+                              CALL CCG1_CM3RR( 
+     :   %VAL( CNF_PVAL( DATSTK ) ), EL, NII,
      :                                  VARLIN, IMETH, MINPIX, NITER,
      :                                  NSIGMA, ALPHA, RMIN, RMAX,
-     :                                  %VAL( RESDAT ),
-     :                                  %VAL( WRK1 ), %VAL( WRK2 ),
-     :                                  %VAL( WRK5 ), %VAL( WRK6 ),
-     :                                  %VAL( WRK7 ), STATUS )
+     :                                  %VAL( CNF_PVAL( RESDAT ) ),
+     :                                  %VAL( CNF_PVAL( WRK1 ) ), 
+     :                                  %VAL( CNF_PVAL( WRK2 ) ),
+     :                                  %VAL( CNF_PVAL( WRK5 ) ), 
+     :                                  %VAL( CNF_PVAL( WRK6 ) ),
+     :                                  %VAL( CNF_PVAL( WRK7 ) ), 
+     :                                  STATUS )
 
 *  _REAL processing, with variances, variances always generated.
                            ELSE
-                              CALL CCG1_CM1RR( %VAL( DATSTK ), EL,
-     :                                  NII, %VAL( VARSTK ), IMETH, 
+                              CALL CCG1_CM1RR( 
+     :   %VAL( CNF_PVAL( DATSTK ) ), EL,
+     :                                  NII, %VAL( CNF_PVAL( VARSTK ) ), 
+     :                                  IMETH,
      :                                  MINPIX, NITER, NSIGMA, ALPHA, 
-     :                                  RMIN, RMAX, %VAL( RESDAT ),
-     :                                  %VAL( RESVAR ), %VAL( WRK1 ),
-     :                                  %VAL( WRK2 ), %VAL( WRK3 ),
-     :                                  %VAL( WRK4 ), NWRK4,
-     :                                  %VAL( WRK5 ), %VAL( WRK6 ),
-     :                                  %VAL( WRK7 ), STATUS )
+     :                                  RMIN, RMAX, 
+     :                                  %VAL( CNF_PVAL( RESDAT ) ),
+     :                                  %VAL( CNF_PVAL( RESVAR ) ), 
+     :                                  %VAL( CNF_PVAL( WRK1 ) ),
+     :                                  %VAL( CNF_PVAL( WRK2 ) ), 
+     :                                  %VAL( CNF_PVAL( WRK3 ) ),
+     :                                  %VAL( CNF_PVAL( WRK4 ) ), NWRK4,
+     :                                  %VAL( CNF_PVAL( WRK5 ) ), 
+     :                                  %VAL( CNF_PVAL( WRK6 ) ),
+     :                                  %VAL( CNF_PVAL( WRK7 ) ), 
+     :                                  STATUS )
                            END IF
 
 *  _DOUBLE processing, no variances.
                         ELSE IF ( ITYPE1 .EQ. '_DOUBLE' ) THEN
                            IF ( .NOT. UVAR ) THEN
-                              CALL CCG1_CM3DD( %VAL( DATSTK ), EL, NII,
+                              CALL CCG1_CM3DD( 
+     :   %VAL( CNF_PVAL( DATSTK ) ), EL, NII,
      :                                  VARLIN, IMETH, MINPIX, NITER,
      :                                  NSIGMA, ALPHA, RMIN, RMAX,
-     :                                  %VAL( RESDAT ),
-     :                                  %VAL( WRK1 ), %VAL( WRK2 ),
-     :                                  %VAL( WRK5 ), %VAL( WRK6 ),
-     :                                  %VAL( WRK7 ), STATUS )
+     :                                  %VAL( CNF_PVAL( RESDAT ) ),
+     :                                  %VAL( CNF_PVAL( WRK1 ) ), 
+     :                                  %VAL( CNF_PVAL( WRK2 ) ),
+     :                                  %VAL( CNF_PVAL( WRK5 ) ), 
+     :                                  %VAL( CNF_PVAL( WRK6 ) ),
+     :                                  %VAL( CNF_PVAL( WRK7 ) ), 
+     :                                  STATUS )
 *  _DOUBLE processing, with variances.
                            ELSE
-                              CALL CCG1_CM1DD( %VAL( DATSTK ), EL,
-     :                                  NII, %VAL( VARSTK ), IMETH, 
+                              CALL CCG1_CM1DD( 
+     :   %VAL( CNF_PVAL( DATSTK ) ), EL,
+     :                                  NII, %VAL( CNF_PVAL( VARSTK ) ), 
+     :                                  IMETH,
      :                                  MINPIX, NITER, NSIGMA, ALPHA, 
-     :                                  RMIN, RMAX, %VAL( RESDAT ),
-     :                                  %VAL( RESVAR ), %VAL( WRK1 ),
-     :                                  %VAL( WRK2 ), %VAL( WRK3 ),
-     :                                  %VAL( WRK4 ), NWRK4,
-     :                                  %VAL( WRK5 ), %VAL( WRK6 ),
-     :                                  %VAL( WRK7 ), STATUS )
+     :                                  RMIN, RMAX, 
+     :                                  %VAL( CNF_PVAL( RESDAT ) ),
+     :                                  %VAL( CNF_PVAL( RESVAR ) ), 
+     :                                  %VAL( CNF_PVAL( WRK1 ) ),
+     :                                  %VAL( CNF_PVAL( WRK2 ) ), 
+     :                                  %VAL( CNF_PVAL( WRK3 ) ),
+     :                                  %VAL( CNF_PVAL( WRK4 ) ), NWRK4,
+     :                                  %VAL( CNF_PVAL( WRK5 ) ), 
+     :                                  %VAL( CNF_PVAL( WRK6 ) ),
+     :                                  %VAL( CNF_PVAL( WRK7 ) ), 
+     :                                  STATUS )
                            END IF
                         END IF
 
 *  Generate estimated variances, if required.
                         IF ( EVAR ) THEN
                            IF ( ITYPE1 .EQ. '_REAL' ) THEN
-                              CALL CCG1_EVARR( %VAL( RESDAT),
-     :                                         %VAL( DATSTK ),
+                              CALL CCG1_EVARR( 
+     :   %VAL( CNF_PVAL( RESDAT )),
+     :                                         
+     :   %VAL( CNF_PVAL( DATSTK ) ),
      :                                         EL, NII,
-     :                                         %VAL( RESVAR ),
+     :                                         
+     :   %VAL( CNF_PVAL( RESVAR ) ),
      :                                         STATUS )
                            ELSE IF ( ITYPE1 .EQ. '_DOUBLE' ) THEN
-                              CALL CCG1_EVARD( %VAL( RESDAT),
-     :                                         %VAL( DATSTK ),
+                              CALL CCG1_EVARD( 
+     :   %VAL( CNF_PVAL( RESDAT )),
+     :                                         
+     :   %VAL( CNF_PVAL( DATSTK ) ),
      :                                         EL, NII,
-     :                                         %VAL( RESVAR ),
+     :                                         
+     :   %VAL( CNF_PVAL( RESVAR ) ),
      :                                         STATUS )
                            END IF
                         END IF

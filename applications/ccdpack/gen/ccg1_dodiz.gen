@@ -116,6 +116,7 @@
       INCLUDE 'PRM_PAR'          ! Magic-value and extreme constants
       INCLUDE 'NDF_PAR'          ! NDF constants
       INCLUDE 'AST_PAR'          ! AST system constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       CHARACTER * ( DAT__SZTYP ) ITYPE ! NDF array implementation type
@@ -272,53 +273,74 @@
 
 *  Do the resampling according to the correct data type.
       IF ( ITYPE .EQ. '_BYTE' ) THEN
-         CALL CCG1_ODB<T>( IX, IY, OX, OY, %VAL( IPDAT ),
-     :                     %VAL( IPVAR ), PIXFRAC, SCALE, ZERO, WEIGHT,
+         CALL CCG1_ODB<T>( IX, IY, OX, OY, %VAL( CNF_PVAL( IPDAT ) ),
+     :                     %VAL( CNF_PVAL( IPVAR ) ), 
+     :                     PIXFRAC, SCALE, ZERO, WEIGHT,
      :                     GETS, GETZ, GETM, VARFAC, VAR, ILBND, OLBND,
-     :                     CMAP, %VAL( IPWK1 ), %VAL( IPWK2 ), 
-     :                     %VAL( IPWK3 ), %VAL( IPWK4 ),
+     :                     CMAP, %VAL( CNF_PVAL( IPWK1 ) ), 
+     :                     %VAL( CNF_PVAL( IPWK2 ) ),
+     :                     %VAL( CNF_PVAL( IPWK3 ) ), 
+     :                     %VAL( CNF_PVAL( IPWK4 ) ),
      :                     ODAT, OVAR, OWHT, VWHT, OCNT, STATUS )
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-         CALL CCG1_ODD<T>( IX, IY, OX, OY, %VAL( IPDAT ), 
-     :                     %VAL( IPVAR ), PIXFRAC, SCALE, ZERO, WEIGHT,
+         CALL CCG1_ODD<T>( IX, IY, OX, OY, %VAL( CNF_PVAL( IPDAT ) ),
+     :                     %VAL( CNF_PVAL( IPVAR ) ), 
+     :                     PIXFRAC, SCALE, ZERO, WEIGHT,
      :                     GETS, GETZ, GETM, VARFAC, VAR, ILBND, OLBND,
-     :                     CMAP, %VAL( IPWK1 ), %VAL( IPWK2 ), 
-     :                     %VAL( IPWK3 ), %VAL( IPWK4 ),
+     :                     CMAP, %VAL( CNF_PVAL( IPWK1 ) ), 
+     :                     %VAL( CNF_PVAL( IPWK2 ) ),
+     :                     %VAL( CNF_PVAL( IPWK3 ) ), 
+     :                     %VAL( CNF_PVAL( IPWK4 ) ),
      :                     ODAT, OVAR, OWHT, VWHT, OCNT, STATUS )
       ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
-         CALL CCG1_ODI<T>( IX, IY, OX, OY, %VAL( IPDAT ), 
-     :                     %VAL( IPVAR ), PIXFRAC, SCALE, ZERO, WEIGHT,
+         CALL CCG1_ODI<T>( IX, IY, OX, OY, %VAL( CNF_PVAL( IPDAT ) ),
+     :                     %VAL( CNF_PVAL( IPVAR ) ), 
+     :                     PIXFRAC, SCALE, ZERO, WEIGHT,
      :                     GETS, GETZ, GETM, VARFAC, VAR, ILBND, OLBND,
-     :                     CMAP, %VAL( IPWK1 ), %VAL( IPWK2 ), 
-     :                     %VAL( IPWK3 ), %VAL( IPWK4 ),
+     :                     CMAP, %VAL( CNF_PVAL( IPWK1 ) ), 
+     :                     %VAL( CNF_PVAL( IPWK2 ) ),
+     :                     %VAL( CNF_PVAL( IPWK3 ) ), 
+     :                     %VAL( CNF_PVAL( IPWK4 ) ),
      :                     ODAT, OVAR, OWHT, VWHT, OCNT, STATUS )
       ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
-         CALL CCG1_ODR<T>( IX, IY, OX, OY, %VAL( IPDAT ), 
-     :                     %VAL( IPVAR ), PIXFRAC, SCALE, ZERO, WEIGHT,
+         CALL CCG1_ODR<T>( IX, IY, OX, OY, %VAL( CNF_PVAL( IPDAT ) ),
+     :                     %VAL( CNF_PVAL( IPVAR ) ), 
+     :                     PIXFRAC, SCALE, ZERO, WEIGHT,
      :                     GETS, GETZ, GETM, VARFAC, VAR, ILBND, OLBND,
-     :                     CMAP, %VAL( IPWK1 ), %VAL( IPWK2 ), 
-     :                     %VAL( IPWK3 ), %VAL( IPWK4 ),
+     :                     CMAP, %VAL( CNF_PVAL( IPWK1 ) ), 
+     :                     %VAL( CNF_PVAL( IPWK2 ) ),
+     :                     %VAL( CNF_PVAL( IPWK3 ) ), 
+     :                     %VAL( CNF_PVAL( IPWK4 ) ),
      :                     ODAT, OVAR, OWHT, VWHT, OCNT, STATUS )
       ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
-         CALL CCG1_ODUB<T>( IX, IY, OX, OY, %VAL( IPDAT ), 
-     :                      %VAL( IPVAR ), PIXFRAC, SCALE, ZERO, WEIGHT,
+         CALL CCG1_ODUB<T>( IX, IY, OX, OY, %VAL( CNF_PVAL( IPDAT ) ),
+     :                      %VAL( CNF_PVAL( IPVAR ) ), 
+     :                      PIXFRAC, SCALE, ZERO, WEIGHT,
      :                      GETS, GETZ, GETM, VARFAC, VAR, ILBND, OLBND,
-     :                      CMAP, %VAL( IPWK1 ), %VAL( IPWK2 ), 
-     :                      %VAL( IPWK3 ), %VAL( IPWK4 ),
+     :                      CMAP, %VAL( CNF_PVAL( IPWK1 ) ), 
+     :                      %VAL( CNF_PVAL( IPWK2 ) ),
+     :                      %VAL( CNF_PVAL( IPWK3 ) ), 
+     :                      %VAL( CNF_PVAL( IPWK4 ) ),
      :                      ODAT, OVAR, OWHT, VWHT, OCNT, STATUS )
       ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
-         CALL CCG1_ODUW<T>( IX, IY, OX, OY, %VAL( IPDAT ), 
-     :                      %VAL( IPVAR ), PIXFRAC, SCALE, ZERO, WEIGHT,
+         CALL CCG1_ODUW<T>( IX, IY, OX, OY, %VAL( CNF_PVAL( IPDAT ) ),
+     :                      %VAL( CNF_PVAL( IPVAR ) ), 
+     :                      PIXFRAC, SCALE, ZERO, WEIGHT,
      :                      GETS, GETZ, GETM, VARFAC, VAR, ILBND, OLBND,
-     :                      CMAP, %VAL( IPWK1 ), %VAL( IPWK2 ), 
-     :                      %VAL( IPWK3 ), %VAL( IPWK4 ),
+     :                      CMAP, %VAL( CNF_PVAL( IPWK1 ) ), 
+     :                      %VAL( CNF_PVAL( IPWK2 ) ),
+     :                      %VAL( CNF_PVAL( IPWK3 ) ), 
+     :                      %VAL( CNF_PVAL( IPWK4 ) ),
      :                      ODAT, OVAR, OWHT, VWHT, OCNT, STATUS )
       ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
-         CALL CCG1_ODW<T>( IX, IY, OX, OY, %VAL( IPDAT ), 
-     :                     %VAL( IPVAR ), PIXFRAC, SCALE, ZERO, WEIGHT,
+         CALL CCG1_ODW<T>( IX, IY, OX, OY, %VAL( CNF_PVAL( IPDAT ) ),
+     :                     %VAL( CNF_PVAL( IPVAR ) ), 
+     :                     PIXFRAC, SCALE, ZERO, WEIGHT,
      :                     GETS, GETZ, GETM, VARFAC, VAR, ILBND, OLBND,
-     :                     CMAP, %VAL( IPWK1 ), %VAL( IPWK2 ), 
-     :                     %VAL( IPWK3 ), %VAL( IPWK4 ),
+     :                     CMAP, %VAL( CNF_PVAL( IPWK1 ) ), 
+     :                     %VAL( CNF_PVAL( IPWK2 ) ),
+     :                     %VAL( CNF_PVAL( IPWK3 ) ), 
+     :                     %VAL( CNF_PVAL( IPWK4 ) ),
      :                     ODAT, OVAR, OWHT, VWHT, OCNT, STATUS )
       END IF
 

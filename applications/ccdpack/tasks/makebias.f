@@ -429,6 +429,7 @@
 *  Internal references:
       INCLUDE 'NUM_DEC_CVT'      ! Conversion declarations
       INCLUDE 'NUM_DEF_CVT'      ! Conversion definitions
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 *.
 
 *  Check inherited global status.
@@ -790,7 +791,8 @@
             CALL CCD1_MKBC( ITYPE, GENVAR, IPWORK, EL, NNDF, VARS,
      :                      IMETH, MINPIX, NITER, NSIGMA, ALPHA,
      :                      RMIN, RMAX, IPOINT, IPVAR, WRK1, WRK2,
-     :                      WRK3, %VAL( IPWRK4 ), NWRK4, NCON, POINT,
+     :                      WRK3, %VAL( CNF_PVAL( IPWRK4 ) ), 
+     :                      NWRK4, NCON, POINT,
      :                      USED, STATUS )
 
 *  Unmap the output section, ready for next chunks.

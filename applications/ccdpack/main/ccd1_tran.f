@@ -83,6 +83,7 @@
 
 *  Global Variables
       INCLUDE 'CCD1_MOSCM'       ! Global variables for MAKEMOS & DRIZZLE
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
       
 *  Arguments Given:
       INTEGER INGRP             ! ID for group of input NDFs
@@ -319,7 +320,8 @@
             CALL CCD1_MALL( AEL( IAXIS ), '_DOUBLE', AXPNTR( IAXIS ),
      :                      STATUS )
             CALL CCG1_AXIND( ILBND( IAXIS ), IUBND( IAXIS ),
-     :                       %VAL( AXPNTR( IAXIS ) ), STATUS )
+     :                       %VAL( CNF_PVAL( AXPNTR( IAXIS ) ) ), 
+     :                       STATUS )
          END DO
 
 *  Find the coordinate bounds of the output NDF.
@@ -397,8 +399,10 @@
                     
 *  Paste each axis into the work array.
             CALL KPG1_PASTD( .FALSE., .TRUE., AXOFFS, ADIMS, ADIMS( 1 ),
-     :                       %VAL( AXPNTR( IAXIS ) ), CADIMS,
-     :                       CADIMS( 1 ), %VAL( CAXPTR ), STATUS )
+     :                       %VAL( CNF_PVAL( AXPNTR( IAXIS ) ) ), 
+     :                       CADIMS,
+     :                       CADIMS( 1 ), %VAL( CNF_PVAL( CAXPTR ) ), 
+     :                       STATUS )
 
 *  Increment the offsets for the next axis.
             AXOFFS( 1 ) = AXOFFS( 1 ) + AEL( IAXIS )
@@ -475,10 +479,13 @@
             CALL CCD1_MPTMP( INDID, 'WRITE', INPNTR, STATUS )      
       
 *  Generate the list of vector indices for the resampling.
-            CALL CCG1_ASPID( NDIMI, IDIMS, MAPCUR, %VAL( CAXPTR ),
+            CALL CCG1_ASPID( NDIMI, IDIMS, MAPCUR, 
+     :                       %VAL( CNF_PVAL( CAXPTR ) ),
      :                       WDIMS( 1 ), NVOUT, OLBND, ODIMS,
-     :                       %VAL( WPNTR1 ), %VAL( WPNTR3 ),
-     :                       %VAL( WPNTR2 ), %VAL( INPNTR ), 
+     :                       %VAL( CNF_PVAL( WPNTR1 ) ), 
+     :                       %VAL( CNF_PVAL( WPNTR3 ) ),
+     :                       %VAL( CNF_PVAL( WPNTR2 ) ), 
+     :                       %VAL( CNF_PVAL( INPNTR ) ),
      :                       STATUS )        
 
 *  Free the workspace that is no longer needed.
@@ -518,45 +525,59 @@
 *  Perform the transformation on the data array for the numeric data
 *  type.  First for a byte array
                   IF ( ITYPE .EQ. '_BYTE' ) THEN
-                     CALL KPG1_VASVB( ELOUT, %VAL( INPNTR ), ELIN,
-     :                                %VAL( IPNTR( 1 ) ),
-     :                                %VAL( OPNTRW ), NBAD, STATUS )
+                     CALL KPG1_VASVB( ELOUT, %VAL( CNF_PVAL( INPNTR ) ), 
+     :                                ELIN,
+     :                                %VAL( CNF_PVAL( IPNTR( 1 ) ) ),
+     :                                %VAL( CNF_PVAL( OPNTRW ) ), 
+     :                                NBAD, STATUS )
 
 *  Transform a double-precision array.
                   ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-                     CALL KPG1_VASVD( ELOUT, %VAL( INPNTR ), ELIN,
-     :                                %VAL( IPNTR( 1 ) ),
-     :                                %VAL( OPNTRW ), NBAD, STATUS )
+                     CALL KPG1_VASVD( ELOUT, %VAL( CNF_PVAL( INPNTR ) ), 
+     :                                ELIN,
+     :                                %VAL( CNF_PVAL( IPNTR( 1 ) ) ),
+     :                                %VAL( CNF_PVAL( OPNTRW ) ), 
+     :                                NBAD, STATUS )
 
 *  Transform an integer array.
                   ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
-                     CALL KPG1_VASVI( ELOUT, %VAL( INPNTR ), ELIN,
-     :                                %VAL( IPNTR( 1 ) ),
-     :                                %VAL( OPNTRW ), NBAD, STATUS )
+                     CALL KPG1_VASVI( ELOUT, %VAL( CNF_PVAL( INPNTR ) ), 
+     :                                ELIN,
+     :                                %VAL( CNF_PVAL( IPNTR( 1 ) ) ),
+     :                                %VAL( CNF_PVAL( OPNTRW ) ), 
+     :                                NBAD, STATUS )
 
 *  Transform a single-precision array.
                   ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
-                     CALL KPG1_VASVR( ELOUT, %VAL( INPNTR ), ELIN,
-     :                                %VAL( IPNTR( 1 ) ),
-     :                                %VAL( OPNTRW ), NBAD, STATUS )
+                     CALL KPG1_VASVR( ELOUT, %VAL( CNF_PVAL( INPNTR ) ), 
+     :                                ELIN,
+     :                                %VAL( CNF_PVAL( IPNTR( 1 ) ) ),
+     :                                %VAL( CNF_PVAL( OPNTRW ) ), 
+     :                                NBAD, STATUS )
 
 *  Transform an unsigned-byte array.
                   ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
-                     CALL KPG1_VASVUB( ELOUT, %VAL( INPNTR ), ELIN,
-     :                                 %VAL( IPNTR( 1 ) ),
-     :                                 %VAL( OPNTRW ), NBAD, STATUS )
+                     CALL KPG1_VASVUB( ELOUT, 
+     :                                 %VAL( CNF_PVAL( INPNTR ) ), ELIN,
+     :                                 %VAL( CNF_PVAL( IPNTR( 1 ) ) ),
+     :                                 %VAL( CNF_PVAL( OPNTRW ) ), 
+     :                                 NBAD, STATUS )
 
 *  Transform an unsigned-word array.
                   ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
-                     CALL KPG1_VASVUW( ELOUT, %VAL( INPNTR ), ELIN,
-     :                                 %VAL( IPNTR( 1 ) ),
-     :                                 %VAL( OPNTRW ), NBAD, STATUS )
+                     CALL KPG1_VASVUW( ELOUT, 
+     :                                 %VAL( CNF_PVAL( INPNTR ) ), ELIN,
+     :                                 %VAL( CNF_PVAL( IPNTR( 1 ) ) ),
+     :                                 %VAL( CNF_PVAL( OPNTRW ) ), 
+     :                                 NBAD, STATUS )
 
 *  Transform a word array.
                   ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
-                     CALL KPG1_VASVW( ELOUT, %VAL( INPNTR ), ELIN,
-     :                                %VAL( IPNTR( 1 ) ),
-     :                                %VAL( OPNTRW ), NBAD, STATUS )
+                     CALL KPG1_VASVW( ELOUT, %VAL( CNF_PVAL( INPNTR ) ), 
+     :                                ELIN,
+     :                                %VAL( CNF_PVAL( IPNTR( 1 ) ) ),
+     :                                %VAL( CNF_PVAL( OPNTRW ) ), 
+     :                                NBAD, STATUS )
                   END IF                  
 
 *  Unmap the output array.
@@ -672,7 +693,7 @@
 *  additional reference NDF, if provided.
       CALL PSX_CALLOC( NNDF, '_INTEGER', WRK1, STATUS )
       CALL CCD1_GTCMP( NNDF, OUT, CCD1_IPAIR, NPIX, NCMP,
-     :                    %VAL( WRK1 ), STATUS )
+     :                    %VAL( CNF_PVAL( WRK1 ) ), STATUS )
       IF ( STATUS .EQ. SAI__OK ) THEN
 
 *  Allocate further workspace and prune the list of overlaps to remove
@@ -680,7 +701,8 @@
          NCMP0 = NCMP
          CALL PSX_CALLOC( NCMP0, '_INTEGER', WRK2, STATUS )
          CALL CCD1_PRUNE( OPTOV, NCMP0, CCD1_IPAIR, NPIX, NNDF,
-     :                       %VAL( WRK1 ), NCMP, %VAL( WRK2 ), STATUS )
+     :                       %VAL( CNF_PVAL( WRK1 ) ), NCMP, 
+     :                    %VAL( CNF_PVAL( WRK2 ) ), STATUS )
          CALL PSX_FREE( WRK2, STATUS )
       END IF
       CALL PSX_FREE( WRK1, STATUS )
@@ -898,9 +920,11 @@
 *  with the inter-comparison results obtained above. Include an
 *  additional reference NDF, if provided.
       CALL CCD1_SZSLV( GETS, GETZ, NNDF, NCMP, NMAX, SCALE, DSCALE,
-     :                 ZERO, DZERO, ORIGIN, %VAL( WRK1 ),
-     :                 %VAL( WRK2 ), %VAL( WRK3 ), %VAL( WRK4 ),
-     :                 %VAL( WRK5 ), STATUS )
+     :                 ZERO, DZERO, ORIGIN, %VAL( CNF_PVAL( WRK1 ) ),
+     :                 %VAL( CNF_PVAL( WRK2 ) ), 
+     :                 %VAL( CNF_PVAL( WRK3 ) ), 
+     :                 %VAL( CNF_PVAL( WRK4 ) ),
+     :                 %VAL( CNF_PVAL( WRK5 ) ), STATUS )
 
 *  Release the workspace.
       CALL PSX_FREE( WRK1, STATUS )

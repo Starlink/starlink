@@ -126,6 +126,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       CHARACTER * ( * ) TYPE
@@ -164,14 +165,18 @@
 *  version of the routine to perform the work.
       IF ( TYPE .EQ. '_REAL' ) THEN
          CALL CCD1_MVDTR( ADJUST, BAD, ISVAR, LBIN, UBIN, NY,
-     :                    %VAL( DATIN ), %VAL( VARIN ), I1, I2, IZ,
+     :                    %VAL( CNF_PVAL( DATIN ) ), 
+     :                    %VAL( CNF_PVAL( VARIN ) ), I1, I2, IZ,
      :                    SCALE, DSCALE, ZERO, DZERO, ORIG,
-     :                    LBOUT, UBOUT, %VAL( OUT ), NBAD, STATUS )
+     :                    LBOUT, UBOUT, %VAL( CNF_PVAL( OUT ) ), 
+     :                    NBAD, STATUS )
       ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
          CALL CCD1_MVDTD( ADJUST, BAD, ISVAR, LBIN, UBIN, NY,
-     :                    %VAL( DATIN ), %VAL( VARIN ), I1, I2, IZ,
+     :                    %VAL( CNF_PVAL( DATIN ) ), 
+     :                    %VAL( CNF_PVAL( VARIN ) ), I1, I2, IZ,
      :                    SCALE, DSCALE, ZERO, DZERO, ORIG,
-     :                    LBOUT, UBOUT, %VAL( OUT ), NBAD, STATUS )
+     :                    LBOUT, UBOUT, %VAL( CNF_PVAL( OUT ) ), 
+     :                    NBAD, STATUS )
       END IF
 
       END

@@ -93,6 +93,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! Standard AST constants
       INCLUDE 'PRM_PAR'          ! Standard PRIMDAT constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER IPIN
@@ -190,89 +191,117 @@
 *  the arguments in the following calls change between types, as well
 *  as the names of the routines.
       IF ( ITYPE .EQ. '_BYTE' ) THEN
-         NBAD = AST_RESAMPLEB( IMAP, 2, ILBND, IUBND, %VAL( IPIN ),
-     :                         %VAL( IPIV ), INTSCH, AST_NULL, 
+         NBAD = AST_RESAMPLEB( IMAP, 2, ILBND, IUBND, 
+     :                         %VAL( CNF_PVAL( IPIN ) ),
+     :                         %VAL( CNF_PVAL( IPIV ) ), 
+     :                         INTSCH, AST_NULL,
      :                         INTPAR, RFLAGS, TOL, MAXPIX, VAL__BADB,
      :                         2, OLBND, OUBND, OLBND, OUBND,
-     :                         %VAL( IPTEMP ), %VAL( IPOV ), STATUS )
+     :                         %VAL( CNF_PVAL( IPTEMP ) ), 
+     :                         %VAL( CNF_PVAL( IPOV ) ), STATUS )
 
       ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
-         NBAD = AST_RESAMPLEUB( IMAP, 2, ILBND, IUBND, %VAL( IPIN ),
-     :                          %VAL( IPIV ), INTSCH, AST_NULL, 
+         NBAD = AST_RESAMPLEUB( IMAP, 2, ILBND, IUBND, 
+     :                          %VAL( CNF_PVAL( IPIN ) ),
+     :                          %VAL( CNF_PVAL( IPIV ) ), 
+     :                          INTSCH, AST_NULL,
      :                          INTPAR, RFLAGS, TOL, MAXPIX, VAL__BADUB,
      :                          2, OLBND, OUBND, OLBND, OUBND,
-     :                          %VAL( IPTEMP ), %VAL( IPOV ), STATUS )
+     :                          %VAL( CNF_PVAL( IPTEMP ) ), 
+     :                          %VAL( CNF_PVAL( IPOV ) ), STATUS )
 
       ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
-         NBAD = AST_RESAMPLEW( IMAP, 2, ILBND, IUBND, %VAL( IPIN ),
-     :                         %VAL( IPIV ), INTSCH, AST_NULL, 
+         NBAD = AST_RESAMPLEW( IMAP, 2, ILBND, IUBND, 
+     :                         %VAL( CNF_PVAL( IPIN ) ),
+     :                         %VAL( CNF_PVAL( IPIV ) ), 
+     :                         INTSCH, AST_NULL,
      :                         INTPAR, RFLAGS, TOL, MAXPIX, VAL__BADW,
      :                         2, OLBND, OUBND, OLBND, OUBND,
-     :                         %VAL( IPTEMP ), %VAL( IPOV ), STATUS )
+     :                         %VAL( CNF_PVAL( IPTEMP ) ), 
+     :                         %VAL( CNF_PVAL( IPOV ) ), STATUS )
 
       ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
-         NBAD = AST_RESAMPLEUW( IMAP, 2, ILBND, IUBND, %VAL( IPIN ),
-     :                          %VAL( IPIV ), INTSCH, AST_NULL, 
+         NBAD = AST_RESAMPLEUW( IMAP, 2, ILBND, IUBND, 
+     :                          %VAL( CNF_PVAL( IPIN ) ),
+     :                          %VAL( CNF_PVAL( IPIV ) ), 
+     :                          INTSCH, AST_NULL,
      :                          INTPAR, RFLAGS, TOL, MAXPIX, VAL__BADUW,
      :                          2, OLBND, OUBND, OLBND, OUBND,
-     :                          %VAL( IPTEMP ), %VAL( IPOV ), STATUS )
+     :                          %VAL( CNF_PVAL( IPTEMP ) ), 
+     :                          %VAL( CNF_PVAL( IPOV ) ), STATUS )
 
       ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
-         NBAD = AST_RESAMPLEI( IMAP, 2, ILBND, IUBND, %VAL( IPIN ),
-     :                         %VAL( IPIV ), INTSCH, AST_NULL, 
+         NBAD = AST_RESAMPLEI( IMAP, 2, ILBND, IUBND, 
+     :                         %VAL( CNF_PVAL( IPIN ) ),
+     :                         %VAL( CNF_PVAL( IPIV ) ), 
+     :                         INTSCH, AST_NULL,
      :                         INTPAR, RFLAGS, TOL, MAXPIX, VAL__BADI,
      :                         2, OLBND, OUBND, OLBND, OUBND,
-     :                         %VAL( IPTEMP ), %VAL( IPOV ), STATUS )
+     :                         %VAL( CNF_PVAL( IPTEMP ) ), 
+     :                         %VAL( CNF_PVAL( IPOV ) ), STATUS )
 
       ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
-         NBAD = AST_RESAMPLER( IMAP, 2, ILBND, IUBND, %VAL( IPIN ),
-     :                         %VAL( IPIV ), INTSCH, AST_NULL, 
+         NBAD = AST_RESAMPLER( IMAP, 2, ILBND, IUBND, 
+     :                         %VAL( CNF_PVAL( IPIN ) ),
+     :                         %VAL( CNF_PVAL( IPIV ) ), 
+     :                         INTSCH, AST_NULL,
      :                         INTPAR, RFLAGS, TOL, MAXPIX, VAL__BADR,
      :                         2, OLBND, OUBND, OLBND, OUBND,
-     :                         %VAL( IPTEMP ), %VAL( IPOV ), STATUS )
+     :                         %VAL( CNF_PVAL( IPTEMP ) ), 
+     :                         %VAL( CNF_PVAL( IPOV ) ), STATUS )
 
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-         NBAD = AST_RESAMPLED( IMAP, 2, ILBND, IUBND, %VAL( IPIN ),
-     :                         %VAL( IPIV ), INTSCH, AST_NULL, 
+         NBAD = AST_RESAMPLED( IMAP, 2, ILBND, IUBND, 
+     :                         %VAL( CNF_PVAL( IPIN ) ),
+     :                         %VAL( CNF_PVAL( IPIV ) ), 
+     :                         INTSCH, AST_NULL,
      :                         INTPAR, RFLAGS, TOL, MAXPIX, VAL__BADD,
      :                         2, OLBND, OUBND, OLBND, OUBND,
-     :                         %VAL( IPTEMP ), %VAL( IPOV ), STATUS )
+     :                         %VAL( CNF_PVAL( IPTEMP ) ), 
+     :                         %VAL( CNF_PVAL( IPOV ) ), STATUS )
 
       END IF
 
 *  And finally rescale it.
       IF ( ITYPE .EQ. '_BYTE' ) THEN
-         CALL CCG1_ISCLB( OXD, OYD, %VAL( IPTEMP ), ILO, IHI, OLO, OHI,
+         CALL CCG1_ISCLB( OXD, OYD, %VAL( CNF_PVAL( IPTEMP ) ), 
+     :                    ILO, IHI, OLO, OHI,
      :                    OBAD, OXDIM, OYDIM, OLBND( 1 ) - 1, 
      :                    OLBND( 2 ) - 1, OUT, STATUS )
 
       ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
-         CALL CCG1_ISCLUB( OXD, OYD, %VAL( IPTEMP ), ILO, IHI, OLO, OHI,
+         CALL CCG1_ISCLUB( OXD, OYD, %VAL( CNF_PVAL( IPTEMP ) ), 
+     :                     ILO, IHI, OLO, OHI,
      :                     OBAD, OXDIM, OYDIM, OLBND( 1 ) - 1, 
      :                     OLBND( 2 ) - 1, OUT, STATUS )
 
       ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
-         CALL CCG1_ISCLW( OXD, OYD, %VAL( IPTEMP ), ILO, IHI, OLO, OHI,
+         CALL CCG1_ISCLW( OXD, OYD, %VAL( CNF_PVAL( IPTEMP ) ), 
+     :                    ILO, IHI, OLO, OHI,
      :                    OBAD, OXDIM, OYDIM, OLBND( 1 ) - 1, 
      :                    OLBND( 2 ) - 1, OUT, STATUS )
 
       ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
-         CALL CCG1_ISCLUW( OXD, OYD, %VAL( IPTEMP ), ILO, IHI, OLO, OHI,
+         CALL CCG1_ISCLUW( OXD, OYD, %VAL( CNF_PVAL( IPTEMP ) ), 
+     :                     ILO, IHI, OLO, OHI,
      :                     OBAD, OXDIM, OYDIM, OLBND( 1 ) - 1, 
      :                     OLBND( 2 ) - 1, OUT, STATUS )
 
       ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
-         CALL CCG1_ISCLI( OXD, OYD, %VAL( IPTEMP ), ILO, IHI, OLO, OHI,
+         CALL CCG1_ISCLI( OXD, OYD, %VAL( CNF_PVAL( IPTEMP ) ), 
+     :                    ILO, IHI, OLO, OHI,
      :                    OBAD, OXDIM, OYDIM, OLBND( 1 ) - 1, 
      :                    OLBND( 2 ) - 1, OUT, STATUS )
 
       ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
-         CALL CCG1_ISCLR( OXD, OYD, %VAL( IPTEMP ), ILO, IHI, OLO, OHI,
+         CALL CCG1_ISCLR( OXD, OYD, %VAL( CNF_PVAL( IPTEMP ) ), 
+     :                    ILO, IHI, OLO, OHI,
      :                    OBAD, OXDIM, OYDIM, OLBND( 1 ) - 1, 
      :                    OLBND( 2 ) - 1, OUT, STATUS )
 
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-         CALL CCG1_ISCLD( OXD, OYD, %VAL( IPTEMP ), ILO, IHI, OLO, OHI,
+         CALL CCG1_ISCLD( OXD, OYD, %VAL( CNF_PVAL( IPTEMP ) ), 
+     :                    ILO, IHI, OLO, OHI,
      :                    OBAD, OXDIM, OYDIM, OLBND( 1 ) - 1, 
      :                    OLBND( 2 ) - 1, OUT, STATUS )
 

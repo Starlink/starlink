@@ -721,6 +721,7 @@
 
 *  Global Variables:
       INCLUDE 'CCD1_MOSCM'       ! Global variables for MAKEMOS
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 *        CCD1_DDIFS( CCD1__MXCMP ) = DOUBLE PRECISION (Write)
 *           Array of standard errors associated with the observed scale
 *           factor differences.
@@ -1200,7 +1201,7 @@
       IF ( ADJUST ) THEN
          CALL PSX_CALLOC( NNDF, '_INTEGER', WRK1, STATUS )
          CALL CCD1_GTCMP( NNDF, NDF, CCD1_IPAIR, NPIX, NCMP,
-     :                    %VAL( WRK1 ), STATUS )
+     :                    %VAL( CNF_PVAL( WRK1 ) ), STATUS )
          IF ( STATUS .EQ. SAI__OK ) THEN
 
 *  Allocate further workspace and prune the list of overlaps to remove
@@ -1208,7 +1209,8 @@
             NCMP0 = NCMP
             CALL PSX_CALLOC( NCMP0, '_INTEGER', WRK2, STATUS )
             CALL CCD1_PRUNE( OPTOV, NCMP0, CCD1_IPAIR, NPIX, NNDF,
-     :                       %VAL( WRK1 ), NCMP, %VAL( WRK2 ), STATUS )
+     :                       %VAL( CNF_PVAL( WRK1 ) ), NCMP, 
+     :                       %VAL( CNF_PVAL( WRK2 ) ), STATUS )
             CALL PSX_FREE( WRK2, STATUS )
          END IF
          CALL PSX_FREE( WRK1, STATUS )
@@ -1425,9 +1427,11 @@
 *  with the inter-comparison results obtained above. Include an
 *  additional reference NDF, if provided.
          CALL CCD1_SZSLV( GETS, GETZ, NNDF, NCMP, NMAX, SCALE, DSCALE,
-     :                    ZERO, DZERO, ORIGIN, %VAL( WRK1 ),
-     :                    %VAL( WRK2 ), %VAL( WRK3 ), %VAL( WRK4 ),
-     :                    %VAL( WRK5 ), STATUS )
+     :                    ZERO, DZERO, ORIGIN, %VAL( CNF_PVAL( WRK1 ) ),
+     :                    %VAL( CNF_PVAL( WRK2 ) ), 
+     :                    %VAL( CNF_PVAL( WRK3 ) ), 
+     :                    %VAL( CNF_PVAL( WRK4 ) ),
+     :                    %VAL( CNF_PVAL( WRK5 ) ), STATUS )
 
 *  Release the workspace.
          CALL PSX_FREE( WRK1, STATUS )
@@ -1654,9 +1658,14 @@
       CALL CCD1_DOMOS( NIN, NDF, LBND, UBND, ADJUST, SCALE, DSCALE,
      :                 ZERO, DZERO, ORIGIN, MODIFY, DOOUT, USEVAR,
      :                 GENVAR, USEWT, WEIGHT, IMETH, ALPHA, NSIGMA,
-     :                 NITER, RMIN, RMAX, NDFOUT, %VAL( WRK1 ),
-     :                 %VAL( WRK2 ), %VAL( WRK3 ), %VAL( WRK4 ),
-     :                 %VAL( WRK5 ), %VAL( WRK6 ), %VAL( WRK7 ), 
+     :                 NITER, RMIN, RMAX, NDFOUT, 
+     :                 %VAL( CNF_PVAL( WRK1 ) ),
+     :                 %VAL( CNF_PVAL( WRK2 ) ), 
+     :                 %VAL( CNF_PVAL( WRK3 ) ), 
+     :                 %VAL( CNF_PVAL( WRK4 ) ),
+     :                 %VAL( CNF_PVAL( WRK5 ) ), 
+     :                 %VAL( CNF_PVAL( WRK6 ) ), 
+     :                 %VAL( CNF_PVAL( WRK7 ) ),
      :                 STATUS )
 
 *  Release the workspace.

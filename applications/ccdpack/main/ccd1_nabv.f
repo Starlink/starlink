@@ -54,6 +54,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       CHARACTER * ( * ) ITYPE
@@ -75,19 +76,26 @@
 
 *  Call the appropriate version of CCG1_NAB to count the values.
       IF ( ITYPE .EQ. '_BYTE' ) THEN 
-         CALL CCG1_NABB( %VAL( VEC ), EL, BAD, VAL, NUM, STATUS )
+         CALL CCG1_NABB( %VAL( CNF_PVAL( VEC ) ), 
+     :                   EL, BAD, VAL, NUM, STATUS )
       ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN 
-         CALL CCG1_NABUB( %VAL( VEC ), EL, BAD, VAL, NUM, STATUS )
+         CALL CCG1_NABUB( %VAL( CNF_PVAL( VEC ) ), 
+     :                    EL, BAD, VAL, NUM, STATUS )
       ELSE IF ( ITYPE .EQ. '_WORD' ) THEN 
-         CALL CCG1_NABW( %VAL( VEC ), EL, BAD, VAL, NUM, STATUS )
+         CALL CCG1_NABW( %VAL( CNF_PVAL( VEC ) ), 
+     :                   EL, BAD, VAL, NUM, STATUS )
       ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN 
-         CALL CCG1_NABUW( %VAL( VEC ), EL, BAD, VAL, NUM, STATUS )
+         CALL CCG1_NABUW( %VAL( CNF_PVAL( VEC ) ), 
+     :                    EL, BAD, VAL, NUM, STATUS )
       ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN 
-         CALL CCG1_NABI( %VAL( VEC ), EL, BAD, VAL, NUM, STATUS )
+         CALL CCG1_NABI( %VAL( CNF_PVAL( VEC ) ), 
+     :                   EL, BAD, VAL, NUM, STATUS )
       ELSE IF ( ITYPE .EQ. '_REAL' ) THEN 
-         CALL CCG1_NABR( %VAL( VEC ), EL, BAD, VAL, NUM, STATUS )
+         CALL CCG1_NABR( %VAL( CNF_PVAL( VEC ) ), 
+     :                   EL, BAD, VAL, NUM, STATUS )
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN 
-         CALL CCG1_NABD( %VAL( VEC ), EL, BAD, VAL, NUM, STATUS )
+         CALL CCG1_NABD( %VAL( CNF_PVAL( VEC ) ), 
+     :                   EL, BAD, VAL, NUM, STATUS )
       ELSE
 
 *  Unsupported data type.

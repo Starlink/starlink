@@ -74,6 +74,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
       
 *  Arguments Given:
       INTEGER NCARD
@@ -127,7 +128,8 @@
 *  getting the FITS character array lengths passed. 
 
 *  Attempt to get numerical value for named keyword.
-      CALL FTS1_GKEYR( NCARD, %VAL( IPFITS ), 1, NAME, THERE, RVAL,
+      CALL FTS1_GKEYR( NCARD, %VAL( CNF_PVAL( IPFITS ) ), 
+     :                 1, NAME, THERE, RVAL,
      :                 ICARD, STATUS, %VAL( LENGTH ) )
       IF ( STATUS .EQ. SAI__OK .AND. THERE ) THEN
          CALL CHR_RTOC( RVAL, VALUE, NCHAR )
@@ -137,7 +139,8 @@
       END IF
 
 *  Attempt to get logical value for named keyword.
-      CALL FTS1_GKEYL( NCARD, %VAL( IPFITS ), 1, NAME, THERE, LVAL,
+      CALL FTS1_GKEYL( NCARD, %VAL( CNF_PVAL( IPFITS ) ), 
+     :                 1, NAME, THERE, LVAL,
      :                 ICARD, STATUS, %VAL( LENGTH ) )
       IF ( STATUS .EQ. SAI__OK .AND. THERE ) THEN
          CALL CHR_LTOC( LVAL, VALUE, NCHAR )
@@ -147,7 +150,8 @@
       END IF
 
 *  Attempt to get character value for named keyword.
-      CALL FTS1_GKEYC( NCARD, %VAL( IPFITS ), 1, NAME, THERE, CVAL,
+      CALL FTS1_GKEYC( NCARD, %VAL( CNF_PVAL( IPFITS ) ), 
+     :                 1, NAME, THERE, CVAL,
      :                 ICARD, STATUS, %VAL( LENGTH ) )
       IF ( STATUS .EQ. SAI__OK .AND. THERE ) THEN
          VALUE = '''' // CVAL

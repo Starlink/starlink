@@ -299,6 +299,7 @@
       INCLUDE 'FIO_PAR'         ! FIO system parameters
       INCLUDE 'GRP_PAR'         ! GRP system constants
       INCLUDE 'CCD1_PAR'        ! CCDPACK parameterisations
+      INCLUDE 'CNF_PAR'         ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -548,7 +549,8 @@
 
 *  Generate some identifiers to go with these positions
                CALL CCD1_MALL( NREC, '_INTEGER', IPDIN, STATUS )
-               CALL CCD1_GISEQ( 1, 1, NREC, %VAL( IPDIN ), STATUS )
+               CALL CCD1_GISEQ( 1, 1, NREC, %VAL( CNF_PVAL( IPDIN ) ), 
+     :                          STATUS )
             ELSE
 
 *  Standard file format map these in.
@@ -562,9 +564,11 @@
             IF ( STATUS .NE. SAI__OK ) GO TO 99
 
 *  Extract the values from the mapped positions data array.
-            CALL CCD1_LEXT( %VAL( IPDAT ), NREC, NVAL, 1, %VAL( IPXIN ),
+            CALL CCD1_LEXT( %VAL( CNF_PVAL( IPDAT ) ), NREC, NVAL, 1, 
+     :                      %VAL( CNF_PVAL( IPXIN ) ),
      :                      STATUS )
-            CALL CCD1_LEXT( %VAL( IPDAT ), NREC, NVAL, 2, %VAL( IPYIN ),
+            CALL CCD1_LEXT( %VAL( CNF_PVAL( IPDAT ) ), NREC, NVAL, 2, 
+     :                      %VAL( CNF_PVAL( IPYIN ) ),
      :                      STATUS )
 
 *  Get memory for centroiding results.
@@ -588,10 +592,13 @@
 *  Perform the centroiding.
             IF ( STATUS .NE. SAI__OK ) GO TO 99
             CALL CCD1_CENT( TYPE, IPIN, NCOL, NLINE, LBND, 
-     :                      %VAL( IPDIN ), %VAL( IPXIN ), %VAL( IPYIN ),
+     :                      %VAL( CNF_PVAL( IPDIN ) ), 
+     :                      %VAL( CNF_PVAL( IPXIN ) ), 
+     :                      %VAL( CNF_PVAL( IPYIN ) ),
      :                      NREC, ISIZES, SIGN, MAXSHS, MAXIT, TOLERS,
-     :                      %VAL( IPDOUT ), %VAL( IPXOUT ),
-     :                      %VAL( IPYOUT ), NOUT, STATUS )
+     :                      %VAL( CNF_PVAL( IPDOUT ) ), 
+     :                      %VAL( CNF_PVAL( IPXOUT ) ),
+     :                      %VAL( CNF_PVAL( IPYOUT ) ), NOUT, STATUS )
 
 *  If there was no input file, there are no output centroids.
          ELSE
@@ -617,8 +624,10 @@
 *  Write the output results.
          IF ( STATUS .NE. SAI__OK ) GO TO 99
          CALL CCD1_FIOHD( FDOUT, 'Output from FINDCENT', STATUS )
-         CALL CCD1_WRIXY( FDOUT, %VAL( IPDOUT ), %VAL( IPXOUT ),
-     :                    %VAL( IPYOUT ), NOUT, LINE, CCD1__BLEN,
+         CALL CCD1_WRIXY( FDOUT, %VAL( CNF_PVAL( IPDOUT ) ), 
+     :                    %VAL( CNF_PVAL( IPXOUT ) ),
+     :                    %VAL( CNF_PVAL( IPYOUT ) ), 
+     :                    NOUT, LINE, CCD1__BLEN,
      :                    STATUS ) 
 
 *  Close the file.

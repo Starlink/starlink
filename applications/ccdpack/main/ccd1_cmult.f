@@ -62,6 +62,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       CHARACTER * ( * ) ITYPE
@@ -87,33 +88,45 @@
 *  Call the appropriate subtraction routine by type. Copy the result to
 *  the  first array.
       IF ( ITYPE .EQ. '_UBYTE' ) THEN
-         CALL CCG1_CMLTUB( BAD, EL, %VAL( IPOINT ), CVAL,
-     :                     %VAL( IPWORK ), NERR, STATUS )
-         CALL CCG1_COPAUB( EL, %VAL( IPWORK ), %VAL( IPOINT ), STATUS )
+         CALL CCG1_CMLTUB( BAD, EL, %VAL( CNF_PVAL( IPOINT ) ), CVAL,
+     :                     %VAL( CNF_PVAL( IPWORK ) ), NERR, STATUS )
+         CALL CCG1_COPAUB( EL, %VAL( CNF_PVAL( IPWORK ) ), 
+     :                     %VAL( CNF_PVAL( IPOINT ) ), STATUS )
       ELSE IF ( ITYPE .EQ. '_BYTE' ) THEN
-         CALL CCG1_CMLTB( BAD, EL, %VAL( IPOINT ), CVAL, %VAL( IPWORK ),
+         CALL CCG1_CMLTB( BAD, EL, %VAL( CNF_PVAL( IPOINT ) ), CVAL, 
+     :                    %VAL( CNF_PVAL( IPWORK ) ),
      :                    NERR, STATUS )
-         CALL CCG1_COPAB( EL, %VAL( IPWORK ), %VAL( IPOINT ), STATUS )
+         CALL CCG1_COPAB( EL, %VAL( CNF_PVAL( IPWORK ) ), 
+     :                    %VAL( CNF_PVAL( IPOINT ) ), STATUS )
       ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
-         CALL CCG1_CMLTUW( BAD, EL, %VAL( IPOINT ), CVAL,
-     :                     %VAL( IPWORK ), NERR, STATUS )
-         CALL CCG1_COPAUW( EL, %VAL( IPWORK ), %VAL( IPOINT ), STATUS )
+         CALL CCG1_CMLTUW( BAD, EL, %VAL( CNF_PVAL( IPOINT ) ), CVAL,
+     :                     %VAL( CNF_PVAL( IPWORK ) ), NERR, STATUS )
+         CALL CCG1_COPAUW( EL, %VAL( CNF_PVAL( IPWORK ) ), 
+     :                     %VAL( CNF_PVAL( IPOINT ) ), STATUS )
       ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
-         CALL CCG1_CMLTW( BAD, EL, %VAL( IPOINT ), CVAL, %VAL( IPWORK ),
+         CALL CCG1_CMLTW( BAD, EL, %VAL( CNF_PVAL( IPOINT ) ), CVAL, 
+     :                    %VAL( CNF_PVAL( IPWORK ) ),
      :                    NERR, STATUS )
-         CALL CCG1_COPAW( EL, %VAL( IPWORK ), %VAL( IPOINT ), STATUS )
+         CALL CCG1_COPAW( EL, %VAL( CNF_PVAL( IPWORK ) ), 
+     :                    %VAL( CNF_PVAL( IPOINT ) ), STATUS )
       ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
-         CALL CCG1_CMLTI( BAD, EL, %VAL( IPOINT ), CVAL, %VAL( IPWORK ),
+         CALL CCG1_CMLTI( BAD, EL, %VAL( CNF_PVAL( IPOINT ) ), CVAL, 
+     :                    %VAL( CNF_PVAL( IPWORK ) ),
      :                    NERR, STATUS )
-         CALL CCG1_COPAI( EL, %VAL( IPWORK ), %VAL( IPOINT ), STATUS )
+         CALL CCG1_COPAI( EL, %VAL( CNF_PVAL( IPWORK ) ), 
+     :                    %VAL( CNF_PVAL( IPOINT ) ), STATUS )
       ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
-         CALL CCG1_CMLTR( BAD, EL, %VAL( IPOINT ), CVAL, %VAL( IPWORK ),
+         CALL CCG1_CMLTR( BAD, EL, %VAL( CNF_PVAL( IPOINT ) ), CVAL, 
+     :                    %VAL( CNF_PVAL( IPWORK ) ),
      :                    NERR, STATUS )
-         CALL CCG1_COPAR( EL, %VAL( IPWORK ), %VAL( IPOINT ), STATUS )
+         CALL CCG1_COPAR( EL, %VAL( CNF_PVAL( IPWORK ) ), 
+     :                    %VAL( CNF_PVAL( IPOINT ) ), STATUS )
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-         CALL CCG1_CMLTD( BAD, EL, %VAL( IPOINT ), CVAL, %VAL( IPWORK ),
+         CALL CCG1_CMLTD( BAD, EL, %VAL( CNF_PVAL( IPOINT ) ), CVAL, 
+     :                    %VAL( CNF_PVAL( IPWORK ) ),
      :                    NERR, STATUS )
-         CALL CCG1_COPAD( EL, %VAL( IPWORK ), %VAL( IPOINT ), STATUS )
+         CALL CCG1_COPAD( EL, %VAL( CNF_PVAL( IPWORK ) ), 
+     :                    %VAL( CNF_PVAL( IPOINT ) ), STATUS )
       ELSE
 
 *  Unsupported numeric type, issue error.

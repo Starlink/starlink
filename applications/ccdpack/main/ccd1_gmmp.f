@@ -118,6 +118,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER NEDGES
@@ -190,18 +191,20 @@
       IIN = 1
       DO 2 I = 1, NEDGES
          J = GRAPH( 4, I )
-         CALL CCG1_LAPND( %VAL( IPX1( J ) ), NIN( J ), IIN,
-     :                    %VAL( IPAX1 ), STATUS )
-         CALL CCG1_LAPND( %VAL( IPY1( J ) ), NIN( J ), IIN,
-     :                    %VAL( IPAY1 ), STATUS )
-         CALL CCG1_LAPND( %VAL( IPX2( J ) ), NIN( J ), IIN,
-     :                    %VAL( IPAX2 ), STATUS )
-         CALL CCG1_LAPND( %VAL( IPY2( J ) ), NIN( J ), IIN,
-     :                    %VAL( IPAY2 ), STATUS )
-         CALL CCG1_LAPNI( %VAL( IPRAN1( J ) ), NIN( J ), IIN,
-     :                    %VAL( IPAR1 ), STATUS )
-         CALL CCG1_LAPNI( %VAL( IPRAN2( J ) ), NIN( J ), IIN,
-     :                    %VAL( IPAR2 ), STATUS )
+         CALL CCG1_LAPND( %VAL( CNF_PVAL( IPX1( J ) ) ), NIN( J ), IIN,
+     :                    %VAL( CNF_PVAL( IPAX1 ) ), STATUS )
+         CALL CCG1_LAPND( %VAL( CNF_PVAL( IPY1( J ) ) ), NIN( J ), IIN,
+     :                    %VAL( CNF_PVAL( IPAY1 ) ), STATUS )
+         CALL CCG1_LAPND( %VAL( CNF_PVAL( IPX2( J ) ) ), NIN( J ), IIN,
+     :                    %VAL( CNF_PVAL( IPAX2 ) ), STATUS )
+         CALL CCG1_LAPND( %VAL( CNF_PVAL( IPY2( J ) ) ), NIN( J ), IIN,
+     :                    %VAL( CNF_PVAL( IPAY2 ) ), STATUS )
+         CALL CCG1_LAPNI( %VAL( CNF_PVAL( IPRAN1( J ) ) ), 
+     :                    NIN( J ), IIN,
+     :                    %VAL( CNF_PVAL( IPAR1 ) ), STATUS )
+         CALL CCG1_LAPNI( %VAL( CNF_PVAL( IPRAN2( J ) ) ), 
+     :                    NIN( J ), IIN,
+     :                    %VAL( CNF_PVAL( IPAR2 ) ), STATUS )
          OFFS( I ) = IIN
          IIN = IIN + NIN( J ) 
  2    CONTINUE
@@ -211,10 +214,14 @@
       IIN = IIN - 1
 
 *  Now do the work of generating the matched identifiers.
-      CALL CCD1_GMID( GRAPH, NEDGES, HINODE, %VAL( IP ), %VAL( IL ),
-     :                %VAL( IPAX1 ), %VAL( IPAY1 ), %VAL( IPAX2 ),
-     :                %VAL( IPAY2 ), IIN, TOLS, OFFS, %VAL( IPI1 ),
-     :                %VAL( IPI2 ), STATUS )
+      CALL CCD1_GMID( GRAPH, NEDGES, HINODE, %VAL( CNF_PVAL( IP ) ), 
+     :                %VAL( CNF_PVAL( IL ) ),
+     :                %VAL( CNF_PVAL( IPAX1 ) ), 
+     :                %VAL( CNF_PVAL( IPAY1 ) ), 
+     :                %VAL( CNF_PVAL( IPAX2 ) ),
+     :                %VAL( CNF_PVAL( IPAY2 ) ), IIN, TOLS, OFFS, 
+     :                %VAL( CNF_PVAL( IPI1 ) ),
+     :                %VAL( CNF_PVAL( IPI2 ) ), STATUS )
 
 *  Reset number of output entries per-node.
       DO 4 I = 1, HINODE
@@ -239,11 +246,17 @@
 
 *  Now generate the final positions and identifiers removing multiple
 *  identifications of the same positions.
-            CALL CCD1_GEFP( GRAPH, NEDGES, %VAL( IPAX1 ), %VAL( IPAY1 ),
-     :                      %VAL( IPAR1 ), %VAL( IPAX2 ), %VAL( IPAY2 ),
-     :                      %VAL( IPAR2 ), %VAL( IPI1 ), IIN, OFFS, I,
-     :                      %VAL( IPX( I ) ), %VAL( IPY( I ) ),
-     :                      %VAL( IPRANK( I ) ), %VAL( IPIDS( I ) ),
+            CALL CCD1_GEFP( GRAPH, NEDGES, %VAL( CNF_PVAL( IPAX1 ) ), 
+     :                      %VAL( CNF_PVAL( IPAY1 ) ),
+     :                      %VAL( CNF_PVAL( IPAR1 ) ), 
+     :                      %VAL( CNF_PVAL( IPAX2 ) ), 
+     :                      %VAL( CNF_PVAL( IPAY2 ) ),
+     :                      %VAL( CNF_PVAL( IPAR2 ) ), 
+     :                      %VAL( CNF_PVAL( IPI1 ) ), IIN, OFFS, I,
+     :                      %VAL( CNF_PVAL( IPX( I ) ) ), 
+     :                      %VAL( CNF_PVAL( IPY( I ) ) ),
+     :                      %VAL( CNF_PVAL( IPRANK( I ) ) ), 
+     :                      %VAL( CNF_PVAL( IPIDS( I ) ) ),
      :                      NOUT( I ), STATUS )
          END IF
  6    CONTINUE

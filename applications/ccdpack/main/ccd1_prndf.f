@@ -92,6 +92,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER XDIMN
@@ -141,13 +142,16 @@
 *  histogram.
          CALL CCD1_MALL( NHIST, '_INTEGER', IPHIST, STATUS )
          CALL CCD1_MKHIS( ITYPE, IPIN, XDIMN * YDIMN, BAD, 1, NHIST,
-     :                    %VAL( IPHIST ), MODE, PEAK, NBIN, ZERO, WIDTH,
+     :                    %VAL( CNF_PVAL( IPHIST ) ), 
+     :                    MODE, PEAK, NBIN, ZERO, WIDTH,
      :                    STATUS )
                                   
 *  Get the actual values.         
-         CALL CCD1_HISP( %VAL( IPHIST ), NBIN, ZERO, WIDTH, UPPER,
+         CALL CCD1_HISP( %VAL( CNF_PVAL( IPHIST ) ), 
+     :                   NBIN, ZERO, WIDTH, UPPER,
      :                   UPVAL, STATUS )    
-         CALL CCD1_HISP( %VAL( IPHIST ), NBIN, ZERO, WIDTH, LOWER,
+         CALL CCD1_HISP( %VAL( CNF_PVAL( IPHIST ) ), 
+     :                   NBIN, ZERO, WIDTH, LOWER,
      :                   LOWVAL, STATUS )    
                                   
 *  Release the histogram.         
@@ -171,56 +175,77 @@
                                   
 *  Now resample the data array into the output array.
       IF ( ITYPE .EQ. '_BYTE' ) THEN             
-         CALL CCG1_RENPB( %VAL( IPIN ), XDIMN, YDIMN, BAD, XDIMW,
-     :                    YDIMW, .FALSE., SCALE, %VAL ( IPTEMP ),
+         CALL CCG1_RENPB( %VAL( CNF_PVAL( IPIN ) ), 
+     :                    XDIMN, YDIMN, BAD, XDIMW,
+     :                    YDIMW, .FALSE., SCALE, 
+     :                    %VAL (CNF_PVAL( IPTEMP) ),
      :                    BADOUT, STATUS )                          
       ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN                  
-         CALL CCG1_RENPUB( %VAL( IPIN ), XDIMN, YDIMN, BAD, XDIMW,
-     :                     YDIMW, .FALSE., SCALE, %VAL( IPTEMP ),
+         CALL CCG1_RENPUB( %VAL( CNF_PVAL( IPIN ) ), 
+     :                     XDIMN, YDIMN, BAD, XDIMW,
+     :                     YDIMW, .FALSE., SCALE, 
+     :                     %VAL( CNF_PVAL( IPTEMP ) ),
      :                     BADOUT, STATUS )      
       ELSE IF ( ITYPE .EQ. '_WORD' ) THEN        
-         CALL CCG1_RENPW( %VAL( IPIN ), XDIMN, YDIMN, BAD, XDIMW,
-     :                    YDIMW, .FALSE., SCALE, %VAL( IPTEMP ),
+         CALL CCG1_RENPW( %VAL( CNF_PVAL( IPIN ) ), 
+     :                    XDIMN, YDIMN, BAD, XDIMW,
+     :                    YDIMW, .FALSE., SCALE, 
+     :                    %VAL( CNF_PVAL( IPTEMP ) ),
      :                    BADOUT, STATUS )        
       ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN        
-         CALL CCG1_RENPUW( %VAL( IPIN ), XDIMN, YDIMN, BAD, XDIMW,
-     :                     YDIMW, .FALSE., SCALE, %VAL( IPTEMP ),
+         CALL CCG1_RENPUW( %VAL( CNF_PVAL( IPIN ) ), 
+     :                     XDIMN, YDIMN, BAD, XDIMW,
+     :                     YDIMW, .FALSE., SCALE, 
+     :                     %VAL( CNF_PVAL( IPTEMP ) ),
      :                     BADOUT, STATUS )      
       ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN     
-         CALL CCG1_RENPI( %VAL( IPIN ), XDIMN, YDIMN, BAD, XDIMW,
-     :                    YDIMW, .FALSE., SCALE, %VAL( IPTEMP ),
+         CALL CCG1_RENPI( %VAL( CNF_PVAL( IPIN ) ), 
+     :                    XDIMN, YDIMN, BAD, XDIMW,
+     :                    YDIMW, .FALSE., SCALE, 
+     :                    %VAL( CNF_PVAL( IPTEMP ) ),
      :                    BADOUT, STATUS )  
       ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
-         CALL CCG1_RENPR( %VAL( IPIN ), XDIMN, YDIMN, BAD, XDIMW,
-     :                    YDIMW, .FALSE., SCALE, %VAL( IPTEMP ),
+         CALL CCG1_RENPR( %VAL( CNF_PVAL( IPIN ) ), 
+     :                    XDIMN, YDIMN, BAD, XDIMW,
+     :                    YDIMW, .FALSE., SCALE, 
+     :                    %VAL( CNF_PVAL( IPTEMP ) ),
      :                    BADOUT, STATUS )    
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-         CALL CCG1_RENPD( %VAL( IPIN ), XDIMN, YDIMN, BAD, XDIMW,
-     :                    YDIMW, .FALSE., SCALE, %VAL( IPTEMP ),
+         CALL CCG1_RENPD( %VAL( CNF_PVAL( IPIN ) ), 
+     :                    XDIMN, YDIMN, BAD, XDIMW,
+     :                    YDIMW, .FALSE., SCALE, 
+     :                    %VAL( CNF_PVAL( IPTEMP ) ),
      :                    BADOUT, STATUS )
       END IF
 
 *  And finally rescale it.
       IF ( ITYPE .EQ. '_BYTE' ) THEN
-         CALL KPG1_ISCLB( BAD, XDIMW, YDIMW, %VAL( IPTEMP ), .FALSE.,
+         CALL KPG1_ISCLB( BAD, XDIMW, YDIMW, %VAL( CNF_PVAL( IPTEMP ) ), 
+     :                    .FALSE.,
      :                    LOWVAL, UPVAL, NRES, 255, 0, OUTPUT, STATUS )
       ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN   
-         CALL KPG1_ISCLUB( BAD, XDIMW, YDIMW, %VAL( IPTEMP ), .FALSE.,
+         CALL KPG1_ISCLUB( BAD, XDIMW, YDIMW, 
+     :                     %VAL( CNF_PVAL( IPTEMP ) ), .FALSE.,
      :                     LOWVAL, UPVAL, NRES, 255, 0, OUTPUT, STATUS )
       ELSE IF ( ITYPE .EQ. '_WORD' ) THEN     
-         CALL KPG1_ISCLW( BAD, XDIMW, YDIMW, %VAL( IPTEMP ), .FALSE.,
+         CALL KPG1_ISCLW( BAD, XDIMW, YDIMW, %VAL( CNF_PVAL( IPTEMP ) ), 
+     :                    .FALSE.,
      :                    LOWVAL, UPVAL, NRES, 255, 0, OUTPUT, STATUS )
       ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN   
-         CALL KPG1_ISCLUW( BAD, XDIMW, YDIMW, %VAL( IPTEMP ), .FALSE.,
+         CALL KPG1_ISCLUW( BAD, XDIMW, YDIMW, 
+     :                     %VAL( CNF_PVAL( IPTEMP ) ), .FALSE.,
      :                     LOWVAL, UPVAL, NRES, 255, 0, OUTPUT, STATUS )
       ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN  
-         CALL KPG1_ISCLI( BAD, XDIMW, YDIMW, %VAL( IPTEMP ), .FALSE.,
+         CALL KPG1_ISCLI( BAD, XDIMW, YDIMW, %VAL( CNF_PVAL( IPTEMP ) ), 
+     :                    .FALSE.,
      :                    LOWVAL, UPVAL, NRES, 255, 0, OUTPUT, STATUS )
       ELSE IF ( ITYPE .EQ. '_REAL' ) THEN     
-         CALL KPG1_ISCLR( BAD, XDIMW, YDIMW, %VAL( IPTEMP ), .FALSE.,
+         CALL KPG1_ISCLR( BAD, XDIMW, YDIMW, %VAL( CNF_PVAL( IPTEMP ) ), 
+     :                    .FALSE.,
      :                    LOWVAL, UPVAL, NRES, 255, 0, OUTPUT, STATUS )
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN  
-         CALL KPG1_ISCLD( BAD, XDIMW, YDIMW, %VAL( IPTEMP ), .FALSE.,
+         CALL KPG1_ISCLD( BAD, XDIMW, YDIMW, %VAL( CNF_PVAL( IPTEMP ) ), 
+     :                    .FALSE.,
      :                    LOWVAL, UPVAL, NRES, 255, 0, OUTPUT, STATUS )
       END IF
 

@@ -447,6 +447,7 @@
       INCLUDE 'AST_PAR'          ! Standard AST constants
       INCLUDE 'GRP_PAR'          ! GRP stysem constants
       INCLUDE 'PAR_ERR'          ! PAR system error constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -769,7 +770,8 @@
 
 *  Generate some dummy identfiers for the output file.
                CALL CCD1_MALL( NREC, '_INTEGER', IPIND, STATUS )
-               CALL CCD1_GISEQ( 1, 1, NREC, %VAL( IPIND ), STATUS )
+               CALL CCD1_GISEQ( 1, 1, NREC, %VAL( CNF_PVAL( IPIND ) ), 
+     :                          STATUS )
             ELSE
                CALL CCD1_LMAP( FDIN, LINE, CCD1__BLEN, IPIND, IPDAT,
      :                         NREC, NVAL, STATUS )
@@ -784,8 +786,9 @@
             IF ( TRTYPE .EQ. 'COEFF' ) THEN
 
 *  Linear transformation from supplied coefficients.
-               CALL CCD1_LXYT( %VAL( IPDAT ), NREC, NREC, NVAL, TR,
-     :                         %VAL( IPWORK ), STATUS )
+               CALL CCD1_LXYT( %VAL( CNF_PVAL( IPDAT ) ), 
+     :                         NREC, NREC, NVAL, TR,
+     :                         %VAL( CNF_PVAL( IPWORK ) ), STATUS )
             ELSE IF ( TRTYPE .EQ. 'EXPRES' .OR. TRTYPE .EQ. 'STRUCT' )
      :      THEN
 
@@ -845,14 +848,17 @@
                END IF
 
 *  Finally transform the data.
-               CALL TRN_TRND( .FALSE., NREC, 2, NREC, %VAL( IPDAT ),
-     :                        IDTR, NREC, 2, %VAL( IPWORK ), STATUS )
+               CALL TRN_TRND( .FALSE., NREC, 2, NREC, 
+     :                        %VAL( CNF_PVAL( IPDAT ) ),
+     :                        IDTR, NREC, 2, %VAL( CNF_PVAL( IPWORK ) ), 
+     :                        STATUS )
 
 *  Copy any further data into the result array.
                IF ( NVAL .GT. 2 ) THEN
                   DO 2 I = 3, NVAL
-                     CALL CCD1_LCC( %VAL( IPDAT ), NREC, NVAL, I, I,
-     :                              %VAL( IPWORK ), STATUS )
+                     CALL CCD1_LCC( %VAL( CNF_PVAL( IPDAT ) ), 
+     :                              NREC, NVAL, I, I,
+     :                              %VAL( CNF_PVAL( IPWORK ) ), STATUS )
  2                CONTINUE
                END IF
                IF ( INEXT ) CALL DAT_ANNUL( LOCTR, STATUS )
@@ -896,8 +902,10 @@
                END IF
 
 *  Transform the coordinates with the given mapping.
-               CALL AST_TRANN( MAPAST, NREC, 2, NREC, %VAL( IPDAT ), 
-     :                         .TRUE., 2, NREC, %VAL( IPWORK ), STATUS )
+               CALL AST_TRANN( MAPAST, NREC, 2, NREC, 
+     :                         %VAL( CNF_PVAL( IPDAT ) ),
+     :                         .TRUE., 2, NREC, 
+     :                         %VAL( CNF_PVAL( IPWORK ) ), STATUS )
 
 *  Dispose of one-use mappings.
                IF ( INEXT ) CALL AST_ANNUL( MAPAST, STATUS )
@@ -905,8 +913,9 @@
 *  Copy any further data into the result array.
                IF ( NVAL .GT. 2 ) THEN
                   DO 4 I = 3, NVAL
-                     CALL CCD1_LCC( %VAL( IPDAT ), NREC, NVAL, I, I,
-     :                              %VAL( IPWORK ), STATUS )
+                     CALL CCD1_LCC( %VAL( CNF_PVAL( IPDAT ) ), 
+     :                              NREC, NVAL, I, I,
+     :                              %VAL( CNF_PVAL( IPWORK ) ), STATUS )
  4                CONTINUE
                END IF
             END IF
@@ -929,7 +938,8 @@
 
 *  Write the results
          CALL CCD1_FIOHD( FDOUT, 'Output from TRANLIST', STATUS )
-         CALL CCD1_WLIS( FDOUT, %VAL( IPIND ), %VAL( IPWORK ), NREC,
+         CALL CCD1_WLIS( FDOUT, %VAL( CNF_PVAL( IPIND ) ), 
+     :                   %VAL( CNF_PVAL( IPWORK ) ), NREC,
      :                   NVAL, NREC, LINE, CCD1__BLEN, STATUS )
 
 *  Tell the user the name of the output file

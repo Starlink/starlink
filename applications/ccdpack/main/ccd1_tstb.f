@@ -50,6 +50,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       CHARACTER * ( * ) TYPE
@@ -70,19 +71,26 @@
 *  Call the appropriate subroutine for the given type to perform the
 *  test.
       IF ( TYPE .EQ. '_UBYTE' ) THEN
-         CALL CCG1_TBUB( %VAL( IPDATA ), NEL, ALLBAD, STATUS )
+         CALL CCG1_TBUB( %VAL( CNF_PVAL( IPDATA ) ), 
+     :                   NEL, ALLBAD, STATUS )
       ELSE IF ( TYPE .EQ. '_BYTE' ) THEN
-         CALL CCG1_TBB( %VAL( IPDATA ), NEL, ALLBAD, STATUS )
+         CALL CCG1_TBB( %VAL( CNF_PVAL( IPDATA ) ), 
+     :                  NEL, ALLBAD, STATUS )
       ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
-         CALL CCG1_TBUW( %VAL( IPDATA ), NEL, ALLBAD, STATUS )
+         CALL CCG1_TBUW( %VAL( CNF_PVAL( IPDATA ) ), 
+     :                   NEL, ALLBAD, STATUS )
       ELSE IF ( TYPE .EQ. '_WORD' ) THEN
-         CALL CCG1_TBW( %VAL( IPDATA ), NEL, ALLBAD, STATUS )
+         CALL CCG1_TBW( %VAL( CNF_PVAL( IPDATA ) ), 
+     :                  NEL, ALLBAD, STATUS )
       ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
-         CALL CCG1_TBI( %VAL( IPDATA ), NEL, ALLBAD, STATUS )
+         CALL CCG1_TBI( %VAL( CNF_PVAL( IPDATA ) ), 
+     :                  NEL, ALLBAD, STATUS )
       ELSE IF ( TYPE .EQ. '_REAL' ) THEN
-         CALL CCG1_TBR( %VAL( IPDATA ), NEL, ALLBAD, STATUS )
+         CALL CCG1_TBR( %VAL( CNF_PVAL( IPDATA ) ), 
+     :                  NEL, ALLBAD, STATUS )
       ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
-         CALL CCG1_TBD( %VAL( IPDATA ), NEL, ALLBAD, STATUS )
+         CALL CCG1_TBD( %VAL( CNF_PVAL( IPDATA ) ), 
+     :                  NEL, ALLBAD, STATUS )
       ELSE
 
 *  Unsupported numeric type, issue error.

@@ -459,6 +459,7 @@
       INCLUDE 'AST_PAR'         ! Standard AST system declarations
       INCLUDE 'DAT_PAR'         ! Standard HDS constants
       INCLUDE 'GRP_PAR'         ! Standard GRP constants
+      INCLUDE 'CNF_PAR'         ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS            ! Global status
@@ -619,15 +620,18 @@
 *  Use a graph of all the connections given by the user. The first stage
 *  is to change the format into one which is a recognisable graph with
 *  edges of weight the number of common positions.
-      CALL CCD1_CRGR2( NMAT, COUNT, NODES, %VAL( IPGRA ), NEDGES,
+      CALL CCD1_CRGR2( NMAT, COUNT, NODES, %VAL( CNF_PVAL( IPGRA ) ), 
+     :                 NEDGES,
      :                 STATUS )
 
 *  Write out what the graph actually is.
-      CALL CCD1_WRGRA( %VAL( IPGRA ), NEDGES, STATUS )
+      CALL CCD1_WRGRA( %VAL( CNF_PVAL( IPGRA ) ), NEDGES, STATUS )
 
 *  Call routine to determine if the graph is complete.
-      CALL CCD1_GRAPC( %VAL( IPGRA ), NEDGES, 1, %VAL( IPQUE ),
-     :                 %VAL( IPBEEN ), COMPL, CYCLIC, %VAL( IPSUB ),
+      CALL CCD1_GRAPC( %VAL( CNF_PVAL( IPGRA ) ), NEDGES, 1, 
+     :                 %VAL( CNF_PVAL( IPQUE ) ),
+     :                 %VAL( CNF_PVAL( IPBEEN ) ), COMPL, CYCLIC, 
+     :                 %VAL( CNF_PVAL( IPSUB ) ),
      :                 NEWED, TOTNOD, STATUS )
 
 *  Decide whether the calculated subgraph is sufficiently complete to
@@ -663,8 +667,10 @@
 *  `complete' solution.  Find the offsets of all positions to the 
 *  `reference' set (first node of first edge of spanning graph is 
 *  assumed to be the reference set).
-      CALL CCD1_GROFF( %VAL( IPSUB ), NEWED, XOFF, YOFF, NSET,
-     :                 %VAL( IPBEEN ), %VAL( IPQUE ), XOFFN, YOFFN,
+      CALL CCD1_GROFF( %VAL( CNF_PVAL( IPSUB ) ), 
+     :                 NEWED, XOFF, YOFF, NSET,
+     :                 %VAL( CNF_PVAL( IPBEEN ) ), 
+     :                 %VAL( CNF_PVAL( IPQUE ) ), XOFFN, YOFFN,
      :                 STATUS )
 
 *  Initialise list of Set current Frame objects.
@@ -702,7 +708,8 @@
       END DO
 
 *  Output offset information to the user.
-      CALL CCD1_PROFF( NSET, %VAL( IPBEEN ), XOFFN, YOFFN, FRM,
+      CALL CCD1_PROFF( NSET, %VAL( CNF_PVAL( IPBEEN ) ), 
+     :                 XOFFN, YOFFN, FRM,
      :                 .TRUE., STATUS )
 
 *  Initialise number of matched points.
@@ -714,13 +721,16 @@
       DO I = 1, COUNT
          CALL CCD1_MALL( NMAT( I ), '_INTEGER', IPRAN1( I ), STATUS )
          CALL CCD1_MALL( NMAT( I ), '_INTEGER', IPRAN2( I ), STATUS )
-         CALL CCD1_GISEQ( 1, 1, NMAT( I ), %VAL( IPRAN1( I ) ), STATUS )
-         CALL CCD1_GISEQ( 1, 1, NMAT( I ), %VAL( IPRAN2( I ) ), STATUS )
+         CALL CCD1_GISEQ( 1, 1, NMAT( I ), 
+     :                    %VAL( CNF_PVAL( IPRAN1( I ) ) ), STATUS )
+         CALL CCD1_GISEQ( 1, 1, NMAT( I ), 
+     :                    %VAL( CNF_PVAL( IPRAN2( I ) ) ), STATUS )
       END DO
 
 *  Generate the ID's for the output lists. Matching positions between
 *  the lists and finally merging all positions for each node.
-      CALL CCD1_GMMP( %VAL( IPSUB ), NEWED, NSET, IPX1, IPY1, IPRAN1,
+      CALL CCD1_GMMP( %VAL( CNF_PVAL( IPSUB ) ), 
+     :                NEWED, NSET, IPX1, IPY1, IPRAN1,
      :                IPX2, IPY2, IPRAN2, NMAT, TOLS, OFFS, IPXO, IPYO,
      :                IPRAN, IPID, NOUT, STATUS )
 
@@ -761,9 +771,11 @@
             CALL CCD1_FRDM( IWCS( I ), 'Pixel', JPIX, STATUS )
             IMAP = AST_GETMAPPING( IWCS( I ), AST__CURRENT, JPIX,
      :                             STATUS )
-            CALL AST_TRAN2( IMAP, NOUT( IS ), %VAL( IPXO( IS ) ),
-     :                      %VAL( IPYO( IS ) ), .TRUE., %VAL( IPXP ),
-     :                      %VAL( IPYP ), STATUS )
+            CALL AST_TRAN2( IMAP, NOUT( IS ), 
+     :                      %VAL( CNF_PVAL( IPXO( IS ) ) ),
+     :                      %VAL( CNF_PVAL( IPYO( IS ) ) ), .TRUE., 
+     :                      %VAL( CNF_PVAL( IPXP ) ),
+     :                      %VAL( CNF_PVAL( IPYP ) ), STATUS )
 
 *  Get the bounds of the NDF.
             CALL NDF_BOUND( INDF( I ), 2, LBND, UBND, NDIM, STATUS )
@@ -774,10 +786,13 @@
 
 *  Pick out only those points which fall in the area of the data array
 *  of this NDF.
-            CALL CCD1_CHUSB( %VAL( IPID( IS ) ), %VAL( IPXP ), 
-     :                       %VAL( IPYP ), NOUT( IS ), XLO, XHI,
-     :                       YLO, YHI, %VAL( IPIQ ), %VAL( IPXQ ),
-     :                       %VAL( IPYQ ), NCOUT, STATUS )
+            CALL CCD1_CHUSB( %VAL( CNF_PVAL( IPID( IS ) ) ), 
+     :                       %VAL( CNF_PVAL( IPXP ) ),
+     :                       %VAL( CNF_PVAL( IPYP ) ), 
+     :                       NOUT( IS ), XLO, XHI,
+     :                       YLO, YHI, %VAL( CNF_PVAL( IPIQ ) ), 
+     :                       %VAL( CNF_PVAL( IPXQ ) ),
+     :                       %VAL( CNF_PVAL( IPYQ ) ), NCOUT, STATUS )
          END IF
 
 *  Open the position list file.
@@ -786,8 +801,10 @@
          CALL CCD1_FIOHD( FDO, 'Output from PAIRNDF', STATUS )
 
 *  Write the data.
-         CALL CCD1_WRIXY( FDO, %VAL( IPIQ ), %VAL( IPXQ ),
-     :                    %VAL( IPYQ ), NCOUT, LINE, CCD1__BLEN,
+         CALL CCD1_WRIXY( FDO, %VAL( CNF_PVAL( IPIQ ) ), 
+     :                    %VAL( CNF_PVAL( IPXQ ) ),
+     :                    %VAL( CNF_PVAL( IPYQ ) ), 
+     :                    NCOUT, LINE, CCD1__BLEN,
      :                    STATUS )
 
 *  Close the file.

@@ -105,6 +105,7 @@
       INCLUDE 'MSG_PAR'          ! Size of message string.. maximum size
                                  ! of NDF file name
       INCLUDE 'CCD1_PAR'         ! CCDPACK parameters
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       CHARACTER * ( * ) PARAM
@@ -195,7 +196,8 @@
          REGVAL = 2
          TRCOEF( 0, 1 ) = VAL__BADR
          CALL ARD_WORK( ID, 2, LBND, UBND, TRCOEF, .FALSE., REGVAL,
-     :                  %VAL( IPWRK ), LBNDI, UBNDI, LBNDE, UBNDE,
+     :                  %VAL( CNF_PVAL( IPWRK ) ), 
+     :                  LBNDI, UBNDI, LBNDE, UBNDE,
      :                  STATUS )
 
 *  Map in the data component of the output mask.
@@ -204,25 +206,32 @@
 
 *  Apply ARD mask to the output mask data component.
          IF ( ITYPE .EQ. '_BYTE' ) THEN
-            CALL CCG1_CMSKB( %VAL( IPWRK ), EL, 0.0D0, %VAL( IPDAT ),
+            CALL CCG1_CMSKB( %VAL( CNF_PVAL( IPWRK ) ), EL, 0.0D0, 
+     :                       %VAL( CNF_PVAL( IPDAT ) ),
      :                       STATUS )
          ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
-            CALL CCG1_CMSKUB( %VAL( IPWRK ), EL, 0.0D0, %VAL( IPDAT ),
+            CALL CCG1_CMSKUB( %VAL( CNF_PVAL( IPWRK ) ), EL, 0.0D0, 
+     :                        %VAL( CNF_PVAL( IPDAT ) ),
      :                       STATUS )
          ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
-            CALL CCG1_CMSKW( %VAL( IPWRK ), EL, 0.0D0, %VAL( IPDAT ),
+            CALL CCG1_CMSKW( %VAL( CNF_PVAL( IPWRK ) ), EL, 0.0D0, 
+     :                       %VAL( CNF_PVAL( IPDAT ) ),
      :                       STATUS )
          ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
-            CALL CCG1_CMSKUW( %VAL( IPWRK ), EL, 0.0D0, %VAL( IPDAT ),
+            CALL CCG1_CMSKUW( %VAL( CNF_PVAL( IPWRK ) ), EL, 0.0D0, 
+     :                        %VAL( CNF_PVAL( IPDAT ) ),
      :                       STATUS )
          ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
-            CALL CCG1_CMSKI( %VAL( IPWRK ), EL, 0.0D0, %VAL( IPDAT ),
+            CALL CCG1_CMSKI( %VAL( CNF_PVAL( IPWRK ) ), EL, 0.0D0, 
+     :                       %VAL( CNF_PVAL( IPDAT ) ),
      :                       STATUS )
          ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
-            CALL CCG1_CMSKR( %VAL( IPWRK ), EL, 0.0D0, %VAL( IPDAT ),
+            CALL CCG1_CMSKR( %VAL( CNF_PVAL( IPWRK ) ), EL, 0.0D0, 
+     :                       %VAL( CNF_PVAL( IPDAT ) ),
      :                       STATUS )
          ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-            CALL CCG1_CMSKD( %VAL( IPWRK ), EL, 0.0D0, %VAL( IPDAT ),
+            CALL CCG1_CMSKD( %VAL( CNF_PVAL( IPWRK ) ), EL, 0.0D0, 
+     :                       %VAL( CNF_PVAL( IPDAT ) ),
      :                       STATUS )
          END IF
 

@@ -85,6 +85,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       CHARACTER * ( * ) TYPE
@@ -115,11 +116,13 @@
 *  version of the routine to perform the work.
       IF ( TYPE .EQ. '_REAL' ) THEN
          CALL CCD1_CRDTR( BAD, DOVAR, EL, SCALE, DSCALE, ZERO, DZERO,
-     :                    ORIG, %VAL( DAT ), %VAL( VAR ), NBADD, NBADV,
+     :                    ORIG, %VAL( CNF_PVAL( DAT ) ), 
+     :                    %VAL( CNF_PVAL( VAR ) ), NBADD, NBADV,
      :                    STATUS )
       ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
          CALL CCD1_CRDTD( BAD, DOVAR, EL, SCALE, DSCALE, ZERO, DZERO,
-     :                    ORIG, %VAL( DAT ), %VAL( VAR ), NBADD, NBADV,
+     :                    ORIG, %VAL( CNF_PVAL( DAT ) ), 
+     :                    %VAL( CNF_PVAL( VAR ) ), NBADD, NBADV,
      :                    STATUS )
       END IF
 

@@ -239,6 +239,7 @@
       INCLUDE 'CCD1_PAR'         ! CCDPACK parameterisations
       INCLUDE 'FIO_PAR'          ! FIO parameters
       INCLUDE 'AST_PAR'          ! Standard AST constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -486,7 +487,8 @@
             END IF
 
 *  Draw the points.
-            CALL CCD1_DRAWA( PLOT, %VAL( IPID ), %VAL( IPDAT ), NREC,
+            CALL CCD1_DRAWA( PLOT, %VAL( CNF_PVAL( IPID ) ), 
+     :                       %VAL( CNF_PVAL( IPDAT ) ), NREC,
      :                       NVAL, MTYPE, STATUS )
 
 *  Free memory used on this pass.

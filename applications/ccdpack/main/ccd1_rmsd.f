@@ -60,6 +60,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       LOGICAL BAD
@@ -82,25 +83,25 @@
 
 *  Call the appropriate routine.
       IF ( PTYPE .EQ. '_BYTE' ) THEN
-         CALL CCG1_STMNB( BAD, %VAL( IPVEC ), SIZE, AVEACC,
+         CALL CCG1_STMNB( BAD, %VAL( CNF_PVAL( IPVEC ) ), SIZE, AVEACC,
      :                    NOISE, VALPIX, STATUS )
       ELSE IF ( PTYPE .EQ. '_UBYTE' ) THEN
-         CALL CCG1_STMNUB( BAD, %VAL( IPVEC ), SIZE, AVEACC,
+         CALL CCG1_STMNUB( BAD, %VAL( CNF_PVAL( IPVEC ) ), SIZE, AVEACC,
      :                     NOISE, VALPIX, STATUS )
       ELSE IF ( PTYPE .EQ. '_WORD' ) THEN
-         CALL CCG1_STMNW( BAD, %VAL( IPVEC ), SIZE, AVEACC,
+         CALL CCG1_STMNW( BAD, %VAL( CNF_PVAL( IPVEC ) ), SIZE, AVEACC,
      :                    NOISE, VALPIX, STATUS )
       ELSE IF ( PTYPE .EQ. '_UWORD' ) THEN
-         CALL CCG1_STMNUW( BAD, %VAL( IPVEC ), SIZE, AVEACC,
+         CALL CCG1_STMNUW( BAD, %VAL( CNF_PVAL( IPVEC ) ), SIZE, AVEACC,
      :                     NOISE, VALPIX, STATUS )
       ELSE IF ( PTYPE .EQ. '_INTEGER' ) THEN
-         CALL CCG1_STMNI( BAD, %VAL( IPVEC ), SIZE, AVEACC,
+         CALL CCG1_STMNI( BAD, %VAL( CNF_PVAL( IPVEC ) ), SIZE, AVEACC,
      :                    NOISE, VALPIX, STATUS )
       ELSE IF ( PTYPE .EQ. '_REAL' ) THEN
-         CALL CCG1_STMNR( BAD, %VAL( IPVEC ), SIZE, AVEACC,
+         CALL CCG1_STMNR( BAD, %VAL( CNF_PVAL( IPVEC ) ), SIZE, AVEACC,
      :                    NOISE, VALPIX, STATUS )
       ELSE IF ( PTYPE .EQ. '_DOUBLE' ) THEN
-         CALL CCG1_STMND( BAD, %VAL( IPVEC ), SIZE, AVEACC,
+         CALL CCG1_STMND( BAD, %VAL( CNF_PVAL( IPVEC ) ), SIZE, AVEACC,
      :                    NOISE, VALPIX, STATUS )
       END IF
 

@@ -200,6 +200,7 @@
       INCLUDE 'CCD1_PAR'        ! CCDPACK parameters
       INCLUDE 'AST_PAR'         ! AST parameters
       INCLUDE 'GRP_PAR'         ! GRP parameters
+      INCLUDE 'CNF_PAR'         ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS            ! Global status
@@ -340,13 +341,17 @@
       CALL CCD1_MALL( NOBJ, '_DOUBLE', IPELL, STATUS )
       CALL CCD1_MALL( NOBJ, '_DOUBLE', IPXT, STATUS )
       CALL CCD1_MALL( NOBJ, '_DOUBLE', IPYT, STATUS )
-      CALL CCD1_LEXT( %VAL( IPDAT ), NOBJ, NVAL, 1, %VAL( IPX ),
+      CALL CCD1_LEXT( %VAL( CNF_PVAL( IPDAT ) ), NOBJ, NVAL, 1, 
+     :                %VAL( CNF_PVAL( IPX ) ),
      :                STATUS )
-      CALL CCD1_LEXT( %VAL( IPDAT ), NOBJ, NVAL, 2, %VAL( IPY ),
+      CALL CCD1_LEXT( %VAL( CNF_PVAL( IPDAT ) ), NOBJ, NVAL, 2, 
+     :                %VAL( CNF_PVAL( IPY ) ),
      :                STATUS )
-      CALL CCD1_LEXT( %VAL( IPDAT ), NOBJ, NVAL, 3, %VAL( IPINT ),
+      CALL CCD1_LEXT( %VAL( CNF_PVAL( IPDAT ) ), NOBJ, NVAL, 3, 
+     :                %VAL( CNF_PVAL( IPINT ) ),
      :                STATUS )
-      CALL CCD1_LEXT( %VAL( IPDAT ), NOBJ, NVAL, 4, %VAL( IPELL ),
+      CALL CCD1_LEXT( %VAL( CNF_PVAL( IPDAT ) ), NOBJ, NVAL, 4, 
+     :                %VAL( CNF_PVAL( IPELL ) ),
      :                STATUS )
 
 *  Get dimensions of output images.
@@ -475,22 +480,28 @@
          CALL NDF_PTWCS( IWCS, IDO, STATUS )
 
 *  Convert objects from CCD_GEN frame to current PIXEL frame.
-         CALL AST_TRAN2( MAPTFM, NOBJ, %VAL( IPX ), %VAL( IPY ),
-     :                   .FALSE., %VAL( IPXT ), %VAL( IPYT ), STATUS )
+         CALL AST_TRAN2( MAPTFM, NOBJ, %VAL( CNF_PVAL( IPX ) ), 
+     :                   %VAL( CNF_PVAL( IPY ) ),
+     :                   .FALSE., %VAL( CNF_PVAL( IPXT ) ), 
+     :                   %VAL( CNF_PVAL( IPYT ) ), STATUS )
 
 *  Map the data in.
          CALL NDF_MAP( IDO, 'DATA', '_REAL', 'WRITE', IPOBJ, EL,
      :                 STATUS )
 
 *  Create the objects.
-         CALL CCD1_OBJS( %VAL( IPOBJ ), DIMS( 1 ), DIMS( 2 ), 1, 1,
-     :                   %VAL( IPXT ), %VAL( IPYT ), %VAL( IPINT ), 
-     :                   NOBJ, 3.0, 0.75, 0.8, %VAL( IPELL ),
+         CALL CCD1_OBJS( %VAL( CNF_PVAL( IPOBJ ) ), 
+     :                   DIMS( 1 ), DIMS( 2 ), 1, 1,
+     :                   %VAL( CNF_PVAL( IPXT ) ), 
+     :                   %VAL( CNF_PVAL( IPYT ) ), 
+     :                   %VAL( CNF_PVAL( IPINT ) ),
+     :                   NOBJ, 3.0, 0.75, 0.8, 
+     :                   %VAL( CNF_PVAL( IPELL ) ),
      :                   REAL( ANGLE( I ) ), 500.0, 100000.0, 15.0,
      :                   .FALSE., 1, STATUS )
 
 *  Add noise to it.
-         CALL CCD1_ANOI( %VAL( IPOBJ ), EL, 8.0, STATUS )
+         CALL CCD1_ANOI( %VAL( CNF_PVAL( IPOBJ ) ), EL, 8.0, STATUS )
 
 *  Create the bias and flatfield frames if required.
          IF ( .NOT. REDUCE ) THEN
@@ -508,8 +519,9 @@
      :                    STATUS )
 
 *  Fill with noise.
-            CALL CCG1_STVR( 100.0, EL, %VAL( IPBIA ), STATUS )
-            CALL CCD1_ANOI( %VAL( IPBIA ), EL, 1.0, STATUS )
+            CALL CCG1_STVR( 100.0, EL, %VAL( CNF_PVAL( IPBIA ) ), 
+     :                      STATUS )
+            CALL CCD1_ANOI( %VAL( CNF_PVAL( IPBIA ) ), EL, 1.0, STATUS )
 
 *  Flatfield frame.
             CALL MSG_SETC( 'BASE', BASFF )
@@ -524,23 +536,31 @@
      :                    STATUS )
 
 *  Create a flatfield.
-            CALL CCD1_CFF( %VAL( IPFF ), DIMS( 1 ), DIMS( 2 ), STATUS )
+            CALL CCD1_CFF( %VAL( CNF_PVAL( IPFF ) ), 
+     :                     DIMS( 1 ), DIMS( 2 ), STATUS )
 
 *  Multiply data by the flatfield.
-            CALL VEC_MULR( .FALSE., EL, %VAL( IPFF ), %VAL( IPOBJ ),
-     :                    %VAL( IPWRK ), IERR, NERR, STATUS )
+            CALL VEC_MULR( .FALSE., EL, %VAL( CNF_PVAL( IPFF ) ), 
+     :                     %VAL( CNF_PVAL( IPOBJ ) ),
+     :                    %VAL( CNF_PVAL( IPWRK ) ), 
+     :                    IERR, NERR, STATUS )
 
 *  Add bias to data.
-            CALL CCD1_ADDS( %VAL( IPWRK ), %VAL( IPBIA ), %VAL( IPOBJ ),
+            CALL CCD1_ADDS( %VAL( CNF_PVAL( IPWRK ) ), 
+     :                      %VAL( CNF_PVAL( IPBIA ) ), 
+     :                      %VAL( CNF_PVAL( IPOBJ ) ),
      :                       DIMS( 1 ), DIMS( 2 ), WID1, WID2, STATUS )
 
 *  Scale flatfield and add noise.
-            CALL CCG1_CMLTR( .FALSE., EL, %VAL( IPFF ), 1000.0D0,
-     :                       %VAL( IPWRK ), NERR, STATUS )
-            CALL CCD1_ANOI( %VAL( IPWRK ), EL, 1.0, STATUS )
+            CALL CCG1_CMLTR( .FALSE., EL, %VAL( CNF_PVAL( IPFF ) ), 
+     :                       1000.0D0,
+     :                       %VAL( CNF_PVAL( IPWRK ) ), NERR, STATUS )
+            CALL CCD1_ANOI( %VAL( CNF_PVAL( IPWRK ) ), EL, 1.0, STATUS )
 
 *  Add bias to the flatfield.
-            CALL CCD1_ADDS( %VAL( IPWRK ), %VAL( IPBIA ), %VAL( IPFF ),
+            CALL CCD1_ADDS( %VAL( CNF_PVAL( IPWRK ) ), 
+     :                      %VAL( CNF_PVAL( IPBIA ) ), 
+     :                      %VAL( CNF_PVAL( IPFF ) ),
      :                      DIMS( 1 ), DIMS( 2 ), WID1, WID2, STATUS )
          END IF
 
