@@ -112,8 +112,10 @@
 *        V2.0-1  Fixed bug in rectangular mode where output units were
 *                not written in radians
 *      3 Oct 1995 (DJA):
-*        V2.0-1  Fixed another bug in rectangular mode, where Y was zero
+*        V2.0-2  Fixed another bug in rectangular mode, where Y was zero
 *                going into PSF_2D_DATA
+*     16 Oct 1995 (DJA):
+*        V2.0-3  Use new BDI_ routines to read and write data
 *     {enter_changes_here}
 
 *  Bugs:
@@ -156,98 +158,100 @@
       REAL                   	ERES           		! Spectral resolution
       REAL                   	MAXR               	! Maximum off-axis angle
       REAL			PXSCALE, PYSCALE
+      REAL			SPARR(2)		! Space array data
       REAL                   	SRES           		! Spatial resolution
-      REAL                   TOR 		! Units to radians conversion
-      REAL                   XBASE, XSCALE      ! X axis attributes
-      REAL                   XLO, XHI           ! X axis extrema
-      REAL                   YBASE, YSCALE      ! Y axis attributes
-      REAL                   YLO, YHI           ! Y axis extrema
+      REAL                   	TOR 		! Units to radians conversion
+      REAL                   	XBASE, XSCALE      	! X axis attributes
+      REAL                   	XLO, XHI           	! X axis extrema
+      REAL                   	YBASE, YSCALE      	! Y axis attributes
+      REAL                   	YLO, YHI           	! Y axis extrema
 
-      INTEGER                CDIMS(4)        	! Dimensions of response index
+      INTEGER			BIID			! Output response id
+      INTEGER                	CDIMS(4)        	! Dimensions of response index
       INTEGER                CNDIM           	! Dimensionality of response i'x
       INTEGER                CNELM           	! Total no. elements in index
       INTEGER		     CP_PTR		! Cursor over spatial response
       INTEGER                DIMS(5)        	! Dimensions of response
       INTEGER 		     EBIN      		! Loop over energy axis
       INTEGER 		     EPTR      		! Ptr to energy bin centres
-      INTEGER                I               	! Loop variable
+      INTEGER                	I                     	! Loop variable
       INTEGER                IDIMS(ADI__MXDIM)  ! Dimensions of input file
+      INTEGER			IDUM			! Dummy argument
       INTEGER			IFID			! Input dataset id
       INTEGER                INDIM           	! Dimensionality of input file
-      INTEGER                IPSF           	! PSF handle
+      INTEGER                	IPSF           		! PSF handle
       INTEGER                NDIM           	! Dimensionality of response
       INTEGER                NPSF            	! Number of psfs in response
       INTEGER                NUSED            	! Length of compressed response
       INTEGER			ONEBIN			! O/p # energy bins
       INTEGER                	PSFSIZ			! Psf size in bytes
-      INTEGER 		     RBIN      		! Loop over off-axis angle
-      INTEGER                RLIMIT		! Limiting psf radius
+      INTEGER 		     	RBIN      		! Loop over off-axis angle
+      INTEGER                	RLIMIT			! Limiting psf radius
       INTEGER			SID			! Response identifier
-      INTEGER		     SI_PTR		! Spatial reponse index
+      INTEGER		     	SI_PTR			! Spatial reponse index
       INTEGER                SNELM           	! Total no. elements in response
-      INTEGER		     SP_PTR		! Full spatial reponse
-      INTEGER                X_AX,Y_AX,E_AX,T_AX ! Axis numbers
-      INTEGER 		     XBIN, YBIN     	! Loop over detector X, Y axes
-      INTEGER		     XSMAX, YSMAX	! Extreme psf sizes
-      LOGICAL                EVDS           	! Input is event dataset?
+      INTEGER		     	SP_PTR			! Full spatial reponse
+      INTEGER                	X_AX,Y_AX,E_AX,T_AX 	! Axis numbers
+      INTEGER 		     	XBIN, YBIN     		! Loop over detector X, Y axes
+      INTEGER		     	XSMAX, YSMAX		! Extreme psf sizes
+
+      LOGICAL                	EVDS           		! Input is event dataset?
       LOGICAL 		     H_OK		! Could psf system do a hint?
-      LOGICAL                OK             	! General validity check
-      LOGICAL                PIXCENT            ! Pixel centred?
+      LOGICAL                	PIXCENT            	! Pixel centred?
       LOGICAL                RADIAL         	! Psf is only function of R
-      LOGICAL                THERE          	! Component exists?
+      LOGICAL                	THERE          		! Component exists?
 
 *  Version
       CHARACTER*30       VERSION
         PARAMETER        ( VERSION = 'SPRESP Version 2.0-2' )
-
-*  Local Data:
-      DATA EVDS/.FALSE./
 *.
 
-*    Check inherited global status.
+*  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Initialise ASTERIX
+*  Initialise ASTERIX
       CALL AST_INIT()
 
-*    Version annoucement
+*  Version annoucement
       CALL MSG_PRNT( VERSION )
 
-*    Get dataset
-      CALL USI_TASSOCI( 'INP', '*', 'UPDATE', IFID, STATUS )
+*  Get dataset
+      CALL USI_ASSOC( 'INP', 'BinDS|EventDS', 'UPDATE', IFID, STATUS )
 
-*    Does ASTERIX structure exist? If not, create it
+*  Does ASTERIX structure exist? If not, create it
       CALL ADI1_LOCAST( IFID, .TRUE., ALOC, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Remove existing SPATIAL_RESP object
+*  Remove existing SPATIAL_RESP object
       CALL DAT_THERE( ALOC, SRESP, THERE, STATUS )
       IF ( THERE ) THEN
         CALL MSG_PRNT( 'Removing existing spatial response...' )
         CALL DAT_ERASE( ALOC, SRESP, STATUS )
       END IF
 
-*    Introduce dataset to psf system
+*  Introduce dataset to psf system
       CALL PSF_TASSOCI( IFID, IPSF, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Create spatial response structure
+*  Create spatial response structure
       CALL DAT_NEW( ALOC, SRESP, 'EXTENSION', 0, 0, STATUS )
       CALL DAT_FIND( ALOC, SRESP, SLOC, STATUS )
       CALL DAT_NEW( SLOC, 'MORE', 'EXTENSION', 0, 0, STATUS )
-      CALL ADI1_PUTLOC( SLOC, SID, STATUS )
 
-*    Write SPRESP version id
+*  Import locator to make a file object
+      CALL ADI1_MKFILE( SLOC, 'UPDATE', SID, STATUS )
+
+*  Write SPRESP version id
       CALL HDX_PUTC( SLOC, 'VERSION', 1, VERSION, STATUS )
 
-*    Is RADIAL_SYMMETRY hint available from the psf? If it is use it as
-*    the default for the RADIAL parameter
+*  Is RADIAL_SYMMETRY hint available from the psf? If it is use it as
+*  the default for the RADIAL parameter
       CALL PSF_QHINT( IPSF, PSF_H_RADSYM, H_OK, RADIAL, STATUS )
       IF ( H_OK ) THEN
         CALL USI_DEF0L( 'RADIAL', RADIAL, STATUS )
       END IF
 
-*    Assume radial symmetry
+*  Assume radial symmetry
       CALL USI_GET0L( 'RADIAL', RADIAL, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
       CALL HDX_PUTL( SLOC, 'RADIAL', 1, RADIAL, STATUS )
@@ -257,14 +261,14 @@
         NDIM = 5
       END IF
 
-*    Identify the axis numbers of the dataset
+*  Identify the axis numbers of the dataset
       CALL PSF_QAXES( IPSF, X_AX, Y_AX, E_AX, T_AX, STATUS )
 
-*    Energy information available in dataset, ie. is there an energy axis
-*    for the binned dataset, or an energy list for the event dataset?
+*  Energy information available in dataset, ie. is there an energy axis
+*  for the binned dataset, or an energy list for the event dataset?
 
-*    Spatial resolution required
-      CALL BDI_GETAXUNITS( IFID, X_AX, UNITS, STATUS )
+*  Spatial resolution required
+      CALL BDI_AXGET0C( IFID, X_AX, 'Units', UNITS, STATUS )
       CALL CONV_UNIT2R( UNITS, TOR, STATUS )
       IF ( RADIAL ) THEN
         CALL USI_PROMT( 'SRES', 'Radial sampling of psf in '/
@@ -276,38 +280,38 @@
       CALL USI_GET0R( 'SRES', SRES, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Only require energy resolution if event dataset, otherwise we use
-*    the full energy variation
+*  Only require energy resolution if event dataset, otherwise we use
+*  the full energy variation
+      CALL ADI_DERVD( IFID, 'EventDS', EVDS, STATUS )
       IF ( EVDS ) THEN
         CALL USI_GET0R( 'ERES', ERES, STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 99
       ELSE
 
-*      Get data dimensions
-        CALL BDI_CHKDATA( IFID, OK, INDIM, IDIMS, STATUS )
+*    Get data dimensions
+        CALL BDI_GETSHP( IFID, ADI__MXDIM, IDIMS, INDIM, STATUS )
 
-*      Map energy if defined
+*    Map energy if defined
         IF ( E_AX .GT. 0 ) THEN
 
-*        Get axis label
-          CALL BDI_GETAXLABEL( IFID, E_AX, EAXLAB, STATUS )
+*      Get axis label
+          CALL BDI_AXGET0C( IFID, E_AX, 'Label', EAXLAB, STATUS )
 
-*        Get number of output energy bins from user
+*      Get number of output energy bins from user
           CALL USI_DEF0I( 'NEBIN', IDIMS(E_AX), STATUS )
           CALL USI_GET0I( 'NEBIN', ONEBIN, STATUS )
           IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*        Ensure number is less than or equal to the number of input energy
-*        bins
+*      Ensure number is less than or equal to the number of input energy bins
           ONEBIN = MIN( IDIMS(E_AX), ONEBIN )
 
-*        If user is happy with the default energy resolution, just map
-*        the input axis
+*      If user is happy with the default energy resolution, just map
+*      the input axis
           IF ( ONEBIN .EQ. IDIMS(E_AX) ) THEN
-            CALL BDI_MAPAXVAL( IFID, 'READ', E_AX, EPTR, STATUS )
+            CALL BDI_AXMAPR( IFID, E_AX, 'Data', 'READ', EPTR, STATUS )
           ELSE
 
-*          Otherwise extract axis extrema and calculate base and scale
+*        Otherwise extract axis extrema and calculate base and scale
             CALL PSF_QAXEXT( IPSF, E_AX, ELO, EHI, STATUS )
             ESCALE = (EHI-ELO) / REAL(ONEBIN)
             EBASE = ELO + ESCALE/2.0
@@ -316,39 +320,43 @@
 
         END IF
 
-*      Extract X,Y pixel sizes
-        CALL BDI_GETAXVAL( IFID, X_AX, XBASE, XSCALE, IDIMS(X_AX),
-     :                     STATUS )
-        CALL BDI_GETAXVAL( IFID, Y_AX, YBASE, YSCALE, IDIMS(Y_AX),
-     :                     STATUS )
+*    Extract X,Y pixel sizes
+        CALL BDI_AXGET1R( IFID, X_AX, 'SpacedData', 2, SPARR, IDUM,
+     :                    STATUS )
+        XBASE = SPARR(1)
+        XSCALE = SPARR(2)
+        CALL BDI_AXGET1R( IFID, Y_AX, 'SpacedData', 2, SPARR, IDUM,
+     :                    STATUS )
+        YBASE = SPARR(1)
+        YSCALE = SPARR(2)
 
-*      Psf bin widths in radians
+*    Psf bin widths in radians
         DX = XSCALE * TOR
         DY = YSCALE * TOR
 
       END IF
 
-*    Decide number of psfs in each dimension X,Y (or R), and E
+*  Decide number of psfs in each dimension X,Y (or R), and E
       IF ( EVDS ) THEN
       END IF
 
-*    Pixel centred or vertex centred array
+*  Pixel centred or vertex centred array
       CALL USI_GET0L( 'PIXCENT', PIXCENT, STATUS )
       CALL HDX_PUTL( SLOC, 'PIXCENT', 1, PIXCENT, STATUS )
 
-*    Fractional amplitude to cut-off
+*  Fractional amplitude to cut-off
       CALL USI_GET0R( 'CUTOFF', CUTOFF, STATUS )
       CALL HDX_PUTR( SLOC, 'CUTOFF', 1, CUTOFF, STATUS )
 
-*    Limiting radius
+*  Limiting radius
       CALL USI_GET0I( 'RLIMIT', RLIMIT, STATUS )
       CALL HDX_PUTI( SLOC, 'RLIMIT', 1, RLIMIT, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    The fact that this a compressed response
+*  The fact that this a compressed response
       CALL HDX_PUTL( SLOC, 'COMPRESSED', 1, .TRUE., STATUS )
 
-*    Define dimensions of response
+*  Define dimensions of response
       DIMS(1) = RLIMIT*2
       DIMS(2) = RLIMIT*2
       IF ( PIXCENT ) THEN
@@ -379,48 +387,57 @@
       END IF
       CALL ARR_SUMDIM( NDIM, DIMS, SNELM )
 
-*    The spatial response is just a collection of NPSF 2D psfs
+*  The spatial response is just a collection of NPSF 2D psfs
+      NPSF = SNELM / (DIMS(1)*DIMS(2))
+
+*  Create BinDS object and link it to the response locator
+      CALL BDI_NEW( 'BinDS', NDIM, DIMS, 'REAL', BIID, STATUS )
+      CALL ADI_SETLNK( BIID, SID, STATUS )
+
+*  Write some axes
+      CALL BDI_PUT0C( BIID, 'Label', 'Psf amplitude', STATUS )
+      CALL BDI_PUT0C( BIID, 'Units', 'Integrated probability per pixel',
+     :                                                    STATUS )
+      CALL BDI_AXPUT0C( BIID, 1, 'Label', 'X offset from source',
+     :                  STATUS )
+      CALL BDI_AXPUT0C( BIID, 1, 'Units', UNITS, STATUS )
+      SPARR(1) = (0.0-DX*DIMS(1))/TOR
+      SPARR(2) = DX/TOR
+      CALL BDI_AXPUT1R( BIID, 1, 'SpacedData', 2, SPARR, STATUS )
+      CALL BDI_AXPUT0C( BIID, 2, 'Label', 'Y offset from source',
+     :                  STATUS )
+      SPARR(1) = (0.0-DY*DIMS(2))/TOR
+      SPARR(2) = DY/TOR
+      CALL BDI_AXPUT1R( BIID, 2, 'SpacedData', 2, SPARR, STATUS )
+
       IF ( RADIAL ) THEN
-        NPSF = DIMS(3)*DIMS(4)
+        CALL BDI_AXPUT0C( BIID, 3, 'Label', 'Off-axis angle', STATUS )
+        CALL BDI_AXPUT0C( BIID, 3, 'Units', 'radian', STATUS )
+        SPARR(1) = SRES*TOR/2.0
+        SPARR(2) = SRES*TOR
+        CALL BDI_AXPUT1R( BIID, 3, 'SpacedData', 2, SPARR, STATUS )
+
       ELSE
-        NPSF = DIMS(3)*DIMS(4)*DIMS(5)
+        CALL BDI_AXPUT0C( BIID, 3, 'Label', 'X_CORR', STATUS )
+        CALL BDI_AXPUT0C( BIID, 3, 'Units', 'radian', STATUS )
+        SPARR(1) = XBASE*TOR
+        SPARR(2) = PXSCALE*TOR
+        CALL BDI_AXPUT1R( BIID, 3, 'SpacedData', 2, SPARR, STATUS )
+        CALL BDI_AXPUT0C( BIID, 4, 'Label', 'Y_CORR', STATUS )
+        CALL BDI_AXPUT0C( BIID, 4, 'Units', 'radian', STATUS )
+        SPARR(1) = YBASE*TOR
+        SPARR(2) = PYSCALE*TOR
+        CALL BDI_AXPUT1R( BIID, 4, 'SpacedData', 2, SPARR, STATUS )
       END IF
 
-*    Write some axes
-      CALL BDI_PUTLABEL( SID, 'Psf amplitude', STATUS )
-      CALL BDI_PUTUNITS( SID, 'Integrated probability per pixel',
-     :                                                    STATUS )
-      CALL BDI_CREAXES( SID, NDIM, STATUS )
-      CALL BDI_PUTAXLABEL( SID, 1, 'X offset from source', STATUS )
-      CALL BDI_PUTAXUNITS( SID, 1, UNITS, STATUS )
-      CALL BDI_PUTAXVAL( SID, 1, (0.0-DX*DIMS(1))/TOR, DX/TOR,
-     :                   DIMS(1), STATUS )
-      CALL BDI_PUTAXLABEL( SID, 2, 'Y offset from source', STATUS )
-      CALL BDI_PUTAXUNITS( SID, 2, UNITS, STATUS )
-      CALL BDI_PUTAXVAL( SID, 2, (0.0-DY*DIMS(2))/TOR, DY/TOR,
-     :                   DIMS(2), STATUS )
-      IF ( RADIAL ) THEN
-        CALL BDI_PUTAXTEXT( SID, 3, 'Off-axis angle', 'radian', STATUS )
-        CALL BDI_PUTAXVAL( SID, 3, SRES*TOR/2.0, SRES*TOR,
-     :                     DIMS(3), STATUS )
-      ELSE
-        CALL BDI_PUTAXTEXT( SID, 3, 'X_CORR', 'radian', STATUS )
-        CALL BDI_CREAXVAL( SID, 3, .TRUE., DIMS(3), STATUS )
-        CALL BDI_PUTAXVAL( SID, 3, XBASE*TOR, PXSCALE*TOR, DIMS(3),
-     :                      STATUS )
-        CALL BDI_PUTAXTEXT( SID, 4, 'Y_CORR', 'radian', STATUS )
-        CALL BDI_CREAXVAL( SID, 4, .TRUE., DIMS(4), STATUS )
-        CALL BDI_PUTAXVAL( SID, 4, YBASE*TOR, PYSCALE*TOR, DIMS(4),
-     :                      STATUS )
-      END IF
+*  Copy energy axis if present
       IF ( E_AX .GT. 0 ) THEN
-        IF ( ONEBIN .EQ. IDIMS(E_AX) ) THEN
-          CALL BDI_COPAXIS( IFID, SID, E_AX, NDIM, STATUS )
-        ELSE
-          CALL BDI_COPAXTEXT( IFID, SID, E_AX, NDIM, STATUS )
-          CALL BDI_CREAXVAL( SID, NDIM, .TRUE., ONEBIN, STATUS )
-          CALL BDI_PUTAXVAL( SID, NDIM, EBASE, ESCALE, ONEBIN, STATUS )
-        END IF
+        CALL BDI_AXPUT0C( BIID, NDIM, 'Label', EAXLAB, STATUS )
+        CALL BDI_AXGET0C( IFID, E_AX, 'Units', UNITS, STATUS )
+        CALL BDI_AXPUT0C( BIID, NDIM, 'Units', UNITS, STATUS )
+        SPARR(1) = EBASE
+        SPARR(2) = ESCALE
+        CALL BDI_AXPUT1R( BIID, NDIM, 'SpacedData', 2, SPARR, STATUS )
       END IF
 
 *    Map space for expanded spatial response structure
@@ -514,16 +531,15 @@
       CALL CMP_MAPV( SLOC, 'INDEX', '_INTEGER', 'WRITE', SI_PTR, CNELM,
      :               STATUS )
 
-*    Compress given CUTOFF. We process the array in memory sequential order
-*    which means that we can overwrite the SP_PTR array.
+*  Compress given CUTOFF. We process the array in memory sequential order
+*  which means that we can overwrite the SP_PTR array.
       CALL SPRESP_COMP( DIMS(1), DIMS(2), NPSF, %VAL(SP_PTR),
      :                  CUTOFF, %VAL(SI_PTR), %VAL(SP_PTR),
      :                  NUSED, STATUS )
 
-*    Find maximum sizes used in compressed index. Adjust expanded
-*    dimensions so fit the largest psf in the index. Doesn't save
-*    any disk space but saves memory in the psf system when the
-*    response has to be uncompressed
+*  Find maximum sizes used in compressed index. Adjust expanded dimensions so
+*  fit the largest psf in the index. Doesn't save any disk space but saves
+*  memory in the psf system when the response has to be uncompressed
       CALL SPRESP_SQSH( NPSF, %VAL(SI_PTR), XSMAX, YSMAX, STATUS )
       DIMS(1) = XSMAX*2
       DIMS(2) = YSMAX*2
@@ -532,28 +548,23 @@
         DIMS(2) = DIMS(2) + 1
       END IF
 
-*    Write the expanded dimensions
+*  Write the expanded dimensions
       CALL HDX_PUTI( SLOC, 'DIMS', NDIM, DIMS, STATUS )
 
-*    Report compression factor
+*  Report compression factor
       CALL MSG_SETR( 'FAC', REAL(SNELM)/REAL(NUSED) )
       CALL MSG_PRNT( 'Response compressed by a factor ^FAC' )
 
-*    Unmap the index
+*  Unmap the index
       CALL CMP_UNMAP( SLOC, 'INDEX', STATUS )
 
-*    Write compressed data to file
+*  Write compressed data to file
       CALL HDX_PUTR( SLOC, 'DATA_ARRAY', NUSED, %VAL(SP_PTR), STATUS )
 
-*    Add a bit of history
+*  Add a bit of history
       CALL HSI_ADD( IFID, VERSION, STATUS )
 
-*    Release response
-      CALL BDI_RELEASE( SID, STATUS )
-      CALL DAT_ANNUL( SLOC, STATUS )
-      CALL BDI_RELEASE( IFID, STATUS )
-
-*    Tidy up
+*  Tidy up
  99   CALL AST_CLOSE()
       CALL AST_ERR( STATUS )
 
@@ -856,17 +867,17 @@
       INTEGER                	IPSF			! Loop over psfs
 *.
 
-*    Check inherited global status.
+*  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Initialise
+*  Initialise
       XMAX = 0
       YMAX = 0
 
-*    Loop over psfs
+*  Loop over psfs
       DO IPSF = 1, NPSF
 
-*      Update maxima
+*    Update maxima
         XMAX = MAX( XMAX, INDEX(2,IPSF) )
         YMAX = MAX( YMAX, INDEX(3,IPSF) )
 
