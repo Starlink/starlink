@@ -96,7 +96,6 @@
 	manyanch	NUMBER	2
 >
 
-<![ include [
 <!--
     The declaration for the DocumentSummary architecture is simple.
     Since all the elements in the architecture have matching names in this DTD,
@@ -119,8 +118,15 @@
 		cdata
 		#fixed "docsumma"
 	>
-]]>
 
+<!-- 
+  Define the TeX notation, using the ISBN prefix, as defined in
+  ISO/IEC 9070:1991, `Information Technology - SGML support facilities
+  - Registration procedures for public text owner identifiers'
+-->
+<!notation tex   public "+//ISBN 0-201-13447//NOTATION The TeXBook//EN">
+<!notation latex public "+//ISBN 0-201-52983//NOTATION LaTeX: A
+  document preparation system//EN">
 
 <!--========== Parameter entities for configuration ==========-->
 <!entity % DocClass "SUN">
@@ -191,9 +197,29 @@
 
 
 <!--========== Entities for special symbols ==========-->
-<!entity % CharEnts public
-	"-//Starlink//ENTITIES Character entity collections//EN">
-%CharEnts;
+
+<!entity % LaTeX.sdata 'IGNORE'>
+<!entity % HTML.sdata 'IGNORE'>
+
+<![ %LaTeX.sdata [
+<!entity % Additional.Char.Ents
+	public "-//Starlink//ENTITIES Additional entities//EN//LATEX">
+<!entity % ISOents
+	PUBLIC  "ISO 8879:1986//ENTITIES Added Latin 1//EN//LATEX">
+]]>
+<![ %HTML.sdata [
+<!entity % Additional.Char.Ents
+	public "-//Starlink//ENTITIES Additional entities//EN//HTML">
+<!entity % ISOents
+	PUBLIC  "ISO 8879:1986//ENTITIES Added Latin 1//EN//HTML">
+]]>
+<!entity % Additional.Char.Ents
+	public "-//Starlink//ENTITIES Additional entities//EN//PLAIN">
+<!entity % ISOents
+	PUBLIC  "ISO 8879:1986//ENTITIES Added Latin 1//EN//PLAIN">
+
+%Additional.Char.Ents;
+%ISOents;
 
 
 <!--======== Shortrefs ==========-->
@@ -611,6 +637,7 @@
   <!entity % simpletext	"(#pcdata | %phrase | %special)*">
 -->
 <!entity % simpletext	"(#pcdata | %simplephrase )*">
+<!entity % maths	"m | mequation | meqnarray">
 
 <!--
   %phrase: different types of phrase display within text.
@@ -635,7 +662,7 @@
   The id attribute is a bit of a pain to implement, but useful.
 -->
 <!entity % p.model 
-    '%update (#pcdata | %phrase | %special | %structuring)*'>
+    '%update (#pcdata | %phrase | %special | %structuring | %maths)*'>
 <!element P o o (%p.model)>
 <!attlist p
 	id	id	#implied	-- id for this paragraph --
@@ -674,6 +701,35 @@
 <!element ATTRIBUTION - - (#pcdata)	-- source of quotation -->
 
 <!element DRAFTNOTE - - (#pcdata)	-- Notes during drafting -->
+
+<!--========== Maths ==========
+  The maths elements in %maths all have the same declaration.  The M
+  element corresponds to the $ in TeX, and the MEQUATION and
+  MEQNARRAY elements correspond to the equation and eqnarray
+  environments respectively.  The content should be raw LaTeX,
+  appropriate for the LaTeX environment the element corresponds to.
+  In principle there are no restrictions on what goes in here, other
+  than that it be valid LaTeX, but in practice, I expect that teh
+  author might need some little awareness of any restrictions of the
+  actual implementation.
+
+  At present, I'm using tth as a translator from TeX to HTML (see
+  http://hutchinson.belmont.ma.us/tth/) - this will deal with Plain as
+  well as LaTeX, but that shouldn't be used in fact.  There's
+  obviously no problem when I'm generating LaTeX.
+
+  Note that I'm declaring this as PCDATA content, accepting the force
+  of the overwhelmingly negative discussion of CDATA/RCDATA at
+  http://www.oasis-open.org/cover/topics.html#CDATA.  Note also that
+  this means that & _is_ interpreted as an entity reference - there's
+  a list of ways to get round that in one of the postings at that URL,
+  but the simplest seem to be either AT&amp;T or <![cdata[ AT&T ]]>.
+-->
+<!element (%maths) - - (#pcdata)>
+<!attlist (%maths)
+	notation	-- the notation - fixed as LaTeX --
+		notation(latex) #fixed latex
+	>
 
 <!--========== Cross references, bibliography, indexing and notes ==========-->
 
@@ -1080,3 +1136,4 @@
 
 
 ]]>
+
