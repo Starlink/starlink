@@ -25,7 +25,7 @@ dnl    PISA is a couple of monoliths.
 STAR_MONOLITHS
 
 dnl    Build dependencies for this package.
-STAR_DECLARE_DEPENDENCIES([build], [agi cat chr fio ndf par pda prm sae])
+STAR_DECLARE_DEPENDENCIES([build], [agi cat chr fio ndf par pda prm sae shl])
 
 dnl    Need "hlib" command to build the help library.
 STAR_CHECK_PROGS(hlib)
@@ -34,7 +34,7 @@ dnl    Documentation.
 STAR_LATEX_DOCUMENTATION(sun109)
 
 dnl    Extra files to go with documents.
-STAR_DOCS_FILES(sun109fig.ps)
+STAR_DOC_FILES(sun109fig.ps)
 
 dnl    Configure files.
 AC_CONFIG_FILES([Makefile component.xml start pisa.icl])
