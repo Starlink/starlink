@@ -2231,7 +2231,7 @@ docs:
   [javadoc] Javadoc execution
   [javadoc] Loading source files for package uk.ac.starlink.topcat.func...
   [javadoc] Constructing Javadoc information...
-  [javadoc] Nov 4, 2004 5:46:10 AM uk.ac.starlink.ast.AstPackage isAvailable
+  [javadoc] Nov 5, 2004 5:46:30 AM uk.ac.starlink.ast.AstPackage isAvailable
   [javadoc] WARNING: JNIAST native library not on java.library.path - no WCS processing
   [javadoc] Generating Javadoc
   [javadoc] Javadoc execution
@@ -2249,4 +2249,4 @@ Xlib: No protocol specified
 BUILD FAILED
 file:/apps/cvsbuild/java/source/topcat/build.xml:1118: Fatal error during transformation
 
-Total time: 4 minutes 10 seconds
+Total time: 4 minutes 3 seconds
