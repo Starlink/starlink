@@ -21,6 +21,8 @@
 #	 library.
 #     1992 August 27 (MJC):
 #     	 Made the output NDF the current data-array.
+#     1992 September 28 (MJC):
+#     	 Made OUT have type NDF and WRITE access.
 #     {enter_further_changes_here}
 
 #-
@@ -39,7 +41,8 @@ interface DST2NDF
 
    parameter      OUT            # Name of NDF
       position    2
-      type        '_CHAR'
+      type        'NDF'
+      access      'WRITE'
       ppath       'CURRENT,DYNAMIC'
       prompt      'Name of output NDF'
       association '->GLOBAL.DATA_ARRAY'
