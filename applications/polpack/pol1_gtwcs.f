@@ -52,6 +52,9 @@
 *  History:
 *     13-JAN-1998 (DSB):
 *        Original version.
+*     2-JUL-1998 (DSB):
+*        Changed the corners of the box used to define the WinMap so
+*        that it never has zero area.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -115,16 +118,16 @@
       PERM = AST_PERMMAP( 3, INPERM, 2, OUTPERM, 1.0, ' ', STATUS )
 
 *  Now create a WinMap which scales and shifts each axis in the 2D Frame
-*  according to the values supplied in TR.
-      INA( 1 ) = 0.0
-      INA( 2 ) = 0.0
-      INB( 1 ) = TR( 1 )/TR( 2 )
-      INB( 2 ) = TR( 3 )/TR( 4 )
+*  according to the values supplied in TR. 
+      INA( 1 ) = 0.0D0
+      INA( 2 ) = 0.0D0
+      INB( 1 ) = 1.0D0
+      INB( 2 ) = 1.0D0
 
       OUTA( 1 ) = TR( 1 )
       OUTA( 2 ) = TR( 3 )
-      OUTB( 1 ) = 2.0*TR( 1 )
-      OUTB( 2 ) = 2.0*TR( 3 )
+      OUTB( 1 ) = TR( 1 ) + TR( 2 )
+      OUTB( 2 ) = TR( 3 ) + TR( 4 )
 
       WIN = AST_WINMAP( 2, INA, INB, OUTA, OUTB, ' ', STATUS ) 
 
