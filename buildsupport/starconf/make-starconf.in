@@ -223,23 +223,22 @@ fi
 #fi
 extrachunks="$extrachunks -xq:bootstrap"
 
-# Scan configure.ac, getting all the used STAR_* macros into a string
-starmacros=`sed -n 's/^\(STAR[_A-Z]*\).*/\1/p' configure.ac | sed '{:a;N;s/\n/ /;t a;}'`
-
-# Certain macros depend on certain additional files.  Scan the list of
-# used macros, and add the required files to $extrachunks.  There are
-# currently no macros in starconf.m4.in which require such files, but
-# if they are added, the dependencies should be documented here.
+# Scan configure.ac, examining all the used STAR_* macros
 found_star_defaults=false
-for foundmacro in $starmacros dummy
-do
-    case $foundmacro in
-        STAR_DEFAULTS)
-            found_star_defaults=true
-            ;;
-        *) ;;
-    esac
-done
+sed -n 's/^\(STAR[_A-Z]*\).*/\1/p' configure.ac | \
+    while read macro
+    do
+        # Certain macros depend on certain additional files.  Scan the list of
+        # used macros, and add the required files to $extrachunks.  There are
+        # currently no macros in starconf.m4.in which require such files, but
+        # if they are added, the dependencies should be documented here.
+        case $macro in
+            STAR_DEFAULTS)
+                found_star_defaults=true
+                ;;
+            *) ;;
+        esac
+    done
 
 # Check that we did find a STAR_DEFAULTS macro in the configure.ac,
 # and object if we didn't.
