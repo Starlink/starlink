@@ -26,6 +26,8 @@
 *     other applications, and is also written to the screen by default 
 *     (see parameter REPORT). An outline may be drawn around the current
 *     picture if required (see parameter OUTLINE).
+*
+*     A list of the colours in the current pallette is also produced.
 
 *  ADAM Parameters:
 *     COMMENT = LITERAL (Write)
@@ -211,6 +213,8 @@
 *     19-AUG-2002 (DSB):
 *        Modify plotting of outline to use bounds of picture rather than
 *        bounds of Plot.
+*     10-DEC-2002 (DSB):
+*        Added display of colour pallette.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -225,18 +229,20 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! Data-system constants
       INCLUDE 'AST_PAR'          ! GNS constants
+      INCLUDE 'CTM_PAR'          ! Colour-table management constants
 
 *  Status:
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
       CHARACTER ATTR*10          ! Buffer for attribute name
+      CHARACTER CNAME*18         ! Name of nearest colour
       CHARACTER COM*80           ! Picture comment
       CHARACTER DOM*30           ! Frame Domain
       CHARACTER DOM0*30          ! Original Current Frame Domain
       CHARACTER LABEL*( DAT__SZNAM ) ! Picture label
-      CHARACTER LINE*60          ! One line of text
       CHARACTER LFMT*80          ! Buffer for formatted lower axis value
+      CHARACTER LINE*60          ! One line of text
       CHARACTER NAME*( DAT__SZNAM ) ! Picture name
       CHARACTER REFNAM*132       ! Reference object's name 
       CHARACTER SYM*30           ! Buffer for an axis symbol string
@@ -257,6 +263,7 @@
       INTEGER IPICB              ! AGI BASE picture ID
       INTEGER IPLOT              ! Pointer to current picture's AST Plot
       INTEGER IPLOTB             ! Pointer to BASE picture's AST Plot
+      INTEGER J                  ! Loop count
       INTEGER JAT                ! Used length of ATTR string
       INTEGER MAP                ! Pointer to Mapping from Base to Current
       INTEGER NCREF              ! Number of characters in reference
@@ -266,6 +273,9 @@
       LOGICAL REPORT             ! Are the results to be reported?
       LOGICAL USECUR             ! Use original Current Frame?
       LOGICAL VALID              ! Is the reference object a locator?
+      REAL B                     ! Blue intensity 
+      REAL G                     ! Green intensity 
+      REAL R                     ! Red intensity 
       REAL X1                    ! Lower picture X bound
       REAL X2                    ! Upper picture X bound
       REAL Y1                    ! Lower picture Y bound
@@ -575,6 +585,25 @@
 
          CALL MSG_BLANK( STATUS )
 
+      END IF
+
+*  If required, display a list of the pallette colours. 
+      IF( REPORT .AND. STATUS .EQ. SAI__OK ) THEN
+         CALL MSG_OUT( ' ', '   The pallette contains the following '//
+     :                 'colours:', STATUS )
+         CALL MSG_BLANK( STATUS )         
+         CALL MSG_OUT( ' ', '      Entry:  Red:    Green:  Blue:   '//
+     :                 ' Name:', STATUS )
+
+         DO  J = 0, CTM__RSVPN - 1
+            CALL PGQCR( J, R, G, B )
+            CALL KPG1_COLNM( R, G, B, CNAME, STATUS )
+            WRITE( TEXT, '(7x,I2,5x,3(F5.3,3x),x,A18)' ) J, R, G, B, 
+     :                                                   CNAME
+            CALL MSG_OUT( ' ', TEXT( : 50 ), STATUS )
+         END DO
+
+         CALL MSG_BLANK( STATUS )         
       END IF
 
 *  Tidy up.
