@@ -177,6 +177,9 @@
 *        Set TR array if no bining is used.
 *     8-AUG-1998 (DSB):
 *        Make the PIXEL Frame the Base Frame in the catalogue WCS.
+*     11-MAY-1999 (DSB):
+*        Pass LBND to POL1_GTWCS so that it can set up the correct
+*        GRID-PIXEL mapping in IWCS.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -410,7 +413,7 @@
 
 *  Get a FrameSet which represents the WCS information of one of the binned
 *  2D arrays.
-      CALL POL1_GTWCS( INDF1, TR, IWCS, STATUS )
+      CALL POL1_GTWCS( INDF1, TR, LBND, IWCS, STATUS )
 
 *  Get the reference direction for the output catalogue. This may be
 *  different to the reference direction for the input cube.

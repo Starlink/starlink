@@ -1,4 +1,4 @@
-      SUBROUTINE POL1_GTWCS( INDF, TR, IWCS, STATUS )
+      SUBROUTINE POL1_GTWCS( INDF, TR, LBND, IWCS, STATUS )
 *+
 *  Name:
 *     POL1_GTWCS
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*      CALL POL1_GTWCS( INDF, TR, IWCS, STATUS )
+*      CALL POL1_GTWCS( INDF, TR, LBND, IWCS, STATUS )
 
 *  Description:
 *     This routine gets the FrameSet from the WCS component of the
@@ -22,8 +22,8 @@
 *     connected to the original 3D GRID Frame by scaling and shifting
 *     axes 1 and 2 according to the values supplied in TR. Since all 
 *     the planes in the input cube are presumed to be aligned, axis 3
-*     is ignored. A new 2D PIXEL Frame is added to the FrameSet assuming
-*     pixel indices equals grid indices. Finally the original GRID and 
+*     is ignored. A new 2D PIXEL Frame is added to the FrameSet using
+*     the supplied pixel bounds. Finally the original GRID and 
 *     PIXEL Frames are removed.
 
 *  Arguments:
@@ -36,6 +36,8 @@
 *           Z' = Z
 *        where (X,Y,Z) are GRID coordinates in the input cube, and
 *        (X',Y',Z') are GRID coordinates in the binned cube.
+*     LBND( 2 ) = INTEGER (Given)
+*        The lower pixel bounds of the grid.
 *     IWCS = INTEGER (Returned)
 *        An AST identifier for the FrameSet to be stored with the output
 *        2-D images created by polvec.
@@ -58,6 +60,8 @@
 *        as constant value to AST_PERMMAP.
 *     5-AUG-1998 (DSB):
 *        Re-instate original Current Frame after adding new PIXEL Frame.
+*     11-MAY-1999 (DSB):
+*        Added arguments LBND.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -75,6 +79,7 @@
 *  Arguments Given:
       INTEGER INDF
       DOUBLE PRECISION TR( 4 )
+      INTEGER LBND( 2 )
 
 *  Arguments Returned:
       INTEGER IWCS
@@ -206,10 +211,10 @@
       INB( 1 ) = 1.5D0
       INB( 2 ) = 1.5D0
 
-      OUTA( 1 ) = 0.0D0
-      OUTA( 2 ) = 0.0D0
-      OUTB( 1 ) = 1.0D0
-      OUTB( 2 ) = 1.0D0
+      OUTA( 1 ) = DBLE( LBND( 1 ) - 1 )
+      OUTA( 2 ) = DBLE( LBND( 2 ) - 1 )
+      OUTB( 1 ) = OUTA( 1 ) + 1.0D0
+      OUTB( 2 ) = OUTA( 2 ) + 1.0D0
 
       WIN = AST_WINMAP( 2, INA, INB, OUTA, OUTB, ' ', STATUS ) 
 
