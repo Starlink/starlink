@@ -329,6 +329,9 @@ itcl::class gaia::StarAstGrid {
 
       #  Select a page.
       $itk_component(TabNoteBook) select 0
+
+      #  Create a unique tag for this grid.
+      set grid_tag_ "grid[incr grid_count_]"
    }
 
    #  Destructor:
@@ -553,8 +556,10 @@ itcl::class gaia::StarAstGrid {
             lappend options $format2
          }
 
-         #  Set the grid tag
-         $itk_option(-rtdimage) configure -ast_tag $itk_option(-ast_tag)
+         #  Set the grid tags, ast_tag for general control, grid_tag_
+	 #  for this particular grid.
+         $itk_option(-rtdimage) configure -ast_tag \
+	    "$itk_option(-ast_tag) $grid_tag_"
 
          #  If requested just display over the visible canvas +/- a little.
          if { ! $gridsize_($this,whole) } { 
@@ -581,7 +586,7 @@ itcl::class gaia::StarAstGrid {
 
    #  Remove the grid.
    protected method remove_grid_ {} {
-      $itk_option(-canvas) delete $itk_option(-ast_tag)
+      $itk_option(-canvas) delete $grid_tag_
       set drawn_ 0
    }
 
@@ -1727,7 +1732,8 @@ itcl::class gaia::StarAstGrid {
    #  If this is a clone, then it should die rather than be withdrawn.
    itk_option define -really_die really_die Really_Die 0
 
-   #  Ast graphics tag used to control redraws etc.
+   #  Ast graphics tag used to control general level redraws of all
+   #  AST elements.
    itk_option define -ast_tag ast_tag Ast_Tag {} {
       if { $itk_option(-ast_tag) == {} } {
          set itk_option(-ast_tag) "ast_element"
@@ -1887,6 +1893,9 @@ itcl::class gaia::StarAstGrid {
    #  XXX not yet.
    #  protected variable xname_ X
    #  protected variable yname_ Y
+
+   #  Unique tag for this grid. 
+   protected variable grid_tag_ {}
 
    #  Common variables: (shared by all instances)
    #  -----------------

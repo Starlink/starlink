@@ -439,11 +439,13 @@ itcl::class gaia::GaiaPhotomObject {
               $eccen $ang $positions $innerscale $outerscale"
    }
 
-   #  Return optimal details.
+   #  Return optimal details. Note included extra major so that
+   #  interactive resizing can be tracked.
    protected method getoptdets_ {} {
       lassign [image_coord $xpos $ypos] x y
+      set maj [image_dist $major]
       return "$index $x $y $mag $magerr $sky $signal $code \
-              $positions $innerscale $outerscale"
+              $positions $innerscale $outerscale $maj"
    }   
 
    #  Return PSF details.

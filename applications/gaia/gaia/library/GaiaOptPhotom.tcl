@@ -221,6 +221,7 @@ itcl::class gaia::GaiaOptPhotom {
                         -psf 1 \
                         -semimajor 5.0 \
                         -allow_resize 0 \
+			-coupled 1 \
                         -notify_changed_cmd [code $this changed_psf]]
       
       #  Create the GaiaPhotomList object to deal with the details of
@@ -237,7 +238,9 @@ itcl::class gaia::GaiaOptPhotom {
                            -usemags $usemags_ \
                            -phottype optimal \
                            -psf 0 \
-                           -allow_resize 0]
+                           -allow_resize 0 \
+			   -coupled 1 \
+			   -notify_changed_cmd [code $this changed_object]]
 
       #  Create a GaiaPhotomDetails object to display the values
       #  of the PSF object.
@@ -721,12 +724,24 @@ itcl::class gaia::GaiaOptPhotom {
       $itk_component(DefinePSF) configure -relief raised
    }
 
-   #  Notification that the PSF object has changed shape (we just
-   #  allow the radius to be modified). All normal apertures need to
-   #  reflect this.
+   #  Notification that the PSF or normal objects have changed shape
+   #  (we just allow the radius to be modified). Objects in other
+   #  list need to reflect this change.
    private method changed_psf {} {
-      $object_list_ configure -semimajor [$psf_list_ cget -semimajor]
-      $object_list_ config_all major [$psf_list_ cget -semimajor]
+      if { $propagate_ } { 
+	 set propagate_ 0
+	 $object_list_ configure -semimajor [$psf_list_ cget -semimajor]
+	 $object_list_ config_all major [$psf_list_ cget -semimajor]
+	 set propagate_ 1
+      }
+   }
+   private method changed_object {} {
+      if { $propagate_ } { 
+	 set propagate_ 0
+	 $psf_list_ configure -semimajor [$object_list_ cget -semimajor]
+	 $psf_list_ config_all major [$object_list_ cget -semimajor]
+	 set propagate_ 1
+      }
    }
 
    #  The measurements are made, read in the results.
@@ -974,6 +989,10 @@ itcl::class gaia::GaiaOptPhotom {
 
    #  Value of skymag when last known.
    protected variable skymag_ 50
+
+   #  Whether to allow propagation. Stop when setting values (in
+   #  GaiaPhotomLists) that may trigger a recall.
+   protected variable propagate_ 1
 
    #  Common variables: (shared by all instances)
    #  -----------------

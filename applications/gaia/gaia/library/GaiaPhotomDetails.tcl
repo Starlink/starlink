@@ -537,7 +537,7 @@ itcl::class gaia::GaiaPhotomDetails {
       #  Stop changes from leaving this object. Otherwise changes to
       #  these values could be propagated back to whoever caused this
       #  update, ending in a positive feedback loop!
-      set propagate_ 0
+      #set propagate_ 0
       if { $phottype_ == "aperture" } {
          update_ap_ $object
       } else {
@@ -548,7 +548,7 @@ itcl::class gaia::GaiaPhotomDetails {
          }
       }
       ::update idletasks ;#  Needed to propagate changes now!
-      set propagate_ 1
+      #set propagate_ 1
    }
 
    #  Update values of aperture photometry object.

@@ -143,13 +143,13 @@
 #
 #        -psf (1|0) {0}
 #
-#     If phottype is optimal then this decides if the list of objects#
+#     If phottype is optimal then this decides if the list of objects
 #     are PSF reference ones, or not.
 #
 #        -notify_changed_cmd
 #
-#     Command to execute when the semimajor axis is changed (use this
-#     to track PSF to optimal object size).
+#     Command to execute when the current object properties are
+#     changed. Use this to track coupled changes into other lists.
 
 #  Methods:
 #     public:
@@ -447,18 +447,18 @@ itcl::class gaia::GaiaPhotomList {
             }
             set id [$objects_($selected_) canvas_id]
             set objects_ids_($id) $selected_
-            
+
             #  Notify command when this object is changed.
             $objects_($selected_) configure -notify_change_cmd \
                [code $this changed_ $selected_]
-            
+
             #  Notify command when this object is deleted.
             $objects_($selected_) configure -notify_delete_cmd \
                [code $this deleted_ $selected_]
             set modified 1
 
          } elseif { $update } {
-            
+
             #  Object exists and update is allowed so modify the
             #  current values.
             if { [llength $args] != 1 } {
@@ -768,30 +768,74 @@ itcl::class gaia::GaiaPhotomList {
       }
    }
 
-   #  Deal with notification that an object has been changed.
+   #  Deal with notification that an object has been changed
+   #  interactively.
    private method changed_ {index} {
+      puts "($this) object changed_ ($index)"
       set selected_ $index
       update_details_
       update_scrollbox_
 
-      # These values now become the default (for creation of
-      # new objects without resize).
+      #  These values now become the default (for creation of
+      #  new objects without resize). We also need to reset all objects
+      #  they are coupled to the same properties.
       if { [info exists objects_($index)] } {
          if { $phottype == "aperture" } {
             lassign [$objects_($index) object_details] \
                index x y mag magerr sky signal code semimajor \
                eccentricity angle positions innerscale outerscale
+	    if { $coupled } {
+	       for {set i $lowest_index_} {$i <= $highest_index_} {incr i} {
+		  if { [info exists objects_($i)] && $i != $index} {
+		     $objects_($i) configure \
+			-major $semimajor \
+			-ecc $eccentricity \
+			-angle $angle \
+			-innerscale $innerscale \
+			-outerscale $outerscale
+		  }
+	       }
+	    }
          } else {
             if { $psf } {
                lassign [$objects_($index) object_details] \
                   index x y fwhm1 fwhm2 angle code semimajor seeing \
                   positions innerscale outerscale
+	       if { $coupled } {
+		  for {set i $lowest_index_} {$i <= $highest_index_} {incr i} {
+		     if { [info exists objects_($i)] && $i != $index} {
+			$objects_($i) configure \
+			   -fwhm1 $fwhm1 \
+			   -fwhm2 $fwhm2 \
+			   -angle $angle \
+			   -major $semimajor \
+			   -seeing $seeing \
+			   -innerscale $innerscale \
+			   -outerscale $outerscale
+		     }
+		  }
+	       }
             } else {
                lassign [$objects_($index) object_details] \
                   index x y mag magerr sky signal code \
-                  positions innerscale outerscale
+                  positions innerscale outerscale semimajor
+	       if { $coupled } {
+		  for {set i $lowest_index_} {$i <= $highest_index_} {incr i} {
+		     if { [info exists objects_($i)] && $i != $index} {
+			$objects_($i) configure \
+			   -major $semimajor \
+			   -innerscale $innerscale \
+			   -outerscale $outerscale
+		     }
+		  }
+	       }
             }
          }
+      }
+
+      #  Send the changed notification, if needed.
+      if { $notify_changed_cmd != {} } {
+         eval $notify_changed_cmd
       }
       set modified 1
    }
@@ -799,7 +843,7 @@ itcl::class gaia::GaiaPhotomList {
    #  Configuration options: (public variables)
    #  ----------------------
 
-   #  Type pf photometry objects we're dealing with.
+   #  Type of photometry objects we're dealing with.
    public variable phottype aperture {
       if { $phottype != "aperture" && $psf } {
          set lowest_index_ 0
@@ -868,17 +912,14 @@ itcl::class gaia::GaiaPhotomList {
       config_selected shape $shape
    }
 
-   #  Default semimajor axis (radius) of apertures. Change the value
-   #  of the current object if available. This is special for PSF
-   #  objects as there can only be one, which is permanently "selected".
+   #  Default semimajor axis (radius) of apertures. Send notify
+   #  command to track changes. Should also do this for other options,
+   #  but don't as not used yet.
    public variable semimajor 5.0 {
+      puts "($this) configure semimajor to $semimajor"
       config_selected major $semimajor
-      if { $phottype != "aperture" } {
-         if { $psf } {
-            config_all major $semimajor
-         }
-      }
       if { $notify_changed_cmd != {} } {
+	 puts "($this) send notify changed command"
          eval $notify_changed_cmd
       }
    }
@@ -886,21 +927,11 @@ itcl::class gaia::GaiaPhotomList {
    #  Default inner scale of apertures.
    public variable innerscale 1.5 {
       config_selected innerscale $innerscale
-      if { $phottype != "aperture" } {
-         if { $psf } {
-            config_all innerscale $innerscale
-         }
-      }
    }
 
    #  Default outer scale of apertures.
    public variable outerscale 2.0 {
       config_selected outerscale $outerscale
-      if { $phottype != "aperture" } {
-         if { $psf } {
-            config_all outerscale $outerscale
-         }
-      }
    }
 
    #  Default boolean for annular or region sky methods.
@@ -913,21 +944,11 @@ itcl::class gaia::GaiaPhotomList {
    }
    public variable positions annulus {
       config_selected positions $positions
-      if { $phottype != "aperture" } {
-         if { $psf } {
-            config_all positions $positions
-         }
-      }
    }
 
    #  Default line width of graphical objects.
    public variable linewidth 1 {
       config_selected linewidth $linewidth
-      if { $phottype != "aperture" } {
-         if { $psf } {
-            config_all linewidth $linewidth
-         }
-      }
    }
 
    #  Default eccentricity of apertures.
@@ -953,10 +974,11 @@ itcl::class gaia::GaiaPhotomList {
       config_all fwhm2 $fwhm2
    }
 
-   #  Whether objects in list can be interactively resized or not.
-   public variable allow_resize {1} {
-      $canvasdraw configure -show_selection_grips $allow_resize
-   }
+   #  Whether objects may be created using resizing.
+   public variable allow_resize {1} {}
+
+   #  Whether aperture/objects properties are coupled.
+   public variable coupled {0} {}
 
    #  Command to execute when a new object is created.
    public variable notify_created_cmd {} {}
