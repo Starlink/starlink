@@ -213,7 +213,21 @@
 *    Define dimensions
         CALL BDI1_CFIND0( NDIM, DIMS, CNDIM, CDIMS )
 
-*    Access variance
+*    Access quality
+        CALL ADI2_CFIND( FITID, 'QUALITY', '@', ' ', CREATE,
+     :                   DELETE, 'WORD', NDIM, DIMS, DIDCRE, CACHEID,
+     :                   STATUS )
+
+*    Add extra info if we created the array
+        IF ( DIDCRE ) CREOBJ = 'QUALITY'
+
+*  Top-level logical quality
+      ELSE IF ( ITEM .EQ. 'LogicalQuality' ) THEN
+
+*    Define dimensions
+        CALL BDI1_CFIND0( NDIM, DIMS, CNDIM, CDIMS )
+
+*    Access quality
         CALL ADI2_CFIND( FITID, 'QUALITY', '@', ' ', CREATE,
      :                   DELETE, 'WORD', NDIM, DIMS, DIDCRE, CACHEID,
      :                   STATUS )
@@ -406,6 +420,7 @@
           IF ( DIDCRE ) THEN
             CREOBJ = 'AUNIT'
             CRECOM = 'Axis '//CAX//' units'
+            CALL ADI_CPUT0C( CACHEID, 'Value', ' ', STATUS )
           END IF
 
 *    Axis label
@@ -420,6 +435,7 @@
           IF ( DIDCRE ) THEN
             CREOBJ = 'ALABEL'
             CRECOM = 'Axis '//CAX//' label'
+            CALL ADI_CPUT0C( CACHEID, 'Value', ' ', STATUS )
           END IF
 
 * added for BDI_AXCHK in GDRAW (start rb)
@@ -443,7 +459,7 @@
 
 *      Add extra info if we created the keyword
           IF ( DIDCRE ) THEN
-            CREOBJ = 'CDELT'
+            CREOBJ = 'DATA'
             IF ( CAX .EQ. '1' ) THEN
               CRECOM = 'X degrees per pixel'
             ELSE IF (CAX .EQ. '2') THEN
@@ -467,6 +483,13 @@
      :                     DELETE, RTYPE, 0, 0, DIDCRE, CACHEID,
      :                     STATUS )
 
+*      Add extra info if we created the keyword
+          IF ( DIDCRE ) THEN
+            CALL ADI_CPUT0I( CACHEID, 'Value', 1, STATUS )
+            CALL ADI_CPUT0C( CACHEID, 'Comment',
+     :                       'Axis '//CAX//' spacing', STATUS )
+          END IF
+
 *    Axis normalisation flag (end rb)
         ELSE IF ( ITEM(8:) .EQ. 'Normalised' ) THEN
 
@@ -479,6 +502,7 @@
           IF ( DIDCRE ) THEN
             CREOBJ = 'ANORM'
             CRECOM = 'Axis '//CAX//' normalised?'
+            CALL ADI_CPUT0L( CACHEID, 'Value', .FALSE., STATUS )
           END IF
 
         ELSE
@@ -505,7 +529,7 @@
           CALL ADI2_FPKYC( FITID, 'VARIANCE', 'EXTNAME', 'VARIANCE',
      :                     'Contains ASTERIX pixel variances', STATUS )
 
-*    QUALITY extension (why doesn't EXTNAME work? RB)
+*    QUALITY extension
         ELSE IF ( CREOBJ .EQ. 'QUALITY' ) THEN
           CALL ADI2_FPKYC( FITID, 'QUALITY', 'EXTNAME', 'QUALITY',
      :                     'Contains ASTERIX pixel quality', STATUS )
