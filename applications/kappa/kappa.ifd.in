@@ -1004,6 +1004,22 @@ package kappa {
 
          helplib {$KAPPA_HELP}
 
+         parameter flbnd {
+            size *
+            type _DOUBLE
+            access WRITE
+            vpath INTERNAL
+            helpkey *
+          }
+
+         parameter fubnd {
+            size *
+            type _DOUBLE
+            access WRITE
+            vpath INTERNAL
+            helpkey *
+          }
+
          parameter aend {
             size *
             type _DOUBLE

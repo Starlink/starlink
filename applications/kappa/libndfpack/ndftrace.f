@@ -36,7 +36,8 @@
 *     indication of whether `bad' pixels may be present);
 *     -  attributes of the current co-ordinate Frame in the WCS component 
 *     (title, domain, and ,optionally, axis labels and axis units, plus the 
-*     system epoch and projection for sky co-ordinate Frames).
+*     system epoch and projection for sky co-ordinate Frames). In addition 
+*     the bounding box of the NDF within the Frame is displayed.
 *     -  optionally, attributes of all other co-ordinate Frames in the WCS
 *     component.
 *     -  a list of any NDF extensions present, together with their data
@@ -108,6 +109,16 @@
 *        of the NDF. The elements in this parameter correspond to 
 *        those in the FDIM and FTITLE parameters. The number of elements 
 *        in each of these parameters is given by NFRAME.
+*     FLBND( ) = _DOUBLE (Write)
+*        The lower bounds of the bounding box enclosing the NDF in the
+*        current WCS Frame. The number of elements in this parameter is
+*        equal to the number of axes in the current WCS Frame (see FDIM).
+*        Celestial axis values will be in units of radians.
+*     FUBND( ) = _DOUBLE (Write)
+*        The upper bounds of the bounding box enclosing the NDF in the
+*        current WCS Frame. The number of elements in this parameter is
+*        equal to the number of axes in the current WCS Frame (see FDIM).
+*        Celestial axis values will be in units of radians.
 *     FORM = LITERAL (Write)
 *        The storage form of the NDF's data array.
 *     FTITLE( ) = LITERAL (Write)
@@ -125,7 +136,8 @@
 *        If a FALSE value is given for this parameter then only the
 *        Title and Domain attributes plus the axis labels and units are 
 *        displayed for a co-ordinate Frame. Otherwise, a more complete 
-*        description is given.   [FALSE]
+*        description is given, including the bounds of the NDF within the
+*        Frame. [FALSE]
 *     FULLWCS = _LOGICAL (Read)
 *        If a TRUE value is given for this parameter then all co-ordinate 
 *        Frames in the WCS component of the NDF are displayed. Otherwise, 
@@ -236,6 +248,8 @@
 *     16-MAR-2005 (DSB):
 *        Only write AXIS-related output parameters if the NDF has an AXIS
 *        structure.
+*     17-MAR-2005 (DSB):
+*        Added FLBND and FUBND.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -288,9 +302,15 @@
       CHARACTER * ( NDF__SZTYP ) CTYPE( NDF__MXDIM ) ! Type for axis centres 
       CHARACTER * ( NDF__SZTYP ) XTYPE( MXEXTN ) ! Extension name
       CHARACTER * ( NDF__SZXNM ) XNAME( MXEXTN ) ! Extension name
-      DOUBLE PRECISION AEND( NDF__MXDIM ) ! End of NDF extent along an axis
-      DOUBLE PRECISION ASTART( NDF__MXDIM ) ! Start of NDF extent along an axis
+      DOUBLE PRECISION AEND( NDF__MXDIM )  ! End of NDF extent along an axis
+      DOUBLE PRECISION ASTART( NDF__MXDIM )! Start of NDF extent along an axis
       DOUBLE PRECISION GFIRST( 1, NDF__MXDIM ) ! GRID coords of first pixel
+      DOUBLE PRECISION LBIN( NDF__MXDIM )  ! Lower GRID bounds
+      DOUBLE PRECISION LBOUT( NDF__MXDIM ) ! Lower WCS bounds
+      DOUBLE PRECISION UBIN( NDF__MXDIM )  ! Upper GRID bounds
+      DOUBLE PRECISION UBOUT( NDF__MXDIM ) ! Upper WCS bounds
+      DOUBLE PRECISION XL( NDF__MXDIM )    ! GRID position at lower limit
+      DOUBLE PRECISION XU( NDF__MXDIM )    ! GRID position at upper limit
       INTEGER AXPNTR( 1 )        ! Pointer to axis centres
       INTEGER BBI                ! Bad-bits value as an integer
       INTEGER DIGVAL             ! Binary digit value
@@ -306,6 +326,7 @@
       INTEGER INDF               ! NDF identifier
       INTEGER IWCS               ! AST identifier for NDF's WCS FrameSet
       INTEGER LBND( NDF__MXDIM ) ! Lower pixel-index bounds
+      INTEGER MAP                ! AST Mapping from GRID to current WCS Frame
       INTEGER N                  ! Loop counter for extensions
       INTEGER NC                 ! Character count
       INTEGER NDIM               ! Number of dimensions
@@ -928,9 +949,12 @@
 
 *  Store the GRID coordinates of the centre of the first pixel. This is
 *  defined to be (1.0,1.0,...). This position will be mapped into each of the
-*  other Frame, to find the coordinates of the first pixel.
+*  other Frame, to find the coordinates of the first pixel. Also store
+*  the lower and upper bounds of the NDF in GRID coords.
          DO 301 IAXIS = 1, NDIM
-            GFIRST( 1, IAXIS ) = 1.0
+            GFIRST( 1, IAXIS ) = 1.0D0
+            LBIN( IAXIS ) = 0.5D0
+            UBIN( IAXIS ) = DBLE( DIM( IAXIS ) ) + 0.5D0
  301     CONTINUE
 
 *  Loop round each coordinate system.
@@ -956,6 +980,26 @@
                WCSNAX( NFRM ) = FRMNAX
             END IF
 
+*  If this is the current Frame, or if we are reporting full information
+*  on all Frames, Get the bounds of the NDF in this Frame.
+            IF( IFRAME .EQ. ICURR .OR. ( REPORT .AND. FULLFR ) ) THEN
+               MAP = AST_GETMAPPING( IWCS, AST__BASE, AST__CURRENT, 
+     :                              STATUS )
+               DO IAXIS = 1, FRMNAX
+                  CALL AST_MAPBOX( MAP, LBIN, UBIN, .TRUE., IAXIS,
+     :                             LBOUT( IAXIS ), UBOUT( IAXIS ), XL, 
+     :                             XU, STATUS )
+               END DO
+               CALL AST_ANNUL( MAP, STATUS )
+
+*  If this is the current Frame, write the bounds to the output
+*  parameters.
+               IF( IFRAME .EQ. ICURR ) THEN 
+                  CALL PAR_PUT1D( 'FLBND', FRMNAX, LBOUT, STATUS )
+                  CALL PAR_PUT1D( 'FUBND', FRMNAX, UBOUT, STATUS )
+               END IF
+            END IF
+
 *  The rest we only do if we are reporting information on the screen. Only
 *  display the Current Frame if parameter FULLWCS is FALSE.
             IF ( REPORT .AND. ( FULLWC .OR. IFRAME .EQ. ICURR ) ) THEN
@@ -976,6 +1020,27 @@
 
                END IF
 
+*  Display the bounds of the NDF in this Frame if full frame information
+*  is being displayed.
+               IF( FULLFR ) THEN
+                  CALL MSG_OUT( 'WCS_WBND1', 
+     :                          '        NDF Bounding Box:', STATUS )
+                  CALL MSG_BLANK( STATUS )
+
+                  DO IAXIS = 1, FRMNAX
+                     CALL MSG_SETI( 'I', IAXIS )
+                     CALL MSG_SETC( 'L', AST_FORMAT( IWCS, IAXIS, 
+     :                                        LBOUT( IAXIS ), STATUS ) )
+                     CALL MSG_SETC( 'U', AST_FORMAT( IWCS, IAXIS, 
+     :                                        UBOUT( IAXIS ), STATUS ) )
+                     CALL MSG_OUT( 'WCS_WBND2', 
+     :                             '           Axis ^I: ^L -> ^U', 
+     :                             STATUS )
+                  END DO
+
+                  CALL MSG_BLANK( STATUS )
+
+               END IF
             END IF
 
  304     CONTINUE 

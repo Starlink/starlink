@@ -12,12 +12,12 @@
 % ? Document identification
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun95.30}
-\newcommand{\stardocnumber}    {95.30}
+\newcommand{\stardocsource}    {sun95.31}
+\newcommand{\stardocnumber}    {95.31}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {12th November 2004}
+\newcommand{\stardocdate}      {17th March 2005}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
-\newcommand{\stardocversion}   {1.4-1}
+\newcommand{\stardocversion}   {1.4-2}
 \newcommand{\stardocmanual}    {User's Guide}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -31576,7 +31576,9 @@ KAPPA: \htmlref{SETBOUND}{SETBOUND};
          \sstitem
          attributes of the current \htmlref{co-ordinate Frame}{se:domains}~ in the \htmlref{WCS}{apndf:wcs} component
          (title, domain, and ,optionally, axis labels and axis units, plus the
-         system epoch and projection for sky co-ordinate Frames).
+         system epoch and projection for sky co-ordinate Frames). In addition 
+         the bounding box of the NDF within the Frame is displayed.
+
 
          \sstitem
          optionally, attributes of all other co-ordinate Frames in the WCS
@@ -31748,6 +31750,14 @@ KAPPA: \htmlref{SETBOUND}{SETBOUND};
          in each of these parameters is given by NFRAME.
       }
       \sstsubsection{
+         FLBND( ) = \_DOUBLE (Write)
+      }{
+         The lower bounds of the bounding box enclosing the NDF in the
+         current WCS Frame. The number of elements in this parameter is
+         equal to the number of axes in the current WCS Frame (see FDIM).
+         Celestial axis values will be in units of radians.
+      }
+      \sstsubsection{
          FORM = LITERAL (Write)
       }{
          The storage form of the NDF's data array.
@@ -31759,6 +31769,14 @@ KAPPA: \htmlref{SETBOUND}{SETBOUND};
          the NDF.  The elements in this parameter correspond to those in the
          FDOMAIN and FDIM parameters.  The number of elements in each
          of these parameters is given by NFRAME.
+      }
+     \sstsubsection{
+         FUBND( ) = \_DOUBLE (Write)
+      }{
+         The upper bounds of the bounding box enclosing the NDF in the
+         current WCS Frame. The number of elements in this parameter is
+         equal to the number of axes in the current WCS Frame (see FDIM).
+         Celestial axis values will be in units of radians.
       }
       \sstsubsection{
          HISTORY = \_LOGICAL (Write)
@@ -48402,7 +48420,7 @@ current WCS co-ordinate system rather than AXIS co-ordinates.
 
 \end{itemize}
 
-\section{\xlabel{se_changes}Release Notes---V1.4-1\label{se:changes}}
+\section{Release Notes---V1.4-1}
 
 \begin{itemize}
 
@@ -48413,6 +48431,17 @@ applying a mask to each block of output pixels.
 aligning the input NDFs in-situ if possible (that is, if the alignment
 Mapping is a simple shift of origin). The new parameters are INSITU and
 ABORT.
+
+\end{itemize}
+
+\section{\xlabel{se_changes}Release Notes---V1.4-2\label{se:changes}}
+
+\begin{itemize}
+
+\item The \htmlref{NDFTRACE}{NDFTRACE} application now displays the
+bounds of the NDF within each WCS Frame if FULLFRAME is set to YES.
+Also, the bounds of the NDF within the current WCS Frame are written to
+the new output parameters DLBND and FUBND.
 
 \end{itemize}
 
