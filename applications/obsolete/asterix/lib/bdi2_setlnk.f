@@ -99,7 +99,7 @@
 
 *  External References:
       EXTERNAL			CHR_SIMLR
-        LOGICAL			CHR_SIMLR
+        LOGICAL			  CHR_SIMLR
 
 *  Local Variables:
       CHARACTER*4		BCS			! String of BCOL
@@ -281,11 +281,12 @@
 *    HDU has CONTENT keyword?
         CALL ADI2_HGKYC( PHDU, 'CONTENT', CONTNT, CMNT, STATUS )
         IF ( STATUS .EQ. SAI__OK ) THEN
-          IF ( CHR_SIMLR( 'SPECTRUM', CONTNT ) ) THEN
+          CALL CHR_UCASE( CONTNT )
+          IF ( INDEX( CONTNT, 'SPECTRUM' ) .GT. 0 ) THEN
             ISSPEC = .TRUE.
-          ELSE IF ( CHR_SIMLR( 'IMAGE', CONTNT ) ) THEN
+          ELSE IF ( INDEX( CONTNT, 'IMAGE' ) .GT. 0 ) THEN
             ISIMAG = .TRUE.
-          ELSE IF ( CHR_SIMLR( 'SERIES', CONTNT ) ) THEN
+          ELSE IF ( INDEX( CONTNT, 'SERIES' ) .GT. 0 ) THEN
             ISTIME = .TRUE.
           END IF
         ELSE
@@ -514,7 +515,7 @@
 
 *  External References:
       EXTERNAL			CHR_SIMLR
-        LOGICAL			CHR_SIMLR
+        LOGICAL			  CHR_SIMLR
 
 *  Local Variables:
       CHARACTER*10		SUBITM			! The sub file item
