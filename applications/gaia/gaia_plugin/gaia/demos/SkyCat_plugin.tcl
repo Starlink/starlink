@@ -1,6 +1,6 @@
 #-*-tcl-*-
 # E.S.O. - VLT project/ESO Archive
-# $Id: SkyCat_plugin.tcl,v 1.14 1999/02/04 12:03:57 abrighto Exp $
+# $Id: SkyCat_plugin.tcl,v 1.15 1999/03/15 22:45:07 abrighto Exp $
 #
 # Skycat_plugin.tcl - plugin script to add GAIA features to Skycat
 #
@@ -31,11 +31,13 @@ puts "Loading the Gaia plugin..."
 set dir [file dirname [info script]]
 
 # on HP, we need to add this dir to the SHLIB_PATH so that libskycat.sl
-# will be found.
-if {[info exists env(SHLIB_PATH)]} {
-    set env(SHLIB_PATH) "$env(SHLIB_PATH):$dir"
-} else {
-    set env(SHLIB_PATH) $dir
+# will be found. On linux it is LD_LIBRARY_PATH.
+foreach v {SHLIB_PATH LD_LIBRARY_PATH} {
+    if {[info exists env($v)]} {
+	set env($v) "$env($v):$dir"
+    } else {
+	set env($v) $dir
+    }
 }
 
 # load the GAIA package dynamically, if it is not compiled in

@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project/ ESO Archive 
- * "@(#) $Id: Gaia.C,v 1.7 1999/02/03 20:14:54 abrighto Exp $"
+ * "@(#) $Id: Gaia.C,v 1.8 1999/03/18 09:31:56 abrighto Exp $"
  *
  * Gaia.C - Initialize Gaia Tcl package
  * 
@@ -8,7 +8,7 @@
  * --------------  --------   ----------------------------------------
  * Allan Brighton  25 Mar 98  Created
  */
-static const char* const rcsId="@(#) $Id: Gaia.C,v 1.7 1999/02/03 20:14:54 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: Gaia.C,v 1.8 1999/03/18 09:31:56 abrighto Exp $";
 
 #include <string.h>
 #include <stdlib.h>
@@ -34,12 +34,12 @@ extern "C" {
 // generated code for bitmaps used in tcl scripts
 void defineGaiaBitmaps(Tcl_Interp*);
 
-#ifdef linux
+// #ifdef linux
 #ifdef __GNUC__
 int xargc = 1;
 char* xargv[] = {"gaia", NULL};
 #endif
-#endif
+// #endif
 
 /*
  * A call to this function is made from the tkAppInit file at startup
@@ -47,11 +47,11 @@ char* xargv[] = {"gaia", NULL};
  */
 extern "C" int Gaia_Init( Tcl_Interp *interp )
 {
-#ifdef linux
+// #ifdef linux
 #ifdef __GNUC__
     f_init();
 #endif
-#endif
+// #endif
 
     // set up Tcl package
     if (Tcl_PkgProvide(interp, "Gaia", GAIA_VERSION) != TCL_OK) {

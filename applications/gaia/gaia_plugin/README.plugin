@@ -1,47 +1,42 @@
 
-Gaia_plugin (Binary Release)
+Skycat/Gaia (Binary Release)
 ----------------------------
 
-This directory contains a binary release of the GAIA plugin, which
-adds a WCS grid and many photometry related features to Skycat.  The
-original GAIA is a standalone application, developed by Peter
-W. Draper (P.W.Draper@durham.ac.uk) that is based on Skycat, Rtd and
+This directory contains a binary release of skycat with the GAIA
+extensions. GAIA adds a WCS grid and many photometry related features
+to Skycat.  The original GAIA application was developed by Peter
+W. Draper (P.W.Draper@durham.ac.uk) and is based on Skycat, Rtd and
 Starlink.  This is a modified version of GAIA that has been merged
 with a newer version of Skycat. It can be compiled as a standalone
 application or loaded dynamically as a Tcl package in a running Skycat
 application.
 
-This package contains everything you need to use the GAIA plugin with
-skycat. Please always use the version of skycat that is released with
-the GAIA plugin to avoid any incompatibilities.
+This package contains everything you need to run skycat with the GAIA
+extensions.
 
-Installing the GAIA Plugin
---------------------------
+Installation
+------------
 
 To install this package, just unpack the contents into a directory of
 your choice, for example:
 
-    % mkdir /usr/local/lib/skycat_plugins
-    % cd /usr/local/lib/skycat_plugins
-    % gunzip < gaia_plugin-Linux-2.0.35.tar.gz | tar xvf -
+    % gunzip < skycatgaia-Linux-2.0.36.tar.gz | tar xvf -
 
 
-Running Skycat with the GAIA Plugin
------------------------------------
+This creates a directory with the same base name as the tar file
+containing the "skycatgaia" binary and a large number of STARLINK
+and PBM binaries, which are used for image format conversion.
 
+Running
+-------
 
-The easiest way to run Skycat with the GAIA plugin is to start skycat
-with the script "skycatgaia" in this package:
+To run the application, either cd to the installation dir or put it in
+your shell path and type:
 
     % skycatgaia
 
-This script just sets the SKYCAT_PLUGIN environment variable to  
-include the GAIA plugin dir and starts skycat.
-
-Note that if you have other Skycat plugins that you want to
-use with the GAIA plugin, you should set the GAIA_PLUGIN
-environment variable to include them.
-See the Skycat documentation for information about plugins:
+GAIA can also be loaded dynamically as a skycat plugin. See the
+Skycat documentation for information about plugins:
 
   http://arcdev.hq.eso.org/~archeso/skycat/skycat-man.html
 

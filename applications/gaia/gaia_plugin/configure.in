@@ -1,5 +1,5 @@
 # E.S.O. - VLT project 
-# $Id: configure.in,v 1.11 1999/02/04 12:03:51 abrighto Exp $
+# $Id: configure.in,v 1.13 1999/03/18 14:26:18 abrighto Exp $
 #
 # This file is used with GNU autoconf to generate a configure script for
 # the Gaia modules.
@@ -21,7 +21,7 @@ AC_INIT(gaia/tkAppInit.C)
 # (That is the place to set the Gaia version number for a new release)
 #
 # -----------------------------------------------------------------------
-GAIA_VERSION=`cat VERSION | sed -e 's/gaia_plugin-//'`
+GAIA_VERSION=`cat VERSION | sed -e 's/skycatgaia-//'`
 AC_SUBST(GAIA_VERSION)
 
 # -----------------------------------------------------------------------
@@ -171,9 +171,9 @@ fi
 # -----------------------------------------------------------------------
 # Check for the Tclpro package from Scriptics
 # -----------------------------------------------------------------------
-AC_MSG_CHECKING([TclPro ])
-file=`which prowrap`
-if test -f "$file" ; then
+file=""
+AC_PATH_PROG(file,  prowrap)
+if test "$file" != "" ; then
 	f=`dirname $file`
 	TCLPRO_MACH_DIR=`dirname $f`
 	TCLPRO_DIR=`dirname $TCLPRO_MACH_DIR`
@@ -341,7 +341,6 @@ AC_SUBST(SHLIB_LD_LIBS)
 AC_SUBST(DL_LIBS)
 AC_SUBST(LD_FLAGS)
 AC_SUBST(LD_SEARCH_FLAGS)
-
 
 # -----------------------------------------------------------------------
 # Check the location of X libraries and includes.

@@ -764,13 +764,13 @@ itcl::class gaia::Gaia {
 	global ::tcl_version ::env ::argv ::argc ::gaia_library
 
 	# we need this for the local atclsh binary for running external tcl commands
-	if {[file isdirectory $dir/tcl$tcl_version]} {
-	    set env(TCL_LIBRARY) $dir/tcl$tcl_version
-	}
+	#if {[file isdirectory $dir/tcl$tcl_version]} {
+	#    set env(TCL_LIBRARY) $dir/tcl$tcl_version
+	#}
 
-	if {! [file isdirectory $gaia_library]} {
-	    set $gaia_library $dir
-	}
+	#if {! [file isdirectory $gaia_library]} {
+	#    set $gaia_library $dir
+	#}
 	
 	# Check if using local Starlink binaries
 	if {[file exists $dir/autophotom]} {
@@ -845,7 +845,8 @@ itcl::class gaia::Gaia {
 	if {! [info exists env(ADAM_USER)]} {
 	    set env(ADAM_USER) $env(HOME)/adam/gaia
 	}
-	if {[file isdirectory $env(ADAM_USER)]} {
+	# be careful here!
+	if {[file isdirectory $env(ADAM_USER)] && "$env(ADAM_USER)" == "$env(HOME)/adam/gaia"} {
 	    exec rm -rf $env(ADAM_USER)
 	}
     }

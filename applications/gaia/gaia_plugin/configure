@@ -533,7 +533,7 @@ fi
 # (That is the place to set the Gaia version number for a new release)
 #
 # -----------------------------------------------------------------------
-GAIA_VERSION=`cat VERSION | sed -e 's/gaia_plugin-//'`
+GAIA_VERSION=`cat VERSION | sed -e 's/skycatgaia-//'`
 
 
 # -----------------------------------------------------------------------
@@ -990,10 +990,39 @@ fi
 # -----------------------------------------------------------------------
 # Check for the Tclpro package from Scriptics
 # -----------------------------------------------------------------------
-echo $ac_n "checking TclPro ""... $ac_c" 1>&6
-echo "configure:995: checking TclPro " >&5
-file=`which prowrap`
-if test -f "$file" ; then
+file=""
+# Extract the first word of "prowrap", so it can be a program name with args.
+set dummy prowrap; ac_word=$2
+echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
+echo "configure:998: checking for $ac_word" >&5
+if eval "test \"`echo '$''{'ac_cv_path_file'+set}'`\" = set"; then
+  echo $ac_n "(cached) $ac_c" 1>&6
+else
+  case "$file" in
+  /*)
+  ac_cv_path_file="$file" # Let the user override the test with a path.
+  ;;
+  *)
+  IFS="${IFS= 	}"; ac_save_ifs="$IFS"; IFS="${IFS}:"
+  for ac_dir in $PATH; do
+    test -z "$ac_dir" && ac_dir=.
+    if test -f $ac_dir/$ac_word; then
+      ac_cv_path_file="$ac_dir/$ac_word"
+      break
+    fi
+  done
+  IFS="$ac_save_ifs"
+  ;;
+esac
+fi
+file="$ac_cv_path_file"
+if test -n "$file"; then
+  echo "$ac_t""$file" 1>&6
+else
+  echo "$ac_t""no" 1>&6
+fi
+
+if test "$file" != "" ; then
 	f=`dirname $file`
 	TCLPRO_MACH_DIR=`dirname $f`
 	TCLPRO_DIR=`dirname $TCLPRO_MACH_DIR`
@@ -1027,7 +1056,7 @@ CXX_INCLUDE=$TCLUTIL_CXX_INCLUDE
 # -----------------------------------------------------------------------
 
 echo $ac_n "checking static C++ library ""... $ac_c" 1>&6
-echo "configure:1031: checking static C++ library " >&5
+echo "configure:1060: checking static C++ library " >&5
 tmpfile=/tmp/tmp$$.C
 tmp1=/tmp/tmp1$$
 tmp2=/tmp/tmp2$$
@@ -1163,7 +1192,6 @@ LD_FLAGS=$TCLUTIL_LD_FLAGS
 # libtcl.so.  Used when linking applications.  Only works if there
 # is a variable "LIB_RUNTIME_DIR" defined in the Makefile.
 LD_SEARCH_FLAGS=$TCLUTIL_LD_SEARCH_FLAGS
-
 
 
 
@@ -1368,7 +1396,7 @@ fi
 #       Check for local installation point of Starlink s/w.
 #--------------------------------------------------------------------
 echo $ac_n "checking Starlink installation""... $ac_c" 1>&6
-echo "configure:1372: checking Starlink installation" >&5
+echo "configure:1400: checking Starlink installation" >&5
 STARLINK=${STARLINK=/star}
 if test ! -x "${STARLINK}"; then
     echo "What directory is the root of the Starlink development system?"
@@ -1386,7 +1414,7 @@ do
 # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:1390: checking for $ac_word" >&5
+echo "configure:1418: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_FC'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -1421,7 +1449,7 @@ do
 # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:1425: checking for $ac_word" >&5
+echo "configure:1453: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_FC'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -1455,7 +1483,7 @@ fi
 
 #  Compilation flags, for g77 we also need -fno-second-underscore.
 echo $ac_n "checking Fortran flags""... $ac_c" 1>&6
-echo "configure:1459: checking Fortran flags" >&5
+echo "configure:1487: checking Fortran flags" >&5
 if test "${FC}" = "g77"; then
    FFLAGS="$FDEBUGFLAGS -fno-second-underscore"
 fi
@@ -1464,7 +1492,7 @@ echo "$ac_t""$FFLAGS" 1>&6
 
 #  How to link files.
 echo $ac_n "checking whether ln -s works""... $ac_c" 1>&6
-echo "configure:1468: checking whether ln -s works" >&5
+echo "configure:1496: checking whether ln -s works" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_LN_S'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -1491,7 +1519,7 @@ LINK=${LN_S}
 # Extract the first word of "alink", so it can be a program name with args.
 set dummy alink; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:1495: checking for $ac_word" >&5
+echo "configure:1523: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_ALINK'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -1524,7 +1552,7 @@ fi
 #--------------------------------------------------------------------
 #  Create a dummy program.
 echo $ac_n "checking mixed language libraries""... $ac_c" 1>&6
-echo "configure:1528: checking mixed language libraries" >&5
+echo "configure:1556: checking mixed language libraries" >&5
 
 echo >  /tmp/tmp$$.f "      program tmp"
 echo >> /tmp/tmp$$.f "      end"
@@ -1560,7 +1588,7 @@ echo "$ac_t""$F77_LIBS" 1>&6
 #   clashes with main in tkAppinit.C.
 if test "$FC" = "g77"; then
    echo $ac_n "checking main in -lf2c""... $ac_c" 1>&6
-echo "configure:1564: checking main in -lf2c" >&5
+echo "configure:1592: checking main in -lf2c" >&5
 
 #  Create and compile a dummy program. The compilation uses
 #  -v to get all the information we should require.
@@ -1605,7 +1633,7 @@ fi
 
 if test "${FC}" = "g77"; then
    echo $ac_n "checking for main in -lf2c""... $ac_c" 1>&6
-echo "configure:1609: checking for main in -lf2c" >&5
+echo "configure:1637: checking for main in -lf2c" >&5
 ac_lib_var=`echo f2c'_'main | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -1613,14 +1641,14 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-lf2c  $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 1617 "configure"
+#line 1645 "configure"
 #include "confdefs.h"
 
 int main() {
 main()
 ; return 0; }
 EOF
-if { (eval echo configure:1624: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest; then
+if { (eval echo configure:1652: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else
@@ -1643,7 +1671,7 @@ fi
 
    if test "`uname`" = "Linux"; then
       echo $ac_n "checking for main in -lgcc""... $ac_c" 1>&6
-echo "configure:1647: checking for main in -lgcc" >&5
+echo "configure:1675: checking for main in -lgcc" >&5
 ac_lib_var=`echo gcc'_'main | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -1651,14 +1679,14 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-lgcc  $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 1655 "configure"
+#line 1683 "configure"
 #include "confdefs.h"
 
 int main() {
 main()
 ; return 0; }
 EOF
-if { (eval echo configure:1662: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest; then
+if { (eval echo configure:1690: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else
@@ -1988,6 +2016,7 @@ s%@ITCL_VERSION@%$ITCL_VERSION%g
 s%@ITK_VERSION@%$ITK_VERSION%g
 s%@TCLX_VERSION@%$TCLX_VERSION%g
 s%@BLT_VERSION@%$BLT_VERSION%g
+s%@file@%$file%g
 s%@TCLPRO_MACH_DIR@%$TCLPRO_MACH_DIR%g
 s%@TCLPRO_DIR@%$TCLPRO_DIR%g
 s%@CXX_INCLUDE@%$CXX_INCLUDE%g

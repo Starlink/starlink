@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ESO Archive
-# $Id: Makefile.in,v 1.8 1999/01/15 22:30:39 abrighto Exp $
+# $Id: Makefile.in,v 1.10 1999/03/16 21:17:12 abrighto Exp $
 #
 # Makefile.in - Makefile
 #
@@ -72,11 +72,8 @@ GAIA_DIR	= @GAIA_DIR@
 GAIA_LIB	= lib/libgaia.a
 
 # ------------------------------------------------------------------------
-#       Libraries required to link against Fortran source code
-#       using a C++ compiler.
+# Starlink libs
 # ------------------------------------------------------------------------
-F77_LIBS = @F77_LIBS@
-# TCLADAM  = @DESTDIR@/lib/tclAdam.o
 STAR_LIB = @STARLINK@/lib
 STAR_INC = @STARLINK@/include
 COMPIFL  = @STARLINK@/bin/compifl
@@ -263,10 +260,10 @@ FINCLUDES = GRP_PAR NDF_PAR SAE_PAR
 ardstat.o: GRP_PAR NDF_PAR SAE_PAR
 autocrop.o: NDF_PAR SAE_PAR
 SAE_PAR: $(STAR_INC)/sae_par
-	  $(LINK) $? $@
+	  $(RM) $@; $(LINK) $? $@
 NDF_PAR: $(STAR_INC)/ndf_par
-	  $(LINK) $? $@
+	  $(RM) $@; $(LINK) $? $@
 GRP_PAR: $(STAR_INC)/grp_par
-	  $(LINK) $? $@
+	  $(RM) $@; $(LINK) $? $@
 
 FORCE:

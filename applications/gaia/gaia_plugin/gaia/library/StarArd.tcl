@@ -384,9 +384,20 @@ itcl::class gaia::StarArd {
       if { $ok } {
          #  Now startup the Ardstat application.
          if { $ardstat_ == {} } {
-            global env gaia_library
-            set ardstat_ [StarApp \#auto -application \
-                             $gaia_library/ardstat \
+	     global env gaia_library
+	     set path [file dirname [info nameofexecutable]]
+	     set app ""
+	     foreach dir [list $gaia_library $path] {
+		 if {[file exists $dir/ardstat]} {
+		     set app $dir/ardstat
+		 }
+	     }
+	     if {"$app" == ""} {
+		 error_dialog "Can't find the ardstat executable in $gaia_library or $path"
+		 return
+	     }
+	     set ardstat_ [StarApp \#auto -application \
+                             $app \
                              -notify [code $this measured_stats_] \
                              -show_output $itk_component(statsresults)]
          }
@@ -549,9 +560,20 @@ itcl::class gaia::StarArd {
 
       #  Now startup the autocrop application.
       if { $autocrop_ == {} } {
-         global env gaia_library
-         set autocrop_ [StarApp \#auto -application \
-                           $gaia_library/autocrop \
+	  global env gaia_library
+	  set path [file dirname [info nameofexecutable]]
+	  set app ""
+	  foreach dir [list $gaia_library $path] {
+	      if {[file exists $dir/autocrop]} {
+		  set app $dir/autocrop
+	      }
+	  }
+	  if {"$app" == ""} {
+	      error_dialog "Can't find the autocrop executable in $gaia_library or $path"
+	      return
+	  }
+	  set autocrop_ [StarApp \#auto -application \
+                           $app \
                            -notify [code $this modified_image_]]
       }
 

@@ -15,6 +15,8 @@ static char sccsid[] = "@(#) tclAppInit.c 1.14 95/06/12 13:47:02";
 
 #include "tcl.h"
 
+extern int Itcl_Init(Tcl_Interp *interp);
+extern int Tclx_Init(Tcl_Interp *interp);
 extern int Tcladam_Init(Tcl_Interp *interp);
 extern int Tclnbs_Init(Tcl_Interp *interp);
 
@@ -99,6 +101,15 @@ Tcl_AppInit(interp)
      *
      * where "Mod" is the name of the module.
      */
+
+    if (Itcl_Init(interp) == TCL_ERROR) {
+	 return TCL_ERROR;
+    }
+    Tcl_StaticPackage(interp, "Itcl", Itcl_Init, (Tcl_PackageInitProc *) NULL);
+
+    if (Tclx_Init(interp) == TCL_ERROR) {
+	return TCL_ERROR;
+    }
 
     /*
      * Call Tcl_CreateCommand for application-specific commands, if

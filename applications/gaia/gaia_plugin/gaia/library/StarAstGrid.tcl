@@ -217,7 +217,7 @@ itcl::class gaia::StarAstGrid {
 
       #  Create the tab notebook for containing each page of options.
       itk_component add TabNoteBook {
-         tabnotebook $w_.tab -angle 30 -tabpos w -width 350 -height 530
+         iwidgets::tabnotebook $w_.tab -angle 30 -tabpos w -width 350 -height 530
       }
       pack $itk_component(TabNoteBook) -fill both -expand 1
 

@@ -4,7 +4,19 @@ CHANGES to the GAIA plugin
 This file contains a list of changes to the GAIA plugin software and
 user interface. The latest changes are at the top.
 
----------------  4.02.99 released gaia_plugin-1.0.10 ------------------------
+---------------  17.03.99 released gaia_plugin-1.0.12 ------------------------
+
+* Replaced itclsh2.2 with itclsh@ITCL_VERSION@ in Makefile.in.
+
+* Added the "tclpro" subdir and implemented a binary Gaia release
+  using the Scriptics TclPro prowrap command. This replaces the GAIA
+  plugin release, which was complicated by shared library
+  requirements.  In the binary release, "skycatgaia" is a "wrapped"
+  binary containing all of the necessary extensions and scripts. The
+  binary release also contains the necessary Starlink utilities for
+  image format conversion, etc.
+
+---------------  4.02.99 released gaia_plugin-1.0.11 ------------------------
 
 * Tested with Tcl8.0.3 and made corrections in the GAIA Tcl sources
   (scope and namespace syntax changed).
