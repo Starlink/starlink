@@ -88,4 +88,12 @@ interface xrtard
     ppath 'DEFAULT'
   endparameter
 
+  parameter RAWDIR
+    TYPE    '_CHAR'
+    PROMPT  'Raw data directory'
+    PPATH   'DYNAMIC'
+    VPATH   'PROMPT'
+    HELP    'Directory containing raw data files'
+ endparameter
+
 endinterface
