@@ -1,3 +1,7 @@
+2003-12-21  Norman Gray  <norman@astro.gla.ac.uk>
+
+	* all: released 0.12 -- no changes required from 0.12b2
+
 2003-10-27  Norman Gray  <norman@astro.gla.ac.uk>
 
 	* dvi2bitmap.cc (process_special): in `outputfile' special,
