@@ -4160,6 +4160,12 @@ as varying the offset will trace out a straight line. On the celestial
 sphere, however ({\em{e.g.}}\ using a SkyFrame), it would trace out a
 great circle.
 
+The routines AST_AXDISTANCE and AST_AXOFFSET are similar to AST_DISTANCE
+and AST_OFFSET, except that the curves which they use as ``straight
+lines'' are not geodesics, but curves parallel to a specified axis. One
+reason for using these routines is to deal with the cyclic ambigity of
+longitude and latitude axes.
+
 The \htmlref{AST\_OFFSET2}{AST_OFFSET2} routine is similar to AST\_OFFSET, but instead of using the
 geodesic which passes through two positions, it uses the geodesic which
 passes at a given position angle\footnote{The angle from the positive
@@ -10213,6 +10219,124 @@ Object            - Base class for all AST Objects
          particular, it will fail if the pointer suppled is not valid,
          but this will only be reported if the error status is clear on
          entry.
+      }
+   }
+}
+\sstroutine{
+   AST\_AXDISTANCE\sstlabel{AST_AXDISTANCE}
+}{
+   Find the distance between two axis values
+}{
+   \sstdescription{
+      This routine returns a signed value representing the axis increment
+      from axis value v1 to axis value v2.
+
+      For a simple \htmlref{Frame}{Frame}, this is a trivial operation returning the
+      difference between the two axis values. But for other derived classes
+      of Frame (such as a \htmlref{SkyFrame}{SkyFrame}) this is not the case.
+   }
+   \sstinvocation{
+      RESULT = AST\_AXDISTANCE( THIS, AXIS, V1, V2, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         THIS = INTEGER (Given)
+      }{
+         Pointer to the Frame.
+      }
+      \sstsubsection{
+         V1 = DOUBLE PRECISION (Given)
+      }{
+         The first axis value.
+      }
+      \sstsubsection{
+         V2 = DOUBLE PRECISION (Given)
+      }{
+         The second axis value.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstreturnedvalue{
+      \sstsubsection{
+         AST\_AXDISTANCE = DOUBLE PRECISION
+      }{
+         The distance between the two axis values.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         This function will return a {\tt{"}}bad{\tt{"}} result value (AST\_\_BAD) if
+         any of the input vaues has this value.
+
+         \sstitem
+         A {\tt{"}}bad{\tt{"}} value will also be returned if this function is
+         invoked with STATUS set to an error value, or if it should fail for
+         any reason.
+      }
+   }
+}
+\sstroutine{
+   AST\_AXOFFSET\sstlabel{AST_AXOFFSET}
+}{
+   Add an increment onto a supplied axis value
+}{
+   \sstdescription{
+      This routine returns an axis value formed by adding a signed axis
+      increment onto a supplied axis value.
+
+      For a simple \htmlref{Frame}{Frame}, this is a trivial operation returning the
+      sum of the two supplied values. But for other derived classes
+      of Frame (such as a \htmlref{SkyFrame}{SkyFrame}) this is not the case.
+   }
+   \sstinvocation{
+      RESULT = AST\_AXOFFSET( THIS, AXIS, V1, DIST, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         THIS = INTEGER (Given)
+      }{
+         Pointer to the Frame.
+      }
+      \sstsubsection{
+         V1 = DOUBLE PRECISION (Given)
+      }{
+         The original axis value.
+      }
+      \sstsubsection{
+         DIST = DOUBLE PRECISION (Given)
+      }{
+         The axis increment to add to the original axis value.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstreturnedvalue{
+      \sstsubsection{
+         AST\_AXOFFSET = DOUBLE PRECISION
+      }{
+         The incremented axis value.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         This function will return a {\tt{"}}bad{\tt{"}} result value (AST\_\_BAD) if
+         any of the input vaues has this value.
+
+         \sstitem
+         A {\tt{"}}bad{\tt{"}} value will also be returned if this function is
+         invoked with STATUS set to an error value, or if it should fail for
+         any reason.
       }
    }
 }
@@ -23342,6 +23466,12 @@ Object            - Base class for all AST Objects
 
          \sstitem
          \htmlref{AST\_ANGLE}{AST_ANGLE}: Calculate the angle subtended by two points at a third point
+
+         \sstitem
+         \htmlref{AST\_AXDISTANCE}{AST_AXDISTANCE}: Calculate the distance between two axis values
+
+         \sstitem
+         \htmlref{AST\_AXOFFSET}{AST_AXOFFSET}: Calculate an offset along an axis
 
          \sstitem
          \htmlref{AST\_CONVERT}{AST_CONVERT}: Determine how to convert between two coordinate systems
