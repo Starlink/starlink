@@ -1,5 +1,5 @@
-      astexp - Exports AST FrameSet information from NDFs into external file.
-      astimp - Imports AST FrameSet information into NDFs.
+      astexp - Exports AST FrameSet information from images to AST file.
+      astimp - Imports AST FrameSet information into images from AST file.
       calcor - Subtracts a scaled dark or flash calibration image from a list.
     ccdalign - Interactive procedure to aid the alignment of images.
     ccdclear - Clears CCDPACK global parameters.
