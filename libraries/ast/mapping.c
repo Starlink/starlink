@@ -5974,43 +5974,86 @@ f     and PARAMS arguments are not used:
 *     easily accommodate missing data and tends to minimise unwanted
 *     oscillations at the edges of the data grid.
 *
-*     Unless otherwise noted in the following schemes (which are based
-*     on a 1-dimensional interpolation kernel), the first element of
-c     the "params" array should be used to specify how many pixels are
-f     the PARAMS array should be used to specify how many pixels are
-*     to contribute to the interpolated result on either side of the
-*     interpolation point in each dimension (the nearest integer value
-*     is used). Typically a value of 2 is appropriate (the execution
-*     time increases rapidly with this number) and the minimum value
-*     used will be 1 (i.e. one pixel on either side).
-c     In these cases, the "finterp" parameter is not used:
-f     In these cases, the FINTERP argument is not used:
+*     In the following schemes, which are based on a 1-dimensional
+c     interpolation kernel, the first element of the "params" array
+f     interpolation kernel, the first element of the PARAMS array
+*     should be used to specify how many pixels are to contribute to the
+*     interpolated result on either side of the interpolation point in
+*     each dimension (the nearest integer value is used). Execution time
+*     increases rapidly with this number. Typically, a value of 2 is
+*     appropriate and the minimum value used will be 1 (i.e. one pixel on
+c     either side). A value of zero or less may be given for "params[0]"
+f     either side). A value of zero or less may be given for PARAMS(1)
+*     to indicate that a suitable number of pixels should be calculated
+*     automatically.
 *
-*     - AST__SINC: This scheme uses the sinc(x) kernel, which
-*     sometimes features as an "optimal" interpolation kernel in books
-*     on image processing. Its supposed optimality depends on the
-*     assumption that the data are band-limited (i.e. have no spatial
-*     frequencies above a certain value) and adequately sampled. In
-*     practice, astronomical data rarely meet these requirements. In
-*     addition, high spatial frequencies are often present due to
-*     (e.g.) image defects and cosmic ray events. Consequently,
-*     substantial ringing can be experienced with this kernel. The
-*     sinc(x) function also decays slowly with distance, so that many
-*     surrounding pixels are required, leading to poor performance.
-*     Abruptly truncating the kernel (by using only a few neighbouring
-*     pixels) improves performance and may reduce ringing, but a more
-*     gradual truncation, as implemented by other kernels, is
-*     generally to be preferred. This kernel is provided mainly so
-*     that you can convince yourself not to use it!
-*     - AST__SINCSINC: This scheme uses a rather better kernel, of the
-*     form sinc(x).sinc(x/2) and uses only two neighbouring pixels on
-c     each side of the interpolation point (the "params" array is
-f     each side of the interpolation point (the PARAMS array is
-*     therefore not used).  This is sometimes known as the Lanczos
-*     kernel. It is a good general-purpose scheme, intermediate in its
+c     In each of these cases, the "finterp" parameter is not used:
+f     In each of these cases, the FINTERP argument is not used:
+*
+*     - AST__SINC: This scheme uses a sinc(pi*x) kernel, where x is the
+*     pixel offset from the interpolation point and sinc(z)=sin(z)/z. This
+*     sometimes features as an "optimal" interpolation kernel in books on
+*     image processing. Its supposed optimality depends on the assumption
+*     that the data are band-limited (i.e. have no spatial frequencies above
+*     a certain value) and are adequately sampled. In practice, astronomical
+*     data rarely meet these requirements. In addition, high spatial
+*     frequencies are often present due (e.g.) to image defects and cosmic
+*     ray events. Consequently, substantial ringing can be experienced with
+*     this kernel. The kernel also decays slowly with distance, so that
+*     many surrounding pixels are required, leading to poor performance.
+*     Abruptly truncating it, by using only a few neighbouring pixels,
+c     improves performance and may reduce ringing (if "params[0]" is set to
+f     improves performance and may reduce ringing (if PARAMS(1) is set to
+*     zero, then only two pixels will be used on either side). However, a
+*     more gradual truncation, as implemented by other kernels, is generally
+*     to be preferred. This kernel is provided mainly so that you can
+*     convince yourself not to use it!
+*     - AST__SINCSINC: This scheme uses an improved kernel, of the form
+*     sinc(pi*x).sinc(k*pi*x), with k a constant, out to the point where
+*     sinc(k*pi*x) goes to zero, and zero beyond. The second sinc() factor
+*     provides an "envelope" which gradually rolls off the normal sinc(pi*x)
+*     kernel at large offsets. The width of this envelope is specified by
+*     giving the number of pixels offset at which it goes to zero by means
+c     of the "params[1]" value, which should be at least 1.0 (in addition,
+c     setting "params[0]" to zero will select the number of contributing
+f     of the PARAMS(2) value, which should be at least 1.0 (in addition,
+f     setting PARAMS(1) to zero will select the number of contributing
+*     pixels so as to utilise the full width of the kernel, out to where it
+c     reaches zero). The case given by "params[0]=2, params[1]=2" is typically
+f     reaches zero). The case given by PARAMS(1)=2, PARAMS(2)=2 is typically
+*     a good choice and is sometimes known as the Lanczos kernel. This is a
+*     valuable general-purpose interpolation scheme, intermediate in its
 *     visual effect on images between the AST__NEAREST and AST__LINEAR
-*     cases. Although the kernel is slightly oscillatory, ringing
-*     is adequately suppressed if the data are well sampled.
+*     schemes. Although the kernel is slightly oscillatory, ringing is
+*     adequately suppressed if the data are well sampled.
+*     - AST__SINCCOS: This scheme uses a kernel of the form
+*     sinc(pi*x).cos(k*pi*x), with k a constant, out to the point where
+*     cos(k*pi*x) goes to zero, and zero beyond. As above, the cos() factor
+*     provides an envelope which gradually rolls off the sinc() kernel
+*     at large offsets. The width of this envelope is specified by giving
+*     the number of pixels offset at which it goes to zero by means
+c     of the "params[1]" value, which should be at least 1.0 (in addition,
+c     setting "params[0]" to zero will select the number of contributing
+f     of the PARAMS(2) value, which should be at least 1.0 (in addition,
+f     setting PARAMS(1) to zero will select the number of contributing
+*     pixels so as to utilise the full width of the kernel, out to where it
+*     reaches zero). This scheme gives similar results to the
+*     AST__SINCSINC scheme, which it resembles.
+*     - AST__SINCGAUSS: This scheme uses a kernel of the form
+*     sinc(pi*x).exp(-k*x*x), with k a positive constant. Here, the sinc()
+*     kernel is rolled off using a Gaussian envelope which is specified by
+c     giving its full-width at half-maximum (FWHM) by means of the "params[1]"
+c     value, which should be at least 0.1 (in addition, setting "params[0]"
+f     giving its full-width at half-maximum (FWHM) by means of the PARAMS(2)
+f     value, which should be at least 0.1 (in addition, setting PARAMS(1)
+*     to zero will select the number of contributing pixels so as to utilise
+*     the width of the kernel out to where the envelope declines to 1% of its
+*     maximum value). On astronomical images and spectra, good results are
+*     often obtained by approximately matching the FWHM of the
+c     envelope function, given by "params[1]", to the point spread function
+f     envelope function, given by PARAMS(2), to the point spread function
+*     of the input data. However, there does not seem to be any theoretical
+*     reason for this.
 *
 c     Finally, supplying the following values for "interp" allows you
 c     to implement your own sub-pixel interpolation scheme by means of
@@ -7412,18 +7455,23 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
             par = NULL;
             switch ( interp ) {
 
-/* sinc(x) interpolation. */
-/* ---------------------- */
+/* sinc(pi*x) interpolation. */
+/* ------------------------- */
 /* Assign the kernel function. */
                case AST__SINC:
                   kernel = Sinc;
 
 /* Calculate the number of neighbouring pixels to use. */
-                  neighb = MaxI( 1, (int) floor( params[ 0 ] + 0.5 ) );
+                  neighb = (int) floor( params[ 0 ] + 0.5 );
+                  if ( neighb <= 0 ) {
+                     neighb = 2;
+                  } else {
+                     neighb = MaxI( 1, neighb );
+                  }
                   break;
 
-/* sinc(x) * cos(pi*k*x) interpolation. */
-/* ------------------------------------ */
+/* sinc(pi*x) * cos(k*pi*x) interpolation. */
+/* --------------------------------------- */
 /* Assign the kernel function. */
                case AST__SINCCOS:
                   kernel = SincCos;
@@ -7444,8 +7492,8 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
                                  (int) ceil( MaxD( 1.0, params[ 1 ] ) ) );
                   break;
 
-/* sinc(x) * exp(-k*x*x) interpolation. */
-/* ------------------------------------ */
+/* sinc(pi*x) * exp(-k*x*x) interpolation. */
+/* --------------------------------------- */
 /* Assign the kernel function. */
                case AST__SINCGAUSS:
                   kernel = SincGauss;
@@ -7467,8 +7515,8 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
                                                                 lpar[ 0 ] ) );
                   break;
 
-/* sinc(x) * sinc(k*x) interpolation. */
-/* ---------------------------------- */
+/* sinc(pi*x) * sinc(k*pi*x) interpolation. */
+/* ---------------------------------------- */
 /* Assign the kernel function. */
                case AST__SINCSINC:
                   kernel = SincSinc;
@@ -8118,7 +8166,7 @@ static void Sinc( double offset, const double params[], int flags,
 *     Sinc
 
 *  Purpose:
-*     1-dimensional sinc(x) interpolation kernel.
+*     1-dimensional sinc(pi*x) interpolation kernel.
 
 *  Type:
 *     Private function.
@@ -8133,7 +8181,8 @@ static void Sinc( double offset, const double params[], int flags,
 
 *  Description:
 *     This function calculates the value of a 1-dimensional sub-pixel
-*     interpolation kernel. The function used is sinc(x).
+*     interpolation kernel. The function used is sinc(pi*x), where
+*     sinc(z)=sin(z)/z.
 
 *  Parameters:
 *     offset
@@ -8176,7 +8225,7 @@ static void SincCos( double offset, const double params[], int flags,
 *     SincCos
 
 *  Purpose:
-*     1-dimensional sinc(x) * cos(pi*k*x) interpolation kernel.
+*     1-dimensional sinc(pi*x)*cos(k*pi*x) interpolation kernel.
 
 *  Type:
 *     Private function.
@@ -8191,8 +8240,9 @@ static void SincCos( double offset, const double params[], int flags,
 
 *  Description:
 *     This function calculates the value of a 1-dimensional sub-pixel
-*     interpolation kernel. The function used is sinc(x) * cos(pi*k*x)
-*     out to the point where cos(pi*k*x) = 0, and zero beyond.
+*     interpolation kernel. The function used is sinc(pi*x)*cos(k*pi*x)
+*     out to the point where cos(k*pi*x) = 0, and zero beyond. Here,
+*     sinc(z)=sin(z)/z.
 
 *  Parameters:
 *     offset
@@ -8200,7 +8250,7 @@ static void SincCos( double offset, const double params[], int flags,
 *        in pixels.
 *     params
 *        The first element of this array should give a value for "k"
-*        in the cos(pi*k*x) term.
+*        in the cos(k*pi*x) term.
 *     flags
 *        Not used.
 *     value
@@ -8231,7 +8281,7 @@ static void SincCos( double offset, const double params[], int flags,
 /* Find the offset scaled by the "k" factor. */
    offset_k = offset * params[ 0 ];
 
-/* If the cos(pi*k*x) term has not reached zero, calculate the
+/* If the cos(k*pi*x) term has not reached zero, calculate the
    result. */
    if ( offset_k < halfpi ) {
       *value = ( ( offset != 0.0 ) ? ( sin( offset ) / offset ) : 1.0 ) *
@@ -8250,7 +8300,7 @@ static void SincGauss( double offset, const double params[], int flags,
 *     SincGauss
 
 *  Purpose:
-*     1-dimensional sinc(x) * exp(-k*x*x) interpolation kernel.
+*     1-dimensional sinc(pi*x)*exp(-k*x*x) interpolation kernel.
 
 *  Type:
 *     Private function.
@@ -8265,8 +8315,8 @@ static void SincGauss( double offset, const double params[], int flags,
 
 *  Description:
 *     This function calculates the value of a 1-dimensional sub-pixel
-*     interpolation kernel. The function used is sinc(x) *
-*     exp(-k*x*x).
+*     interpolation kernel. The function used is sinc(pi*x)*exp(-k*x*x),
+*     where sinc(z)=sin(z)/z.
 
 *  Parameters:
 *     offset
@@ -8312,7 +8362,7 @@ static void SincSinc( double offset, const double params[], int flags,
 *     SincSinc
 
 *  Purpose:
-*     1-dimensional sinc(x) * sinc(k*x) interpolation kernel.
+*     1-dimensional sinc(pi*x)*sinc(k*pi*x) interpolation kernel.
 
 *  Type:
 *     Private function.
@@ -8327,8 +8377,9 @@ static void SincSinc( double offset, const double params[], int flags,
 
 *  Description:
 *     This function calculates the value of a 1-dimensional sub-pixel
-*     interpolation kernel. The function used is sinc(x) * sinc(k*x)
-*     out to the point where sinc(k*x) = 0, and zero beyond.
+*     interpolation kernel. The function used is sinc(pi*x)*sinc(k*pi*x),
+*     out to the point where sinc(k*pi*x)=0, and zero beyond. Here,
+*     sinc(z)=sin(z)/z.
 
 *  Parameters:
 *     offset
@@ -8336,7 +8387,7 @@ static void SincSinc( double offset, const double params[], int flags,
 *        in pixels.
 *     params
 *        The first element of this array should give a value for "k"
-*        in the sinc(k*x) term.
+*        in the sinc(k*pi*x) term.
 *     flags
 *        Not used.
 *     value
@@ -8367,7 +8418,7 @@ static void SincSinc( double offset, const double params[], int flags,
 /* Find the offset scaled by the "k" factor. */
    offset_k = offset * params[ 0 ];
    
-/* If the sinc(k*x) term has not reached zero, calculate the
+/* If the sinc(k*pi*x) term has not reached zero, calculate the
    result. */
    if ( offset_k < halfpi ) {
       *value = ( ( offset != 0.0 ) ? ( sin( offset ) / offset ) : 1.0 ) *
@@ -9815,10 +9866,16 @@ f     - This routine will typically be invoked more than once for each
 f     invocation of AST_RESAMPLE<X>.
 c     - If an error occurs within this function, it should use
 c     astSetStatus to set the AST error status to an error value.
-c     This will cause an immediate return from astResample<X>.
+c     This will cause an immediate return from astResample<X>. The error
+c     value AST__UINER is available for this purpose, but other values may
+c     also be used (e.g. if you wish to distinguish different types of
+c     error).
 f     - If an error occurs within this routine, it should set the
 f     STATUS argument to an error value before returning. This will
-f     cause an immediate return from AST_RESAMPLE<X>.
+f     cause an immediate return from AST_RESAMPLE<X>. The error value
+f     AST__UINER is available for this purpose, but other values may also
+f     be used (e.g. if you wish to distinguish different types of error).
+f     The AST__UINER error value is defined in the AST_ERR include file.
 *--
 */
 /* Note the above is just a description to act as a template. The
@@ -9929,10 +9986,16 @@ f        The global status.
 *     processing for more details.
 c     - If an error occurs within this function, it should use
 c     astSetStatus to set the AST error status to an error value.
-c     This will cause an immediate return from astResample<X>.
+c     This will cause an immediate return from astResample<X>. The error
+c     value AST__UK1ER is available for this purpose, but other values may
+c     also be used (e.g. if you wish to distinguish different types of
+c     error).
 f     - If an error occurs within this routine, it should set the
 f     STATUS argument to an error value before returning. This will
-f     cause an immediate return from AST_RESAMPLE<X>.
+f     cause an immediate return from AST_RESAMPLE<X>. The error value
+f     AST__UK1ER is available for this purpose, but other values may also
+f     be used (e.g. if you wish to distinguish different types of error).
+f     The AST__UK1ER error value is defined in the AST_ERR include file.
 *--
 */
 /* Note the above is just a description to act as a template. The

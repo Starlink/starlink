@@ -169,11 +169,13 @@
 *        AST__NEAREST
 *           Use nearest pixel centre.
 *        AST__SINC
-*           Use sinc(x) interpolation.
+*           Use sinc(pi*x) interpolation.
 *        AST__SINCCOS
-*           Use sinc(x) * cos(kx) interpolation.
+*           Use sinc(pi*x)*cos(k*pi*x) interpolation.
+*        AST__SINCGAUSS
+*           Use sinc(pi*x)*exp(-k*x*x) interpolation.
 *        AST__SINCSINC
-*           Use sinc(x) * sinc(x/2) interpolation.
+*           Use sinc(pi*x)*sinc(k*pi*x) interpolation.
 *        AST__UINTERP
 *           Use general user-defined sub-pixel interpolation algorithm.
 *        AST__UKERN1
@@ -261,16 +263,16 @@
    for use by astResample<X>. They are used by giving the macro's
    value for the "interp" argument. */
 #define AST__UKERN1 (1)          /* User-supplied 1-d interpolation kernel */
-#if 0
+#if 0                            /* Not yet implemented */
 #define AST__UKERNN (2)          /* User-supplied n-d interpolation kernel */
 #endif
 #define AST__UINTERP (3)         /* User-supplied interpolation function */
 #define AST__NEAREST (4)         /* Use pixel with nearest centre */
 #define AST__LINEAR (5)          /* Simple linear interpolation */
-#define AST__SINC (6)            /* sinc(x) interpolation */
-#define AST__SINCSINC (7)        /* sinc(x) * sinc(x/2) interpolation */
-#define AST__SINCCOS (8)         /* sinc(x) * cos(kx) interpolation */
-#define AST__SINCGAUSS (9)       /* sinc(x) * exp(-kx*x) interpolation */
+#define AST__SINC (6)            /* sinc(pi*x) interpolation */
+#define AST__SINCSINC (7)        /* sinc(pi*x)*sinc(k*pi*x) interpolation */
+#define AST__SINCCOS (8)         /* sinc(pi*x)*cos(k*pi*x) interpolation */
+#define AST__SINCGAUSS (9)       /* sinc(pi*x)*exp(-k*x*x) interpolation */
 
 /* Type Definitions. */
 /* ================= */
