@@ -1,0 +1,66 @@
+
+			      Contouring
+			      ==========
+
+   How to use this window to:
+   --------------------------
+
+   --- Contour the displayed image.
+
+   1) Press the "Generate" tab.
+
+   2) Press the "Generate" button.
+
+   3) Press the "Draw Contours" button.
+
+This generates some automatic levels and performs the contouring. The
+levels actually used are shown in the "Level" entries. To change these 
+values just edit the entries and press <Return> or the "Draw Contours" 
+button (pressing <Return in the entry field just redraws that
+contour).
+
+
+   --- Contour another image over the displayed image.
+
+Either display the other image in another window and select it from
+the "Displayed image:" menu, or enter the name of the image file into
+the "Other image:" field. Now enter some appropriate contour levels
+and press "Draw Contours".
+
+NOTE: images entered in the "Other image:" field always override
+displayed images. Clear this field to use a displayed image.
+
+If the images both have sky coordinates then this system will be used
+for alignment, otherwise the images will be assumed to have the same
+pixel coordinates. If you are using sky coordinates which cover large
+areas of sky or your images are not axes aligned then you may need to
+choose the "Options" menu and select the "Draw contours using
+geodesics" item, you may also need to select the "Region" tab and
+choose "Whole of image" for the contour region.
+
+
+   ---  Print the image plus contours.
+
+Choose the "File" menu in the main window and select "Print...". This
+should create a new dialog window. Just choose the appropriate
+options.
+
+
+   ---  Save and restore the contour levels etc. to redraw at a later time.
+
+Choose the "File" menu and select the "Save configuration..."
+item. When the file selection dialog appears choose a filename.
+
+To reload a configuration choose the "Read configuration..." item.
+
+
+   ---  Set the line thickness or colour.
+
+Each contour has its own thickness and colour. The menu associated
+with each level show the possible values, just select the one you
+want.
+
+
+   ---  Generate contours at magnitude intervals.
+
+
