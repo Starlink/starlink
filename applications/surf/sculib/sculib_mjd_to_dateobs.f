@@ -25,6 +25,10 @@
 *  Authors:
 *     Tim Jenness (JAC, Hawaii)
 
+*  Copyright:
+*     Copyright (C) 2000 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
 *  History:
 *     06-Jan-2000 (TIMJ):
 *        First version for SPECX
@@ -36,7 +40,7 @@
 *     keyword. For DATE-OBS < 1999.0, use the old "dd/mm/yy" format.
 *     Otherwise, use the new "ccyy-mm-ddThh:mm:ss[.ssss]Z" format.
 
-*.
+*-
 
 *  Type Definitions:
       IMPLICIT NONE
@@ -65,7 +69,7 @@
       CHARACTER *1 SIGN         ! Sign of time (+/-)
       INTEGER SLA_STATUS        ! SLALIB status
       INTEGER YY                ! year (includes century)
-*-
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 

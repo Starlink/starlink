@@ -127,12 +127,15 @@
 
 
 *  Copyright:
-*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Copyright (C) 1995-2000 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
 
 *  History:
 *     $Id$
 *     $Log$
+*     Revision 1.20  2000/07/10 21:09:30  timj
+*     Documentation tweaks for V1.6
+*
 *     Revision 1.19  2000/05/11 20:00:27  timj
 *     Handle RESIDUAL
 *

@@ -25,7 +25,7 @@
 *     MAX_FITS                       = INTEGER (Given)
 *           the size of the FITS array
 *     N_FITS                         = INTEGER (Given and returned)
-*           the number of FITS items currently in the FITS array
+*           the number of FITS items currently in the FITS array.
 *           This should include an 'END' entry. If N_FITS is 1 it will
 *           be assumed to be an array with just an 'END'. If N_FITS=0
 *           on entry the array will be empty and N_FITS will be changed to 2
@@ -47,7 +47,7 @@
 *     T.Jenness (timj@jach.hawaii.edu)
 
 *  Copyright:
-*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Copyright (C) 1995-2000 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
 
 *  Method:

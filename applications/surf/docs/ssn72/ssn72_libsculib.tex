@@ -2343,6 +2343,99 @@ rotation = \pi - (ra\_N\_app - ra\_app)
    }
 }
 \sstroutine{
+   SCULIB\_CALC\_CLOCKERR
+}{
+   Calculate start up time and error in system clock
+}{
+   \sstdescription{
+      Checks the self-consistency of the FITS headers by calculating
+      the expected LST from the Azimuth and Elevation values stored
+      in the header and comparing this with the supplied reference
+      LST. Returns the difference between the two values and the
+      LST calculated from the headers.
+   }
+   \sstinvocation{
+       CALL SCULIB\_CALC\_CLOCKERR( N\_FITS, FITS, RA\_CEN, LST\_REF,
+      :     CLOCK\_ERR, LST\_AZEL, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         N\_FITS = INTEGER (Given)
+      }{
+         Number of items in the FITS array
+      }
+      \sstsubsection{
+         FITS() = CHAR$*$80 (Given)
+      }{
+         FITS array
+      }
+      \sstsubsection{
+         RA\_CEN = DOUBLE (Given)
+      }{
+         Apparent RA corresponding to the Az/El defined in the FITS header.
+         In radians.
+      }
+      \sstsubsection{
+         LST\_REF = DOUBLE (Given)
+      }{
+         Local sidereal time at the start of data acquisition. This
+         usually comes from the LST\_STRT array. In radians.
+      }
+      \sstsubsection{
+         CLOCK\_ERR = DOUBLE (Returned)
+      }{
+         The time difference (in radians) between the times stored
+         in the data file (header items and LST\_STRT) and the actual
+         time of the observation derived from the azimuth and elevation
+         of the observed source. The value is the number that must be
+         added to the supplied LST\_REF in order to correct it.
+      }
+      \sstsubsection{
+         LST\_AZEL = DOUBLE (Returned)
+      }{
+         Local Sidereal time calculated from the azimuth, elevation
+         and apparent RA/Dec (radians)
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given \& Returned)
+      }{
+         Global status. An error will be returned if the observation
+         was not done in a tracking frame (eg NA or AZ) since those
+         frames can not be used to determine the time from the telescope
+         az and el.
+      }
+   }
+   \sstnotes{
+      Requires the following FITS headers to be defined:
+      \sstitemlist{
+
+         \sstitem
+         LAT-OBS
+
+         \sstitem
+         STRT\_ELD
+
+         \sstitem
+         STRT\_AZD
+
+         \sstitem
+         CENT\_CRD
+
+      }
+      The clock error returned must be added to all times read from
+      the data file in order to make those times correct.
+
+      The centre coordinates of the observation must corresponde to
+      an astronomical frame. AZ can not be used (for obvious reasons).
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright (C) 2000 Particle Physics and Astronomy
+      Research Council. All Rights Reserved.
+   }
+}
+\sstroutine{
    SCULIB\_CALC\_FLATFIELD
 }{
    calculate flat-field results for a bolometer
@@ -6271,7 +6364,7 @@ X_\mathrm{g} = 1 + \frac{h_2 T_\mathrm{lapse}}{T_\mathrm{amb}}\exp\left(-\frac{A
        CALL SCULIB\_FIT\_SKYDIP (CVAR, N\_MEASUREMENTS, AIRMASS, J\_MEASURED,
          J\_VARIANCE, SUB\_WAVELENGTH, SUB\_INSTRUMENT, SUB\_FILTER, T\_TEL,
          T\_AMB, ETA\_TEL\_IN, B\_IN, ETA\_TEL\_FIT, B\_FIT, TAUZ\_FIT,
-         REXISQ, STATUS)
+         REXISQ, TAU\_ERROR, ETA\_ERROR, B\_ERROR, RESIDUAL, SIGMA, STATUS)
    }
    \sstarguments{
       \sstsubsection{
@@ -6372,6 +6465,11 @@ X_\mathrm{g} = 1 + \frac{h_2 T_\mathrm{lapse}}{T_\mathrm{amb}}\exp\left(-\frac{A
          B\_ERROR                   = REAL (Returned)
       }{
          error in B
+      }
+      \sstsubsection{
+         RESIDUAL                     = DOUBLE (Returned)
+      }{
+        Absolute difference between the model and the fit.
       }
       \sstsubsection{
          SIGMA                     = DOUBLE (Returned)
@@ -7776,7 +7874,13 @@ X_\mathrm{g} = 1 + \frac{h_2 T_\mathrm{lapse}}{T_\mathrm{amb}}\exp\left(-\frac{A
 }{
    \sstdescription{
       This routine retrieves the UTSTART and UTDATE values from the FITS
-      array and calculates the MJD from these.
+      array and calculates the MJD from these. It can corrects for the
+      time taken before beginning the observation by comparing the
+      LST stored in the header (written when the observation begins and
+      before the telescope gets on source) and the reference LST supplied to
+      the routine (which is assumed to be the LST when the data acquisition 
+      starts).
+
    }
    \sstinvocation{
       CALL SCULIB\_GET\_MJD(N\_FITS, FITS, MJD, STATUS)
@@ -7793,6 +7897,18 @@ X_\mathrm{g} = 1 + \frac{h_2 T_\mathrm{lapse}}{T_\mathrm{amb}}\exp\left(-\frac{A
          FITS values
       }
       \sstsubsection{
+         LST\_REF = DOUBLE PRECISION (Given)
+      }{
+        Reference LST. This is the LST at which data acquisition
+        begins. The MJD should be calculated for the start of 
+        data taking rather than the time the telescope begain its
+        slew. This number is normally read from the LST\_STRT array
+        and should be in radians. If a negative value or a zero
+        value is given it is assumed that no correction should be applied.
+        This does mean that LST\_REF can never be exactly zero but that
+        is thought be a remarkably unlikely event.
+      }
+      \sstsubsection{
          MJD = DOUBLE PRECISION (Returned)
       }{
          Modified Julian date of observation
@@ -7803,23 +7919,46 @@ X_\mathrm{g} = 1 + \frac{h_2 T_\mathrm{lapse}}{T_\mathrm{amb}}\exp\left(-\frac{A
          Epoch of observation
       }
       \sstsubsection{
+        STARTUP\_TIME = REAL (Returned)
+      }{
+        The time taken, in seconds, for the observation to begin.
+        If the time stored in the STSTART is larger than LST\_REF
+        the assumption is that a day boundary has been crossed since
+        the LST\_REF should always be more recent than STSTART (the
+        data can not be taken before the observation starts). A startup
+        time longer than 5 minutes or so should be treated with
+        suspicion. If the startup time is longer than 10 minutes it is
+        not used for the MJD calculation since this should never
+        be the case. Set to zero if LST\_REF was negative.
+      }
+      \sstsubsection{
          STATUS = \_INTEGER (Given \& Returned)
       }{
          Global status
       }
    }
    \sstnotes{
-      This routine does not annul the locator.
-   }
-   \sstdiytopic{
-      Prior Requirements
-   }{
-      The locator to the structure must already be available.
+     Uses the UTDATE and UTSTART and STSTART FITS headers. 
+     These must be present.
+      \sstitemlist{
+
+         \sstitem
+           The date must be stored in UTDATE in format YYYY:M:D
+
+         \sstitem
+           The time must be stored in UTSTART in format HH:MM:SS.SS
+
+        \sstitem
+     The MJD is calculated for the start of data taking rather
+     than simply using the values stored in UTSTART. This is because
+     there is always a delay between writing the FITS headers and 
+     taking data.
+      }
    }
    \sstdiytopic{
       Copyright
    }{
-      Copyright \copyright 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+      Copyright \copyright 1995-2000 Particle Physics and Astronomy
       Research Council. All Rights Reserved.
    }
 }
@@ -8905,6 +9044,49 @@ variance = \frac{(artificial\_2 - artificial\_1)^2}{2 \times 2}
    }
 }
 \sstroutine{
+   SCULIB\_MJD\_TO\_DATEOBS
+}{
+   Convert a modified julian date to the correct FITS DATE-OBS format
+}{
+   \sstdescription{
+      Given a modified Julian date  generate
+      a correctly formatted FITS DATE-OBS string.
+   }
+   \sstinvocation{
+      CALL SCULIB\_MJD\_TO\_DATEOBS ( MJD, DATE\_OBS, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         MJD = DOUBLE PRECISION (Given)
+      }{
+         Modified Julian date (Defined as JD - 2400000.5)
+      }
+      \sstsubsection{
+         DATE\_OBS = CHARACTER $*$ ($*$) (Returned)
+      }{
+         FITS DATE-OBS string. Should have at least 24
+         characters for YYYY-MM-DDThh:mm:ss.sssZ format
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given \& Returned)
+      }{
+         Global Status
+      }
+   }
+   \sstnotes{
+      The format used for the DATE-OBS keyword depends on the value of the
+      keyword. For DATE-OBS $<$ 1999.0, use the old {\tt "}dd/mm/yy{\tt "} format.
+      Otherwise, use the new {\tt "}ccyy-mm-ddThh:mm:ss[.ssss]Z{\tt "} format.
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright (C) 2000 Particle Physics and Astronomy
+      Research Council. All Rights Reserved.
+   }
+}
+
+\sstroutine{
    SCULIB\_MRQCOF
 }{
    called by SCULIB\_MRQMIN
@@ -9812,7 +9994,10 @@ variance = \frac{(artificial\_2 - artificial\_1)^2}{2 \times 2}
       An error will be reported and bad status returned if the name of the
       FITS item is blank or more than 8 characters long. An error will also
       occur if the FITS character array is full.
-   }
+      The FITS array must contain a final entry of simply `END' unless 
+      N\_FITS is 0. The END entry is automatically moved to the last field
+      as entries are added to the FITS array.
+  }
    \sstinvocation{
        CALL SCULIB\_PUT\_FITS\_C (MAX\_FITS, N\_FITS, FITS, NAME, VALUE,
          COMMENT, STATUS)
@@ -9826,7 +10011,11 @@ variance = \frac{(artificial\_2 - artificial\_1)^2}{2 \times 2}
       \sstsubsection{
          N\_FITS                         = INTEGER (Given and returned)
       }{
-         the number of FITS items currently in the FITS array
+         the number of FITS items currently in the FITS array.
+           This should include an `END' entry. If N\_FITS is 1 it will
+           be assumed to be an array with just an `END'. If N\_FITS=0
+           on entry the array will be empty and N\_FITS will be changed to 2
+           on exit (the entry and the END card).
       }
       \sstsubsection{
          FITS (MAX\_FITS)                = CHARACTER$*$80 (Given and returned)
@@ -9857,7 +10046,7 @@ variance = \frac{(artificial\_2 - artificial\_1)^2}{2 \times 2}
    \sstdiytopic{
       Copyright
    }{
-      Copyright \copyright 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+      Copyright \copyright 1995-2000 Particle Physics and Astronomy
       Research Council. All Rights Reserved.
    }
 }
@@ -9872,6 +10061,9 @@ variance = \frac{(artificial\_2 - artificial\_1)^2}{2 \times 2}
       An error will be reported and bad status returned if the name of the
       FITS item is blank or more than 8 characters long. An error will also
       occur if the FITS character array is full.
+      The FITS array must contain a final entry of simply `END' unless 
+      N\_FITS is 0. The END entry is automatically moved to the last field
+      as entries are added to the FITS array.
    }
    \sstinvocation{
        CALL SCULIB\_PUT\_FITS\_D (MAX\_FITS, N\_FITS, FITS, NAME, VALUE,
@@ -9886,7 +10078,11 @@ variance = \frac{(artificial\_2 - artificial\_1)^2}{2 \times 2}
       \sstsubsection{
          N\_FITS                         = INTEGER (Given and returned)
       }{
-         the number of FITS items currently in the FITS array
+         The number of FITS items currently in the FITS array.
+           This should include an `END' entry. If N\_FITS is 1 it will
+           be assumed to be an array with just an `END'. If N\_FITS=0
+           on entry the array will be empty and N\_FITS will be changed to 2
+           on exit (the entry and the END card).
       }
       \sstsubsection{
          FITS (MAX\_FITS)                = CHARACTER$*$80 (Given and returned)
@@ -9932,6 +10128,9 @@ variance = \frac{(artificial\_2 - artificial\_1)^2}{2 \times 2}
       An error will be reported and bad status returned if the name of the
       FITS item is blank or more than 8 characters long. An error will also
       occur if the FITS character array is full.
+      The FITS array must contain a final entry of simply `END' unless 
+      N\_FITS is 0. The END entry is automatically moved to the last field
+      as entries are added to the FITS array.
    }
    \sstinvocation{
        CALL SCULIB\_PUT\_FITS\_I (MAX\_FITS, N\_FITS, FITS, NAME, VALUE,
@@ -9946,7 +10145,11 @@ variance = \frac{(artificial\_2 - artificial\_1)^2}{2 \times 2}
       \sstsubsection{
          N\_FITS                         = INTEGER (Given and returned)
       }{
-         the number of FITS items currently in the FITS array
+         The number of FITS items currently in the FITS array.
+           This should include an `END' entry. If N\_FITS is 1 it will
+           be assumed to be an array with just an `END'. If N\_FITS=0
+           on entry the array will be empty and N\_FITS will be changed to 2
+           on exit (the entry and the END card).
       }
       \sstsubsection{
          FITS (MAX\_FITS)                = CHARACTER$*$80 (Given and returned)
@@ -9981,6 +10184,65 @@ variance = \frac{(artificial\_2 - artificial\_1)^2}{2 \times 2}
       Research Council. All Rights Reserved.
    }
 }
+\sstroutine{
+   SCULIB\_RAD2STRING
+}{
+   Translate an angle or time in radians to a nicely formatted string
+}{
+   \sstdescription{
+      Converts an angle or time in radians to a string that can be
+      used for display. The sexagesimal format is colon separated.
+      For time output, the output is format SHH:MM:SS.NDP.
+      For angle output, the format used is SDD:MM:SS.NDP. Note
+      that the sign is used for the first character but this can
+      be either blank or a {\tt '}-{\tt '}.
+   }
+   \sstinvocation{
+      CALL SCULIB\_RAD2STRING( ANGLE, NDP, ISTIME, RESLT, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         ANGLE = DOUBLE PRECISION (Given)
+      }{
+         Angle to be translated (radians)
+      }
+      \sstsubsection{
+         NDP = INTEGER (Given)
+      }{
+         Number of decimal places to use for the seconds
+         Can not be greater than 6.
+      }
+      \sstsubsection{
+         ISTIME = LOGICAL (Given)
+      }{
+         If true the angle will be assumed to be a time and will
+         be converted to HH:MM:SS.NDP format. If false it will be
+         assumed to be an angle and converted to SDDD:MM:SS.NDP.
+      }
+      \sstsubsection{
+         RESLT = CHARACTER (Returned)
+      }{
+         String containing the translated angle. Colon separated.
+         Should be at least 11$+$NDP characters long.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given \& Returned)
+      }{
+         Global Status
+      }
+   }
+   \sstnotes{
+      Essentially a wrapper around SLA\_DR2AF and SLA\_DR2TF
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright (C) 2000 Particle Physics and Astronomy Research Council.
+      All Rights Reserved.
+   }
+}
+
+
 \sstroutine{
    SCULIB\_RANGED
 }{
@@ -12503,9 +12765,9 @@ variance = \frac{(artificial\_2 - artificial\_1)^2}{2 \times 2}
          the temperature of the cold load for each sub-instrument
       }
       \sstsubsection{
-         T\_HOT                      = REAL (Given)
+         T\_HOT (N\_SUB)              = REAL (Given)
       }{
-         the temperature of the hot load
+         the temperature of the hot load for each sub-instrument
       }
       \sstsubsection{
          N\_SUB                      = INTEGER (Given)
@@ -12639,7 +12901,9 @@ variance = \frac{(artificial\_2 - artificial\_1)^2}{2 \times 2}
    \sstdescription{
       If entered with good status this routine calculates the variance
       between a SKYDIP dataset and the theoretical curve generated by
-      the the sky and telescope parameters in FIT. Data points with bad
+      the the sky and telescope parameters in FIT.  Additionally, the residual
+      of the fit is also returned (absolute value of measured data mins 
+      fitted values). Data points with bad
       quality will be ignored. If no valid data points are found then an
       error will be reported and bad status returned. The data are passed
       in via common.
@@ -12675,9 +12939,15 @@ Airmass(i) / X\_Gconst)
 
    }
    \sstinvocation{
-      CALL SCULIB\_SKYDIP\_VAR (VAR, N, FIT, NDEG, STATUS)
+      CALL SCULIB\_SKYDIP\_VAR (RESIDUAL, VAR, N, FIT, NDEG, STATUS)
    }
    \sstarguments{
+      \sstsubsection{
+        RESIDUAL = DOUBLE PRECISION (Returned)
+      }{
+        residual of the fit (absolute difference between the
+            model and the data)
+      }
       \sstsubsection{
          VAR                     = DOUBLE PRECISION (Returned)
       }{
@@ -12718,7 +12988,7 @@ Airmass(i) / X\_Gconst)
    \sstdiytopic{
       Copyright
    }{
-      Copyright \copyright 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+      Copyright \copyright 1995-2000 Particle Physics and Astronomy
       Research Council. All Rights Reserved.
    }
 }

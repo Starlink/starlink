@@ -783,7 +783,7 @@ The \scusoft\ environment can be initialised from the C-shell using the
 % surf
  
    SURF - SCUBA User Reduction Facility
-     Commands are now available -- (Version 1.4-0)
+     Commands are now available -- (Version 1.6-0)
  
      Type scuhelp for help on SURF commands.
      Type "showme sun216" to browse the hypertext documentation.
@@ -9315,7 +9315,7 @@ menu.
       unless a command line value is given. In order to calculate the bolometer
       positions it is also necessary to read in the extinction corrected
       data file that was used to regrid the data (in fact any extinction
-      corrected file can be used, possible with strange results).
+      corrected file can be used, possibly with strange results).
       By default the position of the bolometers at the start of
       the first integration and zero jiggle offset is plotted. Optionally,
       it is possible to plot the bolometer positions at any point during
@@ -9326,12 +9326,6 @@ menu.
    }
    \sstparameters{
       \sstsubsection{
-         COL = LITERAL (Read)
-      }{
-         Colour of overlay (by name or number). The previous value is used
-         by default.
-      }
-      \sstsubsection{
          DEVICE = DEVICE (Read)
       }{
          The graphics device on which the bolometers are to be drawn.
@@ -9341,9 +9335,9 @@ menu.
       \sstsubsection{
          EXPOSURE = INTEGER (Read)
       }{
-         Use the bolometer positions at the specified exposure within the
+         Ues the bolometer positions at the specified exposure within the
          specified INTEGRATION and MEASUREMENT. For SCAN/MAP data the
-         start of an exposure (ie scan) is used. Default is exposure 1.
+         middle of an exposure (ie scan) is used. Default is exposure 1.
       }
       \sstsubsection{
          EXT = NDF (Read)
@@ -9366,20 +9360,31 @@ menu.
       \sstsubsection{
          MSG\_FILTER = CHAR (Read)
       }{
-         Message filter level. Allowed values are QUIET, NORM and VERB.
-         Default is NORM. There are no verbose messages.
+         Message filter level. Default is NORM.
       }
       \sstsubsection{
          NDF = NDF (Read)
       }{
-         The name of the regridded data set (taken from the \agi\ graphics
+         The name of the regridded data set (taken from the AGI graphics
          database).
       }
       \sstsubsection{
          NAME = LOGICAL (Read)
       }{
          Label with bolometer name if true, else bolometer number. The default
-         is true.
+         is true. If a null response is given the bolometer label is not
+         drawn.
+      }
+      \sstsubsection{
+         STYLE = LITERAL (Read)
+      }{
+         Plotting style to be used for the bolometers. The relevant key
+         to use for adjusting the plotting style is `\texttt{bolometer}'. This
+         is a synonym for curve and can be abbreviated to `\texttt{bol}'. The most
+         useful attribute to change is the colour. Explicit control
+         of the style of the text labels is provided using the `text'
+         attribute. If this attribute is not supplied all plotting
+         styles are inherited from the `\texttt{bol}' style.
       }
    }
    \sstexamples{
@@ -9389,22 +9394,32 @@ menu.
          The bolometer names will be overlaid using the default colour.
       }
       \sstexamplesubsection{
-         scuover col=red noname
+         scuover style={\tt '}colour(bol)=red{\tt '} noname
       }{
          This command will overlay bolometer numbers over the image in red.
       }
       \sstexamplesubsection{
-         scuover integration=2
+         scuover style={\tt '}colour(bol)=yellow,font(text)=3,colour(text)=cyan{\tt '}
+      }{
+         Draw yellow circles but draw the labels in cyan using font 3
+         (italics).
+      }
+      \sstexamplesubsection{
+         scuover integration=2 name=!
       }{
          Overlay the bolometer positions at the start of the second
-         integration.
+         integration but do not label them
       }
    }
    \sstnotes{
       \sstitemlist{
 
          \sstitem
-         An image must have already been displayed before using \scuover.
+         An image must have already been displayed before using SCUOVER.
+
+         \sstitem
+         The image must have been displayed using an AST aware application
+         (such as \Kappa\ \display). Otherwise the alignment will not occur.
 
          \sstitem
          The array position is always shown with zero jiggle offset.
@@ -9416,6 +9431,12 @@ menu.
 
          \sstitem
          Pointing shifts are taken into account.
+
+         \sstitem
+         It is assumed that the displayed image id regridded to the
+         default map centre. \task{scuover} aligns the image using AXIS coordinates
+         and not SKY coordinates therefore there will be an error if incorrect
+         sky coordinates are assumed.
       }
    }
    \sstdiytopic{

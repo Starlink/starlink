@@ -6,7 +6,7 @@
 *  Purpose:
 *     Translate an angle or time in radians to a nicely formatted string
 
-*  Invoation:
+*  Invocation:
 *     CALL SCULIB_RAD2STRING( ANGLE, NDP, ISTIME, RESLT, STATUS ) 
 
 *  Description:
@@ -46,6 +46,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.2  2000/07/10 21:09:31  timj
+*     Documentation tweaks for V1.6
+*
 *     Revision 1.1  2000/06/17 00:54:39  timj
 *     First version
 *

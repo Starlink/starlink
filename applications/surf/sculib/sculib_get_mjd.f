@@ -20,7 +20,7 @@
 *     time taken before beginning the observation by comparing the
 *     LST stored in the header (written when the observation begins and
 *     before the telescope gets on source) and the reference LST supplied to
-*     theroutine (which is assumed to be the LST when the data acquisition 
+*     the routine (which is assumed to be the LST when the data acquisition 
 *     starts).
 
 *  Arguments:
@@ -75,6 +75,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.6  2000/07/10 21:09:30  timj
+*     Documentation tweaks for V1.6
+*
 *     Revision 1.5  2000/06/16 01:25:57  timj
 *     Correct for startup error
 *
