@@ -14,6 +14,9 @@ files. There are five new commands.
 
   o  Online help is provided.
 
+  o  From DCL, CONVERT commands must be enabled by entering 
+     CONVERTSTART.
+
   o  The parameter names are consistent.  IN is used for the input
      file, OUT for the output file, and the data type is TYPE.
      In the previous version there was a mismatch between the
