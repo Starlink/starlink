@@ -17,6 +17,7 @@
 *      10 Dec 1992      V1.6-1  fixed a 1 bin shift in the energy
 *                               for PH channel array (RDS)
 *      24 Apr 1994  (v1.7-0) for new asterix release
+*       7 Mar 95        V1.8-0  HRI response (RJV)
 * Type Definitions :
       IMPLICIT NONE
 * Global constants :
@@ -54,6 +55,10 @@
       INTEGER EC_PTR                          ! Energy corrections array
       INTEGER EPB_PTR                         ! Pointer to equivalent energy
 *                                             ! of the PH boundaries
+      INTEGER ELO_PTR			      ! HRI low energy bound
+      INTEGER EHI_PTR                         ! HRI hi energy bound
+      INTEGER MAT_PTR                         ! HRI matrix
+      INTEGER NEN                             ! HRI number of energy bands
       INTEGER NLIST                           ! Length of lists
       INTEGER NPHA_OUT                        ! Number of pulse height chns.
 *                                             ! in input datafile
@@ -62,10 +67,12 @@
       INTEGER NPHA                            ! Number of PH chans in response
 *                                             ! array
       INTEGER NENERGY                         ! Number of energy channels
+      LOGICAL HRI                             ! attach HRI response
+      LOGICAL PSPC                            ! attach PSPC response
 * Local data :
 * Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'XRTRESP Version 1.7-0')
+      PARAMETER (VERSION = 'XRTRESP Version 1.8-0')
 *-
       IF (STATUS.NE.SAI__OK) RETURN
 *
@@ -77,6 +84,10 @@
 * Get input filename
       CALL USI_ASSOCI('INPUT','UPDATE',LOC,INPRIM,STATUS)
 *
+* HRI or PSPC (default)
+      CALL USI_GET0L('HRI',HRI,STATUS)
+      PSPC=.NOT.HRI
+
       IF (STATUS .NE. SAI__OK) GOTO 999
 *
       IF (INPRIM) THEN
@@ -93,7 +104,11 @@
          CALL ERR_ANNUL(STATUS)
       ENDIF
 *
-      RFILE = CALDIR(1:CHR_LEN(CALDIR)) // 'drmpspc'
+      IF (HRI) THEN
+        RFILE = CALDIR(1:CHR_LEN(CALDIR)) // 'hri_drm'
+      ELSE
+        RFILE = CALDIR(1:CHR_LEN(CALDIR)) // 'drmpspc'
+      ENDIF
       CALL USI_DEF0C('RESPFILE', RFILE, STATUS)
 *
 *   Get detector response matrix name
@@ -109,127 +124,151 @@
          CALL MSG_PRNT('Error opening ^RFILE')
          GOTO 999
       ENDIF
+
+      IF (HRI) THEN
+
+        CALL CMP_MAPN(RLOC,'ENERG_LO','_REAL','READ',1,ELO_PTR,NEN,
+     :                                                       STATUS)
+        CALL CMP_MAPN(RLOC,'ENERG_HI','_REAL','READ',1,EHI_PTR,NEN,
+     :                                                       STATUS)
+        CALL CMP_MAPN(RLOC,'MATRIX','_REAL','READ',1,MAT_PTR,NEN,
+     :                                                       STATUS)
+
+        CALL XRTRESP_WRIENERGY_HRI(LOC,NEN,%val(ELO_PTR),%val(EHI_PTR),
+     :                                            %val(MAT_PTR),STATUS)
+
+        CALL CMP_UNMAP(RLOC,'ENERG_LO',STATUS)
+        CALL CMP_UNMAP(RLOC,'ENERG_HI',STATUS)
+        CALL CMP_UNMAP(RLOC,'MATRIX',STATUS)
+
+      ELSEIF (PSPC) THEN
 *
 * Find the size of the response array
-      CALL BDA_CHKDATA(RLOC, OK, NDIM, DMX_DIM, STATUS)
+        CALL BDA_CHKDATA(RLOC, OK, NDIM, DMX_DIM, STATUS)
 *
-      IF (.NOT. OK .OR. STATUS .NE. SAI__OK) THEN
-         CALL MSG_PRNT('Error accessing response array')
-         GOTO 999
-      ELSEIF (NDIM .NE. 2) THEN
-         CALL MSG_PRNT('Response array does not have 2 dimensions')
-         GOTO 999
-      ENDIF
+        IF (.NOT. OK .OR. STATUS .NE. SAI__OK) THEN
+           CALL MSG_PRNT('Error accessing response array')
+           GOTO 999
+        ELSEIF (NDIM .NE. 2) THEN
+           CALL MSG_PRNT('Response array does not have 2 dimensions')
+           GOTO 999
+        ENDIF
 *
 * Set number of PHA and ENERGY bins in the response file. NB: This relies
 * on the PHA axis being first.
-      NPHA=DMX_DIM(1)
-      NENERGY=DMX_DIM(2)
+        NPHA=DMX_DIM(1)
+        NENERGY=DMX_DIM(2)
+
 *
 * Map an array to hold the energy boundaries
-      CALL DYN_MAPR(1, NENERGY+1, EB_PTR, STATUS)
+        CALL DYN_MAPR(1, NENERGY+1, EB_PTR, STATUS)
 *
 * Map an array to hold the pulse height boundaries in the input file
-      CALL DYN_MAPR(1, NPHA+1, PB_PTR, STATUS)
+        CALL DYN_MAPR(1, NPHA+1, PB_PTR, STATUS)
 *
 * Map an array to hold the energy boundaries
-      CALL DYN_MAPR(1, NPHA, EPB_PTR, STATUS)
+        CALL DYN_MAPR(1, NPHA, EPB_PTR, STATUS)
 *
+
 * Get info from the datafile including the PHA channel boundaries.
-      CALL XRTRESP_READFILE(LOC, NPHA, NPHA_OUT, %val(PB_PTR),
+        CALL XRTRESP_READFILE(LOC, NPHA, NPHA_OUT, %val(PB_PTR),
      &                                                NR, STATUS)
 *
-      IF (STATUS .NE. SAI__OK) GOTO 999
+        IF (STATUS .NE. SAI__OK) GOTO 999
 *
 * If NR > 10 issue a warning
-      IF (NR .GT. 10) THEN
-         CALL MSG_SETI('SIZ',NR*3000)
-         CALL MSG_PRNT(' Warning: the output file will be ^SIZ blocks')
+        IF (NR .GT. 10) THEN
+           CALL MSG_SETI('SIZ',NR*3000)
+           CALL MSG_PRNT(' Warning: the output file will be ^SIZ blocks')
 *
 *    Ask if user wants to continue
-         CALL USI_GET0L('CONTINUE', LCONT, STATUS)
+           CALL USI_GET0L('CONTINUE', LCONT, STATUS)
 *
-         IF (STATUS .NE. SAI__OK .OR. .NOT. LCONT) GOTO 999
+           IF (STATUS .NE. SAI__OK .OR. .NOT. LCONT) GOTO 999
 *
-      ENDIF
+        ENDIF
 *
 * Map an array to hold the full NENERGY * NR energy correction array
-      CDIM(1)=NENERGY
-      CDIM(2)=NR
+        CDIM(1)=NENERGY
+        CDIM(2)=NR
 *
-      CALL DYN_MAPR(2, CDIM, EC_PTR, STATUS)
+        CALL DYN_MAPR(2, CDIM, EC_PTR, STATUS)
 *
 * Map workspace
-      CALL DYN_MAPR(1, NENERGY, W_PTR, STATUS)
+        CALL DYN_MAPR(1, NENERGY, W_PTR, STATUS)
 *
-      IF (STATUS .NE. SAI__OK) THEN
-         CALL MSG_PRNT('Error obtaining dynamic memory')
-         GOTO 999
-      ENDIF
+        IF (STATUS .NE. SAI__OK) THEN
+           CALL MSG_PRNT('Error obtaining dynamic memory')
+           GOTO 999
+        ENDIF
 *
-      CALL XRTRESP_GETCORR(LOC, NENERGY, NR, %val(W_PTR),
+        CALL XRTRESP_GETCORR(LOC, NENERGY, NR, %val(W_PTR),
      &                                    %val(EC_PTR), STATUS)
 *
-      IF (STATUS .NE. SAI__OK) GOTO 999
+        IF (STATUS .NE. SAI__OK) GOTO 999
 *
+
 * Map energy index, channel index and response lists as temporary 2-d arrays.
-      LIST_DIM=NENERGY*NPHA_OUT
+        LIST_DIM=NENERGY*NPHA_OUT
 *
-      CALL DYN_MAPI(1,LIST_DIM,ELIST_PTR,STATUS)
-      CALL DYN_MAPI(1,LIST_DIM,CLIST_PTR,STATUS)
-      CALL DYN_MAPR(1,LIST_DIM,RESP_PTR,STATUS)
+        CALL DYN_MAPI(1,LIST_DIM,ELIST_PTR,STATUS)
+        CALL DYN_MAPI(1,LIST_DIM,CLIST_PTR,STATUS)
+        CALL DYN_MAPR(1,LIST_DIM,RESP_PTR,STATUS)
 *
 * Map temporary array for the detector matrix
-      CALL DYN_MAPR(2,DMX_DIM,DMX_PTR,STATUS)
+        CALL DYN_MAPR(2,DMX_DIM,DMX_PTR,STATUS)
 *
 * Map temp array as workspace for XRTRESP_RDRESP
-      DMX_DIM(1)=NENERGY
-      DMX_DIM(2)=NPHA_OUT
-      CALL DYN_MAPR(2,DMX_DIM,TOT_PTR,STATUS)
+        DMX_DIM(1)=NENERGY
+        DMX_DIM(2)=NPHA_OUT
+        CALL DYN_MAPR(2,DMX_DIM,TOT_PTR,STATUS)
 *
-      IF (STATUS .NE. SAI__OK) THEN
-         CALL ERR_REP('Error mapping temporary space',STATUS)
-         GOTO 999
-      ENDIF
+        IF (STATUS .NE. SAI__OK) THEN
+           CALL ERR_REP('Error mapping temporary space',STATUS)
+           GOTO 999
+        ENDIF
 *
 * Read the response file
-      CALL XRTRESP_RDRESP(RLOC, NPHA, NENERGY, NPHA_OUT, %val(DMX_PTR),
+        CALL XRTRESP_RDRESP(RLOC,NPHA,NENERGY,NPHA_OUT,%val(DMX_PTR),
      &            %val(TOT_PTR), %val(PB_PTR),
      &            %val(EB_PTR), %val(EPB_PTR), NLIST,
      &            %val(ELIST_PTR), %val(CLIST_PTR), %val(RESP_PTR),
      &                 STATUS)
 *
-      IF (STATUS .NE. SAI__OK) GOTO 999
+        IF (STATUS .NE. SAI__OK) GOTO 999
 *
 * Map workspace array
-      CALL DYN_MAPR(1,NLIST,CR_PTR,STATUS)
+        CALL DYN_MAPR(1,NLIST,CR_PTR,STATUS)
 *
-      IF (STATUS .NE. SAI__OK) THEN
-         CALL ERR_REP('Error mapping temporary space',STATUS)
-         GOTO 999
-      ENDIF
+        IF (STATUS .NE. SAI__OK) THEN
+           CALL ERR_REP('Error mapping temporary space',STATUS)
+           GOTO 999
+        ENDIF
 *
 * Write response structure into the datafile
-      CALL XRTRESP_WRIENERGY(LOC, NPHA, NENERGY, %val(EB_PTR), NPHA_OUT,
-     &           NR, %val(EC_PTR), %val(PB_PTR), %val(EPB_PTR), NLIST,
+        CALL XRTRESP_WRIENERGY_PSPC(LOC,NPHA,NENERGY,%val(EB_PTR),
+     &        NPHA_OUT,NR,%val(EC_PTR),%val(PB_PTR),%val(EPB_PTR),NLIST,
      &           %VAL(ELIST_PTR), %VAL(CLIST_PTR), %VAL(RESP_PTR),
      &                                    VERSION, %VAL(CR_PTR), STATUS)
 *
-      IF (STATUS .NE. SAI__OK) GOTO 999
+        IF (STATUS .NE. SAI__OK) GOTO 999
 *
 * Unmap dynamic components
-      CALL DYN_UNMAP(EB_PTR)
-      CALL DYN_UNMAP(PB_PTR)
-      CALL DYN_UNMAP(EPB_PTR)
-      CALL DYN_UNMAP(EC_PTR)
-      CALL DYN_UNMAP(W_PTR)
-      CALL DYN_UNMAP(CR_PTR)
-      CALL DYN_UNMAP(ELIST_PTR)
-      CALL DYN_UNMAP(CLIST_PTR)
-      CALL DYN_UNMAP(RESP_PTR)
-      CALL DYN_UNMAP(DMX_PTR)
-      CALL DYN_UNMAP(TOT_PTR)
+        CALL DYN_UNMAP(EB_PTR)
+        CALL DYN_UNMAP(PB_PTR)
+        CALL DYN_UNMAP(EPB_PTR)
+        CALL DYN_UNMAP(EC_PTR)
+        CALL DYN_UNMAP(W_PTR)
+        CALL DYN_UNMAP(CR_PTR)
+        CALL DYN_UNMAP(ELIST_PTR)
+        CALL DYN_UNMAP(CLIST_PTR)
+        CALL DYN_UNMAP(RESP_PTR)
+        CALL DYN_UNMAP(DMX_PTR)
+        CALL DYN_UNMAP(TOT_PTR)
 *
+
+      ENDIF		! HRI or PSPC
+
 * Write history component
       CALL HIST_ADD(LOC,VERSION,STATUS)
 *
@@ -243,11 +282,9 @@
 *
 999   CONTINUE
 *
-      CALL AST_CLOSE
+      CALL HDS_CLOSE(RLOC,STATUS)
+      CALL AST_CLOSE()
 *
-      IF (STATUS .NE. SAI__OK) THEN
-          CALL ERR_REP(' ','from XRTRESP',STATUS)
-      ENDIF
 *
       END
 
@@ -764,8 +801,8 @@
 *
       END
 
-*+XRTRESP_WRIENERGY   Writes energy response structure into an Asterix88 NDF
-      SUBROUTINE XRTRESP_WRIENERGY(LOC,NPHA,NENERGY,ENERGY_BOUNDS,
+*+XRTRESP_WRIENERGY_PSPC   Writes PSPC energy response
+      SUBROUTINE XRTRESP_WRIENERGY_PSPC(LOC,NPHA,NENERGY,ENERGY_BOUNDS,
      &             NPHA_OUT,NR,ECORR,PHA_BOUNDS,EPHA_CENTS,NLIST,
      &                ENERGY_LIST,CHAN_LIST,RESP,VERSION,CRESP,STATUS)
 *    Description :
@@ -986,10 +1023,159 @@
       CALL DYN_UNMAP(R_PTR)
 *
       IF (STATUS .NE. SAI__OK) THEN
-          CALL ERR_REP(' ','from XRTRESP_WRIENERGY',STATUS)
+          CALL ERR_REP(' ','from XRTRESP_WRIENERGY_PSPC',STATUS)
       ENDIF
 *
       END
+
+
+
+*+XRTRESP_WRIENERGY_HRI   Writes HRI energy response
+      SUBROUTINE XRTRESP_WRIENERGY_HRI(LOC,NEN,ENERGY_LO,ENERGY_HI,
+     &                                                MATRIX,STATUS)
+*    Description :
+*    Method :
+*    Deficiencies :
+*    Bugs :
+*    Authors :
+*        RJV
+*    History :
+*    Type Definitions :
+      IMPLICIT NONE
+*    Global constants :
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'DAT_PAR'
+*    Global variables :
+*    Structure definitions :
+*    Import :
+      INTEGER NEN
+      CHARACTER*(DAT__SZLOC) LOC            ! Locator to input datafile
+*                                           ! chans in response array
+      REAL ENERGY_LO(*),ENERGY_HI(*)        ! Boundaries of energy bins
+      REAL MATRIX(*)
+*    Import/export
+*    Export :
+*    Status :
+      INTEGER STATUS
+*    Function declarations :
+*    Local constants :
+      INTEGER NMAX
+        PARAMETER(NMAX=100)
+*    Local variables :
+      CHARACTER*(DAT__SZLOC) ALOC           ! Locator to ASTERIX box
+      CHARACTER*(DAT__SZLOC) ELOC           ! Locator to energy_resp struc.
+      CHARACTER*(DAT__SZLOC) ENLOC          ! Locator to energy_lists
+      CHARACTER*(DAT__SZLOC) CHLOC          ! Locator to channel_lists
+      CHARACTER*(DAT__SZLOC) RELOC          ! Locator to response lists
+*
+      REAL ENERGY_SPEC(NMAX)
+      REAL ENERGY_BOUNDS(NMAX+1)
+      REAL CHAN_SPEC(1)
+      REAL CHAN_BOUNDS(2)
+      INTEGER ENERGY_LIST(NMAX)
+      INTEGER CHAN_LIST(NMAX)
+      INTEGER LP
+
+*
+*    Local data :
+*-
+      IF (STATUS .NE. SAI__OK) RETURN
+*
+
+      IF (NEN.GT.NMAX) THEN
+        CALL MSG_PRNT('AST_ERR: insufficient storage for matrix')
+        STATUS=SAI__ERROR
+        GOTO 999
+      ENDIF
+
+      CALL BDA_LOCAST(LOC,ALOC,STATUS)
+*
+*
+*  Create output structure.
+      CALL DAT_NEW(ALOC,'ENERGY_RESP','EXTENSION',0,0,STATUS)
+*
+      CALL DAT_FIND(ALOC,'ENERGY_RESP',ELOC,STATUS)
+*
+*
+*  Calculate energy and channel centres
+      DO LP=1,NEN
+         ENERGY_LIST(LP)=LP
+         CHAN_LIST(LP)=LP
+         ENERGY_SPEC(LP) = (ENERGY_LO(LP)+ENERGY_HI(LP))/2.0
+         ENERGY_BOUNDS(LP)=ENERGY_LO(LP)
+      ENDDO
+      ENERGY_BOUNDS(NEN+1)=ENERGY_HI(NEN)
+*
+      CHAN_SPEC(1)=1.0
+      CHAN_BOUNDS(1)=ENERGY_LO(1)
+      CHAN_BOUNDS(2)=ENERGY_HI(NEN)
+*
+*  Write XRTRESP version number in first energy correction array
+C      CALL HDX_PUTC(ELOC,'VERSION',1,VERSION,STATUS)
+*
+*
+*     Write Energy list
+         CALL DAT_NEW(ELOC,'ENERGY','LIST',0,0,STATUS)
+         CALL DAT_FIND(ELOC,'ENERGY',ENLOC,STATUS)
+*
+*     Write Energy index list
+         CALL HDX_PUTI(ENLOC,'DATA_ARRAY',NEN,
+     &                                     ENERGY_LIST,STATUS)
+*
+*     Write Energy of centre of each bin
+         CALL HDX_PUTR(ENLOC,'ENERGY_SPEC',NEN,
+     &                                     ENERGY_SPEC,STATUS)
+*
+*     Write Energy boundarys of each bin
+         CALL HDX_PUTR(ENLOC,'ENERGY_BOUNDS',NEN+1,
+     &                                   ENERGY_BOUNDS,STATUS)
+*
+         CALL DAT_ANNUL(ENLOC, STATUS)
+*
+*
+*     Write Channel list
+         CALL DAT_NEW(ELOC,'CHANNEL','LIST',0,0,STATUS)
+         CALL DAT_FIND(ELOC,'CHANNEL',CHLOC,STATUS)
+*
+*     Write Channel index list
+         IF (NLIST .NE. 0) THEN
+            CALL HDX_PUTI(CHLOC,'DATA_ARRAY',NEN,
+     &                                     CHAN_LIST,STATUS)
+         ENDIF
+*
+*     Write Channel of centre of each bin
+         CALL HDX_PUTR(CHLOC,'CHANNEL_SPEC',1,
+     &                                     CHAN_SPEC,STATUS)
+*
+*     Write Channel boundaries of each bin
+         CALL HDX_PUTR(CHLOC, 'CHANNEL_BOUNDS', 2,
+     &                                       CHAN_BOUNDS, STATUS)
+*
+         CALL DAT_ANNUL(CHLOC, STATUS)
+*
+
+*    Create Response list structure
+         CALL DAT_NEW(CLOC,'RESPONSE','LIST',0,0,STATUS)
+         CALL DAT_FIND(CLOC,'RESPONSE',RELOC,STATUS)
+*
+*     Write Response array
+         CALL HDX_PUTR(RELOC,'DATA_ARRAY',NEN,MATRIX,STATUS)
+*
+*
+         CALL DAT_ANNUL(RELOC,STATUS)
+         CALL DAT_ANNUL(ELOC,STATUS)
+*
+      ENDDO
+*
+ 999  CONTINUE
+*
+      IF (STATUS .NE. SAI__OK) THEN
+          CALL ERR_REP(' ','from XRTRESP_WRIENERGY_HRI',STATUS)
+      ENDIF
+*
+      END
+
+
 
 ***
 *+ XRTRESP_WRIENERGY_SETBND - Sets energy bounds for output PH chans.
