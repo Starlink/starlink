@@ -49,8 +49,8 @@ proc red4TwoDLineFit {taskname} {
     set Red4Widgets(TWD_ENT02) [entry $midtop.e2 -width 10]
     set Red4Widgets(TWD_LAB03) [label $midtop.lb3 -text "X End"]
     set Red4Widgets(TWD_ENT03) [entry $midtop.e3 -width 10]
-    $Red4Widgets(TWD_ENT02) insert end 1
-    $Red4Widgets(TWD_ENT03) insert end 256
+    $Red4Widgets(TWD_ENT02) insert end Red4Widgets(TWD_DXST)
+    $Red4Widgets(TWD_ENT03) insert end Red4Widgets(TWD_DXEN)
     pack $Red4Widgets(TWD_LAB02) $Red4Widgets(TWD_ENT02) -in $midtop -side left -pady 2m
     pack $Red4Widgets(TWD_ENT03) $Red4Widgets(TWD_LAB03) -in $midtop -side right -pady 2m
     bind $Red4Widgets(TWD_LAB02) <Button-2> "red4Update red4TwoDLineFit ALL"
@@ -65,8 +65,8 @@ proc red4TwoDLineFit {taskname} {
     set Red4Widgets(TWD_ENT04) [entry $bottop.e2 -width 10]
     set Red4Widgets(TWD_LAB05) [label $bottop.lb3 -text "Y End"]
     set Red4Widgets(TWD_ENT05) [entry $bottop.e3 -width 10]
-    $Red4Widgets(TWD_ENT04) insert end 1
-    $Red4Widgets(TWD_ENT05) insert end 256
+    $Red4Widgets(TWD_ENT04) insert end Red4Widgets(TWD_DYST)
+    $Red4Widgets(TWD_ENT05) insert end Red4Widgets(TWD_DYEN)
     pack $Red4Widgets(TWD_LAB04) $Red4Widgets(TWD_ENT04) -in $bottop -side left -pady 2m
     pack $Red4Widgets(TWD_ENT05) $Red4Widgets(TWD_LAB05) -in $bottop -side right -pady 2m
     bind $Red4Widgets(TWD_LAB04) <Button-2> "red4Update red4TwoDLineFit ALL"
@@ -87,21 +87,21 @@ proc red4TwoDLineFit {taskname} {
     }
 
 # Get the values from the dialogue box
-    set data [string trim [$Red4Widgets(TWD_ENT01) get]]
-    set xs   [string trim [$Red4Widgets(TWD_ENT02) get]]
-    set xe   [string trim [$Red4Widgets(TWD_ENT03) get]]
-    set ys   [string trim [$Red4Widgets(TWD_ENT04) get]]
-    set ye   [string trim [$Red4Widgets(TWD_ENT05) get]]
+    set Red4Widgets(RO)       [string trim [$Red4Widgets(TWD_ENT01) get]]
+    set Red4Widgets(TWD_DXST) [string trim [$Red4Widgets(TWD_ENT02) get]]
+    set Red4Widgets(TWD_DXEN) [string trim [$Red4Widgets(TWD_ENT03) get]]
+    set Red4Widgets(TWD_DYST) [string trim [$Red4Widgets(TWD_ENT04) get]]
+    set Red4Widgets(TWD_DYEN) [string trim [$Red4Widgets(TWD_ENT05) get]]
 
 # Abort if dataset is garbage
-   set uspos [string first "_" $data]
+   set uspos [string first "_" $Red4Widgets(RO)]
    if {$uspos>0} {
-     set number [string range $data [expr $uspos + 1] end]
+     set number [string range $Red4Widgets(RO) [expr $uspos + 1] end]
    } else {
      set number -1
    }
    set status [catch {incr number 0}]
-   if {$data=="" || $data==$Red4Widgets(DRO) || $status!=0 || $number<=0} {
+   if {$Red4Widgets(RO)=="" || $Red4Widgets(RO)==$Red4Widgets(DRO) || $status!=0 || $number<=0} {
      cgs4drClear $taskname
      cgs4drInform $taskname "red4TwoDLineFit error : A dataset has not been specified properly!"
      destroy .red4Dialogue
@@ -112,7 +112,6 @@ proc red4TwoDLineFit {taskname} {
 # Remove the dialog box otherwise Figaro SPLOT can't grab input focus!
      destroy .red4Dialogue
    }
-   set Red4Widgets(RO) $data
 
 # Open the engineering log file
    set message "Opening engineering log file"
@@ -121,18 +120,19 @@ proc red4TwoDLineFit {taskname} {
    tkwait variable open_log_done
 
 # Extract the first spectrum
-   set message "Extracting spectrum from rows $ys to $ye in $data to ${data}_spc"
+   set message "Extracting spectrum from rows $Red4Widgets(TWD_DYST) to $Red4Widgets(TWD_DYEN)"
+   set message "$message in $Red4Widgets(RO) to $Red4Widgets(RO)_spc"
    cgs4drInform $taskname $message
-   $taskname obey extract4 "image=$data ystart=$ys yend=$ye spectrum=${data}_spc" \
-      -inform "cgs4drInform $taskname %V" -endmsg {set ext1_done 1}
+   set param "image=$Red4Widgets(RO) ystart=$Red4Widgets(TWD_DYST) yend=$Red4Widgets(TWD_DYEN) spectrum=$Red4Widgets(RO)_spc"
+   $taskname obey extract4 "$param" -inform "cgs4drInform $taskname %V" -endmsg {set ext1_done 1}
    tkwait variable ext1_done
 
 # Do EMLT etc on first spectrum
    if {[file exists emlt.lis] == 1} {exec /usr/bin/rm -rf emlt.lis}
-   set message "Running EMLT on ${data}_spc"
+   set message "Running EMLT on $Red4Widgets(RO)_spc"
    cgs4drInform $taskname $message
-   figaro2 obey emlt "spectrum=${data}_spc xstart=$xs xend=$xe lines=0 moments=T" \
-     -inform "cgs4drInform $taskname %V" -endmsg {set emlt1_done 1}
+   set param "spectrum=$Red4Widgets(RO)_spc xstart=$Red4Widgets(TWD_DXST) xend=$Red4Widgets(TWD_DXEN) lines=0 moments=T"
+   figaro2 obey emlt "$param" -inform "cgs4drInform $taskname %V" -endmsg {set emlt1_done 1}
    tkwait variable emlt1_done
 
 # Log some comments to file
@@ -140,7 +140,7 @@ proc red4TwoDLineFit {taskname} {
    cgs4drInform $taskname $message
    $taskname obey log_comment "comment=' '" -inform "cgs4drInform $taskname %V" -endmsg {set log_comment1_done 1}
    tkwait variable log_comment1_done
-   set comment "Searching for lines in $data"
+   set comment "Searching for lines in $Red4Widgets(RO)"
    $taskname obey log_comment "comment='$comment'" -inform "cgs4drInform $taskname %V" -endmsg {set log_comment2_done 1}
    tkwait variable log_comment2_done
 
@@ -148,9 +148,10 @@ proc red4TwoDLineFit {taskname} {
      catch {exec /usr/bin/cp emlt.lis $env(CGS4_ENG)/emlt.lis}
      $taskname obey copy_to_log "source_file='emlt.lis'" -inform "cgs4drInform $taskname %V" -endmsg {set copy1_done 1}
      tkwait variable copy1_done
-     $taskname obey read_emlt "xmin=$xs xmax=$xe" -inform "cgs4drInform $taskname %V" -endmsg {set remlt1_done 1}
+     set param "xmin=$Red4Widgets(TWD_DXST) xmax=$Red4Widgets(TWD_DXEN)" 
+     $taskname obey read_emlt "$param" -inform "cgs4drInform $taskname %V" -endmsg {set remlt1_done 1}
      tkwait variable remlt1_done
-     set ycen [expr [expr $ys + $ye] / 2.0]
+     set ycen [expr [expr $Red4Widgets(TWD_DYST) + $Red4Widgets(TWD_DYEN)] / 2.0]
      $taskname obey log_emlt "ycen=$ycen" -inform "cgs4drInform $taskname %V" -endmsg {set lemlt1_done 1}
      tkwait variable lemlt1_done
      $taskname obey report_emlt "" -inform "cgs4drInform $taskname %V" -endmsg {set remlt2_done 1}

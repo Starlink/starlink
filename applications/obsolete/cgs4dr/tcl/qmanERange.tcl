@@ -15,11 +15,11 @@ proc qmanERange {taskname} {
     set l1 [label $frame.l1 -text "First"]
     set QmanWidgets(END_RANGE_FIRST) [entry $frame.e1]
     $QmanWidgets(END_RANGE_FIRST) delete 0 end
-    $QmanWidgets(END_RANGE_FIRST) insert end 1
+    $QmanWidgets(END_RANGE_FIRST) insert end $QmanWidgets(DEF)
     set l2 [label $frame.l2 -text "Last"]
     set QmanWidgets(END_RANGE_LAST) [entry $frame.e2]
     $QmanWidgets(END_RANGE_LAST) delete 0 end
-    $QmanWidgets(END_RANGE_LAST) insert end 1
+    $QmanWidgets(END_RANGE_LAST) insert end $QmanWidgets(DEL)
     pack $l1 $QmanWidgets(END_RANGE_FIRST) $l2 $QmanWidgets(END_RANGE_LAST) -side left -padx 1m
 
 # Bind the widgets

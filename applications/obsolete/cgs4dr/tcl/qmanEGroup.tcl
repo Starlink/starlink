@@ -15,7 +15,7 @@ proc qmanEGroup {taskname} {
     set label [label $frame.l1 -text "Group Number"]
     set QmanWidgets(GROUP_NUMBER) [entry $frame.e1]
     $QmanWidgets(GROUP_NUMBER) delete 0 end
-    $QmanWidgets(GROUP_NUMBER) insert end 1
+    $QmanWidgets(GROUP_NUMBER) insert end $QmanWidgets(DGN)
     pack $label $QmanWidgets(GROUP_NUMBER) -side left -padx 1m
     bind $label <Button-2> "$QmanWidgets(GROUP_NUMBER) delete 0 end; $QmanWidgets(GROUP_NUMBER) insert end 1"
     bind $QmanWidgets(GROUP_NUMBER) <Button-2> "$QmanWidgets(GROUP_NUMBER) delete 0 end; $QmanWidgets(GROUP_NUMBER) insert end 1"

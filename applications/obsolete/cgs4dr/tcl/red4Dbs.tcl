@@ -29,14 +29,13 @@ proc red4Dbs {taskname} {
     set bv [dialogShow .red4Dialogue .red4Dialogue]
     if {$bv==0} {
       cgs4drCursor watch red white
-      set data [string trim [$Red4Widgets(DBS_ENTRY) get]]
-      if {$data=="" || $data==$Red4Widgets(DRG)} {
+      set Red4Widgets(RG) [string trim [$Red4Widgets(DBS_ENTRY) get]]
+      if {$Red4Widgets(RG)=="" || $Red4Widgets(RG)==$Red4Widgets(DRG)} {
         cgs4drClear $taskname
         cgs4drInform $taskname "red4Dbs error : A dataset has not been specified properly!"
       } else {
-        set output ${data}_dbs
-        set Red4Widgets(RG) $data
-        $taskname obey divide_by_std "group=$data output=$output standard_mode='BOTH'" -inform "cgs4drInform $taskname %V"
+        set output $Red4Widgets(RG)_dbs
+        $taskname obey divide_by_std "group=$Red4Widgets(RG) output=$output standard_mode='BOTH'" -inform "cgs4drInform $taskname %V"
       }
     }
 

@@ -2,6 +2,7 @@ proc red4Package {taskname args} {
 #+
 # Creates a dialog box for red4 action 
 #-
+    global env
     global Red4Widgets
 
 # Create dialog box
@@ -46,6 +47,8 @@ proc red4Package {taskname args} {
             adamtask figaro2 /star/bin/figaro/figaro2
           } elseif {$pack == "figaro3"} {
             adamtask figaro3 /star/bin/figaro/figaro3
+          } elseif {$pack == "hdstrace"} {
+            adamtask hdstrace /star/bin/hdstrace
           }
           set count 0
           while {[$pack path] == 0} {
@@ -78,10 +81,22 @@ proc red4Package {taskname args} {
           cgs4drInform $taskname $message
           if {[file exists $out] == 1} {exec /usr/bin/rm -rf $out}
           ndfpack_mon obey fitslist "in=$obs logfile=$out" -inform "cgs4drInform $taskname %V"
-        } elseif {$args=="figaro1 exam"} {
-          set message "Examining data structure $obs"
-          cgs4drInform $taskname $message
-          figaro1 obey exam "object=$obs" -inform "cgs4drInform $taskname %V"
+        #} elseif {$args=="figaro1 exam"} {
+        #  set message "Examining data structure $obs"
+        #  cgs4drInform $taskname $message
+        #  figaro1 obey exam "object=$obs" -inform "cgs4drInform $taskname %V"
+        } elseif {$args=="hdstrace"} {
+          if {[string first "." $obs] != -1} {
+            set message "Tracing data structure $obs"
+            cgs4drInform $taskname $message
+            hdstrace obey hdstrace @"$obs" -inform "cgs4drInform $taskname %V"
+          } else {
+            set format [string tolower $env(CGS4_FORMAT)]
+            if {$format == "ndf"} {set format "sdf"}
+            set message "Tracing data structure $obs.${format}"
+            cgs4drInform $taskname $message
+            hdstrace obey hdstrace @"$obs.$format" -inform "cgs4drInform $taskname %V"
+          }
         }
       }
     }

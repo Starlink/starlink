@@ -40,8 +40,6 @@ proc red4Ext {taskname} {
     set Red4Widgets(SPC_LAB03) [label $midtop.l4 -text " "]
     pack $Red4Widgets(SPC_LAB02) $f1 $f2 $Red4Widgets(SPC_LAB03) -in $midtop -side left -pady 2m
     pack $iv -in $midtop -side right -pady 2m
-    set Red4Widgets(SPC_ALGORITHM) BRIGHT
-    set Red4Widgets(SPC_INVERT) 0
     bind $Red4Widgets(SPC_LAB02) <Button-2> "red4Update red4Ext ALL"
     bind $Red4Widgets(SPC_LAB03) <Button-2> "red4Update red4Ext ALL"
     bind $f1 <Button-2> "red4Update red4Ext SPC_ALGORITHM"
@@ -58,8 +56,8 @@ proc red4Ext {taskname} {
     pack $Red4Widgets(SPC_LAB06) $Red4Widgets(SPC_LAB07) -in $bottop -side left -pady 2m
     pack $Red4Widgets(SPC_ENT03) $Red4Widgets(SPC_LAB05) $Red4Widgets(SPC_ENT02) $Red4Widgets(SPC_LAB04) \
       -in $bottop -side right -pady 2m
-    $Red4Widgets(SPC_ENT02) insert end 29 
-    $Red4Widgets(SPC_ENT03) insert end 29 
+    $Red4Widgets(SPC_ENT02) insert end $Red4Widgets(ENT_TRS) 
+    $Red4Widgets(SPC_ENT03) insert end $Red4Widgets(ENT_TRE) 
     bind $Red4Widgets(SPC_LAB04) <Button-2> "red4Update red4Ext ALL"
     bind $Red4Widgets(SPC_LAB05) <Button-2> "red4Update red4Ext ALL"
     bind $Red4Widgets(SPC_LAB06) <Button-2> "red4Update red4Ext ALL"
@@ -79,8 +77,8 @@ proc red4Ext {taskname} {
     pack $Red4Widgets(SPC_LAB10) $Red4Widgets(SPC_LAB11) -in $basetop -side left -pady 2m
     pack $Red4Widgets(SPC_ENT05) $Red4Widgets(SPC_LAB09) $Red4Widgets(SPC_ENT04) $Red4Widgets(SPC_LAB08) \
        -in $basetop -side right -pady 2m
-    $Red4Widgets(SPC_ENT04) insert end -1 
-    $Red4Widgets(SPC_ENT05) insert end -1 
+    $Red4Widgets(SPC_ENT04) insert end $Red4Widgets(ENT_MRS) 
+    $Red4Widgets(SPC_ENT05) insert end $Red4Widgets(ENT_MRE) 
     bind $Red4Widgets(SPC_LAB08) <Button-2> "red4Update red4Ext ALL"
     bind $Red4Widgets(SPC_LAB09) <Button-2> "red4Update red4Ext ALL"
     bind $Red4Widgets(SPC_LAB10) <Button-2> "red4Update red4Ext ALL"
@@ -100,8 +98,8 @@ proc red4Ext {taskname} {
     pack $Red4Widgets(SPC_LAB14) $Red4Widgets(SPC_LAB15) -in $lbasetop -side left -pady 2m
     pack $Red4Widgets(SPC_ENT07) $Red4Widgets(SPC_LAB13) $Red4Widgets(SPC_ENT06) $Red4Widgets(SPC_LAB12) \
        -in $lbasetop -side right -pady 2m
-    $Red4Widgets(SPC_ENT06) insert end -1 
-    $Red4Widgets(SPC_ENT07) insert end -1 
+    $Red4Widgets(SPC_ENT06) insert end $Red4Widgets(ENT_BRS)
+    $Red4Widgets(SPC_ENT07) insert end $Red4Widgets(ENT_BRE)
     bind $Red4Widgets(SPC_LAB12) <Button-2> "red4Update red4Ext ALL"
     bind $Red4Widgets(SPC_LAB13) <Button-2> "red4Update red4Ext ALL"
     bind $Red4Widgets(SPC_LAB14) <Button-2> "red4Update red4Ext ALL"
@@ -115,33 +113,32 @@ proc red4Ext {taskname} {
     set bv [dialogShow .red4Dialogue .red4Dialogue]
     if {$bv==0} {
       cgs4drCursor watch red white
-      set data [string trim [$Red4Widgets(SPC_ENT01) get]]
-      if {$data=="" || $data==$Red4Widgets(DRG)} {
+      set Red4Widgets(RG) [string trim [$Red4Widgets(SPC_ENT01) get]]
+      if {$Red4Widgets(RG)=="" || $Red4Widgets(RG)==$Red4Widgets(DRG)} {
         cgs4drClear $taskname
         cgs4drInform $taskname "red4Ext error : A dataset has not been specified properly!"
       } else {
-        set Red4Widgets(RG) $data
-        set spect ${data}_spc
-        set ispect ${data}_imspc
-        set row1s [string trim [$Red4Widgets(SPC_ENT02) get]]
-        set row1e [string trim [$Red4Widgets(SPC_ENT03) get]]
-        set row2s [string trim [$Red4Widgets(SPC_ENT04) get]]
-        set row2e [string trim [$Red4Widgets(SPC_ENT05) get]]
-        set row3s [string trim [$Red4Widgets(SPC_ENT06) get]]
-        set row3e [string trim [$Red4Widgets(SPC_ENT07) get]]
+        set Red4Widgets(SP) $Red4Widgets(RG)_spc
+        set Red4Widgets(IS) $Red4Widgets(RG)_imspc
+        set Red4Widgets(ENT_TRS) [string trim [$Red4Widgets(SPC_ENT02) get]]
+        set Red4Widgets(ENT_TRE) [string trim [$Red4Widgets(SPC_ENT03) get]]
+        set Red4Widgets(ENT_MRS) [string trim [$Red4Widgets(SPC_ENT04) get]]
+        set Red4Widgets(ENT_MRE) [string trim [$Red4Widgets(SPC_ENT05) get]]
+        set Red4Widgets(ENT_BRS) [string trim [$Red4Widgets(SPC_ENT06) get]]
+        set Red4Widgets(ENT_BRE) [string trim [$Red4Widgets(SPC_ENT07) get]]
 
 # Convert 0 to true/false 
-        set message "Extracting spectrum from $data into $spect and $ispect"
+        set message "Extracting spectrum from $Red4Widgets(RG) into $Red4Widgets(SP) and $Red4Widgets(IS)"
         cgs4drInform $taskname $message
         if {$Red4Widgets(SPC_INVERT) == 0} {
-          $taskname obey nodextract4 "image=$data invert_spec=FALSE algorithm=$Red4Widgets(SPC_ALGORITHM) \
-            row1s=$row1s row1e=$row1e row2s=$row2s row2e=$row2e row3s=$row3s row3e=$row3e \
-            spect=$spect ispect=$ispect" -inform "cgs4drInform $taskname %V"
+          set param "image=$Red4Widgets(RG) invert_spec=FALSE algorithm=$Red4Widgets(SPC_ALGORITHM)"
         } else {
-          $taskname obey nodextract4 "image=$data invert_spec=TRUE algorithm=$Red4Widgets(SPC_ALGORITHM) \
-            row1s=$row1s row1e=$row1e row2s=$row2s row2e=$row2e row3s=$row3s row3e=$row3e \
-            spect=$spect ispect=$ispect" -inform "cgs4drInform $taskname %V"
+          set param "image=$Red4Widgets(RG) invert_spec=TRUE algorithm=$Red4Widgets(SPC_ALGORITHM)"
         }
+        set param "$param row1s=$Red4Widgets(ENT_TRS) row1e=$Red4Widgets(ENT_TRE) row2s=$Red4Widgets(ENT_MRS)"
+        set param "$param row2e=$Red4Widgets(ENT_MRE) row3s=$Red4Widgets(ENT_BRS) row3e=$Red4Widgets(ENT_BRE)"
+        set param "$param spect=$Red4Widgets(SP) ispect=$Red4Widgets(IS)"
+        $taskname obey nodextract4 "$param" -inform "cgs4drInform $taskname %V"
       }
     }
 

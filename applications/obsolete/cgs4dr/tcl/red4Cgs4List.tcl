@@ -22,7 +22,7 @@ proc red4Cgs4List {taskname} {
    set Red4Widgets(LH_LABEL) [label $frame.lb -text "Directory"]
    set Red4Widgets(LH_ENTRY) [entry $frame.en -width 40]
    pack $Red4Widgets(LH_LABEL) $Red4Widgets(LH_ENTRY) -in $frame -side left
-   $Red4Widgets(LH_ENTRY) insert end $env(ODIR)
+   $Red4Widgets(LH_ENTRY) insert end $Red4Widgets(CDIR)
 
 # Bind the defaults buttons
    bind $Red4Widgets(LH_LABEL) <Button-2> "red4Update red4Cgs4List LH_ENTRY"
@@ -32,17 +32,16 @@ proc red4Cgs4List {taskname} {
 # Cancel the dialog box
    set bv [dialogShow .red4Dialogue .red4Dialogue]
    if {$bv==1} {
-     cgs4drCursor arrow green black
      destroy .red4Dialogue
 
 # Show the dialog box
    } elseif {$bv==0} {
      cgs4drCursor watch red white
-     set dir [string trim [$Red4Widgets(LH_ENTRY) get]]
+     set Red4Widgets(CDIR) [string trim [$Red4Widgets(LH_ENTRY) get]]
      destroy .red4Dialogue
 
 #   Now loop and do the cgs4list
-     foreach file [lsort [glob ${dir}/o*.sdf ${dir}/o*.dst]] {
+     foreach file [lsort [glob $Red4Widgets(CDIR)/o*.sdf $Red4Widgets(CDIR)/o*.dst]] {
        set message "cgs4list: listing ${file}"
        cgs4drInform $taskname $message
        ukirtfig obey cgs4list "filename='${file}' listing='temp.out' full=Y" \
@@ -51,6 +50,7 @@ proc red4Cgs4List {taskname} {
      }
 
 #   Now sort the output file
+     cgs4drClear $taskname
      set status [catch {exec $env(CGS4DR_ROOT)/datasort}]
      if {$status==0} {
        set status [catch {exec /usr/bin/mv ukirt_data.out $env(CGS4_INDEX)/cgs4list_$env(CGS4_DATE).lis}]
@@ -63,8 +63,8 @@ proc red4Cgs4List {taskname} {
        } else {
          set message "Error sorting data ... check temp.out"
          cgs4drInform $taskname $message
-         cgs4drCursor arrow green black
        }
      }
    }
+   cgs4drCursor arrow green black
 }

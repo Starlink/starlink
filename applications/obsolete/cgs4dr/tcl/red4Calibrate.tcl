@@ -42,22 +42,22 @@ proc red4Calibrate {taskname lamp} {
    set Red4Widgets(WC_LAB02) [label $bot.bl1 -text "Extract Row Start"]
    set Red4Widgets(WC_ENT02) [entry $bot.be1]
    pack $Red4Widgets(WC_LAB02) $Red4Widgets(WC_ENT02) -in $bot -side left
-   $Red4Widgets(WC_ENT02) insert end 1
+   $Red4Widgets(WC_ENT02) insert end $Red4Widgets(CAL_RST)
 
    set Red4Widgets(WC_LAB03) [label $bot.bl2 -text "Extract Row End"]
    set Red4Widgets(WC_ENT03) [entry $bot.be2]
    pack $Red4Widgets(WC_ENT03) $Red4Widgets(WC_LAB03) -in $bot -side right
-   $Red4Widgets(WC_ENT03) insert end 256
+   $Red4Widgets(WC_ENT03) insert end $Red4Widgets(CAL_REN)
 
    set Red4Widgets(WC_LAB04) [label $mid.ml1 -text "Polynomial Order"]
    set Red4Widgets(WC_ENT04) [entry $mid.me1]
    pack $Red4Widgets(WC_LAB04) $Red4Widgets(WC_ENT04) -in $mid -side left
-   $Red4Widgets(WC_ENT04) insert end 2
+   $Red4Widgets(WC_ENT04) insert end $Red4Widgets(CAL_ORD)
 
    set Red4Widgets(WC_LAB05) [label $mid.ml2 -text "Arcline Sigma"]
    set Red4Widgets(WC_ENT05) [entry $mid.me2]
    pack $Red4Widgets(WC_ENT05) $Red4Widgets(WC_LAB05) -in $mid -side right
-   $Red4Widgets(WC_ENT05) insert end 1
+   $Red4Widgets(WC_ENT05) insert end $Red4Widgets(CAL_SIG)
 
 # Bind the defaults to button-2
    bind $Red4Widgets(WC_LAB01) <Button-2> "red4Update red4Calibrate ALL"
@@ -86,21 +86,21 @@ proc red4Calibrate {taskname lamp} {
    }
 
 # Get the observation number etc
-   set data  [string trim [$Red4Widgets(WC_ENT01) get]]
-   set order [string trim [$Red4Widgets(WC_ENT04) get]]
-   set sigma [string trim [$Red4Widgets(WC_ENT05) get]]
-   set ys    [string trim [$Red4Widgets(WC_ENT02) get]]
-   set ye    [string trim [$Red4Widgets(WC_ENT03) get]]
+   set Red4Widgets(RO)      [string trim [$Red4Widgets(WC_ENT01) get]]
+   set Red4Widgets(CAL_RST) [string trim [$Red4Widgets(WC_ENT02) get]]
+   set Red4Widgets(CAL_REN) [string trim [$Red4Widgets(WC_ENT03) get]]
+   set Red4Widgets(CAL_ORD) [string trim [$Red4Widgets(WC_ENT04) get]]
+   set Red4Widgets(CAL_SIG) [string trim [$Red4Widgets(WC_ENT05) get]]
 
 # Abort if dataset is garbage
-   set uspos [string first "_" $data]
+   set uspos [string first "_" $Red4Widgets(RO)]
    if {$uspos>0} {
-     set number [string range $data [expr $uspos + 1] end]
+     set number [string range $Red4Widgets(RO) [expr $uspos + 1] end]
    } else {
      set number -1
    }
    set status [catch {incr number 0}]
-   if {$data=="" || $data==$Red4Widgets(DRO) || $status!=0 || $number<=0} {
+   if {$Red4Widgets(RO)=="" || $Red4Widgets(RO)==$Red4Widgets(DRO) || $status!=0 || $number<=0} {
      cgs4drClear $taskname
      cgs4drInform $taskname "red4Calibrate error : A dataset has not been specified properly!"
      destroy .red4Dialogue
@@ -113,16 +113,15 @@ proc red4Calibrate {taskname lamp} {
    }
 
 # Set some default filenames
-   set Red4Widgets(RO) $data
-   set Red4Widgets(SP) ${data}_spc
+   set Red4Widgets(SP) $Red4Widgets(RO)_spc
    set Red4Widgets(OB) \$ODIR/o$env(CGS4_DATE)_$number
    set Red4Widgets(CA) \$RODIR/ca$env(CGS4_DATE)_$number
 
 # Extract the spectrum
    set message "Extracting spectrum from $Red4Widgets(RO) to $Red4Widgets(SP)"
    cgs4drInform $taskname $message
-   $taskname obey extract4 "image=$Red4Widgets(RO) ystart=$ys yend=$ye spectrum=$Red4Widgets(SP)" \
-     -inform "cgs4drInform $taskname %V" -endmsg {set ext_done 1}
+   set param "image=$Red4Widgets(RO) ystart=$Red4Widgets(CAL_RST) yend=$Red4Widgets(CAL_REN) spectrum=$Red4Widgets(SP)"
+   $taskname obey extract4 "$param" -inform "cgs4drInform $taskname %V" -endmsg {set ext_done 1}
    tkwait variable ext_done
 
 # Setup a soft device
@@ -134,22 +133,23 @@ proc red4Calibrate {taskname lamp} {
    set message "Starting figaro ARC function"
    cgs4drInform $taskname $message
    set arc cgs4_${lamp}.arc
-   figaro3 obey arc "spectrum=$Red4Widgets(SP) arctype=$arc sigma=$sigma order=$order output=$Red4Widgets(CA) previous=F" \
-     -inform "cgs4drInform $taskname %V" -endmsg {set arc_done 1}
+   set param "spectrum=$Red4Widgets(SP) arctype=$arc sigma=$Red4Widgets(CAL_SIG) order=$Red4Widgets(CAL_ORD)"
+   set param "$param output=$Red4Widgets(CA) previous=F"
+   figaro3 obey arc "$param" -inform "cgs4drInform $taskname %V" -endmsg {set arc_done 1}
    tkwait variable arc_done
 
 # Divide by 000 and file as a calibration
    set message "Changing from angstroms to microns"
    cgs4drInform $taskname $message
-   figaro1 obey xcdiv "image=$Red4Widgets(CA) factor=000.0 output=$Red4Widgets(CA)" \
-     -inform "cgs4drInform $taskname %V" -endmsg {set xcd_done 1}
+   set param "image=$Red4Widgets(CA) factor=10000.0 output=$Red4Widgets(CA)" 
+   figaro1 obey xcdiv "$param" -inform "cgs4drInform $taskname %V" -endmsg {set xcd_done 1}
    tkwait variable xcd_done
 
 # Now file it as a calibration
    set message "Filing $Red4Widgets(CA) as a calibration"
    cgs4drInform $taskname $message
-   $taskname obey file_calib "observation=$Red4Widgets(OB) change_label=TRUE \
-     newlabel='Wavelength' newunits='Microns'" -inform "cgs4drInform $taskname %V" -endmsg {set cal_done 1}
+   set param "observation=$Red4Widgets(OB) change_label=TRUE newlabel='Wavelength' newunits='Microns'" 
+   $taskname obey file_calib "$param" -inform "cgs4drInform $taskname %V" -endmsg {set cal_done 1}
    tkwait variable cal_done
 
 # Issue message

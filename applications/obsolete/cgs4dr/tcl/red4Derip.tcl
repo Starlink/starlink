@@ -33,8 +33,8 @@ proc red4Derip {taskname} {
     pack $Red4Widgets(DR_LAB04) $Red4Widgets(DR_LAB04) -in $bottop -side left -pady 2m
     pack $Red4Widgets(DR_ENT03) $Red4Widgets(DR_LAB03) $Red4Widgets(DR_ENT02) $Red4Widgets(DR_LAB02) \
        -in $bottop -side right -pady 2m
-    $Red4Widgets(DR_ENT02) insert end 0.5 
-    $Red4Widgets(DR_ENT03) insert end 255.5 
+    $Red4Widgets(DR_ENT02) insert end $Red4Widgets(XST)
+    $Red4Widgets(DR_ENT03) insert end $Red4Widgets(XEN)
 
 # Bind default values to Button-2
     bind $Red4Widgets(DR_LAB01) <Button-2> "red4Update red4Derip ALL"
@@ -53,22 +53,22 @@ proc red4Derip {taskname} {
     set bv [dialogShow .red4Dialogue .red4Dialogue]
     if {$bv==0} {
       cgs4drCursor watch red white
-      set data [string trim [$Red4Widgets(DR_ENT01) get]]
-      if {$data=="" || $data==$Red4Widgets(DSP)} {
+      set Red4Widgets(SP) [string trim [$Red4Widgets(DR_ENT01) get]]
+      if {$Red4Widgets(SP)=="" || $Red4Widgets(SP)==$Red4Widgets(DSP)} {
         cgs4drClear $taskname
         cgs4drInform $taskname "red4Derip error : A dataset has not been specified properly!"
       } else {
-        set Red4Widgets(SP) $data
-        set irff ${data}_irff
-        set derip ${data}_derip
-        set xs [string trim [$Red4Widgets(DR_ENT02) get]]
-        set xe [string trim [$Red4Widgets(DR_ENT03) get]]
-        set message "Derippling $data to form $derip"
+        set irff $Red4Widgets(SP)_irff
+        set derip $Red4Widgets(SP)_derip
+        set Red4Widgets(XST) [string trim [$Red4Widgets(DR_ENT02) get]]
+        set Red4Widgets(XEN) [string trim [$Red4Widgets(DR_ENT03) get]]
+        set message "Derippling $Red4Widgets(SP) to form $derip"
         cgs4drInform $taskname $message
-        $taskname obey irflat "spectrum=$data output=$irff xstart=$xs xend=$xe more='NO'" -inform "cgs4drInform $taskname %V" \
-          -endmsg {set done 1}
+        set param "spectrum=$Red4Widgets(SP) output=$irff xstart=$Red4Widgets(XST) xend=$Red4Widgets(XEN) more='NO'" 
+        $taskname obey irflat "$param" -inform "cgs4drInform $taskname %V" -endmsg {set done 1}
         tkwait variable done
-        $taskname obey idiv4 "image1=$data image2=$irff output=$derip errors='GAUSSIAN'" -inform "cgs4drInform $taskname %V"
+        set param "image1=$Red4Widgets(SP) image2=$irff output=$derip errors='GAUSSIAN'" 
+        $taskname obey idiv4 "$param" -inform "cgs4drInform $taskname %V"
       }
     }
 
@@ -76,4 +76,3 @@ proc red4Derip {taskname} {
     cgs4drCursor arrow green black
     destroy .red4Dialogue
 }
-

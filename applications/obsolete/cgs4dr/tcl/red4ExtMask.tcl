@@ -23,7 +23,7 @@ proc red4ExtMask {taskname} {
     set Red4Widgets(ME_LAB01) [label $top.l1 -text "Mask"]
     set Red4Widgets(ME_ENT01) [entry $top.e1 -width 40]
     pack $Red4Widgets(ME_LAB01) $Red4Widgets(ME_ENT01) -in $top -side left
-    $Red4Widgets(ME_ENT01) insert end $Red4Widgets(MASK)
+    $Red4Widgets(ME_ENT01) insert end $Red4Widgets(MBPM)
  
     set Red4Widgets(ME_LAB02) [label $bot.l2 -text "Data"]
     set Red4Widgets(ME_ENT02) [entry $bot.e2 -width 40]
@@ -42,15 +42,15 @@ proc red4ExtMask {taskname} {
     set bv [dialogShow .red4Dialogue .red4Dialogue]
     if {$bv==0} {
       cgs4drCursor watch red white
-      set Red4Widgets(MASK) [string trim [$Red4Widgets(ME_ENT01) get]]
+      set Red4Widgets(MBPM) [string trim [$Red4Widgets(ME_ENT01) get]]
       set Red4Widgets(RO)   [string trim [$Red4Widgets(ME_ENT02) get]]
-      if {$Red4Widgets(RO)=="" || $Red4Widgets(RO)==$Red4Widgets(DRO) || $Red4Widgets(MASK)=="#"} {
+      if {$Red4Widgets(RO)=="" || $Red4Widgets(RO)==$Red4Widgets(DRO) || $Red4Widgets(MBPM)=="#"} {
         cgs4drClear $taskname
         cgs4drInform $taskname "red4ExtMask error : A dataset has not been specified properly!"
       } else {
 
 # Extract the mask
-        $taskname obey extract_mask "data=$Red4Widgets(RO) mask=$Red4Widgets(MASK)" -inform "cgs4drInform $taskname %V"
+        $taskname obey extract_mask "data=$Red4Widgets(RO) mask=$Red4Widgets(MBPM)" -inform "cgs4drInform $taskname %V"
       }
     }
 

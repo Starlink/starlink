@@ -17,13 +17,14 @@ proc qmanMisc {taskname} {
     pack $frame1 $frame2
     set l1 [label $frame1.l1 -text "String"]
     set QmanWidgets(STRING) [entry $frame1.entry -width 30 -relief sunken]
+    $QmanWidgets(STRING) delete 0 end
+    $QmanWidgets(STRING) insert 0 $QmanWidgets(EW_STRING)
     pack $l1 $QmanWidgets(STRING) -side left -padx 1m
     set drmask    [radiobutton $frame2.drmask -text "Mask" -value DRMASK -variable QmanWidgets(RB_STRING)]
     set drconfig  [radiobutton $frame2.drconfig -text "Config" -value DRCONFIG -variable QmanWidgets(RB_STRING)]
     set drskywt   [radiobutton $frame2.drskywt -text "Skywt" -value DRSKYWT -variable QmanWidgets(RB_STRING)]
     set drvarwt   [radiobutton $frame2.drvarwt -text "Varwt" -value DRVARWT -variable QmanWidgets(RB_STRING)]
     set drcomment [radiobutton $frame2.drstring -text "Comment" -value DRCOMMENT -variable QmanWidgets(RB_STRING)]
-    set QmanWidgets(RB_STRING) DRCOMMENT
     pack $drmask $drconfig $drskywt $drvarwt $drcomment -side left -padx 2m
 
 # Bind the widgets

@@ -61,15 +61,14 @@ proc red4Stats {taskname} {
     set Red4Widgets(GS_ENT06)  [entry $limits1.je]
     set jtl [label $limits1.jtl -text "Jstep"]
     set Red4Widgets(GS_ENT07)  [entry $limits1.jt]
-    $Red4Widgets(GS_ENT02) insert end 1
-    $Red4Widgets(GS_ENT03) insert end 256
-    $Red4Widgets(GS_ENT04) insert end 1
-    $Red4Widgets(GS_ENT05) insert end 1
-    $Red4Widgets(GS_ENT06) insert end 256
-    $Red4Widgets(GS_ENT07) insert end 1
+    $Red4Widgets(GS_ENT02) insert end $Red4Widgets(GS_DIST)
+    $Red4Widgets(GS_ENT03) insert end $Red4Widgets(GS_DIEN)
+    $Red4Widgets(GS_ENT04) insert end $Red4Widgets(GS_DIIN)
+    $Red4Widgets(GS_ENT05) insert end $Red4Widgets(GS_DJST)
+    $Red4Widgets(GS_ENT06) insert end $Red4Widgets(GS_DJEN)
+    $Red4Widgets(GS_ENT07) insert end $Red4Widgets(GS_DJIN)
     pack $isl $Red4Widgets(GS_ENT02) $iel $Red4Widgets(GS_ENT03) $itl $Red4Widgets(GS_ENT04) $jsl $Red4Widgets(GS_ENT05) \
       $jel $Red4Widgets(GS_ENT06) $jtl $Red4Widgets(GS_ENT07) -side left -padx 2m
-    set Red4Widgets(GS_WHOLE) 1
     trace variable Red4Widgets(GS_WHOLE) w "RedFlipOut $limits1"
 
     set limits2 [frame $flip.sl]
@@ -78,9 +77,8 @@ proc red4Stats {taskname} {
     set ll [label $limits2.ll -text Low]
     set Red4Widgets(GS_ENT09) [entry $limits2.lo]
     pack $ll $Red4Widgets(GS_ENT08) $hl $Red4Widgets(GS_ENT09) -side left -padx 1 -pady 1
-    $Red4Widgets(GS_ENT08) insert end 00.0
-    $Red4Widgets(GS_ENT09) insert end 0.0
-    set Red4Widgets(GS_AUTOSCALE) 1
+    $Red4Widgets(GS_ENT08) insert end $Red4Widgets(GS_DHI)
+    $Red4Widgets(GS_ENT09) insert end $Red4Widgets(GS_DLO)
     trace variable Red4Widgets(GS_AUTOSCALE) w "RedFlipOut $limits2"
 
     bind $Red4Widgets(GS_ENT02) <Button-2> "red4Update red4Stats GS_ENT02"
@@ -104,40 +102,41 @@ proc red4Stats {taskname} {
     set bv [dialogShow .red4Dialogue .red4Dialogue]
     if {$bv==0} {
       cgs4drCursor watch red white
-      set obs [string trim [$Red4Widgets(GS_ENT01) get]]
-      if {$obs=="" || $obs==$Red4Widgets(DRO)} {
+      set Red4Widgets(RO) [string trim [$Red4Widgets(GS_ENT01) get]]
+      if {$Red4Widgets(RO)=="" || $Red4Widgets(RO)==$Red4Widgets(DRO)} {
         cgs4drClear $taskname
         cgs4drInform $taskname "red4Stats error : A dataset has not been specified properly!"
       } else {
 
 # Do the stats
-        set Red4Widgets(RO) $obs
-        set param "data='[string trim $obs]' plane='[string trim $Red4Widgets(GS_PLANE)]'"
+        set param "data='[string trim $Red4Widgets(RO)]' plane='[string trim $Red4Widgets(GS_PLANE)]'"
         if {$Red4Widgets(GS_WHOLE) == 1} {
-          set ist 1 
-          set ien 256
-          set iin 1
-          set jst 1
-          set jen 256
-          set jin 1
+          set Red4Widgets(GS_DIST) 1 
+          set Red4Widgets(GS_DIEN) 256
+          set Red4Widgets(GS_DIIN) 1
+          set Red4Widgets(GS_DJST) 1
+          set Red4Widgets(GS_DJEN) 256
+          set Red4Widgets(GS_DJIN) 1
           set param "${param} whole='T'"
         } else {
-          set ist [string trim [$Red4Widgets(GS_ENT02) get]]
-          set ien [string trim [$Red4Widgets(GS_ENT03) get]]
-          set iin [string trim [$Red4Widgets(GS_ENT04) get]]
-          set jst [string trim [$Red4Widgets(GS_ENT05) get]]
-          set jen [string trim [$Red4Widgets(GS_ENT06) get]]
-          set jin [string trim [$Red4Widgets(GS_ENT07) get]]
-          set param "${param} whole='F' istart=$ist iend=$ien iincr=$iin jstart=$jst jend=$jen jincr=$jin"
+          set Red4Widgets(GS_DIST) [string trim [$Red4Widgets(GS_ENT02) get]]
+          set Red4Widgets(GS_DIEN) [string trim [$Red4Widgets(GS_ENT03) get]]
+          set Red4Widgets(GS_DIIN) [string trim [$Red4Widgets(GS_ENT04) get]]
+          set Red4Widgets(GS_DJST) [string trim [$Red4Widgets(GS_ENT05) get]]
+          set Red4Widgets(GS_DJEN) [string trim [$Red4Widgets(GS_ENT06) get]]
+          set Red4Widgets(GS_DJIN) [string trim [$Red4Widgets(GS_ENT07) get]]
+          set param "${param} whole='F' istart=$Red4Widgets(GS_DIST) iend=$Red4Widgets(GS_DIEN)"
+          set param "$param iincr=$Red4Widgets(GS_DIIN) jstart=$Red4Widgets(GS_DJST)"
+          set param "$param jend=$Red4Widgets(GS_DJEN) jincr=$Red4Widgets(GS_DJIN)"
         }
         if {$Red4Widgets(GS_AUTOSCALE) == 1} {
-          set high 0.0
-          set low 0.0
+          set Red4Widgets(GS_DHI) 1000.0
+          set Red4Widgets(GS_DLO) 0.0
           set param "${param} autoscale='T'"
         } else {
-          set high [string trim [$Red4Widgets(GS_ENT08) get]]
-          set low [string trim [$Red4Widgets(GS_ENT09) get]]
-          set param "${param} autoscale='F' high=$high low=$low"
+          set Red4Widgets(GS_DHI) [string trim [$Red4Widgets(GS_ENT08) get]]
+          set Red4Widgets(GS_DLO) [string trim [$Red4Widgets(GS_ENT09) get]]
+          set param "${param} autoscale='F' high=$Red4Widhets(GS_DHI) low=$Red4Widhets(GS_DLO)"
         }
         set param "${param} mean=0.0 sigma=0.0 median=0.0 mode=0.0"
         $taskname obey stats "${param}" -inform "cgs4drInform $taskname %V"

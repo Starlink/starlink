@@ -31,7 +31,7 @@ proc red4AddPair {taskname pair} {
     
     set Red4Widgets(AP_LAB02) [label $bot.l1 -text "Sky Weighting Factor"]
     set Red4Widgets(AP_SKYWT) [entry $bot.sk]
-    set Red4Widgets(AP_CHECK) [checkbutton $bot.l2 -text "Variance Weighting" -variable Red4Widgets(AP_VARWT)]
+    set Red4Widgets(AP_CHECK) [checkbutton $bot.l2 -text "Variance Weight" -variable Red4Widgets(AP_VARWT)]
     pack $Red4Widgets(AP_CHECK) -in $bot -side right -pady 2m
     pack $Red4Widgets(AP_LAB02) $Red4Widgets(AP_SKYWT) -in $bot -side left -pady 2m
     $Red4Widgets(AP_SKYWT) insert end $Red4Widgets(DSKYWT)

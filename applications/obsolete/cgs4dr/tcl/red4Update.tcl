@@ -240,7 +240,7 @@ proc red4Update {item value} {
     if {[string trim ${value}] == "ALL"} {
       selection clear $Red4Widgets(FC_ENT01) 
       $Red4Widgets(FC_ENT01) delete 0 end
-      $Red4Widgets(FC_ENT01) insert end $Red4Widgets(DDS)
+      $Red4Widgets(FC_ENT01) insert end $Red4Widgets(DSP)
       selection clear $Red4Widgets(FC_ENT02) 
       $Red4Widgets(FC_ENT02) delete 0 end
       $Red4Widgets(FC_ENT02) insert end 0.0
@@ -249,7 +249,7 @@ proc red4Update {item value} {
     } elseif {[string trim ${value}] == "FC_ENT01"} {
       selection clear $Red4Widgets(FC_ENT01) 
       $Red4Widgets(FC_ENT01) delete 0 end
-      $Red4Widgets(FC_ENT01) insert end $Red4Widgets(DDS)
+      $Red4Widgets(FC_ENT01) insert end $Red4Widgets(DSP)
     } elseif {[string trim ${value}] == "FC_ENT02"} {
       selection clear $Red4Widgets(FC_ENT02) 
       $Red4Widgets(FC_ENT02) delete 0 end

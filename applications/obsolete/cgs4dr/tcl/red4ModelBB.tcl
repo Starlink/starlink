@@ -33,9 +33,9 @@ proc red4ModelBB {taskname} {
     set Red4Widgets(BB_ENT04) [entry $bot.e4]
     pack $Red4Widgets(BB_LAB02) $Red4Widgets(BB_ENT02) $Red4Widgets(BB_LAB03) \
       $Red4Widgets(BB_ENT03) $Red4Widgets(BB_LAB04) $Red4Widgets(BB_ENT04) -in $bot -side left -pady 2m
-    $Red4Widgets(BB_ENT02) insert end 00.0
-    $Red4Widgets(BB_ENT03) insert end 2.2
-    $Red4Widgets(BB_ENT04) insert end 0
+    $Red4Widgets(BB_ENT02) insert end $Red4Widgets(BB_DT)
+    $Red4Widgets(BB_ENT03) insert end $Red4Widgets(BB_DW)
+    $Red4Widgets(BB_ENT04) insert end $Red4Widgets(BB_DF)
 
 # Bind the defaults to Button-2
     bind $Red4Widgets(BB_LAB01) <Button-2> "red4Update red4ModelBB ALL"
@@ -55,22 +55,22 @@ proc red4ModelBB {taskname} {
     set bv [dialogShow .red4Dialogue .red4Dialogue]
     if {$bv==0} {
       cgs4drCursor watch red white
-      set obs [string trim [$Red4Widgets(BB_ENT01) get]]
-      set tef [string trim [$Red4Widgets(BB_ENT02) get]]
-      set rwv [string trim [$Red4Widgets(BB_ENT03) get]]
-      set rfl [string trim [$Red4Widgets(BB_ENT04) get]]
-      if {$obs=="" || $obs==$Red4Widgets(DOB)} {
+      set Red4Widgets(RO) [string trim [$Red4Widgets(BB_ENT01) get]]
+      set Red4Widgets(BB_DT) [string trim [$Red4Widgets(BB_ENT02) get]]
+      set Red4Widgets(BB_DW) [string trim [$Red4Widgets(BB_ENT03) get]]
+      set Red4Widgets(BB_DF) [string trim [$Red4Widgets(BB_ENT04) get]]
+      if {$Red4Widgets(RO)=="" || $Red4Widgets(RO)==$Red4Widgets(DOB)} {
         cgs4drClear $taskname
         cgs4drInform $taskname "red4ModelBB error : A dataset has not been specified properly!"
       } else {
 
 # Remove observation
-        set Red4Widgets(OB) $obs
-        set out ${obs}_bb
-        set message "Generating model black body from $obs output to $out"
+        set out $Red4Widgets(RO)_bb
+        set message "Generating model black body from $Red4Widgets(RO) output to $out"
         cgs4drInform $taskname $message
-        $taskname obey black_body "template=$obs bb_temp=$tef refwave=$rwv refflux=$rfl output=$out" \
-          -inform "cgs4drInform $taskname %V"
+        set param "template=$Red4Widgets(RO) bb_temp=$Red4Widgets(BB_DT) refwave=$Red4Widgets(BB_DW)" 
+        set param "$param refflux=$Red4Widgets(BB_DF) output=$out"
+        $taskname obey black_body "$param" -inform "cgs4drInform $taskname %V"
       }
     }
 

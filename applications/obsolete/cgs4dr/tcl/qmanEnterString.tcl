@@ -14,18 +14,17 @@ proc qmanEnterString {taskname} {
 
 # Set strings
     set qpos $QmanWidgets(QUEUE_POSITION)
-    set sval [string trim [$QmanWidgets(STRING) get]]
-    set fval $QmanWidgets(RB_STRING)
-    if {$fval == "DRCOMMENT"} {
-      set name "$fval $sval"
+    set QmanWidgets(EW_STRING) [string trim [$QmanWidgets(STRING) get]]
+    if {$QmanWidgets(RB_STRING) == "DRCOMMENT"} {
+      set name "$QmanWidgets(RB_STRING) $QmanWidgets(EW_STRING)"
       $taskname obey write "$QmanAccess qposition=$qpos string=\"$name\"" -inform "cgs4drInform $taskname %V"
     } else {
-      if {$sval != ""} {
-        set name "$fval $sval"
+      if {$QmanWidgets(EW_STRING) != ""} {
+        set name "$QmanWidgets(RB_STRING) $QmanWidgets(EW_STRING)"
         $taskname obey write "$QmanAccess qposition=$qpos string=\"$name\"" -inform "cgs4drInform $taskname %V"
       } else {
         cgs4drClear $taskname
-        cgs4drInform $taskname "qmanEnterString error : Cannot accept a null string for $fval!"
+        cgs4drInform $taskname "qmanEnterString error : Cannot accept a null string for $QmanWidgets(RB_STRING)!"
       }
     }
 

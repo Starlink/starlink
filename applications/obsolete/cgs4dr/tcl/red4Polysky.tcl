@@ -45,7 +45,6 @@ proc red4Polysky {taskname} {
     bind $pf2 <Button-3> "red4HelpDialog .helpDialog $cgs4drHtml/red4PolyskyBox1.html"
     bind $pf3 <Button-3> "red4HelpDialog .helpDialog $cgs4drHtml/red4PolyskyBox1.html"
     bind $pf4 <Button-3> "red4HelpDialog .helpDialog $cgs4drHtml/red4PolyskyBox1.html"
-    set Red4Widgets(PF_POLYFIT) REDUCED_GRP
 
     set l1 [label $lev(3).l1 -text "Degree"]
     set Red4Widgets(PF_DEGREE) [entry $lev(3).dg -width 15]
@@ -70,10 +69,9 @@ proc red4Polysky {taskname} {
     bind $we <Button-2> "red4Update red4Polysky PF_WEIGHT"
     bind $we <Button-3> "red4HelpDialog .helpDialog $cgs4drHtml/red4PolyskyBox1.html"
     $Red4Widgets(PF_DEGREE) delete 0 end
-    $Red4Widgets(PF_DEGREE) insert end 1.0
+    $Red4Widgets(PF_DEGREE) insert end $Red4Widgets(PF_DDEG)
     $Red4Widgets(PF_NREJECT) delete 0 end
-    $Red4Widgets(PF_NREJECT) insert end 0
-    set Red4Widgets(PF_WEIGHT) 1
+    $Red4Widgets(PF_NREJECT) insert end $Red4Widgets(PF_DNRJ)
 
 # Do sky areas in loop
     set skn 4
@@ -103,19 +101,24 @@ proc red4Polysky {taskname} {
       bind $Red4Widgets(PF_SAYE$skynum) <Button-3> "red4HelpDialog .helpDialog $cgs4drHtml/red4PolyskyBox1.html"
       if {$skynum == 1} {
         $Red4Widgets(PF_SAYS$skynum) delete 0 end
-        $Red4Widgets(PF_SAYS$skynum) insert end 20
+        $Red4Widgets(PF_SAYS$skynum) insert end $Red4Widgets(PF_DYS1)
         $Red4Widgets(PF_SAYE$skynum) delete 0 end
-        $Red4Widgets(PF_SAYE$skynum) insert end 25
+        $Red4Widgets(PF_SAYE$skynum) insert end $Red4Widgets(PF_DYE1)
       } elseif {$skynum == 2} {
         $Red4Widgets(PF_SAYS$skynum) delete 0 end
-        $Red4Widgets(PF_SAYS$skynum) insert end 35
+        $Red4Widgets(PF_SAYS$skynum) insert end $Red4Widgets(PF_DYS2)
         $Red4Widgets(PF_SAYE$skynum) delete 0 end
-        $Red4Widgets(PF_SAYE$skynum) insert end 40
+        $Red4Widgets(PF_SAYE$skynum) insert end $Red4Widgets(PF_DYE2)
+      } elseif {$skynum == 3} {
+        $Red4Widgets(PF_SAYS$skynum) delete 0 end
+        $Red4Widgets(PF_SAYS$skynum) insert end $Red4Widgets(PF_DYS3)
+        $Red4Widgets(PF_SAYE$skynum) delete 0 end
+        $Red4Widgets(PF_SAYE$skynum) insert end $Red4Widgets(PF_DYE3)
       } else {
         $Red4Widgets(PF_SAYS$skynum) delete 0 end
-        $Red4Widgets(PF_SAYS$skynum) insert end -1
+        $Red4Widgets(PF_SAYS$skynum) insert end $Red4Widgets(PF_DYS4)
         $Red4Widgets(PF_SAYE$skynum) delete 0 end
-        $Red4Widgets(PF_SAYE$skynum) insert end -1
+        $Red4Widgets(PF_SAYE$skynum) insert end $Red4Widgets(PF_DYE4)
       }
       incr skn
     }
@@ -126,37 +129,39 @@ proc red4Polysky {taskname} {
       cgs4drCursor watch red white
 
 #   Get dataset and check it's OK
-      set data [string trim [$Red4Widgets(PF_INPUT) get]]
-      if {$data=="" || $data==$Red4Widgets(DRG)} {
+      set Red4Widgets(RG) [string trim [$Red4Widgets(PF_INPUT) get]]
+      if {$Red4Widgets(RG)=="" || $Red4Widgets(RG)==$Red4Widgets(DRG)} {
         cgs4drClear $taskname
         cgs4drInform $taskname "red4Polysky error : A dataset has not been specified properly!"
       } else {
-        set Red4Widgets(RG) $data
-        set output ${data}_psky
+        set output $Red4Widgets(RG)_psky
 
 #     Set the enhanced sky subtraction parameters
-        set polyfit  $Red4Widgets(PF_POLYFIT)
-        set weight   $Red4Widgets(PF_WEIGHT)
-        set degree   [string trim [$Red4Widgets(PF_DEGREE) get]]
-        set nreject  [string trim [$Red4Widgets(PF_NREJECT) get]]
-        set says1 [string trim [$Red4Widgets(PF_SAYS1) get]]
-        set saye1 [string trim [$Red4Widgets(PF_SAYE1) get]]
-        set says2 [string trim [$Red4Widgets(PF_SAYS2) get]]
-        set saye2 [string trim [$Red4Widgets(PF_SAYE2) get]]
-        set says3 [string trim [$Red4Widgets(PF_SAYS3) get]]
-        set saye3 [string trim [$Red4Widgets(PF_SAYE3) get]]
-        set says4 [string trim [$Red4Widgets(PF_SAYS4) get]]
-        set saye4 [string trim [$Red4Widgets(PF_SAYE4) get]]
+        set polyfit $Red4Widgets(PF_POLYFIT)
+        set weight  $Red4Widgets(PF_WEIGHT)
+        set Red4Widgets(PF_DDEG) [string trim [$Red4Widgets(PF_DEGREE) get]]
+        set Red4Widgets(PF_DNRJ) [string trim [$Red4Widgets(PF_NREJECT) get]]
+        set Red4Widgets(PF_DYS1) [string trim [$Red4Widgets(PF_SAYS1) get]]
+        set Red4Widgets(PF_DYE1) [string trim [$Red4Widgets(PF_SAYE1) get]]
+        set Red4Widgets(PF_DYS2) [string trim [$Red4Widgets(PF_SAYS2) get]]
+        set Red4Widgets(PF_DYE2) [string trim [$Red4Widgets(PF_SAYE2) get]]
+        set Red4Widgets(PF_DYS3) [string trim [$Red4Widgets(PF_SAYS3) get]]
+        set Red4Widgets(PF_DYE3) [string trim [$Red4Widgets(PF_SAYE3) get]]
+        set Red4Widgets(PF_DYS4) [string trim [$Red4Widgets(PF_SAYS4) get]]
+        set Red4Widgets(PF_DYE4) [string trim [$Red4Widgets(PF_SAYE4) get]]
 
 #    Do the action
-        cgs4drInform $taskname "Polysky-ing $data into $output"
+        cgs4drInform $taskname "Polysky-ing $Red4Widgets(RG) into $output"
         if {$weight == 1} {
-          set param "INPUT=$data OUTPUT=$output PF_POLYFIT=$polyfit PF_WEIGHT='TRUE' PF_DEGREE=$degree PF_NREJECT=$nreject"
+          set param "INPUT=$Red4Widgets(RG) OUTPUT=$output PF_POLYFIT=$polyfit PF_WEIGHT='TRUE'"
         } else {
-          set param "INPUT=$data OUTPUT=$output PF_POLYFIT=$polyfit PF_WEIGHT='FALSE' PF_DEGREE=$degree PF_NREJECT=$nreject"
+          set param "INPUT=$Red4Widgets(RG) OUTPUT=$output PF_POLYFIT=$polyfit PF_WEIGHT='FALSE'"
         }
-        set param "$param PF_SAYS1=$says1 PF_SAYE1=$saye1 PF_SAYS2=$says2 PF_SAYE2=$saye2 PF_SAYS3=$says3 PF_SAYE3=$saye3"
-        set param "$param PF_SAYS4=$says4 PF_SAYE4=$saye4"
+        set param "$param PF_DEGREE=$Red4Widgets(PF_DDEG) PF_NREJECT=$Red4Widgets(PF_DNRJ)"
+        set param "$param PF_SAYS1=$Red4Widgets(PF_DYS1) PF_SAYE1=$Red4Widgets(PF_DYE1)"
+        set param "$param PF_SAYS2=$Red4Widgets(PF_DYS2) PF_SAYE2=$Red4Widgets(PF_DYE2)"
+        set param "$param PF_SAYS3=$Red4Widgets(PF_DYS3) PF_SAYE3=$Red4Widgets(PF_DYE3)"
+        set param "$param PF_SAYS4=$Red4Widgets(PF_DYS4) PF_SAYE4=$Red4Widgets(PF_DYE4)"
         $taskname obey polyfit "$param" -inform "cgs4drInform $taskname %V"
       }
     }

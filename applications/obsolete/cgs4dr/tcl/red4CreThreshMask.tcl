@@ -41,7 +41,7 @@ proc red4CreThreshMask {taskname array} {
     set Red4Widgets(TM_LAB02) [label $mid.l2 -text "Maskname"]
     set Red4Widgets(TM_ENT02) [entry $mid.e2 -width 60]
     pack $Red4Widgets(TM_LAB02) $Red4Widgets(TM_ENT02) -in $mid -side left
-    $Red4Widgets(TM_ENT02) insert end "Name_of_new_bad_pixel_mask"
+    $Red4Widgets(TM_ENT02) insert end $Red4Widgets(MBPM)
  
     set Red4Widgets(TM_LAB03) [label $bot.l3 -text "Port"]
     set p0 [radiobutton $bot.p0 -bitmap @$cgs4drBitmaps/port0.xbm -variable Red4Widgets(TM_RDISP) -value 0]
@@ -78,14 +78,13 @@ proc red4CreThreshMask {taskname array} {
     set bv [dialogShow .red4Dialogue .red4Dialogue]
     if {$bv==0} {
       cgs4drCursor watch red white
-      set data [string trim [$Red4Widgets(TM_ENT01) get]]
-      set mask [string trim [$Red4Widgets(TM_ENT02) get]]
+      set Red4Widgets(RO) [string trim [$Red4Widgets(TM_ENT01) get]]
+      set Red4Widgets(MBPM) [string trim [$Red4Widgets(TM_ENT02) get]]
       set port $Red4Widgets(TM_RDISP)
-      set Red4Widgets(RO) $data
       destroy .red4Dialogue
 
 #   Return if no data specified
-      if {$data=="" || $data==$Red4Widgets(DRO) || $mask=="" || $mask=="#" || $mask=="Name_of_new_bad_pixel_mask"} {
+      if {$Red4Widgets(RO)=="" || $Red4Widgets(RO)==$Red4Widgets(DRO) || $Red4Widgets(MBPM)=="" || $Red4Widgets(MBPM)=="#"} {
         set Red4Widgets(RO) $Red4Widgets(DRO)
         cgs4drClear $taskname
         cgs4drInform $taskname "red4CreThreshMask error : A dataset has not been specified properly!"
@@ -94,11 +93,11 @@ proc red4CreThreshMask {taskname array} {
       }
 
 #   Display the dataset
-      set message "Plotting $data ($array array) in port $port as a HISTOGRAM"
+      set message "Plotting $Red4Widgets(RO) ($array array) in port $port as a HISTOGRAM"
       cgs4drInform $taskname $message
       nbs put ${P4NoticeBoard}.port_${port}.display_type HISTOGRAM
       nbs put ${P4NoticeBoard}.port_${port}.display_plane [string trim [string toupper $array]]
-      set status [catch {$P4Task obey display "data=$data port=$port" -inform "cgs4drInform $taskname %V"}]
+      set status [catch {$P4Task obey display "data=$Red4Widgets(RO) port=$port" -inform "cgs4drInform $taskname %V"}]
       if {$status!=0} {
         cgs4drCursor arrow green black
         return
@@ -133,7 +132,7 @@ proc red4CreThreshMask {taskname array} {
         tkwait variable x
         set thigh $x
         if {$cursor_status==0} {
-          $taskname obey cre_thresh_mask "input=$data mask=$mask tlow=$tlow thigh=$thigh" -inform "cgs4drInform $taskname %V"
+          $taskname obey cre_thresh_mask "input=$Red4Widgets(RO) mask=$Red4Widgets(MBPM) tlow=$tlow thigh=$thigh" -inform "cgs4drInform $taskname %V"
         } else {
           set message "Application terminated by non-zero cursor status"
           cgs4drInform $taskname $message

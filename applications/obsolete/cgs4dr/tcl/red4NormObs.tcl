@@ -37,8 +37,8 @@ proc red4NormObs {taskname} {
     pack $pf $sm $Red4Widgets(NO_LAB02) $Red4Widgets(NO_ENT02) $Red4Widgets(NO_LAB03) \
        $Red4Widgets(NO_ENT03) -in $bot -side left -pady 2m
     set Red4Widgets(NO_METHOD) POLYFIT
-    $Red4Widgets(NO_ENT02) insert end 3
-    $Red4Widgets(NO_ENT03) insert end 5
+    $Red4Widgets(NO_ENT02) insert end $Red4Widgets(NO_DPOL)
+    $Red4Widgets(NO_ENT03) insert end $Red4Widgets(NO_DBOX)
     bind $pf <Button-2> "red4Update red4NormObs NO_METHOD"
     bind $sm <Button-2> "red4Update red4NormObs NO_METHOD"
     bind $Red4Widgets(NO_LAB02) <Button-2> "red4Update red4NormObs ALL"
@@ -52,21 +52,21 @@ proc red4NormObs {taskname} {
     set bv [dialogShow .red4Dialogue .red4Dialogue]
     if {$bv==0} {
       cgs4drCursor watch red white
-      set obs [string trim [$Red4Widgets(NO_ENT01) get]]
-      set pol [string trim [$Red4Widgets(NO_ENT02) get]]
-      set box [string trim [$Red4Widgets(NO_ENT03) get]]
-      if {$obs=="" || $obs==$Red4Widgets(DRO)} {
+      set Red4Widgets(RO) [string trim [$Red4Widgets(NO_ENT01) get]]
+      set Red4Widgets(NO_DPOL) [string trim [$Red4Widgets(NO_ENT02) get]]
+      set Red4Widgets(NO_DBOX) [string trim [$Red4Widgets(NO_ENT03) get]]
+      if {$Red4Widgets(RO)=="" || $Red4Widgets(RO)==$Red4Widgets(DRO)} {
         cgs4drClear $taskname
         cgs4drInform $taskname "red4NormObs error : A dataset has not been specified properly!"
       } else {
 
 # Remove observation
-        set Red4Widgets(RO) $obs
-        set out ${obs}_ff
-        set message "Generating normalised observation from $obs output to $out"
+        set out $Red4Widgets(RO)_ff
+        set message "Generating normalised observation from $Red4Widgets(RO) output to $out"
         cgs4drInform $taskname $message
-        $taskname obey normalise_ff "input=$obs output=$out norm_method=$Red4Widgets(NO_METHOD) order=$pol boxsize=$box" \
-           -inform "cgs4drInform $taskname %V"
+        set param "input=$Red4Widgets(RO) output=$out norm_method=$Red4Widgets(NO_METHOD)"
+        set param "$param order=$Red4Widgets(NO_DPOL) boxsize=$Red4Widgets(NO_DBOX)"
+        $taskname obey normalise_ff "$param" -inform "cgs4drInform $taskname %V"
       }
     }
 

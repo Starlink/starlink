@@ -19,11 +19,15 @@ proc qmanEnterEndRange {taskname} {
 # Get the start and end record numbers and set the step to 1 or -1.
     if {$qpos == "oldest"} {
 	set index [$QmanWidgets(END_RANGE_FIRST) get]
+        set QmanWidgets(DEF) $index
 	set end [$QmanWidgets(END_RANGE_LAST) get]
+        set QmanWidgets(DEL) $end
 	set step 1
     } {
 	set end [$QmanWidgets(END_RANGE_FIRST) get]
+        set QmanWidgets(DEF) $end
 	set index [$QmanWidgets(END_RANGE_LAST) get]
+        set QmanWidgets(DEL) $index
 	set step -1
     }
 

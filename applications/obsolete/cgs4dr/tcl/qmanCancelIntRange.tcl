@@ -19,13 +19,18 @@ proc qmanCancelIntRange {taskname} {
 
 # Compute the start and end positions and the step (1 or -1).
     set obsnum [$QmanWidgets(OBS_NUMBER) get]
+    set QmanWidgets(DON) $obsnum
     if {$qpos == "oldest"} {
 	set index [$QmanWidgets(INT_RANGE_FIRST) get]
+        set QmanWidgets(DIF) $index
 	set end [$QmanWidgets(INT_RANGE_LAST) get]
+        set QmanWidgets(DIL) $end
 	set step 1
     } {
 	set end [$QmanWidgets(INT_RANGE_FIRST) get]
+        set QmanWidgets(DIF) $end
 	set index [$QmanWidgets(INT_RANGE_LAST) get]
+        set QmanWidgets(DIL) $index
 	set step -1
     }
 

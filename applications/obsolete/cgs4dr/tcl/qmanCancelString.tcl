@@ -14,9 +14,9 @@ proc qmanCancelString {taskname} {
 
 # Set string
     set qpos $QmanWidgets(QUEUE_POSITION)
-    set sval [string trim [$QmanWidgets(STRING) get]]
-    set fval $QmanWidgets(RB_STRING)
-    set name "$fval $sval"
+    set QmanWidgets(EW_STRING) [string trim [$QmanWidgets(STRING) get]]
+    set QmanWidgets(RB_STRING) $QmanWidgets(RB_STRING)
+    set name "$QmanWidgets(RB_STRING) $QmanWidgets(EW_STRING)"
 
 # Delete the string using destructive reads
     $taskname obey read "$QmanAccess search_mode=$qpos string=\"$name\" \

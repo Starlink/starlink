@@ -17,8 +17,8 @@ proc qmanEnterEndGroup {taskname} {
 # Construct the record name
     set qpos $QmanWidgets(QUEUE_POSITION)
     set tag ENDGROUP
-    set grpnum [$QmanWidgets(GROUP_NUMBER) get]
-    set name "$tag rg$env(QMAN_DATE)_$grpnum"
+    set QmanWidgets(DGN) [$QmanWidgets(GROUP_NUMBER) get]
+    set name "$tag rg$env(QMAN_DATE)_$QmanWidgets(DGN)"
 
 # Write the record
     $taskname obey write "$QmanAccess qposition=$qpos string=\"$name\"" -inform "cgs4drInform $taskname %V"
