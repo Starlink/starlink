@@ -23,8 +23,9 @@
 *     This routine transforms positions stored in position lists.
 *     Transformations are defined either by a set of 6 coefficients
 *     for the linear transform, by an algebraic expression given by
-*     you, or by using a forward or inverse mapping from a TRANSFORM
-*     structure (as created by REGISTER).
+*     you, by using a forward or inverse mapping from a TRANSFORM
+*     structure, or by a mapping between two frames stored in a
+*     WCS component.
 
 *  Usage:
 *     tranlist inlist outlist trtype
@@ -42,21 +43,69 @@
 *           FA > SQRT(X*X+Y*Y)
 *           PA > 100D0
 *     FORWARD = _LOGICAL (Read)
-*        If TRTYPE="STRUCT" is chosen then this parameter's value
-*        controls whether the forward or inverse mapping in the
-*        transform structure is used.
+*        If TRTYPE="STRUCT" then this parameter's value controls whether
+*        the forward or inverse mapping in the transform structure is
+*        used.
 *        [TRUE]
+*     EPOCHIN = _DOUBLE (Read)
+*        If a "Sky Co-ordinate System" specification is supplied (using 
+*        parameter FRAMEIN) for a celestial co-ordinate system, then 
+*        an epoch value is needed to qualify it. This is the epoch at 
+*        which the supplied sky positions were determined. It should be 
+*        given as a decimal years value, with or without decimal places
+*        ("1996.8" for example). Such values are interpreted as a 
+*        Besselian epoch if less than 1984.0 and as a Julian epoch 
+*        otherwise. 
+*        [Dynamic]
+*     EPOCHOUT = _DOUBLE (Read)
+*        If a "Sky Co-ordinate System" specification is supplied (using 
+*        parameter FRAMEOUT) for a celestial co-ordinate system, then 
+*        an epoch value is needed to qualify it. This is the epoch at 
+*        which the supplied sky positions were determined. It should be 
+*        given as a decimal years value, with or without decimal places
+*        ("1996.8" for example). Such values are interpreted as a 
+*        Besselian epoch if less than 1984.0 and as a Julian epoch 
+*        otherwise. 
+*        [Dynamic]
+*     FRAMEIN = LITERAL (Read)
+*        If TRTYPE="WCS" then the transformation is a mapping from the
+*        frame specified by this parameter to that specified by the
+*        FRAMEOUT parameter.  The value of this parameter can be one of
+*        the following:
+*        - A domain name such as SKY, AXIS, PIXEL, etc.
+*        - An integer value giving the index of the required Frame 
+*          within the WCS component.
+*        - A "Sky Co-ordinate System" (SCS) value such as EQUAT(J2000)
+*          (see section "Sky Co-ordinate Systems" in SUN/95).
+*        [PIXEL]
+*     FRAMEOUT = LITERAL (Read)
+*        If TRTYPE="WCS" then the transformation is a mapping from the
+*        frame specified by the FRAMEIN parameter to that specified
+*        by this parameter.  The value of this parameter can be one of
+*        the following:
+*        - A domain name such as SKY, AXIS, PIXEL, etc.
+*        - An integer value giving the index of the required Frame 
+*          within the WCS component.
+*        - A "Sky Co-ordinate System" (SCS) value such as EQUAT(J2000)
+*          (see section "Sky Co-ordinate Systems" in SUN/95).
 *     INEXT = _LOGICAL (Read)
+*        If NDFNAMES is TRUE and the transformation is to be specified
+*        using a WCS component (TRTYPE="WCS"), then this parameter 
+*        controls whether or not the WCS component should be located
+*        in each of the NDFs.  If set FALSE, the WCSFILE parameter will
+*        be used.
+*
 *        If NDFNAMES is TRUE and the transformation is to be specified
 *        using a TRANSFORM structure (TRTYPE="STRUCT") then this
 *        parameter controls whether or not the structure should be
-*        located in the CCDPACK extensions of the NDFs.
+*        located in the CCDPACK extension of each of the NDFs.  If
+*        set FALSE, the TRANSFORM parameter will be used.
 *
-*        If this option is chosen then the transform structure in EACH
-*        NDF will be applied to the associated position list. So for
-*        instance if you have a set of registered NDFs and positions
-*        these may be transformed all at once to and from the reference
-*        coordinate system.
+*        If this option is chosen then the WCS component or transform 
+*        structure in EACH NDF will be applied to the associated
+*        position list. So for instance if you have a set of registered 
+*        NDFs and positions these may be transformed all at once to and 
+*        from the reference coordinate system.
 *        [TRUE]
 *     INLIST = LITERAL (Read)
 *        This parameter is used to access the names of the lists which
@@ -99,7 +148,7 @@
 *        default is "BOTH".
 *        [BOTH]
 *     NAMELIST = _FILENAME
-*        Only used if NDFNAME is FALSE. This specifies the name of a
+*        Only used if NDFNAMES is FALSE. This specifies the name of a
 *        file to contain a listing of the names of the output lists.
 *        This file may then be used to pass the names onto another
 *        CCDPACK application using indirection.
@@ -157,6 +206,7 @@
 *
 *           - COEFF
 *           - EXPRES
+*           - WCS
 *           - STRUCT
 *
 *        or unique abbreviations of.
@@ -176,12 +226,21 @@
 *        and Y. For a full set of possible functions see SUN/61
 *        (TRANSFORM).
 *
+*        WCS means that the transformation will be taken from the WCS
+*        component of an NDF.  In this case the name of the NDF
+*        containing the WCS component should be supplied (this will be
+*        picked up automatically through the association of an NDF
+*        and a position list if NDFNAMES and INEXT are both TRUE).
+*        The transformation will be that between the frames defined by
+*        the FRAMEIN and FRAMEOUT parameters.
+*
 *        STRUCT signifies that a transform structure (probably created
 *        by REGISTER or CCDEDIT) is to be applied to the data. In this
 *        case the name of the object containing the structure should
-*        be supplied (this may be picked up automatically through the
-*        association of an NDF and a position list) and whether to use
-*        the forward or inverse mappings.
+*        be supplied (this will be picked up automatically through the
+*        association of an NDF and a position list if NDFNAMES and 
+*        INEXT are both TRUE) and whether to use the forward or inverse 
+*        mappings (the FORWARD parameter).
 *        [COEFF]
 *     TR( 6 ) = _DOUBLE (Read)
 *        If TRTYPE="COEFF" is chosen then the values of this parameter
@@ -199,6 +258,10 @@
 *            - NDF_NAME.MORE.CCDPACK.TRANSFORM
 *
 *        Only one structure can be used at a time.
+*     WCSFILE = NDF (Read)
+*        If TRTYPE="WCS" and INEXT is false, then this parameter gives
+*        the name of the NDF containing the WCS component which is to
+*        be used for the transformation.
 *     XFOR = LITERAL (Read)
 *        If TRTYPE="EXPRES" is chosen then this parameter specifies the
 *        transformation that maps to the new X coordinate. The
@@ -223,14 +286,19 @@
 *        "X" and "Y".
 
 *  Examples:
-*     tranlist inlist='*' outlist='*.tran' trtype=struct inext=true
-*              forward=false
+*     tranlist inlist='*' outlist='*.reg' trtype=wcs framein=pixel
+*              frameout=ccd_reg
 *        In this example all the NDFs in the current directory are
 *        accessed and their associated position lists are opened.
-*        The transform structures in the NDFs are used to transform the
-*        associated positions using the inverse mappings. The output
-*        lists are called ndf_name.tran and are associated with the
-*        NDFs.
+*        The WCS component of each NDF is used to transform the 
+*        coordinates in the position lists from pixel coordinates to
+*        coordinates in the frame with a domain 'CCD_REG' (the 
+*        registration domain).  The output lists are called 
+*        ndf-name.reg and are associated with the NDFs.
+*     tranlist inlist='*' outlist='*.tran' trtype=struct forward=false
+*        In this example transform structures in each of the NDFs in
+*        the current directory are used to transform their associated
+*        position lists.  The inverse mappings are used.
 *     tranlist inlist='*_reduced' outlist='*.off' trtype=coeff
 *              tr='[10,1,0,20,0,1]'
 *        In this example the position lists associated with the NDFs
@@ -340,6 +408,7 @@
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -353,6 +422,8 @@
 *     3-MAR-1997 (PDRAPER):
 *        Removed control of top-level locators (foreign data access
 *        upgrade) and added DAT_ANNULs for LOCTR.
+*     1-APR-1999 (MBT):
+*        Added new TRTYPE of WCS.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -368,6 +439,7 @@
       INCLUDE 'DAT_PAR'          ! HDS/DAT constants
       INCLUDE 'CCD1_PAR'         ! CCDPACK parameterisations
       INCLUDE 'FIO_PAR'          ! FIO parameterisations
+      INCLUDE 'AST_PAR'          ! Standard AST constants
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -400,7 +472,12 @@
       INTEGER IPDAT              ! Pointer to input data
       INTEGER IPIND              ! Pointer to input identifiers
       INTEGER IPWORK             ! Pointer to workspace for output data
-      INTEGER NDFGRP              ! Group of input NDF names
+      INTEGER IWCS               ! AST pointer to WCSFILE WCS component
+      INTEGER IWCSF              ! NDF identifier for WCSFILE
+      INTEGER JFROM              ! Index of source frame in frameset
+      INTEGER JTO                ! Index of destination frame in frameset
+      INTEGER MAPAST             ! AST pointer to mapping for transformation
+      INTEGER NDFGRP             ! Group of input NDF names
       INTEGER NFOR               ! Number of forward variables
       INTEGER NINV               ! Number of inverse functions =2 X+Y
       INTEGER NOPEN              ! Number of input files
@@ -435,6 +512,9 @@
 
 *  Start the CCDPACK log system.
       CALL CCD1_START( 'TRANLIST', STATUS )
+
+*  Begin AST context.
+      CALL AST_BEGIN( STATUS )
 
 *  See how the user wants to supply the positions list information. This
 *  may be provided using either the named extension item CURRENT_LIST
@@ -490,9 +570,9 @@
       IF ( STATUS .NE. SAI__OK ) GO TO 99
 
 *  How is the user going to supply the transformation data? As
-*  coefficients (COEFF), as a transform formula (EXPRESSION), or using
-*  a transform structure.
-      CALL PAR_CHOIC( 'TRTYPE', ' ', 'COEFF,EXPRES,STRUCT', .FALSE.,
+*  coefficients (COEFF), as a transform formula (EXPRESSION), using
+*  a transform structure, or using a WCS component.
+      CALL PAR_CHOIC( 'TRTYPE', ' ', 'COEFF,EXPRES,WCS,STRUCT', .FALSE.,
      :                TRTYPE, STATUS )
 
 *  Setting up transformation section....................................
@@ -576,10 +656,11 @@
 
 *  Compile it.
          CALL TRN_COMP( LOCTR, .TRUE., IDTR, STATUS )
-      ELSE
+      ELSE IF ( TRTYPE .EQ. 'STRUCT' ) THEN
 
-*  Does the user want us to look for a standard transformations in the
-*  NDF extensions (only if ndfnames are true).
+*  Using a transform structure.  Does the user want us to look 
+*  for a standard transformations in the NDF extensions (only if 
+*  ndfnames are true).
          INEXT = .FALSE.
          IF ( NDFS ) CALL PAR_GET0L( 'INEXT', INEXT, STATUS )
          IF ( .NOT. INEXT ) THEN
@@ -595,11 +676,25 @@
          IF ( .NOT. INEXT ) THEN
             CALL TRN_COMP( LOCTR, FORWRD, IDTR, STATUS )
          END IF
+      ELSE IF ( TRTYPE .EQ. 'WCS' ) THEN
+
+*  Using a mapping between frames in a WCS component.  Does the user
+*  want to use the WCS component of each NDF (only if NDFNAMES is true)
+*  or to use a single NDF for all.
+         INEXT = .FALSE.
+         IF ( NDFS ) CALL PAR_GET0L( 'INEXT', INEXT, STATUS )
+         IF ( .NOT. INEXT ) THEN
+
+*  User supplies a single NDF in which is located the WCS component.
+            CALL NDF_ASSOC( 'WCSFILE', 'READ', IWCSF, STATUS )
+          END IF
+
       END IF
 
 *  Report the options to the user.
       CALL CCD1_RTRAN( TRTYPE, INEXT, TR, XFOR( :XLEN ), YFOR( :YLEN ),
-     :                 LOCTR, FORWRD, STATUS )
+     :                 LOCTR, FORWRD, 'FRAMEIN', 'FRAMEOUT', IWCSF, 
+     :                 STATUS )
 
 *  Stop now if problems are occurring.
       IF ( STATUS .NE. SAI__OK ) GO TO 99
@@ -669,8 +764,8 @@
 *  Linear transformation from supplied coefficients.
             CALL CCD1_LXYT( %VAL( IPDAT ), NREC, NREC, NVAL, TR,
      :                      %VAL( IPWORK ), STATUS )
-          ELSE IF ( TRTYPE .EQ. 'EXPRES' .OR. TRTYPE .EQ. 'STRUCT' )
-     :    THEN
+         ELSE IF ( TRTYPE .EQ. 'EXPRES' .OR. TRTYPE .EQ. 'STRUCT' )
+     :   THEN
 
 *  Using a tranformation structure. If these are stored in the NDF
 *  extensions then we may still need to access them.
@@ -696,7 +791,7 @@
                      CALL DAT_ANNUL( LOCEXT, STATUS )
                      STATUS = SAI__ERROR
                      CALL NDF_MSG( 'NDFNAME', IDIN )
-                     CALL ERR_REP( 'TRANNDF_NOEXT', '  NDF ^NDFNAME '//
+                     CALL ERR_REP( 'TRANLIST_NOEXT', '  NDF ^NDFNAME '//
      : 'does not have a TRANSFORM component in its CCDPACK extension',
      :                             STATUS )
                      GO TO 99
@@ -736,6 +831,48 @@
  2             CONTINUE
             END IF
             IF ( INEXT ) CALL DAT_ANNUL( LOCTR, STATUS )
+         ELSE IF ( TRTYPE .EQ. 'WCS' ) THEN
+
+*  Using WCS component of one or all NDFs for the mapping.  
+*  Generate the mapping from the NDF identifier.  If INEXT is set we 
+*  need to do this every time, otherwise just first time round the loop.
+            IF ( INEXT .OR. INDEX .EQ. 1 ) THEN
+
+*  Get the WCS component.
+               IF ( INEXT ) THEN
+                  CALL CCD1_GTWCS( IDIN, IWCS, STATUS )
+               ELSE
+                  CALL CCD1_GTWCS( IWCSF, IWCS, STATUS )
+               END IF
+
+*  Get the index of the source frame.
+               CALL KPG1_ASFRM( 'FRAMEIN', 'EPOCHIN', IWCS, ' ', ' ',
+     :                          .FALSE., STATUS )
+               JFROM = AST_GETI( IWCS, 'Current', STATUS )
+
+*  Get the index of the destination frame.
+               CALL KPG1_ASFRM( 'FRAMEOUT', 'EPOCHOUT', IWCS, ' ', ' ',
+     :                          .FALSE., STATUS )
+               JTO = AST_GETI( IWCS, 'Current', STATUS )
+
+*  Generate the mapping to use.
+               MAPAST = AST_GETMAPPING( IWCS, JFROM, JTO, STATUS )
+            END IF
+
+*  Transform the coordinates with the given mapping.
+            CALL AST_TRANN( MAPAST, NREC, 2, NREC, %VAL( IPDAT ), 
+     :                      .TRUE., 2, NREC, %VAL( IPWORK ), STATUS )
+
+*  Dispose of one-use mappings.
+            IF ( INEXT ) CALL AST_ANNUL( MAPAST, STATUS )
+
+*  Copy any further data into the result array.
+            IF ( NVAL .GT. 2 ) THEN
+               DO 4 I = 3, NVAL
+                  CALL CCD1_LCC( %VAL( IPDAT ), NREC, NVAL, I, I,
+     :                           %VAL( IPWORK ), STATUS )
+ 4             CONTINUE
+            END IF
          END IF
 
 *  Open a results file.
@@ -808,6 +945,9 @@
          IF ( LOCTR .NE. DAT__NOLOC ) CALL DAT_ANNUL( LOCTR, STATUS )
          CALL TRN_CLOSE( STATUS )
       END IF
+
+*  End AST context.
+      CALL AST_END( STATUS )
 
 *  If an error occurred, then report a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN
