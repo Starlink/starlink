@@ -9,6 +9,7 @@
 *    Bugs :
 *    Authors :
 *             (BHVAD::RJV)
+*             (RB) Richard Beard, University of Birmingham
 *    History :
 *    Type Definitions :
       IMPLICIT NONE
@@ -251,6 +252,7 @@
             CALL PGSLW(BOLD)
           ENDIF
 
+*  now use the correct limits (RB)
           DO IL=1,NL
             POS=(LEVS(IL)-MIN)/(MAX-MIN)
             IF (LEVS(IL).EQ.0.0) THEN
