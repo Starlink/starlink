@@ -2,14 +2,14 @@
 
     PARAMETER INP1
        POSITION 1
-       TYPE 'UNIV'
+       TYPE 'LITERAL'
        PROMPT 'First input dataset'
        HELP 'Either a DATA_ARRAY object or a primitive object'
     ENDPARAMETER
 
     PARAMETER INP2
        POSITION 2
-       TYPE 'UNIV'
+       TYPE 'LITERAL'
        PROMPT 'Second input dataset'
        HELP 'Either a DATA_ARRAY object or a primitive object'
     ENDPARAMETER
@@ -32,7 +32,7 @@
 
     PARAMETER OUT
        POSITION 4
-       TYPE 'UNIV'
+       TYPE 'LITERAL'
        ASSOCIATION '->GLOBAL.GRAFDS'
        PROMPT 'Output dataset'
        HELP 'This will be a 1D DATA_ARRAY object'
