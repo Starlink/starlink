@@ -1196,18 +1196,9 @@ do_test:
 #  Note the test has not yet succeeded.
 	@- if test -f .TESTED_$(SYSTEM); then rm -f .TESTED_$(SYSTEM); else :; fi
 #
-	@ echo
-	@ echo '$(PACK_NAME) does not have a make driven installation test'
-	@ echo
-	@ echo 'To test $(PACK_NAME), you should run the demonstation script,'
-	@ echo 'thus (% is the shell prompt):'
-	@ echo
-	@ echo ' % cd /empty_directory'
-	@ echo ' % source /star/etc/cshrc'
-	@ echo ' % xdisplay'
-	@ echo ' % $(PKG_NAME)setup'
-	@ echo ' % command_name'
-	@ echo
+	$(INSTALL_BIN)/astpcdmap disco=1 pcdcen=\[100,100\] result=atools-test.ast accept
+	$(INSTALL_BIN)/astshow.tcl atools-test.ast
+	rm atools-test.ast
 #
 #  Note the test has been run.
 	@ touch .TESTED_$(SYSTEM)
