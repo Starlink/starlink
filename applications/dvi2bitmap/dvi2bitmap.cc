@@ -967,9 +967,28 @@ void process_dvi_file (DviFile *dvif, bitmap_info& b, int fileResolution,
 		    // as reported by the DVI file; however, the file doesn't
 		    // report the offsets of these pages.  Add a
 		    // couple of inches to both and hope for the best.
-		    bitmap = new Bitmap
-			((bitmapW > 0 ? bitmapW : dvif->hSize()+2*oneInch),
-			 (bitmapH > 0 ? bitmapH : dvif->vSize()+2*oneInch));
+		    // If we haven't read the postamble, then hSize()
+		    // and vSize() return negative, so make a rough guess.
+		    if (bitmap == 0) {
+			int bmw, bmh;
+			if (bitmapW > 0)
+			    bmw = bitmapW;
+			else if (dvif->hSize() < 0)
+			    bmw = 4*oneInch;
+			else
+			    bmw = dvif->hSize() + 2*oneInch;
+			if (bitmapH > 0)
+			    bmh = bitmapH;
+			else if (dvif->vSize() < 0)
+			    bmh = 2*oneInch;
+			else
+			    bmh = dvif->vSize() + oneInch;
+
+			bitmap = new Bitmap(bmw, bmh);
+		    } else {
+			bitmap->clear();
+		    }
+		    
 		    if (verbosity > quiet)
 		    {
 			int last, i;
@@ -993,33 +1012,28 @@ void process_dvi_file (DviFile *dvif, bitmap_info& b, int fileResolution,
 			outcount += ostr.length();
 		    }
 		}
-	    }
-	    else
-	    {
-		if (skipPage)
-		{
+	    } else {
+		// end of page
+		if (skipPage) {
 		    // nothing to do in this case except reset it
 		    skipPage = false;
-		    if (bitmap != 0) // just in case
-		    {
-			delete bitmap;
-			bitmap = 0;
-		    }
-		}
-		else
-		{
+		    if (bitmap != 0 && !bitmap->empty())
+			// shouldn't happen, but just in case
+			bitmap->clear();
+// 		    if (bitmap != 0) // just in case
+// 		    {
+// 			delete bitmap;
+// 			bitmap = 0;
+// 		    }
+		} else {
 		    if (bitmap == 0)
 			throw DviBug ("bitmap uninitialised at page end");
-		    else if (bitmap->empty())
-		    {
+		    else if (bitmap->empty()) {
 			if (verbosity > quiet)
 			    cerr << "Warning: page " << pagenum
 				 << " empty: nothing written" << endl;
-		    }
-		    else
-		    {
-			if (bitmap->overlaps() && verbosity > quiet)
-			{
+		    } else {
+			if (bitmap->overlaps() && verbosity > quiet) {
 			    int *bb = bitmap->boundingBox();
 			    cerr << "Warning: p." << pagenum
 			     << ": bitmap too big: occupies (" << bb[0] << ','
@@ -1063,8 +1077,9 @@ void process_dvi_file (DviFile *dvif, bitmap_info& b, int fileResolution,
 		    }
 		    b.ofile_name = "";
 
-		    delete bitmap;
-		    bitmap = 0;
+		    bitmap->clear();
+// 		    delete bitmap;
+// 		    bitmap = 0;
 
 		    if (verbosity > quiet)
 		    {
