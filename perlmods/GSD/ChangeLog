@@ -1,3 +1,17 @@
+2000-05-16  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* gsdprint: Add -pdl option 
+
+	* MANIFEST: Add new test plus reorganized pdl tree
+
+	* t/pdl.t: Add test of GSD::PDL
+
+	* PDL/PDL.pm: Add PDL subclass
+
+	* GSD.pm (_getTypedData): Check context of return arguments
+
+	* PDL/IO/GSD.pm (PDL::rgsd): Completely rewrite to use GSD::PDL
+
 2000-05-15  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* gsdprint: Add ability to be gsdformat
