@@ -237,7 +237,6 @@
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'TSM_PAR'
       INCLUDE 'PAR_ERR'
       INCLUDE 'FIT_PAR'
 *
@@ -582,7 +581,6 @@
       INCLUDE 'DAT_PAR'
       INCLUDE 'PAR_ERR'
       INCLUDE 'FIT_PAR'
-      INCLUDE 'TSM_PAR'
 *
 *    Global variables :
 *
