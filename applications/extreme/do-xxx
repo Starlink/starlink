@@ -2,31 +2,45 @@
 
 #+
 #  Name:
-#     do-filter
+#     do-xxx
 #
 #  Purpose:
-#     Apply source code filter to a set of files
+#     Apply source code filter xxx to a set of files
 #
 #  Usage:
-#     do-filter files
+#     do-xxx files
 #
 #  Description:
 #     This is a driver script to run one of the filter programs in
 #     the EXTREME package which modifies source code.  It should be 
-#     invoked under the name 'do_xxx' to run the filter 'xxx'.
+#     invoked under the name 'do-xxx' to run the filter 'xxx'.
+#
+#     The available filters xxx are:
+#        - inscnf -- Wrap %VAL invocations in CNF_PVAL calls
+#        - crepint -- Change int type to INT_BIG in C
+#        - frepint -- Change INTEGER to INTEGER * 8 in Fortran
+#
 #     For each of its command line arguments (files) it:
 #        - Runs the filter xxx.
 #        - Writes a line to the file ./xxx.log saying how many lines were
 #          changed.
 #        - If and only if changes were made, it writes the modified file
 #          under the same name into the directory ./xxx.changed.
-#        - If the filter or this script thinks there might be something 
-#          which needs human attention, it prints a line to standard output.
+#        - If the filter wrote any warnings to standard error, these are
+#          summarised to standard output.
+#        - Checks that the input file and output file don't look different
+#          in any unexpected ways, and writes a warning if they do.
+#        - For Fortran files, checks that no lines have been extended 
+#          beyond 72 characters (this shouldn't happen, it's just an
+#          extra precaution).
 #
 #     It then writes a short summary of the run, including a report of
 #     whether any files gained new dependencies on include files.
+#     Thus anything which the filter or this script thinks may require
+#     human attention is written to standard output while modified
+#     files are written to a new directory.
 #
-#     As part of its checking, it invokes a script called cmp_xxx
+#     As part of its checking, it invokes a script called cmp-xxx
 #     on each pair of (original, changed) files; these scripts are 
 #     crude checks that the changes made have not done anything to the
 #     source code to change its intention other than what should have 
@@ -43,12 +57,12 @@
 
 #  Get name of driver script and filter.
       driver=`echo $0 | sed 's%.*/%%'`
-      filter=`echo $driver | sed 's%^do_%%'`
+      filter=`echo $driver | sed 's%^do-%%'`
 
 #  Set up destination directory, logfile and comparison script.
       destdir="./$filter.changed"
       logfile="./$filter.log"
-      cmp_scr="cmp_$filter"
+      cmp_scr="cmp-$filter"
 
 #  Set up temporary file for buffering warnings.
       warnfile="$destdir/.tmp.warnings"
