@@ -171,6 +171,8 @@
 *        Original version.
 *     16-JAN-2002 (DSB):
 *        Added propagation of QUALITY and AXIS.
+*     3-SEP-2002 (DSB):
+*        Avoid use of PSX_CALLOC since it cannot handle all HDS data types.
 *     {enter_further_changes_here}
 
 *-
@@ -202,6 +204,7 @@
       DOUBLE PRECISION ZOOM      ! Zoom factor for 1d expansion
       INTEGER BMIN( NDF__MXDIM ) ! Invalid values for pixel index bound defaults
       INTEGER BMAX( NDF__MXDIM ) ! Maximum values for pixel index bounds
+      INTEGER BPV                ! Bytes per value for selected data type
       INTEGER DIM1( NDF__MXDIM ) ! Dimensions of intermediate input array
       INTEGER DIM2( NDF__MXDIM ) ! Dimensions of intermediate output array
       INTEGER DIMI( NDF__MXDIM ) ! Dimensions of input NDF
@@ -246,6 +249,8 @@
       LOGICAL HASQUA             ! Do we have a quality component?
       LOGICAL HASVAR             ! Do we have a variance component?
 
+*.
+
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
@@ -272,6 +277,30 @@
       CALL NDF_MTYPN( '_BYTE,_UBYTE,_WORD,_UWORD,_INTEGER,_REAL,' //
      :                '_DOUBLE', 1, NDFI, 'DATA,VARIANCE', ITYPE,
      :                DTYPE, STATUS )
+
+*  Determine the number of bytes per value for the selected data type.
+*  We do this becaise PSX_CALLOC cannot accept the whole range of HDS
+*  data types. So we work out the numberof bytes needed and use 
+*  PSX_MALLOC instead.
+      IF( ITYPE .EQ. '_BYTE' ) THEN
+	BPV = VAL__NBB
+      ELSE IF( ITYPE .EQ. '_UBYTE' ) THEN
+	BPV = VAL__NBUB
+      ELSE IF( ITYPE .EQ. '_WORD' ) THEN
+	BPV = VAL__NBW
+      ELSE IF( ITYPE .EQ. '_UWORD' ) THEN
+	BPV = VAL__NBUW
+      ELSE IF( ITYPE .EQ. '_INTEGER' ) THEN
+	BPV = VAL__NBI
+      ELSE IF( ITYPE .EQ. '_REAL' ) THEN
+	BPV = VAL__NBR
+      ELSE IF( ITYPE .EQ. '_DOUBLE' ) THEN
+	BPV = VAL__NBD
+      ELSE IF( STATUS .EQ. SAI__OK ) THEN
+        STATUS = SAI__ERROR
+        CALL ERR_REP( 'SQORST_ERR1', 'Data type '//ITYPE//' not yet '//
+     :                'supported fully.', STATUS )
+      END IF  
 
 *  Get its pixel index bounds.
       CALL NDF_BOUND( NDFI, NDF__MXDIM, LBNDI, UBNDI, NDIM, STATUS )
@@ -513,25 +542,25 @@
                   DO J = 1, NDIM
                      EL2 = EL2 * DIM2( J )
                   END DO
-                  CALL PSX_CALLOC( EL2, ITYPE, IPDAT2, STATUS )
+                  CALL PSX_MALLOC( EL2*BPV, IPDAT2, STATUS )
                   IF ( HASVAR ) THEN
-                     CALL PSX_CALLOC( EL2, ITYPE, IPVAR2, STATUS )
+                     CALL PSX_MALLOC( EL2*BPV, IPVAR2, STATUS )
                   END IF
                   IF ( HASQUA ) THEN
-                     CALL PSX_CALLOC( EL2, '_UBYTE', IPQUA2, STATUS )
+                     CALL PSX_MALLOC( EL2*VAL__NBUB, IPQUA2, STATUS )
                   END IF
                END IF
 
 *  Allocate additional temporary workspace.
-               CALL PSX_CALLOC( DIM1( I ), ITYPE, IPWD1, STATUS )
-               CALL PSX_CALLOC( DIM2( I ), ITYPE, IPWD2, STATUS )
+               CALL PSX_MALLOC( DIM1( I )*BPV, IPWD1, STATUS )
+               CALL PSX_MALLOC( DIM2( I )*BPV, IPWD2, STATUS )
                IF ( HASVAR ) THEN
-                  CALL PSX_CALLOC( DIM1( I ), ITYPE, IPWV1, STATUS )
-                  CALL PSX_CALLOC( DIM2( I ), ITYPE, IPWV2, STATUS )
+                  CALL PSX_MALLOC( DIM1( I )*BPV, IPWV1, STATUS )
+                  CALL PSX_MALLOC( DIM2( I )*BPV, IPWV2, STATUS )
                END IF
                IF ( HASQUA ) THEN
-                  CALL PSX_CALLOC( DIM1( I ), '_UBYTE', IPWQ1, STATUS )
-                  CALL PSX_CALLOC( DIM2( I ), '_UBYTE', IPWQ2, STATUS )
+                  CALL PSX_MALLOC( DIM1( I )*VAL__NBUB, IPWQ1, STATUS )
+                  CALL PSX_MALLOC( DIM2( I )*VAL__NBUB, IPWQ2, STATUS )
                END IF
 
 *  Do the resampling along the current dimension.
@@ -779,7 +808,7 @@
 
 *  Report a contextual message if anything went wrong.
       IF ( STATUS .NE. SAI__OK ) THEN
-         CALL ERR_REP( 'SQORST_ERR1', 
+         CALL ERR_REP( 'SQORST_ERR2', 
      :                 'SQORST: Unable to squash/stretch NDF.', STATUS )
       END IF
 
