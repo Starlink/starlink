@@ -67,7 +67,7 @@ comments are most welcome).  Finally, in <ref id=faq>, I
 answer (I hope) some frequently asked questions about SGML in general
 and this system in particular.
 
-<sect id=sgml export>SGML
+<sect id=sgml export>SGML Overview
 
 <subsect id=why.sgml export>Why SGML?
 
@@ -93,7 +93,10 @@ templates for the principal document types (for example in
 elements, such as a document number, actually appear, nor of ensuring
 that other features, such as raw &tex, do not.  This means that
 document authors can never quite be sure that they have produced a
-`correct' document, and that tools which search or process such
+`correct' document; that, since the effective definition of `correct' is
+`processable by this tool', there is no guarantee that a document
+which is correct at one time will continue to be so; and that tools
+which search or process such 
 documents have to have contingency strategies available, when the
 elements they hope to use are missing.
 
@@ -104,7 +107,7 @@ to rely on heuristics and uncheckable conventions.  &latex documents
 are defined to work with one particular tool -- the &tex tokeniser and
 parser -- so that using
 them with any other tool (which is necessary if you want to produce
-anything other than DVI files<note>In fact, there is a version of &tex
+anything other than DVI files<note>In fact, there is a version of &tex;
 which produces PDF files directly, and a &tex;-to-HTML converter
 called <webref url="http://www.tug.org/applications/tex4ht/mn.html"
 >TeX4ht</webref> which writes special DVI files which work with a
@@ -251,7 +254,7 @@ declares the <code/html/ element.  The element type name is followed
 by a statement of whether the start and end tags may be omitted if the
 parser can infer their presence.  The minimisation specifications may
 be either `-' (minus), indicating that the corresponding tag is
-required, or `o' (letter O), indicating that it may be omitted.
+required, or `o' (letter~O), indicating that it may be omitted.
 Following this is the `content model' which, in this case, states that
 the <code/html/ element must consist of one <code/head/, one
 <code/body/, and an optional <code/copyright/, in that order -- the
@@ -304,7 +307,9 @@ shortly.
 The document body consists of paragraph elements, or `delimited
 lists'.  The `or' connector, `<code/|/', indicates that either of the
 <code/p/ or <code/dl/ elements may appear, and the `plus' occurrence
-indicator asserts that the group <code/(p|dl)/ must appear one or more times.
+indicator asserts that the group <code/(p|dl)/ must appear one or more
+times.  In other words, the body consists of a sequence of <code/p/
+and <code/dl/ elements in arbitrary order.
 
 <p>Finally, we start to specify the `interesting' content of the document.
 <verbatim><![ cdata [
@@ -351,7 +356,7 @@ completely empty markup declaration.  Such a declaration may have a
 single comment within it, as in `<code><![ cdata [<!-- this is a comment
 -->]]></code>', or it may have several, as in
 <code><![ cdata [<!-- here -- -- is a comment ------>]]></code>, which
-has <em/three/ comments within it. 
+has <em/three/ comments within it, the third of which is empty. 
 
 <p>Now we declare the attributes for the <code/link/ element.
 <verbatim><![ cdata [
@@ -408,7 +413,7 @@ HTML-like as follows:
 &lt;!entity % html.model &quot;head, body&quot;>
 &lt;!element html    o o (%html.model)>
 </verbatim>
-This looks very strange, but it is a common construction in DTDs.  The
+This looks very strange, but it is a common idiom in DTDs.  The
 parameter entity <code/%allow.copyright/ is defined to be
 <code/ignore/.  That means that when the parser finds the first marked
 section it ignores it, so that the first definition it finds of the parameter
@@ -425,11 +430,12 @@ elements.  That is, marked sections used internally in this way can be
 a useful way of parameterising DTDs.
 
 <p>You can define entities, including parameter entities, in the
-document's `declaration subset' (see <ref id=markup.dtdsubset>), since these
-conceptually come before, and hence have priority over, definitions in
-the DTD.  However, resist resist resist the temptation to do clever
-things here, since it is easy to make your document unreadable and,
-a much more heinous crime, invalid.
+document's `declaration subset' (see <ref id=markup.dtdsubset>), since
+these conceptually come before, and hence have priority over,
+definitions in the DTD.  Also, SGML parsers usually allow such
+on-the-fly definitions on the command line.  However, resist resist
+resist the temptation to do clever things here, since it is easy to
+make your document unreadable and, a much more heinous crime, invalid.
 
 <sect id=markup export>Marking up your document
 
@@ -450,6 +456,7 @@ a much more heinous crime, invalid.
 <docnumber>1234
 <history>
   <version number=0 date='21-APR-1999'>Initial version
+</history>
 <abstract>
   This is a sample SUN
 </abstract>
@@ -469,8 +476,8 @@ conformant to, in this case the Starlink SUN document type.
 <li>The document is structured in terms of `elements' such as
 <code/author/ or <code/sect/, and these in turn contain further data,
 such as a sequence of characters (`Norman Gray') in the case of the
-<code/author/ element, or further elements (the title and paragraphs)
-in the case of the <code/sect/ element.  Elements are delimited by
+<code/author/ element, or further elements (the <code/version/ element)
+in the case of the <code/history/ element.  Elements are delimited by
 `opening tags' like <code>&lt;abstract&gt;</code> and `closing tags'
 like <code>&lt;/abstract&gt;</code>.
 
@@ -479,7 +486,7 @@ the <code/author/ element has the characters `Norman Gray' as its
 content and a list of strings such as an email address as its
 attributes.
 
-<li>Some of the elements (only the <code/abstract/ element in fact)
+<li>Some of the elements (the <code/abstract/ element for example)
 are closed (ie, have closing tags to match their opening tags), but
 the majority are not.  This is because the DTD tells 
 the parser that a <code/title/ element cannot contain an <code/author/
@@ -600,7 +607,7 @@ application to parse.  There are, for example, Perl libraries (for
 example <code/SGMLSpm/, which should be on CPAN) which
 will parse this output format and allow you to process SGML documents
 using Perl.  The crucial thing in this case is the final line in
-the file, which should be a single `C' command, indicating that the
+the output, which should be a single `C' command, indicating that the
 document conforms to its DTD.
 
 <p>If you want to try normalising your document, give the command
@@ -631,11 +638,90 @@ with the error message <code/nsgmls/ produces.
      the paths and environment variables -->
 
 
-<subsect id=markup.structure export>The structure of the document
+<sect id=markup.structure export>The structure of the document
+
+<p>In this section I will describe all of the elements of the DTD,
+grouping them by type.  There is an alternative description of the
+elements, grouped hierarchically, in <ref id=appx.general.dtd>.
+
+<p>The complete list of element types is given in table <ref
+id=tab.elements>.
+<table id="tab.elements" export>
+<caption>The complete element listing</caption>
+<tgroup cols="3">
+<thead>
+<row><entry>Element        <entry>Description<entry>See
+<tbody>
+<row><entry>abstract       <entry>
+<row><entry>appendices     <entry>
+<row><entry>attribution    <entry>
+<row><entry>author         <entry>
+<row><entry>authorlist     <entry>
+<row><entry>backmatter     <entry>
+<row><entry>bibliography   <entry>
+<row><entry>blockquote     <entry>
+<row><entry>caption        <entry>
+<row><entry>citation       <entry>
+<row><entry>cite           <entry>
+<row><entry>code           <entry>
+<row><entry>colspec        <entry>
+<row><entry>copyright      <entry>
+<row><entry>dd             <entry>
+<row><entry>dl             <entry>
+<row><entry>docbody        <entry>
+<row><entry>docdate        <entry>
+<row><entry>docinfo        <entry>
+<row><entry>docxref        <entry>
+<row><entry>draftnote      <entry>
+<row><entry>dt             <entry>
+<row><entry>editors        <entry>
+<row><entry>em             <entry>
+<row><entry>entry          <entry>
+<row><entry>figure         <entry>
+<row><entry>figurecontent  <entry>
+<row><entry>index          <entry>
+<row><entry>indexcontents  <entry>
+<row><entry>kbd            <entry>
+<row><entry>keyword        <entry>
+<row><entry>li             <entry>
+<row><entry>m              <entry>
+<row><entry>meqnarray      <entry>
+<row><entry>mequation      <entry>
+<row><entry>note           <entry>
+<row><entry>notecontents   <entry>
+<row><entry>ol             <entry>
+<row><entry>otherauthors   <entry>
+<row><entry>p              <entry>
+<row><entry>px             <entry>
+<row><entry>quote          <entry>
+<row><entry>ref            <entry>
+<row><entry>row            <entry>
+<row><entry>sect           <entry>
+<row><entry>strong         <entry>
+<row><entry>subhead        <entry>
+<row><entry>subsect        <entry>
+<row><entry>subsubsect     <entry>
+<row><entry>subsubsubsect  <entry>
+<row><entry>sun            <entry>
+<row><entry>table          <entry>
+<row><entry>tbody          <entry>
+<row><entry>tgroup         <entry>
+<row><entry>thead          <entry>
+<row><entry>title          <entry>
+<row><entry>ul             <entry>
+<row><entry>url            <entry>
+<row><entry>verbatim       <entry>
+<row><entry>webref         <entry>
+</tbody>
+</tgroup>
+</table>
+
 <p>Discuss separately structure, tables, figures, cross-references,
 maths, program code.  
 
 <p>Discuss markup minimisation: recap tag omission, mention NET and SHORTREFs.
+
+<subsect id=str.structure>Overall structure
 
 <sect id=processing export>Processing your document
 
@@ -684,7 +770,8 @@ version of the manual
 <p>This section is a reference for maintainers of the Starlink SGML
 system
 
-<p>Supporting software: in .../sgml/lib (inc BibTeX style)
+<p>Supporting software: in .../sgml/lib (inc BibTeX style).  What
+about distributing perlSGML?
 
 <subsect id=appx.dssslcode export>The DSSSL source code
 
@@ -693,6 +780,10 @@ system
 <subsect id=install export>Installation
 
 <p>How to install everything, including building Jade.
+
+<sect id=appx.releasenotes export>Release Notes
+
+<p>Insert the TODO list, and news.
 
 <backmatter>
 <notecontents>
