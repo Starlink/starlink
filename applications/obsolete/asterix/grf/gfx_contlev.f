@@ -27,7 +27,7 @@
 *    Local Constants :
 *    Local variables :
       INTEGER K
-      LOGICAL OK
+      LOGICAL OK(GCB__MXCONTLEV)
 *    External references :
 *-
 
