@@ -8,6 +8,7 @@ Reduction Facility) package.
 
 2 Alphabetic_list
 
+ADD_DBM         - Generate simulated dual beam images
 BOLREBIN        - Generate a separate regridded image from each bolometer
 CALCSKY         - Calculate sky variation independent of source structure
 CHANGE_DATA     - Change data (or variance) values in the data 
@@ -34,6 +35,7 @@ REDUCE_NOISE    - Process demodulated noise data.
 REDUCE_SWITCH   - Convert raw demodulated data to standard format and
                   process individual switches.
 REMDBM          - Remove dual beam response from SCAN/MAP images (needs Kappa)
+REMIP           - Remove instrumental polarisation from polarimetry data
 REMSKY          - Remove sky contribution from each jiggle
 RESTORE         - Remove dual-beam response from SCAN/MAP data
 RLINPLOT        - Interactive data inspection via MLINPLOT (requires Kappa)
@@ -49,6 +51,7 @@ SCUPA           - Show position angle of array (requires Kappa)
 SCUPHOT         - Process extinction corrected photometry data
 SCUPLOT         - Interactive despiking and data inspection (requires Kappa)
 SCUQUICK        - Script to automate SURF data reduction
+SCUSETENV       - Set SCUBA environment variables (JAC only)
 SCUSHIFT        - Correct for 'data-shift' problem.
 SDIP            - Script to reduce and display skydip data (requires Kappa)
 SETBOLWT        - Calculate and set bolometer weights (requires Kappa)
@@ -74,6 +77,7 @@ REDUCE_NOISE    - Process demodulated noise data.
 SCUHELP         - This help system
 SCUPA           - Show position angle of array (requires Kappa)
 SCUQUICK        - Script to automate SURF data reduction
+SCUSETENV       - Set SCUBA environment variables (JAC only)
 SCUSHIFT        - Correct for `data shift' problem
 SDIP            - Script to reduce and display skydip data (requires Kappa)
 SKYDIP          - Process SKYDIP data in order to determine atmospheric
@@ -95,11 +99,16 @@ SCUCLIP         - Sigma clip photometry data and maps of weak sources
 
 2 SCAN/MAP_data_processing
 
+ADD_DBM         - Add dual-beam to single-beam data
 DESPIKE2        - Despike SCAN/MAP data
 REMDBM          - Remove dual-beam response from SCAN/MAP images (needs Kappa)
 RESTORE         - Remove dual-beam response from SCAN/MAP data (EKH)
 SCAN_RLB        - Remove linear baselines from scans
 SCUMAKEWT       - Generate fourier weights (used by REMDBM)
+
+2 Polarimetry
+
+REMIP           - Remove instrumental polarisation from polarimetry data
 
 2 Inspection
 
@@ -205,6 +214,62 @@ using the following format:
           bolometer from integration 3.
 
 1 Release_notes
+
+2 New_in_version_1_4
+
+  SURF can now process polarimetry data.
+
+3 New_Tasks
+
+  - REMIP for removal of instrumental polarisation
+
+  - ADD_DBM can be used to generate simulated dual beam images
+
+  - SCUSETENV for setting environment variables at the JAC
+
+3 Changes_to_existing_tasks
+
+  - Units should now be propagated correctly through all tasks
+    (ie calibration units are not lost after REBIN or SCUPHOT)
+ 
+  - SURF version number is now written to history information
+
+  - SCAN_RLB: Area to use for baseline removal can now be specified
+    as a SCUBA section.
+
+  - REMDBM: The -filter option will filter out how frequencies
+           before inverting the Fourier transform.
+
+  - REBIN: Add TRIM parameter to trim edge regions from rebinned
+           images (useful when trying to mosaic)
+
+  - REBIN: Astrometry information is now entirely contained in 
+           the AST/WCS component. No longer written to FITS or
+           IRAS90 extensions. Also, the pixel origin is now centred
+           on the specified RA/Dec centre of the image and not
+           the bottom left hand corner.
+
+  - REBIN: REFPIX parameter has been added to make it easier to specify
+           the reference pixel location when changing the map size
+           (in the past the reference pixel was always the middle of the
+           map when specifying the map size)
+
+  - REBIN: The output file is now propagated from the input when
+           processing a single file (keeps history intact)
+
+  - EXTINCTION: Can process FAST_AXIS polarimetry information correctly
+
+  - SKYDIP: Add preliminary support for RASTER mode (not yet stable)
+  
+  - OBSSUM/SCULOG: POLMAP and POLPHOT are now supported modes.
+
+  - SCUPHOT now recognizes measurements as well as integrations
+      (required for polarimetry observing)
+
+  - SCUOVER: Now reads astrometry from WCS/AST component.
+
+  - SCUMAKEWT: Now can make a weights image like a reference image
+     (ie same size, chop throw and position angle). See the LIKE parameter.
 
 2 New_in_version_1_3
 
@@ -378,8 +443,72 @@ This is a minor upgrade.
     recognizes SKYDIP data.
 
 
+1 ADD_DBM
+Generate a dual beam map from a single beam map
 
+Usage:
 
+   add_dbm in chop pa out
+
+Description:
+
+   Create a dual beam map from a single beam input map.
+   Simply finds the signal detected at each pixel by looking
+   at the difference between the pixels nearest to each chop
+   beam. This calculates a middle beam response. (ie the response
+   at each pixel is the difference between the L and the R
+   beams.
+
+   This task can be used to generate test data for REMDBM.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 CHOP
+CHOP = REAL (Read)
+   Chop throw in pixels of the input image. There is no default.
+   The range of this parameter should lie between 1 and the
+   size of the input image.
+3 IN
+IN = NDF (Read)
+   Input single beam image
+3 MSG_FILTER
+MSG_FILTER = CHAR (Read)
+   Message filter level. Options are QUIET, NORMAL and
+   VERBOSE. Default is NORM.
+3 OUT
+OUT = NDF (Write)
+   Output Dual beam image. Default output name is input name
+   + _dbm_int(pa)_int(chop).
+3 PA
+PA = REAL (Read)
+   Position angle of chop throw. Positive is anti-clockwise starting
+   from North. The angle should be specified in degrees.
+3 PIXSIZE
+PIXSIZE = REAL (Read)
+   Pixel size in arcseconds. This is required for compatibility
+   with REMDBM (since the CHOP_THR FITS keyword has to be in
+   arcseconds rather than pixels and REMDBM requires SCUPIXSZ
+   FITS keyword). A null value will be treated as 1 arcsec.
+   Default is to use the value of SCUPIXSZ from the FITS header
+   (if present).
+2 Examples
+add_dbm gaussian 0 30 dbm_out
+   Generate a dual beam image from the single beam 'gaussian'
+   input NDF using a 30 pixel chop at 0 degrees. Write the
+   resulting image to dbm_out.sdf.
+2 Notes
+- The output images are compatible with REMDBM.
+
+- All extensions and AST/WCS information are propogated to the
+  output image.
+
+- A variance array is created if present in the input image.
+
+- If a quality array is present in the input image it is used
+  to generate a bad pixel mask in the output image and is removed.
+2 Related_Applications
+   SURF: REMDBM
+2 Authors
+Tim Jenness (t.jenness@jach.hawaii.edu)
 
 1 BOLREBIN
 Generate a separate regridded image for each bolometer.
@@ -458,7 +587,8 @@ LOOP = LOGICAL (Read)
    if noloop.
 3 MSG_FILTER
 MSG_FILTER = CHAR (Read)
-   Message filter level. Default is NORM.
+   Message filter level. Options are QUIET, NORMAL and VERBOSE.
+   Default is NORM.
 3 OUT
 OUT = NDF (Write)
    This is the name of the HDS container file that will contain the
@@ -517,6 +647,13 @@ REF = CHAR (Read)
    The name of the first NDF to be rebinned. The name may also be the
    name of an ASCII text file containing NDF and parameter values.
    See the notes. REF can include a SCUBA section.
+3 REFPIX
+REFPIX ( 2 ) = INTEGER (Read)
+   The coordinate of the reference pixel in the output data
+   array. This corresponds to the pixel associated with the
+   specified RA/Dec centre. Default is to use the middle pixel
+   if a size is specified or the optimal pixel if the default
+   size is used (see the SIZE parameter).
 3 SCALE
 SCALE = REAL (Read)
   Radius of one scale size in arcsec. This effectively governs the
@@ -545,6 +682,13 @@ TIMES = LOGICAL (Read)
    Note that, in general, the number of pixels in the output grid
    exceeds the number of independent beams in the image.
    The data can be accessed as OUT.more.reds.times. Default is FALSE.
+3 TRIM
+TRIM = INTEGER (Read)
+   This parameter determines the amount of good data that should
+   be trimmed from the final image to correct for edge effects.
+   The supplied value should be in arcseconds. All pixels closer
+   to a bad pixel than this distance will be set to bad in the
+   output image. Default is 0.0.
 3 GUARD
 GUARD = LOGICAL (Read)
    Controls whether the bolometer guard ring should be used during
@@ -601,6 +745,10 @@ regridding the situation is more complicated.
 - Bolometer weights will be used if a BOLWT extension is found
          in the input data file (usually set with SETBOLWT).
 
+- Astrometry information is stored in the WCS component and not 
+  the FITS extension.
+
+
 2 ASCII_input_files
    The REF and IN parameters accept ASCII text files as input. These
    text files may contain comments (signified by a #), NDF names,
@@ -626,7 +774,7 @@ regridding the situation is more complicated.
 2 Authors
 JFL: John Lightfoot (jfl@roe.ac.uk)
 
-TIMJ: Tim Jenness (timj@jach.hawaii.edu)
+TIMJ: Tim Jenness (t.jenness@jach.hawaii.edu)
 
 
 1 CALCSKY
@@ -758,7 +906,7 @@ calcsky file nosrc=nosrc boxsz=10.0 \\
 
 2 Authors
 
-TIMJ: Tim Jenness (timj@jach.hawaii.edu)
+TIMJ: Tim Jenness (t.jenness@jach.hawaii.edu)
 
 
 1 CHANGE_DATA
@@ -878,7 +1026,7 @@ change_data 'map{i2,5}-' value=0.0
 2 Authors
 JFL:  J.Lightfoot (jfl@roe.ac.uk)
 
-TIMJ: T.Jenness   (timj@jach.hawaii.edu)
+TIMJ: T.Jenness   (t.jenness@jach.hawaii.edu)
 
 1 CHANGE_FLAT
 Change the flatfield in a SCUBA datafile
@@ -913,7 +1061,7 @@ change_flat test newflat.dat
 2 Authors
 JFL: John Lightfoot (jfl@roe.ac.uk)
 
-TIMJ: Tim Jenness (timj@jach.hawaii.edu)
+TIMJ: Tim Jenness (t.jenness@jach.hawaii.edu)
 
 
 1 CHANGE_NACENTRE
@@ -963,7 +1111,7 @@ for explicitly.
 
 2 Authors
 
-TIMJ: Tim Jenness (timj@jach.hawaii.edu)
+TIMJ: Tim Jenness (t.jenness@jach.hawaii.edu)
 
 
 1 CHANGE_POINTING
@@ -1029,7 +1177,7 @@ POINT_LST = CHAR (Read)
 2 Authors
 JFL:  J.Lightfoot (jfl@roe.ac.uk)
 
-TIMJ: T.Jenness   (timj@jach.hawaii.edu)
+TIMJ: T.Jenness   (t.jenness@jach.hawaii.edu)
 
 1 CHANGE_QUALITY
 Set SCUBA data quality bad or good.
@@ -1137,7 +1285,7 @@ no longer used as a masking bit.
 2 Authors
 JFL:  J.Lightfoot (jfl@roe.ac.uk)
 
-TIMJ: T.Jenness   (timj@jach.hawaii.edu)
+TIMJ: T.Jenness   (t.jenness@jach.hawaii.edu)
 
 1 DESPIKE
 Despike data by position
@@ -1484,7 +1632,7 @@ extinction test short 0.6 0 0.6 0 test2
 2 Authors
 JFL: John Lightfoot (jfl@roe.ac.uk)
 
-TIMJ: Tim Jenness (timj@jach.hawaii.edu)
+TIMJ: Tim Jenness (t.jenness@jach.hawaii.edu)
 
 
 1 EXTRACT_DATA
@@ -1736,7 +1884,8 @@ LOOP = LOGICAL (Read)
    if noloop.
 3 MSG_FILTER
 MSG_FILTER = CHAR (Read)
-   Message filter level. Default is NORM.
+   Message filter level. Options are QUIET, NORMAL and VERBOSE.
+   Default is NORM.
 3 OUT
 OUT = NDF (Write)
    This is the name of the HDS container file that will contain the
@@ -1795,6 +1944,13 @@ REF = CHAR (Read)
    The name of the first NDF to be rebinned. The name may also be the
    name of an ASCII text file containing NDF and parameter values.
    See the notes. REF can include a SCUBA section.
+3 REFPIX
+REFPIX ( 2 ) = INTEGER (Read)
+   The coordinate of the reference pixel in the output data
+   array. This corresponds to the pixel associated with the
+   specified RA/Dec centre. Default is to use the middle pixel
+   if a size is specified or the optimal pixel if the default
+   size is used (see the SIZE parameter).
 3 SCALE
 SCALE = REAL (Read)
   Radius of one scale size in arcsec. This effectively governs the
@@ -1823,6 +1979,13 @@ TIMES = LOGICAL (Read)
    Note that, in general, the number of pixels in the output grid
    exceeds the number of independent beams in the image.
    The data can be accessed as OUT.more.reds.times. Default is FALSE.
+3 TRIM
+TRIM = INTEGER (Read)
+   This parameter determines the amount of good data that should
+   be trimmed from the final image to correct for edge effects.
+   The supplied value should be in arcseconds. All pixels closer
+   to a bad pixel than this distance will be set to bad in the
+   output image. Default is 0.0.
 3 GUARD
 GUARD = LOGICAL (Read)
    Controls whether the bolometer guard ring should be used during
@@ -1879,6 +2042,9 @@ regridding the situation is more complicated.
 - Bolometer weights will be used if a BOLWT extension is found
          in the input data file (usually set with SETBOLWT).
 
+- Astrometry information is stored in the WCS component and not 
+  the FITS extension.
+
 
 2 ASCII_input_files
    The REF and IN parameters accept ASCII text files as input. These
@@ -1904,7 +2070,7 @@ regridding the situation is more complicated.
 2 Authors
 JFL: J.Lightfoot (ROE)
 
-TIMJ: T. Jenness (timj@jach.hawaii.edu)
+TIMJ: T. Jenness (t.jenness@jach.hawaii.edu)
 
 
 1 MAPSUM
@@ -2344,7 +2510,7 @@ of the KAPPA binaries (this is usually done during a Starlink login).
 
 2 Authors
 
-TIMJ: Tim Jenness (timj@jach.hawaii.edu)
+TIMJ: Tim Jenness (t.jenness@jach.hawaii.edu)
 
 
 1 REBIN
@@ -2422,10 +2588,14 @@ LOOP = LOGICAL (Read)
    if noloop.
 3 MSG_FILTER
 MSG_FILTER = CHAR (Read)
-   Message filter level. Default is NORM.
+   Message filter level. Options are QUIET, NORMAL and VERBOSE.
+   Default is NORM.
 3 OUT
 OUT = NDF (Write)
    This is the name of the NDF that will contain the rebinned map. 
+   A null value can be supplied to shut down rebin without error.
+   This can be used to determine the size of the output map
+   without creating it.
 3 OUT_COORDS
 OUT_COORDS = CHAR (Read)
    The coordinate system of the output map. Available coordinate
@@ -2478,6 +2648,13 @@ REF = CHAR (Read)
    The name of the first NDF to be rebinned. The name may also be the
    name of an ASCII text file containing NDF and parameter values.
    See the notes. REF can include a SCUBA section.
+3 REFPIX
+REFPIX ( 2 ) = INTEGER (Read)
+   The coordinate of the reference pixel in the output data
+   array. This corresponds to the pixel associated with the
+   specified RA/Dec centre. Default is to use the middle pixel
+   if a size is specified or the optimal pixel if the default
+   size is used (see the SIZE parameter).
 3 SCALE
 SCALE = REAL (Read)
   Radius of one scale size in arcsec. This effectively governs the
@@ -2506,6 +2683,13 @@ TIMES = LOGICAL (Read)
    Note that, in general, the number of pixels in the output grid
    exceeds the number of independent beams in the image.
    The data can be accessed as OUT.more.reds.times. Default is FALSE.
+3 TRIM
+TRIM = INTEGER (Read)
+   This parameter determines the amount of good data that should
+   be trimmed from the final image to correct for edge effects.
+   The supplied value should be in arcseconds. All pixels closer
+   to a bad pixel than this distance will be set to bad in the
+   output image. Default is 0.0.
 3 GUARD
 GUARD = LOGICAL (Read)
    Controls whether the bolometer guard ring should be used during
@@ -2563,6 +2747,9 @@ regridding the situation is more complicated.
 - Bolometer weights will be used if a BOLWT extension is found
          in the input data file (usually set with SETBOLWT).
 
+- Astrometry information is stored in the WCS component and not 
+  the FITS extension.
+
 2 ASCII_input_files
    The REF and IN parameters accept ASCII text files as input. These
    text files may contain comments (signified by a #), NDF names,
@@ -2587,7 +2774,7 @@ regridding the situation is more complicated.
 2 Authors
 JFL: J.Lightfoot (ROE)
 
-TIMJ: T. Jenness (timj@jach.hawaii.edu)
+TIMJ: T. Jenness (t.jenness@jach.hawaii.edu)
 
 1 REDUCE_NOISE
 Process demodulated noise data
@@ -2713,7 +2900,7 @@ that the raw data does not have to be in the working directory.
 2 Authors
 JFL: J.Lightfoot (jfl@roe.ac.uk)
 
-TIMJ: T. Jenness (timj@jach.hawaii.edu)
+TIMJ: T. Jenness (t.jenness@jach.hawaii.edu)
 
 1 REMDBM
 Remove dual beam signature from scan maps
@@ -2743,6 +2930,10 @@ For information on individual parameters, select from the list below:
 -noams
    Turns off ADAM messaging. Default is false (if ADAM messaging
    is available.)
+3 -filter
+-filter
+   Turns on high frequency filtering. When used, data at frequencies
+   greater than that to which the telescope is sensitive are set to zero.
 3 files
 files
    List of input files to be processed. Shell wildcards are allowed.
@@ -2754,6 +2945,9 @@ remdbm *_reb.sdf
 remdbm -out=m82 o66_lon_reb o67_lon_reb o68_lon_reb o69_lon_reb
    Process the four input images. The output filename is set to
    m82.sdf.
+remdbm -filter -noams *_reb.sdf
+   Process the supplied files with high frequency filtering. Do not
+   use the messaging system.
 2 Notes
 The following restrictions apply:
 
@@ -2765,14 +2959,77 @@ The following restrictions apply:
 - The images must be rebinned in the same coordinate system
   as the chop throw.
 2 Related_Applications
-   SURF: SCUMAKEWT
+   SURF: SCUMAKEWT, ADD_DBM
    KAPPA: FOURIER
 
 2 Authors
 JFL: John Lightfoot (jfl@roe.ac.uk)
 
-TIMJ: Tim Jenness (timj@jach.hawaii.edu)
+TIMJ: Tim Jenness (t.jenness@jach.hawaii.edu)
 
+1 REMIP
+Remove instrumental polarisation from SCUBA pol data
+
+Usage:
+
+   remip in ipfile out
+
+Description:
+
+   This task calculates and removes the instrumental polarisation
+   signal from SCUBA polarimeter data.
+
+     Actual flux = measured flux / ( 1 + %age IP)
+
+   where IP = P * cos (4 WP - 2 THETA )
+   and P is the (elevation dependent) instrumental percentage
+   polarisation, WP is the position angle of the wave plate and
+   THETA is the (elevation dependant) position angle of the IP.
+
+   This is an approximation of
+
+     Actual flux = measured flux - mean flux * %age IP
+
+   where IP = P * (1 + cos (4 WP - 2 THETA ) )
+   because the mean flux can not be calculated trivially since
+   the bolometers are jiggling on and off the source
+2 Parameters
+For information on individual parameters, select from the list below:
+3 IN
+IN = NDF (Read)
+   Input data file.
+3 IPFILE
+IPFILE = FILE (Read)
+   File containing the IP `flatfield'
+3 MSG_FILTER
+MSG_FILTER = CHAR (Read)
+   Message filter level. Options are QUIET, NORMAL and
+   VERBOSE. Default is NORM.
+3 OUT
+OUT = NDF (Write)
+   Output file containing IP removed data. Default output
+   filename is `_ip' (`i' for short form).
+2 Examples
+remip file1 ipfile.dat \\
+   Correct file1.sdf using ipfile.dat and write IP corrected
+   data to the default output file (eg file1_ip).
+2 Notes
+- Variance is propagated correctly.
+
+- This task writes out the waveplate angles and rotation angles.
+  The waveplate angle per integration is written to .MORE.REDS.WPLATE.
+  The rotation angle (waveplate 0 to X pixel axis) is written
+  to .MORE.REDS.ANGROT (angle per integration). The angle
+  between nasmyth and the ra/dec frame (ie ANGROT - 90 degrees)
+  is stored in .MORE.REDS.NASMYTH_ANG (angle per sample).
+  These are written as NDFs and so can be displayed in the normal way.
+  The angles are in degrees.
+
+- An array containing the fast axis angle is also written
+  to the REDS extension (FAST_AXIS). The size of this array
+  matches the number of sub-instruments in the file.
+2 Authors
+Tim Jenness (t.jenness@jach.hawaii.edu)
 
 1 REMSKY
 Remove sky noise and constant offsets from SCUBA jiggle data
@@ -2895,7 +3152,7 @@ remsky o25_sho_ext bolometers=[r5] mode=mean iter_sigma=4 \
 2 Related_Applications
    SURF: SCUQUICK, REBIN, SCUPHOT, SCUOVER;
 2 Authors
-TIMJ: Tim Jenness (timj@jach.hawaii.edu)
+TIMJ: Tim Jenness (t.jenness@jach.hawaii.edu)
 
 1 RESTORE
 remove the chopped beam response from SCAN/MAP observations
@@ -2944,7 +3201,7 @@ JCMTDR: RESTORE
 2 Authors
 JFL: John Lightfoot (jfl@roe.ac.uk)
 
-TIMJ: Tim Jenness (timj@jach.hawaii.edu)
+TIMJ: Tim Jenness (t.jenness@jach.hawaii.edu)
 
 1 RLINPLOT
 
@@ -2985,7 +3242,11 @@ METHOD = CHAR (Read)
    Governs the method to be used for calculating the baseline.
    Options are MEDIAN: Remove the median from each scan, 
    MEAN: remove the mean level from each scan, LINEAR: fit a linear
-   baseline to the ends of the scan. Default is LINEAR.
+   baseline to the ends of the scan. SECTION: Use a SCUBA section to 
+   specify regions of each integration that are thought to be flux free.
+   Remove the median of the specified section from the associated 
+   integration.
+   Default is LINEAR.
 3 MSG_FILTER
 MSG_FILTER = CHAR (Read)
    The messaging level. Default is NORM. There are no verbose messages.
@@ -2997,6 +3258,46 @@ RLB = INTEGER (Read)
    This parameter governs whether the baseline fit is removed from the
    input data or stored instead of the data. If RLB is .TRUE. the
    corrected data are returned. If RLB is .FALSE. the fit is returned.
+3 SECTION
+SECTION = CHAR (Read)
+   This array parameter can be used to specify SCUBA sections
+   to be used for baseline calculation. It is requested when 
+   METHOD=SECTION. In general the SCUBA section should
+   include scan (exposure) or position (p) specifiers which 
+   will be applied to each bolometer and integration. It is
+   possible to be more specific and to provide multiple sections
+   singling out certain bolometers or integrations. If entire
+   integrations are selected no baseline removal will occur
+   on unselected integrations (this will be stated).
+   The median of the section supplied for each integration
+   is subtracted from every exposure in that integration (remember
+   that if no integration is specified, all integrations are assumed).
+
+   Curly brackets must still be given. Since this is an array
+   parameter square brackets must be used to specify more than
+   one component:
+
+       SECTION > [ {e1} , {e4;b2} ]
+
+   would select exposure one from each integration along with
+   exposure 4 for bolometer 2.
+   be used if the square brackets are not used. 
+
+   Care must also be taken when using commas in SCUBA sections -
+   the parameter system will split multiple entries on commas 
+   unless the entire section is quoted:
+
+       SECTION > "{e1,4}"
+
+   If necessary the negation character should come after a
+   section (ie after the closing curly bracket) and that 
+   negation applies to the combined section and not just the string 
+   containing the negation character:
+
+       SECTION > {e3}-
+
+   implies that the section consists of everything except exposure 3.
+
 2 Examples
 scan_rlb infile method=linear \
    Remove linear baselines from each scan using baseline regions the
@@ -3007,13 +3308,17 @@ scan_rlb infile norlb method=median \
    remove the baseline from the data. Store the baseline determination
    for later analysis.
 
+scan_rlb method=section rlb section={e1,4}
+   Calculate the baseline using the first and 4th exposures of
+   each integration.
+
 2 Notes
    The Kappa SUB command can be used to subtract the baseline from the
    input data at a later stage (if RLB is false).
 2 Authors
 JFL: John Lightfoot (jfl@roe.ac.uk)
 
-TIMJ: Tim Jenness (timj@jach.hawaii.edu)
+TIMJ: Tim Jenness (t.jenness@jach.hawaii.edu)
 
 1 SCUCAT
 Concatenate photometry datasets for further processing
@@ -3159,7 +3464,7 @@ scuclip infile outfile nsigma=5
    SURF: SCUQUICK, REBIN, SCUPHOT, SCUOVER, SIGCLIP, DESPIKE;
    KAPPA: SETBB
 2 Authors
-TIMJ: Tim Jenness (timj@jach.hawaii.edu)
+TIMJ: Tim Jenness (t.jenness@jach.hawaii.edu)
 
 2 Implementation_Status
    The despiking routine sets QUALITY bit 5 to bad. It does not affect
@@ -3281,7 +3586,7 @@ sculog -summary -reduced --begin=100 --end=200 --mode=photom,skydip
 
 2 Authors
 
-TIMJ: Tim Jenness (timj@jach.hawaii.edu)
+TIMJ: Tim Jenness (t.jenness@jach.hawaii.edu)
 
 
 1 SCUMAKEWT
@@ -3301,18 +3606,38 @@ For information on individual parameters, select from the list below:
 3 CHOP
 CHOP = REAL (Read)
    Chop throw in arcseconds. There is no default
-3 PA
-PA = REAL (Read)
-   Position angle of chop throw. Positive is anti-clockwise starting
-   from North. The angle should be specified in degrees.
 3 FTCHOP
 FTCHOP = NDF (Write)
    Output NDF containing fourier transform of the chop function.
    The size of the output array matches the dimensions supplied
    by parameter SIZE
+3 LIKE
+LIKE = NDF (Read)
+   This parameter may be used to supply an NDF which is to be
+   used as a template.  If such a template is supplied, then its
+   origin (its lower pixel-index bounds) and extent will be read
+   used for the output NDFs. By default no template will be used
+   and the size information will be read from the SIZE parameter.
+   Additionally, the PA, PIXSIZE and CHOP parameters are searched
+   for in the FITS extension if one is present (using keywords
+   of CHOP_PA, SCUPIXSZ and CHOP_THR respectively). These parameters
+   values are requested if not found in the FITS extension.
 3 MSG_FILTER
 MSG_FILTER = CHAR (Read)
    Message filter level. Default is NORM.
+3 OUTCHOP
+OUTCHOP = REAL (Write)
+   Chop throw actually used (arcsec).
+3 OUTPA
+OUTPA = REAL (Write)
+   Position angle actually used.
+3 OUTPIXSZ
+OUTPIXSZ = REAL (Write)
+   Actual pixel size used (arcsec).
+3 PA
+PA = REAL (Read)
+   Position angle of chop throw. Positive is anti-clockwise starting
+   from North. The angle should be specified in degrees.
 3 PIXSIZE
 PIXSIZE = INTEGER (Read)
    Pixel size to be used for output images. Should be in arcseconds
@@ -3340,7 +3665,7 @@ scumakewt chop=20 size=[256,512] ftchop=fft wtchop=weights
 2 Authors
 JFL: John Lightfoot (jfl@roe.ac.uk)
 
-TIMJ: Tim Jenness (timj@jach.hawaii.edu)
+TIMJ: Tim Jenness (t.jenness@jach.hawaii.edu)
 
 
 1 SCUNOISE
@@ -3482,7 +3807,7 @@ rebinned image).
 2 Authors
 JFL: J.Lightfoot (ROE)
 
-TIMJ: T. Jenness (timj@jach.hawaii.edu)
+TIMJ: T. Jenness (t.jenness@jach.hawaii.edu)
 
 1 SCUPHOT
 Reduce SCUBA PHOTOM data
@@ -3834,8 +4159,43 @@ sub-instruments since the extinction changes with wavelength.
 
 2 Authors
 
-TIMJ: Tim Jenness (timj@jach.hawaii.edu)
+TIMJ: Tim Jenness (t.jenness@jach.hawaii.edu)
 
+
+1 SCUSETENV
+Set the startup environment variables for SURF
+
+Usage:
+
+   scusetenv [UTdate]
+
+Description:
+
+   This script sets the standard DATADIR and SCUBA_PREFIX
+   environment variables given a UT date.
+2 Examples
+scusetenv
+   Set DATADIR and SCUBA_PREFIX for the current UT date
+
+scubasetenv 19980201
+   Set DATADIR and SCUBA_PREFIX for the data observed on date
+   19980201
+2 Notes
+- Currently this routine only works for the JAC and JCMT systems.
+  This is because the data are stored in standard
+  directories and indexed by YYYYMMDD UT date.
+
+- ORAC_DATA_IN environment variable is also set (only relevant
+  for users of the ORAC-DR pipeline)
+
+- If this routine is run from a non-JAC/JCMT site DATADIR
+  will not be set but SCUBA_PREFIX will be set.
+2 Parameters
+   UTdate = YYYYMMDD format string (Optional)
+     The UT date of the data to be processed (in YYYYMMDD format).
+     The default value is to use the current UT date
+2 Authors
+Tim Jenness (JACH)
 
 1 SCUSHIFT
 Correct for data shift error in demodulated data files
@@ -4009,7 +4369,7 @@ setbolwt -wtfile=wt.dat -filelist=rebin.inp
 
 2 Authors
 
-TIMJ: Tim Jenness (timj@jach.hawaii.edu)
+TIMJ: Tim Jenness (t.jenness@jach.hawaii.edu)
 
 
 1 SIGCLIP
@@ -4047,7 +4407,7 @@ of the KAPPA binaries (this is usually done during a Starlink login).
      if an argument is omitted from the command line.
 2 Authors
 
-TIMJ: Tim Jenness (timj@jach.hawaii.edu)
+TIMJ: Tim Jenness (t.jenness@jach.hawaii.edu)
 
 
 1 SKYDIP
@@ -4156,10 +4516,13 @@ skydip 19970610_dem_0003 long eta_tel=0.9 out=sky model_out=model \
 If the input file is not found in the current directory, the directory
 specified by the DATADIR environment variable is searched. This means
 that the raw data does not have to be in the working directory.
+
+Both RASTER and DISCRETE skydips are supported.
+
 2 Related_Applications
    SURF: EXTINCTION, SDIP, SKYSUM
 2 Authors
-TIMJ: T. Jenness (timj@jach.hawaii.edu)
+TIMJ: T. Jenness (t.jenness@jach.hawaii.edu)
 
 Nick Tothill (QMW)
 
