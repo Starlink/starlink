@@ -1,3 +1,7 @@
+#  A list of .f files not to be included in sun238, which otherwise would
+#  be included.
+EXCLUDE = ctg_test.f lpg_test.f
+
 # The names of all the tar files containing system-independant files:
 TAR_FILES_A = kaplibs_source ira_source
 
