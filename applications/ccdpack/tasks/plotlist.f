@@ -21,11 +21,11 @@
 
 *  Description:
 *     This routine draws a variety of markers (crosses, circles,
-*     squares etc.) at positions specified in series of position lists.
-*     Before this application can be run an image (or other graphical
-*     output such as a contour image) must have been displayed using a
-*     suitable routine such as KAPPA's DISPLAY (SUN/95) or CCDPACK's
-*     BOUNDS.
+*     squares etc.) on a graphics device at positions specified 
+*     in a series of position lists.  Before this application can be 
+*     run an image (or other graphical output such as a contour image)
+*     must have been displayed using a suitable routine such as 
+*     KAPPA's DISPLAY (SUN/95) or CCDPACK's DRAWNDF.
 *
 *     For a more interactive display of markers on an Xwindows display,
 *     you can use the IDICURS program instead.

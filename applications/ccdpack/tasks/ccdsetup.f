@@ -155,7 +155,6 @@
 *            help.
 *
 *        If no mask file is available simply return an !
-*
 *        [!]
 *     NDFNAMES = _LOGICAL (Read and Write)
 *        The value of this parameter controls whether or not position
@@ -243,7 +242,7 @@
 *        will be used when it is available.  Most of the CCDPACK 
 *        reduction and registration programs will look for Set header
 *        information in the .MORE.CCDPACK extension of the NDFs they
-*        are processing, and if one exists it will be used to modify
+*        are processing, and if it exists it will be used to modify
 *        the way the processing is done: broadly speaking, reduction 
 *        programs will group corresponding members of different Sets
 *        together before processing, and registration programs will

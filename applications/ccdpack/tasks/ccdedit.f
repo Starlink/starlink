@@ -20,7 +20,7 @@
 *        The global status.
 
 *  Description:
-*     This routine provides the ability to edit the contents the
+*     This routine provides the ability to edit the contents of the
 *     CCDPACK extensions of a list of NDFs. The following modes
 *     of operation are available:
 *
@@ -46,6 +46,10 @@
 *     are required.
 *
 *     Invert transform inverts the sense of the transformation. 
+*
+*     Note that TRANSFORM structures are no longer (since version 3) 
+*     widely used in CCDPACK, so the TRANSFORM-structure manipulation
+*     options of this command are unlikely to be very useful.
 
 *  Usage:
 *     ccdedit mode in
@@ -171,7 +175,7 @@
 *        importing position lists generated externally to CCDPACK.
 *
 *        The "ERASE" option removes a named item from NDF extensions. 
-*        Two possible items are "CURRENT_LIST" and "TRANSFORM".
+*        Two possible items are "CURRENT_LIST" and "SET".
 *
 *        The "TRANSFORM" option allows the generation or import of
 *        transforms into NDF extensions. Transforms from other NDFs
@@ -343,7 +347,7 @@
 *        In this example the TRANSFORM structure in the CCDPACK
 *        extension of the NDF ndf_with_bad_transform is removed.
 *
-*     ccdedit mode=erase fixwcs=yes in='*' 
+*     ccdedit mode=erase name=set fixwcs=yes in='*' 
 *        All Set header information, and any CCD_SET coordinate
 *        frames which are associated with it, will be removed from
 *        the NDFs in the current directory.

@@ -142,13 +142,13 @@
 *  Notes:
 *     AST file format:
 *        The AST file is designed to be written by ASTEXP and read by
-*        ASTIMP, and the user does not need to understand its format.
-*        It is however a text file, and if care is taken it may be
-*        edited by hand.  Removing entire framesets and modifying ID
-*        values or domain names may be done fairly easily, but care
-*        should be taken (see SUN/210) if any more involved changes
-*        are to be undertaken.  The format of the file is explained
-*        here.
+*        ASTIMP or MAKESET, and the user does not need to understand
+*        its format.  It is however a text file, and if care is taken
+*        it may be edited by hand.  Removing entire framesets and 
+*        modifying ID values or domain names may be done fairly easily,
+*        but care should be taken (see SUN/210) if any more involved 
+*        changes are to be undertaken.  The format of the file is 
+*        explained here.
 *
 *        The AST file consists of the following, in order:
 *

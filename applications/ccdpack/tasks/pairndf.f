@@ -38,11 +38,11 @@
 *     aligned.
 *
 *     The graphical interface consists of two parts: a chooser which
-*     allows you to inspect pairs of images to see whether they are 
-*     able to be paired, and an aligner which allows you to move 
-*     a pair of images around so that they are registered, and to
-*     mark points in the overlapping region where the same centroidable 
-*     features exist in both images.
+*     allows you to nominate pairs of images to be aligned,
+*     and an aligner which allows you to move the pair around the
+*     screen until they are registered, and to mark points in the 
+*     overlapping region where the same centroidable features exist 
+*     on both images.
 *
 *     Operation is as follows.  You must first use the chooser window
 *     to select a pair of images which have a region in common.
@@ -53,14 +53,16 @@
 *     You can use the "Display cutoff" menu to select the percentiles
 *     controlling the brightness of each pixel; alignment is easier if
 *     the same features are of a similar brightness in different images.
-*     The images are displayed resampled into their Current attached 
-*     coordinate system; you can only align them using this program if 
-*     a simple offset (translation) maps one onto another in these 
+*     The images are displayed resampled into their Current coordinates,
+*     so that their orientation (though not necessarily their size) 
+*     will be the same as in the aligner.  You can only align 
+*     them using this program if a simple offset (translation)
+*     maps one onto another in these 
 *     coordinates (or very nearly does so).  If that is not the case,
 *     you will have to set their Current coordinate system 
 *     to a different value (see WCSEDIT) or align them using a 
 *     different method.  The whole of each image will be displayed in
-*     the chooser window, and you can resize it in the usual way to 
+*     the chooser window, and you can resize the window in the usual way to 
 *     make the images appear bigger or smaller.  Select a pair with 
 *     an overlapping region which you wish to align, and click the 
 *     "Use this pair" button.  The aligner window will then appear, 
@@ -234,15 +236,14 @@
 *        be used in the object matching.  If USESET is true,
 *        PAIRNDF will try to group images according to their Set Name
 *        attribute.  All NDFs which share the same (non-blank) Set
-*        Name attribute, and which have a CCD_SET coordinate frame
-*        in their WCS component, will be grouped together and treated
-*        as a single image for alignment.  In the graphical part of
-*        the program you will view and position this group of 
-*        images as a single item.
+*        Name attribute, and which have a CCD_SET attached coordinate
+*        system, will be grouped together and treated as a single 
+*        image for alignment.  In the graphical part of the program you
+*        will view and position this group of images as a single item.
 *
 *        If the input NDFs have no Set headers, or if they have no
-*        CCD_SET frame in their WCS components, the setting of USESET
-*        will make no difference.
+*        Set alignment coordinate system (one with a Domain of CCD_SET)
+*        the setting of USESET will make no difference.
 *
 *        If a global value for this parameter has been set using 
 *        CCDSETUP then that value will be used.

@@ -28,8 +28,8 @@
 *     which can be derived from other NDFs to which similar framesets 
 *     ought to apply.  The key should be generated in the same way when 
 *     the AST file is used for importing the mapping information by
-*     ASTIMP.  Currently these keys can be generated according to a
-*     FITS header card or the order in which the NDFs are presented.
+*     ASTIMP or MAKESET.  Currently these keys can be generated according
+*     to a FITS header card or the order in which the NDFs are presented.
 *     Additional information may be written describing what use to 
 *     make of FITS headers in the NDFs.
 *
@@ -37,10 +37,10 @@
 *     contain information about the positioning of images in a set of
 *     related NDFs.
 *
-*     AST files written out by this program can be applied to
-*     other NDFs of similar origin using the ASTIMP program, so 
+*     AST files written out by this program can be applied to other
+*     NDFs of similar origin using the ASTIMP or MAKESET programs, so 
 *     that registration information present in the WCS components of 
-*     one set of NDFs (put there for instance by the REGISTER or
+*     one group of NDFs (put there for instance by the REGISTER or
 *     WCSEDIT programs) can be transferred using ASTIMP and ASTEXP to
 *     another similar set.  This "similar set" will typically be one
 *     from chips in the same mosaic camera instrument.
@@ -182,7 +182,7 @@
 *        parameter only gives the name that the frames will have in
 *        the AST file, and consequently the name by which they will be
 *        known when the WCS information is imported into other NDFs
-*        using ASTIMP.
+*        using ASTIMP or MAKESET.
 *
 *        The name is converted to upper case, and whitespace is removed.
 *        [CCD_EXPORT]
@@ -193,12 +193,12 @@
 *        This will save the information about the relative positioning
 *        of the NDFs 'reg_data*' to the file 'camera.ast', calling the
 *        alignment domain 'CAMERA'.  The file 'camera.ast' can later be
-*        used by the ASTIMP application to add the same coordinate 
-*        information to a different set of NDFs from the same instrument.
-*        Before running this, the NDFs 'reg_data*' should be correctly
-*        aligned in their Current domain.  CHIPNUM must be the name 
-*        of a FITS header keyword present in the FITS extension of each
-*        NDF whose value distinguishes the CCDs from each other 
+*        used by the ASTIMP or MAKESET applications to add the same 
+*        coordinate information to a different set of NDFs from the same
+*        instrument.  Before running this, the NDFs 'reg_data*' should be 
+*        correctly aligned in their Current domain.  CHIPNUM must be the
+*        name of a FITS header keyword present in the FITS extension 
+*        of each NDF whose value distinguishes the CCDs from each other 
 *        (presumably present in the unreduced data).  The mappings 
 *        between the pixel coordinates and Current coordinates of the
 *        input NDFs are recorded.
@@ -230,13 +230,13 @@
 *  Notes:
 *     AST file format:
 *        The AST file is designed to be written by ASTEXP and read by
-*        ASTIMP, and the user does not need to understand its format.
-*        It is however a text file, and if care is taken it may be
-*        edited by hand.  Removing entire framesets and modifying ID 
-*        values or domain names may be done fairly easily, but care
-*        should be taken (see SUN/210) if any more involved changes
-*        are to be undertaken.  The format of the file is explained 
-*        here.
+*        ASTIMP or MAKESET, and the user does not need to understand 
+*        its format.  It is however a text file, and if care is taken 
+*        it may be edited by hand.  Removing entire framesets and 
+*        modifying ID values or domain names may be done fairly easily,
+*        but care should be taken (see SUN/210) if any more involved 
+*        changes are to be undertaken.  The format of the file is
+*        explained here.
 *
 *        The AST file consists of the following, in order:
 *

@@ -210,10 +210,10 @@
 *     USESET = _LOGICAL (Read)
 *        Whether to use Set header information or not.  If USESET is
 *        false then any Set header information will be ignored.
-*        If USESET is grue, then input files will be considered in
-*        groups; one master bias frame will be constructed using all
-*        those with a Set Index attribute of 1, another using all those
-*        with a Set Index of 2, etc.  If this results in multiple
+*        If USESET is true, then input files will be considered in
+*        groups; a separate master bias frame will be constructed for
+*        each group of corresponding input frames (i.e. those sharing
+*        the same Set Index attribute).  If this results in multiple
 *        output master bias frames, they will be written as separate
 *        NDFs into a single HDS container file.  If no Set header
 *        information is present in the input files, then all the
