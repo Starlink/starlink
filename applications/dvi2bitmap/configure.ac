@@ -35,6 +35,7 @@ AC_PROG_CXX
 AC_PROG_CC
 AC_PROG_LIBTOOL
 
+
 dnl  Use C to compile the AC_CHECK_FUNCS tests (using C++ can cause
 dnl  spurious linking errors on, for example, Solaris)
 AC_LANG([C])
@@ -178,6 +179,20 @@ AC_DEFINE_UNQUOTED(STD,
                    [Define as `std' (no quotes) if standard functions are in 
                     the std namespace; define as empty otherwise])
 
+dnl  Do we have string clear() method? (it's in the standard, but not
+dnl  every compiler supports it)
+AC_CACHE_CHECK([whether string.clear() is supported],
+   [my_cv_string_clear],
+   [AC_TRY_COMPILE([#include <string>],
+       [STD::string teststring = "hello";
+        teststring.clear();],
+        my_cv_string_clear=yes,
+        my_cv_string_clear=no)])
+if test $my_cv_string_clear = yes; then
+    AC_DEFINE(HAVE_STRING_CLEAR, 1,
+      [Define to 1 if the C++ string.clear() method is supported])
+fi
+
 
 dnl   Extra .lo objects, to be conditionally compiled
 AC_SUBST(EXTRALO)
@@ -219,24 +234,25 @@ if test -n "$extrapath"; then
     LIBS="$LIBS -L$extrapath/lib"
   fi
   AC_CHECK_HEADER(kpathsea/pathsearch.h,
-                  [AC_CHECK_LIB(kpathsea, kpse_find_file,
-                                [AC_DEFINE(ENABLE_KPATHSEA,
-				 1,
-	[Define as 1 if you want to enable use of the kpathsea library
-	for font-searching.  The font _generation_ programs (usually)
-	use this library when they work their magic, but that's
-	entirely separate, and controlled only by ENABLE_FONT_GEN.])]
-                                dnl EXTRALO="$EXTRALO kpathsea.lo"
-                                EXTRALO="$EXTRALO KarlPathSearcher.lo"
-                                LIBS="$LIBS -lkpathsea"
-                                needfontfinding=0)])
+     [AC_CHECK_LIB(kpathsea, kpse_find_file,
+         [AC_DEFINE(ENABLE_KPATHSEA,
+          1,
+          [Define as 1 if you want to enable use of the
+           kpathsea library for font-searching.  The font
+           _generation_ programs (usually) use this library
+           when they work their magic, but that's entirely
+           separate, and controlled only by ENABLE_FONT_GEN.])]
+          EXTRALO="$EXTRALO KarlPathSearcher.lo"
+          LIBS="$LIBS -lkpathsea"
+          needfontfinding=0)])
 fi
 
 dnl   Specify an alternative, or additional, font-finding script.
 dnl   This should be expressed as a `font-string template', as
 dnl   described in the README
 AC_ARG_WITH(fontfinder,
-[  --with-fontfinder=script  Specify a script to find fonts],
+  AS_HELP_STRING([--with-fontfinder=script],
+                 [Specify a script to find fonts]),
   if test "$withval" != yes -a "$withval" != no; then
     [AC_DEFINE_UNQUOTED(FONT_SEARCH_SCRIPT,
 			"$withval",
@@ -265,7 +281,8 @@ fi
 dnl --disable-texmfcnf
 if test -n "$ac_cv_path_KPSEWHICH"; then
 AC_ARG_ENABLE(texmfcnf,
-[  --disable-texmfcnf      Disable setting of TEXMFCNF in environment],
+  AS_HELP_STRING([--disable-texmfcnf],
+                 [Disable setting of TEXMFCNF in environment]),
   test "$enableval" = "yes" && T=`kpsewhich cnf texmf.cnf`
   if test -n "$T"; then
     AC_DEFINE_UNQUOTED(DEFAULT_TEXMFCNF,
@@ -437,26 +454,31 @@ if test -n "$extrapath"; then
     LIBS="$LIBS -L$extrapath/lib"
   fi
   AC_CHECK_HEADER(png.h,
-                  [AC_CHECK_LIB(png, png_libpng_ver,
-                                [AC_DEFINE(ENABLE_PNG,
-					   1,
-					   [Define as 1 if you want to
-					   enable generation of
-					   PNGs])]
-                                EXTRALO="$EXTRALO PNGBitmap.lo"
-                                LIBS="$LIBS -lpng -lz",
-                                echo "png library not found or too old -- not including PNG support",
-                                -lz)])
+    [AC_CHECK_LIB(png, png_libpng_ver,
+        [AC_DEFINE(ENABLE_PNG,
+                   1,
+                   [Define as 1 if you want to enable generation of PNGs])]
+         EXTRALO="$EXTRALO PNGBitmap.lo"
+         LIBS="$LIBS -lpng -lz",
+        echo "png library not found or too old -- not including PNG support",
+        -lz)])
 fi
 
 dnl   Specify support for GIF output
-AC_ARG_ENABLE(gif, 
-[  --enable-gif            Enable output of GIF files],
-  [AC_DEFINE(ENABLE_GIF,
-	     1,
-	     [Define as 1 if you want to enable generation of GIFs])]
+AC_ARG_ENABLE(gif,
+  AS_HELP_STRING([--enable-gif],
+                 [Enable output of GIF files (default yes)]),
+  [case $enableval in
+     yes) compile_gifs=yes ;;
+     no)  compile_gifs=no ;;
+   esac],
+   compile_gifs=yes)
+if test $compile_gifs = yes; then
+  AC_DEFINE(ENABLE_GIF,
+	    1,
+	    [Define as 1 if you want to enable generation of GIFs])
   EXTRALO="$EXTRALO GIFBitmap.lo"
-  )
+fi
 
 
 dnl   Now check whether getopt and co. are defined.  Do this last,
