@@ -25,7 +25,7 @@ extern "C" {
 #include "EXTERN.h"   /* std perl include */
 #include "perl.h"     /* std perl include */
 #include "XSUB.h"     /* XSUB include */
-  /* #include "ppport.h" */
+#include "ppport.h"
 #ifdef __cplusplus
 }
 #endif
