@@ -45,6 +45,7 @@ fspecmap.c \
 fsphmap.c \
 funitmap.c \
 fwcsmap.c \
+fshiftmap.c \
 fwinmap.c \
 fzoommap.c \
 grf_null.c \
@@ -75,6 +76,7 @@ unit.c \
 unitmap.c \
 wcsmap.c \
 wcstrig.c \
+shiftmap.c \
 winmap.c \
 zoommap.c
 
@@ -129,6 +131,7 @@ unitmap.h \
 wcsmap.h \
 wcsmath.h \
 wcstrig.h \
+shiftmap.h \
 winmap.h \
 zoommap.h
 

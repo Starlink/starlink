@@ -23,7 +23,7 @@ f+
 \newcommand{\stardocnumber}    {210.11}
 f-
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {16th July 2003}
+\newcommand{\stardocdate}      {18th August 2003}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
@@ -647,8 +647,8 @@ coordinate spaces---{\em{i.e.}}\ map projections (the DssMap and WcsMap).
 \item Permutation, introduction and elimination of coordinates (the
 PermMap).
 
-\item Various linear coordinate transformations (the MatrixMap, WinMap
-and ZoomMap).
+\item Various linear coordinate transformations (the MatrixMap, WinMap,
+ShiftMap and ZoomMap).
 
 \item Lookup tables (the LutMap).
 
@@ -2043,7 +2043,8 @@ In AST, it can be represented by concatenating two Mappings. The first
 is a MatrixMap, which implements the matrix multiplication. The second
 is a WinMap, which linearly transforms one coordinate window on to
 another, but will be used here simply to implement the shift of
-origin. These Mappings may be constructed and concatenated as follows:
+origin (alternatively, a ShiftMap could have been used in place of a
+WinMap). These Mappings may be constructed and concatenated as follows:
 
 c+
 \begin{quote}
@@ -17899,6 +17900,7 @@ Object             - Base class for all AST Objects
       MatrixMap    - Map positions by multiplying them by a matrix
       PcdMap       - Apply 2-dimensional pincushion/barrel distortion
       PermMap      - Coordinate permutation Mapping
+      ShiftMap     - Shifts each axis by a constant amount
       SlaMap       - Sequence of celestial coordinate conversions
       SpecMap      - Sequence of spectral coordinate conversions
       SphMap       - Map 3-d Cartesian to 2-d spherical coordinates

@@ -23,6 +23,7 @@
 #include "skyframe.h"
 #include "specframe.h"
 #include "specmap.h"
+#include "shiftmap.h"
 #include "slamap.h"
 #include "sphmap.h"
 #include "unitmap.h"
@@ -85,6 +86,7 @@ if ( !strcmp( class, #name ) ) return (AstLoaderType *) astLoad##name##_
    LOAD(PermMap);
    LOAD(Plot);
    LOAD(PointSet);
+   LOAD(ShiftMap);
    LOAD(SkyAxis);
    LOAD(SkyFrame);
    LOAD(SlaMap);

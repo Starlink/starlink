@@ -404,6 +404,14 @@ f     - Title: The Plot title drawn using AST_GRID
 *     25-MAR-2003 (DSB):
 *        - Modified FindMajTicks to avoid losing tick marks when dealing
 *        with high precision data.
+*     8-AUG-2003 (DSB):
+*        - Modified PlotLabels to ensure that the root label for the
+*        second axis is not omitted due to it overlapping a label from 
+*        the first axis (a different root label is now chosen if this would
+*        be the case).
+*        - Modify FindMajTicks to avoid tick marks which should be at
+*        exactly zero being placed at some very small non-zero axis value.
+being 
 *class--
 */
 
@@ -9972,12 +9980,15 @@ static int FindMajTicks( AstMapping *map, AstFrame *frame, int axis,
 
 /* Ensure that all ticks marks are offset from the "centre" value by an 
    integer multiple of the gap size. This is done by changing each tick
-   value to the closest accetpable value. */
+   value to the closest acceptable value. Also ensure that values close to
+   zero (i.e. less than 1E-10 of the gap size) are set exactly to zero. */
       r = ticks;
       for( k = 0; k < nticks; k++ ){
          if( *r != AST__BAD ) {
             f = floor( 0.5 + ( *r - centre )/gap );
-            *(r++) = f*gap + centre;
+            *r = f*gap + centre;
+            if( fabs( *r ) < 1.0E-10*gap ) *r = 0.0;
+            r++;
          } else {
             r++;
          }
@@ -17952,6 +17963,10 @@ static void PlotLabels( AstPlot *this, AstFrame *frame, int axis,
 
    AND
    
+   - It does not overlap any labels drawn for a previous axis
+
+   AND
+
    - We do not currently have a candidate root label, or
    - The priority for this label is higher than the priority of the current
    root label, or
@@ -17965,12 +17980,23 @@ static void PlotLabels( AstPlot *this, AstFrame *frame, int axis,
              !found ) {
 
             if( !root_found ) {
-               root = i;
-               rootoff = abs( i - lab0 );
+
+               if( axis == 0 || !Overlap( this, -1, 0, ll->text, (float) ll->x, 
+                                          (float) ll->y, ll->just, 
+                                          (float) ll->upx, (float) ll->upy, box,
+                                          method, class ) ) {
+                  root = i;
+                  rootoff = abs( i - lab0 );
 
 /* If the label value was zero, we will use label as the root label,
    regardless of the priorities of later labels. */
-               if( !found ) root_found = 1;
+                  if( !found ) root_found = 1;
+               }
+
+/* Reset the list of bounding boxes to exclude any box added above. */
+               Overlap( this, nbox, 0, NULL, 0.0, 0.0, NULL, 0.0, 0.0, box, 
+                        method, class );
+
             }
          }
 

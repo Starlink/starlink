@@ -35,6 +35,7 @@ object.h \
       matrixmap.h \
       pcdmap.h \
       permmap.h \
+      shiftmap.h \
       slamap.h \
       specmap.h \
       sphmap.h \

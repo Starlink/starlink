@@ -14,6 +14,7 @@ BADBX           <zero-sized box given>
 BADIN           <bad input data>
 BADNI           <bad number of input coordinates>
 BADNO           <bad number of output coordinates>
+BADSM           <ShiftMap contains no shift information>
 BADWM           <WinMap contains no bounds information>
 BDBRK           <bad break index>
 BDFMT           <bad field specifier>

@@ -23,6 +23,10 @@ respect to one of the Mapping inputs.
 o A new subclass of Mapping, the GrismMap, has been added which models
 the spectral dispersion produced by a grating, prism or grism.
 
+o A new subclass of Mapping, the ShiftMap, has been added which adds
+constant values onto all coordinates (this is equivalent to a WinMap
+with unit scaling on all axes).
+
 
    For further details of these changes, see the final appendix of
 Starlink User Note SUN/210 (Fortran version) or SUN/211 (C version).
