@@ -108,7 +108,7 @@ FUNCTION {output.nonnull}
           % close the <dt> after the end of the first block
           % and set closelink false
 	  close.link
-	    { "</a></dt> <dd>" write$
+	    { "</dt> <dd>" write$
 	      #0 'close.link := }
 	    'skip$
 	  if$
@@ -847,7 +847,8 @@ FUNCTION {manual}
 { output.bibitem
   author empty$
     { organization empty$
-	'skip$
+%	'skip$
+	{ "" output.nonnull }	% must call output.nonnull, to close </a>
 	{ organization output.nonnull
 	  address output
 	}
