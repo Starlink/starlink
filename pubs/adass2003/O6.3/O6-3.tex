@@ -1,18 +1,107 @@
-\documentclass[a4paper]{article}
+\documentclass[11pt,twoside]{article}
 
+%%% XXX Comment out or remove before submission!!!
 \def\RCS$#1: #2 ${\expandafter\def\csname RCS#1\endcsname{#2}}
 \RCS$Revision$
 
-\title{Data models in the VO: how do they make code better?}
-\author{Norman Gray\thanks{Starlink/University of Glasgow},
-        David L Giaretta\thanks{Starlink/RAL},
-        David Berry\thanks{Starlink/University of Central Lancashire},\\
-        Malcolm Currie\thanks{Starlink/RAL}, 
-        Mark Taylor\thanks{Starlink/University of Bristol}}
-\date{ADASS XIII, session O6; 2003 October 14, v\RCSRevision}
+\usepackage{adassconf}
 
+\makeatletter
+% Current adassconf.sty gets the following wrong (picky!)
+\def\vol@title{Astronomical Data Analysis Software and Systems XIII}
+\def\vol@author{Fran\c{c}ois Ochsenbein and Mark Allen eds.}
+\makeatother
+
+% NB: wierdo conference style has \title and co typeset material,
+% rather than store it, so \begin{document} must go here, and there's no
+% \maketitle
 \begin{document}
-\maketitle
+
+\paperID{O6.3}
+\contact{Norman Gray}
+\email{norman@astro.gla.ac.uk}
+
+\title{Data Models in the VO: How Do They Make Code Better? [v\RCSRevision]}
+\titlemark{Data Models in the VO}
+
+\author{Norman Gray\altaffilmark{1},
+        David L. Giaretta,
+        David S. Berry\altaffilmark{2},
+        Malcolm J. Currie,
+        Mark B. Taylor\altaffilmark{3}}
+\affil{Starlink Project,
+        Rutherford Appleton Laboratory,
+        Chilton,
+        Didcot,
+        OX11 0QX,
+        UK}
+
+\altaffiltext{1}{Department of Physics and Astronomy,
+        University of Glasgow,
+        Glasgow,
+        G12 8QQ, 
+        UK}
+
+\altaffiltext{2}{Centre for Astrophysics,
+        University of Central Lancashire,
+        Preston,
+        PR1 2HE,
+        UK}
+
+\altaffiltext{3}{Department of Physics,
+        University of Bristol,
+        Tyndall Avenue,
+        Bristol,
+        BS8 1TL,
+        UK}
+
+\paindex{Gray, N.}
+\aindex{Giaretta, D. L.}
+\aindex{Currie, M. J.}
+\aindex{Berry, D. S.}
+\aindex{Taylor, M. B.}
+
+
+%\author{Norman Gray}
+%\affil{Starlink \& Department of Physics and Astronomy,
+%        University of Glasgow,
+%        Glasgow,
+%        G12 8QQ, 
+%        UK}
+%\paindex{Gray, N.}
+
+%\author{David L. Giaretta and Malcolm J. Currie}
+%\affil{Starlink Project,
+%        Rutherford Appleton Laboratory,
+%        Chilton,
+%        Didcot,
+%        OX11 0QX,
+%        UK}
+%\aindex{Giaretta, D. L.}
+%\aindex{Currie, M. J.}
+
+%\author{David S. Berry}
+%\affil{Starlink \& Centre for Astrophysics,
+%        University of Central Lancashire,
+%        Preston,
+%        PR1 2HE,
+%        UK}
+%\aindex{Berry, D. S.}
+
+%\author{Mark B. Taylor}
+%\affil{Starlink \& Department of Physics,
+%        University of Bristol,
+%        Tyndall Avenue,
+%        Bristol,
+%        BS8 1TL,
+%        UK}
+%\aindex{Taylor, M. B.}
+
+\authormark{Gray, Giaretta, Currie, Berry \& Taylor}
+
+\keywords{Virtual Observatory, data models, usability, Starlink}
+
+
 
 \begin{abstract}
 Data Models exist in people's heads. Data modelling consists of making
