@@ -420,6 +420,14 @@ iraf! {
             helpkey *
           }
 
+         parameter iframe {
+            type _INTEGER
+            access WRITE
+            vpath DEFAULT
+            default 0
+            helpkey *
+          }
+
       }
       action astframe {
          helplib {$ATOOLS_HELP}

@@ -26,6 +26,10 @@
 *     system can be found, the function returns a pointer to a
 *     FrameSet which describes the required coordinate system and how
 *     to convert coordinates to and from it.
+*
+*     The index of the closest matching Frame in the target FrameSet
+*     is displayed on the screen and returned in output parameter 
+*     IFRAME.
 
 *  Usage:
 *     astfindframe target template domainlist result
@@ -47,6 +51,11 @@
 *        This list is case-insensitive and all white space is ignored.
 *        If you do not wish to restrict the domain in this way,
 *        you should supply a blank string or null (!) value.
+*     IFRAME = INTEGER (Write)
+*        On exit, this holds the index of the closest matching Frame in the 
+*        target FrameSet, or zero if no matching Frame was found. If the
+*        Target is a Frame instead of a FrameSet, then a value of 1 is
+*        returned if a match is found, and zero otherwise.
 *     RESULT = LITERAL (Read)
 *        If the search is successful, a FrameSet is written to the specified 
 *        text file or NDF. Otherwise, a warning message is displayed. If 
@@ -138,6 +147,7 @@
          CALL MSG_OUT( 'ASTFINDFRAME_MSG1', 'No Frame matching the '//
      :                 'supplied template could be found in the '//
      :                 'supplied target.', STATUS )
+         CALL PAR_PUT0I( 'IFRAME', 0, STATUS )
       
 *  Otherwise, tell the user which Frame was used.
       ELSE
@@ -163,9 +173,12 @@
    
             CALL MSG_OUT( 'ASTFINDFRAME_MSG3', '   Frame ^CFI ^CFD in'//
      :                    ' the ''TARGET'' FrameSet.', STATUS )
+            CALL PAR_PUT0I( 'IFRAME', CFI, STATUS )
+
          ELSE
             CALL MSG_OUT( 'ASTFINDFRAME_MSG4', '   The supplied '//
      :                    '''TARGET'' Frame.', STATUS )
+            CALL PAR_PUT0I( 'IFRAME', 1, STATUS )
          END IF
 
          CALL MSG_BLANK( STATUS )
