@@ -21,11 +21,15 @@
 *       STATUS argument added.
 *     4-AUG-2004 (TIMJ):
 *       Remove TYPE and replace with PRINT
+*       Remove NAG dependency
 *
+
+      IMPLICIT NONE
 
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'MAIN'
       INTEGER IA(IDIM)
+      INTEGER K, J
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -47,10 +51,7 @@
          DO J = 1,NUM
             IA(J) = NSTAR(1,J)
          ENDDO
-         IFAIL=0
-         CALL M01DBF(IA,1,NUM,'A',IP,IFAIL)
-         CALL M01CBF(IA,1,NUM,'A',IFAIL)
-         IF (IFAIL.NE.0) PRINT *,'SORTING FAILURE'
+         CALL PDA_QSIAI(NUM, IA, IP)
 *
 *   From now on only consider the 'MAXNUM'
 *   Brightest Stars.
