@@ -1,0 +1,47 @@
+#     3-JAN-2003 (PTW):
+#        New routine: sla_PLANTU
+#        Miscellaneous improvements.
+#        Revised document:  SUN/67.60.
+#        Package version number changed to 2.4-11.
+
+
+
+
+SLALIB_Version_2.4-11                                 Expiry 31 March 2004
+
+The latest releases of SLALIB include the following changes:
+
+* A new routine PLANTU has been added.  It predicts the topocentric
+  apparent RA,Dec of a solar-system body given the Universal Elements.
+  It is a Universal-Elements counterpart to PLANTE, which uses
+  conventional spherical elements (and which now calls PLANTU).
+
+* The documentation for the suite of heliocentric orbital elements
+  routines has been improved to make it easier and more obvious how
+  to use of elements from JPL Horizons and from the Minor Planet 
+  Center.
+
+  Confusion over epochs has often arisen, because the epoch of osculation
+  (when the elements are momentarily correct) is completely separate from
+  the epochs that locate a body in its orbit, the former having a role 
+  only when appying perturbations.  Part of the reason for this confusion 
+  is that for major and minor planets it is conventional to adopt the 
+  same epoch for (i) osculation and (ii) computing the anomaly or longitude
+  that fixes the body, even though they could in principle be different.
+  For the comet case this convention is impossible because the choice of
+  perihelion dictates the epoch fixing the body, and hence the existence
+  of (and need for) two independent concepts of epoch is exposed.
+
+  The SLALIB routines in question, especially slaPlante, now have extra 
+  explanation dealing with the three distinct epochs (date of observation, 
+  fixing the body, and osculation) and also some notes dealing with JPL
+  and MPC elements.  Additionally, a table has been added to SUN/67
+  showing how to use the JPL and MPC elements.
+
+   
+ P.T.Wallace
+ 19 May 2003
+
+ ptw@star.rl.ac.uk
+ +44-1235-44-5372
+--------------------------------------------------------------------------

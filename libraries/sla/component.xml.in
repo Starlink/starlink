@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>libraries/sla</path>
+  <description>SLALIB --- Positional Astronomy Library</description>
+  <abstract><p>SLALIB is a library used by writers of
+      positional-astronomy applications.  Most of the
+      routines are concerned with astronomical position and time, but
+      a number have wider trigonometrical, numerical or general
+      applications.</p></abstract>
+  <dependencies>
+    <build>@STAR_BUILD_DEPENDENCIES@</build>
+    <use>@STAR_USE_DEPENDENCIES@</use>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Patrick Wallace</name>
+      <uname>ptw</uname>
+      <email>ptw@star.rl.ac.uk</email>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+</component>

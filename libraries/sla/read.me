@@ -1,0 +1,415 @@
+READ.ME
+
+Revision date 4 September 2000                     SLALIB Version 2.4-5
+
+-----------------------------------------------------------------------
+
+FILES IN THE ORIGINAL SOURCE DIRECTORY (UNIX)
+
+   read.me           this file
+   *.f               Fortran source (separate modules)
+   *.vax             Fortran source for VAX/VMS
+   *.cnvx            Fortran source for Convex
+   *.mips            Fortran source for DECstation
+   *.sun4            Fortran source for Sun SPARCstation
+   *.lnx             Fortran source for Linux
+   *.pcm             Microsoft Fortran source for PC
+   *.c               C functions needed for Linux version
+   sla.news          NEWS item for latest release
+   make_file         Unix make file
+   mk                C-shell script to run make
+   sun67.tex         document
+
+-----------------------------------------------------------------------
+
+PORTING FORTRAN SLALIB TO OTHER SYSTEMS
+
+FORTRAN SLALIB runs on VAX (VMS), PC (Linux+f2c), PC (Microsoft FORTRAN),
+Convex (ConvexOS), DECstation (Ultrix), DEC Alpha (OSF-1) and Sun
+SPARCstation (SunOS and Solaris).
+
+For most platforms, the required changes are confined to these routines:
+
+    sla_GRESID
+    sla_RANDOM
+    sla_WAIT
+
+VAX, CONVEX, DECSTATION/ALPHA, SUN & PC
+
+Versions suitable for the above platforms are supplied in the
+development directory as *.vax, *,cnvx, *.mips, *.sun4, *.pcm and
+*.lnx respectively.
+
+
+-----------------------------------------------------------------------
+
+LATEST RELEASE INFORMATION
+
+The latest release of SLALIB includes the following changes (most recent
+at the end):
+
+*  In sla_RCC, the topocentric term of coefficient 1.3184D-10 sec
+   had the wrong sign.  Minus is correct.
+
+*  The IAU decided in 1991 to rename the Terrestrial Dynamical
+   Time, TDT, which is now called "Terrestrial Time" or TT.
+   Appropriate changes have been made in the SLALIB documentation.
+   The same IAU resolutions introduced the timescales TCG and TCB;
+   there are at present no SLALIB routines to handle these new
+   timescales.
+
+*  The Keck 1 Telescope has been added to sla_OBS.
+
+*  The handling of the random-number seed in the PC versions of
+   sla_RANDOM and sla_GRESID was flawed and has been improved.
+
+*  The UTC leap second at the end of June 1993 has been added to the
+   routine sla_DAT.  Existing applications which call sla_DAT or
+   sla_DTT require relinking.
+
+*  Some unnecessary code in sla_AMPQK has been removed.
+
+*  Minor reorganization of the sla_REFRO code has led to an improvement
+   in speed of about 20%, and precautions have been taken against
+   potential arithmetic errors.
+
+*  There have been small revisions to sla_FK425 and sla_FK524.  The
+   results are not significantly affected, except in the pathological
+   case of large proper motion combined with immense distance, where
+   sla_FK524 could produce erroneous radial velocity values.  The
+   latest versions are close to the algorithms published in the 1992
+   Explanatory Supplement to the Astronomical Almanac.
+
+*  The leap second at the end of June 1994 has been added to sla_DAT.
+
+*  THE SLA_RVLSR ROUTINE HAS BEEN RETIRED.  Its place has been taken
+   by two new routines: sla_RVLSRK and sla_RVLSRD.  The original
+   sla_RVLSR had used a "kinematical" LSR.  When this was later changed
+   to a "dynamical" LSR for (what seemed liked good reasons at the time),
+   the small differences were noticed by spectral-line radio observers,
+   who had to fall back on old copies of the routine to remain consistent
+   with existing practice.  The new routines provide both sorts of LSR:
+   sla_RVLSRK uses a kinematical LSR and sla_RVLSRD uses the dynamical LSR.
+
+*  The sla_PA routine (computation of parallactic angle) used an
+   unnecessarily complicated formulation, which has been simplified.
+   The results are unaffected.
+
+*  The sla_ZD routine (computation of zenith distance) used a
+   straightforward cosine-formula-based method, which suffered from
+   decreased accuracy near the zenith.  A better, vector-derived,
+   formulation has been substituted, without materially affecting
+   the results.  Because sla_ZD is double precision, the old
+   formulation was always adequate;  however, had anyone transcribed
+   the code in single precision errors approaching 1 arcmin could
+   have resulted.  The new formulation delivers good results all
+   over the sky even in a single precision version.
+
+*  Routines have been added to transform equatorial coordinates
+   (HA,Dec) to horizon coordinates (Az,El) and back.  Single and
+   double precision are both supported.  The routines are called
+   sla_E2H, sla_DE2H, sla_H2E, sla_DH2E.
+
+*  A new routine has been added to the tangent-plane projection set.
+   The single and double precision versions are called sla_TPRD and
+   sla_DTPRD respectively.  Given the RA,Dec of a star and its
+   xi,eta coordinates, the routine determines the "plate centre".
+
+*  The existing routine sla_PREC for obtaining the precession matrix
+   uses the official IAU model and should continue to be used for
+   canonical purposes.  A new version, called sla_PRECL, uses a
+   more up-to-date model which delivers better accuracy, especially
+   over intervals of millennia.
+
+*  The routine sla_PVOBS was returning velocities in AU per sidereal
+   second rather than per UT second.  This has been corrected.  The
+   maximum error was equivalent to about 0.001 km/s.
+
+*  In sla_MAPQK and sla_MAPQKZ, the area within which the gravitional
+   light-deflection term is restrained has been extended from its
+   original 300 arcsec radius to about 920 arcsec, just inside the
+   Sun's disc.
+
+*  A chapter of explanation, with examples, has been added to SUN/67,
+   which has also undergone various cosmetic revisions.
+
+*  There were two discrepancies between the documentation of sla_DCMPF
+   (program comments and SUN/67) and the code.  The first was that the
+   formulae for the nonperpendicularity used PERP instead of PERP/2;
+   the documentation has been corrected.  The other was that the
+   documentation showed the zero point corrections being applied first,
+   whereas the code returned zero point corrections corresponding to
+   being applied last.  The code has been corrected to match the
+   documentation.
+
+*  The C module slaCldj gave incorrect answers for dates during
+   January and February.  The error, which did not affect the Fortran
+   version, has been corrected.
+
+*  THE CALLS FOR sla_TPRD AND sla_DTPRD HAS BEEN CHANGED.  An integer
+   status argument has been added;  non-zero means the supplied RA,Dec
+   and Xi,Eta describe an impossible case.  (This can only happen
+   near the pole and with non-zero Xi.)  Also, a slightly neater
+   formulation has been introduced.
+
+*  Three new routines have been added.  sla_ALTAZ takes a star's HA,Dec
+   and produces position, velocity and acceleration for azimuth,
+   elevation and parallactic angle.  sla_PDA2H predicts the HA at which
+   a given azimuth will be reached.  sla_PDQ2H does the same for
+   position angle.
+
+*  In the sla_OBS routine, the wrong sign was returned for the Perkins
+   72 inch telescope at Lowell - fixed.
+
+*  A revised model for the equation of the equinoxes has been
+   installed in sla_EQEQX, in line with recent IAU resolutions.  The
+   change amounts to less than 3 mas.
+
+*  A bug in sla_DFLTIN has been corrected.  A negative number following
+   an E- or D-format number without intervening spaces lost its sign.
+
+*  Four stations have been added to sla_OBS:
+
+     TAUTENBERG  Tautenberg 1.34 metre Schmidt
+     PALOMAR48   Palomar 48-inch Schmidt
+     UKST        UK 1.2 metre Schmidt, Siding Spring
+     KISO        Kiso 1.05 metre Schmidt, Japan
+     ESOSCHMIDT  ESO 1 metre Schmidt, La Silla
+
+*  The sla_EARTH and sla_MOON routines could give an integer divide by zero
+   for years before 1 BC.  This has been corrected.
+
+*  sla_CALYD (provided to support the sla_EARTH and sla_MOON routines)
+   has been upgraded to work outside the interval 1900 March 1 to
+   2100 February 28.  The status value indicating dates outside that
+   range has been dropped;  a new error value for year before -4711
+   has been introduced.
+
+*  A new routine, sla_CLYD, has been added.  It is a version of sla_CALYD
+   without the century-default feature and is to enable 1st-century
+   dates to be supplied to sla_EARTH and sla_MOON.
+
+*  Two new routines, sla_PLANET and sla_RDPLAN, have been added, which
+   compute approximate planetary ephemerides.
+
+*  A new routine, sla_DMOON, implements the same (Meeus) model as the
+   sla_MOON routine, but in full and in double precision.  The time
+   argument is a straightforward MJD rather than sla_MOON's year and
+   day-in-year.
+
+*  The sla_REFRO code has been speeded up by a factor of two (and is
+   also clearer).
+
+*  sla_REFV and sla_REFZ have, in different ways, been made more accurate
+   for cases close to the horizon.  The improvement to sla_REFV is
+   relatively modest, but sla_REFZ is now capable of delivering useful
+   results for rise/set phenomena.
+
+*  sla_AOPQK has been speeded up for low-elevation cases.
+
+*  Versions of the tangent-plane routines working directly in x,y,z
+   instead of spherical coordinates have been added.  They may be
+   faster in some applications.  The routines are sla_DV2TP, sla_V2TP,
+   sla_DTP2V, sla_TP2V, sla_DTPXYZ, sla_TPXYZ.
+
+*  The coordinates of the Australia Telescope Compact Array have been
+   added to sla_OBS.  The name is 'ATCA'.
+
+*  Despite their recent introduction THE ROUTINES sla_DTPRD, sla_DTPXYZ,
+   sla_TPRD AND sla_TPXYZ HAVE BEEN WITHDRAWN.  They have been replaced
+   by the new routines sla_DTPS2C, sla_DTPV2C, sla_TPS2C and sla_TPV2C.
+   These are functionally equivalent to the earlier routines but return
+   two solutions instead of one:  the second solution can arise near a
+   pole.
+
+*  The UTC leap second at the end of 1995 has been added to sla_DAT.
+
+*  The refraction routine sla_REFRO has been extensively revised.  The
+   principal motivation was to improve the radio predictions by
+   introducing better humidity models.  The models previously in
+   use had been entirely adequate for the optical case, for which
+   they had been devised, but improved models were required for
+   the radio case.  None of the changes significantly affects the
+   optical results with respect to the earlier version of the sla_REFRO
+   routine.  For example, at 70 deg zenith distance the new version
+   agrees with the old version to better than 0.05 arcsec for any
+   reasonable combination of parameters.  However, the improved
+   water-vapour expressions do make a significant difference in the
+   radio band, at 70 deg zenith distance reaching almost 4 arcsec
+   for a hot, humid, low-altitude site during a period of low pressure.
+
+*  There was a bug in slaRdplan, the (private) C version of sla_RDPLAN.
+   The answers were unaffected but there could be floating-point
+   problems on some platforms.
+
+*  A new routine has been added, sla_GMSTA.  This gives greater numerical
+   precision than the existing GMST function by allowing the date and
+   time to be specified separately rather than as a single MJD.
+
+*  Measures taken in sla_MAPQK to avoid trouble when processing Solar
+   positions had not been carried through into sla_MAPQKZ.  The two
+   routines now use the same strategy.
+
+*  In sla_REFRO, at zenith distances well beyond 90 deg and under some
+   conditions, it was possible to encounter arithmetic errors due to
+   failure of the tropospheric model-atmosphere to deliver sensible
+   temperatures.  This is inherent in the published algorithm.  To
+   avoid the problem, the temperature delivered by the model has been
+   constrained to the range 200 to 320 deg K.
+
+*  A new routine has been added, sla_ATMDSP, for rapidly recalculating
+   the A,B refraction coefficients for different wavelengths.
+
+*  The first UTC leap-second date in the sla_DAT routine was one day early.
+   This will have had no effect on the results for more recent epochs.
+
+*  slaObs, the C version of sla_OBS, had some problems related to character
+   string handling.  A call using the "number" option retured an invalid
+   station ID, and station ID and name strings of the stipulated 10
+   and 40 character lengths were improperly terminated.
+
+*  A new routine, sla_POLMO has been added.  This is a specialist tool
+   to do with Earth polar motion.
+
+*  sla_DC62S and sla_CC62S could give floating point errors if vectors in
+   unlikely units were supplied.  The handling of difficult cases  has
+   been improved.
+
+*  Support for Linux has been added.
+
+*  slaRefreo, the C version of sla_REFRO, was not re-entrant.  It is now;
+   there has been a small (4%) speed penalty.
+
+*  The C routines slaRandom, slaGresid and slaWait have been dropped.
+   They could not easily be made re-entrant and posed perennial platform-
+   dependency problems.
+
+*  The value for the arcsec to radians factor in several routines
+   had an incorrect (and superfluous) 19th digit, which has been
+   removed.
+
+*  There was a minor bug in sla_DV2TP and sla_V2TP, to do with protection
+   against the special case where the tangent point is the pole.
+
+*  In sla_OBS, the position of the Parkes radiotelescope has been revised,
+   and the ATNF Mopra observatory has been added.
+
+*  Two new routines have been added.  sla_PAV (single precision) and
+   sla_DPAV (double precision) are like sla_BEAR and sla_DBEAR but start
+   with direction cosines rather than spherical coordinates - they return
+   the position angle of one point with respect to the other.
+
+*  slaRefro, the C version of sla_REFRO, still wasn't re-entrant, but is
+   now.
+
+*  slaDtf2d, the C version of sla_DTF2D, used to accept 60.0 in the seconds
+   field;  this has been corrected.
+
+*  The sla_PLANET and sla_RDPLAN routines now include Pluto.  The ephemeris
+   is accurate (sub-arcsecond) but covers the 20th and 21st centuries
+   only.
+
+   !!!  IMPORTANT NOTE  !!!
+
+   sla_RDPLAN used to interpret any planet number outside the range 1-8
+   as meaning the Sun.  The new version uses planet number 9.  Existing
+   programs using 9 for the Sun should be changed to use 0.  The rule
+   has not been changed, except that the range is now 1-9 instead of
+   1-8, as it is unlikely that the equivalent problem will arise in the
+   future.
+
+*  Two new routines have been added, sla_PLANEL and sla_PLANTE.  They are
+   analogues of sla_PLANET and sla_RDPLAN but for the case where orbital
+   elements are available.  They can be used for predicting the
+   positions of asteroids and comets, and, if up-to-date osculating
+   elements are supplied, more accurate positions for the major
+   planets than can be provided through the sla_PLANET and sla_RDPLAN
+   routines.
+
+*  The sla_REFRO routine could give inaccurate results for low temperatures
+   (subzero C).  This was caused by over-cautious defensive programming,
+   which prevented the tropospheric temperature falling below 200 K.
+
+*  A new routine has been added, sla_REFCOQ.  This calculates the coefficients
+   of a two-term refraction model.  It complements the existing sla_REFCO
+   routine, being much faster at the expense of some accuracy.
+
+*  The 1997 July 1 UTC leap second has been added to the sla_DAT routine.
+
+*  A bug in slaSvd, the C version of sla_SVD, caused occasional false
+   indications of ill-conditioning.  The results of least-squares
+   fits do not seem to have been affected.  The Fortran version did not
+   have the bug.
+
+*  The Subaru telescope (Japanese National 8-metre telescope, Mauna Kea)
+   has been added to the sla_OBS routine.
+
+*  The sla_DAT routine has been extended back to the inception of UTC in
+   1960.
+
+*  The "earliest date possible" in DJCL sla_was two days out (disagreeing
+   with sla_DJCAL, which had the correct value).
+
+*  The sla_GMSTA code has been improved.
+
+*  A new routine, sla_PV2EL, takes a heliocentric J2000 equatorial position
+   and velocity and produces the equivalent set of osculating elements.
+
+*  The 1999 January 1 UTC leap second has been added to the sla_DAT routine.
+
+*  Four new routines have been introduced which transform between the
+   FK5 system and the ICRS (Hipparcos) system.  sla_FK52H and sla_H2FK5
+   transform star positions and proper motions from FK5 coordinates to
+   Hipparcos coordinates and vice versa.  sla_FK5HZ and sla_HFK5Z do the
+   same but for the case where the Hipparcos proper motions are zero.
+
+*  Six new routines have been introduced for dealing with orbital elements.
+   Four of them (sla_EL2UE, sla_PV2UE, sla_UE2EL and sla_UE2PV) provide
+   applications with direct access to the "universal variables" method
+   that was already being used internally.  Compared with using conventional
+   (angular) elements and solving Kepler's equation, the universal variables
+   approach has a number of advantages, including better handling of near-
+   parabolic orbits and greater efficiency.  The remaining two routines
+   (sla_PERTEL and sla_PERTUE) generate updated elements by applying
+   major-planet perturbations.  The new elements can then be used to
+   predict positions that are much more accurate.  For minor planets,
+   sub-arcsecond accuracy over a decade is achievable.
+
+*  Several observatory sites have been added to the OBS routine:  CFHT,
+   Keck 2, Gemini North, FCRAO, IRTF and CSO.  The coordinates for all
+   the Mauna Kea sites have been updated in accordance with recent aerial
+   photography results made available by the Institute for Astronomy,
+   University of Hawaii.
+
+*  A bug in sla_DAT has been corrected.  It used to give incorrect
+   results for dates in the first 54 days of 1972.
+
+*  There are new routines for generating permutations (sla_PERMUT) and
+   combinations (sla_COMBN).
+ 
+*  There was a bug in sla_PM for star data using Julian epochs (i.e. all
+   modern data).  The treatment of radial velocity was correct for
+   Besselian epochs but wrong for Julian epochs.  This had only a tiny
+   effect on a handful of nearby stars.  The new version assumes Julian
+   epochs when interpreting the radial velocity.  If the data are old-
+   style, using Besselian epochs, you have to scale the radial velocity
+   by 365.2422/365.25 first.
+
+*  There was a bug in sla_RCC which meant the diurnal terms were being
+   calculated incorrectly, leading to errors of up to about 4 microsec.
+
+*  Two new routines have been added, sla_DSEPV and sla_SEPV.  These are
+   analogues of the existing routines sla_DSEP and sla_SEP, but accept
+   [x,y,z] vectors instead of spherical coordinates.
+
+*  The sla_UNPCD routine used to be approximate but now is rigorous.
+
+*  The four VLTs and Gemini South have been added to sla_OBS.
+
+-----------------------------------------------------------------------
+
+
+ P.T.Wallace
+
+ ptw@star.rl.ac.uk
+ +44-1235-44-5372
