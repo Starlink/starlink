@@ -112,7 +112,6 @@
         ENDIF
 
         IF (SCALING.EQ.'HIS') THEN
-	print *,'Hist1..'
           CALL GFX_PIXELQ_HIST1(Z,NX,NY,Q,MASK,ZMIN,ZMAX,FIRST,LAST,
      :                                                       STATUS)
         ENDIF
@@ -167,13 +166,12 @@
                 ELSEIF (SCALING.EQ.'SIN') THEN
                   CALL GFX_PIXELQ_SIN(Z,NX,NY,I,J,Q,MASK,%VAL(IPTR),
      :                     IX,JY,NI,NJ,ZMIN,ZMAX,BG,FIRST,LAST,STATUS)
-                ELSEIF (SCALING.EQ.'HIS') THEN
-	print *,'Hist2..'
-                  CALL GFX_PIXELQ_HIST2(Z,NX,NY,I,J,Q,MASK,%VAL(IPTR),
-     :                     IX,JY,NI,NJ,ZMIN,ZMAX,BG,FIRST,LAST,STATUS)
                 ELSEIF (SCALING.EQ.'CYC') THEN
                   CALL GFX_PIXELQ_CYC(Z,NX,NY,I,J,Q,MASK,%VAL(IPTR),
      :                     IX,JY,NI,NJ,ZMIN,ZMAX,BG,FIRST,LAST,STATUS)
+                ELSEIF (SCALING.EQ.'HIS') THEN
+                  CALL GFX_PIXELQ_HIST2(Z,NX,NY,I,J,Q,MASK,%VAL(IPTR),
+     :                     IX,JY,NI,NJ,BG,FIRST,LAST,STATUS)
                 ENDIF
 
 *  plot this bit
@@ -240,7 +238,7 @@
      :                                ZMIN,ZMAX,BG,FIRST,LAST,STATUS)
                 ELSEIF (SCALING.EQ.'HIS') THEN
                   CALL GFX_PIXELQ_HIST2(Z,NX,NY,I,J,Q,MASK,IA,1,1,1,1,
-     :                                ZMIN,ZMAX,BG,FIRST,LAST,STATUS)
+     :                                           BG,FIRST,LAST,STATUS)
                 ELSEIF (SCALING.EQ.'CYC') THEN
                   CALL GFX_PIXELQ_CYC(Z,NX,NY,I,J,Q,MASK,IA,1,1,1,1,
      :                                ZMIN,ZMAX,BG,FIRST,LAST,STATUS)
@@ -981,9 +979,6 @@
         G_BOUNDS(2,ICOL)=ZMAX
         G_NBOUNDS=NBIN
 
-	do icol=1,ncol
-	  print *,g_bounds(1,icol),g_bounds(2,icol)
-	enddo
 
         IF (STATUS.NE.SAI__OK) THEN
           CALL ERR_REP(' ','from GFX_PIXELQ_HIST1',STATUS)
