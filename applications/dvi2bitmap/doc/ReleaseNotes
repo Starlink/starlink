@@ -1,3 +1,34 @@
+<subsect id=rn-0.9-5 export>Release 0.9-5
+
+<p>Added some functionality, but more importantly corrected two nasty
+font bugs.
+<ul>
+<li>Added options <code/-bp>, to set initial bitmap size based on
+paper sizes and <code/-Qp> to list the sizes available.  Added option
+<code/-PC> to turn off cropping, which is useful if you want output of
+a certain size.
+
+<li>Fixed a bug which caused fonts loaded at magnified sizes to be
+requested at the wrong size, even though, when they were found to be
+missing, the correct font-generation command was being issued.
+
+<li>Fixed the longish-standing bug to do with spacing at smaller font
+sizes: cmr7 and cmr12 now look as their maker intended.
+
+<li>Corrected a bug which caused page-selection to be done subtly
+wrongly (font selections were being ignored, and byte values of 140 in
+DVI data would have caused merry hell).
+
+<li>configure script: The configuration for PNG now doesn't rely on a
+libpng version better than 0.96.  Font-generation is now enabled by
+default, despite the potential for confusion, which should be covered
+in the documentation.
+
+<li>Added better diagnostics to InputByteStream.cc, so that if it goes
+wrong, you're given at least a clue why.
+
+</ul>
+
 <subsect id=rn-0.9-4 export>Release 0.9-4
 
 <p>No functionality change.  The only difference from release 0.9-4 is
