@@ -2557,7 +2557,7 @@ package kappa {
          parameter frame {
             position 2
             type LITERAL
-            ppath CURRENT DEFAULT
+            ppath DYNAMIC CURRENT DEFAULT
             prompt {Required co-ordinate Frame}
             helpkey *
             default !
