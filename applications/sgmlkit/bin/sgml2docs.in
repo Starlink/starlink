@@ -130,10 +130,14 @@ ident_string='Starlink SGML Kit, release @PACKAGE_VERSION@'
 
 # Location !!pkglibdir!! is inserted at build time
 LIBDIR=!!pkglibdir!!/lib
-STARLINKDECL=!!pkglibdir!!/dtd/starlink.decl
-XMLDECL=!!pkglibdir!!/dtd/xml.decl
+DTDDIR=!!pkglibdir!!/dtd
+STARLINKDECL=$DTDDIR/starlink.decl
+XMLDECL=$DTDDIR/xml.decl
 ICONTARBALL=!!pkglibdir!!/lib/icons.tar
 STYLESHEET=!!pkglibdir!!/dsssl/sl
+
+SGML_CATALOG_FILES=./CATALOG:$DTDDIR/CATALOG-override
+export SGML_CATALOG_FILES
 
 # Binaries
 # Allow the names of the jade and sgmlnorm binaries to be overridden
