@@ -41,6 +41,7 @@
 *  25 Aug 95 V1.8-0   Bug fix for event datasets (RJV)
 *  11 Sep 95 V1.8-1   OMD support removed (RJV)
 *  20 Dec 1995 V2.0-0 ADI port (DJA)
+*   5 Apr 98 V2.2-1 structures removed (rjv)
 *
 *    Type Definitions :
       IMPLICIT NONE
@@ -64,7 +65,7 @@
         PARAMETER		( ELISTS = 'X_CORR,Y_CORR,X_DET,'/
      :           /'Y_DET,RAW_TIMETAG,PULSE_HEIGHT_CH,CORR_PH_CH' )
       CHARACTER*30            VERSION
-         PARAMETER          ( VERSION = 'XSORT Version 2.2-1' )
+         PARAMETER          ( VERSION = 'XRTSORT Version 2.2-1' )
 
 *    Local variables :
 
