@@ -546,10 +546,10 @@
       CALL BDI_PUT0C( OFID, 'Label', 'Relative intensity', STATUS )
 
 *  Map these output objects
-      CALL BDI_MAPR( OFID, 'Data', 'WRITE', OD_PTR, STATUS )
-      CALL BDI_MAPUB( OFID, 'Quality', 'WRITE', OQ_PTR, STATUS )
+      CALL BDI_MAPR( OFID, 'Data', 'WRITE/ZERO', OD_PTR, STATUS )
+      CALL BDI_MAPUB( OFID, 'Quality', 'WRITE/QGOOD', OQ_PTR, STATUS )
       IF ( VARI_OK ) THEN
-        CALL BDI_MAPR( OFID, 'Variance', 'WRITE', OV_PTR, STATUS )
+        CALL BDI_MAPR( OFID, 'Variance', 'WRITE/ZERO', OV_PTR, STATUS )
       ELSE
         CALL DYN_MAPR( ONDIM, ODIMS, OV_PTR, STATUS )
         CALL ARR_INIT1R( 0.0, ONELM, %VAL(OV_PTR), STATUS )
@@ -790,26 +790,23 @@
       REAL                   OV                  ! Temp element of O_V
 *-
 
-*    Check status
+*  Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Find number of output elements
+*  Find number of output elements
       NELM = M1*M2*M3*M4*M5*M6*M7
 
-*    Initialise output arrays
+*  Initialise workspace
       CALL ARR_INIT1R( 0.0, NELM, W_D, STATUS )
-      CALL ARR_INIT1R( 0.0, NELM, O_D, STATUS )
-      CALL ARR_INIT1B( QUAL__GOOD, NELM, O_Q, STATUS )
       CALL ARR_INIT1L( .FALSE., NELM, O_W, STATUS )     ! Bad quality
       IF ( VFLAG ) THEN
         CALL ARR_INIT1R( 0.0, NELM, W_V, STATUS )
-        CALL ARR_INIT1R( 0.0, NELM, O_V, STATUS )
       END IF
 
-*    Set bad points to zero
+*  Set bad points to zero
       NBAD = 0
 
-*    Accumulate the data from I_D into W_D and O_D
+*  Accumulate the data from I_D into W_D and O_D
       IF ( AXIS .EQ. 7 ) THEN
         CALL RATIO_SEL_7( L1,L2,L3,L4,L5,L6,L7, I_D, I_V, I_Q, VFLAG,
      :                   LOW1, HIGH1, LOW2, HIGH2, M1,M2,M3,M4,M5,M6,
@@ -847,8 +844,8 @@
 
       END IF
 
-*    Divide the O_ data array by the W_ data array, taking renormalisation
-*    into account if necessary
+*  Divide the O_ data array by the W_ data array, taking renormalisation
+*  into account if necessary
       DO O = 1, M7
         DO N = 1, M6
           DO M = 1, M5
