@@ -22,8 +22,13 @@ AC_PROG_LIBTOOL
 STAR_MONOLITHS
 STAR_CNF_COMPATIBLE_SYMBOLS
 
-STAR_CHECK_PROGS([ifd2star awish atclsh hlib fgeneric])
 STAR_CHECK_PROGS(prohlp,sst)
+STAR_CHECK_PROGS(ifd2star)
+STAR_CHECK_PROGS(awish) 
+STAR_CHECK_PROGS(atclsh) 
+STAR_CHECK_PROGS(hlib) 
+STAR_CHECK_PROGS(fgeneric)
+ 
 
 dnl    Look for tcl/tk system
 STAR_PATH_TCLTK(8.2, [tk])
