@@ -64,6 +64,7 @@
 *     DSB: David Berry (STARLINK)
 *     MJC: Malcolm J. Currie (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     PWD: Peter W. Draper (Starlink, Durham University)
 *     {enter_new_authors_here}
 
 *  History:
@@ -75,6 +76,8 @@
 *        Used modern-style variable declarations.  Fixed typo's.
 *     2004 September 1 (TIMJ):
 *        Use CNF_PVAL.
+*     2004 September 30 (PWD):
+*        Move CNF_PAR include into declarations.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -88,6 +91,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'NDF_PAR'          ! NDF_ constants
+      INCLUDE 'CNF_PAR'          ! CNF functions
 
 *  Arguments Given:
       INTEGER INDF
@@ -117,7 +121,6 @@
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'      ! NUM declarations for conversions
       INCLUDE 'NUM_DEF_CVT'      ! NUM definitions for conversions
-      INCLUDE 'CNF_PAR'          ! CNF functions
 
 *.
 

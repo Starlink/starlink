@@ -63,6 +63,7 @@
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     PWD: Peter W. Draper (Starlink, Durham University)
 *     {enter_new_authors_here}
  
 *  History:
@@ -78,6 +79,8 @@
 *        and offset.
 *     2004 September 1 (TIMJ):
 *        Use CNF_PVAL
+*     2004 September 20 (PWD):
+*        Moved CNF_PAR include into declarations.
 *     {enter_further_changes_here}
  
 *  Bugs:
@@ -92,6 +95,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'NDF_PAR'          ! NDF constants
       INCLUDE 'PRM_PAR'          ! PRIMDAT constants
+      INCLUDE 'CNF_PAR'          ! CNF functions
  
 *  Arguments Given:
       INTEGER
@@ -132,7 +136,6 @@
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'    ! NUM declarations for conversions
       INCLUDE 'NUM_DEF_CVT'    ! NUM definitions for conversions
-      INCLUDE 'CNF_PAR'        ! For CNF_PVAL function
  
 *.
  

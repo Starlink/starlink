@@ -92,6 +92,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'NDF_PAR'          ! NDF constants
       INCLUDE 'PRM_PAR'          ! PRIMDAT constants
+      INCLUDE 'CNF_PAR'          ! CNF functions
  
 *  Arguments Given:
       INTEGER
@@ -132,7 +133,6 @@
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'    ! NUM declarations for conversions
       INCLUDE 'NUM_DEF_CVT'    ! NUM definitions for conversions
-      INCLUDE 'CNF_PAR'        ! For CNF_PVAL function
  
 *.
  
