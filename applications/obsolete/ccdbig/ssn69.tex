@@ -249,6 +249,10 @@ of the results.
 \newcommand{\KAPPAcmd}[1]{\xref{#1}{sun95}{#1}}
 \newcommand{\CCDPcmd}[1]{\xref{#1}{sun139}{#1}}
 
+\newcommand{\atimesb}[2]{\mbox{$#1 \times #2$}}
+\begin{htmlonly}
+  \renewcommand{\atimesb}[2]{\mbox{$#1$ x $#2$}}
+\end{htmlonly}
 
 
 
@@ -321,9 +325,9 @@ To run the script, the recommended procedure is
 to change to an empty directory, on a local disk with 
 ample free space, and then:
 \begin{quote}
-\verb"% cp $CCDBIG_DIR/ccdbig ." \\
+{\tt \% cp \$CCDBIG\_DIR/ccdbig .} \\
 \hspace*{3em} (edit {\tt ccdbig} as required) \\
-\verb"% ./ccdbig"
+{\tt \% ./ccdbig}
 \end{quote}
 
 
@@ -426,7 +430,7 @@ is architecture-dependent.
 %
 \item {\tt image\_sizes}:
 The data reduction process is performed in turn on 
-test CCD frames of $N \times N$ pixels, where $N$ takes each
+test CCD frames of \atimesb{N}{N} pixels, where $N$ takes each
 of the values given in this list.
 %
 \item {\tt object\_densities}:
