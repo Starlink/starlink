@@ -41,6 +41,9 @@
 *     1996 November 17 (TIMJ):
 *       Original version
 *     $Log$
+*     Revision 1.5  1997/11/13 19:14:38  timj
+*     Remove unwanted SCULIB_BITOFF declaration.
+*
 *     Revision 1.4  1997/10/17 02:25:47  timj
 *     Dont reset the despiking quality bit during the despiking. (ie
 *     allow existing clips to remain valid).
@@ -78,7 +81,6 @@
       INTEGER STATUS                 ! Global status
 
 *  External references:
-      BYTE    SCULIB_BITOFF        ! Turn off badbits
       BYTE    SCULIB_BITON         ! Turn on badbits
 
 *  Local Constants:
