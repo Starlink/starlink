@@ -1139,6 +1139,16 @@ install:
            else :; fi;\
         done
 #
+#  Install the object modules, giving them world read permission.
+	for f in $(GRF_OBJECT_FILES) ""; do \
+           if test -n "$$f"; then \
+              cp -p $$f $(INSTALL_LIB);\
+              chmod 644 $(INSTALL_LIB)/$$f;\
+              rm -f $$f;\
+              $(LINK) $(INSTALL_LIB)/$$f $$f;\
+           else :; fi;\
+        done
+#
 #  Install shareable libraries, giving them read permission (unless
 #  they are dummy, zero size, files in which case they are left in
 #  place).
@@ -1280,6 +1290,15 @@ do_deinstall:
 #
 #  Deinstall the object libraries, if installed versions exist.
 	- for f in $(OBJECT_LIBRARIES) ""; do \
+           if test -n "$$f" -a -f $(INSTALL_LIB)/$$f; then \
+              rm -f $$f;\
+              cp -p $(INSTALL_LIB)/$$f .;\
+              rm -f $(INSTALL_LIB)/$$f;\
+           else :; fi;\
+        done
+#
+#  Deinstall the object modules, if installed versions exist.
+	- for f in $(GRF_OBJECT_FILES) ""; do \
            if test -n "$$f" -a -f $(INSTALL_LIB)/$$f; then \
               rm -f $$f;\
               cp -p $(INSTALL_LIB)/$$f .;\
