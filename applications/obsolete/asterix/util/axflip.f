@@ -94,6 +94,8 @@
 *        Now use USI for user interface
 *      6 Dec 1995 V2.0-0 (DJA):
 *        ADI port, and a bit of a rewrite too
+*      5 Mar 1996 V2.0-1 (DJA):
+*        Added facility to flip the Grouping array
 *     {enter_changes_here}
 
 *  Bugs:
@@ -119,9 +121,9 @@
       INTEGER                   NAXOBJ
         PARAMETER               ( NAXOBJ = 4 )
       INTEGER                   NOBJ
-        PARAMETER               ( NOBJ = 5 )
+        PARAMETER               ( NOBJ = 6 )
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'AXFLIP Version V2.0-0' )
+        PARAMETER		( VERSION = 'AXFLIP Version V2.0-1' )
 
 *  Local Variables:
       CHARACTER*80            	HTXT			! History text
@@ -152,7 +154,7 @@
      :                                'LoWidth','HiWidth'/
       CHARACTER*8               OBJ(NOBJ)
       DATA                      OBJ/'Data','Quality','Variance',
-     :                              'LoError', 'HiError'/
+     :                              'LoError', 'HiError', 'Grouping'/
 *.
 
 *  Check inherited global status.
@@ -295,6 +297,8 @@
 *      Decide on type
           IF ( OBJ(J) .EQ. 'Quality' ) THEN
             TYPE = 'UBYTE'
+          ELSE IF ( OBJ(J) .EQ. 'Grouping' ) THEN
+            TYPE = 'INTEGER'
           ELSE
             TYPE = 'REAL'
           END IF
@@ -306,6 +310,9 @@
 *      Perform n-D flip
           IF ( TYPE .EQ. 'UBYTE' ) THEN
             CALL AR7_AXFLIP_B( DIMS, %VAL(IPTR), FLIP, %VAL(OPTR),
+     :                         STATUS )
+          ELSE IF ( TYPE .EQ. 'INTEGER' ) THEN
+            CALL AR7_AXFLIP_I( DIMS, %VAL(IPTR), FLIP, %VAL(OPTR),
      :                         STATUS )
           ELSE
             CALL AR7_AXFLIP_R( DIMS, %VAL(IPTR), FLIP, %VAL(OPTR),
@@ -326,7 +333,7 @@
      :               ' ', STATUS )
 
 *  Copy ancillary stuff
-      CALL UDI_COPANC( IFID, 'grf', OFID, STATUS )
+      CALL UDI_COPANC( IFID, 'grf,grp', OFID, STATUS )
 
 *  History
       CALL HSI_COPY( IFID, OFID, STATUS )
