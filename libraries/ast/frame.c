@@ -9893,6 +9893,7 @@ AstFrame *astInitFrame_( void *mem, size_t size, int init,
          new->title = NULL;
          new->system = AST__BADSYSTEM;
          new->alignsystem = AST__BADSYSTEM;
+         new->active_unit = -INT_MAX;
 
 /* Allocate memory to store pointers to the Frame's Axis objects and to store
    its axis permutation array. */
