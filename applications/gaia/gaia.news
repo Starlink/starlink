@@ -110,4 +110,7 @@
 
   A print of the "whole image" now works when repeated.
 
+  The astrometry tables now offer a button to project X,Y to RA,DEC
+  to complement the reset projection of RA,DEC to X,Y.
 
+  
