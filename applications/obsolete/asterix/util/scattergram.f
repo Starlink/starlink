@@ -82,7 +82,7 @@
 *
 	CHARACTER*(132) LINES(MAXLINES)		! history text
       CHARACTER*80	LABEL,UNITS
-      CHARACTER*132	PATH,FILE		!
+      CHARACTER*132	FILE		!
 
         INTEGER IQPTR1, IQPTR2                  ! Input quality
         INTEGER NLINES                          ! Lines of history text used
