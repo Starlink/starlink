@@ -120,5 +120,16 @@ proc buildQmanWidgets {w} {
     bind $QmanWidgets(OUTPUT) <Button-3> "cgs4drHelpDialog .helpDialog $cgs4drHtml/cgs4drTextpane.html"
     bind $scrollbar <Button-3> "cgs4drHelpDialog .helpDialog $cgs4drHtml/cgs4drScroll.html"
 
+# Set some defaults
+    set QmanWidgets(RB_STRING) DRCOMMENT
+    set QmanWidgets(EW_STRING) ""
+    set QmanWidgets(DGN) 1
+    set QmanWidgets(DEF) 1
+    set QmanWidgets(DEL) 1
+    set QmanWidgets(DON) 1
+    set QmanWidgets(DIF) 1
+    set QmanWidgets(DIL) 1
+
+# Return the frame
     return $mainFrame
 }

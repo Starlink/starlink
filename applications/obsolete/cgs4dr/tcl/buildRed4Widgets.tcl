@@ -138,17 +138,83 @@ proc buildRed4Widgets w {
     set Red4Widgets(ST) "\$RGDIR/st$env(CGS4_DATE)_gggg"
     set Red4Widgets(DSP) "\$RGDIR/rg$env(CGS4_DATE)_gggg_spc"
     set Red4Widgets(SP) "\$RGDIR/rg$env(CGS4_DATE)_gggg_spc"
+    set Red4Widgets(DIS) "\$RGDIR/rg$env(CGS4_DATE)_gggg_imspc"
+    set Red4Widgets(IS) "\$RGDIR/rg$env(CGS4_DATE)_gggg_imspc"
     set Red4Widgets(DDS) "\$RGDIR/rg$env(CGS4_DATE)_gggg_dbs"
     set Red4Widgets(DS) "\$RGDIR/rg$env(CGS4_DATE)_gggg_dbs"
     set Red4Widgets(IRO1) "\$RODIR/ro$env(CGS4_DATE)_oooo"
     set Red4Widgets(IRO2) "\$RODIR/ro$env(CGS4_DATE)_oooo"
     set Red4Widgets(IRO3) "\$RODIR/ro$env(CGS4_DATE)_oooo"
+    set Red4Widgets(CDIR) "$env(ODIR)"
+    set Red4Widgets(TLF_DRS) 29
+    set Red4Widgets(TLF_DRE) 29
+    set Red4Widgets(TLF_DXS) 1
+    set Red4Widgets(TLF_DXE) 256
+    set Red4Widgets(TLF_RAD01) 1
+    set Red4Widgets(TWD_DXST) 1
+    set Red4Widgets(TWD_DXEN) 256
+    set Red4Widgets(TWD_DYST) 1
+    set Red4Widgets(TWD_DYEN) 256
+    set Red4Widgets(GS_WHOLE) 1
+    set Red4Widgets(GS_AUTOSCALE) 1
+    set Red4Widgets(GS_DIST) 1
+    set Red4Widgets(GS_DIEN) 256
+    set Red4Widgets(GS_DIIN) 1
+    set Red4Widgets(GS_DJST) 1
+    set Red4Widgets(GS_DJEN) 256
+    set Red4Widgets(GS_DJIN) 1
+    set Red4Widgets(GS_DHI) 1000.0
+    set Red4Widgets(GS_DLO) 0.0
+    set Red4Widgets(PF_POLYFIT) REDUCED_GRP
+    set Red4Widgets(PF_WEIGHT) 1
+    set Red4Widgets(PF_DDEG) 1
+    set Red4Widgets(PF_DNRJ) 0
+    set Red4Widgets(PF_DYS1) 20
+    set Red4Widgets(PF_DYE1) 25
+    set Red4Widgets(PF_DYS2) 35
+    set Red4Widgets(PF_DYE2) 40
+    set Red4Widgets(PF_DYS3) -1
+    set Red4Widgets(PF_DYE3) -1
+    set Red4Widgets(PF_DYS4) -1
+    set Red4Widgets(PF_DYE4) -1
+    set Red4Widgets(ATD) 1
+    set Red4Widgets(DMS) 0.0
+    set Red4Widgets(DMV) 0.0
+    set Red4Widgets(FC_IN) 0.0
+    set Red4Widgets(FC_FIN) "J"
+    set Red4Widgets(FC_FOUT) "W/m2/um"
+    set Red4Widgets(BB_DT) 5000.0
+    set Red4Widgets(BB_DW) 2.2
+    set Red4Widgets(BB_DF) 0
+    set Red4Widgets(NO_DPOL) 3
+    set Red4Widgets(NO_DBOX) 5
+    set Red4Widgets(ENT_TRS) 29
+    set Red4Widgets(ENT_TRE) 29
+    set Red4Widgets(ENT_MRS) -1
+    set Red4Widgets(ENT_MRE) -1
+    set Red4Widgets(ENT_BRS) -1
+    set Red4Widgets(ENT_BRE) -1
+    set Red4Widgets(MBPM) "$env(USER)_mask"
+    set Red4Widgets(MBPM_IMIN) 1
+    set Red4Widgets(MBPM_JMIN) 1
+    set Red4Widgets(MBPM_IMAX) 256
+    set Red4Widgets(MBPM_JMAX) 256
+    set Red4Widgets(MBPM_NCOL) 256
+    set Red4Widgets(MBPM_NROW) 256
     set Red4Widgets(MASK) "#"
+    set Red4Widgets(CAL_RST) 1
+    set Red4Widgets(CAL_REN) 256
+    set Red4Widgets(CAL_ORD) 2
+    set Red4Widgets(CAL_SIG) 1
+    set Red4Widgets(XST) 0.5
+    set Red4Widgets(XEN) 255.5
     set Red4Widgets(AP_VARWT) 0
     set Red4Widgets(DSKYWT) 1.0
     set Red4Widgets(FS_TEFF) 5000.0
     set Red4Widgets(FS_REFW) 2.2
     set Red4Widgets(FS_YST) 29.0
     set Red4Widgets(FS_YEN) 29.0
+    set Red4Widgets(SPC_INVERT) 0
+    set Red4Widgets(SPC_ALGORITHM) BRIGHT
     return $mainFrame
 }
