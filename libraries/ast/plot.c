@@ -264,6 +264,11 @@ f     using AST_GRID
 *        pointer.
 *        o  Change method for choosing default LabelAt values to ignore 
 *        values which produce no visible labels.
+*     10-JAN-2001 (DSB):
+*        o  Modified FindMajTick to choose the size of fillable holes in
+*        the axis range on the basis of the number of ticks on the axis.
+*        This avoids holes being visible in the displayed tick marks when 
+*        using very small gaps.
 *class--
 */
 
@@ -1338,6 +1343,7 @@ static int DrawText( AstPlot *, int, const char *, float, float, const char *, f
 static int EdgeCrossings( AstPlot *, int, int, double, double *, double **, const char *, const char * );
 static int EdgeLabels( AstPlot *, int, TickInfo **, CurveData **, const char *, const char * );
 static int FindMajTicks( AstFrame *, int, double, double , double *, int, double *, double ** );
+static int FindMajTicks2( int, double, double, int, double *, double ** );
 static int FullForm( const char *, const char *, const char *, const char *, const char * );
 static int FindString( int, const char *[], const char *, const char *, const char *, const char * );
 static int GVec( AstPlot *, AstMapping *, double *, int, double, AstPointSet **, AstPointSet **, double *, double *, double *, double *, int *, const char *, const char *);
@@ -9001,9 +9007,9 @@ static int FindMajTicks( AstFrame *frame, int axis, double refval,
 *     in the plotting area (i.e. the 22h range from 1h to 23h centred on
 *     12h). For this reason, tick marks are removed if there are no axis
 *     values inbetween the tick mark and either of its neighbours. However,
-*     small "holes" in the axis coverage are allowed (upto 4 empty tick
-*     mark divisions), and ticks marks are returned covering such small
-*     holes. An extra tick marks is placed at each end of the range to
+*     small "holes" in the axis coverage are allowed, and ticks marks are 
+*     returned covering such small
+*     holes. Extra tick marks are also placed at each end of the range to
 *     guard against the supplied array of axis values not entirely covering
 *     the range of axis values in the plotting area.
 *
@@ -9054,9 +9060,9 @@ static int FindMajTicks( AstFrame *frame, int axis, double refval,
    double centre;     /* The axis value at the first tick mark */
    double f;          /* The nearest acceptable tick mark index */
    double val[ 2 ];   /* Axis values to be normalised */
-   int i;             /* Index of current axis value */
    int k;             /* Tick mark index */
-   int klast;         /* Index of the previous tick mark */
+   int lnfill;        /* Last used value for nfill */
+   int nfill;         /* No of tick marks to extend by at edges of coverage */
    int nticks;        /* Number of major tick marks used */
 
 /* Initialise the returned pointer. */
@@ -9075,76 +9081,21 @@ static int FindMajTicks( AstFrame *frame, int axis, double refval,
       if( cen ) *cen = centre;
    }
 
-/* Reserve memory initially to hold 20 major tick mark axis values. */
-   ticks = (double *) astMalloc( sizeof(double)*20 );
+/* Find the number of candidate tick marks assuming an nfill value of 1. */
+   nticks = FindMajTicks2( 1, gap, centre, ngood, data, &ticks );
+   lnfill = 1;
 
-/* Check that the pointer can be used. */
-   if( astOK ){
-
-/* Put the first two tick marks just below the lowest axis value (in case
-   the grid did not sample the entire range of the axis). */
-      k = floor( ( data[ 0 ] - centre )/gap );
-      ticks[ 0 ] = gap*(double)( k - 1 ) + centre;
-      ticks[ 1 ] = gap*(double)( k ) + centre;
-
-/* Initialise the number of major tick marks found so far. */
-      nticks = 2;
-
-/* Loop round each of the remaining good ordered axis values. */
-      klast = k;
-      for( i = 1; i < ngood && astOK; i++ ) {
-
-/* Find the tick marks enclosing the axis value. The tick mark placed at 
-   "centre" is called tick mark zero, and tick marks are indexed (positive 
-   or negative) from an origin at "centre". Find the index of the more 
-   negative of the two tick marks enclosing the axis value. */
-         k = floor( ( data[ i ] - centre )/gap );
-
-/* Ensure that the tick marks enclosing the current axis value are used.
-   Some extra tick marks are used at the start and end of any gaps in
-   the axis coverage. This is done to "fill in" small holes caused by the
-   grid of physical coordinate values not completely covering the
-   plotting area. Large holes, such as occur on an RA axis covering the 2 
-   hour range from 23 hours to 1 hour are left without any tick marks in 
-   them (the "hole" in this case is the 22 hours range from 1 hour to 23 
-   hours). */
-         if( k - klast > 3 ) {
-            ticks = (double *) astGrow( ticks, nticks + 1, sizeof( double ) );
-            if( astOK ) ticks[ nticks++ ] = 
-                                         gap*(double)( klast + 2 ) + centre;
-         }
-   
-         if( k - klast > 2 ) {
-            ticks = (double *) astGrow( ticks, nticks + 1, sizeof( double ) );
-            if( astOK ) ticks[ nticks++ ] =
-                                         gap*(double)( klast + 1 ) + centre;
-         }
-   
-         if( k - klast > 1 ) {
-            ticks = (double *) astGrow( ticks, nticks + 1, sizeof( double ) );
-            if( astOK ) ticks[ nticks++ ] = 
-                                         gap*(double)( k - 1 ) + centre;
-         }
-   
-         if( k - klast > 0 ) {
-            ticks = (double *) astGrow( ticks, nticks + 1, sizeof( double ) );
-            if( astOK ) ticks[ nticks++ ] = 
-                                         gap*(double)( k ) + centre;
-         }
-   
-/* Save the index of the current tick mark. */
-         klast = k;
-   
-      }
-
-/* Add two extra tick marks beyond the end in case the grid did not sample
-   the entire range of the axis. */
-      ticks = (double *) astGrow( ticks, nticks + 2, sizeof( double ) );
-      if( astOK ) ticks[ nticks++ ] = gap*(double)( klast + 1 ) + centre;
-      if( astOK ) ticks[ nticks++ ] = gap*(double)( klast + 2 ) + centre;
-
+/* Now find the tick marks again using an nfill value equal to 10% of the
+   number of ticks returned when nfill=1 was used. Do this iteratively
+   until the number of tick marks stops increasing. */
+   nfill = (int) (0.1*(double) nticks );
+   while( nticks < 2000 && nfill > lnfill && astOK ) {
+      ticks = (double *) astFree( (void *) ticks );
+      nticks = FindMajTicks2( nfill, gap, centre, ngood, data, &ticks );
+      lnfill = nfill;
+      nfill = (int) (0.1*(double) nticks );
    }
-  
+
 /* If all has gone OK, normalise the tick values using the supplied value 
    for the other axis. */
    if( astOK ){
@@ -9184,6 +9135,149 @@ static int FindMajTicks( AstFrame *frame, int axis, double refval,
       nticks = (int) ( w - ticks ) + 1;
    }
 
+/* If an error has occurred, free the memory holding the major tick mark
+   values, and indicate that zero tick marks have been found. */
+   if( !astOK ){
+      ticks = (double *) astFree( (void *) ticks );
+      nticks = 0;
+   }
+
+/* Store the pointer to the major tick mark values. */
+   *tick_data = ticks;
+
+/* Return the number of major ticks. */
+   return nticks;
+
+}
+
+static int FindMajTicks2( int nfill, double gap, double centre, int ngood, 
+                          double *data, double **tick_data ){
+/*
+*  Name:
+*     FindMajTicks2
+
+*  Purpose:
+*     Find candidate major tick marks for FindMajTicks.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "plot.h"
+*     int FindMajTicks2( int nfill, double gap, double centre, int ngood, 
+*                        double *data, double **tick_data )
+
+*  Class Membership:
+*     Plot member function.
+
+*  Description:
+*     A service routine for function FindMajTicks.
+
+*  Parameters:
+*     nfill 
+*        Number of tick marks to extend by at edges of coverage 
+*     gap
+*        The supplied value for the gaps between ticks on the axis.
+*     centre
+*        The supplied axis value at which to put a central tick. 
+*     ngood
+*        The number of good values in the array pointer to by "data" (i.e.
+*        values not equal to AST__BAD).
+*     data
+*        A pointer to an array holding sorted axis values covering the
+*        entire plotting area.
+*     tick_data
+*        A pointer to a place at which to store a pointer to an array
+*        holding the returned tick mark values for the axis.
+
+*  Returned Value:
+*     The number of major tick mark values stored in the array pointer to
+*     by "*tick_data".
+
+*  Notes:
+*     -  If an error has already occurred, or if this function should fail 
+*     for any reason, then a NULL pointer is returned in "tick_data", and zero 
+*     is returned for the function value.
+*/
+
+/* Local Variables: */
+   double *ticks;     /* Pointer to the axis values at the major tick marks */
+   int i;             /* Index of current axis value */
+   int j;             /* Index of filled in tick */
+   int k;             /* Tick mark index */
+   int klast;         /* Index of the previous tick mark */
+   int nticks;        /* Number of major tick marks used */
+
+/* Initialise the returned pointer. */
+   *tick_data = NULL;
+
+/* Check the global error status. */
+   if ( !astOK ) return 0;
+
+/* Reserve memory to hold a reasonable number of tick mark axis values.
+   This memory is later extended as necessary. */
+   ticks = (double *) astMalloc( sizeof(double)*( 6*nfill + 14 ) );
+
+/* Check that the pointer can be used. */
+   if( astOK ){
+
+/* Put the first tick marks just below the lowest axis value (in case
+   the grid did not sample the entire range of the axis). */
+      k = floor( ( data[ 0 ] - centre )/gap );
+
+      for ( i = 0; i < nfill; i++ ){
+         ticks[ i ] = gap*(double)( k - nfill + i ) + centre;
+      }
+      ticks[ nfill ] = gap*(double)( k ) + centre;
+
+/* Initialise the number of major tick marks found so far. */
+      nticks = nfill + 1;
+
+/* Loop round each of the remaining good ordered axis values. */
+      klast = k;
+      for( i = 1; i < ngood && astOK; i++ ) {
+
+/* Find the tick marks enclosing the axis value. The tick mark placed at 
+   "centre" is called tick mark zero, and tick marks are indexed (positive 
+   or negative) from an origin at "centre". Find the index of the more 
+   negative of the two tick marks enclosing the axis value. */
+         k = floor( ( data[ i ] - centre )/gap );
+
+/* Ensure that the tick marks enclosing the current axis value are used.
+   Some extra tick marks are used at the start and end of any gaps in
+   the axis coverage. This is done to "fill in" small holes caused by the
+   grid of physical coordinate values not completely covering the
+   plotting area. Large holes, such as occur on an RA axis covering the 2 
+   hour range from 23 hours to 1 hour are left without any tick marks in 
+   them (the "hole" in this case is the 22 hours range from 1 hour to 23 
+   hours). */
+         for( j = 0; j < nfill + 1; j++ ){
+            if( k - klast > nfill + 2 - j ) {
+               ticks = (double *) astGrow( ticks, nticks + 1, sizeof( double ) );
+               if( astOK ) ticks[ nticks++ ] = 
+                                 gap*(double)( klast + nfill + 1 - j ) + centre;
+            }
+            if( k - klast > nfill - j ) {
+               ticks = (double *) astGrow( ticks, nticks + 1, sizeof( double ) );
+               if( astOK ) ticks[ nticks++ ] = 
+                                 gap*(double)( k - nfill + j ) + centre;
+            }            
+         }
+   
+/* Save the index of the current tick mark. */
+         klast = k;
+   
+      }
+
+/* Add extra tick marks beyond the end in case the grid did not sample
+   the entire range of the axis. */
+      ticks = (double *) astGrow( ticks, nticks + nfill + 1, sizeof( double ) );
+      for( i = 0; i < nfill && astOK; i++ ){
+         ticks[ nticks++ ] = gap*(double)( klast + i + 1 ) + centre;
+      }
+
+   }
+  
 /* If an error has occurred, free the memory holding the major tick mark
    values, and indicate that zero tick marks have been found. */
    if( !astOK ){
