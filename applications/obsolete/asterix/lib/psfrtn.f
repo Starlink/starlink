@@ -3981,6 +3981,12 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *
 *     This is good fit out to 100 arcsec from the centre of the psf.
 *
+*     The S2 parameter varies off-axis as follows,
+*
+*      s2 = 3.3 + 0.019 r - 0.016 r^2 + 0.0044 r^3
+*
+*     See "The ROSAT HRI", Feb 95, David et al.
+*
 *    Method :
 *
 *     Must be normalised to that if the user requested the given spacing
@@ -3994,9 +4000,14 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *
 *    History :
 *
-*     11 Mar 91 : Original (DJA)
-*      3 Sep 92 : Updated response to 3-component fit (DJA)
-*      1 Mar 94 : Use MATH_EXPR rather than D.P. intrinsic (DJA)
+*     11 Mar 1991 (DJA):
+*        Original version
+*      3 Sep 1992 (DJA):
+*        Updated response to 3-component fit
+*      1 Mar 1994 (DJA):
+*        Use MATH_EXPR rather than D.P. intrinsic
+*      4 Apr 1996 (DJA):
+*        Now varies off-axis parameterisation for S2
 *
 *    Type definitions :
 *
@@ -4030,10 +4041,10 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       REAL                     A1, A2, A3              ! Relative contributions
         PARAMETER              ( A1 = 0.9638,          ! of 3 components
      :                           A2 = 0.1798,
-     :                           A3 = 0.001168 )
+     :                           A3 = 0.00090 )
       REAL                     S1, S2, S3              ! Radial scale of comps
         PARAMETER              ( S1 = 2.1858,          ! in arcsec
-     :                           S2 = 4.0419,
+c     :                           S2 = 4.0419,
      :	                         S3 = 31.69 )
       REAL                     NORM                    ! Normalisation
         PARAMETER              ( NORM = 54.848581 )
@@ -4044,6 +4055,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *
       REAL                     LNORM                   ! Normalisation constant
       REAL                     P_SCALE                 ! Scale size of psf
+      REAL			ROFF 			! Off axis angle
       REAL                     RPS                     ! Radius of sub-pix ^ 2
       REAL                     S1_2, S2_2              !
       REAL                     SDX, SDY                ! Sub-pixel bin sizes
@@ -4073,6 +4085,12 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 
 *    Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*    Off-axis angle in arcmin
+      ROFF = SQRT(X0*X0+Y0*Y0)*MATH__RTOD*60.0
+
+*    Compute S2
+      S2 = 3.3 + 0.019 * ROFF - 0.016 * ROFF**2 + 0.0044 * ROFF**3
 
 *    A few variables to speed things up
       S1_2 = -0.5 / S1**2
@@ -4179,6 +4197,79 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       END IF
 
       END
+
+*+  PSF_XRT_HRI_HINT - XRT HRI psf hint handler
+      SUBROUTINE PSF_XRT_HRI_HINT( PSID, HINT, DATA, STATUS )
+*
+*    Description :
+*
+*     Return hints about the XRT HRI psf.
+*
+*    Method :
+*    Deficiencies :
+*    Authors :
+*
+*     David J. Allan (ROSAT, University of Birmingham)
+*
+*    History :
+*
+*      4 Apr 1996 (DJA):
+*        Original version
+*
+*    Type definitions :
+*
+      IMPLICIT NONE
+*
+*    Global constants :
+*
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'PSF_PAR'
+*
+*    Import :
+*
+      INTEGER                 	PSID
+      CHARACTER*(*)           	HINT		 	! Hint name
+*
+*    Export :
+*
+      BYTE			DATA(*)			! Hint data
+*
+*    Status :
+*
+      INTEGER                   STATUS
+*-
+
+*  Check inherited global status
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Radial symmetry?
+      IF ( HINT .EQ. PSF_H_RADSYM ) THEN
+
+*    All our models are radially symmetric about on-axis direction
+        CALL ARR_COP1L( 1, .TRUE., DATA, STATUS )
+
+*  Position dependent?
+      ELSE IF ( HINT .EQ. PSF_H_POSDEP ) THEN
+
+*    It is position dependent
+        CALL ARR_COP1L( 1, .FALSE., DATA, STATUS )
+
+*  Energy dependent
+      ELSE IF ( HINT .EQ. PSF_H_ENDEP ) THEN
+
+*    Doesn't vary with energy
+        CALL ARR_COP1L( 1, .FALSE., DATA, STATUS )
+
+      ELSE
+        STATUS = SAI__ERROR
+        CALL MSG_SETC( 'H', HINT )
+        CALL ERR_REP( ' ', 'Unknown psf hint /^H/', STATUS )
+
+      END IF
+
+      END
+
+
 
 *+  PSF_XRT_PSPC - ROSAT XRT PSPC PSF
       SUBROUTINE PSF_XRT_PSPC( PSID, X0, Y0, QX, QY, DX, DY, INTEG, NX,
