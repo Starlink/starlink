@@ -1,5 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 
+SUBDIRS = doc test
+
 lib_LTLIBRARIES = libdvi2bitmap.la
 D2BHEADERS = \
 	Bitmap.h \
@@ -56,11 +58,7 @@ man1_MANS = dvi2bitmap.1 dvireport.1
 # Special handling for distribution
 #
 # Include both the manual and the library documentation in the distribution
-EXTRA_DIST = $(libdocdir) test manual.tar $(man1_MANS) VERSION
-
-# The test directory has a couple of things to make prior to distribution
-dist-hook:
-	cd $(distdir)/test; $(MAKE) prepare-dist
+EXTRA_DIST = $(libdocdir) $(man1_MANS) VERSION
 
 # Generate library documentation using Doxygen
 libdocdir = @DOXYGEN_OUTPUT_DIRECTORY@
@@ -71,11 +69,6 @@ $(libdocdir): Doxyfile
 	  mkdir $(libdocdir); \
 	  echo "No doxygen available -- library documentation not generated" >$(libdocdir)/stamp; \
 	fi
-
-# doc/ directory has its own simple makefile
-manual.tar: VERSION
-	cd doc; $(MAKE) doc.tar
-	mv doc/doc.tar ./manual.tar
 
 VERSION: configure.ac
 	echo $(VERSION) >VERSION
