@@ -9,7 +9,23 @@ This is a developers' release of the autoastrometry package.
 
 Documentation, including release notes, is in sun242.tar-htx
 
+At present, you'll probably need to define the STARLINK environment
+variable to point to the /stardev tree.  If you have CCDPACK_DIR and
+ATOOLS_DIR defined, make sure that these are pointing to at least
+versions 4.0-1 and 1.3 respectively.
+
 To build, give the sequence of commands
 
     ./mk build
     ./mk install
+
+There's a pre-installation regression test:
+
+    # Define AUTOASTROM_DIR to point to a temporary directory, which
+    # must exist.
+    ./mk test-install
+    ./mk pretest
+
+A couple of regression tests fail on DUX, apparently due to rounding
+errors somewhere.
+
