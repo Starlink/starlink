@@ -93,7 +93,7 @@
 #if FLT_MANT_DIG == 24 && FLT_MAX_EXP == 128
 #  define FLOAT_IS_IEEE 1
 #else
-#  define FLOAT_IS_IEEE 1
+#  define FLOAT_IS_IEEE 0
 #endif
 
 #if HAVE_TIME_H
@@ -252,23 +252,32 @@ int main (int argc, char **argv)
 
     if (FortranOutput == 0 && COutput == 0)
         Usage();
-    
 
     /*
-     * Set the precisions (globlly, so they're visible in par_f).
+     * Set the precisions (globally, so they're visible in par_f).
      *
-     * There are p+1 digits in the floating point mantissa, including
-     * the leading 1 which is suppressed for normalised numbers
-     * (p+1=FLT_MANT_DIG or DBL_MANT_DIG).  Let d=ceil(p log10(2))
-     * = ceil(-log10(2^{-p})) (2^{-p} is epsilon, the smallest number
-     * such that 1.0+epsilon != 1.0).  Then two successive floats are
-     * not less than 10^{-d} apart, and so any correctly-rounded decimal
-     * number with d decimal places represents one and only one binary
-     * floating point number.  That is, d is the output precision
-     * necessary to uniquely identify a float.
+     * IEEE single- and double-precision floating point requires 9 and
+     * 17 decimal digits, respectively, in order that any decimal
+     * number represent one and only one binary number.  The argument
+     * is not obvious (it's not just ceil(-log10(epsilon)), for
+     * example), and is given in, for example, David Goldberg, `What
+     * every computer scientist should know about floating-point
+     * arithmetic', Computing Surveys, March 1991 (reprinted in Sun's
+     * `Numerical Computation Guide' for example).  Note that these
+     * numbers include the leading digit, so that the number of
+     * decimal places which should be printed is xxx_precision-1.
+     *
+     * These numbers apply only to IEEE floating point, so we should
+     * object if we detect we're on a processor with a different
+     * arithmetic.
      */
-    float_precision =  (int)ceil((FLT_MANT_DIG-1) * log10(2.0));
-    double_precision = (int)ceil((DBL_MANT_DIG-1) * log10(2.0));
+#if FLOAT_IS_IEEE
+    float_precision = 9;
+    double_precision = 17;
+#else
+#  error "Don't know the number of decimals required for output"
+#endif
+
 
     if (FortranOutput) {
         fprintf(FortranOutput,
@@ -351,11 +360,11 @@ int main (int argc, char **argv)
     }
     
     comment("Bad values, used for flagging undefined data.");
-    par_i(1, "VAL__BADUB",  UINT8_MAX);
-    par_i(1, "VAL__BADB",    INT8_MIN);
-    par_i(2, "VAL__BADUW", UINT16_MAX);
-    par_i(2, "VAL__BADW",   INT16_MIN);
-    par_i(4, "VAL__BADI",   INT32_MIN);
+    par_i(-1, "VAL__BADUB",  UINT8_MAX);
+    par_i(-1, "VAL__BADB",    INT8_MIN);
+    par_i(-2, "VAL__BADUW", UINT16_MAX);
+    par_i(-2, "VAL__BADW",   INT16_MIN);
+    par_i(-4, "VAL__BADI",   INT32_MIN);
     par_f(1, "VAL__BADR", -FLT_MAX);
     par_f(2, "VAL__BADD", -DBL_MAX);
 
@@ -433,10 +442,10 @@ int main (int argc, char **argv)
     par_i(-4, "VAL__SZUW", 5);
     par_i(-4, "VAL__SZW",  6);
     par_i(-4, "VAL__SZI",  11);
-    /* -x.<float_precision>e+xx */
-    par_i(-4, "VAL__SZR",  float_precision+7);
-    /* -x.<double_precision>e+xxx */
-    par_i(-4, "VAL__SZD",  double_precision+8);
+    /* -x.<float_precision-1>e+xx */
+    par_i(-4, "VAL__SZR",  float_precision-1+7);
+    /* -x.<double_precision-1>e+xxx */
+    par_i(-4, "VAL__SZD",  double_precision-1+8);
 
     exit(0);
     
@@ -469,18 +478,23 @@ void comment(const char* comment)
 void par_i(const int size, const char* name, int val)
 {
     const char *type;
+    int min;
+    
     switch (size) {
       case 1:
       case -1:
         type = "BYTE";
+        min = INT8_MIN;
         break;
       case 2:
       case -2:
         type = "INTEGER*2";
+        min = INT16_MIN;
         break;
       case 4:
       case -4: 
         type = "INTEGER";
+        min = INT32_MIN;
         break;
       default:
         {
@@ -511,12 +525,20 @@ void par_i(const int size, const char* name, int val)
         }
     }
     if (COutput) {
-        if (size > 0) {
-            Number N;
-            N.i = val;
-            fprintf(COutput, "#define %s 0x%s\n", name, tohex(size, &N));
-        } else {
+        if (val >= 0)
             fprintf(COutput, "#define %s %d\n", name, val);
+        else {
+            /* Output negative numbers in brackets, to guarantee no
+               parsing surprises.  Also, write numbers like INT_MIN as
+               (INT_MIN+1)-1.  This is how these numbers are defined
+               in limits.h, for example: I think this is because
+               |INT_MIN| > INT_MAX, and it might be that this is
+               (sometimes?) parsed as a positive number plus a
+               negation.  I admit there's a hint of voodoo here. */
+            if (val == min)
+                fprintf(COutput, "#define %s (%d - 1)\n", name, val+1);
+            else
+                fprintf(COutput, "#define %s (%d)\n", name, val);
         }
     }
 }
@@ -579,7 +601,9 @@ void par_f(const int size, const char* name, double val)
     }
     if (COutput) {
         if (size == 1)
-            fprintf(COutput, "#define %s %.*e\n", name, float_precision, val);
+            /* Include trailing F to indicate a single-precision constant */
+            fprintf(COutput, "#define %s %.*eF\n",
+                    name, float_precision, val);
         else
             fprintf(COutput, "#define %s %.*le\n",
                     name, double_precision, val);
