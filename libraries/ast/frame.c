@@ -185,6 +185,9 @@ f     - AST_UNFORMAT: Read a formatted coordinate value for a Frame axis
 *        Frames must have active units in order for the Mapping to take 
 *        account of differences in units. Previously, the test was based 
 *        on the template Frame alone.
+*     23-MAR-2005 (DSB):
+*        - GetActiveUnit: Always return zero if the Frame contains any
+*        SkyAxes. 
 *class--
 */
 
@@ -585,6 +588,7 @@ int astTest##attribute##_( AstFrame *this, int axis ) { \
 #include "permmap.h"             /* Coordinate permutation Mapping */
 #include "cmpmap.h"              /* Compound Mappings */
 #include "axis.h"                /* Coordinate Axis */
+#include "skyaxis.h"             /* Sky coordinate axes */
 #include "channel.h"             /* I/O channels */
 #include "frame.h"               /* Interface definition for this class */
 #include "frameset.h"            /* Collections of Frames */
@@ -3832,6 +3836,10 @@ f     invoked with STATUS set to an error value, or if it should fail for
 */
 
 /* Local Variables: */
+   AstAxis *ax;        /* Pointer to axis structure */
+   int i;              /* Index of axis in Frame */
+   int has_skyaxis;    /* Does Frame contain any SkyAxes? */
+   int nax;            /* Number of axes in Frame */
    int result;         /* The returned value */
 
 /* Initialise. */
@@ -3840,10 +3848,23 @@ f     invoked with STATUS set to an error value, or if it should fail for
 /* Check the global error status. */
    if ( !astOK ) return result;
 
-/* Get the value from the Frame. If it has not yet been assigned a value
-   return the value zero. */
-   result = this->active_unit;
-   if( result == -INT_MAX ) result = 0;
+/* See if the Frame contains a SkyAxis. */
+   has_skyaxis = 0;
+   nax = astGetNaxes( this );
+   for( i = 0; i < nax; i++ ) {
+      ax = astGetAxis( this, i );
+      if( astIsASkyAxis( ax ) ) has_skyaxis = 1;
+      ax = astAnnul( ax );
+   }
+
+/* If the Frame contains a SkyAxis the ActiveUnit flag is always zero. */
+   if( !has_skyaxis ) {   
+
+/* Otherwise, get the value from the Frame. If it has not yet been assigned a 
+   value return the value zero. */
+      result = this->active_unit;
+      if( result == -INT_MAX ) result = 0;
+   }
 
 /* Return the result. */
    return result;
