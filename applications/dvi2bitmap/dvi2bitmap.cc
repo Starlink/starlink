@@ -84,7 +84,6 @@ bool process_special (DviFile *, string specialString,
 string_list& tokenise_string (string s);
 string get_ofn_pattern (string dviname);
 bool parseRGB (Bitmap::BitmapColour&, char*);
-int doRegression (ostream& o);
 void Usage (void);
 char *progname;
 
@@ -482,23 +481,6 @@ int main (int argc, char **argv)
 			 << " instead" << endl;
 		}
 		break;
-	      case 'X':		// generate regression-test output
-		try
-		{
-		    doRegression(cout);
-		    processing_ = options_only;
-		    break;
-		}
-		catch (DviBug& e)
-		{
-		    cerr << "Bug exception running regression tests ("
-			 << e.problem() << ")" << endl;
-		}
-		catch (DviError& e)
-		{
-		    cerr << "Error exception running regression tests ("
-			 << e.problem() << ")" << endl;
-		}
 
 	      case 'V':		// display version
 		cout << version_string << endl << "Options:" << endl;
@@ -1208,15 +1190,6 @@ bool parseRGB (Bitmap::BitmapColour& rgb, char* s)
 	return false;
 
     return true;
-}
-
-
-int doRegression (ostream& o)
-{
-    int rval = 0;
-    rval += PkFont::regressionOutput ("PkFont:", o);
-    rval += Util::regressionOutput ("Util:", o);
-    return rval;
 }
 
 

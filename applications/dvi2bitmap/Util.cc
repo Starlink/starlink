@@ -97,15 +97,6 @@ string Util::runCommandPipe (string cmd)
     return response;
 }
 
-int Util::regressionOutput (string prefix, ostream& o)
-{
-    o << prefix
-      << Util::runCommandPipe ("echo HeLlO ThErE|tr '[A-Z]' '[a-z]'");
-    // REGRESSIONTEST:hello there
-
-    return 0;
-}
-
 void Util::verbosity (const verbosities level)
 {
     verbosity_ = level;

@@ -12,16 +12,10 @@
 #endif
 
 #include <string>
-#include <ostream>
 #include "InputByteStream.h"
 #include "Byte.h"
 #include "DviError.h"
 #include "verbosity.h"
-
-#if HAVE_STD_NAMESPACE
-//using namespace std;
-using std::ostream;
-#endif
 
 class PkFont;
 
@@ -172,8 +166,6 @@ class PkFont {
 					   const double magnification)
 	throw (PkError);
 
-    // Regression test.  Produce test output to given stream.
-    static int regressionOutput (string prefix, ostream& o);
 
  private:
     static const unsigned int nglyphs_ = 256;

@@ -970,19 +970,3 @@ string PkFont::fontgenCommand (void)
 
     return rval;
 }
-
-
-int PkFont::regressionOutput (string prefix, ostream& o)
-{
-    o << prefix
-      << substitute_font_string ("mode=%M font=%f dpi=%d basedpi=%b mag=%m perc=%%",
-				 "mode", "font", 330, 110, 2.5) << endl;
-    // REGRESSIONTEST:mode=mode font=font dpi=330 basedpi=110 mag=2.5 perc=%
-
-    o << prefix
-      << substitute_font_string	("/var/tmp/texfonts/pk/%M/public/cm/%f.%dpk",
-				 "ibmvga", "cmr10", 330, 110, 3) << endl;
-    // REGRESSIONTEST:/var/tmp/texfonts/pk/ibmvga/public/cm/cmr10.330pk
-
-    return 0;
-}
