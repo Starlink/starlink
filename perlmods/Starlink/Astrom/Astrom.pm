@@ -10,16 +10,12 @@ application.
 use Starlink::Astrom;
 
 my $astrom = new Starlink::Astrom( catalog => $catalog );
-my $frameset = $astrom->do_astrom;
+my $frameset = $astrom->solve;
 
 =head1 DESCRIPTION
 
 This module provides wrapper routines for the Starlink ASTROM
-application. Functions are provided for setting various ASTROM
-parameters.
-
-Any of the configuration options available to ASTROM can be changed
-or read using this module. For example...
+application.
 
 =cut
 
@@ -29,22 +25,16 @@ use File::Spec;
 use File::Temp qw/ tempfile /;
 use File::Basename;
 
-use Starlink::AMS::Init;
-use Starlink::AMS::Task;
 use Starlink::AST;
 use Astro::Catalog;
 use Astro::FITS::Header::CFITSIO;
 
 use base qw/Exporter/;
 
-use vars qw/ $VERSION @EXPORT_OK $DEBUG /;
+use vars qw/ $VERSION $DEBUG /;
 
 $VERSION = '0.01';
 $DEBUG = 0;
-@EXPORT_OK = qw/ /;
-
-# Cache the Starlink Task.
-our $TASK;
 
 =head1 METHODS
 
@@ -127,18 +117,25 @@ sub catalog {
 
 =over 4
 
-=item B<do_astrom>
+=item B<solve>
 
 Perform astrometry for the supplied catalogue.
 
-  my $frameset = $astrom->do_astrom;
+  my $frameset = $astrom->solve;
 
 This method returns a C<Starlink::AST::FrameSet> object that describes
 the WCS calculated by ASTROM.
 
+When running this method it attempts to find the astrom.x binary that
+performs the astrometric calculations. It first looks in the location
+specified by the AUTOASTROM_DIR environment variable, then looks in
+/star/bin/autoastrom, then looks in /star/bin. If all three of these
+locations fail to have the astrom.x binary, the method will croak with
+an error stating such.
+
 =cut
 
-sub do_astrom {
+sub solve {
   my $self = shift;
 
   # Get the catalogue we're supposed to be working on.
@@ -193,20 +190,6 @@ sub do_astrom {
   $param .= " log=$output_log fits=$output_fitsbase";
 
   # Do the astrometric fit.
-#print "setting up AMS\n";
-#  my $ams = new Starlink::AMS::Init(1);
-#print "AMS set up\n";
-#  $ams->messages($DEBUG);
-#print "AMS messages set to $DEBUG\n";
-#  if( ! defined( $TASK ) ) {
-#print "Defining astrom task\n";
-#    $TASK = new Starlink::AMS::Task( "astrom", $astrom_bin );
-#  }
-#print "Contacting task\n";
-#  my $STATUS = $TASK->contactw;
-#print "Sending obeyw\n";
-#  $TASK->obeyw( "astrom", "$param" );
-#print "Completed!\n";
   my @astromargs = ( $astrom_bin,
                      "input=$astrom_input",
                      "report=$output_report",
@@ -235,7 +218,39 @@ sub do_astrom {
   my $cfitsio = new Astro::FITS::Header::CFITSIO( File => $highest );
   my $wcs = $cfitsio->get_wcs;
 
+  # Remove all of the temporary files, unless debugging is turned on.
+  unlink $astrom_input unless $DEBUG;
+  unlink $output_report unless $DEBUG;
+  unlink $output_summary unless $DEBUG;
+  unlink $output_log unless $DEBUG;
+  unlink <$output_fitsbase*> unless $DEBUG;
+
+  # And return the Starlink::AST::FrameSet object.
   return $wcs;
 }
+
+=head1 CVS VERSION
+
+$Id$
+
+=head1 SEE ALSO
+
+Starlink User Note 5
+
+C<Starlink::AST>
+
+=head1 AUTHORS
+
+Brad Cavanagh E<lt>b.cavanagh@jach.hawaii.eduE<gt>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2005 Particle Physics and Astronomy Research
+Council.  All Rights Reserved.
+
+This program is free software; you can redistribute it and/or modify
+it under the same conditions as Perl itself.
+
+=cut
 
 1;
