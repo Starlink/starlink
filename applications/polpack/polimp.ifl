@@ -35,20 +35,20 @@ interface POLIMP
       position 2
       type     LITERAL
       access   READ
-      vpath    'PROMPT,CURRENT,DEFAULT '
-      ppath    'CURRENT,DEFAULT '
-      default  'polimp.tab'
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      default  '$POLPACK_DIR/polimp.tab'
       prompt   'Import control table'
       helpkey  '*'
    endparameter
 
    parameter NAMELIST
       type     LITERAL
-      access   WRITE
+      access   READ
       vpath    'DEFAULT'
       ppath    'DEFAULT'
       default  !
-      prompt   'Input NDF name list'
+      prompt   'File to contain a list of the NDFs'
    endparameter
 
 endinterface
