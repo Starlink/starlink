@@ -4489,7 +4489,7 @@ void adix_dinit( ADIstatus status )
     }
   mtable[] =
     {
-    {"NewLink(ADIbase,ADIbase)",       (ADIcMethodCB) adix_base_NewLink},
+/*    {"NewLink(ADIbase,ADIbase)",       (ADIcMethodCB) adix_base_NewLink}, */
     {"SetLink(ADIbase,ADIbase)",       (ADIcMethodCB) adix_base_SetLink},
     {"UnLink(ADIbase,ADIbase)",        (ADIcMethodCB) adix_base_UnLink},
     {NULL,NULL}};
