@@ -514,7 +514,12 @@ f     - AST_PUTCARDS: Stores a set of FITS header card in a FitsChan
 *     19-MAR-2004 (DSB):
 *        - Added astPutCards to support new fits_hdr2str function in
 *        CFITSIO.
-
+*     25-MAR-2004 (DSB):
+*        - Corrected bug in astSplit which causes legal cards to be
+*        rejected because characters beyond the 80 char limit are being
+*        considered significant.
+*        - Corrected bug in SpecTrans which caused QV keywords to be
+*        ignored.
 *class--
 */
 
@@ -19843,7 +19848,8 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
    char *watmem;                  /* Pointer to total WAT string */
    char bj;                       /* Besselian/Julian indicator */
    char format[ 50 ];             /* scanf format string */
-   char keyname[ FITSNAMLEN + 1 ];/* General Keyword name */
+   char keyname[ FITSNAMLEN + 1 ];/* General keyword name */
+   char template[ FITSNAMLEN + 1 ];/* General keyword name template */
    char lattype[MXCTYPELEN];      /* CTYPE value for latitude axis */
    char lontype[MXCTYPELEN];      /* CTYPE value for longitude axis */
    char prj[6];                   /* Projection string */
@@ -19911,11 +19917,11 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
    CRPIXi keyword name. Pass on if there are no axes for this axis
    description. */
       if( s != ' ' ) {
-         sprintf( keyname, "CRPIX%%d%c", s );
+         sprintf( template, "CRPIX%%d%c", s );
       } else {
-         strcpy( keyname, "CRPIX%d" );
+         strcpy( template, "CRPIX%d" );
       }
-      if( !astKeyFields( this, keyname, 1, &naxis, lbnd ) ) continue;
+      if( !astKeyFields( this, template, 1, &naxis, lbnd ) ) continue;
 
 /* Find the longitude and latitude axes by examining the CTYPE values.
    They are marked as read. Such markings are only provisional, and they
@@ -19977,11 +19983,11 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
 
 /* Check there are some CDELT keywords... */
       if( s != ' ' ) {
-         sprintf( keyname, "CDELT%%d%c", s );
+         sprintf( template, "CDELT%%d%c", s );
       } else {
-         strcpy( keyname, "CDELT%d" );
+         strcpy( template, "CDELT%d" );
       }
-      if( astKeyFields( this, keyname, 0, NULL, NULL ) ){
+      if( astKeyFields( this, template, 0, NULL, NULL ) ){
 
 /* Do each row in the matrix. */
          for( j = 0; j < naxis; j++ ){
@@ -20012,11 +20018,11 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
 /* Following conversions produce PCi_j keywords. Only do them if there
    are currently no PCi_j keywords in the header. */
       if( s != ' ' ) {
-         sprintf( keyname, "PC%%d_%%d%c", s );
+         sprintf( template, "PC%%d_%%d%c", s );
       } else {
-         strcpy( keyname, "PC%d_%d" );
+         strcpy( template, "PC%d_%d" );
       }
-      if( astKeyFields( this, keyname, 0, NULL, NULL ) == 0 ){
+      if( astKeyFields( this, template, 0, NULL, NULL ) == 0 ){
 
 /* CDjjjiii 
    -------- */
@@ -20046,11 +20052,11 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
 /* CDj_i 
    ---- */
          if( s != ' ' ) {
-            sprintf( keyname, "CD%%d_%%d%c", s );
+            sprintf( template, "CD%%d_%%d%c", s );
          } else {
-            strcpy( keyname, "CD%d_%d" );
+            strcpy( template, "CD%d_%d" );
          }
-         if( astKeyFields( this, keyname, 0, NULL, NULL ) ){
+         if( astKeyFields( this, template, 0, NULL, NULL ) ){
 
 /* Do each row in the matrix. */
             for( j = 0; j < naxis; j++ ){
@@ -20078,11 +20084,11 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
 
 /* Check there are some CDELT keywords... */
          if( s != ' ' ) {
-            sprintf( keyname, "CDELT%%d%c", s );
+            sprintf( template, "CDELT%%d%c", s );
          } else {
-            strcpy( keyname, "CDELT%d" );
+            strcpy( template, "CDELT%d" );
          }
-         if( astKeyFields( this, keyname, 0, NULL, NULL ) ){
+         if( astKeyFields( this, template, 0, NULL, NULL ) ){
 
 /* See if there is a CROTA keyword. Try to read values for both axes
    since they are sometimes both included. This ensures they will not be
@@ -20462,11 +20468,11 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
 
 /* Search the FitsChan for QV cards. */
          if( s != ' ' ) {
-            sprintf( keyname, "QV%%d_%%d%c", s );
+            sprintf( template, "QV%%d_%%d%c", s );
          } else {
-            strcpy( keyname, "QV%d_%d" );
+            strcpy( template, "QV%d_%d" );
          }
-         while( FindKeyCard( this, keyname, method, class ) && astOK ) {
+         while( FindKeyCard( this, template, method, class ) && astOK ) {
 
 /* If not already done, replace TAN with TPN in the CTYPE values. */
             if( !Ustrcmp( prj, "-TAN" ) ){
@@ -21007,10 +21013,12 @@ int astSplit_( const char *card, char **name, char **value,
 
 /* The end of the value field is marked by the first "/". Find the number
    of characters in the value field. Pointer "d" is left pointing to the 
-   first character in the comment (if any). */
+   first character in the comment (if any). Only use "/" characters which
+   occur within the first nc characters. */
                d = strchr( card, '/' );
-               if( !d ){
+               if( !d || ( d - card ) >= nc ){
                   ncv = nc - FITSNAMLEN - 1;
+                  d = NULL;
                } else {
                   ncv = (size_t)( d - card ) - FITSNAMLEN - 1;
                }
