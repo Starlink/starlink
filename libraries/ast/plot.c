@@ -2074,7 +2074,6 @@ MAKE_TEST(MajTickLen,( this->majticklen[axis] != AST__BAD ),2)
 MAKE_GET(MajTickLen,double,0.0,( this->majticklen[axis] == AST__BAD ? 0.015 : this->majticklen[axis]),2)
 
 MAKE_SET3(UsedMajTickLen,double,umjtkln,value,2)
-MAKE_GET3(UsedMajTickLen,double,0.0,this->umjtkln[axis],2)
 
 /* TitleGap. */
 /* --------- */
