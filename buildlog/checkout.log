@@ -8342,6 +8342,7 @@ cvs checkout: Updating java/source/table/src
 cvs checkout: Updating java/source/table/src/docs
 U java/source/table/src/docs/table.txt
 cvs checkout: Updating java/source/table/src/lib
+U java/source/table/src/lib/htmIndex.jar
 cvs checkout: Updating java/source/table/src/main
 cvs checkout: Updating java/source/table/src/main/uk
 cvs checkout: Updating java/source/table/src/main/uk/ac
@@ -8358,14 +8359,18 @@ U java/source/table/src/main/uk/ac/starlink/table/DefaultValueInfo.java
 U java/source/table/src/main/uk/ac/starlink/table/DescribedValue.java
 U java/source/table/src/main/uk/ac/starlink/table/EditableColumn.java
 U java/source/table/src/main/uk/ac/starlink/table/IteratorRowSequence.java
+U java/source/table/src/main/uk/ac/starlink/table/JoinStarTable.java
 U java/source/table/src/main/uk/ac/starlink/table/ObjectArrayColumn.java
 U java/source/table/src/main/uk/ac/starlink/table/PrimitiveArrayColumn.java
+U java/source/table/src/main/uk/ac/starlink/table/ProgressLineStarTable.java
 U java/source/table/src/main/uk/ac/starlink/table/RandomRowSequence.java
 U java/source/table/src/main/uk/ac/starlink/table/RandomStarTable.java
 U java/source/table/src/main/uk/ac/starlink/table/RandomWrapperStarTable.java
 U java/source/table/src/main/uk/ac/starlink/table/ReaderRowSequence.java
+U java/source/table/src/main/uk/ac/starlink/table/RowPermutedStarTable.java
 U java/source/table/src/main/uk/ac/starlink/table/RowRandomWrapperStarTable.java
 U java/source/table/src/main/uk/ac/starlink/table/RowSequence.java
+U java/source/table/src/main/uk/ac/starlink/table/RowSubsetStarTable.java
 U java/source/table/src/main/uk/ac/starlink/table/StarTable.java
 U java/source/table/src/main/uk/ac/starlink/table/StarTableFactory.java
 U java/source/table/src/main/uk/ac/starlink/table/StarTableOutput.java
@@ -8421,6 +8426,18 @@ U java/source/table/src/main/uk/ac/starlink/table/jdbc/JDBCHandler.java
 U java/source/table/src/main/uk/ac/starlink/table/jdbc/JDBCStarTable.java
 U java/source/table/src/main/uk/ac/starlink/table/jdbc/SwingAuthenticator.java
 U java/source/table/src/main/uk/ac/starlink/table/jdbc/TerminalAuthenticator.java
+cvs checkout: Updating java/source/table/src/main/uk/ac/starlink/table/join
+U java/source/table/src/main/uk/ac/starlink/table/join/CartesianMatchEngine.java
+U java/source/table/src/main/uk/ac/starlink/table/join/CombinedMatchEngine.java
+U java/source/table/src/main/uk/ac/starlink/table/join/HTMMatchEngine.java
+U java/source/table/src/main/uk/ac/starlink/table/join/MatchEngine.java
+U java/source/table/src/main/uk/ac/starlink/table/join/MatchSet.java
+U java/source/table/src/main/uk/ac/starlink/table/join/MatchStarTables.java
+U java/source/table/src/main/uk/ac/starlink/table/join/RowLink.java
+U java/source/table/src/main/uk/ac/starlink/table/join/RowLink2.java
+U java/source/table/src/main/uk/ac/starlink/table/join/RowMatcher.java
+U java/source/table/src/main/uk/ac/starlink/table/join/RowRef.java
+U java/source/table/src/main/uk/ac/starlink/table/join/SphericalPolarMatchEngine.java
 cvs checkout: Updating java/source/table/src/main/uk/ac/starlink/table/view
 cvs checkout: Updating java/source/table/src/resources
 cvs checkout: Updating java/source/table/src/resources/uk
@@ -8438,6 +8455,7 @@ cvs checkout: Updating java/source/table/src/testcases/uk/ac/starlink
 cvs checkout: Updating java/source/table/src/testcases/uk/ac/starlink/table
 U java/source/table/src/testcases/uk/ac/starlink/table/AutoStarTable.java
 U java/source/table/src/testcases/uk/ac/starlink/table/FormatsTest.java
+U java/source/table/src/testcases/uk/ac/starlink/table/RowSubsetTest.java
 U java/source/table/src/testcases/uk/ac/starlink/table/TableTest.java
 cvs checkout: Updating java/source/table/src/testcases/uk/ac/starlink/table/gui
 U java/source/table/src/testcases/uk/ac/starlink/table/gui/StarTableNodeChooserTest.java
@@ -9101,8 +9119,8 @@ U java/source/votable/src/main/uk/ac/starlink/votable/NumericDecoder.java
 U java/source/votable/src/main/uk/ac/starlink/votable/ParamElement.java
 U java/source/votable/src/main/uk/ac/starlink/votable/RowStepper.java
 U java/source/votable/src/main/uk/ac/starlink/votable/TableBodies.java
-U java/source/votable/src/main/uk/ac/starlink/votable/TableCopier.java
 U java/source/votable/src/main/uk/ac/starlink/votable/TableElement.java
+U java/source/votable/src/main/uk/ac/starlink/votable/TableStreamer.java
 U java/source/votable/src/main/uk/ac/starlink/votable/TabularData.java
 U java/source/votable/src/main/uk/ac/starlink/votable/VOElement.java
 U java/source/votable/src/main/uk/ac/starlink/votable/VOElementFactory.java

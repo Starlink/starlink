@@ -319,7 +319,7 @@ install:
 prepare:
 
 check_packages:
-[available] Jan 13, 2004 5:25:06 AM uk.ac.starlink.util.Loader starjavaDirectory
+[available] Jan 15, 2004 5:13:13 AM uk.ac.starlink.util.Loader starjavaDirectory
 [available] WARNING: Loader.class location file:/apps/cvsbuild/java/source/util/build/classes/uk/ac/starlink/util/Loader.class unexpected
 
 build:
@@ -483,7 +483,6 @@ check_packages:
 build:
 
 jars:
-    [mkdir] Created dir: /apps/cvsbuild/java/source/table/lib/table
       [jar] Building jar: /apps/cvsbuild/java/source/table/lib/table/table.jar
   [signjar] Signing Jar : /apps/cvsbuild/java/source/table/lib/table/table.jar
 
@@ -500,9 +499,9 @@ dist:
 install:
     [mkdir] Created dir: /apps/cvsbuild/starjava/lib/table
     [mkdir] Created dir: /apps/cvsbuild/starjava/docs/table
-[loggedcopy] Copying 3 files to /apps/cvsbuild/starjava/lib
+[loggedcopy] Copying 4 files to /apps/cvsbuild/starjava/lib
 [loggedcopy] Copying 1 file to /apps/cvsbuild/starjava/bin
-[loggedcopy] Copying 93 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 111 files to /apps/cvsbuild/starjava/docs
      [echo] Executing NDTools target: install
 
 prepare:
@@ -645,6 +644,7 @@ webstart:
 dist:
      [copy] Copying 3 files to /apps/cvsbuild/java/source/jsky/bin/jsky
      [copy] Copying 4 files to /apps/cvsbuild/java/source/jsky/docs/jsky
+    [chmod] Result: -1
 
 install:
     [mkdir] Created dir: /apps/cvsbuild/starjava/bin/jsky
@@ -1056,4 +1056,4 @@ install:
 [loggedcopy] Copying 134 files to /apps/cvsbuild/starjava/docs
 
 BUILD SUCCESSFUL
-Total time: 4 minutes 30 seconds
+Total time: 3 minutes 26 seconds
