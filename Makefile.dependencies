@@ -1268,6 +1268,7 @@ $(MANIFEST)/pda: \
 	cd libraries/pda \
 	  && $(MAKE_CPT)
 
+# Component period is OBSOLETE -- do not build
 $(MANIFEST)/period: \
 		$(MANIFEST)/cfitsio \
 		$(MANIFEST)/chr \
@@ -1280,7 +1281,7 @@ $(MANIFEST)/period: \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/star2html \
 		$(MANIFEST)/starx
-	cd applications/oboslete/period \
+	cd applications/obsolete/period \
 	  && $(MAKE_CPT)
 
 $(MANIFEST)/pgp: \
