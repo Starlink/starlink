@@ -215,6 +215,9 @@ class StarRtdImage : public Skycat {
    //  Readonly command (used to make NDF writeable).
    int readonlyCmd( int argc, char *argv[] );
 
+   //  Evaluate command from remote client.
+   int remoteTclCmd( int argc, char* argv[] );
+
   protected:
 
    //  Pointer to structure that holds the image configuration options.

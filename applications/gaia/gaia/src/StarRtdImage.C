@@ -129,6 +129,9 @@
 //        instead of RtdImageRemote class. This cleans up the control
 //        of the ~/.rtd-remote file (which can become invalid when
 //        main windows are closed).
+//     16-MAR-2000 (PWD):
+//        Override "remotetcl" command. This adds error status return
+//        if command fails.
 //-
 
 #include <string.h>
@@ -211,6 +214,7 @@ public:
    { "plotgrid",      &StarRtdImage::plotgridCmd,     0, 2 },
    { "readonly",      &StarRtdImage::readonlyCmd,     0, 1 },
    { "remote",        &StarRtdImage::remoteCmd,       0, 1 },
+   { "remotetcl",     &StarRtdImage::remoteTclCmd,    1,  1},
    { "slice",         &StarRtdImage::sliceCmd,       11, 11},
    { "urlget",        &StarRtdImage::urlgetCmd,       1, 1 },
    { "usingxshm",     &StarRtdImage::usingxshmCmd,    0, 0 }
@@ -4868,3 +4872,22 @@ int StarRtdImage::readonlyCmd( int argc, char *argv[] )
    }
    return set_result( value );
 }
+
+//
+//  StarRtdImage::remoteTclCmd
+//
+//     Override the "remotetcl" subcommand to evaluate a Tcl command
+//     in the RTD Tcl interpreter. Returns TCL_ERROR if eval fails.
+//
+//     usage: $image remotetcl $command
+//
+int StarRtdImage::remoteTclCmd( int argc, char* argv[] )
+{
+   if ( Tcl_Eval( interp_, argv[0] ) == TCL_OK ) {
+      return set_result( interp_->result );
+   } else {
+      set_result( interp_->result );
+      return TCL_ERROR;
+   }
+}
+
