@@ -266,12 +266,12 @@
       ENDIF
 *
 *   Put SORT box into output files
-      CALL XRTSORT_WRISORT(SID, SRT, STATUS)
+      CALL XRTSORT_WRISORT(SID, VERSION, SRT, STATUS)
 *
 
 *   Background sort box
       IF (SRT.BCKGND) THEN
-         CALL XRTSORT_WRISORT(BID, BSRT, STATUS)
+         CALL XRTSORT_WRISORT(BID, VERSION,  BSRT, STATUS)
       ENDIF
 
 *   History
@@ -3854,7 +3854,7 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
 
 
 *+XRTSORT_WRISORT    Writes the sorting conditions into selection structure
-      SUBROUTINE XRTSORT_WRISORT(ID, ASRT, STATUS)
+      SUBROUTINE XRTSORT_WRISORT(ID, VERSION, ASRT, STATUS)
 *    Description :
 *    Bugs :
 *    Authors :
@@ -3867,7 +3867,7 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
       INCLUDE 'INC_XRTSRT'
 *    Import :
       INTEGER ID		       ! ID of file
-*
+      CHARACTER*(*) VERSION
       RECORD /XRT_SCFDEF/ ASRT         ! Sort block for file
 *    Status :
       INTEGER STATUS
@@ -3878,37 +3878,37 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
       IF (STATUS .NE. SAI__OK) RETURN
 
 *  write spatial selection
-      CALL SLN_NEWREC(ID,SID,STATUS)
+      CALL SLN_NEWREC(VERSION,SID,STATUS)
       CALL SLN_PUTARD(SID,'Spatial',ASRT.ARDID,STATUS)
       CALL SLN_PUTREC(ID,SID,STATUS)
 
 
 *  write detector coordinate selection
-      CALL SLN_NEWREC(ID,SID,STATUS)
+      CALL SLN_NEWREC(VERSION,SID,STATUS)
       CALL SLN_PUTRNGI(SID,'XDetector',1,ASRT.MIN_XD,ASRT.MAX_XD,
      :                                                     STATUS)
       CALL SLN_PUTREC(ID,SID,STATUS)
-      CALL SLN_NEWREC(ID,SID,STATUS)
+      CALL SLN_NEWREC(VERSION,SID,STATUS)
       CALL SLN_PUTRNGI(SID,'YDetector',1,ASRT.MIN_YD,ASRT.MAX_YD,
      :                                                     STATUS)
       CALL SLN_PUTREC(ID,SID,STATUS)
 
 
 *  write time ranges
-      CALL SLN_NEWREC(ID,SID,STATUS)
+      CALL SLN_NEWREC(VERSION,SID,STATUS)
       CALL SLN_PUTRNGI(SID,'Time',ASRT.NTIME,
      :             ASRT.MIN_T,ASRT.MAX_T,STATUS)
       CALL SLN_PUTREC(ID,SID,STATUS)
 
 
 *  write PH channel selection
-      CALL SLN_NEWREC(ID,SID,STATUS)
+      CALL SLN_NEWREC(VERSION,SID,STATUS)
       CALL SLN_PUTRNGI(SID,'PHChannel',1,ASRT.MIN_PH,ASRT.MAX_PH,
      :                                                    STATUS)
       CALL SLN_PUTREC(ID,SID,STATUS)
 
 *  write corrected PH channel selection
-      CALL SLN_NEWREC(ID,SID,STATUS)
+      CALL SLN_NEWREC(VERSION,SID,STATUS)
       CALL SLN_PUTRNGI(SID,'Energy',1,ASRT.MIN_EN,ASRT.MAX_EN,
      :                                                    STATUS)
       CALL SLN_PUTREC(ID,SID,STATUS)
