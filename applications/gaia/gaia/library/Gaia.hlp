@@ -23,10 +23,12 @@ You can zoom the main image by one of several methods:
       zooms.
    3) Place your mouse cursor into the "Pan" window (the small one on
       the upper left -- if shown) and press button 2.
+   4) Drag out a region in the main window using shift-drag mouse
+      button 1.
 
 Unzooming uses the button with a small "z", or you can pick a smaller
 number from the "Scale:" options, or finally you can press button
-3 in the pan window.
+3 in the pan window. Unzooming using option 4) uses shift mouse button 2.
 
 
     --- Control the pan:
@@ -258,6 +260,13 @@ window. Note that if you want to save this or perform analyses of the
 image then you must save it to a disk file and reload the image.
 
 
+   --- Contour an image:
+
+Select the "Image-Analysis" menu and choose the "Contouring..."
+item. This will reveal a toolbox for contouring the displayed image
+and/or another image that is aligned to the displayed image.
+
+
    --- Get some help, give some feedback, send a bug report:
 
 Well you're reading the main help, you might also take a look at
@@ -265,6 +274,6 @@ SUN/214 (try "showme sun214" from the command-line).  Specific help is
 given with the image processing toolboxes. Bug reports etc., should be
 sent to:
 
-    ussc@star.rl.ac.uk
+    gaia@star.rl.ac.uk
 
 or me P.W.Draper@durham.ac.uk.
