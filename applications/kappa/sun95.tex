@@ -442,6 +442,15 @@
    \end{description}
 }
 
+%  Format the applicability section.
+\newcommand{\sstapplicability}[1]{
+   \item[Clas\mbox{}s Applicability:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
 %  Format the examples section.
 \newcommand{\sstexamples}[1]{
    \goodbreak
@@ -6881,11 +6890,13 @@ this section):
 
 \begin{verse}
 {\tt Digits}: Number of digits of precision\\
-{\tt Domain}: Co-ordinate system domain\\
+{\tt Domain}: Physical domain described by the co-ordinate system\\
+{\tt Epoch}: A date \& time which defines the co-ordinate system\\
 {\tt Format(axis)}: Format specification for axis values\\
 {\tt Label(axis)}: Axis label\\
 {\tt Naxes}: Number of Frame axes\\
 {\tt Symbol(axis)}: Axis symbol\\
+{\tt System}: Specific co-ordinate system used to describe the domain\\
 {\tt Title}: Frame title\\
 {\tt Unit(axis)}: Axis physical units
 \end{verse}
@@ -6951,13 +6962,17 @@ supported types of Mapping).
 \htmlref{WCSREMOVE}{WCSREMOVE} allows Frames to be removed from the WCS
 component.
 
-One common additional Frame {\tt Domain} is SKY. This is reserved to refer to
-2-dimensional Frames which describe celestial longitude and latitude. Such 
-Frames are known as ``SkyFrames'' and have additional attributes indicating
-the particular celestial co-ordinate system in use ({\it e.g.}\ equatorial,
-galactic, ecliptic, {\it etc}), and any required qualifying parameters (epoch,
-equinox, {\it etc}). A SkyFrame can be added to an NDF by importing it
-from suitable FITS headers using \htmlref{FITSDIN}{FITSDIN}, 
+Two common additional Frame {\tt Domains} are SKY and SPECTRAL. SKY is
+reserved to refer to 2-dimensional Frames which describe celestial
+longitude and latitude (known as ``SkyFrames''). SPECTRAL is reserved to
+refer to 1-dimensional Frames which describe position within a spectrum
+(known as ``SpecFrames'').These sub-classes of Frame have additional
+attributes indicating the particular celestial or spectral co-ordinate
+system in use ({\it e.g.}\ equatorial, galactic, ecliptic, wavelength,
+frequency, radio velocity, optical velocity, {\it etc}), and any required
+qualifying parameters (equinox, rest frequency, standard of rest, {\it
+etc}). Instances of these Frames can be added to an NDF by importing
+suitable FITS headers using \htmlref{FITSDIN}{FITSDIN},
 \htmlref{FITSIN}{FITSIN} or the CONVERT package (see \xref{SUN/55}{sun55}{}).
 Alternatively, a SkyFrame can be created directly by specifying the pixel
 co-ordinates of stars with known celestial co-ordinates (see
@@ -7051,6 +7066,9 @@ pixels).
 \item [AXIS] --- Reserved to represent AXIS co-ordinates (in arbitrary units).
 \item [SKY] --- Reserved to represent celestial longitude and latitude (in
 any suitable system, but always stored internally in units of radians).
+\item [SPECTRAL] --- Reserved to represent position within an
+electro-magnetic spectrum (various spectral systems and units are
+supported).
 \item [GRAPHICS] --- Reserved to represent positions on a graphics device 
 in units of millimetres. measured from the bottom left corner 
 of the device.
@@ -7135,6 +7153,12 @@ the number of axes in the Frame. The exception to this is if you specify
 one of the {\tt Domain} names SKY, GRAPHICS, NDC, CURPIC or BASEPIC, in which 
 case a two dimensional Frame is always created.
 
+The nature of the current Frame can also be changed using
+\htmlref{WCSATTRIB}{WCSATTRIB}, which allows new values to be assigned to
+specified Frame attributes. For instance, assigning a new value to the
+{\tt System} attribute will change the co-ordinate system used to
+describe positions within the domain covered by the Frame. The main
+attributes relevant to Frames are described \hyperref{here}{in section }{}{se:frmatt}.
 
 \subsection{Propagation of WCS Information}
 {\footnotesize KAPPA} applications which create an output NDF on the
@@ -7276,6 +7300,126 @@ An alternative way to add a celestial co-ordinate Frame to an NDF is to
 use the facilities of GAIA (see \xref{SUN/214}{sun214}{}). This provides
 much more sophisticated facilities.
 
+\subsection{Converting an AXIS structure to a SpecFrame}
+For many years, the calibration of spectral axes has been recorded in the
+form of AXIS structures within the NDF. As mentioned above, each pixel
+axis in an NDF has an associated AXIS structure which is a 1-dimensional 
+array containing an element for each pixel on the associated axis.
+The value of each element gives the ``axis'' value for the pixel.
+
+Spectral axis calibration can now also be recorded in the form of a
+``SpecFrame'' within the WCS component. A SpecFrame is a Frame which can
+describe spectral axes in many different forms (wavelength, frequency,
+various forms of velocity, {\emph{etc.}), with many different units, and
+measured in various rest frames. A SpecFrame ``knows'' how to convert
+between all these different forms. Let's say you have two spectra --- in one
+the current co-ordinate Frame is a SpecFrame representing frequency in
+GHz as measured in the rest frame of the telescope (\emph{i.e.} ``topocentric
+frequency''), and in the other the current co-ordinate Frame is a SpecFrame
+representing radio velocity in km/s measured in the kinematic Local
+Standard of Rest. You want to overlay plots of these two spectra for
+comparison purposes, so you display the first using
+\htmlref{LINPLOT}{LINPLOT}. This produces a plot in which the X axis is
+frequency measured in GHz. You then display the second spectrum, again
+using LINPLOT but this time specifying \verb+clear=no+ on the command
+line in order to prevent the previous plot from being erased. The
+SpecFrame representing radio velocity in the second spectrum
+automatically adjusts itself to represent the same system as the
+currently displayed plot (topocentric frequency in this example), so the
+plots can be compared directly. The conversion includes the effects of
+the Doppler shift caused by the differing standards of rest used by the
+two spectra.
+
+So the question arises; ``How can I add a SpecFrame to my existing NDFs
+which only have an AXIS structure?''. This is simple to do using the 
+\htmlref{WCSADD}{WCSADD} command. Let's assume you have a 1-dimensional 
+NDF called {\tt fred} containing an AXIS structure holding the frequency
+at the centre of each pixel in units of GHz. The following command will add
+an appropriate SpecFrame to the WCS component of the NDF (and will also
+make it the \emph{current} Frame}:
+
+\small
+\begin{verbatim}
+    % wcsadd fred frame=axis maptype=unit frmtype=spec domain=SPECTRAL \
+             attrs="'System=freq,Unit=GHz'"
+\end{verbatim}
+\normalsize
+
+The FRMTYPE parameter indicates that a SpecFrame should be created. The
+ATTRS parameter gives the attribute values to be assigned to the
+SpecFrame (note the quotes to protect the string from interpretation by
+the Unix shell). The DOMAIN parameter is given the default domain for a 
+SpecFrame (and should usually not be changed). The MAPTYPE and FRAME
+parameters indicate that this new SpecFrame should be connected to the
+existing AXIS Frame using a UnitMap --- i.e. the frequency values held
+within the AXIS structure are identical to the frequency values described
+by the Specframe.
+
+The above setting for the ATTRS parameter gives the bare minimum of
+information --- there are several other items of information which
+\emph{could} have been given. For instance, the above command does not
+indicate the standard of rest to which the frequency values refer.
+Neither does it indicate the source position, date of observation, 
+or the observers geographical position (all of which may be needed to
+enable conversion between different standards of rest). In general you
+should specify as much information as you can. To do this, you can either
+include the extra information in the ATTRS parameter value above, or you
+can add the information later using \htmlref{WCSATTRIB}{WCSATTRIB}. For
+example:
+
+\small
+\begin{verbatim}
+    % wcsattrib fred remap=no set Stdofrest topo
+    % wcsattrib fred remap=no set RefRA '"10:12:24.2"'
+    % wcsattrib fred remap=no set RefDec '"-32:10:14"'
+    % wcsattrib fred remap=no set Epoch '"2003-10-2 12:13:00"'
+    % wcsattrib fred remap=no set GeoLat '"N19:49:33"'
+    % wcsattrib fred remap=no set GeoLon '"W155:28:47"'
+\end{verbatim}
+\normalsize
+
+These commands set new values for named attributes within the current
+Frame of NDF {\tt fred}. These attributes are described
+\hyperref{here}{in section }{}{se:frmatt}. The inclusion of ``remap=no''
+is important: it tells the command to change the Frame attribute {\emph
+without} changing the Mappings between Frames accordingly. If the default
+value of ``remap=yes'' was used, the Mappings which connect the SpecFrame
+to the other Frames within the WCS FrameSet would be modified in order to
+ensure that the position of each pixel is unchanged. The default mode
+(``remap=yes'') should be used if you already have a fully and correctly
+specified SpecFrame within the WCS component which you want to change to
+desribe a different system. For instance, if you have a SpecFrame
+describing frequency at each pixel, and you want to change it so that it
+describes the corresponding wavelength at each pixel, then doing:
+
+\small
+\begin{verbatim}
+    % wcsattrib fred set System wave
+\end{verbatim}
+\normalsize
+
+will modify the Mapping between the pixel Frame and the SpecFrame using
+the relationship ``wavelength = speed of light/frequency''. 
+
+However, if you have a partially or incorrectly specified SpecFrame you
+should usually use ``remap=no''. For instance, of the above SpecFrame
+which gives the frequency at each pixel was discovered to be 
+incorrect, in that the AXIS values were actually wavelength values and
+not frequency at all, then you would want to \emph{correct} the WCS
+component by changing the System attribute of the SpecFrame from 
+``freq'' to ``wave''. In this situation you want to leave the Mapping
+from the pixel Frame to the spectral Frame unchanged since the Mapping
+already gives the corrrect {\emph wavelength} value (previously, but
+erroneously, thought to be a frequency value). So here you would do:
+
+\small
+\begin{verbatim}
+    % wcsattrib fred remap=no set System wave
+\end{verbatim}
+\normalsize
+
+
+
 \subsection{\xlabel{se_frmatt}Frame Attributes\label{se:frmatt}}
 
 Each co-ordinate Frame has several \emph{attributes} 
@@ -7285,6 +7429,10 @@ properties. This section lists the most important of these. See
 Frames and their attributes. The application \htmlref{WCSATTRIB}{WCSATTRIB} 
 can be used to examine attribute values associated with the current Frame
 of an NDF, and change the values of those which are not read-only.
+
+
+
+
 
 \sstroutine{
    Digits/Digits(axis)
@@ -7353,7 +7501,7 @@ of an NDF, and change the values of those which are not read-only.
       same Domain value can be aligned with it. 
 
       Some Frames are given standard Domain values when they are created
-      ({\it e.g.}\ GRID, PIXEL, AXIS, SKY, CURPIC, NDC, BASEPIC, GRAPHICS). 
+      ({\it e.g.}\ GRID, PIXEL, AXIS, SKY, SPECTRAL, CURPIC, NDC, BASEPIC, GRAPHICS). 
       Frames created by the user (for instance, using \htmlref{WCSADD}{WCSADD})
       can have any Domain value, but the standard Domain names should be
       avoided unless the standard meanings are appropriate for the Frame
@@ -7392,13 +7540,13 @@ of an NDF, and change the values of those which are not read-only.
    Epoch of observation
 }{
    \sstdescription{
-      This attribute is used to qualify the celestial co-ordinate
-      system described by a SkyFrame, by giving the moment 
-      in time when the co-ordinates are known to be correct. Often, this will
-      be the date of observation.
+      This attribute is used to qualify the co-ordinate system described by 
+      a Frame, by giving the moment in time when the co-ordinates are known 
+      to be correct. Often, this will be the date of observation.
 
-      The {\tt Epoch} value is important in cases where the co-ordinates of
-      sources may change with time. Possible reasons for this include:
+      The {\tt Epoch} value is important in cases where the co-ordinate
+      system changes with time. For instance, when considering celestial
+      co-ordinate systems, possible reasons for change include:
       (i) changing aberration of light caused by the observer's
       velocity ({\it e.g.}\ due to the Earth's motion around the Sun), (ii)
       changing gravitational deflection by the Sun due to changes in
@@ -7487,7 +7635,7 @@ of an NDF, and change the values of those which are not read-only.
 \sstroutine{
    Equinox
 }{
-   Epoch of the mean equinox
+   Epoch of the mean equinox (SkyFrames only)
 }{
    \sstdescription{
       This attribute is used to qualify those celestial co-ordinate
@@ -7679,6 +7827,55 @@ of an NDF, and change the values of those which are not read-only.
 }
 
 \sstroutine{
+   GeoLat
+}{
+   The geodetic latitude of the observer (SpecFrames only)
+}{
+   \sstdescription{
+      This attribute specifies the geodetic latitude of the observer, in
+      degrees. Together with the \htmlref{GeoLon}{GeoLon}, \htmlref{Epoch}{Epoch}, \htmlref{RefRA}{RefRA} and \htmlref{RefDec}{RefDec} attributes,
+      it defines the Doppler shift introduced by the observers diurnal
+      motion around the earths axis, which is needed when converting
+      SpecFrames to or from the topocentric standard of rest. The maximum velocity
+      error which can be caused by an incorrect value is 0.5 km/s. The
+      default value for the attribute is zero.
+
+      The value is stored internally in radians, but is converted to and
+      from a degrees string for access. Some example input formats are:
+      {\tt{"}}22:19:23.2{\tt{"}}, {\tt{"}}22 19 23.2{\tt{"}}, {\tt{"}}22:19.387{\tt{"}}, {\tt{"}}22.32311{\tt{"}}, {\tt{"}}N22.32311{\tt{"}},
+      {\tt{"}}-45.6{\tt{"}}, {\tt{"}}S45.6{\tt{"}}. As indicated, the sign of the latitude can
+      optionally be indicated using characters {\tt{"}}N{\tt{"}} and {\tt{"}}S{\tt{"}} in place of the
+      usual {\tt{"}}$+${\tt{"}} and {\tt{"}}-{\tt{"}}. When converting the stored value to a string, the
+      format {\tt{"}}[s]dd:mm:ss.s{\tt{"}} is used, when {\tt{"}}[s]{\tt{"}} is {\tt{"}}N{\tt{"}} or {\tt{"}}S{\tt{"}}.
+   }
+   \sstattributetype{
+      String.
+   }
+}
+\sstroutine{
+   GeoLon
+}{
+   The geodetic longitude of the observer (SpecFrames only)
+}{
+   \sstdescription{
+      This attribute specifies the geodetic (or equivalently, geocentric)
+      longitude of the observer, in degrees, measured positive eastwards.
+      See also attribute \htmlref{GeoLat}{GeoLat}. The default value is zero.
+
+      The value is stored internally in radians, but is converted to and
+      from a degrees string for access. Some example input formats are:
+      {\tt{"}}155:19:23.2{\tt{"}}, {\tt{"}}155 19 23.2{\tt{"}}, {\tt{"}}155:19.387{\tt{"}}, {\tt{"}}155.32311{\tt{"}}, {\tt{"}}E155.32311{\tt{"}},
+      {\tt{"}}-204.67689{\tt{"}}, {\tt{"}}W204.67689{\tt{"}}. As indicated, the sign of the longitude can
+      optionally be indicated using characters {\tt{"}}E{\tt{"}} and {\tt{"}}W{\tt{"}} in place of the
+      usual {\tt{"}}$+${\tt{"}} and {\tt{"}}-{\tt{"}}. When converting the stored value to a string, the
+      format {\tt{"}}[s]ddd:mm:ss.s{\tt{"}} is used, when {\tt{"}}[s]{\tt{"}} is {\tt{"}}E{\tt{"}} or {\tt{"}}W{\tt{"}} and the
+      numerical value is chosen to be less than 180 degrees.
+   }
+   \sstattributetype{
+      String.
+   }
+}
+\sstroutine{
    Label(axis)
 }{
    Axis label
@@ -7694,9 +7891,11 @@ of an NDF, and change the values of those which are not read-only.
       The default for simple Frames is the string ``{\tt Axis <n>}'', where 
       {\tt <n>} is 1, 2, {\it etc.}\ for each successive axis.
 
-      The default labels for SkyFrames depend on the particular celestial
-      co-ordinate system represented by the SkyFrame ({\it e.g.}\ ``{\tt Right 
-      ascension}'' or ``{\tt Galactic latitude}'').
+      The default labels for specialised Frames (SkyFrames, SpecFrames,
+      \emph{etc.}) depend on the particular co-ordinate system represented by 
+      the Frame ({\it e.g.}\ ``{\tt Right ascension}'', 
+      ``{\tt Galactic latitude}'', ``{\tt Frequency}'', 
+      ``{\tt Wavelength in air}'', {\emph etc.}).
 
    }
    \sstattributetype{
@@ -7751,6 +7950,198 @@ of an NDF, and change the values of those which are not read-only.
 }
 
 \sstroutine{
+   RefDec
+}{
+   The declination of the reference point (SpecFrames only)
+}{
+   \sstdescription{
+      This attribute specifies the FK5 J2000.0 declination of a reference
+      point on the sky. See the description of attribute \htmlref{RefRA}{RefRA} for details.
+      This attribute has an undefined value bu default, resulting in an
+      error being reported if any calculation is performed which needs a value
+      for this attribute.
+   }
+   \sstattributetype{
+      String.
+   }
+}
+\sstroutine{
+   RefRA
+}{
+   The right ascension of the reference point (SpecFrames only)
+}{
+   \sstdescription{
+      This attribute, together with the \htmlref{RefDec}{RefDec} attribute, specifies the FK5
+      J2000.0 coordinates of a reference point on the sky. For 1-dimensional
+      spectra, this should normally be the position of the source. For
+      spectral data with spatial coverage (spectral cubes, etc), this should
+      be close to centre of the spatial coverage. It is used to define the
+      correction for Doppler shift to be applied when converting between 
+      different standards of rest.
+
+      The RefRA and RefDec attributes are stored internally in radians,
+      but are converted to and from a string for access. The format
+      {\tt{"}}hh:mm:ss.ss{\tt{"}} is used for RefRA, and
+      {\tt{"}}dd:mm:ss.s{\tt{"}} is used for RefDec.
+
+      Both RefRA and RefDec have undefined values by default, resulting in an
+      error being reported if any calculation is performed which needs a value
+      for this attribute. Explicit values must be set for the RefRA and 
+      RefDec attributes to overcome this.
+   }
+   \sstattributetype{
+      String.
+   }
+}
+\sstroutine{
+   RestFreq
+}{
+   The rest frequency (SpecFrames only)
+}{
+   \sstdescription{
+      This attribute specifies the frequency corresponding to zero
+      velocity. It is used when converting between between velocity-based
+      spectral coordinate systems and and other coordinate systems (such as 
+      frequency, wavelength, energy, etc).
+
+      The default value is undefined resulting in an error being reported
+      if an attempt is made to convert between a velocity system and a 
+      non-velocity system. If you want to work entirely within one system or 
+      the other, it is not necessary to assign a value to this attribute. 
+
+      When setting a new value for this attribute, the new value can be
+      supplied either directly as a frequency, or indirectly as a wavelength
+      or energy, in which case the supplied value is converted to a frequency
+      before being stored. The nature of the supplied value is indicated by
+      appending text to the end of the numerical value indicating the units in
+      which the value is supplied. If the units are not specified, then the
+      supplied value is assumed to be a frequency in units of GHz. If the
+      supplied unit is a unit of frequency, the supplied value is assumed to
+      be a frequency in the given units. If the supplied unit is a unit of
+      length, the supplied value is assumed to be a (vacuum) wavelength. If
+      the supplied unit is a unit of energy, the supplied value is assumed to
+      be an energy. For instance, the following strings all result in
+      a rest frequency of around 1.4E14 Hz being used: {\tt{"}}1.4E5{\tt{"}}, {\tt{"}}1.4E14 Hz{\tt{"}},
+      {\tt{"}}1.4E14 s$*$$*$-1{\tt{"}}, {\tt{"}}1.4E5 GHz{\tt{"}}, {\tt{"}}2.14E-6 m{\tt{"}}, {\tt{"}}21400 Angstrom{\tt{"}}, {\tt{"}}9.28E-20 J{\tt{"}},
+      {\tt{"}}9.28E-13 erg{\tt{"}}, {\tt{"}}0.58 eV{\tt{"}}, etc.
+
+      When getting the value of this attribute, the returned value is
+      always a frequency in units of GHz.
+   }
+   \sstattributetype{
+      Floating point.
+   }
+}
+\sstroutine{
+   SourceVel
+}{
+   The source velocity (SpecFrames only)
+}{
+   \sstdescription{
+      This attribute (together with \htmlref{RefRA}{RefRA} and \htmlref{RefDec}{RefDec}) defines the {\tt{"}}Source{\tt{"}}
+      standard of rest (see attribute \htmlref{StdOfRest}{StdOfRest}). This is a rest frame
+      which is moving towards the position given by RefRA and RefDec at a
+      velocity given by SourceVel (in km/s). The value is stored internally
+      as a heliocentric velocity, but is converted to and from the rest
+      frame specified by the StdOfRest attribute when accessed using
+      WCSATTRIB.
+
+      The default value is zero, resulting in the {\tt{"}}Source{\tt{"}} standard of
+      rest being equivalent to the {\tt{"}}Heliocentric{\tt{"}} standard of rest.
+   }
+   \sstattributetype{
+      Floating point.
+   }
+}
+\sstroutine{
+   StdOfRest
+}{
+   Standard of rest (SpecFrames only)
+}{
+   \sstdescription{
+      This attribute identifies the standard of rest to which the spectral
+      axis values of a \htmlref{SpecFrame}{SpecFrame} refer, and may take any of the values
+      listed in the {\tt{"}}Standards of Rest{\tt{"}} section (below).
+
+      The default StdOfRest value is {\tt{"}}Helio{\tt{"}}.
+   }
+   \sstattributetype{
+      String.
+   }
+   \sstdiytopic{
+      Standards of Rest
+   }{
+      The SpecFrame class supports the following StdOfRest values (all are
+      case-insensitive):
+
+      \sstitemlist{
+
+         \sstitem
+         {\tt{"}}Topocentric{\tt{"}}, {\tt{"}}Topocent{\tt{"}} or {\tt{"}}Topo{\tt{"}}: The observers rest-frame (assumed
+         to be on the surface of the earth). Spectra recorded in this standard of
+         rest suffer a Doppler shift which varies over the course of a day
+         because of the rotation of the observer around the axis of the earth.
+         This standard of rest must be qualified using the \htmlref{GeoLat}{GeoLat}, \htmlref{GeoLon}{GeoLon}, \htmlref{Epoch}{Epoch},
+         \htmlref{RefRA}{RefRA} and \htmlref{RefDec}{RefDec} attributes.
+
+         \sstitem
+         {\tt{"}}Geocentric{\tt{"}}, {\tt{"}}Geocentr{\tt{"}} or {\tt{"}}Geo{\tt{"}}: The rest-frame of the earth centre.
+         Spectra recorded in this standard of rest suffer a Doppler shift which
+         varies over the course of a year because of the rotation of the earth
+         around the Sun. This standard of rest must be qualified using the Epoch,
+         RefRA and RefDec attributes.
+
+         \sstitem
+         {\tt{"}}Barycentric{\tt{"}}, {\tt{"}}Barycent{\tt{"}} or {\tt{"}}Bary{\tt{"}}: The rest-frame of the solar-system
+         barycentre. Spectra recorded in this standard of rest suffer a Doppler
+         shift which depends both on the velocity of the Sun through the Local
+         Standard of Rest, and on the movement of the planets through the solar
+         system. This standard of rest must be qualified using the Epoch, RefRA
+         and RefDec attributes.
+
+         \sstitem
+         {\tt{"}}Heliocentric{\tt{"}}, {\tt{"}}Heliocen{\tt{"}} or {\tt{"}}Helio{\tt{"}}: The rest-frame of the Sun.
+         Spectra recorded in this standard of rest suffer a Doppler shift which
+         depends on the velocity of the Sun through the Local Standard of Rest.
+         This standard of rest must be qualified using the RefRA and RefDec
+         attributes.
+
+         \sstitem
+         {\tt{"}}LSR{\tt{"}}, {\tt{"}}LSRK{\tt{"}}: The rest-frame of the kinematical Local Standard of
+         Rest. Spectra recorded in this standard of rest suffer a Doppler shift
+         which depends on the velocity of the kinematical Local Standard of Rest
+         through the galaxy. This standard of rest must be qualified using the
+         RefRA and RefDec attributes.
+
+         \sstitem
+         {\tt{"}}LSRD{\tt{"}}: The rest-frame of the dynamical Local Standard of Rest. Spectra
+         recorded in this standard of rest suffer a Doppler shift which depends
+         on the velocity of the dynamical Local Standard of Rest through the
+         galaxy.  This standard of rest must be qualified using the RefRA and
+         RefDec attributes.
+
+         \sstitem
+         {\tt{"}}Galactic{\tt{"}}, {\tt{"}}Galactoc{\tt{"}} or {\tt{"}}Gal{\tt{"}}: The rest-frame of the galactic centre.
+         Spectra recorded in this standard of rest suffer a Doppler shift which
+         depends on the velocity of the galactic centre through the local group.
+         This standard of rest must be qualified using the RefRA and RefDec
+         attributes.
+
+         \sstitem
+         {\tt{"}}Local\_group{\tt{"}}, {\tt{"}}Localgrp{\tt{"}} or {\tt{"}}LG{\tt{"}}: The rest-frame of the local group.
+         This standard of rest must be qualified using the RefRA and RefDec
+         attributes.
+
+         \sstitem
+         {\tt{"}}Source{\tt{"}}, or {\tt{"}}src{\tt{"}}: The rest-frame of the source. This standard of
+         rest must be qualified using the RefRA, RefDec and \htmlref{SourceVel}{SourceVel} attributes.
+
+      }
+      Where more than one alternative \htmlref{System}{System} value is shown above, the
+      first of these will be returned when an enquiry is made.
+   }
+}
+\sstroutine{
    Symbol(axis)
 }{
    Axis symbol
@@ -7775,9 +8166,9 @@ of an NDF, and change the values of those which are not read-only.
       set, ``{\tt x}'' is used as the $<${\tt Domain}$>$ value in constructing 
       this default string.
 
-      The SkyFrame class re-defines the default {\tt Symbol} value
-      ({\it e.g.}\ to ``{\tt RA}'' or ``{\tt Dec}'') as appropriate for 
-      the particular celestial co-ordinate system being represented.
+      Specialised Frames (SkyFrame,SpecFrame, {\emph etc.}) re-define the 
+      default {\tt Symbol} value to be appropriate for 
+      the particular co-ordinate system being represented.
 
    }
    \sstattributetype{
@@ -7804,81 +8195,146 @@ of an NDF, and change the values of those which are not read-only.
 \sstroutine{
    System
 }{
-   Celestial co-ordinate system
+   Coordinate system used to describe positions within the domain
 }{
    \sstdescription{
-      This attribute identifies the particular celestial co-ordinate
-      system represented by a \htmlref{SkyFrame}{SkyFrame}, and may take any of the values
-      listed in the ``Celestial Co-ordinate Systems'' section (below).
-
+      In general it is possible for positions within a given physical
+      domain to be described using one of several different coordinate
+      systems. For instance, the \htmlref{SkyFrame}{SkyFrame} class can
+      use galactic coordinates, equatorial coordinates, etc, to describe
+      positions on the sky. As another example, the
+      \htmlref{SpecFrame}{SpecFrame} class can use frequency, wavelength,
+      velocity, etc, to describe a position within an electromagnetic
+      spectrum. The System attribute identifies the particular coordinate
+      system represented by a \htmlref{Frame}{Frame}. Each class of Frame
+      defines a set of acceptable values for this attribute, as listed
+      below (all are case insensitive). Where more than one alternative
+      System value is shown, the first of will be returned when an
+      enquiry is made.
    }
    \sstattributetype{
       String.
    }
-  \sstdiytopic{
-      Celestial Co-ordinate Systems
-   }{
-      The SkyFrame class supports the following {\tt System} values (all are
-      case-insensitive) and associated celestial co-ordinate systems:
-
-      \sstitemlist{
-
-         \sstitem
-         ``{\tt FK4}'': The old FK4 (barycentric) equatorial co-ordinate system,
-         which should be qualified by an \htmlref{Equinox}{Equinox} value. The underlying
-         model on which this is based is non-inertial and rotates slowly
-         with time, so for accurate work FK4 co-ordinate systems should
-         also be qualified by an \htmlref{Epoch}{Epoch} value.
-
-         \sstitem
-         ``{\tt FK4-NO-E}'' or ``{\tt FK4\_NO\_E}'': The old FK4 (barycentric) equatorial
-         system but without the ``E-terms of aberration'' ({\it e.g.}\ some radio
-         catalogues). This co-ordinate system should also be qualified by
-         both an {\tt Equinox} and an {\tt Epoch} value.
-
-         \sstitem
-         ``{\tt FK5}'' or ``{\tt EQUATORIAL}'': The modern FK5 (barycentric) equatorial
-         co-ordinate system. This should be qualified by an {\tt Equinox} value.
-
-         \sstitem
-         ``{\tt GAPPT}'', ``{\tt GEOCENTRIC}'' or ``{\tt APPARENT}'': The geocentric apparent
-         equatorial co-ordinate system, which gives the apparent positions
-         of sources relative to the true plane of the Earth's equator and
-         the equinox (the co-ordinate origin) at a time specified by the
-         qualifying {\tt Epoch} value. (Note that no {\tt Equinox} is needed to
-         qualify this co-ordinate system because no model ``mean equinox''
-         is involved.)  These co-ordinates give the apparent right
-         ascension and declination of a source for a specified date of
-         observation, and therefore form an approximate basis for
-         pointing a telescope. Note, however, that they are applicable to
-         a fictitious observer at the Earth's centre, and therefore
-         ignore such effects as atmospheric refraction and the (normally
-         much smaller) aberration of light due to the rotational velocity
-         of the Earth's surface.  Geocentric apparent co-ordinates are
-         derived from the standard FK5 (J2000.0) barycentric co-ordinates
-         by taking account of the gravitational deflection of light by
-         the Sun (usually small), the aberration of light caused by the
-         motion of the Earth's centre with respect to the barycentre
-         (larger), and the precession and nutation of the Earth's spin
-         axis (normally larger still).
-
-         \sstitem
-         ``{\tt ECLIPTIC}'': Ecliptic co-ordinates (IAU 1980), referred to the
-         ecliptic and mean equinox specified by the qualifying {\tt Equinox}
-         value.
-
-         \sstitem
-         ``{\tt GALACTIC}'': Galactic co-ordinates (IAU 1958).
-
-         \sstitem
-         ``{\tt SUPERGALACTIC}'': De Vaucouleurs Supergalactic co-ordinates.
-
+   \sstapplicability{
+      \sstsubsection{
+         Frame
+      }{
+         The System attribute for a basic Frame always equals {\tt{"}}Cartesian{\tt{"}},
+         and may not be altered.
       }
-      Where more than one alternative {\tt System} value is shown above, the
-      first of these will be returned when an enquiry is made.
+      \sstsubsection{
+         SkyFrame
+      }{
+         The SkyFrame class supports the following System values and
+         associated celestial coordinate systems:
+
+         \sstitemlist{
+
+            \sstitem
+            {\tt{"}}FK4{\tt{"}}: The old FK4 (barycentric) equatorial coordinate system,
+            which should be qualified by an \htmlref{Equinox}{Equinox} value. The underlying
+            model on which this is based is non-inertial and rotates slowly
+            with time, so for accurate work FK4 coordinate systems should
+            also be qualified by an \htmlref{Epoch}{Epoch} value.
+
+            \sstitem
+            {\tt{"}}FK4-NO-E{\tt{"}} or {\tt{"}}FK4\_NO\_E{\tt{"}}: The old FK4 (barycentric) equatorial
+            system but without the {\tt{"}}E-terms of aberration{\tt{"}} (e.g. some radio
+            catalogues). This coordinate system should also be qualified by
+            both an Equinox and an Epoch value.
+
+            \sstitem
+            {\tt{"}}FK5{\tt{"}} or {\tt{"}}EQUATORIAL{\tt{"}}: The modern FK5 (barycentric) equatorial
+            coordinate system. This should be qualified by an Equinox value.
+
+            \sstitem
+            {\tt{"}}GAPPT{\tt{"}}, {\tt{"}}GEOCENTRIC{\tt{"}} or {\tt{"}}APPARENT{\tt{"}}: The geocentric apparent
+            equatorial coordinate system, which gives the apparent positions
+            of sources relative to the true plane of the Earth's equator and
+            the equinox (the coordinate origin) at a time specified by the
+            qualifying Epoch value. (Note that no Equinox is needed to
+            qualify this coordinate system because no model {\tt{"}}mean equinox{\tt{"}}
+            is involved.)  These coordinates give the apparent right
+            ascension and declination of a source for a specified date of
+            observation, and therefore form an approximate basis for
+            pointing a telescope. Note, however, that they are applicable to
+            a fictitious observer at the Earth's centre, and therefore
+            ignore such effects as atmospheric refraction and the (normally
+            much smaller) aberration of light due to the rotational velocity
+            of the Earth's surface.  Geocentric apparent coordinates are
+            derived from the standard FK5 (J2000.0) barycentric coordinates
+            by taking account of the gravitational deflection of light by
+            the Sun (usually small), the aberration of light caused by the
+            motion of the Earth's centre with respect to the barycentre
+            (larger), and the precession and nutation of the Earth's spin
+            axis (normally larger still).
+
+            \sstitem
+            {\tt{"}}ECLIPTIC{\tt{"}}: Ecliptic coordinates (IAU 1980), referred to the
+            ecliptic and mean equinox specified by the qualifying Equinox
+            value.
+
+            \sstitem
+            {\tt{"}}GALACTIC{\tt{"}}: Galactic coordinates (IAU 1958).
+
+            \sstitem
+            {\tt{"}}SUPERGALACTIC{\tt{"}}: De Vaucouleurs Supergalactic coordinates.
+
+            \sstitem
+            {\tt{"}}UNKNOWN{\tt{"}}: Any other general spherical coordinate system. No
+            \htmlref{Mapping}{Mapping} can be created between a pair of SkyFrames if either of the
+            SkyFrames has System set to {\tt{"}}Unknown{\tt{"}}.
+
+         }
+         Currently, the default System value is {\tt{"}}FK5{\tt{"}}.
+      }
+      \sstsubsection{
+         SpecFrame
+      }{
+         The SpecFrame class supports the following System values and
+         associated spectral coordinate systems (the default is {\tt{"}}WAVE{\tt{"}} -
+         wavelength):
+
+         \sstitemlist{
+
+            \sstitem
+            {\tt{"}}FREQ{\tt{"}}: Frequency (Hz)
+
+            \sstitem
+            {\tt{"}}ENER{\tt{"}} or {\tt{"}}ENERGY{\tt{"}}: Energy (J)
+
+            \sstitem
+            {\tt{"}}WAVN{\tt{"}} or {\tt{"}}WAVENUM{\tt{"}}: Wave-number (1/m)
+
+            \sstitem
+            {\tt{"}}WAVE{\tt{"}} or {\tt{"}}WAVELEN{\tt{"}}: Vacuum wave-length (m)
+
+            \sstitem
+            {\tt{"}}AWAV{\tt{"}} or {\tt{"}}AIRWAVE{\tt{"}}: Wave-length in air (m)
+
+            \sstitem
+            {\tt{"}}VRAD{\tt{"}} or {\tt{"}}VRADIO{\tt{"}}: Radio velocity (m/s)
+
+            \sstitem
+            {\tt{"}}VOPT{\tt{"}} or {\tt{"}}VOPTICAL{\tt{"}}: Optical velocity (m/s)
+
+            \sstitem
+            {\tt{"}}ZOPT{\tt{"}} or {\tt{"}}REDSHIFT{\tt{"}}: Reshift (dimensionless)
+
+            \sstitem
+            {\tt{"}}BETA{\tt{"}}: Beta factor (dimensionless)
+
+            \sstitem
+            {\tt{"}}VELO{\tt{"}} or {\tt{"}}VREL{\tt{"}}: Relativistic velocity (m/s)
+
+         }
+         The default value for the Unit attribute for each system is shown
+         in parentheses. Note, changes to the Unit attribute for
+         a SpecFrame will result in the Mapping from pixel to spectral 
+         co-ordinates being modified in order to reflect the change in units.
+      }
    }
 }
-
 \sstroutine{
    Title
 }{
@@ -7898,10 +8354,9 @@ of an NDF, and change the values of those which are not read-only.
       system}'', where {\tt <n>} is the number of Frame axes 
       ({\tt Naxes} attribute).
 
-      The SkyFrame class re-defines the default Title value
-      ({\it e.g.}\ to ``{\tt FK5 equatorial co-ordinates, mean equinox J2000.0}'')
-      as appropriate to the particular celestial co-ordinate system
-      being represented.
+      Specialised Frames (SkyFrame, SpecFrame, {\emph etc.}) re-define the 
+      default Title value to be appropriate to the particular co-ordinate 
+      system being represented.
    }
    \sstattributetype{
       String.
@@ -7931,14 +8386,27 @@ of an NDF, and change the values of those which are not read-only.
 }{
    \sstdescription{
       This attribute contains a textual representation of the physical
-      units used to represent co-ordinate values on a particular axis
-      of a Frame.
+      units used to represent coordinate values on a particular axis
+      of a \htmlref{Frame}{Frame}. 
 
-      The default supplied by the Frame class is an empty string.
+      Specialised Frames (SkyFrame, SpecFrame, {\emph etc.}) re-define the 
+      default Unit values to be appropriate to the particular co-ordinate 
+      system being represented.
 
-      The SkyFrame class re-defines the default {\tt Unit} value ({\it e.g.}\ to
-      ``{\tt hh:mm:ss.sss}'') to describe the character strings
-      returned when co-ordinate values are formatted.
+      For most classes, the Unit attribute is a purely descriptive
+      comment intended for human readers and makes no difference to the
+      operation of the software. However, there are some classes which
+      have {\emph active} Unit attributes. Changing the Unit attribute 
+      for such classes will result in the Mappings within the WCS
+      FrameSet being modified in order to reflect the change in units.
+      By default, only SpecFrames have an active Unit attribute.
+
+      In general, the syntax of the Unit attribute should follow the
+      recommendations made in the FITS standard (see the paper
+      ``Representation of world coordinates in FITS'' by Greisen \&
+      Calabretta (available at 
+\htmladdnormallink{http://www.cv.nrao.edu/fits/documents/wcs/wcs.html} 
+{http://www.cv.nrao.edu/fits/documents/wcs/wcs.html}).
    }
    \sstattributetype{
       String.
@@ -7949,7 +8417,7 @@ of an NDF, and change the values of those which are not read-only.
          \sstitem
          When specifying this attribute by name, it should be
          subscripted with the number of the Frame axis to which it
-         applies.
+         applies (unless the Frame has only one axis).
       }
    }
 }
