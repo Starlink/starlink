@@ -92,7 +92,7 @@
 
 *  Local Constants:
       CHARACTER*1		NUL			! String separator
-        PARAMETER		( NUL = CHAR(0) )
+c        PARAMETER		( NUL = CHAR(0) )
       INTEGER			TLEN			! History text length
         PARAMETER		( TLEN = 132 )
 
@@ -108,6 +108,8 @@
       INTEGER			NNUL			! # nulls in LINE
       INTEGER			PHDU			! Primary HDU
 *.
+
+      NUL=CHAR(0)
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN

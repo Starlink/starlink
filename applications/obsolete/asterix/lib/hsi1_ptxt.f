@@ -105,7 +105,7 @@
 
 *  Local Constants:
       CHARACTER*1		NUL			! String separator
-        PARAMETER		( NUL = CHAR(0) )
+c        PARAMETER		( NUL = CHAR(0) )
       INTEGER			TLEN			! History text length
         PARAMETER		( TLEN = 132 )
 
@@ -133,6 +133,8 @@
       LOGICAL			PRIM			! Object is primitive?
       LOGICAL			THERE			! Exists already?
 *.
+
+      NUL=CHAR(0)
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
