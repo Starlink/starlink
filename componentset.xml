@@ -29,6 +29,41 @@
   </developers>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="sst">
+  <version>1.1</version>
+  <path>applications/sst</path>
+  <description>SST - A Simple Software Tools Package</description>
+  <abstract><p>SST is now considered obsolete; it is included to
+      support those applications which currently use it, but it should
+      not be used for new code.</p>
+    <p>The Simple Software Tools package (SST) is a package of
+      applications designed to help with the production of software
+      and documentation, with particular emphasis on ADAM programming
+      using Fortran 77.</p>
+    <p>As its name suggests, SST is intended for performing fairly
+      simple manipulation of software, but it aims to tackle some of
+      the commonly encountered problems which are not catered for in
+      more sophisticated commercial software tools (such as FORCHECK
+      and VAXset) which are available on Starlink. In future, SST may
+      also duplicate a few of the simpler facilities which commercial
+      products offer in order to avoid the cost (and generally much
+      higher overheads, such as disk space) which prevent the
+      commercial products being freely available on all Starlink
+      machines. </p></abstract>
+  <dependencies >
+    <build>parsecon</build><build>dtask</build><build>chr</build><build>fio</build><build>mers</build><build>par</build><build>psx</build><build>sae</build><build>task</build>
+  </dependencies>
+  <developers>
+    <person>
+      <name>R. F. Warren-Smith</name>
+    </person>
+  </developers>
+  <documentation> sun110</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
 
 <component id="starconf" buildsupport="yes">
   <description>Starlink autoconf support</description>

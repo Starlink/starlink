@@ -249,6 +249,27 @@ $(MANIFEST)/sock: \
 	cd libraries/pcs/sock \
 		&& make>make.log && make install-manifest>>make.log
 
+$(MANIFEST)/sst: \
+		$(MANIFEST)/adam \
+		$(MANIFEST)/chr \
+		$(MANIFEST)/cnf \
+		$(MANIFEST)/dtask \
+		$(MANIFEST)/ems \
+		$(MANIFEST)/fio \
+		$(MANIFEST)/hds \
+		$(MANIFEST)/lex \
+		$(MANIFEST)/mers \
+		$(MANIFEST)/messys \
+		$(MANIFEST)/par \
+		$(MANIFEST)/parsecon \
+		$(MANIFEST)/psx \
+		$(MANIFEST)/sae \
+		$(MANIFEST)/string \
+		$(MANIFEST)/subpar \
+		$(MANIFEST)/task
+	cd applications/sst \
+		&& make>make.log && make install-manifest>>make.log
+
 $(MANIFEST)/starconf: \
 		$(MANIFEST)/autoconf \
 		$(MANIFEST)/automake \
@@ -299,8 +320,9 @@ buildsupport: \
 		$(MANIFEST)/libtool \
 		$(MANIFEST)/starconf
 componentset.xml: \
-		./buildsupport/starconf/component.xml \
 		./applications/messgen/component.xml \
+		./applications/sst/component.xml \
+		./buildsupport/starconf/component.xml \
 		./libraries/chr/component.xml \
 		./libraries/cnf/component.xml \
 		./libraries/ems/component.xml \
