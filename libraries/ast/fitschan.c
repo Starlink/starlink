@@ -341,10 +341,14 @@ f     - AST_PUTFITS: Store a FITS header card in a FitsChan
 *        so that they can be given the same letter when they are written
 *        out to a new FITS file.
 *     10-AUG-2001 (DSB):
-*        Corrected function value returned by SkySys to be 1 unless an
+*        - Corrected function value returned by SkySys to be 1 unless an
 *        error occurs. This error resulted in CAR headers being produced
 *        by astWrite with CRVAL and CD values till in radians rather than 
 *        degrees.
+*        - Introduced SplitMap2 in order to guard against producing
+*        celestial FITS headers for a Mapping which includes more than
+*        one WcsMap.
+
 *class--
 */
 
@@ -718,6 +722,7 @@ static int MatchFront( const char *, const char *, char *, int *, int *, int *, 
 static int MoveCard( AstFitsChan *, int, const char *, const char * );
 static int SearchCard( AstFitsChan *, const char *, const char *, const char *);
 static int SplitMap( AstMapping *, int, AstMapping **, AstMapping **, AstMapping ** );
+static int SplitMap2( AstMapping *, int, AstMapping **, AstMapping **, AstMapping ** );
 static int TestAttrib( AstObject *, const char * );
 static int Use( AstFitsChan *, int, int );
 static int Ustrcmp( const char *, const char * );
@@ -956,6 +961,7 @@ static int AddVersion( AstFrameSet *fset, int ipix,
 
 /* Local Variables: */
    AstFrame *frame;         /* Requested Frame */
+   AstMapping *fmap;        /* Full Mapping before simplification */
    AstMapping *map1;        /* Mapping from pixel to rel. phys. coords */
    AstMapping *map2;        /* Mapping from rel. phys. to Nat. Sph. coords */
    AstMapping *map3;        /* Mapping from Nat. Sph. to abs. phys. coords */
@@ -971,8 +977,10 @@ static int AddVersion( AstFrameSet *fset, int ipix,
    if( !astOK ) return ret;
 
 /* Get a pointer to the Mapping from pixel coordinates to physical
-   coordinates. */
-   mapping = astGetMapping( fset, ipix, iphy );
+   coordinates, and simplify it. */
+   fmap = astGetMapping( fset, ipix, iphy );
+   mapping = astSimplify( fmap );
+   fmap = astAnnul( fmap );
 
 /* Check it has the same number of inputs and outputs. */
    if( naxis == astGetNout( mapping ) ){
@@ -985,7 +993,7 @@ static int AddVersion( AstFrameSet *fset, int ipix,
    this call is the result of compounding all the Mappings up to (but not
    including) the WcsMap, the second returned Mapping is the (inverted) 
    WcsMap, and the third returned Mapping is anything following the WcsMap. 
-   Only proceed if a WcsMap is found. */
+   Only proceed if one and only one WcsMap is found. */
       if( SplitMap( mapping, astGetInvert( mapping ), &map1, &map2, &map3 ) ){
          ret = WcsWithWcs( NULL, map1, map2, map3, frame, naxis, store, dim, 
                            s, method, class );
@@ -12595,6 +12603,9 @@ static int SkySys( AstSkyFrame *skyfrm, int wcstype, FitsStore *store,
 /* Check the status. */
    if( !astOK ) return 0;
 
+/* Check we have a SkyFrame. */
+   if( !astIsASkyFrame( skyfrm ) ) return 0;
+
 /* Initialise */
    ret = 1;
 
@@ -14150,13 +14161,14 @@ static int SplitMap( AstMapping *map, int invert, AstMapping **map1,
 *  Description:
 *     If possible, the supplied Mapping is decomposed into three component 
 *     mappings to be compounded in series. To be acceptable, the second of 
-*     these three Mappings must be an inverted WcsMap. If it is not
+*     these three Mappings must be an inverted WcsMap, and there must not
+*     be a WcsMap in either of the other two Mappings. If it is not
 *     possible to produce such a group of three Mappings, then a zero
 *     function value is returned, together with three NULL Mapping
 *     pointers. All the mappings before the WcsMap are compounded
 *     together and returned as "map1". The inverse of the WcsMap itself is 
 *     returned as "map2", and any remaining Mappings are compounded together 
-*     and returned as "map3". 
+*     and returned as "map3".
 *
 *     The search algorithm allows for an arbitrary combination of series and
 *     parallel CmpMaps.
@@ -14177,6 +14189,136 @@ static int SplitMap( AstMapping *map, int invert, AstMapping **map1,
 *     map3
 *        A location at which to return a pointer to the Mapping from 
 *        native spherical coordinates to physical coordinates. 
+*     dep 
+*        The address of an integer holding the current depth of recursion
+*        into this function.
+
+*  Returned Value:
+*     One if a WcsMap was found, zero otherwise.
+
+*  Notes:
+*     -  The returned Mappings contain independant copies of the relevant
+*     components of the supplied Mapping and can be modified without
+*     changing the supplied Mapping.
+*     -  NULL pointers will be returned for all Mappings if no WcsMap 
+*     can be found in the supplied Mapping. 
+*     -  A pointer to a UnitMap will be returned for map1 if no mappings
+*     exist before the WcsMap.
+*     -  A pointer to a UnitMap will be returned for map3 if no mappings
+*     exist after the WcsMap.
+*     -  NULL pointers will be returned for all Mappings and a function
+*     value of zero will be returned if an error has occurred, or if this 
+*     function should fail for any reason.
+
+*/
+
+/* Local Variables */
+   AstMapping *mapa;       /* Pre-wcs Mapping */
+   AstMapping *mapb;       /* WcsMap */
+   AstMapping *mapc;       /* Post-wcs Mapping */
+   int ret;                /* Was a non-linear Mapping found? */
+
+/* Initialise */
+   *map1 = NULL;
+   *map2 = NULL;
+   *map3 = NULL;
+   ret = 0;
+
+/* Check the global status. */
+   if( !astOK ) return ret;
+
+/* Call SplitMap2 to do the work. SplitMap2 does not check that the 
+   WcsMap is an *inverted* WcsMap, neither does it check that there
+   are no WcsMaps in either map1 or map3. */
+   if( SplitMap2( map, invert, map1, map2, map3 ) ) {
+
+/* Check that the WcsMap is inverted. */
+      if( astGetInvert( *map2 ) ) {
+
+/* Check that map 1 does not contain a WcsMap. */
+         if( !SplitMap2( *map1, astGetInvert( *map1 ), &mapa, &mapb, &mapc ) ) {
+
+/* Check that map 3 does not contain a WcsMap. */
+            if( !SplitMap2( *map3, astGetInvert( *map3 ), &mapa, &mapb, &mapc ) ) {
+
+/* If so, the three Mappings are OK. */
+               ret = 1;
+
+            } else {
+               mapa = astAnnul( mapa );
+               mapb = astAnnul( mapb );
+               mapc = astAnnul( mapc );
+            }
+
+         } else {
+            mapa = astAnnul( mapa );
+            mapb = astAnnul( mapb );
+            mapc = astAnnul( mapc );
+         }
+      }
+
+      if( !ret ) {
+         *map1 = astAnnul( *map1 );
+         *map2 = astAnnul( *map2 );
+         *map3 = astAnnul( *map3 );
+      }
+
+   }
+
+   return ret;
+}
+
+static int SplitMap2( AstMapping *map, int invert, AstMapping **map1,
+                      AstMapping **map2, AstMapping **map3 ){
+/*
+*  Name:
+*     SplitMap2
+
+*  Purpose:
+*     Locate a WCS projection within a Mapping.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     int SplitMap2( AstMapping *map, int invert, AstMapping **map1, 
+*                    AstMapping **map2, AstMapping **map3 )
+
+*  Class Membership:
+*     FitsChan
+
+*  Description:
+*     If possible, the supplied Mapping is decomposed into three component 
+*     mappings to be compounded in series. To be acceptable, the second of 
+*     these three Mappings must be a WcsMap. If it is not possible to produce 
+*     such a group of three Mappings, then a zero function value is returned, 
+*     together with three NULL Mapping pointers. All the mappings before the 
+*     WcsMap are compounded together and returned as "map1". The WcsMap itself 
+*     is returned as "map2", and any remaining Mappings are compounded together
+*     and returned as "map3". 
+*
+*     The search algorithm allows for an arbitrary combination of series and
+*     parallel CmpMaps.
+
+*  Parameters:
+*     map
+*        A pointer to the Mapping from pixel to physical coordinates.
+*     invert
+*        The value of the Invert attribute to use with "map" (the value 
+*        returned by astGetInvert is not used).
+*     map1
+*        A location at which to return a pointer to the Mapping from pixel 
+*        to relative physical coordinates. 
+*     map2
+*        A location at which to return a pointer to the Mapping from relative 
+*        physical coordinates to native spherical coordinates. This will
+*        be a WcsMap.
+*     map3
+*        A location at which to return a pointer to the Mapping from 
+*        native spherical coordinates to physical coordinates. 
+*     dep 
+*        The address of an integer holding the current depth of recursion
+*        into this function.
 
 *  Returned Value:
 *     One if a WcsMap was found, zero otherwise.
@@ -14250,20 +14392,20 @@ static int SplitMap( AstMapping *map, int invert, AstMapping **map1,
             *map1 = (AstMapping *) astUnitMap( astGetNout( map ), "" );
          }
 
-/* Indicate we have not yet found  an inverted WcsMap. */
+/* Indicate we have not yet found  a WcsMap. */
          ret = 0;
 
 /* Process each series Mapping. */
          for( i = 0; i < nmap; i++ ){
 
-/* If we have not yet found an inverted WcsMap... */
+/* If we have not yet found a WcsMap... */
             if( !ret ){
 
-/* Search this Mapping for an inverted WcsMap. */
-               ret = SplitMap( map_list[ i ], invert_list[ i ], &mapa, 
+/* Search this Mapping for a WcsMap. */
+               ret = SplitMap2( map_list[ i ], invert_list[ i ], &mapa, 
                                map2, map3 );
 
-/* If no inverted WcsMap was found, use the whole mapping as part of the 
+/* If no WcsMap was found, use the whole mapping as part of the 
    pre-wcs Mapping. */
                if( !ret ){
                   mapa = astCopy( map_list[ i ] );
@@ -14276,7 +14418,7 @@ static int SplitMap( AstMapping *map, int invert, AstMapping **map1,
                mapa = astAnnul( mapa );
                *map1 = temp;                 
 
-/* If we have previously found an inverted WcsMap, use the whole mapping
+/* If we have previously found a WcsMap, use the whole mapping
    as part of the post-wcs mapping. */
             } else {
                mapc = astCopy( map_list[ i ] );
@@ -14307,12 +14449,12 @@ static int SplitMap( AstMapping *map, int invert, AstMapping **map1,
          axis = 0;
          for( i = 0; i < nmap && astOK; i++ ){
 
-/* See if this Mapping contains a usable inverted WcsMap. Only do the search 
+/* See if this Mapping contains a usable WcsMap. Only do the search 
    if no such WcsMap has already been found, since only the first is usable. */
             if( !ret ) {
 
-/* Search this Mapping for an inverted WcsMap. */
-               haswcs = SplitMap( map_list[ i ], invert_list[ i ], &mapa, 
+/* Search this Mapping for a WcsMap. */
+               haswcs = SplitMap2( map_list[ i ], invert_list[ i ], &mapa, 
                                   &mapb, &mapc );
 
 /* Note if we have found a usable WcsMap, and its first axis index. */
@@ -14321,7 +14463,7 @@ static int SplitMap( AstMapping *map, int invert, AstMapping **map1,
                   wcsaxis = axis;
                }
 
-/* If an inverted WcsMap has already been found, the mapping cannot contain a
+/* If a WcsMap has already been found, the mapping cannot contain a
    usable WcsMap. */
             } else {
                haswcs = 0;
@@ -14390,10 +14532,10 @@ static int SplitMap( AstMapping *map, int invert, AstMapping **map1,
       map_list = astFree( map_list );
       invert_list = astFree( invert_list );
 
-/* If the supplied Mapping is not a CmpMap, see if it is an inverted
-   WcsMap. If so, take a copy and set its invert attribute correctly.
-   Also create UnitMaps for the pre and post wcs mappings. */
-   } else if( !strcmp( class, "WcsMap" ) && invert ){
+/* If the supplied Mapping is not a CmpMap, see if it is a WcsMap. If so, 
+   take a copy and set its invert attribute correctly. Also create UnitMaps 
+   for the pre and post wcs mappings. */
+   } else if( !strcmp( class, "WcsMap" ) ){
       ret = 1;
       nax = astGetNin( map );
       *map1 = (AstMapping *) astUnitMap( nax, "" );
@@ -14409,7 +14551,7 @@ static int SplitMap( AstMapping *map, int invert, AstMapping **map1,
       if( *map2 ) *map2 = astAnnul( *map2 );
       if( *map3 ) *map3 = astAnnul( *map3 );
    }
-
+   
 /* Return the answer. */
    return ret;
 
@@ -18228,17 +18370,8 @@ static int WcsWithWcs( AstFitsChan *this, AstMapping *map1, AstMapping *map2,
                   SetItem( &(store->latpole), 0, 0, s, latpole*AST__DR2D );
                }
 
-/* Get a pointer to the SkyFrame defining the celestial axes. Report an
-   error if the Frame is not a SkyFrame. */
+/* Get a pointer to the SkyFrame defining the celestial axes. */
                astPrimaryFrame( phyfrm, axlon, (AstFrame **) &skyfrm, &axis );
-
-/* If the current axis belongs to a SkyFrame, we need to check that it is
-   the same SkyFrame as any previously found axis. */
-               if( !astIsASkyFrame( skyfrm ) && astOK ) {
-                  astError( AST__BDFTS, "%s(%s): Possible programming "
-                            "error; the current Frame in the supplied "
-                            "FrameSet is not a SkyFrame.", method, class );
-               }
 
 /* Store the CTYPE, EQUINOX, MJDOBS, and RADESYS values. */
                SkySys( skyfrm, astGetWcsType( map2 ), store, 
