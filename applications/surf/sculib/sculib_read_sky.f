@@ -120,7 +120,7 @@
       DOUBLE PRECISION T_DAY          !
       REAL             T_ETA_TEL      !
       INTEGER          T_QUAL         !
-      REAL             T_RUN          !
+      INTEGER          T_RUN          !
       REAL             T_TAUZ         !
       CHARACTER*30     WORD (MAX_WRD) ! individual words in LINE
 *    Internal References :
