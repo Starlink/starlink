@@ -231,8 +231,8 @@
             FRVIN = .TRUE.
 
 *  Now calculate the variance estmates and store them in this array.
-            CALL PSX_CALLOC( DIM1, '_REAL', IPW1, STATUS )
-            CALL PSX_CALLOC( DIM1, '_REAL', IPW2, STATUS )
+            CALL PSX_CALLOC( DIM1, '_DOUBLE', IPW1, STATUS )
+            CALL PSX_CALLOC( DIM1, '_DOUBLE', IPW2, STATUS )
 
 
             CALL POL1_SNGVR( DIM1, DIM2, %VAL( IPDIN ), WORK, 
