@@ -30,7 +30,7 @@
 
       alias crepint $EXTREME_DIR/crepint
       alias frepint $EXTREME_DIR/frepint
-      alias inscnf $EXTREME_DIR/frepint
+      alias inscnf $EXTREME_DIR/inscnf
 
       alias do-crepint $EXTREME_DIR/do-crepint
       alias do-frepint $EXTREME_DIR/do-frepint
