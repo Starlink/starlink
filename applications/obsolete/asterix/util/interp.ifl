@@ -9,10 +9,9 @@
                 DEFAULT         N
 	    ENDPARAMETER
 
-	    PARAMETER INPUT
+	    PARAMETER INP
 		POSITION 	2
 		TYPE 		'UNIV'
-                KEYWORD         'INP'
 		PROMPT  	'Input datafile'
                 PPATH           'GLOBAL,CURRENT'
                 HELP            'File to interpolate bad points'
@@ -20,10 +19,9 @@
 		VPATH		'PROMPT'
 	    ENDPARAMETER
 
-	    PARAMETER OUTPUT
+	    PARAMETER OUT
 		POSITION 	3
 		TYPE 		'UNIV'
-                KEYWORD         'OUT'
 		PROMPT  	'Output datafile'
                 PPATH           'CURRENT'
                 ASSOCIATION     '->GLOBAL.BINDS'

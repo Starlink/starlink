@@ -159,7 +159,6 @@ INTERFACE IMSIM
 
    PARAMETER PSF
       TYPE '_CHAR'
-      KEYWORD 'PSF'
       VPATH 'PROMPT'
       PPATH 'DYNAMIC,DEFAULT'
       PROMPT 'Choose PSF for simulated sources'
