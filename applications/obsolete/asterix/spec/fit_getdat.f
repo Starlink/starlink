@@ -694,6 +694,10 @@
                 CALL DYN_MAPL( 1, OBDAT(NDS).NGDAT, OBDAT(NDS).GQPTR,
      :                         STATUS )
               END IF
+              IF ( OBDAT(NDS).VPTR .NE. 0 ) THEN
+                CALL DYN_MAPR( 1, OBDAT(NDS).NGDAT, OBDAT(NDS).GVPTR,
+     :                         STATUS )
+              END IF
 
 *          Set grouping flag
 	      OBDAT(NDS).GFLAG = .TRUE.
@@ -722,13 +726,6 @@
 	      OBDAT(NDS).WPTR = 0				! Flag
               OBDAT(NDS).GWPTR = 0
 	    END IF
-
-*        Enter weights (=inverse variances)
-            IF ( WEIGHTS ) THEN
-	      CALL FIT_GETDAT_WTS(OBDAT(NDS).NDAT,
-     :       %VAL(OBDAT(NDS).VPTR),QUAL,%VAL(OBDAT(NDS).QPTR),
-     :      %VAL(OBDAT(NDS).WPTR),NDUFVAR,STATUS)
-            END IF
 
 *        Default value for vignetting object
             OBDAT(NDS).V_ID = ADI__NULLID
@@ -795,12 +792,20 @@
 
 *        Grouping specified?
             IF ( OBDAT(NDS).GFLAG ) THEN
-              CALL UTIL_GRPWR( OBDAT(NDS).NDAT, %VAL(OBDAT(NDS).DPTR),
+              CALL UTIL_GRPVR( OBDAT(NDS).NDAT, %VAL(OBDAT(NDS).DPTR),
      :                 (OBDAT(NDS).WPTR.NE.0), %VAL(OBDAT(NDS).WPTR),
      :                 OBDAT(NDS).QFLAG, %VAL(OBDAT(NDS).QPTR),
      :                 %VAL(OBDAT(NDS).GPTR), OBDAT(NDS).NGDAT,
-     :                 %VAL(OBDAT(NDS).GDPTR), %VAL(OBDAT(NDS).GWPTR),
+     :                 %VAL(OBDAT(NDS).GDPTR), %VAL(OBDAT(NDS).GVPTR),
      :                 %VAL(OBDAT(NDS).GQPTR), STATUS )
+            END IF
+
+*        Enter weights (=inverse variances)
+            IF ( WEIGHTS ) THEN
+	      CALL FIT_GETDAT_WTS( OBDAT(NDS).NGDAT,
+     :                   %VAL(OBDAT(NDS).GVPTR), OBDAT(NDS).QFLAG,
+     :                   %VAL(OBDAT(NDS).GQPTR),
+     :                   %VAL(OBDAT(NDS).GWPTR), NDUFVAR, STATUS )
             END IF
 
 *        Compute number of good points
@@ -916,7 +921,7 @@
 *    Type Definitions :
 	IMPLICIT NONE
 *    Global constants:
-        INCLUDE 'SAE_PAR'
+      INCLUDE 'SAE_PAR'
         INTEGER			STATUS
 *    Import :
 	INTEGER NDAT		! No of data values
