@@ -1463,7 +1463,6 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
    double *alpha;                /* Pointer to longitude array */
    double *args;                 /* Pointer to argument list for conversion */
    double *delta;                /* Pointer to latitude array */
-   int coord;                    /* Loop counter for coordinates */
    int cvt;                      /* Loop counter for conversions */
    int end;                      /* Termination index for conversion loop */
    int inc;                      /* Increment for conversion loop */
