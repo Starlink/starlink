@@ -4,7 +4,7 @@
 *     DRIZZLE
 
 *  Purpose:
-*     Mosaics a list of NDFs using the drizziling algorithim and (optionally)
+*     Mosaics a list of NDFs using the drizzling algorithm and (optionally)
 *     normalises them
 
 *  Language:
@@ -80,19 +80,19 @@
 *        error (variance) information contained in the input NDFs
 *        should be used to weight the input image pixels as they
 *        are drizzled on to the output NDF (see the discussion of the
-*        drizziling algorithim). If MAPVAR is set to .TRUE. then the
+*        drizzling algorithm). If MAPVAR is set to .TRUE. then the
 *        ratio of the inverse variance of the input pixel and the
 *        the mean inverse variance of the reference frame (or first 
 *        input NDF if no reference frame is provided) will be used to 
-*        weight each pixel as it drizzled onto the ouptut image. 
+*        weight each pixel as it drizzled onto the output image. 
 *
 *        If weighting of the input pixels by the mean inverse variance
 *        of the entire input image (rather than the pixels own variance)
 *        is required MAPVAR should be set to .FALSE. and USEVAR should
 *        be set to .TRUE. (this is the default condition).
 *        
-*        It should be noted that due to the nature of the algorithim 
-*        variances are not propogated to the final output image.
+*        It should be noted that due to the nature of the algorithm 
+*        variances are not propagated to the final output image.
 *        [FALSE]
 *     MULTI = _DOUBLE (Read)
 *        The linear scaling between the size of the input and output
@@ -100,25 +100,25 @@
 *        pixel is twice that of the sub-sampling output pixel. For large 
 *        values of MULTI, PIXFRAC must also be larger (e.g. for a MULTI 
 *        of 4.0 a PIXFRAC of 0.7 is unacceptably small for simgle image
-*        drizziling, however for a MULTI of 3.0 a PIXFRAC of 0.7 produces
+*        drizzling, however for a MULTI of 3.0 a PIXFRAC of 0.7 produces
 *        acceptable ouput images).
 *        [1.5]
 *     OUT = NDF (Write)
-*        Name of the NDF to contain the output mosaic. This is mandatory.
+*        Name of the NDF to contain the output mosaic.
 *     PIXFRAC = _DOUBLE (Read)
 *        The linear "drop" size, this being the ratio of the linear
 *        size of the drizzled drop to that of the input pixel. Interlacing
 *        is equivalent to setting PIXFRAC=0.0, while shift-and-add is 
-*        equivalent to setting PIXFRAC=1.0. for low values of PIXFRAC the
+*        equivalent to setting PIXFRAC=1.0. For low values of PIXFRAC the
 *        MULTI parameter must also be set correspondingly low.
 *        [0.9]
 *     REF = NDF (Read)
-*        If the input NDFs being drizzed onto the output NDF are being
+*        If the input NDFs being drizzled onto the output NDF are being
 *        weighted by the inverse of their mean variance (see the USEVAR
 *        parameter) then by default the first NDF frame in the input
 *        list (IN) will be used as a reference frame. However, if an NDF
 *        is given via the REF parameter (so as to over-ride its default
-*        null value), then the weighting will then instead be realtive to
+*        null value), then the weighting will instead be relative to
 *        the "reference NDF" supplied via this parameter.
 *
 *        If scale-factor, zero-point corrections (see the SCALE and ZERO
@@ -170,7 +170,7 @@
 *        input data arrays where they overlap.  From this information, 
 *        a global set of multiplicative corrections will be derived which 
 *        make the input data as mutually consistent as possible. These
-*        corrections will be applied to the input data before drizziling 
+*        corrections will be applied to the input data before drizzling 
 *        them onto the output frame.
 *
 *        Calculation of scale-factor corrections may also be combined
@@ -186,17 +186,17 @@
 *        error (variance) information contained in the input NDFs
 *        should be used to weight the input image pixels as they
 *        are drizzled on to the output NDF (see the discussion of the
-*        drizziling algorithim). If USEVAR is set to .TRUE. then the
+*        drizzling algorithm). If USEVAR is set to .TRUE. then the
 *        ratio of the mean inverse variance of the input image and
 *        the mean inverse variance of the reference frame (or first 
 *        input NDF if no reference frame is provided) will be used as 
 *        a weighting for the image. 
-
+*
 *        If weighting of the input image by the inverse variance map 
 *        (rather than the mean) then the MAPVAR parameter whould be used.
 *        
-*        It should be noted that due to the nature of the algorithim 
-*        variances are not propogated to the final output image.
+*        It should be noted that due to the nature of the algorithm 
+*        variances are not propagated to the final output image.
 *        [TRUE]
 *     ZERO = _LOGICAL (Read)
 *        This parameter specifies whether DRIZZLE should attempt to
@@ -219,7 +219,7 @@
 *        information, a global set of additive corrections will be 
 *        derived which make the input data as mutually consistent as 
 *        possible. These corrections will be applied to the input data 
-*        before drizziling them onto the output frame.
+*        before drizzling them onto the output frame.
 *
 *        Calculation of zero-point corrections may also be combined
 *        with the use of scale-factor corrections (see the SCALE
@@ -236,7 +236,7 @@
 *
 *     Where the fields have the following meaning:
 *
-*        INDEX = the index numebr of the frame, this must be the
+*        INDEX = the index number of the frame, this must be the
 *                same as its order number in the input list (see 
 *                the IN parameter)
 *        SCALE = the multiplicative scaling factor for the NDF
@@ -270,32 +270,32 @@
 *     -  All non-complex numeric data types are supported, however the
 *        output mosaic will be of data type _REAL
 *     -  Bad pixels are supported.
-*     -  The algorithim is restricted to handiling 2D NDFs only
+*     -  The algorithm is restricted to handiling 2D NDFs only
 
 *  Algorithms Used:
 *     Taken from Fruchter et al., "A package for the reduction of dithered
 *     undersampled images", in Casertano et al. (eds), HST Calibration 
 *     Workshop, STSCI, 1997, pp. 518-528
 *
-*     "The drizzle algorithim is conceptually straightforward. Pixels in 
+*     "The drizzle algorithm is conceptually straightforward. Pixels in 
 *      the original input images are mapped into pixels in the subsampled
-*      output image, taking in to account shifts and rotations between the
+*      output image, taking into account shifts and rotations between the
 *      images and the optical distortion of the camera. However, in order
 *      to avoid convolving the image with the larger pixel `footprint' of
-*      the camera, we allow the user to shirk the pixel before it is averaged
-*      into the output image.
+*      the camera, we allow the user to shrink the pixel before it is
+*      averaged into the output image.
 *
 *      The new shrunken pixels, or `drops', rain down upon the subsampled
 *      output. In the case of the Hubble Deep Field (HDF), the drops used
 *      had linear dimensions one-half that of the input pixel -- slightly
-*      larger than the dimensions of the output subsmapled pixels. The value 
+*      larger than the dimensions of the output subsampled pixels. The value 
 *      of an input pixel is averaged into the output pixel with a weight
 *      proportional to the area of overlap between the `drop' and the output
-*      pixel. Not that, if the drop size if sufficently small, not all output
-*      pixels have data added to them from each input image. One must therefore
-*      choose a drop size that is small enough to avoid degerading the image,
-*      but large enough so that after all images are `dripped' the coverage
-*      is fairly uniform.
+*      pixel. Note that, if the drop size if sufficently small, not all 
+*      output pixels have data added to them from each input image. One 
+*      must therefore choose a drop size that is small enough to avoid 
+*      degrading the image, but large enough so that after all images 
+*      are `dripped' the coverage is fairly uniform.
 *
 *      The drop pize if controlled by a user-adjustable parameter called
 *      PIXFRAC, which is simply the ratio of the linear size of the drop to
@@ -303,7 +303,7 @@
 *      of the camera). Thus interlacing is equivalent to setting PIXFRAC=0.0,
 *      while shift-and-add is equivalent to PIXFRAC=1.0.
 *
-*      When a drop with value i_{xy} and a user-definaed weight w_{xy}
+*      When a drop with value i_{xy} and a user-defined weight w_{xy}
 *      is added to an image with pixel value I_{xy}, weight W_{xy}, and
 *      fractional pixel overlap 0 < a_{xy} < 1, the resulting value 
 *      the image I'_{xy} and weight W'_{xy} is 
@@ -314,13 +314,13 @@
 *                          ---------------------------------
 *                                      W'_{xy}
 *
-*      This algorithim has a number of advantages over standard linear 
+*      This algorithm has a number of advantages over standard linear 
 *      reconstruction methods presently used. Since the area of the pixels
 *      scales with the Jacobian of the geometric distortion, drizzle
 *      preserves both surface and absolute photometry. Therefore flux can
 *      be measured using an aperture whose size is independent of position
 *      on the chip. As the method anticipates that a given output pixel may
-*      recieve no information from a given input pixel, missing data (due
+*      receive no information from a given input pixel, missing data (due
 *      for instance to cosmic rays or detector defects) do not cause a
 *      substantial problem, so long as there are enough dithered images to
 *      fill in the gaps caused by these zero-weight input pixels. Finally
@@ -345,9 +345,9 @@
 *     06-AUG-1999 (AA):
 *        Debugged version?
 *     13-AUG-1999 (AA):
-*        Bare bones of algorithim completed, sort of works correctly
+*        Bare bones of algorithm completed, sort of works correctly
 *     31-AUG-1999 (AA):
-*        Debugged version, drizziling now works correctly
+*        Debugged version, drizzling now works correctly
 *     01-SEP-1999 (AA):
 *        Added SCALE and ZERO point corrections to code
 *     03-SEP-1999 (AA):
@@ -355,7 +355,7 @@
 *     06-SEP-1999 (AA):
 *        Changed MULTI from _INTEGER to _DOUBLE and propgated changes
 *     06-SEP-1999 (AA):
-*        Moved the drizziling algorithim from CCD1_DODIZ to CCG1_ODIZx
+*        Moved the drizzling algorithm from CCD1_DODIZ to CCG1_ODIZx
 *     07-SEP-1999 (AA):
 *        Added weighting by inverse variance map to code (MAPVAR parameter)
 *     07-SEP-1999 (AA):
@@ -478,6 +478,7 @@
       INTEGER PFRAME                 ! Index of the PIXEL frame
       INTEGER PLACE                  ! NDF place holder
       INTEGER UBNDX( NDF__MXDIM )    ! Maximum (overall) upper bound
+      INTEGER VALPIX                 ! Number of valid pixels in array (dummy)
       
       LOGICAL ADJUST                 ! Apply scale/zero corrections?
       LOGICAL ISECT                  ! NDFs intersect? (not used)
@@ -515,8 +516,8 @@
          GETV = .TRUE.
       ENDIF
               
-*  Get the scaling size for drizziling (ie linear scaling of output
-*  to inoput pixels), this defaults to 2.0.
+*  Get the scaling size for drizzling (ie linear scaling of output
+*  to input pixels), this defaults to 2.0.
        CALL PAR_GET0D( 'MULTI', MULTI, STATUS )
        
 *  Get the PIXFRAC (or drop) size
@@ -600,7 +601,7 @@
 *  ========================================================
 
 *  First check that there is an existing WCS FrameSet
-         CALL NDF_STATE(NDF(I), 'WCS', SWCS, STATUS)
+         CALL NDF_STATE( NDF( I ), 'WCS', SWCS, STATUS )
          IF( .NOT. SWCS ) THEN
              STATUS = SAI__ERROR
              CALL NDF_MSG( 'NDFNAME', NDF(I) )
@@ -611,25 +612,26 @@
          ENDIF  
 
 *  Get pointers to the WCS component 
-         CALL CCD1_GTWCS(NDF(I), IWCS, STATUS)
+         CALL CCD1_GTWCS( NDF( I ), IWCS, STATUS )
 
 *  Validate the transformation
          IF ( IWCS .EQ. AST__NULL ) THEN
              STATUS = SAI__ERROR
-             CALL NDF_MSG( 'NDFNAME', NDF(I) )
+             CALL NDF_MSG( 'NDFNAME', NDF( I ) )
              CALL ERR_REP( 'DRIZZLE_NOAST', '  NDF ^NDFNAME '//
      :'does not have a valid WCS extension.',STATUS ) 
              GO TO 940 
-         ELSE IF (AST_GETC( IWCS,'Class',STATUS) .NE. 'FrameSet') THEN
+         ELSE IF ( AST_GETC( IWCS, 'Class', STATUS ) .NE. 'FrameSet' ) 
+     :      THEN
              STATUS = SAI__ERROR
-             CALL NDF_MSG( 'NDFNAME', NDF(I) )
+             CALL NDF_MSG( 'NDFNAME', NDF( I ) )
              CALL ERR_REP( 'DRIZZLE_FRAME', '  NDF ^NDFNAME '//
-     :'does not have a WCS extention with class FrameSet.',STATUS)
+     :'does not have a WCS extention with class FrameSet.', STATUS)
              GO TO 940             
          ENDIF
           
 *  We have a valid WCS component, get pointer to the current FrameSet
-         FRCUR(I) = AST_GETFRAME( IWCS, AST__CURRENT, STATUS )
+         FRCUR( I ) = AST_GETFRAME( IWCS, AST__CURRENT, STATUS )
          
 *  Lets find out which frame contains the PIXEL domain (its going to be
 *  frame 2, but we may as well do it properly) in the output WCS frameset.
@@ -640,30 +642,30 @@
      :          .EQ. 'PIXEL' ) PFRAME = K
          END DO
       
-*  Get AST__CURRENT mapping
+*  Get mapping between PIXEL and Current frames.
          MAPC = AST_GETMAPPING( IWCS, PFRAME, AST__CURRENT, STATUS )
          MAPC = AST_SIMPLIFY( MAPC, STATUS )
 
 *  Get the index of the current frame for future use 
-         CFRAME(I) = AST_GETI(IWCS, 'Current', STATUS)
+         CFRAME( I ) = AST_GETI( IWCS, 'Current', STATUS )
 
-*  Obtain the number of input and output co-ordinates for a Mapping
-         NVIN = AST_GETI(IWCS, 'Nin', STATUS)
-         NVOUT = AST_GETI(IWCS, 'Nout', STATUS) 
+*  Obtain the number of input and output co-ordinates for the Mapping
+         NVIN = AST_GETI( MAPC, 'Nin', STATUS )
+         NVOUT = AST_GETI( MAPC, 'Nout', STATUS ) 
          
 *  Get the properties of the NDF.
 *  ==============================
 *  Dimensions.
-         CALL NDF_DIM( NDF(I), NDF__MXDIM, IDIMS, NDIMI, STATUS )
+         CALL NDF_DIM( NDF( I ), NDF__MXDIM, IDIMS, NDIMI, STATUS )
 
 *  Bounds.
-         CALL NDF_BOUND( NDF(I), NDF__MXDIM, ILBND, IUBND, 
+         CALL NDF_BOUND( NDF( I ), NDF__MXDIM, ILBND, IUBND, 
      :                   NDIMI, STATUS )
                      
          IF ( STATUS .NE. SAI__OK ) GO TO 940         
 
 *  Report the extent of the input NDF
-         DO IDIM=1, NVIN
+         DO IDIM = 1, NVIN
             IF ( IDIM .NE. 1 ) CALL MSG_SETC( 'INBOUND', ',' )
          
             CALL MSG_SETI( 'INBOUND', ILBND( IDIM ) )
@@ -676,33 +678,23 @@
 *  Find the coordinate bounds of the output NDF.
 *  ==============================================         
          
-*  We need to pad the lower bounds because of the way the drizziling 
-*  alogrithim works, see ccd1_dodiz.f for details
+*  We need to pad the lower bounds because of the way the drizzling 
+*  alogrithm works, see ccd1_dodiz.f for details
          DO IDIM = 1, NVIN
-            ASTART( IDIM ) = DBLE( ILBND( IDIM ) -1 )
+            ASTART( IDIM ) = DBLE( ILBND( IDIM ) - 1 )
             AEND( IDIM ) = DBLE( IUBND( IDIM ) )
          END DO        
-
-*  Use test points at the extremes and midpoints of each axis to obtain
-*  an estimate of the extent of the output NDF's coordinates.  This
-*  assumes that the transformation does not move the innards of the
-*  input array to the outside of the output array.
 
 *  Change the current mapping MAP to include the a multiplicative 
 *  ZOOMMAP of MULTI. We'll have to do the PIXFRAC twiddles later by hand
 *  as this depends on where we are around the pixel.
         MAPZ = AST_ZOOMMAP( NVIN, MULTI, ' ', STATUS)
-        MAPN(I) = AST_CMPMAP( MAPC, MAPZ, .TRUE.,  ' ', STATUS)
+        MAPN( I ) = AST_CMPMAP( MAPC, MAPZ, .TRUE.,  ' ', STATUS )
         
 *  Find the bounding box of the transformed co-ordinates
-*
-*         CALL CCG1_ASBOD( NVIN, ASTART, AEND, MAPN(I), NVOUT, DDLBND,
-*     :                    DDUBND, STATUS )                      
-*
-*  Replaced CCG1_ASBOx with AST_MAPBOX (N.B. DDXL() and DDXU() not used)
          DO IDIM = 1, NVIN
-            CALL AST_MAPBOX( MAPN(I), ASTART, AEND, .TRUE., IDIM,
-     :                       DDLBND(IDIM), DDUBND(IDIM), DDXL, DDXU,
+            CALL AST_MAPBOX( MAPN( I ), ASTART, AEND, .TRUE., IDIM,
+     :                       DDLBND( IDIM ), DDUBND( IDIM ), DDXL, DDXU,
      :                       STATUS )
          END DO        
 
@@ -712,8 +704,8 @@
 *  Find the dimensions and bounds of the output array. The program will
 *  autosize these bounds using the MULTI factor from the parameter system
          DO IDIM = 1, NVOUT
-               OLBND( IDIM, I ) = NUM_DTOI( DDLBND(IDIM) - 0.5D0 )
-               OUBND( IDIM, I ) = NUM_DTOI( DDUBND(IDIM) )
+            OLBND( IDIM, I ) = NUM_DTOI( DDLBND( IDIM ) - 0.5D0 )
+            OUBND( IDIM, I ) = NUM_DTOI( DDUBND( IDIM ) )
          END DO     
                                           
 *  Accumulate the minimum lower bound value, the maximum upper bound
@@ -733,7 +725,7 @@
          IF ( STATUS .NE. SAI__OK ) GO TO 940
 
 * We use the mean variance as a pixel weighting for the image during
-* drizziling, lets calculate this now for each image and stuff the value
+* drizzling, lets calculate this now for each image and stuff the value
 * into an array for later use.
          IF ( VAR .AND. GETV) THEN
          
@@ -745,46 +737,52 @@
             END DO       
          
 * Map the variance component of the image
-            CALL NDF_TYPE( NDF(I), 'Variance', ITYPE, STATUS )
-            CALL NDF_MAP( NDF(I), 'Variance', ITYPE, 'READ', 
-     :                    IVAR, NPXIN(I), STATUS )
+            CALL NDF_TYPE( NDF( I ), 'Variance', ITYPE, STATUS )
+            CALL NDF_MAP( NDF( I ), 'Variance', ITYPE, 'READ', 
+     :                    IVAR, NPXIN( I ), STATUS )
           
 * Calculate the mean variance for the image
             IF ( ITYPE .EQ. '_BYTE' ) THEN
-               CALL CCG1_CALVB( %VAL(IVAR), NPXIN(I), MEANV, STATUS ) 
+               CALL CCG1_MEANB( .TRUE., %VAL( IVAR ), NPXIN( I ), 
+     :                          MEANV, VALPIX, STATUS )
 
 *  Get the mean variance from a double-precision array.
-               ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-                  CALL CCG1_CALVD( %VAL(IVAR), NPXIN(I), MEANV, STATUS ) 
+            ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
+               CALL CCG1_MEAND( .TRUE., %VAL( IVAR ), NPXIN( I ), 
+     :                          MEANV, VALPIX, STATUS )
                   
 *  Get the mean variance from an integer array.
-               ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
-                  CALL CCG1_CALVI( %VAL(IVAR), NPXIN(I), MEANV, STATUS ) 
+            ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
+               CALL CCG1_MEANI( .TRUE., %VAL( IVAR ), NPXIN( I ), 
+     :                          MEANV, VALPIX, STATUS )
 
 *  Get the mean variance from a single-precision array.
-               ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
-                  CALL CCG1_CALVR( %VAL(IVAR), NPXIN(I), MEANV, STATUS ) 
+            ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
+               CALL CCG1_MEANR( .TRUE., %VAL( IVAR ), NPXIN( I ), 
+     :                          MEANV, VALPIX, STATUS )
 
 *  Get the mean variance from an unsigned-byte array.
-               ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
-                  CALL CCG1_CALVUB( %VAL(IVAR), NPXIN(I), MEANV, 
-     :                              STATUS ) 
+            ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
+               CALL CCG1_MEANUB( .TRUE., %VAL( IVAR ), NPXIN( I ), 
+     :                           MEANV, VALPIX, STATUS )
 
 *  Get the mean variance from an unsigned-word array.
-               ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
-                  CALL CCG1_CALVUW( %VAL(IVAR), NPXIN(I), MEANV, 
-     :                              STATUS ) 
+            ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
+               CALL CCG1_MEANUW( .TRUE., %VAL( IVAR ), NPXIN( I ), 
+     :                           MEANV, VALPIX, STATUS )
 
 *  Get the mean variance from a word array.
-               ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
-                  CALL CCG1_CALVW( %VAL(IVAR), NPXIN(I), MEANV, STATUS ) 
- 
+            ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
+               CALL CCG1_MEANW( .TRUE., %VAL( IVAR ), NPXIN( I ), 
+     :                          MEANV, VALPIX, STATUS )
             END IF     
+
+*  Calculate weight from mean variance.
             WEIGHT( I ) = 1.0D0 / MEANV 
-            CALL MSG_SETD( 'MEANVAR', 1.0D0/WEIGHT(I) )
+            CALL MSG_SETD( 'MEANVAR', 1.0D0 / WEIGHT( I ) )
             CALL CCD1_MSG( ' ',
      :'    Mean variance for input image: ^MEANVAR', STATUS )   
-            CALL NDF_UNMAP( NDF(I), 'Variance', STATUS ) 
+            CALL NDF_UNMAP( NDF( I ), 'Variance', STATUS ) 
          ELSE
             WEIGHT( I ) = 1.0D0
          ENDIF
@@ -809,7 +807,7 @@
 *  If correction of scale factors or zero points is required, then mark
 *  the error stack and attempt to obtain a reference NDF to be used to
 *  normalise the corrections.
-      IF ( GETS .OR. GETZ .OR. GETV) THEN
+      IF ( GETS .OR. GETZ .OR. GETV ) THEN
          CALL ERR_MARK
          CALL CCD1_MSG( ' ', ' ', STATUS )
          CALL CCD1_NDFAC( 'REF', 'READ', 1, 1, IDUM, NDFREF, STATUS )
@@ -841,31 +839,32 @@
                NDF( NNDF ) = NDFREF
 
 *  Check that there is an existing WCS FrameSet
-               CALL NDF_STATE(NDF(CCD1_IREF), 'WCS', SWCS, STATUS)
+               CALL NDF_STATE( NDF( CCD1_IREF ), 'WCS', SWCS, STATUS )
                IF( .NOT. SWCS ) THEN
                   STATUS = SAI__ERROR
-                  CALL NDF_MSG( 'NDFNAME', NDF(I) )
+                  CALL NDF_MSG( 'NDFNAME', NDF( I ) )
                   CALL ERR_REP( 'DRIZZLE_NOAST', '  NDF ^NDFNAME '//
      :'does not have a WCS extension.',STATUS ) 
                   GOTO 940
                ENDIF  
          
 *  Get the index of the current frame for future use 
-               CALL CCD1_GTWCS(NDF(CCD1_IREF), IWCS, STATUS)
-               CFRAME(CCD1_IREF) = AST_GETI(IWCS, 'Current', STATUS)               
-* Check if the reference NDF has a veriance component, if so map
-* thsi component and work out the mean variance.
+               CALL CCD1_GTWCS( NDF( CCD1_IREF ), IWCS, STATUS )
+               CFRAME( CCD1_IREF ) = AST_GETI( IWCS, 'Current', STATUS )
+
+*  Check if the reference NDF has a variance component, if so map
+*  this component and work out the mean variance.
                CALL NDF_STATE( NDF( CCD1_IREF ), 
      :                         'Variance', VAR, STATUS )
                
                IF( VAR .AND. GETV ) THEN
 
-                  CALL NDF_TYPE( NDF(CCD1_IREF), 'Variance', ITYPE,
-     :                        STATUS )
-                  CALL NDF_MAP( NDF(CCD1_IREF), 'Variance', ITYPE, 
-     :                       'READ', IVAR, NPXIN(I), STATUS )
+                  CALL NDF_TYPE( NDF( CCD1_IREF ), 'Variance', ITYPE,
+     :                           STATUS )
+                  CALL NDF_MAP( NDF( CCD1_IREF ), 'Variance', ITYPE, 
+     :                         'READ', IVAR, NPXIN( I ), STATUS )
           
-* Calculate the mean variance for the image
+*  Calculate the mean variance for the image
 
 *  Get the mean variance from a byte array.
                   IF ( ITYPE .EQ. '_BYTE' ) THEN
@@ -902,9 +901,9 @@
                      CALL CCG1_CALVW( %VAL(IVAR), NPXIN(I), MEANV, 
      :                                STATUS ) 
  
-                  END IF     
-                  VARFAC =  MEANV 
-                  CALL NDF_UNMAP( NDF(I), 'Variance', STATUS )                  
+                  END IF
+                  VARFAC = MEANV 
+                  CALL NDF_UNMAP( NDF( I ), 'Variance', STATUS )
                ENDIF
             ELSE IF( GETV ) THEN
 
@@ -913,7 +912,7 @@
                CALL NDF_STATE( NDF( CCD1_IREF ), 'Variance', 
      :                         VAR, STATUS )
                IF( VAR ) THEN
-                  VARFAC = 1.0D0/WEIGHT( CCD1_IREF )
+                  VARFAC = 1.0D0 / WEIGHT( CCD1_IREF )
                ENDIF 
             END IF
          END IF
@@ -926,15 +925,12 @@
 *  If we're using variances as weights then scale all the images such
 *  either the reference NDF or the 1st image in the stack has weight
 *  of 1.0
-      IF( VAR .AND. GETV ) THEN
-      
+      IF ( VAR .AND. GETV ) THEN
          DO  IREF = 1, NIN
-         
-            IF( (CCD1_IREF .EQ. 0) .AND. (IREF .EQ. 1) ) THEN
-               VARFAC = 1.0D0/WEIGHT( IREF ) 
+            IF( ( CCD1_IREF .EQ. 0 ) .AND. ( IREF .EQ. 1 ) ) THEN
+               VARFAC = 1.0D0 / WEIGHT( IREF ) 
             ENDIF 
             WEIGHT( IREF ) = WEIGHT( IREF ) * VARFAC      
-                
          END DO 
       ENDIF
               
@@ -1034,7 +1030,7 @@
 *        3 0.99909 0.87089
 *        4 0.97846 7.0652
 *
-*  Frames don't have to be in order, but wierd things will happen if
+*  Frames don't have to be in order, but weird things will happen if
 *  there isn't an entry for every frame.
          CALL CCD1_ASFIO( 'CORRECT', 'READ', 'LIST', 0, FDIN, INOPN,
      :                    STATUS )
@@ -1051,14 +1047,11 @@
 
 *  Call CCD1_TRAN (a knock off of TRANNDF) to do the transformation of
 *  all the input images
-
             CALL CCD1_TRAN( NDF, NNDF, NIN, INGRP, CFRAME, 
      :                      FRCUR, NVAR, GETS, GETZ, SCALE,
      :                      ZERO, STATUS ) 
             IF ( STATUS .NE. SAI__OK ) GOTO 940
-
             CALL CCD1_MSG( ' ',  ' ', STATUS )
-               
          ENDIF              
 
       ENDIF
@@ -1067,9 +1060,9 @@
 *  =====================
 *  Get the data type for the input NDF
       IF ( CCD1_IREF .NE. 0 ) THEN
-         CALL NDF_TYPE( NDF(CCD1_IREF), 'Data', ITYPE, STATUS )
+         CALL NDF_TYPE( NDF( CCD1_IREF ), 'Data', ITYPE, STATUS )
       ELSE
-         CALL NDF_TYPE( NDF(1), 'Data', ITYPE, STATUS )
+         CALL NDF_TYPE( NDF( 1 ), 'Data', ITYPE, STATUS )
       ENDIF
 
 *  Create the output NDF, I'm going to make it a _REAL. 
@@ -1128,24 +1121,19 @@
       CALL CCD1_GTWCS( OUTNDF, OWCS, STATUS )
          
 *  Remove GRID, PIXEL, AXIS frames from original frameset since they're
-*  out of date now.
+*  out of date now.  This will leave us with just the non-automatic
+*  frames.
       IF( CCD1_IREF .NE. 0 ) THEN
-         CALL CCD1_GTWCS(NDF(CCD1_IREF), IWCS, STATUS)
-         CALL AST_SETI( IWCS, 'Current', CFRAME(CCD1_IREF), STATUS )
+         CALL CCD1_GTWCS( NDF( CCD1_IREF ), IWCS, STATUS )
+         CALL AST_SETI( IWCS, 'Current', CFRAME( CCD1_IREF ), STATUS )
       ELSE
-         CALL CCD1_GTWCS(NDF(1), IWCS, STATUS)
-         CALL AST_SETI( IWCS, 'Current', CFRAME(1), STATUS )
+         CALL CCD1_GTWCS( NDF( 1 ), IWCS, STATUS )
+         CALL AST_SETI( IWCS, 'Current', CFRAME( 1 ), STATUS )
       ENDIF
-      CALL CCD1_DMPRG( IWCS, 'PIXEL', 0, STATUS )
-      CALL CCD1_DMPRG( IWCS, 'AXIS', 0, STATUS )
-      CALL CCD1_DMPRG( IWCS, 'GRID', 0, STATUS )
+      CALL CCD1_DMPRG( IWCS, 'PIXEL', .FALSE., 0, STATUS )
+      CALL CCD1_DMPRG( IWCS, 'AXIS', .FALSE., 0, STATUS )
+      CALL CCD1_DMPRG( IWCS, 'GRID', .FALSE., 0, STATUS )
    
-*  We now just have the non-automatic frames of the input WCS component.
-*  This will contain the Current frame (which may or may not be CCD_REG)
-*  and an indeterminate number of other ones which we know nothing about,
-*  perhaps including CCD_GEN.  Now attach these to the default frameset
-*  generated by CCD1_GTWCS.
-
 *  Lets find out which frame contains the PIXEL domain (its going to be
 *  frame 2, but we may as well do it properly) in the output WCS frameset.
       NFRM = AST_GETI( OWCS, 'Nframe', STATUS )
@@ -1203,9 +1191,9 @@
       END DO
 
 *  Erase the count array from the output NDF, we don't need it anymore
-      CALL CMP_UNMAP(DLOC, 'Count', STATUS)
-      CALL DAT_ERASE(DLOC, 'Count', STATUS)
-
+      CALL CMP_UNMAP( DLOC, 'Count', STATUS )
+      CALL DAT_ERASE( DLOC, 'Count', STATUS )
+      
 *  Display information about the output mosaic.
 *  ===========================================     
 
@@ -1259,8 +1247,8 @@
       CALL AST_ANNUL( MAPZ, STATUS )
       
       DO I = 1, NIN
-         CALL AST_ANNUL( FRCUR(I), STATUS )
-         CALL AST_ANNUL( MAPN(I), STATUS )
+         CALL AST_ANNUL( FRCUR( I ), STATUS )
+         CALL AST_ANNUL( MAPN( I ), STATUS )
       END DO
 
       CALL AST_ANNUL( IWCS, STATUS )
@@ -1273,8 +1261,8 @@
       CALL DAT_ANNUL( DLOC, STATUS )
       CALL NDF_ANNUL( OUTNDF, STATUS )
       DO I = 1, NNDF
-         CALL NDF_UNMAP( NDF(I),'*', STATUS )
-         CALL NDF_ANNUL( NDF(I), STATUS )
+         CALL NDF_UNMAP( NDF( I ), '*', STATUS )
+         CALL NDF_ANNUL( NDF( I ), STATUS )
       END DO
 
       CALL NDF_END( STATUS )
@@ -1286,7 +1274,7 @@
 *  If an error occurred, then report a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN
          CALL ERR_REP( 'DRIZZLE_ERR',
-     :   'DRIZZLE: Error drizziling a mosaic from input NDFs.',
+     :   'DRIZZLE: Error drizzling a mosaic from input NDFs.',
      :      STATUS )
       END IF
 
@@ -1295,3 +1283,5 @@
 
 *  Time at the bar please...
       END
+
+* $Id$
