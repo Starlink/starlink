@@ -1,9 +1,26 @@
-*+  BARYCORR - Performs barycentric corrections to timetag
-      SUBROUTINE BARYCORR ( STATUS )
-*
-*    Description :
-*
-*     in SIMPLE mode (hidden default = TRUE), then the mid-point of the
+      SUBROUTINE BARYCORR( STATUS )
+*+
+*  Name:
+*     BARYCORR
+
+*  Purpose:
+*     Performs barycentric corrections on binned and event data
+
+*  Language:
+*     Starlink Fortran
+
+*  Type of Module:
+*     ASTERIX task
+
+*  Invocation:
+*     CALL BARYCORR( STATUS )
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Description:
+*     In SIMPLE mode (hidden default = TRUE), then the mid-point of the
 *     observation is determined. That time, together with the RA, Dec of
 *     the observation is used to barycentrically correct the header components
 *     BASE_TAI and BASE_UTC of the file. Handles event and binned data.
@@ -20,40 +37,6 @@
 *     not be known, so the program can correct the timetags assuming zero
 *     orbital height. This assumption is inaccurate by up to +/-50msec.
 *
-*    Environment parameters :
-*     parameter(dimensions) =type(access,i.e. R,W or U)
-*           <description of parameter>
-*    Method :
-*
-*     get MJD of observation. Get orbital elements of satellite.
-*     get RA DEC of field centre. Apply Barycentric correction to timetag
-*            DO ABOVE AS OFTEN AS USER DEMANDS
-*     write relevant components into HDS structure and HISTORY
-*
-*    Deficiencies :
-*     <description of any deficiencies>
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
-*     author (Doug Bertram,BHVAD::DB)
-*    History :
-*
-*     20-Jun-90 : Original (DB)
-*     23-Nov-90 : V1.5-0 Upgrade (DB)
-*     28 Mar 94 : V1.7-0 Ditto (DB)
-*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
-*
-*    Type definitions :
-*
-      IMPLICIT NONE
-*
-*    Global constants :
-*
-      INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-*
-*    Structure definitions :
-*
 *      STRUCTURE /POS_REC/
 *         INTEGER UT/0/				! hk clock (1/2s) time
 *         REAL SATGEO(3)/0.,0.,0./		! Sat vector in geo frame
@@ -63,77 +46,138 @@
 *         INTEGER*2 IBSIZ_EM8T                   ! B field. 10^{-8} Tesla
 *         INTEGER*2 LVAL_MILLERAD
 *      END STRUCTURE
-*
-*    Status :
-*
-      INTEGER STATUS
-*
-*    Local constants :
-*
-      DOUBLE PRECISION		S2_REF_MJD
-        PARAMETER               ( S2_REF_MJD = 47892.0D0 )
-*
-*    Local variables :
-*
-*      RECORD /POS_REC/ 		POS
 
-      DOUBLE PRECISION 		ROSAT_MATRIX(6)		!XYZ & DX/DT DY/DT, DZ/DT
+*  Usage:
+*     barycorr {parameter_usage}
 
-      REAL 			BARY			! Barycentric correction
-							! in seconds
-      REAL 			SAT_GEOCENTRIC(3)   	! Geocentric XYZ
-      REAL 			SATGEO(3)           	! Geographic XYZ
+*  Environment Parameters:
+*     {parameter_name}[pdims] = {parameter_type} ({parameter_access_mode})
+*        {parameter_description}
 
-      INTEGER 			UT,IFID,OFID
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
+*     {algorithm_description}...
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  Implementation Status:
+*     {routine_implementation_status}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
+*     {routine_deficiencies}...
+
+*  References:
+*     {task_references}...
+
+*  Keywords:
+*     barycorr, usage:public
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1995
+
+*  Authors:
+*     DB: Doug Bertram (ROSAT, University of Birmingham)
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*     20 Jun 1990 V1.4-0 (DB):
+*        Original version.
+*     23 Nov 1990 V1.5-0 (DB):
+*        Upgrade.
+*     28 Mar 1994 V1.7-0 (DB):
+*        Ditto (DB)
+*     24 Nov 1994 V1.8-0 (DJA):
+*        Now use USI for user interface
+*     16 Jan 1996 V2.0-0 (DJA):
+*        ADI port on event handling, put ROSAT orbit stuff back in.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
 
 *-
-*         INTEGER*2 IXRT(3)        ! Restored XRT pointing RA DEC Roll (arcmin)
-*        INTEGER*2 ILONG
-*        INTEGER*2 ILAT
-*        INTEGER*2 B_EM8T
-*        INTEGER*2 LVAL_MILLERAD
-*        INTEGER KEY              ! Key for indexed read
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'ADI_PAR'
+
+*  Status:
+      INTEGER			STATUS             	! Global status
+
+*  External References:
+      EXTERNAL			CHR_INSET
+        LOGICAL			CHR_INSET
+
+*  Local Constants:
+      DOUBLE PRECISION		S2_REF_MJD
+        PARAMETER               ( S2_REF_MJD = 47892.0D0 )
+
+      CHARACTER*30		VERSION
+        PARAMETER		( VERSION = 'BARYCORR Version V2.0-0' )
+
+*  Local Variables:
+      CHARACTER*40             	INSTRUM     		! Instrument string
+      CHARACTER*40             	OBSY           		! Observatory string
+      CHARACTER*20		TLIST			! Name of time list
+
+      DOUBLE PRECISION		EQUINOX			! Equinox of obs'n
+      DOUBLE PRECISION 		MJDOBS			! Base MJD of i/p obs'n
+      DOUBLE PRECISION		NPOINT(2)		! Nominal pointing
+      DOUBLE PRECISION 		NU_MJDOBS		! Base MJD of o/p obs'n
+      DOUBLE PRECISION          NU_BASE_TAI		!
+      DOUBLE PRECISION 		TMIN, TMAX		! Input time range
+
+      INTEGER			DETID			! Detector info
+      INTEGER			IFID			! Input dataset
+      INTEGER			NVAL			! # values read
+      INTEGER			OFID			! Output dataset
+      INTEGER			PIXID, PRJID, SYSID	! Astrometry
+      INTEGER			TIMID			! Timing info
+      INTEGER			TAX			! Time axis number
+
         INTEGER I
         INTEGER LUN_POS          ! Log Unit for ATT_POS_SAT output (rosat specific)
 *        DOUBLE PRECISION BARY_HK2MJD !DP FUNCTION HK SECS TO MJD
 *        INTEGER BARY_MJD2HK ! integer function MJD to HK 1/2 secs
-* END INCLUDE SECTION
-*    Function declarations :
-*      INTEGER BARY_MJD2HK ! integer function MJD to HK 1/2 secs
-*     <declarations for function references>
-*    Local constants :
-*     <local constants defined by PARAMETER>
-*    Local variables :
-      CHARACTER*(DAT__SZLOC)   INLOC          ! locater to event dataset
-      CHARACTER*(DAT__SZLOC)   OUTLOC         ! locater to event dataset
-      CHARACTER*(DAT__SZLOC)   MORELOC        ! locater to .MORE
-      CHARACTER*(DAT__SZLOC)   ASTLOC         ! loc to .MORE.ASTERIX
-      CHARACTER*(DAT__SZLOC)   HEADLOC        ! loc to .MORE.ASTERIX.HEADER
-      CHARACTER*(DAT__SZLOC)   INSTRLOC       ! loc to .MORE.ASTERIX.INSTRUMENT
-      CHARACTER*(DAT__SZLOC)   TIMLOC         ! loc to RAW_TIMETAG, TIME*.*
-      CHARACTER*(DAT__SZTYP)   TYPE           ! for DAT_TYPE
 
-      CHARACTER*40             OBSY           ! OBSERVATORY string
-      CHARACTER*40             INSTRUMENT     ! instrument string
       CHARACTER*80             POS_FILE       ! Name of orbit file
       CHARACTER*80             HISTXT(10)     ! add to HISTORY
-      CHARACTER*11             DATE           ! Date string
 
       DOUBLE PRECISION         MJD_START      !MJD start of observation
       DOUBLE PRECISION         MJD_STOP       !MJD stop of observation
-      DOUBLE PRECISION         RA_CENTRE      !RA  of centre FOV
-      DOUBLE PRECISION         DEC_CENTRE     !Dec of centre FOV
       DOUBLE PRECISION         BASE_UTC       !SECS since start of currentMJD
       DOUBLE PRECISION         BASE_TAI       !continous time (in days) from 1/1/72
-      DOUBLE PRECISION         EQUINOX        ! equinox
-      DOUBLE PRECISION         NU_BASE_UTC    ! equinox
-      DOUBLE PRECISION         NU_BASE_TAI    ! equinox
 
       REAL                     RA,DEC         ! REAL RA nad Dec
       REAL                     OBS_LENGTH     !Obs Length of event dataset
       REAL                     UPDATE_PERIOD  ! update period for bary corr
-      REAL                     TIME_MIN       !smallest `T' in raw_timetags
-      REAL                     TIME_MAX       ! largest  "    "   "   "
       REAL                     DEF_UPD_PRD    ! 1% of max - min
       REAL                     BASE,SCALE,DS  ! Base & Scale of time axis
 
@@ -142,7 +186,7 @@
       INTEGER                  TIMEPTR        !PTR to RAW_TIMETAG or TIME axis
       INTEGER                  ITIMEPTR       !PTR to input time events/axis
       INTEGER                  DUMMYPTR       !PTR to DUMMY
-      INTEGER                  LDIM(DAT__MXDIM) ! input dimensions
+      INTEGER                  LDIM(ADI__MXDIM) ! input dimensions
       INTEGER                  NDIMS          ! number of dimensions
       INTEGER                  T_BINS         ! number of time bins
 
@@ -154,15 +198,11 @@
 *      INTEGER                  END_KEY        ! last relevant KEY in pos file
       INTEGER                  RECORD_SEP     ! The POS file update period (sec)
       INTEGER                  ACTVAL         ! LIST MAPV reads
-      INTEGER                  N_EVENTS       ! No of events in list
+      INTEGER                  NEVENT       ! No of events in list
       INTEGER                  FILE_STATUS    ! IOSTAT for ATT POS SAT open
       INTEGER                  FILE_START     !   "     "   "   "   " base key
       INTEGER                  FILE_END       !   "     "   "   "   " end key
       INTEGER                  BASE_MJD       ! MJD whole part only
-      INTEGER                  NU_BASE_MJD    ! replacement for above (SIMPLE)
-      INTEGER                  EQUI           ! equinox of RA DEC system
-      INTEGER                  T_AXIS         ! index number of time axis
-      INTEGER                  AXN            ! axis index
 
       LOGICAL                  OK,OK1,OK2     ! various checks
       LOGICAL                  VALID_ROSAT    ! file is a ROSAT file
@@ -173,283 +213,199 @@
       LOGICAL                  PRESS_ON       ! press on regardless
       LOGICAL                  RAW_TIME_OK    ! raw timetags used
       LOGICAL                  TIME_OK        ! `TIMETAG'  list used.
-      LOGICAL                  POK            ! PROCESSING THERE
       LOGICAL                  NOT_ROS_GO     ! not a rosat file ... but GO!!
-      LOGICAL                  SIMPLE_MODE    ! Run BARYCORR in simple_mode
+      LOGICAL                  SIMPLE    ! Run BARYCORR in SIMPLE
       LOGICAL                  ULTRA_SIMPLE   ! run BARYCORR in ultra_simple mode
       LOGICAL                  ABORT          ! abort barycorr
       LOGICAL                  AX_REG         ! is the axis regular
       LOGICAL                  BINNED         ! complex mode, data binned
       LOGICAL                  AX_WID_OK      ! AXIS widths are present
-      character*80 text(10)
-*
-*    Local data :
-*
-      DATA UPDATE_PERIOD /0.0/
-      DATA POS_FILE_OK /.FALSE./
-      DATA IGNORE_POS /.FALSE./
-      DATA TIME_OK  /.FALSE./
-*
-*    Version :
-*
-      CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'BARYCORR Version 1.8-0')
-*-
+*.
 
-*    Version id
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Version id
       CALL MSG_PRNT( VERSION )
 
-*    Initialise
+*  Initialise ASTERIX
       CALL AST_INIT()
 
-* get input data
-        CALL USI_TASSOC2('INP', 'OUT','READ', IFID, OFID, STATUS)
-        CALL USI_SHOW(' Input data {INP}',status)
-        CALL ADI1_GETLOC( IFID, INLOC, STATUS )
-        CALL ADI1_GETLOC( OFID, OUTLOC, STATUS )
+*  Initialise
+      UPDATE_PERIOD = 0.0
+      POS_FILE_OK = .FALSE.
+      IGNORE_POS = .FALSE.
+      TIME_OK = .FALSE.
+      ULTRA_SIMPLE = .FALSE.
 
-      CALL MSG_PRNT( 'Copying input to output' )
-      CALL ADI_FCOPY( IFID, OFID, STATUS )
+*  Get input data
+      CALL USI_ASSOC( 'INP', 'EventDS|BinDS', 'READ', IFID, STATUS )
+      CALL USI_SHOW(' Input data {INP}',status)
 
-* see if file is a valid HDS file
-        CALL BDA_CHKAST(INLOC, OK, STATUS)
-        IF(.NOT.OK)THEN
-         CALL MSG_PRNT(' Input file not a valid HDS file')
-         GOTO 999
-        ENDIF
+*   What kind of object did the user supply?
+      CALL ADI_DERVD( IFID, 'BinDS', BINNED, STATUS )
 
+*  Get output dataset as clone of input
+      CALL USI_CLONE( 'INP', 'OUT', '*', OFID, STATUS )
+      IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-* get locators to MORE & ASTERIX etc
-*find MORE -> ASTERIX -> HEADER
-        CALL BDA_LOCAST(OUTLOC, ASTLOC, STATUS)
-        CALL BDA_LOCHEAD(OUTLOC, HEADLOC, STATUS)
-        CALL BDA_LOCINSTR(OUTLOC, INSTRLOC, STATUS)
-* does the user want simple mode?
+*  Does the user want simple mode?
+      CALL USI_GET0L( 'SIMPLE', SIMPLE, STATUS )
+      IF ( SIMPLE ) THEN
+        SATCORR = .FALSE.
+        POS_FILE_OK = .FALSE.
+      END IF
 
-        CALL USI_DEF0L('SIMPLE_MODE', .TRUE. , STATUS)
-        CALL USI_GET0L('SIMPLE_MODE', SIMPLE_MODE, STATUS)
-        IF(SIMPLE_MODE)THEN
-          SATCORR = .FALSE.
-          POS_FILE_OK = .FALSE.
-        ENDIF
-        CALL DAT_THERE(ASTLOC, 'PROCESSING', POK, STATUS)
+*  Obtaining the observatory information is not necessary in simple mode
+      IF ( .NOT. SIMPLE ) THEN
 
-* obtaining the observatory information is not necessary in simple mode
-        IF( .NOT. SIMPLE_MODE)THEN
-*attempt to perform correction on event by even basis,
-* Get OBSERVATORY information
-         CALL DAT_THERE(HEADLOC, 'OBSERVATORY', OK, STATUS)
-*         IF(OK)THEN
-*           CALL CMP_GET0C(HEADLOC, 'OBSERVATORY', OBSY, STATUS)
-*           CALL CMP_GET0C(HEADLOC, 'INSTRUMENT', INSTRUMENT, STATUS)
-*           IF(OBSY(1:6) .EQ. 'ROSAT')THEN
-*            VALID_ROSAT = .TRUE.
-*           ELSEIF(INSTRUMENT(1:3) .EQ. 'WFC')THEN
-*            VALID_ROSAT = .TRUE.
-*           ELSEIF(INSTRUMENT(1:3) .EQ. 'HRI')THEN
-*            VALID_ROSAT = .TRUE.
-*           ELSEIF(INSTRUMENT(1:4) .EQ. 'PSPC')THEN
-*            VALID_ROSAT = .TRUE.
-*           ELSE
-*            VALID_ROSAT = .FALSE.
-*           ENDIF
-*         ELSE
-*          VALID_ROSAT = .FALSE.
-*          CALL MSG_PRNT(' file is not a valid ROSAT file')
-*          CALL MSG_PRNT(' No orbit data can be taken into account')
-*          CALL MSG_PRNT(' Earth-centred Barycentric corrections will')
-*          CALL MSG_PRNT(' be applied if all relevant info is present')
-*         ENDIF
-
-
-	 CALL DAT_THERE(OUTLOC, 'RAW_TIMETAG', OK, STATUS)
-         RAW_TIME_OK = OK
-         IF( .NOT. OK ) THEN
-* no raw_timetag, so there must be a time axis (if the user is competent)
-* find it and map it.
-            CALL BDA_CHKDATA(OUTLOC, OK, NDIMS, LDIM, STATUS)
-            IF (.NOT. OK)THEN
-              CALL MSG_PRNT('RAW_TIMETAG absent & no Data present')
-              CALL MSG_PRNT(' ** Rerun BARYCORR in SIMPLE mode')
-              GOTO 999
-            ENDIF
-            BINNED = .TRUE.
-            CALL BARY_FINDTIME(INLOC, OK, AX_REG, AXN, TIME_MAX,
-     :                                 TIME_MIN, DUMMYPTR, N_EVENTS)
-            CALL BDA_MAPAXVAL(INLOC, 'READ', AXN, ITIMEPTR, STATUS)
-            IF(AX_REG)THEN
-              CALL BDA_GETAXVAL(INLOC,AXN,BASE,SCALE,N_EVENTS,STATUS)
-              DS = ABS(SCALE)
-* going to use this as the width for the regular array mapped as irregular
-              CALL BDA_CREAXVAL(OUTLOC, AXN, .FALSE., N_EVENTS, STATUS)
-              CALL BDA_CREAXWID(OUTLOC, AXN, .FALSE., N_EVENTS, STATUS)
-            ENDIF
-
-            CALL BDA_CHKAXWID(OUTLOC,AXN,OK,OK1,I,STATUS)
-            IF(I .GT. 0)THEN
-              AX_WID_OK = .TRUE.
-              CALL BDA_MAPAXVAL(OUTLOC, 'WRITE', AXN, TIMEPTR, STATUS)
-              CALL BDA_MAPAXWID(OUTLOC, 'WRITE', AXN, WIDTHPTR, STATUS)
-              IF(AX_REG)THEN
-               CALL ARR_INIT1R(DS,N_EVENTS,%VAL(WIDTHPTR),STATUS)
-               CALL ARR_REG1R(BASE,SCALE,N_EVENTS,%VAL(TIMEPTR),STATUS)
-*               call nonsense(n_events,%val(timeptr))
-              ENDIF
-            ELSE
-              AX_WID_OK = .FALSE.
-              CALL BDA_MAPAXVAL(OUTLOC, 'WRITE', AXN, TIMEPTR, STATUS)
-              CALL MSG_PRNT(' Time axis WIDTH array is missing')
-              CALL MSG_PRNT(' BARYCORR applied only on data array')
-            ENDIF
-         ELSE
-* map Timetag list
-           BINNED = .FALSE.
-           CALL LIST_MAPV(OUTLOC, 'RAW_TIMETAG', '_REAL',
-     :     'UPDATE',TIMEPTR,N_EVENTS,STATUS)
-           CALL DAT_FIND(OUTLOC, 'RAW_TIMETAG', TIMLOC, STATUS)
-*trap status if timetag not ok
-           IF(STATUS .NE. SAI__OK)THEN
-             CALL ERR_FLUSH(STATUS)
-             CALL MSG_PRNT(' FATAL error mapping RAW_TIMETAG list')
-             GOTO 999
-           ENDIF
-         ENDIF
-
-         CALL ARR_RANG1R(N_EVENTS,%VAL(TIMEPTR),TIME_MIN,
-     :                                          TIME_MAX,STATUS)
-         CALL MSG_SETI('EVENTS', N_EVENTS)
-         IF(BINNED)THEN
-           CALL MSG_PRNT('There are ^EVENTS bins in this file')
-         ELSE
-           CALL MSG_PRNT('There are ^EVENTS events in this file')
-         ENDIF
-*if SIMPLE_MODE is chosen, then the object of the exercise is to find the
-*mid point (defined by (stop_time - start_time)/2) and to use that
-*time to calculate the barycentric correction and apply it to the
-*relevant components in the header.
-*
-*    in *NON_SIMPLE* mode, then ...
-*if the object is not a valid ROSAT  file then we must try to get as
-* much information as possible about the file, perhaps even with user
-* input in the last resort.  MUST BE ASTERIX88 STANDARD FORMAT
-
-* get required time data from VALID ROSAT event file
-* check that RAW_TIMETAG is available
-* MUST find a raw_timetag  or timetag list in either case
-*
-* Check that the data exists
+*    Check for ROSATish things
+        CALL DCI_GETID( IFID, DETID, STATUS )
+        CALL ADI_CGET0C( DETID, 'Mission', OBSY, STATUS )
+        VALID_ROSAT = .FALSE.
+        IF ( OBSY(1:6) .EQ. 'ROSAT' ) THEN
+          VALID_ROSAT = .TRUE.
         ELSE
-*SIMPLE MODE JUMP POINT
-* look for raw_timetag (event data set)
-	 CALL DAT_THERE(OUTLOC, 'RAW_TIMETAG', OK, STATUS)
-         RAW_TIME_OK = OK
-         IF (.NOT. OK)THEN
-*  binned dataset, find out dimensionality
-           CALL BDA_CHKDATA(OUTLOC, OK, NDIMS, LDIM, STATUS)
-           IF(.NOT. OK)THEN
-             CALL MSG_PRNT(' No RAW_TIMETAG OR DATA present!')
-             CALL MSG_PRNT(' if you continue, barycentric correction')
-             CALL MSG_PRNT(' will occur on basis of header data only')
-             CALL USI_DEF0L('ABORT', .FALSE. , STATUS)
-             CALL USI_GET0L('ABORT', ABORT, STATUS)
-             IF (ABORT)THEN
-               CALL MSG_PRNT(' BARYCORR EXITING...')
-               GOTO 999
-             ELSE
-               ULTRA_SIMPLE = .TRUE.
-               TIME_MIN = 0
-               N_EVENTS = 0
-               TIME_MAX = 0
-               GOTO 500
-             ENDIF
-           ENDIF
-            CALL BARY_FINDTIME(INLOC, OK, AX_REG, AXN, TIME_MAX,
-     :                                 TIME_MIN, DUMMYPTR, N_EVENTS)
-* output will be a binned dataset, as the barycentric corrections will
-* vary as a function of time, then the o/p file will not have regular
-* spacing.
-
-           IF(.NOT. OK)THEN
-             CALL MSG_PRNT(' no RAW_TIMETAG & no time axis present!')
-             CALL MSG_PRNT(' if you continue, barycentric correction')
-             CALL MSG_PRNT(' will occur on basis of header data only')
-             CALL USI_DEF0L('ABORT', .TRUE. , STATUS)
-             CALL USI_GET0L('ABORT', ABORT, STATUS)
-             IF (ABORT)THEN
-               CALL MSG_PRNT(' BARYCORR EXITING...')
-               GOTO 999
-             ELSE
-               ULTRA_SIMPLE = .TRUE.
-             ENDIF
-           ENDIF
-         ELSE
-*LIST and axis meeting point
-* map Timetag list
-          CALL LIST_MAPV(OUTLOC, 'RAW_TIMETAG', '_REAL',
-     :    'UPDATE',TIMEPTR,N_EVENTS,STATUS)
-          CALL DAT_FIND(OUTLOC, 'RAW_TIMETAG', TIMLOC, STATUS)
-*trap status if timetag not ok
-          IF(STATUS .NE. SAI__OK)THEN
-            CALL ERR_FLUSH(STATUS)
-            CALL MSG_PRNT(' FATAL error mapping RAW_TIMETAG list')
-            GOTO 999
-          ENDIF
-
-          CALL ARR_RANG1R(N_EVENTS,%VAL(TIMEPTR),TIME_MIN,
-     :                                   TIME_MAX,STATUS)
-          CALL MSG_SETI('EVENTS', N_EVENTS)
-          CALL MSG_PRNT('There are ^EVENTS events in this file')
-         ENDIF
-        ENDIF
-*SIMPLE AND COMPLEX MEETING POINT.
-
-500      CONTINUE
-* if PROCESSING not there then create it.
-        CALL PRF_GET( OFID, 'BARY_CORR_DONE', OK2, STATUS )
-
-        IF ( OK2 ) THEN
-          CALL MSG_PRNT(' This file has already been corrected')
-          CALL MSG_PRNT('     exiting....')
-          GOTO 999
+          CALL ADI_CGET0C( DETID, 'Instrument', INSTRUM, STATUS )
+          VALID_ROSAT = CHR_INSET( 'WFC,HRI,PSPC', INSTRUM )
+        END IF
+        IF ( STATUS .NE. SAI__OK ) THEN
+          CALL ERR_ANNUL( STATUS )
         END IF
 
-* obtain RA DEC of field centre
-        CALL CMP_GET0D(HEADLOC, 'FIELD_RA', RA_CENTRE, STATUS)
-        CALL CMP_GET0D(HEADLOC, 'FIELD_DEC', DEC_CENTRE, STATUS)
-        CALL CMP_GET0I(HEADLOC, 'EQUINOX', EQUI, STATUS)
-        EQUINOX = DBLE (EQUI)
+*    Not ROSAT
+        IF ( .NOT. VALID_ROSAT ) THEN
+          CALL MSG_PRNT( 'File is not a recognisable ROSAT file. No '/
+     :                   /'orbit data can be taken into account. '/
+     :                   /'Earth-centred Barycentric corrections will'/
+     :                   /'be applied if all relevant info is present.')
+          SIMPLE = .TRUE.
+        END IF
 
-        IF(STATUS .NE. SAI__OK)THEN
-          CALL MSG_PRNT(' FATAL error obtaining RA and DEC of'//
-     :                    ' field centre')
-          GOTO 999
+      END IF
+
+*  Binned data
+      IF ( BINNED ) THEN
+
+*    Get dimensionality
+        CALL BDI_GETSHP( OFID, ADI__MXDIM, LDIM, NDIMS, STATUS )
+
+*    Locate time axis
+        CALL BDI0_FNDAXC( OFID, 'T', TAX, STATUS )
+
+*    No time axis means ultra simple mode
+        IF ( STATUS .LE. SAI__OK ) THEN
+          CALL ERR_ANNUL( STATUS )
+          ULTRA_SIMPLE = .TRUE.
+
         ELSE
-          RA = REAL(RA_CENTRE)
-          DEC = REAL(DEC_CENTRE)
-        ENDIF
 
-* get Integer MJD number
-        CALL CMP_GET0I(HEADLOC, 'BASE_MJD', BASE_MJD, STATUS)
+*      Map input time axis
+          NEVENT = LDIM(TAX)
+          CALL BDI_AXMAPD( IFID, TAX, 'Data', 'READ', ITIMEPTR, STATUS )
 
-* get TAI offsets in the day
-        CALL CMP_GET0D(HEADLOC, 'BASE_TAI', BASE_TAI, STATUS)
-        CALL CMP_GET0D(HEADLOC, 'BASE_UTC', BASE_UTC, STATUS)
-        CALL CMP_GET0R(HEADLOC, 'OBS_LENGTH', OBS_LENGTH, STATUS)
+*      Map output
+          CALL BDI_AXMAPD( OFID, TAX, 'Data', 'UPDATE', TIMEPTR,
+     :                     STATUS )
 
-        IF(STATUS .NE. SAI__OK)THEN
-          CALL MSG_PRNT(' FATAL error obtaining Time offsets')
-          GOTO 999
-        ENDIF
+*      Widths present?
+          CALL BDI_AXCHK( IFID, TAX, 'Width', AX_WID_OK, STATUS )
+          IF ( AX_WID_OK ) THEN
+            CALL BDI_AXMAPD( OFID, TAX, 'Width', 'UPDATE', WIDTHPTR,
+     :                       STATUS )
+          ELSE
+            CALL MSG_PRNT(' Time axis WIDTH array is missing')
+            CALL MSG_PRNT(' BARYCORR applied only on data array')
+          END IF
+
+        END IF
+
+      ELSE
+
+*    Mark as event dataset
+        BINNED = .FALSE.
+
+*    Get event dataset info
+        CALL EDI_GETNS( IFID, NEVENT, NVAL, STATUS )
+
+*    Define the default to the TLIST parameter
+        CALL EDI_DEFLD( IFID, 'TLIST', 'T', 'name', STATUS )
+
+*    Get name of list to use as source of event time offsets
+        CALL EDI_SELCTN( IFID, 'TLIST', TLIST, STATUS )
+        IF ( STATUS .NE. SAI__OK ) GOTO 99
+
+*    Map the time list
+        CALL EDI_MAPR( OFID, TLIST, 'UPDATE', 0, 0, TIMEPTR, STATUS )
+
+*    Trap status if timetag not ok
+        IF ( STATUS .NE. SAI__OK ) THEN
+          CALL MSG_SETC( 'L', TLIST )
+          CALL ERR_REP( ' ', 'FATAL error mapping ^L list', STATUS )
+          GOTO 99
+        END IF
+
+      END IF
+
+*  Find range of times supplied
+      IF ( .NOT. ULTRA_SIMPLE ) THEN
+        CALL ARR_RANG1D( NEVENT, %VAL(TIMEPTR), TMIN, TMAX, STATUS )
+        CALL MSG_SETI( 'EVENTS', NEVENT )
+        IF ( BINNED ) THEN
+          CALL MSG_PRNT( 'There are ^EVENTS bins in this file' )
+        ELSE
+          CALL MSG_PRNT( 'There are ^EVENTS events in this file' )
+        END IF
+      END IF
+
+*  Check that we haven't already applied the correction
+      CALL PRF_GET( OFID, 'BARY_CORR_DONE', OK2, STATUS )
+      IF ( OK2 ) THEN
+        CALL MSG_PRNT( 'This file has already been corrected, '/
+     :                 /'exiting...')
+        GOTO 99
+      END IF
+
+*  Obtain RA, DEC of field centre, and equinox of coordinates
+      CALL WCI_GETIDS( IFID, PIXID, PRJID, SYSID, STATUS )
+      IF ( STATUS .NE. SAI__OK ) GOTO 99
+      CALL ADI_CGET1D( PRJID, 'NPOINT', 2, NPOINT, NVAL, STATUS )
+      IF ( STATUS .NE. SAI__OK ) THEN
+        CALL ERR_ANNUL( STATUS )
+        CALL ADI_CGET1D( PRJID, 'SPOINT', 2, NPOINT, NVAL, STATUS )
+      END IF
+      CALL ADI_CGET0D( SYSID, 'EQUINOX', EQUINOX, STATUS )
+      IF ( STATUS .NE. SAI__OK ) THEN
+        CALL MSG_PRNT(' FATAL error obtaining RA and DEC of'//
+     :                    ' field centre')
+        GOTO 99
+      ELSE
+        RA = NPOINT(1)
+        DEC = NPOINT(2)
+      END IF
+
+*  Get TAI offsets in the day
+      CALL TCI_GETID( OFID, TIMID, STATUS )
+      CALL ADI_CGET0D( TIMID, 'MJDObs', MJDOBS, STATUS )
+      BASE_MJD = INT(MJDOBS)
+      BASE_UTC = (MJDOBS - DBLE(BASE_MJD))*86400D0
+      CALL ADI_CGET0D( TIMID, 'TAIObs', BASE_TAI, STATUS )
+      CALL ADI_CGET0D( TIMID, 'ObsLength', OBS_LENGTH, STATUS )
+      IF ( STATUS .NE. SAI__OK ) THEN
+        CALL ERR_REP( ' ', 'FATAL error obtaining timing parameters',
+     :                STATUS )
+        GOTO 99
+      END IF
 
 *if ROSAT then -> get LUN for position file.  ATT_POS_SAT output
-*        IF(VALID_ROSAT .AND.( .NOT. SIMPLE_MODE) )THEN
+*        IF(VALID_ROSAT .AND.( .NOT. SIMPLE) )THEN
 *
 * Ask if orbit correction is required
 *          CALL USI_GET0L('SATCORR', SATCORR, STATUS)
 * The unix version of barycorr doesn't support the orbital file format
            SATCORR = .FALSE.
 *
-*          IF (STATUS .NE. SAI__OK) GOTO 999
+*          IF (STATUS .NE. SAI__OK) GOTO 99
 *
 *   Is satellite correction required ?
 *          IF (SATCORR) THEN
@@ -457,7 +413,7 @@
 *    Get the name of the orbit file
 *             CALL USI_GET0C('POS_FILE', POS_FILE, STATUS)
 *
-*             IF (STATUS .NE. SAI__OK) GOTO 999
+*             IF (STATUS .NE. SAI__OK) GOTO 99
 *
 *             CALL FIO_GUNIT(LUN_POS,STATUS)
 *
@@ -469,7 +425,7 @@
 *   If file can't be opened type an error message and exit.
 *   	     IF (FILE_STATUS .NE. 0) THEN
 *                CALL MSG_PRNT('**Error opening position record file**')
-*                GOTO 999
+*                GOTO 99
 *             ENDIF
 *
 *          ENDIF
@@ -487,9 +443,9 @@
 *
 * compute start key in pos file from the MIN and MAX times
 *          MJD_START = DBLE(BASE_MJD) +
-*     :                       (BASE_UTC+DBLE(TIME_MIN))/(8.64D04)
+*     :                       (BASE_UTC+DBLE(TMIN))/(8.64D04)
 *          MJD_STOP  = DBLE(BASE_MJD) +
-*     :                       (BASE_UTC + DBLE(TIME_MAX))/8.64D04
+*     :                       (BASE_UTC + DBLE(TMAX))/8.64D04
 *          BASE_KEY = BARY_MJD2HK(MJD_START)
 *          END_KEY = BARY_MJD2HK(MJD_STOP)
 *
@@ -509,11 +465,11 @@
 *             CALL  USI_DEF0L('GO_ON', .TRUE. ,STATUS)
 *             CALL  USI_GET0L('GO_ON', IGNORE_POS, STATUS)
 *
-*             IF (STATUS .NE. SAI__OK) GOTO 999
+*             IF (STATUS .NE. SAI__OK) GOTO 99
 *
 *             IF( .NOT. IGNORE_POS )THEN
 *               CALL MSG_PRNT(' exiting ... ')
-*                GOTO 999
+*                GOTO 99
 *             ELSE
 *               PRESS_ON = .TRUE.
 *                SATCORR = .FALSE.
@@ -553,56 +509,56 @@
       IF( .NOT. POS_FILE_OK ) THEN
          LUN_POS=0
       ENDIF
-*
-* reset the desired update  period, if Earth centred corrections required
-       IF(SIMPLE_MODE)THEN
-       UPDATE_PERIOD = (TIME_MAX-TIME_MIN)/100.0
-       ELSEIF (.NOT. SATCORR)THEN
-         IF(BINNED .AND. AX_WID_OK)THEN
+
+*  Reset the desired update period, if Earth centred corrections required
+      IF ( SIMPLE ) THEN
+        UPDATE_PERIOD = (TMAX-TMIN)/100.0
+      ELSE IF (.NOT. SATCORR)THEN
+        IF(BINNED .AND. AX_WID_OK)THEN
           UPDATE_PERIOD = 0.0
 * update period not used in this mode
-         ELSE
-          DEF_UPD_PRD = (TIME_MAX - TIME_MIN)/100.0
+        ELSE
+          DEF_UPD_PRD = (TMAX - TMIN)/100.0
           CALL USI_DEF0R('UPDATE_INT',DEF_UPD_PRD,STATUS)
           CALL USI_GET0R('UPDATE_INT', UPDATE_PERIOD, STATUS)
-         ENDIF
-       ENDIF
-*
-* Call main routine
-      IF (SIMPLE_MODE)THEN
-       IF(STATUS .NE. SAI__OK)THEN
-         CALL ERR_FLUSH(STATUS)
-         STATUS = SAI__OK
-       ENDIF
-       CALL BARY_SIMPLE(BASE_MJD, BASE_UTC, BASE_TAI, RA, DEC,
-     : EQUINOX, ULTRA_SIMPLE, TIME_MAX, TIME_MIN,
-     : NU_BASE_TAI, NU_BASE_MJD, NU_BASE_UTC,STATUS)
+        END IF
+      END IF
 
-               IF(STATUS .NE. SAI__OK)GOTO 999
+*  Call main routine
+      IF ( SIMPLE ) THEN
+        IF ( STATUS .NE. SAI__OK ) THEN
+          CALL ERR_FLUSH( STATUS )
+        END IF
 
-       IF(NU_BASE_MJD .NE. BASE_MJD)THEN
-        MJD_START = DBLE(NU_BASE_MJD) + NU_BASE_UTC/86400.0D0
-        CALL CONV_MJDDAT(MJD_START,DATE)
-        CALL CMP_PUT0C(HEADLOC,'BASE_DATE',DATE,STATUS)
-        CALL CMP_PUT0I(HEADLOC,'BASE_MJD',NU_BASE_MJD,STATUS)
-       ENDIF
-       CALL CMP_PUT0D(HEADLOC,'BASE_TAI', NU_BASE_TAI,STATUS)
-       CALL CMP_PUT0D(HEADLOC,'BASE_UTC',NU_BASE_UTC,STATUS)
-*update HISTORY
-       HISTXT(1) =
-     :     ' Barycorr was run in simple mode. '
+        CALL BARY_SIMPLE( MJDOBS, BASE_TAI, RA, DEC,
+     :                   EQUINOX, ULTRA_SIMPLE, TMAX, TMIN,
+     :                   NU_BASE_TAI, NU_MJDOBS, STATUS )
+        IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-       HISTXT(2) =
-     :     ' single Barycentric correction applied to header components'
-       N_LINES = 2
+*    Has timing origin changed?
+        IF ( NU_MJDOBS .NE. MJDOBS ) THEN
+          CALL ADI_CPUT0D( TIMID, 'MJDObs', NU_MJDOBS, STATUS )
+        END IF
+        CALL ADI_CPUT0D( TIMID, 'TAIObs', NU_BASE_TAI, STATUS )
+
+*    Write back updated timing data
+        CALL TCI_PUTID( OFID, TIMID, STATUS )
+
+*    Update HISTORY
+        HISTXT(1) = 'Barycorr was run in simple mode. '
+
+        HISTXT(2) =
+     :    'Single Barycentric correction applied to header components'
+        N_LINES = 2
+
       ELSE
        IF (.NOT. BINNED)THEN
          AX_WID_OK = .FALSE.
          ITIMEPTR = TIMEPTR
          WIDTHPTR = TIMEPTR
        ENDIF
-       CALL BARY_CORR(%VAL(ITIMEPTR),%VAL(TIMEPTR),%VAL(WIDTHPTR),
-     :        N_EVENTS,RA,DEC,BINNED,
+       CALL BARY_CORR( %VAL(ITIMEPTR), %VAL(TIMEPTR), %VAL(WIDTHPTR),
+     :        NEVENT,RA,DEC,BINNED,
      :        LUN_POS,POS_FILE_OK,SATCORR,IGNORE_POS,AX_WID_OK,BASE_MJD,
      :        BASE_UTC,BASE_TAI,UPDATE_PERIOD,EQUINOX,STATUS)
 
@@ -622,7 +578,7 @@
           HISTXT(N_LINES) =
      :' The orbit file was not available or not appropriate'
           N_LINES = N_LINES + 1
-          IF(UPDATE_PERIOD .LT. (TIME_MAX-TIME_MIN))THEN
+          IF(UPDATE_PERIOD .LT. (TMAX-TMIN))THEN
             WRITE ( HISTXT(N_LINES), '(A,F9.1,A)')
      :  ' The corrections were updated every ',UPDATE_PERIOD, ' seconds'
           ELSE
@@ -638,7 +594,7 @@
           HISTXT(N_LINES) =
      :' The motions of the satellite were ignored'
           N_LINES = N_LINES + 1
-          IF(UPDATE_PERIOD .LT. (TIME_MAX-TIME_MIN))THEN
+          IF(UPDATE_PERIOD .LT. (TMAX-TMIN))THEN
             WRITE ( HISTXT(N_LINES), '(A,F9.1,A)')
      :  ' The corrections were updated every ',UPDATE_PERIOD, ' seconds'
           ELSE
@@ -655,20 +611,12 @@
 *  Create new flag in file
       CALL PRF_SET( OFID, 'BARY_CORR_DONE', .TRUE., STATUS )
 
-999   CONTINUE
+*  Tidy up and exit
+ 99   IF ( BINNED ) THEN
+        CALL EDI_UNMAP( OFID, TLIST, STATUS )
+      END IF
 
-* tidy up and exit
-      IF(RAW_TIME_OK)THEN
-        CALL LIST_UNMAP(OUTLOC, 'RAW_TIMETAG', STATUS)
-      ELSEIF(TIME_OK)THEN
-        CALL LIST_UNMAP(OUTLOC, 'TIMETAG', STATUS)
-      ENDIF
-
-*  Shut input and output files
-      CALL USI_ANNUL( 'INP', STATUS )
-      CALL USI_ANNUL( 'OUT', STATUS )
-
-*  Exit point
+*  Tidy up
       CALL AST_CLOSE()
       CALL AST_ERR( STATUS )
 
@@ -1102,8 +1050,8 @@
 
 
 
-*+    BARY_CORR   Does the barycentric corrections according to user spec
-      SUBROUTINE BARY_CORR(INTIMES,OUTTIMES,WIDTHS,N_EVENTS,RA,DEC,
+*+ BARY_CORR - Does the barycentric corrections according to user spec
+      SUBROUTINE BARY_CORR(INTIMES,OUTTIMES,WIDTHS,NEVENT,RA,DEC,
      :    BINNED,LUN_POS,
      :    POS_FILE_OK,SATCORR,IGNORE_POS,AX_WID_OK,BASE_MJD,
      :    BASE_UTC,BASE_TAI,UPDATE_PERIOD,EQUINOX,STATUS)
@@ -1128,13 +1076,11 @@
       INCLUDE 'SAE_PAR'
 *    Structure definitions :
       STRUCTURE /POS_REC/
-         INTEGER UT/0/				! hk clock (1/2s) time
-         REAL SATGEO(3)/0.,0.,0./		! Sat vector in geo frame
-         INTEGER*2 IXRT(3)/0,0,0/		! RA, dec, roll, arcmin
+         INTEGER UT				! hk clock (1/2s) time
+         REAL SATGEO(3)		! Sat vector in geo frame
+         INTEGER*2 IXRT(3)		! RA, dec, roll, arcmin
          INTEGER*2 IBGLONG                      ! long and lat
          INTEGER*2 IBGLAT                       !
-         INTEGER*2 IBSIZ_EM8T                   ! B field. 10^{-8} Tesla
-         INTEGER*2 LVAL_MILLERAD
       END STRUCTURE
 
 *
@@ -1161,7 +1107,7 @@
         DOUBLE PRECISION BARY_HK2MJD !DP FUNCTION HK SECS TO MJD
 *     <specification of FORTRAN structures>
 *    Import :
-      INTEGER              N_EVENTS              ! No events in list
+      INTEGER              NEVENT              ! No events in list
       INTEGER              BASE_MJD              ! whole part MJD only
 *      INTEGER              LUN_POS               ! LOG unit for ATT_POS_SAT
 
@@ -1179,9 +1125,9 @@
       LOGICAL              AX_WID_OK             ! AXIS widths OK
 *     <declarations and descriptions for imported arguments>
 *    Import-Export :
-      REAL                 INTIMES(N_EVENTS)     ! timelist
-      REAL                 OUTTIMES(N_EVENTS)    ! timelist
-      REAL                 WIDTHS(N_EVENTS)      ! timelist binwidths
+      DOUBLE PRECISION     INTIMES(NEVENT)     ! timelist
+      DOUBLE PRECISI0N     OUTTIMES(NEVENT)    ! timelist
+      DOUBLE PRECISION     WIDTHS(NEVENT)      ! timelist binwidths
       REAL                 LB,UB                 ! lower and upper bounds
 *     <declarations and descriptions for imported/exported arguments>
 *    Export :
@@ -1206,12 +1152,11 @@
 *     <any DATA initialisations for local variables>
 *-
 
-*     <application code>
 *if binned and axis width present, then do not use trigger times as gaps will
 * appear in the time series due to differential barycentric correections
 * during thee observation
       IF(BINNED .AND. AX_WID_OK)THEN
-*       BOUNDS(N_EVENTS+1) = INTIMES(N_EVENTS)+0.5*WIDTHS(N_EVENTS)
+*       BOUNDS(NEVENT+1) = INTIMES(NEVENT)+0.5*WIDTHS(NEVENT)
          LB = INTIMES(1) - 0.5*WIDTHS(1)
          CALL BARY_CORR_INT(LB,RA,DEC,LUN_POS,
      :   POS_FILE_OK,BASE_MJD,BASE_UTC,BASE_TAI,EQUINOX,BARY,STATUS)
@@ -1222,7 +1167,7 @@
        UB = UB + BARY
        OUTTIMES(1)= 0.5 * (UB+LB)
        WIDTHS(1) = ABS(UB-LB)
-       DO  I = 2,N_EVENTS
+       DO  I = 2,NEVENT
          LB = UB
          UB = INTIMES(I) + 0.5*WIDTHS(I)
          CALL BARY_CORR_INT(UB,RA,DEC,LUN_POS,POS_FILE_OK,
@@ -1237,7 +1182,7 @@
 *comput bary as often as desired. use att pos sat data
 * initialise TRIGGER
          TRIGGER = INTIMES(1) - 1.1 * UPDATE_PERIOD
-         DO I = 1, N_EVENTS
+         DO I = 1, NEVENT
            IF(ABS(INTIMES(I)-TRIGGER) .GE. UPDATE_PERIOD)THEN
 
              TRIGGER = INTIMES(I)
@@ -1249,7 +1194,9 @@
          ENDDO
       ENDIF
       END
-*+    BARY_CORR   Does the barycentric corrections according to user spec
+
+
+*+  BARY_CORR - Does the barycentric corrections according to user spec
       SUBROUTINE BARY_CORR_INT(TIME,RA,DEC,LUN_POS,POS_FILE_OK,
      : BASE_MJD,BASE_UTC,BASE_TAI,EQUINOX,BARY,STATUS)
 *    Description :
@@ -1273,13 +1220,11 @@
       INCLUDE 'SAE_PAR'
 *    Structure definitions :
       STRUCTURE /POS_REC/
-         INTEGER UT/0/				! hk clock (1/2s) time
-         REAL SATGEO(3)/0.,0.,0./		! Sat vector in geo frame
-         INTEGER*2 IXRT(3)/0,0,0/		! RA, dec, roll, arcmin
+         INTEGER UT				! hk clock (1/2s) time
+         REAL SATGEO(3)		! Sat vector in geo frame
+         INTEGER*2 IXRT(3)		! RA, dec, roll, arcmin
          INTEGER*2 IBGLONG                      ! long and lat
          INTEGER*2 IBGLAT                       !
-         INTEGER*2 IBSIZ_EM8T                   ! B field. 10^{-8} Tesla
-         INTEGER*2 LVAL_MILLERAD
       END STRUCTURE
 
 *
@@ -1292,7 +1237,7 @@
       RECORD /POS_REC/ POS
 
       REAL BARY                         ! Barycentric  correction in Secs
-      DOUBLE PRECISION ROSAT_MATRIX(6)            !XYZ & DX/DT DY/DT, DZ/DT
+      DOUBLE PRECISION RMATRIX(6)            !XYZ & DX/DT DY/DT, DZ/DT
 
         INTEGER UT
         REAL SATGEO(3)           ! GEOGRAPHIC XYZ
@@ -1300,16 +1245,13 @@
         INTEGER*2 IXRT(3)        ! Restored XRT pointing RA DEC Roll (arcmin)
         INTEGER*2 ILONG
         INTEGER*2 ILAT
-        INTEGER*2 B_EM8T
-        INTEGER*2 LVAL_MILLERAD
         INTEGER KEY              ! Key for indexed read
         INTEGER LUN_POS          ! Log Unit for ATT_POS_SAT output (rosat specific)
         DOUBLE PRECISION BARY_HK2MJD !DP FUNCTION HK SECS TO MJD
-*     <specification of FORTRAN structures>
 *    Import :
       INTEGER              BASE_MJD              ! whole part MJD only
 
-      REAL                 RA,DEC                ! RA DEC FOR  BARY CORRECTIONS
+      DOUBLE PRECISION     RA,DEC                ! RA DEC FOR  BARY CORRECTIONS
 
       DOUBLE PRECISION     BASE_UTC              ! secs offset in base_mjd
       DOUBLE PRECISION     BASE_TAI              ! continuous time (in days) from Jan72
@@ -1317,7 +1259,6 @@
 
       LOGICAL              POS_FILE_OK           ! ATT_POS_SAT data fine
       LOGICAL              IGNORE_POS            ! pos_sat info to be ignored
-*     <declarations and descriptions for imported arguments>
 *    Import-Export :
       REAL                 TIME     ! timeTAG
 *     <declarations and descriptions for imported/exported arguments>
@@ -1326,10 +1267,7 @@
 *    Status :
       INTEGER STATUS
 *    Function declarations :
-*     <declarations for function references>
       INTEGER BARY_MJD2HK
-*    Local constants :
-*     <local constants defined by PARAMETER>
 *    Local variables :
       DOUBLE PRECISION     MJD_CURRENT           ! MJD for current event
       DOUBLE PRECISION     MJD_START,MJD_END     ! MJD for start/stop
@@ -1338,20 +1276,17 @@
 
       INTEGER              I,J,K                 ! DO loop variables
       INTEGER              CURRENT_KEY           ! for KEYed access to POS file
-*     <declarations for local variables>
-*    Local data :
-*     <any DATA initialisations for local variables>
 *-
 
-*     <application code>
 *if binned and axis width present, then do not use trigger times as gaps will
 * appear in the time series due to differential barycentric correections
 * during thee observation
 
-* compute appropriate MJD or KEY
-         MJD_CURRENT = DBLE(BASE_MJD) +
-     :          (BASE_UTC + TIME)/8.64D04
-         IF( POS_FILE_OK)THEN
+*  Compute appropriate MJD or KEY
+      MJD_CURRENT = DBLE(BASE_MJD) + (BASE_UTC + TIME)/8.64D04
+
+*  Got orbit position file? Load ROSAT position matrix
+      IF( POS_FILE_OK)THEN
           CURRENT_KEY = BARY_MJD2HK(MJD_CURRENT)
 * read ATT POS SAT file
 *          READ(LUN_POS,KEYGE=CURRENT_KEY)POS
@@ -1363,116 +1298,31 @@
           ENDDO
 
 *          MJD_CURRENT = BARY_HK2MJD(UT)
-          CALL BARY_GEO2GEI(MJD_CURRENT,SATGEO,SAT_GEOCENTRIC)
-          DO J = 1,3
-            ROSAT_MATRIX(J)=DBLE(SAT_GEOCENTRIC(J))
-            ROSAT_MATRIX(J+3)=0.0D00
-          ENDDO
-          CALL BARY_ROSAT(mjd_current,RA,DEC,BARY,ROSAT_MATRIX,
-     :                                                 EQUINOX)
-         ELSE
-          DO J = 1,6
-           ROSAT_MATRIX(J) = 0.0D00
-          END DO
-* get BARY time
-          CALL BARY_ROSAT(MJD_CURRENT,RA,DEC,BARY,ROSAT_MATRIX,
-     :                                                 EQUINOX)
-         ENDIF
-      END
-*+  name - BARY_FINDTIME
-      SUBROUTINE BARY_FINDTIME(LOC, OK, REG, AXN, MAX, MIN, PTR, N)
-*    Description :
-*     <description of what the subroutine does - for user info>
-*         finds and maps a time axis
-*    Method :
-*     <description of how the subroutine works - for programmer info>
-*    Deficiencies :
-*     <description of any deficiencies>
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
-*     author (BHVAD::DB)
-*    History :
-*     date:  changes (BHVAD::DB) 02-Feb-1994     (Original)
-*    Type definitions :
-      IMPLICIT NONE
-*    Global constants :
-      INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-*    Import :
-*
-      CHARACTER*(DAT__SZLOC)   LOC         ! locater to event dataset
+        CALL BARY_GEO2GEI(MJD_CURRENT,SATGEO,SAT_GEOCENTRIC)
+        DO J = 1,3
+          RMATRIX(J)=DBLE(SAT_GEOCENTRIC(J))
+          RMATRIX(J+3)=0.0D00
+        END DO
 
-*     <declarations and descriptions for imported arguments>
-*    Import-Export :
-*     <declarations and descriptions for imported/exported arguments>
-*    Export :
-*     <declarations and descriptions for exported arguments>
-      LOGICAL                  OK             !  was a time axis found?
-      LOGICAL                  REG            !  is the time axis regular?
+*  Fake ROSAT matrix
+      ELSE
+        DO J = 1, 6
+          RMATRIX(J) = 0.0D00
+        END DO
 
-      INTEGER                  PTR            ! ptr to axis
-      INTEGER                  LDIM(DAT__MXDIM) ! input dimensions
-      INTEGER                  AXN            ! axis number
-      INTEGER                  N              ! Number of events
-      REAL                     MIN,MAX        ! min/max of array
+      END IF
 
-*    Status :
-      INTEGER STATUS
-*    Function declarations :
-*     <declarations for function references>
-*    Local constants :
-*     <local constants defined by PARAMETER>
-*    Local variables :
-      INTEGER                  NDIMS          ! number of dimensions
-      INTEGER                  X_AXIS,Y_AXIS  ! dummy integers
-      INTEGER                  T_AXIS         ! time axis
-      INTEGER                  N_EVENTS       ! number of bins
-*     <declarations for local variables>
-*    Local data :
-*     <any DATA initialisations for local variables>
-*-
-
-*     <application code>
-        ok = .true.
-        CALL BDA_CHKAST(LOC, OK, STATUS)
-
-        CALL BDA_CHKDATA(LOC, OK, NDIMS, LDIM, STATUS)
-
-        CALL AXIS_FIND(LOC, 'TIME',NDIMS,T_AXIS,STATUS)
-
-        IF(T_AXIS.EQ.0)THEN
-          OK = .FALSE.
-          AXN = 0
-        ELSEIF(T_AXIS.GT.0)THEN
-          CALL BDA_CHKAXVAL(LOC, T_AXIS, OK, REG,
-     :                                        N_EVENTS, STATUS)
-        ELSEIF(T_AXIS.LT.0)THEN
-          CALL AXIS_GET(LOC, 'TIME', 'WHICH_TIME', NDIMS,
-     :                                        T_AXIS, STATUS)
-          CALL BDA_CHKAXVAL(LOC, T_AXIS, OK, REG,
-     :                                        N_EVENTS, STATUS)
-        ENDIF
-* Have now got a time axis, time to map it.
-
-           IF(OK)THEN
-* map time data, whether regular or irregular
-             CALL BDA_MAPAXVAL(LOC, 'READ', T_AXIS, PTR, STATUS)
-             CALL ARR_RANG1R(N_EVENTS, %VAL(PTR), MIN,
-     :                                      MAX, STATUS)
-           AXN = T_AXIS
-           N = N_EVENTS
-           ELSE
-             AXN = -1
-           ENDIF
+*  Get BARY time
+      CALL BARY_ROSAT( MJD_CURRENT, RA, DEC, BARY, RMATRIX, EQUINOX )
 
       END
 
 
 *+  BARY_SIMPLE - Does the simple, one off, barycentric correction
-      SUBROUTINE BARY_SIMPLE(BASE_MJD, BASE_UTC, BASE_TAI, RA, DEC,
-     : EQUINOX, ULTRA_SIMPLE, TIME_MAX, TIME_MIN,
-     : NU_BASE_TAI, NU_BASE_MJD, NU_BASE_UTC,STATUS)
+      SUBROUTINE BARY_SIMPLE( MJDOBS, BASE_TAI, RA, DEC,
+     :                        EQUINOX, ULTRA_SIMPLE, TMAX, TMIN,
+     :                        NU_BASE_TAI, NU_MJDOBS, STATUS )
+*
 *    Description :
 *     <description of what the subroutine does - for user info>
 *    Environment parameters :
@@ -1498,36 +1348,27 @@
       DOUBLE PRECISION S2_REF_MJD
       PARAMETER(S2_REF_MJD=47892.0D0)
       REAL BARY                         ! Barycentric  correction in Secs
-      DOUBLE PRECISION ROSAT_MATRIX(6)            !XYZ & DX/DT DY/DT, DZ/DT
+      DOUBLE PRECISION RMATRIX(6)            !XYZ & DX/DT DY/DT, DZ/DT
 
-c        INTEGER UT
-c        REAL SATGEO(3)           ! GEOGRAPHIC XYZ
-c        REAL SAT_GEOCENTRIC(3)   ! GEOCENTRIC XYZ
-        DOUBLE PRECISION BARY_HK2MJD !DP FUNCTION HK SECS TO MJD
 *    Import :
+      DOUBLE PRECISION		MJDOBS, TMAX, TMIN
+
       INTEGER              BASE_MJD              ! whole part MJD only
 
       REAL                 RA,DEC                ! RA DEC FOR  BARY CORRECTIONS
-      REAL                 TIME_MAX,TIME_MIN     ! min/max times offset from base
       DOUBLE PRECISION     BASE_UTC              ! secs offset in base_mjd
       DOUBLE PRECISION     BASE_TAI              ! continuous time (in days) from Jan72
       DOUBLE PRECISION     EQUINOX               ! equinox of ra dec system
 
-      LOGICAL              ULTRA_SIMPLE          ! TIME_MAX=TIME_MIN=0
-*     <declarations and descriptions for imported arguments>
-*    Import-Export :
-*     <declarations and descriptions for imported/exported arguments>
+      LOGICAL              ULTRA_SIMPLE          ! TMAX=TMIN=0
 *    Export :
 *     <declarations and descriptions for exported arguments>
-      DOUBLE PRECISION NU_BASE_TAI
-      DOUBLE PRECISION NU_BASE_UTC
-      INTEGER NU_BASE_MJD
+      DOUBLE PRECISION NU_BASE_TAI,NU_MJDOBS
 *    Status :
       INTEGER STATUS
 *    Function declarations :
 *     <declarations for function references>
       DOUBLE PRECISION SLA_DAT
-      INTEGER BARY_MJD2HK
 *    Local constants :
       DOUBLE PRECISION        LEAPS_AT_1970
       PARAMETER              (LEAPS_AT_1970 = 10.0D0)
@@ -1536,10 +1377,8 @@ c        REAL SAT_GEOCENTRIC(3)   ! GEOCENTRIC XYZ
       DOUBLE PRECISION        SECONDS_IN_DAY
       PARAMETER              (SECONDS_IN_DAY = 86400.0D0)
 
-*     <local constants defined by PARAMETER>
 *    Local variables :
       DOUBLE PRECISION     MJD_CURRENT           ! MJD for current event
-      DOUBLE PRECISION     MJD_START,MJD_END     ! MJD for start/stop
       DOUBLE PRECISION MJDOBS_OLD,MJDOBS_NEW
       DOUBLE PRECISION TRIAL_TIME1, TRIAL_TIME2  ! trial solutions. TAI->MJD
       DOUBLE PRECISION TEST_TAI
@@ -1547,147 +1386,149 @@ c        REAL SAT_GEOCENTRIC(3)   ! GEOCENTRIC XYZ
       REAL BARY_MID,BARY_START,BARY_END          ! various Barycentric corr times
       REAL DIFFER                                ! differential bary corr
       REAL DIFF_T                                ! diff between trial and answer
-      INTEGER              I,J,K                 ! DO loop variables
+      INTEGER              I,J                 ! DO loop variables
       INTEGER LS_BEF,LS_AFT                      ! leapsecs before and after
       INTEGER UPPER_LIMIT                        ! search bounds for solution
-*     <declarations for local variables>
-*    Local data :
-*     <any DATA initialisations for local variables>
+
+      LOGICAL			DSPRT			! Desparate measures?
 *-
 
-*     <application code>
-* load dummy rosat matrix
+*  Check inherited global status
+      IF ( STATUS .NE. SAI__OK ) RETURN
 
+*  Load dummy rosat matrix
+      DO J = 1,6
+        RMATRIX(J) = 0.0D00
+      END DO
 
+*  Base the correct only on the start time of the observation?
+      IF ( ULTRA_SIMPLE ) THEN
+        MJD_CURRENT = MJDOBS
 
-             DO J = 1,6
-              ROSAT_MATRIX(J) = 0.0D00
-             END DO
+        CALL BARY_ROSAT( MJD_CURRENT, RA, DEC, BARY, RMATRIX, EQUINOX )
+        CALL MSG_SETR('BARY', BARY)
+        CALL MSG_PRNT('A single correction of ^BARY seconds ')
+        CALL MSG_PRNT('has been applied to the header structure')
+        CALL MSG_PRNT(' ')
 
+        NU_BASE_TAI = BASE_TAI + DBLE(BARY)/SECONDS_IN_DAY
+        BARY_MID = BARY
 
-             IF (ULTRA_SIMPLE)THEN
-              MJD_CURRENT = DBLE(BASE_MJD) + BASE_UTC/SECONDS_IN_DAY
+*  Otherwise some half way point
+      ELSE
 
-              CALL BARY_ROSAT(mjd_current,RA,DEC,BARY,ROSAT_MATRIX,
-     :                                                 EQUINOX)
-              CALL MSG_SETR('BARY', BARY)
-              CALL MSG_PRNT('A single correction of ^BARY seconds ')
-              CALL MSG_PRNT('has been applied to the header structure')
-              CALL MSG_PRNT(' ')
+        MJD_CURRENT = MJDOBS + 0.5D0*(TMAX+TMIN) / SECONDS_IN_DAY
 
-              NU_BASE_TAI = BASE_TAI + DBLE(BARY)/SECONDS_IN_DAY
-              BARY_MID = BARY
-             ELSE
-              MJD_CURRENT = DBLE(BASE_MJD) +
-     :            (BASE_UTC+(DBLE(TIME_MAX)+
-     :            (TIME_MIN))/2.0D0 )/SECONDS_IN_DAY
-              CALL BARY_ROSAT(MJD_CURRENT,RA,DEC,BARY,ROSAT_MATRIX,
-     :                                                 EQUINOX)
-              BARY_MID = BARY
-* as TAI is continous, it is impervious to leap second complications
-              NU_BASE_TAI = BASE_TAI + DBLE(BARY)/SECONDS_IN_DAY
-              CALL MSG_SETR('BARY', BARY)
-              CALL MSG_PRNT('A single correction of ^BARY seconds ')
-              CALL MSG_PRNT('has been applied to the header structure')
+        CALL BARY_ROSAT(MJD_CURRENT,RA,DEC,BARY,RMATRIX,EQUINOX)
+        BARY_MID = BARY
 
+*    As TAI is continous, it is impervious to leap second complications
+        NU_BASE_TAI = BASE_TAI + DBLE(BARY)/SECONDS_IN_DAY
+        CALL MSG_SETR('BARY', BARY)
+        CALL MSG_PRNT('A single correction of ^BARY seconds ')
+        CALL MSG_PRNT('has been applied to the header structure')
 
-              MJD_CURRENT = DBLE(BASE_MJD) +
-     :            (BASE_UTC+DBLE(TIME_MIN))/SECONDS_IN_DAY
-              CALL BARY_ROSAT(MJD_CURRENT,RA,DEC,BARY,ROSAT_MATRIX,
-     :                                                 EQUINOX)
+        MJD_CURRENT = MJDOBS + TMIN/SECONDS_IN_DAY
+        CALL BARY_ROSAT(MJD_CURRENT,RA,DEC,BARY,RMATRIX,EQUINOX)
 
-              MJD_CURRENT = DBLE(BASE_MJD) +
-     :           (BASE_UTC+DBLE(TIME_MAX))/SECONDS_IN_DAY
-              BARY_START = BARY
-              CALL BARY_ROSAT(MJD_CURRENT,RA,DEC,BARY,ROSAT_MATRIX,
-     :                                                 EQUINOX)
-              BARY_END = BARY
-             ENDIF
+        MJD_CURRENT = MJDOBS + TMAX/SECONDS_IN_DAY
+        BARY_START = BARY
+        CALL BARY_ROSAT(MJD_CURRENT,RA,DEC,BARY,RMATRIX,EQUINOX)
+        BARY_END = BARY
 
-            IF (.NOT. ULTRA_SIMPLE)THEN
-              DIFFER = ABS(BARY_START - BARY_END)
-           CALL MSG_PRNT('There exists (an uncorrected) differential')
-           CALL MSG_SETR('DIFFER', DIFFER)
-           CALL MSG_PRNT('barycentric shift of ^DIFFER seconds')
-              CALL MSG_PRNT('across your dataset')
+*    Announce differential correction
+        DIFFER = ABS(BARY_START - BARY_END)
+        CALL MSG_SETR( 'DIFFER', DIFFER )
+        CALL MSG_PRNT( 'There exists (an uncorrected) differential '/
+     :                 /'barycentric shift of ^DIFFER seconds '/
+     :                 /'across your dataset' )
 
-            ENDIF
-*recalculate the new MJD UTC etc, complicated by the existence of leapseconds
-       MJDOBS_OLD = DBLE(BASE_MJD) + BASE_UTC/SECONDS_IN_DAY
-*and a guess of the new mjd
-       MJDOBS_NEW = DBLE(BASE_MJD) +
-     :          (BASE_UTC+DBLE(BARY_MID))/SECONDS_IN_DAY
-       LS_BEF = INT(SLA_DAT(MJDOBS_OLD))
-       LS_AFT = INT(SLA_DAT(MJDOBS_NEW))
-       IF(LS_BEF-LS_AFT .EQ. 0)THEN
-*no leapseconds took part during the geocentric-barycentric shift
-         CALL  TIM_MJD2TAI(MJDOBS_NEW,TEST_TAI)
-         DIFF_T = SECONDS_IN_DAY * ABS(TEST_TAI-NU_BASE_TAI)
-         IF(DIFF_T.LT.0.5)THEN
-           NU_BASE_MJD = INT(MJDOBS_NEW)
-           NU_BASE_UTC = SECONDS_IN_DAY *
-     :                   (MJDOBS_NEW - DBLE(NU_BASE_MJD))
-         ELSE
-* AARGH! code shouldn't come here! if it has, then only an error of
-* 1 second is possible
-           TRIAL_TIME1 = MJDOBS_NEW - 1.0D0/SECONDS_IN_DAY
-           TRIAL_TIME2 = MJDOBS_NEW + 1.0D0/SECONDS_IN_DAY
+      END IF
 
-           CALL TIM_MJD2TAI(TRIAL_TIME1,TEST_TAI)
-           DIFF_T = SECONDS_IN_DAY * ABS(TEST_TAI-NU_BASE_TAI)
-           IF(DIFF_T .LT. 0.5)THEN
-             NU_BASE_MJD = INT(TRIAL_TIME1)
-             NU_BASE_UTC = SECONDS_IN_DAY *
-     :                   (MJDOBS_NEW - DBLE(NU_BASE_MJD))
-             GOTO 100
-           ENDIF
-* if it is not trial time 2, then i cannot explain what has happened
-           CALL TIM_MJD2TAI(TRIAL_TIME2,TEST_TAI)
-           DIFF_T = SECONDS_IN_DAY * ABS(TEST_TAI-NU_BASE_TAI)
-           IF(DIFF_T .LT. 0.5)THEN
-             NU_BASE_MJD = INT(TRIAL_TIME2)
-             NU_BASE_UTC = SECONDS_IN_DAY *
-     :                   (MJDOBS_NEW - DBLE(NU_BASE_MJD))
-           ELSE
-* we have had no success in getting selfconsistency. We will jump into a brute
-* force technique for searching for the correct solution
-             GOTO 500
-           ENDIF
-         ENDIF
-       ELSE
-* Apologies for the ugly code here, but this is emergency stuff!
-500    CONTINUE
-         UPPER_LIMIT = 10+IABS(LS_BEF-LS_AFT) + 10
-         DO I = -UPPER_LIMIT,UPPER_LIMIT,1
-          TRIAL_TIME1 = MJDOBS_NEW + DBLE(I)/SECONDS_IN_DAY
-          CALL TIM_MJD2TAI(TRIAL_TIME1,TEST_TAI)
+*  And a guess of the new MJD, complicated by the existence of leapseconds
+      MJDOBS_NEW = MJDOBS + DBLE(BARY_MID)/SECONDS_IN_DAY
+
+*  Number of leap seconds before and after change in barycentre
+      DSPRT = .FALSE.
+      LS_BEF = INT(SLA_DAT(MJDOBS))
+      LS_AFT = INT(SLA_DAT(MJDOBS_NEW))
+
+*  No leapseconds took part during the geocentric-barycentric shift?
+      IF ( (LS_BEF-LS_AFT) .EQ. 0 ) THEN
+
+        CALL TCI_MJD2TAI(MJDOBS_NEW,TEST_TAI)
+        DIFF_T = SECONDS_IN_DAY * ABS(TEST_TAI-NU_BASE_TAI)
+        IF ( DIFF_T .LT. 0.5 ) THEN
+          NU_MJDOBS = MJDOBS_NEW
+        ELSE
+
+*     AARGH! code shouldn't come here! if it has, then only an error of
+*     1 second is possible
+          TRIAL_TIME1 = MJDOBS_NEW - 1.0D0/SECONDS_IN_DAY
+          TRIAL_TIME2 = MJDOBS_NEW + 1.0D0/SECONDS_IN_DAY
+
+          CALL TCI_MJD2TAI(TRIAL_TIME1,TEST_TAI)
           DIFF_T = SECONDS_IN_DAY * ABS(TEST_TAI-NU_BASE_TAI)
           IF(DIFF_T .LT. 0.5)THEN
-            NU_BASE_MJD = INT(TRIAL_TIME1)
-            NU_BASE_UTC = SECONDS_IN_DAY *
-     :                   (MJDOBS_NEW - DBLE(NU_BASE_MJD))
-             GOTO 100
-          ENDIF
-         ENDDO
-* If we are at this point in the code, then something horrible has gone wrong
-         CALL MSG_PRNT('    HELP! ')
-         CALL MSG_SETI('BARY',BARY_MID)
-         CALL MSG_PRNT('The correction is ^BARY seconds')
-         call MSG_PRNT('BARYCORR has screwed up and NOT updated')
-         CALL MSG_PRNT('your file. Please contact BHVAD::DB ')
-         CALL MSG_PRNT('aka db@xun4.sr.bham.ac.uk. Pronto!')
-         STATUS = SAI__ERROR
-       ENDIF
-100    CONTINUE
+            NU_MJDOBS = INT(TRIAL_TIME1) + (MJDOBS_NEW -
+     :              DBLE(INT(TRIAL_TIME1)) )
+            GOTO 99
+          END IF
 
-       END
+* if it is not trial time 2, then i cannot explain what has happened
+          CALL TCI_MJD2TAI(TRIAL_TIME2,TEST_TAI)
+          DIFF_T = SECONDS_IN_DAY * ABS(TEST_TAI-NU_BASE_TAI)
+          IF(DIFF_T .LT. 0.5)THEN
+            NU_MJDOBS = INT(TRIAL_TIME2) + (MJDOBS_NEW -
+     :             DBLE(INT(TRIAL_TIME2)) )
+          ELSE
+* we have had no success in getting selfconsistency. We will jump into a brute
+* force technique for searching for the correct solution
+            DSPRT = .TRUE.
+          END IF
+        END IF
+      ELSE
+        DSPRT = .TRUE.
+      END IF
+
+* Apologies for the ugly code here, but this is emergency stuff!
+      IF ( DSPRT ) THEN
+
+        UPPER_LIMIT = 10+IABS(LS_BEF-LS_AFT) + 10
+        DO I = -UPPER_LIMIT,UPPER_LIMIT,1
+          TRIAL_TIME1 = MJDOBS_NEW + DBLE(I)/SECONDS_IN_DAY
+          CALL TCI_MJD2TAI(TRIAL_TIME1,TEST_TAI)
+          DIFF_T = SECONDS_IN_DAY * ABS(TEST_TAI-NU_BASE_TAI)
+          IF ( DIFF_T .LT. 0.5 ) THEN
+            NU_MJDOBS = INT(TRIAL_TIME1) + (MJDOBS_NEW -
+     :             DBLE(INT(TRIAL_TIME1)) )
+            GOTO 99
+          END IF
+        END DO
+
+*    If we are at this point in the code, then something horrible has gone wrong
+        CALL MSG_PRNT('    HELP! ')
+        CALL MSG_SETI('BARY',BARY_MID)
+        STATUS = SAI__ERROR
+        CALL ERR_REP( ' ', 'The correction is ^BARY seconds. '/
+     :        /'BARYCORR has screwed up and NOT updated your file. '/
+     :        /'Please contact refer to the authors', STATUS )
+
+      END IF
+
+*  Abort point
+ 99   CONTINUE
+
+      END
 
 
 
 *+ BARY_ROSAT performs  barycentric corrections.
 	SUBROUTINE BARY_ROSAT(MJD,XRA,XDEC,BARY,GKROS,EQUINOX)
-	DOUBLE PRECISION MJD,EQUINOX
-	REAL XRA, XDEC, BARY
+        IMPLICIT NONE
+
+	DOUBLE PRECISION MJD,EQUINOX,XRA,XDEC
+	REAL  BARY
 *MJD	input	Modified Julian Date (IAU definition) of observation.
 *XRA	input	Source Right Ascension, epoch 1950.0, degrees.
 *XDEC	input	Source Declination, epoch 1950.0, degrees.
@@ -1701,38 +1542,38 @@ c        REAL SAT_GEOCENTRIC(3)   ! GEOCENTRIC XYZ
 *mods for ROSAT Doug Bertram    1990 JUN 1.
 
 	DOUBLE PRECISION GKROS(6), VELH(3), VELB(3), CORH(3),
-     &   BAEAR(3), AUKM, BKROS(3), VX(3), SUM
+     &   BAEAR(3), BKROS(3), VX(3), SUM
+        INTEGER	I
+
+      INCLUDE 'MATH_PAR'
 
 *CLIGHT is velocity of light in km/sec
 *AUKM  converts from Astronomical Units to kilometres.
 
-	PARAMETER (PI = 3.1415926535, DTOR = PI/180.0,
-     &   CLIGHT = 2.99792458E5, AUKM = 1.495979D8)
+      DOUBLE PRECISION		CLIGHT, AUKM
+	PARAMETER (CLIGHT = 2.99792458E5, AUKM = 1.495979D8)
 
-*Then get Barycentric coords in AU of EARth in BAEAR
+*  Then get Barycentric coords in AU of EARth in BAEAR
+      CALL BARY_BARVEL( MJD, EQUINOX, VELH, VELB )
+      CALL BARY_BARCOR( CORH, BAEAR )
 
-	CALL BARY_BARVEL(MJD,EQUINOX,VELH,VELB)
-	CALL BARY_BARCOR(CORH,BAEAR)
+*  Convert these from AU to km, and add to geocentric coords of Rosat to
+*  get barycentric coords of Rosat in km in BKROS
+      DO I = 1,3
+	BKROS(I) = GKROS(I) + BAEAR(I) * AUKM
+      END DO
 
-*Convert these from AU to km, and add to geocentric coords of Rosat to
-*get barycentric coords of Rosat in km in BKROS
+*  Find unit vector in direction of the source, take dot product with
+*  barycentric vector of ROSAT and divide by speed of light to get time
+*  difference.
+      CALL CONV_DONA2V( XRA*MATH__DDTOR, XDEC*MATH__DDTOR, VX )
+      SUM = 0.0D0
+      DO I = 1,3
+	SUM = SUM + VX(I) * BKROS(I)
+      END DO
+      BARY = SUM / CLIGHT
 
-	DO I = 1,3
-	     BKROS(I) = GKROS(I) + BAEAR(I) * AUKM
-	END DO
-
-*Find unit vector in direction of the source, take dot product with barycentric
-*vector of ROSAT and divide by speed of light to get time difference.
-
-	CALL CONV_DONA2V(DBLE(XRA*DTOR), DBLE(XDEC*DTOR), VX)
-	SUM = 0.0D0
-	DO I = 1,3
-	   SUM = SUM + VX(I) * BKROS(I)
-	END DO
-	BARY = SUM / CLIGHT
-
-90	CONTINUE
-	END
+      END
 
 
 *+  BARY_HK2MJD - Convert to HK UT 1/2 seconds to MJD
