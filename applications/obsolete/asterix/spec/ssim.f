@@ -177,7 +177,7 @@
       CALL SFIT_GETZ( Z, STATUS )
 
 *  Output dataset
-      CALL BDI_NEW( 'Spectrum', 1, NCHAN, SPID, STATUS )
+      CALL BDI_NEW( 'Spectrum', 1, NCHAN, 'REAL', SPID, STATUS )
       CALL USI_CREAT( 'OUT', SPID, OFID, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
