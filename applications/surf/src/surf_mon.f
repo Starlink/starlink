@@ -31,6 +31,9 @@
 *     25-FEB-1993: Original version
 *     12-JAN-1995: Ported to UNIX, changed to 'new style'
 *     $Log$
+*     Revision 1.16  1997/05/23 18:09:43  timj
+*     Add SCAN_RLB
+*
 *     Revision 1.15  1997/05/10 02:28:57  timj
 *     Add EXTRACT_DATA as a new call to REDS_REBIN.
 *
@@ -175,6 +178,10 @@ c
       ELSE IF (NAME .EQ. 'SKYDIP') THEN
 
          CALL REDS_SKYDIP (STATUS)
+
+      ELSE IF (NAME .EQ. 'SCAN_RLB') THEN
+
+         CALL REDS_SCAN_RLB (STATUS)
 
       ELSE IF (NAME .EQ. 'SCUCAT') THEN
 
