@@ -41,7 +41,7 @@
 *     29 Jul 92 : V1.6-0 Explicitly create o/p axes structure (DJA)
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *     20 Apr 95 : V1.8-1 New data interfaces (DJA)
-*
+*     13 Dec 1995 : V2.0-0 ADI port
 *    Type Definitions :
 *
       IMPLICIT NONE
@@ -71,70 +71,53 @@
       INTEGER                	NDIMS                   ! Number of dimensions
       INTEGER                	LDIM(ADI__MXDIM)        ! Input dimensions
       INTEGER			OFID			! Output dataset id
-      INTEGER                	SKIP                    ! Used in copying
-      INTEGER                	AXN1                    ! axes from input
-      INTEGER                	AXN2                    ! to output
+      INTEGER                	TAXIS			! Time axis number
       INTEGER			TIMID			! Timing info
 
-      INTEGER                	TAXIS, XAXIS, YAXIS     ! Axis numbers
-
       LOGICAL                	OK                      ! Input data ok?
-      LOGICAL                	INPRIM                  ! Input primitive?
-      LOGICAL                	REG                     ! Input time axis regular?
 *
 *    Version :
 *
       CHARACTER*22		VERSION
-        PARAMETER         	( VERSION = 'PHASE Version 1.8-1' )
+        PARAMETER         	( VERSION = 'PHASE Version 2.0-0' )
 *-
 
 *    Version Announcement
       CALL MSG_PRNT( VERSION )
 
-*    Initialize ASTERIX
+*  Initialize ASTERIX
       CALL AST_INIT()
 
-*    Associate input and output datasets
-      CALL USI_TASSOC2( 'INP', 'OUT', 'READ', IFID, OFID, STATUS )
-      CALL BDI_PRIM( IFID, INPRIM, STATUS )
-      IF ( INPRIM ) THEN
-        STATUS = SAI__ERROR
-        CALL ERR_REP(' ', 'ERROR: Input object must be a dataset',
-     :               STATUS )
-        GOTO 99
-      END IF
+*  Associate input and output datasets
+      CALL USI_ASSOC( 'INP', 'BinDS', 'READ', IFID, STATUS )
+      IF ( STATUS .NE. SAI__OK ) GOTO 99
+      CALL USI_CLONE( 'INP', 'OUT', 'BinDS', OFID, STATUS )
 
-*    Get dimensions of axis structure (from data array).
-      CALL BDI_CHKDATA(IFID, OK, NDIMS, LDIM, STATUS)
-      IF (.NOT. OK) THEN
-        STATUS = SAI__ERROR
-        CALL ERR_REP( ' ', 'FATAL ERROR: No data!', STATUS )
-        GOTO 99
-      END IF
-
-*    Check time axis exists
-      CALL AXIS_TFINDXYT( IFID, NDIMS, XAXIS, YAXIS, TAXIS, STATUS )
-      IF ( TAXIS .LE. 0 ) THEN
-        CALL MSG_PRNT('FATAL ERROR: No time axis!')
-        STATUS = SAI__ERROR
-
-      ELSE
-        CALL BDI_CHKAXVAL(IFID, TAXIS, OK, REG, NPTS,  STATUS )
-
-        IF ( OK ) THEN
-          CALL BDI_MAPAXVAL(IFID, 'READ', TAXIS, INAXPTR, STATUS )
-
-        ELSE
-          CALL MSG_PRNT('FATAL ERROR: Invalid time axis')
-          STATUS = SAI__ERROR
-
-        END IF
-      END IF
-
-*    Check status
+*  Get dimensions of axis structure
+      CALL BDI_GETSHP( IFID, ADI__MXDIM, LDIM, NDIMS, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Get observation start time
+*  Check time axis exists
+      CALL BDI0_FNDAXC( IFID, 'T', TAXIS, STATUS )
+      IF ( STATUS .NE. SAI__OK ) THEN
+        CALL ERR_FLUSH( STATUS )
+        CALL MSG_PRNT( 'Assuming time axis is axis number one' )
+        AXIS = 1
+      END IF
+
+*  Check time axis
+      CALL BDI_AXCHK( IFID, TAXIS, 'Data', OK, STATUS )
+      IF ( OK ) THEN
+        CALL BDI_AXMAPR( IFID, TAXIS, 'Data', 'READ', INAXPTR, STATUS )
+
+      ELSE
+        STATUS = SAI__ERROR
+        CALL ERR_REP( ' ', 'FATAL ERROR: Invalid time axis', STATUS )
+
+      END IF
+      IF ( STATUS .NE. SAI__OK ) GOTO 99
+
+*  Get observation start time
       CALL TCI_GETID( IFID, TIMID, STATUS )
       CALL ADI_THERE( TIMID, 'TAIObs', OK, STATUS )
       IF ( OK ) THEN
@@ -146,7 +129,7 @@
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Get parameters of ephemeris (units JD)
+*  Get parameters of ephemeris (units JD)
       CALL MSG_PRNT('Enter Ephemeris Coeffs : a(1) + a(2)*N + a(3)*N*N')
       CALL USI_GET0D('COEFF1', COEFF(1), STATUS)
  20   CALL USI_GET0D('COEFF2', COEFF(2), STATUS)
@@ -162,56 +145,33 @@
       WRITE (EPHEMERIS(2), '(A,G15.5)') 'Coefficient 2 = ',COEFF(2)
       WRITE (EPHEMERIS(3), '(A,G15.5)') 'Coefficient 3 = ',COEFF(3)
 
-*    Convert to MJD
+*  Convert to MJD
       COEFF(1) = COEFF(1) - 2400000.5
 
-*    Then to atomic time
+*  Then to atomic time
       CALL TCI_MJD2TAI( COEFF(1), EPHEM_TAI )
 
-*    Find difference from dataset reference time in seconds, and other
-*    coefficents in seconds
+*  Find difference from dataset reference time in seconds, and other
+*  coefficents in seconds
       COEFF(1) = (EPHEM_TAI - BASE_TAI ) * 86400.0D0
       COEFF(2) = COEFF(2) * 86400.0D0
       COEFF(3) = COEFF(3) * 86400.0D0
-
-*    Check status
       IF (STATUS .NE. SAI__OK) GOTO 99
 
-*    Write output file
-      CALL ADI_FCOPY( IFID, OFID, STATUS )
+*  Create & map output phase axis
+      CALL BDI_AXMAPR( OFID, TAXIS, 'WRITE', OUTAXPTR, STATUS )
+      CALL BDI_AXPUT0C( OFID, TAXIS, 'Label', 'Phase', STATUS )
+      CALL BDI_AXPUT0C( OFID, TAXIS, 'Units', 'unitless', STATUS )
 
-*    Delete output AXIS
-      CALL BDI_CREAXES( OFID, NDIMS, STATUS )
-
-*    Copy axes except time axis
-      SKIP = 0
-      IF (NDIMS .GT. 1) THEN
-        DO AXN1 = 1, NDIMS
-          IF (AXN1 .NE. TAXIS) THEN
-            AXN2 = AXN1 - SKIP
-            CALL BDI_COPAXIS( IFID, OFID, AXN1, AXN2, STATUS )
-          ELSE
-            SKIP = 1
-          END IF
-        END DO
-      END IF
-
-*    Create & map output phase axis
-      CALL BDI_CREAXVAL( OFID, NDIMS, .FALSE., NPTS, STATUS)
-      CALL BDI_MAPAXVAL( OFID, 'WRITE', NDIMS, OUTAXPTR, STATUS)
-
-*    Write label & units
-      CALL BDI_PUTAXTEXT( OFID, NDIMS, 'Phase', 'Unitless', STATUS )
-
-*    Execute time-phase conversion
+*  Execute time-phase conversion
       CALL PHASE_DOIT( NPTS, %VAL(INAXPTR), COEFF, %VAL(OUTAXPTR),
      :                                                    STATUS )
 
-*    History
+*  History
       CALL HSI_ADD( OFID, VERSION, STATUS )
       CALL HSI_PTXT( OFID, 3, EPHEMERIS, STATUS )
 
-*    Tidy up
+*  Tidy up
  99   CALL AST_CLOSE()
       CALL AST_ERR( STATUS )
 
@@ -239,7 +199,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *
 *    Import :
 *
@@ -292,7 +251,7 @@
 
 *    Tidy up
  99   IF ( STATUS .NE. SAI__OK ) THEN
-         CALL ERR_REP( 'EXERR', '...from PHASE_DOIT', STATUS )
+        CALL AST_REXIT( 'PHASE_DOIT', STATUS )
       END IF
 
       END
