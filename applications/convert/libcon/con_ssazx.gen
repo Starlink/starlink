@@ -39,6 +39,7 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -46,6 +47,8 @@
 *        Original version based on KPG1_SSCOF.
 *     1992 September 18 (MJC):
 *        Renamed from KPG1_SSAZx for CONVERT.
+*     2004 Octover 1 (TIMJ):
+*        Do not need to load NUM_CMN
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -60,7 +63,6 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
 *  Global Variables:
-      INCLUDE 'NUM_CMN'          ! Numerical error flag
 
 *  Arguments Given:
       INTEGER  EL   
