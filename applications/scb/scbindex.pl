@@ -16,43 +16,53 @@
 #  Description:
 #     This program attempts to find all the source code files which form
 #     part of the USSC.  Given a base directory $srcdir, typically
-#     /star/sources, it examines all files underneath it.
+#     /star/sources, it examines all files underneath it, and builds
+#     three indexes: 
 #
-#     These files may be sitting 'naked' in one of the subordinate 
-#     directories, or may be in a (compressed or uncompressed) tar file,
-#     or may be in a tar file within such a tar file (nested to an 
-#     arbitrary level, although not usually deeper than 2).
-#     For every file, its name and location are written to a StarIndex
-#     object.
+#        - a DBM file called 'file' of C and Fortran functions and routines
+#        - a DBM file called 'func' of all files comprising each package
+#        - a text file called 'tasks' of all package and task names
+#
+#     The files examined to build these indexes may be sitting 'naked' 
+#     in one of the directories below $srcdir, or may be in a (compressed
+#     or uncompressed) tar file, or may be in a tar file within such a 
+#     tar file (nested to an arbitrary level, although not usually deeper 
+#     than 2).
+#
+#     For every file located, its name and location are written to the 
+#     'file' index.
 #
 #     Other actions may be taken according to the kind of file:
 #
 #     If a language-specific tagging routine exists for that file type, 
-#     it is tagged and any modules (functions or subroutines) defined 
-#     in it are written by name and location of the file into a 
-#     StarIndex object (a different one from the one in which filenames
-#     are stored, so that the namespaces are independent).
+#     it is tagged and any function definitions the tagging routines 
+#     identify in it are written by name and location of the file into 
+#     the 'func' index.
 #     
 #     If a .hlp file is found, it is used to try to identify the names
-#     of 'tasks' within the package.  Future versions may examine other
-#     files to gain more indexable information about the packages.
-#
-#     Finally a list of packages, and tasks within each package,
-#     is written out to a second file ($taskfile).
+#     of 'tasks' within the package.  As well as the examining .hlp 
+#     files, some poking around in $bindir (typically /star/bin) is 
+#     done to try to locate more tasks.  
 #     What constitutes a task is not well defined, but is something
 #     like the name of an executable or alias which can be typed from
 #     the user environment to do something useful in the package, and
 #     for which an identifiable piece of source code exists.
-#     As well as the method described above, some more poking around
-#     in $bindir (typically /star/bin) is done to try to locate more
-#     tasks.  The general philosophy for identifying tasks is to look
-#     everywhere which might give an indication of task names, and 
+#     The general philosophy for identifying tasks is to
+#     look everywhere which might give an indication of task names, and
 #     store anything which looks as if it might be a task name in the 
 #     global hash of lists %tasks.  At the end of the indexing, each 
 #     task name candidate in %tasks for which a corresponding source 
 #     module (i.e one in the same package with the same, or nearly
 #     the same name) can be found is written out to the task list, 
 #     and the others are discarded.
+#
+#     The 'file' and 'func' indexes are implemented as StarIndex objects.
+#     These are documented in the module StarIndex.pm, but basically 
+#     resemble a (disk based) two-dimensional hash indexed by key
+#     (where key is filename for 'file' and function name for 'func')
+#     and, optionally, package name.  Hooks are present in the code
+#     for use of other indexes, for instance listing function names 
+#     in languages other than C and Fortran.
 #
 #     Each line in the task file is of the format:
 #
@@ -75,7 +85,7 @@
 #        written for all files and routines found.  Index entries
 #        for other packages are not affected.
 #
-#     If no arguments are given, the indices are erased entirely and
+#     If no arguments are given, the indexes are erased entirely and
 #     built again for scratch from all the packages in $srcdir 
 #     (typically /star/sources).  Additionally all the files in the 
 #     include directory $incdir (typically /star/include) are indexed.
@@ -123,7 +133,6 @@ sub index_tar;
 sub index_hlp;
 sub index_source;
 sub index_files;
-sub taggable;
 sub write_entry;
 sub uniq;
 sub tidyup;
@@ -297,15 +306,15 @@ sub index_pack {
    $package ||= $2;
    print "\nPACKAGE: $package\n";
 
-#  Check specified file is of the right type to index.
+#  Check specified file can be indexed (i.e. is a tar file or directory).
 
    unless ($tarext || -d $pack_file) {
       print "*** Skipping '$fqpack_file' (not tar file or directory) ***\n";
       return;
    }
 
-#  If any records for this package already exist in the function index, 
-#  or file index, delete them.
+#  If any records for this package already exist in any of the indexes,
+#  delete them.
 
    my ($key, $value);
 
@@ -554,6 +563,8 @@ sub index_tar {
 #     indexing will be in at least one level of tarfile, and conversely
 #     most things which are not in a tarfile will be not worth indexing,
 #     e.g. large numbers of object files generated by package building.
+#     A few exceptions to this expectation are dealt with explicitly in
+#     the index_pack() routine.
 
 #  Arguments:
 #     $path = string.
@@ -634,7 +645,7 @@ sub index_source {
 #     This routine passes a source file to a language-specific tagging
 #     routine, and examines the tagged result for the names of any
 #     modules (functions or subroutines) defined in the file.  If any
-#     are found they are written to the 'func' StarIndex object.
+#     are found they are written to the 'func' index.
 
 #  Arguments:
 #     $path = string.
@@ -691,7 +702,7 @@ sub index_source {
    while ($tagged =~ /(<[^>]+>)/g) {
       %tag = parsetag $1;
       if (($tag{'Start'} eq 'a') && $tag{'name'}) {
-         write_entry $tag{'name'}, $path;
+         write_entry 'func', $tag{'name'}, $path;
       }
    }
 
@@ -810,7 +821,8 @@ sub index_includes {
 #     This routine goes through a named directory supposed to contain 
 #     a set of files to be indexed, and indexes them under the package
 #     name given.  It is designed to be used for the $incdir (typically
-#     /star/include) directory.
+#     /star/include) directory.  Note that as written no subdirectories
+#     are explored.
 
 #  Arguments:
 #     $dir = string.
@@ -880,6 +892,8 @@ sub write_entry {
 #     output.
 
 #  Arguments:
+#     $iname = string.
+#        Name of the index (StarIndex object).
 #     $name = string.
 #        Key of record (name of module).
 #     $location = string.
@@ -908,16 +922,16 @@ sub write_entry {
 
 #  Arguments.
 
-   my ($name, $location) = @_;
+   my ($iname, $name, $location) = @_;
 
 #  Tidy path string.
 
-   $location =~ s%([#>/])\./%$1%g;
+   $location =~ s%([#/])\./%$1%g;
    $location =~ s%//+%/%g;
 
 #  Write entry to StarIndex object.
 
-   $index{'func'}->put($name, $location);
+   $index{$iname}->put($name, $location);
 
 #  Optionally log entry to stdout.
 
@@ -989,11 +1003,7 @@ sub index_files {
 
 #     Write entry
 
-      $index{'file'}->put($name, $location);
-
-#     Optionally log entry to stdout.
-
-      printf "%-20s =>  %s\n", $name, $location if ($verbose);
+      write_entry 'file', $name, $location;
    }
 }
 
