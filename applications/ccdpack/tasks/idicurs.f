@@ -310,9 +310,11 @@
       INTEGER NDFGR              ! NDG identifier of group of NDFs
       INTEGER NF                 ! Number of fields per line of input list
       INTEGER NFIELD             ! Number of fields in first line of input file
+      INTEGER NLGR               ! Group of NDFs with no associated lists
       INTEGER NPOS               ! Number of positions in list
       INTEGER NRET               ! Number of returns
       INTEGER NNDF               ! Number of NDFs in group
+      INTEGER NNOLIS             ! Number of NDFs with no associated lists
       INTEGER OLSTGR             ! GRP identifier for output position list files
       INTEGER WINDIM( 2 )        ! Dimensions of display window
       LOGICAL INEXT              ! True if input position list is in extension
@@ -353,12 +355,24 @@
 *  Get the NDFs and input position lists.
          IF ( INEXT ) THEN
             CALL CCD1_GTLIG( .TRUE., 'CURRENT_LIST', 'IN', 1, 
-     :                       CCD1__MXNDF, NNDF, ILSTGR, NDFGR, STATUS )
+     :                       CCD1__MXNDF, NNDF, ILSTGR, NDFGR, NNOLIS,
+     :                       NLGR, STATUS )
+            CALL CCD1_GRDEL( NLGR, STATUS )
+
+*  If not all supplied NDFs have position lists, warn the user of
+*  this fact and continue.
+            IF ( NNOLIS .GT. 0 ) THEN 
+               CALL CCD1_MSG( ' ', '  NDFs with no associated '//
+     :         'position lists will be ignored.', STATUS )
+               CALL CCD1_MSG( ' ', ' ', STATUS )
+            END IF
+
          ELSE
             CALL CCD1_NDFGL( 'IN', 1, CCD1__MXNDF, NDFGR, NNDF, STATUS )
             CALL CCD1_GTLIG( .FALSE., ' ', 'INLIST', NNDF, NNDF, NRET,
-     :                       ILSTGR, DUMGR, STATUS )
+     :                       ILSTGR, DUMGR, NNOLIS, NLGR, STATUS )
             CALL CCD1_GRDEL( DUMGR, STATUS )
+            CALL CCD1_GRDEL( NLGR, STATUS )
          END IF
 
 *  Otherwise, just get a group of NDFs.

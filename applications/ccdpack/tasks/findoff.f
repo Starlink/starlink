@@ -503,14 +503,11 @@
       CHARACTER * ( CCD1__BLEN ) LINE2 ! Line buffer for writing out text
       CHARACTER * ( DAT__SZLOC ) LOCEXT ! HDS locator for CCDPACK extension
       CHARACTER * ( FIO__SZFNM ) FNAME ! Buffer to store filenames
-      CHARACTER * ( GRP__SZNAM ) NDFNAM ! Name of the NDF
       CHARACTER * ( 4 ) METHOD  ! Last method attempted for object matching
       DOUBLE PRECISION BNDX( 4, CCD1__MXLIS ) ! X coords of bounding boxes
       DOUBLE PRECISION BNDY( 4, CCD1__MXLIS ) ! Y coords of bounding boxes
       DOUBLE PRECISION XP( 4 )  ! Pixel domain dummy point X coordinates
-      DOUBLE PRECISION XQ( 2 )  ! Current frame dummy point X coordinates
       DOUBLE PRECISION YP( 4 )  ! Pixel domain dummy point Y coordinates
-      DOUBLE PRECISION YQ( 2 )  ! Current frame dummy point Y coordinates
       DOUBLE PRECISION COMFAC   ! Completeness factor
       DOUBLE PRECISION ERROR    ! Error in input positions
       DOUBLE PRECISION MINSEP   ! Minimum input data separation
@@ -524,6 +521,7 @@
       DOUBLE PRECISION YOFF( CCD1__MXLIC ) ! Determined Y translation
       DOUBLE PRECISION YOFFN( CCD1__MXLIS ) ! Final Y translation
       INTEGER COUNT             ! Dummy loop counter
+      INTEGER DUMMY             ! Dummy value
       INTEGER FDIN              ! Input FIO descriptor
       INTEGER FDOUT             ! Output FIO descriptor
       INTEGER FIOGR             ! Input group identifier
@@ -585,6 +583,7 @@
       INTEGER IPYT              ! Pointer to temporary Y coords
       INTEGER IS                ! Superlist loop variable
       INTEGER ISUP( CCD1__MXLIS ) ! Superlist index applying to this list
+      INTEGER IWCS              ! AST pointer to WCS frameset
       INTEGER J                 ! Loop variable
       INTEGER LBND( 2 )         ! Lower pixel-index bounds of NDF 
       INTEGER K                 ! Loop index
@@ -592,16 +591,17 @@
       INTEGER LOOPS             ! Number of comparison loops
       INTEGER MAPS( CCD1__MXLIS ) ! AST pointers to PIXEL->Current mappings
       INTEGER MAPSET( CCD1__MXLIS ) ! AST pointers to CCD_SET->Current mappings
-      INTEGER MAP1              ! Unsimplified mapping
       INTEGER MINMAT            ! Minimum number of positions for match
       INTEGER NDFGR             ! Input NDF group
       INTEGER NDIM              ! Number of dimensions in NDF
       INTEGER NEDGES            ! Number of edges in graph
       INTEGER NEWED             ! Number of edges in spanning graph
+      INTEGER NLGR              ! Group of NDFs with no associated lists
       INTEGER NLOUT             ! Number of matched points in list
       INTEGER NMAT( CCD1__MXLIC ) ! Number of matched positions
       INTEGER NMATCH            ! Number of matches
       INTEGER NNODE             ! Number of nodes in spanning graph
+      INTEGER NNOLIS            ! Number of NDFs with no associated lists
       INTEGER NOPEN             ! Number of input files opened
       INTEGER NOUT( CCD1__MXLIS ) ! Number of output positions in superlist
       INTEGER NPOSS             ! Number of possible point pairs
@@ -646,7 +646,7 @@
       CALL AST_BEGIN( STATUS )
 
 *  Begin NDF context.
-      CALL NDF_BEGIN( STATUS )
+      CALL NDF_BEGIN
 
 *  Initialise GRP identifiers, so that a later call of CCD1_GRDEL on 
 *  an uninitialised group cannot cause trouble.
@@ -663,7 +663,16 @@
 
 *  Get the lists of of positions.
       CALL CCD1_GTLIG( NDFS, 'CURRENT_LIST', 'INLIST', 1, CCD1__MXLIS, 
-     :                 NOPEN, FIOGR, NDFGR, STATUS )
+     :                 NOPEN, FIOGR, NDFGR, NNOLIS, NLGR, STATUS )
+      CALL CCD1_GRDEL( NLGR, STATUS )
+
+*  If not all supplied NDFs have position lists, warn the user of
+*  this fact and continue.
+      IF ( NNOLIS .GT. 0 ) THEN
+         CALL CCD1_MSG( ' ', '  NDFs with no associated position '//
+     :                  'lists will be ignored.', STATUS )
+         CALL CCD1_MSG( ' ', ' ', STATUS )
+      END IF
 
 *  Get the error in the position measurements.
       CALL PAR_GET0D( 'ERROR', ERROR, STATUS )
@@ -732,9 +741,9 @@
 
 *  Extract required Set and WCS information from the position lists,
 *  and write logging messages to the user.
-      CALL CCD1_SWLIS( NDFGR, FIOGR, NOPEN, NDFS, USEWCS, USESET,
-     :                 FRMS, MAPS, MAPSET, ISUP, NSUP, ILIS, ILISOF,
-     :                 STATUS )
+      CALL CCD1_SWLIS( NDFGR, FIOGR, NOPEN, GRP__NOID, 0, NDFS, USEWCS,
+     :                 USESET, FRMS, MAPS, MAPSET, ISUP, NSUP, ILIS,
+     :                 ILISOF, DUMMY, STATUS )
 
 *  Get the pixel size and bounds if required.
       IF ( USEWCS ) THEN
@@ -769,27 +778,15 @@
 
 *  Work out the approximate linear size of a pixel.  This will
 *  be used to convert ERROR and MAXDISP from pixel coordinates to the
-*  coordinates of the frame in question.  It's approximate for two 
-*  reasons; it's an average of the X and Y linear sizes, and it's taken
-*  from the middle of the data region (it may in fact vary with position), 
-*  but these should both be acceptable in normal use.  It's also chosen
+*  coordinates of the frame in question.  It's chosen 
 *  arbitrarily from one or other of the NDFs in a pair being matched,
 *  but if they aren't of very similar scale they are not going to 
 *  match anyway.
-*  First get two points to convert.
-            XP( 1 ) = 0.5D0 * DBLE( LBND( 1 ) + UBND( 1 ) ) - 0.5D0
-            XP( 2 ) = XP( 1 ) + 1D0
-            YP( 1 ) = 0.5D0 * DBLE( LBND( 2 ) + UBND( 2 ) ) - 0.5D0
-            YP( 2 ) = YP( 1 ) + 1D0
+            CALL CCD1_GTWCS( IDIN, IWCS, STATUS )
+            CALL CCD1_PSIZE( IWCS, AST__CURRENT, PSIZE( I ), STATUS )
 
-*  Convert the points from pixel to current coordinates.
-            CALL AST_TRAN2( MAPS( I ), 2, XP, YP, .TRUE., XQ, YQ,
-     :                      STATUS )
-
-*  Get the linear size of a pixel in current coordinates.
-            PSIZE( I ) = SQRT( ( XQ( 2 ) - XQ( 1 ) ) ** 2 + 
-     :                         ( YQ( 2 ) - YQ( 1 ) ) ** 2 ) 
-     :                             / SQRT( 2D0 )
+*  Relase the NDF.
+            CALL NDF_ANNUL( IDIN, STATUS )
          END DO
 
 *  Not using WCS; set pixel size to unity, since the coordinates we will

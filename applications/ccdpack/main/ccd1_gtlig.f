@@ -1,5 +1,5 @@
       SUBROUTINE CCD1_GTLIG( NDFS, ITEM, PARNAM, MINOPN, MAXOPN, NOPEN,
-     :                       FIOGR, NDFGR, STATUS )
+     :                       FIOGR, NDFGR, NNOLIS, NLGR, STATUS )
 *+
 *  Name:
 *     CCD1_GTLIG
@@ -12,7 +12,7 @@
 
 *  Invocation:
 *     CALL CCD1_GTLIG( NDFS, ITEM, PARNAM, MINOPN, MAXOPN, NOPEN,
-*                      FIOGR, NDFGR, STATUS )
+*                      FIOGR, NDFGR, NNOLIS, NLGR, STATUS )
 
 *  Description:
 *     This routine creates a GRP group of filenames. The files are
@@ -55,13 +55,19 @@
 *     MAXOPN = INTEGER (Given)
 *        The maximum number of files which can be opened.
 *     NOPEN = INTEGER (Returned)
-*        The number of files which were opened.
+*        The number of files which were opened (size of FIOGR and NDFGR).
 *     FIOGR = INTEGER (Returned)
 *        A GRP group identifier for the names of the files which have
 *        opened. This group is intended for use as a modification group.
 *     NDFGR = INTEGER (Returned)
 *        An NDG group identifier for the names of the NDFs from which
 *        the filenames were obtained.
+*     NNOLIS = INTEGER (Returned)
+*        The number of NDFs which were specified by the user but have
+*        no associated position list (size of NLGR).
+*     NLGR = INTEGER (Returned)
+*        An NDG group identifier for the names of NDFs which were 
+*        specified by the user, but have no associated position list.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -91,6 +97,8 @@
 *        is no longer fatal.
 *     29-JUN-2000 (MBT):
 *        Replaced use of IRH/IRG with GRP/NDG.
+*     16-MAR-2001 (MBT):
+*        Added NNOLIS and NLGR arguments.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -104,7 +112,6 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! HDS/DAT constants
-      INCLUDE 'USER_ERR'         ! Private error codes
       INCLUDE 'GRP_PAR'          ! Standard GRP constants
 
 *  Arguments Given:
@@ -116,8 +123,10 @@
 
 *  Arguments Returned:
       INTEGER NOPEN
+      INTEGER NNOLIS
       INTEGER FIOGR
       INTEGER NDFGR
+      INTEGER NLGR
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -169,10 +178,12 @@
 
 *  Initialise number of names successfully entered in the group.
          NOPEN = 0
+         NNOLIS = 0
 
 *  Create GRP groups to contain the name strings.
          CALL GRP_NEW( 'CCDPACK:FILELIST', FIOGR, STATUS )
          CALL GRP_NEW( 'CCDPACK:NDFLIST', NDFGR, STATUS )
+         CALL GRP_NEW( 'CCDPACK:NOLIST', NLGR, STATUS )
 
 *  Open each NDF in turn and locate the required name.
          DO 2 I = 1, NRET
@@ -183,15 +194,17 @@
             CALL CCG1_FCH0C( NDFID, ITEM, FNAME, OK ,STATUS )  
             IF ( .NOT. OK .AND. STATUS .EQ. SAI__OK ) THEN
 
-*  Cannot locate the named extension item.  Report that this NDF will
-*  be ignored but take no other action.
+*  Cannot locate the named extension item.  Add this name to the group
+*  of NDFs with no associated list.
+               CALL GRP_PUT( NLGR, 1, NNAME, 0, STATUS )
+               NNOLIS = NNOLIS + 1
+
+*  Report that this NDF will be ignored and add it to the group of 
+*  NDFs with no associated list.
                CALL MSG_SETC( 'NDF', NNAME )
                CALL MSG_SETC( 'ITEM', ITEM )
                CALL CCD1_MSG( ' ',
      :'  The CCDPACK extension of NDF ^NDF has no item ^ITEM.', STATUS )
-               CALL MSG_SETC( 'NDF', NNAME )
-               CALL CCD1_MSG( ' ', '    NDF ^NDF will be ignored.',
-     :                        STATUS )
                CALL CCD1_MSG( ' ', ' ', STATUS )
             ELSE
 
@@ -209,12 +222,14 @@
 
 *  Annul the original NDF group identifier, since it is no longer required.
          CALL CCD1_GRDEL( NDF1GR, STATUS )
-
       ELSE
 
 *  If position lists are given directly, the number to consider must be 
 *  the number in PARNAM.
          NOPEN = NRET
+         NNOLIS = 0
+         NDFGR = GRP__NOID
+         NLGR = GRP__NOID
       END IF
 
 *  Now at stage were we have a group of names which may belong to a
@@ -239,16 +254,21 @@
          END IF
  3    CONTINUE
 
-*  Set status to a not-necessarily-fatal value if the number of files
-*  opened is not the same as the number in the original list.  This will
-*  be the case if NDFs is true and some of the files lacked an ITEM item
-*  in their CCDPACK extensions.
-      IF ( STATUS .EQ. SAI__OK .AND. NOPEN .NE. NRET ) THEN
-         STATUS = USER__003
-         CALL MSG_SETC( 'PARNAM', PARNAM )
-         CALL MSG_SETC( 'ITEM', ITEM )
-         CALL ERR_REP( 'CCD1_GTLIG_NOITEM', '  NDFs in %^PARNAM ' //
-     :' did not contain .MORE.CCDPACK.^ITEM component.', STATUS )
+*  Ensure that we have an acceptable number of lists.  We may have 
+*  arrived here without that if an acceptable number of NDFs were
+*  supplied but they did not all have associated lists.
+      IF ( NOPEN .LT. MINOPN ) THEN
+         STATUS = SAI__ERROR
+         CALL MSG_SETI( 'NOPEN', NOPEN )
+         CALL MSG_SETI( 'MINOPN', MINOPN )
+         CALL ERR_REP( 'CCD1_GTLIG_TOOFEW', 'Only ^NOPEN lists were'//
+     :' supplied - need at least ^MINOPN', STATUS )
+      ELSE IF ( NOPEN .GT. MAXOPN ) THEN
+         STATUS = SAI__ERROR
+         CALL MSG_SETI( 'NOPEN', NOPEN )
+         CALL MSG_SETI( 'MAXOPN', MAXOPN )
+         CALL ERR_REP( 'CCD1_GTLIG_TOOMANY', '^NOPEN lists were'//
+     :' supplied - no more than ^MAXOPN required', STATUS )
       END IF
 
 *  Exit.

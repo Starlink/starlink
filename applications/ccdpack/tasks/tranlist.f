@@ -484,6 +484,8 @@
       INTEGER NDFGRP             ! Group of input NDF names
       INTEGER NFOR               ! Number of forward variables
       INTEGER NINV               ! Number of inverse functions =2 X+Y
+      INTEGER NLGRP              ! Group of NDFs with no associated lists
+      INTEGER NNOLIS             ! Number of NDFs with no associated lists
       INTEGER NOPEN              ! Number of input files
       INTEGER NREC               ! Number of input records
       INTEGER NRET               ! Number coefficients supplied
@@ -529,7 +531,16 @@
 *  Now get the list names. If NDFS is true then we require a group of
 *  NDFs are well as the group of list names.
       CALL CCD1_GTLIG( NDFS, 'CURRENT_LIST', 'INLIST', 1, CCD1__MXLIS,
-     :                 NOPEN, FIOGRP, NDFGRP, STATUS )
+     :                 NOPEN, FIOGRP, NDFGRP, NNOLIS, NLGRP, STATUS )
+      CALL CCD1_GRDEL( NLGRP, STATUS )
+
+*  If not all supplied NDFs have position lists, warn the user of
+*  this fact and continue.
+      IF ( NNOLIS .GT. 0 ) THEN
+         CALL CCD1_MSG( ' ', '  NDFs with no associated position '//
+     :                  'lists will be ignored.', STATUS )
+         CALL CCD1_MSG( ' ', ' ', STATUS )
+      END IF
 
 *  Write the names of the input lists out to the user.
       CALL CCD1_MSG( ' ', ' ', STATUS )

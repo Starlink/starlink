@@ -338,8 +338,10 @@
       INTEGER NCOL              ! First dimension of input NDF
       INTEGER NDFGR             ! Input group of NDF names
       INTEGER NDIM              ! Dimensionality of input NDF
+      INTEGER NLGR              ! Group of NDFs with no associated lists
       INTEGER NLINE             ! Second dimension of input NDF
       INTEGER NNDF              ! Number of input NDFs
+      INTEGER NNOLIS            ! Number of NDFs with no associated lists
       INTEGER NOUT              ! Number of centroids output
       INTEGER NREC              ! Number of records read from positions file
       INTEGER NVAL              ! Number values per input record
@@ -379,7 +381,16 @@
 
 *  NDF names will also supply the position list names.
          CALL CCD1_GTLIG( .TRUE., 'CURRENT_LIST', 'IN', 1, CCD1__MXNDF,
-     :                    NNDF, FIOGR, NDFGR, STATUS )
+     :                    NNDF, FIOGR, NDFGR, NNOLIS, NLGR, STATUS )
+         CALL CCD1_GRDEL( NLGR, STATUS )
+
+*  If not all supplied NDFs have position lists, warn the user of
+*  this fact and continue.
+         IF ( NNOLIS .GT. 0 ) THEN
+            CALL CCD1_MSG( ' ', '  NDFs with no associated position '//
+     :                     'lists will be ignored.', STATUS )
+            CALL CCD1_MSG( ' ', ' ', STATUS )
+         END IF
       ELSE
 
 *  Just get a group of NDF names.
