@@ -9221,17 +9221,17 @@ physical coordinate space.
 \subsection{\label{ss:plottinggeneralizedcurves}Plotting Generalized Curves}
 We have seen how geodesic curves and grid lines can be drawn. The \htmlref{Plot}{Plot}
 class includes another method,
-AST_GENCURVE,
+\htmlref{AST\_GENCURVE}{AST_GENCURVE},
 which allows curves of {\em any} form to be drawn. The caller supplies a
 \htmlref{Mapping}{Mapping} which maps offset along the curve\footnote{normalized so that the
 start of the curve is at offset 0.0 and the end of the curve is at offset
 1.0 - offset need not be linearly related to distance.} into the
 corresponding position in the current \htmlref{Frame}{Frame} of the Plot.
-AST_GENCURVE,
+AST\_GENCURVE,
 then takes care of Mapping these positions into graphics coordinates. The
 choice of exactly which positions along the curve are to be used to
 define the curve is also made by
-AST_GENCURVE,
+AST\_GENCURVE,
 using an adaptive algorithm which concentrates points around areas where
 the curve is bending sharply or is discontinuous in graphics coordinates.
 
