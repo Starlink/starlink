@@ -238,7 +238,6 @@ javadocs:
 webstart:
 
 dist:
-    [chmod] Result: -1
 
 create_archives:
       [zip] Building zip: /apps/cvsbuild/export/diva-1.0.zip
@@ -855,6 +854,7 @@ docs:
 
 jars:
       [jar] Building jar: /apps/cvsbuild/java/source/topcat/lib/topcat/topcat.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/topcat/lib/topcat/ivoafits-notamfits-0.2.jar
   [signjar] Signing Jar : /apps/cvsbuild/java/source/topcat/lib/topcat/jel_g.jar
   [signjar] Signing Jar : /apps/cvsbuild/java/source/topcat/lib/topcat/epsgraphics_classes.jar
   [signjar] Signing Jar : /apps/cvsbuild/java/source/topcat/lib/topcat/acme_encoding.jar
@@ -1016,4 +1016,4 @@ create_archives:
    [delete] Deleting: /apps/cvsbuild/java/source/frog/frog-0.7.0.tar
 
 BUILD SUCCESSFUL
-Total time: 23 minutes 23 seconds
+Total time: 23 minutes 20 seconds

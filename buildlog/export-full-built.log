@@ -729,6 +729,7 @@ docs:
 
 jars:
       [jar] Building jar: /apps/cvsbuild/java/source/topcat/lib/topcat/topcat.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/topcat/lib/topcat/ivoafits-notamfits-0.2.jar
   [signjar] Signing Jar : /apps/cvsbuild/java/source/topcat/lib/topcat/jel_g.jar
   [signjar] Signing Jar : /apps/cvsbuild/java/source/topcat/lib/topcat/epsgraphics_classes.jar
   [signjar] Signing Jar : /apps/cvsbuild/java/source/topcat/lib/topcat/acme_encoding.jar
@@ -744,8 +745,8 @@ dist:
 
 install:
 [loggedcopy] Copying 1 file to /apps/cvsbuild/starjava/bin
-[loggedcopy] Copying 6 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 213 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 7 files to /apps/cvsbuild/starjava/lib
+[loggedcopy] Copying 214 files to /apps/cvsbuild/starjava/docs
 [loggedcopy] Copying 86 files to /apps/cvsbuild/starjava/docs
      [echo] Executing Treeview target: install
 
@@ -878,4 +879,4 @@ export-full-built:
       [tar] Building tar: /apps/cvsbuild/export/starjava-i386.tar.gz
 
 BUILD SUCCESSFUL
-Total time: 3 minutes 58 seconds
+Total time: 4 minutes 7 seconds

@@ -9026,6 +9026,7 @@ U java/source/topcat/src/etc/demo/wdc/sunspots.wdc
 cvs checkout: Updating java/source/topcat/src/lib
 U java/source/topcat/src/lib/acme_encoding.jar
 U java/source/topcat/src/lib/epsgraphics_classes.jar
+U java/source/topcat/src/lib/ivoafits-notamfits-0.2.jar
 U java/source/topcat/src/lib/jel_g.jar
 cvs checkout: Updating java/source/topcat/src/main
 cvs checkout: Updating java/source/topcat/src/main/uk
@@ -9043,9 +9044,12 @@ U java/source/topcat/src/main/uk/ac/starlink/topcat/CheckBoxStack.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/ClassComboBoxRenderer.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/ColumnCellRenderer.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/ColumnComboBoxModel.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/ColumnConverter.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/ColumnIndexSpinner.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/ColumnInfoWindow.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/ColumnList.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/ColumnSelector.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/ColumnSelectorModel.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/ConcatWindow.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/ControlWindow.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/CustomComboBoxRenderer.java
@@ -9110,8 +9114,6 @@ U java/source/topcat/src/main/uk/ac/starlink/topcat/func/SuperCosmos.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/func/TwoQZ.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/func/package.html
 cvs checkout: Updating java/source/topcat/src/main/uk/ac/starlink/topcat/join
-U java/source/topcat/src/main/uk/ac/starlink/topcat/join/ColumnConverter.java
-U java/source/topcat/src/main/uk/ac/starlink/topcat/join/ColumnSelector.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/join/InterMatchSpec.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/join/IntraMatchSpec.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/join/MatchOption.java
