@@ -26,6 +26,9 @@ AC_LANG_CPLUSPLUS
 dnl   Check for a Perl binary, looking in the likely Starlink area first
 AC_PATH_PROG(PERL, perl, perl, /star/bin:$PATH)
 
+dnl   Check for other tools
+AC_PROG_RANLIB
+
 dnl   Checks for header files.  I don't actually use these defines within
 dnl   the program, so there doesn't seem much point in testing for them. 
 dnl   I think everything I use is in invoked in the place it's supposed to
@@ -39,6 +42,9 @@ dnl AC_CHECK_HEADERS(assert.h)
 dnl   Check if we've got sstream.  If not, we'll assume we have the older
 dnl   strstream
 AC_CHECK_HEADERS(sstream)
+
+dnl   Do we have a map implementation?
+AC_CHECK_HEADERS(map)
 
 dnl   What type of system are we on?
 dnl   The alpha cxx compiler currently (v6.0) needs to be invoked with 
@@ -57,42 +63,159 @@ AC_TRY_COMPILE([#include <cstdio>],,
   AC_DEFINE(HAVE_CSTD_INCLUDE) AC_MSG_RESULT(yes),
   AC_MSG_RESULT(no))
 
-dnl  AC_CHECK_HEADER(cat/AstroCatalog.h,AC_DEFINE(ENABLE_CAT))
-dnl   Specify (or at least check) the location of the cat library.
-dnl
-dnl   This had better work, since the program depends absolutely on
-dnl   the presence of this library.  The option --without-cat works,
-dnl   in the sense that support for the library is not compiled in,
-dnl   but the program as a whole doesn't work in that case, so it's
-dnl   pretty pointless.
-dnl
-AC_SUBST(CATOBJ)
-AC_ARG_WITH(cat,
-[  --with-cat[=path]       Use skycat, giving optional path to library],
-  if test "$withval" = "yes"
-  then
-    AC_CHECK_HEADER(cat/AstroCatalog.h,
-    AC_CHECK_LIB(cat, main,
-      AC_DEFINE(ENABLE_CAT) 
-      LIBS="$LIBS -lcat"))
-  elif test "$withval" != "no"
-  then
-    safe_CPPFLAGS="$CPPFLAGS"
-    CPPFLAGS="$CPPFLAGS -I$withval/include"
-    safe_LIBS="$LIBS"
-    LIBS="$LIBS -L$withval/lib -lcat"
-    AC_CHECK_HEADER(cat/AstroCatalog.h,
-      AC_CHECK_LIB(cat, main,
-        AC_DEFINE(ENABLE_CAT) 
-        safe_CPPFLAGS="$safe_CPPFLAGS -I$withval/include"
-        safe_LIBS="$safe_LIBS -L$withval/lib -lcat"))
-    CPPFLAGS="$safe_CPPFLAGS"
-    LIBS="$safe_LIBS"
+dnl   Add the Starlink include and library paths.  The following
+dnl   components are standard Starlink components (or semi-standard,
+dnl   in the case of cat), so should be in standard places.  Don't add 
+dnl   in much configuration flexibility here -- it's probably won't be 
+dnl   necessary.  Use the STARLINK environment variable.
+AC_SUBST(SLASHSTAR)
+AC_MSG_CHECKING(whether we can find a Starlink installation)
+SLASHSTAR=`(test -n "$STARLINK" && echo $STARLINK) || (test -d /star && echo /star) || (test -d /stardev && echo /stardev)`
+if test -z "$SLASHSTAR"; then
+    AC_MSG_ERROR(No!  Eeek! Giving up.)
+    exit 1
+fi
+AC_MSG_RESULT($SLASHSTAR)
+dnl CPPFLAGS="$CPPFLAGS -I$STARLINK/include"
+dnl LIBS="$LIBS -L$STARLINK/lib"
+dnl AC_CHECK_HEADER(ast.h)
+dnl AC_CHECK_LIB(ast, astIsAFrameSet)
+
+dnl   Specify any non-default location for the SkyCat build
+AC_SUBST(CATLIBSRCDIR)
+AC_ARG_WITH(catlib-builddir,
+[  --with-catlib-builddir=path  Build SkyCat here (default=PWD)],
+  if test "$withval" = "yes"; then
+    # Just take this to indicate the default
+    # Note we need a full path name, since this will
+    # be handed to the SkyCat configure script, which will be doing
+    # its installation from within a different directory to the
+    # current one.
+    CATLIBSRCDIR=`pwd`/SkyCat-build
+  elif test "$withval" != "no"; then
+    test -d $withval || mkdir -p $withval
+    # If the following directory already exists, then the distribution 
+    # won't be unpacked.
+    CATLIBSRCDIR=$withval/SkyCat-build
+  else
+    AC_MSG_WARN(can't say --without-catlib-builddir: using default)
+    CATLIBSRCDIR=`pwd`/SkyCat-build
   fi,
-  AC_CHECK_HEADER(cat/AstroCatalog.h,
-    AC_CHECK_LIB(cat, main,
-      AC_DEFINE(ENABLE_CAT) 
-      LIBS="$LIBS -lcat")))
+  CATLIBSRCDIR=`pwd`/SkyCat-build)
+
+dnl   Find the SkyCat cat library tarball, unpack it, and configure it
+dnl   for building without Tcl.
+AC_ARG_WITH(catlib,
+[  --with-catlib[=path]    Give non-default location of SkyCat tarball],
+  if test "$withval" = "yes"; then
+    # Look in the current directory
+    tarball=`ls ./catlib*tar* 2>/dev/null`
+  elif test "$withval" != "no"; then
+    tarball=`ls $withval 2>/dev/null`
+  fi,
+  tarball=`ls ./catlib*tar* 2>/dev/null`)
+
+AC_SUBST(CATLIBINSTALLDIR)
+AC_SUBST(CATLIBTOP)
+if test -z "$tarball"; then
+    AC_MSG_ERROR(Can't find SkyCat catlib tarball)
+else
+    # canonicalise the tarball name with a full path
+    # echo "tarball=$tarball"
+    tarballdir=`dirname $tarball`
+    tarball=`cd $tarballdir;pwd`/`basename $tarball`
+    # Find the base-name of the tarball -- "catlib" plus version number
+    #CATLIBSRCDIR=`expr $tarball : '.*\(catlib\([-.0-9]*[0-9]\+\)\?\)[^/]*$'`
+    if test -d $CATLIBSRCDIR; then
+	AC_MSG_WARN(Directory $CATLIBSRCDIR already exists -- not unpacked/configured again)
+	# ...but we do have to refind the configure scripts, in order
+	# to find the top of the source tree.  Done as below.
+	config=`find $CATLIBSRCDIR -name configure | \
+		awk 'BEGIN{l=999;s=x;} \
+			{if (length() < l) {l=length();s=$0;}} \
+			END {print s;}'`
+	if test -z "$config"; then
+	    AC_MSG_ERROR(Can't find any configure script in $CATLIBSRCDIR)
+	fi
+	CATLIBTOP=`dirname $config`
+	CATLIBINSTALLDIR=$CATLIBSRCDIR/INSTALL
+    else
+	# NB m4 quote brackets below
+	tarballext=[`expr $tarball : '.*\.\([^.]*\)$'`]
+	case "$tarballext" in
+	    Z)   tarballuncompress=`which uncompress 2>/dev/null`' -c' ;;
+	    gz)  tarballuncompress=`which gzip 2>/dev/null`' -d -c' ;;
+	    bz2) tarballuncompress=`which bzip2 2>/dev/null`' -d -c' ;;
+	    tar) tarballuncompress=cat ;;
+	    *)   tarballuncompress='' ;;
+	esac
+	#echo "tarballuncompress=$tarballuncompress"
+	if test -z "$tarballuncompress"; then
+	    AC_MSG_ERROR([Don't know how to uncompress files like $tarball, with extension <$tarballext>])
+	elif expr "x$tarballuncompress" : "x *-" >/dev/null; then
+	    AC_MSG_ERROR(Can't find the command to uncompress extension <$tarballext>)
+	else
+	    # We know this directory doesn't exist, because we tested
+	    # for that above.
+	    mkdir $CATLIBSRCDIR
+	    (cd $CATLIBSRCDIR; $tarballuncompress $tarball | tar xf -)
+	    # Find the top-level configure script by finding all the configure
+	    # scripts and picking the shortest
+	    config=`find $CATLIBSRCDIR -name configure | \
+			awk 'BEGIN{l=999;s=x;} \
+				{if (length() < l) {l=length();s=$0;}} 
+				END {print s;}'`
+	    if test -z "$config"; then
+		AC_MSG_ERROR(Can't find any configure script in $CATLIBSRCDIR)
+	    fi
+	    CATLIBTOP=`dirname $config`
+	    #echo "config=$config CATLIBTOP=$CATLIBTOP"
+	    CATLIBINSTALLDIR=$CATLIBSRCDIR/INSTALL
+	    mkdir $CATLIBINSTALLDIR
+	    # Configure catlib with the --with-notcl option
+	    echo "Configuring SkyCat..."
+	    (cd $CATLIBTOP;./configure --prefix=$CATLIBINSTALLDIR --with-notcl)
+	    echo "Done!  SkyCat configured"
+	fi
+    fi
+fi
+
+dnl dnl   AC_CHECK_HEADER(cat/AstroCatalog.h,AC_DEFINE(ENABLE_CAT))
+dnl dnl   Specify (or at least check) the location of the cat library.
+dnl dnl
+dnl dnl   This had better work, since the program depends absolutely on
+dnl dnl   the presence of this library.  The option --without-cat works,
+dnl dnl   in the sense that support for the library is not compiled in,
+dnl dnl   but the program as a whole doesn't work in that case, so it's
+dnl dnl   pretty pointless.
+dnl dnl
+dnl dnl AC_SUBST(CATOBJ)
+dnl AC_ARG_WITH(cat,
+dnl [  --with-cat[=path]       Use skycat, giving optional path to library],
+dnl   if test "$withval" = "yes"
+dnl   then
+dnl     AC_CHECK_HEADER(cat/AstroCatalog.h,
+dnl     AC_CHECK_LIB(cat, main,
+dnl       AC_DEFINE(ENABLE_CAT) 
+dnl       LIBS="$LIBS -lcat"))
+dnl   elif test "$withval" != "no"
+dnl   then
+dnl     safe_CPPFLAGS="$CPPFLAGS"
+dnl     CPPFLAGS="$CPPFLAGS -I$withval/include"
+dnl     safe_LIBS="$LIBS"
+dnl     LIBS="$LIBS -L$withval/lib -lcat"
+dnl     AC_CHECK_HEADER(cat/AstroCatalog.h,
+dnl       AC_CHECK_LIB(cat, main,
+dnl         AC_DEFINE(ENABLE_CAT) 
+dnl         safe_CPPFLAGS="$safe_CPPFLAGS -I$withval/include"
+dnl         safe_LIBS="$safe_LIBS -L$withval/lib -lcat"))
+dnl     CPPFLAGS="$safe_CPPFLAGS"
+dnl     LIBS="$safe_LIBS"
+dnl   fi,
+dnl   AC_CHECK_HEADER(cat/AstroCatalog.h,
+dnl     AC_CHECK_LIB(cat, main,
+dnl       AC_DEFINE(ENABLE_CAT) 
+dnl       LIBS="$LIBS -lcat")))
 
 
 AC_OUTPUT(Makefile test/Makefile)
