@@ -238,6 +238,10 @@
           ELSE IF ( CMD .EQ. 'DISP' ) THEN
             CALL IBGND_DISP_SURF( .FALSE., STATUS )
 
+*      Display model residuals
+          ELSE IF ( CMD .EQ. 'RDISP' ) THEN
+            CALL IBGND_DISP_SURF( .TRUE., STATUS )
+
           END IF
 
         END IF
@@ -2447,21 +2451,25 @@
               BGMOD(I,J) = 0.0
             ELSE
 
-*          Find exact distance to this pixel
-              XW = I_XBASE + (I-1)*I_XSCALE
-              XW = XW - I_BGM_X0
-              R = SQRT( XW*XW + Y2 ) / I_BGM_RBIN
-
-*          Evaluate fitted function at R
+*          Simple average
               IF ( FMODE .EQ. F__CONS ) THEN
                 BGMOD(I,J) = MEAN
 
+*          No fitting
               ELSE IF ( FMODE .EQ. F__NONE ) THEN
                 IF ( IDX(I,J) .GT. 0 ) THEN
                   BGMOD(I,J) = SAMM(IDX(I,J))
                 ELSE
                   BGMOD(I,J) = 0.0
                 END IF
+
+*          Evaluate fitted function at R
+              ELSE
+
+*            Find exact distance to this pixel
+                XW = I_XBASE + (I-1)*I_XSCALE
+                XW = XW - I_BGM_X0
+                R = SQRT( XW*XW + Y2 ) / I_BGM_RBIN
 
               END IF
 
@@ -2692,6 +2700,9 @@
         END DO
       END IF
 
+*  Fitting
+      I_BGM_FIT = 'NONE'
+
       END
 
 
@@ -2725,6 +2736,7 @@
      : '  SETFIT  - Method of sample interpolation',
      : ' ', ' Plotting commands:',' ',
      : '  DISP    - Display background model image'/
+     : '  RDISP   - Display data - background model residuals'/
       INTEGER ILINE
 *-
 
