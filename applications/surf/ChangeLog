@@ -1,3 +1,48 @@
+2000-06-14  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* scripts/surf.icl: Add SCUCLKERR
+
+	* scripts/surf.csh: Add SCUCLKERR
+
+2000-06-13  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* src/surf_scuover.f: Reset plot attributes on exit
+
+2000-06-08  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* src/surf_scuclkerr.f (SURF_SCUCLKERR): Create
+
+	* src/surf_mon.f (SURF_MON): Add SCUCLKERR
+
+	* src/surf_read_rebin_ndf.f (SURF_READ_REBIN_NDF):  Account for
+	new arguments in GET_MJD 
+
+	* src/surf_skydip.f: Account for new arguments in GET_MJD
+
+	* src/surf_scuover.f (SURF_SCUOVER): Account for new
+	arguments in GET_MJD
+
+	* src/surf_remip.f (SURF_REMIP): Account for new
+	arguments in GET_MJD
+
+	* src/surf_extinction.f (SURF_EXTINCTION): Account for new
+	arguments in GET_MJD
+
+	* sculib/sculib_calc_skydip_temps.f (SCULIB_CALC_SKYDIP_TEMPS):
+	Account for new arguments in GET_MJD
+
+	* sculib/sculib_get_mjd.f (SCULIB_GET_MJD): Compensate for startup 
+	time
+
+2000-06-07  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* src/surf_scuover.f (SURF_SCUOVER): Add text attribute to allow
+	control of the label independently of the circles.
+
+2000-06-05  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* scripts/scupa.csh: Parameter COL for SCUOVER replaced with STYLE.
+
 2000-06-02  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* surf_kap/makefile: Include new Kappa routines from V0.14-5
