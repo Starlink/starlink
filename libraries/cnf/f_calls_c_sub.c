@@ -286,6 +286,14 @@ F77_SUBROUTINE(getmem)( POINTER(ptr), INTEGER(n) )
 {
    GENPTR_POINTER(ptr)
    GENPTR_INTEGER(n)
+   void * temp;
 
-   *ptr = (F77_POINTER_TYPE)malloc( *n );
+   temp = cnfMalloc( (size_t)(*n) );
+   *ptr = cnfFptr( temp );
 }   
+
+F77_SUBROUTINE(freemem)( POINTER(ptr) )
+{
+   GENPTR_POINTER(ptr)
+   cnfFree( cnfCptr( *ptr ) );
+}

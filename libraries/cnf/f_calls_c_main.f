@@ -35,6 +35,8 @@
       INTEGER*2 FW, FUW
       INTEGER PTR
 
+      INCLUDE 'CNF_PAR'
+
       COMMON CBI, CBR
       COMMON/COMM1/ CNI, CNR
 
@@ -150,8 +152,9 @@
 
 *  Test the use of pointers.
       CALL GETMEM( PTR, 4*10 )
-      CALL SETMEM( %VAL(PTR), 10 )
-      CALL PRTMEM( %VAL(PTR), 10 )
+      CALL SETMEM( %VAL(CNF_PVAL(PTR)), 10 )
+      CALL PRTMEM( %VAL(CNF_PVAL(PTR)), 10 )
+      CALL FREEMEM( %VAL(CNF_PVAL(PTR)))
       END
 
       SUBROUTINE SETMEM( A, N )
