@@ -253,6 +253,8 @@ static void ReportPoints( AstMapping *, int, AstPointSet *, AstPointSet * );
 static void SetAttrib( AstObject *, const char * );
 static void SetInvert( AstMapping *, int );
 static void SetReport( AstMapping *, int );
+static void Sinc( double, const double [], int, double * );
+static void SincSinc( double, const double [], int, double * );
 static void SpecialBounds( const MapData *, double *, double *, double [], double [] );
 static void Tran1( AstMapping *, int, const double [], int, double [] );
 static void Tran2( AstMapping *, int, const double [], const double [], int, double [], double [] );
@@ -262,166 +264,6 @@ static void ValidateMapping( AstMapping *, int, int, int, int, const char * );
 
 /* Member functions. */
 /* ================= */
-/*
-*++
-*  Name:
-c     astUkern1
-f     AST_UKERN1
-
-*  Purpose:
-*     1-dimensional sub-pixel interpolation kernel.
-
-*  Type:
-*     Fictitious function.
-
-*  Synopsis:
-c     #include "mapping.h"
-c     void astUkern1( double offset, const double params[], int flags,
-c                     double *value )
-f     CALL AST_UKERN1( OFFSET, PARAMS, FLAGS, VALUE, STATUS )
-
-*  Class Membership:
-*     Mapping member function.
-
-*  Description:
-c     This is a fictitious function which does not actually
-c     exist. Instead, this description constitutes a template so that
-c     you may implement a function with this interface for yourself
-c     (and give it any name you wish). A pointer to such a function
-c     may be passed via the "finterp" parameter of the astResample<X>
-c     functions (q.v.) in order to supply a 1-dimensional
-c     interpolation kernel to the algorithm which performs sub-pixel
-c     interpolation during resampling of gridded data (you must also
-c     set the "interp" parameter of astResample<X> to the value
-c     AST__UKERN1). This allows you to use your own interpolation
-c     kernel in addition to those which are pre-defined.
-f     This is a fictitious routine which does not actually
-f     exist. Instead, this description constitutes a template so that
-f     you may implement a routine with this interface for yourself
-f     (and give it any name you wish). Such a routine
-f     may be passed via the FINTERP argument of the AST_RESAMPLE<X>
-f     functions (q.v.) in order to supply a 1-dimensional
-f     interpolation kernel to the algorithm which performs sub-pixel
-f     interpolation during resampling of gridded data (you must also
-f     set the INTERP argument of AST_RESAMPLE<X> to the value
-f     AST__UKERN1). This allows you to use your own interpolation
-f     kernel in addition to those which are pre-defined.
-*
-c     The function calculates the value of a 1-dimensional sub-pixel
-f     The routine calculates the value of a 1-dimensional sub-pixel
-*     interpolation kernel. This determines how the weight given to
-*     neighbouring pixels in calculating an interpolated value depends
-*     on the pixel's offset from the interpolation point. In more than
-*     one dimension, the weight assigned to a pixel is formed by
-*     evaluating this 1-dimensional kernel using the offset along each
-*     dimension in turn. The product of the returned values is then
-*     used as the pixel weight.
-
-*  Parameters:
-c     offset
-f     OFFSET = DOUBLE PRECISION (Given)
-*        This will be the offset of the pixel from the interpolation
-*        point, measured in pixels. This value may be positive or
-*        negative, but for most practical interpolation schemes its
-*        sign should be ignored.
-c     params
-f     PARAMS( * ) = DOUBLE PRECISION (Given)
-c        This will be a pointer to the same array as was given via the
-c        "params" parameter of astResample<X>. You may use this to
-f        This will be the same array as was given via the
-f        PARAMS argument of AST_RESAMPLE<X>. You may use this to
-*        pass any additional parameter values required by your kernel,
-c        but note that params[0] will already have been used to specify
-f        but note that PARAMS(1) will already have been used to specify
-*        the number of neighbouring pixels which contribute to the
-*        interpolated value.
-c     flags
-f     FLAGS = INTEGER (Given)
-c        This will be the same value as was given via the "flags"
-c        parameter of astResample<X>. You may test this value to
-f        This will be the same value as was given via the FLAGS
-f        argument of AST_RESAMPLE<X>. You may test this value to
-*        provide additional control over the operation of your
-c        function. Note that the special flag values AST__URESAMP1, 2,
-f        routine. Note that the special flag values AST__URESAMP1, 2,
-*        3 & 4 are reserved for you to use for your own purposes and
-*        will not clash with other pre-defined flag
-c        values (see astResample<X>).
-f        values (see AST_RESAMPLE<X>).
-c     value
-f     VALUE = DOUBLE PRECISION (Returned)
-c        Pointer to a double to receive the calculated kernal value,
-f        The calculated kernal value,
-*        which may be positive or negative.
-f     STATUS = INTEGER (Given and Returned)
-f        The global status.
-
-*  Notes:
-*     - Not all functions make good interpolation kernels. In general,
-*     acceptable kernels tend to be symmetrical about zero, to have a
-*     positive peak (usually unity) at zero, and to evaluate to zero
-*     whenever the pixel offset has any other integral value (this
-*     last property ensures that the interpolated values pass through
-*     the original data). An interpolation kernel may or may not have
-*     regions with negative values. You should consult a good book on
-*     image processing for more details.
-c     - If an error occurs within this function, it should use
-c     astSetStatus to set the AST error status to an error value.
-c     This will cause an immediate return from astResample<X>.
-f     - If an error occurs within this routine, it should set the
-f     STATUS argument to an error value before returning. This will
-f     cause an immediate return from AST_RESAMPLE<X>.
-*--
-*/
-/* Note the above is just a description to act as a template. The
-   function does not actually exist. */
-
-static void SincSinc( double x, const double params[], int flags, double *result ) {
-   static int init = 0;
-   static double pi;
-   if ( !init ) {
-      pi = acos( -1.0 );
-      init = 1;
-   }
-   x *= pi;
-   *result = ( x != 0.0 ) ? ( sin( x ) * 0.5 * sin( 0.5 * x ) / ( x * x ) ) :
-                            1.0;
-}
-static void Sinc( double x, const double params[], int flags, double *result ) {
-   static int init = 0;
-   static double pi;
-   if ( !init ) {
-      pi = acos( -1.0 );
-      init = 1;
-   }
-   x *= pi;
-   if ( x == 0.0 ) {
-      *result = 1.0;
-   } else {
-      *result = sin( x ) / x;
-   }
-}
-static void SqrSinc( double x, const double params[], int flags, double *result ) {
-   static int init = 0;
-   static double pi;
-   if ( !init ) {
-      pi = acos( -1.0 );
-      init = 1;
-   }
-   x *= pi;
-   *result = ( x != 0.0 ) ? ( sin( x ) / x ) : 1.0;
-   *result *= *result;
-}
-static double gausinc_sigma;
-static void GauSinc( double x, const double params[], int flags, double *result ) {
-   double xx;
-   double sinc;
-   Sinc( x, params, flags, &sinc );
-   xx = x / gausinc_sigma;
-   *result = exp( -0.5 * xx * xx ) * sinc;
-}
-/* ---------------------------------------- */
-
 static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /*
 *  Name:
@@ -1756,7 +1598,7 @@ static int InterpolateKernel1##X( AstMapping *this, int ndim_in, \
    Xtype var;                    /* Variance value */ \
    double **kptr;                /* Pointer to array of kernel pointers */ \
    double **kptr_hi;             /* Array of highest kernel pointer values */ \
-   double *kprod;                /* Accumulated kernal value array pointer */ \
+   double *kprod;                /* Accumulated kernel value array pointer */ \
    double *kval;                 /* Pointer to array of kernel values */ \
    double *xn_max;               /* Pointer to upper limits array (n-d) */ \
    double *xn_min;               /* Pointer to lower limits array (n-d) */ \
@@ -5743,7 +5585,7 @@ f        If the INTERP argument has any other value, corresponding to
 f        one of the pre-defined interpolation schemes, then this
 f        routine will not be used and you may supply the null routine
 f        AST_NULL here (note only one underscore).  No EXTERNAL
-f        statment is required for this routine, so long as the AST_PAR
+f        statement is required for this routine, so long as the AST_PAR
 f        include file has been used.
 c     params
 f     PARAMS( * ) = DOUBLE PRECISION (Given)
@@ -5879,7 +5721,7 @@ f        Note that LBND and UBND together define the shape and
 *        should lie wholly within the extent of the output grid (as
 c        defined by the "lbnd_out" and "ubnd_out" arrays). Regions of
 f        defined by the LBND_OUT and UBND_OUT arrays). Regions of
-*        the output grid lying ouside this region will not be
+*        the output grid lying outside this region will not be
 *        modified.
 c     out
 f     OUT( * ) = <Xtype> (Returned)
@@ -6073,7 +5915,31 @@ f     PARAMS(1) should be used to specify how many pixels are to
 c     In these cases, the "finterp" parameter is not used:
 f     In these cases, the FINTERP argument is not used:
 *
-*     - AST__SINC: 
+*     - AST__SINC: This scheme uses the sinc(x) kernel, which
+*     sometimes features as an "optimal" interpolation kernel in books
+*     on image processing. Its supposed optimality depends on the
+*     assumption that the data are band-limited (i.e. have no spatial
+*     frequencies above a certain value) and adequately sampled. In
+*     practice, astronomical data rarely meet these requirements. In
+*     addition, high spatial frequencies are often present due to
+*     (e.g.) image defects and cosmic ray events. Consequently,
+*     substantial ringing can be experienced with this kernel. The
+*     sinc(x) function also decays slowly with distance, so that many
+*     surrounding pixels are required, causing poor performance.
+*     Abruptly truncating the kernel (by using only a few neighbouring
+*     pixels) improves performance and may reduce ringing, but a more
+*     gradual truncation (as implemented by other kernels) is
+*     generally to be preferred. This kernel is provided mainly so
+*     that you can convince yourself not to use it!
+*     - AST__SINCSINC: This scheme uses a rather better kernel, of the
+*     form sinc(x).sinc(x/2) and uses only two neighbouring pixels on
+c     each side of the interpolation point (the "params" array is
+f     each side of the interpolation point (the PARAMS array is
+*     therefore not used).  This is sometimes known as the Lanczos
+*     kernel. It is a good general-purpose scheme, intermediate in its
+*     visual effect on images between the AST__NEAREST and AST__LINEAR
+*     cases. Although the kernel is slightly oscillatory, ringing
+*     is adequately suppressed if the data are well sampled.
 *
 c     Finally, supplying the following values for "interp" allows you
 c     to implement your own sub-pixel interpolation scheme by means of
@@ -6619,7 +6485,7 @@ static int ResampleAdaptively( AstMapping *this, int ndim_in,
 *        the section of the output grid for which resampled values are
 *        required. This section should lie wholly within the extent of
 *        the output grid (as defined by the "lbnd_out" and "ubnd_out"
-*        arrays). Regions of the output grid lying ouside this section
+*        arrays). Regions of the output grid lying outside this section
 *        will not be modified.
 *     out
 *        Pointer to an array with the same data type as the "in"
@@ -6985,7 +6851,7 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
 *        the section of the output grid for which resampled values are
 *        required. This section should lie wholly within the extent of
 *        the output grid (as defined by the "lbnd_out" and "ubnd_out"
-*        arrays). Regions of the output grid lying ouside this section
+*        arrays). Regions of the output grid lying outside this section
 *        will not be modified.
 *     out
 *        Pointer to an array with the same data type as the "in"
@@ -7456,38 +7322,26 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
 
 /* Interpolation using a 1-d kernel. */
 /* --------------------------------- */
-         case AST__GAUSINC:
          case AST__SINC:
          case AST__SINCSINC:
-         case AST__SQRSINC:
          case AST__UKERN1:       /* User-supplied 1-d kernel function */
-
-/* Use the first "params" element to determine the number of
-   neighbouring pixels to use in the interpolation. Ensure at least
-   one pixel is used on either side. */
-            neighb = (int) floor( params[ 0 ] + 0.5 );
-            if ( neighb < 1 ) neighb = 1;
 
 /* Obtain a pointer to the appropriate 1-d kernel function (either
    internal or user-defined) and set up any parameters it may
    require. */
             switch ( interp ) {
-               case AST__GAUSINC:
-                  kernel = GauSinc;
-                  gausinc_sigma = params[ 1 ] / ( 2.0 * sqrt( 2.0 * log( 2.0 ) ) );
-                  break;
                case AST__SINC:
                   kernel = Sinc;
+                  neighb = MaxI( 1, (int) floor( params[ 0 ] + 0.5 ) );
                   break;
                case AST__SINCSINC:
                   kernel = SincSinc;
-                  break;
-               case AST__SQRSINC:
-                  kernel = SqrSinc;
+                  neighb = 2;
                   break;
                case AST__UKERN1: /* User-supplied function */
                   kernel = (void (*)( double, const double [],
                                       int, double * )) finterp;
+                  neighb = MaxI( 1, (int) floor( params[ 0 ] + 0.5 ) );
                   break;
             }
 
@@ -7806,7 +7660,7 @@ static int ResampleWithBlocking( AstMapping *this, const double *linear_fit,
 *        the section of the output grid for which resampled values are
 *        required. This section should lie wholly within the extent of
 *        the output grid (as defined by the "lbnd_out" and "ubnd_out"
-*        arrays). Regions of the output grid lying ouside this section
+*        arrays). Regions of the output grid lying outside this section
 *        will not be modified.
 *     out
 *        Pointer to an array with the same data type as the "in"
@@ -8094,6 +7948,125 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 
 /* Undefine macros local to this function. */
 #undef MATCH
+}
+
+static void Sinc( double offset, const double params[], int flags,
+                  double *value ) {
+/*
+*  Name:
+*     Sinc
+
+*  Purpose:
+*     1-dimensional sinc(x) interpolation kernel.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "mapping.h"
+*     void Sinc( double offset, const double params[], int flags,
+*                double *value )
+
+*  Class Membership:
+*     Mapping member function.
+
+*  Description:
+*     This function calculates the value of a 1-dimensional sub-pixel
+*     interpolation kernel. The function used is sinc(x).
+
+*  Parameters:
+*     offset
+*        The offset of a pixel from the interpolation point, measured
+*        in pixels.
+*     params
+*        Not used.
+*     flags
+*        Not used.
+*     value
+*        Pointer to a double to receive the calculated kernel value.
+
+*  Notes:
+*     - This function does not perform error checking and does not
+*     generate errors.
+*/
+
+/* Local Variables: */
+   static double pi;             /* Value of pi */
+   static int init = 0;          /* Initialisation flag */
+
+/* On the first invocation, initialise a local value for pi. Do this
+   only once. */
+   if ( !init ) {
+      pi = acos( -1.0 );
+      init = 1;
+   }
+
+/* Scale the offset, so that sinc( 1.0 ) == 0.0. */
+   offset *= pi;
+
+/* Evaluate the function. */
+   *value = ( offset != 0.0 ) ? ( sin( offset ) / offset ) : 1.0;
+}
+
+static void SincSinc( double offset, const double params[], int flags,
+                      double *value ) {
+/*
+*  Name:
+*     SincSinc
+
+*  Purpose:
+*     1-dimensional sinc(x) * sinc(x/2) interpolation kernel.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "mapping.h"
+*     void SincSinc( double offset, const double params[], int flags,
+*                    double *value )
+
+*  Class Membership:
+*     Mapping member function.
+
+*  Description:
+*     This function calculates the value of a 1-dimensional sub-pixel
+*     interpolation kernel. The function used is sinc(x) * sinc(x/2).
+
+*  Parameters:
+*     offset
+*        The offset of a pixel from the interpolation point, measured
+*        in pixels.
+*     params
+*        Not used.
+*     flags
+*        Not used.
+*     value
+*        Pointer to a double to receive the calculated kernel value.
+
+*  Notes:
+*     - This function does not perform error checking and does not
+*     generate errors.
+*/
+
+/* Local Variables: */
+   double offset_sq;             /* Square of offset value */
+   static double pi;             /* Value of pi */
+   static int init = 0;          /* Initialisation flag */
+
+/* On the first invocation, initialise a local value for pi. Do this
+   only once. */
+   if ( !init ) {
+      pi = acos( -1.0 );
+      init = 1;
+   }
+
+/* Scale the offset, so that sinc( 1.0 ) == 0.0. */
+   offset *= pi;
+
+/* Evaluate the function. */
+   offset_sq = offset * offset;
+   *value = ( offset_sq != 0.0 ) ?
+            ( 2.0 * sin( offset ) * sin( 0.5 * offset ) / offset_sq ) : 1.0;
 }
 
 static AstMapping *Simplify( AstMapping *this ) {
@@ -9528,6 +9501,120 @@ c     - This function will typically be invoked more than once for each
 c     invocation of astResample<X>.
 f     - This routine will typically be invoked more than once for each
 f     invocation of AST_RESAMPLE<X>.
+c     - If an error occurs within this function, it should use
+c     astSetStatus to set the AST error status to an error value.
+c     This will cause an immediate return from astResample<X>.
+f     - If an error occurs within this routine, it should set the
+f     STATUS argument to an error value before returning. This will
+f     cause an immediate return from AST_RESAMPLE<X>.
+*--
+*/
+/* Note the above is just a description to act as a template. The
+   function does not actually exist. */
+
+/*
+*++
+*  Name:
+c     astUkern1
+f     AST_UKERN1
+
+*  Purpose:
+*     1-dimensional sub-pixel interpolation kernel.
+
+*  Type:
+*     Fictitious function.
+
+*  Synopsis:
+c     #include "mapping.h"
+c     void astUkern1( double offset, const double params[], int flags,
+c                     double *value )
+f     CALL AST_UKERN1( OFFSET, PARAMS, FLAGS, VALUE, STATUS )
+
+*  Class Membership:
+*     Mapping member function.
+
+*  Description:
+c     This is a fictitious function which does not actually
+c     exist. Instead, this description constitutes a template so that
+c     you may implement a function with this interface for yourself
+c     (and give it any name you wish). A pointer to such a function
+c     may be passed via the "finterp" parameter of the astResample<X>
+c     functions (q.v.) in order to supply a 1-dimensional
+c     interpolation kernel to the algorithm which performs sub-pixel
+c     interpolation during resampling of gridded data (you must also
+c     set the "interp" parameter of astResample<X> to the value
+c     AST__UKERN1). This allows you to use your own interpolation
+c     kernel in addition to those which are pre-defined.
+f     This is a fictitious routine which does not actually
+f     exist. Instead, this description constitutes a template so that
+f     you may implement a routine with this interface for yourself
+f     (and give it any name you wish). Such a routine
+f     may be passed via the FINTERP argument of the AST_RESAMPLE<X>
+f     functions (q.v.) in order to supply a 1-dimensional
+f     interpolation kernel to the algorithm which performs sub-pixel
+f     interpolation during resampling of gridded data (you must also
+f     set the INTERP argument of AST_RESAMPLE<X> to the value
+f     AST__UKERN1). This allows you to use your own interpolation
+f     kernel in addition to those which are pre-defined.
+*
+c     The function calculates the value of a 1-dimensional sub-pixel
+f     The routine calculates the value of a 1-dimensional sub-pixel
+*     interpolation kernel. This determines how the weight given to
+*     neighbouring pixels in calculating an interpolated value depends
+*     on the pixel's offset from the interpolation point. In more than
+*     one dimension, the weight assigned to a pixel is formed by
+*     evaluating this 1-dimensional kernel using the offset along each
+*     dimension in turn. The product of the returned values is then
+*     used as the pixel weight.
+
+*  Parameters:
+c     offset
+f     OFFSET = DOUBLE PRECISION (Given)
+*        This will be the offset of the pixel from the interpolation
+*        point, measured in pixels. This value may be positive or
+*        negative, but for most practical interpolation schemes its
+*        sign should be ignored.
+c     params
+f     PARAMS( * ) = DOUBLE PRECISION (Given)
+c        This will be a pointer to the same array as was given via the
+c        "params" parameter of astResample<X>. You may use this to
+f        This will be the same array as was given via the
+f        PARAMS argument of AST_RESAMPLE<X>. You may use this to
+*        pass any additional parameter values required by your kernel,
+c        but note that params[0] will already have been used to specify
+f        but note that PARAMS(1) will already have been used to specify
+*        the number of neighbouring pixels which contribute to the
+*        interpolated value.
+c     flags
+f     FLAGS = INTEGER (Given)
+c        This will be the same value as was given via the "flags"
+c        parameter of astResample<X>. You may test this value to
+f        This will be the same value as was given via the FLAGS
+f        argument of AST_RESAMPLE<X>. You may test this value to
+*        provide additional control over the operation of your
+c        function. Note that the special flag values AST__URESAMP1, 2,
+f        routine. Note that the special flag values AST__URESAMP1, 2,
+*        3 & 4 are reserved for you to use for your own purposes and
+*        will not clash with other pre-defined flag
+c        values (see astResample<X>).
+f        values (see AST_RESAMPLE<X>).
+c     value
+f     VALUE = DOUBLE PRECISION (Returned)
+c        Pointer to a double to receive the calculated kernel value,
+f        The calculated kernel value,
+*        which may be positive or negative.
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
+
+*  Notes:
+*     - Not all functions make good interpolation kernels. In general,
+*     acceptable kernels tend to be symmetrical about zero, to have a
+*     positive peak (usually unity) at zero, and to evaluate to zero
+*     whenever the pixel offset has any other integral value (this
+*     last property ensures that the interpolated values pass through
+*     the original data). An interpolation kernel may or may not have
+*     regions with negative values. You should consult a good book on
+*     image processing for more details.
 c     - If an error occurs within this function, it should use
 c     astSetStatus to set the AST error status to an error value.
 c     This will cause an immediate return from astResample<X>.

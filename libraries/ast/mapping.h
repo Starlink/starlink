@@ -167,9 +167,18 @@
 *        AST__LINEAR
 *           Simple linear interpolation (astResample<X>).
 *        AST__NEAREST
-*           Use nearest pixel centre (astResample<X>)
+*           Use nearest pixel centre (astResample<X>).
+*        AST__SINC
+*           Use sinc interpolation (astResample<X>).
+*        AST__SINCSINC
+*           Use sinc(x) * sinc(x/2) interpolation (astResample<X>).
+*        AST__UINTERP
+*           Use user-defined general sub-pixel interpolation algorithm
+*           (astResample<X>).
+*        AST__UKERN1
+*           Use user-defined 1-d interpolation kernel (astResample<X>).
 *        AST__URESAMP1, 2, 3 & 4
-*           Flags reserved for user-defined purposes.
+*           Flags reserved for user-defined purposes (astResample<X>).
 *        AST__USEBAD
 *           Recognise bad pixels (astResample<X>)?
 *
@@ -254,10 +263,8 @@
 #define AST__UKERN1 (2)          /* Use user-supplied interpolation kernel */
 #define AST__NEAREST (3)         /* Use pixel with nearest centre */
 #define AST__LINEAR (4)          /* Simple linear interpolation */
-#define AST__SINC (5)            /* Sinc interpolation */
-#define AST__SQRSINC (6)         /* Squared sinc interpolation */
-#define AST__SINCSINC (7)        /* sinc(x)sinc(x/2) interpolation */
-#define AST__GAUSINC (8)         /* Gaussian * sinc interpolation */
+#define AST__SINC (5)            /* sinc(x) interpolation */
+#define AST__SINCSINC (6)        /* sinc(x) * sinc(x/2) interpolation */
 
 /* Type Definitions. */
 /* ================= */

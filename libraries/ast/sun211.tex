@@ -17,7 +17,7 @@
 % Variable part - replace [xxx] as appropriate.
 \newcommand{\stardocnumber}    {211.3}
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {10th December 1998}
+\newcommand{\stardocdate}      {18th December 1998}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
@@ -14640,19 +14640,20 @@ Object            - Base class for all AST Objects
    Resample a region of a data grid
 }{
    \sstdescription{
-      This is a set of functions for resampling gridded data under the
-      control of a geometrical transformation, which is specified by a
-      \htmlref{Mapping}{Mapping}.  The functions operate on a pair of data grids (input
-      and output), each of which may have any number of dimensions.
-      Resampling may be restricted to a specified region of these
-      grids. An associated grid of error estimates associated with the
-      input data may also be supplied (in the form of variance
-      values), so as to produce error estimates for the resampled
-      output data. Consistent propagation of missing data (bad pixels)
-      is also supported.
+      This is a set of functions for resampling gridded data (e.g. an
+      image) under the control of a geometrical transformation, which
+      is specified by a \htmlref{Mapping}{Mapping}.  The functions operate on a pair of
+      data grids (input and output), each of which may have any number
+      of dimensions, and resampling may be restricted to a specified
+      region of the output grid. An associated grid of error estimates
+      associated with the input data may also be supplied (in the form
+      of variance values), so as to produce error estimates for the
+      resampled output data. Propagation of missing data (bad pixels)
+      is supported, and a choice of sub-pixel interpolation schemes is
+      provided.
 
-      You should choose a resampling function which matches the
-      numerical type of the data being processed by replacing $<$X$>$ in
+      You should use a resampling function which matches the numerical
+      type of the data you are processing by replacing $<$X$>$ in
       the generic function name astResample$<$X$>$ by an appropriate 1- or
       2-character type code. For example, if you are resampling data
       with type {\tt{"}}float{\tt{"}}, you should use the function astResampleF (see
@@ -14662,25 +14663,24 @@ Object            - Base class for all AST Objects
       Resampling of the grid of input data is performed by
       transforming the coordinates of the centre of each output grid
       element (or pixel) into the coordinate system of the input grid.
-      Since the resulting input coordinates will not, in general,
-      coincide with the centre of an input pixel, sub-pixel
-      interpolation is performed between the neighbouring input
-      pixels. This produces a resampled value which is then assigned
-      to the output pixel. A choice of sub-pixel interpolation
-      algorithms is provided, but you may also supply a function which
-      implements your own (see astInterpolate as an example).
+      Since the resulting coordinates will not, in general, coincide
+      with the centre of an input pixel, sub-pixel interpolation is
+      performed between the neighbouring input pixels. This produces a
+      resampled value which is then assigned to the output pixel. A
+      choice of sub-pixel interpolation schemes is provided, but you
+      may also implement your own.
 
       Output pixel coordinates are transformed into the coordinate
       system of the input grid using the inverse transformation of the
       Mapping which is supplied. This means that geometrical features
-      in the input grid undergo the Mapping's forward transformation
-      as they are transferred from the input to the output grid
-      (although the Mapping's forward transformation is not explicitly
-      used).
+      in the input data are subjected to the Mapping's forward
+      transformation as they are transferred from the input to the
+      output grid (although the Mapping's forward transformation is
+      not explicitly used).
 
       In practice, transforming the coordinates of every pixel of a
       large data grid can be time-consuming, especially if the Mapping
-      involves a number of complicated functions such as sky
+      involves a number of complicated functions, such as sky
       projections. To improve performance, it is therefore possible to
       approximate non-linear Mappings by a set of equivalent simple
       linear transformations which are applied piece-wise to separate
@@ -14706,8 +14706,9 @@ Object            - Base class for all AST Objects
                           const int lbnd\_in[], const int ubnd\_in[],
                           const $<$Xtype$>$ in[], const $<$Xtype$>$ in\_var[],
                           int interp, void ($*$ finterp)(),
-                          const double params[], double tol, int maxpix,
-                          int flags, $<$Xtype$>$ badval, int ndim\_out,
+                          const double params[], int flags,
+                          double tol, int maxpix,
+                          $<$Xtype$>$ badval, int ndim\_out,
                           const int lbnd\_out[], const int ubnd\_out[],
                           const int lbnd[], const int ubnd[],
                           $<$Xtype$>$ out[], $<$Xtype$>$ out\_var[] );
@@ -14740,22 +14741,20 @@ Object            - Base class for all AST Objects
       }{
          Pointer to an array of integers, with {\tt{"}}ndim\_in{\tt{"}} elements,
          containing the coordinates of the centre of the first pixel
-         in the input grid along each dimension (e.g. often these may
-         all be one).
+         in the input grid along each dimension.
       }
       \sstsubsection{
          ubnd\_in
       }{
          Pointer to an array of integers, with {\tt{"}}ndim\_in{\tt{"}} elements,
          containing the coordinates of the centre of the last pixel in
-         the input grid along each dimension (e.g. often these may be
-         equal to the dimension sizes of the grid).
+         the input grid along each dimension.
 
          Note that {\tt{"}}lbnd\_in{\tt{"}} and {\tt{"}}ubnd\_in{\tt{"}} together define the shape
-         and size of the input grid. Its extent along a particular
-         (i'th) dimension is ubnd\_in[i-1]-lbnd\_in[i-1]$+$1 (the first
-         dimension being number 1). They also define
-         the input grid's coordinate system. Each pixel has unit
+         and size of the input grid, its extent along a particular
+         (j'th) dimension being ubnd\_in[j]-lbnd\_in[j]$+$1 (assuming the
+         index {\tt{"}}j{\tt{"}} to be zero-based). They also define
+         the input grid's coordinate system, each pixel having unit
          extent along each dimension with integral coordinate values
          at its centre.
       }
@@ -14767,8 +14766,7 @@ Object            - Base class for all AST Objects
          numerical type of this array should match the 1- or
          2-character type code appended to the function name (e.g. if
          you are using astResampleF, the type of each array element
-         should be {\tt{"}}float{\tt{"}}, while if using astResampleS, the type
-         should be {\tt{"}}short int{\tt{"}}).
+         should be {\tt{"}}float{\tt{"}}).
 
          The storage order of data within this array should be such
          that the index of the first grid dimension varies most
@@ -14792,33 +14790,44 @@ Object            - Base class for all AST Objects
       \sstsubsection{
          interp
       }{
-         This parameter specifies the algorithm to be used for
-         sub-pixel interpolation within the input grid. It may be used
-         to select from a set of pre-defined algorithms by supplying
-         one of the values described in the {\tt{"}}Sub-Pixel Interpolation
-         Schemes{\tt{"}} section below.  If a NULL pointer is supplied, then
-         the default linear interpolation scheme is used (equivalent
-         to supplying the value AST\_\_LINEAR).
+         This parameter specifies the scheme to be used for sub-pixel
+         interpolation within the input grid. It may be used to select
+         from a set of pre-defined schemes by supplying one of the
+         values described in the {\tt{"}}Sub-Pixel Interpolation Schemes{\tt{"}}
+         section below.  If a value of zero is supplied, then the
+         default linear interpolation scheme is used (equivalent to
+         supplying the value AST\_\_LINEAR).
 
-         Alternatively, you may supply a pointer to a function which
-         implements your own interpolation algorithm. This should have
-         the same interface as the dummy function astInterpolate
-         (q.v.), whose description is provided as a template, and
-         should be designed to process data with the same numerical
-         type as the {\tt{"}}in{\tt{"}} array. (Note that the C type
-         AstInterpolate$<$X$>$, where $<$X$>$ is replaced by the appropriate
-         1- or 2-character type code, is provided by AST as a
-         shorthand for the C type of a pointer to such a function.)
+         Alternatively, you may supply a value which indicates that
+         you will provide your own function to perform sub-pixel
+         interpolation by means of the {\tt{"}}finterp {\tt{"}} parameter. Again, see
+         the {\tt{"}}Sub-Pixel Interpolation Schemes{\tt{"}} section below for
+         details.
+      }
+      \sstsubsection{
+         finterp
+      }{
+         If the value given for the {\tt{"}}interp{\tt{"}} parameter indicates that
+         you will provide your own function for sub-pixel
+         interpolation, then a pointer to that function should be
+         given here. For details of the interface which the function
+         should have (several are possible, depending on the value of
+         {\tt{"}}interp{\tt{"}}), see the {\tt{"}}Sub-Pixel Interpolation Schemes{\tt{"}} section
+         below.
+
+         If the {\tt{"}}interp{\tt{"}} parameter has any other value, corresponding
+         to one of the pre-defined interpolation schemes, then this
+         function will not be used and you may supply a NULL pointer.
       }
       \sstsubsection{
          params
       }{
          An optional pointer to an array of double which should contain
          any additional parameter values required by the sub-pixel
-         interpolation algorithm. If such parameters are required,
-         this will be noted in the {\tt{"}}Sub-Pixel Interpolation Schemes{\tt{"}}
+         interpolation scheme. If such parameters are required, this
+         will be noted in the {\tt{"}}Sub-Pixel Interpolation Schemes{\tt{"}}
          section below (you may also use this parameter to pass values
-         to your own interpolation algorithm).
+         to your own interpolation function).
 
          If no additional parameters are required, this array is not
          used and a NULL pointer may be given.
@@ -14826,9 +14835,9 @@ Object            - Base class for all AST Objects
       \sstsubsection{
          flags
       }{
-         The bitwise OR of a set of flag values which provide
-         additional control over the resampling operation. See the
-         {\tt{"}}Control Flags{\tt{"}} section below for a description of the
+         The bitwise OR of a set of flag values which may be used to
+         provide additional control over the resampling operation. See
+         the {\tt{"}}Control Flags{\tt{"}} section below for a description of the
          options available.  If no flag values are to be set, a value
          of zero should be given.
       }
@@ -14884,15 +14893,15 @@ Object            - Base class for all AST Objects
 
          If the AST\_\_USEBAD flag is set via the {\tt{"}}flags{\tt{"}} parameter,
          then this value is used to test for bad pixels in the {\tt{"}}in{\tt{"}}
-         (and {\tt{"}}in\_var{\tt{"}}) arrays.
+         (and {\tt{"}}in\_var{\tt{"}}) array(s).
 
          In all cases, this value is also used to flag any output
          elements in the {\tt{"}}out{\tt{"}} (and {\tt{"}}out\_var{\tt{"}}) array(s) for which
          resampled values could not be obtained (see the {\tt{"}}Propagation
          of Missing Data{\tt{"}} section below for details of the
-         circumstances under which this may occur). The function
-         return value indicates whether any such values have been
-         produced.
+         circumstances under which this may occur). The astResample$<$X$>$
+         function return value indicates whether any such values have
+         been produced.
       }
       \sstsubsection{
          ndim\_out
@@ -14937,11 +14946,12 @@ Object            - Base class for all AST Objects
          calculated.
 
          Note that {\tt{"}}lbnd{\tt{"}} and {\tt{"}}ubnd{\tt{"}} together define the shape and
-         position of the region of the output grid for which resampled
-         values should be produced. This region should lie wholly
-         within the extent of the output grid (as defined by the
-         {\tt{"}}lbnd\_out{\tt{"}} and {\tt{"}}ubnd\_out{\tt{"}} arrays). Regions of the output grid
-         lying ouside this region will not be modified.
+         position of a (hyper-)rectangular region of the output grid
+         for which resampled values should be produced. This region
+         should lie wholly within the extent of the output grid (as
+         defined by the {\tt{"}}lbnd\_out{\tt{"}} and {\tt{"}}ubnd\_out{\tt{"}} arrays). Regions of
+         the output grid lying ouside this region will not be
+         modified.
       }
       \sstsubsection{
          out
@@ -14973,7 +14983,7 @@ Object            - Base class for all AST Objects
          statistical errors on neighbouring output data values (as
          well as the estimates of those errors) may often be
          correlated, even if the above assumption about the input data
-         is correct, because of the sub-pixel interpolation algorithms
+         is correct, because of the sub-pixel interpolation schemes
          employed.
 
          If no output variance estimates are required, a NULL pointer
@@ -15007,8 +15017,7 @@ Object            - Base class for all AST Objects
       To select the appropriate resampling function, you should
       replace $<$X$>$ in the generic function name astResample$<$X$>$ with a
       1- or 2-character data type code, so as to match the numerical
-      type $<$Xtype$>$ of the data you are processing, as follows (in the
-      format $<$X$>$: $<$Xtype$>$):
+      type $<$Xtype$>$ of the data you are processing, as follows:
       \sstitemlist{
 
          \sstitem
@@ -15043,63 +15052,162 @@ Object            - Base class for all AST Objects
 
       }
       For example, astResampleD would be used to process {\tt{"}}double{\tt{"}}
-      data, while astResampleF would be used to process {\tt{"}}float{\tt{"}} data,
-      etc.
+      data, while astResampleS would be used to process {\tt{"}}short int{\tt{"}}
+      data, etc.
    }
    \sstdiytopic{
       Sub-Pixel Interpolation Schemes
    }{
-      The following values are defined in the {\tt{"}}ast.h{\tt{"}} header file and
-      may be supplied via the {\tt{"}}interp{\tt{"}} parameter in order to select a
-      pre-defined sub-pixel interpolation algorithm:
+      There is no such thing as a perfect sub-pixel interpolation
+      scheme and, in practice, all resampling will result in some
+      degradation of gridded data.  A range of schemes is therefore
+      provided, from which you can choose the one which best suits
+      your needs.
+
+      In general, a compromise must be made between schemes which tend
+      to degrade sharp features in the data by smoothing them, and
+      those which attempt to preserve sharp features. The latter will
+      often tend to introduce unwanted oscillations, typically visible
+      as {\tt{"}}ringing{\tt{"}} around sharp features and edges, especially if the
+      data are under-sampled (i.e. the sharpest features are less than
+      about two pixels across). In practice, a good interpolation
+      scheme may exhibit some aspects of both these features.
+
+      For under-sampled data, some interpolation schemes may appear to
+      preserve data resolution because they transform single input
+      pixels into single output pixels, rather than spreading their
+      data between several output pixels. While this may look
+      cosmetically better, it can result in a geometrical shift of
+      sharp features in the data. You should beware of this if you
+      plan to use such features for (e.g.) image alignment.
+
+      The following are two easy-to-use sub-pixel interpolation
+      schemes which are generally applicable. They are selected by
+      supplying the appropriate value (defined in the {\tt{"}}ast.h{\tt{"}} header
+      file) via the {\tt{"}}interp{\tt{"}} parameter. In these cases, the {\tt{"}}finterp{\tt{"}}
+      and {\tt{"}}params{\tt{"}} parameters are not used:
 
       \sstitemlist{
 
          \sstitem
-         AST\_\_NEAREST: This is the simplest interpolation scheme, in
-         which the value of the input pixel with the nearest centre to
-         the required position is used. This is quick to execute and will
-         preserve single-pixel features in the input grid, but may
+         AST\_\_NEAREST: This is the simplest possible scheme, in which
+         the value of the input pixel with the nearest centre to the
+         interpolation point is used. This is very quick to execute and
+         will preserve single-pixel features in the data, but may
          displace them by up to half their width along each dimension. It
-         is therefore unsuitable if accurate geometrical transformation
-         is required.
+         often gives a good cosmetic result, so is useful for quick-look
+         processing, but is unsuitable if accurate geometrical
+         transformation is required.
 
          \sstitem
          AST\_\_LINEAR: This is the default scheme, which uses linear
          interpolation between the nearest neighbouring pixels in the
          input grid (there are two neighbours in one dimension, four
          neighbours in two dimensions, eight in three dimensions,
-         etc.). This general-purpose method is superior to the
-         nearest-pixel scheme (above), since it does not displace
-         features in the data, yet it still executes fairly rapidly.
-         However, it introduces a degree of spatial smoothing which
-         varies according to the distance of the input position from the
-         neighbouring pixel centres. This effect can degrade the shape of
-         sharp features in the data in a position-dependent way. It may
-         also show up in the output variance grid (if used) as a pattern
-         of stripes or fringes.
+         etc.). It is superior to the nearest-pixel scheme (above) in not
+         displacing features in the data, yet it still executes fairly
+         rapidly. It is generally a safe choice if you do not have any
+         particular reason to favour another scheme, since it cannot
+         introduce oscillations. However, it does introduce some spatial
+         smoothing which varies according to the distance of the
+         interpolation point from the neighbouring pixels. This can
+         degrade the shape of sharp features in the data in a
+         position-dependent way. It may also show in the output variance
+         grid (if used) as a pattern of stripes or fringes.
 
       }
-      If none of the above values is given, the {\tt{"}}interp{\tt{"}} argument is
-      interpreted as a pointer to a function which implements the
-      required sub-pixel interpolation algorithm.
+      An alternative set of interpolation schemes is based on forming
+      the interpolated value from the weighted sum of a set of
+      surrounding pixel values (not necessarily just the nearest
+      neighbours). This approach has its origins in the theory of
+      digital filtering, in which interpolated values are obtained by
+      conceptually passing the sampled data through a linear filter
+      which implements a convolution. Because the convolution kernel
+      is continuous, the convolution may then be evaluated at
+      fractional pixel positions.  The (possibly multi-dimensional)
+      kernel is usually regarded as {\tt{"}}separable{\tt{"}} and formed from the
+      product of a set of identical 1-dimensional kernel functions,
+      evaluated along each dimension. Different interpolation schemes
+      are then distinguished by the choice of this 1-dimensional
+      interpolation kernel. The number of surrounding pixels which
+      contribute to the result may also be varied.
+
+      From a practical standpoint, it is useful to divide the weighted
+      sum of pixel values by the sum of the weights when determining
+      the interpolated value.  Strictly, this means that a true
+      convolution is no longer being performed. However, the
+      distinction is rarely important in practice because (for
+      slightly subtle reasons) the sum of weights is always
+      approximately constant for good interpolation kernels. The
+      advantage of this technique, which is used here, is that it can
+      easily accommodate missing data and tends to minimise unwanted
+      oscillations at the edges of the data grid.
+
+      Unless otherwise noted in the following schemes (which are based
+      on a 1-dimensional interpolation kernel), the value of
+      {\tt{"}}params[0]{\tt{"}} should be used to specify how many pixels are to
+      contribute to the interpolated result on either side of the
+      interpolation point in each dimension (the nearest integer value
+      is used). Typically a value of 2 is appropriate (the execution
+      time increases rapidly with this number) and the minimum value
+      used will be 1 (i.e. one pixel on either side).
+      In these cases, the {\tt{"}}finterp{\tt{"}} parameter is not used:
+
+      \sstitemlist{
+
+         \sstitem
+         AST\_\_SINC:
+
+      }
+      Finally, supplying the following values for {\tt{"}}interp{\tt{"}} allows you
+      to implement your own sub-pixel interpolation scheme by means of
+      your own function. You should supply a pointer to this function
+      via the {\tt{"}}finterp{\tt{"}} parameter:
+
+      \sstitemlist{
+
+         \sstitem
+         AST\_\_UKERN1: In this scheme, you supply a function to evaluate
+         your own 1-dimensional interpolation kernel, which is then used
+         to perform sub-pixel interpolation (as described above). The
+         function you supply should have the same interface as the
+         fictitious \htmlref{astUkern1}{astUkern1} function (q.v.).  In addition, a value
+         should be given via {\tt{"}}params[0]{\tt{"}} to specify the number of
+         neighbouring pixels which are to contribute to each interpolated
+         value (in the same way as for the pre-defined interpolation
+         schemes described above). Other elements of the {\tt{"}}params{\tt{"}} array
+         are available to pass values to your interpolation function.
+
+         \sstitem
+         AST\_\_UINTERP: This is a completely general scheme, in which
+         your interpolation function has access to all of the input
+         data. This allows you to implement any interpolation algorithm
+         you choose, which could (for example) be non-linear, or
+         adaptive. In this case, the astResample$<$X$>$ functions play no
+         role in the sub-pixel interpolation process and simply handle
+         the geometrical transformation of coordinates and other
+         housekeeping. The function you supply should have the same
+         interface as the fictitious \htmlref{astUinterp}{astUinterp} function (q.v.). In this
+         case, the {\tt{"}}params{\tt{"}} parameter is not used by astResample$<$X$>$, but
+         is available to pass values to your interpolation function.
+      }
    }
    \sstdiytopic{
       Control Flags
    }{
       The following flags are defined in the {\tt{"}}ast.h{\tt{"}} header file and
-      provide additional control over the resampling process. Having
-      selected a set of flags, you should supply the bitwise OR of
-      their values via the {\tt{"}}flags{\tt{"}} argument:
+      may be used to provide additional control over the resampling
+      process. Having selected a set of flags, you should supply the
+      bitwise OR of their values via the {\tt{"}}flags{\tt{"}} parameter:
 
       \sstitemlist{
 
          \sstitem
          AST\_\_URESAMP1, 2, 3 \& 4: A set of four flags which are
          reserved for your own use. They may be used to pass private
-         information to any sub-pixel interpolation algorithm which you
+         information to any sub-pixel interpolation function which you
          implement yourself. They are ignored by all the pre-defined
-         interpolation algorithms.
+         interpolation schemes.
 
          \sstitem
          AST\_\_USEBAD: Indicates that there may be bad pixels in the
@@ -15131,14 +15239,13 @@ Object            - Base class for all AST Objects
          set in the {\tt{"}}flags{\tt{"}} argument.
          (Positions which have half-integral coordinate values, and
          therefore lie on a pixel boundary, are regarded as lying within
-         the neighbouring pixel which has the larger, i.e. more positive,
-         index in the affected dimension.)
+         the pixel with the larger, i.e. more positive, index.)
 
          \sstitem
          The set of neighbouring input pixels (excluding those which
          are bad) is unsuitable for calculating an interpolated
          value. Whether this is true may depend on the sub-pixel
-         interpolation algorithm in use.
+         interpolation scheme in use.
 
          \sstitem
          The interpolated value lies outside the range which can be
@@ -15146,7 +15253,7 @@ Object            - Base class for all AST Objects
 
       }
       In addition, associated output variance estimates (if
-      calculated) may be declated bad and flagged with the {\tt{"}}badval{\tt{"}}
+      calculated) may be declared bad and flagged with the {\tt{"}}badval{\tt{"}}
       value in the {\tt{"}}out\_var{\tt{"}} array under any of the following
       circumstances:
 
@@ -15165,9 +15272,9 @@ Object            - Base class for all AST Objects
 
          \sstitem
          The set of neighbouring input pixels for which valid variance
-         valuies are available is unsuitable for calculating an overall
+         values are available is unsuitable for calculating an overall
          variance value. Whether this is true may depend on the sub-pixel
-         interpolation algorithm in use.
+         interpolation scheme in use.
 
          \sstitem
          The variance value lies outside the range which can be
@@ -22683,6 +22790,9 @@ grid coordinates (equivalent to FITS pixel coordinates---see
 set.
 
 \item \htmlref{astFindFits}{astFindFits} now ignores trailing spaces in its keyword template.
+
+\item \htmlref{astPutFits}{astPutFits} now recognises ``D'' and ``d'' as valid exponent
+characters in floating point numbers.
 
 \item The FitsChan class is now more tolerant of common minor
 violations of the FITS standard.
