@@ -1,0 +1,15 @@
+*  -------------
+*  BEGIN INCLUDE     WDTWRK.CMN    Version  1    Author CJW
+*  -------------
+
+*  CHANGE LOG
+
+      COMMON /WDTWRK/ REALS, INTS
+
+      INTEGER INTS(1:KNUMS)
+
+      REAL REALS(1:KNUMS)
+
+*  -----------
+*  END INCLUDE
+*  -----------

@@ -1,0 +1,52 @@
+*  -------------
+*  BEGIN INCLUDE     WDTBUF.PAR    Version  1    Author CJW
+*  -------------
+*  CHANGE LOG
+*     02/05/86 RMK  Prime F77 version - changed stream numbers for
+*                   LIST and CDRIVE.
+*     15/12/87 PJWR UNIX BSD 4.2 / SYSTEM V - changed stream numbers
+*                   and the value of KSZWD.
+*     Streams
+*     Formatted WDT
+      INTEGER FWDT
+      PARAMETER (FWDT = 7)
+*     Direct Access WDT
+      INTEGER DWDT
+      PARAMETER (DWDT = 8)
+*     Listing file
+      INTEGER LIST
+      PARAMETER (LIST = 9)
+*     CDRIVE file
+      INTEGER CDRIVE
+      PARAMETER (CDRIVE = 10)
+*     Wordsize of reals/integer - This is machine dependent
+      INTEGER KSZWD
+      PARAMETER (KSZWD = 4)
+*     Size of Buffer
+      INTEGER KMXQBU
+      PARAMETER ( KMXQBU = 512 )
+*     Number of single variables put into buffer
+      INTEGER KSCALR
+      PARAMETER ( KSCALR = 3)
+*     Number of Buffers
+      INTEGER KNBF
+      PARAMETER (KNBF = 5)
+*     Array sizes
+      INTEGER KNUMS
+      PARAMETER ( KNUMS = (KMXQBU/KSZWD) - KSCALR )
+*     Offset of Bundle sizes in WDT entry
+      INTEGER KSZOFF
+      PARAMETER (KSZOFF = 7)
+*     Maximum number of items per section
+      INTEGER KMXITM
+      PARAMETER (KMXITM = 100)
+*     MORE flag can be -
+      INTEGER KYES, KNO
+      PARAMETER (KYES = 1, KNO = 0)
+
+*     Version of Program
+      CHARACTER * 5 VERSN
+      PARAMETER (VERSN = '1.1')
+*  -----------
+*  END INCLUDE
+*  -----------

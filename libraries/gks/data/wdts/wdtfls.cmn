@@ -1,0 +1,13 @@
+*  -------------
+*  BEGIN INCLUDE     WDTFLS.CMN    Version  1    Author CJW
+*  -------------
+
+*  CHANGE LOG
+
+      CHARACTER * 40 DFILE, FFILE, LFILE, CFILE
+
+      COMMON /WDTFLS/ DFILE, FFILE, LFILE, CFILE
+
+*  -----------
+*  END INCLUDE
+*  -----------

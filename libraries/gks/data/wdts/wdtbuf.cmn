@@ -1,0 +1,28 @@
+*  -------------
+*  BEGIN INCLUDE     WDTBUF.CMN    Version  1    Author CJW
+*  -------------
+
+*  CHANGE LOG
+
+*     Single items of data
+
+      INTEGER KWDTRC, KCDIR, KWKTYP, KNXREC
+
+*     Items required per "buffer"
+
+      INTEGER KITEM(1:KNBF), KNEXT(1:KNBF), KMORE(1:KNBF),
+     :        KREAL(0:KMXITM,1:KNBF), KINT(0:KMXITM,1:KNBF),
+     :        KCREC(1:KNBF), KIOFF(1:KNBF), KROFF(1:KNBF),
+     :        KSIZE(1:KNBF), KDATA(1:KNUMS,1:KNBF), KNAMES(1:KNBF)
+
+      REAL QDATA(1:KNUMS,1:KNBF)
+
+      COMMON /WDTBUF/ KWDTRC, KCDIR, KWKTYP, KNXREC,
+     :                KITEM, KNEXT, KMORE, KREAL, KINT, KCREC, KIOFF,
+     :                KROFF, KSIZE,  KDATA, KNAMES,
+     :                QDATA
+
+
+*  -----------
+*  END INCLUDE
+*  -----------

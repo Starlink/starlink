@@ -1,0 +1,11 @@
+*  -------------
+*  BEGIN INCLUDE     WDTERR.PAR    Version  2    Author CJW
+*  -------------
+*  CHANGE LOG
+*     Types of error
+      INTEGER    KCAUTN,     KWARNG,     KERROR
+      PARAMETER (KCAUTN = 0, KWARNG = 1, KERROR = 2)
+
+*  -----------
+*  END INCLUDE
+*  -----------

@@ -1,0 +1,17 @@
+*  -------------
+*  BEGIN INCLUDE     WDTENM.PAR    Version  2    Author CJW
+*  -------------
+*  CHANGE LOG
+      INTEGER KMXDIR
+      PARAMETER ( KMXDIR = 20)
+
+      INTEGER KUNSET
+      PARAMETER (KUNSET = -1)
+
+      INTEGER KMDIR
+      PARAMETER (KMDIR = -2)
+      INTEGER KWKDIR
+      PARAMETER (KWKDIR = -3)
+*  -----------
+*  END INCLUDE
+*  -----------

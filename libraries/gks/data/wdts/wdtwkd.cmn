@@ -1,0 +1,21 @@
+*  -------------
+*  BEGIN INCLUDE     WDTWKD.CMN    Version  1    Author CJW
+*  -------------
+
+*  CHANGE LOG
+*     04/02/86  RMK   Changed KKMXWK from 50 to 200 (S180).
+
+      INTEGER KMXWK
+      PARAMETER (KMXWK = 200)
+
+      INTEGER KNWK, KWKTY(1:KMXWK), KWKITM(1:KMXDIR)
+
+      COMMON /WDTWKD/ KNWK, KWKTY, KWKITM
+
+      CHARACTER * 2 CWKDR(1:KMXWK)
+
+      COMMON /WDTWKZ/ CWKDR
+
+*  -----------
+*  END INCLUDE
+*  -----------

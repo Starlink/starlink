@@ -1,0 +1,14 @@
+*  -------------
+*  BEGIN INCLUDE     WDTERR.CMN    Version  2    Author CJW
+*  -------------
+
+*  CHANGE LOG
+
+
+      COMMON /WDTERR/ KNERR
+
+      INTEGER KNERR(KCAUTN : KERROR)
+
+*  -----------
+*  END INCLUDE
+*  -----------
