@@ -157,7 +157,7 @@
         END IF
 
 *    Free HDS object
-        IF ( MLOC .NE. DAT__SZLOC ) THEN
+        IF ( MLOC .NE. DAT__NOLOC ) THEN
           CALL DAT_ANNUL( MLOC, STATUS )
         ELSE
           CALL DYN_UNMAP( VPTR, STATUS )
