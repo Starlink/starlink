@@ -1,4 +1,4 @@
-#!/bin/csh
+#!/bin/tcsh
 # Name:
 #    make_unix_release
 #
@@ -56,14 +56,15 @@
       end
 
       foreach file (`grp tar_files_b`)
-         grp ${file} > ${TEMPDIR}/blt1
-         awk -F. '{print $1"."$2}' ${TEMPDIR}/blt1 > ${TEMPDIR}/blt2
-         awk -F. '{print "mv "$0" "$1"."$2}' ${TEMPDIR}/blt1 > ${TEMPDIR}/blt3
-         chmod u+x ${TEMPDIR}/blt3
-         source ${TEMPDIR}/blt3
-         tar -cvh -f ${TEMPDIR}/${file}.tar `cat ${TEMPDIR}/blt2`
-         rm -f `cat ${TEMPDIR}/blt2`
-#         rm ${TEMPDIR}/blt1 ${TEMPDIR}/blt2 ${TEMPDIR}/blt3
+         setenv news " "
+         foreach item (`grp ${file}`)
+            setenv new `echo ${item} | awk -F. '{print $1"."$2}'` 
+            mv $item $new
+            setenv news "$news $new"
+         end
+
+         tar -cvh -f ${TEMPDIR}/${file}.tar $news
+         rm -f $news
          mv ${TEMPDIR}/${file}.tar ${REL_DIR}
       end
 
