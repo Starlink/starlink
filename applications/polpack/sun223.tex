@@ -1607,7 +1607,7 @@ Instructions on setting up such WCS information is available
 
 \item If the input data does not contain WCS information for a celestial
 co-ordinate system, then the reference direction will be the second pixel
-axis within the image (i.e. ``Y'', or ``upwards'' if the image is
+axis within the image (\emph{i.e.} ``Y'', or ``upwards'' if the image is
 displayed normally).
 \end{itemize}
 
@@ -2734,7 +2734,7 @@ for NDF applications.
          If FALSE they are processed as single-beam data. If a null (!)
          value is supplied, the dual-beam algorithm is used if all the input
          images contain a legal value for the RAY item in the POLPACK
-         extension (i.e. either {\tt "}E{\tt "} or {\tt "}O{\tt "}). Otherwise, the single-beam
+         extension (\emph{i.e.} either {\tt "}E{\tt "} or {\tt "}O{\tt "}). Otherwise, the single-beam
          algorithm is used. It is possible to process dual-beam data using
          the single-beam algorithm, so DUALBEAM may be set to FALSE even
          if the input images hold dual-beam data. However, the opposite
@@ -2761,44 +2761,46 @@ for NDF applications.
          describing such things as warnings and the E and F factors
          adopted (in dual-beam mode). A value of 2 produces more verbose
          output including details of each iteration in the iterative
-         processes used by both dual and single beam modes. [1]
+         processes used by both dual and single beam modes. A value of
+         3 produces additional details about each individual input image in
+         single beam mode. [1]
       }
       \sstsubsection{
          IN = NDF (Update)
       }{
          A group specifying the names of the input intensity images. This
-         may take the form of a comma separated list, or any of the other 
-         forms described in the help on ``Group Expressions''. Read access
+         may take the form of a comma separated list, or any of the other
+         forms described in the help on {\tt "}Group Expressions{\tt "}. Read access
          only is required unless the SETVAR parameter is assigned a TRUE
          value.
       }
       \sstsubsection{
          MAXIT = \_INTEGER (Read)
       }{
-         This parameter is only accessed by the dual-beam algorithm. It
-         specifies the maximum number of iterations to be used when
-         inter-comparing pairs of input images to determine their relative
-         scale-factor and/or zero-point. If the specified number of
-         iterations is exceeded without achieving the accuracy required by
-         the settings of the TOLS and TOLZ parameters, then a warning message
-         will be issued, but the results will still be used. The value given
-         for MAXIT must be at least one. [30]
-      }
-      \sstsubsection{
-         NITER = \_INTEGER (Read)
-      }{
-         This parameter is only accessed by the single-beam algorithm. It
-         specifies the maximum number of iterations to be used when
-         estimating input variances or rejecting aberrant input values.
-         The default value depends on the value supplied for parameter
-         WEIGHTS. If WEIGHTS indicates that estimates of the input
-         variances are to be made (i.e. if WEIGHTS has the value 2 or 3),
-         then the default value is 4. Otherwise, if variances in the input
-         NDFs are to be used (i.e. if WEIGHTS is 1), the default is zero.
+         This parameter is only accessed by both single and dual-beam
+         algorithm, but is used slightly differently in each case.
+
+         In dual beam mode, it specifies the maximum number of iterations
+         to be used when inter-comparing pairs of input images to determine
+         their relative scale-factor and/or zero-point. If the specified
+         number of iterations is exceeded without achieving the accuracy
+         required by the settings of the TOLS and TOLZ parameters, then a
+         warning message will be issued, but the results will still be used.
+         The value given for MAXIT must be at least one. The runtime
+         default value is 30.
+
+         In single-beam mode, it specifies the maximum number of iterations
+         to be used when estimating input variances or rejecting aberrant
+         input values. The default value depends on the value supplied for
+         parameter WEIGHTS. If WEIGHTS indicates that estimates of the input
+         variances are to be made (\emph{i.e.} if WEIGHTS has the value 2 or 3),
+         then the default value is 8. Otherwise, if variances in the input
+         NDFs are to be used (\emph{i.e.} if WEIGHTS is 1), the default is zero.
          This is because each iteration is a computationally expensive
          process, and so iterations should only be performed if they are
-         really necessary. NITER is always fixed at zero if WEIGHTS is 4
-         (i.e. if all input data are given constant weight). []
+         really necessary. MAXIT is always fixed at zero if WEIGHTS is 4
+         (\emph{i.e.} if all input data are given constant weight). See also
+         parameter TOLR. []
       }
       \sstsubsection{
          NSIGMA = \_REAL (Read)
@@ -2833,10 +2835,10 @@ for NDF applications.
          SETVAR = \_REAL (Read)
       }{
          This parameter is only accessed by the single-beam algorithm.
-         If a TRUE value is supplied for SETVAR, and if the variances in 
+         If a TRUE value is supplied for SETVAR, and if the variances in
          the input images are being estimated (see parameter WEIGHTS), then
          the final mean variance estimate found for each input image will
-         be stored as a constant value in the VARIANCE component of the input 
+         be stored as a constant value in the VARIANCE component of the input
          image. [FALSE]
       }
       \sstsubsection{
@@ -2855,7 +2857,7 @@ for NDF applications.
 
          A SKYSUP value of unity can often be effective, but a value
          set by the approximate ratio of sky pixels to useful object
-         pixels (i.e. those containing non-sky signal) in a {\tt "}typical{\tt "}
+         pixels (\emph{i.e.} those containing non-sky signal) in a {\tt "}typical{\tt "}
          image will usually be better. The precise value
          is not critical. A value of zero disables the sky noise
          suppression algorithm completely. The default value for SKYSUP
@@ -2869,7 +2871,7 @@ for NDF applications.
          This parameter is only accessed by the single-beam algorithm. It
          specifies the size (in pixels) of the smoothing box to use
          when estimating the variance of the input data. It is only
-         accessed if parameter WEIGHTS is given the value 2 or 3 (i.e. if
+         accessed if parameter WEIGHTS is given the value 2 or 3 (\emph{i.e.} if
          input variances are to be estimated from the spread of the input
          data values).
 
@@ -2895,9 +2897,35 @@ for NDF applications.
          necessary. [3]
       }
       \sstsubsection{
+         MINFRAC = \_REAL (Read)
+      }{
+         This parameter is only accessed by the single-beam algorithm
+         when iteratively rejecting input values (\emph{i.e.} if MAXIT is
+         greater than zero). It controls how much good input data is
+         required to form a good output pixel. It is given as a fraction
+         in the range 0 to 1. The miminum number of good input values
+         required to form a good output value at a particular pixel is
+         equal to this fraction multiplied by the number of input NDFs
+         which have good values for the pixel. The number is rounded to
+         the nearest integer and limited to at least 3. If ILEVEL is
+         greater than 1, then the percentage of output pixels which fail
+         this test is displayed. [0.0]
+      }
+      \sstsubsection{
          TITLE = LITERAL (Read)
       }{
          A title for the output cube. [Output from POLCAL]
+      }
+      \sstsubsection{
+         TOLR = \_INTEGER (Read)
+      }{
+         This parameter is only accessed by the single-beam algorithm. It
+         specifies the convergence criterion for the iterative process
+         which estimates the input variances, and rejects bad input values.
+         If the number of pixels rejected from any input NDF changes by more
+         than TOLR pixels between two succesive iterations, then the process
+         is assumed not to have converged and another iteration will be
+         performed unless MAXIT iterations have already been performed. [0]
       }
       \sstsubsection{
          TOLS = \_REAL (Read)
@@ -2951,21 +2979,21 @@ for NDF applications.
             input images do not have associated variances then estimates of
             the variances are made for all input images based on the spread of
             data values. The reciprocal of these variances are used as weights.
-            An error will be reported if parameter NITER is set to zero, thus
+            An error will be reported if parameter MAXIT is set to zero, thus
             preventing the iterative estimation of input variances.
 
             \sstitem
             3 -- Use estimates of the variances for all input images based
             on the spread of data values. The reciprocal of these variances
             are used as weights. Any variances supplied with the input images
-            are ignored. An error will be reported if parameter NITER is set to
+            are ignored. An error will be reported if parameter MAXIT is set to
             zero, thus preventing the iterative estimation of input variances.
 
             \sstitem
             4 -- Use a constant weight of 1.0 for all input images. Any
             variances supplied with the input images are ignored. The
             iterative rejection of bad input values controlled by parameter
-            NITER is not available in this mode.
+            MAXIT and TOLR is not available in this mode.
 
          }
          The dual-beam algorithm always uses scheme 1. [1]
@@ -3025,8 +3053,8 @@ for NDF applications.
       algorithm is described by Sparks and Axon (submitted to P.A.S.P.).
 
       Single beam mode can take account of imperfections in the analyser.
-      The transmission (i.e. the overall throughput) and efficiency
-      (i.e. the ability to reject light polarized across the axis) of the
+      The transmission (\emph{i.e.} the overall throughput) and efficiency
+      (\emph{i.e.} the ability to reject light polarized across the axis) of the
       analyser are read from the POLPACK extension. If not found, values
       of 1.0 are used for both. These values are appropriate for a
       perfect analyser. A perfectly bad analyser (a piece of high quality
@@ -3043,13 +3071,13 @@ for NDF applications.
       angle between the rotating or fixed analyser and the polarimeter
       reference direction). Only one of these two extension items
       should be present. The WPLATE and ANLANG items are free to take
-      any value (i.e. they are not restricted to the values 0.0, 22.5,
+      any value (\emph{i.e.} they are not restricted to the values 0.0, 22.5,
       45.0 and 67.5 degrees as in the dual-beam algorithm).
 
       If the input intensity images do not contain usable variances,
       then estimates of these variances can be made from the spread of
       supplied data values. This is an expensive iterative process
-      (see parameters NITER and WEIGHTS). Initially, Stokes vectors
+      (see parameters TOLR and WEIGHTS). Initially, Stokes vectors
       are estimated assigning a uniform constant weight to all input
       data values. The I, Q and U images are then smoothed by fitting
       a quadratic surface to the data within a box centred on each
@@ -3057,7 +3085,7 @@ for NDF applications.
       SMBOX). For each input image, a similar image is then created
       holding the squared residual between the input intensity values,
       and the intensity values implied by the smoothed Stokes vectors
-      (using the known analyser positions, \emph{etc.}, for the images). These
+      (using the known analyser positions, etc, for the images). These
       images containing squared residuals are then stacked together
       to obtain a single image holding the mean squared residual at
       each pixel. This image is then smoothed using a mean box filter
@@ -3072,12 +3100,16 @@ for NDF applications.
       NSIGMA times the standard deviation expected for the pixel value.
       This standard deviation may be derived from the variances in the
       input data file, or from the variances estimated from the spread
-      of data values.
+      of data values. If many input values are rejected at a particular
+      pixel it may indicate an entirely corrupt pixel, in which case you
+      may want to ignore the pixel altogether by setting it bad in the
+      output cube. This can be done using parameter MINFRAC.
 
       After rejecting such values, the algorithm goes on to re-calculate
       the Stokes vectors excluding the rejected input values, weighting
       the input data values as specified by parameter WEIGHTS. This
-      process is repeated a number of times given by parameter NITER.
+      process is repeated a number of times given by parameters TOLR
+      and MAXIT.
 
       There are a couple of restrictions in single-beam mode. Firstly,
       there is currently no facility for measuring circular
@@ -3089,7 +3121,7 @@ for NDF applications.
       The Dual-beam Algorithm
    }{
       In dual-beam mode, Q and U are estimated by taking the difference
-      between pairs of orthogonally polarized images (i.e. the O and E
+      between pairs of orthogonally polarized images (\emph{i.e.} the O and E
       ray images extracted from a single dual-beam image). The total
       intensity I is estimated by summing such pairs of images. The
       various estimates of these quantities provided by different pairs
@@ -3238,7 +3270,7 @@ for NDF applications.
       are supplied directly by the user in response to application
       parameter prompts. If the required information is present within
       each data file in the form of header cards in a FITS extension, then
-      application POLIMP may be used in place of POLEXT (POLIMP reads the
+      application \htmlref{POLIMP}{POLIMP} may be used in place of POLEXT (POLIMP reads the
       required values from the FITS extension instead of obtaining values
       from the user).
 
@@ -3265,7 +3297,7 @@ for NDF applications.
          and its first axis corresponds to the reference direction. If a
          null (!) value is supplied for this parameter, any image which
          already has a POLANAL Frame retains the existing Frame. Otherwise
-         a POLANAL Frame is created using an ANGROT value of zero (i.e. it
+         a POLANAL Frame is created using an ANGROT value of zero (\emph{i.e.} it
          is assumed that the reference direction corresponds to the X
          pixel axis).
 
@@ -3300,7 +3332,7 @@ for NDF applications.
          files. If a null (!) value is supplied, any image which already
          has an EPS value retains its existing value, and any other images
          are left with an undefined EPS value (this will cause a value of
-         1.0 to be used by POLCAL). [!]
+         1.0 to be used by \htmlref{POLCAL}{POLCAL}). [!]
       }
       \sstsubsection{
          FILTER = LITERAL (Read)
@@ -3387,7 +3419,7 @@ for NDF applications.
          value is supplied, any image which already has a T value retains
          its existing value, and any other images are left with an
          undefined T value (this will cause a value of 1.0 to be used by
-         POLCAL). [!]
+         \htmlref{POLCAL}{POLCAL}). [!]
       }
       \sstsubsection{
          VANGROT = \_REAL (Write)
@@ -3459,7 +3491,7 @@ for NDF applications.
          existing value, and any other images are left with an undefined
          WPLATE value. Note, when using dual-beam data, Stokes vectors can
          only be calculated for WPLATE values of 0.0, 22.5, 45.0 and 67.5.
-         The POLCAL application will fail if any other values are
+         The \htmlref{POLCAL}{POLCAL} application will fail if any other values are
          supplied. There are no such restrictions on the value of WPLATE
          when using single-beam data. [!]
       }
@@ -3556,7 +3588,7 @@ for NDF applications.
                will terminate the help session;
 
          \sstitem
-            enter CTRL/D (i.e. press the CTRL and D keys simultaneously) in
+            enter CTRL/D (\emph{i.e.} press the CTRL and D keys simultaneously) in
                response to any prompt will terminate the help session;
 
          \sstitem
@@ -4180,7 +4212,7 @@ for NDF applications.
       \sstsubsection{
          CURCOL = LITERAL (Update)
       }{
-         The colour with which to mark the objects (i.e. image features and
+         The colour with which to mark the objects (\emph{i.e.} image features and
          masks) currently being entered by the user. This should be
          one of RED, BLUE, GREEN, CYAN, MAGENTA, YELLOW, BLACK. Any
          unambiguous abbreviation can be supplied, and the value is
@@ -4331,7 +4363,7 @@ for NDF applications.
       }{
          The type of polarization being measured; Linear or Circular. This
          parameter is only accessed if an output cube holding Stokes
-         parameters is being created (i.e. if OUT\_S is not given a null (!)
+         parameters is being created (\emph{i.e.} if OUT\_S is not given a null (!)
          value). [Linear]
       }
       \sstsubsection{
@@ -4374,7 +4406,7 @@ for NDF applications.
       \sstsubsection{
          REFCOL = LITERAL (Update)
       }{
-         The colour with which to mark the reference objects (i.e. image
+         The colour with which to mark the reference objects (\emph{i.e.} image
          features or masks). This should be one of RED, BLUE, GREEN, CYAN,
          MAGENTA, YELLOW, BLACK. Any unambiguous abbreviation can be supplied,
          and the value is case-insensitive. [GREEN]
@@ -4407,7 +4439,7 @@ for NDF applications.
          the sky in each output image will be fitted using a polynomial
          surface. The order of the fit on each axis is given by this
          parameter (SKYPAR). A value of 0 will result in a flat surface
-         (i.e. a constant value) being used, 1 will result in a linear
+         (\emph{i.e.} a constant value) being used, 1 will result in a linear
          surface, 2 in a quadratic surface, \emph{etc}. The supplied value
          must be in the range 0 to 14. [0]
       }
@@ -4584,15 +4616,12 @@ for NDF applications.
       \sstsubsection{
          ANGROT = \_REAL (Read)
       }{
-         Specifies the orientation of the reference direction. The angles
-         specified by parameter COLANG are assumed to be angles measured
-         anti-clockwise from this reference direction. The value of ANGROT
-         should be the anti-clockwise angle from the positive X axis to the
-         reference direction, in degrees. For catalogues created by
-         POLPACK V2.0 or later, the run time default value is derived from
-         the POLANAL Frame in the WCS information stored in the catalogue
-         (or zero if the catalogue does not contain a POLANAL Frame).
-         For earlier catalogues, the run time default is zero. []
+         A rotation angle in degrees to be added to each vector orientation 
+         before plotting the vectors (see parameters COLANG and NEGATE). It 
+         should be the range 0-360. Note, this parameter is named ANGROT
+         for historical reasons, and its use should not be confused with
+         the ANGROT extension item (see POLIMP) which gives the orientation 
+         of the reference direction. [0.0]
       }
       \sstsubsection{
          ARROW = LITERAL (Read)
@@ -4789,13 +4818,13 @@ for NDF applications.
          reported).
 
          The appearance of the text in the key is controlled using {\tt "}String{\tt "}
-         attributes (e.g. COLOUR(STRINGS), FONT(STRINGS), \emph{etc.} - the synonym
+         attributes (\emph{e.g.} COLOUR(STRINGS), FONT(STRINGS), \emph{etc.} - the synonym
          TEXT can be used in place of STRINGS). Note, the Size attribute
          specifies the size of key text relative to the size of the numerical
          labels on the vector map axes. Thus a value of 2.0 for Size will
          result in text which is twice the size of the numerical axis labels.
          The appearance of the example vector is controlled using {\tt "}Curve{\tt "}
-         attributes (e.g. COLOUR(CURVES), \emph{etc.} - the synonym VECTOR can be
+         attributes (\emph{e.g.} COLOUR(CURVES), \emph{etc.} - the synonym VECTOR can be
          used in place of CURVES). The numerical scale value is formatted as
          an axis 1 value (using attributes FORMAT(1), DIGITS(1), \emph{etc.} - the
          synonym SCALE can be used in place of the value 1). The length of
@@ -4840,10 +4869,9 @@ for NDF applications.
          NEGATE = \_LOGICAL (Read)
       }{
          If a TRUE value is supplied, then the angles giving the
-         orientation of the polarization (i.e. the values in the column
-         specified by parameter COLANG) are assumed to be measured clockwise
-         (rather than anti-clockwise) from the reference direction given
-         by parameter ANGROT. [FALSE]
+         orientation of the polarization (\emph{i.e.} the values in the column
+         specified by parameter COLANG) are negated before adding on any 
+         value specified by parameter ANGROT. [FALSE]
       }
       \sstsubsection{
          STYLE = GROUP (Read)
@@ -4925,21 +4953,20 @@ for NDF applications.
          and slightly thicker lines are used to draw the border.
       }
       \sstexamplesubsection{
-         polplot poltab ra dec noclear angrot=23.4 frame=eq(B1950)
+         polplot poltab ra dec noclear angrot=90 frame=eq(B1950)
       }{
-         Produces a vector map in which the reference direction for the
-         vectors (as defined by the value zero in the column ANG) is at
-         an angle of 23.4 degrees in the displayed map, measured
-         anti-clockwise from the positive X axis. The position of each vector
-         is specified by columns {\tt "}ra{\tt "} and {\tt "}dec{\tt "}. The annotated axes give
-         equatorial (RA/DEC) coordinates referred to the equinox of B1950.
-         If the vector map is displayed over an existing DATA picture, then
-         the vector map will be aligned on the sky with the previously
-         displayed data if possible (i.e. the FrameSet associated with the
-         existing picture in the AGI database contains a sky coordinate
-         Frame). If this is not possible, then the vector map will be
-         aligned in pixel or grid coordinates. A message is displayed
-         indicating the domain in which alignment took place.
+         Produces a vector map in which each vector is rotated by 90
+         degrees from the orientation specified in the {\tt "}poltab{\tt "}
+         catalogue. The position of each vector is specified by columns
+         {\tt "}ra{\tt "} and {\tt "}dec{\tt "}. The annotated axes give equatorial (RA/DEC)
+         coordinates referred to the equinox of B1950. If the vector map
+         is displayed over an existing DATA picture, then the vector map
+         will be aligned on the sky with the previously displayed data if
+         possible (\emph{i.e.} the FrameSet associated with the existing picture
+         in the AGI database contains a sky coordinate Frame). If this is
+         not possible, then the vector map will be aligned in pixel or
+         grid coordinates. A message is displayed indicating the domain
+         in which alignment took place.
       }
       \sstexamplesubsection{
          polplot poltab arrow=0.01 just=start nokey
@@ -4985,8 +5012,8 @@ for NDF applications.
          specified by the optional catalogue parameters EPOCH and EQUINOX
          (defaults are used for these parameters if they are not present in the
          catalogue). If the vector map is displayed over an existing DATA
-         picture (i.e. if CLEAR=NO) then these RA/DEC positions will be aligned
-         with the existing DATA picture if possible (i.e. if the existing
+         picture (\emph{i.e.} if CLEAR=NO) then these RA/DEC positions will be aligned
+         with the existing DATA picture if possible (\emph{i.e.} if the existing
          picture has sky coordinate information stored with it).
       }
    }
@@ -5819,9 +5846,12 @@ multiple\footnote{Specified by POLCAL parameter NSIGMA.} of the standard
 deviation associated with the observed intensity value, $\sigma_k$, then
 the observed intensity value is rejected. The Stokes vectors are
 calculated again, excluding all the rejected intensity values. This
-process is repeated a number of times, as specified by POLCAL parameter
-NITER. The number of pixels rejected in each image at each iteration can
-be displayed by setting POLCAL parameter ILEVEL to 3.
+process is repeated a number of times, as specified by POLCAL parameters
+MAXIT and TOLR. The number of pixels rejected in each image at each iteration can
+be displayed by setting POLCAL parameter ILEVEL to 3. There is an option
+to reject output pixels (\emph{i.e.} set them bad) if more than a given
+fraction of the input intensity values are rejected as aberrant by the
+above iterative procedure (see parameter MINFRAC).
 
 If no usable variances are available for the observed data values, the
 simplest option is to assume a constant value of $1.0$ for $\sigma_{k}$ 
@@ -5843,7 +5873,7 @@ following pseudo-code, and is illustrated diagramatically in
     1    Fill the variance image with the value 1.0
     2    Calculate Stokes vectors
     3    Set ITER = 0
-    4    While ( ITER < NITER ) do...
+    4    While ( not converged and ITER < MAXIT ) do...
     5       Reduce the noise in the Stokes vectors
     6       Calculate expected intensity values implied by the smoothed 
             I, Q and U values
@@ -5858,6 +5888,8 @@ following pseudo-code, and is illustrated diagramatically in
             and the current variance image
     13      Set ITER = ITER + 1
     14   End do
+    15   Reject any Stokes vectors corresponding to pixel with few good
+         input intensity values.
 \end{verbatim}
 
 \begin{latexonly}
@@ -5900,9 +5932,18 @@ in step 1. All input data is used.
 \item The variable \verb+ITER+ counts the number of iterations which have
 been performed. 
 
-\item Loop round performing the number of iterations specified by
-parameter NITER. If NITER is zero, the Stokes vectors produced in step
-2 are returned.
+\item Loop round performing iterations until the process converges, or
+the maximum number of iterations specified by parameter MAXIT is reached. 
+If MAXIT is zero, the Stokes vectors produced in step 2 are returned.
+
+The convergence criterion is specified by parameter TOLR. Convergence is
+assumed to have been reached when the number of pixels rejected from each
+input image changes by less than TOLR pixels between iterations. If the
+number of pixels rejected from any image changes by more than the value
+of TOLR, then another iteration is performed (subject to the MAXIT limit).
+The default value for TOLR is zero, resulting in iterations being
+performed until the number of pixels rejected from each image no longer
+changes.
 
 \item The three images holding $I$, $Q$ and $U$ are smoothed to reduce
 the noise. The extent of the smoothing (in pixels) is controlled by POLCAL 
@@ -6011,6 +6052,15 @@ flagged as bad in the previous step are not included in the calculation.
 \item Indicate that another iteration has been performed.
 
 \item Go round for the next iteration.
+
+\item Once convergence (or the maximum number of iterations) has been
+reached, a check is made on the number of good intensity values which
+contributed to each output Stokes vector. If too many of the input
+intensity values were rejected as aberrant in step 11, then the Stokes
+vector is set bad. This criterion is set by parameter MINFRAC, which
+gives the minimum fraction of the input intensity values which must pass
+the check in step 11 in order to create a good Stokes vector. The default
+value of zero result in no Stokes vectors being rejected.
 
 \end{enumerate}
 
