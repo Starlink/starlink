@@ -5369,333 +5369,378 @@ Usage:
 
 Description:
 
-   This application contours an image of a 2-dimensional NDF on the
-   current graphics device.  The image may be part or whole of the
-   data array, but also the variance or quality can be shown.  The
-   plot is situated within the current graphics-database picture.
+   This application produces a contour map of a 2-dimensional NDF on
+   the current graphics device, with single-pixel resolution. Contour
+   levels can be chosen automatically in various ways, or specified
+   explicitly (see parameter MODE).
 
-   The contour plot resides within optional, annotated and enumerated
-   axes.  An optional, but recommended, key may be drawn to the
-   right of the contour plot.  It reports the NDF's units if there
-   are any, and only contour heights actually plotted are included.
-   There are seven methods for selecting contours.
+   The plot is produced within the current graphics database picture,
+   and may be aligned with an existing DATA picture if the existing
+   picture contains suitable co-ordinate Frame information (see
+   parameter CLEAR).
 
-   The contouring algorithm has single-pixel resolution.
+   The appearance of each contour can be controlled in several ways. The
+   pens used can be rotated automatically (see parameter PENROT). Contours
+   below a given threshold value can be drawn dashed (see parameter DASHED).
+   Alternatively, the appearance of each contour can be set explicitly
+   (see parameter PENS).
+
+   Annotated axes can be produced (see parameter AXES), and the appearance
+   of the axes can be controlled in detail (see parameter STYLE). The
+   axes show co-ordinates in the current co-ordinate Frame of the supplied
+   NDF.
+
+   A list of the contour levels can be displayed to the right of the
+   contour map (see parameter KEY). The appearance and position of this
+   key may be controlled using parameters KEYSTYLE and KEYPOS.
 2 Parameters
 For information on individual parameters, select from the list below:
-3 ABSLAB
-ABSLAB = LITERAL (Read)
-   Label for the plot abscissa, in which NCAR fancy founts may be
-   embedded when FONT = "NCAR".  If axis information is present
-   the suggested default is the NDF's axis label followed by the
-   units, in parentheses.  If an error occurs obtaining the label
-   the suggested default is "X". []
 3 AXES
 AXES = _LOGICAL (Read)
    TRUE if labelled and annotated axes are to be drawn around the
-   contour plot.  The annotations are either the data
-   co-ordinates from the NDF axis components, provided these are
-   present and linear and COSYS = "Data"; otherwise pixel
-   co-ordinates are used.  [TRUE]
-3 BORDER
-BORDER = _LOGICAL (Read)
-   BORDER is TRUE if a box is to be drawn about the contour plot.
-   This is only accessed when there are no axes required. [TRUE]
+   contour map, showing the current co-ordinate Frame of the
+   supplied NDF. The appearance of the axes can be controlled using
+   the STYLE parameter. [TRUE]
 3 CLEAR
 CLEAR = _LOGICAL (Read)
-   TRUE if the graphics device is to be cleared before display
-   of the array. [TRUE]
+   TRUE if the graphics device is to be cleared before displaying
+   the contour map. If you want the contour map to be drawn over
+   the top of an existing DATA picture, then set CLEAR to FALSE. The
+   contour map will then be drawn in alignment with the displayed
+   data. If possible, alignment occurs within the current co-ordinate
+   Frame of the NDF. If this is not possible, (for instance if
+   suitable WCS information was not stored with the existing DATA
+   picture), then alignment is attempted in PIXEL
+   co-ordinates. If this is not possible, then alignment is
+   attempted in GRID co-ordinates. If this is not possible, then
+   alignment is attempted in the first suitable Frame found in the NDF
+   irrespective of its domain. A message is displayed indicating the
+   domain in which alignment occurred. If there are no suitable Frames
+   in the NDF then an error is reported. [TRUE]
 3 COMP
 COMP = LITERAL (Read)
    The NDF component to be contoured.  It may be "Data",
-   "Quality", "Variance", or "Error" (where "Error" is the
+   "Quality", "Variance", or "Error" (where "Error" is an
    alternative to "Variance" and causes the square root of the
-   variance values to be taken before plotting contours).  If
+   variance values to be displayed).  If
    "Quality" is specified, then the quality values are treated as
    numerical values (in the range 0 to 255). ["Data"]
-3 CONCOL
-CONCOL = LITERAL (Read)
-   The colour of the contour lines on devices that support colour.
-   The options are described below.
-
-     "MAX"          - The maximum colour index in the image
-                      display colour lookup table.
-     "MIN"          - The minimum (non-reserved) colour index in
-                      the image-display colour lookup table.
-     An integer     - The actual colour index.  It is constrained
-                      between 0 and the maximum colour index
-                      available on the device.
-     A named colour - Uses the named colour from the palette, and
-                      if it is not present, the nearest colour
-                      from the palette is selected.
-
-   If the colour is to remain unaltered as the lookup table is
-   manipulated choose an integer between 0 and 15, or a named
-   colour.  This parameter will be ignored if PENROT = TRUE.
-   [The current value, but equals "1" (the foreground colour) if
-   there is no current value.]
-3 COSYS
-COSYS = LITERAL (Read)
-   The co-ordinate system to be used.  This can be either "World"
-   or "Data".  "World" makes pixel co-ordinates to appear on axes.
-   If COSYS = "Data" the NDF's axis information is used to
-   annotate axes.  [Current co-ordinate system]
 3 DASHED
 DASHED = _REAL (Read)
    The height below which the contours will be drawn with dashed
-   lines.  A null value (!) means all contours are drawn with
-   solid lines.  [!]
+   lines (if possible).  A null value (!) results in contours being
+   drawn with the styles specified by parameters PENS, PENROT and
+   STYLE. [!]
 3 DEVICE
 DEVICE = DEVICE (Read)
-   The plotting device. [Current image-display device]
-3 FIRSTCNT
-FIRSTCNT = _REAL (Read)
-   Height of the first contour (Linear and Magnitude modes).
-   The suggested value is the current value.
+   The plotting device. [current image-display device]
+3 FAST
+FAST = _LOGICAL (Given)
+   If TRUE, then a faster, but in certain cases less accurate, method
+   is used to draw the contours. In fast mode, contours may be
+   incorrectly placed on the display if the mapping between graphics
+   co-ordinates and the current co-ordinate Frame of the supplied NDF
+   has any discontinuities, or is strongly non-linear. This may be
+   the case, for instance, when displaying all-sky maps on top of
+   each other. [TRUE]
 3 FILL
 FILL = _LOGICAL (Read)
    The contour plot normally has square pixels, in other words
-   a length along each axis corresponds to the same number of
-   pixels.  However, for images with markedly different
+   a specified length along each axis corresponds to the same number
+   of pixels.  However, for images with markedly different
    dimensions this default behaviour may not be suitable or give
    the clearest plot.  When FILL is TRUE, the square-pixel
    constraint is relaxed and the contour plot is the largest
    possible within the current picture.  When FILL is FALSE, the
-   pixels are square.  The suggested default is the current
-   value.  [FALSE]
+   pixels are square.  [FALSE]
 3 FIRSTCNT
 FIRSTCNT = _REAL (Read)
    Height of the first contour (Linear and Magnitude modes).
-   The suggested value is the current value.
-3 FONT
-FONT = LITERAL (Read)
-   The fount to be used for the line graphics.  It can be either
-   "NCAR" for the NCAR fancy characters and "GKS" for the standard
-   GKS san-serif fount.  The former is intended for hardcopy
-   publication-quality plots, since it is relatively slow; the
-   latter is intended for normal interactive graphics requiring
-   rapid plotting, and it is clearer on small plots.  The
-   suggested default is the current value. ["GKS"]
 3 HEIGHTS
 HEIGHTS() = _REAL (Read)
-   Contour levels (Free mode).  The suggested default is the
-   current value.
+   The required contour levels (Free mode).
 3 KEY
 KEY = _LOGICAL (Read)
-   A key of the contour level versus pixel value is to be
-   produced. [TRUE]
+   TRUE if a key of the contour level versus pixel value is to be
+   produced. The appearance of this key can be controlled using
+   parameter KEYSTYLE, and its position can be controlled using
+   parameter KEYPOS. [TRUE]
+3 KEYPOS
+KEYPOS() = _REAL (Read)
+   Two values giving the position of the key. The first value gives
+   the gap between the right hand edge of the contour map and the left
+   hand edge of the key (0.0 for no gap, 1.0 for the largest gap). The
+   second value gives the vertical position of the top of the key (1.0
+   for the highest position, 0.0 for the lowest). If the second value
+   is not given, the top of the key is placed level with the top of the
+   contour map. Both values should be in the range 0.0 to 1.0. If a
+   key is produced, then the right hand margin specified by parameter
+   MARGIN is ignored. [current value]
+3 KEYSTYLE
+KEYSTYLE = GROUP (Read)
+   A group of attribute settings describing the plotting style to use
+   for the key (see parameter KEY).
+
+   A comma-separated list of strings should be given in which each
+   string is either an attribute setting, or the name of a text file
+   preceded by an up-arrow character "^". Such text files should
+   contain further comma-separated lists which will be read and
+   interpreted in the same manner. Attribute settings are applied in
+   the order in which they occur within the list, with later settings
+   over-riding any earlier settings given for the same attribute.
+
+   Each individual attribute setting should be of the form:
+
+      <name>=<value>
+
+   where <name> is the name of a plotting attribute, and <value> is
+   the value to assign to the attribute. Default values will be
+   used for any unspecified attributes. All attributes will be
+   defaulted if a null value (!) is supplied. See section "Plotting
+   Attributes" in SUN/95 for a description of the available
+   attributes. Any unrecognised attributes are ignored (no error is
+   reported).
+
+   The heading in the key can be changed by setting a value for the
+   Title attribute (the supplied heading is split into lines of no more
+   than 17 characters). The appearance of the heading is controlled
+   by attributes Colour(Title), Font(Title), etc. The appearance of
+   the contour indices is controlled by attributes Colour(TextLab),
+   Font(TextLab), etc (the synonym Index can be used in place of
+   TextLab). The appearance of the contour values is controlled by
+   attributes Colour(NumLab), Font(NumLab), etc (the synonym Value
+   can be used in place of NumLab). Contour indices are formatted
+   using attributes Format(1), Digits(1), etc (the synonym Index can
+   be used in place of value 1). Contour values are formatted
+   using attributes Format(2), etc (the synonym Value can be used in
+   place of the value 2). [current value]
 3 LENGTH
 LENGTH() = _REAL (Write)
-   The total length in pixels of the contours at each selected
-   height.  These values are only computed when STATS = TRUE.
-3 MAJTIC
-MAJTIC( 2 ) = _REAL (Read)
-   The parameter controlling the numbers of major tick marks
-   for the x and y axes.  (Number used is between MAJTIC+2 and
-   5*MAJTIC/2+4.) [3.,3.]
-3 MINTIC
-MINTIC( 2 ) = _REAL (Read)
-   The number of minor tick marks between each major tick mark
-   for the x and y axes.  A negative value forces the graphics
-   package to compute appropriate values. [-1.,-1.]
+   On exit this holds the total length in pixels of the contours at each
+   selected height.  These values are only computed when parameter STATS
+   is TRUE.
+3 MARGIN
+MARGIN( 4 ) = _REAL (Write)
+   The widths of the margins to leave around the contour map for axis
+   annotation. The widths should be given as fractions of the
+   corresponding dimension of the DATA picture.
+   The actual margins used may be increased to preserve the aspect
+   ratio of the DATA picture. Four values may be given, in the order;
+   bottom, right, top, left. If fewer than four values are given,
+   extra values are used equal to the first supplied value. If these
+   margins are too narrow any axis annotation may be clipped. The
+   dynamic default is 0.18 (for all edges) if annotated axes are being
+   produced, and zero otherwise. See also parameter KEYPOS. []
 3 MODE
 MODE = LITERAL (Read)
-   The method used to select the contour levels.  The options are
-   described below.
+   The method used to select the contour levels. The options are:
 
-     "Area"        - The contours enclose areas of the array for
-                     which the equivalent radius increases by
-                     equal increments.  You specify the number of
-                     levels.
-     "Automatic"   - The contour levels are equally spaced between
-                     the maximum and minimum pixel values in the
-                     array.  You supply the number of contour
-                     levels.
-     "Equalised"   - You define the number of equally spaced
-                     percentiles.
-     "Free"        - You specify a series of contour values
-                     explicitly.
-     "Linear"      - You define the number of contours, the start
-                     contour level and linear step between
-                     contours.
-     "Magnitude"   - You define the number of contours, the start
-                     contour level and step between contours.  The
-                     step size is in magnitudes so the nth contour
-                     is dex(-0.4*(n-1)*step) times the start
-                     contour level.
-     "Percentiles" - You specify a series of percentiles.
+     - "Area" -- The contours enclose areas of the array for which
+     the equivalent radius increases by equal increments.  You
+     specify the number of levels.
 
-   The suggested default is the current value, which is initially
-   "Free".
+     - "Automatic" -- The contour levels are equally spaced between
+     the maximum and minimum pixel values in the array.  You supply
+     the number of contour levels.
+
+     - "Equalised" -- You define the number of equally spaced
+     percentiles.
+
+     - "Free" -- You specify a series of contour values explicitly.
+
+     - "Linear" -- You define the number of contours, the start
+     contour level and linear step between contours.
+
+     - "Magnitude" -- You define the number of contours, the start
+     contour level and step between contours.  The step size is in
+     magnitudes so the nth contour is dex(-0.4*(n-1)*step) times the
+     start contour level.
+
+     - "Percentiles" -- You specify a series of percentiles.
+
+   If the contour map is aligned with an existing DATA picture (see
+   parameter CLEAR), then only part of the supplied NDF may be
+   displayed. In this case, the choice of contour levels is based
+   on the data within a rectangular section of the input NDF
+   enclosing the existing DATA picture. Data values outside this
+   section are ignored.
 3 NCONT
 NCONT = _INTEGER (Read)
-   The number of contours required (all modes except Free and
+   The number of contours required (in all modes except Free and
    Percentiles).  It must be between 1 and 50.  If the number is
    large, the plot may be cluttered and take longer to produce.
-   6, the initial suggested default, gives reasonable results.
-   The current value becomes the suggested default.
+   The initial suggested default of 6 gives reasonable results.
 3 NDF
 NDF = NDF (Read)
    NDF structure containing the 2-dimensional image to be
    contoured.
 3 NUMBER
 NUMBER() = _INTEGER (Write)
-   The number of closed contours at each selected height.
-   Contours are not closed if they intersect a bad pixel or the
+   On exit this holds the number of closed contours at each selected
+   height. Contours are not closed if they intersect a bad pixel or the
    edge of the image.  These values are only computed when
-   STATS = TRUE.
-3 ORDLAB
-ORDLAB = LITERAL (Read)
-   Label for the plot ordinate, in which NCAR fancy founts may be
-   embedded when FONT = "NCAR".  If axis information is present
-   the suggested default is the NDF's axis label followed by the
-   units, in parentheses.  If an error occurs obtaining the label
-   the suggested default is "Y". []
-3 OUTTIC
-OUTTIC = _LOGICAL (Read)
-   TRUE if the axis tick marks are to appear on the outside of
-   the axes instead of inside. By default, the tick marks are
-   drawn outside the contouring region to eliminate
-   intersections of ticks with the contours. [TRUE]
+   parameter STATS is TRUE.
 3 PENROT
 PENROT = _LOGICAL (Read)
    If TRUE, the plotting pens are cycled through the contours to
-   aid identification of the contour heights.  [FALSE]
+   aid identification of the contour heights.  Only accessed if
+   pen definitions are not supplied using parameter PENS. [FALSE]
+3 PENS
+PENS = GROUP (Given)
+   A group of strings, separated by semi-colons, each of which specifies
+   the appearance of a pen to be used to draw a contour. The first
+   string in the group describes the pen to use for the first contour,
+   the second string describes the pen for the second contour, etc. If
+   there are fewer strings than contours, then the supplied pens are
+   cycled through again, starting at the beginning. Each string should
+   be a comma-separated list of plotting attributes to be used when drawing
+   the contour. For instance, the string "width=0.02,colour=red,style=2"
+   produces a thick, red, dashed contour. Attributes which are
+   unspecified in a string default to the values implied by parameter
+   STYLE. If a null value (!) is given for PENS, then the pens
+   implied by parameters PENROT, DASHED and STYLE are used. [!]
 3 PERCENTILES
 PERCENTILES() = _REAL (Read)
    Contour levels given as percentiles.  The values must lie
-   between 0.0 and 100.0. (Percentiles mode).  The suggested
-   default is the current value.
-3 PLTITL
-PLTITL = LITERAL (Read)
-   The title of the plot.  Up to about 40 characters can be
-   accommodated, and NCAR fancy founts may be embedded when FONT =
-   "NCAR". If an error occurs obtaining the title, it is
-   defaulted to "Contour plot".  [The NDF title]
-3 PXSIZE
-PXSIZE = _REAL (Read)
-   The length (x axis) of the plot in metres. [Maximum that can
-   fit in the current picture whilst preserving square pixels]
-3 PYSIZE
-PYSIZE = _REAL (Read)
-   The length (y axis) of the plot in metres. [Maximum that can
-   fit in the current picture whilst preserving square pixels]
+   between 0.0 and 100.0. (Percentiles mode).
 3 STATS
 STATS = _LOGICAL (Read)
-   If TRUE, the LENGTH and NUMBER statistics are computed.
-   [FALSE].
+   If TRUE, the LENGTH and NUMBER statistics are computed. [FALSE].
 3 STEPCNT
 STEPCNT = _REAL (Read)
    Separation between contour levels, linear for Linear mode
-   and in magnitudes for Magnitude mode.  The suggested value is
-   the current value.
-3 THICK
-THICK = _REAL (Read)
-   The thickness of the lines and NCAR-fount characters in the
-   plot, where 1.0 is the normal thickness.  Currently, this is
-   only available on a few devices.  It must take a value in the
-   range 0.5--10.0.  [1.0]
+   and in magnitudes for Magnitude mode.
+3 STYLE
+STYLE = GROUP (Read)
+   A group of attribute settings describing the plotting style to use
+   for the contours and annotated axes.
+
+   A comma-separated list of strings should be given in which each
+   string is either an attribute setting, or the name of a text file
+   preceded by an up-arrow character "^". Such text files should
+   contain further comma-separated lists which will be read and
+   interpreted in the same manner. Attribute settings are applied in
+   the order in which they occur within the list, with later settings
+   over-riding any earlier settings given for the same attribute.
+
+   Each individual attribute setting should be of the form:
+
+      <name>=<value>
+
+   where <name> is the name of a plotting attribute, and <value> is
+   the value to assign to the attribute. Default values will be
+   used for any unspecified attributes. All attributes will be
+   defaulted if a null value (!) is supplied. See section "Plotting
+   Attributes" in SUN/95 for a description of the available
+   attributes. Any unrecognised attributes are ignored (no error is
+   reported).
+
+   The appearance of the contours is controlled by the attributes
+   Colour(Curves), Width(Curves), etc (the synonym Contours may be
+   used in place of Curves). The contour appearance established in
+   this way may be modified using parameters PENS, PENROT and DASHED.
+   [current value]
+3 USEAXIS
+USEAXIS = GROUP (Read)
+   USEAXIS is only accessed if the current co-ordinate Frame of the
+   NDF has more than 2 axes. A group of two strings should be
+   supplied specifying the 2 axes which are to be used when annotating
+   and aligning the contour map. Each axis can be specified either by
+   its integer index within the current Frame (in the range 1 to the
+   number of axes in the current Frame), or by its Symbol attribute. A
+   list of acceptable values is displayed if an illegal value is
+   supplied. The dynamic default selects the axes with the same indices
+   as the 2 significant NDF pixel axes. []
 2 Examples
-contour myfile d \
+contour myfile
    Contours the data array in the NDF called myfile on the current
    graphics device.  All other settings are defaulted, so for
    example the current mode for determining heights is used, and
    a key is plotted.
 
-contour taurus1(100:199,150:269,4) \
-   Contours a 2-dimensional portion of current array component in
-   the NDF cube called taurus1 on the current graphics device.
-   The portion extends from pixel (100,150,4) to pixel
-   (199,269,4).  All other settings are defaulted, so for
-   example, the NDF's title adorns the plot, and a key is
-   plotted.
+contour taurus1(100:199,150:269,4)
+   Contours a 2-dimensional section of the 3-dimensional NDF called
+   taurus1 on the current graphics device. The section extends from
+   pixel (100,150,4) to pixel (199,269,4).
 
-contour ngc6872 mode=au ncont=5 device=ps_l concol=white
+contour ngc6872 mode=au ncont=5 device=ps_l pens="style=1;style=2"
    Contours the data array in the NDF called ngc6872 on the ps_l
    graphics device.  Five equally spaced contours between the
-   maximum and minimum data values are drawn in white.  A key is
-   plotted.
+   maximum and minimum data values are drawn, alternating between
+   line styles 1 and 2 (solid and dashed).
 
-contour ndf=ngc6872 mode=au ncont=5 penrot cosys=w device=ps_l
-   As above except that the pens are cycled (which will normally
-   give rise to various dashed patterns on this device).  The
-   axes have pixel co-ordinates.
+contour ndf=ngc6872 mode=au ncont=5 penrot style="^mysty,grid=1"
+   As above except that the current graphics device is used, pens
+   are cycled automatically, and the appearance of the axes is read
+   from text file mysty. The plotting attribute Grid is set
+   explicitly to 1 to ensure that a co-ordinate grid is drawn over
+   the plot. The text file mysty could, for instance, contain the
+   two lines "Title=NGC6872 at 25 microns" and "grid=0". The Title
+   setting gives the title to display at the top of the axes. The
+   Grid setting would normally prevent a co-ordinate grid being
+   drawn, but is over-ridden in this example by the explicit setting
+   for Grid which follows the file name.
 
-contour ngc6872 mode=li firstcnt=10 stepcnt=2 ncont=4 noaxes
-   Contours the data array in the NDF called ngc6872 on the
+contour m51 mode=li firstcnt=10 stepcnt=2 ncont=4 keystyle=^keysty
+   Contours the data array in the NDF called m51 on the
    current graphics device.  Four contours at heights 10, 12, 14,
-   and 16 are drawn.  A key is plotted, but no axes surround the
-   contour plot.
+   and 16 are drawn.  A key is plotted using the style specified
+   in the text file keysty. This file could, for instance, contain
+   the two lines "font=3" and "digits(2)=4" to cause all text in
+   the key to be drawn using PGPLOT font 3 (an italic font), and
+   4 digits to be used when formatting the contour values.
 
-contour ss443 mode=pe percentiles=[80,90,95,98,99,99.9] stats
+contour ss443 mode=pe percentiles=[80,90,95] stats keypos=0.05
    Contours the data array in the NDF called ss443 on the current
    graphics device.  Contours at heights corresponding to the 80,
-   90, 95, 98, 99, and 99.9 percentiles are drawn in the current
-   colour.  A key is plotted.  Contour statistics are computed.
+   90 and 95 percentiles are drawn.  The key is placed closer
+   to the contour map than usual.  Contour statistics are computed.
 
-contour mode=eq ncont=5 dashed=0 concol=red ndf=skyflux
-   Contours the data array in the NDF called skyflux on the
-   current graphics device.  Contours at heights corresponding to
-   the 10, 30, 50, 70 and 90 percentiles are drawn in red.  Those
-   contours whose values are negative will appear as dashed
-   lines.  A key is plotted.
+contour skyflux mode=eq ncont=5 dashed=0 pens='colour=red' noclear
+   Contours the data array in the NDF called skyflux on the current
+   graphics device.  The contour map is automatically aligned with
+   any existing DATA picture, if possible. Contours at heights
+   corresponding to the 10, 30, 50, 70 and 90 percentiles (of the
+   data within the picture) are drawn in red.  Those contours whose
+   values are negative will appear as dashed lines.
 
-contour comp=d nokey penrot \
-   Contours the portion of the data array in the current NDF on
+contour comp=d nokey penrot style="grid=1,title=My data" \
+   Contours the data array in the current NDF on
    the current graphics device using the current method for
-   height selection.  The NDF's title is the plot's title.  No
-   key is drawn.  The appearance of the contours cycles every
-   third contour.
+   height selection.  No key is drawn.  The appearance of the
+   contours cycles every third contour. A co-ordinate grid is
+   drawn over the plot, and a title of "My data" is displayed at
+   the top.
 
-contour comp=v mode=fr heights=[10,20,40,80] title=Variance
+contour comp=v mode=fr heights=[10,20,40,80] \
    Contours the variance array in the current NDF on the
    current graphics device.  Contours at 10, 20, 40 and 80 are
-   drawn.  "Variance" is the title of the plot.
+   drawn.
 2 Notes
+-  The Title component in the NDF is used as the default title for
+the annotated axes. If the NDF does not have a Title component, then
+the default title is taken from current co-ordinate Frame stored in the
+WCS component of the NDF. This
+default may be over-ridden by specifying a value for the Title
+attribute using the STYLE parameter.
+
 -  The application stores a number of pictures in the graphics
-database in the following order: a FRAME of the specified size
-containing the title, annotated axes, contours and key; a DATA
-picture which is stored with world co-ordinates in units of data
-pixels; and a KEY picture to store the key if present.  The DATA
-picture also may have double-precision data co-ordinates derived
-from the NDF axis components provided these are linear and
-different from pixel co-ordinates; the data co-ordinates are
-stored via a linear transformation.  The NDF associated with the
-plot is stored by reference with the DATA picture.  On exit the
-current database picture for the chosen device reverts to the
+database in the following order: a FRAME picture containing the
+annotated axes, contours, and key; a KEY picture to store
+the key if present; and a DATA picture containing just the contours.
+Note, the FRAME picture is only created if annotated axes or a key
+has been drawn, or if non-zero margins were specified using parameter
+MARGIN. The world co-ordinates in the DATA picture will be pixel
+co-ordinates. A reference to the supplied NDF, together with a copy
+of the WCS information in the NDF are stored in the DATA picture. On
+exit the current database picture for the chosen device reverts to the
 input picture.
-
--  There are some options for setting the characteristics of the
-contour lines.  By default, solid lines are drawn with the same
-colour as the axes and key, namely the foreground colour.  The
-colour will depend on the graphics device chosen, but it is often
-black for printers or white for terminals.  The alternatives to
-override this default behaviour are listed below.
-
-   1. Set a colour for all contours using parameter CONCOL.
-   2. Request dashed contours below some threshold given by
-      parameter DASHED and solid lines for other heights.  All
-      contours have either the foreground colour or that
-      prescribed by parameter CONCOL.
-   3. Cycle the pens modulo 3 for each contour height actually
-      plotted by setting PENROT = TRUE.  The characteristics of
-      the second and third line styles will depend on the chosen
-      graphics device.  An image display or pen plotter will draw
-      coloured lines using palette entries 1 to 3; whereas a
-      window overlay, or monochrome laser printer or terminal
-      will draw a variety of dashed or thicker lines.
-   4. Combine options 2 and 3.  However, palette colours 1 to 3
-      will always be used and CONCOL ignored.  The contours below
-      the threshold continue the cycle through the three colours.
-      There may be some confusion on devices that already use
-      dashed lines, so this is only suitable for devices
-      supporting at least three colours simultaneously.
-
-Pen rotation takes precedence over colour control through CONCOL.
 2 Related_Applications
-   KAPPA: CONTOVER, TURBOCONT; Figaro: ICONT; SPECDRE: SPECCONT.
+   KAPPA: WCSFRAME, TURBOCONT, PICDEF; Figaro: ICONT; SPECDRE: SPECCONT.
 2 Authors
-MJC: Malcolm J. Currie  STARLINK
+MJC: Malcolm J. Currie  (STARLINK)
+
+DSB: David S. Berry (STARLINK)
 2 History
  1988 Aug  1 (MJC):
     Original version.
@@ -5815,6 +5860,10 @@ MJC: Malcolm J. Currie  STARLINK
 
  1997 May 31 (MJC):
     Added STATS, LENGTH, and NUMBER.
+
+ 12-AUG-1998 (DSB):
+    Major changes to base graphics on PGPLOT and handling of co-ordinate
+    systems on the AST library.
 2 Implementation_Status
    -  Only real data can be processed directly.  Other non-complex
    numeric data types will undergo a type conversion before the
@@ -6931,205 +6980,290 @@ DSB: David S. Berry (STARLINK)
 
    -  All non-complex numeric data types can be handled.
 1 CURSOR
-Reports the co-ordinates of points selected using the cursor.
+Reports the co-ordinates of positions selected using the cursor.
 
 Usage:
 
-   cursor [mode] [name] [logfile] [device]
+   cursor [mode] [name] [outlist] [device]
 
 Description:
 
-   This reads co-ordinates from the chosen graphics device and
-   displays them on your terminal.  There is commentary that
-   describes which buttons should be pressed to select or erase a
-   point, or exit.  Optionally, the co-ordinates may be stored in a
-   text file.
+   This application reads co-ordinates from the chosen graphics device
+   using a cursor and displays them on your terminal. The selected
+   positions may be marked in various ways on the device (see parameter
+   PLOT), and can be written to an output positions list so that subsequent
+   applications can make use of them (see parameter OUTLIST). The format
+   of the displayed positions may be controlled using parameter STYLE.
 
-   For each selected cursor position its Cartesian co-ordinates are
-   reported.  If the co-ordinate frame changes between selected
-   positions the comment, name and any label associated with the new
-   graphics-database picture are appended to the message.
+   Positions may be reported in several different co-ordinate Frames
+   (see parameter FRAME).
 
-   There are three modes of operation to define which co-ordinate
-   system/picture is to be used.  These are ANCHOR, CURRENT and
-   DYNAMIC.  See the parameter MODE for details.
+   The picture or pictures within which positions are required can be
+   selected in several ways (see parameters MODE and NAME).
 
-   In ANCHOR or DYNAMIC modes there is an option to select only
-   pictures of a certain name in the database.  This is most useful
-   when DATA pictures are covered by transparent FRAME pictures.
+   Restrictions can be made on the number of positions to be given (see
+   parameters MAXPOS and MINPOS), and screen output can be suppressed
+   (see parameter QUIET).
 2 Parameters
 For information on individual parameters, select from the list below:
-3 COLOUR
-COLOUR = LITERAL (Read)
-   The colour in which to draw any graphics specified by
-   parameter PLOT.  The options are described below.
-
-     "MAX"          - The maximum colour index used for the
-                      display of the image.
-     "MIN"          - The minimum colour index used for the
-                      display of the image.
-     An integer     - The actual colour index.  It is constrained
-                      between 0 and the maximum colour index
-                      available on the device.
-     A named colour - Uses the named colour from the palette, and
-                      if it is not present, the nearest colour
-                      from the palette is selected.
-
-   If the colour is to remain unaltered as the lookup table is
-   manipulated choose an integer between 0 and 15, or a named
-   colour.  The suggested default is the current value.
-
-   This parameter is ignored on window overlays, where the
-   overlay colour is used.  (Use the PALENTRY command to change
-   this colour.)  An overlay has the advantage that the crosses
-   or polygon can be erased using OVCLEAR once this task is
-   completed.  The parameter is also ignored for character-cell
-   terminals.
-   [The current value, but equals "Green" if there is no current
-   value.]
-3 COSYS
-COSYS = LITERAL (Read)
-   The co-ordinate system to be used.  This can be either "World"
-   or "Data".  "World" makes the world co-ordinates of the cursor
-   position to be reported.  World co-ordinates that relate to a
-   location in a data array will be in array pixels.  If COSYS =
-   "Data" the graphics database is examined for data co-ordinates
-   stored via a transformation.  Data co-ordinates are arbitrary
-   but most often they will be a linear or logarithmic
-   transformation of the world co-ordinates.  For example, the x
-   co-ordinate of a spectrum would be given in pixels if COSYS =
-   "World", but if COSYS = "Data" the x co-ordinate could be in
-   wavelength units, such as Angstroms.  If the database does not
-   have a world-to-data transformation for a given picture, the
-   value of this parameter is irrelevant and world co-ordinates
-   will be reported for that picture. [Current co-ordinate system]
+3 CLOSE
+CLOSE = _LOGICAL (Read)
+   This parameter is only accessed if parameter PLOT is set to
+   "Chain" or "Poly". If TRUE, polygons will be closed by joining
+   the first position to the last position. [current value]
+3 DESCRIBE
+DESCRIBE = _LOGICAL (Read)
+   If TRUE, a detailed description of the co-ordinate Frame in which
+   subsequent positions will be reported is produced each time a
+   position is reported within a new picture. [current value]
 3 DEVICE
 DEVICE = DEVICE (Read)
    The graphics workstation.  This device must support cursor
-   interaction, and belong to one of the following classes:
-   TERMINAL, IMAGE_DISPLAY, IMAGE_OVERLAY, WINDOW, and
-   WINDOW_OVERLAY.  [The current graphics device]
-3 DOUBLE
-DOUBLE = _LOGICAL (Read)
-   If true co-ordinates will be reported, written to the output
-   parameters, and stored in the text file in double precision,
-   otherwise single precision is used.  [FALSE]
+   interaction. [current graphics device]
+3 EPOCH
+EPOCH = _DOUBLE (Read)
+   If a "Sky Co-ordinate System" specification is supplied (using
+   parameter FRAME) for a celestial co-ordinate system, then an
+   epoch value is needed to qualify it. This is the epoch at
+   which the supplied sky positions were determined. It should be
+   given as a decimal years value, with or without decimal places
+   ("1996.8" for example). Such values are interpreted as a Besselian
+   epoch if less than 1984.0 and as a Julian epoch otherwise.
+3 FRAME
+FRAME = LITERAL (Read)
+   A string determining the co-ordinate Frame in which positions are
+   to be reported. When a data array is displayed by an application
+   such as DISPLAY, CONTOUR, etc, WCS information describing the co-ordinate
+   systems known to the data array are stored with the DATA picture
+   in the graphics database. This application can report positions in
+   any of the co-ordinate Frames stored with each picture. The
+   string supplied for FRAME can be one of the following:
+
+   - A domain name such as SKY, AXIS, PIXEL, etc. The special domains
+   AGI_WORLD and AGI_DATA are used to refer to the world and data
+   co-ordinate system stored in the AGI graphics database. They can
+   be useful if no WCS information was store with the picture when
+   it was created.
+
+   - An integer value giving the index of the required Frame.
+
+   - A "Sky Co-ordinate System" (SCS) value such as EQUAT(J2000) (see
+   section "Sky Co-ordinate Systems" in SUN/95).
+
+   If a null value (!) is supplied, positions are reported in the
+   co-ordinate Frame which was current when the picture was created.
+   [!]
+3 GEODESIC
+GEODESIC = _LOGICAL (Read)
+   This parameter is only accessed if parameter PLOT is set to
+   "Chain" or "Poly". It specifies whether the curves drawn between
+   positions should be straight lines, or should be geodesic curves.
+   In many co-ordinate Frames geodesic curves will be simple straight
+   lines. However, in others (such as the majority of celestial
+   co-ordinates Frames) geodesic curves will be more complex curves
+   tracing the shortest path between two positions in a non-linear
+   projection. [FALSE]
+3 INFO
+INFO = _LOGICAL (Read)
+   If TRUE then messages are displayed describing the use of the
+   mouse prior to obtaining the first position. Note, these
+   informational messages are not suppressed by setting parameter
+   QUIET to TRUE. [TRUE]
+3 LASTDIM
+LASTDIM = _INTEGER (Write)
+   The number of axis values written to parameter LASTPOS.
+3 LASTPOS
+LASTPOS() = _DOUBLE (Write)
+   The unformatted co-ordinates of the last valid position selected
+   with the cursor, in the co-ordinate Frame which was used to
+   report the position. The number of axis values is written to output
+   parameter LASTDIM.
 3 LOGFILE
 LOGFILE = FILENAME (Write)
-   The name of the text file in which the co-ordinates of points
-   selected with the cursor may be stored.  A null string (!)
-   means that no file is created.  The suggested default is the
-   current value. [!]
+   The name of the text file in which the formatted co-ordinates of
+   positions selected with the cursor may be stored. This is intended
+   primarily for recording the screen output, and not for communicating
+   positions to subsequent applications (use parameter OUTLIST for this
+   purpose). A null string (!) means that no file is created.  [!]
+3 MARKER
+MARKER = _INTEGER (Read)
+   This parameter is only accessed if parameter PLOT is set to
+   "Chain" or "Mark". It specifies the symbol with which each
+   position should be marked, and should be given as an integer
+   PGPLOT marker type. For instance, 0 gives a box, 1 gives a dot,
+   2 gives a cross, 3 gives an asterisk, 7 gives a triangle. The
+   value must be larger than or equal to -31. [current value]
+3 MAXPOS
+MAXPOS = _INTEGER (Read)
+   The maximum number of positions which may be supplied before the
+   application terminates. The number must be in the range 1 to 500.
+   [500]
+3 MINPOS
+MINPOS = _INTEGER (Read)
+   The minimum number of positions which may be supplied. The user
+   is asked to supply more if necessary. The number must be in the
+   range 0 to the value of parameter MAXPOS. [0]
 3 MODE
 MODE = LITERAL (Read)
-   The mode defining the co-ordinate system/picture in which
-   cursor positions are returned.  There are three options.
+   The method used to select the pictures in which cursor positions are
+   to be reported. There are three options:
 
-      "Current" selects the current picture in the AGI
-      database and reports the position of a point selected by
-      the cursor.  If the point does not lie within the picture,
-      an extrapolated position is reported.
+   - "Current" -- reports positions within the current picture in the
+   AGI database. If a position does not lie within the current picture,
+   an extrapolated position is reported, if possible.
 
-      "Dynamic" selects the topmost picture in the AGI
-      database which encompasses that position selected.  Thus
-      the second and subsequent cursor hits may result in the
-      selection of a new picture.
+   - "Dynamic" -- reports positions within the top-most picture
+   under the cursor in the AGI  database.  Thus the second and
+   subsequent cursor hits may result in the selection of a new picture.
 
-      "Anchor" lets the first cursor hit select a
-      picture which remains current throughout the running of
-      the application.  If subsequent cursor hits fall outside
-      the extent of this picture, a position extrapolated from
-      the picture's co-ordinate system is reported.
+   - "Anchor" -- lets the first cursor hit select the picture in
+   which all positions are to be reported. If a subsequent cursor hit
+   falls outside this picture, an extrapolated position is reported if
+   possible.
+
    ["Dynamic"]
 3 NAME
 NAME = LITERAL (Read)
-   Only pictures of this name are to be selected.  A null string
-   (!) or blanks means that pictures of all names may be selected.
-   NAME is ignored when MODE = "Current".
-   [!]
+   Only pictures of this name are to be selected.  For instance, if
+   you want positions in a DATA picture which is covered by a
+   transparent FRAME picture, then you could specify NAME=DATA.
+   A null (!) or blank string means that pictures of all names may
+   be selected. NAME is ignored when MODE = "Current". [!]
 3 NUMBER
-NUMBER = _DOUBLE (Write)
-   The number of points selected with the cursor and stored in
-   output parameters XP and YP.
+NUMBER = _INTEGER (Write)
+   The number of positions selected with the cursor (excluding
+   invalid positions).
+3 OUTLIST
+OUTLIST = FILENAME (Write)
+   An output positions list in which to store the valid selected
+   positions (only positions in the first selected picture are
+   recorded). This is the name of a text file which can be used to
+   communicate positions to subsequent applications. It includes
+   information describing the available co-ordinate Frames as well as
+   the positions themselves. If you want a simple record of the
+   positions displayed on the screen, use parameter LOGFILE instead.
+   If a null value is supplied, no output positions list is produced. [!]
 3 PLOT
 PLOT = LITERAL (Read)
-   The type of graphics to be used to mark the position of each
-   selected point.  PLOT can take any of the following values:
+   The type of graphics to be used to mark the selected positions
+   which have valid co-ordinates.  The appearance of these graphics
+   (colour, size, etc ) is controlled by the STYLE parameter. PLOT
+   can take any of the following values:
 
-     "Cross" - Each vertex is marked by a cross.
+   - "None" -- No graphics are produced.
 
-     "None"  - No graphics are produced.
+   - "Mark" -- Each position is marked by the symbol specified
+   by parameter MARKER.
 
-     "Poly"  - Causes each point to be joined by a straight line
-               to the previous point.  The last point is joined
-               to the first point.
+   - "Poly" -- Causes each position to be joined by a line to the
+   previous position.  These lines may be simple straight lines or
+   geodesic curves (see parameter GEODESIC). The polygons may
+   optionally be closed by joining the last position to the first (see
+   parameter CLOSE).
 
-   The initial default is "None", then subsequently it is the
-   current value.  []
-3 XC
-XC = _DOUBLE (Write)
-   The x co-ordinate of the last point selected with the cursor.
-   This is only written when parameter NUMBER is positive.
-3 XP
-XP() = _DOUBLE (Write)
-   The x co-ordinates of the points selected with the cursor.
-   The number of values is given by parameter NUMBER, and
-   therefore this parameter is only written when parameter NUMBER
-   is positive.
-3 YC
-YC = _DOUBLE (Write)
-   The y co-ordinate of the last point selected with the cursor.
-   This is only written when parameter NUMBER is positive.
-3 YP
-YP() = _DOUBLE (Write)
-   The y co-ordinates of the points selected with the cursor.
-   The number of values is given by parameter NUMBER, and
-   therefore this parameter is only written when parameter NUMBER
-   is positive.
+   - "Chain" -- This is a combination of "Mark" and "Poly". Each
+   position is marked by a symbol and joined by a line to the previous
+   position. Parameters MARKER, GEODESIC and CLOSE are used to
+   specify the symbols and lines to use.
+
+   [current value]
+3 QUIET
+QUIET = _LOGICAL (Read)
+   If TRUE then positions are not reported on the screen. Output
+   parameters and files are still created. The display of informational
+   messages describing the use of the cursor is controlled by the
+   parameter INFO. [FALSE]
+3 STYLE
+STYLE = LITERAL (Read)
+   A group of attribute settings describing the plotting style to use
+   when drawing the graphics specified by parameter PLOT. The format
+   of the positions reported on the screen may also be controlled.
+
+   A comma-separated list of strings should be given in which each
+   string is either an attribute setting, or the name of a text file
+   preceded by an up-arrow character "^". Such text files should
+   contain further comma-separated lists which will be read and
+   interpreted in the same manner. Attribute settings are applied in
+   the order in which they occur within the list, with later settings
+   over-riding any earlier settings given for the same attribute.
+
+   Each individual attribute setting should be of the form:
+
+      <name>=<value>
+
+   where <name> is the name of a plotting attribute, and <value> is
+   the value to assign to the attribute. Default values will be
+   used for any unspecified attributes. All attributes will be
+   defaulted if a null value (!) is supplied. See section "Plotting
+   Attributes" in SUN/95 for a description of the available
+   attributes. Any unrecognised attributes are ignored (no error is
+   reported). [current value]
+
+   In addition to the attributes which control the appearance of
+   the graphics (Colour, Font, etc), the following attributes may
+   be set in order to control the appearance of the formatted axis
+   values reported on the screen: Format, Digits, Symbol, Unit. These
+   may be suffixed with an axis number (eg "Digits(2)") to refer to
+   the values displayed for a specific axis. [current value]
 2 Examples
-cursor
-   This obtains the co-ordinates of any visible picture for the
-   current graphics device by use of the cursor.
+cursor frame=pixel
+   This obtains co-ordinates within any visible picture for the
+   current graphics device by use of the cursor. Positions are
+   reported in pixel co-ordinates if available, and in the current
+   co-ordinate Frame of the picture otherwise.
 
-cursor colour=blue plot=cross
-   As above except that the points are marked with blue crosses.
+cursor frame=equat(J2010)
+   This obtains co-ordinates within any visible picture for the
+   current graphics device by use of the cursor. Positions are
+   reported in equatorial RA/DEC co-ordinates (referenced to the
+   J2010 equinox) if available, and in the current co-ordinate Frame
+   of the picture otherwise.
 
-cursor xc=(xpos) yc=(ypos)
-   As the first example.  The x and y co-ordinates of the
-   last-selected point is written to ICL variables xpos and ypos.
+cursor describe plot=mark marker=3 style="colour=red,size=2"
+   As above except, positions are always reported in the current
+   co-ordinate Frame of each picture. The details of these co-ordinate
+   Frames are described as they are used. Each selected point is
+   marked with PGPLOT marker 3 (an asterisk). The markers are
+   red and are twice the default size.
 
-cursor cosys=w
-   This obtains the world co-ordinates of any visible picture for
-   the current graphics device by use of the cursor.
+cursor current maxpos=2 minpos=2 plot=poly quiet outlist=slice
+   Exactly two positions are obtained within the current picture,
+   and are joined with a straight line. The positions are written to
+   a text file called slice but are not displayed on the screen. The
+   text file may be used to communicate the positions to later
+   applications.
 
-cursor current device=graphon
-   This obtains the co-ordinates of any visible picture in the
-   reference frame of the current picture of the Graphon device.
-
-cursor logfile=stars.dat name=data
-   This obtains the co-ordinates of any visible DATA picture
-   for the current graphics device.  The x-y co-ordinates are
-   stored in the text file called stars.dat.
+cursor name=data style="^mystyle,digits(1)=5,digits(2)=7"
+   This obtains co-ordinates within any visible DATA picture on
+   the current graphics device.  The style to use is read from
+   text file mystyle, but is then modified so that 5 digits are used
+   to format axis 1 values, and 7 to format axis 2 values.
 2 Notes
--  Should an error occur trying to obtain the BASE picture for
-ANCHOR or DYNAMIC modes, the current picture is unchanged.
+-  The unformatted values stored in the output parameter LASTPOS,
+may not be in the same units as the formatted values shown on
+the screen and logged to the log file. For instance, unformatted
+celestial co-ordinate values are stored in radians.
+
+-  The current picture is unchanged by this application.
 
 -  In DYNAMIC and ANCHOR modes, if the cursor is situated at a
-point where there are no pictures of the selected name, the
+position where there are no pictures of the selected name, the
 co-ordinates in the BASE picture are reported.
 
--  The maximum number of points is 500.
-
--  Points can be removed (the instructions state how), starting
-from the most-recent one.  For an overlay device, the plotted
-points or polygon lines disappear.  For other devices, the
-erroneous points and lines are plotted with pen 4 of the palette.
+-  Positions can be removed (the instructions state how), starting
+from the most-recent one.  Such positions are excluded from the
+output positions list and log file (if applicable). If graphics
+are being used to mark the positions, then removed positions will
+be highlighted by drawing a marker of type 8 (a circle containing a
+cross) over the removed positions in a different colour.
 2 Related_Applications
-   KAPPA: CURSOR, INSPECT, PICCUR; Figaro: ICUR, IGCUR.
+   KAPPA: LISTSHOW, LISTMAKE, INSPECT, PICCUR; Figaro: ICUR, IGCUR.
 2 Authors
 JM: Jo Murray  (STARLINK)
 
 MJC: Malcolm J. Currie  (STARLINK)
+
+DSB: David S. Berry (STARLINK)
 2 History
  22-MAY-1989 (JM):
     Original version.
@@ -7195,7 +7329,7 @@ MJC: Malcolm J. Currie  (STARLINK)
 
  1995 December 16 (MJC):
     Added NUMBER, XP, and YP output parameters.  Allowed erasure
-    of previous point.
+    of previous position.
 
  1996 May 31 (MJC):
     Improved and simplified the graphics, so the marker has a
@@ -7205,6 +7339,10 @@ MJC: Malcolm J. Currie  (STARLINK)
  1997 March 11 (MJC):
     Fixed initialisation bug for parameter NUMBER, and hence XP and
     YP.  Fixed bug where SGS pen was being set when PLOT="None".
+
+ 28-AUG-1998 (DSB):
+    Radical changes to use PGPLOT and AST for graphics and
+    co-ordinate handling.
 1 Custom_KAPPA
 
 KAPPA applications can be modified to suit your particular
@@ -7664,164 +7802,130 @@ Usage:
 
 Description:
 
-   This application displays an image of a 1- or 2-dimensional NDF
-   on the current image-display device.  The image may be the data
-   array, but also variance or quality can be shown.  The image is
-   situated within the current picture with the maximum
-   magnification without clipping or distorting the image, though
-   the exact positioning and magnification can be controlled.  The
-   colour mapping has several scaling methods described below.  All
-   the available colour indices are used save a few reserved for
-   annotations.
+   This application displays a 1- or 2-dimensional NDF as an image
+   on the current image-display device. The minimum and maximum data
+   values to be displayed can be selected in several ways (see
+   parameter MODE). Data values outside these limits are displayed
+   with the colour of the nearest limit.
 
-   Only the parts of the displayed image that lie within the current
-   picture are visible;  the rest is clipped.  Should the image be
-   too large to fit onto the current picture at unit magnification
-   (if you demand this magnification), then there is an option to
-   squash the array in order to make it just fit; otherwise the
-   portion of the data array visible within the current picture is
-   displayed as originally requested.
+   Annotated axes or a simple border can be drawn around the image (see
+   parameters AXES and BORDER). The appearance of these may be controlled
+   in detail (see parameters STYLE and BORSTYLE).
 
-   Annotated axes and a title, or a coloured border may be drawn
-   around the displayed image.
+   A specified colour lookup table may optionally be loaded prior to
+   displaying the image (see parameter LUT). For devices which reset
+   the colour table when opened (such as postscript files), this may
+   be the only way of controlling the colour table.
+
+   The image is produced within the current graphics database picture
+   The co-ordinates at the centre of the image, and the scale of the
+   image can be controlled using parameters CENTRE, XMAGN and YMAGN. Only
+   the parts of the image that lie within the current picture are visible;
+   the rest is clipped.  The image is padded with bad pixels if necessary.
 2 Parameters
 For information on individual parameters, select from the list below:
-3 ABSLAB
-ABSLAB  =  LITERAL (Read)
-   Label for the plot abscissa, in which NCAR fancy founts
-   may be embedded when FONT = "NCAR".  This parameter is only
-   used when the axes option is selected.  If axis information is
-   present the suggested default is the NDF's axis label followed
-   by the units, in parentheses.  If an error occurs obtaining
-   the label the suggested default is "X". []
 3 AXES
 AXES = _LOGICAL (Read)
    TRUE if labelled and annotated axes are to be drawn around the
-   displayed image.  The annotations are either the data
-   co-ordinates from the NDF axis components, provided these are
-   present and linear and COSYS = "Data"; otherwise pixel
-   co-ordinates are used.  [FALSE]
+   image. These display co-ordinates in the current co-ordinate Frame
+   of the supplied NDF - which may be changed using application WCSFRAME
+   (see also parameter USEAXIS). The width of the margins left for
+   the annotation may be controlled using parameter MARGIN. The
+   appearance of the axes (colours, fonts, etc) can be controlled
+   using the STYLE parameter. [current value]
 3 BADCOL
 BADCOL = LITERAL (Read)
-   The colour to give a bad pixel in the display.  There are a
-   number of options described below.
+   The colour with which to mark any bad (i.e. missing) pixels in the
+   display.  There are a number of options described below:
 
-     "MAX"          - The maximum colour index used for the
-                      display of the image.
-     "MIN"          - The minimum colour index used for the
-                      display of the image.
-     An integer     - The actual colour index.  It is constrained
-                      between 0 and the maximum colour index
-                      available on the device.
-     A named colour - Uses the named colour from the palette, and
-                      if it is not present, the nearest colour
-                      from the palette is selected.
+   - "MAX" -- The maximum colour index used for the display of the image.
+
+   - "MIN" -- The minimum colour index used for the display of the image.
+
+   - An integer -- The actual colour index.  It is constrained between
+   0 and the maximum colour index available on the device.
+
+   - A named colour -- Uses the named colour from the palette, and if it
+   is not present, the nearest colour from the palette is selected.
 
    If the colour is to remain unaltered as the lookup table is
    manipulated choose an integer between 0 and 15, or a named
-   colour.  The suggested default is the current value. [The
-   current value, but equals "MIN" if there is no current value.]
-3 BCOLOUR
-BCOLOUR = LITERAL (Read)
-   The colour of the border.  It is only accessed if BORDER is
-   TRUE.  There are a number of options described below.
-
-     "MAX"          - The maximum palette colour index.
-     "MIN"          - The background colour.
-     An integer     - The actual colour index in the palette.  It
-                      is constrained to be between 0 and 15.
-     A named colour - Uses the named colour from the palette, and
-                      if it is not present, the nearest colour
-                      from the palette is selected.
-
-   The suggested default is the current value. [The current value,
-   but equals "Yellow" if there is no current value.]
+   colour.  The suggested default is the current value. [current value]
 3 BORDER
 BORDER = _LOGICAL (Read)
-   TRUE if a coloured border is to be drawn around the
-   displayed image.  If AXES is TRUE the value of BORDER will
-   be ignored and no border will be drawn.  The colour and width
-   of the border is controlled by parameters BCOLOUR and
-   BWIDTH. [FALSE]
-3 BWIDTH
-BWIDTH( 2 ) = _REAL (Read)
-   The width of the border along each axis in device pixels.  It
-   is only obtained when BORDER is TRUE.  If only a single value
-   is given it is duplicated to the second dimension.  The
-   suggested default is the current value.  The widths must lie
-   in the range 1.0--20.0. [4.0]
+   TRUE if a border is to be drawn around the regions of the
+   displayed image containing valid co-ordinates in the current
+   co-ordinate Frame of the NDF. For instance, if the NDF contains
+   an Aitoff all-sky map, then an elliptical border will be drawn
+   if the current co-ordinate Frame is galactic longitude and
+   latitude. This is because pixels outside this ellipse have
+   undefined positions in galactic co-ordinates. If, instead, the
+   current co-ordinate Frame had been pixel co-ordinates, then a
+   simple box would have been drawn containing the whole image.
+   This is because every pixel has a defined position in pixel
+   co-ordinates. The appearance of the border (colour, width, etc)
+   can be controlled using parameter BORSTYLE. [current value]
+3 BORSTYLE
+BORSTYLE = GROUP (Read)
+   A group of attribute settings describing the plotting style to use
+   for the border (see parameter BORDER).
+
+   A comma-separated list of strings should be given in which each
+   string is either an attribute setting, or the name of a text file
+   preceded by an up-arrow character "^". Such text files should
+   contain further comma-separated lists which will be read and
+   interpreted in the same manner. Attribute settings are applied in
+   the order in which they occur within the list, with later settings
+   over-riding any earlier settings given for the same attribute.
+
+   Each individual attribute setting should be of the form:
+
+      <name>=<value>
+
+   where <name> is the name of a plotting attribute, and <value> is
+   the value to assign to the attribute. Default values will be
+   used for any unspecified attributes. All attributes will be
+   defaulted if a null value (!) is supplied. See section "Plotting
+   Attributes" in SUN/95 for a description of the available
+   attributes. Any unrecognised attributes are ignored (no error is
+   reported). [current value]
 3 CENTRE
-CENTRE( 2 ) = _DOUBLE (Read)
-   These two values control the position of the displayed image.
-   Specifically, if COSYS = "World" they are the pixel indices of
-   the NDF image that are to lie at the centre of the current
-   picture, but they are not limited to the bounds of the NDF
-   array.  If COSYS = "Data" they are the data co-ordinates to
-   lie at the centre of the picture, and are limited by the
-   bounds of the NDF array.  The CENTRE parameters permit you to
-   display a portion of an NDF about a specified pixel at high
-   magnification.  The application attempts to display as much of
-   the NDF array it can at the magnification, so do not expect a
-   symmetric image about the chosen centre.  If you do not
-   specify a magnification with centering, it may result in a
-   small displayed image.  Further it may not be possible to have
-   precisely the pixel you want at the centre of the image; the
-   displacement decreases as the magnification is increased.
-   CENTRE is disabled when FILL is TRUE.  [Centre of the image]
+CENTRE = LITERAL (Read)
+   The co-ordinates of the data pixel to be placed at the centre of
+   the image, in the current co-ordinate Frame of the NDF (supplying
+   a colon ":" will display details of the current co-ordinate Frame).
+   The position should be supplied as a list of formatted axis values
+   separated by spaces or commas. See also parameter USEAXIS.
+   [centre of the image]
 3 CLEAR
 CLEAR = _LOGICAL (Read)
-   TRUE if the current picture is to be cleared before the
-   display of the image. [FALSE]
+   TRUE if the current picture is to be cleared before the image is
+   displayed. [FALSE]
 3 COMP
 COMP = LITERAL (Read)
-   The NDF component to be displayed.  It may be "Data",
-   "Quality", "Variance", or "Error" (where "Error" is the
+   The NDF array component to be displayed.  It may be "Data",
+   "Quality", "Variance", or "Error" (where "Error" is an
    alternative to "Variance" and causes the square root of the
    variance values to be displayed).  If "Quality" is specified,
    then the quality values are treated as numerical values (in
    the range 0 to 255). ["Data"]
-3 COSYS
-COSYS = LITERAL (Read)
-   The co-ordinate system to be used.  This can be either "World"
-   or "Data".  "World" makes pixel co-ordinates to appear on axes
-   and the centering is defined in pixels.  If COSYS = "Data" the
-   NDF's axis information is used to annotate axes and to control
-   the position of the displayed image.  [Current co-ordinate
-   system]
 3 DEVICE
 DEVICE = DEVICE (Read)
    The name of the graphics device used to display the image.
-   The device must be in one of the following GNS categories:
-   IMAGE_DISPLAY, IMAGE_OVERLAY, MATRIX_PRINTER, or WINDOW, and
-   have at least 24 colour indices or greyscale intensities.
-   [Current image-display device]
+   The device must have at least 24 colour indices or greyscale
+   intensities. [current image-display device]
 3 FILL
 FILL = _LOGICAL (Read)
-   The display normally has square pixels, in other words a
-   length along each axis corresponds to the same number of
-   pixels.  However, for images with markedly different
-   dimensions, such as two-dimensional spectra, this default
-   behaviour may not be suitable or give the clearest plot.  When
-   FILL is TRUE, the square-pixel constraint is relaxed and the
-   displayed image is the largest possible within the current
-   picture.  When FILL is FALSE, the pixels are square.  When
-   FILL is TRUE it disables the CENTRE, XMAGN, and YMAGN
-   parameters.  The suggested default is the current value.
-   [FALSE]
-3 FONT
-FONT = LITERAL (Read)
-   The fount to be used for the line graphics.  It can be either
-   "NCAR" for the NCAR fancy characters and "GKS" for the standard
-   GKS san-serif fount.  The former is intended for hardcopy
-   publication-quality plots, since it is relatively slow; the
-   latter is intended for normal interactive graphics requiring
-   rapid plotting, and it is clearer on small plots. The
-   suggested default is the current value. ["GKS"]
+   If FILL is set to TRUE, then the image will be "stretched" to fill
+   the current picture in both directions. This can be useful when
+   displaying images with markedly different dimensions, such as
+   two-dimensional spectra. The dynamic default is TRUE if the array
+   being displayed is 1-dimensional, and FALSE otherwise. []
 3 HIGH
 HIGH = _DOUBLE (Read)
-   The array value that scales to the highest pen in the colour
-   table.  All larger array values are set to the highest colour
-   index when HIGH is greater than LOW, otherwise all array values
+   The data value corresponding to the highest pen in the colour
+   table.  All larger data values are set to the highest colour
+   index when HIGH is greater than LOW, otherwise all data values
    greater than HIGH are set to the lowest colour index.  The
    dynamic default is the maximum data value.  There is an
    efficiency gain when both LOW and HIGH are given on the
@@ -7829,12 +7933,12 @@ HIGH = _DOUBLE (Read)
    (Scale mode)
 3 IN
 IN = NDF (Read)
-   Input NDF data structure containing the image to be displayed.
+   The input NDF structure containing the data to be displayed.
 3 LOW
 LOW = _DOUBLE (Read)
-   The array value that scales to the lowest pen in the colour
-   table.  All smaller array values are set to the lowest colour
-   index when LOW is less than HIGH, otherwise all array values
+   The data value corresponding to the lowest pen in the colour
+   table.  All smaller data values are set to the lowest colour
+   index when LOW is less than HIGH, otherwise all data values
    smaller than LOW are set to the highest colour index.   The
    dynamic default is the minimum data value.  There is an
    efficiency gain when both LOW and HIGH are given on the
@@ -7842,63 +7946,63 @@ LOW = _DOUBLE (Read)
    (Scale mode)
 3 LUT
 LUT = NDF (Read)
-   Name of the NDF containing a lookup table as its data array;
-   the lookup table is written to the image-display's colour
+   Name of the NDF containing a colour lookup table in its Data
+   array; the lookup table is written to the image-display's colour
    table.  The purpose of this parameter is to provide a means of
    controlling the appearance of the image on certain devices,
    such as colour printers, that do not have a dynamic colour
-   table, i.e. the colour table is reset when the device is
-   opened.  If used with dynamic devices, such as windows or
-   Ikons, the new colour table remains after this application has
-   completed. A null, !, means that the existing colour table will
+   table (i.e. the colour table is reset when the device is
+   opened).  If used with dynamic devices (such as X-windows),
+   the new colour table remains after this application has
+   completed. A null value (! ) causes the existing colour table to
    be used.
 
-   The LUT must be 2-dimensional, the first dimension
+   The LUT must be 2-dimensional, the dimension of the first axis
    being 3, and the second being arbitrary.  The method used to
    compress or expand the colour table if the second dimension is
    different from the number of unreserved colour indices is
    controlled by parameter NN.  Also the LUT's values must lie in
    the range 0.0--1.0. [!]
-3 MAJTIC
-MAJTIC( 2 ) = _REAL (Read)
-   The parameter controlling the numbers of major tick marks
-   for the x and y axes.  (Number used is between MAJTIC+2 and
-   5*MAJTIC/2+4.)   A negative value for an axis makes the
-   graphics package decide an appropriate value.  This parameter
-   is only used when the axes option is selected. [3.,3.]
-3 MINTIC
-MINTIC( 2 ) = _REAL (Read)
-   The number of minor tick marks between each major tick mark
-   for the x and y axes.  A negative value forces the graphics
-   package to compute appropriate values.   This parameter is
-   only used when the axes option is selected. [-1.,-1.]
+3 MARGIN
+MARGIN( 4 ) = _REAL (Write)
+   The widths of the margins to leave around the image for axis
+   annotations, given as fractions of the corresponding dimension
+   of the DATA picture. The actual margins used may be increased to
+   preserve the aspect ratio of the data. Four values may be given, in
+   the order - bottom, right, top, left. If less than four values are
+   given, extra values are used equal to the first supplied value. If
+   these margins are too narrow any axis annotation may be clipped. The
+   dynamic default (for all edges) is; 0.16 if annotated axes are
+   being produced; 0.06, if a simple border is being produced; and
+   0.0 if neither border nor axes are being produced. []
 3 MODE
 MODE = LITERAL (Read)
-   The type of scaling to be applied to the array.  The options
-   are described below.
-     "Faint"       - The image is scaled from the mean minus one
-                     standard deviation to the mean plus seven
-                     standard deviations.  The scaling values are
-                     reported so that the faster Scale mode may be
-                     utilised later.
-     "Flash"       - The image is flashed onto the screen without
-                     any scaling at all.  This is the fastest
-                     option.
-     "Percentiles" - The image is scaled between the values
-                     corresponding to two percentiles.  The
-                     scaling values are reported so that the
-                     faster Scale mode may be utilised later.
-     "Range"       - The image is scaled between the minimum and
-                     maximum data values.
-     "Scale"       - You define the upper and lower limits
-                     between which the image is to be scaled.  The
-                     application reports the maximum and the
-                     minimum values for reference and makes these
-                     defaults respectively.
-     "Sigmas"      - The image is scaled between two standard-
-                     deviation limits.  The scaling values used
-                     are reported so that the faster Scale mode
-                     may be utilised later.
+   The method by which the maximum and minimum data values to be
+   displayed are chosen. The options are:
+
+   - "Faint" -- The image is scaled between the mean data value minus
+   one standard deviation and the mean data value plus seven standard
+   deviations. The scaling values are reported so that the faster
+   Scale mode may be utilised later.
+
+   - "Flash" -- The image is flashed onto the screen without any
+   scaling at all.  This is the fastest option.
+
+   - "Percentiles" -- The image is scaled between the data values
+   corresponding to two percentiles.  The scaling values are reported
+   so that the faster Scale mode may be utilised later.
+
+   - "Range" -- The image is scaled between the minimum and maximum
+   data values.
+
+   - "Scale" -- You define the upper and lower limits between which
+   the image is to be scaled.  The application reports the maximum
+   and the minimum data values for reference and makes these the
+   suggested defaults.
+
+   - "Sigmas" -- The image is scaled between two standard-deviation
+   limits.  The scaling values used are reported so that the faster
+   Scale mode may be utilised later.
 3 NN
 NN = _LOGICAL (Read)
    If TRUE the input lookup table is mapped to the colour table by
@@ -7911,58 +8015,39 @@ NN = _LOGICAL (Read)
 NUMBIN  =  _INTEGER (Read)
    The number of histogram bins used to compute percentiles for
    scaling. (Percentiles mode) [2048]
-3 ORDLAB
-ORDLAB  =  LITERAL (Read)
-   Label for the plot ordinate, in which NCAR fancy founts
-   may be embedded when FONT = "NCAR".   This parameter is only
-   used when the axes option is selected.  If axis information is
-   present the suggested default is the NDF's axis label followed
-   by the units, in parentheses.  If an error occurs obtaining
-   the label the suggested default is "Y". []
 3 OUT
 OUT = NDF (Write)
-   The scaled section of the NDF displayed; it also does not have
-   values that equal the reserved portion of the colour table.
-   The output NDF is intended to be used as the input data in
-   conjunction with SCALE=FALSE.  It will be vertically inverted
-   with respect to the input array because of GKS convention.  If
-   it has a null value (!) no output NDF will be created.  This
-   parameter is ignored when SCALE=FALSE. [!]
-3 OUTTIC
-OUTTIC = _LOGICAL (Read)
-   TRUE if the axis tick marks are to appear on the outside of
-   the axes instead of inside.  This parameter is only used
-   when the axes option is selected. [TRUE]
+   A scaled copy of the displayed section of the image. Values in
+   this output image are integer colour indices shifted to exclude
+   the indices reserved for the palette (i.e. the value zero refers
+   to the first colour index following the palette). The output NDF
+   is intended to be used as the input data in conjunction with
+   SCALE=FALSE. If a null value (!) is supplied, no output NDF will
+   be created.  This parameter is not accessed when SCALE=FALSE. [!]
 3 PERCENTILES
 PERCENTILES( 2 ) = _REAL (Read)
    The percentiles that define the scaling limits. For example,
    [25,75] would scale between the quartile values. (Percentile
    mode)
-3 PLTITL
-PLTITL = LITERAL (Read)
-   The title of the plot.  Up to about 40 characters can be
-   accommodated, and NCAR fancy founts may be embedded (cf.
-   SUN/90) when FONT = "NCAR".  This parameter is only used when
-   the axes option is selected. [The NDF title]
 3 SCAHIGH
 SCAHIGH = _DOUBLE (Write)
-   The array value scaled to the maximum colour index for display.
-   In Flash mode or when there is no scaling the highest colour
-   index is used.  The current display linear-scaling maximum is
-   set to this value.
+   On exit, this holds the data value which corresponds to the maximum
+   colour index in the displayed image. In Flash mode or when there is
+   no scaling the highest colour index is returned.
 3 SCALE
 SCALE = _LOGICAL (Read)
-   If TRUE the input array is scaled according to the value of
+   If TRUE the input data is to be scaled according to the value of
    parameter MODE.  If it is FALSE, MODE is ignored, and the input
-   array is displayed as is.  There is no scaling, inversion
-   or avoidance of annotation pens.  SCALE = FALSE is intended to
-   be used with arrays previously scaled by this or similar
-   applications which have already performed the scaling,
-   inversion and exclusion.  It provides the quickest method of
+   data is displayed as is (i.e. the data values are simply converted
+   to integer type and used as indices into the colour table). A value
+   of zero refers to the first pen following the palette. A FALSE
+   value is intended to be used with data previously scaled by this
+   or similar applications which have already performed the required
+   scaling (see parameter OUT). It provides the quickest method of
    image display within this application. [TRUE]
 3 SCALOW
 SCALOW = _DOUBLE (Write)
-   The array value scaled to the minimum colour index for display.
+   The data value scaled to the minimum colour index for display.
    In Flash mode or when there is no scaling the lowest colour
    index is used.  The current display linear-scaling minimum is
    set to this value.
@@ -7973,52 +8058,84 @@ SIGMAS( 2 ) = _REAL (Read)
    a positive value are required.  Thus [-2,3] would scale
    between the mean minus two and the mean plus three standard
    deviations.  [3,-2] would give the negative of that.
-3 SQUASH
-SQUASH = _LOGICAL (Read)
-   TRUE if the array is to be squashed otherwise it is displayed
-   as is with clipping.  This parameter is only used when the x
-   and y magnifications are both one, and the image would be
-   clipped.  It is not used in Flash mode.
-3 THICK
-THICK = _REAL (Read)
-   The thickness of the axes and annotations in the plot, where
-   1.0 is the normal thickness.  It should be between 0.5 and 5.
-   This feature is only available on some devices.   This
-   parameter is only used when the axes option is selected. [1.0]
+3 STYLE
+STYLE = GROUP (Read)
+   A group of attribute settings describing the plotting style to use
+   for the annotated axes (see parameter AXES).
+
+   A comma-separated list of strings should be given in which each
+   string is either an attribute setting, or the name of a text file
+   preceded by an up-arrow character "^". Such text files should
+   contain further comma-separated lists which will be read and
+   interpreted in the same manner. Attribute settings are applied in
+   the order in which they occur within the list, with later settings
+   over-riding any earlier settings given for the same attribute.
+
+   Each individual attribute setting should be of the form:
+
+      <name>=<value>
+
+   where <name> is the name of a plotting attribute, and <value> is
+   the value to assign to the attribute. Default values will be
+   used for any unspecified attributes. All attributes will be
+   defaulted if a null value (!) is supplied. See section "Plotting
+   Attributes" in SUN/95 for a description of the available
+   attributes. Any unrecognised attributes are ignored (no error is
+   reported). [current value]
+3 USEAXIS
+USEAXIS = GROUP (Read)
+   USEAXIS is only accessed if the current co-ordinate Frame of the
+   NDF has more than 2 axes. A group of two strings should be
+   supplied specifying the 2 axes which are to be used when annotating
+   the image, and when supplying a value for parameter CENTRE. Each
+   axis can be specified either by its integer index within the current
+   Frame (in the range 1 to the number of axes in the current Frame), or
+   by its symbol string. A list of acceptable values is displayed if an
+   illegal value is supplied. The dynamic default selects the axes with
+   the same indices as the 2 used pixel axes within the NDF. []
 3 XMAGN
 XMAGN = _REAL (Read)
-   The magnification (zooming) in the x direction.  Unit
-   magnification means that one NDF pixel maps to one
-   display-device pixel.  It is ignored when FILL is TRUE.
-   [Maximum that gives square pixels and just fills the current
-   database picture]
+   The horizontal magnification for the image.  The default
+   value of 1.0 corresponds to 'normal' magnification in which the
+   the image fills the available space in at least one dimension.
+   A value larger than 1.0 makes each data pixel wider. If this
+   results in the image being wider than the available space then
+   the the image will be clipped to display fewer pixels. See also
+   parameters YMAGN, CENTRE and FILL. [1.0]
 3 YMAGN
 YMAGN = _REAL (Read)
-   The magnification (zooming) in the y direction.  Unit
-   magnification means that one NDF pixel maps to one
-   display-device pixel.  It is ignored when FILL is TRUE.
-   [%XMAGN]
+   The vertical magnification for the image.  The default
+   value of 1.0 corresponds to 'normal' magnification in which the
+   the image fills the available space in at least one dimension.
+   A value larger than 1.0 makes each data pixel taller. If this
+   results in the image being taller than the available space then
+   the image will be clipped to display fewer pixels. See also
+   parameters XMAGN, CENTRE and FILL. The dynamic default is the
+   value supplied for XMAGN. [%XMAGN]
 2 Examples
-display ngc6872 mode=p percentiles=[10,90]
+display ngc6872 mode=p percentiles=[10,90] noaxes
    Displays the NDF called ngc6872 on the current image-display
    device.  The scaling is between the 10 and 90 per cent
-   percentiles of the image.
+   percentiles of the image. No annotated axes are produced.
 
-display vv256 mode=flash border bwidth=6.0 badcol="Red"
+display vv256 mode=flash noaxes border borstyle="colour=blue,style=2"
    Displays the NDF called vv256 on the current image-display
    device.  There is no scaling of the data; instead the modulus
    of each pixel with respect to the number of colour-table
-   indices is shown.  Any bad data will be displayed in red.  A
-   coloured border, of width six device pixels, is drawn around
-   the image; it will have the current border colour.
+   indices is shown.  No annotated axes are drawn, but a blue border
+   is drawn around the image using PGPLOT line style number 2 (i.e.
+   dashed lines).
 
-display mode=fa axes clear out=video cosys=d \
+display mode=fa axes style="^sty,grid=1" margin=0.2 clear out=video \
    Displays the current NDF data component with annotated axes
    after clearing the current picture on the current image-display
-   device.  The axes take the axis labels and title from the NDF,
-   and are annotated in data co-ordinates.  The scaling is
-   between the -1 and +7 standard deviations of the image around
-   its mean. The scaled data are stored in an NDF called video.
+   device. The appearance of the axes is specified in the text
+   file sty, but this is modified by setting the Grid attribute
+   to 1 so that a co-ordinate grid is drawn across the plot. The
+   margins around the image containing the axes are made slightly
+   wider than normal. The scaling is between the -1 and +7 standard
+   deviations of the image around its mean. The scaled data are
+   stored in an NDF called video.
 
 display video noscale \
    Displays the data component of the NDF called video (created
@@ -8029,14 +8146,15 @@ display in=cgs4a comp=v mode=sc low=1 high=5.2 device=xwindows
    Displays the variance component of NDF cgs4a on the xwindows
    device, scaling between 1 and 5.2.
 
-display redrectangle xmagn=4 centre=[300,200] \
-   Displays the redrectangle NDF with a magnification of four
-   times, so that four device pixels corresponds to one image
-   pixel, on the current device.  The exact portion of the image
-   visible will depend on the size and location of the current
-   picture, however the displayed portion will have pixel
-   (300,200) at the centre of the current picture.  The current
-   scaling is used.
+display mydata centre="12:23:34 -22:12:23" xmagn=2 badcol="red" \
+   Displays the NDF called mydata centred on the position RA=12:23:34,
+   DEC=-22:12:23. This assumes that the current co-ordinate Frame in the
+   NDF is an equatorial (RA/DEC) Frame. The image is displayed with
+   a magnification of 2 so that each data pixel appears twice as large
+   (on each axis) as normal. Fewer data pixels may be displayed
+   to ensure the image fits within the available space in the current
+   picture. The current scaling is used, and bad pixels are shown
+   in red.
 
 display ngc6872 mode=ra device=lj250 lut=pizza
    Displays the NDF called ngc6872 on the LJ250 device. The
@@ -8044,45 +8162,43 @@ display ngc6872 mode=ra device=lj250 lut=pizza
    colour table.  The scaling is between the minimum and maximum
    of the image.
 2 Notes
--  The application stores a number of pictures in the graphics
-database in the following order: a FRAME of the specified size
-containing the title, annotated axes, and the image area
-(provided AXES is TRUE) or the border (if BORDER is TRUE), whose
-world co-ordinates are in device pixels; a DATA picture with
-world co-ordinates in pixel co-ordinates.  The DATA picture also
-may have data co-ordinates derived from the NDF axis components
-provided these are linear and different from pixel co-ordinates;
-the data co-ordinates are stored via a double-precision linear
-transformation.  The NDF associated with the plot is stored by
-reference with the DATA picture.  On exit the current database
-picture for the chosen device reverts to the input picture.
+-  For large images the resolution of the graphics device may allow
+only a fraction of the detail in the data to be plotted.  Therefore,
+large images will be compressed by block averaging when this can be
+done without loss of resolution in the displayed image.  This saves
+time scaling the data and transmitting them to the image display.
+Note that the default values for parameters LOW and HIGH are
+the minimum and maximum values in the compressed floating-point
+data.
 
--  When axes are requested the axis annotations are defined by
-their lower and upper bounds, i.e. a regular array is assumed.
-The bounds are derived from the part of NDF being displayed, and
-will be in pixel or data co-ordinates.
+-  The Title component in the NDF is used as the default title for
+the annotated axes. If the NDF does not have a Title component, then
+the default title is taken from current co-ordinate Frame in the NDF. This
+default may be over-ridden by specifying a value for the Title
+attribute using the STYLE parameter.
+
+-  The application stores a number of pictures in the graphics
+database in the following order: a FRAME picture containing the
+annotated axes, the image area, and the border; a DATA picture
+containing just the image area. Note, the FRAME picture is only
+created if annotated axes or a border have been drawn, or if non-zero
+margins were specified using parameter MARGIN. The world co-ordinates
+in the DATA picture will be pixel co-ordinates. A reference to the
+supplied NDF, together with a copy of the WCS information in the NDF
+are stored in the DATA picture. On exit the current database picture
+for the chosen device reverts to the input picture.
 
 -  The data type of the output NDF depends on the number of colour
 indices: _UBYTE for no more than 256, _UWORD for 257 to 65535,
 and _INTEGER otherwise.   The output NDF will not contain any
-extensions, UNITS, QUALITY, and VARIANCE; but LABEL, TITLE, and
+extensions, UNITS, QUALITY, and VARIANCE; but LABEL, TITLE, WCS and
 AXIS information are propagated from the input NDF.  The output
 NDF does not become the new current data array.  It is a Simple
 NDF (because the bad-pixel flag is set to false in order to
 access the maximum colour index, and to handle sections),
 therefore only NDF-compliant applications can process it.
-
--  For images much larger than the current picture size measured
-in device pixels, the resolution of the device will allow only a
-fraction of the detail in the array to be plotted.  Therefore,
-the application compresses the image by block averaging when it
-can do so without loss of resolution when displayed.  This saves
-time scaling the data and transmitting them to the image display.
-Note that the default values for parameters LOW and HIGH are
-the minimum and maximum values in the compressed floating-point
-array.
 2 Related_Applications
-   KAPPA: GREYPLOT; Figaro: IGREY, IMAGE; SPECDRE: MOVIE.
+   KAPPA: GREYPLOT, WCSFRAME, PICDEF; Figaro: IGREY, IMAGE; SPECDRE: MOVIE.
 2 Authors
 MJC: Malcolm J. Currie (STARLINK)
 
@@ -8155,6 +8271,12 @@ DSB: David S. Berry (STARLINK)
 
  5-JUN-1998 (DSB):
     Added propagation of the WCS component.
+
+ 14-JUL-1998 (DSB):
+    Use '_DOUBLE' instead of 'DOUBLE' in call to NDF_MTYPE.
+
+ 26-AUG-1998 (DSB)
+    Radical changes to use AST and PGPLOT.
 2 Implementation_Status
    -  This routine correctly processes the AXIS, DATA, QUALITY,
    VARIANCE, LABEL, TITLE, WCS and UNITS components of the input NDF.
@@ -16105,442 +16227,878 @@ MJC: Malcolm J. Currie (STARLINK)
               IMAGE data structure'
 
 1 LINPLOT
-Draws a line plot of a 1-d NDF's data values against their axis
-co-ordinates.
+Draws a line plot of the data values in a 1-dimensional NDF.
 
 Usage:
 
-   linplot ndf [comp] [mode] [pltitl] [abslab] [ordlab] [device]
+   linplot ndf [comp] [mode] [xleft] [xright] [ybot] [ytop] [device]
 
 Description:
 
-   This application creates a line plot of an array versus its
-   co-ordinates for a 1-dimensional NDF on the current graphics
-   device.  Thus it could be used to display a spectrum.  The array
-   may be part or whole of the data array, but also the error,
-   variance, or quality can be shown.  The plot is situated within
-   the current graphics-database picture.
+   This application creates a plot of array value against position for
+   a 1-dimensional NDF. The vertical axis of the plot represents array
+   value (or the logarithm of the array value - see parameter YLOG),
+   and the horizontal axis represents position.
 
-   The graph of the x-y data points can take one of a number of
-   forms:
+   The plot may take several different forms such as a "join-the-dots"
+   plot, a "staircase" plot, a "chain" plot, etc, (see parameter MODE).
+   Errors on both the data values and the data positions may be represented
+   in several different ways (see parameters ERRBAR and SHAPE). The
+   plotting style (colour, fonts, text size, etc) may be specified in
+   detail using parameter STYLE.
 
-      o straight lines connecting successive points;
-      o histogram, where the y co-ordinate is the histogram height;
-      o symbols (from a selection of five) drawn at each point; and
-      o horizontal lines, whose length is specified by the axis
-        width of each pixel.
+   The bounds of the plot on both axes can be specified using
+   parameters XLEFT, XRIGHT, YBOT and YTOP. If not specified they take
+   default values which encompass the entire supplied data set. The
+   current picture is usually cleared before plotting the new picture,
+   but parameter CLEAR can be used to prevent this, allowing several
+   plots to be "stacked" together. If a new plot is drawn over an
+   existing plot, then there is an option to allow the bounds of the
+   new plot to be set to the bounds of the existing plot (see parameter
+   ALIGN).
 
-   Error bars may be plotted too.  There is control of the colour
-   of the components of the plot.
-
-   The graph resides within labelled and enumerated axes
-   corresponding to pixel or data co-ordinates and data value
-   respectively.  The data co-ordinates are derived from the NDF's
-   axis component.  A title and axis labels may be specified.
+   The input NDF may, for instance, contain a spectrum of data values
+   against wavelength, or it may contain data values along a
+   1-dimensional profile through an NDF of higher dimensionality. In
+   the latter case, the current co-ordinate Frame of the NDF may have
+   more than 1 axis. Any of the axes in the current co-ordinate Frame
+   of the input NDF may be used to annotate the horizontal axis of the
+   plot produced by this application. Alternatively, the horizontal
+   axis may be annotated with offset from the first array element
+   measured within the current co-ordinate Frame of the NDF. For
+   instance, a 1-d slice through a 2-d image calibrated in RA/DEC could
+   be annotated with RA, or DEC, or offset from the first element (in
+   arc-minutes, degrees, etc). This offset is measured along the path
+   of the profile. The choice of annotation for the horizontal axis is
+   controlled by parameter USEAXIS.
 2 Parameters
 For information on individual parameters, select from the list below:
-3 ABSLAB
-ABSLAB = LITERAL (Read)
-   Label for the plot abscissa, in which NCAR fancy founts may be
-   embedded when FONT = "NCAR".  If axis information is present
-   the suggested default is the NDF's axis label followed by the
-   units, in parentheses.  If an error occurs obtaining the label
-   the default is "Pixel co-ordinates". []
-3 ABSLIM
-ABSLIM( 2 ) = _REAL (Read)
-   The abscissa limits when AXLIM is TRUE.  The limits may extend
-   beyond the extreme axis values present in the dataset, however,
-   the values must be distinct, and positive when XLOG=TRUE.  The
-   order you supply the limits is unimportant; the first value
-   will always have the lower pixel co-ordinate, and the second
-   will always have the larger pixel co-ordinate.  (This
-   restriction arises because graphics database only permits this
-   order.  Use the FLIP command if you want to reverse the axis.)
-
-   The suggested defaults are the values that would have been used
-   had AXLIM=FALSE, and depend on the value of parameter CLEAR.
-   See parameter AXLIM for details.
-3 AXLIM
-AXLIM = _LOGICAL (Read)
-   If TRUE, you decide the upper and lower limits of the axes via
-   parameters ABSLIM and ORDLIM.  Otherwise, LINPLOT calculates
-   sensible limits as described below.
-
-   When CLEAR=TRUE the limits of the ordinate are derived after
-   applying a margin of 3-percent of the data range to the
-   maximum combined data value and error, and from the minimum
-   combined value and error.  The default abscissa limits are the
-   axis co-ordinate limits after correction for pixel width and
-   axis error.  There may also be up to a half-pixel enlargement
-   if MODE="Histogram".
-
-   When CLEAR=FALSE the plot limits are derived from the previous
-   plot (DATA picture), thus allowing composite pictures to be
-   formed.
-   [FALSE]
+3 ALIGN
+ALIGN = _LOGICAL (Read)
+   Controls the way in which the bounds of a new plot are
+   determined if it is drawn over an existing plot. If ALIGN
+   is FALSE, then the bounds of the new plot are specified
+   using parameters XLEFT, XRIGHT, YBOT and YTOP as usual. If ALIGN
+   is TRUE, then the bounds of the new plot are set equal to
+   the bounds of the existing plot (on both axes), and parameters
+   XLEFT, XRIGHT, YBOT and YTOP are ignored. This parameter is only
+   accessed if parameter CLEAR is TRUE, and if there is another line
+   plot within the current picture. The dynamic default is to align
+   the plots if the labels on the horizontal axes are the same, and
+   not to align the plots if the labels are different. []
+3 AXES
+AXES = _LOGICAL (Read)
+   TRUE if labelled and annotated axes are to be drawn around the
+   plot. The dynamic default is FALSE if the plot is being
+   aligned with an existing plot (see parameter ALIGN), and
+   TRUE otherwise. Parameters USEAXIS and YLOG determine the
+   quantities used to annotated the horizontal and vertical axes
+   respectively. The width of the margins left for the annotation
+   may be controlled using parameter MARGIN. The appearance of the
+   axes (colours, fonts, etc) can be controlled using the parameter
+   STYLE. []
 3 CLEAR
 CLEAR = _LOGICAL (Read)
-   If TRUE the current picture is to be cleared before the
-   line plot is drawn.  If CLEAR is FALSE not only is the existing
-   plot retained, but also the previous plot (DATA picture) is
-   deemed to specify the axis limits when AXLIM=FALSE, and the
-   suggested defaults for parameters ABSLIM and ORDLIM when
-   AXLIM=TRUE.  Thus you can generate a composite plot within
-   a single set of axes, say using different colours or modes to
-   distinguish data from different datasets.
+   If TRUE the current picture is cleared before the plot is
+   drawn. If CLEAR is FALSE not only is the existing plot retained,
+   but also the previous plot can be used to specify the axis
+   limits (see parameter ALIGN). Thus you can generate a composite
+   plot within a single set of axes, say using different colours or
+   modes to distinguish data from different datasets.
 3 COMP
 COMP = LITERAL (Read)
    The NDF component to be plotted.  It may be "Data", "Quality",
-   "Variance", or "Error" (where "Error" is the alternative to
+   "Variance", or "Error" (where "Error" is an alternative to
    "Variance" and causes the square root of the variance values
    to be displayed).  If "Quality" is specified, then the quality
    values are treated as numerical values (in the range 0 to
    255). ["Data"]
-3 COSYS
-COSYS = LITERAL (Read)
-   The co-ordinate system to be used.  This can be either "World"
-   or "Data".  "World" makes pixel co-ordinates to appear on axes
-   and the bounds are obtained in pixel indices.  If COSYS =
-   "Data" the NDF's axis information is used to annotate axes and
-   the bounds are specified in that co-ordinate system.
-   [Current co-ordinate system]
 3 DEVICE
 DEVICE = DEVICE (Read)
-   The plotting device. [Current graphics device]
+   The plotting device. [current graphics device]
 3 ERRBAR
 ERRBAR = _LOGICAL (Read)
-   TRUE if error bars are to be drawn.  The error bars can
+   TRUE if error bars are to be drawn. The error bars can
    comprise either or both of the data and axis-centre errors,
-   depending on what is available in the supplied dataset.  See
-   parameter SHAPE to control the appearance of the error bars.
-   This parameter is ignored unless COMP="Data". [FALSE]
-3 ERRCOL
-ERRCOL = LITERAL (Read)
-   The colour of the error bars (on devices that support colour).
-   See parameter LINCOL for the available options and their
-   meanings.  ERRCOL is only accessed when ERRBAR=TRUE.  [The
-   current value, but equals "1" (the foreground colour) if there
-   is no current value.]
-3 FONT
-FONT = LITERAL (Read)
-   The fount to be used for the line graphics.  It can be either
-   "NCAR" for the NCAR fancy characters and "GKS" for the
-   standard GKS san-serif fount.   The former is intended for
-   hardcopy publication-quality plots, since it is relatively
-   slow; the latter is intended for normal interactive graphics
-   requiring rapid plotting, and it is clearer on small plots.
-   The suggested default is the current value. ["GKS"]
+   depending on what is available in the supplied dataset.  The
+   parameter SHAPE controls the appearance of the error bars, and
+   XSIGMA and YSIGMA control their lengths. The ERRBAR parameter is
+   ignored unless the parameter COMP is set to "Data". [FALSE]
 3 FREQ
 FREQ = _INTEGER (Read)
    The frequency at which error bars are to be plotted.  For
-   instance, a value of 2 would mean that alternative points have
+   instance, a value of 2 would mean that alternate points have
    error bars plotted.  This lets some plots be less cluttered.
    FREQ must lie in the range 1 to half of the number of points
-   to be plotted.  FREQ is only accessed when ERRBAR=TRUE.  [1]
-3 LINCOL
-LINCOL = LITERAL (Read)
-   The colour of the lines showing the data (so this excludes the
-   annotated axes) on devices that support colour.  The options
-   are described below.
+   to be plotted.  FREQ is only accessed when parameter ERRBAR is
+   TRUE.  [1]
+3 KEY
+KEY = _LOGICAL (Read)
+   TRUE if a key is to be plotted below the horizontal axis giving
+   the positions at the start and end of the plot, within the
+   current co-ordinate Frame of the NDF. If parameter USEAXIS is
+   null (i.e. if the horizontal axis is annotated with offset from
+   the first array element), then the positions refer to the centres
+   of the first and last elements in the supplied NDF, whether or not
+   these elements are actually visible in the plot. If USEAXIS is not
+   null (i.e. if the horizontal axis is annotated with the value on
+   one of the axes of the NDFs current co-ordinate Frame), then the
+   displayed positions correspond to the two ends of the visible
+   section of the horizontal axis. The appearance of the key can be
+   controlled using parameter KEYSTYLE. The dynamic default is to
+   produce a key if the current co-ordinate Frame of the supplied NDF
+   has 2 or more axes, and not to if it only has 1 axis. []
+3 KEYSTYLE
+KEYSTYLE = LITERAL (Read)
+   A group of attribute settings describing the plotting style to use
+   for the key (see parameter KEY).
 
-     "MAX"          - The maximum colour index in the image
-                      display colour lookup table.
-     "MIN"          - The minimum (non-reserved) colour index in
-                      the image-display colour lookup table.
-     An integer     - The actual colour index.  It is constrained
-                      between 0 and the maximum colour index
-                      available on the device.
-     A named colour - Uses the named colour from the palette, and
-                      if it is not present, the nearest colour
-                      from the palette is selected.
+   A comma-separated list of strings should be given in which each
+   string is either an attribute setting, or the name of a text file
+   preceded by an up-arrow character "^". Such text files should
+   contain further comma-separated lists which will be read and
+   interpreted in the same manner. Attribute settings are applied in
+   the order in which they occur within the list, with later settings
+   over-riding any earlier settings given for the same attribute.
 
-   If the colour is to remain unaltered as the lookup table is
-   manipulated choose an integer between 0 and 15, or a named
-   colour.  This parameter will be ignored if symbols are plotted.
-   [The current value, but equals "1" (the foreground colour) if
-   there is no current value.]
-3 MAJTIC
-MAJTIC( 2 ) = _REAL (Read)
-   The parameter controlling the numbers of major tick marks
-   for the x and y axes.  (Number used is between MAJTIC+2 and
-   5*MAJTIC/2+4.) [4.,4.]
-3 MINTIC
-MINTIC( 2 ) = _REAL (Read)
-   The number of minor tick marks between each major tick mark
-   for the x and y axes.  A negative value forces the graphics
-   package to compute appropriate values.  The number of
-   minor tick marks per major tick is fixed (8) for a logarithmic
-   axis. [-1.,-1.]
+   Each individual attribute setting should be of the form:
+
+      <name>=<value>
+
+   where <name> is the name of a plotting attribute, and <value> is
+   the value to assign to the attribute. Default values will be
+   used for any unspecified attributes. All attributes will be
+   defaulted if a null value (!) is supplied. See section "Plotting
+   Attributes" in SUN/95 for a description of the available
+   attributes. Any unrecognised attributes are ignored (no error is
+   reported). [current value]
+3 MARGIN
+MARGIN(4) = _REAL (Read)
+   The widths of the margins to leave for axis annotation, given
+   as fractions of the corresponding dimension of the DATA picture.
+   Four values may be given, in the order - bottom, right, top, left.
+   If less than four values are given, extra values are used equal to
+   the first supplied value. If these margins are too narrow any axis
+   annotation may be clipped. The dynamic default is 0.18 (for all
+   edges) if either annotated axes or a key are produced, and zero
+   otherwise. []
+3 MARKER
+MARKER = _INTEGER (Read)
+   This parameter is only accessed if parameter MODE is set to
+   "Chain" or "Mark". It specifies the symbol with which each
+   position should be marked, and should be given as an integer
+   PGPLOT marker type. For instance, 0 gives a box, 1 gives a dot,
+   2 gives a cross, 3 gives an asterisk, 7 gives a triangle. The
+   value must be larger than or equal to -31. [current value]
 3 MODE
 MODE = LITERAL (Read)
-   The type of the line plot.  This can be one of the following
-   values.
+   Specifies the way in which data values are represented. MODE
+   can take the following values:
 
-      "Histogram"   - An histogram of the points is plotted (with
-                      vertical lines only joining the y values and
-                      not extending to the base of the plot).  The
-                      vertical lines are placed midway between
-                      adjacent x positions.
-      "Line"        - The points are joined by straight lines.
-      "Point"       - A dot is plotted at each point.
-      "Step"        - Each point is displayed as a horizontal
-                      line, whose length is specified by the axis
-                      width of the pixel.
-      1             - A synonym for "Point".
-      2--5          - These are similar to "Point", but give
-                      different symbols.  2 gives plus signs,  3
-                      generates asterisks, 4 produces circles, and
-                      5 creates multiplication crosses.
+   - "Histogram" -- An histogram of the points is plotted in the
+   style of a "staircase" (with vertical lines only joining the y
+   values and not extending to the base of the plot).  The vertical
+   lines are placed midway between adjacent x positions.
 
-   Where colour is available the lines of the "Histogram", "Line",
-   and "Step" options are plotted in the colour defined by
-   parameter LINCOL; likewise the symbols of options "Point" and
-   the integers is plotted in the colour specified through
-   parameter SYMCOL.
+   - "Line" -- The points are joined by straight lines.
 
-   MODE is defaulted to the current value, which is initially
-   "Line". []
+   - "Point" -- A dot is plotted at each point.
+
+   - "Mark" -- Each point is marker with a symbol specified by
+   parameter MARKER.
+
+   - "Chain" -- A combination of "Line" and "Mark".
+
+   - "Step" -- Each point is displayed as a horizontal line, whose
+   length is specified by the axis width of the pixel.
+
+   [current value]
 3 NDF
 NDF = NDF (Read)
    NDF structure containing the array to be plotted.
-3 ORDLAB
-ORDLAB = LITERAL (Read)
-   Label for the plot ordinate, in which NCAR fancy founts may be
-   embedded when FONT = "NCAR".  The suggested default is the
-   NDF's label followed by the units, if present, in parentheses.
-   If an error occurs obtaining the label the default is the
-   component name followed by " values". []
-3 ORDLIM
-ORDLIM( 2 ) = _REAL (Read)
-   The ordinate limits when AXLIM is TRUE.  The limits may extend
-   beyond the extreme data values present in the dataset, however,
-   the values must be distinct, and positive when YLOG=TRUE.
-   It is usually best to allow some margin to prevent the plotted
-   values hitting the axes.  The order you supply the limits is
-   unimportant; the smaller value will become the lower limit,
-   and the larger the upper limit.
-
-   The suggested defaults are the values that would have been used
-   had AXLIM=FALSE, and depend on the value of parameter CLEAR.
-   See parameter AXLIM for details.
-3 OUTTIC
-OUTTIC = _LOGICAL (Read)
-   TRUE if the axis tick marks are to appear on the outside of
-   the axes instead of inside. By default, the tick marks are
-   drawn inside the plot region.  [FALSE]
-3 PLTITL
-PLTITL = LITERAL (Read)
-   The title of the plot.  Up to about 40 characters can be
-   accommodated, and NCAR fancy founts may be embedded when
-   FONT = "NCAR".  The suggested default is the title of the NDF.
-   If an error occurs obtaining the title, it is defaulted to
-   "Line plot".  []
-3 PXSIZE
-PXSIZE = _REAL (Read)
-   The horizontal size of the display in metres. If a value less
-   than the default is requested, the display will appear at
-   the bottom left of the current device.  There is an upper
-   limit given by the x size of the current picture. [Maximum
-   that can fit in the current picture]
-3 PYSIZE
-PYSIZE = _REAL (Read)
-   The vertical size of the display in metres. If a value less
-   than the default is requested, then the display will appear at
-   the bottom left of the current device.  There is an upper
-   limit given by the y size of the current picture. [Maximum
-   that can fit in the current picture]
 3 SHAPE
 SHAPE = LITERAL (Read)
-   The way the errors are to be represented graphically.  SHAPE
-   can take the following values.
+   Specifies the way in which errors are represented. SHAPE
+   can take the following values:
 
-      "Bars"     - A cross with serifs is plotted joining the x
-                   error limits and then the y error limits.
-      "Cross"    - A san-serif cross is plotted joining the x
-                   error limits and then the y error limits.
-      "Diamond"  - Adjacent error limits are joined to form an
-                   error diamond.
+   - "Bars" -- Bars with serifs (i.e. cross pieces at each end) are
+   drawn joining the x error limits and the y error limits. The plotting
+   attribute "Size(ErrBars)" (see parameter STYLE) can be used to
+   control the size of these serifs (the attribute value should be
+   a magnification factor - 1.0 gives default serifs).
 
-   SHAPE is defaulted to the current value, which is initially
-   "Bars".  SHAPE is only accessed when ERRBAR=TRUE.  []
-3 SYMCOL
-SYMCOL = LITERAL (Read)
-   The colour of the plotted symbols (on devices that support
-   colour).  See parameter LINCOL for the available options and
-   their meanings.  SYMCOL is only accessed when MODE="Point"
-   or has a integer value.   [The current value, but equals "1"
-   (the foreground colour) if there is no current value.]
-3 THICK
-THICK = _REAL (Read)
-   The thickness of the axes and annotations in the plot, where
-   1.0 is the normal thickness.  Currently, this is only available
-   on a few devices.  When FONT="GKS", axis annotations are
-   unaffected by THICK.  It must take a value in the range
-   0.5--10.0.  [1.0]
-3 XLOG
-XLOG = _LOGICAL (Read)
-   TRUE if the abscissa (pixel number) is to be logarithmic.  It
-   is unlikely that you would want to do this.  The chosen
-   array may be truncated to include only positive co-ordinates.
-   [FALSE]
+   - "Cross" -- San-serif bars are drawn joining the x error limits and
+   the y error limits.
+
+   - "Diamond" -- Adjacent error limits are joined to form an
+   error diamond.
+
+   The length of the error bars can be controlled using parameters
+   XSIGMA and YSIGMA. The colour, line width and line style used to
+   draw them can be controlled using the plotting attributes
+   "Colour(ErrBars)", "Width(ErrBars)" and "Style(ErrBars)" (see
+   parameter STYLE). SHAPE is only accessed when parameter ERRBAR
+   is TRUE.  [current value]
+3 STYLE
+STYLE = LITERAL (Read)
+   A group of attribute settings describing the plotting style to use
+   when drawing the annotated axes, data values, and error markers.
+
+   A comma-separated list of strings should be given in which each
+   string is either an attribute setting, or the name of a text file
+   preceded by an up-arrow character "^". Such text files should
+   contain further comma-separated lists which will be read and
+   interpreted in the same manner. Attribute settings are applied in
+   the order in which they occur within the list, with later settings
+   over-riding any earlier settings given for the same attribute.
+
+   Each individual attribute setting should be of the form:
+
+      <name>=<value>
+
+   where <name> is the name of a plotting attribute, and <value> is
+   the value to assign to the attribute. Default values will be
+   used for any unspecified attributes. All attributes will be
+   defaulted if a null value (!) is supplied. See section "Plotting
+   Attributes" in SUN/95 for a description of the available
+   attributes. Any unrecognised attributes are ignored (no error is
+   reported).
+
+   The appearance of the data values is controlled by the attributes
+   Colour(Curves), Width(Curves), etc (the synonym Lines may be used
+   in place of Curves). The appearance of markers used if parameter
+   MODE is set to "Point", "Mark" or "Chain" is controlled by
+   Colour(Markers), Width(Markers), etc (the synonym Symbols may be
+   used in place of Markers). The appearance of the error symbols is
+   controlled using Colour(ErrBars), Width(ErrBars), etc, (see
+   parameter SHAPE). [current value]
+3 USEAXIS
+USEAXIS = LITERAL (Read)
+   Specifies the quantity to be used to annotate the horizontal axis
+   of the plot. If USEAXIS is given a null (!) value, then the
+   distance along the profile from the centre of the first element in
+   the supplied NDF will be used. This will be measured in the current
+   co-ordinate Frame of the NDF. If USEAXIS is not null, then it
+   gives the index of the axis which is to be used, and must be less
+   than or equal to the number of axes in the current co-ordinate
+   Frame of the NDF.
+
+   The quantity used to annotate the horizontal axis must have a
+   defined value at all points in the array, and must increase or
+   decrease monotonically along the array. For instance, if RA is
+   used to annotate the horizontal axis, then an error will be
+   reported if the profile passes through RA=0 because it will
+   introduce a non-monotonic jump in axis value (from 0h to 24h, or
+   24h to 0h). The dynamic default is 1 if the current co-ordinate
+   Frame in the NDF is 1-dimensional an null (!) otherwise. []
+3 XLEFT
+XLEFT = LITERAL (Read)
+   The axis value to place at the left hand end of the horizontal
+   axis. The dynamic default is the value for the first element in the
+   supplied NDF (with a margin to include any horizontal error bar).
+   The value supplied may be greater than or less than the value
+   supplied for XRIGHT. A formatted value for the quantity specified
+   by parameter USEAXIS should be supplied. See also parameter ALIGN. []
+3 XRIGHT
+XRIGHT = LITERAL (Read)
+   The axis value to place at the right hand end of the horizontal
+   axis. The dynamic default is the value for the last element in the
+   supplied NDF (with a margin to include any horizontal error bar).
+   The value supplied may be greater than or less than the value
+   supplied for XLEFT. A formatted value for the quantity specified
+   by parameter USEAXIS should be supplied. See also parameter ALIGN. []
+3 XSIGMA
+XSIGMA = LITERAL (Read)
+   If horizontal error bars are produced (see parameter ERRBAR), then
+   XSIGMA gives the number of standard deviations which the error
+   bars are to represent. [current value]
+3 YBOT
+YBOT = LITERAL (Read)
+   The axis value to place at the bottom end of the vertical
+   axis. The dynamic default is the lowest value within the supplied
+   array (with a margin to include any vertical error bars).
+   The value supplied may be greater than or less than the value
+   supplied for YTOP. The value should be supplied as a floating
+   point value for the quantity specified by parameter YLOG. See also
+   parameter ALIGN. []
 3 YLOG
 YLOG = _LOGICAL (Read)
-   TRUE if the ordinate (data value) is to be logarithmic.  This
-   is useful when the data have wide dynamic range. [FALSE]
+   TRUE if the value displayed on the vertical axis is to be the
+   logarithm of the supplied data values. If TRUE, then the values
+   supplied for parameters YTOP and YBOT should be values for the
+   logarithm of the data value, not the data value itself. [FALSE]
+3 YSIGMA
+YSIGMA = LITERAL (Read)
+   If vertical error bars are produced (see parameter ERRBAR), then
+   YSIGMA gives the number of standard deviations which the error
+   bars are to represent. [current value]
+3 YTOP
+YTOP = LITERAL (Read)
+   The axis value to place at the top end of the vertical
+   axis. The dynamic default is the highest value within the supplied
+   array (with a margin to include any vertical error bars).
+   The value supplied may be greater than or less than the value
+   supplied for YBOT. The value should be supplied as a floating
+   point value for the quantity specified by parameter YLOG. See also
+   parameter ALIGN. []
 2 Examples
-linplot spectrum cosys=d
-   Plots data values versus data co-ordinate for the whole of the
+linplot spectrum
+   Plots data values versus position for the whole of the
    1-dimensional NDF called spectrum on the current graphics
-   device.  The data co-ordinates will be in pixels if spectrum
-   does not have an axis component (this remark applies to all
-   the examples save the last where world co-ordinates are
-   plotted).
+   device.  If the current co-ordinate Frame of the NDF is also
+   1-dimensional, then the horizontal axis will be labelled with
+   values on axis 1 of the current co-ordinate Frame. Otherwise, it
+   will be labelled with offset from the first element.
 
-linplot spectrum(1:500) device=graphon
-   Plots data values versus the data or pixel co-ordinates
-   (whichever is the current system) for the first 500 elements
-   of the 1-dimensional NDF called spectrum on the Graphon
-   device.
+linplot map(,100)
+   Plots data values versus position for row 100 in the 2-dimensional
+   NDF called map on the current graphics device.
 
-linplot ironarc v pltitl="Fe Arc variance"
-   Plots variance values versus data or pixel co-ordinate for the
-   whole of the 1-dimensional NDF called ironarc on the current
-   graphics device.  The plot has a title of "Fe Arc variance".
+linplot spectrum(1:500) device=ps_l
+   Plots data values versus position for the first 500 elements
+   of the 1-dimensional NDF called spectrum. The output goes to a
+   text file which can be printed on a PostScript printer.
 
-linplot rscvn(3000.42:3994.) noclear abslab="Epoch" cosys=d
-   This plots on the current graphics device data values versus
-   data co-ordinates for those elements of the 1-dimensional NDF
-   called rscvn whose axis values lie between 3000.42 and 3994.0.
-   If the current co-ordinate system is already "Data", the COSYS
-   parameter may be dispensed with.  The device is not cleared so
-   the plot will overlay the existing picture.  The abscissa has
-   label "Epoch".
+linplot ironarc v style="title=Fe Arc variance"
+   Plots variance values versus position for the whole of the
+   1-dimensional NDF called ironarc on the current graphics device.
+   The plot has a title of "Fe Arc variance".
 
-linplot frequencies mode=h lincol=red ylog
-   This draws a red histogram of the 1-dimensional dataset called
-   frequencies.  The red colour will continue to be used in
-   subsequent plots.  The data values will be plotted
-   logarithmically.
+linplot prof useaxis=dec xleft="23:30:22" xright="23:30:45"
+   This plots data values versus declination for those elements of the
+   1-dimensional NDF called prof with declination value between 23d
+   30m 22s, and 23d 30m 45s. This assumes that the current
+   co-ordinate Frame in the NDF has an axis with symbol "dec".
 
-linplot xspec mode=p errbar shape=d errcol=pink symcol=1 xlog
-   This plots the data values versus the logarithm of the axis
-   centres for the dataset called xspec.  Each pixel is plotted
-   as a point surrounded by diamond-shaped error bars.  The
-   points are drawn in the foreground colour and the error
-   diamonds are displayed in pink.
+linplot prof useaxis=2 ybot=1.0 ytop=3.0 ylog
+   This plots the logarithm (base 10) of the data values in the
+   entire 1-dimensional NDF called prof, against the value described
+   by the second axis in the current co-ordinate Frame of the NDF.
+   The bottom of the vertical axis corresponds to a data value of
+   10.0 and the top corresponds to a data value of 1000.0 (10 to
+   the power 3.0).
 
-linplot ndf=spectrum axlim ordlim=[100,250] cosys=w accept
+linplot xspec mode=p errbar xsigma=3 ysigma=3 shape=d style=^my_sty
+   This plots the data values versus position for the dataset called
+   xspec. Each pixel is plotted as a point surrounded by diamond-shaped
+   error bars.  The error bars are 3 sigma error bars. The plotting
+   style is read from text file my_sty. This could, for instance,
+   contain strings such as; colour(err)=pink, colour(sym)=red,
+   tickall=0, edge(2)=right. These cause the error bars to be drawn
+   in pink, the points to be drawn in red, tick marks to be restricted
+   to the labelled edges of the plot, and the vertical axis (axis 2)
+   to be annotated on the right hand edge of the plot.
+
+linplot ndf=spectrum noclear align
    Plots data values versus pixel co-ordinate for the whole of
    the 1-dimensional NDF called spectrum on the current graphics
-   device.  The limits of the ordinate axis are 100 and 250, so
-   data values outside this range will be clipped.
-
-linplot ndf=spectrum2 lincol=yellow noclear
-   This plots data values versus pixel co-ordinate, overlaid on
-   the previous example, for the 1-dimensional NDF called
-   spectrum2.  The new locus is plotted in yellow.
+   device.  The plot is drawn over any existing plot and inherits
+   the bounds of the previous plot on both axes. A warning will be
+   reported if the labels for the horizontal axes of the two plots
+   are different.
 2 Notes
+-  The Title component in the NDF is used as the default title for
+the annotated axes. If the NDF does not have a Title component, then
+the default title is taken from current co-ordinate Frame in the NDF.
+This default may be over-ridden by specifying a value for the Title
+attribute using the STYLE parameter.
+
+-  Default axis errors and widths are used, if none are present in
+the NDF. The defaults are the constants 0 and 1 respectively.
+
 -  The application stores a number of pictures in the graphics
-database in the following order: a FRAME of the specified size
-containing the title, annotated axes, and line plot; and a DATA
-picture, which has world co-ordinates for linear axes measured in
-pixels along the x axis and data values along y, and their
-logarithms if a logarithmic axis is selected.  The DATA picture
-also has data co-ordinates stored; for a linear axis this
-requires that the NDF's axis units are not pixel co-ordinates;
-for a logarithmic axis the actual data co-ordinate or value is
-recorded.  If there is no NDF axis information and a logarithmic
-abscissa, the DATA co-ordinates are pixel co-ordinates.  The NDF
-associated with the plot is stored by reference with the DATA
-picture.  On exit the current database picture for the chosen
-device reverts to the input picture.
-
--  In a logarithmic plot only positive data along each
-logarithmic axis can be displayed, therefore negative data are
-excluded.  Likewise any error bar which has a non-positive
-limit is not plotted, even though the data point itself can
-appear if it has positive co-ordinates.  A logarithmic axis will
-always increase from left to right, and from bottom to top.
-
--  Bad pixels are excluded from the plot, and they do not affect
-the limits of the ordinate.  The same applies to zero or negative
-data values if the plot is to have a logarithmic ordinate.
-
--  When COSYS="World", default axis errors and widths are used,
-if needed.  The defaults are the constants 0 and 1 respectively.
-
--  If you wish to make a composite plot, ensure that parameters
-ABSLAB, ORDLAB, COSYS, XLOG, and YLOG do not change between plots.
-For COSYS="Data" and XLOG=FALSE, the data co-ordinates must
-be linear.
+database in the following order: a FRAME picture containing the
+annotated axes, data plot, and optional key; a KEY picture to store
+the key if present; and a DATA picture containing just the data plot.
+Note, the FRAME picture is only created if annotated axes or a key
+has been drawn, or if non-zero margins were specified using parameter
+MARGIN. The world co-ordinates in the DATA picture will correspond
+to offset along the profile on the horizontal axis, and data value
+(or logarithm of data value) on the vertical axis. On exit the current
+database picture for the chosen device reverts to the input picture.
 2 Related_Applications
-   KAPPA: INSPECT, MLINPLOT; Figaro: ESPLOT, IPLOTS, MSPLOT, SPLOT;
+   KAPPA: PROFILE, MLINPLOT; Figaro: ESPLOT, IPLOTS, MSPLOT, SPLOT;
    SPECDRE: SPECGRID.
 2 Authors
 Malcolm Currie STARLINK (RAL::CUR)
+
+DSB: David S. Berry (STARLINK)
 2 History
- 1991 February 11 (MJC):
-    Original NDF version.
-
- 1991 April 27 (MJC):
-    Stored both world and data co-ordinates in the graphics
-    database.
-
- 1991 May 1 (MJC):
-    Renamed IN parameter to NDF for consistency.
-
- 1991 May 24 (MJC):
-    Added world co-ordinates option.
-
- 1991 July 31 (MJC):
-    No longer redefines colours of SGS pens to predefined state if
-    workstation has dynamic colour representation, now there is
-    palette control.
-
- 1991 August 20 (MJC):
-    Added FONT parameter.
-
- 1992 March 3 (MJC):
-    Replaced AIF parameter-system calls by the extended PAR
-    library.
-
- 1992 April 14 (MJC):
-    Handles arbitrary user-defined sections from non-1-dimensional
-    NDFs.  Removed XLIMIT parameter.
-
- 1992 November 30 (MJC):
-    Does not use non-monotonic axis centres.
-
- 1995 October 19 (MJC):
-    Supports Error component.
-
- 1996 October 3 (MJC):
-    Added several new facilities: error-bar option with choice of
-    styles, choice of plot styles via parameter MODE, use of
-    different colours for the lines, symbols, and error bars.
-
- 1997 January 12 (MJC):
-    Used PSX to obtain workspace more efficiently.  Made thick
-    lines work for all parts of the plot.
-
- 1997 April 7 (MJC):
-    Redesigned to allow easy production of composite plots,
-    controlled using the CLEAR parameter.  Parameter AXLIM
-    introduced to replace ORDLIM.  ORDLIM is now the ordinate
-    limits, replacing ORDLOW and ORDUPP.  Added control of the
-    x-limits via parameter ABSLIM.  Used dynamic defaults for
-    ABSLIM and ORDLIM.  Increased the maximum line thickness.
+ 1-OCT-1998 (DSB):
+    Original AST version, based on earlier version by MJC.
 2 Implementation_Status
    -  This routine correctly processes the AXIS, DATA, VARIANCE,
-   QUALITY, LABEL, TITLE, and UNITS components of the NDF.
+   QUALITY, LABEL, TITLE, WCS and UNITS components of the NDF.
 
    -  Processing of bad pixels and automatic quality masking are
    supported.
 
    -  All non-complex numeric data types can be handled.  Only
-   single-precision floating-point data can be processed directly.
+   double-precision floating-point data can be processed directly.
    Other non-complex data types will undergo a type conversion
-   before the line plot is drawn.
+   before the plot is drawn.
+1 LISTMAKE
+Creates a text file holding a positions list.
+
+Usage:
+
+   listmake outlist [ndf] [mode] [file]
+
+Description:
+
+   This application creates a text file containing a list of positions
+   supplied by the user. Positions list are primarily intended for
+   communicating positions between applications. In addition to the
+   positions themselves, they contain information describing the
+   co-ordinate Frames in which the positions are defined. They also
+   contain integer position identifiers which allow positions to be
+   distinguished.
+
+   If an NDF is specified using parameter NDF, then the positions should
+   be given in the current co-ordinate Frame of the NDF. Information
+   describing the co-ordinate Frames available within the NDF will be
+   copied to the output positions list. Subsequent applications can
+   use this information in order to align the positions with other
+   data sets.
+
+   If no NDF is specified, then the user must indicate the co-ordinate
+   Frame in which the positions will be supplied using parameter FRAME.
+   A description of this Frame will be written to the output positions
+   list for use by subsequent applications.
+
+   The positions themselves may be supplied within another text file,
+   or may be given in response to repeated prompts for a parameter.
+   Alternatively, the pixel centres in the NDF supplied for parameter
+   NDF can be used (see parameter MODE).
+
+   The output can be initialised by copying positions from an existing
+   positions list. Any positions supplied directly by the user are then
+   appended to the end of this initial list (see parameter INLIST).
+2 Parameters
+For information on individual parameters, select from the list below:
+3 DESCRIBE
+DESCRIBE = _LOGICAL (Read)
+   If TRUE, a detailed description of the co-ordinate Frame in which
+   positions are required will be displayed before the positions
+   are obtained using either parameter POSITION or FILE. [current value]
+3 DIM
+DIM = _INTEGER (Read)
+   The number of axes in the co-ordinate Frame in which the positions
+   will be supplied. Only accessed if a null value is supplied for
+   parameter NDF.
+3 EPOCH
+EPOCH = _DOUBLE (Read)
+   If a "Sky Co-ordinate System" specification is supplied (using
+   parameter FRAME) for a celestial co-ordinate system, then an epoch
+   value is needed to qualify it. This is the epoch at which the
+   supplied sky positions were determined. It should be given as a
+   decimal years value, with or without decimal places  ("1996.8" for
+   example). Such values are interpreted as a Besselian epoch if less
+   than 1984.0 and as a Julian epoch otherwise.
+3 FILE
+FILE = FILENAME (Read)
+   A text file containing the positions to be stored in the output
+   positions list. Each line should contain the formatted axis values
+   for a single position, separated by white space. Only accessed if
+   parameter MODE is given the value "File".
+3 FRAME
+FRAME = LITERAL (Read)
+   Specifies the domain of the positions supplied using parameter
+   POSITION or FILE. If a "Sky Co-ordinate System" (SCS) string
+   such as EQUAT(J2000) is supplied (see section "Sky Co-ordinate
+   Systems" in SUN/95), then the positions are assumed to be
+   2-dimensional celestial co-ordinates in the specified system.
+   Otherwise, the given domain name is used without any interpretation.
+   Any string may be supplied, but normally one of the standard domain
+   names such as GRID, PIXEL, GRAPHICS, etc, should be given. Parameter
+   DIM is used to determine the number of axes in the Frame. This
+   parameter is only accessed if the parameter NDF is given a null value.
+3 INLIST
+INLIST = FILENAME (Read)
+   A text file containing an existing positions list which is to be
+   included at the start of the output positions list. These positions
+   are mapped into the current co-ordinate Frame of the supplied
+   NDF, or into the Frame specified by parameter FRAME if no NDF was
+   supplied. A message is displayed indicating the Frame in which
+   alignment occurred. They are then stored in the output list before
+   any further positions are added. A null value may be supplied
+   if there is no input positions list. [!]
+3 MODE
+MODE = LITERAL (Read)
+   The mode by which the positions are to be obtained. The options are
+   as follows:
+
+   - "Interface" -- The positions are obtained using parameter
+   POSITION.
+
+   - "File" -- The positions are to be read from a text file
+   specified using parameter FILE.
+
+   - "Pixel" -- The positions used are the pixel centres in the data
+   file specified by parameter NDF.
+
+   [Interface]
+3 NDF
+NDF = NDF (Read)
+   The NDF which defines the available co-ordinate Frames in the
+   output positions list. If an NDF is supplied, the positions
+   obtained using parameter POSITION or FILE are assumed to be in
+   the current co-ordinate Frame of the NDF, and the WCS component
+   of the NDF is copied to the output positions list. If a null
+   value is supplied, the single co-ordinate Frame defined by parameter
+   FRAME is stored in the output positions list, and supplied
+   positions are assumed to be in the same Frame. [!]
+3 OUTLIST
+OUTLIST = FILENAME (Write)
+   The output positions list.
+3 POSITION
+POSITION = LITERAL (Read)
+   The co-ordinates of a single position to be stored in the output
+   positions list. Supplying a colon ":" will display details of the
+   co-ordinate Frame in which the position is required. The position
+   should be given as a list of formatted axis values separated by
+   commas or spaces. You are prompted for new values for this parameter
+   until a null value (!) is entered. This parameter is only accessed
+   if parameter MODE is given the value "Interface".
+3 TITLE
+TITLE = LITERAL (Read)
+   A title for the output positions list. The dynamic default
+   is obtained from the input positions list if one is supplied.
+   Otherwise, the dynamic default is obtained from the NDF if one
+   is supplied. Otherwise, the dynamic default is "Output from
+   LISTMAKE". []
+2 Examples
+listmake newlist frame=pixel dim=2
+   This creates a text file called newlist containing a list of
+   positions, together with a description of a single 2-dimensional
+   pixel co-ordinate Frame. The positions are supplied as a set of
+   space-separated pixel co-ordinates in response to repeated prompts
+   for the parameter POSITION.
+
+listmake stars.dat frame=equat(B1950) epoch=1962.3
+   This creates a text file called stars.dat containing a list of
+   positions, together with a description of a single FK4 equatorial
+   RA/DEC co-ordinate Frame (referenced to the B1950 equinox). The
+   positions were determined at epoch B1962.3. The epoch of
+   observation is required since the underlying model on which the
+   FK4 system is based is non-inertial and rotates slowly with time,
+   introducing fictitious proper motions. The positions are supplied
+   as hours and degrees values in response to repeated prompts for
+   parameter POSITIONS.
+
+listmake outlist ndf=allsky mode=file file=stars
+   This creates a text file called outlist containing a list of
+   positions, together with descriptions of all the co-ordinate
+   Frames contained in the NDF allsky. The positions are supplied
+   within the current co-ordinate Frame of the NDF. Application
+   WCSFRAME can be used to find out what this Frame is.
+   The positions are supplied in a text file called stars. It may
+   seem pointless to copy positions out of one text file into
+   another. The input and output text files are, however, different in
+   two important respects: the output file contains Frame descriptions
+   which enable subsequent applications to align the positions with
+   other data, and it also contains integer position identifiers which
+   allow the positions to be distinguished.
+
+listmake out inlist=old.dat frame=gal
+   This creates a text file called out containing a list of
+   positions, together with a description of a single galactic
+   co-ordinate Frame. The positions contained in the existing
+   positions list old.dat are mapped into galactic co-ordinates (if
+   possible) and stored in the output positions list. Further
+   galactic co-ordinate positions are then obtained by repeated
+   prompting for the parameter POSITION. These positions are
+   appended to the positions obtained from file old.dat.
+
+listmake out inlist=old.dat ndf=cobe
+   As above but the output positions list contains copies of all the
+   Frames in the NDF cobe. The positions in old.dat are mapped into
+   the current co-ordinate Frame of the NDF (if possible) before
+   being stored in the output positions list. The new positions must
+   also be supplied in the same Frame (using parameter POSITION).
+
+listmake profpos ndf=prof1 mode=pixel
+   This creates a positions list called profpos containing the
+   positions of all the pixel centres in the 1-dimensional NDF
+   called prof. This could for instance be used as input to
+   application PROFILE in order to produce another profile in which
+   the samples are at the same positions as those in NDF prof.
+2 Notes
+-  There is a limit of 200 on the number of positions which can be
+given using parameter POSITION. There is no limit on the number of
+positions which can be given using parameter FILE.
+
+-  Position identifiers are assigned to the supplied positions in
+the order in which they are supplied. If no input positions list is
+given using parameter INLIST, then the first supplied position will
+be assigned the identifier "1". If an input positions list is
+given, then the first supplied position is assigned an identifier
+one greater than the largest identifier in the input positions list.
+
+-  Each line in the created file will either be a comment line
+commencing with a "#" character, or will contain a single integer
+position identifier, followed by a set of space separated double
+precision floating point axis values. A block of comments will be
+included at the end of the file containing a description of the
+co-ordinates Frames in which the positions are defined (an AST
+"FrameSet" - see SUN/210). The structure of such FrameSets is
+complicated and will usually be created by applications, not directly
+by the user. The positions stored in file are in the Base Frame of
+the FrameSet. If no FrameSet is included (for instance if a user
+creates a positions list using a text editor and does not include
+a FrameSet), then subsequent applications will assume that the
+positions are pixel co-ordinates.
+2 Related_Applications
+   KAPPA: CURSOR, LISTSHOW
+2 Authors
+DSB: David S. Berry (STARLINK)
+2 History
+ 16-SEP-1998 (DSB):
+    Original version.
+1 LISTSHOW
+Reports the positions stored in a positions list.
+
+Usage:
+
+   listshow inlist [frame] [first] [last] [plot] [device]
+
+Description:
+
+   This application reports positions contained in a text file. The
+   text file should have the form of a positions list as produced (for
+   instance) by application LISTMAKE. By default all positions in the
+   file are reported, but a subset may be reported by specifying a range
+   of "position identifiers" (see parameters FIRST and LAST).
+
+   Positions may be reported in a range of co-ordinate Frames dependent
+   on the information stored in the supplied positions list (see parameter
+   FRAME). The selected positions are written to an output parameter
+   (parameter POSNS), and may also be written to an output positions
+   list (see parameter OUTLIST). The formatted screen output can be saved
+   in a logfile (see parameter LOGFILE). The formats used to report the
+   axis values can be controlled using parameter STYLE.
+
+   Graphics may also be drawn marking the selected positions (see
+   parameters PLOT and LABEL). If a DATA picture can be found on the
+   specified graphics device, the supplied positions are aligned with the
+   DATA picture. If no DATA picture is found, positions are aligned with
+   the current picture. If possible, this alignment occurs within the
+   co-ordinate Frame specified using parameter FRAME. If this is not
+   possible, alignment may occur in some other suitable Frame. A message
+   is displayed indicating the Frame in which alignment occurred.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 CLOSE
+CLOSE = _LOGICAL (Read)
+   This parameter is only accessed if parameter PLOT is set to
+   "Chain" or "Poly". If TRUE, polygons will be closed by joining
+   the first position to the last position. [current value]
+3 DESCRIBE
+DESCRIBE = _LOGICAL (Read)
+   If TRUE, a detailed description of the co-ordinate Frame in which
+   the positions will be reported is displayed before the
+   positions. [current value]
+3 DEVICE
+DEVICE = DEVICE (Read)
+   The graphics workstation.  Only accessed if parameter PLOT
+   indicates that graphics are required. [current graphics device]
+3 DIM
+DIM = _INTEGER (Write)
+   The number of co-ordinate values for each position written to output
+   parameter POSNS.
+3 EPOCH
+EPOCH = _DOUBLE (Read)
+   If a "Sky Co-ordinate System" specification is supplied (using
+   parameter FRAME) for a celestial co-ordinate system, then an epoch
+   value is needed to qualify it. This is the epoch at which the
+   supplied sky positions were determined. It should be given as a
+   decimal years value, with or without decimal places  ("1996.8" for
+   example). Such values are interpreted as a Besselian epoch if less
+   than 1984.0 and as a Julian epoch otherwise.
+3 FIRST
+FIRST = _INTEGER (Read)
+   The identifier for the first position to be displayed. Positions
+   are only displayed which have identifiers in the range given by
+   parameters FIRST and LAST. The dynamic default is the lowest
+   identifier value in the positions list. []
+3 FRAME
+FRAME = LITERAL (Read)
+   A string determining the co-ordinate Frame in which positions are
+   to be reported. This application can report positions in
+   any of the co-ordinate Frames stored with the positions list. The
+   string supplied for FRAME can be one of the following:
+
+   - A Domain name such as SKY, AXIS, PIXEL, etc.
+
+   - An integer value giving the index of the required Frame.
+
+   - A "Sky Co-ordinate System" (SCS) value such as EQUAT(J2000) (see
+   section "Sky Co-ordinate Systems" in SUN/95).
+
+   If a null value (!) is supplied, positions are reported in the
+   co-ordinate Frame which was current when the positions list was
+   created. The user is re-prompted if the specified Frame is not
+   available within the positions list. [!]
+3 GEODESIC
+GEODESIC = _LOGICAL (Read)
+   This parameter is only accessed if parameter PLOT is set to
+   "Chain" or "Poly". It specifies whether the curves drawn between
+   positions should be straight lines, or should be geodesic curves.
+   In many co-ordinate Frames geodesic curves will be simple straight
+   lines. However, in others (such as the majority of celestial
+   co-ordinates Frames) geodesic curves will be more complex curves
+   tracing the shortest path between two positions in a non-linear
+   projection. [FALSE]
+3 INLIST
+INLIST = FILENAME (Read)
+   A text file containing a positions list such as produced by
+   applications LISTMAKE, or CURSOR.
+3 LABEL
+LABEL = _LOGICAL (Read)
+   If TRUE the positions are labelled with the corresponding integer
+   identifiers on the graphics device specified by parameter DEVICE.
+   The offset from each position to the centre of the corresponding
+   label is controlled using the "NumLabGap(1)" and "NumLabGap(2)"
+   plotting attributes, and the appearance of the labels is
+   controlled using attributes "Colour(NumLab)", "Size(NumLab)", etc.
+   These attributes may be specified using parameter STYLE. [FALSE]
+3 LAST
+LAST = _INTEGER (Read)
+   The identifier for the last position to be displayed. Positions
+   are only displayed which have identifiers in the range given by
+   parameters FIRST and LAST. The dynamic default is the highest
+   identifier value in the positions list. []
+3 LOGFILE
+LOGFILE = FILENAME (Write)
+   The name of the text file in which the formatted co-ordinates of
+   the selected positions may be stored. This is intended primarily
+   for recording the screen output, and not for communicating
+   positions to subsequent applications. A null string (!) means that
+   no file is created.  [!]
+3 MARKER
+MARKER = _INTEGER (Read)
+   This parameter is only accessed if parameter PLOT is set to
+   "Chain" or "Mark". It specifies the symbol with which each
+   position should be marked, and should be given as an integer
+   PGPLOT marker type. For instance, 0 gives a box, 1 gives a dot,
+   2 gives a cross, 3 gives an asterisk, 7 gives a triangle. The
+   value must be larger than or equal to -31. [current value]
+3 NUMBER
+NUMBER = _INTEGER (Write)
+   On exit, this holds the number of positions selected.
+3 OUTLIST
+OUTLIST = FILENAME (Write)
+   The output positions list in which to store the selected
+   positions. If a null value is supplied, no output positions list
+   is produced. [!]
+3 PLOT
+PLOT = LITERAL (Read)
+   The type of graphics to be used to mark the positions on the
+   graphics device specified by parameter DEVICE. The appearance of
+   these graphics (colour, size, etc ) is controlled by the STYLE
+   parameter. PLOT can take any of the following values:
+
+   - "None" -- No graphics are produced.
+
+   - "Mark" -- Each position is marked by the symbol specified
+   by parameter MARKER.
+
+   - "Poly" -- Causes each position to be joined by a line to the
+   previous position.  These lines may be simple straight lines or
+   geodesic curves (see parameter GEODESIC). The polygons may
+   optionally be closed by joining the last position to the first (see
+   parameter CLOSE).
+
+   - "Chain" -- This is a combination of "Mark" and "Poly". Each
+   position is marked by a symbol and joined by a line to the previous
+   position. Parameters MARKER, GEODESIC and CLOSE are used to
+   specify the symbols and lines to use.
+
+   Each position may also be labelled with its integer identifier value
+   by giving a TRUE value for parameter LABEL. [None]
+3 POSNS
+POSNS() = _DOUBLE (Write)
+   On exit, this holds the unformatted co-ordinates of the positions
+   selected by parameters FIRST and LAST, in the co-ordinate Frame
+   selected by FRAME. The axis values are stored as a 1-dimensional
+   vector. All the axis 1 values for the selected positions are stored
+   first, followed by the axis 2 values, etc. The number of positions in
+   the vector is written to the output parameter NUMBER, and the
+   number of axes per position is written to the output parameter
+   DIM. The axis values may not be in the same units as the
+   formatted values shown on the screen. For instance, unformatted
+   celestial co-ordinate values are stored in units of radians.
+3 QUIET
+QUIET = _LOGICAL (Read)
+   If TRUE then nothing is displayed on the screen while the
+   application is running (other than error messages). Output
+   parameters and files are still created. The dynamic default is
+   to run quietly if any graphics or labels are being plotted (see
+   parameters PLOT and LABEL). []
+3 STYLE
+STYLE = LITERAL (Read)
+   A group of attribute settings describing the plotting style to use
+   when drawing the graphics specified by parameter PLOT. The format
+   of the positions reported on the screen may also be controlled.
+
+   A comma-separated list of strings should be given in which each
+   string is either an attribute setting, or the name of a text file
+   preceded by an up-arrow character "^". Such text files should
+   contain further comma-separated lists which will be read and
+   interpreted in the same manner. Attribute settings are applied in
+   the order in which they occur within the list, with later settings
+   over-riding any earlier settings given for the same attribute.
+
+   Each individual attribute setting should be of the form:
+
+      <name>=<value>
+
+   where <name> is the name of a plotting attribute, and <value> is
+   the value to assign to the attribute. Default values will be
+   used for any unspecified attributes. All attributes will be
+   defaulted if a null value (!) is supplied. See section "Plotting
+   Attributes" in SUN/95 for a description of the available
+   attributes. Any unrecognised attributes are ignored (no error is
+   reported). [current value]
+
+   In addition to the attributes which control the appearance of
+   the graphics (Colour, Font, etc), the following attributes may
+   be set in order to control the appearance of the formatted axis
+   values reported on the screen: Format, Digits, Symbol, Unit. These
+   may be suffixed with an axis number (eg "Digits(2)") to refer to
+   the values displayed for a specific axis. [current value]
+2 Examples
+listshow stars.dat pixel
+   This displays the pixel co-ordinates of all the positions
+   stored in the text file stars.dat. They are all written to
+   the output parameter POSNS as well as to the screen.
+
+listshow stars.dat equat(J2010) first=3 last=3 quiet
+   This extracts position 3 from the text file stars.dat transforming
+   it into FK5 equatorial RA/DEC co-ordinates (referenced to the
+   J2010 equinox) if possible. The RA/DEC values (in radians) are
+   written to the output parameter POSNS, but not to the screen.
+
+listshow stars.dat style="digits(1)=5,digits(2)=7"
+   This lists the positions in stars.dat in their original
+   co-ordinate Frame. By default, 5 digits are used to format axis
+   1 values, and 7 to format axis 2 values. These defaults are
+   over-ridden if the attributes Format(1) and/or Format(2) are
+   assigned values in the description of the current Frame stored in
+   the positions list.
+
+listshow stars.dat plot=3 style="colour=red,size=2"
+   This lists the positions in stars.dat on the screen in their original
+   co-ordinate Frame, and also marks them on the currently selected
+   graphics device using PGPLOT marker 3 (an asterisk). The markers are
+   red and are twice the default size.
+2 Related_Applications
+   KAPPA: CURSOR, LISTMAKE
+2 Authors
+DSB: David S. Berry (STARLINK)
+2 History
+ 16-SEP-1998 (DSB):
+    Original version.
 1 LOG10
     Takes the base-10 logarithm of each pixel of a data array
  
@@ -21879,7 +22437,7 @@ Description:
    -  its shape (pixel bounds, dimension sizes, number of dimensions
    and total number of pixels);
 
-   -  zxis co-ordinate information (axis labels, units and extents);
+   -  axis co-ordinate information (axis labels, units and extents);
 
    -  optionally, axis array attributes (type and storage form) and
    the values of the axis normalisation flags;
@@ -21887,6 +22445,13 @@ Description:
    -  attributes of the main data array and any other array
    components present (including the type and storage form and an
    indication of whether `bad' pixels may be present);
+
+   -  attributes of the current co-ordinate Frame in the WCS component
+   (title, domain, and ,optionally, axis labels and axis units, plus the
+   system epoch and projection for sky co-ordinate Frames).
+
+   -  optionally, attributes of all other co-ordinate Frames in the WCS
+   component.
 
    -  a list of any NDF extensions present, together with their data
    types; and
@@ -21945,6 +22510,10 @@ BAD = _LOGICAL (Write)
 3 BADBITS
 BADBITS = LITERAL (Write)
    The BADBITS mask.  This is only valid when QUALITY is TRUE.
+3 CURRENT
+CURRENT = _INTEGER (Write)
+   The integer Frame index of the current co-ordinate Frame in the
+   WCS component.
 3 DIMS
 DIMS( ) = _INTEGER (Write)
    The dimensions of the NDF.
@@ -21957,9 +22526,27 @@ EXTTYPE( ) = LITERAL (Write)
    The types of the extensions in the NDF.  Their order
    corresponds to the names in EXTNAME.  It is only written when
    NEXTN is positive.
+3 FDIM
+FDIM( ) = _INTEGER (Write)
+   The numbers of axes in each co-ordinate Frame stored in the WCS
+   component of the NDF. The elements in this parameter correspond to
+   those in the FDOMAIN and FTITLE parameters. The number of elements
+   in each of these parameters is given by NFRAME.
+3 FDOMAIN
+FDOMAIN( ) = LITERAL (Write)
+   The domain of each co-ordinate Frame stored in the WCS component
+   of the NDF. The elements in this parameter correspond to
+   those in the FDIM and FTITLE parameters. The number of elements
+   in each of these parameters is given by NFRAME.
 3 FORM
 FORM = LITERAL (Write)
    The storage form of the NDF's data array.
+3 FTITLE
+FTITLE( ) = LITERAL (Write)
+   The title of each co-ordinate Frame stored in the WCS component of
+   the NDF. The elements in this parameter correspond to those in the
+   FDOMAIN and FDIM parameters. The number of elements in each
+   of these parameters is given by NFRAME.
 3 FULLAXIS
 FULLAXIS = _LOGICAL (Read)
    If the NDF being examined has an axis co-ordinate system
@@ -21967,6 +22554,16 @@ FULLAXIS = _LOGICAL (Read)
    each axis will be displayed.  However, if a TRUE value is given
    for this parameter, full details of the attributes of all the
    axis arrays will also be given. [FALSE]
+3 FULLFRAME
+FULLFRAME = _LOGICAL (Read)
+   If a FALSE value is given for this parameter then only the
+   Title and Domain attributes are displayed for a co-ordinate Frame.
+   Otherwise, a more complete description is given.   [FALSE]
+3 FULLWCS
+FULLWCS = _LOGICAL (Read)
+   If a TRUE value is given for this parameter then all co-ordinate
+   Frames in the WCS component of the NDF are displayed. Otherwise,
+   only the current co-ordinate Frame is displayed. [FALSE]
 3 HISTORY
 HISTORY = _LOGICAL (Write)
    Whether or not the NDF contains HISTORY records.
@@ -21985,6 +22582,10 @@ NDIM = _INTEGER (Write)
 3 NEXTN
 NEXTN = _INTEGER (Write)
    The number of extensions in the NDF.
+3 NFRAME
+NFRAME = _INTEGER (Write)
+   The number of WCS Frames described by parameters FDIM, FDOMAIN and
+   FTITLE. Set to zero if WCS is FALSE.
 3 QUALITY
 QUALITY = _LOGICAL (Write)
    Whether or not the NDF contains a QUALITY array.
@@ -22008,6 +22609,10 @@ UNITS = LITERAL (Write)
 3 VARIANCE
 VARIANCE = _LOGICAL (Write)
    Whether or not the NDF contains a VARIANCE array.
+3 WCS
+WCS = _LOGICAL (Write)
+   Whether or not the NDF has any WCS co-ordinate Frames, over
+   and above the default GRID, PIXEL and AXIS Frames.
 3 WIDTH
 WIDTH( ) = _LOGICAL (Write)
    Whether or not there are axis width arrays present in the NDF.
@@ -22024,12 +22629,22 @@ ndftrace ndf=r106 fullaxis
 ndftrace mydata quiet ndim=(mdim)
    Passes the number of dimensions of the NDF called mydata
    into the ICL variable mdim.  No information is displayed.
+2 Notes
+-  If the WCS component of the NDF is undefined, then an attempt is
+made to find WCS information from two other sources: firstly, an
+IRAS90 astrometry structure, and secondly, the FITS extension. If
+either of these sources yield usable WCS information, then it is
+displayed in the same way as the NDF WCS component. Other KAPPA
+applications will use this WCS information as if it were stored in
+the WCS component.
 2 Related_Applications
-   HDSTRACE.
+   KAPPA: WCSFRAME; HDSTRACE
 2 Authors
 RFWS: R.F. Warren-Smith (STARLINK)
 
 MJC: Malcolm J. Currie (STARLINK)
+
+DSB: David S. Berry (STARLINK)
 2 History
  1990 April 6 (RFWS):
     Original version.
@@ -22056,6 +22671,9 @@ MJC: Malcolm J. Currie (STARLINK)
 
  1995 June 18 (MJC):
     Added QUIET option and the output parameters.
+
+ 1997 November 27 (DSB):
+    Added support for WCS component.
 1 NOGLOBALS
 Resets the KAPPA global parameters.
 
@@ -24059,17 +24677,18 @@ Description:
          is available on the chosen graphics workstation;
      2.  obtaining the bounds from the environment (in world
          co-ordinates of the reference picture);
-     3.  or by giving a position code for the new picture, and
-         specifying its linear fractional size along each axis in
-         terms of the reference picture, and/or its aspect ratio.
-         The position code comprises two characters.  The first
+     3.  or by giving a position and size for the new picture. The
+         position is specified by a two-character code. The first
          controls the vertical location, and may be "T", "B", or "C"
          to create the new picture at the top, bottom, or in the
          centre respectively.  The second defines the horizontal
          situation, and may be "L", "R", or "C" to define a new
          picture to the left, right, or in the centre respectively.
          Thus a code of "BR" will make a new picture in the
-         bottom-right corner.
+         bottom-right corner. The size of the new picture along each
+         axis may be specified either in centimetres, or as a fraction
+         of the corresponding axis of the reference picture. The picture
+         may also be forced to have a specified aspect ratio.
 
    The picture created becomes the current picture on exit.
 
@@ -24133,7 +24752,8 @@ FRACTION( ) = _REAL (Read)
    the shape of the reference picture.  So a value of 0.5 would
    create a picture 0.25 the area of the current or BASE picture.
    The default is 0.5, unless parameter ASPECT is not null, when
-   the default is 1.0. []
+   the default is 1.0. This parameter is not used if the picture
+   size is specified in centimetres using parameter SIZE. []
 3 LABELNO
 LABELNO = _INTEGER (Read)
    The number used to form the label for the first (bottom-left)
@@ -24152,8 +24772,7 @@ MODE = LITERAL (Read)
    by two characters, the first corresponding to the vertical
    position and the second the horizontal.  For the vertical,
    valid positions are T(op), B(ottom), or C(entre); and for the
-   horizontal the options are L(eft), R(ight), or C(entre). (It
-   is the same as the disposition code in SGS). ["Cursor"]
+   horizontal the options are L(eft), R(ight), or C(entre). ["Cursor"]
 3 OUTLINE
 OUTLINE = _LOGICAL (Read)
    If TRUE, a box that delimits the new picture is drawn. [TRUE]
@@ -24167,6 +24786,13 @@ PREFIX = LITERAL (Read)
    increases the chance of losing existing labels.  A ! response
    means no labelling is required.  The suggested default is the
    last-used prefix.
+3 SIZE
+SIZE( 2 ) = _REAL (Read)
+   The size of the new picture along both axes, in centimetres,
+   applicable for modes other than Array, Cursor, and XY. If a
+   single value is given, it is used for both axes. If a null
+   value (!) is given, then the size of the picture is determined
+   by parameter FRACTION. [!]
 3 UBOUND
 UBOUND( 2 ) = _REAL (Read)
    Co-ordinates of the upper bound that defines the new picture.
@@ -24195,6 +24821,13 @@ picdef bl aspect=1.0
    Creates a new FRAME picture within the full display area on
    the current graphics device, and an outline is drawn around
    the new picture.  This picture is the largest square possible,
+   and it is justified to the bottom-left corner.  It becomes the
+   current picture.
+
+picdef bl size=[15,10]
+   Creates a new FRAME picture within the full display area on
+   the current graphics device, and an outline is drawn around
+   the new picture.  This picture is 15 by 10 centimetres in size
    and it is justified to the bottom-left corner.  It becomes the
    current picture.
 
@@ -24230,6 +24863,8 @@ picdef mode=a prefix="" xpic=3 ypic=2 fill=0.8
           PICLIST, PICSEL, PICXY.
 2 Authors
 MJC: Malcolm J. Currie  (STARLINK)
+
+DSB: David S. Berry (STARLINK)
 2 History
  1989 April 30 (MJC):
     Original.
@@ -24292,6 +24927,9 @@ MJC: Malcolm J. Currie  (STARLINK)
     Removed CURRENT as a positional parameter, and made LBOUND and
     UBOUND positional; this is to enable PICXY to operate and to
     allow both PICGRID and PICXY to inherit the CURRENT option.
+
+ 21-AUG-1998 (DSB):
+    Converted to use PGPLOT. Re-formatted code. Added parameter SIZE.
 1 PICEMPTY
 Finds the first empty FRAME picture in the graphics database.
 
@@ -25928,6 +26566,173 @@ UBOUND parameter arrays.
              UBOUND=[ (XK2&','&YK2)] MODE=XY
         END IF
      END PROC
+1 PROFILE
+Creates a 1-dimensional profile through an N-dimensional NDF.
+
+Usage:
+
+   profile in out start finish [nsamp]
+
+Description:
+
+   This application samples an N-dimensional NDF at a set of positions,
+   producing a 1-dimensional output NDF containing the sample values.
+   Nearest neighbour interpolation is used.
+
+   The samples can be placed at specified positions within the input NDF,
+   or can be spaced evenly along a poly-line joining a set of vertices
+   (see parameter MODE). The positions of the samples may be saved in an
+   output positions list (see parameter OUTLIST).
+2 Parameters
+For information on individual parameters, select from the list below:
+3 FINISH
+FINISH = LITERAL (Read)
+   The co-ordinates of the last sample in the profile, in the current
+   co-ordinate Frame of the NDF (supplying a colon ":" will display
+   details of the required co-ordinate Frame). The position should be
+   supplied as a list of formatted axis values separated by commas or
+   spaces. This parameter is only accessed if parameter MODE is set to
+   "Curve" and a null (!) value is given for INLIST. If the last (top
+   right) pixel in the NDF has valid co-ordinates in the current
+   co-ordinate Frame, then these co-ordinates will be used as the
+   suggested default. Otherwise there will be no suggested default.
+3 GEODESIC
+GEODESIC = _LOGICAL (Read)
+   If TRUE then the line segments which form the profile will be
+   geodesic curves within the current co-ordinate Frame of the NDF.
+   Otherwise, the line segments are simple straight lines within the
+   current co-ordinate Frame. This parameter is only accessed if
+   parameter MODE is set to "Curve".
+
+   As an example, consider a profile through an all-sky image consisting
+   of a single line segment which starts at RA=0h DEC=80d and finishes
+   at RA=12h DEC=80d. If GEODESIC is FALSE, the line segment will be a
+   line of constant declination, i.e. the "straight" line from the
+   position (0,80) to the position (12,80), passing through (1,80),
+   (2,80), etc. If GEODESIC is TRUE, then the line segment will be the
+   curve of shortest distance on the celestial sphere between the start
+   and end. In this particular case, this will be a great circle
+   passing through the north celestial pole. [FALSE]
+3 IN
+IN = NDF (Read)
+   The input NDF structure containing the data to be profiled.
+3 INLIST
+INLIST = FILENAME (Read)
+   A text file containing a set of vertices or sample positions defining
+   the required profile. The file should be in the format of a "positions
+   list" such as produced by applications CURSOR and LISTMAKE. If a
+   null value (!) is given then parameters START and FINISH will be
+   used to obtain the vertex positions. If parameter MODE is given the
+   value "Curve", then the parameter INLIST is only accessed if a value
+   is given for it on the command line (otherwise a null value is
+   assumed).
+3 MODE
+MODE = LITERAL (Read)
+   The mode by which the sample positions are selected. The options
+   are:
+
+   - "Curve" -- The samples are placed evenly along a curve specified
+   by a set of vertices obtained from the user. The line segments
+   joining these vertices may be linear or geodesic (see parameter
+   GEODESIC). Multiple vertices may be supplied using a text file
+   (see parameter INLIST). Alternatively, a single line segment can
+   be specified using parameters START and FINISH. The number of
+   samples to place along the curve is specified by parameter NSAMP.
+
+   - "Points" -- The positions at which samples should be taken are
+   given explicitly by the user in a text file (see parameter
+   INLIST). No other sample positions are used.
+
+   [Curve]
+3 NSAMP
+NSAMP = _INTEGER (Read)
+   The number of samples required along the length of the profile.
+   The first sample is at the first supplied vertex, and the last
+   sample is at the last supplied vertex. The sample positions are
+   evenly spaced within the current co-ordinate Frame of the NDF. If
+   a null value is supplied, a default value is used equal to one
+   more than the length of the profile in pixels. Only accessed if
+   parameter MODE is given the value "Curve". [!]
+3 OUT
+OUT = NDF (Write)
+   The output NDF. The pixel array will be 1-dimensional with length
+   specified by parameter NSAMP, but the corresponding N-dimensional
+   positions in the original NDF will be retained in the WCS
+   component. In particular, the current co-ordinate Frame from the
+   input NDF is retained, and the original N-dimensional pixel
+   co-ordinate Frame will be retained with domain PIXEL_ND (so long
+   as no Frame already exists with this domain).
+3 OUTLIST
+OUTLIST = FILENAME (Write)
+   An output positions list in which to store the sample positions
+   This is the name of a text file which can be used to communicate
+   positions to subsequent applications. It includes information
+   describing the available co-ordinate Frames as well as the positions
+   themselves. If a null value is supplied, no output positions list
+   is produced. [!]
+3 START
+START = LITERAL (Read)
+   The co-ordinates of the first sample in the profile, in the current
+   co-ordinate Frame of the NDF (supplying a colon ":" will display
+   details of the required co-ordinate Frame). The position should be
+   supplied as a list of formatted axis values separated by commas or
+   spaces. This parameter is only accessed if parameter MODE is set to
+   "Curve" and a null (!) value is given for INLIST. If the first
+   (bottom left) pixel in the NDF has valid co-ordinates in the current
+   co-ordinate Frame, then these co-ordinates will be used as the
+   suggested default. Otherwise there will be no suggested default.
+2 Examples
+profile my_data prof "0 0" "100 100" 40 outlist=samps
+   Create a 1-dimensional NDF called prof, holding a profile of the
+   data values in the input NDF my_data along a profile starting at
+   pixel co-ordinates [0.0,0.0] and ending at pixel co-ordinates
+   [100.0,100.0]. The profile consists of 40 samples spread evenly
+   (in the pixel co-ordinate Frame) between these two positions.
+   This example assumes that the current co-ordinate Frame in the NDF
+   my_data represents pixel co-ordinates. This can be ensured by
+   issuing the command "wcsframe my_data pixel" before running
+   profile. An output text file is created called samps containing
+   the positions of all samples in the profile, together with
+   information describing all the co-ordinate Frames in which the
+   positions of the samples are known. This file may be examined
+   using application LISTSHOW.
+
+profile my_data prof "15:32:47 23:40:08" "15:32:47 23:42"
+   This example is the same as the last one except that it is
+   assumed that the current co-ordinate Frame in the input NDF my_data
+   is an equatorial (RA/DEC) system. It creates a 1-dimensional
+   profile starting at RA=15:32:47 DEC=23:40:08, and ending at the same
+   RA, and DEC=23:42:00. The number of points in the profile is
+   determined by the resolution of the data.
+
+profile allsky prof inlist=prof_path npoint=200 geodesic outlist=aa
+   This examples creates a profile of the NDF allsky through a set of
+   points given in a text file called prof_path. Such files can be
+   created (for example) using application CURSOR. Each line segment
+   is a geodesic curve. The profile is sampled at 200 points. The
+   samples positions are written to the output positions list aa.
+
+profile allsky2 prof2 mode=point inlist=aa
+   This examples creates a profile of the NDF allsky2 containing
+   samples at the positions given in the positions list aa. Thus,
+   the profiles created by this example and the previous example
+   will sample the two images allsky and allsky2 at the same
+   positions and so can be compared directly.
+2 Related_Applications
+   KAPPA: LINPLOT, CURSOR, LISTMAKE, LISTSHOW;
+2 Authors
+DSB: David S. Berry (STARLINK)
+2 History
+ 10-SEP-1998 (DSB):
+    Original version.
+2 Implementation_Status
+   -  This routine correctly processes the DATA, VARIANCE, WCS, LABEL,
+   TITLE, and UNITS components of the NDF.
+
+   -  All non-complex numeric data types can be handled.  Only
+   double-precision floating-point data can be processed directly.
+   Other non-complex data types will undergo a type conversion
+   before the profile is produced.
 1 PSF
 Determines the parameters of a model star profile by fitting star
 images in a two-dimensional NDF.
@@ -32143,6 +32948,753 @@ MJC: Malcolm J. Currie (STARLINK)
    vector plot is drawn.
 
    -  Bad pixels and automatic quality masking are supported.
+1 WCSADD
+Adds a new co-ordinate Frame into the WCS component of an NDF.
+
+Usage:
+
+   wcsadd ndf frame domain [tr]
+
+Description:
+
+   This application adds a new co-ordinate Frame into the WCS component
+   of an NDF. The new Frame must be linearly connected to an existing
+   Frame (called the "basis" Frame) in the WCS component. The linear
+   transformation is specified by parameter TR. The new Frame becomes the
+   current co-ordinate Frame in the NDF.
+
+   The new Frame is a copy of the basis Frame, with the new Domain
+   attribute specified by parameter DOMAIN. If necessary, other attributes
+   of the Frame (Title, Label, Format, etc) can be changed using
+   application WCSATTRIB.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 DOMAIN
+DOMAIN = LITERAL (Read)
+   The value for the Domain attribute for the new Frame. Care should be
+   taken to ensure that domain names are used consistently. This
+   will usually mean avoiding any domain names which are already in
+   use within the WCS component, particularly the standard domain names
+   such as GRID, PIXEL, AXIS and GRAPHICS. The supplied value is
+   stripped of spaces, and converted to upper case before being used.
+3 EPOCH
+EPOCH = _DOUBLE (Read)
+   If the basis Frame is specified using a "Sky Co-ordinate System"
+   specification for a celestial co-ordinate system (see parameter
+   FRAME), then an epoch value is needed to qualify it. This is the
+   epoch at which the supplied sky positions were determined. It should
+   be given as a decimal years value, with or without decimal places
+   ("1996.8" for example). Such values are interpreted as a Besselian
+   epoch if less than 1984.0 and as a Julian epoch otherwise. The
+   suggested default is the value stored in the basis Frame.
+3 FRAME
+FRAME = LITERAL (Read)
+   A string specifying the basis Frame. If a null value is supplied
+   the current co-ordinate Frame in the NDF is used. The string can
+   be one of the following:
+
+   - A domain name such as SKY, AXIS, PIXEL, etc. The two
+   "pseudo-domains" WORLD and DATA may be supplied and will be
+   translated into PIXEL and AXIS respectively, so long as the WCS
+   component of the NDF does not contain Frames with these domains.
+
+   - An integer value giving the index of the required Frame within
+   the WCS component.
+
+   - A "Sky Co-ordinate System" (SCS) value such as EQUAT(J2000) (see
+   section "Sky Co-ordinate Systems" in SUN/95).
+3 NDF
+NDF = NDF (Read and Write)
+   The NDF in which the new Frame is to be stored.
+3 TR
+TR( ) = _DOUBLE (Read)
+   The values of this parameter are the coefficients of a linear
+   transformation from the basis Frame specified by parameter FRAME to
+   the new Frame. For instance, if a feature has co-ordinates
+   (X,Y,Z,...) in the basis Frame, and co-ordinates (U,V,W,...) in
+   the new Frame, then the following transformations would be used,
+   depending on how many axes the two Frames have:
+
+   - 1-dimensional:
+
+         U = TR(1) + TR(2)*X
+
+   - 2-dimensional:
+
+         U = TR(1) + TR(2)*X + TR(3)*Y
+
+         V = TR(4) + TR(5)*X + TR(6)*Y
+
+   - 3-dimensional:
+
+         U = TR(1) + TR(2)*X + TR(3)*Y + TR(4)*Z
+
+         V = TR(5) + TR(6)*X + TR(7)*Y + TR(8)*Z
+
+         W = TR(9) + TR(10)*X + TR(11)*Y + TR(12)*Z
+
+   The correct number of values must be supplied (that is, N*(N+1)
+   where N is the number of axes in the new and old Frames). If a
+   null value (!) is given it is assumed that the new Frame and the
+   basis Frame are connected using a unit mapping (i.e. corresponding
+   axis values are identical in the two Frames). [!]
+2 Examples
+wcsadd ngc5128 pixel old_pixel
+   This adds a new co-ordinate Frame into the WCS component of the
+   NDF called ngc5128. The new Frame is given the domain OLD_PIXEL
+   and is a copy of the existing PIXEL Frame. This OLD_PIXEL Frame
+   will be retained through further processing and can be used as a
+   record of the original pixel co-ordinate Frame.
+
+wcsadd my_data dist-lum dist(au)-lum [0,2.0628E5,0,0,0,1]
+   This adds a new co-ordinate Frame into the WCS component of the
+   NDF called my_data. The new Frame is given the domain DIST(AU)-LUM
+   and is a copy of an existing Frame with domain DIST-LUM. The first
+   axis in the new Frame is derived from the first axis in the basis
+   Frame but is in different units (AU instead of parsecs). This
+   change of units is achieved by multiplying the old Frame axis 1
+   values by 2.0628E5. The values on the second axis are copied
+   without change. You could then use application WCSATTRIB to set
+   the "Unit" attribute for axis 1 of the new Frame to "AU".
+2 Notes
+-  The new Frame has the same number of axes as the basis Frame.
+
+-  An error is reported if the transformation supplied using parameter
+TR is singular.
+2 Related_Applications
+   KAPPA: NDFTRACE, WCSFRAME, WCSREMOVE, WCSATTRIB
+2 Authors
+DSB: David Berry (STARLINK)
+2 History
+ 2-OCT-1998 (DSB):
+    Original version.
+1 WCSALIGN
+Aligns a group of 2-dimensional NDFs using World Co-ordinate System
+information.
+
+Usage:
+
+   wcsalign in out lbnd ubnd ref
+
+Description:
+
+   This application resamples a group of 2-dimensional input NDFs,
+   producing corresponding output NDFs which are aligned pixel-for-pixel
+   with a specified reference NDF.
+
+   The transformations needed to produce alignment are derived from the
+   co-ordinate system information stored in the WCS components of the
+   supplied NDFs. For each input NDF, alignment is first attempted in
+   the current co-ordinate Frame of the reference NDF. If this fails,
+   alignment is attempted in the current co-ordinate Frame of the input
+   NDF. If this fails, alignment occurs in the pixel co-ordinate Frame.
+   A message indicating which Frame alignment was achieved in is
+   displayed.
+
+   The output image values are formed by re-sampling the input image
+   values using either nearest neighbour or bi-linear interpolation
+   (see parameter METHOD).
+
+   Two methods exist for determining the bounds of the output images.
+   Firstly, the user can give values for parameters LBND and UBND
+   which are then used as the pixel index bounds for all output
+   images. Secondly, if a null value is given for LBND or UBND,
+   default values are generated separately for each output image so
+   that the output image just encloses the entire area covered by the
+   corresponding input image. Using the first method will ensure that
+   all output images have the same pixel origin, and so the resulting
+   images can be directly compared. However, this may result in the
+   output images being larger than necessary. In general, the second
+   method results in smaller images being produced, in less time.
+   However, the output images will have differing pixel origins which
+   need to be taken into account when comparing the aligned images.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 ACC
+ACC = _REAL (Read)
+   The positional accuracy required, as a a number of pixels. For
+   highly non-linear projections, a recursive algorithm is used in
+   which successively smaller regions of the projection are fitted
+   with a least squares linear transformation. If such a transformation
+   results in a maximum positional error greater than the value
+   supplied for ACC (in pixels), then a smaller region is used. High
+   accuracy is paid for by larger run times. [0.5]
+3 IN
+IN = NDF (Read)
+   A group of 2-dimensional input images. This should be given as
+   a comma separated list, in which each list element can be:
+
+   - an NDF name, optionally containing wild-cards and/or regular
+   expressions ("*", "?", "[a-z]" etc.).
+
+   - the name of a text file, preceded by an up-arrow character "^".
+   Each line in the text file should contain a comma separated list
+   of elements, each of which can in turn be an NDF name (with
+   optional wild-cards, etc), or another file specification
+   (preceded by an up-arrow). Comments can be included in the file
+   by commencing lines with a hash character "#".
+
+   If the value supplied for this parameter ends with a minus
+   sign "-", then the user is re-prompted for further input until
+   a value is given which does not end with a minus sign. All the
+   images given in this way are concatenated into a single group.
+3 LBND
+LBND(2) = _INTEGER (Read)
+   A pair of values giving the lower pixel index bound on each axis
+   for the output images. The given values are used for all output
+   images.  If a null value (!) is given for this parameter or for
+   parameter UBND, then separate default values are calculated for
+   each output image which result in the output image just encompassing
+   the corresponding input image. The suggested defaults are the
+   lower pixel index bounds from the reference image (see parameter REF).
+3 METHOD
+METHOD = LITERAL (Read)
+   The method to use when sampling the input pixel values, in
+   order to find the corresponding output pixel value. It can
+   take the following values:
+
+   - "Bilinear" -- the output pixel values are calculated by
+   bi-linear interpolation among the four nearest pixels values
+   in the input image.
+
+   - "Nearest" -- the output pixel values are assigned the value
+   of the single nearest input pixel.
+
+   Bi-linear interpolation generally produces smoother output
+   images with lower noise, but is marginally slower.
+
+   Both methods propagate variances from input to output, but the
+   variance estimates produced using bi-linear interpolation need
+   to be treated with care since the spatial smoothing produced by
+   this interpolation method introduces correlations in the
+   variances estimates. Also, the degree of smoothing produced varies
+   across the image. This is because a sample taken at a pixel centre
+   will have no contributions from the neighbouring pixels, whereas a
+   sample taken at the corner of a pixel will have equal contributions
+   from all four neighbouring pixels, resulting in greater smoothing
+   and lower noise. This effect can produce complex Moire patterns
+   in the output variance estimates, resulting from the
+   interference of the spatial frequencies in the sample positions
+   and in the pixel centre positions. For these reasons, if you
+   want to use the output variances, you are generally safer using
+   nearest neighbour interpolation. [current value]
+3 OUT
+OUT = NDF (Write)
+   A group of output NDFs corresponding one-for-one with the list
+   of input NDFs given for parameter IN. This should be given as
+   a comma separated list, in which each list element can be:
+
+   - an NDF name. If the name contains an asterisk character "*",
+   the name of the corresponding input image (without directory or
+   file suffix) is substituted for the asterisk (for instance, "*_al"
+   causes the output image name to be formed by appending the string
+   "_al" to the corresponding input image name). Input image names
+   can also be edited by including original and replacement strings
+   between vertical bars after the NDF name (for instance,
+   *_al|b4|B1| causes any occurrence of the string "B4" in the input
+   image name to be replaced by the string "B1" before appending the
+   string "_al" to the result).
+
+   - the name of a text file, preceded by an up-arrow character "^".
+   Each line in the text file should contain a comma separated list
+   of elements, each of which can in turn be an NDF name (with
+   optional editing, etc), or another file specification
+   (preceded by an up-arrow). Comments can be included in the file
+   by commencing lines with a hash character "#".
+
+   If the value supplied for this parameter ends with a minus
+   sign "-", then the user is re-prompted for further input until
+   a value is given which does not end with a minus sign. All the
+   images given in this way are concatenated into a single group.
+3 REF
+REF = NDF (Read)
+   A 2-dimensional NDF containing the image to which all the input
+   images are to be aligned. If a null value is supplied for this
+   parameter, the first image supplied for parameter IN is used.
+3 UBND
+UBND(2) = _INTEGER (Read)
+   A pair of values giving the upper pixel index bound on each axis
+   for the output images. The given values are used for all output
+   images.  If a null value (!) is given for this parameter or for
+   parameter UBND, then separate default values are calculated for
+   each output image which result in the output image just encompassing
+   the corresponding input image. The suggested defaults are the
+   lower pixel index bounds from the reference image (see parameter REF).
+2 Examples
+wcsalign image1 image1_al ref=image2 accept
+   This example resamples the 2-dimensional NDF called image1 so that
+   it is aligned with the 2-dimensional NDF call image2, putting the
+   output in image1_al. The output image has the same pixel index
+   bounds as image2 and inherits WCS information from image2.
+
+wcsalign m51* *_al lbnd=! accept
+   This example resamples all the 2-dimensional NDFs with names
+   starting with the string "m51" in the current directory so that
+   they are aligned with the first input NDF. The output images
+   have the same names as the input images, but extended with the
+   string "_al". Each output image is just big enough to contain all
+   the pixels in the corresponding input image.
+
+wcsalign ^in.lis ^out.lis lbnd=! accept
+   This example is like the previous example, except that the names
+   of the input images are read from the text file in.lis, and the
+   names of the corresponding output images are read from text file
+   out.lis.
+2 Notes
+-  WCS information (including the current co-ordinate Frame) is
+propagated from the reference NDF to all output NDFs.
+
+-  QUALITY is propagated from input to output only if parameter
+METHOD is set to Nearest.
+2 Related_Applications
+   KAPPA: WCSFRAME, TRANMAKE, TRANSFORMER; CCDPACK: TRANNDF
+2 Authors
+DSB: David Berry (STARLINK)
+2 History
+ 6-OCT-1998 (DSB):
+    Original version, based on IRAS90:SKYALIGN.
+2 Implementation_Status
+   -  Only real data can be processed directly.  Other non-complex
+   numeric data types will undergo a type conversion before the
+   resampling takes place.
+1 WCSATTRIB
+Manages attribute values associated with the WCS component of an NDF.
+
+Usage:
+
+   wcsattrib ndf mode name newval
+
+Description:
+
+   This application can be used to manage the values of attributes
+   associated with the current co-ordinate Frame of an NDF (title, axis
+   labels, axis units, etc).
+
+   Each attribute has a name, a value, and a state. This application
+   accesses all attribute values as character strings, converting to
+   and from other data types as necessary. The attribute state is a
+   Boolean flag (i.e. TRUE or FALSE) indicating whether or not a value
+   has been assigned to the attribute. If no value has been assigned to
+   an attribute, then it adopts a default value until an explicit value
+   is assigned to it. An attribute value can be cleared, causing the
+   attribute to revert to its default value.
+
+   The operation performed by this application is controlled by
+   parameter MODE, and can be:
+
+   -  display the value of an attribute.
+
+   -  set a new value for an attribute.
+
+   -  clear an attribute value.
+
+   -  test the state of an attribute.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 NAME
+NAME = LITERAL (Read)
+   The attribute name
+3 NDF
+NDF = NDF (Read and Write)
+   The NDF to be modified.
+3 MODE
+MODE = LITERAL (Read)
+   The operation to be performed on the attribute specified by
+   parameter NAME: It can be one of:
+
+   - "Get" -- The current value of the attribute is displayed on the
+   screen and written to output parameter VALUE. If the attribute
+   has not yet been assigned a value (or has been cleared), then the
+   default value will be displayed.
+
+   - "Set" -- Assigns a new value, given by parameter NEWVAL, to the
+   attribute.
+
+   - "Test" -- Displays "TRUE" if the attribute has been assigned a
+   value, and "FALSE" otherwise (in which case the attribute will
+   adopt its default value). This flag is written to the output
+   parameter STATE.
+
+   - "Clear" -- Clears the current attribute value, causing it to
+   revert to its default value.
+3 NEWVAL
+NEWVAL = LITERAL (Read)
+   The new value to assign to the attribute.
+3 STATE
+STATE = LOGICAL (Write)
+   On exit, this holds the state of the attribute on entry to this
+   application.
+3 VALUE
+VALUE = LITERAL (Write)
+   On exit, this holds the value of the attribute on entry to this
+   application.
+2 Examples
+wcsattrib ngc5128 set title "Polarization map of Centaurus-A"
+   This sets the Title attribute of the current co-ordinate Frame in
+   the NDF called ngc5128 to the string "Polarization map of Centaurus-A".
+
+wcsattrib my_data set domain saved_pixel
+   This sets the Domain attribute of the current co-ordinate Frame in
+   the NDF called my_data to the string SAVED_PIXEL.
+
+wcsattrib my_data set format(1) "%10.5G"
+   This sets the Format attribute for axis 1 in the current co-ordinate
+   Frame in the NDF called my_data, so that axis values are
+   formated as floating point values using a minimum field width of
+   10 characters, and displaying 5 significant figures. An exponent is
+   used if necessary.
+
+wcsattrib ngc5128 set format(2) bdms.2
+   This sets the Format attribute for axis 2 in the current co-ordinate
+   Frame in the NDF called ngc5128, so that axis values are formated as
+   separate degrees, minutes and seconds field, separated by blanks.
+   The seconds field has 2 decimal places. This assumes the current
+   co-ordinate Frame in the NDF is a celestial co-ordinate Frame.
+
+wcsattrib my_data get label(1)
+   This displays the label associated with the first axis of the
+   current co-ordinate Frame in the NDF called my_data. A default
+   label is displayed if no value has been set for this attribute.
+
+wcsattrib my_data test label(1)
+   This displays "TRUE" if a value has been set for the Label
+   attribute for the first axis of the current co-ordinate Frame in
+   the NDF called my_data, and "FALSE" otherwise.
+
+wcsattrib my_data clear label(1)
+   This clears the Label attribute for the first axis of the current
+   co-ordinate Frame in the NDF called my_data. It reverts to its
+   default value.
+2 Notes
+-  An error is reported if an attempt is made to set or clear the
+Base Frame in the WCS component.
+2 Related_Applications
+   KAPPA: NDFTRACE, WCSFRAME, WCSREMOVE, WCSCOPY, WCSADD
+2 Authors
+DSB: David Berry (STARLINK)
+2 History
+ 2-OCT-1998 (DSB):
+    Original version.
+1 WCSCOPY
+Copies WCS information from one NDF to another.
+
+Usage:
+
+   wcscopy ndf like [tr] [confirm]
+
+Description:
+
+   This application copies the WCS component from one NDF to
+   another, optionally modifying it to take account of a linear
+   mapping between the pixel co-ordinates in the two NDFs. It can be
+   used, for instance, to rectify the loss of WCS information produced
+   by older applications which do not propagate the WCS component.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 CONFIRM
+CONFIRM = _LOGICAL (Read)
+   If TRUE, the user is asked for confirmation before replacing any
+   existing WCS component within the input NDF. No confirmation is
+   required if the there is no WCS component in the input NDF. [TRUE]
+3 LIKE
+LIKE = NDF (Read)
+   The reference NDF data structure from which WCS information is to be
+   copied.
+3 NDF
+NDF = NDF (Read and Write)
+   The input NDF data structure in which the WCS information is to be
+   stored. Any existing WCS component is over-written (see parameter
+   CONFIRM).
+3 OK
+OK = _LOGICAL (Read)
+   This parameter is used to get a confirmation that an existing
+   WCS component within the input NDF can be over-written.
+3 TR
+TR( ) = _DOUBLE (Read)
+   The values of this parameter are the coefficients of a linear
+   transformation from pixel co-ordinates in the reference NDF given
+   for parameter LIKE, to pixel co-ordinates in the input NDF given
+   for parameter NDF. For instance, if a feature has pixel co-ordinates
+   (X,Y,Z,...) in the reference NDF, and pixel co-ordinates
+   (U,V,W,...) in the input NDF, then the following transformations
+   would be used, depending on how many axes each NDF has:
+
+   - 1-dimensional:
+
+         U = TR(1) + TR(2)*X
+
+   - 2-dimensional:
+
+         U = TR(1) + TR(2)*X + TR(3)*Y
+
+         V = TR(4) + TR(5)*X + TR(6)*Y
+
+   - 3-dimensional:
+
+         U = TR(1) + TR(2)*X + TR(3)*Y + TR(4)*Z
+
+         V = TR(5) + TR(6)*X + TR(7)*Y + TR(8)*Z
+
+         W = TR(9) + TR(10)*X + TR(11)*Y + TR(12)*Z
+
+   If a null value (!) is given it is assumed that the pixel co-ordinates
+   of a given feature are identical in the two NDFs. [!]
+2 Examples
+wcscopy m51_sim m51
+   This copies the WCS component from the NDF called m51 to the NDF
+   called m51_sim, which may hold the results of a numerical simulation
+   for instance. It is assumed that the two NDFs are aligned (i.e. the
+   pixel co-ordinates of any feature are the same in both NDFs).
+
+wcscopy m51_sqorst m51 [125,0.5,0.0,125,0.0,0.5]
+   This example assumes that the application SQORST has previously
+   been used to change the size of a 2-dimensional NDF called m51,
+   producing a new NDF called m51_sqorst. Since SQORST has not yet
+   been updated to support the full NDF structure, the output NDF
+   m51_sqorst will not have a WCS component. More than this, SQORST
+   also throws away the pixel origin information, effectively
+   resetting the output origin to (1,1). This example shows how
+   WCSCOPY can be used to rectify this by copying the WCS component
+   from the original NDF m51 to the squashed NDF m51_sqorst,
+   modifying it in the process to take account of both the
+   squashing and the resetting of the pixel origin produced by
+   sqorst. To do this, you need to work out the transformation in
+   pixel co-ordinates produced by SQORST, and specify this when
+   running WCSCOPY using the TR parameter. Let's assume the first
+   axis of NDF m51 has pixel index bounds of I1:I2 (these values
+   can be found using NDFTRACE). If the first axis in the squashed
+   NDF m51_sqorst spans M pixels (where M is the value assigned to
+   SQORST parameter XDIM), then it will have pixel index bounds of
+   1:M. Note, the lower bound is 1 since the pixel origin has been
+   reset by SQORST. The squashing factor for the first axis is
+   then:
+
+    FX = M/(I2 - I1 + 1)
+
+   and the shift in the pixel origin is:
+
+    SX = FX*( 1 - I1 )
+
+   Likewise, if the bounds of the second axis in m51 are J1:J2, and
+   SQORST parameter YDIM is set to N, then the squashing factor for
+   the second axis is:
+
+    FY = N/(J2 - J1 + 1)
+
+   and the shift in the pixel origin is:
+
+    SY = FY*( 1 - J1 )
+
+   You would then use the following values for parameter TR when
+   running WCSCOPY:
+
+    TR = [SX, FX, 0.0, SY, 0.0, FY]
+
+   Note, the zero terms indicate that the axes are independent (i.e.
+   there is no rotation of the image). The numerical values in the
+   example are for an image with pixel index bounds of 52:251 on both
+   axes which was squashed by SQORST to produce an image with 100 pixels
+   on each axis.
+
+wcscopy m51_glitch m51 [-51,1,0,-51,0,1]
+   The application GLITCH has been used to replace bad pixels in a
+   2-dimensional NDF called m51, producing a new NDF called
+   m51_glitch. Since GLITCH has not yet been updated to support the
+   full NDF structure, the output NDF m51_sqorst will not have a WCS
+   component. More than this, GLITCH also throws away the pixel origin
+   information, effectively resetting the output origin to (1,1). You
+   can use WCSCOPY to rectify this by copying the WCS component from
+   the original NDF m51 to the de-glitched NDF m51_glitch, modifying it
+   in the process to take account of the resetting of the pixel origin
+   produced by GLITCH. To do this, you to work out the transformation
+   in pixel co-ordinates produced by GLITCH, and specify this when
+   running WCSCOPY using the TR parameter. Let's assume the first axis
+   of NDF m51 has pixel index bounds of I1:I2 (these values can be
+   found using NDFTRACE). GLITCH will produce an image with the
+   same number of pixels along the axis but the first pixel will have
+   index 1 instead of I1. Thus the shift in the pixel origin is:
+
+    SX = ( 1 - I1 )
+
+   Likewise, the first pixel on the second axis will be reset to 1
+   by GLITCH, and so if the bounds of the second axis in m51 are J1:J2,
+   the shift in the pixel origin for the second axis is:
+
+    SY = ( 1 - J1 )
+
+   You would then use the following values for parameter TR when
+   running WCSCOPY:
+
+    TR = [SX, 1.0, 0.0, SY, 0.0, 1.0]
+
+   Note, the zero terms indicate that the axes are independent (i.e.
+   there is no rotation of the image), and the 1.0 terms indicate
+   that the pixels are not changed in size. The numerical values in the
+   example are for an image with pixel index bounds of 52:251 on both
+   axes. Another (maybe simpler) way to rectify the loss of origin
+   information is to use application SETORIGIN to restore the pixel
+   origin, and then use WCSCOPY, accepting the default null value for
+   the parameter TR.
+2 Notes
+-  It is not necessary to use this application after running
+KAPPA applications such as ROTATE or PIXDUPE, since all KAPPA
+applications which produce a linear transformation in pixel
+co-ordinates correctly copy WCS information from input to output.
+
+-  An error is reported if the transformation supplied using parameter
+TR is singular.
+
+-  The pixel with pixel index I spans a range of pixel co-ordinate
+from (I - 1.0) to (I).
+
+-  The pixel indices of the bottom left pixel in an NDF is called
+the "pixel origin" of the NDF, and can take any value. The pixel
+origin can be examined using application NDFTRACE and set using
+application SETORIGIN. WCSCOPY takes account of the pixel origins in
+the two NDFs when modifying the WCS component. Thus, if a null
+value is given for parameter TR, the supplied WCS component may still
+be modified if the two NDFs have different pixel origins.
+2 Related_Applications
+   KAPPA: NDFTRACE, WCSFRAME, WCSREMOVE, WCSADD, WCSATTRIB
+2 Authors
+DSB: David Berry (STARLINK)
+2 History
+ 13-AUG-1998 (DSB):
+    Original version.
+1 WCSFRAME
+Change the current co-ordinate Frame in the WCS component of an NDF.
+
+Usage:
+
+   wcsframe ndf frame epoch
+
+Description:
+
+   This application displays the current co-ordinate Frame associated
+   with an NDF and then allows the user to specify a new Frame. The
+   current co-ordinate Frame determines the co-ordinate system in
+   which positions within the NDF will be expressed when communicating
+   with the user.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 EPOCH
+EPOCH = _DOUBLE (Read)
+   If a "Sky Co-ordinate System" specification is supplied (using
+   parameter FRAME) for a celestial co-ordinate system, then an epoch
+   value is needed to qualify it. This is the epoch at which the
+   supplied sky positions were determined. It should be given as a
+   decimal years value, with or without decimal places  ("1996.8" for
+   example). Such values are interpreted as a Besselian epoch if less
+   than 1984.0 and as a Julian epoch otherwise.
+3 FRAME
+FRAME = LITERAL (Read)
+   A string specifying the new co-ordinate Frame. If a null parameter
+   value is supplied, then the current Frame is left unchanged. The
+   string can be one of the following:
+
+   - A domain name such as SKY, AXIS, PIXEL, etc. The two
+   "pseudo-domains" WORLD and DATA may be supplied and will be
+   translated into PIXEL and AXIS respectively, so long as the WCS
+   component of the NDF does not contain Frames with these domains.
+
+   - An integer value giving the index of the required Frame within
+   the WCS component.
+
+   - A "Sky Co-ordinate System" (SCS) value such as EQUAT(J2000) (see
+   section "Sky Co-ordinate Systems" in SUN/95).
+3 NDF
+NDF = NDF (Read and Write)
+   The NDF data structure in which the current co-ordinate Frame is to
+   be modified.
+2 Examples
+wcsframe m51 pixel
+   This chooses pixel co-ordinates for the current co-ordinate
+   Frame in the NDF m51.
+
+wcsframe m51 sky
+   This chooses celestial co-ordinates for the current co-ordinate
+   Frame in the NDF m51. The specific celestial co-ordinate system
+   will depend on the contents of the WCS component of the NDF.
+
+wcsframe m51 equ(J2000) epoch=1998.2
+   This chooses equatorial (RA/DEC) co-ordinates referred to the
+   equinox at Julian epoch 2000.0 for the current co-ordinate
+   Frame in the NDF m51. The positions were determined at the
+   Julian epoch 1998.2 (this is needed to correct positions for
+   the fictitious proper motions which may be introduced when
+   converting between different celestial co-ordinate systems).
+
+wcsframe m51 2
+   This chooses the second co-ordinate Frame in the WCS component
+   of the NDF.
+
+wcsframe m51 data
+   This chooses a co-ordinate Frame with domain DATA if one exists,
+   or the AXIS co-ordinate Frame otherwise.
+
+wcsframe m51 world
+   This chooses a co-ordinate Frame with domain WORLD if one exists,
+   or the PIXEL co-ordinate Frame otherwise.
+2 Notes
+-  The current co-ordinate Frame in the supplied NDF is not displayed
+if a value is assigned to parameter FRAME on the command line.
+
+-  This routine may add a new co-ordinate Frame into the WCS component
+of the NDF.
+
+-  The NDFTRACE command can be used to examine the co-ordinate
+Frames in the WCS component of an NDF.
+2 Related_Applications
+   KAPPA: NDFTRACE, WCSREMOVE, WCSCOPY, WCSATTRIB
+2 Authors
+DSB: David Berry (STARLINK)
+2 History
+ 13-AUG-1998 (DSB):
+    Original version.
+1 WCSREMOVE
+Remove co-ordinate Frames from the WCS component of an NDF.
+
+Usage:
+
+   wcsremove ndf frames
+
+Description:
+
+   This application allows you to remove one or more co-ordinate Frames
+   from the WCS component in an NDF. The indices of any remaining Frames
+   are "shuffled down" to fill the gaps left by the removed Frames.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 FRAMES
+FRAMES()  = LITERAL (Read
+   The list of the indices (within the WCS component of the supplied NDF)
+   of the Frames to be removed. Any indices outside the range of the
+   available Frames are ignored. Single Frames or a set of adjacent
+   Frames may be specified, e.g. typing [4,6-9,12,14-16] will remove
+   Frames 4,6,7,8,9,12,14,15,16. (Note that the brackets are required to
+   distinguish this array of characters from a single string including
+   commas.  The brackets are unnecessary when there only one item.) If
+   you wish to remove all the files enter the wildcard *. 5-* will
+   remove from 5 to the last Frame.
+3 NDF
+NDF = NDF (Read and Write)
+   The NDF data structure.
+2 Examples
+wcsremove m51 "3-5"
+   This removes Frames 3, 4 and 5 from the NDF "m51". Any remaining
+   Frames with indices higher than 5 will be re-numbered to fill the
+   gaps left by the removed Frames (i.e. the original Frame 6 will
+   become Frame 3, etc).
+2 Notes
+- The Frames within the WCS component of an NDF may be examined
+using application NDFTRACE.
+2 Related_Applications
+   KAPPA: NDFTRACE, WCSADD, WCSFRAME, WCSATTRIB, WCSCOPY
+2 Authors
+DSB: David Berry (STARLINK)
+2 History
+ 2-APR-1998 (DSB):
+    Original version.
 1 WIENER
 Applies a Wiener filter to a 1- or 2-dimensional array.
 
