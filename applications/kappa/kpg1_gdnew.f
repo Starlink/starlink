@@ -122,6 +122,8 @@
 *     26-OCT-1999 (DSB):
 *        Modified to make margin and picture sizes relative to the
 *        original current picture rather than the new DATA picture.
+*     10-AUG-2000 (DSB):
+*        Modified to allow negative margins.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -192,6 +194,11 @@
       REAL PYI                   ! Height of ancillary picture in inches
       REAL PYT                   ! Y at top of ancillary picture in inches
       REAL SASP                  ! Aspect ratio of available space
+      REAL SHIFT                 ! Shift required to centralise the area
+      REAL SXL                   ! X at left of ancillary pictures in inches
+      REAL SXR                   ! X at right of ancillary pictures in inches
+      REAL SYB                   ! Y at bottom of ancillary pictures in inches
+      REAL SYT                   ! Y at top of ancillary pictures in inches
       REAL SZHP                  ! Total normalised height of horizontal pic.s
       REAL SZVP                  ! Total normalised width of vertical pic.s
 *.
@@ -327,33 +334,60 @@
 
       END IF
 
-*  Get the bounds of the FRAME picture which encloses all the other
-*  pictures. To begin with, set the FRAME bounds equal to the DATA bounds.
-      FXL = DXL
-      FXR = DXR
-      FYB = DYB
-      FYT = DYT
+*  Get the bounds of the area enclosing the ancillary pictures. To begin with, 
+*  set the area bounds equal to the DATA picture bounds.
+      SXL = DXL
+      SXR = DXR
+      SYB = DYB
+      SYT = DYT
 
 *  Now add on the margins.
-      FYB = FYB - MARGIN( 1 )*CYI
-      FXR = FXR + MARGIN( 2 )*CXI
-      FYT = FYT + MARGIN( 3 )*CYI
-      FXL = FXL - MARGIN( 4 )*CXI
+      SYB = SYB - MARGIN( 1 )*CYI
+      SXR = SXR + MARGIN( 2 )*CXI
+      SYT = SYT + MARGIN( 3 )*CYI
+      SXL = SXL - MARGIN( 4 )*CXI
 
 *  Now add on each of the extra pictures.
       DO I = 1, NP, -1
 
          IF( PSIDE( I ) .EQ. 'L' ) THEN
-            FXL = FXL - ABS( PSIZE( I )*CXI ) 
+            SXL = SXL - ABS( PSIZE( I )*CXI ) 
          ELSE IF( PSIDE( I ) .EQ. 'R' ) THEN
-            FXR = FXR + ABS( PSIZE( I )*CXI )
+            SXR = SXR + ABS( PSIZE( I )*CXI )
          ELSE IF( PSIDE( I ) .EQ. 'T' ) THEN
-            FYT = FYT + ABS( PSIZE( I )*CYI )
+            SYT = SYT + ABS( PSIZE( I )*CYI )
          ELSE 
-            FYB = FYB - ABS( PSIZE( I )*CYI )
+            SYB = SYB - ABS( PSIZE( I )*CYI )
          END IF
 
       END DO
+
+*  These are the outer bounds of the outer ancillary pictures. If there
+*  are any large negative margins, it is possible for the DATA picture
+*  to extend outside the ancillary pictures. The FRAME picture needs to 
+*  enclose the DATA picture in all cases. 
+      FXL = MIN( DXL, SXL )
+      FXR = MAX( DXR, SXR )
+      FYB = MIN( DYB, SYB )
+      FYT = MAX( DYT, SYT )
+
+*  Now modify all bounds to centre the FRAME picture within the current
+*  picture.
+      SHIFT = 0.5*( ( FXR + FXL ) - ( CXR + CXL ) )
+      DXL = DXL - SHIFT
+      DXR = DXR - SHIFT
+      FXL = FXL - SHIFT
+      FXR = FXR - SHIFT
+      SXL = SXL - SHIFT
+      SXR = SXR - SHIFT
+
+      SHIFT = 0.5*( ( FYT + FYB ) - ( CYT + CYB ) )
+      DYB = DYB - SHIFT
+      DYT = DYT - SHIFT
+      FYB = FYB - SHIFT
+      FYT = FYT - SHIFT
+      SYB = SYB - SHIFT
+      SYT = SYT - SHIFT
 
 *  Ensure the FRAME picture does not extend beyond the current picture.
       FXL = MAX( CXL + 0.001, FXL )
@@ -361,10 +395,17 @@
       FYB = MAX( CYB + 0.001, FYB )
       FYT = MIN( CYT - 0.001, FYT )
 
-*  Store this areas as a FRAME picture, but only if the FRAME picture 
-*  would contain something other than the DATA picture. This is
-*  assumed to be so if any ancillary pictures are being created, or if the 
-*  margins around the DATA picture are not zero.
+*  Ensure the area enclosing the ancillary pictures does not extend beyond 
+*  the current picture.
+      SXL = MAX( CXL + 0.001, SXL )
+      SXR = MIN( CXR - 0.001, SXR )
+      SYB = MAX( CYB + 0.001, SYB )
+      SYT = MIN( CYT - 0.001, SYT )
+
+*  Store the FRAME picture, but only if the FRAME picture would contain 
+*  something other than the DATA picture. This is assumed to be so if 
+*  any ancillary pictures are being created, or if the margins around the 
+*  DATA picture are positive.
       IF( NP .GT. 0 .OR. MARGIN( 1 ) .GT. 0.0 .OR. 
      :    MARGIN( 2 ) .GT. 0.0 .OR. MARGIN( 3 ) .GT. 0.0 .OR.
      :    MARGIN( 4 ) .GT. 0.0 ) THEN
@@ -385,40 +426,40 @@
       END IF
 
 *  Now go round and create the ancillary pictures in reverse order. 
-*  Initiallay the entire FRAME picture is available.
+*  Initially the entire area found above is available.
       DO I = NP, 1, -1
 
          IF( PSIDE( I ) .EQ. 'L' ) THEN
-            PXL = FXL
-            PXR = MIN( FXR, FXL + ABS( PSIZE( I )*CXI ) )
-            PYB = FYB 
-            PYT = FYT
+            PXL = SXL
+            PXR = MIN( SXR, SXL + ABS( PSIZE( I )*CXI ) )
+            PYB = SYB 
+            PYT = SYT
 
-            FXL = PXR
+            SXL = PXR
 
          ELSE IF( PSIDE( I ) .EQ. 'R' ) THEN
-            PXL = MAX( FXL, FXR - ABS( PSIZE( I )*CXI ) )
-            PXR = FXR
-            PYB = FYB 
-            PYT = FYT
+            PXL = MAX( SXL, SXR - ABS( PSIZE( I )*CXI ) )
+            PXR = SXR
+            PYB = SYB 
+            PYT = SYT
 
-            FXR = PXL
+            SXR = PXL
 
          ELSE IF( PSIDE( I ) .EQ. 'T' ) THEN
-            PXL = FXL
-            PXR = FXR
-            PYB = MAX( FYB, FYT - ABS( PSIZE( I )*CYI ) )
-            PYT = FYT
+            PXL = SXL
+            PXR = SXR
+            PYB = MAX( SYB, SYT - ABS( PSIZE( I )*CYI ) )
+            PYT = SYT
 
-            FYT = PYB
+            SYT = PYB
 
          ELSE 
-            PXL = FXL
-            PXR = FXR
-            PYB = FYB
-            PYT = MIN( FYT, FYB + ABS( PSIZE( I )*CYI ) )
+            PXL = SXL
+            PXR = SXR
+            PYB = SYB
+            PYT = MIN( SYT, SYB + ABS( PSIZE( I )*CYI ) )
 
-            FYB = PYT
+            SYB = PYT
 
          END IF
 
