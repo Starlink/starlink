@@ -80,6 +80,10 @@
 
             ENDIF
 
+          ELSE
+
+            PATH=BUFF
+
           ENDIF
 
 *  return length of final string
