@@ -18,7 +18,10 @@ dnl   the STARLINK variable (because of the way that m4/autoconf moves
 dnl   text around, it's generally unreliable to have variables in this
 dnl   macro).  If you wish to relocate this starconf package to match
 dnl   STARLINK, do so with --prefix=$STARLINK/buildsupport
-AC_PREFIX_DEFAULT(/star/buildsupport)
+AC_PREFIX_DEFAULT(/star)
+dnl   ...but put the share files into a non-standard directory, along with the
+dnl   other buildsupport tools
+datadir=`echo $datadir | sed s,share,buildsupport/share,`
 
 
 dnl   Specify the default location of a currently installed Starlink
@@ -85,8 +88,9 @@ dnl   Note that the make-starconf.in file is _not_ to be
 dnl   substituted by this command -- since it involves the
 dnl   installation directory variables, it should have them replaced
 dnl   at `make' time, not configure time.  See Makefile.am for details.
-AC_CONFIG_FILES(Makefile starconf.m4 Makefile.starconf bootstrap.installed)
+AC_CONFIG_FILES(Makefile starconf.m4 bootstrap.installed)
 AC_CONFIG_FILES(java/Makefile)
+AC_CONFIG_FILES(starconf-finder, [chmod +x starconf-finder])
 AC_CONFIG_FILES(starconf-validate, [chmod +x starconf-validate])
 
 

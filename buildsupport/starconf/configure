@@ -275,7 +275,7 @@ PACKAGE_STRING='starconf 1.0-5'
 PACKAGE_BUGREPORT='ussc@star.rl.ac.uk'
 
 ac_unique_file="starconf.m4.in"
-ac_default_prefix=/star/buildsupport
+ac_default_prefix=/star
 ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO AMTAR install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot STARCONF_DEFAULT_STARLINK STARCONF_DEFAULT_PREFIX STAR_MANIFEST_DIR LN_S PERL JAVAC PACKAGE_VERSIONINT LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
@@ -1688,6 +1688,7 @@ INSTALL_STRIP_PROGRAM="\${SHELL} \$(install_sh) -c -s"
 
 
 
+datadir=`echo $datadir | sed s,share,buildsupport/share,`
 
 
 
@@ -1898,9 +1899,11 @@ PACKAGE_VERSIONINT=`echo $PACKAGE_VERSION | sed 's/[^0-9][^0-9]*/ /g' | awk '{pr
 
 
 
-                                        ac_config_files="$ac_config_files Makefile starconf.m4 Makefile.starconf bootstrap.installed"
+                                        ac_config_files="$ac_config_files Makefile Makefile.starconf starconf.m4 bootstrap.installed"
 
           ac_config_files="$ac_config_files java/Makefile"
+
+          ac_config_files="$ac_config_files starconf-finder"
 
           ac_config_files="$ac_config_files starconf-validate"
 
@@ -2458,10 +2461,11 @@ do
   case "$ac_config_target" in
   # Handling of arguments.
   "Makefile" ) CONFIG_FILES="$CONFIG_FILES Makefile" ;;
-  "starconf.m4" ) CONFIG_FILES="$CONFIG_FILES starconf.m4" ;;
   "Makefile.starconf" ) CONFIG_FILES="$CONFIG_FILES Makefile.starconf" ;;
+  "starconf.m4" ) CONFIG_FILES="$CONFIG_FILES starconf.m4" ;;
   "bootstrap.installed" ) CONFIG_FILES="$CONFIG_FILES bootstrap.installed" ;;
   "java/Makefile" ) CONFIG_FILES="$CONFIG_FILES java/Makefile" ;;
+  "starconf-finder" ) CONFIG_FILES="$CONFIG_FILES starconf-finder" ;;
   "starconf-validate" ) CONFIG_FILES="$CONFIG_FILES starconf-validate" ;;
   *) { { echo "$as_me:$LINENO: error: invalid argument: $ac_config_target" >&5
 echo "$as_me: error: invalid argument: $ac_config_target" >&2;}
@@ -2813,6 +2817,7 @@ s,@INSTALL@,$ac_INSTALL,;t t
 
   # Run the commands associated with the file.
   case $ac_file in
+    starconf-finder ) chmod +x starconf-finder ;;
     starconf-validate ) chmod +x starconf-validate ;;
   esac
 done
