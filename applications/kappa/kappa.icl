@@ -17,7 +17,8 @@
 {     help about KAPPA.
 {
 {  Authors:
-{     Malcolm J. Currie (STARLINK)
+{     MJC: Malcolm J. Currie (STARLINK)
+{     DSB: David S. Berry (STARLINK)
 {     {enter_new_authors_here}
 {
 {  History:
@@ -43,6 +44,9 @@
 {        Inserted DRAWSIG, FITSMOD, FITSEXIST, FITSVAL, FITSWRITE,
 {        KSTEST, and SUBSTITUTE.  Also withdrew BLINK, IDUNZOOM,
 {        IDVISIBLE.
+{     7-OCT-1998 (DSB):
+{        Added PROFILE, LISTSHOW, LISTMAKE, WCSALIGN, WCSADD, WCSATTRIB, 
+{        WCSCOPY, WCSFRAME and WCSREMOVE for V0.13.
 {     {enter_further_changes_here}
 {
 {  Bugs:
@@ -88,9 +92,10 @@ define   glob(als)  $KAPPA_DIR/kappa_mon
 define   hista(t)   $KAPPA_DIR/kappa_mon
 define   histe(q)   $KAPPA_DIR/kappa_mon
 define   histo(gram) $KAPPA_DIR/kappa_mon
-defstring kaph(elp) !$KAPPA_DIR/kaphelp
 define   kste(st)   $KAPPA_DIR/kappa_mon
 define   lapl(ace)  $KAPPA_DIR/kappa_mon
+define   listmake   $KAPPA_DIR/kappa_mon
+define   listshow   $KAPPA_DIR/kappa_mon
 define   log1(0)    $KAPPA_DIR/kappa_mon
 define   loga(r)    $KAPPA_DIR/kappa_mon
 define   loge       $KAPPA_DIR/kappa_mon
@@ -108,13 +113,12 @@ define   nogl(obals) $KAPPA_DIR/kappa_mon
 define   noma(gic)  $KAPPA_DIR/kappa_mon
 define   norm(alize) $KAPPA_DIR/kappa_mon
 define   numb       $KAPPA_DIR/kappa_mon
-defstring numba  print NUMBA has been withdrawn.  Use NUMB.
 define   outs(et)   $KAPPA_DIR/kappa_mon
 define   parg(et)   $KAPPA_DIR/kappa_mon
 define   past(e)    $KAPPA_DIR/kappa_mon
-defstring pick2(d) print PICK2D has been superseded by NDFCOPY and SETBOUND
 define   pixd(upe)  $KAPPA_DIR/kappa_mon
 define   pow        $KAPPA_DIR/kappa_mon
+define   profile    $KAPPA_DIR/kappa_mon
 define   psf        $KAPPA_DIR/kappa_mon
 define   quil(t)    $KAPPA_DIR/kappa_mon
 define   rift       $KAPPA_DIR/kappa_mon
@@ -123,16 +127,14 @@ define   segm(ent)  $KAPPA_DIR/kappa_mon
 define   setma(gic) $KAPPA_DIR/kappa_mon
 define   shad(ow)   $KAPPA_DIR/kappa_mon
 define   shif(t)    $KAPPA_DIR/kappa_mon slide
-define   slid(e)    $KAPPA_DIR/kappa_mon
 define   shod(ev)   $KAPPA_DIR/kappa_mon gdnames
+define   slid(e)    $KAPPA_DIR/kappa_mon
 define   sqor(st)   $KAPPA_DIR/kappa_mon
 define   stats      $KAPPA_DIR/kappa_mon
-defstring stats2(d) print STATS2D has been superseded by STATS
 define   sub        $KAPPA_DIR/kappa_mon
 define   subs(titute) $KAPPA_DIR/kappa_mon
 define   surf(it)   $KAPPA_DIR/kappa_mon
 define   thre(sh)   $KAPPA_DIR/kappa_mon
-defstring thresh0  print THRESH0 has been withdrawn.  Use THRESH.
 define   trand(at)  $KAPPA_DIR/kappa_mon
 define   trani(nvert) $KAPPA_DIR/kappa_mon
 define   tranj(oin)  $KAPPA_DIR/kappa_mon
@@ -140,8 +142,15 @@ define   tranm(ake)  $KAPPA_DIR/kappa_mon
 define   trans(former) $KAPPA_DIR/kappa_mon
 define   trant(race) $KAPPA_DIR/kappa_mon
 define   trig       $KAPPA_DIR/kappa_mon
+define   wcsalign   $KAPPA_DIR/kappa_mon
 define   wien(er)   $KAPPA_DIR/kappa_mon
 define   zapl(in)   $KAPPA_DIR/kappa_mon
+
+defstring kaph(elp) !$KAPPA_DIR/kaphelp
+defstring numba  print NUMBA has been withdrawn.  Use NUMB.
+defstring pick2(d) print PICK2D has been superseded by NDFCOPY and SETBOUND
+defstring stats2(d) print STATS2D has been superseded by STATS
+defstring thresh0  print THRESH0 has been withdrawn.  Use THRESH.
 
 { Define KAPVIEW commands, including aliases for the now non-existent ones.
 { Use the monolith.
@@ -205,14 +214,12 @@ define   axla(bel)  $KAPPA_DIR/ndfpack_mon
 define   axun(its)  $KAPPA_DIR/ndfpack_mon
 define   eras(e)    $KAPPA_DIR/ndfpack_mon
 define   fitsd(in)  $KAPPA_DIR/ndfpack_mon
-defstring fitsed(it) !$KAPPA_DIR/fitsedit.csh
 define   fitsexp    $KAPPA_DIR/ndfpack_mon
-defstring fitsh(ead) !$KAPPA_DIR/fitshead.csh
 define   fitsim(p)  $KAPPA_DIR/ndfpack_mon
 define   fitsin     $KAPPA_DIR/ndfpack_mon
 define   fitsl(ist) $KAPPA_DIR/ndfpack_mon
-define   fitst(ext) $KAPPA_DIR/ndfpack_mon
 define   fitsm(od)  $KAPPA_DIR/ndfpack_mon
+define   fitst(ext) $KAPPA_DIR/ndfpack_mon
 define   hisc(om)   $KAPPA_DIR/ndfpack_mon
 define   hisl(ist)  $KAPPA_DIR/ndfpack_mon
 define   hiss(et)   $KAPPA_DIR/ndfpack_mon
@@ -232,6 +239,15 @@ define   setti(tle) $KAPPA_DIR/ndfpack_mon
 define   setty(pe)  $KAPPA_DIR/ndfpack_mon
 define   setu(nits) $KAPPA_DIR/ndfpack_mon
 define   setv(ar)   $KAPPA_DIR/ndfpack_mon
+define   wcsadd     $KAPPA_DIR/ndfpack_mon
+define   wcsattrib  $KAPPA_DIR/ndfpack_mon
+define   wcscopy    $KAPPA_DIR/ndfpack_mon
+define   wcsframe   $KAPPA_DIR/ndfpack_mon
+define   wcsremove  $KAPPA_DIR/ndfpack_mon
+
+defstring fitsed(it) !$KAPPA_DIR/fitsedit.csh
+defstring fitsh(ead) !$KAPPA_DIR/fitshead.csh
+
 
 { Define KAPPA's ICL procedures
 set nosave
@@ -277,7 +293,6 @@ defhelp  cdiv       $KAPPA_HELP
 defhelp  centroid   $KAPPA_HELP
 defhelp  chpix      $KAPPA_HELP
 defhelp  cmult      $KAPPA_HELP
-{defhelp  columnar   $KAPPA_HELP
 defhelp  compadd    $KAPPA_HELP
 defhelp  compave    $KAPPA_HELP
 defhelp  compick    $KAPPA_HELP
@@ -290,8 +305,8 @@ defhelp  csub       $KAPPA_HELP
 defhelp  cursor     $KAPPA_HELP
 defhelp  defpic     $KAPPA_HELP picdef
 defhelp  display    $KAPPA_HELP
-defhelp  drawsig    $KAPPA_HELP
 defhelp  div        $KAPPA_HELP
+defhelp  drawsig    $KAPPA_HELP
 defhelp  elprof     $KAPPA_HELP
 defhelp  erase      $KAPPA_HELP
 defhelp  errclip    $KAPPA_HELP
@@ -308,8 +323,8 @@ defhelp  fitsimp    $KAPPA_HELP
 defhelp  fitsin     $KAPPA_HELP
 defhelp  fitslist   $KAPPA_HELP
 defhelp  fitsmod    $KAPPA_HELP
-defhelp  fitsurface $KAPPA_HELP
 defhelp  fitstext   $KAPPA_HELP
+defhelp  fitsurface $KAPPA_HELP
 defhelp  flip       $KAPPA_HELP
 defhelp  fourier    $KAPPA_HELP
 defhelp  gausmooth  $KAPPA_HELP
@@ -317,10 +332,9 @@ defhelp  gdclear    $KAPPA_HELP
 defhelp  gdnames    $KAPPA_HELP
 defhelp  gdset      $KAPPA_HELP
 defhelp  gdstate    $KAPPA_HELP
-defhelp  globals    $KAPPA_HELP
 defhelp  glitch     $KAPPA_HELP
+defhelp  globals    $KAPPA_HELP
 defhelp  greyplot   $KAPPA_HELP
-{defhelp  hide       $KAPPA_HELP
 defhelp  hiscom     $KAPPA_HELP
 defhelp  hislist    $KAPPA_HELP
 defhelp  hisset     $KAPPA_HELP
@@ -340,6 +354,8 @@ defhelp  kappa      $KAPPA_HELP 0
 defhelp  kstest     $KAPPA_HELP
 defhelp  laplace    $KAPPA_HELP
 defhelp  linplot    $KAPPA_HELP
+defhelp  listmake   $KAPPA_HELP
+defhelp  listshow   $KAPPA_HELP
 defhelp  log10      $KAPPA_HELP
 defhelp  logar      $KAPPA_HELP
 defhelp  loge       $KAPPA_HELP
@@ -401,6 +417,7 @@ defhelp  pictrans   $KAPPA_HELP
 defhelp  picvis     $KAPPA_HELP
 defhelp  pixdupe    $KAPPA_HELP
 defhelp  pow        $KAPPA_HELP
+defhelp  profile    $KAPPA_HELP
 defhelp  psf        $KAPPA_HELP
 defhelp  quilt      $KAPPA_HELP
 defhelp  rift       $KAPPA_HELP
@@ -422,8 +439,8 @@ defhelp  setunits   $KAPPA_HELP
 defhelp  setvar     $KAPPA_HELP
 defhelp  shadow     $KAPPA_HELP
 defhelp  shift      $KAPPA_HELP slide
-defhelp  slide      $KAPPA_HELP
 defhelp  shodev     $KAPPA_HELP gdnames
+defhelp  slide      $KAPPA_HELP
 defhelp  snapshot   $KAPPA_HELP
 defhelp  sqorst     $KAPPA_HELP
 defhelp  stats      $KAPPA_HELP
@@ -431,6 +448,7 @@ defhelp  sub        $KAPPA_HELP
 defhelp  substitute $KAPPA_HELP
 defhelp  surfit     $KAPPA_HELP
 defhelp  thresh     $KAPPA_HELP
+defhelp  trandat    $KAPPA_HELP
 defhelp  trandat    $KAPPA_HELP
 defhelp  traninvert $KAPPA_HELP
 defhelp  tranjoin   $KAPPA_HELP
@@ -440,10 +458,18 @@ defhelp  trantrace  $KAPPA_HELP
 defhelp  trig       $KAPPA_HELP
 defhelp  turbocont  $KAPPA_HELP
 defhelp  tweak      $KAPPA_HELP
-defhelp  trandat    $KAPPA_HELP
 defhelp  vecplot    $KAPPA_HELP
+defhelp  wcsadd     $KAPPA_HELP
+defhelp  wcsalign   $KAPPA_HELP
+defhelp  wcsattrib  $KAPPA_HELP
+defhelp  wcscopy    $KAPPA_HELP
+defhelp  wcsframe   $KAPPA_HELP
+defhelp  wcsremove  $KAPPA_HELP
 defhelp  wiener     $KAPPA_HELP
 defhelp  zaplin     $KAPPA_HELP
+
+{defhelp  columnar   $KAPPA_HELP
+{defhelp  hide       $KAPPA_HELP
 
 { Define help for synonyms.
 defhelp  fitsexist  $KAPPA_HELP
@@ -480,8 +506,8 @@ define   kap_errc(lip)  $KAPPA_DIR/kappa_mon errclip
 define   kap_exp1(0)    $KAPPA_DIR/kappa_mon exp10
 define   kap_expe       $KAPPA_DIR/kappa_mon expe
 define   kap_expo(n)    $KAPPA_DIR/kappa_mon expon
-define   kap_fill(bad)  $KAPPA_DIR/kappa_mon fillbad
 define   kap_ffcl(ean)  $KAPPA_DIR/kappa_mon ffclean
+define   kap_fill(bad)  $KAPPA_DIR/kappa_mon fillbad
 define   kap_fitsu(rface) $KAPPA_DIR/kappa_mon fitsurface
 define   kap_flip       $KAPPA_DIR/kappa_mon flip
 define   kap_four(ier)  $KAPPA_DIR/kappa_mon fourier
@@ -491,9 +517,10 @@ define   kap_glob(als)  $KAPPA_DIR/kappa_mon globals
 define   kap_hista(t)   $KAPPA_DIR/kappa_mon histat
 define   kap_histe(q)   $KAPPA_DIR/kappa_mon histeq
 define   kap_histo(gram) $KAPPA_DIR/kappa_mon histogram
-defstring kap_kaph(elp) !$KAPPA_DIR/kaphelp
 define   kap_kste(st)   $KAPPA_DIR/kappa_mon kstest
 define   kap_lapl(ace)  $KAPPA_DIR/kappa_mon laplace
+define   kap_listmake   $KAPPA_DIR/kappa_mon listmake
+define   kap_listshow   $KAPPA_DIR/kappa_mon listshow
 define   kap_log1(0)    $KAPPA_DIR/kappa_mon log10
 define   kap_loga(r)    $KAPPA_DIR/kappa_mon logar
 define   kap_loge       $KAPPA_DIR/kappa_mon loge
@@ -511,13 +538,12 @@ define   kap_nogl(obals) $KAPPA_DIR/kappa_mon noglobals
 define   kap_noma(gic)  $KAPPA_DIR/kappa_mon nomagic
 define   kap_norm(alize) $KAPPA_DIR/kappa_mon normalize
 define   kap_numb       $KAPPA_DIR/kappa_mon numb
-defstring kap_numba  print NUMBA has been withdrawn.  Use NUMB.
 define   kap_outs(et)   $KAPPA_DIR/kappa_mon outset
 define   kap_parg(et)   $KAPPA_DIR/kappa_mon parget
 define   kap_past(e)    $KAPPA_DIR/kappa_mon paste
-defstring kap_pick2(d) print PICK2D has been superseded by NDFCOPY and SETBOUND
 define   kap_pixd(upe)  $KAPPA_DIR/kappa_mon pixdupe
 define   kap_pow        $KAPPA_DIR/kappa_mon pow
+define   kap_profile    $KAPPA_DIR/kappa_mon profile
 define   kap_psf        $KAPPA_DIR/kappa_mon psf
 define   kap_quil(t)    $KAPPA_DIR/kappa_mon quilt
 define   kap_rift       $KAPPA_DIR/kappa_mon rift
@@ -526,16 +552,14 @@ define   kap_segm(ent)  $KAPPA_DIR/kappa_mon segment
 define   kap_setma(gic) $KAPPA_DIR/kappa_mon setmagic
 define   kap_shad(ow)   $KAPPA_DIR/kappa_mon shadow
 define   kap_shif(t)    $KAPPA_DIR/kappa_mon slide
-define   kap_slid(e)    $KAPPA_DIR/kappa_mon slide
 define   kap_shod(ev)   $KAPPA_DIR/kappa_mon gdnames
+define   kap_slid(e)    $KAPPA_DIR/kappa_mon slide
 define   kap_sqor(st)   $KAPPA_DIR/kappa_mon sqorst
 define   kap_stats      $KAPPA_DIR/kappa_mon stats
-defstring kap_stats2(d) print STATS2D has been superseded by STATS
 define   kap_sub        $KAPPA_DIR/kappa_mon sub
 define   kap_subs(titute) $KAPPA_DIR/kappa_mon substitute
 define   kap_surf(it)   $KAPPA_DIR/kappa_mon surfit
 define   kap_thre(sh)   $KAPPA_DIR/kappa_mon thresh
-defstring kap_thresh0  print THRESH0 has been withdrawn.  Use THRESH.
 define   kap_trand(at)  $KAPPA_DIR/kappa_mon trandat
 define   kap_trani(nvert) $KAPPA_DIR/kappa_mon traninvert
 define   kap_tranj(oin)  $KAPPA_DIR/kappa_mon tranjoin
@@ -543,8 +567,15 @@ define   kap_tranm(ake)  $KAPPA_DIR/kappa_mon tranmake
 define   kap_trans(former) $KAPPA_DIR/kappa_mon transformer
 define   kap_trant(race) $KAPPA_DIR/kappa_mon trantrace
 define   kap_trig       $KAPPA_DIR/kappa_mon trig
+define   kap_wcsalign   $KAPPA_DIR/kappa_mon wcsalign
 define   kap_wien(er)   $KAPPA_DIR/kappa_mon wiener
 define   kap_zapl(in)   $KAPPA_DIR/kappa_mon zaplin
+
+defstring kap_kaph(elp) !$KAPPA_DIR/kaphelp
+defstring kap_numba  print NUMBA has been withdrawn.  Use NUMB.
+defstring kap_pick2(d) print PICK2D has been superseded by NDFCOPY and SETBOUND
+defstring kap_stats2(d) print STATS2D has been superseded by STATS
+defstring kap_thresh0  print THRESH0 has been withdrawn.  Use THRESH.
 
 { Define full commands for KAPVIEW.
 {define   kap_colu(mnar) $KAPPA_DIR/kapview_mon columnar
@@ -607,9 +638,7 @@ define   kap_axla(bel)  $KAPPA_DIR/ndfpack_mon axlabel
 define   kap_axun(its)  $KAPPA_DIR/ndfpack_mon axunits
 define   kap_eras(e)    $KAPPA_DIR/ndfpack_mon erase
 define   kap_fitsd(in)  $KAPPA_DIR/ndfpack_mon fitsdin
-defstring kap_fitsed(it) !$KAPPA_DIR/fitsedit.csh
 define   kap_fitsexp    $KAPPA_DIR/ndfpack_mon fitsexp
-defstring kap_fitsh(ead) !$KAPPA_DIR/fitshead.csh
 define   kap_fitsim(p)  $KAPPA_DIR/ndfpack_mon fitsimp
 define   kap_fitsin     $KAPPA_DIR/ndfpack_mon fitsin
 define   kap_fitsl(ist) $KAPPA_DIR/ndfpack_mon fitslist
@@ -634,6 +663,14 @@ define   kap_setti(tle) $KAPPA_DIR/ndfpack_mon settitle
 define   kap_setty(pe)  $KAPPA_DIR/ndfpack_mon settype
 define   kap_setu(nits) $KAPPA_DIR/ndfpack_mon setunits
 define   kap_setv(ar)   $KAPPA_DIR/ndfpack_mon setvar
+define   kap_wcsadd     $KAPPA_DIR/ndfpack_mon wcsadd
+define   kap_wcsattrib  $KAPPA_DIR/ndfpack_mon wcsattrib
+define   kap_wcscopy    $KAPPA_DIR/ndfpack_mon wcscopy
+define   kap_wcsframe   $KAPPA_DIR/ndfpack_mon wcsframe
+define   kap_wcsremove  $KAPPA_DIR/ndfpack_mon wcsremove
+
+defstring kap_fitsed(it) !$KAPPA_DIR/fitsedit.csh
+defstring kap_fitsh(ead) !$KAPPA_DIR/fitshead.csh
 
 { Define KAPPA's ICL procedures for the full names.
 set nosave
@@ -680,7 +717,6 @@ defhelp  kap_cdiv       $KAPPA_HELP cdiv
 defhelp  kap_centroid   $KAPPA_HELP centroid
 defhelp  kap_chpix      $KAPPA_HELP chpix
 defhelp  kap_cmult      $KAPPA_HELP cmult
-{defhelp  kap_columnar   $KAPPA_HELP columnar
 defhelp  kap_compadd    $KAPPA_HELP compadd
 defhelp  kap_compave    $KAPPA_HELP compave
 defhelp  kap_compick    $KAPPA_HELP compick
@@ -711,8 +747,8 @@ defhelp  kap_fitsimp    $KAPPA_HELP fitsimp
 defhelp  kap_fitsin     $KAPPA_HELP fitsin
 defhelp  kap_fitslist   $KAPPA_HELP fitslist
 defhelp  kap_fitsmod    $KAPPA_HELP fitsmod
-defhelp  kap_fitsurface $KAPPA_HELP fitsurface
 defhelp  kap_fitstext   $KAPPA_HELP fitstext
+defhelp  kap_fitsurface $KAPPA_HELP fitsurface
 defhelp  kap_flip       $KAPPA_HELP flip
 defhelp  kap_fourier    $KAPPA_HELP fourier
 defhelp  kap_gausmooth  $KAPPA_HELP gausmooth
@@ -720,10 +756,9 @@ defhelp  kap_gdclear    $KAPPA_HELP gdclear
 defhelp  kap_gdnames    $KAPPA_HELP gdnames
 defhelp  kap_gdset      $KAPPA_HELP gdset
 defhelp  kap_gdstate    $KAPPA_HELP gdstate
-defhelp  kap_globals    $KAPPA_HELP globals
 defhelp  kap_glitch     $KAPPA_HELP glitch
+defhelp  kap_globals    $KAPPA_HELP globals
 defhelp  kap_greyplot   $KAPPA_HELP greyplot
-{defhelp  kap_hide       $KAPPA_HELP hide
 defhelp  kap_hiscom     $KAPPA_HELP hiscom
 defhelp  kap_hislist    $KAPPA_HELP hislist
 defhelp  kap_hisset     $KAPPA_HELP hisset
@@ -743,6 +778,8 @@ defhelp  kap_kappa      $KAPPA_HELP 0
 defhelp  kap_kstest     $KAPPA_HELP kstest
 defhelp  kap_laplace    $KAPPA_HELP laplace
 defhelp  kap_linplot    $KAPPA_HELP linplot
+defhelp  kap_listmake   $KAPPA_HELP listmake
+defhelp  kap_listshow   $KAPPA_HELP listshow
 defhelp  kap_log10      $KAPPA_HELP log10
 defhelp  kap_logar      $KAPPA_HELP logar
 defhelp  kap_loge       $KAPPA_HELP loge
@@ -806,6 +843,7 @@ defhelp  kap_pictrans   $KAPPA_HELP pictrans
 defhelp  kap_picvis     $KAPPA_HELP picvis
 defhelp  kap_pixdupe    $KAPPA_HELP pixdupe
 defhelp  kap_pow        $KAPPA_HELP pow
+defhelp  kap_profile    $KAPPA_HELP profile
 defhelp  kap_psf        $KAPPA_HELP psf
 defhelp  kap_quilt      $KAPPA_HELP quilt
 defhelp  kap_rift       $KAPPA_HELP rift
@@ -827,8 +865,8 @@ defhelp  kap_setunits   $KAPPA_HELP setunits
 defhelp  kap_setvar     $KAPPA_HELP setvar
 defhelp  kap_shadow     $KAPPA_HELP shadow
 defhelp  kap_shift      $KAPPA_HELP slide
-defhelp  kap_slide      $KAPPA_HELP slide
 defhelp  kap_shodev     $KAPPA_HELP gdnames
+defhelp  kap_slide      $KAPPA_HELP slide
 defhelp  kap_snapshot   $KAPPA_HELP snapshot
 defhelp  kap_sqorst     $KAPPA_HELP sqorst
 defhelp  kap_stats      $KAPPA_HELP stats
@@ -848,8 +886,16 @@ defhelp  kap_trig       $KAPPA_HELP trig
 defhelp  kap_turbocont  $KAPPA_HELP turbocont
 defhelp  kap_tweak      $KAPPA_HELP tweak
 defhelp  kap_vecplot    $KAPPA_HELP vecplot
+defhelp  kap_wcsadd     $KAPPA_HELP wcsadd
+defhelp  kap_wcsalign   $KAPPA_HELP wcsalign
+defhelp  kap_wcsattrib  $KAPPA_HELP wcsattrib
+defhelp  kap_wcsframe   $KAPPA_HELP wcsframe
+defhelp  kap_wcsremove  $KAPPA_HELP wcsremove
 defhelp  kap_wiener     $KAPPA_HELP wiener
 defhelp  kap_zaplin     $KAPPA_HELP zaplin
+
+{defhelp  kap_columnar   $KAPPA_HELP columnar
+{defhelp  kap_hide       $KAPPA_HELP hide
 
 { Define help for full-name synonyms.
 defhelp  kap_fitsexist  $KAPPA_HELP fitsexist

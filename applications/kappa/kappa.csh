@@ -23,7 +23,8 @@
 #     done.
 #
 #  Authors:
-#     Malcolm J. Currie (STARLINK)
+#     MJC: Malcolm J. Currie (STARLINK)
+#     DSB: David S. Berry (STARLINK)
 #     {enter_new_authors_here}
 #
 #  History:
@@ -59,6 +60,9 @@
 #        Inserted DRAWSIG, FITSMOD, FITSEXIST, FITSVAL, FITSWRITE,
 #        KSTEST, and SUBSTITUTE.  Also withdrew BLINK, IDUNZOOM,
 #        IDVISIBLE.
+#     7-OCT-1998 (DSB):
+#        Added PROFILE, LISTSHOW, LISTMAKE, WCSALIGN, WCSADD, WCSATTRIB, 
+#        WCSCOPY, WCSFRAME and WCSREMOVE for V0.13.
 #     {enter_further_changes_here}
 #
 #  Bugs:
@@ -95,6 +99,10 @@ setenv KAPPA_HELP INSTALL_HELP/kappa
 #
 #  Define symbols for each application and script.
 #  ===============================================
+# Cannot alias compress to print a message indicating which command to
+# use now, as it clashes with the UNIX command of the same name.
+#alias columnar  $KAPPA_DIR/columnar
+#alias hide      $KAPPA_DIR/hide
 alias add       $KAPPA_DIR/add
 alias aperadd   $KAPPA_DIR/aperadd
 alias ardgen    $KAPPA_DIR/ardgen
@@ -109,13 +117,10 @@ alias calpol    $KAPPA_DIR/calpol
 alias cdiv      $KAPPA_DIR/cdiv
 alias centroid  $KAPPA_DIR/centroid
 alias chpix     $KAPPA_DIR/chpix
-#alias columnar  $KAPPA_DIR/columnar
 alias cmult     $KAPPA_DIR/cmult
 alias compadd   $KAPPA_DIR/compadd
 alias compave   $KAPPA_DIR/compave
 alias compick   $KAPPA_DIR/compick
-# Cannot alias compress to print a message indicating which command to
-# use now, as it clashes with the UNIX command of the same name.
 alias contour   $KAPPA_DIR/contour
 alias contover  $KAPPA_DIR/contover
 alias convolve  $KAPPA_DIR/convolve
@@ -143,8 +148,8 @@ alias fitsimp   $KAPPA_DIR/fitsimp
 alias fitsin    $KAPPA_DIR/fitsin
 alias fitslist  $KAPPA_DIR/fitslist
 alias fitsmod   $KAPPA_DIR/fitsmod
-alias fitsurface $KAPPA_DIR/fitsurface
 alias fitstext  $KAPPA_DIR/fitstext
+alias fitsurface $KAPPA_DIR/fitsurface
 alias flip      $KAPPA_DIR/flip
 alias fourier   $KAPPA_DIR/fourier
 alias gausmooth $KAPPA_DIR/gausmooth
@@ -155,7 +160,6 @@ alias gdstate   $KAPPA_DIR/gdstate
 alias glitch    $KAPPA_DIR/glitch
 alias globals   $KAPPA_DIR/globals
 alias greyplot  $KAPPA_DIR/greyplot
-#alias hide      $KAPPA_DIR/hide
 alias hiscom    $KAPPA_DIR/hiscom
 alias hislist   $KAPPA_DIR/hislist
 alias hisset    $KAPPA_DIR/hisset
@@ -172,6 +176,8 @@ alias kaphelp   $KAPPA_DIR/kaphelp
 alias kstest    $KAPPA_DIR/kstest
 alias laplace   $KAPPA_DIR/laplace
 alias linplot   $KAPPA_DIR/linplot
+alias listmake  $KAPPA_DIR/listmake
+alias listshow  $KAPPA_DIR/listshow
 alias log10     $KAPPA_DIR/log10
 alias logar     $KAPPA_DIR/logar
 alias loge      $KAPPA_DIR/loge
@@ -223,6 +229,7 @@ alias pictrans  $KAPPA_DIR/pictrans
 alias picvis    $KAPPA_DIR/picvis
 alias pixdupe   $KAPPA_DIR/pixdupe
 alias pow       $KAPPA_DIR/pow
+alias profile   $KAPPA_DIR/profile
 alias psf       $KAPPA_DIR/psf
 alias quilt     $KAPPA_DIR/quilt
 alias rift      $KAPPA_DIR/rift
@@ -263,8 +270,15 @@ alias trig      $KAPPA_DIR/trig
 alias turbocont $KAPPA_DIR/turbocont
 alias tweak     $KAPPA_DIR/tweak
 alias vecplot   $KAPPA_DIR/vecplot
+alias wcsadd    $KAPPA_DIR/wcsadd
+alias wcsalign  $KAPPA_DIR/wcsalign
+alias wcsattrib $KAPPA_DIR/wcsattrib
+alias wcscopy   $KAPPA_DIR/wcscopy
+alias wcsframe  $KAPPA_DIR/wcsframe
+alias wcsremove $KAPPA_DIR/wcsremove
 alias wiener    $KAPPA_DIR/wiener
 alias zaplin    $KAPPA_DIR/zaplin
+
 #
 # Define procedures and commands requiring the above symbols.
 #
@@ -292,6 +306,8 @@ alias picxy       'picdef xy 1.0'
 #
 #  Now repeat for the full command names.
 #
+#alias kap_columnar  $KAPPA_DIR/columnar
+#alias kap_hide      $KAPPA_DIR/hide
 alias kap_add       $KAPPA_DIR/add
 alias kap_aperadd   $KAPPA_DIR/aperadd
 alias kap_ardgen    $KAPPA_DIR/ardgen
@@ -306,7 +322,6 @@ alias kap_calpol    $KAPPA_DIR/calpol
 alias kap_cdiv      $KAPPA_DIR/cdiv
 alias kap_centroid  $KAPPA_DIR/centroid
 alias kap_chpix     $KAPPA_DIR/chpix
-#alias kap_columnar  $KAPPA_DIR/columnar
 alias kap_cmult     $KAPPA_DIR/cmult
 alias kap_compadd   $KAPPA_DIR/compadd
 alias kap_compave   $KAPPA_DIR/compave
@@ -321,8 +336,8 @@ alias kap_csub      $KAPPA_DIR/csub
 alias kap_cursor    $KAPPA_DIR/cursor
 alias kap_defpic    $KAPPA_DIR/picdef
 alias kap_display   $KAPPA_DIR/display
-alias kap_drawsig   $KAPPA_DIR/drawsig
 alias kap_div       $KAPPA_DIR/div
+alias kap_drawsig   $KAPPA_DIR/drawsig
 alias kap_elprof    $KAPPA_DIR/elprof
 alias kap_erase     $KAPPA_DIR/erase
 alias kap_errclip   $KAPPA_DIR/errclip
@@ -339,8 +354,8 @@ alias kap_fitsimp   $KAPPA_DIR/fitsimp
 alias kap_fitsin    $KAPPA_DIR/fitsin
 alias kap_fitslist  $KAPPA_DIR/fitslist
 alias kap_fitsmod   $KAPPA_DIR/fitsmod
-alias kap_fitsurface $KAPPA_DIR/fitsurface
 alias kap_fitstext  $KAPPA_DIR/fitstext
+alias kap_fitsurface $KAPPA_DIR/fitsurface
 alias kap_flip      $KAPPA_DIR/flip
 alias kap_fourier   $KAPPA_DIR/fourier
 alias kap_gausmooth $KAPPA_DIR/gausmooth
@@ -351,7 +366,6 @@ alias kap_gdstate   $KAPPA_DIR/gdstate
 alias kap_glitch    $KAPPA_DIR/glitch
 alias kap_globals   $KAPPA_DIR/globals
 alias kap_greyplot  $KAPPA_DIR/greyplot
-#alias kap_hide      $KAPPA_DIR/hide
 alias kap_hiscom    $KAPPA_DIR/hiscom
 alias kap_hislist   $KAPPA_DIR/hislist
 alias kap_hisset    $KAPPA_DIR/hisset
@@ -368,6 +382,8 @@ alias kap_kaphelp   $KAPPA_DIR/kaphelp
 alias kap_kstest    $KAPPA_DIR/kstest
 alias kap_laplace   $KAPPA_DIR/laplace
 alias kap_linplot   $KAPPA_DIR/linplot
+alias kap_listmake  $KAPPA_DIR/listmake
+alias kap_listshow  $KAPPA_DIR/listshow
 alias kap_log10     $KAPPA_DIR/log10
 alias kap_logar     $KAPPA_DIR/logar
 alias kap_loge      $KAPPA_DIR/loge
@@ -419,6 +435,7 @@ alias kap_pictrans  $KAPPA_DIR/pictrans
 alias kap_picvis    $KAPPA_DIR/picvis
 alias kap_pixdupe   $KAPPA_DIR/pixdupe
 alias kap_pow       $KAPPA_DIR/pow
+alias kap_profile   $KAPPA_DIR/profile
 alias kap_psf       $KAPPA_DIR/psf
 alias kap_quilt     $KAPPA_DIR/quilt
 alias kap_rift      $KAPPA_DIR/rift
@@ -459,8 +476,15 @@ alias kap_trig      $KAPPA_DIR/trig
 alias kap_turbocont $KAPPA_DIR/turbocont
 alias kap_tweak     $KAPPA_DIR/tweak
 alias kap_vecplot   $KAPPA_DIR/vecplot
+alias kap_wcsadd    $KAPPA_DIR/wcsadd
+alias kap_wcsalign  $KAPPA_DIR/wcsalign
+alias kap_wcsattrib $KAPPA_DIR/wcsattrib
+alias kap_wcscopy   $KAPPA_DIR/wcscopy
+alias kap_wcsframe  $KAPPA_DIR/wcsframe
+alias kap_wcsremove $KAPPA_DIR/wcsremove
 alias kap_wiener    $KAPPA_DIR/wiener
 alias kap_zaplin    $KAPPA_DIR/zaplin
+
 #
 # Define procedures and commands requiring the above symbols.
 #

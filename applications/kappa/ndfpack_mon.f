@@ -33,6 +33,7 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie  (STARLINK)
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -40,6 +41,8 @@
 *        Original version.
 *     1997 May 31 (MJC):
 *        Added FITSMOD. V1.1.
+*     7-OCT-1998 (DSB):
+*        Added WCSADD, WCSATTRIB, WCSCOPY, WCSFRAME and WCSREMOVE for V0.13.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -199,6 +202,26 @@
 *  Sets new values for the variance component of an NDF data structure.
       ELSE IF ( NAME .EQ. 'SETVAR' ) THEN
          CALL SETVAR ( STATUS )
+
+*  Add a Frame into the WCS component of an NDF.
+      ELSE IF ( NAME .EQ. 'WCSADD' ) THEN
+         CALL WCSADD ( STATUS )
+
+*  Manage the attributes of the WCS component of an NDF.
+      ELSE IF ( NAME .EQ. 'WCSATTRIB' ) THEN
+         CALL WCSATTRIB ( STATUS )
+
+*  Copy the WCS component from one NDF to another.
+      ELSE IF ( NAME .EQ. 'WCSCOPY' ) THEN
+         CALL WCSCOPY ( STATUS )
+
+*  Chaneg the current co-ordinate Frame in the WCS component of an NDF.
+      ELSE IF ( NAME .EQ. 'WCSFRAME' ) THEN
+         CALL WCSFRAME ( STATUS )
+
+*  Remove Frames from the WCS component of an NDF.
+      ELSE IF ( NAME .EQ. 'WCSREMOVE' ) THEN
+         CALL WCSREMOVE ( STATUS )
 
       ELSE
 

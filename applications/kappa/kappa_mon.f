@@ -33,6 +33,7 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie  (STARLINK)
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -45,6 +46,8 @@
 *        Removed applications now in separate monoliths.
 *     1997 May 31 (MJC):
 *        Added KSTEST and SUBSTITUTE for V0.10.
+*     7-OCT-1998 (DSB):
+*        Added PROFILE LISTSHOW LISTMAKE WCSALIGN for V0.13
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -234,6 +237,14 @@
       ELSE IF ( NAME .EQ. 'LAPLACE' ) THEN
          CALL LAPLACE ( STATUS )
 
+*  Create a positions list.
+      ELSE IF ( NAME .EQ. 'LISTMAKE' ) THEN
+         CALL LISTMAKE ( STATUS )
+
+*  Display a positions list.
+      ELSE IF ( NAME .EQ. 'LISTSHOW' ) THEN
+         CALL LISTSHOW ( STATUS )
+
 *  Takes the base-10 logarithm of each pixel of a data array.
       ELSE IF ( NAME .EQ. 'LOG10' ) THEN
          CALL KAP_LOG10 ( STATUS )
@@ -328,6 +339,10 @@
       ELSE IF ( NAME .EQ. 'POW' ) THEN
          CALL KAP_POW ( STATUS )
 
+*  Create a 1-d profile through an N-d NDF.
+      ELSE IF ( NAME .EQ. 'PROFILE' ) THEN
+         CALL PROFILE ( STATUS )
+
 *  Determines the parameters of a model star profile by fitting
 *  star images in a 2-dimensional NDF.
       ELSE IF ( NAME .EQ. 'PSF' ) THEN
@@ -417,6 +432,10 @@
 *  Performs a trigonometric transformation on a data array.
       ELSE IF ( NAME .EQ. 'TRIG' ) THEN
          CALL TRIG ( STATUS )
+
+*  Align a group of NDFs using the WCS components.
+      ELSE IF ( NAME .EQ. 'WCSALIGN' ) THEN
+         CALL WCSALIGN ( STATUS )
 
 *  Applies a Wiener filter to a 1- or 2-dimensional array.
       ELSE IF ( NAME .EQ. 'WIENER' ) THEN
