@@ -3026,6 +3026,13 @@ test1_wrap.c:
           <title>Importing third-party sources</title>
         </subhead>
 
+        <p><strong>NOTE: this section is subject to change.</strong>
+          It's not yet clear what the best mechanism is for doing this
+          work, because it's not yet clear how general the support
+          should be.  Therefore the autoconf/automake support is likely to
+          change.  The documentation below is almost certain to
+          change.  If you're working on this area, let Norman know.</p>
+
         <p>If an application needs to rely on a non-Starlink
           application, and especially if it relies on a modified
           version, then the sources for that application should be
