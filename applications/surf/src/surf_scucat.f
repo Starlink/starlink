@@ -33,7 +33,7 @@
 *        bolometers to one data point. The program will then ask for another
 *        data set.
 
-*  ADAM parameters:
+*  ADAM Parameters:
 *     IN = NDF (Read)
 *        The input dataset(s). This parameter is requested for repeatedly
 *        until a NULL (!) value is given.
@@ -53,16 +53,19 @@
 *  Implementation status:
 *     Data, Variance and Quality arrays are copied.
 
-*    Authors:
+*  Authors:
 *     TIMJ: Tim Jenness (JACH)
 *     {enter_new_authors_here}
 
-*    History:
+*  History:
 *     $Id$
 *     $Log$
-*     Revision 1.8  1996/11/02 01:24:00  timj
-*     Change Name to SCUCAT (from REDS_SCUCAT)
+*     Revision 1.9  1996/11/02 01:42:34  timj
+*     Fix bug in Author/History header
 *
+c Revision 1.8  1996/11/02  01:24:00  timj
+c Change Name to SCUCAT (from REDS_SCUCAT)
+c
 c Revision 1.7  1996/10/30  20:23:05  timj
 c Add modern STARLINK header.
 c Replace SCULIB_COPY? with VEC_
