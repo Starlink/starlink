@@ -182,6 +182,22 @@ else
     echo
     echo "I was expecting to find file $opfname, but couldn't."
     echo "Something is amiss"
+
+    texmfcnf=`type kpsewhich >/dev/null 2>&1 && kpsewhich cnf texmf.cnf 2>/dev/null`
+    if [ -n "$texmfcnf" ]; then
+	# kpsewhich exists, and found texmf.cnf file.
+	# The following test isn't bulletproof, but should at least
+	# give the user a pointer to the right place in the manual.
+	if grep 'FONTS.*AUTO' $texmfcnf >/dev/null; then
+	    echo ""
+	    echo "Aha!"
+	    echo "I think that your texmf.cnf file ($texmfcnf) may be broken."
+	    echo "See the section on `Not finding fonts' in the manual."
+	    echo "You may have to use the --enable-fake-progname"
+	    echo "configuration option, as described in the manual."
+	fi
+    fi
+
 fi
 
 echo
