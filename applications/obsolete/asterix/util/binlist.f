@@ -1,49 +1,127 @@
-*+  BINLIST - Lists data stored in a 1D binned dataset
       SUBROUTINE BINLIST( STATUS )
-*    Description :
-*    Parameters :
-*
-*     INP = UNIV(R)
-*       NDF to be listed
-*     DEV = CHAR(R)
-*       Ascii output device name
-*
-*    Method :
-*
-*    Deficiencies :
-*    Bugs :
-*    Authors :
-*             (BHVAD::RJV)
-*    History :
-*
-*      1 Jun 89 : V1.0-1 Now indicates where quantities are defaulted (RJV)
-*     29 Oct 91 : V1.5-0 Uses PRS_GETSLICE for slice parse. Doesn't display
-*                        data which doesn't exist. Handles asymmetric data
-*                        and axis errors. (DJA)
-*      3 Mar 94 : V1.7-0 Use sensible format for real numbers (DJA)
-*      4 May 94 : V1.7-1 Use AIO to do i/o (DJA)
-*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
-*     12 Jan 95 : V1.8-1 Updated data interface (DJA)
-*
-*    Type Definitions :
-*
-      IMPLICIT NONE
-*
-*    Global constants :
-*
-      INCLUDE 'SAE_PAR'
+*+
+*  Name:
+*     BINLIST
+
+*  Purpose:
+*     Lists data stored in a 1D binned dataset
+
+*  Language:
+*     Starlink Fortran
+
+*  Type of Module:
+*     ASTERIX task
+
+*  Invocation:
+*     CALL BINLIST( STATUS )
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Description:
+*     {routine_description}
+
+*  Usage:
+*     binlist {parameter_usage}
+
+*  Environment Parameters:
+*     INP = LITERAL (read)
+*        NDF to be listed
+*     DEV = CHAR (read)
+*        Ascii output device name
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
+*     {algorithm_description}...
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  Implementation Status:
+*     {routine_implementation_status}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
+*     {routine_deficiencies}...
+
+*  References:
+*     {task_references}...
+
+*  Keywords:
+*     binlist, usage:public
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1995
+
+*  Authors:
+*     RJV: Bob Vallance (ROSAT, University of Birmingham)
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*      1 Jun 1989 V1.0-1 (RJV):
+*        Now indicates where quantities are defaulted
+*     29 Oct 1991 V1.5-0 (DJA):
+*        Uses PRS_GETSLICE for slice parse. Doesn't display data which
+*        doesn't exist. Handles asymmetric data and axis errors.
+*      3 Mar 1994 V1.7-0 (DJA):
+*        Use sensible format for real numbers
+*      4 May 1994 V1.7-1 (DJA):
+*        Use AIO to do i/o
+*     24 Nov 1994 V1.8-0 (DJA):
+*        Now use USI for user interface
+*     12 Jan 1995 V1.8-1 (DJA):
+*        Updated data interface
+*     30 Aug 1995 V2.0-0 (DJA):
+*        Full ADI port
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'ADI_PAR'
-*
-*    Status :
-*
-      INTEGER STATUS
-*
-*    Functions :
-*
-      INTEGER CHR_LEN
-*
-*    Local variables :
-*
+
+*  Status:
+      INTEGER			STATUS             	! Global status
+
+*  External References:
+      EXTERNAL			CHR_LEN
+        INTEGER			CHR_LEN
+
+*  Local Constants:
+      CHARACTER*30		VERSION
+        PARAMETER		( VERSION = 'BINLIST Version V2.0-0' )
+
+*  Local Variables:
       CHARACTER*132		FILE, PATH
       CHARACTER*20           	SLICE       		! Data slice specification
 
@@ -54,40 +132,40 @@
       INTEGER 			NLEV
       INTEGER			OCH			! Output channel
       INTEGER 			DEFWIDTH                ! Width of output
-      INTEGER 			NDIM            	! Dimensionality of object
-      INTEGER DIMS(ADI__MXDIM)           ! Dimensions of object
-      INTEGER NDUM,DUMS(ADI__MXDIM)
+      INTEGER 			NDIM            	! I/p dimensionality
+      INTEGER 			DIMS(ADI__MXDIM)	! I/p dimensions
       INTEGER RANGES(2,ADI__MXDIM)       ! Ranges of data to be output
       INTEGER DPTR,VPTR,QPTR,APTR,WPTR
 
       LOGICAL                	DOK
-      LOGICAL VOK,AOK,WOK,QOK,AWOK,AEOK
-      LOGICAL DUM
-*
-*    Version id :
-*
-      CHARACTER*30 VERSION
-        PARAMETER (VERSION='BINLIST Version 1.8-1')
-*-
+      LOGICAL VOK,AOK,WOK,QOK,AWOK(2),AEOK(2)
+*.
 
-*    Version id
-      CALL MSG_PRNT(VERSION)
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Initialise
+*  Version id
+      CALL MSG_PRNT( VERSION )
+
+*  Initialise ASTERIX
       CALL AST_INIT()
-      DOK=.FALSE.
 
-*    Input dataset
-      CALL USI_TASSOCI( 'INP', '*', 'READ', FID, STATUS )
+      DOK = .FALSE.
 
-*    Set up output channel
-      CALL AIO_ASSOCO( 'DEV', 'LIST', OCH, DEFWIDTH, STATUS )
+*  Input dataset
+      CALL USI_ASSOC( 'INP', 'BinDS|Array', 'READ', FID, STATUS )
 
-      CALL BDI_CHKDATA(FID,DOK,NDIM,DIMS,STATUS)
+*  Get dimensionality and whether data is ok
+      CALL BDI_GETSHP( FID, ADI__MXDIM, DIMS, NDIM, STATUS )
+      CALL BDI_CHK( FID, 'Data', DOK, STATUS )
 
+*  Must be 1-D
       IF ( DOK.AND. (NDIM.EQ.1) ) THEN
 
-*      Write dataset name
+*    Set up output channel
+        CALL AIO_ASSOCO( 'DEV', 'LIST', OCH, DEFWIDTH, STATUS )
+
+*    Write dataset name
         CALL ADI_FTRACE( FID, NLEV, PATH, FILE, STATUS )
         CALL AIO_BLNK( OCH, STATUS )
         CALL AIO_WRITE( OCH, 'Dataset:-', STATUS )
@@ -95,45 +173,52 @@
         CALL AIO_IWRITE( OCH, 2, FILE(:CHR_LEN(FILE)), STATUS )
         CALL AIO_BLNK( OCH, STATUS )
 
-*      Axis data?
-        CALL BDI_CHKAXVAL( FID,1,AOK,DUM,NDUM,STATUS)
-        CALL BDI_MAPAXVAL( FID, 'READ', 1, APTR, STATUS )
+*    Axis data?
+        CALL BDI_AXCHK( FID, 1, 'Data', AOK, STATUS )
+        CALL BDI_AXMAPR( FID, 1, 'Data', 'READ', APTR, STATUS )
 
-*      Asymmetric axis errors?
-        CALL BDI_CHKXERR( FID, AWOK, DUM, STATUS )
-        IF ( AWOK ) THEN
+*    Asymmetric axis errors?
+        CALL BDI_AXCHK( FID, 1, 'LoWidth,HiWidth', AWOK, STATUS )
+        IF ( AWOK(1) .AND. AWOK(2) ) THEN
           WOK = .FALSE.
-          CALL BDI_MAPXERR( FID,'READ',AWPTR(1),AWPTR(2),STATUS)
+          CALL BDI_AXMAPR( FID, 1, 'LoWidth,HiWidth', 'READ',
+     :                     AWPTR, STATUS )
         ELSE
-          CALL BDI_CHKAXWID(FID,1,WOK,DUM,NDUM,STATUS)
-          CALL BDI_MAPAXWID(FID,'READ',1,WPTR,STATUS)
+          CALL BDI_AXCHK( FID, 1, 'Width', WOK, STATUS )
+          IF ( WOK ) THEN
+            CALL BDI_AXMAPR( FID, 1, 'Width', 'READ', WPTR, STATUS )
+          END IF
         END IF
 
-*      The data
-        CALL BDI_MAPDATA(FID,'READ',DPTR,STATUS)
+*    The data
+        CALL BDI_MAPR( FID, 'Data', 'READ', DPTR, STATUS )
 
-*      Asymmetric data errors?
-        CALL BDI_CHKYERR(FID,AEOK,DUM,STATUS)
-        IF ( AEOK ) THEN
+*    Asymmetric data errors?
+        CALL BDI_CHK( FID, 'LoError,HiError', AEOK, STATUS )
+        IF ( AEOK(1) .AND. AEOK(2) ) THEN
           VOK = .FALSE.
-          CALL BDI_MAPYERR(FID,'READ',AEPTR(1),AEPTR(2),STATUS)
+          CALL BDI_MAPR( FID, 'LoError,HiError', 'READ', AEPTR, STATUS )
 
 *      Otherwise look for variance
         ELSE
-          CALL BDI_CHKVAR(FID,VOK,NDUM,DUMS,STATUS)
-          CALL BDI_MAPVAR(FID,'READ',VPTR,STATUS)
+          CALL BDI_CHK( FID, 'Variance', VOK, STATUS )
+          IF ( VOK ) THEN
+            CALL BDI_MAPR( FID, 'Variance', 'READ', VPTR, STATUS )
+          END IF
 
         END IF
 
-*      Quality
-        CALL BDI_CHKQUAL(FID,QOK,NDUM,DUMS,STATUS)
-        CALL BDI_MAPQUAL(FID,'READ',QPTR,STATUS)
+*    Quality
+        CALL BDI_CHK( FID, 'Quality', QOK, STATUS )
+        IF ( QOK ) THEN
+          CALL BDI_MAP( FID, 'Quality', 'UBYTE', 'READ', QPTR, STATUS )
+        END IF
 
-*      Get slice of dataset
+*    Get slice of dataset
         CALL USI_GET0C( 'SLICE', SLICE, STATUS )
         CALL PRS_GETSLICE( NDIM, DIMS(1), SLICE, RANGES, STATUS )
 
-*      Output the data
+*    Output the data
         CALL BINLIST_OUT( %VAL(DPTR), %VAL(VPTR), VOK, %VAL(AEPTR(1)),
      :                    %VAL(AEPTR(2)), AEOK, %VAL(QPTR), QOK,
      :                    %VAL(AWPTR(1)), %VAL(AWPTR(2)), AWOK,
@@ -141,83 +226,156 @@
      :                                      OCH, DEFWIDTH, STATUS )
 
 
-      ELSE IF (.NOT.DOK) THEN
-        STATUS=SAI__ERROR
+*    Close output channel
+        CALL AIO_CANCL( 'DEV', STATUS )
+
+      ELSE IF ( .NOT. DOK ) THEN
+        STATUS = SAI__ERROR
         CALL ERR_REP(' ','AST_ERR: no data present',STATUS)
 
-      ELSE IF (DOK.AND.NDIM.NE.1) THEN
-        STATUS=SAI__ERROR
+      ELSE IF ( DOK .AND. (NDIM.NE.1) ) THEN
+        STATUS = SAI__ERROR
         CALL ERR_REP(' ','AST_ERR: dataset not 1D',STATUS)
 
       END IF
 
-*    Close output channel
-      CALL AIO_CANCL( 'DEV', STATUS )
-
-*    Close down ASTERIX
+*  Close down ASTERIX
       CALL AST_CLOSE()
-      CALL AST_ERR(STATUS)
+      CALL AST_ERR( STATUS )
 
       END
 
 
 
 
-*+  BINLIST_OUT - Write data values to text file
-      SUBROUTINE BINLIST_OUT(D,V,VOK,AEL,AEU,AEOK,Q,QOK,AWL,AWU,AWOK,A,
-     :           AOK,W,WOK,RANGES,OCH, OUTWIDTH, STATUS )
-*
-*    Description :
-*    Method :
-*
-*    Type Definitions :
-      IMPLICIT NONE
-*    Global constants :
-      INCLUDE 'SAE_PAR'
-*
-*    Import :
-*
-      REAL D(*),V(*), AEL(*), AEU(*)
-      BYTE Q(*)
-      REAL A(*),W(*),AWL(*),AWU(*)
-      LOGICAL VOK,QOK,AOK,WOK,AEOK,AWOK
-      INTEGER RANGES(2)              ! range of data to be output
-      INTEGER 			OCH                    	! Output channel id
-      INTEGER			OUTWIDTH		! Channel width
-*    Import-export :
-*    Export :
-*    Status :
-      INTEGER STATUS
-*    Local Constants :
-      CHARACTER*10 FMT2,FMT3
-      PARAMETER (FMT2='(I6)',
-     &           FMT3='(1PG14.6)')
-      CHARACTER*1 BLANK,KET,DASH,VLIN
-      PARAMETER (BLANK=' ',
-     &           KET='>',
-     &           DASH='-',
-     &           VLIN='|')
-*
-*    Local variables :
-*
-      CHARACTER*80     LINE                          ! Output buffer
+      SUBROUTINE BINLIST_OUT( D, V, VOK, AEL, AEU, AEOK, Q, QOK,
+     :                        AWL, AWU, AWOK, A, AOK, W, WOK,
+     :                        RANGES, OCH, OUTWID, STATUS )
+*+
+*  Name:
+*     BINLIST_OUT
 
-      INTEGER          COL                           ! Column counter
-      INTEGER          ACOL,WCOL,DCOL,VCOL,QCOL      ! Columns for output
-      INTEGER          I                             ! Index to vector component
+*  Purpose:
+*     Write 1-D binned dataset values to text file
+
+*  Language:
+*     Starlink Fortran
+
+*  Invocation:
+*     CALL BINLIST_OUT( [p]... )
+
+*  Description:
+*     {routine_description}
+
+*  Arguments:
+*     {argument_name}[dimensions] = {data_type} ({argument_access_mode})
+*        {argument_description}
+*     OCH = INTEGER (given)
+*        Output channel id
+*     OUTWID = INTEGER (given)
+*        Width of output page
+*     STATUS = INTEGER (given and returned)
+*        The global status.
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
+*     {algorithm_description}...
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
+*     {routine_deficiencies}...
+
+*  References:
+*     {task_references}...
+
+*  Keywords:
+*     binlist, usage:private
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1995
+
+*  Authors:
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*     19 Sep 1995 (DJA):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
 *-
 
-*    Check status
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+
+*  Arguments Given:
+      REAL 			D(*), V(*), AEL(*), AEU(*)
+      REAL 			A(*), W(*), AWL(*), AWU(*)
+      BYTE 			Q(*)
+      LOGICAL 			VOK, QOK, AOK, WOK, AEOK, AWOK
+      INTEGER 			RANGES(2), OCH, OUTWID
+
+*  Status:
+      INTEGER 			STATUS             	! Global status
+
+*  Local Constants:
+      CHARACTER*10 		FMT2,FMT3
+        PARAMETER 		( FMT2='(I6)', FMT3='(1PG14.6)' )
+
+      CHARACTER*1 		BLANK, KET, DASH, VLIN
+        PARAMETER 		( BLANK=' ', KET='>', DASH='-',
+     :                            VLIN='|' )
+
+*  Local Variables:
+      CHARACTER*80     		LINE                	! Output buffer
+
+      INTEGER          		COL                   	! Column counter
+      INTEGER          		ACOL,WCOL,DCOL,VCOL,QCOL ! Columns for output
+      INTEGER          		I                       ! Index to vector component
+*.
+
+*  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*  Print header
       LINE=BLANK
-      CALL CHR_FILL(DASH,LINE(8:OUTWIDTH-1))
-      CALL AIO_WRITE( OCH, LINE(:OUTWIDTH), STATUS )
+      CALL CHR_FILL(DASH,LINE(8:OUTWID-1))
+      CALL AIO_WRITE( OCH, LINE(:OUTWID), STATUS )
       LINE=BLANK
       LINE(7:7)=VLIN
-      LINE(OUTWIDTH:OUTWIDTH)=VLIN
+      LINE(OUTWID:OUTWID)=VLIN
 
-*    Write out headers
+*  Write out headers
       COL = 9
       IF ( AOK ) THEN
         ACOL = COL
@@ -251,15 +409,15 @@
         QCOL=COL
         LINE(QCOL+1:) = 'QUALITY'
       END IF
-      CALL AIO_WRITE( OCH, LINE(:OUTWIDTH), STATUS )
+      CALL AIO_WRITE( OCH, LINE(:OUTWID), STATUS )
 
-*    Loop over data
+*  Loop over data
       DO I = RANGES(1), RANGES(2)
 
-*      Blank the buffer
-        LINE=BLANK
+*    Blank the buffer
+        LINE = BLANK
 
-*      The line number
+*    The line number
         IF (MOD(I,5).EQ.0) THEN
           WRITE(LINE(:6),FMT2) I
           LINE(7:7)=KET
@@ -267,7 +425,7 @@
           LINE(7:7)=VLIN
         END IF
 
-*      Write data to buffer
+*    Write data to buffer
         IF ( AOK) WRITE(LINE(ACOL:),FMT3)  A(I)
         IF ( AWOK ) THEN
           WRITE(LINE(WCOL:),FMT3) AWL(I)
@@ -285,20 +443,21 @@
         END IF
         IF ( QOK) CALL STR_BTOC(Q(I),LINE(QCOL:),STATUS)
 
-*      End vertical bar
-        LINE(OUTWIDTH:OUTWIDTH) = VLIN
+*    End vertical bar
+        LINE(OUTWID:OUTWID) = VLIN
 
-*      Write buffer
-        CALL AIO_WRITE( OCH, LINE(:OUTWIDTH), STATUS )
+*    Write buffer
+        CALL AIO_WRITE( OCH, LINE(:OUTWID), STATUS )
 
+*  Next data point
       END DO
 
-      LINE=BLANK
-      CALL CHR_FILL(DASH,LINE(8:OUTWIDTH-1))
-      CALL AIO_WRITE( OCH, LINE(:OUTWIDTH), STATUS )
+*  Footer
+      LINE = BLANK
+      CALL CHR_FILL(DASH,LINE(8:OUTWID-1))
+      CALL AIO_WRITE( OCH, LINE(:OUTWID), STATUS )
 
-      IF ( STATUS.NE.SAI__OK ) THEN
-        CALL AST_REXIT( 'BINLIST_OUT', STATUS )
-      END IF
+*  Report any errors
+      IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'BINLIST_OUT', STATUS )
 
       END
