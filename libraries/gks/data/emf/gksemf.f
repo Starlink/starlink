@@ -33,7 +33,8 @@
 *     Prologue
 
       OPEN (UNIT = FROM, FILE = SEQN, STATUS = 'OLD', BLANK = 'ZERO')
-      OPEN (UNIT = TO, FILE = RNDM, ACCESS = 'DIRECT', RECL = RECLEN)
+      OPEN (UNIT = TO, FILE = RNDM, ACCESS = 'DIRECT', RECL = RECLEN,
+     :      STATUS = 'UNKNOWN')
 
       INREC = 0
       NREC = 1
