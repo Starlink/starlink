@@ -921,7 +921,7 @@ itcl::class gaia::GaiaContour {
 
 	 set rtdimage {}
 	 #  Remove the existing external image, if not using same file.
-	 if { $image_rtd_ != {} } {
+	 if { $image_rtd_ != {} && [info exists $image_rtd_ ] } {
 	    if { "[$image_rtd_ cget -file]" == "$imagefile_" } {
 	       set rtdimage $image_rtd_
 	    } else {
@@ -932,11 +932,13 @@ itcl::class gaia::GaiaContour {
 	 if { $rtdimage == {} } {
 	    #  Displayed on disk, create an rtdimage and return this.
 	    if {[catch {image create rtdimage -file $imagefile_} rtdimage] != 0} {
-	       error "Failed to access image: $imagefile_, for contouring"
+	       error "Failed to access image: $imagefile_"
 	       set rtdimage 0
-	    }
-	    #  Record so we can tidy up.
-	    set image_rtd_ $rtdimage
+               set image_rtd_ {}
+	    } else {
+               #  Record so we can tidy up.
+               set image_rtd_ $rtdimage
+            }
 	 }
       } else {
 
