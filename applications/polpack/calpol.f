@@ -88,7 +88,6 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! PRIMDAT constants
       INCLUDE 'NDF_PAR'          ! NDF constants
-      INCLUDE 'DAT_PAR'          ! ONLY TEMPORARY FOR TSP
       
 *  Status:
       INTEGER STATUS             ! Global status
@@ -171,13 +170,6 @@
       LOGICAL USED( MAXIN )      ! flag for images that have been
                                  ! processed
 
-
-* TEMPORARY TSP SECTION FOR DIAGNOSTIC OUTPUT!!!!!!
-* 
-      INTEGER MP_INDEX,MP_I,MP_Q,MP_U
-      INTEGER NX,NY,IERR,NERR
-      CHARACTER * ( DAT__SZLOC ) TSPLOC,ILOC,SLOC,QLOC,ULOC
-      
 *  Local Data:
       REAL WPREF( 4 )            ! The actual waveplate positions that
                                  ! are expected
@@ -660,47 +652,6 @@
      :               %VAL( IPVUEST ), %VAL( IPWEIGHT ), %VAL( IPDOUT ),
      :               %VAL( IPVOUT ), STATUS )
 
-
-* TEMPORARY SECTION TO CREATE AN OUTPUT TSP STRUVCTURE.
-* =====================================================
-
-* Create an output TSP data structure.
-
-      NX = UBND( 1 ) - LBND( 1 ) + 1
-      NY = UBND( 2 ) - LBND( 2 ) + 1 
-      CALL DAT_CREAT( 'TSPOUT', 'NDF', 0, 0, STATUS )
-      CALL DAT_ASSOC( 'TSPOUT', 'WRITE', TSPLOC, STATUS )
-      CALL TSP_CREATE_2D( TSPLOC, NX, NY, 'QU', .FALSE.,
-     :                    .FALSE., STATUS )
-
-* Map the stokes components.
-
-      CALL TSP_MAP_DATA( TSPLOC, 'WRITE', MP_I, ILOC, STATUS )
-      CALL TSP_GET_STOKES( TSPLOC, 'Q', SLOC, STATUS )
-      CALL TSP_MAP_DATA( SLOC, 'WRITE', MP_Q, QLOC, STATUS )
-      CALL DAT_ANNUL( SLOC, STATUS )
-      CALL TSP_GET_STOKES( TSPLOC, 'U', SLOC, STATUS )
-      CALL TSP_MAP_DATA( SLOC, 'WRITE', MP_U, ULOC, STATUS )
-      CALL DAT_ANNUL( SLOC, STATUS )
-
-* Copy the results into the TSP structures.
-
-      CALL VEC_RTOR( .TRUE., NEL, %VAL( IPDOUT ), %VAL( MP_I ), IERR,
-     :     NERR, STATUS )
-      MP_INDEX = IPDOUT + 4 * NEL
-      CALL VEC_RTOR( .TRUE., NEL, %VAL( MP_INDEX ), %VAL( MP_Q ), IERR,
-     :     NERR, STATUS )
-      MP_INDEX = MP_INDEX + 4 * NEL
-      CALL VEC_RTOR( .TRUE., NEL, %VAL( MP_INDEX ), %VAL( MP_U ), IERR,
-     :     NERR, STATUS )
-
-* Unmap and annul TSP locators.
-
-      CALL TSP_UNMAP( ILOC, STATUS )
-      CALL TSP_UNMAP( QLOC, STATUS )
-      CALL TSP_UNMAP( ULOC, STATUS )
-      CALL DAT_ANNUL( TSPLOC, STATUS )
-      
 * Release unwanted workspace.
       CALL PSX_FREE( IPIEST, STATUS )
       CALL PSX_FREE( IPQEST, STATUS )

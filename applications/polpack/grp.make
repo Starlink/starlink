@@ -16,7 +16,8 @@ polcent.ifl polhelp.f polhelp.ifl polpack.csh polpack.hlp polpack.icl \
 polpack_link_adam polpack_mon.f polpack_mon.ifl polpack_test polreg.f \
 polreg.ifl pthlpo.f rdndf.f rfeature.bit right_arrow.bit rvertex.bit \
 segment.f segment.ifl sread.f vertex.bit wrndf.f datapic.ifl polpack.c \
-gui.gif hlpcmd polmap.f polmap.ifl
+gui.gif hlpcmd polmap.f polmap.ifl calpol.f calpol.ifl ndfac.f pol_cale.f \
+pol_calf.f pol_calp.f pol_calti.f
 
 # The other files which need to be extracted from the source code
 # repository and which end up in polpack.tar.
