@@ -173,7 +173,7 @@
         CALL BDI1_INVNT_V2W( NELM, %VAL(PTR), %VAL(WPTR), STATUS )
 
 *    Free mapped file data and mapped item
-        CALL BDI1_UNMAP_INT( PSID, STATUS )
+        CALL BDI1_UNMAP_INT( BDID, PSID, STATUS )
         CALL ADI_UNMAP( ITID, WPTR, STATUS )
 
 *  Logical quality
@@ -269,7 +269,7 @@
 
 *      Unmap the invented object and the file data
           CALL ADI_UNMAP( ITID, WPTR, STATUS )
-          CALL BDI1_UNMAP_INT( PSID, STATUS )
+          CALL BDI1_UNMAP_INT( BDID, PSID, STATUS )
 
 *      Set the WriteBack function
           WBPTR = UTIL_PLOC( BDI1_INVNT_E2V )
@@ -300,7 +300,7 @@
             CALL BDI1_INVNT_W2HW( NELM, %VAL(PTR), %VAL(WPTR), STATUS )
 
 *        Free mapped data
-            CALL BDI1_UNMAP_INT( PSID, STATUS )
+            CALL BDI1_UNMAP_INT( BDID, PSID, STATUS )
 
 *         Return widths
             PTR = WPTR
@@ -334,7 +334,7 @@
      :                              STATUS )
 
 *          Free mapped data
-              CALL BDI1_UNMAP_INT( PSID, STATUS )
+              CALL BDI1_UNMAP_INT( BDID, PSID, STATUS )
 
 *          Return widths
               PTR = WPTR
@@ -725,7 +725,7 @@
 
 
 
-      SUBROUTINE BDI1_INVNT_V2ER( NVAL, VALUE, STATUS )
+      SUBROUTINE BDI1_INVNT_V2ER( NVAL, VAR, ERR, STATUS )
 *+
 *  Name:
 *     BDI1_INVNT_V2ER
@@ -737,15 +737,17 @@
 *     Starlink Fortran
 
 *  Invocation:
-*     CALL BDI1_INVNT_V2ER( NVAL, VALUE, STATUS )
+*     CALL BDI1_INVNT_V2ER( NVAL, VAR, ERR, STATUS )
 
 *  Description:
 
 *  Arguments:
 *     NVAL = INTEGER (given)
 *        Number of axis widths to invent
-*     VALUE(*) = REAL (given and returned)
-*        Variance on entry, error on exit
+*     VAR(*) = REAL (given)
+*        Variance values
+*     ERR(*) = REAL (returned)
+*        Error values
 *     STATUS = INTEGER (given and returned)
 *        The global status.
 
@@ -812,9 +814,10 @@
 
 *  Arguments Given:
       INTEGER                   NVAL
+      REAL			VAR(*)
 
-*  Arguments Given and Returned:
-      REAL			VALUE(*)
+*  Arguments Returned:
+      REAL			ERR(*)
 
 *  Status:
       INTEGER 			STATUS             	! Global status
@@ -828,10 +831,10 @@
 
 *  Convert values to half-widths
       DO I = 1, NVAL
-        IF ( VALUE(I) .GT. 0.0 ) THEN
-          VALUE(I) = SQRT( VALUE(I) )
+        IF ( VAR(I) .GT. 0.0 ) THEN
+          ERR(I) = SQRT( VAR(I) )
         ELSE
-          VALUE(I) = 0.0
+          ERR(I) = 0.0
         END IF
       END DO
 
