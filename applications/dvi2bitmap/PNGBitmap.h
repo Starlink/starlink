@@ -1,8 +1,7 @@
-/* Part of dvi2bitmap.
- * Copyright 2000, Central Laboratory of the Research Councils.
- * See file LICENCE for conditions.
- */
-
+// Part of dvi2bitmap.
+// Copyright 2000 Council for the Central Laboratory of the Research Councils.
+// See file LICENCE for conditions.
+//
 // $Id$
 
 #ifndef PNGBITMAP_HEADER_READ

@@ -1,6 +1,6 @@
 include $(STARLINK_SGML_DIR)/lib/Makefile.common
 
-DOCTARBALLS=doc.tar-htx doc.tar-latex doc.tar-htxsingle
+DOCTARBALLS=doc.tar-htx doc.tar-latex # doc.tar-htxsingle
 
 doc.tar-htx: dvi2bitmap.sgml
 	$(STARLINK_SGML_DIR)/bin/sgml2docs --html \
@@ -19,11 +19,15 @@ doc.tar: $(DOCTARBALLS)
 	cd dvi2bitmap_doc; \
 	for i in $(DOCTARBALLS); do \
 		tar xf ../$$i; \
-	done; \
-	mv ssn71.htxsingle/ssn71.html ssn71.htx/ssn71.single.html; \
-	mv ssn71.latex/ssn71.tex .
-	tar cf doc.tar dvi2bitmap_doc/ssn71.htx dvi2bitmap_doc/ssn71.tex
-	rm -Rf dvi2bitmap_doc
+	done
+	mv ssn71.htxsingle/index.html ssn71.htx/ssn71.single.html; \
+	mv dvi2bitmap_doc/ssn71.latex/ssn71.tex dvi2bitmap_doc/dvi2bitmap.tex
+	mv dvi2bitmap_doc/ssn71.htx/* dvi2bitmap_doc
+	rm -Rf dvi2bitmap_doc/ssn71.latex dvi2bitmap_doc/ssn71.htx
+	ln dvi2bitmap.sgml dvi2bitmap_doc/dvi2bitmap.sgml
+	#tar cf doc.tar dvi2bitmap_doc/dvi2bitmap.sgml dvi2bitmap_doc/ssn71.htx dvi2bitmap_doc/ssn71.tex
+	tar cf doc.tar dvi2bitmap_doc
+	#rm -Rf dvi2bitmap_doc
 
 
 #ps.stamp: dvi2bitmap.latex.stamp

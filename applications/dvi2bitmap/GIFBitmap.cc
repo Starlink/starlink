@@ -4,10 +4,8 @@
  *
  * $Id$
  *
- * This is based on GIFENCOD by David Rowley, as extracted from the
- * ppmtogif.c program which is part of the pbmplus distribution.  I'm
- * afraid I don't know where to get a copy of the original GIFENCOD,
- * nor what its precise licensing conditions were.
+ * This file is based on ppmtogif.c program which is part of the
+ * pbmplus distribution.
  *
  * The header at the top of ppmtogif.c is reproduced below.
  */

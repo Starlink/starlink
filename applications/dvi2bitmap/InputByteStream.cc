@@ -1,8 +1,7 @@
 // Part of dvi2bitmap.
-// Copyright 1999, Particle Physics and Astronomy Research Council.
+// Copyright 1999, 2000 Council for the Central Laboratory of the Research Councils.
 // See file LICENCE for conditions.
 //
-// part of dvi2bitmap
 // $Id$
 
 #ifdef HAVE_CONFIG_H

@@ -1,9 +1,7 @@
-/*
- * Part of dvi2bitmap
- * Copyright 2000, Central Laboratory of the Research Councils.
- * See file LICENCE for conditions.
- */
-
+// Part of dvi2bitmap
+// Copyright 2000, Council for the Central Laboratory of the Research Councils.
+// See file LICENCE for conditions.
+//
 // $Id$
 
 // TO DO: Support transparency.  That might involve using an alpha

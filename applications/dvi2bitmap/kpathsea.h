@@ -1,4 +1,5 @@
 // Part of dvi2bitmap
+// Copyright 1999, 2000 Council for the Central Laboratory of the Research Councils.
 //
 // This is merely an interface to the kpathsea library
 #include "verbosity.h"

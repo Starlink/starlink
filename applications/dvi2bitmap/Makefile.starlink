@@ -828,9 +828,9 @@ $(EXPORT)/$(PKG_NAME)-$(PKG_VERS).tar.Z: $(SOURCE_FILES)
 #	make -f Makefile.in dvi2bitmap.tar
 #
 dvi2bitmap_source.tar: 
-	@ if test -f dvi2bitmap.tar; then \
-	    $(LINK) dvi2bitmap.tar dvi2bitmap_source.tar; \
-	else \
+#	@ if test -f dvi2bitmap.tar; then \
+#	    $(LINK) dvi2bitmap.tar dvi2bitmap_source.tar; \
+#	else \
 	    echo;\
 	    echo '*** This makefile, Makefile.starlink, regards the file';\
 	    echo '    dvi2bitmap_source.tar as a SOURCE file, and will';\
@@ -838,7 +838,7 @@ dvi2bitmap_source.tar:
 	    echo '    you probably have an incomplete source set.';\
 	    echo;\
 	    false;\
-	fi
+#	fi
 
 
 #  clean: Clean up the source directory.
@@ -906,8 +906,8 @@ dvi2bitmap: version.h
 # be newer, but that's _not_ what we're testing here.
 version.h:
 	$(TAR_OUT) dvi2bitmap_source.tar
-	mv dvi2bitmap/* .
-	rmdir dvi2bitmap
+#	mv dvi2bitmap/* .
+#	rmdir dvi2bitmap
 
 #  This target should need to be built only in the distribuTION directory
 $(NEWS):

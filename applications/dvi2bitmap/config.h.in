@@ -1,9 +1,9 @@
 /* Part of dvi2bitmap.
-   Copyright 1999, Particle Physics and Astronomy Research Council.
-   See file LICENCE for conditions.
-
-   $Id$
-*/
+ * Copyright 1999, 2000 Council for the Central Laboratories of the Research Councils.
+ * See file LICENCE for conditions.
+ *
+ * $Id$
+ */
 
 
 /* Define as 1 if you do NOT have <cstdio> headers.  In this case, we use
