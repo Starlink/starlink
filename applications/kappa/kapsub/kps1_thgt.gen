@@ -178,9 +178,9 @@
 *  status.
       THRHI = VAL_DTO<T>( .FALSE., DTHRHI, STATUS )
 
-*  If THRHI is less than or equal to THRLO we do not need a high repalcement
+*  If THRHI is less than THRLO we do not need a high repalcement
 *  value.
-      IF( THRHI .GT. THRLO ) THEN
+      IF( THRHI .GE. THRLO ) THEN
  
 *  Obtain the default replacement value.  It must be character for
 *  PAR_MIX0x.
