@@ -2870,6 +2870,7 @@
 
       INTEGER			FMODE			! Fitting mode
       INTEGER			I, J			! Loop over image
+      INTEGER			IR			! Radial bin number
       INTEGER			ITEMID			! GUI noticeboard item
       INTEGER			MAXFR_X, MAXFR_Y	! Max position
       INTEGER			MINFR_X, MINFR_Y	! Min position
@@ -2945,7 +2946,7 @@
 
 *      Fit coefficients
           NGS = 0
-          DO I = 1, NS
+          DO I = 1, I_BGM_NSAMP
             IF ( SAMNP(I) .GT. 1 ) THEN
               NGS = NGS + 1
               PFX(NGS) = (REAL(I)-0.5) * I_BGM_RBIN
