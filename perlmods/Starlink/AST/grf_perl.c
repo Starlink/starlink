@@ -114,7 +114,7 @@ int astGFlush( void ){
 
       count = perl_call_sv( SvRV(cb), G_SCALAR | G_EVAL);
 
-      retval = ReportPerlError();
+      retval = ReportPerlError( AST__GRFER );
 
       SPAGAIN;
 
@@ -190,7 +190,7 @@ int astGLine( int n, const float *x, const float *y ){
       PUTBACK;
 
       count = perl_call_sv( SvRV(cb), G_SCALAR | G_EVAL );
-      retval = ReportPerlError();
+      retval = ReportPerlError( AST__GRFER );
 
       SPAGAIN;
 
@@ -272,7 +272,7 @@ int astGMark( int n, const float *x, const float *y, int type ){
       PUTBACK;
 
       count = perl_call_sv( SvRV(cb), G_SCALAR | G_EVAL );
-      retval = ReportPerlError();
+      retval = ReportPerlError( AST__GRFER );
 
       SPAGAIN;
 
@@ -343,7 +343,7 @@ int astGText( const char *text, float x, float y, const char *just,
       PUTBACK;
 
       count = perl_call_sv( SvRV(cb), G_SCALAR | G_EVAL);
-      retval = ReportPerlError();
+      retval = ReportPerlError( AST__GRFER );
 
       SPAGAIN;
 
@@ -420,7 +420,7 @@ int astGTxExt( const char *text, float x, float y, const char *just,
       PUTBACK;
 
       count = perl_call_sv( SvRV(cb), G_ARRAY | G_EVAL );
-      retval = ReportPerlError();
+      retval = ReportPerlError( AST__GRFER );
 
       SPAGAIN;
 
@@ -555,7 +555,7 @@ int astGAttr( int attr, double value, double *old_value, int prim ){
       PUTBACK;
 
       count = perl_call_sv( SvRV(cb), G_ARRAY | G_EVAL );
-      retval = ReportPerlError();
+      retval = ReportPerlError( AST__GRFER );
 
       SPAGAIN;
 
@@ -593,56 +593,4 @@ static void Report( const char *name ){
    astError( AST__GRFER, "%s: No graphics facilities are available.", name );
    astError( AST__GRFER, "Register one using eg Starlink::AST::PGPLOT "
              " ->pgplot method." );
-}
-
-/*
- * Copies the contents of $@ into the AST error system. Tests $@ before
- * trying to read it. Returns 0 if $@ contained something (ie an error
- * that is suitable for return to ast) and 1 if $@ was empty. This
- * allows you to call this method immediately after an eval.
- *
- * $@ is split across multiple lines.
- */
-
-# define ASTPERL_ERRBUFF 72
-
-int ReportPerlError() {
-  char * dollarat;
-  int lengthat;
-  int strindex = 0;
-  char errbuff[ASTPERL_ERRBUFF];  /* Eval error message buffer */
-  int retval;
-
-  /* Check the status of the eval */
-  if (SvTRUE(GvSV(PL_errgv))) {
-
-    /* This code stolen from my Perl DRAMA interface */
-
-    /* Get the error message */
-    dollarat = SvPV(GvSV(PL_errgv), PL_na);
-    lengthat = strlen(dollarat);
-
-    /* and split into chunks. Really need the equivalent of Text::Wrap */
-    while (strindex < lengthat ) {
-      int length = ASTPERL_ERRBUFF-1;
-      if (strindex + length >= lengthat ) {
-        length = lengthat - strindex;
-      }
-      Copy(dollarat+strindex,errbuff,length,char);
-      errbuff[length] = '\0';
-      /* Remove newline character from end of string */
-      if (errbuff[length-1] == '\n') errbuff[length-1] = '\0';
-
-      astError( AST__GRFER, errbuff );
-
-      strindex += length;
-    }
-
-    /* bad ast return value */
-    retval = 0;
-  } else {
-    /* everything okay */
-    retval = 1;
-  }
-  return retval;
 }
