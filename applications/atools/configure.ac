@@ -25,7 +25,8 @@ dnl    Setup for creating a monolith.
 STAR_MONOLITHS
 
 dnl    Build dependencies for this package.
-STAR_DECLARE_DEPENDENCIES([build], [ast grp ndf par fio ifd kaplibs sae shl])
+STAR_DECLARE_DEPENDENCIES([build], [ast cnf hds fio grp ifd ndf par sae])
+STAR_DECLARE_DEPENDENCIES([build], [kaplibs ast shl], [link])
 STAR_DECLARE_DEPENDENCIES(sourceset, sst)
 
 dnl    Need prohlp to create help.
