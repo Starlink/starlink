@@ -396,7 +396,7 @@ sun95_agi6.eps sun95_agi7.eps sun95_ardwork.eps sun95.htx_tar kappa.news \
 aif_sub.tar fts_sub.tar irm_sub.tar kapgen_sub.tar kappa_sub.tar \
 kapsub_sub.tar kapview_sub.tar ndfpack_sub.tar kappa_ifls.tar \
 kappa_data_alpha_OSF1.tar kappa_data_ix86_Linux.tar \
-kappa_data_sun4_Solaris.tar sun112.tex sun112.htx_tar kappa_iraf.tar
+kappa_data_sun4_Solaris.tar sun221.tex sun221.htx_tar kappa_iraf.tar
 
 #  Target for use by the grp command.
 $(action)
