@@ -1,0 +1,96 @@
+## SCUCLKERR - Determine clock error
+ 
+#+
+#  Name:
+#     SCUCLKERR.IFL
+ 
+#  Type of Module:
+#     ADAM A-task parameter interface.
+ 
+#  Authors:
+#     TIMJ: Tim Jenness (JACH)
+ 
+
+#  Copyright:
+#     Copyright (C) 2000 Particle Physics and Astronomy
+#     Research Council. All Rights Reserved.
+
+#  History:
+#     2000 Jun 8
+#        Original Version
+#     {enter_further_changes_here}
+ 
+#-
+ 
+   INTERFACE SCUCLKERR
+
+      HELPLIB 'SURF_HELP:'
+
+
+      PARAMETER   IN
+         POSITION 1
+         PROMPT   'Name of input file'
+         TYPE     'FILENAME'
+	 ACCESS   'READ'
+	 VPATH    'PROMPT'
+	 PPATH    'GLOBAL'
+	 ASSOCIATION '<-GLOBAL.DATA_ARRAY'
+         HELPKEY  '*'
+      ENDPARAMETER
+
+      PARAMETER MSG_FILTER
+        TYPE     '_CHAR'
+        PROMPT   'Messaging level'
+        DEFAULT  'NORM'
+        VPATH    'DEFAULT'
+        HELPKEY  '*'
+      ENDPARAMETER
+
+    PARAMETER CLOCKERR
+        PROMPT 'Error in clock'
+        TYPE '_REAL'
+        DEFAULT -999.0
+        HELPKEY '*'
+        VPATH  'DEFAULT'
+        ACCESS WRITE
+    ENDPARAMETER
+
+    PARAMETER DR
+        PROMPT 'Error in positions at edge of array due to clock error'
+        TYPE '_REAL'
+        DEFAULT -999.0
+        HELPKEY '*'
+        VPATH  'DEFAULT'
+        ACCESS WRITE
+    ENDPARAMETER
+
+    PARAMETER DANG
+        PROMPT 'Error in rotation angle'
+        TYPE '_REAL'
+        DEFAULT -999.0
+        HELPKEY '*'
+        VPATH  'DEFAULT'
+        ACCESS WRITE
+    ENDPARAMETER
+
+    PARAMETER LAG
+        PROMPT 'Lag between starting obs and taking data'
+        TYPE '_REAL'
+        DEFAULT -999.0
+        HELPKEY '*'
+        VPATH  'DEFAULT'
+        ACCESS WRITE
+    ENDPARAMETER
+
+    PARAMETER MJD
+        PROMPT 'Corrected Modified Julian date of start of observation'
+        TYPE '_DOUBLE'
+        DEFAULT -999.0
+        HELPKEY '*'
+        VPATH  'DEFAULT'
+        ACCESS WRITE
+    ENDPARAMETER
+
+
+   ENDINTERFACE
+
