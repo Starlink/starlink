@@ -30,6 +30,14 @@
 *        Dataset to be altered, or grown into
 *     GROW = CHAR (read)
 *        Dataset to be grown with
+*     AXIS = INTEGER (read)
+*        Axis to grow into
+*     DATA = LOGICAL (read)
+*        Grow data?
+*     QUAL = LOGICAL (read)
+*        Grow quality?
+*     VAR = LOGICAL (read)
+*        Grow variance?
 
 *  Examples:
 *     {routine_example_text}
@@ -159,8 +167,8 @@
 *  Check dimensions are compatible
       IF ( GDIM .NE. DIMS(AXIS) ) THEN
         CALL MSG_SETI( 'A', AXIS )
-        CALL BDI0_DESCID( 'G', GFID, STATUS )
-        CALL BDI0_DESCID( 'INP', IFID, STATUS )
+        CALL BDI0_DESCID( GFID, 'G', STATUS )
+        CALL BDI0_DESCID( IFID, 'INP', STATUS )
         CALL ERR_REP( ' ', 'Dimension of ^G does not match size '/
      :                /'of axis ^A of ^INP', STATUS )
         GOTO 99
