@@ -20499,6 +20499,10 @@ current version):
 sub-class of SpecFrame which can be used to describe spectral axes
 associated with dual sideband spectral data.
 
+\item The FitsChan class will now read headers which use the old ``-GLS''
+projection code, converting them to the corresponding modern ``-SFL'' code,
+provided that the celestial axes are not rotated.
+
 \end{enumerate}
 
 Programs which are statically linked will need to be re-linked in

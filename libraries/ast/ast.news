@@ -19,6 +19,10 @@ o Addition of a new class classed DSBSpecFrame. This is a
 sub-class of SpecFrame which can be used to describe spectral axes
 associated with dual sideband spectral data.
 
+o The FitsChan class will now read headers which use the old "-GLS"
+projection code, converting them to the corresponding modern "-SFL" code,
+provided that the celestial axes are not rotated.
+
 For further details of these changes, see the final appendix of Starlink
 User Note SUN/210 (Fortran version) or SUN/211 (C version). These are
 available on the WWW at:

@@ -569,6 +569,8 @@ f     - AST_PUTCARDS: Stores a set of FITS header card in a FitsChan
 *        - Modify SpecTrans to recognize AIPS spectral axis keywords, and
 *        to convert "HZ" to "Hz".
 *        - Added FITS-AIPS++ encoding.
+*     12-AUG-2004 (DSB):
+*        - Convert GLS projection codes to equivalent SFL in SpecTrans.
 
 *class--
 */
@@ -20990,8 +20992,8 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
 *     10) EQUINOX or EPOCH keywords with value zero  are converted to 
 *         B1950. 
 *     
-*     11) The AIPS NCP projection is converted into an equivalent SIN
-*         projection.
+*     11) The AIPS NCP and GLS projections are converted into equivalent SIN
+*         or SFL projections.
 *
 *     12) The IRAF "ZPX" projection. If the last 4 chacaters of CTYPEi 
 *       (i = 1, naxis) are "-ZPX", then:
@@ -21085,10 +21087,13 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
    char prj[6];                   /* Projection string */
    char s;                        /* Co-ordinate version character */
    char ss;                       /* Co-ordinate version character */
+   double cdelt;                  /* CDELT value */
    double cdelti;                 /* CDELT for longitude axis */
    double cdeltj;                 /* CDELT for latitude axis */
    double cosrota;                /* Cos( CROTA ) */
    double crota;                  /* CROTA Value */
+   double crpix;                  /* CRPIX value */
+   double crval;                  /* CRVAL value */
    double dval;                   /* General floating value */
    double lambda;                 /* Ratio of CDELTs */
    double projp;                  /* Projection parameter value */
@@ -21105,6 +21110,7 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
    int m;                         /* Co-ordinate version index */
    int naxis;                     /* Number of axes */
    int nch;                       /* No. of characters read */
+   int norot;                     /* Non-zero if there is no axis rotation */
    int ok;                        /* Can projection be represented in FITS-WCS?*/
    int porder;                    /* Order of polynomial */
    int ubnd[ 2 ];                 /* Upper index bounds */
@@ -21737,6 +21743,65 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
                SetValue( ret, FormatKey( "PROJP", 1, -1, s ),
                          (void *) &dval, AST__FLOAT, NULL );
             }
+         }
+      }
+
+/* AIPS "GLS" projections (see FITS-WCS paper II section 6.1.4)
+   --------------------- */
+
+/* Compare the projection type with "-GLS" */
+      if( !Ustrcmp( prj, "-GLS" ) ) {
+
+/* Translation is only possible if there is no rotation on the celestial
+   axes. Check the off-diagonal elements of the PCi_j array are zero. */
+         norot = 1;
+         sprintf( keyname, "PC%d_%d", axlon + 1, axlat + 1 );
+         if( GetValue2( ret, this, keyname, AST__FLOAT, (void *) &dval, 0, 
+                        method, class ) ){
+            if( dval != 0.0 ) norot = 0;
+         } 
+         sprintf( keyname, "PC%d_%d", axlat + 1, axlon + 1 );
+         if( GetValue2( ret, this, keyname, AST__FLOAT, (void *) &dval, 0, 
+                        method, class ) ){
+            if( dval != 0.0 ) norot = 0;
+         } 
+
+         if( norot ) {
+
+/* Get the reference value,reference pixel and cdelt value for the longitude 
+   axis. */
+            GetValue2( ret, this, FormatKey( "CRVAL", axlon + 1, -1, s ),
+                       AST__FLOAT, (void *) &crval, 1, method, class );
+            GetValue2( ret, this, FormatKey( "CDELT", axlon + 1, -1, s ),
+                       AST__FLOAT, (void *) &cdelt, 1, method, class );
+            GetValue2( ret, this, FormatKey( "CRPIX", axlon + 1, -1, s ),
+                       AST__FLOAT, (void *) &crpix, 1, method, class );
+   
+/* Calculate and store a new CRPIX value which corresponds to a longitude 
+   value of zero. Also store zero for CRVAL. */
+            crpix -= crval/cdelt;
+            SetValue( ret, FormatKey( "CRPIX", axlon + 1, 1, s ),
+                      (void *) &crpix, AST__FLOAT, NULL );
+            SetValue( ret, FormatKey( "CRVAL", axlon + 1, 1, s ),
+                      (void *) &crval, AST__FLOAT, NULL );
+
+/* Get the reference value,reference pixel and cdelt value for the latitude 
+   axis. */
+            GetValue2( ret, this, FormatKey( "CRVAL", axlat + 1, -1, s ),
+                       AST__FLOAT, (void *) &crval, 1, method, class );
+            GetValue2( ret, this, FormatKey( "CDELT", axlat + 1, -1, s ),
+                       AST__FLOAT, (void *) &cdelt, 1, method, class );
+            GetValue2( ret, this, FormatKey( "CRPIX", axlat + 1, -1, s ),
+                       AST__FLOAT, (void *) &crpix, 1, method, class );
+   
+/* Calculate and store a new CRPIX value which corresponds to a longitude 
+   value of zero. Also store zero for CRVAL. */
+            crpix -= crval/cdelt;
+            SetValue( ret, FormatKey( "CRPIX", axlat + 1, 1, s ),
+                      (void *) &crpix, AST__FLOAT, NULL );
+            SetValue( ret, FormatKey( "CRVAL", axlat + 1, 1, s ),
+                      (void *) &crval, AST__FLOAT, NULL );
+
          }
       }
 
