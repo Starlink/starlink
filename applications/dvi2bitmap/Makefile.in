@@ -130,8 +130,8 @@ deps_:
 	@ if test -z "$(CXXMM)"; then \
 		$(MAKE) simpledeps_; \
 	else \
-		for c in `echo $(OBJS) | sed 's/\.o/\.cc/g'`; do \
-			$(CXX) $(DEFS) $(CXXMM) $$c >> Makefile; \
+		for c in dvi2bitmap.cc `echo $(OBJS) | sed 's/\.o/\.cc/g'`; do \
+			$(CXX) $(CPPFLAGS) $(DEFS) $(CXXMM) $$c >> Makefile; \
 		done; \
 	fi
 

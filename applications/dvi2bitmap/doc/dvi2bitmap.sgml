@@ -1096,14 +1096,14 @@ have to give <code/&ddash;disable-maketexpk> as well.  Both options
 take an optional argument giving the path to an alternative script
 with the same calling interface.
 
-<dt><code/&ddash;enable-png> (default: enabled)
+<dt><code/&ddash;with-png> (default: enabled)
 <dd>If you give this option, and if the PNG library is installed
 (needs a version after 0.96), then
 the program will be compiled with support for PNG bitmaps as an output
 format.  You can obtain the PNG library from the 
 <webref url="http://www.libpng.org/pub/png/" >PNG home page</webref>.
 You can disable the use of PNG with the option
-<code/&ddash;disable-png>.
+<code/&ddash;without-png>.
 
 <dt><code/&ddash;enable-gif> (default: disabled)
 <dd>The program generates only XBM bitmaps by default.  
@@ -1153,7 +1153,7 @@ order.  For example, the arguments appropriate for DOS would be
 </dl>
 
 <p>The <code>./configure</code> command without any options is
-equivalent to <code>./configure --with-kpathsea --enable-png
+equivalent to <code>./configure --with-kpathsea --with-png
 --enable-mktexpk</code> (meaning that kpathsea and PNG output will be
 enabled if library support for them is found).
 
@@ -1166,12 +1166,13 @@ successfully on (at least):
 <thead>
 <row><entry>Platform<entry>Version<entry>Compiler
 <tbody>
-<row><entry>i686-pc-linux-gnu (RedHat 6.2)<entry>0.9-7<entry>egcs-2.91.66
+<row><entry>i686-pc-linux-gnu (RedHat 6.2)<entry>0.9-7p1<entry>egcs-2.91.66
 <row><entry>powerpc-unknown-linux-gnu (Mac mklinux DR-0.3?)<entry>0.9<entry>egcs-2.90.25 980302 (egcs-1.0.2 prerelease)
 <row><entry>sparc-sun-solaris2.7<entry>0.9<entry>egcs-2.91.66
 <row><entry>sparc-sun-solaris2.7<entry>0.9<entry>gcc 2.8.1
 <row><entry>sparc-sun-solaris2.7<entry>0.9-6<entry>WorkShop Compilers 5.0 98/12/15 C++ 5.0
 <row><entry>alpha-dec-osf4.0f<entry>0.9-6<entry>Compaq C++ V6.2-024 for Digital UNIX V4.0F
+<row><entry>i386-pc-solaris2.6<entry>0.9-7p1<entry>gcc v2.8.1/libstdc++ v2.8.1.1
 </tabular>
 </blockquote>
 The `version' column is the last version which was actually tested on

@@ -10,6 +10,11 @@
 # then this is a reasonable directory to have as the value of
 # DVI2BITMAP_PK_PATH.
 #
+# The script appears to fail first time it's run.  I think this is
+# because it searches for cmr10.110pk too quickly after it's created
+# by mktexpk (or something like that, mmm?).  Running the test script
+# again usually works.
+#
 # $Id$
 
 if [ $# -lt 2 ]; then

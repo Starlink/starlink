@@ -2,7 +2,7 @@
 dvi2bitmap
 ==========
 
-%%VERSION%% 0.9-7
+%%VERSION%% 0.9-7p1
 
 dvi2bitmap is a utility to convert TeX DVI files directly to bitmaps,
 without going through the complicated (and slow!) route of conversion

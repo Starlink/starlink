@@ -36,8 +36,19 @@
 // defined here, since the facilities they represent should be
 // available in C++ (that's `should' as in `ought' rather than as in
 // `probably are'...).
+//
+// We must _avoid_ including c-std.h, since that file carefully
+// declares popen and pclose, but does so K&R-style, with no
+// arguments.  This seems to have got past most compilers, but gcc,
+// apparently in a recent burst of standards enthusiasm, seems to have
+// decided to object to this.  KPATHSEA_C_STD_H is the guard
+// definition which c-std.h uses to avoid rereading itself; the one
+// thing we do need from that file is stdio.h, so we read that
+// explicitly.
 #define HAVE_PROTOTYPES
 #define STDC_HEADERS
+#define KPATHSEA_C_STD_H 1
+#include <stdio.h>
 extern "C" {
 #include <kpathsea/progname.h>
 #include <kpathsea/debug.h>

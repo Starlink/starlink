@@ -1,5 +1,5 @@
 /* Part of dvi2bitmap.
- * Copyright 1999, 2000 Council for the Central Laboratories of the Research Councils.
+ * Copyright 1999, 2000, 2002 Council for the Central Laboratories of the Research Councils.
  * See file LICENCE for conditions.
  *
  * $Id$
@@ -11,14 +11,16 @@
 #define HAVE_CSTD_INCLUDE 0
 
 /* Related: define as 1 if you have standard functions in the std
-   namespace; that is, if you need `using namespace std' in order to
-   get to them.  At present, we use this flag to decide if we need to
-   dump everything into the global namespace; this is not as elegant
-   as I'd like, but it'll do for now. */
+ * namespace; that is, if you need `using namespace std' in order to
+ * get to them.  At present, we use this flag to decide if we need to
+ * dump everything into the global namespace; this is not as elegant as
+ * I'd like, but it'll do for now.
+ */
 #define HAVE_STD_NAMESPACE 0
 
 /* Define as 1 if you have <assert.h> and <sstream> (as opposed to
-   older <strstream>) */
+ * older <strstream>), and so on
+ */
 #undef HAVE_ASSERT_H
 #undef HAVE_SSTREAM
 
@@ -31,86 +33,90 @@
 /* Define as 1 if you want to enable generation of GIFs */
 #define ENABLE_GIF 0
 
-/* Define filesystem and search path separator.
-   The default slash and colon are for unix, but DOS uses backslash
-   and semicolon. */
+/* Define filesystem and search path separator.  The default slash and
+ * colon are for unix, but DOS uses backslash and semicolon.
+ */
 #define FSPATH_SEP   '/'
 #define SRCHPATH_SEP ':'
 
-/* The alpha cxx compiler currently (v6.0) needs to be invoked with 
-   __USE_STD_IOSTREAM defined, so that it uses a standards-conforming 
-   streams library.  See Digital C++ v6.0 manual, section 7.1.2.
-   This is defined by default when the compiler is invoked with
-   `-std strict_ansi', but that's a little harder to arrange in
-   here. */
+/* The alpha cxx compiler currently (v6.0) needs to be invoked with
+ * __USE_STD_IOSTREAM defined, so that it uses a standards-conforming
+ * streams library.  See Digital C++ v6.0 manual, section 7.1.2.  This
+ * is defined by default when the compiler is invoked with `-std
+ * strict_ansi', but that's a little harder to arrange in here.
+ */
 #undef __USE_STD_IOSTREAM
 
 /* Define as 1 if you want to enable use of the kpathsea library for
-   font-searching.  The font _generation_ programs (usually) use this
-   library when they work their magic, but that's entirely separate,
-   and controlled only by ENABLE_FONT_GEN.  */
+ * font-searching.  The font _generation_ programs (usually) use this
+ * library when they work their magic, but that's entirely separate,
+ * and controlled only by ENABLE_FONT_GEN.
+ */
 #define ENABLE_KPATHSEA 0
 
 /* Several strings below are in the format of a `font string
-   template'.  This is a printf-like string which has %? specifiers
-   replaced by font parameters, according to the following scheme:
-     %M = mode (eg. ibmvga)
-     %f = font name (eg. cmr10)
-     %d = dpi (eg. 330)
-     %b = base dpi (eg. 110)
-     %m = magnification (eg. 3)
-     %% = %
-*/
+ * template'.  This is a printf-like string which has %? specifiers
+ * replaced by font parameters, according to the following scheme:
+ *   %M = mode (eg. ibmvga)
+ *   %f = font name (eg. cmr10)
+ *   %d = dpi (eg. 330)
+ *   %b = base dpi (eg. 110)
+ *   %m = magnification (eg. 3)
+ *   %% = %
+ */
 
 /* Define FONT_GEN_TEMPLATE to be a command which generates fonts, and
-   returns a single line giving the name of the generated file.  It's
-   a `font-string template', as described above.  For example:
-
-       /usr/local/teTeX/bin/mktexpk --dpi %d --bdpi %b --mag %m --mfmode %M %f
-   or
-       /usr/local/teTeX/bin/MakeTeXPK %f %d %b %m %M
-
-   Undefine to disable.
-   */
+ * returns a single line giving the name of the generated file.  It's
+ * a `font-string template', as described above.  For example:
+ *
+ *     /usr/local/teTeX/bin/mktexpk --dpi %d --bdpi %b --mag %m --mfmode %M %f
+ * or
+ *     /usr/local/teTeX/bin/MakeTeXPK %f %d %b %m %M
+ *
+ * Undefine to disable.
+ */
 #undef FONT_GEN_TEMPLATE
 
 /* Define DEFAULT_MFMODE and DEFAULT_RESOLUTION to be the default
-   Metafont mode and resolution which should be used when generating
-   fonts.  These two parameters must be consistent with each other.
-   For examples, see the file modes.mf, which is either available as
-   part of your TeX distribution, or from CTAN.  If not defined,
-   internal defaults will be used.  */
+ * Metafont mode and resolution which should be used when generating
+ * fonts.  These two parameters must be consistent with each other.
+ * For examples, see the file modes.mf, which is either available as
+ * part of your TeX distribution, or from CTAN.  If not defined,
+ * internal defaults will be used.
+ */
 #undef DEFAULT_MFMODE
 #undef DEFAULT_RESOLUTION
 
 /* Specify a command-line which searches for fonts according to a
-   specification given in its argument list, and returns a single line
-   containing a found font file, or EOF if it can't find anything.
-   It's a `font-string template', as described above.  For example, 
-
-     kpsewhich %f.%dpk
-
-*/
+ * specification given in its argument list, and returns a single line
+ * containing a found font file, or EOF if it can't find anything.
+ * It's a `font-string template', as described above.  For example, 
+ *
+ *   kpsewhich %f.%dpk
+ *
+ */
 #undef FONT_SEARCH_SCRIPT
 
 /* Set DEFAULT_TEXMFCNF to be the location of the texmf.cnf file which
-   the kpathsea library is to use.  This will be overridden by a value
-   of TEXMFCNF set in the program's environment at run time.  It is
-   not necessary to set this if the program will be installed
-   alongside the other dvi-ware (if they use kpathsea), since the
-   kpathsea library can find its own configuration file relative to
-   that location.  This affects only the kpathsea font-searching parts
-   of this program (and so has an effect only if ENABLE_KPATHSEA is
-   1), and does not affect font-generation. */
+ * the kpathsea library is to use.  This will be overridden by a value
+ * of TEXMFCNF set in the program's environment at run time.  It is
+ * not necessary to set this if the program will be installed
+ * alongside the other dvi-ware (if they use kpathsea), since the
+ * kpathsea library can find its own configuration file relative to
+ * that location.  This affects only the kpathsea font-searching parts
+ * of this program (and so has an effect only if ENABLE_KPATHSEA is
+ * 1), and does not affect font-generation.
+ */
 #undef DEFAULT_TEXMFCNF
 
 /* The texmf.cnf file uses the value of variables SELFAUTO..., and
-   sets these based on the location of the program's binary.  Some
-   (broken!) configuration files have the VARTEXFONTS variable
-   depending on these, and this means that font generation fails
-   unless the dvi2bitmap program is installed along with the other
-   dvi-ware binaries.  If you have such a configuration file, and you
-   can't or don't want to install the program with the other dvi-ware,
-   then you can define this variable to the location of a binary that
-   is in the `correct' place.  Has an effect only if ENABLE_KPATHSEA is 1. */
+ * sets these based on the location of the program's binary.  Some
+ * (broken!) configuration files have the VARTEXFONTS variable
+ * depending on these, and this means that font generation fails
+ * unless the dvi2bitmap program is installed along with the other
+ * dvi-ware binaries.  If you have such a configuration file, and you
+ * can't or don't want to install the program with the other dvi-ware,
+ * then you can define this variable to the location of a binary that
+ * is in the `correct' place.  Has an effect only if ENABLE_KPATHSEA is 1.
+ */
 #undef FAKE_PROGNAME

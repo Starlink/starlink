@@ -14,7 +14,25 @@ with the <code/-P> option.
 consistency, option <code/-Qt> no longer automatically exits.
 
 </ul>
+
+<p>Changes in the configure script
+<ul>
+<li>Configure option <code>&ddash;enable-png</code> has turned into
+<code>&ddash;with-png</code> for consistency with
+<code>&ddash;with-kpathsea</code>, since part of this option's purpose
+is to indicate the possibly non-standard location of the
+<code>libpng</code> library.</li>
+
+</ul>
+</p>
 -->
+
+<subsect id=rn-0.9-7p1 export>Release 0.9-7p1
+
+<p>Jeff Holt (<code>jeff.holt@hotsos.com</code>) noted build
+problems.  Either the RedHat includes or gcc have recently become
+fussier, which exposed a clash of prototypes within the kpathsea
+code.  Extra configuration code added to resolve this.
 
 <subsect id=rn-0.9-7 export>Release 0.9-7
 
