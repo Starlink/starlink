@@ -1256,21 +1256,41 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
 *
 *    Local variables :
 *
-      REAL			RXP, RYP
+      REAL			RXP, RYP, XOFF, YOFF, T, U
 
       INTEGER			IX,IY			! Pixel numbers
+      INTEGER			J, K			! Base for interp
 *-
 
 *    Apply rotation to XP,YP
       CALL MATH_R2DR( -XP, YP, -ROTA, RXP, RYP )
       RXP = - RXP
 
-      IX = INT(RXP+SIGN(0.5,RXP))
-      IY = INT(RYP+SIGN(0.5,RYP))
+*  Offsets from edge of grid
+      XOFF = REAL(NXY)/2.0 + RXP
+      YOFF = REAL(NXY)/2.0 + RYP
+
+*  Pixel number in PVALS
+      IX = -NXY/2 + INT(XOFF)
+      IY = -NXY/2 + INT(YOFF)
+
       IF ( (ABS(IX) .GT. NXY) .OR. (ABS(IY) .GT. NXY) ) THEN
         PSF_ASCA_CINT = 0.0
-      ELSE
+      ELSE IF ( (ABS(IX) .EQ. NXY) ) THEN
         PSF_ASCA_CINT = PVALS(IX,IY)
+      ELSE IF ( (ABS(IY) .EQ. NXY) ) THEN
+        PSF_ASCA_CINT = PVALS(IX,IY)
+      ELSE
+        J = INT( XOFF - 0.5 ) + 1
+        K = INT( YOFF - 0.5 ) + 1
+        T = XOFF - REAL(J) + 0.5
+        U = YOFF - REAL(K) + 0.5
+        J = -NXY/2 + J - 1
+        K = -NXY/2 + K - 1
+        PSF_ASCA_CINT = (1.0-T)*(1.0-U)*PVALS(J,K) +
+     :                  T * (1.0-U) * PVALS(J+1,K) +
+     :                  T * U * PVALS(J+1,K+1) +
+     :                  (1.0-T) * U * PVALS(J,K+1)
       END IF
 
       END
