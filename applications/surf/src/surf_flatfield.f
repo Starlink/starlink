@@ -60,17 +60,20 @@
 *  Implementation Status:
 *     -Bad pixel handling is performed.
 
-*    Authors :
+*  Authors:
 *     JFL: J.Lightfoot (ROE)
 *     TIMJ: T. Jenness (JACH)
 
-*    History :
+*  History:
 *     $Id$
 *     18-JUN-1996: Original version.
 *     $Log$
-*     Revision 1.6  1996/11/02 01:23:28  timj
-*     Change name to FLATFIELD
+*     Revision 1.7  1996/11/02 01:39:40  timj
+*     Remove space from History : header
 *
+c Revision 1.6  1996/11/02  01:23:28  timj
+c Change name to FLATFIELD
+c
 c Revision 1.5  1996/10/31  18:22:55  timj
 c Added modern Starlink header.
 c
