@@ -1,2 +1,2 @@
 /* %%VERSION%% */
-const char version_string[] = "dvi2bitmap 0.9-4";
+const char version_string[] = "dvi2bitmap 0.9-4-devel";
