@@ -130,9 +130,9 @@
           CALL ADI_NEW0( 'CurfitControl', CTRLID, STATUS )
 
 *      Write control data
-          CALL ADI_CPUT0I( 'MaxIt', NITMAX, STATUS )
-          CALL ADI_CPUT0I( 'UpdateInterval', NUP, STATUS )
-          CALL ADI_CPUT0R( 'MinSlope', MINSLO, STATUS )
+          CALL ADI_CPUT0I( CTRLID, 'MaxIt', NITMAX, STATUS )
+          CALL ADI_CPUT0I( CTRLID, 'UpdateInterval', NUP, STATUS )
+          CALL ADI_CPUT0R( CTRLID, 'MinSlope', MINSLO, STATUS )
 
         END IF
 
