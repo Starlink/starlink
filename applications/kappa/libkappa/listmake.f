@@ -345,7 +345,7 @@
 *  are in the Base Frame of the returned FrameSet.
       TITLE = ' '
       CALL KPG1_RDLST( 'INCAT', .FALSE., IWCSIN, NPIN, NAXIN, IPIN, 
-     :                 IPIDIN, TITLE, STATUS )
+     :                 IPIDIN, TITLE, ' ', STATUS )
 
 *  If an input list was supplied...
       IF( STATUS .EQ. SAI__OK ) THEN
@@ -396,7 +396,7 @@
 *  If required, attempt to read positions from a file specified by the 
 *  user. 
       IF( MODE .EQ. 'FILE' ) THEN
-         CALL KPG1_ASFIL( 'FILE', FRM, NP, IPFIL, STATUS )
+         CALL KPG1_ASFIL( 'FILE', ' ', FRM, NP, IPFIL, ' ', STATUS )
 
 *  If succesful, indicate that the IPFIL pointer should be used.
          USEFIL = ( NP .GT. 0 .AND. STATUS .EQ. SAI__OK )

@@ -356,7 +356,7 @@
 *  FrameSet stored in the positions list.
       IF( STATE .EQ. PAR__ACTIVE .OR. MODE .EQ. 'POINTS' ) THEN
          CALL KPG1_RDLST( 'INCAT', .FALSE., IWCSIN, NPOS, NAXIN, IPW1,
-     :                    IPID, TITLE, STATUS )
+     :                    IPID, TITLE, ' ', STATUS )
 
 *  If succesful, indicate that the IPW1 pointer can be used.
          IF( STATUS .EQ. SAI__OK ) THEN

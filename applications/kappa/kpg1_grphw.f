@@ -58,22 +58,22 @@
 *                         and 5).
 *           "Lin(es)"   - Specifies colour, etc for lines (used in modes 1, 2
 *                         and 5).
-*        XLEFT = LITERAL (Read)
+*        XLEFT = _REAL (Read)
 *           The axis value to place at the left hand end of the horizontal
 *           axis. The dynamic default is specified by argument XL. The value 
 *           supplied may be greater than or less than the value supplied for 
 *           XRIGHT. 
-*        XRIGHT = LITERAL (Read)
+*        XRIGHT = _REAL (Read)
 *           The axis value to place at the right hand end of the horizontal
 *           axis. The dynamic default is specified by argument XR. The value 
 *           supplied may be greater than or less than the value supplied for 
 *           XLEFT. 
-*        YBOT = LITERAL (Read)
+*        YBOT = _REAL (Read)
 *           The axis value to place at the bottom end of the vertical 
 *           axis. The dynamic default is specified by argument YB. The value 
 *           supplied may be greater than or less than the value supplied for 
 *           YTOP. 
-*        YTOP = LITERAL (Read)
+*        YTOP = _REAL (Read)
 *           The axis value to place at the top end of the vertical axis. 
 *           The dynamic default is specified by argument YT. The value 
 *           supplied may be greater than or less than the value supplied 
@@ -95,10 +95,10 @@
 *        accessed if NSIGMA is zero.
 *     XLAB = CHARACTER * ( * ) (Given)
 *        A default label for the X axis. Only used if the user does not
-*        supply an alternative.
+*        supply an alternative. Trailing spaces are ignored.
 *     YLAB = CHARACTER * ( * ) (Given)
 *        A default label for the Y axis. Only used if the user does not
-*        supply an alternative.
+*        supply an alternative. Trailing spaces are ignored.
 *     TTL = CHARACTER * ( * ) (Given)
 *        A default title for the plot. Only used if the user does not
 *        supply an alternative.
@@ -160,6 +160,11 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
+*  Notes:
+*     - If an error occurs, or if no graphics is produced because the
+*     user supplied a null value for a parameter, IPLOT is returned equal
+*     to AST__NULL, and PGPLOT is shut down.
+
 *  Authors:
 *     DSB: D.S. Berry (STARLINK)
 *     {enter_new_authors_here}
@@ -167,6 +172,12 @@
 *  History:
 *     17-JUN-1999 (DSB):
 *        Original version.
+*     17-SEP-1999 (DSB):
+*        Modified to shutdown PGPLOT and return IPLOT=AST__NULL if
+*        an error occurs. Swapped the order of drawing so that the axes
+*        are drawn last (this looks better for instance, if a histogram is
+*        drawn in which may bins have value zero and are therefore drawn 
+*        on the bottom axis).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -214,6 +225,9 @@
 *  Status:
       INTEGER STATUS          ! Global status
 
+*  External References:
+      INTEGER CHR_LEN         ! Used length of a string.
+
 *  Local Variables:
       DOUBLE PRECISION BOX(4) ! Bounding box for plot
       INTEGER AXMAPS( 2 )     ! 1-D Mappings for each axis
@@ -227,7 +241,7 @@
       INTEGER NMARG           ! No. of supplied margin widths
       LOGICAL AXES            ! Draw axes?
       LOGICAL LVAL            ! Unused logical argument
-      REAL DEFMAR             ! Default margin
+      REAL DEFMAR             ! Default margin value
       REAL DELTA              ! Axis range
       REAL HI                 ! Y at high end of error bar
       REAL LO                 ! Y at low end of error bar
@@ -409,7 +423,7 @@
       CALL PAR_GET0L( 'AXES', AXES, STATUS )
 
 *  Abort if an error has occurred.
-      IF( STATUS .NE. SAI__OK ) GO TO 999
+      IF( STATUS .NE. SAI__OK) GO TO 999
 
 *  Get the margin values, using a dynamic default of zero if no axes are 
 *  being created (to avoid the unnecessary creation of FRAME pictures by 
@@ -419,10 +433,9 @@
       ELSE
          DEFMAR = 0.18
       END IF
-
       CALL PAR_DEF1R( 'MARGIN', 1, DEFMAR, STATUS )
-      CALL PAR_GDRVR( 'MARGIN', 4, -0.49, 10.0, MARGIN, NMARG, STATUS )
 
+      CALL PAR_GDRVR( 'MARGIN', 4, -0.49, 10.0, MARGIN, NMARG, STATUS )
       IF( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
          MARGIN( 1 ) = DEFMAR
@@ -438,14 +451,17 @@
          END DO
       END IF
 
+
 *  Create a FrameSet containing a single Frame in which the default values 
 *  for labels, symbols, title, etc can be set.
       IFRM = AST_FRAMESET( AST_FRAME( 2, 'DOMAIN=DATAPLOT', STATUS ), 
      :                     ' ', STATUS )
 
 *  Set the default value for the axis labels.
-      CALL AST_SETC( IFRM, 'LABEL(1)', XLAB, STATUS )
-      CALL AST_SETC( IFRM, 'LABEL(2)', YLAB, STATUS )
+      CALL AST_SETC( IFRM, 'LABEL(1)', XLAB( : CHR_LEN( XLAB ) ), 
+     :               STATUS )
+      CALL AST_SETC( IFRM, 'LABEL(2)', YLAB( : CHR_LEN( YLAB ) ), 
+     :               STATUS )
 
 *  Set the default plot title.
       CALL AST_SETC( IFRM, 'TITLE', TTL, STATUS )
@@ -460,10 +476,15 @@
      :                ' ', 0.0, 0.0, 'DATAPLOT', BOX, IPICD, IPICF, 
      :                IVAL, IPLOT, IVAL, LVAL, STATUS )
 
-*  If a null value was supplied for aNY graphics parameter, annul the error
-*  if allowed, and do not plot anything.
+*  If a null value was supplied for any graphics parameter, annul the
+*  Plot, shut down PGPLOT and annull the error if allowed, and do not plot 
+*  anything.
       IF( STATUS .EQ. PAR__NULL ) THEN
-         IF( NULL ) CALL ERR_ANNUL( STATUS )
+         IF( NULL ) THEN
+            CALL AST_ANNUL( IPLOT, STATUS )
+            CALL AGP_DEASS( 'DEVICE', .FALSE., STATUS )
+            CALL ERR_ANNUL( STATUS )
+         END IF
 
 *  Otherwise, if the device was opened succesfully...
       ELSE IF( STATUS .EQ. SAI__OK ) THEN
@@ -484,13 +505,13 @@
 *  Start a PGPLOT buffering context.
          CALL PGBBUF
 
-*  Draw the axes if required.
-         IF( AXES ) CALL KPG1_ASGRD( IPLOT, IPICF, .TRUE., STATUS )
-
 *  Draw the points.
          CALL KPG1_PLTLN( N, 1, N, DX, DY, .FALSE., ( NSIGMA .GT. 0.0 ),
      :                    0.0D0, DBAR, 0.0D0, 'STYLE', IPLOT, MODE, 
      :                    IMARK, 1, 1, APP, STATUS )
+
+*  Draw the axes if required.
+         IF( AXES ) CALL KPG1_ASGRD( IPLOT, IPICF, .TRUE., STATUS )
 
 *  End the PGPLOT buffering context.
          CALL PGEBUF
@@ -520,8 +541,15 @@
 *  will not be annulled by the following call to AST_END.
       CALL AST_EXPORT( IPLOT, STATUS )
 
-*  Tidy up
+*  Tidy up.
  999  CONTINUE
+
+*  If an error has occurred, annul the returned Plot and shutdown the
+*  graphics system.
+      IF( STATUS .NE. SAI__OK ) THEN
+         CALL AST_ANNUL( IPLOT, STATUS )
+         CALL AGP_DEASS( 'DEVICE', .FALSE., STATUS )
+      END IF
 
 *  End AST context.
       CALL AST_END( STATUS )

@@ -458,7 +458,7 @@
 *  The positions are returned in the Base Frame of this FrameSet.
       IWCS = AST__NULL
       CALL KPG1_RDLST( 'INCAT', .FALSE., IWCS, NPOS, NBAX, IPPOS, IPID,
-     :                 TITLE, STATUS )
+     :                 TITLE, ' ', STATUS )
 
 *  Give a suitable message, store zero for NUMBER, and abort if the file 
 *  was empty.

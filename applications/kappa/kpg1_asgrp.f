@@ -1,4 +1,4 @@
-      SUBROUTINE KPG1_ASGRP( FRM, IGRP, NP, NAX, OUT, STATUS )
+      SUBROUTINE KPG1_ASGRP( PARAM, FRM, IGRP, NP, NAX, OUT, STATUS )
 *+
 *  Name:
 *     KPG1_ASGRP
@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG1_ASGRP( FRM, IGRP, NP, NAX, OUT, STATUS )
+*     CALL KPG1_ASGRP( PARAM, FRM, IGRP, NP, NAX, OUT, STATUS )
 
 *  Description:
 *     This routine reads formatted positions from a GRP group. The
@@ -24,6 +24,12 @@
 *     An error is reported if any unreadable elements are found.
 
 *  Arguments:
+*     PARAM = CHARACTER * ( * ) (Given)
+*        The name of an environment parameter to use to get the indices of 
+*        the columns within the text file which are to be used. If blank, 
+*        the file must contain exactly NAX columns, all of which are used.
+*        If a null value is supplied, the dynamic default values will be
+*        used which is [1,2,3... NAX]. 
 *     FRM = INTEGER (Given)
 *        A pointer to an AST Frame.
 *     IGRP = INTEGER (Given)
@@ -44,6 +50,8 @@
 *  History:
 *     10-SEP-1998 (DSB):
 *        Original version.
+*     17-SEP-1999 (DSB):
+*        Added argument PARAM.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -57,10 +65,11 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'GRP_PAR'          ! GRP constants
-      INCLUDE 'NDF_PAR'          ! NDF constants
+      INCLUDE 'PRM_PAR'          ! VAL__ constants
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
 
 *  Arguments Given:
+      CHARACTER PARAM*(*)
       INTEGER FRM
       INTEGER IGRP
       INTEGER NP
@@ -72,24 +81,106 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
+*  External References:
+      CHARACTER CHR_NTH          ! Returns "st", "nd", "rd", etc.
+
+*  Local Constants:
+      INTEGER MXCOL              ! Max no of columns in a text file
+      PARAMETER ( MXCOL = 200 )
+
 *  Local Variables:
       CHARACTER MESS*30          ! Error message phrase
       CHARACTER TEXT*(GRP__SZNAM)! Text of current element
-      CHARACTER WORDS( NDF__MXDIM )*30! Words extracted from current element
+      CHARACTER WORDS( MXCOL )*50! Words extracted from current element
       INTEGER I                  ! Element index
-      INTEGER J                  ! Axis index
+      INTEGER J                  ! Column index
+      INTEGER K                  ! Axis index
       INTEGER LSTAT              ! CHR status
       INTEGER NC                 ! No. of characters used by AST_UNFORMAT
       INTEGER NCW                ! No. of characters in current word
       INTEGER NWRD               ! No. of words in current element
       INTEGER SIZE               ! No. of elements in group
-      INTEGER WSTART( NDF__MXDIM )! Index of start of each word
-      INTEGER WSTOP( NDF__MXDIM )! Index of end of each word
+      INTEGER WSTART( MXCOL )    ! Index of start of each word
+      INTEGER WSTOP( MXCOL )     ! Index of end of each word
       LOGICAL OK                 ! Can element be read?
+      INTEGER POSMAX             ! Largest required column index
+      INTEGER POSDEF( MXCOL )    ! Default column indices
+      INTEGER POSCOD( MXCOL )    ! Required column indices
+      LOGICAL POSDUP             ! Duplicate column indices supplied?
 *.
 
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  If no parameter has been supplied, use columns 1 to NAX.
+      IF( PARAM .EQ. ' ' ) THEN
+         DO I = 1, NAX
+            POSCOD( I ) = I
+         END DO
+
+*  Otherwise, ask the user which columns to use.
+      ELSE
+
+*  Set dynamic defaults for position columns.
+         DO I = 1, NAX
+            POSDEF( I ) = I
+         END DO
+
+*  Loop until we have a unique set of columns.
+         POSDUP = .TRUE.
+         DO WHILE ( POSDUP .AND. STATUS .EQ. SAI__OK )
+
+*  Get the co-ordinates.  
+            CALL PAR_GDR1I( PARAM, NAX, POSDEF, 1, VAL__MAXI, .TRUE.,
+     :                      POSCOD, STATUS )
+            IF( STATUS .EQ. SAI__OK ) THEN
+
+*  Assume no duplication for the moment.
+               POSDUP = .FALSE.
+
+*  Check for duplication of the  co-ordinate columns.
+               DO I = 1, NAX - 1
+                  DO J = I + 1, NAX
+                     IF( POSCOD( I ) .EQ. POSCOD( J ) .AND. 
+     :                   STATUS .EQ. SAI__OK ) THEN
+                        STATUS = SAI__ERROR
+                        CALL MSG_SETI( 'I', I )
+                        CALL MSG_SETC( 'I', CHR_NTH( I ) )
+                        CALL MSG_SETI( 'J', J )
+                        CALL MSG_SETC( 'J', CHR_NTH( J ) )
+                        CALL MSG_SETC( 'P', PARAM )
+                        CALL ERR_REP( 'KPG1_ASGRP_ERR1', '^I and ^J '//
+     :                           'columns specified by parameter %^P '//
+     :                           'are equal.', STATUS )
+                     END IF   
+                  END DO   
+               END DO
+
+*  Report the error immediately, and reset the status to OK.
+               IF( STATUS .NE. SAI__OK ) THEN
+                  CALL ERR_FLUSH( STATUS )
+
+*  There is duplication so try again.
+                  POSDUP = .TRUE.
+
+*  Cancel the parameters so that the user can be re-prompted.
+                  CALL PAR_CANCL( PARAM, STATUS )
+               END IF
+
+            END IF
+
+         END DO
+
+*  Abort if an error has occurred.
+         IF( STATUS .NE. SAI__OK ) GO TO 999
+
+      END IF
+
+*  Find the largest required column index.
+      POSMAX = 0
+      DO I = 1, NAX
+         POSMAX = MAX( POSMAX, POSCOD( I ) )
+      END DO
 
 *  Get the size of the group.
       CALL GRP_GRPSZ( IGRP, SIZE, STATUS )
@@ -106,14 +197,14 @@
          CALL CHR_TRCHR( ',	', '  ', TEXT, LSTAT ) 
 
 *  Split the element up in to words delimited by spaces.
-         CALL CHR_DCWRD( TEXT, NDF__MXDIM, NWRD, WSTART, WSTOP, WORDS, 
+         CALL CHR_DCWRD( TEXT, MXCOL, NWRD, WSTART, WSTOP, WORDS, 
      :                   LSTAT ) 
 
 *  If this element has too many or too few fields, store a message.
-         IF( NWRD .LT. NAX ) THEN
+         IF( NWRD .LT. POSMAX ) THEN
             MESS = 'too few fields'
 
-         ELSE IF( NWRD .GT. NAX ) THEN
+         ELSE IF( PARAM .EQ. ' ' .AND. NWRD .GT. NAX ) THEN
             MESS = 'too many fields'
 
 *  Otherwise...
@@ -122,8 +213,11 @@
 *  Assume the element can be read OK.
             OK = .TRUE.
  
-*  Loop round each word in the element.
-            DO J = 1, NAX
+*  Loop round each required column.
+            DO K = 1, NAX
+
+*  Get the word index.
+               J = POSCOD( K )
 
 *  Store number of characters in this word.
                NCW = WSTOP( J ) - WSTART( J ) + 1
@@ -148,21 +242,31 @@
 
 *  If this element could not be used, report an error.
          IF( .NOT. OK .AND. STATUS .EQ. SAI__OK ) THEN
-            STATUS = SAI__ERROR
+            CALL MSG_SETC( 'D', AST_GETC( FRM, 'DOMAIN', STATUS ) )
             CALL MSG_SETI( 'N', NAX )
             CALL MSG_SETC( 'TEXT', TEXT )
+            STATUS = SAI__ERROR
 
             IF( MESS .EQ. ' ' ) THEN
                CALL ERR_REP( 'KPG1_ASGRP_1', 'The following string '//
-     :                       'could not  be interpreted as an ^N '//
-     :                       'dimensional position: ``^TEXT''.', 
+     :                       'could not  be interpreted as a ^N '//
+     :                       'dimensional ^D position: ``^TEXT''.', 
      :                       STATUS )
             ELSE
                CALL MSG_SETC( 'M', MESS )
-               CALL ERR_REP( 'KPG1_ASGRP_2', 'The following string '//
-     :                       'could not  be interpreted as an ^N '//
-     :                       'dimensional position (^M): ``^TEXT''.', 
-     :                       STATUS )
+               IF( PARAM .EQ. ' ' ) THEN
+                  CALL ERR_REP( 'KPG1_ASGRP_2', 'The following string'//
+     :                          ' could not  be interpreted as a ^N '//
+     :                          'dimensional ^D position (^M): '//
+     :                          '``^TEXT''.', STATUS )
+               ELSE
+                  CALL MSG_SETC( 'P', PARAM )
+                  CALL ERR_REP( 'KPG1_ASGRP_3', 'The following string'//
+     :                          ' could not  be interpreted as a ^N '//
+     :                          'dimensional ^D position using the '//
+     :                          'columns given by parameter %^P (^M)'//
+     :                          ': ``^TEXT''.', STATUS )
+               END IF
 
             END IF
 

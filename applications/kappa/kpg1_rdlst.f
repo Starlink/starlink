@@ -1,5 +1,5 @@
       SUBROUTINE KPG1_RDLST( PARAM, CURFRM, IWCS, NPOS, NAX, IPPOS,
-     :                       IPID, TITLE, STATUS )
+     :                       IPID, TITLE, NAME, STATUS )
 *+
 *  Name:
 *     KPG1_RDLST
@@ -12,7 +12,7 @@
 
 *  Invocation:
 *     CALL KPG1_RDLST( PARAM, CURFRM, IWCS, NPOS, NAX, IPPOS, IPID, TITLE, 
-*                      STATUS )
+*                      NAME, STATUS )
 
 *  Description:
 *     This routine reads a FrameSet, and a set of positions with
@@ -51,14 +51,18 @@
 *        A pointer to a 2-dimensional DOUBLE PRECISION array holding the
 *        returned positions. Element (I,J) of this array gives axis J for
 *        position I. The first axis will have NPOS elements, and the
-*        second will have NAX elements.
+*        second will have NAX elements. Should be released using PSX_FREE 
+*        when no longer needed.
 *     IPID = INTEGER (Returned)
 *        A pointer to a 1-dimensional INTEGER array holding the integer
 *        identifiers for the returned positions. The array will have NPOS
-*        elements.
+*        elements. Should be released using PSX_FREE when no longer needed.
 *     TITLE = CHARACTER * ( * ) (Returned)
 *        The value of the TITLE parameter in the supplied catalogue.
 *        Returned blank if there is no TITLE parameter.
+*     NAME = CHARACTER * ( * ) (Returned)
+*        The file spec of the catalogue containing the positions list.
+*        Not accessed if the declared length is 1.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -97,6 +101,7 @@
       INTEGER IPPOS
       INTEGER IPID
       CHARACTER TITLE*(*)
+      CHARACTER NAME*(*)
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -143,6 +148,9 @@
 
 *  Get the catalogue name for use in error messages.
       CALL CAT_TIQAC( CI, 'NAME', CNAME, STATUS )
+
+*  If required return the catalogue name.
+      IF( LEN( NAME ) .GT. 1 ) NAME = CNAME
 
 *  Reset the pointer for the next item of textual information to be read
 *  from the catalogue.
@@ -398,6 +406,7 @@
          IPPOS = 0
          IPID = 0
          TITLE = ' '
+         IF( LEN( NAME ) .GT. 1 ) NAME = ' '
 
          CALL MSG_SETC( 'PARAM', PARAM )
          CALL ERR_REP( 'KPG1_RDLST_ERR3', 'Error reading a positions '//

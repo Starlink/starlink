@@ -94,10 +94,10 @@
 *        The standard deviation associated with each Y value.
 *     XLAB = CHARACTER * ( * ) (Given)
 *        A default label for the X axis. Only used if the user does not
-*        supply an alternative.
+*        supply an alternative. Trailing spaces are ignored.
 *     YLAB = CHARACTER * ( * ) (Given)
 *        A default label for the Y axis. Only used if the user does not
-*        supply an alternative.
+*        supply an alternative. Trailing spaces are ignored.
 *     TTL = CHARACTER * ( * ) (Given)
 *        A default title for the plot. Only used if the user does not
 *        supply an alternative.
@@ -154,6 +154,11 @@
 *        The AST Plot used to do the drawing.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
+
+*  Notes:
+*     - If an error occurs, or if no graphics is produced because the
+*     user supplied a null value for a parameter, IPLOT is returned equal
+*     to AST__NULL, and PGPLOT is shut down.
 
 *  Authors:
 *     DSB: D.S. Berry (STARLINK)

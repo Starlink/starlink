@@ -1,4 +1,5 @@
-      SUBROUTINE KPG1_ASFIL( PARAM, FRM, NP, IPOUT, STATUS )
+      SUBROUTINE KPG1_ASFIL( PARAM1, PARAM2, FRM, NP, IPOUT, FNAME, 
+     ;                       STATUS )
 *+
 *  Name:
 *     KPG1_ASFIL
@@ -10,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG1_ASFIL( PARAM, FRM, NP, IPOUT, STATUS )
+*     CALL KPG1_ASFIL( PARAM1, PARAM2, FRM, NP, IPOUT, FNAME, STATUS )
 
 *  Description:
 *     This routine obtains formatted positions from a text file specified by 
@@ -21,13 +22,19 @@
 *     a set of strings delimited by comma, space or tab (the first gives the
 *     value for axis 1, the second for axis 2, etc). The number of strings
 *     per line should equal the number of axes in the supplied Frame. 
+*     The user can specify the columns to use using parameter PARAM2.
 *
 *     The file may contain blank lines, and comment lines commencing with 
 *     "!" or "#".
 
 *  Arguments:
-*     PARAM = CHARACTER * ( * ) (Given)
-*        The name of the parameter to use.
+*     PARAM1 = CHARACTER * ( * ) (Given)
+*        The name of an environment parameter to use to get the file.
+*     PARAM2 = CHARACTER * ( * ) (Given)
+*        The name of an environment parameter to use to get the indices of 
+*        the columns within the text file which are to be used. If blank, 
+*        the file must contain a column for every axis in FRM, all of which 
+*        are used in the order 1, 2, 3, etc.
 *     FRM = INTEGER (Given)
 *        A pointer to an AST Frame.
 *     NP = INTEGER (Returned)
@@ -35,7 +42,11 @@
 *     IPOUT = INTEGER (Returned)
 *        A pointer to an _DOUBLE array "COR( NP, * )" holding the obtained
 *        co-ordinates. The second dimension of the array is equal to the
-*        number of axes in the suppleid Frame.
+*        number of axes in the suppleid Frame. Should be released using 
+*        PSX_FREE when no longer needed.
+*     FNAME = CHARACTER * ( * ) (Returned)
+*        The file's name. Not accesed if the declared length of the
+*        supplied string is 1 character.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -46,6 +57,8 @@
 *  History:
 *     10-SEP-1998 (DSB):
 *        Original version.
+*     17-SEP-1999 (DSB):
+*        Added arguments PARAM2 and FNAME.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -63,19 +76,20 @@
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
 
 *  Arguments Given:
-      CHARACTER PARAM*(*)
+      CHARACTER PARAM1*(*)
+      CHARACTER PARAM2*(*)
       INTEGER FRM
 
 *  Arguments Returned:
       INTEGER NP
       INTEGER IPOUT
+      CHARACTER FNAME*(*)
 
 *  Status:
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
       CHARACTER BUFFER*(GRP__SZNAM)! AST attribute name
-      CHARACTER FNAME*(GRP__SZFNM)! File name
       INTEGER FD                 ! FIO file descriptor for input file
       INTEGER IGRP               ! GRP identifier for group holding file contents
       INTEGER NAX                ! No. of axes in supplied Frame
@@ -93,8 +107,8 @@
       CALL AST_BEGIN( STATUS )
 
 *  Obtain the input text file, and save its name.
-      CALL FIO_ASSOC( PARAM, 'READ', 'LIST', 0, FD, STATUS )
-      CALL FIO_FNAME( FD, FNAME, STATUS ) 
+      CALL FIO_ASSOC( PARAM1, 'READ', 'LIST', 0, FD, STATUS )
+      IF( LEN( FNAME ) .GT. 1 ) CALL FIO_FNAME( FD, FNAME, STATUS ) 
 
 *  Create a GRP group to hold the file contents. 
       CALL GRP_NEW( ' ', IGRP, STATUS )
@@ -140,7 +154,8 @@
          IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Read the positions from the group into the array allocated above.
-         CALL KPG1_ASGRP( FRM, IGRP, NP, NAX, %VAL( IPOUT ), STATUS )
+         CALL KPG1_ASGRP( PARAM2, FRM, IGRP, NP, NAX, %VAL( IPOUT ), 
+     :                    STATUS )
 
       END IF
 
@@ -159,9 +174,9 @@
          NP = 0
 
 *  Give a context message.
-         CALL MSG_SETC( 'PARAM', PARAM )
+         CALL MSG_SETC( 'PARAM1', PARAM1 )
          CALL ERR_REP( 'KPG1_ASFIL_ERR3', 'Error obtained a set of '//
-     :                 'formatted positions using parameter %^PARAM.',
+     :                 'formatted positions using parameter %^PARAM1.',
      :                  STATUS )
 
       END IF

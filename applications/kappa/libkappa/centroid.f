@@ -503,7 +503,7 @@
       ELSE IF( CAT ) THEN
          IWCSG = AST__NULL
          CALL KPG1_RDLST( 'INCAT', .FALSE., IWCSG, NPOS, NAXIN, IPIN, 
-     :                    IPID, TITLE, STATUS )
+     :                    IPID, TITLE, ' ', STATUS )
 
 *  In "Cursor" mode, open and prepare the graphics device.
       ELSE IF( CURSOR ) THEN
@@ -673,9 +673,8 @@
 *  the Mapping from Current Frame to PIXEL Frame (obtained by 
 *  temporarily inverting the Mapping from PIXEL to Current Frame).
       CALL AST_INVERT( MAP1, STATUS )
-c      MAP3 = AST_SIMPLIFY( AST_CMPMAP( MAP2, MAP1, .TRUE., ' ', 
-c     :                                 STATUS ), STATUS )
-      MAP3 = AST_CMPMAP( MAP2, MAP1, .TRUE., ' ', STATUS )
+      MAP3 = AST_SIMPLIFY( AST_CMPMAP( MAP2, MAP1, .TRUE., ' ', 
+     :                                 STATUS ), STATUS )
       CALL AST_INVERT( MAP1, STATUS )
 
 *  See if a description of the NDFs current Frame is required.
@@ -695,7 +694,7 @@ c     :                                 STATUS ), STATUS )
 *  in File mode instead of being read from the file, and so we do not
 *  have a pointer to an array of identifiers at this point.
       IF( FILE ) THEN
-         CALL KPG1_ASFIL( 'COIN', CFRM, NPOS, IPIN, STATUS )
+         CALL KPG1_ASFIL( 'COIN', ' ', CFRM, NPOS, IPIN, ' ', STATUS )
          IPID = IPIN
       END IF
 
