@@ -200,8 +200,9 @@
 
 *    See if the next energy is actually closer
         IF ( EBIN .LT. DIMS(NDIM) ) THEN
-          CALL ARR_ELEM1R( EPTR, DIMS(NDIM), EBIN-1, E1, STATUS )
-          CALL ARR_ELEM1R( EPTR, DIMS(NDIM), EBIN, E2, STATUS )
+          CALL ARR_ELEM1R( EPTR, DIMS(NDIM), EBIN, E1, STATUS )
+          CALL ARR_ELEM1R( EPTR, DIMS(NDIM), EBIN+1, E2, STATUS )
+	print *,energy,e1,e2
           IF ( (E2-ENERGY) .LT. (ENERGY-E1) ) EBIN = EBIN + 1
         END IF
 
