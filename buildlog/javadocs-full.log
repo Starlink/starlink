@@ -73,8 +73,6 @@ javadoc-sources:
 prepare:
 
 assemble_java:
-    [mkdir] Created dir: /apps/cvsbuild/java/source/array/build/java
-     [copy] Copying 42 files to /apps/cvsbuild/java/source/array/build/java
 
 javadoc-sources:
      [echo] Executing NDX target: javadoc-sources
@@ -197,18 +195,6 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/Compression.java:7: package org.apache.tools.bzip2 does not exist
   [javadoc] import org.apache.tools.bzip2.CBZip2InputStream;
   [javadoc]                               ^
-  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/SelectTextField.java:17: package uk.ac.starlink.ast.gui.images does not exist
-  [javadoc] import uk.ac.starlink.ast.gui.images.ImageHolder;
-  [javadoc]                                      ^
-  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/SelectCharacters.java:30: package uk.ac.starlink.ast.gui.images does not exist
-  [javadoc] import uk.ac.starlink.ast.gui.images.ImageHolder;
-  [javadoc]                                      ^
-  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/PlotConfigurator.java:40: package uk.ac.starlink.ast.gui.images does not exist
-  [javadoc] import uk.ac.starlink.ast.gui.images.ImageHolder;
-  [javadoc]                                      ^
-  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/StoreConfigurator.java:33: package uk.ac.starlink.ast.gui.images does not exist
-  [javadoc] import uk.ac.starlink.ast.gui.images.ImageHolder;
-  [javadoc]                                      ^
   [javadoc] Standard Doclet version 1.4.1
 
   [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/Compression.java:141: cannot resolve symbol
@@ -261,15 +247,15 @@ javadoc-sources:
   [javadoc] "The suggested fraction resolution (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "The suggested fraction resolution (i.e. interval between steps)."
+  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstTitle.java:71: warning - The first sentence is interpreted to be:
+  [javadoc] "The suggested gap resolution (i.e."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "The suggested gap resolution (i.e. interval between steps)."
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstNumberLabels.java:99: warning - The first sentence is interpreted to be:
   [javadoc] "The suggested gap resolution (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "The suggested gap resolution (i.e. interval between steps)."
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstAxisLabels.java:93: warning - The first sentence is interpreted to be:
-  [javadoc] "The suggested gap resolution (i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "The suggested gap resolution (i.e. interval between steps)."
-  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstTitle.java:71: warning - The first sentence is interpreted to be:
   [javadoc] "The suggested gap resolution (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "The suggested gap resolution (i.e. interval between steps)."
@@ -493,7 +479,7 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstDoubleField.java:29: warning - Tag @link: reference not found: Frame
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/stylesheet.css...
   [javadoc] 1 error
-  [javadoc] 101 warnings
+  [javadoc] 97 warnings
 
 BUILD SUCCESSFUL
-Total time: 44 seconds
+Total time: 46 seconds
