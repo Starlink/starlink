@@ -98,6 +98,9 @@
 *     1997 May 12 (TIMJ)
 *        Remove FITS from input arguments
 * $Log$
+* Revision 1.4  2004/11/18 20:37:46  timj
+* Forgot to pass STATUS into PSX_TIME
+*
 * Revision 1.3  2004/11/18 20:37:24  timj
 * Annul AST objects
 *
@@ -454,7 +457,7 @@
 *      - Dont feel the need to call MJD_TO_DATEOBS since we know PSX_GMTIME
 *        gives the Y/M/D etc and we are now always going to be writing
 *        post-1999 FITS format since we cant go back in time!
-      CALL PSX_TIME( NTICKS )   ! Time in seconds
+      CALL PSX_TIME( NTICKS, STATUS )   ! Time in seconds
       CALL PSX_GMTIME( NTICKS, TARRAY(1), TARRAY(2), TARRAY(3),
      :     TARRAY(4), TARRAY(5), TARRAY(6), TARRAY(7), TARRAY(8), 
      :     ITEMP, STATUS )
