@@ -1,0 +1,96 @@
+*+
+*  Name:
+*     CHART_CMN
+*  Purpose:
+*     Common block for the catchart application.
+*  Language:
+*     FORTRAN 77.
+*  Type of Module:
+*     INCLUDE FILE.
+*  Description:
+*     Common block for the catchart application.
+*  Authors:
+*     ACD: A C Davenhall (Edinburgh)
+*  History:
+*     18/8/96 (ACD): Original version.
+*     22/8/96 (ACD): First stable version.
+*     20/4/01 (ACD): Removed the variables holding the radius of the
+*       plotting region (RADC__CIO and RAD__CIO).
+*-
+
+*
+*    Common block variables.
+*    ======================
+
+*
+*    Description of the region to be plotted.
+
+      CHARACTER
+     :  RAC__CIO*20,    ! Right Ascension of centre (sexagesimal).
+     :  DECC__CIO*20,   ! Declination     "    "    (     "     ).
+     :  EPOCH__CIO*10,  ! Epoch of centre.
+     :  EQUNX__CIO*10   ! Equinox of centre.
+
+      DOUBLE PRECISION
+     :  RA__CIO,        ! Right Ascension of centre (radians).
+     :  DEC__CIO        ! Declination     "    "    (   "   ).
+
+*
+*    Viewport and window for the annotation.
+
+      REAL
+     :  AVXMN__CIO,     ! Viewport X minimum.
+     :  AVXMX__CIO,     !    "     X maximum.
+     :  AVYMN__CIO,     !    "     Y minimum.
+     :  AVYMX__CIO,     !    "     Y maximum.
+     :  AWXMN__CIO,     ! Window X minimum.
+     :  AWXMX__CIO,     !   "    X maximum.
+     :  AWYMN__CIO,     !   "    Y minimum.
+     :  AWYMX__CIO      !   "    Y maximum.
+
+*
+*    Viewport and window for the chart.
+
+      REAL
+     :  CVXMN__CIO,     ! Viewport X minimum.
+     :  CVXMX__CIO,     !    "     X maximum.
+     :  CVYMN__CIO,     !    "     Y minimum.
+     :  CVYMX__CIO,     !    "     Y maximum.
+     :  CWXMN__CIO,     ! Window X minimum.
+     :  CWXMX__CIO,     !   "    X maximum.
+     :  CWYMN__CIO,     !   "    Y minimum.
+     :  CWYMX__CIO      !   "    Y maximum.
+
+*
+*    Plotting symbols.
+
+      LOGICAL
+     :  AVSYM__CIO(18)  ! List of symbols which have been used.
+      INTEGER
+     :  DSYMB__CIO,     ! The current default symbol.
+     :  CSYMB__CIO      ! The current plotting symbol.
+      REAL
+     :  YTEXT__CIO      ! Current Y position in the chart legend.
+
+*
+*    Common blocks.
+*    =============
+
+      COMMON /CHART_C/
+     :  RAC__CIO,    DECC__CIO,   EPOCH__CIO,  EQUNX__CIO
+
+      COMMON /CHART_D/
+     :  RA__CIO,     DEC__CIO
+
+      COMMON /CHART_R/
+     :  AVXMN__CIO,  AVXMX__CIO,  AVYMN__CIO,  AVYMX__CIO,
+     :  AWXMN__CIO,  AWXMX__CIO,  AWYMN__CIO,  AWYMX__CIO,
+     :  CVXMN__CIO,  CVXMX__CIO,  CVYMN__CIO,  CVYMX__CIO,
+     :  CWXMN__CIO,  CWXMX__CIO,  CWYMN__CIO,  CWYMX__CIO,
+     :  YTEXT__CIO
+
+      COMMON /CHART_I/
+     :  DSYMB__CIO,  CSYMB__CIO
+
+      COMMON /CHART_L/
+     :  AVSYM__CIO

@@ -1,0 +1,185 @@
+*+
+*  Name:
+*     CIO_PAR
+*  Purpose:
+*     Parametric constants for the CIO library.
+*  Language:
+*     FORTRAN 77.
+*  Type of Module:
+*     INCLUDE FILE.
+*  Description:
+*     Parametric constants for the CIO library.
+*  Authors:
+*     ACD: A C Davenhall (Edinburgh)
+*  History:
+*     2/8/96  (ACD): Original version.
+*     22/8/96 (ACD): First stable version.
+*     18/4/01 (ACD): Replaced the single symbol for an ellipse (CIO__SELLP)
+*       with separate symbols for open and filled ellipses.
+*-
+
+*
+*    Codes for the various items which can occur in the graphics
+*    translation file.
+
+      INTEGER CIO__TYSMB   ! Symbol.
+      PARAMETER (CIO__TYSMB = 1)
+
+      INTEGER CIO__TYCOL   ! Colour.
+      PARAMETER (CIO__TYCOL = 2)
+
+      INTEGER CIO__TYUNT   ! Units.
+      PARAMETER (CIO__TYUNT = 3)
+
+      INTEGER CIO__TYSZ1   ! First symbol size.
+      PARAMETER (CIO__TYSZ1 = 4)
+
+      INTEGER CIO__TYSZ2   ! Second symbol size.
+      PARAMETER (CIO__TYSZ2 = 5)
+
+      INTEGER CIO__TYSZ3   ! Third symbol size.
+      PARAMETER (CIO__TYSZ3 = 6)
+
+      INTEGER CIO__TYSZ4   ! Fourth symbol size.
+      PARAMETER (CIO__TYSZ4 = 7)
+
+      INTEGER CIO__TYLBL   ! Label.
+      PARAMETER (CIO__TYLBL = 8)
+
+*
+*    Plotting symbols.
+
+      INTEGER CIO__SVAR    ! Plotting symbol varies.
+      PARAMETER (CIO__SVAR = -1)
+
+      INTEGER CIO__SOMIT   ! Omit (do not plot) the object.
+      PARAMETER (CIO__SOMIT = 0)
+
+      INTEGER CIO__SUNDF   ! Undefined (plotting engine may choose).
+      PARAMETER (CIO__SUNDF = 1)
+
+      INTEGER CIO__SDOT    ! Dot.
+      PARAMETER (CIO__SDOT = 2)
+
+      INTEGER CIO__SOPCR   ! Open circle.
+      PARAMETER (CIO__SOPCR = 3)
+
+      INTEGER CIO__SFLCR   ! Filled circle.
+      PARAMETER (CIO__SFLCR = 4)
+
+      INTEGER CIO__SOPSQ   ! Open square.
+      PARAMETER (CIO__SOPSQ = 5)
+
+      INTEGER CIO__SFLSQ   ! Filled square.
+      PARAMETER (CIO__SFLSQ = 6)
+
+      INTEGER CIO__SOPTR   ! Open triangle.
+      PARAMETER (CIO__SOPTR = 7)
+
+      INTEGER CIO__SFLTR   ! Filled triangle.
+      PARAMETER (CIO__SFLTR = 8)
+
+      INTEGER CIO__SOPSR   ! Open star.
+      PARAMETER (CIO__SOPSR = 9)
+
+      INTEGER CIO__SFLSR   ! Filled star.
+      PARAMETER (CIO__SFLSR = 10)
+
+      INTEGER CIO__SPLUS   ! Plus sign.
+      PARAMETER (CIO__SPLUS = 11)
+
+      INTEGER CIO__SMULT   ! Multiplication sign.
+      PARAMETER (CIO__SMULT = 12)
+
+      INTEGER CIO__SAST    ! Asterisk.
+      PARAMETER (CIO__SAST = 13)
+
+      INTEGER CIO__SXERR   ! X error bar.
+      PARAMETER (CIO__SXERR = 14)
+
+      INTEGER CIO__SYERR   ! Y error bar.
+      PARAMETER (CIO__SYERR = 15)
+
+      INTEGER CIO__SXYER   ! XY error bar.
+      PARAMETER (CIO__SXYER = 16)
+
+      INTEGER CIO__SLOZG   ! Error lozenge.
+      PARAMETER (CIO__SLOZG = 17)
+
+      INTEGER CIO__SOELP   ! Open ellipse.
+      PARAMETER (CIO__SOELP = 18)
+
+      INTEGER CIO__SFELP   ! Filled ellipse.
+      PARAMETER (CIO__SFELP = 19)
+
+*
+*    Plotting colours.
+
+      INTEGER CIO__CDEF    ! Default (plotting engine may choose).
+      PARAMETER (CIO__CDEF = 1)
+
+      INTEGER CIO__CRED    ! Red.
+      PARAMETER (CIO__CRED = 2)
+
+      INTEGER CIO__CGRN    ! Green.
+      PARAMETER (CIO__CGRN = 3)
+
+      INTEGER CIO__CBLUE   ! Blue.
+      PARAMETER (CIO__CBLUE = 4)
+
+      INTEGER CIO__CCYAN   ! Cyan.
+      PARAMETER (CIO__CCYAN = 5)
+
+      INTEGER CIO__CMAGN   ! Magenta.
+      PARAMETER (CIO__CMAGN = 6)
+
+      INTEGER CIO__CYELL   ! Yellow.
+      PARAMETER (CIO__CYELL = 7)
+
+*
+*    Plotting units.
+
+      INTEGER CIO__UFRAC   ! Fraction of X range.
+      PARAMETER (CIO__UFRAC = 1)
+
+      INTEGER CIO__UASEC   ! Seconds of arc.
+      PARAMETER (CIO__UASEC = 2)
+
+      INTEGER CIO__UAMIN   ! Minutes of arc.
+      PARAMETER (CIO__UAMIN = 3)
+
+      INTEGER CIO__UDEGR   ! Degrees.
+      PARAMETER (CIO__UDEGR = 4)
+
+      INTEGER CIO__UHOUR   ! Hours.
+      PARAMETER (CIO__UHOUR = 5)
+
+      INTEGER CIO__URADN   ! Radians.
+      PARAMETER (CIO__URADN = 6)
+
+*
+*    Maximum sizes for arrays and character strings etc.
+
+      INTEGER CIO__MXIFB   ! Maximum number of IF blocks.
+      PARAMETER (CIO__MXIFB = 20)
+
+      INTEGER CIO__MXCLS   ! Maximum number of clauses in an IF block.
+      PARAMETER (CIO__MXCLS = 20)
+
+      INTEGER CIO__SZREC   ! Size of Graphics Translation file record.
+      PARAMETER (CIO__SZREC = 200)
+
+*
+*    Null value for an item.
+
+      INTEGER CIO__NULL
+      PARAMETER (CIO__NULL = -1)
+
+*
+*    States for the parser while reading the graphics translation file.
+
+      INTEGER CIO__INIB    ! Currently inside an IF block.
+      PARAMETER (CIO__INIB = 1)
+
+      INTEGER CIO__OUTIB   ! Currently outside an IF block.
+      PARAMETER (CIO__OUTIB = 2)

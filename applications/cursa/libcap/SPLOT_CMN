@@ -1,0 +1,137 @@
+*+
+*  Name:
+*     SPLOT_CMN
+*  Purpose:
+*     catview scatterplot and histogram common block.
+*  Language:
+*     FORTRAN 77.
+*  Type of Module:
+*     INCLUDE FILE.
+*  Description:
+*     catview scatterplot and histogram common block.
+*
+*     Note that scatterplot variables have suffix __SPLOT and
+*     histogram variables have suffix __HIST.
+*  Authors:
+*     ACD: A C Davenhall (Edinburgh)
+*  History:
+*     9/7/98  (ACD): Original version.
+*     14/9/99 (ACD): Added details for histograms.
+*-
+
+*
+*    Scatterplot.
+*    ===========
+*
+*    Flags.
+
+      LOGICAL
+     :  OPEN__SPLOT,  ! Is there a scatterplot open?
+     :  XPRS__SPLOT,  ! Are the expessions for the axes specified?
+     :  AXPL__SPLOT,  ! Have the axes and title been plotted?
+     :  AUTO__SPLOT   ! Are the axis ranges to be auto-scaled?
+
+*
+*    Plotting ranges.
+
+      REAL
+     :  XMIN__SPLOT,  ! Minimum value of the X axis.
+     :  XMAX__SPLOT,  ! Maximum   "   "   "  "  "  .
+     :  YMIN__SPLOT,  ! Minimum   "   "   "  Y  "  .
+     :  YMAX__SPLOT   ! Maximum   "   "   "  "  "  .
+
+*
+*    Details of the expressions defining the axes.
+
+      INTEGER
+     :  XID__SPLOT,   ! Identifier for the X axis expression.
+     :  YID__SPLOT    !     "       "   "  Y  "       "     .
+
+      CHARACTER
+     :  XLABL__SPLOT*40,  ! Label for the X axis.
+     :  YLABL__SPLOT*40   !   "    "   "  Y  "  .
+
+*
+*    Title for the scatterplot.
+
+      CHARACTER TITLE__SPLOT*50
+
+*
+*    Details of the points plotted.
+
+      INTEGER
+     :  PTS__SPLOT,   ! Number of points.
+     :  XPTR__SPLOT,  ! Pointer to array of X values.
+     :  YPTR__SPLOT   !    "    "    "   "  Y   "   .
+
+*
+*    Histogram.
+*    =========
+*
+*    Flags.
+
+      LOGICAL
+     :  OPEN__HIST,   ! Is there a histogram open?
+     :  AXPL__HIST,   ! Have the axes and title been plotted?
+     :  NORM__HIST,   ! Is the Y axis normalised?
+     :  AUTO__HIST,   ! Is the X axis range to be auto-scaled?
+     :  BINSP__HIST   ! Bin specification: width - .TRUE.; number - .FALSE.
+
+*
+*    Plotting ranges.
+
+      REAL
+     :  XMIN__HIST,   ! Minimum value of the X axis.
+     :  XMAX__HIST,   ! Maximum   "   "   "  "  "  .
+     :  YMIN__HIST,   ! Minimum   "   "   "  Y  "  .
+     :  YMAX__HIST,   ! Maximum   "   "   "  "  "  .
+     :  BINWD__HIST   ! Bin width.
+      INTEGER
+     :  NBINS__HIST   ! Number of bins in the histogram.
+
+*
+*    Details of the expression defining the X axis.
+
+      INTEGER
+     :  XID__HIST     ! Identifier for the X axis expression.
+
+      CHARACTER
+     :  XLABL__HIST*40   ! Label for the X axis.
+
+*
+*    Title for the histogram.
+
+      CHARACTER TITLE__HIST*50
+
+*
+*    Details of the points to be histogrammed.
+
+      INTEGER
+     :  PTS__HIST,   ! Number of points.
+     :  XPTR__HIST   ! Pointer to array of values.
+
+
+*
+*    Common blocks.
+*    =============
+
+      COMMON /SPLOT_R/
+     :  XMIN__SPLOT,  XMAX__SPLOT,  YMIN__SPLOT,  YMAX__SPLOT   
+      COMMON /SPLOT_I/
+     :  XID__SPLOT,   YID__SPLOT,   PTS__SPLOT,   
+     :  XPTR__SPLOT,  YPTR__SPLOT   
+      COMMON /SPLOT_L/
+     :  OPEN__SPLOT,  XPRS__SPLOT,  AXPL__SPLOT,  AUTO__SPLOT   
+      COMMON /SPLOT_C/
+     :  XLABL__SPLOT, YLABL__SPLOT, TITLE__SPLOT
+
+      COMMON /HIST_R/
+     :  XMIN__HIST,   XMAX__HIST,   YMIN__HIST,   YMAX__HIST,   
+     :  BINWD__HIST   
+      COMMON /HIST_I/
+     :  NBINS__HIST,  XID__HIST,   PTS__HIST,   XPTR__HIST   
+      COMMON /HIST_L/
+     :  OPEN__HIST,   AXPL__HIST,   NORM__HIST,  AUTO__HIST,
+     :  BINSP__HIST   
+      COMMON /HIST_C/
+     :  XLABL__HIST,  TITLE__HIST

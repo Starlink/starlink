@@ -1,0 +1,26 @@
+*+
+*  Name:
+*     CHART_PAR
+*  Purpose:
+*     Parametric constants for the catchart application.
+*  Language:
+*     FORTRAN 77.
+*  Type of Module:
+*     INCLUDE FILE.
+*  Description:
+*     Parametric constants for the catchart application.
+*  Authors:
+*     ACD: A C Davenhall (Edinburgh)
+*  History:
+*     18/8/96  (ACD): Original version.
+*     18/8/96 (ACD): First stable version.
+*-
+
+*
+*    Increments for plotting text annotation.
+
+      REAL CIO__TINCR    ! Vertical.
+      PARAMETER (CIO__TINCR = 5.0E-2)
+
+      REAL CIO__HINCR    ! Horizontal.
+      PARAMETER (CIO__HINCR = 2.5E-2)

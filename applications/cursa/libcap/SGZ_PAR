@@ -1,0 +1,82 @@
+*+
+*  Name:
+*     SGZ_PAR
+*  Purpose:
+*     catview parameter file.
+*  Language:
+*     FORTRAN 77.
+*  Type of Module:
+*     INCLUDE FILE.
+*  Description:
+*     StarGaze parameter file.
+*  Authors:
+*     ACD: A C Davenhall (Leicester)
+*  History:
+*     27/4/94 (ACD): Original version.
+*     6/3/95  (ACD): First stable version.
+*     21/6/99 (ACD): Changed the value (and subtly the meaning) of
+*        SGZ__SZOLN and the value of SGZ__TITLE.
+*     1/7/99  (ACD): Subtly changed the meaning of SGZ__SZOLN again and
+*        added SGZ__SZOMS and SGZ__SZOPR.  These changes properly
+*        (and finally) separate the line lengths used for (a) output
+*        to the terminal via the ADAM message system, (b) output to
+*        a print file and (c) output to a data file.
+*-
+
+*
+*    Maximum permitted number of components (columns, parameters and
+*    expressions).
+
+      INTEGER SGZ__MXCMP
+      PARAMETER (SGZ__MXCMP = 200)
+
+*
+*    Maximum permitted number of selections.
+
+      INTEGER SGZ__MXSEL
+      PARAMETER (SGZ__MXSEL = 50)
+
+*
+*    Maximum permitted number of lines of title in a screen listing.
+
+      INTEGER SGZ__TITLE
+      PARAMETER (SGZ__TITLE = 3)
+
+*
+*    The number of spaces left between successive columns in a listing.
+
+      INTEGER SGZ__SPACE
+      PARAMETER (SGZ__SPACE = 2)
+
+*
+*    Flag to indicate that all the rows in the current selection are to
+*    be listed.
+
+      INTEGER SGZ__LALL
+      PARAMETER (SGZ__LALL = -1)
+
+*
+*    The maximum size of output line lengths.
+
+      INTEGER SGZ__SZOLN             ! Output to a data file (also used 
+      PARAMETER (SGZ__SZOLN = 2000)  ! as internal buffer size).
+
+      INTEGER SGZ__SZOPR             ! Output to a print file.
+      PARAMETER (SGZ__SZOPR = 132)
+
+      INTEGER SGZ__SZOMS             ! Terminal output via the ADAM
+      PARAMETER (SGZ__SZOMS = 300)   ! message system.
+
+*
+*    Flags defining which items are to be included in a text file.
+*    The various items (summary, columns details, parameter details,
+*    text information, table) adopt one of the following flags.
+
+      INTEGER SGZ__FABNT          ! The item is absent.
+      PARAMETER (SGZ__FABNT = 1)
+
+      INTEGER SGZ__FSUMM          ! Only a summary is output.
+      PARAMETER (SGZ__FSUMM = 2)
+
+      INTEGER SGZ__FFULL          ! Full details are output.
+      PARAMETER (SGZ__FFULL = 3)

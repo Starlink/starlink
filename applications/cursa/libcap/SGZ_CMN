@@ -1,0 +1,167 @@
+*+
+*  Name:
+*     SGZ_CMN
+*  Purpose:
+*     catview common block.
+*  Language:
+*     FORTRAN 77.
+*  Type of Module:
+*     INCLUDE FILE.
+*  Description:
+*     StarGaze common block.
+*  Authors:
+*     ACD: A C Davenhall (Leicester)
+*  History:
+*     21/4/94  (ACD): Original version.
+*     28/3/95  (ACD): First stable version.
+*     24/2/96  (ACD): Added ANGRF__SGZ
+*     28/11/96 (ACD): Added variables and arrays for the list of columns
+*       for which statistics are to be computed.
+*     21/6/99  (ACD): Added FPRNT__SGZ.
+*-
+
+*
+*    Details of the catalogue.
+
+      LOGICAL COPEN__SGZ  ! Flag indicating a catalogue has been opened.
+
+      CHARACTER CNAME__SGZ*(CAT__SZCNF)  ! Catalogue name.
+
+      INTEGER CI__SGZ                    ! Catalogue identifier.
+
+*
+*    Components to be listed.  Here the components may be either
+*    columns, parameters or expressions.
+
+      INTEGER CMPS__SGZ             ! Number of components.
+
+      CHARACTER
+     :  CMPNM__SGZ(SGZ__MXCMP)*(CAT__SZEXP)  ! Component names.
+
+      INTEGER
+     :  CMPID__SGZ(SGZ__MXCMP)      ! Component identifiers.
+
+*
+*    Flag indicating whether any of the details of the set of components
+*    to be listed may have changed.  It is coded as follows:
+*    .TRUE.   -  the details may have changed,
+*    .FALSE.  -  the details have not changed.
+
+      LOGICAL CMPCG__SGZ
+
+*
+*    Components for which statistics are to be computed.  Here the
+*    components must be columns.
+
+      INTEGER SCPS__SGZ             ! Number of components.
+
+      CHARACTER
+     :  SCPNM__SGZ(SGZ__MXCMP)*(CAT__SZEXP)  ! Component names.
+
+      INTEGER
+     :  SCPID__SGZ(SGZ__MXCMP)      ! Component identifiers.
+
+*
+*    Number of decimal places with which the column statistics will be
+*    displayed.
+
+      INTEGER
+     :  SDCPL__SGZ
+
+*
+*    Selections created.
+
+      INTEGER SELS__SGZ             ! Number of selections.
+
+      CHARACTER CRIT__SGZ(SGZ__MXSEL)*(CAT__SZEXP) ! Selection criteria.
+
+      INTEGER
+     :  SELID__SGZ(SGZ__MXSEL),     ! Selection identifiers.
+     :  SELBS__SGZ(SGZ__MXSEL),     ! Base selection of each selection.
+     :  SELRW__SGZ(SGZ__MXSEL)      ! No. of rows in each selection.
+
+*
+*    Current selection.
+
+      INTEGER CSEL__SGZ
+
+*
+*    Number of the current row in the current selection.
+
+      INTEGER CROW__SGZ
+
+*
+*    Is the application being driven from a GUI.
+
+      LOGICAL GUI__SGZ
+
+*
+*    Screen details.
+
+      INTEGER
+     :  SWID__SGZ,           ! Screen width.
+     :  SHT__SGZ             ! Screen height.
+
+*
+*    The number of spaces to reserved in a screen listing for a running
+*    sequence number.  A value of zero implies that a sequence number is
+*    not required.
+
+      INTEGER RUN__SGZ
+
+*
+*    Number of rows to be listed by a single invocation of action LIST.
+
+      INTEGER NLIST__SGZ
+
+*
+*    Flag determining whether a UNITS attribute is recognised as describing
+*    a column of angles is displayed unaltered or reformatted prior to
+*    display.  If it is reformatted then the contents of the attribute
+*    are replaced (for display only) by either the sexagesimal format
+*    specifier (extracted from the attribute) or the string 'Radians',
+*    depending on whether or not angles are currently being output as
+*    sexagesimal values or radians.  The values are:
+*    .TRUE.  -  reformat the UNITS attribute,
+*    .FALSE. -  do not reformat the UNITS attribute.
+
+      LOGICAL ANGRF__SGZ
+
+*
+*    Variables holding details for the output text file.
+
+      LOGICAL
+     :  FPRNT__SGZ   ! Flag: is the file a print file?
+      INTEGER
+     :  FSUMM__SGZ,  ! Flag: level of detail for summary listing.
+     :  FCOL__SGZ,   !  "  :   "   "    "     "  column     "   .
+     :  FPAR__SGZ,   !  "  :   "   "    "     "  parameter  "   .
+     :  FTXT__SGZ,   !  "  :   "   "    "     "  text       "   .
+     :  FTABL__SGZ,  !  "  :   "   "    "     "  table      "   .
+     :  FPGSZ__SGZ,  ! Page size (number of lines in a page).
+     :  FWID__SGZ,   ! Page width (in characters).
+     :  FNTTL__SGZ,  ! Number of lines of title for the listing.
+     :  FLNCT__SGZ,  ! Line count in the current page.
+     :  FPGCT__SGZ   ! page count.
+
+      CHARACTER
+     :  FTITL__SGZ(SGZ__TITLE)*(SGZ__SZOLN)  ! Title lines.
+
+*
+*    Common block.
+*    ============
+
+      COMMON /SGZ/
+     :  CI__SGZ,
+     :  CMPS__SGZ,   CMPID__SGZ,
+     :  SCPS__SGZ,   SCPID__SGZ,  SDCPL__SGZ,
+     :  SELS__SGZ,   SELID__SGZ,  SELBS__SGZ,  SELRW__SGZ,  
+     :  CSEL__SGZ,   CROW__SGZ,
+     :  SWID__SGZ,   SHT__SGZ,    RUN__SGZ,    NLIST__SGZ,
+     :  FSUMM__SGZ,  FCOL__SGZ,   FPAR__SGZ,   FTXT__SGZ,
+     :  FTABL__SGZ,  FPGSZ__SGZ,  FWID__SGZ,   
+     :  FNTTL__SGZ,  FLNCT__SGZ,  FPGCT__SGZ,
+     :  COPEN__SGZ,  CMPCG__SGZ,  GUI__SGZ,    ANGRF__SGZ,  FPRNT__SGZ
+
+      COMMON /SGZ_C/
+     :  CNAME__SGZ,  CMPNM__SGZ,  SCPNM__SGZ,  CRIT__SGZ,   FTITL__SGZ

@@ -1,0 +1,49 @@
+*  Name:
+*     CAP_PAR.
+*  Purpose:
+*     Parametric constants for the CAP library.
+*  Language:
+*     FORTRAN 77.
+*  Type of Module:
+*     INCLUDE FILE.
+*  Description:
+*     Parametric constants for the CAP library.
+*  Authors:
+*     ACD: A C Davenhall (Edinburgh)
+*  History:
+*     23/9/96 (ACD): Original version.
+*     5/6/97  (ACD): Added CAP__SPI
+*     19/5/98 (ACD): Added celestial coordinate codes.
+*-
+
+      DOUBLE PRECISION CAP__PI             ! Pi.
+      PARAMETER (CAP__PI = 3.14159265359D0)
+
+      REAL CAP__SPI                        ! Single precision Pi.
+      PARAMETER (CAP__SPI = 3.14159265E0)
+
+*
+*    Codes for the various different types of celestial coordinates
+*    used by catcoord.
+
+      INTEGER CAP__CDEQM         ! Mean equatorial.
+      PARAMETER (CAP__CDEQM = 1)
+
+      INTEGER CAP__CDEQO         ! Observed equatorial.
+      PARAMETER (CAP__CDEQO = 2)
+
+      INTEGER CAP__CDEQL         ! Local equatorial.
+      PARAMETER (CAP__CDEQL = 3)
+
+      INTEGER CAP__CDHOR         ! Horizon.
+      PARAMETER (CAP__CDHOR = 4)
+
+      INTEGER CAP__CDECL         ! Ecliptic.
+      PARAMETER (CAP__CDECL = 5)
+
+      INTEGER CAP__CDGAL         ! Galactic ('new'; IAU 1958).
+      PARAMETER (CAP__CDGAL = 6)
+
+      INTEGER CAP__CDSPG         ! Supergalactic.
+      PARAMETER (CAP__CDSPG = 7)
+

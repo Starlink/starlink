@@ -1,0 +1,88 @@
+*+
+*  Name:
+*     CIO_CMN
+*  Purpose:
+*     Common blocks for the CIO library.
+*  Language:
+*     FORTRAN 77.
+*  Type of Module:
+*     INCLUDE FILE.
+*  Description:
+*     Common blocks for the CIO library.
+*  Authors:
+*     ACD: A C Davenhall (Edinburgh)
+*  History:
+*     2/8/96  (ACD): Original version.
+*     12/8/96 (ACD): First stable version.
+*-
+
+*
+*    Common block variables.
+*    ======================
+
+*
+*    Variables for the default symbols (that is, those defined outside
+*    any IF block).
+
+      INTEGER
+     :  DSYMB__CIO,   ! Plotting symbol.
+     :  DCOLR__CIO,   !    "     colour.
+     :  DUNIT__CIO    !    "     units.
+      CHARACTER
+     :  DSIZ1__CIO*(CAT__SZEXP),   ! First  size.
+     :  DSIZ2__CIO*(CAT__SZEXP),   ! Second  "  .
+     :  DSIZ3__CIO*(CAT__SZEXP),   ! Third   "  .
+     :  DSIZ4__CIO*(CAT__SZEXP),   ! Fourth  "  .
+     :  DLABL__CIO*(CAT__SZEXP)    ! Label.
+      INTEGER
+     :  DEIS1__CIO,   ! Identifier to expression for first  size.
+     :  DEIS2__CIO,   !     "      "      "       "  second  "  .
+     :  DEIS3__CIO,   !     "      "      "       "  third   "  .
+     :  DEIS4__CIO    !     "      "      "       "  fourth  "  .
+
+*
+*    Variables for symbols defined inside the clauses of IF blocks.
+
+      INTEGER
+     :  SYMB__CIO(CIO__MXIFB, CIO__MXCLS),   ! Plotting symbol.
+     :  COLR__CIO(CIO__MXIFB, CIO__MXCLS),   !    "     colour.
+     :  UNIT__CIO(CIO__MXIFB, CIO__MXCLS)    !    "     units.
+      CHARACTER
+     :  CRIT__CIO(CIO__MXIFB, CIO__MXCLS)*(CAT__SZEXP), ! Clause criterion.
+     :  SIZ1__CIO(CIO__MXIFB, CIO__MXCLS)*(CAT__SZEXP), ! First  size.
+     :  SIZ2__CIO(CIO__MXIFB, CIO__MXCLS)*(CAT__SZEXP), ! Second  "  .
+     :  SIZ3__CIO(CIO__MXIFB, CIO__MXCLS)*(CAT__SZEXP), ! Third   "  .
+     :  SIZ4__CIO(CIO__MXIFB, CIO__MXCLS)*(CAT__SZEXP), ! Fourth  "  .
+     :  LABL__CIO(CIO__MXIFB, CIO__MXCLS)*(CAT__SZCMP)  ! Label.
+      INTEGER
+     :  EICT__CIO(CIO__MXIFB, CIO__MXCLS),   ! Identifier to criterion.
+     :  EIS1__CIO(CIO__MXIFB, CIO__MXCLS),   !     "      "  1st size.
+     :  EIS2__CIO(CIO__MXIFB, CIO__MXCLS),   !     "      "  2nd size.
+     :  EIS3__CIO(CIO__MXIFB, CIO__MXCLS),   !     "      "  3rd size.
+     :  EIS4__CIO(CIO__MXIFB, CIO__MXCLS)    !     "      "  4th size.
+
+*
+*    Number of clauses in each IF block.
+
+      INTEGER NCLS__CIO(CIO__MXIFB)
+
+*
+*    Number of IF blocks.
+
+      INTEGER NIFB__CIO
+
+*
+*    Common blocks.
+*    =============
+
+      COMMON /CIO_I/
+     :  DSYMB__CIO,  DCOLR__CIO,  DUNIT__CIO,
+     :  SYMB__CIO,   COLR__CIO,   UNIT__CIO,
+     :  NCLS__CIO,   NIFB__CIO,
+     :  DEIS1__CIO,  DEIS2__CIO,  DEIS3__CIO,  DEIS4__CIO,
+     :  EICT__CIO,   EIS1__CIO,   EIS2__CIO,   EIS3__CIO,   EIS4__CIO
+
+      COMMON /CIO_C/
+     :  DSIZ1__CIO,  DSIZ2__CIO,  DSIZ3__CIO,  DSIZ4__CIO,  DLABL__CIO,
+     :  CRIT__CIO,
+     :  SIZ1__CIO,   SIZ2__CIO,   SIZ3__CIO,   SIZ4__CIO,   LABL__CIO
