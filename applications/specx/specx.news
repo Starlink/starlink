@@ -1,0 +1,15 @@
+1 SPECX - Millimetre-wave Spectral data reduction - v6.7-7
+
+ SPECX version 6.7-7 is now available. This release contains minor patches 
+ and an updated SUN/17 document.
+
+ Changes in this release are:
+
+  o Add wideband support to DAS-MERGE command
+
+  o FITS DATE header is now Y2K compliant
+
+  o Fix problem translating some dates from the GSD header 
+    value due to a loss of  precision.
+
+  o Fix problem reading old GSD files that did not know about rastering.
