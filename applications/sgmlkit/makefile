@@ -821,14 +821,14 @@ test:
 #
 #  The export target depends on the resulting compressed tar file being
 #  up to date.
-export: CVS-CHECK $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z
+export: CVS-CHECK $(EXPORT)/$(PKG_NAME)-$(PKG_VERS)_$(SYSTEM).tar.Z
 	@ echo
-	@ echo '*** Export copy of the built $(PACK_NAME) package';\
-	@ echo '    is in the compressed tar file';\
-	@ echo '    $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z'
+	@ echo '*** Export copy of the built $(PACK_NAME) package'
+	@ echo '    is in the compressed tar file'
+	@ echo '    $(EXPORT)/$(PKG_NAME)-$(PKG_VERS)_$(SYSTEM).tar.Z'
 	@ echo
 
-$(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z: $(EXPORT)/$(PKG_NAME).tar.Z
+$(EXPORT)/$(PKG_NAME)-$(PKG_VERS)_$(SYSTEM).tar.Z: $(EXPORT)/$(PKG_NAME)-$(PKG_VERS).tar.Z
 	ln $< $@
 
 #  export_run: Export the built system (without source).
@@ -838,14 +838,15 @@ $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z: $(EXPORT)/$(PKG_NAME).tar.Z
 #
 #  The export_run target depends on the resulting compressed tar file being
 #  up to date.
-export_run: CVS-CHECK $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z
+export_run: CVS-CHECK $(EXPORT)/$(PKG_NAME)-$(PKG_VERS)_$(SYSTEM)_run.tar.Z
 	@ echo
-	@ echo '*** Export copy of the "runtime" $(PACK_NAME) package';\
+	@ echo '*** Export copy of the "runtime" $(PACK_NAME) package'
 	@ echo '    is in the compressed tar file'
-	@ echo '    $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z'
+	@ echo '    $(EXPORT)/$(PKG_NAME)-$(PKG_VERS)_$(SYSTEM)_run.tar.Z'
 	@ echo
 
-$(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z: $(EXPORT)/$(PKG_NAME).tar.Z
+$(EXPORT)/$(PKG_NAME)-$(PKG_VERS)_$(SYSTEM)_run.tar.Z: \
+		$(EXPORT)/$(PKG_NAME)-$(PKG_VERS).tar.Z
 	ln $< $@
 
 #  export_source: Export the source.
@@ -855,21 +856,21 @@ $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z: $(EXPORT)/$(PKG_NAME).tar.Z
 
 #  This target depends on the resulting compressed tar file being up to
 #  date.
-export_source: CVS-CHECK $(EXPORT)/$(PKG_NAME).tar.Z
+export_source: CVS-CHECK $(EXPORT)/$(PKG_NAME)-$(PKG_VERS).tar.Z
 	@ echo
 	@ echo '*** Export copy of the $(PACK_NAME) package source'
 	@ echo '    is in the compressed tar file'
-	@ echo '    $(EXPORT)/$(PKG_NAME).tar.Z'
+	@ echo '    $(EXPORT)/$(PKG_NAME)-$(PKG_VERS).tar.Z'
 	@ echo
 
 #  The compressed tar file is up to date if it exists and is more
 #  recent than all the source files.
-$(EXPORT)/$(PKG_NAME).tar.Z: $(SOURCE_FILES)
+$(EXPORT)/$(PKG_NAME)-$(PKG_VERS).tar.Z: $(SOURCE_FILES)
 #	# Remove any pre-existing tar files before creating new ones.
-	if test -f $(EXPORT)/$(PKG_NAME).tar.Z; then \
-		rm -f $(EXPORT)/$(PKG_NAME).tar.Z; else :; fi
+	if test -f $(EXPORT)/$(PKG_NAME)-$(PKG_VERS).tar.Z; then \
+		rm -f $(EXPORT)/$(PKG_NAME)-$(PKG_VERS).tar.Z; else :; fi
 	$(TAR_IN) - $(SOURCE_FILES) \
-		| compress -v > $(EXPORT)/$(PKG_NAME).tar.Z
+		| compress -v > $(EXPORT)/$(PKG_NAME)-$(PKG_VERS).tar.Z
 
 # The following target, which should never exist, tests for the
 # presence of a CVS directory.  If it finds one, it refuses to 
