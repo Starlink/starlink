@@ -45,13 +45,20 @@
 *     LBNDIN() = _DOUBLE (Read)
 *        An array with one element for each Mapping input coordinate. This 
 *        should contain the lower bound of the input box in each input 
-*        dimension.
+*        dimension. If an NDF was supplied for THIS and FORWARD is true, then 
+*        a null (!) value can be supplied in which case a default will be used 
+*        corresponding to the GRID cordinates of the bottom left corner of the 
+*        bottom left pixel in the NDF (i.e. a value of 0.5 on every grid axis).
 *     UBNDIN() = _DOUBLE (Read)
 *        An array with one element for each Mapping input coordinate. This 
 *        should contain the upper bound of the input box in each input 
 *        dimension. Note that it is permissible for the upper bound to be 
 *        less than the corresponding lower bound, as the values will simply
-*        be swapped before use.
+*        be swapped before use. If an NDF was supplied for THIS and FORWARD is 
+*        true, then a null (!) value can be supplied in which case a default 
+*        will be used corresponding to the GRID cordinates of the top right 
+*        corner of the top right pixel in the NDF (i.e. a value of (DIM+0.5) 
+*        on every grid axis, where DIM is the number of pixels along the axis).
 *     FORWARD = _LOGICAL (Read)
 *        If this value is TRUE, then the Mapping's forward
 *        transformation will be used to transform the input
@@ -94,6 +101,9 @@
 *  History:
 *     9-OCT-2002 (DSB):
 *        Original version.
+*     30-SEP-2004 (DSB):
+*        Modified to use NDF GRID bounds as input bounds if an NDF is
+*        supplied. Also show axis label with results (if available).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -106,6 +116,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'NDF_PAR'          ! NDF constants
+      INCLUDE 'PAR_ERR'          ! Parameter system error constants
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
 
 *  External References:
@@ -116,12 +127,13 @@
 
 *  Local Variables:
       INTEGER THIS
-      INTEGER NIN, NOUT, NAXIN, NAXOUT, COORDOUT, I
+      INTEGER NIN, NOUT, NAXIN, NAXOUT, COORDOUT, I, DIMS( NDF__MXDIM ),
+     :        NDIM, INDF, IAT, INFRM, OUTFRM, IAST
       LOGICAL FORWRD
+      CHARACTER ATTR*20
       DOUBLE PRECISION LBNDIN( NDF__MXDIM ), UBNDIN( NDF__MXDIM )
       DOUBLE PRECISION XL( NDF__MXDIM ), XU( NDF__MXDIM ), LBNDOUT,
      :                 UBNDOUT
-
 *.
 
 *  Check inherited status.      
@@ -133,6 +145,11 @@
 *  Get the Mapping.
       CALL ATL1_GTOBJ( 'THIS', 'Mapping', AST_ISAMAPPING, THIS,
      :                 STATUS )
+
+*  See if an NDF was used to specify the Mapping, by attempting to access the 
+*  parameter as an NDF. INDF will be returned set to NDF__NOID (without error) 
+*  if the Mapping was not supplied va an NDF. 
+      CALL NDF_EXIST( 'THIS', 'READ', INDF, STATUS )
 
 *  Determine the Nin and Nout attributes of the Mapping
       NIN = AST_GETI( THIS, 'Nin', STATUS)
@@ -161,9 +178,37 @@
          NAXOUT = NIN
       END IF
 
-*  Get the other parameters.
+*  Abort if an error has occurred.
+      IF( STATUS .NE. SAI__OK ) GO TO 999
+
+*  Get the lower input limits. Use a default of (0.5,0.5,...) if a null
+*  value is supplied and the forward transformation is being used and the 
+*  Mapping was specified via an NDF (d1,d2,...) are the pixel dimension. 
       CALL PAR_EXACD( 'LBNDIN', NAXIN, LBNDIN, STATUS ) 
+      IF( STATUS .EQ. PAR__NULL .AND. FORWRD .AND. 
+     :    INDF .NE. NDF__NOID ) THEN
+         CALL ERR_ANNUL( STATUS )
+
+         DO I = 1, NIN
+            LBNDIN( I ) = 0.5
+         END DO
+
+      END IF
+
+*  Get the upper input limits. Use a default of (d1+0.5,d2+0.5,...) if a null
+*  value is supplied and the forward transformation is being used and the 
+*  Mapping was specified via an NDF (d1,d2,...) are the pixel dimension. 
       CALL PAR_EXACD( 'UBNDIN', NAXIN, UBNDIN, STATUS ) 
+      IF( STATUS .EQ. PAR__NULL .AND. FORWRD .AND. 
+     :    INDF .NE. NDF__NOID ) THEN
+         CALL ERR_ANNUL( STATUS )
+         CALL NDF_DIM( INDF, NIN, DIMS, NDIM, STATUS )
+         DO I = 1, NDIM
+            UBNDIN( I ) = DIMS( I ) + 0.5
+         END DO
+      END IF
+
+*  Get the other parameters.
       CALL PAR_GDR0I( 'COORDOUT', 1, 1, NAXOUT, .FALSE., COORDOUT, 
      :                STATUS ) 
 
@@ -171,13 +216,44 @@
       CALL AST_MAPBOX( THIS, LBNDIN, UBNDIN, FORWRD, COORDOUT, LBNDOUT,
      :                 UBNDOUT, XL, XU, STATUS ) 
 
+*  If an NDF was suplied get its current and base Frames. Swap them if the
+*  inverse Mapping was used. 
+      IF( INDF .NE. NDF__NOID ) THEN
+         CALL KPG1_GTWCS( INDF, IAST, STATUS )
+         IF( FORWRD ) THEN 
+            INFRM = AST_GETFRAME( IAST, AST__BASE, STATUS )
+            OUTFRM = AST_GETFRAME( IAST, AST__CURRENT, STATUS )
+         ELSE
+            OUTFRM = AST_GETFRAME( IAST, AST__BASE, STATUS )
+            INFRM = AST_GETFRAME( IAST, AST__CURRENT, STATUS )
+         END IF
+
+      ELSE
+         INFRM = AST__NULL
+         OUTFRM = AST__NULL
+      END IF
+
 *  Display the results.
       CALL MSG_BLANK( STATUS )
+      IF( OUTFRM .NE. AST__NULL ) THEN
+         ATTR = 'LABEL('
+         IAT = 6
+         CALL CHR_PUTI( COORDOUT, ATTR, IAT )
+         CALL CHR_APPND( ')', ATTR, IAT )
+
+         CALL MSG_SETC( 'LB', ' (' )
+         CALL MSG_SETC( 'LB', AST_GETC( OUTFRM, ATTR( : IAT ), 
+     :                                  STATUS ) )
+         CALL MSG_SETC( 'LB', ')' )
+      ELSE 
+         CALL MSG_SETC( 'LB', ' ' )
+      END IF
+
       CALL MSG_SETI( 'O', COORDOUT )
       CALL MSG_SETD( 'L', LBNDOUT )
       CALL MSG_SETD( 'H', UBNDOUT )
-      CALL MSG_OUT( ' ', 'Output axis ^O varies between ^L and ^H '//
-     :              'within the specified region of input space.', 
+      CALL MSG_OUT( ' ', 'Output axis ^O^LB varies between ^L and ^H'//
+     :              ' within the specified region of input space.', 
      :              STATUS )
       CALL PAR_PUT0D( 'LBNDOUT', LBNDOUT, STATUS ) 
       CALL PAR_PUT0D( 'UBNDOUT', UBNDOUT, STATUS ) 
@@ -187,9 +263,18 @@
          CALL MSG_SETD( 'XL', XL( I ) )
          IF( I .NE. NAXOUT ) CALL MSG_SETC( 'XL', ',' )
       END DO
-      CALL MSG_OUT( ' ', 'The lowest output axis value was '//
+
+      IF( INFRM .NE. AST__NULL ) THEN
+         CALL MSG_SETC( 'D', AST_GETC( INFRM, 'DOMAIN', STATUS ) )
+         CALL MSG_OUT( ' ', 'The lowest output axis value was '//
+     :              'attained at, for example, input ^D position '//
+     :              '(^XL).', STATUS )
+      ELSE 
+         CALL MSG_OUT( ' ', 'The lowest output axis value was '//
      :              'attained at, for example, input position '//
      :              '(^XL).', STATUS )
+      END IF
+
       CALL PAR_PUT1D( 'XL', NAXOUT, XL, STATUS ) 
 
       CALL MSG_BLANK( STATUS )
@@ -197,11 +282,26 @@
          CALL MSG_SETD( 'XU', XU( I ) )
          IF( I .NE. NAXOUT ) CALL MSG_SETC( 'XU', ',' )
       END DO
-      CALL MSG_OUT( ' ', 'The highest output axis value was '//
+
+      IF( INFRM .NE. AST__NULL ) THEN
+         CALL MSG_SETC( 'D', AST_GETC( INFRM, 'DOMAIN', STATUS ) )
+         CALL MSG_OUT( ' ', 'The highest output axis value was '//
+     :              'attained at, for example, input ^D position '//
+     :              '(^XU).', STATUS )
+      ELSE 
+         CALL MSG_OUT( ' ', 'The highest output axis value was '//
      :              'attained at, for example, input position '//
      :              '(^XU).', STATUS )
+      END IF
+
       CALL PAR_PUT1D( 'XU', NAXOUT, XU, STATUS ) 
       CALL MSG_BLANK( STATUS )
+
+*  Tidy up.
+ 999  CONTINUE
+
+* Free the NDF if one was used.
+      IF( INDF .NE. NDF__NOID ) CALL NDF_ANNUL( INDF, STATUS )
 
 *  End the AST context.
       CALL AST_END( STATUS )
