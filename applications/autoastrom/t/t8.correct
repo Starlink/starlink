@@ -1,9 +1,9 @@
 valid cases: ok
-fail?  pa=88.7:8	 ok -- <pa=88.7:8> failed
+fail?  angle=88.7:8	 ok -- <angle=88.7:8> failed
 fail?  time=12:34 56	 ok -- <time=12:34 56> failed
 fail?  source=fits:something:user	 ok -- <source=fits:something:user> failed
-fail?  obs=Anglo-Austrailian	 ok -- <obs=Anglo-Austrailian> failed
+fail?  obs=Anglo-Australian	 ok -- <obs=Anglo-Australian> failed
 fail?  obs=12:34:56 78:90:12	 ok -- <obs=12:34:56 78:90:12> failed
-fail?  obs=AAT met=1 2 3	 ok -- <met=1 2 3> failed
+fail?  met=1 2 3 obs=AAT	 ok -- <met=1 2 3> failed
 fail?  col=Red	 ok -- <col=Red> failed
 fail?  wonky=nothing	 ok -- <nothing> failed

@@ -20,8 +20,8 @@ print "valid cases: ";
 	   'dec' => '-12:34:56 ',
 	   'scale' => '0.33',
 	   'invert' => '  1   ',
-	   'pa' => '88.7',
-	   'pa' => ' -88.7   ',
+	   'angle' => '88.7',
+	   'angle' => ' -88.7   ',
 	   'source' => 'AST',
 	   'source' => '  user :Ast: fits  ',
 	   'time' => '1984:01 20:16:00.1',
@@ -38,10 +38,10 @@ print "valid cases: ";
 $testres = check_obsdata_kwd (%okkws);
 printf ("%s\n", (defined($testres) ? "BAD -- $testres didn't match" : "ok"));
 
-check_fails ({'pa' => '88.7:8'}); # must be decimal angle
+check_fails ({'angle' => '88.7:8'}); # must be decimal angle
 check_fails ({'time' => '12:34 56'}); # time is full UT or sidereal, neither with seconds
 check_fails ({'source' => 'fits:something:user'}); # invalid keyword
-check_fails ({'obs' => 'Anglo-Austrailian'});
+check_fails ({'obs' => 'Anglo-Australian'});
 check_fails ({'obs' => '12:34:56 78:90:12'}); # lat and long to minutes only
 check_fails ({'obs' => 'AAT', 'met' => '1 2 3'});
 check_fails ({'col' => 'Red'});	# must be wavelength
@@ -50,10 +50,9 @@ check_fails ({'wonky' => 'nothing'}); # bad keyword
 sub check_fails {
     my $testkw = shift;
     print "fail? ";
-    foreach my $k (keys(%$testkw)) { print " $k=", $testkw->{$k}; }
+    foreach my $k (sort keys %$testkw) { print " $k=", $testkw->{$k}; }
     print "\t ";
     my $testres = check_obsdata_kwd (%$testkw);
-    #my $testres = check_kwd_list ($testkw, \%goodkws);
     printf ("%s\n", (defined($testres)
 		     ? "ok -- <$testres> failed"
 		     : "BAD -- didn't fail"));
