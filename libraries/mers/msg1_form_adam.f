@@ -235,6 +235,7 @@
 *     Initialise the escape string and previous escape character.
          ESCSTR = MSG__KEYEC // MSG__REFEC
          PREVEC = ' '
+         ESCAPE = ' '
 
 *     Parse and translate the returned message text.
 *     DO WHILE loop.
