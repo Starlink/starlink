@@ -9,6 +9,8 @@
  * who             when       what
  * --------------  --------   ----------------------------------------
  * Allan Brighton  26 Sep 95  Created
+ * Peter W. Draper 24 Jul 00  Added (!cat_) test to symbolCmd. If argc 
+ *                            was zero this test wasn't being applied.
  */
 static const char* const rcsId="@(#) $Id: TclAstroCat.C,v 1.48 1999/03/15 12:30:49 abrighto Exp $";
 
@@ -1399,12 +1401,13 @@ int TclAstroCat::is_tcsCmd(int argc, char* argv[])
  */
 int TclAstroCat::symbolCmd(int argc, char* argv[])
 {
-    if (argc == 0) {
-	if (cat_) 
-	    return appendListVal(cat_->symbol());
+    //  PWD: test cat_ before continuing.
+    if ( ! cat_ ) {
+        return error( "no catalog is open" );
     }
-    else if (! cat_)
-	return error("no catalog is open");
+    if (argc == 0) {
+        return appendListVal(cat_->symbol());
+    }
     cat_->entry()->symbol(argv[0]);
     return TCL_OK;
 }
