@@ -1,5 +1,4 @@
    proc CCDSetCCDGlobals { Topwin args } {
-
 #+
 #  Name:
 #     CCDSetGlobals
@@ -88,8 +87,12 @@
 #  If we are using CCDPACK Sets, work out how many different Set Index 
 #  values we have (hence how many panels are required to get values).
       if { $CCDglobalpars(USESET) == "TRUE" } {
-         CCDGetSetIndices $Topwin
-         set useset [expr [llength $CCDsetindices] > 1]
+         CCDGetSetIndices $Topwin 1
+         if { $CCDglobalpars(USESET) == "TRUE" } {
+            set useset [expr [llength $CCDsetindices] > 1]
+         } else {
+            set useset 0
+         }
       } else {
          set useset 0
       }
