@@ -310,6 +310,10 @@
     </p>
   </xsl:template>
 
+  <xsl:template match="verbatim">
+    <blockquote><pre><xsl:apply-templates/></pre></blockquote>
+  </xsl:template>
+
   <xsl:template match="code">
     <xsl:copy><xsl:apply-templates/></xsl:copy>
   </xsl:template>
@@ -326,6 +330,30 @@
   <xsl:template match="webref">
     <a><xsl:attribute name="href"><xsl:value-of select="@url"/></xsl:attribute>
       <xsl:apply-templates/></a>
+  </xsl:template>
+
+  <xsl:template match="dl">
+    <dl><xsl:apply-templates/></dl>
+  </xsl:template>
+
+  <xsl:template match="dt">
+    <dt><xsl:apply-templates/></dt>
+  </xsl:template>
+
+  <xsl:template match="dd">
+    <dd><xsl:apply-templates/></dd>
+  </xsl:template>
+
+  <xsl:template match="ul">
+    <ul><xsl:apply-templates/></ul>
+  </xsl:template>
+
+  <xsl:template match="ol">
+    <ol><xsl:apply-templates/></ol>
+  </xsl:template>
+
+  <xsl:template match="li">
+    <li><xsl:apply-templates/></li>
   </xsl:template>
 
   <xsl:template match="email">

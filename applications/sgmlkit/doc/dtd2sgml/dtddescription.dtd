@@ -15,8 +15,11 @@
 <!ELEMENT dtddescription	(dtdsummary, element+, commentary*)>
 <!ELEMENT element		(p+, attribute*, commentary*)>
 <!ELEMENT attribute		(p+)>
-<!ELEMENT p			(#PCDATA | elemref | elemxref | example 
-					| code | em | url | webref)*>
+
+<!ENTITY % phrase "#PCDATA | code | em | url | webref | elemref | elemxref ">
+<!ENTITY % block "verbatim | dl | ol | ul | example">
+<!ELEMENT p			(%phrase; | %block;)*>
+
 <!ELEMENT elemref		EMPTY>
 <!ELEMENT elemxref		EMPTY>
 <!ELEMENT example		(#PCDATA)>
@@ -24,6 +27,15 @@
 <!ELEMENT em			(#PCDATA)>
 <!ELEMENT webref		(#PCDATA)>
 <!ELEMENT url			(#PCDATA)>
+
+<!ELEMENT dl			(dt,dd)+>
+<!ELEMENT ol			(li+)>
+<!ELEMENT ul			(li+)>
+<!ELEMENT dt			(%phrase;)*>
+<!ELEMENT dd			(%phrase;)*>
+<!ELEMENT li			(%phrase;)*>
+
+<!ELEMENT verbatim		(#PCDATA)>
 
 <!-- The output of script dtd2sgml.pl consists of a representation of
      a DTD's structure, marked up using the following elements.  That
