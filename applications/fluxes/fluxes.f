@@ -2194,6 +2194,9 @@ C  GET UT in an array
 *    Check status on entry - return if not o.k.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*   Initialise
+      EXCLAIM = .FALSE.
+
 *   Look for the environmental variable
 *   dealing with the saving files and grab the name.
       CALL PSX_GETENV('FLUXPWD',PATH,STATUS)
