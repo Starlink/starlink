@@ -324,13 +324,13 @@ ADIobj adix_assoc( ADIobj idx, ADIobj lst, ADIstatus status )
   ADIobj curp = lst;
   ADIobj rval = ADI__nullid;
 
-  if ( _ok(status) )
-    {
-    while ( _valid_q(curp) )
-      {
-      if ( idx == _CAAR(curp) )
-	{
-	rval = _CAR(curp);
+  if ( _ok(status) ) {
+    while ( _valid_q(curp) ) {
+
+      ADIobj	car = _CAR(curp);
+
+      if ( idx == _CAR(car) ) {
+	rval = car;
 	break;
 	}
       else

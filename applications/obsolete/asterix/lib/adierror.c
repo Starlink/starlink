@@ -254,6 +254,7 @@ char *adix_errmsg( ADIstatype code, char *buf, int buflen )
       {ADI__NOTMAP,	"Object is not mapped at this address"},
       {ADI__RDONLY,	"Object is readonly"},
       {ADI__SYNTAX,	"Syntax error"},
+      {ADI__ITREND,	"No more items"},
       {SAI__ERROR,	"Error"},
       {SAI__OK,		""}
       };

@@ -130,6 +130,7 @@
 *      Enquiry routines :
 *
 *	adi_class	- Enquire object class
+*	adi_clen	- Enquire string length
 * 	adi_cshape	- Enquire object component dimensions
 *	adi_csize	- Enquire object number of elements
 * 	adi_name	- Enquire object name
@@ -900,7 +901,7 @@ F77_SUBROUTINE(adifn(newv0c))( CHARACTER(value), INTEGER(id),
   _ERR_IN("ADI_NEWV0C");		/* Mark routine for error reporting */
 
   adix_new_n( ADI__false, ADI__nullid, NULL, 0, 0, NULL,
-	      (void *) &value, _TM_cdef(c),
+	      (void *) value, _TM_cdef(c),
 	      value_length, (ADIobj *) id, status );
 
   _ERR_OUT;
@@ -1156,7 +1157,7 @@ F77_SUBROUTINE(adifn(put0c))( INTEGER(id), CHARACTER(value), INTEGER(status) TRA
   _ERR_IN("ADI_PUT0C");		/* Mark routine for error reporting */
 
   adix_put_n( 0, (ADIobj) *id, NULL, 0, 0, NULL, _TM_cdef(c),
-	      value_length, (void *) &value, status );
+	      value_length, (void *) value, status );
 
   _ERR_OUT;
   }
@@ -1389,7 +1390,7 @@ _genproc(i)	_genproc(r)	_genproc(d)	_genproc(l)
 #undef _genproc
 
 F77_SUBROUTINE(adifn(cnewv0c))( INTEGER(pid), CHARACTER(name), CHARACTER(value),
-			        INTEGER(status) TRAIL(name) TRAIL(value) )
+				INTEGER(status) TRAIL(name) TRAIL(value) )
   {
   GENPTR_INTEGER(pid)
   GENPTR_CHARACTER(name)
@@ -1401,7 +1402,7 @@ F77_SUBROUTINE(adifn(cnewv0c))( INTEGER(pid), CHARACTER(name), CHARACTER(value),
   _ERR_IN("ADI_CNEWV0C");		/* Mark routine for error reporting */
 
   adix_new_n( ADI__false, (ADIobj) *pid, name, name_length, 0, NULL,
-	      (void *) &value, _TM_cdef(c), value_length, NULL, status );
+	      (void *) value, _TM_cdef(c), value_length, NULL, status );
 
   _ERR_OUT;
   }
@@ -1426,7 +1427,7 @@ _genproc(i)	_genproc(r)	_genproc(d)	_genproc(l)
 
 F77_SUBROUTINE(adifn(cnewv1c))( INTEGER(pid), CHARACTER(name), INTEGER(nval),
 				CHARACTER_ARRAY(value), INTEGER(status)
-			        TRAIL(name) TRAIL(value) )
+				TRAIL(name) TRAIL(value) )
   {
   GENPTR_INTEGER(pid)
   GENPTR_CHARACTER(name)
@@ -1681,7 +1682,7 @@ F77_SUBROUTINE(adifn(cput0c))( INTEGER(id), CHARACTER(name),
   _ERR_IN("ADI_CPUT0C");		/* Mark routine for error reporting */
 
   adix_put_n( 0, (ADIobj) *id, name, name_length, 0, NULL, _TM_cdef(c),
-	      value_length, (void *) &value, status );
+	      value_length, (void *) value, status );
 
   _ERR_OUT;
   }
@@ -1756,7 +1757,7 @@ F77_SUBROUTINE(adifn(cset0c))( INTEGER(id), CHARACTER(name),
   _ERR_IN("ADI_CSET0C");		/* Mark routine for error reporting */
 
   adix_set_n( 0, (ADIobj) *id, name, name_length, 0, NULL, _TM_cdef(c),
-	      value_length, (void *) &value, status );
+	      value_length, (void *) value, status );
 
   _ERR_OUT;
   }
@@ -1888,10 +1889,29 @@ F77_SUBROUTINE(adifn(class))( INTEGER(id), CHARACTER(cls), INTEGER(status) TRAIL
 
   _chk_init_err; _chk_stat;             /* Standard entry checks */
 
+  _ERR_IN("ADI_CLASS");		/* Mark routine for error reporting */
+
   cname = adix_qcls( (ADIobj) *id, status );	/* Locate class name string */
 
   strx_expf( strlen(cname), cname, 	/* Export data */
 		cls_length, cls );
+
+  _ERR_OUT;
+  }
+
+F77_SUBROUTINE(adifn(clen))( INTEGER(id), INTEGER(clen), INTEGER(status) )
+  {
+  GENPTR_INTEGER(id)
+  GENPTR_INTEGER(clen)
+  GENPTR_INTEGER(status)
+
+  _chk_init_err; _chk_stat;             /* Standard entry checks */
+
+  _ERR_IN("ADI_CLEN");		/* Mark routine for error reporting */
+
+  ADIstrngGetLen( (ADIobj) *id, clen, status );
+
+  _ERR_OUT;
   }
 
 F77_SUBROUTINE(adifn(cshape))( INTEGER(id), CHARACTER(name), INTEGER(mxndim),
@@ -1940,17 +1960,12 @@ F77_SUBROUTINE(adifn(name))( INTEGER(id), CHARACTER(name), INTEGER(status) TRAIL
   GENPTR_CHARACTER(name)
   GENPTR_INTEGER(status)
 
-  char 	*cname;
-
   _chk_init_err; _chk_stat;             /* Standard entry checks */
 
   _ERR_IN("ADI_NAME");			/* Mark routine for error reporting */
 
 /* Invoke kernel routine */
-  cname = adix_name( (ADIobj) *id, status );
-
-/* Export data */
-  strx_expf( strlen(cname), cname, name_length, name );
+  adix_name( (ADIobj) *id, ADI__false, name, name_length, status );
 
   _ERR_OUT;
   }

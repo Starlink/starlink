@@ -132,6 +132,7 @@
 *      Enquiry routines :
 *
 *	adic_class	- Enquire object class
+*	adic_clen	- Enquire string length
 * 	adic_cshape	- Enquire object component dimensions
 * 	adic_csize	- Enquire object component number of elements
 * 	adic_name	- Enquire object name
@@ -687,7 +688,7 @@ _genproc(i)	_genproc(r)	_genproc(d)	_genproc(l)
 _genproc(p)
 #undef _genproc
 
-void adic_newvc( int ndim, int dims[], charptr value[], ADIobj *id, ADIstatus status )
+void adic_newvc( int ndim, int dims[], char *value[], ADIobj *id, ADIstatus status )
   {
   _chk_init; _chk_stat;
 
@@ -734,7 +735,7 @@ void adic_newv0c_n( _TM_ctype(c) value, int len,
   _ERR_IN("adic_newv0c_n");		/* Mark routine for error reporting */
 
 /* Use user supplied length */
-  adix_new_n( ADI__true, ADI__nullid, NULL, 0, 0, NULL, &value,
+  adix_new_n( ADI__true, ADI__nullid, NULL, 0, 0, NULL, value,
 	      _TM_cdef(c), len, id, status );
 
   _ERR_OUT;
@@ -755,7 +756,7 @@ _genproc(i)	_genproc(r)	_genproc(d)	_genproc(l)
 _genproc(p)
 #undef _genproc
 
-void adic_newv1c( int nval, charptr value[], ADIobj *id, ADIstatus status )
+void adic_newv1c( int nval, char *value[], ADIobj *id, ADIstatus status )
   {
   _chk_init; _chk_stat;
 
@@ -1079,7 +1080,7 @@ _genproc(i)	_genproc(r)	_genproc(d)	_genproc(l)
 _genproc(p)
 #undef _genproc
 
-void adic_cnewvc( ADIobj id, char *name, int ndim, int dims[], charptr value[], ADIstatus status )
+void adic_cnewvc( ADIobj id, char *name, int ndim, int dims[], char *value[], ADIstatus status )
   {
   _chk_init; _chk_stat;
 
@@ -1146,7 +1147,7 @@ _genproc(i)	_genproc(r)	_genproc(d)	_genproc(l)
 _genproc(p)
 #undef _genproc
 
-void adic_cnewv1c( ADIobj id, char *name, int nval, charptr value[], ADIstatus status )
+void adic_cnewv1c( ADIobj id, char *name, int nval, char *value[], ADIstatus status )
   {
   _chk_init; _chk_stat;
 
@@ -1504,6 +1505,17 @@ void adic_class( ADIobj id, int blen, char *buf, ADIstatus status )
   _ERR_OUT;
   }
 
+void adic_clen( ADIobj id, ADIinteger *clen, ADIstatus status )
+  {
+  _chk_init_err; _chk_stat;             /* Standard entry checks */
+
+  _ERR_IN("adic_clen");			/* Mark routine for error reporting */
+
+  ADIstrngGetLen( id, clen, status );
+
+  _ERR_OUT;
+  }
+
 void adic_cshape( ADIobj id, char *name, int mxndim, int dims[], int *ndim, ADIstatus status )
   {
   _chk_init_err; _chk_stat;             /* Standard entry checks */
@@ -1530,16 +1542,12 @@ void adic_csize( ADIobj id, char *name, int *nelm, ADIstatus status )
 
 void adic_name( ADIobj id, int blen, char *buf, ADIstatus status )
   {
-  char 	*cname;
-
   _chk_init_err; _chk_stat;             /* Standard entry checks */
 
-  _ERR_IN("adic_cerase");		/* Mark routine for error reporting */
+  _ERR_IN("adic_name");			/* Mark routine for error reporting */
 
-  cname = adix_name( id, status );	/* Get address of name */
-
-  strx_expc( strlen(cname), cname, 	/* Export data */
-		      blen, buf );
+/* Construct object name */
+  adix_name( id, ADI__true, buf, blen, status );
 
   _ERR_OUT;
   }

@@ -121,94 +121,94 @@ ADIobj  K_While = ADI__nullid;
 void prsx_init( ADIstatus status )
   {
   DEFINE_CSTR_TABLE(stringtable)
-    DEFINE_CSTR_TABLE_ENTRY(EXC_ArrayBound,"ArrayBound"),
-    DEFINE_CSTR_TABLE_ENTRY(EXC_BoolExp,"BooleanExpected"),
-    DEFINE_CSTR_TABLE_ENTRY(EXC_ControlC,"ControlC"),
-    DEFINE_CSTR_TABLE_ENTRY(EXC_Error,"Error"),
-    DEFINE_CSTR_TABLE_ENTRY(EXC_ExceedMaxRecurse,"ExceedMaxRecurse"),
-    DEFINE_CSTR_TABLE_ENTRY(EXC_InvalidArg,"InvalidArg"),
-    DEFINE_CSTR_TABLE_ENTRY(EXC_NoSuchField,"NoSuchField"),
-    DEFINE_CSTR_TABLE_ENTRY(EXC_ScopeBreak,"ScopeBreak"),
-    DEFINE_CSTR_TABLE_ENTRY(EXC_SyntaxError, "SyntaxError"),
+    CSTR_TABLE_ENTRY(EXC_ArrayBound,"ArrayBound"),
+    CSTR_TABLE_ENTRY(EXC_BoolExp,"BooleanExpected"),
+    CSTR_TABLE_ENTRY(EXC_ControlC,"ControlC"),
+    CSTR_TABLE_ENTRY(EXC_Error,"Error"),
+    CSTR_TABLE_ENTRY(EXC_ExceedMaxRecurse,"ExceedMaxRecurse"),
+    CSTR_TABLE_ENTRY(EXC_InvalidArg,"InvalidArg"),
+    CSTR_TABLE_ENTRY(EXC_NoSuchField,"NoSuchField"),
+    CSTR_TABLE_ENTRY(EXC_ScopeBreak,"ScopeBreak"),
+    CSTR_TABLE_ENTRY(EXC_SyntaxError, "SyntaxError"),
 
-    DEFINE_CSTR_TABLE_ENTRY(K_AddTo,"AddTo"),
-    DEFINE_CSTR_TABLE_ENTRY(K_Alternatives,"Alternatives"),
-    DEFINE_CSTR_TABLE_ENTRY(K_And,"And"),
-    DEFINE_CSTR_TABLE_ENTRY(K_Apply,"Apply"),
-    DEFINE_CSTR_TABLE_ENTRY(K_Array,"Array"),
-    DEFINE_CSTR_TABLE_ENTRY(K_ArrayRef,"ArrayRef"),
+    CSTR_TABLE_ENTRY(K_AddTo,"AddTo"),
+    CSTR_TABLE_ENTRY(K_Alternatives,"Alternatives"),
+    CSTR_TABLE_ENTRY(K_And,"And"),
+    CSTR_TABLE_ENTRY(K_Apply,"Apply"),
+    CSTR_TABLE_ENTRY(K_Array,"Array"),
+    CSTR_TABLE_ENTRY(K_ArrayRef,"ArrayRef"),
 
-    DEFINE_CSTR_TABLE_ENTRY(K_Blank,"Blank"),
-    DEFINE_CSTR_TABLE_ENTRY(K_BlankSeq,"BlankSeq"),
-    DEFINE_CSTR_TABLE_ENTRY(K_BlankNullSeq,"BlankNullSeq"),
-    DEFINE_CSTR_TABLE_ENTRY(K_Break,"Break"),
+    CSTR_TABLE_ENTRY(K_Blank,"Blank"),
+    CSTR_TABLE_ENTRY(K_BlankSeq,"BlankSeq"),
+    CSTR_TABLE_ENTRY(K_BlankNullSeq,"BlankNullSeq"),
+    CSTR_TABLE_ENTRY(K_Break,"Break"),
 
-    DEFINE_CSTR_TABLE_ENTRY(K_Catch,"Catch"),
-    DEFINE_CSTR_TABLE_ENTRY(K_Concat,"Concat"),
-    DEFINE_CSTR_TABLE_ENTRY(K_Condition,"Condition"),
+    CSTR_TABLE_ENTRY(K_Catch,"Catch"),
+    CSTR_TABLE_ENTRY(K_Concat,"Concat"),
+    CSTR_TABLE_ENTRY(K_Condition,"Condition"),
 
-    DEFINE_CSTR_TABLE_ENTRY(K_DefEnum,"DefEnum"),
-    DEFINE_CSTR_TABLE_ENTRY(K_Divide,"Divide"),
-    DEFINE_CSTR_TABLE_ENTRY(K_DivideBy,"DivideBy"),
-    DEFINE_CSTR_TABLE_ENTRY(K_Dot,"Dot"),
-    DEFINE_CSTR_TABLE_ENTRY(K_DoWhile,"DoWhile"),
+    CSTR_TABLE_ENTRY(K_DefEnum,"DefEnum"),
+    CSTR_TABLE_ENTRY(K_Divide,"Divide"),
+    CSTR_TABLE_ENTRY(K_DivideBy,"DivideBy"),
+    CSTR_TABLE_ENTRY(K_Dot,"Dot"),
+    CSTR_TABLE_ENTRY(K_DoWhile,"DoWhile"),
 
-    DEFINE_CSTR_TABLE_ENTRY(K_Echo,"Echo"),
-    DEFINE_CSTR_TABLE_ENTRY(K_Equal,"Equal"),
-    DEFINE_CSTR_TABLE_ENTRY(K_Factorial,"Factorial"),
-    DEFINE_CSTR_TABLE_ENTRY(K_Finally,"Finally"),
-    DEFINE_CSTR_TABLE_ENTRY(K_Foreach,"Foreach"),
+    CSTR_TABLE_ENTRY(K_Echo,"Echo"),
+    CSTR_TABLE_ENTRY(K_Equal,"Equal"),
+    CSTR_TABLE_ENTRY(K_Factorial,"Factorial"),
+    CSTR_TABLE_ENTRY(K_Finally,"Finally"),
+    CSTR_TABLE_ENTRY(K_Foreach,"Foreach"),
 
-    DEFINE_CSTR_TABLE_ENTRY(K_Get,"Get"),
-    DEFINE_CSTR_TABLE_ENTRY(K_GE,"GreaterThanOrEqual"),
-    DEFINE_CSTR_TABLE_ENTRY(K_GT,"GreaterThan"),
+    CSTR_TABLE_ENTRY(K_Get,"Get"),
+    CSTR_TABLE_ENTRY(K_GE,"GreaterThanOrEqual"),
+    CSTR_TABLE_ENTRY(K_GT,"GreaterThan"),
 
-    DEFINE_CSTR_TABLE_ENTRY(K_HoldAll,"HoldAll"),
-    DEFINE_CSTR_TABLE_ENTRY(K_HoldFirst,"HoldFirst"),
-    DEFINE_CSTR_TABLE_ENTRY(K_HoldRest,"HoldRest"),
+    CSTR_TABLE_ENTRY(K_HoldAll,"HoldAll"),
+    CSTR_TABLE_ENTRY(K_HoldFirst,"HoldFirst"),
+    CSTR_TABLE_ENTRY(K_HoldRest,"HoldRest"),
 
-    DEFINE_CSTR_TABLE_ENTRY(K_If,"If"),
+    CSTR_TABLE_ENTRY(K_If,"If"),
 
-    DEFINE_CSTR_TABLE_ENTRY(K_List,"List"),
-    DEFINE_CSTR_TABLE_ENTRY(K_Listable,"Listable"),
-    DEFINE_CSTR_TABLE_ENTRY(K_LE,"LessThanOrEqual"),
-    DEFINE_CSTR_TABLE_ENTRY(K_LT,"LessThan"),
+    CSTR_TABLE_ENTRY(K_List,"List"),
+    CSTR_TABLE_ENTRY(K_Listable,"Listable"),
+    CSTR_TABLE_ENTRY(K_LE,"LessThanOrEqual"),
+    CSTR_TABLE_ENTRY(K_LT,"LessThan"),
 
-    DEFINE_CSTR_TABLE_ENTRY(K_Map,"Map"),
-    DEFINE_CSTR_TABLE_ENTRY(K_Multiply,"Multiply"),
-    DEFINE_CSTR_TABLE_ENTRY(K_MultiplyBy,"MultiplyBy"),
+    CSTR_TABLE_ENTRY(K_Map,"Map"),
+    CSTR_TABLE_ENTRY(K_Multiply,"Multiply"),
+    CSTR_TABLE_ENTRY(K_MultiplyBy,"MultiplyBy"),
 
-    DEFINE_CSTR_TABLE_ENTRY(K_Negate,"Negate"),
-    DEFINE_CSTR_TABLE_ENTRY(K_Not,"Not"),
-    DEFINE_CSTR_TABLE_ENTRY(K_NotEqual,"NotEqual"),
+    CSTR_TABLE_ENTRY(K_Negate,"Negate"),
+    CSTR_TABLE_ENTRY(K_Not,"Not"),
+    CSTR_TABLE_ENTRY(K_NotEqual,"NotEqual"),
 
-    DEFINE_CSTR_TABLE_ENTRY(K_Or,"Or"),
+    CSTR_TABLE_ENTRY(K_Or,"Or"),
 
-    DEFINE_CSTR_TABLE_ENTRY(K_Pattern,"Pattern"),
-    DEFINE_CSTR_TABLE_ENTRY(K_PatternTest,"PatternTest"),
-    DEFINE_CSTR_TABLE_ENTRY(K_Plus,"Plus"),
-    DEFINE_CSTR_TABLE_ENTRY(K_PostDec,"PostDecrement"),
-    DEFINE_CSTR_TABLE_ENTRY(K_PostInc,"PostIncrement"),
-    DEFINE_CSTR_TABLE_ENTRY(K_Power,"Power"),
-    DEFINE_CSTR_TABLE_ENTRY(K_PreDec,"PreDecrement"),
-    DEFINE_CSTR_TABLE_ENTRY(K_PreInc,"PreIncrement"),
-    DEFINE_CSTR_TABLE_ENTRY(K_Put,"Put"),
+    CSTR_TABLE_ENTRY(K_Pattern,"Pattern"),
+    CSTR_TABLE_ENTRY(K_PatternTest,"PatternTest"),
+    CSTR_TABLE_ENTRY(K_Plus,"Plus"),
+    CSTR_TABLE_ENTRY(K_PostDec,"PostDecrement"),
+    CSTR_TABLE_ENTRY(K_PostInc,"PostIncrement"),
+    CSTR_TABLE_ENTRY(K_Power,"Power"),
+    CSTR_TABLE_ENTRY(K_PreDec,"PreDecrement"),
+    CSTR_TABLE_ENTRY(K_PreInc,"PreIncrement"),
+    CSTR_TABLE_ENTRY(K_Put,"Put"),
 
-    DEFINE_CSTR_TABLE_ENTRY(K_Query,"Query"),
+    CSTR_TABLE_ENTRY(K_Query,"Query"),
 
-    DEFINE_CSTR_TABLE_ENTRY(K_Raise,"Raise"),
-    DEFINE_CSTR_TABLE_ENTRY(K_Range,"Range"),
-    DEFINE_CSTR_TABLE_ENTRY(K_ReRaise,"ReRaise"),
+    CSTR_TABLE_ENTRY(K_Raise,"Raise"),
+    CSTR_TABLE_ENTRY(K_Range,"Range"),
+    CSTR_TABLE_ENTRY(K_ReRaise,"ReRaise"),
 
-    DEFINE_CSTR_TABLE_ENTRY(K_Set,"Set"),
-    DEFINE_CSTR_TABLE_ENTRY(K_SetDelayed,"SetDelayed"),
-    DEFINE_CSTR_TABLE_ENTRY(K_Subtract,"Subtract"),
-    DEFINE_CSTR_TABLE_ENTRY(K_SubtractFrom,"SubtractFrom"),
-    DEFINE_CSTR_TABLE_ENTRY(K_Switch,"Switch"),
+    CSTR_TABLE_ENTRY(K_Set,"Set"),
+    CSTR_TABLE_ENTRY(K_SetDelayed,"SetDelayed"),
+    CSTR_TABLE_ENTRY(K_Subtract,"Subtract"),
+    CSTR_TABLE_ENTRY(K_SubtractFrom,"SubtractFrom"),
+    CSTR_TABLE_ENTRY(K_Switch,"Switch"),
 
-    DEFINE_CSTR_TABLE_ENTRY(K_Try,"Try"),
+    CSTR_TABLE_ENTRY(K_Try,"Try"),
 
-    DEFINE_CSTR_TABLE_ENTRY(K_While,"While"),
+    CSTR_TABLE_ENTRY(K_While,"While"),
   END_CSTR_TABLE;
 
   ADIkrnlAddCommonStrings( stringtable, status );
@@ -286,24 +286,27 @@ void prsx_namvalcmp( ADIobj stream, ADIobj id, ADIstatus status )
 
   _chk_stat;
 
-  while ( (str->ctok.t == TOK__SYM) && 	/* While more identifiers */
-		  _ok(status) ) {
+/* While more identifiers */
+  while ( (str->ctok.t == TOK__SYM) && _ok(status) ) {
 
-    cnam = prsx_symname( stream, status ); /* Take the component name from stream */
+/* Take the component name from stream */
+    cnam = prsx_symname( stream, status );
 
     ADInextToken( stream, status );
 
-    if ( ADIifMatchToken( stream, 	/* Assignment bit name=value ? */
-		 TOK__ASSIGN, status )) {
-      cval = prsx_cvalue( stream,		/* Take component value from stream */
-		     status );
+/* Assignment bit name=value ? */
+    if ( ADIifMatchToken( stream, TOK__ASSIGN, status )) {
 
-      adix_cputiid( id, cnam, cval,	/* Write new component to structure */
-			  status );
+/* Take component value from stream */
+      cval = prsx_cvalue( stream, status );
+
+/* Write new component to structure */
+      adix_cputiid( id, cnam, cval, status );
       }
-    else {				/* We've hit the end */
+
+/* We've hit the end */
+    else
       adic_erase( &cnam, status );
-      }
     }
   }
 
@@ -325,6 +328,7 @@ void ADIaddDeviceToStream( ADIobj stream, ADIdeviceType type, ADIstatus status )
     dev->type = type;
     dev->dstatic = ADI__false;
     dev->pstatic = ADI__false;
+    dev->isatty = ADI__false;
     dev->bufsiz = dev->bnc = 0;
     str->dev = dev;
     }
@@ -715,8 +719,6 @@ void ADIdropDeviceInt( ADIstream *str, ADIstatus status )
 	if ( ! dev->pstatic )
 	  fclose( dev->f );
 	}
-      else if ( dev->type == ADIdevCin )
-	ADImemFree( dev->buf, dev->bufsiz, status );
       str->dev = dev->last;
       if ( dev != &str->basedev )
 	ADImemFree( dev->buf, sizeof(ADIdevice), status );
@@ -785,23 +787,6 @@ ADIobj ADIstrmExtendCst( ADIobj stream, char *buf, int blen, ADIstatus status )
   return stream;
   }
 
-
-ADIobj ADIstrmExtendCin( ADIobj stream, int bufsiz, ADIstatus status )
-  {
-  if ( _ok(status) ) {
-    ADIstream	*str = _strm_data(stream);
-
-    ADIaddDeviceToStream( stream, ADIdevCin, status );
-    str->dev->bufsiz = bufsiz;
-    str->dev->buf = (char *) ADImemAlloc( (size_t) bufsiz, status );
-    str->dev->buf[0] = '\0';
-    str->dev->ptr = str->dev->buf;
-    }
-
-  return stream;
-  }
-
-
 ADIobj ADIstrmExtendFile( ADIobj stream, FILE *f, ADIstatus status )
   {
   if ( _ok(status) ) {
@@ -813,6 +798,9 @@ ADIobj ADIstrmExtendFile( ADIobj stream, FILE *f, ADIstatus status )
     str->dev->pstatic = ADI__true;
     str->dev->buf = ADImemAlloc( FILEBUF, status );
     str->dev->bufsiz = FILEBUF;
+    str->dev->isatty = isatty(fileno(f));
+    str->dev->buf[0] = '\0';
+    str->dev->ptr = str->dev->buf;
     }
 
   return stream;
@@ -826,34 +814,33 @@ char ADIreadCharFromStream( ADIobj stream, ADIstatus status )
   int           gotit = ADI__false;
 
   while ( _ok(status) && ! gotit ) {
+    ADIdevice	*dev = str->dev;
+
     if ( str->nc_pb ) {
       ch = str->c_pb[--str->nc_pb]; gotit = ADI__true;
       }
-    else if ( str->dev ) {
-      switch( str->dev->type ) {
+    else if ( dev ) {
+      switch( dev->type ) {
 	case ADIdevCstring:
 	  ch = *(str->dev->ptr++); gotit = ADI__true;
 	  break;
 	case ADIdevFile:
-	  if ( feof(str->dev->f) )
+	  if ( feof(dev->f) )
 	    ADIdropDevice( stream, status );
 	  else {
-	    ch = fgetc( str->dev->f );
-	    gotit = ! feof(str->dev->f);
-	    }
-	  break;
-	case ADIdevCin:
-	  if ( *str->dev->ptr ) {
-	    ch = *(str->dev->ptr++); gotit = ADI__true;
-	    }
-	  else {
-	    str->dev->ptr = str->dev->buf;
-	    printf( "> " );
-	    fgets( str->dev->buf, str->dev->bufsiz, stdin );
-	    if ( feof(stdin) )
-	      ADIdropDevice( stream, status );
+	    if ( *dev->ptr ) {
+	      ch = *(dev->ptr++); gotit = ADI__true;
+	      }
 	    else {
-	      ch = *(str->dev->ptr++); gotit = ADI__true;
+	      dev->ptr = dev->buf;
+	      if ( dev->isatty )
+		printf( "> " );
+	      fgets( dev->buf, dev->bufsiz, dev->f );
+	      if ( feof(dev->f) )
+		ADIdropDevice( stream, status );
+	      else {
+		ch = *(dev->ptr++); gotit = ADI__true;
+		}
 	      }
 	    }
 	  break;

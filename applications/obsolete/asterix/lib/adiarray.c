@@ -187,7 +187,7 @@ void ADIaryAlter( ADIobj id, char *name, int nlen, int ndim,
   ADIobj      	*lid;
 
 /* Find data address */
-  adix_locdat( &id, name, nlen, DA__ARRAY, &lid, NULL, status );
+  adix_locdat( &id, name, nlen, DA__ARRAY, &lid, NULL, NULL, status );
 
 /* Check not accessed, not a slice */
   if ( _ok(status) ) {

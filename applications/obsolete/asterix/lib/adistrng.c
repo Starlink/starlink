@@ -156,9 +156,6 @@ void strx_init( ADIstatus status )
   {
   _chk_stat;
 
-/* Install the string constructor */
-  adix_def_mcon( UT_ALLOC_c, strx_newmta, status );
-
 /* Install the string destructor */
   adix_def_destruc( UT_ALLOC_c, strx_dstrc, status );
   }
@@ -331,69 +328,22 @@ void strx_exit( ADIstatus status )
 /*  Load data into newly created string instance
  *
  */
-void strx_newmta( ADIobj id, ADImta *mta, ADIstatus status )
-  {
-  int                   nval;
-  ADIstring         	*sptr;
-
-  _chk_stat;
-
-  sptr = _str_data(id);                 /* Locate string data area */
-
-  if ( ! mta->data ) {                  /* Null mta data? -> null string */
-    sptr->data = NULL;
-    sptr->len = 0;
-    }
-  else if ( ! mta->ndim ) {
-    if ( _null_q(mta->id) ) {
-      if ( mta->size == _CSM )
-	sptr->len = strlen( *((charptr *) mta->data) );
-      else
-	sptr->len = mta->size;
-
-      sptr->data = strx_dupl( *((charptr *) mta->data), sptr->len );
-      }
-    else {
-      ADIstring *isptr = (ADIstring *) mta->data;
-
-      sptr->data = strx_dupl( isptr->data, isptr->len );
-      sptr->len = isptr->len;
-      }
-    }
-  else if ( mta->ndim == 1 )
-    {
-    int                   i;
-
-    nval = mta->udims[0];
-
-    if ( mta->nulterm )
-      {
-      charptr         *vstr = (charptr *) mta->data;
-
-      for( i=0; i<nval; i++, sptr++ )
-	{
-	sptr->len = strlen(vstr[i]);
-	sptr->data = strx_dupl( vstr[i], sptr->len );
-	}
-      }
-    else
-      {
-      char             *vstr = (char *) mta->data;
-
-      for( i=0; i<nval; i++, sptr++, vstr += mta->size )
-	{
-	sptr->len = mta->size;
-	sptr->data = strx_dupl( vstr, sptr->len );
-	}
-      }
-    }
-  }
-
 
 void strx_dstrc( ADIobj str, ADIstatus status )
   {
   ADIstring         *sptr = _str_data(str);
 
   strx_free( sptr->data, status );
+  }
+
+
+void ADIstrngGetLen( ADIobj id, ADIinteger *rval, ADIstatus status )
+  {
+  _chk_stat;
+
+  if ( _valid_q(id) && _str_q(id) )
+    *rval = _str_len(id);
+  else
+    adic_setecs( ADI__INVARG, "Object is not a character string", status );
   }
 

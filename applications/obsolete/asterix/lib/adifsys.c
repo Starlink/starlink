@@ -491,28 +491,31 @@ void adix_locrep( char *name, int nlen, ADIobj *id, ADIstatus status )
   ADIobj        cid;                    /* Class description id */
   ADIobj        curp = ADI_G_replist;   /* Cursor over representations */
   ADIlogical    found = ADI__false;     /* Found the representation yet? */
-  ADIobj        *nid;                   /* NAME member address */
+  ADIobj        nid;                    /* NAME member address */
 
   _chk_stat;                            /* Check status on entry */
 
   _GET_NAME(name,nlen);               	/* Import string */
 
-  while ( (curp!=ADI__nullid) &&        /* Loop until found or finished */
-	  _ok(status) &&
-	  ! found )
-    {
-    cid = _CAR(curp);                   /* Locate class definition object */
+/* Loop until found or finished */
+  while ( (curp!=ADI__nullid) && _ok(status) && ! found ) {
 
-    adix_findmem( cid, "NAME", 4,       /* Find NAME member insertion */
-		  &nid, NULL, status );
+/* Locate class definition object */
+    cid = _CAR(curp);
+
+/* Find NAME member insertion */
+    adic_find( cid, "NAME", &nid, status );
 
 /* Found the one we want? */
-    if ( ! strx_cmpic( name, nlen, *nid ) ) {
+    if ( ! strx_cmpic( name, nlen, nid ) ) {
       found = ADI__true;
       *id = cid;
       }
     else
       curp = _CDR(curp);
+
+/*  Release NAME member */
+    adic_erase( &nid, status );
     }
   }
 
@@ -567,48 +570,33 @@ void adix_locrcb( ADIobj rid, char *name, int nlen,
   _chk_stat;
 
   *rtn = adix_find( rid, name, nlen,   	/* Find member data identifier */
-                    status );
+		    status );
   }
 
 
 void ADIfsysInit( ADIstatus status )
   {
   DEFINE_CSTR_TABLE(stringtable)
-    DEFINE_CSTR_TABLE_ENTRY(DnameAround, "Around"),
-    DEFINE_CSTR_TABLE_ENTRY(DnameAfter,	 "After"),
-    DEFINE_CSTR_TABLE_ENTRY(DnameBefore, "Before"),
-    DEFINE_CSTR_TABLE_ENTRY(DnamePrimary,"Primary"),
-    DEFINE_CSTR_TABLE_ENTRY(DnameNewLink,"NewLink"),
-    DEFINE_CSTR_TABLE_ENTRY(DnameSetLink,"SetLink"),
-    DEFINE_CSTR_TABLE_ENTRY(DnameUnLink, "UnLink"),
+    CSTR_TABLE_ENTRY(DnameAround, "Around"),
+    CSTR_TABLE_ENTRY(DnameAfter,  "After"),
+    CSTR_TABLE_ENTRY(DnameBefore, "Before"),
+    CSTR_TABLE_ENTRY(DnamePrimary,"Primary"),
+    CSTR_TABLE_ENTRY(DnameNewLink,"NewLink"),
+    CSTR_TABLE_ENTRY(DnameSetLink,"SetLink"),
+    CSTR_TABLE_ENTRY(DnameUnLink, "UnLink"),
   END_CSTR_TABLE;
 
-  static struct
-    {
-    char        *spec;
-    ADIcGenericDispatchCB       cdisp;
-    ADIfGenericDispatchCB       fdisp;
-    }
-  gtable[] =
-    {
-    {"NewLink(lhs,rhs)",       adix_cdsp_voo,	adix_fdsp_voo},
-    {"SetLink(lhs,rhs)",       adix_cdsp_voo,	adix_fdsp_voo},
-    {"UnLink(lhs,rhs)",        adix_cdsp_vo,	adix_fdsp_vo},
-    {NULL,NULL,NULL}};
+  DEFINE_GNRC_TABLE(gnrctable)
+    GNRC_TABLE_ENTRY("NewLink(lhs,rhs)", adix_cdsp_voo,	adix_fdsp_voo),
+    GNRC_TABLE_ENTRY("SetLink(lhs,rhs)", adix_cdsp_voo,	adix_fdsp_voo),
+    GNRC_TABLE_ENTRY("UnLink(lhs,rhs)",  adix_cdsp_vo,	adix_fdsp_vo),
+  END_GNRC_TABLE;
 
-  static struct
-    {
-    char        *spec;
-    ADIcMethodCB       exec;
-    }
-  mtable[] =
-    {
-    {"NewLink(ADIbase,ADIbase)",       (ADIcMethodCB) adix_base_NewLink},
-    {"SetLink(ADIbase,ADIbase)",       (ADIcMethodCB) adix_base_SetLink},
-    {"UnLink(ADIbase,ADIbase)",        (ADIcMethodCB) adix_base_UnLink},
-    {NULL,NULL}};
-
-  int i;
+  DEFINE_MTHD_TABLE(mthdtable)
+    MTHD_TABLE_ENTRY( "NewLink(ADIbase,ADIbase)", adix_base_NewLink ),
+    MTHD_TABLE_ENTRY( "SetLink(ADIbase,ADIbase)", adix_base_SetLink ),
+    MTHD_TABLE_ENTRY( "UnLink(ADIbase,ADIbase)", adix_base_UnLink ),
+  END_MTHD_TABLE;
 
   _chk_stat;
 
@@ -616,7 +604,7 @@ void ADIfsysInit( ADIstatus status )
   ADIkrnlAddCommonStrings( stringtable, status );
 
   adic_defcls( "FileRepresentation", "",
-           "NAME,OPEN_RTN,CREAT_RTN,NATRL_RTN,CLOSE_RTN,COMIT_RTN,TRACE_RTN",
+	   "NAME,OPEN_RTN,CREAT_RTN,NATRL_RTN,CLOSE_RTN,COMIT_RTN,TRACE_RTN",
 	       &DsysFileRep, status );
 
   adic_defcls( "FileObject",
@@ -639,23 +627,12 @@ void ADIfsysInit( ADIstatus status )
 	       "BinDS", "",
 	       &DsysSpectrum, status );
 
-  for( i=0; gtable[i].spec; i++ ) {     /* Install methods from table */
-    ADIobj	gid;
 
-    adic_defgen( gtable[i].spec,        /* Define generic and C dispatch */
-		 "", gtable[i].cdisp,
-		 &gid, status );
+/* Install generics from table */
+  ADIkrnlAddGenerics( gnrctable, status );
 
-    if ( gtable[i].fdisp )		/* Fortran dispatch defined? */
-      adix_defgdp( gid,
-		   adix_neweprc( ADI__false, (ADICB) gtable[i].fdisp, status ),
-		   status );
-    }
-
-  for( i=0; mtable[i].spec; i++ )       /* Install methods from table */
-    adic_defmth( mtable[i].spec,        /* Ignore returned id */
-		 mtable[i].exec,
-		 NULL, status );
+/* Install methods from table */
+  ADIkrnlAddMethods( mthdtable, status );
 
 #ifndef NOHDS
   F77_EXTERNAL_NAME(adi1_init)( status );
