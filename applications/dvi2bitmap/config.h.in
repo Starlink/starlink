@@ -49,6 +49,7 @@
 
 /* Specific functions */
 #undef HAVE_POPEN
+#undef HAVE_PIPE
 #undef HAVE___STRCHRNUL
 /* Define as 1 if the getopt function (and thus, which is more
  * important to us, the getopt globals, optarg, optind, opterr and
