@@ -1,3 +1,22 @@
+2000-06-23  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* surflib/surflib_process_bols.f (SURFLIB_PROCESS_BOLS): Add
+	support for clock error correction.
+
+	* src/surf_write_map_info.F (SURF_WRITE_MAP_INFO): Add DATE and
+	ORIGIN keywords.
+
+2000-06-22  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* sculib/sculib_put_fits_c.f (SCULIB_PUT_FITS_C):  Should be .LT.0
+	not .LE.0. Allow N_FITS to be 0.
+
+	* sculib/sculib_put_fits_i.f (SCULIB_PUT_FITS_I): Should be .LT.0
+	not .LE.0. Allow N_FITS to be 0.
+
+	* sculib/sculib_put_fits_d.f (SCULIB_PUT_FITS_D): Should be .LT.0
+	not .LE.0. Allow N_FITS to be 0.
+
 2000-06-14  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* scripts/surf.icl: Add SCUCLKERR

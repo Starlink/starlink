@@ -263,6 +263,11 @@
 *     updated as the sky rotated. This fix is only important for SCUBA2MEM
 *     where the positions of the off-beams are returned.
 
+*     For data taken on 19970405 and later the data headers are 
+*     checked for internal consistency to determine possible clock
+*     errors on the acquisition computer. If the error is greater than
+*     20 seconds all LST's and the MJD are corrected accordingly.
+
 *  Authors:
 *     TIMJ: Tim Jenness (JACH)
 *     JFL:  John Lightfoot (RoE)
@@ -276,6 +281,9 @@
 *     1997 March 20 (TIMJ)
 *        Extract from main tasks
 *     $Log$
+*     Revision 1.9  2000/06/24 01:04:55  timj
+*     Calculate and correct for possible clock error
+*
 *     Revision 1.8  1999/08/19 03:37:49  timj
 *     Header tweaks to ease production of SSN72 documentation.
 *
@@ -319,10 +327,8 @@
 *
 
 *  Bugs:
-*     Currently the IN_UT1 is assumed to be the MJD when the data taking
-*     begins. As of 24-NOV-1997 IN_UT1 is actually the MJD of the start
-*     of the observation (ie when the telescope begins to slew). This is
-*     a problem for data using a moving centre.
+*     - Does not deal with chop beam positions for 2 bolometer phot 
+*     observations.
 *     {note_any_bugs_here}
  
 *-
@@ -333,6 +339,7 @@
 *  Global Constants:
       INCLUDE 'PRM_PAR'          ! VAL__ constants
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'MSG_PAR'          ! MSG__ constants
 
 *  Arguments Given:
       INTEGER          NUM_CHAN
@@ -419,11 +426,19 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
+*  External References:
+      DOUBLE PRECISION SLA_DRANRM
+
 *  Local constants:
-      DOUBLE PRECISION ARCSEC2RAD         ! arcsec 2 radians conversion
+      DOUBLE PRECISION ARCSEC2RAD ! arcsec 2 radians conversion
       PARAMETER (ARCSEC2RAD = 4.84813681110D-6)
       DOUBLE PRECISION PI
       PARAMETER (PI = 3.14159265359D0)
+      DOUBLE PRECISION DR2S     ! Radians to seconds of time
+      PARAMETER ( DR2S = 1.37509870831397570104315571553852408797773D4)
+      DOUBLE PRECISION D2PI     ! 2 * PI
+      PARAMETER ( D2PI = 6.283185307179586476925286766559005768394339 )
+
 
 *  Local Variables:
       LOGICAL          AZNASCAN         ! Am I using RASTER with AZ or NA?
@@ -443,6 +458,7 @@
       CHARACTER*(20)   CHOP_FUN         ! Chop function
       REAL             CHOP_PA          ! Chop position angle
       REAL             CHOP_THROW       ! Chop in arcseconds
+      DOUBLE PRECISION CLOCK_ERR        ! Clock error in radians
       DOUBLE PRECISION CURR_MJD         ! MJD for current sample
       INTEGER          DATA_OFFSET      ! Offset in BOL_RA and BOL_DEC
       REAL             DEC_START        ! declination at start of SCAN 
@@ -475,6 +491,7 @@
       DOUBLE PRECISION NEW_DEC_START    ! Corrected scan pos (Dec/Start)
       DOUBLE PRECISION NEW_RA_END       ! Corrected scan pos (RA/End)
       DOUBLE PRECISION NEW_RA_START     ! Corrected scan pos (RA/Start)
+      INTEGER          NLOOPS           ! Number of loops to calculate clock err
       CHARACTER *(2)   OFFSET_COORDS    ! Coordinate system of offsets
       REAL             OFFSET_X         ! X offset of measurement in OFF_COORDS
       REAL             OFFSET_Y         ! Y offset of measurement in OFF_COORDS
@@ -490,6 +507,7 @@
       LOGICAL          SOME_DATA        ! True if data was found
       INTEGER          STORED_OFFSET    ! Data offset at start of exposure
       REAL             TAUZ             ! Tau at zenith for given Bol elevation
+      DOUBLE PRECISION UT1_REF          ! Temp MJD variable
       DOUBLE PRECISION XI               ! Tangent plane x offset
 *.
 
@@ -605,6 +623,97 @@
 
       CALL SCULIB_GET_FITS_C (N_FITS, N_FITS, FITS, 
      :     'CHOP_FUN', CHOP_FUN, STATUS)
+
+*     Check for an inconsistency in the times stored in the
+*     headers. We do this by comparing the AZ/EL in the header
+*     to the LST in the header - see also SURF_SCUCLKERR
+*     We can only do this for data taken 19970405 or later
+*     (MJD 50543)
+
+      IF (IN_UT1 .GT. 50543.0D0) THEN
+
+*     For PLANET observation we need to iterate over the calculation
+*     of the clock error since the source is moving and we need to
+*     work out where the apparent RA/Dec of the moving source taking
+*     into account the clock error. Only need to loop once for stationary
+*     objects and twice for moving sources
+
+         IF (CENTRE_COORDS .EQ. 'PLANET') THEN
+            NLOOPS = 2
+         ELSE
+            NLOOPS = 1
+         END IF
+
+*     Reset clock error and store the uncorrected MJD
+         CLOCK_ERR = 0.0D0
+         UT1_REF = IN_UT1
+
+         DO I = 1, NLOOPS
+
+*     Calculate new MJD (no change first time through loop)
+            IN_UT1 = UT1_REF + ( CLOCK_ERR / D2PI )
+
+*     For planet observations we need to recalculate the
+*     apparent ra/dec since the time has changed
+
+            IF (CENTRE_COORDS .EQ. 'PLANET') THEN
+
+               CALL SCULIB_CALC_APPARENT (LAT_OBS, LONG1, LAT1,
+     :              LONG2, LAT2, 0.0D0, 0.0D0,
+     :              CENTRE_COORDS, LST_STRT, IN_UT1,
+     :              MJD1, MJD2, RA_CEN, DEC_CEN, IN_ROTATION,
+     :              STATUS)
+
+            END IF
+
+*     Now get the clock error
+            CALL SCULIB_CALC_CLOCKERR( N_FITS, FITS, RA_CEN, 
+     :           LST_STRT, CLOCK_ERR, DTEMP, STATUS )
+            
+         END DO
+
+*     If the correction is greater than 20 seconds and less than 
+*     about 1000 secs we apply the correction. Else we either do not
+*     want to bother (the accuaracy of the calculation means that a
+*     20 seconds error is not known well enough to make a difference) or
+*     the value is so large we dont believe it)
+
+         RTEMP = CLOCK_ERR * DR2S ! Convert to seconds
+         IF (RTEMP .GT. 1000.0) THEN
+
+            CALL MSG_SETR( 'ERR', RTEMP) 
+            CALL MSG_OUTIF(MSG__QUIET, ' ','PROCESS_BOLS: Clock error'//
+     :           ' calculated to be ^ERR seconds. Too large so '//
+     :           'ignoring.', STATUS)
+
+         ELSE IF ( RTEMP .GT. 20.0) THEN
+
+            CALL MSG_SETR( 'ERR', RTEMP)
+            CALL MSG_OUTIF(MSG__VERB, ' ','PROCESS_BOLS: Correct '//
+     :           'times by adding ^ERR seconds', STATUS)
+
+*     Calculate the new MJD reference
+            IN_UT1 = UT1_REF + ( CLOCK_ERR / D2PI )
+
+*     Now calculate the new LST values
+            DO MEASUREMENT = 1, N_MEASUREMENTS
+               DO INTEGRATION = 1, N_INTEGRATIONS
+                  DO EXPOSURE = 1, N_EXPOSURES
+                     DO I = 1, N_SWITCHES
+                        
+*     Add clock error and put into range 0 to 2pi
+                        LST_STRT(I,EXPOSURE,INTEGRATION,MEASUREMENT) =
+     :                    SLA_DRANRM( 
+     :                    LST_STRT(I,EXPOSURE,INTEGRATION,MEASUREMENT) +
+     :                    CLOCK_ERR)
+                     END DO
+                  END DO
+               END DO
+            END DO
+            
+         END IF
+
+      END IF
 
 *     Decide whether we have to fix the chop tracking bug or not
 *     The chop tracking bug for LO Jiggle maps was fixed on
@@ -877,7 +986,9 @@
 
 
 *     Current MJD is MJD at start of observation plus the elapsed
-*     time to this exposure. 
+*     time to this exposure. This is only correct if the IN_UT1 refers
+*     to the first LST_STRT entry (should be okay as of V1.6 of SURF
+*     where the startup time is calculated)
 
                         CURR_MJD = IN_UT1 + ELAPSED
 
