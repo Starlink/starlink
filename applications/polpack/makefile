@@ -671,8 +671,8 @@ libpolpack.a: $(O_SUB2)
 
 $(MONOLITH): $(MONO_OBJECT) $(OBJECT_LIBRARIES) $(LINK_SCRIPT) grf_kappa.o
 	$(ALINK) $(MONO_OBJECT) -o $(MONOLITH) $(OBJECT_LIBRARIES) \
-            -L/star-test/lib -L$(KAPPA_SOURCE) $(ADDLIBS) $(TCLLIBS) \
-            `./$(LINK_SCRIPT)` $(LDFLAGS)
+            -L/star-test/lib -L$(KAPPA_SOURCE) $(ADDLIBS) \
+            `./$(LINK_SCRIPT)` $(TCLLIBS) $(LDFLAGS)
 
 
 #  Rules for building the help libraries.
