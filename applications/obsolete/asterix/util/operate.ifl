@@ -1,7 +1,8 @@
-Interface OPERATE
-   Parameter INP
-      position    1
-      type        'UNIV'
+INTERFACE OPERATE
+
+   PARAMETER INP
+      POSITION    1
+      type        'LITERAL'
       ppath       'GLOBAL'
       association '<-GLOBAL.BINDS'
       prompt      'Input data object'
@@ -10,7 +11,7 @@ Interface OPERATE
 
    Parameter OUT
       position    2
-      type        'UNIV'
+      type        'LITERAL'
       association '->GLOBAL.BINDS'
       prompt      'Output data object'
       help        'Can be same as input'
