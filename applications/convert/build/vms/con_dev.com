@@ -1,7 +1,7 @@
 $ VERIFY = F$VERIFY( 0 )
 $!+
 $! Name:
-$!    CONVERTDEV
+$!    CON_DEV
 $!
 $! Purpose:
 $!    Sets up symbols and logical names for public CONVERT development.
@@ -13,7 +13,7 @@ $! Type of Module:
 $!    Command procedure.
 $!
 $! Invocation:
-$!    @CONVERTDEV
+$!    @CON_DEV
 $!
 $! Description :
 $!    Defines the logical names and symbols for public CONVERT development. 
@@ -29,6 +29,8 @@ $!
 $! History :
 $!    1992 September 23 (MJC):
 $!       Original version.
+$!    1993 August 20 (MJC):
+$!       Renamed from CONVERTDEV for connsistency with other packages.
 $!    {enter_changes_here}
 $!
 $!-
