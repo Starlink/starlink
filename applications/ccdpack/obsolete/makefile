@@ -429,7 +429,7 @@ PKG_LINK = CCD1
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
-PKG_VERS = 3.1-0
+PKG_VERS = 3.2-0
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the
@@ -486,15 +486,11 @@ TCL_SCRIPTS = CCDAnimateBitmap.tcl CCDBindings.tcl CCDContextHelp.tcl \
  CCDGeometryMain.tcl CCDTaskRegistry.tcl CCDTaskStart.tcl \
  CCDCheckReduce.tcl CCDInitialize.tcl \
  CCDTaskQuery.tcl CCDGeomSetPercent.tcl CCDExit.tcl \
- CCDFileMonitorMain.tcl CCDDoPresent.tcl
+ CCDFileMonitorMain.tcl CCDDoPresent.tcl \
+ CCDTkWidget.tcl CCDCcdWidget.tcl CCDNameTail.tcl CCDPathOf.tcl CCDCmdOf.tcl
 
 STANDALONE_SCRIPTS = \
- adamMessageRelay dialogStart.tcl menu.tcl scrollbar.tcl adamtask.tcl \
- entry.tcl msgbox.tcl tearoff.tcl bgerror.tcl focus.tcl obsolete.tcl \
- test.tcl button.tcl init.tcl optMenu.tcl text.tcl clrpick.tcl \
- itcl.tcl optionMenu.tcl tk.tcl comdlg.tcl itk.tcl palette.tcl tkerror.tcl \
- console.tcl parray.tcl tkfbox.tcl dialog.tcl ldAout.tcl \
- scale.tcl xmfbox.tcl dialogShow.tcl listbox.tcl scrlbar.tcl
+ adamMessageRelay adamtask.tcl 
 
 CONFIG_SCRIPTS = EEV3QUICK.DAT EEV3STANDARD.DAT EEV5QUICK.DAT \
  EEV5STANDARD.DAT EEV6QUICK.DAT EEV6STANDARD.DAT EEV7QUICK.DAT \
@@ -586,7 +582,7 @@ SUBSRC = ccd1_achan.f ccd1_acmsk.f ccd1_adds.f ccd1_adkey.f \
  ccd1_duesc.f ccd1_dxy12.f ccd1_end.f ccd1_estm.f ccd1_ffcl.f \
  ccd1_ffcor.f ccd1_filas.f ccd1_fiohd.f ccd1_fitg.f \
  ccd1_fitlm.f ccd1_flnms.f ccd1_fra.f ccd1_frdm.f ccd1_frtmp.f \
- ccd1_ftval.f ccd1_ftypi.f \
+ ccd1_ftval.f ccd1_ftget.f ccd1_ftypi.f \
  ccd1_ftypl.f ccd1_gafit.f ccd1_gastc.f ccd1_gastd.f \
  ccd1_gefp.f ccd1_ggmap.f ccd1_giseq.f ccd1_gmdcp.f ccd1_gmid.f \
  ccd1_gmmp.f ccd1_grapc.f ccd1_groff.f ccd1_grpth.f ccd1_grrep.f ccd1_gtbds.f \
@@ -605,7 +601,7 @@ SUBSRC = ccd1_achan.f ccd1_acmsk.f ccd1_adds.f ccd1_adkey.f \
  ccd1_mxyo.f ccd1_mxyo2.f ccd1_nabv.f ccd1_ndfab.f \
  ccd1_ndfac.f ccd1_ndfck.f ccd1_ndfgb.f \
  ccd1_ndfgl.f ccd1_ndfgr.f ccd1_ndfgu.f ccd1_ndfin.f \
- ccd1_ndfpg.f ccd1_ndfpr.f ccd1_nlmap.f ccd1_nmid.f ccd1_nrmed.f \
+ ccd1_ndfpg.f ccd1_ndfpr.f ccd1_nglis.f ccd1_nlmap.f ccd1_nmid.f ccd1_nrmed.f \
  ccd1_nxwrd.f ccd1_objs.f ccd1_opfio.f ccd1_orvar.f \
  ccd1_ovcom.f ccd1_ovlap.f ccd1_plof.f ccd1_pnply.f ccd1_prmin.f \
  ccd1_prndf.f ccd1_proff.f ccd1_prsel.f ccd1_prune.f \
@@ -2174,6 +2170,7 @@ ccd1_frtmp.o: CCD1_PAR CCD1_TMPCM DAT_PAR
 ccd1_fspec.o: SAE_PAR GRP_PAR
 ccd1_ftgrp.o: GRP_PAR SAE_PAR TRN_ERR
 ccd1_ftval.o: DAT_PAR SAE_PAR
+ccd1_ftget.o: SAE_PAR
 ccd1_ftypi.o: CCD1_PAR DAT_PAR SAE_PAR
 ccd1_ftypl.o: CCD1_PAR DAT_PAR SAE_PAR
 ccd1_gafit.o: SAE_PAR
@@ -2260,6 +2257,7 @@ ccd1_ndfgu.o: PAR_ERR SAE_PAR GRP_PAR NDG_ERR
 ccd1_ndfin.o: FIO_ERR PAR_ERR SAE_PAR GRP_PAR NDG_ERR
 ccd1_ndfpg.o: FIO_ERR PAR_ERR SAE_PAR GRP_PAR NDG_ERR
 ccd1_ndfpr.o: CCD1_PAR FIO_ERR PAR_ERR SAE_PAR GRP_PAR NDG_ERR
+ccd1_nglis.o: SAE_PAR GRP_PAR PAR_ERR
 ccd1_nlmap.o: SAE_PAR
 ccd1_nmid.o: SAE_PAR
 ccd1_nrmed.o: SAE_PAR
