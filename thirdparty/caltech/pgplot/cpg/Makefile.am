@@ -19,7 +19,7 @@ cpgplot.c cpgplot.h: pgbind
 
 lib_LTLIBRARIES = libcpgplot.la
 libcpgplot_la_SOURCES = $(C_WRAPPERS)
-include_HEADERS = $(PUBLIC_INCLUIDES)
+include_HEADERS = $(PUBLIC_INCLUDES)
 
 # Build the test
 
