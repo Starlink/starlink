@@ -37,8 +37,10 @@
  */
 #ifndef __cplusplus
 enum ImageDataType {
-   BYTE_IMAGE   =  8,   /* 8 bit images  */
-   X_IMAGE      = -8,   /* special, already color scaled, X image data */
+   BYTE_IMAGE  =   8,   /* 8 bit unsigned images  */
+   X_IMAGE      = -8,   /* 8 bit signed, really a special type as
+                           Skycat assumes this is already color
+                           scaled, X image data */ 
    SHORT_IMAGE  =  16,  /* 16 bit signed */
    USHORT_IMAGE = -16,  /* 16 bit unsigned */
    LONG_IMAGE   =  32,  /* 32 bit integer */

@@ -258,6 +258,9 @@ class StarRtdImage : public Skycat {
    //  Enable readouts etc. to show milli-arcsec precision.
    int astmilliCmd( int argc, char *argv[] );
 
+   //  Access to some SLALIB routines.
+   int slalibCmd( int argc, char *argv[] );
+
  protected:
 
    //  Pointer to structure that holds the image configuration options.
