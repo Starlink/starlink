@@ -104,7 +104,7 @@ while (defined($line = <EQIN>)) {
 	# Calculate checksum.  Base the checksum on the equation type
 	# as well as its contents.
 	($checkeqn = $eqtype.$eqn) =~ s/\s+//sg;
-	$checksum = unpack ("%32C*", $checkeqn);
+	$checksum = simple_checksum($checkeqn);
 	if (defined($checklist{$checksum})) {
 	    # already seen this equation
 	    print SGMLOUT "<img-eq label='$label' sysid='" .
@@ -112,8 +112,9 @@ while (defined($line = <EQIN>)) {
 	} else {
 	    $eqn =~ s/\s+$//s;
 	    print LATEXOUT $eqtypes{'start-'.$eqtype} .
-		$eqn . $eqtypes{'end-'.$eqtype} .
-		    "\n\\special{dvi2bitmap outputfile $outfilename}\n\\newpage\n";
+		$eqn . 
+		$eqtypes{'end-'.$eqtype} .
+		"\n\\special{dvi2bitmap outputfile $outfilename}\n\\newpage\n";
 	    print SGMLOUT "<img-eq label='$label' sysid='$outfilename'>\n";
 	    $checklist{$checksum} = $outfilename;
 	    $eqcount++;
@@ -139,4 +140,51 @@ exit 0;
 
 sub Usage {
     die "$ident_string\nUsage: $0 filename\n";
+}
+
+# Provide a simple checksum with a decent hash length.
+#
+# Repeatedly call crypt_checksum, concatenating the results.  This is a
+# respectable way to increase the hash size of an algorithm (see Schneier,
+# for example).
+#
+# This checksum isn't cryptographically secure, but it's good enough to 
+# allow us to more-or-less guarantee that if two strings give the same
+# hash, they're the same string.
+#
+# We can make an arbitrarily long hash here, but a single round gives us 
+# 2^(56) values, which should be enough, without being overly slow.
+#
+# Do _not_ use unpack("%32C*",...) as a checksum - it doesn't seem to 
+# fill the 32 bits the documentation semi-claims it does. 
+#
+sub simple_checksum {
+    my $msg = shift;
+    my $cs = "";
+    my $cs16;
+    my $lcount;
+#    for ($lcount=0; $lcount<2; $lcount++)
+#    {
+	$cs_short = crypt_checksum ($cs.$msg);
+	$cs = $cs_short.$cs;
+	# I _think this is robust, since crypt()ing the result of crypt() 
+	# should be safe.
+#    }
+    return $cs;
+}
+
+# Use the crypt() function to obtain a checksum.  Call it repeatedly, taking
+# the message in blocks of 4 characters, using the result of the previous
+# round as half of the `password'.  Returns a string 11 characters long.
+sub crypt_checksum {
+    my $msg = shift;
+    my $msglen = length($msg);
+    my $i;
+    my $salt = "xx";
+    for ($i=0; $i<$msglen; $i+=4)
+    {
+	$cs = crypt (substr($salt,0,4).substr($msg, $i, 4), $salt);
+	$salt = substr($cs,2);
+    }
+    return $salt;
 }
