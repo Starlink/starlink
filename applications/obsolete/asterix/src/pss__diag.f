@@ -154,7 +154,7 @@
 
 *    Open file
       OPEN( UNIT=RMAP, FILE=NAME, STATUS='NEW',
-     :      CARRIAGECONTROL='LIST', IOSTAT=FSTAT )
+     :      IOSTAT=FSTAT )
       IF ( FSTAT .EQ. 0 ) THEN
         WRITE( RMAP, * )
      :     'TOPLEVEL TYPE "BINDS" TITLE "Background rescale factor"'
