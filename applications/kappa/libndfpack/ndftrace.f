@@ -215,11 +215,8 @@
 *        declarations and other tidying.
 *     1995 June 18 (MJC):
 *        Added QUIET option and the output parameters.
-*     27-NOV-1998 (DSB):
+*     1997 November 27 (DSB):
 *        Added support for WCS component.
-*     9-DEC-1998 (DSB):
-*        Allow the extent of axes spanning only one or two pixels to be
-*        displayed, instead of just saying "non-monotonic".
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -300,7 +297,6 @@
       INTEGER LBND( NDF__MXDIM ) ! Lower pixel-index bounds
       LOGICAL MONOTO( NDF__MXDIM ) ! Axis monotonic flags
       INTEGER N                  ! Loop counter for extensions
-      INTEGER NBAD               ! No. of bad values
       INTEGER NC                 ! Character count
       INTEGER NDIM               ! Number of dimensions
       INTEGER NEXTN              ! Number of extensions
@@ -543,30 +539,18 @@
             CALL NDF_AMAP( INDF, 'Centre', IAXIS, '_DOUBLE',
      :                     'READ', AXPNTR, EL, STATUS )
 
-*  Are all the axes monotonic?  If the axis has less than 3 elements,
-*  then the axis is nonotonic so long as there are no bad centre values.
-            IF( EL .LT. 3 ) THEN            
-               CALL KPG1_NBADD( EL, %VAL( AXPNTR ), NBAD, STATUS )
-               IF( NBAD .EQ. 0 ) THEN
-                  MONOTO( IAXIS ) = .TRUE.
-               ELSE
-                  MONOTO( IAXIS ) = .FALSE.
-               END IF                  
-
-*  If there are 3 or more axis values, start a new error context so that 
-*  the error reports concerning a non-monotonic axis may be annulled.
+*  Are all the axes monotonic?  Start a new error context so that the
+*  error reports concerning a non-monotonic axis may be annulled.
 *  Instead we issue a warning message so that the application can
 *  continue by using world co-ordinates.
-            ELSE 
-               CALL ERR_MARK
-               CALL KPG1_MONOD( .TRUE., EL, %VAL( AXPNTR( 1 ) ),
-     :                          MONOTO( IAXIS ), STATUS )
-               IF ( STATUS .NE. SAI__OK ) THEN
-                  CALL ERR_ANNUL( STATUS )
-                  MONOTO( IAXIS ) = .FALSE.
-               END IF
-               CALL ERR_RLSE
+            CALL ERR_MARK
+            CALL KPG1_MONOD( .TRUE., EL, %VAL( AXPNTR( 1 ) ),
+     :                       MONOTO( IAXIS ), STATUS )
+            IF ( STATUS .NE. SAI__OK ) THEN
+               CALL ERR_ANNUL( STATUS )
+               MONOTO( IAXIS ) = .FALSE.
             END IF
+            CALL ERR_RLSE
 
 *  Unmap the axis.
             CALL NDF_AUNMP( INDF, 'Centre', IAXIS, STATUS )
