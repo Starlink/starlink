@@ -36,6 +36,10 @@
       cd ${REL_DIR}
       echo "Moved to $PWD"
 
+#  Make the ctg and lpg source tar files.
+      ${CTG_SYS}/dev/bin/make_source.csh
+      ${LPG_SYS}/dev/bin/make_source.csh
+
 #  Expand any generic source files.
 #      foreach file (`grp generic_sources`)
 #         echo "Expanding generic source file $file"
@@ -63,10 +67,6 @@
          endif
       endif
 
-#  Copy the hypertext docs to the release directory.
-      echo "Copying the hypertext docs to the release directory."
-      cp ${KAPLIBS_DEV}/../sun238.htx_tar ${REL_DIR}
-
 #  Ensure all files are accessable.
       echo "Setting protection for all files"
       chmod 777 *
@@ -82,9 +82,8 @@
          mv ${TEMPDIR}/${file}.tar ${REL_DIR}
       end
 
-#  Make the ctg and lpg source tar files.
-#      ${CTG_SYS}/dev/bin/make_source.csh
-#      ${LPG_SYS}/dev/bin/make_source.csh
+#  Create the documentation in the current directory
+      $KAPLIBS_DEV/bin/make_sun238.csh
 
 #  Tar up all the release files and then remove them.
       echo "Creating kaplibs.tar"
