@@ -11,6 +11,8 @@ AM_INIT_AUTOMAKE(1.8.2-starlink)
 dnl    Include defaults for Starlink configurations
 STAR_DEFAULTS
 
+dnl    Get EXEEXT for make.config
+
 AC_PROG_MAKE_SET
 
 dnl    To configure Tcl, run ./configure in the `unix' directory.
@@ -27,6 +29,6 @@ STAR_SPECIAL_INSTALL_COMMAND([
     cd unix;
     $(MAKE) INSTALL_ROOT=$$DESTDIR install])
 
-AC_CONFIG_FILES([Makefile component.xml])
+AC_CONFIG_FILES([Makefile component.xml make.config])
 
 AC_OUTPUT
