@@ -632,6 +632,7 @@ static double GetEpoch( AstFrame * );
 static double GetEquinox( AstSkyFrame * );
 static double GetTop( AstFrame *, int );
 static double Offset2( AstFrame *, const double[2], double, double, double[2] );
+static int GetActiveUnit( AstFrame * );
 static int GetAsTime( AstSkyFrame *, int );
 static int GetDirection( AstFrame *, int );
 static int GetLatAxis( AstSkyFrame * );
@@ -641,6 +642,7 @@ static int IsEquatorial( AstSystemType );
 static int MakeSkyMapping( AstSkyFrame *, AstSkyFrame *, AstSystemType, AstMapping ** );
 static int Match( AstFrame *, AstFrame *, int **, int **, AstMapping **, AstFrame ** );
 static int SubFrame( AstFrame *, AstFrame *, int, const int *, const int *, AstMapping **, AstFrame ** );
+static int TestActiveUnit( AstFrame * );
 static int TestAsTime( AstSkyFrame *, int );
 static int TestAttrib( AstObject *, const char * );
 static int TestEquinox( AstSkyFrame * );
@@ -1255,6 +1257,40 @@ static double Gap( AstFrame *this_frame, int axis, double gap, int *ntick ) {
 
 /* Return the result. */
    return result;
+}
+
+static int GetActiveUnit( AstFrame *this_frame ) {
+/*
+*  Name:
+*     GetActiveUnit
+
+*  Purpose:
+*     Obtain the value of the ActiveUnit flag for a SkyFrame.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "skyframe.h"
+*     int GetActiveUnit( AstFrame *this_frame ) 
+
+*  Class Membership:
+*     SkyFrame member function (over-rides the astGetActiveUnit protected
+*     method inherited from the Frame class).
+
+*  Description:
+*    This function returns the value of the ActiveUnit flag for a
+*    SkyFrame, which is always 0.
+
+*  Parameters:
+*     this
+*        Pointer to the SkyFrame.
+
+*  Returned Value:
+*     The value to use for the ActiveUnit flag (0).
+
+*/
+   return 0;
 }
 
 static int GetAsTime( AstSkyFrame *this, int axis ) {
@@ -3218,6 +3254,8 @@ void astInitSkyFrameVtab_(  AstSkyFrameVtab *vtab, const char *name ) {
    frame->LineContains = LineContains;
    frame->LineCrossing = LineCrossing;
    frame->LineOffset = LineOffset;
+   frame->GetActiveUnit = GetActiveUnit;
+   frame->TestActiveUnit = TestActiveUnit;
 
 /* Store pointers to inherited methods that will be invoked explicitly
    by this class. */
@@ -7123,6 +7161,40 @@ static const char *SystemString( AstFrame *this, AstSystemType system ) {
 
 /* Return the result pointer. */
    return result;
+}
+
+static int TestActiveUnit( AstFrame *this_frame ) {
+/*
+*  Name:
+*     TestActiveUnit
+
+*  Purpose:
+*     Test the ActiveUnit flag for a SkyFrame.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "skyframe.h"
+*     int TestActiveUnit( AstFrame *this_frame ) 
+
+*  Class Membership:
+*     SkyFrame member function (over-rides the astTestActiveUnit protected
+*     method inherited from the Frame class).
+
+*  Description:
+*    This function test the value of the ActiveUnit flag for a SkyFrame, 
+*    which is always "unset". 
+
+*  Parameters:
+*     this
+*        Pointer to the SkyFrame.
+
+*  Returned Value:
+*     The result of the test (0).
+
+*/
+   return 0;
 }
 
 static int TestAsTime( AstSkyFrame *this, int axis ) {
