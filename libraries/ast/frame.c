@@ -77,7 +77,6 @@ c     - astPickAxes: Create a new Frame by picking axes from an existing one
 c     - astResolve: Resolve a vector into two orthogonal components
 c     - astSetActiveUnit: Specify how the Unit attribute should be used
 c     - astUnformat: Read a formatted coordinate value for a Frame axis
-c     - AST_ACTIVEUNIT: Specify how the Unit attribute should be used
 f     - AST_ANGLE: Find the angle subtended by two points at a third point
 f     - AST_AXANGLE: Find the angle from an axis, to a line through two points
 f     - AST_AXDISTANCE: Calculate the distance between two axis values
@@ -93,6 +92,7 @@ f     - AST_OFFSET2: Calculate an offset along a geodesic curve in a 2D Frame
 f     - AST_PERMAXES: Permute the order of a Frame's axes
 f     - AST_PICKAXES: Create a new Frame by picking axes from an existing one
 f     - AST_RESOLVE: Resolve a vector into two orthogonal components
+f     - AST_SETACTIVEUNIT: Specify how the Unit attribute should be used
 f     - AST_UNFORMAT: Read a formatted coordinate value for a Frame axis
 
 *  Notes:
