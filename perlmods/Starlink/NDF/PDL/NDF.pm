@@ -1,16 +1,49 @@
-#!/bin/perl
+package PDL::IO::NDF;
 
-package PDL::Io::NDF;
+=head1 NAME
 
-use PDL::Core;     # Grab the Core names
-use DynaLoader; use Carp; use SelfLoader;use strict;
+  PDL::Io::NDF - PDL Module for reading and writing Starlink
+                 N-dimensional data structures as PDLs.
 
-use vars qw/@EXPORT_OK @ISA @EXPORT_STATIC/;
+=head1 SYNOPSIS
+
+  use PDL::Io::NDF;
+
+  $a = PDL->rndf($file);
+
+  $a = rndf('test_image');
+  $a = rndf('test_image', 1);
+
+  $a->wndf($file);
+  wndf($a, 'out_image');
+
+  propndfx($a, 'template', 'out_image');
+
+=head1 DESCRIPTION
+
+This module adds the ability to read and write Starlink N-dimensional data 
+files as N-dimensional PDLs.
+
+=cut
+
+
+@EXPORT_OK = qw/rndf wndf/;
+%EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+
+@ISA    = qw( PDL::Exporter );
+ 
+
+
+use PDL::Core;
+use PDL::Types;
+use Carp;
+use strict;
 
 # Starlink data type conversion
-use vars qw/%pdltypes %startypes $ndf_loaded $VERSION/;
+use vars qw/%pdltypes %startypes $ndf_loaded $VERSION $EXTNAME/;
 
-'$Revision$ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = "$1");
+$VERSION = undef;
+$VERSION = '1.00';
 
 # Set PDL -> Starlink data types
 %pdltypes = ("$PDL_B"  => "_BYTE",
@@ -32,176 +65,77 @@ use vars qw/%pdltypes %startypes $ndf_loaded $VERSION/;
 	     );
 
 
-@EXPORT_OK = qw( wndf rndf propndfx );
-@ISA = qw( PDL::Exporter DynaLoader SelfLoader ); 
-@EXPORT_STATIC = qw( rndf );
+# This is the name I use in the PDL header hash that contains the
+# NDF extensions so that they can be recreated
 
-1;
+$EXTNAME = 'NDF_EXT';
 
-__DATA__
+=head2 rndf()
 
-############################################################################
-#  WNDF
-#    Routine to write a PDL to an NDF.
-#    Header information is written to NDF extensions.
-#    DATA,VARIANCE,QUALITY, AXIS are written from a PDL
-#    (if they exist)
-############################################################################
+  Reads a piddle from a NDF format data file.
 
-sub wndf {  # Write a PDL to a NDF format file
+     $pdl = rgsd('file.sdf');
+     $pdl = rgsd('file.sdf',1);
 
-  use strict;
+  The '.sdf' suffix is optional. The optional second argument turns off 
+  automatic quality masking and returns a quality array as well.
 
-  croak 'Usage: wndf($pdl, $outfile)' if $#_!=1;
+  Header information and NDF Extensions are stored in the piddle as a hash 
+  which can be retreived with the $pdl->gethdr command.
+  Array extensions are stored in the header as follows:
 
-  my ($indf, $place, $status, $place, $outndf);
-  my (@lbnd, @ubnd);
+     $a - the base DATA_ARRAY
+     
+  If $hdr = $a->gethdr;
 
-  my ($pdl, $outfile) = @_; 
-  eval 'use NDF' unless $ndf_loaded++;
-  croak 'Cannot use NDF library' if $@ ne "";
+  then:
+      %{$hdr}        contains all the FITS headers plus:
+      $$hdr{Error}   contains the Error/Variance PDL
+      $$hdr{Quality} The quality byte array
+      @{$$hdr{Axis}} Is an array of piddles containing the information
+                     for axis 0, 1, etc.
+      $$hdr{NDF_EXT} Contains all the NDF extensions
+      $$hdr{Hist}    Contains the history information
+      $$hdr{NDF_EXT}{_TYPES} - Data types for non-PDL NDF extensions so that
+                           wndf can reconstruct a NDF.
 
-  # Set status
-  $status = &NDF::SAI__OK;
-  
-  # Strip trailing .sdf if one is present
-  $outfile =~ s/\.sdf$//;
-
-  # Begin context
-  ndf_begin();
-  err_begin($status);
-
-  # Open the new file
-  ndf_place(&NDF::DAT__ROOT, $outfile, $place, $status);
-
-  # Need to create data_array component
-  # Change the bounds to match the PDL
-
-  @ubnd = dims($pdl);
-  @lbnd = ();
-  for (0..$#ubnd) {
-    @lbnd[$_] = 1;
-  }
-
-  ndf_new($pdltypes{$$pdl{Datatype}}, $#ubnd+1, @lbnd, @ubnd, $place, 
-	  $outndf, $status);
-
-  # Set the application name
-  ndf_happn('PDL::wndf', $status);
-
-  # Write the data to this file
-  wdata($outndf, $pdl, $status);
-
-  # Write the header and title
-  whdr($outndf, $pdl, $status);
-
-  # Create a history extension
-  ndf_hcre($outndf, $status);
-
-  # Annul the identifier
-  ndf_annul($outndf, $status);
-
-  # End context
-  ndf_end($status);
-  err_end($status);
-
-  croak "Bad STATUS in wndf\n" if $status != &NDF::SAI__OK; 
-
-  return 1;
-}
+All extension information is stored in the header hash array.
+Extension structures are preserved in hashes, so that the PROJ_PARS
+component of the IRAS.ASTROMETRY extension is stored in
+$$hdr{NDF_EXT}{IRAS}{ASTROMETRY}{'PROJ_PARS'}. All array structures are
+stored as arrays in the Hdr: numeric arrays are stored as PDLs,
+logical and character arrays are stored as plain Perl arrays. FITS
+arrays are a special case and are expanded as scalars into the header.
 
 
-############################################################################
-#  PROPNDFX
-#    Routine to write a PDL to an NDF by copying the extension from an
-#    existing NDF and writing DATA,VARIANCE,QUALITY, AXIS from a PDL
-#    (if they exist)
-#    Extensions, labels and history are propogated from the old NDF.
-#    No new extension information is written.
-############################################################################
 
-sub propndfx {  # Write a PDL to a NDF format file
+=cut
 
-  use strict;
+# This is one form of the new command
 
-  croak 'Usage: propndfx($pdl, $infile, $outfile)' if $#_!=2;
+sub rndf {PDL->rndf(@_)}
 
-  my ($indf, $in_place, $status, $outplace, $outndf);
+# And this is the real form
+# Allows the command to be called in OO form or as a function
+sub PDL::rndf {  # Read a piddle from a NDF file
 
-  my ($pdl, $infile, $outfile) = @_; 
-  eval 'use NDF' unless $ndf_loaded++;
-  croak 'Cannot use NDF library' if $@ ne "";
-
-  # Set status
-  $status = &NDF::SAI__OK;
-  
-  # Strip trailing .sdf if one is present
-  $outfile =~ s/\.sdf$//;
-  $infile =~ s/\.sdf$//;
-  # File is the first thing before a .
-  $file = (split(/\./,$infile))[0];
-
-  croak "$file does not exist\n" unless -e "$file.sdf";
-
-  # Begin context
-  ndf_begin();
-  err_begin($status);
-
-  # Open the old file
-  ndf_open(&NDF::DAT__ROOT, $infile, 'READ', 'OLD', $indf, $in_place, $status);
-
-  # Set the application name
-  ndf_happn('PDL::propndfx', $status);
-
-  # Open the new file
-  ndf_place(&NDF::DAT__ROOT, $outfile, $outplace, $status);
-
-  # Copy the extension information to outfile
-  ndf_scopy($indf, ' ', $outplace, $outndf, $status);
-
-  # Annul the input file identifier
-  ndf_annul($indf, $status);
-
-  # Write the data to this file
-  wdata($outndf, $pdl, $status);
-
-  # Annul the identifier
-  ndf_annul($outndf, $status);
-
-  # End context
-  ndf_end($status);
-  err_end($status);
-
-  croak "Bad STATUS in propndfx\n" if $status != &NDF::SAI__OK; 
-
-  return 1;
-}
-
-#########################################################################
-# Routine to read an NDF and extensions into a PDL
-# If a second argument is passed for $nomask, automatic quality masking
-# will be switched off and a QUALITY array will also be mapped
-#
-# Header information is populated with all the extensions, FITS information,
-# title and data units. Quality bad bit mask is stored
-# in the Hdr extensions of the Quality PDL.
-#########################################################################
-
-sub rndf {  # Read an NDF format file into a PDL
-
-  use strict;
-
-  croak 'Usage: ($data) = rndf($file,[$nomask]) or PDL->rndf(...) ' 
-    if ($#_!=1 && $#_!=2);
   my $class = shift;
-  my $file = shift; my $pdl = $class->new();
+  barf 'Usage: $a = rndf($file,[$nomask]); $a = PDL->rndf(...) ' 
+    if ($#_!=0 && $#_!=1);
+
+  # Setup the Header Hash
+  my $header = {};
+
+  # Read in the filename
+  # And setup the new PDL
+  my $file = shift; my $pdl = $class->new;
   my $nomask = shift if $#_ > -1;
 
   my ($infile, $status, $indf, $entry, @info, $value);
 
   eval 'use NDF' unless $ndf_loaded++;
   croak 'Cannot use NDF library' if $@ ne "";
- 
+
   # Strip trailing .sdf if one is present
   # File is the first thing before a .
   $file =~ s/\.sdf$//;
@@ -209,7 +143,7 @@ sub rndf {  # Read an NDF format file into a PDL
 
   # If file is not there
   croak "Cannot find $infile.sdf" unless -e "$infile.sdf";
-  
+
   # Set status
   $status = &NDF::SAI__OK;
     
@@ -225,24 +159,24 @@ sub rndf {  # Read an NDF format file into a PDL
   $nomask = 1 if $nomask != 0;
   ndf_sqmf($nomask, $indf, $status);
 
-  # Read the data array
-  rdata($indf, $pdl, $nomask, $status);
+  # Read the data array (need to pass the header as well)
+  rdata($indf, $pdl, $nomask, $header, $class, $status);
 
   # Read the axes
-  raxes($indf, $pdl, $status);
+  raxes($indf, $pdl, $header, $class, $status);
 
   # Read the header
-  rhdr($indf, $pdl, $status);
+  rhdr($indf, $pdl, $header, $class, $status);
 
   # Read history information
-  rhist($indf, $pdl, $status);
+  rhist($indf, $pdl, $header, $status);
 
   # Read labels
   @info = ('Label', 'Title', 'Units');
   for $entry (@info) {
     $value = 'NULL';
     ndf_cget($indf, $entry, $value, $status);
-    $$pdl{Hdr}{"$entry"} = $value if $value ne 'NULL';
+    $$header{"$entry"} = $value if $value ne 'NULL';
     print "$entry is $value\n" if ($PDL::verbose && $value ne 'NULL');
     undef $value;
   }
@@ -258,31 +192,229 @@ sub rndf {  # Read an NDF format file into a PDL
   }
 
   err_end($status);
-  $pdl->flush();  # A final flush  
+
+  # Put the header into the main pdl
+  $pdl->sethdr($header); 
 
   return $pdl;
 }
 
 
-###########################################################################
-###########################################################################
-###########################################################################
-#    INTERNAL SUBROUTINES 
-###########################################################################
-###########################################################################
-###########################################################################
+=head2 wndf()
+
+  Writes a piddle to a NDF format file:
+
+   $pdl->wndf($file);
+   wndf($pdl,$file);
+
+  wndf can be used for writing PDLs to NDF files. All the extensions
+  created by rndf are supported by wndf.  This means that error, axis
+  and quality arrays will be written if they exist. Extensions are also
+  reconstructed by using their name (ie FIGARO.TEST would be expanded as
+  a FIGARO extension and a TEST component). Hdr keywords Label, Title
+  and Units are treated as special cases and are written to the label,
+  title and units fields of the NDF.
+
+  Header information is written to corresponding NDF extensions.
+  NDF extensions can also be created in the {NDF} hash by using a key
+  containing '.', ie {NDF}{'IRAS.DATA'} would write the information to
+  an IRAS.DATA extension in the NDF. rndf stores this as
+  $$hdr{NDF}{IRAS}{DATA} and the two systems are interchangeable.
+
+  rndf stores type information in {NDF}{'_TYPES'} and below so that
+  wndf can reconstruct the data type of non-PDL extensions. If no
+  entry exists in _TYPES, wndf chooses between characters, integer and
+  double on a best guess basis.  Any perl arrays are written as CHAR
+  array extensions (on the assumption that numeric arrays will exist as
+  PDLs).
+
+=cut
+
+# This is one form of the new command
+# OO version.
+
+*wndf = \&PDL::wndf;
+
+# And this is the real form
+# Allows the command to be called in OO form or as a function
+sub PDL::wndf {  # Write a PDL to an NDF format file
+
+  use strict;
+
+  barf 'Usage: wndf($pdl,$file)' if $#_!=1;
+ 
+  my ($indf, $place, $status, $place, $outndf);
+  my (@lbnd, @ubnd);
+ 
+  my ($pdl, $outfile) = @_; 
+  eval 'use NDF' unless $ndf_loaded++;
+  croak 'Cannot use NDF library' if $@ ne "";
+
+  # Check that we are dealing with a PDL
+  croak 'Argument is not a PDL variable' unless $pdl->isa('PDL');
+
+  # Set status
+  $status = &NDF::SAI__OK;
+  
+  # Strip trailing .sdf if one is present
+  $outfile =~ s/\.sdf$//;
+ 
+  # Begin context
+  ndf_begin();
+  err_begin($status);
+
+  # Open the new file
+  ndf_place(&NDF::DAT__ROOT(), $outfile, $place, $status);
+ 
+  # Need to create data_array component
+  # Change the bounds to match the PDL
+
+  @ubnd = $pdl->dims;
+  @lbnd = ();
+  @lbnd = map { 1 } (0..$#ubnd);
+ 
+  ndf_new($pdltypes{$pdl->get_datatype}, $#ubnd+1, \@lbnd, \@ubnd, $place, 
+          $outndf, $status);
+
+  # Set the application name
+  ndf_happn('PDL::wndf', $status);
+
+  # Write the data to this file
+  wdata($outndf, $pdl, $status);
+
+  # Write the header and title
+  whdr($outndf, $pdl, $status);
+
+  # Create a history extension
+  ndf_hcre($outndf, $status);
+ 
+  # Annul the identifier
+  ndf_annul($outndf, $status);
+ 
+  # End context
+  ndf_end($status);
+ 
+  if ($status != &NDF::SAI__OK) {
+    err_flush($status);
+    croak "Bad STATUS in wndf\n";
+  }
+
+  err_end($status);
+ 
+  return 1;
+}
+
+
+=head2 propndfx()
+
+Routine to write a PDL to an NDF by copying the extension information
+from an existing NDF and writing DATA,VARIANCE, QUALITY and AXIS info
+from a PDL (if they exist).
+
+Extensions, labels and history are propogated from the old NDF.
+No new extension information is written.
+
+This command has been superseded by wndf().
+
+=cut
+
+*propndfx = \&PDL::propndfx;
+
+sub PDL::propndfx {  # Write a PDL to a NDF format file
+ 
+  use strict;
+ 
+  barf 'Usage: propndfx($pdl, $infile, $outfile)' if $#_!=2;
+ 
+  my ($indf, $in_place, $status, $outplace, $outndf);
+ 
+  my ($pdl, $infile, $outfile) = @_; 
+  eval 'use NDF' unless $ndf_loaded++;
+  croak 'Cannot use NDF library' if $@ ne "";
+ 
+  # Set status
+  $status = &NDF::SAI__OK;
+  
+  # Strip trailing .sdf if one is present
+  $outfile =~ s/\.sdf$//;
+  $infile =~ s/\.sdf$//;
+  # File is the first thing before a .
+  my $file = (split(/\./,$infile))[0];
+ 
+  croak "$file does not exist\n" unless -e "$file.sdf";
+ 
+  # Begin context
+  ndf_begin();
+  err_begin($status);
+ 
+  # Open the old file
+  ndf_find(&NDF::DAT__ROOT(), $infile, $indf, $status);
+ 
+  # Set the application name
+  ndf_happn('PDL::propndfx', $status);
+ 
+  # Open the new file
+  ndf_place(&NDF::DAT__ROOT(), $outfile, $outplace, $status);
+ 
+  # Copy the extension information to outfile
+  ndf_scopy($indf, ' ', $outplace, $outndf, $status);
+ 
+  # Annul the input file identifier
+  ndf_annul($indf, $status);
+ 
+  # Write the data to this file
+  wdata($outndf, $pdl, $status);
+ 
+  # Annul the identifier
+  ndf_annul($outndf, $status);
+ 
+  # End context
+  ndf_end($status);
+
+  if ($status != &NDF::SAI__OK) {
+    err_flush($status);
+    croak "Bad STATUS in propndfx\n";
+  }
+
+  err_end($status);
+ 
+  return 1;
+}
+
+
+=head1 NOTES
+
+The perl NDF module must be available.
+
+=head1 AUTHOR
+
+This module was written by Tim Jenness, t.jenness@jach.hawaii.edu.
+Copyright (C) Tim Jenness 1997.
+
+=head1 SEE ALSO
+
+L<PDL> for general information on the Perl Data language,
+L<NDF> for information on the NDF module.
+
+=cut
+
+
+
+#######################################################################
+
+# These are the generic routines used by the rndf command
 
 #  RDATA
 #    Read Data, Quality and Variance
 
 sub rdata {
   use strict;
-  my ($indf, $pdl, $nomask, $status) = @_;
+  my ($indf, $pdl, $nomask, $header, $class, $status) = @_;
 
   return $status if $status != &NDF::SAI__OK;
 
   my ($maxdims, @dim, $ndim, @dim, @comps, $dcomp, $tcomp, $exist);
-  my ($type, $data_pntr, $el, $temppdl, $nbytes, $badbit);
+  my ($type, $data_pntr, $el, $temppdl, $nbytes, $badbit, $dref);
 
   ####################################################################
   #                      D  I  M  S                                  #
@@ -296,7 +428,7 @@ sub rdata {
   
   print "Dims = @dim\n" if $PDL::verbose;
   
-  $$pdl{Extensions} = [];
+  $$header{Extensions} = [];
 
   ####################################################################
   #    D A T A  +  V  A  R  I  A  N  C  E  +  Q U A L I T Y          #
@@ -329,29 +461,35 @@ sub rdata {
 	  $temppdl = $pdl;
 	} else {
 	  $dcomp = 'Errors' if $dcomp eq 'Error';
-	  $$pdl{"$dcomp"} = pdl();
-	  $temppdl = $$pdl{"$dcomp"};
+	  $$header{"$dcomp"} = $class->new;
+	  $temppdl = $$header{"$dcomp"};
 	}
       
-	$$temppdl{Dims} = [@dim];
-	$$temppdl{Datatype} = $startypes{$type};
+	# Set up the PDL
+	$temppdl->set_datatype($startypes{$type});
+	$temppdl->setdims([@dim]);
+	$dref = $temppdl->get_dataref;
+
      
 	# How many bytes in this data type? 
 	$type =~ s/^_|^_U//;
 	$nbytes = &NDF::byte_size($type);
       
-	mem2string($data_pntr, $nbytes*$el, $$temppdl{Data});
+	mem2string($data_pntr, $nbytes*$el, $$dref);
 
-	push(@{$$pdl{Extensions}}, $dcomp) if $dcomp ne 'Data';
+	push(@{$$header{Extensions}}, $dcomp) if $dcomp ne 'Data';
 
 	if ($dcomp eq 'Quality') {
 	  # Quality bad bit mask
 	  ndf_bb($indf, $badbit, $status);
-	  $$temppdl{Hdr}{BADBIT} = $badbit;
+
+	  my $qhdr = {};
+	  $$qhdr{BADBIT} = $badbit;
+	  $temppdl->sethdr($qhdr);	  
 	}
 
 	# Flush and Clear temporary PDL
-	$temppdl->flush();
+	$temppdl->upd_data();
 	undef $temppdl;
       }
     
@@ -362,38 +500,48 @@ sub rdata {
 
   return $status;
 }
- 
+
+
  
   ####################################################################
   #                      A  X  I  S                                  #
   ####################################################################
 
+# Axes are stored as follows:
+#  Array of PDL axes as an array in header of main pdl (called 'Axis')
+#  Header of this PDL contains label and errors and units etc.
+
 sub raxes {
   use strict;
-  my ($indf, $pdl, $status) = @_;
+  my ($indf, $pdl, $header, $class, $status) = @_;
 
   return $status if $status != &NDF::SAI__OK;
 
   my ($there, $naxis, @dims, $axcomp, $exist, $axtype, $axpntr, $el);
-  my ($nbytes, $entry, $value, $temppdl, $tcomp);
+  my ($nbytes, $entry, $value, $temppdl, $tcomp, $daxref, $dref);
+  my ($axhdr, $ndims);
 
   # Read in axis information
   ndf_state($indf, 'Axis', $there, $status);
 
-  @dims = dims $pdl; # Find number of dimensions
+  $ndims = $pdl->getndims; # Find number of dimensions
   
   if ($there) {
 
     # Label from 0..$#dims to match array index handling
+    # Want to put the axes into an array of axes
+    # And update the extensions field
+    $$header{Axis} = [];
+    push(@{$$header{Extensions}}, "Axis");
 
-    for $naxis (0..$#dims) {
+    for $naxis (0..$ndims-1) {
       # Does a CENTRE component exist
       $axcomp = 'CENTRE';
       ndf_astat($indf, $axcomp, $naxis+1, $exist, $status);
 
       if ($exist && ($status == &NDF::SAI__OK)) {
 
-	print "Reading Axis$naxis...\n";
+	print "Reading Axis $naxis...\n" if $PDL::verbose;
 	ndf_atype($indf, $axcomp, $naxis+1, $axtype, $status);
 	
 	ndf_amap($indf, $axcomp, $naxis+1, $axtype, 'READ', $axpntr, 
@@ -401,19 +549,22 @@ sub raxes {
 	
 	# Set up new PDL for axis info if map was okay
 	if ($status == &NDF::SAI__OK) {
-	  $$pdl{"Axis$naxis"} = pdl();
-	  $temppdl = $$pdl{"Axis$naxis"};
-	  # Update EXTENSIONS array
-	  push(@{$$pdl{Extensions}}, "Axis$naxis");
+	  $$header{Axis}[$naxis] = $class->new;
+	  $temppdl = $$header{Axis}[$naxis];
+	  $temppdl->set_datatype($startypes{$axtype});
+	  $temppdl->setdims([$el]);  
+	  $dref = $temppdl->get_dataref;
 
-	  $$temppdl{Dims} = [$el];
-	  $$temppdl{Datatype} = $startypes{$axtype};
-  
+
 	  # How many bytes?
 	  $axtype =~ s/^_|^_U//;
 	  $nbytes = &NDF::byte_size($axtype);
 	  
-	  mem2string($axpntr, $nbytes*$el, $$temppdl{Data});
+	  mem2string($axpntr, $nbytes*$el, $$dref);
+	  $temppdl->upd_data();
+
+	  # Header info for axis
+	  $axhdr = {};   # somewhere to put the pdl
 
 	  # Read VARIANCE array if there
 	  $axcomp = 'Error';
@@ -421,27 +572,29 @@ sub raxes {
 	  ndf_astat($indf, $tcomp, $naxis+1, $exist, $status);
 
 	  if ($exist && ($status == &NDF::SAI__OK)) {
-	    print "Reading Axis$naxis errors...\n";
+	    print "Reading Axis $naxis errors...\n";
 	    ndf_atype($indf, $tcomp, $naxis+1, $axtype, $status);
 	
 	    ndf_amap($indf, $axcomp, $naxis+1, $axtype, 'READ', $axpntr, 
 		     $el, $status);
+
 	    # Set up new PDL for axis info if map was okay
 	    if ($status == &NDF::SAI__OK) {
-	      $$pdl{"Axis$naxis"}{Errors} = pdl();
-	      $temppdl = $$pdl{"Axis$naxis"}{Errors};
-	      # Update EXTENSIONS array
-	      $$pdl{"Axis$naxis"}{Extensions} = ["Errors"];
-	      
-	      $$temppdl{Dims} = [$el];
-	      $$temppdl{Datatype} = $startypes{$axtype};
-	      
+
+	      $$axhdr{Errors} = $class->new;
+	      $$axhdr{Extensions} = ["Errors"];
+
+	      $$axhdr{Errors}->set_datatype($startypes{$axtype});
+	      $$axhdr{Errors}->setdims([$el]);  
+	      $daxref = $$axhdr{Errors}->get_dataref;
+
 	      # How many bytes?
 	      $axtype =~ s/^_|^_U//;
 	      $nbytes = &NDF::byte_size($axtype);
 	      
-	      mem2string($axpntr, $nbytes*$el, $$temppdl{Data});
-	      $$pdl{"Axis$naxis"}{Errors}->flush();
+	      mem2string($axpntr, $nbytes*$el, $$daxref);
+	      $$axhdr{Errors}->upd_data();
+
 	    }
 	  }
 
@@ -450,14 +603,15 @@ sub raxes {
 	    ndf_astat($indf, $entry, $naxis+1, $exist, $status);
 	    if ($exist) {
 	      ndf_acget($indf,$entry, $naxis+1, $value, $status);
-	      $$pdl{"Axis$naxis"}{Hdr}{"$entry"} = $value;
+	      $$axhdr{"$entry"} = $value;
 	    }
 	  }
 	}
 	ndf_aunmp($indf,'*',$naxis+1,$status);
 
-	$$pdl{"Axis$naxis"}->flush();	
-	
+	# Now store this header into temppdl
+	$temppdl->sethdr($axhdr);
+
       } else {
 	err_annul($status) unless $status == &NDF::SAI__OK;
       }
@@ -469,13 +623,14 @@ sub raxes {
  return $status;
 }
 
+
   ####################################################################
   #                      E  X  T  E  N  S  I  O  N  S                #
   ####################################################################
 
 sub rhdr {
   use strict;
-  my ($indf, $pdl, $status) = @_;
+  my ($indf, $pdl, $header, $class, $status) = @_;
 
   return $status if $status != &NDF::SAI__OK;
 
@@ -507,8 +662,8 @@ sub rhdr {
 	print "Reading FITS header...\n" if $PDL::verbose;
 	for $entry (0..$el-1) { 
 	  ($item, $value, $comment) = &fits_get_nth_item(\@fits,$entry);
-	  $$pdl{Hdr}{$item} = $value;
-	  $$pdl{Hdr}{'_COMMENTS'}{$item} = $comment;
+	  $$header{$item} = $value;
+	  $$header{'_COMMENTS'}{$item} = $comment;
 	}
       } else {
 	print "Error mapping $xname\n";
@@ -517,22 +672,22 @@ sub rhdr {
       undef @fits;
     } else {
 
-      # Read in extensions to {NDF}
-      $status = &find_prim($xloc, \%{$$pdl{NDF}}, $status);
+      # Read in extensions to $EXTNAME
+      $status = &find_prim($xloc, \%{$$header{$EXTNAME}}, $class, $status);
     }
 
     dat_annul($xloc, $status);
   }
   return $status;
 }  
-  
+
   ####################################################################
   #                      H  I  S  T  O  R  Y                         #
   ####################################################################
   
 sub rhist {
   use strict;
-  my ($indf, $pdl, $status) = @_;
+  my ($indf, $pdl, $header, $status) = @_;
 
   return $status if $status != &NDF::SAI__OK;
 
@@ -545,7 +700,7 @@ sub rhist {
   if ($status == &NDF::SAI__OK && ($nrec > 0)) {
     print "Reading  history information into 'Hist'...\n" if $PDL::verbose;
     
-    $$pdl{Hist}{'Nrecords'} = $nrec;
+    $$header{Hist}{'Nrecords'} = $nrec;
     
     # Loop through the history components and find last "APPLICATION"
     for $i (1..$nrec) {
@@ -553,8 +708,8 @@ sub rhist {
       ndf_hinfo($indf, 'APPLICATION', $i, $app, $status);
       ndf_hinfo($indf, 'DATE', $i, $date, $status);
       
-      $$pdl{Hist}{"Application$i"} = $app;
-      $$pdl{Hist}{"Date$i"} = $date;
+      $$header{Hist}{"Application$i"} = $app;
+      $$header{Hist}{"Date$i"} = $date;
       
       print "  $app on $date\n" if $PDL::verbose;
     }
@@ -564,7 +719,10 @@ sub rhist {
   return $status;
 }  
 
-#####  - INTERNAL SUBROUTINES - ####
+
+
+################ Generic routines ###########################
+#################### INTERNAL ###############################
 
 # Find primitive components below a given HDS locator
 # FITS information is stored in Hdr
@@ -574,11 +732,11 @@ sub find_prim {
 
   use strict;
 
-  my ($loc, $href, $status) = @_;
+  my ($loc, $href, $class, $status) = @_;
   my ($prim, $type, $size, @dim, $ndims, $struct, $name, $nloc, $el);
   my ($value, @values, $item, $entry, $maxdims);
   my ($packtype, $ncomp, $packed, $comp);
-  my ($pntr, $nbytes, $comment);
+  my ($pntr, $nbytes, $comment, $dref);
 
   # Return if bad status
   return  0 if $status != &NDF::SAI__OK;
@@ -592,7 +750,7 @@ sub find_prim {
   # Type, size and shape
   dat_type($loc, $type, $status);
   dat_size($loc, $size, $status);
-  dat_shape($loc, $maxdims, @dim, $ndims, $status);
+  dat_shape($loc, $maxdims, \@dim, $ndims, $status);
   dat_name($loc, $name, $status);
 
   if ($prim) {
@@ -633,7 +791,7 @@ sub find_prim {
       if ($type =~ /CHAR|LOG/) {
 
 	# Read in the data
-	dat_getvc($loc, $size, @values, $el, $status);
+	dat_getvc($loc, $size, \@values, $el, $status);
 
 	if ($status != &NDF::SAI__OK) {
 	  print "Error mapping $name\n";
@@ -654,20 +812,20 @@ sub find_prim {
 
 	if ($status == &NDF::SAI__OK) {
 	  # Create the pdl
-	  $$href{"$name"} = pdl();
-	  $$href{"$name"}{Dims} = [@dim];
-	  $$href{"$name"}{Datatype} = $startypes{$type};
-
+	  $$href{"$name"} = $class->new;
+	  $$href{"$name"}->set_datatype($startypes{$type});
+	  $$href{"$name"}->setdims([@dim]);
+	  $dref = $$href{"$name"}->get_dataref();
 
 	  # How many bytes in this data type? 
 	  $type =~ s/^_|^_U//;
 	  $nbytes = &NDF::byte_size($type);
       
-	  mem2string($pntr, $nbytes*$el, $$href{"$name"}{Data});
+	  mem2string($pntr, $nbytes*$el, $$dref);
+	  $$href{"$name"}->upd_data();
 	}
     
 	dat_unmap($loc,$status);
-	$$href{"$name"}->flush(); # Flush PDL	
       }
     }
     print "\n" if $PDL::verbose;      
@@ -682,7 +840,7 @@ sub find_prim {
 
     for $comp (1..$ncomp) {
       dat_index($loc, $comp, $nloc, $status);
-      $status = &find_prim($nloc, \%{$$href{$name}}, $status);
+      $status = &find_prim($nloc, \%{$$href{$name}}, $class, $status);
       dat_annul($nloc, $status);
     }
 
@@ -691,19 +849,18 @@ sub find_prim {
 }
 
 
-# This subroutine maps data,error,quality and axes to
-# and NDF identifier
+###### Routines for WRITING data ######################################
 
 sub wdata {
-
+ 
   use strict;
-
+ 
   my ($outndf, $pdl, $status) = @_;
   my (@bounds, $ndims, @lower, @comps, $dcomp, $temppdl, $type);
-  my ($pntr, $el, $nbytes, $naxis, @axbnd, $axis, $axcomp, $axpntr);
+  my ($pntr, $el, $nbytes, $axis, $axcomp, $axpntr);
   my ($entry, $value, $i, $axndims, $axtype, $tcomp, @acomps);
-
-
+ 
+ 
   # Return if bad status
   return  0 if $status != &NDF::SAI__OK;
 
@@ -711,128 +868,199 @@ sub wdata {
   #                      D  I  M  S                                  #
   ####################################################################
   # Change the bounds to match the PDL
-  @bounds = dims($pdl);
+  @bounds = $pdl->dims;
   $ndims = $#bounds;
-  @lower = ();
-  for $i (0..$ndims) {
-    $lower[$i] = 1;
-  }
+  @lower = map { 1 } (0..$ndims);
+ 
+  &ndf_sbnd($ndims+1, \@lower, \@bounds, $outndf, $status);
 
-  ndf_sbnd($ndims+1, @lower, @bounds, $outndf, $status);
 
   ####################################################################
   #    D A T A  +  V  A  R  I  A  N  C  E  +  Q U A L I T Y          #
   ####################################################################
   # Map data, variance, quality...
   @comps = ('Data','Errors','Quality');
+ 
+  # Retrieve header
+  my $hdr = $pdl->gethdr;
+  my %hdr = %$hdr;
 
   for $dcomp (@comps) {
 
     if ($dcomp eq 'Data') {
       $temppdl = $pdl;
     } else {
-      $temppdl = $$pdl{"$dcomp"};
-    }
-
-    if (length($$temppdl{Data}) > 0) {
-
-      if (($dcomp eq 'Quality') && ($$pdl{"$dcomp"}{Datatype} != $PDL_B)) {
-	# Quality must be bytes so convert to BYTE if this is not true
-	$temppdl = byte ($$pdl{"$dcomp"});
+      if (exists $hdr{"$dcomp"}) {
+        $temppdl = $hdr{"$dcomp"};
+        # Check that we have a PDL
+        next unless UNIVERSAL::isa($temppdl, 'PDL');
+      } else {
+        next;			# Skip this component
       } 
+    }
+ 
+    # Check that we have some data
+    if ($temppdl->nelem > 0) {
 
-      $type = $pdltypes{$$temppdl{Datatype}};
+      if (($dcomp eq 'Quality') && ($temppdl->get_datatype != $PDL_B)) {
+        # Quality must be bytes so convert to BYTE if this is not true
+        $temppdl = byte ($$pdl{"$dcomp"});
+      } 
+ 
+      $type = $pdltypes{$temppdl->get_datatype};
       $type = '_UBYTE' if $dcomp eq 'Quality'; # No choice for QUALITY
-
+ 
       # Set the output type of the NDF
       $tcomp = $dcomp;
       $tcomp = 'Variance' if $tcomp eq 'Errors';
       ndf_stype($type, $outndf, $tcomp, $status) unless $dcomp eq 'Quality';
-
-      print "Mapping $dcomp, $type\n" if $PDL::verbose;
+ 
+      print "Mapping $dcomp , $type\n" if $PDL::verbose;
       # Map NDF
       $dcomp = 'Error' if $dcomp eq 'Errors';
       ndf_map($outndf, $dcomp, $type, 'WRITE', $pntr, $el, $status);
-
+ 
       if ($status == &NDF::SAI__OK) {
-	$nbytes = length $$temppdl{Data};
-	string2mem($$temppdl{Data}, $nbytes, $pntr);
+        # Number of bytes per entry
+        $nbytes = PDL::Core::howbig($temppdl->get_datatype);
 
-	# Write badbit mask
-	if ($dcomp eq 'Quality') {
-	  ndf_sbb($$temppdl{Hdr}{BADBIT}, $outndf, $status) 
-	    if defined $$temppdl{Hdr}{BADBIT};
-	}
+        # Convert to 1D data stream
+        my $p1d = $temppdl->clump(-1);
+        # Total number of bytes
+        $nbytes *= $p1d->getdim(0);
+       
+        # Copy to disk
+        string2mem(${$temppdl->get_dataref}, $nbytes, $pntr);
+ 
+        # Write badbit mask
+        if ($dcomp eq 'Quality') {
+          ndf_sbb($$temppdl{Hdr}{BADBIT}, $outndf, $status) 
+            if defined $$temppdl{Hdr}{BADBIT};
+        }
       }
       # Unmap Data
       ndf_unmap($outndf, $tcomp, $status);
-
+ 
     }
+
+    # free the temporary pdl
     undef $temppdl;
+
   }
+
 
   ####################################################################
   #                      A  X  I  S                                  #
   ####################################################################
-  #  A X I S information (stored as Axis0, Axis1 etc...)
+  # A X I S information is expected as an array in the header
+  # called 'Axis'. These PDLs contain the CENTRE data and any further
+  # info is stored in their header.
   # @bounds is accessed to find expected shape
-  
-  foreach $axis (keys %$pdl) {
-    if ($axis =~ /^Axis/) {	# Found an axis
-      $naxis = substr($axis,4);
-      
-      @acomps = ('Centre', 'Errors');
-      
-      foreach $axcomp (@acomps) {
 
-	$tcomp = $axcomp;
-	if ($axcomp eq 'Centre') {
-	  $temppdl = $$pdl{$axis};
-	} elsif ($axcomp eq 'Errors') {
-	  next unless defined $$pdl{$axis}{"$axcomp"};
-	  $temppdl = $$pdl{$axis}{"$axcomp"};
-	  $axcomp = 'Errors';
-	  $tcomp = 'Variance';
-	} else {
-	  next;
-	}
-	
-	@axbnd = dims($temppdl);
-	$axndims = $#axbnd;
-	# Check bounds
-	print "Ndims = $axndims and @axbnd and $bounds[$naxis]\n";
-	if (($axndims == 0) && ($axbnd[0] == $bounds[$naxis])) {
-	  $axtype = $pdltypes{$$temppdl{Datatype}};
-	  ndf_astyp($axtype, $outndf, $tcomp, $naxis+1, $status);
-	  
-	  ndf_amap($outndf, $axcomp, $naxis+1, $axtype, 'WRITE', $axpntr, 
-		   $el, $status);
-	  
-	  if ($status == &NDF::SAI__OK) {
-	    print "Mapping $axis $axcomp...\n";
-	    $nbytes = length($$temppdl{Data});
-	    string2mem($$temppdl{Data}, $nbytes, $axpntr);
-	    
-	    # Map label and units
-	    if ($axcomp eq 'Centre') {
-	      foreach $entry (keys %{$$temppdl{Hdr}}) {
-		if ($entry =~ /LABEL|UNITS/i) {
-		  $value = $$temppdl{Hdr}{"$entry"};
-		  ndf_acput($value, $outndf, $entry, $naxis+1, $status)
-		    if length($value) > 0;
-		}
-	      }
-	    }
-	  }
-	  
-	  ndf_aunmp($outndf, '*', $naxis+1, $status);
-	  
-	} else {
-	  print "$axis does not match the corresponding PDL size\n";
-	}
-      }     
-    }
+
+  # Simply look in the header for a Axis
+  if (exists $hdr{Axis}) {
+     # Check that we have an array
+     if (ref($hdr{Axis}) eq 'ARRAY') {
+ 
+       # Now loop over axes
+       for (my $i = 0; $i <= $#{$hdr{Axis}}; $i++) {
+
+         my $axis = ${$hdr{Axis}}[$i];
+
+         # If we have a PDL
+         if (UNIVERSAL::isa($axis, 'PDL')) {
+
+            # We now want to copy the data and if necessary the
+            # Error array. Since there are only two I will do it the
+            # long way by explcitly storing data and then error
+
+            # Set data type
+            $axtype = $pdltypes{$axis->get_datatype};
+            ndf_astyp($axtype, $outndf, 'Centre', $i+1, $status);
+
+            # Okay we can now map this pdl 
+            ndf_amap($outndf, 'Centre', $i+1, $axtype, 'WRITE', $axpntr, 
+                   $el, $status);             
+
+            # Check that we have the correct number of entries
+            if ($axis->nelem == $el) {
+
+              print "Mapping axis " , $i+1 , "\n"  if $PDL::verbose;
+
+              # Number of bytes per entry
+              $nbytes = PDL::Core::howbig($axis->get_datatype) * $el;
+
+              # Copy to disk
+              string2mem(${$axis->get_dataref}, $nbytes, $axpntr)
+                 if ($status == &NDF::SAI__OK);
+
+            } else {
+              carp "Axis ",$i+1 .
+                   " is the wrong size ($el values required but got ".
+                   $axis->nelem . ")- ignoring";
+            }
+            # Unmap
+            ndf_aunmp($outndf, '*', $i+1, $status);
+
+            # Errors
+            my $axhdr = $axis->gethdr;
+            my %axhdr = %$axhdr;
+
+            if (exists $axhdr{Errors}) {
+               my $axis = $axhdr{Errors};
+               if (UNIVERSAL::isa($axis, 'PDL')) {
+
+                 # Set data type
+                 $axtype = $pdltypes{$axis->get_datatype};
+                 ndf_astyp($axtype, $outndf, 'Variance', $i+1, $status);
+
+                 # Okay we can now map this pdl 
+                 ndf_amap($outndf, 'Errors', $i+1, $axtype, 'WRITE', 
+                   $axpntr, $el, $status);             
+
+                 # Check that we have the correct number of entries
+                 if ($axis->nelem == $el) {
+                   print "Mapping errors for axis " . $i+1 . "\n" 
+                     if $PDL::verbose;
+ 
+                   # Number of bytes per entry
+                   $nbytes = PDL::Core::howbig($axis->get_datatype) * $el;
+
+                   # Copy to disk
+                   string2mem(${$axis->get_dataref}, $nbytes, $axpntr)
+                     if ($status == &NDF::SAI__OK);
+
+                 } else {
+                    carp "Error PDL for Axis ",$i+1,
+                       " is the wrong size ($el values required but got ".
+                        $axis->nelem . ")- ignoring";
+                 }
+                 # Unmap
+                 ndf_aunmp($outndf, '*', $i+1, $status);
+
+               }
+
+            }
+
+            # Now character components
+            foreach my $char (keys %axhdr) {
+              if ($char =~ /LABEL|UNITS/i) {
+                $value = $axhdr{"$char"};
+                ndf_acput($value, $outndf, $char, $i+1, $status)
+                  if length($value) > 0;
+              }
+
+            }
+
+         }
+
+       }
+
+     }
+
   }
+  
 }
 
 
@@ -842,90 +1070,109 @@ sub wdata {
 # are written as doubles (apart from PDLs which carry there own type
 # information) unless _TYPES information exists in {NDF}.
 
+
 sub whdr {
-
+ 
   use strict;
+ 
+  my ($outndf, $pdl, $status) = @_;
 
-   my ($outndf, $pdl, $status) = @_;
-
-   my ($key, %header, @fitsdim, $fitsloc, $value);
-   my (%unused, @fits, $hashref);
-
-   # Return if bad status
-   return 0 if $status != &NDF::SAI__OK;
-
-   print "Writing header information...\n" if $PDL::verbose;
-
-   # Write FITS header from {Hdr}
-
-   %header = %{$$pdl{Hdr}};
-   %unused = ();
-   @fits = ();
-
-   foreach $key (sort keys %header) {
-
-     next if $key eq '_COMMENTS';
-
-     if ($key =~ /^TITLE$|^UNITS$|^LABEL$/i) {
-       # This is not extension info
-       ndf_cput($header{$key}, $outndf, $key, $status) 
-	 if length($header{$key} > 0);
-     }
-
-     # Only write scalars
-     unless (ref($header{"$key"}) =~ /./) {
+  my ($key, %header, @fitsdim, $fitsloc, $value);
+  my (%unused, @fits, $hashref);
+ 
+  # Return if bad status
+  return 0 if $status != &NDF::SAI__OK;
+ 
+  print "Writing header information...\n" if $PDL::verbose;
+ 
+  # Write FITS header from {Hdr}
+ 
+  %header = %{$pdl->gethdr};
+  %unused = ();
+  @fits = ();
+ 
+  foreach $key (sort keys %header) {
+ 
+    next if $key eq '_COMMENTS';
+ 
+    if ($key =~ /^TITLE$|^UNITS$|^LABEL$/i) {
+      # This is not extension info
+      ndf_cput($header{$key}, $outndf, $key, $status) 
+        if length($header{$key} > 0);
+    }
+ 
+    # Only write scalars
+    if (not ref($header{"$key"})) {
        
-       push(@fits, fits_construct_string($key,$header{$key},$header{'_COMMENTS'}{$key}) );
-
-     } else {
-       # Deal with later
+       push(@fits, fits_construct_string($key,$header{$key},
+            $header{'_COMMENTS'}{$key}) );
+ 
+    } else {
+      # Deal with later
       $unused{$key} = $header{$key};
-     }
+    }
+ 
+  }
+ 
+  # Write the FITS extension
+  if ($#fits > -1) {
+    push(@fits, "END");
+    # Write it out
+    @fitsdim = ($#fits+1);
+    ndf_xnew($outndf, 'FITS', '_CHAR*80', 1, @fitsdim, $fitsloc, $status);
+    dat_put1c($fitsloc, $#fits+1, \@fits, $status);
+    dat_annul($fitsloc, $status);
+  }
+ 
+  # Loop through all NDF header info and array Hdr information
+  # Note that %unused still contains our NDF hash so 
+  # we must remove that before proceeding (else we end up with
+  # an 'NDF_EXT' extension!
+ 
+  delete $unused{$EXTNAME};
 
-   }
+  foreach $hashref (\%unused, $header{$EXTNAME}) {
+     whash($hashref, $outndf, '', '', $status);
+  }
+}
 
-   # Write the FITS extension
-   if ($#fits > -1) {
-     push(@fits, "END");
-     # Write it out
-     @fitsdim = ($#fits+1);
-     ndf_xnew($outndf, 'FITS', '_CHAR*80', 1, @fitsdim, $fitsloc, $status);
-     dat_put1c($fitsloc, $#fits+1, @fits, $status);
-     dat_annul($fitsloc, $status);
-   }
-
-   # Loop through all NDF header info and array Hdr information
-
-   foreach $hashref (\%unused, \%{$$pdl{NDF}}) {
-       whash($hashref, $outndf, '', '', $status);
-   }
- }
 
 #-----------------------------------------------------
 # This routine writes a hash array to a NDF extension
 # Keys that have leading underscores are skipped
 # $hashname contains the extension name to use by default.
 # This is extended  by any '.' in the key.
-
+ 
 sub whash {
+
+  no strict "refs";
   
   my ($hash, $outndf, $hashname, $stypes, $status) = @_;
   
   my ($key, $comp, @structures, $extension, $xtype, @dim, $ndims, $loc);
   my (@locs, $there, $type, %header, $packed, $length);
   my (@bounds, $nbytes, $pntr, $maxsize, $which, $el, $path);
-  my ($oldhash, $oldtypes);
-
+  my ($oldhash, $oldtypes, $structs);
+ 
   %header = %$hash;
-
-  $root = 1 if length($hashname) == 0; # Mark a ROOT structure
+ 
+  my $root = 1 if length($hashname) == 0; # Mark a ROOT structure
   
   # Return if bad status
   return 0 if $status != &NDF::SAI__OK;
   
   foreach $key (sort keys %header) {
-    
+
     next if $key =~ /^_/;
+
+    # If the key matches the Extensions (Axis or errors)
+    # then skip. Should probably use the Extensions array 
+    # itself to work out which components to skip
+
+    next if $key eq 'Axis';
+    next if $key eq 'Errors';
+    next if $key eq 'Extensions'; 
+    next if $key eq 'Hist'; 
 
     # Deal with HASH arrays early
     ref($header{"$key"}) eq 'HASH' && do {
@@ -940,28 +1187,28 @@ sub whash {
       $stypes = $oldtypes;
       next;
     };
-
-
-
+ 
+ 
+ 
     $path = $hashname . ".$key";
     $path =~ s/^\.//; # remove leading dot
-
+ 
     if ($key =~ /^TITLE$|^UNITS$|^LABEL$/i) {
       # This is not extension info
       ndf_cput($header{$key}, $outndf, $key, $status);
     } else {
-
+ 
       # Find nested structures
       @structures = split(/\./, uc($path));
       
       # Last entry in structure is the important name
       $comp = pop(@structures);
-
+ 
       # Find list of structures
       $structs = join(".", @structures);
       $structs = 'PERLDL' unless ($structs =~ /./);
       $stypes = 'PERLDL_HDR' unless ($stypes =~ /./);
-	
+        
       $loc = mkstruct($outndf, $structs, $stypes, $status);
       undef $stypes;
       
@@ -971,252 +1218,142 @@ sub whash {
       
       # What is the data type?
       unless ($type =~ /./) {
-	# number or character or array or pdl
-	# All arrays are chars - should be PDLs if nums
-	ref($header{"$key"}) eq 'ARRAY' && ($type = "_CHAR"); 
-	
-	ref($header{"$key"}) eq 'PDL' && 
-	  ($type = $pdltypes{$header{"$key"}{"Datatype"}});
-	
-	ref($header{"$key"}) || do {
-	  if ($header{"$key"} =~ /^(-?)(\d*)(\.?)(\d*)([Ee][-\+]?\d+)?$/) {
-	    $header{"$key"} =~ /\.|[eE]/ 
-	      && ($type = "_DOUBLE")
-		||   ($type = "_INTEGER");
-	  } else {
-	    ($type = '_CHAR')	# Character
-	  }
-	};
-	
+        # number or character or array or pdl
+        # All arrays are chars - should be PDLs if nums
+        ref($header{"$key"}) eq 'ARRAY' && ($type = "_CHAR"); 
+        
+        ref($header{"$key"}) eq 'PDL' && 
+          ($type = $pdltypes{$header{"$key"}{"Datatype"}});
+        
+        ref($header{"$key"}) || do {
+          if ($header{"$key"} =~ /^(-?)(\d*)(\.?)(\d*)([Ee][-\+]?\d+)?$/) {
+            $header{"$key"} =~ /\.|[eE]/ 
+              && ($type = "_DOUBLE")
+                ||   ($type = "_INTEGER");
+          } else {
+            ($type = '_CHAR')   # Character
+          }
+        };
+        
       }
       
       # Create and write component
       # PDLs
       
       if (ref($header{"$key"}) eq 'PDL') {
-	@bounds = dims($header{"$key"});
-	dat_new($loc, $comp, $type, $#bounds+1, @bounds, $status);
-	$nbytes = length($header{"$key"}{Data});
-	cmp_mapv($loc, $comp, $type, 'WRITE', $pntr, $el, $status);
-	string2mem($header{"$key"}{Data}, $nbytes, $pntr)
-	  if ($status == &NDF::SAI__OK);
-	cmp_unmap($loc, $comp, $status);
+        my $pdl = $header{"$key"};
+        @bounds = $pdl->dims;
+        dat_new($loc, $comp, $type, $#bounds+1, @bounds, $status);
+        $nbytes = PDL::Core::howbig($pdl->get_datatype) *
+            $pdl->nelem;
+        cmp_mapv($loc, $comp, $type, 'WRITE', $pntr, $el, $status);
+        string2mem(${$pdl->get_dataref}, $nbytes, $pntr)
+          if ($status == &NDF::SAI__OK);
+        cmp_unmap($loc, $comp, $status);
       }
       
       # SCALARS
       ref($header{"$key"}) || do {
-	
-	if ($type =~ /_CHAR/) {
-	  $length = length($header{"$key"});
-	  dat_new0c($loc, $comp, $length, $status);
-	  cmp_put0c($loc, $comp, $header{"$key"}, $status)
-	    if $length > 0;
-	} else {
-	  $which = lc(substr($type, 1,1));
-	  &{"dat_new0$which"}($loc, $comp, $status);
-	  &{"cmp_put0$which"}($loc, $comp, $header{"$key"}, $status);
-	}
+        
+        if ($type =~ /_CHAR/) {
+          $length = length($header{"$key"});
+          dat_new0c($loc, $comp, $length, $status);
+          cmp_put0c($loc, $comp, $header{"$key"}, $status)
+            if $length > 0;
+        } else {
+          $which = lc(substr($type, 1,1));
+          &{"dat_new0$which"}($loc, $comp, $status);
+          &{"cmp_put0$which"}($loc, $comp, $header{"$key"}, $status);
+        }
       };
       
       # CHARACTER ARRAYS
       ref($header{"$key"}) eq 'ARRAY' && do {
-	($maxsize, $packed) = &NDF::pack1Dchar(\@{$header{"$key"}});
-	$ndims = 1;
-	@dim = ($#{$header{"$key"}}+1);
-	dat_newc($loc, $comp, $maxsize, $ndims, @dim, $status);
-	cmp_putvc($loc, $comp, $dim[0], @{$header{"$key"}}, $status);
-      };
+        # First go through the array and remove any 
+        # entries that are references. I draw the line at storing
+        # nested arrays
+        my @norefs = grep { not ref($_) } @{$header{"$key"}};
 
+        ($maxsize, $packed) = &NDF::pack1Dchar(\@norefs);
+        $ndims = 1;
+        @dim = ($#norefs+1);
+        dat_newc($loc, $comp, $maxsize, $ndims, @dim, $status);
+        cmp_putvc($loc, $comp, $dim[0], @norefs, $status);
+      };
+ 
       # Annul all the locators
       dat_annul($loc, $status);      
-
+ 
     } 
   }
   
 }
-
+ 
 # Subroutine to make extension structures of arbritrary depth
 # Just pass dot separated string to this function
 # A locator to the final structure is returned
-
+ 
 sub mkstruct {
-
+ 
   my ($outndf, $structs, $types, $status) = @_;
   my ($extension, @locs, @dim, $ndims, $xtype, $loc, $retloc);
-  my ($set, $prmry);
-
+  my ($set, $prmry, $there);
+ 
   my (@structures) = split('\.', $structs);
   my (@types) = split('\.', $types);
-
+ 
   return &NDF::DAT__NOLOC if $#structures < 0;
   return &NDF::DAT__NOLOC if $status != &NDF::SAI__OK;
-
+ 
   # Does extension exist
-
+ 
   $extension = shift(@structures);
   $xtype = shift(@types);
-
+ 
   ndf_xstat($outndf, $extension, $there, $status); 
       
   # Make it if necessary
   unless ($there) {
     print "Writing $extension extension ($xtype)...\n" if $PDL::verbose;
-    @dim = (0);		# No pdl extensions!
+    @dim = (0);         # No pdl extensions!
     $ndims = 0;
     ndf_xnew($outndf, $extension, $xtype, $ndims, @dim, $loc, $status);
-  } else {			# Get the locator to the extension
+  } else {                      # Get the locator to the extension
     ndf_xloc($outndf, $extension, 'UPDATE', $loc, $status);
   }
-
+ 
   
-  @locs = ();      	# store the locators so that they can be annulled later
+  @locs = ();           # store the locators so that they can be annulled later
   push(@locs, $loc);
-
+ 
   # Make the structures, end up with a locator to the correct component
   for (0..$#structures) {
     dat_there($loc, $structures[$_], $there, $status);
-    unless ($there) {	# Make it if it isnt there
-      $type = $types[$_];
+    unless ($there) {   # Make it if it isnt there
+      my $type = $types[$_];
       @dim = (0);
       dat_new($loc, $structures[$_], $type, 0, @dim, $status);
     }
     dat_find($loc, $structures[$_], $loc, $status);
-    push(@locs, $loc);	# Store the new locator
+    push(@locs, $loc);  # Store the new locator
   }
-
+ 
   # Clone the locator
   dat_clone($loc, $retloc, $status);
   $set = 1;
-  $primry = 1;
+  $prmry = 1;
   dat_prmry($set, $retloc, $prmry, $status);
-
+ 
   # Annul all except the last locator
   foreach (@locs) {
     dat_annul($_, $status);
   }      
-
+ 
   return &NDF::DAT__NOLOC unless $status == &NDF::SAI__OK;
   return $retloc;
-
+ 
 }
 
 
+
 1;
-
-__END__
-# Documentation
-
-=head1 NAME
-
-  PDL::NDF - PDL Module for reading and writing Starlink N-dimensional data 
-structures as PDLs.
-
-=head1 SYNOPSIS
-
-  use PDL::NDF;
-
-  $a = rndf('test_image');
-  $a = rndf('test_image', 1);
-
-  wndf($a, 'out_image');
-
-  propndfx($a, 'template', 'out_image');
-
-=head1 DESCRIPTION
-
-This module add the ability to read and write Starlink N-dimensional data 
-files as N-dimensional PDLs. Three routines are currently available:
-
-=head2 rndf
-
-rndf can be used for reading NDF files into PDL. Data, Quality, Variance, Axis
-and numerical array extensions are read in as PDLs. All extensions are read
-into the Hdr hash of the base PDL.
-
-The first form of rndf performs automatic bad pixel masking from the quality
-array. Use of the optional second parameter turns off this feature and the
-quality array is mapped.
-
-A NDF pdl (eg $a) has the following structure:
-
-  $a   - the base DATA_ARRAY        
-  $$a{Error} - the variance array 
-  $$a{Quality}  - Quality byte array
-  $$a{Axis0}    - the axis array associated with the first dimension
-  $$a{Axis1} etc 
-  $$a{Hdr}      - All FITS header information
-  $$a{Hdr}{_COMMENTS} - Comments associated with the FITS information
-
-  $$a{Hist}     - History information (for information only)
-  $$a{NDF}      - NDF extension information
-  $$a{NDF}{_TYPES} - Data types for non-PDL NDF extensions.
-
-All extension information is stored in the Hdr associative array.
-Extension structures are preserved in hashes, so that the PROJ_PARS
-component of the IRAS.ASTROMETRY extension is stored in
-$$a{NDF}{IRAS}{ASTROMETRY}{'PROJ_PARS'}. All array structures are
-stored as arrays in the Hdr: numeric arrays are stored as PDLs,
-logical and character arrays are stored as plain Perl arrays. FITS
-arrays are a special case and are expanded as scalars into the header.
-
-=head2 wndf
-
-wndf can be used for writing PDLs to NDF files. All the extensions
-created by rndf are supported by wndf.  This means that error, axis
-and quality arrays will be written if they exist. Extensions are also
-reconstructed by using their name (ie FIGARO.TEST would be expanded as
-a FIGARO extension and a TEST component). Hdr keywords Label, Title
-and Units are treated as special cases and are written to the label,
-title and units fields of the NDF.
-
-Hash arrays in {NDF} or {Hdr} are written to corresponding NDF extensions.
-NDF extensions can also be created in the {NDF} hash by using a key
-containging '.', ie {NDF}{'IRAS.DATA'} would write the information to
-an IRAS.DATA extension in the NDF.
-
-rndf stores type information in {NDF}{'_TYPES'} and below so that wndf
-can reconstruct the data type of non-PDL extensions. If no entry
-exists in _TYPES, wndf chooses between characters, integer and double
-on a best guess basis.  Any perl arrays are written as CHAR array
-extensions (on the assumption that and numeric arrays will exist as
-PDLs).
-
-All {NDF} extensions are written back to NDF extensions. Any scalar
-arguments in {Hdr} are written to a NDF FITS extension. Any non-scalar
-entries in {Hdr} are written to a PERLDL extension. All entried in
-{NDF} which are not associated with a specific extension (via decimal
-points) are written to a PERLDL extension.
-
-
-=head2 propndfx
-
-The limitations in wndf's ability to reconstruct an NDF of exactly the
-same structure as an input NDF (because of loose typing and FITS
-extensions) means that it is sometimes desirable to propogate an
-extension from an already existing NDF rather than letting wndf try to
-get it right.
-
-In many case it is good enough to simply read in an NDF, modify the
-data array and write out a new NDF with the old extension
-information. propndfx supplies this ability. Title, label, units and
-all extensions are supplied from the template NDF, whereas Data,
-Variance, Quality and Axis are supplied from the PDL (if they exist).
-
-It is still possible to modify the new extension field by hand using
-the NDF module itself.
-
-=head1 NOTES
-
-The perl NDF module must be accessible.
-
-
-=head1 AUTHOR
-
-This module was written by Tim Jenness, timj@jach.hawaii.edu.
-
-=head1 SEE ALSO
-
-L<PDL> for general information on the Perl Data language,
-L<NDF> for information on the NDF module.
-
-=cut
