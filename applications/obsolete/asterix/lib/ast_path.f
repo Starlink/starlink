@@ -32,8 +32,20 @@
           CALL PSX_GETENV(DEF,BUFF,STATUS)
           IF (CHR_LEN(BUFF).EQ.0) THEN
             CALL PSX_GETENV('AST_ETC',BUFF,STATUS)
+            IF (CHR_LEN(BUFF).EQ.0) THEN
+              CALL MSG_PRNT('! Unable to resolve data path')
+              STATUS=SAI__ERROR
+            ENDIF
           ENDIF
         ENDIF
+
+        IF (STATUS.EQ.SAI__OK) THEN
+
+          L=CHR_LEN(BUFF)
+          PATH=BUFF(1:L)//REL
+
+        ENDIF
+
 
       ENDIF
 
