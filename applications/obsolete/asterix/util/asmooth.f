@@ -83,6 +83,7 @@
 *     10 Mar 94 : V1.7-4  Revised quality handling, correct treatment of
 *                         negative data slices. (DJA)
 *     29 Jun 94 : V1.8-0  Put bias to make LOG spacing more useful (DJA)
+*     24 Nov 94 : V1.8-1  Now use USI for user interface (DJA)
 *
 *    Type definitions :
 *
@@ -92,7 +93,6 @@
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
       INCLUDE 'QUAL_PAR'
 *
 *    Status :
@@ -160,7 +160,7 @@
 *    Version :
 *
       CHARACTER*30           	VERSION
-        PARAMETER            	( VERSION = 'ASMOOTH Version 1.8-0')
+        PARAMETER            	( VERSION = 'ASMOOTH Version 1.8-1')
 *-
 
 *    Check status
@@ -229,13 +229,13 @@
         SDIMS(1) = A_X
         SDIMS(2) = A_Y
         NSDIM = 2
-        CALL PAR_DEF1I( 'SDIMS', NSDIM, SDIMS, STATUS )
+        CALL USI_DEF1I( 'SDIMS', NSDIM, SDIMS, STATUS )
       ELSE IF ( NDIM .EQ. 1 ) THEN
-        CALL PAR_DEF0I( 'SDIMS', 1, STATUS )
+        CALL USI_DEF0I( 'SDIMS', 1, STATUS )
       END IF
 
 *    Get dimensions to be smoothed
-      CALL PAR_GET1I( 'SDIMS', DAT__MXDIM, SDIMS, NSDIM, STATUS )
+      CALL USI_GET1I( 'SDIMS', DAT__MXDIM, SDIMS, NSDIM, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
       IF ( NSDIM .GT. 2 ) THEN
         STATUS = SAI__ERROR
@@ -244,7 +244,7 @@
       END IF
 
 *    Get mode for selecting data levels
-      CALL PAR_GET0I( 'OPT', OPTION, STATUS )
+      CALL USI_GET0I( 'OPT', OPTION, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Get min & max in data
@@ -263,7 +263,7 @@
       IF ( (OPTION.EQ.1) .OR. (OPTION.EQ.2) ) THEN
 
 *      Get number of levels
-        CALL PAR_GET0I( 'NLEV', NLEVEL, STATUS )
+        CALL USI_GET0I( 'NLEV', NLEVEL, STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 99
         IF ( (NLEVEL.LT.1) .OR. (NLEVEL.GT.ASM__MXLEV) ) THEN
           STATUS = SAI__ERROR
@@ -277,8 +277,8 @@
         IF ( (OPTION .EQ. 2) .AND. (DMIN.LE.0.0) ) THEN
           CALL MSG_PRNT( 'The data contains values <= zero - supply'/
      :  /' a bias value to make the minimum positive, or ! to quit' )
-          CALL PAR_DEF0R( 'BIAS', 0.01*DMAX-DMIN, STATUS )
-          CALL PAR_GET0R( 'BIAS', BIAS, STATUS )
+          CALL USI_DEF0R( 'BIAS', 0.01*DMAX-DMIN, STATUS )
+          CALL USI_GET0R( 'BIAS', BIAS, STATUS )
           IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *        Check bias big enough
@@ -320,7 +320,7 @@
       ELSE IF ( OPTION .EQ. 3 ) THEN
 
 *      Read levels directly
-        CALL PAR_GET1R( 'LEVS', ASM__MXLEV, LEVEL, NLEVEL, STATUS )
+        CALL USI_GET1R( 'LEVS', ASM__MXLEV, LEVEL, NLEVEL, STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 99
 
       ELSE
@@ -341,16 +341,16 @@
       NLEVEL = NLEVEL + 1
 
 *    Filter choice
-      CALL PAR_GET0I( 'FILTER', FILTER, STATUS )
+      CALL USI_GET0I( 'FILTER', FILTER, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Get smooth signal to noise
-      CALL PAR_GET0R( 'SNR', SNR, STATUS )
+      CALL USI_GET0R( 'SNR', SNR, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Get smooth box max width
-      CALL PAR_GET0I( 'WSTART', WSTART, STATUS )
-      CALL PAR_GET0I( 'WMAXSZ', WMAXSZ, STATUS )
+      CALL USI_GET0I( 'WSTART', WSTART, STATUS )
+      CALL USI_GET0I( 'WMAXSZ', WMAXSZ, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Pad dimensions to 7D
