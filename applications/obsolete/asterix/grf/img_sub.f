@@ -1467,7 +1467,7 @@ c     :           I_X1_1D,I_X2_1D,I_Y1_1D,I_Y2_1D,SCALED,STATUS)
 *  Local variables :
       REAL			SPARR(2)
 
-      INTEGER DPTR,VPTR,QPTR,IMASK
+      INTEGER DPTR,VPTR,QPTR
       INTEGER DIMS(2),LBND(2),UBND(2)
 *-
       IF (STATUS.EQ.SAI__OK) THEN
@@ -1505,8 +1505,8 @@ c     :           I_X1_1D,I_X2_1D,I_Y1_1D,I_Y2_1D,SCALED,STATUS)
           CALL ARR_SLCOPB( 2, DIMS, %VAL(I_QPTR), LBND, UBND,
      :                     %VAL(QPTR), STATUS )
           CALL BDI_UNMAP(ID,'Quality',QPTR,STATUS)
-          IMASK = I_MASK
-          CALL BDI_PUT0I( ID, 'QualityMask', IMASK, STATUS )
+          CALL BDI_PUT( ID, 'QualityMask', 'UBYTE', 0, 0, I_MASK,
+     :                  STATUS )
         ENDIF
 
 *  axis values
@@ -1564,7 +1564,7 @@ c     :           I_X1_1D,I_X2_1D,I_Y1_1D,I_Y2_1D,SCALED,STATUS)
 *  Local variables :
       REAL	SPARR(2)
       INTEGER ID
-      INTEGER NVAL,BID,IMASK
+      INTEGER NVAL,BID
       LOGICAL AUX
 *-
       IF (STATUS.EQ.SAI__OK) THEN
@@ -1597,8 +1597,7 @@ c     :           I_X1_1D,I_X2_1D,I_Y1_1D,I_Y2_1D,SCALED,STATUS)
 *  quality
         CALL BDI_PUT( ID, 'Quality', 'UBYTE', 1, NVAL,
      :                         %VAL(I_QPTR_1D), STATUS)
-        IMASK = I_MASK
-        CALL BDI_PUT0I( ID, 'QualityMask', IMASK, STATUS )
+        CALL BDI_PUT( ID, 'QualityMask', 'UBYTE', 0, 0, I_MASK, STATUS )
 
 *  axis values
         SPARR(1) = I_XBASE_1D
