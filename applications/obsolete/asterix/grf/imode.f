@@ -23,7 +23,7 @@
       LOGICAL KEY,CURS
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'IMODE Version 2.1-0')
+      PARAMETER (VERSION = 'IMODE Version 2.1-0b')
 *-
       CALL USI_INIT()
 

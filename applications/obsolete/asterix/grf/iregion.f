@@ -32,7 +32,7 @@
       REAL XMIN,XMAX,YMIN,YMAX
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'IREGION Version 2.1-0')
+      PARAMETER (VERSION = 'IREGION Version 2.1-0b')
 *-
       CALL USI_INIT()
 

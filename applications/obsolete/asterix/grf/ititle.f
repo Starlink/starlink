@@ -25,7 +25,7 @@
       LOGICAL OK
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'ITITLE Version 2.1-0')
+      PARAMETER (VERSION = 'ITITLE Version 2.1-0b')
 *-
       CALL USI_INIT()
 

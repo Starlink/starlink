@@ -25,7 +25,7 @@
       LOGICAL XOK,YOK
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'ILABELS Version 2.1-0')
+      PARAMETER (VERSION = 'ILABELS Version 2.1-0b')
 *-
       CALL USI_INIT()
 

@@ -25,7 +25,7 @@
       INTEGER			OFID,BID,DIMS(2)
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'ISAVE Version 2.1-0')
+      PARAMETER (VERSION = 'ISAVE Version 2.1-0b')
 *-
       CALL USI_INIT()
 

@@ -54,7 +54,7 @@
 *    Functions :
 *    Local Constants :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION='GDRAW Version 2.1-0')
+      PARAMETER (VERSION='GDRAW Version 2.1-0b')
 *    Local variables :
       CHARACTER*20 DEV
       CHARACTER*132		FILE, PATH

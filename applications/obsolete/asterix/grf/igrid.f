@@ -20,7 +20,7 @@
       INTEGER STATUS
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'IGRID Version 2.1-0')
+      PARAMETER (VERSION = 'IGRID Version 2.1-0b')
 *    Local constants :
 *    Local variables :
         INTEGER NFRAME                 	! Reference frame code

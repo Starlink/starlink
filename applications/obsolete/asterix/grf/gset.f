@@ -30,7 +30,7 @@
       INCLUDE 'GMD_CMN'
 *    Local Constants :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION='GSET Version 2.1-0')
+      PARAMETER (VERSION='GSET Version 2.1-0b')
 *    Local variables :
       CHARACTER*10 SWITCH
       CHARACTER*20 CONTEXT

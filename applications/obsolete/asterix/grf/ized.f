@@ -30,7 +30,7 @@
       LOGICAL	REG
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'IZED Version 2.1-0')
+      PARAMETER (VERSION = 'IZED Version 2.1-0b')
 *-
       CALL USI_INIT()
 

@@ -171,7 +171,7 @@
 
 *  Local Constants:
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'IPOLAR Version 2.1-0' )
+        PARAMETER		( VERSION = 'IPOLAR Version 2.1-0b' )
 
 *  Local Variables:
       CHARACTER*40 		AUNITS(2)            	! Units of axes

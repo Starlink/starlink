@@ -32,7 +32,7 @@
       LOGICAL GAUSSIAN
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'IBLUR Version 2.1-0')
+      PARAMETER (VERSION = 'IBLUR Version 2.1-0b')
 *-
       CALL MSG_PRNT(VERSION)
 

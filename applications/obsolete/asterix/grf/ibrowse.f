@@ -48,7 +48,7 @@ c     INTEGER NCOLS
       INCLUDE 'IMG_CMN'
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION='IBROWSE Version 2.1-0')
+      PARAMETER (VERSION='IBROWSE Version 2.1-0b')
 *-
 
       CALL MSG_PRNT(VERSION)

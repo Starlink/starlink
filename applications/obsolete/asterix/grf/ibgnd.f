@@ -120,7 +120,7 @@
 
 *  Local Constants:
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'IBGND Version 2.1-0' )
+        PARAMETER		( VERSION = 'IBGND Version 2.1-0b' )
 
 *  Local Variables:
       CHARACTER*16		CMD			! Major mode

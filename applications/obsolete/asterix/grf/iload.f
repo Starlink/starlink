@@ -44,7 +44,7 @@
       LOGICAL FRESH
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'ILOAD Version 2.1-0')
+      PARAMETER (VERSION = 'ILOAD Version 2.1-0b')
 *-
 *  first invocation do global initialisation
       IF (.NOT.I_OPEN) THEN

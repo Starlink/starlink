@@ -33,7 +33,7 @@
       CHARACTER*10 MODE
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'ICOLOUR Version 2.1-0')
+      PARAMETER (VERSION = 'ICOLOUR Version 2.1-0b')
 *-
       CALL USI_INIT()
 

@@ -24,7 +24,7 @@
 
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'GCLOSE Version 2.1-0')
+      PARAMETER (VERSION = 'GCLOSE Version 2.1-0b')
 *-
       CALL USI_INIT()
 
