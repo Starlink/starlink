@@ -62,31 +62,30 @@ libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libtrn_la_LIBADD =
 am__objects_1 =
-am__objects_2 = trn1_alwrk.lo trn1_anlst.lo trn1_antmp.lo \
-	trn1_cbcli.lo trn1_cbcls.lo trn1_clexp.lo trn1_clvar.lo \
-	trn1_cmpex.lo trn1_cmpfn.lo trn1_cmpsl.lo trn1_cmptm.lo \
-	trn1_cmptr.lo trn1_cpyst.lo trn1_cswap.lo trn1_empst.lo \
-	trn1_errc.lo trn1_errl.lo trn1_error.lo trn1_evexd.lo \
-	trn1_evexi.lo trn1_evexr.lo trn1_evsrt.lo trn1_evtmd.lo \
-	trn1_evtmi.lo trn1_evtmr.lo trn1_excml.lo trn1_exctt.lo \
-	trn1_getsl.lo trn1_gtclc.lo trn1_gtnv.lo trn1_gtnvl.lo \
-	trn1_gtnvs.lo trn1_impid.lo trn1_initl.lo trn1_invcm.lo \
-	trn1_invtm.lo trn1_isnam.lo trn1_movst.lo trn1_nvcls.lo \
-	trn1_pscon.lo trn1_psvar.lo trn1_rdcls.lo trn1_rddst.lo \
-	trn1_rdlog.lo trn1_rdver.lo trn1_relsl.lo trn1_relts.lo \
-	trn1_setup.lo trn1_temp.lo trn1_trbtd.lo trn1_trbti.lo \
-	trn1_trbtr.lo trn1_trdtd.lo trn1_trdti.lo trn1_trdtr.lo \
-	trn1_upvsn.lo trn1_valcl.lo trn1_vfunc.lo trn1_vprec.lo \
-	trn1_vsymb.lo trn1_vtok.lo trn1_vtr.lo trn1_wrcls.lo \
-	trn1_wrdst.lo trn1_wrlog.lo trn_annul.lo trn_apnd.lo \
-	trn_close.lo trn_comp.lo trn_gtcl.lo trn_gtclc.lo trn_gtnv.lo \
-	trn_gtnvc.lo trn_inv.lo trn_join.lo trn_new.lo trn_prfx.lo \
-	trn_ptcl.lo trn_stok.lo trn_stokd.lo trn_stoki.lo trn_stokr.lo \
-	trn_tr1d.lo trn_tr1i.lo trn_tr1r.lo trn_tr2d.lo trn_tr2i.lo \
-	trn_tr2r.lo trn_trnd.lo trn_trni.lo trn_trnr.lo
-am__objects_3 = trn1_symdt.lo
+am__objects_2 = trn1_symdt.lo trn1_alwrk.lo trn1_anlst.lo \
+	trn1_antmp.lo trn1_cbcli.lo trn1_cbcls.lo trn1_clexp.lo \
+	trn1_clvar.lo trn1_cmpex.lo trn1_cmpfn.lo trn1_cmpsl.lo \
+	trn1_cmptm.lo trn1_cmptr.lo trn1_cpyst.lo trn1_cswap.lo \
+	trn1_empst.lo trn1_errc.lo trn1_errl.lo trn1_error.lo \
+	trn1_evexd.lo trn1_evexi.lo trn1_evexr.lo trn1_evsrt.lo \
+	trn1_evtmd.lo trn1_evtmi.lo trn1_evtmr.lo trn1_excml.lo \
+	trn1_exctt.lo trn1_getsl.lo trn1_gtclc.lo trn1_gtnv.lo \
+	trn1_gtnvl.lo trn1_gtnvs.lo trn1_impid.lo trn1_initl.lo \
+	trn1_invcm.lo trn1_invtm.lo trn1_isnam.lo trn1_movst.lo \
+	trn1_nvcls.lo trn1_pscon.lo trn1_psvar.lo trn1_rdcls.lo \
+	trn1_rddst.lo trn1_rdlog.lo trn1_rdver.lo trn1_relsl.lo \
+	trn1_relts.lo trn1_setup.lo trn1_temp.lo trn1_trbtd.lo \
+	trn1_trbti.lo trn1_trbtr.lo trn1_trdtd.lo trn1_trdti.lo \
+	trn1_trdtr.lo trn1_upvsn.lo trn1_valcl.lo trn1_vfunc.lo \
+	trn1_vprec.lo trn1_vsymb.lo trn1_vtok.lo trn1_vtr.lo \
+	trn1_wrcls.lo trn1_wrdst.lo trn1_wrlog.lo trn_annul.lo \
+	trn_apnd.lo trn_close.lo trn_comp.lo trn_gtcl.lo trn_gtclc.lo \
+	trn_gtnv.lo trn_gtnvc.lo trn_inv.lo trn_join.lo trn_new.lo \
+	trn_prfx.lo trn_ptcl.lo trn_stok.lo trn_stokd.lo trn_stoki.lo \
+	trn_stokr.lo trn_tr1d.lo trn_tr1i.lo trn_tr1r.lo trn_tr2d.lo \
+	trn_tr2i.lo trn_tr2r.lo trn_trnd.lo trn_trni.lo trn_trnr.lo
 am_libtrn_la_OBJECTS = $(am__objects_1) $(am__objects_2) \
-	$(am__objects_3) $(am__objects_1)
+	$(am__objects_1)
 libtrn_la_OBJECTS = $(am_libtrn_la_OBJECTS)
 am_trn_test_OBJECTS = trn_test.$(OBJEXT)
 trn_test_OBJECTS = $(am_trn_test_OBJECTS)
@@ -241,7 +240,6 @@ lib_LTLIBRARIES = libtrn.la
 libtrn_la_SOURCES = \
 	$(PUBLIC_INCLUDES) \
 	$(F_ROUTINES) \
-	$(BLOCK_DATA) \
 	$(PRIVATE_INCLUDES)
 
 include_HEADERS = $(PUBLIC_INCLUDES)
@@ -249,25 +247,24 @@ PRIVATE_INCLUDES = TRN_CMN TRN_CMN_SYM TRN_CONST TRN_CONST_STM
 PUBLIC_INCLUDES = \
 	TRN_PAR TRN_ERR
 
-BLOCK_DATA = trn1_symdt.f
-F_ROUTINES = trn1_alwrk.f trn1_anlst.f trn1_antmp.f trn1_cbcli.f      \
-trn1_cbcls.f trn1_clexp.f trn1_clvar.f trn1_cmpex.f trn1_cmpfn.f      \
-trn1_cmpsl.f trn1_cmptm.f trn1_cmptr.f trn1_cpyst.f trn1_cswap.f      \
-trn1_empst.f trn1_errc.f trn1_errl.f trn1_error.f trn1_evexd.f	      \
-trn1_evexi.f trn1_evexr.f trn1_evsrt.f trn1_evtmd.f trn1_evtmi.f      \
-trn1_evtmr.f trn1_excml.f trn1_exctt.f trn1_getsl.f trn1_gtclc.f      \
-trn1_gtnv.f trn1_gtnvl.f trn1_gtnvs.f trn1_impid.f trn1_initl.f	      \
-trn1_invcm.f trn1_invtm.f trn1_isnam.f trn1_movst.f trn1_nvcls.f      \
-trn1_pscon.f trn1_psvar.f trn1_rdcls.f trn1_rddst.f trn1_rdlog.f      \
-trn1_rdver.f trn1_relsl.f trn1_relts.f trn1_setup.f trn1_temp.f	      \
-trn1_trbtd.f trn1_trbti.f trn1_trbtr.f trn1_trdtd.f trn1_trdti.f      \
-trn1_trdtr.f trn1_upvsn.f trn1_valcl.f trn1_vfunc.f trn1_vprec.f      \
-trn1_vsymb.f trn1_vtok.f trn1_vtr.f trn1_wrcls.f trn1_wrdst.f	      \
-trn1_wrlog.f trn_annul.f trn_apnd.f trn_close.f trn_comp.f trn_gtcl.f \
-trn_gtclc.f trn_gtnv.f trn_gtnvc.f trn_inv.f trn_join.f trn_new.f     \
-trn_prfx.f trn_ptcl.f trn_stok.f trn_stokd.f trn_stoki.f trn_stokr.f  \
-trn_tr1d.f trn_tr1i.f trn_tr1r.f trn_tr2d.f trn_tr2i.f     \
-trn_tr2r.f trn_trnd.f trn_trni.f trn_trnr.f
+F_ROUTINES = trn1_symdt.f trn1_alwrk.f trn1_anlst.f trn1_antmp.f    \
+trn1_cbcli.f trn1_cbcls.f trn1_clexp.f trn1_clvar.f trn1_cmpex.f    \
+trn1_cmpfn.f trn1_cmpsl.f trn1_cmptm.f trn1_cmptr.f trn1_cpyst.f    \
+trn1_cswap.f trn1_empst.f trn1_errc.f trn1_errl.f trn1_error.f	    \
+trn1_evexd.f trn1_evexi.f trn1_evexr.f trn1_evsrt.f trn1_evtmd.f    \
+trn1_evtmi.f trn1_evtmr.f trn1_excml.f trn1_exctt.f trn1_getsl.f    \
+trn1_gtclc.f trn1_gtnv.f trn1_gtnvl.f trn1_gtnvs.f trn1_impid.f	    \
+trn1_initl.f trn1_invcm.f trn1_invtm.f trn1_isnam.f trn1_movst.f    \
+trn1_nvcls.f trn1_pscon.f trn1_psvar.f trn1_rdcls.f trn1_rddst.f    \
+trn1_rdlog.f trn1_rdver.f trn1_relsl.f trn1_relts.f trn1_setup.f    \
+trn1_temp.f trn1_trbtd.f trn1_trbti.f trn1_trbtr.f trn1_trdtd.f	    \
+trn1_trdti.f trn1_trdtr.f trn1_upvsn.f trn1_valcl.f trn1_vfunc.f    \
+trn1_vprec.f trn1_vsymb.f trn1_vtok.f trn1_vtr.f trn1_wrcls.f	    \
+trn1_wrdst.f trn1_wrlog.f trn_annul.f trn_apnd.f trn_close.f	    \
+trn_comp.f trn_gtcl.f trn_gtclc.f trn_gtnv.f trn_gtnvc.f trn_inv.f  \
+trn_join.f trn_new.f trn_prfx.f trn_ptcl.f trn_stok.f trn_stokd.f   \
+trn_stoki.f trn_stokr.f trn_tr1d.f trn_tr1i.f trn_tr1r.f trn_tr2d.f \
+trn_tr2i.f trn_tr2r.f trn_trnd.f trn_trni.f trn_trnr.f
 
 BUILT_SOURCES = TRN_ERR
 
