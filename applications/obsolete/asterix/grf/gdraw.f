@@ -41,6 +41,7 @@
 *     17 Jun 93 : V1.7-4  GTR used (RJV)
 *      4 Feb 94 : V1.7-5  Local GCB used when not in interactive mode (RJV)
 *      1 Jul 94 : V1.7-6  More intelligent screen handling (RJV)
+*      6 Dec 94 : V1.8-1  Asymmetric widths for stepped line (RJV)
 *    Type Definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -55,7 +56,7 @@
 *    Functions :
 *    Local Constants :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION='GDRAW Version 1.7-5')
+      PARAMETER (VERSION='GDRAW Version 1.8-1')
 *    Local variables :
       CHARACTER*(DAT__SZLOC) LOC	! locator to input object
       CHARACTER*132 NAME
@@ -332,6 +333,7 @@
       INTEGER XLPTR,XUPTR
       INTEGER YLPTR,YUPTR
       INTEGER NXERR,NYERR
+      INTEGER NWID
       BYTE MASK
       LOGICAL VOK				! variance OK
       LOGICAL XERROK,YERROK
@@ -341,11 +343,14 @@
       LOGICAL POLY,STEP,POINTS,ERRS		! plotting style
       LOGICAL ABS				! if plot pos. in abs units
       LOGICAL SCALED				! if axes scaled evenly
+      LOGICAL WOK,UNIF,AWID
 *-
 
       IF (STATUS.EQ.SAI__OK) THEN
+
 *  use integer ID instead of locator
         CALL BDA_FIND(LOC,ID,STATUS)
+
 *  get pointer to data
         CALL BDA_MAPDATA_INT(ID,'R',DPTR,STATUS)
 
@@ -407,7 +412,14 @@
 
 *  if step-line need axis widths
         IF (STEP) THEN
-          CALL BDA_MAPAXWID_INT(ID,'R',1,WPTR,STATUS)
+          CALL BDA_CHKAXWID_INT(ID,WOK,UNIF,NWID,STATUS)
+          IF (WOK) THEN
+            CALL BDA_MAPAXWID_INT(ID,'R',1,WPTR,STATUS)
+            AWID=.FALSE.
+          ELSE
+            CALL BDA_MAPXERR_INT(ID,'R',XLPTR,XUPTR,STATUS)
+            AWID=.TRUE.
+          ENDIF
         ENDIF
 
 
@@ -479,13 +491,24 @@
 
 *  stepped line
         IF (STEP) THEN
-          IF (QOK) THEN
-            CALL GFX_STEPQ(NVAL,1,NVAL,%val(APTR),%val(WPTR),
-     :                                 %val(DPTR),%val(QPTR),
-     :                                          MASK,STATUS)
+          IF (AWID) THEN
+            IF (QOK) THEN
+              CALL GFX_ASTEPQ(NVAL,1,NVAL,%val(APTR),%val(XLPTR),
+     :                         %val(XUPTR),%val(DPTR),%val(QPTR),
+     :                                              MASK,STATUS)
+            ELSE
+              CALL GFX_ASTEP(NVAL,1,NVAL,%val(APTR),%val(XLPTR),
+     :                           %val(XUPTR),%val(DPTR),STATUS)
+            ENDIF
           ELSE
-            CALL GFX_STEP(NVAL,1,NVAL,%val(APTR),%val(WPTR),
-     :                                    %val(DPTR),STATUS)
+            IF (QOK) THEN
+              CALL GFX_STEPQ(NVAL,1,NVAL,%val(APTR),%val(WPTR),
+     :                                   %val(DPTR),%val(QPTR),
+     :                                            MASK,STATUS)
+            ELSE
+              CALL GFX_STEP(NVAL,1,NVAL,%val(APTR),%val(WPTR),
+     :                                      %val(DPTR),STATUS)
+            ENDIF
           ENDIF
         ENDIF
 
