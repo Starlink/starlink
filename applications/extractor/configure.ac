@@ -46,10 +46,10 @@ dnl    List the sun/ssn/... numbers which document this package and
 dnl    which are present as .tex files in this directory.
 STAR_LATEX_DOCUMENTATION(sun226)
 
-dnl    Files for the docs, directory. These are present in the .htx
+dnl    Files for the docs, directory. Some of these may present in the .htx
 dnl    subdirectory as they are needed by the hypertext document, this just
-dnl    copies the files out of there and into "star/docs".
-STAR_DOCS_FILES([sun226.htx/mud165.ps sun226.htx/sun226fig.ps])
+dnl    copies the files out of there and into "star/docs" when necessary.
+STAR_DOCS_FILES([sun226.htx/mud165.ps sun226fig.ps])
 
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.
