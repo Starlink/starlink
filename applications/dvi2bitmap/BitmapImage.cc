@@ -25,11 +25,17 @@ const string *BitmapImage::softwareversion = 0;
 const string *BitmapImage::inputfilename = 0;
 const string *BitmapImage::furtherinfo = 0;
 
+const char *BitmapImage::formats[] = {
 #if ENABLE_PNG
-const string BitmapImage::defaultBitmapImageFormat = "png";
-#else
-const string BitmapImage::defaultBitmapImageFormat = "xbm";
+    "png",
 #endif
+    "xbm",
+#if ENABLE_GIF
+    "gif",
+#endif
+};
+const int BitmapImage::nformats = sizeof(formats)/sizeof(formats[0]);
+int BitmapImage::iterator_index = 0;
 
 verbosities BitmapImage::verbosity_ = normal;
 
@@ -39,6 +45,15 @@ BitmapImage::BitmapImage(const int w, const int h, const int bpp)
       isTransparent_(false)
 {
 };
+
+BitmapImage::~BitmapImage ()
+{
+    if (myBitmap_)
+    {
+	delete[] allocBitmap_;
+	allocBitmap_ = 0;
+    }
+}
 
 BitmapImage *BitmapImage::newBitmapImage
 	(const string format, const int w, const int h, const int bpp)
@@ -80,13 +95,19 @@ bool BitmapImage::supportedBitmapImage (const string format)
     return false;
 }
 
-BitmapImage::~BitmapImage ()
+const char *BitmapImage::defaultBitmapImageFormat()
 {
-    if (myBitmap_)
-    {
-	delete[] allocBitmap_;
-	allocBitmap_ = 0;
-    }
+    iterator_index = 0;
+    return formats[0];
+}
+
+const char *BitmapImage::otherBitmapImageFormat()
+{
+    iterator_index++;
+    if (iterator_index >= nformats)
+	return 0;
+    else
+	return formats[iterator_index];
 }
 
 void BitmapImage::setBitmap (const Byte *b)
