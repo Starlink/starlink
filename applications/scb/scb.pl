@@ -45,7 +45,8 @@ $taskfile  = "/local/devel/scb/tasks";
 
 #  Directory locations.
 
-$tmpdir = "/local/junk/scb/unpack";    # scratch directory
+$tmpbase = "/local/junk/scb";    # scratch directory
+$tmpdir = "$tmpbase/$$";
 
 #  Name of this program relative to this program.
 
@@ -70,6 +71,7 @@ sub error;
 sub header;
 sub footer;
 sub hprint;
+sub tidyfiles;
 
 #  Determine operating environment.
 
@@ -77,18 +79,35 @@ $cgi = defined $ENV{'SERVER_PROTOCOL'};
 print "Content-Type: text/html\n\n" if ($cgi);
 $html = $cgi;
 
-#  Name of source module to locate.
+#  Parse arguments.
 
-if ($cgi) {
-   $module = $ENV{'QUERY_STRING'};
-}
-else {
-   $module = shift @ARGV;
+#  Get argument list from command line or CGI environment variable.
+
+@args = $cgi ? split ('&', $ENV{'QUERY_STRING'})
+             : @ARGV;
+
+#  Extract named arguments (of format arg=value).
+
+if (@args) {
+   for ($i = $#args; $i>=0; $i--) {
+      if ($args[$i] =~ /(.*)=(.*)/) {
+         $arg{$1} = $2;
+         splice (@args, $i, 1);
+      }
+   }
 }
 
-if ($module) {
-   $module =~ s/^module=//;
-   get_module $module;
+#  If chosen variables still have no value pick them up by order on 
+#  command line.
+
+$arg{'module'}  ||= shift @args;
+$arg{'package'} ||= shift @args;
+$arg{'package'} ||= '';
+
+#  Main processing: either pull out requested module, or present a form.
+
+if ($arg{'module'}) {
+   get_module uc ($arg{'module'}), uc ($arg{'package'});
 }
 else {
    if ($cgi) {
@@ -120,6 +139,11 @@ sub query_form {
       <form method=GET action="$self">
           Name of source module:
           <input name=module size=24 value=''>
+          <br>
+          Name of package (optional):
+          <input name=package size=24 value=''>
+          <br>
+          <input type=submit value='Retrieve'>
       </form>
       <hr>
    END
@@ -155,39 +179,71 @@ sub get_module {
 #  Arguments.
 
    $module = shift;
+   $package = shift;
 
 #  Open index file, tied to index hash %locate.
 
    tie %locate, SDBM_File, $indexfile, O_RDONLY, 0644;
 
-#  Set locations of logical names appearing in logical paths.
-#  It may be desirable to override these if the database has been moved.
-
-   $basedir{'SOURCE'}  = $locate{'#SOURCE'};
-   $basedir{'INCLUDE'} = $locate{'#INCLUDE'};
-
 #  Set up scratch directory.
 
-   system "mkdir -p $tmpdir" and error "Failed to mkdir $tmpdir: $?";
-   chdir $tmpdir             or  error "Failed to enter $tmpdir";
+   mkdir "$tmpdir", 0777;
+   chdir "$tmpdir"  or error "Failed to enter $tmpdir";
 
 #  Get logical path name from database.
 
-   $location = $locate{$module};
-   unless ($location) {
+   @locations = split ' ', $locate{$module};
+
+#  Generate an error if no module of the requested name is indexed.
+
+   unless (@locations) {
       error "Failed to find module $module",
          "Probably this is a result of a deficiency in the source
           code indexing program, but it may be because the index 
           database <code>$indexfile</code> has become out of date.";
    }
 
-#  Substitute in base directory name.
+#  See if any of the listed locations is in the requested package;
+#  otherwise just pick any of them (in fact, the last).
 
-   $location =~ s%(^[^/]*)(.*)$%$basedir{$1}/$2%;
+   foreach $location (@locations) {
+      $locname = $location;
+      $location =~ /^(.+)#(.+)/i;
+      ($head, $tail) = (lc ($1), $2);
+      last if (uc ($head) eq uc ($package));
+   }
+
+
+#  Interpret the first element of the location as a package or symbolic
+#  directory name.  Either way, change it for a logical path name.
+
+   my $file;
+   if (-d "$srcdir/$head") {
+      $file = "$srcdir/$head/$tail";
+   }
+   elsif (-f ($tarfile = <$srcdir/$head.tar*>)) {
+      $file = "$tarfile>$tail";
+   }
+   elsif ($head eq "INCLUDE") {
+      $file = $incdir/$tail;
+   }
+   else {
+      error "Failed to interpret location $location",
+         "Probably the index file $indexfile is outdated or corrupted.";
+   }
 
 #  Extract file from logical path.
 
-   extract_file $location;
+   extract_file $file;
+
+#  Finished with STDOUT; by closing it here the CGI user doesn't have to
+#  wait any longer than necessary (I think).
+
+   close STDOUT;
+
+#  Tidy up.
+
+   tidyfiles;
 
 }
 
@@ -239,11 +295,11 @@ sub output {
 #  Output appropriate header text.
 
    if ($html) {
-      header $locate{$module};
+      header $locname;
       print "<pre>\n" if ($html);
    }
    else {
-      print STDERR $location;
+      print STDERR "$locname\n";
    }
 
    my ($body, $name, @names, $include, $sub);
@@ -348,11 +404,32 @@ sub output {
 
 
 ########################################################################
+sub tidyfiles {
+
+#  Delete temporary directory in which files were unpacked.
+#
+#  Note use of "die" here rather than "error" this routine is called by
+#  error, and we don't want to get into an infinite loop.
+
+#  Maintain a healthy respect for rm -rf.
+
+   die "Warning: $tmpdir does not match $tmpbase" 
+      unless ($tmpdir =~ /^$tmpbase/);
+
+#  Remove the directory conaining all temporary files.
+
+   system "rm -rf $tmpdir" and die "rm -rf $tmpdir: $?\n";
+}
+
+
+########################################################################
 sub error {
 
 #  Arguments.
 
    my ($message, $more) = @_;
+
+   tidyfiles;
 
    if ($html) {
       header "Error";
@@ -360,11 +437,13 @@ sub error {
       hprint "<b>$message</b>\n";
       hprint "<p>\n$more\n" if $more;
       footer;
+      print STDERR "$self: $message\n" if ($cgi);
       exit 1;
    }
    else {
       die "$message\n";
    }
+
 }
 
 
