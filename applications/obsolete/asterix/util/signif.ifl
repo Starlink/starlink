@@ -19,14 +19,12 @@ Interface SIGNIF
    Parameter WEIGHT_DATA
       position    3
       type        '_REAL'
-      keyword     'WEIGHT_DATA'
       prompt      'Significance data'
       help        'Must be a primitive object'
    EndParameter
 
    Parameter OVER
       type        '_LOGICAL'
-      keyword     'OVERWRITE'
       default     N
       vpath       'DEFAULT'
       prompt      'Overwrite first input data object?'
