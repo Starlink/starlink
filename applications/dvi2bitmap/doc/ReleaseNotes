@@ -8,7 +8,7 @@ important changes, where there is a straightforward mapping.
 <tabular>
 <tgroup cols=2>
 <thead>
-<row><entry>old</entry><entry>new</code></entry><entry>Note</entry></row>
+<row><entry>old</entry><entry>new</entry><entry>Note</entry></row>
 <tbody>
 <row><entry><code>-bh</code></entry><entry><code>-h, --height</code></entry></row>
 <row><entry><code>-bw</code></entry><entry><code>-w, --width</code></entry></row>
@@ -24,11 +24,11 @@ important changes, where there is a straightforward mapping.
 <row><entry><code>-p</code></entry><entry><code>-p, --start-page</code></entry></row>
 <row><entry><code>-pp</code></entry><entry><code>-P, --page-range</code></entry><entry>(3)</entry></row>
 <row><entry><code>-o</code></entry><entry><code>-o, --output</code></entry></row>
-<row><entry><code>-P:-X, --process</code></entry><entry><code>extra syntax</code></entry></row>
+<row><entry><code>-P</code></entry><entry><code>-X, --process</code></entry><entry>(4)</entry></row>
 <row><entry><code>-q</code></entry><entry><code>-v, --verbose</code></entry></row>
 <row><entry><code>-Q</code></entry><entry><code>-Q, --query</code></entry></row>
 <row><entry><code>-r</code></entry><entry><code>-r, --resolution</code></entry></row>
-<row><entry><code>-R:-R, --colours</code></entry><entry><code>extra syntax</code></entry></row>
+<row><entry><code>-R</code></entry><entry><code>-R, --colours</code></entry><entry>(4)</entry></row>
 <row><entry><code>-s</code></entry><entry><code>-s, --scalefactor</code></entry></row>
 <row><entry><code>-t</code></entry><entry><code>-T, --output-type</code></entry></row>
 <row><entry><code>-V</code></entry><entry><code>-V, --version</code></entry></row>
@@ -42,6 +42,8 @@ now <code>--font-search=path=mypath</code></p>
 <code>--process=preamble-only</code></p>
 
 <p>Note 3: page-selection syntax has changed.</p>
+
+<p>Note 4: extra syntax added.</p>
 
 <p>Slight changes in functionality (enough that scripts might
 break):
@@ -156,7 +158,7 @@ rather inconsistent before), and <code/-qq> turns off errors, too.
 gcc 2.8.1.  I'm not sure I found any underlying problem, but I fixed
 something, which stopped it crashing for me (Mmmm...).
 
-<p>This release adds a script <code>img-eqlist.pl</>, to transform
+<p>This release adds a script <code>img-eqlist.pl</code>, to transform
 a file of LaTeX maths fragments into a LaTeX file, keeping track of
 filenames, and avoiding generating duplicate bitmaps for duplicated
 maths.  See <ref id=developments/>.
