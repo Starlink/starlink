@@ -374,6 +374,8 @@
 *  History:
 *     20 Mar 1995 (DJA):
 *        Renamed to DYN_MAP_ADD. No longer works in pages.
+*     21 Dec 1995 (DJA):
+*        Added diagnostic output
 *     {enter_changes_here}
 
 *  Bugs:
@@ -389,6 +391,8 @@
 
 *  Global Variables:
       INCLUDE 'DYN_CMN'                                 ! DYN common block
+*       DYS_DIAG = LOGICAL (given)
+*         Package diagnostics on?
 *       DYS_PTR = INTEGER (given and returned)
 *         DYN memory addresses
 *       DYS_NBYTE = INTEGER (returned)
@@ -433,6 +437,13 @@
         DYS_NBYTE(I) = NBYTE
         DYS_NITEM(I) = NITEM
         DYS_FID(I) = FID
+
+*    Diagnostic?
+        IF ( DYS_DIAG ) THEN
+          CALL MSG_SETI( 'PTR', PTR )
+          CALL MSG_SETI( 'NB', NBYTE )
+          CALL ADP_OUT( 'DYN: Allocated ^NB bytes at address ^PTR' )
+        END IF
 
       ELSE
         STATUS = SAI__ERROR
