@@ -84,7 +84,9 @@
 
 #  Create the documentation in the current directory
       fetch sun238.master
-      $KAPLIBS_DEV/bin/make_sun238.csh "`grp exclude`"
+      set exc = `grp exlude`
+echo "make_unix_release excluding $exc"
+      $KAPLIBS_DEV/bin/make_sun238.csh "$exc"
 
 #  Tar up all the release files and then remove them.
       echo "Creating kaplibs.tar"
