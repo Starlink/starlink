@@ -32,7 +32,7 @@
 *     file will then be requested.
 
 *  Usage:
-*     modify in change_flat
+*     change_flat in new_flat
 
 *  ADAM Parameters:
 *     IN = NDF (Read)
@@ -42,6 +42,11 @@
 
 *  Related Application:
 *     FLATFIELD
+
+*  Examples:
+*     change_flat test newflat.dat
+*        This will change the flatfield stored in test.sdf to that stored
+*        in newflat.dat.
 
 *  Authors:
 *     JFL:  J.Lightfoot (jfl@roe.ac.uk)
@@ -247,7 +252,7 @@
       CALL MSG_SETC ('OBJECT', OBJECT)
       CALL MSG_SETC ('MODE', OBSERVING_MODE)
       CALL MSG_SETI ('RUN', RUN_NUMBER)
-      CALL MSG_SETC ('^PKG', PACKAGE)
+      CALL MSG_SETC ('PKG', PACKAGE)
       CALL MSG_OUT (' ', '^PKG: run ^RUN was a ^MODE observation of '//
      :  '^OBJECT', STATUS)
 
