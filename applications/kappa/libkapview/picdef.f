@@ -260,6 +260,8 @@
 *        allow both PICGRID and PICXY to inherit the CURRENT option.
 *     21-AUG-1998 (DSB):
 *        Converted to use PGPLOT. Re-formatted code. Added parameter SIZE.
+*     15-FEB-2000 (DSB):
+*        Calls to KPG1_PGCUR modified for new argument list.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -273,6 +275,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'        ! Global SSE definitions
       INCLUDE 'DAT_PAR'        ! Data-system constants
+      INCLUDE 'AST_PAR'        ! AST constants
       INCLUDE 'PAR_ERR'        ! Parameter-system errors
       INCLUDE 'PRM_PAR'        ! Extreme and magic-value constants.
 
@@ -495,7 +498,8 @@
          AMES( 2 ) = 'quit'
          CALL KPG1_PGCUR( .TRUE., 'select 2 distinct points', 2, AMES, 
      :                    ' .', X1E, X2E, Y1E, Y2E, 2, XIN, YIN, NPTS, 
-     :                    2, 0, 0, 1, XP, YP, ACT, NP, STATUS )
+     :                    2, 0, 0, 1, AST__NULL, XP, YP, ACT, NP, 
+     :                    STATUS )
 
 *  Look out for an abort, i.e. the number of points is not 2.
 *  Copy from the arrays into the standard (to the rest of the

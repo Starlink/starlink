@@ -217,6 +217,8 @@
 *     2-FEB-2000 (DSB):
 *        Added code to ensure the supplied points are in the correct
 *        order.
+*     15-FEB-2000 (DSB):
+*        Calls to KPG1_PGCUR modified for new argument list.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -369,8 +371,8 @@
 *  may be selected are restricted to the current picture.
          CALL KPG1_PGCUR( .TRUE., 'select two opposite corners', 2, 
      :                   AMES, 'A.', X1, X2, Y1, Y2, 0, 0.5*( X1 + X2 ), 
-     :                   0.5*( Y1 + Y2 ), 2, 2, 0, 0, -32, RXC, RYC, 
-     :                   ACT, NP, STATUS )
+     :                   0.5*( Y1 + Y2 ), 2, 2, 0, 0, -32, AST__NULL,
+     :                   RXC, RYC, ACT, NP, STATUS )
 
 *  Abort if less than two positions were supplied.
          IF( NP .LT. 2 .OR. STATUS .NE. SAI__OK ) GO TO 999
