@@ -104,8 +104,17 @@
         INTEGER			CHR_LEN
 
 *  Local Variables:
+      CHARACTER*20		DET			! Detector name
+      CHARACTER*20		FILT			! Filter name
       CHARACTER*(DAT__SZLOC)	HLOC			! HEADER object
       CHARACTER*(DAT__SZLOC)	INLOC			! INSTRUMENT object
+      CHARACTER*20		INSTRUM			!
+      CHARACTER*20		MISSION			!
+      CHARACTER*50		OBSERVER		!
+      CHARACTER*50		TARGET			!
+
+      LOGICAL			DOK, FOK, IOK, MOK	! Things present?
+      LOGICAL			TOK, OOK
 *.
 
 *  Check inherited global status.
@@ -117,22 +126,50 @@
 *  Locate HEADER structure
       CALL ADI1_LOCHEAD( ARGS(1), .FALSE., HLOC, STATUS )
 
-*  The new object
+*  Look for the various header components
+      CALL ADI1_CGET0C( HLOC, 'OBSERVATORY', MOK, MISSION, STATUS )
+      CALL ADI1_CGET0C( HLOC, 'INSTRUMENT', IOK, INSTRUM, STATUS )
+      CALL ADI1_CGET0C( HLOC, 'TARGET', TOK, TARGET, STATUS )
+      CALL ADI1_CGET0C( HLOC, 'OBSERVER', OOK, OBSERVER, STATUS )
+
+*  If instrument was specified, look for detector and filter names
+      IF ( IOK ) THEN
+        CALL ADI1_LOCINSTR( ARGS(1), .FALSE., INLOC, STATUS )
+        IF ( STATUS .EQ. SAI__OK ) THEN
+          CALL ADI1_CGET0C( INLOC, 'DETECTOR', DOK, DET, STATUS )
+          CALL ADI1_CGET0C( INLOC, 'FILTER', FOK, FILT, STATUS )
+        ELSE
+          CALL ERR_ANNUL( STATUS )
+        END IF
+      END IF
+
+*    The new object
       CALL ADI_NEW0( 'MissionStrings', OARG, STATUS )
 
-*  Transfer HDS info to ADI object
-      CALL ADI1_CCH2AC( HLOC, 'INSTRUMENT', OARG, 'Instrument', STATUS )
-      CALL ADI1_CCH2AC( HLOC, 'OBSERVATORY', OARG, 'Mission', STATUS )
-      CALL ADI1_CCH2AC( HLOC, 'TARGET', OARG, 'Target', STATUS )
-      CALL ADI1_CCH2AC( HLOC, 'OBSERVER', OARG, 'Observer', STATUS )
-
-*  Locate INSTRUMENT structure
-      CALL ADI1_LOCINSTR( ARGS(1), .FALSE., INLOC, STATUS )
-      IF ( STATUS .EQ. SAI__OK ) THEN
-        CALL ADI1_CCH2AC( INLOC, 'DETECTOR', OARG, 'Detector', STATUS )
-        CALL ADI1_CCH2AC( INLOC, 'FILTER', OARG, 'Filter', STATUS )
-      ELSE
-        CALL ERR_ANNUL( STATUS )
+*    Write its member values
+      IF ( MOK ) THEN
+        CALL ADI_CPUT0C( OARG, 'Mission',
+     :                   MISSION(:CHR_LEN(MISSION)), STATUS )
+      END IF
+      IF ( IOK ) THEN
+        CALL ADI_CPUT0C( OARG, 'Instrument',
+     :                   INSTRUM(:CHR_LEN(INSTRUM)), STATUS )
+      END IF
+      IF ( DOK ) THEN
+        CALL ADI_CPUT0C( OARG, 'Detector', DET(:CHR_LEN(DET)),
+     :                   STATUS )
+      END IF
+      IF ( FOK ) THEN
+        CALL ADI_CPUT0C( OARG, 'Filter', FILT(:CHR_LEN(FILT)),
+     :                   STATUS )
+      END IF
+      IF ( TOK ) THEN
+        CALL ADI_CPUT0C( OARG, 'Target', TARGET(:CHR_LEN(TARGET)),
+     :                   STATUS )
+      END IF
+      IF ( OOK ) THEN
+        CALL ADI_CPUT0C( OARG, 'Observer', OBSERVER(:CHR_LEN(OBSERVER)),
+     :                   STATUS )
       END IF
 
 *  Report any errors
