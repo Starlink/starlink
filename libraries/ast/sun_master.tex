@@ -8015,11 +8015,12 @@ f+
 f-
 
 Such a SkyFrame would represent the default celestial coordinate
-system which, at present, is the FK5~(J2000.0) equatorial system.
+system which, at present, is the ICRS system (the default was "FK5(J2000)" 
+in versions of AST prior to 3.0).
 
 \subsection{Specifying a Particular Celestial Coordinate System}
 
-For many purposes, the FK5~(J2000.0) coordinate system is perfectly
+For many purposes, the ICRS coordinate system is perfectly
 adequate. In order to support conversion between a variety of
 celestial coordinate systems, however, you can create SkyFrames that
 represent any of these.
@@ -8068,7 +8069,7 @@ celestial coordinate systems (see \secref{ss:introducingconversion} ).
 Many celestial coordinate systems have some additional free parameters
 which serve to identify a particular coordinate system from amongst a
 broader class of related coordinate systems. For example, the
-FK5~(J2010.0) system is distinguished from the (default) FK5~(J2000.0)
+FK5~(J2010.0) system is distinguished from the FK5~(J2000.0)
 system by a different equinox---and the coordinates of a fixed
 astronomical source would have different values when expressed in
 these two systems.
@@ -8998,7 +8999,7 @@ A very common use for a CmpFrame within astronomy is to represent a
 represents position within a spectrum, and the other two axes represent
 position on the sky (or some other spatial domain such as the focal plane
 of a telescope). As an example, we create such a CmpFrame in which axes
-1 and 2 represent Right Ascension and Declination (FK5 J2000), and axis 3 
+1 and 2 represent Right Ascension and Declination (ICRS), and axis 3 
 represents wavelength (these are the default coordinate Systems
 represented by a SkyFrame and a SpecFrame respectively):
 
@@ -9935,9 +9936,8 @@ SpecFrame, the default is wavelength (or equivalently, frequency)
 since this is the system in which observations are usually made. The
 SpecFrame class also has an attribute called AlignStdOfRest which
 allows the standard of rest of the alignment system to be specified.
-Currently, the SkyFrame uses FK5 as the default for AlignSystem, since
-this is a close approximation to an inertial frame of rest (future
-versions of AST will use ICRS as the default).
+Currently, the SkyFrame uses ICRS as the default for AlignSystem, since
+this is a close approximation to an inertial frame of rest.
 
 \cleardoublepage
 \section{\label{ss:framesets}Coordinate System Networks (FrameSets)}
@@ -11712,7 +11712,7 @@ f-
 This constructs a trivial FrameSet whose base and current Frames are
 both the same SkyFrame connected by a UnitMap. You can think of this
 as a ``pipe'' connecting two coordinate systems. At present, these two
-systems represent identical FK5 (J2000) coordinates, so the FrameSet
+systems represent identical ICRS coordinates, so the FrameSet
 implements a unit Mapping. We can change the coordinate system on the
 current end of this pipe as follows:
 
@@ -19112,6 +19112,10 @@ current version):
 
 \begin{enumerate}
 
+\item The SkyFrame class now represents ICRS coordinates by default
+instead of FK5 (that is, the default for the System attribute for SkyFrames 
+has been changed to ``ICRS'').
+
 \item The 
 c+
 astRate
@@ -19124,6 +19128,20 @@ change of a Mapping output with respect to one of the Mapping inputs.
 
 \item A new subclass of Mapping, the GrismMap, has been added which
 models the spectral dispersion produced by a grating, prism or grism.
+
+\item A new subclass of Mapping, the ShiftMap, has been added which adds
+constant values onto all coordinates (this is equivalent to a WinMap
+with unit scaling on all axes).
+
+\item Minor bugs have been fixed within the Plot class to do with the choice 
+and placement of numerical axis labels.
+
+\item The SphMap class has a new attribute caller PolarLong which gives the 
+longitude value to be returned when a Cartesian position corresponding to 
+either the north or south pole is transformed into spherical coordinates.
+
+\item The WcsMap class now assigns a longitude of zero to output
+celestial coordinates which have a latitude of plus or minus 90 degrees.
 
 \end{enumerate}
 
