@@ -30,6 +30,7 @@
 *  Authors:
 *     hme: Horst Meyerdierks (UoE, Starlink)
 *     timj: Tim Jenness (JAC, Hilo)
+*     rpt: Remo Tilanus (JAC, Hilo)
 *     {enter_new_authors_here}
 
 *  History:
@@ -40,6 +41,13 @@
 *        Must not forget to swap the first data record.
 *     11 Mar 1997 (timj):
 *        Reset LOFREQ and IFFREQ prior to read.
+*     03 May 1999 (rpt):
+*        Since Figaro GEN routines for Byte-swap are now tied to
+*        host type, byte swap needs to be handled by local subs.
+*     06 Jan 2000 (timj):
+*        Make compatible with MJD-OBS and Y2K compliant DATE-OBS
+*        Initialise ITITLE/IDATE/ITIME so that do not contain leftovers
+*        from earlier stack entry.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -61,6 +69,7 @@
 
 *  Local Variables:
       INTEGER I
+      INTEGER ISTAT
       INTEGER HPTR               ! Pointer into buffer
       INTEGER DPTR               ! Pointer into DATA
       INTEGER BITPIX             ! BITPIX value
@@ -76,6 +85,8 @@
       DOUBLE PRECISION BSCALE    ! BSCALE value
       DOUBLE PRECISION BZERO     ! BZERO value
       DOUBLE PRECISION DTEMP     ! Temporary double precision number
+      LOGICAL READUT             ! Read UT from previous keyword
+      LOGICAL READDATE           ! Read IDATE from previos keyword
       DOUBLE PRECISION RESTFREQ  ! Local rest frequency value
       DOUBLE PRECISION FRZERO    ! Zeropoint for freq. axis
       DOUBLE PRECISION CRVAL1    ! CRVAL1 value
@@ -83,21 +94,23 @@
       CHARACTER * ( 8 ) KEYWRD   ! A FITS keyword (actual or potential)
       CHARACTER * ( 4 ) VFRAME   ! VFRAME value
       CHARACTER * ( 3 ) VDEF     ! VDEF value
-      CHARACTER * ( 3 ) MONTH( 12 ) ! A calendar
 
       BYTE        BUFFER( 2880 )
       INTEGER * 2  WBUFF( 1440 )
       INTEGER      IBUFF(  720 )
       CHARACTER * ( 2880 ) HEADER
+      CHARACTER * 24 OBS_DATE   ! DATE-OBS string
       EQUIVALENCE ( BUFFER(1), WBUFF(1), IBUFF(1) , HEADER )
 
 *  Internal References:
 
 *  Local Data:
-      DATA MONTH / 'JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN',
-     :             'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC' /
 
 *.
+
+*  Initialise
+      READUT = .FALSE.
+      READDATE = .FALSE.
 
 *  Reset inherited global status.
       IFAIL = 0
@@ -117,6 +130,11 @@
       VDEF   = ' '
       IFFREQ(1) = 0.0
       LOFREQ(1) = 0.0
+
+*     Initialise title, date and time
+      ITITLE = 'FITS'
+      IDATE  = '00-JAN-00'
+      ITIME  = '00:00:00'
 
 *  Read in the first header record.
 *  A record is 2880 bytes, or 36 items with 80 characters each.
@@ -228,28 +246,28 @@
          IF      ( KEYWRD .EQ. 'BLANK'   ) THEN
             READ( HEADER(HPTR+10:), *, IOSTAT=STATUS ) BLANK
             IF ( STATUS .NE. 0 ) THEN
-               WRITE( *, * ) ' An item value is invalid.'
+               WRITE( *, * ) ' BLANK item value is invalid.'
                IFAIL = 18
                GO TO 500
             END IF
          ELSE IF ( KEYWRD .EQ. 'BSCALE'  ) THEN
             READ( HEADER(HPTR+10:), *, IOSTAT=STATUS ) BSCALE
             IF ( STATUS .NE. 0 ) THEN
-               WRITE( *, * ) ' An item value is invalid.'
+               WRITE( *, * ) ' BSCALE item value is invalid.'
                IFAIL = 18
                GO TO 500
             END IF
          ELSE IF ( KEYWRD .EQ. 'BZERO'   ) THEN
             READ( HEADER(HPTR+10:), *, IOSTAT=STATUS ) BZERO
             IF ( STATUS .NE. 0 ) THEN
-               WRITE( *, * ) ' An item value is invalid.'
+               WRITE( *, * ) ' BZERO item value is invalid.'
                IFAIL = 18
                GO TO 500
             END IF
          ELSE IF ( KEYWRD .EQ. 'SCAN-NUM') THEN
             READ( HEADER(HPTR+10:), *, IOSTAT=STATUS ) RTEMP
             IF ( STATUS .NE. 0 ) THEN
-               WRITE( *, * ) ' An item value is invalid.'
+               WRITE( *, * ) ' SCAN-NUM item value is invalid.'
                IFAIL = 18
                GO TO 500
             END IF
@@ -260,7 +278,7 @@
          ELSE IF ( KEYWRD .EQ. 'CRVAL2'  ) THEN
             READ( HEADER(HPTR+10:), *, IOSTAT=STATUS ) DTEMP
             IF ( STATUS .NE. 0 ) THEN
-               WRITE( *, * ) ' An item value is invalid.'
+               WRITE( *, * ) ' CRVAL2 item value is invalid.'
                IFAIL = 18
                GO TO 500
             END IF
@@ -268,7 +286,7 @@
          ELSE IF ( KEYWRD .EQ. 'CRVAL3'  ) THEN
             READ( HEADER(HPTR+10:), *, IOSTAT=STATUS ) DTEMP
             IF ( STATUS .NE. 0 ) THEN
-               WRITE( *, * ) ' An item value is invalid.'
+               WRITE( *, * ) ' CRVAL3 item value is invalid.'
                IFAIL = 18
                GO TO 500
             END IF
@@ -276,7 +294,7 @@
          ELSE IF ( KEYWRD .EQ. 'CDELT2'  ) THEN
             READ( HEADER(HPTR+10:), *, IOSTAT=STATUS ) RTEMP
             IF ( STATUS .NE. 0 ) THEN
-               WRITE( *, * ) ' An item value is invalid.'
+               WRITE( *, * ) ' CDELT2 item value is invalid.'
                IFAIL = 18
                GO TO 500
             END IF
@@ -284,7 +302,7 @@
          ELSE IF ( KEYWRD .EQ. 'CDELT3'  ) THEN
             READ( HEADER(HPTR+10:), *, IOSTAT=STATUS ) RTEMP
             IF ( STATUS .NE. 0 ) THEN
-               WRITE( *, * ) ' An item value is invalid.'
+               WRITE( *, * ) ' CDELT3 item value is invalid.'
                IFAIL = 18
                GO TO 500
             END IF
@@ -292,7 +310,7 @@
          ELSE IF ( KEYWRD .EQ. 'VLSR'    ) THEN
             READ( HEADER(HPTR+10:), *, IOSTAT=STATUS ) RTEMP
             IF ( STATUS .NE. 0 ) THEN
-               WRITE( *, * ) ' An item value is invalid.'
+               WRITE( *, * ) ' VLSR item value is invalid.'
                IFAIL = 18
                GO TO 500
             END IF
@@ -300,7 +318,7 @@
          ELSE IF ( KEYWRD .EQ. 'VELO-LSR') THEN
             READ( HEADER(HPTR+10:), *, IOSTAT=STATUS ) RTEMP
             IF ( STATUS .NE. 0 ) THEN
-               WRITE( *, * ) ' An item value is invalid.'
+               WRITE( *, * ) ' VELO-LSR item value is invalid.'
                IFAIL = 18
                GO TO 500
             END IF
@@ -310,7 +328,7 @@
          ELSE IF ( KEYWRD .EQ. 'VELO-HEL') THEN
             READ( HEADER(HPTR+10:), *, IOSTAT=STATUS ) RTEMP
             IF ( STATUS .NE. 0 ) THEN
-               WRITE( *, * ) ' An item value is invalid.'
+               WRITE( *, * ) ' VELO-HEL item value is invalid.'
                IFAIL = 18
                GO TO 500
             END IF
@@ -320,7 +338,7 @@
          ELSE IF ( KEYWRD .EQ. 'VELO-EAR') THEN
             READ( HEADER(HPTR+10:), *, IOSTAT=STATUS ) RTEMP
             IF ( STATUS .NE. 0 ) THEN
-               WRITE( *, * ) ' An item value is invalid.'
+               WRITE( *, * ) ' VELO-EAR item value is invalid.'
                IFAIL = 18
                GO TO 500
             END IF
@@ -330,7 +348,7 @@
          ELSE IF ( KEYWRD .EQ. 'VELO-OBS') THEN
             READ( HEADER(HPTR+10:), *, IOSTAT=STATUS ) RTEMP
             IF ( STATUS .NE. 0 ) THEN
-               WRITE( *, * ) ' An item value is invalid.'
+               WRITE( *, * ) ' VELO-OBS item value is invalid.'
                IFAIL = 18
                GO TO 500
             END IF
@@ -340,28 +358,28 @@
          ELSE IF ( KEYWRD .EQ. 'VEL-FRAM') THEN
             READ( HEADER(HPTR+10:), *, IOSTAT=STATUS ) VFRAME
             IF ( STATUS .NE. 0 ) THEN
-               WRITE( *, * ) ' An item value is invalid.'
+               WRITE( *, * ) ' VEL-FRAM item value is invalid.'
                IFAIL = 18
                GO TO 500
             END IF
          ELSE IF ( KEYWRD .EQ. 'VEL-LAW' ) THEN
             READ( HEADER(HPTR+10:), *, IOSTAT=STATUS ) VDEF
             IF ( STATUS .NE. 0 ) THEN
-               WRITE( *, * ) ' An item value is invalid.'
+               WRITE( *, * ) ' VEL-LAW item value is invalid.'
                IFAIL = 18
                GO TO 500
             END IF
          ELSE IF ( KEYWRD .EQ. 'RESTFREQ') THEN
             READ( HEADER(HPTR+10:), *, IOSTAT=STATUS ) RESTFREQ
             IF ( STATUS .NE. 0 ) THEN
-               WRITE( *, * ) ' An item value is invalid.'
+               WRITE( *, * ) ' RESTFREQ item value is invalid.'
                IFAIL = 18
                GO TO 500
             END IF
          ELSE IF ( KEYWRD .EQ. 'LOFREQ'  ) THEN
             READ( HEADER(HPTR+10:), *, IOSTAT=STATUS ) DTEMP
             IF ( STATUS .NE. 0 ) THEN
-               WRITE( *, * ) ' An item value is invalid.'
+               WRITE( *, * ) ' LOFREQ item value is invalid.'
                IFAIL = 18
                GO TO 500
             END IF
@@ -369,7 +387,7 @@
          ELSE IF ( KEYWRD .EQ. 'IFFREQ'  ) THEN
             READ( HEADER(HPTR+10:), *, IOSTAT=STATUS ) DTEMP
             IF ( STATUS .NE. 0 ) THEN
-               WRITE( *, * ) ' An item value is invalid.'
+               WRITE( *, * ) ' IFFREQ item value is invalid.'
                IFAIL = 18
                GO TO 500
             END IF
@@ -377,28 +395,28 @@
          ELSE IF ( KEYWRD .EQ. 'CRVAL1'  ) THEN
             READ( HEADER(HPTR+10:), *, IOSTAT=STATUS ) CRVAL1
             IF ( STATUS .NE. 0 ) THEN
-               WRITE( *, * ) ' An item value is invalid.'
+               WRITE( *, * ) ' CRVAL1 item value is invalid.'
                IFAIL = 18
                GO TO 500
             END IF
          ELSE IF ( KEYWRD .EQ. 'CDELT1'  ) THEN
             READ( HEADER(HPTR+10:), *, IOSTAT=STATUS ) CDELT1
             IF ( STATUS .NE. 0 ) THEN
-               WRITE( *, * ) ' An item value is invalid.'
+               WRITE( *, * ) ' CDELT1 item value is invalid.'
                IFAIL = 18
                GO TO 500
             END IF
          ELSE IF ( KEYWRD .EQ. 'CRPIX1'  ) THEN
             READ( HEADER(HPTR+10:), *, IOSTAT=STATUS ) CRPIX1
             IF ( STATUS .NE. 0 ) THEN
-               WRITE( *, * ) ' An item value is invalid.'
+               WRITE( *, * ) ' CRPIX1 item value is invalid.'
                IFAIL = 18
                GO TO 500
             END IF
          ELSE IF ( KEYWRD .EQ. 'AZIMUTH' ) THEN
             READ( HEADER(HPTR+10:), *, IOSTAT=STATUS ) RTEMP
             IF ( STATUS .NE. 0 ) THEN
-               WRITE( *, * ) ' An item value is invalid.'
+               WRITE( *, * ) ' AZIMUTH item value is invalid.'
                IFAIL = 18
                GO TO 500
             END IF
@@ -406,7 +424,7 @@
          ELSE IF ( KEYWRD .EQ. 'ELEVATIO') THEN
             READ( HEADER(HPTR+10:), *, IOSTAT=STATUS ) RTEMP
             IF ( STATUS .NE. 0 ) THEN
-               WRITE( *, * ) ' An item value is invalid.'
+               WRITE( *, * ) ' ELEVATIO item value is invalid.'
                IFAIL = 18
                GO TO 500
             END IF
@@ -414,7 +432,7 @@
          ELSE IF ( KEYWRD .EQ. 'OBSTIME' ) THEN
             READ( HEADER(HPTR+10:), *, IOSTAT=STATUS ) RTEMP
             IF ( STATUS .NE. 0 ) THEN
-               WRITE( *, * ) ' An item value is invalid.'
+               WRITE( *, * ) ' OBSTIME item value is invalid.'
                IFAIL = 18
                GO TO 500
             END IF
@@ -422,41 +440,71 @@
          ELSE IF ( KEYWRD .EQ. 'TSYS'    ) THEN
             READ( HEADER(HPTR+10:), *, IOSTAT=STATUS ) RTEMP
             IF ( STATUS .NE. 0 ) THEN
-               WRITE( *, * ) ' An item value is invalid.'
+               WRITE( *, * ) ' TSYS item value is invalid.'
                IFAIL = 18
                GO TO 500
             END IF
             TSYS(1) = RTEMP
-         ELSE IF ( KEYWRD .EQ. 'UT'      ) THEN
+         ELSE IF ( KEYWRD .EQ. 'UT' .AND. .NOT. READUT ) THEN
+*     Only read UT keyword if we have not yet read the UT time
+*     from either the MJD-OBS keyword or via DATE-OBS
             READ( HEADER(HPTR+10:), *, IOSTAT=STATUS ) ITIME(1:8)
             IF ( STATUS .NE. 0 ) THEN
-               WRITE( *, * ) ' An item value is invalid.'
+               WRITE( *, * ) ' UT item value is invalid.'
                IFAIL = 18
                GO TO 500
             END IF
-         ELSE IF ( KEYWRD .EQ. 'DATE-OBS') THEN
-            IDATE(1:2) = HEADER(HPTR+11:HPTR+12)
-            IDATE(3:3) = '-'
-            IDATE(7:7) = '-'
-            IDATE(8:9) = HEADER(HPTR+17:HPTR+18)
-            READ ( HEADER(HPTR+14:HPTR+15), *, IOSTAT=STATUS ) RTEMP
+         ELSE IF (KEYWRD .EQ. 'MJD-OBS') THEN
+            READ( HEADER(HPTR+10:), *, IOSTAT=STATUS ) DTEMP
             IF ( STATUS .NE. 0 ) THEN
-               WRITE( *, * ) ' An item value is invalid.'
+               WRITE( *, * ) ' MJD-OBS item value is invalid.'
                IFAIL = 18
                GO TO 500
             END IF
-            IDATE(4:6) = MONTH(NINT(RTEMP))
+*     Specx stores date and time internally as IDATE and ITIME
+*     strings where IDATE is form DD-MON-YY and ITIME is HH:MM:SS.
+*     Both these can be obtained via MJD-OBS (and should supercede)
+*     the values in UT and DATE-OBS
+            CALL DATTIM_FROM_MJD(DTEMP, IDATE, ITIME, STATUS)
+            IF (STATUS .NE. 0) THEN
+               PRINT *, 'Error calculating date and time from MJD:',
+     :              DTEMP, STATUS
+               IFAIL = 18
+               GO TO 500
+            END IF
+*     Successfully read date and time so set logicals to prevent
+*     UT and DATE-OBS keywords from overriding
+            READDATE = .TRUE.
+            READUT   = .TRUE.
+         ELSE IF ( KEYWRD .EQ. 'DATE-OBS' .AND. .NOT. READDATE) THEN
+*     Only read DATE-OBS if we have not previously read the date
+*     from an MJD-OBS keyword
+            READ ( HEADER(HPTR+10:), *, IOSTAT=STATUS ) OBS_DATE
+            IF ( STATUS .NE. 0 ) THEN
+               WRITE( *, * ), ' DATE-OBS item value is invalid.'
+               IFAIL = 18
+               GO TO 500
+            END IF
+*     Parse new DATE-OBS -- can obtain ITIME and IDATE from this
+*     if we are lucky
+            CALL PARSE_DATE_OBS( OBS_DATE, READUT, IDATE, ITIME, STATUS)
+            IF ( STATUS .NE. 0 ) THEN
+               PRINT *, 'Error parsing DATE-OBS -',OBS_DATE,'-', STATUS
+               IFAIL = 18
+               GO TO 500
+            END IF
+            READDATE = .TRUE.
          ELSE IF ( KEYWRD .EQ. 'LINE'    ) THEN
             READ( HEADER(HPTR+10:), *, IOSTAT=STATUS ) ITITLE(7:16)
             IF ( STATUS .NE. 0 ) THEN
-               WRITE( *, * ) ' An item value is invalid.'
+               WRITE( *, * ) ' LINE item value is invalid.'
                IFAIL = 18
                GO TO 500
             END IF
          ELSE IF ( KEYWRD .EQ. 'OBJECT'  ) THEN
             READ( HEADER(HPTR+10:), *, IOSTAT=STATUS ) ITITLE(17:)
             IF ( STATUS .NE. 0 ) THEN
-               WRITE( *, * ) ' An item value is invalid.'
+               WRITE( *, * ) ' OBJECT item value is invalid.'
                IFAIL = 18
                GO TO 500
             END IF
@@ -544,11 +592,18 @@
       HPTR = 1
       DPTR = 1
 
-*  Apply byte swap to first data record.
+
+*  Ask for Byteswap here now instead of in OPEN-FITS.
+      BYTESWAP = .FALSE.
+       CALL GEN_YESNO( 'Should disk file be byte-reversed?',
+     :   BYTESWAP, BYTESWAP, ISTAT )
+
+*  Apply byte swap to first data record: use local versions of
+*  the GEN_BSWAP and GEN_WBSWAP routine NOT locked to host type.
       IF ( BYTESWAP .AND. BITPIX .EQ. 16 ) THEN
-         CALL GEN_BSWAP( WBUFF, 1440 )
+         CALL BSWAP( WBUFF, 1440 )
       ELSE IF ( BYTESWAP .AND. BITPIX .EQ. 32 ) THEN
-         CALL GEN_WBSWAP( IBUFF, 720 )
+         CALL WBSWAP( IBUFF, 720 )
       END IF
 
 *  If 8-bit data.
@@ -603,7 +658,7 @@
                END IF
                RECNO = RECNO + 1
                HPTR  = 1
-               IF ( BYTESWAP ) CALL GEN_BSWAP( WBUFF, 1440 )
+               IF ( BYTESWAP ) CALL BSWAP( WBUFF, 1440 )
             END IF
 
 *        Process pixel. 16-bit data are taken as signed.
@@ -636,7 +691,7 @@
                END IF
                RECNO = RECNO + 1
                HPTR  = 1
-               IF ( BYTESWAP ) CALL GEN_WBSWAP( IBUFF, 720 )
+               IF ( BYTESWAP ) CALL WBSWAP( IBUFF, 720 )
             END IF
 
 *        Process pixel. 32-bit data are taken as signed.

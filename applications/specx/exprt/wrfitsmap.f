@@ -25,6 +25,9 @@
       INCLUDE  'PLOT2D'         !  Info about required 2D maps
       INCLUDE  'SPECX_FITS'     !  FITS file system parameters
 
+*     External routines
+      DOUBLE PRECISION SPECXJD_TO_MJD
+
 *     standard fits keywords...
 
       INTEGER   BITPIX
@@ -53,7 +56,7 @@
       INTEGER             BLANK
       INTEGER             VELREF
       CHARACTER           LSTSTR*12
-      CHARACTER           OBS_DATE*8
+      CHARACTER           OBS_DATE*24
       CHARACTER           UTSTR*12
       CHARACTER           WRITE_DATE*8
       CHARACTER           LINE*12
@@ -220,7 +223,8 @@
 
       CALL UGETDATE        (WRDATE,        STATUS)
       CALL DATE_CVT        (WRDATE,        WRITE_DATE)
-      CALL DATE_CVT        (IDATE,         OBS_DATE)
+*      CALL DATE_CVT        (IDATE,         OBS_DATE)
+      CALL CVT_TO_DATE_OBS( SPECXJD_TO_MJD(JULIAN_DATE), OBS_DATE)
       CALL HOURS_TO_STRING (UTHRS,         UTSTR)
       CALL HOURS_TO_STRING (SIDEREAL_TIME, LSTSTR)
 
@@ -256,9 +260,9 @@
       IF (VFRAME.EQ.'TELL') VELREF = VELREF + 3
       IF (VFRAME.EQ.'GEO' ) VELREF = VELREF + 4
       IF (VFRAME.EQ.'GEO' .or. VDEF.eq.'REL') THEN
-        TYPE *, '*** specx_wrfitsmap ***'
-        TYPE *, '    non-standard velocity frame/law combination!'
-        TYPE *, '    -- VELREF value may not be recognized; be warned.'
+        PRINT *, '*** specx_wrfitsmap ***'
+        PRINT *, '    non-standard velocity frame/law combination!'
+        PRINT *, '    -- VELREF value may not be recognized; be warned.'
       END IF
 
       IF (VFRAME.eq.'LSR' .and. VDEF.eq.'RAD') THEN
@@ -270,20 +274,20 @@
       ELSE IF (VFRAME.eq.'TELL' .and. VDEF.eq.'RAD') THEN
         VELCODE = 'VOBS'
       ELSE
-        TYPE *, '*** specx_wrfitsmap ***'
-        TYPE *, '    non-standard velocity frame/law combination!'
-        TYPE *, '    -- encoded as FITS keyword VLSR; be warned.'
+        PRINT *, '*** specx_wrfitsmap ***'
+        PRINT *, '    non-standard velocity frame/law combination!'
+        PRINT *, '    -- encoded as FITS keyword VLSR; be warned.'
         VELCODE = 'VLSR'
         NSVEL   = .TRUE.
       END IF
 
-      TYPE *, ' -- specx_wrfitsmap --'
-      TYPE *, '    VFRAME  = ', VFRAME
-      TYPE *, '    VDEF    = ', VDEF
-      TYPE *, '    VELCODE = ', VELCODE
-      TYPE *, '    VELREF  = ', VELREF
-      TYPE *, '    Image frequency = ', imagfreq
-      TYPE *, '    Deltav          = ', deltav
+      PRINT *, ' -- specx_wrfitsmap --'
+      PRINT *, '    VFRAME  = ', VFRAME
+      PRINT *, '    VDEF    = ', VDEF
+      PRINT *, '    VELCODE = ', VELCODE
+      PRINT *, '    VELREF  = ', VELREF
+      PRINT *, '    Image frequency = ', imagfreq
+      PRINT *, '    Deltav          = ', deltav
 
 *     Calibration parameters
 
@@ -294,7 +298,7 @@
 
 *     Miscellaneous
 
-      ORIGIN   = 'VMS Specx V6.7   '
+      ORIGIN   = 'UNIX Specx V6.7   '
       LINE     = '*'
 *     ITITLE was changed to accommodate for subscanno > 999
 *     assume old format if ititle(12) not blank.
@@ -422,13 +426,15 @@
      &                'Forward efficiency ',                 STATUS)
       CALL FIT_WDBLE ('GAINIMAG', GAINIMAG,
      &                'Image sideband gain ratio ',          STATUS)
+      CALL FIT_WDBLE ('MJD-OBS', SPECXJD_TO_MJD(JULIAN_DATE),
+     &     'Modified Julian Date of first observation', STATUS)
 
       CALL FIT_WSTR  ('ORIGIN  ', ORIGIN,
      &                'Originating reduction system ',       STATUS)
       CALL FIT_WSTR  ('DATE-MAP', WRITE_DATE,
      &                'Date FITS file written ',             STATUS)
       CALL FIT_WSTR  ('DATE-OBS', OBS_DATE,
-     &                'Date of observation ',                STATUS)
+     &                'Date of first map observation ',      STATUS)
 
       CALL FIT_WDBLE ('ELEVATIO', EL8,
      &                'Telescope elevation (deg) ',          STATUS)
@@ -452,8 +458,8 @@
 
       ISTAT = IFREEVM (IPTR)
       IF (ISTAT.NE.0) THEN
-        TYPE *, '--- wrfitsmap ---'
-        TYPE *, '    error freeing virtual memory: ', ISTAT
+        PRINT *, '--- wrfitsmap ---'
+        PRINT *, '    error freeing virtual memory: ', ISTAT
       END IF
 
 *     close the image
@@ -467,9 +473,9 @@
 
    99 CONTINUE
 
-      TYPE *, 'Error writing MAP to FITS file: status = ', STATUS
+      PRINT *, 'Error writing MAP to FITS file: status = ', STATUS
       CALL FIT_ERROR (STATUS, ERROR)
-      TYPE *, ERROR
+      PRINT *, ERROR
 
       RETURN
       END

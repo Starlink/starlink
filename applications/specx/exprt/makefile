@@ -38,9 +38,10 @@ index_gsd.f open_fits.f rd_gsd_ras.f rdfitsspec.f \
 read_gsd.f sgsdclose.f sgsdlist.f sgsdlocate.f \
 sgsdopen.f sgsdreopen.f sgsdv4data.f sgsdv4header.f \
 sgsdv51data.f sgsdv52data.f sgsdv5data.f \
-sgsdv5header.f wrfitscube.f wrfitsmap.f wrfitsspec.f write_gildas.f 
+sgsdv5header.f wrfitscube.f wrfitsmap.f wrfitsspec.f write_gildas.f
 
-CSOURCES = 
+
+CSOURCES = bswap.c wbswap.c
 
 # These are the external include files
 # They will be deleted by make clean (they are soft links).
