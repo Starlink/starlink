@@ -261,10 +261,10 @@
 *  name, use it on all invocations of the application.
          IF( SIZE( IPAR ) .EQ. 1 ) THEN
             CALL CTG_CATCR( IGRP( IPAR ), 1, CI, STATUS )
-            CALL GRP_GET( IGRP, 1, 1, NAME, STATUS ) 
+            CALL GRP_GET( IGRP( IPAR ), 1, 1, NAME, STATUS ) 
          ELSE
             CALL CTG_CATCR( IGRP( IPAR ), NRUN, CI, STATUS )
-            CALL GRP_GET( IGRP, NRUN, 1, NAME, STATUS ) 
+            CALL GRP_GET( IGRP( IPAR ), NRUN, 1, NAME, STATUS ) 
          END IF
 
 *  Tell the user which catalogue is being used, if required, and if it has not 
