@@ -1,0 +1,53 @@
+## NDF2PGM - Converts an NDF into a PBMPLUS-style PGM-format file.
+
+#+
+#  Name:
+#     NDF2PGM.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     GJP: Grant Privett (STARLINK)
+#     AJP: A.J. Chipperfield (STARLINK)
+#     MJC: Malcolm J. Currie (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     22-NOV-1995 (GJP):
+#        Original version.
+#      5-DEC-1995 (AJC):
+#        Added helplib.
+#     1996 February 12 (MJC):
+#     	 Converted to standard (and more readable) style, and added
+#	 function banner.
+#     {enter_further_changes_here}
+
+#-    
+
+interface NDF2PGM
+
+  helplib        $CONVERT_HELP
+
+  parameter      IN              # The name of the source NDF image to be used.
+     position    1
+     type        'NDF'
+     access      'READ'
+     prompt      'NDF to convert'
+     ppath       'GLOBAL,CURRENT,DEFAULT'
+     vpath       'PROMPT'
+     association '<->GLOBAL.DATA_ARRAY'
+     helpkey     '*'
+  endparameter
+
+  parameter      OUT             # The output PGM file.
+     position    2
+     type        '_CHAR'
+     access      'UPDATE'
+     prompt      'PGM filename'
+     ppath       'CURRENT,DEFAULT'
+     vpath       'PROMPT'
+     helpkey     '*'
+  endparameter
+
+endinterface
