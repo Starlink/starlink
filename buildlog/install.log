@@ -834,7 +834,7 @@ docs_check:
 
 docs:
     [mkdir] Created dir: /apps/cvsbuild/java/source/topcat/build/docs
-     [copy] Copying 46 files to /apps/cvsbuild/java/source/topcat/build/docs
+     [copy] Copying 48 files to /apps/cvsbuild/java/source/topcat/build/docs
      [copy] Copied 1 empty directory to /apps/cvsbuild/java/source/topcat/build/docs
     [mkdir] Created dir: /apps/cvsbuild/java/source/topcat/build/docs/sun253
      [xslt] Processing /apps/cvsbuild/java/source/topcat/build/docs/sun253.xml to /apps/cvsbuild/java/source/topcat/build/docs/sun253/sun253.html
@@ -862,7 +862,7 @@ dist:
     [mkdir] Created dir: /apps/cvsbuild/java/source/topcat/bin
     [mkdir] Created dir: /apps/cvsbuild/java/source/topcat/etc/topcat
      [copy] Copying 1 file to /apps/cvsbuild/java/source/topcat/bin
-     [copy] Copying 114 files to /apps/cvsbuild/java/source/topcat/docs/topcat
+     [copy] Copying 116 files to /apps/cvsbuild/java/source/topcat/docs/topcat
      [copy] Copied 1 empty directory to /apps/cvsbuild/java/source/topcat/docs/topcat
 
 install:
@@ -872,7 +872,7 @@ install:
 [loggedcopy] Copying 5 files to /apps/cvsbuild/starjava/lib
 [loggedcopy] Copying 148 files to /apps/cvsbuild/starjava/docs
 [loggedcopy] Copied 2 empty directories to /apps/cvsbuild/starjava/docs
-[loggedcopy] Copying 44 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 46 files to /apps/cvsbuild/starjava/docs
      [echo] Executing Treeview target: install
 
 prepare:
@@ -1020,4 +1020,4 @@ install:
 [loggedcopy] Copying 152 files to /apps/cvsbuild/starjava/docs
 
 BUILD SUCCESSFUL
-Total time: 7 minutes 2 seconds
+Total time: 7 minutes 6 seconds

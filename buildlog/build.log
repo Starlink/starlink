@@ -375,7 +375,7 @@ build_demo:
 
 build:
     [javac] Compiling 59 source files to /apps/cvsbuild/java/source/topcat/build/classes
-     [copy] Copying 44 files to /apps/cvsbuild/java/source/topcat/build/classes
+     [copy] Copying 46 files to /apps/cvsbuild/java/source/topcat/build/classes
      [copy] Copied 2 empty directories to /apps/cvsbuild/java/source/topcat/build/classes
     [mkdir] Created dir: /apps/cvsbuild/java/source/topcat/lib/topcat
      [copy] Copying 2 files to /apps/cvsbuild/java/source/topcat/lib/topcat
@@ -457,4 +457,4 @@ execute_mk_script:
      [exec] g77: temp/*.o: No such file or directory
 
 BUILD SUCCESSFUL
-Total time: 2 minutes 16 seconds
+Total time: 2 minutes 14 seconds

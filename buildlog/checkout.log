@@ -8917,6 +8917,7 @@ U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/burst.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/colmeta0.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/concat4.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/demo.gif
+U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/false.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/fx2.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/gridoff.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/gridon.gif
@@ -8933,6 +8934,7 @@ U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/spoints5.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/starlinklogo3.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/tablemeta0.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/tc3.gif
+U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/true.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/venn2.gif
 cvs checkout: Updating java/source/topcat/src/resources/uk/ac/starlink/topcat/images/treeview
 cvs checkout: Updating java/source/topcat/src/script
