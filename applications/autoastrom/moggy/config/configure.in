@@ -197,13 +197,35 @@ while test $# -gt 0; do
   shift
 done
 
+dnl   Find which AST libraries we want to use.  The -I and -L specifiers must
+dnl   go at the _beginning_ of the list of libraries, so that the
+dnl   given directory is searched before /star
+AC_ARG_WITH(ast,
+[  --with-ast=path         Give /star-equivalent directory where AST is to be found],
+  if test "$withval" = "yes" -o "$withval" = "no"; then
+    # same as default
+    LIBS="$LIBS `ast_link`"
+  else
+    CPPFLAGS="-I$withval $CPPFLAGS"
+    LIBS="-L$withval `ast_link` $LIBS"
+  fi,
+  LIBS="$LIBS `ast_link`")
+  
+dnl   Following tests need the ast_link collection of libraries to be
+dnl   specified in LIBS.  This will work, because we've make sure that
+dnl   the appropriate -L option in already in LIBS, when we processed
+dnl   --with-starlink above.
+dnl LIBS="$LIBS `ast_link`"
 
 
-dnl   Now that we've found the /star directories, check that ast.h is
-dnl   there.  There was a problem with ast.h which meant it caused the
-dnl   Tru64 C++ compiler to object.  This is certainly fixed by AST
-dnl   1.8-1.  This is more direct than the obvious alternative of
-dnl   testing for the preprocessor constants AST_{MAJOR,MINOR}_VERS.
+
+
+dnl   Now that we've found the /star (or other AST) directories, check
+dnl   that ast.h is there.  There was a problem with ast.h which meant
+dnl   it caused the Tru64 C++ compiler to object (this is certainly
+dnl   fixed by AST 1.8-1).  This is therefore more direct than the
+dnl   obvious alternative of testing for the preprocessor constants
+dnl   AST_{MAJOR,MINOR}_VERS.
 AC_CHECK_HEADER(ast.h)
 AC_MSG_CHECKING(whether your AST headers are usable)
 AC_TRY_COMPILE([extern "C" {
@@ -211,14 +233,17 @@ AC_TRY_COMPILE([extern "C" {
 }],,
   AC_MSG_RESULT(ok),
   AC_MSG_RESULT(not on this platform)
-  AC_MSG_ERROR(consider defining STARLINK to point to a newer distribution))
+  AC_MSG_ERROR([[consider defining STARLINK to point to a newer distribution, or give an alternative AST location using --with-ast]]))
 
-
-dnl   Following tests need the ast_link collection of libraries to be
-dnl   specified in LIBS.  This will work, because we've make sure that
-dnl   the appropriate -L option in already in LIBS, when we processed
-dnl   --with-starlink above.
-LIBS="$LIBS `ast_link`"
+dnl   Check that the $LIBS path we now have does work for linking
+dnl   against the AST function astOK_.  Note that we do provide a
+dnl   non-null action-if-found, here.  The default prepends -last to
+dnl   $LIBS, but we want to ensure that that stays safely behind
+dnl   -Last-dir (there's no difference for Linux ld, for example, but
+dnl   DUX ld has -L options apply only to the -l options which follow them).
+AC_CHECK_LIB(ast, astOK_,
+  AC_DEFINE(HAVE_LIBAST),
+  AC_MSG_ERROR([[consider defining STARLINK to point to a newer distribution, or give an alternative AST location using --with-ast]]))
 
 dnl   Do we have the wcslib glsfwd function?  This might be in
 dnl   ast_wcslib (if that's very old) or in $CATLIBDIR/lib/libcat.a
@@ -228,6 +253,7 @@ dnl   copy, we supply one ourselves in SkyCatHoles.c -- see the
 dnl   discussion of this problem in that file.
 AC_CHECK_FUNCS(glsfwd)
 
+dnl echo LIBS=$LIBS
 dnl echo glsfwd=$ac_cv_func_glsfwd
 
 
