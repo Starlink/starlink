@@ -35,6 +35,8 @@ ast_link command is not in your path." if $astlibs !~ /./;
 
 # Libs requires the location of the Starlink libraries 
 my $libs = "-L$StarConfig{Star_Lib} $astlibs ";
+$libs = "-L/sw/lib $libs" if $^O eq 'darwin';
+
 
 # Write the makefile....
 WriteMakefile(
