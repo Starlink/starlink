@@ -19,3 +19,4 @@ starconf.status
 starconf.status.local
 figaro2
 *.ifc
+version.dat
