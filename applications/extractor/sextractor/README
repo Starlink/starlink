@@ -1,8 +1,15 @@
-September  24, 2001
+May 13, 2003
 
-This is V2.2.2 of SExtractor.
+This is V2.3 of SExtractor.
 SExtractor stands for ``Source Extractor'': a software for making
 catalog of sources from astronomical images.
+Multi-Extension FITS is now supported. Binary output catalogs are also MEFs.
+ASCII output catalogs contain detections from all extensions merged together.
+Use the "EXT_NUMBER" catalog parameter to identify the extension on which a
+given source was detected. Check-images will also be written as MEFs if the
+input image is a MEF.
+- The (main) default config file can be dumped by typing "sex -d". Secondary
+configuration files like default.param are still needed, though.
 
 SExtractor is:
 Copyright (C) 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001 Emmanuel Bertin
@@ -16,9 +23,20 @@ please don't hesitate to send a mail (preferably in english) to the
 official mailing list:
 sextractor@iap.fr
 These questions and answers to them are posted on the Web at:
-http://terapix.iap.fr/sextractor/
+http://terapix.iap.fr/soft/sextractor/
 In any case you can still reach me at bertin@iap.fr. I cannot garantee
 that I will reply immediately, but I will try for sure to provide
 an answer.
+-----------
+Notes:
+- A version "sextractor-2.3.1_lanl" of SExtractor is available on
+SourceForge thanks to Mark Galassi and Dan Starr:
+http://sourceforge.net/projects/sextractor/
+It is a reconditioned version of SExtractor 2.2.2. The LanL and the TERAPIX
+(present one) versions follow two different development branches.
+- Benne Holwerda <holwerda@stsci.edu> has written a SExtractor handbook and a
+GUI which can be found in the doc/ subdirectory or at
+http://www-int.stsci.edu/~holwerda/se.html
+
 
 					Emmanuel Bertin.
