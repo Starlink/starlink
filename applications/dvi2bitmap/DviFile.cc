@@ -20,10 +20,27 @@
 // Static debug switch
 verbosities DviFile::verbosity_ = normal;
 
-DviFile::DviFile (string s, int res, double magmag)
+// Mmm, there's something strangely amiss with the exception handling
+// in this module, or here and in InputByteStream.  
+//
+// Odd things happen when I run the program with a non-existent file
+// as argument.  What should happen is that InputByteStream throws an
+// exception, so DviFile throws an exception, which dvi2bitmap.cc
+// should catch, and so fail gracefully.  If, below, I try
+// to `throw DviError ("DviFile: "+e.problem())', then GCC 2.8.1 (but
+// no other compiler) dumps core shortly afterwards.  In this case,
+// dvi2bitmap appears _not_ to receive any exception from DviFile.
+//
+// I made the problem go away by (a) having the InputByteStreamError
+// handler rethrow a static string, and (b), altering the eof()
+// function to check if dvif_ was non-zero before testing it (which is
+// good anyway).  But this isn't really a fix.
+
+DviFile::DviFile (string& s, int res, double magmag)
     : fileName_(s), pending_hupdate_(0), pending_hhupdate_(0),
       current_font_(0), dvif_(0), resolution_(res), magmag_(magmag),
-      magfactor_(1.0), skipPage_(false), iterOK_(false)
+      magfactor_(1.0), skipPage_(false), iterOK_(false),
+      max_drift_(0)
 {
     PkFont::setResolution(res);
 
@@ -31,12 +48,16 @@ DviFile::DviFile (string s, int res, double magmag)
     {
 	dvif_ = new InputByteStream (fileName_, false, ".dvi");
 	read_postamble();
-	//posStack_ = new PosStateStack(postamble_.s);
+#if HOMEMADE_POSSTATESTACK
+	posStack_ = new PosStateStack(postamble_.s);
+#endif
 	dvif_->seek(0);		// return to beginning
     }
     catch (InputByteStreamError& e)
     {
-	throw DviError ("DviFile: "+e.problem());
+	e.print();
+	//throw DviError ("DviFile: "+e.problem());
+	throw DviError ("DviFile: can't open file");
     }
 }
 
@@ -192,25 +213,34 @@ DviFileEvent *DviFile::getEvent()
 			pageEvent->count[i] = getSIS(4);
 		    pageEvent->previous = getSIS(4);
 		    h_ = v_ = w_ = x_ = y_ = z_ = hh_ = vv_ = 0;
-		    //posStack_->clear();
+#if HOMEMADE_POSSTATESTACK
+		    posStack_->clear();
+#else
 		    while (posStack_.size() > 0)
 			posStack_.pop();
+#endif
 		    gotEvent = pageEvent;
 		}
 		break;
 	      case 140:		// eop
-		//if (!posStack_->empty())
+#if HOMEMADE_POSSTATESTACK
+		if (!posStack_->empty())
+#else
 		if (!posStack_.empty())
+#endif
 		    throw DviBug("EOP: position stack not empty");
 		gotEvent = new DviFilePage(false);
 		break;
 	      case 141:		// push
 		{
-		    //const PosState *ps
-		    //= new PosState(h_,v_,w_,x_,y_,z_,hh_,vv_);
-		    //posStack_->push(ps);
+#if HOMEMADE_POSSTATESTACK
+		    const PosState *ps
+			= new PosState(h_,v_,w_,x_,y_,z_,hh_,vv_);
+		    posStack_->push(ps);
+#else
 		    PosState ps = PosState(h_,v_,w_,x_,y_,z_,hh_,vv_);
 		    posStack_.push(ps);
+#endif
 		    if (verbosity_ > normal)
 			cerr << ">> "<<h_<<','<<v_<<','
 			     <<w_<<','<<x_<<','
@@ -221,6 +251,18 @@ DviFileEvent *DviFile::getEvent()
 		break;
 	      case 142:		// pop
 		{
+#if HOMEMADE_POSSTATESTACK
+		    const PosState *ps = posStack_->pop();
+		    h_ = ps->h;
+		    v_ = ps->v;
+		    hh_ = ps->hh;
+		    vv_ = ps->vv;
+		    w_ = ps->w;
+		    x_ = ps->x;
+		    y_ = ps->y;
+		    z_ = ps->z;
+		    delete ps;
+#else
 		    const PosState& ps = posStack_.top();
 		    posStack_.pop();
 		    h_ = ps.h;
@@ -232,16 +274,7 @@ DviFileEvent *DviFile::getEvent()
 		    hh_ = ps.hh;
 		    vv_ = ps.vv;
 		    //delete ps;
-		    //const PosState *ps = posStack_->pop();
-		    //h_ = ps->h;
-		    //v_ = ps->v;
-		    //hh_ = ps->hh;
-		    //vv_ = ps->vv;
-		    //w_ = ps->w;
-		    //x_ = ps->x;
-		    //y_ = ps->y;
-		    //z_ = ps->z;
-		    //delete ps;
+#endif
 		    if (verbosity_ > normal)
 			cerr << "<< "<<h_<<','<<v_<<','
 			     <<w_<<','<<x_<<','
@@ -519,7 +552,7 @@ DviFileEvent *DviFile::getEvent()
 // routines in InputByteStream
 Byte DviFile::getByte()
 {
-    if (eof() || dvif_ == 0)
+    if (eof())
 	throw DviBug ("Tried to getByte when no file open");
     else
     {
@@ -528,7 +561,7 @@ Byte DviFile::getByte()
 }
 signed int DviFile::getSIU(int n)
 {
-    if (eof() || dvif_ == 0)
+    if (eof())
 	throw DviBug ("Tried to getSIU when no file open");
     else
     {
@@ -537,7 +570,7 @@ signed int DviFile::getSIU(int n)
 }
 signed int DviFile::getSIS(int n)
 {
-    if (eof() || dvif_ == 0)
+    if (eof())
 	throw DviBug ("Tried to getSIS when no file open");
     else
     {
@@ -546,7 +579,7 @@ signed int DviFile::getSIS(int n)
 }
 unsigned int DviFile::getUIU(int n)
 {
-    if (eof() || dvif_ == 0)
+    if (eof())
 	throw DviBug ("Tried to getUIU when no file open");
     else
     {
@@ -555,7 +588,7 @@ unsigned int DviFile::getUIU(int n)
 }
 bool DviFile::eof()
 {
-    return dvif_->eof();
+    return (dvif_ == 0 || dvif_->eof());
 }
 
 // dp is in DVI units, and should be converted to pixel units, with any
@@ -598,8 +631,8 @@ void DviFile::updateH_ (int hup, int hhup)
     if (hhup == 0)
     {
 	if (current_font_ != 0
-	    && (   (hup > 0 && hup < current_font_->wordSpace())
-		|| (hup < 0 && hup > current_font_->backSpace())))
+	    && hup <  current_font_->wordSpace()
+	    && hup > -current_font_->backSpace())
 	    hh_ += pixel_round(hup);
 	else
 	    hh_ = pixel_round(h_ + hup);
@@ -623,7 +656,9 @@ void DviFile::updateH_ (int hup, int hhup)
     if (verbosity_ > normal)
 	cerr << "updateH_ ("
 	     << hup << ',' << hhup << ") -> ("
-	     << h_ << ',' << hh_ << ")\n";
+	     << h_ << ',' << hh_ << ") dist="
+	     << (sdist > 0 ? '+' : '-') << dist
+	     << '\n';
 }
 // Similarly, update the vertical position.  vup is in DVI units.
 void DviFile::updateV_ (int vup)
@@ -653,7 +688,9 @@ void DviFile::updateV_ (int vup)
     if (verbosity_ > normal)
 	cerr << "updateV_ ("
 	     << vup << ") -> ("
-	     << v_ << ',' << vv_ << ',' << y_ << ',' << z_ << ")\n";
+	     << v_ << ',' << vv_ << ',' << y_ << ',' << z_ << ") dist="
+	     << (sdist > 0 ? '+' : '-') << dist
+	     << '\n';
 }
 
 void DviFile::read_postamble()
@@ -814,6 +851,11 @@ void DviFile::read_postamble()
 // values for num and den, this works out as
 // DVI unit = sp = 1/2^16 x 1pt, which we actually knew as soon as we
 // were told that TeX's DVI files have (DVI units=sp).
+//
+// The `device units' in this case are pixels, each of which is
+// (1pt=1/72.27in)/magfactor_ in size.   This matters, as it
+// determines the size of the max_drift_ parameter, as described in
+// the DVI standard, section 2.6.2.
 void DviFile::process_preamble(DviFilePreamble* p)
 {
     preamble_.i = p->dviType;
@@ -828,6 +870,13 @@ void DviFile::process_preamble(DviFilePreamble* p)
     true_dviu_per_pt_ = ((double)p->den/(double)p->num) * (2.54e7/7227e0);
     dviu_per_pt_ = true_dviu_per_pt_ * magfactor_;
     px_per_dviu_ = ((double)p->num/(double)p->den) * (resolution_/254000e0);
+    double device_units = 1.0/72.27/magfactor_;
+    if (device_units > 0.01)
+	max_drift_ = 0;
+    else if (device_units > 0.005)
+	max_drift_ = 1;
+    else
+	max_drift_ = 2;
     if (verbosity_ > normal)
 	cerr << "Preamble: dviu_per_pt_ = " << dviu_per_pt_
 	     << ", px_per_dviu_ = " << px_per_dviu_
@@ -835,6 +884,8 @@ void DviFile::process_preamble(DviFilePreamble* p)
 	     << ", magmag=" << magmag_
 	     << "\nScales: resolution_=" << resolution_
 	     << " magfactor_=" << magfactor_
+	     << " device_units=" << device_units
+	     << "=>max_drift_=" << max_drift_
 	     << '\n';
 }
 
@@ -914,7 +965,7 @@ const
 	comment << "\'\n";
 }
 
-/*
+#if HOMEMADE_POSSTATESTACK
 void DviFile::PosStateStack::push(const PosState *p)
 {
     if (i == size)
@@ -943,7 +994,7 @@ void DviFile::PosStateStack::clear()
 	delete s[--i];
     while (i != 0);
 }
-*/
+#endif
 
 // Font iterator -- probably better implemented as an iterator itself
 PkFont *DviFile::firstFont()

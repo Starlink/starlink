@@ -16,6 +16,10 @@
 #include "PkFont.h"
 #include "verbosity.h"
 
+// I think the GCC 2.8.1 stack implementation may be buggy.  
+// Setting this to 1 switches on a home-made version
+#define HOMEMADE_POSSTATESTACK 0
+
 class DviFileEvent;
 class DviFilePreamble;
 
@@ -23,7 +27,7 @@ class DviFile {
 public:
     // magmag is a factor by which the file's internal
     // magnification should be increased.
-    DviFile (string s, int resolution, double magmag=1.0);
+    DviFile (string& s, int resolution, double magmag=1.0);
     ~DviFile();
     bool eof();
     DviFileEvent *getEvent();
@@ -80,7 +84,7 @@ private:
     // device units are 1pt=1/2.54 mm, so set max_drift_ to 0
     // This might change in future, if the effective device units of the output
     // change (for example if we produce oversize gifs, ready for shrinking).
-    static const int max_drift_ = 0;
+    int max_drift_;
 
     Byte getByte();
     signed int getSIU(int), getSIS(int);
@@ -109,8 +113,7 @@ private:
 	PosState(int h, int v, int w, int x, int y, int z, int hh, int vv)
 	    : h(h),v(v),w(w),x(x),y(y),z(z),hh(hh),vv(vv) { }
     };
-    stack<PosState> posStack_;
-    /*
+#if HOMEMADE_POSSTATESTACK
     class PosStateStack {
 	// It seems wrong to implement a stack rather than using the standard
 	// one, but either I'm doing something wrong the way
@@ -128,7 +131,9 @@ private:
         const PosState **s;
     };
     PosStateStack *posStack_;
-    */
+#else
+    stack<PosState> posStack_;
+#endif
     map<int,PkFont*> fontMap_;
     map<int,PkFont*>::const_iterator fontIter_;
     bool iterOK_;		/* there's some visibility sublety involved 
