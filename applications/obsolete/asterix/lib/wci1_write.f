@@ -127,6 +127,7 @@
       INTEGER			DIMS(2)			! Axis dimensions
       INTEGER			IMJD			! Value of BASE_MJD
       INTEGER			IPSF			! Psf system handle
+      INTEGER			NACT			! Actual # values read
       INTEGER			PIXID			! Pixellation object
       INTEGER			PRJID			! Projection object
       INTEGER			PTR(2)			! Axis data pointers
