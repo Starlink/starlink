@@ -83,7 +83,7 @@
         CALL ADI_ERASE( PID, STATUS )
 
 *    Match?
-        IF ( STR_ABBREV( TAG, ROUT ) ) THEN
+        IF ( STR_ABBREV( ROUT, TAG ) ) THEN
           FOUND = .TRUE.
         ELSE
           ICMP = ICMP + 1
