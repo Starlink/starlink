@@ -46,6 +46,7 @@
 *
 *       adi_defcac	 - Define class cluster size
 *       adi_defcls	 - Define a new class
+*       adi_defcpa	 - Define a command parser
 *	adi_defdes	 - Define a class destructor
 *	adi_deffun	 - Define a function
 *       adi_defgdp	 - Define generic dispatch procedure
@@ -136,6 +137,11 @@
 *       adi_fcreat	 - Create a new file system object
 *       adi_fopen	 - Open existing file system object
 *
+*      Exception handling :
+*
+*	adi_accpt	 - Accept the named exception
+*	adi_raise	 - Raise an exception by name
+*
 *      Miscellaneous :
 *
 *	adi_link	 - Link an identifier to a name group
@@ -176,6 +182,7 @@
 #include "adikrnl.h"
 #include "adiarray.h"
 #include "adimem.h"
+#include "adiexpr.h"
 #include "adipkg.h"
 #include "adisyms.h"
 #include "adifsys.h"
@@ -434,6 +441,18 @@ F77_SUBROUTINE(adifn(defcac))( INTEGER(clsid), INTEGER(number),
   _ERR_REP( "ADI_DEFCAC", Estr__DefClsCac );
   }
 
+F77_SUBROUTINE(adifn(defcpa))( CHARACTER(name), ADIfMethodCB rtn,
+			       INTEGER(id), INTEGER(status) TRAIL(name) )
+  {
+  _chk_stat;                 		/* Standard entry checks */
+
+  adix_defcpa( name, name_length,     	/* Invoke kernel routine */
+	       ADIkrnlNewEproc( ADI__false, (ADICB) rtn, status ),
+	       (ADIobj *) id, status );
+
+  _ERR_REP( "ADI_DEFCPA", Estr__DefCpa );
+  }
+
 F77_SUBROUTINE(adifn(defdes))( INTEGER(clsid), ADIfMethodCB rtn,
 			       INTEGER(status) )
   {
@@ -674,7 +693,7 @@ F77_SUBROUTINE(adifn(print))( INTEGER(id), INTEGER(status) )
   {
   _chk_stat;
 
-  adix_print( ADIcvStdOut, *id, 0, ADI__false, status );
+  adix_print( ADI_G_curint->StdOut, *id, 0, ADI__false, status );
 
   _ERR_REP( "ADI_PRINT", Estr__PriObj );
   }
@@ -2203,6 +2222,22 @@ F77_SUBROUTINE(adifn(fopen))( CHARACTER(fspec), CHARACTER(cls),
 	      mode, mode_length, (ADIobj *) id, status );
 
   _ERR_REP( "ADI_FOPEN", Estr__OpeFilObj );
+  }
+
+/* -------------------------------------------------------------------------
+ * Exception handling
+ * -------------------------------------------------------------------------
+ */
+
+F77_SUBROUTINE(adifn(accpt))( CHARACTER(except), INTEGER(status) TRAIL(except) )
+  {
+  ADIexecAccept( except, except_length, status );
+  }
+
+F77_SUBROUTINE(adifn(raise))( CHARACTER(except), INTEGER(code),
+			CHARACTER(msg), INTEGER(status) TRAIL(except) TRAIL(msg) )
+  {
+  ADIexecRaise( except, except_length, *code, msg, msg_length, status );
   }
 
 /* -------------------------------------------------------------------------

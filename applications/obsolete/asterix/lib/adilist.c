@@ -54,12 +54,12 @@ ADIobj lstx_print( int narg, ADIobj args[], ADIstatus status )
 
     _GET_CARCDR(car,cdr,curp);
 
-    ADIstrmPrintf( stream, "{", status );
+    ADIstrmFprintf( stream, "{", status );
     if ( _null_q(cdr) ? 1 : _list_q(cdr) ) { /* This is a standard list? */
       do {
 	_GET_CARCDR(car,curp,curp);
 
-	ADIstrmPrintf( stream, "%O%s", status, car,
+	ADIstrmFprintf( stream, "%O%s", status, car,
 		_valid_q(curp) ? ", " : "" );
 	}
       while ( _valid_q(curp) );
@@ -67,9 +67,9 @@ ADIobj lstx_print( int narg, ADIobj args[], ADIstatus status )
 
 /* It's a dotted pair */
     else
-      ADIstrmPrintf( stream, "%O.%O", status, car, cdr );
+      ADIstrmFprintf( stream, "%O.%O", status, car, cdr );
 
-    ADIstrmPrintf( stream, "}", status );
+    ADIstrmFprintf( stream, "}", status );
     }
 
   return ADI__nullid;

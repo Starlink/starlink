@@ -92,8 +92,6 @@ char *strx_alloc( int len, ADIstatus status )
   return rval;
   }
 
-#include <stdio.h>
-
 void strx_free( char *ptr, int len, ADIstatus status )
   {
   StrStorePtr   curp = ss_first;
@@ -108,7 +106,11 @@ void strx_free( char *ptr, int len, ADIstatus status )
   while ( curp && ! found ) {
 
 /* Distance from data block start */
+#ifdef __MSDOS__
+    pdif = ((unsigned long) ptr) - ((unsigned long) curp->data);
+#else
     pdif = ptr - curp->data;
+#endif
 
     if ( (pdif>=0) && (pdif<SS_CHARS) )
       found = ADI__true;

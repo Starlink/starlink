@@ -36,7 +36,9 @@ ADIobj  EXC_ControlC = ADI__nullid;
 ADIobj  EXC_Error = ADI__nullid;
 ADIobj  EXC_ExceedMaxRecurse = ADI__nullid;
 ADIobj  EXC_InvalidArg = ADI__nullid;
+ADIobj  EXC_MathErr = ADI__nullid;
 ADIobj  EXC_NoSuchField = ADI__nullid;
+ADIobj  EXC_ReturnValue = ADI__nullid;
 ADIobj  EXC_ScopeBreak = ADI__nullid;
 ADIobj  EXC_SyntaxError = ADI__nullid;
 
@@ -59,6 +61,7 @@ ADIobj  K_Condition = ADI__nullid;
 
 ADIobj  K_DefClass = ADI__nullid;
 ADIobj  K_DefEnum = ADI__nullid;
+ADIobj  K_DefProc = ADI__nullid;
 ADIobj  K_Divide = ADI__nullid;
 ADIobj  K_DivideBy = ADI__nullid;
 ADIobj  K_Dot = ADI__nullid;
@@ -111,6 +114,7 @@ ADIobj  K_Query = ADI__nullid;
 ADIobj  K_Raise = ADI__nullid;
 ADIobj  K_Range = ADI__nullid;
 ADIobj  K_ReRaise = ADI__nullid;
+ADIobj  K_Return = ADI__nullid;
 
 ADIobj  K_Set = ADI__nullid;
 ADIobj  K_SetDelayed = ADI__nullid;
@@ -382,7 +386,7 @@ void ADIstrmFlushDev( ADIdevice *dev, ADIstatus status )
 /*
  * Flush a stream
  */
-void ADIstrmFlush( ADIobj stream, ADIstatus status )
+void ADIstrmFflush( ADIobj stream, ADIstatus status )
   {
   if ( _ok(status) ) {
     ADIstream	*pstr = _strm_data(stream);
@@ -390,6 +394,11 @@ void ADIstrmFlush( ADIobj stream, ADIstatus status )
     if ( pstr->dev->bufsiz )
       ADIstrmFlushDev( pstr->dev, status );
     }
+  }
+
+void ADIstrmFlush( ADIstatus status )
+  {
+  ADIstrmFflush( ADI_G_curint->StdOut, status );
   }
 
 #ifdef __MSDOS__
@@ -1342,7 +1351,21 @@ done:
 }
 
 
-void ADIstrmPrintf( ADIobj stream, char *format, ADIstatus status, ... )
+void ADIstrmPrintf( char *format, ADIstatus status, ... )
+  {
+  va_list	ap;
+
+/* Start variable arg processing */
+  va_start(ap,status);
+
+/* Invoke the internal routine */
+  ADIstrmVprintf( ADI_G_curint->StdOut, format, ap, status );
+
+/* End variable arg list processing */
+  va_end(ap);
+  }
+
+void ADIstrmFprintf( ADIobj stream, char *format, ADIstatus status, ... )
   {
   va_list	ap;
 
@@ -1354,6 +1377,27 @@ void ADIstrmPrintf( ADIobj stream, char *format, ADIstatus status, ... )
 
 /* End variable arg list processing */
   va_end(ap);
+  }
+
+void ADIstrmCBprintf( char *buf, int blen, char *fmt, va_list ap, int *used,
+		      ADIstatus status )
+  {
+  ADIobj	estr;
+
+/* Make users string area a writeable stream */
+  estr = ADIstrmExtendCst( ADIstrmNew( "w", status ), buf, blen, status );
+
+/* Write data to buffer */
+  ADIstrmVprintf( estr, fmt, ap, status );
+
+/* Length of buffer used */
+  *used = _strm_data(estr)->dev->bnc;
+
+/* Null terminate */
+  buf[*used] = 0;
+
+/* Scrub stream object */
+  adix_erase( &estr, 1, status );
   }
 
 
@@ -2440,7 +2484,9 @@ void prsx_init( ADIstatus status )
     CSTR_TENTRY(EXC_Error,"Error"),
     CSTR_TENTRY(EXC_ExceedMaxRecurse,"ExceedMaxRecurse"),
     CSTR_TENTRY(EXC_InvalidArg,"InvalidArg"),
+    CSTR_TENTRY(EXC_MathErr,"MathErr"),
     CSTR_TENTRY(EXC_NoSuchField,"NoSuchField"),
+    CSTR_TENTRY(EXC_ReturnValue,"ReturnValue"),
     CSTR_TENTRY(EXC_ScopeBreak,"ScopeBreak"),
     CSTR_TENTRY(EXC_SyntaxError, "SyntaxError"),
 
@@ -2463,6 +2509,7 @@ void prsx_init( ADIstatus status )
 
     CSTR_TENTRY(K_DefClass,"DefClass"),
     CSTR_TENTRY(K_DefEnum,"DefEnum"),
+    CSTR_TENTRY(K_DefProc,"DefProc"),
     CSTR_TENTRY(K_Divide,"Divide"),
     CSTR_TENTRY(K_DivideBy,"DivideBy"),
     CSTR_TENTRY(K_Dot,"Dot"),
@@ -2515,6 +2562,7 @@ void prsx_init( ADIstatus status )
     CSTR_TENTRY(K_Raise,"Raise"),
     CSTR_TENTRY(K_Range,"Range"),
     CSTR_TENTRY(K_ReRaise,"ReRaise"),
+    CSTR_TENTRY(K_Return,"Return"),
 
     CSTR_TENTRY(K_Set,"Set"),
     CSTR_TENTRY(K_SetDelayed,"SetDelayed"),

@@ -30,6 +30,7 @@ _ESTR(Estr__DefCls,    "defining class")
 _ESTR(Estr__DefClsCac, "defining class cluster size")
 _ESTR(Estr__DefClsDes, "defining class destructor method")
 _ESTR(Estr__DefClsPrt, "defining class print method")
+_ESTR(Estr__DefCpa,    "defining command parse procedure")
 _ESTR(Estr__DefCst,    "defining common string")
 _ESTR(Estr__DefFilRep, "defining file representation")
 _ESTR(Estr__DefFun,    "defining new function")
@@ -201,18 +202,17 @@ void adix_setes( char *ctx, int clen, ADIstatus status )
 void adix_setecs( ADIstatype code, char *ctx, int clen, va_list ap, ADIstatus status )
   {
   char 		buf[200];
-  ADIobj	estr;
+  int		used;
+  ADIstatype	lstat = SAI__OK;
 
 /* Load users contextual message to use tokens before they're cancelled */
   if ( ctx && (clen!=0) ) {
-    estr = ADIstrmExtendCst( ADIstrmNew( "w", status ), buf, 200, status );
-    ADIstrmVprintf( estr, ctx, ap, status );
-    buf[_strm_data(estr)->dev->bnc] = 0;
-    adix_erase( &estr, 1, status );
+
+    ADIstrmCBprintf( buf, 200, ctx, ap, &used, &lstat );
 
     *status = code;
 
-    adix_setes( buf, _CSM, status );
+    adix_setes( buf, used, status );
     }
 
   else {

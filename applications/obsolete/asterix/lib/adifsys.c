@@ -359,7 +359,8 @@ void adix_fopen( char *fspec, int flen, char *cls, int clen,
 
   _chk_init; _chk_stat;			/* Check status on entry */
 
-  _GET_STRING(fspec,flen);		/* Import strings resolving lengths */
+/* Import strings resolving lengths */
+  _GET_NAME(fspec,flen);
   _GET_STRING(cls,clen);
   _GET_STRING(mode,mlen);
 
@@ -367,25 +368,30 @@ void adix_fopen( char *fspec, int flen, char *cls, int clen,
   adic_newv0c_n( fspec, flen, &fid, status );
   adic_newv0c_n( mode, mlen, &mid, status );
 
-  ppos = strstr( fspec, "%" );		/* Look for representation delimiter */
+/* Look for representation delimiter */
+  ppos = strstr( fspec, "%" );
 
-  if ( ppos ) { 			/* User specified a representation? */
-    rlen = flen - (ppos-fspec) - 1;	/* Length of representation code */
+/* User specified a representation? */
+  if ( ppos ) {
 
-    adix_locrep( ppos+1, rlen, &rid,	/* Look for representation */
-		 status );
+/* Length of representation code */
+    rlen = flen - (ppos-fspec) - 1;
+
+/* Look for representation */
+    adix_locrep( ppos+1, rlen, &rid, status );
 
     if ( _null_q(rid) )
-      adic_setecs( ADI__INVARG, "File representation /^REP/ not known",
-                   status );
+      adic_setecs( ADI__INVARG, "File representation /^REP/ not known", status );
     else {
-      adix_locrcb( rid, "OpenRtn",	/* Locate the open routine */
-		   _CSM, &ortn, status );
+
+/* Locate the open routine */
+      adix_locrcb( rid, "OpenRtn", _CSM, &ortn, status );
 
 /* Try to open file */
       adix_fopen_int( ortn, fid, mid, id, status );
 
-      found = _ok(status);		/* Opened ok? */
+/* Opened ok? */
+      found = _ok(status);
       }
     }
   else {
@@ -401,11 +407,12 @@ void adix_fopen( char *fspec, int flen, char *cls, int clen,
       adic_there( rid, "OpenRtn", &there, status );
 
       if ( there ) {
-	adix_locrcb( rid, "OpenRtn",	/* Locate the opening routine */
-		     _CSM, &ortn, status );
 
-	adix_fopen_int( ortn, fid, mid,	/* Try to open file */
-			id, status );
+/* Locate the opening routine */
+	adix_locrcb( rid, "OpenRtn", _CSM, &ortn, status );
+
+/* Try to open file */
+	adix_fopen_int( ortn, fid, mid, id, status );
 
 	if ( _ok(status) )		/* Did it work? */
 	  found = ADI__true;
@@ -429,7 +436,7 @@ void adix_fopen( char *fspec, int flen, char *cls, int clen,
     *status = istat;
 
     if ( ! ppos )
-      adic_setecs( ADI__INVARG, "File cannot be opened", status );
+      adic_setecs( ADI__INVARG, "File %*s cannot be opened", status, flen, fspec );
     }
 
 /* Opened ok? If so, write in details of representation and access mode */

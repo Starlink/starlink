@@ -260,35 +260,35 @@ void ADIaryPrint( ADIobj stream, ADIarray *ary, ADIstatus status )
 
   idata = ary->data;
 
-  if ( ndim > 6 ) ADIstrmPrintf( stream, "[", status );
+  if ( ndim > 6 ) ADIstrmFprintf( stream, "[", status );
   for( o = pdims[6]; o; o-- ) {
-    if ( ndim > 5 ) ADIstrmPrintf( stream, "[", status );
+    if ( ndim > 5 ) ADIstrmFprintf( stream, "[", status );
     for( n = pdims[5]; n; n-- ) {
-      if ( ndim > 4 ) ADIstrmPrintf( stream, "[", status );
+      if ( ndim > 4 ) ADIstrmFprintf( stream, "[", status );
       for( m = pdims[4]; m; m-- ) {
-	if ( ndim > 3 ) ADIstrmPrintf( stream, "[", status );
+	if ( ndim > 3 ) ADIstrmFprintf( stream, "[", status );
 	for( l = pdims[3]; l; l-- ) {
-	  if ( ndim > 2 ) ADIstrmPrintf( stream, "[", status );
+	  if ( ndim > 2 ) ADIstrmFprintf( stream, "[", status );
 	  for( k = pdims[2]; k; k-- ) {
-	    if ( ndim > 1 ) ADIstrmPrintf( stream, "[", status );
+	    if ( ndim > 1 ) ADIstrmFprintf( stream, "[", status );
 	    for( j = pdims[1]; j; j-- ) {
-	      ADIstrmPrintf( stream, "[", status );
+	      ADIstrmFprintf( stream, "[", status );
 	      for( i = pdims[0]; i; i-- ) {
-		ADIstrmPrintf( stream, "%O%s", status, idata, i>1 ? ", " : "]" );
+		ADIstrmFprintf( stream, "%O%s", status, idata, i>1 ? ", " : "]" );
 		idata = ADImemIdAddOff( idata, 1, status );
 		}
 	      }
-	    if ( ndim > 1 ) ADIstrmPrintf( stream, "]", status );
+	    if ( ndim > 1 ) ADIstrmFprintf( stream, "]", status );
 	    }
-	  if ( ndim > 2 ) ADIstrmPrintf( stream, "]", status );
+	  if ( ndim > 2 ) ADIstrmFprintf( stream, "]", status );
 	  }
-	if ( ndim > 3 ) ADIstrmPrintf( stream, "]", status );
+	if ( ndim > 3 ) ADIstrmFprintf( stream, "]", status );
 	}
-      if ( ndim > 4 ) ADIstrmPrintf( stream, "]", status );
+      if ( ndim > 4 ) ADIstrmFprintf( stream, "]", status );
       }
-    if ( ndim > 5 ) ADIstrmPrintf( stream, "]", status );
+    if ( ndim > 5 ) ADIstrmFprintf( stream, "]", status );
     }
-  if ( ndim > 6 ) ADIstrmPrintf( stream, "]", status );
+  if ( ndim > 6 ) ADIstrmFprintf( stream, "]", status );
   }
 
 

@@ -10,7 +10,6 @@
 #include "adistrng.h"                   /* String manipulations */
 #include "adiparse.h"
 #include "adicface.h"                   /* C interface */
-#include "adisyms.h"
 #include "adierror.h"                   /* ADI error handling */
 
 
@@ -19,12 +18,13 @@ ADIobj UT_ALLOC_tbl = ADI__nullid;
 
 void tblx_prnt( int narg, ADIobj args[], ADIstatus status )
   {
-  ADIobj        *heads = _tbl_hash(args[1]);
+  ADItable	*tdata = _tbl_data(args[1]);
+  ADIobj        *heads;
   ADIinteger    i;
 
   _chk_stat;
 
-  for( i=_tbl_htsize(args[1]); i>0; i--, heads++ )
+  for( i = tdata->htsize, heads = (ADIobj *) _DTDAT(tdata->heads); i>0; i--, heads++ )
     if ( ! _null_q(*heads) )
       adix_print( args[0], *heads, 1, ADI__true, status );
   }
@@ -32,13 +32,14 @@ void tblx_prnt( int narg, ADIobj args[], ADIstatus status )
 
 void tblx_init( ADIstatus status )
   {
+  DEFINE_PTYPE_TABLE(ptable)
+    PTYPE_TENTRY("HashTable",   ADItable,    &UT_ALLOC_tbl, tblx_prnt ),
+  END_PTYPE_TABLE;
+
   _chk_stat;                            /* Check status on entry */
 
-  adic_defcls( "HashTable", "", "htsize,head", &UT_ALLOC_tbl, status );
-
-  adic_defcac( UT_ALLOC_tbl, 8, status );
-
-  adic_defprt( UT_ALLOC_tbl, (ADIcMethodCB) tblx_prnt, status );
+/* Install table type */
+  ADIkrnlAddPtypes( ptable, status );
   }
 
 
@@ -52,9 +53,10 @@ ADIobj tblx_iterate( ADIobj table,
   ADIobj	cptr;		/* Used to pass over list */
   ADIobj	robj = ADI__nullid;	/* Returned value */
   ADIobj	rval;		/* Value returned from iterator */
+  ADItable	*tdata = _tbl_data(table);
 
   if ( _ok(status) ) {
-    for ( i=_tbl_htsize(table), chead = _tbl_hash(table); i>0; i--, chead++ )
+    for ( i=tdata->htsize, chead = (ADIobj *) _DTDAT(tdata->heads); i>0; i--, chead++ )
       {
       cptr = *chead;
       while ( cptr ) {
@@ -162,18 +164,13 @@ ADIlogical tblx_scani( ADIobj *head, ADIobj str, ADIobj **sptr,
 
 ADIobj *tblx_lochead( ADIobj *table, char *str, int slen, ADIstatus status )
   {
-  int           hcode;                  /* Table hashing code */
   ADIobj	*head = table;
-  ADIobj	*tdata;
-  char		*data;
-  ADIclassDef	*cdef;
+  ADItable	*tdata;
 
   if ( _tbl_q(*table) )	{		/* Table or a-list? */
-    tdata = _class_data(*table);
+    tdata = _tbl_data(*table);
 
-    hcode = (int) _IVAL(tdata[0]);
-
-    head = (ADIobj *) adix_dtdat(tdata[1]) + strx_hash( str, slen, hcode );
+    head = (ADIobj *) adix_dtdat(tdata->heads) + strx_hash( str, slen, (int) tdata->htsize );
     }
 
   return head;
@@ -182,16 +179,16 @@ ADIobj *tblx_lochead( ADIobj *table, char *str, int slen, ADIstatus status )
 
 ADIobj tblx_new( int size, ADIstatus status )
   {
-  ADIobj	iargs[2];
+  ADItable	tinit;
 
   if ( !_ok(status) )			/* Check status */
     return ADI__nullid;
 
-  adic_newv0i( size, &iargs[0], status );
-  adic_new1( "*", size, &iargs[1], status );
+  tinit.htsize = size;
+  adic_new1( "*", size, &tinit.heads, status );
 
 /* Create new table object */
-  return adix_cls_nallocd( _cdef_data(UT_ALLOC_tbl), 0, 0, iargs, status );
+  return adix_cls_nallocd( _cdef_data(UT_ALLOC_tbl), 0, 0, &tinit, status );
   }
 
 
@@ -357,16 +354,15 @@ void tblx_hstats( ADIobj table, ADIstatus status )
   ADIobj	*baddr;
   ADIinteger	bcount[11] = {0,0,0,0,0,0,0,0,0,0,0};
   ADIinteger	big = 0;
-  ADIinteger	hsize,i;
+  ADIinteger	i;
   ADIinteger	llen;
   ADIinteger	total = 0;
+  ADItable	*tdata = _tbl_data(table);
 
   _chk_init_err; _chk_stat;
 
-  adic_get0i( _tbl_htsize(table), &hsize, status );
-
 /* Loop over buckets, accumulating counts */
-  for( baddr = _tbl_hash(table), i = hsize; i; i--, baddr++ ) {
+  for( baddr = (ADIobj *) _DTDAT(tdata->heads), i = tdata->htsize; i; i--, baddr++ ) {
 
 /* Find length of chain */
     if ( _valid_q(*baddr) )
@@ -385,9 +381,9 @@ void tblx_hstats( ADIobj table, ADIstatus status )
 /* Print results */
   for( i=0; i<11; i++ )
     if ( bcount[i] )
-      ADIstrmPrintf( ADIcvStdOut, "Buckets with %I entries (%I)\n", status, i, bcount[i] );
-  ADIstrmPrintf( ADIcvStdOut, "Buckets with > 10 entries (%I)\n\n", status, big );
-  ADIstrmPrintf( ADIcvStdOut, "Average search depth %f\n", status,
-	((float) total)/((float) (hsize-bcount[0])) );
-  ADIstrmFlush( ADIcvStdOut, status );
+      ADIstrmPrintf( "Buckets with %I entries (%I)\n", status, i, bcount[i] );
+  ADIstrmPrintf( "Buckets with > 10 entries (%I)\n\n", status, big );
+  ADIstrmPrintf( "Average search depth %f\n", status,
+	((float) total)/((float) (tdata->htsize-bcount[0])) );
+  ADIstrmFlush( status );
   }

@@ -46,6 +46,7 @@
 *
 *	adic_defcac	- define class allocation cluster size
 *       adic_defcls	- define a new class
+*       adic_defcpa	- define a new command parser
 *	adic_deffun	- define a function
 * 	adic_defgdp	- define generic dispatch procedure
 *	adic_defgen	- define a generic function
@@ -137,6 +138,11 @@
 *       adi_fcreat       - Create a new file system object
 *       adi_fopen        - Open existing file system object
 *
+*      Exception handling :
+*
+*	adic_accpt	 - Accept an exception with given C name
+*	adic_raise	 - Raise an exception with C name
+*
 *      Miscellaneous :
 *
 *	adic_link	 - Link an identifier to a name group
@@ -169,6 +175,7 @@
 #include "adimem.h"
 #include "adiarray.h"
 #include "adierror.h"
+#include "adiexpr.h"
 #include "adilist.h"
 #include "adistrng.h"
 #include "adipkg.h"
@@ -344,6 +351,18 @@ void adic_defcls( char *name, char *parents,
   ADIdefClass_e( name, _CSM, parents, _CSM, members, _CSM, tid, status );
 
   _ERR_REP( "adic_defcls", Estr__DefCls);
+  }
+
+void adic_defcpa( char *name, ADIcMethodCB rtn,
+		  ADIobj *id, ADIstatus status )
+  {
+  _chk_stat;                 		/* Standard entry checks */
+
+  adix_defcpa( name, _CSM,
+	       ADIkrnlNewEproc( ADI__true, (ADICB) rtn, status ),
+	       id, status );
+
+  _ERR_REP("adic_defcpa",Estr__DefCpa);
   }
 
 void adic_defdes( ADIobj clsid, ADIcMethodCB rtn, ADIstatus status )
@@ -540,7 +559,7 @@ void adic_print( ADIobj id, ADIstatus status )
   {
   _chk_stat;
 
-  adix_print( ADIcvStdOut, id, 0, ADI__false, status );
+  adix_print( ADI_G_curint->StdOut, id, 0, ADI__false, status );
 
   _ERR_REP( "adic_print", Estr__PriObj );
   }
@@ -1644,6 +1663,22 @@ void adic_fopen( char *fspec, char *cls, char *mode, ADIobj *id,
 
   _ERR_REP( "adic_fopen", Estr__OpeFilObj );
   }
+
+/* -------------------------------------------------------------------------
+ * Exception handling
+ * -------------------------------------------------------------------------
+ */
+
+void adic_accpt( char *except, ADIstatus status )
+  {
+  ADIexecAccept( except, _CSM, status );
+  }
+
+void adic_raise( char *except, ADIstatype code, char *msg, ADIstatus status )
+  {
+  ADIexecRaise( except, _CSM, code, msg, _CSM, status );
+  }
+
 
 /* -------------------------------------------------------------------------
  * Miscellaneous

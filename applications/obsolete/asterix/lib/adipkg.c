@@ -8,6 +8,7 @@
 #include <stdarg.h>
 
 #include "asterix.h"                    /* Asterix definitions */
+#include "ems.h"
 
 #include "aditypes.h"
 #include "adimem.h"
@@ -57,38 +58,45 @@ ADIobj adix_prs_cmdlist( ADIobj pstream, char *termlist,
 /* While more statements */
   while ( _ok(status) && more ) {
 
-    state = adix_prs_cmd( pstream, status );
-
-    ADInextToken( pstream, status );
-
-    if ( _valid_q(state) )
-      lstx_inscel( state, &ipoint, status );
-
+/* If statement starts with a symbol, test against terminal list */
     if ( ADIcurrentToken(pstream,status) == TOK__SYM ) {
 
-	tcur = termlist;
-	*choice = 1;
-	while ( more && _ok(status) && (*tcur=='|') )
-	  {
-	  len = 0; tcur++;
-	  while ( (tcur[len] != '|') &&
-		tcur[len] )
-	    len++;
-	  if ( !strncmp(_strm_data(pstream)->ctok.dat,tcur,len) )
-	    more = ADI__false;
-	  else
-	    (*choice)++;
-	  tcur += len;
-	  }
+      tcur = termlist;
+      *choice = 1;
+      while ( more && _ok(status) && (*tcur=='|') ) {
+	len = 0; tcur++;
+	while ( (tcur[len] != '|') && tcur[len] )
+	  len++;
+
+	if ( !strncmp(_strm_data(pstream)->ctok.dat,tcur,len) )
+	  more = ADI__false;
+	else
+	  (*choice)++;
+
+	tcur += len;
 	}
+      }
+
+    if ( more ) {
+      state = adix_prs_cmd( pstream, status );
+
+      ADInextToken( pstream, status );
+
+      if ( _valid_q(state) )
+	lstx_inscel( state, &ipoint, status );
+      }
     }
+
+/* Use the null list to represent the null statement list */
+  if ( _null_q(robj) )
+    robj = adix_clone( ADIcvNulCons, status );
 
   return robj;
   }
 
-ADIobj adix_prs_break( ADIobj pstream, ADIstatus status )
+ADIobj adix_prs_break( int narg, ADIobj args[], ADIstatus status )
   {
-  _chk_stat_ret(ADI__nullid);
+  ADIobj	pstream = args[0];
 
 /* Skip the BREAK keyword */
   ADInextToken( pstream, status );
@@ -100,8 +108,10 @@ ADIobj adix_prs_break( ADIobj pstream, ADIstatus status )
   }
 
 
-ADIobj adix_prs_defcls( ADIobj pstream, ADIstatus status )
+ADIobj adix_prs_defclass( int narg, ADIobj args[], ADIstatus status )
   {
+  ADIobj	pstream = args[0];
+  ADIlogical	matchend = ADI__false;
   int		oflags;			/* Old stream flags */
 
   ADIobj	cargs[3] = {ADI__nullid, ADI__nullid, ADI__nullid};
@@ -124,32 +134,69 @@ ADIobj adix_prs_defcls( ADIobj pstream, ADIstatus status )
   if ( ADIifMatchToken( pstream, TOK__LBRACE, status ) ) {
     ADIparseClassMembers( pstream, cargs+2, status );
 
-    if ( ADIcurrentToken(pstream,status) == TOK__RBRACE ) {
-
-/* Restore stream flags */
-      ADIputStreamAttrs( pstream, oflags, status );
-
-      ADInextToken( pstream, status );
-      }
+    if ( ADIcurrentToken(pstream,status) == TOK__RBRACE )
+      matchend = ADI__true;
     else {
       adic_setecs( ADI__INVARG, "Closing brace expected", status );
       }
     }
 
+/* Restore stream flags */
+  ADIputStreamAttrs( pstream, oflags, status );
+
+/* Match end token */
+  if ( matchend )
+    ADInextToken( pstream, status );
+
 /* Define class, ignoring returned identifier */
   ADIdefClass_i( 3, cargs, status );
+
   return ADI__nullid;
   }
 
 
-ADIobj adix_prs_dowhile( ADIobj pstream, ADIstatus status )
+ADIobj adix_prs_defproc( int narg, ADIobj args[], ADIstatus status )
   {
+  ADIobj	pstream = args[0];
+  ADIobj	actions;
+  int		choice;
+  ADIobj	defn;
+  ADIobj	robj = ADI__nullid;
+
+/* Skip the DEFPROC keyword */
+  ADInextToken( pstream, status );
+
+/* Get the definition expression */
+  defn = ADIparseExpInt( pstream, 1, status );
+
+/* Check it */
+  if ( _ok(status) ) {
+    if ( ! _etn_q(defn) ) {
+      adic_setecs( ADI__SYNTAX, "Invalid procedure definition", status );
+      }
+    else {
+      actions = adix_prs_cmdlist( pstream, "|endproc", &choice, status );
+
+      ADInextToken( pstream, status );
+
+      robj = ADIetnNew( adix_clone( K_DefProc, status ),
+		     lstx_new2( defn, actions, status ),
+		     status );
+      }
+    }
+
+/* Create the expression node */
+  return robj;
+  }
+
+
+ADIobj adix_prs_dowhile( int narg, ADIobj args[], ADIstatus status )
+  {
+  ADIobj	pstream = args[0];
   int           choice;
   ADIobj        robj;                   /* Returned object */
   ADIobj        action;                 /* Action procedure */
   ADIobj        test;                   /* The WHILE test expression */
-
-  _chk_stat_ret(ADI__nullid);
 
 /* Skip the DO keyword */
   ADInextToken( pstream, status );
@@ -174,8 +221,9 @@ ADIobj adix_prs_dowhile( ADIobj pstream, ADIstatus status )
   }
 
 
-ADIobj adix_prs_global( ADIobj pstream, ADIstatus status )
+ADIobj adix_prs_global( int narg, ADIobj args[], ADIstatus status )
   {
+  ADIobj	pstream = args[0];
   ADIobj	cargs[3] = {ADI__nullid, ADI__nullid, ADI__nullid};
   ADIobj	lcell;
   ADIobj	rlist = ADI__nullid;
@@ -220,17 +268,15 @@ ADIobj adix_prs_global( ADIobj pstream, ADIstatus status )
   }
 
 
-ADIobj adix_prs_if( ADIobj pstream, ADIstatus status )
+ADIobj adix_prs_if( int narg, ADIobj args[], ADIstatus status )
   {
+  ADIobj	pstream = args[0];
   int           choice;                 /* Keyword choice */
   ADIlogical	first = ADI__true;	/* First time through complex loop? */
   ADIlogical    more = ADI__true;       /* More ELSE clauses */
   ADIobj        robj = ADI__nullid;     /* Returned object */
   ADIobj        action;                 /* Action procedure */
   ADIobj	*ipoint = &robj;	/* List insertion point */
-
-/* Check inherited status on entry */
-  _chk_stat_ret(ADI__nullid);
 
   ADInextToken( pstream, status );
 
@@ -320,29 +366,186 @@ ADIobj adix_prs_if( ADIobj pstream, ADIstatus status )
   }
 
 
-ADIobj adix_prs_print( ADIobj pstream, ADIstatus status )
+ADIobj adix_prs_print( int narg, ADIobj args[], ADIstatus status )
   {
-  ADIobj	args = ADI__nullid;
+  ADIobj	pstream = args[0];
+  ADIobj	pargs = ADI__nullid;
 
 /* Skip the command name */
   ADInextToken( pstream, status );
 
 /* Gather arguments - separated by commas */
-  args = ADIparseComDelList( pstream, TOK__END, ADI__false, status );
+  pargs = ADIparseComDelList( pstream, TOK__END, ADI__false, status );
 
 /* Return expression */
-  return ADIetnNew( adix_clone( K_Print, status ), args, status );
+  return ADIetnNew( adix_clone( K_Print, status ), pargs, status );
   }
 
 
-ADIobj adix_prs_while( ADIobj pstream, ADIstatus status )
+ADIobj adix_prs_raise( int narg, ADIobj args[], ADIstatus status )
   {
-  int           choice;
-  ADIobj        robj = ADI__nullid;            /* Returned object */
-  ADIobj        action;                 /* Action procedure */
-  ADIobj     test;                   /* The WHILE test expression */
+  ADIobj	exname, exdata = ADI__nullid;
+  ADIobj	pstream = args[0];
 
-  _chk_stat_ret(ADI__nullid);
+/* Skip the RAISE keyword */
+  ADInextToken( pstream, status );
+
+/* Get exception name */
+  if ( ADIcurrentToken(pstream,status) == TOK__SYM ) {
+    exname = prsx_symname( pstream, status );
+
+    ADInextToken( pstream, status );
+
+/* Optional data */
+    if ( ADIcurrentToken(pstream,status) == TOK__CONST )
+      exdata = prsx_cvalue( pstream, status );
+    }
+  else
+    adic_setecs( ADI__SYNTAX, "Exception name expected", status );
+
+/* Create the expression node */
+  return ADIetnNew( adix_clone( K_Raise, status ),
+		    _null_q(exdata) ?
+		       lstx_cell( exname, ADI__nullid, status ) :
+		       lstx_new2( exname, exdata, status ),
+		    status );
+  }
+
+
+ADIobj adix_prs_return( int narg, ADIobj args[], ADIstatus status )
+  {
+  ADIobj	pstream = args[0];
+  ADIobj	defn;
+
+/* Skip the RETURN keyword */
+  ADInextToken( pstream, status );
+
+/* Get the return expression */
+  defn = ADIparseExpInt( pstream, 1, status );
+
+  return ADIetnNew( adix_clone( K_Return, status ),
+		    lstx_cell( defn, ADI__nullid, status ),
+		    status );
+  }
+
+
+ADIobj adix_prs_try( int narg, ADIobj args[], ADIstatus status )
+  {
+  ADIobj	pstream = args[0];
+  int           choice;                 /* Keyword choice */
+  ADIlogical	first = ADI__true;	/* First time through complex loop? */
+  ADIlogical    more = ADI__true;       /* More ELSE clauses */
+  ADIobj        robj = ADI__nullid;     /* Returned object */
+  ADIobj        action;                 /* Action procedure */
+  ADIobj	*ipoint = &robj;	/* List insertion point */
+
+/* Skip the TRY keyword */
+  ADInextToken( pstream, status );
+
+/* End of line with TRY on it */
+  ADImatchToken( pstream, TOK__END, status );
+
+/* Get actions which might trigger exceptions */
+  action = adix_prs_cmdlist( pstream, "|catch|finally|endtry", &choice, status );
+  lstx_inscel( action, &ipoint, status );
+
+  /* While more clauses*/
+  do {
+
+/* Command list */
+    action = adix_prs_cmdlist( pstream, "|catch|finally|endtry", &choice, status );
+
+    }
+  while ( more && _ok(status) );
+
+/* There are 2 forms of 'if' statement. The simple form is simply
+ *
+ *	if ( expr ) statement
+ *
+ * which is trapped here on the presence of the 'then' keyword.
+ */
+  if ( ADIisTokenCstring( pstream, "then", status ) ) {
+
+/* While more if..else if..endif clauses */
+    while ( _ok(status) && more ) {
+
+/* Get the conditional expression unless the first time through */
+      if ( first )
+	first = ADI__false;
+      else {
+	ADImatchToken( pstream, TOK__LPAREN, status );
+	lstx_inscel( ADIparseExpInt( pstream, 1, status ), &ipoint, status );
+	ADImatchToken( pstream, TOK__RPAREN, status );
+	}
+
+/* Skip the 'then' token if present */
+      if ( ADIisTokenCstring( pstream, "then", status ) ) {
+	ADInextToken( pstream, status );
+	ADImatchToken( pstream, TOK__END, status );
+	}
+      else
+	adic_setecs( ADI__SYNTAX, "THEN keyword expected", status );
+
+/* Append truth action list */
+      lstx_inscel( adix_prs_cmdlist( pstream, "|else|endif", &choice, status ),
+		   &ipoint, status );
+
+      if ( _ok(status) ) {
+
+/* Match the ELSE or ENDIF */
+	ADInextToken( pstream, status );
+
+/* The keyword was ELSE */
+	if ( choice == 1 ) {
+	  if ( ADIcurrentToken(pstream,status) == TOK__SYM ) {
+
+	    if ( ADIisTokenCstring( pstream, "if", status ) )
+	      ADInextToken( pstream, status );
+	    else
+	      adic_setecs( ADI__SYNTAX, "Illegal token - can only be IF () THEN or end of line at this point", status );
+	    }
+	  else {
+
+/* Terminal ELSE clause */
+	    ADImatchToken( pstream, TOK__END, status );
+
+	    lstx_inscel( adix_prs_cmdlist( pstream, "|endif", &choice, status ),
+			 &ipoint, status );
+
+/* Match the "endif" */
+	    ADInextToken( pstream, status );
+
+	    more = ADI__false;
+	    }
+	  }
+
+/* The keyword was ENDIF. Flag end of loop */
+	else
+	  more = ADI__false;
+	}
+      }
+    }
+  else {
+
+/* Parse a single statement, and put into the action list */
+    action = lstx_cell( adix_prs_cmd( pstream, status ), ADI__nullid, status );
+
+/* Add action list to output args */
+    lstx_inscel( action, &ipoint, status );
+    }
+
+/* Return the expression tree */
+  return ADIetnNew( adix_clone( K_Try, status ), robj, status );
+  }
+
+
+ADIobj adix_prs_while( int narg, ADIobj args[], ADIstatus status )
+  {
+  ADIobj	pstream = args[0];
+  int           choice;
+  ADIobj        robj = ADI__nullid;     /* Returned object */
+  ADIobj        action;                 /* Action procedure */
+  ADIobj     	test;                   /* The WHILE test expression */
 
 /* Skip the command name */
   ADInextToken( pstream, status );
@@ -375,25 +578,26 @@ ADIobj adix_prs_while( ADIobj pstream, ADIstatus status )
  */
 ADIobj adix_prs_cmd( ADIobj pstream, ADIstatus status )
   {
+  ADIobj	cbind;
   ADItokenType	ctok;
+  ADIobj	name;
   ADIobj	rval = ADI__nullid;
 
+/* IF command starts with a symbol, look for a command binding */
   if ( ADIcurrentToken(pstream,status) == TOK__SYM ) {
-    if ( ADIisTokenCstring( pstream, "defclass", status ) ) {
-      rval = adix_prs_defcls( pstream, status );
+
+    name = prsx_symname( pstream, status );
+
+    cbind = ADIsymFind( name, ADI__true, ADI__command_sb, status );
+
+/* Located a command symbol? */
+    if ( _valid_q(cbind) ) {
+
+/* Invoke parser procedure with stream as argument */
+      rval = adix_exemth( ADI__nullid, _mthd_exec(_sbind_defn(cbind)),
+		1, &pstream, status );
       }
-    else if ( ADIisTokenCstring( pstream, "if", status ) )
-      rval = adix_prs_if( pstream, status );
-    else if ( ADIisTokenCstring( pstream, "do", status ) )
-      rval = adix_prs_dowhile( pstream, status );
-    else if ( ADIisTokenCstring( pstream, "while", status ) )
-      rval = adix_prs_while( pstream, status );
-    else if ( ADIisTokenCstring( pstream, "break", status ) )
-      rval = adix_prs_break( pstream, status );
-    else if ( ADIisTokenCstring( pstream, "print", status ) )
-      rval = adix_prs_print( pstream, status );
-    else if ( ADIisTokenCstring( pstream, "global", status ) )
-      rval = adix_prs_global( pstream, status );
+
     else
       rval = ADIparseExpInt( pstream, 1, status );
     }
@@ -421,8 +625,6 @@ ADIobj adix_prs_cmd( ADIobj pstream, ADIstatus status )
   return rval;
   }
 
-extern ADIlogical showdes;
-
 /*
  *  Parse and execute commands appearing on an input stream, sending output
  *  to the output stream if specified
@@ -439,16 +641,27 @@ void ADIcmdExec( ADIobj istream, ADIobj ostream, ADIstatus status )
     cmd = adix_prs_cmd( istream, status );
     if ( _valid_q(cmd) ) {
       res = ADIexprEval( cmd, ADI__true, status );
-/*      showdes=ADI__true; */
-      adic_erase( &cmd, status );
-      if ( _valid_q(res) ) {
+      if ( _valid_q(ADI_G_curint->exec.name) ) {
+	adic_setecs( ADI_G_curint->exec.code, "Break on unhandled exception %S", status,
+		ADI_G_curint->exec.name );
+	if ( _valid_q(ADI_G_curint->exec.errtext) ) {
+	  adic_setecs( ADI_G_curint->exec.code, "%O", status,
+			 ADI_G_curint->exec.errtext );
+	  }
+	ADIexecAcceptI( ADI_G_curint->exec.name, status );
+	ems_annul_c( status ); *status = SAI__OK;
+	}
+      else if ( _valid_q(res) ) {
 	if ( _valid_q(ostream) ) {
 	  adix_print( ostream, res, 0, 1, status );
-	  ADIstrmPrintf( ostream, "\n", status );
-	  ADIstrmFlush( ostream, status );
+	  ADIstrmFprintf( ostream, "\n", status );
+	  ADIstrmFflush( ostream, status );
 	  }
 	adic_erase( &res, status );
 	}
+
+/* Destroy the command */
+      adic_erase( &cmd, status );
       }
     }
   while ( _ok(status) && (ADIcurrentToken(istream,status) != TOK__NOTATOK) );
@@ -510,7 +723,7 @@ void ADIpkgRequire( char *name, int nlen, ADIstatus status )
     pstream = ADIstrmNew( "r", status );
     ADIstrmExtendFile( pstream, fp, status );
 
-    ADIcmdExec( pstream, ADIcvStdOut, status );
+    ADIcmdExec( pstream, ADI_G_curint->StdOut, status );
 
 /* Close stream and file */
     adic_erase( &pstream, status );
@@ -519,4 +732,24 @@ void ADIpkgRequire( char *name, int nlen, ADIstatus status )
   else
     adic_setecs( ADI__INVARG, "Package /%*s/ not found", status,
 	nlen, name );
+  }
+
+
+void ADIpkgInit( ADIstatus status )
+  {
+  DEFINE_CMDPAR_TABLE(ctable)
+    CMDPAR_TENTRY( "break",	adix_prs_break ),
+    CMDPAR_TENTRY( "defclass",	adix_prs_defclass ),
+    CMDPAR_TENTRY( "defproc",	adix_prs_defproc ),
+    CMDPAR_TENTRY( "do",	adix_prs_dowhile ),
+    CMDPAR_TENTRY( "global",	adix_prs_global ),
+    CMDPAR_TENTRY( "if",	adix_prs_if ),
+    CMDPAR_TENTRY( "print",	adix_prs_print ),
+    CMDPAR_TENTRY( "raise",	adix_prs_raise ),
+    CMDPAR_TENTRY( "return",	adix_prs_return ),
+    CMDPAR_TENTRY( "try",	adix_prs_try ),
+    CMDPAR_TENTRY( "while",	adix_prs_while ),
+  END_CMDPAR_TABLE;
+
+  ADIkrnlAddCmdPars( ctable, status );
   }
