@@ -143,7 +143,7 @@ F77_SUBROUTINE(util_getcwd)( CHARACTER(pathnm), INTEGER(status) TRAIL(pathnm))
 #else
 
 /* Get working directory */
-  ptest = getcwd( (char *)0, pathnm_length + 1 );
+  ptest = (char *) getcwd( (char *)0, pathnm_length + 1 );
 
 /* Will we have to truncate the text? */
   if ( ! ptest ) {
