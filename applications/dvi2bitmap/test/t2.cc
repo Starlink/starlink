@@ -9,14 +9,15 @@
 #include <stdlib.h>
 #endif
 
+#include <string>
+
 #if HAVE_STD_NAMESPACE
 using std::cerr;
 using std::cout;
 using std::exit;
 using std::endl;
+using std::string;
 #endif
-
-#include <string>
 
 #include "PkFont.h"
 
