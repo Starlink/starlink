@@ -59,6 +59,9 @@
 *  History:
 *     $Id$
 *     $Log$
+*     Revision 1.13  1997/03/31 21:18:29  timj
+*     Use PACKAGE and TSKNAME.
+*
 *     Revision 1.12  1997/01/17 00:32:36  timj
 *     Spell fixes to header.
 *
@@ -116,6 +119,7 @@ c
       INCLUDE 'PRM_PAR'          ! VAL__ constants
       INCLUDE 'PAR_ERR'          ! PAR_ error codes
       INCLUDE 'DAT_PAR'          ! Data-system constants
+      INCLUDE 'REDS_SYS'         ! SCUBA constants
 
 *     Status:
       INTEGER STATUS
@@ -123,14 +127,14 @@ c
 *     External references:
       INTEGER  CHR_LEN           ! Length of string
       EXTERNAL CHR_LEN
-      BYTE     SCULIB_BITOR      ! Bitwise AND for Quality
-      EXTERNAL SCULIB_BITOR
 
 *     Local constants:
       INTEGER MAXCMP             ! Max number of bolometers in an HDS
       PARAMETER (MAXCMP = 15)
       INTEGER MAXBOLS            ! Max number of bolometers used
       PARAMETER (MAXBOLS = 132)
+      CHARACTER * 10 TSKNAME     ! Name of task
+      PARAMETER (TSKNAME = 'SCUCAT')
 
 *     Local variables:
       BYTE          BADBIT       ! Bad bit mask
@@ -260,7 +264,8 @@ c
 *     Finish with LOC
                CALL DAT_ANNUL(LOC, STATUS)
             ELSE
-               CALL ERR_REP(' ', 'Failed to open file', STATUS)
+               CALL MSG_SETC('TASK',TSKNAME)
+               CALL ERR_REP(' ', '^TASK: Failed to open file', STATUS)
                CALL ERR_ANNUL(STATUS)
             END IF
 
@@ -277,7 +282,8 @@ c
                END DO
 
                CALL MSG_SETC('BOL',BOL_LIST)
-               CALL MSG_OUT(' ','Found data for the following '//
+               CALL MSG_SETC('PKG', PACKAGE)
+               CALL MSG_OUT(' ','^PKG: Found data for the following '//
      :              'bolometers: ^BOL', STATUS)
 
 *     Find out if we already used this one
@@ -354,10 +360,11 @@ c
 *     Number of integrations
                   CALL MSG_SETI('NINT', EL)
                   CALL MSG_SETC('TITLE', TITLE)
+                  CALL MSG_SETC('PKG', PACKAGE)
                   
-                  CALL MSG_OUT(' ','This is a PHOTOM observation of '//
-     :                 '^TITLE. There are ^NINT integrations', STATUS)
-
+                  CALL MSG_OUT(' ','^PKG: This is a PHOTOM '//
+     :                 'observation of ^TITLE. There are ^NINT '//
+     :                 'integrations', STATUS)
                END IF
 
 *     Current index of bolometer in full bolometer list
@@ -462,12 +469,13 @@ c
 
          END DO
       ELSE 
+         CALL MSG_SETC('TASK', TSKNAME)
          IF (STATUS .EQ. SAI__OK) THEN
             STATUS = SAI__ERROR
-            CALL ERR_REP (' ', 'REDS_SCUCAT: there was no '//
+            CALL ERR_REP (' ', '^TASK: there was no '//
      :           'input data', STATUS)
          ELSE
-            CALL ERR_REP(' ','REDS_SCUCAT: No data found', STATUS)
+            CALL ERR_REP(' ','^TASK: No data found', STATUS)
          END IF
 
       END IF
