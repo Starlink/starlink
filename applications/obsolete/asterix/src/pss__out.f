@@ -117,15 +117,15 @@
           SSDS = MU_IMG(:CHR_LEN(MU_IMG))//'_ss'
         END IF
 
-*      Create output
-        CALL ADI_FCREAT( SSDS, ADI__NULLID, SID, STATUS )
-
       ELSE
 
 *      Get name of user's output file
-        CALL USI_TASSOCO( 'OUT', 'SSDS', SID, STATUS )
+        CALL USI_GET0C( 'OUT', SSDS, STATUS )
 
       END IF
+
+*    Create output
+      CALL ADI_FCREAT( SSDS, ADI__NULLID, SID, STATUS )
 
 *    Book-keeping structure
       CALL SSI_CREBOOK( SID, 1, STATUS )

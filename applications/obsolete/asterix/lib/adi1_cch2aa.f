@@ -138,6 +138,7 @@
 
 *    Get HDS array shape and total number of elements
         CALL ADI1_ARYSHP( CLOC, DAT__MXDIM, DIMS, NDIM, ATYPE, STATUS )
+        ATYPE = ATYPE(2:)
 
 *    Map the HDS data
         CALL ADI1_ARYMAP( CLOC, ATYPE, 'READ', MLOC, VPTR, NELM,
