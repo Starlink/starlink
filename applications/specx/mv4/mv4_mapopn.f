@@ -41,7 +41,13 @@
 *     02 Sep 1994 (hme):
 *        Actually, do return the Starlink status. The calling routine
 *        must decide why this one failed.
-*     09 Oct 1995 (timj): Upgrade to map version 4.2
+*     09 Oct 1995 (timj): 
+*        Upgrade to map version 4.2
+*     10 June 2003 (timj):
+*        Add bounds check and store NSPEC and NPTS1 from POSN
+*        for size verification against header. This was added
+*        because some people have maps where NSPEC is not equal
+*        to the number of spectra in the map itself!
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -64,6 +70,10 @@
 *  Status:
       INTEGER IFAIL              ! Global status
 
+*  Constants:
+      INTEGER NUM_POSN_DIMS      ! Expected number of dims for POSN
+      PARAMETER ( NUM_POSN_DIMS = 2 )
+
 *  Local Variables:
       INTEGER K                  ! Temporary integer
       INTEGER STATUS             ! Starlink status
@@ -72,6 +82,8 @@
       INTEGER NPOINTS            ! Number of points in POSN
       REAL MAPVERSION            ! Map version number
       CHARACTER * ( DAT__SZLOC ) TLOC ! Temporary locator
+      INTEGER SPDIM( NUM_POSN_DIMS ) ! Dimensions of POSN
+      INTEGER NSPDIMS            ! Actual number of dimensions
 
       LOGICAL CONTINUE           ! Yes/no
       INTEGER ISTAT              ! Genlib thing
@@ -133,12 +145,27 @@
       CALL NDF_MAP(   POSNDF, 'DATA', '_REAL', 'UPDATE',
      :                POSPTR, NPOINTS, STATUS )
 
+*  Verify the dimensions of the spectral data
+      CALL NDF_DIM( POSNDF, NUM_POSN_DIMS, SPDIM, NSPDIMS, STATUS)
+      IF (NSPDIMS .NE. NUM_POSN_DIMS) THEN
+*  Abort if we do not get the right number of dimensions
+         print *,'Fatal error in map. Number of dimensions is ',
+     :        NSPDIMS, ' and not ', NUM_POSN_DIMS
+         IFAIL = 18
+         RETURN
+      END IF
+
+*  Set NSPEC from here prior to reading the header itself
+*  Ideally the header should already have been read.      
+      NSPEC = SPDIM(2)
+      NPTS1 = SPDIM(1)
+
       CALL DAT_ANNUL( TLOC, STATUS )
 
 * Find out current bounds of map for use when spectra are written to it
 * Find out lower bound just in case it is not equal to 1
 
-      CALL NDF_BOUND( POSNDF, 2, MAPLBND, MAPUBND, K, STATUS )
+      CALL NDF_BOUND( POSNDF, NUM_POSN_DIMS, MAPLBND, MAPUBND, K,STATUS)
 
 
 
