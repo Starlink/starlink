@@ -16,6 +16,10 @@
 #     DOMAIN = string (Given)
 #        The domain in which the ndfset is to be plotted, and in which
 #        the POINTS coordinates will be supplied and returned in.
+#     ERROR = string (Returned)
+#        If returned as a non-empty string, this should give the text
+#        of an error to be presented to the user.  This indicates that
+#        the routine did not complete successfully.
 #     MARKSTYLE = string (Given and Returned)
 #        A string, in the form of comma-separated att=value pairs, 
 #        indicating how markers should be plotted on the image.
@@ -62,6 +66,9 @@
 #  Initialise screen.
       wm withdraw .
 
+#  Initialise the error status variable.
+      set ERROR ""
+
 #  Get the requested NDF object.
       set ndfset [ eval ndfset $NDFSET ]
 
@@ -77,6 +84,8 @@
 
 #  Tinker with cosmetic aspects of the viewer.
       [ .viewer component exit ] configure -balloonstr "Finish adding points"
+      [ .viewer component abort ] configure \
+          -cmd [ code "set ERROR {User aborted GUI}; .viewer deactivate" ]
 
 #  Add a help control.
       catch { unset helplines }
@@ -107,45 +116,50 @@
 #  Wait for the user to indicate that he has finished.
       tkwait variable viewstatus
 
+#  Proceed to pack the results for passing back to the caller if nothing
+#  untoward happened.
+      if { $ERROR == "" } {
+
 #  Retrieve configuration variables which the user may have changed 
 #  interactively.
-      set ZOOM [ .viewer cget -zoom ]
-      set MAXCANV [ .viewer maxcanvas ]
-      regexp {^([0-9]+)x([0-9]+)} [ winfo geometry .viewer ] dummy WINX WINY
-      set PERCLO [ lindex [ .viewer cget -percentiles ] 0 ]
-      set PERCHI [ lindex [ .viewer cget -percentiles ] 1 ]
-      set MARKSTYLE [ .viewer cget -markstyle ]
+         set ZOOM [ .viewer cget -zoom ]
+         set MAXCANV [ .viewer maxcanvas ]
+         regexp {^([0-9]+)x([0-9]+)} [ winfo geometry .viewer ] dummy WINX WINY
+         set PERCLO [ lindex [ .viewer cget -percentiles ] 0 ]
+         set PERCHI [ lindex [ .viewer cget -percentiles ] 1 ]
+         set MARKSTYLE [ .viewer cget -markstyle ]
 
 #  Set the return variable to contain the list of points selected.  If 
 #  If we were displaying the indices then return the list with the indices
 #  as plotted, otherwise return the list with indices starting from unity
 #  and increasing to the number of points plotted.  Log the points to the
 #  user while we're at it.
-      set POINTS {}
-      if { $VERBOSE } { ccdputs -log " " }
-      if { [ llength [ .viewer points ] ] == 0 } {
-         if { $VERBOSE } { ccdputs -log "    No points marked" }
-      } else {
-         if { $VERBOSE } {
-            set frame [ .viewer cget -wcsframe ]
-            set fmt "      %5s   %16s %16s"
-            ccdputs -log "    Points marked (coordinate frame $frame):"
-            ccdputs -log [ format $fmt "Index" \
-                                       [ $ndfset frameatt Symbol(1) $frame ] \
-                                       [ $ndfset frameatt Symbol(2) $frame ] ]
-         }
-         set i 0
-         foreach point [ .viewer points ] {
-            set i [ lindex $point 0 ]
-            set x [ lindex $point 1 ]
-            set y [ lindex $point 2 ]
-            lappend POINTS [ list $i $x $y ]
+         set POINTS {}
+         if { $VERBOSE } { ccdputs -log " " }
+         if { [ llength [ .viewer points ] ] == 0 } {
+            if { $VERBOSE } { ccdputs -log "    No points marked" }
+         } else {
             if { $VERBOSE } {
-               set fpos [ lindex [ $ndfset wcstran -format $DOMAIN $frame \
+               set frame [ .viewer cget -wcsframe ]
+               set fmt "      %5s   %16s %16s"
+               ccdputs -log "    Points marked (coordinate frame $frame):"
+               ccdputs -log [ format $fmt "Index" \
+                                     [ $ndfset frameatt Symbol(1) $frame ] \
+                                     [ $ndfset frameatt Symbol(2) $frame ] ]
+            }
+            set i 0
+            foreach point [ .viewer points ] {
+               set i [ lindex $point 0 ]
+               set x [ lindex $point 1 ]
+               set y [ lindex $point 2 ]
+               lappend POINTS [ list $i $x $y ]
+               if { $VERBOSE } {
+                  set fpos [ lindex [ $ndfset wcstran -format $DOMAIN $frame \
                                                    [ list $x $y ] ] 0 ]
-               set fx [ lindex $fpos 0 ]
-               set fy [ lindex $fpos 1 ]
-               ccdputs -log [ format $fmt $i $fx $fy ]
+                  set fx [ lindex $fpos 0 ]
+                  set fy [ lindex $fpos 1 ]
+                  ccdputs -log [ format $fmt $i $fx $fy ]
+               }
             }
          }
       }

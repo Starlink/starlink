@@ -14,14 +14,14 @@
 
 
    F77_SUBROUTINE(ccd1_tcurs)( CHARACTER_ARRAY(ndfnms), INTEGER(nndf), 
-                               CHARACTER(sname),
-                               CHARACTER(domain), INTEGER(maxpos), 
+                               CHARACTER(sname), CHARACTER(domain), 
+                               INTEGER_ARRAY(idi), DOUBLE_ARRAY(xipos), 
+                               DOUBLE_ARRAY(yipos), INTEGER(nipos), 
                                DOUBLE_ARRAY(percnt), DOUBLE(zoom), 
                                INTEGER(maxcanv), INTEGER(windim),
                                CHARACTER(mstyle), LOGICAL(verbos),
-                               INTEGER_ARRAY(id), DOUBLE_ARRAY(xpos), 
-                               DOUBLE_ARRAY(ypos), INTEGER(npos), 
-                               INTEGER(status)
+                               POINTER(ipio), POINTER(ipxo), POINTER(ipyo),
+                               INTEGER(nopos), INTEGER(status)
                                TRAIL(ndfnms) TRAIL(sname) TRAIL(domain) 
                                TRAIL(mstyle) ) {
 /*
@@ -36,22 +36,18 @@
 *     ANSI C.
 
 *  Invocation:
-*     CALL CCD1_TCURS( NDFNMS, NNDF, SNAME, DOMAIN, MAXPOS, PERCNT,
-*                      ZOOM, MAXCANV, WINDIM, MSTYLE, VERBOS, YPOS,
-*                      NPOS, STATUS )
+*     CALL CCD1_TCURS( NDFNMS, NNDF, SNAME, DOMAIN, IDI, XIPOS, YIPOS,
+*                      NIPOS, PERCNT, ZOOM, MAXCANV, WINDIM, MSTYLE,
+*                      VERBOS, IPIO, IPXO, IPYO, NOPOS, STATUS )
 
 *  Description:
 *     This routine calls a Tcl script which displays an NDF or Set
 *     of NDFs in a window and allows the user to select points on it
 *     using an intuitive graphical interface.  It returns a list of
 *     the selected points to the calling routine.  If the list of
-*     selected points is not empty on entry (if NPOS is not zero)
+*     selected points is not empty on entry (if NIPOS is not zero)
 *     then the list passed in to the routine will be used as a 
 *     starting point.
-*
-*     If the user attempts to select more positions than MAXPOS, the
-*     GUI part of the application will not allow it, and will force an
-*     early exit.
 
 *  Arguments:
 *     NDFNMS( * ) = CHARACTER * ( * ) (Given)
@@ -65,8 +61,17 @@
 *     DOMAIN = CHARACTER * ( * ) (Given)
 *        The AST domain in which the coordinates XPOS and YPOS are 
 *        given.
-*     MAXPOS = INTEGER (Given)
-*        The size of the XPOS and YPOS arrays.
+*     IDI( * ) = INTEGER (Given)
+*        The index identifiers for the initial list of positions.
+*     XIPOS( * ) = DOUBLE PRECISION (Given)
+*        X coordinates of the initial list of positions, in DOMAIN 
+*        coordinates.
+*     YIPOS( * ) = DOUBLE PRECISION (Given)
+*        Y coordinates of the initial list of positions, in DOMAIN
+*        coordinates.
+*     NIPOS = INTEGER (Given)
+*        Number of positions in the initial list (size of IDI, XIPOS, 
+*        YIPOS).
 *     PERCNT( 2 ) = DOUBLE PRECISION (Given and Returned)
 *        Lower and higher percentiles to use in displaying the images.
 *        They should satisfy 0 <= PERCNT( 0 ) <= PERCNT( 1 ) <= 100.
@@ -83,16 +88,24 @@
 *     VERBOS = LOGICAL (Given)
 *        If true, then all the postions will be written to the user 
 *        at the end.
-*     ID( MAXPOS ) = INTEGER (Given and Returned)
-*        The index idenfiers for the positions selected.
-*     XPOS( MAXPOS ) = DOUBLE PRECISION (Given and Returned)
-*        X coordinates of the positions selected, in DOMAIN coordinates.
-*     YPOS( MAXPOS ) = DOUBLE PRECISION (Given and Returned)
-*        Y coordinates of the positions selected, in DOMAIN coordinates.
-*     NPOS = INTEGER (Given and Returned)
-*        The number of X,Y positions selected.
+*     IPIO = INTEGER (Returned)
+*        Pointer to the index idenfiers for the positions selected.
+*     IPXO = DOUBLE PRECISION (Returned)
+*        Pointer to the X coordinates of the positions selected, in 
+*        DOMAIN coordinates.
+*     IPYO = DOUBLE PRECISION (Returned)
+*        Pointer to the Y coordinates of the positions selected, in 
+*        DOMAIN coordinates.
+*     NOPOS = INTEGER (Returned)
+*        The number of X,Y positions selected (size of the arrays 
+*        pointed to by IPIO, IPXO, IPYO).
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
+
+*  Notes:
+*     The pointers in the arrays IPIO, IPXO and IPYO are allocated
+*     using CCD1_MALL by this routine, and should be freed by the 
+*     caller using CCD1_MFREE.
 
 *  Copyright:
 *     Copyright (C) 1999 Central Laboratory of the Research Councils
@@ -114,22 +127,31 @@
 *-
 */
 
-/* Arguments. */
+/* Arguments Given. */
       GENPTR_CHARACTER_ARRAY(ndfnms)
       GENPTR_INTEGER(nndf)
       GENPTR_CHARACTER(sname)
       GENPTR_CHARACTER(domain)
-      GENPTR_INTEGER(maxpos)
+      GENPTR_INTEGER_ARRAY(idi)
+      GENPTR_DOUBLE_ARRAY(xipos)
+      GENPTR_DOUBLE_ARRAY(yipos)
+      GENPTR_INTEGER(nipos)
+
+/* Arguments Given and Returned. */
       GENPTR_DOUBLE(zoom)
       GENPTR_DOUBLE_ARRAY(percnt)
       GENPTR_INTEGER(maxcanv)
       GENPTR_INTEGER_ARRAY(windim)
       GENPTR_CHARACTER(mstyle)
       GENPTR_LOGICAL(verbos)
-      GENPTR_INTEGER_ARRAY(id)
-      GENPTR_DOUBLE_ARRAY(xpos)
-      GENPTR_DOUBLE_ARRAY(ypos)
-      GENPTR_INTEGER(npos)
+
+/* Arguments Returned. */
+      GENPTR_POINTER(ipio)
+      GENPTR_POINTER(ipxo)
+      GENPTR_POINTER(ipyo)
+      GENPTR_INTEGER(nopos)
+
+/* Global Status. */
       GENPTR_INTEGER(status)
 
 /* Local variables. */
@@ -139,6 +161,10 @@
       char cdomain[ GRP__SZNAM + 1 ];
       char csname[ GRP__SZNAM + 1 ];
       char cndfname[ GRP__SZNAM + 1 ];
+      char *errtext;
+      F77_DOUBLE_TYPE *px;
+      F77_DOUBLE_TYPE *py;
+      F77_INTEGER_TYPE *pi;
       int i;
 
 /* Test the global status. */
@@ -164,7 +190,7 @@
          ccdTclAppC( cinterp, "NDFSET", cndfname, status );
       }
       ccdTclSetC( cinterp, "DOMAIN", cdomain, status );
-      ccdTclSetI( cinterp, "MAXPOS", *maxpos, status );
+      ccdTclSetI( cinterp, "MAXPOS", 0, status );
       ccdTclSetD( cinterp, "ZOOM", *zoom, status );
       ccdTclSetD( cinterp, "PERCLO", percnt[ 0 ], status );
       ccdTclSetD( cinterp, "PERCHI", percnt[ 1 ], status );
@@ -173,26 +199,52 @@
       ccdTclSetI( cinterp, "WINY", windim[ 1 ], status );
       ccdTclSetC( cinterp, "MARKSTYLE", cmstyle, status );
       ccdTclSetI( cinterp, "VERBOSE", F77_ISTRUE(*verbos), status );
-      for ( i = 0; i < *npos; i++ ) {
+      for ( i = 0; i < *nipos; i++ ) {
          sprintf( buffer, "lappend POINTS [ list %d %lf %lf ]", 
-                          id[ i ], xpos[ i ], ypos[ i ] );
+                          idi[ i ], xipos[ i ], yipos[ i ] );
          ccdTclEval( cinterp, buffer, status );
       }
 
 /* Execute the Tcl script. */
       ccdTclRun( cinterp, "idicurs.tcl", status );
 
-/* Retrieve the values generated by the script. */
-      ccdTclGetI( cinterp, "llength $POINTS", npos, status );
+/* Check for abnormal exit. */
       if ( *status == SAI__OK ) {
-         char *fmt = "lindex [ lindex $POINTS %d ] %d";
-         for ( i = 0; i < *npos && i < *maxpos; i++ ) {
-            sprintf( buffer, fmt, i, 0 );
-            ccdTclGetI( cinterp, buffer, id + i, status );
-            sprintf( buffer, fmt, i, 1 );
-            ccdTclGetD( cinterp, buffer, xpos + i, status );
-            sprintf( buffer, fmt, i, 2 );
-            ccdTclGetD( cinterp, buffer, ypos + i, status );
+         errtext = ccdTclGetC( cinterp, "set ERROR", status );
+         if ( *status == SAI__OK && *errtext ) {
+            *status = SAI__ERROR;
+            msgSetc( "TEXT", errtext );
+            errRep( " ", "CCD1_TCURS_ERR: ^TEXT", status );
+         }
+         else if ( *status != SAI__OK ) {
+            errAnnul( status );
+         }
+      }
+
+/* Retrieve the other values generated by the script. */
+      ccdTclGetI( cinterp, "llength $POINTS", nopos, status );
+      if ( *nopos ) {
+         px = (double *) ccdMall( "_DOUBLE", *nopos, status );
+         py = (double *) ccdMall( "_DOUBLE", *nopos, status );
+         pi = (int *) ccdMall( "_INTEGER", *nopos, status );
+         *ipxo = cnfFptr( px );
+         *ipyo = cnfFptr( py );
+         *ipio = cnfFptr( pi );
+         if ( *status == SAI__OK ) {
+            char *fmt = "lindex [ lindex $POINTS %d ] %d";
+            for ( i = 0; i < *nopos; i++ ) {
+               sprintf( buffer, fmt, i, 0 );
+               ccdTclGetI( cinterp, buffer, &pi[ i ], status );
+               sprintf( buffer, fmt, i, 1 );
+               ccdTclGetD( cinterp, buffer, &px[ i ], status );
+               sprintf( buffer, fmt, i, 2 );
+               ccdTclGetD( cinterp, buffer, &py[ i ], status );
+            }
+         }
+         else {
+            *ipxo = (F77_POINTER_TYPE) NULL;
+            *ipyo = (F77_POINTER_TYPE) NULL;
+            *ipio = (F77_POINTER_TYPE) NULL;
          }
          ccdTclGetD( cinterp, "set ZOOM", zoom, status );
          ccdTclGetD( cinterp, "set PERCLO", percnt, status );
