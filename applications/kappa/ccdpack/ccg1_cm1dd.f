@@ -178,7 +178,7 @@
 *  for the order statistics of a normal popl with up to NLINE members.
 *  This also sets up the scale factor for converting mean variances to
 *  median variances.
-      IF( IMETH .NE. 2 ) THEN
+      IF( IMETH .NE. 1 .AND. IMETH .NE. 2 ) THEN
           CALL CCD1_ORVAR( NLINES, NMAT, PP, COVEC, STATUS )
       END IF
 

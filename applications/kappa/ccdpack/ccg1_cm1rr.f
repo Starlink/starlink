@@ -41,7 +41,8 @@
 *     IMETH = INTEGER (Given)
 *        The method to use in combining the lines. Has a code of 2 to 9
 *        which represent.
-*        2  = MEAN
+*        1  = MEAN
+*        2  = WEIGHTED MEAN
 *        3  = MEDIAN
 *        4  = TRIMMED MEAN
 *        5  = MODE
@@ -123,6 +124,8 @@
 *        Added sigma clipped median.
 *     16-NOV-1998 (PDRAPER):
 *        Added fast median.
+*     9-SEP-2002 (DSB):
+*        Added unweighted mean method.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -175,12 +178,18 @@
 *  for the order statistics of a normal popl with up to NLINE members.
 *  This also sets up the scale factor for converting mean variances to
 *  median variances.
-      IF( IMETH .NE. 2 ) THEN
+      IF( IMETH .NE. 1 .AND. IMETH .NE. 2 ) THEN
           CALL CCD1_ORVAR( NLINES, NMAT, PP, COVEC, STATUS )
       END IF
 
 *  Now branch for each method.
-      IF ( IMETH .EQ. 2 ) THEN
+      IF ( IMETH .EQ. 1 ) THEN
+
+*  Forming the unweighted mean.
+         CALL CCG1_UMR1R( STACK, NPIX, NLINES, VARS, MINPIX,
+     :                    RESULT, RESVAR, NCON, STATUS )
+
+      ELSE IF ( IMETH .EQ. 2 ) THEN
 
 *  Forming the weighted mean.
          CALL CCG1_MER1R( STACK, NPIX, NLINES, VARS, MINPIX,

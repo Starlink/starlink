@@ -438,7 +438,7 @@ PKG_LINK = :
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
-PKG_VERS = 1.0-5
+PKG_VERS = 1.0-6
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the
@@ -584,7 +584,7 @@ ccg1_tmn2d.f ccg1_tmn2r.f ccg1_tmn3d.f ccg1_tmn3r.f ccg1_tmr1r.f \
 ccg1_tmr3r.f ccg1_trm2d.f ccg1_trm2r.f ccg1_trm3d.f ccg1_trm3r.f \
 ccg1_wmd2d.f ccg1_wmd2r.f ccg1_wmd3d.f ccg1_wmd3r.f ccg1_wtm2d.f \
 ccg1_wtm2r.f ccg1_wtm3d.f ccg1_wtm3r.f ccg1_wtm4d.f ccg1_wtm4r.f \
-ccg1_umd1d.f
+ccg1_umd1d.f ccg1_umr1r.f ccg1_umd3d.f ccg1_umr3r.f
 
 KAPSUB_C_ROUTINES = kps1_luted.c
 
@@ -2303,6 +2303,9 @@ ccg1_trm2r.o:	SAE_PAR NUM_DEC_CVT NUM_DEF_CVT
 ccg1_trm3d.o:	SAE_PAR NUM_DEC_CVT NUM_DEF_CVT
 ccg1_trm3r.o:	SAE_PAR NUM_DEC_CVT NUM_DEF_CVT
 ccg1_umd1d.o:	SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEF_CVT
+ccg1_umr1r.o:	SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEF_CVT
+ccg1_umd3d.o:	SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEF_CVT
+ccg1_umr3r.o:	SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEF_CVT
 ccg1_wmd2d.o:	SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
 ccg1_wmd2r.o:	SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
 ccg1_wmd3d.o:	SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT

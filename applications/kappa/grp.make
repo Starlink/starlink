@@ -29,7 +29,8 @@ ccg1_tmd1d.f ccg1_tmd3d.f ccg1_tmn2d.f ccg1_tmn2r.f ccg1_tmn3d.f \
 ccg1_tmn3r.f ccg1_tmr1r.f ccg1_tmr3r.f ccg1_trm2d.f ccg1_trm2r.f \
 ccg1_trm3d.f ccg1_trm3r.f ccg1_wmd2d.f ccg1_wmd2r.f ccg1_wmd3d.f \
 ccg1_wmd3r.f ccg1_wtm2d.f ccg1_wtm2r.f ccg1_wtm3d.f ccg1_wtm3r.f \
-ccg1_wtm4d.f ccg1_wtm4r.f ccg1_umd1d.f 
+ccg1_wtm4d.f ccg1_wtm4r.f ccg1_umd1d.f ccg1_umr1r.f ccg1_umd3d.f \
+ccg1_umr3r.f 
 
 # The contents of the kappa_source.tar file:
 KAPPA_SOURCE = fitsedit.csh fitshead.csh lutread.csh multiplot.csh \
