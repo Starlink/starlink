@@ -21,7 +21,7 @@ STAR_DEFAULTS(per-package-dirs)
 dnl    Find required versions of the programs we need for configuration
 AC_PROG_FC
 AC_PROG_LIBTOOL
-STAR_MONOLITHS
+STAR_CNF_COMPATIBLE_SYMBOLS
 
 dnl dependances on starlink packages
 dnl STAR_DECLARE_DEPENDENCIES(build, [hlp fio cnf])
