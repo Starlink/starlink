@@ -22,10 +22,11 @@
 *  Description:
 *     This application will bin the input image into elliptical annuli,
 *     or into a `fan' of adjacent sectors, centred on a specified
-*     position.  The mean data values in each bin are found, and stored 
-*     in a 1-dimensional NDF which can be examined using LINPLOT,
-*     etc.  A 2-dimensional mask image can optionally be 
-*     produced indicating which bin each input pixel was placed in.
+*     position.  The typical data values in each bin are found (see
+*     parameter ESTIMATOR), and stored in a 1-dimensional NDF which 
+*     can be examined using LINPLOT, INSPECT, etc.  A 2-dimensional mask 
+*     image can optionally be produced indicating which bin each input 
+*     pixel was placed in.
 *
 *     The area of the input image which is to be binned is the annulus 
 *     enclosed between the two concentric ellipses defined by parameter 
@@ -62,6 +63,11 @@
 *        The angle between the x-axis and the major axis of the
 *        ellipse, in degrees.  Rotation from the x-axis to the y-axis is
 *        positive.  [0.0]
+*     ESTIMATOR = LITERAL (Read)
+*        The method to use for estimating the output pixel values.  It
+*        can be either "Mean" or "Weighted Mean". If the weighted mean
+*        option is selected but no variances are available in the input
+*        data, the unweighted mean will be used instead. ["Mean"]
 *     IN = NDF (Read)
 *        The input NDF containing the 2-dimensional image from which a
 *        profile is to be generated.
@@ -160,7 +166,7 @@
 *        pixels.
 
 *  Related Applications:
-*     ESP: ELLFOU, ELLPRO, SECTOR.
+*     KAPPA: INSPECT; ESP: ELLFOU, ELLPRO, SECTOR.
 
 *  Implementation Status:
 *     -  This routine correctly processes the DATA, VARIANCE, TITLE,
@@ -187,6 +193,8 @@
 *     6-SEP-1999 (DSB):
 *        Changed the defaulting for ANGMAJ, RATIO, RMAX, RMIN and WIDTH
 *        to avoid vpath=dynamic parameters.
+*     13-JUN-2001 (DSB):
+*        Added parameter WMEAN.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -216,6 +224,7 @@
       PARAMETER ( PI = 3.1415927 )
       
 *  Local Variables:
+      CHARACTER ESTIM*15         ! Method to use to estimate output values
       INTEGER ACTVAL             ! Actual no. of values obtained
       INTEGER EL                 ! No. of elements in mapped array
       INTEGER I                  ! Loop count
@@ -242,6 +251,7 @@
       LOGICAL USEANN             ! Is only part of input image to be binned?
       LOGICAL USESEC             ! Restrict binning to a sector?
       LOGICAL VAR                ! Does input NDF have a VARIANCE array?
+      LOGICAL WMEAN              ! Use weighted mean?
       REAL ANGLIM( 2 )           ! Angular bounds of the binning sector
       REAL ANGMAJ                ! Position angle of ellipse major axis
       REAL MAXWID                ! Maximum bin width
@@ -287,6 +297,17 @@
      :                  STATUS )
       END IF
          
+*  Obtain the method to use for estimating the smoothed pixel values.
+      CALL PAR_CHOIC( 'ESTIMATOR', 'Mean', 'Mean,Weighted Mean', 
+     :                .FALSE., ESTIM, STATUS )
+      IF( ESTIM .EQ. 'MEAN' ) THEN
+         WMEAN = .FALSE.
+      ELSE IF( VAR ) THEN
+         WMEAN = .TRUE.
+      ELSE
+         WMEAN = .FALSE.
+      END IF       
+
 *  Get the number of bins required. Use a minimum of one.
       CALL PAR_GDR0I( 'NBIN', 0, 1, VAL__MAXI, .FALSE., NBIN, STATUS )
 
@@ -578,9 +599,9 @@
 *  Find the mean and variance of the data values in each bin.
       CALL KPS1_ELPR3( VAR, SLBND( 1 ), SUBND( 1 ), SLBND( 2 ), 
      :                 SUBND( 2 ), %VAL( IPI( 1 ) ), %VAL( IPI( 2 ) ),
-     :                 IGRP, %VAL( IPW1 ), NBIN, REGVAL, %VAL( IPDO ), 
-     :                 %VAL( IPVO ), %VAL( IPW2 ), %VAL( IPMASK ),
-     :                 STATUS )
+     :                 IGRP, %VAL( IPW1 ), NBIN, WMEAN, REGVAL, 
+     :                 %VAL( IPDO ), %VAL( IPVO ), %VAL( IPW2 ), 
+     :                 %VAL( IPMASK ), STATUS )
 
 *  Store a new title in the output NDF.
       CALL KPG1_CCPRO( 'TITLE', 'TITLE', INDF1, INDF2, STATUS )

@@ -3870,6 +3870,15 @@ package kappa {
             helpkey *
           }
 
+         parameter estimator {
+            type LITERAL
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default Mean
+            prompt {Method for estimating output pixel values}
+            helpkey *
+          }
+
          parameter in {
             position 1
             type NDF
