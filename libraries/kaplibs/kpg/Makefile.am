@@ -11,16 +11,22 @@ libkpg_la_SOURCES = \
 
 include_HEADERS = $(PUBLIC_INCLUDES)
 
-PUBLIC_INCLUDES = KPG_AST HLPCMD CTM_COM CTM_PAR
-PRIVATE_INCLUDES = KPG_PAR
+PUBLIC_INCLUDES = HLPCMD CTM_COM CTM_PAR
+PRIVATE_INCLUDES = KPG_PAR KPG_AST
 BLOCK_DATA_FILES = ctm_xcols.f
 
 C_ROUTINES = kpg1_ieeed.c  kpg1_isfind.c  kpg1_memry.c  kpg1_trmsz.c \
 kpg1_ieeer.c  kpg1_isfinr.c  kpg1_tkast.c
 
-F_ROUTINES = $(KPG_NONGEN) $(KPG_N_GEN:.gn=.f) $(KPG_DR_GEN:.gdr=.f) \
+F_ROUTINES = $(KPG_NONGEN) $(GEN_F_ROUTINES)
+
+# Need to make sure that a maintainer clean really removes the
+# output of generic
+GEN_F_ROUTINES = $(KPG_N_GEN:.gn=.f) $(KPG_DR_GEN:.gdr=.f) \
 	$(KPG_DIR_GEN:.gdir=.f) $(KPG_NXD_GEN:.gnxd=.f) \
 	$(KPG_BDIRW_GEN:.gbdirw=.f)
+
+MAINTAINERCLEANFILES = $(GEN_F_ROUTINES)
 
 # Numeric types except Double precision
 # Note that in this case the suffix is strange since a case insensitive
@@ -170,7 +176,9 @@ kpg1_is3d.f kpg1_wtm3d.f kpg1_is3r.f kpg1_wtm3r.f kpg1_orvar.f \
 kpg1_lutk2.f kpg1_lutk3.f kpg1_lutk4.f kpg1_pglut.f kpg1_lstar.f  \
 kpg1_ltlod.f  kpg1_ltget.f kpg1_ltsav.f kpg1_pgloc.f \
 kpg1_dnag2r.f  kpg1_dr2nag.f  kpg1_nag2r.f  kpg1_r2nag.f \
-kpg1_pgsht.f kpg1_pacol.f
+kpg1_pgsht.f kpg1_pacol.f \
+kpg1_astcmn.f
+
 
 .gn.f:
 	cp $< $(<:.gn=.gen)
