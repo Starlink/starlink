@@ -34,16 +34,19 @@
 *
       INTEGER STATUS
 *
+*
+*
+      INTEGER			CHR_LEN
+*
 *    Local variables :
 *
       CHARACTER*(DAT__SZLOC) ASTLOC             ! Locator to ASTERIX struc
       CHARACTER*(DAT__SZLOC) HLOC               ! Locator to HEADER struc
       CHARACTER*(DAT__SZLOC) PLOC               ! Locator to PROCESSING struc
-      CHARACTER              LINE*80, NAME*132
+      CHARACTER              LINE*80
       CHARACTER*200		FILE,PATH
 
       INTEGER			FID			! Dataset id
-      INTEGER                	L
       INTEGER			NLEV			! Trace info
       INTEGER                	OCH                	! Output channel
       INTEGER                	WIDTH              	! Output width
