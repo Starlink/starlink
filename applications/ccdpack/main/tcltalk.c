@@ -182,6 +182,11 @@
       close( cinterp->downfd[ 0 ] );
       close( cinterp->upfd[ 1 ] );
 
+/* Execute the CCDFixConvert procedure.  This prevents confusion between
+   the temporary HDS container files created for foreign data files by 
+   the calling process and those created by the ccdwish child process. */
+      ccdTclDo( cinterp, "CCDFixConvert tcl-", status );
+
 /* Return the created interpreter structure. */
       return cinterp;
    }
