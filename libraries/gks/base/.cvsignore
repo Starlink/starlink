@@ -1,6 +1,7 @@
 stamp-h1
 config.h
 config.h.in
+gkioop.f
 .libs
 *.lo
 *.la
