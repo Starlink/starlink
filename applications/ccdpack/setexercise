@@ -184,7 +184,7 @@
       showset \
          in='"data-?,ff-?,bias-?"' \
          setless=false \
-         sortby=name \
+         listby=name \
          reset \
          accept
 
