@@ -162,8 +162,8 @@
 *  For projections whose special point is the north pole of the native system
 *  this is is just the coordinates of the special point. For others it must be
 *  calculated
-      IF ( CHR_INSET( LNAME(1:3),
-     :   'AZP,TAN,SIN,STG,ARC,ZPN,ZEA,AIR,COP,COD,COE,COO,BON' ) ) THEN
+      IF ( CHR_INSET( 'AZP,TAN,SIN,STG,ARC,ZPN,ZEA,AIR,COP,COD,'/
+     :                             /'COE,COO,BON', LNAME(1:3) ) ) THEN
         AP = SPOINT(1)
         DP = SPOINT(2)
 
