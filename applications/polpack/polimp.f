@@ -284,6 +284,7 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
+      CHARACTER * ( DAT__SZLOC ) CELLOC ! Locator to array cell
       CHARACTER * ( DAT__SZLOC ) POLLOC ! Locator to POLPACK extension
       CHARACTER * ( DAT__SZLOC ) FITLOC ! Locator to FITS block
       CHARACTER * ( FIO__SZFNM ) FNAME  ! FITS control table name
@@ -311,12 +312,16 @@
       INTEGER NNDF               ! Number of input NDFs
       INTEGER WRDGRP( 3 )        ! GRP identifiers for table "words"
       LOGICAL QUIET              ! Run silently?
+      LOGICAL THERE              ! Object exists
       LOGICAL TOPEN              ! Translation table is open
       LOGICAL OK                 ! Obtained value ok
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  See if we are running quietly.
+      CALL PAR_GET0L( 'QUIET', QUIET, STATUS )
 
 *  Input table is not open.
       TOPEN = .FALSE.
@@ -415,15 +420,15 @@
 *  Get the name of the NDF now, while we know that no error has occurred.
          CALL GRP_GET( IGRP1, INDEX, 1, NDFNAM, STATUS )
 
-*  Get the input NDF identifier
-         CALL NDG_NDFAS( IGRP1, INDEX, 'UPDATE', INDF, STATUS )
-
 *  Write out name of this NDF.
          IF( .NOT. QUIET ) THEN
-            CALL NDF_MSG( 'CURRENT_NDF', INDF )
+            CALL MSG_SETC( 'CURRENT_NDF', NDFNAM )
             CALL MSG_OUT( ' ', '  Processing ''^CURRENT_NDF''',
      :                     STATUS )
          END IF
+
+*  Get the input NDF identifier
+         CALL NDG_NDFAS( IGRP1, INDEX, 'UPDATE', INDF, STATUS )
 
 *  Ensure that the NDF does not already have a POLPACK extension, and
 *  then create one.
@@ -431,20 +436,23 @@
          CALL NDF_XNEW( INDF, 'POLPACK', 'POLPACK', 0, 0, POLLOC, 
      :                  STATUS )            
 
-*  Look for a FITS extension in the NDF.
-         IF( STATUS .EQ. SAI__OK ) THEN
+*  Look for a FITS extension in the NDF. Create one if there isn't one
+*  already, containing a single END card.
+         CALL NDF_XSTAT( INDF, 'FITS', THERE, STATUS )
+         IF( THERE ) THEN
             CALL NDF_XLOC( INDF, 'FITS', 'READ', FITLOC, STATUS )
-            IF ( STATUS .NE. SAI__OK ) THEN
-               CALL NDF_MSG( 'NDF', INDF )
-               CALL ERR_REP( 'POLIMP_NOFITS',
-     :         '  NDF ^NDF has no fits information', STATUS )
-            END IF
+         ELSE
+            CALL NDF_XNEW( INDF, 'FITS', '_CHAR*80', 1, 1, FITLOC, 
+     :                     STATUS ) 
+            CALL DAT_CELL( FITLOC, 1, 1, CELLOC, STATUS )
+            CALL DAT_PUT0C( CELLOC, 'END', STATUS )
+            CALL DAT_ANNUL( CELLOC, STATUS )
          END IF
 
-*  Map in the fits block of the NDF.
+*  Map in the fits block of the NDF, if it exists
          CALL DAT_MAPV( FITLOC, '_CHAR*80', 'READ', IPFIT, FITLEN,
      :                  STATUS )
-
+            
 *  Now interpret and import the FITS information into the NDF. Note
 *  that the lengths of the FITS block character strings are appended
 *  after the last genuine argument. This is the usual method in UNIX
@@ -480,7 +488,7 @@
             CALL GRP_PUT( IGRP2, 1, NDFNAM, 0, STATUS )
          END IF
 
-         CALL MSG_BLANK( STATUS )
+         IF( .NOT. QUIET ) CALL MSG_BLANK( STATUS )
 
  100  CONTINUE
 

@@ -80,7 +80,7 @@
 *        case-insensitive. [RED]
 *     STARTHELP = _LOGICAL (Read)
 *        If a true value is supplied, then a hyper-text browser will be
-*        created with the GUI, displaying the contents page of the PolReg
+*        created with the GUI, displaying the contents page of the PolMap
 *        on-line help documentation. Otherwise, the browser is only created
 *        if the user accesses the on-line help information explicitly
 *        from within the GUI by using the "Help" menu or the F1 key on 
@@ -183,7 +183,7 @@
 *  See if the status area is to be displayed.
       CALL PAR_GET0L( 'STATUSAREA', SAREA, STATUS )
 
-*  See if a WWW browser displaying the PolReg manual contents page should
+*  See if a WWW browser displaying the PolMap manual contents page should
 *  be created at start-up.
       CALL PAR_GET0L( 'STARTHELP', STHLP, STATUS )
 

@@ -37,7 +37,7 @@ define polexp            $POLPACK_DIR/polpack_mon
 define polimp            $POLPACK_DIR/polpack_mon
 define calpol            $POLPACK_DIR/polpack_mon
 define polmap            $POLPACK_DIR/polpack_mon
-define polreg            $POLPACK_DIR/polpack_mon
+define polka             $POLPACK_DIR/polpack_mon
 defstring polh(elp)      !$POLPACK_DIR/polhelp
 
 {  Full command definitions.
@@ -45,14 +45,14 @@ define pol_polexp        $POLPACK_DIR/polpack_mon polexp
 define pol_polimp        $POLPACK_DIR/polpack_mon polimp
 define pol_calpol        $POLPACK_DIR/polpack_mon calpol
 define pol_polmap        $POLPACK_DIR/polpack_mon polmap
-define pol_polreg        $POLPACK_DIR/polpack_mon polreg
+define pol_polka         $POLPACK_DIR/polpack_mon polka
 defstring pol_polh(elp)  !$POLPACK_DIR/polhelp
 
 { Define POLPACK's help from ICL.  Note that polhelp points to help polpack
 { because polhelp doesn't work from UNIX ICL.
 defhelp  polhelp         $POLPACK_HELP
 defhelp  polmap          $POLPACK_HELP
-defhelp  polreg          $POLPACK_HELP
+defhelp  polka           $POLPACK_HELP
 defhelp  calpol          $POLPACK_HELP
 defhelp  polexp          $POLPACK_HELP
 defhelp  polimp          $POLPACK_HELP

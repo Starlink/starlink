@@ -91,8 +91,8 @@
       ELSE IF ( NAME .EQ. 'POLMAP' ) THEN
          CALL POLMAP( STATUS )
 
-      ELSE IF ( NAME .EQ. 'POLREG' ) THEN
-         CALL POLREG( STATUS )
+      ELSE IF ( NAME .EQ. 'POLKA' ) THEN
+         CALL POLKA( STATUS )
 
       ELSE IF ( NAME .EQ. 'SEGMENT' ) THEN
          CALL SEGMENT( STATUS )

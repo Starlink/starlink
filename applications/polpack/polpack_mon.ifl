@@ -725,7 +725,7 @@ endinterface
 
 #+
 #  Name:
-#     POLREG.IFL
+#     POLKA.IFL
 
 #  Type of Module:
 #     ADAM A-task parameter interface.
@@ -741,7 +741,7 @@ endinterface
 
 #-
 
-interface POLREG
+interface POLKA
 
    helplib 'POLPACK_HELP:'
 

@@ -36,7 +36,7 @@ int *tclDummyMathPtr = (int *) matherr;
 #define SAI__ERROR 148013867
 #define GRP__NOID 0
 #define PACK_DIR "POLPACK_DIR"
-#define TCL_SCRIPT "/PolReg.tcl"
+#define TCL_SCRIPT "/Polka.tcl"
 
 extern F77_SUBROUTINE(grp_grpsz)( INTEGER(igrp), INTEGER(size),
                                   INTEGER(status) );
@@ -343,11 +343,11 @@ F77_SUBROUTINE(doplrg)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
 *     doplrg
 
 *  Purpose:
-*     Activates the main PolReg tcl script.
+*     Activates the main Polka tcl script.
 
 *  Description:
 *     This C function creates a Tcl interpreter to execute the Tcl script
-*     which implements the GUI for the PolReg application. Values for 
+*     which implements the GUI for the Polka application. Values for 
 *     various user preferences are communicated to the Tcl script by 
 *     initialising various Tcl variables to hold the supplied options
 *     values. When the Tcl script terminates, the (potentially modified)
@@ -584,7 +584,7 @@ F77_SUBROUTINE(doplrg)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
 
 /* Create the main window, and report an error if it fails. */
    if( *STATUS == SAI__OK ) {
-      main = Tk_CreateMainWindow(interp, NULL, "PolReg", "POLREG" );
+      main = Tk_CreateMainWindow(interp, NULL, "Polka", "POLKA" );
       if( !main ) {
          *STATUS = SAI__ERROR;
          Error( "Unable to create main Tk window.", STATUS );
@@ -600,7 +600,7 @@ F77_SUBROUTINE(doplrg)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
    dir = (char *) Envir( PACK_DIR, STATUS );      
    if( *STATUS == SAI__OK ){
       dirlen = strlen( dir );
-      script = (char *) malloc( (size_t) ( dirlen + strlen( "/PolReg.tcl" )  
+      script = (char *) malloc( (size_t) ( dirlen + strlen( "/Polka.tcl" )  
                                            + 1 ) );
       if( !script ) {
          *STATUS = SAI__ERROR;
@@ -608,7 +608,7 @@ F77_SUBROUTINE(doplrg)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
                  STATUS );
       } else {
          strcpy( script, dir );
-         strcpy( script + dirlen, "/PolReg.tcl" );
+         strcpy( script + dirlen, "/Polka.tcl" );
          SetVar( interp, "POLPACK_DIR", dir, TCL_LEAVE_ERR_MSG |
                  TCL_GLOBAL_ONLY, STATUS );
       }

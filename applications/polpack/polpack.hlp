@@ -113,9 +113,9 @@ SUBSUBSUBTOPIC = LITERAL (Read)
 
    At a prompt you may enter:
       o  a topic and/or subtopic name(s) to display the help for that
-         topic or subtopic, so for example, "polreg parameters dpi"
+         topic or subtopic, so for example, "polka parameters dpi"
          gives help on DPI, which is a subtopic of Parameters, which
-         in turn is a subtopic of POLREG;
+         in turn is a subtopic of POLKA;
 
       o  a <CR> to see more text at a "Press RETURN to continue ..."
          request;
@@ -131,9 +131,9 @@ SUBSUBSUBTOPIC = LITERAL (Read)
          topic, including the list of topic or subtopic names; or
 
       o  an ellipsis "..." to display all the text below the
-         current point in the hierarchy.  For example, "POLREG..."
-         displays information on the POLREG topic as well as
-         information on all the subtopics under POLREG.
+         current point in the hierarchy.  For example, "POLKA..."
+         displays information on the POLKA topic as well as
+         information on all the subtopics under POLKA.
 
    You can abbreviate any topic or subtopic using the following
    rules.
@@ -503,12 +503,12 @@ Type ? to see the main help topics.
 1 POLMAP
 Display a polarisation map.
 
-1 POLREG
+1 POLKA
 Extract and align O and E ray areas from a set of images.
 
 Usage:
 
-   polreg in out_o out_e [skyframes]
+   polka in out_o out_e [skyframes]
 
 Description:
 
@@ -542,10 +542,10 @@ Description:
    Alternatively, they can be set using the "Options" menu in the menu
    bar at the top of the GUI. If not supplied on the command line, these
    parameters usually adopt the values they had on the previous
-   invocation of PolReg. The values shown in square brackets in the
+   invocation of Polka. The values shown in square brackets in the
    parameter descriptions below are the initial default values.
 
-   Detailed information on the operation of PolReg and how to use the GUI
+   Detailed information on the operation of Polka and how to use the GUI
    is available by clicking on the "Help" button at the right hand end of
    the menu bar.
 2 Parameters
@@ -575,7 +575,7 @@ DPI = _INTEGER (Read)
    Note, this value cannot be set from the GUI's "Options" menu. [!]
 3 DUALBEAM
 DUALBEAM = _LOGICAL (Read)
-   If a true value is suplied, then PolReg will operate in
+   If a true value is suplied, then Polka will operate in
    dual-beam mode, producing two output images for each input image.
    Otherwise, it will operate in single-beam mode, with one output
    image being produced for each input image. In single-beam mode,
@@ -628,7 +628,7 @@ NEWCOLMAP = _LOGICAL (Read)
    its own private colour map. Otherwise it will share the standard
    colour map. Note, with a false value for NEWCOLMAP, there may
    be insufficient free colours in the standard colour map (i.e. if
-   other X applications are running). In this case polreg will report
+   other X applications are running). In this case polka will report
    an error and abort. If this happens, try re-running with a true
    value for NEWCOLMAP. [FALSE]
 3 OEFITTYPE
@@ -712,7 +712,7 @@ SKYOFF = _LOGICAL (Update)
 3 STARTHELP
 STARTHELP = _LOGICAL (Read)
    If a true value is supplied, then a hyper-text browser will be
-   created with the GUI, displaying the contents page of the PolReg
+   created with the GUI, displaying the contents page of the Polka
    on-line help documentation. Otherwise, the browser is only created
    if the user accesses the on-line help information explicitly
    from within the GUI by using the "Help" menu or the F1 key on
@@ -748,14 +748,14 @@ XHAIRCOL = LITERAL (Update)
    unambiguous abbreviation can be supplied, and the value is
    case-insensitive. [YELLOW]
 2 Examples
-polreg 'im1,im2' '*_o' '*_e'
+polka 'im1,im2' '*_o' '*_e'
    This example aligns and extracts the O and E ray areas from the two
    images `im1` and `im2`, subtracts a sky background (estimated
    from areas within the object frames), and stores the results in
    the images `im1_o`, `im1_e`, `im2_o` and `im2_e`. The current
    values for all other parameters are used.
 
-polreg ^in.lis out=^out.lis dualbeam=no skyframes=^sky.lis reset
+polka ^in.lis out=^out.lis dualbeam=no skyframes=^sky.lis reset
    This example uses single-beam mode. It reads the names of input
    images from the text file `in.lis`, subtracts the sky frames
    read from the text file `sky.lis`, aligns them and stores

@@ -435,9 +435,9 @@
    set gwm_frame [GwmCreate $F2.gwm $size 64 PolMap]
    if { $gwm_frame == "" } {
       if { $usingnewcmap } {
-         Message "Failed to create the image display.\n\nIt may be possible to overcome this problem by closing down some other X applications, and then re-running polreg."
+         Message "Failed to create the image display.\n\nIt may be possible to overcome this problem by closing down some other X applications, and then re-running polmap."
       } {
-         Message "Failed to create the image display.\n\nIt may be possible to overcome this problem by re-running polreg giving a true value for the NEWCOLMAP parameter."
+         Message "Failed to create the image display.\n\nIt may be possible to overcome this problem by re-running polmap giving a true value for the NEWCOLMAP parameter."
       }
       exit
    }

@@ -21,13 +21,10 @@
 
 *  Description:
 *     This routine is equivalent to CCDPACK:FINDCENT, but is simpler and 
-*     therefore faster. It is tailored to the needs of the PolReg
+*     therefore faster. It is tailored to the needs of the Polka
 *     application, and is not intended for public use. The algorithm
 *     used by CCG1_CENR has been modified to improve the background
 *     subtraction prior to forming the marginal profiles.
-
-*  Usage:
-*     polreg ndf
 
 *  ADAM Parameters:
 *     ISIZE = _INTEGER (Read)

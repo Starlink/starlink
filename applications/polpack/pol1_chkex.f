@@ -93,14 +93,19 @@
 
 *  Local Variables:
       CHARACTER CCDLOC*(DAT__SZLOC) 
+      CHARACTER COMP*(GRP__SZNAM)
+      CHARACTER FDIRN*(GRP__SZFNM)
       CHARACTER FILTER*256
+      CHARACTER FTYPE*(GRP__SZFNM)
       CHARACTER IMGID*256
       CHARACTER NDFNAM*256
+      CHARACTER SLICE*(GRP__SZNAM)
       CHARACTER WPLATE*10
       DOUBLE PRECISION ANGCOS  
-      DOUBLE PRECISION MAT( NDF__MXDIM*NDF__MXDIM )
       DOUBLE PRECISION ANGSIN
+      DOUBLE PRECISION MAT( NDF__MXDIM*NDF__MXDIM )
       INTEGER DIM( NDF__MXDIM )
+      INTEGER FORM                      
       INTEGER FRAME                  
       INTEGER I
       INTEGER IAT
@@ -162,31 +167,22 @@
          CALL NDF_MSG( 'NDF', INDF )
          CALL MSG_LOAD( ' ', '^NDF', NDFNAM, LC, STATUS ) 
 
-*  Find the position of the last "/" character marking the end of the
-*  directory path.
-         IF( STATUS .EQ. SAI__OK ) THEN
-            LC = CHR_LEN( NDFNAM )
-            I = LC
-            DO WHILE( NDFNAM( I : I ) .NE. '/' .AND. I .GT. 0 )
-               I = I - 1
-            END DO
-
-*  We use the string following the last "/".
-            I = I + 1
+*  Extract the file basename, and use it as the IMGID value.
+         CALL NDG1_HSPEC( NDFNAM, ' ', .FALSE., FDIRN, IMGID, FTYPE,
+     :                    COMP, SLICE, FORM, STATUS )
 
 *  Tell the user what is happening.
-            IMGID = NDFNAM( I : LC ) 
-            IF( .NOT. QUIET ) THEN
-               CALL MSG_SETC( 'IMGID', IMGID )
-               CALL MSG_OUT( ' ', '     Setting IMGID to ''^IMGID''', 
-     :                       STATUS )
-            END IF
+         IF( .NOT. QUIET ) THEN
+            CALL MSG_SETC( 'IMGID', IMGID )
+            CALL MSG_OUT( ' ', '     Setting IMGID to ''^IMGID''', 
+     :                    STATUS )
+         END IF
 
 *  Create ther IMGID component and store the NDF basename as its value.
-            CALL DAT_NEW0C( LOC, 'IMGID', LC - I + 1, STATUS ) 
-            CALL CMP_PUT0C( LOC, 'IMGID', IMGID, STATUS ) 
+         CALL DAT_NEW0C( LOC, 'IMGID', MAX( 1, CHR_LEN( IMGID ) ), 
+     :                   STATUS ) 
+         CALL CMP_PUT0C( LOC, 'IMGID', IMGID, STATUS ) 
 
-         END IF
       END IF
 
 *  If necessary, create a GRP group to hold the used IMGID values.
@@ -249,7 +245,7 @@
          CALL MSG_OUT( ' ', '     Setting FILTER to ''^VL''', STATUS )
       END IF
       CALL DAT_ERASE( LOC, 'FILTER', STATUS )
-      CALL DAT_NEW0C( LOC, 'FILTER', IAT, STATUS ) 
+      CALL DAT_NEW0C( LOC, 'FILTER', MAX( 1, IAT ), STATUS ) 
       CALL CMP_PUT0C( LOC, 'FILTER', FILTER( : IAT ), STATUS ) 
 
 *  See if there is a CCDPACK extension. If not create one.
@@ -266,7 +262,7 @@
       END IF
 
 *  Store the new FILTER value in the CCDPACK extension.
-      CALL DAT_NEW0C( CCDLOC, 'FILTER', IAT, STATUS ) 
+      CALL DAT_NEW0C( CCDLOC, 'FILTER', MAX( 1, IAT ), STATUS ) 
       CALL CMP_PUT0C( CCDLOC, 'FILTER', FILTER( : IAT ), STATUS ) 
 
 *  Annul the locator to the CCDPACK extension.

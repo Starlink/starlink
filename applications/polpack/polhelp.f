@@ -71,9 +71,9 @@
 *
 *     At a prompt you may enter:
 *        o  a topic and/or subtopic name(s) to display the help for that
-*           topic or subtopic, so for example, "polreg parameters dpi"
+*           topic or subtopic, so for example, "polka parameters dpi"
 *           gives help on DPI, which is a subtopic of Parameters, which
-*           in turn is a subtopic of POLREG;
+*           in turn is a subtopic of POLKA;
 *
 *        o  a <CR> to see more text at a "Press RETURN to continue ..."
 *           request;
@@ -89,9 +89,9 @@
 *           topic, including the list of topic or subtopic names; or
 * 
 *        o  an ellipsis "..." to display all the text below the
-*           current point in the hierarchy.  For example, "POLREG..."
-*           displays information on the POLREG topic as well as
-*           information on all the subtopics under POLREG.
+*           current point in the hierarchy.  For example, "POLKA..."
+*           displays information on the POLKA topic as well as
+*           information on all the subtopics under POLKA.
 *
 *     You can abbreviate any topic or subtopic using the following
 *     rules.

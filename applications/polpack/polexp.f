@@ -173,15 +173,15 @@
 *  Get the name of the NDF now, while we know that no error has occurred.
          CALL GRP_GET( IGRP1, I, 1, NDFNAM, STATUS )
 
-*  Get the input NDF identifier
-         CALL NDG_NDFAS( IGRP1, I, 'UPDATE', INDF, STATUS )
-
 *  Write out name of this NDF.
          IF( .NOT. QUIET ) THEN
-            CALL NDF_MSG( 'CURRENT_NDF', INDF )
+            CALL MSG_SETC( 'CURRENT_NDF', NDFNAM )
             CALL MSG_OUT( ' ', '  Processing ''^CURRENT_NDF''',
      :                     STATUS )
          END IF
+
+*  Get the input NDF identifier
+         CALL NDG_NDFAS( IGRP1, I, 'UPDATE', INDF, STATUS )
 
 *  Get a locator to the POLPACK extension.
          CALL NDF_XLOC( INDF, 'POLPACK', 'READ', POLLOC, STATUS ) 
@@ -242,7 +242,7 @@
          IF( STATUS .EQ. SAI__OK ) THEN
 
 *  Assume for the moment that no existing keywords will be over-written.
-*  This emans that all the cards written by this routine will be new and
+*  This means that all the cards written by this routine will be new and
 *  so the size of the FITS header at the end will be the size noted above.
             UCARD = NCARD
 
