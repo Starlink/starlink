@@ -122,6 +122,7 @@
 
 *    Get value from environment
         CALL UCLGST( PAR, CVAL, CLEN )
+	print *,cval,clen
 
 *    Increment try counter
         NTRY = NTRY + 1
