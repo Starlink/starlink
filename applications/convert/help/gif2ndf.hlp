@@ -7,13 +7,12 @@ Usage:
 
 Description:
 
-   This Bourne shell script converts a Graphics Interchange Format (GIF)
-   file into a 256 grey-level Starlink NDF image format file.
-   One or two-dimensional images can be handled.
-   The script uses various PBMPLUS utilities to produce a FITS file
-   and then KAPPA applications FITSDIN, MATHS and FLIP to produce the
-   final NDF. Error messages are converted into Starlink style (preceded
-   by !).
+   This Bourne-shell script converts a Graphics Interchange Format
+   (GIF) file into an unsigned-byte (256 grey-level) NDF format file.
+   It handles one- or two-dimensional images.  The script uses
+   various PBMPLUS utilities to produce a FITS file, flipped top
+   to bottom, and then FITS2NDF to produce the final NDF.  Error
+   messages are converted into Starlink style (preceded by !).
 2 Parameters
 For information on individual parameters, select from the list below:
 3 IN
@@ -44,12 +43,15 @@ must be available on your PATH.
 2 Related_Applications
    CONVERT: NDF2GIF
 2 Authors
-MJC: M.J.Currie (Starlink - RAL)
+MJC: Malcolm J. Currie (STARLINK)
 
 GJP: G.J.Privett (Starlink - UWCC)
 
 AJC: A.J.Chipperfield (Starlink - RAL)
 2 History
  28-NOV-1995 (AJC):
-    Original version
-    Based on work by MJC and GJP
+    Original version, based on work by MJC and GJP.
+
+ 1997 August 1 (MJC):
+    Removed KAPPA dependencies.  Reworded and reordered the
+    description.  Added some comments.

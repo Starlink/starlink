@@ -5,13 +5,12 @@
    Converts a GIF file into an NDF. 
 }{
    \sstdescription{
-      This Bourne shell script converts a Graphics Interchange Format file 
-      into a Starlink NDF image format file. 
-      One or two-dimensional images can be handled.
-      The script uses various PBMPLUS utilities to produce a FITS file 
-      and then KAPPA applications FITSDIN, MATHS and FLIP to produce the
-      final NDF. Error messages are converted into Starlink style (preceded
-      by !).
+      This Bourne-shell script converts a Graphics Interchange Format
+      (GIF) file into an unsigned-byte (256 grey-level) NDF format file.
+      It handles one- or two-dimensional images.  The script uses
+      various PBMPLUS utilities to produce a FITS file, flipped top
+      to bottom, and then FITS2NDF to produce the final NDF.  Error
+      messages are converted into Starlink style (preceded by !).
    }
    \sstusage{
       gif2ndf in [out]
@@ -51,7 +50,7 @@
       \sstitemlist{ 
          \sstitem
             This initial version of the script generates images with at most
-            256 grey levels. It does not use the image colour lookup table.
+            256 grey levels.  It does not use the image colour lookup table.
          \sstitem
             Input image filenames must have the file extension {\tt .gif}.
          \sstitem
