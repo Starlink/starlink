@@ -352,9 +352,11 @@ ast.h: $(AST_H_FILES) ast_err.h makeh
 BUILT_SOURCES = AST_ERR ast_err.h version.h
 
 #  Form second links to the main object library (static and shared). This is 
-#  used when a second pass through the library is needed during linking. Use
-#  target install-exec-hook rather than install-exec-local so that the
-#  soft links are created *after* the main library has been installed. 
+#  used when a second pass through the library is needed during linking.
+#  Do not forget to change the contents of the libast_pass2.la file to refer
+#  to the pass2 libraries rather than the original libraries. Use target 
+#  install-exec-hook rather than install-exec-local so that the soft links 
+#  and files are created *after* the main library has been installed. 
 install-exec-hook: libast.la
 	$(mkdir_p) $(DESTDIR)$(libdir) 
 	cd $(DESTDIR)$(libdir); \
@@ -365,7 +367,11 @@ install-exec-hook: libast.la
 	   if test -n "$$MANIFEST_FD"; then \
 	       echo "$(DESTDIR)$(libdir)/$$ff" >&$${MANIFEST_FD-0}; \
 	   fi \
-	done
+	done; \
+	if test -e "libast.la"; then \
+	   if test -e "libast_pass2.la"; then rm "libast_pass2.la"; fi; \
+	   sed -e 's/libast/libast_pass2/g' libast.la > libast_pass2.la; \
+	fi
 
 # Make pre-distribution files.  These are files which are required for
 # building the distribution, but are not themselves distributed.
