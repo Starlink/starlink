@@ -125,7 +125,7 @@ emsFmtc(token, format, value)
  PREINIT:
   int maxchar;
  CODE:
-  Perl_croak("emsFmtc no longer supported. Use sprintf instead\n");
+  Perl_croak(aTHX_ "emsFmtc no longer supported. Use sprintf instead\n");
   /* maxchar = EMS__SZTOK;
      emsFmtc(token, format, value, maxchar);*/
 
@@ -137,7 +137,7 @@ emsFmtd(token, format, value)
  ALIAS:
   Starlink::EMS::ems_fmtd = 2
  CODE:
-  Perl_croak("emsFmtd no longer supported. Use sprintf instead\n");
+  Perl_croak(aTHX_ "emsFmtd no longer supported. Use sprintf instead\n");
   /* emsFmtd(token, format, value);*/
 
 void
@@ -148,7 +148,7 @@ emsFmti(token, format, value)
  ALIAS:
   Starlink::EMS::ems_fmti = 2
  CODE:
-  Perl_croak("emsFmti no longer supported. Use sprintf instead\n");
+  Perl_croak(aTHX_ "emsFmti no longer supported. Use sprintf instead\n");
   /* emsFmti(token, format, value); */
 
 void
@@ -159,7 +159,7 @@ emsFmtl(token, format, value)
  ALIAS:
   Starlink::EMS::ems_fmtl= 2
  CODE:
-  Perl_croak("emsFmtl no longer supported. Use sprintf instead\n");
+  Perl_croak(aTHX_ "emsFmtl no longer supported. Use sprintf instead\n");
   /* emsFmtl(token, format, value);*/
 
 void
@@ -170,7 +170,7 @@ emsFmtr(token, format, value)
  ALIAS:
   Starlink::EMS::ems_fmtr = 2
  CODE:
-  Perl_croak("emsFmtr no longer supported. Use sprintf instead\n");
+  Perl_croak(aTHX_ "emsFmtr no longer supported. Use sprintf instead\n");
   /* emsFmtr(token, format, value); */
 
 
