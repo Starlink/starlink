@@ -79,7 +79,7 @@ atclsh_LDADD = $(LDADD) `ams_link_adam` `nbs_link` -ladam
 awish_SOURCES = tkAppInit.c tclNbs.c
 awish_LDADD = $(LDADD) tkGwm.o tkGwmPrint.o tkGwmCanv.o libadam.la \
              `nbs_link` `ams_link_adam` `gwm_link_adam` `chr_link_adam`
-awish_LDFLAGS = -all-static
+awish_LDFLAGS = -static
 
 # Define what is to be done with which sets of files.
 
