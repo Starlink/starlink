@@ -18,7 +18,7 @@
 % Variable part - replace [xxx] as appropriate.
 \newcommand{\stardocnumber}    {211.9}
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {14th June 2001}
+\newcommand{\stardocdate}      {20th June 2001}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
@@ -4464,13 +4464,15 @@ restriction is necessary, but consider creating a Frame with one
 longitude axis and two latitude axes. Which latitude axis should be
 associated with the longitude axis?}
 
-\subsection{\label{ss:distanceandoffset}Calculating Distances and Offsets}
-
-Two complementary functions are provided for use with Frames to allow
-you to find the distance between two points and to offset a specified
-distance along a line joining two points. In essence, these functions
-define the metric of the coordinate space which the \htmlref{Frame}{Frame}
-represents. In the case of a basic Frame, this is a Cartesian metric.
+\subsection{\label{ss:distanceandoffset}Calculating Distances, angles and Offsets}
+Some complementary 
+functions 
+are provided for use with Frames to allow you to find the distance
+between two points, to offset a specified distance along a line joining
+two points, {\em{etc.}} In essence, these 
+functions 
+define the metric of the coordinate space which the \htmlref{Frame}{Frame} represents. In
+the case of a basic Frame, this is a Cartesian metric.
 
 The first of these functions, \htmlref{astDistance}{astDistance}, returns a double distance
 value when supplied with the Frame coordinates of two points. For
@@ -4523,6 +4525,38 @@ of the position (1,1). Again, this is a simple result in a Cartesian
 Frame, as varying the offset will trace out a straight line. On the
 celestial sphere, however ({\em{e.g.}}\ using a SkyFrame), it would
 trace out a great circle.
+
+The \htmlref{astOffset2}{astOffset2} function is similar to astOffset, but instead of using the
+geodesic which passes through two positions, it uses the geodesic which
+passes at a given position angle\footnote{The angle from the positive
+direction of the second Frame axis to the geodesic, positive values being
+in the same sense as rotation from the positive direction of the second
+axis to the positive direction of the first Frame axis.}through a given
+starting position. The method is restricted to 2-dimensional Frames, and
+may not be used with CmpFrames.
+
+Within a Cartesian coordinate system, the position angle of a geodesic
+({\em{i.e.}}\ a straight line) is constant along its entire length, but
+this is not necessarily true of other coordinate systems. Within a
+spherical coordinate system, for instance, the position angle of a geodesic
+will vary along its length (except for the special cases of a meridian and
+the equator). In addition to returning the required offset position, the 
+astOffset2 function 
+returns the position angle of the geodesic at the
+offset position. This is useful if you want to trace out a path which
+involves turning through specified angles. For instance, tracing out a
+rectangle in which each side is a geodesic involves turning through 90 
+degrees at the corners. To do this, use astOffset2 to calculate the
+position of each corner, and then add (or subtract) 90 degrees from the 
+position angle returned by astOffset2.
+
+The \htmlref{astAngle}{astAngle} function 
+calculates the angle subtended by two points, at a third point.
+It can only be used with 2 or 3 dimensional Frames, and may not be used
+with a \htmlref{CmpFrame}{CmpFrame}. If used with a 2-dimensional Frame the returned angle
+is signed to indicate the sense of rotation (clockwise or anticlockwise)
+in taking the ``shortest route'' from the first point to the second.
+If used with a 3-dimensional Frame the result is un-signed.
 
 \subsection{\label{ss:framedomains}The Domain Attribute}
 
@@ -9626,6 +9660,27 @@ draw parallel to. The ``start'' array contains the coordinates of the
 start of the curve and ``length'' specifies the distance to draw along
 the axis in physical coordinate space.
 
+\subsection{\label{ss:plottinggeneralizedcurves}Plotting Generalized Curves}
+We have seen how geodesic curves and grid lines can be drawn. The \htmlref{Plot}{Plot}
+class includes another method,
+\htmlref{astGenCurve}{astGenCurve},
+which allows curves of {\em any} form to be drawn. The caller supplies a
+\htmlref{Mapping}{Mapping} which maps offset along the curve\footnote{normalized so that the
+start of the curve is at offset 0.0 and the end of the curve is at offset
+1.0 - offset need not be linearly related to distance.} into the
+corresponding position in the current \htmlref{Frame}{Frame} of the Plot.
+astGenCurve,
+then takes care of Mapping these positions into graphics coordinates. The
+choice of exactly which positions along the curve are to be used to
+define the curve is also made by
+astGenCurve,
+using an adaptive algorithm which concentrates points around areas where
+the curve is bending sharply or is discontinuous in graphics coordinates.
+
+The \htmlref{IntraMap}{IntraMap} class may be of particular use in this context since it allows 
+you to code your own Mappings to do any transformation you choose.
+
+
 \subsection{\label{ss:clipping}Clipping}
 
 Like many graphics systems, a \htmlref{Plot}{Plot} allows you to {\em{clip}} the graphics
@@ -10458,6 +10513,86 @@ Object            - Base class for all AST Objects
          the {\tt{"}}iframe{\tt{"}} parameter (in the original FrameSet) and the current
          Frame of the {\tt{"}}frame{\tt{"}} FrameSet. This latter Frame becomes the
          current Frame in the merged FrameSet.
+      }
+   }
+}
+\sstroutine{
+   astAngle\sstlabel{astAngle}
+}{
+   Calculate the angle subtended by two points at a third point
+}{
+   \sstdescription{
+      This function is only applicable to 2 or 3 dimensional Frames.
+      It finds the angle at point B between the line
+      joining points A and B, and the line joining points C
+      and B. These lines will in fact be geodesic curves appropriate to
+      the \htmlref{Frame}{Frame} in use. For instance, in \htmlref{SkyFrame}{SkyFrame}, they will be great
+      circles.
+   }
+   \sstsynopsis{
+      double astAngle( AstFrame $*$this, const double a[], const double b[],
+                       const double c[] )
+   }
+   \sstparameters{
+      \sstsubsection{
+         this
+      }{
+         Pointer to the 2-dimensional Frame.
+      }
+      \sstsubsection{
+         a
+      }{
+         An array of double, with one element for each Frame axis
+         (\htmlref{Naxes}{Naxes} attribute) containing the coordinates of the first point.
+      }
+      \sstsubsection{
+         b
+      }{
+         An array of double, with one element for each Frame axis
+         (Naxes attribute) containing the coordinates of the second point.
+      }
+      \sstsubsection{
+         c
+      }{
+         An array of double, with one element for each Frame axis
+         (Naxes attribute) containing the coordinates of the third point.
+      }
+   }
+   \sstreturnedvalue{
+      \sstsubsection{
+         astAngle
+      }{
+         The angle in radians, from the line AB to the line CB. If the
+         Frame is 2-dimensional, it will be in the range \$$\backslash$pm $\backslash$pi\$
+         with positive rotation is in the same sense as rotation from
+         the positive direction of axis 2 to the positive direction of
+         axis 1. If the Frame has 3 axes, a positive value will
+         always be returned in the range zero to \$$\backslash$pi\$.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         An error will be reported if the supplied Frame is
+         not 2 or 3 dimensional.
+
+         \sstitem
+         An error will be reported if an attempt is made to use this
+         method with a \htmlref{CmpFrame}{CmpFrame}.
+
+         \sstitem
+         This function will return a {\tt{"}}bad{\tt{"}} result value (AST\_\_BAD) if
+         any of the input coordinates has this value.
+
+         \sstitem
+         A {\tt{"}}bad{\tt{"}} value will also be returned if points A and B are
+         co-incident, or if points B and C are co-incident.
+
+         \sstitem
+         A {\tt{"}}bad{\tt{"}} value will also be returned if this function is
+         invoked with the AST error status set, or if it should fail for
+         any reason.
       }
    }
 }
@@ -11470,6 +11605,9 @@ Object            - Base class for all AST Objects
       If you need to draw many geodesic curves end-to-end, then the
       \htmlref{astPolyCurve}{astPolyCurve} function is equivalent to repeatedly using
       astCurve, but will usually be more efficient.
+
+      If you need to draw curves which are not geodesics, see \htmlref{astGenCurve}{astGenCurve}
+      or \htmlref{astGridLine}{astGridLine}.
    }
    \sstsynopsis{
       void astCurve( AstPlot $*$this, const double start[],
@@ -12735,6 +12873,60 @@ Object            - Base class for all AST Objects
          A null \htmlref{Object}{Object} pointer (AST\_\_NULL) will be returned if this
          function is invoked with the AST error status set, or if it
          should fail for any reason.
+      }
+   }
+}
+\sstroutine{
+   astGenCurve\sstlabel{astGenCurve}
+}{
+   Draw a generalized curve
+}{
+   \sstdescription{
+      This function draws a general user-defined curve defined by the
+      supplied \htmlref{Mapping}{Mapping}. Note that the curve is transformed into graphical
+      coordinate space for plotting, so that a straight line in
+      physical coordinates may result in a curved line being drawn if
+      the Mapping involved is non-linear. Any discontinuities in the
+      Mapping between physical and graphical coordinates are
+      catered for, as is any clipping established using \htmlref{astClip}{astClip}.
+
+      If you need to draw simple straight lines (geodesics), \htmlref{astCurve}{astCurve}
+      or \htmlref{astPolyCurve}{astPolyCurve} will usually be easier to use and faster.
+   }
+   \sstsynopsis{
+      void astGenCurve( AstPlot $*$this, astMapping $*$map )
+   }
+   \sstparameters{
+      \sstsubsection{
+         this
+      }{
+         Pointer to the \htmlref{Plot}{Plot}.
+      }
+      \sstsubsection{
+         map
+      }{
+         Pointer to a Mapping. This Mapping should have 1 input
+         coordinate representing offset along the required curve,
+         normalized so that the start of the curve is at offset 0.0,
+         and the end of the curve is at offset 1.0. Note, this offset
+         does not need to be linearly related to distance along the curve.
+         The number of output coordinates should equal the number of axes
+         in the current \htmlref{Frame}{Frame} of the Plot. The Mapping should map a
+         specified offset along the curve, into the corresponding
+         coordinates in the current Frame of the Plot. The inverse
+         transformation need not be defined.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         An error results if the base Frame of the Plot is not 2-dimensional.
+
+         \sstitem
+         An error also results if the transformation between the
+         current and base Frames of the Plot is not defined (i.e. the
+         Plot's \htmlref{TranInverse}{TranInverse} attribute is zero).
       }
    }
 }
@@ -15082,6 +15274,90 @@ Object            - Base class for all AST Objects
          {\tt{"}}Bad{\tt{"}} coordinate values will also be returned if the two
          points supplied are coincident (or otherwise fail to uniquely
          specify a geodesic curve) but the requested offset is non-zero.
+      }
+   }
+}
+\sstroutine{
+   astOffset2\sstlabel{astOffset2}
+}{
+   Calculate an offset along a geodesic curve in a 2D Frame
+}{
+   \sstdescription{
+      This function finds the \htmlref{Frame}{Frame} coordinate values of a point which
+      is offset a specified distance along the geodesic curve at a
+      given bearing from a specified staring point. It can only be
+      used with 2-dimensional Frames.
+
+      For example, in a basic Frame, this offset will be along the
+      straight line joining two points. For a more specialised Frame
+      describing a sky coordinate system, however, it would be along
+      the great circle passing through two sky positions.
+   }
+   \sstsynopsis{
+      double Offset2( AstFrame $*$this, const double point1[2], double angle,
+                    double offset, double point2[2] );
+   }
+   \sstparameters{
+      \sstsubsection{
+         this
+      }{
+         Pointer to the Frame.
+         An array of double, with one element for each Frame axis
+         (\htmlref{Naxes}{Naxes} attribute). This should contain the coordinates of the
+         point marking the start of the geodesic curve.
+      }
+      \sstsubsection{
+         angle
+      }{
+         The angle (in radians) from the positive direction of the second
+         axis, to the direction of the required position, as seen from
+         the starting position. Positive rotation is in the sense of
+         rotation from the positive direction of the second axis to the
+         positive direction of the first axis.
+      }
+      \sstsubsection{
+         offset
+      }{
+         The required offset from the first point along the geodesic
+         curve. If this is positive, it will be in the direction of the
+         given angle. If it is negative, it will be in the opposite
+         direction.
+      }
+      \sstsubsection{
+         point2
+      }{
+         An array of double, with one element for each Frame axis
+         in which the coordinates of the required point will be returned.
+      }
+   }
+   \sstreturnedvalue{
+      \sstsubsection{
+         astOffset2
+      }{
+         The position angle which the geodesic curve has at the end point.
+         That is, the angle between the positive direction of the second
+         axis and the continuation of the geodesic curve at the requested
+         end point.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The geodesic curve used by this function is the path of
+         shortest distance between two points, as defined by the
+         \htmlref{astDistance}{astDistance} function.
+
+         \sstitem
+         An error will be reported if the Frame is not 2-dimensional.
+
+         \sstitem
+         An error will be reported if an attempt is made to use this
+         method with a \htmlref{CmpFrame}{CmpFrame}.
+
+         \sstitem
+         This function will return {\tt{"}}bad{\tt{"}} coordinate values (AST\_\_BAD)
+         if any of the input coordinates has this value.
       }
    }
 }
@@ -19017,6 +19293,12 @@ Object            - Base class for all AST Objects
          system is specified by the CTYPE keywords.
 
          \sstitem
+         {\tt{"}}BadLat{\tt{"}}: This condition arises when reading a FrameSet from a
+         non-Native encoded FitsChan if the latitude of the reference point
+         has an absolute value greater than 90 degrees. The actual absolute
+         value used is set to exactly 90 degrees in these cases.
+
+         \sstitem
          {\tt{"}}NoCTYPE{\tt{"}}: This condition arises if a default CTYPE value is used
          within \htmlref{astRead}{astRead}, due to no value being present in the supplied FitsChan.
          This condition is only tested for when using non-Native encodings.
@@ -19552,7 +19834,7 @@ Object            - Base class for all AST Objects
    }
 }
 \sstroutine{
-   DrawAxes\sstlabel{DrawAxes}
+   DrawAxes(axis)\sstlabel{DrawAxesaxis}
 }{
    Draw axes for a Plot?
 }{
@@ -19560,11 +19842,14 @@ Object            - Base class for all AST Objects
       This attribute controls the appearance of an annotated
       coordinate grid (drawn with the \htmlref{astGrid}{astGrid} function) by determining
       whether curves representing coordinate axes should be drawn.
+      It takes a separate value for each physical axis of a
+      \htmlref{Plot}{Plot} so that, for instance, the setting {\tt{"}}DrawAxes(2)=0{\tt{"}}
+      specifies that no axis should be drawn for the second axis.
 
       If drawn, these axis lines will pass through any tick marks
       associated with numerical labels drawn to mark values on the
       axes. The location of these tick marks and labels (and hence the
-      axis lines) is determined by the \htmlref{Plot}{Plot}'s \htmlref{LabelAt(axis)}{LabelAtaxis} attribute.
+      axis lines) is determined by the Plot's \htmlref{LabelAt(axis)}{LabelAtaxis} attribute.
 
       If the DrawAxes value of a Plot is non-zero (the default), then
       axis lines will be drawn, otherwise they will be omitted.
@@ -19592,6 +19877,12 @@ Object            - Base class for all AST Objects
          drawn around the edges of the plotting area (see the \htmlref{Labelling}{Labelling}
          attribute).  In this case, the value of the DrawAxes attribute
          is ignored.
+
+         \sstitem
+         If no axis is specified, (e.g. {\tt{"}}DrawAxes{\tt{"}} instead of
+         {\tt{"}}DrawAxes(2){\tt{"}}), then a {\tt{"}}set{\tt{"}} or {\tt{"}}clear{\tt{"}} operation will affect
+         the attribute value of all the Plot axes, while a {\tt{"}}get{\tt{"}} or
+         {\tt{"}}test{\tt{"}} operation will use just the DrawAxes(1) value.
       }
    }
 }
@@ -20952,7 +21243,7 @@ Object            - Base class for all AST Objects
          \sstitem
          Normally, the LabelAt value also determines where the lines
          representing coordinate axes will be drawn, so that the tick
-         marks will lie on these lines (but also see the \htmlref{DrawAxes}{DrawAxes}
+         marks will lie on these lines (but also see the DrawAxes
          attribute).
 
          \sstitem
@@ -23590,6 +23881,9 @@ Object            - Base class for all AST Objects
       \sstitemlist{
 
          \sstitem
+         \htmlref{astAngle}{astAngle}: Calculate the angle subtended by two points at a third point
+
+         \sstitem
          \htmlref{astConvert}{astConvert}: Determine how to convert between two coordinate systems
 
          \sstitem
@@ -23608,6 +23902,9 @@ Object            - Base class for all AST Objects
          \htmlref{astOffset}{astOffset}: Calculate an offset along a geodesic curve
 
          \sstitem
+         \htmlref{astOffset2}{astOffset2}: Calculate an offset along a geodesic curve in a 2D Frame
+
+         \sstitem
          \htmlref{astPermAxes}{astPermAxes}: Permute the order of a Frame's axes
 
          \sstitem
@@ -23615,6 +23912,9 @@ Object            - Base class for all AST Objects
 
          \sstitem
          \htmlref{astUnformat}{astUnformat}: Read a formatted coordinate value for a Frame axis
+
+         \sstitem
+         AST\_OFFSET2: Calculate an offset along a geodesic curve in a 2D Frame
       }
    }
 }
@@ -24202,7 +24502,7 @@ Object            - Base class for all AST Objects
       may often be non-linear, or even discontinuous, most plotting
       does not result in simple straight lines. The basic plotting
       element is therefore not a straight line, but a geodesic curve
-      (see \htmlref{astCurve}{astCurve} and \htmlref{astPolyCurve}{astPolyCurve}). A Plot also provides facilities for
+      (see \htmlref{astCurve}{astCurve}, \htmlref{astGenCurve}{astGenCurve} and \htmlref{astPolyCurve}{astPolyCurve}). A Plot also provides facilities for
       drawing markers or symbols (\htmlref{astMark}{astMark}), text (\htmlref{astText}{astText}) and grid lines
       (\htmlref{astGridLine}{astGridLine}). It is also possible to draw curvilinear axes with
       optional coordinate grids (\htmlref{astGrid}{astGrid}).
@@ -24255,7 +24555,7 @@ Object            - Base class for all AST Objects
          \htmlref{Colour(element)}{Colourelement}: Colour index for a Plot element
 
          \sstitem
-         \htmlref{DrawAxes}{DrawAxes}: Draw axes for a Plot?
+         \htmlref{DrawAxes(axis)}{DrawAxesaxis}: Draw axes for a Plot?
 
          \sstitem
          \htmlref{DrawTitle}{DrawTitle}: Draw a title for a Plot?
@@ -24345,6 +24645,9 @@ Object            - Base class for all AST Objects
          astCurve: Draw a geodesic curve
 
          \sstitem
+         astGenCurve: Draw a generalized curve
+
+         \sstitem
          \htmlref{astGrfPop}{astGrfPop}: Retrieve previously saved graphics functions
 
          \sstitem
@@ -24390,7 +24693,7 @@ Object            - Base class for all AST Objects
          Grid: Grid lines drawn using astGridLine or astGrid
 
          \sstitem
-         Curves: Geodesic curves drawn using astCurve or astPolyCurve
+         Curves: Geodesic curves drawn using astCurve, astGenCurve or astPolyCurve
 
          \sstitem
          NumLab: Numerical axis labels drawn using astGrid
@@ -25510,7 +25813,27 @@ current version):
 
 \begin{enumerate}
 
+\item The \htmlref{Frame}{Frame} class has a new method called 
+\htmlref{astAngle}{astAngle}
+which returns the angle subtended by two points at a third point within a
+2 or 3 dimensional Frame.
+
+\item The Frame class has a new method called 
+\htmlref{astOffset2}{astOffset2}
+which calculates a position which is offset away from a given starting
+point by a specified distance along a geodesic curve which passes
+through the starting point at a given position angle. It can only be used
+with 2-dimensional Frames.
+
 \item The \htmlref{Plot}{Plot} class has a new method called 
+\htmlref{astGenCurve}{astGenCurve}
+which allows generalised user-defined curves to be drawn. The curve is
+defined by a user-supplied \htmlref{Mapping}{Mapping} which maps distance along the curve
+into the corresponding position in the current Frame of the Plot. The new
+method then maps these current Frame position into graphics coordinates,
+taking care of any non-linearities or discontinuities in the mapping.
+
+\item The Plot class has a new method called 
 \htmlref{astGrfSet}{astGrfSet} 
 which allows the underlying primitive graphics functions to be selected
 at run-time. Previously, the functions used by the Plot class to produce
@@ -25523,10 +25846,24 @@ allow the current graphics routines to be saved and restore on a
 first-in-last-out stack, allowing temporary changes to be made to the set
 of registered graphics routines.
 
+\item The DrawAxes attribute of the Plot class can now be specified
+independantly for each axis, by appending the axis index to the
+end of the attribute name.
 
 \item A bug has been fixed in the Plot class which could result in axis
 labels being drawn on inappropriate edges of the plotting box when using
 ``interior'' labelling.
+
+\item A bug has been fixed in the \htmlref{IntraMap}{IntraMap} class which could cause IntraMaps
+to be corrupted after transforming any points.
+
+\item Bugs have been fixed in the \htmlref{FitsChan}{FitsChan} class which could cause
+inappropriate ordering of headers within a FitsChan when writing or
+reading objects using NATIVE encodings.  
+
+\item A bug has been fixed in the FitsChan class which could cause the
+celestial longitude of a pixel to be estimated incorrectly by 180 degrees
+if the reference point is at either the north or the south pole. 
 
 \end{enumerate}
 
