@@ -1,7 +1,7 @@
 #!perl
 
 use strict;
-use Test::More tests => 10;
+use Test::More tests => 11;
 
 require_ok("Starlink::AST");
 
@@ -13,32 +13,44 @@ while (<DATA>) {
 }
 
 $fchan->Clear( "Card" );
+is( $fchan->GetC( "Encoding" ), "FITS-WCS", 
+    "Encoding type of the FitsChan object" );
+
+
 my $wcsinfo = $fchan->Read();
 isa_ok( $wcsinfo, "AstFrameSetPtr" );
 
+# define some arrays (and references) to hold out inital coordinates
 my ( @x, @y );
+my $xpixel = \@x;
+my $ypixel = \@y;
+
+# FORWARD MAPPING
+# ---------------
 $x[0] = 0;
 $y[0] = 0;;
 $x[1] = 114;
 $y[1] = 128;
-my $xpixel = \@x;
-my $ypixel = \@y;
+
 my ( $xworld, $yworld) = $wcsinfo->Tran2( $xpixel, $ypixel, 1 );
 is( $$xworld[0], 4.5, "Forward mapping of lower bound X co-ordinate" ); 
 is( $$yworld[0], -0.5, "Forward mapping of lower bound Y co-ordinate" );
 is( $$xworld[1], 118.5, "Forward mapping of upper bound X co-ordinate" ); 
 is( $$yworld[1], 127.5, "Forward mapping of upper bound Y co-ordinate" );
 
+# REVERSE MAPPING
+# ---------------
 $x[0] = 4.5;
 $y[0] = -0.5;
 $x[1] = 118.5;
 $y[1] = 127.5;
-my ( $xworld, $yworld) = $wcsinfo->Tran2( $xpixel, $ypixel, 0 );
+($xworld, $yworld) = $wcsinfo->Tran2( $xpixel, $ypixel, 0 );
 is( $$xworld[0], 0, "Reverse mapping of lower bound X co-ordinate" ); 
 is( $$yworld[0], 0, "Reverse mapping of lower bound Y co-ordinate" );
 is( $$xworld[1], 114, "Reverse mapping of upper bound X co-ordinate" ); 
 is( $$yworld[1], 128, "Reverse mapping of upper bound Y co-ordinate" );
 
+# Done!
 
 __DATA__
 SIMPLE  =                    T / file does conform to FITS standard             
