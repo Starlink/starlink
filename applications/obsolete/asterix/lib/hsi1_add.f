@@ -78,6 +78,8 @@
 *        Original version.
 *     13 Feb 1996 (DJA):
 *        Don't try to write history to primitives
+*     20 May 1998 (RB):
+*        Write out the USER
 *     {enter_changes_here}
 
 *  Bugs:
@@ -114,7 +116,7 @@
       CHARACTER*(DAT__SZLOC)	LOC			! Output HDS object
       CHARACTER*(DAT__SZLOC)	RLOC			! RECORDS structure
 
-      CHARACTER*12           	SYSNAME, NODENAME,
+      CHARACTER*12           	SYSNAME, NODENAME, USERNAME,
      :                       	RELEASE, VERSION, MACHINE
       CHARACTER*18		TSTR			! Time string
 
@@ -177,6 +179,14 @@
 *      Get locator to current record
           CALL DAT_CELL( RLOC, 1, CURREC, CRLOC, STATUS )
 
+*      Get username and write it
+          CALL PSX_GETENV( 'USER', USERNAME, STATUS )
+          IF ( STATUS .NE. SAI__OK ) THEN
+            CALL ERR_ANNUL( STATUS )
+            USERNAME = 'unknown'
+          END IF
+          CALL DAT_NEW0C( CRLOC, 'USER', 30, STATUS )
+          CALL CMP_PUT0C( CRLOC, 'USER', USERNAME, STATUS )
 *      Get system stuff including node name
           CALL PSX_UNAME( SYSNAME, NODENAME, RELEASE, VERSION,
      :                                       MACHINE, STATUS )

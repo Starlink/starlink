@@ -70,11 +70,14 @@
 
 *  Authors:
 *     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     RB: Richard Beard
 *     {enter_new_authors_here}
 
 *  History:
 *     16 Mar 1995 (DJA):
 *        Original version.
+*     20 May 1998 (RB):
+*        Get username as well.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -108,6 +111,7 @@
       CHARACTER*30              CDATE                   ! Creation date
       CHARACTER*(DAT__SZLOC)    CRLOC                   ! Current RECORDS cell
       CHARACTER*(DAT__SZLOC)    HLOC                    ! HISTORY object
+      CHARACTER*30		USER			! History username
       CHARACTER*30		HOST			! History host
       CHARACTER*(DAT__SZLOC)    LOC                     ! Dataset locator
       CHARACTER*(DAT__SZLOC)    RLOC                    ! RECORDS object
@@ -161,6 +165,15 @@
 *    Write command
         CALL CMP_GET0C( CRLOC, 'COMMAND', TEXT, STATUS )
         CALL ADI_CPUT0C( OARG, 'Creator', TEXT(:CHR_LEN(TEXT)), STATUS )
+
+*    Write username
+        CALL DAT_THERE( CRLOC, 'USER', THERE, STATUS )
+        IF ( THERE ) THEN
+          CALL CMP_GET0C( CRLOC, 'USER', USER, STATUS )
+        ELSE
+          USER = 'unknown'
+        END IF
+        CALL ADI_CPUT0C( OARG, 'User', USER, STATUS )
 
 *    Write host
         CALL DAT_THERE( CRLOC, 'HOST', THERE, STATUS )

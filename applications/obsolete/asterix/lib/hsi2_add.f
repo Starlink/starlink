@@ -72,6 +72,12 @@
 *        Original version.
 *     13 May 1997 (RB):
 *        Update the CREATOR keyword each time.
+*     25 Nov 1997 (RB):
+*        Add lines to a special HISTORY extension.
+*     10 Feb 1998 (RB):
+*        Converted to new linked structure format.
+*     20 May 1998 (RB):
+*        Write out the USER
 *     {enter_changes_here}
 
 *  Bugs:
@@ -101,16 +107,22 @@
         PARAMETER		( UMODE = 'NORMAL' )
 
 *  Local Variables:
-      CHARACTER*80		HTXT			! History text line
+      CHARACTER*80		CMNT			! FITS comment line
+      CHARACTER*4		RSTR			! Record number as string
 
       CHARACTER*80		NAME			! Creator name
-      CHARACTER*12           	SYSNAME, NODENAME,
+      CHARACTER*12           	SYSNAME, NODENAME, USERNAME,
      :                       	RELEASE, VERSION, MACHINE
       CHARACTER*18		TSTR			! Time string
 
       INTEGER			IVERB			! Verbosity
       INTEGER			PHDU			! Main HDU in file
-      INTEGER			TLEN			! Text length
+      INTEGER			HHDU			! HISTORY HDU in file
+      INTEGER			CURREC			! Currect history record
+      INTEGER			NDIG			! Number of digits
+      INTEGER			RHDU			! New record HDU in HISTORY
+
+      LOGICAL			DIDCRE			! Was the HDU created?
 *.
 
 *  Check inherited global status.
@@ -119,15 +131,27 @@
 *  No output from this method
       OARG = ADI__NULLID
 
-*  Locate our primary HDU
-      CALL ADI2_FNDHDU( ARGS(1), ' ', .TRUE., PHDU, STATUS )
+*  Locate our primary and HISTORY HDUs
+      CALL ADI2_FNDHDU( ARGS(1), ' ', .FALSE., PHDU, STATUS )
+      CALL ADI2_FNDHDU( ARGS(1), 'HISTORY', .FALSE., HHDU, STATUS )
+      IF ( HHDU .EQ. ADI__NULLID ) THEN
+        CALL ERR_ANNUL( STATUS )
+	CALL HSI_NEW( ARGS(1), STATUS )
+        CALL ADI2_FNDHDU( ARGS(1), 'HISTORY', .FALSE., HHDU, STATUS )
+      END IF
 
 *  Get verbosity
-c     CALL HSI1_GETVRB( HLOC, IVERB, STATUS )
-      IVERB = HSI__QUIET
+      CALL HSI2_GETVRB( HHDU, IVERB, STATUS )
 
 *  Only write text if verbosity is QUIET or greater
       IF ( IVERB .GE. HSI__QUIET ) THEN
+
+*  Get username
+      CALL PSX_GETENV( 'USER', USERNAME, STATUS )
+      IF ( STATUS .NE. SAI__OK ) THEN
+        CALL ERR_ANNUL( STATUS )
+        USERNAME = 'unknown'
+      END IF
 
 *    Get system stuff including node name
         CALL PSX_UNAME( SYSNAME, NODENAME, RELEASE, VERSION, MACHINE,
@@ -147,14 +171,38 @@ c     CALL HSI1_GETVRB( HLOC, IVERB, STATUS )
         CALL ADI2_HPKYC( PHDU, 'CREATOR', NAME,
      :                   'Creator of this file', STATUS )
 
-*    Format history line
-        CALL MSG_SETC( 'CMD', NAME )
-        CALL MSG_SETC( 'HOST', NODENAME )
-        CALL MSG_SETC( 'TIME', TSTR )
-        CALL MSG_MAKE( 'ASTHIS: ^CMD on ^HOST at ^TIME', HTXT, TLEN )
+*    Get current record number
+        CALL ADI2_HGKYI( HHDU, 'CHILDREN', CURREC, CMNT, STATUS )
+        CURREC = CURREC + 1
+        CALL ADI2_HPKYI( HHDU, 'CHILDREN', CURREC, CMNT, STATUS )
+        CALL CHR_ITOC( CURREC, RSTR, NDIG )
+        CALL ADI2_HPKYC( HHDU, 'CHILD'//RSTR(:NDIG),
+     :                   'RECORD'//RSTR(:NDIG),
+     :                   'Name of child extension',
+     :                   STATUS )
 
-*    Write hew history record
-        CALL ADI2_HPHIS( PHDU, HTXT(:TLEN), STATUS )
+*    Write hew history record extension
+        CALL ADI2_CFIND( ARGS(1), 'RECORD'//RSTR(:NDIG), ' ', ' ',
+     :                   .TRUE., .FALSE., ' ', 0, 0, DIDCRE, RHDU,
+     :                   STATUS )
+        CALL ADI2_HPKYC( RHDU, 'EXTNAME', 'RECORD'//RSTR(:NDIG),
+     :                   'Contains ASTERIX HIST_REC structure', STATUS )
+        CALL ADI2_HPKYC( RHDU, 'TYPE', 'HIST_REC',
+     :                   'Data type of this extension', STATUS )
+        CALL ADI2_HPKYC( RHDU, 'USER', USERNAME,
+     :                   'Username of person modifying file', STATUS )
+        CALL ADI2_HPKYC( RHDU, 'HOST', NODENAME,
+     :                   'Machine application was run from', STATUS )
+        CALL ADI2_HPKYC( RHDU, 'DATE', TSTR,
+     :                   'Date & time application was started', STATUS )
+        CALL ADI2_HPKYC( RHDU, 'COMM', NAME,
+     :                   'Version of application being run', STATUS )
+        CALL ADI2_HPKYI( RHDU, 'TEXT_REC', 0,
+     :                   'Current text line number', STATUS )
+        CALL ADI2_HPKYC( RHDU, 'PARENT', 'HISTORY',
+     :                   'Parent HDU of this extension', STATUS )
+        CALL ADI2_HPKYI( RHDU, 'CHILDREN', 0,
+     :                   'Number of children for this HDU', STATUS )
 
 *  End of verbosity test
       END IF

@@ -86,6 +86,7 @@
 *     Jim Peden (JCMP,University of Birmingham)
 *     Phil Andrews (ROSAT,University of Birmingham)
 *     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     RB: Richard Beard
 *     {enter_new_authors_here}
 
 *  History:
@@ -120,6 +121,8 @@
 *     16 Mar 95 V1.8-1 (DJA):
 *        Total re-write for ADI. No longer needs history common block.
 *        Output style tidied up.
+*     20 May 98 V2.2-1 (RB):
+*        Add "User".
 *     {enter_changes_here}
 
 *  Bugs:
@@ -142,12 +145,12 @@
 
 *  Local Constants:
       CHARACTER*30		VERSION
-        PARAMETER               ( VERSION = 'HIST Version 2.2-0' )
+        PARAMETER               ( VERSION = 'HIST Version 2.2-1' )
 
 *  Local Variables:
       CHARACTER*30		CDATE			! Creation date
       CHARACTER*80		CREATOR			! Creation command
-      CHARACTER*30		HOST			! Machine of creation
+      CHARACTER*30		HOST, USER		! Machine of creation
       CHARACTER*132		FILE,PATH		! Path info
       CHARACTER*132           	STRING           	! String value
 
@@ -259,6 +262,7 @@
         END IF
         CALL MSG_SETC( 'CREATOR', CREATOR )
         CALL AIO_IWRITE( OCH, 2, 'Creator: ^CREATOR', STATUS )
+
         CALL ADI_CGET0C( HRID, 'Date', CDATE, STATUS )
         IF ( STATUS .NE. SAI__OK ) THEN
           CALL ERR_ANNUL( STATUS )
@@ -268,6 +272,15 @@
         END IF
         CALL MSG_SETC( 'DATE', CDATE )
         CALL AIO_IWRITE( OCH, 2, 'Date:    ^DATE', STATUS )
+
+        CALL ADI_CGET0C( HRID, 'User', USER, STATUS )
+        IF ( STATUS .NE. SAI__OK ) THEN
+          CALL ERR_ANNUL( STATUS )
+          USER = 'Unknown'
+        END IF
+        CALL MSG_SETC( 'USER', USER )
+        CALL AIO_IWRITE( OCH, 2, 'User:    ^USER', STATUS )
+
         CALL ADI_CGET0C( HRID, 'Host', HOST, STATUS )
         IF ( STATUS .NE. SAI__OK ) THEN
           CALL ERR_ANNUL( STATUS )
