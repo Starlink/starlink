@@ -174,7 +174,7 @@
   <!entity % Internal.Feature.Dateonly	'include'>
   <!entity % Feature.Docnumber		'include'>
   <!entity % Feature.Routinelist	'include'>
-  <!entity % Feature.EnforceLinkpolicy	'include'>
+  <!entity % Feature.EnforceLinkPolicy	'include'>
 ]]>
 
 <!--
@@ -231,13 +231,13 @@
 <!entity % Feature.Routinelist 'ignore'>
 
 <!--
-  The entity %Feature.EnforceLinkpolicy controls whether the link
+  The entity %Feature.EnforceLinkPolicy controls whether the link
   policy described below is enforced by the DTD.  Set this to IGNORE
   to relax the policy.
 
   Default: enforced
 -->
-<!entity % Feature.EnforceLinkpolicy 'include'>
+<!entity % Feature.EnforceLinkPolicy 'include'>
 
 
 <!--========== Entities for special symbols ==========
@@ -333,9 +333,11 @@
 <![ %Feature.Versioning [
     <!entity % history ',history'>
     <!entity % update 'update*,'>
+    <!entity % update.pc ',update*'  -- hacky, but update with prec. comma -->
 ]]>
 <!entity % history ',docdate'>
 <!entity % update ''>
+<!entity % update.pc ''>
 <!-- either HISTORY or DOCDATE elements will be present in DTD -->
 
 <![ %Feature.Docnumber [
@@ -351,15 +353,13 @@
   makes the DTD more nearly conformant with XML.  Also, 
   having the order fixed means that the AUTHORLIST start tag can be
   made omissable.
-
-  There's also a requirement for the specification of a `cover
-  picture'.  Add this somewhere here.
 -->
 <!entity % docinfo.model 
-	'title , authorlist , keyword* %docnumber %history , copyright?'>
+	'title , authorlist , keyword* %docnumber %history ,
+	coverimage?, copyright?'>
 <!element DOCINFO o o (%docinfo.model)>
 
-<!element TITLE		o o (#pcdata)	
+<!element TITLE		o o (#pcdata)
 			-- contains document title.  This is marked as
 			   omissable: it typically won't be, in the
 			   document head, but the same element is used
@@ -424,62 +424,17 @@
 
 <![ %Feature.Versioning [
 <!--
-	FIXME FIXME
-
-  The documentation below refers to an earlier version of the history
-  structure.  It should be fixed when the structure is finalised.
-
-  The date format should be finalised.  Should it be yyyymmdd or dd-mmm-yyyy?
-
-================
-
-  The history consists of a series of versions, each of which contains
-  a series of distributions.  There must be at least one distribution, so the
-  first will typically have no `release number'.  The versions and
-  distributions must be in chronological order, with the latest last.
-
-  A `version' is a significant release of a document; a `distribution'
-  is an intermediate/bugfixing/developers' release.  Typically,
-  distributions will have minor but significant differences.  The
-  distinction is a little artificial, and is more concerned with
-  Starlink distribution cycles than than any terrifically clear
-  distinction between the two ideas.  As an example, SUN/123.4-5 is
-  document number 123, version 4, release 5, which will typically be
-  quoted as simply SUN/123.4.
-
-  A distribution must contain free-text notes on the distribution, and
-  additionally provides an ID for UPDATE elements elsewhere in
-  the document to point to.  Updates, which may appear at various
-  points in the document (at the beginning of paragraphs, for
-  example), log edits made to the file by a particular author or
-  editor.  An adjustment to a paragraph should go in an update element
-  at the beginning of the paragraph, a global edit or a note about
-  general tidying (for example) would go in an update element at the
-  beginning of the document body.  Note that this model requires that,
-  in order for there to be a `distribution' element for `update's to
-  link to, there must be a `distribution' element present for the
-  distribution you will make next.
-
-  In this model, updates are not individually dated (but we could add a
-  required or optional date attribute to it, if we think we care that
-  much about a precise date for a change), but acquire a date by
-  reference to the distribution in which they were made public.  Note
-  that this seems slightly counterintuitive from the author's point of
-  view, in that when you're working on a document, the `distribution'
-  you'll attach your changes to is the one `yet to come'.  However, this
-  makes more sense than alternatives, because when you look at a
-  document, the thing you want to know is `in which distribution of a
-  document did this change appear?', so that updates are in this sense
-  attached to distributions (and specifically the distribution
-  temporally following the change), rather than merely having a date
-  attached to them.
+  Versioning is simple.  The history consists of a sequence of
+  versions, distributions and changes, regarded as events.  Versions
+  are significant releases of the software or manual, distributions
+  are less significant, and might mark a bugfix release, or a
+  beta-release for comments.  Changes simply mark some edit, for
+  whatever reason.  The last two have an optional versionid
+  attribute.  This can be used as the target of the update element's
+  versionid attribute.  The update elements are scattered throughout
+  the document, and mark the location of some change; they are optional.
 -->
 <!element HISTORY	- o (version, (version | distribution | change)*)>
-<![ ignore [
-<!element VERSION	- o (distribution+)>
-<!element DISTRIBUTION	- o (px+)	
-			-- Contains free-text notes on the distribution. -->
-]]>
 <!element (VERSION | DISTRIBUTION | CHANGE)
 			- o (px+)
 			-- contain free-text notes on the release or change -->
@@ -556,27 +511,19 @@
 <!element DOCDATE - o (#pcdata)>
 ]]>
 
-<!element COPYRIGHT - - (p+)
+<!element COVERIMAGE - o (figurecontent)
+			-- Display the image on the coverpage -->
+
+<!element COPYRIGHT - o (p+)
 			-- Replace the copyright boilerplate with this
 			   text. -->
 
 <!--========== Document body ==========-->
 <![ %Feature.Routinelist [
-  <!entity % body.content '%update (routinelist | (p | table | figure)*)'>
+  <!entity % body.content '(routinelist | (p | table | figure)*)'>
 ]]>
-<!entity % body.content '%update (p | table | figure)*'>
+<!entity % body.content '(p | table | figure)*'>
 
-<!--
-  I'm don't think we need to have the bibliography, indexcontents
-  and notecontents as elements.  Their existence should instead be
-  inferred whenever there are references to material in the body of
-  the document.
--->
-<!--
-<![ %Feature.Routinelist [
-  <!entity % appendix.content "routinelist?, sect*">
-]]>
--->
 <!entity % appendix.content "sect+">
 
 <!--
@@ -590,13 +537,13 @@
   If an element has %export.id.optional in its attribute list, then it
   may specify an ID, and it may export it, but neither is required.
 -->
-<![ %Feature.EnforceLinkpolicy [
+<![ %Feature.EnforceLinkPolicy [
   <!entity % export.id.required "
 	id id #required
 	export (export) #required">
 ]]>
 <!-- 
-  If %Feature.EnforceLinkpolicy is IGNORE, then make all the
+  If %Feature.EnforceLinkPolicy is IGNORE, then make all the
   attributes implied
  -->
 <!entity % export.id.required "
@@ -666,9 +613,6 @@
 		#implied
 	>
 
-<!--
-<!element BACKMATTER	o o (bibliography? & indexcontents? & notecontents?)>
--->
 <!element BACKMATTER    - o empty>
 <!attlist BACKMATTER
 	bibliography		-- bibliography name --
@@ -677,7 +621,8 @@
 	>
 
 <!-- Subhead and title are the header and title for (sub*)sections -->
-<!element SUBHEAD o o (title)>
+<!entity % subhead.model 'title %update.pc'>
+<!element SUBHEAD o o (%subhead.model;)>
 
 <!--
   UPDATE elements can appear in several places.  They are intended to
@@ -698,11 +643,13 @@
 		idref	#required
 		-- version/release when the alteration was made --
 		-- id matches one DISTRIBUTION or CHANGE element --
+
+	-- remove author attribute.  The idea was that this could
+	   override the author attribute in the distribution or
+	   change element this refers to, but this is probably a bad idea.
 	author
 		idref	#implied
-		-- author of modification.  id matches author element.
-		   If no author given, then take it from author of
-		   change or distribution referred to by versionid --
+	--
   	>
 <!-- end of %Feature.Versioning -->
 ]]>
@@ -765,8 +712,10 @@
   pathnames which needs to be shown in a distinctive font.  KBD is
   much the same, except that it is for text a user should type.  That
   is, these are identical at the DTD level.
+
+  Allow %references within CODE: see verbatim below.
 -->
-<!element (CODE|KBD) - - (#pcdata)	-- literal text -->
+<!element (CODE|KBD) - - ((#pcdata | %references)*)	-- literal text -->
 <!attlist CODE
 	type			-- what type of thing is it?  Used for
 				   formatting hints. --
@@ -790,10 +739,6 @@
 -->
 <!element VERBATIM - - ((#pcdata | %simplephrase | %references)*)
 					-- verbatim text -->
-<![ ignore [
-<!element VERBATIM - - (#pcdata)	-- verbatim text -->
-]]>
-
 <!element BLOCKQUOTE - - (attribution?, px+)	-- extended quotation -->
 <!element QUOTE - - (attribution?, (%phrase)+)	
 					-- simple quotation  -->
@@ -839,26 +784,7 @@
 		-- just include an entry in the bibliography --
 	>
 
-<![ ignore [
-<!element BIBLIOGRAPHY - o empty	-- bib contents, in
-					   back-matter only -->
-<!attlist bibliography
-	bib	cdata	#required	-- name of bibliography --
-	all	(all)	#implied	-- list all of bib, not just citns --
-	>
-
-<!--
-  How about an alternative bibliography, with elements in place?  Or
-  make bibliography non-empty, and have its contents supplement those
-  in the database.
--->
-]]>
-
 <!element NOTE - - (px)+		-- foot/endnotes -->
-<![ ignore [
-<!element NOTECONTENTS - o empty	-- body of footnotes, in
-					   back-matter only --> 
-]]>
 
 <!--
   We perhaps need to think carefully about how INDEX interrelates with
@@ -869,9 +795,6 @@
 <!attlist index
 	key	cdata	#implied	-- key, if not element contents --
 	>
-<![ ignore [
-<!element INDEXCONTENTS - o empty	-- the index, in back-matter only -->
-]]>
 
 <!--========== Routine list ==========-->
 <![ %Feature.Routinelist [
@@ -887,28 +810,6 @@
 			   elements with these ids should be processed --
 		cdata
 		#implied
-	>
-]]>
-<![ ignore [ 
-<!-- old routinelist structure -->
-<!element ROUTINELIST - - (p*,routine+) 
-	-- routines optionally prefaced by text-->
-<!element ROUTINE - o (routinename, summary, description, usage,
-  parameterlist, examples, routinenotes?)>
-<!element ROUTINENAME	- o (#pcdata)>
-<!element SUMMARY 	- o (#pcdata)>
-<!element DESCRIPTION	- o (p+)>
-<!element USAGE		- o (#pcdata)>
-<!element PARAMETERLIST	- o (parameter,paramdesc)+>
-<!element EXAMPLES	- o (p+)>
-<!element ROUTINENOTES	- o (p+)>
-
-<!element PARAMETER	- o (#pcdata)>
-<!element PARAMDESC	- o (#pcdata)>
-
-<!attlist parameter
-	type	(real,integer,char,logical,ndf)	#required
-	access	(r,w,rw)	#required
 	>
 ]]>
 
