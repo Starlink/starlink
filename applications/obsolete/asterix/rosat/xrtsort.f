@@ -1600,6 +1600,7 @@ C              WRITE(*,*)MAP,NINMAP,MAXLIM
             PARAMETER (TOL=1.0/3600)  ! Set tolerance to one arcsecond
 * Local variables :
         CHARACTER*132 TIMSTRING       ! Time ranges
+        CHARACTER*20 RAS,DECS	      ! RA/DEC in any format
         CHARACTER*30 C1,C2            ! Default time range
         CHARACTER CENTRE	      ! Option for region centre
         CHARACTER*10 RANGES,BIN_AXES  ! Axes codes for choosing range and data
@@ -1792,8 +1793,9 @@ C              WRITE(*,*)MAP,NINMAP,MAXLIM
      :                                                XW,YW,STATUS)
         ELSEIF (CENTRE.EQ.'4') THEN
           CENTRE='USER'
-          CALL USI_GET0D('RA', SRT.FIELD_RA, STATUS)
-          CALL USI_GET0D('DEC', SRT.FIELD_DEC, STATUS)
+          CALL USI_GET0C('RA', RAS, STATUS)
+          CALL USI_GET0C('DEC', DECS, STATUS)
+          CALL CONV_RADEC(RAS,DECS,SRT.FIELD_RA,SRT.FIELD_DEC,STATUS)
           CALL XRTSORT_RADEC2AXIS(SRT.FIELD_RA,SRT.FIELD_DEC,TMAT,
      :                                                XW,YW,STATUS)
         ELSE
@@ -1815,12 +1817,14 @@ c        SRT.ELBMAX=Y_HWIDTH
       ELSE
 
 *   Set centre of the field as default
-        CALL USI_DEF0D('RA', HEAD.AXIS_RA, STATUS)
-        CALL USI_DEF0D('DEC', HEAD.AXIS_DEC, STATUS)
+        WRITE(RAS,*) HEAD.AXIS_RA
+        WRITE(DECS,*) HEAD.AXIS_DEC
+        CALL USI_DEF0C('RA', RAS, STATUS)
+        CALL USI_DEF0C('DEC', DECS, STATUS)
 
-        CALL USI_GET0D('RA', SRT.FIELD_RA, STATUS)
-        CALL USI_GET0D('DEC', SRT.FIELD_DEC, STATUS)
-
+        CALL USI_GET0C('RA', RAS, STATUS)
+        CALL USI_GET0C('DEC', DECS, STATUS)
+        CALL CONV_RADEC(RAS,DECS,SRT.FIELD_RA,SRT.FIELD_DEC,STATUS)
         CALL XRTSORT_RADEC2AXIS(SRT.FIELD_RA,SRT.FIELD_DEC,TMAT,
      :                                              XW,YW,STATUS)
 
@@ -2494,8 +2498,10 @@ C????            SRT.ELBMAX = SRT.ELBMAX * SRT.MAX_X / X_HWIDTH
                 CALL XRTSORT_RADEC2AXIS(BSRT.FIELD_RA,BSRT.FIELD_DEC,
      :                                             TMAT,XW,YW,STATUS)
             ELSEIF (CENTRE.EQ.'USER') THEN
-                CALL USI_GET0D('RAB', BSRT.FIELD_RA, STATUS)
-                CALL USI_GET0D('DECB', BSRT.FIELD_DEC, STATUS)
+                CALL USI_GET0C('RAB', RAS, STATUS)
+                CALL USI_GET0C('DECB', DECS, STATUS)
+                CALL CONV_RADEC(RAS,DECS,BSRT.FIELD_RA,BSRT.FIELD_DEC,
+     :                                                         STATUS)
                 CALL XRTSORT_RADEC2AXIS(BSRT.FIELD_RA,BSRT.FIELD_DEC,
      :                                              TMAT,XW,YW,STATUS)
             ENDIF
@@ -2507,12 +2513,15 @@ C????            SRT.ELBMAX = SRT.ELBMAX * SRT.MAX_X / X_HWIDTH
         ELSE
 
 *   Set centre of the field as default
-           CALL USI_DEF0D('RAB', HEAD.AXIS_RA, STATUS)
-           CALL USI_DEF0D('DECB', HEAD.AXIS_DEC, STATUS)
+           WRITE(RAS,*) HEAD.AXIS_RA
+           WRITE(DECS,*) HEAD.AXIS_DEC
+           CALL USI_DEF0C('RAB', RAS, STATUS)
+           CALL USI_DEF0C('DECB', DECS, STATUS)
 
-           CALL USI_GET0D('RAB', BSRT.FIELD_RA, STATUS)
-           CALL USI_GET0D('DECB',BSRT.FIELD_DEC, STATUS)
-
+           CALL USI_GET0C('RAB', RAS, STATUS)
+           CALL USI_GET0C('DECB',DECS, STATUS)
+           CALL CONV_RADEC(RAS,DECS,BSRT.FIELD_RA,BSRT.FIELD_DEC,
+     :                                                     STATUS)
            CALL XRTSORT_RADEC2AXIS(BSRT.FIELD_RA,BSRT.FIELD_DEC,TMAT,
      :                                                   XW,YW,STATUS)
 
