@@ -141,7 +141,8 @@ it produces an <funcname/error/.
 	 (xrefent-gen-sysid (and xrefent
 				 (entity-generated-system-id xrefent)))
 	 (docelem (and xrefent-gen-sysid
-		       (document-element (sgml-parse xrefent-gen-sysid))))
+		       (document-element-from-entity xrefent)
+		       ))
 	 (xrefid (attribute-string (normalize "loc") (current-node)))
 	 ;; xreftarget is the element the docxref refers to, or #f if
 	 ;; attribute LOC is implied or the document doesn't have such
@@ -206,7 +207,8 @@ it produces an <funcname/error/.
 	 (xrefent-sysid (error (string-append "DOCXREF: entity " xrefent
 					      " has a SYSTEM id")))
 	 (xrefent-gen-sysid (error (string-append
-				"DOCXREF: Couldn't parse " xrefent)))
+				"DOCXREF: Couldn't parse " xrefent
+				" (gen-sys-id " xrefent-gen-sysid ")")))
 	 (xrefent-pubid (or ($make-dummy-link$ xrefent-pubid linktext)
 			    (error (string-append
 				    "DOCXREF: couldn't make sense of FPI '"
