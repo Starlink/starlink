@@ -9,7 +9,7 @@
 *
 *	Contents:	Routines for catalog-associations.
 *
-*	Last modify:	29/11/98
+*	Last modify:	27/01/99
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -142,7 +142,7 @@ assocstruct  *load_assoc(char *filename)
       else
         {
         mindex = -1;
-        prefs.assoc_type = ASSOC_FIRST; /*PWD: modification here */
+        prefs.assoc_type = ASSOC_FIRST;
         }
 
       nlist = ndata+3;
@@ -221,7 +221,7 @@ void	init_assoc(picstruct *field)
 
 /********************************** end_assoc ********************************/
 /*
-Save the ANN weights and free memory related to the assoc operations.
+Free memory related to the assoc operations.
 */
 void	end_assoc(picstruct *field)
 
