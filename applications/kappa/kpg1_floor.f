@@ -49,10 +49,10 @@
       REAL VALUE
 
 *  Do it.
-      IF( VALUE > VAL__MAXI ) THEN
+      IF( VALUE .GT. VAL__MAXI ) THEN
          KPG1_FLOOR = VAL__MAXI
 
-      ELSE IF( VALUE < VAL__MINI ) THEN
+      ELSE IF( VALUE .LT. VAL__MINI ) THEN
          KPG1_FLOOR = VAL__MINI
 
       ELSE
