@@ -309,7 +309,6 @@ void adix_fcreat( char *fspec, int flen, ADIobj id, ADIobj *fileid,
       ADIlogical	there=ADI__false;
 
       rid = _CAR(curp);
-       adic_print( rid, status );
 
       adic_there( rid, "CREAT_RTN", &there, status );
 
