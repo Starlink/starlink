@@ -1,0 +1,8 @@
+interface IBGND
+  parameter MODE
+    position 1
+    type '_CHAR'
+    prompt 'Mode'
+    help 'Type HELP for a full list'
+  endparameter
+endinterface
