@@ -21,11 +21,11 @@
      prompt 'Output width'
      help 'Allows you to overide default width of 80 for a terminal'
    endparameter
-   parameter SLICE                                                               
-     type 'LITERAL'
+   parameter SLICE
+     type '_CHAR'
      vpath 'DEFAULT'
-     default '*'                                                               
-     prompt 'Slice'                                                         
+     default '*'
+     prompt 'Slice'
      help 'Should have format: i1:i2,j1:j2'                                      
    endparameter                                                                  
    parameter FMT
