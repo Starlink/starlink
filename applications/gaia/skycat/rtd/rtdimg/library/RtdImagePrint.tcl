@@ -214,7 +214,6 @@ itcl::class rtd::RtdImagePrint {
 	    # use a bounding box that encompasses all the displayed items.
 
            if { ! [set $w_.whole] } {
-               puts "Not printing whole canvas"
 
 		#  The origin of the image is always 0,0 for a canvas
 		#  print to work.
@@ -223,7 +222,6 @@ itcl::class rtd::RtdImagePrint {
 		set x1 [min [winfo width $canvas_] [$image_ dispwidth]]
 		set y1 [min [winfo height $canvas_] [$image_ dispheight]]
 	    } else {
-               puts "Printing whole canvas"
 		#  Use whole printing surface.
 		set x0 [min 0 [$canvas_ canvasx 0]]
 		set y0 [min 0 [$canvas_ canvasy 0]]
@@ -234,7 +232,6 @@ itcl::class rtd::RtdImagePrint {
 
 	#  Set the background (use a filled rectangle to simulate this).
        if { [set $w_.whole] } {
-           puts "set_background"
 	    set_background
 	}
 
@@ -283,7 +280,6 @@ itcl::class rtd::RtdImagePrint {
 
 	#  Remove background.
        if { [set $w_.whole] } {
-           puts "remove_background"
 	    remove_background
 	}
     }
