@@ -60,7 +60,6 @@
                       -percentiles [ list $PERCLO $PERCHI ] \
                       -watchstate viewstate \
                       -zoom $ZOOM \
-                      -geometry ${WINX}x${WINY} \
                       -uselabels 0 \
                       -maxpoints $MAXPOS
       .viewer configure -geometry ${WINX}x${WINY}

@@ -97,70 +97,68 @@
       
 #  Allow selection of points for the reference NDF.
       set refndf [ ndf $refndfname ]
-      Ndfview .v$ref \
+      Ndfview .vref \
                   -title "$title: %n (reference)" \
                   -watchstate state$ref \
                   -percentiles [ list $PERCLO $PERCHI ] \
                   -zoom $ZOOM \
                   -maxpoints $MAXPOS
-      .v$ref loadndf $refndf $MAXCANV
-      .v$ref configure -geometry ${WINX}x${WINY}
+      .vref loadndf $refndf $MAXCANV
+      .vref configure -geometry ${WINX}x${WINY}
       ccdputs -log "   Mark points on the reference image, [ $refndf name ]:"
-      .v$ref activate
+      .vref activate
       tkwait variable state$ref
-      ccdputs -log "   [ llength [ .v$ref points ] ] points initially marked."
+      ccdputs -log "   [ llength [ .vref points ] ] points initially marked."
       ccdputs -log " "
 
 #  Get display preferences so that they can be propagated to subsequent
 #  windows.
-      set ZOOM [ .v$ref cget -zoom ]
-      set MAXCANV [ .v$ref maxcanvas ]
-      regexp {^([0-9]+)x([0-9]+)} [ .v$ref cget -geometry ] dummy WINX WINY 
-      set PERCLO [ lindex [ .v$ref cget -percentiles ] 0 ]
-      set PERCHI [ lindex [ .v$ref cget -percentiles ] 1 ]
+      set ZOOM [ .vref cget -zoom ]
+      set MAXCANV [ .vref maxcanvas ]
+      regexp {^([0-9]+)x([0-9]+)} [ .vref cget -geometry ] dummy WINX WINY 
+      set PERCLO [ lindex [ .vref cget -percentiles ] 0 ]
+      set PERCHI [ lindex [ .vref cget -percentiles ] 1 ]
 
 #  Allow the user to muck about with the list for the reference NDF 
 #  while the later ones are being modified.
-      .v$ref configure -state active
+      .vref configure -state active
+
+
+      puts "${WINX}x${WINY}"
 
 #  Allow selection of points for the other NDFs.
+      ndfview .v \
+                 -watchstate state \
+                 -percentiles [ list $PERCLO $PERCHI ] \
+                 -zoom $ZOOM \
+                 -maxpoints $MAXPOS
+      .v configure -geometry ${WINX}x${WINY} 
+
       set i 0
       set done 0
       foreach ndfname $ndfnames {
          if { $i != $ref } {
             incr done
             set ndf [ ndf [ lindex $ndfnames $i ] ]
-            Ndfview .v$i \
-                         -title "$title: %n (#$done/$nother)" \
-                         -watchstate state$i \
-                         -percentiles [ list $PERCLO $PERCHI ] \
-                         -zoom $ZOOM \
-                         -geometry ${WINX}x${WINY} \
-                         -maxpoints $MAXPOS
-            .v$i configure -geometry ${WINX}x${WINY}
-            .v$i loadndf $ndf $MAXCANV
+            .v configure -title "$title: %n (#$done/$nother)"
+            .v clearpoints
+            .v loadndf $ndf $MAXCANV
             ccdputs -log \
             "   Mark points on image #$done/$nother, [ $ndf name ]:"
-            .v$i activate
-            tkwait variable state$i
-            ccdputs -log "   [ llength [ .v$i points ] ] points marked."
+            .v activate
+            tkwait variable state
+            ccdputs -log "   [ llength [ .v points ] ] points marked."
             ccdputs -log " "
-
-            set ZOOM [ .v$i cget -zoom ]
-            set MAXCANV [ .v$i maxcanvas ]
-            regexp {^([0-9]+)x([0-9]+)} [ .v$i cget -geometry ] dummy WINX WINY 
-            set PERCLO [ lindex [ .v$ref cget -percentiles ] 0 ]
-            set PERCHI [ lindex [ .v$ref cget -percentiles ] 1 ]
-            set pts($i) [ .v$i points ]
-            destroy .v$i
+            set pts($i) [ .v points ]
             $ndf destroy
          }
          incr i
       }
+      destroy .v
 
 #  Get list of points for the reference NDF.  We do this last since it may
 #  have been modified while the other NDFs are being marked.
-      set pts($ref) [ .v$ref points ]
+      set pts($ref) [ .vref points ]
 
 #  Construct the list of all points for return to calling program.
       for { set i 0 } { $i < $nndf } { incr i } {
@@ -169,7 +167,7 @@
       }
 
 #  Destroy remaining windows.
-      .v$ref configure -state done
-      destroy .v$ref
+      .vref configure -state done
+      destroy .vref
     
 # $Id$
