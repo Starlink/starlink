@@ -13,36 +13,42 @@ AC_DEFUN([STAR_DEFAULTS],
 # `precious variable'.  Amongst other things, this will make
 # ./configure squeal if the package is re-configured with an
 # inconsistent value of this variable.
-AC_ARG_VAR(STARLINK, [Where all the Starlink software lives])dnl
+# XXXNO_AC_ARG_VAR(STARLINK, [Where all the Starlink software lives])dnl
 
 # AC_SUBST the STARLINK variable.  Macro AC_ARG_VAR does this anyway,
 # but automake doesn't know that (in 1.6 at least): however any
 # variable that automake finds has been AC_SUBSTed, it includes in
 # Makefile.in, and that is useful to us.
-AC_SUBST(STARLINK)
+# XXXNO_AC_SUBST(STARLINK)
 
-# Ensure that STARLINK has a value, defaulting to @DEFAULT_STARLINK@.  
-# Note that this directory will be different from /star, if the
-# `starconf' component was configured with a non-default value of STARLINK
-test -n "$STARLINK" || STARLINK=@DEFAULT_STARLINK@
+# Ensure that STARLINK has a value, defaulting to !!DEFAULT_STARLINK!!.
+# Note that this directory may be different from /star, and reflects the
+# value of DEFAULT_STARLINK that the `starconf' package was configured with
+# before its installation.
+## test -n "$STARLINK" || STARLINK=!!DEFAULT_STARLINK!!
 
-# Install software in @DEFAULT_STARLINK@ by default
-AC_PREFIX_DEFAULT(@DEFAULT_STARLINK@)dnl
-dnl    Don't include a dependency of acinclude.m4 on this .m4 file, or on
-dnl    starconf.status: we can't have it depending on starconf.status,
-dnl    since that isn't distributed (only its products are
-dnl    distributed), and we can't just have an empty dependency with
-dnl    ./starconf.status as the rule, since this file must exist
-dnl    before any Makefile is run.  Another way of putting this is
-dnl    that, in order for this rule to be discovered and included in a
-dnl    Makefile, we must _already_ have an up-to-date acinclude.m4,
-dnl    which means that the rule is completely redundant.
+# Install software in !!DEFAULT_STARLINK!! by default
+AC_PREFIX_DEFAULT(!!DEFAULT_STARLINK!!)dnl
+
+##    Note: Don't be tempted to modify this macro to include a dependency
+##    of acinclude.m4 on this .m4 file, or on
+##    starconf.status: we can't have it depending on starconf.status,
+##    since that isn't distributed (only its products are
+##    distributed), and we can't just have an empty dependency with
+##    ./starconf.status as the rule, since this file must exist
+##    before any Makefile is run.  Another way of putting this is
+##    that, in order for this rule to be discovered and included in a
+##    Makefile, we must _already_ have an up-to-date acinclude.m4,
+##    which means that the rule is completely redundant.
 #
 # Always create a manifest-install target
 _STAR_MAKE_MANIFEST
 
-FFLAGS="$FFLAGS -I$STARLINK/include"
-CFLAGS="$CFLAGS -I$STARLINK/include"
+# FFLAGS="$FFLAGS -I$STARLINK/include"
+# CFLAGS="$CFLAGS -I$STARLINK/include"
+# XXX check below
+FFLAGS="$FFLAGS "'-I$(prefix)/include'
+CFLAGS="$CFLAGS "'-I$(includedir)'
 
 # Dependencies declarations and checks (see macros
 # [STAR_DECLARE_BUILD_DEPENDENCIES] and [STAR_DECLARE_USE_DEPENDENCIES])
@@ -53,9 +59,9 @@ AC_SUBST(STAR_BUILD_DEPENDENCIES)dnl
 STAR_USE_DEPENDENCIES=''
 AC_SUBST(STAR_USE_DEPENDENCIES)dnl
 
-dnl    Create a PACKAGE_VERSIONINT variable, which contains the
-dnl    package's version number as an integer major*1e6+minor*1e3+release.
-dnl    NB hairy quoting: quadrigraph @S|@ is replaced by $ after m4 has run.
+# Create a PACKAGE_VERSIONINT variable, which contains the
+# package's version number as an integer major*1e6+minor*1e3+release.
+## NB hairy quoting: quadrigraph @S|@ is replaced by $ after m4 has run.
 PACKAGE_VERSIONINT=[`echo $PACKAGE_VERSION | sed 's/[^0-9][^0-9]*/ /g' | awk '{print @S|@1*1000000+@S|@2*1000+(NF>2 ? @S|@3 : 0)}'`]
 AC_SUBST(PACKAGE_VERSIONINT)
 
@@ -436,28 +442,23 @@ EOD
 # configure.ac files.
 #
 AC_DEFUN([STAR_HELP_FILES],
-[AC_REQUIRE([_STAR_BOILERPLATE])dnl
-m4_ifval([$1], [], [AC_FATAL([$0: called with no helpfiles])])dnl
-if test "X$_STAR_INSTALL_HELP" = X; then
-    # First time
-    STAR_HELPDIR='$(prefix)/help'
-    AC_SUBST(STAR_HELPDIR)
-    AC_SUBST(_STAR_INSTALL_HELP)
-    cat >>$STAR_BOILERPLATE <<\_EOD
-install-starhelp: $(_STAR_INSTALL_HELP) 
-	@ $(NORMAL_INSTALL)
-	$(mkinstalldirs) $(DESTDIR)$(STAR_HELPDIR)
-	@ list='$(_STAR_INSTALL_HELP)'; for p in $$list; do \
-	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
-	  f="`echo $$p | sed -e 's|^.*/||'`"; \
-	  echo " $(INSTALL_DATA) $$d$$p $(DESTDIR)$(STAR_HELPDIR)/$$f"; \
-	  $(INSTALL_DATA) $$d$$p $(DESTDIR)$(STAR_HELPDIR)/$$f; \
-	done
-_EOD
-    _STAR_INSTALL_DATA_LOCAL="$_STAR_INSTALL_DATA_LOCAL install-starhelp"
-fi
-_STAR_INSTALL_HELP="$_STAR_INSTALL_HELP $1"
+	 [_STAR_EXTRADIR_BOILERPLATE([help],[HELP])
+          _STAR_INSTALL_HELP="$_STAR_INSTALL_HELP $1"
 ])# STAR_HELP_FILES
+
+
+# STAR_ETC_FILES(etcfiles)
+# ------------------------
+#
+# Declare a list of files to be installed into the Starlink etc
+# directory.  This can be used both internally and in user
+# configure.ac files.
+#
+AC_DEFUN([STAR_ETC_FILES],
+         [_STAR_EXTRADIR_BOILERPLATE([etc],[ETC])
+          _STAR_INSTALL_ETC="$_STAR_INSTALL_ETC $1"
+])# STAR_ETC_FILES
+
 
 # STAR_DOC_FILES(docfiles)
 # ------------------------
@@ -467,29 +468,41 @@ _STAR_INSTALL_HELP="$_STAR_INSTALL_HELP $1"
 # user configure.ac files.
 #
 AC_DEFUN([STAR_DOC_FILES],
-[AC_REQUIRE([_STAR_BOILERPLATE])dnl
-m4_ifval([$1], [], [AC_FATAL([$0: called with no doc files])])dnl
-if test "X$_STAR_INSTALL_DOCS" = X; then
-    # First time
-    STAR_DOCDIR='$(prefix)/docs'
-    AC_SUBST(STAR_DOCDIR)
-    AC_SUBST(_STAR_INSTALL_DOCS)
-    cat >>$STAR_BOILERPLATE <<\_EOD
-install-stardocs: $(_STAR_INSTALL_DOCS)
-	@ $(NORMAL_INSTALL)
-	$(mkinstalldirs) $(DESTDIR)$(STAR_DOCDIR)
-	@ list='$(_STAR_INSTALL_DOCS)'; for p in $$list; do \
-	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
-	  f="`echo $$p | sed -e 's|^.*/||'`"; \
-	  echo " $(INSTALL_DATA) $$d$$p $(DESTDIR)$(STAR_DOCDIR)/$$f"; \
-	  $(INSTALL_DATA) $$d$$p $(DESTDIR)$(STAR_DOCDIR)/$$f; \
-	done
-_EOD
-    _STAR_INSTALL_DATA_LOCAL="$_STAR_INSTALL_DATA_LOCAL install-stardocs"
-fi
-_STAR_INSTALL_DOCS="$_STAR_INSTALL_DOCS $1"
+         [_STAR_EXTRADIR_BOILERPLATE([docs],[DOCS])
+          _STAR_INSTALL_DOCS="$_STAR_INSTALL_DOCS $1"
 ])# STAR_DOC_FILES
 
+
+# _STAR_EXTRADIR_BOILERPLATE(dirname,DIRNAME)
+# -------------------------------------------
+#
+# Add the boilerplate for installing stuff in the appropriate
+# directory.  Arguments are the directory name in both lower and upper
+# case -- for example `etc' and `ETC'.
+#
+AC_DEFUN([_STAR_EXTRADIR_BOILERPLATE],
+[AC_REQUIRE([_STAR_BOILERPLATE])dnl
+m4_ifval([$1], [], [AC_FATAL([$0: called with no args])])dnl
+m4_ifval([$2], [], [AC_FATAL([$0: called with only one arg])])dnl
+if test "X$_STAR_INSTALL_$2" = X; then
+    # First time
+    STAR_$2DIR='$(prefix)/$1'
+    AC_SUBST(STAR_$2DIR)
+    AC_SUBST(_STAR_INSTALL_$2)
+    cat >>$STAR_BOILERPLATE <<\_EOD
+install-star$1: $(_STAR_INSTALL_$2) 
+	@ $(NORMAL_INSTALL)
+	$(mkinstalldirs) $(DESTDIR)$(STAR_$2DIR)
+	@ list='$(_STAR_INSTALL_$2)'; for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  f="`echo $$p | sed -e 's|^.*/||'`"; \
+	  echo " $(INSTALL_DATA) $$d$$p $(DESTDIR)$(STAR_$2DIR)/$$f"; \
+	  $(INSTALL_DATA) $$d$$p $(DESTDIR)$(STAR_$2DIR)/$$f; \
+	done
+_EOD
+    _STAR_INSTALL_DATA_LOCAL="$_STAR_INSTALL_DATA_LOCAL install-star$1"
+fi
+])# _STAR_EXTRADIR_BOILERPLATE
 
 
 # STAR_DECLARE_BUILD_DEPENDENCIES(packagelist)
