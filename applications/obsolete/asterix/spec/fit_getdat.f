@@ -147,6 +147,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'ADI_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'FIT_PAR'
 
@@ -210,6 +211,11 @@
 	LOGICAL BG			! B/g data file found?
 	LOGICAL BGSUB			! B/g subtracted flag set in data?
 	LOGICAL BGCOR			! Has b/g data been exposure corrected?
+
+      INTEGER			BFID(NDSMAX)		! Bgnd datasets
+      INTEGER			DCFID(NDSMAX)		! Source datasets
+      INTEGER			TIMID			! Timing info
+
 	INTEGER PTR			! General mapping pointer
 	INTEGER I			! Index
 	INTEGER NDSC			! No of dataset container files
@@ -257,7 +263,9 @@
 *    Single input dataset container (directly referenced)
 	  REF=.FALSE.
 	  NDSC=1
+          CALL ADI_CLONE( ID, DCFID(1), STATUS )
 	  CALL DAT_CLONE(ILOC,DCLOC(1),STATUS)
+
 *       Spectral set?
 	  CALL SPEC_SETSEARCH(DCLOC(NDSC),SPECSET(NDSC),STATUS)
 	  IF(SPECSET(1)) DETNO(1)=0		! Flag to use all spectra
@@ -273,6 +281,7 @@
 	    IF(TYPE.EQ.'REFERENCE_OBJ')THEN
 	      NDSC=NDSC+1
 	      CALL REF_GET(LOC,'READ',DCLOC(NDSC),STATUS)
+              CALL ADI1_PUTLOC( DCLOC(NDSC), DCFID(NDSC), STATUS )
 
 *       Spectral set?
 	      CALL SPEC_SETSEARCH(DCLOC(NDSC),SPECSET(NDSC),STATUS)
@@ -318,7 +327,7 @@
 	  IF(STATUS.NE.SAI__OK) CALL ERR_FLUSH(STATUS)
 
 *    Check main data array
-	  CALL BDA_CHKDATA(DCLOC(N),OK,NDIM,DIMS,STATUS)
+	  CALL BDI_CHKDATA(DCFID(N),OK,NDIM,DIMS,STATUS)
 	  IF(STATUS.NE.SAI__OK) GOTO 99
 	  IF(.NOT.OK)THEN
 	    STATUS=SAI__ERROR
@@ -327,23 +336,26 @@
 	  ENDIF
 
 *      Check that spectrum is exposure corrected (i.e in ct/s)
-          CALL PRO_GET( DCLOC(N), 'CORRECTED.EXPOSURE', LOG, STATUS )
+          CALL PRF_GET( DCFID(N), 'CORRECTED.EXPOSURE', LOG, STATUS )
 	  IF(.NOT.LOG)THEN
 	    CALL MSG_PRNT(' ')
 	    CALL MSG_PRNT('!! Warning - data must be corrected to ct/s')
 	    CALL MSG_PRNT(' ')
 	  ENDIF
 
-*    For likelihood case, get eff.exposure time from dataset and locate b/g data
+*      Likelihood case?
 	  IF ( LIKSTAT ) THEN
-	    CALL BDA_LOCHEAD(DCLOC(N),LOC,STATUS)
-	    CALL CMP_GET0R(LOC,'EFF_EXPOSURE',TEFF,STATUS)
+
+*        Get effective exposure time
+            CALL TCI_GETID( DCFID(N), TIMID, STATUS )
+            CALL ADI_CGET0R( TIMID, 'EffExposure', TEFF, STATUS )
+
 	    IF(STATUS.EQ.SAI__OK)THEN
 	      CALL MSG_SETR('TEFF',TEFF)
 	      CALL MSG_PRNT('    Effective exposure time ^TEFF')
 	    ELSE
 	      CALL ERR_ANNUL(STATUS)
-	      CALL CMP_GET0R(LOC,'EXPOSURE_TIME',TEFF,STATUS)
+              CALL ADI_CGET0R( TIMID, 'Exposure', TEFF, STATUS )
 	      IF(STATUS.EQ.SAI__OK)THEN
 	        CALL MSG_SETR('TEFF',TEFF)
 	        CALL MSG_PRNT('Effective exposure time not found - '//
@@ -354,9 +366,10 @@
 	        GOTO 99
 	      ENDIF
 	    ENDIF
+            CALL ADI_ERASE( TIMID, STATUS )
 
 *      Have data been b/g subtracted?
-            CALL PRO_GET( DCLOC(N), 'BGND_SUBTRACTED', BGSUB, STATUS )
+            CALL PRF_GET( DCFID(N), 'BGND_SUBTRACTED', BGSUB, STATUS )
 	    IF ( BGSUB ) THEN
 	      CALL MSG_PRNT('    Background-subtracted data')
 	    ELSE
@@ -372,13 +385,14 @@
 	      BG=.FALSE.
 	    ELSE
 	      BG=.TRUE.
-	    ENDIF
+              CALL ADI1_PUTLOC( BLOC(N), BFID(N), STATUS )
+	    END IF
 	    CALL DAT_VALID(BRLOC,VALID,STATUS)
 	    IF(VALID) CALL DAT_ANNUL(BRLOC,STATUS)
 
 *      Check that background data array is same size as main data array
 	    IF(BG)THEN
-	      CALL BDA_CHKDATA(BLOC(N),OK,NBDIM,BDIMS,STATUS)
+	      CALL BDI_CHKDATA( BFID(N),OK,NBDIM,BDIMS,STATUS)
 	      IF(STATUS.NE.SAI__OK)THEN
 	        CALL ERR_FLUSH(STATUS)
 	        BG=.FALSE.
@@ -412,16 +426,10 @@
 
 *      Has background been exposure corrected? (We will require raw count
 *                               contribution from b/g expected in the data)
-	      CALL HDX_FIND(BLOC(N),
-     :        'MORE.ASTERIX.PROCESSING.CORRECTED.EXPOSURE',LOC,STATUS)
-	      IF(STATUS.EQ.SAI__OK)THEN
-	        CALL DAT_GET0L(LOC,BGCOR,STATUS)
-	        CALL DAT_ANNUL(LOC,STATUS)
-	      ELSE
-	        CALL ERR_ANNUL(STATUS)
-	        BGCOR=.FALSE.
-	      ENDIF
-	    ENDIF
+              CALL PRF_GET( BFID(N), 'CORRECTED.EXPOSURE', BGCOR,
+     :                      STATUS )
+
+	    END IF
 
 	    IF(.NOT.BG)THEN
 	      CALL MSG_PRNT('    No background data found -'//
@@ -482,6 +490,8 @@
 
 *       Set up name, locator and set position
 	    CALL DAT_CLONE(DCLOC(N),OBDAT(NDS).DLOC,STATUS)
+            CALL ADI_CLONE( DCFID(N), OBDAT(NDS).D_ID, STATUS )
+
 	    IF(SPECSET(N))THEN
 	      INDEX=INDEX+1
 	      IF(DETNO(N).GT.0)THEN
@@ -526,10 +536,11 @@ D    :        obdat(nds).idim,obdat(nds).ndim
 	        OBDAT(NDS).IDIM(I)=DIMS(I)
 	        OBDAT(NDS).NDAT=OBDAT(NDS).NDAT*DIMS(I)
 	      ENDDO
-	      CALL BDA_MAPDATA(OBDAT(NDS).DLOC,'READ',OBDAT(NDS).DPTR,
+	      CALL BDI_MAPDATA(OBDAT(NDS).D_ID,'READ',OBDAT(NDS).DPTR,
      :        STATUS)
 	      IF(STATUS.NE.SAI__OK) GOTO 99
-	    ENDIF
+
+	    END IF
 
 *         For likelihood case scale to give raw counts, & accumulate SSCALE
 	    IF(LIKSTAT)THEN
@@ -544,7 +555,7 @@ D    :        obdat(nds).idim,obdat(nds).ndim
 *       Map variance and quality and use to set up array of data weights
 
 *          Get variance (slice in case of spectral set)
-	    CALL BDA_CHKVAR(OBDAT(NDS).DLOC,OK,NDIM,DIMS,STATUS)
+	    CALL BDI_CHKVAR(OBDAT(NDS).D_ID,OK,NDIM,DIMS,STATUS)
 	    IF(OK)THEN
 	      IF(SPECSET(N))THEN
 	        CALL BDA_LOCVAR(OBDAT(NDS).DLOC,CLOC,STATUS)
@@ -552,7 +563,7 @@ D    :        obdat(nds).idim,obdat(nds).ndim
 	        CALL DAT_MAPV(SVLOC(NDS),'_REAL','READ',OBDAT(NDS).VPTR,
      :          NACT,STATUS)
 	      ELSE
-	        CALL BDA_MAPVAR(OBDAT(NDS).DLOC,'READ',
+	        CALL BDI_MAPVAR(OBDAT(NDS).D_ID,'READ',
      :          OBDAT(NDS).VPTR,STATUS)
 	      ENDIF
 	    ELSE
@@ -568,10 +579,10 @@ D    :        obdat(nds).idim,obdat(nds).ndim
 	    IF(STATUS.NE.SAI__OK) GOTO 99
 
 *          Get quality
-	    CALL BDA_CHKQUAL(OBDAT(NDS).DLOC,QUAL,NDIM,DIMS,STATUS)
+	    CALL BDI_CHKQUAL(OBDAT(NDS).D_ID,QUAL,NDIM,DIMS,STATUS)
 	    IF(QUAL)THEN
 	      IF(SPECSET(N))THEN
-	        CALL BDA_GETMASK(OBDAT(NDS).DLOC,MASK,STATUS)
+	        CALL BDI_GETMASK(OBDAT(NDS).D_ID,MASK,STATUS)
 	        CALL BDA_LOCQUAL(OBDAT(NDS).DLOC,CLOC,STATUS)
 	        CALL DAT_SLICE(CLOC,2,LDIM,UDIM,SQLOC(NDS),STATUS)
 	        CALL DAT_MAPV(SQLOC(NDS),'_UBYTE','READ',PTR,NACT,STATUS)
@@ -579,7 +590,7 @@ D    :        obdat(nds).idim,obdat(nds).ndim
 	        CALL ARR_LOGMASK(%VAL(PTR),OBDAT(NDS).NDAT,MASK,
      :          %VAL(OBDAT(NDS).QPTR),BAD,GOOD,STATUS)
 	      ELSE
-	        CALL BDA_MAPLQUAL(OBDAT(NDS).DLOC,'READ',BAD,
+	        CALL BDI_MAPLQUAL(OBDAT(NDS).D_ID,'READ',BAD,
      :          OBDAT(NDS).QPTR,STATUS)
 	      ENDIF
 
@@ -636,6 +647,7 @@ D	    print *,'ldim,udim :',ldim,udim
 
 *          Default value for background object
             OBDAT(NDS).BLOC = DAT__NOLOC
+            OBDAT(NDS).B_ID = ADI__NULLID
 
 *       For likelihood case, Set up OBDAT.TEFF and get background data
 	    IF(LIKSTAT)THEN
@@ -644,6 +656,7 @@ D	    print *,'ldim,udim :',ldim,udim
 
 *              Store background object
                 OBDAT(NDS).BLOC = BLOC(N)
+                OBDAT(NDS).B_ID = BFID(N)
 
 *         Find and map b/g data array
 	        IF(SPECSET(N))THEN
@@ -653,11 +666,14 @@ D	    print *,'ldim,udim :',ldim,udim
 	          CALL DAT_SLICE(CLOC,2,LDIM,UDIM,BSLOC(NDS),STATUS)
 	          CALL DAT_MAPV(BSLOC(NDS),'_REAL','READ',OBDAT(NDS).BPTR,
      :            NACT,STATUS)
+
 	        ELSE
 
-*           Simple BDA_ map for straight b/g spectrum
-	          CALL BDA_MAPDATA(BLOC(N),'READ',OBDAT(NDS).BPTR,STATUS)
+*           Simple BDI_ map for straight b/g spectrum
+	          CALL BDI_MAPDATA( BFID(N), 'READ', OBDAT(NDS).BPTR,
+     :                              STATUS )
 	          IF(STATUS.NE.SAI__OK) GOTO 99
+
 	        ENDIF
 
 *           Scale b/g to give raw counts if it has been exposure corrected
@@ -703,7 +719,7 @@ D	    print *,'ldim,udim :',ldim,udim
               PREDDAT(N).CONVOLVE = .FALSE.
             ELSE
 *      Look for instrument response, set up INSTR if found, and report
-	      CALL FIT_GETINS( OBDAT(NDS).DLOC, SPECNO,
+	      CALL FIT_GETINS( OBDAT(NDS).D_ID, SPECNO,
      :               PREDDAT(NDS).CONVOLVE, INSTR(NDS), STATUS )
 	      IF(STATUS.NE.SAI__OK) GOTO 99
             END IF
@@ -719,28 +735,17 @@ D	    print *,'ldim,udim :',ldim,udim
 	      ENDIF
 	    ENDIF
 
-* Find remaining components of PREDDAT(NDS)
-	    CALL FIT_PREDSET(OBDAT(NDS).DLOC,NDS,WORKSPACE,OBDAT(NDS),
-     :      PREDDAT(NDS),STATUS)
-	  ENDDO
-	ENDDO
+*      Find remaining components of PREDDAT(NDS)
+	  CALL FIT_TPREDSET( OBDAT(NDS).D_ID, NDS, WORKSPACE,
+     :                       OBDAT(NDS), PREDDAT(NDS), STATUS )
+
+	END DO
+
+      END DO
 
 *  Set up ADI stuff
- 99   IF ( STATUS .EQ. SAI__OK ) THEN
-
-*    Input is not a set?
-        IF ( (OBDAT(1).SETINDEX .EQ. 0) .AND. .NOT. REF ) THEN
-          CALL ADI_CLONE( ID, OBDAT(1).D_ID, STATUS )
-        ELSE
-          DO I = 1, NDS
-            CALL ADI1_PUTLOC( OBDAT(I).DLOC, OBDAT(I).D_ID, STATUS )
-            CALL ADI1_PUTLOC( OBDAT(I).BLOC, OBDAT(I).B_ID, STATUS )
-          END DO
-        END IF
-
+ 99   IF ( STATUS .NE. SAI__OK ) THEN
+        CALL AST_REXIT( 'FIT_GETDAT', STATUS )
       END IF
-
-*  Report any errors
-      IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'FIT_GETDAT', STATUS )
 
       END
