@@ -1,33 +1,22 @@
 1 POLPACK
 
- Version 2.0-14 of POLPACK (an applications package for processing imaging 
+ Version 2.1-2 of POLPACK (an applications package for processing imaging 
  polarimetry data) is now available. It is fully documented in SUN/223.
- The main changes since V2.0-8 are:
+ The main changes since V2.0-14 are:
 
-   o  A new command called POLVERSION has been added to check the version 
-      number of the installed package.
+   o  POLKA has been modified to use KAPPA V0.15 and CCDPACK V3.0.
 
-   o  The names of catalogues provided in response to parameter prompts 
-      can now contain shell meta-characters (e.g. $HOME/mycat, ~/mycat, 
-      etc).
+   o  POLKA now checks that the required versions of KAPPA and CCDPACK 
+      are available before proceeding.
 
-   o  The output cube created by POLCAL in dual-beam mode now covers the
-      union of the input frames, rather than the intersection.
+   o  POLKA no longer requires input images to have a POLPACK extension
+      if the POL parameter is set FALSE.
 
-   o  A bug has been fixed which could cause the masks displayed by POLKA 
-      in dual-beam mode to jump around as different images were selected.
+   o  The current co-ordinate Frame in the output cube created by POLCAL 
+      is now 3-dimensional instead of 2-dimensional. A STOKES axis has
+      been attached to the third pixel axis.
 
-   o  The POLSTACK command is now included in the latex and hypertext 
-      documentation, as well as the on-line help library.
+   o  POLBIN now chooses the bin locations so that the XY origin is always 
+      placed at the corner of a bin
 
-   o  The use of the MARGIN parameter to determine the width of the
-      margins to place around annotated axes produced by POLPLOT has been
-      changed. The widths of the margins used to be specified as
-      fractions of the height or width of the DATA plot. They are now
-      given as fractions of the height or width of the current picture.
 
-   o  A bug has been fixed in POLKA which caused the output NDFs to have 
-      the wrong names if an image was supplied for parameter REFIN. The
-      output images corresponding to the first input image were stored in
-      files appropriate for the second input image, etc., and the output
-      images for the final input image were not produced at all.
