@@ -5,12 +5,26 @@
 # Usage:
 #    make-starconf file...
 #
-# The input files may be either a plain filename or a
-# "genfile:sourcefile" pair, in which case the file `sourcefile' is
-# packaged up, but unpacked as `genfile': this allows us to say
+# `file' has the format '[<option>*]<file>[:<sourcefile>].
+#
+# The file <sourcefile> is packaged up and unpacked as <file>.  If
+# [:<sourcefile>] is omitted, then <sourcefile>=<file>.  This allows us to say
 # "acinclude.m4:starconf.m4", so that the starconf.m4 file in the
 # current directory doesn't have to be called acinclude.m4, which
 # would confuse things.
+#
+# The <option> characters are `?' and `!'.  If the files start with a
+# `?' then they are optionally unpacked, depending on logic contained
+# within this script, which is kept consistent with the requirements
+# of macros in starconf.m4.in.  That is, files which do not have a `?' 
+# <option> are always unpacked.  If the <option> includes `!' then the
+# file is will overwrite any file of the same name in the directory in
+# which the `starconf' script is run; if the <option> `!' is not
+# present, then the script will not overwrite a file named <file> if
+# one exists in the directory.  Thus files which the starconf package
+# `owns' (such as the `acinclude.m4' file) should be given with a `!' 
+# option, and ones which it merely provides if they are not present
+# (such as the `component.xml.in' file) should not have a `!' option.
 #
 # This script generates a starconf script which has the specified
 # files contained within it.  When the (generated) starconf script is
@@ -37,6 +51,22 @@ if test $# -eq 0; then
 fi
 allconfchunks="$@"
 
+# The list of option characters
+optchars="?!"
+
+# Find all the files which are always extracted -- that is, all the
+# files which do not have a `?' <option>
+defaultchunklist=
+for c in $allconfchunks
+do
+    if expr $c : "[$optchars]*?" >/dev/null; then
+        : skip it
+    else
+        defaultchunklist="$defaultchunklist $c"
+    fi
+done
+
+
 # Start generating the output -- open FD 3 for the generated script
 outputscript=starconf
 exec 3>$outputscript
@@ -47,15 +77,15 @@ cat >&3 <<\_STARCONF_EOD
 # This is starconf, version @PACKAGE_VERSION@
 
 # Configuration
+bindir=@bindir@
 datadir=@datadir@
 ln_s="@LN_S@"
 
 # Always include the following files:
-#   acinclude.m4: to add Starlink autoconf macros;
-#   install-with-manifest.in: since the STAR_DEFAULTS macro depends on it;
-#   component.xml: every starconf directory should have a component.xml
-defaultchunks="acinclude.m4 install-with-manifest.in component.xml "
-# Extra chunks should be added to this variable
+_STARCONF_EOD
+echo "defaultchunks=\"$defaultchunklist\"" >&3
+cat >&3 <<\_STARCONF_EOD
+# Extra chunks should be added to this variable, according to logic below
 extrachunks=""
 
 # Make sure we have a configure.ac in the current directory
@@ -64,6 +94,18 @@ if test -r configure.ac; then
 else
     echo "$0: can't find readable configure.ac"
     exit 1
+fi
+
+# If we can find a starconf-validate script (that is, if we're on a build
+# system (which has starconf installed) rather than a distribution system)
+# then run starconf-validate to make sure everything's OK
+if test -x $bindir/starconf-validate; then
+    if $bindir/starconf-validate .; then
+        : OK
+    else
+        echo "$0: Configuration not valid -- fix above errors first"
+        exit 1
+    fi
 fi
 
 # Scan configure.ac, getting all the used macros into a string
@@ -93,6 +135,15 @@ else
     exit 1
 fi
 
+# Similarly, scan Makefile.am and check that there it includes
+# Makefile.starconf
+if grep 'include .*Makefile.starconf' Makefile.am >/dev/null; then
+    : OK -- found it
+else
+    echo "$0: Makefile.am does not include \$(srcdir)/Makefile.starconf"
+    exit 1
+fi
+
 # We now know what files we're going to include in the generated
 # starconf.status
 filelist=" $defaultchunks $extrachunks "
@@ -112,27 +163,43 @@ cat >&4 <<EOF
 EOF
 for f in $filelist
 do
-    echo "#    $f" >&4
-done
-echo "" >&4
 _STARCONF_EOD
+echo "    echo \$f | sed \"s/^[$optchars]*\([^:]*\).*/#    \1/\" >&4"    >&3
+echo 'done'                                            	                >&3
+echo 'echo "" >&4'                                                      >&3
 
 for ch in $allconfchunks
 do
-    eval `echo $ch | sed 's/\([^:]*\)\(:\(.*\)\)*/filename=\1; filesource=\3/'`
+    # extract the options, destination and source filenames
+    eval `echo $ch | sed 's/\(['$optchars']*\)\([^:]*\)\(:\(.*\)\)*/opts=\1;filename=\2; filesource=\4/'`
     test -n "$filesource" || filesource=$filename
-    echo "Including $filename from $filesource"
+    echo "Including $filename from $filesource (opts=$opts)"
+
     # Don't just cat to &3 here -- we need to be careful about quoting
     echo ""                                                              >&3
     echo "# -------------------- $filename --------------------"         >&3
-    echo "if test \`expr \"\$filelist\" : '.* $filename '\` -gt 0; then" >&3
-    echo "echo \"Creating $filename\""                                   >&3
-    echo "echo '# ---------- $filename ----------'   >&4"                >&3
-    echo "echo 'cat >$filename <<\_STARCONF_EOD'     >&4"                >&3
+    echo "if test \`expr \"\$filelist\" : '.* [$optchars]*$filename'\` -gt 0; then" >&3
+    echo "echo '# ---------- $filename ----------'       >&4"            >&3
+
+    # if the `!' <option> is present, ...
+    if expr "$opts" : '.*!' >/dev/null; then
+        # ...then just unpack the file (stomp away!)
+        echo "echo 'unpack_this=true'                    >&4"            >&3
+    else
+        # ...but if not, then only unpack the file if there's no such 
+        # file in the current directory (ie, don't stomp on modified files)
+        echo "echo 'if test -e $filename; then unpack_this=false; else unpack_this=true;fi' >&4" >&3
+    fi
+    echo "echo 'if \$unpack_this; then'                  >&4"            >&3
+    echo "echo '    echo \"Creating $filename\"'         >&4"            >&3
+    echo "echo '    cat >$filename <<\_STARCONF_EOD'     >&4"            >&3
     echo 'cat >&4 <<\_STARCONF_EOD'                                      >&3
     cat $filesource                                                      >&3
     echo '_STARCONF_EOD'                                                 >&3
-    echo 'echo _STARCONF_EOD >&4'                                        >&3
+    echo 'echo _STARCONF_EOD                             >&4'            >&3
+    echo "echo 'else'                                    >&4"            >&3
+    echo "echo '    echo \"File $filename already exists, not overwriting\"'>&4 ">&3
+    echo "echo 'fi'                                      >&4"            >&3
     echo 'fi'                                                            >&3
 done
 
