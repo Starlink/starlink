@@ -279,15 +279,15 @@ F77_INTEGER_FUNCTION(ast_resample##f)( INTEGER(THIS), \
    arrays, otherwise pass NULL pointers. */ \
       in_var = out_var = NULL; \
       if ( AST__USEVAR & *FLAGS ) { \
-         in_var = IN_VAR; \
-         out_var = OUT_VAR; \
+         in_var = (const Xtype *) IN_VAR; \
+         out_var = (Xtype *) OUT_VAR; \
       } \
       RESULT = astResample##X( astI2P( *THIS ), *NDIM_IN, \
-                               LBND_IN, UBND_IN, IN, in_var, \
+                               LBND_IN, UBND_IN, (const Xtype *) IN, in_var, \
                                *INTERP, finterp, PARAMS, *FLAGS, \
                                *TOL, *MAXPIX, *BADVAL, \
                                *NDIM_OUT, LBND_OUT, UBND_OUT, \
-                               LBND, UBND, OUT, out_var ); \
+                               LBND, UBND, (Xtype *) OUT, out_var ); \
    ) \
    return RESULT; \
 }
