@@ -478,20 +478,61 @@ ADIobj adix_link_efile( ADIobj id, char *cls, int clen, ADIstatus status )
         found = ADI__true;
       }
 
-/* We haven't matched any of the requested classes */
+/* We haven't matched any of the requested classes? */
     if ( ! found ) {
       ADIobj newid;
 
-/* Create first requested class object */
-      adix_newn( ADI__nullid, NULL, 0, cls, fjcp, 0, NULL,
-		 &newid, status );
+/* Loop over supplied classes trying to create the link */
+      icp = 0;
+      found = ADI__false;
+      while ( (icp < clen) && _ok(status) && ! found ) {
 
-/* Try to link them */
-      newid = adix_setlnk( newid, id, status );
+/*   Find end of this class name */
+        jcp = icp;
+        atend = ADI__false;
+        while ( (jcp<clen) && ! atend ) {
+          if ( cls[jcp] == '|' )
+            atend = ADI__true;
+          else
+            jcp++;
+          }
 
-      if ( _ok(status) )
-	id = newid;
+/*   Store end of first word for later */
+        if ( ! icp ) fjcp = jcp;
+
+/*   Create instance of class */
+        adix_newn( ADI__nullid, NULL, 0, cls, jcp-icp, 0, NULL,
+		   &newid, status );
+
+/*   Try to link them */
+        newid = adix_setlnk( newid, id, status );
+
+/*   Linkage worked? Return new object */
+        if ( _ok(status) ) {
+          found = ADI__true;
+          id = newid;
+          }
+
+/*   Status was no applicable method, in which case we try the next list */
+        else if ( *status == ADI__NOMTH ) {
+
+/*   Cancel the bad status */
+          adic_erranl( status );
+
+/*   Destroy the object we don't want */
+          adic_erase( &newid, status );
+
+/*   Next class */
+          icp = jcp + 1;
+          }
+
+        }
       }
+
+/* Report error if no linkage */
+    if ( ! found ) {
+      adic_setecs( ADI__NOMTH, "Unable to link object of class %S to any of %*s",
+                   status, ocls, clen, cls );
     }
 
   return id;
