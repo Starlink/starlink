@@ -14,7 +14,7 @@ use Exporter;
 	      generate_astrom run_astrom
 	      twodarray2ndf ndf2twodarray txt2arr txt2ndf ndf2txt
 	      reuse_files get_temp_files make_pseudo_fits
-	      verbosity wmessage check_kwd_list );
+	      verbosity wmessage check_obsdata_kwd);
 
 @EXPORT_OK = (@EXPORT,
 	      'deg2sex',
@@ -62,6 +62,7 @@ sub parse_fits_date ($);
 sub invP ($);
 sub make_pseudo_fits (\%\%);
 sub check_kwd_list ($$);
+sub check_obsdata_kwd (\%);
 sub verbosity ($);
 sub wmessage ($$);
 
@@ -1994,6 +1995,24 @@ sub check_kwd_list ($$) {
 	return "$k=".$t->{$k} unless $t->{$k} =~ m{$pattern};
     }
     return undef;
+}
+
+sub check_obsdata_kwd (\%) {
+    my $t = shift;
+    my %goodkws = (
+		   'ra' => '\s*[+-]?\d{1,3}((:\d{1,2}){0,2}(\.\d+)?)\s*',
+		   'dec' => '\s*[+-]?\d{1,2}((:\d{1,2}){0,2}(\.\d+)?)\s*',
+		   'scale' => '\s*\d+(\.\d+)?\s*',
+		   'invert' => '\s*[01]\s*',
+		   'pa' => '\s*[+-]?\d+(\.\d+)?\s*',
+		   'source' => '(?i)\s*(AST|FITS|USER)(\s*:\s*(AST|FITS|USER))*\s*',
+		   'time' => '\s*(\d+\.\d+|\d{4}([: ]+\d{1,2}){4}(\.\d+)?|\d{1,2}[: ]+\d{1,2}(\.\d+)?)\s*',
+		   'obs' => '\s*(\w+|([: ]*-?\d+[: ]+\d+(\.\d*)?){2}([: ]*\d*(\.\d*)?)?)\s*',
+		   'met' => '\s*\d+(\.\d+)?([: ]*\d+(\.\d+)?)\s*',
+		   'col' => '\s*\d+\s*'
+		  );
+
+    return check_kwd_list ($t, \%goodkws);
 }
 
 # Wmessage writes a message on the stdout.  $1 is one of `info',
