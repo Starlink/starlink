@@ -61,7 +61,7 @@
             IF ( SSO_MI_MAPPED(I) ) THEN
               CALL CMP_UNMAP( SSO_MI_FLOC(I), OBJS(SSO_MI_TYPE(I)),
      :                                                     STATUS )
-              SSO_MI_TYPE(I) = .FALSE.
+              SSO_MI_MAPPED(I) = .FALSE.
             END IF
 
 *          Free field locator
