@@ -70,7 +70,7 @@ FSOURCES= sculib_1d2_jiggle.f sculib_2pos_deconv.f sculib_3pos_deconv.f \
 	sculib_extract_2dim_d.f sculib_skyfunc.f sculib_skyfuncd.f \
 	sculib_get_dem_pntr.f sculib_get_lst_strt.f sculib_get_bol_desc.f \
 	sculib_get_jiggle.f sculib_get_raster.f sculib_get_mjd.f \
-	sculib_process_bols.f sculib_get_sub_inst.f sculib_wtfn_regrid.f \
+	sculib_get_sub_inst.f sculib_wtfn_regrid.f \
 	sculib_spline_regrid.f sculib_copy_good.f sculib_set_data.f\
 	sculib_spline_regrid_1.f sculib_spline_pda_idbvip.f\
 	sculib_spline_pda_idsfft.f sculib_spline_pda_surfit.f\
@@ -255,7 +255,6 @@ sculib_noise_mean.o: SAE_PAR
 sculib_par_get.o: PRM_PAR SAE_PAR
 sculib_photom_bolselect.o: PRM_PAR SAE_PAR
 sculib_power2.o:
-sculib_process_bols.o: PRM_PAR SAE_PAR
 sculib_put_fits_c.o: SAE_PAR
 sculib_put_fits_d.o: SAE_PAR
 sculib_put_fits_i.o: SAE_PAR
