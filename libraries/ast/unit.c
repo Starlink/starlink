@@ -298,7 +298,7 @@ static const char *CleanExp( const char *exp ) {
    non-alphanumerical characters is also a token. The + and - signs are
    counted as alphanumeric. */
    start = exp;
-   p = (char *) exp;
+   p = (char *) exp - 1;
    word = ISWORD( *p );
    ntok = 0;
    tok = NULL;
@@ -1192,7 +1192,7 @@ static UnitNode *CreateTree( const char *exp, int basic ){
 /* If the string is blank, return the NULL pointer. Otherwise, create a 
    tree of UnitNodes describing the units. The returned tree has LDVAR 
    nodes which refer to the unit symbols contained in the supplied string. */
-   if( (*cleanex) ) {
+   if( cleanex && (*cleanex) ) {
       result = MakeTree( cleanex, strlen( cleanex ) );
 
 /* Replace each subtree which simply combines constants (i.e. which has no 
