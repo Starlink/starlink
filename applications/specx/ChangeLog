@@ -22,7 +22,8 @@ Fri Aug 29 09:51:18 1997  Remo Tilanus  <rpt@menehune.jach.hawaii.edu>
 
 Wed Aug 27 21:23:51 1997  Remo Tilanus  <rpt@menehune.jach.hawaii.edu>
 
-	* dasmerge.f (dasmerge): Added wideband mode as subroutine parameter
+	* util/dasmerge.f (dasmerge): Added wideband mode as subroutine
+	parameter
 
 
 Wed Aug 27 21:22:20 1997  Remo Tilanus  <rpt@menehune.jach.hawaii.edu>
