@@ -3865,11 +3865,43 @@ c        REAL XX,XP,YP
         INTEGER STATUS
 *    Function declarations :
 *    Local variables :
+      REAL XP,YP,XPC,YPC,X,Y
+      REAL AP,BP
+      REAL ANG,SANG,CANG,SA,CA
+      INTEGER IA
 *-
         IF (STATUS.NE.SAI__OK) RETURN
 
-          call img_slicetobox(xc,yc,angle,major,minor,i1,i2,j1,j2,
-     :                                                       status)
+        CALL IMG_WORLDTOPIX(XC,YC,XPC,YPC,STATUS)
+        AP=MAJOR/ABS(I_XSCALE)
+        BP=MINOR/ABS(I_XSCALE)
+
+        CANG=COS(ANGLE)
+        SANG=SIN(ANGLE)
+
+        I1=INT(XPC)
+        I2=NINT(XPC)
+        J1=INT(YPC)
+        J2=NINT(YPC)
+
+        DO IA=0,360
+
+
+          ANG=REAL(IA)
+          CA=COSD(ANG)
+          SA=SIND(ANG)
+
+          XP=XPC + AP*CA*CANG - BP*SA*SANG
+          YP=YPC + AP*CA*SANG + BP*SA*CANG
+
+          I1=MAX(1,MIN(I1,INT(XP)))
+          I2=MIN(I_NX,MAX(I2,NINT(XP)))
+          J1=MAX(1,MIN(J1,INT(YP)))
+          J2=MIN(I_NY,MAX(J2,NINT(YP)))
+
+        ENDDO
+
+
 
 	END
 
@@ -4214,32 +4246,26 @@ c        REAL XX,XP,YP
       REAL RAD
 *-
 
-*  get world coord of pixel centre
         STATUS=SAI__OK
-        CALL IMG_PIXTOWORLD(REAL(I),REAL(J),X,Y,STATUS)
 
-*  adjust angle to direction of axes
-        LANGLE=ANGLE*(I_XSCALE/ABS(I_XSCALE))
-     :                         *(I_YSCALE/ABS(I_YSCALE))
+*  convert everything to pixel coords
+        CALL IMG_WORLDTOPIX(XC,YC,XPC,YPC,STATUS)
+        AP=MAJOR/ABS(I_XSCALE)
+        BP=MINOR/ABS(I_XSCALE)
+        XP=REAL(I)
+        YP=REAL(J)
+
+*  displacement from centre of ellipse
+        DISP=SQRT((XP-XPC)**2 + (YP-YPC)**2)
+
+*  get distance to ellipse along same line
+        THETA=ATAN2((YP-YPC),(XP-XPC))
+        ALPHA=THETA-ANGLE
+        XP=XPC + AP*COS(ALPHA)*COS(ANGLE) - BP*SIN(ALPHA)*SIN(ANGLE)
+        YP=YPC + AP*COS(ALPHA)*SIN(ANGLE) + BP*SIN(ALPHA)*COS(ANGLE)
+        RAD=SQRT((XP-XPC)**2 + (YP-YPC)**2)
 
 
-*  transform to frame centred on ellipse
-        X=X-XC
-        Y=Y-YC
-
-*  rotate to frame parallel with major axis
-        THETA=ATAN2(Y,X)
-        DISP=SQRT(X**2 + Y**2)
-        X=DISP*COS(LANGLE-THETA)
-        Y=DISP*SIN(LANGLE-THETA)
-
-*  get angular displacement of point
-        ALPHA=ATAN2(Y,X)
-
-*  get radius of ellipse at this point
-        RAD=SQRT((MAJOR*COS(ALPHA))**2 + (MINOR*SIN(ALPHA))**2)
-
-*  check transformed coord falls within ellipse
         IMG_INELLIPSE=(DISP.LE.RAD.AND.IMG_INBOUNDS(I,J))
 
 
