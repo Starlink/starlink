@@ -200,17 +200,17 @@
 *    Get the array of times of the good data points
          CALL UTIL_QUALSPLIT(1, 1, 1, NTOT, 1, 1, 1, %val(IQPNTR),
      :                   BADBITS, %val(ITPNTR), NGOOD, %val(DUM1),
-     :                               %val(TPNTR), NBAD, %val(DUM2))
+     :                       %val(TPNTR), NBAD, %val(DUM2),STATUS)
 
 *    Get the array of data values of the good points
          CALL UTIL_QUALSPLIT(1, 1, 1, NTOT, 1, 1, 1, %val(IQPNTR),
      :                   BADBITS, %val(IDPNTR), NGOOD, %val(DUM1),
-     :                               %val(DPNTR), NBAD, %val(DUM2))
+     :                     %val(DPNTR), NBAD, %val(DUM2), STATUS )
 
 *    Get the array of variances of the good data points
          CALL UTIL_QUALSPLIT(1, 1, 1, NTOT, 1, 1, 1, %val(IQPNTR),
      :                   BADBITS, %val(IVPNTR), NGOOD, %val(DUM1),
-     :                               %val(VPNTR), NBAD, %val(DUM2))
+     :                     %val(VPNTR), NBAD, %val(DUM2), STATUS )
 
 *  If quality data is not available then copy the time,data and variance
 *  input arrays into the output arrays

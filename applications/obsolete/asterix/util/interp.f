@@ -396,7 +396,7 @@
             CALL UTIL_QUALSPLIT(LP2,LP3,LP4,TDIM(1),TDIM(2),
      :           TDIM(3),TDIM(4),%VAL(TQUAL_PNTR),
      :           BADBITS,%VAL(TDATA_PNTR),NGOOD,%VAL(GOODBIN_PNTR),
-     :           %VAL(GOODY_PNTR),NBAD,%VAL(BADBIN_PNTR) )
+     :           %VAL(GOODY_PNTR),NBAD,%VAL(BADBIN_PNTR), STATUS )
 *
             FIXTOT=FIXTOT+NBAD
 *

@@ -96,12 +96,6 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE '{global_constants_file}' ! [global_constants_description]
-
-*  Global Variables:
-      INCLUDE '{global_variables_file}' ! [global_variables_description]
-*        {global_name}[dimensions] = {data_type} ({global_access_mode})
-*           [global_variable_purpose]
 
 *  Status:
       INTEGER			STATUS             	! Global status
@@ -197,13 +191,13 @@
 
 
 
-      SUBROUTINE ASHOW_WCS( [p]... )
+      SUBROUTINE ASHOW_WCS( IFID, OCH, STATUS )
 *+
 *  Name:
 *     ASHOW_WCS
 
 *  Purpose:
-*     {routine_purpose}
+*     Display world coordinates data
 
 *  Language:
 *     Starlink Fortran
