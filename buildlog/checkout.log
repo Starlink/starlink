@@ -7387,6 +7387,7 @@ U java/source/table/src/main/uk/ac/starlink/table/view/OptionsListModel.java
 U java/source/table/src/main/uk/ac/starlink/table/view/ParameterWindow.java
 U java/source/table/src/main/uk/ac/starlink/table/view/PlasticStarTable.java
 U java/source/table/src/main/uk/ac/starlink/table/view/PlotWindow.java
+U java/source/table/src/main/uk/ac/starlink/table/view/ResourceIcon.java
 U java/source/table/src/main/uk/ac/starlink/table/view/RowSubset.java
 U java/source/table/src/main/uk/ac/starlink/table/view/SizingScrollPane.java
 U java/source/table/src/main/uk/ac/starlink/table/view/StatsWindow.java
