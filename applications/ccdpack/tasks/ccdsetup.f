@@ -397,7 +397,9 @@
 *  First remind users of useful options.
       CALL CCD1_SETEX( NULL, IAT, STATUS )
       CALL MSG_BLANK( STATUS )
-      CALL MSG_OUT( ' ', '  Type "?" for help on any prompt.', STATUS )
+      IF ( NULL .EQ. '!' ) 
+     :   CALL MSG_OUT( ' ', '  Type "?" for help on any prompt.', 
+     :                 STATUS )
       LINE = '  Type "'//NULL(:IAT)//'" if you do not want to set a '//
      :       'parameter.'
       CALL MSG_OUT( ' ', LINE, STATUS )
