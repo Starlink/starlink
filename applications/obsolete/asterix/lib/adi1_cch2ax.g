@@ -115,21 +115,33 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Does component exist
-      CALL DAT_THERE( LOC, CMP, THERE, STATUS )
+*  Access component?
+      IF ( CMP .GT. ' ' ) THEN
+
+*    Does component exist
+        CALL DAT_THERE( LOC, CMP, THERE, STATUS )
+
+*    Locate HDS object
+        IF ( THERE ) THEN
+          CALL DAT_FIND( LOC, CMP, CLOC, STATUS )
+        END IF
+
+*  Otherwise access object supplied
+      ELSE
+        THERE = .TRUE.
+        CALL DAT_CLONE( LOC, CLOC, STATUS )
+
+      END IF
 
 *  Try to copy if it exists
       IF ( THERE ) THEN
 
-*    Locate HDS object
-        CALL DAT_FIND( LOC, CMP, CLOC, STATUS )
-
-*    Get shape of DHS data
+*    Get shape of HDS data
         CALL DAT_SHAPE( CLOC, DAT__MXDIM, DIMS, NDIM, STATUS )
 
 *    Read the HDS data
         IF ( NDIM .EQ. 0 ) THEN
-          CALL DAT_GET0<T>( CLOC, VALUE, STATUS )
+          CALL DAT_GET( CLOC, '<HTYPE>', 0, 0, VALUE, STATUS )
         ELSE
           CALL DAT_MAPV( CLOC, '<HTYPE>', 'READ', VPTR, NELM, STATUS )
         END IF
