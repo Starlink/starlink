@@ -75,14 +75,15 @@
 *        ndfset object it will annul all the NDFs associated with
 *        the members of the ndfset.
 *
-*     ndfob-or-ndfsetob display ?-resamp? device loval hival frame plotstyle
+*     ndfob-or-ndfsetob display ?-resamp? device loperc hiperc frame ?plotstyle?
 *        Plots the image on the named PGPLOT device, with colour cutoffs
-*        given by the loval and hival arguments, and axes drawn according
-*        to the frame argument.  The plotstyle string may contain any 
-*        plotting options desired, in astSet format.  If the '-resamp'
-*        option is given, then the image will be resampled into the
-*        indicated frame before plotting; otherwise the frame argument
-*        is just used for plotting axes.
+*        determined by the loperc and hiperc arguments, and axes drawn
+*        according to the frame argument.  Loperc and hiperc give the
+*        percentile values to use for cutoffs.  The plotstyle string
+*        may contain any plotting options desired, in astSet format.
+*        If the '-resamp' option is given, then the image will be 
+*        resampled into the indicated frame before plotting; otherwise
+*        the frame argument is just used for plotting axes.
 *
 *        The frame may be specified either as a numerical frame index,
 *        as a domain name, or as one of the special strings "BASE"
@@ -505,25 +506,9 @@
 /* "percentile" command                                               */
 /**********************************************************************/
       else if ( ! strcmp( command, "percentile" ) ) {
-         double *fracs;
          double *percs;
          double *vals;
-         int first;
-         int nfrac;
          int nperc;
-         int nextra;
-         Tcl_HashSearch hsearch;
-         double initset[] = {  0.,  1.,  2.,  3.,  4.,  5.,  6.,  7.,  8.,  9.,
-                              10., 11., 12., 13., 14., 15., 16., 17., 18., 19.,
-                              20., 21., 22., 23., 24., 25., 26., 27., 28., 29.,
-                              30., 31., 32., 33., 34., 35., 36., 37., 38., 39.,
-                              40., 41., 42., 43., 44., 45., 46., 47., 48., 49.,
-                              50., 51., 52., 53., 54., 55., 56., 57., 58., 59.,
-                              60., 61., 62., 63., 64., 65., 66., 67., 68., 69.,
-                              70., 71., 72., 73., 74., 75., 76., 77., 78., 79.,
-                              80., 81., 82., 83., 84., 85., 86., 87., 88., 89.,
-                              90., 91., 92., 93., 94., 95., 96., 97., 98., 99.,
-                              0.5, 99.5, 0.1, 99.9, 100. };
 
 /* Check syntax. */
          nperc = objc - 2;
@@ -532,130 +517,28 @@
             return TCL_ERROR;
          }
 
-/* If we have not got any percentiles before, then initialise the table
-   with a useful set.  It makes sense to do this because it is nearly as
-   fast to work out many percentiles as just one.  If we can predict 
-   most of the ones which might be likely to be needed, we can probably
-   save time on subsequent calls. */
-         nextra = 0;
-         first = ( Tcl_FirstHashEntry( &ndf1->perchash, &hsearch ) == NULL );
-         if ( first ) {
-            nextra = sizeof( initset ) / sizeof( initset[ 0 ] );
-         }
-
 /* Allocate arrays in which to store percentiles and values. */
-         percs = malloc( ( nperc + nextra ) * sizeof( double ) );
-         fracs = malloc( ( nperc + nextra ) * sizeof( double ) );
-         vals = malloc( ( nperc + nextra ) * sizeof( double ) );
+         percs = malloc( nperc * sizeof( double ) );
+         vals = malloc( nperc * sizeof( double ) );
          if ( tclmemok( interp, percs ) != TCL_OK ||
-              tclmemok( interp, fracs ) != TCL_OK ||
               tclmemok( interp, vals ) != TCL_OK ) {
             return TCL_ERROR;
          }
 
-/* Store each of the extra arguments in the percentiles array.  Check that
-   each is a number in the correct range as we go, and bail out with an
-   error if not. */
+/* Store each of the percentile arguments in the percentiles array. */
          for ( i = 0; i < nperc; i++ ) {
-            if ( Tcl_GetDoubleFromObj( interp, objv[ i + 2 ], percs + i ) 
-                 != TCL_OK || percs[ i ] < 0.0 || percs[ i ] > 100.0 ) {
-               result = Tcl_NewStringObj( "ndf percentile: argument \"", -1 );
-               Tcl_AppendObjToObj( result, objv[ i + 2 ] );
-               Tcl_AppendStringsToObj( result, "\" should be a number ",
-                                       "between 0 and 100", (char *) NULL );
-               Tcl_SetObjResult( interp, result );
+            if ( Tcl_GetDoubleFromObj( interp, objv[ i + 2 ], &percs[ i ] )
+                 != TCL_OK ) {
                return TCL_ERROR;
             }
          }
-         for ( i = 0; i < nextra; i++ ) {
-            percs[ nperc + i ] = initset[ i ];
-         }
-         
-/* Find out which of these percentiles we already have values for.
-   If there are any missing, write these into a new array which we
-   can feed to the percentile calculation routine. */
-         nfrac = 0;
-         for ( i = 0; i < ( nperc + nextra ); i++ ) {
-            PercHashKey hkey;
-            hkey.hash = NULL;
-            hkey.data = percs[ i ];
-            if ( Tcl_FindHashEntry( &ndf1->perchash, hkey.hash ) == NULL ) {
-               fracs[ nfrac++ ] = percs[ i ] * 0.01;
-            }
-         }
 
-/* Unless all the requested values were in the hash table, we will need
-   to work some more out. */
-         if ( nfrac > 0 ) {
-            double *work;
+/* Get the values. */
+         STARCALL(
+            getpercentiles( ndf1, nperc, percs, vals, status );
+         )
 
-/* We have to sort the array of new percentiles to be worked out, since
-   the percentile calculation routine likes them that way. */
-            qsort( fracs, nfrac, sizeof( fracs[ 0 ] ), dcompare );
-
-/* Now do the work of calcluating the percentiles. */
-            work = malloc( nfrac * sizeof( double ) );
-            if ( tclmemok( interp, work ) != TCL_OK ) {
-               return TCL_ERROR;
-            }
-            STARCALL(
-               DECLARE_CHARACTER( type, DAT__SZTYP );
-               F77_LOGICAL_TYPE bad;
-
-/* If the array is not currently mapped, we have to map it. */
-               if ( ! ndf1->mapped ) domapdata( ndf1, status );
-
-/* Massage some arguments for fortran. */
-               bad = F77_ISTRUE(ndf1->bad);
-               cnfExprt( ndf1->mtype, type, DAT__SZTYP );
-
-/* Call the routine which does the calculations. */
-               F77_CALL(ccd1_fra)( CHARACTER_ARG(type),
-                                   INTEGER_ARG(&ndf1->nel),
-                                   (F77_POINTER_TYPE) &ndf1->data,
-                                   INTEGER_ARG(&nfrac), DOUBLE_ARG(fracs),
-                                   LOGICAL_ARG(&bad), DOUBLE_ARG(work),
-                                   DOUBLE_ARG(vals), INTEGER_ARG(status)
-                                   TRAIL_ARG(type) );
-
-/* We can update the bad flag as a bonus. */
-               ndf1->bad = F77_ISTRUE(bad);
-            )
-            free( work );
-
-/* Store the new percentile results in the hash table. */
-            for ( i = 0; i < nfrac; i++ ) {
-               PercHashKey hkey;
-               PercHashValue hval;
-               Tcl_HashEntry *entry;
-               int new;
-               hkey.hash = NULL;
-               hkey.data = fracs[ i ] * 100.0;
-               entry = Tcl_CreateHashEntry( &ndf1->perchash, hkey.hash, &new );
-               hval.hash = (ClientData) NULL;
-               hval.data = vals[ i ];
-               Tcl_SetHashValue( entry, hval.hash );
-            }
-         }
-
-/* We should now have all the values in the hash.  Get them out and write
-   them into the result vector. */
-         for ( i = 0; i < nperc; i++ ) {
-            PercHashKey hkey;
-            PercHashValue hval;
-            Tcl_HashEntry *entry; 
-            hkey.hash = NULL;
-            hkey.data = percs[ i ];
-            entry = Tcl_FindHashEntry( &ndf1->perchash, hkey.hash );
-            if ( entry == NULL ) {    /* kludge - sorry */
-               hkey.data = ( percs[ i ] * 0.01 ) * 100.0;
-               entry = Tcl_FindHashEntry( &ndf1->perchash, hkey.hash );
-            }
-            hval.hash = Tcl_GetHashValue( entry );
-            vals[ i ] = hval.data;
-         }
-
-/* Store the answers as a list in a result object. */
+/* Create the result object. */
          result = Tcl_NewListObj( 0, NULL );
          for ( i = 0; i < nperc; i++ ) {
             op = Tcl_NewDoubleObj( vals[ i ] );
@@ -663,7 +546,6 @@
          }
 
 /* Tidy up. */
-         free( fracs );
          free( percs );
          free( vals );
       }
@@ -754,8 +636,8 @@
                                "\n    bbox frame",
                                "\n    bounds", 
                                "\n    destroy",
-                               "\n    display ?-resamp? device loval hival "
-                                             "frame plotstyle",
+                               "\n    display ?-resamp? device loperc hiperc "
+                                             "frame ?plotstyle?",
                                "\n    fitshead ?key? ...",
                                "\n    frameatt attname ?frame?",
                                "\n    mapped ?setmap?",
@@ -991,8 +873,8 @@
          float yplo;
          float yphi;
          double bbox[ 4 ];
-         double loval;
-         double hival;
+         double loperc;
+         double hiperc;
          double psize;
          double zoom;
          struct ndfdisplay_args args;
@@ -1009,25 +891,26 @@
          }
 
 /* Check syntax. */
-         if ( objc != 7 + nflag ) {
+         if ( objc < 6 + nflag || objc > 7 + nflag ) {
             Tcl_WrongNumArgs( interp, 2, objv, "?-resamp? "
-                              "device loval hival frame plotstyle" );
-                            /* 2      3     4     5     6        */
+                              "device loperc hiperc frame ?plotstyle?" );
+                            /* 2      3      4      5     6           */
             return TCL_ERROR;
          }
 
 /* Get string arguments. */
          device = Tcl_GetString( objv[ 2 + nflag ] );
-         settings = Tcl_GetString( objv[ 6 + nflag ] );
+         settings = ( objc == 7 + nflag ) ? Tcl_GetString( objv[ 6 + nflag ] )
+                                          : "";
 
 /* Get numeric arguments. */
          if ( Tcl_GetDoubleFromObj( interp, 
-                                    objv[ 3 + nflag ], &loval ) != TCL_OK ||
+                                    objv[ 3 + nflag ], &loperc ) != TCL_OK ||
               Tcl_GetDoubleFromObj( interp, 
-                                    objv[ 4 + nflag ], &hival ) != TCL_OK ) {
+                                    objv[ 4 + nflag ], &hiperc ) != TCL_OK ) {
             return TCL_ERROR;
          }
-           
+
 /* Allocate some space. */
          iframes = malloc( nndf * sizeof( int ) );
          pframes = malloc( nndf * sizeof( int ) );
@@ -1091,7 +974,7 @@
 
 /* Prepare the image in a PGPLOT-friendly form. */
          STARCALL(
-            pixbloc = getpixbloc( ndfset, pframes, zoom, loval, hival, 
+            pixbloc = getpixbloc( ndfset, pframes, zoom, loperc, hiperc, 
                                   locolour, hicolour, badcolour, status );
          )
          xpix = ndfset->plotarray->xdim;
@@ -1303,6 +1186,7 @@
          doall = 0;
          if ( Tcl_GetIntFromObj( interp, objv[ 2 ], &imember ) != TCL_OK ) {
             if ( ! strcmp( Tcl_GetString( objv[ 2 ] ), "all" ) ) {
+               Tcl_SetObjResult( interp, Tcl_NewStringObj( "", -1 ) );
                doall = 1;
             }
             else {
@@ -1573,8 +1457,8 @@
                                "Should be one of -",
                                "\n    bbox frame",
                                "\n    destroy",
-                               "\n    display ?-resamp? device loval hival "
-                                             "frame plotstyle",
+                               "\n    display ?-resamp? device loperc hiperc "
+                                             "frame ?plotstyle?",
                                "\n    frameatt attname ?frame?",
                                "\n    mapped ?setmap?",
                                "\n    name",
@@ -2008,7 +1892,7 @@
 
 /**********************************************************************/
    int *getpixbloc( NdfOrNdfset *ndfset, int iframes[], double zoom, 
-                    double loval, double hival, int locolour, int hicolour,
+                    double loperc, double hiperc, int locolour, int hicolour,
                     int badcolour, int *status ) {
 /**********************************************************************/
 /* Return the address of a PGPLOT-friendly array of integers representing
@@ -2030,8 +1914,8 @@
    exists, or if the scale values are different from the ones 
    we've been asked for, then we'll have to construct it.  Otherwise
    we can just use the one we've already got. */
-      if ( ! ndfset->plotarray->exists || ndfset->plotarray->loval != loval
-                                       || ndfset->plotarray->hival != hival 
+      if ( ! ndfset->plotarray->exists || ndfset->plotarray->loperc != loperc
+                                       || ndfset->plotarray->hiperc != hiperc 
                                        || ndfset->plotarray->iframe != iframe
                                        || ndfset->plotarray->zoom != zoom ) {
          int i;
@@ -2061,16 +1945,22 @@
          double factor;
          double iparams[ 10 ];
          double lbox[ NDF__MXDIM ];
+         double percs[ 2 ];
          double psize;
          double scale;
          double tol;
          double ubox[ NDF__MXDIM ];
+         double vals[ 2 ];
          void *work;
          AstMapping *map;
          Ndf **ndfs;
          Ndf *ndf;
          Ndf1 *ndf1;
          DECLARE_CHARACTER( ftype, DAT__SZTYP );
+
+/* Initialise some things. */
+         percs[ 0 ] = loperc;
+         percs[ 1 ] = hiperc;
 
 /* Get the size of the output array. */
          psize = getpixelsize( ndfset, iframes[ 0 ], status );
@@ -2094,14 +1984,13 @@
             iparams[ 0 ] = floor( ( ( 1.0 / factor ) - 0.5 ) / 2.0 );
          }
 
-/* Get the rescaling factor. */
-         if ( loval >= hival ) {
+/* Validate the percentile values. */
+         if ( loperc >= hiperc ) {
             *status = SAI__ERROR;
             errRep( "NDF_BADLIM", "Maximum must be greater than minimum",
                     status );
             return NULL;
          }
-         scale = ( hicolour - locolour ) / ( hival - loval );
 
 /* If a previous plotarray exists but is the wrong size, we will need to
    deallocate that memory prior to allocating more. */
@@ -2150,6 +2039,13 @@
             ndf1 = ndf->content.ndf1;
             xndf = ndf1->ubnd[ 0 ] - ndf1->lbnd[ 0 ] + 1;
             yndf = ndf1->ubnd[ 1 ] - ndf1->lbnd[ 1 ] + 1;
+
+/* Get the pixel values corresponding to the low and high percentile
+   limits we have. */
+            getpercentiles( ndf1, 2, percs, vals, status );
+
+/* Work out the scaling factor. */
+            scale = ( hicolour - locolour ) / ( vals[ 1 ] - vals[ 0 ] );
 
 /* Get the dimensions of the output array for this ndf only. */
             getbbox( ndf, &iframes[ i ], lbox, ubox, status );
@@ -2213,15 +2109,16 @@
                            xval = ( (Xctype *) work )[ ix + iy * xd ]; \
                            if ( xval != Xbadval ) { \
                               dval = (double) xval; \
-                              if ( dval <= loval ) { \
+                              if ( dval <= vals[ 0 ] ) { \
                                  ival = locolour; \
                               } \
-                              else if ( dval >= hival ) { \
+                              else if ( dval >= vals[ 1 ] ) { \
                                  ival = hicolour; \
                               } \
                               else { \
                                  ival = locolour + \
-                                    (int) ( 0.5 + ( dval - loval ) * scale ); \
+                                    (int) ( 0.5 + \
+                                            ( dval - vals[ 0 ] ) * scale ); \
                               } \
                               data[ ( ix + xb - xbase ) + \
                                     ( iy + yb - ybase ) * xdim ] = ival; \
@@ -2262,8 +2159,8 @@
          ndfset->plotarray->ydim = ydim;
          ndfset->plotarray->iframe = iframe;
          ndfset->plotarray->zoom = zoom;
-         ndfset->plotarray->loval = loval;
-         ndfset->plotarray->hival = hival;
+         ndfset->plotarray->loperc = loperc;
+         ndfset->plotarray->hiperc = hiperc;
       }
 
 /* Return the address of the prepared array. */
@@ -2271,9 +2168,166 @@
    }
 
 
+/**********************************************************************/
+   void getpercentiles( Ndf1 *ndf1, int nperc, double *percs, double *values,
+                        int *status ) {
+/**********************************************************************/
+/* Gets a list of percentile values for an Ndf1 structure.  It does
+   plenty of work to cache things so that subsequent calls ought to
+   get the same results quickly.  Much better to call it once with
+   many percentiles than one invocation for each value.
+*/
+      double *afracs;
+      double *apercs;
+      double *avals;
+      int first;
+      int i;
+      int nfrac;
+      int nextra;
+      Tcl_HashSearch hsearch;
+      double initset[] = {  0.,  1.,  2.,  3.,  4.,  5.,  6.,  7.,  8.,  9.,
+                           10., 11., 12., 13., 14., 15., 16., 17., 18., 19.,
+                           20., 21., 22., 23., 24., 25., 26., 27., 28., 29.,
+                           30., 31., 32., 33., 34., 35., 36., 37., 38., 39.,
+                           40., 41., 42., 43., 44., 45., 46., 47., 48., 49.,
+                           50., 51., 52., 53., 54., 55., 56., 57., 58., 59.,
+                           60., 61., 62., 63., 64., 65., 66., 67., 68., 69.,
+                           70., 71., 72., 73., 74., 75., 76., 77., 78., 79.,
+                           80., 81., 82., 83., 84., 85., 86., 87., 88., 89.,
+                           90., 91., 92., 93., 94., 95., 96., 97., 98., 99.,
+                           0.5, 99.5, 0.1, 99.9, 100. };
 
+/* If we have not got any percentiles before, then initialise the table
+   with a useful set.  It makes sense to do this because it is nearly as
+   fast to work out many percentiles as just one.  If we can predict 
+   most of the ones which might be likely to be needed, we can probably
+   save time on subsequent calls. */
+      nextra = 0;
+      first = ( Tcl_FirstHashEntry( &ndf1->perchash, &hsearch ) == NULL );
+      if ( first ) {
+         nextra = sizeof( initset ) / sizeof( initset[ 0 ] );
+      }
 
+/* Allocate arrays in which to store percentiles and values. */
+      apercs = malloc( ( nperc + nextra ) * sizeof( double ) );
+      afracs = malloc( ( nperc + nextra ) * sizeof( double ) );
+      avals = malloc( ( nperc + nextra ) * sizeof( double ) );
+      if ( apercs == NULL || afracs == NULL || avals == NULL ) {
+         *status = SAI__ERROR;
+         errRep( " ", "getpercentile: memory allocation failed", status );
+         return;
+      }
 
+/* Copy all the passed arguments, and all the extra values, into the
+   work array. */
+      for ( i = 0; i < nperc; i++ ) {
+         apercs[ i ] = percs[ i ];
+      }
+      for ( i = 0; i < nextra; i++ ) {
+         apercs[ nperc + i ] = initset[ i ];
+      }
+
+/* Check that all the requested values are in the correct range. */
+      for ( i = 0; i < nperc + nextra; i++ ) {
+         if ( apercs[ i ] < 0.0 || apercs[ i ] > 100.0 ) {
+            *status = SAI__ERROR;
+            errRep( " ", "getpercentile: argument out of range (0..100)",
+                    status );
+            return;
+         }
+      }
+
+/* Find out which of these percentiles we already have values for.
+   If there are any missing, write these into a new array which we
+   can feed to the percentile calculation routine. */
+      nfrac = 0;
+      for ( i = 0; i < ( nperc + nextra ); i++ ) {
+         PercHashKey hkey;
+         hkey.hash = NULL;
+         hkey.data = percs[ i ];
+         if ( Tcl_FindHashEntry( &ndf1->perchash, hkey.hash ) == NULL ) {
+            afracs[ nfrac++ ] = apercs[ i ] * 0.01;
+         }
+      }
+
+/* Unless all the requested values were in the hash table, we will need
+   to work some more out. */
+      if ( nfrac > 0 ) {
+         double *work;
+         DECLARE_CHARACTER( type, DAT__SZTYP );
+         F77_LOGICAL_TYPE bad;
+  
+/* We have to sort the array of new percentiles to be worked out, since
+   the percentile calculation routine likes them that way. */
+         qsort( afracs, nfrac, sizeof( afracs[ 0 ] ), dcompare );
+
+/* Now do the work of calcluating the percentiles. */
+         work = malloc( nfrac * sizeof( double ) );
+         if ( work == NULL ) {
+            *status = SAI__ERROR;
+            errRep( " ", "getpercentile: memory allocation failed", status );
+            return;
+         }
+
+/* If the array is not currently mapped, we have to map it. */
+         if ( ! ndf1->mapped ) domapdata( ndf1, status );
+
+/* Massage some arguments for fortran. */
+         bad = F77_ISTRUE(ndf1->bad);
+         cnfExprt( ndf1->mtype, type, DAT__SZTYP );
+
+/* Call the routine which does the calculations. */
+         F77_CALL(ccd1_fra)( CHARACTER_ARG(type), INTEGER_ARG(&ndf1->nel),
+                             (F77_POINTER_TYPE) &ndf1->data,
+                             INTEGER_ARG(&nfrac), DOUBLE_ARG(afracs),
+                             LOGICAL_ARG(&bad), DOUBLE_ARG(work),
+                             DOUBLE_ARG(avals), INTEGER_ARG(status)
+                             TRAIL_ARG(type) );
+
+/* We can update the bad flag as a bonus. */
+         ndf1->bad = F77_ISTRUE(bad);
+         free( work );
+
+/* Store the new percentile results in the hash table. */
+         for ( i = 0; i < nfrac; i++ ) {
+            PercHashKey hkey;
+            PercHashValue hval;
+            Tcl_HashEntry *entry;
+            int new;
+            hkey.hash = NULL;
+            hkey.data = afracs[ i ] * 100.0;
+            entry = Tcl_CreateHashEntry( &ndf1->perchash, hkey.hash, &new );
+            hval.hash = (ClientData) NULL;
+            hval.data = avals[ i ];
+            Tcl_SetHashValue( entry, hval.hash );
+         }
+      }
+
+/* We should now have all the values in the hash.  Get them out and write
+   them into the result vector. */
+      for ( i = 0; i < nperc; i++ ) {
+         PercHashKey hkey;
+         PercHashValue hval;
+         Tcl_HashEntry *entry; 
+         hkey.hash = NULL;
+         hkey.data = percs[ i ];
+         entry = Tcl_FindHashEntry( &ndf1->perchash, hkey.hash );
+         if ( entry == NULL ) {    /* kludge - sorry */
+            hkey.data = ( percs[ i ] * 0.01 ) * 100.0;
+            entry = Tcl_FindHashEntry( &ndf1->perchash, hkey.hash );
+         }
+         hval.hash = Tcl_GetHashValue( entry );
+         values[ i ] = hval.data;
+      }
+
+/* Tidy up. */
+      free( apercs );
+      free( afracs );
+      free( avals );
+
+/* Return with success status. */
+      return;
+   }
 
 
 /**********************************************************************/
