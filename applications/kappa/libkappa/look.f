@@ -40,10 +40,15 @@
 *        a value is supplied which does not end with a minus sign. All
 *        the supplied values are then concatenated together (after removal 
 *        of the trailing minus signs). Only acessed if MODE is "ARD".
+*        Positions in the ARD description are assumed to be in the
+*        current co-ordinate Frame of the NDF unless there are COFRAME or 
+*        WCS statements which indicate a different system. See "Notes" below.
 *     ARDFILE = FILENAME (Read)
 *        The name of an existing text file containing an ARD description
 *        for the parts of the image to be listed. Only acessed if MODE is 
-*        "ARDFile".
+*        "ARDFile". Positions in the ARD description are assumed to be in
+*        pixel co-ordinates unless there are COFRAME or WCS statements 
+*        which indicate a different system. See "Notes" below.
 *     CENTRE = LITERAL (Read)
 *        The co-ordinates of the data pixel at the centre of the area to
 *        be displayed, in the current co-ordinate Frame of the NDF (supplying 
@@ -209,16 +214,20 @@
 *        in the text file "central.dat".
 
 *  Notes:
-*     -  The co-ordinate system in which positions are given within ARD
+*     - ARD files may be created by ARDGEN or written manually.  In the
+*     latter case consult SUN/183 for full details of the ARD
+*     descriptors and syntax; however, much may be learnt from looking
+*     at the ARD files created by ARDGEN and the ARDGEN documentation.
+*     There is also a summary with examples in the main body of SUN/95.
+*     - The co-ordinate system in which positions are given within ARD
 *     descriptions can be indicated by including suitable
 *     COFRAME or WCS statements within the description (see SUN/183).
 *     For instance, starting the description with the text
 *     "COFRAME(PIXEL)" will indicate that positions are specified in
 *     pixel co-ordinates. The statement "COFRAME(SKY,System=FK5)" would
 *     indicate that positions are specified in RA/DEC (FK5,J2000). If
-*     no such statements are included, then it is assumed that
-*     positions are given within the current co-ordinate system of the
-*     input NDF.
+*     no such statements are included, then a default co-ordinate system
+*     is used as specified in the parameter description above.
 
 *  Related Applications:
 *     KAPPA: TRANDAT, ARDGEN, ARDMASK, ARDPLOT.
