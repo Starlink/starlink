@@ -1,0 +1,115 @@
+## SCUOVER - Overlay the SCUBA array onto a rebinned image
+
+#+
+#  Name:
+#     SCUOVER.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+ 
+#  Authors:
+#     TIMJ: Tim Jenness (timj@jach.hawaii.edu)
+#     {enter_new_authors_here}
+
+#  History:
+#     1996 December 17 (TIMJ)
+#	 Original version
+#     1997 May 8 (TIMJ)
+#	 Specify INT,MEAS and EXP for overlay
+#	Add MSG_FILTER
+#     1997 May 30 (TimJ)
+#       Turn of prompting of EXT, INT, MEAS, EXP.
+#	Only use if asked for to reduce prompting.
+
+#-
+
+   INTERFACE SCUOVER
+
+      HELPLIB 'SCUBA_HELP:'
+
+   parameter      COL         # Colour of graph lines
+      type        'LITERAL'
+      prompt      'Colour of annotation'
+      vpath       'CURRENT,DEFAULT'
+      ppath       'CURRENT'
+      default     1
+      helpkey     '*'
+   endparameter
+
+   parameter      DEVICE         # Graphics device
+      ptype       'DEVICE'
+      vpath       'GLOBAL,PROMPT'
+      ppath       'GLOBAL,CURRENT'
+      association '<-GLOBAL.GRAPHICS_DEVICE'
+      prompt      'Name of graphics device'
+      helpkey     '*'
+   endparameter
+
+      PARAMETER EXPOSURE
+         TYPE '_INTEGER'
+         PROMPT   'Exposure number'
+         vpath       'DYNAMIC, PROMPT'
+         ppath       'DYNAMIC'
+         HELPKEY  '*'
+      ENDPARAMETER
+
+
+      PARAMETER EXT        # Source of bolometer coordinates
+         TYPE NDF
+         ACCESS 'READ'
+	 PROMPT   'Name of (extinction corrected) demodulated data file'
+	 VPATH 'DYNAMIC'
+	 HELPKEY  '*'
+      ENDPARAMETER
+
+      PARAMETER INTEGRATION
+         TYPE '_INTEGER'
+         PROMPT   'Integration number'
+         vpath       'DYNAMIC, DEFAULT, PROMPT'
+         ppath       'DEFAULT'
+         HELPKEY  '*'
+      ENDPARAMETER
+
+      PARAMETER MEASUREMENT
+         TYPE '_INTEGER'
+         PROMPT   'Measurement number'
+         vpath       'DYNAMIC, DEFAULT, PROMPT'
+         ppath       'DEFAULT'
+         HELPKEY  '*'
+      ENDPARAMETER
+
+      PARAMETER MSG_FILTER
+        TYPE     '_CHAR'
+        PROMPT   'Messaging level'
+        DEFAULT  'NORM'
+        VPATH    'DEFAULT'
+        HELPKEY  '*'
+      ENDPARAMETER
+
+
+   parameter      NDF            # Input NDF to be analysed
+      position    1
+      type        'NDF'
+      access      'READ'
+      vpath       'PROMPT'
+      ppath       'GLOBAL'
+      association '<->GLOBAL.DATA_ARRAY'
+      prompt      'Image to display bolometers over'
+      helpkey     '*'
+   endparameter
+
+   parameter      NAME         # Write name or number of bolometer
+      type        _LOGICAL
+      prompt      'Display bolometer name (else number)?'
+      vpath       'CURRENT,DEFAULT'
+      ppath       'CURRENT'
+      default     TRUE
+      helpkey     '*'
+   endparameter
+
+         
+   ENDINTERFACE
+
+
+
+
