@@ -18,9 +18,12 @@
 *     25-FEB-1993: Original version
 *     12-JAN-1995: Ported to UNIX, changed to 'new style'
 *     $Log$
-*     Revision 1.3  1996/09/16 20:27:18  timj
-*     Change PHOTOM to SCUPHOT
+*     Revision 1.4  1996/09/17 02:14:22  timj
+*     Add CONCAT
 *
+c Revision 1.3  1996/09/16  20:27:18  timj
+c Change PHOTOM to SCUPHOT
+c
 c Revision 1.2  1996/07/31  18:53:16  timj
 c Add skydip option
 c
@@ -91,6 +94,10 @@ c
       ELSE IF (NAME .EQ. 'SKYDIP') THEN
 
          CALL REDS_SKYDIP (STATUS)
+
+      ELSE IF (NAME .EQ. 'CONCAT') THEN
+
+         CALL REDS_CONCAT (STATUS)
 
       END IF
 
