@@ -330,31 +330,13 @@
 #  Create the GWM viewing item.
          makegwm $xbase $ybase $xdim $ydim
 
-#  Get percentile values for drawing the display (these are cached 
-#  efficiently by the NDF object, so there is no need to remember them
-#  from last time for ourselves).  It is however better to calculate
-#  both of these with a single call rather than with two calls.
-         set scalevals [ $ndf percentile [ lindex $percentiles 0 ] \
-                                         [ lindex $percentiles 1 ] ]
-
 #  Display the NDF into the GWM item.
          set options {border=1 drawtitle=0 textlab=0 tickall=1 \
                       colour=3 colour(numlab)=5 colour(border)=4}
          lappend options $displaystyle
          $ndf display "[ gwmname ]/GWM" \
-                      [ lindex $scalevals 0 ] [ lindex $scalevals 1 ] \
+                      [ lindex $percentiles 0 ] [ lindex $percentiles 1 ] \
                       $wcsframe [ join $options "," ]
-       # taskrun display " \
-       #       in=$ndfname \
-       #       device=[ devname ] \
-       #       scale=true \
-       #       mode=scale \
-       #       low=[ lindex $scalevals 0 ] \
-       #       high=[ lindex $scalevals 1 ] \
-       #       margin=0 \
-       #       style=\"tickall=1,drawtitle=0,$displaystyle\" \
-       #       reset \
-       #    "
 
 #  Draw any points which have already been selected onto the new display.
          refreshpoints
