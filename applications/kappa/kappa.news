@@ -78,7 +78,7 @@
    -----------------
    The following commands have had major changes to functionality which
    may break any existing scripts, etc, which use them: APERADD, LAPLACE,
-   LUTABLE, LUTSAVE, MANIC, MSTATS, OUTSET, POW, SQORST, TRIG
+   LUTABLE, LUTSAVE, MANIC, MSTATS, OUTSET, POW, SQORST, SLIDE, TRIG
 
    The following commands have extra functionality: ARDMASK, COLLAPSE,
    GDSET, SETSKY, WCSADD
