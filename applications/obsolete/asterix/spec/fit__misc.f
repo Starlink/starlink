@@ -1,5 +1,6 @@
 *+  FIT_CHISQ_ACCUM
-	SUBROUTINE FIT_CHISQ_ACCUM(NDAT,OBS,WT,PRED,DCHISQ)
+      SUBROUTINE FIT_CHISQ_ACCUM(NDAT,OBS,QOK,QUAL,WT,PRED,DCHISQ,
+     :           STATUS)
 *    Description :
 *     Accumulates chi-squared fit between observed and predicted data.
 *    History :
@@ -7,28 +8,40 @@
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
+       INCLUDE 'SAE_PAR'
 *    Import :
 	INTEGER NDAT			! No of values in dataset
+        LOGICAL QOK, QUAL(NDAT)
 	REAL OBS(NDAT)			! Observed data
 	REAL WT(NDAT)			! Data weights (inverse variances)
 	REAL PRED(NDAT)			! Array of predicted data
 *    Import-Export :
 	DOUBLE PRECISION DCHISQ		! Double prec chisq accumulator
-*    Export :
 *    Status :
-*    Local constants :
+        INTEGER STATUS
 *    Local variables :
 	INTEGER I			! Data index
-*-----------------------------------------------------------------------------
-C	print *,'fit_chisq_accum;ndat,chisq(init): ',ndat,dchisq
-	DO I=1,NDAT
-C	  print *,'fit_chisq_accum;i,obs: ',i,obs(i)
-C	  print *,'wt: ',wt(i)
-C	  print *,'pred,chisq: ',pred(i),dchisq
-	  DCHISQ=DCHISQ+DBLE(WT(I)*(OBS(I)-PRED(I))**2)
-	ENDDO
+*-
 
-	END
+*  Check inherited global status
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Switch on quality
+      IF ( QOK ) THEN
+	DO I = 1, NDAT
+          IF ( QUAL(I) ) THEN
+	    DCHISQ = DCHISQ + DBLE(WT(I)*(OBS(I)-PRED(I))**2)
+          END IF
+	ENDDO
+      ELSE
+	DO I=1,NDAT
+	  DCHISQ = DCHISQ + DBLE(WT(I)*(OBS(I)-PRED(I))**2)
+	ENDDO
+      END IF
+
+      END
+
+
 *+  FIT_DEFIRREGRID - Define values in an irregular grid axis block
       SUBROUTINE FIT_DEFIRREGRID( PAR, NVAL, LOGARITHMIC, VALUES,
      :                                              GAX, STATUS )
@@ -51,7 +64,6 @@ C	  print *,'pred,chisq: ',pred(i),dchisq
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'FIT_PAR'
 *
 *    Structure definitions :
@@ -115,7 +127,6 @@ C	  print *,'pred,chisq: ',pred(i),dchisq
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *
 *    Import :
 *
