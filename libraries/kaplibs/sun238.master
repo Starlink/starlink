@@ -406,7 +406,7 @@ numerical types. The \emph{actual} routines names will not include the trailing
    The hypertext version of this document contains a tool which allows
    the reference documentation to be searched for given words or phrases
    in a versatile manner, reporting the names of routines which match the
-   given criteria. This provides a potentially powerfull method for
+   given criteria. This provides a potentially powerful method for
    finding the routines you need. To access the tool, do:
 
 \small
@@ -432,10 +432,39 @@ numerical types. The \emph{actual} routines names will not include the trailing
     </SCRIPT>
   \end{rawhtml}
 
-   Use the pop-up window to search for KAPLIBS routines which match your
-   requirements. Matching routines will appear at the right hand side of
-   the pop-up window. Clicking on the name of a matching routine will
-   display the full documentation for that routine in this window.
+   Accessing this page should cause your browser to pop up a window with
+   title "Search for KAPLIBS routines". Use this pop-up window to search
+   for KAPLIBS routines which match your requirements. Type a phrase into
+   the ``Search for:'' box, and press return, or press the ``Go'' button.
+   When you have finished, close the pop-up window by clicking on the
+   cross at the right hand end of the window's title bar.
+
+   You can search for a given string within various fields of the 
+   documentation of all KAPLIBS routines. You can select to search
+   through any combination of the routine name, purpose, description,
+   argument list (\emph{i.e.} argument \emph{names}), or argument 
+   descriptions. Use the check buttons to the right of the ``Within
+   the:'' label to make your choice.
+
+   When a search is succesfull, the matching routines are routines will
+   appear at the right hand side of the pop-up window. These are the
+   ``selected'' routines. You can click on a routine name to see the full
+   documentation in the main browser window. Subsequent searches can
+   optionally search the list of currently selected routines rather than
+   the entire list of all KAPLIBS routines. You can also search all
+   routines \emph{except} for those in the current selection. Choose
+   using the radio buttons to the right of the label ``Of:''.
+
+   The names of any routines matching your search can either be:
+
+\begin{itemize}
+   \item Added to the routines currently listed in the right hand frame
+   \item Removed from the routines currently listed in the right hand frame
+   \item Used to replace the routines currently listed in the right hand frame
+\end{itemize}
+
+   Clicking on the \emph{Remove} link associated with a routine will
+   cause it to be removed from the current selection.
 
 \end{htmlonly}
 
