@@ -15,6 +15,7 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <string.h>		// for strerror
 #if NO_CSTD_INCLUDE
 #include <stdio.h>
 #include <errno.h>
@@ -34,23 +35,31 @@ verbosities InputByteStream::verbosity_ = normal;
 InputByteStream::InputByteStream (string& s, bool preload, string tryext)
     : eof_(true), preloaded_(preload)
 {
-    string fname = s;
-    fd_ = open (fname.c_str(), O_RDONLY);
+    fname_ = s;
+    fd_ = open (fname_.c_str(), O_RDONLY);
     if (fd_ < 0 && tryext.length() > 0)
     {
-	fname += tryext;
-	fd_ = open (fname.c_str(), O_RDONLY);
+	fname_ += tryext;
+	fd_ = open (fname_.c_str(), O_RDONLY);
 	if (fd_ >= 0)
-	    s = fname;		// modify the input filename
+	    s = fname_;		// modify the input filename
     }
     if (fd_ < 0)
-	throw InputByteStreamError ("can\'t open file " + s + " to read");
+    {
+	string errstr = strerror (errno);
+	throw InputByteStreamError ("can\'t open file " + s + " to read ("
+				    +errstr+")");
+    }
 
     eof_ = false;
 
     struct stat S;
     if (fstat (fd_, &S))
-	throw InputByteStreamError ("Can't stat open file");
+    {
+	string errstr = strerror (errno);
+	throw InputByteStreamError ("Can't stat open file ("
+				    +errstr+")");
+    }
     filesize_ = S.st_size;
 
     if (preload)
@@ -59,14 +68,19 @@ InputByteStream::InputByteStream (string& s, bool preload, string tryext)
 	buf_ = new Byte[buflen_];
 	size_t bufcontents = read (fd_, buf_, buflen_);
 	if (bufcontents != buflen_)
-	    throw InputByteStreamError ("Couldn't preload file");
+	{
+	    string errstr = strerror (errno);
+	    throw InputByteStreamError ("Couldn't preload file "+fname_
+					+" ("+errstr+")");
+	}
 	eob_ = buf_ + bufcontents;
 
 	close (fd_);
 	fd_ = -1;
 
 	if (verbosity_ > normal)
-	    cerr << "InputByteStream: preloaded " << filesize_ << " bytes\n";
+	    cerr << "InputByteStream: preloaded " << fname_
+		 << ", " << filesize_ << " bytes\n";
     }
     else
     {
@@ -75,7 +89,8 @@ InputByteStream::InputByteStream (string& s, bool preload, string tryext)
 	eob_ = buf_;	// nothing read in yet - eob at start
 
 	if (verbosity_ > normal)
-	    cerr << "InputByteStream: filesize=" << filesize_
+	    cerr << "InputByteStream: name=" << fname_
+		 << " filesize=" << filesize_
 		 << " buflen=" << buflen_ << '\n';
     }
     p_ = buf_;
@@ -94,9 +109,9 @@ Byte InputByteStream::getByte(int n)
 	return 0;
 
     if (p_ < buf_)
-	throw DviBug ("InputByteStream: pointer before buffer start");
+	throw DviBug ("InputByteStream:"+fname_+": pointer before buffer start");
     if (p_ > eob_)
-	throw DviBug ("InputByteStream: pointer beyond EOF");
+	throw DviBug ("InputByteStream:"+fname_+": pointer beyond EOF");
 
     if (p_ == eob_)
     {
@@ -120,21 +135,27 @@ const Byte *InputByteStream::getBlock (int pos, unsigned int length)
 
     Byte *blockp;
 
-    if (pos < 0)
+    if (pos < 0)		// retrieve last `length' bytes from
+				// end of file
     {
 	if (preloaded_)
 	{
 	    blockp = buf_ + buflen_ - length;
 	    if (blockp < buf_)
 		throw DviBug
-		  ("InputByteStream::getBlock: requested more than bufferful");
+		  ("InputByteStream::getBlock:"+fname_+": requested more than bufferful");
 	}
 	else
 	{
 	    if (length > buflen_)
-		throw InputByteStreamError ("getBlock: length too large");
+		throw InputByteStreamError ("getBlock:"+fname_+": length too large");
 	    if (lseek (fd_, filesize_-length, SEEK_SET) < 0)
-		throw InputByteStreamError ("getBlock: can\'t seek");
+	    {
+		string errstr = strerror (errno);
+		throw InputByteStreamError ("getBlock:"+fname_+
+					    ": can\'t seek to EOF ("
+					    +errstr+")");
+	    }
 	    read_buf_();
 	    blockp = buf_;
 	}
@@ -146,27 +167,27 @@ const Byte *InputByteStream::getBlock (int pos, unsigned int length)
 	    blockp = buf_ + pos;
 	    if (blockp < buf_)
 		throw DviBug
-		    ("InputByteStream::getBlock: pointer before buffer start");
+		    ("InputByteStream::getBlock:"+fname_+": pointer before buffer start");
 	    if (blockp > eob_)
 	    {
 		char buf[100];
 		sprintf (buf,
-		      "InputByteStream::getBlock: pointer beyond EOF (%d,%d)",
-			 pos, length);
+		      "InputByteStream::getBlock:%s: pointer beyond EOF (%d,%d)",
+			 fname_.c_str(), pos, length);
 		throw DviBug (buf);
 	    }
 	    if (blockp+length > eob_)
 	    {
 		char buf[100];
 		sprintf (buf,
-		"InputByteStream::getBlock: requested block too large (%d,%d)",
-			 pos,length);
+		"InputByteStream::getBlock:%s: requested block too large (%d,%d)",
+			 fname_.c_str(), pos,length);
 		throw DviBug (buf);
 	    }
 	}
 	else
 	    throw DviBug
-		("InputByteStream::getBlock: implemented only for preloaded");
+		("InputByteStream::getBlock:"+fname_+": implemented only for preloaded");
     }
 
     return blockp;
@@ -182,7 +203,7 @@ void InputByteStream::seek (unsigned int pos)
     if (preloaded_)
     {
 	if (pos > buflen_)	// pos unsigned, so can't be negative
-	    throw DviBug ("InputByteStream::seek: out of range");
+	    throw DviBug ("InputByteStream::seek:"+fname_+": out of range");
 	p_ = buf_ + pos;
     }
     else
@@ -190,7 +211,8 @@ void InputByteStream::seek (unsigned int pos)
 	if (lseek (fd_, pos, SEEK_SET) < 0)
 	{
 	    string errstr = strerror(errno);
-	    throw DviBug ("InputByteStream::seek: can\'t seek ("+errstr+")");
+	    throw DviBug ("InputByteStream::seek:"+fname_+": can\'t seek ("
+			  +errstr+")");
 	}
 	read_buf_();
 	p_ = buf_;
@@ -199,13 +221,13 @@ void InputByteStream::seek (unsigned int pos)
 int InputByteStream::pos ()
 {
     if (!preloaded_)
-	throw DviBug ("Can't get pos in non-preloaded file");
+	throw DviBug ("InputByteStream:"+fname_+": Can't get pos in non-preloaded file");
     return static_cast<int>(p_ - buf_);
 }
 void InputByteStream::skip (unsigned int skipsize)
 {
     if (!preloaded_)
-	throw DviBug ("Can't skip in non-preloaded file");
+	throw DviBug ("InputByteStream:"+fname_+": Can't skip in non-preloaded file");
     p_ += skipsize;
 }
 
@@ -213,7 +235,11 @@ void InputByteStream::read_buf_ ()
 {
     ssize_t bufcontents = read (fd_, buf_, buflen_);
     if (bufcontents < 0)
-	throw DviBug ("InputByteStream::read_buf_: can't read");
+    {
+	string errmsg = strerror(errno);
+	throw DviBug ("InputByteStream::read_buf_:"+fname_+": read error ("
+		      +errmsg+")");
+    }
     eof_ = (bufcontents == 0);
     eob_ = buf_ + bufcontents;
 }
@@ -237,7 +263,7 @@ void InputByteStream::read_buf_ ()
 signed int InputByteStream::getSIS(int n)
 {
     if (n<0 || n>4)
-	throw DviBug("bad argument to getSIS");
+	throw DviBug("InputByteStream:"+fname_+": bad argument to getSIS");
     unsigned int t = getByte();
     unsigned int pow2 = 128;	// 2^7-1   is largest one-byte signed int
 				// 2^7=128 is most negative signed int
@@ -282,7 +308,7 @@ signed int InputByteStream::getSIU(int n)
 {
     // disallow n==4 - there are no unsigned 4-byte quantities in the DVI file
     if (n<0 || n>3)
-	throw DviBug("bad argument to getSIU");
+	throw DviBug("InputByteStream:"+fname_+": bad argument to getSIU");
     unsigned int t = 0;
     for (; n>0; n--)
     {
@@ -295,7 +321,7 @@ signed int InputByteStream::getSIU(int n)
 unsigned int InputByteStream::getUIU(int n)
 {
     if (n<0 || n>4)
-	throw DviBug("bad argument to getUIU");
+	throw DviBug("InputByteStream:"+fname_+": bad argument to getUIU");
     unsigned int t = 0;
     for (; n>0; n--)
     {
@@ -308,7 +334,7 @@ unsigned int InputByteStream::getUIU(int n)
 unsigned int InputByteStream::getUIU(int n, const Byte *p)
 {
     if (n<0 || n>4)
-	throw DviBug("bad argument to getUIU");
+	throw DviBug("InputByteStream: bad argument to getUIU(int,Byte*)");
     unsigned int t = 0;
     for (const Byte *b=p; n>0; n--, b++)
 	t = t*256 + static_cast<unsigned int>(*b);
