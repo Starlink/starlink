@@ -261,7 +261,7 @@
 
 #  Get the NDF name and make a shortened version.
          set fullname($slot) [ $ndfset($slot) name ]
-         regsub {.*[./]} $fullname($slot) {} shortname($slot)
+         regsub {.*/} $fullname($slot) {} shortname($slot)
 
 #  Write info string substitution variables.  We take the opportunity
 #  here to verify that all NDFs are two-dimensional.
