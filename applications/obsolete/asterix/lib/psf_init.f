@@ -20,7 +20,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PSF_PAR'
 *
 *    Global variables :
@@ -34,30 +33,48 @@
 *    External references :
 *
       EXTERNAL 			PSF_BLK
+      EXTERNAL			PSF_ANAL_INIT
+      EXTERNAL			PSF_ASCA_INIT
+      EXTERNAL			PSF_EXOLE_INIT
+      EXTERNAL			PSF_PWFC_INIT
+      EXTERNAL			PSF_RADIAL_INIT
+      EXTERNAL			PSF_RESPFILE_INIT
+      EXTERNAL			PSF_TABULAR_INIT
+      EXTERNAL			PSF_WFC_INIT
+      EXTERNAL			PSF_XRT_HRI_INIT
+      EXTERNAL			PSF_XRT_PSPC_INIT
 *
 *    Local variables :
 *
       INTEGER                  	I               ! Loop over libraries/models
 *-
 
-*    Check status
+*  Check inherited global status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Zero the library slots
-      L_NLIB = 0
-
-*    Reset psf slots
+*  Reset psf slots
       DO I = 1, PSF_NMAX
         P_USED(I) = .FALSE.
       END DO
 
-*    Reset default time/energy block
+*  Reset default time/energy block
       TE_INIT = .FALSE.
 
-*    Psf system now initialised
+*  Psf system now initialised
       PSFINIT = .TRUE.
 
-*    Load the ADI package
+*  Load the ADI package
       CALL ADI_REQPKG( 'psf', STATUS )
+
+*  Load the system psfs
+      CALL PSF0_DEFPSF( 'ANALYTIC', PSF_ANAL_INIT, STATUS )
+      CALL PSF0_DEFPSF( 'ASCA', PSF_ASCA_INIT, STATUS )
+      CALL PSF0_DEFPSF( 'EXOLE', PSF_EXOLE_INIT, STATUS )
+      CALL PSF0_DEFPSF( 'PWFC', PSF_PWFC_INIT, STATUS )
+      CALL PSF0_DEFPSF( 'RADIAL', PSF_RADIAL_INIT, STATUS )
+      CALL PSF0_DEFPSF( 'TABULAR', PSF_TABULAR_INIT, STATUS )
+      CALL PSF0_DEFPSF( 'WFC', PSF_WFC_INIT, STATUS )
+      CALL PSF0_DEFPSF( 'XRT_HRI', PSF_XRT_HRI_INIT, STATUS )
+      CALL PSF0_DEFPSF( 'XRT_PSPC', PSF_XRT_PSPC_INIT, STATUS )
 
       END

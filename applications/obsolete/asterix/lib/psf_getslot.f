@@ -19,7 +19,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PSF_PAR'
 *
 *    Global variables :
@@ -72,8 +71,6 @@
       ELSE IF ( .NOT. P_USED(SLOT) ) THEN
 
 *      Zero the storage area
-        P_LIBID(SLOT) = 0
-        P_MODID(SLOT) = 0
         P_MODEL(SLOT) = .FALSE.
         P_INST(SLOT) = 0
         P_GOTAX(SLOT) = .FALSE.
