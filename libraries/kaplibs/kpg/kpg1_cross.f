@@ -1,21 +1,22 @@
-*+  KPG1_CROSS - Draws a cross at the specified pixel position.
-
       SUBROUTINE KPG1_CROSS( X, Y, SIZE, STATUS )
-*
-*    Description :
-*
+*+
+*  Name:
+*     KPG1_CROSS 
+
+*  Purpose:
+*     Draws a cross at the specified pixel position.
+
+*  Description:
 *     This routine accepts the co-ordinates of a point and draws a
 *     cross of defined size centred at that point.  The SGS buffers
 *     are flushed after the cross is drawn.
 *
 *     An SGS device must already be open.
-*
-*    Invocation :
-*
+
+*  Invocation:
 *     CALL KPG1_CROSS( X, Y, SIZE, STATUS )
-*
-*    Arguments :
-*
+
+*  Arguments:
 *     X = REAL( READ )
 *         The X co-ordinate of the point.
 *     Y = REAL( READ )
@@ -24,19 +25,16 @@
 *         The width and height of the cross in pixels
 *     STATUS = INTEGER( READ )
 *         The status on entry to this subroutine.
-*
-*    Method :
-*
+
+*  Method:
 *     The co-ordinates of the ends of the arms of the cross are
 *     calculated, then the cross is plotted.
-*
-*    Authors :
-*
+
+*  Authors:
 *     S.Chan ( RGVAD::KFH )
 *     Malcolm Currie RAL (UK.AC.RL.STAR::CUR)
-*
-*    History :
-*
+
+*  History:
 *     26 October 1983:  Original
 *     1986 Sep 17 : Renamed from KFH_CROSS. Standardised to RAPI2D
 *                   style; renamed parameters section to arguments and
@@ -45,7 +43,8 @@
 *     1988 Sep 12 : Added SIZE argument and fixed typing bug
 *                   (RL.STAR::CUR).
 *     1991 Jun 18 : Renamed from CROSS (RAL::CUR).
-*
+*-
+
 *    Type Definitions :
 
       IMPLICIT NONE            ! no default typing allowed

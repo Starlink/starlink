@@ -13,6 +13,8 @@
          OK = .FALSE.
          GO TO 999
       END IF      
+
+      CALL KPG1_PSEED( STATUS )
       
 *  Add other tests here...
 

@@ -153,7 +153,7 @@ kpg1_is3d.f kpg1_wtm3d.f kpg1_is3r.f kpg1_wtm3r.f kpg1_orvar.f
 
 # The contents of the kpg_source.tar file (including expanded generic
 # files and the generic source files):
-KPG_SOURCE = $(KAPGEN_SOURCES) kpg1_darar.f kpg1_darad.f kpg1_darai.f \
+KPG_SOURCE = $(KPG_SOURCES) kpg1_darar.f kpg1_darad.f kpg1_darai.f \
 kpg1_daraw.f kpg1_darab.f kpg1_daraub.f kpg1_darauw.f kpg1_fracr.f \
 kpg1_fracd.f kpg1_fraci.f kpg1_fracw.f kpg1_fracb.f kpg1_fracub.f \
 kpg1_fracuw.f kpg1_mixvr.f kpg1_mixvd.f kpg1_mixvi.f kpg1_mixvw.f \
