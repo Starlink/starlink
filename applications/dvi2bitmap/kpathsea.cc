@@ -76,7 +76,9 @@ using std::cerr;
 // thing we do need from that file is stdio.h, so we read that
 // explicitly.
 #define HAVE_PROTOTYPES
+#ifndef STDC_HEADERS
 #define STDC_HEADERS
+#endif
 #define KPATHSEA_C_STD_H 1
 #include <stdio.h>
 namespace kpse {
@@ -96,7 +98,6 @@ namespace kpse {
         kpse_format_info_type kpse_format_info[kpse_last_format] = { 0 };
     }
 }
-#undef STDC_HEADERS
 #undef HAVE_PROTOTYPES
 
 
