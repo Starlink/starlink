@@ -296,6 +296,7 @@
                lbnds="[$x1lo,$y1lo,$x2lo,$y2lo]" \
      	       file=ccdtest_obj.dat \
                bias=$biasframe \
+               dtype=$datatype \
      	       accept
 #           end ccdbgen
 
