@@ -1,0 +1,29 @@
+#
+#  Name:
+#     polimp.tab
+#
+#  Purpose:
+#     The default control table for use with POLIMP.
+#
+#  Description:
+#     This table contains a description of how to set values for the 
+#     components of the POLPACK extension by copying values from FITS 
+#     keywords stored in the NDF's FITS extension. The keywords used are
+#     those written by the POLEXP routine.
+#
+#  Authors:
+#     DSB: David Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     11-DEC-1997 (DSB):
+#        Original version.
+#     {enter_changes_here}
+#
+ANGROT      PPCKANGR         # The orientation of the analyser.
+FILTER      PPCKFILT         # The filter.
+IMGID       PPCKIMID         # The image idenrtifier.
+RAY?        PPCKRAY          # The ray "O" or "E" (optional)
+ROTATION?   PPCKROT          # The rotation of the aligned image (optional)
+WPLATE      PPCKWPLT         # The waveplate position
+YROTATION?  PPCKYROT         # The rotation of the Y axis (optional)
