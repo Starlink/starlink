@@ -39,6 +39,10 @@ use Carp;
 
 use vars qw/$VERSION/;
 
+# NDF required for A-task parameter retrieval
+# Only 'use' when we need to
+use autouse NDF => qw/ par_get($$$) /;
+
 # Access the Core functions
 use Starlink::AMS::Core qw/:Func/;
 use Starlink::ADAM qw/:adam/;
@@ -73,6 +77,9 @@ sub new {
   $task->{Name} = undef;  # Name in AMS
   $task->{PID}  = undef;  # Process ID (object) of monolith
   $task->{Running} = 0;   # Is the monolith contactable
+  $task->{TaskType} = 'A'; # Default to A-task
+  $task->{Monolith} = undef; # Monolith name
+  $task->{AdamDir} = undef; # Location of $ADAM_USER
  
   # Bless task into class
   bless($task, $class);
@@ -141,7 +148,64 @@ sub running {
   if (@_) { $self->{Running} = shift; }
   return $self->{Running};
 }
- 
+
+
+=item tasktype
+
+Return or set the type of task associated with the object.
+Should be either 'A' or 'I' (although this is not trapped).
+
+  $task->tasktype('A');
+
+=cut
+
+sub tasktype {
+  my $self = shift;
+  if (@_) { $self->{TaskType} = uc(shift()); }
+  return $self->{TaskType};
+} 
+
+
+=item monolith
+
+Returns or sets the name of the monolith (not including path).
+This is obtained by looking at the second argument to the
+load method and is required for A-tasks when performing a parameter
+get.
+
+=cut
+
+sub monolith {
+  my $self = shift;
+  if (@_) { $self->{Monolith} = shift(); }
+  return $self->{Monolith};
+} 
+
+=item adamdir
+
+Retrieve the current value of $ENV{ADAM_USER}. If not defined the
+value of $ADAM_USER is stored -- this method is used to store the
+value of $ADAM_USER at load time so that the location of any
+adam parameter file can be found (for A-tasks).
+
+=cut
+
+sub adamdir {
+  my $self = shift;
+  unless (defined $self->{AdamDir}) {
+    # ADAM_USER can be either $ADAM_USER or $HOME/adam
+    if (exists $ENV{'ADAM_USER'}) {
+      $self->{AdamDir} = $ENV{'ADAM_USER'};
+    } elsif (exists $ENV{HOME}) {
+      $self->{AdamDir} = $ENV{'HOME'} .'/adam';
+    } else {
+      croak 'Neither $ADAM_USER not $HOME environment variables are defined';
+    }
+  }
+  return $self->{AdamDir};
+}
+
+
 
 # I could set up a desctructor here to make the monolith
 # die before perl exits.
@@ -185,10 +249,16 @@ sub DESTROY {
 Load a monolith and set up the name in the messaging system.
 This task is called by the 'new' method.
 
-  $status = $obj->load("name","monolith_binary");
+  $status = $obj->load("name","monolith_binary",{ TASKTYPE => 'A' });
 
 If the second argument is omitted it is assumed that the binary
 is already running and can be called by "name".   
+
+The last argument, if needed, is a reference to a hash containing
+the load options. The only option currently supported is TASKTYPE
+which can be either 'A' (for A-task) or 'I' (for I-tasks).
+
+Default is to launch an A-task.
 
 If a path to a binary with name "name" already exists then the monolith
 is not loaded.
@@ -199,19 +269,40 @@ is not loaded.
 sub load {
  
   my $self = shift;
-  my $status = 0;  # A good status
+  my $status = &Starlink::ADAM::SAI__OK;  # A good status
  
   # First argument is the name of the system so set that in the object
   $self->name(shift);
  
   # A further argument (optional) will be the monolith name
+  # and optional hash.
   if (@_) { 
  
     # If we can already talk to a monolith via this path then
     # we should not start a new monolith
  
     unless ($self->contact) {
-      my ($process, $status) = adamtask($self->name(), shift ); 
+
+      # If the last argument is a hash reference then this may
+      # contain the task type
+      # Note that we have hard-wired in default behaviour
+      # in ::Core and this routine - this is dangerous.
+      if (ref($_[-1]) eq 'HASH') {
+	if (exists $_[-1]->{TASKTYPE}) {
+	  $self->tasktype($_[-1]->{TASKTYPE});
+	}
+      }
+
+      # Get the monolith name (if present)
+      if (not ref $_[0]) {
+	# Need to extract the monolith name
+	my $monolith = (split(/\//, $_[0]))[-1];
+	# Store ADAM_USER
+	$self->monolith( $monolith );
+	$self->adamdir;
+      }
+
+      my ($process, $status) = adamtask($self->name(), @_ ); 
  
       # Store the PID object (may be undefined if not spawned by us)
       # if good status?
@@ -245,7 +336,7 @@ sub obeyw {
 
   my $parameters = " ";
   if (@_) { $parameters = shift; } 
- 
+
   # Now do the obeyw
   my $status = adamtask_obeyw($self->name(), $action, $parameters);
  
@@ -257,9 +348,20 @@ sub obeyw {
 
 =item get
 
-Obtain the value of a parameter.
+Obtain the value of a parameter from an I-task. The value is returned
+as a single string even for array parameters. If called in an array
+context the parameter value and status are returned. If called in a
+scalar context only the value is returned.
 
  ($value, $status) = $obj->get("task:param");
+
+or
+
+  $value = $obj->get("task:param");
+
+If the monolith has been started as an A-task the adam messaging
+system can not be used to retrieve the parameter value. Instead,
+the par_get routine from the perl NDF module is invoked.
 
 =cut
 
@@ -270,12 +372,66 @@ sub get {
   my $param = shift;
  
   my $value = undef;
-  my $status = undef;
+  my $status = &Starlink::ADAM::SAI__OK;
  
   # Now do the get
-  ($value, $status) = adamtask_get($self->name(), $param);
+  if ($self->tasktype eq 'I') {
+    ($value, $status) = adamtask_get($self->name(), $param);
+  } else {
+
+    # First need to split on the colon to separate parameter from
+    # task [should have forced separation from the beginning and
+    # then joined as needed!!!]
+    my ($task, $par) = split(/:/, $param);
+
+    # Use NDF - need to search in file $monolith for task 
+    my $monolith = $self->monolith;
+    
+    if (defined $monolith) {
+
+      my $file = $monolith . ".$task";
+
+      # Store and set ADAM_USER
+      my $old_adam;
+      $old_adam = $ENV{ADAM_USER} if exists $ENV{ADAM_USER};
+      $ENV{ADAM_USER} = $self->adamdir;
+
+      my @result = par_get($par, $file, \$status);
+
+      # Reset ADAM_USER
+      if (defined $old_adam) {
+	$ENV{ADAM_USER} = $old_adam;
+      } else {
+	delete $ENV{ADAM_USER};
+      }
+
+      # If we have more than one value we need to join with commas
+      # and square brackets
+      if ($#result > 0) {
+	$value = '['.join(',',@result) .']';
+      } else {
+	$value = $result[0];
+      }
+
+    } else {
+      # Monolith name is not defined. Suggests that we did not
+      # start the monolith.
+      carp 'Error determining name of monolith. ' . 
+	'Parameters cannot be retrieved from monoliths that were not started '.
+	  'by this process.';
+      $status = &Starlink::ADAM::SAI__ERROR;
+      $value = undef;
+    }
+
+  }
+
  
-  return $value, $status;
+  if (wantarray) {
+    return $value, $status;
+  } else {
+    return $value;
+  }
+
 }
  
 # SET
@@ -284,9 +440,11 @@ sub get {
 
 =item set
 
-Set the value of a parameter in a task.
+Set the value of a parameter in an I-task.
 
   $status = $obj->set("action:param","value");
+
+This routine has no effect in A-tasks.
 
 =cut
 
@@ -298,7 +456,16 @@ sub set {
   my $value = shift;
   
   # Now do the set
-  my $status = adamtask_set($self->name(), $param, $value);
+
+  my $status;
+  if ($self->tasktype eq 'I') {
+    $status = adamtask_set($self->name(), $param, $value);
+  } else {
+    carp 'Can not use AMS set for non I-tasks' if $^W;
+    $status = &Starlink::ADAM::SAI__ERROR;
+  }
+
+  return $status;
  
 }
  
@@ -420,13 +587,17 @@ The C<Starlink::AMS::Core> and C<Starlink::AMS::Init>
 modules must be installed in order to use this
 module.
 
-=head1 See Also
+The C<NDF> module is required in order to retrieve parameters
+from A-tasks.
+
+=head1 SEE ALSO
 
 L<perl>, 
 L<Starlink::AMS::Core>,
 L<Starlink::AMS::Init>,
 L<Starlink::ADAM>,
-L<Starlink::EMS>, and L<Proc::Simple>.
+L<Starlink::EMS>, L<Proc::Simple>,
+and L<NDF>.
 
 =cut
 
