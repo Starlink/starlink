@@ -142,7 +142,8 @@
       REAL                   BASE            ! Axis base value
       REAL                   OSCALE           ! Axis scale value
       REAL                   SCALE(2)
-      REAL                   VMIN,VMAX       ! Min and max variance values
+      REAL			SPARR(2)		! Spaced array data
+      REAL                   	VMIN,VMAX       	! Min and max variance values
 
       INTEGER                I
       INTEGER                XCPTR           ! Pointer to cross-correln values
@@ -151,10 +152,10 @@
       INTEGER                NL              ! Total number of lag values
       INTEGER                NDIM            ! Dimensionality of data
       INTEGER                NBAD            ! No.of bad quality data
-      INTEGER                NVAL            ! No.of values
       INTEGER                NLINE           ! Line no. of HISTORY text
       INTEGER                TEXTLEN         ! Length of text string
 
+      LOGICAL			AOK(2)			! Axis data ok?
       INTEGER                   BF                      ! The base file number
       INTEGER                   DPTR(2)                 ! Mapped input data
       INTEGER                   IFID(2)                 ! Input identifiers
@@ -316,17 +317,9 @@
       SPARR(2) = OSCALE
       CALL BDI_AXPUT1R( XCID, 1, 'SpacedData', 2, SPARR, STATUS )
 
-*    Copy ancillary information from first non-primitive reg. spaced input file
+*  Choose file to copy from
       BF = 1
-      IF ( YREG ) THEN
-        BF = 1
-      ELSE IF(ZREG)THEN
-        BF = 2
-      ELSE IF(.NOT.YPRIM)THEN
-        BF = 1
-      ELSE IF(.NOT.ZPRIM)THEN
-        BF = 2
-      END IF
+      IF ( AOK(2) .AND. .NOT. AOK(1) ) BF = 2
 
 *  Create or copy data and axis ancillaries
       CALL BDI_PUT0C( XCID, 'Label', 'Cross-correlation', STATUS )
@@ -335,7 +328,7 @@
       CALL BDI_AXCOPY( IFID(BF), 1, 'Units', XCID, 1, STATUS )
 
 *  Copy ancillaries
-      CALL UDI_COPMORE( IFID(BF), 'grf', XCID, STATUS )
+      CALL UDI_COPANC( IFID(BF), 'grf', XCID, STATUS )
 
 *  History entry (copy history file from IFID, if available)
       CALL HSI_COPY( IFID(BF), XCID, STATUS )
