@@ -1,0 +1,130 @@
+#!/bin/sh
+# The next line is executed by /bin/sh, but not Tcl \
+TCL_LIBRARY=$GAIA_DIR; \
+TCLX_LIBRARY=$GAIA_DIR; \
+TK_LIBRARY=$GAIA_DIR; \
+TKX_LIBRARY=$GAIA_DIR; \
+ITCL_LIBRARY=$GAIA_DIR; \
+ITK_LIBRARY=$GAIA_DIR; \
+IWIDGETS_LIBRARY=$GAIA_DIR; \
+RTD_LIBRARY=$GAIA_DIR; \
+TCLADAM_DIR=$GAIA_DIR; \
+TIX_LIBRARY=$GAIA_DIR; \
+export TCL_LIBRARY; \
+export TCLX_LIBRARY; \
+export TK_LIBRARY; \
+export TKX_LIBRARY; \
+export ITCL_LIBRARY; \
+export ITK_LIBRARY; \
+export IWIDGETS_LIBRARY; \
+export RTD_LIBRARY; \
+export TCLADAM_DIR; \
+export TIX_LIBRARY; \
+exec $GAIA_DIR/gaia_wish $0 ${1+"$@"}
+#+
+#   Name:
+#      pix2wcs
+#
+#   Purpose:
+#      Convert a file of pixel coordinate to world coordinates.
+#
+#   Usage:
+#      pix2wcs image pixel_coordinates_file world_coordinates file
+#
+#   Description:
+#      This command transforms a list of pixel coordinate stored in a
+#      file into world coordinates. The format of the pixel file
+#      should be:
+#
+#        x y
+#        x y
+#
+#      The output file is proper tab-table which can be displayed
+#      in GAIA.
+#
+#   Authors:
+#      Peter W. Draper (PDRAPER):
+#
+#   History:
+#      28-APR-1999 (PDRAPER):
+#         Original version.
+#-
+#.
+
+#  Do not show the main window.
+wm withdraw .
+global argc
+global argv
+
+#  Get the image, if not given.
+if { $argc == 0 } {
+   puts -nonewline "Image: "
+   flush stdout
+   gets stdin image
+} else {
+   set image [lindex $argv 0]
+}
+
+#  Get names of files.
+if { $argc <= 1  } {
+   puts -nonewline "XY coordinate file: "
+   flush stdout
+   gets stdin infile
+} else {
+   set infile [lindex $argv 1]
+}
+if { ! [file exists $infile] } {
+   puts stderr "Sorry file: $infile, does not exist"
+   exit 1
+}
+
+if { $argc <= 2 } {
+   puts -nonewline "Output file: "
+   flush stdout
+   gets stdin outfile
+} else {
+   set outfile [lindex $argv 2]
+}
+
+#  Open the XY positions file and the output file.
+if { [catch "open $infile r" infile] } {
+   puts stderr "Failed to open input file: $infile ($infile)"
+   exit 1
+}
+if { [catch "open $outfile w" outfile] } {
+   puts stderr "Failed to open output file: $infile ($outfile)"
+   exit 1
+}
+
+#  Open the image.
+set rtdimage [image create rtdimage -file $image]
+if { ! [info exists rtdimage] } {
+   puts stderr "Failed to open image: $image"
+   exit 1
+}
+
+#  Add the initialising commands.
+puts $outfile "QueryResult"
+puts $outfile "ra_col: 1"
+puts $outfile "dec_col: 2"
+puts $outfile "symbol: INDEX {circle {} {} {} {\$INDEX} {}} {4.0 {}}"
+
+puts $outfile "INDEX\t RA\t DEC\t XPOS\t YPOS"
+puts $outfile "-----\t --\t ---\t ----\t ----"
+
+#  Loop over the input file reading all the elements and writing them
+#  back out with RA/Dec and TAB separated fields.
+set id 0
+while { [gets $infile line] > -1 } {
+   set nitems [llength $line]
+   if { $nitems > 0 } {
+      foreach {x y} $line {
+         incr id
+         $rtdimage convert coords $x $y image ra dec wcs
+         puts $outfile "$id\t $ra\t $dec\t $x\t $y"
+      }
+   }
+}
+close $infile
+close $outfile
+exit
