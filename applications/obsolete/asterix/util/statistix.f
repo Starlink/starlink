@@ -426,6 +426,7 @@
       INTEGER                MINP, MAXP         ! Min and max pixels
       INTEGER                NBAD               ! Number of bad points found
       INTEGER                NBIGW              ! Number of big weights
+      INTEGER                NNEGV              ! # negative variances
       INTEGER                NVALID             ! # pts used by NAG routine.
 
       LOGICAL                DISPLAY            ! Display ignored points?
@@ -447,14 +448,16 @@
       USEWEIGHT = .TRUE.
       NBAD = 0
 
-*    Set up weights
+*  Set up weights
       NBIGW = 0
+      NNEGV = 0
       IF ( VAROK .AND. QUALOK ) THEN
 
         DO I = 1, N
           IF ( QUAL(I) ) THEN
-            IF ( VAR(I) .EQ. 0.0 ) THEN
+            IF ( VAR(I) .LE. 0.0 ) THEN
               WEIGHTS(I) = IGNORE
+              NNEGV = NNEGV + 1
             ELSE
               WEIGHTS(I) = 1.0D0 / VAR(I)
               IF ( WEIGHTS(I) .GT. MAXWEIGHT ) THEN
@@ -470,8 +473,9 @@
 
       ELSE IF ( VAROK ) THEN
         DO I = 1, N
-          IF ( VAR(I) .EQ. 0.0 ) THEN
+          IF ( VAR(I) .LE. 0.0 ) THEN
             WEIGHTS(I) = IGNORE
+            NNEGV = NNEGV + 1
           ELSE
             WEIGHTS(I) = 1.0D0 / VAR(I)
             IF ( WEIGHTS(I) .GT. MAXWEIGHT ) THEN
@@ -512,7 +516,16 @@
         END IF
       END IF
 
-*    Any big weights
+*  Any silly variances
+      IF ( NNEGV .GT. 0 ) THEN
+        CALL AIO_BLNK( OCH, STATUS )
+        CALL MSG_SETI( 'NB', NBIGW )
+        CALL AIO_WRITE( OCH, ' ^NB '//OBJ//' excluded as variances'/
+     :                  /' zero or negative', STATUS )
+        CALL AIO_BLNK( OCH, STATUS )
+      END IF
+
+*  Any big weights
       IF ( NBIGW .GT. 0 ) THEN
         CALL AIO_BLNK( OCH, STATUS )
         CALL MSG_SETI( 'NB', NBIGW )
@@ -520,7 +533,7 @@
      :                  /' large to square', STATUS )
         CALL AIO_BLNK( OCH, STATUS )
       END IF
-      NBAD = NBAD + NBIGW
+      NBAD = NBAD + NNEGV + NBIGW
 
 *    Do statistics
       CALL STATISTIX_CALC( N, DATA, VAROK, USEWEIGHT, WEIGHTS,
