@@ -39,11 +39,12 @@ Interface SINFIT
    EndParameter
 
    Parameter   PHASE
-      type           '_LOGICAL'
+      type           'UNIV'
       vpath          'DEFAULT'
-      default        N
-      prompt         'Write PHASE information ?'
-      help           'Written to <file>.MORE.ASTERIX.PHASE_SPECTRUM'
+      ppath          'DEFAULT'
+      default        !
+      prompt         'Output dataset for phase information'
+      help           'If the default is accepted the information will be discarded'
    EndParameter
 
    Parameter   DEMEAN
