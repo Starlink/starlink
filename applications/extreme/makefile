@@ -337,14 +337,14 @@ LINK_SCRIPT = ext_dev
 #  installed in the $(INSTALL_BIN) directory with execute permission
 #  set.
 
-PUBLIC_SCRIPTS = do_filter
+PUBLIC_SCRIPTS = do-xxx
 
 #  List of public Perl scripts.  These are Perl scripts which form part
 #  of the package and will be required by users of it.  They will be
 #  edited to contain the correct location of the Perl binary, and installed
 #  in the $(INSTALL_BIN) directory with execute permssion set.
 
-PUBLIC_PERL_SCRIPTS = cmp_filter extmk
+PUBLIC_PERL_SCRIPTS = cmp-xxx extmk
 
 #  List of source code filter programs.
 
@@ -680,8 +680,8 @@ install:
 #  Install the scripts associated with filters.
 	for f in $(FILTERS) ""; do \
            if test -n "$$f"; then \
-              $(LINK) do_filter $(INSTALL_BIN)/do_$$f;\
-              $(LINK) cmp_filter $(INSTALL_BIN)/cmp_$$f;\
+              $(LINK) do-xxx $(INSTALL_BIN)/do-$$f;\
+              $(LINK) cmp-xxx $(INSTALL_BIN)/cmp-$$f;\
            else :; fi;\
         done
 #
@@ -822,8 +822,8 @@ do_deinstall:
 #  Deinstall the scripts associated with the filter programs, if installed
 #  version exists.
 	- for f in $(FILTERS) ""; do \
-           rm -f $(INSTALL_BIN)/do_$$f;\
-           rm -f $(INSTALL_BIN)/cmp_$$f;\
+           rm -f $(INSTALL_BIN)/do-$$f;\
+           rm -f $(INSTALL_BIN)/cmp-$$f;\
         done
 #
 #  Deinstall the public C include files, if installed versions exist.
@@ -940,6 +940,7 @@ do_test:
 	@/bin/echo "frepint test:"
 	@/bin/echo "-------------"
 	@/bin/echo "      INCLUDE 'SAE_PAR'         ! Standard SAE constants" \
+                 "\n " \
                  "\n      REAL XSIZE                ! Horizontal size" \
 	         "\n      INTEGER NPIX              ! Number of pixels" \
                  "\n      INTEGER I1, I2, I3, I4, I5, I6, I7, I8," \
