@@ -1923,6 +1923,58 @@ apparently not)
 	 (append (list (car l)) (list-difference (cdr l) xl)))))
 
 
+<routine>
+<routinename>sort-list
+<description>
+Given a list and a sorting predicate (which returns true if its first argument
+should be taken to be less-than-or-equal to its second), return a sorted list.
+Fairly simple shell sort, but seems to work!
+<returnvalue type="list">Sorted list of the elements in the input list.
+<codebody>
+(define (*merge-lists* ina inb <=)
+  (let loop ((res '())
+             (a ina)
+             (b inb))
+    (cond
+     ((null? a)
+      (append (reverse res) b))
+     ((null? b)
+      (append (reverse res) a))
+     (else
+      (if (<= (car a) (car b))
+          (loop (cons (car a) res)
+                (cdr a)
+                b)
+          (loop (cons (car b) res)
+                a
+                (cdr b)))))))
+
+(define (*partition-list* pe inl <=)
+  (let loop ((pa '())
+             (pb '())
+             (l inl))
+    (if (null? l)
+        (cons pa pb)
+        (if (<= (car l) pe)
+            (loop (cons (car l) pa) pb (cdr l))
+            (loop pa (cons (car l) pb) (cdr l))))))
+
+
+(define (sort-list l <=)
+  (case (length l)
+    ((0 1) l)
+    ((2) (if (<= (car l) (cadr l))
+             l
+             (list (cadr l) (car l))))
+    (else
+     (let* ((pe (car l))
+            (twolists (*partition-list* pe (cdr l) <=)))
+       (*merge-lists* (sort-list (car twolists) <=)
+                      (cons pe
+                            (sort-list (cdr twolists) <=))
+                      <=)))))
+
+
 <!-- now scoop up the remaining common functions, from sl-gentext.dsl -->
 <routine>
 <description>Various strings (document in more detail!)
