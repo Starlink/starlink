@@ -7,7 +7,6 @@ include_HEADERS = CNF_PAR f77.h cnf.h
 
 lib_LTLIBRARIES = libcnf.la
 libcnf_la_SOURCES = \
-	$(F_ROUTINES) \
 	$(C_ROUTINES) \
 	CNF_PAR
 
