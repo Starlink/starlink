@@ -75,17 +75,17 @@ a bitmap image viewable on the web.  This is most often the case when
 being conveted to HTML.  It is possible to do this with a chain of
 general-purpose tools, for example going from DVI to postscript to PNM
 files to GIFs, but this is generally slow.  For an overview of maths
-and SGML/HTML, see <ref id=sgml.maths>.
+and SGML/HTML, see <ref id=sgml.maths/>.
 
 <p>The tool dvi2bitmap does this processing in a single step, reading
 the DVI file and font files, and emitting a bitmap.  It can, at
 present, generate XBM, GIF and, if the relevant library is installed,
 PNG files.
 
-<p>See <ref id=usage> for usage instructions, and <ref id=install> for
+<p>See <ref id=usage/> for usage instructions, and <ref id=install/> for
 installation instructions.
 
-<p>The <code/dvi2bitmap/ application is available for download at 
+<p>The <code/dvi2bitmap> application is available for download at 
 <url>http://www.astro.gla.ac.uk/users/norman/star/dvi2bitmap/</url>.
 <![ %Only.web [
 This HTML documentation is also available as a 
@@ -93,7 +93,7 @@ This HTML documentation is also available as a
 ]]>
 
 <p>This document matches version 0.7-1 of the program (you can see
-what version you have with the command <kbd/dvi2bitmap -V/).  This
+what version you have with the command <kbd/dvi2bitmap -V>).  This
 should currently be regarded as beta software.
 
 <sect id=usage export>Usage
@@ -162,40 +162,40 @@ height, not horizontal!  At some point, I'd like to make the bitmap
 `expandable', obviating the need for these options.
 
 <dt><code>-c[edge] dimen, -C[edge] dimen</code>
-<dd>The <code/-c/ and <code/-C/ options allow you to control how the
+<dd>The <code/-c> and <code/-C> options allow you to control how the
 generated bitmaps are cropped before they are written.  The
-<code/[edge]/ may be one of `l', `r', `t' or `b', referring to the
+<code/[edge]> may be one of `l', `r', `t' or `b', referring to the
 left, right, top and bottom edge of the bitmap, or be missing, in
-which case it refers to all four sides.  In the case of the <code/-c/
-option, this sets the crop to be <code/dimen/ points from the
+which case it refers to all four sides.  In the case of the <code/-c>
+option, this sets the crop to be <code/dimen> points from the
 specified edge of the
-bounding box of the blackened pixels; in the case of the <code/-C/
-option, it sets it to be <code/dimen/ points from the left or top of
-the `page'.  The specification <code/-C dimen/, which would set all
+bounding box of the blackened pixels; in the case of the <code/-C>
+option, it sets it to be <code/dimen> points from the left or top of
+the `page'.  The specification <code/-C dimen>, which would set all
 the crops to the same position, is silly, and so is forbidden.
 <p>The conversion from points to pixels takes account of the
-magnification set in the <code/-m/ option, if that's been specified
+magnification set in the <code/-m> option, if that's been specified
 already, but it doesn't notice if that's set after this option, and it
 takes no account of any magnification in the DVI file. 
-<p>See <ref id=usage.special> for &tex; <code/\special/ commands which
+<p>See <ref id=usage.special/> for &tex; <code/\special> commands which
 set this within the &tex; file.
 
 <dt><code>-fp font-path</code>
 <dd>Specifies the path to the PK fonts which dvi2bitmap will use.  See
-also <ref id=usage.fonts>.
+also <ref id=usage.fonts/>.
 
 <dt><code>-fm mode</code>
 <dd>Specify the MetaFont mode which is to be used when generating fonts.
-The default is <code/ibmvga/, but see
-<code/&ddash;enable-fontgen/ in <ref id=install.nonstarlink>.
+The default is <code/ibmvga>, but see
+<code/&ddash;enable-fontgen> in <ref id=install.nonstarlink/>.
 
-<dt><code/-fg/
+<dt><code/-fg>
 <dd>Switch off automatic font-generation.
 
-<dt><code/-fG/
+<dt><code/-fG>
 <dd>Switch on automatic font-generation.
 
-<dt><code/-g(d|p|r|i|b|m|g)/
+<dt><code/-g(d|p|r|i|b|m|g)>
 <dd>Switch on debugging.  The options are to trace DVI file parsing
 (`d'), PK file parsing (`p'), font rasterdata parsing (`r'), input
 (`i'), bitmap generation (`b') or the main program (`m').  Adding an
@@ -204,7 +204,7 @@ debugging information may be uninformative or unintelligible; it might
 even crash the program (mention that to me).
 
 <dt><code>-l pagenum</code>
-<dd>See option <code/-p/
+<dd>See option <code/-p>
 
 <dt><code>-m magnification</code>
 <dd>The &tex; magnification parameter which is used when processing the DVI
@@ -219,7 +219,7 @@ postamble.  Useful in conjunction with the <code>-Qf</code>
 option.  If this option is present, then the program returns non-zero
 if any fonts were missing.
 
-<dt><code/-nf/
+<dt><code/-nf>
 <dd>Do process the DVI file, but switch off font generation.
 
 <dt><code>-o output</code>
@@ -227,32 +227,32 @@ if any fonts were missing.
 `printf' formatting string, with a single <code>%d</code>
 formatting descriptor, which will be replaced in output filenames
 with the page number.  This can be overridden on a per-page basis by
-a &tex; <code/\special/ embedded in the DVI file (see <ref
-id=usage.special>).  If there is no 
+a &tex; <code/\special> embedded in the DVI file (see <ref
+id=usage.special/>).  If there is no 
 file extension, or if it does not match the output type, a suitable file
 extension will be added.
 
-<dt><code/-p pnum/, <code/-l lnum/, <code/-pp pagelist/
+<dt><code/-p pnum>, <code/-l lnum>, <code/-pp pagelist>
 <dd>These select page ranges, using a slight extension of the notation
-used by <code/dvips/ (and the same option letters).
+used by <code/dvips> (and the same option letters).
 
-<p>The <code/-p/ and <code/-l/ options take single page numbers; if
+<p>The <code/-p> and <code/-l> options take single page numbers; if
 either of these is given, then the program will process pages from
-page <code/pnum/ to page <code/lnum/, with the defaults being the
-corresponding extremes.  The <code/pagelist/ consists of a
-comma-separated sequence of page numbers and ranges (<code/a-b/); only
+page <code/pnum> to page <code/lnum>, with the defaults being the
+corresponding extremes.  The <code/pagelist> consists of a
+comma-separated sequence of page numbers and ranges (<code/a-b>); only
 those pages, and the pages falling in those ranges (inclusive of the
 end pages) are processed.  Any of these specifications may be prefixed
-by either `<code/=/' or `<code/:n,/'.  In the former case, DVI page
-numbers are used rather than &tex; <code/\count/ registers; in the
-latter case, the program examines the <code/\count/<m/n/ register
-rather than the default <code/\count0/.
+by either `<code/=>' or `<code/:n,>'.  In the former case, DVI page
+numbers are used rather than &tex; <code/\count> registers; in the
+latter case, the program examines the <code/\count><m/n> register
+rather than the default <code/\count0>.
 
 <p>You can specify both of these prefixes one or more times, but you
-cannot mix the <code/-p/ and <code/-l/ options with the <code/-pp/
-option.  The program will respect only the last <code/-p/ and
-<code/-l/ options, but the <code/-pp/ options are cumulative.  There
-may be no spaces in the <code/pagelist/.  The page numbers may be
+cannot mix the <code/-p> and <code/-l> options with the <code/-pp>
+option.  The program will respect only the last <code/-p> and
+<code/-l> options, but the <code/-pp> options are cumulative.  There
+may be no spaces in the <code/pagelist>.  The page numbers may be
 negative.
 
 <p><update versionid="v0-7">
@@ -262,25 +262,25 @@ dvi2bitmap -pp 3,6-10 ... # process only the specified pages
 dvi2bitmap -pp :2,1 ... # process only pages where \count2 was 1
 </verbatim>
 
-<dt><code/-P[bt]/
+<dt><code/-P[bt]>
 <dd>Specifies processing of the output bitmap.
-<code/-Pb/ blurs the bitmap, making a half-hearted attempt to make a
+<code/-Pb> blurs the bitmap, making a half-hearted attempt to make a
 low-resolution bitmap look better.  This really isn't up to much -- if
 you have the fonts available, or are prepared to wait for them to be
-generated, a better way is to use the <code/-m/ option to magnify the
-DVI file, and then the <code/-s/ option to scale it back down to the
+generated, a better way is to use the <code/-m> option to magnify the
+DVI file, and then the <code/-s> option to scale it back down to the
 correct size.
-<code/-Pt/ makes the output bitmap have a transparent background, if
+<code/-Pt> makes the output bitmap have a transparent background, if
 that's supported by the particular format you choose using option
-<code/-t/
+<code/-t>
 
-<dt><code/-q/
+<dt><code/-q>
 <dd>Quiet mode -- suppress chatter.  
 
-<dt><code/-qq/
+<dt><code/-qq>
 <dd>Silent mode -- suppress warnings and errors as well.
 
-<dt><code/-Q.../
+<dt><code/-Q...>
 <dd>Query various things.  The available possibilities are
   <dl>
   <dt><code>-Qf</code>
@@ -293,32 +293,32 @@ that's supported by the particular format you choose using option
   be used with the mktexpk (TeXLive) or MakeTeXPK (teTeX) scripts to
   generate the required fonts.
 
-  <dt><code/-QF/
-  <dd>As for <code/-Qf/,
+  <dt><code/-QF>
+  <dd>As for <code/-Qf>,
   except that found fonts are also listed, prefixed by a % character.
 
-  <dt><code/-Qt/
+  <dt><code/-Qt>
   <dd>List the output image formats which the program can generate, on
   stdout, separated by whitespace.  The first output format is the default.
   The program then exits.
   </dl>
 
-<dt><code/-r resolution/
+<dt><code/-r resolution>
 <dd>Specifies the output resolution, in pixels-per-inch.  This is used
 when deciding which PK files to use.  The default is 110, but see
-<code/&ddash;enable-fontgen/ in <ref id=install.nonstarlink>.
+<code/&ddash;enable-fontgen> in <ref id=install.nonstarlink/>.
 
-<dt><code/-s scalefactor/
+<dt><code/-s scalefactor>
 <dd>Reduces the linear size of the output bitmap by a factor
-<code/scalefactor/ (default 1).
+<code/scalefactor> (default 1).
 
-<dt><code/-t type/
-<dd>Choose the output format, which can be <code/png/, <code/xbm/ or
-<code/gif/. The program generates XBM bitmaps by default.  The GIF and
+<dt><code/-t type>
+<dd>Choose the output format, which can be <code/png>, <code/xbm> or
+<code/gif>. The program generates XBM bitmaps by default.  The GIF and
 PNG options may not be available if they weren't selected when the
 program was configured.
 
-<dt><code/-V/
+<dt><code/-V>
 <dd>Display the version number and compilation options, and exit.
 
 </dl>
@@ -352,39 +352,39 @@ defaults.  See those commands for details.
 
 <dt><code>outputfile &lt;filename&gt;</code>
 <dd>The output file used for the current page will be named
-<code/filename.gif/ (if the output type were `gif').  A filename
+<code/filename.gif> (if the output type were `gif').  A filename
 extension will be added if none is 
 present, or if it does not match the output type selected.  If the
-<code/default/ command has been given, then this instead specifies the
+<code/default> command has been given, then this instead specifies the
 default filename pattern, and the `filename' should contain a single
-<code/#/-sign.
+<code/#>-sign.
 
-<dt><code/absolute/
-<dd>Affects the <code/crop/ command.
+<dt><code/absolute>
+<dd>Affects the <code/crop> command.
 
 <dt><code>crop &lt;side&gt; &lt;dimen&gt;</code>
 <dd>Crop the bitmap on the current page so that the specified edge of
-the bitmap is <code/&lt;dimen&gt;/ points away from the bounding box
-of the blackened pixels.  <code/&lt;side&gt;/ may be one of `left',
+the bitmap is <code/&lt;dimen&gt;> points away from the bounding box
+of the blackened pixels.  <code/&lt;side&gt;> may be one of `left',
 `right', `top', `bottom' or `all', referring to the corresponding
-edge, or all four edges at once.  If the <code/default/ command has
+edge, or all four edges at once.  If the <code/default> command has
 been given in this special, then this pattern of cropping is
 additionally made the default for subsequent pages.  If the
-<code/absolute/ command has been given, then the crop position is set
-at <code/&lt;dimen&gt;/ points from the appropriate edge of the
+<code/absolute> command has been given, then the crop position is set
+at <code/&lt;dimen&gt;> points from the appropriate edge of the
 `paper'.
-<p>The <code/-c/ and <code/-C/ command-line options
-(<ref id=usage.options>) have the effect of setting initial defaults.
+<p>The <code/-c> and <code/-C> command-line options
+(<ref id=usage.options/>) have the effect of setting initial defaults.
 In the absence of either of these, the initial crop is exactly at the
 bounding box.
 
-<dt><code/default imageformat &lt;format&gt;/
+<dt><code/default imageformat &lt;format&gt;>
 <dd>Set the default image format, which should be one of the keywords
 `xbm', `gif', `png'.  This is equivalent to specifying the image
-format through the <code/-t/ option (section <ref id=usage.options>).
-<p>The keyword is just <code/imageformat/, but you must specify the
-<code/default/ keyword when you
-specify <code/imageformat/; this is for consistency, and makes it
+format through the <code/-t> option (section <ref id=usage.options/>).
+<p>The keyword is just <code/imageformat>, but you must specify the
+<code/default> keyword when you
+specify <code/imageformat>; this is for consistency, and makes it
 clear that this is setting a default format rather than setting the
 format only for the next image (that's not implemented at present, but
 could be added).
@@ -406,19 +406,19 @@ program reckons the absolute distances for the cropping.
 <subsect id=usage.exit export>Exit value
 
 <p>Exits with a non-zero status if there were any processing errors.
-Having <em/no/ fonts present counts as a processing error; if there is
+Having <em/no> fonts present counts as a processing error; if there is
 at least one font present, then missing fonts will be replaced by a
 more-or-less randomly chosen alternative, and the program will produce a
-warning if the <code/-Q/ option is not present, but it will return
+warning if the <code/-Q> option is not present, but it will return
 with a zero (success) status.
-See also the <code/-n/ option in <ref id=usage.options>.
+See also the <code/-n> option in <ref id=usage.options/>.
 
 <subsect id=usage.examples export>Examples
 
 <p><verbatim>
 % dvi2bitmap -r 110 -m 2 -s 2 -t gif hello.dvi
 </verbatim>
-This converts the file <code/hello.dvi/ to a GIF bitmap.  It first sets the
+This converts the file <code/hello.dvi> to a GIF bitmap.  It first sets the
 magnification factor to 2, so that the program uses a double-size font
 (eg, <code>.../cmr10.220pk</code>), then scales the bitmap down by a
 factor of 2 to obtain a bitmap of the correct size.
@@ -432,7 +432,7 @@ not process it further.  It then tries to find the fonts, fails, and
 produces a list of parameters which could be used to generate the
 font files.  
 
-<p>See also <ref id=usage.fonts>.
+<p>See also <ref id=usage.fonts/>.
 
 <subsect id=usage.fonts export>Finding and generating fonts
 <update versionid="upd2">Renamed this section from vague
@@ -452,17 +452,17 @@ enable-kpathsea and enable-fontgen configuration options.</update>
 <p>The program searches in up to three places for fonts.
 
 <ol>
-<li>The <code/-f/ option specifies a colon-separated list of
+<li>The <code/-f> option specifies a colon-separated list of
 directories which should be searched for font PK files.  If this is given on
 the command line, it overrides&ellip
 
-<li>The <code/DVI2BITMAP_PK_PATH/ environment variable, if defined,
+<li>The <code/DVI2BITMAP_PK_PATH> environment variable, if defined,
 specifies a colon-separated list of directories which are to be
 searched for PK files.
 
 <li>If the program cannot find fonts using the environment variable,
-and if it was configured with support for the <code/kpathsea/
-library (see <ref id=install.nonstarlink>), then it should find PK
+and if it was configured with support for the <code/kpathsea>
+library (see <ref id=install.nonstarlink/>), then it should find PK
 files using the same mechanism other DVI processors use.
 
 </ol>
@@ -471,42 +471,42 @@ files using the same mechanism other DVI processors use.
 path-searching library is very powerful and flexible, but it is
 possible to be tripped up by its configuration file.
 
-<p>Firstly, the program has to <em/find/ the configuration file.  The
+<p>Firstly, the program has to <em/find> the configuration file.  The
 program should sort this out for itself at configuration time, but it
 is possible that you might have to give it some help.  If you specify the
-<code/TEXMFCNF/ environment variable, setting it to the directory
-which contains your &tex; installation's <code/texmf.cnf/ file, then
+<code/TEXMFCNF> environment variable, setting it to the directory
+which contains your &tex; installation's <code/texmf.cnf> file, then
 this overrides the program's notion of where the configuration should
 be.  You can find this file using the command <kbd/kpsewhich cnf
-texmf.cnf/.
+texmf.cnf>.
 
 <p>If the program cannot find a font, it may generate it.  If the
-<code/kpathsea/ library was found and enabled at configuration time
-(see <ref id=install.nonstarlink>), then font-generation is enabled.
+<code/kpathsea> library was found and enabled at configuration time
+(see <ref id=install.nonstarlink/>), then font-generation is enabled.
 If not, font-generation is disabled, by default, but can be re-enabled
-using the configuration switch <code/&ddash;enable-fontgen/.
+using the configuration switch <code/&ddash;enable-fontgen>.
 
-<p>It can sometimes happen that <code/dvi2bitmap/ fails to find fonts,
-successfully calls <code/mktexpk/ to build them, but then <em/still/
-fails to find them, even though <code/mktexpk/ has put them where they
+<p>It can sometimes happen that <code/dvi2bitmap> fails to find fonts,
+successfully calls <code/mktexpk> to build them, but then <em/still>
+fails to find them, even though <code/mktexpk> has put them where they
 should be.  There are (at least) two possible reasons for this.
 
-<p>Perhaps you do not have the <code/kpathsea/ library installed, or
-have disabled it, but you <em/have/ requested that font-generation be
-enabled (see <ref id=install.nonstarlink>).  What happens in this case
-is that <code/mktexpk/ successfully builds the fonts, and installs
+<p>Perhaps you do not have the <code/kpathsea> library installed, or
+have disabled it, but you <em/have> requested that font-generation be
+enabled (see <ref id=install.nonstarlink/>).  What happens in this case
+is that <code/mktexpk> successfully builds the fonts, and installs
 them in the correct place, where `correct place' means `the place
-where <code/kpathsea/ would find them'; you're not using
-<code/kpathsea/, so no fonts for you.  What you have to do in this
-case is work out where the `correct place' is (<code/kpsepath/ and
-<code/kpsewhich/ can help here), and specify that place using either
-the <code/-f/ option or the <code/DVI2BITMAP_PK_PATH/ variable, as
+where <code/kpathsea> would find them'; you're not using
+<code/kpathsea>, so no fonts for you.  What you have to do in this
+case is work out where the `correct place' is (<code/kpsepath> and
+<code/kpsewhich> can help here), and specify that place using either
+the <code/-f> option or the <code/DVI2BITMAP_PK_PATH> variable, as
 above (this is confusing, and is why font-generation is, by default,
-configured off if the <code/kpathsea/ library is unavailable).
+configured off if the <code/kpathsea> library is unavailable).
 
 <p>Another, slightly nastier reason is as follows.
 
-<p>Some <code/texmf.cnf/ files declare the location of the
+<p>Some <code/texmf.cnf> files declare the location of the
 user-writable font directory though a setting like
 <verbatim>
 VARTEXFONTS=$SELFAUTOPARENT/var/lib/texmf
@@ -515,33 +515,33 @@ whereas others have something like
 <verbatim>
 VARTEXFONTS=$TEXMFLOCAL/fonts
 </verbatim>
-Now, <code/$SELFAUTOPARENT/ is a variable which is set
+Now, <code/$SELFAUTOPARENT> is a variable which is set
 by the kpathsea library to be the grandparent directory of the executable
 which uses the library.  So, for <code>/usr/bin/{tex,latex,mktexpk,...}</code>,
-it's <code>/</code>, but if your <code/dvi2bitmap/ binary doesn't live
-with the other dvi-ware then its <code/$SELFAUTOPARENT/ will be
-different, so that <code/dvi2bitmap/ will look for fonts in a
-<em/different/ place from the place where <code/mktexpk/ put them when
+it's <code>/</code>, but if your <code/dvi2bitmap> binary doesn't live
+with the other dvi-ware then its <code/$SELFAUTOPARENT> will be
+different, so that <code/dvi2bitmap> will look for fonts in a
+<em/different> place from the place where <code/mktexpk> put them when
 it successfully generated them.
 
-<p>I would argue fairly strongly that having the <code/VARTEXFONTS/
-directory depend on the location of the dvi-ware <em/executables/ is
+<p>I would argue fairly strongly that having the <code/VARTEXFONTS>
+directory depend on the location of the dvi-ware <em/executables> is
 a very silly thing to do, but unfortunately it's true in at least one
 widespread &tex; distribution (namely RedHat 6.0, though this was
 fixed pretty rapidly).  If you've fallen foul of this, then you
 can either
 <ul>
-<li>change your <code/texmf.cnf/ file to something more like the
+<li>change your <code/texmf.cnf> file to something more like the
 second example above; or
-<li>install <code/dvi2bitmap/ along with the other &tex;ware.
+<li>install <code/dvi2bitmap> along with the other &tex;ware.
 </ul>
 I'd prefer the first alternative, myself.
 
-<p>A third option is to get <code/dvi2bitmap/ to work around the
-problem, by telling it to claim to be some program which <em/is/
+<p>A third option is to get <code/dvi2bitmap> to work around the
+problem, by telling it to claim to be some program which <em/is>
 installed along with the other dvi-ware.  You do this with the
-<code/&ddash;enable-fake-progname/ option to the configuration
-script.  See <ref id=install.nonstarlink> for details.
+<code/&ddash;enable-fake-progname> option to the configuration
+script.  See <ref id=install.nonstarlink/> for details.
 
 
 <subsubsect>Generating fonts by hand
@@ -549,20 +549,20 @@ script.  See <ref id=install.nonstarlink> for details.
 <p>If you didn't enable automatic font-generation, or if you did and
 something went wrong, you might have to generate fonts by hand.  You
 need to look at the documentation for your &tex; system, specifically
-the <code/mktexpk/ and <code/MakeTeXPK/ scripts (one of which might be
+the <code/mktexpk> and <code/MakeTeXPK> scripts (one of which might be
 just an interface to the other).
 
 <p>Since dvi2bitmap's default resolution is 72~dpi, as opposed to the
 usual printer resolution of 300 or 600~dpi, you are unlikely to have
 suitable fonts on your system, and will need to generate them.  The
 program will generate these automatically, if it was configured with
-support for that (see <ref id=install.nonstarlink>); if it wasn't
+support for that (see <ref id=install.nonstarlink/>); if it wasn't
 configured with that support, or if the automatic font generation
 fails, you might need to generate the fonts by hand.
 
 <p>How you generate fonts depends on your &tex; distribution.  As explained
-in <ref id=usage.examples>, you can determine which fonts you need using the 
-<code/-Qf/ option.  The teTeX and TeXLive &tex; distributions include
+in <ref id=usage.examples/>, you can determine which fonts you need using the 
+<code/-Qf> option.  The teTeX and TeXLive &tex; distributions include
 scripts to 
 generate fonts for you; if you have a different distribution, there
 might be a similar script for you to use, or you might have to do it
@@ -571,7 +571,7 @@ example would be:
 <verbatim>
 % MakeTeXPK cmr10 165 110 1.5 ibmvga
 </verbatim>
-This would generate fonts using the <code/ibmvga/ Metafont mode, using
+This would generate fonts using the <code/ibmvga> Metafont mode, using
 a base resolution of 110~dpi (the default for that mode), at a
 magnification of 1.5 times, giving a resultant resolution of 165~dpi.
 
@@ -582,12 +582,12 @@ magnification of 1.5 times, giving a resultant resolution of 165~dpi.
 
 <p>If you want to use the same mode as you
 use for printing documents, then the mode
-<code/localfont/ should do the right thing.  Otherwise, and probably
+<code/localfont> should do the right thing.  Otherwise, and probably
 better if these images are intended for the screen rather than paper,
 you could use a more specialised mode such as 
-<code/ibmvga/,
+<code/ibmvga>,
 which has been tweaked to be readable at small resolutions.  See the file
-<code/modes.mf/
+<code/modes.mf>
 somewhere in your metafont distribution for the list of possibilities.
 
 <p>After you have created the fonts, try giving the command
@@ -596,7 +596,7 @@ somewhere in your metafont distribution for the list of possibilities.
 </verbatim>
 to confirm that &tex; and friends can find the new fonts, and that your 
 dvi2bitmap environment variable is set correctly.  This command is
-part of the <code/kpathsea/ distribution, rather than the core &tex;
+part of the <code/kpathsea> distribution, rather than the core &tex;
 distribution, so may not be present on your system.
 
 <sect id=install export>Building and installing dvi2bitmap
@@ -608,21 +608,21 @@ which is more usual for network-distributed software.
 
 <p>When you unpack the distribution tarball, you should find at least
 the files
-<code/dvi2bitmap_source.tar/, <code/Makefile.starlink/ and <code/mk/.
-You can build the software the Starlink way, using the <code/mk/
-script (see <ref id=install.starlink>), or unpack the
-<code/dvi2bitmap_source.tar/ file, and build it the other way (see
-<ref id=install.nonstarlink>).  Since the <code/mk/ script is really
+<code/dvi2bitmap_source.tar>, <code/Makefile.starlink> and <code/mk>.
+You can build the software the Starlink way, using the <code/mk>
+script (see <ref id=install.starlink/>), or unpack the
+<code/dvi2bitmap_source.tar> file, and build it the other way (see
+<ref id=install.nonstarlink/>).  Since the <code/mk> script is really
 just a driver for the Makefile within the tar file, you should get the
 same results both ways.
 
 <subsect id=install.starlink export>Starlink nodes
 
 <p>If you are on a Starlink node, then you
-should be able to use the usual <code/mk/ script.  Define the
-environment variables <code/INSTALL/ and <code/SYSTEM/ as usual.
-<code/SYSTEM/ can be any one of the Starlink-supported platforms
-<code/ix86_Linux/, <code/alpha_OSF1/ or <code/sun4_Solaris/.  Then
+should be able to use the usual <code/mk> script.  Define the
+environment variables <code/INSTALL> and <code/SYSTEM> as usual.
+<code/SYSTEM> can be any one of the Starlink-supported platforms
+<code/ix86_Linux>, <code/alpha_OSF1> or <code/sun4_Solaris>.  Then
 give the commands
 <verbatim>
 % ./mk build
@@ -630,7 +630,7 @@ give the commands
 </verbatim>
 
 <p>This build configures support for GIFs, plus support for the
-<code/kpathsea/ library if that library is present on the system (it
+<code/kpathsea> library if that library is present on the system (it
 is not distributed with this package and not present by default on all
 project machines).
 
@@ -665,111 +665,111 @@ to live.
 <code>./configure</code> command:
 <dl>
 
-<dt><code/&ddash;disable-kpathsea/
+<dt><code/&ddash;disable-kpathsea>
 
-<dd>If you have the <code/kpathsea/ library (see <ref
-id=usage.fonts.finding>) but don't, for some
+<dd>If you have the <code/kpathsea> library (see <ref
+id=usage.fonts.finding/>) but don't, for some
 reason, want to use it, then give the configure option
-<code/&ddash;disable-kpathsea/.  By default, the configuration enables
-use of the library if it is installed (that is, if the <code/kpathsea/ include
+<code/&ddash;disable-kpathsea>.  By default, the configuration enables
+use of the library if it is installed (that is, if the <code/kpathsea> include
 files and library are somewhere the compiler will find them.  If
-<code/kpathsea/ is disabled (by default or by request), then fonts
+<code/kpathsea> is disabled (by default or by request), then fonts
 will not be generated by default.
 
 <![ IGNORE [
 For this
 library to find its configuration files, you will either have to
 install the program where the rest of the &tex;ware lives (you can
-find this out with the command <kbd/which kpsewhich/), or tell it
-where the <code/kpathsea/ configuration files are by setting the
-environment variable <code/TEXMFCNF/ (use <kbd/kpsewhich cnf
-texmf.cnf/ to find the configuration file, and set the environment
-variable to the directory which contains that file -- I <em/think/
-that some versions of the library require <code/TEXMFCNF/ to specify
+find this out with the command <kbd/which kpsewhich>), or tell it
+where the <code/kpathsea> configuration files are by setting the
+environment variable <code/TEXMFCNF> (use <kbd/kpsewhich cnf
+texmf.cnf> to find the configuration file, and set the environment
+variable to the directory which contains that file -- I <em/think>
+that some versions of the library require <code/TEXMFCNF> to specify
 the file rather than the directory).
 ]]>
 
 If you don't have the
-<code/kpathsea/ library available, see below (<ref id=install.web2c>)
+<code/kpathsea> library available, see below (<ref id=install.web2c/>)
 for notes on obtaining it.
 <!-- 
  (I don't believe it's installed by
-the <code/TeXLive/ distribution, for example), then you can obtain a
+the <code/TeXLive> distribution, for example), then you can obtain a
 copy from <webref url='http://www.tug.org' >TUG</webref> or <webref
 url='http://www.tex.ac.uk' >CTAN</webref>, in <code
 fspath>/tex-archive/systems/web2c/texk-n.n</code> (it seems
-you can only get <code/kpathsea/ as part of the complete web2c
+you can only get <code/kpathsea> as part of the complete web2c
 distribution, and not as a standalone library).
 -->
 
-<dt><code/&ddash;disable-texmfcnf/
+<dt><code/&ddash;disable-texmfcnf>
 
-<dd>The <code/kpathsea/ library finds its configuration files in two
+<dd>The <code/kpathsea> library finds its configuration files in two
 ways, either automatically if it is installed in the same directory as
 the rest of 
-the &tex;ware, or using the <code/TEXMFCNF/ environment variable.  The
-<code/dvi2bitmap/ program sets the latter variable internally, unless
+the &tex;ware, or using the <code/TEXMFCNF> environment variable.  The
+<code/dvi2bitmap> program sets the latter variable internally, unless
 it finds it already set.  If this will be inconvenient, you can
 suppress this behaviour by providing the flag
-<code/&ddash;disable-texmfcnf/, or equivalently
-<code/&ddash;enable-texmfcnf=no/.
+<code/&ddash;disable-texmfcnf>, or equivalently
+<code/&ddash;enable-texmfcnf=no>.
 
-<dt><code/&ddash;enable-fontgen/
+<dt><code/&ddash;enable-fontgen>
 
 <dd>The program can attempt to generate fonts, and will
-do so using the MetaFont mode <code/ibmvga/, which has a resolution of
+do so using the MetaFont mode <code/ibmvga>, which has a resolution of
 110 dots-per-inch.
 
-<p>If the <code/kpathsea/ library is enabled, then the default for
+<p>If the <code/kpathsea> library is enabled, then the default for
 this option is `on' -- the program will attempt to generate fonts.  If
 the library is disabled, however (either because it is not available
 on your system, or because you have given the option
-<code/&ddash;disable-kpathsea/), then the default is for
+<code/&ddash;disable-kpathsea>), then the default is for
 font-generation to be turned off.  The two features are actually
 independent, so you can turn it back on again with the option
-<code/&ddash;enable-fontgen/, but see <ref id=usage.fonts.finding> for
+<code/&ddash;enable-fontgen>, but see <ref id=usage.fonts.finding/> for
 some problems which might appear.
 
 <p>If you wish to disable this automatic font
-generation, give the option <code/--disable-fontgen/.
+generation, give the option <code/--disable-fontgen>.
 Note that this does not completely disable font generation -- it
 merely sets the default for font generation to `off', and it can be
-switched back on again using the option <code/-fG./
+switched back on again using the option <code/-fG.>
 
 <p>If you wish
 to change the default mode, you can do so with an argument to this
 option.  For example, the option
-<code/&ddash;enable-fontgen=pcprevw,118/ will make <code/pcprevw/,
+<code/&ddash;enable-fontgen=pcprevw,118> will make <code/pcprevw>,
 which has a resolution of 118 dpi, the default MetaFont mode.  Note
-that the resolution you specify <em/must/ match the mode: see file
-<code/modes.mf/ for a list of modes and resolutions (use
-<kbd/kpsewhich mf modes.mf/ to find this).  You can change the
-resolution and mode on the fly using the <code/-fm/ and <code/-r/
-options to the compiled program (<ref id=usage.options>).
+that the resolution you specify <em/must> match the mode: see file
+<code/modes.mf> for a list of modes and resolutions (use
+<kbd/kpsewhich mf modes.mf> to find this).  You can change the
+resolution and mode on the fly using the <code/-fm> and <code/-r>
+options to the compiled program (<ref id=usage.options/>).
 
-<dt><code/&ddash;enable-mktexpk/ and <code/&ddash;enable-maketexpk/
+<dt><code/&ddash;enable-mktexpk> and <code/&ddash;enable-maketexpk>
 <dd>In the default configuration, the program will generate missing
 fonts using one of the standard scripts present in most &tex;
 distributions.  The configuration process looks first for
-<code/mktexpk/ then <code/MakeTeXPK/, and uses whichever it
+<code/mktexpk> then <code/MakeTeXPK>, and uses whichever it
 finds first.  If you have both scripts but wish to use
-<code/MakeTeXPK/ for some reason, you will have to give the option
-<code/&ddash;disable-mktexpk/; if you wish to disable both, you will
-have to give <code/&ddash;disable-maketexpk/ as well.  Both options
+<code/MakeTeXPK> for some reason, you will have to give the option
+<code/&ddash;disable-mktexpk>; if you wish to disable both, you will
+have to give <code/&ddash;disable-maketexpk> as well.  Both options
 take an optional argument giving the path to an alternative script
 with the same calling interface.
 
-<dt><code/&ddash;enable-png/
+<dt><code/&ddash;enable-png>
 <dd>If you give this option, and if the PNG library is installed
 (needs a version after 0.96), then
 the program will be compiled with support for PNG bitmaps as an output
 format.  You can obtain the PNG library from the 
 <webref url="http://www.libpng.org/pub/png/" >PNG home page</webref>.
 
-<dt><code/&ddash;enable-gif/
+<dt><code/&ddash;enable-gif>
 <dd>The program generates only XBM bitmaps by default.  
 If you want it to be able to generate GIFs, then give the configure
-option <code/&ddash;enable-gif/.  The GIF format is the copyright of
+option <code/&ddash;enable-gif>.  The GIF format is the copyright of
 CompuServe.  As far as I understand it, one does not need a licence
 from CompuServe if one is distributing non-commercial, not-for-profit
 software, such as this.  You probably shouldn't enable GIF support
@@ -779,17 +779,17 @@ sorry business in the <webref
 url='http://www.lib.ox.ac.uk/internet/news/faq/archive/graphics.fileformats-faq.part1.html'
 >comp.graphics.misc FAQ</webref>
 
-<dt><code/&ddash;enable-fake-progname/
+<dt><code/&ddash;enable-fake-progname>
 
-<dd>This option enables a workaround which allows <code/dvi2bitmap/ to
+<dd>This option enables a workaround which allows <code/dvi2bitmap> to
 have the expected behaviour when (a) you do not install
-<code/dvi2bitmap/ along with the other dvi-ware, and (b) your
-<code/texmf.cnf/ file has <code/VARTEXFONTS/ or similar depend on one
-of the <code/SELFAUTO.../ variables.  This option makes
-<code/dvi2bitmap/ claim to be a different DVI-reading program which
-<em/is/ installed in the standard place.  See <ref
-id=usage.fonts.finding> for discussion.  The configuration script uses
-the location of the <code/xdvi/ program by default, but you can
+<code/dvi2bitmap> along with the other dvi-ware, and (b) your
+<code/texmf.cnf> file has <code/VARTEXFONTS> or similar depend on one
+of the <code/SELFAUTO...> variables.  This option makes
+<code/dvi2bitmap> claim to be a different DVI-reading program which
+<em/is> installed in the standard place.  See <ref
+id=usage.fonts.finding/> for discussion.  The configuration script uses
+the location of the <code/xdvi> program by default, but you can
 override this by giving the full path to an alternative as an argument
 to this option.
 <p>Since this uses undocumented behaviour of the library (`use the
@@ -810,7 +810,7 @@ compiler to be conformant (in which case tell me, if there's something
 I can do in the autoconfigure script).
 
 <p>You can override the C++ compiler the configure script will choose by
-setting the environment variable <code/CXX/, either via 
+setting the environment variable <code/CXX>, either via 
 <verbatim>
 % CXX=cxx ./configure
 </verbatim>
@@ -820,24 +820,24 @@ or
 </verbatim>
 depending on your shell.
 
-<subsubsect id=install.web2c>Obtaining the <code/kpathsea/ library
+<subsubsect id=install.web2c>Obtaining the <code/kpathsea> library
 <update versionid="v0-7">Improved instructions on getting the
 kpathsea library source.</update>
 
-<p>Not all &tex; distributions install the <code/kpathsea/ library,
+<p>Not all &tex; distributions install the <code/kpathsea> library,
 even though they install applications built with it, and the
-<code/texmf.cnf/ configuration file which controls it.
+<code/texmf.cnf> configuration file which controls it.
 
 <p>If the library does not appear to be in your distribution, then you
 can obtain and build it yourself.  The library is distributed as part
-of the <code/web2c/ (Unix &tex; source) distribution, which you can
+of the <code/web2c> (Unix &tex; source) distribution, which you can
 find at <url>ftp://ftp.tug.org/tex/web2c.tar.gz</url>, or mirrored on
 CTAN sites (for example at <url>http://www.tex.ac.uk</url> in
 directory <code fspath>systems/web2c</code>).  Take a copy of the
-library (this is a <em/big/ distribution), unpack it, and delete the
+library (this is a <em/big> distribution), unpack it, and delete the
 web2c directory (which is the bulk of the distribution).  Configure
 and build it as usual, ignoring the warnings about the missing main
-<code/texmf/ tree.
+<code/texmf> tree.
 
 <sect id=developments export>Bugs, and further developments
 <update versionid=v0-7-1>Added bugreport address</update>
@@ -853,16 +853,16 @@ find some more cunning way to calculate the bounding box.
 
 </ul>
 
-<p>To report bugs, please send to <code/norman@astro.gla.ac.uk/ a
+<p>To report bugs, please send to <code/norman@astro.gla.ac.uk> a
 brief description of the problem; 
 a minimal &tex; file which reproduces it;
-some indication of the machine you're running on (<kbd/uname -a/ is good);
-and the output of <kbd/dvi2bitmap -V/, which shows the options you
+some indication of the machine you're running on (<kbd/uname -a> is good);
+and the output of <kbd/dvi2bitmap -V>, which shows the options you
 have enabled.
 
 <p>Things I'd like to do sometime:
 <ul>
-<li>There are an <em/awful/ lot of options, aren't there.
+<li>There are an <em/awful> lot of options, aren't there.
 <li>Support PBM graphics.
 <li>Support for different colours of output, controllable through specials.
 <li>Ermmm, any suggestions?
@@ -873,7 +873,7 @@ have enabled.
 
 <sect id=refs export>References and acknowledgements
 
-<p>CTAN, the Comprehensive &tex; Archive Network, is <em/the/
+<p>CTAN, the Comprehensive &tex; Archive Network, is <em/the>
 repository of &tex; and &latex; documentation.  The archive is
 mirrored in numerous places, but the UK node is at
 <url>http://www.tex.ac.uk</url>.
@@ -887,7 +887,7 @@ distribution, but are also available on CTAN, in
 and 
 <code fspath>/tex-archive/systems/knuth/pxl/pktopx.web</code>.
 
-<p>The <cite/DVI Driver Standard, Level 0/ is
+<p>The <cite/DVI Driver Standard, Level 0> is
 available on CTAN, in directory 
 <code fspath>/tex-archive/dviware/driv-standard</code>.
 This incorporates sections of the DVItype documentation.
@@ -927,16 +927,16 @@ The working group also supports the
 
 <subsect id=sgml.maths.latex export>&latex; maths within HTML
 
-<p>The <em/real/ issue here (for me at least) is rendering
+<p>The <em/real> issue here (for me at least) is rendering
 equations within an HTML document.  There are several tools available
 which can do that with different trade-offs. The most popular method
 is to write the equations in a &latex; document, process it, and then hoik
 the equations out of the resulting DVI file somehow (typically using
-<code/dvips/ and a postscript to gif converter), and display them
+<code/dvips> and a postscript to gif converter), and display them
 on the web as gifs.  The big disadvantage with this is that you get an
 awful lot of gifs, and the conversion is rather inefficient.
 
-<p>All this hassle <em/should/ become irrelevant once we get browsers
+<p>All this hassle <em/should> become irrelevant once we get browsers
 which can render MathML directly.
 
 <p>There are reviews of the problems, and some of the tools, in articles
@@ -957,7 +957,7 @@ gifs.  It's very robust by now.
 	>textogif</webref>
 is a Perl program which orchestrates the various tools to do the
 conversion via postscript, once you've generated the DVI file.  It
-works, but it's <em/terribly/ slow, which was the motivation for this program.
+works, but it's <em/terribly> slow, which was the motivation for this program.
 
 <p><webref url="http://www.cis.ohio-state.edu/~gurari/TeX4ht/mn.html"
 	>TeX4ht</webref> (&tex; for Hypertext) uses &tex;'s own
@@ -971,7 +971,7 @@ There's an alternative location for TeX4ht
 <p><webref url="http://hutchinson.belmont.ma.us/tth/"
 	>tth: TeX to HTML translator</webref> 
 (<webref url="http://hutchinson.belmont.ma.us/tth/manual.cgi"
->manual</webref>).  <code/tth/ translates &latex; maths directly to HTML,
+>manual</webref>).  <code/tth> translates &latex; maths directly to HTML,
 with remarkable success, and with good failure strategies.  It works
 very sweetly, but (a) requires you to tweak your browser to have it
 map the symbol font appropriately, and (b) the resulting HTML can't be
@@ -1042,11 +1042,11 @@ April 1999).
 <sect id=tex.dimensions export>&tex; dimensions
 
 <p>When producing this program, I became terribly confused about the
-variety of dimensions which appear in DVI and PK files.  <ref id=tsizes>
+variety of dimensions which appear in DVI and PK files.  <ref id=tsizes/>
 is a summary of the sizes which appear, for the benefit of anyone else
 attempting a project like this.  The reference [Dn] refers to
-section~`<m/n/' of the webbed DVItype document and [Pn] to section~`<m/n/' of
-the PktoPX document (see <ref id=refs>).
+section~`<m/n>' of the webbed DVItype document and [Pn] to section~`<m/n>' of
+the PktoPX document (see <ref id=refs/>).
 
 <p>If you feel I have misunderstood something here, or got one of the
 conversion factors wrong (I hate these!), please correct me.
@@ -1062,61 +1062,61 @@ Sizes in TeX
 <tbody>
 <row>
 <entry>DVI preamble
-<entry><code/num/, <code/den/: multiply a `DVI unit' by
+<entry><code/num>, <code/den>: multiply a `DVI unit' by
 <m>\mbox{num}/\mbox{den}</m> to obtain a length in units of
-<m/10^{-7}\mathrm{m}/
+<m/10^{-7}\mathrm{m}>
 <entry>[D17]
 
 <row>
 <entry>
-<entry><code/mag/: DVI units are actually multiplied by
+<entry><code/mag>: DVI units are actually multiplied by
 <m>(\mbox{num}\times\mbox{mag})/(1000\times\mbox{den})</m>
 <entry>[D17]
 
 <row>
 <entry>DVI font definition
-<entry><code/d/: a design size, in DVI units.  The nominal size of the font.
+<entry><code/d>: a design size, in DVI units.  The nominal size of the font.
 <entry>[D18]
 
 <row>
 <entry>
-<entry><code/s/: a `fixed point' scale factor, range
-<m>2^{27}>s>0</m>, scaling <code/d/ (see note).
+<entry><code/s>: a `fixed point' scale factor, range
+<m>2^{27}>s>0</m>, scaling <code/d> (see note).
 <entry>[D18]
 
 <row>
 <entry>PK preamble
-<entry><code/ds/: the font design size in units of <m/2^{-20}/ points.
+<entry><code/ds>: the font design size in units of <m/2^{-20}> points.
 <entry>[P12]
 
 <row>
 <entry>
-<entry><code/hppp/, <code/vppp/: number of pixels per point, times
-<m/2^{16}/ (see note).
+<entry><code/hppp>, <code/vppp>: number of pixels per point, times
+<m/2^{16}> (see note).
 <entry>[P12]
 
 <row>
 <entry>Character
-<entry><code/tfmwidth/: the width of the character (see note).
+<entry><code/tfmwidth>: the width of the character (see note).
 <entry>[D37], [P9]
 
 <row>
 <entry>
-<entry><code/w/, <code/h/: the width and height, in pixels, of the
+<entry><code/w>, <code/h>: the width and height, in pixels, of the
 character pixel map.
 <entry>[P21]
 
 <row>
 <entry>
-<entry><code/hoff/ and <code/voff/: offset of the pixel map from the
+<entry><code/hoff> and <code/voff>: offset of the pixel map from the
 reference point.
 <entry>[P21]
 
 <row>
 <entry>
-<entry><code/dm/, <code/dx/, <code/dy/: the pixel escapements.
-<code/dm/ in pixels, <code/dx/ and <code/dy/ in pixels times
-<m/2^{16}/ (see note).
+<entry><code/dm>, <code/dx>, <code/dy>: the pixel escapements.
+<code/dm> in pixels, <code/dx> and <code/dy> in pixels times
+<m/2^{16}> (see note).
 <entry>[P21]
 
 </tbody>
@@ -1125,22 +1125,22 @@ reference point.
 </table>
 
 <p><ol>
-<li><code/s/ scales the design size, so that a font is actually used at
+<li><code/s> scales the design size, so that a font is actually used at
 <m>(\mbox{s}\times\mbox{mag})/(1000\times\mbox{d})</m> times its normal
 size.
 
-<li><code/hppp/ and <code/vppp/ aren't used as sizes, but can be used
+<li><code/hppp> and <code/vppp> aren't used as sizes, but can be used
 to check you have the right fonts by comparing resolution, etc..
 
-<li><code/tfmwidth/ is the `physical' size of a character, and is the
+<li><code/tfmwidth> is the `physical' size of a character, and is the
 only size that &tex; uses in its calculations, and which the DVI
 reader uses when working out how far to move the reference point when
 it sets a character.  This is defined in [P9] to be in units of
-<code/FIXes/, where one <code/FIX/ is <m/2^{-20}/ points.  [D37]
+<code/FIXes>, where one <code/FIX> is <m/2^{-20}> points.  [D37]
 describes how to multiply these widths by scaling factors without
 overflowing.
 
-<li>The difference between the pixel escapements and <code/tfmwidth/
+<li>The difference between the pixel escapements and <code/tfmwidth>
 is that the latter is a resolution-independent shift of the DVI
 reference point, and the former is the PK file's recommendation of the
 number of pixels the DVI processor should actually move.  The DVI
@@ -1155,17 +1155,17 @@ resolution-independent one.  See [D89] and [D91]; also [D40].
 <li>The design size of a font is a physical length, of
 <m>\mbox{ds}/2^{20}</m> points. [P12]
 
-<li>A <code/FIX/ is a physical size, of length
+<li>A <code/FIX> is a physical size, of length
 <m>(\mbox{designsize})/2^{20}</m>
 
-<li>A TFM width is a physical size.  The <code/tfmwidth/ parameter is
-in units of <code/FIXes/, so that the TFM width is a length of
-<code/tfmwidth/ fixes, which is equal to <m>\mbox{tfmwidth}/2^{20}
+<li>A TFM width is a physical size.  The <code/tfmwidth> parameter is
+in units of <code/FIXes>, so that the TFM width is a length of
+<code/tfmwidth> fixes, which is equal to <m>\mbox{tfmwidth}/2^{20}
 \times \mbox{ds}/2^{20}</m> points.
 
 <li>Writing `dviu' for the unit `DVI units', `sp' for the scaled point
-of <m/2^{-16}/ points, `px' for pixels, and <m/d\mu/ for Knuth's
-deci-micron, or <m/10^{-7}\mathrm{m}/,
+of <m/2^{-16}> points, `px' for pixels, and <m/d\mu> for Knuth's
+deci-micron, or <m/10^{-7}\mathrm{m}>,
 <meqnarray>
 <mline>
 1\mathrm{sp} = \frac{1}{2^{20}}\mathrm{pt} & = & 
