@@ -43,6 +43,8 @@
 *  History:
 *     20 Mar 1995 (DJA):
 *        Original version.
+*     21 Dec 1995 (DJA):
+*        Added diagnostic flag
 *     {enter_changes_here}
 
 *-
@@ -54,11 +56,14 @@
       INCLUDE 'DYN_CMN'
 *       DYN_ISINIT = LOGICAL (returned)
 *         DYN system is initialised?
+*       DYS_DIAG = LOGICAL (returned)
+*         Diagnnostics on?
 *       DYS_ISEQ = INTEGER (returned)
 *         File sequence flag
 
 *  Global Data:
       DATA DYN_ISINIT / .FALSE. /
+      DATA DYS_DIAG / .FALSE. /
       DATA DYS_ISEQ / 1 /
 *.
 
