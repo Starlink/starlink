@@ -819,7 +819,7 @@ itcl::class gaia::Gaia {
    #  Make the simple autoastrom toolbox.
    public method make_simpleautoastrom_toolbox {name {cloned 0}} {
       itk_component add $name {
-         GaiaAutoAstromSimple $w_.\#auto \
+         GaiaAutoAstrom $w_.\#auto \
             -expert 0 \
             -rtdimage [$image_ get_image] \
             -image $image_ \
@@ -834,7 +834,7 @@ itcl::class gaia::Gaia {
    #  Make the advanced autoastrom toolbox.
    public method make_advancedautoastrom_toolbox {name {cloned 0}} {
       itk_component add $name {
-         GaiaAutoAstromSimple $w_.\#auto \
+         GaiaAutoAstrom $w_.\#auto \
             -expert 1 \
             -rtdimage [$image_ get_image] \
             -image $image_ \

@@ -1,18 +1,18 @@
 #+
 #  Name:
-#     GaiaAutoAstromSimple
+#     GaiaAutoAstrom
 
 #  Type of Module:
 #     [incr Tk] class
 
 #  Purpose:
-#     Toolbox for performing "simple" astrometry using autoastrom.
+#     Toolbox for performing astrometry using autoastrom.
 
 #  Invocations:
 #
-#        GaiaAutoAstromSimple object_name [configuration options]
+#        GaiaAutoAstrom object_name [configuration options]
 #
-#     This creates an instance of a GaiaAutoAstromSimple object. The return is
+#     This creates an instance of a GaiaAutoAstrom object. The return is
 #     the name of the object.
 #
 #        object_name configure -configuration_options value
@@ -49,9 +49,9 @@
 
 #.
 
-itk::usual GaiaAutoAstromSimple {}
+itk::usual GaiaAutoAstrom {}
 
-itcl::class gaia::GaiaAutoAstromSimple {
+itcl::class gaia::GaiaAutoAstrom {
 
    #  Inheritances:
    #  -------------
@@ -65,7 +65,7 @@ itcl::class gaia::GaiaAutoAstromSimple {
       eval itk_initialize $args
 
       #  Set the top-level window title.
-      if { $itk_option(-expert) } { 
+      if { $itk_option(-expert) } {
          set title "GAIA: Auto astrometry ($itk_option(-number))"
       } else {
          set title "GAIA: Simple auto astrometry ($itk_option(-number))"
@@ -125,16 +125,6 @@ itcl::class gaia::GaiaAutoAstromSimple {
             {Use match} \
             {Use the "match" algorithm, otherwise "findoff"}
 
-         #  Whether to remove defects. Note more expertise could be
-         #  added to define the area and ellipticity.
-         $Options add checkbutton -label {Remove defects} \
-            -variable [scope values_(defects)] \
-            -onvalue 1 \
-            -offvalue 0
-         $short_help_win_ add_menu_short_help $Options \
-            {Remove defects} \
-            {Attempt to remove defects from detection catalogue}
-
          #  Whether to keep any temporary files.
          $Options add checkbutton -label {Keep temps} \
             -variable [scope values_(keeptemps)] \
@@ -165,7 +155,6 @@ itcl::class gaia::GaiaAutoAstromSimple {
       set values_(keeptemps) 0
       set values_(usematch) 1
       set values_(messages) 0
-      set values_(defects) 1
       set values_(command) 0
 
       #  Add window help.
@@ -178,11 +167,20 @@ itcl::class gaia::GaiaAutoAstromSimple {
       add_short_help $itk_component(menubar).help \
          {Help menu: get some help about this window}
 
+      #  Add tab window for saving space by providing various pages of
+      #  controls. Remember to put the most useful first.
+      itk_component add notebook {
+         iwidgets::tabnotebook $w_.tab \
+            -angle 0 -tabpos n -width 350 -height 450
+      }
+      set position_page [$itk_component(notebook) add -label "Position"]
+      set more_page [$itk_component(notebook) add -label "More"]
+
       #  Get the WCS to use as bootstrap. This can come from the
       #  image, or as a set of fixed parameters.
       set lwidth 20
       itk_component add wcssource {
-         StarLabelCheck $w_.wcssource \
+         StarLabelCheck $position_page.wcssource \
             -text "Initial WCS from image:" \
             -onvalue Y \
             -offvalue N \
@@ -197,7 +195,7 @@ itcl::class gaia::GaiaAutoAstromSimple {
 
       #  If WCS source isn't the image, then we need some parameters.
       itk_component add racentre {
-         FITSLabelEntry $w_.racentre \
+         FITSLabelEntry $position_page.racentre \
             -text "RA centre:" \
             -labelwidth $lwidth \
             -textvariable [scope values_(racentre)] \
@@ -208,7 +206,7 @@ itcl::class gaia::GaiaAutoAstromSimple {
       set values_(racentre) "00:00:00"
 
       itk_component add deccentre {
-         FITSLabelEntry $w_.deccentre \
+         FITSLabelEntry $position_page.deccentre \
             -text "Dec centre:" \
             -labelwidth $lwidth \
             -textvariable [scope values_(deccentre)] \
@@ -219,7 +217,7 @@ itcl::class gaia::GaiaAutoAstromSimple {
       set values_(deccentre) "00:00:00"
 
       itk_component add imagescale {
-         FITSLabelEntry $w_.imagescale \
+         FITSLabelEntry $position_page.imagescale \
             -text "Image scale:" \
             -labelwidth $lwidth \
             -textvariable [scope values_(imagescale)] \
@@ -230,7 +228,7 @@ itcl::class gaia::GaiaAutoAstromSimple {
       set values_(imagescale) "1.0"
 
       itk_component add angle {
-         FITSLabelEntry $w_.angle \
+         FITSLabelEntry $position_page.angle \
             -text "Position Angle:" \
             -labelwidth $lwidth \
             -textvariable [scope values_(angle)] \
@@ -240,10 +238,10 @@ itcl::class gaia::GaiaAutoAstromSimple {
          {Position angle, Dec axis anti-clock degrees}
       set values_(angle) "0.0"
 
-      #  Select a telescope.
+      #  Advanced ASTROM options.
       if { $itk_option(-expert) } {
          itk_component add telescope {
-            LabelEntryMenu $w_.telescope \
+            LabelEntryMenu $position_page.telescope \
                -text "Telescope:" \
                -labelwidth $lwidth \
                -textvariable [scope values_(telescope)]
@@ -252,9 +250,20 @@ itcl::class gaia::GaiaAutoAstromSimple {
             {SLALIB code or longitude(dd:mm.mm):latitude(dd:mm.mm)[:height(m)]}
          fill_telescope_menu_
 
+         #  Date of observation:
+         itk_component add date {
+            FITSLabelEntry $position_page.date \
+               -text "Date:" \
+               -labelwidth $lwidth \
+               -textvariable [scope values_(date)] \
+               -rtdimage $itk_option(-rtdimage)
+         }
+         add_short_help $itk_component(date) \
+            {Date and time of the observation (Julian epoch)}
+
          #  Define the observation wavelength.
          itk_component add wavelength {
-            FITSLabelEntry $w_.wavelength \
+            FITSLabelEntry $position_page.wavelength \
                -text "Wavelength (nm):" \
                -labelwidth $lwidth \
                -textvariable [scope values_(wavelength)] \
@@ -265,7 +274,7 @@ itcl::class gaia::GaiaAutoAstromSimple {
 
          #  Define the telescope temperature.
          itk_component add temperature {
-            FITSLabelEntry $w_.temperature \
+            FITSLabelEntry $position_page.temperature \
                -text "Temperature (K):" \
                -labelwidth $lwidth \
                -textvariable [scope values_(temperature)] \
@@ -276,7 +285,7 @@ itcl::class gaia::GaiaAutoAstromSimple {
 
          #  Define the atmospheric pressure.
          itk_component add pressure {
-            FITSLabelEntry $w_.pressure \
+            FITSLabelEntry $position_page.pressure \
                -text "Pressure (milliBar):" \
                -labelwidth $lwidth \
                -textvariable [scope values_(pressure)] \
@@ -289,10 +298,11 @@ itcl::class gaia::GaiaAutoAstromSimple {
       set values_(wavelength) ""
       set values_(temperature) ""
       set values_(pressure) ""
+      set values_(date) ""
 
       #  Button to guess initial values based on FITS headers.
       itk_component add guess {
-         button $w_.guess \
+         button $position_page.guess \
             -text "Guess" \
             -command [code $this fits_based_guess_]
       }
@@ -300,7 +310,7 @@ itcl::class gaia::GaiaAutoAstromSimple {
          {Make a guess based on FITS headers}
 
       itk_component add invert {
-         StarLabelCheck $w_.invert \
+         StarLabelCheck $more_page.invert \
             -text "Axes are flipped:" \
             -onvalue 1 \
             -offvalue 0 \
@@ -314,7 +324,7 @@ itcl::class gaia::GaiaAutoAstromSimple {
 
       #  Attempt linear fit.
       itk_component add linear  {
-         StarLabelCheck $w_.linear \
+         StarLabelCheck $more_page.linear \
             -text "Perform linear fit:" \
             -onvalue 1 \
             -offvalue 0 \
@@ -328,18 +338,57 @@ itcl::class gaia::GaiaAutoAstromSimple {
 
       #  Number of objects downloaded from reference catalogue.
       itk_component add maxobj {
-         LabelEntry $w_.maxobj \
+         LabelEntry $more_page.maxobj \
             -text "Max catalogue objects:" \
             -labelwidth $lwidth \
             -textvariable [scope values_(maxobj)]
       }
       set values_(maxobj) 500
 
+      #  Whether to remove defects, and if so what parameters to use.
+      if { $itk_option(-expert) } {
+         itk_component add defects {
+            StarLabelCheck $more_page.defects \
+               -text "Remove defects:" \
+               -onvalue 1 \
+               -offvalue 0 \
+               -labelwidth $lwidth \
+               -anchor w \
+               -variable [scope values_(defects)] \
+               -command [code $this toggle_defects_]
+         }
+         add_short_help $itk_component(defects) \
+            {Remove defects from the detection catalogue}
+
+         #  The "badness" of objects.
+         itk_component add badness {
+            LabelEntry $more_page.defectarea \
+               -text "Badness factor:" \
+               -labelwidth $lwidth \
+               -textvariable [scope values_(badness)]
+         }
+         add_short_help $itk_component(badness) \
+            {A "badness" factor, default is 1}
+
+         #  Timeout for tasks
+         itk_component add timeout {
+            LabelEntry $more_page.timeout \
+               -text "Timeout (secs):" \
+               -labelwidth $lwidth \
+               -textvariable [scope values_(timeout)]
+         }
+         add_short_help $itk_component(timeout) \
+            {Timeout for communicating with subtasks}
+      }
+      set values_(defects) 1
+      set values_(badness) 1
+      set values_(timeout) 180
+
       #  Choose an calibration catalogue. This should contain
       #  all the remote reference RA and Dec catalogues and when in
       #  expert mode all the local ones too.
       itk_component add refcat {
-         set m [util::LabelMenu $w_.refcat \
+         set m [util::LabelMenu $more_page.refcat \
                    -text "Reference catalogue:" \
                    -relief raised \
                    -labelwidth $lwidth \
@@ -356,7 +405,7 @@ itcl::class gaia::GaiaAutoAstromSimple {
       #  a run of EXTRACTOR with the standard set of parameters.
       if { $itk_option(-expert) } {
          itk_component add detectcat {
-            set m [util::LabelMenu $w_.detectcat \
+            set m [util::LabelMenu $more_page.detectcat \
                       -text "Detection catalogue:" \
                       -relief raised \
                       -labelwidth $lwidth \
@@ -415,12 +464,15 @@ itcl::class gaia::GaiaAutoAstromSimple {
          {Reset image to the original astrometric calibration}
 
       #  Pack widgets into place.
+      pack $itk_component(notebook) -side top -fill x -pady 5 -padx 5
+
       pack $itk_component(wcssource) -side top -fill x -pady 5 -padx 5
       pack $itk_component(racentre) -side top -fill x -pady 5 -padx 5
       pack $itk_component(deccentre) -side top -fill x -pady 5 -padx 5
       pack $itk_component(imagescale) -side top -fill x -pady 5 -padx 5
       pack $itk_component(angle) -side top -fill x -pady 5 -padx 5
       if { $itk_option(-expert) } {
+         pack $itk_component(date) -side top -fill x -pady 5 -padx 5
          pack $itk_component(telescope) -side top -fill x -pady 5 -padx 5
          pack $itk_component(wavelength) -side top -fill x -pady 5 -padx 5
          pack $itk_component(temperature) -side top -fill x -pady 5 -padx 5
@@ -430,17 +482,25 @@ itcl::class gaia::GaiaAutoAstromSimple {
       pack $itk_component(invert) -side top -fill x -pady 5 -padx 5
       pack $itk_component(linear) -side top -fill x -pady 5 -padx 5
       pack $itk_component(maxobj) -side top -fill x -pady 5 -padx 5
+      if { $itk_option(-expert) } {
+         pack $itk_component(defects) -side top -fill x -pady 5 -padx 5
+         pack $itk_component(badness) -side top -fill x -pady 5 -padx 5
+         pack $itk_component(timeout) -side top -fill x -pady 5 -padx 5
+      }
       pack $itk_component(refcat) -side top -fill x -pady 5 -padx 5
       if { $itk_option(-expert) } {
          pack $itk_component(detectcat) -side top -fill x -pady 5 -padx 5
       }
-      pack $itk_component(status) -side top -fill both -expand 1 -pady 5 -padx 5
 
       pack $itk_component(actionframe) -side bottom -fill x -pady 5 -padx 5
       pack $itk_component(accept) -side right -expand 1 -pady 3 -padx 3
       pack $itk_component(cancel) -side right -expand 1 -pady 3 -padx 3
       pack $itk_component(reset) -side right -expand 1 -pady 3 -padx 3
       pack $itk_component(fit)   -side right -expand 1 -pady 3 -padx 3
+
+      pack $itk_component(status) -side top -fill both -expand 1 -pady 5 -padx 5
+
+      $itk_component(notebook) select 0
 
       #  Create an object for dealing with image names.
       set namer_ [GaiaImageName \#auto]
@@ -589,6 +649,11 @@ itcl::class gaia::GaiaAutoAstromSimple {
             append wcssource ",invert=[string trim $values_(invert)]"
          }
 
+         #  Date.
+         if { $values_(date) != {} } {
+            append wcssource ",time=$values_(date)"
+         }
+
          #  Telescope.
          if { $values_(telescope) != "Undefined" } {
             append wcssource ",obs=$values_(telescope)"
@@ -648,10 +713,13 @@ itcl::class gaia::GaiaAutoAstromSimple {
 
          #  Defect removal.
          if { $values_(defects) } {
-            set defects "--defects=remove"
+            set defects "--defects=remove,badness=$values_(badness)"
          } else {
             set defects "--defects=warn"
          }
+
+         #  Timeout
+         set timeout "--timeout=$values_(timeout)"
 
          #  Name of solution fits file.
          set fitssolution_ "${solutions_}[incr count_].fits"
@@ -673,6 +741,7 @@ itcl::class gaia::GaiaAutoAstromSimple {
                 $messages\
                 $keeptemps\
                 $defects\
+                $timeout \
                 --bestfitlog=$bestfitlog_"
 
          #  Report command arguments used (for repeat outside of GAIA).
@@ -965,6 +1034,15 @@ itcl::class gaia::GaiaAutoAstromSimple {
       $itk_component(invert) configure -state $state
    }
 
+   protected method toggle_defects_ {} {
+      if { $values_(defects) } {
+         set state "normal"
+      } else {
+         set state "disabled"
+      }
+      $itk_component(badness) configure -state $state
+   }
+
    #  Display the solution positions. Note this may not return if the
    #  window is created (waits for toplevel to be destroyed).
    protected method display_solution_cat_ {} {
@@ -1066,6 +1144,34 @@ itcl::class gaia::GaiaAutoAstromSimple {
 
          if { $itk_option(-expert) } {
 
+            #  Date of observation.
+            set havedate 0
+            set value [get_fits_value_ "MJD-OBS"]
+            if { $value != {} } {
+               #  Modified Julian date, convert to Julian Epoch.
+               set values_(date) [expr 2000.0+($value-51544.5)/365.25]
+            }
+            if { ! $havedate } {
+               set key "DATE-OBS"
+               set value [get_fits_value_ $key]
+               if { $value == {} } {
+                  set key "DATE"
+                  set value [get_fits_value_ $key]
+               }
+               if { $value != {} } {
+                  set values_(date) [$itk_option(-rtdimage) slalib \
+                                        dateobs2je $key "$key = '$value'"]
+                  set havedate 1
+               }
+            }
+            if { ! $havedate } {
+               set value [get_fits_value_ "JD"]
+               if { $value != {} } {
+                  #  Julian date, convert to Julian Epoch.
+                  set values_(date) [expr 2000.0+($value-2451545.0)/365.25]
+               }
+            }
+
             #  Telescope. SLALIB value, then look for site values.
             set havetel 0
             set value [get_fits_value_ "SLATEL"]
@@ -1073,12 +1179,12 @@ itcl::class gaia::GaiaAutoAstromSimple {
                set values_(telescope) $value
                set havetel 1
             }
-            if { ! $havetel } { 
+            if { ! $havetel } {
                catch {
                   set value1 [get_fits_value_ "SITELONG"]
                   set value2 [get_fits_value_ "SITELAT"]
                   set value3 [get_fits_value_ "HEIGHT"]
-                  if { $value1 != {} && $value2 != {} } { 
+                  if { $value1 != {} && $value2 != {} } {
                      regexp {([^:]*):([^:]*):(.*)} $value1 w v11 v12 v13
                      set value1 "$v11:[expr $v12+$v13/60.0]"
                      regexp {([^:]*):([^:]*):(.*)} $value2 w v21 v22 v23
@@ -1092,7 +1198,7 @@ itcl::class gaia::GaiaAutoAstromSimple {
                   }
                }
             }
-            if { ! $havetel } { 
+            if { ! $havetel } {
                catch {
                   set value1 [get_fits_value_ "LONGITUD"]
                   set value2 [get_fits_value_ "LATITUDE"]
@@ -1117,7 +1223,7 @@ itcl::class gaia::GaiaAutoAstromSimple {
 
             #  Temperature
             set value [get_fits_value_ "TEMPTUBE"]
-            if { $value != {} } { 
+            if { $value != {} } {
                set values_(temperature) [expr $value + 273.15]
             }
 
