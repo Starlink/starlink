@@ -65,7 +65,7 @@ Bibliography element removed, replaced with backmatter/bibliography attribute
 <p>If this element is present within the <elemref gi=backmatter>
 element, then a 
 bibliography will be included in the document.  The application will
-generate the bibliography itself -- it is not included within this
+generate the bibliography itself: it is not included within this
 element, which is empty.  
 
 <p>Bibliographic entries are included in the bibliography if they were
@@ -102,7 +102,7 @@ start with a number)
 
 
 <element gi='citation'>
-<p>Refers to an entry in the <elemref gi=bibliography> associated with
+<p>Refers to an entry in the bibliography associated with
 this document.  In the current application, the content is interpreted
 as the key to an entry in a BibTeX database.
 <attribute name='noref'>
@@ -152,6 +152,13 @@ implemented).
 
 <element gi='copyright'>
 <p>Specifies a copyright declaration for the document.
+<example>
+&lt;copyright>Copyright, 1999, Particle Physics and Astronomy Research Council
+</example>
+
+<element gi='coverimage'>
+<p>Via the required <elemref gi=figurecontent> element, this provides
+an image for the cover or front page of the document.
 
 <element gi='dd'>
 <p>`Description data' in a description list.
@@ -163,9 +170,7 @@ notes on the distribution or the packaging.  See the description of
 <elemref gi=history> for an overview of the history element.
 <attribute name='string'>
 <p>Identifies the distribution.  This will
-typically be something like '1' or '2', but
-could be 'draft' or something
-descriptive.  It should be a single word.
+typically be something like 'DR1' or 'aug-pre'.  It should be a single word.
 <attribute name='date'>
 <p>The date this distribution was
 made. Format: dd-MMM-yyyy.
@@ -332,7 +337,8 @@ about the change or distribution.
 <p>A version of a document (marked by a <elemref gi=version> element
 in the history) is a significant release of a document, perhaps
 describing new functionality in a package.  The number attribute gives
-the version number to be attached to the document.
+the version number to be attached to the document.  You would normally
+set the version number to be one greater than the previous version.
 
 <p>A distribution of a document (marked by a <elemref gi=distribution>
 element in the history) is a less significant update to a document,
@@ -342,13 +348,21 @@ attribute is a label for the distribution, and could be something like
 
 <p>Other changes to the document are labelled by a <elemref gi=change>
 element.  These record an edit of a document without a corresponding
-change to an version number.
+change to an version number.  I anticipate that the <elemref
+gi=change> element could actually cover a range of edits to a
+document: for example the assorted changes made, perhaps over a period
+of some weeks, after a beta-release of the document or any associated
+software.
 
 <p>The <elemref gi=distribution> and <elemref gi=change> elements have
 an optional <code/versionid/ attribute.  This allows you to specify a
-label for this edit.  Any <elemref gi=update> elements elsewhere in
-the text must attach themselves to one of these elements, using the
-<code/versionid/ attribute.
+label for this edit.  Throughout the rest of the document, you might
+insert <elemref gi=update> elements to comment or document a change or
+insertion.  These elements have a required <code/versionid/ attribute
+which allows them to refer to a distribution or change element, and
+inherit their date and author from them.  These updates can be
+collected together at the end of a document, and serve as a `what's
+new' section for readers of the updated document.
 <example><![ cdata [
 <author id=ng>Norman
 <editors>
@@ -356,13 +370,16 @@ the text must attach themselves to one of these elements, using the
 ...
 <history>
 <version author=ng date='02-MAR-1999' number=0>Initial version
-<distribution author=ng date='03-MAR-1999' string='comments1'>Released
+<distribution author=ng date='03-MAR-1999' string='DR-0.2'>Released
   to programmers for comment.
-<change author=ng date='04-MAR-1999' versionid=alt99>Various tidyings
+<change author=ng date='04-MAR-1999' versionid=post-0.2>Various tidyings
 <version author=mb date='05-MAR-1999' number=1>First public release
 ...
-<p><update author=ng versionid=alt99>Corrected typos and reexpressed
-argument</update>In this section....
+<p><update versionid=post-0.2>Corrected typos and reexpressed
+argument</update>In this section...
+<sect>Further details
+<update versionid=post-0.2>Added this section</update>
+<p>Blah...
 ]]></example>
 
 <element gi='index'>
@@ -588,9 +605,15 @@ least) a <elemref gi=change> element in the <elemref gi=history>.
 When more, or more localised, detail is desired, an <elemref self
 gi=update> element can include notes within the text.  There may be
 one or more <elemref self gi=update> elements as the first children of
-those elements which include it as a child.
+those elements which include it as a child.  The <elemref self
+gi=update> element can also be placed immediately after a section title.
 
 <p>See the documentation of the <elemref gi=history> element for an example.
+<attribute name='versionid'>
+<p>This links to the `versionid' attribute of one of the <elemref
+gi='distribution'> or <elemref gi='change'> elements in the <elemref
+gi='history'>, and therefore implicitly provides the date and author
+of the change.
 
 <element gi='url'>
 <p>This element encloses a URL, which is displayed appropriately.  If
