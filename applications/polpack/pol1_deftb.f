@@ -80,18 +80,18 @@
 
 *  Define the default control table information.
       DATA FITSNM / 'PPCKANGR', 'PPCKFILT', 'PPCKIMID', 'PPCKWPLT', 
-     :              'PPCKRAY', 'PPCKROT', 'PPCKYROT' /
+     :              'PPCKRAY', 'PPCKROT', 'PPCKYROT' /,
 
-      DATA FITSTY / '_REAL', '_CHAR', '_CHAR', '_CHAR', '_CHAR', '_REAL',
-     :             '_REAL' /
+     :     FITSTY / '_REAL', '_CHAR', '_CHAR', '_CHAR', '_CHAR', 
+     :             '_REAL', '_REAL' /,
 
-      DATA EXTNM / 'ANGROT', 'FILTER', 'IMGID', 'WPLATE', 'RAY?', 
-     :             'ROTATION?', 'YROTATION?'/
+     :     EXTNM / 'ANGROT', 'FILTER', 'IMGID', 'WPLATE', 'RAY?', 
+     :             'ROTATION?', 'YROTATION?'/,
 
-      DATA EXTTY / '_REAL', '_CHAR', '_CHAR', '_CHAR', '_CHAR', '_REAL',
-     :             '_REAL' /
+     :     EXTTY / '_REAL', '_CHAR', '_CHAR', '_CHAR', '_CHAR', '_REAL',
+     :             '_REAL' /,
 
-      DATA EXTFUN / 'PPCKANGR', 'PPCKFILT', 'PPCKIMID', 'PPCKWPLT', 
+     :     EXTFUN / 'PPCKANGR', 'PPCKFILT', 'PPCKIMID', 'PPCKWPLT', 
      :              'PPCKRAY', 'PPCKROT', 'PPCKYROT' /
 
 *.

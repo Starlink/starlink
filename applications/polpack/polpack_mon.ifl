@@ -479,8 +479,8 @@ interface POLIMP
       type     LITERAL
       access   READ
       vpath    'DEFAULT'
-      ppath    'DEFAULT'
-      default  '$POLPACK_DIR/polimp.tab'
+      ppath    'CURRENT,DEFAULT'
+      default  !
       prompt   'Import control table'
       helpkey  '*'
    endparameter

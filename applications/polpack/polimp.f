@@ -271,6 +271,7 @@
       INCLUDE 'DAT_PAR'          ! HDS/DAT parameters
       INCLUDE 'FIO_PAR'          ! FIO parameters
       INCLUDE 'GRP_PAR'          ! GRP parameters
+      INCLUDE 'PAR_ERR'          ! PAR error codes
 
 *  Status:
       INTEGER STATUS             ! Global status
