@@ -55,241 +55,78 @@
 *
 *    Local variables :
 *
-      CHARACTER*5             LSUF              ! List suffix for evds
-      CHARACTER*(DAT__SZTYP)  TYPE              ! Dataset type
-      CHARACTER*40            LABEL, UNITS	! Axis attributes
-      CHARACTER*(DAT__SZLOC)  LLOC(2)           ! X & Y list locators
-      CHARACTER*(DAT__SZLOC)  LOC           	! Dataset locator
+      CHARACTER*5             	LSUF              	! List suffix for evds
+      CHARACTER*20  		TYPE              	! Dataset type
+      CHARACTER*40            	LABEL, UNITS		! Axis attributes
 
-      REAL                    AXV1, AXV2        ! Axis values
+      REAL                    	AXV1, AXV2        ! Axis values
       REAL                    BASE, SCALE       ! Axis data attributes
-      REAL                    TOR               ! Radian conversion factor
+      REAL                    	TOR               	! Radian conversion factor
 
-      INTEGER                 DIM               ! Size of an axis
-      INTEGER                 DIMS(ADI__MXDIM)  ! Dataset dimensions
-      INTEGER                 IAX               ! Loop over axes
-      INTEGER                 NAXES             ! Number of axes
-      INTEGER                 NDIM              ! Dimensionality
-      INTEGER                 PTR               ! Pointer to axis data
-      INTEGER                 WE                ! Word delimiter
-      INTEGER                 X_AX,Y_AX,E_AX,T_AX
+      INTEGER			AXID(4)			! Axis numbers
+      INTEGER                 	DIM               	! Size of an axis
+      INTEGER                 	DIMS(ADI__MXDIM)  	! Dataset dimensions
+      INTEGER                 	IAX               	! Loop over axes
+      INTEGER			LID			! List identifier
+      INTEGER                 	NDIM              	! Dimensionality
+      INTEGER                 	PTR               	! Pointer to axis data
+      INTEGER                 	WE                	! Word delimiter
 
-      LOGICAL                 OK                ! General validity check
-      LOGICAL                 PRIM              ! Dataset primitive?
-      LOGICAL                 REG               ! Axis is regular?
-      LOGICAL                 XOK, YOK          ! X/Y lists present?
+      LOGICAL                 	OK                	! General validity check
+      LOGICAL                 	REG               	! Axis is regular?
       LOGICAL			XTHERE			! X_CORR present?
+*
+*  Local Data:
+*
+      CHARACTER*1		QCODE(4)
+        DATA			QCODE/'X','Y','E','T'/
 *-
 
-*    Check status
+*  Check inherited global status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Allocate internal storage if not already done
+*  Allocate internal storage if not already done
       IF ( P_INST(SLOT) .EQ. 0 ) THEN
         CALL PSF1_ALLOC( P_INST(SLOT), STATUS )
       END IF
 
-*    Already done this?
+*  Already done this?
       IF ( P_GOTAX(SLOT) ) RETURN
 
-*    Initialise
-      P_EVDS(SLOT) = .FALSE.
-      X_AX = 0
-      Y_AX = 0
-      E_AX = 0
-      T_AX = 0
+*  Initialise
+      DO IAX = 1, 4
+        AXID(IAX) = 0
+      END DO
 
-*    Extract locator
-      CALL ADI1_GETLOC( P_FID(SLOT), LOC, STATUS )
+*  Is input an event dataset?
+      CALL ADI_DERVD( P_FID(SLOT), 'EventDS', P_EVDS(SLOT), STATUS )
+      IF ( P_EVDS(SLOT) ) THEN
 
-*    Primitive?
-      CALL DAT_PRIM( LOC, PRIM, STATUS )
-      IF ( PRIM ) THEN
-
-*      Can't be event dataset so check data
-        CALL BDI_CHKDATA( P_FID(SLOT), OK, NDIM, DIMS, STATUS )
-
-*      If data isn't ok then we can't do much anyway!
-        IF ( OK ) THEN
-          CALL PSF_CHKAXES_DUMMY( P_INST(SLOT), NDIM, DIMS, STATUS )
-        ELSE
-          STATUS = SAI__ERROR
-          CALL ERR_REP( ' ', 'Invalid primitive data', STATUS )
-        END IF
-
-      ELSE
-
-*      Decide whether event or image dataset
-        CALL DAT_TYPE( LOC, TYPE, STATUS )
-
-        CALL DAT_THERE( LOC, 'X_CORR', XTHERE, STATUS )
-
-*      If binned
-        IF ( .NOT. ((TYPE(:4).EQ.'EVDS') .OR.
-     :              (TYPE(:5).EQ.'EVENT')) .AND. .NOT. XTHERE ) THEN
-
-*        Check data
-          CALL BDI_CHKDATA( P_FID(SLOT), OK, NDIM, DIMS, STATUS )
-
-*        Get number of axes
-          CALL BDI_CHKAXES( P_FID(SLOT), NAXES, STATUS )
+*    Locate 'axes' by quantity code. EDI returns the list number
+        DO IAX = 1, 4
+          CALL EDI_QFND( P_FID(SLOT), QCODE(IAX), LABEL, AXID(IAX),
+     :                   STATUS )
           IF ( STATUS .NE. SAI__OK ) THEN
             CALL ERR_ANNUL( STATUS )
-            NAXES = 0
+            AXID(IAX) = 0
           END IF
+        END DO
 
-*        Any axes present?
-          IF ( NAXES .GT. 0 ) THEN
+*    X and Y axis lists supplied?
+        DO IAX = 1, 2
 
-            NDIM = NAXES
+          IF ( AXID(1) .GT. 0 ) THEN
 
-*          Check axes
-            DO IAX = 1, NAXES
+*        Index list
+            CALL EDI_IDX( P_FID(SLOT), AXID(1), LID, STATUS )
 
-*            Some defaults
-              TOR = 1.0
+*        Get name as label
+            CALL ADI_CGET0C( LID, 'Name', LABEL, STATUS )
 
-*            Get axis description
-              CALL BDI_CHKAXVAL( P_FID(SLOT), IAX, OK, REG, DIM,
-     :                           STATUS )
-              IF ( .NOT. OK ) THEN
-                OK = .TRUE.
-                BASE = 1.0
-                SCALE = 1.0
-                TOR = 1.0
-                DIM = DIMS(IAX)
-
-              ELSE IF ( REG ) THEN
-                CALL BDI_GETAXVAL( P_FID(SLOT), IAX, BASE, SCALE, DIM,
-     :                                 STATUS )
-
-              ELSE
-                CALL BDI_MAPAXVAL( P_FID(SLOT), 'READ', IAX, PTR,
-     :                             STATUS )
-                CALL ARR_ELEM1R( PTR, DIM, 1, AXV1, STATUS )
-                BASE = AXV1
-                IF ( DIM .EQ. 1 ) THEN
-                  SCALE = 1.0
-                ELSE
-                  CALL ARR_ELEM1R( PTR, DIM, 2, AXV2, STATUS )
-                  SCALE = AXV2 - AXV1
-                END IF
-                TOR = 1.0
-              END IF
-
-*            Get units and label
-              CALL BDI_GETAXTEXT( P_FID(SLOT), IAX, LABEL, UNITS,
-     :                            STATUS )
-
-*            Identify axis
-              WE = 1
-              CALL CHR_FIWE( LABEL, WE, STATUS )
-              IF ( (X_AX.EQ.0) .AND.
-     :             CHR_INSET( 'X,X_CORR,X_RAW',LABEL(:WE) ) ) THEN
-                X_AX = IAX
-              ELSE IF ( (Y_AX.EQ.0) .AND.
-     :             CHR_INSET( 'Y,Y_CORR,Y_RAW',LABEL(:WE) ) ) THEN
-                Y_AX = IAX
-              ELSE IF ( (X_AX.EQ.0) .AND. (IAX.EQ.1) .AND.
-     :                 (NDIM.EQ.2) ) THEN
-                X_AX = IAX
-              ELSE IF ( (Y_AX.EQ.0) .AND. (IAX.EQ.2) .AND.
-     :                 (NDIM.EQ.2) ) THEN
-                Y_AX = IAX
-              ELSE IF ( (E_AX.EQ.0) .AND.
-     :             CHR_INSET( 'CORR_PH_CH,PULSE_HEIGHT,PI,'/
-     :                        /'PULSE_HEIGHT_CH,ENERGY',
-     :                        LABEL(:WE) ) .OR.
-     :             (INDEX(LABEL,'PHA').NE.0) ) THEN
-                E_AX = IAX
-              ELSE IF ( (T_AX.EQ.0) .AND.
-     :             CHR_INSET( 'RAW_TIMETAG,TIME',LABEL(:WE) ) ) THEN
-                T_AX = IAX
-              END IF
-
-*            Was this axis spatial?
-              IF ( (IAX.EQ.X_AX) .OR. (IAX.EQ.Y_AX) ) THEN
-                IF ( UNITS .GT. ' ' ) THEN
-                  CALL CONV_UNIT2R( UNITS, TOR, STATUS )
-                  IF ( STATUS .NE. SAI__OK ) THEN
-                    CALL ERR_ANNUL( STATUS )
-                    UNITS = 'pixels'
-                  END IF
-                END IF
-              END IF
-
-*            Write axis data
-              CALL PSF1_PUTAX( P_INST(SLOT), IAX, OK, DIM, REG,
-     :                         .FALSE., PTR, BASE, SCALE,
-     :                         TOR, LABEL, UNITS, STATUS )
-
-            END DO
-
-*        no...same as for primitive
-          ELSE
-
-*          Issue warning
-            CALL MSG_PRNT( 'Binned dataset has no valid axis data' )
-
-*          Set up dummies
-            CALL PSF_CHKAXES_DUMMY( P_INST(SLOT), NDIM, DIMS, STATUS )
-
-          END IF
-
-*      else if event...
-        ELSE IF ( XTHERE ) THEN
-
-*        Set event dataset flag
-          P_EVDS(SLOT) = .TRUE.
-
-*        Look for X_CORR list
-          XOK = XTHERE
-          IF ( XOK ) THEN
-            CALL DAT_FIND( LOC, 'X_CORR', LLOC(1), STATUS )
-            LSUF = '_CORR'
-          ELSE
-
-*          Look for X_RAW list
-            CALL DAT_THERE( LOC, 'X_RAW', XOK, STATUS )
-            IF ( XOK ) THEN
-              CALL DAT_FIND( LOC, 'X_RAW', LLOC(1), STATUS )
-              LSUF = '_RAW'
-
-*          Give up
-            ELSE
-              CALL MSG_PRNT( '! No X axis list data present' )
-              STATUS = SAI__ERROR
-              GOTO 99
-
-            END IF
-
-          END IF
-
-*        Look for matching Y list
-          CALL DAT_THERE( LOC, 'Y'//LSUF, YOK, STATUS )
-          IF ( YOK ) THEN
-            CALL DAT_FIND( LOC, 'Y'//LSUF, LLOC(2), STATUS )
-          ELSE
-            CALL MSG_PRNT( '! No Y axis list data present' )
-            STATUS = SAI__ERROR
-            GOTO 99
-          END IF
-
-*        Get quanta and units for each list
-          DO IAX = 1, 2
-
-*          Get quantum and units
-            CALL CMP_GET0R( LLOC(IAX), 'QUANTUM', SCALE, STATUS )
-            IF ( STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
-            CALL CMP_GET0C( LLOC(IAX), 'UNITS', UNITS, STATUS )
-            IF ( STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
-
-*          Free locator
-            CALL DAT_ANNUL( LLOC(IAX), STATUS )
-
-*          Was this axis spatial?
+*        Get units if present
             TOR = 1.0
-            IF ( UNITS .GT. ' ' ) THEN
+            CALL ADI_CGET0C( LID, 'Units', UNITS, STATUS )
+            IF ( STATUS .EQ. SAI__OK ) THEN
               CALL CONV_UNIT2R( UNITS, TOR, STATUS )
               IF ( STATUS .NE. SAI__OK ) THEN
                 CALL ERR_ANNUL( STATUS )
@@ -297,28 +134,95 @@
               END IF
             END IF
 
-*          Write axis data
+*        Write axis data
             CALL PSF1_PUTAX( P_INST(SLOT), IAX, .TRUE., -1, .TRUE.,
      :                       .FALSE., 0, BASE, SCALE,
      :                       TOR, LABEL, UNITS, STATUS )
 
-          END DO
+*        Release the list
+            CALL ADI_ERASE( LID, STATUS )
 
-*        Set axis numbers
-          X_AX = 1
-          Y_AX = 2
+          END IF
 
-        END IF
+        END DO
+
+*  Otherwise binned
+      ELSE
+
+*    Check data
+        CALL BDI_GETSHP( P_FID(SLOT), DAT__MXDIM, DIMS, NDIM, STATUS )
+
+*    Locate axes by quantity code
+        DO IAX = 1, 4
+          CALL BDI0_FNDAXC( P_FID(SLOT), QCODE(IAX), AXID(IAX), STATUS )
+          IF ( STATUS .NE. SAI__OK ) THEN
+            CALL ERR_ANNUL( STATUS )
+            AXID(IAX) = 0
+          END IF
+        END DO
+
+*    Check axes
+        DO IAX = 1, NDIM
+
+*      Some defaults
+          TOR = 1.0
+
+*      Get axis description
+          CALL BDI_AXCHK( P_FID(SLOT), IAX, 'Data', OK, STATUS )
+          IF ( .NOT. OK ) THEN
+            OK = .TRUE.
+            BASE = 1.0
+            SCALE = 1.0
+
+          ELSE
+
+*        Map axis values
+            CALL BDI_AXMAPR( P_FID(SLOT), IAX, 'Data', 'READ', PTR,
+     :                         STATUS )
+
+*        Regular?
+            CALL ARR_CHKREG( %VAL(PTR), DIMS(IAX), REG, BASE,
+     :                       SCALE, STATUS )
+
+*        If regular unmap
+            IF ( REG ) THEN
+              CALL BDI_AXUNMAP( P_FID(SLOT), IAX, 'Data', PTR, STATUS )
+            END IF
+
+          END IF
+
+*      Get units and label
+          CALL BDI_AXGET0C( P_FID(SLOT), IAX, 'Label', LABEL, STATUS )
+          CALL BDI_AXGET0C( P_FID(SLOT), IAX, 'Units', UNITS, STATUS )
+
+*      Was this axis spatial?
+          IF ( (IAX.EQ.AXID(1)) .OR. (IAX.EQ.AXID(2)) ) THEN
+            IF ( UNITS .GT. ' ' ) THEN
+              CALL CONV_UNIT2R( UNITS, TOR, STATUS )
+              IF ( STATUS .NE. SAI__OK ) THEN
+                CALL ERR_ANNUL( STATUS )
+                UNITS = 'pixels'
+              END IF
+            END IF
+          END IF
+
+*      Write axis data
+          CALL PSF1_PUTAX( P_INST(SLOT), IAX, OK, DIMS(IAX), REG,
+     :                     .FALSE., PTR, BASE, SCALE,
+     :                     TOR, LABEL, UNITS, STATUS )
+
+        END DO
 
       END IF
 
-*    Write axis identifiers
-      CALL PSF1_PUTAXID( P_INST(SLOT), X_AX, Y_AX, E_AX, T_AX, STATUS )
+*  Write axis identifiers
+      CALL PSF1_PUTAXID( P_INST(SLOT), AXID(1), AXID(2), AXID(3),
+     :                   AXID(4), STATUS )
 
-*    Mark as done
+*  Mark as done
       P_GOTAX(SLOT) = .TRUE.
 
-*    Tidy up
+*  Tidy up
  99   IF ( STATUS .NE. SAI__OK ) THEN
         CALL AST_REXIT( 'PSF_CHKAXES', STATUS )
       END IF
