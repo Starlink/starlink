@@ -71,7 +71,7 @@ itcl::class gaia::GaiaSextractor {
 
    #  Inheritances:
    #  -------------
-   inherit TopLevelWidget
+   inherit util::TopLevelWidget
 
    #  Constructor:
    #  ------------
@@ -743,11 +743,11 @@ itcl::class gaia::GaiaSextractor {
 
       #  Detection filter. Either NONE or some known filename. Note
       #  the use of full path names.
+      #  -variable [scope values_($this,detfilter)]
       itk_component add detfilter {
          LabelMenu $parent.detfilter \
             -text "Detection filter:" \
-            -labelwidth $lwidth \
-            -variable [scope values_($this,detfilter)]
+            -labelwidth $lwidth
       }
       pack $itk_component(detfilter) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(detfilter) \
@@ -1086,11 +1086,11 @@ itcl::class gaia::GaiaSextractor {
          {Minimum applicable radius for Kron magnitudes}
 
       #  Type of MASKing used on photometry neighbours.
+      #  -variable [scope values_($this,photmask)]
       itk_component add photmask {
          LabelMenu $childsite.detmask \
             -text "Neighbour mask:" \
-            -labelwidth $lwidth \
-            -variable [scope values_($this,photmask)]
+            -labelwidth $lwidth
       }
       pack $itk_component(photmask) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(photmask) \
@@ -1186,11 +1186,11 @@ itcl::class gaia::GaiaSextractor {
       set vwidth 5
 
       #  Type of detector.
+      #  -variable [scope values_($this,dettype)]
       itk_component add dettype {
          LabelMenu $parent.dettype \
             -text "Detector type:" \
-            -labelwidth $lwidth \
-            -variable [scope values_($this,dettype)]
+            -labelwidth $lwidth
       }
       pack $itk_component(dettype) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(dettype) \
@@ -1312,11 +1312,11 @@ itcl::class gaia::GaiaSextractor {
          {FWHM of stellar images in arcseconds}
 
       #  Neural network weight table.
+      #  -variable [scope values_($this,nettable)]
       itk_component add nettable {
          LabelMenu $parent.nettable \
             -text "Neural network table:" \
-            -labelwidth $lwidth \
-            -variable [scope values_($this,nettable)]
+            -labelwidth $lwidth
       }
       pack $itk_component(nettable) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(nettable) \
@@ -1398,11 +1398,11 @@ itcl::class gaia::GaiaSextractor {
          {Size of local median filter (size or width,height) max=7}
 
       #  Type of background estimates used when estimate magnitudes.
+      #  -variable [scope values_($this,backtype)]
       itk_component add backtype {
          LabelMenu $parent.backtype \
             -text "Photometry type:" \
-            -labelwidth $lwidth \
-            -variable [scope values_($this,backtype)]
+            -labelwidth $lwidth
       }
       pack $itk_component(backtype) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(backtype) \
@@ -1414,6 +1414,7 @@ itcl::class gaia::GaiaSextractor {
             -value $shortname \
             -command [code $this toggle_annulus_ $shortname]
       }
+      set values_($this,backtype) $values_($this,backtype)
 
       #  Thickness of background annulus.
       itk_component add backthick {
@@ -1464,11 +1465,11 @@ itcl::class gaia::GaiaSextractor {
       set vwidth 5
 
       #  Type of checkimage to produce.
+      #  -variable [scope values_($this,checktype)]
       itk_component add checktype {
          LabelMenu $parent.checktype \
             -text "Checkimage type:" \
-            -labelwidth $lwidth \
-            -variable [scope values_($this,checktype)]
+            -labelwidth $lwidth
       }
       pack $itk_component(checktype) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(checktype) \
@@ -2025,9 +2026,7 @@ itcl::class gaia::GaiaSextractor {
       $astrocat delete
 
       #  Now open the catalogue window.
-#      set astrocat [AstroCat::new_catalog $catalogue \
-#                       [code $itk_option(-image)] $itk_option(-astrocat)]
-      set astrocat [AstroCat::open_catalog_window $catalogue \
+      set astrocat [cat::AstroCat::open_catalog_window $catalogue \
                        [code $itk_option(-image)] $itk_option(-astrocat)]
 
       #  Now display the catalogue.
@@ -2096,7 +2095,7 @@ itcl::class gaia::GaiaSextractor {
    #  complete, so we can proceed. The number we should use here
    #  is 1000 or the size of the catalogue.
    protected method set_maxobjs_ {catalogue} {
-      
+
       set maxobjs [find_maxobjs_]
       set ok [$astrocatnames_($catalogue) set_maxobjs $maxobjs]
       if { ! $ok } {

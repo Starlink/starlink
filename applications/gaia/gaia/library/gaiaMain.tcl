@@ -105,6 +105,7 @@ incr argc 2
 set env(NATIVE_GAIA) 1
 
 #  Start up the main window.
+source $gaia_library/LabelEntryScale.tcl
 gaia::Gaia::startGaia
 
 #----------------------------------------------

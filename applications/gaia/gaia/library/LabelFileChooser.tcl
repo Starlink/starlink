@@ -57,7 +57,7 @@ itcl::class gaia::LabelFileChooser {
 
    #  Inheritances:
    #  -------------
-   inherit LabelEntry
+   inherit util::LabelEntry
 
    #  Constructor:
    #  ------------

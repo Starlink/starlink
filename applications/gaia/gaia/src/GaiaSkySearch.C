@@ -16,6 +16,10 @@
 //     foreign catalogues are controlled by the GaiaLocalCatalog
 //     class.
 //
+//     A special override of the plot_objects function is added to 
+//     sort out problems with catalogues that have both WCS and X-Y 
+//     coordinates.
+//
 //  Authors:
 //     P.W. Draper (PWD)
 //
@@ -446,4 +450,112 @@ int GaiaSkySearch::csizeCmd( int argc, char *argv[] )
     Tcl_Free( (char *) mainArgv );
   }
   return TCL_OK;
+}
+
+
+//
+//  Override plot_objects to sort out problems with plotting when 
+//  have both pixel coordinates and sky coordinates.
+//
+int GaiaSkySearch::plot_objects( Skycat* image, const QueryResult& r, 
+                                 const char* cols, const char* symbol, 
+                                 const char* expr )
+{
+    int status = 0;
+    int numCols = 0;
+    char** colNames = NULL;
+    int* colIndexes = NULL;
+    int nsymb = 0;
+    char** symb = NULL;
+    int nexpr = 0;
+    char** exprList = NULL;
+
+    // this loop executes only once and is used for error handling/cleanup via "break"
+    int once = 1;
+    while (once-- > 0) {
+	// check that plot columns are valid and also save the column indexes 
+	// for accessing row values as variables later
+	if ((status = Tcl_SplitList(interp_, (char*)cols, &numCols, &colNames)) != TCL_OK)
+	    break;
+	colIndexes = new int[numCols];
+	for (int i = 0; i < numCols; i++) {
+	    if ((colIndexes[i] = r.colIndex(colNames[i])) < 0) {
+		status = error("invalid plot column: ", colNames[i]);
+		break;
+	    }
+	}
+    
+	// parse symbol info, a variable length list of 
+	// {shape color ratio angle label cond}
+	if ((status = Tcl_SplitList(interp_, (char*)symbol, &nsymb, &symb)) != TCL_OK)
+	    break;
+    
+	// default values
+	char* shape = "";
+	char* fg = "white"; // if no color is specified, use 2: b&w
+	char* bg = "black";
+	char* ratio = "1";  // these may be Tcl expressions
+	char* angle = "0";
+	char* label = "";
+	char* cond = "1";
+	if ((status = parse_symbol(r, nsymb, symb, shape, fg, bg, ratio, 
+				   angle, label, cond)) != TCL_OK) 
+	    break;
+    
+	// parse the size expr list: {size units}
+	if ((status = Tcl_SplitList(interp_, (char*)expr, &nexpr, &exprList)) != TCL_OK)
+	    break;
+	if (nexpr == 0 || strlen(exprList[0]) == 0) {
+	    status = error("invalid symbol expression: ", expr);
+	    break;
+	}
+	char* size = exprList[0];
+	char* units = "image";
+	if (nexpr > 1 && strlen(exprList[1]))
+	    units = exprList[1];
+
+	// for each row in the catalog, eval the expressions and plot the symbols
+	int nrows = r.numRows();
+	int id_col = r.id_col();
+	for (int rownum = 0; rownum < nrows; rownum++) {
+	    char* id;
+	    if ((status = r.get(rownum, id_col, id)) != 0) 
+		break;
+	    WorldOrImageCoords pos;
+	    if ((status = r.getPos(rownum, pos)) != 0) 
+		break;
+	    double x, y;
+	    char xy_units[32];
+	    if (r.isPix() && ! r.isWcs() ) { // PWD: modify here
+		x = pos.x();
+		y = pos.y();
+		strcpy(xy_units, "image");
+	    }
+	    else if (r.isWcs()) {
+		x = pos.ra_deg();
+		y = pos.dec_deg();
+		strcpy(xy_units, "deg");
+	    } 
+	    else {
+		status = error("no wcs or image coordinates to plot");
+		break;
+	    }
+	    if ((status = plot_row(image, r, rownum, id, x, y, xy_units, 
+				   numCols, colNames, colIndexes, shape, bg, fg, ratio, 
+				   angle, label, cond, size, units)) != TCL_OK) 
+		break;
+	}
+    }
+
+    // free memory allocated for split Tcl lists and return the status
+    if (colNames)
+	free(colNames);
+    if (colIndexes)
+	delete colIndexes;
+    if (symb)
+	free(symb);
+    if (exprList)
+	free(exprList);
+
+    return status;
 }

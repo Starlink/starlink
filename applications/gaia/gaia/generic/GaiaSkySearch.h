@@ -47,6 +47,12 @@ public:
   //  Call a member function by name.
   virtual int call( const char *name, int len, int argc, char  *argv[] );
 
+  //  Plot command (overriden to sort out X,Y -v- RA/Dec clash).
+  virtual int plot_objects( Skycat *image, const QueryResult& r, 
+                            const char *cols, const char *symbol, 
+                            const char *expr );
+
+
   // -- tcl subcommands --
   virtual int openCmd( int argc, char *argv[] );
   virtual int saveCmd( int argc, char *argv[] );
