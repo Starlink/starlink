@@ -1936,6 +1936,8 @@ C        ENDIF
         CALL IMG_MINMAX(STATUS)
 
 *  get top level text
+	print *,'get titles'
+        call flush(6)
         CALL BDI_GET0C( IFID, 'Title', I_TITLE, STATUS )
         CALL BDI_GET0C( IFID, 'Label', I_LABEL, STATUS )
         CALL BDI_GET0C( IFID, 'Units', I_UNITS, STATUS )
