@@ -461,31 +461,31 @@ OPTIONS:
 DETAILS:
    Scuplot is a wrapper script around a number of kappa utilities. Since it
    understands the Scuba NDF file format, it hides most of the complicated
-   syntax from the user.  Mode = `p' and `r' are wrappers around plotting
+   syntax from the user.  Mode = 'p' and 'r' are wrappers around plotting
    utilities and facilitate the inspection of the data of each bolometer.
    The utility allows change to the plot scales via the menu but will keep 
    the scales the same for all bolometers which makes is easy to compare
-   bolometers. Mode = `d' allows for interactive despiking. Please read
+   bolometers. Mode = 'd' allows for interactive despiking. Please read
    the note below the description of the menu on the use of the mouse.
 
-   Mode = `p' or pltbol (or any p* link to scuplot) is a wrapper around the
+   Mode = 'p' or pltbol (or any p* link to scuplot) is a wrapper around the
    Kappa utility linplot. It allows plots  of a whole series of bolometers
    one by one, optionally overlaying them with the same bolometer from a
    second file. Obvious overlays are despiked on non-despiked data or
    data from different exposures to check the noise.
 
-   Mode = `r' or rlinplot (or any r* link to scuplot) is a wrapper around the
+   Mode = 'r' or rlinplot (or any r* link to scuplot) is a wrapper around the
    Kappa utility mlinplot. It provides  plots of sets of bolometers in a single
    window with optionally data from a second file in a second window.
    Obvious files are despiked and non-despiked data or data from different 
    exposures to check the noise.
 
-   Mode = `d' or dspbol (or any d* link to scuplot) can be used to 
+   Mode = 'd' or dspbol (or any d* link to scuplot) can be used to 
    interactively despike bolometers. While it is not as fast as a completely
    integrated routine would be, it makes interactive despiking much
    easier by hiding the cycle between linplot and change_quality for the
    user. The most common use is to zoom in on the region with the spike
-   via the `X' menu option (either typing the input or using the cursor)
+   via the 'X' menu option (either typing the input or using the cursor)
    and subsequently to flag the offending point (just type the coordinate
    of the point, a range, or use the cursor; IN GENERAL THE COORDINATE IS
    TO THE RIGHT OF THE PLOTTED POINT). The routine will overlay the
@@ -501,12 +501,12 @@ DETAILS:
       [N]                   Next bolometer
       [B#]                  Switch to bol #
       [X min max], [X cen]  X-axis from min:max or cen+/-10
-                            Just `x' activates the cursor.
+                            Just 'x' activates the cursor.
       [R]                   Reset X-axis
       [Y min max], [Y lim]  Y-axis from min:max or -lim:+lim
       [U]                   Reset Y-axis
       [#], [#:#], [#-#]     Despike point or range of points; 
-                            Just `p' activates the cursor.
+                            Just 'p' activates the cursor.
    
       Option >
 
@@ -556,35 +556,35 @@ exit
 *  Description:
 *    Scuplot is a wrapper script around a number of kappa
 *    utilities. Since it understands the Scuba NDF file format, it
-*    hides most of the complicated syntax from the user.  Mode = `p'
-*    and `r' are wrappers around plotting utilities and facilitate the
+*    hides most of the complicated syntax from the user.  Mode = 'p'
+*    and 'r' are wrappers around plotting utilities and facilitate the
 *    inspection of the data of each bolometer.  The utility allows
 *    change to the plot scales via the menu but will keep the scales
 *    the same for all bolometers which makes is easy to compare
-*    bolometers. Mode = `d' allows for interactive despiking. Please
+*    bolometers. Mode = 'd' allows for interactive despiking. Please
 *    read the note below the description of the menu on the use of the
 *    mouse.
 *
-*    Mode = `p' or pltbol (or any p* link to scuplot) is a wrapper
+*    Mode = 'p' or pltbol (or any p* link to scuplot) is a wrapper
 *    around the Kappa utility linplot. It allows plots of a whole series
 *    of bolometers one by one, optionally overlaying them with the same
 *    bolometer from a second file. Obvious overlays are despiked on
 *    non-despiked data or data from different exposures to check the
 *    noise.
 * 
-*    Mode = `r' or rlinplot (or any r* link to scuplot) is a wrapper
+*    Mode = 'r' or rlinplot (or any r* link to scuplot) is a wrapper
 *    around the Kappa utility mlinplot. It provides plots of sets of
 *    bolometers in a single window with optionally data from a second
 *    file in a second window.  Obvious files are despiked and
 *    non-despiked data or data from different exposures to check the
 *    noise.
 * 
-*    Mode = `d' or dspbol (or any d* link to scuplot) can be used to
+*    Mode = 'd' or dspbol (or any d* link to scuplot) can be used to
 *    interactively despike bolometers. While it is not as fast as a
 *    completely integrated routine would be, it makes interactive
 *    despiking much easier by hiding the cycle between linplot and
 *    change_quality for the user. The most common use is to zoom in on
-*    the region with the spike via the `X' menu option (either typing
+*    the region with the spike via the 'X' menu option (either typing
 *    the input or using the cursor) and subsequently to flag the
 *    offending point (just type the coordinate of the point, a range, or
 *    use the cursor; IN GENERAL THE COORDINATE IS TO THE RIGHT OF THE
@@ -602,12 +602,12 @@ exit
 *      [N]                   Next bolometer
 *      [B#]                  Switch to bol #
 *      [X min max], [X cen]  X-axis from min:max or cen+/-10
-*                            Just `x' activates the cursor.
+*                            Just 'x' activates the cursor.
 *      [R]                   Reset X-axis
 *      [Y min max], [Y lim]  Y-axis from min:max or -lim:+lim
 *      [U]                   Reset Y-axis
 *      [#], [#:#], [#-#]     Despike point or range of points; 
-*                            Just `p' activates the cursor.
+*                            Just 'p' activates the cursor.
 *   
 *      Option >
 *
@@ -667,6 +667,9 @@ exit
 *
 *  History:
 *     $Log$
+*     Revision 1.2  1998/06/15 20:18:27  timj
+*     Fix -h option (RPT)
+*
 *     Revision 1.1  1997/12/01 01:44:39  timj
 *     Initial revision
 *
