@@ -30,11 +30,14 @@
 #        After a call to this method, the user may no longer interact 
 #        with the widget to add points etc.
 #
-#     loadndf slot ndf ?maxcanv?
+#     loadndf slot ndf ?percs? ?maxcanv?
 #        This method loads an NDF into the viewer.
 #           - slot     -- Either "A" or "B", to identify whether this is
 #                         the A or B NDF.
 #           - ndf      -- ndf object
+#           - percs    -- If present, this is a two-element list giving the 
+#                         percentile bounds between which the display of the
+#                         NDF should be made.  If absent, a default is used.
 #           - maxcanv  -- If given and non-zero, the GWM widget will not 
 #                         be more than maxcanv pixels in either direction.
 #
@@ -147,7 +150,7 @@
 ########################################################################
 
 #-----------------------------------------------------------------------
-      public method loadndf { slot ndfob { maxcanv 0 } } {
+      public method loadndf { slot ndfob { percs { 0 100 } } { maxcanv 0 } } {
 #-----------------------------------------------------------------------
 
 #  Validate the slot identifier.
@@ -170,6 +173,12 @@
 
 #  Store the ndf object.
          set ndf($slot) $ndfob
+
+#  Validate and store the display percentiles.
+         if { [ llength $percs ] != 2 } {
+            error "Percentiles \"$percs\" is not a two-element list"
+         }
+         set percentiles($slot) $percs
 
 #  Get the NDF name and make a shortened version.
          set ndfname($slot) [ $ndf($slot) name ]
@@ -389,9 +398,8 @@
 #  Clear the canvas (it may contain items other than the GWM).
          $canvas delete all
 
-#  Create the GWM viewing item.
-         set corigin [ makegwm $vxlo $vylo [ expr $vxhi - $vxlo ] \
-                                           [ expr $vyhi - $vylo ] ]
+#  Make the new GWM item.
+         makegwm $vxlo $vylo [ expr $vxhi - $vxlo ] [ expr $vyhi - $vylo ]
 
 #  Create polygons on the canvas for both NDFs.  This both provides visual
 #  feedback for the user and makes it easier to identify positions on
@@ -412,17 +420,12 @@
             ndfdrawpair [ gwmname ]/GWM \
                $vxlo $vylo [ expr $vxhi - $vxlo ] [ expr $vyhi - $vylo ] \
                $zoomfactor \
-               [ lindex $percentiles 0 ] [ lindex $percentiles 1 ] \
                $ndf(A) CURRENT $xoff(A) $yoff(A) \
+               [ lindex $percentiles(A) 0 ] [ lindex $percentiles(A) 1 ] \
                $ndf(B) CURRENT $xoff(B) $yoff(B) \
+               [ lindex $percentiles(B) 0 ] [ lindex $percentiles(B) 1 ] \
          ]
          $canvas create oval -5 -5 5 5 -fill yellow
-
-#  Note this is an ugly workaround for what I believe to be a bug in
-#  the GWM canvas item and/or its PGPLOT driver.  See the documentation
-#  of the makegwm method.
-         $canvas move gwmitem [ lindex $corigin 0 ] [ lindex $corigin 1 ]
-         # $canvas delete $cover
 
 #  Redraw any points in the points list.
          refreshpoints
@@ -532,13 +535,6 @@
 ########################################################################
 
 #-----------------------------------------------------------------------
-      public variable percentiles { 5 95 } {
-#-----------------------------------------------------------------------
-         display
-      }
-
-
-#-----------------------------------------------------------------------
       public variable title "Ndfalign" {
 #-----------------------------------------------------------------------
          if { $state == "active" && $title != "" } {
@@ -574,6 +570,7 @@
       private variable ndf             ;# Tcl ndf object
       private variable ndfname         ;# Full name of NDF
       private variable ndfshort        ;# Short name of NDF
+      private variable percentiles     ;# Display percentiles for NDF
       private variable present         ;# Is slot occupied by a valid NDF?
       private variable xlo             ;# Lower X bounding box frame coordinate
       private variable xhi             ;# Upper X bounding box frame coordinate

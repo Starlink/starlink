@@ -39,8 +39,9 @@
 #
 #     command
 #        This gives a command which will be executed whenever the value
-#        of the control changes.  The value of value will be appended
-#        to the command string before it is executed.
+#        of the control changes.  Any occurrence of the sequence "%v" 
+#        in the command variable will be replaced by the value of the
+#        variable before it is executed.
 #
 #     hidden
 #        This variable has a boolean value which indicates whether it is
@@ -164,7 +165,8 @@
             }
          }
          if { $command != "" } {
-            eval $command "{$value}"
+            regsub %v $command "{$value}" com
+            eval $com 
          }
       }
 

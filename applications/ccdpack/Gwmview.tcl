@@ -137,19 +137,6 @@ class Gwmview {
 #        The name of the GWM and its corresponding device should be got 
 #        using the gwmname or devname methods respectively.
 #
-#        NOTE: there is/was a bug in the GWM canvas item and/or its
-#        PGPLOT driver.  To work around this, the makegwm method always
-#        puts the created GWM canvas item at coordinates {0 0}, not those
-#        indicated by xorigin and yorigin.  A calling application should
-#        call makegwm, then do any PGPLOT operations required on the 
-#        GWM, then do:
-#           $canvas move gwmitem [ lindex $shift 0 ] [ lindex $shift 1 ]
-#        where $shift is the return value of the makegwm method.  
-#        If xorigin and yorigin are specified as zero, this step may be
-#        skipped.  Hopefully the bug will be removed one day.
-#        The bug is now fixed in some versions of PGLPLOT.  See Notes 
-#        section.
-#
 #     markertype type colour size
 #        Sets the current marker style; any markers subsequently
 #        drawn will be drawn according to the last call of this method.
@@ -403,9 +390,9 @@ class Gwmview {
 #  move it after it has performed whatever PGPLOT operations it needs to.  
 #  If this bug gets fixed, then the 'set corigin $properorigin' line below
 #  could get uncommented.
-         set properorigin [ view2canv $xorigin [ expr $yorigin + $ysize ] ]
-         set corigin { 0 0 }
-         set corigin $properorigin; set properorigin { 0 0 }
+
+#  Get the position of the origin in canvas coordinates.
+         set corigin [ view2canv $xorigin [ expr $yorigin + $ysize ] ]
 
 #  Create the canvas item itself.
          $canvas create gwm \
@@ -417,9 +404,6 @@ class Gwmview {
 
 #  Set the lookup table.
          configure -lutable $lutable
-
-#  Return the distance by which this has to be shifted on the canvas.
-         return $properorigin
       }
 
 

@@ -10,8 +10,9 @@
 *     Allow plotting of two NDFs on a GWM device.
 
 *  Usage:
-*     ndfdrawpair device xorigin yorigin xdev ydev zoom loperc hiperc 
-*                 ndfA frameA xoffA yoffA ndfB frameB xoffB yoffB
+*     ndfdrawpair device xorigin yorigin xdev ydev zoom 
+*                 ndfA frameA xoffA yoffA lopercA hipercA
+*                 ndfB frameB xoffB yoffB lopercB hipercB
 
 *  Description:
 *     The ndfdrawpair command causes two NDFs to be drawn on the plotting
@@ -25,8 +26,8 @@
 *     the two NDFs.  The plotting surface is taken to extend from
 *     (xorigin, yorigin) to (xorigin + xdev, yorigin + ydev), so if
 *     any parts of the NDFs extend outside the rectangle thus defined,
-*     they will be clipped.  Both NDFs are drawn plotted scaled between
-*     the percentile values given by loperc and hiperc.
+*     they will be clipped.  The NDFs are drawn plotted scaled between
+*     the percentile values given by the loperc and hiperc values.
 *
 *     The dimensions of the plotting device and positions of the NDFs
 *     are given in 'view coordinates'.
@@ -51,12 +52,6 @@
 *        the size of one plotting pixel (though not necessarily one 
 *        screen pixel, which is determined by the size of the plotting
 *        device).
-*     loperc = real
-*        Percentile in the NDF data to correspond to the lower colour 
-*        index for plotting (0 <= loperc <= hiperc <= 100).
-*     hiperc = real
-*        Percentile in the NDF data to correspond to the upper colour
-*        index for plotting (0 <= loperc <= hiperc <= 100).
 *     ndfA = ndf object
 *        The first NDF to plot.
 *     frameA = string
@@ -67,6 +62,12 @@
 *        X offset by which to translate the first NDF in frame coordinates.
 *     yoffA = real
 *        Y offset by which to translate the first NDF in frame coordinates.
+*     lopercA = real
+*        Percentile in the data of the first NDF to correspond to the 
+*        lower colour index for plotting (0 <= lopercA <= hipercA <= 100).
+*     hipercA = real
+*        Percentile in the data of the first NDF to correspond to the 
+*        upper colour index for plotting (0 <= lopercA <= hipercA <= 100).
 *     ndfB = ndf object
 *        The second NDF to plot
 *     frameB = string
@@ -77,6 +78,12 @@
 *        X offset by which to translate the second NDF in frame coordinates.
 *     yoffB = real
 *        Y offset by which to translate the second NDF in frame coordinates.
+*     lopercB = real
+*        Percentile in the data of the second NDF to correspond to the 
+*        lower colour index for plotting (0 <= lopercB <= hipercB <= 100).
+*     hipercB = real
+*        Percentile in the data of the second NDF to correspond to the 
+*        upper colour index for plotting (0 <= lopercB <= hipercB <= 100).
 
 *  Return Value:
 *     The return value is a count of the pixels in the overlap region 
@@ -113,10 +120,12 @@
 *  the first element of the array in each dimension is 1, not 0.
 */
 
-      char *arglist = "device xorigin yorigin xdev ydev zoom loperc hiperc " 
-                  /*   1      2       3       4    5    6    7      8    */
-                      "ndfA frameA xoffA yoffA ndfB frameB xoffB yoffB";
-                  /*   9    10     11    12    13   14     15    16      */
+      char *arglist = "device xorigin yorigin xdev ydev zoom "
+                  /*   1      2       3       4    5    6      */
+                      "ndfA frameA xoffA yoffA lopercA hipercA "
+                  /*   7    8      9     10    11      12      */
+                      "ndfB frameB xoffB yoffB lopercB hipercB ";
+                  /*   13   14     15    16    17      18      */
       int xpix[ 2 ];
       int xpof[ 2 ];
       int ypix[ 2 ];
@@ -144,6 +153,8 @@
       int *pixbloc[ 2 ];
       double loval[ 2 ];
       double hival[ 2 ];
+      double loperc[ 2 ];
+      double hiperc[ 2 ];
       char *arg;
       char *device;
       int i;
@@ -151,13 +162,11 @@
       int hicolour;
       int ngood = 0;
       int const badcolour = 0;
-      double loperc;
-      double hiperc;
       Tcl_Obj *result;
       Ndf *ndf[ 2 ];
 
 /* Check syntax. */
-      if ( objc != 17 ) {
+      if ( objc != 19 ) {
          Tcl_WrongNumArgs( interp, 1, objv, arglist );
          return TCL_ERROR;
       }
@@ -171,12 +180,15 @@
            Tcl_GetDoubleFromObj( interp, objv[ 4 ], &xdev ) != TCL_OK ||
            Tcl_GetDoubleFromObj( interp, objv[ 5 ], &ydev ) != TCL_OK ||
            Tcl_GetDoubleFromObj( interp, objv[ 6 ], &zoom ) != TCL_OK ||
-           Tcl_GetDoubleFromObj( interp, objv[ 7 ], &loperc ) != TCL_OK ||
-           Tcl_GetDoubleFromObj( interp, objv[ 8 ], &hiperc ) != TCL_OK ||
-           Tcl_GetDoubleFromObj( interp, objv[ 11 ], &xoff[ 0 ] ) != TCL_OK ||
-           Tcl_GetDoubleFromObj( interp, objv[ 12 ], &yoff[ 0 ] ) != TCL_OK ||
+           Tcl_GetDoubleFromObj( interp, objv[ 9 ], &xoff[ 0 ] ) != TCL_OK ||
+           Tcl_GetDoubleFromObj( interp, objv[ 10 ], &yoff[ 0 ] ) != TCL_OK ||
+           Tcl_GetDoubleFromObj( interp, objv[ 11 ], &loperc[ 0 ] ) != TCL_OK ||
+           Tcl_GetDoubleFromObj( interp, objv[ 12 ], &hiperc[ 0 ] ) != TCL_OK ||
            Tcl_GetDoubleFromObj( interp, objv[ 15 ], &xoff[ 1 ] ) != TCL_OK ||
-           Tcl_GetDoubleFromObj( interp, objv[ 16 ], &yoff[ 1 ] ) != TCL_OK ) {
+           Tcl_GetDoubleFromObj( interp, objv[ 16 ], &yoff[ 1 ] ) != TCL_OK ||
+           Tcl_GetDoubleFromObj( interp, objv[ 17 ], &loperc[ 1 ] ) != TCL_OK ||
+           Tcl_GetDoubleFromObj( interp, objv[ 18 ], &hiperc[ 1 ] ) != TCL_OK
+         ) {
          result = Tcl_GetObjResult( interp );
          Tcl_AppendStringsToObj( result, "Usage: ", Tcl_GetString( objv[ 0 ] ),
                                  " ", arglist, (char *) NULL );
@@ -185,13 +197,13 @@
       }
 
 /* Extract and validate ndf object arguments. */
-      if ( NdfGetNdfFromObj( interp, objv[ 9 ], &ndf[ 0 ] ) != TCL_OK ||
+      if ( NdfGetNdfFromObj( interp, objv[ 7 ], &ndf[ 0 ] ) != TCL_OK ||
            NdfGetNdfFromObj( interp, objv[ 13 ], &ndf[ 1 ] ) != TCL_OK ) {
          return TCL_ERROR;
       }
 
 /* Extract and validate frame objects. */
-      if ( NdfGetIframeFromObj( interp, objv[ 10 ], ndf[ 0 ]->wcs, 
+      if ( NdfGetIframeFromObj( interp, objv[ 8 ], ndf[ 0 ]->wcs, 
                                 &iframe[ 0 ] ) != TCL_OK ||
            NdfGetIframeFromObj( interp, objv[ 14 ], ndf[ 1 ]->wcs, 
                                 &iframe[ 1 ] ) != TCL_OK ) {
@@ -203,10 +215,10 @@
          Tcl_Obj *ob[ 4 ];
          Tcl_Obj **ov;
          int oc;
-         ob[ 0 ] = objv[ 9 + 4 * i ];
+         ob[ 0 ] = objv[ 7 + 6 * i ];
          ob[ 1 ] = Tcl_NewStringObj( "percentile", -1 );
-         ob[ 2 ] = Tcl_NewDoubleObj( loperc );
-         ob[ 3 ] = Tcl_NewDoubleObj( hiperc );
+         ob[ 2 ] = Tcl_NewDoubleObj( loperc[ i ] );
+         ob[ 3 ] = Tcl_NewDoubleObj( hiperc[ i ] );
          if ( Tcl_EvalObjv( interp, 4,ob, 0 ) != TCL_OK ||
               Tcl_ListObjGetElements( interp, Tcl_GetObjResult( interp ),
                                       &oc, &ov ) != TCL_OK ||

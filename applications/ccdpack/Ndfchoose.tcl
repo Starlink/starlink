@@ -568,13 +568,13 @@
       private method refreshinfo { index } {
 #-----------------------------------------------------------------------
          if { $index == "all" } {
-            foreach comp [ array names itk_component {info[0-9AB]*} ] {
-               destroy $itk_component($comp)
-               unset itk_component($comp)
-            }
+            set pattern {info[0-9AB]*}
          } else {
-            destroy $itk_component($index)
-            unset itk_component($index)
+            set pattern "info${index}*"
+         }
+         foreach comp [ array names itk_component $pattern ] {
+            destroy $itk_component($comp)
+            unset itk_component($comp)
          }
          foreach slot { A B } {
             if { $inview($slot) == $slot } {
@@ -593,13 +593,13 @@
 #  if it did, it would be how to implement resizing the NDFs after a 
 #  window resize event.
          if { $index == "all" } {
-            foreach comp [ array names itk_component {info[0-9AB]*} ] {
-               destroy $itk_component($comp)
-               unset itk_component($comp)
-            }
+            set pattern {plot[0-9AB]*}
          } else {
-            destroy $itk_component($index)
-            unset itk_component($index)
+            set pattern "plot${index}*"
+         }
+         foreach comp [ array names itk_component $pattern ] {
+            destroy $itk_component($comp)
+            unset itk_component($comp)
          }
          foreach slot { A B } {
             if { $inview($slot) == $slot } {
@@ -817,7 +817,7 @@
          }
 
 #  Cause the display to be updated.
-         refreshinfo
+         refreshinfo all
       }
 
 

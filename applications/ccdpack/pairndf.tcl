@@ -21,7 +21,7 @@
 #        successfully centroided in both NDFs, and each of those
 #        entries is a quad giving coordinates in each NDF, of the 
 #        form {X1 Y1 X2 Y2}.
-#     MAXCANV = integer (Given)
+#     MAXCANV = integer (Given and Returned)
 #        The maximum X or Y dimension of the canvas in which the initial
 #        pair of NDFs is to be displayed.  If zero, there is no limit.
 #     MAXPOS = integer (Given)
@@ -92,7 +92,6 @@
                          -title "PAIRNDF: %An -- %Bn" \
                          -info "%N (%h x %w) Frame: %f" \
                          -watchstate alignstate \
-                         -percentiles [ list $PERCLO $PERCHI ] \
                          -zoom $ZOOM \
                          -geometry ${WINX}x${WINY} \
                          -uselabels 0 \
@@ -164,12 +163,15 @@
 #  Load the NDF pair into the aligner widget and wait for the user to 
 #  select some positions in common.
          raise $aligner
-         $aligner loadndf A $ndfs($iA) $MAXCANV
-         $aligner loadndf B $ndfs($iB) $MAXCANV
+         set percA [ $chooser percentiles $iA ]
+         set percB [ $chooser percentiles $iB ]
+         puts "percs: $percA $percB"
+         $aligner loadndf A $ndfs($iA) $percA $MAXCANV
+         $aligner loadndf B $ndfs($iB) $percB $MAXCANV
          $aligner activate
          tkwait variable alignstate
-         set mc [ $aligner maxcanvas ]
          set MAXCANV [ $aligner maxcanvas ]
+         set ZOOM [ $aligner cget -zoom ]
 
 #  Get the resulting lists of points.
          set pA [ $aligner pointsndf A CURRENT ]
