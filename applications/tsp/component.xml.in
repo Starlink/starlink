@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>applications/kappa</path>
+  <description>TSP - Time Series/Polarimetry Package</description>
+  <abstract><p>
+TSP is an astronomical data reduction package which handles time series
+data and polarimetric data. These facilities are missing from most existing
+data reduction packages which are usually oriented towards either spectroscopy
+or image processing or both. Where facilities for polarimetry or time series
+data have been provided they have usually not been sufficiently general
+to handle data from a variety of different instruments.
+  </p></abstract>
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <developers>
+    <person>
+      <name>Jeremy Bailey</name>
+      <uname>jb</uname>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
