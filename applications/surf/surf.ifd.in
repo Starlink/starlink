@@ -3607,55 +3607,55 @@ package surf {
    }
 
    command change_nacentre {
-      obey {@STARPERL@ ${SURF_DIR}/change_nacentre.pl}
+      obey {@PERL@ ${SURF_DIR}/change_nacentre.pl}
    }
 
    command sculog {
-      obey {@STARPERL@ ${SURF_DIR}/sculog}
+      obey {@PERL@ ${SURF_DIR}/sculog}
    }
 
    command scuquick {
-      obey {@STARPERL@ ${SURF_DIR}/scuquick}
+      obey {@PERL@ ${SURF_DIR}/scuquick}
    }
 
    command photsum {
-      obey {@STARPERL@ ${SURF_DIR}/photsum}
+      obey {@PERL@ ${SURF_DIR}/photsum}
    }
 
    command pointsum {
-      obey {@STARPERL@ ${SURF_DIR}/pointsum}
+      obey {@PERL@ ${SURF_DIR}/pointsum}
    }
 
    command remdbm {
-      obey {@STARPERL@ ${SURF_DIR}/remdbm.pl}
+      obey {@PERL@ ${SURF_DIR}/remdbm.pl}
    }
 
    command scushift {
-      obey {@STARPERL@ -s ${SURF_DIR}/scushift}
+      obey {@PERL@ -s ${SURF_DIR}/scushift}
    }
 
    command scunoise {
-      obey {@STARPERL@ -s ${SURF_DIR}/scunoise}
+      obey {@PERL@ -s ${SURF_DIR}/scunoise}
    }
 
    command setbolwt {
-      obey {@STARPERL@ ${SURF_DIR}/setbolwt.pl}
+      obey {@PERL@ ${SURF_DIR}/setbolwt.pl}
    }
 
    command skysum {
-      obey {@STARPERL@ ${SURF_DIR}/skysum}
+      obey {@PERL@ ${SURF_DIR}/skysum}
    }
 
    command obssum {
-      obey {@STARPERL@ ${SURF_DIR}/sculog -summary}
+      obey {@PERL@ ${SURF_DIR}/sculog -summary}
    }
 
    command qdraw {
-      obey {@STARPERL@ ${SURF_DIR}/qdraw}
+      obey {@PERL@ ${SURF_DIR}/qdraw}
    }
 
    command sigclip {
-      obey {@STARPERL@ ${SURF_DIR}/sigclip}
+      obey {@PERL@ ${SURF_DIR}/sigclip}
    }
 
 
