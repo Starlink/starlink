@@ -148,6 +148,8 @@
      :                 DID, STATUS )
       CALL ADI_DEFMTH( 'UnLink(_Array,_HDSfile)', BDI1_UNLNK,
      :                 DID, STATUS )
+      CALL ADI_DEFMTH( 'UnLink(_Scalar,_HDSfile)', BDI1_UNLNK,
+     :                 DID, STATUS )
 
 *  Define EDI interface
       CALL ADI_DEFMTH( 'SetLink(_EventDS,_HDSfile)', EDI1_SETLNK,
