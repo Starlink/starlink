@@ -290,7 +290,8 @@ DviFileEvent *DviFile::getEvent()
 		    int b = magnify_(getSIS(4));
 		    pending_hupdate_ += b;
 		    if (a > 0 && b > 0)
-			gotEvent = new DviFileSetRule (opcode, this,
+			gotEvent = new DviFileSetRule (opcode,
+						       this,
 						       pixel_round(a),
 						       pixel_round(b));
 		    break;
@@ -313,7 +314,8 @@ DviFileEvent *DviFile::getEvent()
 		    int b = magnify_(getSIS(4));
 		    if (a > 0 && b > 0)
 			gotEvent = new DviFileSetRule (opcode,
-						       this, pixel_round(a),
+						       this,
+						       pixel_round(a),
 						       pixel_round(b));
 		    break;
 		}
@@ -766,7 +768,7 @@ double DviFile::convertFromScaledPoints(int sp, DviUnits units)
 	ans = sp / 65536.0 / 72.27;
 	break;
       case unit_bp:
-	ans = sp / 65536.0 / 72.0;
+	ans = sp / 65536.0 / 72.27 * 72.0;
 	break;
       case unit_cm:
 	ans = sp / 65536.0 / 72.27 * 2.54;
