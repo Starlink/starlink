@@ -109,10 +109,11 @@
 
       REAL                      MAGVAL			! Magic value
 
-      INTEGER                   IFID                    ! Input dataset id
-      INTEGER                   OFID                    ! Output dataset id
-      INTEGER 			LEN			! # data elements
       INTEGER 			DPTR,QPTR		! Mapped iinput data
+      INTEGER			IDUM			! Unnused BDI_GET data
+      INTEGER                   IFID                    ! Input dataset id
+      INTEGER 			LEN			! # data elements
+      INTEGER                   OFID                    ! Output dataset id
 
       BYTE 			MASK			! Quality mask value
 
@@ -130,7 +131,7 @@
       CALL AST_INIT()
 
 *  Overwrite mode?
-      CALL USI_GET0L( 'OVER' OVER, STATUS )
+      CALL USI_GET0L( 'OVER', OVER, STATUS )
 
 *  Overwrite case - input becomes output
       IF ( OVER ) THEN
