@@ -2,7 +2,7 @@ INTERFACE BARYCORR
 
  PARAMETER INP
    POSITION    1
-   TYPE        'UNIV'
+   TYPE        'LITERAL'
    ASSOCIATION '<->GLOBAL.EVDS'
    VPATH       'PROMPT'
    PPATH       'GLOBAL'
@@ -12,7 +12,7 @@ INTERFACE BARYCORR
 
  PARAMETER OUT
    POSITION    2
-   TYPE        'UNIV'
+   TYPE        'LITERAL'
    VPATH       'PROMPT'
    PPATH       'GLOBAL'
    PROMPT      'barycentrically corrected output dataset'
