@@ -325,6 +325,8 @@ f     - Axis2: Axis line drawn through tick marks on axis 2 using AST_GRID
 *        constructor to be a Plot.
 *     10-JAN-2002 (DSB):
 *       - Added axis-specific graphical elements "axis1", "axis2", etc.
+*       - FullForm returns a match without ambiguity if the test string
+*       matches an option exactly, including length.
 *class--
 */
 
@@ -10180,12 +10182,23 @@ static int FullForm( const char *list, const char *test, const char *text,
    i = 0;
    while( option ){
 
+/* If the test string and the current option are identical (including
+   length). use the current option. */
+
 /* If every character in the supplied label matches the corresponding
    character in the current test label we have a match. Increment the 
-   number of matches and save the current item index. */
+   number of matches and save the current item index. If the test string 
+   and the current option are identical (including length), use the 
+   current option. */
+
       if( !Ustrncmp( test, option, len ) ) {
-         nmatch++;
          ret = i;
+         if( ChrLen( option ) == len ) {
+            nmatch = 1;
+            break;
+         } else {
+            nmatch++;
+         }
       }
 
 /* Get a pointer to the next option. */
