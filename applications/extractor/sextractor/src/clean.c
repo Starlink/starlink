@@ -10,16 +10,21 @@
 *	Contents:	functions that remove spurious detections from the
 *			catalog
 *
-*	Last modify:	08/02/2001
+*	Last modify:	13/12/2002
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
+
+#ifdef HAVE_CONFIG_H
+#include        "config.h"
+#endif
 
 #include	<math.h>
 #include	<stdlib.h>
 
 #include	"define.h"
 #include	"globals.h"
+#include	"prefs.h"
 #include	"check.h"
 #include	"clean.h"
 #include        "flag.h"      /* PWD change here */
