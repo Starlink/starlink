@@ -779,8 +779,8 @@ c DCFID(I)
               DATASET_V_ID(NDS) = VFID(N)
 
 *        Map vignetting array
-              CALL BDI_MAPR( VFID(N), 'Data', 'READ', DATASET_GPTR(NDS),
-     :                          STATUS )
+              CALL BDI_MAPR( VFID(N), 'Data', 'READ',
+     :                    DATASET_VIGPTR(NDS),STATUS )
 	      CALL MSG_PRNT('    Loaded associated vignetting array')
 
             END IF
