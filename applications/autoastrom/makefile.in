@@ -1142,11 +1142,13 @@ $(PKG_NAME)_source.tar:
 #  ------------------------------------
 #
 #  Remove all intermediate files.  Do not remove built files.
+#  Make sure we work even when there's no source in the subdirectories
+#  (that is, when this is running as part of an unpacked export_run tarball)
 clean:
 	$(RMF) *~ core
-	-cd astrom && ./mk clean
-	-cd moggy && make -f Makefile.in tidy
-	-cd doc && make tidy
+	if test -f astrom/mk; then cd astrom; ./mk clean; else :; fi
+	if test -f moggy/Makefile; then cd moggy; make tidy; else :; fi
+	if test -d doc; then cd doc; make tidy; else :; fi
 	@ echo
 	@ echo '*** Intermediate files removed'
 	@ echo
@@ -1168,10 +1170,9 @@ clean:
 #  unconfigured Makefile will fail to clean out the SkyCat directories.
 #  Within catlib, Makefile.in doesn't handle distclean well. ]
 unbuild: clean
-	cd astrom && if test -f makefile; then ./mk unbuild; else :; fi
-	cd moggy && if test -f Makefile; then make distclean; else :; fi
-#	cd moggy && if test -f Makefile; then make distclean; else make -f Makefile.in distclean; fi
-	cd catlib && if test -f Makefile; then make distclean; else :; fi
+	if test -f astrom/makefile; then cd astrom; ./mk unbuild; else :; fi
+	if test -f moggy/Makefile; then cd moggy; make distclean; else :; fi
+	if test -f catlib/Makefile; then cd catlib; make distclean; else :; fi
 	test ! -d $(CATLIBINSTALLDIR) || rm -Rf $(CATLIBINSTALLDIR)
 	if test -d doc; then cd doc; make unbuild; else :; fi
 	@- $(RMF) $(BUILT_FILES) $(DATE_STAMP) .BUILT 1>/dev/null 2>/dev/null
