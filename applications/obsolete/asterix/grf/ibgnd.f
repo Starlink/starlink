@@ -403,8 +403,8 @@
         I_BGM_NELM = I_NX*I_NY
       END IF
 	print *,'done ALLOC'
+	print *,i_nx,i_ny,i_qptr,i_bgm_qptr
 	call flush(6)
-	print *,nx,ny,i_qptr,i_bgm_qptr
 
 *  Initialise the the background model quality array. This is ok for points
 *  inside the current region, and bad outside and for bad input pixels
