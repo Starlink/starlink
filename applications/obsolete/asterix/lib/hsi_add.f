@@ -7,7 +7,7 @@
 *     Create new history record
 
 *  Language:
-*     Starlink Fortran 77
+*     Starlink Fortran
 
 *  Invocation:
 *     CALL HSI_ADD( IFID, NAME, STATUS )
@@ -56,17 +56,11 @@
 *  Implementation Deficiencies:
 *     {routine_deficiencies}...
 
-*  {machine}-specific features used:
-*     {routine_machine_specifics}...
-
-*  {DIY_prologue_heading}:
-*     {DIY_prologue_text}
-
 *  References:
 *     HSI Subroutine Guide : http://www.sr.bham.ac.uk:8080/asterix-docs/Programmer/Guides/hsi.html
 
 *  Keywords:
-*     package:hsi, usage:public
+*     package:hsi, usage:public, history, creation
 
 *  Copyright:
 *     Copyright (C) University of Birmingham, 1995
@@ -90,7 +84,11 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'DAT_PAR'
+
+*  Global Variables:
+      INCLUDE 'HSI_CMN'                                 ! HSI common block
+*       HSI_INIT = LOGICAL (given)
+*         HSI class definitions loaded?
 
 *  Arguments Given:
       INTEGER			IFID			! Dataset identifier
@@ -100,15 +98,41 @@
       INTEGER 			STATUS             	! Global status
 
 *  Local Variables:
-      CHARACTER*(DAT__SZLOC)	ILOC			! Dataset locator
+      INTEGER			IARG(2)			! Method inputs
+      INTEGER			OARG			! Method output
+
+      LOGICAL			TEMPOK			! Temp string created?
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Get locator and use HDS version
-      CALL ADI1_GETLOC( IFID, ILOC, STATUS )
-      CALL HIST_ADD( ILOC, NAME, STATUS )
+*  Check initialised
+      IF ( .NOT. HSI_INIT ) CALL HSI0_INIT( STATUS )
+
+*  Store first argument
+      IARG(1) = IFID
+
+*  Temporary string for command name
+      CALL ADI_NEWV0C( NAME, IARG(2), STATUS )
+      TEMPOK = (STATUS.EQ.SAI__OK)
+
+*  Invoke the method
+      CALL ADI_EXEC( 'AddHistory', 2, IARG, OARG, STATUS )
+
+*  Scrub temporary string
+      IF ( TEMPOK ) THEN
+
+*    New error context in case addition of history failed
+        CALL ERR_BEGIN( STATUS )
+
+*    Scrub the string
+        CALL ADI_ERASE( IARG(2), STATUS )
+
+*    Restore context
+        CALL ERR_END( STATUS )
+
+      END IF
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'HSI_ADD', STATUS )

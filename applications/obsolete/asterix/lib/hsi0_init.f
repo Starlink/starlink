@@ -93,6 +93,7 @@
       INTEGER 			STATUS             	! Global status
 
 *  External References:
+      EXTERNAL			HSI1_ADD
       EXTERNAL			HSI1_COPY
       EXTERNAL			HSI1_NEW
 
@@ -117,6 +118,8 @@
      :                   DID, STATUS )
 
 *    Creators of new history
+        CALL ADI_DEFMTH( 'AddHistory(HDSfile,CHAR)', HSI1_ADD,
+     :                   DID, STATUS )
         CALL ADI_DEFMTH( 'NewHistory(HDSfile)', HSI1_NEW,
      :                   DID, STATUS )
 
