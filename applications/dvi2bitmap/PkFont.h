@@ -229,11 +229,13 @@ class PkFont {
      * @param mode a Metafont mode
      */
     static void setMissingFontMode(string mode) { missingFontMode_ = mode; }
-    /**
-     * Enable or disable font generation.
-     * @param doit if true, font generation is enabled
-     */
-    static void setMakeFonts(bool doit) { makeMissingFonts_ = doit; }
+    // Ought I to rationalise setMakeFonts, so that this looks more
+    // like the interface of setFontSearchCommand()?  Not really,
+    // since it's possible in principle that there could be more than
+    // just this command-based way of making fonts.
+    static void setFontgen(bool doit);
+    static void setFontgenCommand(string command_template);
+    string fontgenCommand() const;
     /**
      * Identifies the current font
      * @return the font's name
@@ -244,7 +246,6 @@ class PkFont {
      * @return theh path to the PK file which defines this font
      */
     string fontFilename() const { return path_; }
-    string fontgenCommand() const;
     double magnification() const;
     /**
      * Obtains the base font resolution, in dots-per-inch.  This is
@@ -384,7 +385,8 @@ class PkFont {
     				// postamble
     static verbosities verbosity_;
     static string fontSearchPath_;	// colon-separated list of directories
-    static string fontSearchCommand_; // command to find fonts
+    static string fontSearchCommandTemplate_; // command to find fonts
+    static string fontgenCommandTemplate_; // command to generate fonts
     static void setFontSearchStrategy_(unsigned int, bool);
     static unsigned int fontSearchStrategies_; // ways to find fonts: flags:
     static const unsigned int fontSearchStrategyPath_ = 1;
