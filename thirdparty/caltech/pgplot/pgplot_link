@@ -17,6 +17,10 @@
 #     arguments for the compiler (or ld) command. The arguments
 #     generated are written to the standard output.
 
+#     Note that this really does link against the standard native
+#     PGPLOT library with no starlink-isms.
+#     Use pgplot_link_adam for native pgplot with starlink drivers.
+
 #  Invocation:
 #     The script is normally invoked as part of a compiler command line,
 #     such as:
@@ -30,6 +34,7 @@
 #     RFWS: R.F. Warren-Smith (STARLINK, RAL)
 #     BLY:  M.J. Bly (Starlink, RAL)
 #     BKM:  B.K. McIlwrath (Starlink, RAL)
+#     TIMJ: Tim Jenness (JAC, Hawaii)
 #     {enter_new_authors_here}
 
 #  History:
@@ -43,6 +48,8 @@
 #        Version for Native PGPLOT.
 #     28-SEP-1999 (BKM):
 #        Version for GWM window enabled native PGPLOT.
+#     01-JUL-2004 (TIMJ):
+#        Revert to no Starlink libraries
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -50,7 +57,7 @@
 
 #-
 
-      echo -lpgplot -lpng -lz `gwm_link` \
+      echo -lpgplot -lpng -lz `starx_link` \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}
                   END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
