@@ -109,7 +109,6 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'FIO_PAR'          ! Fortran-I/O-system constants
       INCLUDE 'FIO_ERR'          ! Fortran-I/O-system errors
       INCLUDE 'CHR_ERR'          ! CHR error codes
 

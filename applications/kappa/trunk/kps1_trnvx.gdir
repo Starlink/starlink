@@ -89,7 +89,6 @@
 
 *  Global Constants:
       INCLUDE  'SAE_PAR'          ! SSE global definitions
-      INCLUDE  'PRM_PAR'          ! Magic-value definitions
 
 *  Arguments Given:
       INTEGER
