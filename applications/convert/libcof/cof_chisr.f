@@ -131,6 +131,10 @@
       MAKHIS = .TRUE.
       NEXREC = 0
 
+*  Initialise the FITSIO status.  It's not the same as the Starlink
+*  status, which is reset by the fixed part.
+      FSTAT = FITSOK
+
 *  Start the search from the first card.
       KINDEX = 1
 
