@@ -48,7 +48,11 @@ See the C<extract()> method's documentation for further information.
 
 use Carp;
 use strict;
+
 use File::Spec;
+use File::Temp;
+use Class::Struct;
+
 use Starlink::ADAM;
 use Starlink::AMS::Init;
 use Starlink::AMS::Task;
@@ -500,8 +504,12 @@ temp_dir method) and the filename "config<n>.sex", where
 
 sub _config_file_name {
   my $self = shift;
-  print "config file is " . File::Spec->catdir( $self->temp_dir, "config$$.sex" ) . "\n" if $DEBUG;
-  return File::Spec->catdir( $self->temp_dir, "config$$.sex" );
+  if( ! defined( $self->{_CONFIG_FILE_NAME} ) ) {
+    my $tmp = new File::Temp( UNLINK => 0 );
+    $self->{_CONFIG_FILE_NAME} = "$tmp";
+  }
+  print "config file is " . $self->{_CONFIG_FILE_NAME} . "\n" if $DEBUG;
+  return $self->{_CONFIG_FILE_NAME};
 }
 
 =item B<_param_file_name>
@@ -519,8 +527,12 @@ temp_dir method) and the filename "extract<n>.param", where
 
 sub _param_file_name {
   my $self = shift;
-  print "param file is " . File::Spec->catdir( $self->temp_dir, "extract$$.param" ) . "\n" if $DEBUG;
-  return File::Spec->catdir( $self->temp_dir, "extract$$.param" );
+  if( ! defined( $self->{_PARAM_FILE_NAME} ) ) {
+    my $tmp = new File::Temp( UNLINK => 0 );
+    $self->{_PARAM_FILE_NAME} = "$tmp";
+  }
+  print "param file is " . $self->{_PARAM_FILE_NAME} . "\n" if $DEBUG;
+  return $self->{_PARAM_FILE_NAME};
 }
 
 =item B<_catalog_file_name>
@@ -538,8 +550,12 @@ temp_dir method) and the filename "extract<n>.cat", where
 
 sub _catalog_file_name {
   my $self = shift;
-  print "catalog file is " . File::Spec->catdir( $self->temp_dir, "extract$$.cat" ) . "\n" if $DEBUG;
-  return File::Spec->catdir( $self->temp_dir, "extract$$.cat" );
+  if( ! defined( $self->{_CATALOG_FILE_NAME} ) ) {
+    my $tmp = new File::Temp( UNLINK => 0 );
+    $self->{_CATALOG_FILE_NAME} = "$tmp";
+  }
+  print "catalog file is " . $self->{_CATALOG_FILE_NAME} . "\n" if $DEBUG;
+  return $self->{_CATALOG_FILE_NAME};
 }
 
 =item B<CreateAccessors>
@@ -839,6 +855,8 @@ Brad Cavanagh E<lt>b.cavanagh@jach.hawaii.eduE<gt>
 
 Copyright (C) 2004-2005 Particle Physics and Astronomy Research
 Council.  All Rights Reserved.
+
+
 
 =cut
 
