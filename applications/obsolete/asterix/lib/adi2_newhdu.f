@@ -134,7 +134,7 @@
 
 *  Write property name so that ADI can do number -> HDU name mapping
       CALL CHR_ITOC( NHDU, STR, NDIG )
-      CALL ADI_CPUT0C( FID, '.HDU_'//STR(:NDIG), CNAME, STATUS )
+      CALL ADI_CPUT0C( FID, '.HDU_'//STR(:NDIG), LHDU(:HLEN), STATUS )
 
 *  Write true name
       CALL ADI_CPUT0C( HID, 'Name', HDUNAME, STATUS )

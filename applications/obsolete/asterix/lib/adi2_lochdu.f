@@ -235,10 +235,12 @@
 *  Initialise
       IF ( CANCRE ) CREATED = .FALSE.
 
+*  Locate HDU container
+      CALL ADI_FIND( FID, 'Hdus', HCID, STATUS )
+
 *  Locate the approriate place depending on the HDU value. Blank means
 *  primary HDU
       IF ( HDU(1:1) .EQ. ' ' ) THEN
-        CALL ADI_FIND( FID, 'PRIMARY', ID, STATUS )
         LHDU = 'PRIMARY'
         HLEN = 7
 
@@ -256,13 +258,10 @@
 
       END IF
 
-*  Locate HDU container
-      CALL ADI_FIND( FID, 'Hdus', HCID, STATUS )
-
 *  Has HDU been created yet?
       CALL ADI_THERE( HCID, LHDU(:HLEN), THERE, STATUS )
       IF ( CANCRE .AND. .NOT. THERE ) THEN
-        CALL ADI2_NEWHDU( FID, LHDU(:HLEN), HDU, STATUS )
+        CALL ADI2_NEWHDU( FID, HDU, STATUS )
         CREATED = .TRUE.
       END IF
       CALL ADI_FIND( HCID, LHDU(:HLEN), ID, STATUS )
