@@ -73,6 +73,9 @@
 *  History :
 *     $Id$
 *     $Log$
+*     Revision 1.13  1997/05/27 22:19:55  timj
+*     Use %LOC instead of LOC - for Alpha compiler
+*
 *     Revision 1.12  1997/05/22 03:27:03  timj
 *     Fix problem with setting status to bad early on.
 *     Now allows remote access (DATADIR) of input files.
@@ -643,8 +646,8 @@ c
             NPTS = N_MEASUREMENTS
             LABEL = 'Jsky'
             BADPIX = .TRUE.
-            DREF = LOC(JSKY)
-            AREF = LOC(AIRMASS)
+            DREF = %LOC(JSKY)
+            AREF = %LOC(AIRMASS)
 
          ELSE
 *     Model parameters and create
@@ -652,8 +655,8 @@ c
             NPTS = N_MODEL
             LABEL = 'Jsky (Model)'
             BADPIX = .FALSE.
-            DREF = LOC(J_THEORETICAL)   ! Reference to data
-            AREF = LOC(AIR_MODEL)       ! Reference to axis
+            DREF = %LOC(J_THEORETICAL)   ! Reference to data
+            AREF = %LOC(AIR_MODEL)       ! Reference to axis
 
             AIRSTEP = (AIRMASS(N_MEASUREMENTS) - AIRMASS(1)) /
      :           (N_MODEL - 1)
