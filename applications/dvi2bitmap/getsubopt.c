@@ -21,6 +21,18 @@
 #include <stdlib.h>
 #include <string.h>
 
+/* This function doesn't exist on most systems (this replacement is
+   lifted from the libc sources. */
+#if !defined HAVE___STRCHRNUL && !defined _LIBC
+static char * __strchrnul (const char *s, int c);
+static char * __strchrnul (const char *s, int c)
+{
+  char *result = strchr (s, c);
+  if (result == NULL)
+    result = strchr (s, '\0');
+  return result;
+}
+# endif
 
 /* Parse comma separated suboption from *OPTIONP and match against
    strings in TOKENS.  If found return index and set *VALUEP to
