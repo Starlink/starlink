@@ -1,5 +1,5 @@
 # part of dvi2bitmap
-# Copyright 1999, 2000 Council for the Central Laboratories of the Research Councils.
+# Copyright 1999, 2000, 2001 Council for the Central Laboratory of the Research Councils.
 # See file LICENCE for conditions.
 #
 # $Id$
@@ -19,7 +19,7 @@ GIF_OBJ=@GIFOBJ@
 
 EXEC=dvi2bitmap
 OBJS=dvi2bitmap.o DviFile.o InputByteStream.o PkFont.o Bitmap.o \
-	BitmapImage.o XBMBitmap.o PageRange.o \
+	BitmapImage.o XBMBitmap.o XPMBitmap.o PageRange.o \
 	$(KPATHSEA_OBJ) $(PNG_OBJ) $(GIF_OBJ)
 
 # Add a suffix rule for stupid makes (hello, Tru64...)
@@ -32,7 +32,7 @@ $(EXEC): $(OBJS)
 
 # for i in *.cc;do echo `echo $i|sed 's/\.cc/.o/'`: $i `sed -n '/^#include/s/^[^\"]*\"\(.*\)\".*/\1/p' $i`;done
 Bitmap.o: Bitmap.cc dvi2bitmap.h config.h Bitmap.h BitmapImage.h
-BitmapImage.o: BitmapImage.cc config.h BitmapImage.h PNGBitmap.h GIFBitmap.h XBMBitmap.h
+BitmapImage.o: BitmapImage.cc config.h BitmapImage.h PNGBitmap.h GIFBitmap.h XBMBitmap.h XPMBitmap.h
 DviFile.o: DviFile.cc DviFile.h PkFont.h InputByteStream.h
 GIFBitmap.o: GIFBitmap.cc config.h Bitmap.h GIFBitmap.h
 InputByteStream.o: InputByteStream.cc config.h dvi2bitmap.h InputByteStream.h
@@ -41,6 +41,7 @@ PNGBitmap.o: PNGBitmap.cc config.h Bitmap.h PNGBitmap.h
 PageRange.o: PageRange.cc config.h PageRange.h
 PkFont.o: PkFont.cc config.h dvi2bitmap.h kpathsea.h InputByteStream.h PkFont.h
 XBMBitmap.o: XBMBitmap.cc config.h Bitmap.h XBMBitmap.h
+XPMBitmap.o: XPMBitmap.cc config.h Bitmap.h XPMBitmap.h
 dvi2bitmap.o: dvi2bitmap.cc config.h dvi2bitmap.h DviFile.h PkFont.h Bitmap.h BitmapImage.h verbosity.h PageRange.h version.h kpathsea.h
 kpathsea.o: kpathsea.cc config.h kpathsea.h
 
@@ -54,6 +55,7 @@ PNGBitmap.h: dvi2bitmap.h BitmapImage.h
 PageRange.h: verbosity.h
 PkFont.h: InputByteStream.h dvi2bitmap.h verbosity.h
 XBMBitmap.h: dvi2bitmap.h BitmapImage.h
+XPMBitmap.h: dvi2bitmap.h BitmapImage.h
 kpathsea.h: verbosity.h
 
 # Distribution

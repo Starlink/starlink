@@ -1,5 +1,5 @@
 // Part of dvi2bitmap.
-// Copyright 1999, 2000 Council for the Central Laboratory of the Research Councils.
+// Copyright 1999, 2000, 2001 Council for the Central Laboratory of the Research Councils.
 // See file LICENCE for conditions.
 //
 // $Id$
@@ -40,10 +40,10 @@ class BitmapImage {
 	(const string format, const int w, const int h, const int bpp=1);
     static bool supportedBitmapImage (const string format);
     // Return default bitmap format
-    static const char* defaultBitmapImageFormat();
-    // After a call to defaultBitmapImageFormat, successive calls to
-    // otherBitmapImageFormat return further allowable formats.
-    static const char* otherBitmapImageFormat();
+    static const char* firstBitmapImageFormat();
+    // After a call to firstBitmapImageFormat, successive calls to
+    // nextBitmapImageFormat return further allowable formats.
+    static const char* nextBitmapImageFormat();
     static void verbosity (const verbosities level) { verbosity_ = level; }
 
  protected:

@@ -1,5 +1,5 @@
 // Part of dvi2bitmap.
-// Copyright 1999, 2000 Council for the Central Laboratory of the Research Councils.
+// Copyright 1999, 2000, 2001 Council for the Central Laboratory of the Research Councils.
 // See file LICENCE for conditions.
 //
 // $Id$
@@ -499,7 +499,7 @@ void Bitmap::write (const string filename, const string format)
     BitmapImage *bi = BitmapImage::newBitmapImage(format, hsize, vsize, bpp_);
     if (bi == 0)		// invalid format
     {
-	const string& deffmt = BitmapImage::defaultBitmapImageFormat();
+	const string& deffmt = BitmapImage::firstBitmapImageFormat();
 	if (verbosity_ >= normal)
 	    cerr << "Bitmap: can't create image with format "
 		 << format

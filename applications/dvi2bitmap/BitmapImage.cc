@@ -1,5 +1,5 @@
 // Part of dvi2bitmap.
-// Copyright 1999, 2000 Council for the Central Laboratory of the Research Councils.
+// Copyright 1999, 2000, 2001 Council for the Central Laboratory of the Research Councils.
 // See file LICENCE for conditions.
 //
 // $Id$
@@ -23,6 +23,7 @@
 #include "GIFBitmap.h"
 #endif
 #include "XBMBitmap.h"
+#include "XPMBitmap.h"
 
 // Define and initialise static strings.  
 // FIXME: This is a very untidy mechanism!  
@@ -40,6 +41,7 @@ const char *BitmapImage::formats[] = {
     "gif",
 #endif
     "xbm",
+    "xpm",
 };
 const int BitmapImage::nformats = sizeof(formats)/sizeof(formats[0]);
 int BitmapImage::iterator_index = 0;
@@ -71,7 +73,9 @@ BitmapImage::~BitmapImage ()
 BitmapImage *BitmapImage::newBitmapImage
 	(const string format, const int w, const int h, const int bpp)
 {
-    // format may be zero length: pick default
+    if (! supportedBitmapImage (format))
+	return 0;
+
 #if ENABLE_PNG
     if (format == "png")
 	return new PNGBitmap (w, h, bpp);
@@ -85,36 +89,36 @@ BitmapImage *BitmapImage::newBitmapImage
     if (format == "xbm")
 	return new XBMBitmap (w, h);
 
-    return 0;
+    if (format == "xpm")
+	return new XPMBitmap (w, h);
+
+    // Ooops -- if we get here, then there's a disagreement between this
+    // routine and supportedBitmapImage about what formats are supported.
+    // Apologise abjectly.
+    string apology = 
+	"BitmapImage: I claim to support format " + format +
+	", but appear not to do so in practice (oops -- this shouldn't happen!)";
+    throw BitmapError (apology);
 }
 
 // Return true if newBitmapImage would succeed -- ie, if the format is
 // a valid one.
 bool BitmapImage::supportedBitmapImage (const string format)
 {
-#if ENABLE_PNG
-    if (format == "png")
-	return true;
-#endif
-
-#if ENABLE_GIF
-    if (format == "gif")
-	return true;
-#endif
-
-    if (format == "xbm")
-	return true;
+    for (int i=0; i<nformats; i++)
+	if (format == formats[i])
+	    return true;
 
     return false;
 }
 
-const char *BitmapImage::defaultBitmapImageFormat()
+const char *BitmapImage::firstBitmapImageFormat()
 {
     iterator_index = 0;
     return formats[0];
 }
 
-const char *BitmapImage::otherBitmapImageFormat()
+const char *BitmapImage::nextBitmapImageFormat()
 {
     iterator_index++;
     if (iterator_index >= nformats)

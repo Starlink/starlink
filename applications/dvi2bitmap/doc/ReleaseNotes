@@ -16,6 +16,13 @@ consistency, option <code/-Qt> no longer automatically exits.
 </ul>
 -->
 
+<subsect id=rn-0.9-7 export>Release 0.9-7
+
+<p>Yamabe Kazuharu (<code/tako_da@qc4.so-net.ne.jp>) supplied a writer 
+for XPM bitmaps.  This is built-in, not using the XPM library (see the 
+<webref url='http://www-sop.inria.fr/koala/lehors/xpm.html' >XPM home
+page</webref>), so may not support all the XPM functionality.
+
 <subsect id=rn-0.9-6 export>Release 0.9-6
 
 <p>Fixed a character-handling bug.  Oleg Bartunov (<code/oleg@sai.msu.su>)

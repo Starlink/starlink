@@ -11,7 +11,7 @@ dvi2bitmap
     [\-l num] [\-p num] [\-pp ranges] [\-o outfile-pattern]
     [\-P[bBtTcC]] [\-q[q]] [\-Q[FfGgtbp]]
     [\-r resolution] [\-R[fb] int,int,int] [\-s scale-factor]
-    [\-t xbm|gif|png] [\-V]
+    [\-t xbm|gif|png|xpm] [\-V]
     dvi-file
 .SH DESCRIPTION
 dvi2bitmap processes a DVI file produced by the TeX typesetting
@@ -19,7 +19,7 @@ system, converting each page to a single bitmap.
 .PP
 This man-page documents dvi2bitmap version
 .\" %%VERSION%%
-.I "0.9-6"
+.I "0.9-7"
 .PP
 This program is intended to conform to the DVI processing standard.
 .PP
@@ -398,11 +398,13 @@ Choose the output format, which can be
 .I "png"
 ,
 .I "gif"
+,
+.I "xpm"
 or
 .I "xbm"
 . The program generates XBM bitmaps by 
-default.  The GIF and PNG options may not be available if they weren't
-selected when the program was configured.
+default, and has simple support for XPM.  The GIF and PNG options may
+not be available if they weren't selected when the program was configured.
 .TP
 .I "\-V"
 Display the version number and compilation options, and exit.
@@ -470,7 +472,7 @@ bounding box.
 .TP
 .I "default imageformat <format>"
 Set the default image format, which should be one of the keywords
-`xbm', `gif', `png'.  This is equivalent to specifying the image
+`xbm', `xpm', `gif', `png'.  This is equivalent to specifying the image
 format through the 
 .I -t
 option.

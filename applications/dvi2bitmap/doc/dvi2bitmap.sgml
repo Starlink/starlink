@@ -90,6 +90,9 @@ documentation tidyups.
 Took opportunity of a bug-fix release of the software to make
 miscellaneous minor edits to the documentation.
 
+<distribution string="0.9-7" date='05-Feb-2001' author='ng' versionid='v0-9-7'>
+The program now generates XPM bitmaps, too, and I noted this where appropriate.
+
 </history>
 
 <copyright>
@@ -102,7 +105,7 @@ Research Councils.
 converting each page to a single bitmap.  The conversion is done
 directly, rather than through a chain of intermediate file formats,
 making the process extremely fast.  It can produce output as
-XBM, GIF and PNG files.
+XBM, XPM, GIF and PNG files.
 </abstract>
 
 <sect id=intro export>Introduction
@@ -117,7 +120,7 @@ and SGML/HTML, see <ref id=sgml.maths/>.
 
 <p>The tool dvi2bitmap does this processing in a single step, reading
 the DVI file and font files, and emitting a bitmap.  It can, at
-present, generate XBM, GIF and, if the relevant library is installed,
+present, generate XBM, XPM, GIF and, if the relevant library is installed,
 PNG files.
 
 <p>See <ref id=usage/> for usage instructions, and <ref id=install/> for
@@ -146,7 +149,7 @@ dvi2bitmap
         [-g[dpribmg]] [-l num] [-m magmag ] [-n[n]] [-o outfile-pattern]
         [-p num] [-pp ranges] [-P[bBtTcC]] [-q[q]] [-Q[FfGgtbp]]
         [-r resolution] [-R[fb] int,int,int] [-s scale-factor]
-        [-t xbm|gif|png] [-V]
+        [-t xbm|gif|png|xpm] [-V]
     dvi-file
 </verbatim>
 
@@ -434,9 +437,10 @@ be specified in decimal, octal or hex (ie, <code/127=0177=0x7f>).
 <code/scalefactor> (default 1).
 
 <dt><code/-t type>
-<dd>Choose the output format, which can be <code/png>, <code/xbm> or
-<code/gif>.  The GIF and PNG options may not be available if they
-weren't selected when the program was configured.
+<dd>Choose the output format, which can be <code/png>, <code/xbm>,
+<code/xpm> or <code/gif>.  The GIF and PNG options may not be
+available if they weren't selected when the program was configured.
+The XPM support is only partial -- it doesn't use the XPM library.
 
 <dt><code/-V>
 <dd>Display the version number and compilation options, and exit.
@@ -500,7 +504,7 @@ bounding box.
 
 <dt><code/default imageformat &lt;format&gt;>
 <dd>Set the default image format, which should be one of the keywords
-`xbm', `gif', `png'.  This is equivalent to specifying the image
+`xbm', `xpm' `gif', `png'.  This is equivalent to specifying the image
 format through the <code/-t> option (section <ref id=usage.options/>).
 <p>The keyword is just <code/imageformat>, but you must specify the
 <code/default> keyword when you
@@ -1057,7 +1061,7 @@ successfully on (at least):
 <thead>
 <row><entry>Platform<entry>Version<entry>Compiler
 <tbody>
-<row><entry>i686-pc-linux-gnu (RedHat 6.2)<entry>0.9-6<entry>egcs-2.91.66
+<row><entry>i686-pc-linux-gnu (RedHat 6.2)<entry>0.9-7<entry>egcs-2.91.66
 <row><entry>powerpc-unknown-linux-gnu (Mac mklinux DR-0.3?)<entry>0.9<entry>egcs-2.90.25 980302 (egcs-1.0.2 prerelease)
 <row><entry>sparc-sun-solaris2.7<entry>0.9<entry>egcs-2.91.66
 <row><entry>sparc-sun-solaris2.7<entry>0.9<entry>gcc 2.8.1
@@ -1210,7 +1214,11 @@ let me know.
 
 <p>Thanks for bug reports and other suggestions to <webref
 url="http://www.cis.ohio-state.edu/~gurari/" >Eitan Gurari</webref>
-(heroic tester), Oliver Schurr and Oleg Bartunov (<code/oleg@sai.msu.su>).
+(heroic tester), Oliver Schurr and Oleg Bartunov
+(<code/oleg@sai.msu.su>).
+
+<p>Yamabe Kazuharu (<code/tako_da@qc4.so-net.ne.jp>) supplied the writer 
+for XPM bitmaps.
 
 
 <appendices>

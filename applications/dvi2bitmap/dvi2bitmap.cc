@@ -1,5 +1,5 @@
 // Part of dvi2bitmap.
-// Copyright 1999, 2000 Council for the Central Laboratory of the Research Councils.
+// Copyright 1999, 2000, 2001 Council for the Central Laboratory of the Research Councils.
 // See file LICENCE for conditions.
 
 static const char RCSID[] =
@@ -399,13 +399,13 @@ int main (int argc, char **argv)
 			{
 			    cout << "Qt ";
 			    const char *ft
-				= BitmapImage::defaultBitmapImageFormat();
+				= BitmapImage::firstBitmapImageFormat();
 			    cout << ft;
-			    ft = BitmapImage::otherBitmapImageFormat();
+			    ft = BitmapImage::nextBitmapImageFormat();
 			    while (ft != 0)
 			    {
 				cout << ' ' << ft;
-				ft = BitmapImage::otherBitmapImageFormat();
+				ft = BitmapImage::nextBitmapImageFormat();
 			    }
 			    cout << '\n';
 			    // FIXME: remove the following line at the
@@ -469,7 +469,7 @@ int main (int argc, char **argv)
 		if (! BitmapImage::supportedBitmapImage (bm.ofile_type))
 		{
 		    bm.ofile_type
-			= BitmapImage::defaultBitmapImageFormat();
+			= BitmapImage::firstBitmapImageFormat();
 		    cerr << "Unsupported image type "
 			 << *argv
 			 << ": using "
@@ -791,7 +791,7 @@ void process_dvi_file (DviFile *dvif, bitmap_info& b, int fileResolution,
 			if (b.ofile_type.length() == 0)
 			{
 			    b.ofile_type 
-				= BitmapImage::defaultBitmapImageFormat();
+				= BitmapImage::firstBitmapImageFormat();
 			    /*
 			    cerr << "Warning: unspecified image format.  Selecting default ("
 				 << b.ofile_type << ")\n";
@@ -1007,7 +1007,15 @@ bool process_special (DviFile *dvif, string specialString,
 		    stringOK = false;
 		else
 		{
-		    b.ofile_type = *s;
+		    if (BitmapImage::supportedBitmapImage (*s))
+			b.ofile_type = *s;
+		    else
+		    {
+			b.ofile_type = BitmapImage::firstBitmapImageFormat();
+			cerr << "Warning: imageformat " << *s
+			     << " not supported.  Using " << b.ofile_type
+			     << " instead.\n";
+		    }
 		    if (!setDefault && verbosity > quiet)
 			cerr << "Warning: imageformat special should be prefixed with `default'\n";
 		}
