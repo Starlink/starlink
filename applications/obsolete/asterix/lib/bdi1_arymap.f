@@ -235,6 +235,9 @@
 *      Data is dynamic
           ISDYN = .TRUE.
 
+*      Clone a copy of the locator for mapping
+          CALL DAT_CLONE( LOC, SLOC, STATUS )
+
         ELSE
           STATUS = SAI__ERROR
           CALL MSG_SETC( 'V', VARNT )
