@@ -17,25 +17,32 @@ echmono_TASKS = \
     ech_tuner echmenu ech_wvcsis ech_fitord \
     ech_mulmrg
 echmono_SOURCES = echmono.f
+echmono_DEPENDENCIES = libechomop.la
+## We must specify _DEPENDENCIES explicitly, else automake tries to parse the
+## following line (and gets confused)
 echmono_LDADD = libechomop.la \
-	 `pda_link_adam` `pgp_link` `sla_link_adam` `one_link_adam` \
-	 `hlp_link` `fio_link_adam` `ndf_link_adam` \
-	 `kaplibs_link_adam` `ast_link`
+	 `$(srcdir)/ech_coalesce_link_flags \
+	 pda_link_adam pgp_link_adam sla_link_adam one_link_adam \
+	 hlp_link fio_link_adam ndf_link_adam \
+	 kaplibs_link_adam ast_link`
 
 bin_PROGRAMS = echhelp
 
-## This was pgplot_link -- better as pgp_link?
 ech_ftrdb_SOURCES = ech_ftrdb.f
+ech_ftrdb_DEPENDENCIES = libechomop.la
 ech_ftrdb_LDADD = libechomop.la \
-	  `hlp_link` `pgp_link` `sla_link_adam` `pda_link` `one_link_adam` \
-	  `psx_link_adam` `fio_link_adam` `ndf_link_adam` \
-	  `kaplibs_link_adam` `ast_link`
+	`$(srcdir)/ech_coalesce_link_flags \
+	hlp_link pgp_link_adam sla_link_adam pda_link one_link_adam \
+	psx_link_adam fio_link_adam ndf_link_adam \
+	kaplibs_link_adam ast_link`
 
 ech_scrn2d_SOURCES = ech_scrn2d.f
+ech_scrn2d_DEPENDENCIES = libechomop.la
 ech_scrn2d_LDADD = libechomop.la \
-	  `hlp_link` `pgp_link` `sla_link_adam` `pda_link` `one_link_adam` \
-	  `psx_link_adam` `fio_link_adam` `ndf_link_adam` \
-	  `kaplibs_link_adam` `ast_link`
+	`$(srcdir)/ech_coalesce_link_flags \
+	hlp_link pgp_link_adam sla_link_adam pda_link one_link_adam \
+	psx_link_adam fio_link_adam ndf_link_adam \
+	kaplibs_link_adam ast_link`
 
 echhelp_SOURCES = helpm.c
 echhelp_LDADD = `shl_link` @FCLIBS@
