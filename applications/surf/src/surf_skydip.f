@@ -1,26 +1,54 @@
-*+  REDS_SKYDIP - calculate sky properties from SCUBA skydip data
       SUBROUTINE REDS_SKYDIP (STATUS)
-*    Description:
+*+
+*  Name:
+*     SKYDIP
+
+*  Purpose:
+*     calculate sky properties from SCUBA skydip data
+ 
+*  Language:
+*     Starlink Fortran 77
+ 
+*  Type of Module:
+*     ADAM A-task
+ 
+*  Invocation:
+*     CALL REDS_SKYDIP( STATUS )
+ 
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status
+ 
+*  Description :
+
 *     This application takes raw SKYDIP data and calculates tau, eta_tel
 *     and B by fitting. Sky temperatures are taken at different airmasses.
-*     The paramteres used are:-
-*
-*     IN              - The name of the raw skydip data file
-*     SUB_INSTRUMENT  - The name of the sub-instrument whose data are to be
-*                       selected from the input file and fitted. Permitted 
-*                       values are SHORT, LONG, P1100, P1300 and P2000
-*     T_COLD          - Temperature of cold load
-*     T_AMB           - Air Temperature  - read from FITS
-*     T_TEL           - Temperature of telescope - read from FITS
-*     T_HOT           - temperature of hot load  - read from FITS
-*     ETA_TEL         - Telescope efficiency
-*     B_FIT           - The B parameter (filter transmission)
-*     OUT             - The name of the file to contain the fitted data
-*
-*     If ETA_TEL or B_CONST are negative they will be treated as free
-*     parameters. If they are between 0 and 1 they will be treated as 
-*     constants.
-*
+
+*  ADAM Parameters:
+*     IN = NDF (Read)
+*        The name of the raw skydip data file
+*     B_FIT = _REAL (Read)
+*        The B parameter (filter transmission). This efficiency factor
+*        must be between 0 and 1. A negative value allows this parameter
+*        to be free.
+*     ETA_TEL = _REAL (Read)
+*        The telescope efficiency. Must be between 0 and 1.0. 
+*        A negative value allows this parameter to be free.
+*     MODEL_OUT = NDF (Write)
+*        The name of the output file that contains the fitted sky
+*        temperatures.
+*     OUT = NDF (Write)
+*        The name of the output file that contains the measured 
+*        sky temperatures.
+*     SUB_INSTRUMENT = _CHAR (Read)
+*        The name of the sub-instrument whose data are to be
+*        selected from the input file and fitted. Permitted 
+*        values are SHORT, LONG, P1100, P1300 and P2000
+*     T_COLD = _REAL (Read)
+*        Temperature of the cold load. The default value is the one
+*        taken from the input file.
+
+*  Algorithm:
 *     If status is good on entry, the routine reads in some general information
 *     about the run and checks the HISTORY record to make sure this is a SKYDIP
 *     observation. 
@@ -40,21 +68,25 @@
 *     model data are then written to NDFs for plotting in KAPPA-LINPLOT. (The
 *     model data is calculated with SCULIB_J_THEORETICAL.
 
-*    Invocation :
-*     CALL REDS_SKYDIP (STATUS)
-*    Parameters :
-*     STATUS           = INTEGER (Given and returned)
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
-*     T. Jenness (timj@jach.hawaii.edu)
-*    History :
+*  Implementation status:
+*     Data, Variance and Quality arrays are copied. 
+*     Bad pixels are recognised.
+*     Uses NAG routine for fit.
+
+*  Authors :
+*     TIMJ: T. Jenness (timj@jach.hawaii.edu)
+
+*  History :
 *     $Id$
 *     $Log$
-*     Revision 1.6  1996/08/28 03:07:57  timj
-*     Added BADBIT
+*     Revision 1.7  1996/12/12 21:05:28  timj
+*     Fix Starlink header.
+*     Replace COPYR with VEC
+*     Use PAR_CHOIC for SUB_INSTRUMENT.
 *
+c Revision 1.6  1996/08/28  03:07:57  timj
+c Added BADBIT
+c
 c Revision 1.5  1996/08/27  03:42:44  timj
 c Fix UBYTES for QUALITY
 c
@@ -71,11 +103,20 @@ c
 c Revision 1.1  1996/08/16  15:26:31  timj
 c Initial revision
 c
-*    endhistory
-*    Type Definitions :
+*     {enter_further_changes_here}
+ 
+*  Bugs:
+*     Aborted datasets have an incorrect Y-axis scale.
+*     {note_any_bugs_here}
+
+*-
+
+
+*  Type Definitions :
       IMPLICIT NONE
-*    Global constants :
-      INCLUDE 'SAE_PAR'
+
+*  Global constants :
+      INCLUDE 'SAE_PAR'                 ! SSE global definitions
       INCLUDE 'DAT_PAR'                 ! for DAT__SZLOC
       INCLUDE 'PRM_PAR'                 ! for VAL__xxxx
       INCLUDE 'REDS_SYS'                ! REDS constants
@@ -125,7 +166,9 @@ c
       CHARACTER*(DAT__SZLOC) FITS_LOC   ! HDS locator to FITS structure
       INTEGER I                         ! DO loop index
       INTEGER IARY1                     ! ARY array identifier
+      INTEGER IERR                      ! For VEC_
       CHARACTER*15 INST                 ! Selected instrument
+      INTEGER IPOSN                     ! posn in string
       INTEGER ITEMP                     ! scratch integer
       INTEGER IN_BOL_ADC (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
                                         ! A/D numbers of bolometers measured in
@@ -163,6 +206,7 @@ c
       REAL    MIN_EL                    ! Min elevation of skydip
       INTEGER MOD_NDF                   ! NDF identifier of output file
       INTEGER NDIM                      ! the number of dimensions in an array
+      INTEGER NERR                      ! For VEC_
       INTEGER NREC                      ! number of history records in file
       INTEGER N_BOLS                    ! number of bolometers measured
       INTEGER N_BOL_OUT                 ! number of bolometers measured in
@@ -194,6 +238,7 @@ c
       INTEGER SLICE_PTR                 ! Pointer to start of slice
       INTEGER SLICE_PTR_END             ! Pointer to end of slice
       CHARACTER*80 STEMP                ! scratch string
+      CHARACTER*40     SUBLIST          ! List of available sub instruments
       CHARACTER*15 SUB_FILTER (SCUBA__MAX_SUB)
                                         ! filters in front of sub-instruments
       CHARACTER*15 SUB_INSTRUMENT (SCUBA__MAX_SUB)
@@ -214,9 +259,7 @@ c
       REAL    WAVE                      ! Selectred wavelength
       CHARACTER*(DAT__SZLOC) XLOC       ! Locator to EXTENSIONS
 
-*    Internal References :
-*    Local data :
-*_
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 
@@ -325,24 +368,45 @@ c
 
 *  get the sub-instrument of interest and check it's OK
  
-      CALL PAR_DEF0C ('SUB_INSTRUMENT', SUB_INSTRUMENT(1), STATUS)
-      CALL PAR_GET0C ('SUB_INSTRUMENT', SUB_REQUIRED, STATUS)
-      CALL CHR_UCASE (SUB_REQUIRED)
+      IF (N_SUB .EQ. 1) THEN
  
-      SUB_POINTER = VAL__BADI
-      IF (N_SUB .GT. 0) THEN
-         DO I = 1, N_SUB
-            IF (SUB_REQUIRED .EQ. SUB_INSTRUMENT(I)) THEN
-               SUB_POINTER =I 
-            END IF
-         END DO
+*  If we only have one wavelength we dont need to ask
+ 
+         SUB_POINTER = 1
+         SUB_REQUIRED = SUB_INSTRUMENT(SUB_POINTER)
+      ELSE
+         SUB_POINTER = VAL__BADI
+ 
+*  Put all possible answers in a string
+ 
+         IF (N_SUB .GT. 0) THEN
+            SUBLIST = ''
+            IPOSN = 0
+            CALL CHR_APPND(SUB_INSTRUMENT(1), SUBLIST, IPOSN)
+            DO I = 2, N_SUB
+               CALL CHR_APPND(',',SUBLIST,IPOSN)
+               CALL CHR_APPND(SUB_INSTRUMENT(I), SUBLIST, IPOSN)
+            END DO
+ 
+*  Ask for the sub array
+ 
+            CALL PAR_CHOIC('SUB_INSTRUMENT', SUB_INSTRUMENT(1), SUBLIST,
+     :           .TRUE., SUB_REQUIRED, STATUS)
+            CALL CHR_UCASE (SUB_REQUIRED)
+ 
+            DO I = 1, N_SUB
+               IF (SUB_REQUIRED .EQ. SUB_INSTRUMENT(I)) THEN
+                  SUB_POINTER =I 
+               END IF
+            END DO
+         END IF
       END IF
- 
+         
       IF (STATUS .EQ. SAI__OK) THEN
          IF (SUB_POINTER .EQ. VAL__BADI) THEN
             STATUS = SAI__ERROR
             CALL MSG_SETC ('SUB', SUB_REQUIRED)
-            CALL ERR_REP (' ', 'REDS_SKYDIP: the file does not '//
+            CALL ERR_REP (' ', 'REDS_EXTINCTION: the file does not '//
      :        'contain data for sub-instrument ^SUB', STATUS)
          END IF
       END IF
@@ -717,14 +781,16 @@ c
       CALL NDF_MAP (OUT_NDF, 'DATA', '_REAL', 'WRITE',
      : OUT_DATA_PTR, ITEMP, STATUS)
 
-      CALL SCULIB_COPYR(UBND(1),JSKY, %VAL(OUT_DATA_PTR))
+      CALL VEC_RTOR(.FALSE., UBND(1),JSKY, %VAL(OUT_DATA_PTR),
+     :     IERR, NERR, STATUS)
 
 * Write VARIANCE
 
       CALL NDF_MAP (OUT_NDF, 'VARIANCE', '_REAL', 'WRITE',
      : OUT_VAR_PTR, ITEMP, STATUS)
 
-      CALL SCULIB_COPYR(UBND(1),JSKY_VAR, %VAL(OUT_VAR_PTR))
+      CALL VEC_RTOR(.FALSE., UBND(1),JSKY_VAR, %VAL(OUT_VAR_PTR),
+     :     IERR, NERR, STATUS)
 
 
 * Write QUALITY
@@ -733,7 +799,8 @@ c
      : OUT_QUAL_PTR, ITEMP, STATUS)
       CALL NDF_SBB(BADBIT, OUT_NDF, STATUS)
 
-      CALL SCULIB_COPYB(UBND(1),JSKY_QUAL, %VAL(OUT_QUAL_PTR))
+      CALL VEC_BTOB(.FALSE.,UBND(1),JSKY_QUAL, %VAL(OUT_QUAL_PTR),
+     :     IERR, NERR, STATUS)
 
 * Create the AXES
 
@@ -748,13 +815,15 @@ c
       CALL NDF_AMAP (OUT_NDF, 'Centre', 1, '_REAL', 'WRITE',
      :     OUT_AXIS_PTR, UBND(1), STATUS)
 
-      CALL SCULIB_COPYR(UBND(1), AIRMASS, %VAL(OUT_AXIS_PTR))
+      CALL VEC_RTOR(.FALSE., UBND(1), AIRMASS, %VAL(OUT_AXIS_PTR),
+     :     IERR, NERR, STATUS)
 
 * Write the AXIS variance (probably pretty inaccurate)
       CALL NDF_AMAP (OUT_NDF, 'Error', 1, '_REAL', 'WRITE',
      :     OUT_AXIS_PTR, UBND(1), STATUS)
 
-      CALL SCULIB_COPYR(UBND(1), AIRMASS_VAR, %VAL(OUT_AXIS_PTR))
+      CALL VEC_RTOR(.FALSE., UBND(1), AIRMASS_VAR, %VAL(OUT_AXIS_PTR),
+     :     IERR, NERR, STATUS)
 
 * If FIT worked...
 
@@ -818,7 +887,8 @@ c
       CALL NDF_MAP (MOD_NDF, 'DATA', '_REAL', 'WRITE',
      : OUT_DATA_PTR_M, ITEMP, STATUS)
 
-      CALL SCULIB_COPYR(UBND(1),J_THEORETICAL, %VAL(OUT_DATA_PTR_M))
+      CALL VEC_RTOR(.FALSE.,UBND(1),J_THEORETICAL, %VAL(OUT_DATA_PTR_M),
+     :     IERR, NERR, STATUS)
 
 * Set the BAD pixel flag
       CALL NDF_SBAD(.FALSE., MOD_NDF, 'Data', STATUS)
@@ -831,7 +901,8 @@ c
       CALL NDF_AMAP (MOD_NDF, 'Centre', 1, '_REAL', 'WRITE',
      :     OUT_AXIS_PTR_M, UBND(1), STATUS)
 
-      CALL SCULIB_COPYR(UBND(1), AIR_MODEL, %VAL(OUT_AXIS_PTR_M))
+      CALL VEC_RTOR(.FALSE., UBND(1), AIR_MODEL, %VAL(OUT_AXIS_PTR_M),
+     :     IERR, NERR, STATUS)
 
       ENDIF
 
