@@ -14,8 +14,6 @@
 
 *  Description:
 *     Copy all history records from the first dataset to the second.
-*     Although this routine is just using HDS at present, the interface
-*     will not change when it is FITS capable.
 
 *  Arguments:
 *     IFID = INTEGER (given)
@@ -57,17 +55,11 @@
 *  Implementation Deficiencies:
 *     {routine_deficiencies}...
 
-*  {machine}-specific features used:
-*     {routine_machine_specifics}...
-
-*  {DIY_prologue_heading}:
-*     {DIY_prologue_text}
-
 *  References:
 *     HSI Subroutine Guide : http://www.sr.bham.ac.uk:8080/asterix-docs/Programmer/Guides/hsi.html
 
 *  Keywords:
-*     package:hsi, usage:public
+*     package:hsi, usage:public, history, copying
 
 *  Copyright:
 *     Copyright (C) University of Birmingham, 1995
@@ -79,6 +71,8 @@
 *  History:
 *     12 Jan 1995 (DJA):
 *        Original version.
+*     14 Mar 1995 (DJA):
+*        Now works using ADI method.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -90,8 +84,12 @@
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
-      INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'SAE_PAR'          			! SAE constants
+
+*  Global Variables:
+      INCLUDE 'HSI_CMN'                 		! HSI common block
+*       HSI_INIT = LOGICAL (given)
+*         HSI class definitions loaded?
 
 *  Arguments Given:
       INTEGER			IFID			! Input dataset
@@ -101,17 +99,20 @@
       INTEGER 			STATUS             	! Global status
 
 *  Local Variables:
-      CHARACTER*(DAT__SZLOC)	ILOC			! Input locator
-      CHARACTER*(DAT__SZLOC)	OLOC			! Output locator
+      INTEGER			IARG(2)			! Method inputs
+      INTEGER			OARG			! Output from method
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Simply extract locators and invoke HDS version for the momemnt
-      CALL ADI1_GETLOC( IFID, ILOC, STATUS )
-      CALL ADI1_GETLOC( OFID, OLOC, STATUS )
-      CALL HIST_COPY( ILOC, OLOC, STATUS )
+*  Check initialised
+      IF ( .NOT. HSI_INIT ) CALL HSI0_INIT( STATUS )
+
+*  Invoke the CopyHistory method
+      IARG(1) = IFID
+      IARG(2) = OFID
+      CALL ADI_EXEC( 'CopyHistory', 2, ARGS, OARG, STATUS )
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'HSI_COPY', STATUS )
