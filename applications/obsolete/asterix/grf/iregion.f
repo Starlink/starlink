@@ -689,6 +689,7 @@
 
         CALL IMG_SETWHOLE(STATUS)
 
+        CALL ARX_RESET(I_ARD_ID,STATUS)
         CALL ARX_PUT(I_ARD_ID,0,'WHOLE',STATUS)
 
         IF (STATUS.NE.SAI__OK) THEN
@@ -862,7 +863,7 @@
 
 
 *+
-      SUBROUTINE IREGION_IMPORT(EXCLUDE,STATUS)
+      SUBROUTINE IREGION_IMPORT(STATUS)
 *    Description :
 *    Deficiencies :
 *    Bugs :
