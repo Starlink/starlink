@@ -3,6 +3,7 @@
 # general makefile
 #
 # E.BERTIN 12/07/1998
+# P.W.Draper 24/11/1998: Remove copy to home directory.
 #
 include Macrodefs.$(SEXMACHINE)
 DEST  = ${HOME}/bin
@@ -18,7 +19,6 @@ STDO  =
 
 sex: $(ALL)
 	$(CC) $(ALL) -o sex $(LIBS) $(COPTS)
-	$(CP) sex $(DEST)/sex
 
 clean:
 	$(RM) $(ALL) sex
