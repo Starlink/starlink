@@ -1432,6 +1432,7 @@ ccg1_wtm3r.o:	 SAE_PAR NUM_DEC_CVT NUM_DEF_CVT
 datapic.o:	 SAE_PAR
 gethlp.o:	 SAE_PAR HLPCMD
 gthlpi.o:	 SAE_PAR HLPCMD
+grf_polpack.o:   grf.h
 ndfac.o:	 SAE_PAR
 ndg1_expan.o:    SAE_PAR GRP_PAR DAT_PAR NDG_CONST NDG_ERR
 ndg1_hspec.o:    SAE_PAR GRP_PAR
