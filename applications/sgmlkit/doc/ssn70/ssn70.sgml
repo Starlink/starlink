@@ -145,6 +145,14 @@ have been clarified.
 versionid='v0-7-11'>
 <px>RCS Id: ssn70.sgml,v 1.59 2000/08/30 14:55:33 norman Exp 
 <px>Slight changes to explanations of maths elements.
+</distribution>
+
+<distribution string="DR-0.7-12" date="15-Mar-2001" author="ng"
+	versionid='v0-7-12'>
+<px>RCS $Id$</px>
+<px>Mentioned the various jadeflags.</px>
+</distribution>
+
 
 </history>
 
@@ -2763,7 +2771,86 @@ which can more conveniently be set using options, using the
 <code/cts-appx> (same, for appendices), and <code/onepass> (produce
 output which needs only a single pass through &latex;, which means
 that the table-of-contents ends up printed last, requiring trivial
-rearrangement).
+rearrangement).</p>
+
+<subsubsect>Jade flags</title>
+<update versionid="v0-7-12">
+<px>Added Jade flags section.  The information was present, before,
+but rather well hidden.</px></update>
+
+<p>There are a few flags which you can pass to the stylesheet via the
+<code>--jadeflags</code> option.  For example, to turn on the
+<code>show-element-ids</code> and <code>suppress-idindex</code>
+options, you would give the <code>sgml2docs</code> option
+<code>--jadeflags '-Vshow-element-ids -Vsuppress-idindex'</code>.
+These stylesheet options include the following.</p>
+
+<p>All-format parameterisation:
+<dl>
+<dt>show-element-ids</dt>
+<dd><p>Display exported IDs in the formatted document (can be useful when
+working with draft documents).</p></dd>
+
+<dt>suppress-manifest</dt>
+<dd>
+<p>Suppress the generation of a manifest file in the output tarball.
+This can <em>occasionally</em> be useful when something appears to be
+going wrong with the packaging, but it's intended for debugging rather 
+than production use.</p>
+</dd>
+</dl></p>
+
+<p>HTML parameterisation:
+<dl>
+
+<dt>nochunks</dt>
+<dd><p>Output the HTML as a single file, rather than a collection of
+smaller ones.</p></dd>
+
+<dt>stream-output</dt>
+<dd><p>Send the output to stdout, rather than a generated file name.</p></dd>
+
+<dt>suppress-navig</dt>
+<dd><p>Suppress the navigation panels at the top and bottom of each
+output file.</p></dd>
+
+<dt>separate-toc</dt>
+<dd><p>Put the table of contents in a separate file.</p></dd>
+
+<dt>suppress-banner</dt>
+<dd><p>Prevents the Starlink banner from being output.</p></dd>
+
+<dt>suppress-idindex</dt>
+<dd><p>Suppress the generation of the ID Index page.  Though this is
+useful, it can take a <em>long</em> time to generate.</p></dd>
+
+<dt>suppress-printable</dt>
+<dd><p>Suppress the legend `Retrieve hardcopy' on the front page.</p></dd>
+
+</dl>
+</p>
+
+<p>LaTeX mode parameterisations (these are more conveniently set via
+the <code>--options</code> argument described above):
+<dl>
+<dt>section-samepage</dt>
+<dd><p>Don't start a new page with each section.</p></dd>
+
+<dt>appendix-samepage</dt>
+<dd><p>Don't start a new page for the appendices.</p></dd>
+
+<dt>onepass-latex</dt>
+<dd><p>Generate LaTeX which does not need a second pass through the
+LaTeX processor -- the TOC appears at the end of the file, in this
+case, with page numbers which require the paper to be moved to the
+beginning of the stack.</p></dd>
+
+</dl>
+</p>
+
+<![ %Only.web [ 
+<p>See <ref id=appx.system.dssslcode/> for copious further details.
+]]>
 
 
 <subsect id=proc.sgml2hlp export>Generating HELP files
