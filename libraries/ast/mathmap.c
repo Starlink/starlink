@@ -1,6 +1,4 @@
 /* To do:
-      o Fully implement << and >> operators (efficiently!) and assign
-        them their correct evaluation priorities.
       o Look at implementing other bitwise operators.
       o Implement random number generators.
       o Add Seed attribute for above.
@@ -149,6 +147,9 @@ typedef enum {
    OP_AND,                       /* Boolean AND */
    OP_XOR,                       /* Boolean exclusive OR */
    OP_EQV,                       /* Fortran logical .EQV. operation */
+   OP_BITOR,                     /* Bit-wise OR */
+   OP_BITXOR,                    /* Bit-wise exclusive OR */
+   OP_BITAND,                    /* Bit-wise AND */
    OP_EQ,                        /* Relational equal */
    OP_NE,                        /* Not equal */
    OP_LT,                        /* Less than */
@@ -156,11 +157,15 @@ typedef enum {
    OP_GT,                        /* Greater than */
    OP_GE,                        /* Greater than or equal */
    OP_SHFTL,                     /* Shift bits left */
+   OP_SHFTR,                     /* Shift bits right */
    OP_ADD,                       /* Add */
    OP_SUB,                       /* Subtract */
    OP_MUL,                       /* Multiply */
    OP_DIV,                       /* Divide */
    OP_POW,                       /* Raise to power */
+   OP_POW2,                      /* Value times power of 2 (ldexp function) */
+   OP_FREXPON,                   /* Exponent of 2 for fraction below */
+   OP_FREXP,                     /* Normalised fraction (frexp function) */
    OP_MIN,                       /* Minimum of 2 or more values */
    OP_MAX,                       /* Maximum of 2 or more values */
    OP_DIM,                       /* Fortran DIM (positive difference) fn. */
@@ -192,26 +197,27 @@ typedef struct {
    symbols should not be abbreviations of later ones. The end of the
    array is indicated by an element with a NULL "text" component. */
 static const Symbol symbol[] = {
-   { ""            ,  0,  0,  0,  0,  0, 14, 14,  0,  1,  0,  OP_LDVAR    },
-   { ""            ,  0,  0,  0,  0,  0, 14, 14,  0,  1,  0,  OP_LDCON    },
-   { "<bad>"       ,  5,  0,  0,  0,  0, 14, 14,  0,  1,  0,  OP_LDBAD    },
-   { "<radix>"     ,  7,  0,  0,  0,  0, 14, 14,  0,  1,  0,  OP_LDRAD    },
-   { "<rounds>"    ,  8,  0,  0,  0,  0, 14, 14,  0,  1,  0,  OP_LDRND    },
-   { "<mant_dig>"  , 10,  0,  0,  0,  0, 14, 14,  0,  1,  0,  OP_LDMDIG   },
-   { "<dig>"       ,  5,  0,  0,  0,  0, 14, 14,  0,  1,  0,  OP_LDDIG    },
-   { "<min_exp>"   ,  9,  0,  0,  0,  0, 14, 14,  0,  1,  0,  OP_LDMINE   },
-   { "<min_10_exp>", 12,  0,  0,  0,  0, 14, 14,  0,  1,  0,  OP_LDMIN10E },
-   { "<max_exp>"   ,  9,  0,  0,  0,  0, 14, 14,  0,  1,  0,  OP_LDMAXE   },
-   { "<max_10_exp>", 12,  0,  0,  0,  0, 14, 14,  0,  1,  0,  OP_LDMAX10E },
-   { "<max>"       ,  5,  0,  0,  0,  0, 14, 14,  0,  1,  0,  OP_LDMAX    },
-   { "<epsilon>"   ,  9,  0,  0,  0,  0, 14, 14,  0,  1,  0,  OP_LDEPS    },
-   { "<min>"       ,  5,  0,  0,  0,  0, 14, 14,  0,  1,  0,  OP_LDMIN    },
-   { "<pi>"        ,  4,  0,  0,  0,  0, 14, 14,  0,  1,  0,  OP_LDPI     },
-   { "<e>"         ,  3,  0,  0,  0,  0, 14, 14,  0,  1,  0,  OP_LDE      },
-   { "(int)"       ,  5,  0,  1,  1,  0, 12, 11,  0,  0,  0,  OP_INT      },
-   { ")"           ,  1,  1,  0,  0,  0,  2, 14, -1,  0,  0,  OP_NULL     },
-   { "("           ,  1,  0,  1,  1,  0, 14,  1,  1,  0,  0,  OP_NULL     },
-   { "<<"          ,  2,  1,  1,  1,  0,  8,  8,  0, -1,  0,  OP_SHFTL    },
+   { ""            ,  0,  0,  0,  0,  0, 18, 18,  0,  1,  0,  OP_LDVAR    },
+   { ""            ,  0,  0,  0,  0,  0, 18, 18,  0,  1,  0,  OP_LDCON    },
+   { "<bad>"       ,  5,  0,  0,  0,  0, 18, 18,  0,  1,  0,  OP_LDBAD    },
+   { "<radix>"     ,  7,  0,  0,  0,  0, 18, 18,  0,  1,  0,  OP_LDRAD    },
+   { "<rounds>"    ,  8,  0,  0,  0,  0, 18, 18,  0,  1,  0,  OP_LDRND    },
+   { "<mant_dig>"  , 10,  0,  0,  0,  0, 18, 18,  0,  1,  0,  OP_LDMDIG   },
+   { "<dig>"       ,  5,  0,  0,  0,  0, 18, 18,  0,  1,  0,  OP_LDDIG    },
+   { "<min_exp>"   ,  9,  0,  0,  0,  0, 18, 18,  0,  1,  0,  OP_LDMINE   },
+   { "<min_10_exp>", 12,  0,  0,  0,  0, 18, 18,  0,  1,  0,  OP_LDMIN10E },
+   { "<max_exp>"   ,  9,  0,  0,  0,  0, 18, 18,  0,  1,  0,  OP_LDMAXE   },
+   { "<max_10_exp>", 12,  0,  0,  0,  0, 18, 18,  0,  1,  0,  OP_LDMAX10E },
+   { "<max>"       ,  5,  0,  0,  0,  0, 18, 18,  0,  1,  0,  OP_LDMAX    },
+   { "<epsilon>"   ,  9,  0,  0,  0,  0, 18, 18,  0,  1,  0,  OP_LDEPS    },
+   { "<min>"       ,  5,  0,  0,  0,  0, 18, 18,  0,  1,  0,  OP_LDMIN    },
+   { "<pi>"        ,  4,  0,  0,  0,  0, 18, 18,  0,  1,  0,  OP_LDPI     },
+   { "<e>"         ,  3,  0,  0,  0,  0, 18, 18,  0,  1,  0,  OP_LDE      },
+   { "(int)"       ,  5,  0,  1,  1,  0, 16, 15,  0,  0,  0,  OP_INT      },
+   { ")"           ,  1,  1,  0,  0,  0,  2, 18, -1,  0,  0,  OP_NULL     },
+   { "("           ,  1,  0,  1,  1,  0, 18,  1,  1,  0,  0,  OP_NULL     },
+   { "<<"          ,  2,  1,  1,  1,  0, 11, 11,  0, -1,  0,  OP_SHFTL    },
+   { ">>"          ,  2,  1,  1,  1,  0, 11, 11,  0, -1,  0,  OP_SHFTR    },
    { ".eqv."       ,  5,  1,  1,  1,  0,  3,  3,  0, -1,  0,  OP_EQV      },
    { ".neqv."      ,  6,  1,  1,  1,  0,  3,  3,  0, -1,  0,  OP_XOR      },
    { ".xor."       ,  5,  1,  1,  1,  0,  3,  3,  0, -1,  0,  OP_XOR      },
@@ -219,63 +225,70 @@ static const Symbol symbol[] = {
    { ".or."        ,  4,  1,  1,  1,  0,  4,  4,  0, -1,  0,  OP_OR       },
    { "&&"          ,  2,  1,  1,  1,  0,  5,  5,  0, -1,  0,  OP_AND      },
    { ".and."       ,  5,  1,  1,  1,  0,  5,  5,  0, -1,  0,  OP_AND      },
-   { "=="          ,  2,  1,  1,  1,  0,  6,  6,  0, -1,  0,  OP_EQ       },
-   { ".eq."        ,  4,  1,  1,  1,  0,  6,  6,  0, -1,  0,  OP_EQ       },
-   { "!="          ,  2,  1,  1,  1,  0,  6,  6,  0, -1,  0,  OP_NE       },
-   { ".ne."        ,  4,  1,  1,  1,  0,  6,  6,  0, -1,  0,  OP_NE       },
-   { "<="          ,  2,  1,  1,  1,  0,  7,  7,  0, -1,  0,  OP_LE       },
-   { ".le."        ,  4,  1,  1,  1,  0,  7,  7,  0, -1,  0,  OP_LE       },
-   { "<"           ,  1,  1,  1,  1,  0,  7,  7,  0, -1,  0,  OP_LT       },
-   { ".lt."        ,  4,  1,  1,  1,  0,  7,  7,  0, -1,  0,  OP_LT       },
-   { ">="          ,  2,  1,  1,  1,  0,  7,  7,  0, -1,  0,  OP_GE       },
-   { ".ge."        ,  4,  1,  1,  1,  0,  7,  7,  0, -1,  0,  OP_GE       },
-   { ">"           ,  1,  1,  1,  1,  0,  7,  7,  0, -1,  0,  OP_GT       },
-   { ".gt."        ,  4,  1,  1,  1,  0,  7,  7,  0, -1,  0,  OP_GT       },
-   { "-"           ,  1,  1,  1,  0,  0,  8,  8,  0, -1,  0,  OP_SUB      },
-   { "+"           ,  1,  1,  1,  0,  0,  8,  8,  0, -1,  0,  OP_ADD      },
-   { "**"          ,  2,  1,  1,  0,  0, 13, 10,  0, -1,  0,  OP_POW      },
-   { "*"           ,  1,  1,  1,  0,  0,  9,  9,  0, -1,  0,  OP_MUL      },
-   { "/"           ,  1,  1,  1,  0,  0,  9,  9,  0, -1,  0,  OP_DIV      },
-   { "     ,"      ,  1,  1,  1,  1,  0,  2,  2,  0,  0,  0,  OP_NULL     },
-   { "!"           ,  1,  0,  1,  1,  0, 12, 11,  0,  0,  0,  OP_NOT      },
-   { ".not."       ,  5,  0,  1,  1,  0, 12, 11,  0,  0,  0,  OP_NOT      },
-   { "-"           ,  1,  0,  1,  0,  1, 12, 11,  0,  0,  0,  OP_NEG      },
-   { "+"           ,  1,  0,  1,  0,  1, 12, 11,  0,  0,  0,  OP_NULL     },
-   { "isbad("      ,  6,  0,  1,  1,  0, 14,  1,  1,  0,  1,  OP_ISBAD    },
-   { "sqrt("       ,  5,  0,  1,  1,  0, 14,  1,  1,  0,  1,  OP_SQRT     },
-   { "log("        ,  4,  0,  1,  1,  0, 14,  1,  1,  0,  1,  OP_LOG      },
-   { "log10("      ,  6,  0,  1,  1,  0, 14,  1,  1,  0,  1,  OP_LOG10    },
-   { "exp("        ,  4,  0,  1,  1,  0, 14,  1,  1,  0,  1,  OP_EXP      },
-   { "sin("        ,  4,  0,  1,  1,  0, 14,  1,  1,  0,  1,  OP_SIN      },
-   { "cos("        ,  4,  0,  1,  1,  0, 14,  1,  1,  0,  1,  OP_COS      },
-   { "tan("        ,  4,  0,  1,  1,  0, 14,  1,  1,  0,  1,  OP_TAN      },
-   { "sind("       ,  5,  0,  1,  1,  0, 14,  1,  1,  0,  1,  OP_SIND     },
-   { "cosd("       ,  5,  0,  1,  1,  0, 14,  1,  1,  0,  1,  OP_COSD     },
-   { "tand("       ,  5,  0,  1,  1,  0, 14,  1,  1,  0,  1,  OP_TAND     },
-   { "asin("       ,  5,  0,  1,  1,  0, 14,  1,  1,  0,  1,  OP_ASIN     },
-   { "acos("       ,  5,  0,  1,  1,  0, 14,  1,  1,  0,  1,  OP_ACOS     },
-   { "atan("       ,  5,  0,  1,  1,  0, 14,  1,  1,  0,  1,  OP_ATAN     },
-   { "asind("      ,  6,  0,  1,  1,  0, 14,  1,  1,  0,  1,  OP_ASIND    },
-   { "acosd("      ,  6,  0,  1,  1,  0, 14,  1,  1,  0,  1,  OP_ACOSD    },
-   { "atand("      ,  6,  0,  1,  1,  0, 14,  1,  1,  0,  1,  OP_ATAND    },
-   { "sinh("       ,  5,  0,  1,  1,  0, 14,  1,  1,  0,  1,  OP_SINH     },
-   { "cosh("       ,  5,  0,  1,  1,  0, 14,  1,  1,  0,  1,  OP_COSH     },
-   { "tanh("       ,  5,  0,  1,  1,  0, 14,  1,  1,  0,  1,  OP_TANH     },
-   { "abs("        ,  4,  0,  1,  1,  0, 14,  1,  1,  0,  1,  OP_ABS      },
-   { "fabs("       ,  5,  0,  1,  1,  0, 14,  1,  1,  0,  1,  OP_ABS      },
-   { "int("        ,  4,  0,  1,  1,  0, 14,  1,  1,  0,  1,  OP_INT      },
-   { "ceil("       ,  5,  0,  1,  1,  0, 14,  1,  1,  0,  1,  OP_CEIL     },
-   { "floor("      ,  6,  0,  1,  1,  0, 14,  1,  1,  0,  1,  OP_FLOOR    },
-   { "nint("       ,  5,  0,  1,  1,  0, 14,  1,  1,  0,  1,  OP_NINT     },
-   { "pow("        ,  4,  0,  1,  1,  0, 14,  1,  1, -1,  2,  OP_POW      },
-   { "dim("        ,  4,  0,  1,  1,  0, 14,  1,  1, -1,  2,  OP_DIM      },
-   { "mod("        ,  4,  0,  1,  1,  0, 14,  1,  1, -1,  2,  OP_MOD      },
-   { "fmod("       ,  5,  0,  1,  1,  0, 14,  1,  1, -1,  2,  OP_MOD      },
-   { "sign("       ,  5,  0,  1,  1,  0, 14,  1,  1, -1,  2,  OP_SIGN     },
-   { "atan2("      ,  6,  0,  1,  1,  0, 14,  1,  1, -1,  2,  OP_ATAN2    },
-   { "atan2d("     ,  7,  0,  1,  1,  0, 14,  1,  1, -1,  2,  OP_ATAN2D   },
-   { "min("        ,  4,  0,  1,  1,  0, 14,  1,  1, -1, -2,  OP_MIN      },
-   { "max("        ,  4,  0,  1,  1,  0, 14,  1,  1, -1, -2,  OP_MAX      },
+   { "|"           ,  1,  1,  1,  1,  0,  6,  6,  0, -1,  0,  OP_BITOR    },
+   { "^"           ,  1,  1,  1,  1,  0,  7,  7,  0, -1,  0,  OP_BITXOR   },
+   { "&"           ,  1,  1,  1,  1,  0,  8,  8,  0, -1,  0,  OP_BITAND   },
+   { "=="          ,  2,  1,  1,  1,  0,  9,  9,  0, -1,  0,  OP_EQ       },
+   { ".eq."        ,  4,  1,  1,  1,  0,  9,  9,  0, -1,  0,  OP_EQ       },
+   { "!="          ,  2,  1,  1,  1,  0,  9,  9,  0, -1,  0,  OP_NE       },
+   { ".ne."        ,  4,  1,  1,  1,  0,  9,  9,  0, -1,  0,  OP_NE       },
+   { "<="          ,  2,  1,  1,  1,  0, 10, 10,  0, -1,  0,  OP_LE       },
+   { ".le."        ,  4,  1,  1,  1,  0, 10, 10,  0, -1,  0,  OP_LE       },
+   { "<"           ,  1,  1,  1,  1,  0, 10, 10,  0, -1,  0,  OP_LT       },
+   { ".lt."        ,  4,  1,  1,  1,  0, 10, 10,  0, -1,  0,  OP_LT       },
+   { ">="          ,  2,  1,  1,  1,  0, 10, 10,  0, -1,  0,  OP_GE       },
+   { ".ge."        ,  4,  1,  1,  1,  0, 10, 10,  0, -1,  0,  OP_GE       },
+   { ">"           ,  1,  1,  1,  1,  0, 10, 10,  0, -1,  0,  OP_GT       },
+   { ".gt."        ,  4,  1,  1,  1,  0, 10, 10,  0, -1,  0,  OP_GT       },
+   { "-"           ,  1,  1,  1,  0,  0, 11, 12,  0, -1,  0,  OP_SUB      },
+   { "+"           ,  1,  1,  1,  0,  0, 11, 12,  0, -1,  0,  OP_ADD      },
+   { "**"          ,  2,  1,  1,  1,  0, 17, 14,  0, -1,  0,  OP_POW      },
+   { "*"           ,  1,  1,  1,  1,  0, 13, 13,  0, -1,  0,  OP_MUL      },
+   { "/"           ,  1,  1,  1,  1,  0, 13, 13,  0, -1,  0,  OP_DIV      },
+   { "%"           ,  1,  1,  1,  1,  0, 13, 13,  0, -1,  0,  OP_MOD      },
+   { ","           ,  1,  1,  1,  1,  0,  2,  2,  0,  0,  0,  OP_NULL     },
+   { "!"           ,  1,  0,  1,  1,  0, 16, 15,  0,  0,  0,  OP_NOT      },
+   { ".not."       ,  5,  0,  1,  1,  0, 16, 15,  0,  0,  0,  OP_NOT      },
+   { "-"           ,  1,  0,  1,  0,  1, 16, 15,  0,  0,  0,  OP_NEG      },
+   { "+"           ,  1,  0,  1,  0,  1, 16, 15,  0,  0,  0,  OP_NULL     },
+   { "isbad("      ,  6,  0,  1,  1,  0, 18,  1,  1,  0,  1,  OP_ISBAD    },
+   { "sqrt("       ,  5,  0,  1,  1,  0, 18,  1,  1,  0,  1,  OP_SQRT     },
+   { "log("        ,  4,  0,  1,  1,  0, 18,  1,  1,  0,  1,  OP_LOG      },
+   { "log10("      ,  6,  0,  1,  1,  0, 18,  1,  1,  0,  1,  OP_LOG10    },
+   { "exp("        ,  4,  0,  1,  1,  0, 18,  1,  1,  0,  1,  OP_EXP      },
+   { "sin("        ,  4,  0,  1,  1,  0, 18,  1,  1,  0,  1,  OP_SIN      },
+   { "cos("        ,  4,  0,  1,  1,  0, 18,  1,  1,  0,  1,  OP_COS      },
+   { "tan("        ,  4,  0,  1,  1,  0, 18,  1,  1,  0,  1,  OP_TAN      },
+   { "sind("       ,  5,  0,  1,  1,  0, 18,  1,  1,  0,  1,  OP_SIND     },
+   { "cosd("       ,  5,  0,  1,  1,  0, 18,  1,  1,  0,  1,  OP_COSD     },
+   { "tand("       ,  5,  0,  1,  1,  0, 18,  1,  1,  0,  1,  OP_TAND     },
+   { "asin("       ,  5,  0,  1,  1,  0, 18,  1,  1,  0,  1,  OP_ASIN     },
+   { "acos("       ,  5,  0,  1,  1,  0, 18,  1,  1,  0,  1,  OP_ACOS     },
+   { "atan("       ,  5,  0,  1,  1,  0, 18,  1,  1,  0,  1,  OP_ATAN     },
+   { "asind("      ,  6,  0,  1,  1,  0, 18,  1,  1,  0,  1,  OP_ASIND    },
+   { "acosd("      ,  6,  0,  1,  1,  0, 18,  1,  1,  0,  1,  OP_ACOSD    },
+   { "atand("      ,  6,  0,  1,  1,  0, 18,  1,  1,  0,  1,  OP_ATAND    },
+   { "sinh("       ,  5,  0,  1,  1,  0, 18,  1,  1,  0,  1,  OP_SINH     },
+   { "cosh("       ,  5,  0,  1,  1,  0, 18,  1,  1,  0,  1,  OP_COSH     },
+   { "tanh("       ,  5,  0,  1,  1,  0, 18,  1,  1,  0,  1,  OP_TANH     },
+   { "abs("        ,  4,  0,  1,  1,  0, 18,  1,  1,  0,  1,  OP_ABS      },
+   { "fabs("       ,  5,  0,  1,  1,  0, 18,  1,  1,  0,  1,  OP_ABS      },
+   { "int("        ,  4,  0,  1,  1,  0, 18,  1,  1,  0,  1,  OP_INT      },
+   { "ceil("       ,  5,  0,  1,  1,  0, 18,  1,  1,  0,  1,  OP_CEIL     },
+   { "floor("      ,  6,  0,  1,  1,  0, 18,  1,  1,  0,  1,  OP_FLOOR    },
+   { "nint("       ,  5,  0,  1,  1,  0, 18,  1,  1,  0,  1,  OP_NINT     },
+   { "frexpon("    ,  8,  0,  1,  1,  0, 18,  1,  1,  0,  1,  OP_FREXPON  },
+   { "frexp("      ,  6,  0,  1,  1,  0, 18,  1,  1,  0,  1,  OP_FREXP    },
+   { "pow("        ,  4,  0,  1,  1,  0, 18,  1,  1, -1,  2,  OP_POW      },
+   { "ldexp("      ,  6,  0,  1,  1,  0, 18,  1,  1, -1,  2,  OP_POW2     },
+   { "dim("        ,  4,  0,  1,  1,  0, 18,  1,  1, -1,  2,  OP_DIM      },
+   { "mod("        ,  4,  0,  1,  1,  0, 18,  1,  1, -1,  2,  OP_MOD      },
+   { "fmod("       ,  5,  0,  1,  1,  0, 18,  1,  1, -1,  2,  OP_MOD      },
+   { "sign("       ,  5,  0,  1,  1,  0, 18,  1,  1, -1,  2,  OP_SIGN     },
+   { "atan2("      ,  6,  0,  1,  1,  0, 18,  1,  1, -1,  2,  OP_ATAN2    },
+   { "atan2d("     ,  7,  0,  1,  1,  0, 18,  1,  1, -1,  2,  OP_ATAN2D   },
+   { "min("        ,  4,  0,  1,  1,  0, 18,  1,  1, -1, -2,  OP_MIN      },
+   { "max("        ,  4,  0,  1,  1,  0, 18,  1,  1, -1, -2,  OP_MAX      },
    { NULL          ,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  OP_NULL     }
 };
 
@@ -2954,6 +2967,25 @@ static void VirtualMachine( int npoint, int ncoord_in, const double **ptr_in,
 *        return the vector of result values.
 */
 
+/* Local Constants: */
+   const int bits =              /* Number of bits in an unsigned long */
+      sizeof( unsigned long ) * CHAR_BIT;
+   const double eps =            /* Smallest number subtractable from 2.0 */
+      2.0 * DBL_EPSILON;
+   const double scale =          /* 2.0 raised to the power "bits" */
+      ldexp( 1.0, bits );
+   const double scale1 =         /* 2.0 raised to the power "bits-1" */
+      scale * 0.5;
+   const double rscale =         /* Reciprocal scale factor */
+      1.0 / scale;
+   const double rscale1 =        /* Reciprocal initial scale factor */
+      1.0 / scale1;
+   const int nblock =            /* Number of blocks of bits to process */
+      ( sizeof( double ) + sizeof( unsigned long ) - 1 ) /
+      sizeof( unsigned long );
+   const unsigned long signbit = /* Mask for extracting sign bit */
+      1UL << ( bits - 1 );
+
 /* Local Variables: */
    double **stack;               /* Array of pointers to stack elements */
    double *work;                 /* Pointer to stack workspace */
@@ -2964,13 +2996,23 @@ static void VirtualMachine( int npoint, int ncoord_in, const double **ptr_in,
    double *yv;                   /* Pointer to result vector */
    double abs1;                  /* Absolute value (temporary variable) */
    double abs2;                  /* Absolute value (temporary variable) */
+   double frac1;                 /* First (maybe normalised) fraction */
+   double frac2;                 /* Second (maybe normalised) fraction */
+   double frac;                  /* Sole normalised fraction */
+   double newexp;                /* New power of 2 exponent value */
    double pi;                    /* Value of PI */
-   double tmp;                   /* Temporary variable for use in macros */
+   double result;                /* Function result value */
+   double tmp;                   /* Temporary variable */
+   double unscale;               /* Factor for removing scaling */
    double value;                 /* Value to be assigned to stack vector */
    double x1;                    /* First argument value */
    double x2;                    /* Second argument value */
    double x;                     /* Sole argument value */
+   int expon1;                   /* First power of 2 exponent */
+   int expon2;                   /* Second power of 2 exponent */
+   int expon;                    /* Sole power of 2 exponent */
    int iarg;                     /* Loop counter for arguments */
+   int iblock;                   /* Loop counter for blocks of bits */
    int icode;                    /* Opcode value */
    int icon;                     /* Counter for number of constants used */
    int istk;                     /* Loop counter for stack elements */
@@ -2982,9 +3024,10 @@ static void VirtualMachine( int npoint, int ncoord_in, const double **ptr_in,
    static double d2r;            /* Degrees to radians conversion factor */
    static double r2d;            /* Radians to degrees conversion factor */
    static int init = 0;          /* Initialisation performed? */
-
-   static double pow2[ 2000 ];
-   static int ipow;
+   unsigned long b1;             /* Block of bits from first argument */
+   unsigned long b2;             /* Block of bits from second argument */
+   unsigned long b;              /* Block of bits for result */
+   unsigned long neg;            /* Result is negative? (sign bit) */
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -2995,11 +3038,6 @@ static void VirtualMachine( int npoint, int ncoord_in, const double **ptr_in,
       pi = acos( -1.0 );
       r2d = 180.0 / pi;
       d2r = pi / 180.0;
-
-      pow2[ 0 ] = 1.0;
-      for ( ipow = 0; ipow < 2000 && pow2[ ipow ] <= DBL_MAX / 2.0; ipow++ ) {
-         pow2[ ipow + 1 ] = pow2[ ipow ] * 2.0;
-      }
 
 /* Note that initialisation has been performed. */
       init = 1;
@@ -3211,11 +3249,11 @@ static void VirtualMachine( int npoint, int ncoord_in, const double **ptr_in,
       errno = 0, \
 \
 /* Evaluate the function. */ \
-      tmp = (function), \
+      result = (function), \
 \
 /* Check if "errno" and the returned result indicate overflow and \
    return the appropriate result. */ \
-      ( ( errno == ERANGE ) && ( tmp == HUGE_VAL ) ) ? AST__BAD : tmp \
+      ( ( errno == ERANGE ) && ( result == HUGE_VAL ) ) ? AST__BAD : result \
    )
 
 /* Trap maths errors. */
@@ -3229,12 +3267,13 @@ static void VirtualMachine( int npoint, int ncoord_in, const double **ptr_in,
       errno = 0, \
 \
 /* Evaluate the function. */ \
-      tmp = (function), \
+      result = (function), \
 \
 /* Check if "errno" and the returned result indicate a domain error or \
    overflow and return the appropriate result. */ \
       ( ( errno == EDOM ) || \
-        ( ( errno == ERANGE ) && ( tmp == HUGE_VAL ) ) ) ? AST__BAD : tmp \
+        ( ( errno == ERANGE ) && ( result == HUGE_VAL ) ) ) ? AST__BAD : \
+                                                              result \
    )
 
 /* Tri-state boolean OR. */
@@ -3398,6 +3437,145 @@ static void VirtualMachine( int npoint, int ncoord_in, const double **ptr_in,
    ) \
 )
 
+/* Bit shift operation. */
+/* -------------------- */
+#define SHIFT_BITS( x1, x2 ) ( \
+   frac = frexp( (x1), &expon ), \
+   newexp = INT( (x2) ) + (double) expon, \
+   ( newexp < (double) -INT_MAX ) ? ( \
+      0.0 \
+   ) : ( ( newexp > (double) INT_MAX ) ? ( \
+      AST__BAD \
+   ) : ( \
+      CATCH_MATHS_OVERFLOW( ldexp( frac, (int) newexp ) ) \
+   ) ) \
+)
+
+/* Two-argument bit-wise boolean operation. */
+/* ---------------------------------------- */
+/* This macro expands to code which performs a bit-wise boolean
+   operation on a pair of arguments and assigns the result to the
+   variable "result". It operates on floating point (double) values,
+   which are regarded as if they are fixed-point binary numbers with
+   negative values expressed in twos-complement notation. This means that
+   it delivers the same results for integer values as the normal
+   (integer) C bit-wise operations. However, it will also operate on the
+   fraction bits of floating point numbers. It also offers greater
+   precision (the first 53 or so significant bits of the result being
+   preserved for typical IEEE floating point implementations). */
+#define BIT_OPER_2( oper, x1, x2 ) \
+\
+/* Convert each argument to a normalised fraction in the range \
+   [0.5,1.0) and a power of two exponent, removing any sign \
+   information. */ \
+   frac1 = frexp( ABS( (x1) ), &expon1 ); \
+   frac2 = frexp( ABS( (x2) ), &expon2 ); \
+\
+/* Set "expon" to be the larger of the two exponents. If the two \
+   exponents are not equal, divide the fraction with the smaller exponent \
+   by 2 to the power of the exponent difference. This gives both \
+   fractions the same effective exponent (although one of them may no \
+   longer be normalised). Note that overflow is avoided because all \
+   numbers remain less than 1.0, but underflow may occur. */ \
+   expon = expon1; \
+   if ( expon2 > expon1 ) { \
+      expon = expon2; \
+      frac1 = ldexp( frac1, expon1 - expon ); \
+   } else if ( expon1 > expon2 ) { \
+      frac2 = ldexp( frac2, expon2 - expon ); \
+   } \
+\
+/* If either of the original arguments is negative, we now subtract \
+   the corresponding fraction from 2.0. If we think of the fraction as \
+   represented in fixed-point binary notation, this corresponds to \
+   converting negative numbers into the twos-complement form normally used \
+   for integers (the sign bit being the bit with value 1) instead \
+   of having a separate sign bit as for floating point numbers. \
+\
+   Note that one of the fractions may have underflowed during the \
+   scaling above. In that case (if the original argument was negative), \
+   we must subtract the value "eps" (= 2.0 * DBL_EPSILON) from 2.0 \
+   instead, so that we produce the largest number less than 2.0. In \
+   twos-complement notation this represents the smallest possible \
+   negative number and corresponds to extending the sign bit of the \
+   original number up into more significant bits. This causes all bits to \
+   be set as we require (rather than all being clear if the underflow \
+   is simply ignored). */ \
+   if ( (x1) < 0.0 ) frac1 = 2.0 - ( ( frac1 > eps ) ? frac1 : eps ); \
+   if ( (x2) < 0.0 ) frac2 = 2.0 - ( ( frac2 > eps ) ? frac2 : eps ); \
+\
+/* We now extract the bits from the fraction values into integer \
+   variables so that we may perform bit-wise operations on them. However, \
+   since a double may be longer than any available integer, we may \
+   have to handle several successive blocks of bits individually. */ \
+\
+/* Extract the first block of bits by scaling by the required power of \
+   2 to shift the required bits to the left of the binary point. Then \
+   extract the integer part. Note that this initial shift is one bit less \
+   than the number of bits in an unsigned long, because we have \
+   introduced an extra sign bit. */ \
+   frac1 *= scale1; \
+   frac2 *= scale1; \
+   b1 = (unsigned long) frac1; \
+   b2 = (unsigned long) frac2; \
+\
+/* Perform the required bit-wise operation on the extracted blocks of \
+   bits. */ \
+   b = b1 oper b2; \
+\
+/* Extract the sign bit from this initial result. This determines \
+   whether the final result bit pattern should represent a negative \
+   floating point number. */ \
+   neg = b & signbit; \
+\
+/* Initialise the floating point result by setting it to the integer \
+   result multipled by the reciprocal of the scale factor used to shift \
+   the bits above. This returns the result bits to their correct \
+   significance. */ \
+   unscale = rscale1; \
+   result = (double) b * unscale; \
+\
+/* We now loop to extract and process further blocks of bits (if \
+   present). The number of blocks is determined by the relative lengths \
+   of a double and an unsigned long. In practice, some bits of the double \
+   will be used by its exponent, so the last block may be incomplete and \
+   will simply be padded with zeros. */ \
+   for ( iblock = 1; iblock < nblock; iblock++ ) { \
+\
+/* Subtract the integer part (which has already been processed) from \
+   each fraction, to leave the bits which remain to be processed. Then \
+   multiply by a scale factor to shift the next set of bits to the left \
+   of the binary point. This time, we use as many bits as will fit into \
+   an unsigned long. */ \
+      frac1 = ( frac1 - (double) b1 ) * scale; \
+      frac2 = ( frac2 - (double) b2 ) * scale; \
+\
+/* Extract the integer part, which contains the required bits. */ \
+      b1 = (unsigned long) frac1; \
+      b2 = (unsigned long) frac2; \
+\
+/* Perform the required bit-wise operation on the extracted blocks of \
+   bits. */ \
+      b = b1 oper b2; \
+\
+/* Update the result floating point value by adding the new integer \
+   result multiplied by a scale factor to return the bits to their \
+   original significance. */ \
+      unscale *= rscale; \
+      result += (double) b * unscale; \
+   } \
+\
+/* If the (normalised fraction) result represents a negative number, \
+   then subtract 2.0 from it (equivalent to subtracting it from 2 and \
+   negating the result). This converts back to using a separate sign bit \
+   instead of twos-complement notation. */ \
+   if ( neg ) result -= 2.0; \
+\
+/* Scale by the required power of 2 to remove the initial \
+   normalisation applied and assign the result to the "result" \
+   variable. */ \
+   result = ldexp( result, expon )
+
 /* All the required macros are now defined. */
 
 /* Initialise the top of stack index and constant counter. */
@@ -3445,8 +3623,8 @@ static void VirtualMachine( int npoint, int ncoord_in, const double **ptr_in,
 
 /* The following load mathematical constants into the top of stack
    element. */
-            ARG_0( OP_LDPI,     value = acos( -1.0 ), *y = value )
-            ARG_0( OP_LDE,      value = exp( 1.0 ),   *y = value )
+            ARG_0( OP_LDPI,     , *y = pi )
+            ARG_0( OP_LDE,      value = exp( 1.0 ), *y = value )
 
 /* The following 1-argument operations simply evaluate a function of
    the top of stack element and assign the result to the same element. */
@@ -3482,6 +3660,9 @@ static void VirtualMachine( int npoint, int ncoord_in, const double **ptr_in,
             ARG_1( OP_FLOOR,    *y = floor( x ) )
             ARG_1( OP_NINT,     *y = ( x >= 0 ) ?
                                      floor( x + 0.5 ) : ceil( x - 0.5 ) )
+            ARG_1( OP_FREXP,    *y = frexp( x, &expon ) )
+            ARG_1( OP_FREXPON,  (void) frexp( x, &expon );
+                                *y = (double) expon )
 
 /* These 2-argument operations evaluate a function of the top two
    entries on the stack. */
@@ -3489,20 +3670,27 @@ static void VirtualMachine( int npoint, int ncoord_in, const double **ptr_in,
             ARG_2( OP_XOR,      *y = ( ( x1 != 0.0 ) != ( x2 != 0.0 ) ) )
             ARG_2B( OP_OR,      *y = TRISTATE_OR( x1, x2 ) )
             ARG_2B( OP_AND,     *y = TRISTATE_AND( x1, x2 ) )
+            ARG_2( OP_BITOR,    BIT_OPER_2( |, x1, x2 ); *y = result )
+            ARG_2( OP_BITXOR,   BIT_OPER_2( ^, x1, x2 ); *y = result )
+            ARG_2( OP_BITAND,   BIT_OPER_2( &, x1, x2 ); *y = result )
             ARG_2( OP_EQ,       *y = ( x1 == x2 ) )
             ARG_2( OP_NE,       *y = ( x1 != x2 ) )
             ARG_2( OP_LE,       *y = ( x1 <= x2 ) )
             ARG_2( OP_LT,       *y = ( x1 < x2 ) )
             ARG_2( OP_GE,       *y = ( x1 >= x2 ) )
             ARG_2( OP_GT,       *y = ( x1 > x2 ) )
-            ARG_2( OP_SHFTL,    *y = ( ( ( tmp = INT( x2 ) ) >= 0.0 )  &&
-                                       ( tmp <= (double) ipow ) ) ?
-                                     INT( x1 ) * pow2[ (int) tmp ] : AST__BAD )
+            ARG_2( OP_SHFTL,    *y = SHIFT_BITS( x1, x2 ) )
+            ARG_2( OP_SHFTR,    *y = SHIFT_BITS( x1, -x2 ) )
             ARG_2( OP_ADD,      *y = SAFE_ADD( x1, x2 ) )
             ARG_2( OP_SUB,      *y = SAFE_SUB( x1, x2 ) )
             ARG_2( OP_MUL,      *y = SAFE_MUL( x1, x2 ) )
             ARG_2( OP_DIV ,     *y = SAFE_DIV( x1, x2 ) )
             ARG_2( OP_POW,      *y = CATCH_MATHS_ERROR( pow( x1, x2 ) ) )
+            ARG_2( OP_POW2,     tmp = INT( x2 );
+                                *y = ( ( tmp < (double) -INT_MAX ) ? 0.0 :
+                                     ( ( tmp > (double) INT_MAX ) ? AST__BAD :
+                                     CATCH_MATHS_OVERFLOW( ldexp( x1,
+                                                           (int) tmp ) ) ) ) )
             ARG_2( OP_SIGN,     *y = ( ( x1 >= 0.0 ) == ( x2 >= 0.0 ) ) ?
                                      x1 : -x1 )
             ARG_2( OP_DIM,      *y = ( x1 > x2 ) ? x1 - x2 : 0.0 )
