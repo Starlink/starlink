@@ -828,13 +828,13 @@ install:
 # when it fails.
 test-install:
 	@ test -n "$$AUTOASTROM_DIR" || (echo "Define AUTOASTROM_DIR" && false)
-	@ echo "TEST-INSTALL in $$AUTOASTROM_DIR..."
+	@ echo "TEST-INSTALL in $$AUTOASTROM_DIR ..."
 	test -n "$$AUTOASTROM_DIR" && test -d "$$AUTOASTROM_DIR"
 	@ for f in $(PUBLIC_SCRIPTS); do \
 		DEST=$$AUTOASTROM_DIR/`echo $$f|sed s+.*/++`; \
 		if test -n "$$f"; then \
 			sed '1s+/[^ ]*+$(STARPERL)+' $$f >$$DEST; \
-			echo $$DEST; \
+			echo "$$f --> $$DEST"; \
 			chmod 755 $$DEST; \
 		else :; fi; \
 	done
@@ -842,7 +842,7 @@ test-install:
 		DEST=$$AUTOASTROM_DIR/`echo $$f|sed s+.*/++`; \
 		if test -n "$$f"; then \
 			cp -p $$f $$DEST; \
-			echo $$DEST; \
+			echo "$$f --> $$DEST"; \
 			chmod 755 $$DEST; \
 		else :; fi; \
 	done
