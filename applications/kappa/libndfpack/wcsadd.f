@@ -346,6 +346,13 @@
 *        get the MATHMAP expressions.
 *     9-JAN-2003 (DSB):
 *        Added support for SpecFrames (parameters FRMTYPE and ATTRS).
+*     4-MAR-2005 (DSB):
+*        Moved assignment of ATTR attributes to before the point where
+*        attributes are transferred from the basis Frame to the new Frame.
+*        This is so that ATTR can be used to describe the existing Frame
+*        (as in the case where a SpecFrame is being created on the basis of 
+*        an AXIS Frame). As it was, the existing AXIS Frame was always
+*        described by default SpecFrame, with default attributes.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -735,6 +742,9 @@
             CALL ERR_ANNUL( STATUS )
             FRMN = AST_COPY( FRMB, STATUS ) 
 
+*  Allow the user to modify the attributes of the Frame.
+            CALL KPG1_ASSET( 'WCSADD', 'ATTRS', FRMN, STATUS )
+
 *  Otherwise, create a default Frame of the specified class.
          ELSE
             IF( FRMTYP .EQ. 'SKYFRAME' ) THEN
@@ -745,6 +755,9 @@
                FRMN = AST_FRAME( AST_GETI( MAP, 'NOUT', STATUS ), ' ', 
      :                           STATUS )
             END IF
+
+*  Allow the user to modify the attributes of the Frame.
+            CALL KPG1_ASSET( 'WCSADD', 'ATTRS', FRMN, STATUS )
 
 *  Transfer the values of attributes which have been set in the basis Frame 
 *  to the new Frame, and modify the Mapping. We temporarily clear the Domain 
@@ -787,9 +800,6 @@
 
 *  Note the current Domain in the Frame.
          DOM0 = AST_GETC( FRMN, 'Domain', STATUS )
-
-*  Allow the user to modify the attributes of the Frame.
-         CALL KPG1_ASSET( 'WCSADD', 'ATTRS', FRMN, STATUS )
 
 *  If the new Frame has active Unit attributes, check all Unit attributes
 *  have non-blank values.
