@@ -42,6 +42,7 @@
 *      4 Feb 94 : V1.7-5  Local GCB used when not in interactive mode (RJV)
 *      1 Jul 94 : V1.7-6  More intelligent screen handling (RJV)
 *      6 Dec 94 : V1.8-1  Asymmetric widths for stepped line (RJV)
+*      9 Jan 95 : V1.8-2  Double checks for regular axis values (RJV)
 *    Type Definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -907,6 +908,7 @@ C          CALL PGWINDOW(XMIN,XMAX,YMIN,YMAX)
       REAL XW1,XW2,YW1,YW2
       REAL MIN,MAX
       REAL DMIN,DMAX
+      REAL XBASE,XSCALE,YBASE,YSCALE
       INTEGER ID				! identifier for BDA_
       INTEGER NDIM				! dimensionality
       INTEGER XSIZ,YSIZ
@@ -963,6 +965,8 @@ C          CALL PGWINDOW(XMIN,XMAX,YMIN,YMAX)
         CALL BDA_MAPAXVAL_INT(ID,'R',1,XPTR,STATUS)
         IF (.NOT.XOK) THEN
           XREG=.TRUE.
+        ELSEIF (.NOT.XREG) THEN
+          CALL ARR_CHKREG(%val(XPTR),XDIM,XREG,XBASE,XSCALE,STATUS)
         ENDIF
 
 *  map y-axis values
@@ -970,6 +974,8 @@ C          CALL PGWINDOW(XMIN,XMAX,YMIN,YMAX)
         CALL BDA_MAPAXVAL_INT(ID,'R',2,YPTR,STATUS)
         IF (.NOT.YOK) THEN
           YREG=.TRUE.
+        ELSEIF (.NOT.YREG) THEN
+          CALL ARR_CHKREG(%val(YPTR),YDIM,YREG,YBASE,YSCALE,STATUS)
         ENDIF
 
         REG=(XREG.AND.YREG)
