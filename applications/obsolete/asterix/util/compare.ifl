@@ -11,16 +11,14 @@ INTERFACE COMPARE
    PARAMETER MODEL
       POSITION    2
       TYPE        'UNIV'
-      KEYWORD     'MODEL'
       ASSOCIATION '<->GLOBAL.FITMOD'
       VPATH       'GLOBAL,PROMPT'
       PROMPT      'Model'
    ENDPARAMETER
 
-   PARAMETER POISS_ERR
+   PARAMETER POISSON
       TYPE        '_LOGICAL'
       DEFAULT     Y
-      KEYWORD 'POISSON'
       PROMPT      'Poisson data errors (Y/N)'
       HELP        'Root n data errors to be assumed; otherwise adopt unit errors'
    ENDPARAMETER

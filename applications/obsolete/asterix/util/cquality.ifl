@@ -73,8 +73,7 @@ INTERFACE CQUALITY
     HELP      'i.e. Complement existing quality values'
   ENDPARAMETER
 
-  PARAMETER OVERWRITE
-    KEYWORD   OVER
+  PARAMETER OVER
     TYPE      '_LOGICAL'
     VPATH     'DEFAULT'
     DEFAULT   F

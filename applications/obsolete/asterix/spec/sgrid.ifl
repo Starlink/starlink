@@ -2,7 +2,6 @@ INTERFACE SGRID
 
    PARAMETER LIK
       TYPE '_LOGICAL'
-      KEYWORD 'LIK'
       VPATH 'DEFAULT'
       DEFAULT FALSE
       HELP 'Likelihood (Y) or chis-squared (N) fit?'
@@ -11,7 +10,6 @@ INTERFACE SGRID
    PARAMETER INP
       POSITION 1
       TYPE 'UNIV'
-      KEYWORD 'INP'
       VPATH 'GLOBAL,PROMPT'
       PPATH 'GLOBAL'
       ASSOCIATION '<->GLOBAL.FIT_DATA'
