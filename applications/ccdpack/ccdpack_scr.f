@@ -96,6 +96,9 @@
       END IF
       CALL ERR_RLSE
 
+*  Tweak the numerics on a RedHat 7 Linux system.
+      CALL CCD1_LINFLT
+
 *  Test the action name against each valid value in turn, calling the
 *  appropriate routine...  
       IF ( ACTION .EQ. 'CCDALIGN' ) THEN
