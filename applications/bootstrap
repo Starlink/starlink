@@ -11,11 +11,11 @@ if $STAR_SUPPRESS_AUTORECONF; then
     echo "Suppressing autoreconf"
 else
     echorun autoreconf --install --symlink
-fi
 
-if test ! -x configure; then
-    echo "Ooooh dear, autoreconf didn't work -- I can't find ./configure"
-    exit 1
+    if test ! -x configure; then
+        echo "Ooooh dear, autoreconf didn't work -- I can't find ./configure"
+        exit 1
+    fi
 fi
 
 thisdir=`basename $PWD`
