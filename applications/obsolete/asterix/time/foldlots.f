@@ -202,6 +202,7 @@
 
 *  Define base epoch
       CALL TCI_GETID( IFID, TIMID, STATUS )
+	call adi_print( timid,status)
       CALL ADI_THERE( TIMID, 'TAIObs', BOK, STATUS )
       IF ( BOK ) THEN
         CALL ADI_CGET0D( TIMID, 'TAIObs', BASE_TAI, STATUS )
@@ -343,7 +344,7 @@ C          NBINS = INBINS
       END IF
       CALL BDI_PUTAXLABEL(FFID,1,'Phase',STATUS)
       CALL BDI_PUTAXNORM(FFID,1,.TRUE.,STATUS)
-      CALL BDI_PUTAXLABEL(CFID,1,'Period',STATUS)
+      CALL BDI_PUTAXTEXT(CFID,1,'Period','seconds',STATUS)
       CALL BDI_PUTAXNORM(CFID,1,.TRUE.,STATUS)
 
 *    Add history records
