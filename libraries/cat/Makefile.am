@@ -5,17 +5,27 @@ dist_bin_SCRIPTS = cat_link cat_link_adam
 lib_LTLIBRARIES = libcat.la libcat_adam.la
 
 libcat_la_SOURCES = \
-	$(PUBLIC_INCLUDES) \
-	$(PRIVATE_INCLUDES) \
 	$(BLOCK_DATA_FILES) \
 	$(F_ROUTINES)
 
-libcat_adam_la_SOURCES = \
+libcat_la_DEPENDENCIES = \
 	$(PUBLIC_INCLUDES) \
-	$(PRIVATE_INCLUDES) \
+	$(PRIVATE_INCLUDES)
+
+libcat_adam_la_SOURCES = \
 	$(ADAM_F_ROUTINES)
 
-## List headers which are to be installed -- these are built first if necessary
+libcat_adam_la_DEPENDENCIES = \
+	$(PUBLIC_INCLUDES) \
+	$(PRIVATE_INCLUDES)
+
+
+## Need dependency to get include files generated.
+$(libcat_la_SOURCES): $(PUBLIC_INCLUDES)
+$(libcat_adam_la_SOURCES): $(PUBLIC_INCLUDES)
+
+## List headers which are to be installed -- these are built first if
+## necessary, XXX oh no they are not! Hence above.
 include_HEADERS = $(PUBLIC_INCLUDES)
 
 PUBLIC_INCLUDES = CAT_ERR CAT_PAR
