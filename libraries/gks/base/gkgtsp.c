@@ -71,6 +71,7 @@ f77_integer gkgtsp_(ichan, ittspd)
 
 #if HAVE_TERMIOS_H
   struct termios tty;
+  speed_t speed;
 #elif HAVE_TERMIO_H
   struct termio tty;            /* For terminal information */
 #elif HAVE_SGTTY_H
@@ -87,7 +88,12 @@ f77_integer gkgtsp_(ichan, ittspd)
   {
 #if HAVE_TERMIOS_H
     (void)tcgetattr(fd, &tty);
-    *ittspd = cfgetispeed(&tty);
+    speed = cfgetispeed(&tty);
+    if ( speed < 16 ) {
+       *ittspd = bauds[(int)speed];
+    } else {
+        *ittspd = bauds[15];
+    }
 #elif HAVE_TERMIO_H
     (void)ioctl(fd,TCGETA,&tty);
     *ittspd = bauds[(int)(tty.c_cflag & CBAUD)];

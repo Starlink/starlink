@@ -175,7 +175,7 @@ f77_integer gkiosb_( f77_integer *lun, f77_integer *action )
 		was_break[index] = i;
 		parms.c_cc[i] = DISABLE;
 #if HAVE_TERMIOS_H
-                (void)tcsetattr(fd, TCSETA,&parms);
+                (void)tcsetattr(fd, TCSANOW, &parms);
 #else
 		(void)ioctl(fd, TCSETA, &parms);
 #endif
@@ -198,7 +198,7 @@ f77_integer gkiosb_( f77_integer *lun, f77_integer *action )
 	      parms.c_cc[was_break[index]] = GKS_BRK;
 	      was_break[index] = NONE;
 #if HAVE_TERMIOS_H
-	      (void)tcsetattr(fd, TCSETA, &parms);
+	      (void)tcsetattr(fd, TCSANOW, &parms);
 #else
 	      (void)ioctl(fd, TCSETA, &parms);
 #endif

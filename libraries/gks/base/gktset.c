@@ -107,7 +107,7 @@ f77_integer gktset_(f77_integer *lun,
 
     if(*purge) {
 #if HAVE_TERMIOS_H
-      (void)tcsetattr(fd, TCSETAF, &tty );
+      (void)tcsetattr(fd, TCSAFLUSH, &tty);
 #elif HAVE_TERMIO_H
       (void) ioctl(fd, TCSETAF, &tty);
 #elif HAVE_SGTTY_H
@@ -115,7 +115,7 @@ f77_integer gktset_(f77_integer *lun,
 #endif
     } else {
 #if HAVE_TERMIOS_H
-      (void)tcsetattr(fd, TCSETAW, &tty);
+      (void)tcsetattr(fd, TCSADRAIN, &tty);
 #elif HAVE_TERMIO_H
       (void) ioctl(fd, TCSETAW, &tty);
 #elif HAVE_SGTTY_H
