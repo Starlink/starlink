@@ -131,23 +131,23 @@ C      EXTERNAL			BDI2_WBWID
       CHARACTER*1		CAX			! Axis code char
       CHARACTER*72		CMNT			! Keyword comment
 
-      REAL			AXVAL,ASCALE		! Axis scale
+      REAL			AXVAL			! Axis scale
       REAL			RPIX, RVAL, PIXW	! Axis keyword values
 
       INTEGER			I			! Loop variable
       INTEGER			IAX			! Axis number
-      INTEGER			IERR, NERR		! Error info from VEC_
-      INTEGER			NELM			! # invented elements
+c     INTEGER			IERR, NERR		! Error info from VEC_
+c     INTEGER			NELM			! # invented elements
       INTEGER			PHDU			! Primary HDU id
-      INTEGER			PSID, WPSID		! Private item storage
-      INTEGER			PTR, PTR2		! Mapped data address
-      INTEGER			TNDIM, TDIMS(ADI__MXDIM)! Temp dims
+      INTEGER			PSID			! Private item storage
+c     INTEGER			PTR, PTR2		! Mapped data address
+c     INTEGER			TNDIM, TDIMS(ADI__MXDIM)! Temp dims
       INTEGER			WPTR			! Workspace
 
       BYTE			MASK			! Quality mask
 
       LOGICAL			RMODE			! READ mode?
-      LOGICAL			STHERE			! Axis scale defined?
+c     LOGICAL			STHERE			! Axis scale defined?
       LOGICAL			WMODE			! WRITE mode?
 *.
 
