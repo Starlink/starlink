@@ -103,6 +103,8 @@
                          -maxpoints $MAXPOS \
                          -geometry ${WINX}x${WINY} \
 
+      [ $aligner component exit ] configure -balloonstr "Use this alignment"
+
 #  Set the pair selection criterion.
       set choosestatus ""
       proc pairok { a b } {
@@ -153,10 +155,11 @@
       set quitdialog [ iwidgets::messagedialog $chooser.qd \
                           -modality application \
                           -bitmap questhead \
+                          -master $chooser \
                           -title "PAIRNDF: Confirm exit" \
                           -text $confirmtext ]
       $quitdialog buttonconfigure Cancel -text "Abort PAIRNDF"
-      $quitdialog buttonconfigure OK -text "Continue processing"
+      $quitdialog buttonconfigure OK -text "Continue"
       $quitdialog hide Help
 
 #  Create a warning dialog for unsuccessful use of the aligner widget.
@@ -165,9 +168,10 @@
       set aligndialog [ iwidgets::messagedialog $aligner.qd \
                            -modality application \
                            -bitmap questhead \
+                           -master $aligner \
                            -title "PAIRNDF: No pairs" ]
       $aligndialog buttonconfigure Cancel -text "Pick another pair"
-      $aligndialog buttonconfigure OK -text "Try again"
+      $aligndialog buttonconfigure OK -text "Continue alignment"
       $aligndialog hide Help
       proc carryon { args } {
          global aligndialog
@@ -213,9 +217,10 @@
 
 #  Load the NDF pair into the aligner widget and wait for the user to 
 #  select some positions in common.
-         wm deiconify $aligner
-         raise $aligner $chooser
+         wm positionfrom $chooser user
          wm withdraw $chooser
+         wm deiconify $aligner
+         raise $aligner
          set percA [ $chooser percentiles $iA ]
          set percB [ $chooser percentiles $iB ]
          $aligner loadndf A $ndfs($iA) CURRENT $percA $MAXCANV
@@ -275,24 +280,34 @@
 #  No objects were matched between frames.
                } else {
                   set tryagain [ carryon "Centroiding failed." ]
-                  ccdputs -log \
-                  "    Centroiding failed, no offset determined - ignored."
+                  if { ! $tryagain } {
+                     ccdputs -log \
+                     "    Centroiding failed, no offset determined - ignored."
+                  }
                }
 
 #  There was an overlap, but the user failed to indicate any points to 
 #  be centroided.
             } elseif { [ $aligner overlapping ] } {
-               set tryagain \
-                   [ carryon "No points were selected in the overlap." ]
-               ccdputs -log "    No points selected in overlap - ignored."
+               set text [ join {"No points were selected."
+                                "You have to mark centroidable objects in the"
+                                "overlapping region to use this alignment."} \
+                          "\n" ]
+               set tryagain [ carryon $text ]
+               if { ! $tryagain } {
+                  ccdputs -log "    No points selected in overlap - ignored."
+               }
 
 #  The user decided there was no overlap between the selected images.
             } else {
                set tryagain [ carryon "Images do not overlap." ]
-               ccdputs -log "    Images do not overlap - ignored."
+               if { ! $tryagain } {
+                  ccdputs -log "    Images do not overlap - ignored."
+               }
             }
          }
          $aligner unbindall
+         wm positionfrom $aligner user
          wm withdraw $aligner
       }
 
