@@ -306,11 +306,8 @@ sub index_pack {
    print "\nPACKAGE: $package\n";
 
 #  Check specified file can be indexed (i.e. is a tar file or directory).
-#  It's a good idea to skip symlinks (at least in the case of directories)
-#  in case there's a link to the file . or a parent of it, which would
-#  lead to a vicious loop.
 
-   if ((!$tarext && !-d $pack_file) || -l $pack_file) {
+   unless ($tarext || -d $pack_file) {
       print "*** Skipping '$fqpack_file' (not tar file or directory) ***\n";
       return;
    }
@@ -454,9 +451,12 @@ sub index_list {
       $ext = '';
       $ext = $1 if ($file =~ /\.([^.]+)$/);
 
-#     Directory.
+#     Directory.  Skip it if it's a symbolic link, since symbolic links
+#     to the current directory or its parents can cause terrible trouble,
+#     and in any case we probably don't want to index it if it's not 
+#     really in the source tree.
 
-      if (-d $file && -r _ && -x _) {
+      if (-d $file && -r _ && -x _ && !-l _) {
          index_dir "$path$file/", $file; 
       }
 
