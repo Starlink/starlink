@@ -40,7 +40,8 @@
 *  ADAM Parameters:
 *     IN = LITERAL (Read)
 *        A list of image names which contain the raw bias frame data.
-*        The image names should be separated by commas and may include wildcards.
+*        The image names should be separated by commas and may include 
+*        wildcards.
 *     LOGFILE = FILENAME (Read)
 *        Name of the CCDPACK logfile.  If a null (!) value is given for
 *        this parameter then no logfile will be written, regardless of
@@ -178,6 +179,20 @@
 *     must be "YES", "TRUE", "T", "Y" for TRUE or "NO", "FALSE", "N",
 *     "F".
 *
+*     The FITS keywords may be hierarchical, and on the whole are 
+*     specified simply by giving their name in the normal way.
+*     However, there is one special case: if the value of a FITS
+*     header is known to be a string of the form '[A:B,C:D]' the
+*     numbers A, B, C and D may be extracted individually by appending
+*     '(X1)', '(X1)', '(Y1)' or '(Y2)' respectively to the name of
+*     the keyword.  Hence:
+*
+*        EXTENT.MINX   TRIMSEC(X1)
+*        EXTENT.MAXX   TRIMSEC(X2)
+*
+*     would set the extents from the first two fields of a suitably 
+*     formatted TRIMSEC header.
+*
 *     Fields in the table may be separated by commas if desired, any
 *     amount of white space and tabs are also allowed. Comments may be
 *     placed anywhere and should start with the characters "#" or "!".
@@ -242,6 +257,9 @@
 *        Added missing CCD1_END call.
 *     29-JUN-2000 (MBT):
 *        Replaced use of IRH/IRG with GRP/NDG.
+*     3-AUG-2000 (MBT):
+*        Added ability to index into [X1:X2,Y1:Y2] FITS header values,
+*        and fixed handling of hierarchical FITS keywords.
 *     {enter_changes_here}
 
 *  Bugs:

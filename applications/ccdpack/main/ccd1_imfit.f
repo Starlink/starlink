@@ -91,11 +91,14 @@
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK - Durham University)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     8-DEC-1993 (PDRAPER):
 *        Original version.
+*     2-AUG-2000 (MBT):
+*        Added support for FITS header values of the form '[X1:X2,Y1:Y2]'.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -143,13 +146,17 @@
       CHARACTER * ( GRP__SZNAM ) EXTTYP ! Extension item type
       CHARACTER * ( GRP__SZNAM ) FITVAL ! FITS keyword value
       CHARACTER * ( GRP__SZNAM ) KEYWRD ! FITS keyword name
+      CHARACTER * ( GRP__SZNAM ) KEYBAS ! FITS keyword base name
+      CHARACTER * ( GRP__SZNAM ) ORIFUN ! Unmodified form of EXTFUN
       CHARACTER * ( GRP__SZNAM + GRP__SZNAM ) FOR ! Forward expression for FITS function
       DOUBLE PRECISION DFIT     ! DBLE value of FITS item
       DOUBLE PRECISION DZERO( 1 ) ! 0.0D0
+      DOUBLE PRECISION DVECT( 4 ) ! Numbers in "[X1:X2,Y1:Y2]" string
       INTEGER CHRGRP            ! Group for storing character values
       INTEGER FIRST             ! Position of first character in word
       INTEGER I                 ! Loop variable
       INTEGER IAT               ! Position in string
+      INTEGER IX                ! Index of '[X1:X2,Y1:Y2]' substitution
       INTEGER NOWAT             ! Position in string
       INTEGER IFIT              ! Integer value of FITS item
       INTEGER IZERO( 1 )        ! 0
@@ -199,51 +206,117 @@
 *  Their types are stored in FITGRP( 2 ).
       NCHAR = 0
       DO 1 I = 1, NFITS
-         CALL GRP_GET( FITGRP( 1 ), I, 1, KEYWRD, STATUS )
-         CALL GRP_GET( FITGRP( 2 ), I, 1, FITVAL, STATUS )
          CVALS( I ) = 0
          IAT = 0
-         IF ( FITVAL( 1 : 8 ) .EQ. '_INTEGER' ) THEN
-            CALL FTS1_GKEYI( FITLEN, FITBLK, 1, KEYWRD, FOUND,
-     :                       IVALS( I ), IAT, STATUS )
-         ELSE IF ( FITVAL( 1 : 5 ) .EQ. '_REAL' ) THEN
-            CALL FTS1_GKEYR( FITLEN, FITBLK, 1, KEYWRD, FOUND,
-     :                       RVALS( I ), IAT, STATUS )
-         ELSE IF ( FITVAL( 1 : 7 ) .EQ. '_DOUBLE' ) THEN
-            CALL FTS1_GKEYD( FITLEN, FITBLK, 1, KEYWRD, FOUND,
-     :                       DVALS( I ), IAT, STATUS )
-         ELSE IF ( FITVAL( 1 : 8 ) .EQ. '_LOGICAL' ) THEN
-            CALL FTS1_GKEYL( FITLEN, FITBLK, 1, KEYWRD, FOUND,
-     :                       LVALS( I ), IAT, STATUS )
-         ELSE IF ( FITVAL( 1 : 5 ) .EQ. '_CHAR' ) THEN
+         CALL GRP_GET( FITGRP( 1 ), I, 1, KEYWRD, STATUS )
+         CALL GRP_GET( FITGRP( 2 ), I, 1, FITVAL, STATUS )
+
+*  Check whether the header keyword has an index into an [X1:X2,Y1:Y2]
+*  type value.
+         KEYBAS = KEYWRD
+         CALL CCD1_KTIDY( .FALSE., KEYBAS, IX, STATUS )
+
+*  The keyword has too many X1-type strings in it; this constitutes
+*  a syntax error.
+         IF ( IX .LT. 0 ) THEN
+            STATUS = SAI__ERROR
+            CALL MSG_SETC( 'KEY', KEYWRD )
+            CALL ERR_REP( 'CCD1_IMFIT_BADTEXT',
+     : '  CCD1_IMFIT: Syntax error in keyword ^KEY', STATUS )
+
+*  the value of the header is (asserted to be) a character string of 
+*  the form [x1:y1,x2:y2].
+         ELSE IF ( IX .GT. 0 ) THEN
+
+*  Get the character string.
+            CALL FTS1_GKEYC( FITLEN, FITBLK, 1, KEYBAS, FOUND,
+     :                       EXTFUN, IAT, STATUS )
+
+*  Decode the string according to the value of IX to get a numeric value.
+            CALL CCD1_DXY12( EXTFUN, DVECT, STATUS )
+
+*  And store the value.
+            IF ( FITVAL( 1 : 8 ) .EQ. '_INTEGER' ) THEN
+               IVALS( I ) = INT( DVECT( IX ) )
+            ELSE IF ( FITVAL( 1 : 5 ) .EQ. '_REAL' ) THEN
+               RVALS( I ) = REAL( DVECT( IX ) )
+            ELSE IF ( FITVAL( 1 : 7 ) .EQ. '_DOUBLE' ) THEN
+               DVALS( I ) = DBLE( DVECT( IX ) )
+            ELSE
+               STATUS = SAI__ERROR
+               CALL MSG_SETC( 'KEY', KEYWRD )
+               CALL ERR_REP( 'CCD1_IMFIT_BADTYP',
+     : '  CCD1_IMFIT: Unrecognised numeric HDS type for FITS-keyword'//
+     : ' ^KEY', STATUS )
+               GO TO 99
+            END IF
+
+*  This is a normal header keyword, so we just need to pull the value
+*  from the FITS header block and store it.
+         ELSE
+            IF ( FITVAL( 1 : 8 ) .EQ. '_INTEGER' ) THEN
+               CALL FTS1_GKEYI( FITLEN, FITBLK, 1, KEYWRD, FOUND,
+     :                          IVALS( I ), IAT, STATUS )
+            ELSE IF ( FITVAL( 1 : 5 ) .EQ. '_REAL' ) THEN
+               CALL FTS1_GKEYR( FITLEN, FITBLK, 1, KEYWRD, FOUND,
+     :                          RVALS( I ), IAT, STATUS )
+            ELSE IF ( FITVAL( 1 : 7 ) .EQ. '_DOUBLE' ) THEN
+               CALL FTS1_GKEYD( FITLEN, FITBLK, 1, KEYWRD, FOUND,
+     :                          DVALS( I ), IAT, STATUS )
+            ELSE IF ( FITVAL( 1 : 8 ) .EQ. '_LOGICAL' ) THEN
+               CALL FTS1_GKEYL( FITLEN, FITBLK, 1, KEYWRD, FOUND,
+     :                          LVALS( I ), IAT, STATUS )
+            ELSE IF ( FITVAL( 1 : 5 ) .EQ. '_CHAR' ) THEN
 
 *  Characters are a special case, store these in a GRP group and retain
 *  pointer information to extract them in order.
-            CALL FTS1_GKEYC( FITLEN, FITBLK, 1, KEYWRD, FOUND,
-     :                       EXTFUN, IAT, STATUS )
-            NCHAR = NCHAR + 1
-            CALL GRP_PUT( CHRGRP, 1, EXTFUN, NCHAR, STATUS )
-            CVALS( I ) = NCHAR
-         ELSE
+               CALL FTS1_GKEYC( FITLEN, FITBLK, 1, KEYWRD, FOUND,
+     :                          EXTFUN, IAT, STATUS )
+               NCHAR = NCHAR + 1
+               CALL GRP_PUT( CHRGRP, 1, EXTFUN, NCHAR, STATUS )
+               CVALS( I ) = NCHAR
+            ELSE
 
 *  Should never happen. Issue an error and abort.
-            STATUS = SAI__ERROR
-            CALL ERR_REP( 'CCD1_IMFIT_BADTYP',
+               STATUS = SAI__ERROR
+               CALL ERR_REP( 'CCD1_IMFIT_BADTYP',
      : '  CCD1_IMFIT: Unrecognised HDS type for FITS-keyword', STATUS )
-            GO TO 99
+               GO TO 99
+            END IF
          END IF
 
-*  If IAT is zero we failed to locate the FITS item.
-         IF ( IAT .EQ. 0 .AND. STATUS .EQ. SAI__OK .AND. STRICT ) THEN
+*  If IAT is zero we failed to locate the FITS item.  Warn the user at
+*  least, and either exit or carry on.
+*  error and exit, or write a sensible value.
+         IF ( IAT .EQ. 0 .AND. STATUS .EQ. SAI__OK ) THEN
+            IF ( STRICT ) THEN
 
 *  Consider this serious.
-            STATUS = SAI__ERROR
-            CALL MSG_SETC( 'KEYWRD', KEYWRD )
-            CALL NDF_MSG( 'NDF', NDF )
-            CALL ERR_REP( 'CCD1_IMFIT_MISS',
+               STATUS = SAI__ERROR
+               CALL MSG_SETC( 'KEYWRD', KEYWRD )
+               CALL NDF_MSG( 'NDF', NDF )
+               CALL ERR_REP( 'CCD1_IMFIT_MISS',
      :'  Cannot locate the FITS keyword: ^KEYWRD, in the'//
      :' extension of NDF: ^NDF' , STATUS )
-            GO TO 99
+               GO TO 99
+            ELSE
+               CALL MSG_SETC( 'KEY', KEYWRD )
+               CALL CCD1_MSG( ' ', 
+     :'  Warning: keyword ^KEY not found in FITS header.', STATUS )
+               IF ( FITVAL( 1 : 8 ) .EQ. '_INTEGER' ) THEN
+                  IVALS( I ) = 0
+               ELSE IF ( FITVAL( 1 : 5 ) .EQ. '_REAL' ) THEN
+                  RVALS( I ) = 0.0
+               ELSE IF ( FITVAL( 1 : 7 ) .EQ. '_DOUBLE' ) THEN
+                  DVALS( I ) = 0D0
+               ELSE IF ( FITVAL( 1 : 8 ) .EQ. '_LOGICAL' ) THEN
+                  LVALS( I ) = .FALSE.
+               ELSE IF ( FITVAL( 1 : 5 ) .EQ. '_CHAR' ) THEN
+                  NCHAR = NCHAR + 1
+                  CALL GRP_PUT( CHRGRP, 1, ' ', NCHAR, STATUS )
+                  CVALS( I ) = NCHAR
+               END IF
+            END IF
          END IF
  1    CONTINUE
 
@@ -268,6 +341,8 @@
          CALL GRP_GET( DESGRP( 2 ), I, 1, EXTTYP, STATUS )
          LENTYP = CHR_LEN( EXTTYP( :15 ) )
          CALL GRP_GET( DESGRP( 3 ), I, 1, EXTFUN, STATUS )
+         ORIFUN = EXTFUN
+         CALL CCD1_KTIDY( .TRUE., EXTFUN, IX, STATUS )
          LENFUN = CHR_LEN( EXTFUN )
          NOFUN = .FALSE.
          IF ( LENFUN .EQ. 0 ) NOFUN = .TRUE.
@@ -304,6 +379,7 @@
                   IF ( .NOT. NOTFND ) THEN
                      DO 8 J = 1, NFITS
                         CALL GRP_GET( FITGRP( 1 ), J, 1, KEYWRD, STATUS)
+                        CALL CCD1_KTIDY( .TRUE., KEYWRD, IX, STATUS )
                         IF ( EXTFUN( FIRST : LAST ) .EQ.
      :                       KEYWRD( : LAST - FIRST + 1 ) ) THEN
                            FOUND = .TRUE.
@@ -355,6 +431,7 @@
                   FOUND = .FALSE.
                   DO 3 J = 1, NFITS
                      CALL GRP_GET( FITGRP( 1 ), J, 1, KEYWRD, STATUS )
+                     CALL CCD1_KTIDY( .TRUE., KEYWRD, IX, STATUS )
                      IF ( EXTFUN( 1: NCHAR ) .EQ. KEYWRD( 1: NCHAR ) )
      :               THEN
                         FOUND = .TRUE.
@@ -517,6 +594,7 @@
                FOUND = .FALSE.
                DO 5 J = 1, NFITS
                   CALL GRP_GET( FITGRP( 1 ), J, 1, KEYWRD, STATUS )
+                  CALL CCD1_KTIDY( .TRUE., KEYWRD, IX, STATUS )
                   IF ( EXTFUN( 1: NCHAR ) .EQ. KEYWRD( 1: NCHAR ) )
      :            THEN
                      FOUND = .TRUE.
@@ -580,6 +658,7 @@
 *  We will manafacture tokens for the actual expression evaluation.
             DO 7 J = 1, NFITS
                CALL GRP_GET( FITGRP( 1 ), J, 1, KEYWRD, STATUS )
+               CALL CCD1_KTIDY( .TRUE., KEYWRD, IX, STATUS )
                NCHAR = CHR_LEN( KEYWRD )
                CALL GRP_GET( FITGRP( 2 ), J, 1, FITVAL, STATUS )
                IF ( FITVAL( 1 : 8 ) .EQ. '_INTEGER' ) THEN
@@ -659,9 +738,9 @@
                IF ( STATUS .NE. SAI__OK ) THEN
                   CALL ERR_ANNUL( STATUS )
                   STATUS = SAI__ERROR
-                  CALL MSG_SETC( 'EXTFUN', EXTFUN( : LENFUN ) )
+                  CALL MSG_SETC( 'FUN', ORIFUN )
                   CALL MSG_SETC( 'EXTNAM', EXTNAM( : LENNAM ) )
-                  CALL ERR_REP( ' ', '  Cannot interpret:"^EXTFUN", '//
+                  CALL ERR_REP( ' ', '  Cannot interpret:"^FUN", '//
      :'as a valid transform for any known FIT-keywords '//
      : '(extension item ^EXTNAM).', STATUS )
                   CALL ERR_RLSE

@@ -114,7 +114,7 @@
 #
 #        The following ADAM UNIX software libraries and their
 #        dependencies.
-#           AGI ARD AST CHR FIO GRP IDI NDF PGPLOT PRM PSX TRN PDA
+#           AGI ARD AST CHR FIO GRP IDI NDF PGPLOT PRM PSX TRN PDA NDG
 #        HTX
 #           The hypertext linker.
 #        GENERIC
@@ -440,7 +440,7 @@ PKG_VERS = 3.1-0
 
 SOURCE_FILES = makefile mk $(DOCUMENTATION) $(HELPTASK).tar \
  $(PKG_NAME)_source.tar $(PKG_NAME)_sub.tar $(PKG_NAME)_dgen.tar \
- $(PKG_NAME)_gen.tar $(PKG_NAME)_tasks.tar ndg_source.tar \
+ $(PKG_NAME)_gen.tar $(PKG_NAME)_tasks.tar \
  $(DATA_FILES) $(PKG_NAME)_iraf.tar
 
 #  List of public script files.  These are scripts which form part of
@@ -539,8 +539,6 @@ PRIVATE_INCLUDES = ccd1_fdcm ccd1_fitcm ccd1_memcm ccd1_moscm \
  ccd1_mospr ccd1_tmpcm fio1_clog hlpcmd.inc ira_err ira_par \
  ndf_const user_err slv.h
 
-NDG_INCLUDES = ndg_const ndg_err
-
 #  Package include file which will be edited at build time to contain
 #  the package version number.
 
@@ -557,13 +555,13 @@ EXTERNAL_INCLUDES = AST_PAR CHR_ERR DAT_PAR DAT_ERR TRN_PAR TRN_ERR \
  NUM_DEC_CVT NUM_DEC_D NUM_DEC_I NUM_DEC_R NUM_DEC_UB NUM_DEC_UW \
  NUM_DEC_W NUM_DEF_B NUM_DEF_CVT NUM_DEF_D NUM_DEF_I NUM_DEF_R \
  NUM_DEF_UB NUM_DEF_UW NUM_DEF_W PAR_ERR PAR_PAR PRM_PAR SAE_PAR \
- SUBPAR_PAR GRP_PAR GRP_ERR PSX_ERR
+ SUBPAR_PAR GRP_PAR GRP_ERR PSX_ERR NDG_ERR
 
 #  List of Fortran routines required for building the package.  This is
 #  just a list of all the Fortran source files (excluding BLOCK DATA
 #  routines and the main routine, which are treated separately).
 
-F_ROUTINES = $(TASKSRC) $(SUBSRC) $(HELPSRC) $(NDGSRC) \
+F_ROUTINES = $(TASKSRC) $(SUBSRC) $(HELPSRC) \
              $(GENSRC) $(GENSRC:.gen=.f) \
              $(GENRDSRC) $(GENRDSRC:.grd=.f) \
              $(GENLRDICSRC) $(GENLRDICSRC:.glrdic=.f) \
@@ -584,7 +582,7 @@ SUBSRC = ccd1_achan.f ccd1_acmsk.f ccd1_adds.f ccd1_adkey.f \
  ccd1_dcen.f ccd1_dcon.f ccd1_debia.f ccd1_decl2.f \
  ccd1_decl3.f ccd1_decl4.f ccd1_disp.f ccd1_dlcat.f ccd1_dmprg.f ccd1_docmp.f \
  ccd1_domos.f ccd1_drawi.f ccd1_drawp.f ccd1_dtrn.f \
- ccd1_duesc.f ccd1_end.f ccd1_estm.f ccd1_ffcl.f \
+ ccd1_duesc.f ccd1_dxy12.f ccd1_end.f ccd1_estm.f ccd1_ffcl.f \
  ccd1_ffcor.f ccd1_filas.f ccd1_fiohd.f ccd1_fitg.f \
  ccd1_fitlm.f ccd1_flnms.f ccd1_frdm.f ccd1_frtmp.f ccd1_ftval.f ccd1_ftypi.f \
  ccd1_ftypl.f ccd1_gafit.f ccd1_gastc.f ccd1_gastd.f \
@@ -594,7 +592,7 @@ SUBSRC = ccd1_achan.f ccd1_acmsk.f ccd1_adds.f ccd1_adkey.f \
  ccd1_gtlig.f ccd1_gtlis.f ccd1_gtmlg.f ccd1_gtmli.f \
  ccd1_gtmsk.f ccd1_gtsec.f ccd1_gtwcs.f ccd1_hisp.f ccd1_hvcon.f \
  ccd1_hvusr.f ccd1_inply.f ccd1_inser.f ccd1_iscom.f ccd1_itra.f \
- ccd1_lasto.f ccd1_lastw.f ccd1_lcc.f ccd1_lext.f \
+ ccd1_ktidy.f ccd1_lasto.f ccd1_lastw.f ccd1_lcc.f ccd1_lext.f \
  ccd1_linv.f ccd1_lmap.f ccd1_lnam.f ccd1_lnamm.f \
  ccd1_lnmap.f ccd1_locs2.f \
  ccd1_locs3.f ccd1_ltest.f ccd1_ltrcm.f ccd1_lxyt.f \
@@ -608,8 +606,8 @@ SUBSRC = ccd1_achan.f ccd1_acmsk.f ccd1_adds.f ccd1_adkey.f \
  ccd1_ndfpg.f ccd1_ndfpr.f ccd1_nlmap.f ccd1_nmid.f ccd1_nrmed.f \
  ccd1_nxwrd.f ccd1_objs.f ccd1_opfio.f ccd1_orvar.f \
  ccd1_ovcom.f ccd1_ovlap.f ccd1_plof.f ccd1_pnply.f ccd1_prmin.f \
- ccd1_prndf.f ccd1_proff.f ccd1_prsel.f ccd1_prune.f ccd1_ptbad.f \
- ccd1_pthmp.f ccd1_ptins.f ccd1_putr.f ccd1_rbia.f ccd1_rcal.f \
+ ccd1_prndf.f ccd1_proff.f ccd1_prsel.f ccd1_prune.f \
+ ccd1_ptbad.f ccd1_pthmp.f ccd1_ptins.f ccd1_putr.f ccd1_rbia.f ccd1_rcal.f \
  ccd1_rccr.f ccd1_rdbi.f ccd1_rdlin.f ccd1_redtr.f \
  ccd1_rend.f ccd1_reov.f ccd1_repc.f ccd1_rexp.f \
  ccd1_rfcr.f ccd1_rflt.f ccd1_rglo.f ccd1_rmcom.f \
@@ -635,16 +633,7 @@ SUBSRC = ccd1_achan.f ccd1_acmsk.f ccd1_adds.f ccd1_adkey.f \
  kpg1_asfrm.f kpg1_asffr.f kpg1_isscs.f kpg1_assir.f \
  ira1_chscs.f ira_seteq.f ira_iscs.f \
  ccd1_box.f ccd1_gszff.f ccd1_sgare.f ccd1_tran.f \
- ccd1_fspec.f ccd1_slice.f
-
-NDGSRC = ndg1_appen.f ndg1_asexp.f ndg1_chscn.f ndg1_crexp.f \
- ndg1_expan.f ndg1_fpars.f ndg1_fparx.f ndg1_gtyps.f ndg1_hcut.f \
- ndg1_hfind.f ndg1_hsplt.f ndg1_lasto.f ndg1_match.f ndg1_ndfch.f \
- ndg1_ndfdl.f ndg1_pshdb.f ndg1_pshde.f ndg1_pshdf.f ndg1_sdfex.f \
- ndg1_subst.f ndg_gtsup.f ndg_ndfas.f ndg_ndfcp.f ndg_ndfcr.f ndg_ndfpr.f \
- ndg_ptsup.f ndg_setsz.f ndg1_sort.f ndg1_crpth.f ndg1_open.f \
- ndg_asso1.f ndg_assoc.f ndg_crea1.f ndg_creat.f \
- ndg_crep1.f ndg_prop1.f
+ ccd1_fspec.f ccd1_slice.f ccd1_grdel.f
 
 HELPSRC = $(HELPTASK).f gethlp.f gthlpi.f kpg1_scrsz.f \
  pthlpo.f sread.f
@@ -678,7 +667,8 @@ GENSRC = ccg1_add.gen ccg1_bext.gen ccg1_bl.gen ccg1_bmd1.gen \
  ccg1_wtm4.gen ccg1_smr1.gen ccg1_smd2.gen ccg1_smr2.gen \
  ccg1_smd3.gen ccg1_smr3.gen ccg1_fmr1.gen ccg1_fmr2.gen \
  ccg1_fmr3.gen ccg1_fmd1.gen ccg1_fmd2.gen ccg1_fmd3.gen \
- ccg1_kthx.gen ccg1_asli.gen ccg1_dodiz.gen
+ ccg1_kthx.gen ccg1_asli.gen ccg1_dodiz.gen ccg1_frac.gen \
+ ccg1_ghst.gen
 
 #  Routines which may be real or double precision
 GENRDSRC = ccg1_ffrj.grd kpg1_bloc.grd ccg1_axin.grd \
@@ -708,11 +698,9 @@ PLATFORM_F =
 #  C routines required for building the package.  This is just a list of
 #  all the C source files.
 
-C_ROUTINES = $(CSUBSRC) $(CNDGSRC)
+C_ROUTINES = $(CSUBSRC)
 
 CSUBSRC = ccd1_exec.c slv.c find_file.c
-
-CNDGSRC = ndg1_wild.c
 
 #  List of applications/tasks in monoliths.
 
@@ -838,8 +826,7 @@ BUILT_FILES = $(LINK_SCRIPT1) $(LINK_SCRIPT2) \
 
 INCLUDE_LINKS = $(EXTERNAL_INCLUDES) CCD1_FDCM CCD1_FITCM CCD1_MEMCM \
                 CCD1_MOSCM CCD1_MOSPR CCD1_PAR CCD1_TMPCM FIO1_CLOG \
-                HLPCMD.INC IRA_ERR IRA_PAR NDF_CONST USER_ERR \
-                NDG_CONST NDG_ERR
+                HLPCMD.INC IRA_ERR IRA_PAR NDF_CONST USER_ERR
 
 #  Rules to set up links to locate each of the above include files.
 
@@ -868,8 +855,7 @@ MSG_PAR:        $(STAR_INC)/msg_par;      $(LINK) $? $@
 NDF_CONST:	ndf_const;	          $(LINK) $? $@
 NDF_ERR:       	$(STAR_INC)/ndf_err;      $(LINK) $? $@
 NDF_PAR:       	$(STAR_INC)/ndf_par;      $(LINK) $? $@
-NDG_CONST:      ndg_const;                $(LINK) $? $@
-NDG_ERR:        ndg_err;                  $(LINK) $? $@
+NDG_ERR:        $(STAR_INC)/ndg_err;      $(LINK) $? $@
 NUM_CMN:        $(STAR_INC)/num_cmn;      $(LINK) $? $@
 NUM_DEC_B :     $(STAR_INC)/num_dec_B;    $(LINK) $? $@
 NUM_DEC_CVT:    $(STAR_INC)/num_dec_cvt;  $(LINK) $? $@
@@ -945,11 +931,6 @@ $(DGENSRC) : $(PKG_NAME)_dgen.tar
 	@ if test -f $@; then :;\
 	  else echo $@ is not in the tar file; exit 1; fi
 
-$(NDGSRC) $(CNDGSRC) $(NDG_INCLUDES) : ndg_source.tar
-	$(TAR_OUT) ndg_source.tar $@
-	@ if test -f $@; then :;\
-          else echo $@ is not in the tar file; exit 1; fi
-
 $(HELPSRC) : $(HELPTASK).tar
 	$(TAR_OUT) $(HELPTASK).tar $@
 	@ if test -f $@; then :;\
@@ -988,14 +969,14 @@ RCSFILES = makefile mk $(LATEX_DOCS) $(PKG_NAME).news $(HELPSRC) \
 
 check_source: makefile mk $(DOCUMENTATION) $(HELPTASK).tar \
  $(PKG_NAME)_source.tar $(PKG_NAME)_sub.tar $(PKG_NAME)_dgen.tar \
- $(PKG_NAME)_gen.tar $(PKG_NAME)_tasks.tar ndg_source.tar \
+ $(PKG_NAME)_gen.tar $(PKG_NAME)_tasks.tar \
  $(DOCUMENTATION) $(DATA_FILES) $(PKG_NAME)_iraf.tar \
  rcsrevs
 
 clean_source:
 	$(RM) $(DOCUMENTATION) $(HELPTASK).tar $(PKG_NAME)_source.tar \
               $(PKG_NAME)_sub.tar $(PKG_NAME)_dgen.tar $(PKG_NAME)_gen.tar \
-              $(PKG_NAME)_tasks.tar ndg_source.tar \
+              $(PKG_NAME)_tasks.tar \
               $(DATA_FILES) $(PKG_NAME)_iraf.tar
 
 #  Build list of files under RCS control used at this release, and log
@@ -1083,9 +1064,6 @@ $(PKG_NAME)_dgen.tar:
 	$(TAR_IN) $(PKG_NAME)_dgen.tar $(DGENSRC)
 	@- $(RM) $(DGENSRC)
 
-ndg_source.tar:
-	zcat /stardev/local/tarfiles/ndg.tar.Z | tar xvf - ndg_source.tar
-
 $(HELPTASK).tar:
 	co $(HELPSRC)
 	chmod 644 $(HELPSRC)
@@ -1134,8 +1112,7 @@ $(PLATFORM_TCLBINARIES):
 #  for performing the compilations.
 
 OBJECT_FILES = $(TASKOBJ) $(SUBOBJ) $(CSUBOBJ) $(GENOBJ) $(GENRDOBJ) \
- $(GENLRDIOBJ) $(GENCOBJ) $(DGENOBJ) \
- $(NDGOBJ) $(CNDGOBJ) $(HELPOBJ) $(MONO_OBJECT)
+ $(GENLRDIOBJ) $(GENCOBJ) $(DGENOBJ) $(HELPOBJ) $(MONO_OBJECT)
 
 TASKOBJ = $(TASKSRC:.f=.o)
 
@@ -1153,10 +1130,6 @@ GENLRDIOBJ = $(GENLRDISRC:.glrdi=.o)
 
 DGENOBJ = $(DGENSRC:.dgen=.o)
 $(DGENOBJ): $(PRIVATE_SCRIPTS)
-
-NDGOBJ = $(NDGSRC:.f=.o)
-
-CNDGOBJ = $(CNDGSRC:.c=.o)
 
 HELPOBJ = $(HELPSRC:.f=.o)
 
@@ -1203,7 +1176,7 @@ MONO_OBJECT = $(MONO_SOURCE:.f=.o)
 #  them.
 
 OBJECT_LIBRARIES = lib$(PKG_NAME)_tasks.a lib$(PKG_NAME).a \
- lib$(PKG_NAME)_gen.a lib$(HELPTASK).a libndg.a
+ lib$(PKG_NAME)_gen.a lib$(HELPTASK).a
 
 lib$(PKG_NAME)_tasks.a : $(TASKOBJ)
 	$(AR_IN) lib$(PKG_NAME)_tasks.a $?
@@ -1221,10 +1194,6 @@ lib$(PKG_NAME)_gen.a : $(GENOBJ) $(GENRDOBJ) $(GENCOBJ) \
 lib$(HELPTASK).a : $(HELPOBJ)
 	$(AR_IN) lib$(HELPTASK).a $?
 	$(RANLIB) lib$(HELPTASK).a
-
-libndg.a : $(NDGOBJ) $(CNDGOBJ)
-	$(AR_IN) libndg.a $?
-	$(RANLIB) libndg.a
 
 #  Rule and dependencies for building the monoliths.
 
@@ -2085,7 +2054,7 @@ $(EXPORT)/$(PKG_NAME).tar.Z: $(SOURCE_FILES)
 #  Remove all intermediate files.  Do not remove built files.
 
 clean:
-	@- $(RM) $(INCLUDE_LINKS) $(PRIVATE_INCLUDES) $(NDG_INCLUDES) \
+	@- $(RM) $(INCLUDE_LINKS) $(PRIVATE_INCLUDES) \
                  $(PKG_INCLUDE) $(IFL_FILES) \
 		 $(MONO_IFL) $(HELP_SOURCES) $(PLATFORM_F) $(BLOCK_DATA) \
 		 $(C_ROUTINES) $(PRIVATE_SCRIPTS) $(IFD_FILES) \
@@ -2185,6 +2154,7 @@ ccd1_drawi.o: IDI_ERR SAE_PAR
 ccd1_drawp.o: PRM_PAR SAE_PAR
 ccd1_dtrn.o: SAE_PAR
 ccd1_duesc.o: MSG_PAR SAE_PAR
+ccd1_dxy12.o: SAE_PAR
 ccd1_end.o: SAE_PAR
 ccd1_entrn.o: DAT_PAR SAE_PAR TRN_PAR
 ccd1_estm.o: SAE_PAR
@@ -2214,6 +2184,7 @@ ccd1_gmdcp.o: PAR_ERR PRM_PAR SAE_PAR
 ccd1_gmid.o: PRM_PAR SAE_PAR
 ccd1_gmmp.o: PRM_PAR SAE_PAR
 ccd1_grapc.o: PRM_PAR SAE_PAR
+ccd1_grdel.o: GRP_PAR SAE_PAR
 ccd1_grpth.o: PRM_PAR SAE_PAR
 ccd1_grrep.o: CCD1_PAR SAE_PAR
 ccd1_groff.o: MSG_PAR PRM_PAR SAE_PAR
@@ -2240,6 +2211,7 @@ ccd1_inser.o: SAE_PAR
 ccd1_iscom.o: SAE_PAR
 ccd1_itra.o: SAE_PAR
 ccd1_knext.o: SAE_PAR
+ccd1_ktidy.o: SAE_PAR GRP_PAR
 ccd1_lasto.o: SAE_PAR
 ccd1_lastw.o: SAE_PAR
 ccd1_lcc.o: SAE_PAR
@@ -2415,6 +2387,8 @@ ccg1_fch1.o: DAT_PAR PRM_PAR SAE_PAR
 ccg1_ffrj.o: PRM_PAR SAE_PAR
 ccg1_flw.o: NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR
 ccg1_fpw.o: NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR
+ccg1_frac.o: NUM_DEC_CVT NUM_DEF_CVT SAE_PAR
+ccg1_ghst.o: NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR
 ccg1_gpl.o: NUM_DEC_CVT NUM_DEF_CVT SAE_PAR
 ccg1_gvar.o: NUM_CMN NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR
 ccg1_irhg.o: DAT_PAR FIO_ERR PAR_ERR SAE_PAR GRP_PAR
@@ -2564,39 +2538,5 @@ ccg1_smd2.o: NUM_CMN NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR
 ccg1_smr2.o: NUM_CMN NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR
 ccg1_smd3.o: NUM_CMN NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR
 ccg1_smr3.o: NUM_CMN NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR
-ndg1_appen.o:    SAE_PAR GRP_PAR NDG_CONST NDG_ERR
-ndg1_asexp.o:    SAE_PAR NDG_CONST NDG_ERR GRP_PAR
-ndg1_chscn.o:    SAE_PAR DAT_PAR NDF_ERR
-ndg1_crexp.o:    SAE_PAR DAT_PAR GRP_PAR NDG_CONST PSX_ERR
-ndg1_crpth.o:    SAE_PAR GRP_PAR DAT_PAR DAT_ERR NDG_CONST
-ndg1_expan.o:    SAE_PAR GRP_PAR DAT_PAR
-ndg1_fpars.o:    SAE_PAR
-ndg1_gtyps.o:    SAE_PAR
-ndg1_hcut.o:     SAE_PAR DAT_PAR NDF_ERR
-ndg1_hfind.o:    SAE_PAR DAT_PAR NDF_ERR
-ndg1_hsplt.o:    SAE_PAR DAT_PAR NDF_ERR
-ndg1_lasto.o:    SAE_PAR
-ndg1_match.o:    SAE_PAR GRP_PAR NDG_CONST
-ndg1_ndfch.o:    SAE_PAR GRP_PAR NDG_CONST NDG_ERR PSX_ERR
-ndg1_ndfdl.o:    SAE_PAR GRP_PAR DAT_PAR
-ndg1_pshdb.o:    SAE_PAR DAT_PAR NDF_ERR
-ndg1_pshde.o:    SAE_PAR DAT_PAR NDF_ERR
-ndg1_pshdf.o:    SAE_PAR DAT_PAR NDF_ERR
-ndg1_sdfex.o:    SAE_PAR GRP_PAR DAT_PAR
-ndg1_sort.o:     SAE_PAR GRP_PAR PRM_PAR NDG_CONST
-ndg1_subst.o:    SAE_PAR
-ndg_asso1.o:     SAE_PAR GRP_PAR NDF_PAR
-ndg_assoc.o:     SAE_PAR GRP_PAR GRP_ERR PAR_ERR NDG_ERR
-ndg_crea1.o:     SAE_PAR GRP_PAR NDF_PAR
-ndg_creat.o:     SAE_PAR GRP_PAR PAR_ERR
-ndg_crep1.o:     SAE_PAR GRP_PAR NDF_PAR
-ndg_gtsup.o:     SAE_PAR GRP_PAR
-ndg_ndfas.o:     SAE_PAR DAT_PAR NDF_PAR GRP_PAR NDG_CONST
-ndg_ndfcp.o:     SAE_PAR DAT_PAR NDF_PAR GRP_PAR NDG_CONST
-ndg_ndfcr.o:     SAE_PAR DAT_PAR NDF_PAR GRP_PAR NDG_CONST
-ndg_ndfpr.o:     SAE_PAR DAT_PAR NDF_PAR GRP_PAR NDG_CONST
-ndg_prop1.o:     SAE_PAR GRP_PAR NDF_PAR
-ndg_ptsup.o:     SAE_PAR GRP_PAR
-ndg_setsz.o:     SAE_PAR GRP_PAR
 
 # $Id$

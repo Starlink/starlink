@@ -13,14 +13,14 @@
 *     CALL CCD1_KTIDY( TOTRN, TEXT, INDXY, STATUS )
 
 *  Description:
-*     This routine turns a FITS-header-like string of the form which
-*     may be found in a translation table as used by the IMPORT 
-*     utility into a string suitable for use as a token in TRANSFORM
-*     routines.
+*     This routine turns text containing FITS-header-like strings of 
+*     the form which may be found in the translation tables used 
+*     by the IMPORT utility into a string suitable for use as a token 
+*     in TRANSFORM routines.
 *
 *     In fact it makes two related sets of substitutions: if it finds
 *     either a character which is legal in a FITS header but not a 
-*     TRANSFORM token ('-' or '.'), or one of the special strings 
+*     TRANSFORM token ('.'), or one of the special strings 
 *     '(X1)', '(X2)', '(Y1)' or '(Y2)', then it replaces them by 
 *     something identifiable but palatable to TRANSFORM.  
 *     Additionally, if exactly one substitution of the X1,X2,Y1,Y2 type
@@ -66,6 +66,10 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
+*  Bugs:
+*     This routine does not cope with '-', which is a legal character
+*     in a FITS header keyword, but not in a TRANSFORM token.
+
 *  Copyright:
 *     Copyright (C) 2000 Central Laboratory of the Research Councils
 
@@ -102,10 +106,12 @@
 *  External References:
       EXTERNAL CHR_LEN
       INTEGER CHR_LEN            ! Length of string excluding trailing blanks
+      EXTERNAL CHR_ISALF
+      LOGICAL CHR_ISALF          ! Whether character is alphabetic
       
 *  Local Constants:
       INTEGER NTOK
-      PARAMETER ( NTOK = 6 )     ! Number of possible token substitutions
+      PARAMETER ( NTOK = 4 )     ! Number of possible token substitutions
       
 *  Local Variables:
       INTEGER I                  ! Loop variable
@@ -116,14 +122,16 @@
       INTEGER SLENG              ! Length of TEXT string
       INTEGER TOTREP             ! Number of replacements altogether
       INTEGER TLENG( NTOK )      ! Length of strings in TOKEN
+      LOGICAL FOUND              ! Have we found a replacement token?
+      CHARACTER * 8 DOTREP       ! Replacement for '.' character
       CHARACTER * 8 REPLC( NTOK ) ! Replacements for tokens
       CHARACTER * 4 TOKEN( NTOK ) ! Tokens to substitute for
       CHARACTER * ( GRP__SZNAM ) WORK ! Output string
       
 *  Local Data:
-      DATA TOKEN / '(X1)', '(X2)', '(Y1)', '(Y2)', '.', '-' /
-      DATA REPLC / '___X1___', '___X2___', '___Y1___', '___Y2___',
-     :             '___DT___', '___MI___' /
+      DATA TOKEN / '(X1)', '(X2)', '(Y1)', '(Y2)' /
+      DATA REPLC / '___X1___', '___X2___', '___Y1___', '___Y2___' /
+      DATA DOTREP / '___DT___' /
       
 *.
 
@@ -137,29 +145,42 @@
          RLENG( I ) = CHR_LEN( REPLC( I ) )
       END DO
       SLENG = CHR_LEN( TEXT )
+      WORK = ' '
 
 *  Work through the text string a character at a time, replacing tokens
 *  as they are encountered.
       IAT = 1
       OAT = 1
  1    CONTINUE
+
+*  Check for the replacement tokens and handle them if we find them.
+         FOUND = .FALSE.
          DO I = 1, NTOK
 
 *  If this is one of the tokens, copy the replacement string to the
 *  output string.
-            IF ( TEXT( IAT : IAT + TLENG( I ) ) .EQ. TOKEN( I ) ) THEN
+            IF ( TEXT( IAT : IAT + TLENG( I ) - 1 ) .EQ. TOKEN( I ) )
+     :         THEN
+               FOUND = .TRUE.
                IAT = IAT + TLENG( I )
                NREP( I ) = NREP( I ) + 1
-
                IF ( TOTRN ) THEN
-                  WORK( OAT : ) = REPLC( I )
+                  WORK( OAT : OAT + RLENG( I ) - 1 ) = REPLC( I )
                   OAT = OAT + RLENG( I  )
-               ELSE
-                  IF ( I .GT. 4 ) THEN
-                     WORK( OAT : OAT ) = TEXT( IAT : IAT )
-                     OAT = OAT + 1
-                  END IF
                END IF
+            END IF
+         END DO
+
+*  If it's a '.' character between alphabetic characters it should
+*  get translated (in other contexts it is probably a decimal point).
+         IF ( .NOT. FOUND ) THEN
+            IF ( TOTRN .AND. TEXT( IAT : IAT ) .EQ. '.' .AND.
+     :                IAT .GT. 1 .AND.
+     :                CHR_ISALF( TEXT( IAT - 1 : IAT - 1 ) ) .AND.
+     :                CHR_ISALF( TEXT( IAT + 1 : IAT + 1 ) ) ) THEN
+               WORK( OAT : OAT + CHR_LEN( DOTREP ) - 1 ) = DOTREP
+               OAT = OAT + CHR_LEN( DOTREP )
+               IAT = IAT + 1
 
 *  Otherwise, copy the character unchanged.
             ELSE
@@ -167,7 +188,7 @@
                OAT = OAT + 1
                IAT = IAT + 1
             END IF
-         END DO
+         END IF
 
 *  Check that we haven't overflowed the string length.
          IF ( OAT .GT. LEN( TEXT ) .OR. OAT .GT. LEN( WORK ) ) THEN
@@ -179,13 +200,13 @@
          END IF
 
 *  Go to the next character if there is one.
-      IF ( IAT .GT. SLENG ) GO TO 1
+      IF ( IAT .LE. SLENG ) GO TO 1
 
 *  Set INDXY so that if there has been a single substitution of one of
 *  the first four tokens it is set to the index of that token, otherwise
 *  it is 0 or -1.
       TOTREP = 0
-      DO I = 1, 4
+      DO I = 1, NTOK
          IF ( NREP( I ) .EQ. 1 ) INDXY = I
          TOTREP = TOTREP + NREP( I )
       END DO

@@ -47,7 +47,11 @@
 *     FITGRP( 2 ) = INTEGER (Returned)
 *        Two groups which on exit will contain the keyword and type of
 *        any FITS items whose values will be used in contructing
-*        extension item values.
+*        extension item values.  The members of the first group will
+*        be normal (though possibly hierarchical) FITS keyword names, 
+*        except that they may contain one of the strings "(X1)", "(X2)",
+*        "(Y1)" or "(Y2)" to indicate indexing into a header value
+*        of the form [X1:X2,Y1:Y2].
 *     DESGRP( 3 ) = INTEGER (Returned)
 *        Three groups which on exit will contain the extension item
 *        name, its expected type (constrained by CCDPACK) and the
@@ -77,11 +81,15 @@
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK - Durham University)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     9-DEC-1993 (PDRAPER):
 *        Original version.
+*     2-AUG-2000 (MBT):
+*        Added support for FITS header values of the form [X1:X2,Y1:Y2],
+*        and fixed some bugs with ERR_MARK/ERR_RLSE pairing.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -120,11 +128,13 @@
       CHARACTER * ( GRP__SZNAM ) NAME2 ! Buffer for "name" from group
       CHARACTER * ( GRP__SZNAM ) NAME3 ! Buffer for "name" from group
       CHARACTER * ( GRP__SZNAM ) NAME4 ! Buffer for "name" from group
+      CHARACTER * ( GRP__SZNAM ) NAME5 ! Buffer for "name" from group
       CHARACTER * ( GRP__SZNAM ) WORDS( 1 ) ! Word returned
       DOUBLE PRECISION DVAL      ! Dummy
       INTEGER I                  ! Loop variable
       INTEGER IAT                ! Position in string
       INTEGER INDEX              ! Index into group
+      INTEGER IX                 ! Index of '[X1:X2,Y1:Y2]' substitution
       INTEGER J                  ! Loop variable
       INTEGER LSTAT              ! Local status
       INTEGER NFITS              ! Number of FITS items
@@ -176,10 +186,31 @@
      :        NAME1( 1 : 8 ) .EQ. '_LOGICAL' .OR.
      :        NAME1( 1 : 5 ) .EQ. '_CHAR' ) THEN 
 
-*  Yes it is assume next value is a FITS-keyword. These may be
-*  hierarchical so don't impose any strict limits on size.
-            MASK( I ) = .TRUE.
+*  Yes it is.  Check that the next word is a usable FITS keyword by
+*  making it TRANSFORM-friendly and then attempting a dummy substitution
+*  with it.
             CALL GRP_GET( WRDGRP( 2 ), I, 1, NAME2, STATUS )
+            NAME3 = NAME2
+            CALL CCD1_KTIDY( .TRUE., NAME3, IX, STATUS )
+            CALL ERR_MARK
+            CALL TRN_STOK( NAME3, ' ', ' ', NSUB, STATUS )
+
+*  If TRANSFORM choked on it, we can't use this.
+            IF ( STATUS .EQ. TRN__TOKIN ) THEN
+               CALL ERR_ANNUL( STATUS )
+               CALL GRP_GET( LINGRP, I, 1, NAME1, STATUS )
+               CALL MSG_SETC( 'LINNUM', NAME1 )
+               CALL MSG_SETC( 'KEY', NAME2 )
+               STATUS = SAI__ERROR
+               CALL ERR_REP( 'CCD1_FTGRP_ERR', 
+     :'  Invalid keyword name ^KEY at line ^LINNUM', STATUS )
+               CALL ERR_RLSE
+               GO TO 99
+            END IF
+            CALL ERR_RLSE
+
+*  It's a usable keyword, so store it.
+            MASK( I ) = .TRUE.
             CALL GRP_PUT( FITGRP( 1 ), 1, NAME2, 0, STATUS )
             CALL GRP_PUT( FITGRP( 2 ), 1, NAME1, 0, STATUS )
          END IF
@@ -321,9 +352,13 @@ C               END IF
                            DO 5 J = 1, NFITS
                               CALL GRP_GET( FITGRP( 1 ), J, 1, NAME4,
      :                                      STATUS )
-                              WORDS( 1 ) = NAME4
-                              CALL TRN_STOK( WORDS( 1 ), NAME4, NAME3,
-     :                                       NSUB, STATUS )
+                              CALL CCD1_KTIDY( .TRUE., NAME4, IX,
+     :                                         STATUS )
+                              NAME5 = NAME3
+                              CALL CCD1_KTIDY( .TRUE., NAME5, IX, 
+     :                                         STATUS )
+                              CALL TRN_STOK( NAME4, ' ', NAME5, NSUB,
+     :                                       STATUS )
                               IF ( NSUB .NE. 0 ) THEN
                            
 *  Known keyword substitutes into value, must be a function.
@@ -335,12 +370,13 @@ C               END IF
                            IF ( .NOT. LVAL ) THEN
                            
 *  Almost certainly is a new FITS-keyword, one final check. Is it a
-*  valid token? Test this by subtituting into itself.
-                              CALL ERR_MARK
-                              NAME4 = NAME3
+*  valid token?  Test this by doing a dummy substitution.
                               WORDS( 1 ) = NAME3
-                              CALL TRN_STOK( NAME4, NAME3, WORDS( 1 ),
-     :                                       NSUB, STATUS )
+                              CALL CCD1_KTIDY( .TRUE., WORDS( 1 ), IX,
+     :                                         STATUS )
+                              CALL ERR_MARK
+                              CALL TRN_STOK( WORDS( 1 ), ' ', ' ', NSUB,
+     :                                       STATUS )
                               IF ( STATUS .EQ. TRN__TOKIN ) THEN
                            
 *  It's an invalid token. Cannot process this regardless. Time to give
@@ -356,6 +392,8 @@ C               END IF
                                  CALL ERR_REP( 'CCD1_FTGRP_ERR3',
      :'  Cannot interpret "^NAME3" as a FITS-keyword -- keywords in'//
      :' functions must be declared', STATUS )
+                                 CALL ERR_RLSE
+                                 CALL ERR_RLSE
                                  GO TO 99
                               ELSE
                            
@@ -381,10 +419,10 @@ C               END IF
                LVAL = .FALSE.               
                DO 7 J = 1, NFITS            
                   CALL GRP_GET( FITGRP( 1 ), J, 1, NAME4, STATUS )
-                  WORDS( 1 ) = NAME4
-                  CALL TRN_STOK( WORDS( 1 ), NAME4,
-     :                           NAME3( START( 1 ) : STOP( 1 ) ), NSUB,
-     :                           STATUS )
+                  CALL CCD1_KTIDY( .TRUE., NAME4, IX, STATUS )
+                  NAME5 = NAME3( START( 1 ) : STOP( 1 ) )
+                  CALL CCD1_KTIDY( .TRUE., NAME5, IX, STATUS )
+                  CALL TRN_STOK( NAME4, ' ', NAME5, NSUB, STATUS )
                   IF ( NSUB .NE. 0 ) THEN
                            
 *  Known keyword substitutes into value, must be a function.
@@ -396,13 +434,11 @@ C               END IF
                IF ( .NOT. LVAL ) THEN
                            
 *  Almost certainly is a new FITS-keyword, one final check. Is it a
-*  valid token? Test this by subtituting into itself.
+*  valid token?  Test this by doing a dummy substitution.
+                  WORDS( 1 ) = NAME3( START( 1 ) : STOP( 1 ) )
+                  CALL CCD1_KTIDY( .TRUE., WORDS( 1 ), IX, STATUS )
                   CALL ERR_MARK
-                  NAME4 = NAME3
-                  WORDS( 1 ) = NAME3
-                  CALL TRN_STOK( NAME3( START( 1 ) : STOP( 1 ) ),
-     :                           NAME4( START( 1 ) : STOP( 1 ) ),
-     :                           WORDS( 1 ), NSUB, STATUS )
+                  CALL TRN_STOK( WORDS( 1 ), ' ', ' ', NSUB, STATUS )
                   IF ( STATUS .EQ. TRN__TOKIN ) THEN
                            
 *  It's an invalid token. Cannot process this regardless. Time to give
@@ -417,6 +453,7 @@ C               END IF
      :                              NAME3( START( 1 ): STOP( 1 ) ) )
                      CALL ERR_REP( 'CCD1_FTGRP_ERR3',
      :'  Cannot interpret "^NAME3" as a FITS-keyword', STATUS )
+                     CALL ERR_RLSE
                      GO TO 99
                   ELSE
                            
