@@ -8435,17 +8435,6 @@ package kappa {
       action creframe {
          alias {cref(rame)}
 
-         parameter like {
-            type NDF
-            access READ
-            vpath DEFAULT
-            ppath GLOBAL DEFAULT
-            association <-GLOBAL.DATA_ARRAY
-            prompt {Template NDF (null for none)}
-            helpkey *
-            default !
-         }
-
          parameter logfile {
             type FILENAME
             vpath DEFAULT
@@ -8454,20 +8443,6 @@ package kappa {
             default !
             helpkey *
          }
-
-         parameter out {
-            position 1
-            type NDF
-            access WRITE
-            vpath PROMPT
-            association ->GLOBAL.DATA_ARRAY
-            prompt {NDF to contain surface}
-            helpkey *
-         }
-
-
-
-
 
          parameter xdim {
             position 1

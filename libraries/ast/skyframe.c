@@ -319,7 +319,7 @@ static double Angle( AstFrame *this_frame, const double a[],
    result = AST__BAD;
 
 /* Check the global error status. */
-   if ( !astOK ) return;
+   if ( !astOK ) return result;
 
 /* If not already done, obtain a value for pi/2 from SLALIB by
    converting 90 degrees into radians. */
@@ -3268,7 +3268,7 @@ static double Offset2( AstFrame *this_frame, const double point1[2],
    result = AST__BAD;
 
 /* Check the global error status. */
-   if ( !astOK ) return;
+   if ( !astOK ) return result;
 
 /* If not already done, obtain a value for pi/2 from SLALIB by
    converting 90 degrees into radians. */
