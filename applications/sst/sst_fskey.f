@@ -62,7 +62,6 @@
       CHARACTER * ( 132 ) FILE   ! Full name of file to open
       INTEGER FD                 ! File descriptor
       INTEGER F                  ! First character position
-      INTEGER IOERR              ! I/O error status
       INTEGER KEY                ! I/O unit for key data file
       INTEGER L                  ! Last character position
 

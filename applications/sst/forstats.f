@@ -182,7 +182,6 @@
       INTEGER FDIN               ! Input file descriptors
       INTEGER FDOUT              ! Output file descriptors
       INTEGER IFILE              ! Loop counter for input files
-      INTEGER IOERR              ! I/O error status
       INTEGER ISPEC              ! Loop counter for file specifications
       INTEGER MEANCC             ! Mean alphanumerics per comment line
       INTEGER MXCODE             ! Maximum contiguous code lines

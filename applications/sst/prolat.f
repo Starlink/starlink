@@ -192,7 +192,6 @@
       INTEGER FDIN               ! Input file descriptor
       INTEGER FDOUT              ! Output file descriptor
       INTEGER IFILE              ! Loop counter for input files
-      INTEGER IOERR              ! I/O error status
       INTEGER NFILE              ! Number of input files
       INTEGER NPRO               ! Number of prologues read
       INTEGER NSPEC              ! Number of file specifications

@@ -71,7 +71,6 @@
       INTEGER FD                 ! File descriptor
       INTEGER DEFNS              ! I/O unit for layout definitions
       INTEGER F                  ! First character position
-      INTEGER IOERR              ! I/O error status
       INTEGER L                  ! Last character position
 
 *.

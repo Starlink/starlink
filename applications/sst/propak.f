@@ -184,7 +184,6 @@
       INTEGER I                  ! Loop counter for sorting arguments
       INTEGER IFILE              ! Loop counter for input files
       INTEGER IMAX               ! Max. argument number to sort
-      INTEGER IOERR              ! I/O error status
       INTEGER NARG               ! Number of routine arguments
       INTEGER NC                 ! Number of characters
       INTEGER NCPACK             ! No. characters in package name
