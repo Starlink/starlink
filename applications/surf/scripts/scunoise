@@ -30,6 +30,9 @@
 #       DD/MM/YY: INIT  Comments
 #       --------- ----  --------
 #        $Log$
+#        Revision 1.13  1999/10/28 03:33:13  rpt
+#        Fixed bug if only one noise file runlist did not get activated.
+#
 #        Revision 1.12  1999/10/21 01:39:24  rpt
 #        Fix Y2K bug in semester selection.
 #
@@ -428,7 +431,7 @@ sub mk_runfield {
     destroy $mr;
     $mr = undef;
   }
-  if ($#runlist > 0) {
+  if ($#runlist > -1) {
     $mr = $rf->Menubutton(
 			-text => 'Run', 
 			-relief => 'raised',
@@ -779,7 +782,7 @@ sub scandisk {
     }
 
     $run == $runlist[0] if ($#runlist == 0);
-    @runlist = sort { $a <=> $b } @runlist if ($#runlist > 0);
+    @runlist = sort { $a <=> $b } @runlist if ($#runlist > -1);
 
     if ($found) {
 	$idsk = $i;
