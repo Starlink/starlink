@@ -492,7 +492,7 @@ PKG_LINK = SURF
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
-PKG_VERS = 1.6-3
+PKG_VERS = 1.6-4
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the
@@ -1929,7 +1929,7 @@ sculib_wtfn_regrid_1.o: PRM_PAR SAE_PAR
 sculib_wtfn_regrid_2.o: PRM_PAR SAE_PAR
 sculib_wtfn_regrid_3.o: PRM_PAR SAE_PAR
 sculib_bessel_wtinit.o: SAE_PAR
-sculib_skydip_temperatures.o: SAE_PAR
+sculib_skydip_temperatures.o: SAE_PAR PRM_PAR
 sculib_find_int.o: SAE_PAR
 sculib_mjd_to_dateobs.o: SAE_PAR
 
