@@ -1,0 +1,111 @@
+      SUBROUTINE POL1_STO0<T>( ID, NAME, VALUE, STATUS )
+*+
+*  Name:
+*     POL1_STO0<T>
+
+*  Purpose:
+*     To store a scalar value in the POLPACK extension.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL POL1_STO0<T>( ID, NAME, VALUE, STATUS )
+
+*  Description:
+*     The routine attempts to store a scalar value in the object
+*     (within the extension) NAME. If the extension does not exist it is
+*     created. Any previous values stored at NAME are over written.
+
+*  Arguments:
+*     ID = INTEGER (Given)
+*        Identifier of the NDF with the extension to be written to.
+*     NAME = CHARACTER * ( * ) (Given)
+*        The name of the storage object. Note that this is the name of
+*        the object excluding the implied 'NDF.MORE.POLPACK' string.
+*     VALUE = <COMM> (Given)
+*        The value to be stored at the object.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     This routine has versions for B, UB, W, UW, I, R, D, C and L data
+*     types.
+
+*  Authors:
+*     PDRAPER: Peter Draper (STARLINK)
+*     DSB: David S. Berry (DSB)
+*     {enter_new_authors_here}
+
+*  History:
+*     11-JUN-1991 (PDRAPER):
+*        Original version.
+*     18-FEB-1992 (PDRAPER):
+*        Changed write to update.
+*     3-DEC-1997 (DSB):
+*        CCDPACK version modified for use in POLPACK.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'DAT_PAR'          ! HDS DAT constants
+      INCLUDE 'PRM_PAR'          ! BAD values codes
+
+*  Arguments Given:
+      INTEGER ID
+      CHARACTER * ( * ) NAME
+      <TYPE> VALUE
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  External References:
+      EXTERNAL CHR_LEN
+      INTEGER CHR_LEN            ! Length of string excluding blanks
+
+*  Local Variables:
+      LOGICAL THERE              ! Set true if extension exists.
+      CHARACTER * ( DAT__SZLOC ) LOC ! Locator to data object.
+      INTEGER LENGTH             ! Length of string (if given one)
+
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Check that the extension exists.
+      CALL NDF_XSTAT( ID, 'POLPACK', THERE, STATUS )
+
+*  If the extension does not exist then create it.
+      IF ( .NOT. THERE ) THEN
+         CALL NDF_XNEW( ID, 'POLPACK', 'POLPACK', 0, 0, LOC,
+     :                  STATUS )
+      ELSE
+
+*  Just get a locator to it.
+         CALL NDF_XLOC( ID, 'POLPACK', 'UPDATE', LOC, STATUS )
+      END IF
+
+*  Make sure that the object exists.
+      IF ( '<T>' .EQ. 'C' ) THEN 
+         LENGTH = CHR_LEN( VALUE )
+         CALL CMP_MODC( LOC, NAME, LENGTH, 0, 0, STATUS )
+      ELSE
+         CALL CMP_MOD( LOC, NAME, '<HTYPE>', 0, 0, STATUS )
+      END IF
+
+*  Try to store the data value.
+      CALL CMP_PUT0<T>( LOC, NAME, VALUE, STATUS )
+
+*  Annul the locator
+      CALL DAT_ANNUL( LOC, STATUS )
+
+      END

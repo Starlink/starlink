@@ -1,0 +1,165 @@
+      SUBROUTINE POL1_STOC<T>( ID, NAME, VALUE, STATUS )
+*+
+*  Name:
+*     POL1_STOC<T>
+
+*  Purpose:
+*     Stores a scalar value in a compound POLPACK extension item.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL POL1_STOC<T>( ID, NAME, VALUE, STATUS )
+
+*  Description:
+*     The routine attempts to store a scalar value in the object
+*     (within the POLPACK extension) NAME. If a POLPACK extension does
+*     not exist it is created. NAME may be compound using "." as
+*     separators, (i.e. OBJECT1.OBJECT2.OBJECT3). In this case each
+*     object is created with a type <POLPACK_XITEM>, if it does not
+*     exist already, until the final object which is created with the
+*     type indicated by the version of this routine being called. Any
+*     previous values stored in the final primitive of NAME are over
+*     written.
+
+*  Arguments:
+*     ID = INTEGER (Given)
+*        Identifier of the NDF with the extension to be written to.
+*     NAME = CHARACTER * ( * ) (Given)
+*        The name of the storage object. Note that this is the "full"
+*        name of the object excluding the implied 'NDF.MORE.POLPACK'
+*        string.
+*     VALUE = <COMM> (Given)
+*        The value to be stored at the object.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     This routine has versions for B, UB, W, UW, I, R, D, C and L data
+*     types.
+
+*  Authors:
+*     PDRAPER: Peter Draper (STARLINK)
+*     DSB: David S. Berry (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     11-JUN-1991 (PDRAPER):
+*        Original version.
+*     18-FEB-1992 (PDRAPER):
+*        Changed write to update.
+*     13-DEC-1993 (PDRAPER):
+*        Version for compound objects.
+*     3-DEC-1997 (DSB):
+*        CCDPACK version modified for use in POLPACK.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'DAT_PAR'          ! HDS DAT constants
+      INCLUDE 'PRM_PAR'          ! BAD values codes
+
+*  Arguments Given:
+      INTEGER ID
+      CHARACTER * ( * ) NAME
+      <TYPE> VALUE
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  External References:
+      EXTERNAL CHR_LEN
+      INTEGER CHR_LEN            ! Length of string excluding blanks
+
+*  Local Variables:
+      LOGICAL THERE              ! Set true if extension exists.
+      INTEGER FIRST              ! Position of first character
+      INTEGER LAST               ! Position of last character
+      INTEGER NCHAR              ! Number of characters in string
+      CHARACTER * ( DAT__SZLOC ) ELOC ! Locator to data object.
+      CHARACTER * ( DAT__SZLOC ) NLOC ! Locator to data object.
+      CHARACTER * ( DAT__SZNAM ) PRIM ! Name of HDS object
+      INTEGER LENGTH             ! Length of string (if given one)
+      LOGICAL YES                ! Object exists
+
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Check that the extension exists.
+      CALL NDF_XSTAT( ID, 'POLPACK', THERE, STATUS )
+
+*  If the extension does not exist then create it.
+      IF ( .NOT. THERE ) THEN
+         CALL NDF_XNEW( ID, 'POLPACK', 'POLPACK', 0, 0, ELOC,
+     :                  STATUS )
+      ELSE
+
+*  Just get a locator to it.
+         CALL NDF_XLOC( ID, 'POLPACK', 'UPDATE', ELOC, STATUS )
+      END IF
+
+*  Is the object compound?
+      FIRST = 1
+      NCHAR = CHR_LEN( NAME )
+      LAST = NCHAR 
+ 1    CONTINUE
+      LAST = INDEX( NAME( FIRST: ), '.' )
+      IF ( LAST .NE. 0  ) THEN
+
+*  Have a full stop, must be an object. Found other end so strip
+*  trailing full stop off.
+         PRIM = NAME( FIRST : LAST - 1 )
+
+*  Check to see it if exists.
+         CALL DAT_THERE( ELOC, PRIM, YES, STATUS )
+         IF ( .NOT. YES ) THEN
+
+*  Need to create it.
+            CALL DAT_NEW( ELOC, PRIM, 'POLPACK_XITEM', 0, 0, STATUS )
+         END IF
+
+*  Get locator to object.
+         CALL DAT_FIND( ELOC, PRIM, NLOC, STATUS )
+
+*  Release unwanted locator.
+         CALL DAT_ANNUL( ELOC, STATUS )
+         ELOC = NLOC       
+
+*  Next position.
+         FIRST = LAST + 1
+         GO TO 1
+      ELSE
+
+*  At end of string.
+         LAST = NCHAR
+      END IF        
+
+*  Extract name of storage primitive.
+      PRIM = NAME( FIRST : LAST ) 
+
+*  Make sure that the object exists.
+      IF ( '<T>' .EQ. 'C' ) THEN 
+         LENGTH = MAX( 1, CHR_LEN( VALUE ) )
+         CALL CMP_MODC( ELOC, PRIM, LENGTH, 0, 0, STATUS )
+      ELSE
+         CALL CMP_MOD( ELOC, PRIM, '<HTYPE>', 0, 0, STATUS )
+      END IF
+
+*  Try to store the data value.
+      CALL CMP_PUT0<T>( ELOC, PRIM, VALUE, STATUS )
+
+*  Annul the locator
+      CALL DAT_ANNUL( ELOC, STATUS )
+
+      END
