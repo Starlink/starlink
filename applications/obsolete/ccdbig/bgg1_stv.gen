@@ -16,7 +16,7 @@
 *     Loops over array setting the elements to the given value.
 
 *  Arguments:
-*     VAL = <COMM> (Given)
+*     VAL = REAL (Given)
 *        The value to set array to.
 *     SIZE = INTEGER (Given)
 *        Size of the array.
@@ -34,7 +34,7 @@
 *     10-MAY-1991 (PDRAPER):
 *        Original version.
 *     3-JUL1998 (MBT)
-*        Just changed the name for (consistent) inclusion with CCDBIG.
+*        Now supply REAL value whatever the type of the array.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -49,26 +49,33 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
 *  Arguments Given:
-      <TYPE> VAL
+      REAL VAL
       INTEGER SIZE
 
 *  Arguments Returned:
       <TYPE> ARR( SIZE )
+
+*  External references:
+      INCLUDE 'DCV_FUN'          ! Generic type conversion functions
 
 *  Status:
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
       INTEGER I                  ! Loop variable
+      <TYPE> TVAL                ! Value of same type as array
 
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*  Get a value of the right type and right value
+      TVAL = DCV_RTO<T>( VAL )
+
       DO 1 I = 1, SIZE
-         ARR( I ) = VAL
+         ARR( I ) = TVAL
  1    CONTINUE
 
       END
-* $Id: ccg1_stv.gen,v 1.1 1997/06/27 09:01:41 pwd Exp $
+* $Id: bgg1_stv.gen,v 1.1 1998/07/03 13:22:45 mbt Exp $
