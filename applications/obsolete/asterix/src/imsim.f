@@ -293,7 +293,7 @@
      :                     STATUS )
         XBASE = SPARR(1)
         XSCALE = SPARR(2)
-        CALL BDI_AXGET1R( MFID, 1, 'SpacedData', 2, SPARR, NVAL,
+        CALL BDI_AXGET1R( MFID, 2, 'SpacedData', 2, SPARR, NVAL,
      :                     STATUS )
         YBASE = SPARR(1)
         YSCALE = SPARR(2)
@@ -483,7 +483,7 @@
         END IF
 
 *      Open file
-        CALL BDI_NEW( 'XYimage', NDIM, DIMS, 'REAL', BID, STATUS )
+        CALL BDI_NEW( 'XYimage', 2, DIMS, 'REAL', BID, STATUS )
         CALL ADI_FCREAT( ONAME(:CHR_LEN(ONAME))//'%hds', BID,
      :                   OFID, STATUS )
 
@@ -525,7 +525,7 @@
 *        Commit the axis description to BDA structures
           IF ( MOK ) THEN
             CALL BDI_AXCOPY( MFID, 1, ' ', OFID, 1, STATUS )
-            CALL BDI_AXCOPY( MFID, 2, ' ', OFID, 1, STATUS )
+            CALL BDI_AXCOPY( MFID, 2, ' ', OFID, 2, STATUS )
           ELSE
             SPARR(1) = XBASE
             SPARR(2) = XSCALE
@@ -616,7 +616,7 @@
 
 *    Free model
       IF ( MOK ) THEN
-        CALL ADI_FCLOSE( MFID, STATUS )
+        CALL USI_ANNUL( 'MODEL', STATUS )
       END IF
 
 *    Tidy up
