@@ -1,3 +1,11 @@
+1999-07-29  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* sculib/sculib_ranged.f (SCULIB_RANGED): Add STATUS
+	checking. Tidy up header.
+
+	* surflib/surflib_calc_output_grid.f (SURFLIB_CALC_OUTPUT_GRID):
+	Parametrize max output size. Add STATUS to sculib_ranged.
+
 1999-07-28  Tim Jenness  <timj@jach.hawaii.edu>
 
 	SURF V1.4-3 - to include this patch to surflib_process_bols
