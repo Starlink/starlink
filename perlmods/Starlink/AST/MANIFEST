@@ -4,5 +4,9 @@ AST.xs
 arrays.c
 arrays.h
 typemap
-t/basic.t
+t/attrib.t
+t/fitschan.t
+t/formats.t
+t/unitmap.t
+t/zoommap.t
 MANIFEST
