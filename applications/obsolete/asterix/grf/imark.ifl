@@ -65,4 +65,10 @@ interface IMARK
     prompt 'Number the symbols'
     help 'Default is just to plot the symbol'
   endparameter
+  parameter HDB
+    type '_LOGICAL'
+    default N
+    vpath 'DEFAULT'
+    prompt 'Is input text file in HEASARC database format'
+  endparameter
 endinterface
