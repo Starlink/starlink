@@ -6,13 +6,13 @@
 #     [incr Tk] class
 
 #  Purpose:
-#     Extends StarAstTable to allow the interactive definition of X,Y
+#     Extends StarAstTable to allow the interactive definition of X-Y
 #     and RA/Dec pairs on images.
 
 #  Description:
 #     This class extends the ability of the StarAstTable widget adding
-#     controls for selecting X,Y positions on an associated image and
-#     for selecting the corresponding RA,Dec positions on any other
+#     controls for selecting X-Y positions on an associated image and
+#     for selecting the corresponding RA-Dec positions on any other
 #     image that is displayed (in another clone). The positions may be
 #     "centroided" and a list of  them is displayed in a text
 #     window.
@@ -76,11 +76,12 @@ itcl::class gaia::GaiaAstTransferTable {
 
       #  Evaluate any options [incr Tk].
       itk_option remove StarAstTable::coupled
+      itk_option remove StarAstTable::bind_enters
       eval itk_initialize $args
 
       #  Override short help for Table window.
       add_short_help $itk_component(table) \
-         {Reference positions and their associated X,Y coordinates}
+         {Reference positions and their associated X-Y coordinates}
 
       #  Disable some of the control buttons to customise the
       #  interface.
@@ -100,7 +101,7 @@ itcl::class gaia::GaiaAstTransferTable {
       pack $itk_component(sep1) -fill x -ipadx 1m
 
       #  Add control for selecting the image (i.e. window clone) to
-      #  read the RA,Dec values from.
+      #  read the RA-Dec values from.
       add_targets_
 
       #  Add frame for holding table action buttons.
@@ -121,7 +122,7 @@ itcl::class gaia::GaiaAstTransferTable {
       #  Add button for updating the X and Y coordinates of the
       #  currently selected row.
       itk_component add update_xy {
-         button $itk_component(frame3).xy -text "Update X,Y" \
+         button $itk_component(frame3).xy -text "Update X-Y" \
             -command [code $this update_xy] \
             -width 13
       }
@@ -132,7 +133,7 @@ itcl::class gaia::GaiaAstTransferTable {
       #  Add button for updating the RA/Dec coordinates of the
       #  currently selected row.
       itk_component add update_radec {
-         button $itk_component(frame3).radec -text "Update RA,Dec" \
+         button $itk_component(frame3).radec -text "Update RA-Dec" \
             -command [code $this update_radec] \
             -width 13
       }
@@ -143,18 +144,22 @@ itcl::class gaia::GaiaAstTransferTable {
       #  Pack button frame.
       pack $itk_component(frame3) -side top -fill x -expand 1 -pady 2 -padx 2 -anchor w
 
+      #  First time add an empty row.
+      add_new_row
    }
 
    #  Destructor:
    #  -----------
    destructor  {
+      #  Remove RA/Dec marker if needed.
+      remove_radec
    }
 
    #  Methods:
    #  --------
 
    #  Add a new row to the table. This serves as a blank entry which
-   #  is updated to have the correct X,Y and RA/Dec coordinates.
+   #  is updated to have the correct X-Y and RA/Dec coordinates.
    public method add_new_row {} {
 
       #  Create a unique identifier.
@@ -204,6 +209,7 @@ itcl::class gaia::GaiaAstTransferTable {
    #  row. This is done by selecting a position in the target image
    #  and then refining this.
    public method update_radec {} {
+
       #  Get the selected row.
       set row [$itk_component(table) get_selected]
       if { $row != "" } {
@@ -220,11 +226,12 @@ itcl::class gaia::GaiaAstTransferTable {
          eval lassign $row id radummy decdummy x y
          eval $itk_component(table) set_row $row [list "$id $ra $dec $x $y"]
          redraw
+         redraw_radec
       }
    }
 
    #  Add all the image views to a menu for selection as the
-   #  current RA,Dec reference image (the "target").
+   #  current RA-Dec reference image (the "target").
    protected method add_targets_ {} {
 
       #  Menu button for selection.
@@ -237,7 +244,7 @@ itcl::class gaia::GaiaAstTransferTable {
       }
       pack $itk_component(targets) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(targets) \
-         {Image used for obtaining RA,Dec coordinates}
+         {Image used for obtaining RA-Dec coordinates}
 
       #  Add a binding to update the menu item whenever it is pressed.
       #  XXX bit of a cheat to get menubutton name.
@@ -271,10 +278,16 @@ itcl::class gaia::GaiaAstTransferTable {
       } else {
          set_target_ [lindex $images 0]
       }
+
    }
 
-   #  Set the target image for RA,Dec coordinates.
+   #  Set the target image for RA-Dec coordinates.
    protected method set_target_ {image} {
+      if { $target_ != $image && $target_ != {} } { 
+         #  Remove RA/Dec marker if needed (this is needed when target
+         #  image is changed).
+         remove_radec
+      }
       set target_ $image
    }
 
@@ -316,7 +329,7 @@ itcl::class gaia::GaiaAstTransferTable {
       set canvasx [$canvas canvasx $winx]
       set canvasy [$canvas canvasy $winy]
 
-      #  Convert canvas coordinates into X,Y and RA,Dec. Image X and
+      #  Convert canvas coordinates into X-Y and RA-Dec. Image X and
       #  Y positions are centroided.
       set rtdimage [$image get_image]
       $rtdimage convert coords $canvasx $canvasy canvas imagex imagey image
@@ -340,6 +353,59 @@ itcl::class gaia::GaiaAstTransferTable {
       set $w_.picked "$ra $dec $imagex $imagey"
    }
 
+   #  Draw the RA/Dec marker. This is restricted to the current
+   #  selection (since in principle the RA/Dec values could be
+   #  obtained from a range of images and keeping track of all the
+   #  markers could be a nightmare). Use same marker as X-Y
+   #  image. This uses a special tag "$this::ra_dec_tag".
+   public method redraw_radec {} {
+      set row [$itk_component(table) get_selected]
+      if { $row != {} } {
+         set canvas [$target_ get_canvas]
+         set image [$target_ get_image]
+
+         #  Remove existing marker.
+         remove_radec
+
+         #  Adjust markers for image scale.
+         lassign [$image scale] xs ys
+         if { $xs > 1 } {
+            set scale [expr $xs*$itk_option(-msize)]
+         } else {
+            set scale [expr $itk_option(-msize)/abs($xs)]
+         }
+         eval lassign $row id ra dec x y
+         if { [catch \
+                  { $image convert coords $ra $dec wcs x y canvas } \
+                  msg] == 0 } {
+            $canvas create rtd_mark $x $y \
+               -type $itk_option(-mtype) \
+               -tags "$this::ra_dec_tag" \
+               -outline $itk_option(-mcolour) \
+               -size $scale -fill $itk_option(-mfill) \
+               -width $itk_option(-mwidth) \
+               -stipple $itk_option(-mstipple)
+         } else {
+            error_dialog $msg
+         }
+      }
+   }
+
+   #  Remove existing RA/Dec marker if can (invoke this when finished
+   #  with table, image is changed etc.).
+   public method remove_radec {} {
+      catch {
+         set canvas [$target_ get_canvas]
+         $canvas delete "$this::ra_dec_tag"
+      }
+   }
+
+   #  Override clear_table to also clear the RA/Dec marker.
+   public method clear_table {} {
+      remove_radec
+      StarAstTable::clear_table
+   }
+
    #  Configuration options: (public variables)
    #  ----------------------
 
@@ -347,6 +413,11 @@ itcl::class gaia::GaiaAstTransferTable {
    itk_option define -coupled coupled Coupled 0 {
       set itk_option(-coupled) 0
    }
+
+   #  Whether to add the any-enter binding to graphics markers. Always 
+   #  false as causes occasional problems with selection moving in
+   #  table (with updates of coordinates to wrong row).
+   itk_option define -bind_enters bind_enters Bind_enters 0
 
    #  Protected variables: (available to instance)
    #  --------------------

@@ -72,16 +72,16 @@ itcl::class gaia::GaiaAstTransfer {
 
       #  Set the top-level window title.
       wm title $w_ "GAIA: Transfer coordinates ($itk_option(-number))"
-      
+
       #  Add short help window.
       make_short_help
-      
+
       #  Add the File menu.
       add_menubar
       set File [add_menubutton "File" left]
       configure_menubutton File -underline 0
       add_short_help $itk_component(menubar).file {File menu: close window}
-      
+
       #  Set the exit menu items.
       $File add command -label {Cancel changes and close window} \
          -command [code $this cancel] \
@@ -91,17 +91,17 @@ itcl::class gaia::GaiaAstTransfer {
          -command [code $this accept] \
          -accelerator {Control-a}
       bind $w_ <Control-a> [code $this accept]
-      
+
       #  Markers menu
       set Markers [add_menubutton Markers]
-      
+
       #  Add window help.
       global gaia_library
       add_help_button $gaia_library/StarAst.hlp "Astrometry Overview..."
       add_help_button $gaia_library/StarAstTransfer.hlp "On Window..."
       add_short_help $itk_component(menubar).help \
          {Help menu: get some help about this window}
-      
+
       #  Add table for displaying coordinates.
       itk_component add table {
          GaiaAstTransferTable $w_.table \
@@ -110,7 +110,7 @@ itcl::class gaia::GaiaAstTransfer {
             -canvas $itk_option(-canvas) \
             -image $itk_option(-image)
       }
-      
+
       #  Override short help for Table window.
       add_short_help $itk_component(table) \
          {Reference positions and their associated X,Y coordinates}
@@ -120,7 +120,7 @@ itcl::class gaia::GaiaAstTransfer {
       itk_component add frame2 {
          frame $w_.frame2
       }
-      
+
       #  Add a frame of buttons for Accepting and Cancelling the table
       #  of values.
       itk_component add accept {
@@ -130,7 +130,7 @@ itcl::class gaia::GaiaAstTransfer {
       add_short_help $itk_component(accept) \
          {Accept new positions, updating reference table and close window}
       pack $itk_component(accept) -side left -expand 1 -pady 2 -padx 2
-      
+
       itk_component add cancel {
          button $itk_component(frame2).cancel -text Cancel \
             -command [code $this cancel]
@@ -141,7 +141,6 @@ itcl::class gaia::GaiaAstTransfer {
 
       #  Pack button frame.
       pack $itk_component(frame2) -fill x -expand 1 -side top -pady 2 -padx 2 -anchor w
-
    }
 
    #  Destructor:
@@ -159,6 +158,9 @@ itcl::class gaia::GaiaAstTransfer {
       if { $itk_option(-update_cmd) != {} } {
          eval $itk_option(-update_cmd) [$itk_component(table) get_contents]
       }
+
+      #  Clear table (to remove the markers) and withdraw.
+      $itk_component(table) clear_table
       wm withdraw $w_
    }
 
@@ -167,15 +169,31 @@ itcl::class gaia::GaiaAstTransfer {
 
       #  Invoke the "update" command with no content
       if { $itk_option(-update_cmd) != {} } {
-         eval $itk_option(-update_cmd) {}
+         $itk_option(-update_cmd) {}
       }
+
+      #  Clear table (to remove the markers) and withdraw.
+      $itk_component(table) clear_table
       wm withdraw $w_
+   }
+
+   #  Set the contents of the table (appended to any existing content).
+   public method set_contents {args} {
+      foreach line $args {
+         $itk_component(table) set_contents $line
+      }
+      $itk_component(table) redraw
+   }
+
+   #  Clear the table.
+   public method clear_table {} {
+      $itk_component(table) clear_table
    }
 
    #  Configuration options: (public variables)
    #  ----------------------
 
-  #  Name of starrtdimage widget.
+   #  Name of rtdimage widget.
    itk_option define -rtdimage rtdimage RtdImage {}
 
    #  Name of the canvas holding the starrtdimage widget.

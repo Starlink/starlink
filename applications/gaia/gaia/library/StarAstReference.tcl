@@ -1069,18 +1069,22 @@ itcl::class gaia::StarAstReference {
                           -canvas $itk_option(-canvas) \
                           -image $itk_option(-image) \
                           -update_cmd [code $this stop_transfer_]]
+      } else {
+         wm deiconify $trantop_
       }
       set content [$itk_component(table) get_contents]
       if { $content != {} } {
-         $trantop_ set_contents $content
+         $trantop_ clear_table
+         $itk_component(table) clear_marks
+         eval $trantop_ set_contents $content
       }
    }
 
    #  Transfer completed.
    protected method stop_transfer_ {args} {
-      if { $args != {} } { 
+      if { $args != {{}} } { 
          $itk_component(table) clear_table
-         $itk_component(table) set_contents $args
+         eval $itk_component(table) set_contents $args
       }
       blt::busy release $w_
    }

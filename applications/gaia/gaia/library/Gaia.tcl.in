@@ -348,7 +348,6 @@ class gaia::Gaia {
             -max_scale $itk_option(-max_scale) \
             -pickobjectorient $itk_option(-pickobjectorient)
       }
-      puts stdout "$itk_option(-panel_layout)"; flush stdout
 
       #  Keep a list of SkyCat/GAIA instances.
       global ::skycat_images

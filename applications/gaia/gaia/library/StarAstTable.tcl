@@ -287,10 +287,11 @@ itcl::class gaia::StarAstTable {
 
    #  Set the contents of the table.
    public method set_contents {args} {
-      foreach line {$args} {
+      foreach line $args {
          $itk_component(table) append_row $line
       }
       $itk_component(table) new_info
+      redraw
    }
 
    #  Grab a catalogue of objects from an AstroCat window.
@@ -430,8 +431,10 @@ itcl::class gaia::StarAstTable {
               [code eval $this update_mark_ $id]
 	   $canvas bind $tag <Double-1> \
               [code eval $this edit_selected_object $tag]
-	   $canvas bind $tag <Any-Enter> \
-              [code eval $this select_row $id]
+           if { $itk_option(-bind_enters) } { 
+              $canvas bind $tag <Any-Enter> \
+                 [code eval $this select_row $id]
+           }
 	   $canvas bind $tag <Control-Button-1> [code $this remove_object $tag]
 
 	   #  Using <B2-Motion> to scale clashes with canvas binding
@@ -442,7 +445,6 @@ itcl::class gaia::StarAstTable {
 		   [code eval $this scale_mark_ $tag $canvasX_ $canvasY_]
 	   $canvas bind $tag <B2-ButtonRelease> \
 		   [code eval $this update_marks_ 1]
-
        }
    }
 
@@ -1271,6 +1273,10 @@ itcl::class gaia::StarAstTable {
    #  Centroid parameters.
    itk_option define -isize isize Isize 9 {}
    itk_option define -maxshift maxshift Maxshift 5.5 {}
+
+   #  Whether to add <Any-Enter> bindings (these can cause confusion for
+   #  some applications).
+   itk_option define -bind_enters bind_enters Bind_enters 0
 
    #  Protected variables: (available to instance)
    #  --------------------
