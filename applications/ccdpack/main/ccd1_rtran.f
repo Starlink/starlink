@@ -78,6 +78,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'MSG_PAR'          ! Message system parameters
       INCLUDE 'PRM_PAR'          ! PRIMDAT constants
+      INCLUDE 'PAR_ERR'          ! PAR system error constants
 
 *  Arguments Given:
       CHARACTER * ( * ) TRTYPE
@@ -133,12 +134,21 @@
 *  either the WCS component of each NDF or from one which serves all.
 *  Print frame identifiers.
          CALL PAR_GET0C( FR1PAR, FR1, STATUS )
+         CALL CHR_UCASE( FR1 )
+         CALL CHR_RMBLK( FR1 )
+         IF ( STATUS .NE. SAI__OK ) GO TO 99
          CALL PAR_GET0C( FR2PAR, FR2, STATUS )
-         CALL MSG_SETC( 'FR1', FR1 )
-         CALL MSG_SETC( 'FR2', FR2 )
+         IF ( STATUS .EQ. PAR__NULL ) THEN
+            CALL ERR_ANNUL( STATUS )
+            CALL MSG_SETC( 'FR2', 'Current frame' )
+         ELSE
+            CALL CHR_UCASE( FR2 )
+            CALL CHR_RMBLK( FR2 )
+            CALL MSG_SETC( 'FR2', 'frame ' // FR2 )
+         END IF
+         CALL MSG_SETC( 'FR1', 'frame ' // FR1 )
          CALL CCD1_MSG( ' ', 
-     : '  Transformation is the mapping from frame ^FR1 to frame ^FR2',
-     :                     STATUS )
+     : '  Transformation is the mapping from ^FR1 to ^FR2', STATUS )
 
 *  Print name of single WCS containing file or alternative as appropriate.
          IF ( INEXT ) THEN
@@ -178,5 +188,8 @@
             CALL CCD1_MSG( ' ', '    ^OBJ', STATUS )
          END IF
       END IF 
+
+*  Error status exit.
+ 99   CONTINUE
       END
 * $Id$
