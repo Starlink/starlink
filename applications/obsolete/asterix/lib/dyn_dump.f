@@ -88,11 +88,11 @@
 *         DYN file identifiers
 
 *  Arguments Given:
-      INTEGER			PTR			! See above
-      INTEGER			NITEM, NBYTE, FID
+c     INTEGER			PTR			! See above
+c     INTEGER			NITEM, NBYTE, FID
 
 *  Status:
-      INTEGER 			STATUS             	! Global status
+c     INTEGER 			STATUS             	! Global status
 
 *  Local Variables:
       INTEGER			I,N
