@@ -57,6 +57,7 @@
       INCLUDE 'SAE_PAR'
       INCLUDE 'ADI_PAR'
       INCLUDE 'DAT_PAR'
+      INCLUDE 'MATH_PAR'
       INCLUDE 'PAR_ERR'
 *
 *    Structure definitions :
