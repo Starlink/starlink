@@ -25,6 +25,11 @@
 
 #include <config.h>
 
+#if HAVE_UNISTD_H
+/* Declares getopt, if present */
+#include <unistd.h>
+#endif
+
 #ifdef	__cplusplus
 extern "C" {
 #endif

@@ -57,8 +57,7 @@ dnl   be according to the C++ standard (with the possible exception of the
 dnl   things in GIFBitmap.cc), so if anything goes wrong here, it's the 
 dnl   compiler's fault, not mine.
 dnl AC_HEADER_STDC
-dnl AC_CHECK_HEADERS(fcntl.h unistd.h)
-AC_CHECK_HEADERS(assert.h)
+AC_CHECK_HEADERS(assert.h unistd.h)
 
 dnl   I don't use HAVE_STDLIB_H, but kpathsea does
 AC_CHECK_HEADERS(stdlib.h)
