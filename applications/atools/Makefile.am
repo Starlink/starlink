@@ -13,7 +13,7 @@ atools_mon_SOURCES = \
 	$(CSRC) \
 	$(PRIVATE_INCLUDES)
 
-atools_mon_LDADD = $(LDADD) `atools_link_adam`
+atools_mon_LDADD = $(LDADD) `$(srcdir)/atools_link_adam`
 
 atools_mon_TASKS = astcopy astaddframe astclear astget astset asttest \
  astcmpframe astcmpmap astframe astgetframe astgetmapping astunitmap \
