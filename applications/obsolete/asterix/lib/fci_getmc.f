@@ -132,18 +132,8 @@
           END IF
         END IF
 
-*    Good data from user?
-        IF ( STATUS .EQ. SAI__OK ) THEN
-
-*      Create control for CURFIT algorithm
-          CALL ADI_NEW0( 'CurfitControl', CTRLID, STATUS )
-
-*      Write control data
-          CALL ADI_CPUT0I( CTRLID, 'MaxIt', NITMAX, STATUS )
-          CALL ADI_CPUT0I( CTRLID, 'UpdateInterval', NUP, STATUS )
-          CALL ADI_CPUT0R( CTRLID, 'MinSlope', MINSLO, STATUS )
-
-        END IF
+*    Create control for CURFIT algorithm
+        CALL FCI_CURFMC( NITMAX, NUP, MINSLO, CTRLID, STATUS )
 
       END IF
 
