@@ -410,9 +410,12 @@ bool CatalogueHandler::setCatname (string name)
 	else
 	    return false;
     }
-    catch (MoggyException)
+    catch (MoggyException& e)
     {
 	// This error will be `unknown catalog', raised by the error handler
+	if (verbosity_ > normal)
+	    // log the error to stderr
+	    cerr << e.msg << endl;
 	return false;
     }
 }
