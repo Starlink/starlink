@@ -35,6 +35,8 @@
 *        Added AST_OFFSET2 and AST_ANGLE to Frame class.
 *     6-SEP-2001 (DSB):
 *        Added AST_AXDISTANCE and AST_AXOFFSET to Frame class.
+*     12-SEP-2001 (DSB):
+*        Added AST_BEAR to Frame class.
 *-
 
 *  Length of character string returned by a character function.
@@ -141,6 +143,7 @@ c      PARAMETER ( AST__UKERNN = 2 )
       DOUBLE PRECISION AST_OFFSET2
       DOUBLE PRECISION AST_AXDISTANCE
       DOUBLE PRECISION AST_AXOFFSET
+      DOUBLE PRECISION AST_BEAR
 
 *  CmpFrame class.
       INTEGER AST_CMPFRAME
