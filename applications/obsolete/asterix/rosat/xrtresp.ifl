@@ -2,7 +2,7 @@
 
      PARAMETER INP
                POSITION 1
-               TYPE    'UNIV'
+               TYPE    'LITERAL'
                PROMPT  'Name of source file'
                PPATH   'GLOBAL,CURRENT'
                ASSOCIATION '<->GLOBAL.BINDS'
@@ -49,4 +49,3 @@
      ENDPARAMETER
 
  ENDINTERFACE
-
