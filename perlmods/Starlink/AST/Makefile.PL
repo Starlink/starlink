@@ -53,7 +53,7 @@ unshift( @typemaps, "typemap.561") if $] < 5.008;
 # Write the makefile....
 WriteMakefile(
     'NAME'      => 'Starlink::AST',
-    'VERSION'   => '0.02',
+    'VERSION_FROM'   => 'AST.pm',
     'LIBS'      => [ $libs ],   # e.g., '-lm' 
     'INC'       => "-I$StarConfig{Star_Inc}", # e.g., '-I/usr/include/other' 
     'TYPEMAPS'  => \@typemaps,
