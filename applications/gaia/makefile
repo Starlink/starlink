@@ -218,6 +218,8 @@
 #     20-JUL-2000 (PWD):
 #        Update for GAIA version 2.5. Single monolith for tasks now.
 #        Copy and link for installed documentation.
+#     02-MAY-2001 (PWD):
+#        Update for new on-line help system and GAIA 2.6 release.
 #     {enter_further_changes_here}
 #
 #  Bugs:
@@ -404,7 +406,7 @@ PKG_VERS = 2.6-0
 
 SOURCE_FILES = $(PKG_NAME)_source.tar $(PKG_NAME).tar $(PKG_NAME)_skycat.tar \
 	$(PKG_NAME)_tcl.tar makefile mk $(PKG_NAME)_iraf.tar \
-	$(DATA_FILES) $(DOCUMENTATION)
+	$(DATA_FILES) $(DOCUMENTATION) $(ONLINE_HELP)
 
 #  List of public script files.  These are scripts which form part of
 #  the package and will be required by users of it.  They will be
@@ -502,6 +504,8 @@ HELP_SOURCES =
 
 IRAF_HELP = gaia.hlp gaiadisp.hlp
 
+ONLINE_HELP = gaia.htx_tar
+
 #  List of ancilliary data files.
 
 DATA_FILES = demodata.tar
@@ -519,13 +523,6 @@ DOCUMENTATION = $(LATEX_DOCS) $(HYPERTEXT_DOCS:.htx=.htx_tar) $(PKG_NAME).news
 #  directory for a sucessful built of GAIA.
 
 GAIA_LIB_FILES =  \
-   Catalogue.hlp Gaia.hlp GaiaApPhotom.hlp GaiaArd.hlp GaiaAst.hlp \
-   GaiaAstCopy.hlp GaiaAstDefine.hlp GaiaAstGrid.hlp \
-   GaiaAstReference.hlp GaiaAstRefine.hlp GaiaAstSystem.hlp \
-   GaiaAstDomain.hlp GaiaAstTransfer.hlp GaiaAstTransform.hlp \
-   GaiaContour.hlp GaiaEsp.hlp GaiaOptPhotom.hlp GaiaPatch.hlp \
-   GaiaPositions.hlp GaiaSearch.hlp GaiaSextractor.hlp GaiaTextImport.hlp \
-   GaiaXYProfile.hlp StarBlink.hlp GaiaPolarimetry.hlp \
    skycat2.0.cfg gaiawcs2tab pix2wcs gaia.sh gaiadisp.sh gaiaremote.sh \
    adamMessageRelay displaycat
 
@@ -577,7 +574,7 @@ RUNTIME_SCRIPTS = gaia.sh gaiadisp.sh gaiaremote.sh adamMessageRelay \
 
 BUILT_FILES = \
  $(PUBLIC_SCRIPTS) $(RUNTIME_FILES) \
- $(IRAF_SCRIPTS) $(IRAF_HELP) helpdb.mip
+ $(IRAF_SCRIPTS) $(IRAF_HELP) $helpdb.mip
 
 #  List of links used to access include files during compilation.  This
 #  should comprise all the external include files and any other include
@@ -644,6 +641,7 @@ INSTALL_BIN = $(INSTALL)/bin/$(PKG_NAME)
 INSTALL_DATES = $(INSTALL)/dates
 INSTALL_DOCS = $(INSTALL)/docs
 INSTALL_HELP = $(INSTALL)/help/$(PKG_NAME)
+INSTALL_ONLINE_DOC = $(INSTALL_BIN)/$(PKG_NAME).htx
 
 #  And the IRAF equivalents.
 INSTALL_IRAF_BIN = $(INSTALL)/iraf/$(PKG_NAME)
@@ -654,7 +652,7 @@ INSTALL_IRAF_DOC = $(INSTALL)/iraf/$(PKG_NAME)/doc
 
 INSTALL_DIRS = $(INSTALL_BIN) $(INSTALL_DATES) $(INSTALL_DOCS) \
                $(INSTALL_HELP) $(INSTALL_MAPS) $(INSTALL_IRAF_BIN) \
-	       $(INSTALL_IRAF_DOC)
+	       $(INSTALL_IRAF_DOC) $(INSTALL_ONLINE_DOC)
 
 $(INSTALL_DIRS):
 	mkdir -p $@
@@ -1021,6 +1019,24 @@ install:
 	   else :; fi;\
 	done
 #
+#   Install the on-line help documentation (lives in
+#   $GAIA_DIR/gaia.htx, but this could be $STAR_HELP in future).
+	if test -n "$(ONLINE_DOCS)"; then \
+           pwd=`pwd`;\
+           (cd $(INSTALL_ONLINE_DOCS);\
+           for f in $(ONLINE_DOCS) ""; do \
+              if test -n "$$f"; then\
+                 $(TAR_OUT) $$pwd/$${f}_tar;\
+                 chmod 755 `find $$f -type d -print`;\
+                 chmod 644 `find $$f ! -type d -print`;\
+                 touch $$f;\
+              else :; fi;\
+           done);\
+           HTX_PATH='$(STAR_DOCS):$(STAR_HELP):$(INSTALL_BIN)';\
+           export HTX_PATH;\
+           $(STAR_BIN)/hlink $(INSTALL_BIN);\
+        fi;
+#
 #  Install the Latex documentation, giving it world read permission,
 #  leaving the source copy in place.
 	for f in $(LATEX_DOCS) ""; do \
@@ -1207,6 +1223,18 @@ do_deinstall:
 	   else :; fi;\
 	done
 #
+#  Deinstall any on-line help documents.
+	- if test -n "$(ONLINE_DOCS)"; then \
+	   for f in $(ONLINE_DOCS) ""; do \
+	      if test -n "$$f" -a -d $(ONLINE_DOCS)/$$f; then \
+	         rm -f -r $(ONLINE_DOCS)/$$f;\
+	      else :; fi;\
+	   done;\
+	   HTX_PATH='$(STAR_DOCS):$(STAR_HELP):$(INSTALL_BIN)';\
+	   export HTX_PATH;\
+	   $(STAR_BIN)/hlink $(INSTALL_BIN);\
+	fi
+#
 #  Deinstall the Latex documentation, if installed versions exist.
 	- for f in $(LATEX_DOCS) ""; do \
 	    if test -n "$$f" -a -f $(INSTALL_DOCS)/$$f; then \
@@ -1290,6 +1318,8 @@ do_test:
 	@ echo ' % xdisplay'
 	@ echo ' % $(PKG_NAME) -demo_mode 1'
 	@ echo
+	@ echo 'And select the Demonstration item in the Image-Analysis menu.'
+	@ echo 
 #
 #  Note the test has been run.
 	@ touch .TESTED_$(SYSTEM)
@@ -1327,7 +1357,7 @@ $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z: $(SOURCE_FILES) $(DATE_STAMP)
 	if test -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z; then \
            rm -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z; else :; fi
 	$(TAR_IN) - $(SOURCE_FILES) $(PUBLIC_SCRIPTS) $(RUNTIME_FILES)  \
-		$(DATE_STAMP) $(IRAF_SCRIPTS) \
+		$(DATE_STAMP) $(IRAF_SCRIPTS) $(ONLINE_HELP) \
 		$(IRAF_HELP) helpdb.mip .BUILT .gaia.built \
 		.skycat.built .tcl.built \
            | compress -v > $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z
@@ -1365,7 +1395,7 @@ $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z: $(SOURCE_FILES) $(DATE_STAMP)
 	if test -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z; then \
            rm -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z; else :; fi
 	$(TAR_IN) - mk makefile $(DOCUMENTATION) $(PUBLIC_SCRIPTS) \
-	   $(RUNTIME_FILES) $(DATA_FILES) \
+	   $(RUNTIME_FILES) $(DATA_FILES) $(ONLINE_HELP) \
 	   $(IRAF_SCRIPTS) $(IRAF_HELP) helpdb.mip $(DATE_STAMP) .BUILT \
            | compress -v > $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z
 
