@@ -57,11 +57,11 @@
         CALL USI_INIT( STATUS )
       END IF
 
-*    Locate the CANCL facility in this context
-      CALL USI0_LOCRTN( USI__F_DEF0<T>, RPTR, STATUS )
+*    Locate the vector DEF facility in this context
+      CALL USI0_LOCRTN( USI__F_DEF1<T>, RPTR, STATUS )
 
 *    Invoke it
-      CALL USI_DEF0<T>_E( %VAL(RPTR), PAR, NVALUE, VALUE, STATUS )
+      CALL USI_DEF1<T>_E( %VAL(RPTR), PAR, NVALUE, VALUE, STATUS )
 
 *    Restore error context
       CALL ERR_RLSE

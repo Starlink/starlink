@@ -62,7 +62,7 @@
       END IF
 
 *    Locate the CANCL facility in this context
-      CALL USI0_LOCRTN( USI__F_DEF0<T>, RPTR, STATUS )
+      CALL USI0_LOCRTN( USI__F_GET1<T>, RPTR, STATUS )
 
 *    Invoke it
       CALL USI_GET1<T>_E( %VAL(RPTR), PAR, MXVAL, VALUE, NACTVAL,
