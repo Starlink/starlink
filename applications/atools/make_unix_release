@@ -62,6 +62,7 @@
       end
 
 #  Create the on-line help file.
+      $ATOOLS_DEV/bin/make_history_help
       foreach file (`grp user_tasks`)
          prohlp in=$file out=$file.help
       end

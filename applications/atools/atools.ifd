@@ -1315,6 +1315,95 @@ iraf! {
           }
       }
 
+      action astformat {
+         helplib {$ATOOLS_HELP}
+         parameter this {
+            position 1
+            type LITERAL
+            prompt {The Frame}
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.AST_OBJECT
+            helpkey *
+          }
+         parameter axis {
+            position 2
+            type _INTEGER
+            prompt {Index of Frame axis to use}
+            ppath CURRENT
+            helpkey *
+          }
+         parameter value {
+            position 3
+            type LITERAL
+            prompt {Group of numerical axis values}
+            ppath CURRENT
+            helpkey *
+          }
+         parameter result {
+            position 4
+            type LITERAL
+            prompt {Name of output text file to hold formatted values}
+            ppath CURRENT
+            vpath DEFAULT
+            default !
+            helpkey *
+          }
+      }
+
+      action asttran2 {
+         helplib {$ATOOLS_HELP}
+         parameter forward {
+            position 4
+            type _LOGICAL
+            access READ
+            prompt {Use the forward transformation?}
+            ppath CURRENT DEFAULT
+            default TRUE
+            helpkey *
+          }
+         parameter this {
+            position 1
+            type LITERAL
+            prompt {The input Mapping}
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.AST_OBJECT
+            helpkey *
+          }
+         parameter xin {
+            position 2
+            type LITERAL
+            prompt {Group of numerical X axis values}
+            ppath CURRENT
+            helpkey *
+          }
+         parameter yin {
+            position 3
+            type LITERAL
+            prompt {Group of numerical Y axis values}
+            ppath CURRENT
+            helpkey *
+          }
+         parameter xout {
+            position 5
+            type LITERAL
+            prompt {Name of output text file to hold X axis values}
+            ppath CURRENT
+            vpath DEFAULT
+            default !
+            helpkey *
+          }
+         parameter yout {
+            position 6
+            type LITERAL
+            prompt {Name of output text file to hold Y axis values}
+            ppath CURRENT
+            vpath DEFAULT
+            default !
+            helpkey *
+          }
+      }
+
+
 
    }
 

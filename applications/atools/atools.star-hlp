@@ -37,16 +37,6 @@
  - Otherwise, a new text file is created with the given name containing a
  dump of the Object.
 
-1 Version History
-
-2 V1.6-1
-
- - A bug has been fixed which could cause output text files to be
- truncated when ATOOLS commands are used from ICL (or other similar
- environments).
-
-
-
 1 ASTSHOW
 
  This is a simple tcl script which allows you to browse an AST Object in

@@ -1,6 +1,6 @@
 1 ATOOLS
 
- Version 1.6-1 of ATOOLS is now available. It is fully documented in SUN/???.
+ Version 1.6-2 of ATOOLS is now available. It is fully documented in SUN/???.
 
  ATOOLS is a package of applications which manipulate descriptions
  of coordinate frames, mappings, etc, in the form of AST Objects (see
@@ -8,13 +8,31 @@
  to one of the functions within the AST library. ATOOLS thus provides a
  high-level interface to the AST library. 
 
-  Changes in this release:
+
+  Changes in V1.6-2:
+
+  - New command asttran2. Uses a Mapping to transform a set of 2-D
+  positions. Unlike asttrann, this command does not use NDFs to store the
+  input and output positions. The input positions can be given in a text
+  file or in response to parameter prompts. Output positions are written
+  to the screen and optionally to an output text file.
+
+  - New commands astformat. Formats one or more axis values using the
+  attributes of a supplied Frame.
+
+  - The informational messages which say where the output data has been
+  written to are now only produced if the environment variable
+  ATOOLS_VERBOSE is defined.
+
+
+  Changes in V1.6-1:
 
   - A bug has been fixed which could cause output text files to be
   truncated when ATOOLS commands are used from ICL (or other similar
   environments).
 
-  Changes in V1.6
+
+  Changes in V1.6:
 
   - New commands added: astshiftmap. These are straight analogues of the 
   corresponding AST routines.
