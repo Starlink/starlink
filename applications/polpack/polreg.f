@@ -418,7 +418,7 @@
 * If we are producing Stokes parameters, check that all of the input
 * object frames hasve POLPACK extensions containing WPLATE values. 
       IF( IGRP4 .NE. GRP__NOID ) THEN
-         IF(  SIZE0 .GT. 0 ) THEN
+         IF( SIZEO .GT. 0 ) THEN
             DO I = 1, SIZE
                CALL NDG_NDFAS( IGRP1, I, 'READ', INDF, STATUS )
                WPLATE = VAL__BADR
