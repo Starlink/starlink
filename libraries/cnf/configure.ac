@@ -28,6 +28,15 @@ AC_FC_LIBRARY_LDFLAGS
 dnl   Check if BSD bcopy function is available, if not should use memmove.
 AC_CHECK_FUNCS(memmove bcopy)
 
+dnl   Need to know the size of a pointer for CNF_PVAL
+AC_CHECK_SIZEOF(void*)
+
+dnl   Create a variable containing the pointer size (and the "*")
+dnl   so that we can create CNF_PAR dynamically from configure itself
+dnl   rather than having to write a program to generate CNF_PAR
+SIZEOF_VOIDP="*$ac_cv_sizeof_voidp"
+AC_SUBST(SIZEOF_VOIDP)
+
 dnl   This package has no dependencies
 
 STAR_LATEX_DOCUMENTATION(sun209)
@@ -35,6 +44,6 @@ STAR_LATEX_DOCUMENTATION(sun209)
 dnl   Header checks.  
 AM_CONFIG_HEADER(config.h)
 
-AC_CONFIG_FILES(Makefile component.xml)
+AC_CONFIG_FILES(Makefile component.xml CNF_PAR)
 
 AC_OUTPUT
