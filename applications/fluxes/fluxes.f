@@ -190,7 +190,7 @@
       INTEGER START(3),ASTOP(3),LSTAT,LPATH,LEN,LUP(10)
       INTEGER II,JJ,KK,INOTE,JUNK
 
-      CHARACTER*2  WORDS(3)
+      CHARACTER*6  WORDS(3)
       CHARACTER*7  REQBODY,BODY, PLANET(10), FPLAN(5)
       CHARACTER*10 REQFILT,FILT,DUMMY, FNAME(15),TNAME
       CHARACTER*25 ALINE
@@ -426,6 +426,7 @@ C For the time
 		     CALL MSG_OUT(' ','ERROR INTERPRETING DATE',
      :                     STATUS)
 		  END IF
+                  IC = IC + 1
 		  GOTO 2
   
 	       END IF
@@ -466,7 +467,7 @@ C For the time
 
                   IF (I.EQ.3) THEN
                      CALL CHR_CTOD(WORDS(3), S,STATUS)
-                     CALL CHR_CTOI(WORDS(3),IS,STATUS)
+                     IS = INT( S + 0.5D0 )
                   ELSE
                      S = 0.0D0
                      IS = 0
@@ -519,6 +520,7 @@ C  GET UT in an array
             ID = tarray(4)
             IH = tarray(3)
             IM = tarray(2)
+            IS = tarray(1)
             S = DBLE(tarray(1))
             cmon=sysmo(m)
 
@@ -1049,7 +1051,7 @@ C  GET UT in an array
      
 *     Calculate the RA and Dec of the Pole of the planet and convert to radians
      
-      CALL POLEPLAN(J,RJD,RAP,DECP)
+      CALL POLEPLAN(J,RJD+2400000.5D0,RAP,DECP)
       RANPJ  = RAP*R
       DECNPJ = DECP*R
      
@@ -1430,7 +1432,7 @@ C  GET UT in an array
 	 
 *   Current epoch.
       EPOCH=SLA_EPJ(TDB)
-     
+
 *   Call the slalib jpl routines to get the local sid. time. 
       CALL SLA_DR2TF(4,SLALAST(TDB,TLONG),SIGN,IVR1)
      
@@ -1441,7 +1443,7 @@ C  GET UT in an array
       CALL MSG_FMTD('P3','F7.4',FRAC1)
       CALL MSG_FMTD('P4','F12.3',RJD)
       CALL MSG_FMTD('P5','F9.4',EPOCH)
-      STRING1='LST: ^P1:^P2:^P3  Julian: ^P4  Epoch: ^P5'
+      STRING1='LST: ^P1:^P2:^P3  MJD (TT): ^P4  Epoch: ^P5'
       CALL MSG_LOAD(' ',STRING1,STRING2,JUNK,STATUS)
 
 *   Create display / file headings.     
@@ -1553,9 +1555,8 @@ C  GET UT in an array
       
 *   Variables:      
       DOUBLE PRECISION DAY, S
-      INTEGER I, ID, IH,IM,IY,IS, IYEAR, J, K, L, M, MONTH
-      CHARACTER*3 CMON
       DOUBLE PRECISION FDUTC
+      INTEGER I, ID, IH,IM,IY,IS, IYEAR, J, K, L, M, MONTH
 
 *   External Functions
       DOUBLE PRECISION SLA_EPJ,SLA_DT,SLA_DTT
@@ -1563,14 +1564,10 @@ C  GET UT in an array
 *   Common blocks:
       COMMON /TIMEBLK/IY,M,ID,IH,IM,IS
       COMMON /TIMEBLK2/S
-      
-      CALL SLA_CALDJ(IY,M,ID,RJDATE,J)
-      CALL SLA_DTF2D(IH,IM,IS,FDUTC,J)
-      RJDATE = RJDATE + FDUTC
 
-*     In principal S contains the double precision seconds so
-*     we need to add on the difference between S and IS
-      RJDATE = RJDATE + (S-DBLE(IS)/86500.D0)
+      CALL SLA_CALDJ(IY,M,ID,RJDATE,J)
+      CALL SLA_DTF2D(IH,IM,S,FDUTC,J)
+      RJDATE = RJDATE + FDUTC
 
 *     Correct to TT [older than 1960 we need to guess]
       IF (RJDATE > 36934.0D0) THEN
