@@ -8,6 +8,7 @@
 23-Mar-98 : shmem://0, shmem://1, etc changed to shmem://h0, etc due to bug
 	    in url parser.
 10-Apr-98 : code cleanup
+02-Feb-00 : now deletes global table shared memory (P.W.Draper@durham.ac.uk)
 */
 
 #include "fitsio2.h"				/* drvrsmem.h is included by it */
@@ -101,6 +102,7 @@ void	shared_cleanup(void)			/* this must (should) be called during exit/abort */
    if (NULL != shared_gt)			/* detach global index table */
      { if (shared_debug) printf(" detaching globalsharedtable");
        shmdt((char *)shared_gt);		/* detach global table */
+       shmctl(shared_gt_h, IPC_RMID, 0);          /* and delete it */
        shared_gt = NULL;
      }
    shared_gt_h = SHARED_INVALID;
