@@ -64,8 +64,8 @@ any pending graphics to the output device.
 =cut
 
 sub _GFlush {
-   my $canvas = shift;
-   
+   my $external = shift;   
+   my $canvas = $$external[0];
    $canvas->update();
    return 1;
 }
@@ -79,20 +79,31 @@ This function displays lines joining the given positions.
 =cut
 
 sub _GLine {
-   my ( $canvas, $xf, $yf ) = @_;
+   my ( $external, $xf, $yf ) = @_;
+   my $canvas = $$external[0];
+   my ($xlo,$xhi,$ylo,$yhi) = @$external[1 .. 4];
    
    if( scalar(@$xf) > 1 && scalar(@$xf) == scalar(@$yf) ) {
-
+      
       my $xmax = $canvas->cget( '-width' );
+      my $xmin = 0 + ($xlo*$xmax);
+
       my $ymax = $canvas->cget( '-height' );
-        
+      my $ymin = 0 + ($ylo*$ymax);
+       
       my ( @x, @y, @points);
       foreach my $i ( 0 ... $#$xf ) {
+         
          $x[$i] = $$xf[$i]*$xmax;
          $y[$i] = (1 - $$yf[$i])*$ymax;   
          push @points, $x[$i];
          push @points, $y[$i];
+         #print "\nPOINT $i\nXF = $$xf[$i], YF = $$yf[$i]\n";
+         #print "X[$i] = $x[$i], Y = $y[$i]\n";
+         #print "XLO = $xlo, XHI $xhi, YLO = $ylo, YHI = $yhi\n";
+         #print "XMAX = $xmax, YMAX = $ymax\n";
       }
+      
       $canvas->createLine( @points );
    }   
    return 1;
@@ -109,19 +120,22 @@ where $type is an integer used to indicate the type of marker required.
 =cut
 
 sub _GMark {
-   my ( $canvas, $xf, $yf, $type ) = @_;
- 
-   if( scalar(@$xf) >= 1 && scalar(@$xf) == scalar(@$yf) ) {
+   my ($external, $xf, $yf, $type) = shift;
+   my $canvas = $$external[0];
+   my ($xlo,$xhi,$ylo,$yhi) = @$external[1 .. 4];
+   
+   if( scalar(@$xf) > 1 && scalar(@$xf) == scalar(@$yf) ) {
       
-      my ( @x, @y );
+      my $xmax = $canvas->cget( '-width' );
+      my $xmin = 0 + ($xlo*$xmax);
+
+      my $ymax = $canvas->cget( '-height' );
+      my $ymin = 0 + ($ylo*$ymax);
+        
+      my ( @x, @y, @points);
       foreach my $i ( 0 ... $#$xf ) {
-                     
-         my $xmax = $canvas->cget( '-width' );
-         my $ymax = $canvas->cget( '-height' );
-         
-         # multiple the current co-ordinate
          $x[$i] = $$xf[$i]*$xmax;
-         $y[$i] = (1 - $$yf[$i] )*$ymax;
+         $y[$i] = (1 - $$yf[$i])*$ymax;   
                   
          # basic scaling factor
          my $scale = $xmax/500;
@@ -203,18 +217,23 @@ top on the screen.
 
 sub _GText {
    #croak( "_GText: Not yet implemented");
-   my ( $canvas, $text, $xf, $yf, $just, $upx, $upy ) = @_;
+   my ( $external, $text, $xf, $yf, $just, $upx, $upy ) = @_;
+   my $canvas = $$external[0];
+   my ($xlo,$xhi,$ylo,$yhi) = @$external[1 .. 4];
    print "_GText: Placeholder routine called\n";
    
    # check we have a string to print
    if( defined $text && length($text) != 0 ) {
-                    
+                          
       my $xmax = $canvas->cget( '-width' );
+      my $xmin = 0 + ($xlo*$xmax);
+
       my $ymax = $canvas->cget( '-height' );
+      my $ymin = 0 + ($ylo*$ymax);
      
       # multiple the current co-ordinate
       my $x = $xf*$xmax;
-      my $y = (1 - $yf )*$ymax;   
+      my $y = (1 - $yf)*$ymax;         
       
       # draw text
       print "_GText: ($x,$y) ($xf, $yf) $text\n";
@@ -239,9 +258,9 @@ increase from bottom to top.
 =cut
 
 sub _GScales {
-    my $canvas = shift;
-    my $alpha = shift;
-    my $beta = shift;
+    my ( $external, $alpha, $beta ) = @_;
+   my $canvas = $$external[0];
+   my ($xlo,$xhi,$ylo,$yhi) = @$external[1 .. 4];
     print "_GScales: Placeholder routine called\n";
     
     my ( $nx1, $nx2, $ny1, $ny2, $wx1, $wx2, $wy1, $wy2, $ret );
@@ -251,10 +270,10 @@ sub _GScales {
     $ny1 = $canvas->cget( '-height' );
     $ny2 = 0;
     
-    $wx1 = 0.1;
-    $wx2 = 0.9;
-    $wy1 = 0.1;
-    $wy2 = 0.9;    
+    $wx1 = $xlo;
+    $wx2 = $xhi;
+    $wy1 = $yhi;
+    $wy2 = $ylo;    
 
     if( $wx2 != $wx1 && $wy2 != $wy1 && $nx2 != $nx1 && $ny2 != $ny1 ) {
        $alpha = ( $nx2 - $nx1 ) / ( $wx2 - $wx1 );
@@ -314,7 +333,9 @@ Notes:
 =cut
 
 sub _GTxExt {
-   my ( $canvas, $text, $x, $y, $just, $upx, $upy ) = @_;
+   my ( $external, $text, $x, $y, $just, $upx, $upy ) = @_;
+   my $canvas = $$external[0];
+   my ($xlo,$xhi,$ylo,$yhi) = @$external[1 .. 4];
    print "_GTxExt: Placeholder routine called\n";
    
    # initalise @$xb and @$yb
@@ -484,8 +505,15 @@ use Starlink::AST::Tk;
 sub tk {
   my $self = shift;
   my $canvas = shift;
+ 
+  my @external;
+  push @external, $canvas;
+  push @external, $self->GBox();
   
-  $self->GExternal( $canvas );
+  
+  use Data::Dumper; print ( @external );
+  
+  $self->GExternal( \@external );
   $self->GFlush(\&Starlink::AST::Tk::_GFlush);  
   $self->GLine(\&Starlink::AST::Tk::_GLine);
   $self->GMark(\&Starlink::AST::Tk::_GMark);
