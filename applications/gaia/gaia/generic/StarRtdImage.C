@@ -93,11 +93,14 @@
 //        Added contour command. Lots of restructuring of gridplot
 //        command.
 //     14-JUN-1999 (PWD):
-//        Added "hdu" command to stop use of this facility. There is a 
+//        Added "hdu" command to stop use of this facility. There is a
 //        fundermental problem with memory mapped FITS files that
 //        stops the use of these commands (basically the disk file is
 //        not available to add/read HDUs). When time permits this
 //        problem should be worked around.
+//     12-JUL-1999 (PWD):
+//        Added changes to sliceCmd to replace blank pixels by the
+//        mean along the slice.
 //-
 
 #include <string.h>
@@ -542,8 +545,9 @@ int StarRtdImage::loadFile()
   delete name;
   delete slice;
 
-  if (! image)
+  if (! image ) {
     return TCL_ERROR;
+  }
   image_ = image;
 
   // Restore transformations.
@@ -1182,7 +1186,7 @@ int StarRtdImage::plotgridCmd( int argc, char *argv[] )
   if ( coordArgc > 0 ) {
     Tcl_Free( (char *) coordArgv );
   }
-  
+
   //  Do not exit with AST still in error.
   if ( inerror || ! astOK ) {
     if ( !astOK ) {
@@ -1309,7 +1313,7 @@ int StarRtdImage::aststoreCmd( int argc, char *argv[] )
 //      keyword name, value and comment.
 //-
 void StarRtdImage::storeCard( AstFitsChan *channel, const char *keyword,
-                              const char *value, const char *comment, 
+                              const char *value, const char *comment,
                               int overwrite )
 {
   char card[80];
@@ -2901,7 +2905,7 @@ int StarRtdImage::sliceCmd(int argc, char *argv[])
   double* ivvalues = new double[dist*2];
   double* xyvalues = new double[dist*2];
 
-  // Fill the xyvalues array and set numValues to the actual number of points
+  //  Fill the xyvalues array and set numValues to the actual number of points
   int numValues = image_->getSpectrum(ivvalues, x0, y0, x1, y1);
 
   //  Convert the slice indices to the equivalent X and Y coordinates.
@@ -2993,7 +2997,31 @@ int StarRtdImage::sliceCmd(int argc, char *argv[])
     }
   }
 
-  //  Convert the index/value and x/y pairs into Blyt vectors.
+  //  Strip out any blank values, if needed. Do this now to preserve
+  //  X-Y correspondence. The replacement value is the mean, which is
+  //  as unlikely to occur as any other value and will still look odd
+  //  when a long run of values occur.
+  if ( image_->haveBlank() ) {
+    double blank = image_->getBlank();
+    double mean = 0.0;
+    int count = 0;
+    for ( i = 0; i < numValues; i++ ) {
+      if ( ivvalues[i*2+1] != blank ) {
+	mean += ivvalues[i*2+1];
+	count++;
+      }    
+    }
+    if ( count != 0 ) {
+      mean /= (double) count;
+    }
+    for ( i = 0; i < numValues; i++ ) {
+      if ( ivvalues[i*2+1] == blank ) {
+	ivvalues[i*2+1] = mean;
+      }
+    }
+  }
+
+  //  Convert the index/value and x/y pairs into Blt vectors.
   if (Blt_GraphElement(interp_, argv[0], argv[1], numValues*2,
                        ivvalues, argv[7], argv[8]) != TCL_OK) {
     delete xyvalues;
@@ -3610,7 +3638,7 @@ AstPlot* StarRtdImage::createPlot( AstFrameSet *wcs,
 //
 //   Purpose:
 //      Overrides the "hdu" command of Skycat. None of this
-//      functionality is implemented in GAIA, and at present cannot be 
+//      functionality is implemented in GAIA, and at present cannot be
 //      (because we byte swap FITS files these are memory mapped and
 //      not available for access by the FitsIO library).
 //
@@ -3636,9 +3664,9 @@ int StarRtdImage::hduCmd( int argc, char *argv[] )
 //
 //      With no arguments the standard "colorramp" command is invoked.
 //      With the arguments "setwcs" the WCS system is added based on
-//      the image whose name is given as the second argument. 
+//      the image whose name is given as the second argument.
 //-
-int StarRtdImage::colorrampCmd( int argc, char *argv[] ) 
+int StarRtdImage::colorrampCmd( int argc, char *argv[] )
 {
 #ifdef _DEBUG_
   cout << "Called StarRtdImage::colorrampCmd" << endl;
@@ -3647,21 +3675,21 @@ int StarRtdImage::colorrampCmd( int argc, char *argv[] )
     return RtdImage::colorrampCmd( argc, argv );
   } else {
 
-    //  Get the image, should be named as second argument. 
+    //  Get the image, should be named as second argument.
     StarRtdImage *rtdimage = (StarRtdImage *) getView( argv[1] );
     if ( rtdimage == (StarRtdImage *) NULL ) {
       return error( "Cannot access main image" );
     }
     ImageData *rtdimagedata = rtdimage->image();
 
-    //  Create a frameset that maps from BASE pixels to 
+    //  Create a frameset that maps from BASE pixels to
     AstFrame *base = (AstFrame *) astFrame( 2, "Domain=GRID" );
     AstFrameSet *fset = (AstFrameSet *) astFrameSet( base, "" );
     AstMapping *map = (AstMapping *) astUnitMap( 2, "" );
     AstFrame *current = (AstFrame *) astFrame( 2, "Domain=PIXEL" );
     astAddFrame( fset, 1, map, current );
 
-    // Add a linear mapping that transforms from the base map to the 
+    // Add a linear mapping that transforms from the base map to the
     // current as intensity along the X axis.
     double tr[6];
     double low = rtdimagedata->lowCut();
