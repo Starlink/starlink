@@ -50,18 +50,35 @@ AstHandler::AstHandler (vector<string>serialFrameset,
     Util::uppercaseString (fromdomain_);
     todomain_ = "SKY";		// always
 
+    bool isFits;		// `frameset' is actually a set of FITS cards
+    isFits = serialFrameset_[0].substr(0,6) == "SIMPLE";
+    if (verbosity_ > normal)
+	cerr << "AstHandler: Frameset[0]=<" << serialFrameset_[0]
+	     << ">: " << (isFits ? "FITS" : "AST") << endl;
 
     // begin an AST context
     astBegin;
 
     channel_source (true);	// reset the stream, just in case
     channel_source_init (this);
-    AstChannel *channel_ = astChannel
-	(static_cast<const char *(*)()>(&channel_source_server),
-	 0,
-	 "");
-    astobj_ = static_cast<AstObject*>(astRead (channel_));
-    channel_ = static_cast<AstChannel*>(astAnnul (channel_));
+    if (isFits)
+    {
+	AstFitsChan *channel_ = astFitsChan
+	    (static_cast<const char *(*)()>(&channel_source_server),
+	     0,
+	     "");
+	astobj_ = static_cast<AstObject*>(astRead (channel_));
+	channel_ = static_cast<AstFitsChan*>(astAnnul (channel_));
+    }
+    else
+    {
+	AstChannel *channel_ = astChannel
+	    (static_cast<const char *(*)()>(&channel_source_server),
+	     0,
+	     "");
+	astobj_ = static_cast<AstObject*>(astRead (channel_));
+	channel_ = static_cast<AstChannel*>(astAnnul (channel_));
+    }
 
     // Check here that this is indeed a FrameSet.
     // Alternatively (for the future) we could accept a mapping.
@@ -201,21 +218,20 @@ bool AstHandler::transToSky (const double xpix, const double ypix,
     astTran2 (astmap_, 1, &xpix, &ypix, 1, &radeg, &decdeg);
     if (verbosity_ > normal)
 	cerr << "AstHandler::transToSky: (" << xpix << ',' << ypix
-	     << ") --> ("
+	     << ") --> (" << radeg << ',' << decdeg
+	     << ")rad = ("
 	     << astFormat (astobj_, 1, radeg)
 	     << ','
 	     << astFormat (astobj_, 2, decdeg)
-	     << ")rad";
+	     << ")";
 
     // These coordinates are in radians (by the definition of the
-    // SkyFrame).  Convert them to decimal degrees and normalise them
+    // SkyFrame).  Convert them to decimal degrees and normalise RA
     // to [0,360[.
     radeg *= DegreesPerRadian;
     while (radeg < 0) radeg += 360.0;
     while (radeg >= 360) radeg -= 360.0;
     decdeg *= DegreesPerRadian;
-    while (decdeg < 0) decdeg += 360.0;
-    while (decdeg >= 360) decdeg -= 360.0;
 
     if (verbosity_ > normal)
 	cerr << " = (" << radeg << ',' << decdeg << ")deg" << endl;
@@ -303,11 +319,13 @@ const char *AstHandler::channel_source (bool reset)
 	iter++;
     }
 
+#if 0
     if (verbosity_ > normal)
 	if (rval != 0)
 	    cerr << "AstHandler::channel_source: " << rval << endl;
 	else
 	    cerr << "AstHandler::channel_source: EOD" << endl;
+#endif
 
     return rval;
 }
