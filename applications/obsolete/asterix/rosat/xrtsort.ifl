@@ -78,9 +78,9 @@
      PARAMETER PROPERTY
                TYPE    '_CHAR'
                PROMPT  'Property limits to change (enter numbers)'
-               PPATH   'CURRENT,DEFAULT'
+               PPATH   'DEFAULT'
                HELP    'Enter 1 for Temp, 2 for Gain... Enter "!" to use default values'
-               VPATH   'PROMPT'
+               DEFAULT !
             ENDPARAMETER
 
      PARAMETER TEMPMIN
