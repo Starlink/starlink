@@ -45,6 +45,10 @@
 *           MEAN:    Remove the mean level from each scan (data further
 *                    than 3 sigma from the mean are ignored and the MEAN
 *                    recalculated)
+*           SECTION: Use a SCUBA section to specify regions of each
+*                    integration that are thought to be flux free.
+*                    Remove the median of the specified section
+*                    from the associated integration.
 *     MSG_FILTER = CHAR (Read)
 *        The messaging level. Default is NORM. There are no verbose messages.
 *     OUT = NDF (Write)
@@ -53,11 +57,53 @@
 *        This parameter governs whether the baseline fit is removed from the
 *        input data or stored instead of the data. If RLB is .TRUE. the
 *        corrected data are returned. If RLB is .FALSE. the fit is returned.
+*     SECTION() = CHAR (Read)
+*         This array parameter can be used to specify SCUBA sections
+*         to be used for baseline calculation. It is requested when 
+*         METHOD=SECTION. In general the SCUBA section should
+*         include scan (exposure) or position (p) specifiers which 
+*         will be applied to each bolometer and integration. It is
+*         possible to be more specific and to provide multiple sections
+*         singling out certain bolometers or integrations. If entire
+*         integrations are selected no baseline removal will occur
+*         on unselected integrations (this will be stated).
+*         The median of the section supplied for each integration
+*         is subtracted from every exposure in that integration (remember
+*         that if no integration is specified, all integrations are assumed).
+
+*         Curly brackets must still be given. Since this is an array
+*         parameter square brackets must be used to specify more than
+*         one component:
+* 
+*             SECTION > [ {e1} , {e4;b2} ]
+*
+*         would select exposure one from each integration along with
+*         exposure 4 for bolometer 2.
+*         be used if the square brackets are not used. 
+
+*         Care must also be taken when using commas in SCUBA sections -
+*         the parameter system will split multiple entries on commas 
+*         unless the entire section is quoted:
+*
+*             SECTION > "{e1,4}"
+*
+*         If necessary the negation character should come after a
+*         section (ie after the closing curly bracket) and that 
+*         negation applies to the combined section and not just the string 
+*         containing the negation character:
+*
+*             SECTION > {e3}-
+*
+*         implies that the section consists of everything except exposure 3.
+
 
 *  Examples:
 *     scan_rlb infile \
 *        Remove linear baslines from each scan using basline regions the
 *        same size as the chop. Write the results to the default output file.
+*     scan_rlb infile method=section section='"{e1,3}"' \
+*        Use exposures 1 and 3 to calculate baseline region for each
+*        integration.
 
 
 *  Authors:
@@ -68,6 +114,10 @@
 *    History :
 *     $Id$
 *     21-SEP-1995: original version.
+*     $Log$
+*     Revision 1.11  1999/06/16 21:08:18  timj
+*     Add SECTIONing
+*
 *     {enter_further_changes_here}
  
 *  Bugs:
@@ -88,11 +138,17 @@
 *    Status:
       INTEGER STATUS
 
+*  External References:
+      INTEGER CHR_LEN
+
 *    Local Constants:
       INTEGER MAXDIM
       PARAMETER (MAXDIM = 4)
       CHARACTER * 10 TSKNAME            ! Name of task
       PARAMETER (TSKNAME = 'SCAN_RLB')
+      CHARACTER * 1    NEGCHAR  ! Character used to negate a section
+      PARAMETER (NEGCHAR = '-') ! 
+
 
 *    Local variables:
       LOGICAL      ABORTED              ! .TRUE. if observation was
@@ -102,6 +158,7 @@
       CHARACTER*15 CHOP_FUN             ! chop mode used in observation
       INTEGER      CHOP_SIZE            ! Chop in pixels
       REAL         CHOP_THROW           ! chopper throw (arcsec)
+      CHARACTER*128 DATA_SPEC(SCUBA__MAX_SECT) ! Array of section specs
       INTEGER      DIM (MAXDIM)         ! the dimensions of an array
       LOGICAL      DORLB                ! Perform the subtraction
       LOGICAL      EXTINCTION           ! .TRUE. if the EXTINCTION application
@@ -130,13 +187,15 @@
       INTEGER      LAST_MEAS            ! measurement where abort occurred
       CHARACTER*10 METHOD               ! Baseline removal method
       INTEGER      NDIM                 ! the number of dimensions in an array
+      INTEGER      NEGPOS               ! Position of NEGCHAR
       INTEGER      NREC                 ! number of history records in file
       INTEGER      N_BOL                ! number of bolometers measured 
       INTEGER      N_EXPOSURES          ! number of exposures per integration
       INTEGER      N_FITS               ! number of FITS lines read from file
       INTEGER      N_INTEGRATIONS       ! number of integrations per measurement
       INTEGER      N_MEASUREMENTS       ! number of measurements in the file
-      INTEGER      N_POS                ! the total number of positions measured
+      INTEGER      N_POS                ! the total number of posns measured
+      INTEGER      N_SPEC               ! Number of section specifications
       CHARACTER*30 OBJECT               ! name of object observed
       CHARACTER*15 OBSERVING_MODE       ! type of observation
       CHARACTER*132 OUTFILE             ! Output filename
@@ -152,6 +211,7 @@
                                         ! observation
       CHARACTER*80 STEMP                ! scratch string
       CHARACTER * (10) SUFFIX_STRINGS(SCUBA__N_SUFFIX) ! Suffix for OUT
+      LOGICAL      USE_SECT             ! Am I using the section or inverse?
 
 *  Local Data:
       DATA SUFFIX_STRINGS /'!_rlb','b','_rlb'/
@@ -284,20 +344,6 @@
       CALL SCULIB_GET_FITS_R (SCUBA__MAX_FITS, N_FITS, FITS, 'CHOP_THR',
      :  CHOP_THROW, STATUS)
 
-*     Ask for the baseline removal mode
-      CALL PAR_CHOIC('METHOD', 'LINEAR','LINEAR,MEDIAN,MEAN', .TRUE.,
-     :     METHOD, STATUS)
-
-
-*     Ask for the chop throw (only needed for METHOD=LINEAR)
-
-      IF (METHOD .EQ. 'LINEAR') THEN
-
-         CALL PAR_DEF0R('CHOP', CHOP_THROW, STATUS)
-         CALL PAR_GET0R('CHOP', CHOP_THROW, STATUS)
-
-      END IF
-
 *  find out if the observation was aborted
 
       CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 'STATE',
@@ -403,6 +449,21 @@
 * Bad bit mask
       CALL NDF_SBB(BADBIT, OUTNDF, STATUS)
 
+*     Ask for the baseline removal mode
+      CALL PAR_CHOIC('METHOD', 'LINEAR','LINEAR,MEDIAN,MEAN,SECTION', 
+     :     .TRUE., METHOD, STATUS)
+
+*     Ask for the chop throw (only needed for METHOD=LINEAR)
+
+      IF (METHOD .EQ. 'LINEAR') THEN
+
+         CALL PAR_DEF0R('CHOP', CHOP_THROW, STATUS)
+         CALL PAR_GET0R('CHOP', CHOP_THROW, STATUS)
+
+      END IF
+
+
+
 *     Allow for the fit to be stored rather than simply the
 *     data with the fit subtracted. Gives you more flexibility later
 *     since can use the Kappa command SUB to do the subtraction if
@@ -441,7 +502,48 @@
      :           %val(IN_QUALITY_PTR),
      :           %val(OUT_DATA_PTR), %val(OUT_VARIANCE_PTR),
      :           %val(OUT_QUALITY_PTR), BADBIT, STATUS)
+
+         ELSE IF (METHOD .EQ. 'SECTION') THEN
+
+*     Get the section
+            CALL PAR_GET1C('SECTION', SCUBA__MAX_SECT, DATA_SPEC,
+     :           N_SPEC, STATUS)
             
+
+*     Look for inverse section specified
+            USE_SECT = .TRUE.
+
+            DO I = 1, N_SPEC
+
+               NEGPOS = 1
+               CALL CHR_FIND(DATA_SPEC(I), NEGCHAR, .TRUE., NEGPOS)
+
+*     If the string contains the character remove it and set USE_SECT
+               IF (NEGPOS .LE. CHR_LEN(DATA_SPEC(I))) THEN
+                  USE_SECT = .FALSE.
+                  CALL CHR_RMCHR(NEGCHAR, DATA_SPEC(I))
+               END IF
+
+            END DO
+
+*     Report that we are using an inverted section if necessary
+            IF (.NOT.USE_SECT) THEN
+
+               CALL MSG_SETC('TASK', TSKNAME)
+               CALL MSG_OUTIF(MSG__NORM,' ','^TASK: The inverse '//
+     :              'section has been selected', STATUS)
+
+            END IF
+
+*     Do the removal
+            CALL SURFLIB_REMOVE_DC_VIA_SECT(DORLB, N_SPEC, DATA_SPEC, 
+     :           USE_SECT, N_EXPOSURES, N_INTEGRATIONS, N_MEASUREMENTS,
+     :           %VAL(IN_DEM_PNTR_PTR), N_BOL, N_POS,
+     :           %val(IN_DATA_PTR), %VAL(IN_VARIANCE_PTR),
+     :           %val(IN_QUALITY_PTR),
+     :           %val(OUT_DATA_PTR), %val(OUT_VARIANCE_PTR),
+     :           %val(OUT_QUALITY_PTR), BADBIT, STATUS)
+
          ELSE
 
             STATUS = SAI__ERROR
