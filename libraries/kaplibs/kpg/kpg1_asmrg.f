@@ -20,11 +20,12 @@
 *
 *     1) The domain of the Current Frame in IWCS2, if not blank.
 *     2) "SKY"
-*     3) "PIXEL"
-*     4) "GRID"
-*     5) The domain specified by argument DOMAIN, if not blank. If DOMAIN
+*     3) "SPECTRAL"
+*     4) "PIXEL"
+*     5) "GRID"
+*     6) The domain specified by argument DOMAIN, if not blank. If DOMAIN
 *        is blank, "AGI_WORLD" is used.
-*     6) Any other suitable Frame.
+*     7) Any other suitable Frame.
 *
 *     An error is reported if alignment is not possible, and a message 
 *     identifying the alignment Frame is displayed if alignment is possible.
@@ -40,7 +41,7 @@
 *     DOMAIN = CHARACTER * ( * ) (Given)
 *        A comma separated list of domains in which alignment of the FrameSets 
 *        should be attempted if alignment is not possible in the Current Frame 
-*        of the second FrameSet, or SKY, PIXEL or GRID.
+*        of the second FrameSet, or SKY, SPECTRAL, PIXEL or GRID.
 *     QUIET = LOGICAL (Given)
 *        Suppress the message identifying the alignment Frame?
 *     IND = INTEGER (Given)
@@ -57,6 +58,8 @@
 *        Original version.
 *     22-JUN-1999 (DSB):
 *        Added SKY and PIXEL before GRID is Domain search path.
+*     8-JAN-2003 (DSB):
+*        Added SPECTRAL to Domain search path.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -121,8 +124,8 @@
 
 *  Create a list of preferences for the Domain in which alignment should
 *  occur. First use the Domain of the Current Frame in IWCS2, then try 
-*  SKY, PIXEL and GRID, then try the supplied Domain (if any), then try 
-*  any other Domain. 
+*  SKY, SPECTRAL, PIXEL and GRID, then try the supplied Domain (if any), 
+*  then try any other Domain. 
       DOMLST = ' '
       IAT = 0
 
@@ -131,7 +134,7 @@
          CALL CHR_APPND( ',', DOMLST, IAT )
       END IF
 
-      CALL CHR_APPND( 'SKY,PIXEL,GRID,', DOMLST, IAT )
+      CALL CHR_APPND( 'SKY,SPECTRAL,PIXEL,GRID,', DOMLST, IAT )
 
       IF( DOMAIN .NE. ' ' ) THEN
          CALL CHR_APPND( DOMAIN, DOMLST, IAT )

@@ -1,7 +1,21 @@
 1 DIPSO - friendly spectrum analysis program
 
- V3.5-5 (19-SEP-2001) 
-    DIPSO V3.5-5 has been released. This includes a fix for a bug which
-    caused the ISATM command to be unable to find entries in the ATOMIC.DAT
-    file when being run under Linux, together with fixes for other bugs
-    in the FTRANS, CDRAW and ISCALC commands.
+ V3.6 (18-FEB-2003) 
+    DIPSO V3.6 has been released. This includes the following changes:
+
+    o  The READ command has been modified so that it will attempt to read
+    spectral axis information from the WCS component of an NDF if the NDF
+    was not created by DIPSO. If the NDF has no WCS component, the
+    spectral axis information will be read from the FITS header cards in
+    the NDF FITS extension (if any). Details of the spectral axis are
+    displayed.
+
+    o  The WRITE command has been modified so that it will add a WCS
+    component to the output NDF describing the spectral axis. This allows
+    it to be used by other Starlink applications such as SPLAT, KAPPA,
+    etc.
+
+    o  The ELFRESTC command has been changed so that it no longer converts
+    the supplied file name to upper case before being used to access the
+    file. The previous behaviour resulted in open failure for file names
+    containing lower case letters. 

@@ -1339,7 +1339,7 @@ fintramap.o: fintramap.c f77.h c2f77.h error.h memory.h intramap.h \
 fitschan.o: fitschan.c error.h memory.h object.h channel.h pointset.h \
  unitmap.h mapping.h frame.h axis.h frameset.h skyframe.h cmpframe.h \
  wcsmap.h proj.h wcstrig.h wcsmath.h dssmap.h fitschan.h winmap.h matrixmap.h \
- sphmap.h permmap.h cmpmap.h slalib.h ast_err.h
+ sphmap.h permmap.h cmpmap.h slalib.h ast_err.h specframe.h specmap.h
 flutmap.o: flutmap.c f77.h c2f77.h error.h memory.h lutmap.h mapping.h \
  object.h channel.h pointset.h
 fmapping.o: fmapping.c f77.h c2f77.h error.h mapping.h object.h \
