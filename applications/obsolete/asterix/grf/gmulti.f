@@ -257,8 +257,8 @@
 *    Local constants :
 *    Local variables :
       CHARACTER*20 		ASTR
-      CHARACTER*75 		NAME
-      CHARACTER*80 		LABEL
+      CHARACTER*132 		NAME
+      CHARACTER*132 		LABEL
 
       REAL 			AVAL			! Slice axis value
 
@@ -385,7 +385,7 @@
 *    Function declarations :
 *    Local constants :
 *    Local variables :
-      CHARACTER LINE*80,OVLY*132
+      CHARACTER LINE*132,OVLY*132
       INTEGER NPLOT,IPLOT,BASE
       INTEGER IGRAF,NGRAF
       INTEGER L
@@ -610,7 +610,7 @@
       INTEGER NLINE
       PARAMETER (NLINE=7)
 *    Local variables :
-      CHARACTER*79 TEXT(NLINE)
+      CHARACTER*132 TEXT(NLINE)
       INTEGER ILINE
 *    Local data :
       DATA TEXT/
