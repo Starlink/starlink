@@ -491,7 +491,6 @@ javadocs:
 webstart:
 
 dist:
-    [chmod] Result: -1
 
 install:
 [loggedcopy] Copying 3 files to /apps/cvsbuild/starjava/bin
