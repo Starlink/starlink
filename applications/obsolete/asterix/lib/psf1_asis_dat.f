@@ -137,7 +137,7 @@
 
 *    Load grid
         CALL PSF0_LDGRID( 'asca_sis_psfs', AS_SIS_DIMS, AS_SIS_NDIM,
-     :                    AS_SIS_DX, AS_SIS_XYSAM, AS_SYS_RPTR,
+     :                    AS_SIS_DX, AS_SIS_XYSAM, AS_SIS_RPTR,
      :                    AS_SIS_EPTR, AS_SIS_FLAGS, AS_SIS_DPTR,
      :                    STATUS )
 
@@ -151,7 +151,7 @@
 
 *  Use the grid to get the psf
       CALL PSF0_USEGRID( AS_SIS_DIMS, AS_SIS_NDIM, AS_SIS_DX,
-     :                   AS_SIS_XYSAM, AS_SYS_RPTR, AS_SIS_EPTR,
+     :                   AS_SIS_XYSAM, AS_SIS_RPTR, AS_SIS_EPTR,
      :                   AS_SIS_FLAGS, AS_SIS_DPTR,
      :                   PSID, ENERGY, X0, Y0, QX, QY, DX, DY,
      :                   NX, NY, ARRAY, STATUS )

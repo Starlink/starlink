@@ -147,20 +147,28 @@
 *  Status:
       INTEGER 			STATUS             	! Global status
 
+*  External References:
+      EXTERNAL			PSF0_GRID_D
+        REAL			PSF0_GRID_D
+
 *  Local Constants:
       INTEGER			SAMPLE			! Over sampling
         PARAMETER		( SAMPLE = 3 )
 
 *  Local Variables:
+      REAL			AFAC			! Normalisation factor
       REAL			E1, E2			! Sample energies
       REAL			F1, F2			! Interpolate fractions
+      REAL			LHS, BOT		!
       REAL			P1, P2			! Psf values
       REAL			R1, R2			! Sample radii
       REAL			ROFF			! Off axis angle
       REAL			WIDX, WIDY		! Psf image size
+      REAL			XP, YP, XPP, YPP	! Pixel positions
 
       INTEGER			EBIN			! Energy bin number
       INTEGER			I, J, II, JJ		! Pixel & subpix loops
+      INTEGER			IP1, IP2		! Psf numbers
       INTEGER			RBIN			! Radial bin number
       INTEGER			XROW, YROW		! Psf image indices
 
