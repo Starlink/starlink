@@ -194,4 +194,4 @@ unpack_jni_arch:
 BUILD FAILED
 file:/apps/cvsbuild/java/source/jniast/build.xml:426: Error while expanding /apps/cvsbuild/java/source/jniast/src/lib/ppc/jniast_libs.jar
 
-Total time: 3 minutes 28 seconds
+Total time: 4 minutes 16 seconds
