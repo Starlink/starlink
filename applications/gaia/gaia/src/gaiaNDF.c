@@ -1,6 +1,6 @@
 /*
  *   Name:
- *      rtdNDF
+ *      gaiaNDF
  *
  *   Purpose:
  *      Primitive access to NDFs for GAIA.
@@ -46,7 +46,7 @@
 #include "ems.h"
 #include "dat_par.h"
 #include "ndf.h"
-#include "rtdNDF.h"
+#include "gaiaNDF.h"
 
 /*  Maximum number of pixels to copy during chunking. */
 #define MXPIX 500000
@@ -82,7 +82,7 @@ extern void F77_EXTERNAL_NAME(rtd_rdndf)( CHARACTER(ndfname),
                                           POINTER(charPtr),
                                           INTEGER(header_length),
                                           INTEGER(status)
-                                          TRAIL(ndfname));
+                                          TRAIL(ndfname) );
 
 extern void F77_EXTERNAL_NAME(rtd_wrndf)( CHARACTER(ndfname),
                                           INTEGER(type),
@@ -96,7 +96,7 @@ extern void F77_EXTERNAL_NAME(rtd_wrndf)( CHARACTER(ndfname),
                                           INTEGER(status )
                                           TRAIL(ndfname)
                                           TRAIL(comp)
-                                          TRAIL(fhead));
+                                          TRAIL(fhead) );
 
 extern void F77_EXTERNAL_NAME(rtd_cpdat)( INTEGER(ndfid),
                                           POINTER(data),
@@ -107,7 +107,7 @@ extern void F77_EXTERNAL_NAME(rtd_cpdat)( INTEGER(ndfid),
 extern F77_SUBROUTINE(rtd1_aqual)( INTEGER(ndfId),
                                    LOGICAL(grab),
                                    LOGICAL(haveQual),
-                                   POINTER(q));
+                                   POINTER(q) );
 
 /*  Local prototypes */
 static void datAnnul( const char *loc, int *status );
@@ -134,10 +134,15 @@ static void datClone( const char *loc1, char *loc2, int *status );
 static char *errMessage( int *status );
 
 /*
- *  Copy the current EMS error message into a dynamic string for
- *  returning. Make sure status is set before calling this and release
- *  the memory used for the string when complete. On return status is
- *  reset to SAI__OK and the error stack is empty.
+ *  Name:
+ *     errMessage
+ *
+ *  Purpose:
+ *     Copy the current EMS error message into a dynamic string for
+ *     returning. Make sure status is set before calling this and
+ *     release the memory used for the string when complete. On
+ *     return status is reset to SAI__OK and the error stack is
+ *     empty.  
  */
 static char *errMessage( int *status )
 {
@@ -164,18 +169,28 @@ static char *errMessage( int *status )
 }
 
 /*
- *  Access an NDF returning pseudo FITS headers and the NDF
- *  identifier.
+ *  Name:
+ *     gaiaAccessNDF
+ *
+ *  Purpose:
+ *     Access an NDF by name.
+ *
+ * Description: 
+ *     Accesses an NDF by name (filename or HDS pathname) returning
+ *     its data type (as FITS bitpix), width and height, a pseudo FITS
+ *     header (including any WCS information) and the NDF identifier.
+ *
+ *     The error message (if generated) must be "free"d by the caller.
+ *     Releasing the header is also the caller's responsibility.
  */
-
-int rtdAccessNDF( const char *filename, int *type, int *width, int *height,
+int gaiaAccessNDF( const char *filename, int *type, int *width, int *height,
                   char **header, int *header_length, int *ndfid,
                   char **error_mess )
 {
    DECLARE_CHARACTER(ndfname, MXNAME);   /* Local copy of filename (F77) */
    DECLARE_CHARACTER(tmpname, MXNAME);   /* Local copy of filename (F77) */
-   DECLARE_INTEGER(status);             /* Global status */
-   DECLARE_POINTER(charPtr);            /* Pointer to F77 character array */
+   DECLARE_INTEGER(status);              /* Global status */
+   DECLARE_POINTER(charPtr);             /* Pointer to F77 character array */
    char *opStr;
    char *opPtr;
    int used, i, j, errcount;
@@ -211,18 +226,22 @@ int rtdAccessNDF( const char *filename, int *type, int *width, int *height,
 
 
 /*
- *  Create an NDF from an existing NDF, replacing the given
- *  component.
+ *  Name:
+ *     gaiaWriteNDF
+ *
+ *  Purpose:
+ *     Create an NDF from an existing NDF, replacing the named
+ *     component with the data given.
  */
-int rtdWriteNDF( const char *filename, int type, int width, int height,
+int gaiaWriteNDF( const char *filename, int type, int width, int height,
                  void *data , int ndfid, const char *component,
                  const char *header, int lheader, char **error_mess )
 {
    DECLARE_CHARACTER(ndfname,MXNAME);   /* Local copy of filename (F77) */
    DECLARE_CHARACTER(tmpname,MXNAME);   /* Local copy of filename (F77) */
-   DECLARE_CHARACTER(comp, 20);      /* NDF component to use (F77) */
-   DECLARE_INTEGER(status);          /* Global status */
-   DECLARE_POINTER(dataPtr);         /* Pointer to F77 memory */
+   DECLARE_CHARACTER(comp, 20);         /* NDF component to use (F77) */
+   DECLARE_INTEGER(status);             /* Global status */
+   DECLARE_POINTER(dataPtr);            /* Pointer to F77 memory */
    DECLARE_CHARACTER_ARRAY_DYN(fhead);
    char *opStr;
    char *opPtr;
@@ -252,7 +271,7 @@ int rtdWriteNDF( const char *filename, int type, int width, int height,
 
    /* Attempt to open the NDF. */
    emsMark();
-   F77_CALL( rtd_wrndf )( CHARACTER_ARG(ndfname),
+   F77_CALL( gaia_wrndf )( CHARACTER_ARG(ndfname),
                           INTEGER_ARG(&type),
                           INTEGER_ARG(&ndfid),
                           POINTER_ARG(&dataPtr),
@@ -280,9 +299,14 @@ int rtdWriteNDF( const char *filename, int type, int width, int height,
 }
 
 /*
- *  Free an NDF.
+ *  Name:
+ *     gaiaFreeNDF
+ *
+ *  Purpose:
+ *     Free an NDF, by anulling it's identifier and freeing any
+ *     locally allocated resources.
  */
-int rtdFreeNDF( int ndfid )
+int gaiaFreeNDF( int ndfid )
 {
    DECLARE_LOGICAL(haveQual);
    DECLARE_POINTER(qualPtr);
@@ -292,8 +316,9 @@ int rtdFreeNDF( int ndfid )
    grab = F77_FALSE;
    emsMark();
 
-   /* Free any quality associated with this NDF (should be safe under
-    * any circumstances). */
+   /*  Free any quality associated with this NDF (should be safe under
+    *  any circumstances).  
+    */
    if ( ndfid != 0 ) {
       F77_CALL( rtd1_aqual)( INTEGER_ARG(&ndfid), LOGICAL_ARG(&grab),
                              LOGICAL_ARG(&haveQual),
@@ -310,9 +335,69 @@ int rtdFreeNDF( int ndfid )
 }
 
 /*
- *  Copy an NDF data component into some given memory.
+ *   Name:
+ *      gaiaCopyNDF
+ * 
+ *   Purpose:
+ *      Copy an NDF data component into an array of previously
+ *      allocated memory. The routine uses NDF chunking to minimize
+ *      the total memory footprint.
  */
-int rtdCopyNDF( int ndfid, void **data, const char* component,
+int gaiaCopyNDF( int ndfid, void **data, const char* component,
+                char **error_mess )
+{
+   char *opPtr;
+   char *opStr;
+   char dtype[NDF__SZTYP+1];
+   int chunkid;
+   int el;
+   int errcount;
+   int i;
+   int j;
+   int nchunk;
+   int status = SAI__OK;
+   int used;
+   void *ptr[1];
+
+   /* Get the type of the NDF component. */
+   emsMark();
+   ndfBegin();
+   ndfType( ndfid, component, dtype, NDF__SZTYP+1, &status );
+   
+   /*  Trap _DOUBLE and really map _REAL */
+   if ( strncmp( dtype, "_DOUBLE", 7 ) == 0 ) {
+      strcpy( dtype, "_REAL" );
+   }
+   ndfMap( ndfid, component, dtype, "READ", ptr, &el, &status ); 
+   *data = ptr[0];
+
+   /* If an error occurred return an error message */
+   if ( status != SAI__OK ) {
+      *error_mess = errMessage( &status );
+      ndfEnd( &status );
+      emsRlse();
+      return 0;
+   }
+   ndfEnd( &status );
+   emsRlse();
+   return 1;
+}
+
+/*
+ *   Name:
+ *      gaiaMapNDF
+ * 
+ *   Purpose:
+ *      Map an NDF data component for READ access, returning a pointer
+ *      to the mapped memory. The memory must be unmapped either
+ *      directly or by annuling the NDF identifier, before the program
+ *      exits.  
+ *
+ *   Note:
+ *      If the data values require modification, then a copy should be 
+ *      made instead.
+ */
+int gaiaMap NDF( int ndfid, void **data, const char* component,
                 char **error_mess )
 {
    char *opPtr;
@@ -407,7 +492,7 @@ static void setState( struct NDFinfo *state, int ndfid, const char *name,
  *  information structure about the NDFs and displayables
  *  available. If this fails then zero is returned.
  */
-int rtdInitNDF( const char *name, void **handle, char **error_mess )
+int gaiaInitNDF( const char *name, void **handle, char **error_mess )
 {
    NDFinfo *head = (NDFinfo *) NULL;
    NDFinfo *newstate = (NDFinfo *) NULL;
@@ -445,7 +530,7 @@ int rtdInitNDF( const char *name, void **handle, char **error_mess )
    emsMark();
 
    /*  Attempt to open the given name as an NDF */
-   if ( rtdAccessNDF( name, &type, &width, &height, &header, &hlen,
+   if ( gaiaAccessNDF( name, &type, &width, &height, &header, &hlen,
                       &ndfid, &emess ) ) {
 
       /*  Name is an NDF. Need a HDS path to its top-level so we can
@@ -556,7 +641,7 @@ int rtdInitNDF( const char *name, void **handle, char **error_mess )
 
          /*  Attempt to open NDF to see if it exists (could check for
              DATA_ARRAY component) */
-         if ( rtdAccessNDF( ndffile, &type, &width, &height, &header, &hlen,
+         if ( gaiaAccessNDF( ndffile, &type, &width, &height, &header, &hlen,
                             &ndfid, &emess ) ) {
 
             /*  Check that this isn't the base NDF by another name */
@@ -614,7 +699,7 @@ int rtdInitNDF( const char *name, void **handle, char **error_mess )
  *  If not found then a 0 is returned.
  *
  */
-int rtdCheckDisplayable( const void *handle, int index, const char *component )
+int gaiaCheckDisplayable( const void *handle, int index, const char *component )
 {
    NDFinfo *current = (NDFinfo *) handle;
    int count = 0;
@@ -675,7 +760,7 @@ int rtdCheckDisplayable( const void *handle, int index, const char *component )
 /*
  *  Return useful information about an NDF.
  */
-void rtdGetNDFInfo( const void *handle, int index,
+void gaiaGetNDFInfo( const void *handle, int index,
                     char **name, int *type, int *width,
                     int *height, char **header, int *hlen,
                     int *ndfid, int *hasvar, int *hasqual )
@@ -710,7 +795,7 @@ void rtdGetNDFInfo( const void *handle, int index,
 /*
  *  Copy a displayables data component into some memory.
  */
-int rtdCopyDisplayable( const void *handle, int index, const char *component,
+int gaiaCopyDisplayable( const void *handle, int index, const char *component,
                         void **data, char **error_mess )
 {
    /*  Access the appropriate NDF information structure */
@@ -727,7 +812,7 @@ int rtdCopyDisplayable( const void *handle, int index, const char *component,
       }
       if ( status ) {
          /*  Copy the data */
-         return rtdCopyNDF( current->ndfid, data, component,
+         return gaiaCopyNDF( current->ndfid, data, component,
                             error_mess );
       }
    }
@@ -740,7 +825,7 @@ int rtdCopyDisplayable( const void *handle, int index, const char *component,
 /*
  *  Return the number of NDFs available.
  */
-int rtdCountNDFs( const void *handle )
+int gaiaCountNDFs( const void *handle )
 {
    NDFinfo *current = (NDFinfo *) handle;
    int count = 0;
@@ -754,13 +839,13 @@ int rtdCountNDFs( const void *handle )
 /*
  *  Release all NDF resources.
  */
-void rtdReleaseNDF( const void *handle )
+void gaiaReleaseNDF( const void *handle )
 {
    NDFinfo *current = (NDFinfo *) handle;
    int count = 0;
    if ( current ) {
       for ( ; current->next; current = current->next ) {
-         rtdFreeNDF( current->ndfid );
+         gaiaFreeNDF( current->ndfid );
 
          /*  Free the headers that remain allocated for each query */
          cnf_free( current->header ); /*  Memory allocated by PSX_ routines */
@@ -771,7 +856,7 @@ void rtdReleaseNDF( const void *handle )
 /*
  *  Release displayables accessed for an NDF.
  */
-void rtdFreeDisplayable( void *handle, int index ) 
+void gaiaFreeDisplayable( void *handle, int index ) 
 {   
    /*  Access the appropriate NDF information structure */
    NDFinfo *current = (NDFinfo *) handle;
