@@ -10,9 +10,26 @@
 
    Many of these commands have been archived in a new package called
    KAPRH in order to satisfy any occasional need that may occur for them
-   (see SUN/xxx):
+   (see SUN/239):
 
    - The PSF command now has a parameter PROFOUT which allows the
    displayed profile to be saved in a 1-dimensional NDF.
 
-   
+   - Many of the internal subroutines used within KAPPA are of potential
+   use to people developing their own applications. To make it easier for
+   such people to use the internal facilities of KAPPA, the following
+   internal subroutine libraries have been removed from KAPPA and are now
+   distributed as a separate software item called KAPLIBS (see SUN/238):
+
+     -   libaif.a   
+     -   libctg.a   
+     -   libfits.a  
+     -   libira.a
+     -   libkapgen.a
+     -   libkapgrf.a (contains grf_kappa.o)
+     -   liblpg.a
+
+   If you have applications which used to link against any of these
+   libraries, you should now include `kaplibs_link_adam` in your
+   linking command.
+

@@ -44177,6 +44177,27 @@ The following applications have been modified:
 
 \end{description}
 
+\subsecton{KAPPA Subroutine Libraries}
+Many of the internal subroutines used within KAPPA are of potential
+use to people developing their own applications. To make it easier for
+such people to use the internal facilities of KAPPA, the following
+internal subroutine libraries have been removed from KAPPA and are now
+distributed as a separate software item called KAPLIBS (see SUN/238):
+
+\begin{itemize}
+\item libaif.a   
+\item libctg.a   
+\item libfits.a  
+\item libira.a
+\item libkapgen.a
+\item libkapgrf.a (contains grf_kappa.o)
+\item liblpg.a
+\end{itemize}
+
+If you have applications which used to link against any of these
+libraries, you should now include {\tt `kaplibs\_link\_adam`} in your
+linking command.
+
 
 \begin{latexonly}
 \newpage
