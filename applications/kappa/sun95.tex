@@ -7801,6 +7801,8 @@ Copies WCS information from one NDF to another.}
 Changes the current co-ordinate Frame in the WCS component of an NDF.}
 \menuitem{WCSREMOVE}{
 Removes co-ordinate Frames from the WCS component of an NDF.}
+\menuitem{WCSTRAN}{
+Transforms a position from one NDF co-ordinate Frame to another.}
 \menuitem{WIENER}{
  Applies a Wiener filter to a 1- or 2- dimensional array.}
 \menuitem{ZAPLIN}{
@@ -8286,6 +8288,8 @@ functions as follows.
  Changes the current co-ordinate Frame in the WCS component of an NDF.
 \classitem{WCSREMOVE}
  Removes co-ordinate Frames from the WCS component of an NDF.
+\classitem{WCSTRAN}
+ Transforms a position from one NDF co-ordinate Frame to another.
 \end{description}
 \vspace*{0.7ex}
 %
@@ -36266,6 +36270,144 @@ plot (7k).
    }
 }
 \sstroutine{
+   WCSTRAN
+}{
+   Transform a position from one NDF co-ordinate Frame to another
+}{
+   \sstdescription{
+      This application transforms a position from one NDF co-ordinate Frame
+      to another. The input and output Frames may be chosen freely from the
+      Frames available in the WCS component of the supplied NDF. The
+      transformed position is formatted for display and written to the screen
+      and also to an output parameter.
+   }
+   \sstusage{
+      wcstran ndf posin framein [frameout]
+   }
+   \sstparameters{
+      \sstsubsection{
+         EPOCHIN = \_DOUBLE (Read)
+      }{
+         If a {\tt "}Sky Co-ordinate System{\tt "} specification is supplied (using
+         parameter FRAMEIN) for a celestial co-ordinate system, then an epoch
+         value is needed to qualify it. This is the epoch at which the
+         supplied sky position was determined. It should be given as a
+         decimal years value, with or without decimal places  ({\tt "}1996.8{\tt "} for
+         example). Such values are interpreted as a Besselian epoch if less
+         than 1984.0 and as a Julian epoch otherwise.
+      }
+      \sstsubsection{
+         EPOCHOUT = \_DOUBLE (Read)
+      }{
+         If a {\tt "}Sky Co-ordinate System{\tt "} specification is supplied (using
+         parameter FRAMEOUT) for a celestial co-ordinate system, then an epoch
+         value is needed to qualify it. This is the epoch at which the
+         transformed sky position is required. It should be given as a
+         decimal years value, with or without decimal places  ({\tt "}1996.8{\tt "} for
+         example). Such values are interpreted as a Besselian epoch if less
+         than 1984.0 and as a Julian epoch otherwise.
+      }
+      \sstsubsection{
+         FRAMEIN = LITERAL (Read)
+      }{
+         A string specifying the co-ordinate Frame in which the input
+         position is supplied (see parameter POSIN). If a null parameter
+         value is supplied, then the current Frame in the NDF is used. The
+         string can be one of the following:
+         \sstitemlist{
+
+            \sstitem
+            A domain name such as SKY, AXIS, PIXEL, etc. The two
+            {\tt "}pseudo-domains{\tt "} WORLD and DATA may be supplied and will be
+            translated into PIXEL and AXIS respectively, so long as the WCS
+            component of the NDF does not contain Frames with these domains.
+
+            \sstitem
+            An integer value giving the index of the required Frame within
+            the WCS component.
+
+            \sstitem
+            A {\tt "}Sky Co-ordinate System{\tt "} (SCS) value such as EQUAT(J2000) (see
+            section {\tt "}Sky Co-ordinate Systems{\tt "} in SUN/95).
+         }
+      }
+      \sstsubsection{
+         FRAMEOUT = LITERAL (Read)
+      }{
+         A string specifying the co-ordinate Frame in which the transformed
+         position is required. If a null parameter value is supplied, then
+         the current Frame in the NDF is used. The string can be one of the
+         following:
+         \sstitemlist{
+
+            \sstitem
+            A domain name such as SKY, AXIS, PIXEL, etc. The two
+            {\tt "}pseudo-domains{\tt "} WORLD and DATA may be supplied and will be
+            translated into PIXEL and AXIS respectively, so long as the WCS
+            component of the NDF does not contain Frames with these domains.
+
+            \sstitem
+            An integer value giving the index of the required Frame within
+            the WCS component.
+
+            \sstitem
+            A {\tt "}Sky Co-ordinate System{\tt "} (SCS) value such as EQUAT(J2000) (see
+            section {\tt "}Sky Co-ordinate Systems{\tt "} in SUN/95). [!]
+         }
+      }
+      \sstsubsection{
+         NDF = NDF (Read and Write)
+      }{
+         The NDF data structure containing the required co-ordinate Frames.
+      }
+      \sstsubsection{
+         POSIN = LITERAL (Read)
+      }{
+         The co-ordinates of the position to be transformed, in the
+         co-ordinate Frame specified by parameter FRAMEIN (supplying
+         a colon {\tt "}:{\tt "} will display details of the required co-ordinate Frame).
+         The position should be supplied as a list of formatted axis values
+         separated by spaces or commas.
+      }
+      \sstsubsection{
+         POSOUT = LITERAL (Write)
+      }{
+         The formatted co-ordinates of the transformed position, in the
+         co-ordinate Frame specified by parameter FRAMEOUT. The position
+         will be stored as a list of formatted axis values separated by
+         spaces or commas.
+      }
+      \sstsubsection{
+         QUIET = \_LOGICAL (Read)
+      }{
+         If TRUE, the transformed position is not written to the screen
+         (it is still written to the output parameter POSOUT). [FALSE]
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         wcstran m51 {\tt "}100.1 21.5{\tt "} pixel
+      }{
+         This transforms the pixel position {\tt "}100.1 21.5{\tt "} into the current
+         co-ordinate Frame of the NDF m51. The results are displayed on
+         the screen and written to the output parameter POSOUT.
+      }
+      \sstexamplesubsection{
+         wcstran m51 {\tt "}1:00:00 -12:30{\tt "} equ(B1950) pixel quiet
+      }{
+         This transforms the RA/DEC position {\tt "}1:00:00 -12:30{\tt "} (referred
+         (to the J2000 equinox) into pixel co-ordinates within the NDF m51.
+         The results are written to the output parameter POSOUT, but are
+         not displayed on the screen.
+      }
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+      KAPPA: LISTMAKE, LISTSHOW, WCSFRAME, NDFTRACE, WCSATTRIB
+   }
+}
+\sstroutine{
    WIENER
 }{
    Applies a Wiener filter to a 1- or 2- dimensional array
@@ -38537,6 +38679,9 @@ plotting application.
    \item [\htmlref{WCSREMOVE}{WCSREMOVE}] Removes one or more co-ordinate
          Frames from the WCS component of an NDF.
 
+   \item [\htmlref{WCSTRAN}{WCSTRAN}] Transforms a position from one NDF 
+         WCS co-ordinate Frame to another.}
+
 \end{description}
 
 
@@ -39018,6 +39163,8 @@ functions as follows.
  Changes the current co-ordinate Frame in the WCS component of an NDF.
 \classitem{WCSREMOVE}
  Removes co-ordinate Frames from the WCS component of an NDF.
+\classitem{WCSTRAN}
+ Transforms a position from one NDF WCS co-ordinate Frame to another.
 \end{description}
 \vspace*{0.7ex}
 %
