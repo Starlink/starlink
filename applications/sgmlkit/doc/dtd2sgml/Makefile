@@ -9,7 +9,7 @@ DTDDIR=$(STARLINK_SGML_DIR)/dtd
 	SGML_SEARCH_PATH=$(DTDDIR) \
 	perl -I $(PERLSGML_DIR) dtd2sgml.pl $< >$@ #2>/dev/null
 
-%.text: %.description
+%.text: %.dtdsummary
 	jade -t sgml -d dtd2sgml.dsl $< >$@
 
 # This stamp file is tested by ../ssn70/Makefile -- do not rename!
