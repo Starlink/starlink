@@ -61,6 +61,19 @@ class Ccdtop {
 #        Specifies a text string which can be presented to the user to
 #        tell him what he should be doing.
 #
+#     waitpop
+#        Must occur in a matching pair with the waitpush method.
+#
+#     waitpush msg
+#        If the widget is not already in a "waiting" state, put it in
+#        such a state, and present the msg argument to the user by way
+#        of explanation.  If the widget is already in waiting state, 
+#        no action is taken.  A waitpush should be executed any time
+#        that the widget is likely to be unresponsive to user activity
+#        for a significant amount of time (especially if attempted user
+#        activity could cause problems).  A matching waitpop must be
+#        executed after the action has completed.
+#
 #     panel
 #        Returns the path of a frame into which controls should be placed.
 #
@@ -306,6 +319,28 @@ class Ccdtop {
       }
 
 
+#-----------------------------------------------------------------------
+      public method waitpush { msg } {
+#-----------------------------------------------------------------------
+         if { [ incr waitlevel ] == 1 } {
+            set waitwin [ waiter $itk_interior.waiter -text $msg ]
+            set normalcursor [ $itk_interior cget -cursor ]
+            $itk_interior configure -cursor watch
+            $waitwin configure -cursor $normalcursor
+         }
+      }
+
+
+#-----------------------------------------------------------------------
+      public method waitpop { } {
+#-----------------------------------------------------------------------
+         if { [ incr waitlevel -1 ] == 0 } {
+            destroy $waitwin
+            $itk_interior configure -cursor $normalcursor
+         }
+      }
+
+
 ########################################################################
 #  Public procedures.
 ########################################################################
@@ -418,6 +453,9 @@ class Ccdtop {
       private variable controls        ;# List of control widgets in panel
       private variable groups          ;# List of control groups in panel
       private variable ngroup 0        ;# Number of control groups in panel
+      private variable normalcursor    ;# Non-waiting cursor of window
+      private variable waitlevel 0     ;# Number of active waitpush calls
+      private variable waitwin         ;# Name of the waiter window
       private variable watchlevel 0    ;# Call stack level of calling code
 
    }
