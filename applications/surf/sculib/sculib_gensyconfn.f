@@ -185,7 +185,6 @@
 
       DO I = 1, NCFN
          CONF(I) = CONF(I) / SUMT
-         conf(i) = 0.0
       END DO
 
 * !!! now add in the first component of the convolution function as described
