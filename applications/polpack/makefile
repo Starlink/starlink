@@ -398,7 +398,7 @@ I_SUB2 = hlpcmd ccd1_par ccd1_memcm
 #  reference the files within the source code, not the actual names of
 #  the files.
 
-EXTERNAL_INCLUDES = SAE_PAR DAT_PAR GRP_PAR MSG_PAR NDF_PAR PAR_ERR \
+EXTERNAL_INCLUDES = SAE_PAR DAT_PAR GRP_PAR MSG_PAR NDF_PAR PAR_ERR AST_PAR \
 PAR_PAR PRM_PAR FIO_ERR FIO_PAR NDF_ERR GRP_ERR NUM_DEF_CVT PAR_PAR PSX_ERR \
 NUM_DEC_CVT NUM_CMN NUM_DEC_R NUM_DEF_R TRN_ERR CHR_ERR
 
@@ -552,6 +552,7 @@ DAT_PAR:   $(STAR_INC)/dat_par;   $(LINK) $? $@
 GRP_PAR:   $(STAR_INC)/grp_par;   $(LINK) $? $@
 MSG_PAR:   $(STAR_INC)/msg_par;   $(LINK) $? $@
 NDF_PAR:   $(STAR_INC)/ndf_par;   $(LINK) $? $@
+AST_PAR:   $(STAR_INC)/ast_par;   $(LINK) $? $@
 CHR_ERR:   $(STAR_INC)/chr_err;   $(LINK) $? $@
 TRN_ERR:   $(STAR_INC)/trn_err;   $(LINK) $? $@
 FIO_ERR:   $(STAR_INC)/fio_err;   $(LINK) $? $@
@@ -1499,6 +1500,11 @@ ndg_ndfpr.o:	DAT_PAR
 ndg_ndfpr.o:	NDF_PAR     
 ndg_ndfpr.o:	GRP_PAR     
 ndg_ndfpr.o:	NDG_CONST   
+pol1_chkex.o:	SAE_PAR     
+pol1_chkex.o:	GRP_PAR     
+pol1_chkex.o:	DAT_PAR     
+pol1_chkex.o:	NDF_PAR     
+pol1_chkex.o:	AST_PAR     
 pol1_imfit.o:	SAE_PAR     
 pol1_imfit.o:	GRP_PAR     
 pol1_imfit.o:	DAT_PAR     
