@@ -165,8 +165,8 @@
           CALL ADI_ERASE( OARG, STATUS )
         ELSE IF ( STATUS .NE. SAI__OK ) THEN
           CALL MSG_SETC( 'ITEM', LISTS(C1:C2) )
-          CALL ERR_REP( 'EDI_QMAP_1', 'Unable to map list ^ITEM quantum',
-     :                    STATUS )
+          CALL ERR_REP( 'EDI_QMAP_1', 'Unable to map list ^ITEM'/
+     :                  /' quantum', STATUS )
         ELSE
           PTRS(IITEM) = 0
         END IF
