@@ -46,7 +46,7 @@ compile-tests:
 
 run-tests:
     [junit] Testsuite: TestProxySetupFrame
-    [junit] Tests run: 1, Failures: 1, Errors: 0, Time elapsed: 0.03 sec
+    [junit] Tests run: 1, Failures: 1, Errors: 0, Time elapsed: 0.028 sec
 
     [junit] Testcase: warning took 0.018 sec
     [junit] 	FAILED
