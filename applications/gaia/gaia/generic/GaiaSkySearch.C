@@ -190,10 +190,6 @@ GaiaSkySearch::GaiaSkySearch( Tcl_Interp *interp,
 //
 GaiaSkySearch::~GaiaSkySearch()
 {
-  if ( cat_ ) {
-    delete cat_;
-    cat_ == NULL;
-  }
 }
 
 //
