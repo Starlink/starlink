@@ -157,6 +157,7 @@
 *  Tidy up and exit.
  99   CONTINUE
 
+      CALL DAT_UNMAP( LOC, STATUS )
       CALL DAT_ANNUL( LOC, STATUS )
 
       END
