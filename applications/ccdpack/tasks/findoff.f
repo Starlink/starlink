@@ -242,8 +242,11 @@
 *       positions.  In the output position lists from one run of FINDOFF,
 *       lines with the same column-1 value in different files represent
 *       the same object.  In the input position lists column-1 values
-*       are ignored.  Values in trailing columns (beyond column three)
-*       are ignored.
+*       are ignored.  If additional columns are present they must be
+*       numeric, and there must be the same number of them in every 
+*       line.  These have no effect on the calculations, but FINDOFF
+*       will propagate them to the corresponding lines in the output
+*       list.
 *
 *       EXTERNAL format - positions are specified using just an X 
 *       and a Y entry and no other entries.
@@ -444,6 +447,9 @@
 *     25-JAN-2001 (MBT):
 *        Fixed an old bug which caused good positions to be discarded
 *        when USECOMP=TRUE.
+*     30-JAN-2001 (MBT):
+*        Modified to propagate columns beyond column 3 of input position
+*        lists to the output lists.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -502,7 +508,7 @@
       INTEGER IAT               ! Position in CHR_ string
       INTEGER IDIN              ! NDF identifier
       INTEGER IPBEEN            ! Pointer to workspace
-      INTEGER IPDAT( CCD1__MXLIS ) ! Pointer to input data
+      INTEGER IPDAT             ! Pointer to input data
       INTEGER IPGRA             ! Pointer to graph
       INTEGER IPID( CCD1__MXLIS ) ! Pointer to Output X positions
       INTEGER IPIND             ! Pointer to input indices in file 1
@@ -522,6 +528,8 @@
       INTEGER IPWRK4            ! Workspace pointers
       INTEGER IPWRK5            ! Workspace pointers
       INTEGER IPX( CCD1__MXLIS ) ! Pointer to out/input X positions
+      INTEGER IPXDAT( CCD1__MXLIS ) ! Pointer to extra data from lists
+      INTEGER IPXDP             ! Pointer to permuted extra data
       INTEGER IPXI1             ! Pointer to current frame list 1 X coords
       INTEGER IPXI2             ! Pointer to current frame list 2 X coords
       INTEGER IPXN              ! Pointer to usable pixel frame X coords
@@ -560,7 +568,8 @@
       INTEGER NRET              ! Dummy variable
       INTEGER NUMI1             ! Number of list 1 points in list 2 box
       INTEGER NUMI2             ! Number of list 2 points in list 1 box
-      INTEGER NVAL( CCD1__MXLIS ) ! Number of values per-record
+      INTEGER NVAL              ! Number of values per-record
+      INTEGER NXVAL( CCD1__MXLIS ) ! Number of extra data columns
       INTEGER OFFS( CCD1__MXLIS + 1 ) ! Offsets into extended lists
       INTEGER OUTGRP            ! Output group identifier
       INTEGER TOTNOD            ! Total number of nodes in graph
@@ -880,18 +889,19 @@
 *  Open the input files and test the number of entries.
          CALL GRP_GET( FIOGR, I, 1, FNAME, STATUS )
          CALL CCD1_OPFIO( FNAME, 'READ', 'LIST', 0, FDIN, STATUS )
-         CALL CCD1_LTEST( FDIN, LINE, CCD1__BLEN, 2, 0, NVAL( I ), 
-     :                    STATUS )
-         IF ( NVAL( I ) .EQ. 2 ) THEN 
+         CALL CCD1_LTEST( FDIN, LINE, CCD1__BLEN, 2, 0, NVAL, STATUS )
+         IF ( NVAL .EQ. 2 ) THEN 
 
 *  Map in X and Y positions only (non-standard file)
-            CALL CCD1_NLMAP( FDIN, LINE, CCD1__BLEN, IPDAT( I ), 
-     :                       NREC( I ), NVAL( I ), STATUS )
+            NXVAL( I ) = 0
+            CALL CCD1_NLMAP( FDIN, LINE, CCD1__BLEN, IPDAT, NREC( I ),
+     :                       NVAL, STATUS )
          ELSE
 
 *  Standard file format map these in.
-            CALL CCD1_LMAP( FDIN, LINE, CCD1__BLEN, IPIND, IPDAT( I ),
-     :                      NREC( I ), NVAL( I ), STATUS )
+            NXVAL( I ) = NVAL - 3
+            CALL CCD1_LMAP( FDIN, LINE, CCD1__BLEN, IPIND, IPDAT,
+     :                      NREC( I ), NVAL, STATUS )
             CALL CCD1_MFREE( IPIND, STATUS )            
          END IF
 
@@ -905,6 +915,7 @@
             CALL ERR_REP( 'TOOFEW','  The file ''^FNAME'' '//
      :'only contains ^NREC positions. At least ^MINMAT are required '//
      :'per file.',STATUS )
+            CALL CCD1_MFREE( IPDAT, STATUS )
             GO TO 99
          END IF
 
@@ -912,11 +923,29 @@
          CALL CCD1_MALL( NREC( I ), '_DOUBLE', IPXP, STATUS )
          CALL CCD1_MALL( NREC( I ), '_DOUBLE', IPYP, STATUS )
 
-*  Extract the values from the mapped data array.
-         CALL CCD1_LEXT( %VAL( IPDAT( I ) ), NREC( I ), NVAL( I ), 1,
+*  Extract the X and Y values from the mapped data array.
+         CALL CCD1_LEXT( %VAL( IPDAT ), NREC( I ), NVAL, 1,
      :                   %VAL( IPXP ), STATUS )
-         CALL CCD1_LEXT( %VAL( IPDAT( I ) ), NREC( I ), NVAL( I ), 2,
+         CALL CCD1_LEXT( %VAL( IPDAT ), NREC( I ), NVAL, 2,
      :                   %VAL( IPYP ), STATUS )
+
+*  Extract additional values from the mapped data array if present.
+         IF ( NXVAL( I ) .GT. 0 ) THEN
+            CALL CCD1_MALL( NREC( I ), '_DOUBLE', IPWRK1, STATUS )
+            CALL CCD1_MALL( NREC( I ) * NXVAL( I ), '_DOUBLE',
+     :                      IPXDAT( I ), STATUS )
+            DO J = 1, NXVAL( I )
+               CALL CCD1_LEXT( %VAL( IPDAT ), NREC( I ), NVAL, 2 + J,
+     :                         %VAL( IPWRK1 ), STATUS )
+               CALL CCG1_COPSD( 1, %VAL( IPWRK1 ), NREC( I ),
+     :                          1 + ( J - 1 ) * NREC( I ),
+     :                          %VAL( IPXDAT( I ) ), STATUS )
+            END DO
+            CALL CCD1_MFREE( IPWRK1, STATUS )
+         END IF
+
+*  Release workspace.
+         CALL CCD1_MFREE( IPDAT, STATUS )
 
 *  Ok. Now select which of these point will be considered for matching.
 *  Remove points which are too close.
@@ -1516,11 +1545,30 @@
             CALL CCD1_OPFIO( FNAME, 'WRITE', 'LIST', 0, FDOUT,
      :                       STATUS )
             CALL CCD1_FIOHD( FDOUT, 'Output from FINDOFF', STATUS )
-            CALL CCD1_WRIDI( FDOUT, %VAL( IPID( I ) ),
-     :                       %VAL( IPRAN( I ) ), NOUT( I ), 
-     :                       %VAL( IPDAT( I ) ), NREC( I ), NVAL( I ),
-     :                       LINE, CCD1__BLEN, STATUS, 
-     :                       %val(ipx(i)),%val(ipy(i)) )
+
+*  If extra data columns were present in the input file, permute them
+*  into the right order and output.
+            IF ( NXVAL( I ) .GT. 0 ) THEN
+               CALL CCD1_MALL( NXVAL( I ) * NRECN( I ), '_DOUBLE',
+     :                         IPXDP, STATUS )
+               CALL CCG1_PRMTD( %VAL( IPXDAT( I ) ), %VAL( IPRAN( I ) ),
+     :                          NXVAL( I ), NOUT( I ), %VAL( IPXDP ),
+     :                          STATUS )
+               CALL CCD1_WRIDI( FDOUT, %VAL( IPID( I ) ),
+     :                          %VAL( IPX( I ) ), %VAL( IPY( I ) ),
+     :                          %VAL( IPXDP ), NXVAL( I ), 
+     :                          NOUT( I ), LINE, CCD1__BLEN, STATUS )
+               CALL CCD1_MFREE( IPXDP, STATUS )
+               CALL CCD1_MFREE( IPXDAT( I ), STATUS )
+
+*  If no extra data columns, just output I, X and Y.
+            ELSE
+               CALL CCD1_WRIXY( FDOUT, %VAL( IPID( I ) ),
+     :                          %VAL( IPX( I ) ), %VAL( IPY( I ) ),
+     :                          NOUT( I ), LINE, CCD1__BLEN, STATUS )
+            END IF
+
+*  Write the output.
             CALL FIO_CLOSE( FDOUT, STATUS )
 
 *  Output name.
@@ -1542,7 +1590,6 @@
          CALL CCD1_MFREE( IPID( I ), STATUS )
          CALL CCD1_MFREE( IPX( I ), STATUS )
          CALL CCD1_MFREE( IPY( I ), STATUS )
-         CALL CCD1_MFREE( IPDAT( I ), STATUS )
          CALL CCD1_MFREE( IPRAN( I ), STATUS )
       END DO 
 
