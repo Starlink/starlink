@@ -39,6 +39,7 @@
 *                 smoothing now done simultaneously, code structured. (PLA)
 *      8 Oct 92 : V1.7-0 Converted to D.P. for UNIX port (DJA)
 *      6 Aug 93 : V1.7-1 MAP_MOV to ARR_COP translation (DJA)
+*     20 Apr 95 : V1.8-0 Updated data interface - use GMI_ to create o/p (DJA)
 *
 *    Type Definitions :
 *
@@ -47,8 +48,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
+      INCLUDE 'ADI_PAR'
 *
 *    Status :
 *
@@ -60,59 +60,58 @@
 *
 *    Local variables :
 *
-      CHARACTER*(DAT__SZLOC)   INP(2)         ! Input data object locators
-      CHARACTER*(DAT__SZLOC)   OUT            ! Locator to output object
-      CHARACTER*(DAT__SZLOC)   GRAPH          ! Locator to output GRAFS
-      CHARACTER*(DAT__SZLOC)   COLOC          ! Locator to coherency graph
-      CHARACTER*(DAT__SZLOC)   PHLOC          ! Locator to phase graph
-      CHARACTER*80             UNITS          ! Output (frequency) units
-      CHARACTER*80             UNITS1         ! Input 1 axis units
-      CHARACTER*80             UNITS2         ! Input 2 axis units
-      CHARACTER*80             TEXT(20)       ! Text for history
-      CHARACTER*4              PAR            ! Parameter name
+      CHARACTER*80              UNITS          		! O/p (frequency) units
+      CHARACTER*80              UNITS1         		! Input 1 axis units
+      CHARACTER*80              UNITS2         		! Input 2 axis units
+      CHARACTER*80              TEXT(20)       		! Text for history
+      CHARACTER*4               PAR            		! Parameter name
 
-      REAL                     BANDWIDTH      ! Bandwidth of smoothing window
-      REAL                     BASE           ! Base value of output axis
-      REAL                     FRAC           ! Fraction of array to taper
+      REAL                      BANDWIDTH      ! Bandwidth of smoothing window
+      REAL                      BASE           ! Base value of output axis
+      REAL                      FRAC           ! Fraction of array to taper
                                               ! at each end
-      REAL                     SCALE          ! Scale of output axis
-      REAL                     SCALE1         ! Scale of ist input axis
-      REAL                     SCALE2         ! Scale of 2nd input axis
+      REAL                      SCALE          ! Scale of output axis
+      REAL                      SCALE1         ! Scale of ist input axis
+      REAL                      SCALE2         ! Scale of 2nd input axis
 
-      INTEGER                  CODAT          ! Pointer to output coherency data
-      INTEGER                  COVAR          ! Ptr to coherency variance
-      INTEGER                  DIMS(7,2)      ! Length of dimension of each dataset
-      INTEGER                  DPTR1, DPTR2   ! pointers to input data arrays
-      INTEGER                  I              ! loop counter
-      INTEGER                  LEN            ! Length of an axis
-      INTEGER                  LEN1, LEN2     ! length of input 1 & 2 units
-      INTEGER                  LSHIFT         ! Alignment shift
-      INTEGER                  NDIM(2)        ! No of dimensions of input (n)
-      INTEGER                  NLINES         ! Number of history text lines
-      INTEGER                  NPTS           ! No. of data points
-      INTEGER                  NTOT           ! No. of data after padding
-      INTEGER                  NV             ! No. of elements in spectra
-      INTEGER                  PHDAT          ! Pointer to output phase data
-      INTEGER                  PHVAR          ! Ptr to phase variance
-      INTEGER                  QDIMS(DAT__MXDIM)
-      INTEGER                  QNDIM
-      INTEGER                  QPTR           ! Pointer to quality array
-      INTEGER                  SIGMA          ! Sigma width of Gaussian window
-      INTEGER                  TPTR           ! temporary pointer
-      INTEGER                  WRK1PTR        ! Pointer to work array
-      INTEGER                  WRK2PTR        ! Pointer to work array
+      INTEGER                   CODAT          ! Pointer to output coherency data
+      INTEGER			COFID			! Coherency object
+      INTEGER                   COVAR          ! Ptr to coherency variance
+      INTEGER			DIMS(ADI__MXDIM,2)	! Input dimensions
+      INTEGER                   DPTR1, DPTR2   ! pointers to input data arrays
+      INTEGER                   I              ! loop counter
+      INTEGER			IFID(2)			! Input dataset ids
+      INTEGER                   LEN            ! Length of an axis
+      INTEGER                   LEN1, LEN2     ! length of input 1 & 2 units
+      INTEGER                   LSHIFT         ! Alignment shift
+      INTEGER                   NDIM(2)        ! No of dimensions of input (n)
+      INTEGER                   NLINES         ! Number of history text lines
+      INTEGER                   NPTS           ! No. of data points
+      INTEGER                   NTOT           ! No. of data after padding
+      INTEGER                   NV             ! No. of elements in spectra
+      INTEGER			OFID(2)			! Output dataset id
+      INTEGER                   PHDAT          ! Pointer to output phase data
+      INTEGER			PHFID			! Phase object
+      INTEGER                   PHVAR          ! Ptr to phase variance
+      INTEGER                   QDIMS(ADI__MXDIM)
+      INTEGER                   QNDIM
+      INTEGER                   QPTR           ! Pointer to quality array
+      INTEGER                   SIGMA          ! Sigma width of Gaussian window
+      INTEGER                   TPTR           ! temporary pointer
+      INTEGER                   WRK1PTR        ! Pointer to work array
+      INTEGER                   WRK2PTR        ! Pointer to work array
 
-      LOGICAL                  BAD            ! True if any bad quality values
-      LOGICAL                  TAPER          ! Apply taper to data?
-      LOGICAL                  INPRIM(2)      ! Is input (n) primitive?
-      LOGICAL                  INPUT          ! Continue to look for input?
-      LOGICAL                  OK
-      LOGICAL                  REG            ! Is axis regularly spaced?
+      LOGICAL                   BAD            ! True if any bad quality values
+      LOGICAL                   TAPER          ! Apply taper to data?
+      LOGICAL                   INPRIM(2)      ! Is input (n) primitive?
+      LOGICAL                   INPUT          ! Continue to look for input?
+      LOGICAL                   OK
+      LOGICAL                   REG            ! Is axis regularly spaced?
 *
 *    Version id :
 *
-      CHARACTER*20             VERSION
-        PARAMETER             (VERSION = ' CROSSSPEC Version 1.7-1')
+      CHARACTER*20		VERSION
+        PARAMETER               ( VERSION = 'CROSSPEC Version 1.8-0' )
 *-
 
 *    Version
@@ -126,13 +125,13 @@
         DO WHILE ( INPUT )
           INPUT = .FALSE.
           WRITE (PAR, '(A3,I1)') 'INP', I
-          CALL USI_ASSOCI  (PAR, 'READ', INP(I), INPRIM(I), STATUS)
+          CALL USI_TASSOCI( PAR, 'READ', IFID(I), INPRIM(I), STATUS)
 
 *        Check status
           IF (STATUS .NE. SAI__OK) GOTO 99
 
 *        Check not primitive
-          CALL BDA_CHKDATA (INP(I), OK, NDIM(I), DIMS(1,I), STATUS)
+          CALL BDI_CHKDATA (IFID(I), OK, NDIM(I), DIMS(1,I), STATUS)
 
           IF (.NOT. OK) THEN
             CALL MSG_PRNT ('ERROR: Invalid input')
@@ -144,13 +143,13 @@
 
           ELSE
 *          Check for regular spacing
-            CALL BDA_CHKAXVAL (INP(I), 1, OK, REG, LEN, STATUS)
+            CALL BDI_CHKAXVAL (IFID(I), 1, OK, REG, LEN, STATUS)
 
             IF (OK) THEN
               IF (.NOT. REG) THEN
-                CALL MSG_PRNT ('FATAL ERROR: Only works for regularly '/
-     :                                                   /'spaced data')
                 STATUS = SAI__ERROR
+                CALL ERR_REP(' ', 'CROSSPEC only works for regularly '/
+     :                                         /'spaced data', STATUS )
 
               END IF
             END IF
@@ -169,8 +168,8 @@
         CALL MSG_PRNT ('Assuming unit spacing')
 
       ELSE IF (.NOT. INPRIM(1) .AND. .NOT. INPRIM(2)) THEN
-        CALL BDA_GETAXVAL (INP(1), 1, BASE, SCALE1, LEN, STATUS)
-        CALL BDA_GETAXVAL (INP(2), 1, BASE, SCALE2, LEN, STATUS)
+        CALL BDI_GETAXVAL (IFID(1), 1, BASE, SCALE1, LEN, STATUS)
+        CALL BDI_GETAXVAL (IFID(2), 1, BASE, SCALE2, LEN, STATUS)
 
         IF (SCALE1 .NE. SCALE2) THEN
           CALL MSG_PRNT ('FATAL ERROR: The datasets have different '//
@@ -179,8 +178,8 @@
           GOTO 99
 
         END IF
-        CALL BDA_GETAXUNITS (INP(1), 1, UNITS1, STATUS)
-        CALL BDA_GETAXUNITS (INP(2), 1, UNITS2, STATUS)
+        CALL BDI_GETAXUNITS (IFID(1), 1, UNITS1, STATUS)
+        CALL BDI_GETAXUNITS (IFID(2), 1, UNITS2, STATUS)
         CALL CHR_UCASE( UNITS1 )
         CALL CHR_UCASE( UNITS2 )
         LEN1 = CHR_LEN( UNITS1 )
@@ -209,11 +208,11 @@
         END IF
       ELSE IF ( .NOT. INPRIM(1) ) THEN
         CALL MSG_PRNT( 'Using axis spacing from first dataset' )
-        CALL BDA_GETAXVAL( INP(1), 1, BASE, SCALE1, LEN, STATUS )
+        CALL BDI_GETAXVAL( IFID(1), 1, BASE, SCALE1, LEN, STATUS )
 
       ELSE IF ( .NOT. INPRIM(2) ) THEN
         CALL MSG_PRNT( 'Using axis spacing from second dataset' )
-        CALL BDA_GETAXVAL( INP(2), 1, BASE, SCALE1, LEN, STATUS )
+        CALL BDI_GETAXVAL( IFID(2), 1, BASE, SCALE1, LEN, STATUS )
 
       END IF
 
@@ -234,41 +233,41 @@
       CALL MSG_PRNT ('Using ^NDAT data points')
 
 *    Check data quality
-      CALL BDA_CHKQUAL (INP(1), OK, QNDIM, QDIMS, STATUS)
+      CALL BDI_CHKQUAL (IFID(1), OK, QNDIM, QDIMS, STATUS)
 
       IF (OK) THEN
-        CALL BDA_MAPLQUAL (INP(1), 'READ', BAD, QPTR, STATUS)
+        CALL BDI_MAPLQUAL (IFID(1), 'READ', BAD, QPTR, STATUS)
 
         IF (BAD) THEN
           CALL MSG_PRNT ('WARNING: First dataset contains bad quality '/
      :                                                   /'data points')
 
         END IF
-        CALL BDA_UNMAPLQUAL (INP(1), STATUS)
+        CALL BDI_UNMAPLQUAL (IFID(1), STATUS)
 
       END IF
 
-      CALL BDA_CHKQUAL (INP(2), OK, QNDIM, QDIMS, STATUS)
+      CALL BDI_CHKQUAL (IFID(2), OK, QNDIM, QDIMS, STATUS)
 
       IF (OK) THEN
-        CALL BDA_MAPLQUAL (INP(2), 'READ', BAD, QPTR, STATUS)
+        CALL BDI_MAPLQUAL (IFID(2), 'READ', BAD, QPTR, STATUS)
 
         IF (BAD) THEN
           CALL MSG_PRNT ('WARNING: Second dataset contains bad quality '
      :                                                  //'data points')
 
         END IF
-        CALL BDA_UNMAPLQUAL (INP(2), STATUS)
+        CALL BDI_UNMAPLQUAL (IFID(2), STATUS)
 
       END IF
 
 *    Map data
-      CALL BDA_MAPTDATA( INP(1), '_DOUBLE', 'READ', DPTR1, STATUS )
-      CALL BDA_MAPTDATA( INP(2), '_DOUBLE', 'READ', DPTR2, STATUS )
+      CALL BDI_MAPTDATA( IFID(1), '_DOUBLE', 'READ', DPTR1, STATUS )
+      CALL BDI_MAPTDATA( IFID(2), '_DOUBLE', 'READ', DPTR2, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    User input
-      CALL USI_ASSOCO( 'OUT', 'GRAFIX', OUT, STATUS )
+      CALL USI_TASSOCO( 'OUT', 'GRAFIX', OFID, STATUS )
       CALL USI_GET0L( 'TAPER', TAPER, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
@@ -285,7 +284,7 @@
 
         CALL ARR_COP1D( NPTS, %VAL(DPTR1), %VAL(TPTR), STATUS )
         DPTR1 = TPTR
-        CALL BDA_UNMAPDATA( INP(1), STATUS )
+        CALL BDI_UNMAPDATA( IFID(1), STATUS )
 
 
 *      Taper second input
@@ -293,7 +292,7 @@
         IF ( STATUS .NE. SAI__OK ) GOTO 99
         CALL ARR_COP1D( NPTS, %VAL(DPTR2), %VAL(TPTR), STATUS )
         DPTR2 = TPTR
-        CALL BDA_UNMAPDATA( INP(2), STATUS )
+        CALL BDI_UNMAPDATA( IFID(2), STATUS )
 
 *      Taper copied data
         CALL ARR_TAPERD( %VAL(DPTR1), NPTS, FRAC )
@@ -319,7 +318,7 @@
         IF ( TAPER ) THEN
           CALL DYN_UNMAP( DPTR1, STATUS )
         ELSE
-          CALL BDA_UNMAPDATA( INP(1), STATUS )
+          CALL BDI_UNMAPDATA( IFID(1), STATUS )
         END IF
         DPTR1 = TPTR
         CALL DYN_MAPD( 1, NTOT, TPTR, STATUS )
@@ -333,7 +332,7 @@
         IF ( TAPER ) THEN
           CALL DYN_UNMAP( DPTR2, STATUS )
         ELSE
-          CALL BDA_UNMAPDATA( INP(2), STATUS )
+          CALL BDI_UNMAPDATA( IFID(2), STATUS )
         END IF
         DPTR2 = TPTR
 
@@ -360,31 +359,29 @@
 
 *    Create output Multi graph dataset. Need 2 graphs - one for Coherency
 *    the other for Phase information.
-      CALL DAT_NEW( OUT, 'GRAFS', 'EXTENSION', 1, 2, STATUS )
-      CALL DAT_FIND( OUT, 'GRAFS', GRAPH, STATUS )
+      CALL GMI_CREMULT( OFID, 2, STATUS )
+      CALL GMI_LOCNDF( OFID, 1, COFID, STATUS )
+      CALL GMI_LOCNDF( OFID, 2, PHFID, STATUS )
 
-      CALL DAT_CELL( GRAPH, 1, 1, COLOC, STATUS )
-      CALL DAT_CELL( GRAPH, 1, 2, PHLOC, STATUS )
-
-      CALL BDA_PUTTITLE   (COLOC, 'Cross Spectrum',     STATUS )
-      CALL BDA_PUTLABEL   (COLOC, 'Squared Coherency',  STATUS )
-      CALL BDA_CREBDS     (COLOC, 1, NV, .TRUE., .TRUE.,
+      CALL BDI_PUTTITLE   (COFID, 'Cross Spectrum',     STATUS )
+      CALL BDI_PUTLABEL   (COFID, 'Squared Coherency',  STATUS )
+      CALL BDI_CREBDS     (COFID, 1, NV, .TRUE., .TRUE.,
      :                                         .FALSE., STATUS )
-      CALL BDA_MAPDATA    (COLOC, 'WRITE', CODAT,       STATUS )
-      CALL BDA_PUTAXVAL   (COLOC, 1, 0.0, SCALE, NV,    STATUS )
-      CALL BDA_PUTAXLABEL (COLOC, 1, 'Frequency',       STATUS )
+      CALL BDI_MAPDATA    (COFID, 'WRITE', CODAT,       STATUS )
+      CALL BDI_PUTAXVAL   (COFID, 1, 0.0, SCALE, NV,    STATUS )
+      CALL BDI_PUTAXLABEL (COFID, 1, 'Frequency',       STATUS )
 
-      CALL BDA_PUTTITLE   (PHLOC, 'Cross Spectrum',     STATUS )
-      CALL BDA_PUTLABEL   (PHLOC, 'Phase',              STATUS )
-      CALL BDA_CREBDS     (PHLOC, 1, NV, .TRUE., .TRUE.,
+      CALL BDI_PUTTITLE   (PHFID, 'Cross Spectrum',     STATUS )
+      CALL BDI_PUTLABEL   (PHFID, 'Phase',              STATUS )
+      CALL BDI_CREBDS     (PHFID, 1, NV, .TRUE., .TRUE.,
      :                                         .FALSE., STATUS )
-      CALL BDA_MAPDATA    (PHLOC, 'WRITE', PHDAT,       STATUS )
-      CALL BDA_PUTAXVAL   (PHLOC, 1, 0.0, SCALE, NV,    STATUS )
-      CALL BDA_PUTAXLABEL (PHLOC, 1, 'Frequency',       STATUS )
+      CALL BDI_MAPDATA    (PHFID, 'WRITE', PHDAT,       STATUS )
+      CALL BDI_PUTAXVAL   (PHFID, 1, 0.0, SCALE, NV,    STATUS )
+      CALL BDI_PUTAXLABEL (PHFID, 1, 'Frequency',       STATUS )
 
       IF ( LEN1 .GT. 0 ) THEN
-        CALL BDA_PUTAXUNITS( COLOC, 1, UNITS, STATUS )
-        CALL BDA_PUTAXUNITS( PHLOC, 1, UNITS, STATUS )
+        CALL BDI_PUTAXUNITS( COFID, 1, UNITS, STATUS )
+        CALL BDI_PUTAXUNITS( PHFID, 1, UNITS, STATUS )
       END IF
 
 *    Map work arrays for cross soectrum
@@ -401,17 +398,17 @@
       IF (STATUS .NE. SAI__OK) GOTO 99
 
 *    Calculate coherency & phase variances
-      CALL BDA_MAPVAR (COLOC, 'WRITE', COVAR, STATUS)
-      CALL BDA_MAPVAR (PHLOC, 'WRITE', PHVAR, STATUS)
+      CALL BDI_MAPVAR( COFID, 'WRITE', COVAR, STATUS )
+      CALL BDI_MAPVAR( PHFID, 'WRITE', PHVAR, STATUS )
 
 *    Check status
       IF (STATUS .NE. SAI__OK) GOTO 99
 
-      CALL CROSSPEC_VAR (NV, NPTS, NTOT, BANDWIDTH, FRAC, %VAL(CODAT),
+      CALL CROSSPEC_VAR( NV, NPTS, NTOT, BANDWIDTH, FRAC, %VAL(CODAT),
      :                     %VAL(PHDAT), TAPER, %VAL(COVAR), %VAL(PHVAR))
 
 *    History
-      CALL HIST_ADD( OUT, VERSION, STATUS )
+      CALL HSI_ADD( OFID, VERSION, STATUS )
       CALL USI_NAMEI( NLINES, TEXT, STATUS )
       NLINES       = NLINES + 1
       TEXT(NLINES) = ' '
@@ -420,7 +417,7 @@
       NLINES       = NLINES + 1
       WRITE(TEXT(NLINES), '(A,I2,A)') 'of SIGMA width = ',SIGMA,
      :                                                   ' output bins.'
-      CALL HIST_PTXT (OUT, NLINES, TEXT, STATUS)
+      CALL HSI_PTXT( OFID, NLINES, TEXT, STATUS )
 
 *    Exit
  99   CALL AST_CLOSE
@@ -457,8 +454,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *
 *    Import :
 *
@@ -652,8 +647,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Import :
       INTEGER     NV           ! No. of elements in spectra
       INTEGER     SIGMA        ! Sigma width of Gaussian window
@@ -883,20 +876,18 @@
 *    History :
 *    Type Definitions :
       IMPLICIT NONE
+*    Global constants:
+      INCLUDE 'MATH_PAR'
 *    Import :
       REAL            SIGMA               ! Sigma of smoothing Gaussian.
       REAL            POSN                ! Position wrt mean.
-
-*    Local Constants :
-      REAL            PI                  ! Pi
-         PARAMETER   (PI = 3.1415926536)
 *-
 
       IF (ABS(POSN / SIGMA) .LE. 1E-9) THEN
-        CROSSPEC_GAUSS = 1.0 / SQRT (2.0 * PI * SIGMA)
+        CROSSPEC_GAUSS = 1.0 / SQRT (2.0 * MATH__PI * SIGMA)
 
       ELSE
-        CROSSPEC_GAUSS = (1.0 / SQRT (2.0 * PI * SIGMA))
+        CROSSPEC_GAUSS = (1.0 / SQRT (2.0 * MATH__PI * SIGMA))
      :         * EXP (-0.5 * (POSN / SIGMA)**2)
 
       END IF
