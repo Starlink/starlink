@@ -59,6 +59,11 @@
 #        request. Do not include an escaped new line before awk since this
 #        produces a "null command" error. Explicitly remove any shell
 #        metacharacters (such as "$") from the NDF name.
+#     3-FEB-2000 (DSB):
+#        Corrected implementation of yesterdays changes, and modified the
+#        "echo -n" commands to use the csh built-in echo command in place
+#        of the sh built-in echo command which does not seem to recognize
+#        the -n option on Solaris.
 #     {enter_further_changes_here}
 #
 #  Bugs:
@@ -95,12 +100,13 @@ if ( $#argv == 0 ) then
 #
 #   Obtain the current DATA_ARRAY. Check that parget worked ok by testing
 #   status. Also remove angle brackets introduced by parget (eg. replace 
-#   "$<KAPPA_DIR>/m31" by "$KAPPA_DIR/m31" ).
+#   "$<KAPPA_DIR>/m31" by "$KAPPA_DIR/m31" ), and any NDF section specifier.
 #
-      set defndf = `parget data_array GLOBAL | sed -e 's/^\$<\(.*\)>\(.*\)/\$\1\2/'`
+      set defndf = `parget data_array GLOBAL`
       if ( $status || "$defndf" == "" ) then
          set prstring = "NDF - Name of the NDF > "
       else
+         set defndf = `echo $defndf | sed -e 's/^\$<\(.*\)>\(.*\)/\$\1\2/' | sed -e 's/^\(.*\)(.*)/\1/'`
          set prstring = "NDF - Name of the NDF /@"$defndf"/ > "
          set ndf = $defndf
       endif
@@ -118,7 +124,7 @@ if ( $#argv == 0 ) then
 #
       set ok = 1
       set noglob
-      sh -c "echo -n '$prstring' 1>&2"
+      echo -n "$prstring"
       set ndf = $<
 #
 #   Write some help information, but continue in the loop.
@@ -152,7 +158,7 @@ if ( $#argv == 0 ) then
 #  
 #   Remove any shell meta-characters
 #
-         eval set ndf = $ndf
+         eval set ndf = "$ndf"
 #
 #   Check that the supplied NDF exists.  If there is a specific
 #   extension, test that the file exists.
