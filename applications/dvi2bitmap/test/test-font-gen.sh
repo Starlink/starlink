@@ -49,7 +49,7 @@ postline='^^^^^^^^^^^^^^^^^^^^'
 
 # Find out what was enabled in dvi2bitmap,
 # by parsing the output with the -V option
-eval `$d2bpath -V | sed -n '/^ENABLE/s/ \+/=/p'`
+eval `$d2bpath -V | sed -n '/^ENABLE/s/  */=/p'`
 
 if [ "$ENABLE_FONT_GEN" = yes ]; then
     echo "Font generation ... enabled"
@@ -103,8 +103,9 @@ else
 	    sh
 	echo $postline
 
+	# Get just the first fontname, in case there's more than one
 	fontname=`$d2bpath -QF -n $infile -q | \
-	    awk '/^Qf/{printf "%s.%spk",$2,$3}'`
+	    awk '/^Qf/{printf "%s.%spk",$2,$3; exit}'`
 	echo
 	echo "Looking for font $fontname..."
 	fontnamepath=`$KPW pk $fontname`
