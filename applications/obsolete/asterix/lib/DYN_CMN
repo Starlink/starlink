@@ -13,3 +13,5 @@
 *  Word aligned items
       COMMON /DYN_CMN_1/	DYN_ISINIT, DYS_ISEQ, DYS_PTR,
      :                            DYS_NITEM, DYS_NBYTE, DYS_FID
+
+      SAVE /DYN_CMN_1/
