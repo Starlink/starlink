@@ -1935,7 +1935,7 @@ AstIntraMap *astLoadIntraMap_( void *mem, size_t size, int init,
 
 /* If required, initialise the part of the virtual function table used
    by this class. */
-   if ( init && !class_init ) InitVtab( vtab );
+   if ( init ) InitVtab( vtab );
 
 /* Note if we have successfully initialised the (static) virtual
    function table owned by this class (so that this is done only
