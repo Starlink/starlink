@@ -26,7 +26,7 @@ STAR_CHECK_PROGS([fgeneric])
 dnl    Build dependencies for this package.
 dnl    Includes: fio, par, sae; 
 dnl    links to: chr, mers, fio, psx, task.
-STAR_DECLARE_DEPENDENCIES([build], [fio prm par sae hds])
+STAR_DECLARE_DEPENDENCIES([build], [fio generic prm par sae hds], [link])
 dnl    No use dependencies
 
 STAR_LATEX_DOCUMENTATION(sun102)
