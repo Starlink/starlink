@@ -31,6 +31,9 @@
 #  Ensure the sdt grp command is available.
       source $SDT_DIR/startup.csh
 
+#  Ensure the sst prohlp command is available.
+      source $SST_DIR/start
+
 #  Store the name of the release directory, and go there.
       set REL_DIR = ${TEMPDIR}/polpack_${SYSTEM}
       cd ${REL_DIR}
@@ -54,6 +57,14 @@
 
 #  Ensure all files are accessable.
       chmod 777 *
+
+#  Create the on-line help file.
+      foreach file (`grp user_tasks`)
+         prohlp in=$file out=$file.help
+      end
+      cat polpack.hlp *.help > new.hlp
+      mv new.hlp polpack.hlp
+      rm *.help
 
 #  Tar up the source files and then remove them.
       tar -cvh -f ${TEMPDIR}/polpack_source.tar `grp unix_source` 

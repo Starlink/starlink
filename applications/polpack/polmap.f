@@ -4,7 +4,7 @@
 *     POLMAP
 
 *  Purpose:
-*     
+*     Displays polarisation maps.
 
 *  Language:
 *     Starlink Fortran 77
