@@ -49,7 +49,7 @@
 
 #-
 
-      echo -lagp -lgns `ref_link` `trn_link` `pgplot_link`  \
+      echo -lagp `gns_link` `ref_link` `trn_link` `pgplot_link`  \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}
                   END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
