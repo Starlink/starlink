@@ -8299,6 +8299,7 @@ U java/source/splat/src/main/uk/ac/starlink/splat/iface/images/close.gif
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/images/closeFile.gif
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/images/config.gif
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/images/cutter.gif
+U java/source/splat/src/main/uk/ac/starlink/splat/iface/images/deblend.gif
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/images/delete.gif
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/images/display.gif
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/images/divide.gif
@@ -8620,6 +8621,7 @@ U java/source/table/src/main/uk/ac/starlink/table/jdbc/TerminalAuthenticator.jav
 cvs checkout: Updating java/source/table/src/main/uk/ac/starlink/table/join
 U java/source/table/src/main/uk/ac/starlink/table/join/CartesianMatchEngine.java
 U java/source/table/src/main/uk/ac/starlink/table/join/CombinedMatchEngine.java
+U java/source/table/src/main/uk/ac/starlink/table/join/EqualsMatchEngine.java
 U java/source/table/src/main/uk/ac/starlink/table/join/HTMMatchEngine.java
 U java/source/table/src/main/uk/ac/starlink/table/join/MatchEngine.java
 U java/source/table/src/main/uk/ac/starlink/table/join/MatchStarTables.java
@@ -8856,12 +8858,23 @@ U java/source/topcat/src/main/uk/ac/starlink/topcat/SyntheticRowSubset.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/SyntheticSubsetQueryWindow.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/TableColumnModelAdapter.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/TableViewerWindow.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/TablesListComboBoxModel.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/TopcatListener.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/TopcatModel.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/TopcatViewWindow.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/UpDownButton.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/ViewerTableModel.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/WindowAction.java
+cvs checkout: Updating java/source/topcat/src/main/uk/ac/starlink/topcat/join
+U java/source/topcat/src/main/uk/ac/starlink/topcat/join/InterMatchSpec.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/join/IntraMatchSpec.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/join/MatchOption.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/join/MatchSpec.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/join/MatchWindow.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/join/OutputRequirements.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/join/ParameterEditor.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/join/ParameterPanel.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/join/TupleSelector.java
 cvs checkout: Updating java/source/topcat/src/resources
 cvs checkout: Updating java/source/topcat/src/resources/uk
 cvs checkout: Updating java/source/topcat/src/resources/uk/ac

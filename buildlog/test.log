@@ -32,53 +32,53 @@ compile-tests:
 
 run-tests:
     [junit] Testsuite: uk.ac.starlink.util.DOMUtilsTest
-    [junit] Tests run: 4, Failures: 0, Errors: 0, Time elapsed: 0.419 sec
+    [junit] Tests run: 4, Failures: 0, Errors: 0, Time elapsed: 0.479 sec
 
-    [junit] Testcase: testGetChildElementByName took 0.186 sec
-    [junit] Testcase: testGetTextContent took 0.059 sec
+    [junit] Testcase: testGetChildElementByName took 0.222 sec
+    [junit] Testcase: testGetTextContent took 0.027 sec
     [junit] Testcase: testNewDocument took 0.019 sec
-    [junit] Testcase: testRelativizeDOM took 0.15 sec
+    [junit] Testcase: testRelativizeDOM took 0.206 sec
     [junit] Testsuite: uk.ac.starlink.util.DataSourceTest
-    [junit] Tests run: 6, Failures: 0, Errors: 0, Time elapsed: 3.581 sec
+    [junit] Tests run: 6, Failures: 0, Errors: 0, Time elapsed: 5.316 sec
 
-    [junit] Testcase: testData took 0.669 sec
-    [junit] Testcase: testIntro took 0.605 sec
-    [junit] Testcase: testStream took 0.544 sec
-    [junit] Testcase: testHybridStream took 0.697 sec
-    [junit] Testcase: testCombo1 took 0.879 sec
-    [junit] Testcase: testResourceStream took 0.183 sec
+    [junit] Testcase: testData took 0.753 sec
+    [junit] Testcase: testIntro took 1.271 sec
+    [junit] Testcase: testStream took 0.836 sec
+    [junit] Testcase: testHybridStream took 0.664 sec
+    [junit] Testcase: testCombo1 took 1.376 sec
+    [junit] Testcase: testResourceStream took 0.412 sec
     [junit] Testsuite: uk.ac.starlink.util.IOUtilsTest
-    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.034 sec
+    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.026 sec
 
-    [junit] Testcase: testDataInput took 0.009 sec
-    [junit] Testcase: testInputStream took 0.022 sec
+    [junit] Testcase: testDataInput took 0.008 sec
+    [junit] Testcase: testInputStream took 0.015 sec
     [junit] Testsuite: uk.ac.starlink.util.NodeDescendantsTest
-    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.246 sec
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.167 sec
 
-    [junit] Testcase: testTraversal took 0.241 sec
+    [junit] Testcase: testTraversal took 0.163 sec
     [junit] Testsuite: uk.ac.starlink.util.PipeReaderThreadTest
-    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.051 sec
+    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.202 sec
 
-    [junit] Testcase: testPipe1 took 0.025 sec
+    [junit] Testcase: testPipe1 took 0.177 sec
     [junit] Testcase: testPipeBlock took 0.022 sec
     [junit] Testsuite: uk.ac.starlink.util.ReaderThreadTest
-    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.013 sec
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.187 sec
 
-    [junit] Testcase: testThread took 0.009 sec
+    [junit] Testcase: testThread took 0.184 sec
     [junit] Testsuite: uk.ac.starlink.util.SourceReaderTest
-    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.679 sec
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.729 sec
 
-    [junit] Testcase: testGetDOM took 0.674 sec
+    [junit] Testcase: testGetDOM took 0.725 sec
     [junit] Testsuite: uk.ac.starlink.util.TestCaseTest
-    [junit] Tests run: 3, Failures: 0, Errors: 0, Time elapsed: 0.466 sec
+    [junit] Tests run: 3, Failures: 0, Errors: 0, Time elapsed: 0.388 sec
 
-    [junit] Testcase: testFlags took 0.338 sec
-    [junit] Testcase: testAssertSource took 0.049 sec
-    [junit] Testcase: testValidation took 0.075 sec
+    [junit] Testcase: testFlags took 0.294 sec
+    [junit] Testcase: testAssertSource took 0.046 sec
+    [junit] Testcase: testValidation took 0.044 sec
     [junit] Testsuite: uk.ac.starlink.util.XMLUtilTest
-    [junit] Tests run: 1, Failures: 0, Errors: 1, Time elapsed: 6.795 sec
+    [junit] Tests run: 1, Failures: 0, Errors: 1, Time elapsed: 7.236 sec
 
-    [junit] Testcase: testXMLEncodeDecode took 6.771 sec
+    [junit] Testcase: testXMLEncodeDecode took 7.229 sec
     [junit] 	Caused an ERROR
     [junit] Can't connect to X11 window server using 'rlspc10:0.0' as the value of the DISPLAY variable.
     [junit] java.lang.InternalError: Can't connect to X11 window server using 'rlspc10:0.0' as the value of the DISPLAY variable.
@@ -111,4 +111,4 @@ run-tests:
 BUILD FAILED
 file:/apps/cvsbuild/java/source/util/build.xml:914: Test uk.ac.starlink.util.XMLUtilTest failed
 
-Total time: 27 seconds
+Total time: 44 seconds

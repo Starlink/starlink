@@ -79,7 +79,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/table/build/java
-     [copy] Copying 90 files to /apps/cvsbuild/java/source/table/build/java
+     [copy] Copying 91 files to /apps/cvsbuild/java/source/table/build/java
      [copy] Copied 1 empty directory to /apps/cvsbuild/java/source/table/build/java
      [echo] Executing NDTools target: javadoc-sources
 
@@ -145,7 +145,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/topcat/build/java
-     [copy] Copying 47 files to /apps/cvsbuild/java/source/topcat/build/java
+     [copy] Copying 57 files to /apps/cvsbuild/java/source/topcat/build/java
      [echo] Executing Treeview target: javadoc-sources
 
 javadoc-sources:
@@ -180,9 +180,9 @@ javadoc-sources:
   [javadoc] Loading source files for package uk.ac.starlink.array...
   [javadoc] Loading source files for package uk.ac.starlink.ndx...
   [javadoc] Loading source files for package uk.ac.starlink.table...
+  [javadoc] Loading source files for package uk.ac.starlink.table.join...
   [javadoc] Loading source files for package uk.ac.starlink.table.formats...
   [javadoc] Loading source files for package uk.ac.starlink.table.jdbc...
-  [javadoc] Loading source files for package uk.ac.starlink.table.join...
   [javadoc] Loading source files for package uk.ac.starlink.table.gui...
   [javadoc] Loading source files for package uk.ac.starlink.fits...
   [javadoc] Loading source files for package uk.ac.starlink.votable...
@@ -1544,4 +1544,4 @@ javadoc-sources:
   [javadoc] 578 warnings
 
 BUILD SUCCESSFUL
-Total time: 1 minute 33 seconds
+Total time: 1 minute 32 seconds
