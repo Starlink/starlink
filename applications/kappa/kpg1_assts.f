@@ -1,0 +1,129 @@
+      SUBROUTINE KPG1_ASSTS( SETTNG, REPORT, OVER, IPLOT, BADAT, 
+     :                       STATUS )
+*+
+*  Name:
+*     KPG1_ASSTS
+
+*  Purpose:
+*     Apply an attribute setting to a Plot.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL KPG1_ASSTS( SETTNG, REPORT, OVER, IPLOT, BADAT, STATUS )
+
+*  Description:
+*     This routine applies the supplied attribute setting to the supplied
+*     Plot. The attribute setting should be of the form "name=value" where
+*     "name" is an AST attribute name or a synonym for an AST attribute
+*     name established by a call to KPG1_ASPSY, and "value" is the value
+*     to assign to the attribute. If the attribute name starts with COLOR
+*     or COLOUR then the value string is checked to see if it is the name
+*     of a colour, and if so, the corresponding colour index is used
+*     instead. The resulting setting, after translation of synonyms and
+*     colour names is applied to the supplied Plot. If the Plot already
+*     has a set value for the specified attribute, then the behaviour depends
+*     on OVER; if OVER is .TRUE. then the new attribute value over-writes
+*     the value already in the Plot; if OVER is .FALSE. then the supplied
+*     setting is ignored.
+*
+*  Arguments:
+*     SETTING = CHARACTER * ( * ) (Given)
+*        The attribute setting string.
+*     REPORT = LOGICAL (Given)
+*        Should an error be reported if the attribute setting string
+*        is not legal?
+*     OVER = LOGICAL (Given)
+*        Over-write existing attribute values in the Plot?
+*     IPLOT = INTEGER (Given)
+*        An AST pointer to the Plot to be modified. 
+*     BADAT = LOGICAL (Given)
+*        Was the setting string invalid? If so, an appropriate error
+*        message will have been reported (unless REPORT is .FALSE.).
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     -  Colour attribute values may be supplied in any form recognised
+*     by KPG1_PGCOL (eg colour name, MIN, MAX, integer index, etc), and
+*     the nearest colour in the current KAPPA pallette is used.
+
+*  Authors:
+*     DSB: David S. Berry (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     15-JUL-1998 (DSB):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+      
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'GRP_PAR'          ! GRP constants
+      INCLUDE 'AST_PAR'          ! AST constants and function declarations
+      INCLUDE 'AST_ERR'          ! AST error constants 
+
+*  Arguments Given:
+      CHARACTER SETTNG*(*)
+      LOGICAL REPORT
+      LOGICAL OVER
+      INTEGER IPLOT
+
+*  Arguments Returned:
+      LOGICAL BADAT
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  External References:
+      INTEGER CHR_LEN            ! Used length of a string
+
+*  Local Variables:
+      CHARACTER NAME*(GRP__SZNAM)  ! Attribute name
+      CHARACTER VALUE*(GRP__SZNAM) ! Attribute value
+*.
+
+*  Initialise.
+      BADAT = .FALSE.
+
+*  Check the inherited status. 
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Return if the setting is blank.
+      IF( SETTNG .NE. ' ' ) THEN
+
+*  Extract the attribute name and value, replacing any synonyms 
+*  or any colour names.
+         CALL KPG1_ASSTY( SETTNG, NAME, VALUE, STATUS )
+
+*  Set the attribute in the Plot. If required, check that the attribute 
+*  is not already set in the Plot.
+         IF( OVER .OR. .NOT. AST_TEST( IPLOT, NAME, STATUS ) ) THEN
+            CALL AST_SETC( IPLOT, NAME( : CHR_LEN( NAME ) ), 
+     :                     VALUE( : CHR_LEN( VALUE ) ), STATUS )
+         END IF
+
+*  If AST_SETC or AST_TESTC returned an error indicating that the setting 
+*  string was invalid, return a flag to indicate this.
+         BADAT = ( STATUS .EQ. AST__BADAT .OR.
+     :             STATUS .EQ. AST__ATSER .OR.
+     :             STATUS .EQ. AST__ATTIN .OR.
+     :             STATUS .EQ. AST__AXIIN .OR.
+     :             STATUS .EQ. AST__OPT .OR.
+     :             STATUS .EQ. AST__NOWRT )
+
+*  If no report is wanted, annul the error.
+         IF( .NOT. REPORT ) CALL ERR_ANNUL( STATUS )
+
+      END IF
+
+      END

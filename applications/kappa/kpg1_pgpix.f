@@ -1,0 +1,134 @@
+      SUBROUTINE KPG1_PGPIX( IPLOT, DOMAIN, LBND, UBND, NX, NY, COLI, 
+     :                       STATUS )
+*+
+*  Name:
+*     KPG1_PGPIX
+
+*  Purpose:
+*     Display an image using PGPLOT.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL  KPG1_PGPIX( IPLOT, DOMAIN, LBND, UBND, NX, NY, COLI, STATUS )
+
+*  Description:
+*     This routine uses PGPIXL to display an array of colour indices
+*     as a rectangular image. The area occupied by the array of colour
+*     indices is specified within a nominated Domain. Two opposite 
+*     corners of this area are transformed into the Base Frame 
+*     of the Plot (which should correspond to the current PGPLOT world
+*     co-ordinate sysytem), and the array of colour indices is drawn
+*     between these two transformed positions.
+
+*  Arguments:
+*     IPLOT = INTEGER (Given)
+*        A pointer to an AST Plot. The Base Frame in this Plot should
+*        correspond to the world co-ordinates in the current PGPLOT window.
+*     DOMAIN = CHARACTER * ( * ) (Given)
+*        The Domain in which the coordinates supplied in BOX are defined.
+*     LBND( 2 ) = REAL (Given)
+*        The lower bounds of the area covered by the supplied array of
+*        colour indices, in the Domain given by DOMAIN.
+*     UBND( 2 ) = REAL (Given)
+*        The upper bounds of the area covered by the supplied array of
+*        colour indices, in the Domain given by DOMAIN.
+*     NX = INTEGER
+*        Number of columns in the array of colour indices.
+*     NY = INTEGER
+*        Number of rows in the array of colour indices.
+*     COLI( NX, NY ) = INTEGER (Given)
+*        The array of colour indices.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Authors:
+*     DSB: David S. Berry (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     19-AUG-1998 (DSB):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+      
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'AST_PAR'          ! AST constants and functions
+
+*  Arguments Given:
+      INTEGER IPLOT
+      CHARACTER DOMAIN*(*)
+      REAL LBND( 2 )
+      REAL UBND( 2 )
+      INTEGER NX
+      INTEGER NY
+      INTEGER COLI( NX, NY )
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      INTEGER ICURR              ! Index of original Current Frame
+      DOUBLE PRECISION XIN( 2 )  ! X co-ords in supplied Domain
+      DOUBLE PRECISION XOUT( 2 ) ! X co-ords in GRAPHICS Domain
+      DOUBLE PRECISION YIN( 2 )  ! Y co-ords in supplied Domain
+      DOUBLE PRECISION YOUT( 2 ) ! Y co-ords in GRAPHICS Domain
+*.
+
+*  Check the inherited status. 
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Begin an AST context.
+      CALL AST_BEGIN( STATUS )
+
+*  Note the index of the Current Frame in the Plot. This is changed by
+*  AST_FINDFRAME.
+      ICURR = AST_GETI( IPLOT, 'CURRENT', STATUS )
+
+*  Find the first Frame in the Plot with the specified Domain.
+      IF( AST_FINDFRAME( IPLOT, AST_FRAME( 2, ' ', STATUS ), DOMAIN, 
+     :                   STATUS ) .NE. AST__NULL ) THEN
+
+*  Transform the bottom left and top right corners from the given Domain
+*  into the GRAPHICS Frame.
+         XIN( 1 ) = DBLE( LBND( 1 ) )
+         XIN( 2 ) = DBLE( UBND( 1 ) )
+         YIN( 1 ) = DBLE( LBND( 2 ) )
+         YIN( 2 ) = DBLE( UBND( 2 ) )
+         CALL AST_TRAN2( IPLOT, 2, XIN, YIN, .FALSE., XOUT, YOUT, 
+     :                   STATUS ) 
+
+*  If succesful, draw the image.
+         IF( STATUS .EQ. SAI__OK ) THEN
+            CALL PGPIXL( COLI, NX, NY, 1, NX, 1, NY, REAL( XOUT( 1 ) ),
+     :                   REAL( XOUT( 2 ) ), REAL( YOUT( 1 ) ),
+     :                   REAL( YOUT( 2 ) ) )
+         END IF
+
+*  Re-instate the original Current Frame in the Plot (modified by
+*  AST_FINDFRAME).
+         CALL AST_SETI( IPLOT, 'CURRENT', ICURR, STATUS )
+
+*  Report an error if no Frame with the specified Domain was found in the 
+*  Plot.
+      ELSE IF( STATUS .EQ. SAI__OK ) THEN
+         STATUS = SAI__ERROR
+         CALL MSG_SETC( 'DOM', DOMAIN )
+         CALL ERR_REP( 'KPG1_PGPIX_1', 'KPG1_PGPIX: No ^DOM Frame is '//
+     :                 'available (possible programming error).', 
+     :                 STATUS )
+      END IF
+
+*  End the AST context.
+      CALL AST_END( STATUS )
+
+      END

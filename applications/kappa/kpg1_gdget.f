@@ -1,0 +1,316 @@
+      SUBROUTINE KPG1_GDGET( IPIC, WCFRM, MKDATA, IPLOT, STATUS )
+*+
+*  Name:
+*     KPG1_GDGET
+
+*  Purpose:
+*     Get the AST Plot associated with an AGI picture.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL KPG1_GDGET( IPIC, WCFRM, MKDATA, IPLOT, STATUS )
+
+*  Description:
+*     This routine makes the specified AGI picture current, creates a
+*     corresponding PGPLOT viewport and window, and returns a Plot 
+*     associated with the picture. 
+*
+*     On exit, the PGPLOT viewport corresponds to the area encompassed by
+*     the specified picture. The world co-ordinate bounds within this
+*     viewport are set so that the PGPLOT world co-ordinate system is
+*     millimetres from the bottom left corner of the view surface. This
+*     corresponds to the Base (GRAPHICS) Frame in the returned Plot.
+*
+*     The returned Plot will normally be obtained from the MORE structure 
+*     in the graphics database (where it was stored by a previous AST-based
+*     application). The Base Frame will be a GRAPHICS Frame, giving 
+*     millimetres from the bottom left corner of the view surface. 
+*
+*     If no Plot is available in the database, then an initial PLOT is 
+*     created containing a Base Frame with Domain GRAPHICS (giving 
+*     millimetres from the bottom left corner of the view surface), and 
+*     a Current Frame corresponding to AGI world co-ordinates. The Frame
+*     to represent AGI world co-ordinates in the Plot may be supplied by 
+*     the calling application (for instance, an application may supply a 
+*     PIXEL Frame on the assumption that AGI world co-ordinates are pixel 
+*     co-ordinates). If no such Frame is supplied then a simple Frame is 
+*     used, with Domain set to AGI_WORLD. 
+*
+*     A third Frame may optionally be added to the Plot representing AGI
+*     DATA co-ordinates. This Frame will have Domain AGI_DATA, and the
+*     Mapping from world to data co-ordinates will be given by the
+*     TRANSFORM structure stored with the picture in the database. If
+*     present, it will be the Current Frame int the Plot on exit. See
+*     "Usage" below for warnings about using this option.
+
+*  Usage:
+*     -  To create a new AGI picture, an AST-based application should 
+*     call routine AGP_SVIEW to store the bounds of the current PGPLOT 
+*     viewport as a new picture in the AGI database. The bounds of the
+*     viewport in PGPLOT world co-ordinates will be saved as AGI world
+*     co-ordinates in the AGI database. Non-AST applications will use this
+*     information and so PGPLOT world co-ordinates should be set
+*     appropriately before calling AGP_SVIEW (for instance, DISPLAY sets
+*     them to pixel co-ordinates in the displayed NDF). Note, AST-based
+*     applications do not use the world co-ordinate information stored in 
+*     AGI database (see below).
+*     -  After calling AGP_SVIEW, this routine (KPG1_GDGET) should be 
+*     called to obtain an AST Plot for the new picture. Since the picture
+*     has just been created, it will not as yet have a Plot stored with it 
+*     in the database. An initial Plot is created in which the Base Frame
+*     is a GRAPHICS Frame (giving millimetres from the bottom left corner
+*     of the view surface), and the Current Frame gives AGI world
+*     co-ordinates (as stored with the picture by AGP_SVIEW). The Frame 
+*     specified by argument WCFRM is used for this purpose (a default
+*     Frame with Domain AGI_WORLD is used if no Frame is supplied). For
+*     instance, DISPLAY supplies a PIXEL Frame for WCFRM to identify AGI 
+*     world co-ordinates as pixel co-ordinates. As well as creating a Plot,
+*     this routine also sets PGPLOT world co-ordinates so that they
+*     correspond to GRAPHICS co-ordinates (millimetres from bottom left
+*     corner of the view surface).
+*     -  The application can then modify the returned Plot, for instance
+*     by setting plotting style attributes, or adding extra Frames.
+*     -  Finally, KPG1_GDPUT should be called to store the modified Plot
+*     with the picture in the database. If a non-AST application
+*     subsequently accesses the picture, it will ignore the Plot and use
+*     the AGI world co-ordinates in the usual manner. AST-based
+*     applications will ignore the AGI world co-ordinate bounds, and use
+*     the information stored with the Plot instead.
+*     -  If an AST-based application accesses an existing AGI picture, it
+*     should first call this routine (KPG1_GDGET) to create a Plot defining
+*     the co-ordinate systems associated with the picture. If a Plot is
+*     stored with the picture in the database, then it will be returned.
+*     Otherwise, an initial Plot will be created containing a GRAPHICS
+*     Frame and a world co-ordinate Frame as described above. A DATA
+*     co-ordinate Frame can optionally be included in the initial Plot
+*     (see below).
+*     -  The facility provided by AGI for storing a TRANSFORM structure
+*     defining AGI "DATA" co-ordinates complicates things. If an AST-based 
+*     application creates a new AGI picture, it should NOT store any DATA
+*     co-ordinates with the picture, either in the form of a TRANSFORM 
+*     structure, or in the form of Frames with Domain AGI_DATA in the Plot.
+*     -  If a AST-based application accesses an existing picture (created
+*     by a non-AST application) which has an associated TRANSFORM structure, 
+*     then the initial Plot created by this routine can optionally include
+*     a Frame with Domain AGI_DATA. This Frame will be connected to the 
+*     world co-ordinate Frame using an AST IntraMap which encapsulates the 
+*     mapping implemented by the TRANSFORM structure in the AGI database.
+*     If this option is selected, there are some restrictions on what can
+*     and cannot be done with the returned Plot, because of the potential
+*     presence of the IntraMap: 
+*        1) The Plot must not be combined with another Plot if the other 
+*        Plot may also contain an AGI_DATA Frame.
+*        2) Before using the Plot (or a derived Mapping) to transform
+*        positions (eg using AST_TRAN2), it should be ensured that the 
+*        picture from which the Plot was created is the current AGI
+*        picture.
+*     Because of these restrictions, the option to create an AGI_DATA
+*     Frame should only be used when necessary.
+
+*  Arguments:
+*     IPIC = INTEGER (Given)
+*        The AGI identifier for the picture. If a value of -1 is supplied, 
+*        the identifier for the current picture is used.
+*     WCFRM = INTEGER (Given)
+*        A pointer to an AST Frame which will be used to describe AGI
+*        world co-ordinates if the picture has no associated Plot. This
+*        argument is ignored if the picture already has a Plot stored with 
+*        it in the database. If a null pointer (AST__NULL) is supplied, then 
+*        a default Frame is used with Domain set to AGI_WORLD.
+*     MKDATA = LOGICAL (Given)
+*        Should a Frame with Domain AGI_DATA be included in the returned
+*        Plot to represent AGI DATA co-ordinates? This is ignored if the
+*        picture has a Plot already stored with it in the database.
+*     IPLOT = INTEGER (Returned)
+*        An AST pointer to the Plot. Returned equal to AST__NULL if an 
+*        error occurs.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     -  The PGPLOT interface to the AGI library should be opened before
+*     calling this routine.  
+
+*  Authors:
+*     DSB: David S. Berry (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     2-SEP-1998 (DSB):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+      
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'AST_PAR'          ! AST constants
+      INCLUDE 'DAT_PAR'          ! DAT constants
+      INCLUDE 'AGI_PAR'          ! AGI constants
+
+*  Arguments Given:
+      INTEGER IPIC
+      INTEGER WCFRM
+      LOGICAL MKDATA
+
+*  Arguments Returned:
+      INTEGER IPLOT
+
+*  Status:
+      INTEGER STATUS               ! Global status
+
+*  External References:
+      EXTERNAL KPG1_ASAGD          ! Encapsulates a TRANSFORM strcuture
+
+*  Local Variables:
+      CHARACTER MORLOC*(DAT__SZLOC)! HDS locator for picture's MORE structure
+      CHARACTER NAME*(AGI__SZNAM)  ! Name stored with required picture
+      DOUBLE PRECISION DBX( 4 )    ! D.P. version of BX
+      INTEGER IPICL                ! AGI identifier for picture to use
+      INTEGER IWOCO                ! Index of AGI world co-ordinates Frame
+      INTEGER MAP                  ! Pointer to WORLD -> DATA Mapping
+      LOGICAL MORE                 ! Does picture have a MORE structure?
+      REAL BX( 4 )                 ! Bounds of plotting area
+*.
+
+*  Initialise returned values.
+      IPLOT = AST__NULL
+
+*  Check the inherited status. 
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Begin an AST context.
+      CALL AST_BEGIN( STATUS )
+
+*  Ensure all KAPPA AST IntraMaps are registered.
+      CALL KPG1_ASREG( STATUS )
+
+*  If a picture was specified, make it current.
+      IF( IPIC .NE. -1 ) THEN
+         IPICL = IPIC
+         CALL AGI_SELP( IPIC, STATUS )
+
+*  Otherwise, store the current picture identifier.
+      ELSE
+         CALL AGI_ICURP( IPICL, STATUS )
+      END IF
+
+*  Create a PGPLOT viewport from the picture. The viewport covers the 
+*  entire picture (no border is left), and has world co-ordinates defined
+*  by the AGI database.
+      CALL AGP_NVIEW( .FALSE., STATUS )
+
+*  See if there is a MORE structure associated with the picture.
+      CALL AGI_IMORE( IPICL, MORE, STATUS ) 
+
+*  If so we see if the MORE structure contains an AST Plot.
+      IF( MORE ) THEN
+
+*  Get an HDS locator to the MORE structure.
+         CALL AGI_MORE( IPICL, 'READ', MORLOC, STATUS ) 
+
+*  Attempt to read an AST Object from the AST_PLOT component of the HDS 
+*  structure. No error is reported if there is no AST_PLOT component.
+         CALL KPG1_WREAD( MORLOC, 'AST_PLOT', IPLOT, STATUS )
+
+*  Annul the locator to the MORE structure.
+         CALL DAT_ANNUL( MORLOC, STATUS )
+
+*  If the AST Object read from the database is not a Plot, report an error.
+         IF( IPLOT .NE. AST__NULL ) THEN
+            IF( .NOT. AST_ISAPLOT( IPLOT, STATUS ) .AND. 
+     :          STATUS .EQ. SAI__OK ) THEN
+               CALL AST_ANNUL( IPLOT, STATUS )
+
+               CALL AGI_INAME( NAME, STATUS )
+               CALL MSG_SETC( 'NAME', NAME )
+               CALL MSG_SETC( 'CLASS', AST_GETC( IPLOT, 'CLASS',
+     :                                              STATUS ) )
+
+               STATUS = SAI__ERROR
+               CALL ERR_REP( 'KPG1_GDGET_1', 'The required ^NAME '//
+     :                       'picture has an AST ^CLASS associated '//
+     :                       'with it in the AGI database. This '//
+     :                       'application requires an AST Plot.',
+     :                       STATUS )
+            END IF
+
+         END IF
+
+      END IF
+
+*  If a Plot was obtained, ensure that the current PGPLOT window corresponds
+*  to millimetres from the bottom left corner of the view surface. This is
+*  the co-ordinate system used by the Base (GRAPHICS) Frame in the Plot.
+      IF( IPLOT .NE. AST__NULL ) THEN
+         CALL PGQVP( 2, BX( 1 ), BX( 3 ), BX( 2 ), BX( 4 ) )
+         CALL PGSWIN( BX( 1 ), BX( 3 ), BX( 2 ), BX( 4 ) )
+
+*  If no Plot was obtained, return a Plot containing the GRAPHICS Frame,
+*  an AGI world co-ordinates Frame and (optionally) an AGI Data 
+*  co-ordinates Frame.
+      ELSE
+
+*  Get the AGI world co-ordinate bounds of the specified picture,
+*  and convert to double precision.
+         CALL PGQWIN( BX( 1 ), BX( 3 ), BX( 2 ), BX( 4 ) )
+         DBX( 1 ) = DBLE( BX( 1 ) )
+         DBX( 2 ) = DBLE( BX( 2 ) )
+         DBX( 3 ) = DBLE( BX( 3 ) )
+         DBX( 4 ) = DBLE( BX( 4 ) )
+
+*  Create the Plot.
+         CALL KPG1_ASPLT( WCFRM, DBX, ' ', IPLOT, STATUS )
+
+*  If no Frame was supplied, a default 2D Frame will have been used. Set
+*  its Domain to AGI_WORLD. Also set its Title and axis Symbols.
+         IF( WCFRM .EQ. AST__NULL ) THEN
+            CALL AST_SETC( IPLOT, 'Domain', 'AGI_WORLD', STATUS )
+            CALL AST_SET( IPLOT, 'Title=World co-ordinates,'//
+     :                    'symbol(1)=X,symbol(2)=Y', STATUS )
+         END IF
+
+*  If required, add an AGI_DATA Frame into the returned Plot. 
+         IF( MKDATA ) THEN
+
+*  Get the Frame index of the AGI world co-ordinate Frame.
+            IWOCO = AST_GETI( IPLOT, 'CURRENT', STATUS )
+
+*  Create an "ASAGD" IntraMap to encapsulate the TRANSFORM structure stored in
+*  the AGI database. It maps AGI WORLD co-ords into AGI data co-ords
+*  using the TRANSFORM structure for the current AGI picture.
+            MAP = AST_INTRAMAP( 'ASAGD', 2, 2, ' ', STATUS ) 
+
+*  Create the Frame and add it into the Plot, using the above IntraMap to 
+*  connect it to the world co-ordinate Frame. The new Frame becomes the 
+*  Current Frame.
+            CALL AST_ADDFRAME( IPLOT, IWOCO, MAP, 
+     :                         AST_FRAME( 2, ' ', STATUS ), STATUS ) 
+
+*  Set its Domain to AGI_DATA, and set its Title and axis Symbols.
+            CALL AST_SETC( IPLOT, 'Domain', 'AGI_DATA', STATUS )
+            CALL AST_SET( IPLOT, 'Title=Data co-ordinates,'//
+     :                    'symbol(1)=X,symbol(2)=Y', STATUS )
+
+         END IF
+
+      END IF
+
+*  Export the Plot pointer from the current AST context. This will 
+*  prevent it being annulled by the following call to AST_END. If
+*  an error has occurred, then the Plot will not be exported by this
+*  call and so will be annulled by AST_END.
+      CALL AST_EXPORT( IPLOT, STATUS )
+
+*  End the AST context.
+      CALL AST_END( STATUS )
+
+      END
