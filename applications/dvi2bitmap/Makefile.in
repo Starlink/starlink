@@ -23,25 +23,25 @@ $(EXEC): $(OBJS)
 DviFile.o: DviFile.cc DviFile.h InputByteStream.h PkFont.h verbosity.h
 
 InputByteStream.o: InputByteStream.cc InputByteStream.h dvi2bitmap.h \
-		verbosity.h
+		verbosity.h config.h
 
 dvi2bitmap.o: dvi2bitmap.cc dvi2bitmap.h DviFile.h PkFont.h Bitmap.h \
-		version.h verbosity.h
+		version.h verbosity.h config.h
 
 PkFont.o: PkFont.cc PkFont.h InputByteStream.h dvi2bitmap.h kpathsea.h \
-		verbosity.h
+		verbosity.h config.h
 
-BitmapImage.o: BitmapImage.cc BitmapImage.h GIFBitmap.h XBMBitmap.h
+BitmapImage.o: BitmapImage.cc BitmapImage.h GIFBitmap.h XBMBitmap.h config.h
 
-Bitmap.o: Bitmap.cc Bitmap.h dvi2bitmap.h BitmapImage.h verbosity.h
+Bitmap.o: Bitmap.cc Bitmap.h dvi2bitmap.h BitmapImage.h verbosity.h config.h
 
-GIFBitmap.o: GIFBitmap.cc GIFBitmap.h Bitmap.h
+GIFBitmap.o: GIFBitmap.cc GIFBitmap.h Bitmap.h config.h
 
-XBMBitmap.o: XBMBitmap.cc XBMBitmap.h Bitmap.h
+XBMBitmap.o: XBMBitmap.cc XBMBitmap.h Bitmap.h config.h
 
-kpathsea.o: kpathsea.cc kpathsea.h verbosity.h
+kpathsea.o: kpathsea.cc kpathsea.h verbosity.h config.h
 
-PageRange.o: PageRange.cc PageRange.h verbosity.h
+PageRange.o: PageRange.cc PageRange.h verbosity.h config.h
 
 
 # Distribution
@@ -56,7 +56,7 @@ dvi2bitmap.tar: configure dvi2bitmap.mantext
 	rm -f Manifest
 	cd doc; $(MAKE) doc.tar
 	mv doc/doc.tar .
-	for i in *.cc *.h Makefile.in README \
+	for i in *.cc *.h Makefile.in config.h.in README \
 			configure config/config* config/install-sh \
 			dvi2bitmap.1 dvi2bitmap.mantext LICENCE doc.tar; do \
 		echo dvi2bitmap/$$i >>Manifest; \
