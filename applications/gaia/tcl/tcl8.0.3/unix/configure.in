@@ -679,7 +679,7 @@ case $system in
 	SHLIB_SUFFIX=".so"
 	DL_OBJS="tclLoadDl.o"
 	DL_LIBS="-ldl"
-	LD_FLAGS=""
+	LD_FLAGS="${LDFLAGS}"
 	LD_SEARCH_FLAGS='-L${LIB_RUNTIME_DIR}'
 	AIX=yes
 	TCL_SHARED_LIB_SUFFIX='${VERSION}\$\{DBGX\}.a'
@@ -691,7 +691,7 @@ case $system in
 	SHLIB_SUFFIX=".so"
 	DL_OBJS="tclLoadDl.o tclLoadAix.o"
 	DL_LIBS="-lld"
-	LD_FLAGS=""
+	LD_FLAGS="${LDFLAGS}"
 	LD_SEARCH_FLAGS='-L${LIB_RUNTIME_DIR}'
 	TCL_SHARED_LIB_SUFFIX='${VERSION}\$\{DBGX\}.a'
 	;;
@@ -702,7 +702,7 @@ case $system in
 	SHLIB_SUFFIX=".so"
 	DL_OBJS="tclLoadDl.o"
 	DL_LIBS="-ldl"
-	LD_FLAGS=""
+	LD_FLAGS="${LDFLAGS}"
 	LD_SEARCH_FLAGS=""
 	;;
     dgux*)
@@ -712,7 +712,7 @@ case $system in
 	SHLIB_SUFFIX=".so"
 	DL_OBJS="tclLoadDl.o"
 	DL_LIBS="-ldl"
-	LD_FLAGS=""
+	LD_FLAGS="${LDFLAGS}"
 	LD_SEARCH_FLAGS=""
 	;;
     HP-UX-*.08.*|HP-UX-*.09.*|HP-UX-*.10.*)
@@ -724,7 +724,7 @@ case $system in
 	    SHLIB_SUFFIX=".sl"
 	    DL_OBJS="tclLoadShl.o"
 	    DL_LIBS="-ldld"
-	    LD_FLAGS="-Wl,-E"
+	    LD_FLAGS="${LDFLAGS} -Wl,-E"
 	    LD_SEARCH_FLAGS='-Wl,+s,+b,${LIB_RUNTIME_DIR}:.'
 	fi
 	;;
@@ -735,7 +735,7 @@ case $system in
 	SHLIB_LD_LIBS='${LIBS}'
 	DL_OBJS="tclLoadAout.o"
 	DL_LIBS=""
-	LD_FLAGS="-Wl,-D,08000000"
+	LD_FLAGS="${LDFLAGS} -Wl,-D,08000000"
 	LD_SEARCH_FLAGS='-L${LIB_RUNTIME_DIR}'
 	TCL_SHARED_LIB_SUFFIX='${VERSION}\$\{DBGX\}.a'
 	;;
@@ -746,7 +746,7 @@ case $system in
 	SHLIB_SUFFIX=".so"
 	DL_OBJS="tclLoadDl.o"
 	DL_LIBS=""
-	LD_FLAGS=""
+	LD_FLAGS="${LDFLAGS}"
 	LD_SEARCH_FLAGS='-Wl,-rpath,${LIB_RUNTIME_DIR}'
 	;;
     IRIX64-6.*)
@@ -756,7 +756,7 @@ case $system in
 	SHLIB_SUFFIX=".so"
 	DL_OBJS="tclLoadDl.o"
 	DL_LIBS=""
-	LD_FLAGS=""
+	LD_FLAGS="${LDFLAGS}"
 	LD_SEARCH_FLAGS='-Wl,-rpath,${LIB_RUNTIME_DIR}'
 	;;
     Linux*)
@@ -767,14 +767,14 @@ case $system in
 	    SHLIB_LD="${CC} -shared"
 	    DL_OBJS="tclLoadDl.o"
 	    DL_LIBS="-ldl"
-	    LD_FLAGS="-rdynamic"
+	    LD_FLAGS="${LDFLAGS}-rdynamic"
 	    LD_SEARCH_FLAGS=""
 	else
 	    AC_CHECK_HEADER(dld.h, [
 		SHLIB_LD="ld -shared"
 		DL_OBJS="tclLoadDld.o"
 		DL_LIBS="-ldld"
-		LD_FLAGS=""
+		LD_FLAGS="${LDFLAGS}"
 		LD_SEARCH_FLAGS=""])
 	fi
 	;;
@@ -785,7 +785,7 @@ case $system in
 	SHLIB_SUFFIX=".so"
 	DL_OBJS="tclLoadDl.o"
 	DL_LIBS="-ldl"
-	LD_FLAGS=""
+	LD_FLAGS="${LDFLAGS}"
 	LD_SEARCH_FLAGS=""
 	;;
     MP-RAS-*)
@@ -795,7 +795,7 @@ case $system in
 	SHLIB_SUFFIX=".so"
 	DL_OBJS="tclLoadDl.o"
 	DL_LIBS="-ldl"
-	LD_FLAGS="-Wl,-Bexport"
+	LD_FLAGS="${LDFLAGS} -Wl,-Bexport"
 	LD_SEARCH_FLAGS=""
 	;;
     NetBSD-*|FreeBSD-*|OpenBSD-*)
@@ -807,7 +807,7 @@ case $system in
 	    SHLIB_SUFFIX=".so"
 	    DL_OBJS="tclLoadDl.o"
 	    DL_LIBS=""
-	    LD_FLAGS=""
+	    LD_FLAGS="${LDFLAGS}"
 	    LD_SEARCH_FLAGS=""
 	    TCL_SHARED_LIB_SUFFIX='${TCL_TRIM_DOTS}\$\{DBGX\}.so.1.0'
 	], [
@@ -817,7 +817,7 @@ case $system in
 	    SHLIB_SUFFIX=".a"
 	    DL_OBJS="tclLoadAout.o"
 	    DL_LIBS=""
-	    LD_FLAGS=""
+	    LD_FLAGS="${LDFLAGS}"
 	    LD_SEARCH_FLAGS='-L${LIB_RUNTIME_DIR}'
 	    TCL_SHARED_LIB_SUFFIX='${TCL_TRIM_DOTS}\$\{DBGX\}.a'
 	])
@@ -834,7 +834,7 @@ case $system in
 	SHLIB_SUFFIX=".so"
 	DL_OBJS="tclLoadNext.o"
 	DL_LIBS=""
-	LD_FLAGS=""
+	LD_FLAGS="${LDFLAGS}"
 	LD_SEARCH_FLAGS=""
 	;;
     OSF1-1.0|OSF1-1.1|OSF1-1.2)
@@ -846,7 +846,7 @@ case $system in
 	SHLIB_SUFFIX=".so"
 	DL_OBJS="tclLoadOSF.o"
 	DL_LIBS=""
-	LD_FLAGS=""
+	LD_FLAGS="${LDFLAGS}"
 	LD_SEARCH_FLAGS=""
 	;;
     OSF1-1.*)
@@ -857,7 +857,7 @@ case $system in
 	SHLIB_SUFFIX=".so"
 	DL_OBJS="tclLoadDl.o"
 	DL_LIBS=""
-	LD_FLAGS=""
+	LD_FLAGS="${LDFLAGS}"
 	LD_SEARCH_FLAGS=""
 	;;
     OSF1-V*)
@@ -868,7 +868,7 @@ case $system in
 	SHLIB_SUFFIX=".so"
 	DL_OBJS="tclLoadDl.o"
 	DL_LIBS=""
-	LD_FLAGS=""
+	LD_FLAGS="${LDFLAGS}"
 	LD_SEARCH_FLAGS='-Wl,-rpath,${LIB_RUNTIME_DIR}'
 	;;
     RISCos-*)
@@ -878,7 +878,7 @@ case $system in
 	SHLIB_SUFFIX=".a"
 	DL_OBJS="tclLoadAout.o"
 	DL_LIBS=""
-	LD_FLAGS="-Wl,-D,08000000"
+	LD_FLAGS="${LDFLAGS} -Wl,-D,08000000"
 	LD_SEARCH_FLAGS='-L${LIB_RUNTIME_DIR}'
 	;;
     SCO_SV-3.2*)
@@ -891,7 +891,7 @@ case $system in
 	SHLIB_SUFFIX=".so"
 	DL_OBJS="tclLoadDl.o"
 	DL_LIBS=""
-	LD_FLAGS="-belf -Wl,-Bexport"
+	LD_FLAGS="${LDFLAGS} -belf -Wl,-Bexport"
 	LD_SEARCH_FLAGS=""
 	;;
      SINIX*5.4*)
@@ -901,7 +901,7 @@ case $system in
 	SHLIB_SUFFIX=".so"
 	DL_OBJS="tclLoadDl.o"
 	DL_LIBS="-ldl"
-	LD_FLAGS=""
+	LD_FLAGS="${LDFLAGS}"
 	LD_SEARCH_FLAGS=""
 	;;
     SunOS-4*)
@@ -911,7 +911,7 @@ case $system in
 	SHLIB_SUFFIX=".so"
 	DL_OBJS="tclLoadDl.o"
 	DL_LIBS="-ldl"
-	LD_FLAGS=""
+	LD_FLAGS="${LDFLAGS}"
 	LD_SEARCH_FLAGS='-L${LIB_RUNTIME_DIR}'
 
 	# SunOS can't handle version numbers with dots in them in library
@@ -934,7 +934,7 @@ case $system in
 	SHLIB_SUFFIX=".so"
 	DL_OBJS="tclLoadDl.o"
 	DL_LIBS="-ldl"
-	LD_FLAGS=""
+	LD_FLAGS="${LDFLAGS}"
 	LD_SEARCH_FLAGS='-R ${LIB_RUNTIME_DIR}'
 	;;
     ULTRIX-4.*)
@@ -944,7 +944,7 @@ case $system in
 	SHLIB_LD_LIBS='${LIBS}'
 	DL_OBJS="tclLoadAout.o"
 	DL_LIBS=""
-	LD_FLAGS="-Wl,-D,08000000"
+	LD_FLAGS="${LDFLAGS} -Wl,-D,08000000"
 	LD_SEARCH_FLAGS='-L${LIB_RUNTIME_DIR}'
 	;;
     UNIX_SV* | UnixWare-5*)
@@ -963,9 +963,9 @@ case $system in
 	LDFLAGS=$hold_ldflags
 	AC_MSG_RESULT($found)
 	if test $found = yes; then
-	  LD_FLAGS="-Wl,-Bexport"
+	  LD_FLAGS="${LDFLAGS} -Wl,-Bexport"
 	else
-	  LD_FLAGS=""
+	  LD_FLAGS="${LDFLAGS}"
 	fi
 	LD_SEARCH_FLAGS=""
 	;;
