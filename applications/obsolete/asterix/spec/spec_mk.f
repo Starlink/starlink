@@ -107,8 +107,6 @@
 	REAL A				! Normalisation (e.m./distance**2)
 	REAL T				! Temperature in keV
 	REAL METALS			! [Metal/H] relative to cosmic
-
-	REAL FACTOR			! multiplication factor
 *-
 
 * Status check
