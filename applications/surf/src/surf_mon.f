@@ -31,6 +31,10 @@
 *     25-FEB-1993: Original version
 *     12-JAN-1995: Ported to UNIX, changed to 'new style'
 *     $Log$
+*     Revision 1.18  1997/06/12 21:07:45  timj
+*     Remove KSTEST and DRAWSIG
+*     Comment out GET_FLAT
+*
 *     Revision 1.17  1997/05/27 23:10:27  timj
 *     Remove GET_DEMOD, MODIFY and KSTEST from monolith
 *
@@ -147,17 +151,13 @@ c
 
 *         CALL REDS_GET_DEMOD (STATUS)
 
-      ELSE IF (NAME .EQ. 'GET_FLAT') THEN
+*      ELSE IF (NAME .EQ. 'GET_FLAT') THEN
 
-         CALL REDS_GET_FLAT (STATUS)
+*         CALL REDS_GET_FLAT (STATUS)
 
       ELSE IF (NAME .EQ. 'INTREBIN') THEN
 
          CALL REDS_REBIN (NAME, STATUS)
-
-*      ELSE IF (NAME .EQ. 'MODIFY') THEN
-
-*         CALL REDS_MODIFY (STATUS)
 
       ELSE IF (NAME .EQ. 'SCUPHOT') THEN
 
@@ -197,13 +197,6 @@ c
       ELSE IF (NAME .EQ. 'SCUHELP') THEN
 
          CALL SCUHELP (STATUS)
-
-*      ELSE IF (NAME .EQ. 'KSTEST') THEN
-
-*         CALL REDS_KSTEST (STATUS)
-
-      ELSE IF (NAME .EQ. 'DRAWSIG') THEN
-         CALL DRAWSIG (STATUS) 
 
       ELSE
          CALL MSG_SETC('TAS', NAME)
