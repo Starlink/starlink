@@ -32,9 +32,10 @@
 *        node) in position 4.  This graph should be complete (i.e. fully
 *        connected) on entry. On exit the graph will be sorted into
 *        decreasing weight order.
-*     WEIGHT( NEDGES ) = DOUBLE PRECISION (Given and Returned)
-*        The weights associated with each edge.  On exit this will be
-*        sorted to match the positions in the graph.
+*     WEIGHT( * ) = DOUBLE PRECISION (Given and Returned)
+*        The weights associated with each edge.  It is indexed by 
+*        GRAPH( 4, * ).  On exit this will be sorted to match the 
+*        positions in the graph.
 *     NEDGES = INTEGER (Given)
 *        The number of edges in the graph.
 *     TOTNOD = INTEGER (Given)
@@ -93,7 +94,7 @@
       INTEGER GRAPH( 4, NEDGES )
       INTEGER QUEUE( * )
       INTEGER SPAN( 4, * )
-      DOUBLE PRECISION WEIGHT( NEDGES )
+      DOUBLE PRECISION WEIGHT( * )
 
 *  Arguments Returned:
       INTEGER BEEN( * )
@@ -127,14 +128,14 @@
          VAL( 2 ) = GRAPH( 2, I )
          VAL( 3 ) = GRAPH( 3, I )
          VAL( 4 ) = GRAPH( 4, I )
-         WT = WEIGHT( I )
+         WT = WEIGHT( GRAPH( 4, I ) )
          DO 2 J = I - 1, 1, -1
-            IF ( WT .LT. WEIGHT( J ) ) GO TO 3
+            IF ( WT .LT. WEIGHT( GRAPH( 4, J ) ) ) GO TO 3
             GRAPH( 1, J + 1 ) = GRAPH( 1, J )
             GRAPH( 2, J + 1 ) = GRAPH( 2, J )
             GRAPH( 3, J + 1 ) = GRAPH( 3, J )
             GRAPH( 4, J + 1 ) = GRAPH( 4, J )
-            WEIGHT( J + 1 ) = WEIGHT( J )
+            WEIGHT( GRAPH( 4, J + 1 ) ) = WEIGHT( GRAPH( 4, J ) )
  2       CONTINUE
          J = 0
  3       CONTINUE
@@ -142,7 +143,7 @@
          GRAPH( 2, J + 1 ) = VAL( 2 )
          GRAPH( 3, J + 1 ) = VAL( 3 )
          GRAPH( 4, J + 1 ) = VAL( 4 )
-         WEIGHT( J + 1 ) = WT
+         WEIGHT( GRAPH( 4, J + 1 ) ) = WT
  1    CONTINUE
 
 *  Pick first edge as starting point.
@@ -196,7 +197,7 @@
          WT = -1D0
          DO 6 J = 1, NEDGES
             IF ( SPAN( 4, I ) .EQ. GRAPH( 4, J ) ) THEN
-               WT = WEIGHT( J )
+               WT = WEIGHT( GRAPH( 4, J ) )
                GO TO 7
             END IF
  6       CONTINUE
