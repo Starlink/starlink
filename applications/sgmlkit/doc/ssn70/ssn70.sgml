@@ -5,8 +5,8 @@
 	public "-//Starlink//DOCUMENT Summary SUN/199//EN" subdoc>
   <!entity sgmlsystem.eps system 'SGMLsystem.eps' ndata eps>
   <!entity sgmlsystem.gif system 'SGMLsystem.gif' ndata gif87a>
-  <!entity starlinkdtddoc system '../dtd2sgml/starlink-0.2.text'>
-  <!entity programcodedtddoc system '../dtd2sgml/programcode-0.2.text'>
+  <!entity starlinkdtddoc system '../dtd2sgml/starlink-0.2.sgmltext'>
+  <!entity programcodedtddoc system '../dtd2sgml/programcode-0.2.sgmltext'>
   <!entity % Feature.Routinelist 'include'>
   <!entity rsqbrack ']'>
 ]>
@@ -70,6 +70,9 @@ answer (I hope) some frequently asked questions about SGML in general
 and this system in particular.
 
 <sect id=sgml export>SGML Overview
+
+<p>This section introduces you to SGML, and explains its advantages
+over other approaches to document preparation.
 
 <subsect id=why.sgml export>Why SGML?
 
@@ -190,13 +193,382 @@ is tied to a particular DTD.  There is a diagram of this system in
 	alt="An SGML system">
 </figure>
 
-<p>For further information on SGML, see the well-known
+<p>For further information on SGML, see <ref id=appx.sgml>.  For other
+texts, see the well-known
 <cite>Gentle Introduction to SGML</cite><citation/gentle/.
 For more detailed information,
 see the useful but compressed <citation/bradley/; and for an
 authoritative account see 
 <citation/goldfarb/, which is an exegesis of the standard,
 <citation/iso8879/. 
+
+<sect id=markup export>Marking up your document
+
+<subsect id=markup.intro export>Sample document, and overview
+
+<p>A sample SUN is illustrated in <ref id=fig.simplesun>.
+<figure id=fig.simplesun export float>
+<caption>A simple sample SUN
+<figurecontent alt="Simple SUN document">
+<verbatim><![ cdata [
+<!doctype sun public "-//Starlink//DTD Starlink SUN//EN">
+<title>The Starlink SGML system
+<author email='norman@astro.gla.ac.uk'
+	webpage='http://www.astro.gla.ac.uk/users/norman'
+	affiliation='University of Glasgow'
+	id=ng
+	>Norman Gray
+<docnumber>1234
+<history>
+  <version number=0 date='21-APR-1999'>Initial version
+</history>
+<abstract>
+  This is a sample SUN
+</abstract>
+
+<sect id=intro export>Introduction
+<p>Starlink SUNs are easy to write.
+]]></verbatim>
+</figurecontent>
+</figure>
+<p>Features to note:
+<ul>
+<li>The document starts off with a `document type declaration',
+<code>&lt;!doctype sun public &quot;-//Starlink//DTD Starlink
+SUN//EN&quot;></code>, which states which DTD this document claims to be
+conformant to, in this case the Starlink SUN document type.
+
+<li>The document is structured in terms of `elements' such as
+<code/author/ or <code/sect/, and these in turn contain further data,
+such as a sequence of characters (`Norman Gray') in the case of the
+<code/author/ element, or further elements (the <code/version/ element)
+in the case of the <code/history/ element.  Elements are delimited by
+`opening tags' like <code>&lt;abstract&gt;</code> and `closing tags'
+like <code>&lt;/abstract&gt;</code>.
+
+<li>Elements have both <em/content/ and <em/attributes/.  For example,
+the <code/author/ element has the characters `Norman Gray' as its
+content and a list of strings such as an email address as its
+attributes.
+
+<li>Some of the elements (the <code/abstract/ element for example)
+are closed (ie, have closing tags to match their opening tags), but
+the majority are not.  This is because the DTD tells 
+the parser that a <code/title/ element cannot contain an <code/author/
+element, so the appearance of the latter implicitly finishes the
+former.
+
+<li>Some elements and attributes are required, others optional.  This
+document is close to being a minimal SUN.  It is not quite minimal
+because the <code/copyright/ element is optional, and it turns out
+that the only <em/required/ content of a document 
+body is the abstract!  Also, the only required attribute of the
+<code/author/ element is the <code/id/ attribute.
+
+<li>There are actually more elements present here than are apparent to
+the eye.  As well as allowing some closing tags to be omitted, a DTD
+can be allow certain <em/opening/ tags to be omitted, too.  In fact,
+the full structure of this document is as seen in <ref
+id=fig.simplesun2>.
+</ul>
+<figure float id="fig.simplesun2" export>
+<caption>A SUN document with all tags in place, the normalised version
+of the document in <ref id=fig.simplesun>.
+<figurecontent alt="Normalised SUN document">
+<verbatim><![ cdata [
+<SUN>
+<DOCINFO>
+<TITLE>The Starlink SGML system</TITLE>
+<AUTHORLIST>
+<AUTHOR EMAIL="norman@astro.gla.ac.uk" 
+WEBPAGE="http://www.astro.gla.ac.uk/users/norman" 
+AFFILIATION="University of Glasgow" 
+ID="NG">Norman Gray</AUTHOR>
+</AUTHORLIST>
+<DOCNUMBER>1234</DOCNUMBER>
+<HISTORY>
+<VERSION NUMBER="0" DATE="21-APR-1999">
+<PX>Initial version</PX>
+</VERSION>
+</HISTORY>
+<COPYRIGHT>
+<P>Copyright 1999, Particle Physics and Astronomy Research Council</P>
+</COPYRIGHT>
+</DOCINFO>
+<DOCBODY>
+<ABSTRACT>
+<PX>This is a sample SUN</PX>
+</ABSTRACT>
+<SECT ID="INTRO" EXPORT>
+<SUBHEAD>
+<TITLE>Introduction</TITLE>
+</SUBHEAD>
+<P>Starlink SUNs are easy to write.</P>
+</SECT>
+</DOCBODY>
+</SUN>
+]]></verbatim>
+</figurecontent>
+</figure>
+
+<p>In <ref id=fig.simplesun2>, note that the actual content of
+the <code/abstract/ element is one or more <code/px/ elements (a
+slightly restricted variant of the standard <code/p/ paragraph
+element), and that the <code/sect/ element contains a <code/subhead/
+element, and <em/contains/ the paragraphs which constitute it (note
+that this is a significant difference from HTML, where the heading
+elements <code/hn/ contain only a section title).  You will rarely
+have to be aware of these `hidden' tags when you are creating a
+document, but it will occasionally be
+useful to know that these tags are there somewhere, and that you're
+glad you don't have to type all of them.
+In fact, when I explain the document structure below, I will do it in terms
+of the elements which are `really' there.
+
+<p>`Markup minimisation', which is SGML's name for this, was
+introduced to SGML to make typing less onerous.  Personally, I like
+this, since it seems to make the document look less cluttered, and so
+I have designed the DTD to support this quite extensively.  The
+minimisation is completely optional, however, and you may insert all
+the tags if you prefer.  SGML-aware editors (see <ref id=editors>)
+typically insert all tags.
+
+<p>You can see from <ref id=fig.simplesun2> that the `top-level'
+element of this document is <code/sun/.  The top-level element of SSN
+documents is <code/ssn/, and similarly for the other Starlink document
+types.  These different document types are broadly the same, but the
+SSN document type does not include elements for documenting
+programming code, and the MUD document type has a <code/docdate/
+element instead of a <code/docnumber/ and a <code/history/.  The SUN
+document type is the most general.  The top-level <code/sun/ element
+has only two `children', <code/docinfo/, which contains the document
+information such as its author, number, and so on, and <code/docbody/,
+which contains the actual content of the document.
+
+<subsect id=markup.entities export>Entity references
+
+<p>Entity references are a mechanism for referring to characters, or
+longer pieces of text, which you cannot type on your keyboard, which
+must be escaped from the parser, or which you simply want to
+abbreviate.
+
+<p>A reference to an entity <code/amp/ is of the form
+<code/&amp;amp;/.  It is prefixed by the character <code/&amp/ and
+suffixed by a semicolon.
+
+<p>The list of entities predefined by the Starlink general DTD is
+given in <ref id=table.entities>.
+
+<table id="table.entities">
+<caption>Entities predefined in the Starlink general DTD.</caption>
+<tgroup cols="3">
+<thead>
+<row><entry>Entity reference<entry>Replacement<entry>Description
+<tbody>
+<row><entry>&amp;copy;<entry>&copy<entry>Copyright symbol
+<row><entry>&amp;amp;<entry>&amp<entry>ampersand
+<row><entry>&amp;gt;<entry>&gt<entry>greater-than symbol
+<row><entry>&amp;lt;<entry>&lt<entry>less-than symbol
+<row><entry>&amp;quot;<entry>&quot<entry>quotation mark
+<row><entry>&amp;nbsp;<entry>&nbsp<entry>non-breaking space
+<row><entry>&amp;hash;<entry>&hash<entry>hash sign
+<row><entry>&amp;pounds;<entry>&pounds<entry>pounds sign
+<row><entry>&amp;dollar;<entry>&dollar<entry>dollar sign
+<row><entry>&amp;ellip;<entry>&ellip<entry>ellipses
+<row><entry>&amp;emdash;<entry>&emdash<entry>em dash
+<row><entry>&amp;endash;<entry>&endash<entry>en dash
+<row><entry>&amp;percent;<entry>&percent<entry>percent sign
+<row><entry>&amp;deg;<entry>&deg<entry>degrees symbol
+<row><entry>&amp;latex;<entry>&latex<entry>&latex logo
+<row><entry>&amp;tex;<entry>&tex<entry>&tex logo
+</row>
+</tbody>
+</tgroup>
+</table>
+
+<p>For more details on entities, see <ref id=sgml.entities>.
+
+<subsect id=markup.dtdsubset export>Declaration subset.
+
+<!-- FIXME -->
+<p>Explain doc declaration subset, once I've finalised how to refer to
+documentsummary documents -- in a master catalogue, or locally?
+
+<p>Can be used to include subfiles, create abbreviations, necessarily
+declare subdocs or, in extremis, modify the DTD.  Use for HTML-only
+sections, etc.  Recapitulate the warnings about careless use making
+the document invalid.  Perhaps put this into a separate section on
+marked sections, and mention the CDATA marked section.
+
+<subsect id=markup.try export>Try it yourself
+
+<p>Type the document given in <ref id=fig.simplesun> into a file, and
+check it with the distributed SGML parser, as follows.  If the
+document is in a file <code/sun1234.sgml/, then give the command
+<kbd>nsgmls -s sun1234.sgml</kbd>.  This invokes the <code/nsgmls/
+parser, and, with the <code/-s/ option, suppresses all output except
+warnings and error messages.  This means that for a valid document,
+you should see precisely no output from this command.  If you want to
+see output, leave off the <code/-s/ option and the parser will produce
+a version of your document in a form which is easy for a downstream
+application to parse.  There are, for example, Perl libraries (for
+example <code/SGMLSpm/, which should be on CPAN) which
+will parse this output format and allow you to process SGML documents
+using Perl.  The crucial thing in this case is the final line in
+the output, which should be a single `C' command, indicating that the
+document conforms to its DTD.
+
+<p>If you want to try normalising your document, give the command
+<kbd>sgmlnorm sun1234.sgml</kbd>.  This transforms your document into
+an equivalent one with all omitted elements reinserted.
+
+<p>Finally, try converting your document to HTML.  This uses the
+program Jade, which is an implementation of the DSSSL formatting
+language.  Give the command 
+<kbd>jade -t sgml -d
+$STARLINK_SGML_DIR/dsssl/sl/html/sl.dsl#html sun1234.sgml</kbd>.  This
+will parse your document, and convert it to a collection of HTML
+files, with the master file named <code/SUN-1234.html/ (this name is based
+on the information in the document, and is independent of what your
+source file is actually called).  The command actually spits out a
+line of text to the standard output; this is because the system is
+designed to be used from within a Makefile (see <ref id=setup>) rather
+than directly from the command line.
+
+<p>You can also convert your document to &latex;, with the command 
+<kbd>jade -t latex -d $STARLINK_SGML_DIR/dsssl/sl/latex/sl.dsl#latex
+sun1234.sgml</kbd>.
+
+<p>Try making parts of your document invalid, and comparing the error
+with the error message <code/nsgmls/ produces.
+
+<!-- FIXME : check that this is consistent with whatever I do to set up
+     the paths and environment variables -->
+
+
+<sect id=markup.structure export>The structure of the document
+
+<p>In this section I will describe all of the elements of the DTD,
+grouping them by type.  There is an alternative description of the
+elements, grouped hierarchically, in <ref id=appx.general.dtd>.
+
+<p>The complete list of element types is given in table <ref
+id=tab.elements>.
+<table id="tab.elements" export>
+<caption>The complete element listing</caption>
+<tgroup cols="3">
+<thead>
+<row><entry>Element        <entry>Description<entry>See
+<tbody>
+<row><entry>abstract       <entry>
+<row><entry>appendices     <entry>
+<row><entry>attribution    <entry>
+<row><entry>author         <entry>
+<row><entry>authorlist     <entry>
+<row><entry>backmatter     <entry>
+<row><entry>bibliography   <entry>
+<row><entry>blockquote     <entry>
+<row><entry>caption        <entry>
+<row><entry>citation       <entry>
+<row><entry>cite           <entry>
+<row><entry>code           <entry>
+<row><entry>colspec        <entry>
+<row><entry>copyright      <entry>
+<row><entry>dd             <entry>
+<row><entry>dl             <entry>
+<row><entry>docbody        <entry>
+<row><entry>docdate        <entry>
+<row><entry>docinfo        <entry>
+<row><entry>docxref        <entry>
+<row><entry>draftnote      <entry>
+<row><entry>dt             <entry>
+<row><entry>editors        <entry>
+<row><entry>em             <entry>
+<row><entry>entry          <entry>
+<row><entry>figure         <entry>
+<row><entry>figurecontent  <entry>
+<row><entry>index          <entry>
+<row><entry>indexcontents  <entry>
+<row><entry>kbd            <entry>
+<row><entry>keyword        <entry>
+<row><entry>li             <entry>
+<row><entry>m              <entry>
+<row><entry>meqnarray      <entry>
+<row><entry>mequation      <entry>
+<row><entry>note           <entry>
+<row><entry>notecontents   <entry>
+<row><entry>ol             <entry>
+<row><entry>otherauthors   <entry>
+<row><entry>p              <entry>
+<row><entry>px             <entry>
+<row><entry>quote          <entry>
+<row><entry>ref            <entry>
+<row><entry>row            <entry>
+<row><entry>sect           <entry>
+<row><entry>strong         <entry>
+<row><entry>subhead        <entry>
+<row><entry>subsect        <entry>
+<row><entry>subsubsect     <entry>
+<row><entry>subsubsubsect  <entry>
+<row><entry>sun            <entry>
+<row><entry>table          <entry>
+<row><entry>tbody          <entry>
+<row><entry>tgroup         <entry>
+<row><entry>thead          <entry>
+<row><entry>title          <entry>
+<row><entry>ul             <entry>
+<row><entry>url            <entry>
+<row><entry>verbatim       <entry>
+<row><entry>webref         <entry>
+</tbody>
+</tgroup>
+</table>
+
+<p>Discuss separately structure, tables, figures, cross-references,
+maths, program code.  
+
+<p>Discuss markup minimisation: recap tag omission, mention NET and SHORTREFs.
+
+<subsect id=str.structure export>Overall structure
+
+<sect id=processing export>Processing your document
+
+<subsect id=setup export>Setting up
+<p>Makefiles
+
+<p>Packaging document for distribution.  BOS?  Manifest?  Figures?  Makefile?
+
+<subsect id=editors export>Editors
+
+<p>Is this the best place for this?
+
+<sect id=future export>Further developments
+
+<p>What next?  Weaknesses with the current implementation.
+
+<p>HyTime?  XML?  Searching?
+
+<sect id=faq export>Frequently Asked Questions
+
+<subsect id=faq.html export>What's wrong with HTML?
+
+<p>Well?
+
+<subsect id=faq.latex export>What's wrong with &latex?
+
+<p>Well?
+
+<subsect id=faq.xml export>What about XML?
+
+<p>Well?
+
+<appendices>
+
+<sect id=appx.sgml export>SGML -- some of the details
+
+<p>This section covers some SGML topics in a little more detail than is
+necessary if you simply want to write Starlink documents.  It should
+give you enough understanding to allow you to read most DTDs.
 
 <subsect id=sgml.dtd export>Reading DTDs
 
@@ -396,40 +768,36 @@ include an ampersand in text by typing `<code/&amp;amp;/'.  You can
 use this in your own documents to create shorthand forms for bits of
 text you don't want to retype.
 
-<p>The remaining feature you will commonly find in DTDs is the `marked
-section'.  This is a construction such as
-<verbatim>
-Here is some text &lt![ ignore [ and here is some ignored text &rsqbrack;]>
-</verbatim>
-Along with <code/ignore/ there is <code/include/.
-Why on earth would you want to do this?  Because the ignore/include
-keyword can be the expansion of an entity.  We could have defined our
-HTML-like as follows:
-<!-- can't use marked section when I'm illustrating one! -->
-<verbatim>
-&lt;!entity % allow.copyright &quot;ignore&quot;>
-&lt;![ %allow.copyright [
-  &lt;!entity % html.model &quot;head, body, copyright?&quot;>
-  &lt;!element copyright - - (#pcdata)>
-&rsqbrack;]>
-&lt;!entity % html.model &quot;head, body&quot;>
-&lt;!element html    o o (%html.model)>
-</verbatim>
-This looks very strange, but it is a common idiom in DTDs.  The
-parameter entity <code/%allow.copyright/ is defined to be
-<code/ignore/.  That means that when the parser finds the first marked
-section it ignores it, so that the first definition it finds of the parameter
-entity <code/%html.model/ is the one which sets it to be
-`<code/head,body/', so that is what is used as the content model
-in the declaration of the <code/html/ element.  If the
-<code/%allow.copyright/ entity had <em/earlier/ been set to
-<code/include/, then the redefinition of it here would have been
-ignored, the marked section would have been included, the
-<code/%html.model/ entity would have been defined as
-`<code/head,body,copyright?/' with the (now) second one ignored, and
-the <code/html/ element would have been defined to allow all three
-elements.  That is, marked sections used internally in this way can be
-a useful way of parameterising DTDs.
+<subsect id=sgml.dtdsubset export>Document type declaration  subset
+
+<p>As explained above, the structure of your document type, plus a
+variety of entities, is declared in the DTD, which, because it is
+common to a large number of documents, is held separately
+from the document you are writing.
+
+<p>It is possible, however, for a specific document to adjust or add to the
+declarations within the DTD, and this is done within the `document
+type declaration subset'.
+
+<subsect id=sgml.entities export>SGML entities
+
+<p>Entity references are a mechanism for referring to characters, or
+longer pieces of text, which you cannot type on your keyboard, which
+must be escaped from the parser, or which you simply want to
+abbreviate.
+
+<p>A reference to an entity <code/amp/ is of the form
+<code/&amp;amp;/.  It is prefixed by the character <code/&amp/ and
+suffixed by a semicolon<note>In fact, you can omit the trailing
+semicolon if the character following the entity name is not a name
+character -- not a letter, hyphen or dot.  This is probably a bad
+habit to get into.</note>.
+
+<p>The list of entities predefined by the Starlink general DTD is
+given in <ref id=table.entities>.
+
+<p>It is not an error to define an entity twice.  In this case, the
+second definition is silently ignored.
 
 <p>You can define entities, including parameter entities, in the
 document's `declaration subset' (see <ref id=markup.dtdsubset>), since
@@ -439,324 +807,98 @@ on-the-fly definitions on the command line.  However, resist resist
 resist the temptation to do clever things here, since it is easy to
 make your document unreadable and, a much more heinous crime, invalid.
 
-<sect id=markup export>Marking up your document
+<subsect id=sgml.ms export>Marked sections
+<p>Another feature you will commonly find in DTDs is the `marked
+section'.  As an author, you will most likely only ever use the
+<code/cdata/ marked section, but the <code/ignore/ and <code/include/
+marked sections are very commonly used within DTDs.
 
-<subsect id=markup.intro export>Sample document, and overview
+<p>A marked section is a construction such as
+<verbatim>
+Here is some text &lt;![ cdata [ with &lt;odds&gt; &amp sods &rsqbrack;]>
+</verbatim>
+and
+<verbatim>
+Here is some text &lt;![ ignore [ and here is some ignored text &rsqbrack;]>
+</verbatim>
+Along with <code/ignore/ there is <code/include/.
 
-<p>A sample SUN is illustrated in <ref id=fig.simplesun>.
-<figure id=fig.simplesun export float>
-<caption>A simple sample SUN
-<figurecontent alt="Simple SUN document">
-<verbatim><![ cdata [
-<!doctype sun public "-//Starlink//DTD Starlink SUN//EN">
-<title>The Starlink SGML system
-<author email='norman@astro.gla.ac.uk'
-	webpage='http://www.astro.gla.ac.uk/users/norman'
-	affiliation='University of Glasgow'
-	id=ng
-	>Norman Gray
-<docnumber>1234
-<history>
-  <version number=0 date='21-APR-1999'>Initial version
-</history>
-<abstract>
-  This is a sample SUN
-</abstract>
+<p>The marked section ends at the sequence of characters
+<code/&rsqbrack;&rsqbrack;&gt;/, which is therefore the one sequence
+which cannot appear within the marked section.
 
-<sect id=intro export>Introduction
-<p>Starlink SUNs are easy to write.
-]]></verbatim>
-</figurecontent>
-</figure>
-<p>Features to note:
-<ul>
-<li>The document starts off with a `document type declaration',
-<code>&lt;!doctype sun public &quot;-//Starlink//DTD Starlink
-SUN//EN&quot;></code>, which states which DTD this document claims to be
-conformant to, in this case the Starlink SUN document type.
+<subsubsect>CDATA marked sections
 
-<li>The document is structured in terms of `elements' such as
-<code/author/ or <code/sect/, and these in turn contain further data,
-such as a sequence of characters (`Norman Gray') in the case of the
-<code/author/ element, or further elements (the <code/version/ element)
-in the case of the <code/history/ element.  Elements are delimited by
-`opening tags' like <code>&lt;abstract&gt;</code> and `closing tags'
-like <code>&lt;/abstract&gt;</code>.
+<p>Within the <code/cdata/ marked section, parsing is switched off, so
+that angle brackets, <code/&lt/, and ampersands, <code/&amp/, are no
+longer recognised as introducing markup and entity references.
 
-<li>Elements have both <em/content/ and <em/attributes/.  For example,
-the <code/author/ element has the characters `Norman Gray' as its
-content and a list of strings such as an email address as its
-attributes.
+<p>You will typically use a <code/cdata/ marked section to delimit
+verbatim text.  The <code/code/ and <code/verbatim/ elements (see <ref
+id=el.sun.code> and <ref id=el.sun.verbatim>) do not make any
+provision to switch off parsing of the text within them.  If the text
+would be significant to the parser -- that is, if it contains angle
+brackets or ampersands -- you must either escape those characters by
+giving them as entity references <code/&amp;lt;/ or <code/&amp;amp;/,
+or else enclose the contents in a <code/cdata/ marked section as
+follows.
+<verbatim>
+&lt;verbatim>&lt;![ cdata [
+Here is some &lt;em>marked-up&lt/em> text
+which will be skipped &amp; ignored
+&rsqbrack;&rsqbrack>&lt;/verbatim>
+</verbatim>
 
-<li>Some of the elements (the <code/abstract/ element for example)
-are closed (ie, have closing tags to match their opening tags), but
-the majority are not.  This is because the DTD tells 
-the parser that a <code/title/ element cannot contain an <code/author/
-element, so the appearance of the latter implicitly finishes the
-former.
+<subsubsect>IGNORE and INCLUDE marked sections
 
-<li>Some elements and attributes are required, others optional.  This
-document is close to being a minimal SUN.  It is not quite minimal
-because the <code/copyright/ element is optional, and it turns out
-that the only <em/required/ content of a document 
-body is the abstract!  Also, the only required attribute of the
-<code/author/ element is the <code/id/ attribute.
+<p>Text within <code/include/ and <code/ignore/ marked sections is
+parsed or skipped by the parser, as appropriate.  They are <em/not/
+typically used outside of DTDs, but the <code/ignore/ marked section
+is occasionally useful as a way of `commenting out' large sections of
+text which might itself include SGML comments <code/&lt;!--
+... --&gt;/. 
 
-<li>There are actually more elements present here than are apparent to
-the eye.  As well as allowing some closing tags to be omitted, a DTD
-can be allow certain <em/opening/ tags to be omitted, too.  In fact,
-the full structure of this document is as seen in <ref
-id=fig.simplesun2>.
-</ul>
-<figure float id="fig.simplesun2" export>
-<caption>A SUN document with all tags in place, the normalised version
-of the document in <ref id=fig.simplesun>.
-<figurecontent alt="Normalised SUN document">
-<verbatim><![ cdata [
-<SUN>
-<DOCINFO>
-<TITLE>The Starlink SGML system</TITLE>
-<AUTHORLIST>
-<AUTHOR EMAIL="norman@astro.gla.ac.uk" 
-WEBPAGE="http://www.astro.gla.ac.uk/users/norman" 
-AFFILIATION="University of Glasgow" 
-ID="NG">Norman Gray</AUTHOR>
-</AUTHORLIST>
-<DOCNUMBER>1234</DOCNUMBER>
-<HISTORY>
-<VERSION NUMBER="0" DATE="21-APR-1999">
-<PX>Initial version</PX>
-</VERSION>
-</HISTORY>
-<COPYRIGHT>
-<P>Copyright 1999, Particle Physics and Astronomy Research Council</P>
-</COPYRIGHT>
-</DOCINFO>
-<DOCBODY>
-<ABSTRACT>
-<PX>This is a sample SUN</PX>
-</ABSTRACT>
-<SECT ID="INTRO" EXPORT>
-<SUBHEAD>
-<TITLE>Introduction</TITLE>
-</SUBHEAD>
-<P>Starlink SUNs are easy to write.</P>
-</SECT>
-</DOCBODY>
-</SUN>
-]]></verbatim>
-</figurecontent>
-</figure>
+<p>Why on earth would you want to do this?  Because the ignore/include
+keyword can be the expansion of an entity.  We could have defined our
+HTML-like document type as follows:
+<!-- can't use marked section when I'm illustrating one! -->
+<verbatim>
+&lt;!entity % allow.copyright &quot;ignore&quot;>
+&lt;![ %allow.copyright; [
+  &lt;!entity % html.model &quot;head, body, copyright?&quot;>
+  &lt;!element copyright - - (#pcdata)>
+&rsqbrack;]>
+&lt;!entity % html.model &quot;head, body&quot;>
+&lt;!element html    o o (%html.model;)>
+</verbatim>
+This looks very strange, but it is a common idiom in DTDs.  
 
-<p>In <ref id=fig.simplesun2>, note that the actual content of
-the <code/abstract/ element is one or more <code/px/ elements (a
-slightly restricted variant of the standard <code/p/ paragraph
-element), and that the <code/sect/ element contains a <code/subhead/
-element, and <em/contains/ the paragraphs which constitute it (note
-that this is a significant difference from HTML, where the heading
-elements <code/hn/ contain only a section title).  You will rarely
-have to be aware of these `hidden' tags when you are creating a
-document, but it will occasionally be
-useful to know that these tags are there somewhere, and that you're
-glad you don't have to type all of them.
-In fact, when I explain the document structure below, I will do it in terms
-of the elements which are `really' there.
+<p>The entity reference <code/&percent;allow.copyright;/ is a
+`parameter entity reference' (see section <ref id=sgml.entities>),
+which is distinct from a general entity 
+reference such as <code/&amp;amp;/, and can occur only within markup
+(ie, within DTDs).
 
-<p>`Markup minimisation', which is SGML's name for this, was
-introduced to SGML to make typing less onerous.  Personally, I like
-this, since it seems to make the document look less cluttered, and so
-I have designed the DTD to support this quite extensively.  The
-minimisation is completely optional, however, and you may insert all
-the tags if you prefer.  SGML-aware editors (see <ref id=editors>)
-typically insert all tags.
+<p>The parameter entity <code/%allow.copyright/ is defined to be
+<code/ignore/.  That means that when the parser finds the marked
+section it ignores it, so that the first definition it finds of the parameter
+entity <code/%html.model/ is the one which sets it to be
+`<code/head,body/', so that is what is used as the content model
+in the declaration of the <code/html/ element in the last line.
 
-<p>You can see from <ref id=fig.simplesun2> that the `top-level'
-element of this document is <code/sun/.  The top-level element of SSN
-documents is <code/ssn/, and similarly for the other Starlink document
-types.  These different document types are broadly the same, but the
-SSN document type does not include elements for documenting
-programming code, and the MUD document type has a <code/docdate/
-element instead of a <code/docnumber/ and a <code/history/.  The SUN
-document type is the most general.  The top-level <code/sun/ element
-has only two `children', <code/docinfo/, which contains the document
-information such as its author, number, and so on, and <code/docbody/,
-which contains the actual content of the document.
+<p>Nothing appears to have been achieved here.  However, if the
+<code/%allow.copyright/ entity had <em/earlier/ been set to
+<code/include/, then the redefinition of it here would have been
+ignored, the marked section would have been included, the
+<code/%html.model/ entity would have been defined as
+`<code/head,body,copyright?/' with the (now) second one ignored, and
+the <code/html/ element would have been defined to allow all three
+elements.  That is, marked sections used internally in this way can be
+a useful way of parameterising DTDs.
 
-<subsect id=markup.dtdsubset export>Declaration subset.
-
-<!-- FIXME -->
-<p>Explain doc declaration subset, once I've finalised how to refer to
-documentsummary documents -- in a master catalogue, or locally?
-
-<p>Can be used to include subfiles, create abbreviations, necessarily
-declare subdocs or, in extremis, modify the DTD.  Use for HTML-only
-sections, etc.  Recapitulate the warnings about careless use making
-the document invalid.  Perhaps put this into a separate section on
-marked sections, and mention the CDATA marked section.
-
-<subsect id=markup.try export>Try it yourself
-
-<p>Type the document given in <ref id=fig.simplesun> into a file, and
-check it with the distributed SGML parser, as follows.  If the
-document is in a file <code/sun1234.sgml/, then give the command
-<kbd>nsgmls -s sun1234.sgml</kbd>.  This invokes the <code/nsgmls/
-parser, and, with the <code/-s/ option, suppresses all output except
-warnings and error messages.  This means that for a valid document,
-you should see precisely no output from this command.  If you want to
-see output, leave off the <code/-s/ option and the parser will produce
-a version of your document in a form which is easy for a downstream
-application to parse.  There are, for example, Perl libraries (for
-example <code/SGMLSpm/, which should be on CPAN) which
-will parse this output format and allow you to process SGML documents
-using Perl.  The crucial thing in this case is the final line in
-the output, which should be a single `C' command, indicating that the
-document conforms to its DTD.
-
-<p>If you want to try normalising your document, give the command
-<kbd>sgmlnorm sun1234.sgml</kbd>.  This transforms your document into
-an equivalent one with all omitted elements reinserted.
-
-<p>Finally, try converting your document to HTML.  This uses the
-program Jade, which is an implementation of the DSSSL formatting
-language.  Give the command 
-<kbd>jade -t sgml -d
-$STARLINK_SGML_DIR/dsssl/sl/html/sl.dsl#html sun1234.sgml</kbd>.  This
-will parse your document, and convert it to a collection of HTML
-files, with the master file named <code/SUN-1234.html/ (this name is based
-on the information in the document, and is independent of what your
-source file is actually called).  The command actually spits out a
-line of text to the standard output; this is because the system is
-designed to be used from within a Makefile (see <ref id=setup>) rather
-than directly from the command line.
-
-<p>You can also convert your document to &latex;, with the command 
-<kbd>jade -t latex -d $STARLINK_SGML_DIR/dsssl/sl/latex/sl.dsl#latex
-sun1234.sgml</kbd>.
-
-<p>Try making parts of your document invalid, and comparing the error
-with the error message <code/nsgmls/ produces.
-
-<!-- FIXME : check that this is consistent with whatever I do to set up
-     the paths and environment variables -->
-
-
-<sect id=markup.structure export>The structure of the document
-
-<p>In this section I will describe all of the elements of the DTD,
-grouping them by type.  There is an alternative description of the
-elements, grouped hierarchically, in <ref id=appx.general.dtd>.
-
-<p>The complete list of element types is given in table <ref
-id=tab.elements>.
-<table id="tab.elements" export>
-<caption>The complete element listing</caption>
-<tgroup cols="3">
-<thead>
-<row><entry>Element        <entry>Description<entry>See
-<tbody>
-<row><entry>abstract       <entry>
-<row><entry>appendices     <entry>
-<row><entry>attribution    <entry>
-<row><entry>author         <entry>
-<row><entry>authorlist     <entry>
-<row><entry>backmatter     <entry>
-<row><entry>bibliography   <entry>
-<row><entry>blockquote     <entry>
-<row><entry>caption        <entry>
-<row><entry>citation       <entry>
-<row><entry>cite           <entry>
-<row><entry>code           <entry>
-<row><entry>colspec        <entry>
-<row><entry>copyright      <entry>
-<row><entry>dd             <entry>
-<row><entry>dl             <entry>
-<row><entry>docbody        <entry>
-<row><entry>docdate        <entry>
-<row><entry>docinfo        <entry>
-<row><entry>docxref        <entry>
-<row><entry>draftnote      <entry>
-<row><entry>dt             <entry>
-<row><entry>editors        <entry>
-<row><entry>em             <entry>
-<row><entry>entry          <entry>
-<row><entry>figure         <entry>
-<row><entry>figurecontent  <entry>
-<row><entry>index          <entry>
-<row><entry>indexcontents  <entry>
-<row><entry>kbd            <entry>
-<row><entry>keyword        <entry>
-<row><entry>li             <entry>
-<row><entry>m              <entry>
-<row><entry>meqnarray      <entry>
-<row><entry>mequation      <entry>
-<row><entry>note           <entry>
-<row><entry>notecontents   <entry>
-<row><entry>ol             <entry>
-<row><entry>otherauthors   <entry>
-<row><entry>p              <entry>
-<row><entry>px             <entry>
-<row><entry>quote          <entry>
-<row><entry>ref            <entry>
-<row><entry>row            <entry>
-<row><entry>sect           <entry>
-<row><entry>strong         <entry>
-<row><entry>subhead        <entry>
-<row><entry>subsect        <entry>
-<row><entry>subsubsect     <entry>
-<row><entry>subsubsubsect  <entry>
-<row><entry>sun            <entry>
-<row><entry>table          <entry>
-<row><entry>tbody          <entry>
-<row><entry>tgroup         <entry>
-<row><entry>thead          <entry>
-<row><entry>title          <entry>
-<row><entry>ul             <entry>
-<row><entry>url            <entry>
-<row><entry>verbatim       <entry>
-<row><entry>webref         <entry>
-</tbody>
-</tgroup>
-</table>
-
-<p>Discuss separately structure, tables, figures, cross-references,
-maths, program code.  
-
-<p>Discuss markup minimisation: recap tag omission, mention NET and SHORTREFs.
-
-<subsect id=str.structure export>Overall structure
-
-<sect id=processing export>Processing your document
-
-<subsect id=setup export>Setting up
-<p>Makefiles
-
-<p>Packaging document for distribution.  BOS?  Manifest?  Figures?  Makefile?
-
-<subsect id=editors export>Editors
-
-<p>Is this the best place for this?
-
-<sect id=future export>Further developments
-
-<p>What next?  Weaknesses with the current implementation.
-
-<p>HyTime?  XML?  Searching?
-
-<sect id=faq export>Frequently Asked Questions
-
-<subsect id=faq.html export>What's wrong with HTML?
-
-<p>Well?
-
-<subsect id=faq.latex export>What's wrong with &latex?
-
-<p>Well?
-
-<subsect id=faq.xml export>What about XML?
-
-<p>Well?
-
-<appendices>
+<p>The entity could be declared earlier in the same DTD, in a
+particular document's DTD-subset (see <ref id=markup.dtdsubset>), or
+completely externally to the document in a command-line option to the parser.
 
 <sect id=appx.general.dtd export>The Starlink General DTD
 
