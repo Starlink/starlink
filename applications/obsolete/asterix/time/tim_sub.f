@@ -128,6 +128,7 @@
 *    Local constants :
 *    Local variables :
       INTEGER NVAL,TIMID
+      INTEGER DPTR
       LOGICAL OK
 *-
 
@@ -142,6 +143,8 @@
         CALL BDI_GET0C( FID, 'Title', T_TITLE,STATUS)
         CALL BDI_GET0C( FID ,'Label',T_LABEL,STATUS)
         CALL BDI_GET0C( FID,'Units',T_UNITS,STATUS)
+*  cludge to force ADI to keep file object alive
+        CALL BDI_MAPR(FID, 'Data', 'READ', DPTR, STATUS)
 
 *  axis values
         CALL DYN_MAPR(1,T_NVAL,T_APTR,STATUS)
