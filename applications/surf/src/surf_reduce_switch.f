@@ -26,6 +26,43 @@
 *     exposure to give the exposure result. Optionally, the routine will
 *     divide the internal calibrator signal into the data before doing either
 *     of these things. 
+
+*  Usage:
+*     reduce_switch IN USE_CALIBRATOR SPIKE_LEVEL OUT
+
+
+*  ADAM Parameters:
+*     IN = NDF (Read)
+*        The name of the demodulated data file.
+*     OUT = NDF (Read)
+*        The name of the file to contain the output data.
+*     SPIKE_LEVEL = _INTEGER (Read)
+*        Number of spikes tolerated before marking data point bad.
+*        The default is that the sample should be marked bad if the transputers
+*        detected any spikes during a 1 second sample.
+*     USE_CALIBRATOR = _LOGICAL (Read)
+*        Yes, if you want the data for each bolometer measurement
+*        divided by the corresponding internal calibrator signal.
+*        The default is yes.
+
+*  Examples:
+*     reduce_switch
+*        All parameters will be requested.
+*     reduce_switch IN=test USE_CALIBRATOR=no SPIKE_LEVEL=0 OUT=nosw
+*        This will reduce the switch from input file test.sdf without dividing
+*        by the calibrator signal and no toleration of spikes detected by
+*        the transputers. The output data will be written to nosw.sdf.
+
+*  Notes:
+*     If the input file is not found in the current directory, the directory
+*     specified by the DATADIR environment variable is searched. This means
+*     that the raw data does not have to be in the working directory.
+
+*  Authors:
+*     JFL: J.Lightfoot (jfl@roe.ac.uk)
+*     TIMJ: T. Jenness (timj@jach.hawaii.edu)
+
+*  Algorithm:
 *     If status is good on entry, the routine reads the USE_CALIBRATOR
 *     parameter and opens the IN file. 
 *        Some FITS items describing the observation are read from the
@@ -68,32 +105,6 @@
 *        Finally, the IN and OUT files are closed and all virtual memory
 *     freed.
 
-*  ADAM Parameters:
-*     IN = NDF (Read)
-*        The name of the demodulated data file.
-*     OUT = NDF (Read)
-*        The name of the file to contain the output data.
-*     SPIKE_LEVEL = _INTEGER (Read)
-*        Number of spikes tolerated before marking data point bad.
-*     USE_CALIBRATOR = _LOGICAL (Read)
-*        Yes, if you want the data for each bolometer measurement
-*        divided by the corresponding internal calibrator signal.
-
-*  Examples:
-*     reduce_switch IN=test USE_CALIBRATOR=no SPIKE_LEVEL=0 OUT=nosw
-*        This will reduce the switch from input file test.sdf without dividing
-*        by the calibrator signal and no toleration of any spikes detected by
-*        the transputers. The output data will be written to nosw.sdf.
-
-*  Notes:
-
-*  Implementation status:
-*      - Deals with QUALITY arrays
-
-*  Authors:
-*     JFL: J.Lightfoot (jfl@roe.ac.uk)
-*     TIMJ: T. Jenness (timj@jach.hawaii.edu)
-
 *  History:
 *     $Id$
 *     24-JUL-1995: original version.
@@ -101,9 +112,12 @@
 *      9-JUL-1996: modified to handle v200 data with 5 data per demodulated
 *                  point (JFL).
 *     $Log$
-*     Revision 1.11  1996/11/02 01:41:38  timj
-*     Fix bug in History header
+*     Revision 1.12  1997/03/05 23:59:03  timj
+*     can't remember
 *
+c Revision 1.11  1996/11/02  01:41:38  timj
+c Fix bug in History header
+c
 c Revision 1.10  1996/11/02  01:21:45  timj
 c Add ADAM to header
 c
@@ -255,7 +269,7 @@ c
 *  The file could be in DATADIR
 
          IF (IN_NDF.EQ.NDF__NOID) THEN
-            CALL GETENV('DATADIR', DATA_DIR)
+            CALL PSX_GETENV('DATADIR', DATA_DIR, STATUS)
 
             ISTAT = GETCWD(CWD)
             IF (ISTAT .EQ. 0) THEN
