@@ -247,6 +247,7 @@ class Ccdtop {
 #-----------------------------------------------------------------------
 
 #  Arrange for geometry constraints to be met.
+         wm deiconify $itk_interior
          update idletasks
          set wnow [ winfo width $itk_component(panel) ]
          set hnow [ winfo height $itk_interior ]
