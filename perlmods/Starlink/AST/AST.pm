@@ -66,7 +66,11 @@ sub ThrowError {
 
 package AstObjectPtr;
 
-# Looks like AST is smart enough 
+# Looks like AST is smart enough to figure out whether we want to SetC(),
+# SetD() or SetI() all on its own, ditto for GetC(), GetD() or GetI(). We
+# can therfore write generic Set() and Get() perl wrapper that ignore the
+# underlying strict typing (and also take hash/list as areguements). This
+# is much more Perl like than would otherwise be the case.
 sub Set {
   my $self = shift;
   
