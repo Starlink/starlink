@@ -145,8 +145,8 @@ AC_ARG_ENABLE(maketexpk,
   elif test "$enableval" != "yes"
   then MAKETEXPK_PATH=$enableval
   fi
-  test -z "$MKTEXPK_PATH" && test -n "MAKETEXPK_PATH" && AC_DEFINE_UNQUOTED(MAKETEXPK, "${MAKETEXPK_PATH}"),
-  test -z "$MKTEXPK_PATH" && test -n "MAKETEXPK_PATH" && AC_DEFINE_UNQUOTED(MAKETEXPK, "${MAKETEXPK_PATH}"))
+  test -z "$MKTEXPK_PATH" && test -n "$MAKETEXPK_PATH" && AC_DEFINE_UNQUOTED(MAKETEXPK, "${MAKETEXPK_PATH}"),
+  test -z "$MKTEXPK_PATH" && test -n "$MAKETEXPK_PATH" && AC_DEFINE_UNQUOTED(MAKETEXPK, "${MAKETEXPK_PATH}"))
 
 dnl   Do we want to use the fake_progname feature in kpathsea.cc?
 if $usekpse; then
