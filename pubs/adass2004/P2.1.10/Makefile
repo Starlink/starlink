@@ -1,13 +1,27 @@
+%.dvi: %.tex
+	latex $<
+	if grep -q 'Reference.*undefined' ${<:.tex=.log}; then latex $<; fi
+
+%.ps: %.dvi
+	dvips -o $@ $<
+
+%.pdf: %.tex
+	pdflatex $<
+	if grep -q 'Reference.*undefined' ${<:.tex=.log}; then pdflatex $<; fi
+#%.pdf: %.ps
+#	ps2pdf $<
+
+%.pdf: %.eps
+	epstopdf $<
+
+
+all: P2-1-10.pdf
+
 poster.pdf: poster.tex script-big.pdf script-little.pdf
 	pdflatex poster
 poster.ps: poster.tex script-big.eps script-little.eps
 	latex poster
 	dvips -o $@ poster.dvi
-
-.SUFFIXES: .pdf .eps
-
-.eps.pdf:
-	epstopdf $<
 
 # Alternative colours: ".3 setgray" is quite dark, for the small one,
 # and ".9 setgray" is quite light for the large one.
