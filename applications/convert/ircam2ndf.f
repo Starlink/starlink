@@ -49,7 +49,7 @@
 *        the IRCAM observation has non-null scale and offset values,
 *        the observation data array will be converted to type _REAL in
 *        the NDF, and the scale and offset applied to the input data
-*        values to give the "true" data values.  A null scale factor is
+*        values to give the `true' data values.  A null scale factor is
 *        1 and a null offset is 0. [FALSE]
 *     IN = IRCAM (Read)
 *        The name of the input IRCAM file to convert to NDFs.  The
@@ -122,10 +122,10 @@
 *                                  become "arcseconds".
 *
 *       .GENERAL               ->  .MORE.IRCAM.GENERAL
-*       .GENERAL.xxxx          ->  .MORE.IRCAM.GENERAL.xxxx
-*       .GENERAL.xxxx.yyyy     ->  .MORE.IRCAM.GENERAL.xxxx.yyyy
+*       .GENERAL.x             ->  .MORE.IRCAM.GENERAL.x
+*       .GENERAL.x.y           ->  .MORE.IRCAM.GENERAL.x.y
 *
-*       .OBS.xxxx              ->  .MORE.IRCAM.OBS.xxxx
+*       .OBS.x                 ->  .MORE.IRCAM.OBS.x
 *                                  This excludes the components of OBS
 *                                  already listed above and DATA_BLANK.
 
@@ -141,8 +141,8 @@
 *       IRCAM.GENERAL.ID             IRCAM_ID
 *       IRCAM.GENERAL.TELESCOPE      IRCAM_TELESCOPE
 *
-*     -  Upon a successful completion the number of observations
-*     successfully converted to NDFs is reported.
+*     -  Upon completion the number of observations successfully
+*     converted to NDFs is reported.
 
 *  Bad-pixel Handling:
 *     Elements of the data array equal to the IRCAM component
