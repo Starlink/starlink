@@ -123,9 +123,6 @@
 #  while the later ones are being modified.
       .vref configure -state active
 
-
-      puts "${WINX}x${WINY}"
-
 #  Allow selection of points for the other NDFs.
       ndfview .v \
                  -watchstate state \
