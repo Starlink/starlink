@@ -1,0 +1,67 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     pgplot_link_adam
+
+#  Purpose:
+#     Generate linker (ld) arguments for linking against adam Starlink-PGPLOT.
+
+#  Type of Module:
+#     Shell script.
+
+#  Description:
+#     This script should be invoked by those building ADAM applications
+#     which use Starlink-PGPLOT in order to generate the correct arguments for
+#     the compiler (or ld) command. The arguments generated are written to 
+#     the standard output.
+
+#  Invocation:
+#     The script is normally invoked as part of a compiler command line,
+#     such as:
+#
+#        alink program.f -L/star/lib `pgplot_link_adam`
+
+#  Copyright:
+#     Copyright (C) 1995,1998-1999,2004 Rutherford Appleton Laboratory
+
+#  Authors:
+#     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+#     BLY:  M.J. Bly (Starlink, RAL)
+#     DLT:  D.L. Terrett (Starlink, RAL)
+#     BKM:  B.K. McIlwrath (Starlink, RAL)
+#     TIMJ: Tim Jenness (JAC, Hawaii)
+#     PWD: Peter W. Draper (Starlink, Durham University)
+#     {enter_new_authors_here}
+
+#  History:
+#     19-JUL-1995 (DLT):
+#        Original version created from template.
+#     23-SEP-1998 (BLY):
+#        Changed reference to -lpgplot to -lpgp for Starlink-PGPLOT.
+#     08-OCT-1999 (BKM);
+#        Version for Starlink "native" PGPLOT.
+#     01-JUL-2004 (TIMJ):
+#        Use pgplot_adam library and include png
+#     08-JUL-2004 (TIMJ):
+#        Now get pgplot libraries using pgplot_link script
+#      9-AUG-2004 (TIMJ):
+#        Do not get libraries from pgplot_link and add err_link_adam
+#      7-SEP-2004 (TIMJ):
+#        Forgot to include png and z libraries
+#     07-OCT-2004 (PWD):
+#        Moved into drivers so we can make -lpng and -lz optional.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+      echo -lpgppar_adam  -lpgplot_star @LIBS@ `gwm_link_adam` \
+           `psx_link_adam` `chr_link_adam` `err_link_adam`  \
+           | awk 'BEGIN{RS=" ";FS="\n"}
+                  {f[i++]=$1}
+                  END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
+
+#  End of script.

@@ -60,7 +60,7 @@ AC_SUBST(STAR_BUILT_DRIVERS)
 
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.
-AC_CONFIG_FILES(Makefile)
+AC_CONFIG_FILES([Makefile pgplot_link pgplot_link_adam])
 
 dnl    This is the bit that does the actual work
 AC_OUTPUT
