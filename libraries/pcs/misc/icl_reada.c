@@ -1450,7 +1450,7 @@ initscreen(int nolines)
 /* Now simulate a 'newline' */
         ch = '\n';
 /* Cygwin doesn't offer this, so just do nothing... */
-#if defined HAVE_DECL_TIOCSTI && HAVE_DECL_TIOCSTI
+#ifdef TIOCSTI
 	if (ioctl(fileno(stdin), TIOCSTI, &ch) < 0) /* Simulate \n tty input */
 	    perror("initscreen - ioctl  error");
 	else {
