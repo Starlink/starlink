@@ -12,7 +12,7 @@ quadfit.eps varest.eps singopt.eps fig.eps
 
 #  The fortran A-task files containing prologues to be included in the
 #  on-line help file.
-USER_TASKS = polcal.f polexp.f polhelp.f polimp.f polka.f version.f \
+USER_TASKS = polcal.f polexp.f polhelp.f polimp.f polka.f polversion.f \
 polvec.f polplot.f polbin.f polext.f polimage.f polsim.f polstack.f
 
 #  Binary data files.
@@ -20,7 +20,7 @@ DATA = test_data.sdf
 
 #  The tasks visible within IRAF.
 IRAF_TASKS = polcal polexp polimp polka polvec polplot polbin polext \
-polimage polsim polstack version
+polimage polsim polstack polversion
 
 #  Fixed KAPPA subroutines which are here only until the fixes are
 #  available in KAPPA.
@@ -48,7 +48,7 @@ pol_calf.f pol_calp.f pol_calti.f polbin.f polbin.ifl polcal.f \
 polcal.ifl polcent.f polcent.ifl polexp.csh polexp.f polexp.ifl \
 polext.f polext.ifl polhelp.f polhelp.ifl polimp.csh polimp.f \
 polimp.ifl polka.f polka.ifl polpack.c polpack.csh polexpx.f polexpx.ifl \
-polpack.hlp polpack.icl polpack_link_adam polpack_mon.ifl version.f \
+polpack.hlp polpack.icl polpack_link_adam polpack_mon.ifl polversion.f polversion.ifl \
 polpack_mon.f polpack_test polplot.f polplot.ifl polvec.f polvec.ifl \
 pthlpo.f rdndf.f rfeature.bit right_arrow.bit rvertex.bit sread.f \
 tick.bit vertex.bit wrndf.f pol1_dbeam.f pol1_ceval.c pol1_dftab.f \

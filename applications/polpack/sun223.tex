@@ -5350,7 +5350,7 @@ for NDF applications.
 }
 
 \sstroutine{
-   VERSION
+   POLVERSION
 }{
    Checks the package version number
 }{
@@ -5361,7 +5361,7 @@ for NDF applications.
       is older, or younger, or equal to the specified version.
    }
    \sstusage{
-      version [compare]
+      polversion [compare]
    }
    \sstparameters{
       \sstsubsection{
@@ -5404,12 +5404,12 @@ for NDF applications.
    }
    \sstexamples{
       \sstexamplesubsection{
-         version
+         polversion
       }{
          Displays the version number of the installed package.
       }
       \sstexamplesubsection{
-         version compare={\tt "}V2.3{\tt "}
+         polversion compare={\tt "}V2.3{\tt "}
       }{
          Compares the version of the installed package with the version
          {\tt "}V2.3{\tt "}, and sets the RESULT parameter appropriately. For
@@ -6285,7 +6285,7 @@ POLPACK.
 
 \begin{itemize}
 
-\item A new command \htmlref{VERSION}{VERSION} has been added to check
+\item A new command \htmlref{POLVERSION}{POLVERSION} has been added to check
 the version number of the installed package.
 
 \item The names of catalogues provided in response to parameter prompts 

@@ -4,7 +4,7 @@
  polarimetry data) is now available. It is fully documented in SUN/223.
  The main changes since V2.0 are:
 
-   o  A new command called VERSION has been added to check the version 
+   o  A new command called POLVERSION has been added to check the version 
       number of the installed package.
 
    o  The names of catalogues provided in response to parameter prompts 

@@ -48,7 +48,7 @@ define polplot           $POLPACK_DIR/polpack_mon
 define polsim            $POLPACK_DIR/polpack_mon
 define polstack          $POLPACK_DIR/polpack_mon
 define polvec            $POLPACK_DIR/polpack_mon
-define version           $POLPACK_DIR/polpack_mon
+define polversion        $POLPACK_DIR/polpack_mon
 defstring polh(elp)      !$POLPACK_DIR/polhelp
 defstring makec(ube)     !$POLPACK_DIR/makecube.csh
 
@@ -65,7 +65,7 @@ define pol_polplot       $POLPACK_DIR/polpack_mon polplot
 define pol_polsim        $POLPACK_DIR/polpack_mon polsim
 define pol_polstack      $POLPACK_DIR/polpack_mon polstack
 define pol_polvec        $POLPACK_DIR/polpack_mon polvec
-define pol_version       $POLPACK_DIR/polpack_mon version
+define pol_polversion    $POLPACK_DIR/polpack_mon polversion
 defstring pol_polh(elp)  !$POLPACK_DIR/polhelp
 defstring pol_makec(ube) !$POLPACK_DIR/makecube.csh
 
@@ -84,7 +84,7 @@ defhelp  polplot         $POLPACK_HELP
 defhelp  polsim          $POLPACK_HELP
 defhelp  polstack        $POLPACK_HELP
 defhelp  polvec          $POLPACK_HELP
-defhelp  version         $POLPACK_HELP
+defhelp  polversion      $POLPACK_HELP
 
 {
 {  Announce that the POLPACK commands are available.

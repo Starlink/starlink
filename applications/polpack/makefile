@@ -466,7 +466,7 @@ polsim.f pol1_simcl.f pol1_ptvrs.f pol1_gtvrs.f pol1_prsvr.f \
 pol1_ptvrc.f pol1_gtvrc.f pol1_ptang.f pol1_gtang.f pol1_stftr.f \
 polimage.f pol1_axset.f pol1_xeval.f pol1_imprt.f pol1_dftab.f \
 pol1_srtim.f pol1_stkim.f pol1_stknm.f pol1_stksm.f polstack.f \
-version.f
+polversion.f
 
 #  Routines which may be logical,real,double,integer or character (storage)
 GENLRDICSRC = 
@@ -507,7 +507,7 @@ TCLLIBS = -ltk$(TK_VERS) -ltcl$(TCL_VERS)
 
 TASKS = polhelp polka datapic polcent polcal polimp polimpx polext \
 polexpx polexp polvec polplot polbin polsim polimage polstack polprep \
-version
+polversion
 
 #  Monolith routine source name.
 
@@ -526,7 +526,7 @@ MONO_IFL = $(PKG_NAME)_mon.ifl
 IFL_FILES = datapic.ifl polcent.ifl polhelp.ifl polka.ifl polext.ifl \
 polcal.ifl polimp.ifl polexp.ifl polvec.ifl polplot.ifl polimage.ifl \
 polbin.ifl polsim.ifl polimpx.ifl polexpx.ifl polstack.ifl polprep.ifl \
-version.ifl
+polversion.ifl
 
 #  List of help library sources.
 
@@ -555,7 +555,7 @@ IRAF_PKG_PAR = $(PKG_NAME).par
 
 IRAF_PAR_FILES = polcal.par polexp.par polimp.par polka.par polvec.par \
 polplot.par polbin.par polext.par polsim.par polimage.par polstack.par \
-version.par
+polversion.par
 
 #  Name the ADAM executables to be run under IRAF
 #  This assumes there are no IRAF-specific versions of the executables
@@ -1902,7 +1902,7 @@ polvec.o:	 SAE_PAR PAR_ERR PRM_PAR NDF_PAR AST_PAR
 pthlpo.o:	 SAE_PAR HLPCMD
 rdndf.o:	 SAE_PAR PAR_ERR MSG_PAR GRP_PAR NDG_ERR
 wrndf.o:	 SAE_PAR PAR_ERR MSG_PAR GRP_PAR NDG_ERR
-version.o:	 SAE_PAR PAR_ERR
+polversion.o:	 SAE_PAR PAR_ERR
 
 kpg1_rcatw.o: SAE_PAR DAT_PAR AST_PAR CAT_PAR GRP_PAR KPG_AST
 kpg1_srcta.o: SAE_PAR DAT_PAR GRP_PAR KPG_PAR AST_PAR KPG_AST 
