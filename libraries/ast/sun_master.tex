@@ -18,13 +18,13 @@
 
 % Variable part - replace [xxx] as appropriate.
 c+
-\newcommand{\stardocnumber}    {211.18}
+\newcommand{\stardocnumber}    {211.19}
 c-
 f+
-\newcommand{\stardocnumber}    {210.18}
+\newcommand{\stardocnumber}    {210.19}
 f-
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {17th January 2005}
+\newcommand{\stardocdate}      {18th March 2005}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
@@ -20670,12 +20670,10 @@ http://www.iram.fr/IRAMFR/GILDAS/doc/html/class-html/class.html}).
 \end{enumerate}
 
 
-\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
-Introduced in V3.5}
+\subsection{Changes Introduced in V3.5}
 
 The following describes the most significant changes which have
-occurred in the AST library between versions V3.4 and V3.5 (the
-current version):
+occurred in the AST library between versions V3.4 and V3.5:
 
 \begin{enumerate}
 
@@ -20730,6 +20728,22 @@ f+
 f-
 have been added to the FitsChan class to allow values for named
 keywords to be changed or added.
+
+\end{enumerate}
+
+
+\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
+Introduced in V3.6}
+
+The following describes the most significant changes which have
+occurred in the AST library between versions V3.5 and V3.6 (the
+current version):
+
+\begin{enumerate}
+\item If the Format attribute associated with an axis of a SkyFrame
+starts with a percent character (``\verb+%+''), then axis values are
+now formatted and unformatted as a decimal radians value, using the
+Format syntax of a simple Frame.
 
 \end{enumerate}
 

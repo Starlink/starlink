@@ -1,6 +1,6 @@
 AST Library
 -----------
-   A new release (V3.5) of the Starlink AST (astrometry) library is
+   A new release (V3.6) of the Starlink AST (astrometry) library is
 now available.
 
    AST provides a comprehensive range of facilities for attaching
@@ -15,6 +15,18 @@ environment-independent.
 
 Main Changes in this Version
 ----------------------------
+
+- If the Format attribute associated with an axis of a SkyFrame starts
+with a percent character (%), then axis values are now formatted and
+unformatted as a decimal radians value, using the Format syntax of a
+simple Frame.
+
+
+
+
+Main Changes in Version 3.5
+---------------------------
+
 - AST now provides facilities for representing regions of various
 shapes within a coordinate system. The Region class provides general
 facilities which are independent of the specific shape of region being
@@ -50,4 +62,4 @@ modified. It no longer returns a second derivative estimate. Existing
 code which uses the astRate (AST_RATE) method will need to be changed.
 
 
-10/12/04
+18/3/2005

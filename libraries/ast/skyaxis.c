@@ -78,6 +78,9 @@ f     only within textual output (e.g. from AST_WRITE).
 *        Modified ParseDHmsFormat so that the number of decimal places
 *        is specified by Digits if the given format string include a ".*"
 *        precision (e.g. "dms.*").
+*     18-MAR-2005 (DSB):
+*        Invoke methods inherited from parent Axis class if the format
+*        string starts with a '%' character.
 *class--
 */
 
@@ -131,6 +134,10 @@ static void (* parent_clearattrib)( AstObject *, const char * );
 static void (* parent_setattrib)( AstObject *, const char * );
 static double (*parent_getaxisbottom)( AstAxis *this );
 static double (*parent_getaxistop)( AstAxis *this );
+static const char *(* parent_axisformat)( AstAxis *, double );
+static double (*parent_axisgap)( AstAxis *, double, int * );
+static int (*parent_axisunformat)( AstAxis *, const char *, double * );
+static int (*parent_axisfields)( AstAxis *, const char *, const char *, int, char **, int *, double * );
 
 /* Factors for converting between hours, degrees and radians. */
 static double hr2rad;
@@ -457,6 +464,13 @@ static int AxisFields( AstAxis *this_axis, const char *fmt, const char *str,
 /* Check the global error status. */
    if ( !astOK ) return 0;
 
+/* If the format string starts with a "%" call the method inherited from
+   the parent Axis class. */
+   if( fmt[ 0 ] == '%' ) {
+      return (*parent_axisfields)( this_axis, fmt, str, maxfld, fields, nc, 
+                                   val );
+   }   
+
 /* Initialise. */
    result = 0;
    for( ifld = 0; ifld < maxfld; ifld++ ) {
@@ -739,8 +753,16 @@ static const char *AxisFormat( AstAxis *this_axis, double value ) {
    extended the syntax of this string. */
    fmt = GetAxisFormat( this_axis );
 
-/* Format the value and obtain a pointer to the result string. */
-   if ( astOK ) result = DHmsFormat( fmt, astGetAxisDigits( this ), value );
+/* If the format string starts with a percent, use the AxisFormat method
+   inherited from the parent Axis class. Otherwise, format using the
+   syntax of this class. */
+   if ( astOK ) {
+      if( fmt[ 0 ] == '%' ) {
+         result = (*parent_axisformat)( this_axis, value );
+      } else { 
+         result = DHmsFormat( fmt, astGetAxisDigits( this ), value );
+      }
+   }
 
 /* Return the result. */
    return result;
@@ -817,6 +839,17 @@ static double AxisGap( AstAxis *this_axis, double gap, int *ntick ) {
 
 /* Obtain the closest "nice" gap size. */
    if ( astOK ) result = DHmsGap( fmt, astGetAxisDigits( this ), gap, ntick );
+
+/* If the format string starts with a percent, use the AxisGap method
+   inherited from the parent Axis class. Otherwise, use the method
+   provided by this class. */
+   if ( astOK ) {
+      if( fmt[ 0 ] == '%' ) {
+         result = (*parent_axisgap)( this_axis, gap, ntick );
+      } else { 
+         result = DHmsGap( fmt, astGetAxisDigits( this ), gap, ntick );
+      }
+   }
 
 /* Return the result. */
    return result;
@@ -2749,9 +2782,16 @@ static const char *GetAxisUnit( AstAxis *this_axis ) {
    } else {
       fmt = GetAxisFormat( this_axis );
 
-/* Use the format specifier to generate a matching default Unit string and
-   obtain a pointer to it. */
-      if ( astOK ) result = DHmsUnit( fmt, astGetAxisDigits( this_axis ), 1 );
+/* If the format string starts with a percent, use "rad" as the default units 
+   string. Otherwise, use the format specifier to generate a matching
+   default Unit string and obtain a pointer to it. */
+      if ( astOK ) {
+         if( fmt[ 0 ] == '%' ) {
+            result = "rad";
+         } else { 
+            result = DHmsUnit( fmt, astGetAxisDigits( this_axis ), 1 );
+         }
+      }
    }
 
 /* Return the result. */
@@ -2856,17 +2896,25 @@ void astInitSkyAxisVtab_(  AstSkyAxisVtab *vtab, const char *name ) {
    parent_getaxisbottom = axis->GetAxisBottom;
    axis->GetAxisBottom = GetAxisBottom;
 
+   parent_axisformat = axis->AxisFormat;
+   axis->AxisFormat = AxisFormat;
+
+   parent_axisunformat = axis->AxisUnformat;
+   axis->AxisUnformat = AxisUnformat;
+
+   parent_axisgap = axis->AxisGap;
+   axis->AxisGap = AxisGap;
+
+   parent_axisfields = axis->AxisFields;
+   axis->AxisFields = AxisFields;
+
 /* Store replacement pointers for methods which will be over-ridden by
    new member functions implemented here. */
    axis->AxisAbbrev = AxisAbbrev;
-   axis->AxisFields = AxisFields;
-   axis->AxisFormat = AxisFormat;
-   axis->AxisGap = AxisGap;
    axis->AxisIn = AxisIn;
    axis->AxisDistance = AxisDistance;
    axis->AxisOffset = AxisOffset;
    axis->AxisNorm = AxisNorm;
-   axis->AxisUnformat = AxisUnformat;
    axis->ClearAxisFormat = ClearAxisFormat;
    axis->GetAxisFormat = GetAxisFormat;
    axis->SetAxisFormat = SetAxisFormat;
@@ -3479,18 +3527,22 @@ static int AxisUnformat( AstAxis *this_axis, const char *string,
 /* Check the global error status. */
    if ( !astOK ) return nc;
 
-/* Obtain the SkyAxis Format string and parse it to determine the
-   default choice of input format. Use a private method to obtain the
-   Format string, in case the syntax has been over-ridden by a derived
-   class. */
+/* Obtain the SkyAxis Format string. If its starts with a "%" sign, use
+   the parent AxisUnformat method inherited from the Axis class. Use 
+   a private method to obtain the Format string, in case the syntax has been 
+   over-ridden by a derived class. */
    fmt = GetAxisFormat( this_axis );
-   digs = astGetAxisDigits( this_axis );
-   ParseDHmsFormat( fmt, digs, &fmtsep, &plus, &lead_zero, &as_time, &dh, &min,
-                    &sec, &ndp );
+   if( fmt && fmt[0] == '%' ) {
+      nc = (*parent_axisunformat)( this_axis, string, value );
+   
+/* Otherwise, parse it to determine the default choice of input format. */
+   } else if( astOK ){
+      digs = astGetAxisDigits( this_axis );
+      ParseDHmsFormat( fmt, digs, &fmtsep, &plus, &lead_zero, &as_time, &dh,
+                       &min, &sec, &ndp );
 
 /* Initialise a pointer into the string and advance it to the first
    non-white space character. Save a copy of this pointer. */
-   if ( astOK ) {
       s = string;
       while ( isspace( (int) *s ) ) s++;
       string_start = s;

@@ -9830,6 +9830,11 @@ c        this.
 *     several characters make conflicting requests (e.g. if both "i"
 *     and "b" appear), then the character occurring last takes
 *     precedence, except that "d" and "h" always override "t".
+*
+*     If the format string starts with a percentage sign (%), then the 
+*     whole format string is assumed to conform to the syntax defined by
+*     the Frame class, and the axis values is formated as a decimal
+*     radians value.
 
 *  Notes:
 *     - When specifying this attribute by name, it should be
