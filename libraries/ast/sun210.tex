@@ -11540,6 +11540,115 @@ Object            - Base class for all AST Objects
    }
 }
 \sstroutine{
+   AST\_DECOMPOSE\sstlabel{AST_DECOMPOSE}
+}{
+   Decompose a Mapping into two component Mappings
+}{
+   \sstdescription{
+      This routine returns pointers to two Mappings which, when applied
+      either in series or parallel, are equivalent to the supplied \htmlref{Mapping}{Mapping}.
+
+      Since the \htmlref{Frame}{Frame} class inherits from the Mapping class, Frames can
+      be considered as special types of Mappings and so this method can
+      be used to decompose either CmpMaps or CmpFrames.
+   }
+   \sstinvocation{
+      CALL AST\_DECOMPOSE( THIS, MAP1, MAP2, SERIES, INVERT1, INVERT2, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         THIS = INTEGER (Given)
+      }{
+         Pointer to the Mapping.
+      }
+      \sstsubsection{
+         MAP1 = INTEGER (Returned)
+      }{
+         A pointer to first component
+         Mapping.
+      }
+      \sstsubsection{
+         MAP2 = INTEGER (Returned)
+      }{
+         A pointer to second component
+         Mapping.
+      }
+      \sstsubsection{
+         SERIES = LOGICAL (Returned)
+      }{
+         Indicates if the
+         component Mappings are applied in series or parallel. A .TRUE.
+         value means that the supplied Mapping is equivalent to applying MAP1
+         followed by MAP2 in series. A zero value means that the supplied
+         Mapping is equivalent to applying MAP1 to the lower numbered axes
+         and MAP2 to the higher numbered axes, in parallel.
+      }
+      \sstsubsection{
+         INVERT1 = INTEGER (Returned)
+      }{
+         The value of the \htmlref{Invert}{Invert} attribute to be used with MAP1.
+      }
+      \sstsubsection{
+         INVERT2 = INTEGER (Returned)
+      }{
+         The value of the Invert attribute to be used with MAP2.
+      }
+   }
+   \sstapplicability{
+      \sstsubsection{
+         \htmlref{CmpMap}{CmpMap}
+      }{
+         If the supplied Mapping is a CmpMap, then MAP1 and MAP2 will be
+         returned holding pointers to the component Mappings used to
+         create the CmpMap, either in series or parallel. Note, changing
+         the Invert attribute of either of the component Mappings using
+         the returned pointers will have no effect on the supplied CmpMap.
+         This is because the CmpMap remembers and uses the original settings
+         of the Invert attributes (that is, the values of the Invert
+         attributes when the CmpMap was first created). These are the
+         Invert values which are returned in INVERT1 and INVERT2.
+      }
+      \sstsubsection{
+         Mapping
+      }{
+         For any class of Mapping other than a CmpMap, MAP1 will be
+         returned holding a clone of the supplied Mapping pointer, and MAP2
+         will be returned holding AST\_\_NULL. INVERT1 will be returned
+         holding the current value of the Invert attribute for the supplied
+         Mapping, and INVERT2 will be returned holding zero.
+      }
+      \sstsubsection{
+         \htmlref{CmpFrame}{CmpFrame}
+      }{
+         If the supplied Mapping is a CmpFrame, then MAP1 and MAP2 will be
+         returned holding pointers to the component Frames used to
+         create the CmpFrame. The component Frames are considered to be in
+         applied in parallel.
+      }
+      \sstsubsection{
+         Frame
+      }{
+         For any class of Frame other than a CmpFrame, MAP1 will be
+         returned holding a clone of the supplied Frame pointer, and MAP2
+         will be returned holding AST\_\_NULL.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The returned Invert values should be used in preference to the
+         current values of the Invert attribute in map1 and map2. This is
+         because the attributes may have changed value since the Mappings
+         were combined.
+
+         \sstitem
+         Any changes made to the component Mappings using the returned
+         pointers will be reflected in the supplied Mapping.
+      }
+   }
+}
+\sstroutine{
    AST\_DELETE\sstlabel{AST_DELETE}
 }{
    Delete an Object
@@ -24071,6 +24180,9 @@ Object            - Base class for all AST Objects
       \sstitemlist{
 
          \sstitem
+         \htmlref{AST\_DECOMPOSE}{AST_DECOMPOSE}: Decompose a Mapping into two component Mappings
+
+         \sstitem
          \htmlref{AST\_INVERT}{AST_INVERT}: Invert a Mapping
 
          \sstitem
@@ -25761,12 +25873,10 @@ if the reference point is at either the north or the south pole.
 \end{enumerate}
 
 
-\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
-Introduced in V1.8-2}
+\subsection{Changes Introduced in V1.8-2}
 
 The following describes the most significant changes which have
-occurred in the AST library between versions V1.7 and V1.8-2 (the
-current version):
+occurred in the AST library between versions V1.7 and V1.8-2:
 
 \begin{enumerate}
 
@@ -25790,8 +25900,31 @@ AST\_BEAR routine has been replaced by AST\_AXANGLE.
 
 \end{enumerate}
 
+
+
+\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
+Introduced in V1.8-3}
+
+The following describes the most significant changes which have
+occurred in the AST library between versions V1.8-2 and V1.8-3 (the
+current version):
+
+\begin{enumerate}
+
+\item A new method called astDecompose has been added to the \htmlref{Mapping}{Mapping} class
+which enables pointers to be obtained to the component parts of \htmlref{CmpMap}{CmpMap} and 
+\htmlref{CmpFrame}{CmpFrame} objects.
+
+\item Functions within proj.c and wcstrig.c have been renamed to avoid name 
+clashes with functions in more recent versions of Mark Calabretta's wcslib 
+library.
+
+\end{enumerate}
+
 Programs which are statically linked will need to be re-linked in
 order to take advantage of these new facilities.
+
+
 
 
 \end{document}
