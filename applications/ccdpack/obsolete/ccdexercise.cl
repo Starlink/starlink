@@ -20,11 +20,14 @@ procedure ccdexercise ( device )
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK)
+#     MBT: Mark Taylor (STARLINK)
 #     {enter_new_authors_here}
 
 #  History:
 #     2-APR-1997 (PDRAPER):
 #        Original version.
+#     11-MAY-1999 (MBT):
+#        Modified for use with WCS-aware tasks.
 #     {enter_further_changes_here}
 #-
 #
@@ -52,7 +55,6 @@ begin
          gdset ( device=local_dev )
          gdclear ( device=local_dev )
          paldef ( device=local_dev )
-         palentry ( device=local_dev, colour="white", palnum=0 )
       }
    }
 
@@ -118,9 +120,9 @@ begin
 
    #  Make the output files of type ".imh"
    reset NDF_FORMATS_OUT="IRAF(.imh),.,*"
-   ccdgenerate ( nseq=4, file="ccdtest_obj.dat",
-                 ubnds="128,128,166,128,128,201,166,201",
-                 lbnds="1,1,39,1,1,74,39,74" )
+   ccdgenerate ( nseq=4, file="ccdtest_obj.dat", reduced=no,
+                 pixels="128,128", origins="-1,-1,-40,15,-10,-74,-35,-70",
+                 angles="0,0,0,0" )
 
 #  If display capability is enabled then display the DATA frames.
    if ( local_dev != "NONE" ) {
@@ -130,8 +132,10 @@ begin
      picdef ( mode_="array", xpic=2, ypic=2, prefix="a" )
      lutheat
      picsel ( label="a1" )
-     display.xmagn=INDEF
-     display.ymagn=INDEF
+     display.xmagn=1.0
+     display.ymagn=1.0
+     display.style="'colour(numlab)=red,grid=1,colour(grid)=black'"
+     display.margin=0.16
      display ( in="data1.imh", mode_="percentiles", percentiles="2,98" )
      picsel ( label="a2" )
      display ( in="data2.imh", mode_="percentiles", percentiles="2,98" )
@@ -259,7 +263,8 @@ begin
    print "  After locating the objects it is now necessary to determine"
    print "  which objects correspond."
    print " "
-   findoff ( inlist="reduced_data?.imh", ndfnames=yes, 
+   findoff ( inlist="reduced_data?.imh", ndfnames=yes,
+             usewcs=yes, restrict=yes, maxdisp=INDEF,
              outlist="*|.imh|.off|", error=1, fast=yes, failsafe=yes )
    if ( local_dev != "NONE" ) {
      #  Display the objects located.
@@ -288,7 +293,21 @@ begin
    print "  transformation types. It also writes the information into the"
    print "  images so that other routines may use it."
    print " "
-   register ( inlist="reduced_data?.imh", fittype=1 )
+   register ( inlist="reduced_data?.imh", refpos=1, outformat=wcs, 
+              outdomain=ccd_reg, fittype=2 )
+
+   #  Export the registration information to an AST file.
+   print " "
+   print "  Write World Coordinate System information about the alignment"
+   print "  of these frames to an external file 'ccdexercise.ast' as a"
+   print "  record of their mutual alignment."
+   print " "
+   if ( access ( "ccdexercise.ast" ) ) {
+     delete ccdexercise.ast
+   }
+   astexp ( in="reduced_data?.imh", astfile="ccdexercise.ast", 
+            idtype="fitsid", fitsid="ISEQ", outdomain="matched",
+            outtitle=INDEF, baseframe=axis )
 
    #  Resample the data.
    print " "
@@ -300,6 +319,7 @@ begin
    print "  data coverage for the target area."
    print " "
    tranndf ( in="reduced_data?.imh", out="*|reduced|resamp|" )
+
 
    #  Normalise it.
    print " "
