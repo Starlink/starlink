@@ -12,6 +12,9 @@
 *        (R.F. Warren-Smith, 13th November 1996).
 *     -  Un-define the PI macro if previously defined (R.F. Warren-Smith,
 *        23rd April 1997).
+*     -  Changed prjprm.p to use"PVj_m" instead of "PROJPi" ("double p[10]" 
+*        changed to "double **p", w[10] changed to w[110], and np, unset,
+*        axlat and axlon added). (D.S. Berry 1st April 2000).
 *
 *=============================================================================
 */
@@ -22,10 +25,13 @@ struct prjprm {
    int flag;
    int n;
    double r0;
-   double p[10];
-   double w[10];
+   double **p;
+   int *np;
+   double w[110];
+   double unset;
+   int axlat;
+   int axlon;
 };
-
 
    int azpset(struct prjprm *);
    int azpfwd(double, double, struct prjprm *, double *, double *);
@@ -81,9 +87,9 @@ struct prjprm {
    int pcoset(struct prjprm *);
    int pcofwd(double, double, struct prjprm *, double *, double *);
    int pcorev(double, double, struct prjprm *, double *, double *);
-   int glsset(struct prjprm *);
-   int glsfwd(double, double, struct prjprm *, double *, double *);
-   int glsrev(double, double, struct prjprm *, double *, double *);
+   int sflset(struct prjprm *);
+   int sflfwd(double, double, struct prjprm *, double *, double *);
+   int sflrev(double, double, struct prjprm *, double *, double *);
    int parset(struct prjprm *);
    int parfwd(double, double, struct prjprm *, double *, double *);
    int parrev(double, double, struct prjprm *, double *, double *);
@@ -113,5 +119,7 @@ struct prjprm {
 #define SQRT2INV 1.0/SQRT2
 
 #define PRJSET 137
+
+#define NPTAN 40
 
 #endif /* PROJ_INCLUDED */

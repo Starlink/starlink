@@ -1,5 +1,3 @@
-kkkkkk
-
 #if !defined( WCSMAP_INCLUDED ) /* Include this file only once */
 #define WCSMAP_INCLUDED
 /*
@@ -39,13 +37,17 @@ kkkkkk
 *        a FITS WCS projection, in the native coordinate system. The value 
 *        returned is in radians. A value of AST__BAD is returned if 
 *        no value is defined. This attribute is read only, and may change 
-*        if new values are assigned to the projection parameters given by 
-*        attribute ProjP.
+*        if new values are assigned to the projection parameters.
 *     ProjP(i) (double)
+*        This attribute provides aliases for the PV attributes, which 
+*        specifies the projection parameter values to be used by a WcsMap 
+*        when implementing a FITS-WCS sky projection. ProjP is retained for 
+*        compatibility with previous versions of FITS-WCS and AST. New 
+*        applications should use the PV attibute instead.
+*     PVj_m (double)
 *        This attribute gives the parameter values used by a FITS WCS 
-*        projection. The index value included in the attribute name selects
-*        a particular parameter, and should be an integer in the range 0 to 9. 
-*        These values correspond to FITS keywords PROJP0 to PROJP9. They will 
+*        projection. The index j is the axis index in the range 1 to 99, and 
+*        the index m is the parameter index in the range 0 to 99. They will 
 *        have the value AST__BAD if undefined. By default, no projection 
 *        parameters are defined. These should be assigned appropriate values 
 *        before using a WcsMap to transform points.
@@ -84,20 +86,20 @@ kkkkkk
 *        None.
 *
 *     Protected:
-*        astClearProjP
-*           Clear a ProjP attribute value for a WcsMap.
+*        astClearPV
+*           Clear a PVi_j attribute value for a WcsMap.
 *        astGetNatLat
 *           Get the NatLat attribute value for a WcsMap.
-*        astGetProjP
-*           Get a ProjP attribute value for a WcsMap.
+*        astGetPV
+*           Get a PVi_j attribute value for a WcsMap.
 *        astGetWcsAxis
 *           Get a WcsAxis attribute value for a WcsMap.
 *        astGetWcsType
 *           Get the WcsType attribute value for a WcsMap.
-*        astSetProjP
-*           Set a ProjP attribute value for a WcsMap.
-*        astTestProjP
-*           Test if a ProjP attribute value has been set for a WcsMap.
+*        astSetPV
+*           Set a PVi_j attribute value for a WcsMap.
+*        astTestPV
+*           Test if a PVi_j attribute value has been set for a WcsMap.
 *        astWcsPrjName
 *           Return the FITS CTYPE keyword value for a given projection type.
 *        astWcsPrjDesc
@@ -169,7 +171,9 @@ kkkkkk
 *        AST__PCO     
 *           An integer identifier for the FITS PCO projection. 
 *        AST__GLS     
-*           An integer identifier for the FITS GLS projection. 
+*           A depracated integer identifier for the FITS SFL projection. 
+*        AST__SFL     
+*           An integer identifier for the FITS SFL projection. 
 *        AST__PAR     
 *           An integer identifier for the FITS PAR projection. 
 *        AST__AIT     
@@ -220,6 +224,8 @@ kkkkkk
 *        Updated to include attributes, etc.
 *     26-SEP-1997 (DSB):
 *        Included new protected function, astPrjDesc.
+*     11-FEB-2000 (DSB):
+*        Replaced wcsmap component projp by pointers p and np.
 *-
 */
 
@@ -279,14 +285,15 @@ kkkkkk
 #define   AST__BON    17         /* The FITS BON projection */ 
 #define   AST__PCO    18         /* The FITS PCO projection */ 
 #define   AST__GLS    19         /* The FITS GLS projection */ 
-#define   AST__PAR    20         /* The FITS PAR projection */ 
-#define   AST__AIT    21         /* The FITS AIT projection */ 
-#define   AST__MOL    22         /* The FITS MOL projection */ 
-#define   AST__CSC    23         /* The FITS CSC projection */ 
-#define   AST__QSC    24         /* The FITS QSC projection */ 
-#define   AST__NCP    25         /* The AIPS NCP projection */
-#define   AST__TSC    26         /* The FITS TSC projection */
-#define   AST__WCSBAD 27          /* A bad projection type */
+#define   AST__SFL    20         /* The FITS GLS projection */ 
+#define   AST__PAR    21         /* The FITS PAR projection */ 
+#define   AST__AIT    22         /* The FITS AIT projection */ 
+#define   AST__MOL    23         /* The FITS MOL projection */ 
+#define   AST__CSC    24         /* The FITS CSC projection */ 
+#define   AST__QSC    25         /* The FITS QSC projection */ 
+#define   AST__NCP    26         /* The AIPS NCP projection */
+#define   AST__TSC    27         /* The FITS TSC projection */
+#define   AST__WCSBAD 28         /* A bad projection type */
 
 /* Type Definitions. */
 /* ================= */
@@ -303,7 +310,8 @@ typedef struct AstWcsMap {
    double natlat;                /* Native latitude of reference point */
    int type;                     /* Projection type */
    int wcsaxis[2];               /* Indices of lon and lat. axes */
-   double projp[ AST__WCSMX ];   /* Projection parameters */
+   double **p;                   /* Pointer to array of projection parameter arrays */
+   int *np;                      /* Pointer to array of projection parameter counts */
    struct prjprm params;         /* WCS structure holding projection
                                     parameters, etc. Defined in proj.h */
 
@@ -324,12 +332,12 @@ typedef struct AstWcsMapVtab {
 
 /* Properties (e.g. methods) specific to this class. */
    double (* GetNatLat)( AstWcsMap * );
-   double (* GetProjP)( AstWcsMap *, int );
+   double (* GetPV)( AstWcsMap *, int, int );
    int (* GetWcsAxis)( AstWcsMap *, int );
    int (* GetWcsType)( AstWcsMap * );
-   int (* TestProjP)( AstWcsMap *, int );
-   void (* ClearProjP)( AstWcsMap *, int );
-   void (* SetProjP)( AstWcsMap *, int, double );
+   int (* TestPV)( AstWcsMap *, int, int );
+   void (* ClearPV)( AstWcsMap *, int, int );
+   void (* SetPV)( AstWcsMap *, int, int, double );
 
 } AstWcsMapVtab;
 #endif
@@ -365,13 +373,13 @@ AstWcsMap *astLoadWcsMap_( void *, size_t, int, AstWcsMapVtab *,
    const char *PrjDesc_( int );
    const char *PrjName_( int );
    double astGetNatLat_( AstWcsMap * );
-   double astGetProjP_( AstWcsMap *, int );
+   double astGetPV_( AstWcsMap *, int, int );
    int PrjType_( const char * );
    int astGetWcsAxis_( AstWcsMap *, int );
    int astGetWcsType_( AstWcsMap * );
-   int astTestProjP_( AstWcsMap *, int );
-   void astClearProjP_( AstWcsMap *, int );
-   void astSetProjP_( AstWcsMap *, int, double );
+   int astTestPV_( AstWcsMap *, int, int );
+   void astClearPV_( AstWcsMap *, int, int );
+   void astSetPV_( AstWcsMap *, int, int, double );
 #endif
 
 /* Function interfaces. */
@@ -423,14 +431,14 @@ astINVOKE(O,astLoadWcsMap_(mem,size,init,vtab,name,astCheckChannel(channel)))
 #define astWcsPrjName PrjName_
 #define astWcsPrjDesc PrjDesc_
 
-#define astClearProjP(this,index) \
-astINVOKE(V,astClearProjP_(astCheckWcsMap(this),index))
-#define astGetProjP(this,index) \
-astINVOKE(V,astGetProjP_(astCheckWcsMap(this),index))
-#define astSetProjP(this,index,par) \
-astINVOKE(V,astSetProjP_(astCheckWcsMap(this),index,par))
-#define astTestProjP(this,index) \
-astINVOKE(V,astTestProjP_(astCheckWcsMap(this),index))
+#define astClearPV(this,i,j) \
+astINVOKE(V,astClearPV_(astCheckWcsMap(this),i,j))
+#define astGetPV(this,i,j) \
+astINVOKE(V,astGetPV_(astCheckWcsMap(this),i,j))
+#define astSetPV(this,i,j,par) \
+astINVOKE(V,astSetPV_(astCheckWcsMap(this),i,j,par))
+#define astTestPV(this,i,j) \
+astINVOKE(V,astTestPV_(astCheckWcsMap(this),i,j))
 
 #define astGetWcsType(this) \
 astINVOKE(V,astGetWcsType_(astCheckWcsMap(this)))

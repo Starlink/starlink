@@ -135,8 +135,6 @@
 *           Clear the Encoding attribute value for a FitsChan.
 *        astClearFitsDigits  
 *           Clear the FitsDigits attribute value for a FitsChan.
-*        astClearCDMatrix
-*           Clear the CDMatrix attribute value for a FitsChan.
 *        astEmpty
 *           Remove all cards and related data from a FitsChan.
 *        astKeyFields
@@ -147,16 +145,12 @@
 *           Get the value of the Encoding attribute for a FitsChan.
 *        astGetFitsDigits  
 *           Get the value of the FitsDigits attribute for a FitsChan.
-*        astGetCDMatrix
-*           Get the value of the CDMatrix attribute for a FitsChan.
 *        astGetNcard
 *           Get the value of the Ncard attribute for a FitsChan.
 *        astSetCard  
 *           Set the value of the Card attribute for a FitsChan.
 *        astSetEncoding  
 *           Set the value of the Encoding attribute for a FitsChan.
-*        astSetCDMatrix
-*           Set the value of the CDMatrix attribute for a FitsChan.
 *        astSetFitsDigits  
 *           Set the value of the FitsDigits attribute for a FitsChan.
 *        astTestCard  
@@ -165,8 +159,6 @@
 *           Test the Encoding attribute value for a FitsChan.
 *        astTestFitsDigits  
 *           Test the FitsDigits attribute value for a FitsChan.
-*        astTestCDMatrix
-*           Test the CDMatrix attribute value for a FitsChan.
            
 *  Other Class Functions:
 *     Public:
@@ -198,6 +190,8 @@
 *           Integer dentifier for the floating point FITS data type.
 *        AST__STRING 
 *           Integer dentifier for the string FITS data type.
+*        AST__CONTINUE 
+*           Integer dentifier for the continuation string FITS data type.
 *        AST__COMPLEXF
 *           Integer dentifier for the complex floating point FITS data type.
 *        AST__COMPLEXI
@@ -223,7 +217,7 @@
 *        provided for external calls to the AST library.
 
 *  Copyright:
-*     <COPYRIGHT_STATEMENT>
+*     Copyright (C) 1999 Central Laboratory of the Research Councils
 
 *  Authors:
 *     DSB: D.S. Berry (Starlink)
@@ -237,6 +231,8 @@
 *        Added CDMatrix attribute.
 *     21-OCT-1997 (DSB):
 *        o  Renamed astFields as astKeyFields.
+*     1-APR-2000 (DSB):
+*        Changes for CDi_j based FITS-WCS standard.
 *-
 */
 
@@ -263,6 +259,7 @@
 #define AST__COMPLEXF      4
 #define AST__COMPLEXI      5
 #define AST__LOGICAL       6
+#define AST__CONTINUE      7
 #endif
 
 /* Type Definitions. */
@@ -280,7 +277,6 @@ typedef struct AstFitsChan {
 /* Attributes specific to objects in this class. */
    int encoding;    /* System for encoding AST objects ito FITS headers */
    int fitsdigits;  /* No. of decmial places in formatted floating point keyword values */
-   int cdmatrix;    /* Should CD matrices be written? */
    void *card;      /* Pointer to next FitsCard to be read */
    void *head;      /* Pointer to first FitsCard in the circular linked list */
    void *keyseq;    /* List of keyword sequence numbers used */
@@ -319,6 +315,7 @@ typedef struct AstFitsChanVtab {
    int (* FitsGetI)( AstFitsChan *, const char *, int * );
    int (* FitsGetL)( AstFitsChan *, const char *, int * );
    int (* FitsGetS)( AstFitsChan *, const char *, char ** );
+   int (* FitsGetCN)( AstFitsChan *, const char *, char ** );
    int (* FitsGetCom)( AstFitsChan *, const char *, char ** );
    void (* FitsSetCom)( AstFitsChan *, const char *, const char *, int  );
    void (* FitsSetCF)( AstFitsChan *, const char *, double *, const char *, int  );
@@ -327,6 +324,7 @@ typedef struct AstFitsChanVtab {
    void (* FitsSetI)( AstFitsChan *, const char *, int, const char *, int  );
    void (* FitsSetL)( AstFitsChan *, const char *, int, const char *, int  );
    void (* FitsSetS)( AstFitsChan *, const char *, const char *, const char *, int  );
+   void (* FitsSetCN)( AstFitsChan *, const char *, const char *, const char *, int  );
    int (* GetCard)( AstFitsChan * );
    int (* TestCard)( AstFitsChan * );
    void (* SetCard)( AstFitsChan *, int );
@@ -335,10 +333,6 @@ typedef struct AstFitsChanVtab {
    int (* TestFitsDigits)( AstFitsChan * );
    void (* SetFitsDigits)( AstFitsChan *, int );
    void (* ClearFitsDigits)( AstFitsChan * );
-   int (* GetCDMatrix)( AstFitsChan * );
-   int (* TestCDMatrix)( AstFitsChan * );
-   void (* SetCDMatrix)( AstFitsChan *, int );
-   void (* ClearCDMatrix)( AstFitsChan * );
    int (* GetNcard)( AstFitsChan * );
    int (* GetEncoding)( AstFitsChan * );
    int (* TestEncoding)( AstFitsChan * );
@@ -402,6 +396,7 @@ AstFitsChan *astLoadFitsChan_( void *, size_t, int, AstFitsChanVtab *,
    int  astFitsGetI_( AstFitsChan *, const char *, int * );
    int  astFitsGetL_( AstFitsChan *, const char *, int * );
    int  astFitsGetS_( AstFitsChan *, const char *, char ** );
+   int  astFitsGetCN_( AstFitsChan *, const char *, char ** );
    int  astFitsGetCom_( AstFitsChan *, const char *, char ** );
    void astFitsSetCom_( AstFitsChan *, const char *, const char *, int  );
    void astFitsSetCF_( AstFitsChan *, const char *, double *, const char *, int  );
@@ -410,6 +405,7 @@ AstFitsChan *astLoadFitsChan_( void *, size_t, int, AstFitsChanVtab *,
    void astFitsSetI_( AstFitsChan *, const char *, int, const char *, int  );
    void astFitsSetL_( AstFitsChan *, const char *, int, const char *, int  );
    void astFitsSetS_( AstFitsChan *, const char *, const char *, const char *, int  );
+   void astFitsSetCN_( AstFitsChan *, const char *, const char *, const char *, int  );
 
    void astEmpty_( AstFitsChan * );
    int  astKeyFields_( AstFitsChan *, const char *, int, int *, int *);
@@ -423,11 +419,6 @@ AstFitsChan *astLoadFitsChan_( void *, size_t, int, AstFitsChanVtab *,
    int astTestFitsDigits_( AstFitsChan * );
    void astSetFitsDigits_( AstFitsChan *, int );
    void astClearFitsDigits_( AstFitsChan * );
-
-   int astGetCDMatrix_( AstFitsChan * );
-   int astTestCDMatrix_( AstFitsChan * );
-   void astSetCDMatrix_( AstFitsChan *, int );
-   void astClearCDMatrix_( AstFitsChan * );
 
    int astGetNcard_( AstFitsChan * );
 
@@ -515,6 +506,9 @@ astINVOKE(V,astFitsGetL_(astCheckFitsChan(this),name,value))
 #define astFitsGetS(this,name,value) \
 astINVOKE(V,astFitsGetS_(astCheckFitsChan(this),name,value))
 
+#define astFitsGetCN(this,name,value) \
+astINVOKE(V,astFitsGetCN_(astCheckFitsChan(this),name,value))
+
 #define astFitsGetCom(this,name,comment) \
 astINVOKE(V,astFitsGetCom_(astCheckFitsChan(this),name,comment))
 
@@ -529,6 +523,9 @@ astINVOKE(V,astFitsSetF_(astCheckFitsChan(this),name,value,comment,overwrite))
 
 #define astFitsSetS(this,name,value,comment,overwrite) \
 astINVOKE(V,astFitsSetS_(astCheckFitsChan(this),name,value,comment,overwrite))
+
+#define astFitsSetCN(this,name,value,comment,overwrite) \
+astINVOKE(V,astFitsSetCN_(astCheckFitsChan(this),name,value,comment,overwrite))
 
 #define astFitsSetCI(this,name,value,comment,overwrite) \
 astINVOKE(V,astFitsSetCI_(astCheckFitsChan(this),name,value,comment,overwrite))
@@ -564,15 +561,6 @@ astINVOKE(V,astGetFitsDigits_(astCheckFitsChan(this)))
 astINVOKE(V,astSetFitsDigits_(astCheckFitsChan(this),fitsdigits))
 #define astTestFitsDigits(this) \
 astINVOKE(V,astTestFitsDigits_(astCheckFitsChan(this)))
-
-#define astClearCDMatrix(this) \
-astINVOKE(V,astClearCDMatrix_(astCheckFitsChan(this)))
-#define astGetCDMatrix(this) \
-astINVOKE(V,astGetCDMatrix_(astCheckFitsChan(this)))
-#define astSetCDMatrix(this,cdmatrix) \
-astINVOKE(V,astSetCDMatrix_(astCheckFitsChan(this),cdmatrix))
-#define astTestCDMatrix(this) \
-astINVOKE(V,astTestCDMatrix_(astCheckFitsChan(this)))
 
 #define astGetNcard(this) \
 astINVOKE(V,astGetNcard_(astCheckFitsChan(this)))
