@@ -92,6 +92,13 @@
           CALL GCB_CACHE(I_CACHE,STATUS)
         ENDIF
 
+*  unpack a structured GCB component
+      ELSEIF (ACTION.EQ.'STRUCT') THEN
+
+        CALL USI_GET0C('VALUE',VALUE,STATUS)
+        CALL CHR_UCASE(VALUE)
+
+
       ENDIF
 
       CALL USI_CLOSE()
@@ -258,9 +265,8 @@
      :                                                   SID,STATUS)
         CALL NBS_DEFINE_PRIMITIVE(ID,'PAR_D2','_DOUBLE',0,VAL__NBD,
      :                                                   SID,STATUS)
-        CALL NBS_DEFINE_PRIMITIVE(ID,'PAR_C1','_CHAR',0,16,SID,STATUS)
-        CALL NBS_DEFINE_PRIMITIVE(ID,'PAR_C2','_CHAR',0,16,SID,STATUS)
-        CALL NBS_DEFINE_PRIMITIVE(ID,'PAR_C80','_CHAR',0,16,SID,STATUS)
+        CALL NBS_DEFINE_PRIMITIVE(ID,'PAR_C1','_CHAR',0,80,SID,STATUS)
+        CALL NBS_DEFINE_PRIMITIVE(ID,'PAR_C2','_CHAR',0,80,SID,STATUS)
 
 *  status of buffer and cache
         CALL NBS_DEFINE_PRIMITIVE(ID,'BUFFER','_INTEGER',0,VAL__NBI,
@@ -376,7 +382,6 @@
         CALL IMG_NBPUT0I('PAR_D2',0.0d0,STATUS)
         CALL IMG_NBPUT0C('PAR_C1',' ',STATUS)
         CALL IMG_NBPUT0C('PAR_C2',' ',STATUS)
-        CALL IMG_NBPUT0C('PAR_C80',' ',STATUS)
         CALL IMG_NBPUT0I('BUFFER',0,STATUS)
         CALL IMG_NBPUT0I('CACHE',0,STATUS)
         CNAME='DATA'
@@ -435,6 +440,105 @@
         CALL NBS_PUT_VALUE(ITEMID,0,VAL__NBR,YMIN,STATUS)
         CALL NBS_FIND_ITEM(I_NBID,'YMAX',ITEMID,STATUS)
         CALL NBS_PUT_VALUE(ITEMID,0,VAL__NBR,YMAX,STATUS)
+
+      ENDIF
+
+      END
+
+
+
+
+*+  IGUI_GETSTRUCT
+      SUBROUTINE IGUI_GETSTRUCT(NAME,STATUS)
+*    Description :
+*    Deficiencies :
+*    Bugs :
+*    Authors :
+*        rjv@star.sr.bham.ac.uk
+*    History :
+*    Type definitions :
+      IMPLICIT NONE
+*    Global constants :
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'PAR_ERR'
+      INCLUDE 'PRM_PAR'
+*    Import :
+      CHARACTER*(*) NAME
+*    Global variables :
+      INCLUDE 'IMG_CMN'
+*    Status :
+      INTEGER STATUS
+*    Function declarations :
+*    Local constants :
+*    Local variables :
+      CHARACTER TEXT*80,JUST*1
+      REAL SIZE
+      INTEGER FONT,BOLD,COLOUR
+      INTEGER I,N
+      INTEGER FLAG
+      LOGICAL OK
+*-
+      IF (STATUS.EQ.SAI__OK) THEN
+
+        IF (NAME.EQ.'TITLE') THEN
+
+          CALL GCB_GETI('TITLE_N',OK,N,STATUS)
+          I=1
+          DO WHILE (I.LE.N)
+*  put block on reading by GUI
+            CALL IMG_NBPUT0I('FLAG',-1,STATUS)
+*  write parameters to noticeboard
+            CALL GCB_GET1C('TITLE_TEXT',I,1,OK,TEXT,STATUS)
+            IF (.NOT.OK) THEN
+              TEXT=' '
+            ENDIF
+            CALL IMG_NBPUT0C('PAR_C1',TEXT,STATUS)
+            CALL GCB_GET1I('TITLE_FONT',I,1,OK,FONT,STATUS)
+            IF (.NOT.OK) THEN
+              FONT=1
+            ENDIF
+            CALL IMG_NBPUT0C('PAR_I1',FONT,STATUS)
+            CALL GCB_GET1I('TITLE_BOLD',I,1,OK,BOLD,STATUS)
+            IF (.NOT.OK) THEN
+              BOLD=1
+            ENDIF
+            CALL IMG_NBPUT0C('PAR_I2',BOLD,STATUS)
+            CALL GCB_GET1R('TITLE_SIZE',I,1,OK,SIZE,STATUS)
+            IF (.NOT.OK) THEN
+              SIZE=1.0
+            ENDIF
+            CALL IMG_NBPUT0R('PAR_R1',SIZE,STATUS)
+            CALL GCB_GET1I('TITLE_COLOUR',I,1,OK,COLOUR,STATUS)
+            IF (.NOT.OK) THEN
+              COLOUR=1
+            ENDIF
+            CALL IMG_NBPUT0I('PAR_I3',COLOUR,STATUS)
+            CALL GCB_GET1C('TITLE_JUST',I,1,OK,JUST,STATUS)
+            IF (.NOT.OK) THEN
+              JUST='L'
+            ENDIF
+            CALL IMG_NBPUT0C('PAR_C2',JUST,STATUS)
+*  take block off reading
+            CALL IMG_NBPUT0I('FLAG',0,STATUS)
+            FLAG=0
+*  wait 'til GUI flags that values have been read
+            DO WHILE (FLAG.EQ.0)
+              CALL IMG_NBGET0I('FLAG',FLAG,STATUS)
+            ENDDO
+
+          ENDDO
+
+        ELSEIF (NAME.EQ.'NOTE') THEN
+
+
+        ELSEIF (NAME.EQ.'MARKER') THEN
+
+
+        ELSEIF (NAME.EQ.'SHAPE') THEN
+
+
+        ENDIF
+
 
       ENDIF
 
