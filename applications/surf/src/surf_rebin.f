@@ -17,8 +17,8 @@
 
 *  Arguments:
 *     TSKNAME = CHARACTER * () (Given)
-*        Name of task so that I can distinguish REBIN, BOLREBIN and INTREBIN
-*        and EXTRACT_DATA
+*        Name of task so that I can distinguish REBIN, BOLREBIN and INTREBIN,
+*        DESPIKE and EXTRACT_DATA
 *     STATUS = INTEGER (Given and Returned)
 *        The global status
 
@@ -170,6 +170,10 @@
 *     of integrations added into the final data point. For weight function
 *     regridding the situation is more complicated.
 
+*  Implementation Status:
+*     This code deals with REBIN, INTREBIN, BOLREBIN, EXTRACT_DATA and
+*     DESPIKE.
+
 *  Related Applications:
 *     SURF: SCUQUICK, EXTRACT_DATA
 
@@ -182,6 +186,9 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
+*     Revision 1.41  1997/10/28 19:08:38  timj
+*     Add support for despiking.
+*
 *     Revision 1.40  1997/09/03 23:33:37  timj
 *     Use SCULIB_GET_FILENAME instead of SUBPAR.
 *     Supply a default for the 'OUT' parameter based on object name.
@@ -317,6 +324,7 @@ c
       INTEGER STATUS
 * External references:
       INTEGER CHR_LEN                  ! CHR used-string-length function
+      BYTE    SCULIB_BITON             ! Turn on bit
 
 * Local Constants:
       REAL DIAMETER                    ! diameter of JCMT mirror
@@ -350,6 +358,8 @@ c
                                        ! Pointer to bolometer var end
       INTEGER          ABOL_VAR_PTR(MAX_FILE)
                                        ! Pointer to bolometer variance
+      BYTE             BADB            ! Bad bit mask for despiking
+      INTEGER          BITNUM          ! Bit set by DESPIKE
       LOGICAL          BOLREBIN        ! Am I rebinning bols separately?
       INTEGER          BOL_ADC (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
                                        ! A/D numbers of bolometers measured in
@@ -375,13 +385,8 @@ c
       INTEGER          COUNT           ! Number of ints in INTREBIN
       INTEGER          CURR_FILE       ! Current file in INTREBIN loop
       INTEGER          CURR_INT        ! Current int in INTREBIN loop
+      LOGICAL          DESPIKE         ! Is this the despike task
       LOGICAL          DOLOOP          ! Loop for input data
-      DOUBLE PRECISION DTEMP           ! scratch double
-      DOUBLE PRECISION DTEMP1          ! scratch double
-      INTEGER          DUMMY_ENDVAR_PTR (MAX_FILE)
-                                       ! Pointer to end of dummy var
-      INTEGER          DUMMY_VARIANCE_PTR (MAX_FILE)
-                                       ! Pointer to dummy variance
       INTEGER          EACHBOL         ! Bolometer loop counter
       INTEGER          FD              ! File descriptor
       INTEGER          FILE            ! number of input files read
@@ -393,7 +398,8 @@ c
       LOGICAL          HOURS           ! .TRUE. if the angle being read in is
                                        ! in units of hours rather than degrees
       INTEGER          I               ! DO loop index
-      CHARACTER*80     IN                 ! input filename and data-spec
+      INTEGER          IERR            ! For VEC copies
+      CHARACTER*80     IN              ! input filename and data-spec
       LOGICAL          INTREBIN        ! Am I rebinning ints separately?
       INTEGER          INT_LIST(MAX_FILE, SCUBA__MAX_INT + 1)
                                 ! Pointer to integration posns
@@ -407,6 +413,12 @@ c
                                        ! data from input files
       DOUBLE PRECISION IN_DEC_CEN(MAX_FILE)!apparent Dec of input file map centre
                                        ! (radians)
+      INTEGER          IN_QUALITY_END (MAX_FILE)
+                                       ! Pointer to end of scratch space
+                                       ! holding quality from input files
+      INTEGER          IN_QUALITY_PTR (MAX_FILE)
+                                       ! pointer to scratch space holding
+                                       ! data variance from input files
       DOUBLE PRECISION IN_RA_CEN(MAX_FILE)!apparent RA of input file map centre
                                        ! (radians)
       DOUBLE PRECISION IN_UT1(MAX_FILE)! UT1 at start of an input observation,
@@ -430,8 +442,10 @@ c
       DOUBLE PRECISION MJD_STANDARD    ! date for which apparent RA,Decs
                                        ! of all
                                        ! measured positions are calculated
+      INTEGER          NERR            ! For VEC copies
       INTEGER          NFILES          ! Number of files in INTREBIN/REBIN
       INTEGER          NPARS           ! Number of dummy pars
+      INTEGER          NSPIKES(MAX_FILE) ! Number of spikes per file
       INTEGER          NX_OUT          ! x dimension of output map
       INTEGER          NY_OUT          ! y dimension of output map
       INTEGER          N_BOL (MAX_FILE)! number of bolometers measured in input
@@ -469,6 +483,12 @@ c
       CHARACTER * (PAR__SZNAM) PARAM   ! Name of input parameter
       INTEGER          PLACE           ! Place holder for output NDF
       LOGICAL          READING         ! .TRUE. while reading input files
+      BYTE             QBITS(MAX_FILE) ! BADBITS for each input file
+      LOGICAL          QMF             ! .false. = return quality array
+                                       ! .true.= return masked data
+                                       ! This is used in NDF_SQMF. Rebinning
+                                       ! data should use .true.
+      INTEGER          QPTR            ! Pointer to mapped output quality
       INTEGER          RLEV            ! Recursion depth for reading
       REAL             RTEMP           ! Scratch real
       REAL             SFACTOR         ! Smoothing factor for spline PDA_SURFIT
@@ -484,6 +504,7 @@ c
       CHARACTER*80     STEMP           ! scratch string
       CHARACTER*15     SUB_INSTRUMENT  ! the sub-instrument used to make the
                                        ! maps
+      CHARACTER * (10) SUFFIX_STRINGS(SCUBA__N_SUFFIX) ! Suffix for OUT
       CHARACTER*15     SUTDATE         ! date of first observation
       CHARACTER*15     SUTSTART        ! UT of start of first observation
       INTEGER          TOT(MAX_FILE)   ! Number of integrations per input file
@@ -495,15 +516,14 @@ c
       REAL             WAVELENGTH      ! the wavelength of the map (microns)
       REAL             WEIGHT (MAX_FILE)
                                        ! weights assigned to each input file
-      DOUBLE PRECISION XMAX            ! max of map offsets
-      DOUBLE PRECISION XMIN            ! min of map offsets
-      DOUBLE PRECISION YMAX            ! max of map offsets
-      DOUBLE PRECISION YMIN            ! min of map offsets
       INTEGER          WEIGHTSIZE      ! Radius of weighting function
       REAL             WTFN (WTFNRAD * WTFNRAD * WTFNRES * WTFNRES + 1)
                                        ! Weighting function
 
 * Local data:
+
+      DATA SUFFIX_STRINGS /'_dsp','d'/ ! Used for DESPIKE
+
 
 *-
 
@@ -515,6 +535,9 @@ c
 *     Initialize
       INTREBIN = .FALSE.
       BOLREBIN = .FALSE.
+      DESPIKE  = .FALSE.
+      QMF = .TRUE.
+
 
 * Setup taskname (can never have BOLREBIN and INTREBIN)
 
@@ -522,13 +545,10 @@ c
          BOLREBIN = .TRUE.
       ELSE IF (TSKNAME .EQ. 'INTREBIN') THEN
          INTREBIN = .TRUE.
+      ELSE IF (TSKNAME .EQ. 'DESPIKE') THEN
+         DESPIKE = .TRUE.
+         QMF = .FALSE.
       END IF
-
-* Make sure the Pointers really are 0
-
-      DO I = 1, MAX_FILE
-         DUMMY_VARIANCE_PTR(I) = 0
-      END DO
 
 *     Set the MSG output level (for use with MSG_OUTIF)
       CALL MSG_IFGET('MSG_FILTER', STATUS)
@@ -540,6 +560,12 @@ c
          CALL MSG_SETC('PKG', PACKAGE)
          CALL MSG_OUTIF(MSG__NORM, ' ', '^PKG: Extracting data and'//
      :        ' position information', STATUS)
+
+      ELSE IF (TSKNAME .EQ. 'DESPIKE') THEN
+
+         CALL MSG_SETC('PKG', PACKAGE)
+         CALL MSG_OUTIF(MSG__VERB, ' ', '^PKG: Despiking data',
+     :        STATUS)
 
       ELSE
 
@@ -686,6 +712,7 @@ c
      :           BOL_RA_PTR, BOL_RA_END, BOL_DEC_PTR, 
      :           BOL_DEC_END, IN_DATA_PTR, IN_DATA_END, 
      :           IN_VARIANCE_PTR, IN_VARIANCE_END,
+     :           QMF, IN_QUALITY_PTR, IN_QUALITY_END, QBITS,
      :           INT_LIST, WEIGHT, SHIFT_DX, 
      :           SHIFT_DY, NPARS, PARS,
      :           STATUS)
@@ -776,6 +803,7 @@ c
          END IF
       END IF
 
+
 *     Nasmyth rebin doesn't need a coordinate frame
 *     Should only get through here if I am trying to rebin NA or AZ
 *     with SCAN data
@@ -789,32 +817,6 @@ c
          CALL SCULIB_CALC_OUTPUT_COORDS (OUT_RA_CEN, OUT_DEC_CEN, 
      :        MJD_STANDARD, OUT_COORDS, OUT_LONG, OUT_LAT, STATUS)
 
-         IF (STATUS .EQ. SAI__OK) THEN
-            IF (HOURS) then
-               CALL SLA_DR2TF (2, OUT_LONG, SIGN, HMSF)
-                  
-               STEMP = SIGN
-               WRITE (STEMP(2:3),'(I2.2)') HMSF(1)
-               STEMP (4:4) = ' '
-               WRITE (STEMP(5:6),'(I2.2)') HMSF(2)
-               STEMP (7:7) = ' '
-               WRITE (STEMP(8:9),'(I2.2)') HMSF(3)
-               STEMP (10:10) = '.'
-               WRITE (STEMP(11:12),'(I2.2)') HMSF(4)
-            ELSE
-               CALL SLA_DR2AF (1, OUT_LONG, SIGN, HMSF)
-               
-               STEMP = SIGN
-               WRITE (STEMP(2:4), '(I3.3)') HMSF(1)
-               STEMP (5:5) = ' '
-               WRITE (STEMP(6:7), '(I2.2)') HMSF(2)
-               STEMP (8:8) = ' '
-               WRITE (STEMP(9:10), '(I2.2)') HMSF(3)
-               STEMP (11:11) = '.'
-               WRITE (STEMP(12:12), '(I1.1)') HMSF(4)
-            END IF
-         END IF
-
 *     Inform the 'RD' regridder the date of regrid
 
          IF (OUT_COORDS .EQ. 'RD') THEN
@@ -826,55 +828,92 @@ c
      :           'apparent RA,Dec at ^UTSTART on ^UTDATE', STATUS)
          END IF
 
-*     Ask for long and lat of output image
 
-         CALL PAR_DEF0C ('LONG_OUT', STEMP, STATUS)
-         CALL PAR_GET0C ('LONG_OUT', STEMP, STATUS)
-         
-         IF (STATUS .EQ. SAI__OK) THEN
-            ITEMP = 1
-            CALL SLA_DAFIN (STEMP, ITEMP, OUT_LONG, STATUS)
-            IF (STATUS .NE. 0) THEN
-               STATUS = SAI__ERROR
-               CALL MSG_SETC('TASK', TSKNAME)
-               CALL ERR_REP (' ', '^TASK: error reading '//
-     :              'output centre longitude - it must be in '//
-     :              '5 10 34.6 format', STATUS)
-            ELSE
-               IF (HOURS) THEN
-                  OUT_LONG = OUT_LONG * 15.0D0
+*     If we are just despiking we don't need to ask about the
+*     coordinates
+
+         IF (.NOT.DESPIKE) THEN
+
+            IF (STATUS .EQ. SAI__OK) THEN
+               IF (HOURS) then
+                  CALL SLA_DR2TF (2, OUT_LONG, SIGN, HMSF)
+                  
+                  STEMP = SIGN
+                  WRITE (STEMP(2:3),'(I2.2)') HMSF(1)
+                  STEMP (4:4) = ' '
+                  WRITE (STEMP(5:6),'(I2.2)') HMSF(2)
+                  STEMP (7:7) = ' '
+                  WRITE (STEMP(8:9),'(I2.2)') HMSF(3)
+                  STEMP (10:10) = '.'
+                  WRITE (STEMP(11:12),'(I2.2)') HMSF(4)
+               ELSE
+                  CALL SLA_DR2AF (1, OUT_LONG, SIGN, HMSF)
+                  
+                  STEMP = SIGN
+                  WRITE (STEMP(2:4), '(I3.3)') HMSF(1)
+                  STEMP (5:5) = ' '
+                  WRITE (STEMP(6:7), '(I2.2)') HMSF(2)
+                  STEMP (8:8) = ' '
+                  WRITE (STEMP(9:10), '(I2.2)') HMSF(3)
+                  STEMP (11:11) = '.'
+                  WRITE (STEMP(12:12), '(I1.1)') HMSF(4)
                END IF
             END IF
-         END IF
 
-         IF (STATUS .EQ. SAI__OK) THEN
-            CALL SLA_DR2AF (1, OUT_LAT, SIGN, HMSF)
-            
-            STEMP = SIGN
-            WRITE (STEMP(3:4),'(I2.2)') HMSF(1)
-            STEMP (5:5) = ' '
-            WRITE (STEMP(6:7),'(I2.2)') HMSF(2)
-            STEMP (8:8) = ' '
-            WRITE (STEMP(9:10),'(I2.2)') HMSF(3)
-            STEMP (11:11) = '.'
-            WRITE (STEMP(12:12), '(I1.1)') HMSF(4)
-         END IF
-            
-         CALL PAR_DEF0C ('LAT_OUT', STEMP, STATUS)
-         CALL PAR_GET0C ('LAT_OUT', STEMP, STATUS)
 
-         IF (STATUS .EQ. SAI__OK) THEN
-            ITEMP = 1
-            CALL SLA_DAFIN (STEMP, ITEMP, OUT_LAT, STATUS)
-            IF (STATUS .NE. 0) THEN
-               STATUS = SAI__ERROR
-               CALL MSG_SETC('TASK', TSKNAME)
-               CALL ERR_REP (' ', '^TASK: error reading '//
-     :              'output centre latitude -  it must be in '//
-     :              '-30 13 56.4 format', STATUS)
+*     Ask for long and lat of output image
+
+
+            CALL PAR_DEF0C ('LONG_OUT', STEMP, STATUS)
+            CALL PAR_GET0C ('LONG_OUT', STEMP, STATUS)
+         
+            IF (STATUS .EQ. SAI__OK) THEN
+               ITEMP = 1
+               CALL SLA_DAFIN (STEMP, ITEMP, OUT_LONG, STATUS)
+               IF (STATUS .NE. 0) THEN
+                  STATUS = SAI__ERROR
+                  CALL MSG_SETC('TASK', TSKNAME)
+                  CALL ERR_REP (' ', '^TASK: error reading '//
+     :                 'output centre longitude - it must be in '//
+     :                 '5 10 34.6 format', STATUS)
+               ELSE
+                  IF (HOURS) THEN
+                     OUT_LONG = OUT_LONG * 15.0D0
+                  END IF
+               END IF
             END IF
+
+            IF (STATUS .EQ. SAI__OK) THEN
+               CALL SLA_DR2AF (1, OUT_LAT, SIGN, HMSF)
+               
+               STEMP = SIGN
+               WRITE (STEMP(3:4),'(I2.2)') HMSF(1)
+               STEMP (5:5) = ' '
+               WRITE (STEMP(6:7),'(I2.2)') HMSF(2)
+               STEMP (8:8) = ' '
+               WRITE (STEMP(9:10),'(I2.2)') HMSF(3)
+               STEMP (11:11) = '.'
+               WRITE (STEMP(12:12), '(I1.1)') HMSF(4)
+            END IF
+            
+            CALL PAR_DEF0C ('LAT_OUT', STEMP, STATUS)
+            CALL PAR_GET0C ('LAT_OUT', STEMP, STATUS)
+            
+            IF (STATUS .EQ. SAI__OK) THEN
+               ITEMP = 1
+               CALL SLA_DAFIN (STEMP, ITEMP, OUT_LAT, STATUS)
+               IF (STATUS .NE. 0) THEN
+                  STATUS = SAI__ERROR
+                  CALL MSG_SETC('TASK', TSKNAME)
+                  CALL ERR_REP (' ', '^TASK: error reading '//
+     :                 'output centre latitude -  it must be in '//
+     :                 '-30 13 56.4 format', STATUS)
+               END IF
+            END IF
+
          END IF
 
+            
 *  calculate the apparent RA,Dec of the selected output centre
 
          CALL SCULIB_CALC_APPARENT (OUT_LONG, OUT_LAT, 0.0D0, 0.0D0,
@@ -955,6 +994,131 @@ c
 
 *     Close the file
          CALL FIO_CANCL('FILE', STATUS)
+
+*     Time for despiking
+      ELSE IF (DESPIKE) THEN
+
+*     Call the despiking routines here
+
+
+*     Construct a N_PTS array containing the total number of data
+*     points for each map. This is calculated in a different place
+*     for REBIN and BOLREBIN but there doesn't seem to be much gain
+*     in doing this in the shared code.
+            
+            IF (STATUS .EQ. SAI__OK) THEN
+               DO I = 1, FILE
+                  N_PTS(I) = N_BOL(I) * N_POS(I)
+               END DO
+            END IF
+
+*     First we have to put the data into bins related to position
+*     Returns the 2-D array filled with pointers to the individual
+*     data values in a given bin
+
+*     Select the bit that is used for despiking
+
+            BITNUM = 4
+
+*     Bin and despike the data
+
+            CALL SURF_GRID_DESPIKE(FILE, N_PTS, N_POS, N_BOL, BITNUM,
+     :           WAVELENGTH, DIAMETER, BOL_RA_PTR, BOL_DEC_PTR, 
+     :           IN_DATA_PTR, IN_QUALITY_PTR, 
+     :           NX_OUT, NY_OUT, I_CENTRE, J_CENTRE, NSPIKES,
+     :           QBITS, STATUS)
+
+*     Look through NSPIKES and see whether any spikes were detected
+*     Report the number to the user. Do it here as I want to get the
+*     list before I start asking for output files
+
+            DO I = 1, FILE
+               IF (NSPIKES(I) .GT. 0) THEN
+
+                  CALL MSG_SETC('FILE', FILENAME(I))
+                  CALL MSG_SETI('NS', NSPIKES(I))
+                  CALL MSG_SETC('PKG', PACKAGE)
+                  CALL MSG_OUTIF(MSG__NORM, ' ', 
+     :                 '^PKG: ^NS spikes detected in file ^FILE',
+     :                 STATUS)
+               END IF
+            END DO
+
+*     Now we need to write the new quality data to an output file
+*     Do this by propogating everything from each input file
+*     and then copying in the new quality
+*     Currently the system does not support a change in the actual
+*     data values (because the data is changed when using scuba sections)
+*     This means that the user is asked for an output file for
+*     each input file. Also means that we now have to generate
+*     an output filename from the input
+
+            DO I = 1, FILE
+
+*     No point writing an output file if there were none.
+               IF (NSPIKES(I) .GT. 0) THEN
+
+*     Generate a default name for the output file
+                  CALL SCULIB_CONSTRUCT_OUT(FILENAME(I), SUFFIX_ENV, 
+     :                 SCUBA__N_SUFFIX,
+     :                 SUFFIX_OPTIONS, SUFFIX_STRINGS, OUT, STATUS)
+
+*     set the default
+                  CALL PAR_DEF0C('OUT', OUT, STATUS)
+
+*     Get an NDF identifier to the input file
+*     (could simply do a SYSTEM copy!)
+
+                  CALL NDF_FIND (DAT__ROOT, FILENAME(I), ITEMP, STATUS) 
+
+*     OK, propagate the input ndf to the output
+ 
+                  CALL NDF_PROP (ITEMP, 
+     :                 'Units,Axis,DATA,VARIANCE,Quality',
+     :                 'OUT', OUT_NDF, STATUS)
+
+*     Check status for NULL (ie didn't want to write a file)
+               
+                  IF (STATUS .EQ. PAR__NULL) THEN
+
+                     CALL ERR_ANNUL(STATUS)
+                     CALL NDF_ANNUL(ITEMP, STATUS)
+
+                  ELSE
+
+*     Annul the input
+                     CALL NDF_ANNUL(ITEMP, STATUS)
+
+*     Map the quality array
+
+                     CALL NDF_MAP(OUT_NDF, 'QUALITY', '_UBYTE', 'WRITE',
+     :                    QPTR, ITEMP, STATUS)
+                  
+*     Copy the new quality array
+
+                     CALL VEC_UBTOUB(.FALSE., N_POS(I) * N_BOL(I),
+     :                    %VAL(IN_QUALITY_PTR(I)), %VAL(QPTR), IERR,
+     :                    NERR, STATUS)
+
+*     Get and set the bad bits mask
+                     CALL NDF_BB(OUT_NDF, BADB, STATUS)
+                     BADB = SCULIB_BITON(BADB, 4)
+                     CALL NDF_SBB(BADB, OUT_NDF, STATUS)
+                  
+*     Close output
+               
+                     CALL NDF_UNMAP(OUT_NDF, 'QUALITY', STATUS)
+                     CALL NDF_ANNUL(OUT_NDF, STATUS)
+
+                  END IF
+
+*     Dont cancel the parameter if this is the last time round the loop
+*     This means that the HISTORY will contain some mention of this param
+                  IF (I .NE. FILE) CALL PAR_CANCL('OUT', STATUS)
+
+               END IF
+
+            END DO
 
       ELSE
 
@@ -1107,52 +1271,10 @@ c
 
 *     find the extent of the input data
 
-            XMAX = VAL__MIND
-            XMIN = VAL__MAXD
-            YMIN = VAL__MAXD
-            YMAX = VAL__MIND
+            CALL SURFLIB_CALC_OUTPUT_GRID(FILE, N_PTS, OUT_PIXEL,
+     :           ABOL_RA_PTR, ABOL_DEC_PTR, NX_OUT, NY_OUT,
+     :           I_CENTRE, J_CENTRE, STATUS)
 
-            IF (STATUS .EQ. SAI__OK) THEN
-               CALL SCULIB_RANGED (%val(ABOL_RA_PTR(1)), 1,
-     :              N_PTS(1), XMAX, XMIN)
-               CALL SCULIB_RANGED (%val(ABOL_DEC_PTR(1)), 1,
-     :              N_PTS(1), YMAX, YMIN)
-               
-               IF (FILE .GT. 1) THEN
-                  DO I = 1, FILE
-                     CALL SCULIB_RANGED (%val(ABOL_RA_PTR(I)), 1,
-     :                    N_PTS(I), DTEMP, DTEMP1)
-                     XMAX = MAX (XMAX,DTEMP)
-                     XMIN = MIN (XMIN,DTEMP1)
-                     CALL SCULIB_RANGED (%val(ABOL_DEC_PTR(I)), 1,
-     :                    N_PTS(I), DTEMP, DTEMP1)
-                     YMAX = MAX (YMAX,DTEMP)
-                     YMIN = MIN (YMIN,DTEMP1)
-                  END DO
-               END IF
-            END IF
-
-*     calculate the size of the output array and the position of the centre
-*     pixel. X increases to the left and lower pixel x index. The array is
-*     slightly oversized to allow edge effects to be countered during the
-*     convolution.
-
-            IF (OUT_PIXEL .GT. 0.0) THEN
-               NX_OUT = NINT (REAL(XMAX - XMIN) / OUT_PIXEL) + 10
-               NY_OUT = NINT (REAL(YMAX - YMIN) / OUT_PIXEL) + 10
-               I_CENTRE = NINT (REAL(XMAX) / OUT_PIXEL) + 5
-               J_CENTRE = NINT (REAL(-YMIN) / OUT_PIXEL) + 5
-            END IF
-
-            IF ((NX_OUT .GT. 1000) .OR. (NY_OUT .GT. 1000)) THEN
-               IF (STATUS .EQ. SAI__OK) THEN
-                  STATUS = SAI__ERROR
-                  CALL MSG_SETC('TASK', TSKNAME)
-                  CALL ERR_REP (' ', '^TASK: output map is too '//
-     :                 'big, having one or both dimensions greater '//
-     :                 'than 1000 pixels', STATUS)
-               END IF
-            END IF
 
 *     Now that the size of the map is determined we have to work out whether
 *     we are rebinning all integrations into one image (REBIN/BOLREBIN) or 
@@ -1384,8 +1506,11 @@ c
          CALL SCULIB_FREE ('BOL_DEC', BOL_DEC_PTR(I),
      :        BOL_DEC_END(I), STATUS)
 
-         CALL SCULIB_FREE ('DUMMY_VAR', DUMMY_VARIANCE_PTR(I),
-     :        DUMMY_ENDVAR_PTR(I), STATUS)
+         IF (.NOT.QMF) THEN
+            CALL SCULIB_FREE ('IN_QUALITY', IN_QUALITY_PTR(I),
+     :           IN_QUALITY_END(I), STATUS)
+         END IF
+
       END DO
 
 
