@@ -107,7 +107,7 @@ NDFIO *NDFIO::read( const char *filename, const char *component, int
                      &header_records, &ndfid, &error_mess ) ) {
 
     // Create the Mem object to hold the image data.
-    int tsize = width * height * abs( bitpix ) / 8;
+    int tsize = width * height * ( abs( bitpix ) / 8 );
     data = Mem( tsize, mem_options );
     indata = data.ptr();
 
