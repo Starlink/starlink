@@ -26,9 +26,9 @@
 *     jiggle. Each jiggle is analysed in turn. The average value can be
 *     calculated in two ways: either MEDIAN or MEAN.
 *
-*     After the calculation, the mean value removed from each jiggle is
-*     added back onto the data -- this should protect against removing
-*     flux from the data.
+*     After the calculation, the mean value removed from each jiggle
+*     can be added back onto the data -- this should protect against removing
+*     flux from MAP data.
 
 *  Usage:
 *     remsky in out
@@ -37,7 +37,10 @@
 *     ADD = LOGICAL (Read)
 *        If true the mean of the `sky' level that was removed from every 
 *        frame is added back onto the data after sky removal. This step should
-*        make sure that flux is not removed from the data.
+*        make sure that flux is not removed from the data. The default is
+*        for ADD to be true for MAPs and false for other modes (the assumption
+*        being that sky bolometers in PHOTOM observations are guaranteed to
+*        be on sky)
 *     BOLOMETERS = CHAR (Read)
 *        List of sky bolometers (either by number in the data file, or
 *        by id (eg H7,G3)), or by ring number (r0,r1, etc) or even
@@ -123,6 +126,9 @@
 *     3 Nov 1996: TIMJ
 *        Original version
 *     $Log$
+*     Revision 1.14  1997/11/30 01:12:15  timj
+*     Change it so that ADD is true for MAP but FALSE otherwise.
+*
 *     Revision 1.13  1997/11/27 20:08:12  timj
 *     Update documentation
 *
@@ -601,6 +607,15 @@
       END IF
 
 *     Find out if we want to add back the constant offset
+*     The default behaviour should depend on the observation 
+*     mode. If this is a MAP then add it on, else (ie for PHOTOM)
+*     do not add it unless asked.
+
+      IF (OBSERVING_MODE .EQ. 'MAP') THEN
+         CALL PAR_DEF0L('ADD', .TRUE., STATUS)
+      ELSE
+         CALL PAR_DEF0L('ADD',.FALSE., STATUS)
+      END IF
 
       CALL PAR_GET0L('ADD', ADD_BACK, STATUS)
 
