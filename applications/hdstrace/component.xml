@@ -8,7 +8,7 @@
   <description>HDSTRACE - Trace an HDS file</description>
   <abstract><p>
 Traces an HDS file
-  </abstract>
+  </p></abstract>
   <dependencies >
     <build>parsecon</build><build>dtask</build><build>fio</build><build>prm</build><build>par</build><build>sae</build><build>hds</build><sourceset>star2html</sourceset>
   </dependencies>

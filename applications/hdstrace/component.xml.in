@@ -8,7 +8,7 @@
   <description>HDSTRACE - Trace an HDS file</description>
   <abstract><p>
 Traces an HDS file
-  </abstract>
+  </p></abstract>
   <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
     @STAR_DEPENDENCIES_CHILDREN@
   </dependencies>
