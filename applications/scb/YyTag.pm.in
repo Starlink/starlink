@@ -53,8 +53,7 @@ sub dotag;
 #  Determine the location of the tagging binaries.  
 #  The following assignment is edited by the install script.
 
-my( $SCB_DIR ) = ".";
-my( $scb_dir ) = "$SCB_DIR";
+my( $scb_dir ) = "@bindir@";
 
 
 #  Define the functions to be used externally in terms of the generic 

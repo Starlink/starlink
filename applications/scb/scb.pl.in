@@ -1,4 +1,4 @@
-#!/stardev/Perl/bin/perl -w
+#! @PERL@ -w -I@bindir@
 
 #+
 #  Name:

@@ -93,15 +93,9 @@ sub cwd { $ENV{'PWD'} ||= Cwd::cwd }
 ########################################################################
 
 #  The capitalised variable names in this section may be replaced by
-#  environment variables or mk script variables by the makefile at 
-#  installation time.  The sequences "$VARIABLE_NAME" are substituted for 
-#  by sed(1), so it is important that the quoting syntax (in the pre-
-#  build files) is not modified in these assignments.  Since the mk 
-#  script/makefile modify these files at install time, if you are looking
-#  at the installed version of this script it may look confusing.
-#
-#  The script is written as a matter of convenience so that it works in 
-#  its pre-install form also, using default values.
+#  configure variables or mk script variables by autoconf at 
+#  configure time.  Since the configure modifies this file, if you are
+#  looking at the configured version of this script it may look confusing.
 #
 #  Some of the values determined by install-time environment variables
 #  (or pre-install defaults) can be overridden at run-time by environment 
@@ -109,36 +103,28 @@ sub cwd { $ENV{'PWD'} ||= Cwd::cwd }
 
 #  Starlink source tree directory locations.
 
-my $STARLINK = "/star"; 
-my $SCB_SOURCES = "$STARLINK/sources"; 
-
-my $star = "$STARLINK";
-$srcdir = $ENV{'SCB_SOURCES'} || "$SCB_SOURCES";
+my $star = "@STARLINK@";
+$srcdir = $ENV{'SCB_SOURCES'} || "@SCB_SOURCES@";
 $bindir = "$star/bin";
 $incdir = "$star/include";
 $docslisfile = "$star/docs/docs_lis";
 
 #  Temporary directory locations.
 
-my $SCB_BROWSER_TMP = "/usr/tmp/scb";
-my $SCB_INDEXER_TMP = "/usr/tmp/scbindex";
-$scb_tmpdir      = $ENV{'SCB_BROWSER_TMP'} || "$SCB_BROWSER_TMP";
-$scbindex_tmpdir = $ENV{'SCB_INDEXER_TMP'} || "$SCB_INDEXER_TMP";
+$scb_tmpdir      = $ENV{'SCB_BROWSER_TMP'} || "@SCB_BROWSER_TMP@";
+$scbindex_tmpdir = $ENV{'SCB_INDEXER_TMP'} || "@SCB_INDEXER_TMP@";
 
 #  System file locations.
 
-my $SCB_DIR = ".";
-$mimetypes_file = "$SCB_DIR" . "/mime.types"; 
+$mimetypes_file = "@bindir@" . "/mime.types"; 
 
 #  HTX server base URL
 
-my $HTX_SERVER = "http://star-www.rl.ac.uk/cgi-bin/htxserver";
-$htxserver = "$HTX_SERVER";
+$htxserver = "@HTX_SERVER@";
 
 #  Index file locations.
 
-my $SCB_INDEX = cwd;
-$indexdir = $ENV{'SCB_INDEX'} || "$SCB_INDEX" || cwd;
+$indexdir = $ENV{'SCB_INDEX'} || "@SCB_INDEX@" || cwd;
 
 #  Names of indexes (independent name spaces).
 #     By adding entries to this list, additional name spaces for indexing 

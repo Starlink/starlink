@@ -1,0 +1,62 @@
+#+
+#  Name:
+#     scb.csh
+#
+#  Purpose:
+#     Start the SCB system from the Unix shell.
+#
+#  Type of module:
+#     C shell script
+#
+#  Invocation:
+#     source scb.csh
+#
+#  Description:
+#     This procedure starts the SCB system for use from the C shell by 
+#     setting aliases for the commands it provides and setting up some 
+#     environment variables.
+#
+#  Authors:
+#     MBT: Mark Taylor (STARLINK)
+#
+#  History:
+#     08-DEC-1999 (MBT):
+#        Initial revision.
+#     07-JUL-2004 (MBT):
+#        Modified for preprocessing by configure script.
+#-
+
+#  The following environment variable assignments are edited by the 
+#  configure script.
+      setenv STARLINK "@STARLINK@"
+      setenv SCB_INDEX "@SCB_INDEX@"
+      setenv SCB_SOURCES "@SCB_SOURCES@"
+      setenv SCB_BROWSER_TMP "@SCB_BROWSER_TMP@"
+      setenv SCB_INDEXER_TMP "@SCB_INDEXER_TMP@"
+      setenv HTX_SERVER "@HTX_SERVER@"
+      setenv SCB_DIR "@bindir@"
+
+#  Now set the aliases for the commands.
+      alias scb '$SCB_DIR/scb.pl'
+      alias scbindex '$SCB_DIR/scbindex.pl'
+      alias dbmcat '$SCB_DIR/dbmcat.pl'
+      alias scbcp '$SCB_DIR/scbcp.pl'
+      alias ctag '$SCB_DIR/ctag'
+      alias ftag '$SCB_DIR/ftag'
+
+#  Indicate that the SCB commands are available.
+#  This startup message is a bit on the verbose side, but you might want
+#  different settings of the environment variables for different 
+#  occasions, so it's as well to be reminded of the values of the more
+#  important ones.
+      echo " "
+      echo "   Source Code Browser (SCB) version @PACKAGE_VERSION@.  See SUN/225 for help."
+      echo " "
+      echo "   Environment variable settings:"
+      echo "      SCB_INDEX         $SCB_INDEX"
+      echo "      SCB_SOURCES       $SCB_SOURCES"
+      echo "      SCB_BROWSER_TMP   $SCB_BROWSER_TMP"
+      echo "      SCB_INDEXER_TMP   $SCB_INDEXER_TMP"
+      echo " "
+
+# $Id$
