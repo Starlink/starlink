@@ -100,13 +100,21 @@
       CALL COF_MXMN<T>( BAD, EL, ARRAY, NINVAL, MAXV, MINV, MAXPOS,
      :                   MINPOS, STATUS )
 
+      IF ( MAXV .NE. MINV ) THEN
+
 *  Derive the scale factor by differencing the simultaneous equations.
 *  Note the halving is done to prevent overflows.  Try to defeat the
 *  optimiser too.
-      SCALE = 0.5D0 * ( NUM_<T>TOD( MAXV ) - NUM_<T>TOD( MINV ) )
-      SCALE = SCALE / ( ( 0.5D0 * MAXVAL ) - ( 0.5D0 * MINVAL ) )
+         SCALE = 0.5D0 * ( NUM_<T>TOD( MAXV ) - NUM_<T>TOD( MINV ) )
+         SCALE = SCALE / ( ( 0.5D0 * MAXVAL ) - ( 0.5D0 * MINVAL ) )
 
 *  Derive the offset.
-      OFFSET = NUM_<T>TOD( MAXV ) - SCALE * MAXVAL
+         OFFSET = NUM_<T>TOD( MAXV ) - SCALE * MAXVAL
+
+*  Assign sensible values for a constant image.
+      ELSE
+         SCALE = 1.0D0
+         OFFSET = 0.0D0
+      END IF
 
       END
