@@ -5,10 +5,10 @@
 #     scb.pl
 
 #  Purpose:
-#     Generate HTML listing of a Starlink source code file.
+#     Generate listing of a Starlink source code file.
 
 #  Language:
-#     Perl
+#     Perl 5
 
 #  Description:
 #     This script extracts the source code for a routine in the USSC.  
@@ -37,19 +37,40 @@
 
 #-
 
-#  Required libraries.
+#  Index file location.
 
-use Fcntl;
-use SDBM_File;
-use libscb.pl;
+$indexfile = "/local/devel/scb/index";
 
 #  Directory locations.
 
 $tmpdir = "/local/junk/scb";         # scratch directory
 
+#  Name of this program relative to this program.
+
+$scb = 'scb.pl';
+
+#  Required libraries.
+
+use Fcntl;
+use SDBM_File;
+use libscb;
+
+#  Declarations.
+
+sub extract_file;
+sub output;
+sub error;
+sub header;
+
+#  Determine operating environment.
+
+$cgi = 1;
+$html = $cgi;
+
 #  Name of source module to locate.
 
 $module = $ARGV[0];
+$module =~ s/^module=//;
 
 #  Open index file, tied to index hash %locate.
 
@@ -58,17 +79,18 @@ tie %locate, SDBM_File, $indexfile, O_RDONLY, 0644;
 #  Set locations of logical names appearing in logical paths.
 #  It may be desirable to override these if the database has been moved.
 
-$basedir{'SOURCE'}  = $location{'#SOURCE'};
-$basedir{'INCLUDE'} = $location{'#INCLUDE'};
+$basedir{'SOURCE'}  = $locate{'#SOURCE'};
+$basedir{'INCLUDE'} = $locate{'#INCLUDE'};
 
 #  Set up scratch directory.
 
-system "mkdir -p $tmpdir" and die "Failed to mkdir $tmpdir: $?\n";
-chdir $tmpdir             or  die "Failed to enter $tmpdir\n";
+system "mkdir -p $tmpdir" and error "Failed to mkdir $tmpdir: $?";
+chdir $tmpdir             or  error "Failed to enter $tmpdir";
 
 #  Get logical path name from database.
 
 $location = $locate{$module};
+error "Failed to find $module; index may be outdated." unless $location;
 
 #  Substitute in base directory name.
 
@@ -88,18 +110,150 @@ exit;
 
 sub extract_file {
 
+#  This routine takes as argument the logical path name of a file, 
+#  and, by calling itself recursively to extract files from tar 
+#  archives, finishes by calling routine 'output' with a filename
+#  (possibly relative to the current directory) containing the 
+#  requested module.
+
 #  Arguments.
 
    my $location = shift;
 
    $location =~ /^([^>]+)>?([^>]*)(>?.*)$/;
    ($file, $tarcontents, $tail) = ($1, $2, $3);
-   if ($tarfile) {
+   if ($tarcontents) {
       tarxf $file, $tarcontents;
       extract_file "$tarcontents$tail";
+      unlink $tarcontents;
    }
    else {
       output $file;
    }
 }
+
+
+sub output {
+
+#  Arguments.
+
+   my $file = shift;
+
+#  Open module source file.
+
+   open FILE, $file 
+      or error "Failed to open $file - index may be outdated.";
+
+#  Output appropriate header text.
+
+   header $file;
+   print "<pre>\n" if ($html);
+
+   my ($body, $name, @names, $include, $sub);
+   while (<FILE>) {
+      if ($html) {
+
+#        Identify active part of line.
+
+         $body = /^[cC*]/ ? '' : $_;     #  Ignore comments.
+         if ($body) {
+            $body =~ s/^......//;        #  Discard first six characters.
+            $body =~ s/!.*//;            #  Discard inline comments.
+            $body =~ s/\s//g;             #  Discard spaces.
+            $body =~ y/a-z/A-Z/;         #  Fold to upper case.
+         }
+
+#        Substitute for HTML meta-characters.
+
+         s%>%&gt;%g;
+         s%<%&lt;%g;
+
+         if ($body) {
+
+#           Identify and deal with lines beginning modules.
+
+            if ($name = module_name) {
+
+#              Embolden module name.
+
+               s%($name)%<b>$1</b>%;
+
+#              Add anchors (multiple ones if generic function).
+
+               @names = ($name);
+               if ($name =~ /^(.*)&gt;T&lt;(.*)/) {
+                  ($g1, $g2) = ($1, $2);
+                  @names = map { "$g1$_$g2" } qw/I R D L C B UB W UW/; 
+               }
+               foreach $name (@names) {
+                  s/^/<a name='$name'>/;
+               }
+
+            }
+
+#           Identify and deal with fortran includes.
+
+            if ($body =~ /\bINCLUDE['"]([^'"]+)['"]/) {
+               $include = $1;
+               s%$include%<a href='$scb?$include'>$include</a>%;
+            }
+
+#           Identify and deal with fortran subroutine calls.
+
+            if ($body =~ /\bCALL([A-Z0-9_]+)[^=]*$/) {
+               $sub = $1;
+               s%$sub%<a href='$scb?$sub#$sub'>$sub</a>%;
+            }
+
+         }
+      }
+
+#     Output (modified or unmodified) line of source.
+
+      print;
+   }
+   close FILE;
+
+#  Output appropriate footer text.
+
+   print "</pre>\n</body>\n</html>\n" if ($html);
+
+}
+
+
+sub error {
+
+#  Arguments.
+
+   my $message = shift;
+
+   if ($html) {
+      header "Error";
+      print "<h1>Error</h1>\n";
+      print "$message\n";
+      print "</body>\n</html>\n";
+   }
+   else {
+      die "$message\n";
+   }
+}
+
+
+sub header {
+
+#  Arguments.
+
+   my $title = shift;
+
+   if ($cgi) {
+      print "Content-type: text/html\n\n";
+   }
+   if ($html) {
+      print "<html>\n";
+      print "<head><title>$title</title></head>\n";
+      print "<body>\n";
+   }
+}
+
+
 
