@@ -238,6 +238,8 @@ int main(int argc, char *argv[])
 {
   PGbind *pg=NULL;     /* pgbind state container */
   int waserr = 0;      /* True after any error */
+
+
 /*
  * Create a new PGbind container.
  */
@@ -254,6 +256,8 @@ int main(int argc, char *argv[])
   } else {
     waserr = parse_file(pg, NULL);
   };
+
+  
 /*
  * Clean up.
  */
@@ -531,7 +535,7 @@ static PGbind *new_PGbind(int argc, char **argv)
     };
   };
 /*
- * The remaining arguments must be the names of PGPLOT routine files.
+ * The remainwrite_prototypeing arguments must be the names of PGPLOT routine files.
  */
   pg->files = argv + i;
 /*
@@ -878,11 +882,13 @@ static int decode_prototype(Lex *lex, Function *fn)
 static int write_prototype(FILE *hfile, Function *fn)
 {
   int i;
+  
+
   if(hfile) {
 /*
  * Write the type and function name and introduce the argument list.
  */
-    fprintf(hfile, "%s %s(", type_name(fn->type), fn->name);
+    fprintf(hfile, "%s %s(", type_name(fn->type), "cpgplot");
 /*
  * Write the function arguments.
  */
@@ -924,14 +930,17 @@ static int write_wrapper(Sysattr *sys, Function *fn)
 /*
  * Compose the wrapper file name.
  */
-  sprintf(buffer, "%s.c", fn->name);
+  sprintf(buffer, "%s.c", "pgbind_generated");
 /*
  * Open the wrapper file.
  */
-  if((wfile = fopen(buffer, "w")) == NULL) {
+
+  if((wfile = fopen(buffer, "a")) == NULL) {
     fprintf(stderr, "%s: Can't open output wrapper file: %s\n", prgnam, buffer);
     return 1;
   };
+  
+  
 /*
  * Allow prototype vs. function definition checking by including the
  * library header file.
@@ -1173,10 +1182,12 @@ static int write_wrapper(Sysattr *sys, Function *fn)
 /*
  * Close the wrapper file.
  */
+
   if(fclose(wfile)) {
     fprintf(stderr, "%s: Error closing wrapper file: %s.c\n", prgnam, fn->name);
     return 1;
   };
+  
   return 0;
 }
 
