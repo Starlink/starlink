@@ -81,7 +81,7 @@ $VERSION = '1.44';
 			dat_ncomp dat_new dat_new0c dat_new0d dat_new0i
 			dat_new0l dat_new0r dat_new1c dat_new1d dat_new1i
 			dat_new1l dat_new1r dat_newc dat_paren dat_prec
-			dat_prim dat_prmry dat_put0c dat_put0d dat_put0d
+			dat_prim dat_prmry dat_put0c dat_put0d dat_put0i
 			dat_put0l dat_put0r dat_put1d dat_put1i dat_put1r
 			dat_put1c dat_putc dat_putd dat_puti dat_putr dat_putvc
 			dat_putvd dat_putvi
@@ -1170,7 +1170,7 @@ dat_len dat_map dat_mapc dat_mapd dat_mapi dat_mapl dat_mapr dat_mapv
 dat_mould dat_move dat_msg dat_name dat_ncomp dat_new dat_new0c
 dat_new0d dat_new0i dat_new0l dat_new0r dat_new1c dat_new1d dat_new1i
 dat_new1l dat_new1r dat_newc dat_paren dat_prec dat_prim dat_prmry
-dat_put0c dat_put0d dat_put0d dat_put0l dat_put0r dat_put1c dat_put1d
+dat_put0c dat_put0d dat_put0i dat_put0l dat_put0r dat_put1c dat_put1d
 dat_put1i dat_put1r dat_putd dat_puti dat_putr dat_putvc dat_putvd
 dat_putvi dat_putvr dat_ref dat_refct dat_renam dat_reset dat_retyp
 dat_shape dat_size dat_slice dat_state dat_struc dat_temp dat_there

@@ -1,3 +1,7 @@
+2003-03-19  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* NDF.pm: Forgot to export dat_put0i 
+
 2003-03-07  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* NDF.xs: dat_cell had a return value that was marked for input.
