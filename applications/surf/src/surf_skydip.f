@@ -104,6 +104,9 @@
 *  History :
 *     $Id$
 *     $Log$
+*     Revision 1.19  1997/07/19 00:26:49  timj
+*     Change SEARCH_DATADIR so that it passes PACKAGE.
+*
 *     Revision 1.18  1997/07/19 00:23:22  timj
 *     Now can read REDUCE_SWITCH output.
 *     Uses SCULIB_CALC_SKYDIP_TEMPS
@@ -343,7 +346,7 @@ c
 
       CALL NDF_BEGIN
 
-      CALL SCULIB_SEARCH_DATADIR('IN', IN_NDF, STATUS)
+      CALL SCULIB_SEARCH_DATADIR(PACKAGE, 'IN', IN_NDF, STATUS)
 
 *  get some general descriptive parameters of the observation
 
