@@ -144,7 +144,7 @@
         PARAMETER		( MAXIG = 2 )
 
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'AST2XSP Version 1.8-4' )
+        PARAMETER		( VERSION = 'AST2XSP Version 1.8-3' )
 
       INTEGER			XSP_OK
         PARAMETER		( XSP_OK = 0 )
@@ -354,7 +354,7 @@ C           ENDIF
         NIGNORE = 1
         IGSTART(1) = 1
         IGEND(1) = 4
-C 	CALL DAT_FIND(LOCSRT, 'TIME', LOCTIME, STATUS)
+	CALL DAT_FIND(LOCSRT, 'TIME', LOCTIME, STATUS)
 
 *  EXOSAT LE
       ELSE IF (INDEX(INSTMNT, 'LE') .GT. 0 ) THEN
