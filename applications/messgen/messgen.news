@@ -1,5 +1,17 @@
 1 MESSGEN
 
+ Messgen v1.2:
+
+   Assorted changes to fit in with requirements of the rules generated
+   by the version of automake patched for Starlink use:
+
+     Add -F option, to generate Fortran files with uppercase names
+     (thus FAC_ERR rather than fac_err)
+ 
+     Add -V option to write the names of generated files to stdout
+
+     Make -f and -F paths independent, so it's possible to specify both
+
  Messgen v1.1-2:
 
    Correction to include files for Linux case.
