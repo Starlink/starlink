@@ -2,9 +2,10 @@
 
 
 %{
-/*+
-* Name:
-*    ftag-l.l
+/*
+*+
+*  Name:
+*    ftok.l
 *
 *  Type of module:
 *     lex source
@@ -45,7 +46,7 @@
 *     26-NOV-1999 (MBT):
 *        Initial version.
 *     24-JAN-2000 (MBT):
-*        Adapted for use with inscnf.
+*        Adapted for use with EXTREME.
 *-
 */
 
@@ -53,6 +54,7 @@ void count();
 void munch();
 
 #include "ygen.h"
+#include "ftokens.h"
 
 %}
 
@@ -93,7 +95,7 @@ SPACE			[ \t]*
 
 %p 5000
 %a 5000
-%o 5000
+%o 6000
 
 %%
 
@@ -184,8 +186,15 @@ SPACE			[ \t]*
    with a token, add it to the encountered text string, since if it hasn't
    been associated with a token yet it will never be. */
       if ( preleng > 0 ) {
+         yyleng = preleng;
+         yylval = (char *) memok( malloc( yyleng + 1 ) );
+         strcpy( yylval, preval );
          preleng = 0;
          prealloc = 0;
+      }
+      else {
+         yyleng = 0;
+         yylval = NULL;
       }
 /* Return 1 to the caller. */
       return(1);
@@ -215,6 +224,7 @@ SPACE			[ \t]*
 /* Append preval and the matched text. */
       yyleng = preleng + strlen( yytext );
       yylval = (char *) memok( malloc( yyleng + 1 ) );
+      ymatchst = preleng;
       if ( preleng > 0 ) {
          strcpy( yylval, preval );
          strcat( yylval, yytext );
