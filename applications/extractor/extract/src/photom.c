@@ -9,7 +9,7 @@
 *
 *	Contents:	Compute magnitudes and other photometrical parameters.
 *
-*	Last modify:	24/01/2000
+*	Last modify:	11/02/2000
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -295,9 +295,9 @@ void  computeautoflux(picstruct *field, picstruct *dfield, picstruct *wfield,
           r1 += sqrt(r2)*pix;
           v1 += pix;
           }
+        else
+          areab++;
         }
-      else
-        areab++;
       }
     }
 

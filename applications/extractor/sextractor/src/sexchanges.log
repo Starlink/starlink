@@ -9,7 +9,7 @@
 *
 *       Contents:       log of changes made to the SExtractor source
 *
-*       Last modify:    13/11/99
+*       Last modify:    11/02/2000
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -327,3 +327,7 @@ EB      01/02/2000      localback()     Fixed division by zero in local backgrou
 					detections in MASK_TYPE CORRECT mode.
 EB      03/02/2000      makeback()      Risk of segmentation fault with huge weight
                                         maps fixed.
+
+EB      11/02/2000      computeautoflux()
+                                        Wrong version of photom.c in release V2.1.5
+                                        fixed.
