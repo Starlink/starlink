@@ -1,5 +1,5 @@
-      SUBROUTINE COF_WNDFH( NDF, COMP, FUNIT, NFLAGS, BITPIX, CMPTHE,
-     :                      STATUS )
+      SUBROUTINE COF_WNDFH( NDF, COMP, FUNIT, NFLAGS, BITPIX, ORIGIN,
+     :                      CMPTHE, STATUS )
 *+
 *  Name:
 *     COF_WNDFH
@@ -12,7 +12,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL COF_WNDFH( NDF, COMP, FUNIT, NFLAGS, BITPIX, CMPTHE, STATUS )
+*     CALL COF_WNDFH( NDF, COMP, FUNIT, NFLAGS, BITPIX, ORIGIN, CMPTHE,
+*                     STATUS )
 
 *  Description:
 *     This routine writes the mandatory and the optional but reserved
@@ -53,6 +54,8 @@
 *        file.  It should be set to 6.
 *     BITPIX = INTEGER (Given)
 *        The BITPIX value for the output FITS file.
+*     ORIGIN = CHARACTER * ( * ) (Given)
+*        The value of the ORIGIN card.
 *     CMPTHE( NFLAGS ) = LOGICAL (Returned)
 *        The flags when set to true indicate that certain optional NDF
 *        components have been used to write descriptors to the NDF.
@@ -72,6 +75,8 @@
 *     1996 September 16 (MJC):
 *        Corrected usage of CTYPEn (was CRTYPEn) and introduced CUNITn
 *        for axis units.  Write CRPIXn. 
+*     1998 January 5 (MJC):
+*        Added ORIGIN argument.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -94,6 +99,7 @@
       INTEGER   NFLAGS            ! Number of flags to indicate
                                   ! presence of certain components
       INTEGER   BITPIX            ! Bits per pixel
+      CHARACTER * ( * ) ORIGIN    ! The value of the ORIGIN card
 
 *  Arguments Returned:
       LOGICAL   CMPTHE( NFLAGS )
@@ -539,17 +545,17 @@
          GOTO 999
       END IF
 
-*  Write a default ORIGIN card.
-*  ============================
-      CALL FTPKYS( FUNIT, 'ORIGIN', 'Starlink Project, U.K.',
+*  Write an ORIGIN card.
+*  =====================
+      CALL FTPKYS( FUNIT, 'ORIGIN', ORIGIN,
      :             'Origin of this FITS file', FSTAT )
 
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.
       IF ( FSTAT .GT. FITSOK ) THEN
          CALL COF_FIOER( FSTAT, 'COF_WNDFH_ERR4', 'FTPKYS',
-     :                    'Error writing the ORIGIN header card.',
-     :                    STATUS )
+     :                   'Error writing the ORIGIN header card.',
+     :                   STATUS )
          GOTO 999
       END IF
 
