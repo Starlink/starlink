@@ -113,7 +113,7 @@ itcl::class gaia::GaiaHduChooser {
       }
       return $fname
    }
-   
+
    #  Configuration options: (public variables)
    #  ----------------------
 

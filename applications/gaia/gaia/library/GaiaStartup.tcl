@@ -180,6 +180,7 @@ itcl::class gaia::GaiaStartup {
    #  Set defaults for widget states.
    protected method set_defaults_ {} {
       set values_($this,extended_precision) 0
+      set values_($this,show_hdu_chooser) 1
       set values_($this,float_panel) 0
       set values_($this,with_zoom_window) 1
       set values_($this,with_pan_window) 1
@@ -198,10 +199,11 @@ itcl::class gaia::GaiaStartup {
    #  Update the properties object to the local values and cause a
    #  save to backing store.
    protected method save_properties_ {} {
-      foreach key "extended_precision float_panel with_zoom_window \
-                   with_pan_window with_colorramp focus_follows_mouse \
-                   scrollbars transient_tools quiet_exit min_scale max_scale \
-                   zoom_factor default_cmap default_itt" {
+      foreach key "extended_precision show_hdu_chooser float_panel \
+                   with_zoom_window with_pan_window with_colorramp \
+                   focus_follows_mouse scrollbars transient_tools \
+                   quiet_exit min_scale max_scale zoom_factor \
+                   default_cmap default_itt" {
          $props_ set_named_property Gaia $key $values_($this,$key)
       }
       $props_ save_properties
@@ -213,6 +215,8 @@ itcl::class gaia::GaiaStartup {
       if { $itk_option(-image) != {} } {
          $itk_option(-image) configure -extended_precision \
             $values_($this,extended_precision)
+         $itk_option(-image) configure -show_hdu_chooser \
+            $values_($this,show_hdu_chooser)
       }
       if { $itk_option(-gaia) != {} } {
          $itk_option(-gaia) configure -transient_tools \
@@ -339,6 +343,18 @@ itcl::class gaia::GaiaStartup {
       add_short_help $itk_component(precision) \
          {Display milli-arcsecond resolution in readouts}
       pack $itk_component(precision) -side top -fill x
+
+      #  Show HDU chooser by default
+      itk_component add hduchooser {
+         StarLabelCheck $w_.hduchooser \
+            -text "Show HDU chooser:" \
+            -onvalue 1 -offvalue 0 \
+            -labelwidth $lwidth \
+            -variable [scope values_($this,show_hdu_chooser)]
+      }
+      add_short_help $itk_component(hduchooser) \
+         {Show the HDU chooser, by default, when loading multiextension images}
+      pack $itk_component(hduchooser) -side top -fill x
 
       #  Minimum zoom scale.
       itk_component add minscale {

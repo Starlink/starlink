@@ -820,20 +820,29 @@ itcl::class gaia::GaiaImageCtrl {
 
    #  Update the popup window listing the HDUs in the current image
    #  Override to select between the FITS and NDF versions of this
-   #  window.
+   #  window and to allow for this window to be not shown (useful for
+   #  remote control).
    public method update_fits_hdus {} {
+
+      if { ! $itk_option(-show_hdu_chooser) } {
+
+         # Only need control if created already by the user.
+         if { ! [winfo exists $w_.ndfhdu] && ! [winfo exists $w_.hdu] } {
+            return
+         }
+      }
       if { [$image_ isfits] } {
 
          #  Displaying FITS now, if NDF last time remove popup.
          if { [winfo exists $w_.ndfhdu] } {
-            after idle "destroy $w_.ndfhdu"
+            after idle [code destroy $w_.ndfhdu]
          }
          SkyCatCtrl::update_fits_hdus
       } else {
 
          #  Displaying NDF now, if FITS last time remove popup.
          if { [winfo exists $w_.hdu] } {
-            after idle "destroy $w_.hdu"
+            after idle [code destroy $w_.hdu]
          }
 
          #  Get number of HDUs.
@@ -844,9 +853,9 @@ itcl::class gaia::GaiaImageCtrl {
          #  Display and hide window automatically as needed.
          if { [winfo exists $w_.ndfhdu] } {
             if { $n > 1 } {
-               after idle [code catch {$w_.ndfhdu show_hdu_list}]
+               after idle [code $w_.ndfhdu show_hdu_list]
             } else {
-               after idle "destroy $w_.ndfhdu"
+               after idle [code destroy $w_.ndfhdu]
             }
          } else {
             #  If there is more than one HDU, display the HDU select
@@ -984,6 +993,10 @@ itcl::class gaia::GaiaImageCtrl {
       Extended_Precision 0 {
          set_readout_precision_
       }
+
+   #  Whether to attempt to show and control the HDU chooser. If 0
+   #  then control is only attempted when the HDU already exists.
+   itk_option define -show_hdu_chooser show_hdu_chooser Show_Hdu_Chooser 1
 
    #  Protected variables:
    #  ====================

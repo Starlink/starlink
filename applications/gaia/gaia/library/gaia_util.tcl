@@ -92,3 +92,15 @@ proc option_dialog {realmsg optionmsg optioncommand optionstate {parent ""}} {
         -option_state $optionstate \
         -option_cmd $optioncommand] activate
 }
+
+#  Implement a GAIA version so we can inhibit the raise.
+proc gaiaReUseWidget {type w raise args} {
+   if {[winfo exists $w]} {
+      uplevel "$w config $args"
+      if { $raise } {
+         utilRaiseWindow $w
+      }
+   } else {
+      uplevel "$type $w $args"
+   }
+}

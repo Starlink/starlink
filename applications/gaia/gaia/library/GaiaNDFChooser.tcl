@@ -86,7 +86,7 @@ itcl::class gaia::GaiaNDFChooser {
 
    # This method is called after the options have been evaluated.
    protected method init {} {
-      wm title $w_ "NDFs ($itk_option(-number))"
+      wm title $w_ "Select NDF in container file ($itk_option(-number))"
       wm iconname $w_ "NDFs ($itk_option(-number))"
 
       #  Get internal image handle
@@ -267,6 +267,9 @@ itcl::class gaia::GaiaNDFChooser {
       if {"$filename_" == ""} {
          return
       }
+
+      #  Update title.
+      $table_ configure -title "NDF list for file: $filename_" \
 
       #  See if there is more than one image, otherwise skip it.
       set num_images_ 0

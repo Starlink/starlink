@@ -388,7 +388,8 @@ itcl::class gaia::Gaia {
             -hdu $itk_option(-hdu) \
             -ukirt_ql $itk_option(-ukirt_ql) \
             -appname $appname_ \
-            -extended_precision $itk_option(-extended_precision)
+            -extended_precision $itk_option(-extended_precision) \
+            -show_hdu_chooser $itk_option(-show_hdu_chooser)
       }
 
       #  Keep a list of SkyCat/GAIA instances.
@@ -1593,6 +1594,10 @@ itcl::class gaia::Gaia {
    #  displays at milli arc-second resolution.
    itk_option define -extended_precision extended_precision \
       Extended_Precision 0
+
+   #  Whether to attempt to show and control the HDU chooser. If 0
+   #  then control is only attempted when the HDU already exists.
+   itk_option define -show_hdu_chooser show_hdu_chooser Show_Hdu_Chooser 1
 
    # -- Protected variables --
 
