@@ -106,9 +106,17 @@
 *  Local Variables:
       CHARACTER*(DAT__SZLOC)	HLOC			! HEADER object
 
-      REAL			EXPO, EFEXPO		! Exposure times
+      DOUBLE PRECISION		TAI			! BASE_TAI value
+      DOUBLE PRECISION		UTC			! BASE_UTC value
+
+      REAL			EXPO, EFEXP		! Exposure times
+      REAL			OBSLEN			! Observation length
+
+      INTEGER			IMJD			! BASE_MJD value
 
       LOGICAL			EFFOK, EXPOK		! Things present?
+      LOGICAL			UTCOK, MJDOK, TAIOK	!
+      LOGICAL			OBSOK			!
 *.
 
 *  Check inherited global status.
@@ -121,16 +129,23 @@
       CALL ADI_NEW0( 'TimingInfo', OARG, STATUS )
 
 *  Look for the various header components
-      CALL ADI1_CGET0C( HLOC, 'EXPOSURE', EXPOK, EXPO, STATUS )
-      CALL ADI1_CGET0C( HLOC, 'EFF_EXPOSURE', EFFOK, EFEXPO, STATUS )
+      CALL ADI1_CGET0R( HLOC, 'EXPOSURE', EXPOK, EXPO, STATUS )
+      CALL ADI1_CGET0R( HLOC, 'EFF_EXPOSURE', EFFOK, EFEXP, STATUS )
+      CALL ADI1_CGET0I( HLOC, 'BASE_MJD', MJDOK, IMJD, STATUS )
+      CALL ADI1_CGET0D( HLOC, 'BASE_UTC', UTCOK, UTC, STATUS )
+      CALL ADI1_CGET0D( HLOC, 'BASE_TAI', TAIOK, TAI, STATUS )
+      CALL ADI1_CGET0D( HLOC, 'OBS_LENGTH', OBSOK, OBSLEN, STATUS )
+
+*  Default for BASE_UTC
+      IF ( .NOT. UTCOK ) UTC = 0D0
 
 *  Write its member values
-      IF ( EXPOK ) THEN
-        CALL ADI_CPUT0R( OARG, 'Exposure', EXPO, STATUS )
-      END IF
-      IF ( EFFOK ) THEN
-        CALL ADI_CPUT0R( OARG, 'EffExposure', EFEXPO, STATUS )
-      END IF
+      IF ( EXPOK ) CALL ADI_CPUT0R( OARG, 'Exposure', EXPO, STATUS )
+      IF ( EFFOK ) CALL ADI_CPUT0R( OARG, 'EffExposure', EFEXP, STATUS )
+      IF ( MJDOK ) CALL ADI_CPUT0D( OARG, 'TAIObs', DBLE(IMJD) +
+     :                              UTC/86400D0, STATUS )
+      IF ( TAIOK ) CALL ADI_CPUT0D( OARG, 'MJDObs', TAI, STATUS )
+      IF ( OBSOK ) CALL ADI_CPUT0R( OARG, 'ObsLength', OBSLEN, STATUS )
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'TCI1_READ', STATUS )
