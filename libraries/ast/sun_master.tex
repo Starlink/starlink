@@ -22,7 +22,7 @@ f+
 \newcommand{\stardocnumber}    {210.3}
 f-
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {12th November 1998}
+\newcommand{\stardocdate}      {19th November 1998}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
@@ -16676,6 +16676,14 @@ Encoding attribute of a FitsChan. This new encoding provides an
 interim solution to the problem of storing coordinate system
 information in FITS headers, until the proposed new FITS-WCS standard
 becomes stable.
+
+\item When a FrameSet is created from a set of FITS header cards (by
+reading from a FitsChan using a ``foreign'' encoding), the base Frame
+of the resulting FrameSet now has its Domain attribute set to
+``GRID''. This reflects the fact that this Frame represents FITS data
+grid coordinates (equivalent to FITS pixel coordinates---see
+(\secref{ss:domainconventions}). Previously, this Domain value was not
+set.
 
 c+
 \item astFindFits now ignores trailing spaces in its keyword template.

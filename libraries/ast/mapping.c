@@ -235,7 +235,7 @@ static void ValidateMapping( AstMapping *, int, int, int, int, const char * );
 /* Member functions. */
 /* ================= */
 /*
-*++
+*+
 *  Name:
 c     astResample<X>
 f     AST_RESAMPLE<X>
@@ -398,7 +398,8 @@ f     FLAGS = INTEGER (Given)
 *        "bad" (i.e. missing) data in the input array(s) which must be
 *        recognised and propagated to the output array(s).  If this
 *        flag is not set, all input values are treated literally.
-*     badval_ptr
+c     badval
+f     BADVAL = <Xtype> (Given)
 *        If the AST__USEBAD flag is set (above), this parameter is a
 *        pointer to a value which is used to identify bad data and/or
 *        variance values in the input array(s). The referenced value's
@@ -409,18 +410,22 @@ f     FLAGS = INTEGER (Given)
 *        value whether or not the AST__USEBAD flag is set (the
 *        function return value indicates whether any such values have
 *        been produced).
-*     params
+c     params
+f     PARAMS( * ) = DOUBLE PRECISION (Given)
 *        Pointer to an optional array of parameters that may be passed
 *        to the interpolation function, if required. If no parameters
 *        are required, a NULL pointer should be supplied.
-*     ndim_out
+c     ndim_out
+f     NDIM_OUT = INTEGER (Given)
 *        The number of dimensions in the output grid. This should be
 *        at least one.
-*     lbnd_out
+c     lbnd_out
+f     LBND_OUT( NDIM_OUT ) = INTEGER (Given)
 *        Pointer to an array of integers, with "ndim_out" elements.
 *        This should give the coordinates of the centre of the first
 *        pixel in the output data grid along each dimension.
-*     ubnd_out
+c     ubnd_out
+f     UBND_OUT( NDIM_OUT ) = INTEGER (Given)
 *        Pointer to an array of integers, with "ndim_out" elements.
 *        This should give the coordinates of the centre of the last
 *        pixel in the output data grid along each dimension.
@@ -429,12 +434,14 @@ f     FLAGS = INTEGER (Given)
 *        and size of the output data grid in the same way as "lbnd_in"
 *        and "ubnd_in" define the shape and size of the input grid
 *        (see above).
-*     lbnd
+c     lbnd
+f     LBND( NDIM_OUT ) = INTEGER (Given)
 *        Pointer to an array of integers, with "ndim_out" elements.
 *        This should give the coordinates of the first pixel in the
 *        section of the output data grid for which a value is
 *        required.
-*     ubnd
+c     ubnd
+f     UBND( NDIM_OUT ) = INTEGER (Given)
 *        Pointer to an array of integers, with "ndim_out" elements.
 *        This should give the coordinates of the last pixel in the
 *        section of the output data grid for which a value is
@@ -446,13 +453,15 @@ f     FLAGS = INTEGER (Given)
 *        the output grid (as defined by the "lbnd_out" and "ubnd_out"
 *        arrays). Regions of the output grid lying ouside this section
 *        will not be modified.
-*     out
+c     out
+f     OUT( * ) = <Xtype> (Returned)
 *        Pointer to an array with the same data type as the "in"
 *        array, into which the resampled data will be returned.  The
 *        storage order should be such that the coordinate of the first
 *        dimension varies most rapidly and that of the final dimension
 *        least rapidly (i.e. Fortran array storage order is used).
-*     out_var
+c     out_var
+f     OUT_VAR( * ) = <Xtype> (Returned)
 *        An optional pointer to an array with the same data type and
 *        size as the "out" array, into which variance estimates for
 *        the resampled values may be returned. This array will only be
@@ -460,17 +469,21 @@ f     FLAGS = INTEGER (Given)
 *
 *        If no output variance estimates are required, a NULL pointer
 *        should be given.
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
 
 *  Returned Value:
-*     The number of output grid points to which a data value (or a
-*     variance value if relevant) equal to "badval" has been assigned
-*     because no valid output value could be obtained.
+c     astResample<X>()
+f     AST_RESAMPLE<X> = INTEGER
+*        The number of output grid points to which a data value (or a
+*        variance value if relevant) equal to "badval" has been
+*        assigned because no valid output value could be obtained.
 
 *  Notes:
 *     - A value of zero will be returned if this function is invoked
 *     with the global error status set, or if it should fail for any
 *     reason.
-*--
+*-
 */
 /* Define a macro to implement the function for a specific data
    type. */
