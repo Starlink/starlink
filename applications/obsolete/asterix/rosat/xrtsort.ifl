@@ -18,17 +18,17 @@
                VPATH   'PROMPT'
             ENDPARAMETER
 
-     PARAMETER DATASET
+     PARAMETER TYPE
                POSITION 3
                TYPE    '_CHAR'
-               PROMPT  'Output files required Event(E) Binned(B)'
+               PROMPT  'Output data type - Event(E) Binned(B)'
                PPATH   'CURRENT,DEFAULT'
                VPATH   'PROMPT'
                DEFAULT 'B'
                HELP    'See user manual'
             ENDPARAMETER
 
-     PARAMETER SRCFILE
+     PARAMETER OUT
                POSITION 4
                TYPE    '_UNIV'
                PROMPT  'Output source filename'
@@ -38,7 +38,7 @@
                HELP    'Enter name without extension'
             ENDPARAMETER
 
-     PARAMETER BCKFILE
+     PARAMETER BOUT
                POSITION 5
                TYPE    '_UNIV'
                PROMPT  'Output background filename'
@@ -48,7 +48,7 @@
                HELP    'Enter name without extension'
             ENDPARAMETER
 
-     PARAMETER DIFFILE
+     PARAMETER DOUT
                TYPE    '_CHAR'
                PROMPT  'Name of the difevents file'
                PPATH   'CURRENT'
@@ -64,6 +64,18 @@
      PARAMETER BARD
                TYPE '_CHAR'
                PROMPT 'ARD file'
+     ENDPARAMETER
+
+     PARAMETER CENTRE
+               TYPE '_CHAR'
+               PROMPT 'Nominal source centre'
+     ENDPARAMETER
+
+     PARAMETER RES
+               TYPE '_INTEGER'
+               PROMPT 'Resolution factor'
+               HELP '1=high 2=medium 3=low'
+               DEFAULT 2
      ENDPARAMETER
 
      PARAMETER QCHANGE
@@ -231,7 +243,7 @@
                VPATH   'PROMPT'
             ENDPARAMETER
 
-     PARAMETER BIN_AXES
+     PARAMETER AXES
                TYPE    '_CHAR'
                PROMPT  'Enter integer codes of axes required in data array'
                PPATH   'CURRENT,DEFAULT'
@@ -241,30 +253,30 @@
 
      PARAMETER SHAPE
                TYPE    '_CHAR'
-               PROMPT  'Shape of source area [C,A,E,R]'
+               PROMPT  'Shape of source area [D,C,A,E,R]'
                PPATH   'CURRENT,DEFAULT'
                VPATH   'PROMPT'
-               HELP    'Circle, annulus, ellipse or rectangle'
+               HELP    'ard-Description, Circle, Annulus, Ellipse or Rectangle'
                DEFAULT 'R'
             ENDPARAMETER
 
-     PARAMETER GRP_RA
+     PARAMETER RA
                TYPE    '_DOUBLE'
-               PROMPT  'RA of the centre of the source box'
+               PROMPT  'RA of the centre of the source region'
                PPATH   'DYNAMIC'
                VPATH   'PROMPT'
                HELP    'Enter in decimal degrees, default is centre of field'
             ENDPARAMETER
 
-     PARAMETER GRP_DEC
+     PARAMETER DEC
                TYPE    '_DOUBLE'
-               PROMPT  'DEC of the centre of the source box'
+               PROMPT  'DEC of the centre of the source region'
                PPATH   'DYNAMIC'
                VPATH   'PROMPT'
                HELP    'Enter in decimal degrees, default is centre of field'
             ENDPARAMETER
 
-     PARAMETER GRP_SWIDTH
+     PARAMETER SWIDTH
                TYPE    '_REAL'
                PROMPT  'Width of source box '
                PPATH   'DYNAMIC,CURRENT'
@@ -272,7 +284,7 @@
                HELP    'Enter in decimal degrees'
             ENDPARAMETER
 
-     PARAMETER GRP_SHEIGHT
+     PARAMETER SHEIGHT
                TYPE    '_REAL'
                PROMPT  'Height of source box '
                PPATH   'DYNAMIC,CURRENT'
@@ -280,7 +292,7 @@
                HELP    'Enter in decimal degrees'
             ENDPARAMETER
 
-     PARAMETER RADIUS
+     PARAMETER RAD
                TYPE    '_REAL'
                PROMPT  'Radius of source box (degrees)'
                PPATH   'DYNAMIC,CURRENT'
@@ -288,7 +300,7 @@
                HELP    'Enter in decimal degrees'
             ENDPARAMETER
 
-     PARAMETER RADINN
+     PARAMETER IRAD
                TYPE    '_REAL'
                PROMPT  'Inner radius of source box (degrees)'
                PPATH   'DEFAULT'
@@ -297,7 +309,7 @@
                DEFAULT  0.0
             ENDPARAMETER
 
-     PARAMETER RADOUT
+     PARAMETER ORAD
                TYPE    '_REAL'
                PROMPT  'Outer radius of source box (degrees)'
                PPATH   'DYNAMIC,CURRENT'
@@ -305,9 +317,9 @@
                HELP    'Enter in decimal degrees'
             ENDPARAMETER
 
-     PARAMETER ORIENT
+     PARAMETER ANGLE
                TYPE    '_REAL'
-               PROMPT  'Orientation of ellipse (degrees)'
+               PROMPT  'Orientation angle of ellipse (degrees)'
                PPATH   'CURRENT,DEFAULT'
                VPATH   'PROMPT'
    HELP    'Enter in degrees, clockwise from the X axis (eg. South is +90)'
@@ -417,7 +429,7 @@
                DEFAULT  N
             ENDPARAMETER
 
-     PARAMETER GRP_RAB
+     PARAMETER RAB
                TYPE    '_DOUBLE'
                PROMPT  'RA of centre of bckgnd box (dec. degrees)'
                PPATH   'DYNAMIC'
@@ -425,7 +437,7 @@
                HELP    'Can be away from source box or an annulus around it.'
             ENDPARAMETER
 
-     PARAMETER GRP_DECB
+     PARAMETER DECB
                TYPE    '_DOUBLE'
                PROMPT  'DEC of the centre of the bckgnd box'
                PPATH   'DYNAMIC'
@@ -433,7 +445,7 @@
                HELP    ' Enter in decimal degrees'
             ENDPARAMETER
 
-     PARAMETER GRP_BWIDTH
+     PARAMETER BWIDTH
                TYPE    '_REAL'
                PROMPT  'Width of bckgnd box '
                PPATH   'CURRENT,DEFAULT'
@@ -441,7 +453,7 @@
                HELP    ' Enter in decimal degrees'
             ENDPARAMETER
 
-     PARAMETER GRP_BHEIGHT
+     PARAMETER BHEIGHT
                TYPE    '_REAL'
                PROMPT  'Height of bckgnd box'
                PPATH   'CURRENT,DEFAULT'
@@ -449,7 +461,7 @@
                HELP    ' Enter in decimal degrees'
             ENDPARAMETER
 
-     PARAMETER BRADINN
+     PARAMETER BIRAD
                TYPE    '_REAL'
                PROMPT  'Inner radius of bckgnd box (degrees)'
                PPATH   'DYNAMIC'
@@ -457,22 +469,22 @@
                HELP    'Enter 0.0 if a circular box is wanted >0 for an annulus'
             ENDPARAMETER
 
-     PARAMETER BRADOUT
+     PARAMETER BORAD
                TYPE    '_REAL'
                PROMPT  'Outer radius of bckgnd box (degrees)'
                PPATH   'DYNAMIC,CURRENT'
                VPATH   'PROMPT'
                HELP    'Enter in decimal degrees'
-            ENDPARAMETER
+     ENDPARAMETER
 
-     PARAMETER  BORIENT
+     PARAMETER  BANGLE
                TYPE    '_REAL'
                PROMPT  'Orientation of background ellipse (degrees)'
                PPATH   'CURRENT,DEFAULT'
                VPATH   'PROMPT'
    HELP    'Enter in degrees, clockwise from the X axis (eg. South is +90)'
                DEFAULT  0.0
-            ENDPARAMETER
+     ENDPARAMETER
 
      PARAMETER BEXINN
                TYPE    '_REAL'
@@ -480,7 +492,7 @@
                PPATH   'DYNAMIC,CURRENT'
                VPATH   'PROMPT'
                HELP    'Enter in decimal degrees'
-            ENDPARAMETER
+     ENDPARAMETER
 
      PARAMETER BEXOUT
                TYPE    '_REAL'
@@ -488,7 +500,7 @@
                PPATH   'DYNAMIC,CURRENT'
                VPATH   'PROMPT'
                HELP    'Enter in decimal degrees'
-            ENDPARAMETER
+     ENDPARAMETER
 
      PARAMETER BEYOUT
                TYPE    '_REAL'
@@ -497,14 +509,8 @@
                VPATH   'PROMPT'
                HELP    'Enter in decimal degrees'
                DEFAULT  0.0
-            ENDPARAMETER
+     ENDPARAMETER
 
-     PARAMETER DIR
-               TYPE    '_LOGICAL'
-               PROMPT  'List files on the directory'
-               PPATH   'DEFAULT'
-               VPATH   'DEFAULT'
-               DEFAULT  Y
-            ENDPARAMETER
 
  ENDINTERFACE
+
