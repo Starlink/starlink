@@ -80,8 +80,9 @@ The details of the conversion are as follows:
    NAXIS1, NAXIS2 etc. as appropriate.
 
    -  If the NDF contains any linear axis structures the
-   information necessary to generate these structures is
-   written to the BDF descriptors. For example, if a linear
+   information necessary to generate these structures is written
+   to the BDF descriptors (except when there is a non-zero value
+   of CROTAn in the FITS extension).  For example, if a linear
    AXIS(1) structure exists in the input NDF the value of the
    first data point is stored in the BDF descriptor CRVAL1,
    and the incremental value between successive axis data is
@@ -105,9 +106,10 @@ The details of the conversion are as follows:
       o  The TITLE, LABEL, and BUNITS descriptors are only copied
       if no TITLE, LABEL, and UNITS NDF components have already
       been copied into these descriptors.
-      o  The CDELTn, CRVALn, CTYPEn, and CRTYPEn descriptors in
-      the FITS extension are only copied if the input NDF
-      contained no linear axis structures.
+      o  The CDELTn, CRVALn, CRPIXn, CTYPEn, and CRTYPEn
+      descriptors in the FITS extension are only copied if the
+      input NDF contained no linear axis structures or there is a
+      non-zero CROTAn descriptor.
       o  The standard order of the FITS keywords is preserved,
       thus NAXIS and NAXISn appear immediately after the second
       card image, which should be BITPIX.  No FITS comments are
@@ -144,6 +146,13 @@ MJC: Malcolm J. Currie (STARLINK)
     Prevented special keywords from being copied from the FITS
     header when there are overriding objects present in the
     NDF; these are formatted into FITS-like descriptors.
+
+ 1992 November 16 (MJC):
+    Made more robust for the case when there are duplicated
+    standard FITS headers at the start of the FITS extension.
+    Allowed for non-zero axis rotation so that axis information is
+    not lost when converting a BDF to an NDF and then back to a
+    BDF.
 2 Implementation_Status
    -  Primitive NDFs are created.
 

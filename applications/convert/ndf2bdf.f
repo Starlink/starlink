@@ -83,9 +83,10 @@
 *        -  The number of dimensions of the data array is written 
 *        to the BDF descriptor NAXIS, and the actual dimensions to 
 *        NAXIS1, NAXIS2 etc. as appropriate.
-*        -  If the NDF contains any linear axis structures the 
-*        information necessary to generate these structures is 
-*        written to the BDF descriptors. For example, if a linear 
+*        -  If the NDF contains any linear axis structures the
+*        information necessary to generate these structures is written
+*        to the BDF descriptors (except when there is a non-zero value
+*        of CROTAn in the FITS extension).  For example, if a linear
 *        AXIS(1) structure exists in the input NDF the value of the 
 *        first data point is stored in the BDF descriptor CRVAL1,
 *        and the incremental value between successive axis data is 
@@ -107,9 +108,10 @@
 *           o  The TITLE, LABEL, and BUNITS descriptors are only copied
 *           if no TITLE, LABEL, and UNITS NDF components have already
 *           been copied into these descriptors.
-*           o  The CDELTn, CRVALn, CTYPEn, and CRTYPEn descriptors in
-*           the FITS extension are only copied if the input NDF
-*           contained no linear axis structures.
+*           o  The CDELTn, CRVALn, CRPIXn, CTYPEn, and CRTYPEn
+*           descriptors in the FITS extension are only copied if the
+*           input NDF contained no linear axis structures or there is a
+*           non-zero CROTAn descriptor.
 *           o  The standard order of the FITS keywords is preserved,
 *           thus NAXIS and NAXISn appear immediately after the second
 *           card image, which should be BITPIX.  No FITS comments are
@@ -138,7 +140,10 @@
 *     from the NDF standard items if possible. These are copied into
 *     the appropriate BDF FITS descriptors.
 *     -  If the NDF contains a FITS extension, those items not already
-*     set, are copied to the appropriate BDF descriptor.
+*     set, are copied to the appropriate BDF descriptor.  Detect any
+*     rotated axis.
+*     -  Handle rotated axes by re-writing the axis descriptors (CRVALn,
+*     CDELTn, CRPIXn) from the FITS headers.
 *     -  Reset INTERIM environment in case NDF2BDF is re-run without re-
 *     loading.
 
@@ -151,7 +156,7 @@
 *     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
-*  History:
+*  hISTORY:
 *     1991 March 5th (JM):
 *        Adapted from STAROUT.
 *     1991 October 30 (MJC):
@@ -168,6 +173,12 @@
 *        Prevented special keywords from being copied from the FITS
 *        header when there are overriding objects present in the
 *        NDF; these are formatted into FITS-like descriptors.
+*     1992 November 16 (MJC):
+*        Made more robust for the case when there are duplicated
+*        standard FITS headers at the start of the FITS extension.
+*        Allowed for non-zero axis rotation so that axis information is
+*        not lost when converting a BDF to an NDF and then back to a
+*        BDF.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -181,6 +192,7 @@
 *  Global constants:
       INCLUDE 'SAE_PAR'              ! Standard ADAM constants
       INCLUDE 'PAR_ERR'              ! Parameter-system error codes
+      INCLUDE 'PRM_PAR'              ! PRIMDAT public constants
       INCLUDE 'NDF_PAR'              ! NDF_ public constants
       INCLUDE 'FIO_PAR'              ! FIO_ constants
 
@@ -203,18 +215,23 @@
 
 *  Local Variables:
       INTEGER   APNTR(DAT__MXDIM)   ! Pointers to NDF axis arrays
+      INTEGER   ADIM                ! Axis loop counter
       LOGICAL   AXIFND              ! True if NDF contains a linear axis
                                     ! comps.
       LOGICAL   AXLFND              ! True if NDF contains axis label
+      REAL      AXROT               ! Rotation angle of an axis
       LOGICAL   AXUFND              ! True if NDF contains axis units
       CHARACTER BDFILE*(FIO__SZFNM) ! BDF filename
       INTEGER   BDFORM              ! Format in BDF style
       CHARACTER C*1                 ! Accommodates character string
+      CHARACTER CDELT*(SZDESC)      ! Descriptor name of CDELTn
       CHARACTER CMDFIL*(FIO__SZFNM) ! Command filename
       LOGICAL   CMPFND( NFLAGS )    ! True if certain special NDF
                                     ! components are present
       CHARACTER COMAND*(80)         ! RUNSTAR-type command line 
       CHARACTER CONECT*(FIO__SZFNM) ! Connection filename
+      CHARACTER CRPIX*(SZDESC)      ! Descriptor name of CRPIXn
+      CHARACTER CRVAL*(SZDESC)      ! Descriptor name of CRVALn
       CHARACTER CVALUE*(SZVAL)      ! Accommodates descriptor value
       CHARACTER DESCR*(SZDESC)      ! Accommodates descriptor name
       LOGICAL   DESCRP              ! True if descriptors output to user
@@ -230,6 +247,7 @@
       INTEGER   IMAGEP              ! Pointer to BDF data
       REAL      INCREM              ! Incremental value for axis array
       INTEGER   ISTAT               ! Local status return
+      INTEGER   J                   ! Loop variable
       LOGICAL   LABFND              ! True if NDF LABEL found
       LOGICAL   LINEAR              ! True if an axis is linear
       INTEGER   NBPI                ! Number of bytes per item
@@ -242,12 +260,15 @@
       INTEGER   NELM                ! Number of elements
       INTEGER   NITEM               ! Number of items in data
       INTEGER   POINTR              ! Pointer to DSS data
+      LOGICAL   ROTAX( DAT__MXDIM ) ! True if an axis is rotated in the
+                                    ! FITS extension
       REAL      START               ! Start value for an axis structure
       LOGICAL   THERE               ! True if NDF has FITS extension
       LOGICAL   TITFND              ! True if NDF TITLE found
       LOGICAL   UNTFND              ! True if NDF UNITS found
       CHARACTER VALUE*(SZVAL)       ! Accommodates descriptor value
       INTEGER   WRSTAT              ! Status for WRDSCR routine
+
 *.
 
 *   Check the inherited global status.
@@ -294,8 +315,8 @@
       CALL NDF_MAP( NDF, 'Data', HDSTYP, 'READ', POINTR, NITEM, 
      :              STATUS )
 
-*   Create Interim-like files and point logicals to the them.
-*   =========================================================
+*   Create Interim-like files and point logicals to them.
+*   =====================================================
 *
 *   Here we must simulate an Interim environment application running.
 *   Two files are created: the connection file (equivalent to a
@@ -440,7 +461,7 @@
          CALL CON_SPDES( NDF, 'IMAGE', DESCRP, NFLAGS, CMPFND, STATUS )
 
 
-*   Deal with the fits extension if it is present.
+*   Deal with the FITS extension if it is present.
 *   ==============================================
 *   
       ELSE
@@ -448,11 +469,11 @@
 *      Each item is copied to a BDF descriptor except:
 *         NAXIS, NAXISn - these are derived directly from the NDF data
 *           array;
-*         CRVALn, CDELTn, CRTYPEn, CTYPEn - derived from the NDF axis
-*           structures if possible. If no linear NDF axis structures
-*           are present, the values in the NDF FITS extension are
-*           copied.  If any are non-linear all FITS axis information is
-*           lost.
+*         CRVALn, CDELTn, CRPIXn, CRTYPEn, CTYPEn - derived from the
+*           NDF axis structures if possible.  If no linear NDF axis
+*           structures are present, the values in the NDF FITS
+*           extension are copied.  If any are non-linear, all FITS axis
+*           information is lost.
 *         TITLE, LABEL, BUNITS - the values held in NDF TITLE, LABEL,
 *           and UNITS are used if present, otherwise any values found in
 *           the FITS extension are used.
@@ -466,45 +487,69 @@
          LABFND = .FALSE.
          UNTFND = .FALSE.
 
+*      Initialise the flags that indicate a rotated axis.
+         DO I = 1, NDIM
+            ROTAX( I ) = .FALSE.
+         END DO
+
+*      Initialise count of FITS items copied to the BDF.
+         J = 0
+
 *      Deal with the items in the NDF FITS extension one by one.
          CALL NDF_XLOC (NDF, 'FITS', 'READ', FTLOC, STATUS)
          CALL DAT_SIZE (FTLOC, NCOMP, STATUS)
 
-         DO I = 1, NCOMP          
+         DO I = 1, NCOMP
 
 *         Get locator to successive elements in the FITS extension.
             CALL DAT_CELL (FTLOC, 1, I, FTLOCI, STATUS)
 
-*         Read the FITS string.
+*         Read the FITS string, and extract the keyword and value.
             CALL DAT_GET0C (FTLOCI, FITSTR, STATUS)
             DESCR = FITSTR(1:SZDESC)
             VALUE(1:SZVAL) = FITSTR(11:SZFITS)
 
-*         Leave out NAXIS, NAXISn, and possibly CDELTn, CRVALn, CRTYPEn,
-*         CTYPEn, TITLE, LABEL, and BUNITS as described above.  Note
-*         CROTAn are also excluded.   Also ignore blank keywords---they
-*         confuse the INTERIM descriptors.
+*         Leave out NAXIS, NAXISn, and possibly CDELTn, CRVALn,
+*         CRPIXn,CRTYPEn, CTYPEn, TITLE, LABEL, and BUNITS as described
+*         above.  Note CROTAn are also excluded.   Also ignore blank
+*         keywords---they confuse the INTERIM descriptors.
             IF ( (INDEX(DESCR,'NAXIS') .EQ. 0) .AND.
      :           DESCR .NE. ' ' .AND.
      :           (INDEX(DESCR,'CDELT') .EQ. 0 .OR. .NOT. AXIFND) .AND.
      :           (INDEX(DESCR,'CRVAL') .EQ. 0 .OR. .NOT. AXIFND) .AND.
-     :           (INDEX(DESCR,'CROTA') .EQ. 0 .OR. .NOT. AXIFND) .AND.
+     :           (INDEX(DESCR,'CRPIX') .EQ. 0 .OR. .NOT. AXIFND) .AND.
      :           (INDEX(DESCR,'CRTYPE') .EQ. 0 .OR. .NOT. AXLFND) .AND.
      :           (INDEX(DESCR,'CTYPE') .EQ. 0 .OR. .NOT. AXUFND) .AND.
      :           (INDEX(DESCR,'LABEL') .EQ. 0 .OR. .NOT. LABFND) .AND.
      :           (INDEX(DESCR,'BUNITS') .EQ. 0 .OR. .NOT. UNTFND) .AND.
      :           (INDEX(DESCR,'TITLE') .EQ. 0 .OR. .NOT. TITFND) ) THEN
 
+*            Look for a rotated axis in the FITS extension (CROTAn is
+*            present and non-zero).  If there is one, the NDF AXIS
+*            structure will contain pixel co-ordinates, which are
+*            probably not the original co-ordinates for the axis.  If
+*            there are rotated axes, the descriptors defining the axis
+*            will be re-written later using the values of CRVALn and
+*            CDELTn in the FITS extension.
+               IF ( INDEX(DESCR,'CROTA') .NE. 0 ) THEN
+                  CALL CHR_CTOI( DESCR( 6: ), ADIM, STATUS )
+                  CALL CHR_CTOR( VALUE, AXROT, STATUS )
+                  ROTAX( ADIM ) = ABS( AXROT ) .GT. VAL__EPSR
+               END IF
+
 *            Write descriptor to the BDF.
                CALL WRDSCR('IMAGE', DESCR, VALUE, 1, WRSTAT)
                IF (WRSTAT .NE. 0) GO TO 994
 
-*            This code assumes that the FITS header will begin with
+*            Count it.
+               J = J + 1
+
+*            This code ssumes that the FITS header will begin with
 *            the mandatory headers in the mandatory order.  It is not
 *            worth the great effort to validate the FITS descriptors
 *            of a defunct format.  Thus keyword two is BITPIX.  Want
 *            to write after this.
-               IF ( I .EQ. 2 ) THEN
+               IF ( J .EQ. 2 ) THEN
 
 *               Insert NAXIS, AXISn, and optional keywords if the
 *               appropriate special objects are present in the NDF.
@@ -531,7 +576,46 @@
                END IF
 
             END IF
-         END DO         
+         END DO
+
+*      Deal with rotated axes.
+*      =======================
+
+*      For each dimension check if there are any rotated axes.
+         DO J = 1, NDIM
+            IF ( ROTAX( J ) ) THEN
+
+*            Search through the FITS headers to find the values of
+*            CRVALn, CDELTn, and CRPIXn.
+               DO I = 1, NCOMP
+
+*               Get locator to successive elements in the FITS
+*               extension.
+                  CALL DAT_CELL (FTLOC, 1, I, FTLOCI, STATUS)
+
+*               Read the FITS string, and extract the keyword and value.
+                  CALL DAT_GET0C (FTLOCI, FITSTR, STATUS)
+                  DESCR = FITSTR(1:SZDESC)
+                  VALUE(1:SZVAL) = FITSTR(11:SZFITS)
+
+*               Create the keywords being searched.
+                  CALL CHR_ITOC( J, C, NCHAR )
+                  CDELT = 'CDELT'//C(:1)
+                  CRPIX = 'CRPIX'//C(:1)
+                  CRVAL = 'CRVAL'//C(:1)
+
+*               Test the current keyword.
+                  IF ( ( INDEX(DESCR,CDELT) .EQ. 0 ) .OR.
+     :                 ( INDEX(DESCR,CRPIX) .EQ. 0 ) .OR.
+     :                 ( INDEX(DESCR,CRVAL) .EQ. 0 ) ) THEN
+
+*                  Write the revised descriptor to the BDF.
+                     CALL WRDSCR('IMAGE', DESCR, VALUE, 1, WRSTAT)
+                     IF (WRSTAT .NE. 0) GO TO 994
+                  END IF
+               END DO
+            END IF
+         END DO      
       END IF
            
 *   Closedown.
