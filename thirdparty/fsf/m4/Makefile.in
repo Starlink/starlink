@@ -38,6 +38,8 @@ INSTALL_PROGRAM = @INSTALL_PROGRAM@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 
+STAR_MANIFEST_DIR = @STAR_MANIFEST_DIR@
+
 prefix = @prefix@
 exec_prefix = @exec_prefix@
 bindir = $(exec_prefix)/bin
@@ -83,7 +85,7 @@ realclean: realclean-recursive realclean-local
 
 mostlyclean-recursive clean-recursive distclean-recursive realclean-recursive:
 	for subdir in $(SUBDIRS); do \
- 	  target=`echo $@ | sed 's/-recursive//'`; \
+	  target=`echo $@ | sed 's/-recursive//'`; \
 	  echo making $$target in $$subdir; \
 	  (cd $$subdir && $(MAKE) $$target) || exit 1; \
 	done
@@ -132,6 +134,26 @@ config.h.in: stamp-h.in
 stamp-h.in: configure.in aclocal.m4 acconfig.h
 	cd $(srcdir) && autoheader
 	date > $(srcdir)/stamp-h.in
+
+install-manifest: install-manifest.xml
+	$(srcdir)/mkinstalldirs $(STAR_MANIFEST_DIR)
+	$(INSTALL_DATA) install-manifest.xml $(STAR_MANIFEST_DIR)/$(PRODUCT)
+
+install-manifest.xml: all
+	$(MAKE) install
+	rm -rf STAGING
+	mkdir STAGING
+	$(MAKE) prefix=`pwd`/STAGING install
+	rm -f $@
+	echo "<?xml version='1.0'?>"                            >$@
+	echo "<!DOCTYPE manifest SYSTEM 'componentinfo.dtd'>"   >>$@
+	echo "<manifest component='$(PRODUCT)'>"                >>$@
+	echo "<version>$(VERSION)</version>"                    >>$@
+	echo "<files>"                                          >>$@
+	find STAGING -type f | sed 's,^.*STAGING,$(prefix),'    >>$@
+	echo "</files>"                                         >>$@
+	echo "</manifest>"                                      >>$@
+	rm -rf STAGING
 
 # Tell versions [3.59,3.63) of GNU make not to export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
