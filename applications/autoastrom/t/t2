@@ -1,12 +1,14 @@
 
+##testing qchi
+
 test -n "$AUTOASTROM_DIR"   || AUTOASTROM_DIR=..
 test -n "$PERLBIN" || PERLBIN=/star/Perl/bin/perl
 
 export AUTOASTROM_DIR;
 exec $PERLBIN <<'EOD';
 
-use lib '..';
-use autoastrom;
+use lib "$ENV{AUTOASTROM_DIR}";
+use autoastrom qw(qchi);
 
 print "      chi2         dof     Q(chi2)       ratio\n";
 print "      ----         ---     -------       -----\n";

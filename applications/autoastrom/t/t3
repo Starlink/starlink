@@ -1,4 +1,6 @@
 
+##testing twodarray2ndf, ndf2twodarray, ndf2txt, canonicalise_ndfname
+
 test -n "$AUTOASTROM_DIR"   || AUTOASTROM_DIR=..
 test -n "$PERLBIN" || PERLBIN=/star/Perl/bin/perl
 
@@ -7,8 +9,8 @@ exec $PERLBIN <<'EOD';
 
 use NDF;
 
-use lib '..';
-use autoastrom;
+use lib "$ENV{AUTOASTROM_DIR}";
+use autoastrom qw(canonicalise_ndfname twodarray2ndf ndf2twodarray ndf2txt);
 
 print "canonicalise_ndfname...\n";
 foreach $n (('ndfname', 'HellO4.there-howd+yedo?',
