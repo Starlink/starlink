@@ -17,7 +17,7 @@ dnl    Include defaults for Starlink configurations
 STAR_DEFAULTS(per-package-dirs)
 
 dnl    Declare dependencies.
-STAR_DECLARE_DEPENDENCIES(build, sst)
+STAR_DECLARE_DEPENDENCIES(sourceset, sst)
 
 dnl    Find required versions of the programs we need for configuration
 AC_PROG_CC

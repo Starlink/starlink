@@ -24,7 +24,7 @@
   </p>
   </abstract>
   <dependencies >
-    <build>sst</build><sourceset>star2html</sourceset>
+    <sourceset>sst</sourceset><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
