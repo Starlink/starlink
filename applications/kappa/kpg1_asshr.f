@@ -2,7 +2,7 @@
      :                       STATUS )
 *+
 *  Name:
-*     KPG1_PLOT
+*     KPG1_ASSHR
 
 *  Purpose:
 *     Shrink a Plot so that it covers an area which allows all annotation 

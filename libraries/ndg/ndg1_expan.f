@@ -71,6 +71,8 @@
 *     15-FEB-1999 (DSB):
 *        Modified to include paths to all NDFs contained within a given
 *        HDS container file.
+*     30-NOV-1999 (DSB):
+*        Check that nothing is written beyond the end of SEARCH string.
 *     {enter_further_changes_here}
 
 *-
@@ -100,6 +102,10 @@
       INTEGER CHR_LEN
       LOGICAL NDG1_MATCH
 
+*  Local Constants:
+      INTEGER MXSRCH             ! Max length of search list string
+      PARAMETER ( MXSRCH = 2048 )
+
 *  Local Variables:
       CHARACTER BN*50              ! File basename
       CHARACTER DIR*(GRP__SZNAM)   ! Directory field
@@ -110,7 +116,7 @@
       CHARACTER PATH*(GRP__SZNAM)  ! HDS path field
       CHARACTER REST*(GRP__SZNAM)  ! The remaining text after the file spec
       CHARACTER SEC*50             ! File NDF/HDS section
-      CHARACTER SEARCH*1024        ! The total search string
+      CHARACTER SEARCH*(MXSRCH)    ! The total search string
       CHARACTER SLICE*(GRP__SZNAM) ! The NDF slice spec
       CHARACTER SPEC*(GRP__SZNAM)  ! The file spec of the matching file
       CHARACTER STORED*(GRP__SZNAM)! Text to store in the supplied group
@@ -265,7 +271,7 @@
                CALL CHR_APPND( BN, FTEMP, IAT )
                CALL CHR_APPND( FMT( IFMT ), FTEMP, IAT )
          
-               IF( IAT .GT. 0 ) THEN
+               IF( IAT .GT. 0 .AND. MXSRCH - SLEN .GT. IAT ) THEN
                   CALL CHR_APPND( FTEMP( : IAT ), SEARCH, SLEN )
                   SLEN = SLEN + 1
                ENDIF

@@ -750,12 +750,12 @@
          STATUS = SAI__ERROR
 
          IF( KEY ) THEN
-            CALL ERR_REP( 'DISPLAY_ERR5', 'No room left for the DATA '//
+            CALL ERR_REP( 'DISPLAY_ERR1', 'No room left for the DATA '//
      :                    'picture (try reducing the size of the '//
      :                    'margins or key - see parameters MARGIN '//
      :                    'and KEYPOS).', STATUS )
          ELSE 
-            CALL ERR_REP( 'DISPLAY_ERR4', 'No room left for the DATA '//
+            CALL ERR_REP( 'DISPLAY_ERR2', 'No room left for the DATA '//
      :                    'picture (try reducing the size of the '//
      :                    'margins - see parameter MARGIN).', STATUS )
          END IF
@@ -792,12 +792,12 @@
 *  Check the viewport does not have zero area.
          IF( X2 .EQ. X1 ) THEN
             STATUS = SAI__ERROR
-            CALL ERR_REP( 'DISPLAY_1', 'Current AGI picture has zero '//
+            CALL ERR_REP( 'DISPLAY_3', 'Current AGI picture has zero '//
      :                    'width.', STATUS )
 
          ELSE IF( Y2 .EQ. Y1 ) THEN
             STATUS = SAI__ERROR
-            CALL ERR_REP( 'DISPLAY_2', 'Current AGI picture has zero '//
+            CALL ERR_REP( 'DISPLAY_4', 'Current AGI picture has zero '//
      :                    'height.', STATUS )
          END IF
 
@@ -962,7 +962,7 @@
       IF( OPLBND( 1 ) .EQ. OPUBND( 1 ) .OR. OPLBND( 2 ) .EQ. OPUBND( 2 ) 
      :    .AND. STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
-         CALL ERR_REP( 'DISPLAY_3', 'The values supplied for '//
+         CALL ERR_REP( 'DISPLAY_5', 'The values supplied for '//
      :                 'parameters %CENTRE, %XMAGN and %YMAGN would '//
      :                 'result in no part of the image being '//
      :                 'displayed.', STATUS )
@@ -1102,6 +1102,8 @@
      :                 STATUS )
          NX = WDIM( 1 )
          NY = WDIM( 2 )
+         DLO = LP + SLBND( 2 ) - 1
+         DHI = LP + SUBND( 2 ) - 1
 
 *  Otherwise, scale the supplied data to produce colour indices.
       ELSE 
@@ -1160,6 +1162,12 @@
      :                    LABEL( : NC ), 'KAPPA_DISPLAY', LP, UP, 0.1,
      :                    ( Y2 - Y1 )*0.1, ( Y2 - Y1 )*0.1, 'CL',
      :                    %VAL( IPWORK ), STATUS )
+
+*  Report a context message if anything went wrong.
+         IF( STATUS .NE. SAI__OK ) THEN
+            CALL ERR_REP( 'DISPLAY_ERR6', 'Failed to display the key.',
+     :                     STATUS )
+         END IF
 
 *  Deallocate the work array.
          CALL PSX_FREE( IPWORK, STATUS )

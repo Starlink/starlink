@@ -651,7 +651,8 @@
          CALL KPS1_SPARB( CFRM, MAP1, DIMS( 1 ), DIMS( 2 ), 
      :                    %VAL( IPDIN ), SLBND, ISIZE, RANGE, GAUSS, 
      :                    NPOS, %VAL( IPW1 ), LOGPOS,
-     :                    FDL, 'MINOR', %VAL( IPID ), GOTID, AXISR, 
+     :                    FDL, 'MINOR', 'AXISR', 'ORIENT', 'FWHM', 
+     :                    'GAMMA', %VAL( IPID ), GOTID, AXISR, 
      :                    THETA, FWHM, GAMMA, PSFSIZ, %VAL( IPW2 ), 
      :                    PX, PY, STATUS )
 
@@ -659,7 +660,8 @@
          CALL KPS1_SPARD( CFRM, MAP1, DIMS( 1 ), DIMS( 2 ), 
      :                    %VAL( IPDIN ), SLBND, ISIZE, RANGE, GAUSS, 
      :                    NPOS, %VAL( IPW1 ), LOGPOS,
-     :                    FDL, 'MINOR', %VAL( IPID ), GOTID, AXISR, 
+     :                    FDL, 'MINOR', 'AXISR', 'ORIENT', 'FWHM', 
+     :                    'GAMMA', %VAL( IPID ), GOTID, AXISR, 
      :                    THETA, FWHM, GAMMA, PSFSIZ, %VAL( IPW2 ), 
      :                    PX, PY, STATUS )
 
@@ -667,7 +669,8 @@
          CALL KPS1_SPARI( CFRM, MAP1, DIMS( 1 ), DIMS( 2 ), 
      :                    %VAL( IPDIN ), SLBND, ISIZE, RANGE, GAUSS, 
      :                    NPOS, %VAL( IPW1 ), LOGPOS,
-     :                    FDL, 'MINOR', %VAL( IPID ), GOTID, AXISR, 
+     :                    FDL, 'MINOR', 'AXISR', 'ORIENT', 'FWHM', 
+     :                    'GAMMA', %VAL( IPID ), GOTID, AXISR, 
      :                    THETA, FWHM, GAMMA, PSFSIZ, %VAL( IPW2 ), 
      :                    PX, PY, STATUS )
 
@@ -675,7 +678,8 @@
          CALL KPS1_SPARUW( CFRM, MAP1, DIMS( 1 ), DIMS( 2 ), 
      :                    %VAL( IPDIN ), SLBND, ISIZE, RANGE, GAUSS, 
      :                    NPOS, %VAL( IPW1 ), LOGPOS,
-     :                    FDL, 'MINOR', %VAL( IPID ), GOTID, AXISR, 
+     :                    FDL, 'MINOR', 'AXISR', 'ORIENT', 'FWHM', 
+     :                    'GAMMA', %VAL( IPID ), GOTID, AXISR, 
      :                    THETA, FWHM, GAMMA, PSFSIZ, %VAL( IPW2 ), 
      :                    PX, PY, STATUS )
 
@@ -683,7 +687,8 @@
          CALL KPS1_SPARUB( CFRM, MAP1, DIMS( 1 ), DIMS( 2 ), 
      :                    %VAL( IPDIN ), SLBND, ISIZE, RANGE, GAUSS, 
      :                    NPOS, %VAL( IPW1 ), LOGPOS,
-     :                    FDL, 'MINOR', %VAL( IPID ), GOTID, AXISR, 
+     :                    FDL, 'MINOR', 'AXISR', 'ORIENT', 'FWHM', 
+     :                    'GAMMA', %VAL( IPID ), GOTID, AXISR, 
      :                    THETA, FWHM, GAMMA, PSFSIZ, %VAL( IPW2 ), 
      :                    PX, PY, STATUS )
 
@@ -691,7 +696,8 @@
          CALL KPS1_SPARW( CFRM, MAP1, DIMS( 1 ), DIMS( 2 ), 
      :                    %VAL( IPDIN ), SLBND, ISIZE, RANGE, GAUSS, 
      :                    NPOS, %VAL( IPW1 ), LOGPOS,
-     :                    FDL, 'MINOR', %VAL( IPID ), GOTID, AXISR, 
+     :                    FDL, 'MINOR', 'AXISR', 'ORIENT', 'FWHM', 
+     :                    'GAMMA', %VAL( IPID ), GOTID, AXISR, 
      :                    THETA, FWHM, GAMMA, PSFSIZ, %VAL( IPW2 ), 
      :                    PX, PY, STATUS )
 

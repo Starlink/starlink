@@ -81,6 +81,7 @@
    set COM ""
    set DEMO_INFO ""
    set DOING ""
+   set ENV_VARS ""
    set F3 ""
    set F4 ""
    set HAREA 1 

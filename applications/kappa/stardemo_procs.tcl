@@ -1718,6 +1718,9 @@ proc Demo {name body} {
          if { $element == "step" } {
             incr i
          
+         } elseif { $element == "env" } {
+            incr i
+
          } elseif { $element == "link" } {
             incr i
             set linkname [lindex $body $i]
@@ -1756,6 +1759,13 @@ proc Demo {name body} {
             break
          }
          
+      } elseif { $element == "env" } {
+         incr i
+         if { ![GetEnv [lindex $body $i]] } {
+            set ret 0
+            break
+         }
+
       } elseif { $element == "link" } {
          incr i 2
          
@@ -2041,10 +2051,17 @@ proc Command {command} {
 #-
    global CHECK_DEMO
    global ABORT_DEMO
+   global ENV_VARS
+   global env
 
    Diag "      $command"
 
    if { !$CHECK_DEMO && !$ABORT_DEMO } { 
+
+      foreach var $ENV_VARS {
+         set $var $env($var)
+      }
+
       if { [catch {eval $command} mess] } {
          Message "Error executing command \"$command\" - $mess"
       }
@@ -3445,6 +3462,26 @@ proc ShowMe {doc args} {
    return $ret
 
 }
+
+
+
+proc GetEnv {varnam} {
+   global env
+   global ENV_VARS
+
+   Diag "      $varnam"
+
+   if { [info exists env($varnam)] } {
+      lappend ENV_VARS $varnam 
+      set ret 1
+   } {
+      Message "Environment variable \"$varnam\" is not defined."
+      set ret 0
+   }
+
+   return $ret
+}
+
 
    proc CCDShowHelp {url} {
 #+
