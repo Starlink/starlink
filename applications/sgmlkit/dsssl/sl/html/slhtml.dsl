@@ -54,9 +54,14 @@ depending on whether the element is to be chunked.
   <type>boolean
   <description>If true, then treat the body as a chunk, even if it
   wouldn't otherwise be taken to be one.
+<parameter keyword default='#t'>navbars?
+  <type>boolean
+  <description>If true (default) then include the navigation aids at 
+  the beginning and end of the page.
 <codebody>
 (define (html-document title-sosofo body-sosofo #!key (system-id #f)
-						      (force-chunk? #f))
+						      (force-chunk? #f)
+						      (navbars? #t))
   (let* ((is-de? (node-list=? (current-node) (document-element)))
 	 (doc-sosofo 
 	  (if (or force-chunk? (chunk?) is-de?)
@@ -66,9 +71,13 @@ depending on whether the element is to be chunked.
 			  ($standard-html-header$))
 		    (make element gi: "body" 
 			  attributes: %body-attr%
-			  (header-navigation (current-node))
+			  (if navbars?
+			      (header-navigation (current-node))
+			      (empty-sosofo))
 			  body-sosofo
-			  (footer-navigation (current-node))
+			  (if navbars?
+			      (footer-navigation (current-node))
+			      (empty-sosofo))
 			  ))
 	      body-sosofo)))
     (if stream-output
@@ -101,17 +110,31 @@ turned off, just return the fragment identifier.
 turned off, just return the fragment identifier.
 <p>There can be a number of special cases in the determination of the fragid.
 Each one of these at present consists of a call to a function 
-<funcname/href-to-fragid-giname/, which returns a fragment prefixed by `#'.
+<funcname/href-to-fragid-giname/, which returns a fragment not prefixed by `#'.
+<p>HTTP hrefs are described in
+<webref url='http://sunsite.org.uk/rfc/rfc1945.txt'
+>RFC 1945</webref> and
+URLs are described in <webref
+url='http://sunsite.org.uk/rfc/rfc1738.txt' >RFC 1738</webref>.
 <returnvalue type="string">An HTML HREF which can be used to refer to
-the current node.
+the current node.  If the function was called with <code/frag-only/
+set to <code/#t/ and no fragment ID could be generated, then it
+returns <code/#f/.
 <argumentlist>
 <parameter>target
   <type>node-list
   <description>The href returned refers to the node passed as <code/target/
-<parameter keyword>reffrag
+<parameter keyword default='#t'>reffrag
   <type>boolean
-  <description>If reffrag is false, don't append the fragid to the HREF.  
-<parameter keyword>full-url
+  <description>If reffrag is true (default), then append the fragid to
+  the HREF.
+<parameter keyword default='#f'>frag-only
+  <type>boolean
+  <description>If true, then only the fragment identifier (without the
+  <code/#/ character) is returned.  Calling <funcname/href-to/
+  with this set to <code/#t/ is the best way of generating IDs within
+  the stylesheet.
+<parameter keyword default='#f'>full-url
   <type>boolean
   <description>If full-url is true, prefix
   <code/%starlink-document-server%/ to the returned URL.
@@ -119,29 +142,35 @@ the current node.
   <type>string
   <description>If not <code/#f/, force the fragment id to be this string.
 <codebody>
-(define (href-to target #!key (reffrag #t) (full-url #f) (force-frag #f))
-  (let* ((id (attribute-string (normalize "id") target))
-	 (entfile (html-file target_nd: target))
-	 (url (string-append (if full-url %starlink-document-server% "")
-			     entfile))
+(define (href-to target #!key (reffrag #t)
+			      (frag-only #f)
+			      (full-url #f)
+			      (force-frag #f))
+  (let* ((id (or (attribute-string (normalize "id") target)
+		 (and (member (gi target) (section-element-list))
+		      (string-append
+		       "_ID" (number->string (all-element-number target))))))
+	 (entfile (and (not frag-only)
+		       (html-file target_nd: target)))
+	 (url (and entfile
+		   (string-append (if full-url %starlink-document-server% "")
+				  entfile)))
 	 (fragid (cond
 		  (force-frag force-frag)
 		  ((node-list=? target (document-element))
-		   "#xref_")
+		   "xref_")
 		  (else (case (case-fold-down (gi target))
 			  (("mlabel") (href-to-fragid-mlabel target))
 			  (else (if (or (chunk? target)
 					(not id))
-				    ""
-				    (string-append "#xref_" id)))))))
-	 ;(fragid (if (or (chunk? target)
-		;	 (not id))
-		;     ""
-		;     (string-append "#xref_" id)))
-	 )
-    (if reffrag
-	(string-append url fragid)
-	url)))
+				    #f
+				    (string-append "xref_" id))))))))
+    (cond (frag-only fragid)
+	  (reffrag (string-append url (if fragid
+					  (string-append "#" fragid)
+					  "")))
+	  (else url))))
+
 ;; Following is an attempt to (neatly) suppress the entfile if the reference
 ;; would be local, but (chunk?) as currently written returns false for any
 ;; nodes within the `master' chunk.
