@@ -35,6 +35,7 @@
 *     10 Mar 92 : V1.6-1 Added X0,Y0 parameters (DJA)
 *     15 Dec 92 : V1.7-0 Made units switchable, and added DX,DY parameter (DJA)
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
+*     28 Mar 95 : V1.8-1 Use new data interface (DJA)
 *
 *    Type definitions :
 *
@@ -43,7 +44,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PAR_ERR'
       INCLUDE 'MATH_PAR'
 *
@@ -53,28 +53,28 @@
 *
 *    Local variables :
 *
-      CHARACTER         OLOC*(DAT__SZLOC)      ! Locator to output dataset
-      CHARACTER         PLOC*(DAT__SZLOC)      ! Locator to output psf box
-      CHARACTER*20      UNITS                  ! Units to work in
+      CHARACTER*20      	UNITS                  	! Units to work in
 
-      DOUBLE PRECISION  MJD                    ! MJD for observation
+      DOUBLE PRECISION  	MJD                    	! MJD for observation
 
-      REAL              DX, DY                 ! Table to psf offset
-      REAL              SCALE                  ! Image binsize in arcmin
-      REAL              TOR                    ! Units to radian conversion
-      REAL              X0, Y0                 ! Image position
+      REAL              	DX, DY                 	! Table to psf offset
+      REAL              	SCALE                  	! Image binsize in arcmin
+      REAL              	TOR                    	! Units to radian conversion
+      REAL              	X0, Y0                 	! Image position
 
-      INTEGER           DIMS(2)                ! Image dimensions
-      INTEGER           DPTR                   ! Pointer to data
-      INTEGER           PSLOT                  ! PSF system slot
-      INTEGER           RADIUS                 ! User selected image half width
+      INTEGER           	DIMS(2)                	! Image dimensions
+      INTEGER           	DPTR                   	! Pointer to data
+      INTEGER			OFID			! Output dataset id
+      INTEGER           	PSLOT                  	! PSF system slot
+      INTEGER           	RADIUS                 	! User selected image half width
+      INTEGER			TIMID			! Timing info
 
-      LOGICAL           GOT_MJD                ! Got MJD from user
+      LOGICAL           	GOT_MJD                	! Got MJD from user
 *
 *    Version id :
 *
       CHARACTER*30      VERSION
-         PARAMETER      ( VERSION = 'CREPSF Version 1.7-0' )
+         PARAMETER      ( VERSION = 'CREPSF Version 1.8-1' )
 *-
 
 *    Check status
@@ -84,11 +84,10 @@
       CALL MSG_PRNT( VERSION )
 
 *    Initialise Asterix
-      CALL AST_INIT( STATUS )
-      CALL PSF_INIT( STATUS )
+      CALL AST_INIT()
 
 *    Get output dataset
-      CALL USI_ASSOCO( 'OUT', 'PSF_DATA', OLOC, STATUS )
+      CALL USI_TASSOCO( 'OUT', 'PSF_DATA', OFID, STATUS )
 
 *    Get units to work with
       CALL USI_GET0C( 'UNITS', UNITS, STATUS )
@@ -100,12 +99,12 @@
       CALL USI_GET0R( 'PIXSIZE', SCALE, STATUS )
 
 *    Create axes
-      CALL BDA_CREAXES( OLOC, 2, STATUS )
-      CALL BDA_PUTAXUNITS( OLOC, 1, UNITS, STATUS )
-      CALL BDA_PUTAXUNITS( OLOC, 2, UNITS, STATUS )
-      CALL BDA_PUTAXLABEL( OLOC, 1, 'X position', STATUS )
-      CALL BDA_PUTAXLABEL( OLOC, 2, 'Y position', STATUS )
-      CALL BDA_PUTUNITS( OLOC, 'Probability/pixel', STATUS )
+      CALL BDI_CREAXES( OFID, 2, STATUS )
+      CALL BDI_PUTAXUNITS( OFID, 1, UNITS, STATUS )
+      CALL BDI_PUTAXUNITS( OFID, 2, UNITS, STATUS )
+      CALL BDI_PUTAXLABEL( OFID, 1, 'X position', STATUS )
+      CALL BDI_PUTAXLABEL( OFID, 2, 'Y position', STATUS )
+      CALL BDI_PUTUNITS( OFID, 'Probability/pixel', STATUS )
 
 *    Image position
       CALL USI_GET0R( 'X0', X0, STATUS )
@@ -126,13 +125,12 @@
         GOTO 99
       END IF
 
-*    Create header structure and write various parameters
-      CALL BDA_CREHEAD( OLOC, STATUS )
+*    Write timing info if user supplied MJD
       IF ( GOT_MJD ) THEN
-        CALL DAT_NEW0I( OLOC, 'BASE_MJD', STATUS )
-        CALL DAT_NEW0D( OLOC, 'BASE_UTC', STATUS )
-        CALL CMP_PUT0I( OLOC, 'BASE_MJD', INT(MJD), STATUS )
-        CALL CMP_PUT0D( OLOC, 'BASE_UTC', MJD-DBLE(INT(MJD)), STATUS )
+        CALL TCI0_INIT( STATUS )
+        CALL ADI_NEW0( 'TimingInfo', TIMID, STATUS )
+        CALL ADI_CPUT0D( TIMID, 'MJDObs', MJD, STATUS )
+        CALL TCI_PUTID( OFID, TIMID, STATUS )
       END IF
 
 *    Get size of output psf dataset
@@ -141,17 +139,17 @@
       DIMS(2) = RADIUS*2+1
 
 *    Create axis values
-      CALL BDA_PUTAXVAL( OLOC, 1, RADIUS*SCALE, -SCALE, DIMS(1),
+      CALL BDI_PUTAXVAL( OFID, 1, RADIUS*SCALE, -SCALE, DIMS(1),
      :                                                  STATUS )
-      CALL BDA_PUTAXVAL( OLOC, 2, -RADIUS*SCALE, SCALE, DIMS(2),
+      CALL BDI_PUTAXVAL( OFID, 2, -RADIUS*SCALE, SCALE, DIMS(2),
      :                                                  STATUS )
 
 *    Create PSF structure and associate with PSF system
-      CALL PSF_ASSOCO( OLOC, PSLOT, STATUS )
+      CALL PSF_TASSOCO( OFID, PSLOT, STATUS )
 
 *    Map data
-      CALL BDA_CREDATA( OLOC, 2, DIMS, STATUS )
-      CALL BDA_MAPDATA( OLOC, 'WRITE', DPTR, STATUS )
+      CALL BDI_CREDATA( OFID, 2, DIMS, STATUS )
+      CALL BDI_MAPDATA( OFID, 'WRITE', DPTR, STATUS )
 
 *    Get psf <-> grid offsets
       CALL USI_GET0R( 'DX', DX, STATUS )
