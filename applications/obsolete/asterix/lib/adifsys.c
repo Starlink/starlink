@@ -514,8 +514,8 @@ ADIobj adix_link_efile( ADIobj id, char *cls, int clen, ADIstatus status )
           rval = newid;
           }
 
-/*   Status was no applicable method, in which case we try the next list */
-        else if ( *status == ADI__NOMTH ) {
+/*   Failed to link, so try the next class in the list */
+        else if ( ! _ok(status) ) {
 
 /*   Cancel the bad status */
           adic_erranl( status );
