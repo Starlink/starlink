@@ -32,8 +32,8 @@ interface POLBIN
    parameter      IN
       position    1
       type        LITERAL
-      ppath       'CURRENT'
-      association <-GLOBAL.CATALOGUE
+      ppath       'GLOBAL'
+      association '<-GLOBAL.CATALOGUE'
       prompt      'Input catalogue'
       helpkey     '*'
    endparameter
@@ -41,7 +41,7 @@ interface POLBIN
    parameter      OUT
       position    2
       type        LITERAL
-      association ->GLOBAL.CATALOGUE
+      association '->GLOBAL.CATALOGUE'
       prompt      'Output catalogue'
       helpkey     '*'
    endparameter

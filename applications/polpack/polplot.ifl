@@ -56,8 +56,8 @@ interface POLPLOT
    parameter      CAT
       position    1
       type        LITERAL
-      ppath       'CURRENT'
-      association <-GLOBAL.CATALOGUE
+      ppath       'GLOBAL'
+      association '<-GLOBAL.CATALOGUE'
       prompt      'Input catalogue'
       helpkey     '*'
    endparameter
