@@ -36,11 +36,14 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     1990 November 15 (MJC):
 *        Original version.
+*     2004 Oct 1 (TIMJ):
+*        NUM_CMN not required
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -55,7 +58,6 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
 *  Global Variables:
-      INCLUDE 'NUM_CMN'          ! Numerical error flag
 
 *  Arguments Given:
       INTEGER  EL   

@@ -36,6 +36,7 @@
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -43,6 +44,8 @@
 *        Original version.
 *     1990 Sep 27 (MJC):
 *        Renamed from the more generic and common SCALE.
+*     2004 Oct 1 (TIMJ):
+*        NUM_CMN not required
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -58,7 +61,6 @@
       INCLUDE 'PRM_PAR'          ! Bad data values.
 
 *  Global Variables:
-      INCLUDE 'NUM_CMN'          ! Numerical error flag
 
 *  Arguments Given:
       INTEGER  EL   
