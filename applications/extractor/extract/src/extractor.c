@@ -106,11 +106,13 @@
  *     {enter_new_authors_here}
 
  *  History:
- *     25-NOV-1998 (PDRAPER):
+ *     25-NOV-1998 (PWD):
  *        Added prologue and comments, removed print statements.
- *     20-MAY-1999 (PDRAPER):
+ *     20-MAY-1999 (PWD):
  *        Now deals with NDF sections as inputs (previously split at
  *        comma in parentheses)
+ *     10-MAR-2004 (PWD):
+ *        Increased size of filename buffers from 20 to 256.
  *     {enter_changes_here}
  
  *  Bugs:
@@ -131,19 +133,24 @@
 #include        "par.h"
 #include        "ndf.h"
 
+/* Maximum number of NAME/VALUE pairs */
+#define MAXARGS 20
+/* Maximum length of a return parameter value (NAME/VALUE/IMAGE)*/
+#define VALUELEN 256
+
 /* Global variables: */
 jmp_buf env;          /*  Program environment when setjmp called */
 
 void extractor( int *status ) {
 
-  /* Declarations@ */
-  int keywords=0;       /*  Prompt for interactive parameters */
-  char *argkey[20];     /*  Pointers to parameter names */
-  char *argval[20];     /*  Pointers to parameter values */
-  char argstr[800];     /*  Storage space for parameters */
-  int narg;             /*  Number of parameters */
+  /* Declarations */
+  int keywords=0;          /*  Prompt for interactive parameters */
+  char *argkey[MAXARGS];   /*  Pointers to parameter names */
+  char *argval[MAXARGS];   /*  Pointers to parameter values */
+  char argstr[MAXARGS*VALUELEN]; /*  Storage space for name & values */
+  int narg;                /*  Number of parameters */
   int i;
-  int nim;              /*  Number of images given (max=2) */
+  int nim;                 /*  Number of images given (max=2) */
   char *str;
   char *ptr;
   
@@ -168,15 +175,16 @@ void extractor( int *status ) {
        *   Use argstr as temporary buffer
        */
       argkey[0] = argstr;
-      for ( narg=0; (*status == SAI__OK) && (narg < 20); narg++ ) {
+      for ( narg=0; (*status == SAI__OK) && (narg < MAXARGS); narg++ ) {
         
         /*     Get KEYWORD name */
-        parGet0c( "NAME", argkey[narg], 20, status );
+        parGet0c( "NAME", argkey[narg], VALUELEN, status );
         argval[narg] = argkey[narg] + strlen(argkey[narg]) + 1;
         
         /*     Get value */
-        parGet0c( "VALUE", argval[narg], 20, status );
+        parGet0c( "VALUE", argval[narg], VALUELEN, status );
         argkey[narg+1] = argval[narg] + strlen(argval[narg]) + 1;
+
         parCancl( "NAME", status );
         parCancl( "VALUE", status );
       }
@@ -187,13 +195,15 @@ void extractor( int *status ) {
     }
     
     /* Get configuration file name */
-    parGet0c( "CONFIG", prefs.prefs_name, MAXCHAR, status );
+    parGet0c( "CONFIG", prefs.prefs_name, VALUELEN, status );
     if ( *status == SAI__OK ) {
-      readprefs(prefs.prefs_name, argkey, argval, narg);
+        /* And read it, using our NAME, VALUE pairs in preference to those in
+         * the file */
+        readprefs(prefs.prefs_name, argkey, argval, narg);
     }
     
     /* and image name(s) - again use argstr as buffer */
-    parGet0c( "IMAGE", argstr, MAXCHAR, status );
+    parGet0c( "IMAGE", argstr, VALUELEN, status );
     if ( *status == SAI__OK ) {
       for (nim = 0; (str=strtok( nim?NULL:argstr, notokstr ))!=NULL; nim++) {
         if (nim<MAXIMAGE) {
