@@ -1,3 +1,11 @@
+adamMessageRelay
+all.f
+kappa.csh
+kappa.icl
+*.shl
+lutedit.tcl
+multiplot.csh
+stardemo.tcl
 core.*
 kappa.ifd
 kappa_mon
