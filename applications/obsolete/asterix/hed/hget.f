@@ -87,6 +87,7 @@
       CHARACTER*200          CVALUE           ! Character attribute
       CHARACTER*(DAT__SZLOC) LOC              ! Locator to data object
       CHARACTER*40           ITEM             ! Item to get
+      CHARACTER*20           TYPSTR
 
       DOUBLE PRECISION       DVALUE           ! Double attribute
 
@@ -105,6 +106,7 @@
       INTEGER                NELM             ! # of elements
       INTEGER                PTR              ! Ptr to mapped data
       INTEGER                TSTAT            ! Temporary status
+      INTEGER                FC
 
       LOGICAL                ECHO             ! Echo to standard output?
       LOGICAL                LVALUE           ! Logical attribute
