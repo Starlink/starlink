@@ -5,8 +5,8 @@
 *     COF_H2BIN
 
 *  Purpose:
-*     Converts an HDS structure of primitive objects into a FITS binary
-*     table.
+*     Converts an HDS primitive or structure of primitive objects into
+*     a FITS binary table.
 
 *  Language:
 *     Starlink Fortran 77
@@ -16,15 +16,16 @@
 
 *  Description:
 *     The routine creates a FITS binary table of one row to store the
-*     contents of the given HDS structure.  Only primitive objects are
-*     stored.
+*     contents of the given HDS structure or primitive component.
+*     Within a structure only the primitive objects are stored.
 
 *  Arguments:
 *     LOC = CHARACTER * ( DAT__SZLOC ) (Given)
-*        Locator for the structure whose contents are to be converted.
+*        Locator for the primitive object or structure whose contents
+*        are to be converted, or locator to a primitive component.
 *     ALOC = CHARACTER * ( DAT__SZLOC ) (Given)
 *        If the structure given by argument LOC is a cell, ALOC is the
-*        locator to the full structure array.  Otherwise it sohuld be
+*        locator to the full structure array.  Otherwise it should be
 *        set to DAT__NOLOC.
 *     FUNIT = INTEGER (Given)
 *        The logical unit number of the output FITS file.
@@ -60,6 +61,8 @@
 *     1997 March (MJC):
 *        ALOC argument added.  Writes EXTSHAPE keyword and TDIMn
 *        keywords.
+*     1997 November 15 (MJC):
+*        Extended to convert primitive objects too.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -178,7 +181,616 @@
       CALL DAT_PRIM( LOC, PRIM, STATUS )
 
 *  There is nothing to do if the initial object is primitive.
-      IF ( .NOT. PRIM ) THEN
+      IF ( PRIM ) THEN
+
+*  Assimilate the information to make the binary-table header.
+*  ===========================================================
+
+*  Determine its name and record that as the label for the column.
+*  Note the FITS type is equivalent to HDS name just to confuse matters.
+*  There is only one column for the primitive object.
+         CALL DAT_NAME( LOC, TTYPE( 1 ), STATUS )
+
+*  Determine its data type.
+         CALL DAT_TYPE( LOC, TYPE, STATUS )
+
+*  Inquire the component's size.
+         CALL DAT_SIZE( LOC, SIZE, STATUS )
+
+*  Convert the type to the binary-table code.
+         CALL COF_HT2BN( TYPE, SIZE, TFORM( 1 ), STATUS )
+
+*  Assign a null units.
+         TUNIT( 1 ) = ' '
+
+*  Obtain the shape of the component.
+         CALL DAT_SHAPE( LOC, DAT__MXDIM, DIMS, NDIM, STATUS )
+
+*  Get the object's path name and assign it to the extension name.
+         CALL HDS_TRACE( LOC, NLEV, EXTNAM, FILE, STATUS )
+
+*  Remove the prefix if one exists.
+         IF ( EXPATH .NE. ' ' ) THEN
+            NCPRE = CHR_LEN( EXPATH )
+
+*  Get the length of the string.
+            PRECOL = INDEX( EXPATH( :NCPRE ), EXTNAM )
+
+*  Remove the string if it is a prefix.  It is done by adjusting the
+*  string lower limit.
+            IF ( PRECOL .EQ. 1 ) NCEXT = PRECOL + 1
+         ELSE
+            NCEXT = 1
+         END IF
+
+*  Create the dimension string for the header, as a comma-separated
+*  list.  A scalar has value zero.
+         IF ( NDIM .EQ. 0 ) THEN
+            SHAPE = '0'
+
+         ELSE
+            CPOS = 0
+            DO I = 1, NDIM
+               CALL CHR_ITOC( DIMS( I ), CDIM, NC )
+               CALL CHR_APPND( CDIM, SHAPE, CPOS )
+               IF ( I .NE. NDIM ) CALL CHR_APPND( ',', SHAPE, CPOS )
+            END DO
+
+         END IF
+
+
+*  Don't create a new extension if there was something wrong with the
+*  component.
+         IF ( STATUS .NE. SAI__OK ) GOTO 999
+
+*  Create the binary table.
+*  ========================
+
+*  Create new header and data section.
+         CALL FTCRHD( FUNIT, FSTAT )
+
+*  Create binary-table header.  There is only one row in the table.
+*  The "variable-length data area" has length of 0 bytes.
+         CALL FTPHBN( FUNIT, 1, 1, TTYPE, TFORM, TUNIT,
+     :                EXTNAM( NCEXT: ), 0, FSTAT )
+
+*  Handle a bad status.  Negative values are reserved for non-fatal
+*  warnings.
+         IF ( FSTAT .GT. FITSOK ) THEN
+            CALL COF_FIOER( FSTAT, 'COF_H2BIN_ERR1',
+     :        'FTPHBN', 'Error writing binary-table header.', STATUS )
+            GOTO 999
+         END IF
+
+*  Write the TNULL1 card for an integer object (column).
+*  =====================================================
+
+*  An integer type must have its null value defined before it is used.
+*  Floating-point values take defined NaN values.
+         IF ( TYPE .EQ. '_BYTE' .OR. TYPE .EQ. '_UBYTE' .OR.
+     :        TYPE .EQ. '_WORD' .OR. TYPE .EQ. '_UWORD' .OR.
+     :        TYPE .EQ. '_INTEGER' ) THEN
+
+*  FITSIO does not permit cards to be placed after a named card; 
+*  it requires that we read that named card first.  So choose the
+*  the TFORM1 card.  Note that by definition the table only has one
+*  column.
+            CALL FTGCRD( FUNIT, 'TFORM1', CDUMMY, FSTAT )
+
+*  Assign the bad/null value for each of the integer data types.
+            IF ( TYPE .EQ. '_BYTE' ) THEN
+               INULL = NUM_BTOI( VAL__BADB )
+            ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
+               INULL = NUM_UBTOI( VAL__BADUB )
+            ELSE IF ( TYPE .EQ. '_WORD' ) THEN
+               INULL = NUM_WTOI( VAL__BADW )
+            ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
+               INULL = NUM_UWTOI( VAL__BADUW )
+            ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
+               INULL = VAL__BADI
+            END IF
+
+*  Insert the TNULL1 card.
+            CALL FTIKYJ( FUNIT, CRDNAM, INULL,
+     :                   'Starlink bad value', FSTAT )
+
+*  Handle a bad status.  Negative values are reserved for non-fatal
+*  warnings.  Specify from which routine the error arose.
+            IF ( FSTAT .GT. FITSOK ) THEN
+               CALL COF_FIOER( FSTAT, 'COF_H2BIN_ERR7', 'FTIKYJ',
+     :           'Error writing TNULL1 card for a binary table.',
+     :           STATUS )
+               GOTO 999
+            END IF
+         END IF
+
+*  Write the TDIM1 card for a multi-dimensional column.
+*  ====================================================
+
+*  This is only necessary when the object is multi-dimensional.  
+         IF ( NDIM .GT. 1 ) THEN
+
+*  FITSIO does not permit cards to be placed after a named card; 
+*  it requires that we read that named card first.
+            CALL FTGCRD( FUNIT, 'TFORM1', CDUMMY, FSTAT )
+
+*  Insert the TDIM1 card.
+            CALL FTPTDM( FUNIT, 1, NDIM, DIMS, FSTAT )
+
+*  Handle a bad status.  Negative values are reserved for non-fatal
+*  warnings.  Specify from which routine the error arose.
+            IF ( FSTAT .GT. FITSOK ) THEN
+               CALL COF_FIOER( FSTAT, 'COF_H2BIN_ERR7', 'FTIKYJ',
+     :           'Error writing TDIM1 card for a binary table.',
+     :           STATUS )
+               GOTO 999
+            END IF
+         END IF
+
+*  Write additional header cards.
+*  ==============================
+
+*  Set the extension level.
+         CALL FTPKYJ( FUNIT, 'EXTLEVEL', EXTLEV, 'Level in the '/
+     :               /'hierarchical structure', FSTAT )
+
+*  Handle a bad status.  Negative values are reserved for non-fatal
+*  warnings.
+         IF ( FSTAT .GT. FITSOK ) THEN
+            CALL COF_FIOER( FSTAT, 'COF_H2BIN_ERR2', 'FTPKYJ',
+     :        'Error writing extension level in header.', STATUS )
+            GOTO 999
+         END IF
+
+*  Set the extension type.
+         CALL FTPKYS( FUNIT, 'EXTTYPE', TYPE, 'HDS data '/
+     :                /'type of the primitive object', FSTAT )
+
+*  Handle a bad status.  Negative values are reserved for non-fatal
+*  warnings.
+         IF ( FSTAT .GT. FITSOK ) THEN
+            CALL COF_FIOER( FSTAT, 'COF_H2BIN_ERR3', 'FTPKYJ',
+     :        'Error writing extension type in header.', STATUS )
+            GOTO 999
+         END IF
+
+*  Set the extension shape.
+         CALL FTPKYS( FUNIT, 'EXTSHAPE', SHAPE, 'Shape '/
+     :                /'of the hierarchical structure', FSTAT )
+
+*  Handle a bad status.  Negative values are reserved for non-fatal
+*  warnings.
+         IF ( FSTAT .GT. FITSOK ) THEN
+            CALL COF_FIOER( FSTAT, 'COF_H2BIN_ERR8', 'FTPKYJ',
+     :        'Error writing extension shape in header.', STATUS )
+            GOTO 999
+         END IF
+
+*  Define the structure of the binary table.
+*  =========================================
+
+*  Define the structure of a new binary table.  The "variable-length
+*  data area" has length of 0 bytes.  The first 1 is because there is
+*  only one column.
+         CALL FTBDEF( FUNIT, 1, TFORM, 0, 1, FSTAT )
+
+*  Handle a bad status.  Negative values are reserved for non-fatal
+*  warnings.
+         IF ( FSTAT .GT. FITSOK ) THEN
+            CALL COF_FIOER( FSTAT, 'COF_H2BIN_ERR3', 'FTBDEF',
+     :        'Error defining binary-table structure.', STATUS )
+            GOTO 999
+         END IF
+
+*  Inquire a character component's length in bytes per value, starting
+*  a new error context as we wish to annul an error status if the
+*  value is undefined.
+         IF ( INDEX( TYPE, '_CHAR' ) .NE. 0 ) THEN
+            CALL ERR_MARK
+            CALL DAT_LEN( LOC, STRLEN, STATUS )
+
+*  Check for an undefined object.
+            IF ( STATUS .EQ. DAT__UNSET ) THEN
+
+*  Annul the error but record the fact by making the length negative.
+               CALL ERR_ANNUL( STATUS )
+               STRLEN = -1
+            END IF
+
+*  Release the new error context.
+            CALL ERR_RLSE
+         END IF
+
+*  Use a new error context as an undefined HDS value may be processed
+*  and so the error must be annulled.
+         CALL ERR_MARK
+
+*  Copy a scalar value to the table.
+*  =================================
+
+*  Deal with vectors and scalars separately.  First scalars.
+         IF ( NDIM .EQ. 0 ) THEN
+
+*  Obtain each value using the appropriate type and write it to the
+*  binary table.  Certain data types (_BYTE and _UWORD) are not
+*  available in FITS.  These must be converted to the next higher
+*  integer data type.  Note that there is no DAT_GET0UB or DAT_GET0W,
+*  so use the _INTEGER type for these too.  HDS will do the type
+*  conversion.  The data will be converted to the desired by the FITSIO
+*  routine.
+            IF ( TYPE .EQ. '_BYTE' .OR. TYPE .EQ. '_UBYTE' .OR.
+     :           TYPE .EQ. '_WORD' .OR. TYPE .EQ. '_UWORD' .OR.
+     :           TYPE .EQ. '_INTEGER' ) THEN
+
+*  Set the current null value for undefined values.
+               CALL FTTNUL( FUNIT, 1, INULL, FSTAT )
+
+*  Handle a bad status.  Negative values are reserved for non-fatal
+*  warnings.  Specify from which routine the error arose.
+               IF ( FSTAT .GT. FITSOK ) THEN
+                  CALL COF_FIOER( FSTAT, 'COF_H2BIN_ERR6', 'FTTNUL',
+     :              'Error setting null value for a binary-table '/
+     :              /'column.', STATUS )
+                  GOTO 999
+               END IF
+
+*  Obtain an integer scalar value.
+               CALL DAT_GET0I( LOC, IVALUE, STATUS )
+
+*  Check for an HDS undefined value.
+               IF ( STATUS .EQ. DAT__UNSET ) THEN
+
+*  Annul the bad status as we can cope with the error.
+                  CALL ERR_ANNUL( STATUS )
+
+*  Set the binary-table entry to be undefined in this case.
+                  CALL FTPCLU( FUNIT, 1, 1, 1, 1, FSTAT )
+                  ROUTIN = 'FTPCLU'
+
+*  Check for a bad (undefined value) of the appropriate data type; set
+*  the table entry to be undefined in this case.
+               ELSE IF (
+     :                 ( IVALUE .EQ. VAL__BADB .AND.
+     :                   TYPE .EQ. '_BYTE' ) .OR.
+     :                 ( IVALUE .EQ. VAL__BADUB .AND.
+     :                   TYPE .EQ. '_UBYTE' ) .OR.
+     :                 ( IVALUE .EQ. VAL__BADW .AND.
+     :                   TYPE .EQ. '_WORD' ) .OR.
+     :                 ( IVALUE .EQ. VAL__BADUW .AND.
+     :                   TYPE .EQ. '_UWORD' ) .OR.
+     :                 ( IVALUE .EQ. VAL__BADI .AND.
+     :                   TYPE .EQ. '_INTEGER' ) ) THEN
+
+                    CALL FTPCLU( FUNIT, 1, 1, 1, 1, FSTAT )
+                    ROUTIN = 'FTPCLU'
+                 ELSE
+
+*  Copy the integer value to the FITS binary table.
+                    CALL FTPCLI( FUNIT, 1, 1, 1, 1, IVALUE, FSTAT )
+                    ROUTIN = 'FTPCLI'
+                 END IF
+      
+*  Obtain a short string.
+              ELSE IF ( TYPE( 1:5 ) .EQ. '_CHAR' .AND.
+     :                  STRLEN .LE. MXSLEN ) THEN
+
+*  Start a new error context as we wish to annul an error status if the
+*  value is undefined.  Get the value.
+                 CALL ERR_MARK
+                 CALL DAT_GET0C( LOC, CVALUE, STATUS )
+
+*  Check for an undefined object.
+                 IF ( STATUS .EQ. DAT__UNSET ) THEN
+
+*  Annul the error but record the setting the value to be null, i.e.
+*  a blank string.
+                    CALL ERR_ANNUL( STATUS )
+                    CVALUE = ' '
+                 END IF
+
+*  Release the new error context.
+                 CALL ERR_RLSE
+
+*  Copy the value to the binary-table.
+                 CALL FTPCLS( FUNIT, 1, 1, 1, 1, CVALUE ( :STRLEN ),
+     :                        FSTAT )
+                 ROUTIN = 'FTPCLS'
+
+*  Obtain a string.  Copy it to the FITS binary table.  Start a new
+*  error context as we wish to annul an error status if the value is
+*  undefined.  Get the value.  Only MXSLEN characters can be stored in
+*  the character variable so for long strings map the array.
+              ELSE IF ( TYPE( 1:5 ) .EQ. '_CHAR' .AND.
+     :                  STRLEN .GT. MXSLEN ) THEN
+                 CALL ERR_MARK
+                 CALL DAT_MAPV( LOC, TYPE, 'READ', OPNTR, EL, STATUS )
+
+*  Check for an undefined object.
+                 IF ( STATUS .EQ. DAT__UNSET ) THEN
+
+*  Annul the error but record the setting the value to be null, i.e.
+*  a blank string.  Copy this blank string to the binary table.
+                    CALL ERR_ANNUL( STATUS )
+                    CVALUE = ' '
+                    CALL FTPCLS( FUNIT, 1, 1, 1, EL, CVALUE, STRLEN,
+     :                           FSTAT )
+                 ELSE
+
+*  Copy the mapped value to the binary table.
+                    CALL FTPCLS( FUNIT, 1, 1, 1, EL, %VAL( OPNTR ),
+     :                           STRLEN, FSTAT )
+                 END IF
+
+*  Release the new error context.
+                 CALL ERR_RLSE
+
+*  Record the routine name in case of error and unmap the value.
+                 ROUTIN = 'FTPCLS'
+                 CALL DAT_UNMAP( LOC, STATUS )
+
+*  Obtain a real scalar value.
+              ELSE IF ( TYPE .EQ. '_REAL' ) THEN
+                 CALL DAT_GET0R( LOC, RVALUE, STATUS )
+
+*  Check for an HDS-undefined value.  Set the table entry to be
+*  undefined in this case, and annul the error.
+                IF ( STATUS .EQ. DAT__UNSET ) THEN
+                   CALL ERR_ANNUL( STATUS )
+                   CALL FTPCLU( FUNIT, 1, 1, 1, 1, FSTAT )
+                   ROUTIN = 'FTPCLU'
+
+*  Check for a bad (undefined value); set the table entry to be
+*  undefined in this case.
+                ELSE IF ( RVALUE .EQ. VAL__BADR ) THEN
+                   CALL FTPCLU( FUNIT, 1, 1, 1, 1, FSTAT )
+                   ROUTIN = 'FTPCLU'
+                ELSE
+
+*  Copy the real value to the FITS binary table.
+                   CALL FTPCLE( FUNIT, 1, 1, 1, 1, RVALUE, FSTAT )
+                   ROUTIN = 'FTPCLE'
+                END IF
+
+*  Obtain a double-precision scalar value.
+             ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
+
+*  Check for an HDS-undefined value.  Set the table entry to be
+*  undefined in this case, and annul the error.
+                IF ( STATUS .EQ. DAT__UNSET ) THEN
+                   CALL ERR_ANNUL( STATUS )
+                   CALL FTPCLU( FUNIT, 1, 1, 1, 1, FSTAT )
+                   ROUTIN = 'FTPCLU'
+
+*  Check for a bad (undefined value); set the table entry to be
+*  undefined in this case.
+                ELSE IF ( DVALUE .EQ. VAL__BADD ) THEN
+                   CALL FTPCLU( FUNIT, 1, 1, 1, 1, FSTAT )
+                   ROUTIN = 'FTPCLU'
+
+                ELSE
+
+*  Copy the double-precision value to the FITS binary table.
+                   CALL FTPCLD( FUNIT, 1, 1, 1, 1, DVALUE, FSTAT )
+                   ROUTIN = 'FTPCLD'
+                END IF
+
+*  Obtain a logical scalar value.
+             ELSE IF ( TYPE .EQ. '_LOGICAL' ) THEN
+                CALL DAT_GET0L( LOC, LVALUE, STATUS )
+
+*  Check for an HDS-undefined value.  Since there is no logical null
+*  value, by convention it is set to be true, and annul the error.
+                IF ( STATUS .EQ. DAT__UNSET ) THEN
+                   CALL ERR_ANNUL( STATUS )
+                   LVALUE = .TRUE.
+                END IF
+
+*  Copy the logical value to the FITS binary table.
+                CALL FTPCLL( FUNIT, 1, 1, 1, 1, LVALUE, FSTAT )
+                ROUTIN = 'FTPCLL'
+             END IF
+
+*  Handle a bad status.  Negative values are reserved for non-fatal
+*  warnings.  Specify from which routine the error arose.
+             IF ( FSTAT .GT. FITSOK ) THEN
+                CALL COF_FIOER( FSTAT, 'COF_H2BIN_ERR4', ROUTIN,
+     :            'Error copying scalar value to the binary table.',
+     :            STATUS )
+                GOTO 999
+             END IF
+
+          ELSE
+
+*  Copy an array to the table.
+*  ===========================
+
+*  An integer type must have its null value defined before it is used.
+            IF ( TYPE .EQ. '_BYTE' .OR. TYPE .EQ. '_UBYTE' .OR.
+     :           TYPE .EQ. '_WORD' .OR. TYPE .EQ. '_UWORD' .OR.
+     :           TYPE .EQ. '_INTEGER' ) THEN
+
+*  Set the current null value for undefined values.
+               CALL FTTNUL( FUNIT, 1, INULL, FSTAT )
+
+*  Handle a bad status.  Negative values are reserved for non-fatal
+*  warnings.  Specify from which routine the error arose.
+               IF ( FSTAT .GT. FITSOK ) THEN
+                  CALL COF_FIOER( FSTAT, 'COF_H2BIN_ERR6', 'FTTNUL',
+     :              'Error setting null value for a '/
+     :              /'binary-table column.', STATUS )
+                  GOTO 999
+               END IF
+            END IF
+
+*  Map each array using the appropriate type and write it to the
+*  binary table.  Certain data types (_BYTE and _UWORD) are not
+*  available in FITS.  These must be converted to the next higher
+*  integer data type.  HDS undefined values are assigned the table
+*  undefined value.  A new error context is used handle undefined values
+*  transparently.
+
+*  Byte is converted to word for the binary table.
+            IF ( TYPE .EQ. '_BYTE' ) THEN
+               CALL DAT_MAPV( LOC, '_WORD', 'READ', OPNTR, EL, STATUS )
+
+               IF ( STATUS .EQ. DAT__UNSET ) THEN
+                  CALL ERR_ANNUL( STATUS )
+                  CALL FTPCLU( FUNIT, 1, 1, 1, EL, FSTAT )
+                  ROUTIN = 'FTPCLU'
+               ELSE
+                  CALL FTPCNI( FUNIT, 1, 1, 1, EL, %VAL( OPNTR ), 
+     :                         NUM_BTOW( VAL__BADB ), FSTAT )
+                  ROUTIN = 'FTPCNI'
+               END IF
+
+*  Copy an unsigned-byte array to the binary table.
+            ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
+               CALL DAT_MAPV( LOC, TYPE, 'READ', OPNTR, EL, STATUS )
+
+               IF ( STATUS .EQ. DAT__UNSET ) THEN
+                  CALL ERR_ANNUL( STATUS )
+                  CALL FTPCLU( FUNIT, 1, 1, 1, EL, FSTAT )
+                  ROUTIN = 'FTPCLU'
+               ELSE
+                  CALL FTPCNB( FUNIT, 1, 1, 1, EL, %VAL( OPNTR ),
+     :                         NUM_UBTOI( VAL__BADUB ), FSTAT )
+                  ROUTIN = 'FTPCNB'
+               END IF
+
+*  Copy a word array to the binary table.
+            ELSE IF ( TYPE .EQ. '_WORD' ) THEN
+               CALL DAT_MAPV( LOC, TYPE, 'READ', OPNTR, EL, STATUS )
+
+               IF ( STATUS .EQ. DAT__UNSET ) THEN
+                  CALL ERR_ANNUL( STATUS )
+                  CALL FTPCLU( FUNIT, 1, 1, 1, EL, FSTAT )
+                  ROUTIN = 'FTPCLU'
+               ELSE
+                  CALL FTPCNI( FUNIT, 1, 1, 1, EL, %VAL( OPNTR ),
+     :                         VAL__BADW, FSTAT )
+                  ROUTIN = 'FTPCNI'
+               END IF
+
+*  Unsigned word is converted to integer for the binary table.
+            ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
+               CALL DAT_MAPV( LOC, '_INTEGER', 'READ', OPNTR, EL,
+     :                        STATUS )
+
+               IF ( STATUS .EQ. DAT__UNSET ) THEN
+                  CALL ERR_ANNUL( STATUS )
+                  CALL FTPCLU( FUNIT, 1, 1, 1, EL, FSTAT )
+                  ROUTIN = 'FTPCLU'
+               ELSE
+                  CALL FTPCNJ( FUNIT, 1, 1, 1, EL, %VAL( OPNTR ),
+     :                         NUM_UWTOI( VAL__BADUW ), FSTAT )
+                  ROUTIN = 'FTPCNJ'
+               END IF
+
+*  Copy an integer array to the binary table.
+            ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
+               CALL DAT_MAPV( LOC, TYPE, 'READ', OPNTR, EL, STATUS )
+
+               IF ( STATUS .EQ. DAT__UNSET ) THEN
+                  CALL ERR_ANNUL( STATUS )
+                  CALL FTPCLU( FUNIT, 1, 1, 1, EL, FSTAT )
+                  ROUTIN = 'FTPCLU'
+               ELSE
+                  CALL FTPCNJ( FUNIT, 1, 1, 1, EL, %VAL( OPNTR ),
+     :                         VAL__BADI, FSTAT )
+                  ROUTIN = 'FTPCNJ'
+               END IF
+
+*  Copy a string array to the binary table.
+            ELSE IF ( TYPE( 1:5 ) .EQ. '_CHAR' ) THEN
+               CALL DAT_MAPV( LOC, TYPE, 'READ', OPNTR, EL, STATUS )
+
+*  There is no null character value, so set to be blank by convention.
+*  Since this is really a fault in the NDF, the user can suffer
+*  a little by calling the FITSIO routine for every element, instead of
+*  getting workspace and filling it with blank values.
+               IF ( STATUS .EQ. DAT__UNSET ) THEN
+                  CALL ERR_ANNUL( STATUS )
+                  CVALUE = ' '
+                  DO LEL = 1, EL
+                     CALL FTPCLS( FUNIT, 1, 1, LEL, 1,
+     :                            CVALUE( :STRLEN ), STRLEN, FSTAT )
+                  END DO
+               ELSE
+                  CALL FTPCLS( FUNIT, 1, 1, 1, EL, %VAL( OPNTR ),
+     :                         STRLEN, FSTAT )
+               END IF
+               ROUTIN = 'FTPCLS'
+
+*  Copy a real array to the binary table.
+            ELSE IF ( TYPE .EQ. '_REAL' ) THEN
+               CALL DAT_MAPV( LOC, TYPE, 'READ', OPNTR, EL, STATUS )
+
+               IF ( STATUS .EQ. DAT__UNSET ) THEN
+                  CALL ERR_ANNUL( STATUS )
+                  CALL FTPCLU( FUNIT, 1, 1, 1, EL, FSTAT )
+                  ROUTIN = 'FTPCLU'
+               ELSE
+                  CALL FTPCNE( FUNIT, 1, 1, 1, EL, %VAL( OPNTR ),
+     :                         VAL__BADR, FSTAT )
+                  ROUTIN = 'FTPCNE'
+               END IF
+
+*  Copy an double-precision array to the binary table.
+            ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
+               CALL DAT_MAPV( LOC, TYPE, 'READ', OPNTR, EL, STATUS )
+
+               IF ( STATUS .EQ. DAT__UNSET ) THEN
+                  CALL ERR_ANNUL( STATUS )
+                  CALL FTPCLU( FUNIT, 1, 1, 1, EL, FSTAT )
+                  ROUTIN = 'FTPCLU'
+               ELSE
+                  CALL FTPCND( FUNIT, 1, 1, 1, EL, %VAL( OPNTR ),
+     :                         VAL__BADD, FSTAT )
+                  ROUTIN = 'FTPCND'
+               END IF
+
+*  Copy a logical array to the binary table.
+            ELSE IF ( TYPE .EQ. '_LOGICAL' ) THEN
+               CALL DAT_MAPV( LOC, TYPE, 'READ', OPNTR, EL, STATUS )
+
+*  There is no null logical value, so set to be true by convention.
+*  Since this is really a fault in the NDF, the user can suffer
+*  a little by calling the FITSIO routine for every element, instead of
+*  getting workspace and filling it with TRUE values.
+               IF ( STATUS .EQ. DAT__UNSET ) THEN
+                  CALL ERR_ANNUL( STATUS )
+                  DO LEL = 1, EL
+                     CALL FTPCLL( FUNIT, 1, 1, LEL, 1, .TRUE., FSTAT )
+                  END DO
+               ELSE
+                  CALL FTPCLL( FUNIT, 1, 1, 1, EL, %VAL( OPNTR ),
+     :                         FSTAT )
+                  ROUTIN = 'FTPCLL'
+               END IF
+
+            END IF
+
+*  Unmap the array component.
+            CALL DAT_UNMAP( LOC, STATUS )
+
+*  Handle a bad status.  Negative values are reserved for non-fatal
+*  warnings.  Specify from which routine the error arose.
+            IF ( FSTAT .GT. FITSOK ) THEN
+               CALL COF_FIOER( FSTAT, 'COF_H2BIN_ERR5', ROUTIN,
+     :           'Error copying an array to the binary table.', STATUS )
+               GOTO 999
+            END IF
+         END IF
+
+*  Release the error context.
+         CALL ERR_RLSE
+
+*  Record that the extension was written satisfactorily.
+         WRITTN = .TRUE.
+
+*  Structure
+*  =========
+      ELSE
 
 *  Determine how many components the structure has.
          CALL DAT_NCOMP( LOC, NCMP, STATUS )
@@ -233,7 +845,7 @@
 *  Assign a null units.
                      TUNIT( NOPRIM ) = ' '
 
-*  Obtain the shape pf the component.
+*  Obtain the shape of the component.
                      CALL DAT_SHAPE( LCMP, DAT__MXDIM, DIMS, NDIM,
      :                               STATUS )
 
@@ -289,7 +901,7 @@
      :                               STATUS )
                   END IF
 
-*  Create the dimension string for the header, as a comma separated
+*  Create the dimension string for the header, as a comma-separated
 *  list.  A scalar has value zero.
                   IF ( NDIM .EQ. 0 ) THEN
                      SHAPE = '0'
@@ -392,9 +1004,7 @@
 *  Write the TDIMn cards for any multi-dimensional columns.
 *  ========================================================
 
-*  This is only necessary when there is at least one column that has one
-*  of the integer types.  Floating-point values take defined NaN
-*  values.
+*  This is only necessary when the object is multi-dimensional.  
                   IF ( NMDCOL .GT. 0 ) THEN
                      DO ICMD = 1, NMDCOL
 
@@ -949,7 +1559,7 @@
                                  ROUTIN = 'FTPCNE'
                               END IF
 
-*  Copy an double-precsion array to the binary table.
+*  Copy an double-precision array to the binary table.
                            ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
                               CALL DAT_MAPV( LCMP, TYPE, 'READ',
      :                                       OPNTR, EL, STATUS )
