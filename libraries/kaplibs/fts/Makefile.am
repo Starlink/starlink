@@ -11,7 +11,7 @@ libfts_la_SOURCES = \
 
 PRIVATE_INCLUDES = FTS_PAR
 
-C_ROUTINES = fts1_findf.c fts1_rnand.c fts1_rnanr.c
+C_ROUTINES = fts1_rnand.c fts1_rnanr.c
 
 F_ROUTINES = fts1_astwn.f fts1_axis.f fts1_blcar.f fts1_bswap.f \
 fts1_chvai.f fts1_chvaub.f fts1_chvaw.f fts1_comnt.f \
