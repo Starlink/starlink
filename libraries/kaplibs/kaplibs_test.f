@@ -46,8 +46,8 @@
 *  Tell the user what should happen.
       CALL MSG_BLANK( STATUS )
       CALL MSG_OUT( ' ', 'A graphics window should appear '//
-     :              'containing a red diagonal line in a blue box '//
-     :              'with a green grid and cyan numerical labels.',
+     :              'containing a red diagonal line, a grid, and '//
+     :              'a set of annotated axes.',
      :              STATUS )
       CALL MSG_BLANK( STATUS )
 
