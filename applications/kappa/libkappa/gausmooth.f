@@ -194,6 +194,8 @@
 *        default of TITLE to null.  Used PSX to obtain workspace.
 *     5-JUN-1998 (DSB):
 *        Added propagation of the WCS component.
+*     13-APR-2000 (DSB):
+*        Corrected argument list for KPS1_PSEVL.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -519,7 +521,8 @@
 *  Evaluate the point-spread function within the box.  Gamma is 2.0 for
 *  a Gaussian.
          CALL KPS1_PSEVL( AXISR, RORI, MIN( FWHM( 1 ), FWHM( 2 ) ),
-     :                    2.0, 2 * IBOX + 1, 2 * JBOX + 1,
+     :                    2.0, 1, 2 * IBOX + 1, 1, 2 * JBOX + 1,
+     :                    REAL( IBOX )+0.5, REAL( JBOX )+0.5, 
      :                    %VAL( WPNTR1 ), STATUS )
 
          IF ( ITYPE .EQ. '_DOUBLE' ) THEN
