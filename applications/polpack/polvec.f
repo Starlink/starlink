@@ -814,8 +814,13 @@
       TR2( 3 ) = REAL( LBND( 2 ) ) - 0.5 - TR2( 4 )
 
 *  Allocate work arrays.
-      CALL PSX_CALLOC( NXBIN*NYBIN, '_DOUBLE', IPW1, STATUS )
-      CALL PSX_CALLOC( NXBIN*NYBIN, '_DOUBLE', IPW2, STATUS )
+      IF( EQMAP .NE. AST_NULL ) THEN
+         CALL PSX_CALLOC( NXBIN*NYBIN, '_DOUBLE', IPW1, STATUS )
+         CALL PSX_CALLOC( NXBIN*NYBIN, '_DOUBLE', IPW2, STATUS )
+      ELSE 
+         IPW1 = IPI
+         IPW2 = IPI
+      END IF
 
 *  Call the routine to do the work.
       CALL POL1_PLVEC( TR2, EQMAP, NXBIN, NYBIN, DIM( 3 ), 
@@ -830,8 +835,10 @@
      :                 %VAL( IPW2 ), STATUS )
 
 *  Free the work space.
-      CALL PSX_FREE( IPW1, STATUS )   
-      CALL PSX_FREE( IPW2, STATUS )   
+      IF( EQMAP .NE. AST_NULL ) THEN
+         CALL PSX_FREE( IPW1, STATUS )   
+         CALL PSX_FREE( IPW2, STATUS )   
+      END IF
 
 *  Closedown.
 *  ==========
