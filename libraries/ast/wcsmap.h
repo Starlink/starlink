@@ -273,36 +273,36 @@
 
 /* Projection Types: (note, WCSBAD must be the last in this list) */
 
-#define AST__AZP 0
-#define AST__SZP 1
-#define AST__TAN 2
-#define AST__STG 3
-#define AST__SIN 4
-#define AST__ARC 5
-#define AST__ZPN 6
-#define AST__ZEA 7
-#define AST__AIR 8
-#define AST__CYP 9
-#define AST__CEA 10
-#define AST__CAR 11
-#define AST__MER 12
-#define AST__SFL 13
-#define AST__PAR 14
-#define AST__MOL 15
-#define AST__AIT 16
-#define AST__COP 17
-#define AST__COE 18
-#define AST__COD 19
-#define AST__COO 20
-#define AST__BON 21
-#define AST__PCO 22
-#define AST__TSC 23
-#define AST__CSC 24
-#define AST__QSC 25
-#define AST__NCP 26
-#define AST__GLS 27
-#define AST__TPN 28
-#define AST__WCSBAD 29   /* A bad projection type */
+#define AST__AZP 1
+#define AST__SZP 2
+#define AST__TAN 3
+#define AST__STG 4
+#define AST__SIN 5
+#define AST__ARC 6
+#define AST__ZPN 7
+#define AST__ZEA 8
+#define AST__AIR 9
+#define AST__CYP 10
+#define AST__CEA 11
+#define AST__CAR 12
+#define AST__MER 13
+#define AST__SFL 14
+#define AST__PAR 15
+#define AST__MOL 16
+#define AST__AIT 17
+#define AST__COP 18
+#define AST__COE 19
+#define AST__COD 20
+#define AST__COO 21
+#define AST__BON 22
+#define AST__PCO 23
+#define AST__TSC 24
+#define AST__CSC 25
+#define AST__QSC 26
+#define AST__NCP 27
+#define AST__GLS 28
+#define AST__TPN 29
+#define AST__WCSBAD 30   /* A bad projection type */
 
 /* Type Definitions. */
 /* ================= */
