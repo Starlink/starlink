@@ -61,8 +61,8 @@
 	 TYPE '_INTEGER'
 	 DEFAULT 0
  	 PROMPT   'Which switch (0=reduce;1,2,3=switch number)'
-         vpath       'CURRENT,DEFAULT'
-         ppath       'CURRENT'
+         vpath       'DEFAULT'
+         ppath       'DEFAULT'
 	 HELPKEY  '*'
       ENDPARAMETER
 
