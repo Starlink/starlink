@@ -280,7 +280,7 @@
                CC='cc'
                CFLAGS='-I$(STAR_INC) -O -std1'
                FC='f77'
-               FFLAGS='-O'
+               FFLAGS='-O -warn nouncalled'
                LINK='ln -s'
                RANLIB='ranlib'
                TAR_IN='tar -cvhf'

@@ -83,6 +83,9 @@
 #        Original version.
 #     1994 November 10 (MJC):
 #        Added ADAM-like prompting user interface.
+#     13-APR-2000 (DSB):
+#        Added "bs=80" to the dd command at the end of the script to prevent 
+#        an unwanted newline being added at 512 intervals.
 #     {enter_further_changes_here}
 #
 #  Bugs:
@@ -560,7 +563,7 @@ else
 #
 #   List the headers for the current file.
 #
-      dd cbs=80 conv=unblock if=$file | sed -n -e "$sedsim" -e "$sedext"
+      dd cbs=80 bs=80 conv=unblock if=$file | sed -n -e "$sedsim" -e "$sedext"
    end
 endif
 #
