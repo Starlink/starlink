@@ -112,6 +112,8 @@
 *        Now use USI for user interface (DJA)
 *     14 Dec 1995 V2.0-0 (DJA):
 *        Full ADI port.
+*      3 Jan 1996 V2.0-1 (DJA):
+*        Main body of copying moved to EDI_SUBSET (DJA)
 *     {enter_changes_here}
 
 *  Bugs:
@@ -130,10 +132,6 @@
 *  Status:
       INTEGER			STATUS             	! Global status
 
-*  External References:
-C      [external_declaration]
-C      {data_type} {external_name} ! [external_description]
-
 *  Local Constants:
       INTEGER                 	MXSEL                	! Maximum number of
         PARAMETER            	(MXSEL = 10)          	! LISTs to select
@@ -141,16 +139,11 @@ C      {data_type} {external_name} ! [external_description]
       INTEGER                 	MXBNDS               	! Maximum number of bounds
         PARAMETER            	(MXBNDS = 1000)       	! => 500 ranges
 
-      INTEGER                 	BLOCKSIZE            	! Maximum # elements
-        PARAMETER            	(BLOCKSIZE = 262144 ) 	! per section
-
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'EVSUBSET Version V2.0-0' )
+        PARAMETER		( VERSION = 'EVSUBSET Version V2.0-1' )
 
 *  Local Variables:
-      CHARACTER*20  		LNAME    		! Current list name
       CHARACTER*20  		NAME(MXSEL)    		! Names of selected lists
-      CHARACTER*7  		MTYPE                	! Mapping type
       CHARACTER*12            	PAR                  	! Parameter name
       CHARACTER*20		TNAME			! Time list name
       CHARACTER*200             TXT                  	! Input text
@@ -163,35 +156,22 @@ C      {data_type} {external_name} ! [external_description]
       REAL                    	RANGES(MXBNDS,MXSEL) 	! Range boundaries
       REAL                    	QUANTUM              	! Value of scalar quantum
 
-      INTEGER                 	ADPTR                	! A vector data array
-      INTEGER                 	AQPTR                	! A vector quantum array
-      INTEGER                 	BSTART      	   	! Block start index
-      INTEGER                 	BEND      	   	! Block end index
-      INTEGER                 	BLEN      	   	! Block length
-      INTEGER			CBPTR			! Counts per block store
-      INTEGER		      	CCOUNT			! Events to copy per block
       INTEGER                 	COPY                 	! Pointer to copy array
       INTEGER                 	EVENTS               	! Number of events in EVDS
       INTEGER			EVID			! New event object
       INTEGER                 	I, J, K              	! Loop counters
-      INTEGER                 	IBLOCK               	! Loop over blocks
       INTEGER                 	ICOPY                	! Pointer to copy array
       INTEGER                 	IDPTR(MXSEL)    	! List data pointers
       INTEGER			IFID			! Input dataset id
-      INTEGER			ILID			! Input list id
       INTEGER                   INDEX(MXSEL)       	! Lists to apply ranges
       INTEGER                 	IQPTR(MXSEL)    	! Pointer to input quantum
       INTEGER                 	LEN                  	! Length of various things
       INTEGER			LID			! List identifier
-      INTEGER			NBLK			! # blocks to copy
       INTEGER                 	NLISTS               	! Number of LISTs
       INTEGER                 	NRANGES(MXSEL)  	! Number of ranges per list
       INTEGER                 	NSEL                 	! # selected lists
-      INTEGER                 	ODPTR                	! Output list data
-      INTEGER		      	OFFSET		   	! Output data offset
       INTEGER			OFID			! Output dataset id
       INTEGER			OLID			! Output list id
-      INTEGER                 	OQPTR                	! Output list quantum
       INTEGER			TIMID			! Timing info
       INTEGER			TLIST			! Time list number
 
@@ -385,126 +365,52 @@ C      {data_type} {external_name} ! [external_description]
 *  Copy ancillaries from input
       CALL UDI_COPANC( IFID, ' ', OFID, STATUS )
 
-*  Allocate array to hold number of events to be copied per block
-      NBLK = EVENTS/BLOCKSIZE + 1
-      CALL DYN_MAPI( 1, NBLK, CBPTR, STATUS )
+*  Copy lists to output
+      CALL EDI_SUBSET( IFID, %VAL(COPY), OFID, STATUS )
 
-*  Count number of events to be copied in each block
-      BSTART = 1
-      DO IBLOCK = 1, NBLK
-
-*    End of the block
-        BEND = MIN(BSTART + BLOCKSIZE -1, EVENTS)
-        BLEN = BEND - BSTART + 1
-
-*    Count non-zeros
-        CALL EVSUBSET_COUNT( BLEN, %VAL(COPY+VAL__NBB*(BSTART-1)),
-     :                       CCOUNT, STATUS )
-        CALL ARR_SELEM1I( CBPTR, NBLK, IBLOCK, CCOUNT, STATUS )
-
-*    Next block
-        BSTART = BSTART + BLOCKSIZE
-
-      END DO
-
-*  Look for time list in input
-      CALL EDI_QFND( IFID, 'T', TNAME, TLIST, STATUS )
-
-*  Write output LISTs
-      DO I = 1, NLISTS
+*  Loop over selected lists to update ranges
+      DO I = 1, NSEL
 
 *    Locate input list
-        CALL EDI_IDX( IFID, I, ILID, STATUS )
-        CALL ADI_CGET0C( ILID, 'Name', LNAME, STATUS )
-
-*    Is this one of the selected lists
-        SELECT = .FALSE.
-        DO J = 1, NSEL
-          IF ( J .EQ. INDEX(J) ) SELECT = .TRUE.
-        END DO
-
-*    Make copy for output
-        CALL ADI_COPY( ILID, OLID, STATUS )
-
-*    Decide on mapping type
-        CALL EDI_MTYPE( ILID, MTYPE, STATUS )
+        CALL EDI_IDX( OFID, INDEX(I), OLID, STATUS )
 
 *    Update lists extrema for selected lists
-        IF ( SELECT ) THEN
-          FMIN(I) = RANGES(1,I)
-          FMAX(I) = RANGES(2*NRANGES(I),I)
-          CALL ADI_CPUT0R( OLID, 'Min', FMIN(I), STATUS )
-          CALL ADI_CPUT0R( OLID, 'Max', FMAX(I), STATUS )
-        END IF
+        FMIN(I) = RANGES(1,I)
+        FMAX(I) = RANGES(2*NRANGES(I),I)
+        CALL ADI_CPUT0R( OLID, 'Min', FMIN(I), STATUS )
+        CALL ADI_CPUT0R( OLID, 'Max', FMAX(I), STATUS )
 
-*    Create the list
-        CALL EDI_CREAT( OFID, OLID, STATUS )
+*    Update list fields
+        CALL EDI_LUPDT( OFID, OLID, 'Min,Max', STATUS )
 
-*    Loop over blocks
-        OFFSET = 0
-        BSTART = 1
-        DO IBLOCK = 1, EVENTS/BLOCKSIZE + 1
+*    Release the list
+        CALL ADI_ERASE( OLID, STATUS )
 
-*      End of the block
-          BEND = MIN(BSTART + BLOCKSIZE -1, EVENTS)
-          BLEN = BEND - BSTART + 1
+*  Next list
+      END DO
 
-*      Any selected events in this block?
-          CALL ARR_ELEM1I( CBPTR, NBLK, IBLOCK, CCOUNT, STATUS )
-          IF ( CCOUNT .EQ. 0 ) GOTO 50
+*  Time list present?
+      CALL EDI_QFND( IFID, 'T', TNAME, TLIST, STATUS )
+      IF ( STATUS .EQ. SAI__OK ) THEN
 
-*      Map the input event block
-          CALL EDI_MAP( IFID, LNAME, MTYPE, 'READ', BSTART, BEND,
-     :                  ADPTR, STATUS )
-          CALL EDI_MAP( OFID, LNAME, MTYPE, 'WRITE', OFFSET + 1,
-     :                  OFFSET + CCOUNT, ODPTR, STATUS )
-
-*        Ditto the quantum
-          IF ( QVEC(I) ) THEN
-            CALL EDI_QMAP( IFID, LNAME, MTYPE, 'READ', BSTART, BEND,
-     :                  AQPTR, STATUS )
-            CALL EDI_QMAP( OFID, LNAME, MTYPE, 'WRITE', OFFSET + 1,
-     :                  OFFSET + CCOUNT, OQPTR, STATUS )
-          END IF
-
-*        Copy the data
-          IF ( MTYPE(1:1) .EQ. 'D' ) THEN
-            CALL EVSUBSET_QCOPYD( BLEN,
-     :                            %VAL(ADPTR), QVEC(I), %VAL(AQPTR),
-     :                            %VAL(COPY+(BSTART-1)*VAL__NBB),
-     :                            %VAL(ODPTR), %VAL(OQPTR), STATUS )
+*    Was it selected?
+        SELECT = .FALSE.
+        J = 1
+        DO WHILE ( (J.LE.NSEL) .AND. .NOT. SELECT )
+          IF ( J .EQ. INDEX(J) ) THEN
+            SELECT = .TRUE.
           ELSE
-            CALL EVSUBSET_QCOPYI( BLEN,
-     :                            %VAL(ADPTR), QVEC(I), %VAL(AQPTR),
-     :                            %VAL(COPY+(BSTART-1)*VAL__NBB),
-     :                            %VAL(ODPTR), %VAL(OQPTR), STATUS )
+            J = J + 1
           END IF
-
-*      Unmap the slices
-          CALL EDI_UNMAP( IFID, LNAME, STATUS )
-          CALL EDI_UNMAP( OFID, LNAME, STATUS )
-
-*      Annul vector quantum slices
-          IF ( QVEC(I) ) THEN
-            CALL EDI_QUNMAP( IFID, LNAME, STATUS )
-            CALL EDI_QUNMAP( OFID, LNAME, STATUS )
-          END IF
-
-*      Adjust output pointer
- 50       BSTART = BSTART + BLOCKSIZE
-          OFFSET = OFFSET + CCOUNT
-
-*    Next block
         END DO
-
-*    Is this the preferred time list, and is be subsetted?
-        IF ( SELECT .AND. (TLIST.EQ.I) ) THEN
+        IF ( SELECT ) THEN
 
 *      Accumulate selected ranges
           OBS_LENGTH = 0.0
-          DO J = 1, NRANGES(I)
-            K = (2 * J) - 1
-            OBS_LENGTH = OBS_LENGTH + (RANGES(K+1,I) - RANGES(K,I))
+          DO I = 1, NRANGES(J)
+            K = (2 * I) - 1
+            OBS_LENGTH = OBS_LENGTH +
+     :               (RANGES(K+1,TLIST) - RANGES(K,TLIST))
           END DO
 
 *      Extract existing observation length
@@ -514,7 +420,7 @@ C      {data_type} {external_name} ! [external_description]
             CALL ADI_CGET0R( TIMID, 'ObsLength', OLD_OBS_LENGTH,
      :                       STATUS )
             OBS_LENGTH = OLD_OBS_LENGTH - OBS_LENGTH
-          ELSE IF ( .NOT. OK .AND. .NOT. KEEP(I) ) THEN
+          ELSE IF ( .NOT. OK .AND. .NOT. KEEP(J) ) THEN
             OBS_LENGTH = VAL__BADR
           END IF
 
@@ -523,7 +429,12 @@ C      {data_type} {external_name} ! [external_description]
           CALL TCI_PUTID( OFID, TIMID, STATUS )
 
         END IF
-      END DO
+
+*  No time list, but not a problem
+      ELSE
+        CALL ERR_ANNUL( STATUS )
+
+      END IF
 
 *  History
       CALL HSI_ADD( OFID, VERSION, STATUS )
@@ -619,135 +530,6 @@ C      {data_type} {external_name} ! [external_description]
 
       END
 
-
-*+  EVSUBSET_QCOPYD - Copy DATA & QUANTUM values
-      SUBROUTINE EVSUBSET_QCOPYD( EVENTS, IN, QOK, QIN, COPY, OUT, QOUT,
-     :                            STATUS )
-*    Description :
-*     Copies from IN to OUT if COPY is true
-*    Authors :
-*     Phil Andrews
-*    History :
-*      1-JUN-1989 :  Original  (PLA_AST88@uk.ac.bham.sr.star)
-*    Type Definitions :
-      IMPLICIT NONE
-*
-*    Global constants :
-*
-      INCLUDE 'SAE_PAR'
-*
-*    Status :
-*
-      INTEGER STATUS
-*
-*    Import :
-*
-      INTEGER        EVENTS
-
-      DOUBLE PRECISION IN(*)
-      LOGICAL          QOK
-      DOUBLE PRECISION QIN(*)
-
-      BYTE            COPY(*)
-*
-*    Export :
-*
-      DOUBLE PRECISION QOUT(*)
-      DOUBLE PRECISION OUT(*)
-*
-*    Local variables :
-*
-      INTEGER        I, J
-*-
-
-*    Check status
-      IF ( STATUS .NE. SAI__OK ) RETURN
-
-      J = 0
-
-      IF ( QOK ) THEN
-        DO I = 1, EVENTS
-          IF ( COPY(I) .NE. 0 ) THEN
-            J = J + 1
-            OUT(J) = IN(I)
-            QOUT(J) = QIN(J)
-          END IF
-        END DO
-      ELSE
-        DO I = 1, EVENTS
-          IF ( COPY(I) .NE. 0 ) THEN
-            J = J + 1
-            OUT(J) = IN(I)
-          END IF
-        END DO
-      END IF
-
-      END
-
-
-
-*+  EVSUBSET_QCOPYI - Copy DATA & QUANTUM values
-      SUBROUTINE EVSUBSET_QCOPYI( EVENTS, IN, QOK, QIN, COPY, OUT, QOUT,
-     :                            STATUS )
-*    Description :
-*     Copies from IN to OUT if COPY is true
-*    Authors :
-*     Phil Andrews
-*    History :
-*      1-JUN-1989 :  Original  (PLA_AST88@uk.ac.bham.sr.star)
-*    Type Definitions :
-      IMPLICIT NONE
-*
-*    Global constants :
-*
-      INCLUDE 'SAE_PAR'
-*
-*    Status :
-*
-      INTEGER STATUS
-*
-*    Import :
-*
-      INTEGER        EVENTS
-      LOGICAL        QOK
-      INTEGER        IN(*)
-      INTEGER        QIN(*)
-
-      BYTE           COPY(*)
-*
-*    Export :
-*
-      INTEGER        QOUT(*)
-      INTEGER        OUT(*)
-*
-*    Local variables :
-*
-      INTEGER        I, J
-*-
-
-*    Check status
-      IF ( STATUS .NE. SAI__OK ) RETURN
-
-      J = 0
-
-      IF ( QOK ) THEN
-        DO I = 1, EVENTS
-          IF ( COPY(I) .NE. 0 ) THEN
-            J = J + 1
-            OUT(J) = IN(I)
-            QOUT(J) = QIN(J)
-          END IF
-        END DO
-      ELSE
-        DO I = 1, EVENTS
-          IF ( COPY(I) .NE. 0 ) THEN
-            J = J + 1
-            OUT(J) = IN(I)
-          END IF
-        END DO
-      END IF
-
-      END
 
 
 *+  EVSUBSET_ALTER_RNG_S - Alter range values according to SCALAR quantum
@@ -944,57 +726,6 @@ C      {data_type} {external_name} ! [external_description]
 *    Loop over selected events
       DO I = 1, NIN
         OUT(IN(I)) = 1
-      END DO
-
-      END
-
-
-*+  EVSUBSET_COUNT - Count selected events
-      SUBROUTINE EVSUBSET_COUNT( NIN, COPY, NOUT, STATUS )
-*    Description :
-*     <description of what the subroutine does - for user info>
-*    Method:
-*    Bugs :
-*    Authors :
-*
-*     David J. Allan (ROSAT,BHVAD::DJA)
-*
-*    History :
-*
-*      1 Nov 93 : Original (DJA)
-*
-*    Type definitions :
-*
-      IMPLICIT NONE
-*
-*    Global constants :
-*
-      INCLUDE 'SAE_PAR'
-*
-*    Import :
-*
-      INTEGER NIN
-      BYTE    COPY(NIN)
-*
-*    Export :
-*
-      INTEGER NOUT
-*
-*    Status :
-      INTEGER STATUS
-*
-*    Local variables :
-*
-      INTEGER I
-*-
-
-*    Check status
-      IF ( STATUS .NE. SAI__OK ) RETURN
-
-*    Loop over selected events
-      NOUT = 0
-      DO I = 1, NIN
-        IF ( COPY(I) .NE. 0 ) NOUT = NOUT + 1
       END DO
 
       END

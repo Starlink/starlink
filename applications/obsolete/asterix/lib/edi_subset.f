@@ -21,7 +21,7 @@
 *     IFID = INTEGER (given)
 *        ADI identifier of input object, derived from EventDS
 *     SEL[] = BYTE (given)
-*        Selector. Set to one if event is to be copied
+*        Selector. Set to non-zero if event is to be copied
 *     OFID = INTEGER (given)
 *        ADI identifier of output object, derived from EventDS
 *     STATUS = INTEGER (given and returned)
@@ -116,7 +116,6 @@
       INTEGER                 	EVENTS               	! Number of events in EVDS
       INTEGER                 	I              		! Loop counters
       INTEGER                 	IBLOCK               	! Loop over blocks
-      INTEGER			IFID			! Input dataset id
       INTEGER			ILID			! Input list id
       INTEGER			LID			! List identifier
       INTEGER			NBLK			! # blocks to copy
@@ -148,8 +147,10 @@
         BLEN = BEND - BSTART + 1
 
 *    Count non-zeros
-        CALL EDI_SUBSET1( BLEN, %VAL(COPY+VAL__NBB*(BSTART-1)),
-     :                    CCOUNT, STATUS )
+        CCOUNT = 0
+        DO I = 1, NIN
+          IF ( SEL(I) .NE. 0 ) CCOUNT = CCOUNT + 1
+        END DO
         CALL ARR_SELEM1I( CBPTR, NBLK, IBLOCK, CCOUNT, STATUS )
 
 *    Next block
@@ -208,15 +209,11 @@
 
 *      Copy the data
           IF ( MTYPE(1:1) .EQ. 'D' ) THEN
-            CALL EDI_SUBSET_COPD( BLEN,
-     :                            %VAL(ADPTR), QVEC, %VAL(AQPTR),
-     :                            %VAL(COPY+(BSTART-1)*VAL__NBB),
-     :                            %VAL(ODPTR), %VAL(OQPTR), STATUS )
+            CALL EDI_SUBSET_COPD( BLEN, %VAL(ADPTR), QVEC, %VAL(AQPTR),
+     :                  SEL(BSTART), %VAL(ODPTR), %VAL(OQPTR), STATUS )
           ELSE
-            CALL EDI_SUBSET_COPI( BLEN,
-     :                            %VAL(ADPTR), QVEC, %VAL(AQPTR),
-     :                            %VAL(COPY+(BSTART-1)*VAL__NBB),
-     :                            %VAL(ODPTR), %VAL(OQPTR), STATUS )
+            CALL EDI_SUBSET_COPI( BLEN, %VAL(ADPTR), QVEC, %VAL(AQPTR),
+     :                  SEL(BSTART), %VAL(ODPTR), %VAL(OQPTR), STATUS )
           END IF
 
 *      Unmap the slices
@@ -375,56 +372,5 @@
           END IF
         END DO
       END IF
-
-      END
-
-
-*+  EDI_SUBSET1 - Count selected events
-      SUBROUTINE EDI_SUBSET1( NIN, COPY, NOUT, STATUS )
-*    Description :
-*     <description of what the subroutine does - for user info>
-*    Method:
-*    Bugs :
-*    Authors :
-*
-*     David J. Allan (ROSAT,BHVAD::DJA)
-*
-*    History :
-*
-*      1 Nov 93 : Original (DJA)
-*
-*    Type definitions :
-*
-      IMPLICIT NONE
-*
-*    Global constants :
-*
-      INCLUDE 'SAE_PAR'
-*
-*    Import :
-*
-      INTEGER NIN
-      BYTE    COPY(NIN)
-*
-*    Export :
-*
-      INTEGER NOUT
-*
-*    Status :
-      INTEGER STATUS
-*
-*    Local variables :
-*
-      INTEGER I
-*-
-
-*    Check status
-      IF ( STATUS .NE. SAI__OK ) RETURN
-
-*    Loop over selected events
-      NOUT = 0
-      DO I = 1, NIN
-        IF ( COPY(I) .NE. 0 ) NOUT = NOUT + 1
-      END DO
 
       END
