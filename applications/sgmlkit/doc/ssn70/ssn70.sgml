@@ -44,6 +44,11 @@
 	affiliation='University of Glasgow'
 	id=ng
 	>Norman Gray
+<author email='mbt@ast.cam.ac.uk'
+	webpage='http://www.ast.cam.ac.uk/%7Embt/'
+	affiliation='University of Cambridge'
+	id=mbt
+	>Mark Taylor
 
 <docnumber>70
 
@@ -152,7 +157,10 @@ In <ref id=doccode>, I describe the
 support which exists to support documentation of source code, allowing
 you to maintain detailed routine documentation along with the routine
 source code.  In <ref id=processing>, I describe the details of how
-you transform your document from SGML to an output format.  Finally,
+you transform your document from SGML to an output format.  In <ref
+id=upconvert> we describe how to transform a document from
+<code/star2html/ format to an SGML document.
+Finally,
 the appendices give the detailed descriptions of the elements in the
 two DTDs described here, a more detailed description of SGML than is
 necessary for simple use of the set, and documentation for
@@ -2601,6 +2609,372 @@ document.
 soon be free XML editors.  These aren't useful quite yet, as there is
 not yet an XML version of the Starlink DTD, but their time will come.
 
+<!-- Upconverter documentation, maintained by Mark Taylor -->
+<sect id=upconvert export>Converting existing text to SGML
+<update versionid="v0.6">Added Mark's upconverter documentation</update>
+
+<p>If you are not writing a document from scratch, 
+then to use the SGML system you will have first to convert existing
+documents from their current form to SGML -- in the jargon this
+is called `<em>upconversion</em>'.
+Two sets of upconversion programs exist: one for the main
+text of Starlink documents in their &latex; form, and one 
+for source code which contains prologues which are written in the
+normal Starlink way. 
+
+<subsect id=upconvert.latex export>Upconversion from &latex;
+
+<p>The &latex; upconverter takes an existing Starlink document
+(a SUN or SSN etc)
+and outputs an SGML version of the same thing, which conforms to 
+the appropriate one of the Starlink DTDs.
+The upconversion process is somewhat complicated and error-prone
+for a number of reasons, and it is unlikely that simply running
+the upconverter will give you a perfect SGML document without
+further effort -- it will probably be necessary to make a few
+changes to the original &latex;, run the upconverter, examine
+the log messages given by the converter and the resulting SGML, 
+and then either tidy the SGML by hand or make further changes to
+the &latex;, and repeat the cycle.
+Some documents require relatively little manual adjustment,
+and others more.  Since the upconverter makes use of the
+<code/latex2html/ program, if the document cannnot be successfully
+processed by <code/star2html/ then it's unlikely that the upconverter
+will make a good job of it.
+
+<p>At its simplest, a document can be converted using a command like:
+<verbatim>
+latex2sgml sun666
+</verbatim>
+This will produce a fair bit of output.
+The verbose and highly punctuated part near the beginning 
+can be recognised as the output of <code>latex2html</code>,
+and unless it looks unduly alarming can be ignored.
+The rest of the screen output should consist of fairly terse messages
+explaining the steps which the <code>latex2sgml</code>
+script is performing.
+If things have gone mostly according to plan,
+when the upconversion is completed
+it will output the following:
+<verbatim>
+--------------------------------------------------------------------
+--- latex2sgml: Transformer apparently successful
+---             See sun666.translog for comments on transformation
+--------------------------------------------------------------------
+</verbatim>
+All the messages which may require attention will be in the 
+<code>.translog</code> file indicated.
+Here is an example of what that file looks like:
+<verbatim>
+2:1:     Beginning l2s -> Starlink final SGML transformation
+2:1:     Verbosity level 5
+5:26:    Apparently duplicate author initials - using ID `auto.id-auth.1'
+5:55:    Ignoring line break in element H1
+4:56:    Eight-bit character &#244; may cause trouble for LaTeX
+            ...
+4:368:   Extra info from includegraphics ignored:
+4:            clip,height=118mm
+2:377:   References stable - no further passes required
+2:377:   Ending l2s -> Starlink final SGML transformation
+</verbatim>
+The first digit on each line is an integer between 0 and 6 indicating
+the severity of the message, as follows:
+<dl compact>
+<dt>0 <dd>fatal
+<dt>1 <dd>serious
+<dt>2 <dd>control information
+<dt>3 <dd>almost certainly requires attention to the converted document
+<dt>4 <dd>probably requires attention to the converted document
+<dt>5 <dd>can probably be ignored
+<dt>6 <dd>debugging
+</dl>
+The second number is the line number of the output SGML file to which
+the message refers; if there is no second number the line is a 
+continuation of the message on the previous line.
+The text on the rest of the line is intended to explain what the
+problem is, or may be.
+
+<p>Finally, the script will attempt to parse the output script
+to see whether it conforms to the appropriate Starlink DTD.
+If you're lucky, a message like the following will be given:
+<verbatim>
+--------------------------------------------------------------------
+--- latex2sgml: Parsing final output file sun224.sgml
+---             Document sun666.sgml conforms to DTD
+---             Removing intermediate files.
+--------------------------------------------------------------------
+</verbatim>
+In this case, the document is synatactically correct 
+and you only need to
+worry about whether its semantics are as desired,
+by looking at the <code>.translog</code> file.
+
+<p>However, if the output SGML does not conform to the DTD then 
+a message like this will be output:
+<verbatim>
+--------------------------------------------------------------------
+--- latex2sgml: Parsing final output file sun666.sgml
+---             Document sun666.sgml does not conform to DTD - 1 errors.
+---             Use 'nsgmls -s sun666.sgml' to see messages.
+---             Leaving intermediate files (sun666.l2s*)
+--------------------------------------------------------------------
+</verbatim>
+Following the script's advice and using the <code>nsgmls</code>
+parser will give output something like:
+<verbatim>
+nsgmls:sun666.sgml:351:9:E: end tag for "CAPTION" which is not finished
+</verbatim>
+-- the third and fourth fields on each line give line number and column
+of the SGML file where the problem occurred.
+Such errors sometimes result from deficiencies in the upconverter
+and sometimes from errors in the original &latex; file;
+either fix up the SGML file by hand or modify the &latex; source
+accordingly and re-run the upconverter.
+
+<p>As the output notes, some temporary files are left when the
+conversion is not perfect, since they may be of use for debugging etc.
+You may wish to delete them by hand if you're not going to use them.
+
+<p>There is a detailed description of the script's internals in <ref
+id=appx.system.latex2sgml>, which <em/may/ be of use if you're having
+difficulties. 
+
+
+<subsubsect>Tweaking by hand
+
+<p>Even after the best efforts of <code>latex2sgml</code> 
+some manual intervention will be required to produce a good SGML document
+from your &latex; source.
+This is due to several kinds of problem, some of which can be considered as
+upconverter bugs or deficiencies, and which may get fixed, and some
+which can't.
+
+<p>Here is a list of things which require attention.  
+On the whole particular instances of these are flagged up in the
+<code>.translog</code> file. 
+This list does not cover things which are inherent in the difference
+between what can be expressed in &latex; and what can be expressed
+in the Starlink DTD.
+
+<dl>
+
+<dt>Conditional inclusion
+<dd>To a greater or lesser extent, most existing Starlink 
+documents present different text to be processed by the &latex; 
+interpreter and the <code>star2html</code> system.
+Given that the SGML should contain all the information in the document,
+it's rather hard to know what to do with this.
+Currently, the rule is that the upconverter sees the version 
+which gets presented to <code>star2html</code>, since this 
+is likely to cause fewest problems for the conversion process itself
+(an exception is the text in a <code>rawhtml</code> environment, 
+which is discarded).
+This can lead to text which is not what's wanted in a printed document.
+To make sure that the output SGML contains what you want it to,
+it is really best to go through the input document and identify
+all the commands which lead to text being conditionally included
+and make sure that the unconditional and <code>htmlonly</code> parts
+contain what you want to go into the output.
+This includes attention to the following &latex; constructs:
+<ul>
+<li>The various <code>latexonly</code> and <code>htmlonly</code>
+    commands and environments.
+<li>The <code>\latex</code>, <code>\html</code> and <code>\latexhtml</code>
+    commands.
+<li>The <code>\hyperref</code> and <code>\htmlref</code> commands.
+</ul>
+Normally the upconverter will warn you when LATEXONLY code is omitted,
+although macro redefinitions at the start of the document are likely
+to be missed.
+
+<dt>Figures
+<dd>Figures are usually handled differently in latexonly and htmlonly
+parts of the original document.
+For correct processing, any <code>\includegraphics</code>-type command
+for importing GIF or JPEG files into the HTML source should appear within
+the <code>figure</code> environment of the &latex; part.
+
+<dt>Tabbing environments
+<dd>Latex2html often makes a terrible mess of &latex; <code>tabbing</code>
+environments, and <code>latex2sgml</code> is no better, and sometimes worse.
+You will almost certainly have to recode these by hand.
+
+<dt>LATEX-notation NDATA
+<dd>Maths is embedded in the final document within M, MEQUATION or
+MEQNARRAY elements, and ought to produce the same result as the original.
+However, all user-defined macros (<code>\newcommand</code>s) 
+are expanded before being put into the output, which can lead to
+verbose and ugly inline latex-notation source.
+This is sort of unavoidable, since each latex-notation element is
+treated separately, so that a <code>\newcommand</code> near the start
+of the document is not visible to an M element later, 
+and it's very difficult to know which definitions are required for a
+given bit of latex..
+In extreme cases, the only way of getting maintainable SGML may be
+to cut and paste source from the original document.
+
+<p>Conversely, &latex; lengths are not expanded, so that when a length
+is reset somewhere in a document and used later, this setting will 
+be wrong.  This most frequently causes problems in <code>picture</code>
+environments -- a FIGURE with a &lt;FIGURECONTENT NOTATION=LATEXGRAPHICS>
+child may come out with <em>entirely</em> the wrong dimensions.  
+In this case it is necessary to identify by hand where the relevant
+lengths are set in the &latex; source and put them into each
+bit of &latex; where they are used.
+
+<p>To make matters worse, it seems that line breaks are occasionally 
+messed up in long latex-notation math elements.  
+This is a bug, but I currently don't know how to fix it.
+
+<dt>History and author information
+<dd>The upconverter constructs basic HISTORY and AUTHORLIST elements
+but doesn't try to be too clever.  You may wish to modify these.
+
+<dt>Line breaks
+<dd>For technical reasons it is sometimes difficult for the 
+upconverter to get line breaks in the right place.  
+It inserts some and removes some near tags, and the result may
+be ugly.  This might undergo some improvement in future versions.
+It does <em>not</em> attempt to insert line breaks apart from near tags,
+which can result in overlong lines if long tags have been inserted.
+
+<dt>Extraneous P elements
+<dd>The upconverter, although it tries to avoid it, sometimes writes
+more P elements than necessary -- it is never reasonable to have two
+&lt;P> start tags separated only by whitespace.
+This is a bug and may be fixed in the future.
+
+<dt>Entities going astray
+<dd>Non-breaking spaces, endashes and emdashes (`&ddash;' and
+`&ddash;-') seem to get 
+lost sometimes and mapped to ordinary spaces and single dashes respectively.
+This is a bug and will hopefully be fixed.
+
+<dt>Bad latex source code
+<dd>Some &latex; source which has only ever been processed by 
+<code>latex2html</code> and not by &latex; (within an <code>htmlonly</code>
+environment or similar) may not make much sense; 
+historically <code>latex2html</code>
+has done the best it can and written non-conforming HTML which Netscape
+does its best to render, and which may coincidentally look perfectly OK<note>
+   Some of the SST macros provide fine examples of this --
+   this case is dealt with explicitly by the upconverter.
+   </note>.
+Other parts may make sense but not in fact look very good in existing 
+<code>star2html</code>'d form.
+In either case, if the HTML view of the &latex; source which the
+upconverter is presented with isn't very good, then the output 
+isn't going to be any better.  
+You have been warned.
+
+</dl>
+
+<p>To aid in hand tweaking of the &latex; source code, 
+the upconverter provides an <code>\sgml{}</code> and 
+a <code>\begin{rawsgml} ... \end{rawsgml}</code> environment.
+These do what you would expect: their contents,
+after normal expansion of any &latex; macros, 
+appear verbatim in the output SGML document.
+
+
+
+<subsect id=upconvert.sourcecode export>Upconversion from source code
+
+<p>The &latex; upconverter described in <ref id=upconvert.latex>
+will turn subroutine or command descriptions within a normal SUN into 
+SGML like the rest of the text in them, but does not make
+an especially pretty job of it; the proper way is to 
+mark these up using the PROGRAMCODE DTD referenced via a
+CODECOLLECTION element, as described in <ref id=doccode>.
+
+<p>If the corresponding source files are written with prologues 
+in the normal Starlink style, then an upconverter is provided which
+can mark these up as SGML conforming to the PROGRAMCODE DTD.
+It can behave in different ways according to how you wish to 
+organise the files - it can either produce a set of files 
+which are still the same compilable source code as before but can
+also be included directly into an SGML document,
+or it can produce a document containing just the marked up prologues
+to be included.
+
+<p>The upconverter currently only exists for Fortran source code,
+and is called <code>fortran2sgml.pl</code>.
+
+<p><code>fortran2sgml.pl</code> has many configuration options 
+which are not detailed exhaustively in this document.
+To invoke it in the simplest instance, simply type
+<verbatim>
+fortran2sgml.pl file.f
+</verbatim>
+and you will see what the marked up source code looks like.
+The form of the prologue is kept as closely as possible to its
+original format, and all the SGML markup is guaranteed to be hidden
+from the compiler in comments (in the very rare case that this is 
+not possible the upconverter will exit with a fatal error).
+Only the prologue lines between the `<code>*+</code>' and `<code>*-</code>', 
+and a comment line immediately after it, and a comment line at the
+end of the file (or before the next prologue) are changed in any way.
+
+<p>Configuration is done by specifying a configuration file,
+which may be given using the `<code>-c</code>' flag on the command line.
+If this is not done the script will look for a file 
+`<code>f2sconfig.pl</code>' in the current working directory, and use this.
+Otherwise, it will run using the defaults as in the above example.
+
+<p>The configuration file
+is executable Perl overriding variable and subroutine 
+definitions in the <code>fortran2sgml.pl</code> script.
+Many of these are regular expressions giving 
+the details of the pattern matching, so that individual 
+prologue style conventions 
+can be accomodated; to investigate these see the documentation within
+the script itself.
+
+<p>Additionally, there are options determining the action of the script.
+These too are described in detail with inline comments,
+but the following examples illustrate the main points.
+The default configuration, which behaves like a filter, is as follows:
+<verbatim>
+      @Files = ();
+      $Indir = "";
+      $Outdir = "";
+      $Containerfile = "";
+      $Withindoc = 0;
+</verbatim>
+By writing
+<verbatim>
+      @Files = qw( makebias.f makecal.f calcor.f makeflat.f );
+      $Indir = "/stardev/local/sources/ccdpack";
+      $Outdir = ".";
+      $Containerfile = "ccd-progs.sgml";
+      $Withindoc = 0;
+      1;
+</verbatim>
+we get a set of files in the current directory with the same names
+as the original source files given in the `<code>@Files =</code>' 
+line, which compile to do the same, but have their prologues marked
+up in SGML.  There is additionally a file `<code>ccd-progs.sgml</code>'
+which refers to all the others.
+If we wish therefore, it is possible to throw away the unmarked up
+versions of the routines, replace them in the main source archive
+by the new ones, and in the appropriate SUN include the entity
+declaration
+<verbatim>
+&lt;!ENTITY prologues SYSTEM 'ccd-progs.sgml' SUBDOC>
+</verbatim>
+and in the proper place the entity reference
+<verbatim>
+&lt;!CODECOLLECTION DOC=prologues>
+</verbatim>
+
+<p>If you prefer to keep the source in its original form and 
+generate the SGML from the code prologues each time they are
+modified, then the configuration file should read as above,
+but with
+<verbatim>
+      $Withindoc = 1;
+</verbatim>
+
 <sect id=final export>Finally
 
 <subsect id=final.development export>Further developments
@@ -3188,8 +3562,13 @@ parser.
 <update versionid="post-0.2">Very substantial additions -- this
 section was barely present before.</update>
 
-<p>This section is a reference for maintainers of the Starlink SGML
-set
+<p>This section is a technical reference for maintainers of the
+Starlink SGML set.  The documentation here may be provisional, or
+irrelevant, or use terminology not defined elsewhere in the document.
+Any functionality described here may change between releases without
+warning, and without preserving backward-compatibility.
+It is included as an appendix in this user-level documentation for the
+benefit of those maintaining the set, and for any others who are interested.
 
 <subsect id=appx.system.sgml export>SGML arcana
 
@@ -3534,6 +3913,46 @@ erroneously splits.
 
 <p><ref id=appx.system.dssslcode> includes a selection of the more important
 DSSSL code modules.
+
+<subsubsect id=appx.system.latex2sgml>What latex2sgml does
+<update versionid='v0.6'>Moved the detailed latex2sgml remarks in
+Mark's upconverter documentation to the maintainers' section</update>
+  <!-- MBT: I'm not sure whether this belongs in user-level documentation -
+       in any case it's not too urgent so I'll defer writing it properly
+       until I have more time.
+    -->
+
+<p>The upconversion process is described in detail in <ref
+id=upconvert>.  This section describes the internals of one of the
+tools included in the upconversion package, <code/latex2sgml/.
+
+<p>It's not necessary to understand the details of the upconversion
+process, but if you're having several goes at converting a 
+problematic and long document, especially on a slow machine, you can 
+save time by only re-doing the parts you need to.
+
+<p>The conversion is in two parts: first the script 
+<code>l2s.pl</code> is invoked to convert the &latex; source into 
+SGML conforming to a temporary DTD called 
+`L2S' which preserves the structure of the
+original but is rather messy 
+(<code>l2s.pl</code> is a harness for a modified version of 
+<code>latex2html</code>, and suffers from the same deficiencies as
+that program as well as a few of its own).
+This produces a file with the extension <code>.l2s</code>.
+Secondly the script <code>trans.pl</code> is invoked to 
+perform an SGML transformation from text marked up in the 
+L2S DTD to the appropriate Starlink document DTD.
+This second part is a multiple pass process - normally the first pass
+produces badly non-conforming SGML, the second pass produces 
+something nearly right, and after three passes the document is stable.
+
+<p>If the <code>.l2s</code> file does not conform to the L2S DTD
+-- which is unusual, but can happen --
+then it will probably be necessary to modify the &latex; source
+and run <code>l2s.pl</code> again - in this case it's a bit of a waste
+running the rest of the conversion process before this part is fixed up.
+
 
 <subsect id=appx.system.summaries export>Document summaries
 
