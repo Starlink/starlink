@@ -26,3 +26,5 @@ dvi2bitmap.html.stamp: dvi2bitmap.sgml dvi2bitmap.imgeq.list.stamp
 index.html: dvi2bitmap.html.stamp
 	ln -sf `awk -F: '{print $$1}' $<`.html $@
 
+localclean:
+	rm -f doc.tar
