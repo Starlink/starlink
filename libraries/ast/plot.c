@@ -383,6 +383,7 @@ f     - Title: The Plot title drawn using AST_GRID
 *       value corresponds to a point on the line through the tick mark 
 *       which is outside the valid region of the mapping) leave the original
 *       tick mark values unchanged".
+*       - GetTicks: Limit maxticks to be no less than 8.
 
 *class--
 */
@@ -12184,6 +12185,7 @@ static double GetTicks( AstPlot *this, int axis, double *cen, double gap,
       maxticks = (int) ( 0.5 + MAJTICKS_MAX*sqrt( frac ) );
       mintick = (int) ( 0.5 + MAJTICKS_MIN*sqrt( frac ) );
       if( mintick < 5 ) mintick = 5;
+      if( maxticks < 8 ) maxticks = 8;
       if( maxticks < mintick ) maxticks = mintick;
 
 /* Get a pointer to the data in the PointSet. */
@@ -17451,7 +17453,7 @@ static void Norm1( AstMapping *map, int axis, int nv, double *vals,
 /* Transform the Base Frame positions back into the Current Frame. */
    (void) astTransform( map, pset2, 1, pset1 );
 
-/* If good, store these values back in the supplied array. */If the
+/* If good, store these values back in the supplied array. */
    if( astOK ) {
       a = ptr1[ axis ];
       for( i = 0; i < nv; i++){
