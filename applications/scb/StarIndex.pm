@@ -135,16 +135,24 @@ sub each {
 
    my ($rlocate, $package) = @_;
 
-   return (each %$rlocate) unless ($package);
-
    my ($key, $value, @loc, $loc);
-   while (($key, $value) = each %$rlocate) {
-      @loc = split ' ', $value;
-      foreach $loc (split ' ', $value) {
-         return ($key, $loc) if ((starpack ($loc) || '') eq $package);
+
+   if ($package) {
+      while (($key, $value) = each %$rlocate) {
+         @loc = split ' ', $value;
+         foreach $loc (split ' ', $value) {
+            return ($key, $loc) if ((starpack ($loc) || '') eq $package);
+         }
       }
+      return ();
    }
-   return ();
+   else {
+      unless (@each_loc) {
+         (($each_key, $value) = each %$rlocate) || return ();
+         @each_loc = split ' ', $value;
+      }
+      return $each_key, shift (@each_loc);
+   }
 }
 
 
