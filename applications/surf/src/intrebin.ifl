@@ -138,6 +138,12 @@
 	 HELPKEY  '*'
       ENDPARAMETER
 
+      PARAMETER SFACTOR
+        TYPE     '_REAL'
+        PROMPT   'Smoothing factor for spline interpolation
+         HELPKEY  '*'
+      ENDPARAMETER
+
       PARAMETER SHIFT_DX
          TYPE    '_REAL'
          PROMPT  'X shift to be applied to input dataset on output map (arcsec)'
