@@ -498,6 +498,8 @@
       REAL KEYPOS( 2 )           ! Key position
       REAL MARGIN( 4 )           ! Margins round DATA picture
       REAL REFANG                ! ACW angle from +ve X to ref direction
+      REAL SZHI                  ! Max Z value in catalogue
+      REAL SZLO                  ! Min Z value in catalogue
       REAL TYPDAT                ! A typical vector data value
       REAL VSCALE                ! Vector scale, viz. data units per cm
       REAL X1                    ! Lower x w.c. bound of picture
@@ -650,28 +652,42 @@
 *  value of Z are displayed.
       IF( GOTZ ) THEN
 
-*  Get the required Z value in the current Frame.
-         CALL KPG1_GTAXV( 'Z', 1, .TRUE., IWCS, 3, Z, NVAL, STATUS )
+*  Get the name of the Z column.
+         CALL CAT_TIQAC( GIS( 3 ), 'NAME', NAME, STATUS )
 
-*  First split the Base Frame to Current Frame Mapping up into 3 separate
+*  Split the Base Frame to Current Frame Mapping up into 3 separate
 *  1D Mappings.
          CALL KPG1_ASSPL( IWCS, 3, MAPS, STATUS )
 
+*  Find the max and min Z values in the Z column.
+         CALL KPG1_MXMNR( .TRUE., NVEC, %VAL( IPZ ), NBAD, SZHI, SZLO, 
+     :                    MAXPOS, MINPOS, STATUS )
+
+*  If there is only a single Z value available, use it.
+         IF( SZHI .LE. SZLO ) THEN
+            ZUSE = SZLO
+            ZCURR = .TRUE.
+
+*  Otherwise, allow the user to choose a Z value.
+         ELSE
+
+*  Get the required Z value in the current Frame.
+            CALL KPG1_GTAXV( 'Z', 1, .TRUE., IWCS, 3, Z, NVAL, STATUS )
+
 *  Use the third Mapping to transform the current Frame Z value into a
 *  base Frame Z value.
-         CALL AST_TRAN1( MAPS( 3 ), 1, Z, .FALSE., Z, STATUS )
+            CALL AST_TRAN1( MAPS( 3 ), 1, Z, .FALSE., Z, STATUS )
 
 *  If the result was undefined, we need to get the Z value again, this
 *  time in the base Frame.
-         IF( Z .EQ. AST__BAD ) THEN
-            ZCURR = .FALSE.
-            CALL PAR_GET0C( 'Z', ZTEXT, STATUS )
-            CALL CAT_TIQAC( GIS( 3 ), 'NAME', NAME, STATUS )
-
-            CALL MSG_BLANK( STATUS )
-            CALL MSG_SETC( 'NAME', NAME )
-            CALL MSG_SETC( 'Z', ZTEXT )
-            CALL MSG_OUT( 'POLPLOT_MSG1', 'The supplied value for '//
+            IF( Z .EQ. AST__BAD ) THEN
+               ZCURR = .FALSE.
+               CALL PAR_GET0C( 'Z', ZTEXT, STATUS )
+ 
+               CALL MSG_BLANK( STATUS )
+               CALL MSG_SETC( 'NAME', NAME )
+               CALL MSG_SETC( 'Z', ZTEXT )
+               CALL MSG_OUT( 'POLPLOT_MSG1', 'The supplied value for '//
      :                    'the Z parameter (^Z) could not be '//
      :                    'converted into a value for the ^NAME '//
      :                    'column in the catalogue. Please supply '//
@@ -679,30 +695,61 @@
      :                    'same coordinate system as the values in '//
      :                    'the ^NAME column:', STATUS )
 
-            CALL PAR_CANCL( 'Z', STATUS )
-            CALL PAR_GET0D( 'Z', Z, STATUS )
-         ELSE
-            ZCURR = .TRUE.
-         END IF
+               CALL PAR_CANCL( 'Z', STATUS )
+               CALL PAR_GET0D( 'Z', Z, STATUS )
+            ELSE
+               ZCURR = .TRUE.
+            END IF
 
 *  Find the closest available value to the requested Z value.
-         CALL POL1_FCLOS( NVEC, %VAL( IPZ ), REAL( Z ), ZUSE, STATUS )
+            CALL POL1_FCLOS( NVEC, %VAL( IPZ ), REAL( Z ), ZUSE, 
+     :                       STATUS )
 
-*  If the Z value was given in the current Frame, transform this value back into 
-*  the current Frame, and format it.
+         END IF
+
+*  If required, transform this value into the current Frame, and format it. If 
+*  this is not possible, use the Base Frame value.
+         ZTEXT = ' '
+         IAT = 1
+
          IF( ZCURR ) THEN 
             CALL AST_TRAN1( MAPS( 3 ), 1, DBLE( ZUSE ), .TRUE., Z, 
      :                      STATUS )
-            ZTEXT = AST_FORMAT( IWCS, 3, Z, STATUS )
+
+            IF( Z .NE. AST__BAD ) THEN 
+               CALL CHR_APPND( AST_GETC( IWCS, 'SYMBOL(3)', STATUS ),
+     :                         ZTEXT, IAT )
+               CALL CHR_APPND( ' =', ZTEXT, IAT )
+               IAT = IAT + 1
+               CALL CHR_APPND( AST_FORMAT( IWCS, 3, Z, STATUS ), ZTEXT,
+     :                         IAT )
+            ELSE
+               CALL CHR_APPND( NAME, ZTEXT, IAT )
+               CALL CHR_APPND( ' =', ZTEXT, IAT )
+               IAT = IAT + 1
+               CALL CHR_PUTR( ZUSE, ZTEXT, IAT )
+            END IF
+
          ELSE
-            CALL CHR_RTOC( ZUSE, ZTEXT, STATUS )
+            CALL CHR_APPND( NAME, ZTEXT, IAT )
+            CALL CHR_APPND( ' =', ZTEXT, IAT )
+            IAT = IAT + 1
+            CALL CHR_PUTR( ZUSE, ZTEXT, IAT )
          END IF
+
+*  Display the Z value being used.
+         CALL MSG_SETC( 'Z', ZTEXT )
+         CALL MSG_OUT( 'POLPLOT_MSG', '  Using ^Z', STATUS )
 
 *  Modify the WCS FrameSet so that the Base Frame has only two axes (the
 *  original Base Frame may have 3 when dealing with spectropolarimtry data).
          CONST( 3 ) = DBLE( ZUSE )
          CALL POL1_PKAXS( NDIM, GIS, CONST, IWCS, STATUS )
 
+*  If there is no Z column, store a blank string for the textual descxription 
+*  of the Z value being used.
+      ELSE
+         ZTEXT = ' '
       END IF
 
 *  Give the user the chance to change the Current Frame. 
@@ -961,13 +1008,6 @@
 
 *  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999
-
-*  Get a string describing any Z plane selection.
-      IF( GOTZ ) THEN
-         CALL CHR_PREFX( ' Z = ', ZTEXT, IAT ) 
-      ELSE
-         ZTEXT = ' '
-      END IF
 
 *  Get the TITLE parameter (if any) from the input catalogue.
       CALL CAT_TIDNT( CI, 'TITLE', GTTL, STATUS )       
