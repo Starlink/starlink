@@ -304,7 +304,7 @@ case $TARGETFORMAT in
 	PACKAGEEXT='.htx' ;;
     1)  $VERBOSE && echo "$PROGNAME:I: Target LaTeX...";
 	PACKAGEEXT='.latex' ;;
-    2)  $VERBOSE && ECHO "$PROGNAME:I: Target TeXML...";
+    2)  $VERBOSE && echo "$PROGNAME:I: Target TeXML...";
         PACKAGEEXT='.texml' ;;
     *) echo $USAGE; exit 1 ;;
 esac
@@ -566,7 +566,7 @@ elif [ $TARGETFORMAT -eq 2 ]; then
     fi
 
     # convert the $ROOT.xml file into LaTeX
-    $VERBOSE && echo "PWD=$PWD" $PYTHON $LIBDIR/texml/texml.py $ROOT.xml $ROOT.tex
+    $VERBOSE && echo "$PYTHON $LIBDIR/texml/texml.py $ROOT.xml $ROOT.tex"
     $run $PYTHON $LIBDIR/texml/texml.py $ROOT.xml $ROOT.tex
     echo $ROOT.tex >>MANIFEST
 
