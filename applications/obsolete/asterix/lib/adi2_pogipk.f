@@ -96,24 +96,16 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE '{global_constants_file}' ! [global_constants_description]
-
-*  Global Variables:
-      INCLUDE '{global_variables_file}' ! [global_variables_description]
-*        {global_name}[dimensions] = {data_type} ({global_access_mode})
-*           [global_variable_purpose]
 
 *  Arguments Given:
-      {data_type} {name}[dimensions]
-
-*  Arguments Given and Returned:
-      {data_type} {name}[dimensions]
+      INTEGER			FID			! See above
+      CHARACTER*(*)		HDU			! HDU name
+      CHARACTER*(*)		HC1, HV1		! Level 1
+      CHARACTER*(*)		HC2, HV2		! Level 2
+      CHARACTER*(*)		HC3, HV3		! Level 3
 
 *  Arguments Returned:
-      {data_type} {name}[dimensions]
-
-*  Status:
-      INTEGER STATUS             ! Global status
+      INTEGER 			STATUS             	! Global status
 
 *  External References:
       [external_declaration]
