@@ -1,4 +1,6 @@
-<!doctype ssn public "-//Starlink//DTD Starlink SSN//EN">
+<!doctype ssn public "-//Starlink//DTD Starlink SSN//EN" [
+  <!entity ddash cdata "--">
+]>
 <!-- $Id$ -->
 
 <title>Dvi2bitmap -- convert DVI files to bitmap images
@@ -15,7 +17,7 @@
 version</version>
 <distribution string="1" date="14-JUN-1999" author="ng">
   First public release
-<change date="17-JUN-1999" author=ng versionid=upd1>
+<change date="19-JUN-1999" author=ng versionid=upd1>
   Added kpathsea support, and appendix on TeX dimensions.
 </history>
 
@@ -69,7 +71,7 @@ also <ref id=usage.env>.
 The program writes on standard output one line per missing font, with
 five fields: the 
 font name, the DPI value it was looking for, the base-DPI of the font,
-the magnification factor, and the filename which it tried to look for.
+the magnification factor, and a dummy metafont mode.
 This output can 
 be used with the mktexpk (TeXLive) or MakeTeXPK (teTeX) scripts to
 generate the required fonts.
@@ -147,8 +149,13 @@ then the output file used for the current page will be
 
 <subsect id=usage.exit export>Exit value
 
-<p>Exits with a non-zero status if there were any processing errors.  See
-also the <code/-n/ option in <ref id=usage.options>.
+<p>Exits with a non-zero status if there were any processing errors.
+Having <em/no/ fonts present counts as a processing error; if there is
+at least one font present, then missing fonts will be replaced by a
+more-or-less randomly chosen alternative, and the program will produce a
+warning if the <code/-q/ option is not present, but it will return
+with a zero (success) status.
+See also the <code/-n/ option in <ref id=usage.options>.
 
 <subsect id=usage.examples export>Examples
 
@@ -162,7 +169,7 @@ factor of 2 to obtain a bitmap of the correct size.
 
 <p><verbatim>
 % dvi2bitmap -n -l -r 110 -m 1.5 -q hello.dvi
-cmr10 165 110 1.5 /var/lib/.../cm/cmr10.165pk
+cmr10 165 110 1.5 localfont
 </verbatim>
 This reads the DVI file to find out what fonts are required, but does
 not process it further.  It then tries to find the fonts, fails, and
@@ -192,7 +199,7 @@ somewhere in your metafont distribution for the list of possibilities.
 
 <p>If you're using the TeXLive distribution, the command would be:
 <verbatim>
-% mktexpk --mfmode ibmvga --mag 1.5 --bdpi 110 --dpi 165 cmr10
+% mktexpk &ddash;mfmode ibmvga &ddash;mag 1.5 &ddash;bdpi 110 &ddash;dpi 165 cmr10
 </verbatim>
 
 <p>After you have created the fonts, try giving the command
@@ -204,13 +211,15 @@ dvi2bitmap environment variable is set correctly.
 
 <subsect id=usage.env export>Environment
 
-<p>The <code/DVI2BITMAP_PK_PATH/
-environment variable gives the directory which is to be searched for
-PK files.  Note that, although the variable name refers to a
-`path', you may specify only one directory.  I may make this
-marginally more sophisticated in future versions, but probably not:
-the correct thing to do here is to use the same Kpathsearch library
-that the rest of the TeX system uses.
+<p>The <code/DVI2BITMAP_PK_PATH/ environment variable gives a single
+directory which is to be searched for PK files.  The <code/-f/ option
+overrides this.
+
+<p>If the program was configured with support for the Kpathsearch
+library (see <ref id=install.nonstarlink>), then it should find PK
+files using the same mechanism other DVI processors use.  The
+<code/-f/ option and the <code/DVI2BITMAP_PK_PATH/ environment
+variable are used before the Kpathsearch library.
 
 <sect id=install export>Building and installing dvi2bitmap
 
@@ -219,7 +228,8 @@ which respects the bundling conventions of the <webref
 url='http://www.starlink.rl.ac.uk' >Starlink Project</webref>, and one
 which is more usual for network-distributed software.  
 
-<p>When you unpack the distribution tarball, you should fine three files:
+<p>When you unpack the distribution tarball, you should find at least
+the files
 <code/dvi2bitmap_source.tar/, <code/Makefile.starlink/ and <code/mk/.
 You can build the software the Starlink way, using the <code/mk/
 script (see <ref id=install.starlink>), or unpack the
@@ -243,10 +253,12 @@ give the commands
 
 <p>This build configures support for GIFs, but not for the
 <code/kpathsea/ library, since that requires an additional
-non-Starlink library which is not distributed with this package.  See
-the non-Starlink instructions, <ref id=install.nonstarlink>, for details.
+non-Starlink library which is not distributed with this package and
+not present by default on all machines.  I recommend you do configure
+in support for this library -- see the non-Starlink instructions, <ref
+id=install.nonstarlink>, for details.
 
-<subsect id=install.nonstarlink export>Non-starlink machines
+<subsect id=install.nonstarlink export>General installation and configuration
 <update versionid="upd1">
   Added instructions on configuring in support for the kpathsea
   library
@@ -277,7 +289,7 @@ to live.
 <p>If you want to use the <code/kpathsea/ library, which means that
 the program finds font files using the same mechanism and the same
 configuration file as other &tex;ware then give the configure option
-<code/--with-kpathsea/, and make sure that the <code/kpathsea/ include
+<code/&ddash;with-kpathsea/, and make sure that the <code/kpathsea/ include
 files and library are somewhere the compiler will find them.  For this
 library to find its configuration files, you will either have to
 install the program where the rest of the &tex;ware lives (you can
@@ -296,7 +308,7 @@ distribution, and not as a standalone library).
 
 <p>The program generates XBM bitmaps by default.  
 If you want it to be able to generate GIFs, then give the configure
-option <code/--enable-gif/.  The GIF format is the copyright of
+option <code/&ddash;enable-gif/.  The GIF format is the copyright of
 CompuServe.  As far as I understand it, one does not need a licence
 from CompuServe if one is distributing non-commercial, not-for-profit
 software, such as this.  You probably shouldn't enable GIF support
@@ -515,7 +527,7 @@ Sizes in TeX
 <row>
 <entry>
 <entry><code/mag/: DVI units are actually multiplied by
-<m>\mbox{num}\times\mbox{mag}/1000\times\mbox{den}</m>
+<m>(\mbox{num}\times\mbox{mag})/(1000\times\mbox{den})</m>
 <entry>[D17]
 
 <row>
@@ -570,7 +582,7 @@ reference point.
 
 <p><ol>
 <li><code/s/ scales the design size, so that a font is actually used at
-<m>\mbox{mag}\times\mbox{s}/1000\times\mbox{d}</m> times its normal
+<m>(\mbox{s}\times\mbox{mag})/(1000\times\mbox{d})</m> times its normal
 size.
 
 <li><code/hppp/ and <code/vppp/ aren't used as sizes, but can be used

@@ -61,7 +61,7 @@ main (int argc, char **argv)
     bitmap_info bm;
     bool do_process_file = true; // if true, then process DVI file
     bool all_fonts_present = true;
-    bool one_font_present = false;
+    bool no_font_present = true;
 
     //DviFile::verbosity(2);
     //PkFont::verbosity(2);
@@ -219,17 +219,17 @@ main (int argc, char **argv)
 	}
 
 	all_fonts_present = true;
-	one_font_present = false;
+	no_font_present = true;
 	const PkFont *fallback_font = 0;
 
 	for (PkFont *f = dvif->firstFont();
 	     f != 0;
 	     f = dvif->nextFont())
 	{
-	    string unk = "unknown";
+	    //string unk = "unknown";
 	    if (f->loaded())
 	    {
-		one_font_present = true;
+		no_font_present = false;
 		// Set the fallback font to be the first loaded font.
 		// Could be more sophisticated - first cmr10?
 		if (fallback_font == 0)
@@ -242,21 +242,19 @@ main (int argc, char **argv)
 		{
 		    if (f->loaded()) // show_font_list is >1
 			cout << "% ";
-		    // write out font name, dpi, base-dpi, mag and failed path
-		    string fn = f->fontFilename();
+		    // write out font name, dpi, base-dpi, mag and MF mode
+		    //string fn = f->fontFilename();
 		    cout << f->name() << ' '
 			 << f->dpi()*magmag << ' '
 			 << f->dpi() << ' '
-			 << magmag << ' '
-			 << (fn.length() == 0 ? unk : fn)
-			 << '\n';
+			 << magmag << " localfont\n";
 		}
 	}
 
 
 	if (do_process_file)
 	{
-	    if (!one_font_present) // give up!
+	    if (no_font_present) // give up!
 		cerr << progname << ": no fonts found!  Giving up\n";
 	    else
 		process_dvi_file (dvif, bm, resolution, fallback_font);
@@ -274,7 +272,7 @@ main (int argc, char **argv)
 
     // Exit non-zero if we were just checking the pre- and postambles,
     // and we found some missing fonts
-    if (!one_font_present || (!do_process_file && !all_fonts_present))
+    if (no_font_present || (!do_process_file && !all_fonts_present))
 	exit (1);
     else
 	exit (0);

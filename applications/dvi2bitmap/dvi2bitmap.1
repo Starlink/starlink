@@ -25,7 +25,7 @@ Show missing fonts.
 The program writes on standard output one line per missing font, with
 five fields: the 
 font name, the DPI value it was looking for, the base-DPI of the font,
-the magnification factor, and the filename which it tried to look for.
+the magnification factor, and a dummy metafont mode.
 This output can 
 be used with the mktexpk (TeXLive) or MakeTeXPK (teTeX) scripts to
 generate the required fonts.
@@ -113,7 +113,7 @@ obtain a bitmap of the correct size.
 .PP
 % dvi2bitmap -n -l -r 110 -m 1.5 -q hello.dvi
 .br
-cmr10 165 110 1.5 /var/lib/.../cm/cmr10.165pk
+cmr10 165 110 1.5 localfont
 .PP
 This reads the DVI file to find out what fonts are required, but does
 not process it further.  It then tries to find the fonts, fails, and
