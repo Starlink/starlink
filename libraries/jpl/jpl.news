@@ -1,6 +1,11 @@
 1 JPL - JPL Ephemeris library - maintenance release
                                                    Expires: ????.??.??
 
+ V2.0-2 Build system changed to use GNU autoconf
+        + Ephemeris now installed into $STARLINK/etc rather than
+          $STARLINK/etc/jpl
+        + JPL helper programs now installed into $STARLINK/bin
+
  v2.0-1 is a maintenance release of the JPL Ephemeris and library
  which provides a slightly updated SUN/87 which has been released
  in hypertext (`showme sun87' or `findme jpl').  There are only 

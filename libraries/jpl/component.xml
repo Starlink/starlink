@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+
+<component id="jpl">
+  <version>2.0-2</version>
+  <path>libraries/jpl</path>
+  <description>JPL Ephemeris access routines</description>
+  <abstract>The JPL library and data sets provide high-accuracy
+  predictions for the positions and velocities of the Sun and planets.
+  </abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Pat Wallace</name>
+      <uname>ptw</uname>
+    </person>
+    <person>
+      <name>A. J. J. Broderick</name>
+      <uname>ajjb</uname>
+    </person>
+  </developers>
+  <documentation> sun87</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>

@@ -1,8 +1,14 @@
+#if HAVE_CONFIG_H
+# include <config.h>
+#endif
+
 C------------------------------ SUBROUTINE 'EPHOPN' --------------------
 *
-*  Version for DECstation and DEC Alpha
 *
 *  P.T.Wallace   Starlink   18 April 1994
+*
+*  Tim Jenness   JACH       13 July  2004
+*     Autoconf version [derived from VMS variant]
 *
 C
 C++++++++++++++++++++++++
@@ -72,6 +78,20 @@ C
       LOGICAL FIRST
 C
       CHARACTER*7 STAWD
+
+C   Use autoconf without trying to do variable substitution
+      INTEGER BYTEPRU
+
+#if FC_RECL_UNIT == 1
+       PARAMETER ( BYTEPRU = 1 )
+#elif FC_RECL_UNIT == 2
+       PARAMETER ( BYTEPRU = 2 )
+#elif FC_RECL_UNIT == 4
+       PARAMETER ( BYTEPRU = 4 )
+#else
+#  error "Impossible FC_RECL_UNIT"
+#endif
+
 C
       DATA FIRST/.TRUE./
 C
@@ -82,8 +102,12 @@ C       BE IN WORDS, LEAVE THE STATEMENTS AS THEY ARE. IF THE LENGTH
 C       IS EXPECTED IN BYTES, REMOVE THE 'C' FROM COLUMN 1 IN THE
 C       SECOND STATEMENT.
 C
-      IRECSZ=IBSZ
-C     IRECSZ=IRECSZ*4
+C     IBSZ is the record length in 4-byte WORDS
+C     This should be converted to local record length units
+C     by converting the record length to bytes and then dividing
+C     by the number of bytes per record unit
+      IRECSZ=IBSZ * 4 / BYTEPRU
+
 C
 C       OPEN FILE AND READ RECORD # 1 AND 2 ON FIRST ENTRY ONLY
 C
@@ -94,12 +118,26 @@ C
         ELSE
           STAWD='UNKNOWN'
         ENDIF
-        OPEN(UNIT=FILE,
-     *       FILE='JPLEPH',
-     *       ACCESS='DIRECT',
-     *       FORM='UNFORMATTED',
-     *       RECL=IRECSZ,
-     *       STATUS=STAWD)
+! Mods by Starlink in this area
+        IF (RDF) THEN
+           OPEN(UNIT=FILE,
+     *          FILE='JPLEPH',
+     *          ACCESS='DIRECT',
+     *          FORM='UNFORMATTED',
+     *          RECL=IRECSZ,
+#if HAVE_FC_OPEN_READONLY
+     *       READONLY,
+#endif
+     *          STATUS=STAWD)
+        ELSE
+           OPEN(UNIT=FILE,
+     *          FILE='JPLEPH',
+     *          ACCESS='DIRECT',
+     *          FORM='UNFORMATTED',
+     *          RECL=IRECSZ,
+     *          STATUS=STAWD)
+        END IF
+! End of Starlink mods
         IF(RDF) THEN
           READ(FILE,REC=1)TTL,CNAM,SS,NCON,AU,EMRAT,IPT,DENUM,LPT
           READ(FILE,REC=2)CVAL
