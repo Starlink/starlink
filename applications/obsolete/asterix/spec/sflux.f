@@ -156,11 +156,12 @@
 	PARAMETER 		( DEFAULT = 1000 )	! default number of energy channels
 
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'SFLUX Version 2.2-0' )
+        PARAMETER		( VERSION = 'SFLUX Version 2.2-1' )
 
 *  Local Variables:
-      RECORD /MODEL_SPEC/ MODEL      	! model specification
-      RECORD /MODEL_SPEC/ TMODEL      	! Term model specification
+c     RECORD /MODEL_SPEC/ MODEL      	! model specification
+c     RECORD /MODEL_SPEC/ TMODEL      	! Term model specification
+      INTEGER IMOD, TMOD
 
       CHARACTER*79           TXT        ! Output text
 
@@ -207,11 +208,13 @@
       CALL SPEC_INIT( STATUS )
 
 *  Model genus
-      MODEL.GENUS = 'SPEC'
+      IMOD = 1
+      TMOD = 2
+      MODEL_SPEC_GENUS(IMOD) = 'SPEC'
 
 *  Read in the model to be fitted
       CALL USI_ASSOC( 'MODEL', '*', 'READ', MFID, STATUS )
-      CALL FIT_MODGET( MFID, MODEL, NPAR, PARAM, LB, UB, LE, UE,
+      CALL FIT_MODGET( MFID, IMOD, NPAR, PARAM, LB, UB, LE, UE,
      :                 FROZEN, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
@@ -252,11 +255,11 @@
 
 *  Calculate number of photons in each energy channel
       CALL DYN_MAPR( 1, NEN*MAXSTACK, STACKPTR, STATUS )
-      CALL FIT_MCALC( MODEL, PARAM, 1, 1, NEN, NEN, NEN+1, ELBOUND,
+      CALL FIT_MCALC( IMOD, PARAM, 1, 1, NEN, NEN, NEN+1, ELBOUND,
      :                EUBOUND, %VAL(STACKPTR), FLUX, STATUS )
 
 *  Split model up
-      IF ( MODEL.NCOMP .GT. 1 ) THEN
+      IF ( MODEL_SPEC_NCOMP(IMOD) .GT. 1 ) THEN
         CALL USI_GET0L( 'SPLIT', SPLIT, STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 99
       ELSE
@@ -272,7 +275,7 @@
 
 *    Identify the additive terms in the model and their associated
 *    multiplicative components.
-        CALL FIT_MSPECFLAT( MODEL, MAXTERM, NTERM, TERMS, SIGNS,
+        CALL FIT_MSPECFLAT( IMOD, MAXTERM, NTERM, TERMS, SIGNS,
      :                      STATUS )
 
 *    Heading
@@ -283,10 +286,10 @@
         DO J = 1, NTERM
 
 *      Evaluate this term
-          CALL FIT_MCALCTERM( MODEL, NTERM, TERMS, SIGNS, J,
+          CALL FIT_MCALCTERM( IMOD, NTERM, TERMS, SIGNS, J,
      :                        PARAM, 1, 1, NEN, NEN, NEN+1,
      :                        ELBOUND, EUBOUND, %VAL(STACKPTR),
-     :                        TMODEL, FLUX, STATUS )
+     :                        TMOD, FLUX, STATUS )
 
 *      Get energy and photon flux for this spectrum
           CALL SFLUX_FLX( NEN, FLUX, ELBOUND, EUBOUND, TPHOTONS,
@@ -294,7 +297,7 @@
 
 *      Output text
           WRITE( TXT, '(2X,A23,2(2X,1PG14.7))' )
-     :                           TMODEL.SPEC, TPHOTONS, TTOTFLX
+     :                MODEL_SPEC_SPEC(TMOD), TPHOTONS, TTOTFLX
           CALL MSG_PRNT( TXT )
 
         END DO
