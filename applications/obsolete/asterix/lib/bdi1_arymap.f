@@ -1,4 +1,4 @@
-      SUBROUTINE BDI1_ARYMAP( LOC, TYPE, MODE, PSID, PTR,
+      SUBROUTINE BDI1_ARYMAP( LOC, TYPE, MODE, ENDIM, EDIMS, PSID, PTR,
      :                        NELM, STATUS )
 *+
 *  Name:
@@ -11,7 +11,7 @@
 *     Starlink Fortran
 
 *  Invocation:
-*     CALL BDI1_ARYMAP( LOC, TYPE, MODE, PSID, PTR, NELM, STATUS )
+*     CALL BDI1_ARYMAP( LOC, TYPE, MODE, ENDIM, EDIMS, PSID, PTR, NELM, STATUS )
 
 *  Description:
 *     {routine_description}
@@ -23,6 +23,10 @@
 *        The type to map with
 *     MODE = CHARACTER*(*) (given)
 *        The access mode, READ, UPDATE or WRITE
+*     ENDIM = INTEGER (given)
+*        The expected dimensionality according to the data model
+*     EDIMS[] = INTEGER (given)
+*        The expected dimensions according to the data model
 *     PSID = INTEGER (given)
 *        ADI identifier of private storage area
 *     PTR = INTEGER (returned)
@@ -99,7 +103,7 @@
 *  Arguments Given:
       CHARACTER*(DAT__SZLOC)	LOC
       CHARACTER*(*)		TYPE, MODE
-      INTEGER			PSID
+      INTEGER			PSID, ENDIM, EDIMS(*)
 
 *  Arguments Returned:
       INTEGER			PTR, NELM
@@ -116,13 +120,16 @@
       CHARACTER*(DAT__SZLOC)	ACLOC			! ARRAY component
       CHARACTER*(DAT__SZTYP)	ATYPE			! Actual array type
       CHARACTER*(DAT__SZTYP)	HTYPE			! HDS style type name
-      CHARACTER*3		MMODE			! Mapping mode
+      CHARACTER*20		ITEM			! The item name
+      CHARACTER*3		MSYS			! Mapping system
       CHARACTER*(DAT__SZLOC)	SLOC			! Locator to save
       CHARACTER*10		VARNT			! Array variant name
 
       DOUBLE PRECISION		BASE, SCALE		! Spaced array descrip
+      DOUBLE PRECISION		DBUF			! Scalar data buffer
 
       INTEGER			DIMS(DAT__MXDIM)	! Array dimensions
+      INTEGER			ENELM			! Expected # elements
       INTEGER			FPTR			! Mapped file object
       INTEGER			NDIM			! Array dimensionality
 
@@ -133,12 +140,15 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Defaults
-      MMODE = 'loc'
+      MSYS = 'loc'
       FPTR = 0
       SLOC = DAT__NOLOC
 
 *  Construct HDS type
       HTYPE = '_'//TYPE
+
+*  Expect number of data elements
+      CALL ARR_SUMDIM( ENDIM, EDIMS, ENELM )
 
 *  Get array shape and total number of elements
       CALL ADI1_ARYSHP( LOC, DAT__MXDIM, DIMS, NDIM, ATYPE, STATUS )
@@ -146,7 +156,38 @@
 
 *  Is object primitive?
       CALL DAT_PRIM( LOC, PRIM, STATUS )
-      IF ( PRIM ) THEN
+
+*  If number of elements doesn't match and the actual object is a scalar
+*  then we have to map dynamically
+      IF ( (NELM .NE. ENELM) .AND. (NDIM.EQ.0) ) THEN
+
+*    Map workspace of required type
+        CALL DYN_MAPT( 1, ENELM, HTYPE, PTR, STATUS )
+
+*    Data is dynamic
+        MSYS = 'dyn'
+
+*    Extract the scalar value
+        CALL DAT_GET( LOC, HTYPE, 0, 0, DBUF, STATUS )
+
+*    Size in bytes of scalar
+        CALL DAT_PREC( LOC, SSIZE, STATUS )
+
+*    Fill mapped array with copies of scalar data
+        CALL BDI1_ARYMAP_REP( SSIZE, DBUF, ENELM, %VAL(PTR), STATUS )
+
+*  Otherwise if number of elements differ we report an error
+      ELSE IF ( ENELM .NE. NELM ) THEN
+        STATUS = SAI__ERROR
+        CALL ADI_NAME( PSID, ITEM, STATUS )
+        CALL MSG_SETC( 'IT', ITEM )
+        CALL ERR_REP( ' ', 'The dimensions of item ^IT differ '/
+     :                /'from those expected - check the program '/
+     :                /'which created this file', STATUS )
+        GOTO 99
+
+*  Object is primitive (and matches dimensions from here on)
+      ELSE IF ( PRIM ) THEN
 
 *    Clone a copy of the locator for mapping
         CALL DAT_CLONE( LOC, SLOC, STATUS )
@@ -206,7 +247,7 @@
           CALL ARR_REG1T( HTYPE, BASE, SCALE, NELM, %VAL(PTR), STATUS )
 
 *      Data is dynamic
-          MMODE = 'dyn'
+          MSYS = 'dyn'
 
 *      Clone a copy of the locator for mapping
           CALL DAT_CLONE( LOC, SLOC, STATUS )
@@ -222,11 +263,106 @@
       END IF
 
 *  Store details in private store
-      CALL BDI1_STOMAP( PSID, MMODE, SLOC, FPTR, PTR, NELM,
+      CALL BDI1_STOMAP( PSID, MSYS, SLOC, FPTR, PTR, ENELM,
      :                  UTIL_PLOC( BDI1_ARYWB ), TYPE,
      :                  MODE, STATUS )
 
+*  Always return expected number of elements
+      NELM = ENELM
+
 *  Report any errors
  99   IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'BDI1_ARYMAP', STATUS )
+
+      END
+
+
+
+      SUBROUTINE BDI1_ARYMAP_REP( SIZE, IN, N, OUT, STATUS )
+*+
+*  Name:
+*     BDI1_ARYMAP_REP
+
+*  Purpose:
+*     Replicate the byte pattern IN into OUT N times
+
+*  Language:
+*     Starlink Fortran
+
+*  Invocation:
+*     CALL BDI1_ARYMAP_REP( SIZE, IN, N, OUT, STATUS )
+
+*  Description:
+*     {routine_description}
+
+*  Arguments:
+*     SIZE = INTEGER (given)
+*        Number of bytes in IN
+*     IN[] = BYTE (given)
+*        Data to be replicated
+*     N = INTEGER (given)
+*        Number of copies to make
+*     OUT[] = BYTE (returned)
+*        Copies of IN
+*     STATUS = INTEGER (given and returned)
+*        The global status.
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  References:
+*     BDI Subroutine Guide : http://www.sr.bham.ac.uk/asterix-docs/Programmer/Guides/bdi.html
+
+*  Keywords:
+*     package:bdi, usage:private
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1995
+
+*  Authors:
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*     14 Aug 1995 (DJA):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+
+*  Arguments Given:
+      INTEGER			N, SIZE
+      BYTE			IN(*)
+
+*  Arguments Returned:
+      BYTE			OUT(*)
+
+*  Status:
+      INTEGER 			STATUS             	! Global status
+
+*  Local Variables:
+      INTEGER			I,J,K			! Loop variables
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Make copies of input
+      J = 1
+      DO I = 1, N
+        DO K = 1, SSIZE
+          OUT(J) = IN(K)
+          J = J + 1
+        END DO
+      END DO
 
       END
