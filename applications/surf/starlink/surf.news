@@ -1,8 +1,8 @@
 1 SURF - SCUBA User Reduction Facility -update
                                                      Expires: ????.??.??
 
-  This is the release V1.6-10 of SURF. It will be 
-  distributed on the Autumn 2002 Starlink CD-ROM.
+  This is the release V1.6-11 of SURF. It will be 
+  distributed on the Summer 2003 Starlink CD-ROM.
 
   The SCUBA User Reduction Facility (SURF) is a collection of applications
   for use in reducing mapping and photometry data from the Submillimetre
@@ -34,6 +34,24 @@
   The list is at scubadr@jach.hawaii.edu.
   To subscribe please send a message to majordomo@jach.hawaii.edu with
   an empty subject and containing the message 'subscribe scubadr <your email>'
+
+2 New_in_version_1_6_11
+
+  - Now includes a new version of the scunoise application.
+
+  - A small error was found and fixed in the equation used by
+  REMIP. Essentially the flux at all waveplate angles should have been
+  reduced by a further small (constant) fraction determined by the
+  level of instrumental polarization at the observing wavelength. The
+  net result is that source polarizations will have been very slightly
+  underestimated. For example, a source polarization of 1.00% at 850
+  microns should in fact have been 1.01% and a source polarization of
+  1.00% at 450 microns should have been 1.03%. This effect is smaller
+  than measurement errors unless the source polarization exceeds ~
+  10%.
+
+  - Fix a bug preventing more than 173 maps to be combined in REBIN.
+  The limit is now correctly set to 256 input maps.
 
 2 New_in_version_1_6_10
 
