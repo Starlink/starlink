@@ -316,6 +316,10 @@
    . configure -background $BACKCOL
    option add *background $BACKCOL
 
+# Set the default colour for all foregrounds.
+   . configure -foreground "#000"
+   option add *foreground "#000"
+
 # Set the default font.
    option add *font $FONT
 
