@@ -11,10 +11,10 @@
 % ? Document identification
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun95.20}
-\newcommand{\stardocnumber}    {95.20}
+\newcommand{\stardocsource}    {sun95.21}
+\newcommand{\stardocnumber}    {95.21}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {19th August 2002}
+\newcommand{\stardocdate}      {3rd September 2002}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
 \newcommand{\stardocversion}   {1.0}
 \newcommand{\stardocmanual}    {User's Guide}
@@ -17982,7 +17982,7 @@ plot (101k).
          The size of the arrow heads are specified by this parameter. Simple
          lines can be drawn by setting the arrow head size to zero. The value
          should be expressed as a fraction of the largest dimension of the
-         underlying picture. {\tt [current value]}
+         underlying DATA picture. {\tt [current value]}
       }
       \sstsubsection{
          BLANK = \_LOGICAL (Read)
@@ -18040,9 +18040,9 @@ plot (101k).
          LENGTH( 2 ) = \_REAL (Read)
       }{
          The lengths of the arrows, expressed as fractions of the largest
-         dimension of the underlying picture. If only one value is supplied,
-         both arrows will be drawn with the given length. One of the
-         supplied values can be set to zero if only a single arrow is
+         dimension of the underlying DATA picture. If only one value is
+         supplied, both arrows will be drawn with the given length. One of
+         the supplied values can be set to zero if only a single arrow is
          required. {\tt [current value]}
       }
       \sstsubsection{
@@ -18095,7 +18095,8 @@ plot (101k).
          The co-ordinates at which to place the origin of the arrows, in the
          Frame specified by parameter OFRAME. If a null (!) value is
          supplied, OFRAME is ignored and the arrows are positions at a
-         default position near one of the corners, or at the centre. An
+         default position near one of the corners, or at the centre. The
+         supplied position can be anywhere within the current picture. An
          error is reported if the arrows and labels cannot be drawn at any
          of these positions. {\tt [!]}
       }
@@ -18166,7 +18167,7 @@ plot (101k).
          As above, but blanks out the picture area behind the arrows, and
          positions them in the middle of the underlying DATA picture. In
          addition, the text labels are drawn with a clear background so
-         that the underlying image can seen around the text. 
+         that the underlying image can seen around the text.
       }
       \sstexamplesubsection{
          drawnorth blank blanksize=1.2 oframe=pixel origin={\tt "}150,250{\tt "}
@@ -18204,8 +18205,8 @@ plot (101k).
       \sstitemlist{
 
          \sstitem
-         An error is reported if there is no existing DATA picture on the
-         selected graphics device.
+         An error is reported if there is no existing DATA picture within
+         the current picture on the selected graphics device.
 
          \sstitem
          The application stores a picture in the graphics database with name

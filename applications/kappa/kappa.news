@@ -52,6 +52,10 @@
    New Commands: 
    -------------
 
+   - DRAWNORTH: Draws a pair of arrows on top of a previously displayed 
+   picture indicating the directions of the labelled axes in the
+   picture (e.g. north and east).
+
    - LUTCOLD: Loads a colour table which goes from black to white,
    passing through cold shades of pale blue and grey.
 
