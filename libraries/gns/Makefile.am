@@ -56,12 +56,12 @@ idibuild_SOURCES = idibuild.fpp
 gksbuild.f: gksbuild.fpp
 idibuild.f: idibuild.fpp
 
-gns_gksdevices : gksbuild gksdevices.txt
+gns_gksdevices : gksbuild$(EXEEXT) gksdevices.txt
 	-rm -f gns_gksdevices
 	echo gksdevices.txt | ./gksbuild
 	chmod o+r gns_gksdevices
 
-gns_ididevices : idibuild ididevices.txt
+gns_ididevices : idibuild$(EXEEXT) ididevices.txt
 	-rm -f gns_ididevices
 	echo ididevices.txt | ./idibuild
 	chmod o+r gns_ididevices
