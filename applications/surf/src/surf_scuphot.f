@@ -160,6 +160,9 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
+*     Revision 1.32  2004/09/08 02:03:35  timj
+*     Add CNF_PVAL where appropriate
+*
 *     Revision 1.31  2000/09/20 00:52:12  timj
 *     Fix SEGV when using POLPHOT data (the if statement was incorrect)
 *
@@ -277,6 +280,7 @@ c
       INCLUDE 'PRM_PAR'                ! for VAL__xxxx constants
       INCLUDE 'SURF_PAR'               ! REDS constants
       INCLUDE 'PAR_ERR'                ! PAR__ constants
+      INCLUDE 'CNF_PAR'                ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS
@@ -1131,15 +1135,20 @@ c
      :                    N_BOLS + (PHOT_BB(BEAM) - 1)
                      OUT_OFFSET = POS - 1
 
-                     CALL VEC_RTOR(.FALSE., 1, %val(IN_D_PTR + IN_OFFSET
-     :                    * VAL__NBR), %val(INT_D_PTR(BEAM) + OUT_OFFSET
+                     CALL VEC_RTOR(.FALSE., 1, 
+     :                             %VAL(CNF_PVAL(IN_D_PTR) + IN_OFFSET
+     :                    * VAL__NBR), 
+     :   %VAL(CNF_PVAL(INT_D_PTR(BEAM)) + OUT_OFFSET
      :                    * VAL__NBR), IERR, NERR, STATUS)
-                     CALL VEC_RTOR(.FALSE., 1, %val(IN_V_PTR + IN_OFFSET
-     :                    * VAL__NBR), %val(INT_V_PTR(BEAM) + OUT_OFFSET
+                     CALL VEC_RTOR(.FALSE., 1, 
+     :                             %VAL(CNF_PVAL(IN_V_PTR) + IN_OFFSET
+     :                    * VAL__NBR), 
+     :   %VAL(CNF_PVAL(INT_V_PTR(BEAM)) + OUT_OFFSET
      :                    * VAL__NBR), IERR, NERR, STATUS)
-                     CALL VEC_UBTOUB(.FALSE., 1, %val(IN_Q_PTR + 
-     :                    IN_OFFSET * VAL__NBUB), 
-     :                    %val(INT_Q_PTR(BEAM) + OUT_OFFSET *
+                     CALL VEC_UBTOUB(.FALSE., 1, 
+     :                               %VAL(CNF_PVAL(IN_Q_PTR) +
+     :                    IN_OFFSET * VAL__NBUB),
+     :                    %VAL(CNF_PVAL(INT_Q_PTR(BEAM)) + OUT_OFFSET *
      :                    VAL__NBUB), IERR, NERR, STATUS)
 
                   END DO
@@ -1206,7 +1215,8 @@ c
 *     initialise quality to bad
 
                      IF (STATUS .EQ. SAI__OK) THEN
-                        CALL SCULIB_CFILLB (NELM, 1, %val(MAP_Q_PTR))
+                        CALL SCULIB_CFILLB (NELM, 1, 
+     :                                      %VAL(CNF_PVAL(MAP_Q_PTR)))
                      END IF
 
 *     construct axes
@@ -1216,20 +1226,22 @@ c
      :                       'WRITE', TEMP_PTR, NELM, STATUS)
                         IF (STATUS .EQ. SAI__OK) THEN
                            CALL SCULIB_NFILLR (JIGGLE_COUNT, 
-     :                          %val(TEMP_PTR))
+     :                          %VAL(CNF_PVAL(TEMP_PTR)))
                         END IF
                         CALL NDF_AUNMP (IBEAM, 'CENTRE', 1, STATUS)
                      ELSE IF (N_OBSDIM .EQ. 2) THEN
                         CALL NDF_AMAP (IBEAM, 'CENTRE', 1, '_REAL',
      :                       'WRITE', TEMP_PTR, NELM, STATUS)
                         CALL VEC_RTOR(.FALSE., UBND(1), JIGGLE_2D_A1,
-     :                       %val(TEMP_PTR), IERR, NERR, STATUS)
+     :                       %VAL(CNF_PVAL(TEMP_PTR)), 
+     :                       IERR, NERR, STATUS)
                         CALL NDF_AUNMP (IBEAM, 'CENTRE', 1, STATUS)
                         
                         CALL NDF_AMAP (IBEAM, 'CENTRE', 2, '_REAL',
      :                       'WRITE', TEMP_PTR, NELM, STATUS)
                         CALL VEC_RTOR(.FALSE., UBND(2), JIGGLE_2D_A2,
-     :                       %val(TEMP_PTR), IERR, NERR, STATUS)
+     :                       %VAL(CNF_PVAL(TEMP_PTR)), 
+     :                       IERR, NERR, STATUS)
                         CALL NDF_AUNMP (IBEAM, 'CENTRE', 2, STATUS)
                      END IF
 
@@ -1284,7 +1296,8 @@ c
                   CALL NDF_AMAP (IPEAK, 'CENTRE', 1, '_INTEGER',
      :                 'WRITE', TEMP_PTR, NELM, STATUS)
                   IF (STATUS .EQ. SAI__OK) THEN
-                     CALL SCULIB_NFILLI (N_BITS, %val(TEMP_PTR))
+                     CALL SCULIB_NFILLI (N_BITS, 
+     :                                   %VAL(CNF_PVAL(TEMP_PTR)))
                   END IF
                   CALL NDF_AUNMP (IPEAK, 'CENTRE', 1, STATUS)
 
@@ -1334,7 +1347,8 @@ c
 *     initialise quality to bad
 
                   IF (STATUS .EQ. SAI__OK) THEN
-                     CALL SCULIB_CFILLB (NELM, 1, %val(PEAK_Q_PTR))
+                     CALL SCULIB_CFILLB (NELM, 1, 
+     :                                   %VAL(CNF_PVAL(PEAK_Q_PTR)))
                   END IF
 
 *     Cycle through measurements
@@ -1354,11 +1368,11 @@ c
 *     coadd the jiggle data for the integration into that for the measurement
                         
                         CALL SCULIB_COADD (JIGGLE_COUNT,
-     :                       %val(INT_D_PTR(BEAM) 
+     :                       %VAL(CNF_PVAL(INT_D_PTR(BEAM))
      :                       + INT_OFFSET*VAL__NBR),
-     :                       %val(INT_V_PTR(BEAM) 
+     :                       %VAL(CNF_PVAL(INT_V_PTR(BEAM))
      :                       + INT_OFFSET*VAL__NBR),
-     :                       %val(INT_Q_PTR(BEAM)
+     :                       %VAL(CNF_PVAL(INT_Q_PTR(BEAM))
      :                       + INT_OFFSET*VAL__NBUB),
      :                       MEAS_D(1,BEAM), MEAS_V(1,BEAM),
      :                       MEAS_Q(1,BEAM), MEAS_N(1,BEAM),
@@ -1370,11 +1384,11 @@ c
 
                         CALL SCULIB_ANALYSE_PHOTOM_JIGGLE (ANALYSIS,
      :                       1, 1, JIGGLE_COUNT, JIGGLE_X, JIGGLE_Y,
-     :                       %val(INT_D_PTR(BEAM) 
+     :                       %VAL(CNF_PVAL(INT_D_PTR(BEAM))
      :                       + INT_OFFSET*VAL__NBR),
-     :                       %val(INT_V_PTR(BEAM) 
+     :                       %VAL(CNF_PVAL(INT_V_PTR(BEAM))
      :                       + INT_OFFSET*VAL__NBR),
-     :                       %val(INT_Q_PTR(BEAM)
+     :                       %VAL(CNF_PVAL(INT_Q_PTR(BEAM))
      :                       + INT_OFFSET*VAL__NBUB),
      :                       PEAK_D(NUM_INTS,BEAM), 
      :                       PEAK_V(NUM_INTS,BEAM),
@@ -1427,9 +1441,11 @@ c
      :                       JIGGLE_COUNT, 1, MEAS_D(1,BEAM), 
      :                       MEAS_V(1,BEAM),
      :                       MEAS_Q(1,BEAM), 1, JIGGLE_COUNT, IPOS,
-     :                       JPOS, UBND(1), UBND(2), %val(MAP_D_PTR), 
-     :                       %VAL(MAP_V_PTR), %val(MAP_Q_PTR), 
-     :                       %val(MAP_N_PTR), ITEMP, BADBIT, 
+     :                       JPOS, UBND(1), UBND(2), 
+     :                       %VAL(CNF_PVAL(MAP_D_PTR)),
+     :                       %VAL(CNF_PVAL(MAP_V_PTR)), 
+     :                       %VAL(CNF_PVAL(MAP_Q_PTR)),
+     :                       %VAL(CNF_PVAL(MAP_N_PTR)), ITEMP, BADBIT,
      :                       STATUS)
                      END IF
                      
@@ -1443,14 +1459,17 @@ c
                   IF (ANALYSIS_METHOD .EQ. 'SAMPLES') THEN
 
                      CALL VEC_RTOR(.FALSE., N_BITS, 
-     :                    %VAL(INT_D_PTR(BEAM)),
-     :                    %val(PEAK_D_PTR), IERR, NERR, STATUS)
+     :                    %VAL(CNF_PVAL(INT_D_PTR(BEAM))),
+     :                    %VAL(CNF_PVAL(PEAK_D_PTR)), 
+     :                    IERR, NERR, STATUS)
                      CALL VEC_RTOR(.FALSE., N_BITS, 
-     :                    %VAL(INT_V_PTR(BEAM)),
-     :                    %val(PEAK_V_PTR), IERR, NERR, STATUS)
+     :                    %VAL(CNF_PVAL(INT_V_PTR(BEAM))),
+     :                    %VAL(CNF_PVAL(PEAK_V_PTR)), 
+     :                    IERR, NERR, STATUS)
                      CALL VEC_UBTOUB(.FALSE., N_BITS, 
-     :                    %VAL(INT_Q_PTR(BEAM)), 
-     :                    %val(PEAK_Q_PTR), IERR, NERR, STATUS)
+     :                    %VAL(CNF_PVAL(INT_Q_PTR(BEAM))),
+     :                    %VAL(CNF_PVAL(PEAK_Q_PTR)), 
+     :                    IERR, NERR, STATUS)
 
 *     Now set the bad pixel mask from the input
                      CALL NDF_SBB(BADBIT, IPEAK, STATUS)                      
@@ -1459,15 +1478,18 @@ c
 *     Store the fitted peak
                      CALL VEC_RTOR(.FALSE., 
      :                    N_INTEGRATIONS * N_MEASUREMENTS,
-     :                    PEAK_D(1,BEAM), %val(PEAK_D_PTR), IERR, NERR, 
+     :                    PEAK_D(1,BEAM), %VAL(CNF_PVAL(PEAK_D_PTR)), 
+     :                    IERR, NERR,
      :                    STATUS)
                      CALL VEC_RTOR(.FALSE., 
      :                    N_INTEGRATIONS * N_MEASUREMENTS,
-     :                    PEAK_V(1,BEAM), %val(PEAK_V_PTR), IERR, NERR, 
+     :                    PEAK_V(1,BEAM), %VAL(CNF_PVAL(PEAK_V_PTR)), 
+     :                    IERR, NERR,
      :                    STATUS)
                      CALL VEC_UBTOUB(.FALSE., 
      :                    N_INTEGRATIONS * N_MEASUREMENTS,
-     :                    PEAK_Q(1,BEAM), %val(PEAK_Q_PTR), IERR, NERR,
+     :                    PEAK_Q(1,BEAM), %VAL(CNF_PVAL(PEAK_Q_PTR)), 
+     :                    IERR, NERR,
      :                    STATUS)
 
 *     Write BIT MASK

@@ -114,6 +114,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.15  2004/09/08 02:03:34  timj
+*     Add CNF_PVAL where appropriate
+*
 *     Revision 1.14  2003/04/02 02:58:31  timj
 *     Protect bad pixels when changing type with VEC
 *
@@ -180,6 +183,7 @@
       INCLUDE 'SURF_PAR'               ! SURF definitions
       INCLUDE 'MSG_PAR'
       INCLUDE 'GRP_PAR'
+      INCLUDE 'CNF_PAR'
 
 * Status:
       INTEGER STATUS
@@ -483,7 +487,8 @@
 *     map centre
 
             CALL SCULIB_APPARENT_2_TP (N_PTS * N_BEAM, 
-     :           %val(BOL_RA_PTR), %val(BOL_DEC_PTR), 
+     :           %VAL(CNF_PVAL(BOL_RA_PTR)), 
+     :           %VAL(CNF_PVAL(BOL_DEC_PTR)),
      :           OUT_RA_CEN, OUT_DEC_CEN, OUT_ROTATION,
      :           DBLE(SHIFT(1)), DBLE(SHIFT(2)), STATUS)
             
@@ -499,11 +504,11 @@
             IF (STATUS .EQ. SAI__OK) THEN
 
                CALL SCULIB_ADDCAD(N_PTS * N_BEAM,
-     :              %VAL(BOL_RA_PTR), DBLE(SHIFT(1)), 
-     :              %VAL(BOL_RA_PTR))
+     :              %VAL(CNF_PVAL(BOL_RA_PTR)), DBLE(SHIFT(1)),
+     :              %VAL(CNF_PVAL(BOL_RA_PTR)))
                CALL SCULIB_ADDCAD(N_PTS * N_BEAM,
-     :              %VAL(BOL_DEC_PTR), DBLE(SHIFT(2)), 
-     :              %VAL(BOL_DEC_PTR))
+     :              %VAL(CNF_PVAL(BOL_DEC_PTR)), DBLE(SHIFT(2)),
+     :              %VAL(CNF_PVAL(BOL_DEC_PTR)))
             
             END IF
 
@@ -514,11 +519,11 @@
          IF (STATUS .EQ. SAI__OK) THEN
 
             CALL SCULIB_MULCAD(N_PTS * N_BEAM,
-     :           %VAL(BOL_RA_PTR), R2AS,
-     :           %VAL(BOL_RA_PTR), STATUS)
+     :           %VAL(CNF_PVAL(BOL_RA_PTR)), R2AS,
+     :           %VAL(CNF_PVAL(BOL_RA_PTR)), STATUS)
             CALL SCULIB_MULCAD(N_PTS * N_BEAM,
-     :           %VAL(BOL_DEC_PTR), R2AS,
-     :           %VAL(BOL_DEC_PTR), STATUS) 
+     :           %VAL(CNF_PVAL(BOL_DEC_PTR)), R2AS,
+     :           %VAL(CNF_PVAL(BOL_DEC_PTR)), STATUS)
 
          END IF
 
@@ -566,8 +571,8 @@
 *     Now copy some data in.
 *     First the actual data values
 
-         CALL VEC_RTOR(.FALSE., N_PTS, %VAL(DATA_PTR),
-     :        %VAL(OUT_DATA_PTR), IERR, NERR, STATUS)
+         CALL VEC_RTOR(.FALSE., N_PTS, %VAL(CNF_PVAL(DATA_PTR)),
+     :        %VAL(CNF_PVAL(OUT_DATA_PTR)), IERR, NERR, STATUS)
 
 
 *     Go through a beam at a time
@@ -576,14 +581,14 @@
 
 *     Now the X positions
             CALL VEC_DTOR(.TRUE., N_PTS, 
-     :           %VAL(BOL_RA_PTR + VAL__NBD * N_PTS * (I - 1)),
-     :           %VAL(OUT_DATA_PTR + VAL__NBR * (2 * I - 1) * N_PTS ),
+     :   %VAL(CNF_PVAL(BOL_RA_PTR) + VAL__NBD * N_PTS * (I - 1)),
+     :   %VAL(CNF_PVAL(OUT_DATA_PTR) + VAL__NBR * (2 * I - 1) * N_PTS),
      :           IERR, NERR, STATUS)
 
 *     Now Y
             CALL VEC_DTOR(.TRUE., N_PTS, 
-     :           %VAL(BOL_DEC_PTR + VAL__NBD * N_PTS * (I - 1)),
-     :           %VAL(OUT_DATA_PTR + VAL__NBR * (2 * I) * N_PTS ),
+     :   %VAL(CNF_PVAL(BOL_DEC_PTR) + VAL__NBD * N_PTS * (I - 1)),
+     :   %VAL(CNF_PVAL(OUT_DATA_PTR) + VAL__NBR * (2 * I) * N_PTS),
      :           IERR, NERR, STATUS)
 
          END DO
@@ -635,7 +640,7 @@
          CALL NDF_AMAP(OUTNDF, 'CENTRE', 1, '_INTEGER', 'WRITE',
      :        OUT_A_PTR, ITEMP, STATUS)
          IF (STATUS .EQ. SAI__OK) THEN
-            CALL SCULIB_NFILLI (N_BOL, %val(OUT_A_PTR))
+            CALL SCULIB_NFILLI (N_BOL, %VAL(CNF_PVAL(OUT_A_PTR)))
          END IF
          CALL NDF_ACPUT ('Bolometer', OUTNDF, 'LABEL', 1, STATUS)
          CALL NDF_AUNMP (OUTNDF, 'CENTRE', 1, STATUS)
@@ -648,7 +653,7 @@
      :        OUT_A_PTR, ITEMP, STATUS)
 
          CALL VEC_DTOD(.TRUE., N_POS, 
-     :        %VAL(LST_PTR(1)), %VAL(OUT_A_PTR),
+     :        %VAL(CNF_PVAL(LST_PTR(1))), %VAL(CNF_PVAL(OUT_A_PTR)),
      :        IERR, NERR, STATUS)
 
          CALL NDF_AUNMP (OUTNDF, 'CENTRE', 2, STATUS)

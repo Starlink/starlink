@@ -249,6 +249,9 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
+*     Revision 1.77  2004/09/08 02:03:33  timj
+*     Add CNF_PVAL where appropriate
+*
 *     Revision 1.76  2003/04/01 01:10:35  timj
 *     Add a comment linking MAX_DIM to SCUBA__MAX_FITS
 *
@@ -499,6 +502,7 @@ c
       INCLUDE 'PAR_PAR'                ! for PAR__ constants
       INCLUDE 'SURF_PAR'               ! REDS definitions
       INCLUDE 'SAE_PAR'                ! SSE global definitions
+      INCLUDE 'CNF_PAR'                ! For CNF_PVAL function
 
 *  Arguments Given:
       CHARACTER * (*)  TSKNAME
@@ -1299,7 +1303,8 @@ c
          IF (STATUS .EQ. SAI__OK) THEN
             DO I = 1, FILE
                CALL SCULIB_APPARENT_2_TP (N_BOL(I) * N_POS(I), 
-     :              %val(BOL_RA_PTR(I)), %val(BOL_DEC_PTR(I)), 
+     :              %VAL(CNF_PVAL(BOL_RA_PTR(I))), 
+     :              %VAL(CNF_PVAL(BOL_DEC_PTR(I))),
      :              OUT_RA_CEN, OUT_DEC_CEN, OUT_ROTATION,
      :              DBLE(SHIFT_DX(I)), DBLE(SHIFT_DY(I)), STATUS)
             END DO
@@ -1317,11 +1322,11 @@ c
             DO I = 1, FILE
 
                CALL SCULIB_ADDCAD(N_BOL(I) * N_POS(I),
-     :              %VAL(BOL_RA_PTR(I)), DBLE(SHIFT_DX(I)), 
-     :              %VAL(BOL_RA_PTR(I)))
+     :              %VAL(CNF_PVAL(BOL_RA_PTR(I))), DBLE(SHIFT_DX(I)),
+     :              %VAL(CNF_PVAL(BOL_RA_PTR(I))))
                CALL SCULIB_ADDCAD(N_BOL(I) * N_POS(I),
-     :              %VAL(BOL_DEC_PTR(I)), DBLE(SHIFT_DY(I)), 
-     :              %VAL(BOL_DEC_PTR(I)))
+     :              %VAL(CNF_PVAL(BOL_DEC_PTR(I))), DBLE(SHIFT_DY(I)),
+     :              %VAL(CNF_PVAL(BOL_DEC_PTR(I))))
                
             END DO
          END IF
@@ -1349,18 +1354,20 @@ c
 *     Multiply all the data by the weight and variance by weight squared
             IF (STATUS .EQ. SAI__OK) THEN
                CALL SCULIB_MULCAR(N_POS(I) * N_BOL(I),
-     :              %VAL(IN_DATA_PTR(I)), WEIGHT(I), 
-     :              %VAL(IN_DATA_PTR(I)))
+     :              %VAL(CNF_PVAL(IN_DATA_PTR(I))), WEIGHT(I),
+     :              %VAL(CNF_PVAL(IN_DATA_PTR(I))))
 
                CALL SCULIB_MULCAR(N_POS(I) * N_BOL(I),
-     :              %VAL(IN_VARIANCE_PTR(I)), WEIGHT(I)**2, 
-     :              %VAL(IN_VARIANCE_PTR(I)))
+     :              %VAL(CNF_PVAL(IN_VARIANCE_PTR(I))), WEIGHT(I)**2,
+     :              %VAL(CNF_PVAL(IN_VARIANCE_PTR(I))))
             END IF
 
 *     Write out the data
             CALL SURF_WRITE_DATA( FD, N_POS(I) * N_BOL(I), 
-     :           %VAL(IN_DATA_PTR(I)), %VAL(IN_VARIANCE_PTR(I)),
-     :           %VAL(BOL_RA_PTR(I)), %VAL(BOL_DEC_PTR(I)),
+     :           %VAL(CNF_PVAL(IN_DATA_PTR(I))), 
+     :           %VAL(CNF_PVAL(IN_VARIANCE_PTR(I))),
+     :           %VAL(CNF_PVAL(BOL_RA_PTR(I))), 
+     :           %VAL(CNF_PVAL(BOL_DEC_PTR(I))),
      :           STATUS)
          END DO
 
@@ -1498,7 +1505,8 @@ c
 *     Copy the new quality array
 
                   CALL VEC_UBTOUB(.FALSE., N_POS(I) * N_BOL(I),
-     :                 %VAL(IN_QUALITY_PTR(I)), %VAL(QPTR), IERR,
+     :                 %VAL(CNF_PVAL(IN_QUALITY_PTR(I))), 
+     :                 %VAL(CNF_PVAL(QPTR)), IERR,
      :                 NERR, STATUS)
 
 *     Get and set the bad bits mask
@@ -1620,8 +1628,8 @@ c
      :           QPTR, ITEMP, STATUS)
 
 *     Copy the sky data in
-            CALL VEC_RTOR(.FALSE., N_POS(I), %VAL(SKY_PTR(I)),
-     :           %VAL(QPTR), IERR, NERR, STATUS)
+            CALL VEC_RTOR(.FALSE., N_POS(I), %VAL(CNF_PVAL(SKY_PTR(I))),
+     :           %VAL(CNF_PVAL(QPTR)), IERR, NERR, STATUS)
 
 *     Unmap DATA
             CALL NDF_UNMAP(SKYNDF, 'DATA', STATUS)
@@ -1634,8 +1642,9 @@ c
      :           QPTR, ITEMP, STATUS)
 
 *     Copy in error
-            CALL VEC_RTOR(.FALSE., N_POS(I), %VAL(SKY_VPTR(I)),
-     :           %VAL(QPTR), IERR, NERR, STATUS)
+            CALL VEC_RTOR(.FALSE., N_POS(I), 
+     :                    %VAL(CNF_PVAL(SKY_VPTR(I))),
+     :           %VAL(CNF_PVAL(QPTR)), IERR, NERR, STATUS)
 
 *     Unmap variance
             CALL NDF_UNMAP(SKYNDF, '*', STATUS)
@@ -1899,16 +1908,20 @@ c
 
 *     Extract a bolometer
                   CALL SCULIB_EXTRACT_2DIM_R(EACHBOL, N_BOL(I),N_POS(I),
-     :                 %val(IN_DATA_PTR(I)), %val(ABOL_DATA_PTR(I)),
+     :                 %VAL(CNF_PVAL(IN_DATA_PTR(I))), 
+     :                 %VAL(CNF_PVAL(ABOL_DATA_PTR(I))),
      :                 STATUS)
                   CALL SCULIB_EXTRACT_2DIM_R(EACHBOL, N_BOL(I),N_POS(I),
-     :                 %val(IN_VARIANCE_PTR(I)), %val(ABOL_VAR_PTR(I)),
+     :                 %VAL(CNF_PVAL(IN_VARIANCE_PTR(I))), 
+     :                 %VAL(CNF_PVAL(ABOL_VAR_PTR(I))),
      :                 STATUS)
                   CALL SCULIB_EXTRACT_2DIM_D(EACHBOL, N_BOL(I),N_POS(I),
-     :                 %val(BOL_RA_PTR(I)), %val(ABOL_RA_PTR(I)), 
+     :                 %VAL(CNF_PVAL(BOL_RA_PTR(I))), 
+     :                 %VAL(CNF_PVAL(ABOL_RA_PTR(I))),
      :                 STATUS)
                   CALL SCULIB_EXTRACT_2DIM_D(EACHBOL, N_BOL(I),N_POS(I),
-     :                 %val(BOL_DEC_PTR(I)), %val(ABOL_DEC_PTR(I)), 
+     :                 %VAL(CNF_PVAL(BOL_DEC_PTR(I))), 
+     :                 %VAL(CNF_PVAL(ABOL_DEC_PTR(I))),
      :                 STATUS)
                END DO
             ELSE
@@ -2150,11 +2163,11 @@ c
 
                   IF (STATUS .EQ. SAI__OK) THEN
                      CALL SCULIB_CFILLB (N_PIXELS, BADBIT,
-     :                    %val(OUT_QUALITY_PTR))
+     :                    %VAL(CNF_PVAL(OUT_QUALITY_PTR)))
                      CALL SCULIB_CFILLR(N_PIXELS, 0.0, 
-     :                    %VAL(OUT_DATA_PTR))
+     :                    %VAL(CNF_PVAL(OUT_DATA_PTR)))
                      CALL SCULIB_CFILLR(N_PIXELS, 0.0, 
-     :                    %VAL(OUT_VARIANCE_PTR))
+     :                    %VAL(CNF_PVAL(OUT_VARIANCE_PTR)))
                   END IF
 
 
@@ -2165,7 +2178,7 @@ c
      :                 OUT_WEIGHT_PTR, OUT_WEIGHT_END, STATUS)
                   IF (STATUS .EQ. SAI__OK) THEN
                      CALL SCULIB_CFILLR (N_PIXELS, 0.0, 
-     :                    %val(OUT_WEIGHT_PTR))
+     :                    %VAL(CNF_PVAL(OUT_WEIGHT_PTR)))
                   END IF
 
 
@@ -2181,9 +2194,11 @@ c
      :                    MAP_SIZE(2), I_CENTRE, J_CENTRE, WTFN, WEIGHT,
      :                    BOLWT, N_BOL, SCUBA__NUM_ADC*SCUBA__NUM_CHAN,
      :                    ABOL_DATA_PTR, ABOL_VAR_PTR, 
-     :                    ABOL_RA_PTR, ABOL_DEC_PTR, %VAL(OUT_DATA_PTR), 
-     :                    %VAL(OUT_VARIANCE_PTR), %VAL(OUT_QUALITY_PTR), 
-     :                    %VAL(OUT_WEIGHT_PTR), STATUS )
+     :                    ABOL_RA_PTR, ABOL_DEC_PTR, 
+     :                    %VAL(CNF_PVAL(OUT_DATA_PTR)),
+     :                    %VAL(CNF_PVAL(OUT_VARIANCE_PTR)), 
+     :                    %VAL(CNF_PVAL(OUT_QUALITY_PTR)),
+     :                    %VAL(CNF_PVAL(OUT_WEIGHT_PTR)), STATUS )
 
                   ELSE IF (METHOD .EQ. 'MEDIAN') THEN
 
@@ -2193,8 +2208,9 @@ c
      :                    I_CENTRE, J_CENTRE, 
      :                    ABOL_RA_PTR, ABOL_DEC_PTR,
      :                    ABOL_DATA_PTR,
-     :                    %VAL(OUT_DATA_PTR), %VAL(OUT_VARIANCE_PTR),
-     :                    %VAL(OUT_QUALITY_PTR), STATUS)
+     :                    %VAL(CNF_PVAL(OUT_DATA_PTR)), 
+     :                    %VAL(CNF_PVAL(OUT_VARIANCE_PTR)),
+     :                    %VAL(CNF_PVAL(OUT_QUALITY_PTR)), STATUS)
 
                   ELSE IF (METHOD(1:6) .EQ. 'SPLINE') THEN
 
@@ -2221,9 +2237,10 @@ c
      :                    MAP_SIZE(1), MAP_SIZE(2),
      :                    I_CENTRE, J_CENTRE, WEIGHT, INT_LIST, 
      :                    ABOL_DATA_PTR, ABOL_VAR_PTR, ABOL_RA_PTR, 
-     :                    ABOL_DEC_PTR, %VAL(OUT_DATA_PTR), 
-     :                    %VAL(OUT_VARIANCE_PTR), %VAL(OUT_QUALITY_PTR), 
-     :                    %VAL(OUT_WEIGHT_PTR), STATUS )
+     :                    ABOL_DEC_PTR, %VAL(CNF_PVAL(OUT_DATA_PTR)),
+     :                    %VAL(CNF_PVAL(OUT_VARIANCE_PTR)), 
+     :                    %VAL(CNF_PVAL(OUT_QUALITY_PTR)),
+     :                    %VAL(CNF_PVAL(OUT_WEIGHT_PTR)), STATUS )
 
                   ELSE
 
@@ -2242,14 +2259,16 @@ c
                   CALL NDF_MAP (OUT_NDF, 'DATA', '_REAL', 'WRITE', 
      :                 NDF_PTR, ITEMP, STATUS)
                   CALL VEC_RTOR(.FALSE., N_PIXELS,
-     :                 %VAL(OUT_DATA_PTR), %VAL(NDF_PTR), IERR,
+     :                 %VAL(CNF_PVAL(OUT_DATA_PTR)), 
+     :                 %VAL(CNF_PVAL(NDF_PTR)), IERR,
      :                 NERR, STATUS)
                   CALL NDF_UNMAP(OUT_NDF, 'DATA', STATUS)
 
                   CALL NDF_MAP (OUT_NDF, 'VARIANCE', '_REAL', 
      :                 'WRITE', NDF_PTR, ITEMP, STATUS)
                   CALL VEC_RTOR(.FALSE., N_PIXELS,
-     :                 %VAL(OUT_VARIANCE_PTR), %VAL(NDF_PTR), IERR,
+     :                 %VAL(CNF_PVAL(OUT_VARIANCE_PTR)), 
+     :                 %VAL(CNF_PVAL(NDF_PTR)), IERR,
      :                 NERR, STATUS)
                   CALL NDF_UNMAP(OUT_NDF, 'VARIANCE', STATUS)
 
@@ -2270,13 +2289,15 @@ c
 
 *     Trim the image - set the second bit
                      CALL SURFLIB_TRIM_IMAGE( TRIM, MAP_SIZE(1),
-     :                    MAP_SIZE(2), 1, %VAL(OUT_QUALITY_PTR),
-     :                    %VAL(NDF_PTR), STATUS)
+     :                    MAP_SIZE(2), 1, 
+     :                    %VAL(CNF_PVAL(OUT_QUALITY_PTR)),
+     :                    %VAL(CNF_PVAL(NDF_PTR)), STATUS)
 
                   ELSE
 
                      CALL VEC_UBTOUB(.FALSE., N_PIXELS,
-     :                    %VAL(OUT_QUALITY_PTR), %VAL(NDF_PTR), IERR,
+     :                    %VAL(CNF_PVAL(OUT_QUALITY_PTR)), 
+     :                    %VAL(CNF_PVAL(NDF_PTR)), IERR,
      :                    NERR, STATUS)
 
                   END IF
@@ -2358,7 +2379,8 @@ c
 *     Copy the weights into the output NDF
 
                      CALL VEC_RTOR(.FALSE., N_PIXELS,
-     :                    %VAL(OUT_WEIGHT_PTR), %VAL(NDF_PTR), IERR,
+     :                    %VAL(CNF_PVAL(OUT_WEIGHT_PTR)), 
+     :                    %VAL(CNF_PVAL(NDF_PTR)), IERR,
      :                    NERR, STATUS)
 
 *     Unmap the weights NDF
@@ -2398,7 +2420,7 @@ c
                      BADB = 0
                      IF (STATUS .EQ. SAI__OK) THEN
                         CALL SCULIB_CFILLB (N_PIXELS, BADB,
-     :                       %val(OUT_QUALITY_PTR))
+     :                       %VAL(CNF_PVAL(OUT_QUALITY_PTR)))
                      END IF
 
                      DO I = 1, FILE
@@ -2409,14 +2431,16 @@ c
 
                         CALL SURFLIB_CALC_IJPOS(N_PTS(I), 
      :                       DBLE(OUT_PIXEL), I_CENTRE, J_CENTRE,
-     :                       %VAL(ABOL_RA_PTR(I)),%VAL(ABOL_DEC_PTR(I)), 
-     :                       %VAL(IJ_PTR), STATUS)
+     :                       %VAL(CNF_PVAL(ABOL_RA_PTR(I))),
+     :                       %VAL(CNF_PVAL(ABOL_DEC_PTR(I))),
+     :                       %VAL(CNF_PVAL(IJ_PTR)), STATUS)
 
                         CALL SURFLIB_HISTOGRAM_GRID(N_PTS(I),
      :                       MAP_SIZE(1), MAP_SIZE(2), .TRUE.,
-     :                       %VAL(ABOL_DATA_PTR(I)),
-     :                       %VAL(OUT_QUALITY_PTR), BADB, 
-     :                       %VAL(IJ_PTR), %VAL(NDF_PTR), ITEMP,
+     :                       %VAL(CNF_PVAL(ABOL_DATA_PTR(I))),
+     :                       %VAL(CNF_PVAL(OUT_QUALITY_PTR)), BADB,
+     :                       %VAL(CNF_PVAL(IJ_PTR)), 
+     :                       %VAL(CNF_PVAL(NDF_PTR)), ITEMP,
      :                       ITEMP, ITEMP, STATUS)
 
                         CALL SCULIB_FREE('IJs',IJ_PTR, IJ_PTR_END,

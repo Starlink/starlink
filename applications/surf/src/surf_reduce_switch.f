@@ -146,6 +146,9 @@
 *      9-JUL-1996: modified to handle v200 data with 5 data per demodulated
 *                  point (JFL).
 *     $Log$
+*     Revision 1.32  2004/09/08 02:03:34  timj
+*     Add CNF_PVAL where appropriate
+*
 *     Revision 1.31  2000/05/11 19:58:41  timj
 *     Add TARRAY, T_HOT and T_COLD to header documentation
 *
@@ -249,6 +252,7 @@ c
       INCLUDE 'NDF_PAR'                ! for NDF__NOID
       INCLUDE 'MSG_PAR'                ! MSG__ constants
       INCLUDE 'SURF_PAR'               ! REDS constants
+      INCLUDE 'CNF_PAR'                ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS
@@ -732,9 +736,12 @@ c
          
          IF (STATUS .EQ. SAI__OK) THEN
             CALL SCULIB_COPY_DEMOD_SWITCH (N_BOLS, EXPECTED_DIM1, N_POS,
-     :           SPIKE_LEVEL, %val(IN_DATA_PTR), %val(DEMOD_DATA_PTR),
-     :           %val(DEMOD_VARIANCE_PTR), %val(DEMOD_CALIBRATOR_PTR),
-     :           %val(DEMOD_CAL_VARIANCE_PTR), %val(DEMOD_QUALITY_PTR),
+     :           SPIKE_LEVEL, %VAL(CNF_PVAL(IN_DATA_PTR)), 
+     :           %VAL(CNF_PVAL(DEMOD_DATA_PTR)),
+     :           %VAL(CNF_PVAL(DEMOD_VARIANCE_PTR)), 
+     :           %VAL(CNF_PVAL(DEMOD_CALIBRATOR_PTR)),
+     :           %VAL(CNF_PVAL(DEMOD_CAL_VARIANCE_PTR)), 
+     :           %VAL(CNF_PVAL(DEMOD_QUALITY_PTR)),
      :           STATUS)
          END IF
 
@@ -847,11 +854,14 @@ c
          CALL SCULIB_CALC_SKYDIP_TEMPS(SCUBA__N_TEMPS, 0, N_FITS, FITS,
      :        'T_COLD', N_INTEGRATIONS, N_MEASUREMENTS, N_POS,
      :        N_BOLS, SCUBA__MAX_SUB, SCUBA__NUM_CHAN, SCUBA__NUM_ADC, 
-     :        BOL_CHAN, BOL_TYPE, BOL_ADC, %VAL(IN_DEM_PNTR_PTR), 
-     :        %VAL(IN_DATA_PTR), %VAL(OUT_DATA_PTR), 
-     :        %VAL(OUT_VARIANCE_PTR), %VAL(OUT_QUALITY_PTR),
-     :        %VAL(OUT_DEM_PNTR_PTR), AV_DATA, AV_VAR, AV_QUAL,
-     :        %VAL(SLICE_PTR), STATUS)
+     :        BOL_CHAN, BOL_TYPE, BOL_ADC, 
+     :        %VAL(CNF_PVAL(IN_DEM_PNTR_PTR)),
+     :        %VAL(CNF_PVAL(IN_DATA_PTR)), %VAL(CNF_PVAL(OUT_DATA_PTR)),
+     :        %VAL(CNF_PVAL(OUT_VARIANCE_PTR)), 
+     :        %VAL(CNF_PVAL(OUT_QUALITY_PTR)),
+     :        %VAL(CNF_PVAL(OUT_DEM_PNTR_PTR)), 
+     :        AV_DATA, AV_VAR, AV_QUAL,
+     :        %VAL(CNF_PVAL(SLICE_PTR)), STATUS)
 
 *     Have now finished with input data
 
@@ -883,7 +893,8 @@ c
 
 *  find the offset of the switches in the data array
 
-                  CALL SCULIB_FIND_SWITCH (%val(IN_DEM_PNTR_PTR),
+                  CALL SCULIB_FIND_SWITCH (
+     :   %VAL(CNF_PVAL(IN_DEM_PNTR_PTR)),
      :              N_SWITCHES, N_EXPOSURES, N_INTEGRATIONS,
      :              N_MEASUREMENTS, N_POS, 1, EXPOSURE, INTEGRATION,
      :              MEASUREMENT, SWITCH1_START, SWITCH1_END, STATUS)
@@ -901,7 +912,8 @@ c
                   END IF
 
                   IF (N_SWITCHES .GE. 2) THEN
-                     CALL SCULIB_FIND_SWITCH (%val(IN_DEM_PNTR_PTR),
+                     CALL SCULIB_FIND_SWITCH (
+     :   %VAL(CNF_PVAL(IN_DEM_PNTR_PTR)),
      :                 N_SWITCHES, N_EXPOSURES, N_INTEGRATIONS,
      :                 N_MEASUREMENTS, N_POS, 2, EXPOSURE,
      :                 INTEGRATION, MEASUREMENT, SWITCH2_START,
@@ -923,7 +935,8 @@ c
                   END IF
 
                   IF (N_SWITCHES .GE. 3) THEN
-                     CALL SCULIB_FIND_SWITCH (%val(IN_DEM_PNTR_PTR),
+                     CALL SCULIB_FIND_SWITCH (
+     :   %VAL(CNF_PVAL(IN_DEM_PNTR_PTR)),
      :                 N_SWITCHES, N_EXPOSURES, N_INTEGRATIONS,
      :                 N_MEASUREMENTS, N_POS, 3, EXPOSURE,
      :                 INTEGRATION, MEASUREMENT, SWITCH3_START,
@@ -957,26 +970,26 @@ c
                      IF (USE_CALIBRATOR) THEN
                         CALL SCULIB_DIV_CALIBRATOR_2 (N_BOLS,
      :                    N_SWITCH_POS,
-     :                    %val(DEMOD_DATA_PTR + 
+     :                    %VAL(CNF_PVAL(DEMOD_DATA_PTR) +
      :                    (SWITCH1_START - 1) * N_BOLS * VAL__NBR),
-     :                    %val(DEMOD_VARIANCE_PTR + 
+     :                    %VAL(CNF_PVAL(DEMOD_VARIANCE_PTR) +
      :                    (SWITCH1_START - 1) * N_BOLS * VAL__NBR),
-     :                    %val(DEMOD_CALIBRATOR_PTR +
+     :                    %VAL(CNF_PVAL(DEMOD_CALIBRATOR_PTR) +
      :                    (SWITCH1_START - 1) * N_BOLS * VAL__NBR),
-     :                    %val(DEMOD_QUALITY_PTR + 
+     :                    %VAL(CNF_PVAL(DEMOD_QUALITY_PTR) +
      :                    (SWITCH1_START - 1) * N_BOLS * VAL__NBUB),
      :                       STATUS)
 
                         IF (N_SWITCHES .GE. 2) THEN
                            CALL SCULIB_DIV_CALIBRATOR_2 (N_BOLS,
      :                       N_SWITCH_POS,
-     :                       %val(DEMOD_DATA_PTR + 
+     :                       %VAL(CNF_PVAL(DEMOD_DATA_PTR) +
      :                       (SWITCH2_START - 1) * N_BOLS * VAL__NBR),
-     :                       %val(DEMOD_VARIANCE_PTR + 
+     :                       %VAL(CNF_PVAL(DEMOD_VARIANCE_PTR) +
      :                       (SWITCH2_START - 1) * N_BOLS * VAL__NBR),
-     :                       %val(DEMOD_CALIBRATOR_PTR +
+     :                       %VAL(CNF_PVAL(DEMOD_CALIBRATOR_PTR) +
      :                       (SWITCH1_START - 1) * N_BOLS * VAL__NBR),
-     :                       %val(DEMOD_QUALITY_PTR + 
+     :                       %VAL(CNF_PVAL(DEMOD_QUALITY_PTR) +
      :                       (SWITCH2_START - 1) * N_BOLS * VAL__NBUB),
      :                          STATUS)
                         END IF
@@ -984,13 +997,13 @@ c
                         IF (N_SWITCHES .GE. 3) THEN
                            CALL SCULIB_DIV_CALIBRATOR_2 (N_BOLS,
      :                       N_SWITCH_POS,
-     :                       %val(DEMOD_DATA_PTR + 
+     :                       %VAL(CNF_PVAL(DEMOD_DATA_PTR) +
      :                       (SWITCH3_START - 1) * N_BOLS * VAL__NBR),
-     :                       %val(DEMOD_VARIANCE_PTR + 
+     :                       %VAL(CNF_PVAL(DEMOD_VARIANCE_PTR) +
      :                       (SWITCH3_START - 1) * N_BOLS * VAL__NBR),
-     :                       %val(DEMOD_CALIBRATOR_PTR +
+     :                       %VAL(CNF_PVAL(DEMOD_CALIBRATOR_PTR) +
      :                       (SWITCH1_START - 1) * N_BOLS * VAL__NBR),
-     :                       %val(DEMOD_QUALITY_PTR + 
+     :                       %VAL(CNF_PVAL(DEMOD_QUALITY_PTR) +
      :                       (SWITCH3_START - 1) * N_BOLS * VAL__NBUB),
      :                          STATUS)
                         END IF
@@ -1020,100 +1033,110 @@ c
 
                            CALL SCULIB_REDUCE_SWITCH (CHOP_FUNCTION,
      :                          N_SWITCHES, N_SWITCH_POS * N_BOLS,
-     :                          %val(DEMOD_DATA_PTR + 
+     :                          %VAL(CNF_PVAL(DEMOD_DATA_PTR) +
      :                          (SWITCH1_START - 1) * N_BOLS* VAL__NBR),
-     :                          %val(DEMOD_VARIANCE_PTR + 
+     :                          %VAL(CNF_PVAL(DEMOD_VARIANCE_PTR) +
      :                          (SWITCH1_START - 1) * N_BOLS* VAL__NBR),
-     :                          %val(DEMOD_QUALITY_PTR + 
+     :                          %VAL(CNF_PVAL(DEMOD_QUALITY_PTR) +
      :                          (SWITCH1_START - 1) * N_BOLS*VAL__NBUB),
-     :                          %val(DEMOD_DATA_PTR +
+     :                          %VAL(CNF_PVAL(DEMOD_DATA_PTR) +
      :                          (SWITCH2_START - 1) * N_BOLS*VAL__NBR),
-     :                          %val(DEMOD_VARIANCE_PTR + 
+     :                          %VAL(CNF_PVAL(DEMOD_VARIANCE_PTR) +
      :                          (SWITCH2_START - 1) * N_BOLS*VAL__NBR),
-     :                          %val(DEMOD_QUALITY_PTR + 
+     :                          %VAL(CNF_PVAL(DEMOD_QUALITY_PTR) +
      :                          (SWITCH2_START - 1) * N_BOLS*VAL__NBUB),
-     :                          %val(DEMOD_DATA_PTR + 
+     :                          %VAL(CNF_PVAL(DEMOD_DATA_PTR) +
      :                          (SWITCH3_START - 1) * N_BOLS* VAL__NBR),
-     :                          %val(DEMOD_VARIANCE_PTR + 
+     :                          %VAL(CNF_PVAL(DEMOD_VARIANCE_PTR) +
      :                          (SWITCH3_START - 1) * N_BOLS *VAL__NBR),
-     :                          %val(DEMOD_QUALITY_PTR + 
+     :                          %VAL(CNF_PVAL(DEMOD_QUALITY_PTR) +
      :                          (SWITCH3_START - 1) * N_BOLS*VAL__NBUB),
-     :                          BEAM,
-     :                          %val(OUT_DATA_PTR + (BEAM_OFFSET +
+     :                          BEAM,%VAL(CNF_PVAL(OUT_DATA_PTR)
+     :                          + (BEAM_OFFSET +
      :                          (EXP_POINTER-1) * N_BOLS) * VAL__NBR),
-     :                          %val(OUT_VARIANCE_PTR + (BEAM_OFFSET +
+     :                          %VAL(CNF_PVAL(OUT_VARIANCE_PTR)
+     :                          + (BEAM_OFFSET +
      :                          (EXP_POINTER-1) * N_BOLS) * VAL__NBR),
-     :                          %val(OUT_QUALITY_PTR + (BEAM_OFFSET +
+     :                          %VAL(CNF_PVAL(OUT_QUALITY_PTR)
+     :                          + (BEAM_OFFSET +
      :                          (EXP_POINTER-1) * N_BOLS) * VAL__NBUB),
-     :                          BEAM_WEIGHT(BEAM),
-     :                          STATUS)
+     :                          BEAM_WEIGHT(BEAM), STATUS)
 
                         ELSE IF (SWITCH .EQ. 1) THEN
 *     Should do this with %LOC
                            CALL VEC_RTOR(.FALSE., N_SWITCH_POS * N_BOLS,
-     :                          %VAL(DEMOD_DATA_PTR + 
+     :                          %VAL(CNF_PVAL(DEMOD_DATA_PTR) +
      :                          (SWITCH1_START - 1) * N_BOLS* VAL__NBR),
-     :                          %VAL(OUT_DATA_PTR + (BEAM_OFFSET +
+     :                          %VAL(CNF_PVAL(OUT_DATA_PTR)
+     :                          + (BEAM_OFFSET +
      :                          (EXP_POINTER-1) * N_BOLS) * VAL__NBR),
      :                          IERR, NERR, STATUS)
 
                            CALL VEC_RTOR(.FALSE., N_SWITCH_POS * N_BOLS,
-     :                          %VAL(DEMOD_VARIANCE_PTR + 
+     :                          %VAL(CNF_PVAL(DEMOD_VARIANCE_PTR) +
      :                          (SWITCH1_START - 1) * N_BOLS* VAL__NBR),
-     :                          %VAL(OUT_VARIANCE_PTR + (BEAM_OFFSET +
+     :                          %VAL(CNF_PVAL(OUT_VARIANCE_PTR)
+     :                          + (BEAM_OFFSET +
      :                          (EXP_POINTER-1) * N_BOLS) * VAL__NBR),
      :                          IERR, NERR, STATUS)
 
                            CALL VEC_UBTOUB(.FALSE., N_SWITCH_POS*N_BOLS,
-     :                          %VAL(DEMOD_QUALITY_PTR + 
+     :                          %VAL(CNF_PVAL(DEMOD_QUALITY_PTR) +
      :                          (SWITCH1_START - 1) * N_BOLS*VAL__NBUB),
-     :                          %VAL(OUT_QUALITY_PTR + (BEAM_OFFSET +
+     :                          %VAL(CNF_PVAL(OUT_QUALITY_PTR)
+     :                          + (BEAM_OFFSET +
      :                          (EXP_POINTER-1) * N_BOLS) * VAL__NBUB),
      :                          IERR, NERR, STATUS)
 
                         ELSE IF (SWITCH .EQ. 2) THEN
 *     Should do this with %LOC
                            CALL VEC_RTOR(.FALSE., N_SWITCH_POS * N_BOLS,
-     :                          %VAL(DEMOD_DATA_PTR + 
+     :                          %VAL(CNF_PVAL(DEMOD_DATA_PTR) +
      :                          (SWITCH2_START - 1) * N_BOLS* VAL__NBR),
-     :                          %VAL(OUT_DATA_PTR + (BEAM_OFFSET +
+     :                          %VAL(CNF_PVAL(OUT_DATA_PTR)
+     :                          + (BEAM_OFFSET +
      :                          (EXP_POINTER-1) * N_BOLS) * VAL__NBR),
      :                          IERR, NERR, STATUS)
 
                            CALL VEC_RTOR(.FALSE., N_SWITCH_POS * N_BOLS,
-     :                          %VAL(DEMOD_VARIANCE_PTR + 
+     :                          %VAL(CNF_PVAL(DEMOD_VARIANCE_PTR) +
      :                          (SWITCH2_START - 1) * N_BOLS* VAL__NBR),
-     :                          %VAL(OUT_VARIANCE_PTR + (BEAM_OFFSET +
+     :                          %VAL(CNF_PVAL(OUT_VARIANCE_PTR)
+     :                          + (BEAM_OFFSET +
      :                          (EXP_POINTER-1) * N_BOLS) * VAL__NBR),
      :                          IERR, NERR, STATUS)
 
                            CALL VEC_UBTOUB(.FALSE., N_SWITCH_POS*N_BOLS,
-     :                          %VAL(DEMOD_QUALITY_PTR + 
+     :                          %VAL(CNF_PVAL(DEMOD_QUALITY_PTR) +
      :                          (SWITCH2_START - 1) * N_BOLS*VAL__NBUB),
-     :                          %VAL(OUT_QUALITY_PTR + (BEAM_OFFSET +
+     :                          %VAL(CNF_PVAL(OUT_QUALITY_PTR)
+     :                          + (BEAM_OFFSET +
      :                          (EXP_POINTER-1) * N_BOLS) * VAL__NBUB),
      :                          IERR, NERR, STATUS)
 
                         ELSE IF (SWITCH .EQ. 3) THEN
 *     Should do this with %LOC
                            CALL VEC_RTOR(.FALSE., N_SWITCH_POS * N_BOLS,
-     :                          %VAL(DEMOD_DATA_PTR + 
+     :                          %VAL(CNF_PVAL(DEMOD_DATA_PTR) +
      :                          (SWITCH3_START - 1) * N_BOLS* VAL__NBR),
-     :                          %VAL(OUT_DATA_PTR + (BEAM_OFFSET +
+     :                          %VAL(CNF_PVAL(OUT_DATA_PTR)
+     :                          + (BEAM_OFFSET +
      :                          (EXP_POINTER-1) * N_BOLS) * VAL__NBR),
      :                          IERR, NERR, STATUS)
 
                            CALL VEC_RTOR(.FALSE., N_SWITCH_POS * N_BOLS,
-     :                          %VAL(DEMOD_VARIANCE_PTR + 
+     :                          %VAL(CNF_PVAL(DEMOD_VARIANCE_PTR) +
      :                          (SWITCH3_START - 1) * N_BOLS* VAL__NBR),
-     :                          %VAL(OUT_VARIANCE_PTR + (BEAM_OFFSET +
+     :                          %VAL(CNF_PVAL(OUT_VARIANCE_PTR)
+     :                          + (BEAM_OFFSET +
      :                          (EXP_POINTER-1) * N_BOLS) * VAL__NBR),
      :                          IERR, NERR, STATUS)
 
                            CALL VEC_UBTOUB(.FALSE., N_SWITCH_POS*N_BOLS,
-     :                          %VAL(DEMOD_QUALITY_PTR + 
+     :                          %VAL(CNF_PVAL(DEMOD_QUALITY_PTR) +
      :                          (SWITCH3_START - 1) * N_BOLS*VAL__NBUB),
-     :                          %VAL(OUT_QUALITY_PTR + (BEAM_OFFSET +
+     :                          %VAL(CNF_PVAL(OUT_QUALITY_PTR)
+     :                          + (BEAM_OFFSET +
      :                          (EXP_POINTER-1) * N_BOLS) * VAL__NBUB),
      :                          IERR, NERR, STATUS)
                         END IF
@@ -1124,8 +1147,9 @@ c
                      ITEMP = ((MEASUREMENT-1) * N_INTEGRATIONS +
      :                 INTEGRATION-1) * N_EXPOSURES + EXPOSURE-1
                      CALL VEC_ITOI(.FALSE., 1, EXP_POINTER,
-     :                 %val (OUT_DEM_PNTR_PTR + ITEMP * VAL__NBI),
-     :                 IERR, NERR, STATUS)
+     :                    %VAL(CNF_PVAL(OUT_DEM_PNTR_PTR) + 
+     :                    ITEMP * VAL__NBI),
+     :                    IERR, NERR, STATUS)
                      EXP_POINTER = EXP_POINTER + N_SWITCH_POS
                   ELSE
 
@@ -1135,7 +1159,7 @@ c
                      ITEMP = ((MEASUREMENT-1) * N_INTEGRATIONS +
      :                 INTEGRATION-1) * N_EXPOSURES + EXPOSURE-1
                      CALL VEC_ITOI (.FALSE., 1, 0,
-     :                 %val (OUT_DEM_PNTR_PTR + ITEMP * VAL__NBI),
+     :   %VAL(CNF_PVAL(OUT_DEM_PNTR_PTR) + ITEMP * VAL__NBI),
      :                 IERR, NERR, STATUS)
                   END IF
                END DO
@@ -1191,9 +1215,12 @@ c
 *     Its easier to use a small subroutine which I will add to the end
 *     of this code for the moment.
 
-      CALL SURF_LOCAL_COPY(N_BOLS, N_POS, UBND(3), %VAL(OUT_DATA_PTR),
-     :     %VAL(OUT_VARIANCE_PTR), %VAL(OUT_QUALITY_PTR), EXP_POINTER-1,
-     :     %VAL(OUT_DAT_PTR), %VAL(OUT_VAR_PTR), %VAL(OUT_QUL_PTR),
+      CALL SURF_LOCAL_COPY(N_BOLS, N_POS, UBND(3), 
+     :                     %VAL(CNF_PVAL(OUT_DATA_PTR)),
+     :     %VAL(CNF_PVAL(OUT_VARIANCE_PTR)), 
+     :     %VAL(CNF_PVAL(OUT_QUALITY_PTR)), EXP_POINTER-1,
+     :     %VAL(CNF_PVAL(OUT_DAT_PTR)), %VAL(CNF_PVAL(OUT_VAR_PTR)), 
+     :     %VAL(CNF_PVAL(OUT_QUL_PTR)),
      :     STATUS)
 
 *  write the BEAM_WEIGHT array to the REDS extension
@@ -1230,7 +1257,7 @@ c
       CALL NDF_AMAP(OUT_NDF, 'CENTRE', 1, '_INTEGER', 'WRITE',
      :     OUT_A_PTR, ITEMP, STATUS)
       IF (STATUS .EQ. SAI__OK) THEN
-         CALL SCULIB_NFILLI (N_BOLS, %val(OUT_A_PTR))
+         CALL SCULIB_NFILLI (N_BOLS, %VAL(CNF_PVAL(OUT_A_PTR)))
       END IF
       CALL NDF_ACPUT ('Bolometer', OUT_NDF, 'LABEL', 1, STATUS)
       CALL NDF_AUNMP (OUT_NDF, 'CENTRE', 1, STATUS)
@@ -1243,7 +1270,7 @@ c
          CALL NDF_AMAP(OUT_NDF, 'CENTRE', 3, '_INTEGER', 'WRITE',
      :        OUT_A_PTR, ITEMP, STATUS)
          IF (STATUS .EQ. SAI__OK) THEN
-            CALL SCULIB_NFILLI (3, %val(OUT_A_PTR))
+            CALL SCULIB_NFILLI (3, %VAL(CNF_PVAL(OUT_A_PTR)))
          END IF
          CALL NDF_ACPUT ('Beam', OUT_NDF, 'LABEL', 3, STATUS)
          CALL NDF_AUNMP (OUT_NDF, 'CENTRE', 3, STATUS)
@@ -1268,16 +1295,16 @@ c
 
          IF (STATUS .EQ. SAI__OK) THEN
 *     Fill with numbers 1->N_POS
-            CALL SCULIB_NFILLR(N_POS, %VAL(OUT_A_PTR))
+            CALL SCULIB_NFILLR(N_POS, %VAL(CNF_PVAL(OUT_A_PTR)))
 *     Start the counting at 0
-            CALL SCULIB_ADDCAR(N_POS, %VAL(OUT_A_PTR),
-     :           -1.0, %VAL(OUT_A_PTR))
+            CALL SCULIB_ADDCAR(N_POS, %VAL(CNF_PVAL(OUT_A_PTR)),
+     :           -1.0, %VAL(CNF_PVAL(OUT_A_PTR)))
 *     Mulitply these numbers by 1/N_INTEGRATIONS
-            CALL SCULIB_MULCAR(N_POS, %VAL(OUT_A_PTR), 
-     :           1.0/REAL(N_INTEGRATIONS), %VAL(OUT_A_PTR))
+            CALL SCULIB_MULCAR(N_POS, %VAL(CNF_PVAL(OUT_A_PTR)),
+     :           1.0/REAL(N_INTEGRATIONS), %VAL(CNF_PVAL(OUT_A_PTR)))
 *     Offset these number by 1 unit so that the first entry is 1
-            CALL SCULIB_ADDCAR(N_POS, %VAL(OUT_A_PTR),
-     :           1.0, %VAL(OUT_A_PTR))
+            CALL SCULIB_ADDCAR(N_POS, %VAL(CNF_PVAL(OUT_A_PTR)),
+     :           1.0, %VAL(CNF_PVAL(OUT_A_PTR)))
          END IF
 
          CALL NDF_ACPUT ('Measurements', OUT_NDF, 'LABEL', 2, STATUS)
@@ -1319,7 +1346,7 @@ c
                DO J = 1, NJIGGLE
                   RTEMP = REAL(I)+ (REAL(J-1)/REAL(JIGGLE_COUNT))
                   CALL SCULIB_CFILLR(1,RTEMP,
-     :                 %VAL(OUT_A_PTR+(ITEMP * VAL__NBR)))
+     :                 %VAL(CNF_PVAL(OUT_A_PTR)+(ITEMP * VAL__NBR)))
                   ITEMP = ITEMP + 1
                END DO
             END DO

@@ -103,6 +103,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.9  2004/09/08 02:03:33  timj
+*     Add CNF_PVAL where appropriate
+*
 *     Revision 1.8  1999/08/03 20:36:38  timj
 *     Add copyright message to header.
 *     Minor fixes to header style.
@@ -144,6 +147,7 @@
       INCLUDE 'NDF_ERR'         ! For NDF__DIMIN
       INCLUDE 'DAT_PAR'         ! For DAT__SZLOC
       INCLUDE 'PAR_ERR'         ! For PAR__NULL
+      INCLUDE 'CNF_PAR'         ! For CNF_PVAL function
 
 *  External references:
       INTEGER CHR_LEN
@@ -300,8 +304,10 @@
 
 *     Call the dual beam subroutine
       CALL SURFLIB_CALC_CHOPPED_IMAGE(NBEAMS, CHOP_THROW, CHOP_PA, 
-     :     DIM(1), DIM(2), %VAL(IN_DATA_PTR), %VAL(OUT_DATA_PTR), 
-     :     STATE, %VAL(IN_DATA_PTR), %VAL(OUT_VARIANCE_PTR), 
+     :     DIM(1), DIM(2), %VAL(CNF_PVAL(IN_DATA_PTR)), 
+     :     %VAL(CNF_PVAL(OUT_DATA_PTR)),
+     :     STATE, %VAL(CNF_PVAL(IN_DATA_PTR)), 
+     :     %VAL(CNF_PVAL(OUT_VARIANCE_PTR)),
      :     STATUS)
 
 *     Unmap the arrays

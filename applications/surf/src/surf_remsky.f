@@ -137,6 +137,9 @@
 *     3 Nov 1996: TIMJ
 *        Original version
 *     $Log$
+*     Revision 1.21  2004/09/08 02:03:34  timj
+*     Add CNF_PVAL where appropriate
+*
 *     Revision 1.20  2002/09/14 03:58:13  timj
 *     Update copyright
 *
@@ -191,6 +194,7 @@
       INCLUDE 'PRM_PAR'                 ! for VAL__xxxx
       INCLUDE 'SURF_PAR'                ! REDS constants
       INCLUDE 'MSG_PAR'                 ! MSG__ constants
+      INCLUDE 'CNF_PAR'                 ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS
@@ -760,8 +764,10 @@
          IF (USESKYNDF) THEN
 
             CALL SURFLIB_REM_TIMESERIES(N_BOLS, N_POS,
-     :           %VAL(SKYDATA_PTR), %VAL(SKYVAR_PTR),
-     :           %VAL(OUT_DATA_PTR), %VAL(OUT_VARIANCE_PTR),
+     :           %VAL(CNF_PVAL(SKYDATA_PTR)), 
+     :           %VAL(CNF_PVAL(SKYVAR_PTR)),
+     :           %VAL(CNF_PVAL(OUT_DATA_PTR)), 
+     :           %VAL(CNF_PVAL(OUT_VARIANCE_PTR)),
      :           STATUS)
 
 
@@ -769,9 +775,9 @@
 
             IF (N_BOLS .GT. 1) THEN
                CALL SCULIB_REM_SKY(MODE, ADD_BACK, N_BOLS, N_POS, 
-     :              %val(OUT_DATA_PTR),
-     :              %val(OUT_VARIANCE_PTR), 
-     :              %val(OUT_QUALITY_PTR),
+     :              %VAL(CNF_PVAL(OUT_DATA_PTR)),
+     :              %VAL(CNF_PVAL(OUT_VARIANCE_PTR)),
+     :              %VAL(CNF_PVAL(OUT_QUALITY_PTR)),
      :              ITERCLIP, N_GOODBOLS, SKYBOLS, BADBIT, STATUS)
             END IF
 

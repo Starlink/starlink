@@ -78,6 +78,9 @@
 *     3 Nov 1996: TIMJ
 *        Original version (in REMSKY)
 *     $Log$
+*     Revision 1.6  2004/09/08 02:03:34  timj
+*     Add CNF_PVAL where appropriate
+*
 *     Revision 1.5  1999/08/03 20:01:42  timj
 *     Add copyright message to header.
 *     Minor fixes to header style.
@@ -114,6 +117,7 @@
       INCLUDE 'PRM_PAR'                 ! for VAL__xxxx
       INCLUDE 'SURF_PAR'                ! REDS constants
       INCLUDE 'MSG_PAR'                 ! MSG__ constants
+      INCLUDE 'CNF_PAR'                 ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS
@@ -424,13 +428,15 @@
          DO I = 1, N_BOLS
 
             CALL SCULIB_EXTRACT_BOL(I, N_BOLS, N_POS, 
-     :           %val(OUT_DATA_PTR), 
-     :           %val(OUT_QUALITY_PTR),
-     :           %val(BOL_PTR), %val(BOL_QPTR), STATUS)
+     :           %VAL(CNF_PVAL(OUT_DATA_PTR)),
+     :           %VAL(CNF_PVAL(OUT_QUALITY_PTR)),
+     :           %VAL(CNF_PVAL(BOL_PTR)), %VAL(CNF_PVAL(BOL_QPTR)), 
+     :           STATUS)
 
 *  Despike
-            CALL SCULIB_CLIP_BOL(N_POS, %val(BOL_PTR),
-     :           %val(BOL_QPTR), NSIGMA, BADBIT, NSPIKES, STATUS)
+            CALL SCULIB_CLIP_BOL(N_POS, %VAL(CNF_PVAL(BOL_PTR)),
+     :           %VAL(CNF_PVAL(BOL_QPTR)), 
+     :           NSIGMA, BADBIT, NSPIKES, STATUS)
 
 *     I note that the system will find the same spike in each
 *     beam (of photometry data) so that I should only report spikes
@@ -457,9 +463,10 @@
             END IF
 
 
-            CALL SCULIB_INSERT_BOL(I, N_BOLS, N_POS, %val(BOL_PTR), 
-     :           %val(BOL_QPTR), %val(OUT_DATA_PTR),
-     :           %val(OUT_QUALITY_PTR), STATUS)
+            CALL SCULIB_INSERT_BOL(I, N_BOLS, N_POS, 
+     :                             %VAL(CNF_PVAL(BOL_PTR)),
+     :           %VAL(CNF_PVAL(BOL_QPTR)), %VAL(CNF_PVAL(OUT_DATA_PTR)),
+     :           %VAL(CNF_PVAL(OUT_QUALITY_PTR)), STATUS)
 
          END DO
 

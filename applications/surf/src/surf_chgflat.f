@@ -70,6 +70,7 @@
       INCLUDE 'DAT_PAR'
       INCLUDE 'SURF_PAR'                         ! SURF constants
       INCLUDE 'MSG_PAR'                          ! MSG__ constants
+      INCLUDE 'CNF_PAR'                          ! For CNF_PVAL function
 
 *  Arguments Given:
 
@@ -434,7 +435,8 @@
          DO B = 1, N_BOLS
             QUALITY_BIT = BOL_QUAL (BOL_CHAN(B), BOL_ADC(B))
             CALL SCULIB_SET_QUALITY (N_BOLS, N_POS, N_BEAM, 
-     :           %val (IN_QUALITY_PTR), B, B, 1, N_POS, 1, N_BEAM, 1, 
+     :           %VAL(CNF_PVAL(IN_QUALITY_PTR)), 
+     :           B, B, 1, N_POS, 1, N_BEAM, 1,
      :           QUALITY_BIT, STATUS)
          END DO
       END IF

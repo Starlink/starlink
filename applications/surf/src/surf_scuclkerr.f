@@ -67,6 +67,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.3  2004/09/08 02:03:34  timj
+*     Add CNF_PVAL where appropriate
+*
 *     Revision 1.2  2000/07/07 03:24:15  timj
 *     Doc fixes
 *
@@ -88,6 +91,7 @@
       INCLUDE 'SURF_PAR'        ! SURF constants
       INCLUDE 'MSG_PAR'         ! MSG__ constants
       INCLUDE 'PRM_PAR'         ! bad values
+      INCLUDE 'CNF_PAR'         ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS
@@ -249,7 +253,7 @@
      :     LST_STRT_PTR, ITEMP, STATUS)
 
 *     Copy the LST_STRT value to a scalar
-      CALL VEC_DTOD( .FALSE., 1, %VAL(LST_STRT_PTR), LST,
+      CALL VEC_DTOD( .FALSE., 1, %VAL(CNF_PVAL(LST_STRT_PTR)), LST,
      :     IERR, NERR, STATUS)
 
 *     ...and check to see that it contains something valid (non zero)
@@ -271,7 +275,8 @@
 
 *     UT at which observation was made expressed as modified Julian day
 
-      CALL SCULIB_GET_MJD(N_FITS, FITS, %VAL(LST_STRT_PTR), UT1, 
+      CALL SCULIB_GET_MJD(N_FITS, FITS, %VAL(CNF_PVAL(LST_STRT_PTR)), 
+     :                    UT1,
      :     RTEMP, LAG, STATUS)
 
 
@@ -346,7 +351,7 @@
 
          CALL SCULIB_CALC_APPARENT (LAT_OBS, IN_LONG_RAD, IN_LAT_RAD,
      :        IN_LONG2_RAD, IN_LAT2_RAD, 0.0D0, 0.0D0,
-     :        IN_CENTRE_COORDS, %VAL(LST_STRT_PTR), UT1,
+     :        IN_CENTRE_COORDS, %VAL(CNF_PVAL(LST_STRT_PTR)), UT1,
      :        IN_MJD1, IN_MJD2, RA_CEN, DEC_CEN, IN_ROTATION,
      :        STATUS)
 
@@ -355,7 +360,8 @@
 
 *     Now get the clock error
          CALL SCULIB_CALC_CLOCKERR( N_FITS, FITS, RA_CEN, 
-     :        %VAL(LST_STRT_PTR), CLOCK_ERR, LST_AZEL, STATUS )
+     :        %VAL(CNF_PVAL(LST_STRT_PTR)), 
+     :        CLOCK_ERR, LST_AZEL, STATUS )
 
       END DO
 
@@ -436,7 +442,8 @@
      :     STATUS )
 
 *     LST_STRT
-      CALL SCULIB_RAD2STRING(%VAL(LST_STRT_PTR), 1, .TRUE., STEMP,
+      CALL SCULIB_RAD2STRING(%VAL(CNF_PVAL(LST_STRT_PTR)), 
+     :                       1, .TRUE., STEMP,
      :     STATUS )
       CALL MSG_SETC( 'LST', STEMP )
       CALL MSG_OUTIF(MSG__NORM, ' ',' Time stored in LST_STRT : ^LST',

@@ -245,6 +245,7 @@
 *  External:
       INCLUDE 'NUM_DEC_CVT'               ! Convert UB to integer
       INCLUDE 'NUM_DEF_CVT'               ! Function definitions
+      INCLUDE 'CNF_PAR'                   ! For CNF_PVAL function
 *.
 
       IF (STATUS .NE. SAI__OK) RETURN
@@ -603,7 +604,8 @@
          SWITCH_EXPECTED = .FALSE.
 
          CALL SCULIB_MASK_DATA(USE_SECT, CHG_TYPE, N_SPEC, DATA_SPEC,
-     :        %VAL(IN_DEM_PNTR_PTR), 1, N_EXPOSURES, N_INTEGRATIONS,
+     :        %VAL(CNF_PVAL(IN_DEM_PNTR_PTR)), 
+     :        1, N_EXPOSURES, N_INTEGRATIONS,
      :        N_MEASUREMENTS, N_POS, N_BOLS, N_BEAM, SWITCH_EXPECTED,
      :        VALUE, BVALUE, 0, .TRUE., OUT_DATA_PTR,
      :        STATUS)

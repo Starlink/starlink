@@ -187,6 +187,9 @@
 *  History:
 *     Original version: Timj, 1997 Oct 20
 *     $Log$
+*     Revision 1.11  2004/09/08 02:03:33  timj
+*     Add CNF_PVAL where appropriate
+*
 *     Revision 1.10  2000/08/24 03:18:23  timj
 *     Add more informative error message if all input data are bad
 *
@@ -240,6 +243,7 @@
       INCLUDE 'MSG_PAR'                          ! MSG__NORM
       INCLUDE 'SURF_PAR'                         ! SURF constants
       INCLUDE 'NDF_PAR'                          ! NDF__NOID
+      INCLUDE 'CNF_PAR'                          ! For CNF_PVAL function
  
 *  Arguments Given:
       CHARACTER * (*) TSKNAME
@@ -452,7 +456,7 @@
 
 *     Fill with zeroes
       IF (STATUS .EQ. SAI__OK) THEN
-         CALL SCULIB_CFILLI(NX * NY, 0, %VAL(GRID_PTR))
+         CALL SCULIB_CFILLI(NX * NY, 0, %VAL(CNF_PVAL(GRID_PTR)))
       END IF
 
 
@@ -472,8 +476,9 @@
 *     Fill the array with data. (1 file at a time)
 
          CALL SURFLIB_CALC_IJPOS(N_PTS(I), DBLE(OUT_PIXEL), ICEN, JCEN,
-     :        %VAL(BOL_RA_PTR(I)), %VAL(BOL_DEC_PTR(I)), 
-     :        %VAL(IJPOS_PTR + (2 * OFFSET * VAL__NBR)),
+     :        %VAL(CNF_PVAL(BOL_RA_PTR(I))), 
+     :        %VAL(CNF_PVAL(BOL_DEC_PTR(I))),
+     :        %VAL(CNF_PVAL(IJPOS_PTR) + (2 * OFFSET * VAL__NBR)),
      :        STATUS)
 
 *     At the same time we can be adding the returned data into
@@ -489,9 +494,10 @@
          IF (STATUS .EQ. SAI__OK) THEN
 
             CALL SURFLIB_HISTOGRAM_GRID( N_PTS(I), NX, NY, .TRUE.,
-     :           %VAL(DATA_PTR(I)), %VAL(QUALITY_PTR(I)), BADBIT(I),
-     :           %VAL(IJPOS_PTR + (2 * OFFSET * VAL__NBI)),
-     :           %VAL(GRID_PTR), IMAX, JMAX, NMAX, STATUS)
+     :           %VAL(CNF_PVAL(DATA_PTR(I))), 
+     :           %VAL(CNF_PVAL(QUALITY_PTR(I))), BADBIT(I),
+     :           %VAL(CNF_PVAL(IJPOS_PTR) + (2 * OFFSET * VAL__NBI)),
+     :           %VAL(CNF_PVAL(GRID_PTR)), IMAX, JMAX, NMAX, STATUS)
 
 *     If status comes back as SAI__WARN our model does not cover
 *     the same area as the data. This is fine, but we should warn
@@ -571,7 +577,8 @@
 
 *     Add the dual beam
             CALL SURFLIB_CALC_CHOPPED_IMAGE( 2, MODEL_THROW, MODEL_PA,
-     :           NX, NY, %VAL(MODEL_PTR), %VAL(STATS_PTR), .FALSE.,
+     :           NX, NY, %VAL(CNF_PVAL(MODEL_PTR)), 
+     :           %VAL(CNF_PVAL(STATS_PTR)), .FALSE.,
      :           0, 0, STATUS)
 
 *     Write to disk - to test the dual beam
@@ -633,10 +640,11 @@
 *     Initialise the work arrays
 
          IF (STATUS .EQ. SAI__OK) THEN
-            CALL SCULIB_CFILLI(NX * NY, 0, %VAL(GRID_PTR))
-            CALL SCULIB_CFILLR(NX * NY * NMAX, VAL__BADR, %VAL(BIN_PTR))
+            CALL SCULIB_CFILLI(NX * NY, 0, %VAL(CNF_PVAL(GRID_PTR)))
+            CALL SCULIB_CFILLR(NX * NY * NMAX, VAL__BADR, 
+     :                         %VAL(CNF_PVAL(BIN_PTR)))
             CALL SCULIB_CFILLI(NX * NY * NMAX, VAL__BADI, 
-     :           %VAL(BIN_POS_PTR))
+     :           %VAL(CNF_PVAL(BIN_POS_PTR)))
          END IF
 
 *     Now we need to copy the data into BIN_PTR and the positions
@@ -649,9 +657,11 @@
             IF (STATUS .EQ. SAI__OK) THEN
                
                CALL SURFLIB_FILL_GRID(N_PTS(I), NX, NY, NMAX, OFFSET,
-     :              %VAL(DATA_PTR(I)), %VAL(QUALITY_PTR(I)), BADBIT(I),
-     :              %VAL(IJPOS_PTR + (2 * OFFSET * VAL__NBI)),
-     :              %VAL(GRID_PTR), %VAL(BIN_PTR), %VAL(BIN_POS_PTR),
+     :              %VAL(CNF_PVAL(DATA_PTR(I))), 
+     :              %VAL(CNF_PVAL(QUALITY_PTR(I))), BADBIT(I),
+     :              %VAL(CNF_PVAL(IJPOS_PTR) + (2 * OFFSET * VAL__NBI)),
+     :              %VAL(CNF_PVAL(GRID_PTR)), %VAL(CNF_PVAL(BIN_PTR)), 
+     :              %VAL(CNF_PVAL(BIN_POS_PTR)),
      :              STATUS)
 
 *     If we have a return status of SAI__WARN, we can annull it without
@@ -700,7 +710,8 @@
 
          UMODE = 'XLINEAR'
          CALL SURFLIB_CALC_GRIDIJ(UMODE, NX, NY, ICEN, JCEN,
-     :        %VAL(IPOS_PTR), %VAL(JPOS_PTR), STATUS)
+     :        %VAL(CNF_PVAL(IPOS_PTR)), %VAL(CNF_PVAL(JPOS_PTR)), 
+     :        STATUS)
 
 
 *     Calculate the statistics of each bin and store in an array.
@@ -725,9 +736,10 @@
          SMODE = 'NONE'
          NSIGMA = 0.0
          CALL SURFLIB_STATS_GRID(SMODE, NX, NY, NMAX, NSIGMA, 
-     :        %VAL(IPOS_PTR),
-     :        %VAL(JPOS_PTR), %VAL(BIN_PTR), %VAL(PNT_PTR),
-     :        %VAL(STATS_PTR), STATUS)
+     :        %VAL(CNF_PVAL(IPOS_PTR)),
+     :        %VAL(CNF_PVAL(JPOS_PTR)), %VAL(CNF_PVAL(BIN_PTR)), 
+     :        %VAL(CNF_PVAL(PNT_PTR)),
+     :        %VAL(CNF_PVAL(STATS_PTR)), STATUS)
          
 *     Free memory
          CALL SCULIB_FREE('PNT_PTR', PNT_PTR, PNT_END, STATUS)
@@ -754,8 +766,9 @@
 
 *     Subtract source model
          CALL SURFLIB_REM_GRID(N_PTS(I), NX, NY,
-     :        %VAL(IJPOS_PTR + (2 * OFFSET * VAL__NBI)), 
-     :        %VAL(STATS_PTR), %VAL(DATA_PTR(I)), STATUS)
+     :        %VAL(CNF_PVAL(IJPOS_PTR) + (2 * OFFSET * VAL__NBI)),
+     :        %VAL(CNF_PVAL(STATS_PTR)), %VAL(CNF_PVAL(DATA_PTR(I))), 
+     :        STATUS)
       
 *     Find new offset in lookup table
          OFFSET = OFFSET + N_PTS(I)
@@ -791,14 +804,14 @@
             CALL NDF_MAP(GRNDF, 'DATA', '_REAL', 'WRITE', GRPNTR, 
      :           ITEMP, STATUS)
             CALL VEC_RTOR(.FALSE., N_BOLS(1) * N_POS(1), 
-     :           %VAL(DATA_PTR(1)), 
-     :           %VAL(GRPNTR), IERR, NERR, STATUS)
+     :           %VAL(CNF_PVAL(DATA_PTR(1))),
+     :           %VAL(CNF_PVAL(GRPNTR)), IERR, NERR, STATUS)
             CALL NDF_UNMAP(GRNDF, 'DATA', STATUS)
             CALL NDF_MAP(GRNDF, 'QUALITY', '_UBYTE', 'WRITE', GRPNTR, 
      :           ITEMP, STATUS)
             CALL VEC_UBTOUB(.FALSE., N_BOLS(1) * N_POS(1), 
-     :           %VAL(QUALITY_PTR(1)), 
-     :           %VAL(GRPNTR), IERR, NERR, STATUS)
+     :           %VAL(CNF_PVAL(QUALITY_PTR(1))),
+     :           %VAL(CNF_PVAL(GRPNTR)), IERR, NERR, STATUS)
             CALL NDF_UNMAP(GRNDF, 'QUALITY', STATUS)
             CALL NDF_SBB(BADBIT(1), GRNDF, STATUS)
 
@@ -859,17 +872,17 @@
             DO K = 1, N_BOLS(I)
                
                CALL VEC_RTOR(.FALSE., 1,
-     :              %VAL(DATA_PTR(I) + ((K-1) + OFFSET) * VAL__NBR),
+     :   %VAL(CNF_PVAL(DATA_PTR(I)) + ((K-1) + OFFSET) * VAL__NBR),
      :              RTEMP, IERR, NERR, STATUS)
 
 *       Skip if zero (but not if we are using an external model)
                IF (RTEMP .NE. 0.0 .OR. HAVE_MODEL) THEN
                   CALL VEC_RTOR(.FALSE., 1, RTEMP,
-     :                 %VAL(SCRATCH2_PTR + NGOOD*VAL__NBR),
+     :                 %VAL(CNF_PVAL(SCRATCH2_PTR) + NGOOD*VAL__NBR),
      :                 IERR, NERR, STATUS)
                   CALL VEC_UBTOUB(.FALSE., 1,
-     :                 %VAL(QUALITY_PTR(I) + ((K-1)+OFFSET)* VAL__NBUB),
-     :                 %VAL(SCRATCHUB_PTR + NGOOD*VAL__NBUB),
+     :   %VAL(CNF_PVAL(QUALITY_PTR(I)) + ((K-1)+OFFSET)* VAL__NBUB),
+     :                 %VAL(CNF_PVAL(SCRATCHUB_PTR) + NGOOD*VAL__NBUB),
      :                 IERR, NERR, STATUS)
 
                   NGOOD = NGOOD + 1
@@ -886,17 +899,18 @@
 *     :           %VAL(DATA_PTR(I) + OFFSET * VAL__NBR),
 *     :           %VAL(QUALITY_PTR(I) + OFFSET * VAL__NBUB),
             CALL SCULIB_STATR(NGOOD, -1.0,
-     :           %VAL(SCRATCH2_PTR), %VAL(SCRATCHUB_PTR),
+     :           %VAL(CNF_PVAL(SCRATCH2_PTR)), 
+     :           %VAL(CNF_PVAL(SCRATCHUB_PTR)),
      :           BADBIT(I), ITEMP, MEAN, MEDIAN, SUM, SUMSQ,
-     :           STDEV, %VAL(SCRATCH_PTR), STATUS)
+     :           STDEV, %VAL(CNF_PVAL(SCRATCH_PTR)), STATUS)
 
 *     Copy this value to the SKY_PTR array
             CALL VEC_DTOR(.TRUE., 1, MEDIAN, 
-     :           %VAL(SKY_PTR(I) + (J-1) * VAL__NBR),
+     :           %VAL(CNF_PVAL(SKY_PTR(I)) + (J-1) * VAL__NBR),
      :           IERR, NERR, STATUS)
 *     Copy in the error
             CALL VEC_DTOR(.TRUE., 1, STDEV, 
-     :           %VAL(SKY_ERR(I) + (J-1) * VAL__NBR),
+     :           %VAL(CNF_PVAL(SKY_ERR(I)) + (J-1) * VAL__NBR),
      :           IERR, NERR, STATUS)
 
          END DO
@@ -930,11 +944,12 @@
      :        SCRATCHUB_PTR, SCRATCHUB_END, STATUS)
 
 *     Copy unsmoothed data into scratch space (variance from spread)
-         CALL VEC_RTOR(.FALSE., N_POS(I), %VAL(SKY_PTR(I)),
-     :        %VAL(SCRATCH_PTR), IERR, NERR, STATUS)
+         CALL VEC_RTOR(.FALSE., N_POS(I), %VAL(CNF_PVAL(SKY_PTR(I))),
+     :        %VAL(CNF_PVAL(SCRATCH_PTR)), IERR, NERR, STATUS)
          BTEMP = 0
          IF (STATUS .EQ. SAI__OK) THEN
-            CALL SCULIB_CFILLB(N_POS(I), BTEMP, %VAL(SCRATCHUB_PTR))
+            CALL SCULIB_CFILLB(N_POS(I), BTEMP, 
+     :                         %VAL(CNF_PVAL(SCRATCHUB_PTR)))
          END IF
 
 *     Loop over positions
@@ -948,22 +963,22 @@
             NGOOD = ISTOP - ISTART + 1
 
             CALL SCULIB_STATR(NGOOD, -1.0,
-     :           %VAL(SCRATCH_PTR + (ISTART - 1)*VAL__NBR), 
-     :           %VAL(SCRATCHUB_PTR + (ISTART - 1)*VAL__NBUB),
+     :           %VAL(CNF_PVAL(SCRATCH_PTR) + (ISTART - 1)*VAL__NBR),
+     :           %VAL(CNF_PVAL(SCRATCHUB_PTR) + (ISTART - 1)*VAL__NBUB),
      :           BTEMP, ITEMP, MEAN, MEDIAN, SUM, SUMSQ,
-     :           STDEV, %VAL(SCRATCH2_PTR), STATUS)
+     :           STDEV, %VAL(CNF_PVAL(SCRATCH2_PTR)), STATUS)
 
 *     Copy result to output file
 *     Copy this value to the SKY_PTR array
             CALL VEC_DTOR(.TRUE., 1, MEAN, 
-     :           %VAL(SKY_PTR(I) + (J-1) * VAL__NBR),
+     :           %VAL(CNF_PVAL(SKY_PTR(I)) + (J-1) * VAL__NBR),
      :           IERR, NERR, STATUS)
 *     Copy in the error if the status was good
 *     if not (eg bin was 1 pixel wide). Just keep the variance
 *     from the earlier calculation
             IF (STDEV .NE. VAL__BADD) THEN
                CALL VEC_DTOR(.TRUE., 1, STDEV, 
-     :              %VAL(SKY_ERR(I) + (J-1) * VAL__NBR),
+     :              %VAL(CNF_PVAL(SKY_ERR(I)) + (J-1) * VAL__NBR),
      :              IERR, NERR, STATUS)
             END IF
 

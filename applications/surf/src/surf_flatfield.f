@@ -74,6 +74,9 @@
 *     $Id$
 *     18-JUN-1996: Original version.
 *     $Log$
+*     Revision 1.16  2004/09/08 02:03:33  timj
+*     Add CNF_PVAL where appropriate
+*
 *     Revision 1.15  1999/08/03 20:36:42  timj
 *     Add copyright message to header.
 *     Minor fixes to header style.
@@ -128,6 +131,7 @@ c
       INCLUDE 'DAT_PAR'                ! Data-system constants
       INCLUDE 'SURF_PAR'               ! SURF constants
       INCLUDE 'MSG_PAR'                ! MSG__ constants
+      INCLUDE 'CNF_PAR'                ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS
@@ -452,7 +456,8 @@ c
 
       IF (STATUS .EQ. SAI__OK) THEN
          CALL SCULIB_FLATFIELD_DATA (N_BOL, N_POS, N_BEAM,
-     :     %val(OUT_D_PTR), %val(OUT_V_PTR), %val(OUT_Q_PTR),
+     :     %VAL(CNF_PVAL(OUT_D_PTR)), %VAL(CNF_PVAL(OUT_V_PTR)), 
+     :     %VAL(CNF_PVAL(OUT_Q_PTR)),
      :     BOL_CHAN, BOL_ADC, SCUBA__NUM_CHAN, SCUBA__NUM_ADC, 
      :     BOL_CALB, BOL_QUAL, STATUS)
       END IF

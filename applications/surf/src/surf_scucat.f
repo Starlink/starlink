@@ -108,6 +108,9 @@
 *  History:
 *     $Id$
 *     $Log$
+*     Revision 1.27  2004/09/08 02:03:34  timj
+*     Add CNF_PVAL where appropriate
+*
 *     Revision 1.26  1999/08/03 20:01:41  timj
 *     Add copyright message to header.
 *     Minor fixes to header style.
@@ -218,6 +221,7 @@ c
       INCLUDE 'DAT_PAR'         ! Data-system constants
       INCLUDE 'SURF_PAR'        ! SCUBA constants
       INCLUDE 'GRP_PAR'         ! GRP__ constants
+      INCLUDE 'CNF_PAR'         ! For CNF_PVAL function
 
 *     Status:
       INTEGER STATUS
@@ -736,12 +740,18 @@ c
      :                       MODE, OUT_APTR, ITEMP, STATUS)
 
 *     Copy the input data into the output data
-                        CALL VEC_RTOR(.FALSE., EL, %VAL(IN_DATA_PTR),
-     :                       %VAL(OUT_DATA_PTR), IERR, NERR, STATUS)
-                        CALL VEC_RTOR(.FALSE., EL, %VAL(IN_VAR_PTR),
-     :                       %VAL(OUT_VAR_PTR), IERR, NERR, STATUS)
-                        CALL VEC_UBTOUB(.FALSE., EL, %VAL(IN_QUAL_PTR),
-     :                       %VAL(OUT_QUAL_PTR), IERR, NERR, STATUS)
+                        CALL VEC_RTOR(.FALSE., EL, 
+     :                                %VAL(CNF_PVAL(IN_DATA_PTR)),
+     :                       %VAL(CNF_PVAL(OUT_DATA_PTR)), 
+     :                       IERR, NERR, STATUS)
+                        CALL VEC_RTOR(.FALSE., EL, 
+     :                                %VAL(CNF_PVAL(IN_VAR_PTR)),
+     :                       %VAL(CNF_PVAL(OUT_VAR_PTR)), 
+     :                       IERR, NERR, STATUS)
+                        CALL VEC_UBTOUB(.FALSE., EL, 
+     :                                  %VAL(CNF_PVAL(IN_QUAL_PTR)),
+     :                       %VAL(CNF_PVAL(OUT_QUAL_PTR)), 
+     :                       IERR, NERR, STATUS)
 
 *     Copy the axis values (just integers)
 *     Should really just copy from LOWER to UPPER of a section
@@ -749,7 +759,7 @@ c
                         ITEMP = 0
                         DO N = 1, UBND(INDEX)
                            CALL VEC_ITOI(.FALSE., 1, N,
-     :                          %VAL(OUT_APTR + (ITEMP * VAL__NBI)), 
+     :   %VAL(CNF_PVAL(OUT_APTR) + (ITEMP * VAL__NBI)),
      :                          IERR, NERR, STATUS)
                            ITEMP = ITEMP + 1
                         END DO

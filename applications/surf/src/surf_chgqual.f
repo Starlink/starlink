@@ -138,6 +138,7 @@
       INCLUDE 'PRM_PAR'                   ! for VAL__NBx
       INCLUDE 'SURF_PAR'                  ! SURF constants
       INCLUDE 'MSG_PAR'                   ! MSG__ constants
+      INCLUDE 'CNF_PAR'                   ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS
@@ -487,7 +488,8 @@
          SWITCH_EXPECTED = .FALSE.
 
          CALL SCULIB_MASK_DATA(USE_SECT, 'BIT', N_SPEC, DATA_SPEC,
-     :        %VAL(IN_DEM_PNTR_PTR), 1, N_EXPOSURES, N_INTEGRATIONS,
+     :        %VAL(CNF_PVAL(IN_DEM_PNTR_PTR)), 
+     :        1, N_EXPOSURES, N_INTEGRATIONS,
      :        N_MEASUREMENTS, N_POS, N_BOLS, N_BEAM, SWITCH_EXPECTED,
      :        0.0, BTEMP, BITNUM, BAD_QUALITY, IN_QUALITY_PTR,
      :        STATUS)

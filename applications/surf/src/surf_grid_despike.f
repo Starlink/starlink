@@ -123,6 +123,9 @@
 *  History:
 *     Original version: Timj, 1997 Oct 20
 *     $Log$
+*     Revision 1.6  2004/09/08 02:03:33  timj
+*     Add CNF_PVAL where appropriate
+*
 *     Revision 1.5  1999/08/19 03:37:42  timj
 *     Header tweaks to ease production of SSN72 documentation.
 *
@@ -151,6 +154,7 @@
       INCLUDE 'PRM_PAR'                          ! Bad values
       INCLUDE 'PAR_ERR'                          ! PAR__NULL
       INCLUDE 'MSG_PAR'                          ! MSG__NORM
+      INCLUDE 'CNF_PAR'                          ! For CNF_PVAL function
  
 *  Arguments Given:
       INTEGER N_FILES
@@ -276,7 +280,7 @@
 
 *     Fill with zeroes
       IF (STATUS .EQ. SAI__OK) THEN
-         CALL SCULIB_CFILLI(NX * NY, 0, %VAL(GRID_PTR))
+         CALL SCULIB_CFILLI(NX * NY, 0, %VAL(CNF_PVAL(GRID_PTR)))
       END IF
 
 
@@ -296,8 +300,9 @@
 *     Fill the array with data. (1 file at a time)
 
          CALL SURFLIB_CALC_IJPOS(N_PTS(I), DBLE(OUT_PIXEL), ICEN, JCEN,
-     :        %VAL(BOL_RA_PTR(I)), %VAL(BOL_DEC_PTR(I)), 
-     :        %VAL(IJPOS_PTR + (2 * OFFSET * VAL__NBR)),
+     :        %VAL(CNF_PVAL(BOL_RA_PTR(I))), 
+     :        %VAL(CNF_PVAL(BOL_DEC_PTR(I))),
+     :        %VAL(CNF_PVAL(IJPOS_PTR) + (2 * OFFSET * VAL__NBR)),
      :        STATUS)
 
 *     At the same time we can be adding the returned data into
@@ -311,9 +316,10 @@
 *     should) but I am just trying to do it properly...
 
          CALL SURFLIB_HISTOGRAM_GRID( N_PTS(I), NX, NY, .TRUE.,
-     :        %VAL(DATA_PTR(I)), %VAL(QUALITY_PTR(I)), BADBIT(I),
-     :        %VAL(IJPOS_PTR + (2 * OFFSET * VAL__NBI)),
-     :        %VAL(GRID_PTR), IMAX, JMAX, NMAX, STATUS)
+     :        %VAL(CNF_PVAL(DATA_PTR(I))), 
+     :        %VAL(CNF_PVAL(QUALITY_PTR(I))), BADBIT(I),
+     :        %VAL(CNF_PVAL(IJPOS_PTR) + (2 * OFFSET * VAL__NBI)),
+     :        %VAL(CNF_PVAL(GRID_PTR)), IMAX, JMAX, NMAX, STATUS)
 
 
 *     Calculate the offset in the position array based on file number
@@ -348,10 +354,11 @@
 *     Initialise the work arrays
 
       IF (STATUS .EQ. SAI__OK) THEN
-         CALL SCULIB_CFILLI(NX * NY, 0, %VAL(GRID_PTR))
-         CALL SCULIB_CFILLR(NX * NY * NMAX, VAL__BADR, %VAL(BIN_PTR))
+         CALL SCULIB_CFILLI(NX * NY, 0, %VAL(CNF_PVAL(GRID_PTR)))
+         CALL SCULIB_CFILLR(NX * NY * NMAX, VAL__BADR, 
+     :                      %VAL(CNF_PVAL(BIN_PTR)))
          CALL SCULIB_CFILLI(NX * NY * NMAX, VAL__BADI, 
-     :        %VAL(BIN_POS_PTR))
+     :        %VAL(CNF_PVAL(BIN_POS_PTR)))
       END IF
 
 *     Now we need to copy the data into BIN_PTR and the positions
@@ -362,9 +369,11 @@
       DO I = 1, N_FILES
 
          CALL SURFLIB_FILL_GRID(N_PTS(I), NX, NY, NMAX, OFFSET,
-     :        %VAL(DATA_PTR(I)), %VAL(QUALITY_PTR(I)), BADBIT(I),
-     :        %VAL(IJPOS_PTR + (2 * OFFSET * VAL__NBI)),
-     :        %VAL(GRID_PTR), %VAL(BIN_PTR), %VAL(BIN_POS_PTR),
+     :        %VAL(CNF_PVAL(DATA_PTR(I))), 
+     :        %VAL(CNF_PVAL(QUALITY_PTR(I))), BADBIT(I),
+     :        %VAL(CNF_PVAL(IJPOS_PTR) + (2 * OFFSET * VAL__NBI)),
+     :        %VAL(CNF_PVAL(GRID_PTR)), %VAL(CNF_PVAL(BIN_PTR)), 
+     :        %VAL(CNF_PVAL(BIN_POS_PTR)),
      :        STATUS)
 
 *     Calculate the offset in the position array based on file number
@@ -460,7 +469,7 @@
 *     ...and calculate the new grid look up table
 
       CALL SURFLIB_CALC_GRIDIJ(UMODE, NX, NY, ICEN, JCEN,
-     :     %VAL(IPOS_PTR), %VAL(JPOS_PTR), STATUS)
+     :     %VAL(CNF_PVAL(IPOS_PTR)), %VAL(CNF_PVAL(JPOS_PTR)), STATUS)
 
 
 *     Calculate the statistics of each bin and store in an array.
@@ -483,9 +492,10 @@
 *     Calculate stats using the specified smoothing mode
 
       CALL SURFLIB_STATS_GRID(SMODE, NX, NY, NMAX, NSIGMA, 
-     :     %VAL(IPOS_PTR),
-     :     %VAL(JPOS_PTR), %VAL(BIN_PTR), %VAL(PNT_PTR),
-     :     %VAL(STATS_PTR), STATUS)
+     :     %VAL(CNF_PVAL(IPOS_PTR)),
+     :     %VAL(CNF_PVAL(JPOS_PTR)), %VAL(CNF_PVAL(BIN_PTR)), 
+     :     %VAL(CNF_PVAL(PNT_PTR)),
+     :     %VAL(CNF_PVAL(STATS_PTR)), STATUS)
 
 *     Write the median image to disk - now use MEDIAN regridding option
 *      LBND ( 1 ) = 1
@@ -520,8 +530,10 @@
 
 *     Plot the data
          CALL SURFLIB_PLOT_GRID(UNIT, NX, NY, NMAX, NSIGMA, 
-     :        %VAL(IPOS_PTR), %VAL(JPOS_PTR), %VAL(BIN_PTR), 
-     :        %VAL(STATS_PTR), %VAL(PNT_PTR), %VAL(SCRATCH_PTR), 
+     :        %VAL(CNF_PVAL(IPOS_PTR)), %VAL(CNF_PVAL(JPOS_PTR)), 
+     :        %VAL(CNF_PVAL(BIN_PTR)),
+     :        %VAL(CNF_PVAL(STATS_PTR)), %VAL(CNF_PVAL(PNT_PTR)), 
+     :        %VAL(CNF_PVAL(SCRATCH_PTR)),
      :        STATUS)
          
 *     Finish the plotting excursion
@@ -538,9 +550,11 @@
 *     difficult to relate back to actual quality.
 
       CALL SURFLIB_CLIP_GRID(N_FILES, N_PTS, NX, NY, NMAX,
-     :     N_BOLS, BITNUM, DATA_PTR, QUALITY_PTR, %VAL(BIN_PTR),
-     :     %VAL(BIN_POS_PTR), %VAL(STATS_PTR), %VAL(IPOS_PTR),
-     :     %VAL(JPOS_PTR), NSPIKES, STATUS)
+     :     N_BOLS, BITNUM, DATA_PTR, QUALITY_PTR, 
+     :     %VAL(CNF_PVAL(BIN_PTR)),
+     :     %VAL(CNF_PVAL(BIN_POS_PTR)), %VAL(CNF_PVAL(STATS_PTR)), 
+     :     %VAL(CNF_PVAL(IPOS_PTR)),
+     :     %VAL(CNF_PVAL(JPOS_PTR)), NSPIKES, STATUS)
          
 *     Free memory
       CALL SCULIB_FREE('PNT_PTR', PNT_PTR, PNT_END, STATUS)

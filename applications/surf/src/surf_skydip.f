@@ -151,6 +151,9 @@
 *  History:
 *     $Id$
 *     $Log$
+*     Revision 1.37  2004/09/08 02:03:35  timj
+*     Add CNF_PVAL where appropriate
+*
 *     Revision 1.36  2004/09/08 00:57:56  timj
 *     Register %LOC pointer with CNF
 *
@@ -490,7 +493,6 @@ c
 
 *  External functions:
       INCLUDE 'NDF_FUNC'
-
 
 *.
 
@@ -1004,8 +1006,10 @@ c
      :           DUM_QUAL_PTR_END, STATUS)
 
             CALL SCULIB_EXTRACT_BOL(SUB_POINTER, N_BOLS, N_POS, 
-     :           %VAL(IN_DATA_PTR), %VAL(DUM_QUAL_PTR), 
-     :           %VAL(DUM_DATA_PTR), %VAL(DUM_QUAL_PTR), STATUS)
+     :           %VAL(CNF_PVAL(IN_DATA_PTR)), 
+     :           %VAL(CNF_PVAL(DUM_QUAL_PTR)),
+     :           %VAL(CNF_PVAL(DUM_DATA_PTR)), 
+     :           %VAL(CNF_PVAL(DUM_QUAL_PTR)), STATUS)
 
 *     Get dummy variance memory and fill with zeroes
             DUM_VAR_PTR = 0
@@ -1013,7 +1017,8 @@ c
             CALL SCULIB_MALLOC(N_POS * VAL__NBR, DUM_VAR_PTR,
      :           DUM_VAR_PTR_END, STATUS)
             IF (STATUS .EQ. SAI__OK) THEN
-               CALL SCULIB_CFILLR(N_POS, 0.0, %VAL(DUM_VAR_PTR))
+               CALL SCULIB_CFILLR(N_POS, 0.0, 
+     :                            %VAL(CNF_PVAL(DUM_VAR_PTR)))
             END IF   
 
 *     Note that AIRMASST and AIRMASS_TVAR need to be copied
@@ -1023,8 +1028,8 @@ c
                
 *     Copy from input array to ouput array, removing bad pixels
 *     assumes the data were mapped with automatic quality masking
-            CALL SCULIB_COPY_GOOD(N_POS, %VAL(DUM_DATA_PTR),
-     :           %VAL(DUM_VAR_PTR), DAIRMASST, DAIRMASS_TVAR,
+            CALL SCULIB_COPY_GOOD(N_POS, %VAL(CNF_PVAL(DUM_DATA_PTR)),
+     :           %VAL(CNF_PVAL(DUM_VAR_PTR)), DAIRMASST, DAIRMASS_TVAR,
      :           NKEPT, JSKY, JSKY_VAR, AIRMASS, AIRMASS_VAR,
      :           STATUS)
 
@@ -1054,8 +1059,10 @@ c
 
 
             CALL SCULIB_EXTRACT_BOL(SUB_POINTER, N_BOLS, N_POS, 
-     :           %VAL(IN_DATA_PTR), %VAL(IN_QUAL_PTR), 
-     :           %VAL(DUM_DATA_PTR), %VAL(DUM_QUAL_PTR), STATUS)
+     :           %VAL(CNF_PVAL(IN_DATA_PTR)), 
+     :           %VAL(CNF_PVAL(IN_QUAL_PTR)),
+     :           %VAL(CNF_PVAL(DUM_DATA_PTR)), 
+     :           %VAL(CNF_PVAL(DUM_QUAL_PTR)), STATUS)
 
 *     Setup a counter before the loop so that we can remove
 *     bad data
@@ -1070,7 +1077,7 @@ c
 
 *  find where the exposure starts and finishes in the data array
  
-               CALL SCULIB_FIND_SWITCH (%val(IN_DEM_PNTR_PTR),
+               CALL SCULIB_FIND_SWITCH (%VAL(CNF_PVAL(IN_DEM_PNTR_PTR)),
      :              1, 1, N_INTEGRATIONS, N_MEASUREMENTS,
      :              N_POS, 1, 1, 1, I,
      :              EXP_START, EXP_END, STATUS)
@@ -1082,8 +1089,8 @@ c
 *     Now calculate the mean of the data
 
                CALL SCULIB_STATR(N_INTEGRATIONS, -1.0, 
-     :              %VAL(DUM_DATA_PTR + (EXP_START - 1) * VAL__NBR),
-     :              %VAL(DUM_QUAL_PTR + (EXP_START - 1) * VAL__NBUB),
+     :   %VAL(CNF_PVAL(DUM_DATA_PTR) + (EXP_START - 1) * VAL__NBR),
+     :   %VAL(CNF_PVAL(DUM_QUAL_PTR) + (EXP_START - 1) * VAL__NBUB),
      :              IN_BADBIT, NGOOD, MEAN, MEDIAN, SUM, SUMSQ,
      :              STDEV, QSORT, STATUS)
             
@@ -1167,11 +1174,12 @@ c
      :        N_FITS, FITS,
      :        'T_COLD', N_INTEGRATIONS, N_MEASUREMENTS, N_POS,
      :        N_BOLS, SCUBA__MAX_SUB, SCUBA__NUM_CHAN, SCUBA__NUM_ADC, 
-     :        BOL_CHAN, BOL_TYPE, BOL_ADC, %VAL(IN_DEM_PNTR_PTR), 
-     :        %VAL(IN_DATA_PTR), %VAL(DUM_DATA_PTR), 
-     :        %VAL(DUM_VAR_PTR), %VAL(DUM_QUAL_PTR),
-     :        %VAL(DUMMY_PTR), AV_DATA, AV_VAR, AV_QUAL,
-     :        %VAL(SLICE_PTR), STATUS)
+     :        BOL_CHAN, BOL_TYPE, BOL_ADC, 
+     :        %VAL(CNF_PVAL(IN_DEM_PNTR_PTR)),
+     :        %VAL(CNF_PVAL(IN_DATA_PTR)), %VAL(CNF_PVAL(DUM_DATA_PTR)),
+     :        %VAL(CNF_PVAL(DUM_VAR_PTR)), %VAL(CNF_PVAL(DUM_QUAL_PTR)),
+     :        %VAL(CNF_PVAL(DUMMY_PTR)), AV_DATA, AV_VAR, AV_QUAL,
+     :        %VAL(CNF_PVAL(SLICE_PTR)), STATUS)
          
 *     Now extract the necesary data from the average data
 *     Keep track of how many bad points we have removed
@@ -1193,17 +1201,20 @@ c
 
 *     ...data and quality
             CALL SCULIB_EXTRACT_BOL(SUB_POINTER, N_BOLS, N_POS, 
-     :           %VAL(DUM_DATA_PTR), %VAL(DUM_QUAL_PTR), 
-     :           %VAL(DUM_DATA_PTR), %VAL(DUM_QUAL_PTR), STATUS)
+     :           %VAL(CNF_PVAL(DUM_DATA_PTR)), 
+     :           %VAL(CNF_PVAL(DUM_QUAL_PTR)),
+     :           %VAL(CNF_PVAL(DUM_DATA_PTR)), 
+     :           %VAL(CNF_PVAL(DUM_QUAL_PTR)), STATUS)
 
 *     ....variance
             CALL SCULIB_EXTRACT_2DIM_R(SUB_POINTER, N_BOLS,
-     :           N_POS, %VAL(DUM_VAR_PTR), %VAL(DUM_VAR_PTR),
+     :           N_POS, %VAL(CNF_PVAL(DUM_VAR_PTR)), 
+     :           %VAL(CNF_PVAL(DUM_VAR_PTR)),
      :           STATUS)
 
 *     Now copy the good data (ignoring quality for now)
-            CALL SCULIB_COPY_GOOD(N_POS, %VAL(DUM_DATA_PTR),
-     :           %VAL(DUM_VAR_PTR), DAIRMASST, DAIRMASS_TVAR,
+            CALL SCULIB_COPY_GOOD(N_POS, %VAL(CNF_PVAL(DUM_DATA_PTR)),
+     :           %VAL(CNF_PVAL(DUM_VAR_PTR)), DAIRMASST, DAIRMASS_TVAR,
      :           NKEPT, JSKY, JSKY_VAR, AIRMASS, AIRMASS_VAR,
      :           STATUS)
 
@@ -1512,8 +1523,8 @@ c
             CALL NDF_MAP (OUT_NDF, 'DATA', '_REAL', 'WRITE',
      :           OUT_DATA_PTR, ITEMP, STATUS)
 
-            CALL VEC_RTOR(.FALSE.,UBND(1), %VAL(DREF),
-     :           %VAL(OUT_DATA_PTR), IERR, NERR, STATUS)
+            CALL VEC_RTOR(.FALSE.,UBND(1), %VAL(CNF_PVAL(DREF)),
+     :           %VAL(CNF_PVAL(OUT_DATA_PTR)), IERR, NERR, STATUS)
 
 *     Only data has VARIANCE
             IF (FILE .EQ. 1) THEN
@@ -1521,7 +1532,7 @@ c
      :              OUT_VAR_PTR, ITEMP, STATUS)
          
                CALL VEC_RTOR(.FALSE., UBND(1), JSKY_VAR, 
-     :              %VAL(OUT_VAR_PTR), IERR, NERR, STATUS)
+     :              %VAL(CNF_PVAL(OUT_VAR_PTR)), IERR, NERR, STATUS)
 
 *               CALL NDF_MAP (OUT_NDF, 'QUALITY', '_UBYTE', 'WRITE',
 *     :              OUT_QUAL_PTR, ITEMP, STATUS)
@@ -1535,8 +1546,8 @@ c
             CALL NDF_AMAP (OUT_NDF, 'Centre', 1, '_REAL', 'WRITE',
      :           OUT_AXIS_PTR, UBND(1), STATUS)
 
-            CALL VEC_RTOR(.FALSE., UBND(1), %VAL(AREF),
-     :           %VAL(OUT_AXIS_PTR), IERR, NERR, STATUS)
+            CALL VEC_RTOR(.FALSE., UBND(1), %VAL(CNF_PVAL(AREF)),
+     :           %VAL(CNF_PVAL(OUT_AXIS_PTR)), IERR, NERR, STATUS)
 
 * if data then write the AXIS variance (probably pretty inaccurate)
             IF (FILE .EQ. 1) THEN
@@ -1545,7 +1556,7 @@ c
      :              OUT_AXIS_PTR, UBND(1), STATUS)
 
                CALL VEC_RTOR(.FALSE., UBND(1), AIRMASS_VAR,
-     :              %VAL(OUT_AXIS_PTR), IERR, NERR, STATUS)
+     :              %VAL(CNF_PVAL(OUT_AXIS_PTR)), IERR, NERR, STATUS)
             END IF
          
 *     Set the bad pixel flag

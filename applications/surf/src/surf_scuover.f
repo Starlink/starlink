@@ -111,6 +111,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.19  2004/09/08 02:03:34  timj
+*     Add CNF_PVAL where appropriate
+*
 *     Revision 1.18  2004/07/14 21:46:59  timj
 *     Remove obsolete GKS_PAR reference
 *
@@ -149,6 +152,7 @@
       INCLUDE 'SURF_PAR'               ! SURF definitions
       INCLUDE 'SAE_PAR'                ! SSE global definitions
       INCLUDE 'MSG_PAR'                ! MSG__ constants
+      INCLUDE 'CNF_PAR'                ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS
@@ -751,7 +755,8 @@
 
 *  UT at which observation was made expressed as modified Julian day
 
-      CALL SCULIB_GET_MJD(N_FITS, FITS, %VAL(IN_LST_STRT_PTR), IN_UT1, 
+      CALL SCULIB_GET_MJD(N_FITS, FITS, %VAL(CNF_PVAL(IN_LST_STRT_PTR)), 
+     :                    IN_UT1,
      :     RTEMP, RTEMP, STATUS)
 
 *  see if the observation completed normally or was aborted
@@ -802,7 +807,7 @@
 
       CALL SCULIB_CALC_APPARENT (LAT_OBS, IN_LONG_RAD, IN_LAT_RAD,
      :     IN_LONG2_RAD, IN_LAT2_RAD, 0.0D0, 0.0D0,
-     :     IN_CENTRE_COORDS, %VAL(IN_LST_STRT_PTR), IN_UT1,
+     :     IN_CENTRE_COORDS, %VAL(CNF_PVAL(IN_LST_STRT_PTR)), IN_UT1,
      :     IN_MJD1, IN_MJD2, IN_RA_CEN, IN_DEC_CEN, IN_ROTATION,
      :     STATUS)
 
@@ -893,20 +898,22 @@
      :     N_INTEGRATIONS,N_MEASUREMENTS,
      :     START_EXP, END_EXP, START_INT, END_INT, START_MEAS, END_MEAS,
      :     0, N_FITS, FITS,
-     :     %VAL(IN_DEM_PNTR_PTR), %VAL(IN_LST_STRT_PTR),
+     :     %VAL(CNF_PVAL(IN_DEM_PNTR_PTR)), 
+     :     %VAL(CNF_PVAL(IN_LST_STRT_PTR)),
      :     IN_ROTATION, SAMPLE_MODE,
      :     SAMPLE_COORDS, OUT_COORDS, JIGGLE_REPEAT,
      :     JIGGLE_COUNT, JIGGLE_X, JIGGLE_Y, JIGGLE_P_SWITCH,
      :     IN_RA_CEN, IN_DEC_CEN,
-     :     %VAL(IN_RA1_PTR), %VAL(IN_RA2_PTR), 
-     :     %VAL(IN_DEC1_PTR), %VAL(IN_DEC2_PTR), MJD_STANDARD,
+     :     %VAL(CNF_PVAL(IN_RA1_PTR)), %VAL(CNF_PVAL(IN_RA2_PTR)),
+     :     %VAL(CNF_PVAL(IN_DEC1_PTR)), %VAL(CNF_PVAL(IN_DEC2_PTR)), 
+     :     MJD_STANDARD,
      :     IN_UT1,IN_MJD1, IN_LONG_RAD, IN_LAT_RAD, IN_MJD2, 
      :     IN_LONG2_RAD, IN_LAT2_RAD, 
      :     LOCAL_COORDS, DBLE(MAP_X), DBLE(MAP_Y),
      :     N_POINT, POINT_LST, POINT_DAZ, POINT_DEL,
      :     SCUBA__NUM_CHAN, SCUBA__NUM_ADC, BOL_ADC, BOL_CHAN,
      :     BOL_DU3, BOL_DU4, .FALSE., 0.0D0, 0.0D0, 0.0, 0.0,
-     :     %VAL(BOL_DEC_PTR), %VAL(BOL_RA_PTR),
+     :     %VAL(CNF_PVAL(BOL_DEC_PTR)), %VAL(CNF_PVAL(BOL_RA_PTR)),
      :     0.0, 0.0, .FALSE., 0, 0, 0, STATUS)
 
 *     annul locators and array identifiers and close the file
@@ -957,7 +964,8 @@
 
          IF (STATUS .EQ. SAI__OK) THEN
             CALL SCULIB_APPARENT_2_TP (N_BOL, 
-     :           %val(BOL_RA_PTR), %val(BOL_DEC_PTR), 
+     :           %VAL(CNF_PVAL(BOL_RA_PTR)), 
+     :           %VAL(CNF_PVAL(BOL_DEC_PTR)),
      :           OUT_RA_CEN, OUT_DEC_CEN, OUT_ROTATION, 
      :           DBLE(SHIFT_DX), DBLE(SHIFT_DY), STATUS)
          END IF
@@ -999,9 +1007,9 @@
          ELSE
          
 *     Need to find half distance between bolometers
-            CALL VEC_DTOD(.TRUE., 2, %val(BOL_RA_PTR),
+            CALL VEC_DTOD(.TRUE., 2, %VAL(CNF_PVAL(BOL_RA_PTR)),
      :           XTEMP, IERR, NERR, STATUS)
-            CALL VEC_DTOD(.TRUE., 2, %val(BOL_DEC_PTR),
+            CALL VEC_DTOD(.TRUE., 2, %VAL(CNF_PVAL(BOL_DEC_PTR)),
      :           YTEMP, IERR, NERR, STATUS)
          
             BOL_DIST = SQRT((XTEMP(2)-XTEMP(1))**2 +
@@ -1063,9 +1071,11 @@
 *     Loop through all bolometers
          DO I = 1, N_BOL
 
-            CALL VEC_DTOD(.TRUE., 1, %val(BOL_RA_PTR+(I-1)*VAL__NBD), 
+            CALL VEC_DTOD(.TRUE., 1, 
+     :                    %VAL(CNF_PVAL(BOL_RA_PTR)+(I-1)*VAL__NBD),
      :           DXTEMP, IERR, NERR, STATUS)
-            CALL VEC_DTOD(.TRUE., 1, %val(BOL_DEC_PTR+(I-1)*VAL__NBD),
+            CALL VEC_DTOD(.TRUE., 1, 
+     :                    %VAL(CNF_PVAL(BOL_DEC_PTR)+(I-1)*VAL__NBD),
      :           DYTEMP, IERR, NERR, STATUS)
 
             DXTEMP = DXTEMP * R2AS
@@ -1102,10 +1112,11 @@
          IF (PLOTNAME) THEN
             DO I = 1, N_BOL
 
-               CALL VEC_DTOD(.TRUE., 1, %val(BOL_RA_PTR+(I-1)*VAL__NBD), 
+               CALL VEC_DTOD(.TRUE., 1, 
+     :                       %VAL(CNF_PVAL(BOL_RA_PTR+(I-1)*VAL__NBD)),
      :              DXTEMP, IERR, NERR, STATUS)
                CALL VEC_DTOD(.TRUE., 1, 
-     :              %val(BOL_DEC_PTR+(I-1)*VAL__NBD),
+     :              %VAL(CNF_PVAL(BOL_DEC_PTR)+(I-1)*VAL__NBD),
      :              DYTEMP, IERR, NERR, STATUS)
 
                DXTEMP = DXTEMP * R2AS

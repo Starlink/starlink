@@ -107,6 +107,7 @@
       INCLUDE 'MSG_PAR'                 ! for MSG__ constants
       INCLUDE 'PRM_PAR'                 ! for VAL__BAD
       INCLUDE 'PAR_ERR'                 ! For PAR__ constants
+      INCLUDE 'CNF_PAR'                 ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS
@@ -302,8 +303,9 @@
 *  calculate the required F.T.
 
          CALL SURFLIB_2DFT_CHOP (CHOP_THROW, CHOP_PA, PIXSIZE, IDIMS(1),
-     :        IDIMS(2), %val(FT_D_PTR), %val(FT_V_PTR), %val(WT_D_PTR),
-     :        %val(WT_V_PTR), STATUS)
+     :        IDIMS(2), %VAL(CNF_PVAL(FT_D_PTR)), 
+     :        %VAL(CNF_PVAL(FT_V_PTR)), %VAL(CNF_PVAL(WT_D_PTR)),
+     :        %VAL(CNF_PVAL(WT_V_PTR)), STATUS)
 
       END IF
 
@@ -319,11 +321,11 @@
      :        OUT_A_PTR, ITEMP, STATUS)
 
          IF (STATUS .EQ. SAI__OK) THEN
-            CALL SCULIB_NFILLR (IDIMS(I), %VAL(OUT_A_PTR))
-            CALL SCULIB_ADDCAR (IDIMS(I), %val(OUT_A_PTR), 
-     :              -REAL(IDIMS(I)+1)/2.0, %val(OUT_A_PTR))
-            CALL SCULIB_MULCAR (IDIMS(I), %val(OUT_A_PTR), 
-     :           INC, %val(OUT_A_PTR))
+            CALL SCULIB_NFILLR (IDIMS(I), %VAL(CNF_PVAL(OUT_A_PTR)))
+            CALL SCULIB_ADDCAR (IDIMS(I), %VAL(CNF_PVAL(OUT_A_PTR)),
+     :              -REAL(IDIMS(I)+1)/2.0, %VAL(CNF_PVAL(OUT_A_PTR)))
+            CALL SCULIB_MULCAR (IDIMS(I), %VAL(CNF_PVAL(OUT_A_PTR)),
+     :           INC, %VAL(CNF_PVAL(OUT_A_PTR)))
          END IF
 
 *     Unmap
@@ -335,11 +337,11 @@
      :        OUT_A_PTR, ITEMP, STATUS)
 
          IF (STATUS .EQ. SAI__OK) THEN
-            CALL SCULIB_NFILLR (IDIMS(I), %VAL(OUT_A_PTR))
-            CALL SCULIB_ADDCAR (IDIMS(I), %val(OUT_A_PTR), 
-     :              -REAL(IDIMS(I)+1)/2.0, %val(OUT_A_PTR))
-            CALL SCULIB_MULCAR (IDIMS(I), %val(OUT_A_PTR), 
-     :           INC, %val(OUT_A_PTR))
+            CALL SCULIB_NFILLR (IDIMS(I), %VAL(CNF_PVAL(OUT_A_PTR)))
+            CALL SCULIB_ADDCAR (IDIMS(I), %VAL(CNF_PVAL(OUT_A_PTR)),
+     :              -REAL(IDIMS(I)+1)/2.0, %VAL(CNF_PVAL(OUT_A_PTR)))
+            CALL SCULIB_MULCAR (IDIMS(I), %VAL(CNF_PVAL(OUT_A_PTR)),
+     :           INC, %VAL(CNF_PVAL(OUT_A_PTR)))
          END IF
 
 *     Unmap

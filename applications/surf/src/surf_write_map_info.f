@@ -98,6 +98,9 @@
 *     1997 May 12 (TIMJ)
 *        Remove FITS from input arguments
 * $Log$
+* Revision 1.2  2004/09/08 02:03:35  timj
+* Add CNF_PVAL where appropriate
+*
 * Revision 1.1  2004/07/14 02:57:34  timj
 * no fpp in there
 *
@@ -142,6 +145,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! AST constants
       INCLUDE 'SURF_PAR'         ! REDS constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER          NFILE
@@ -252,11 +256,11 @@
       CALL NDF_AMAP (OUT_NDF, 'CENTRE', 1, '_REAL', 'WRITE',
      :     OUT_A_PTR, ITEMP, STATUS)
       IF (STATUS .EQ. SAI__OK) THEN
-         CALL SCULIB_NFILLR (NX_OUT, %val(OUT_A_PTR))
-         CALL SCULIB_ADDCAR (NX_OUT, %val(OUT_A_PTR), 
-     :        REAL(-I_CENTRE), %val(OUT_A_PTR))
-         CALL SCULIB_MULCAR (NX_OUT, %val(OUT_A_PTR), 
-     :        -OUT_PIXEL * REAL(R2AS), %val(OUT_A_PTR))
+         CALL SCULIB_NFILLR (NX_OUT, %VAL(CNF_PVAL(OUT_A_PTR)))
+         CALL SCULIB_ADDCAR (NX_OUT, %VAL(CNF_PVAL(OUT_A_PTR)),
+     :        REAL(-I_CENTRE), %VAL(CNF_PVAL(OUT_A_PTR)))
+         CALL SCULIB_MULCAR (NX_OUT, %VAL(CNF_PVAL(OUT_A_PTR)),
+     :        -OUT_PIXEL * REAL(R2AS), %VAL(CNF_PVAL(OUT_A_PTR)))
       END IF
       CALL NDF_ACPUT (XLAB, OUT_NDF, 'LABEL', 1, STATUS)
       CALL NDF_ACPUT ('arcsec', OUT_NDF, 'UNITS', 1, STATUS)
@@ -265,11 +269,11 @@
       CALL NDF_AMAP (OUT_NDF, 'CENTRE', 2, '_REAL', 'WRITE',
      :     OUT_A_PTR, ITEMP, STATUS)
       IF (STATUS .EQ. SAI__OK) THEN
-         CALL SCULIB_NFILLR (NY_OUT, %val(OUT_A_PTR))
-         CALL SCULIB_ADDCAR (NY_OUT, %val(OUT_A_PTR), 
-     :        REAL(-J_CENTRE), %val(OUT_A_PTR))
-         CALL SCULIB_MULCAR (NY_OUT, %val(OUT_A_PTR),
-     :        OUT_PIXEL * REAL(R2AS), %val(OUT_A_PTR))
+         CALL SCULIB_NFILLR (NY_OUT, %VAL(CNF_PVAL(OUT_A_PTR)))
+         CALL SCULIB_ADDCAR (NY_OUT, %VAL(CNF_PVAL(OUT_A_PTR)),
+     :        REAL(-J_CENTRE), %VAL(CNF_PVAL(OUT_A_PTR)))
+         CALL SCULIB_MULCAR (NY_OUT, %VAL(CNF_PVAL(OUT_A_PTR)),
+     :        OUT_PIXEL * REAL(R2AS), %VAL(CNF_PVAL(OUT_A_PTR)))
       END IF
       CALL NDF_ACPUT (YLAB, OUT_NDF, 'LABEL', 2, STATUS)
       CALL NDF_ACPUT ('arcsec', OUT_NDF, 'UNITS', 2, STATUS)

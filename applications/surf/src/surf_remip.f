@@ -78,6 +78,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.10  2004/09/08 02:03:34  timj
+*     Add CNF_PVAL where appropriate
+*
 *     Revision 1.9  2003/04/07 23:48:34  timj
 *     Change %age to 'frac' in documentation header
 *
@@ -137,6 +140,7 @@
       INCLUDE 'PRM_PAR'         ! For VAL_NB*
       INCLUDE 'DAT_PAR'         ! For DAT__SZLOC
       INCLUDE 'MSG_PAR'         ! For MSG__NORM
+      INCLUDE 'CNF_PAR'         ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS
@@ -529,7 +533,8 @@
 
 *  UT at which observation was made expressed as modified Julian day
 
-      CALL SCULIB_GET_MJD(N_FITS, FITS, %VAL(LST_STRT_PTR), UT1, 
+      CALL SCULIB_GET_MJD(N_FITS, FITS, %VAL(CNF_PVAL(LST_STRT_PTR)), 
+     :                    UT1,
      :     RTEMP, RTEMP, STATUS)
 
 *     see if the observation completed normally or was aborted
@@ -587,7 +592,7 @@
 
       CALL SCULIB_CALC_APPARENT (LAT_OBS, LONG_RAD, LAT_RAD, LONG2_RAD,
      :     LAT2_RAD, 0.0D0, 0.0D0, CENTRE_COORDS, 
-     :     %VAL(LST_STRT_PTR), UT1, 
+     :     %VAL(CNF_PVAL(LST_STRT_PTR)), UT1,
      :     MJD1, MJD2, RA_CENTRE, DEC_CENTRE, ROTATION, STATUS)
 
 
@@ -672,10 +677,11 @@
 *     The return array is then filled with the waveplate position
 *     angle in degrees
 
-      CALL SURFLIB_FILL_WPLATE(N_WP_POS, %VAL(SCUCD_WPLATE_PTR),
+      CALL SURFLIB_FILL_WPLATE(N_WP_POS, 
+     :                         %VAL(CNF_PVAL(SCUCD_WPLATE_PTR)),
      :     N_POS, N_EXPOSURES, N_INTEGRATIONS, N_MEASUREMENTS,
-     :     %VAL(IN_DEM_PNTR_PTR), %VAL(WPLATE_PTR), 
-     :     %VAL(WPLATE_PER_INT_PTR), STATUS)
+     :     %VAL(CNF_PVAL(IN_DEM_PNTR_PTR)), %VAL(CNF_PVAL(WPLATE_PTR)),
+     :     %VAL(CNF_PVAL(WPLATE_PER_INT_PTR)), STATUS)
 
 *     Free the SCUCD WPLATE array
       IF (USE_WP) CALL CMP_UNMAP(IN_SCUCDX_LOC, 'WPLATE', STATUS)
@@ -766,21 +772,23 @@
      :     N_INTEGRATIONS, N_MEASUREMENTS, 
      :     1, N_EXPOSURES, 1, N_INTEGRATIONS, 1, N_MEASUREMENTS,
      :     1, N_FITS, FITS,
-     :     %VAL(IN_DEM_PNTR_PTR), %VAL(LST_STRT_PTR),
+     :     %VAL(CNF_PVAL(IN_DEM_PNTR_PTR)), 
+     :     %VAL(CNF_PVAL(LST_STRT_PTR)),
      :     ROTATION, SAMPLE_MODE,
      :     SAMPLE_COORDS, 'RA', JIGGLE_REPEAT,
      :     JIGGLE_COUNT, JIGGLE_X, JIGGLE_Y, JIGGLE_P_SWITCH,
      :     RA_CENTRE, DEC_CENTRE,
-     :     %VAL(RA1_PTR), %VAL(RA2_PTR), 
-     :     %VAL(DEC1_PTR), %VAL(DEC2_PTR), UT1, UT1,
+     :     %VAL(CNF_PVAL(RA1_PTR)), %VAL(CNF_PVAL(RA2_PTR)),
+     :     %VAL(CNF_PVAL(DEC1_PTR)), %VAL(CNF_PVAL(DEC2_PTR)), UT1, UT1,
      :     MJD1, LONG_RAD, LAT_RAD, MJD2, LONG2_RAD, LAT2_RAD,
      :     LOCAL_COORDS, DBLE(MAP_X), DBLE(MAP_Y),
      :     0, POINT_LST, POINT_DAZ, POINT_DEL,
      :     SCUBA__NUM_CHAN, SCUBA__NUM_ADC,BOL_ADC,BOL_CHAN,
      :     BOL_DU3, BOL_DU4, .FALSE., 0.0D0,0.0D0,0.0,0.0,
      :     BOL_RA, BOL_DEC,
-     :     %VAL(OUT_DATA_PTR), %VAL(OUT_VARIANCE_PTR), .FALSE., 0,
-     :     %VAL(WPLATE_PTR), BOL_IP_DATA,
+     :     %VAL(CNF_PVAL(OUT_DATA_PTR)), 
+     :     %VAL(CNF_PVAL(OUT_VARIANCE_PTR)), .FALSE., 0,
+     :     %VAL(CNF_PVAL(WPLATE_PTR)), BOL_IP_DATA,
      :     STATUS)
 
 *     Now that the data (and variance) have been corrected for
@@ -848,8 +856,8 @@
 
 *     Write the waveplate angles to the extension
 
-      CALL VEC_RTOR(.FALSE., ITEMP, %VAL(WPLATE_PER_INT_PTR),
-     :     %VAL(WP_DATA_PTR), IERR, NERR, STATUS)
+      CALL VEC_RTOR(.FALSE., ITEMP, %VAL(CNF_PVAL(WPLATE_PER_INT_PTR)),
+     :     %VAL(CNF_PVAL(WP_DATA_PTR)), IERR, NERR, STATUS)
 
 *     Unmap and annul the WP_NDF
       CALL NDF_UNMAP(WP_NDF,'DATA', STATUS)
@@ -881,8 +889,9 @@
 
       CALL SURFLIB_CALC_POLPACK_ANGROT(
      :     N_POS, N_EXPOSURES, N_INTEGRATIONS, N_MEASUREMENTS,
-     :     %VAL(IN_DEM_PNTR_PTR), %VAL(WPLATE_PTR), 
-     :     %VAL(WP_DATA_PTR), %VAL(WP_VAR_PTR), STATUS)
+     :     %VAL(CNF_PVAL(IN_DEM_PNTR_PTR)), %VAL(CNF_PVAL(WPLATE_PTR)),
+     :     %VAL(CNF_PVAL(WP_DATA_PTR)), %VAL(CNF_PVAL(WP_VAR_PTR)), 
+     :     STATUS)
       
 *     Unmap and annul the ANGROT NDF
       CALL NDF_UNMAP(WP_NDF,'*', STATUS)
@@ -900,8 +909,8 @@
       CALL NDF_MAP(WP_NDF, 'DATA', '_REAL', 'WRITE', WP_DATA_PTR,
      :     ITEMP, STATUS)
 
-      CALL VEC_RTOR(.FALSE., ITEMP, %VAL(WPLATE_PTR),
-     :     %VAL(WP_DATA_PTR), IERR, NERR, STATUS)
+      CALL VEC_RTOR(.FALSE., ITEMP, %VAL(CNF_PVAL(WPLATE_PTR)),
+     :     %VAL(CNF_PVAL(WP_DATA_PTR)), IERR, NERR, STATUS)
 
 *     Unmap and annul the Namyth angle  NDF
       CALL NDF_UNMAP(WP_NDF,'DATA', STATUS)

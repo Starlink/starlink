@@ -122,6 +122,9 @@
 
 *    History:
 *     $Log$
+*     Revision 1.10  2004/09/08 02:03:33  timj
+*     Add CNF_PVAL where appropriate
+*
 *     Revision 1.9  2001/10/30 03:02:03  timj
 *     POLMAP is a MAP observation
 *
@@ -170,6 +173,7 @@
       INCLUDE 'DAT_PAR'                 ! for DAT__SZLOC
       INCLUDE 'SURF_PAR'                ! SURF constants
       INCLUDE 'MSG_PAR'                 ! for MSG__ constants
+      INCLUDE 'CNF_PAR'                 ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS
@@ -463,11 +467,12 @@
 
          CALL SURFLIB_DIFF_DESPIKE (N_EXPOSURES,
      :     N_INTEGRATIONS, N_MEASUREMENTS, 
-     :     %val(IN_DEM_PNTR_PTR), N_BOL, N_POS, 
-     :     %val(IN_DATA_PTR), %val(IN_VARIANCE_PTR),
-     :     %val(IN_QUALITY_PTR), BADBIT, NSIGMA,
-     :     %val(OUT_DATA_PTR), %val(OUT_VARIANCE_PTR),
-     :     %val(OUT_QUALITY_PTR), NSPIKES, STATUS)
+     :     %VAL(CNF_PVAL(IN_DEM_PNTR_PTR)), N_BOL, N_POS,
+     :     %VAL(CNF_PVAL(IN_DATA_PTR)), %VAL(CNF_PVAL(IN_VARIANCE_PTR)),
+     :     %VAL(CNF_PVAL(IN_QUALITY_PTR)), BADBIT, NSIGMA,
+     :     %VAL(CNF_PVAL(OUT_DATA_PTR)), 
+     :     %VAL(CNF_PVAL(OUT_VARIANCE_PTR)),
+     :     %VAL(CNF_PVAL(OUT_QUALITY_PTR)), NSPIKES, STATUS)
 
 *     unmap the main data array
 

@@ -75,6 +75,9 @@
 *     November 1998
 *       Converted to SURF (TIMJ)
 *     $Log$
+*     Revision 1.7  2004/09/08 02:03:34  timj
+*     Add CNF_PVAL where appropriate
+*
 *     Revision 1.6  2003/04/02 02:58:24  timj
 *     Protect bad pixels when changing type with VEC
 *
@@ -114,6 +117,7 @@
       INCLUDE 'DAT_PAR'                ! DAT__ constants
       INCLUDE 'PRM_PAR'                ! VAL__ constants
       INCLUDE 'PAR_ERR'                ! PAR__NULL
+      INCLUDE 'CNF_PAR'                ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS
@@ -442,11 +446,13 @@
 *     signal to the calibrator signal.
 
       CALL SCULIB_NOISE_MEAN( N_INTEGRATIONS, N_BOLS,
-     :     %VAL(IN_DATA_PTR),
-     :     %VAL(OUT_DATA_PTR), %VAL(OUT_VARIANCE_PTR),
-     :     %VAL(OUT_DATA_PTR + (N_BOLS * VAL__NBR)),
-     :     %VAL(OUT_VARIANCE_PTR + (N_BOLS * VAL__NBR)),
-     :     %VAL(OUT_QUALITY_PTR), %VAL(SCRATCH_PTR), STATUS)
+     :     %VAL(CNF_PVAL(IN_DATA_PTR)),
+     :     %VAL(CNF_PVAL(OUT_DATA_PTR)), 
+     :     %VAL(CNF_PVAL(OUT_VARIANCE_PTR)),
+     :     %VAL(CNF_PVAL(OUT_DATA_PTR) + (N_BOLS * VAL__NBR)),
+     :     %VAL(CNF_PVAL(OUT_VARIANCE_PTR) + (N_BOLS * VAL__NBR)),
+     :     %VAL(CNF_PVAL(OUT_QUALITY_PTR)), %VAL(CNF_PVAL(SCRATCH_PTR)), 
+     :     STATUS)
 
 *     Free the scratch space
       CALL SCULIB_FREE('SCRATCH', SCRATCH_PTR, SCRATCH_END, STATUS)
@@ -456,10 +462,10 @@
 
       IF (STATUS .EQ. SAI__OK) THEN
 
-         CALL SCULIB_MULCAR(2*N_BOLS, %VAL(OUT_DATA_PTR),
-     :        1.0E9 / AMP_GAIN, %VAL(OUT_DATA_PTR))
-         CALL SCULIB_MULCAR(2*N_BOLS, %VAL(OUT_VARIANCE_PTR),
-     :        1.0E18 / AMP_GAIN**2, %VAL(OUT_VARIANCE_PTR))
+         CALL SCULIB_MULCAR(2*N_BOLS, %VAL(CNF_PVAL(OUT_DATA_PTR)),
+     :        1.0E9 / AMP_GAIN, %VAL(CNF_PVAL(OUT_DATA_PTR)))
+         CALL SCULIB_MULCAR(2*N_BOLS, %VAL(CNF_PVAL(OUT_VARIANCE_PTR)),
+     :        1.0E18 / AMP_GAIN**2, %VAL(CNF_PVAL(OUT_VARIANCE_PTR)))
 
       END IF
 
@@ -467,8 +473,8 @@
 *     of the array (chop quality) to the end of the array
 *     (calibrator quality)
 
-      CALL VEC_UBTOUB(.FALSE., N_BOLS, %VAL(OUT_QUALITY_PTR),
-     :     %VAL(OUT_QUALITY_PTR + (N_BOLS * VAL__NBUB)),
+      CALL VEC_UBTOUB(.FALSE., N_BOLS, %VAL(CNF_PVAL(OUT_QUALITY_PTR)),
+     :     %VAL(CNF_PVAL(OUT_QUALITY_PTR) + (N_BOLS * VAL__NBUB)),
      :     IERR, NERR, STATUS)
 
 
@@ -708,19 +714,19 @@
     
 *     Copy the data out of the 'pointer'
                CALL VEC_RTOR(.FALSE., 1,
-     :              %VAL(OUT_DATA_PTR + (I-1) * VAL__NBR ),
+     :              %VAL(CNF_PVAL(OUT_DATA_PTR) + (I-1) * VAL__NBR ),
      :              CHOP_DATA, IERR, NERR, STATUS)
                CALL VEC_RTOR(.FALSE., 1,
-     :              %VAL(OUT_VARIANCE_PTR + (I-1) * VAL__NBR ),
+     :   %VAL(CNF_PVAL(OUT_VARIANCE_PTR) + (I-1) * VAL__NBR ),
      :              CHOP_VARIANCE, IERR, NERR, STATUS)
                CALL VEC_RTOR(.FALSE., 1,
-     :              %VAL(OUT_DATA_PTR + (N_BOLS + I-1) * VAL__NBR ),
+     :   %VAL(CNF_PVAL(OUT_DATA_PTR) + (N_BOLS + I-1) * VAL__NBR ),
      :              CAL_DATA, IERR, NERR, STATUS)
                CALL VEC_RTOR(.FALSE., 1,
-     :              %VAL(OUT_VARIANCE_PTR + (N_BOLS + I-1) * VAL__NBR ),
+     :   %VAL(CNF_PVAL(OUT_VARIANCE_PTR) + (N_BOLS + I-1) * VAL__NBR ),
      :              CAL_VARIANCE, IERR, NERR, STATUS)
                CALL VEC_UBTOI(.TRUE., 1,
-     :              %VAL(OUT_QUALITY_PTR + (I-1) * VAL__NBUB ),
+     :   %VAL(CNF_PVAL(OUT_QUALITY_PTR) + (I-1) * VAL__NBUB ),
      :              DEMOD_QUALITY, IERR, NERR, STATUS)
 
 

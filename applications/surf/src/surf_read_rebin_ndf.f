@@ -156,6 +156,9 @@
 *     1997 May 12 (TIMJ)
 *       Initial version removed from reds_wtfn_rebin.f
 *     $Log$
+*     Revision 1.23  2004/09/08 02:03:33  timj
+*     Add CNF_PVAL where appropriate
+*
 *     Revision 1.22  2000/06/27 02:44:38  timj
 *     Allow for a small range of WAVElengths
 *
@@ -216,6 +219,7 @@
       INCLUDE 'SURF_PAR'         ! REDS
       INCLUDE 'DAT_PAR'          ! DAT__ constants
       INCLUDE 'MSG_PAR'          ! MSG__ constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Local Constants:
       INTEGER          MAX_DIM              ! max number of dims in array
@@ -842,7 +846,7 @@
             ITEMP = DIM(1) * DIM(2)
             RTEMP = 1.0e-6
             CALL SCULIB_CFILLR(ITEMP, RTEMP,
-     :           %VAL(DUMMY_VARIANCE_PTR))
+     :           %VAL(CNF_PVAL(DUMMY_VARIANCE_PTR)))
             FILE_VARIANCE_PTR = DUMMY_VARIANCE_PTR
          END IF               
       END IF
@@ -870,7 +874,7 @@
                ITEMP = DIM(1) * DIM(2)
                BTEMP = 0
                CALL SCULIB_CFILLB(ITEMP, BTEMP,
-     :              %VAL(DUMMY_QUALITY_PTR))
+     :              %VAL(CNF_PVAL(DUMMY_QUALITY_PTR)))
                FILE_QUALITY_PTR = DUMMY_QUALITY_PTR
                BADBITS = VAL__BADUB
             END IF               
@@ -893,7 +897,8 @@
 
 *  UT at which observation was made expressed as modified Julian day
 
-      CALL SCULIB_GET_MJD(N_FITS, FITS, %VAL(IN_LST_STRT_PTR), IN_UT1, 
+      CALL SCULIB_GET_MJD(N_FITS, FITS, %VAL(CNF_PVAL(IN_LST_STRT_PTR)), 
+     :                    IN_UT1,
      :     RTEMP, RTEMP, STATUS)
 
 *     find if the observation was aborted
@@ -987,7 +992,7 @@
 
       CALL SCULIB_CALC_APPARENT (LAT_OBS, IN_LONG_RAD, IN_LAT_RAD,
      :     IN_LONG2_RAD, IN_LAT2_RAD, 0.0D0, 0.0D0, 
-     :     IN_CENTRE_COORDS, %VAL(IN_LST_STRT_PTR), IN_UT1,
+     :     IN_CENTRE_COORDS, %VAL(CNF_PVAL(IN_LST_STRT_PTR)), IN_UT1,
      :     IN_MJD1, IN_MJD2, IN_RA_CEN, IN_DEC_CEN, IN_ROTATION,
      :     STATUS)
 
@@ -1033,11 +1038,12 @@
 
       IF (STATUS .EQ. SAI__OK) THEN
          CALL VEC_RTOR(.FALSE., N_POS * N_BOL,
-     :        %VAL(FILE_DATA_PTR), %VAL(DATA_PTR), IERR,
+     :        %VAL(CNF_PVAL(FILE_DATA_PTR)), %VAL(CNF_PVAL(DATA_PTR)), 
+     :        IERR,
      :        NERR, STATUS)
          CALL VEC_RTOR(.FALSE., N_POS * N_BOL,
-     :        %VAL(FILE_VARIANCE_PTR), 
-     :        %VAL(VARIANCE_PTR), IERR, NERR, STATUS)
+     :        %VAL(CNF_PVAL(FILE_VARIANCE_PTR)),
+     :        %VAL(CNF_PVAL(VARIANCE_PTR)), IERR, NERR, STATUS)
          
       END IF
 
@@ -1051,7 +1057,8 @@
          IF (STATUS .EQ. SAI__OK) THEN
             
             CALL VEC_UBTOUB(.FALSE., N_POS * N_BOL,
-     :           %VAL(FILE_QUALITY_PTR), %VAL(QUALITY_PTR), IERR,
+     :           %VAL(CNF_PVAL(FILE_QUALITY_PTR)), 
+     :           %VAL(CNF_PVAL(QUALITY_PTR)), IERR,
      :           NERR, STATUS)
 
          END IF
@@ -1088,7 +1095,8 @@
          SWITCH_EXPECTED = .FALSE.
 
          CALL SCULIB_MASK_DATA(USE_INTS, 'REAL', NSPEC, DATA_SPEC,
-     :        %VAL(IN_DEM_PNTR_PTR), 1, N_EXPOSURES, N_INTEGRATIONS,
+     :        %VAL(CNF_PVAL(IN_DEM_PNTR_PTR)), 
+     :        1, N_EXPOSURES, N_INTEGRATIONS,
      :        N_MEASUREMENTS, N_POS, N_BOL, 1, SWITCH_EXPECTED,
      :        VAL__BADR, BTEMP, 0, .TRUE., DATA_PTR,
      :        STATUS)
@@ -1111,7 +1119,8 @@
 
 *     Fill it with Bad values
          IF (STATUS .EQ. SAI__OK) THEN
-            CALL SCULIB_CFILLD(N_POS, VAL__BADD, %VAL(LST_PTR(1)))
+            CALL SCULIB_CFILLD(N_POS, VAL__BADD, 
+     :                         %VAL(CNF_PVAL(LST_PTR(1))))
          END IF
             
       END IF
@@ -1124,21 +1133,24 @@
      :        N_INTEGRATIONS, N_MEASUREMENTS,
      :        1, N_EXPOSURES, 1, N_INTEGRATIONS, 1,N_MEASUREMENTS,
      :        N_FILE, N_FITS, FITS,
-     :        %VAL(IN_DEM_PNTR_PTR), %VAL(IN_LST_STRT_PTR),
+     :        %VAL(CNF_PVAL(IN_DEM_PNTR_PTR)), 
+     :        %VAL(CNF_PVAL(IN_LST_STRT_PTR)),
      :        IN_ROTATION, SAMPLE_MODE,
      :        SAMPLE_COORDS, OUT_COORDS, JIGGLE_REPEAT,
      :        JIGGLE_COUNT, JIGGLE_X, JIGGLE_Y, JIGGLE_P_SWITCH,
      :        IN_RA_CEN, IN_DEC_CEN,
-     :        %VAL(IN_RA1_PTR), %VAL(IN_RA2_PTR), 
-     :        %VAL(IN_DEC1_PTR), %VAL(IN_DEC2_PTR), MJD_STANDARD,
+     :        %VAL(CNF_PVAL(IN_RA1_PTR)), %VAL(CNF_PVAL(IN_RA2_PTR)),
+     :        %VAL(CNF_PVAL(IN_DEC1_PTR)), %VAL(CNF_PVAL(IN_DEC2_PTR)), 
+     :        MJD_STANDARD,
      :        IN_UT1, IN_MJD1, IN_LONG_RAD, IN_LAT_RAD, IN_MJD2, 
      :        IN_LONG2_RAD, IN_LAT2_RAD,
      :        LOCAL_COORDS, DBLE(MAP_X), DBLE(MAP_Y),
      :        N_POINT, POINT_LST, POINT_DAZ, POINT_DEL,
      :        SCUBA__NUM_CHAN, SCUBA__NUM_ADC, BOL_ADC, BOL_CHAN,
      :        BOL_DU3, BOL_DU4, SCAN_REVERSAL, 0.0D0, 0.0D0, 0.0, 0.0,
-     :        %VAL(BOL_DEC_PTR), %VAL(BOL_RA_PTR),
-     :        %VAL(DATA_PTR), 0, USE_LST, %VAL(LST_PTR(1)),
+     :        %VAL(CNF_PVAL(BOL_DEC_PTR)), %VAL(CNF_PVAL(BOL_RA_PTR)),
+     :        %VAL(CNF_PVAL(DATA_PTR)), 0, USE_LST, 
+     :        %VAL(CNF_PVAL(LST_PTR(1))),
      :        0, 0, STATUS)
 
       END IF
@@ -1155,7 +1167,7 @@
       DO MEASUREMENT = 1, N_MEASUREMENTS
          DO INTEGRATION = 1, N_INTEGRATIONS
 
-            CALL SCULIB_FIND_SWITCH(%VAL(IN_DEM_PNTR_PTR),
+            CALL SCULIB_FIND_SWITCH(%VAL(CNF_PVAL(IN_DEM_PNTR_PTR)),
      :           1, N_EXPOSURES, N_INTEGRATIONS, N_MEASUREMENTS,
      :           N_POS, 1, 1, INTEGRATION,MEASUREMENT,
      :           INT_LIST(N_FILE, DATA_OFFSET), ITEMP, STATUS)
@@ -1186,7 +1198,7 @@
 
       DO MEASUREMENT = 1, N_MEASUREMENTS
 
-            CALL SCULIB_FIND_SWITCH(%VAL(IN_DEM_PNTR_PTR),
+            CALL SCULIB_FIND_SWITCH(%VAL(CNF_PVAL(IN_DEM_PNTR_PTR)),
      :           1, N_EXPOSURES, N_INTEGRATIONS, N_MEASUREMENTS,
      :           N_POS, 1, 1, 1, MEASUREMENT,
      :           MEAS_LIST(N_FILE, DATA_OFFSET), ITEMP, STATUS)
@@ -1267,7 +1279,8 @@
                CALL SURFLIB_FILL_POLPACK_ANGLES(MAX_FILE,
      :              SCUBA__MAX_INT, SCUBA__MAX_MEAS, N_FILE,
      :              N_INTEGRATIONS,
-     :              N_MEASUREMENTS, %VAL(WP_PTR), %VAL(ANG_PTR),
+     :              N_MEASUREMENTS, %VAL(CNF_PVAL(WP_PTR)), 
+     :              %VAL(CNF_PVAL(ANG_PTR)),
      :              FAST_AXIS, ANG_INT, ANG_MEAS, STATUS)
 
 *     Shut down

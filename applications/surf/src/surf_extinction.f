@@ -161,6 +161,7 @@
       INCLUDE 'PRM_PAR'                 ! for VAL__xxxx
       INCLUDE 'SURF_PAR'                ! SURF constants
       INCLUDE 'MSG_PAR'                 ! MSG constants
+      INCLUDE 'CNF_PAR'                 ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS
@@ -603,7 +604,8 @@
 
 *  UT at which observation was made expressed as modified Julian day
 
-      CALL SCULIB_GET_MJD(N_FITS, FITS, %VAL(IN_LST_STRT_PTR), UT1, 
+      CALL SCULIB_GET_MJD(N_FITS, FITS, %VAL(CNF_PVAL(IN_LST_STRT_PTR)), 
+     :                    UT1,
      :     RTEMP, RTEMP, STATUS)
 
 *  see if the observation completed normally or was aborted
@@ -660,7 +662,7 @@
 
       CALL SCULIB_CALC_APPARENT (LAT_OBS, LONG_RAD, LAT_RAD, LONG2_RAD,
      :     LAT2_RAD, 0.0D0, 0.0D0, CENTRE_COORDS, 
-     :     %VAL(IN_LST_STRT_PTR), UT1, 
+     :     %VAL(CNF_PVAL(IN_LST_STRT_PTR)), UT1,
      :     MJD1, MJD2, RA_CENTRE, DEC_CENTRE, ROTATION, STATUS)
 
 
@@ -947,10 +949,11 @@
 
       IF (STATUS .EQ. SAI__OK) THEN
          CALL SCULIB_GET_SUB_BOLS (N_BOL_IN, N_POS, N_BEAM,
-     :     %val(IN_DATA_PTR), %val(IN_VARIANCE_PTR), 
-     :     %val(IN_QUALITY_PTR), N_BOL_OUT,
-     :     IN_POINTER, %val(OUT_DATA_PTR), %val(OUT_VARIANCE_PTR),
-     :     %val(OUT_QUALITY_PTR), STATUS)
+     :     %VAL(CNF_PVAL(IN_DATA_PTR)), %VAL(CNF_PVAL(IN_VARIANCE_PTR)),
+     :     %VAL(CNF_PVAL(IN_QUALITY_PTR)), N_BOL_OUT,
+     :     IN_POINTER, %VAL(CNF_PVAL(OUT_DATA_PTR)), 
+     :     %VAL(CNF_PVAL(OUT_VARIANCE_PTR)),
+     :     %VAL(CNF_PVAL(OUT_QUALITY_PTR)), STATUS)
       END IF
 
 *  set the bolometer description arrays to their new values
@@ -1049,20 +1052,23 @@
      :        N_INTEGRATIONS, N_MEASUREMENTS, 
      :        1, N_EXPOSURES, 1, N_INTEGRATIONS, 1, N_MEASUREMENTS,
      :        1, N_FITS, FITS,
-     :        %VAL(IN_DEM_PNTR_PTR), %VAL(IN_LST_STRT_PTR),
+     :        %VAL(CNF_PVAL(IN_DEM_PNTR_PTR)), 
+     :        %VAL(CNF_PVAL(IN_LST_STRT_PTR)),
      :        ROTATION, SAMPLE_MODE,
      :        SAMPLE_COORDS, 'RA', JIGGLE_REPEAT,
      :        JIGGLE_COUNT, JIGGLE_X, JIGGLE_Y, JIGGLE_P_SWITCH,
      :        RA_CENTRE, DEC_CENTRE,
-     :        %VAL(IN_RA1_PTR), %VAL(IN_RA2_PTR), 
-     :        %VAL(IN_DEC1_PTR), %VAL(IN_DEC2_PTR), UT1, UT1,
+     :        %VAL(CNF_PVAL(IN_RA1_PTR)), %VAL(CNF_PVAL(IN_RA2_PTR)),
+     :        %VAL(CNF_PVAL(IN_DEC1_PTR)), %VAL(CNF_PVAL(IN_DEC2_PTR)), 
+     :        UT1, UT1,
      :        MJD1, LONG_RAD, LAT_RAD, MJD2, LONG2_RAD, LAT2_RAD,
      :        LOCAL_COORDS, DBLE(MAP_X), DBLE(MAP_Y),
      :        0, POINT_LST, POINT_DAZ, POINT_DEL,
      :        SCUBA__NUM_CHAN, SCUBA__NUM_ADC,OUT_BOL_ADC,OUT_BOL_CHAN,
      :        BOL_DU3, BOL_DU4, .FALSE., FIRST_LST_RAD, SECOND_LST_RAD,
      :        FIRST_TAU, SECOND_TAU, BOL_RA, BOL_DEC,
-     :        %VAL(OUT_DATA_PTR), %VAL(OUT_VARIANCE_PTR), .FALSE., 0,
+     :        %VAL(CNF_PVAL(OUT_DATA_PTR)), 
+     :        %VAL(CNF_PVAL(OUT_VARIANCE_PTR)), .FALSE., 0,
      :        0,0,
      :        STATUS)
 
