@@ -1,4 +1,5 @@
 <!doctype ssn public "-//Starlink//DTD Starlink SSN//EN" [
+  <!entity releasenotes system "ReleaseNotes">
   <!entity ddash cdata "--">
 ]>
 <!-- $Id$ -->
@@ -17,8 +18,18 @@
 version</version>
 <distribution string="1" date="14-JUN-1999" author="ng">
   First public release
+
 <change date="19-JUN-1999" author=ng versionid=upd1>
   Added kpathsea support, and appendix on TeX dimensions.
+
+<change date="24-JUN-1999" versionid=upd2>
+Slight restructuring to make it easier to find the instructions on
+generating fonts.  Fixed a couple of typos.
+
+<distribution string="2" date="05-JUL-1999" author="ng" versionid=upd3>
+Altered documentation of font-searching, to match new functionality.
+</distribution>
+
 </history>
 
 <copyright>
@@ -47,7 +58,19 @@ present, generate XBM and GIF files.
 <p>See <ref id=usage> for usage instructions, and <ref id=install> for
 installation instructions.
 
+<p>The <code/dvi2bitmap/ application is available for download at 
+<url>http://www.astro.gla.ac.uk/users/norman/star/dvi2bitmap/</url>.
+<![ %Only.web [
+This HTML documetation is also available as a 
+<webref url='dvi2bitmap.single.html' >single file</webref>
+]]>
+
+<p>This document matches version 1.0-4 of the program (you can see
+what version you have with the command <kbd/dvi2bitmap -V/).
+
 <sect id=usage export>Usage
+<update versionid=upd3>Added a description of my usage model, to help
+make things a little clearer.</update>
 
 <p>Synopsis:
 <verbatim>
@@ -58,6 +81,29 @@ dvi2bitmap
 </verbatim>
 
 <p>This program is intended to conform to the DVI processing standard.
+
+<p>The motivation for this program was the need for a helper program
+to produce small bitmaps for inclusion in web pages.  Accordingly, my
+model of the way the program is used is that it will process a file of
+(typically) equations generated specifically for it.  For example, the
+processor which generates the HTML could spit out a file such as
+<verbatim>
+\documentclass{article}
+\pagestyle{empty}
+\begin{document}
+$E=mc^2$
+\newpage
+% etc...
+\end{document}
+</verbatim>
+and then this program can scoot through it turning each page into a
+bitmap.  I had thought about some complicated scheme to delimit areas
+on the page, but realised that since the file being processed would
+typically be generated on the fly specifically for processing by a
+tool like this, this wasn't really necessary.
+
+<p>I hope that the program is (or can be made to be) flexible enough
+to support other models of use.
 
 <subsect id=usage.options export>Options
 
@@ -78,7 +124,7 @@ height, not horizontal!  At some point, I'd like to make the bitmap
 
 <dt><code>-f font-path</code>
 <dd>Specifies the path to the PK fonts which dvi2bitmap will use.  See
-also <ref id=usage.env>.
+also <ref id=usage.fonts>.
 
 <dt><code>-l</code>
 <dd>Show missing fonts.
@@ -96,7 +142,7 @@ generate the required fonts.
 option, except that found fonts are also listed, prefixed by a % character.
 
 <dt><code>-m magnification</code>
-<dd>The TeX magnification parameter which is used when processing the DVI
+<dd>The &tex; magnification parameter which is used when processing the DVI
 file. It is a float, with 1.0 corresponding to no magnification (the
 default).  This interacts with the resolution as follows: if you
 specify a resolution of 100, and a magnification of 2, then dvi2bitmap
@@ -114,7 +160,7 @@ if any fonts were missing.
 `printf' formatting string, with a single <code>%d</code>
 formatting descriptor, which will be replaced in output filenames
 with the page number.  This can be overridden on a per-page basis by
-a TeX <code/\special/ embedded in the DVI file (see <ref
+a &tex; <code/\special/ embedded in the DVI file (see <ref
 id=usage.special>).  If there is no 
 file extension, or if it does not match the output type, a suitable file
 extension will be added.
@@ -141,8 +187,9 @@ when deciding which PK files to use. The default is 72.
 <dd>Reduces the linear size of the output bitmap by a factor
 <code/scalefactor/ (default 1).
 
-<dt><code/-t xbm|gif/
-<dd>Choose the output format.  The program generates XBM bitmaps by
+<dt><code/-t type/
+<dd>Choose the output format, which can be <code/xbm/ or <code/gif/.
+The program generates XBM bitmaps by 
 default.  The GIF option may not be available if it wasn't selected
 when the program was configured.
 
@@ -156,7 +203,7 @@ when the program was configured.
 <p>dvi2bitmap recognises a single DVI special command, and emits a
 warning if it finds any others.
 
-<p>If the TeX file contains a special command:
+<p>If the &tex; file contains a special command:
 <verbatim>
 \special{dvi2bitmap outputfile thispage}
 </verbatim>
@@ -167,7 +214,7 @@ then the output file used for the current page will be
 <subsect id=usage.exit export>Exit value
 
 <p>Exits with a non-zero status if there were any processing errors.
-Having <em/no/ fonts present counts as a processing error; if there is
+`Having <em/no/ fonts present counts as a processing error; if there is
 at least one font present, then missing fonts will be replaced by a
 more-or-less randomly chosen alternative, and the program will produce a
 warning if the <code/-Q/ option is not present, but it will return
@@ -191,21 +238,58 @@ cmr10 165 110 1.5 localfont
 This reads the DVI file to find out what fonts are required, but does
 not process it further.  It then tries to find the fonts, fails, and
 produces a list of parameters which could be used to generate the
-font files.
+font files.  
 
-<p>How you generate fonts depends on your TeX distribution.  As explained
-above, you can determine which fonts you need using the 
-<code/-l/ option.  The teTeX and TeXLive TeX distributions include scripts to
+<p>See also <ref id=usage.fonts>.
+
+<subsect id=usage.fonts export>Finding and generating fonts
+<update versionid="upd2">Renamed this section from vague
+`environment', and moved description of font generation from
+examples.</update>
+<update versionid="upd3">Described new functionality for environment
+variable.</update>
+
+<p>The program searches in up to three places for fonts.
+
+<p>The <code/DVI2BITMAP_PK_PATH/ environment variable, if defined,
+specifies a colon-separated list of directories which are to be
+searched for PK files.  If you give the <code/-f/ option, it overrides
+the value in <code/DVI2BITMAP_PK_PATH/.
+
+<p>If the program cannot find fonts using the environment variable,
+and if it was configured with support for the Kpathsearch
+library (see <ref id=install.nonstarlink>), then it should find PK
+files using the same mechanism other DVI processors use.  If you did
+not install dvi2bitmap along with other &tex;ware, then you might
+additionally have to specify the <code/TEXMFCNF/ environment variable:
+set it to the directory which contains the main &tex; configuration
+file, which you can find using the command <kbd/kpsewhich cnf texmf.cnf/.
+
+<p>Since dvi2bitmap's default resolution is 72~dpi, as opposed to the
+usual printer resolution of 300 or 600~dpi, you are unlikely to have
+suitable fonts on your system, and will need to generate them
+
+<p>How you generate fonts depends on your &tex; distribution.  As explained
+in <ref id=usage.examples>, you can determine which fonts you need using the 
+<code/-l/ option.  The teTeX and TeXLive &tex; distributions include scripts to
 generate fonts for you; if you have a different distribution, there
 might be a similar script for you to use, or you might have to do it
-by hand.  In the case of teTeX, the command you'd use in the above
+by hand.  In the case of teTeX, the command you'd use in the
 example would be:
 <verbatim>
 % MakeTeXPK cmr10 165 110 1.5 ibmvga
 </verbatim>
-assuming you want to use the 
-<code/ibmvga/ metafont mode.  If you want to use the same mode as you
-use for other documents, then the mode
+This would generate fonts using the <code/ibmvga/ Metafont mode, using
+a base resolution of 110~dpi (the default for that mode), at a
+magnification of 1.5 times, giving a resultant resolution of 165~dpi.
+
+<p>If you're using the TeXLive distribution, the equivalent command would be:
+<verbatim>
+% mktexpk &ddash;mfmode ibmvga &ddash;mag 1.5 &ddash;bdpi 110 &ddash;dpi 165 cmr10
+</verbatim>
+
+<p>If you want to use the same mode as you
+use for printing documents, then the mode
 <code/localfont/ should do the right thing.  Otherwise, and probably
 better if these images are intended for the screen rather than paper,
 you could use a more specialised mode such as 
@@ -214,29 +298,14 @@ which has been tweaked to be readable at small resolutions.  See the file
 <code/modes.mf/
 somewhere in your metafont distribution for the list of possibilities.
 
-<p>If you're using the TeXLive distribution, the command would be:
-<verbatim>
-% mktexpk &ddash;mfmode ibmvga &ddash;mag 1.5 &ddash;bdpi 110 &ddash;dpi 165 cmr10
-</verbatim>
-
 <p>After you have created the fonts, try giving the command
 <verbatim>
 % kpsewhich pk cmr10.165pk
 </verbatim>
-to confirm that TeX and friends can find the new fonts, and that your 
-dvi2bitmap environment variable is set correctly.
-
-<subsect id=usage.env export>Environment
-
-<p>The <code/DVI2BITMAP_PK_PATH/ environment variable gives a single
-directory which is to be searched for PK files.  The <code/-f/ option
-overrides this.
-
-<p>If the program was configured with support for the Kpathsearch
-library (see <ref id=install.nonstarlink>), then it should find PK
-files using the same mechanism other DVI processors use.  The
-<code/-f/ option and the <code/DVI2BITMAP_PK_PATH/ environment
-variable are used before the Kpathsearch library.
+to confirm that &tex; and friends can find the new fonts, and that your 
+dvi2bitmap environment variable is set correctly.  This command is
+part of the <code/kpathsea/ distribution, rather than the core &tex;
+distribution, so may not be present on your system.
 
 <sect id=install export>Building and installing dvi2bitmap
 
@@ -279,9 +348,6 @@ machines).
   library
 </update>
 
-<p>If you are not on a Starlink node, then you should build and
-install as follows.
-
 <p>To configure and build:
 <verbatim>
 % ./configure
@@ -312,7 +378,9 @@ find this out with the command <kbd/which kpsewhich/), or tell it
 where the <code/kpathsea/ configuration files are by setting the
 environment variable <code/TEXMFCNF/ (use <kbd/kpsewhich cnf
 texmf.cnf/ to find the configuration file, and set the environment
-variable to the location of that file).  If you don't have the
+variable to the directory which contains that file -- I <em/think/
+that some versions of the library require <code/TEXMFCNF/ to specify
+the file rather than the directory`).  If you don't have the
 <code/kpathsea/ library available (I don't believe it's installed by
 the <code/TeXLive/ distribution, for example), then you can obtain a
 copy from <webref url='http://www.tug.org' >TUG</webref> or <webref
@@ -343,6 +411,19 @@ don't tell me), or (3) you need to invoke some magic to get the
 compiler to be conformant (in which case tell me, if there's something
 I can do in the autoconfigure script).
 
+<sect id=developments export>Further developments
+
+<p>Things I'd like to do sometime:
+<ul>
+<li>I'd like to have missing PK files generated automatically.  This
+isn't too difficult, but is likely to be a tad fiddly to do well.
+
+<li>At some point I'll add an option to select which pages are
+processed.  Again, this comes under the heading of `fiddly' rather
+than `interestingly difficult'. 
+
+</ul>
+
 <sect id=refs export>References
 
 <p>CTAN, the Comprehensive &tex; Archive Network, is <em/the/
@@ -353,7 +434,7 @@ mirrored in numerous places, but the UK node is at
 <p>DVItype and PKtoPX are two programs Donald Knuth programs intended
 as model DVI and PK file 
 readers, and as containers for the canonical documentation of the DVI
-and PK file formats.  They might be available as part of your TeX
+and PK file formats.  They might be available as part of your &tex;
 distribution, but are also available on CTAN, in
 <code fspath>/tex-archive/systems/knuth/texware/dvitype.web</code>
 and 
@@ -366,6 +447,8 @@ This incorporates sections of the DVItype documentation.
 This program claims to conform to this standard: if it doesn't, please
 let me know.
 
+<p>Thanks for bug reports and other suggestions to Eitan Gurari and
+Oliver Schurr.
 
 
 <appendices>
@@ -393,12 +476,12 @@ The working group also supports the
 
 </ul>
 
-<subsect id=sgml.maths.latex export>LaTeX maths within HTML
+<subsect id=sgml.maths.latex export>&latex; maths within HTML
 
 <p>The <em/real/ issue here (for me at least) is rendering
 equations within an HTML document.  There are several tools available
 which can do that with different trade-offs. The most popular method
-is to write the equations in a LaTeX document, process it, and then howk
+is to write the equations in a &latex; document, process it, and then howk
 the equations out of the resulting DVI file somehow (typically using
 <code/dvips/ and a postscript to gif converter), and display them
 on the web as gifs.  The big disadvantage with this is that you get an
@@ -417,7 +500,7 @@ Renderers</cite></webref>.
 
 <p><webref url='http://www.tex.ac.uk/tex-archive/support/latex2html/'
 	>LaTeX2HTML</webref> is the granddaddy of these translators -- it
-parses the LaTeX using Perl, and spits out HTML, turning maths into
+parses the &latex; using Perl, and spits out HTML, turning maths into
 gifs.  It's very robust by now.
 
 <p>John Walker's 
@@ -427,11 +510,11 @@ is a Perl program which orchestrates the various tools to do the
 conversion via postscript, once you've generated the DVI file.
 
 <p><webref url="http://www.cis.ohio-state.edu/~gurari/TeX4ht/mn.html"
-	>TeX4ht</webref> (TeX for Hypertext) uses TeX's own
+	>TeX4ht</webref> (&tex; for Hypertext) uses &tex;'s own
 parser, but still produces equations as gifs.
 TeX4ht can produce
 <webref url='http://www.cis.ohio-state.edu/~gurari/TeX4ht/mml/'
-	>XML and MathML from LaTeX</webref>.  The TeX4ht documentation has
+	>XML and MathML from &latex;</webref>.  The TeX4ht documentation has
 a useful collection of resources.
 There's an alternative location for TeX4ht
 <webref url='http://www.tug.org/applications/tex4ht/mn.html'
@@ -442,15 +525,15 @@ The package's
 commands you might use to convert DVIs to gifs.
 
 <p><webref url="http://hutchinson.belmont.ma.us/tth/"
-	>tth: TeX to HTML translator</webref> 
+	>tth: &tex; to HTML translator</webref> 
 (<webref url="http://hutchinson.belmont.ma.us/tth/manual.cgi"
->manual</webref>).  <code/tth/ translates LaTeX maths directly to HTML,
+>manual</webref>).  <code/tth/ translates &latex; maths directly to HTML,
 with remarkable success, and with good failure strategies.  It works
 very sweetly, but (a) requires you to tweak your browser to have it
 map the symbol font appropriately, and (b) the resulting HTML can't be
 printed legibly.  From the same source is 
 <webref url='http://hutchinson.belmont.ma.us/tth/mml/'
-	>TtHMML</webref>, which translates (La)TeX to HTML plus MathML.
+	>TtHMML</webref>, which translates (La)&tex; to HTML plus MathML.
 
 <p><webref url='http://norma.nikhef.nl/~t16/ndvi_doc.html'
 	>nDVI</webref> is a DVI viewer plugin for Unix Netscape.  This
@@ -461,7 +544,7 @@ addresses the problem at the client end.
 <p>A quite different approach is to use a different markup for maths,
 possibly requiring specialised client software.  These other notations
 typically use semantic markup -- expressing the structure of the maths.
-At first sight, this seems preferable to LaTeX's presentational
+At first sight, this seems preferable to &latex;'s presentational
 markup, but its weaknesses for authoring are exposed (I feel) when you
 realise that maths is not as closed and unambiguous a language as
 computer scientists feel it ought to be.  Semantic markup's strength
@@ -481,7 +564,7 @@ rather nicely, but works with its own semantic maths notation.
 	>Euromath</webref>, which includes a structured SGML editor.  This
 project included a converter which could transform 
 <webref url="http://www.dcs.fmph.uniba.sk/~emt/EmSystem.html#editor"
-	>LaTeX to Euromath SGML</webref>.
+	>&latex; to Euromath SGML</webref>.
 
 <p><webref url='http://www.nag.co.uk/projects/OpenMath/'
 	>OpenMath</webref> might be a successor to Euromath.  It's an
@@ -490,7 +573,7 @@ semantically-rich representation of mathematics'.
 
 <p><webref url='http://www.albany.edu/~hammond/gellmu/'
 	>GELLMU</webref>
-is a LaTeX-like markup language, intended to be easy to convert to
+is a &latex;-like markup language, intended to be easy to convert to
 SGML.  Specifically, it is intended to support maths (and hence
 conversion to MathML) well.
 
@@ -502,9 +585,9 @@ either MathML or other maths DTD fragments.
 is a suite of Java programs which implement MathML.  It's commercial.
 
 <p><webref url='http://www.alphaworks.ibm.com/formula/texml'
-	>TeXML</webref> is a gadget from IBM which converts XML to TeX via
+	>TeXML</webref> is a gadget from IBM which converts XML to &tex; via
 a DTD fragment.  You transform your XML to an equivalent document
-marked up in TeXML, which you then separately transform to TeX.
+marked up in TeXML, which you then separately transform to &tex;.
 
 <p><webref url='http://www.w3.org/People/Raggett/EzMath'
 	>EzMath</webref> is a Dave Raggett proposal for producing maths on
@@ -512,10 +595,10 @@ the web.  It uses yet another notation, and converts it to online
 form using a plugin (no printing, and Windows only, as of
 April 1999).
 
-<sect id=tex.dimensions export>TeX dimensions
+<sect id=tex.dimensions export>&tex; dimensions
 
 <p>When producing this program, I became terribly confused about the
-variety of dimensions which appear in DVI and PK files.  The following
+variety of dimensions which appear in DVI and PK files.  <ref id=tsizes>
 is a summary of the sizes which appear, for the benefit of anyone else
 attempting a project like this.  The reference [Dn] refers to
 section~`<m/n/' of the webbed DVItype document and [Pn] to section~`<m/n/' of
@@ -524,7 +607,7 @@ the PktoPX document (see <ref id=refs>).
 <p>If you feel I have misunderstood something here, or got one of the
 conversion factors wrong (I hate these!), please correct me.
 
-<table>
+<table id=tsizes>
 <caption>
 Sizes in TeX
 </caption>
@@ -607,7 +690,7 @@ to check you have the right fonts by comparing resolution, etc..
 only size that &tex; uses in its calculations, and which the DVI
 reader uses when working out how far to move the reference point when
 it sets a character.  This is defined in [P9] to be in units of
-<code/FIXes/, where one <code/FIX/ is <em/2^{-20}/ points.  [D37]
+<code/FIXes/, where one <code/FIX/ is <m/2^{-20}/ points.  [D37]
 describes how to multiply these widths by scaling factors without
 overflowing.
 
@@ -648,5 +731,9 @@ deci-micron, or <m/10^{-7}\mathrm{m}/,
 </meqnarray>
 
 </ul>
+
+<sect id=rn export>Release notes
+
+&releasenotes
 
 <backmatter>
