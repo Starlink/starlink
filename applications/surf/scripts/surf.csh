@@ -46,6 +46,8 @@
 #        scuplot and dspbol
 #     26-JAN-1997 (TIMJ)
 #        Add SCUBA2MEM
+#     10-Jun-1997 (TIMJ)
+#        Add CALCSKY, REMDBM and CHANGE_NACENTRE. SCUNOISE and SETBOLWT
 #     {enter_changes_here}
 #
 #-
@@ -55,6 +57,7 @@
 #  Define aliases for the applications.
 
 alias bolrebin        ${SURF_DIR}/bolrebin
+alias calcsky         ${SURF_DIR}/calcsky
 alias change_data     ${SURF_DIR}/change_data
 alias change_flat     ${SURF_DIR}/change_flat
 alias change_pointing ${SURF_DIR}/change_pointing
@@ -80,6 +83,7 @@ alias scuover         ${SURF_DIR}/scuover
 alias skydip          ${SURF_DIR}/skydip
 
 alias surf_bolrebin        ${SURF_DIR}/bolrebin
+alias surf_calcsky         ${SURF_DIR}/calcsky
 alias surf_change_data     ${SURF_DIR}/change_data
 alias surf_change_flat     ${SURF_DIR}/change_flat
 alias surf_change_pointing ${SURF_DIR}/change_pointing
@@ -110,44 +114,57 @@ alias surf_skydip          ${SURF_DIR}/skydip
 # or ndfperl.
 
 # Check for ndfperl module.
-if ( -e /star/bin/ndfperl ) then
-   alias sculog         ${SURF_DIR}/sculog
-   alias scuquick       ${SURF_DIR}/scuquick
-   alias photsum        ${SURF_DIR}/photsum
-   alias pointsum       ${SURF_DIR}/pointsum
-   alias mapsum         ${SURF_DIR}/mapsum
-   alias scushift       ${SURF_DIR}/scushift
-   alias skysum         ${SURF_DIR}/skysum
-   alias obssum         "${SURF_DIR}/sculog -summary"
-   alias qdraw          ${SURF_DIR}/qdraw
-   alias sigclip        ${SURF_DIR}/sigclip 
-   alias surf_sculog    ${SURF_DIR}/sculog
-   alias surf_scuquick  ${SURF_DIR}/scuquick
-   alias surf_photsum   ${SURF_DIR}/photsum
-   alias surf_pointsum  ${SURF_DIR}/pointsum
-   alias surf_mapsum    ${SURF_DIR}/mapsum
-   alias surf_scushift  ${SURF_DIR}/scushift
-   alias surf_skysum    ${SURF_DIR}/skysum
-   alias surf_obssum    "${SURF_DIR}/sculog -summary"
-   alias surf_qdraw     ${SURF_DIR}/qdraw
-   alias surf_sigclip   ${SURF_DIR}/sigclip 
+if ( -e STAR_BIN/ndfperl ) then
+   set myperl = STAR_BIN/ndfperl
+   alias change_nacentre  "$myperl ${SURF_DIR}/change_nacentre.pl"
+   alias sculog           "$myperl ${SURF_DIR}/sculog"
+   alias scuquick         "$myperl ${SURF_DIR}/scuquick"
+   alias photsum          "$myperl ${SURF_DIR}/photsum"
+   alias pointsum         "$myperl ${SURF_DIR}/pointsum"
+   alias mapsum           "$myperl ${SURF_DIR}/mapsum"
+   alias remdbm           "$myperl ${SURF_DIR}/remdbm.pl"
+   alias scushift         "$myperl -s ${SURF_DIR}/scushift"
+   alias setbolwt         "$myperl ${SURF_DIR}/setbolwt.pl"
+   alias skysum           "$myperl ${SURF_DIR}/skysum"
+   alias obssum           "$myperl ${SURF_DIR}/sculog -summary"
+   alias qdraw            "$myperl -s ${SURF_DIR}/qdraw"
+   alias sigclip          "$myperl -s ${SURF_DIR}/sigclip" 
+   alias surf_change_nacentre "$myperl ${SURF_DIR}/change_nacentre.pl"
+   alias surf_sculog      "$myperl ${SURF_DIR}/sculog"
+   alias surf_scuquick    "$myperl ${SURF_DIR}/scuquick"
+   alias surf_photsum     "$myperl ${SURF_DIR}/photsum"
+   alias surf_pointsum    "$myperl ${SURF_DIR}/pointsum"
+   alias surf_mapsum      "$myperl ${SURF_DIR}/mapsum"
+   alias surf_remdbm      "$myperl ${SURF_DIR}/remdbm.pl"
+   alias surf_scushift    "$myperl -s ${SURF_DIR}/scushift"
+   alias surf_setbolwt    "$myperl ${SURF_DIR}/setbolwt.pl"
+   alias surf_skysum      "$myperl ${SURF_DIR}/skysum"
+   alias surf_obssum      "$myperl ${SURF_DIR}/sculog -summary"
+   alias surf_qdraw       "$myperl -s ${SURF_DIR}/qdraw"
+   alias surf_sigclip     "$myperl -s ${SURF_DIR}/sigclip" 
 else
+   alias change_nacentre  echo 'Command not available - needs ndfperl'
    alias sculog         echo 'Command not available - needs ndfperl'
    alias scuquick       echo 'Command not available - needs ndfperl'
    alias photsum        echo 'Command not available - needs ndfperl'
    alias pointsum       echo 'Command not available - needs ndfperl'
    alias mapsum         echo 'Command not available - needs ndfperl'
+   alias remdbm         echo 'Command not available - needs ndfperl'
    alias scushift       echo 'Command not available - needs ndfperl'
+   alias setbolwt       echo 'Command not available - needs ndfperl'
    alias skysum         echo 'Command not available - needs ndfperl'
    alias obssum         echo 'Command not available - needs ndfperl'
    alias qdraw          echo 'Command not available - needs ndfperl'
    alias sigclip        echo 'Command not available - needs ndfperl'
+   alias surf_change_nacentre  echo 'Command not available - needs ndfperl'
    alias surf_sculog    echo 'Command not available - needs ndfperl' 
    alias surf_scuquick  echo 'Command not available - needs ndfperl'
    alias surf_photsum   echo 'Command not available - needs ndfperl'
    alias surf_pointsum  echo 'Command not available - needs ndfperl'
    alias surf_mapsum    echo 'Command not available - needs ndfperl'
+   alias surf_remdbm    echo 'Command not available - needs ndfperl'
    alias surf_scushift  echo 'Command not available - needs ndfperl'
+   alias surf_setbolwt  echo 'Command not available - needs ndfperl'
    alias surf_skysum    echo 'Command not available - needs ndfperl'
    alias surf_obssum    echo 'Command not available - needs ndfperl'
    alias surf_qdraw     echo 'Command not available - needs ndfperl'
@@ -169,6 +186,11 @@ alias surf_dspbol      ${SURF_DIR}/dspbol
 alias surf_pltbol      ${SURF_DIR}/pltbol
 alias surf_rlinplot    ${SURF_DIR}/rlinplot
 alias surf_scuplot     ${SURF_DIR}/scuplot.csh
+
+# Straight perl scripts
+alias scunoise         'perl -s ${SURF_DIR}/scunoise'
+alias surf_scunoise    'perl -s ${SURF_DIR}/scunoise'
+
 
 
 # Announce the availability of the SURF commands
