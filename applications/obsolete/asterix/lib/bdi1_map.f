@@ -155,23 +155,14 @@
 
         END IF
 
-*    Release storage
-        CALL ADI_ERASE( PSID, STATUS )
-
-*    If mapping went ok, store the pointer in the return argument
-        CALL ADI_NEWV0I( PTR, OARG, STATUS )
-
-*    Release the object
-        CALL DAT_ANNUL( CLOC, STATUS )
-
 *  Object doesn't exist?
-      ELSE IF ( STATUS .EQ. SAI__OK ) THEN
+      ELSE
 
 *     Axis widths?
         IF ( (ITEM(1:5).EQ.'Axis_') .AND. (ITEM(8:).EQ.'Width') ) THEN
 
-*       Use axis data to invent widths
-          CALL ERR_ANNUL( STATUS )
+*      Locate the BDI private storage for the item, creating if required
+          CALL BDI0_LOCPST( ARGS(1), ITEM, .TRUE., PSID, STATUS )
 
 *       Locate the data
           CALL BDI1_CFIND( ARGS(1), ARGS(2), ITEM(1:7)//'Data',
@@ -197,12 +188,15 @@
           CALL BDI1_STOMAP( PSID, .TRUE., DAT__NOLOC, 0, PTR, 'REAL',
      :                      'READ', STATUS )
 
-        END IF
+        ELSE
 
-*     Report error
-        STATUS = SAI__ERROR
-        CALL MSG_SETC( 'IT', ITEM )
-        CALL ERR_REP( 'BDI1_MAP_1', 'Item ^IT does not exist', STATUS )
+*       Report error
+          STATUS = SAI__ERROR
+          CALL MSG_SETC( 'IT', ITEM )
+          CALL ERR_REP( 'BDI1_MAP_1', 'Item ^IT does not exist',
+     :                  STATUS )
+
+        END IF
 
       END IF
 
