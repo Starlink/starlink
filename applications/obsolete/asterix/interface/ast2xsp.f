@@ -144,7 +144,7 @@
         PARAMETER		( MAXIG = 2 )
 
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'AST2XSP Version 1.8-3a' )
+        PARAMETER		( VERSION = 'AST2XSP Version 1.8-4' )
 
       INTEGER			XSP_OK
         PARAMETER		( XSP_OK = 0 )
