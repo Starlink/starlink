@@ -56,6 +56,8 @@
 #        Replace most of the library list with `kaplibs_link_adam`.
 #     28-JUL-2004 (TIMJ):
 #        Add SHL
+#     2-SEP-2004 (TIMJ):
+#        Add ONE
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -88,7 +90,7 @@
 
 #  Echo the link list.
       echo `ard_link_adam` `kaplibs_link_adam ${kaplibs_opts}` \
-           `shl_link_adam` \
+           `shl_link_adam` `one_link_adam` \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}
                   END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
