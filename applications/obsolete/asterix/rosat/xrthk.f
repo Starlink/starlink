@@ -133,6 +133,7 @@
 *
 *   Read eventrates times
          CALL RAT_HDLOOKUP(HEAD,'EVRATE','TIME',COL,STATUS)
+	print*,col
          CALL DAT_FIND(ERLOC, COL, EVTLOC, STATUS)
          CALL DAT_SIZE(EVTLOC, ENTIM, STATUS)
 *
@@ -149,6 +150,7 @@
 * Attempt to open the attitude file
       CALL RAT_HDLOOKUP(HEAD,'ASPECT','EXTNAME',EXT,STATUS)
       ATTFIL = SRT.ROOTNAME(1:CHR_LEN(SRT.ROOTNAME))//EXT
+	print*,attfil
 *
       CALL HDS_OPEN(ATTFIL, 'READ', ATTLOC, STATUS)
 *
@@ -166,6 +168,7 @@
 *
 *   Read attitude times
          CALL RAT_HDLOOKUP(HEAD,'ASPECT','TIME',COL,STATUS)
+	print*,col
          CALL DAT_FIND(ATTLOC, COL, AFTLOC, STATUS)
          CALL DAT_SIZE(AFTLOC, ANTIM, STATUS)
 *
