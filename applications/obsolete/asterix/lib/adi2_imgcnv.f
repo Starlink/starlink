@@ -129,6 +129,8 @@
         CALL ADI2_IC2I( PTR, TYPE, %VAL(NPTR), NELM, STATUS )
       ELSE IF ( DTYPE .EQ. 'BYTE' .OR. DTYPE .EQ. 'UBYTE' ) THEN
         CALL ADI2_IC2B( PTR, TYPE, %VAL(NPTR), NELM, STATUS )
+      ELSE IF ( DTYPE .EQ. 'LOGICAL' ) THEN
+        CALL ADI2_IC2L( PTR, TYPE, %VAL(NPTR), NELM, STATUS )
       ELSE
         STATUS = SAI__ERROR
         CALL MSG_SETC( 'T', DTYPE )
@@ -146,5 +148,45 @@ c     CALL ADI_ERASE( NID, STATUS )
  99   IF ( STATUS .NE. SAI__OK ) THEN
         CALL AST_REXIT( 'ADI2_IMGCNV', STATUS )
       END IF
+
+      END
+
+
+      SUBROUTINE ADI2_IMGCNV_NOTL( DATA, N, STATUS )
+*+
+*  Description:
+*    Asterix Quality definition => 0 = GOOD and >0 = BAD
+*    This is the reverse of most architecture bit logic
+*    and thus if a LOGICAL dataset is required we have to
+*    .NOT. all the converted values.
+
+*  Authors:
+*    RB: Richard Beard (ROSAT, University of Birmingham)
+
+*  History:
+*    17 May 1997: Original version (RB)
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'
+
+*  Import/export:
+      LOGICAL			DATA(*)
+      INTEGER			N, STATUS
+
+*  Local variables:
+      INTEGER			I
+*.
+
+*  Check global status
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Flip all the logical value
+      DO I = 1, N
+        DATA(I) = .NOT. DATA(I)
+      END DO
 
       END
