@@ -108,7 +108,6 @@
       CHARACTER*300		CVAL			! Transfer value
 
       INTEGER			CLEN			! Length of CVAL used
-      INTEGER			FSTAT			! XPI status
       INTEGER			NTRY			! Number of tries
 *.
 
@@ -129,7 +128,7 @@
 
 *    Trap special values
         IF ( CLEN .EQ. 0 ) THEN
-        IF ( CVAL(:CLEN) .EQ. '!' ) THEN
+        ELSE IF ( CVAL(:CLEN) .EQ. '!' ) THEN
           STATUS = PAR__NULL
 
         ELSE IF ( CVAL(:CLEN) .EQ. '!!' ) THEN
@@ -144,11 +143,9 @@
         IF ( (STATUS.NE.SAI__OK) .AND. (STATUS.NE.PAR__NULL) .AND.
      :       (STATUS.NE.PAR__ABORT) .AND. (NTRY .LT. MAXTRY) ) THEN
           CALL ERR_ANNUL( STATUS )
-
         END IF
 
       END DO
-
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'USI3_GET0<T>', STATUS )
