@@ -34,7 +34,12 @@
   DTD subset.
 -->
 <?IS10744 ArcBase programcode>
-<!notation programcode system ''>
+<!notation 
+	programcode
+		-- A base architecture used in conformance with the
+		   Architectural Form Definition Requirements of
+		   International Standard ISO/IEC 10744 --
+	system ''>
 <!entity % generalcode.dtd
 	public "-//Starlink//DTD Program Source Code 0.2//EN">
 <!attlist #notation programcode

@@ -32,11 +32,14 @@
 -->
 <?IS10744 ArcBase DSSSL programcode>
 <!notation sgml public "ISO 8879:1986//NOTATION Standard Generalised Markup Language//EN">
+
 <!ENTITY DSSSLDTD PUBLIC "ISO/IEC 10179:1996//DTD DSSSL Architecture//EN"
 	cdata sgml>
-<!--
-<!entity % DSSSLDTD PUBLIC "-//James Clark//DTD DSSSL Style Sheet//EN">
--->
+<!-- The DSSSL notation is in the PROGRAMCODE DTD.  Its use here is... --
+	-- A base architecture used in conformance with the
+	   Architectural Form Definition Requirements of
+	   International Standard ISO/IEC 10744 --
+	>
 <!attlist #notation dsssl
 	ArcDocF
 		name #fixed dsssl-specification
@@ -84,7 +87,12 @@
   on (admittedly rare) files which do whizzy things in their internal
   DTD subset.
 -->
-<!notation programcode system ''>
+<!notation 
+	programcode
+		-- A base architecture used in conformance with the
+		   Architectural Form Definition Requirements of
+		   International Standard ISO/IEC 10744 --
+	system ''>
 <!entity % generalcode.dtd
 	public "-//Starlink//DTD Program Source Code 0.2//EN">
 <!attlist #notation programcode
