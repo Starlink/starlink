@@ -22,10 +22,25 @@
      Copyright 1999, Particle Physics and Astronomy Research Council.
      -->
 
+<!-- This paragraph-content DTD has been modified so that it can be
+     used as part of either an SGML or an XML DTD.  Part of this
+     modification was parameterising the tag-omission specifiers so
+     that they could be defined away when used within an XML DTD.  We
+     therefore have to define these here, in such a way that this acts
+     as an SGML DTD by default, in case they haven't been
+     defined already.  This means that this DTD can be used from
+     within an SGML DTD without modifying that DTD (eg, the
+     programcode DTD).
+     -->
+<!ENTITY % MXX "- -">
+<!ENTITY % MXO "- O">
+<!ENTITY % MOO "O O">
+
 <!-- Can predefine %update.or to more useful content.  See
      starlink-general DTD for details. -->
 <!ENTITY % update.or ''>
 <!ENTITY % update.fc ''>
+
 
 <!--========== Features ==========-->
 <!-- Use %Feature.Paracontent.References to include the reference
@@ -80,6 +95,7 @@
 <!ENTITY % references	"">
 
 <!ENTITY % simplephrase	"| em | strong | quote | code | kbd | cite | m
+			 | angle | foreign
 			%additional.simplephrase;">
 <!ENTITY % structuring	"| blockquote | dl | ul | ol | verbatim | linespecific 
 			%update.or;
@@ -119,6 +135,7 @@
 <!ELEMENT em		%MXX; (%phrase;)*>
 <!ELEMENT strong	%MXX; (%phrase;)*>
 <!ELEMENT cite		%MXX; (%phrase;)*>
+<!ELEMENT foreign	%MXX; (%phrase;)*>
 
 <!-- CODE is part of %phrase markup, and is for inline text such as
      pathnames which needs to be shown in a distinctive font.  KBD is
@@ -483,4 +500,29 @@
 		compact		contents would benefit from a more
 				compact representation (formatting
 				hint).
+		-->
+
+<!--========== Astronomical angles ==========-->
+<!ELEMENT angle %MXO EMPTY>
+<!ATTLIST angle
+	unit
+		(hours | degrees)	degrees
+	angle
+		CDATA			#IMPLIED
+	minutes
+		CDATA			#IMPLIED
+	seconds
+		CDATA			#IMPLIED
+	fraction
+		CDATA			#IMPLIED
+	>
+	<!-- attributes:
+		unit		is the following angle in hours or degrees?
+		angle		number or hours or degrees as appropriate
+		minutes		number of minutes
+		seconds		number of seconds
+		fraction	fraction of a second
+
+		Allowable specifications are a, a+m, a+m+s, a+m+s+f,
+		m, m+s, m+s+f, s, s+f.
 		-->
