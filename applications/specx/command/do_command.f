@@ -113,7 +113,7 @@ C-----------------------------------------------------------------------
 
 * Used by DAS-MERGE
       INTEGER   NDROP   ! dummy
-      LOGICAL   LOGDUM  ! dummy
+      LOGICAL   LOGDUM, LOGDUM2  ! dummy
 *------------
       LOGICAL   DUMP_OK
       LOGICAL   SXGGREYOK
@@ -1260,7 +1260,7 @@ C-----------------------
  
       ELSE IF(COMMAND.EQ.'DAS-MERGE')  THEN
         IF((ICHECK(1,IFAIL).NE.1).OR.NQUAD.LT.2) RETURN
-        CALL DASMERGE(NDROP, LOGDUM, IFAIL)
+        CALL DASMERGE(NDROP, LOGDUM, LOGDUM2, IFAIL)
         DUMP_OK = .TRUE.
 
 

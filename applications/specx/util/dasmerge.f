@@ -1,4 +1,4 @@
-      SUBROUTINE dasmerge( NDROP, ADJQUAD, IFAIL )
+      SUBROUTINE dasmerge( NDROP, ADJQUAD, WIDEBAND, IFAIL )
 *+
 * Name:
 *     dasmerge.f
@@ -22,6 +22,8 @@
 *         Number of channels to be dropped (only used by READ-GSD-RASTER)
 *     ADJQUAD   - LOGICAL  (returned)
 *         Adjust qudrant DC offset in merge? (only used by READ-GSD-RASTER)
+*     WIDEBAND  - LOGICAL  (returned)
+*         Wideband mode? If so, use X and Y  (only used by READ-GSD-RASTER)
 *     IFAIL     - INTEGER  (given and returned)
 *         Status flag
 *
@@ -38,6 +40,9 @@
 *          dasmerge.spx script written
 *     14 Dec 1995 (timj):
 *          converted to FORTRAN
+*      4 Jun 1997 (rpt):
+*          added poor-mans support for wideband: uses concatsp
+*          and three merges rather than one merge on all quadrants
 *     {enter_further_changes_here}
  
 *
@@ -58,6 +63,7 @@
       INTEGER NDROP              ! Number of channels to drop
       REAL*8  FEDGE(2)           ! Frequency boundaries of overlap
       LOGICAL ADJQUAD            ! Adjust quadrant offsets?
+      LOGICAL WIDEBAND           ! Wideband mode?
 
 * Global variables:
       INTEGER IFAIL              ! Don't know what to do with this'
@@ -95,9 +101,12 @@
      +        NUSE,'I4',NUSE,JDEF)
          CALL GEN_YESNO ('Adjust any DC offset quadrants? ', .FALSE.,
      +        ADJQUAD, JDEF)
+         CALL GEN_YESNO ('Wideband mode (also merge Y spectrum)? ', .FALSE.,
+     +        WIDEBAND, JDEF)
 
 C         print *,'NUSE = ',NUSE
 C         IF (ADJQUAD) print *,'ADJ quad is true'
+C         IF (WIDEBAND) print *,'Wideband mode is true'
 
 C Call the core dasmerge subroutine
          IF (NUSE .LE. NOVER .AND. NUSE .GT. 0) THEN
@@ -117,7 +126,7 @@ C Call the core dasmerge subroutine
 C         PRINT *, 'NDROP = ',NDROP
 C         IF (.NOT.ADJQUAD) print *,'ADJ quad is false'
 
-         CALL DODASMERGE(NDROP, ADJQUAD, IFAIL)
+         CALL DODASMERGE(NDROP, ADJQUAD, WIDEBAND, IFAIL)
 
 
       ELSE
@@ -134,7 +143,7 @@ C---------------------------------------------------------------------
 *     FORTRAN 77 (Sun)
 *
 * Invocation:
-*     CALL DODASMERGE( NDROP, ADJQUAD, IFAIL )
+*     CALL DODASMERGE( NDROP, ADJQUAD, WIDEBAND, IFAIL )
 *
 * Description:
 *     This is just Remo's dasmerge.spx command implemented in FORTRAN
@@ -142,6 +151,7 @@ C---------------------------------------------------------------------
 * Arguments:
 *     NDROP       -     Number of channels to drop (INTEGER)
 *     ADJQUAD     -     Whether to adjust quadrant offsets (LOGICAL)
+*     WIDEBAND    -     Whether in wideband mode and to merge Y (LOGICAL)
 *     IFAIL       -     Status (INTEGER)
 *
 * Prior Requirements:
@@ -149,7 +159,7 @@ C---------------------------------------------------------------------
 *
 *-
 
-      SUBROUTINE DODASMERGE( NDROP , ADJQUAD, IFAIL )
+      SUBROUTINE DODASMERGE( NDROP , ADJQUAD, WIDEBAND, IFAIL )
 
       IMPLICIT NONE
       INTEGER NDROP
@@ -158,7 +168,8 @@ C---------------------------------------------------------------------
       INTEGER ICHECK
       INTEGER ISLCTQ
       LOGICAL ADJQUAD
-
+      LOGICAL WIDEBAND
+ 
       INCLUDE 'FLAGCOMM'
       INCLUDE 'SPECX_PARS'
       REAL XSCALE (2*LSPMAX)
@@ -172,23 +183,24 @@ C First check status
 C Quadrant status
       IF(ISLCTQ(NQ,IFAIL).NE.1)   RETURN
 
-C First run the truncate command
-      CALL TRUNC(NQ, NDROP)
-
-C Now run merge
+C Set DC adjust mode for merge
       SECTOR_OFFSET = ADJQUAD
 
+C First run the truncate command, then merge
+      CALL TRUNC(NQ, NDROP)
       CALL MERGE(XSCALE,IFAIL)
 
+C If WIDEBAND mode repeat for the Y spectrum
+      IF(WIDEBAND) THEN
+         CALL XY
+         CALL TRUNC(NQ, NDROP)
+         CALL MERGE(XSCALE,IFAIL)
+         CALL XY
+
+C Now finally concatinate X and Y and do a final merge
+
+         CALL CONCATSP(IFAIL)
+         CALL MERGE(XSCALE,IFAIL)
+      ENDIF
 
       END
-
-
-
-
-
-
-
-
-
-

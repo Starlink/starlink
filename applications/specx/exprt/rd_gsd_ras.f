@@ -9,6 +9,7 @@ C   8-JUN-1991 REVAD::JFL - modified to handle GSD V5 (post-DAS) data format
 C  22-NOV-1991 REVAD::JFL - modified to handle GSD V5.1 format
 C  07-OCT-1995 Rachael@mrao - keep file open until new one needed.
 C  13-DEC-1995 Timj@jach    - read all scans in at once.
+C   4-JUN-1997 RPT@jach     - updated for DASMERGE wideband mode
 
       IMPLICIT  NONE
 
@@ -36,6 +37,7 @@ C      INTEGER*4 OUTFILE
       CHARACTER PROMPT*256
       LOGICAL   ADJQUAD           ! Adjust quadrant DC offsets
       LOGICAL   DOMERGE           ! Do the das-merge
+      LOGICAL   WIDEBAND          ! Wideband mode?
 
       INCLUDE  'FLAGCOMM'
       INCLUDE  'STACKCOMM'
@@ -142,7 +144,7 @@ C stack first so that header information is correct
          DOMERGE = .FALSE.
       END IF
 
-      IF (DOMERGE) CALL DASMERGE(NDROP, ADJQUAD, IFAIL)
+      IF (DOMERGE) CALL DASMERGE(NDROP, ADJQUAD, WIDEBAND, IFAIL)
 
 C Write spectrum to waiting Specx data-file
 
@@ -176,7 +178,7 @@ C  Read data according to GSD version
          END IF
 
 C Do das-merge if required
-         IF (DOMERGE) CALL DODASMERGE(NDROP, ADJQUAD, IFAIL)
+         IF (DOMERGE) CALL DODASMERGE(NDROP, ADJQUAD, WIDEBAND, IFAIL)
 
 C Write spectrum to waiting Specx data-file
 
