@@ -1,26 +1,22 @@
-      SUBROUTINE CCD1_WRIDI( FD, ID, RANK, NOUT, DATA, NREC, NVAL,
-     :                       BUFFER, BLEN, STATUS, x, y )
+      SUBROUTINE CCD1_WRIDI( FD, ID, X, Y, P, NP, N, BUFFER, BLEN,
+     :                       STATUS )
 *+
 *  Name:
 *     CCD1_WRIDI
 
 *  Purpose:
-*     Write identifiers and data values from an array to a list file.
+*     Write identifiers, X, Y and associated data to a list file.
 
 *  Language:
 *     Starlink Fortran 77.
 
 *  Invocation:
-*     CALL CCD1_WRIDI( FD, ID, RANK, NOUT, DATA, NREC, NVAL, BUFFER,
-*                      BLEN, STATUS )
+*     CALL CCD1_WRIDI( FD, ID, X, Y, P, NP, N, BUFFER, BLEN, STATUS )
 
 *  Description:
-*     This routine writes out the ID values from an array in order, and
-*     data values from a two-dimensional array in the order determined
-*     by an accompanying indirection array.  Hence in line I of the
-*     output file will be written the index integer ID( I ), followed
-*     by a list of all the elements in column RANK( I ) of the DATA
-*     array.
+*     This routine writes out a number of data lines to a list file:
+*     an ID number, an X and Y coordinate, and zero or more associated
+*     data values from an array.
 *
 *     If the output buffer is potentially too short to hold all the
 *     values in each column of the array, then a message to this 
@@ -30,20 +26,19 @@
 *  Arguments:
 *     FD = INTEGER (Given)
 *        FIO file descriptor.
-*     ID( NOUT ) = INTEGER (Given)
+*     ID( N ) = INTEGER (Given)
 *        The identifiers for the lines.
-*     RANK( NOUT ) = INTEGER (Given)
-*        An array saying which column of DATA should be output on
-*        which line of the file.
-*     NOUT = INTEGER (Given)
+*     X( N ) = DOUBLE PRECISION (Given)
+*        The X coordinates for the lines.
+*     Y( N ) = DOUBLE PRECISION (Given)
+*        The Y coordinates for the lines.
+*     P( NP, N ) = DOUBLE PRECISION (Given)
+*        The associated data.  On each line I, all the values P( 1, I )
+*        to P( NP, I ) will be written (if there is space).
+*     NP = INTEGER (Given)
+*        The number of additional data items to be written on each line.
+*     N = INTEGER (Given)
 *        The number of lines to write to the output file.
-*     DATA( NREC, NVAL ) = DOUBLE PRECISION (Given)
-*        The array containing the data values to be written to the file.
-*     NREC = INTEGER (Given)
-*        The first dimension of DATA.
-*     NVAL = INTEGER (Given)
-*        The second dimension of DATA; also the number of values to be
-*        written on each line after the identifier.
 *     BUFFER = CHARACTER * ( BLEN ) (Given and Returned)
 *        Buffer to hold an output line.
 *     BLEN = INTEGER (Given)
@@ -77,13 +72,13 @@
       
 *  Arguments Given:
       INTEGER FD
-      INTEGER NREC
-      INTEGER NVAL
-      INTEGER NOUT
-      INTEGER ID( NOUT )
-      INTEGER RANK( NOUT )
+      INTEGER N
+      INTEGER NP
+      INTEGER ID( N )
       INTEGER BLEN
-      DOUBLE PRECISION DATA( NREC, NVAL )
+      DOUBLE PRECISION X( N )
+      DOUBLE PRECISION Y( N )
+      DOUBLE PRECISION P( NP, N )
       
 *  Arguments Given and Returned:
       CHARACTER * ( * ) BUFFER
@@ -105,8 +100,6 @@
       INTEGER NV                 ! Number of values which can be safely output
       CHARACTER * ( VAL__SZD ) WORD ! Buffer to contain values as a string
 
-      double precision x(*), y(*)
-
 *  Local Data:
       DATA GAP / 2 /
       
@@ -116,19 +109,19 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Work out how many columns we can be sure of outputting.
-      NV = MIN( NVAL, ( BLEN - VAL__SZI + GAP ) / ( VAL__SZD + GAP ) )
+      NV = MIN( NP, ( BLEN - VAL__SZI + GAP ) / ( VAL__SZD + GAP ) )
 
 *  If that is fewer than requested, warn that this is the case.
-      IF ( NV .LT. NVAL ) THEN
+      IF ( NV .LT. NP ) THEN
          CALL MSG_SETI( 'NV', NV )
-         CALL MSG_SETI( 'NVAL', NVAL )
+         CALL MSG_SETI( 'NP', NP )
          CALL CCD1_MSG( ' ', '     Warning: can only output ^NV ' //
-     :                  'data columns out of ^NVAL.', STATUS )
+     :                  'data columns out of ^NP.', STATUS )
          CALL CCD1_MSG( ' ', ' ', STATUS )
       END IF
 
 *  Loop for all output lines.
-      DO I = 1, NOUT
+      DO I = 1, N
 
 *  Clear the output buffer.
          BUFFER = ' '
@@ -142,21 +135,25 @@
 *  Increment position within output buffer.
          IAT = MAX( NCHAR, 8 ) + 2
 
-*  Insert the data columns.
+*  Do the same with the X coordinate.
+         CALL CHR_DTOC( X( I ), WORD, NCHAR )
+         IEND = IAT + NCHAR
+         BUFFER( IAT : IEND ) = WORD( 1 : NCHAR )
+         IAT = IAT + MAX( NCHAR, 8 ) + GAP
+
+*  Do the same with the Y coordinate.
+         CALL CHR_DTOC( Y( I ), WORD, NCHAR )
+         IEND = IAT + NCHAR
+         BUFFER( IAT : IEND ) = WORD( 1 : NCHAR )
+         IAT = IAT + MAX( NCHAR, 8 ) + GAP
+
+*  Do the same with the data columns.
          DO J = 1, NV
-            CALL CHR_DTOC( DATA( RANK( I ), J ), WORD, NCHAR )
+            CALL CHR_DTOC( P( J, I ), WORD, NCHAR )
             IEND = IAT + NCHAR
             BUFFER( IAT : IEND ) = WORD( 1 : NCHAR )
             IAT = IAT + MAX( NCHAR, 8 ) + GAP
          END DO
-         call chr_dtoc( x(i), word, nchar )
-         iend = iat + nchar
-         buffer( iat: iend ) = word( 1:nchar )
-         iat = iat + max( nchar, 8 ) + gap
-         call chr_dtoc( y(i), word, nchar )
-         iend = iat + nchar
-         buffer( iat: iend ) = word( 1:nchar )
-         iat = iat + max( nchar, 8 ) + gap
 
 *  Now write the buffer to file.
          CALL FIO_WRITE( FD, BUFFER( 1 : CHR_LEN( BUFFER ) ), STATUS )
