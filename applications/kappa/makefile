@@ -2023,8 +2023,8 @@ do_deinstall:
 #
 #  Remove the package version file in the installation directory.
 	- if test -n "version.dat"; then \
-             rm -f $(INSTALL_BIN)/version.dat ;\
-           else :; 
+           rm -f $(INSTALL_BIN)/version.dat ;\
+        else :; fi
 #
 #  Deinstall the package startup file.  Since it will have been edited
 #  during installation, we remove the installed copy, if present, and
