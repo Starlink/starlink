@@ -160,6 +160,37 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/Compression.java:7: package org.apache.tools.bzip2 does not exist
   [javadoc] import org.apache.tools.bzip2.CBZip2InputStream;
   [javadoc]                               ^
+  [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/view/JELRowReader.java:3: cannot resolve symbol
+  [javadoc] symbol  : class DVMap 
+  [javadoc] location: package jel
+  [javadoc] import gnu.jel.DVMap;
+  [javadoc]                ^
+  [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/view/JELRowReader.java:24: cannot resolve symbol
+  [javadoc] symbol  : class DVMap 
+  [javadoc] location: class uk.ac.starlink.table.view.JELRowReader
+  [javadoc] public class JELRowReader extends DVMap {
+  [javadoc]                                   ^
+  [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/view/PlotWindow.java:21: package ptolemy.plot does not exist
+  [javadoc] import ptolemy.plot.Plot;
+  [javadoc]                     ^
+  [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/view/PlotWindow.java:22: package ptolemy.plot does not exist
+  [javadoc] import ptolemy.plot.PlotBox;
+  [javadoc]                     ^
+  [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/view/PlotWindow.java:176: cannot resolve symbol
+  [javadoc] symbol  : class PlotBox 
+  [javadoc] location: class uk.ac.starlink.table.view.PlotWindow
+  [javadoc]     private PlotBox makePlot( PlotState state ) {
+  [javadoc]             ^
+  [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/view/SyntheticColumn.java:5: cannot resolve symbol
+  [javadoc] symbol  : class DVMap 
+  [javadoc] location: package jel
+  [javadoc] import gnu.jel.DVMap;
+  [javadoc]                ^
+  [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/view/SyntheticRowSubset.java:5: cannot resolve symbol
+  [javadoc] symbol  : class DVMap 
+  [javadoc] location: package jel
+  [javadoc] import gnu.jel.DVMap;
+  [javadoc]                ^
   [javadoc] Standard Doclet version 1.4.1
 
   [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/Compression.java:141: cannot resolve symbol
@@ -430,6 +461,8 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/IteratorRowSequence.java:29: warning - Tag @link: can't find PackagedIOException in uk.ac.starlink.table.IteratorRowSequence
   [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/IteratorRowSequence.java:29: warning - Tag @link: can't find PackagedIOException in uk.ac.starlink.table.IteratorRowSequence
   [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/StarTableOutput.java:29: warning - Tag @link: reference not found: uk.ac.starlink.mirage.MirageTableWriter
+  [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/view/JELRowReader.java:68: warning - Tag @see: reference not found: JEL manual
+  [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/view/JELRowReader.java:166: warning - Tag @see: reference not found: JEL manual
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/uk/ac/starlink/soap/AppAxisServerFactory.html...
   [javadoc] /apps/cvsbuild/java/source/soapserver/build/java/uk/ac/starlink/soap/AppAxisServerFactory.java:28: Tag @see: Malformed: Plot, PlotConfigurator
   [javadoc] /apps/cvsbuild/java/source/tamfits/build/java/nom/tam/util/BufferedDataInputStream.java:349: warning - @returns is an unknown tag.
@@ -439,10 +472,10 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstDoubleField.java:29: warning - Tag @link: reference not found: Frame
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/stylesheet.css...
   [javadoc] 1 error
-  [javadoc] 92 warnings
+  [javadoc] 101 warnings
 
 export-full-docs:
       [zip] Building zip: /apps/cvsbuild/export/starjava-docs.zip
 
 BUILD SUCCESSFUL
-Total time: 5 minutes 41 seconds
+Total time: 1 minute 2 seconds
