@@ -63,6 +63,7 @@
 *     12 May 93 : V1.7-2  Fixed bug displaying double precision data (DJA)
 *      4 May 94 : V1.7-3  Upgraded i.o to use AIO (DJA)
 *     24 Nov 94 : V1.8-0  Now use USI for user interface (DJA)
+*      8 Feb 95 : V1.8-1  Fixed bug in multi-page output (DJA)
 *
 *    Type definitions :
 *
