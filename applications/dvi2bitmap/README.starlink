@@ -1,0 +1,31 @@
+
+Random notes about building and packaging
+-----------------------------------------
+
+Bootstrapping
+
+The Makefile, the configure script, and config.h are _not_ under
+version control, since they are generated files.  If you're starting
+from a freshly checked-out set, then you need to make the configure
+script, then the makefile, using 
+
+    make -f Makefile.in configure
+    ./configure ... (configure options: see documentation)
+
+In general, use the standard makefile (Makefile) for building when
+within this directory.
+
+Packaging
+
+It's dangerous (read, `confusing') to put too much cleverness in the
+packaging makefile, Makefile.starlink.  The only thing that makefile
+should be used for within the CVS directory is to package up the
+source in an export_source bundle.  However, there are some things
+which have to be done by hand.
+
+The packaging makefile regards the file dvi2bitmap_source.tar to be a
+_source_ file, and will not automatically generate it.  You have to do
+that by hand, using
+
+    make -f Makefile.in dvi2bitmap.tar
+    ./mk dvi2bitmap_source.tar
