@@ -332,7 +332,7 @@ F77_SUBROUTINE(doplrg)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
                         CHARACTER(VIEW), REAL(PLO), REAL(PHI), LOGICAL(NEWCM),
                         LOGICAL(XHAIR), CHARACTER(XHRCOL), LOGICAL(STHLP),
                         INTEGER(IGRPS), INTEGER(SSIZE), LOGICAL(SKYOFF),
-                        INTEGER(SKYPAR), INTEGER(STATUS) 
+                        INTEGER(SKYPAR), LOGICAL(STOKES), INTEGER(STATUS) 
                         TRAIL(SI) TRAIL(LOGFIL) TRAIL(BADCOL)
                         TRAIL(CURCOL) TRAIL(REFCOL) TRAIL(SELCOL)
                         TRAIL(VIEW) TRAIL(XHRCOL) ){
@@ -420,6 +420,9 @@ F77_SUBROUTINE(doplrg)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
 *        Should the sky background be removed from the output images?
 *     SKYPAR = INTEGER (Given and Returned)
 *        No. of fitting parameters along each axis of a sky surface.
+*     STOKES = LOGICAL (Given)
+*        Produces output Stokes parameters? (otherwise output intensity
+*        images are created).
 *     STATUS = INTEGER (Given and Returned)
 *        The inherited global status.
 
@@ -462,6 +465,7 @@ F77_SUBROUTINE(doplrg)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
    GENPTR_INTEGER(SSIZE)
    GENPTR_LOGICAL(SKYOFF)
    GENPTR_LOGICAL(STHLP)
+   GENPTR_LOGICAL(STOKES)
    GENPTR_INTEGER(STATUS)
 
    Tcl_Interp *interp = NULL;
@@ -495,17 +499,27 @@ F77_SUBROUTINE(doplrg)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
       SetVar( interp, "in_list", name, TCL_LEAVE_ERR_MSG | TCL_LIST_ELEMENT | TCL_APPEND_VALUE, STATUS );
    }
 
+/* If producing Stokes parameters as output, store the name of the output
+   data set in Tcl variable "stokes". */
+   if( F77_ISTRUE(*STOKES) ) {
+      name = GetName( *IGRP2, 1, STATUS );
+      SetVar( interp, "stokes", name, TCL_LEAVE_ERR_MSG | TCL_LIST_ELEMENT | TCL_APPEND_VALUE, STATUS );
+
+/* Otherwise, we are producing alighned output intensity images. */
+   } {
+
 /* Store the name of the O-ray output images in Tcl variable "o_list". */
-   for( i = 1; i <= size && *STATUS == SAI__OK; i++ ){
-      name = GetName( *IGRP2, i, STATUS );
-      SetVar( interp, "o_list", name, TCL_LEAVE_ERR_MSG | TCL_LIST_ELEMENT | TCL_APPEND_VALUE, STATUS );
-   }
+      for( i = 1; i <= size && *STATUS == SAI__OK; i++ ){
+         name = GetName( *IGRP2, i, STATUS );
+         SetVar( interp, "o_list", name, TCL_LEAVE_ERR_MSG | TCL_LIST_ELEMENT | TCL_APPEND_VALUE, STATUS );
+      }
 
 /* Do the same for the E-ray output images (if in dual-beam mode). */
-   if( *IGRP3 != *IGRP2 ) {
-      for( i = 1; i <= size && *STATUS == SAI__OK; i++ ){
-         name = GetName( *IGRP3, i, STATUS );
-         SetVar( interp, "e_list", name, TCL_LEAVE_ERR_MSG | TCL_LIST_ELEMENT | TCL_APPEND_VALUE, STATUS );
+      if( *IGRP3 != *IGRP2 ) {
+         for( i = 1; i <= size && *STATUS == SAI__OK; i++ ){
+            name = GetName( *IGRP3, i, STATUS );
+            SetVar( interp, "e_list", name, TCL_LEAVE_ERR_MSG | TCL_LIST_ELEMENT | TCL_APPEND_VALUE, STATUS );
+         }
       }
    }
 

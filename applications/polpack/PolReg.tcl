@@ -351,29 +351,47 @@
 
             if { $argc > 2 } {
                set e_list [lindex "$argv" 2]
-           }
+            }
          }
       }
    }
 
    set IMSECS $in_list
    set nin [llength $IMSECS]
-   set nout(O) [llength $o_list]
-   if { [info exists e_list] } {
-      set nout(E) [llength $e_list]
-      set DBEAM 1
-      set DBEAM_STATE normal
-      set DBEAM_TEXT "Dual-beam"
-   } {
-      set DBEAM 0
-      set DBEAM_STATE disabled
-      set DBEAM_TEXT "Single-beam"
-   }
+
+# If the variable o_list is not defined, we are producing Stokes
+# parameters as output, instead of intensity images. First get the
+# names of any output intensity images.
+   if { [info exists o_list] } {
+      set STOKES 0
+
+      set nout(O) [llength $o_list]
+      if { [info exists e_list] } {
+         set nout(E) [llength $e_list]
+         set DBEAM 1
+         set DBEAM_STATE normal
+         set DBEAM_TEXT "Dual-beam"
+      } {
+         set DBEAM 0
+         set DBEAM_STATE disabled
+         set DBEAM_TEXT "Single-beam"
+      }
 
 # Abort if the number of output images does not equal the number of input
 # images.
-   if { $nin != $nout(O) || $DBEAM && $nin != $nout(E) } {
-      puts "PolReg: No of input and output images are different."
+      if { $nin != $nout(O) || $DBEAM && $nin != $nout(E) } {
+         puts "PolReg: Numbers of input and output images are different."
+         exit 1
+      }
+
+# If we are producing Stokes parameters, set a flag and store the name of
+# the output cube.
+   } elseif { [info exists stokes] } {
+      set STOKES 1   
+      set STKOUT $stokes
+
+   } {
+      puts "PolReg: No name supplied for output data cube."
       exit 1
    }
 
@@ -750,8 +768,16 @@
                                   -selectcolor $RB_COL 
 
 # Store the names of the O and E ray output image for this input image.
-      set OUTIMS($image,O) [lindex $o_list $i]
-      if { $DBEAM } { set OUTIMS($image,E) [lindex $e_list $i] }
+# If these will be the output images, then use the names supplied by the
+# A-task. If they will be temporary files needed only as input to the
+# Stokes parameter calculation, then store temporary names.
+      if { !$STOKES } {
+         set OUTIMS($image,O) [lindex $o_list $i]
+         if { $DBEAM } { set OUTIMS($image,E) [lindex $e_list $i] }
+      } {
+         set OUTIMS($image,O) [UniqueFile]
+         if { $DBEAM } { set OUTIMS($image,E) [UniqueFile] }
+      }
 
 # Update the length of the longest image section and image name.
       set imwid [string length $imsec]

@@ -745,12 +745,20 @@ interface POLREG
       vpath    'PROMPT '
       ppath    'CURRENT,DEFAULT'
       default  '*_A'
-      prompt   'Aligned output images '
+      prompt   'Aligned output intensity images '
+      helpkey  '*'
+   endparameter
+
+   parameter OUTSTK
+      position 2
+      type     LITERAL
+      access   WRITE
+      vpath    'PROMPT '
+      prompt   'Output Stokes parameters'
       helpkey  '*'
    endparameter
 
    parameter OUT_E
-      position 3
       type     LITERAL
       access   WRITE
       vpath    'PROMPT '
@@ -761,7 +769,6 @@ interface POLREG
    endparameter
 
    parameter OUT_O
-      position 2
       type     LITERAL
       access   WRITE
       vpath    'PROMPT '
@@ -812,7 +819,7 @@ interface POLREG
    endparameter
 
    parameter SKYFRAMES
-      position 4
+      position 3
       type     NDF
       access   READ
       vpath    'DEFAULT '
@@ -862,6 +869,16 @@ interface POLREG
       helpkey  '*'
    endparameter
 
+   parameter STOKES
+      type     _LOGICAL
+      access   READ
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  YES
+      prompt   'Produces Stokes parameters as outputs?"
+      helpkey  '*'
+   endparameter
+
    parameter VIEW
       type     _CHAR
       access   UPDATE
@@ -893,6 +910,7 @@ interface POLREG
    endparameter
 
 endinterface
+
 #+
 #  Name:
 #     SEGMENT.IFL

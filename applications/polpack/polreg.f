@@ -58,7 +58,7 @@
 *     the menu bar.
 
 *  Usage:
-*     polreg in out_o out_e [skyframes]
+*     polreg in outstk [skyframes]
 
 *  ADAM Parameters:
 *     BADCOL = LITERAL (Update)
@@ -136,24 +136,33 @@
 *     OEFITTYPE = _INTEGER (Update)
 *        The type of mapping which should be used between O and E rays. See
 *        parameter FITTYPE for a description of the allowed values. [1]
+*     OUTSTK = NDF (Write)
+*        This parameter is only used if parameter STOKES is given a true
+*        value. It is the name of the output cube to create holding the
+*        Stokes parameters calculated from the input images.
 *     OUT = LITERAL (Write)
-*        A list of the names of the output images to create in single-beam
-*        mode. These should correspond one-for-one to the input images
-*        supplied using parameter IN. This parameter is only accessed if
-*        parameter DUALBEAM is given a false value. Note, the output images 
-*        cannot be specified within the GUI.
+*        This parameter is only used if parameters STOKES and DUALBEAM
+*        are both given false values. It is a list of the names of the 
+*        output images to create in single-beam mode, holding aligned
+*        intensity values from the input images. These should correspond 
+*        one-for-one to the input images supplied using parameter IN. 
+*        Note, the output images cannot be specified within the GUI. 
 *     OUT_E = LITERAL (Write)
-*        A list of the names of the E-ray output images to create in dual-beam
-*        mode. These should correspond one-for-one to the input images
-*        supplied using parameter IN. This parameter is only accessed if
-*        parameter DUALBEAM is given a true value. Note, the output images 
-*        cannot be specified within the GUI.
+*        This parameter is only used if parameter STOKES is given a false 
+*        value, and DUALBEAM is given a true value. It is a list of the 
+*        names of the E-ray output images to create in dual-beam mode, 
+*        holding aligned E-ray intensity values from the input images. These 
+*        should correspond one-for-one to the input images supplied using 
+*        parameter IN. Note, the output images cannot be specified within the 
+*        GUI. 
 *     OUT_O = LITERAL (Write)
-*        A list of the names of the O-ray output images to create in dual-beam
-*        mode. These should correspond one-for-one to the input images
-*        supplied using parameter IN. This parameter is only accessed if
-*        parameter DUALBEAM is given a true value. Note, the output images 
-*        cannot be specified within the GUI.
+*        This parameter is only used if parameter STOKES is given a false 
+*        value, and DUALBEAM is given a true value. It is a list of the 
+*        names of the O-ray output images to create in dual-beam mode, 
+*        holding aligned O-ray intensity values from the input images. These 
+*        should correspond one-for-one to the input images supplied using 
+*        parameter IN. Note, the output images cannot be specified within the 
+*        GUI. 
 *     PERCENTILES( 2 ) = _REAL (Update)
 *        The percentiles that define the scaling limits for the displayed
 *        images. For example, [25,75] would scale between the quartile 
@@ -213,6 +222,13 @@
 *        displayed in a box underneath the displayed image. The contents
 *        of this box can be selected using the "Options" menu in the GUI.
 *        [TRUE]
+*     STOKES = _LOGICAL (Read)
+*        If a true value is supplied, then the output will be specified
+*        by parameter OUTSTK and will be a single cube holding Stokes 
+*        parameters. Otherwise, the outputs will be specified either by
+*        parameter OUT (in single-beam mode), or OUT_E and OUT_O (in
+*        dual-beam mode), and will consist of sets of images holding 
+*        aligned intensity values. [TRUE]
 *     VIEW = LITERAL (Update)
 *        This controls how images are placed within the image display
 *        area of the GUI when a new image is selected using the "Images"
@@ -343,6 +359,7 @@
      :        SAREA,             ! Is the status area to be displayed?
      :        SKYOFF,            ! Should a sky background be subtracted?
      :        STHLP,             ! Display a WWW browser at start-up?
+     :        STOKES,            ! Produce Stokes parameters?
      :        XHAIR              ! Is a cross-hair required?
       REAL
      :        PERCNT(2),         ! Display percentiles
@@ -391,12 +408,24 @@
          END IF
       END DO
 
+*  See if we should produce aligned intensity images or Stokes parameters.
+      CALL PAR_GET0L( 'STOKES', STOKES, STATUS )
+
 *  See if we should run in dual-beam mode.
       CALL PAR_GET0L( 'DUALBEAM', DBEAM, STATUS )
 
 *  Get the output images. How this is done depends on whether we are
-*  in single or dual beam mode.
-      IF ( DBEAM ) THEN
+*  in single or dual beam mode, and whether we are producing Stokes
+*  parameters or aligned intensity images. FOr STokes parameters a 
+*  single output stack is required.
+      IF ( STOKES ) THEN
+         CALL WRNDF( 'OUTSTK', GRP__NOID, 1, 1, ' ', IGRP2, SIZEO,
+     :               STATUS )
+         IGRP3 = IGRP2
+
+* Now deal with cases where we are creating aligned intensity images from
+* dual-beam data.
+      ELSE IF ( DBEAM ) THEN
 
 *  Get a group containing the names of the output NDFs to hold the
 *  registered O-ray areas. Base modification elements on the group 
@@ -517,7 +546,7 @@
      :             SI, FIT, OEFIT, LOGFIL( : CHR_LEN( LOGFIL ) ),
      :             BADCOL, CURCOL, REFCOL, SELCOL, VIEW, PERCNT(1),
      :             PERCNT(2), NEWCM, XHAIR, XHRCOL, STHLP, 
-     :             IGRPS, SSIZE, SKYOFF, SKYPAR, STATUS )
+     :             IGRPS, SSIZE, SKYOFF, SKYPAR, STOKES, STATUS )
 
 *  The various options values may have been altered by the use of the 
 *  "Options" menu in the GUI. Write them back to the parameter file in case.
