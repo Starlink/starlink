@@ -1411,7 +1411,7 @@ dnl in fact an intrinsic function.
               ])
    AC_LANG_POP([Fortran])
 ])# AC_FC_CHECK_INTRINSICS
-
+    
 
 # AC_FC_RECL_UNIT
 # ----------------
@@ -1511,6 +1511,60 @@ AC_DEFUN([AC_FC_RECL_UNIT],
           fi
 ])# AC_FC_RECL_UNIT
 
+
+dnl  FIXME: Move/copy this macro to the dev-nxg-20040116-add-fpp-support branch
+# AC_FC_CHECK_HEADERS(include-file...)
+# ------------------------------------
+# Fortran analogue of AC_CHECK_HEADERS, though it only takes the
+# first argument, giving the list of include files to check.  For
+# each include file, defines HAVE_include-file (in all capitals) if the
+# include file is found.  Respects the current value of FCFLAGS.
+AC_DEFUN([AC_FC_CHECK_HEADERS],
+   [AC_REQUIRE([AC_PROG_FC])dnl
+    m4_ifval([$1], , [AC_FATAL([$0: missing argument])])dnl
+    AC_LANG_PUSH([Fortran])
+    AC_FOREACH([IncludeName],
+              dnl In case the user is mad, escape impossible names
+              m4_bpatsubst(m4_toupper([$1]), [[^a-zA-Z0-9_ ]], [_]),
+              [AC_CACHE_CHECK([whether ${FC} supports include ]IncludeName,
+                              [ac_cv_fc_has_]IncludeName,
+                              [AC_COMPILE_IFELSE([AC_LANG_PROGRAM([],[
+      include 'IncludeName'
+      i=0
+])],
+                               [ac_cv_fc_has_]IncludeName=yes,
+                               [ac_cv_fc_has_]IncludeName=no)])
+               if test $ac_cv_fc_has_[]IncludeName = yes; then
+                   AC_DEFINE([HAVE_]IncludeName, 1,
+                             [Define to 1 if the we have Fortran include ]IncludeName)
+               fi
+              ])
+    AC_LANG_POP([Fortran])
+])# AC_FC_CHECK_HEADERS
+
+dnl  FIXME: Move/copy this macro to the dev-nxg-20040116-add-fpp-support branch
+# AC_FC_HAVE_PERCENTVAL
+# ---------------------
+# Test whether the FC compiler has the %VAL extension.  If so, define
+# the preprocessor variable HAVE_PERCENTVAL to be 1.  If the compiler
+# has %VAL, it presumably has %LOC also.  If 
+AC_DEFUN([AC_FC_HAVE_PERCENTVAL],
+         [AC_REQUIRE([AC_PROG_FC])dnl
+          AC_CACHE_CHECK([whether ${FC} has the %VAL extension],
+                         [ac_cv_fc_have_val],
+                         [AC_LANG_PUSH([Fortran])
+                          AC_COMPILE_IFELSE([AC_LANG_PROGRAM([],[
+      i=1
+      call t1(%valx(i))
+])],
+                          ac_cv_fc_have_val=yes,
+                          ac_cv_fc_have_val=no)
+                          AC_LANG_POP([Fortran])])
+          if test $ac_cv_Fc_have_val = yes; then
+              AC_DEFINE([HAVE_PERCENTVAL], 1,
+                        [Define to 1 if the Fortran compiler supports the VAX %VAL and %LOC extensions])
+          fi
+])# AC_FC_HAVE_PERCENTVAL
 
 # -------------------------------------- #
 # Feature tests for Preprocessed Fortran #
